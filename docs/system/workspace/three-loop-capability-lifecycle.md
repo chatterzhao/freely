@@ -1,6 +1,9 @@
 # Three-Loop Capability Lifecycle
 
-本文件是 Freely whole-app lifecycle / logic 的唯一细节真源；未来必须持续只用这 sequenceDiagram 图表形式表达 three-loop 真相，不允许在图表之外再增加章节、表格或补充性文本说明。
+本文件是 Freely whole-app lifecycle / logic 的唯一细节真源。
+
+> **注意**: Mermaid 时序图已不反映 chat-inbox 架构（chat 不再直接写 `docs/issues/` 而是走 `.freely/chat-inbox.db`）。
+> 图的语义保真度已下降，计划后续用 SVG 重绘。当前以 `docs/system/workspace/ibm-framework.md` 和 `docs/pre-brainstorms/20260429-2040--chat-inbox-sqlite/brainstorms.md` 为准。
 
 凡是会改变 three-loop routing、loop placement、completion / verification / cleanup / recovery judgment 的实现、prompt、agent、skill 或高层文档，在修改前都必须先阅读并理解本文件；若语义变化，必须同步检查并按需更新本文件，再更新引用面。
 

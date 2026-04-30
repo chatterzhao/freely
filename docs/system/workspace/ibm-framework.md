@@ -6,6 +6,9 @@ Freely doc-loop 的治理框架。每个工作项经历两个 IBM 阶段——B1
 
 本文件是 IBM Framework 的能力真源。Freely 开发自身项目时吃自己的狗粮，外部项目由 Freely 托管时同样以此框架推进。执行路由（auto/dev loop）见 `docs/system/workspace/three-loop-capability-lifecycle.md`，治理规则见 `docs/LAWS.md` §2。
 
+> **注意**: 以下 ASCII 图不反映 chat-inbox 架构（chat 不再直接写 `docs/issues/`）。
+> 计划后续用 SVG 重绘。
+
 ## 总览
 
 ```
@@ -36,7 +39,8 @@ Freely doc-loop 的治理框架。每个工作项经历两个 IBM 阶段——B1
 
 **信号进入 B1_IBM**：
 - 平台 issue（github/gitee）：`task-source-scan.py` 下载到本地 `docs/issues/`。raw issue 的 `restart_point=pre_brainstorm`，lead agent 路由到 B1_IBM
-- chat 插话：`freely chat` → `chat-routing skill` 判断属于哪个 issue → 创建 raw issue 或已有 issue 的 comment → 写入 `docs/issues/`。新 raw issue 进入 scan → B1_IBM
+- chat 插话：`freely chat` → `chat-routing skill` 判断属于哪个 issue → 写入 `.freely/chat-inbox.db`（git-ignored 暂存，不污染 protected branch）。`task-source-scan` 扫出未消费的 chat，AI 判断后创建工位（wt-create 自动 materialize 到 `docs/issues/`）或追加评论
+- chat 写入时若有对应工位，则直接同步到 worktree 的 `docs/issues/`，跳过暂存
 - 其他信号（runtime anomaly、review 发现）：通过 chat 插话进入，同上
 - AI **永远不直接读平台内容**——只读本地 `docs/issues/` 中的副本。平台内容由 scan 脚本下载一次
 - 详细路由见 `context-source-skill` 和 `docs/system/workspace/three-loop-capability-lifecycle.md`
@@ -168,18 +172,21 @@ chat 插话 / 平台扫描
 
 每条 `freely chat` 必须落地为 issue 或已有 issue 的评论：
 
-- 如果消息归属于已有 issue：`--issue <id>`，评论追加到该 issue
-- 如果是新话题：`--new-issue`，创建 raw issue
+- 所有 chat 先写入 `.freely/chat-inbox.db`（SQLite，git-ignored），不直接写 `docs/issues/`
+- chat 写入时若有对应工位，直接同步到 worktree 的 `docs/issues/`，标记 consumed=1
+- 无工位时留在 DB（consumed=0），由 task-source-scan 扫出供 AI 判断
+- 如果是新话题（`--new-issue`）：AI 创建工位 → wt-create 自动 materialize 到 worktree 的 `docs/issues/`
+- 如果是已有 issue 的评论（`--issue <id>`）：AI 在 worktree 中追加评论
+- 噪声（如"你好"）：标记 consumed=-1 丢弃
 - 如果 `--issue raw-xxx` 但该 raw 已被 promote（`status=absorbed`）：自动路由到 `absorbed_into` 指向的 I-*
 - skill 只做路由，不做价值判断。最终 promote/absorb/drop 由 B1_IBM 决定
-- 即使内容看似无价值，也创建 raw issue——B1 标记 `dropped` 并写清 `drop_reason`
 
 ### issue 生命周期中的 sync 触发点
 
 | 事件 | sync 动作 | 触发机制 |
 |------|----------|---------|
-| chat 插话 | `issue-sync comment` | `freely chat` 内部调用 |
-| raw issue 创建 | `issue-sync create` | `freely chat --new-issue` 内部调用 |
+| chat 插话（写入 chat-inbox） | `issue-sync comment` | AI 消费后 |
+| raw issue 创建（wt-create materialize） | `issue-sync create` | wt-create 内部调用 |
 | candidate promoted → I-* | `issue-sync promote` | B1_IBM 收口时脚本调用 |
 | phase_state 变更 | `issue-sync update` | daemon worker 完成状态更新后 |
 | merge 到 develop | `issue-sync close`（关闭已完成的 I-*） | `merge-guarded` post-merge hook |
