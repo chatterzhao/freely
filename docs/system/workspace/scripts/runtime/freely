@@ -7308,6 +7308,20 @@ ensure_install_lifecycle_allowlist_file() {
 EOF
 }
 
+# Lazy-init freely.db on startup so existing projects don't need manual re-init.
+ensure_freely_db() {
+  local project="$1"
+  local freely_db="$project/.freely/freely.db"
+  local chat_inbox_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/chat-inbox.py"
+  local session_store_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-store.py"
+  if [[ -f "$chat_inbox_py" && ! -f "$freely_db" ]]; then
+    python3 "$chat_inbox_py" init --db "$freely_db" >/dev/null 2>&1 || true
+  fi
+  if [[ -f "$session_store_py" ]]; then
+    python3 "$session_store_py" init --db "$freely_db" >/dev/null 2>&1 || true
+  fi
+}
+
 preemption_state_file() {
   local project="$1"
   printf '%s/run/preemption-state.env\n' "$(state_dir "$project")"
@@ -17478,6 +17492,7 @@ start_project_runtime() {
   fi
   append_runtime_event "$project" "start_project_runtime_after_load_config" \
     "entrypoint_mode=$entrypoint_mode"
+  ensure_freely_db "$project"
   register_project_in_registry "$project"
   append_runtime_event "$project" "start_project_runtime_after_registry" \
     "entrypoint_mode=$entrypoint_mode"
