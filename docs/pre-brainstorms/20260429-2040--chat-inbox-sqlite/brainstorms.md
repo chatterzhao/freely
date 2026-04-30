@@ -2,45 +2,47 @@
 
 ## 为什么需要 chat-inbox
 
-`freely chat --new-issue` / `--issue <id>` 是人机插话入口。插话时还没有 worktree。
+`freely chat --new-issue` / `--issue <id>` 是人机插话入口。
+之前直接写 `docs/issues/`，落在 daemon 所在分支（develop，protected），污染受保护分支。
 
-如果 chat 直接写 `docs/issues/`，文件落在 daemon 所在分支（develop，protected），
-每次插话都在污染受保护分支。
+## 核心思路：chat-inbox 是 fallback，不是默认
 
-解决方案：chat 先写入 git-ignored 的 `.freely/chat-inbox.db`（SQLite 暂存），
-scan 消费后进入 worktree 的 `docs/issues/`（Git 跟踪）。
-
-## chat-inbox.db 的定位
-
-**故意不健壮**：
-- 只存 `consumed=0` 的 chat。消费后原样进入 `docs/issues/`
-- 换电脑丢失 pending chat 可接受（插话实时交互，重发即可）
-- chat ID 不被溯源——内容消费后已在 issue 里
-
-## 用户接口：不变
+插话时先判断目标 issue 是否已有 worktree：
 
 ```
-freely chat --new-issue "消息"       # 不变
-freely chat --issue <id> "评论"      # 不变
-freely intake chat ...               # 不变
+freely chat --new-issue "msg"
+  → 新 issue，必然没有 worktree
+  → chat-inbox（暂存，等 scan 消费后建工位）
+
+freely chat --issue xxx "评论"
+  → 扫描 worktree 列表，查找 docs/issues/xxx/issue.md
+     ├─ 找到 → 直接追加评论到 worktree（不经过 chat-inbox）
+     └─ 未找到 → chat-inbox（暂存，等 scan 消费）
 ```
 
-内部唯一变化：`_write_chat_to_issue` 不再写 `docs/issues/`，
-改为调用内部命令写入 SQLite。
+chat-inbox 只处理两种 fallback 场景：
+1. 新建 issue（天然没有工位）
+2. 评论一个找不到工位的 issue（可能已 merge 或工位已删除）
 
-## 内部命令（非用户面）
+## 工位扫描逻辑
 
+```bash
+# 在 _write_chat_to_issue 的评论分支中
+_find_issue_in_worktrees() {
+  local target="$1"  # raw-xxx 或 I-xxx
+  local worktrees_root="$project/../freely-worktrees"
+
+  for wt in "$worktrees_root"/*/; do
+    [[ -d "$wt" ]] || continue
+    [[ -f "$wt/docs/issues/$target/issue.md" ]] || continue
+    echo "$wt"
+    return 0
+  done
+  return 1
+}
 ```
-chat-inbox init                       # freely init 调用，建表
-chat-inbox add --type ... --msg ...   # _write_chat_to_issue 调用
-chat-inbox list [--limit 50]          # task-source-scan 调用
-chat-inbox consume <id>               # task-source-scan 消费后标记
-chat-inbox show <id>                  # debug 用
-```
 
-这些命令不暴露给用户。`freely chat` 参数和行为完全不变。
-
-## SQLite Schema
+## SQLite Schema（仅 fallback 用）
 
 ```sql
 CREATE TABLE IF NOT EXISTS chats (
@@ -58,52 +60,60 @@ CREATE TABLE IF NOT EXISTS chats (
 CREATE INDEX IF NOT EXISTS idx_consumed ON chats(consumed);
 ```
 
+## 写入逻辑（_write_chat_to_issue 改动）
+
+```
+--new-issue:
+  → chat-inbox add（always，新 issue 无工位）
+
+--issue xxx:
+  → _find_issue_in_worktrees(xxx)
+     ├─ 找到 worktree
+     │    → 直接 cat >> worktree/docs/issues/xxx/issue.md（不经过 chat-inbox）
+     │    → 如果是 raw-* 且已 absorbed，重定向到 I-*
+     │
+     └─ 未找到
+          → chat-inbox add --type issue-id:xxx（fallback）
+```
+
+## 消费逻辑（task-source-scan.py，不变）
+
+chat-inbox 中的 pending 项由 scan 消费，与之前设计一致。
+
 ## 重构范围
 
 ### 新增
 | 文件 | 职责 |
 |------|------|
-| `chat-inbox.py` | `init_db()` `add_chat()` `list_pending()` `mark_consumed()` `show_chat()` |
+| `chat-inbox.py` | SQLite 操作：init/add/list/consume/show |
 
 ### 修改
 | 调用方 | 改动 |
 |--------|------|
-| `freely init` | 调用 `chat-inbox init` |
-| `_write_chat_to_issue` — new-issue 分支 | `mkdir docs/issues/`+`cat > issue.md` → `chat-inbox add --type new-issue` |
-| `_write_chat_to_issue` — 评论分支 | `cat >> issue.md` → `chat-inbox add --type issue-id:xxx` |
-| `task-source-scan.py` | 新增 `scan_chat_inbox()`，调 `list` + `consume` |
+| `freely init` | 调 `chat-inbox init` 建表 |
+| `_write_chat_to_issue` — new-issue | → `chat-inbox add` |
+| `_write_chat_to_issue` — 评论 | → 先扫工位，找到直接写；未找到 → `chat-inbox add` |
+| `task-source-scan.py` | 新增 `scan_chat_inbox()` |
 
 ### 不变
 | 组件 | 原因 |
 |------|------|
-| `freely chat` CLI 参数 | 用户接口不变 |
+| `freely chat` CLI | 用户接口不变 |
 | `scan_raw_issues` / `scan_linked_issues` | 继续扫 `docs/issues/` |
 | `governance-merge-gate` | 验证 `docs/issues/` |
 | AI agent | 只读 scan JSON + `docs/issues/` |
-| `issue-sync` | 从 `docs/issues/` 同步平台 |
+| `issue-sync` | 从 `docs/issues/` 同步 |
 | B1→B2 全流程 | unchanged |
 
 ## 完整链路
 
 ```
-freely chat --new-issue "msg"               # 用户接口不变
-  → _write_chat_to_issue
-    → chat-inbox add --type new-issue ...   # 内部：写入 SQLite
-  → develop 零变更 ✓
+freely chat --new-issue "msg"
+  → chat-inbox add（无工位，暂存）
+  → scan → AI 建工位 → docs/issues/raw-{id}/issue.md
 
-freely chat --issue raw-xxx "评论"          # 用户接口不变
-  → _write_chat_to_issue
-    → chat-inbox add --type issue-id:xxx .. # 内部：写入 SQLite
-  → develop 零变更 ✓
-
-task-source-scan.py scan_chat_inbox()
-  → chat-inbox list                        # SELECT WHERE consumed=0
-  → 按 chat_type 组装 source JSON
-  → chat-inbox consume <id>                # UPDATE consumed=1
-
-AI agent 读 scan JSON
-  → chat_intake source → 创建 worktree
-  → worktree/docs/issues/raw-{id}/issue.md
-
-后续 B1_IBM → B2_IBM → merge → issue-sync → platform（完全不变）
+freely chat --issue raw-xxx "评论"
+  → 扫工位
+     ├─ 找到 → 直接写 worktree/docs/issues/raw-xxx/issue.md
+     └─ 未找到 → chat-inbox add（暂存）
 ```
