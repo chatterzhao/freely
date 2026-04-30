@@ -54,3 +54,11 @@ Also auto-cleans polluted LAST_TOOL_SESSION_ID in session-state.env.
 
 Industry pattern: nginx (PID file validation), PostgreSQL (crash recovery),
 systemd (PIDFile= with automatic cleanup).
+
+## follow-on: 2026-04-30 (3) extended self-heal for acp_bridge
+
+Extended existing startup_self_heal mechanism (not a new function):
+- `acp_bridge` role added to `runtime_pid_file_for_role`, `runtime_pid_valid_for_role`, and `startup_self_heal_clear_stale_pid_files_if_needed`
+- `acp-bridge.sock` cleaned alongside stale bridge PID
+- Cycle-specific failure markers removed on every startup
+- Polluted `LAST_TOOL_SESSION_ID` auto-healed via `is_valid_uuid` check
