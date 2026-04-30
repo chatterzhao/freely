@@ -1317,6 +1317,7 @@ runtime_pid_file_for_role() {
     ai) printf '%s\n' "$(run_dir_for_project "$project")/ai.pid" ;;
     manager_watchdog) printf '%s\n' "$(ensure_manager_watchdog_pid_file "$project")" ;;
     interruption_dispatcher) printf '%s\n' "$(interruption_dispatcher_pid_file "$project")" ;;
+    acp_bridge) printf '%s\n' "$(run_dir_for_project "$project")/acp-bridge.pid" ;;
     *) return 1 ;;
   esac
 }
@@ -1328,6 +1329,7 @@ runtime_pid_valid_for_role() {
     ai) valid_ai_pid_for_project "$project" "$pid" ;;
     manager_watchdog) valid_ensure_manager_watchdog_pid_for_project "$project" "$pid" ;;
     interruption_dispatcher) valid_interruption_dispatcher_pid_for_project "$project" "$pid" ;;
+    acp_bridge) kill -0 "$pid" 2>/dev/null ;;  # alive = valid
     *) return 1 ;;
   esac
 }
@@ -1349,6 +1351,10 @@ clear_stale_runtime_pid_file_if_invalid() {
     return 1
   fi
   rm -f "$pid_file"
+  # ACP bridge owns a Unix socket — clean it alongside the stale PID.
+  if [[ "$role" == "acp_bridge" ]]; then
+    rm -f "$(run_dir_for_project "$project")/acp-bridge.sock"
+  fi
   append_runtime_event "$project" "startup_self_heal_stale_pid_cleared" \
     "trigger=$trigger" \
     "role=$role" \
@@ -1358,7 +1364,7 @@ clear_stale_runtime_pid_file_if_invalid() {
 
 startup_self_heal_clear_stale_pid_files_if_needed() {
   local project="$1" trigger="${2:-runtime_read}" role cleared_any=1
-  for role in supervisor ai manager_watchdog interruption_dispatcher; do
+  for role in supervisor ai acp_bridge manager_watchdog interruption_dispatcher; do
     if clear_stale_runtime_pid_file_if_invalid "$project" "$role" "$trigger"; then
       cleared_any=0
     fi
@@ -1409,6 +1415,23 @@ startup_self_heal_machine_state_if_needed() {
   [[ -n "$project" && -d "$project" ]] || return 0
   startup_self_heal_clear_stale_pid_files_if_needed "$project" "$trigger" || true
   manager_worker_launch_state_refresh_for_status "$project" >/dev/null 2>&1 || true
+
+  # Clean cycle-specific failure markers (always stale on fresh start).
+  local run_dir; run_dir="$(run_dir_for_project "$project")"
+  rm -f "$run_dir/tool-runtime-failure.marker" \
+        "$run_dir/network-failure.marker" \
+        "$run_dir/bridge-lost.marker"
+
+  # Auto-heal polluted session IDs in session-state.env.
+  local state_file="$run_dir/session-state.env"
+  if [[ -f "$state_file" ]]; then
+    local last_sid
+    last_sid=$(grep "^LAST_TOOL_SESSION_ID=" "$state_file" 2>/dev/null | cut -d= -f2- | tr -d '"')
+    if [[ -n "$last_sid" ]] && ! is_valid_uuid "$last_sid"; then
+      sed -i '' 's/^LAST_TOOL_SESSION_ID=.*/LAST_TOOL_SESSION_ID=""/' "$state_file"
+    fi
+  fi
+
   if startup_self_heal_should_mark_runtime_down "$project"; then
     stale_launch_state_rc=0
   else
@@ -7319,89 +7342,6 @@ ensure_freely_db() {
   fi
   if [[ -f "$session_store_py" ]]; then
     python3 "$session_store_py" init --db "$freely_db" >/dev/null 2>&1 || true
-  fi
-}
-
-# Self-healing: clean up stale runtime state from crashed previous runs.
-# Industry pattern — nginx, PostgreSQL, systemd all validate PID files on startup
-# and remove lock/socket/pid artifacts whose owning process is dead.
-_cleanup_stale_runtime_state() {
-  local project="$1"
-  local run_dir
-  run_dir="$(run_dir_for_project "$project")"
-
-  # Helper: check if a PID is alive. Returns 0 if alive, 1 if dead.
-  _pid_alive() {
-    local pid="$1"
-    [[ -n "$pid" && "$pid" =~ ^[0-9]+$ ]] || return 1
-    kill -0 "$pid" 2>/dev/null
-  }
-
-  local pid
-
-  # ── AI process ──
-  pid=$(cat "$run_dir/ai.pid" 2>/dev/null || true)
-  if [[ -n "$pid" ]] && ! _pid_alive "$pid"; then
-    log_info "stale ai.pid ($pid) cleaned"
-    rm -f "$run_dir/ai.pid"
-  fi
-
-  # ── ACP bridge (process + socket) ──
-  pid=$(cat "$run_dir/acp-bridge.pid" 2>/dev/null || true)
-  if [[ -n "$pid" ]] && ! _pid_alive "$pid"; then
-    log_info "stale acp-bridge ($pid) cleaned"
-    rm -f "$run_dir/acp-bridge.pid" "$run_dir/acp-bridge.sock"
-  fi
-
-  # ── Supervisor (the control-plane watchdog) ──
-  pid=$(cat "$run_dir/supervisor.pid" 2>/dev/null || true)
-  if [[ -n "$pid" ]] && ! _pid_alive "$pid"; then
-    log_info "stale supervisor.pid ($pid) cleaned"
-    rm -f "$run_dir/supervisor.pid"
-  fi
-
-  # ── Interruption dispatcher ──
-  pid=$(cat "$run_dir/interruption-dispatch.pid" 2>/dev/null || true)
-  if [[ -n "$pid" ]] && ! _pid_alive "$pid"; then
-    log_info "stale interruption-dispatch.pid ($pid) cleaned"
-    rm -f "$run_dir/interruption-dispatch.pid"
-  fi
-
-  # ── Lock files: check holder PID ──
-  if [[ -f "$run_dir/project-start.lock" ]]; then
-    local lock_content lock_pid
-    lock_content=$(cat "$run_dir/project-start.lock" 2>/dev/null || true)
-    lock_pid=$(echo "$lock_content" | grep -oE 'pid=[0-9]+' | cut -d= -f2)
-    if [[ -n "$lock_pid" ]] && ! _pid_alive "$lock_pid"; then
-      log_info "stale project-start.lock ($lock_pid) cleaned"
-      rm -f "$run_dir/project-start.lock"
-    elif [[ -z "$lock_pid" ]]; then
-      # Lock file exists but can't parse PID — stale format
-      rm -f "$run_dir/project-start.lock"
-    fi
-  fi
-
-  # ── Lifecycle trace lock ──
-  pid=$(cat "$run_dir/lifecycle-trace.lock" 2>/dev/null || true)
-  if [[ -n "$pid" ]] && ! _pid_alive "$pid"; then
-    rm -f "$run_dir/lifecycle-trace.lock"
-  fi
-
-  # ── Failure markers (cycle-specific, always stale on fresh start) ──
-  rm -f "$run_dir/tool-runtime-failure.marker"
-  rm -f "$run_dir/network-failure.marker"
-  rm -f "$run_dir/bridge-lost.marker"
-
-  # ── Stale session-state.env session IDs ──
-  # If LAST_TOOL_SESSION_ID is polluted (contains annotations), clear it.
-  local state_file="$run_dir/session-state.env"
-  if [[ -f "$state_file" ]]; then
-    local last_sid
-    last_sid=$(grep "^LAST_TOOL_SESSION_ID=" "$state_file" 2>/dev/null | cut -d= -f2- | tr -d '"')
-    if [[ -n "$last_sid" ]] && ! is_valid_uuid "$last_sid"; then
-      log_info "polluted LAST_TOOL_SESSION_ID cleaned: $last_sid"
-      sed -i '' 's/^LAST_TOOL_SESSION_ID=.*/LAST_TOOL_SESSION_ID=""/' "$state_file"
-    fi
   fi
 }
 
@@ -17576,7 +17516,6 @@ start_project_runtime() {
   append_runtime_event "$project" "start_project_runtime_after_load_config" \
     "entrypoint_mode=$entrypoint_mode"
   ensure_freely_db "$project"
-  _cleanup_stale_runtime_state "$project"
   register_project_in_registry "$project"
   append_runtime_event "$project" "start_project_runtime_after_registry" \
     "entrypoint_mode=$entrypoint_mode"
