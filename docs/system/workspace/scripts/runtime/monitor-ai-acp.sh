@@ -205,10 +205,15 @@ main() {
   }
   [[ -f "$prompt_file" ]] || { echo "[ERROR] prompt file not found: $prompt_file" >&2; exit 1; }
 
-  # Ensure persistent ACP server is running
-  _bridge_ensure_running "$project" || exit 1
-
+  # Load tool launchers FIRST so alias settings (model, API key, base URL)
+  # are applied to the environment BEFORE starting the ACP bridge.
+  # This ensures claude-agent-acp inherits the correct per-alias config,
+  # not the user's interactive shell environment variables.
   _load_tool_launchers || exit 1
+  _apply_tool_alias_settings "$tool"
+
+  # Ensure persistent ACP server is running (inherits env from alias settings)
+  _bridge_ensure_running "$project" || exit 1
 
   # Write own PID as initial AI PID (freely uses this for liveness)
   # The bridge PID is the real AI process handle — written below.
