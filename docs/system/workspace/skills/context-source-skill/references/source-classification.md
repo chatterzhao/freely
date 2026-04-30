@@ -22,7 +22,7 @@
 ## Output hints
 
 - `discovery` 通常先去 `doc-pre-brainstorm-execution`
-- `chat_intake`（来自 chat-inbox.db 的未消费 chat）
+- `chat_intake`（来自 freely.db 的未消费 chat）
   - 仍属于 `discovery`
   - 默认首跳：AI 判断 → 有价值的创建工位（wt-create 自动 materialize），噪声标记 consumed=-1
   - 语义：插话暂存于 SQLite，等待 AI 消费。与 `docs/issues/` 中的 raw issue 不同，chat 尚未进入 IBM 生命周期

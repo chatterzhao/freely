@@ -55,8 +55,8 @@
 ## 执行
 
 路由结果返回后，由 `freely chat` 命令执行实际的写入操作：
-- `action=new_issue` → 写入 `.freely/chat-inbox.db`（SQLite，不污染 protected branch），后续由 AI 创建工位时 wt-create 自动 materialize 到 `docs/issues/`
-- `action=comment` → 写入 `.freely/chat-inbox.db`；有对应工位时直接追加到 worktree 的 `docs/issues/{target}/issue.md`
+- `action=new_issue` → 写入 `.freely/freely.db`（SQLite，不污染 protected branch），后续由 AI 创建工位时 wt-create 自动 materialize 到 `docs/issues/`
+- `action=comment` → 写入 `.freely/freely.db`；有对应工位时直接追加到 worktree 的 `docs/issues/{target}/issue.md`
 
 ## 边界
 

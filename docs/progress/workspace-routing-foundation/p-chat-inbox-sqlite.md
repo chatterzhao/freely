@@ -6,6 +6,15 @@
 - phase_state: `in_dev`
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/chat-inbox-sqlite-20260429`
-- updated_at: `2026-04-29`
+- updated_at: `2026-04-30`
 - session_refs:
   - {tool: ccds, session_id: "20260429-chat-inbox-sqlite", role: "author"}
+  - {tool: ccds, session_id: "20260430-acp-session-store", role: "author", absorbed: true}
+- absorbed_candidates:
+  - `docs/pre-brainstorms/20260430-0000--acp-session-store-and-lifecycle/candidates.md#C-20260430-0000-A`
+
+## 2026-04-30: ACP session-store absorbed
+
+Hotfix absorbed into this issue: session-store.py replaces fragile cycle-log text parsing
+with SQLite-backed session identity. See code-reviews/20260430-acp-session-store-verification.md
+for implementation decision and review evidence.

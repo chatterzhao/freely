@@ -864,9 +864,9 @@ def scan_external_gitee(project: Path) -> tuple[list[dict], dict]:
 
 
 def scan_chat_inbox(project: Path) -> list[dict]:
-    """Scan .freely/chat-inbox.db for unconsumed chat intakes."""
+    """Scan .freely/freely.db chats table for unconsumed chat intakes."""
     items = []
-    db_path = project / ".freely" / "chat-inbox.db"
+    db_path = project / ".freely" / "freely.db"
     if not db_path.is_file():
         return items
     try:

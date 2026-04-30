@@ -85,7 +85,7 @@ _bridge_ensure_running() {
 # ── Error detection ────────────────────────────────────────────────
 
 _detect_acp_failure() {
-  local log_file="$1" failure_marker="$2" network_failure_marker="$3"
+  local log_file="$1" failure_marker="$2" network_failure_marker="$3" bridge_lost_marker="$4"
   [[ -f "$log_file" ]] || return 0
 
   if grep -qE '(Connection refused|Connection reset|TLS|timeout|ECONNREFUSED|ENOTFOUND|ETIMEDOUT|socket hang up|proxy|DNS)' "$log_file" 2>/dev/null; then
@@ -95,23 +95,69 @@ _detect_acp_failure() {
   if grep -qE '(401|402|403|429|Unauthorized|Payment Required|insufficient_quota|rate_limit|quota exceeded|InsufficientBalance)' "$log_file" 2>/dev/null; then
     [[ -n "$failure_marker" ]] && echo "auth_or_rate_limit" > "$failure_marker"
   fi
+
+  # Bridge restart / session lost: session/resume fails with "not found"
+  if grep -qE '(session.*not found|unknown session|no such session|Session not found)' "$log_file" 2>/dev/null; then
+    [[ -n "$bridge_lost_marker" ]] && echo "bridge_session_lost" > "$bridge_lost_marker"
+  fi
 }
 
-# ── Session state ──────────────────────────────────────────────────
+# ── Session state (via session-store.py SQLite) ─────────────────────
 
-_write_acp_session_state() {
-  local project="$1" session_id="$2" log_file="$3" launch_kind="$4"
-  local state_dir="$project/.freely/run"
-  mkdir -p "$state_dir"
-  local state_file="$state_dir/session-state.env"
+_persist_session_to_store() {
+  local project="$1" clean_session_id="$2" tool="$3" launch_kind="$4" resume_mode="$5"
+  local db_path="$project/.freely/freely.db"
+  local session_store_py
+  session_store_py="$(dirname "$0")/session-store.py"
+  if [[ ! -f "$session_store_py" ]]; then
+    echo "[WARN] session-store.py not found, cannot persist session" >&2
+    return 1
+  fi
+  local role="${FREELY_ROLE_HINT:-manager}"
+  python3 "$session_store_py" upsert \
+    --db "$db_path" \
+    --session-id "$clean_session_id" \
+    --project "$project" \
+    --tool "$tool" \
+    --role "$role" \
+    --launch-kind "$launch_kind" \
+    --tool-adapter acp \
+    --resume-mode "${resume_mode:-}" \
+    >/dev/null 2>&1 || {
+      echo "[WARN] session-store.py upsert failed for $clean_session_id" >&2
+      return 1
+    }
+}
 
-  {
-    echo "# ACP session state — $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-    echo "SESSION_ID_CURRENT=$session_id"
-    echo "SESSION_LAUNCH_KIND=$launch_kind"
-    echo "SESSION_ANCHOR_UPDATED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-    echo "AI_TOOL_ADAPTER=acp"
-  } > "$state_file"
+_mark_session_failed() {
+  local project="$1" session_id="$2" error_reason="$3"
+  local db_path="$project/.freely/freely.db"
+  local session_store_py
+  session_store_py="$(dirname "$0")/session-store.py"
+  if [[ ! -f "$session_store_py" ]]; then
+    return 1
+  fi
+  python3 "$session_store_py" complete \
+    --db "$db_path" \
+    --session-id "$session_id" \
+    --status failed \
+    --error-reason "$error_reason" \
+    >/dev/null 2>&1 || true
+}
+
+_mark_session_completed() {
+  local project="$1" session_id="$2"
+  local db_path="$project/.freely/freely.db"
+  local session_store_py
+  session_store_py="$(dirname "$0")/session-store.py"
+  if [[ ! -f "$session_store_py" ]]; then
+    return 1
+  fi
+  python3 "$session_store_py" complete \
+    --db "$db_path" \
+    --session-id "$session_id" \
+    --status completed \
+    >/dev/null 2>&1 || true
 }
 
 # ── Main ───────────────────────────────────────────────────────────
@@ -121,7 +167,7 @@ main() {
   local session_id="" resume_target=""
   local mode="auto" model="" reasoning_effort="" launch_kind="fresh"
   local pid_file="" log_file="" debug_log_file=""
-  local failure_marker_file="" network_failure_marker_file=""
+  local failure_marker_file="" network_failure_marker_file="" bridge_lost_marker_file=""
   local tool_capabilities="" tool_policy=""
   local codex_capability_model="" codex_capability_sandbox="" codex_capability_approval_policy="" codex_capability_cwd_mode=""
 
@@ -142,6 +188,7 @@ main() {
       --debug-log-file) debug_log_file="$2"; shift 2 ;;
       --failure-marker-file) failure_marker_file="$2"; shift 2 ;;
       --network-failure-marker-file) network_failure_marker_file="$2"; shift 2 ;;
+      --bridge-lost-marker-file) bridge_lost_marker_file="$2"; shift 2 ;;
       --tool-capabilities) tool_capabilities="$2"; shift 2 ;;
       --tool-policy) tool_policy="$2"; shift 2 ;;
       --codex-capability-model) codex_capability_model="$2"; shift 2 ;;
@@ -197,9 +244,9 @@ main() {
   # ── Monitor loop (transport monitoring, not AI completion detection) ──
   while kill -0 "$child_pid" 2>/dev/null; do
     # Live failure detection
-    if [[ -n "$failure_marker_file" || -n "$network_failure_marker_file" ]]; then
-      _detect_acp_failure "$log_file" "$failure_marker_file" "$network_failure_marker_file"
-      if [[ -f "$failure_marker_file" || -f "$network_failure_marker_file" ]]; then
+    if [[ -n "$failure_marker_file" || -n "$network_failure_marker_file" || -n "$bridge_lost_marker_file" ]]; then
+      _detect_acp_failure "$log_file" "$failure_marker_file" "$network_failure_marker_file" "$bridge_lost_marker_file"
+      if [[ -f "$failure_marker_file" || -f "$network_failure_marker_file" || -f "$bridge_lost_marker_file" ]]; then
         kill "$child_pid" 2>/dev/null || true
         break
       fi
@@ -213,7 +260,9 @@ main() {
   set -e
 
   # ── Completion detection: stopReason from ACP protocol output ──
-  local session_id_out stop_reason
+  # Line 1 of log = clean UUID (machine-readable), line 2+ = annotated human log.
+  local session_id_clean session_id_out stop_reason
+  session_id_clean=$(head -1 "$log_file" 2>/dev/null | grep -oE '[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}' | head -1)
   session_id_out=$(sed -n 's/^session id: //p' "$log_file" | head -n 1)
   stop_reason=$(grep -o 'stop_reason=[a-z_]*' "$log_file" | head -n 1 | cut -d= -f2)
 
@@ -221,21 +270,46 @@ main() {
     stop_reason="unknown"
   fi
 
-  # Write session state for next cycle's resume
-  if [[ -n "$session_id_out" ]]; then
-    _write_acp_session_state "$project" "$session_id_out" "$log_file" "$launch_kind"
+  # Persist clean session ID to session-store (authoritative source)
+  if [[ -n "$session_id_clean" ]]; then
+    local resume_mode_detected=""
+    if [[ "$launch_kind" == "resume" ]]; then
+      if echo "$session_id_out" | grep -q "(fresh after resume failure)"; then
+        resume_mode_detected="recreated"
+      else
+        resume_mode_detected="native"
+      fi
+    fi
+    _persist_session_to_store "$project" "$session_id_clean" "$tool" "$launch_kind" "$resume_mode_detected"
   fi
 
   # Post-exit failure detection
-  if [[ -n "$failure_marker_file" || -n "$network_failure_marker_file" ]]; then
-    _detect_acp_failure "$log_file" "$failure_marker_file" "$network_failure_marker_file"
+  local failure_detected=""
+  if [[ -n "$failure_marker_file" || -n "$network_failure_marker_file" || -n "$bridge_lost_marker_file" ]]; then
+    _detect_acp_failure "$log_file" "$failure_marker_file" "$network_failure_marker_file" "$bridge_lost_marker_file"
+    if [[ -f "$failure_marker_file" ]]; then
+      failure_detected="auth_or_rate_limit"
+    elif [[ -f "$bridge_lost_marker_file" ]]; then
+      failure_detected="bridge_session_lost"
+    fi
   fi
 
   # Completion verdict: stopReason is the authoritative signal
   if [[ "$stop_reason" == "end_turn" ]]; then
-    echo "[ACP] cycle complete: session=${session_id_out:-unknown} stopReason=end_turn" >&2
+    if [[ -n "$session_id_clean" ]]; then
+      _mark_session_completed "$project" "$session_id_clean"
+    fi
+    echo "[ACP] cycle complete: session=${session_id_clean:-unknown} stopReason=end_turn" >&2
     exit 0
+  elif [[ -n "$failure_detected" ]]; then
+    # Non-recoverable failure: mark session failed so next launch goes fresh
+    if [[ -n "$session_id_clean" ]]; then
+      _mark_session_failed "$project" "$session_id_clean" "$failure_detected"
+    fi
+    echo "[WARN] ACP cycle failed: session=${session_id_clean:-unknown} reason=$failure_detected" >&2
+    exit 1
   else
+    # Network failure or unknown: keep session active for retry
     echo "[WARN] ACP cycle finished with stopReason=$stop_reason (rc=$child_rc)" >&2
     exit 1
   fi
