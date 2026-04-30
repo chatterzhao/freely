@@ -7429,7 +7429,7 @@ develop_push_attempt_reason_from_output() {
   local output="${1:-}"
   if printf '%s\n' "$output" | grep -Eqi 'governance-merge-gate|pretests-gate|pre-push|hook declined|pushes to .* are not allowed'; then
     printf 'push_rejected_by_gate\n'
-  elif printf '%s\n' "$output" | grep -Eqi 'Authentication failed|Permission denied|403|401|denied'; then
+  elif printf '%s\n' "$output" | grep -Eqi 'Authentication failed|Permission denied|\b403\b|\b401\b|denied'; then
     printf 'auth_failure\n'
   elif printf '%s\n' "$output" | grep -Eqi 'remote rejected|protected branch hook declined|non-fast-forward|failed to push some refs'; then
     printf 'remote_rejected\n'

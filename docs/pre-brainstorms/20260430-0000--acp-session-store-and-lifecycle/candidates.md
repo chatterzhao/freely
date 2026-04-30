@@ -33,3 +33,5 @@
 - alias_env_inheritance: `2026-04-30`
 
 - issue_id_date_false_positive: `2026-04-30`
+
+- bridge_pid_after_fork: `2026-04-30`
