@@ -177,17 +177,26 @@ _require_issue_exists() {
   case "$key" in
     raw-*)
       local ts="${key#raw-}"
-      # 1. chat-inbox（new-issue，未消费）
-      if chat-inbox show "$ts" >/dev/null 2>&1; then
-        return 0  # wt-create 创建工位后会 materialize
+      # 1. chat-inbox（new-issue，仅查 consumed=0）
+      if chat-inbox query --id "$ts" --consumed 0 >/dev/null 2>&1; then
+        return 0
       fi
-      # 2. docs/issues/（已有 issue，重新开工）
+      # 2. chat-inbox consumed=1 + docs/issues/ 存在 → 正常
+      if chat-inbox query --id "$ts" --consumed 1 >/dev/null 2>&1; then
+        if [[ -d "$ROOT_DIR/docs/issues/$key" ]]; then
+          return 0
+        fi
+        # consumed=1 但 issue 缺失 → 异常恢复
+        echo "警告: chat $key 已标记消费但 issue 缺失，重置" >&2
+        chat-inbox reset "$ts"  # consumed=0
+        return 0
+      fi
+      # 3. docs/issues/（已有 issue，重新开工）
       if [[ -d "$ROOT_DIR/docs/issues/$key" ]]; then
         return 0
       fi
       ;;
     I-*)
-      # I-* 只查 docs/issues/
       if [[ -d "$ROOT_DIR/docs/issues/$key" ]]; then
         return 0
       fi
@@ -195,7 +204,7 @@ _require_issue_exists() {
   esac
 
   echo "拒绝创建: 未找到 issue $key" >&2
-  echo "  chat-inbox: $(chat-inbox show "${key#raw-}" 2>&1 || echo '无')" >&2
+  echo "  chat-inbox (pending): $(chat-inbox query --id "${key#raw-}" --consumed 0 2>&1 || echo '无')" >&2
   echo "  docs/issues/: 无" >&2
   return 1
 }
@@ -230,3 +239,27 @@ _materialize_chat_if_needed() {
 ```
 
 调用位置：`git worktree add` 成功后，`sync-tooling` 之前。
+
+
+
+## 场景推演（10 个场景全部通过）
+
+| # | 场景 | 结果 |
+|---|------|------|
+| 1 | `--new-issue` → scan → AI → wt-create → materialize | ✓ |
+| 2 | `--issue raw-xxx` 评论，工位存在 | scan 找到工位，AI 追加，consume | ✓ |
+| 3 | `--issue raw-xxx` 评论，无工位，issue 在 develop 已关闭 | orphan, consumed=1 | ✓ |
+| 4 | `--issue raw-xxx` 评论，raw 被 absorb → 重定向 I-* | scan 递归查 I-* 工位 | ✓ |
+| 5 | wt-create I-* 重新开工 | docs/issues/I-* 找到，放行 | ✓ |
+| 6 | 同秒两个 chat | INSERT OR IGNORE + +1s 重试 | ✓ |
+| 7 | materialize 失败（磁盘满等）| 回滚 worktree + branch | ✓ |
+| 8 | AI 拿到 source 但 crash | consumed=0 不变，下次 scan 再出现 | ✓ |
+| 9 | consumed=1 但 docs/issues/ 缺失 | 异常恢复：reset 为 consumed=0 | ✓ |
+| 10 | 分支名无 issue key | 放行，兼容旧命名 | ✓ |
+
+## 不变式
+
+- **develop 零写入**：chat-inbox + wt-create materialize 都不写 develop
+- **consumed 只由 AI 或 wt-create 标记**：scan 永远不标 consumed（orphan 除外）
+- **工位 = issue**：wt-create 强制验证，没有 issue 不能建工位
+- **原子 materialize**：失败回滚，不留半成品工位
