@@ -45,3 +45,12 @@ auto-initialize freely.db on first start after upgrade. No manual re-init needed
 ## verdict
 
 PASS — all 7 success criteria verified, critical regression found and fixed, auto-init added
+
+## follow-on: 2026-04-30 (2) self-healing cleanup
+
+Added `_cleanup_stale_runtime_state()` — validates PID files on startup,
+removes stale lock/socket/pid/marker artifacts whose owning process is dead.
+Also auto-cleans polluted LAST_TOOL_SESSION_ID in session-state.env.
+
+Industry pattern: nginx (PID file validation), PostgreSQL (crash recovery),
+systemd (PIDFile= with automatic cleanup).
