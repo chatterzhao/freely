@@ -23,3 +23,9 @@ for implementation decision and review evidence.
 
 Added ensure_freely_db() lazy-init called from start_project_runtime.
 Existing projects no longer need manual re-init after upgrade.
+
+## 2026-04-30 (3): Self-healing startup cleanup
+
+Added _cleanup_stale_runtime_state() called from start_project_runtime.
+Validates all PID files (supervisor, ai, acp-bridge, interruption-dispatcher),
+removes stale lock/socket/marker files, and auto-cleans polluted session IDs.
