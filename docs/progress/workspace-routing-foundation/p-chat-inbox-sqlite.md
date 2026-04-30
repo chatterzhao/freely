@@ -41,3 +41,5 @@ Extended existing startup_self_heal mechanism (not a new function):
 - self_heal_stale_lock: completed
 
 - acp_bridge_lazy_restart: completed
+
+- acp_resume_evidence_session_store: completed
