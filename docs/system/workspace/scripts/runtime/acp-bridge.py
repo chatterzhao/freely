@@ -83,10 +83,6 @@ class AcpBridge:
             bufsize=1,
             env=env,
         )
-        # Write PID file
-        os.makedirs(_runtime_dir(self.project), exist_ok=True)
-        with open(_pid_file(self.project), "w") as f:
-            f.write(str(os.getpid()))
 
         # Start reader threads
         self.running = True
@@ -504,13 +500,10 @@ def cmd_start(args):
         acp_bin = resolved
 
     bridge = AcpBridge(project, acp_bin, log_file)
-    try:
-        bridge.start_server()
-    except Exception as e:
-        print(f"[ERROR] failed to start ACP server: {e}", file=sys.stderr)
-        return 1
 
-    # Daemonize: fork and run socket server in background
+    # Daemonize: fork and run socket server in background.
+    # start_server() writes the PID file — must happen AFTER fork so the
+    # PID file contains the daemon child PID, not the short-lived parent.
     if not args.foreground:
         pid = os.fork()
         if pid > 0:
@@ -524,7 +517,16 @@ def cmd_start(args):
                 print("[ERROR] bridge failed to start", file=sys.stderr)
                 return 1
 
-    # Child: run socket server
+    # Child (or foreground): update PID file with real process PID,
+    # start the ACP server, and run the socket server.
+    os.makedirs(_runtime_dir(bridge.project), exist_ok=True)
+    with open(_pid_file(bridge.project), "w") as f:
+        f.write(str(os.getpid()))
+    try:
+        bridge.start_server()
+    except Exception as e:
+        print(f"[ERROR] failed to start ACP server: {e}", file=sys.stderr)
+        return 1
     signal.signal(signal.SIGTERM, lambda *_: bridge.stop_server() or sys.exit(0))
     signal.signal(signal.SIGINT, lambda *_: bridge.stop_server() or sys.exit(0))
     run_socket_server(bridge)
