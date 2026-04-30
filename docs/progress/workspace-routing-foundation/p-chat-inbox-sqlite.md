@@ -49,3 +49,5 @@ Extended existing startup_self_heal mechanism (not a new function):
 - acp_permission_fix: completed
 
 - alias_env_inheritance: completed
+
+- auth_regex_fix: completed
