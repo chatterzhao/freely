@@ -35,8 +35,13 @@ The current session ID extraction chain is broken: run-acp-prompt.py outputs ann
 
 ## scope
 
-session-store.py + run-acp-prompt.py + monitor-ai-acp.sh + freely select_launch_kind
+session-store.py + run-acp-prompt.py + monitor-ai-acp.sh + freely select_launch_kind + ensure_freely_db auto-init
+
+## follow-on: 2026-04-30 auto-init
+
+Added `ensure_freely_db()` called from `start_project_runtime` so existing projects
+auto-initialize freely.db on first start after upgrade. No manual re-init needed.
 
 ## verdict
 
-PASS — all 7 success criteria verified, critical regression found and fixed
+PASS — all 7 success criteria verified, critical regression found and fixed, auto-init added
