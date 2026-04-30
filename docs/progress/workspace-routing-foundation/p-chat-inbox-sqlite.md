@@ -18,3 +18,8 @@
 Hotfix absorbed into this issue: session-store.py replaces fragile cycle-log text parsing
 with SQLite-backed session identity. See code-reviews/20260430-acp-session-store-verification.md
 for implementation decision and review evidence.
+
+## 2026-04-30 (2): Auto-init on start
+
+Added ensure_freely_db() lazy-init called from start_project_runtime.
+Existing projects no longer need manual re-init after upgrade.
