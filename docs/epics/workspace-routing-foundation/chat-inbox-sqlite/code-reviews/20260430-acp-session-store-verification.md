@@ -62,3 +62,8 @@ Extended existing startup_self_heal mechanism (not a new function):
 - `acp-bridge.sock` cleaned alongside stale bridge PID
 - Cycle-specific failure markers removed on every startup
 - Polluted `LAST_TOOL_SESSION_ID` auto-healed via `is_valid_uuid` check
+
+## follow-on: 2026-04-30 (4) stale lock cleanup
+
+Added stale `project-start.lock` cleanup in `startup_self_heal_machine_state_if_needed`.
+Lock holder PID is validated; if dead, lock is removed regardless of runtime state.
