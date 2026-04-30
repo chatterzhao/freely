@@ -14440,8 +14440,23 @@ select_launch_kind() {
       acp_has_session="1"
     else
       # Fallback: scan latest cycle log for a session ID
-      local recent_log
-      recent_log=$(ls -t "$logs_dir"/cycle-*.log 2>/dev/null | head -1)
+      # bash 3.2 + pipefail: ls on empty glob triggers fatal exit even
+      # inside $(). Guard the pipeline with a nullglob check first.
+      local recent_log=""
+      local -a _cycle_candidates=()
+      if shopt -s nullglob 2>/dev/null; then
+        _cycle_candidates=("$logs_dir"/cycle-*.log)
+        shopt -u nullglob
+      else
+        local _f
+        for _f in "$logs_dir"/cycle-*.log; do
+          [[ -f "$_f" ]] || continue
+          _cycle_candidates+=("$_f")
+        done
+      fi
+      if [[ ${#_cycle_candidates[@]} -gt 0 ]]; then
+        recent_log=$(ls -t "${_cycle_candidates[@]}" 2>/dev/null | head -1)
+      fi
       if [[ -n "$recent_log" && -f "$recent_log" ]]; then
         local extracted; extracted=$(sed -n 's/^session id: //p' "$recent_log" | head -1)
         if [[ -n "$extracted" ]]; then
@@ -17215,14 +17230,22 @@ resolve_active_supervisor_pid_for_start() {
   RESOLVED_ACTIVE_SUPERVISOR_PID=""
   LAST_ATTACH_REUSE_SUPERVISOR_SOURCE=""
   excluded_pids="$(current_runtime_discovery_excluded_pids_csv)"
+  # Always exclude the current process itself from supervisor discovery.
+  # macOS bash 3.2 lacks BASHPID, so the subshell-based exclusion chain may
+  # not include $$ when the lookup starts from a command-substitution subshell.
+  excluded_pids="${excluded_pids}${excluded_pids:+,}$$"
   if [[ -f "$sup_pid_file" ]]; then
     candidate_pid="$(cat "$sup_pid_file" 2>/dev/null || true)"
-    if valid_supervisor_pid_for_project "$project" "$candidate_pid"; then
+    if [[ "$candidate_pid" == "$$" ]]; then
+      # supervisor.pid points to this process (written by a prior
+      # write_supervisor_identity_truth); skip so we don't self-repair.
+      :
+    elif valid_supervisor_pid_for_project "$project" "$candidate_pid"; then
       LAST_ATTACH_REUSE_SUPERVISOR_SOURCE="supervisor_pid_file"
       RESOLVED_ACTIVE_SUPERVISOR_PID="$candidate_pid"
       return 0
     fi
-    if [[ -n "$candidate_pid" ]]; then
+    if [[ -n "$candidate_pid" && "$candidate_pid" != "$$" ]]; then
       log_warn "ignoring stale supervisor.pid that is not owned by project: $candidate_pid"
       rm -f "$sup_pid_file"
     fi
