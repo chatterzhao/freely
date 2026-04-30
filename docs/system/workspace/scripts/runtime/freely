@@ -1422,6 +1422,15 @@ startup_self_heal_machine_state_if_needed() {
         "$run_dir/network-failure.marker" \
         "$run_dir/bridge-lost.marker"
 
+  # Clean stale project-start.lock if holder PID is dead.
+  if [[ -f "$run_dir/project-start.lock" ]]; then
+    local lock_pid
+    lock_pid=$(grep -oE 'pid=[0-9]+' "$run_dir/project-start.lock" 2>/dev/null | cut -d= -f2)
+    if [[ -z "$lock_pid" ]] || ! kill -0 "$lock_pid" 2>/dev/null; then
+      rm -f "$run_dir/project-start.lock"
+    fi
+  fi
+
   # Auto-heal polluted session IDs in session-state.env.
   local state_file="$run_dir/session-state.env"
   if [[ -f "$state_file" ]]; then
