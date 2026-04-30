@@ -72,3 +72,5 @@ Lock holder PID is validated; if dead, lock is removed regardless of runtime sta
 
 Fixed bridge process keepalive: lazy initialize, auto-restart on death,
 restart race guard. Fresh 5s, resume 2s (cache hit).
+
+## follow-on: 2026-04-30 (6) ACP resume evidence from session-store
