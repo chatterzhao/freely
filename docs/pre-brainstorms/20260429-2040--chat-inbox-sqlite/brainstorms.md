@@ -125,3 +125,108 @@ freely chat --issue raw-xxx "评论"
 
 ### 不变
 `freely chat` CLI、`scan_raw_issues`、`governance-merge-gate`、`issue-sync`、B1→B2
+
+## 实现细节：wt-create 前置检查
+
+### 插入位置
+
+`docs/system/workspace/scripts/worktree/wt-create` L54（base 验证之后，git worktree add 之前）：
+
+```bash
+# L51-54: 验证 base 分支存在
+if ! git show-ref --verify --quiet "refs/heads/$base" ...; then
+  echo "Base branch/ref not found: $base" >&2; exit 1
+fi
+
+# >>> 新增：issue 前置检查 <<<
+_require_issue_exists "$branch" || exit 1
+
+# L56-58: 创建 worktree
+target_path="$(freely_wt_resolve_target_path "$branch")"
+git worktree add -b "$branch" "$target_path" "$base"
+```
+
+### Key 提取逻辑
+
+```bash
+_extract_issue_key() {
+  local branch="$1"
+  # raw-{14位时间戳}: raw-20260429204530
+  if echo "$branch" | grep -qoE 'raw-[0-9]{14}'; then
+    echo "$branch" | grep -oE 'raw-[0-9]{14}' | head -1
+    return 0
+  fi
+  # I-{8位日期}-{4位时间}-{后缀}: I-20260429-2045-A
+  if echo "$branch" | grep -qoE 'I-[0-9]{8}-[0-9]{4}-[A-Z]'; then
+    echo "$branch" | grep -oE 'I-[0-9]{8}-[0-9]{4}-[A-Z]' | head -1
+    return 0
+  fi
+  return 1
+}
+```
+
+### 前置检查函数
+
+```bash
+_require_issue_exists() {
+  local branch="$1"
+  local key
+  key="$(_extract_issue_key "$branch")"
+  [[ -n "$key" ]] || return 0  # 无 key 放行（兼容旧分支名）
+
+  case "$key" in
+    raw-*)
+      local ts="${key#raw-}"
+      # 1. chat-inbox（new-issue，未消费）
+      if chat-inbox show "$ts" >/dev/null 2>&1; then
+        return 0  # wt-create 创建工位后会 materialize
+      fi
+      # 2. docs/issues/（已有 issue，重新开工）
+      if [[ -d "$ROOT_DIR/docs/issues/$key" ]]; then
+        return 0
+      fi
+      ;;
+    I-*)
+      # I-* 只查 docs/issues/
+      if [[ -d "$ROOT_DIR/docs/issues/$key" ]]; then
+        return 0
+      fi
+      ;;
+  esac
+
+  echo "拒绝创建: 未找到 issue $key" >&2
+  echo "  chat-inbox: $(chat-inbox show "${key#raw-}" 2>&1 || echo '无')" >&2
+  echo "  docs/issues/: 无" >&2
+  return 1
+}
+```
+
+### materialize（wt-create 创建工位后立即执行）
+
+```bash
+_materialize_chat_if_needed() {
+  local branch="$1" target_path="$2"
+  local key ts
+  key="$(_extract_issue_key "$branch")"
+  [[ "$key" == raw-* ]] || return 0
+  ts="${key#raw-}"
+
+  # 从 chat-inbox 搬入 worktree
+  if chat-inbox show "$ts" >/dev/null 2>&1; then
+    local issue_dir="$target_path/docs/issues/$key"
+    mkdir -p "$issue_dir"
+    chat-inbox materialize "$ts" "$issue_dir/issue.md"
+    chat-inbox consume "$ts" --materialized-as "$key"
+    echo "materialized: chat-inbox → $issue_dir/issue.md"
+
+    # 同时搬入该 issue 的所有待处理评论
+    chat-inbox query-by-issue "$key" --type comment --pending \
+      | while read -r comment_id; do
+          chat-inbox materialize-comment "$comment_id" "$issue_dir/issue.md"
+          chat-inbox consume "$comment_id"
+        done
+  fi
+}
+```
+
+调用位置：`git worktree add` 成功后，`sync-tooling` 之前。
