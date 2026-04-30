@@ -76,3 +76,8 @@ restart race guard. Fresh 5s, resume 2s (cache hit).
 ## follow-on: 2026-04-30 (6) ACP resume evidence from session-store
 
 ## follow-on: 2026-04-30 (7) ACP no in-memory fallback
+
+## follow-on: 2026-04-30 (8) ACP permission mode fix
+Root cause: --permission-mode bypassPermissions requires --allow-dangerously-skip-permissions
+to take effect on child claude process. Without it, Claude CLI silently falls back to default mode.
+Fix: call session/set_mode bypassPermissions after session/new in bridge + run-acp-prompt.py direct mode.
