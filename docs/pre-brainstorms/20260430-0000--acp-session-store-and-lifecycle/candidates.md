@@ -25,3 +25,5 @@
 - promotion_gate: `governance-merge-gate`
 - open_questions: []
 - next_action: `已吸收到 chat-inbox-sqlite issue，同仓库合并。`
+
+- stale_lock_cleanup: `2026-04-30`
