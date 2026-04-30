@@ -10,6 +10,8 @@ from typing import Dict, List, Optional, Set
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../../"))
 USE_STAGED_VIEW = False
+USE_RANGE_VIEW = False
+RANGE_SOURCE_REF = ""
 IMPLEMENTATION_DECISION_NOTE_FIELDS = (
     "decision",
     "why_this",
@@ -211,10 +213,28 @@ def staged_path_exists(rel_path: Optional[str]) -> bool:
     return result.returncode == 0
 
 
+def range_path_exists(rel_path: Optional[str]) -> bool:
+    if not rel_path or not RANGE_SOURCE_REF:
+        return False
+    result = subprocess.run(
+        ["git", "cat-file", "-e", f"{RANGE_SOURCE_REF}:{rel_path}"],
+        cwd=ROOT_DIR,
+        text=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    return result.returncode == 0
+
+
 def read_repo_text(rel_path: str) -> str:
     full_path = os.path.join(ROOT_DIR, rel_path)
     if USE_STAGED_VIEW and staged_path_exists(rel_path):
         return git("show", f":{rel_path}")
+    if os.path.isfile(full_path):
+        with open(full_path, "r", encoding="utf-8") as handle:
+            return handle.read()
+    if USE_RANGE_VIEW and RANGE_SOURCE_REF and range_path_exists(rel_path):
+        return git("show", f"{RANGE_SOURCE_REF}:{rel_path}")
     with open(full_path, "r", encoding="utf-8") as handle:
         return handle.read()
 
@@ -223,6 +243,7 @@ def path_exists(rel_path: Optional[str]) -> bool:
     return bool(rel_path) and (
         os.path.isfile(os.path.join(ROOT_DIR, rel_path))
         or (USE_STAGED_VIEW and staged_path_exists(rel_path))
+        or (USE_RANGE_VIEW and range_path_exists(rel_path))
     )
 
 
@@ -570,7 +591,7 @@ def candidate_has_canonical_owner_line(
 
 
 def main() -> int:
-    global USE_STAGED_VIEW
+    global USE_STAGED_VIEW, USE_RANGE_VIEW, RANGE_SOURCE_REF
     parser = argparse.ArgumentParser(description="Develop-merge governance gate for C/M/I materialization.")
     parser.add_argument("--staged", action="store_true", help="Validate the staged merge result.")
     parser.add_argument("--range", help="Validate changed governance artifacts in the given git revision range.")
@@ -578,6 +599,9 @@ def main() -> int:
     parser.add_argument("--source-branch", default="", help="Source branch for guarded merge verification.")
     args = parser.parse_args()
     USE_STAGED_VIEW = bool(args.staged)
+    if args.range:
+        USE_RANGE_VIEW = True
+        RANGE_SOURCE_REF = args.range.split("...")[-1].split("..")[-1]
 
     changed_paths = changed_paths_from_args(args)
     candidate_paths: Set[str] = {p for p in changed_paths if p.startswith("docs/pre-brainstorms/") and p.endswith("/candidates.md")}

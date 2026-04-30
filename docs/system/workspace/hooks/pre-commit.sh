@@ -29,6 +29,25 @@ _scan_staged_for_secrets() {
     esac
     for pattern in "${patterns[@]}"; do
       if grep -qE "$pattern" "$file" 2>/dev/null; then
+        # Check for false positives: file paths in .md docs
+        # (e.g. task-source-scan-*) can match sk-* key patterns.
+        # If every match is inside backtick-quoted markdown, skip.
+        local false_positive=0
+        if [[ "$file" == *.md ]]; then
+          local matches matched_text
+          matches="$(grep -oE "$pattern" "$file" 2>/dev/null || true)"
+          false_positive=1
+          while IFS= read -r matched_text; do
+            [[ -n "$matched_text" ]] || continue
+            if ! grep -qE "\`[^\`]*${matched_text}[^\`]*\`" "$file" 2>/dev/null; then
+              false_positive=0
+              break
+            fi
+          done <<< "$matches"
+        fi
+        if [[ "$false_positive" -eq 1 ]]; then
+          continue
+        fi
         echo "[SECURITY] Possible secret detected in: $file"
         echo "  Pattern matched: $pattern"
         found=1
