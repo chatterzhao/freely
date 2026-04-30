@@ -29,3 +29,11 @@ Existing projects no longer need manual re-init after upgrade.
 Added _cleanup_stale_runtime_state() called from start_project_runtime.
 Validates all PID files (supervisor, ai, acp-bridge, interruption-dispatcher),
 removes stale lock/socket/marker files, and auto-cleans polluted session IDs.
+
+## 2026-04-30 (4): Extend startup self-heal for acp_bridge
+
+Extended existing startup_self_heal mechanism (not a new function):
+- acp_bridge role added to PID validation loop
+- Socket cleanup alongside stale bridge PID
+- Marker file cleanup on every start
+- Polluted session ID auto-heal
