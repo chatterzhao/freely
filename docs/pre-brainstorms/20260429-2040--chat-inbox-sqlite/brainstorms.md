@@ -3,123 +3,112 @@
 ## 为什么需要 chat-inbox
 
 `freely chat --new-issue` / `--issue <id>` 是人机插话入口。
-插话发生时，还没有对应的 feature worktree——工位是 daemon 后续根据 scan 结果才创建的。
+插话发生时还没有对应的 feature worktree。
 
-如果 chat 直接写入 `docs/issues/`，文件就落在当前分支上。
+如果 chat 直接写入 `docs/issues/`，文件就落在 daemon 所在分支上。
 daemon 运行在 develop（protected branch），每次插话都在污染受保护分支。
 
 所以需要一个**暂存区**：chat 先落地到 git-ignored 的 SQLite，
-等 scan 消费后，再搬迁到 worktree 的 `docs/issues/` 下进入 Git 跟踪。
+scan 消费后搬迁到 worktree 的 `docs/issues/` 进入 Git 跟踪。
 
-```
-chat → .freely/chat-inbox.db (git-ignored, 暂存)
-     → task-source-scan 消费
-     → worktree/docs/issues/ (git 跟踪, canonical)
-     → issue-sync → GitHub/Gitee 平台 issue
-```
+## chat-inbox.db 的定位
 
-`docs/issues/` 是 canonical 真相源的原因：
-- Git 跟踪，门禁可审计
-- AI agent 直接读文件，命中 prompt cache，无需 API/CLI 调用
-- 平台 issue 是从这里 sync 出去的副本
+**故意设计为不健壮**。原因：
+- 它只存未消费的 chat（`consumed=0`）。消费后内容原样进入 `docs/issues/`
+- `docs/issues/` 是 Git 跟踪的 canonical 真相源，换电脑不会丢
+- 每次 scan 只看 `consumed=0`，数据量极小
+- 没有跨阶段溯源需求——chat ID 不需要被其他组件引用
+- 换电脑丢失 pending chat 是可接受的（插话本身是实时交互，用户会重发）
 
 ## ID 设计
 
 纯 UTC 时间戳 `YYYYMMDDHHMMSS`，如 `20260429204530`。
-
-- 直接用 UTC，不翻译、不组合、不做时区转换
-- 永不重复（同一秒内两次插话概率极低，INSERT OR IGNORE +1s 重试即可）
-- DB 内无前缀。`raw-` / `chat-` 前缀是 scan 消费时根据 `chat_type` 组装的展示层逻辑
+- 不翻译、不组合、不做时区转换
+- DB 内无前缀。`raw-` / `chat-` 前缀仅 scan 消费时根据 `chat_type` 组装
 
 ## SQLite Schema
 
 ```sql
 CREATE TABLE IF NOT EXISTS chats (
     id INTEGER PRIMARY KEY,              -- UTC YYYYMMDDHHMMSS
-    chat_type TEXT NOT NULL,             -- 'new-issue' | 'issue-id:raw-xxx' | 'issue-id:I-xxx'
+    chat_type TEXT NOT NULL,             -- 'new-issue' | 'issue-id:xxx'
     author TEXT NOT NULL DEFAULT 'human',
     channel TEXT NOT NULL DEFAULT 'chat',
     message TEXT NOT NULL,
-    consumed INTEGER NOT NULL DEFAULT 0, -- 0=未消费, 1=已消费
+    consumed INTEGER NOT NULL DEFAULT 0,
     created_at TEXT NOT NULL,
     session_refs TEXT DEFAULT '[]',
     intake_id TEXT,
-    materialized_as TEXT                 -- 消费后产物引用（issue ID 或 worktree 路径）
+    materialized_as TEXT
 );
-
 CREATE INDEX IF NOT EXISTS idx_consumed ON chats(consumed);
 ```
 
-- `id` 纯 UTC 时间戳，无时区歧义
-- `consumed` 整数 0/1，`WHERE consumed=0` 索引扫描
-- `materialized_as` 记录消费产物，用于审计追踪
+## 重构范围
 
-## 写入（freely chat）
+### 新增
 
-```
-freely chat --new-issue "消息"
-  → INSERT INTO chats (id={UTC_TS}, chat_type='new-issue', message='...')
-  → develop 零文件变更 ✓
+| 文件 | 职责 |
+|------|------|
+| `docs/system/workspace/scripts/runtime/chat-inbox.py` | SQLite 操作模块：init_db(), insert_chat(), get_pending(), mark_consumed() |
+| （在 `freely init` 中调用） | 初始化 chat-inbox.db 表结构 |
 
-freely chat --issue raw-20260401-1200 "评论"
-  → INSERT INTO chats (id={UTC_TS}, chat_type='issue-id:raw-20260401-1200', ...)
-  → develop 零文件变更 ✓
-```
+### 修改
 
-## 消费（task-source-scan.py）
+| 文件 | 改动 |
+|------|------|
+| `freely` runtime `_write_chat_to_issue` | `docs/issues/` 文件写入 → `chat_inbox.insert_chat()` |
+| `freely` runtime `freely init` | 调用 `chat_inbox.init_db()` |
+| `task-source-scan.py` | 新增 `scan_chat_inbox()`，调用 `get_pending()` |
 
-```
-SELECT * FROM chats WHERE consumed=0 ORDER BY id ASC LIMIT 50
+### 不变
 
-对每条 pending：
+| 组件 | 原因 |
+|------|------|
+| `scan_raw_issues` / `scan_linked_issues` | 继续扫 `docs/issues/`，chat 消费后已在那里 |
+| `governance-merge-gate` GATE 6.2/6.3 | 验证 `docs/issues/` 下的 C/M/I 链 |
+| AI agent (lead-agent, context-source-skill) | 只读 scan JSON + `docs/issues/` |
+| `issue-sync` | 从 `docs/issues/` 同步到平台 |
+| B1_IBM → B2_IBM 全流程 | unchanged |
 
-  chat_type='new-issue'
-    → 组装 source_ref = "intake://raw-{id}"
-    → source_type='chat_intake', restart_point='pre_brainstorm'
-    → next_action='Create worktree, materialize as docs/issues/raw-{id}/issue.md'
-    → UPDATE consumed=1
-
-  chat_type='issue-id:raw-xxx'
-    → 查找 docs/issues/raw-xxx/issue.md
-       ├─ 找到且未关闭
-       │    → source_type='chat_comment'
-       │    → next_action='Append comment to raw-xxx'
-       │    → UPDATE consumed=1
-       │
-       ├─ status=absorbed → 读 absorbed_into → 重定向到 I-*
-       │    → 追加 comment 到 I-* issue
-       │    → UPDATE consumed=1, materialized_as='{I-*}'
-       │
-       └─ 未找到或已关闭
-            → source_type='chat_orphan'
-            → UPDATE consumed=1（避免死循环扫描）
-
-  chat_type='issue-id:I-xxx'
-    → 同上逻辑
-```
-
-## 消费后的完整链路
+## 完整链路
 
 ```
-chat-inbox.db (consumed=1)
-     ↓ AI agent 读 scan JSON，创建 worktree
-worktree/docs/issues/raw-{id}/issue.md  (git 跟踪)
-     ↓ AI agent B1_IBM → B2_IBM → merge to develop
-develop/docs/issues/I-{id}-A/issue.md   (canonical)
-     ↓ issue-sync
-GitHub/Gitee platform issue              (外部同步)
+freely init
+  → chat_inbox.init_db()                    # 建表
+
+freely chat --new-issue "msg"
+  → chat_inbox.insert_chat(type='new-issue') # SQLite INSERT
+  → develop 零变更 ✓
+
+task-source-scan.py scan_chat_inbox()
+  → chat_inbox.get_pending()                 # SELECT WHERE consumed=0
+  → 按 chat_type 组装 source
+  → chat_inbox.mark_consumed(id)             # UPDATE consumed=1
+
+AI agent 读 scan JSON
+  → 看到 chat_intake source
+  → 创建 worktree
+  → 在 worktree 中写 docs/issues/raw-{id}/issue.md
+
+后续 B1_IBM → B2_IBM → merge to develop → issue-sync → platform
+  （完全不变）
 ```
 
-## 角色边界
+## 消费分支逻辑（task-source-scan.py 内）
 
-| 组件 | 职责 | 接触什么 |
-|------|------|---------|
-| `freely chat` | 写入 chat 记录 | SQLite |
-| `task-source-scan` | 消费 + 标记 + 组装 source | SQLite + docs/issues/ |
-| AI agent | 读 scan JSON，创建 worktree，B1_IBM | scan JSON + docs/issues/ |
-| `issue-sync` | 本地→平台同步 | docs/issues/ |
+```
+chat_type='new-issue'
+  → source_ref = "intake://raw-{id}"
+  → restart_point='pre_brainstorm'
+  → mark_consumed(id)
 
-AI 完全不接触 SQLite。它只读 `docs/issues/` 下的文件——直接文件读取，命中 prompt cache，不经过 API 或 CLI。
+chat_type='issue-id:xxx'
+  → 查 docs/issues/xxx/issue.md
+     ├─ 找到且未关闭 → source_type='chat_comment' → mark_consumed
+     ├─ absorbed → 重定向到 I-* → 追加评论 → mark_consumed
+     └─ 未找到/已关闭 → source_type='chat_orphan' → mark_consumed
+```
 
 ## 旧 intake 不迁移
 

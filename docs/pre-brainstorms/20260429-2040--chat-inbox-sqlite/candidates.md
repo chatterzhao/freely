@@ -5,10 +5,9 @@
 - title: `SQLite chat-inbox staging for protected-branch chat intake`
 - status: `proposed`
 - scope: |
-  1. `.freely/chat-inbox.db` — SQLite，id=UTC时间戳，consumed=0/1
-  2. `freely chat` → INSERT，不写 `docs/issues/`
-  3. `task-source-scan.py` → SELECT WHERE consumed=0 → 消费 → UPDATE consumed=1
-  4. 消费后进入 `docs/issues/`（git 跟踪）→ AI 读文件 → issue-sync 推平台
+  **新增**: `chat-inbox.py` 模块（init/insert/query/consume）
+  **修改**: `_write_chat_to_issue` → SQLite 写入, `freely init` → 建表, `task-source-scan.py` → 新增 scan_chat_inbox
+  **不变**: scan_raw_issues, scan_linked_issues, governance-merge-gate, AI agent, issue-sync, B1/B2 全流程
 - priority: `P0`
 - type: `architecture`
 - milestone: `M-20260306-workspace-routing-foundation`
@@ -18,9 +17,10 @@
   - {tool: ccds, session_id: "20260429-chat-inbox-sqlite", role: "author"}
 - acceptance_criteria:
   - `freely chat` 不污染 develop
-  - SQLite `WHERE consumed=0` 索引扫描 O(log n)
-  - 消费后 issue 进入 `docs/issues/`，Git 可跟踪
-  - raw→I absorb 重定向正确
+  - `freely init` 自动建表
+  - 消费后 chat 原样进入 `docs/issues/`，Git 可跟踪
+  - raw→I absorb 评论重定向正确
+  - 已有组件（gate/AI/sync）零改动
 - promotion_gate: `governance-merge-gate`
 - open_questions: []
-- next_action: `Confirm design, promote to B2_IBM implementation.`
+- next_action: `Confirm scope, promote to B2_IBM.`
