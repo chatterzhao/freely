@@ -4,101 +4,56 @@
 
 `freely chat` 直接写 `docs/issues/` 污染 develop（protected branch）。
 
-## 核心设计
+## 设计审查（全局推演）
 
-### 1. 统一先写 DB
+### 审查 1：consumed 标记时机 — BUG
 
-```
-freely chat（--new-issue / --issue，不做任何工位判断）
-  → chat-inbox add（SQLite INSERT，10ms）
-  → touch intake.pending 信号文件
-  → develop 零变更
-```
+原设计：scan 对 `new-issue` 直接 `mark consumed=1` 再放入 sources。
+问题：AI 拿到 source 后可能 crash、context loss、被更高优先级任务抢占。chat 已标记 consumed 但从未 materialize，永久丢失。
 
-### 2. 事件触发消费
+**修复**：`new-issue` 不在 scan 时标记 consumed。scan 只读 consumed=0，放入 sources，**不改状态**。
+AI 成功创建 worktree + 写入 `docs/issues/raw-{id}/issue.md` 后，调 `chat-inbox consume <id>` 完成标记。
+scan 每次都会看到同一个 pending chat，直到 AI 处理掉。AI 需去重（同 source_ref 出现多次则跳过）。
 
-已有基础设施：`intake.pending` 信号文件 + `interruption_dispatcher` watch 循环。
+### 审查 2：评论直接写 develop — BUG
 
-```
-freely chat → SQLite INSERT → touch intake.pending
-  → interruption_dispatcher 检测到信号文件
-    → ensure_interruption_dispatch_once()
-      → scan_chat_inbox()  ← 消费
-```
+原设计：`issue-id:xxx` 未找到 worktree 时，查 develop 上的 issue 并 `cat >>` 追加评论。
+问题：develop 是 protected branch。`cat >>` 同样是污染。
 
-不是每 10s 轮询，是有信号才动作。
+**修复**：消费脚本**永远不写 develop**。对 develop 上的 issue：
+- 已 merge 且 phase_state 完成 → `chat_orphan`（issue 已关闭，让 AI 决定是否需要 reopen）
+- 已 merge 且 phase_state 未完成 → `chat_orphan`（异常状态，让 AI 判断）
 
-### 3. 工位名含 issue ID
+### 审查 3：消费脚本写 worktree 的竞态 — RISK
 
-当前工位名：`20260429-feature-chat-inbox-sqlite`（日期+分支名）
-改进后：`20260429-raw-20260429204530-feature-fix-bug`（日期+issueID+分支名）
+原设计：`cat >> worktree/docs/issues/xxx/issue.md`。
+问题：worktree 可能正被 AI 修改同一文件，`cat >>` 在外部追加可能造成冲突或 dirty state。
 
-```
-AI 创建工位时：
-  wt-create feature/raw-{ts}-{slug} --base develop
-  → worktree: {date}-raw-{ts}-feature-{slug}
+**修复**：评论也走 scan sources，不直接写文件。
+- `issue-id:xxx` + 找到活跃 worktree → `source_type='chat_comment'`，放入 sources，AI 在 worktree 上下文中追加
+- 这样评论在 AI 的正常工作流中处理，无外部写入竞态
 
-scan 查找工位时：
-  find worktrees-root -maxdepth 1 -name "*raw-{ts}*"
-  → O(1) 定位
-```
+### 审查 4：同秒碰撞 — BUG
 
-AI agent 在 B1_IBM 阶段创建工位时，自然知道 issue ID，
-工位名包含 issue ID 是举手之劳。
+两个 chat 在同一秒到达 → 第二个 INSERT 因 PRIMARY KEY(UTC秒) 冲突失败。
 
-## 消费路由（scan_chat_inbox 内）
+**修复**：`INSERT OR IGNORE`，冲突时 +1 秒重试，最多 3 次。
 
-```
-SELECT * FROM chats WHERE consumed=0
+### 审查 5：created_at 冗余
 
-对每条 pending chat：
+`id` 已是 UTC 时间戳。`created_at` 完全冗余。
 
-  chat_type='new-issue'
-    → source_type='chat_intake', restart_point='pre_brainstorm'
-    → next_action='AI creates worktree named with raw-{id}'
-    → mark consumed=1
+**修复**：删除 `created_at` 字段。
 
-  chat_type='issue-id:xxx'
-    → find worktrees-root/*xxx*/docs/issues/xxx/issue.md
-       ├─ 找到 worktree 且 phase_state 未关闭
-       │    → cat >> 追加评论到该 worktree 的 issue.md
-       │    → mark consumed=1
-       │
-       ├─ 找到 worktree 但已关闭
-       │    → source_type='chat_orphan'
-       │    → mark consumed=1
-       │
-       ├─ 未找到 worktree → 查 develop/docs/issues/xxx/
-       │    ├─ 找到（已 merge）且未关闭
-       │    │    → cat >> 追加评论
-       │    │    → mark consumed=1
-       │    │
-       │    ├─ raw-xxx 被 absorb → 读 absorbed_into → 重定向到 I-*
-       │    │    → 递归查找 I-* 的 worktree
-       │    │    → 追加评论
-       │    │    → mark consumed=1
-       │    │
-       │    └─ 全没找到或已关闭
-       │         → source_type='chat_orphan'
-       │         → mark consumed=1
-       │
-       └─ 注意：不区分"已 merge 删除"和"从未建工位"
-           因为对评论投递而言结果一样——找不到可写的目标 issue
-           统一标 orphan，让 AI 决定去向
-```
+### 审查 6：信号文件清理
 
-## 为什么这样设计
+chat 被消费完后，`intake.pending` 文件不删除，dispatcher 下次还会触发空扫。
 
-| 问题 | 方案 |
-|------|------|
-| 写入时不知道工位状态 | 不判断，全写 DB |
-| 写入时竞态 | scan 消费时有全量上下文 |
-| 工位已 merge 删除 vs 从未建 | 对评论投递结果一样，统一处理 |
-| 如何找工位 | 工位名含 issue ID，find 一行 |
-| 消费触发 | 信号文件，事件驱动 |
-| 消费不及时 | 信号触发 dispatcher，秒级响应 |
+**修复**：`scan_chat_inbox()` 结尾检查 `SELECT COUNT(*) WHERE consumed=0`，为 0 则 `rm intake.pending`。
 
-## SQLite Schema
+## 最终设计
+
+### SQLite Schema
 
 ```sql
 CREATE TABLE IF NOT EXISTS chats (
@@ -107,49 +62,109 @@ CREATE TABLE IF NOT EXISTS chats (
     author TEXT NOT NULL DEFAULT 'human',
     channel TEXT NOT NULL DEFAULT 'chat',
     message TEXT NOT NULL,
-    consumed INTEGER NOT NULL DEFAULT 0,
-    created_at TEXT NOT NULL,
+    consumed INTEGER NOT NULL DEFAULT 0, -- 0=pending, 1=done (AI 标记)
     session_refs TEXT DEFAULT '[]',
     intake_id TEXT,
-    materialized_as TEXT
+    materialized_as TEXT                 -- AI 填写：产物 issue ID 或 worktree 路径
 );
 CREATE INDEX IF NOT EXISTS idx_consumed ON chats(consumed);
 ```
 
+### 写入（freely chat）
+
+```
+freely chat --new-issue / --issue <id>
+  → chat-inbox add（INSERT OR IGNORE, +1s retry）
+  → touch intake.pending
+  → develop 零变更
+```
+
+### 消费路由（scan_chat_inbox，由 interruption_dispatcher 触发）
+
+```
+SELECT * FROM chats WHERE consumed=0
+
+对每条：
+
+  chat_type='new-issue'
+    → source_type='chat_intake'
+    → restart_point='pre_brainstorm'
+    → next_action='Create worktree named with raw-{id}, materialize issue'
+    → 不标记 consumed（AI 处理后才标记）
+
+  chat_type='issue-id:xxx'
+    → find worktrees-root/*xxx*/docs/issues/xxx/issue.md
+       ├─ 找到且 phase_state 未关闭
+       │    → source_type='chat_comment'
+       │    → next_action='Append comment to xxx in worktree {path}'
+       │    → 不标记 consumed（AI 处理后才标记）
+       │
+       ├─ raw-xxx 被 absorb → 读 absorbed_into 得到 I-*
+       │    → 同上，递归查 I-* 的 worktree
+       │
+       └─ 未找到 worktree 或已关闭
+            → source_type='chat_orphan'
+            → 标记 consumed=1（无法处理，交给 AI 判断去向）
+
+结尾：SELECT COUNT(*) WHERE consumed=0，为 0 则 rm intake.pending
+```
+
+### AI 处理后的收尾
+
+AI 在 worktree 中完成处理后：
+```
+# new-issue 被 materialize 后
+chat-inbox consume <id> --materialized-as raw-{id}
+
+# 评论被追加后
+chat-inbox consume <id> --materialized-as {issue-id}
+```
+
+### 完整链路
+
+```
+freely chat --new-issue "msg"
+  → chat-inbox add + touch intake.pending
+  → dispatcher 触发 scan_chat_inbox
+    → source_type='chat_intake' 放入 scan sources（consumed 仍为 0）
+  → AI 读 scan → 建 worktree 20260429-raw-{id}-feature-{slug}
+  → AI 写 worktree/docs/issues/raw-{id}/issue.md
+  → AI 调 chat-inbox consume <id>（consumed=1）
+
+freely chat --issue raw-xxx "评论"
+  → chat-inbox add + touch intake.pending
+  → dispatcher 触发 scan_chat_inbox
+    → find worktrees-root/*raw-xxx*
+       ├─ 找到活跃工位 → source_type='chat_comment'（consumed 仍为 0）
+       │    → AI 读 scan → 在 worktree 中追加评论
+       │    → AI 调 chat-inbox consume <id>
+       │
+       └─ 未找到/已关闭 → source_type='chat_orphan'（consumed=1）
+            → AI 读 scan → 决定 reopen 或 drop
+```
+
+### 核心原则
+
+| 原则 | 说明 |
+|------|------|
+| scan 不直接写文件 | 避免 develop 污染、worktree 竞态 |
+| scan 不标记 consumed | AI 确认处理后才标记，防止丢失 |
+| 写 develop 是唯一红线 | scan 永远不 touch develop |
+| consumed 由 AI 标记 | AI 完成 materialize/comment 后调 CLI |
+| 信号文件及时清理 | 无 pending 就 rm，避免空扫 |
+
 ## 重构范围
 
 ### 新增
-| 文件 | 职责 |
-|------|------|
-| `chat-inbox.py` | init / add / list / consume / show |
+`chat-inbox.py` — init / add / list / consume / show
 
 ### 修改
 | 位置 | 改动 |
 |------|------|
 | `freely init` | 调 `chat-inbox init` |
-| `_write_chat_to_issue` | 两个分支都改为 `chat-inbox add` + touch signal |
-| `ensure_interruption_dispatch_once` | 新增 `scan_chat_inbox()` 调用 |
-| `task-source-scan.py` | 新增 `scan_chat_inbox()`，含完整路由 |
+| `_write_chat_to_issue` | 两个分支 → `chat-inbox add` + touch signal |
+| `ensure_interruption_dispatch_once` | 新增 `scan_chat_inbox()` |
+| `task-source-scan.py` | 新增 `scan_chat_inbox()`，只读不写 |
 
 ### 不变
-`freely chat` CLI、`scan_raw_issues`、`governance-merge-gate`、AI agent、`issue-sync`、B1→B2
-
-## 完整链路
-
-```
-freely chat --new-issue "msg"
-  → chat-inbox add + touch intake.pending
-  → interruption_dispatcher 检测信号
-    → scan_chat_inbox()
-      → new-issue → 放入 scan sources[]
-      → AI 读 scan → 建工位 20260429-raw-{id}-feature-{slug}
-      → worktree/docs/issues/raw-{id}/issue.md
-
-freely chat --issue raw-xxx "评论"
-  → chat-inbox add + touch intake.pending
-  → interruption_dispatcher 检测信号
-    → scan_chat_inbox()
-      → find worktrees-root/*raw-xxx*
-         ├─ 找到 → cat >> 直接写评论
-         └─ 未找到 → 查 develop → 写评论或标 orphan
-```
+`freely chat` CLI、`scan_raw_issues`、`governance-merge-gate`、`issue-sync`、B1→B2
