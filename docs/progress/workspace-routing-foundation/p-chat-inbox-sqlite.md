@@ -45,3 +45,5 @@ Extended existing startup_self_heal mechanism (not a new function):
 - acp_resume_evidence_session_store: completed
 
 - acp_no_inmemory_fallback: completed
+
+- acp_permission_fix: completed
