@@ -6,8 +6,10 @@ status: in_dev
 phase_state: in_dev
 promoted_from: raw-20260429-1745
 platform_ids:
-  github: {}
-  gitee: {}
+  github:
+    issue_id: ""
+  gitee:
+    issue_id: ""
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/bash32-daemon-compat-fix/issues/I-20260429-1745-A.md"
 last_synced_comment_at: {}
@@ -20,16 +22,11 @@ session_refs:
 
 ## Pre-Brainstorm Summary
 
-macOS bash 3.2 兼容性修复：两处防御性代码改动，不改变核心逻辑。
-- `resolve_active_supervisor_pid_for_start`：显式排除 `$$` 防止自检测
-- `select_launch_kind`：用 `nullglob` 数组检查代替裸 `ls` 管道
+macOS bash 3.2 compatibility fix: two defensive changes, no core logic changes.
 
 ## Scope
 
-两处修复均为最小化针对性改动，仅增加防御性代码：
-- 不升级 bash 版本要求
-- 不修改 shebang
-- 不改变核心业务逻辑
+Minimal changes to `docs/system/workspace/scripts/runtime/freely`.
 
 ## References
 
