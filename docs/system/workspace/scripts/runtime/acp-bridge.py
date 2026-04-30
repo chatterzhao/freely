@@ -54,6 +54,7 @@ class AcpBridge:
         self.running = False
         self.socket_path = _socket_path(project)
         self.server_ready = threading.Event()
+        self._restarting = False
         self.clients = []  # connected client sockets for notification broadcast
         self.clients_lock = threading.Lock()
 
@@ -89,31 +90,95 @@ class AcpBridge:
 
         # Start reader threads
         self.running = True
+        self.server_ready.clear()
         self.stdout_thread = threading.Thread(target=self._read_stdout, daemon=True)
         self.stderr_thread = threading.Thread(target=self._read_stderr, daemon=True)
         self.stdout_thread.start()
         self.stderr_thread.start()
+        # Initialize handshake is deferred to _ensure_server_alive() —
+        # called on first client request to avoid deadlock during restart.
 
-        # Initialize handshake
+    def _ensure_server_alive(self):
+        """Check if server is alive and initialized; restart + init if needed."""
+        if self.server_proc is None or self.server_proc.poll() is not None:
+            if self.running:
+                self.log("server process dead, restarting")
+                self._restart_server()
+        # Lazy initialize: if server was restarted, do the handshake now.
+        if not self.server_ready.is_set():
+            self.log("server needs initialize, performing handshake")
+            try:
+                result = self._send_request("initialize", {
+                    "protocolVersion": 1,
+                    "clientInfo": {"name": "freely-bridge", "title": "Freely ACP Bridge", "version": "0.2"},
+                    "clientCapabilities": {"loadSession": True, "resumeSession": True},
+                }, timeout=10)
+                self.server_ready.set()
+                self.log(f"initialize OK: {json.dumps(result)[:200]}")
+            except Exception as e:
+                self.log(f"initialize failed: {e}")
+                raise
+
+    def _restart_server(self):
+        """Kill stale server process and start a fresh one.
+        Does NOT create new threads — existing _read_stdout thread picks up
+        the new process's stdout. Guarded against concurrent restarts."""
+        with self.server_lock:
+            if getattr(self, '_restarting', False):
+                return  # another thread is already restarting
+            self._restarting = True
         try:
-            result = self._send_request("initialize", {
-                "protocolVersion": 1,
-                "clientInfo": {"name": "freely-bridge", "title": "Freely ACP Bridge", "version": "0.2"},
-                "clientCapabilities": {"loadSession": True, "resumeSession": True},
-            }, timeout=30)
-            self.log(f"initialize OK: {json.dumps(result)[:200]}")
-        except Exception as e:
-            self.log(f"initialize failed: {e}")
-            raise
+            self._restart_server_locked()
+        finally:
+            self._restarting = False
+
+    def _restart_server_locked(self):
+        stale = self.server_proc
+        if stale:
+            try:
+                stale.stdin.close()
+            except OSError:
+                pass
+            try:
+                stale.terminate()
+                stale.wait(timeout=2)
+            except subprocess.TimeoutExpired:
+                stale.kill()
+                stale.wait()
+        self.server_proc = None
+        self.server_ready.clear()
+        # Clear pending requests — their callers will get TimeoutError
+        with self.server_lock:
+            for req_id, (event, _container) in list(self.pending.items()):
+                event.set()
+                del self.pending[req_id]
+        # Start new process (no initialize yet — lazy, done on first request)
+        env = os.environ.copy()
+        self.server_proc = subprocess.Popen(
+            [self.acp_bin, "--permission-mode", "bypassPermissions"],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            bufsize=1,
+            env=env,
+        )
+        self.log("server process restarted (initialize deferred to first request)")
 
     def _read_stdout(self):
         """Read newline-delimited JSON from server stdout."""
-        while self.running and self.server_proc and self.server_proc.stdout:
+        while self.running:
+            if not self.server_proc or not self.server_proc.stdout:
+                if self.running:
+                    self.log("server stdout closed, restarting")
+                    self._restart_server()
+                continue
             try:
                 line = self.server_proc.stdout.readline()
                 if not line:
                     self.log("server stdout closed")
-                    break
+                    self._restart_server()
+                    continue
                 line = line.strip()
                 if not line:
                     continue
@@ -311,6 +376,8 @@ def handle_client(conn, bridge):
                     continue
 
                 try:
+                    # Ensure server is alive before forwarding (lazy restart).
+                    bridge._ensure_server_alive()
                     # Forward request to server via bridge's send/recv pipeline
                     result = bridge._send_request(method, params,
                         timeout=params.get("timeout", BRIDGE_TIMEOUT))

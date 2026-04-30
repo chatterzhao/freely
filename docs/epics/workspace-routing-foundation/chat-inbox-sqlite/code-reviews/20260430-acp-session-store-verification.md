@@ -67,3 +67,8 @@ Extended existing startup_self_heal mechanism (not a new function):
 
 Added stale `project-start.lock` cleanup in `startup_self_heal_machine_state_if_needed`.
 Lock holder PID is validated; if dead, lock is removed regardless of runtime state.
+
+## follow-on: 2026-04-30 (5) ACP bridge lazy restart
+
+Fixed bridge process keepalive: lazy initialize, auto-restart on death,
+restart race guard. Fresh 5s, resume 2s (cache hit).
