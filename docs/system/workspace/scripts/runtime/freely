@@ -14223,12 +14223,26 @@ settle_retire_ready_merged_worker_runtime_state() {
     "$(ensure_manager_watchdog_pid_file "$target_project")" \
     "$(session_state_file "$target_project")" \
     "$(handoff_file "$target_project")"
+  # Perform actual cleanup: remove worktree and branch for merged worktrees.
+  # This is the self-governing closeout — the worktree was merged into develop,
+  # so it can be safely removed without a dedicated worker process.
+  local _settle_cleaned=0
+  if [[ -n "$branch" && -n "$target_project" && "$target_project" != "$manager_project" ]]; then
+    if git -C "$manager_project" worktree remove "$target_project" 2>/dev/null; then
+      git -C "$manager_project" branch -d "$branch" 2>/dev/null || true
+      _settle_cleaned=1
+      append_runtime_event "$manager_project" "retire_ready_merged_worker_cleaned" \
+        "worktree=$target_project" \
+        "branch=${branch:-unknown}"
+    fi
+  fi
   write_workcell_state "$target_project" "stopped" "down" "down" "retire_ready_merged_worker"
   append_runtime_event "$manager_project" "retire_ready_merged_worker_settled" \
     "worktree=$target_project" \
     "branch=${branch:-unknown}" \
     "previous_supervisor_pid=${supervisor_pid:-none}" \
-    "previous_ai_pid=${ai_pid:-none}"
+    "previous_ai_pid=${ai_pid:-none}" \
+    "cleaned=${_settle_cleaned}"
   return 0
 }
 
