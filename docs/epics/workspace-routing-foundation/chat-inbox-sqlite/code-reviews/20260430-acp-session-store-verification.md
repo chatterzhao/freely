@@ -120,3 +120,5 @@ files. Enables self-governing closeout without dedicated worker processes.
 ## follow-on: 2026-04-30 (16) settle logging
 
 ## follow-on: 2026-04-30 (17) cleanup workers launchable for merged worktrees
+
+## follow-on: 2026-04-30 (18) worker launch on delegate_workers not just rc=0
