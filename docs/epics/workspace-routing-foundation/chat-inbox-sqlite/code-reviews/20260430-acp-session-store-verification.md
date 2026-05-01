@@ -111,3 +111,8 @@ and refuses to attach to a crashing supervisor, forcing a clean start.
 - log_info/log_warn/log_error now include UTC timestamps
 - _detect_acp_failure logs exact matched text (no more mystery triggers)
 - ACP session_id extracted from cycle log line 1 (no more "unavailable")
+
+## follow-on: 2026-04-30 (15) settle cleanup now removes worktrees
+settle_retire_ready_merged_worker_runtime_state now executes git worktree
+remove + git branch -d for merged worktrees instead of just clearing state
+files. Enables self-governing closeout without dedicated worker processes.
