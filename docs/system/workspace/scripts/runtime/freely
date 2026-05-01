@@ -18513,6 +18513,22 @@ cmd_daemon_start() {
     "expected_next=L010"
   append_runtime_event "$project" "user_daemon_start_command_received" \
     "force=$force"
+  # Detect restart storm from previous run and auto-force clean start.
+  if [[ "$force" != "1" ]]; then
+    local _state_file _exit_reason _storm_count
+    _state_file="$(workcell_state_file "$project")"
+    if [[ -f "$_state_file" ]]; then
+      unset LAST_EXIT_REASON LAST_RESTART_STORM_COUNT
+      source "$_state_file" 2>/dev/null || true
+      _exit_reason="${LAST_EXIT_REASON:-}"
+      _storm_count="${LAST_RESTART_STORM_COUNT:-0}"
+      if [[ "$_storm_count" =~ ^[0-9]+$ && "$_storm_count" -gt 0 ]] \
+         || [[ "$_exit_reason" == "auth_or_rate_limit" ]]; then
+        log_warn "detected prior restart storm (exit=$_exit_reason storm_count=$_storm_count); forcing clean daemon start"
+        force="1"
+      fi
+    fi
+  fi
   if [[ "$force" == "1" ]]; then
     log_info "forcing project-local runtime rebuild before daemon start"
     stop_project_runtime "$project" "daemon_start_force"

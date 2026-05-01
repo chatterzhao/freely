@@ -98,3 +98,5 @@ Verified: "I-20260429-2000-A" → no_match, "HTTP 429" → MATCH.
 Root cause: start_server() wrote os.getpid() before fork, placing parent PID in file.
 After parent exits, PID file has dead PID. stop sends SIGTERM to dead PID → no effect.
 Fix: move PID write to after fork so file contains daemon child PID.
+
+## follow-on: 2026-04-30 (12) auto-force clean start on restart storm
