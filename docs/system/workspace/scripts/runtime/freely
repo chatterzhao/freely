@@ -11594,10 +11594,15 @@ manager_runtime_launch_workers_after_ai_cycle_if_needed() {
     printf '0\n'
     return 0
   }
-  [[ "$exit_reason" == "ai_exit_rc_0" ]] || {
+  # Launch workers whenever the manager has a delegate_workers exit contract,
+  # not just when rc=0. The AI may have completed its analysis but exited non-zero
+  # due to transient ACP errors — the worker delegation is still valid.
+  local _contract_kind
+  _contract_kind="$(manager_exit_contract_kind "$project" 2>/dev/null || true)"
+  if [[ "$_contract_kind" != "delegate_workers" ]]; then
     printf '0\n'
     return 0
-  }
+  fi
   launched_count="$(manager_runtime_launch_workers_from_latest_handoff "$project")"
   [[ "$launched_count" =~ ^[0-9]+$ ]] || launched_count="0"
   if (( launched_count > 0 )); then

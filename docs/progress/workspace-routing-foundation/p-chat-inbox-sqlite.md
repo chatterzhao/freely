@@ -66,3 +66,5 @@ Extended existing startup_self_heal mechanism (not a new function):
 - settle_cleanup_logging: completed
 
 - cleanup_worker_launchable: completed
+
+- worker_launch_on_delegate: completed
