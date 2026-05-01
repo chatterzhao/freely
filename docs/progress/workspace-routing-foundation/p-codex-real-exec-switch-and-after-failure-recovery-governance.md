@@ -3,7 +3,7 @@
 - issue_id: `I-20260410-1835-B`
 - issue_path: `docs/epics/workspace-routing-foundation/codex-real-exec-switch-and-after-failure-recovery-governance/issues/codex-real-exec-switch-and-after-failure-recovery-governance.md`
 - title: `Codex real exec switch and after-failure recovery governance`
-- phase_state: `done_ibm`
+- phase_state: `completed`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/codex-real-switch-e2e-and-pretests-gap-20260410-170500`
