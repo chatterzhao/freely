@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260416-0448-A`
 - title: MemArk protected-root bootstrap followthrough governance
-- phase_state: `in_dev`
+- phase_state: `completed`
 - milestone: `M-20260326-freely-product-architecture`
 - epic-name: `freely-product-architecture`
 - story-name: `memark-protected-root-bootstrap-followthrough-governance`

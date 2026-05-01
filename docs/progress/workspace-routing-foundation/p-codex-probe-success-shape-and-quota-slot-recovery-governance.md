@@ -3,7 +3,7 @@
 - issue_id: `I-20260412-0907-A`
 - issue_path: `docs/epics/workspace-routing-foundation/codex-probe-success-shape-and-quota-slot-recovery-governance/issues/codex-probe-success-shape-and-quota-slot-recovery-governance.md`
 - title: `Codex probe success shape and quota slot recovery governance`
-- phase_state: `in_verification`
+- phase_state: `completed`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/runtime-slot-recovery-network-failure`

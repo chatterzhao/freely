@@ -3,7 +3,7 @@
 - issue_id: `I-20260407-1042-A`
 - issue_path: `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/issues/github-first-external-issue-source-governance.md`
 - title: `GitHub-first external issue source governance`
-- phase_state: `in_verification`
+- phase_state: `completed`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/external-issue-source-lifecycle-governance-20260420`

@@ -39,6 +39,8 @@
 - target environment: `test-pre-merge-runtime-slot-recovery-20260412-1004`
 - required evidence: `guarded promote replay plus governance-check`
 - blocker taxonomy: `protected_environment_only`
+- real_environment_status: `pass`
+- real_environment_reason: `Merged into develop via 3ded2a09. Guarded promote replay confirmed owner-bound verification evidence is preserved.`
 1. Run `./bin/governance-check`.
 
 ## Acceptance Items

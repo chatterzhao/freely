@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260407-1042-A`
 - title: `GitHub-first external issue source governance`
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `github-first-external-issue-source-governance`

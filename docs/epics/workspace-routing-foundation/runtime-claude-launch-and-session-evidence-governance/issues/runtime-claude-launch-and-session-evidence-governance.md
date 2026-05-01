@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260419-2245-A`
 - title: `Runtime Claude launch and session evidence governance`
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `runtime-claude-launch-and-session-evidence-governance`

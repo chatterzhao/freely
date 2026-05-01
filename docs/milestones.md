@@ -50,164 +50,6 @@ routing_policy:
 - why_now: 这批项定义 Freely 如何发现上下文、读取 milestone、并路由到下一跳 skill；如果 milestone 自身不先落盘，Freely 的狗粮链路就是断的
 
 ### committed_issues
-1. `I-20260419-1505-A`
-- title: Runtime supervisor attach reuse followthrough governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/issues/runtime-supervisor-attach-reuse-followthrough-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-supervisor-attach-reuse-followthrough-governance.md`
-- pretests_path: `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/pre-tests.md`
-- tasks_path: `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/tasks.md`
-- source_brainstorm: `docs/pre-brainstorms/20260419-1505--runtime-supervisor-attach-reuse-followthrough/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260419-1505--runtime-supervisor-attach-reuse-followthrough/candidates.md`
-- branch: `feature/checkpoint-lifecycle-trace-debuggability-20260419`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260416-feature-lifecycle-trace-debuggability`
-- evidence:
-  - `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/issues/runtime-supervisor-attach-reuse-followthrough-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/tasks.md`
-  - `docs/progress/workspace-routing-foundation/p-runtime-supervisor-attach-reuse-followthrough-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/code-reviews/20260419-runtime-supervisor-attach-reuse-followthrough-verification.md`
-  - `bash docs/system/workspace/scripts/tests/test-freely-daemon-start-reuses-live-supervisor-without-relaunch`
-  - `bash docs/system/workspace/scripts/tests/test-freely-start-attaches-live-supervisor-between-ai-cycles`
-  - `bash docs/system/workspace/scripts/tests/test-freely-start-attaches-when-ps-is-unavailable`
-  - `bash docs/system/workspace/scripts/tests/test-freely-cc-launch-isolates-home-under-project-runtime`
-- next_action: `Keep this owner narrow, preserve the checkpoint evidence, and decide in a later pass whether guarded replay should happen directly or be absorbed by a newer runtime followthrough owner.`
-- revisit_trigger: `If later replay shows launcher-home isolation or supervisor attach should split into separate owners, reopen narrowly around the conflicting seam instead of silently widening this owner.`
-
-2. `I-20260419-1630-A`
-- title: Runtime startup self-healing governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/issues/runtime-startup-self-healing-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-startup-self-healing-governance.md`
-- prd_path: `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/prd.md`
-- pretests_path: `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/pre-tests.md`
-- tasks_path: `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/tasks.md`
-- source_brainstorm: `docs/pre-brainstorms/20260419-1630--runtime-startup-self-healing-boundary/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260419-1630--runtime-startup-self-healing-boundary/candidates.md`
-- branch: `feature/runtime-manager-startup-blocker-rootcause-20260419`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260419-feature-runtime-manager-startup-blocker-rootcause`
-- follow_on_to: `I-20260414-0255-A`
-- evidence:
-  - `docs/pre-brainstorms/20260419-1630--runtime-startup-self-healing-boundary/brainstorms.md`
-  - `docs/pre-brainstorms/20260419-1630--runtime-startup-self-healing-boundary/candidates.md`
-  - `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/issues/runtime-startup-self-healing-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/prd.md`
-  - `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/tasks.md`
-  - `docs/progress/workspace-routing-foundation/p-runtime-startup-self-healing-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/code-reviews/20260419-runtime-startup-self-healing-verification.md`
-  - `bash docs/system/workspace/scripts/tests/test-freely-live-status-keeps-daemon-runtime-across-case-variant-project-path`
-  - `bash docs/system/workspace/scripts/tests/test-freely-live-status-startup-self-heals-stale-runtime-state`
-  - `bash docs/system/workspace/scripts/tests/test-freely-live-status`
-  - `./bin/governance-check`
-- next_action: `Keep the owner narrow, preserve the new path-equivalence verification evidence, then finish the guarded promote path for the current feature continuation.`
-- revisit_trigger: `If replay shows startup self-heal must make semantic continuation choices rather than machine-only repairs, split that follow-on back into a manager-owned recovery owner instead of widening this one.`
-
-3. `I-20260419-2245-A`
-- title: Runtime Claude launch and session evidence governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-claude-launch-and-session-evidence-governance/issues/runtime-claude-launch-and-session-evidence-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-claude-launch-and-session-evidence-governance.md`
-- pretests_path: `docs/epics/workspace-routing-foundation/runtime-claude-launch-and-session-evidence-governance/pre-tests.md`
-- tasks_path: `docs/epics/workspace-routing-foundation/runtime-claude-launch-and-session-evidence-governance/tasks.md`
-- source_brainstorm: `docs/pre-brainstorms/20260419-2245--runtime-claude-launch-and-session-evidence/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260419-2245--runtime-claude-launch-and-session-evidence/candidates.md`
-- branch: `feature/fix-tool-switch-noninteractive-state-20260419-2315`
-- worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260419-2315-feature-fix-tool-switch-noninteractive-state`
-- evidence:
-  - `docs/pre-brainstorms/20260419-2245--runtime-claude-launch-and-session-evidence/brainstorms.md`
-  - `docs/pre-brainstorms/20260419-2245--runtime-claude-launch-and-session-evidence/candidates.md`
-  - `docs/epics/workspace-routing-foundation/runtime-claude-launch-and-session-evidence-governance/issues/runtime-claude-launch-and-session-evidence-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-claude-launch-and-session-evidence-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/runtime-claude-launch-and-session-evidence-governance/tasks.md`
-  - `docs/progress/workspace-routing-foundation/p-runtime-claude-launch-and-session-evidence-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-claude-launch-and-session-evidence-governance/code-reviews/20260419-runtime-claude-launch-and-session-evidence-verification.md`
-  - `bash docs/system/workspace/scripts/tests/test-tool-launchers-cc-stdin-add-dir`
-  - `bash docs/system/workspace/scripts/tests/test-freely-claude-resume-target-requires-evidence`
-  - `printf 'say hi\n' | claude -p --permission-mode bypassPermissions --add-dir /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees`
-  - `./bin/governance-check`
-- next_action: `Refresh the disposable premerge batch with this owner evidence, rerun the focused regressions there, and promote the bounded repair into develop.`
-- revisit_trigger: `If later replay proves the remaining failure is actually generic runtime truth drift rather than Claude-family launcher/session evidence, split that into a new owner instead of widening this one.`
-
-4. `I-20260412-0907-A`
-- title: Codex probe success shape and quota slot recovery governance
-- milestone_state: candidate
-- phase_state: `in_verification`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/codex-probe-success-shape-and-quota-slot-recovery-governance/issues/codex-probe-success-shape-and-quota-slot-recovery-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-codex-probe-success-shape-and-quota-slot-recovery-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260412-0907--codex-probe-success-shape-and-quota-slot-recovery/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260412-0907--codex-probe-success-shape-and-quota-slot-recovery/candidates.md`
-- follow_on_to: `I-20260410-1835-B`
-- evidence:
-  - `docs/epics/workspace-routing-foundation/codex-probe-success-shape-and-quota-slot-recovery-governance/code-reviews/20260412-codex-probe-success-shape-and-quota-slot-recovery-verification.md`
-  - `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-requires-expected-success-shape`
-  - `bash docs/system/workspace/scripts/tests/test-freely-rate-limit-log-defers-to-watchdog`
-  - `bash docs/system/workspace/scripts/tests/test-freely-active-runtime-reconnect-stays-network-local`
-  - `real bad-account ./bin/freely start replay with auto-switch to the next usable slot`
-  - `bash docs/system/workspace/scripts/tests/test-freely-ai-apikey-switch-all-unavailable-falls-back-to-exec`
-  - `bash docs/system/workspace/scripts/tests/test-freely-ai-apikey-switch-oauth-unreachable-falls-back-to-exec`
-  - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch-oauth-unreachable`
-  - `bash docs/system/workspace/scripts/tests/test-ai-cli-codex-apikey-slot-bundle-switch`
-  - `./bin/governance-check`
-- completion_note: `Canonical develop now carries the bounded saved-apikey fallback after an all-unavailable account sweep, so this owner should no longer remain in committed_issues.`
-
-5. `I-20260407-1042-A`
-- title: GitHub-first external issue source governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P1
-- issue_path: `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/issues/github-first-external-issue-source-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-github-first-external-issue-source-governance.md`
-- pretests_path: `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/pre-tests.md`
-- tasks_path: `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/tasks.md`
-- source_brainstorm: `docs/pre-brainstorms/20260407-1042--external-issue-identity-and-publication-boundary/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260407-1042--external-issue-identity-and-publication-boundary/candidates.md`
-- evidence:
-  - `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/issues/github-first-external-issue-source-governance.md`
-  - `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/tasks.md`
-  - `docs/progress/workspace-routing-foundation/p-github-first-external-issue-source-governance.md`
-  - `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/code-reviews/20260420-github-first-external-issue-source-governance-decision.md`
-  - `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/code-reviews/20260420-github-first-external-issue-source-governance-verification.md`
-  - `bash docs/system/workspace/scripts/tests/test-routing-foundation-loop`
-  - `bash docs/system/workspace/scripts/tests/test-human-chat-routing`
-  - `./bin/governance-check`
-- next_action: Keep this owner bounded to GitHub-first source contract truth, finish verification in the current closeout lane, and open provider API automation only as a follow-on implementation owner after canonical `develop` absorbs the governance package.
-
-6. `I-20260420-1130-A`
-- title: Manager task-source scan idle/replan boundary governance
-- milestone_state: committed
-- phase_state: `in_verification`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/issues/manager-task-source-scan-idle-replan-boundary-governance.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-manager-task-source-scan-idle-replan-boundary-governance.md`
-- pretests_path: `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/pre-tests.md`
-- tasks_path: `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/tasks.md`
-- source_brainstorm: `docs/pre-brainstorms/20260420-1130--manager-task-source-scan-replan-boundary/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260420-1130--manager-task-source-scan-replan-boundary/candidates.md`
-- evidence:
-  - `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/issues/manager-task-source-scan-idle-replan-boundary-governance.md`
-  - `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/tasks.md`
-  - `docs/progress/workspace-routing-foundation/p-manager-task-source-scan-idle-replan-boundary-governance.md`
-  - `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/code-reviews/20260420-manager-task-source-scan-idle-replan-boundary-verification.md`
-  - `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-includes-milestone-patrol-seed`
-  - `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-regenerates-scan-after-idle-continuity-advance`
-  - `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-suppresses-broad-patrol-while-worker-active`
-  - `bash docs/system/workspace/scripts/tests/test-freely-manager-task-source-scan-ignores-pre-stop-continuity-anchor`
-  - `bash docs/system/workspace/scripts/tests/test-freely-task-source-scan-provider-hints`
-  - `bash docs/system/workspace/scripts/tests/test-freely-task-source-scan-python-compat`
-  - `bash docs/system/workspace/scripts/tests/test-start-lead-agent-verification-metadata-contract`
-  - `./bin/governance-check`
-- next_action: Keep the patrol seam narrow, verify the idle/replan scan contract against the focused runtime tests, and route any future GitHub or Gitee provider expansion into a separate external-source implementation owner.
-
 7. `I-20260421-1530-A`
 - title: Live-status scan summary and prompt anchor governance
 - milestone_state: committed
@@ -239,23 +81,6 @@ routing_policy:
   - `./bin/governance-check`
 - next_action: Preserve this owner as the smallest implementation slice: complete guarded develop merge and run develop-side daemon/status replay before considering any broader status-family or scan-schema follow-on.
 
-25. `I-20260429-1745-A`
-- title: macOS bash 3.2 daemon compatibility fix
-- milestone_state: committed
-- phase_state: `in_dev`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/bash32-daemon-compat-fix/issues/I-20260429-1745-A.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-bash32-daemon-compat-fix.md`
-- pretests_path: `docs/epics/workspace-routing-foundation/bash32-daemon-compat-fix/pre-tests.md`
-- source_brainstorm: `docs/pre-brainstorms/20260429-1745--bash32-daemon-compat-fix/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260429-1745--bash32-daemon-compat-fix/candidates.md`
-- branch: `feature/fix-daemon-bash32-crash-20260429`
-- evidence:
-  - `docs/epics/workspace-routing-foundation/bash32-daemon-compat-fix/issues/I-20260429-1745-A.md`
-  - `docs/epics/workspace-routing-foundation/bash32-daemon-compat-fix/pre-tests.md`
-  - `docs/progress/workspace-routing-foundation/p-bash32-daemon-compat-fix.md`
-  - `docs/epics/workspace-routing-foundation/bash32-daemon-compat-fix/code-reviews/20260429-bash32-daemon-compat-fix-verification.md`
-- next_action: `Merge into develop via test-pre-merge batch.`
 
 
 24. `I-20260429-2000-A`
@@ -276,22 +101,7 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/gate-dev-experience-preflight/code-reviews/20260429-gate-dev-experience-preflight-verification.md`
 - next_action: `Merge into develop.`
 
-25. `I-20260429-2040-A`
-- title: SQLite chat-inbox staging for protected-branch chat intake
-- milestone_state: committed
-- phase_state: `in_dev`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/chat-inbox-sqlite/issues/I-20260429-2040-A.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-chat-inbox-sqlite.md`
-- pretests_path: `docs/epics/workspace-routing-foundation/chat-inbox-sqlite/pre-tests.md`
-- source_brainstorm: `docs/pre-brainstorms/20260429-2040--chat-inbox-sqlite/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260429-2040--chat-inbox-sqlite/candidates.md`
-- branch: `feature/chat-inbox-sqlite-20260429`
-- evidence:
-  - `docs/epics/workspace-routing-foundation/chat-inbox-sqlite/issues/I-20260429-2040-A.md`
-  - `docs/epics/workspace-routing-foundation/chat-inbox-sqlite/pre-tests.md`
-  - `docs/progress/workspace-routing-foundation/p-chat-inbox-sqlite.md`
-- next_action: `B2_IBM implementation in progress.`
+
 
 ### candidate_issues
 
@@ -3784,6 +3594,78 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260304-0000--openclaw-workspace-freely-feasibility/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260304-0000--openclaw-workspace-freely-feasibility/candidates.md`
 - completion_note: 这条候选的独立 owner 价值已被后续架构真源吸收；当前 canonical 边界明确 OpenClaw 只是 optional adapter/profile，而不是 Freely 主定义
+
+1. `I-20260419-1505-A`
+- title: Runtime supervisor attach reuse followthrough governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/issues/runtime-supervisor-attach-reuse-followthrough-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-supervisor-attach-reuse-followthrough-governance.md`
+- completion_note: `Merged into develop via commits 43e30af1, 2724e574, 6a4f5f66.`
+
+1. `I-20260419-1630-A`
+- title: Runtime startup self-healing governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/issues/runtime-startup-self-healing-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-startup-self-healing-governance.md`
+- completion_note: `Merged into develop via commits 0df063da, 50356bbc, 7b9f2f5f, e5f97bc4, 7c9878cf.`
+
+1. `I-20260419-2245-A`
+- title: Runtime Claude launch and session evidence governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-claude-launch-and-session-evidence-governance/issues/runtime-claude-launch-and-session-evidence-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-runtime-claude-launch-and-session-evidence-governance.md`
+- completion_note: `Merged into develop via 6547187d hotfix merge, 518d4974, c444fe7d, 79e55633.`
+
+1. `I-20260412-0907-A`
+- title: Codex probe success shape and quota slot recovery governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/codex-probe-success-shape-and-quota-slot-recovery-governance/issues/codex-probe-success-shape-and-quota-slot-recovery-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-codex-probe-success-shape-and-quota-slot-recovery-governance.md`
+- completion_note: `Merged into develop via 3ded2a09 merge, b044a461, 64c6bd5b, e6ce4879.`
+
+1. `I-20260407-1042-A`
+- title: GitHub-first external issue source governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/issues/github-first-external-issue-source-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-github-first-external-issue-source-governance.md`
+- completion_note: `Merged into develop via d46a1ad4 → e2489413.`
+
+1. `I-20260420-1130-A`
+- title: Manager task-source scan idle/replan boundary governance
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/issues/manager-task-source-scan-idle-replan-boundary-governance.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-manager-task-source-scan-idle-replan-boundary-governance.md`
+- completion_note: `Merged into develop; scan contract live and operational.`
+
+1. `I-20260429-1745-A`
+- title: Fix daemon self-detection suicide + bash 3.2 pipefail crash
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/bash32-daemon-compat-fix/issues/I-20260429-1745-A.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-bash32-daemon-compat-fix.md`
+- completion_note: `Merged into develop via 83cd79eb (test-pre-merge-bash32-fix) and 96ec25ea (fix code).`
+
+1. `I-20260429-2040-A`
+- title: SQLite chat-inbox staging for protected-branch chat intake
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/chat-inbox-sqlite/issues/I-20260429-2040-A.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-chat-inbox-sqlite.md`
+- completion_note: `Merged into develop via 12c16edf (test-pre-merge-chat-inbox) and 7bb14222 (feat code).`
 
 ## M-20260326-freely-product-architecture
 

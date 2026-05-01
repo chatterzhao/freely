@@ -3,7 +3,7 @@
 - issue_id: `I-20260419-1505-A`
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/issues/runtime-supervisor-attach-reuse-followthrough-governance.md`
 - title: `Runtime supervisor attach reuse followthrough governance`
-- phase_state: `in_verification`
+- phase_state: `completed`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/checkpoint-lifecycle-trace-debuggability-20260419`

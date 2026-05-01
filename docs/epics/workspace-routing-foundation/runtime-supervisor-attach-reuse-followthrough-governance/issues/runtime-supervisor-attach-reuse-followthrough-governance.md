@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260419-1505-A`
 - title: `Runtime supervisor attach reuse followthrough governance`
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `runtime-supervisor-attach-reuse-followthrough-governance`
