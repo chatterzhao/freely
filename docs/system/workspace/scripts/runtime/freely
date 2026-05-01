@@ -11642,7 +11642,24 @@ manager_runtime_launch_workers_after_ai_cycle_if_needed() {
     printf '0\n'
     return 0
   fi
-  launched_count="$(manager_runtime_launch_workers_from_latest_handoff "$project")"
+  # Read worker prompts directly from exit_contract (machine-readable env format),
+  # bypassing the fragile continuity markdown parsing pipeline.
+  local _worker_csv _prompt_file _launched_count
+  _worker_csv="$(meta_env_value "$(manager_exit_contract_file "$project")" "WORKER_PROMPTS_CSV" 2>/dev/null || true)"
+  _launched_count=0
+  if [[ -n "$_worker_csv" ]]; then
+    local IFS=","
+    for _prompt_file in $_worker_csv; do
+      [[ -n "$_prompt_file" && -f "$_prompt_file" ]] || continue
+      if launch_worker_from_manager_prompt_if_needed "$project" "$_prompt_file"; then
+        _launched_count=$((_launched_count + 1))
+        log_info "worker launched via exit_contract: $(basename "$_prompt_file")"
+      else
+        log_warn "worker launch failed: $(basename "$_prompt_file")"
+      fi
+    done
+  fi
+  launched_count="$_launched_count"
   [[ "$launched_count" =~ ^[0-9]+$ ]] || launched_count="0"
   if (( launched_count > 0 )); then
     append_runtime_event "$project" "manager_worker_launch_after_ai_cycle" \

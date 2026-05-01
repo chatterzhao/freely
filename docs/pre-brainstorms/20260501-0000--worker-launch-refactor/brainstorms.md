@@ -122,15 +122,48 @@ launch_worker_ai_directly() {
 - Updates milestone/progress based on worker completions
 - Re-delegates blocked workers with updated context
 
+## Continuity vs Exit Contract: 数据源分析
+
+### Continuity (`manager-continuity-*.md`)
+
+Manager 跨周期状态快照（markdown，AI 生成）：
+- 项目状态：worktree fleet, scan results, governance checks
+- Worker 委派历史：previous_worker_prompt, prompt_path
+- 跨周期恢复上下文：下一个 manager cycle 读取
+
+### Exit Contract (`manager-exit-contract.env`)
+
+Manager 本轮决策的 machine-readable 合同（env 格式）：
+```env
+EXIT_KIND="delegate_workers"
+WORKER_PROMPTS_CSV="/p1.txt,/p2.txt"
+```
+
+### 当前问题
+
+Worker launch 走 continuity pipeline → 多层 gate + awk regex 解析 markdown → 脆弱。AI 输出格式微小偏差就导致 worker 不 launch。
+
+### 修正方案
+
+**保留 continuity 的 manager 上下文职能，worker launch 改从 exit_contract 读取。**
+
+```
+exit_contract (env, machine-readable)
+  WORKER_PROMPTS_CSV=/p1.txt,/p2.txt
+    ↓ 直接 split by comma → 逐个 launch_worker
+    ↓ (不走 continuity pipeline)
+
+continuity (markdown)
+  保留给 manager 跨周期上下文
+  不参与 worker launch 决策
+```
+
 ## Files to Change
 
 | File | Change |
 |---|---|
-| `freely` line 11347-11367 | Replace `start_workcell_supervisor_async` with direct AI launch |
-| `freely` line 11303-11368 | Refactor `launch_worker_from_manager_prompt_if_needed` |
-| `freely` line 11591-11612 | Update `manager_runtime_launch_workers_after_ai_cycle_if_needed` |
-| New function | `launch_worker_ai_directly` — direct AI process launch for worker |
-| New function | `write_worker_session_state` — set up worker session fork state |
+| `freely` line 11591-11612 | `manager_runtime_launch_workers_after_ai_cycle_if_needed` — 从 exit_contract 读 WORKER_PROMPTS_CSV |
+| `freely` line 11347-11367 | `launch_worker_from_manager_prompt_if_needed` — 已改 ✅ (直接 AI launch 替代 start_workcell_supervisor_async) |
 
 ## Success Criteria
 

@@ -126,3 +126,7 @@ files. Enables self-governing closeout without dedicated worker processes.
 ## follow-on: 2026-05-01 (19) stream-json prototype (dropped)
 Prototype shelved: no cross-process cache hits with claude -p mode.
 ACP confirmed 60% speed improvement via session/resume cache.
+
+## follow-on: 2026-05-01 (20) worker launch from exit_contract CSV
+Worker launch now reads WORKER_PROMPTS_CSV directly from exit_contract
+(env format, 100% machine-readable) instead of parsing continuity markdown.
