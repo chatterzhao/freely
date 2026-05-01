@@ -3,7 +3,7 @@
 - issue_id: `I-20260416-0448-A`
 - issue_path: `docs/epics/freely-product-architecture/memark-protected-root-bootstrap-followthrough-governance/issues/memark-protected-root-bootstrap-followthrough-governance.md`
 - title: `MemArk protected-root bootstrap followthrough governance`
-- phase_state: `in_dev`
+- phase_state: `completed`
 - runtime_state: `stopped`
 - milestone: `M-20260326-freely-product-architecture`
 - branch: `feature/memark-init`
