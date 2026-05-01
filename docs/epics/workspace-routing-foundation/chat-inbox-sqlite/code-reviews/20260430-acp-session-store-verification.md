@@ -130,3 +130,5 @@ ACP confirmed 60% speed improvement via session/resume cache.
 ## follow-on: 2026-05-01 (20) worker launch from exit_contract CSV
 Worker launch now reads WORKER_PROMPTS_CSV directly from exit_contract
 (env format, 100% machine-readable) instead of parsing continuity markdown.
+
+## follow-on: 2026-05-01 (21) worker launch inline docs
