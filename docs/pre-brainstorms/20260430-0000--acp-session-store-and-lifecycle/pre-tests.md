@@ -210,3 +210,51 @@ curl -s -w "TIME=%{time_total}s HTTP=%{http_code}" --max-time 60 \
 - DeepSeek API is NOT slow (~13s for 34KB)
 - Claude CLI adds 3-4x overhead (~50s)
 - Supervisors must not kill AI during active output — timeout should reset on each output event
+
+## 2026-04-30 (4): Stop/Start lifecycle + multi-worker stability
+
+### Test J: Stop kills ALL project processes
+```bash
+# 1. Start daemon
+./bin/freely daemon start --project $PWD
+# 2. Stop
+./bin/freely daemon stop --project $PWD
+sleep 3
+# 3. Verify no residue
+ps aux | grep -E "freely|acp-bridge|claude-agent|watchdog|daemon-run" | grep -v grep | grep -v memark
+# Expected: 0 processes (除了 memark 外部工具)
+```
+
+### Test K: Daemon start rejects crash-loop supervisor
+```bash
+# 1. Create restart storm state
+echo 'LAST_RESTART_STORM_COUNT="5"' >> .freely/run/session-state.env
+# 2. Start daemon
+./bin/freely daemon start --project $PWD
+# 3. Verify: should either force clean start or reject with clear error
+# 4. Check daemon log for "refusing to attach" or "forcing clean daemon start"
+```
+
+### Test L: Multi-worker recovery doesn't crash supervisor
+```bash
+# 1. Create 2 valid test worker prompts in .freely/run/worker-prompts/
+# 2. Start daemon
+# 3. Monitor supervisor PID for 2 minutes
+prev=$(cat .freely/run/supervisor.pid)
+for i in $(seq 1 8); do
+  sleep 15
+  cur=$(cat .freely/run/supervisor.pid || echo dead)
+  [[ "$cur" != "$prev" ]] && echo "RESTART" && break
+done
+echo "stable: $([[ "$cur" == "$prev" ]] && echo YES || echo NO)"
+# Expected: supervisor stays alive, workers processed or skipped
+```
+
+### Test M: Supervisor completes full cycle after fixes
+```bash
+# 1. Start daemon (clean state)
+# 2. Wait 2 minutes
+# 3. Verify: ai_cycle_finished event with rc=0, no auth_or_rate_limit
+grep "ai_cycle_finished" .freely/logs/runtime-events.log | tail -1
+# Expected: rc=0, exit_reason=ai_exit_rc_ (not auth_or_rate_limit)
+```

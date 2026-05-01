@@ -88,16 +88,20 @@ _detect_acp_failure() {
   local log_file="$1" failure_marker="$2" network_failure_marker="$3" bridge_lost_marker="$4"
   [[ -f "$log_file" ]] || return 0
 
-  if grep -qE '(Connection refused|Connection reset|TLS|timeout|ECONNREFUSED|ENOTFOUND|ETIMEDOUT|socket hang up|proxy|DNS)' "$log_file" 2>/dev/null; then
+  local _matched
+  if _matched=$(grep -m1 -E '(Connection refused|Connection reset|TLS|timeout|ECONNREFUSED|ENOTFOUND|ETIMEDOUT|socket hang up|proxy|DNS)' "$log_file" 2>/dev/null); then
+    echo "[ACP-detect] network_failure matched: ${_matched:0:200}" >&2
     [[ -n "$network_failure_marker" ]] && echo "network_failure" > "$network_failure_marker"
   fi
 
-  if grep -qE '(\b401\b|\b402\b|\b403\b|\b429\b|Unauthorized|Payment Required|insufficient_quota|rate_limit|quota exceeded|InsufficientBalance)' "$log_file" 2>/dev/null; then
+  if _matched=$(grep -m1 -E '(\b401\b|\b402\b|\b403\b|\b429\b|Unauthorized|Payment Required|insufficient_quota|rate_limit|quota exceeded|InsufficientBalance)' "$log_file" 2>/dev/null); then
+    echo "[ACP-detect] auth_or_rate_limit matched: ${_matched:0:200}" >&2
     [[ -n "$failure_marker" ]] && echo "auth_or_rate_limit" > "$failure_marker"
   fi
 
   # Bridge restart / session lost: session/resume fails with "not found"
-  if grep -qE '(session.*not found|unknown session|no such session|Session not found)' "$log_file" 2>/dev/null; then
+  if _matched=$(grep -m1 -E '(session.*not found|unknown session|no such session|Session not found)' "$log_file" 2>/dev/null); then
+    echo "[ACP-detect] bridge_session_lost matched: ${_matched:0:200}" >&2
     [[ -n "$bridge_lost_marker" ]] && echo "bridge_session_lost" > "$bridge_lost_marker"
   fi
 }

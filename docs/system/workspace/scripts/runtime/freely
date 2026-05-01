@@ -22,9 +22,10 @@ TOOL_NAME="freely"
 STATE_DIR_NAME=".freely"
 SELF_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
 
-log_info() { echo "[INFO] $*" >&2; }
-log_warn() { echo "[WARN] $*" >&2; }
-log_error() { echo "[ERROR] $*" >&2; }
+_log_ts() { date -u +"[%Y-%m-%dT%H:%M:%SZ]" | tr -d '\n'; }
+log_info() { echo "$(_log_ts) [INFO] $*" >&2; }
+log_warn() { echo "$(_log_ts) [WARN] $*" >&2; }
+log_error() { echo "$(_log_ts) [ERROR] $*" >&2; }
 
 WATCHDOG_CONTROL_PLANE_SKILL_ROOT="$SELF_ROOT/docs/system/workspace/skills/watchdog-control-plane"
 WATCHDOG_AVAILABILITY_LIB="$WATCHDOG_CONTROL_PLANE_SKILL_ROOT/scripts/availability-watchdog.sh"
@@ -18000,6 +18001,14 @@ start_project_runtime() {
     local launch_resume_target
     child_pid="$(cat "$child_pid_file" 2>/dev/null || true)"
     tool_session_id="$(runtime_capture_or_empty extract_tool_session_id_from_log "$AI_TOOL" "$cycle_log")"
+    # ACP mode: extract clean UUID from cycle log line 1 (run-acp-prompt.py output)
+    if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" && ( -z "$tool_session_id" || "$tool_session_id" == "unavailable" ) ]]; then
+      if [[ -f "$cycle_log" ]]; then
+        local _line1_uuid
+        _line1_uuid=$(head -1 "$cycle_log" 2>/dev/null | grep -oE '[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}' | head -1)
+        [[ -n "$_line1_uuid" ]] && tool_session_id="$_line1_uuid"
+      fi
+    fi
     tool_resume_target=""
     tool_jsonl_path=""
     context_ratio=""

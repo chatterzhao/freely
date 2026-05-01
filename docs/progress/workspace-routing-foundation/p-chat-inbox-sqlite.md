@@ -58,3 +58,5 @@ Extended existing startup_self_heal mechanism (not a new function):
 
 - stop_cleanup: completed
 - no_attach_storm: completed
+
+- diagnostic_logging: completed

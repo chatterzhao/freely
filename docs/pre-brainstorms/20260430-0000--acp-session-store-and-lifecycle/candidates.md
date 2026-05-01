@@ -37,3 +37,5 @@
 - bridge_pid_after_fork: `2026-04-30`
 
 - restart_storm_auto_force: `2026-04-30`
+
+- pre_tests_update: `2026-04-30`
