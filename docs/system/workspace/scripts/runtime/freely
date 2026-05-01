@@ -9591,12 +9591,11 @@ worker_prompt_launchable_for_manager_project() {
   fi
   target_branch="$(worker_prompt_target_branch "$prompt_file")"
   if worker_project_is_absorbed_merged_lane "$manager_project" "$resolved_worktree" "$target_branch"; then
-    if [[ "$(worker_prompt_normalized_intent_kind "$prompt_file")" == "cleanup" ]] \
-      && worker_prompt_has_verification_metadata "$prompt_file"; then
-      if ! worker_project_is_retire_ready_merged_followthrough "$manager_project" "$resolved_worktree" "$target_branch" "$prompt_file" || \
-        worker_prompt_spans_external_cleanup_surfaces "$manager_project" "$prompt_file"; then
-        return 0
-      fi
+    # Cleanup workers targeting merged worktrees should still be launchable
+    # so the AI can execute the actual cleanup (git worktree remove, etc.)
+    # rather than being settled by hardcoded script logic.
+    if [[ "$(worker_prompt_normalized_intent_kind "$prompt_file")" == "cleanup" ]]; then
+      return 0
     fi
     return 1
   fi
@@ -14223,30 +14222,12 @@ settle_retire_ready_merged_worker_runtime_state() {
     "$(ensure_manager_watchdog_pid_file "$target_project")" \
     "$(session_state_file "$target_project")" \
     "$(handoff_file "$target_project")"
-  # Perform actual cleanup: remove worktree and branch for merged worktrees.
-  # This is the self-governing closeout — the worktree was merged into develop,
-  # so it can be safely removed without a dedicated worker process.
-  local _settle_cleaned=0
-  if [[ -n "$branch" && -n "$target_project" && "$target_project" != "$manager_project" && "$target_project" != "$manager_project/" ]]; then
-    log_info "settle: attempting git worktree remove $target_project (branch=$branch)"
-    if git -C "$manager_project" worktree remove "$target_project" 2>&1; then
-      git -C "$manager_project" branch -d "$branch" 2>/dev/null || true
-      _settle_cleaned=1
-      log_info "settle: removed worktree $target_project and branch $branch"
-      append_runtime_event "$manager_project" "retire_ready_merged_worker_cleaned" \
-        "worktree=$target_project" \
-        "branch=${branch:-unknown}"
-    else
-      log_warn "settle: failed to remove worktree $target_project"
-    fi
-  fi
   write_workcell_state "$target_project" "stopped" "down" "down" "retire_ready_merged_worker"
   append_runtime_event "$manager_project" "retire_ready_merged_worker_settled" \
     "worktree=$target_project" \
     "branch=${branch:-unknown}" \
     "previous_supervisor_pid=${supervisor_pid:-none}" \
-    "previous_ai_pid=${ai_pid:-none}" \
-    "cleaned=${_settle_cleaned}"
+    "previous_ai_pid=${ai_pid:-none}"
   return 0
 }
 
