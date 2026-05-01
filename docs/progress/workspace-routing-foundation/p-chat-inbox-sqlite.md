@@ -68,3 +68,5 @@ Extended existing startup_self_heal mechanism (not a new function):
 - cleanup_worker_launchable: completed
 
 - worker_launch_on_delegate: completed
+
+- worker_exit_contract_launch: completed
