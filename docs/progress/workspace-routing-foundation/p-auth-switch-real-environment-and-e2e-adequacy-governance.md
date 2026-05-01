@@ -3,7 +3,7 @@
 - issue_id: `I-20260410-1835-A`
 - issue_path: `docs/epics/workspace-routing-foundation/auth-switch-real-environment-and-e2e-adequacy-governance/issues/auth-switch-real-environment-and-e2e-adequacy-governance.md`
 - title: `Auth switch real-environment and end-to-end adequacy governance`
-- phase_state: `done_ibm`
+- phase_state: `completed`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/auth-switch-pretests-governance-gap-analysis-20260410-171800`
