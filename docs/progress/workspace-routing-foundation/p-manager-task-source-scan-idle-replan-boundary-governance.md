@@ -3,7 +3,7 @@
 - issue_id: `I-20260420-1130-A`
 - issue_path: `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/issues/manager-task-source-scan-idle-replan-boundary-governance.md`
 - title: `Manager task-source scan idle/replan boundary governance`
-- phase_state: `in_verification`
+- phase_state: `completed`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/startup-task-source-patrol-and-reconcile-20260420`
