@@ -106,3 +106,8 @@ Fix: move PID write to after fork so file contains daemon child PID.
 stop: added last-resort pkill of all project processes after PID-file termination.
 start: active_runtime_attach_reusable_for_project now checks restart storm count
 and refuses to attach to a crashing supervisor, forcing a clean start.
+
+## follow-on: 2026-04-30 (14) diagnostic logging improvements
+- log_info/log_warn/log_error now include UTC timestamps
+- _detect_acp_failure logs exact matched text (no more mystery triggers)
+- ACP session_id extracted from cycle log line 1 (no more "unavailable")
