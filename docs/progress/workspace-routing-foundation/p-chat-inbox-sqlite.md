@@ -53,3 +53,5 @@ Extended existing startup_self_heal mechanism (not a new function):
 - auth_regex_fix: completed
 
 - bridge_pid_fix: completed
+
+- auto_force_clean_start_on_storm: completed
