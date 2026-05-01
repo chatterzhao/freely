@@ -118,3 +118,5 @@ remove + git branch -d for merged worktrees instead of just clearing state
 files. Enables self-governing closeout without dedicated worker processes.
 
 ## follow-on: 2026-04-30 (16) settle logging
+
+## follow-on: 2026-04-30 (17) cleanup workers launchable for merged worktrees
