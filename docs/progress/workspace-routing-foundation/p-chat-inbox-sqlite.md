@@ -62,3 +62,5 @@ Extended existing startup_self_heal mechanism (not a new function):
 - diagnostic_logging: completed
 
 - settle_cleanup: completed
+
+- settle_cleanup_logging: completed
