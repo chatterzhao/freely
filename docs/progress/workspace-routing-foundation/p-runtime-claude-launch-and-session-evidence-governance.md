@@ -3,7 +3,7 @@
 - issue_id: `I-20260419-2245-A`
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-claude-launch-and-session-evidence-governance/issues/runtime-claude-launch-and-session-evidence-governance.md`
 - title: `Runtime Claude launch and session evidence governance`
-- phase_state: `in_verification`
+- phase_state: `completed`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/fix-tool-switch-noninteractive-state-20260419-2315`
