@@ -200,6 +200,16 @@ routing_policy:
   - docs/epics/freely-packaging-selfhost/code-reviews/20260502-packaging-implementation.md
 - next_action: 推进到 test-pre-merge，打包自举验证后 merge 到 develop
 
+8. `C-20260501-0000-A`
+- title: PR scan surface + FREELY_REPO_PLATFORMS config
+- milestone_state: committed
+- phase_state: `done_pre_brainstorm`
+- priority: P0
+- source_brainstorm: `docs/pre-brainstorms/20260501-0000--scan-pr-platform-config/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260501-0000--scan-pr-platform-config/candidates.md`
+- branch: `hotfix/scan-pr-platform-config`
+- next_action: Hotfix merged to develop.
+
 ### candidate_issues
 
 1. `C-20260417-0445-A`
@@ -3564,6 +3574,16 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/worker-active-reentry-for-manager-delegated-continuation-governance/issues/worker-active-reentry-for-manager-delegated-continuation-governance.md`
   - `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
 - completion_note: 当前 candidate 的旧 blocker 已被 canonical `develop` 否定并吸收：dispatch metadata 已成为 runtime contract，固定 numeric launch cap 已退场，parallel-safe prompts 会直接 launch，queue 只保留给 same-lane busy、单 wave 非并行限制与 `write_scope` 冲突。后续若要继续做更强的 scheduler fairness / quota / transaction 语义，应新开 lifecycle，而不是复活这条已收口的 research。
+
+1. `C-20260501-0000-A`
+- title: PR scan surface + FREELY_REPO_PLATFORMS config
+- milestone_state: candidate
+- phase_state: `done_pre_brainstorm`
+- priority: P0
+- promoted_issue_path: `docs/pre-brainstorms/20260501-0000--scan-pr-platform-config/brainstorms.md`
+- source_brainstorm: `docs/pre-brainstorms/20260501-0000--scan-pr-platform-config/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260501-0000--scan-pr-platform-config/candidates.md`
+- next_action: Hotfix merged to develop.
 
 ## M-20260312-control-surface-runtime-convergence
 
