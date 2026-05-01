@@ -11301,6 +11301,34 @@ ensure_runtime_workcell_initialized_for_launch() {
 }
 
 launch_worker_from_manager_prompt_if_needed() {
+  # ── Worker AI launch ──────────────────────────────────────────────
+  #
+  # DESIGN (2026-05-01):
+  #   If the worker worktree already has a running supervisor+AI → rebind/reentry.
+  #   Otherwise → launch worker AI directly via manager's ACP bridge:
+  #     run-acp-prompt.py --bridge-socket <manager_bridge> --cwd <worker_worktree>
+  #     This creates a new ACP session (fork) sharing the manager's bridge.
+  #     No separate freely daemon is started.
+  #
+  # PREVIOUS APPROACH (abandoned):
+  #   start_workcell_supervisor_async spawned a full freely daemon per worker
+  #   (nohup freely daemon-run --project <worker_worktree> &). This caused:
+  #   - Multiple daemon instances competing for PID files and system resources
+  #   - Orphan watchdog processes piling up (9+ concurrent observed)
+  #   - Worker prompts never consumed because worker daemon couldn't start cleanly
+  #
+  # OBSERVATION:
+  #   - Successful launch emits "worker_launched_directly" runtime event
+  #   - Worker output goes to cycle-worker-*.log in the manager's log dir
+  #   - Worker uses manager's bridge socket; bridge must be running
+  #   - If bridge socket is missing, worker launch is blocked (return 1)
+  #
+  # CAPABILITIES THE OLD APPROACH HAD:
+  #   - Independent worker lifecycle (worker daemon had its own supervisor loop)
+  #   - Worker crash recovery (daemon would restart worker AI)
+  #   - Worker state isolation (separate .freely/run/ per worktree)
+  #   The new approach shares the manager's runtime. If the worker AI crashes,
+  #   the manager's watchdog should detect and recover it.
   local manager_project="$1" prompt_file="$2"
   local target_project runtime_probe_project prompt_target_worktree
   local intake_id supervisor_pid ai_pid runtime_contract_file missing_fields_csv has_any_verification_metadata="0"
@@ -11351,14 +11379,29 @@ launch_worker_from_manager_prompt_if_needed() {
     request_local_continuation_reentry "$target_project" "$intake_id"
     return 0
   fi
-  # Launch worker AI directly via the manager's runtime — no separate daemon.
-  # The worker runs as a forked AI process, sharing the manager's ACP bridge.
+  # ── Direct worker AI launch (no separate daemon) ──────────────────
+  # The worker AI process runs in the background, connected to the manager's
+  # ACP bridge. This replaces start_workcell_supervisor_async which spawned
+  # a full freely daemon per worker (nohup freely daemon-run &).
+  #
+  # Worker lifecycle:
+  #   1. run-acp-prompt.py --bridge-socket <manager> --cwd <worker_worktree>
+  #   2. ACP session/new (fork) — worker gets own session
+  #   3. Worker AI reads prompt, executes task
+  #   4. Worker AI writes exit_contract (worker_done|blocked|handoff_needed)
+  #   5. Background process exits
+  #   6. Manager watchdog/patrol detects completion
+  #
+  # OBSERVATION POINTS:
+  #   - worker_launched_directly event in runtime-events.log
+  #   - cycle-worker-*.log in manager's log directory
+  #   - ai.pid file in worker's .freely/run/
+  #   - If bridge socket missing → launch blocked (return 1)
   local worker_pid worker_rc worker_cycle_log worker_ts
   worker_ts="$(date '+%Y%m%d-%H%M%S')"
   worker_cycle_log="$(logs_dir_for_project "$manager_project")/cycle-worker-$worker_ts.log"
 
   write_workcell_state "$target_project" "running" "down" "down" "manager_worker_launch_linkage"
-  # Pass parent session ID to worker so it can fork manager's context on startup.
   if [[ -n "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
     local worker_state_file
     worker_state_file="$(session_state_file "$target_project")"
@@ -11371,9 +11414,6 @@ SESSIONEOF
     log_info "worker session parent set: ${CLAUDE_SESSION_ID_CURRENT} → $target_project"
   fi
 
-  # Launch worker AI directly via manager's ACP bridge (no separate daemon).
-  # Worker reuses the manager's already-running bridge socket instead of
-  # starting its own claude-agent-acp process.
   local _worker_bridge_socket _worker_pid
   _worker_bridge_socket="$manager_project/.freely/run/acp-bridge.sock"
   if [[ ! -S "$_worker_bridge_socket" ]]; then
@@ -11628,22 +11668,47 @@ manager_runtime_launch_workers_from_latest_handoff() {
 }
 
 manager_runtime_launch_workers_after_ai_cycle_if_needed() {
+  # ── Worker launch after manager AI cycle ──────────────────────────
+  #
+  # DESIGN (2026-05-01):
+  #   Worker prompt paths are read from the exit_contract's WORKER_PROMPTS_CSV
+  #   field (env format, 100% machine-readable). Each worker is launched
+  #   directly via the manager's ACP bridge — no separate freely daemon.
+  #
+  # PREVIOUS APPROACH (abandoned):
+  #   manager_runtime_launch_workers_from_latest_handoff parsed worker
+  #   prompts from continuity markdown (awk regex). This was fragile:
+  #   - AI output format variations broke the regex parser
+  #   - Multi-layer gate checks (stale refs, launchable, etc.) filtered
+  #     out valid workers
+  #   - start_workcell_supervisor_async spawned a full freely daemon per
+  #     worker, causing resource conflicts and crash loops
+  #
+  # OBSERVATION:
+  #   - Watch for "worker launched via exit_contract" log entries
+  #   - If workers fail to launch, check exit_contract WORKER_PROMPTS_CSV
+  #   - launch_worker_from_manager_prompt_if_needed writes worker_launched_directly
+  #     event on success
+  #
+  # CAPABILITIES THE OLD APPROACH HAD:
+  #   - continuity-based dedup (same worker not re-launched across cycles)
+  #   - write_scope conflict detection (prevent parallel mutate conflicts)
+  #   - intent_signature blocking (prevent duplicate intent execution)
+  #   These are NOT implemented in the new path yet. Monitor for:
+  #   - Same worker being re-launched across multiple cycles
+  #   - Parallel workers mutating the same files
+  #   Future iterations should add these guards back at the exit_contract level.
   local project="$1" exit_reason="${2:-}" launched_count="0"
   [[ "$(effective_runtime_role_for_project "$project")" == "manager" ]] || {
     printf '0\n'
     return 0
   }
-  # Launch workers whenever the manager has a delegate_workers exit contract,
-  # not just when rc=0. The AI may have completed its analysis but exited non-zero
-  # due to transient ACP errors — the worker delegation is still valid.
   local _contract_kind
   _contract_kind="$(manager_exit_contract_kind "$project" 2>/dev/null || true)"
   if [[ "$_contract_kind" != "delegate_workers" ]]; then
     printf '0\n'
     return 0
   fi
-  # Read worker prompts directly from exit_contract (machine-readable env format),
-  # bypassing the fragile continuity markdown parsing pipeline.
   local _worker_csv _prompt_file _launched_count
   _worker_csv="$(meta_env_value "$(manager_exit_contract_file "$project")" "WORKER_PROMPTS_CSV" 2>/dev/null || true)"
   _launched_count=0
