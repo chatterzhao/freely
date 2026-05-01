@@ -68,3 +68,7 @@ Extended existing startup_self_heal mechanism (not a new function):
 - cleanup_worker_launchable: completed
 
 - worker_launch_on_delegate: completed
+
+- stream_json_adapter: dropped (prototype, shelved for cache reasons)
+
+- worker_direct_launch: completed
