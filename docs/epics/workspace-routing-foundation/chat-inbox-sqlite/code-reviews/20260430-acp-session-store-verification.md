@@ -116,3 +116,5 @@ and refuses to attach to a crashing supervisor, forcing a clean start.
 settle_retire_ready_merged_worker_runtime_state now executes git worktree
 remove + git branch -d for merged worktrees instead of just clearing state
 files. Enables self-governing closeout without dedicated worker processes.
+
+## follow-on: 2026-04-30 (16) settle logging
