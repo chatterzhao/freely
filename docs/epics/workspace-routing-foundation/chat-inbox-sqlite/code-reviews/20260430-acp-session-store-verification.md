@@ -122,3 +122,7 @@ files. Enables self-governing closeout without dedicated worker processes.
 ## follow-on: 2026-04-30 (17) cleanup workers launchable for merged worktrees
 
 ## follow-on: 2026-04-30 (18) worker launch on delegate_workers not just rc=0
+
+## follow-on: 2026-05-01 (19) stream-json prototype (dropped)
+Prototype shelved: no cross-process cache hits with claude -p mode.
+ACP confirmed 60% speed improvement via session/resume cache.

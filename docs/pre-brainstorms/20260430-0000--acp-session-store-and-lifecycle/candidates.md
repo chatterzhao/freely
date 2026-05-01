@@ -39,3 +39,15 @@
 - restart_storm_auto_force: `2026-04-30`
 
 - pre_tests_update: `2026-04-30`
+
+### C-20260430-0000-B: Claude stream-json adapter (prototype, shelved)
+
+- title: `Claude stream-json direct adapter replacing claude-agent-acp`
+- status: `dropped`
+- scope: |
+  stream-json-bridge.py + monitor-ai-stream-json.sh.
+  Direct claude communication without claude-agent-acp dependency.
+- priority: `P1`
+- type: `experiment`
+- decision_reason: `No cross-process cache hits — claude -p mode generates new system prompt each invocation. ACP confirmed 60% cache improvement via session/resume. Shelved until Claude CLI supports persistent --session-id in -p mode or we implement process-level session persistence.`
+- next_action: `Revisit when upstream supports persistent sessions in print mode.`
