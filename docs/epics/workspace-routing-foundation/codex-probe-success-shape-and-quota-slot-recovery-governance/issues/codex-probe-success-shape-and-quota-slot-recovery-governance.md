@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260412-0907-A`
 - title: Codex probe success shape and quota slot recovery governance
-- phase_state: `in_verification`
+- phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - epic-name: `workspace-routing-foundation`
 - story-name: `codex-probe-success-shape-and-quota-slot-recovery-governance`
