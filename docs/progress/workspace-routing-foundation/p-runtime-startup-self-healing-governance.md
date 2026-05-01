@@ -3,7 +3,7 @@
 - issue_id: `I-20260419-1630-A`
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/issues/runtime-startup-self-healing-governance.md`
 - title: `Runtime startup self-healing governance`
-- phase_state: `in_verification`
+- phase_state: `completed`
 - runtime_state: `stopped`
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/live-status-hang-root-cause-20260422`
