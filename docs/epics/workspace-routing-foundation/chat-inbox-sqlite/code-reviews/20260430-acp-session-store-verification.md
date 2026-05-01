@@ -100,3 +100,9 @@ After parent exits, PID file has dead PID. stop sends SIGTERM to dead PID → no
 Fix: move PID write to after fork so file contains daemon child PID.
 
 ## follow-on: 2026-04-30 (12) auto-force clean start on restart storm
+
+## follow-on: 2026-04-30 (13) stop cleanup + no attach to storm
+
+stop: added last-resort pkill of all project processes after PID-file termination.
+start: active_runtime_attach_reusable_for_project now checks restart storm count
+and refuses to attach to a crashing supervisor, forcing a clean start.
