@@ -18399,7 +18399,7 @@ start_project_runtime() {
       "role=${LAST_ROLE_HINT:-unknown}" \
       "launch_kind=$mode_name" \
       "prompt_file=$prompt_file" \
-      "prompt_bytes=$(wc -c < "$prompt_file" 2>/dev/null || echo '0')" \
+      "prompt_bytes=$(wc -c < "$prompt_file" 2>/dev/null | tr -d ' ' || echo '0')" \
       "resume_streak=${RESUME_STREAK_CURRENT:-0}" \
       "context_ratio=${context_ratio:-0}" \
       "acp_process_count=${_cache_acp_count}" \
