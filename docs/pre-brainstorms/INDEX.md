@@ -1,4 +1,16 @@
 # Pre-brainstorm 索引（IBM Framework B1）
+- 20260501-0000--worker-launch-refactor
+  - brainstorms: docs/pre-brainstorms/20260501-0000--worker-launch-refactor/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260501-0000--worker-launch-refactor/candidates.md
+
+- 20260430-0000--acp-session-store-and-lifecycle
+  - brainstorms: docs/pre-brainstorms/20260430-0000--acp-session-store-and-lifecycle/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260430-0000--acp-session-store-and-lifecycle/candidates.md
+
+- 20260430-0010--doc-sync-chat-inbox
+  - brainstorms: docs/pre-brainstorms/20260430-0010--doc-sync-chat-inbox/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260430-0010--doc-sync-chat-inbox/candidates.md
+
 - 20260429-1745--bash32-daemon-compat-fix
   - brainstorms: docs/pre-brainstorms/20260429-1745--bash32-daemon-compat-fix/brainstorms.md
   - candidates: docs/pre-brainstorms/20260429-1745--bash32-daemon-compat-fix/candidates.md
@@ -10,6 +22,10 @@
 - 20260429-2040--chat-inbox-sqlite
   - brainstorms: docs/pre-brainstorms/20260429-2040--chat-inbox-sqlite/brainstorms.md
   - candidates: docs/pre-brainstorms/20260429-2040--chat-inbox-sqlite/candidates.md
+
+- 20260428-1737--scan-lifecycle-platform-sync-redesign
+  - brainstorms: docs/pre-brainstorms/20260428-1737--scan-lifecycle-platform-sync-redesign/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260428-1737--scan-lifecycle-platform-sync-redesign/candidates.md
 
 - 20260427-0000--b1-intake-issue-sync
   - brainstorms: docs/pre-brainstorms/20260427-0000--b1-intake-issue-sync/brainstorms.md
