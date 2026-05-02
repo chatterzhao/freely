@@ -312,10 +312,12 @@ try:
     env = d.get('env', {})
     for k, v in env.items():
         print(f'{k}={v}')
-    # Also export permissionMode so ACP bridge inherits it
+    # Export permissionMode for Claude Code SDK
     pm = d.get('permissionMode', '')
     if pm:
-        print(f'FREELY_PERMISSION_MODE={pm}')
+        print(f'CLAUDE_CODE_PERMISSION_MODE={pm}')
+    # Also export the settings file path itself
+    print(f'CLAUDE_CODE_SETTINGS_FILE={alias_path}')
 except: pass
 " 2>/dev/null)
 }
