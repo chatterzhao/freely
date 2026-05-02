@@ -2,7 +2,8 @@
 set -euo pipefail
 
 branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
-[[ "$branch" == "develop" ]] || exit 0
+# Protected branches that only accept merge: develop, main
+[[ "$branch" == "develop" || "$branch" == "main" ]] || exit 0
 project_root="$(git rev-parse --show-toplevel 2>/dev/null || pwd -P)"
 guarded_state_path="$(git rev-parse --git-dir 2>/dev/null || true)"
 if [[ -n "$guarded_state_path" ]]; then
@@ -158,7 +159,7 @@ set -e
 
 if [[ "$gate_rc" -ne 0 ]]; then
   cat <<MSG
-[HOOK] Merge blocked: develop-bound governance materialization gate failed.
+[HOOK] Merge blocked: protected-branch governance materialization gate failed.
 
 $gate_output
 
@@ -182,7 +183,7 @@ set -e
 
 if [[ "$promotion_rc" -ne 0 ]]; then
   cat <<MSG
-[HOOK] Merge blocked: develop-bound promotion ownership gate failed.
+[HOOK] Merge blocked: protected-branch promotion ownership gate failed.
 
 $promotion_output
 

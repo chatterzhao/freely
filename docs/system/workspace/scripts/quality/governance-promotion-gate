@@ -109,7 +109,7 @@ done
 
 project="$(abs_path_or_fail "$project")"
 target_branch="${target_branch:-$(branch_name_for_project "$project")}"
-[[ "$target_branch" == "develop" ]] || exit 0
+[[ "$target_branch" == "develop" || "$target_branch" == "main" ]] || exit 0
 
 current_branch="$(branch_name_for_project "$project")"
 source_branch="${source_branch:-$(discover_merge_source_branch "$project" "$current_branch")}"
@@ -119,7 +119,7 @@ if [[ -n "$source_worktree" && -d "$source_worktree" ]] && worker_project_is_act
   local_match_count=0
   conflict_worktree=""
   signature="$(project_current_blocking_intent_signature "$source_worktree")"
-  if [[ "$signature" == promotion@*"-> develop" ]]; then
+  if [[ "$signature" == promotion@*"-> develop" || "$signature" == promotion@*"-> main" ]]; then
     while IFS= read -r candidate_worktree; do
       [[ -n "$candidate_worktree" ]] || continue
       local_match_count=$((local_match_count + 1))
@@ -138,7 +138,7 @@ while IFS= read -r issue_id; do
   [[ -n "$issue_id" ]] || continue
   local_match_count=0
   conflict_worktree=""
-  signature="promotion@${issue_id} -> develop"
+  signature="promotion@${issue_id} -> ${target_branch}"
   while IFS= read -r candidate_worktree; do
     [[ -n "$candidate_worktree" ]] || continue
     local_match_count=$((local_match_count + 1))

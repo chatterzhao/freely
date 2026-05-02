@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+set -euo pipefail
+shopt -s nullglob
+
+# test-pre-merge-selfhost: 打包当前分支并用它开发 Freely，验证自举
+#
+# 这是 merge 到 develop 的前置门禁。
+# 从 test-pre-merge 分支打包 Freely，用打包版本启动 daemon，
+# 验证它能正常完成一个 Manager cycle（patrol → 判断 → 产出）。
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+PACKAGE_DIR=""
+PROJECT="${1:-$ROOT_DIR}"
+VERSION="test-$(date -u +%Y%m%d-%H%M%S)"
+
+cleanup() {
+  if [[ -n "${PACKAGE_DIR:-}" && -d "$PACKAGE_DIR" ]]; then
+    rm -rf "$PACKAGE_DIR"
+  fi
+}
+trap cleanup EXIT
+
+echo "[selfhost-test] packaging $VERSION from $ROOT_DIR ..."
+PACKAGE_DIR="$(mktemp -d /tmp/freely-selfhost-test.XXXXXX)"
+
+"$ROOT_DIR/bin/freely-package" --version "$VERSION" --output "$PACKAGE_DIR" 2>&1 | tail -1
+
+echo "[selfhost-test] starting packaged freely daemon on $PROJECT ..."
+PACKAGED_FREELY="$PACKAGE_DIR/bin/freely"
+
+if [[ ! -x "$PACKAGED_FREELY" ]]; then
+  echo "[selfhost-test] FAIL: packaged freely not found at $PACKAGED_FREELY"
+  exit 1
+fi
+
+# 启动 daemon
+DAEMON_OUTPUT=$("$PACKAGED_FREELY" daemon start --project "$PROJECT" 2>&1)
+echo "$DAEMON_OUTPUT"
+
+# 提取 supervisor PID
+SUPERVISOR_PID=$(echo "$DAEMON_OUTPUT" | grep "supervisor_pid:" | awk '{print $2}')
+if [[ -z "${SUPERVISOR_PID:-}" ]]; then
+  echo "[selfhost-test] FAIL: cannot determine supervisor PID"
+  exit 1
+fi
+echo "[selfhost-test] supervisor PID: $SUPERVISOR_PID"
+
+# 等待第一个 Manager cycle 完成 (最多 5 分钟)
+echo "[selfhost-test] waiting for first Manager cycle ..."
+WAITED=0
+MAX_WAIT=300
+CYCLE_DONE=0
+
+while [[ $WAITED -lt $MAX_WAIT ]]; do
+  sleep 10
+  WAITED=$((WAITED + 10))
+
+  # 检查 lifecycle trace 是否有 prompt_build_complete (L021)
+  TRACE="$PROJECT/.freely/logs/lifecycle-trace.log"
+  if [[ -f "$TRACE" ]]; then
+    if grep -q "stage=prompt_build_complete\|stage=ai_launch_begin" "$TRACE" 2>/dev/null; then
+      CYCLE_DONE=1
+      break
+    fi
+  fi
+
+  # supervisor 还活着吗
+  if ! kill -0 "$SUPERVISOR_PID" 2>/dev/null; then
+    echo "[selfhost-test] FAIL: supervisor died before completing first cycle"
+    tail -20 "$PROJECT/.freely/logs/runtime-events.log" 2>/dev/null || true
+    exit 1
+  fi
+done
+
+if [[ $CYCLE_DONE -eq 0 ]]; then
+  echo "[selfhost-test] FAIL: timeout waiting for first cycle ($MAX_WAIT s)"
+  "$PACKAGED_FREELY" daemon stop --project "$PROJECT" 2>/dev/null || true
+  exit 1
+fi
+
+echo "[selfhost-test] first cycle detected — stopping daemon ..."
+"$PACKAGED_FREELY" daemon stop --project "$PROJECT" 2>/dev/null || true
+
+echo "[selfhost-test] PASS: packaged $VERSION successfully developed Freely"
+exit 0

@@ -103,6 +103,21 @@ routing_policy:
 
 
 
+### committed_issues
+
+7. `I-20260502-0500-A`
+- title: Freely 打包与自举验证
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P0
+- issue_path: docs/epics/freely-packaging-selfhost/issues/freely-packaging-selfhost.md
+- progress_path: docs/progress/freely-packaging-selfhost/p-freely-packaging-selfhost.md
+- source_brainstorm: docs/pre-brainstorms/freely-packaging-selfhost/freely-packaging-selfhost.md
+- source_candidates: docs/pre-brainstorms/freely-packaging-selfhost/candidates.md
+- evidence:
+  - docs/epics/freely-packaging-selfhost/code-reviews/20260502-packaging-implementation.md
+- next_action: 推进到 test-pre-merge，打包自举验证后 merge 到 develop
+
 ### candidate_issues
 
 1. `C-20260417-0445-A`
