@@ -4,7 +4,10 @@ description: 打包与自举验证——从 develop 打包可独立运行的 Fre
 type: candidate
 phase_state: promoted
 priority: P0
+promoted_issue_path: ""
 milestone: current
+session_refs:
+  - {tool: "manual", session_id: "pre-brainstorm-creation", jsonl_path: "unavailable"}
 next_action: 推进到 B2_IBM，创建 issue 进行实现
 revisit_trigger: 无
 ---
@@ -26,4 +29,4 @@ revisit_trigger: 无
 
 ## 关联预研
 
-`docs/pre-brainstorms/freely-packaging-selfhost.md`
+`docs/pre-brainstorms/20260502-0500--freely-packaging-selfhost/brainstorms.md`
