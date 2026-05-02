@@ -2,8 +2,7 @@
 name: freely-packaging-selfhost-candidate
 description: 打包与自举验证——从 develop 打包可独立运行的 Freely 版本，用打包版本开发 Freely 自己，作为 merge 到 develop 的前置门禁
 type: candidate
-phase_state: promoted
-promoted_to: I-20260502-0500
+phase_state: proposed
 priority: P0
 milestone: current
 next_action: 推进到 B2_IBM，创建 issue 进行实现
