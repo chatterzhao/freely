@@ -125,8 +125,8 @@ routing_policy:
 - priority: P0
 - issue_path: docs/epics/freely-packaging-selfhost/issues/freely-packaging-selfhost.md
 - progress_path: docs/progress/freely-packaging-selfhost/p-freely-packaging-selfhost.md
-- source_brainstorm: docs/pre-brainstorms/freely-packaging-selfhost/freely-packaging-selfhost.md
-- source_candidates: docs/pre-brainstorms/freely-packaging-selfhost/candidates.md
+- source_brainstorm: docs/pre-brainstorms/20260502-0500--freely-packaging-selfhost/freely-packaging-selfhost.md
+- source_candidates: docs/pre-brainstorms/20260502-0500--freely-packaging-selfhost/candidates.md
 - evidence:
   - docs/epics/freely-packaging-selfhost/code-reviews/20260502-packaging-implementation.md
 - next_action: 推进到 test-pre-merge，打包自举验证后 merge 到 develop

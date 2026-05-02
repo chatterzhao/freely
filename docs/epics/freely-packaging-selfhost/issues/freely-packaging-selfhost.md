@@ -1,7 +1,7 @@
 # Issue: Freely 打包与自举验证
 
 - issue_id: I-20260502-0500-A
-- source_candidate: docs/pre-brainstorms/freely-packaging-selfhost/candidates.md#c-20260502-0500-a
+- source_candidate: docs/pre-brainstorms/20260502-0500--freely-packaging-selfhost/candidates.md#c-20260502-0500-a
 - phase_state: in_dev
 - milestone: current
 - verification_artifact_dir: docs/epics/freely-packaging-selfhost/code-reviews
