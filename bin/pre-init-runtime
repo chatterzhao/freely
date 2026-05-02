@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# pre-init-runtime: 初始化 test-pre-merge 工位的运行时环境
+# 从 develop（或指定源）复制 config、session-store、continuity 等
+# 使 pre 工位具备完整的 Manager 运行能力
+#
+# 用法: ./bin/pre-init-runtime --pre-project <path> [--source-project <path>]
+# 默认 --source-project 为 develop 分支对应的项目根目录
+
+PRE_PROJECT=""
+SOURCE_PROJECT=""
+
+usage() {
+  echo "Usage: pre-init-runtime --pre-project <path> [--source-project <path>]" >&2
+  exit 1
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --pre-project) PRE_PROJECT="${2:-}"; shift 2 ;;
+    --source-project) SOURCE_PROJECT="${2:-}"; shift 2 ;;
+    *) usage ;;
+  esac
+done
+
+[[ -n "$PRE_PROJECT" && -d "$PRE_PROJECT" ]] || usage
+
+if [[ -z "$SOURCE_PROJECT" ]]; then
+  SOURCE_PROJECT="$(git worktree list --porcelain 2>/dev/null | awk '
+    /^worktree / { wt=$2 }
+    /^branch/ && $2 == "refs/heads/develop" { print wt; exit }
+  ')"
+fi
+
+[[ -n "$SOURCE_PROJECT" && -d "$SOURCE_PROJECT" ]] || {
+  echo "[ERROR] cannot find develop worktree for --source-project" >&2
+  exit 1
+}
+
+echo "[pre-init] source: $SOURCE_PROJECT"
+echo "[pre-init] target: $PRE_PROJECT"
+
+# 1. 创建目录
+mkdir -p "$PRE_PROJECT/.freely/run" "$PRE_PROJECT/.freely/logs" "$PRE_PROJECT/.freely/intake"
+
+# 2. 复制 config.env，修正 PROJECT_ROOT 和相关路径
+if [[ -f "$SOURCE_PROJECT/.freely/config.env" ]]; then
+  sed \
+    -e "s|PROJECT_ROOT=.*|PROJECT_ROOT=\"$PRE_PROJECT\"|" \
+    -e "s|INTENT_FILE=.*|INTENT_FILE=\"$PRE_PROJECT/docs/PROJECT_INTENT.md\"|" \
+    -e "s|CONSTITUTION_FILE=.*|CONSTITUTION_FILE=\"$PRE_PROJECT/docs/CONSTITUTION.md\"|" \
+    "$SOURCE_PROJECT/.freely/config.env" > "$PRE_PROJECT/.freely/config.env"
+  echo "  config.env (paths fixed)"
+else
+  echo "  [WARN] no config.env in source"
+fi
+
+# 3. 复制 freely.db（session-store、chat-inbox）
+if [[ -f "$SOURCE_PROJECT/.freely/freely.db" ]]; then
+  cp "$SOURCE_PROJECT/.freely/freely.db" "$PRE_PROJECT/.freely/freely.db"
+  echo "  freely.db"
+fi
+
+# 4. 复制工具边界引导
+if [[ -f "$SOURCE_PROJECT/.freely/tool-boundary-bootstrap.md" ]]; then
+  cp "$SOURCE_PROJECT/.freely/tool-boundary-bootstrap.md" "$PRE_PROJECT/.freely/tool-boundary-bootstrap.md"
+  echo "  tool-boundary-bootstrap.md"
+fi
+
+echo "[pre-init] done. $PRE_PROJECT is ready to run as Manager."

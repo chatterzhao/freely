@@ -61,11 +61,20 @@ Freely 处于研究优先的整合阶段。
 1. **分支/Worktree检查**：如在 `main`/`develop`/`test-pre-merge-*` 分支则禁止写入、提交，它们只接受 merge。若是启动 Freely runtime，应在项目根目录启动，但这不放宽 protected root 的 owner-development 禁令；实际写入必须由 Freely 委派到 dedicated worktree。先执行 `cd <your-project-path>`，再优先使用标准入口 `./bin/wt-create <branch> [--base <base>]` 创建 feature worktree，并 `cd` 到该 worktree 中工作。只有在基础设施受限、必须手工执行 `git worktree add -b <branch> ../<your-project-worktrees>/<branch-dir> <base>` 时，才允许裸建树，并且随后必须立刻执行 `./bin/freely sync-tooling --source-project <your-project-path> --project ../<your-project-worktrees>/<branch-dir>`。默认 `<base>` 为 `develop`；若当前 issue 依赖未合并父分支改动，可用父 `feature/*` 作为 `<base>`，但必须在 pre-brainstorm / milestone / issue 中记录依赖关系。`<your-project-worktrees>` 指当前项目同级的 worktree 根目录，格式为 `<your-project-name>-worktrees`。`<branch-dir>` 必须与当前 worktree 派生规则一致：无日期分支使用 `<branch>` 的安全化名称；若分支名包含 `YYYYMMDD` 或 `YYYYMMDD-HHMM/HHMMSS`，目录名改为日期前置，例：`feature/foo-20260307-1015` -> `20260307-1015-feature-foo`
    - 先确认 `git config --get core.hooksPath` 返回 `.githooks`。仓库中“存在 hook 脚本”不代表 Git 已启用它们；只有 `core.hooksPath=.githooks` 时，根目录 `.githooks/` 包装层才会实际转发到 `docs/system/workspace/hooks/*.sh` 执行门禁。
    - `test-pre-merge-*` 是一次性本地测试批次：必须从当前 `develop` 新建，只允许 merge 装配验证，不允许普通写入/提交/push，不允许承载 owner / milestone / continuation 真相，测试结束后立即删除。
+  	   - **test-pre-merge 的职责**：验证 feature 能否在真实环境中正常工作，保证 develop 只接受已验证的代码。
+  	     - develop 的干净面 = 每次 merge 前都经过了 test-pre-merge 的端到端验证
+  	     - 未经 test-pre-merge 验证的代码不得 merge 到 develop
+  	   - **test-pre-merge 运行环境初始化**：
+  	     - pre 工位从 develop 创建后是裸分支，无 config、无 session-store、无 continuity
+  	     - 必须运行 `./bin/pre-init-runtime --pre-project <pre-worktree>` 从 develop 复制运行时状态
+  	     - 这会复制 config.env（修正路径）、freely.db（session-store）、tool-boundary-bootstrap
+  	     - 初始化后 pre 工位具备完整的 Manager 运行能力
   	   - **test-pre-merge 的真实环境测试（端到端门禁）**：feature 合并到 test-pre-merge 后必须通过自举验证才能合并到 develop：
-  	     1. `./bin/freely-package --version test-YYYYMMDD-NNN-dev` — 从 test-pre-merge 打包 pre 版本
-  	     2. 用打包后的 `freely` 启动 daemon 开发 Freely 自己（或指定一个 feature worktree）
-  	     3. 验证至少完成一个 Manager cycle（patrol → 判断 → 产出）
-  	     4. 通过 → merge 到 develop。失败 → 丢弃 test-pre-merge，修 feature
+  	     1. `./bin/pre-init-runtime --pre-project <pre-worktree>` — 初始化运行时环境
+  	     2. `./bin/freely-package --version test-YYYYMMDD-NNN-dev` — 从 test-pre-merge 打包 pre 版本
+  	     3. 用打包后的 `freely` 启动 daemon 开发 Freely 自己（或指定一个 feature worktree）
+  	     4. 验证至少完成一个 Manager cycle（patrol → 判断 → 产出），AI 不崩溃、不重启循环
+  	     5. 通过 → merge 到 develop。失败 → 丢弃 test-pre-merge，修 feature
   	     - 预置脚本：`./bin/test-pre-merge-selfhost <project>` 执行步骤 1-3
   	     - 成功标准：打包版本能开发 Freely 自己。这个测试落地了"编译器自举"——用上一个版本开发下一个版本。
   	     - 示例：`./bin/test-pre-merge-selfhost /path/to/project`
