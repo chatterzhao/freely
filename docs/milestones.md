@@ -108,8 +108,9 @@ routing_policy:
 1. `C-20260502-0500-A`
 - title: Freely 打包与自举验证
 - milestone_state: candidate
-- phase_state: `proposed`
+- phase_state: `promoted`
 - priority: P0
+- promoted_issue_path: docs/epics/freely-packaging-selfhost/issues/freely-packaging-selfhost.md
 - source_brainstorm: `docs/pre-brainstorms/freely-packaging-selfhost/freely-packaging-selfhost.md`
 - source_candidates: `docs/pre-brainstorms/freely-packaging-selfhost/candidates.md`
 - next_action: 推进到 test-pre-merge，打包自举验证后 merge 到 develop
