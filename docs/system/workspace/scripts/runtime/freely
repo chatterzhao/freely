@@ -11488,7 +11488,9 @@ manager_runtime_launch_workers_from_latest_handoff() {
   max_parallel_workers="$(manager_max_parallel_workers)"
   active_running_workers="$(manager_semantic_loop_active_worker_count_for_project "$project")"
   available_new_slots="$(manager_worker_launch_available_slots "$project")"
+  local max_new_workers_per_cycle=2  # Phase 4: stagger worker creation to prevent session/new storms
   launched_count=0
+  local new_worker_count=0
   queued_prompt_blockers="none"
   selected_write_scopes_csv=""
   active_intent_signatures_csv="$(manager_active_blocking_intent_signatures_csv "$project")"
@@ -11651,6 +11653,11 @@ manager_runtime_launch_workers_from_latest_handoff() {
         continue
       fi
     fi
+    # Phase 4: stagger new worker creation (max 2 per cycle)
+    if [[ "$worker_is_active" != "1" ]] && (( new_worker_count >= max_new_workers_per_cycle )); then
+      queued_csv="$(csv_append_unique_item "$queued_csv" "$prompt_file")"
+      continue
+    fi
     if launch_worker_from_manager_prompt_if_needed "$project" "$prompt_file"; then
       launched_csv="$(csv_append_unique_item "$launched_csv" "$prompt_file")"
       selected_write_scopes_csv="$(csv_append_unique_item "$selected_write_scopes_csv" "$write_scope")"
@@ -11659,6 +11666,7 @@ manager_runtime_launch_workers_from_latest_handoff() {
       fi
       launched_count=$((launched_count + 1))
       if [[ "$worker_is_active" != "1" ]]; then
+        new_worker_count=$((new_worker_count + 1))
         active_running_workers=$((active_running_workers + 1))
       fi
     else
