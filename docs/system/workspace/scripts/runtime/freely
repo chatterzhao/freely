@@ -11897,6 +11897,9 @@ try:
         d = json.load(f)
     for k, v in d.get('env', {}).items():
         print(f'{k}={v}')
+    pm = d.get('permissionMode', '')
+    if pm:
+        print(f'CLAUDE_CODE_PERMISSION_MODE={pm}')
 except: pass
 " 2>/dev/null)
         fi
