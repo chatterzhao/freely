@@ -18109,7 +18109,7 @@ start_project_runtime() {
         --tool "$AI_TOOL" \
         --tool-adapter "${tool_adapter:-}" \
         --model "${AI_MODEL:-}" \
-        --reasoning-effort "${AI_REASONING_EFFORT:-}" \ \
+        --reasoning-effort "${AI_REASONING_EFFORT:-}" \
         --tool-capabilities "${AI_TOOL_CAPABILITIES:-}" \
         --tool-policy "${AI_TOOL_POLICY:-}" \
         --codex-capability-model "${AI_CAPABILITY_CODEX_MODEL:-}" \
