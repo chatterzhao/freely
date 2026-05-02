@@ -300,7 +300,7 @@ _apply_tool_alias_settings() {
   # Expand ~ to $HOME
   alias_path="${alias_path/#\~/$HOME}"
   [[ -f "$alias_path" ]] || return 0
-  # Read env vars from settings JSON and export them
+  # Read env vars and permission mode from settings JSON and export them
   while IFS='=' read -r key value; do
     [[ -n "$key" ]] || continue
     export "$key"="$value"
@@ -312,6 +312,10 @@ try:
     env = d.get('env', {})
     for k, v in env.items():
         print(f'{k}={v}')
+    # Also export permissionMode so ACP bridge inherits it
+    pm = d.get('permissionMode', '')
+    if pm:
+        print(f'FREELY_PERMISSION_MODE={pm}')
 except: pass
 " 2>/dev/null)
 }
