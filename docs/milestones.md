@@ -63,6 +63,21 @@ routing_policy:
   - docs/epics/token-cost-optimization/code-reviews/20260502-phase-0-4-implementation.md
 - next_action: test-pre-merge 验证后 merge develop
 
+8. `I-20260502-1028-A`
+- title: fix: clean stale start lock before daemon stop
+- milestone_state: committed
+- phase_state: `done`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/stale-start-lock-cleanup/issues/I-20260502-1028-A.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-stale-start-lock-cleanup.md`
+- source_candidates: `docs/pre-brainstorms/20260502-1028--stale-start-lock-cleanup/candidates.md`
+- branch: `hotfix/stop-clean-stale-lock-20260502`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/stale-start-lock-cleanup/issues/I-20260502-1028-A.md`
+  - `docs/progress/workspace-routing-foundation/p-stale-start-lock-cleanup.md`
+  - `docs/epics/workspace-routing-foundation/stale-start-lock-cleanup/code-reviews/20260502-stale-start-lock-cleanup-verification.md`
+- next_action: `Merge to develop, then release to main.`
+
 7. `I-20260421-1530-A`
 - title: Live-status scan summary and prompt anchor governance
 - milestone_state: committed
