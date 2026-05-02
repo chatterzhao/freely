@@ -11897,6 +11897,9 @@ try:
         d = json.load(f)
     for k, v in d.get('env', {}).items():
         print(f'{k}={v}')
+    pm = d.get('permissionMode', '')
+    if pm:
+        print(f'CLAUDE_CODE_PERMISSION_MODE={pm}')
 except: pass
 " 2>/dev/null)
         fi
@@ -17256,6 +17259,9 @@ stop_project_runtime() {
   sdir="$(state_dir "$project")"
   run_dir="$(run_dir_for_project "$project")"
   mkdir -p "$run_dir"
+  # Clean stale start lock before acquiring — a force-killed daemon leaves
+  # the lock behind, which would block stop with "start already in progress".
+  cleanup_project_start_lock_if_stale_for_runtime "$project"
   acquire_project_start_lock_or_wait "$project" "freely_stop" || exit 1
   stop_lock_acquired="1"
   stop_marker="$(stop_marker_file "$project")"
