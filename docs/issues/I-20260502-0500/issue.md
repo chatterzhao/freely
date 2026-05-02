@@ -3,6 +3,7 @@ local_id: I-20260502-0500
 kind: linked
 status: in_progress
 phase_state: done_ibm
+source_candidate: docs/pre-brainstorms/freely-packaging-selfhost/candidates.md
 canonical_issue_path: docs/issues/I-20260502-0500/issue.md
 created_at: "2026-05-02T05:00:00Z"
 updated_at: "2026-05-02T05:50:00Z"
