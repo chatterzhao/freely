@@ -1,0 +1,463 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'USAGE'
+Usage:
+  ./bin/merge-guarded <target-branch> <source-branch>
+  ./bin/merge-guarded complete <target-branch> <source-branch> [--break-glass --reason <reason> --blocked-gate <gate> --evidence-ref <ref>... --follow-on-issue <issue>]
+
+Behavior:
+  - non-interactive policy gate before merge
+  - blocks invalid merge direction immediately
+  - writes protected-branch merge receipts into merge commit messages
+  - supports a controlled conflict completion path
+
+Break-glass:
+  - default bypass mode is forbidden
+  - break-glass is only for protected-branch merge completion
+  - bare git commit --no-verify is not an allowed replacement
+USAGE
+}
+
+fail() {
+  echo "[MERGE-GUARD] $*" >&2
+  exit 1
+}
+
+current_branch() {
+  git rev-parse --abbrev-ref HEAD 2>/dev/null || true
+}
+
+git_dir() {
+  git rev-parse --git-dir 2>/dev/null || true
+}
+
+guarded_state_path() {
+  printf '%s/freely-guarded-merge-state\n' "$(git_dir)"
+}
+
+protected_branch() {
+  local branch="$1"
+  case "$branch" in
+    main|develop|test-pre-merge-*) return 0 ;;
+  esac
+  return 1
+}
+
+validate_merge_direction() {
+  local target="$1"
+  local source_branch="$2"
+  local allowed=0
+
+  if [[ "$target" == test-pre-merge-* ]]; then
+    case "$source_branch" in
+      feature/*|hotfix/*|feature/premerge-*) allowed=1 ;;
+    esac
+  else
+    case "$target" in
+      develop)
+        case "$source_branch" in
+          test-pre-merge-*|hotfix/*) allowed=1 ;;
+        esac
+        ;;
+      main)
+        case "$source_branch" in
+          release/*|hotfix/*) allowed=1 ;;
+        esac
+        ;;
+    esac
+  fi
+
+  if [[ "$allowed" != "1" ]]; then
+    cat <<MSG >&2
+[MERGE-GUARD] blocked merge:
+  target: $target
+  source: $source_branch
+
+Allowed:
+  feature/* -> test-pre-merge-*
+  hotfix/* -> test-pre-merge-*
+  feature/premerge-* -> test-pre-merge-*
+  test-pre-merge-* -> develop
+  hotfix/* -> develop
+  release/* -> main
+  hotfix/* -> main
+MSG
+    exit 1
+  fi
+}
+
+check_branch_context() {
+  local expected="$1"
+  local actual
+  actual="$(current_branch)"
+  [[ "$actual" == "$expected" ]] || fail "blocked: current branch is '$actual', expected '$expected'."
+}
+
+run_promotion_gate_if_needed() {
+  local target="$1"
+  local source_branch="$2"
+  if [[ "$target" == "develop" && -x "./bin/governance-promotion-gate" ]]; then
+    ./bin/governance-promotion-gate --project "$PWD" --target-branch "$target" --source-branch "$source_branch"
+  fi
+}
+
+render_merge_message() {
+  local merge_path="$1"
+  local bypass_mode="$2"
+  local source_branch="$3"
+  local reason="${4:-}"
+  local blocked_gate="${5:-}"
+  local follow_on_issue="${6:-}"
+  shift 6 || true
+  local evidence_refs=()
+  if [[ "$#" -gt 0 ]]; then
+    evidence_refs=("$@")
+  fi
+
+  cat <<EOF
+Merge branch '$source_branch' into $(current_branch)
+
+Freely-Merge-Path: $merge_path
+Freely-Bypass-Mode: $bypass_mode
+Freely-Source-Branch: $source_branch
+EOF
+
+  if [[ "$bypass_mode" == "break_glass" ]]; then
+    cat <<EOF
+Freely-Break-Glass-Reason: $reason
+Freely-Blocked-Gate: $blocked_gate
+Freely-Operation-Scope: merge_completion_only
+Freely-Follow-On-Issue: $follow_on_issue
+EOF
+    local ref
+    for ref in "${evidence_refs[@]}"; do
+      printf 'Freely-Evidence-Ref: %s\n' "$ref"
+    done
+  fi
+}
+
+require_merge_in_progress() {
+  local merge_head_path
+  merge_head_path="$(git_dir)/MERGE_HEAD"
+  [[ -f "$merge_head_path" ]] || fail "blocked: no merge in progress."
+}
+
+require_matching_merge_head() {
+  local source_branch="$1"
+  local merge_head_path merge_head source_sha
+  merge_head_path="$(git_dir)/MERGE_HEAD"
+  merge_head="$(tr -d '\n' <"$merge_head_path")"
+  source_sha="$(git rev-parse "$source_branch" 2>/dev/null || true)"
+  [[ -n "$source_sha" ]] || fail "blocked: source branch '$source_branch' does not resolve."
+  [[ "$merge_head" == "$source_sha" ]] || fail "blocked: MERGE_HEAD does not match '$source_branch'."
+}
+
+validate_break_glass_reason() {
+  local reason="$1"
+  case "$reason" in
+    tooling_unavailable|verified_false_negative) ;;
+    *) fail "blocked: invalid break-glass reason '$reason'." ;;
+  esac
+}
+
+validate_blocked_gate() {
+  local blocked_gate="$1"
+  case "$blocked_gate" in
+    pre-commit|pre-merge-commit|governance-merge-gate|governance-promotion-gate|pretests-gate|checkpoint-guard) ;;
+    *) fail "blocked: invalid blocked gate '$blocked_gate'." ;;
+  esac
+}
+
+write_merge_message_file() {
+  local content="$1"
+  local merge_msg
+  merge_msg="$(git_dir)/MERGE_MSG"
+  printf '%s\n' "$content" >"$merge_msg"
+}
+
+write_guarded_state() {
+  local target="$1"
+  local source_branch="$2"
+  local bypass_mode="$3"
+  local state_file
+  state_file="$(guarded_state_path)"
+  cat >"$state_file" <<EOF
+target_branch=$target
+source_branch=$source_branch
+bypass_mode=$bypass_mode
+EOF
+}
+
+cleanup_guarded_state() {
+  local state_file
+  state_file="$(guarded_state_path)"
+  rm -f "$state_file"
+}
+
+attempt_develop_push_followthrough_if_needed() {
+  local target="$1"
+  [[ "$target" == "develop" ]] || return 0
+  [[ -x "./bin/freely" ]] || return 0
+
+  echo "[MERGE-GUARD] develop merge completed; attempting single push followthrough"
+  if ! ./bin/freely develop-push attempt --project "$PWD"; then
+    echo "[MERGE-GUARD] develop push followthrough blocked; merge already committed and explicit push_blocked truth should be available" >&2
+  fi
+
+  # Sync changed issues to platforms after merge to develop.
+  _sync_issues_changed_in_merge
+}
+
+# _sync_issues_changed_in_merge: after merge to develop, push local issue
+# state changes to platforms. Only runs for issues in the merge diff.
+_sync_issues_changed_in_merge() {
+  local issues_dir="$PWD/docs/issues"
+  [[ -d "$issues_dir" ]] || return 0
+  [[ -x "$PWD/bin/issue-sync" ]] || return 0
+
+  # Get the merge commit's parent (pre-merge HEAD) to diff against.
+  local parent_sha
+  parent_sha=$(git rev-parse HEAD^ 2>/dev/null || true)
+  [[ -n "$parent_sha" ]] || return 0
+
+  local changed_issues synced=0
+  changed_issues=$(git diff --name-only "$parent_sha" HEAD -- "$issues_dir" | grep 'issue\.md$' | sed 's|docs/issues/||' | sed 's|/issue\.md$||' | sort -u)
+  [[ -n "$changed_issues" ]] || return 0
+
+  for local_id in $changed_issues; do
+    local issue_file="$issues_dir/$local_id/issue.md"
+    [[ -f "$issue_file" ]] || continue
+
+    local kind status absorbed
+    kind=$(python3 -c "import yaml; f=open('$issue_file'); c=f.read(); p=c.split('---',2); fm=yaml.safe_load(p[1]) if len(p)>=3 else {}; print(fm.get('kind',''))" 2>/dev/null || true)
+    status=$(python3 -c "import yaml; f=open('$issue_file'); c=f.read(); p=c.split('---',2); fm=yaml.safe_load(p[1]) if len(p)>=3 else {}; print(fm.get('status',''))" 2>/dev/null || true)
+
+    case "$kind/$status" in
+      raw/absorbed|raw/dropped)
+        echo "[MERGE-GUARD] issue-sync close $local_id (status=$status)"
+        "$PWD/bin/issue-sync" close "$local_id" "completed" || true
+        synced=$((synced + 1))
+        ;;
+      linked/completed)
+        echo "[MERGE-GUARD] issue-sync update + close $local_id (phase=completed)"
+        "$PWD/bin/issue-sync" update "$local_id" || true
+        "$PWD/bin/issue-sync" close "$local_id" "completed" || true
+        synced=$((synced + 1))
+        ;;
+      linked/*)
+        echo "[MERGE-GUARD] issue-sync update $local_id"
+        "$PWD/bin/issue-sync" update "$local_id" || true
+        synced=$((synced + 1))
+        ;;
+    esac
+  done
+
+  if [[ "$synced" -gt 0 ]]; then
+    echo "[MERGE-GUARD] synced $synced issue(s) to platforms"
+  fi
+}
+
+do_initial_merge() {
+  local target="$1"
+  local source_branch="$2"
+
+  check_branch_context "$target"
+  validate_merge_direction "$target" "$source_branch"
+
+  echo "[MERGE-GUARD] allowed: $source_branch -> $target"
+
+  # Pre-flight governance gate for feature->test-pre-merge merges.
+  # Runs from the SOURCE worktree so the gate can read feature files on disk.
+  if [[ "$target" == test-pre-merge-* ]] && [[ "$source_branch" == feature/* ]]; then
+    local source_wt gate_bin gate_output gate_rc
+    source_wt="$(git worktree list --porcelain 2>/dev/null | awk -v branch="$source_branch" '
+      /^worktree / { wt=$2 }
+      /^branch/ && $2 == "refs/heads/'"$source_branch"'" { print wt; exit }
+    ')"
+    if [[ -n "$source_wt" && -x "$source_wt/bin/governance-merge-gate" ]]; then
+      gate_bin="$source_wt/bin/governance-merge-gate"
+    elif [[ -x "./bin/governance-merge-gate" ]]; then
+      gate_bin="./bin/governance-merge-gate"
+    else
+      gate_bin=""
+    fi
+    if [[ -n "$gate_bin" ]]; then
+      set +e
+      gate_output="$("$gate_bin" --range "develop..${source_branch}" 2>&1)"
+      gate_rc=$?
+      set -e
+      if [[ "$gate_rc" -ne 0 ]]; then
+        cat >&2 <<MSG
+
+┌─────────────────────────────────────────────────────────────┐
+│  Pre-flight governance gate FAILED for: $source_branch       │
+│                                                             │
+│  Fix these issues in the feature worktree before merging:   │
+└─────────────────────────────────────────────────────────────┘
+
+$gate_output
+
+Run this check directly in your feature worktree:
+  cd "$source_wt" && ./bin/governance-merge-gate --range develop..HEAD
+MSG
+        exit 1
+      fi
+    fi
+  fi
+
+  run_promotion_gate_if_needed "$target" "$source_branch"
+
+  local merge_message
+  merge_message="$(render_merge_message "merge-guarded" "forbidden" "$source_branch" "" "" "")"
+
+  set +e
+  git merge --no-commit --no-ff "$source_branch"
+  local merge_rc=$?
+  set -e
+  if [[ "$merge_rc" -ne 0 ]]; then
+    return "$merge_rc"
+  fi
+
+  require_merge_in_progress
+  require_matching_merge_head "$source_branch"
+  write_merge_message_file "$merge_message"
+  write_guarded_state "$target" "$source_branch" "forbidden"
+  set +e
+  FREELY_GUARDED_MERGE_COMPLETION=1 GIT_EDITOR=: git merge --continue
+  local continue_rc=$?
+  set -e
+  if [[ "$continue_rc" -eq 0 ]]; then
+    cleanup_guarded_state
+    attempt_develop_push_followthrough_if_needed "$target"
+  fi
+  return "$continue_rc"
+}
+
+do_completion() {
+  local target="$1"
+  local source_branch="$2"
+  shift 2 || true
+
+  local bypass_mode="forbidden"
+  local reason=""
+  local blocked_gate=""
+  local follow_on_issue=""
+  local evidence_refs=()
+
+  while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+      --break-glass)
+        bypass_mode="break_glass"
+        ;;
+      --reason)
+        shift
+        [[ "$#" -gt 0 ]] || fail "blocked: missing value for --reason."
+        reason="$1"
+        ;;
+      --blocked-gate)
+        shift
+        [[ "$#" -gt 0 ]] || fail "blocked: missing value for --blocked-gate."
+        blocked_gate="$1"
+        ;;
+      --evidence-ref)
+        shift
+        [[ "$#" -gt 0 ]] || fail "blocked: missing value for --evidence-ref."
+        evidence_refs+=("$1")
+        ;;
+      --follow-on-issue)
+        shift
+        [[ "$#" -gt 0 ]] || fail "blocked: missing value for --follow-on-issue."
+        follow_on_issue="$1"
+        ;;
+      *)
+        fail "blocked: unknown option '$1'."
+        ;;
+    esac
+    shift
+  done
+
+  check_branch_context "$target"
+  validate_merge_direction "$target" "$source_branch"
+  require_merge_in_progress
+  require_matching_merge_head "$source_branch"
+
+  if [[ "$bypass_mode" == "break_glass" ]]; then
+    protected_branch "$target" || fail "blocked: break-glass only applies to protected branches."
+    validate_break_glass_reason "$reason"
+    validate_blocked_gate "$blocked_gate"
+    [[ "${#evidence_refs[@]}" -gt 0 ]] || fail "blocked: break-glass requires at least one --evidence-ref."
+    [[ -n "$follow_on_issue" ]] || fail "blocked: break-glass requires --follow-on-issue."
+  fi
+
+  local merge_path="merge-guarded-complete"
+  if [[ "$bypass_mode" == "break_glass" ]]; then
+    merge_path="merge-guarded-break-glass"
+  fi
+  local merge_message
+  if [[ "${#evidence_refs[@]}" -gt 0 ]]; then
+    merge_message="$(render_merge_message "$merge_path" "$bypass_mode" "$source_branch" "$reason" "$blocked_gate" "$follow_on_issue" "${evidence_refs[@]}")"
+  else
+    merge_message="$(render_merge_message "$merge_path" "$bypass_mode" "$source_branch" "$reason" "$blocked_gate" "$follow_on_issue")"
+  fi
+  write_merge_message_file "$merge_message"
+  write_guarded_state "$target" "$source_branch" "$bypass_mode"
+
+  if [[ "$bypass_mode" == "break_glass" ]]; then
+    set +e
+    FREELY_BREAK_GLASS_REASON="$reason" \
+    FREELY_BLOCKED_GATE="$blocked_gate" \
+    FREELY_OPERATION_SCOPE="merge_completion_only" \
+    FREELY_FOLLOW_ON_ISSUE="$follow_on_issue" \
+    FREELY_EVIDENCE_REFS="${evidence_refs[*]}" \
+    FREELY_GUARDED_MERGE_COMPLETION=1 \
+    GIT_EDITOR=: \
+    git merge --continue
+    local continue_rc=$?
+    set -e
+  else
+    set +e
+    FREELY_GUARDED_MERGE_COMPLETION=1 GIT_EDITOR=: git merge --continue
+    local continue_rc=$?
+    set -e
+  fi
+  if [[ "$continue_rc" -eq 0 ]]; then
+    cleanup_guarded_state
+    attempt_develop_push_followthrough_if_needed "$target"
+  fi
+  return "$continue_rc"
+}
+
+main() {
+  local subcommand="${1:-}"
+  if [[ "$subcommand" == "--help" || "$subcommand" == "-h" ]]; then
+    usage
+    exit 0
+  fi
+  if [[ -z "$subcommand" ]]; then
+    usage
+    exit 1
+  fi
+
+  if [[ "$subcommand" == "complete" ]]; then
+    shift
+    if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+      usage
+      exit 0
+    fi
+    local target="${1:-}"
+    local source_branch="${2:-}"
+    [[ -n "$target" && -n "$source_branch" ]] || { usage; exit 1; }
+    shift 2
+    do_completion "$target" "$source_branch" "$@"
+    exit 0
+  fi
+
+  local target="$subcommand"
+  local source_branch="${2:-}"
+  [[ -n "$target" && -n "$source_branch" ]] || { usage; exit 1; }
+  do_initial_merge "$target" "$source_branch"
+}
+
+main "$@"
