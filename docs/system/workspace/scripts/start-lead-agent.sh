@@ -228,6 +228,7 @@ constitution=""
 ai_spec=""
 workspace_root=""
 reasoning_effort=""
+delta_mode="false"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -237,6 +238,7 @@ while [[ $# -gt 0 ]]; do
     --ai) ai_spec="${2:-}"; shift 2 ;;
     --workspace-root) workspace_root="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
     --reasoning-effort) reasoning_effort="${2:-}"; shift 2 ;;
+    --delta) delta_mode="true"; shift ;;
     *) usage; exit 1 ;;
   esac
 done
@@ -403,6 +405,22 @@ additional_requirements_escaped="$(escape_prompt_backticks "$additional_requirem
 startup_bounded_patrol_rule_escaped="$(escape_prompt_backticks "$startup_bounded_patrol_rule")"
 initial_read_targets_escaped="$(escape_prompt_backticks "$initial_read_targets")"
 
+# Delta mode: minimal resume prompt
+if [[ "$delta_mode" == "true" ]]; then
+  cat <<'DELTA'
+你现在继续 Freely 会话。
+
+本轮是 resume——完整对话历史已在 session 中，不要重新开始 patrol。
+优先消费上轮 continuity 中锚定的 route_kind 和 next_action。
+检查是否有新的 intake items 或 delegated continuation 需要处理。
+按 exit contract directive 要求在结束前写出退出合同。
+
+角色规则和读取约定已在 session 历史中，无需重新读取 AGENTS.md / constitution / laws，
+除非当前任务需要重新核实某个具体规则。
+DELTA
+  exit 0
+fi
+
 cat <<EOF
 你现在进入 Freely 的首跳闭环。
 
@@ -414,32 +432,6 @@ cat <<EOF
 
 先读取以下文档或索引：
 ${initial_read_targets_escaped}
-
-运行上下文：
-- PROJECT_ROOT=$project
-- WORKSPACE_ROOT=$workspace_root
-- CURRENT_BRANCH=${current_branch:-unknown}
-- MANAGER_MODE=${manager_mode}
-- AI_TOOL=$ai_tool
-- AI_MODEL=${ai_model:-}
-- AI_MODE=$ai_mode
-- AI_REASONING_EFFORT=${reasoning_effort:-}
-- AI_TOOL_CAPABILITIES=${AI_TOOL_CAPABILITIES:-}
-- AI_TOOL_POLICY=${AI_TOOL_POLICY:-}
-- AI_CAPABILITY_CODEX_MODEL=${AI_CAPABILITY_CODEX_MODEL:-}
-- AI_CAPABILITY_CODEX_SANDBOX=${AI_CAPABILITY_CODEX_SANDBOX:-}
-- AI_CAPABILITY_CODEX_APPROVAL_POLICY=${AI_CAPABILITY_CODEX_APPROVAL_POLICY:-}
-- AI_CAPABILITY_CODEX_CWD_MODE=${AI_CAPABILITY_CODEX_CWD_MODE:-}
-
-工作区治理提醒（非强制阻断，但必须纳入判断）：
-- current_worktree_state: ${current_clean_state}
-- current_project_dirty_entries: ${current_dirty_entries}
-- ${current_checkpoint_summary}
-- project_worktree_summary: ${current_fleet_summary}
-- 开始当前轮次前，先判断是否需要先维护工作区卫生、切 checkpoint commit、或把无关改动分流到其他 worktree。
-- 若上一轮 handoff、当前运行输出、或工具自身提示出现 \`context compacted\`、compact、上下文压缩/摘要信号，不要继续扩 scope；先更新当前阶段对应的 continuity artifact，再决定是继续、checkpoint，还是交给外层 runtime 做 \`fresh_with_handoff\`。
-- 若 runtime 已注入 \`上下文容量预警\` 或 \`会话轮换交接\`，优先按该治理提示收口；不要把它当作可忽略的背景信息。
-- 这不是强制停止开发；你需要结合 issue 边界、验证状态和当前改动范围自主决定是否先收口，再继续委派/实现。
 
 执行要求：
 1. 先遵守 \`PROJECT_ROOT/AGENTS.md\`；它是当前目标项目的治理入口，不要在 workspace 能力文档里重复发明第二套项目规则。
@@ -495,6 +487,32 @@ ${execution_rule_15_escaped}
 ${execution_rule_16_escaped}
 ${execution_rule_17_escaped}
 ${manager_artifact_rule_escaped}
+
+运行上下文：
+- PROJECT_ROOT=$project
+- WORKSPACE_ROOT=$workspace_root
+- CURRENT_BRANCH=${current_branch:-unknown}
+- MANAGER_MODE=${manager_mode}
+- AI_TOOL=$ai_tool
+- AI_MODEL=${ai_model:-}
+- AI_MODE=$ai_mode
+- AI_REASONING_EFFORT=${reasoning_effort:-}
+- AI_TOOL_CAPABILITIES=${AI_TOOL_CAPABILITIES:-}
+- AI_TOOL_POLICY=${AI_TOOL_POLICY:-}
+- AI_CAPABILITY_CODEX_MODEL=${AI_CAPABILITY_CODEX_MODEL:-}
+- AI_CAPABILITY_CODEX_SANDBOX=${AI_CAPABILITY_CODEX_SANDBOX:-}
+- AI_CAPABILITY_CODEX_APPROVAL_POLICY=${AI_CAPABILITY_CODEX_APPROVAL_POLICY:-}
+- AI_CAPABILITY_CODEX_CWD_MODE=${AI_CAPABILITY_CODEX_CWD_MODE:-}
+
+工作区治理提醒（非强制阻断，但必须纳入判断）：
+- current_worktree_state: ${current_clean_state}
+- current_project_dirty_entries: ${current_dirty_entries}
+- ${current_checkpoint_summary}
+- project_worktree_summary: ${current_fleet_summary}
+- 开始当前轮次前，先判断是否需要先维护工作区卫生、切 checkpoint commit、或把无关改动分流到其他 worktree。
+- 若上一轮 handoff、当前运行输出、或工具自身提示出现 \`context compacted\`、compact、上下文压缩/摘要信号，不要继续扩 scope；先更新当前阶段对应的 continuity artifact，再决定是继续、checkpoint，还是交给外层 runtime 做 \`fresh_with_handoff\`。
+- 若 runtime 已注入 \`上下文容量预警\` 或 \`会话轮换交接\`，优先按该治理提示收口；不要把它当作可忽略的背景信息。
+- 这不是强制停止开发；你需要结合 issue 边界、验证状态和当前改动范围自主决定是否先收口，再继续委派/实现。
 
 补充要求：
 ${additional_requirements_escaped}

@@ -50,6 +50,19 @@ routing_policy:
 - why_now: 这批项定义 Freely 如何发现上下文、读取 milestone、并路由到下一跳 skill；如果 milestone 自身不先落盘，Freely 的狗粮链路就是断的
 
 ### committed_issues
+7. `I-20260502-0500-C`
+- title: Token 花费优化
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P0
+- issue_path: docs/epics/token-cost-optimization/issues/token-cost-optimization.md
+- progress_path: docs/progress/token-cost-optimization/p-token-cost-optimization.md
+- source_brainstorm: docs/pre-brainstorms/token-cost-optimization.md
+- source_candidates: docs/pre-brainstorms/token-cost-optimization.md
+- evidence:
+  - docs/epics/token-cost-optimization/code-reviews/20260502-phase-0-4-implementation.md
+- next_action: test-pre-merge 验证后 merge develop
+
 7. `I-20260421-1530-A`
 - title: Live-status scan summary and prompt anchor governance
 - milestone_state: committed
