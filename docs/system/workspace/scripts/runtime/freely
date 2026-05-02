@@ -16571,7 +16571,8 @@ build_prompt() {
       --constitution "$CONSTITUTION_FILE" \
       --ai "${AI_TOOL}:${AI_MODEL:-}:${AI_MODE}" \
       --workspace-root "$workspace_root" \
-      --reasoning-effort "${AI_REASONING_EFFORT:-}"
+      --reasoning-effort "${AI_REASONING_EFFORT:-}" \
+	      ${mode_name:+$( [[ "$mode_name" == "resume" ]] && printf "%s" "--delta" )}
     append_context_warning_if_needed
     append_checkpoint_governance_if_needed
     append_checkpoint_intervention_if_needed
@@ -18100,7 +18101,7 @@ start_project_runtime() {
         --tool "$AI_TOOL" \
         --tool-adapter "${tool_adapter:-}" \
         --model "${AI_MODEL:-}" \
-        --reasoning-effort "${AI_REASONING_EFFORT:-}" \
+        --reasoning-effort "${AI_REASONING_EFFORT:-}" \ \
         --tool-capabilities "${AI_TOOL_CAPABILITIES:-}" \
         --tool-policy "${AI_TOOL_POLICY:-}" \
         --codex-capability-model "${AI_CAPABILITY_CODEX_MODEL:-}" \
