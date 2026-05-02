@@ -1,5 +1,9 @@
 # Candidates — Issue Lifecycle + Scan + Platform Sync
 
+- promoted_issue_path: ""
+- milestone: M-20260306-workspace-routing-foundation
+- session_refs: ""
+
 ## C-20260428-1737-A: 统一生命周期 Scan 模块（task-lifecycle-scan.py）
 
 - status: proposed
