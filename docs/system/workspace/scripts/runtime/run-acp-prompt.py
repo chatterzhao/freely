@@ -293,6 +293,8 @@ def parse_args():
     parser.add_argument("--resume", default="", help="Session ID to resume via session/resume")
     parser.add_argument("--launch-kind", choices=("fresh", "resume", "fork"), default="fresh",
                         help="Session lifecycle state")
+    parser.add_argument("--loop", action="store_true",
+                        help="Loop mode: after prompt completes, read next prompt file path from stdin. Send EXIT to stop.")
     return parser.parse_args()
 
 
@@ -402,35 +404,64 @@ def main():
                     file=sys.stderr, flush=True,
                 )
 
-        # Send prompt
-        t_before_prompt = time.time()
-        prompt_result = client.request(
-            "session/prompt",
-            {"sessionId": session_id, "prompt": [{"type": "text", "text": prompt_text}]},
-            timeout=900,
-        )
-        t_prompt_done = time.time()
-        stop_reason = prompt_result.get("stopReason", "unknown")
-        print(f"stop_reason={stop_reason}", flush=True)
-
-        # Timing report (to stderr so it doesn't pollute the session id: line)
-        prompt_kb = len(prompt_text.encode("utf-8")) / 1024
-        print(f"[TIMING] transport_connect={(t_transport - t_start):.1f}s session_new={(t_session - t_transport):.1f}s prompt_wait={(t_prompt_done - t_before_prompt):.1f}s total={(t_prompt_done - t_start):.1f}s prompt_size={prompt_kb:.1f}kb", file=sys.stderr, flush=True)
-
-        # Cache metrics (to stderr, not consumed by AI)
-        usage = prompt_result.get("usage") or {}
-        cache_read = usage.get("cache_read_input_tokens", 0)
-        cache_create = usage.get("cache_creation_input_tokens", 0)
-        input_tokens = usage.get("input_tokens", 0)
-        output_tokens = usage.get("output_tokens", 0)
-        print(f"[CACHE] session_id={session_id} launch_kind={launch_kind} prompt_bytes={len(prompt_text.encode('utf-8'))} input_tokens={input_tokens} cache_read={cache_read} cache_create={cache_create} output_tokens={output_tokens}", file=sys.stderr, flush=True)
-
-        if stop_reason != "end_turn":
-            print(
-                f"[WARN] ACP prompt finished with stopReason={stop_reason}",
-                file=sys.stderr, flush=True,
+        # ── Prompt loop (one-shot or loop mode) ────────────────────
+        def send_prompt(prompt_text, t_start, t_session, launch_kind):
+            t_before = time.time()
+            prompt_result = client.request(
+                "session/prompt",
+                {"sessionId": session_id, "prompt": [{"type": "text", "text": prompt_text}]},
+                timeout=900,
             )
+            t_done = time.time()
+            stop_reason = prompt_result.get("stopReason", "unknown")
+            print(f"stop_reason={stop_reason}", flush=True)
+
+            prompt_kb = len(prompt_text.encode("utf-8")) / 1024
+            print(f"[TIMING] transport_connect={(t_session - t_start):.1f}s session_new={0:.1f}s prompt_wait={(t_done - t_before):.1f}s total={(t_done - t_start):.1f}s prompt_size={prompt_kb:.1f}kb", file=sys.stderr, flush=True)
+
+            usage = prompt_result.get("usage") or {}
+            cache_read = usage.get("cache_read_input_tokens", 0)
+            cache_create = usage.get("cache_creation_input_tokens", 0)
+            input_tokens = usage.get("input_tokens", 0)
+            output_tokens = usage.get("output_tokens", 0)
+            print(f"[CACHE] session_id={session_id} launch_kind={launch_kind} prompt_bytes={len(prompt_text.encode('utf-8'))} input_tokens={input_tokens} cache_read={cache_read} cache_create={cache_create} output_tokens={output_tokens}", file=sys.stderr, flush=True)
+
+            if stop_reason != "end_turn":
+                print(f"[WARN] ACP prompt finished with stopReason={stop_reason}", file=sys.stderr, flush=True)
+            return stop_reason
+
+        stop_reason = send_prompt(prompt_text, t_start, t_session, launch_kind)
+
+        # Loop mode: keep session alive, read next prompt from stdin
+        if args.loop:
+            import select
+            while True:
+                # Read next prompt file path from stdin (blocking with timeout)
+                ready, _, _ = select.select([sys.stdin], [], [], 1.0)
+                if not ready:
+                    continue
+                line = sys.stdin.readline()
+                if not line:
+                    break  # EOF
+                line = line.strip()
+                if not line:
+                    continue
+                if line == "EXIT":
+                    break
+                # Read next prompt from file
+                try:
+                    next_text = Path(line).read_text(encoding="utf-8")
+                except Exception as e:
+                    print(f"[WARN] cannot read next prompt file: {line} ({e})", file=sys.stderr, flush=True)
+                    continue
+                stop_reason = send_prompt(next_text, t_start, t_session, launch_kind)
+                t_start = time.time()  # reset timing baseline for next prompt
     finally:
+        if args.loop:
+            try:
+                client.request("session/close", {"sessionId": session_id}, timeout=10)
+            except Exception:
+                pass
         client.close()
 
 
