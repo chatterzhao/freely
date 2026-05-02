@@ -55,10 +55,50 @@ Freely 处于研究优先的整合阶段。
 - Freely 是 AI 开发工具，所以 `agent`、`skill`、runtime script、系统说明文档本身就是 Freely 的能力，不因为它们是 Markdown 就降级为“仅开发辅助”。
 - 开发 Freely 过程允许调用 Freely 能力目录中的 agent / skill / runtime 真源来指导开发自己；这就是吃狗粮，而不是目录混淆。
 
+## 分支与工位治理
+
+### 分支职责速查
+
+| 分支 | 角色 | 可写？ | 可 commit？ | merge 来源 | merge 到 | 用途 |
+|------|------|--------|------------|-----------|----------|------|
+| `main` | Manager | ❌ | ❌ | release/*, hotfix/* | — | 正式发布入口 |
+| `develop` | Manager | ❌ | ❌ | test-pre-merge-*, hotfix/* | — | 默认开发集成入口 |
+| `test-pre-merge-*` | Manager（测试） | ❌ | ❌ | feature/*, hotfix/* | develop | 一次性验证批次，用完即删 |
+| `feature/*` | Worker | ✅ worktree | ✅ worktree | — | test-pre-merge-* | 日常开发 |
+| `release/*` | Worker | ✅ worktree | ✅ worktree | — | main, develop | 发布准备 |
+| `hotfix/*` | Worker | ✅ worktree | ✅ worktree | — | main, develop | 紧急修复 |
+
+### 合并流程（不可跳过）
+
+```
+feature/*（写代码）
+  │ PR + governance-merge-gate
+  ▼
+test-pre-merge-*（一次性测试批次）
+  │ pre-init-runtime → 打包 → 自举验证
+  │ 通过 → merge develop
+  │ 失败 → 丢弃，修 feature
+  ▼
+develop（集成）
+  │ 打包 nightly
+  ▼
+main（发布）
+  │ 打包 stable
+```
+
+### 关键约束
+
+- **develop/main/test-pre-merge-* 不可直接写入/提交。** 代码只能通过 merge 进入。
+- **test-pre-merge 必须从 develop 新建，用完立即删除。** 不承载 owner/milestone/continuity 真相。
+- **develop 不是预测试环境。** 需要主线前集成验证时用 test-pre-merge-*。
+- **feature 从 develop 创建**（或依赖未合并父分支时从父 feature 创建）。
+- **hotfix 从 main 创建**，修复后 merge 到 main 和 develop。
+- **pre-init-runtime 初始化 test-pre-merge 运行时**：复制 config.env、freely.db、tool-boundary-bootstrap，修正 PROJECT_ROOT 路径。
+
 ## 会话启动检查
 
 每次会话开始：
-1. **分支/Worktree检查**：如在 `main`/`develop`/`test-pre-merge-*` 分支则禁止写入、提交，它们只接受 merge。若是启动 Freely runtime，应在项目根目录启动，但这不放宽 protected root 的 owner-development 禁令；实际写入必须由 Freely 委派到 dedicated worktree。先执行 `cd <your-project-path>`，再优先使用标准入口 `./bin/wt-create <branch> [--base <base>]` 创建 feature worktree，并 `cd` 到该 worktree 中工作。只有在基础设施受限、必须手工执行 `git worktree add -b <branch> ../<your-project-worktrees>/<branch-dir> <base>` 时，才允许裸建树，并且随后必须立刻执行 `./bin/freely sync-tooling --source-project <your-project-path> --project ../<your-project-worktrees>/<branch-dir>`。默认 `<base>` 为 `develop`；若当前 issue 依赖未合并父分支改动，可用父 `feature/*` 作为 `<base>`，但必须在 pre-brainstorm / milestone / issue 中记录依赖关系。`<your-project-worktrees>` 指当前项目同级的 worktree 根目录，格式为 `<your-project-name>-worktrees`。`<branch-dir>` 必须与当前 worktree 派生规则一致：无日期分支使用 `<branch>` 的安全化名称；若分支名包含 `YYYYMMDD` 或 `YYYYMMDD-HHMM/HHMMSS`，目录名改为日期前置，例：`feature/foo-20260307-1015` -> `20260307-1015-feature-foo`
+1. **分支/Worktree检查**：先看自己在哪个分支。如在 `main`/`develop`/`test-pre-merge-*` 分支则禁止写入、提交，它们只接受 merge。若是启动 Freely runtime，应在项目根目录启动，但这不放宽 protected root 的 owner-development 禁令；实际写入必须由 Freely 委派到 dedicated worktree。先执行 `cd <your-project-path>`，再优先使用标准入口 `./bin/wt-create <branch> [--base <base>]` 创建 feature worktree，并 `cd` 到该 worktree 中工作。只有在基础设施受限、必须手工执行 `git worktree add -b <branch> ../<your-project-worktrees>/<branch-dir> <base>` 时，才允许裸建树，并且随后必须立刻执行 `./bin/freely sync-tooling --source-project <your-project-path> --project ../<your-project-worktrees>/<branch-dir>`。默认 `<base>` 为 `develop`；若当前 issue 依赖未合并父分支改动，可用父 `feature/*` 作为 `<base>`，但必须在 pre-brainstorm / milestone / issue 中记录依赖关系。`<your-project-worktrees>` 指当前项目同级的 worktree 根目录，格式为 `<your-project-name>-worktrees`。`<branch-dir>` 必须与当前 worktree 派生规则一致：无日期分支使用 `<branch>` 的安全化名称；若分支名包含 `YYYYMMDD` 或 `YYYYMMDD-HHMM/HHMMSS`，目录名改为日期前置，例：`feature/foo-20260307-1015` -> `20260307-1015-feature-foo`
    - 先确认 `git config --get core.hooksPath` 返回 `.githooks`。仓库中“存在 hook 脚本”不代表 Git 已启用它们；只有 `core.hooksPath=.githooks` 时，根目录 `.githooks/` 包装层才会实际转发到 `docs/system/workspace/hooks/*.sh` 执行门禁。
    - `test-pre-merge-*` 是一次性本地测试批次：必须从当前 `develop` 新建，只允许 merge 装配验证，不允许普通写入/提交/push，不允许承载 owner / milestone / continuation 真相，测试结束后立即删除。
   	   - **test-pre-merge 的职责**：验证 feature 能否在真实环境中正常工作，保证 develop 只接受已验证的代码。
