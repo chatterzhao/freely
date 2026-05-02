@@ -11,6 +11,7 @@
 - status: `proposed`
 - milestone: `M-20260306-workspace-routing-foundation`
 - priority: `P1`
+- promoted_issue_path: ""
 - problem: `AGENTS.md break-glass guidance was too soft, enabling AI to rationalize bypass during dogfooding.`
 - why_now:
   - two break-glass merges occurred during dogfooding that should have been documentation fixes
