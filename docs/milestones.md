@@ -732,6 +732,28 @@ routing_policy:
 - next_action: Candidate mirror only. `I-20260405-2358-D` is now the canonical owner for audited help/usage contracts and bounded `ai switch --dry-run` result alignment.
 - revisit_trigger: Revisit if help invocations still carry side effects or non-obvious exit semantics, or if `ai switch --dry-run` remains inconsistent with the saved auth inventory on canonical `develop`.
 
+16. `C-20260426-0002-A`
+- title: Harden AGENTS.md break-glass guidance
+- milestone_state: candidate
+- phase_state: `done_pre_brainstorm`
+- priority: P1
+- promoted_issue_path: ""
+- source_brainstorm: `docs/pre-brainstorms/20260426-0002--break-glass-agents-guidance/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260426-0002--break-glass-agents-guidance/candidates.md`
+- next_action: If the guidance change proves sufficient during continued dogfooding, promote to a formal issue. Otherwise revisit and strengthen.
+- revisit_trigger: Re-open if guidance change still allows break-glass bypasses during continued dogfooding.
+
+16. `C-20260430-0010-A`
+- title: Sync docs + fix governance-only paths for architecture docs
+- milestone_state: candidate
+- phase_state: `done_pre_brainstorm`
+- priority: P1
+- promoted_issue_path: `docs/issues/I-20260430-0010-A/issue.md`
+- source_brainstorm: `docs/pre-brainstorms/20260430-0010--doc-sync-chat-inbox/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260430-0010--doc-sync-chat-inbox/candidates.md`
+- next_action: Merge to develop.
+- revisit_trigger: Re-open if architecture docs drift again after sync.
+
 ### completed_issues
 
 1. `I-20260421-1200-A`
