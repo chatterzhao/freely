@@ -114,6 +114,8 @@ routing_policy:
 - progress_path: docs/progress/freely-packaging-selfhost/p-freely-packaging-selfhost.md
 - source_brainstorm: docs/pre-brainstorms/freely-packaging-selfhost/freely-packaging-selfhost.md
 - source_candidates: docs/pre-brainstorms/freely-packaging-selfhost/candidates.md
+- evidence:
+  - docs/epics/freely-packaging-selfhost/code-reviews
 - next_action: 推进到 test-pre-merge，打包自举验证后 merge 到 develop
 
 ### candidate_issues
