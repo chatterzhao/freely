@@ -1,6 +1,6 @@
 # Progress: Freely 打包与自举验证
 
-- issue_id: I-20260502-0500
+- issue_id: I-20260502-0500-A
 - issue_path: docs/epics/freely-packaging-selfhost/issues/freely-packaging-selfhost.md
 - phase_state: done_ibm
 
