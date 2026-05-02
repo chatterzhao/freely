@@ -417,6 +417,14 @@ def main():
         prompt_kb = len(prompt_text.encode("utf-8")) / 1024
         print(f"[TIMING] transport_connect={(t_transport - t_start):.1f}s session_new={(t_session - t_transport):.1f}s prompt_wait={(t_prompt_done - t_before_prompt):.1f}s total={(t_prompt_done - t_start):.1f}s prompt_size={prompt_kb:.1f}kb", file=sys.stderr, flush=True)
 
+        # Cache metrics (to stderr, not consumed by AI)
+        usage = prompt_result.get("usage") or {}
+        cache_read = usage.get("cache_read_input_tokens", 0)
+        cache_create = usage.get("cache_creation_input_tokens", 0)
+        input_tokens = usage.get("input_tokens", 0)
+        output_tokens = usage.get("output_tokens", 0)
+        print(f"[CACHE] session_id={session_id} launch_kind={launch_kind} prompt_bytes={len(prompt_text.encode('utf-8'))} input_tokens={input_tokens} cache_read={cache_read} cache_create={cache_create} output_tokens={output_tokens}", file=sys.stderr, flush=True)
+
         if stop_reason != "end_turn":
             print(
                 f"[WARN] ACP prompt finished with stopReason={stop_reason}",
