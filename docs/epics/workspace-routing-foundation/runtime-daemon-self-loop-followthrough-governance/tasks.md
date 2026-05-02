@@ -1,0 +1,43 @@
+# Tasks: runtime-daemon-self-loop-followthrough-governance
+
+- [x] Reproduce the self-loop blocker on real Freely runtime behavior and isolate it to control-plane ownership rather than task-selection logic.
+- [x] Ignore orphaned dispatcher/watchdog residue in user-facing repeated-start precheck when no authoritative supervisor exists.
+- [x] Ignore unexpected daemon `TERM` without `stop.marker` while preserving explicit daemon stop semantics.
+- [x] Add focused regressions for both seams and rerun nearby daemon/live-status coverage.
+- [x] Parse the current `## Worker Delegation` continuity shape into concrete runtime worker launches.
+- [x] Settle merged-clean blocker worktrees toward cleanup followthrough retirement instead of runtime auto-recovery, and let cleanup reclaim stale recorded ownership for those lanes.
+- [x] Materialize the candidate -> issue -> progress -> pre-tests -> review owner chain required for guarded promote.
+- [x] Replay `feature/runtime-daemon-self-loop-blocker-20260421 -> test-pre-merge-20260421-runtime-self-loop-blocker` through `./bin/merge-guarded` and rerun owner gates on the protected test lane.
+- [x] Keep canonical develop self-host acceptance and temporary lane retirement as post-promote completion conditions owned by the same issue, not as unfinished pre-promote task checklist items.
+- [x] Enforce structured manager / worker exit contracts so runtime can stop, resume, or delegate from machine-checkable artifacts instead of inferring intent from free text.
+- [x] Reuse the exact current role resume target when an exit contract artifact is missing or malformed, and block broader patrol until that same session repairs the contract.
+- [x] Keep cleanup-governance handoff workers launchable when their prompt still carries full verification metadata and external cleanup scope, instead of auto-settling them as merged-lane retirement before the real cleanup work runs.
+- [x] Keep reconnect-in-progress logs on the bounded execution-network retry path until the current tool actually exits, and restore the original tool after one fallback episode exhausts every configured fallback.
+- [x] Keep exit-contract repair relaunches on the same resume path across supervisor restarts and same-process relaunch loops, so repair rounds do not regress into `initial_start`.
+- [x] Preserve daemon-owned control-plane recovery after `tool_runtime_failure` so watchdog/manager relaunch returns through `daemon-run` instead of silently materializing foreground `start`.
+- [x] Ignore the known benign Codex `failed to refresh available models: timeout waiting for child process to exit` startup noise so monitor/runtime do not misclassify a successful manager round as `tool_runtime_failure`.
+- [x] Keep daemon bootstrap supervisors alive while startup is still between `L010 supervisor_started` and prompt build, so long pre-prompt recovery or fleet prep does not get misclassified as an idle manager.
+- [x] Emit explicit runtime guidance for network/proxy/auth/subscription failures and document proxy mode semantics in the runtime config template without widening tool or slot policy.
+- [x] When Codex exhausts its own reconnect loop and exits on upstream `502 Bad Gateway`, keep the failure on the bounded execution-network path instead of writing `tool_runtime_failure` and triggering cross-tool fallback.
+- [x] When manager materializes a cleanup followthrough prompt from continuity, carry the authoritative `selected_tool` into that prompt and correct stale retained cleanup worktree config before launch.
+- [x] Reject zero-byte Codex rollout/session jsonl files as resume evidence so canonical cleanup replay falls back away from `thread/resume failed: empty session file`.
+- [x] Downgrade exit-contract repair relaunches away from `resume` whenever the resolved Codex resume target is empty or lacks verified rollout evidence, so canonical daemon replay cannot die in monitor preflight with `codex resume requires --tool-resume-target`.
+- [x] Force `resume_manager` exit-contract replay to execute pending cleanup followthrough before relaunch and fail closed with exact blocker truth when that cleanup step breaks.
+- [x] Keep worktree summary pipe-safe during daemon patrol, materialize governed missing worker lanes from prompt metadata, and block retire-ready cleanup when authoritative continuity still grants active `edit` ownership to the merged-tip lane.
+- [x] Refresh the manager operator-stop freshness boundary on explicit `daemon stop`, so the next fresh startup patrol cannot reuse pre-stop continuity as current queue truth.
+- [x] Keep `## Queue State` `worker_prompts:` continuity launchable so manager `delegate_workers` materializes queued/launched worker state instead of silently dropping the selected cleanup handoff.
+- [x] Keep delegated-continuation freshness anchored to the later of continuity truth and explicit operator-stop boundary, so fresh restart cannot re-consume pre-stop cleanup handoffs after stale continuity is fenced off.
+- [x] Keep blocked cleanup-worker recorded ownership anchored to the verification-contract source prompt, so duplicate cleanup launch requests queue behind the real blocked owner instead of relaunching the same retained lane.
+- [x] When cleanup_governance continuity already carries an AI-written retained-lane prompt that fails launchability, auto-materialize the authoritative verification-bound cleanup prompt instead of looping on `WORKER_PROMPTS_NOT_LAUNCHABLE`.
+- [x] When cleanup_governance continuity carries retained-lane prompt truth only under `## Dispatch State` `worker_prompt_paths:` and the retained worker no longer has an authoritative local prompt, recover the authoritative cleanup prompt from the continuity-carried source prompt metadata instead of reusing the merged-lane nonlaunchable `edit` prompt.
+- [x] Let a retained merged cleanup lane reclaim its own recorded cleanup intent during manager relaunch, so `delegate_workers` can launch the selected hygiene worker instead of self-queuing forever on the target lane's stale recorded signature.
+- [x] Let a re-delegated stopped worker lane reclaim its own soft-stale recorded intent when manager explicitly targets that same worktree/signature again, so retained owner-rebind relaunches do not self-queue behind their own recorded edit ownership.
+- [x] Rebind retained active worker control planes to the manager/source runtime when the target worktree is still running stale runtime code, so canonical `develop` closeout logic governs the already-selected retained lane.
+- [x] Skip control-plane rebind when the active delegated worker is already running under the authoritative manager/source runtime, and prefer live worker process discovery over stale launch-count hints so manager does not self-block on phantom capacity.
+- [x] Launch background control-plane helpers (`ensure-interruption-dispatch`, `ensure-manager`, manager recheck) with the same `runtime/freely ...` argv contract that runtime pid discovery validates, so daemon startup cannot stall with live helper processes that look invisible to ready checks.
+- [x] Guard cached worktree and continuity discovery producers against closed-pipe exits, so early-return closeout consumers cannot strand manager/worker supervision before `ai_cycle_finished` and exit-contract followthrough are recorded.
+- [x] Repair already-existing worker worktrees that still lack managed tooling/runtime bootstrap, so manager launch no longer treats `config present but .freely/run/tooling missing` directories as ready workers.
+- [x] Keep manager supervisors alive during the post-`L041`/pre-`L042` finalize window, so watchdog does not restart a live manager while it is still materializing terminal closeout or delegated followthrough.
+- [x] Clear delegated-continuation pending session state as soon as the current manager prompt has already absorbed that handoff, so consumed continuity stays on the execute-current-followthrough path instead of reappearing as still-pending backlog.
+- [x] Keep manager supervisors alive during resumed-round prompt build after `resume_manager`, so a fresh `L020/L021/L022` startup lifecycle cannot be torn down as idle just because the generic between-rounds grace expires before prompt build completes.
+- [x] Keep manager supervisors alive during the immediate post-`L042` exit-contract/followthrough window, so watchdog does not restart a live manager after `ai_cycle_finished` before the same supervisor writes later terminal or delegated-followthrough truth.

@@ -1,0 +1,136 @@
+#!/usr/bin/env bash
+# issue-index: maintain docs/issues/ cache index
+# Usage:
+#   bin/issue-index [--project <path>]             # incremental: scan files newer than last_scan_at
+#   bin/issue-index --rebuild [--project <path>]   # full rebuild from all issue.md frontmatter
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+PROJECT="${ROOT_DIR}"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --project) PROJECT="$2"; shift 2 ;;
+    --rebuild) REBUILD=1; shift ;;
+    *) shift ;;
+  esac
+done
+
+ISSUES_DIR="$PROJECT/docs/issues"
+SCAN_STATE="$ISSUES_DIR/.scan-state"
+INDEX_FILE="$ISSUES_DIR/ISSUES.md"
+REBUILD="${REBUILD:-0}"
+
+[[ -d "$ISSUES_DIR" ]] || { echo "[ERROR] $ISSUES_DIR not found" >&2; exit 1; }
+
+last_scan_at=""
+if [[ "$REBUILD" -eq 0 ]] && [[ -f "$SCAN_STATE" ]]; then
+  last_scan_at=$(python3 -c "import json; d=json.load(open('$SCAN_STATE')); print(d.get('last_scan_at',''))" 2>/dev/null || echo "")
+fi
+
+# Find issue.md files to process
+if [[ -n "$last_scan_at" ]]; then
+  # macOS-compatible: use mtime comparison
+  files=$(find "$ISSUES_DIR" -name "issue.md" -newermt "$last_scan_at" 2>/dev/null | sort || find "$ISSUES_DIR" -name "issue.md" | sort)
+else
+  files=$(find "$ISSUES_DIR" -name "issue.md" | sort)
+fi
+
+# Rebuild header
+if [[ "$REBUILD" -eq 1 ]] || [[ ! -f "$INDEX_FILE" ]]; then
+  cat > "$INDEX_FILE" << 'HEADER'
+# Issues Index
+
+> Script-maintained cache. Do not edit manually.
+> Regenerate: `bin/issue-index --rebuild`
+
+HEADER
+fi
+
+# Process each issue.md
+count=0
+for f in $files; do
+  local_dir=$(dirname "$f")
+  local_id=$(basename "$local_dir")
+
+  # Skip if already indexed (incremental mode)
+  if [[ "$REBUILD" -eq 0 ]] && grep -q "local_id: $local_id" "$INDEX_FILE" 2>/dev/null; then
+    continue
+  fi
+
+  # Extract frontmatter fields
+  kind=$(python3 -c "
+import yaml, sys
+try:
+  with open('$f') as fh:
+    content = fh.read()
+  if content.startswith('---'):
+    parts = content.split('---', 2)
+    if len(parts) >= 3:
+      fm = yaml.safe_load(parts[1])
+      print(fm.get('kind','unknown'))
+except: print('unknown')
+" 2>/dev/null || echo "unknown")
+
+  platform_ids=$(python3 -c "
+import yaml, sys
+try:
+  with open('$f') as fh:
+    content = fh.read()
+  if content.startswith('---'):
+    parts = content.split('---', 2)
+    if len(parts) >= 3:
+      fm = yaml.safe_load(parts[1])
+      ids = fm.get('platform_ids',{})
+      parts = []
+      for plat, info in ids.items():
+        if isinstance(info, dict) and 'issue_id' in info:
+          parts.append(f'{plat}:{info[\"issue_id\"]}')
+      print(', '.join(parts) if parts else 'none')
+except: print('none')
+" 2>/dev/null || echo "none")
+
+  status=$(python3 -c "
+import yaml, sys
+try:
+  with open('$f') as fh:
+    content = fh.read()
+  if content.startswith('---'):
+    parts = content.split('---', 2)
+    if len(parts) >= 3:
+      fm = yaml.safe_load(parts[1])
+      print(fm.get('status','unknown'))
+except: print('unknown')
+" 2>/dev/null || echo "unknown")
+
+  # Count comments. grep -c returns "0" to stdout but exits 1 on no matches.
+  # || echo 0 would double-output, so suppress exit and default empty to 0.
+  comment_count=$(grep -c '^### comment-' "$f" 2>/dev/null || true)
+  comment_count="${comment_count:-0}"
+
+  # Append to index
+  cat >> "$INDEX_FILE" << INDEXENTRY
+
+---
+local_id: $local_id
+kind: $kind
+platform_ids: $platform_ids
+status: $status
+comment_count: $comment_count
+canonical_issue_path: ""
+updated_at: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
+---
+INDEXENTRY
+
+  count=$((count + 1))
+done
+
+# Update scan state
+python3 -c "
+import json, datetime
+state = {'last_scan_at': datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'), 'version': '1.0'}
+with open('$SCAN_STATE', 'w') as f:
+    json.dump(state, f, indent=2)
+" 2>/dev/null || true
+
+echo "[issue-index] processed $count files"

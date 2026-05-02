@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_HOME="$(mktemp -d /tmp/freely-ai-cli-switch-default.XXXXXX)"
+OUTPUT_FILE="$TMP_HOME/output.txt"
+trap 'rm -rf "$TMP_HOME"' EXIT
+
+work_payload="$(python3 - <<'PY'
+import base64, json
+payload = base64.urlsafe_b64encode(json.dumps({"email":"work@example.com"}).encode()).decode().rstrip("=")
+print(payload)
+PY
+)"
+old_payload="$(python3 - <<'PY'
+import base64, json
+payload = base64.urlsafe_b64encode(json.dumps({"email":"old@example.com"}).encode()).decode().rstrip("=")
+print(payload)
+PY
+)"
+
+mkdir -p "$TMP_HOME/.ai-auth/codex-work@example-com-1" "$TMP_HOME/.codex"
+printf '{"tokens":{"id_token":"x.%s.y"}}\n' "$work_payload" >"$TMP_HOME/.ai-auth/codex-work@example-com-1/auth.json"
+printf '{"tokens":{"id_token":"x.%s.y"}}\n' "$old_payload" >"$TMP_HOME/.codex/auth.json"
+
+HOME="$TMP_HOME" bash "$ROOT_DIR/bin/ai" switch work@example-com-1 --yes >"$OUTPUT_FILE"
+
+grep -q 'No ai tool name provided; defaulting to codex' "$OUTPUT_FILE"
+grep -q 'Switched codex to slot: work@example-com-1' "$OUTPUT_FILE"
+grep -q '"auth_email": "work@example.com"' <(HOME="$TMP_HOME" bash "$ROOT_DIR/bin/ai" --quiet --format json whoami codex)
+grep -q '"slot": "work@example-com-1"' <(HOME="$TMP_HOME" bash "$ROOT_DIR/bin/ai" --quiet --format json whoami codex)
+
+echo "[PASS] ai switch defaults tool to codex when only slot is provided"

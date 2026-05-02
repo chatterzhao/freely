@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-project-resolution-defaults.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+FREELY_HOME="$TMP_DIR/freely-home"
+HANDLER_FIXTURE="$TMP_DIR/interruption-handler-fixture"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260320-0018--sample" "$PROJECT/nested/work"
+
+git init -q -b develop "$PROJECT"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260320-0018--sample
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260320-0018--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260320-0018--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$HANDLER_FIXTURE" <<'EOF'
+#!/usr/bin/env bash
+cat <<'OUT'
+DECISION=delegate_general
+REACTION=followup
+CLASSIFICATION=discovery
+WHY=测试使用的通用委派夹具
+OUT
+EOF
+chmod +x "$HANDLER_FIXTURE"
+
+INIT_OUTPUT="$(
+  cd "$PROJECT" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init \
+    --intent "$PROJECT/docs/PROJECT_INTENT.md" \
+    --constitution "$PROJECT/docs/CONSTITUTION.md" \
+    --ai codex:gpt-5.4:auto
+)"
+printf '%s\n' "$INIT_OUTPUT" | grep -q 'initialized:'
+CANON_PROJECT="$(cd "$PROJECT" && pwd -P)"
+
+STATUS_OUTPUT="$(
+  cd "$PROJECT/nested/work" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" baseline-status
+)"
+printf '%s\n' "$STATUS_OUTPUT" | grep -q "project: $CANON_PROJECT"
+
+CHAT_OUTPUT="$(
+  cd "$PROJECT/nested/work" && FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat "你好，Freely"
+)"
+CHAT_ID="$(printf '%s\n' "$CHAT_OUTPUT" | sed -n 's/^intake_id: //p')"
+[[ -n "$CHAT_ID" ]] || {
+  echo "[FAIL] freely chat did not return intake_id" >&2
+  exit 1
+}
+grep -q '你好，Freely' "$PROJECT/.freely/intake/$CHAT_ID/message.txt"
+
+TUI_OUTPUT="$(
+  cd "$PROJECT/nested/work" && printf '继续测试默认项目解析\n' | FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" tui --once
+)"
+printf '%s\n' "$TUI_OUTPUT" | grep -q 'submitted: 继续测试默认项目解析'
+
+REGISTRY_STATUS_OUTPUT="$(
+  cd "$TMP_DIR" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" baseline-status
+)"
+printf '%s\n' "$REGISTRY_STATUS_OUTPUT" | grep -q "project: $CANON_PROJECT"
+
+INTAKE_STATUS_OUTPUT="$(
+  cd "$PROJECT/nested/work" && FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" intake status
+)"
+printf '%s\n' "$INTAKE_STATUS_OUTPUT" | grep -q 'active_items: 1'
+
+echo "[PASS] freely resolves current project from cwd and falls back to a single authorized project"

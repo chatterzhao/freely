@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-doctor-supply-chain-gate.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+make_project() {
+  local project="$1"
+  mkdir -p "$project/docs/pre-brainstorms/20260320-0018--sample" "$project/.githooks" "$project/.freely/run" "$project/.codex" "$project/docs/system/workspace"
+  git init -q -b develop "$project"
+  git -C "$project" config core.hooksPath .githooks
+
+  cat >"$project/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+  cat >"$project/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+  cat >"$project/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+  cat >"$project/AGENTS.md" <<'EOF'
+# Agents
+EOF
+  cat >"$project/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+  cat >"$project/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260320-0018--sample
+EOF
+  cat >"$project/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+  cat >"$project/docs/pre-brainstorms/20260320-0018--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+  cat >"$project/docs/pre-brainstorms/20260320-0018--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+  cat >"$project/docs/system/workspace/install-lifecycle-allowlist.txt" <<'EOF'
+# empty by default
+EOF
+  cat >"$project/package.json" <<'EOF'
+{
+  "name": "sample",
+  "private": true,
+  "dependencies": {
+    "react": "^18.3.1"
+  }
+}
+EOF
+  cat >"$project/bun.lock" <<'EOF'
+{
+  "lockfileVersion": 1
+}
+EOF
+  cat >"$project/.freely/config.env" <<EOF
+PROJECT_ROOT="$project"
+INTENT_FILE="$project/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$project/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="high"
+AI_TOOL_ADAPTER="direct"
+AI_TOOL_ADAPTER_POLICY="direct"
+AI_CAPABILITY_CODEX_MODEL="gpt-5.4"
+AI_CAPABILITY_CODEX_SANDBOX="workspace-write"
+AI_CAPABILITY_CODEX_APPROVAL_POLICY="never"
+AI_CAPABILITY_CODEX_CWD_MODE="project-root"
+FREELY_ACTIVATION_CONSENT_STATUS="accepted"
+FREELY_ACTIVATION_CONSENT_RECORDED_AT="2026-04-01T00:00:00Z"
+FREELY_ACTIVATION_CONSENT_RECORDED_VIA="test"
+EOF
+  cat >"$project/.codex/config.toml" <<'EOF'
+approval_policy = "never"
+sandbox_mode = "workspace-write"
+[sandbox_workspace_write]
+network_access = false
+EOF
+}
+
+PROJECT="$TMP_DIR/project"
+make_project "$PROJECT"
+
+bash "$ROOT_DIR/bin/freely" doctor --project "$PROJECT" >"$TMP_DIR/doctor-pass.out" 2>&1
+grep -q 'supply-chain baseline PASS' "$TMP_DIR/doctor-pass.out"
+
+cat >"$PROJECT/package.json" <<'EOF'
+{
+  "name": "sample",
+  "private": true,
+  "dependencies": {
+    "bad": "file:../bad"
+  }
+}
+EOF
+
+if bash "$ROOT_DIR/bin/freely" doctor --project "$PROJECT" >"$TMP_DIR/doctor-fail.out" 2>&1; then
+  echo "[FAIL] expected doctor to fail on disallowed dependency source" >&2
+  exit 1
+fi
+grep -q 'disallowed dependency source bad=file:../bad' "$TMP_DIR/doctor-fail.out"
+
+echo "[PASS] freely doctor enforces supply-chain baseline audit"

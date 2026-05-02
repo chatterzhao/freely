@@ -1,0 +1,1260 @@
+#!/usr/bin/env python3
+import argparse
+import os
+import re
+import subprocess
+import sys
+from dataclasses import dataclass, field
+from typing import Dict, List, Optional, Set
+
+
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../../"))
+USE_STAGED_VIEW = False
+USE_RANGE_VIEW = False
+RANGE_SOURCE_REF = ""
+IMPLEMENTATION_DECISION_NOTE_FIELDS = (
+    "decision",
+    "why_this",
+    "alternatives_considered",
+    "boundary_non_goals",
+    "residual_risk",
+)
+IMPLEMENTATION_PATH_PREFIXES = (
+    "bin/",
+    "docs/system/",
+    "src/",
+    "apps/",
+    "crates/",
+    "packages/",
+    "frontend/",
+    "gui/",
+    "tui/",
+    "tauri/",
+)
+IMPLEMENTATION_PATH_FILES = {
+    "Cargo.toml",
+    "Cargo.lock",
+    "package.json",
+    "bun.lock",
+    "bun.lockb",
+    "tsconfig.json",
+    "vite.config.ts",
+    "vite.config.js",
+}
+PRETESTS_GATE_BIN = os.path.join(ROOT_DIR, "bin", "pretests-gate")
+
+
+def git(*args: str) -> str:
+    return subprocess.check_output(["git", *args], cwd=ROOT_DIR, text=True)
+
+
+def normalize_scalar(value: str) -> str:
+    value = value.strip()
+    if value.startswith("- "):
+        value = value[2:].strip()
+    if ":" in value and value.split(":", 1)[0].strip() in {
+        "issue_path",
+        "milestone",
+        "status",
+        "promoted_issue_path",
+        "promoted_issue_id",
+        "issue_id",
+        "phase_state",
+        "source_candidate",
+        "id",
+        "candidate_id",
+    }:
+        value = value.split(":", 1)[1].strip()
+    value = value.strip("`").strip("'").strip('"').strip()
+    # 移除行内注释（# 后面的内容）
+    if " #" in value:
+        value = value.split(" #")[0].strip()
+    return value
+
+
+def normalize_milestone(value: Optional[str]) -> str:
+    normalized = normalize_scalar(value or "")
+    match = re.search(r"(M-[A-Za-z0-9-]+)$", normalized, re.IGNORECASE)
+    if match:
+        return "M-" + match.group(1)[2:]
+    return normalized
+
+
+def normalize_milestone_ref(value: Optional[str]) -> str:
+    return normalize_milestone(value)
+
+
+def extract_inline_refs(text: str) -> List[str]:
+    refs = re.findall(r"`([^`]+)`", text)
+    if refs:
+        return refs
+    if ":" in text:
+        raw = text.split(":", 1)[1].strip()
+        if raw and raw != "[]":
+            return [normalize_scalar(raw)]
+    return []
+
+
+def candidate_key(candidate_id: str) -> Optional[str]:
+    match = re.match(r"^C-(.+)$", candidate_id)
+    return match.group(1) if match else None
+
+
+def issue_key(issue_id: str) -> Optional[str]:
+    match = re.match(r"^I-(.+)$", issue_id)
+    return match.group(1) if match else None
+
+
+def issue_matches_candidate_identity(
+    issue_id: Optional[str],
+    candidate_id: Optional[str],
+    legacy_issue_id: Optional[str] = None,
+) -> bool:
+    c_key = candidate_key(candidate_id or "")
+    i_key = issue_key(issue_id or "")
+    legacy_key = issue_key(legacy_issue_id or "")
+    if c_key and i_key and i_key.startswith(c_key):
+        return True
+    if legacy_key and i_key and (i_key == legacy_key or i_key.startswith(legacy_key)):
+        return True
+    return False
+
+
+def raw_key(raw_id: str) -> Optional[str]:
+    """Extract the shared key from a raw issue local_id: raw-YYYYMMDD-HHMM -> YYYYMMDD-HHMM"""
+    match = re.match(r"^raw-(.+)$", raw_id)
+    return match.group(1) if match else None
+
+
+def candidate_matches_raw_identity(
+    candidate_id: Optional[str],
+    raw_local_ids: set[str],
+) -> bool:
+    """Check if a promoted candidate has a corresponding raw issue with shared key."""
+    c_key = candidate_key(candidate_id or "")
+    if not c_key:
+        return False
+    for raw_id in raw_local_ids:
+        r_key = raw_key(raw_id)
+        if r_key and c_key.startswith(r_key):
+            return True
+    return False
+
+
+@dataclass
+class CandidateRecord:
+    path: str
+    candidate_id: str
+    start_line: int
+    end_line: int
+    status: Optional[str]
+    milestone: Optional[str]
+    promoted_issue_path: Optional[str]
+    promoted_issue_id: Optional[str]
+    decision_reason: Optional[str]
+    next_action: Optional[str]
+    revisit_trigger: Optional[str]
+    legacy_id_mapping: Optional[str] = None
+
+
+@dataclass
+class MilestoneEntry:
+    milestone_id: str
+    milestone_status: Optional[str]
+    queue: str
+    item_id: str
+    issue_path: Optional[str] = None
+    source_candidates: List[str] = field(default_factory=list)
+
+
+@dataclass
+class IssueRecord:
+    path: str
+    issue_id: Optional[str]
+    phase_state: Optional[str]
+    milestone: Optional[str]
+    source_candidate: Optional[str]
+    verification_artifact_dir: Optional[str]
+
+
+@dataclass
+class ProgressRecord:
+    path: str
+    issue_id: Optional[str]
+    issue_path: Optional[str]
+
+
+@dataclass
+class ReviewRecord:
+    path: str
+    issue_id: Optional[str]
+    issue_path: Optional[str]
+    decision_note_fields: Set[str] = field(default_factory=set)
+
+
+def relative_path(path: str) -> str:
+    return os.path.relpath(path, ROOT_DIR)
+
+
+def is_test_premerge_branch(branch: Optional[str]) -> bool:
+    return bool(branch) and branch.startswith("test-pre-merge-")
+
+
+def staged_path_exists(rel_path: Optional[str]) -> bool:
+    if not rel_path:
+        return False
+    result = subprocess.run(
+        ["git", "cat-file", "-e", f":{rel_path}"],
+        cwd=ROOT_DIR,
+        text=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    return result.returncode == 0
+
+
+def range_path_exists(rel_path: Optional[str]) -> bool:
+    if not rel_path or not RANGE_SOURCE_REF:
+        return False
+    result = subprocess.run(
+        ["git", "cat-file", "-e", f"{RANGE_SOURCE_REF}:{rel_path}"],
+        cwd=ROOT_DIR,
+        text=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    return result.returncode == 0
+
+
+def read_repo_text(rel_path: str) -> str:
+    full_path = os.path.join(ROOT_DIR, rel_path)
+    if USE_STAGED_VIEW and staged_path_exists(rel_path):
+        return git("show", f":{rel_path}")
+    # Range view must take priority over disk read:
+    # When validating a feature→test-pre-merge merge from the target worktree,
+    # the files exist in the source branch (git) but not on disk.
+    if USE_RANGE_VIEW and RANGE_SOURCE_REF and range_path_exists(rel_path):
+        return git("show", f"{RANGE_SOURCE_REF}:{rel_path}")
+    if os.path.isfile(full_path):
+        with open(full_path, "r", encoding="utf-8") as handle:
+            return handle.read()
+    raise FileNotFoundError(f"cannot read {rel_path}: not on disk, not in staged view, not in range view")
+
+
+def path_exists(rel_path: Optional[str]) -> bool:
+    return bool(rel_path) and (
+        os.path.isfile(os.path.join(ROOT_DIR, rel_path))
+        or (USE_STAGED_VIEW and staged_path_exists(rel_path))
+        or (USE_RANGE_VIEW and range_path_exists(rel_path))
+    )
+
+
+def verification_artifact_dir_is_scoped(rel_path: str) -> bool:
+    parts = [part for part in normalize_scalar(rel_path).split("/") if part]
+    if len(parts) < 4:
+        return False
+    if parts[0] != "docs" or parts[1] != "epics":
+        return False
+    if parts[-1] != "code-reviews":
+        return False
+    return True
+
+
+def normalized_phase(value: Optional[str]) -> str:
+    return (value or "").strip("`").strip()
+
+
+def is_governance_only_path(rel_path: str) -> bool:
+    if rel_path in {
+        "AGENTS.md",
+        "docs/CONSTITUTION.md",
+        "docs/LAWS.md",
+        "docs/PROJECT_INTENT.md",
+        "docs/milestones.md",
+        "docs/system/workspace/ibm-framework.md",
+        "docs/system/workspace/three-loop-capability-lifecycle.md",
+        "docs/system/workspace/scan-lifecycle-design.md",
+    }:
+        return True
+    if rel_path.startswith(("docs/pre-brainstorms/", "docs/epics/", "docs/progress/")):
+        return True
+    if rel_path.startswith(("docs/system/workspace/agents/", "docs/system/workspace/skills/", "docs/system/workspace/hooks/")):
+        return True
+    if rel_path.startswith("docs/system/workspace/scripts/quality/"):
+        return True
+    if re.match(r"docs/system/workspace/scripts/tests/test-governance-[^/]+$", rel_path):
+        return True
+    return False
+
+
+def is_implementation_bearing_path(rel_path: str) -> bool:
+    if rel_path in IMPLEMENTATION_PATH_FILES:
+        return True
+    return rel_path.startswith(IMPLEMENTATION_PATH_PREFIXES)
+
+
+def changed_paths_from_args(args: argparse.Namespace) -> List[str]:
+    if args.staged:
+        output = git("diff", "--cached", "--name-only", "--diff-filter=ACMR")
+    elif args.range:
+        output = git("diff", "--name-only", "--diff-filter=ACMR", args.range)
+    else:
+        raise SystemExit("governance-merge-gate requires --staged or --range")
+    return [line.strip() for line in output.splitlines() if line.strip()]
+
+
+def changed_line_numbers(rel_path: str, args: argparse.Namespace) -> Set[int]:
+    if args.staged:
+        output = git("diff", "--cached", "--unified=0", "--", rel_path)
+    elif args.range:
+        output = git("diff", "--unified=0", args.range, "--", rel_path)
+    else:
+        return set()
+
+    changed: Set[int] = set()
+    for line in output.splitlines():
+        match = re.match(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@", line)
+        if not match:
+            continue
+        start = int(match.group(1))
+        length = int(match.group(2) or "1")
+        if length <= 0:
+            continue
+        changed.update(range(start, start + length))
+    return changed
+
+
+def parse_candidate_file(rel_path: str) -> List[CandidateRecord]:
+    lines = read_repo_text(rel_path).splitlines(keepends=True)
+
+    starts = []
+    for idx, line in enumerate(lines):
+        heading = re.match(r"^##{1,3}\s+(C-[A-Za-z0-9-]+)", line.strip())
+        if heading:
+            starts.append((idx, heading.group(1)))
+            continue
+        inline = re.match(r"^\s*-\s*(candidate_id|id):\s*`?(C-[A-Za-z0-9-]+)`?\s*$", line)
+        if inline:
+            starts.append((idx, inline.group(2)))
+
+    records: List[CandidateRecord] = []
+    if not starts:
+        return records
+
+    for pos, (start_idx, candidate_id_value) in enumerate(starts):
+        end_idx = starts[pos + 1][0] if pos + 1 < len(starts) else len(lines)
+        block = "".join(lines[start_idx:end_idx])
+
+        def grab(name: str) -> Optional[str]:
+            # 支持两种格式：
+            # 1. "- field: value" (Markdown 标题格式)
+            # 2. "  field: value" (YAML 列表格式，缩进)
+            match = re.search(rf"^\s*(?:-\s*)?{re.escape(name)}:\s*(.+?)\s*$", block, re.MULTILINE)
+            return normalize_scalar(match.group(1)) if match else None
+
+        records.append(
+            CandidateRecord(
+                path=rel_path,
+                candidate_id=candidate_id_value,
+                start_line=start_idx + 1,
+                end_line=end_idx,
+                status=grab("status"),
+                milestone=normalize_milestone(grab("milestone")),
+                promoted_issue_path=grab("promoted_issue_path"),
+                promoted_issue_id=grab("promoted_issue_id"),
+                decision_reason=grab("decision_reason"),
+                next_action=grab("next_action"),
+                revisit_trigger=grab("revisit_trigger"),
+                legacy_id_mapping=grab("legacy_id_mapping"),
+            )
+        )
+    return records
+
+
+def parse_issue_file(rel_path: str) -> IssueRecord:
+    text = read_repo_text(rel_path)
+
+    def grab(name: str) -> Optional[str]:
+        match = re.search(rf"^\s*-\s*{re.escape(name)}:\s*(.+?)\s*$", text, re.MULTILINE)
+        return normalize_scalar(match.group(1)) if match else None
+
+    return IssueRecord(
+        path=rel_path,
+        issue_id=grab("issue_id"),
+        phase_state=grab("phase_state"),
+        milestone=normalize_milestone(grab("milestone")),
+        source_candidate=grab("source_candidate"),
+        verification_artifact_dir=grab("verification_artifact_dir"),
+    )
+
+
+def parse_progress_file(rel_path: str) -> ProgressRecord:
+    text = read_repo_text(rel_path)
+
+    def grab(name: str) -> Optional[str]:
+        match = re.search(rf"^\s*-\s*{re.escape(name)}:\s*(.+?)\s*$", text, re.MULTILINE)
+        return normalize_scalar(match.group(1)) if match else None
+
+    return ProgressRecord(
+        path=rel_path,
+        issue_id=grab("issue_id"),
+        issue_path=grab("issue_path"),
+    )
+
+
+def parse_review_file(rel_path: str) -> ReviewRecord:
+    text = read_repo_text(rel_path)
+
+    def grab(name: str) -> Optional[str]:
+        match = re.search(rf"^\s*-\s*{re.escape(name)}:\s*(.+?)\s*$", text, re.MULTILINE)
+        return normalize_scalar(match.group(1)) if match else None
+
+    issue_id = grab("issue_id")
+    issue_path = grab("issue_path")
+    decision_note_fields: Set[str] = set()
+    section_match = re.search(
+        r"^##\s+Implementation Decision Note\s*$([\s\S]*?)(?=^##\s+|\Z)",
+        text,
+        re.MULTILINE,
+    )
+    if section_match:
+        section = section_match.group(1)
+        for field_name in IMPLEMENTATION_DECISION_NOTE_FIELDS:
+            if re.search(rf"^\s*-\s*{re.escape(field_name)}:\s*(.+?)\s*$", section, re.MULTILINE):
+                decision_note_fields.add(field_name)
+
+    if not decision_note_fields:
+        for field_name in IMPLEMENTATION_DECISION_NOTE_FIELDS:
+            legacy_section = re.search(
+                rf"^##\s+{re.escape(field_name)}\s*$([\s\S]*?)(?=^##\s+|\Z)",
+                text,
+                re.MULTILINE,
+            )
+            if legacy_section and legacy_section.group(1).strip():
+                decision_note_fields.add(field_name)
+
+    return ReviewRecord(
+        path=rel_path,
+        issue_id=issue_id,
+        issue_path=issue_path,
+        decision_note_fields=decision_note_fields,
+    )
+
+
+def parse_milestones() -> List[MilestoneEntry]:
+    lines = read_repo_text("docs/milestones.md").splitlines(keepends=True)
+
+    entries: List[MilestoneEntry] = []
+    current_milestone = None
+    current_milestone_status = None
+    current_queue = None
+    current_item: Optional[MilestoneEntry] = None
+    current_list_field = None
+
+    for raw_line in lines:
+        line = raw_line.rstrip("\n")
+        heading = re.match(r"^##\s+(M-[A-Za-z0-9-]+)\s*$", line.strip())
+        if heading:
+            current_milestone = heading.group(1)
+            current_milestone_status = None
+            current_queue = None
+            current_item = None
+            current_list_field = None
+            continue
+
+        milestone_status = re.match(r"^-\s*status:\s*(.+?)\s*$", line.strip())
+        if milestone_status and current_milestone and not current_queue and not current_item:
+            current_milestone_status = normalize_scalar(milestone_status.group(1))
+            continue
+
+        queue = re.match(r"^###\s+(candidate_issues|committed_issues|completed_issues)\s*$", line.strip())
+        if queue:
+            current_queue = queue.group(1)
+            current_item = None
+            current_list_field = None
+            continue
+
+        item = re.match(r"^\d+\.\s+`([^`]+)`\s*$", line.strip())
+        if item and current_milestone and current_queue:
+            current_item = MilestoneEntry(
+                milestone_id=current_milestone,
+                milestone_status=current_milestone_status,
+                queue=current_queue,
+                item_id=item.group(1),
+            )
+            entries.append(current_item)
+            current_list_field = None
+            continue
+
+        if not current_item:
+            continue
+
+        issue_path = re.match(r"^\s*-\s*issue_path:\s*(.+?)\s*$", line)
+        if issue_path:
+            current_item.issue_path = normalize_scalar(issue_path.group(1))
+            current_list_field = None
+            continue
+
+        source_candidates = re.match(r"^\s*-\s*source_candidates:\s*(.*)$", line)
+        if source_candidates:
+            current_item.source_candidates.extend(extract_inline_refs(source_candidates.group(1)))
+            current_list_field = "source_candidates"
+            continue
+
+        if current_list_field == "source_candidates":
+            list_item = re.match(r"^\s*-\s+(.+?)\s*$", line)
+            if list_item:
+                current_item.source_candidates.extend(extract_inline_refs(list_item.group(1)))
+                continue
+            if line.strip():
+                current_list_field = None
+
+    return entries
+
+
+def anchorless_source_candidate(source_candidate: Optional[str]) -> Optional[str]:
+    if not source_candidate:
+        return None
+    return source_candidate.split("#", 1)[0]
+
+
+def build_issue_index() -> Dict[str, IssueRecord]:
+    output = git("ls-files", "docs/epics/**/issues/*.md")
+    result: Dict[str, IssueRecord] = {}
+    for path in [line.strip() for line in output.splitlines() if line.strip()]:
+        result[path] = parse_issue_file(path)
+    return result
+
+
+def build_issue_id_index(issues_index: Dict[str, IssueRecord]) -> Dict[str, IssueRecord]:
+    result: Dict[str, IssueRecord] = {}
+    for issue in issues_index.values():
+        if issue.issue_id:
+            result[issue.issue_id] = issue
+    return result
+
+
+def resolve_source_candidate_record(
+    issue: Optional[IssueRecord], candidate_records_by_path: Dict[str, List[CandidateRecord]]
+) -> Optional[CandidateRecord]:
+    if not issue or not issue.source_candidate:
+        return None
+
+    source_candidate_path = anchorless_source_candidate(issue.source_candidate)
+    if not source_candidate_path:
+        return None
+
+    source_candidates = candidate_records_by_path.get(source_candidate_path, [])
+    if not source_candidates:
+        return None
+
+    issue_anchor = issue.source_candidate.split("#", 1)[1].lower() if "#" in issue.source_candidate else None
+    for candidate in source_candidates:
+        if issue_anchor and candidate.candidate_id.lower() == issue_anchor:
+            return candidate
+
+    return source_candidates[0]
+
+
+def resolve_review_owner_issue(
+    review: ReviewRecord,
+    issues_by_id: Dict[str, IssueRecord],
+    issues_index: Dict[str, IssueRecord],
+) -> Optional[IssueRecord]:
+    if review.issue_id:
+        return issues_by_id.get(review.issue_id)
+    if review.issue_path:
+        return issues_index.get(review.issue_path)
+    return None
+
+
+def candidate_has_canonical_owner_line(
+    candidate: CandidateRecord,
+    issues_index: Dict[str, IssueRecord],
+    milestone_by_issue_path: Dict[str, List[MilestoneEntry]],
+) -> bool:
+    owner_path = normalize_scalar(candidate.promoted_issue_path or "")
+    if not owner_path or owner_path.startswith("pending://"):
+        return False
+
+    issue_record = issues_index.get(owner_path)
+    if not issue_record:
+        return False
+
+    candidate_source = anchorless_source_candidate(issue_record.source_candidate)
+    if candidate_source != candidate.path:
+        return False
+
+    if not issue_matches_candidate_identity(
+        issue_record.issue_id,
+        candidate.candidate_id,
+        candidate.legacy_id_mapping,
+    ):
+        return False
+
+    return bool(milestone_by_issue_path.get(owner_path))
+
+
+def main() -> int:
+    global USE_STAGED_VIEW, USE_RANGE_VIEW, RANGE_SOURCE_REF
+    parser = argparse.ArgumentParser(description="Develop-merge governance gate for C/M/I materialization.")
+    parser.add_argument("--staged", action="store_true", help="Validate the staged merge result.")
+    parser.add_argument("--range", help="Validate changed governance artifacts in the given git revision range.")
+    parser.add_argument("--target-branch", default="develop", help="Target branch for the guarded merge or push.")
+    parser.add_argument("--source-branch", default="", help="Source branch for guarded merge verification.")
+    args = parser.parse_args()
+    USE_STAGED_VIEW = bool(args.staged)
+    if args.range:
+        USE_RANGE_VIEW = True
+        RANGE_SOURCE_REF = args.range.split("...")[-1].split("..")[-1]
+
+    changed_paths = changed_paths_from_args(args)
+    candidate_paths: Set[str] = {p for p in changed_paths if p.startswith("docs/pre-brainstorms/") and p.endswith("/candidates.md")}
+    touched_candidate_paths: Set[str] = set(candidate_paths)
+    issue_paths: Set[str] = {p for p in changed_paths if re.match(r"docs/epics/.+/issues/.+\.md$", p)}
+    progress_paths: Set[str] = {p for p in changed_paths if re.match(r"docs/progress/.+\.md$", p)}
+    review_paths: Set[str] = {p for p in changed_paths if re.match(r"docs/epics/.+/code-reviews/.+\.md$", p)}
+    milestones_changed = "docs/milestones.md" in changed_paths
+
+    milestones = parse_milestones()
+    milestone_by_issue_path: Dict[str, List[MilestoneEntry]] = {}
+    milestone_candidate_entries: Dict[str, List[MilestoneEntry]] = {}
+    milestone_entries_by_source_candidate: Dict[str, List[MilestoneEntry]] = {}
+    milestone_status_by_id: Dict[str, str] = {}
+
+    for entry in milestones:
+        if entry.milestone_status:
+            milestone_status_by_id[entry.milestone_id] = entry.milestone_status
+        if entry.issue_path:
+            milestone_by_issue_path.setdefault(entry.issue_path, []).append(entry)
+        if entry.queue == "candidate_issues":
+            milestone_candidate_entries.setdefault(entry.item_id, []).append(entry)
+        for source_candidate_path in entry.source_candidates:
+            milestone_entries_by_source_candidate.setdefault(source_candidate_path, []).append(entry)
+
+    issues_index = build_issue_index()
+    issues_by_id = build_issue_id_index(issues_index)
+    candidate_records: List[CandidateRecord] = []
+    progress_records: List[ProgressRecord] = [parse_progress_file(path) for path in sorted(progress_paths)]
+    review_records: List[ReviewRecord] = [parse_review_file(path) for path in sorted(review_paths)]
+    for candidate_path in sorted(candidate_paths):
+        candidate_records.extend(parse_candidate_file(candidate_path))
+
+    for issue_path in list(issue_paths):
+        issue = issues_index.get(issue_path)
+        if issue:
+            candidate_source_path = anchorless_source_candidate(issue.source_candidate)
+            if candidate_source_path:
+                candidate_paths.add(candidate_source_path)
+
+    for progress in progress_records:
+        owner_issue = None
+        if progress.issue_path:
+            owner_issue = issues_index.get(progress.issue_path)
+        if not owner_issue and progress.issue_id:
+            owner_issue = issues_by_id.get(progress.issue_id)
+        if owner_issue:
+            candidate_source_path = anchorless_source_candidate(owner_issue.source_candidate)
+            if candidate_source_path:
+                candidate_paths.add(candidate_source_path)
+
+    for review in review_records:
+        owner_issue = issues_by_id.get(review.issue_id or "")
+        if owner_issue:
+            candidate_source_path = anchorless_source_candidate(owner_issue.source_candidate)
+            if candidate_source_path:
+                candidate_paths.add(candidate_source_path)
+
+    for candidate_path in sorted(candidate_paths):
+        if all(record.path != candidate_path for record in candidate_records):
+            candidate_records.extend(parse_candidate_file(candidate_path))
+
+    candidate_records_by_path: Dict[str, List[CandidateRecord]] = {}
+    for candidate in candidate_records:
+        candidate_records_by_path.setdefault(candidate.path, []).append(candidate)
+
+    errors: List[str] = []
+    warnings: List[str] = []
+    allowed_status_guide = [
+        "proposed (候选已提出，但还没收敛到可进入 IBM；可停在 milestone candidate_issues)",
+        "needs_research (还需要继续研究；可停在 milestone candidate_issues，但必须有 next_action 和 revisit_trigger)",
+        "blocked (当前 pre-brainstorm 已识别阻塞；可停在 milestone candidate_issues，但必须写清 blocker 后的下一步)",
+        "promoted (不允许停在当前环；必须已经 materialize 成一个或多个 I-{issue-id}*)",
+        "absorbed (允许不新开独立 issue，但必须指向吸收它的 canonical owner issue)",
+        "dropped (允许不进入下一环，但必须写清不再推进的原因)",
+    ]
+
+    candidate_changed_lines_by_path = {
+        path: changed_line_numbers(path, args) for path in sorted(touched_candidate_paths)
+    }
+    touched_candidate_ids: Set[str] = set()
+    for candidate in candidate_records:
+        changed_lines = candidate_changed_lines_by_path.get(candidate.path)
+        if not changed_lines:
+            continue
+        candidate_lines = set(range(candidate.start_line, candidate.end_line + 1))
+        if candidate_lines & changed_lines:
+            touched_candidate_ids.add(candidate.candidate_id)
+    candidate_driven_evidence: Set[str] = set(touched_candidate_ids)
+    issue_bound_evidence: Set[str] = set()
+    issue_bound_issue_paths: Set[str] = set()
+    issue_bound_candidate_ids: Set[str] = set()
+    progress_owner_issue_paths: Set[str] = set()
+    review_owner_issue_paths: Set[str] = set()
+    owner_issue_records: Dict[str, IssueRecord] = {}
+
+    for issue_path in sorted(issue_paths):
+        issue = issues_index.get(issue_path)
+        if issue and issue.source_candidate:
+            issue_bound_evidence.add(issue.issue_id or issue.path)
+            issue_bound_issue_paths.add(issue.path)
+            owner_issue_records[issue.path] = issue
+            source_candidate = resolve_source_candidate_record(issue, candidate_records_by_path)
+            if source_candidate:
+                issue_bound_candidate_ids.add(source_candidate.candidate_id)
+                candidate_driven_evidence.add(source_candidate.candidate_id)
+
+    for progress in progress_records:
+        owner_issue = None
+        if progress.issue_path:
+            owner_issue = issues_index.get(progress.issue_path)
+        if not owner_issue and progress.issue_id:
+            owner_issue = issues_by_id.get(progress.issue_id)
+
+        if not owner_issue:
+            errors.append(
+                f"{progress.path} points to owner issue '{progress.issue_id or progress.issue_path or 'missing'}', but that issue cannot be resolved. "
+                f"Every develop-bound merge must stay on a candidate-driven lifecycle. Link progress to a real issue that already traces back to a pre-brainstorm candidate."
+            )
+            continue
+
+        issue_bound_evidence.add(owner_issue.issue_id or owner_issue.path)
+        issue_bound_issue_paths.add(owner_issue.path)
+        progress_owner_issue_paths.add(owner_issue.path)
+        owner_issue_records[owner_issue.path] = owner_issue
+        source_candidate = resolve_source_candidate_record(owner_issue, candidate_records_by_path)
+        if not source_candidate:
+            errors.append(
+                f"{progress.path} points to owner issue {owner_issue.issue_id or owner_issue.path}, but that issue has no valid source_candidate. "
+                f"Restore the originating C-* candidate before merging develop-bound work."
+            )
+            continue
+
+        issue_bound_candidate_ids.add(source_candidate.candidate_id)
+        candidate_driven_evidence.add(source_candidate.candidate_id)
+
+    for review in review_records:
+        owner_issue = resolve_review_owner_issue(review, issues_by_id, issues_index)
+        if not owner_issue:
+            errors.append(
+                f"{review.path} points to owner issue '{review.issue_id or review.issue_path or 'missing'}', but that issue cannot be resolved. "
+                f"Every develop-bound merge must stay on a candidate-driven lifecycle. Link the review to a real issue that traces back to a pre-brainstorm candidate."
+            )
+            continue
+
+        issue_bound_evidence.add(owner_issue.issue_id or owner_issue.path)
+        issue_bound_issue_paths.add(owner_issue.path)
+        review_owner_issue_paths.add(owner_issue.path)
+        owner_issue_records[owner_issue.path] = owner_issue
+        source_candidate = resolve_source_candidate_record(owner_issue, candidate_records_by_path)
+        if not source_candidate:
+            errors.append(
+                f"{review.path} points to owner issue {owner_issue.issue_id or owner_issue.path}, but that issue has no valid source_candidate. "
+                f"Restore the originating C-* candidate before merging develop-bound work."
+            )
+            continue
+
+        issue_bound_candidate_ids.add(source_candidate.candidate_id)
+        candidate_driven_evidence.add(source_candidate.candidate_id)
+
+    if not candidate_driven_evidence:
+        errors.append(
+            "This develop-bound merge has no candidate-driven lifecycle evidence. Every worktree must start from pre-brainstorm research and hit a traceable C-* candidate in the merge diff. "
+            "Continue existing research by updating its candidate/issue/progress/review artifacts, or if this is a completed-family reopen, create a new candidate and new issue that records reopen_of_issue and reopen_reason before replaying the merge."
+        )
+
+    if not issue_bound_evidence:
+        errors.append(
+            "This develop-bound merge is not based on a specific issue. Candidate-only evidence is not enough for a develop merge: the merge diff must carry a concrete issue/progress/review owner, and then the C/M/I chain must still validate."
+        )
+
+    governance_only_merge = all(is_governance_only_path(path) for path in changed_paths)
+
+    for candidate in candidate_records:
+        status = (candidate.status or "").strip("`").strip()
+        milestone = normalize_milestone_ref(candidate.milestone or "")
+        key = candidate_key(candidate.candidate_id)
+        if not key:
+            continue
+
+        owner_path = normalize_scalar(candidate.promoted_issue_path or "")
+        candidate_is_directly_touched = candidate.candidate_id in touched_candidate_ids
+        candidate_is_bound_to_touched_issue = candidate.candidate_id in issue_bound_candidate_ids
+        candidate_is_bound_to_touched_owner = bool(owner_path) and owner_path in issue_bound_issue_paths
+        candidate_is_relevant = (
+            candidate_is_directly_touched
+            or candidate_is_bound_to_touched_owner
+        )
+        candidate_is_unresolved_pre_ibm = status in {"proposed", "needs_research", "blocked"}
+        unresolved_metadata_fix_is_absorbed_by_governance_owner = (
+            candidate_is_directly_touched
+            and candidate_is_unresolved_pre_ibm
+            and governance_only_merge
+            and bool(issue_bound_evidence)
+        )
+        completed_provenance_fix_is_backed_by_canonical_owner = (
+            candidate_is_directly_touched
+            and status == "completed"
+            and candidate_has_canonical_owner_line(candidate, issues_index, milestone_by_issue_path)
+        )
+
+        # dropped 状态的 candidate 不需要 owner issue，因为它们已被明确放弃
+        if status == "dropped":
+            continue
+
+        # pre-IBM 状态的 candidate（proposed, needs_research, blocked, candidate）不需要 owner issue
+        # 它们处于研究阶段，尚未决定是否 materialize
+        pre_ibm_statuses = {"proposed", "needs_research", "blocked", "candidate"}
+        if status in pre_ibm_statuses:
+            continue
+
+        if (
+            not candidate_is_relevant
+            and not unresolved_metadata_fix_is_absorbed_by_governance_owner
+            and not completed_provenance_fix_is_backed_by_canonical_owner
+        ):
+            continue
+
+        if (
+            not candidate_is_bound_to_touched_issue
+            and not (status == "absorbed" and candidate_is_bound_to_touched_owner)
+            and not unresolved_metadata_fix_is_absorbed_by_governance_owner
+            and not completed_provenance_fix_is_backed_by_canonical_owner
+        ):
+            errors.append(
+                f"{candidate.candidate_id} in {candidate.path} is touched by this develop merge, but the same merge does not carry its concrete owner issue/progress/review. "
+                f"Candidate-only evidence or an unrelated issue in the diff is not enough: bind the merge to this candidate's own I-* issue, or for an absorbed candidate include the canonical owner issue/progress/review in the same merge."
+            )
+
+        active_statuses = {"proposed", "needs_research", "blocked", "promoted"}
+        if status in active_statuses and (not milestone or milestone == "unassigned" or milestone.startswith("pending://")):
+            errors.append(
+                f"{candidate.candidate_id} in {candidate.path} is active with status '{status}', but milestone binding is missing. "
+                f"Create milestone identity M-{key} and place the candidate in docs/milestones.md candidate_issues before merging to develop."
+            )
+            continue
+
+        candidate_queue_entries = milestone_candidate_entries.get(candidate.candidate_id, [])
+        if status in active_statuses:
+            declared_milestone_status = milestone_status_by_id.get(milestone, "missing")
+            if declared_milestone_status != "active":
+                errors.append(
+                    f"{candidate.candidate_id} in {candidate.path} is active with status '{status}', but declared milestone {milestone} has status '{declared_milestone_status}'. "
+                    f"Active unresolved candidates must bind to an active milestone."
+                )
+            if status in {"proposed", "needs_research", "blocked"} and candidate_queue_entries:
+                entry_milestones = {entry.milestone_id for entry in candidate_queue_entries}
+                if milestone not in entry_milestones:
+                    errors.append(
+                        f"{candidate.candidate_id} in {candidate.path} declares milestone {milestone}, but docs/milestones.md currently places it in {', '.join(sorted(entry_milestones))}. "
+                        f"Keep the candidate metadata aligned with the milestone queue that actually carries it."
+                    )
+                for entry in candidate_queue_entries:
+                    if entry.milestone_status != "active":
+                        errors.append(
+                            f"{candidate.candidate_id} in {candidate.path} is still queued under milestone {entry.milestone_id}, but that milestone has status '{entry.milestone_status or 'missing'}'. "
+                            f"Unresolved active candidates cannot stay in completed or non-active milestone queues."
+                        )
+
+        if status in {"proposed", "needs_research", "blocked"} and not candidate_queue_entries:
+            errors.append(
+                f"{candidate.candidate_id} in {candidate.path} stays at pre-IBM status '{status}', but docs/milestones.md has no candidate_issues entry for it. "
+                f"Keep C-{key} visible as M-{key} in the milestone candidate queue instead of merging it as an orphan."
+            )
+        if status in {"proposed", "needs_research", "blocked"}:
+            if not (candidate.next_action or "").strip():
+                errors.append(
+                    f"{candidate.candidate_id} in {candidate.path} is merge-eligible only because it stays in pre-IBM status '{status}', but next_action is missing. "
+                    f"Write the concrete next action before merging unresolved research to develop."
+                )
+            if not (candidate.revisit_trigger or "").strip():
+                errors.append(
+                    f"{candidate.candidate_id} in {candidate.path} is merge-eligible only because it stays in pre-IBM status '{status}', but revisit_trigger is missing. "
+                    f"Write the restart condition so the candidate does not disappear after merge."
+                )
+
+        if status == "promoted":
+            # Check raw→C key chain: promoted candidates should have a matching raw issue
+            issues_dir = os.path.join(ROOT_DIR, "docs", "issues")
+            raw_ids: set[str] = set()
+            if os.path.isdir(issues_dir):
+                for entry in os.listdir(issues_dir):
+                    raw_dir = os.path.join(issues_dir, entry)
+                    if os.path.isdir(raw_dir) and entry.startswith("raw-"):
+                        raw_ids.add(entry)
+            if raw_ids and not candidate_matches_raw_identity(candidate.candidate_id, raw_ids):
+                # GATE 6.3: promoted candidate must trace back to a raw-* issue (B1 input source)
+                c_key_val = candidate_key(candidate.candidate_id) or candidate.candidate_id
+                errors.append(
+                    f"GATE 6.3: {candidate.candidate_id} in {candidate.path} is promoted but has no matching raw-* issue in docs/issues/. "
+                    f"Every promoted candidate must share its date-time key with a raw issue (raw-{c_key_val.split('-')[0] if '-' in str(c_key_val) else c_key_val} → {candidate.candidate_id}). "
+                    f"Create docs/issues/raw-{{key}}/issue.md for this candidate, or if the candidate came from a platform issue, ensure scan creates the raw-* entry."
+                )
+
+            issue_path = owner_path
+            if not issue_path or issue_path.startswith("pending://"):
+                errors.append(
+                    f"{candidate.candidate_id} in {candidate.path} is marked promoted, but promoted_issue_path is still '{issue_path or 'missing'}'. "
+                    f"Materialize it into one or more I-{key}* issues before merging to develop."
+                )
+                continue
+
+            if issue_path not in issue_bound_issue_paths:
+                errors.append(
+                    f"{candidate.candidate_id} in {candidate.path} is marked promoted to {issue_path}, but this merge does not carry that issue or its linked progress/review. "
+                    f"Develop-bound implementation merges must bring the concrete owner issue into the same diff so the C/M/I chain is auditable."
+                )
+
+            issue_record = issues_index.get(issue_path)
+            if not issue_record:
+                errors.append(
+                    f"{candidate.candidate_id} in {candidate.path} points to {issue_path}, but that issue file does not exist. "
+                    f"Create the I-{key}* issue artifact or correct promoted_issue_path."
+                )
+                continue
+
+            candidate_source = anchorless_source_candidate(issue_record.source_candidate)
+            if candidate_source != candidate.path:
+                errors.append(
+                    f"{candidate.candidate_id} in {candidate.path} materialized to {issue_path}, but the issue source_candidate is '{issue_record.source_candidate or 'missing'}'. "
+                    f"Point the issue back to this candidate so the C/M/I chain is traceable."
+                )
+
+            issue_identifier = issue_record.issue_id or ""
+            if not issue_matches_candidate_identity(
+                issue_identifier,
+                candidate.candidate_id,
+                candidate.legacy_id_mapping,
+            ):
+                errors.append(
+                    f"{candidate.candidate_id} in {candidate.path} promoted to issue '{issue_identifier or issue_path}', but it does not preserve the shared issue-id key '{key}'. "
+                    f"Use an issue id like I-{key} or I-{key}-<split> so IBM splits still trace back to the same candidate."
+                )
+
+            formal_entries = milestone_by_issue_path.get(issue_path, [])
+            if not formal_entries:
+                errors.append(
+                    f"{candidate.candidate_id} in {candidate.path} already materialized to {issue_path}, but docs/milestones.md still has no committed/completed issue entry for it. "
+                    f"Move the work from milestone candidate_issues into formal issue orchestration before merging to develop."
+                )
+            else:
+                formal_milestones = {entry.milestone_id for entry in formal_entries}
+                if milestone not in formal_milestones:
+                    errors.append(
+                        f"{candidate.candidate_id} in {candidate.path} declares milestone {milestone}, but docs/milestones.md sequences {issue_path} under {', '.join(sorted(formal_milestones))}. "
+                        f"Keep candidate metadata aligned with the active milestone that owns the formal issue."
+                    )
+                for entry in formal_entries:
+                    if entry.milestone_status != "active":
+                        errors.append(
+                            f"{candidate.candidate_id} in {candidate.path} is materialized under milestone {entry.milestone_id}, but that milestone has status '{entry.milestone_status or 'missing'}'. "
+                            f"Promoted candidates must sequence their formal issues under an active milestone."
+                        )
+
+            if candidate_queue_entries and not formal_entries:
+                errors.append(
+                    f"{candidate.candidate_id} in {candidate.path} is still only represented in milestone candidate_issues even though {issue_path} exists. "
+                    f"Once IBM creates I-{key}*, the milestone must sequence those formal issues instead of leaving the candidate as the execution surface."
+                )
+
+        if status == "absorbed":
+            if not owner_path or owner_path.startswith("pending://"):
+                errors.append(
+                    f"{candidate.candidate_id} in {candidate.path} is marked absorbed, but there is no canonical owner issue in promoted_issue_path. "
+                    f"Point it to the issue that absorbed this candidate before merging to develop."
+                )
+            elif not path_exists(owner_path):
+                errors.append(
+                    f"{candidate.candidate_id} in {candidate.path} is marked absorbed, but promoted_issue_path points to missing owner issue {owner_path}. "
+                    f"Restore the owner issue path or choose a different final status."
+                )
+            elif owner_path not in issue_bound_issue_paths:
+                errors.append(
+                    f"{candidate.candidate_id} in {candidate.path} is marked absorbed into {owner_path}, but this merge does not carry that canonical owner issue or its linked progress/review. "
+                    f"An absorbed candidate only counts when the absorbing owner is part of the same develop-bound diff."
+                )
+            if not (candidate.decision_reason or "").strip():
+                errors.append(
+                    f"{candidate.candidate_id} in {candidate.path} is marked absorbed, but decision_reason is missing. "
+                    f"Explain why this candidate no longer needs an independent lifecycle."
+                )
+
+        if status == "dropped" and not (candidate.decision_reason or "").strip():
+            errors.append(
+                f"{candidate.candidate_id} in {candidate.path} is marked dropped, but decision_reason is missing. "
+                f"Record why this candidate is intentionally not moving to the next lifecycle stage."
+            )
+
+    queue_for_phase = {
+        "in_ibm": "committed_issues",
+        "done_ibm": "committed_issues",
+        "in_dev": "committed_issues",
+        "blocked_dev": "committed_issues",
+        "in_verification": "committed_issues",
+        "completed": "completed_issues",
+    }
+
+    touched_issue_records: List[IssueRecord] = []
+    for issue_path in sorted(issue_paths):
+        issue = issues_index.get(issue_path)
+        if issue:
+            touched_issue_records.append(issue)
+
+    for issue in touched_issue_records:
+        if not issue.issue_id:
+            errors.append(f"{issue.path} is missing issue_id, so the develop merge gate cannot bind it into an I-{{issue-id}} chain.")
+            continue
+
+        source_candidate_path = anchorless_source_candidate(issue.source_candidate)
+        if not source_candidate_path or not path_exists(source_candidate_path):
+            errors.append(
+                f"{issue.issue_id} in {issue.path} is missing a valid source_candidate. "
+                f"Point it to the originating pre-brainstorm candidate so the merge gate can trace the lifecycle."
+            )
+
+        expected_queue = queue_for_phase.get((issue.phase_state or "").strip("`").strip())
+        entries = milestone_by_issue_path.get(issue.path, [])
+        if expected_queue:
+            matching_queue = [entry for entry in entries if entry.queue == expected_queue]
+            if not matching_queue:
+                errors.append(
+                    f"{issue.issue_id} in {issue.path} has phase_state '{issue.phase_state}', but docs/milestones.md does not place it in {expected_queue}. "
+                    f"Synchronize the milestone queue with the real issue phase before merging to develop."
+                )
+
+        if source_candidate_path:
+            referenced_candidate = resolve_source_candidate_record(issue, candidate_records_by_path)
+
+            if referenced_candidate:
+                c_key = candidate_key(referenced_candidate.candidate_id)
+                if not issue_matches_candidate_identity(
+                    issue.issue_id,
+                    referenced_candidate.candidate_id,
+                    referenced_candidate.legacy_id_mapping,
+                ):
+                    errors.append(
+                        f"{issue.issue_id} in {issue.path} comes from {referenced_candidate.candidate_id}, but the issue id does not preserve the shared issue-id key '{c_key}'. "
+                        f"Rename it to I-{c_key} or I-{c_key}-<split> so milestone and IBM stay on the same lifecycle line."
+                    )
+
+                candidate_status = (referenced_candidate.status or "").strip("`").strip()
+                if candidate_status in {"proposed", "needs_research", "blocked"} and expected_queue:
+                    errors.append(
+                        f"{issue.issue_id} in {issue.path} is already in phase '{issue.phase_state}', but its source candidate {referenced_candidate.candidate_id} still says '{candidate_status}'. "
+                        f"Update the candidate to the promoted/materialized state instead of leaving upstream status stale."
+                    )
+
+    capability_changed_paths = [path for path in changed_paths if not is_governance_only_path(path)]
+    implementation_changed_paths = [path for path in changed_paths if is_implementation_bearing_path(path)]
+    if capability_changed_paths:
+        capability_owner_phases = {"in_dev", "blocked_dev", "in_verification", "completed"}
+        for owner_issue_path in sorted(issue_bound_issue_paths):
+            owner_issue = issues_index.get(owner_issue_path)
+            if not owner_issue:
+                continue
+            phase = normalized_phase(owner_issue.phase_state)
+            if phase not in capability_owner_phases:
+                errors.append(
+                    f"{owner_issue.issue_id or owner_issue.path} in {owner_issue.path} has phase_state '{owner_issue.phase_state}', which cannot own capability/implementation changes in a develop-bound merge. "
+                    f"First advance the lifecycle to an execution phase like in_dev / blocked_dev / in_verification, or keep this merge governance-only."
+                )
+            # 历史遗留豁免：phase_state 为 completed 的 issue 允许后补 capability changes
+            # 这些是历史 issue，之前已完成但后来有后续修复合并进来
+            if phase == "completed":
+                warnings.append(
+                    f"{owner_issue.issue_id or owner_issue.path} in {owner_issue.path} has phase_state 'completed' but carries capability/implementation changes. "
+                    f"This is allowed for legacy issues with post-completion fixes. Consider creating a follow-up issue for future work."
+                )
+
+        for issue in touched_issue_records:
+            phase = normalized_phase(issue.phase_state)
+            has_progress = issue.path in progress_owner_issue_paths
+            has_review = issue.path in review_owner_issue_paths
+            if phase in {"in_dev", "blocked_dev"} and not has_progress:
+                errors.append(
+                    f"{issue.issue_id} in {issue.path} touches capability/implementation changes while still in phase '{phase}', but the same develop-bound diff carries no same-line progress artifact. "
+                    f"Runtime or product-surface changes must bring the concrete progress owner into the same diff, not just the bare issue document."
+                )
+            if phase == "in_verification" and not (has_progress or has_review):
+                errors.append(
+                    f"{issue.issue_id} in {issue.path} touches capability/implementation changes while in_verification, but the same develop-bound diff carries neither same-line progress nor review evidence. "
+                    f"Verification-phase merges must include the concrete verification/progress artifact that justifies the closeout state."
+                )
+
+    if implementation_changed_paths:
+        for owner_issue_path in sorted(issue_bound_issue_paths):
+            owner_issue = owner_issue_records.get(owner_issue_path) or issues_index.get(owner_issue_path)
+            if not owner_issue:
+                continue
+
+            verification_dir = normalize_scalar(owner_issue.verification_artifact_dir or "")
+
+            # 对于已完成的 issue，豁免 review artifact 要求（历史遗留问题）
+            phase = normalized_phase(owner_issue.phase_state)
+            if phase == "completed":
+                continue
+
+            if not verification_dir:
+                errors.append(
+                    f"{owner_issue.issue_id or owner_issue.path} in {owner_issue.path} owns implementation-bearing changes, but verification_artifact_dir is missing. "
+                    f"Set the canonical review/verification directory on the issue before merging develop-bound implementation work."
+                )
+                continue
+            if not verification_artifact_dir_is_scoped(verification_dir):
+                errors.append(
+                    f"{owner_issue.issue_id or owner_issue.path} in {owner_issue.path} uses verification_artifact_dir '{verification_dir}', which is too broad or non-canonical. "
+                    f"Use an issue-scoped docs/epics/.../code-reviews directory before merging implementation-bearing changes."
+                )
+                continue
+
+            normalized_dir = verification_dir.rstrip("/")
+            owner_reviews = [review for review in review_records if review.path.startswith(f"{normalized_dir}/")]
+            if not owner_reviews:
+                errors.append(
+                    f"{owner_issue.issue_id or owner_issue.path} in {owner_issue.path} owns implementation-bearing changes, but no fresh staged owner review artifact was added under {verification_dir}. "
+                    f"Stage an issue-bound review/verification artifact there and record the implementation decision note."
+                )
+                continue
+
+            complete_review = None
+            for review in owner_reviews:
+                missing_fields = [
+                    field_name
+                    for field_name in IMPLEMENTATION_DECISION_NOTE_FIELDS
+                    if field_name not in review.decision_note_fields
+                ]
+                if not missing_fields:
+                    complete_review = review
+                    break
+
+            if complete_review:
+                continue
+
+            first_review = owner_reviews[0]
+            missing_fields = [
+                field_name
+                for field_name in IMPLEMENTATION_DECISION_NOTE_FIELDS
+                if field_name not in first_review.decision_note_fields
+            ]
+            errors.append(
+                f"{first_review.path} is the staged review artifact for {owner_issue.issue_id or owner_issue.path}, but its implementation decision note is incomplete. "
+                f"Missing fields: {', '.join(missing_fields)}."
+            )
+
+    if (
+        args.target_branch == "develop"
+        and is_test_premerge_branch(args.source_branch)
+        and issue_bound_issue_paths
+    ):
+        # test-pre-merge -> develop is itself a guarded promotion surface.
+        # Once the merge binds to an owner issue, consume that owner's pre-tests
+        # contract even for governance/status-only closeout diffs so develop
+        # cannot accept "completed/verified" truth that lacks adequate evidence.
+        if not os.path.exists(PRETESTS_GATE_BIN):
+            errors.append(
+                f"test-pre-merge promote from {args.source_branch} requires {relative_path(PRETESTS_GATE_BIN)}, but that gate is unavailable."
+            )
+        else:
+            for owner_issue_path in sorted(issue_bound_issue_paths):
+                result = subprocess.run(
+                    [
+                        PRETESTS_GATE_BIN,
+                        "--project",
+                        ROOT_DIR,
+                        "--issue",
+                        owner_issue_path,
+                        "--staged-only",
+                        "--require-adequacy",
+                        "--target-lane",
+                        "premerge-integration",
+                        "--promotion-gate",
+                        "develop_merge",
+                    ],
+                    cwd=ROOT_DIR,
+                    text=True,
+                    capture_output=True,
+                )
+                if result.returncode == 0:
+                    continue
+                output_lines = [
+                    line.strip()
+                    for line in f"{result.stdout}\n{result.stderr}".splitlines()
+                    if line.strip()
+                ]
+                errors.append(
+                    f"{owner_issue_path}: owner issue pre-tests are not adequate for guarded promote from {args.source_branch}."
+                )
+                for line in output_lines:
+                    if line.startswith("[pretests-gate]"):
+                        continue
+                    if line.startswith("- "):
+                        errors.append(line[2:].strip())
+                    else:
+                        errors.append(line)
+
+    if milestones_changed:
+        for entry in milestones:
+            if entry.queue in {"committed_issues", "completed_issues"} and entry.item_id.startswith("C-") and entry.issue_path:
+                warnings.append(
+                    f"docs/milestones.md still uses legacy candidate identity {entry.item_id} in {entry.queue} for {entry.issue_path}. "
+                    f"Prefer formal I-{{issue-id}} identities for new develop-bound work."
+                )
+
+    # GATE 6.2: linked issues must have platform_ids in docs/issues/
+    for issue_path in sorted(issue_bound_issue_paths):
+        matched = re.match(r".*/(I-\d{8}-\d{4}[A-Za-z0-9-]*)\.md$", issue_path)
+        if not matched:
+            continue
+        issue_local_id = matched.group(1)
+        docs_issue_file = os.path.join(ROOT_DIR, "docs", "issues", issue_local_id, "issue.md")
+        if os.path.exists(docs_issue_file):
+            with open(docs_issue_file) as f:
+                docs_text = f.read()
+            if "platform_ids:" not in docs_text or "issue_id:" not in docs_text.split("platform_ids:")[1][:100] if "platform_ids:" in docs_text else True:
+                errors.append(
+                    f"GATE 6.2: {issue_local_id} in docs/issues/ has no platform_ids. "
+                    "Run bin/issue-sync-bootstrap to sync before merge."
+                )
+        else:
+            errors.append(
+                f"GATE 6.2: {issue_local_id} has no docs/issues/ entry. "
+                "Run bin/issue-sync-bootstrap to create it before merge."
+            )
+
+    if errors:
+        print("[FAIL] develop merge governance gate blocked.")
+        print("The following C/M/I lifecycle links are incomplete or inconsistent:")
+        for message in errors:
+            print(f"- {message}")
+        print()
+        print("Allowed candidate statuses before merge:")
+        for message in allowed_status_guide:
+            print(f"- {message}")
+        if warnings:
+            print()
+            print("Warnings:")
+            for message in warnings:
+                print(f"- {message}")
+        return 1
+
+    if warnings:
+        print("Develop merge governance gate passed with warnings:")
+        for message in warnings:
+            print(f"- {message}")
+    else:
+        print("Develop merge governance gate passed.")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

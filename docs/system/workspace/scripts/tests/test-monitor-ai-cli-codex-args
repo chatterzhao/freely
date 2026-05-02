@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-monitor-codex-args.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+project_dir="$TMP_DIR/project"
+prompt_file="$TMP_DIR/prompt.txt"
+pid_file="$TMP_DIR/ai.pid"
+log_file="$TMP_DIR/ai.log"
+mock_bin="$TMP_DIR/bin"
+project_worktrees_root="${project_dir}-worktrees"
+mkdir -p "$mock_bin" "$project_dir"
+project_real="$(cd "$project_dir" && pwd -P)"
+
+cat >"$prompt_file" <<'EOF'
+test prompt
+EOF
+
+cat >"$mock_bin/codex" <<'EOF'
+#!/usr/bin/env bash
+printf '%s\n' "$@" >"$TMP_DIR/codex.args"
+pwd -P >"$TMP_DIR/codex.cwd"
+echo "[TEST] mock codex started"
+sleep 1
+EOF
+chmod +x "$mock_bin/codex"
+
+PATH="$mock_bin:$PATH" TMP_DIR="$TMP_DIR" \
+bash "$ROOT_DIR/docs/system/workspace/scripts/monitor-ai-cli.sh" \
+  --project "$project_dir" \
+  --tool codex \
+  --model "gpt-5.4" \
+  --reasoning-effort "medium" \
+  --mode auto \
+  --prompt-file "$prompt_file" \
+  --pid-file "$pid_file" \
+  --log-file "$log_file" \
+  --launch-kind fresh \
+  >/dev/null
+
+grep -q -- "-C" "$TMP_DIR/codex.args"
+grep -q "$project_dir" "$TMP_DIR/codex.args"
+grep -q -- "^--add-dir$" "$TMP_DIR/codex.args"
+grep -q -- "^$project_worktrees_root$" "$TMP_DIR/codex.args"
+grep -q 'gpt-5.4' "$TMP_DIR/codex.args"
+grep -q 'model_reasoning_effort="medium"' "$TMP_DIR/codex.args"
+grep -q -- '--dangerously-bypass-approvals-and-sandbox' "$TMP_DIR/codex.args"
+grep -q '\[TEST\] mock codex started' "$log_file"
+grep -q "^$project_real\$" "$TMP_DIR/codex.cwd"
+
+PATH="$mock_bin:$PATH" TMP_DIR="$TMP_DIR" \
+bash "$ROOT_DIR/docs/system/workspace/scripts/monitor-ai-cli.sh" \
+  --project "$project_dir" \
+  --tool codex \
+  --model "gpt-5.4" \
+  --reasoning-effort "medium" \
+  --mode auto \
+  --prompt-file "$prompt_file" \
+  --pid-file "$pid_file" \
+  --log-file "$log_file" \
+  --launch-kind resume \
+  --tool-resume-target "session-123" \
+  >/dev/null
+
+grep -q '^resume$' "$TMP_DIR/codex.args"
+grep -q '^session-123$' "$TMP_DIR/codex.args"
+grep -q "^$project_real\$" "$TMP_DIR/codex.cwd"
+if grep -q '^--add-dir$' "$TMP_DIR/codex.args"; then
+  echo "[FAIL] codex resume should not pass --add-dir"
+  exit 1
+fi
+if grep -q '^--all$' "$TMP_DIR/codex.args"; then
+  echo "[FAIL] resume launch should stay cwd-scoped instead of using --all"
+  exit 1
+fi
+if grep -q '^--last$' "$TMP_DIR/codex.args"; then
+  echo "[FAIL] codex resume should not fall back to --last"
+  exit 1
+fi
+
+if PATH="$mock_bin:$PATH" TMP_DIR="$TMP_DIR" \
+  bash "$ROOT_DIR/docs/system/workspace/scripts/monitor-ai-cli.sh" \
+    --project "$project_dir" \
+    --tool codex \
+    --model "gpt-5.4" \
+    --reasoning-effort "medium" \
+    --mode auto \
+    --prompt-file "$prompt_file" \
+    --pid-file "$pid_file" \
+    --log-file "$log_file" \
+    --launch-kind resume \
+    >/dev/null 2>&1; then
+  echo "[FAIL] codex resume should fail when explicit session target is missing"
+  exit 1
+fi
+
+echo "[PASS] monitor launches codex with project-scoped fresh and resume arguments"

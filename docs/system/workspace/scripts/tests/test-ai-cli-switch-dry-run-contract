@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-ai-cli-switch-dry-run.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+TMP_HOME="$TMP_DIR/home"
+MOCK_BIN="$TMP_DIR/mock-bin"
+CODEX_LOG="$TMP_DIR/codex.log"
+mkdir -p \
+  "$TMP_HOME/.ai-auth/codex-apikey-custom-1" \
+  "$TMP_HOME/.ai-auth/codex-account-work@example-com-1" \
+  "$TMP_HOME/.codex" \
+  "$MOCK_BIN"
+
+cat >"$TMP_HOME/.ai-auth/.codex-current-slot" <<'EOF'
+apikey-custom-1
+EOF
+
+cat >"$TMP_HOME/.ai-auth/codex-apikey-custom-1/auth.json" <<'EOF'
+{"OPENAI_API_KEY":"sk-live"}
+EOF
+cat >"$TMP_HOME/.ai-auth/codex-apikey-custom-1/config-auth.toml" <<'EOF'
+model_provider = "custom"
+EOF
+cat >"$TMP_HOME/.ai-auth/codex-apikey-custom-1/manifest.json" <<'EOF'
+{"manifest_version":"codex-slot-v1","tool":"codex","slot_id":"apikey-custom-1","slot_kind":"apikey","provider_id":"custom"}
+EOF
+
+python3 - <<'PY' "$TMP_HOME/.ai-auth/codex-account-work@example-com-1/auth.json"
+import base64
+import json
+import pathlib
+import sys
+
+payload = base64.urlsafe_b64encode(json.dumps({"email": "work@example.com"}).encode()).decode().rstrip("=")
+pathlib.Path(sys.argv[1]).write_text(json.dumps({"tokens": {"id_token": f"x.{payload}.y"}}), encoding="utf-8")
+PY
+cat >"$TMP_HOME/.ai-auth/codex-account-work@example-com-1/config-auth.toml" <<'EOF'
+
+EOF
+cat >"$TMP_HOME/.ai-auth/codex-account-work@example-com-1/manifest.json" <<'EOF'
+{"manifest_version":"codex-slot-v1","tool":"codex","slot_id":"account-work@example-com-1","slot_kind":"account","auth_email":"work@example.com"}
+EOF
+
+cat >"$TMP_HOME/.codex/auth.json" <<'EOF'
+{"OPENAI_API_KEY":"sk-current"}
+EOF
+
+cat >"$MOCK_BIN/codex" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+printf '%s\n' "$*" >>"${CODEX_LOG:?}"
+exit 99
+EOF
+chmod +x "$MOCK_BIN/codex"
+
+HOME="$TMP_HOME" PATH="$MOCK_BIN:$PATH" CODEX_LOG="$CODEX_LOG" \
+  bash "$ROOT_DIR/bin/ai" --quiet --format json --dry-run switch codex >"$TMP_DIR/out.json"
+
+python3 - <<'PY' "$TMP_DIR/out.json"
+import json
+import pathlib
+import sys
+
+data = json.loads(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"))
+assert data["switched"] is False
+assert data["dry_run"] is True
+assert data["tool"] == "codex"
+assert data["status"] == "dry_run_inventory"
+assert data["current_slot"] is None
+assert data["candidate_slot"] == "account-work@example-com-1" or data["candidate_slot"] == "apikey-custom-1"
+assert data["saved_slot_count"] == 2
+assert data["saved_apikey_slot_count"] == 1
+assert data["saved_account_slot_count"] == 1
+assert data["saved_other_slot_count"] == 0
+assert data["saved_slots"] == ["account-work@example-com-1", "apikey-custom-1"] or data["saved_slots"] == ["apikey-custom-1", "account-work@example-com-1"]
+assert data["saved_apikey_slots"] == ["apikey-custom-1"]
+assert data["saved_account_slots"] == ["account-work@example-com-1"]
+PY
+
+if [[ -f "$CODEX_LOG" && -s "$CODEX_LOG" ]]; then
+  echo "[FAIL] dry-run switch should not invoke codex probing" >&2
+  exit 1
+fi
+
+echo "[PASS] ai switch codex dry-run emits inventory JSON from saved slots without treating a stale active-slot as the current live slot"

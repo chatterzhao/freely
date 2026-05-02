@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-monitor-ai-reconnect-defer.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+HOME_DIR="$TMP_DIR/home"
+MOCK_BIN="$TMP_DIR/mock-bin"
+PROMPT_FILE="$TMP_DIR/prompt.txt"
+PID_FILE="$TMP_DIR/child.pid"
+LOG_FILE="$TMP_DIR/monitor.log"
+MARKER_FILE="$TMP_DIR/network.marker"
+
+mkdir -p "$PROJECT" "$HOME_DIR/.codex" "$MOCK_BIN"
+printf 'hi\n' >"$PROMPT_FILE"
+
+cat >"$MOCK_BIN/codex" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+if [[ "${1:-}" == "exec" ]]; then
+  echo "ERROR: Reconnecting... 2/5"
+  sleep 2
+  exit 99
+fi
+exit 98
+EOF
+chmod +x "$MOCK_BIN/codex"
+
+set +e
+HOME="$HOME_DIR" \
+PATH="$MOCK_BIN:$PATH" \
+  bash "$ROOT_DIR/docs/system/workspace/scripts/monitor-ai-cli.sh" \
+    --project "$PROJECT" \
+    --tool codex \
+    --tool-adapter direct \
+    --model gpt-5.4 \
+    --reasoning-effort medium \
+    --tool-capabilities "" \
+    --tool-policy "" \
+    --codex-capability-model gpt-5.4 \
+    --codex-capability-sandbox workspace-write \
+    --codex-capability-approval-policy never \
+    --codex-capability-cwd-mode project-root \
+    --debug-log-file "$TMP_DIR/debug.log" \
+    --claude-session-id "" \
+    --tool-resume-target "" \
+    --mode auto \
+    --prompt-file "$PROMPT_FILE" \
+    --pid-file "$PID_FILE" \
+    --log-file "$LOG_FILE" \
+    --network-failure-marker-file "$MARKER_FILE" \
+    --launch-kind fresh >/dev/null 2>&1
+RC=$?
+set -e
+
+[[ "$RC" -ne 0 ]]
+[[ ! -f "$MARKER_FILE" ]]
+grep -q 'ERROR: Reconnecting... 2/5' "$LOG_FILE"
+
+CHILD_PID="$(cat "$PID_FILE")"
+if kill -0 "$CHILD_PID" 2>/dev/null; then
+  echo "[FAIL] monitor-ai-cli should let codex finish its own reconnect loop before intervening" >&2
+  exit 1
+fi
+
+echo "[PASS] monitor-ai-cli defers reconnect-in-progress logs to the tool's own retry loop"

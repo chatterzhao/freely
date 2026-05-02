@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_HOME="$(mktemp -d /tmp/freely-ai-login-codex-apikey-interactive.XXXXXX)"
+trap 'rm -rf "$TMP_HOME"' EXIT
+
+mkdir -p "$TMP_HOME/.codex"
+
+printf 'custom\nhttps://api.example.com/v1\nsk-interactive\n' | \
+  HOME="$TMP_HOME" bash "$ROOT_DIR/bin/ai" --quiet --format json login codex apikey >"$TMP_HOME/login.json"
+
+python3 - <<'PY' "$TMP_HOME"
+import json
+import pathlib
+import sys
+import tomllib
+
+home = pathlib.Path(sys.argv[1])
+payload = json.loads((home / "login.json").read_text(encoding="utf-8"))
+assert payload["logged_in"] is True
+assert payload["slot"] == "apikey-custom-1"
+assert payload["slot_kind"] == "apikey"
+assert payload["provider_id"] == "custom"
+
+auth = json.loads((home / ".codex" / "auth.json").read_text(encoding="utf-8"))
+assert auth["OPENAI_API_KEY"] == "sk-interactive"
+
+config = tomllib.loads((home / ".codex" / "config.toml").read_text(encoding="utf-8"))
+assert config["model_provider"] == "custom"
+assert config["preferred_auth_method"] == "apikey"
+assert config["model_providers"]["custom"]["name"] == "custom"
+assert config["model_providers"]["custom"]["base_url"] == "https://api.example.com/v1"
+assert config["model_providers"]["custom"]["wire_api"] == "responses"
+assert config["model_providers"]["custom"]["requires_openai_auth"] is False
+
+manifest = json.loads((home / ".ai-auth" / "codex-apikey-custom-1" / "manifest.json").read_text(encoding="utf-8"))
+assert manifest["slot_kind"] == "apikey"
+assert manifest["provider_id"] == "custom"
+
+saved_auth = json.loads((home / ".ai-auth" / "codex-apikey-custom-1" / "auth.json").read_text(encoding="utf-8"))
+assert saved_auth["OPENAI_API_KEY"] == "sk-interactive"
+
+saved_config = tomllib.loads((home / ".ai-auth" / "codex-apikey-custom-1" / "config-auth.toml").read_text(encoding="utf-8"))
+assert saved_config["model_provider"] == "custom"
+assert saved_config["preferred_auth_method"] == "apikey"
+assert saved_config["model_providers"]["custom"]["base_url"] == "https://api.example.com/v1"
+PY
+
+echo "[PASS] ai login codex apikey prompts for missing provider inputs and materializes live plus saved slot state"

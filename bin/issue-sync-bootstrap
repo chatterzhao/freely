@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# issue-sync-bootstrap: 将历史 milestone issue 同步到 GitHub/Gitee
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+BATCH_SIZE=0
+DRY_RUN=0
+
+usage() { cat <<'EOF'
+Usage:
+  bin/issue-sync-bootstrap --dry-run
+  bin/issue-sync-bootstrap --batch N
+  bin/issue-sync-bootstrap --all
+  bin/issue-sync-bootstrap --delete <gh-issue-url>
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --dry-run) DRY_RUN=1; shift ;;
+    --batch) BATCH_SIZE="$2"; shift 2 ;;
+    --all) BATCH_SIZE=999; shift ;;
+    --delete) gh issue delete "$2" --yes 2>&1; exit $? ;;
+    *) shift ;;
+  esac
+done
+
+# Detect GitHub repo
+GITHUB_REPO=$(gh repo view --json nameWithOwner -q '.nameWithOwner' 2>/dev/null || echo "")
+[[ -z "$GITHUB_REPO" ]] && { echo "[ERROR] No GitHub repo found" >&2; exit 1; }
+
+echo "GitHub: $GITHUB_REPO"
+echo ""
+
+PY_CMD=(python3 "$SCRIPT_DIR/issue-sync-batch.py"
+  --repo "$GITHUB_REPO"
+  --issues-dir "$ROOT_DIR/docs/issues"
+  --milestones "$ROOT_DIR/docs/milestones.md"
+)
+
+if [[ "$DRY_RUN" -eq 1 ]]; then
+  "${PY_CMD[@]}" --dry-run
+else
+  "${PY_CMD[@]}" --batch "${BATCH_SIZE:-50}"
+fi

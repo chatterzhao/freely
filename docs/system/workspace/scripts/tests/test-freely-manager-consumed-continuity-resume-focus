@@ -1,0 +1,168 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-consumed-continuity-resume-focus.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260327-0000--sample" \
+  "$PROJECT/.freely/run"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/docs/milestones.md" <<'EOF'
+# Milestones
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260327-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260327-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260327-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+git -C "$PROJECT" init -q -b develop
+git -C "$PROJECT" config user.name freely-test
+git -C "$PROJECT" config user.email freely-test@example.com
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m "init"
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+
+CONTINUITY_OLD="$PROJECT/.freely/run/manager-continuity-20260327-181023.md"
+cat >"$CONTINUITY_OLD" <<'EOF'
+# Manager Continuity
+
+## Primary Judgement
+- route_kind: `completion_verification`
+- restart_point: `runtime followthrough is the only remaining open thread`
+- next_action: `stay on runtime followthrough instead of restarting milestone patrol`
+
+## Queue
+- worker_prompt_paths_created_this_round: `none`
+- worker_prompt_paths_referenced_this_round: `none`
+
+## Next Supervision Priority
+1. verify live-status still points at this continuity
+2. only expand if current fleet truth contradicts this continuity
+EOF
+
+cat >"$PROJECT/.freely/run/manager-worker-launch-state.env" <<EOF
+LAST_MANAGER_CONTINUITY_GENERATED="$CONTINUITY_OLD"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED="none"
+LAST_MANAGER_CONTINUITY_CONSUMED="$CONTINUITY_OLD"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED="none"
+LAUNCHED_WORKER_PROMPTS="none"
+QUEUED_WORKER_PROMPTS="none"
+MAX_PARALLEL_WORKERS="unbounded"
+ACTIVE_RUNNING_WORKER_COUNT="0"
+AVAILABLE_NEW_WORKER_SLOTS="unbounded"
+UPDATED_AT="2026-03-27T18:10:24Z"
+EOF
+
+build_test_prompt() {
+  local launch_kind="$1" delegated_count="$2" consumed_continuity="$3"
+  PROJECT_ROOT="$PROJECT" \
+  INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md" \
+  CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md" \
+  AI_TOOL="codex" \
+  AI_MODEL="gpt-5.4" \
+  AI_MODE="auto" \
+  AI_REASONING_EFFORT="medium" \
+  LAUNCH_KIND_SELECTED="$launch_kind" \
+  LAST_DELEGATED_CONTINUATION_PENDING_COUNT="$delegated_count" \
+  LAST_MANAGER_CONTINUITY_CONSUMED="$consumed_continuity" \
+  bash -lc '
+    source "$1"
+    build_prompt
+  ' _ "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+}
+
+PROMPT_RESUME="$(build_test_prompt "resume" "0" "$CONTINUITY_OLD")"
+[[ "$PROMPT_RESUME" == *'已消费 manager continuity 续接：'* ]]
+[[ "$PROMPT_RESUME" == *'route_kind: `completion_verification`'* ]]
+[[ "$PROMPT_RESUME" == *'restart_point: `runtime followthrough is the only remaining open thread`'* ]]
+[[ "$PROMPT_RESUME" == *'next_action: `stay on runtime followthrough instead of restarting milestone patrol`'* ]]
+[[ "$PROMPT_RESUME" == *'workspace/skills/worktree-maintenance-governance/SKILL.md'* ]]
+
+PROMPT_PENDING="$(build_test_prompt "resume" "1" "$CONTINUITY_OLD")"
+if [[ "$PROMPT_PENDING" == *'已消费 manager continuity 续接：'* ]]; then
+  echo "[FAIL] consumed-continuity resume focus should not override fresh delegated continuation work" >&2
+  exit 1
+fi
+
+CONTINUITY_NEW="$PROJECT/.freely/run/manager-continuity-20260327-181024.md"
+cat >"$CONTINUITY_NEW" <<'EOF'
+# Manager Continuity
+
+## Primary Judgement
+- route_kind: `completion_verification`
+- restart_point: `a newer continuity superseded the previous lane`
+- next_action: `use the newer continuity instead of the older consumed one`
+EOF
+
+cat >"$PROJECT/.freely/run/manager-worker-launch-state.env" <<EOF
+LAST_MANAGER_CONTINUITY_GENERATED="$CONTINUITY_NEW"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED="none"
+LAST_MANAGER_CONTINUITY_CONSUMED="$CONTINUITY_OLD"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED="none"
+LAUNCHED_WORKER_PROMPTS="none"
+QUEUED_WORKER_PROMPTS="none"
+MAX_PARALLEL_WORKERS="unbounded"
+ACTIVE_RUNNING_WORKER_COUNT="0"
+AVAILABLE_NEW_WORKER_SLOTS="unbounded"
+UPDATED_AT="2026-03-27T18:10:25Z"
+EOF
+
+PROMPT_STALE="$(build_test_prompt "resume" "0" "$CONTINUITY_OLD")"
+if [[ "$PROMPT_STALE" == *'已消费 manager continuity 续接：'* ]]; then
+  echo "[FAIL] consumed-continuity resume focus should not apply when consumed continuity is no longer the latest generated truth" >&2
+  exit 1
+fi
+
+cat >"$PROJECT/.freely/run/session-handoff.txt" <<'EOF'
+# Session Handoff
+
+- rotation_reason: context_compacted
+- previous_launch_kind: fresh
+EOF
+
+PROMPT_HANDOFF="$(build_test_prompt "fresh_with_handoff" "0" "$CONTINUITY_OLD")"
+[[ "$PROMPT_HANDOFF" == *'manager continuity handoff 续接：'* ]]
+[[ "$PROMPT_HANDOFF" == *"$CONTINUITY_NEW"* ]]
+[[ "$PROMPT_HANDOFF" == *'workspace/skills/worktree-maintenance-governance/SKILL.md'* ]]
+
+echo "[PASS] manager resume prompt stays anchored to current manager continuity across resume and handoff paths"

@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<USAGE
+Usage:
+  source bin/wt-enter <branch>
+
+Behavior:
+- checkout branch in primary worktree (triggers post-checkout auto worktree creation)
+- auto-cd into the branch worktree path
+USAGE
+}
+
+freely_wt_self_path() {
+  if [[ -n "${BASH_SOURCE[0]:-}" ]]; then
+    printf '%s\n' "${BASH_SOURCE[0]}"
+    return 0
+  fi
+  if [[ -n "${ZSH_VERSION:-}" ]]; then
+    eval 'printf "%s\n" "${(%):-%x}"'
+    return 0
+  fi
+  return 1
+}
+
+freely_wt_is_sourced() {
+  if [[ -n "${ZSH_VERSION:-}" ]]; then
+    [[ "${ZSH_EVAL_CONTEXT:-}" == *:file* ]]
+    return
+  fi
+  [[ "${BASH_SOURCE[0]:-}" != "$0" ]]
+}
+
+SELF_PATH="$(freely_wt_self_path)" || { echo "Unable to determine wt-enter script path." >&2; return 1 2>/dev/null || exit 1; }
+SELF_DIR="$(cd "$(dirname "$SELF_PATH")" && pwd -P)"
+
+if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+  usage
+  return 0 2>/dev/null || exit 0
+fi
+
+branch="${1:-}"
+[[ -n "$branch" ]] || { usage; return 1 2>/dev/null || exit 1; }
+
+# Must be sourced to allow cd in current shell.
+if ! freely_wt_is_sourced; then
+  echo "Please run with: source bin/wt-enter <branch>" >&2
+  exit 1
+fi
+
+# shellcheck disable=SC1091
+source "$SELF_DIR/worktree-common.sh"
+freely_wt_assert_strict_root || return 1 2>/dev/null || exit 1
+freely_wt_assert_existing_in_strict_root "$branch" || return 1 2>/dev/null || exit 1
+
+existing_path="$(freely_wt_existing_for_branch "$branch")"
+if [[ -n "$existing_path" && "$(pwd -P)" != "$existing_path" ]]; then
+  cd "$existing_path"
+  echo "Entered existing worktree: $existing_path"
+  return 0
+fi
+
+git checkout "$branch"
+wt_path="$(freely_wt_existing_for_branch "$branch")"
+
+if [[ "$wt_path" == "$(freely_wt_primary_worktree)" ]]; then
+  wt_path=""
+fi
+
+if [[ -z "$wt_path" ]]; then
+  echo "No dedicated sibling worktree found for branch '$branch'." >&2
+  return 1
+fi
+
+cd "$wt_path"
+echo "Entered worktree: $wt_path"

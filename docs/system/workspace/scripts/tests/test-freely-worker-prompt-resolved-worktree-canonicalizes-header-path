@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-worker-prompt-canonicalize.XXXXXX)"
+TMP_DIR_REAL="$(cd "$TMP_DIR" && pwd -P)"
+trap 'rm -rf "$TMP_DIR_REAL"' EXIT
+
+PROJECT="$TMP_DIR/project"
+WORKER="$TMP_DIR/project-worktrees/feature-worker"
+WORKER_REAL="$TMP_DIR_REAL/project-worktrees/feature-worker"
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$WORKER"
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+PROMPT="$PROJECT/.freely/run/worker-prompts/20260402-150000-worker-edit-codex.txt"
+cat >"$PROMPT" <<EOF
+Dispatch metadata:
+- intent_kind: edit
+- intent_target: \`$WORKER\`
+
+Worktree:
+- \`$WORKER\`
+
+Branch:
+- \`feature/worker-prompt-resolved-worktree-canonicalizes-header-path\`
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+RESOLVED="$(worker_prompt_resolved_worktree "$PROJECT" "$PROMPT")"
+[[ "$RESOLVED" == "$WORKER_REAL" ]]
+worker_prompt_targets_worktree "$PROJECT" "$PROMPT" "$WORKER_REAL"
+[[ "$(worker_prompt_effective_intent_target "$PROJECT" "$PROMPT")" == "$WORKER_REAL" ]]
+
+echo "[PASS] worker prompt resolved worktree canonicalizes header paths before ownership checks"

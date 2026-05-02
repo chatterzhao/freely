@@ -1,0 +1,343 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SELF_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+# shellcheck disable=SC1091
+source "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely"
+# shellcheck disable=SC1091
+source "$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-launchers.sh"
+WATCHDOG_AVAILABILITY_LIB="$SELF_ROOT/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+
+ai_cli_bin_for_project() {
+  local project="$1"
+  if [[ -x "$project/bin/ai" ]]; then
+    printf '%s\n' "$project/bin/ai"
+  else
+    printf '%s\n' "$SELF_ROOT/bin/ai"
+  fi
+}
+
+codex_account_cooldown_file() {
+  local project="$1"
+  printf '%s\n' "$project/.freely/run/codex-account-cooldowns.tsv"
+}
+
+seconds_until_epoch() {
+  local target_epoch="${1:-0}" now_epoch
+  [[ "$target_epoch" =~ ^[0-9]+$ ]] || target_epoch=0
+  now_epoch="$(date +%s)"
+  if (( target_epoch <= now_epoch )); then
+    printf '0\n'
+  else
+    printf '%s\n' "$((target_epoch - now_epoch))"
+  fi
+}
+
+write_manager_bootstrap_handoff() {
+  local project="$1" trigger="$2" previous_account="$3" active_account="$4" reason="$5" next_action="$6"
+  local handoff_path branch
+  handoff_path="$project/.freely/run/session-handoff.txt"
+  branch="$(git -C "$project" branch --show-current 2>/dev/null || true)"
+  mkdir -p "$(dirname "$handoff_path")"
+  cat >"$handoff_path" <<EOF
+# Session Handoff
+
+- rotation_reason: manager_bootstrap_watchdog
+- previous_launch_kind: ensure-manager
+- previous_tool_session_id: unavailable://manager-relaunched-by-script
+- previous_tool_jsonl_path: unavailable://manager-relaunched-by-script
+- previous_cycle_log: unavailable://manager-relaunched-by-script
+- previous_context_ratio: unavailable
+- previous_route_only_handoff: 0
+- previous_project_dirty_entries: 0
+- previous_worktree_summary_total: 0
+- previous_worktree_summary_dirty: 0
+- branch: ${branch:-unknown}
+- worktree_path: $project
+
+## Manager Bootstrap Recovery
+- trigger: ${trigger:-unknown}
+- previous_account: ${previous_account:-unavailable}
+- active_account: ${active_account:-unavailable}
+- reason: ${reason:-unavailable}
+- next_action: ${next_action:-check-fleet-and-continue}
+EOF
+}
+
+usage() {
+  cat <<'EOF'
+Usage:
+  interruption-manager-handler --project <abs_path> --intake-id <id>
+EOF
+}
+
+abs_path_or_fail() {
+  local p="$1"
+  [[ "$p" == /* ]] || {
+    echo "[ERROR] path must be absolute: $p" >&2
+    exit 1
+  }
+  printf '%s\n' "$p"
+}
+
+project=""
+intake_id=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+    --intake-id) intake_id="${2:-}"; shift 2 ;;
+    *) usage; exit 1 ;;
+  esac
+done
+
+[[ -n "$project" && -n "$intake_id" ]] || {
+  usage
+  exit 1
+}
+
+meta_file="$project/.freely/intake/$intake_id/meta.env"
+message_file="$project/.freely/intake/$intake_id/message.txt"
+[[ -f "$meta_file" && -f "$message_file" ]] || exit 1
+message="$(cat "$message_file")"
+
+message_has_any_phrase() {
+  local haystack="$1"
+  shift
+  local needle
+  for needle in "$@"; do
+    [[ -n "$needle" ]] || continue
+    if [[ "$haystack" == *"$needle"* ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+message_lacks_any_phrase() {
+  local haystack="$1"
+  shift
+  if message_has_any_phrase "$haystack" "$@"; then
+    return 1
+  fi
+  return 0
+}
+
+emit_cleanup_worker_fast_path_if_applicable() {
+  local text="$1"
+
+  message_has_any_phrase "$text" \
+    "worktree" "工位" "分支" "branch" "cleanup" "收口" "retire" "退休" "merged" "已合并" "merge" || return 1
+  message_has_any_phrase "$text" \
+    "检查" "核对" "清理" "收口" "cleanup" "retire" "退休" "删除" "remove" "merge" "已合并" || return 1
+  message_lacks_any_phrase "$text" \
+    "milestones" "issues" "intake" "runtime" "主管" "所有 worktree" "所有工位" "所有" "当前状态推进" || return 1
+
+  cat <<'EOF'
+DECISION=delegate
+REACTION=followup
+CLASSIFICATION=control
+RESTART_POINT=cleanup
+OWNERSHIP=worker
+WHY=收口问题依赖现场核对与实际 cleanup 动作
+HANDOFF=检查 merged worktree 是否满足 cleanup 生命周期并执行收口
+ANSWER=
+EOF
+  return 0
+}
+
+emit_manager_supervision_fast_path_if_applicable() {
+  local text="$1" role="$2"
+  [[ "$role" == "manager" ]] || return 1
+
+  if message_has_any_phrase "$text" "milestones" "issues" "intake" "runtime" "fleet-status" "live-status"; then
+    :
+  elif message_has_any_phrase "$text" "当前状态" "closeout" "收口项" "worker prompt" "continuity" "blocker" "启动链路"; then
+    message_has_any_phrase "$text" "继续" "推进" "处理" "优先" "materialize" "委派" || return 1
+  else
+    return 1
+  fi
+
+  cat <<'EOF'
+DECISION=delegate
+REACTION=followup
+CLASSIFICATION=continuation
+RESTART_POINT=continuation
+OWNERSHIP=manager
+WHY=开发类插话需回主管主循环巡检并产出后续开发交接
+HANDOFF=先做 live-status 与 fleet-status 巡检，再把 blocker materialize 成 continuity 或 worker prompt
+ANSWER=
+EOF
+  return 0
+}
+
+emit_execution_continuation_fast_path_if_applicable() {
+  local text="$1" role="$2"
+
+  message_has_any_phrase "$text" \
+    "继续" "推进" "开发" "修复" "实现" "测试" "review" "验证" "blocker" "current issue" "active issue" "继续当前" "closeout" "收口" || return 1
+
+  if [[ "$role" == "worker" ]]; then
+    cat <<'EOF'
+DECISION=delegate
+REACTION=followup
+CLASSIFICATION=continuation
+RESTART_POINT=continuation
+OWNERSHIP=worker
+WHY=开发类插话应回到当前工位继续执行 active issue
+HANDOFF=围绕当前工位 active issue 继续推进，不要停在旧 prompt
+ANSWER=
+EOF
+    return 0
+  fi
+
+  emit_manager_supervision_fast_path_if_applicable "$text" "$role"
+}
+
+emit_minimal_control_validation_fast_path_if_applicable() {
+  local text="$1"
+
+  message_has_any_phrase "$text" "控制类" "control" || return 1
+  message_has_any_phrase "$text" "最小验证" "minimal validation" "最小校验" "测试插话" || return 1
+  message_has_any_phrase "$text" "不要委派" "无需委派" "不用委派" "不必委派" || return 1
+  if ! message_has_any_phrase "$text" "只需分类并收尾" "只需要分类并收尾"; then
+    message_has_any_phrase "$text" "分类" || return 1
+    message_has_any_phrase "$text" "收尾" "结束" "closing" "close out" || return 1
+  fi
+
+  cat <<'EOF'
+DECISION=answer
+REACTION=followup
+CLASSIFICATION=control
+RESTART_POINT=continuation
+OWNERSHIP=manager
+WHY=显式控制类最小验证，无需委派执行
+HANDOFF=
+ANSWER=已按控制类最小验证处理，主管完成分类并收尾
+EOF
+  return 0
+}
+
+role_hint="$(role_hint_for_project "$project")"
+
+if emit_minimal_control_validation_fast_path_if_applicable "$message"; then
+  exit 0
+fi
+if emit_cleanup_worker_fast_path_if_applicable "$message"; then
+  exit 0
+fi
+if emit_manager_supervision_fast_path_if_applicable "$message" "$role_hint"; then
+  exit 0
+fi
+if emit_execution_continuation_fast_path_if_applicable "$message" "$role_hint"; then
+  exit 0
+fi
+
+config_file="$project/.freely/config.env"
+[[ -f "$config_file" ]] || exit 1
+# shellcheck disable=SC1090
+source "$config_file"
+
+tool="${AI_TOOL:-codex}"
+model="${AI_MODEL:-gpt-5.4}"
+reasoning_effort="${AI_REASONING_EFFORT:-medium}"
+tool_capabilities="${AI_TOOL_CAPABILITIES:-$(tool_default_capabilities "$tool")}"
+tool_policy="${AI_TOOL_POLICY:-$(tool_default_policy "$tool")}"
+codex_capability_model="${AI_CAPABILITY_CODEX_MODEL:-gpt-5.4}"
+codex_capability_sandbox="${AI_CAPABILITY_CODEX_SANDBOX:-workspace-write}"
+codex_capability_approval_policy="${AI_CAPABILITY_CODEX_APPROVAL_POLICY:-never}"
+codex_capability_cwd_mode="${AI_CAPABILITY_CODEX_CWD_MODE:-project-root}"
+
+if [[ "$tool" == "codex" ]]; then
+  [[ -f "$WATCHDOG_AVAILABILITY_LIB" ]] || {
+    echo "[ERROR] missing watchdog availability module: $WATCHDOG_AVAILABILITY_LIB" >&2
+    exit 1
+  }
+  # shellcheck disable=SC1090
+  source "$WATCHDOG_AVAILABILITY_LIB"
+  ensure_codex_slot_ready_for_manager "$project"
+fi
+
+prompt_file="$(mktemp /tmp/freely-interruption-manager-prompt.XXXXXX)"
+trap 'rm -f "$prompt_file"' EXIT
+
+cat >"$prompt_file" <<'EOF'
+你现在承担 Freely 的 interruption manager agent。
+
+目标：
+- 第一时间注意到任意人类插话。
+- 先在内部完成最小 intent understanding，再决定 routing。
+- 你只根据自己的职责做最小判断：
+  - 是主管先做简短澄清/回答
+  - 还是委派到后续专门处理链
+- 不能靠关键词穷举，也不要发明很多问题类型。
+- 可以参考少量示例，但示例不是硬编码规则：
+  - 纯主管监督面事实查询，通常可由主管先澄清
+  - 涉及分析、执行、清理、分支/worktree收口、文档补齐、实现/测试/review 的，通常应委派
+- 主管只负责 notice / claim / routing / 必要澄清，不直接承担需要实际执行的变更动作。
+- 只要这条 signal 需要真正做文件修改、git 操作、worktree/branch cleanup、测试执行、review 整理、文档补齐，就不应把 ownership 留给 manager。
+- 只要正确答案依赖“当前仓库/当前工位/当前运行态”的真实检查结果，也不要停在主管抽象回答；应委派到能读取并处理现场状态的后续链。
+- OWNERSHIP=manager 只适用于：
+  - 主管自己先回答或澄清
+  - 或主管只需写自己的 continuity / routing note，而不需要执行实际变更
+- 先在内部收敛这条 signal 的最小意图：
+  - 它更像 clarify / audit / propose / fix / continue / recover 中哪一类
+  - 是否需要 live inspection
+  - 是否需要 execution
+  - scope 更偏 manager-only / current-issue / fleet / runtime / project 哪一侧
+  - complexity 更偏 direct 还是 multi-step
+- 对 restart_point=cleanup：
+- 若要真正核对并执行 worktree / branch 收口，通常应给 OWNERSHIP=worker
+- 即使判断为 cleanup，也只表示主管已识别 restart point；当前 signal 仍应先交接为 cleanup handoff，而不是直接吸收到旧 cleanup continuity
+- 如果用户问的是“这个现在应该怎么收口”，由于答案依赖 live fleet state，也通常应走 delegate + cleanup + worker
+- 如果 signal 本身是在问“检查 worktree / 哪些 worktree 可 merge / 哪些应退休 / 现在该怎么收口”：
+  - 优先按 worktree maintenance 问题理解，而不是泛化成 continuation
+  - 默认走 DECISION=delegate
+  - 默认走 RESTART_POINT=cleanup
+  - 默认走 OWNERSHIP=worker
+  - HANDOFF 应明确要求后续链使用 worktree-maintenance-governance 做 audit / merge_prep / retirement_handoff 判断
+- 但如果 signal 同时覆盖多个主管监督面，例如：
+  - `worktree + milestones + issues + intake + runtime`
+  - 或显式要求“你现在是主管”“检查所有”“开发 Freely 自己”
+  - 或目标是先做项目级巡检、再决定委派
+  则不要直接落到 cleanup followthrough。
+  这类 signal 默认：
+  - 仍走 DECISION=delegate
+  - RESTART_POINT=continuation
+  - OWNERSHIP=manager
+  - HANDOFF 应要求下一轮主管主循环先做 `live-status -> fleet-status -> restart-point routing`
+
+若选择委派，必须同时判断：
+- restart point 从哪里重新开始：
+  - pre_brainstorm / candidate / milestone / ibm / dev / review / verification / continuation / runtime / cleanup
+- ownership 属于 manager / worker / runtime 哪一侧
+- 给出一行 handoff 摘要
+- `RESTART_POINT=runtime` 只用于当前 runtime 本身需要停车、重启、续跑治理或恢复的 signal。
+- 若 signal 是继续当前 issue、创建文件、实现、测试、review、修 bug、补文档等实际工作，即使最终由运行中的 worker 去执行，也应优先落在 `continuation`、`dev`、`review`、`verification` 等工作阶段，而不是 `runtime`。
+
+只输出以下 KEY=VALUE 行，不要输出任何额外文本：
+DECISION=answer 或 delegate
+REACTION=followup
+CLASSIFICATION=control 或 discovery 或 continuation 或 noise
+RESTART_POINT=<pre_brainstorm|candidate|milestone|ibm|dev|review|verification|continuation|runtime|cleanup>
+OWNERSHIP=<manager|worker|runtime>
+WHY=<单行中文原因，最多 40 字>
+HANDOFF=<单行中文交接摘要，最多 60 字；若是 answer 可留空>
+ANSWER=<单行中文回答摘要，最多 60 字；若是 delegate 可留空>
+
+插话：
+EOF
+
+printf '%s\n' "$message" >>"$prompt_file"
+
+(
+  cd "$project"
+  tool_run_from_prompt_file "$project" "$tool" "" "$model" "$reasoning_effort" "auto" "$prompt_file" "fresh" "$tool_capabilities" "$tool_policy" "$codex_capability_model" "$codex_capability_sandbox" "$codex_capability_approval_policy" "$codex_capability_cwd_mode"
+) \
+  | awk '
+      /^(DECISION|REACTION|CLASSIFICATION|RESTART_POINT|OWNERSHIP|WHY|HANDOFF|ANSWER)=/ {
+        if (count < 8) {
+          print
+          count++
+        }
+      }
+    '

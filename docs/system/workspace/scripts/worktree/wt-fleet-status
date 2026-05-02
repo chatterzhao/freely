@@ -1,0 +1,328 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SELF_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+PROJECT_ROOT="$(pwd -P)"
+FORMAT="text"
+
+usage() {
+  cat <<'EOF'
+Usage:
+  wt-fleet-status [--project <repo_root>] [--format text|json]
+
+Purpose:
+  - show all mounted worktrees as supervised workcells
+  - surface branch, cleanliness, checkpoint pressure, and Freely runtime state in one CLI-first view
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --project) PROJECT_ROOT="$2"; shift 2 ;;
+    --format) FORMAT="$2"; shift 2 ;;
+    -h|--help) usage; exit 0 ;;
+    *)
+      echo "unknown arg: $1" >&2
+      usage >&2
+      exit 1
+      ;;
+  esac
+done
+
+git -C "$PROJECT_ROOT" rev-parse --show-toplevel >/dev/null 2>&1 || {
+  echo "not a git repository: $PROJECT_ROOT" >&2
+  exit 1
+}
+
+extract_phase_hint() {
+  local worktree="$1"
+  local session_state="$worktree/.freely/run/session-state.env"
+  [[ -f "$session_state" ]] || return 0
+  awk -F '"' '/^LAST_PHASE_HINT=/{print $2; exit}' "$session_state"
+}
+
+extract_issue_hint() {
+  local worktree="$1"
+  local session_state="$worktree/.freely/run/session-state.env"
+  [[ -f "$session_state" ]] || return 0
+  awk -F '"' '/^LAST_ISSUE_HINT=/{print $2; exit}' "$session_state"
+}
+
+extract_workcell_state_value() {
+  local worktree="$1" key="$2"
+  local workcell_state="$worktree/.freely/run/workcell-state.env"
+  [[ -f "$workcell_state" ]] || return 0
+  awk -F '"' -v key="$key" '$1 == key "=" {print $2; exit}' "$workcell_state"
+}
+
+develop_push_followthrough_state_file() {
+  local worktree="$1"
+  printf '%s/.freely/run/develop-push-followthrough.env\n' "$worktree"
+}
+
+develop_push_attempt_state_file() {
+  local worktree="$1"
+  printf '%s/.freely/run/develop-push-attempt.env\n' "$worktree"
+}
+
+develop_push_defer_reason_is_valid() {
+  local reason="${1:-}"
+  case "$reason" in
+    post_merge_acceptance|cleanup_followthrough|remote_delivery_hold) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+develop_push_attempt_reason_is_valid() {
+  local reason="${1:-}"
+  case "$reason" in
+    push_rejected_by_gate|remote_rejected|transport_failure|auth_failure|unknown_failure) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+develop_push_followthrough_push_urgency_for_state() {
+  local state="${1:-}"
+  case "$state" in
+    push_pending|push_blocked) printf 'immediate\n' ;;
+    push_deferred) printf 'deferred\n' ;;
+    *) printf 'none\n' ;;
+  esac
+}
+
+authoritative_develop_worktree() {
+  local project="$1" repo_root
+  repo_root="$(git -C "$project" rev-parse --show-toplevel 2>/dev/null || true)"
+  [[ -n "$repo_root" ]] || return 0
+
+  if [[ "$(git -C "$repo_root" branch --show-current 2>/dev/null || printf 'unknown')" == "develop" ]]; then
+    printf '%s\n' "$repo_root"
+    return 0
+  fi
+
+  git -C "$repo_root" worktree list --porcelain 2>/dev/null | awk '
+    /^worktree / { wt=substr($0, 10); br="" }
+    /^branch / {
+      br=$2
+      sub(/^refs\/heads\//, "", br)
+      if (br == "develop") {
+        print wt
+        exit
+      }
+    }
+  '
+}
+
+branch_is_merged_into_authoritative_develop() {
+  local project="$1" branch="$2" develop_worktree branch_head develop_head
+  [[ -n "$branch" ]] || return 1
+  develop_worktree="$(authoritative_develop_worktree "$project")"
+  [[ -n "$develop_worktree" ]] || return 1
+  branch_head="$(git -C "$develop_worktree" rev-parse "$branch" 2>/dev/null || true)"
+  develop_head="$(git -C "$develop_worktree" rev-parse develop 2>/dev/null || true)"
+  [[ -n "$branch_head" && -n "$develop_head" ]] || return 1
+  [[ "$branch_head" != "$develop_head" ]] || return 1
+  git -C "$develop_worktree" merge-base --is-ancestor "$branch" develop >/dev/null 2>&1
+}
+
+worktree_has_runtime_history() {
+  local worktree="$1"
+  [[ -f "$worktree/.freely/run/workcell-state.env" ]] \
+    || [[ -f "$worktree/.freely/run/session-state.env" ]] \
+    || [[ -f "$worktree/.freely/run/manager-worker-launch-state.env" ]]
+}
+
+normalized_role_hint() {
+  local project="$1" worktree="$2" branch="$3" role_hint="$4"
+  if [[ "$role_hint" == "worker" ]] \
+    && worktree_has_runtime_history "$worktree" \
+    && branch_is_merged_into_authoritative_develop "$project" "$branch"; then
+    printf 'cleanup\n'
+    return 0
+  fi
+  printf '%s\n' "${role_hint:-unavailable}"
+}
+
+develop_push_followthrough_snapshot_for_develop_worktree() {
+  local worktree="$1"
+  local upstream counts ahead behind state summary head blocked_reason blocked_head
+  state="not_applicable"
+  summary="branch_not_develop"
+  upstream="none"
+  ahead="0"
+  behind="0"
+  blocked_reason="none"
+  blocked_head="none"
+
+  if [[ -f "$(develop_push_followthrough_state_file "$worktree")" ]]; then
+    # shellcheck disable=SC1090
+    source "$(develop_push_followthrough_state_file "$worktree")"
+  fi
+  if [[ -f "$(develop_push_attempt_state_file "$worktree")" ]]; then
+    # shellcheck disable=SC1090
+    source "$(develop_push_attempt_state_file "$worktree")"
+    blocked_reason="${DEVELOP_PUSH_ATTEMPT_REASON:-none}"
+    blocked_head="${DEVELOP_PUSH_ATTEMPT_HEAD:-none}"
+    if [[ -n "$blocked_reason" ]] && ! develop_push_attempt_reason_is_valid "$blocked_reason"; then
+      blocked_reason="invalid:${blocked_reason}"
+    fi
+  fi
+
+  upstream="$(git -C "$worktree" rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>/dev/null || true)"
+  if [[ -z "$upstream" ]]; then
+    state="not_applicable"
+    summary="no_upstream"
+    upstream="none"
+  else
+    counts="$(git -C "$worktree" rev-list --left-right --count "HEAD...$upstream" 2>/dev/null || true)"
+    if [[ -n "$counts" ]]; then
+      ahead="$(printf '%s\n' "$counts" | awk '{print $1}')"
+      behind="$(printf '%s\n' "$counts" | awk '{print $2}')"
+    fi
+    head="$(git -C "$worktree" rev-parse HEAD 2>/dev/null || true)"
+    [[ "$ahead" =~ ^[0-9]+$ ]] || ahead="0"
+    [[ "$behind" =~ ^[0-9]+$ ]] || behind="0"
+    if (( ahead > 0 )); then
+      if develop_push_defer_reason_is_valid "${DEVELOP_PUSH_DEFER_REASON:-}"; then
+        state="push_deferred"
+        summary="ahead=${ahead} upstream=${upstream} defer=${DEVELOP_PUSH_DEFER_REASON}"
+      elif [[ "${DEVELOP_PUSH_ATTEMPT_STATUS:-}" == "blocked" && -n "$head" && "$blocked_head" == "$head" ]]; then
+        state="push_blocked"
+        summary="ahead=${ahead} upstream=${upstream} blocked=${blocked_reason}"
+      else
+        state="push_pending"
+        summary="ahead=${ahead} upstream=${upstream} defer=none"
+      fi
+    else
+      state="clean"
+      summary="ahead=0 upstream=${upstream}"
+    fi
+  fi
+
+  printf '%s|%s|%s|%s|%s\n' "$state" "$summary" "$upstream" "$ahead" "$behind"
+}
+
+develop_push_followthrough_snapshot() {
+  local worktree="$1"
+  local branch state summary push_urgency resync_required
+  local canonical_develop_worktree canonical_develop_state canonical_develop_summary canonical_develop_upstream canonical_develop_ahead canonical_develop_behind
+  branch="$(git -C "$worktree" branch --show-current 2>/dev/null || printf 'unknown')"
+  state="not_applicable"
+  summary="branch_not_develop"
+  push_urgency="none"
+  resync_required="false"
+
+  if [[ "$branch" == "develop" ]]; then
+    IFS='|' read -r state summary _ _ _ <<<"$(develop_push_followthrough_snapshot_for_develop_worktree "$worktree")"
+  else
+    canonical_develop_worktree="$(authoritative_develop_worktree "$worktree")"
+    if [[ -n "$canonical_develop_worktree" ]]; then
+      IFS='|' read -r canonical_develop_state canonical_develop_summary canonical_develop_upstream canonical_develop_ahead canonical_develop_behind <<<"$(develop_push_followthrough_snapshot_for_develop_worktree "$canonical_develop_worktree")"
+      if [[ "${canonical_develop_ahead:-0}" =~ ^[0-9]+$ ]] && (( canonical_develop_ahead > 0 )); then
+        resync_required="true"
+        summary="branch_not_develop canonical_develop_state=${canonical_develop_state} canonical_develop_ahead=${canonical_develop_ahead} canonical_develop_upstream=${canonical_develop_upstream}"
+      fi
+    fi
+  fi
+
+  push_urgency="$(develop_push_followthrough_push_urgency_for_state "$state")"
+  printf '%s|%s|%s|%s\n' "$state" "$summary" "$push_urgency" "$resync_required"
+}
+
+checkpoint_guard_bin_for_project() {
+  local project="$1"
+  if [[ -x "$project/bin/checkpoint-guard" ]]; then
+    echo "$project/bin/checkpoint-guard"
+  else
+    echo "$SELF_ROOT/bin/checkpoint-guard"
+  fi
+}
+
+json_bool_value() {
+  local json="$1" key="$2" marker value
+  marker="\"${key}\":"
+  value="${json#*${marker}}"
+  [[ "$value" != "$json" ]] || return 0
+  case "$value" in
+    true*) printf 'true\n' ;;
+    false*) printf 'false\n' ;;
+  esac
+}
+
+json_int_value() {
+  local json="$1" key="$2" marker value
+  marker="\"${key}\":"
+  value="${json#*${marker}}"
+  [[ "$value" != "$json" ]] || return 0
+  case "$value" in
+    [0-9]*) printf '%s\n' "${value%%[^0-9]*}" ;;
+  esac
+}
+
+worktree_rows=()
+while IFS='|' read -r wt_path wt_branch; do
+  [[ -n "$wt_path" ]] || continue
+  dirty_state="CLEAN"
+  if [[ -n "$(git -C "$wt_path" status --short 2>/dev/null || true)" ]]; then
+    dirty_state="DIRTY"
+  fi
+
+  checkpoint_json="$(bash "$(checkpoint_guard_bin_for_project "$wt_path")" --project "$wt_path" --format json 2>/dev/null || true)"
+  checkpoint_required="$(json_bool_value "$checkpoint_json" checkpoint_required)"
+  changed_files="$(json_int_value "$checkpoint_json" changed_files)"
+  phase_hint="$(extract_phase_hint "$wt_path")"
+  issue_hint="$(extract_issue_hint "$wt_path")"
+  desired_runtime_state="$(extract_workcell_state_value "$wt_path" DESIRED_RUNTIME_STATE)"
+  role_hint="$(extract_workcell_state_value "$wt_path" LAST_ROLE_HINT)"
+  role_hint="$(normalized_role_hint "$PROJECT_ROOT" "$wt_path" "$wt_branch" "$role_hint")"
+  exit_reason="$(extract_workcell_state_value "$wt_path" LAST_EXIT_REASON)"
+  develop_push_snapshot="$(develop_push_followthrough_snapshot "$wt_path")"
+  IFS='|' read -r develop_push_state develop_push_summary develop_push_urgency develop_push_resync_required <<<"$develop_push_snapshot"
+
+  supervisor="down"
+  ai="down"
+  if [[ -f "$wt_path/.freely/run/supervisor.pid" ]]; then
+    supervisor_pid="$(cat "$wt_path/.freely/run/supervisor.pid" 2>/dev/null || true)"
+    if [[ -n "$supervisor_pid" ]] && kill -0 "$supervisor_pid" 2>/dev/null; then
+      supervisor="up"
+    fi
+  fi
+  if [[ -f "$wt_path/.freely/run/ai.pid" ]]; then
+    ai_pid="$(cat "$wt_path/.freely/run/ai.pid" 2>/dev/null || true)"
+    if [[ -n "$ai_pid" ]] && kill -0 "$ai_pid" 2>/dev/null; then
+      ai="up"
+    fi
+  fi
+
+  worktree_rows+=("$wt_path|$wt_branch|$dirty_state|${checkpoint_required:-false}|${changed_files:-0}|$supervisor|$ai|${phase_hint:-unavailable}|${issue_hint:-unavailable}|${desired_runtime_state:-stopped}|${role_hint:-unavailable}|${exit_reason:-unavailable}|${develop_push_state:-not_applicable}|${develop_push_summary:-none}|${develop_push_urgency:-none}|${develop_push_resync_required:-false}")
+done < <(git -C "$PROJECT_ROOT" worktree list --porcelain | awk '
+  /^worktree / { wt=substr($0, 10); br="" }
+  /^branch / { br=$2; sub(/^refs\/heads\//, "", br); print wt "|" br }
+')
+
+if [[ "$FORMAT" == "json" ]]; then
+  printf '['
+  first=1
+  for row in "${worktree_rows[@]}"; do
+    IFS='|' read -r wt_path wt_branch dirty checkpoint_required changed_files supervisor ai phase issue desired_runtime_state role_hint exit_reason develop_push_state develop_push_summary develop_push_urgency develop_push_resync_required <<<"$row"
+    [[ "$first" -eq 0 ]] && printf ','
+    first=0
+    printf '{"worktree":"%s","branch":"%s","dirty_state":"%s","checkpoint_required":%s,"changed_files":%s,"supervisor":"%s","ai":"%s","phase_hint":"%s","issue_hint":"%s","desired_runtime_state":"%s","role_hint":"%s","exit_reason":"%s","develop_push_followthrough_state":"%s","develop_push_followthrough_summary":"%s","develop_push_followthrough_push_urgency":"%s","develop_push_followthrough_resync_required":"%s"}' \
+      "$wt_path" "$wt_branch" "$dirty" "$checkpoint_required" "$changed_files" "$supervisor" "$ai" "$phase" "$issue" "$desired_runtime_state" "$role_hint" "$exit_reason" "$develop_push_state" "$develop_push_summary" "$develop_push_urgency" "$develop_push_resync_required"
+  done
+  printf ']\n'
+  exit 0
+fi
+
+printf '%-62s %-44s %-6s %-11s %-7s %-10s %-10s %-10s %-10s %-18s %-20s %s\n' "WORKTREE" "BRANCH" "DIRTY" "CHECKPOINT" "FILES" "SUPERVISOR" "AI" "DESIRED" "ROLE" "PHASE" "PUSH" "ISSUE"
+for row in "${worktree_rows[@]}"; do
+  IFS='|' read -r wt_path wt_branch dirty checkpoint_required changed_files supervisor ai phase issue desired_runtime_state role_hint exit_reason develop_push_state develop_push_summary develop_push_urgency develop_push_resync_required <<<"$row"
+  printf '%-62s %-44s %-6s %-11s %-7s %-10s %-10s %-10s %-10s %-18s %-20s %s\n' \
+    "$wt_path" "$wt_branch" "$dirty" "$checkpoint_required" "$changed_files" "$supervisor" "$ai" "$desired_runtime_state" "$role_hint" "$phase" "$develop_push_state" "$issue"
+  if [[ "$develop_push_state" != "not_applicable" || "$develop_push_resync_required" == "true" ]]; then
+    printf '%-62s %-44s %-6s %-11s %-7s %-10s %-10s %-10s %-10s %-18s %-20s %s\n' \
+      "" "" "" "" "" "" "" "" "" "" "develop_push" "$develop_push_summary"
+    printf '%-62s %-44s %-6s %-11s %-7s %-10s %-10s %-10s %-10s %-18s %-20s %s\n' \
+      "" "" "" "" "" "" "" "" "" "" "push_urgency" "${develop_push_urgency} resync_required=${develop_push_resync_required}"
+  fi
+done

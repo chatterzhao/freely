@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-watchdog-entry-slot-disabled.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+HOME_DIR="$TMP_DIR/home"
+mkdir -p "$PROJECT/.freely/run" "$HOME_DIR/.codex"
+
+bash -lc '
+  set -euo pipefail
+  export HOME="'"$HOME_DIR"'"
+  export AUTO_SWITCH_SLOT="false"
+  log_info() { :; }
+  log_warn() { :; }
+  log_error() { :; }
+  source "'"$ROOT_DIR"'/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+  codex_current_slot() { echo ""; }
+  codex_current_slot_kind() { echo ""; }
+  codex_current_identity_hint() { echo ""; }
+  codex_saved_slots_fingerprint() { echo "slot-fingerprint"; }
+  codex_load_availability_state() { return 1; }
+  codex_write_availability_state() {
+    echo "[FAIL] watchdog should not enter probing state when AUTO_SWITCH_SLOT=false" >&2
+    exit 1
+  }
+  select_any_available_codex_slot() {
+    echo "[FAIL] watchdog should not select a saved slot when AUTO_SWITCH_SLOT=false" >&2
+    exit 1
+  }
+  switch_to_codex_slot() {
+    echo "[FAIL] watchdog should not switch slots when AUTO_SWITCH_SLOT=false" >&2
+    exit 1
+  }
+  if ensure_codex_slot_ready_for_manager "'"$PROJECT"'" "entry"; then
+    echo "[FAIL] watchdog manager entry should stay blocked when AUTO_SWITCH_SLOT=false" >&2
+    exit 1
+  fi
+'
+
+echo "[PASS] watchdog manager entry skips slot selection when AUTO_SWITCH_SLOT=false"

@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-supervisor-loop.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260309-0000--sample" \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/.freely/logs"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260309-0000--sample
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260309-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260309-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="test-sleep"
+AI_MODEL=""
+AI_MODE="auto"
+AI_REASONING_EFFORT=""
+CHECK_INTERVAL=1
+RESTART_DELAY=1
+MAX_RESTARTS=0
+IFLOW_MAX_TURNS=100
+EOF
+
+bash "$ROOT_DIR/bin/freely" start --project "$PROJECT" >/dev/null 2>&1 &
+supervisor_pid=$!
+
+for _ in $(seq 1 10); do
+  [[ -f "$PROJECT/.freely/run/ai.pid" ]] && break
+  sleep 1
+done
+
+first_ai_pid="$(cat "$PROJECT/.freely/run/ai.pid")"
+kill -0 "$supervisor_pid" 2>/dev/null
+kill -0 "$first_ai_pid" 2>/dev/null
+
+for _ in $(seq 1 10); do
+  sleep 1
+  if [[ ! -f "$PROJECT/.freely/run/ai.pid" ]]; then
+    continue
+  fi
+  second_ai_pid="$(cat "$PROJECT/.freely/run/ai.pid")"
+  if [[ "$second_ai_pid" != "$first_ai_pid" ]]; then
+    break
+  fi
+done
+
+[[ "${second_ai_pid:-}" != "$first_ai_pid" ]]
+kill -0 "$second_ai_pid" 2>/dev/null
+
+bash "$ROOT_DIR/bin/freely" stop --project "$PROJECT" >/dev/null 2>&1 || true
+wait "$supervisor_pid" || true
+
+if [[ -f "$PROJECT/.freely/run/supervisor.pid" ]]; then
+  echo "[FAIL] supervisor.pid still exists after TERM"
+  exit 1
+fi
+
+if [[ -f "$PROJECT/.freely/run/session-state.env" ]]; then
+  echo "[FAIL] session-state.env still exists after freely stop"
+  exit 1
+fi
+
+echo "[PASS] freely supervisor keeps relaunching ai cli until stop signal terminates it"

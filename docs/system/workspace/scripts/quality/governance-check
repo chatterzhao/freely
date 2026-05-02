@@ -1,0 +1,1149 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+required_files=(
+  "docs/PROJECT_INTENT.md"
+  "docs/CONSTITUTION.md"
+  "docs/LAWS.md"
+  "AGENTS.md"
+  "docs/system/workspace/hooks/README.md"
+  "docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md"
+  "docs/system/workspace/hooks/protected-branch-breakglass-receipts.md"
+  "docs/system/workspace/three-loop-capability-lifecycle.md"
+  "docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md"
+  "docs/pre-brainstorms/README.md"
+  "docs/pre-brainstorms/INDEX.md"
+  "docs/pre-brainstorms/CONVERGENCE.md"
+)
+
+three_loop_reference_targets=(
+  "docs/CONSTITUTION.md"
+  "docs/PROJECT_INTENT.md"
+  "docs/system/workspace/scripts/README.md"
+  "docs/system/workspace/skills/README.md"
+  "docs/system/workspace/agents/lead-agent.md"
+  "docs/system/workspace/agents/manager-agent.md"
+  "docs/system/workspace/agents/worker-agent.md"
+  "docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md"
+  "docs/system/workspace/skills/doc-pre-brainstorm-execution/SKILL.md"
+  "docs/system/workspace/skills/doc-ibm-execution/SKILL.md"
+  "docs/system/workspace/skills/dev-loop-execution/SKILL.md"
+)
+
+errors=0
+warnings=0
+
+fail() {
+  echo "[FAIL] $*"
+  errors=$((errors + 1))
+}
+
+warn() {
+  echo "[WARN] $*"
+  warnings=$((warnings + 1))
+}
+
+check_v2_candidate_fields() {
+  local candidates="$1"
+  rg -n "^[- ]*candidate_format_version:\\s*v2$" "$candidates" >/dev/null 2>&1 || return 0
+
+  rg -n "acceptance_criteria:" "$candidates" >/dev/null 2>&1 || fail "missing acceptance_criteria in v2 candidate file $candidates"
+  rg -n "promotion_gate:" "$candidates" >/dev/null 2>&1 || fail "missing promotion_gate in v2 candidate file $candidates"
+  rg -n "open_questions:" "$candidates" >/dev/null 2>&1 || fail "missing open_questions in v2 candidate file $candidates"
+  rg -n "acceptance_reviews:" "$candidates" >/dev/null 2>&1 || fail "missing acceptance_reviews in v2 candidate file $candidates"
+
+  if rg -n "^[- ]*status:\\s*promoted$" "$candidates" >/dev/null 2>&1; then
+    rg -n "reviewer:" "$candidates" >/dev/null 2>&1 || fail "promoted v2 candidate file $candidates must contain at least one acceptance review"
+  fi
+}
+
+check_candidate_milestone_bindings() {
+  python3 - <<'PY'
+import pathlib
+import re
+import sys
+
+root = pathlib.Path(".")
+milestones_path = root / "docs/milestones.md"
+lines = milestones_path.read_text(encoding="utf-8").splitlines()
+
+def normalize_milestone(value: str) -> str:
+    value = value.strip().strip("`").strip("'").strip('"').strip()
+    anchor = re.search(r"(M-[A-Za-z0-9-]+)$", value, re.IGNORECASE)
+    if anchor:
+        value = "M-" + anchor.group(1)[2:]
+    return value
+
+milestone_status = {}
+candidate_entries = {}
+formal_issue_entries = {}
+current_milestone = None
+current_queue = None
+current_item = None
+
+for raw in lines:
+    line = raw.strip()
+    m = re.match(r"^##\s+(M-[A-Za-z0-9-]+)\s*$", line)
+    if m:
+        current_milestone = m.group(1)
+        current_queue = None
+        current_item = None
+        continue
+    m = re.match(r"^-+\s*status:\s*([A-Za-z0-9_-]+)\s*$", line)
+    if m and current_milestone:
+        milestone_status[current_milestone] = m.group(1)
+        continue
+    m = re.match(r"^###\s+(candidate_issues|committed_issues|completed_issues)\s*$", line)
+    if m:
+        current_queue = m.group(1)
+        current_item = None
+        continue
+    m = re.match(r"^\d+\.\s+`(C-[^`]+)`\s*$", line)
+    if m and current_milestone and current_queue == "candidate_issues":
+        candidate_entries.setdefault(m.group(1), []).append(current_milestone)
+        current_item = None
+        continue
+    m = re.match(r"^\d+\.\s+`(I-[^`]+)`\s*$", line)
+    if m and current_milestone and current_queue in {"committed_issues", "completed_issues"}:
+        current_item = (current_milestone, current_queue)
+        continue
+    m = re.match(r"^\s*-\s*issue_path:\s*(.+?)\s*$", raw)
+    if m and current_item:
+        issue_path = m.group(1).strip().strip("`").strip("'").strip('"').strip()
+        formal_issue_entries.setdefault(issue_path, []).append(current_item)
+        continue
+    m = re.match(r"^\s*-\s*source_candidates:\s*(.+?)\s*$", raw)
+    if m and current_item:
+        refs = re.findall(r"`([^`]+)`", m.group(1))
+        if not refs:
+            refs = [m.group(1).split(":", 1)[-1].strip()]
+        for ref in refs:
+            normalized_ref = ref.strip().strip("`").strip("'").strip('"').strip()
+            if normalized_ref:
+                formal_issue_entries.setdefault(normalized_ref, []).append(current_item)
+        continue
+    m = re.match(r"^\s*-\s+(.+?)\s*$", raw)
+    if m and current_item:
+        refs = re.findall(r"`([^`]+)`", m.group(1))
+        if refs:
+            for ref in refs:
+                formal_issue_entries.setdefault(ref.split("#", 1)[0].strip(), []).append(current_item)
+
+errors = []
+
+candidate_files = sorted((root / "docs/pre-brainstorms").glob("*/candidates.md"))
+for path in candidate_files:
+    text = path.read_text(encoding="utf-8")
+    starts = []
+    for idx, line in enumerate(text.splitlines()):
+        m = re.match(r"^\s*###\s+(C-[A-Za-z0-9-]+)\s*$", line.strip())
+        if m:
+            starts.append((idx, m.group(1)))
+            continue
+        m = re.match(r"^\s*-\s*(candidate_id|id):\s*`?(C-[A-Za-z0-9-]+)`?\s*$", line)
+        if m:
+            starts.append((idx, m.group(2)))
+    if not starts:
+        continue
+    lines = text.splitlines()
+    for pos, (start_idx, candidate_id) in enumerate(starts):
+        end_idx = starts[pos + 1][0] if pos + 1 < len(starts) else len(lines)
+        block = "\n".join(lines[start_idx:end_idx])
+        def grab(name):
+            m = re.search(rf"^\s*-\s*{re.escape(name)}:\s*(.+?)\s*$", block, re.MULTILINE)
+            if not m:
+                return ""
+            value = m.group(1).strip().strip("`").strip("'").strip('"').strip()
+            return value
+        def grab_list(name):
+            values = []
+            inline = re.search(rf"^\s*-\s*{re.escape(name)}:\s*(.+?)\s*$", block, re.MULTILINE)
+            if inline:
+                inline_value = inline.group(1).strip()
+                if inline_value:
+                    values.append(inline_value.strip("`").strip("'").strip('"').strip())
+            list_block = re.search(rf"^\s*-\s*{re.escape(name)}:\s*$([\s\S]*?)(?=^\s*-\s*[A-Za-z0-9_-]+:|\Z)", block, re.MULTILINE)
+            if list_block:
+                for raw_line in list_block.group(1).splitlines():
+                    item = re.match(r"^\s*-\s+(.+?)\s*$", raw_line)
+                    if item:
+                        values.append(item.group(1).strip().strip("`").strip("'").strip('"').strip())
+            return [value for value in values if value]
+        status = grab("status")
+        milestone = normalize_milestone(grab("milestone"))
+        promoted_issue_paths = grab_list("promoted_issue_path")
+        active_statuses = {"proposed", "needs_research", "blocked", "promoted"}
+        if status not in active_statuses:
+            continue
+        if not milestone or milestone == "unassigned" or milestone.startswith("pending://"):
+            errors.append(f"[FAIL] {candidate_id} in {path.as_posix()} is active with status '{status}', but milestone is '{milestone or 'missing'}'. Bind it to an active milestone instead of leaving it unassigned.")
+            continue
+        if milestone_status.get(milestone) != "active":
+            actual = milestone_status.get(milestone, "missing")
+            errors.append(f"[FAIL] {candidate_id} in {path.as_posix()} is active with status '{status}', but declared milestone {milestone} has status '{actual}'. Active unresolved candidates must bind to an active milestone.")
+        if status in {"proposed", "needs_research", "blocked"}:
+            actual_entries = candidate_entries.get(candidate_id, [])
+            if milestone not in actual_entries:
+                if actual_entries:
+                    errors.append(f"[FAIL] {candidate_id} in {path.as_posix()} declares milestone {milestone}, but docs/milestones.md places it in {', '.join(sorted(set(actual_entries)))}. Keep candidate metadata and milestone queue placement aligned.")
+                else:
+                    errors.append(f"[FAIL] {candidate_id} in {path.as_posix()} declares milestone {milestone}, but docs/milestones.md has no candidate_issues entry for it.")
+        elif status == "promoted":
+            if not promoted_issue_paths:
+                errors.append(f"[FAIL] {candidate_id} in {path.as_posix()} is marked promoted, but promoted_issue_path is missing. Materialize it into a real issue before merge.")
+                continue
+            if all(issue_path.startswith("pending://") for issue_path in promoted_issue_paths):
+                rendered = ", ".join(promoted_issue_paths)
+                errors.append(f"[FAIL] {candidate_id} in {path.as_posix()} is marked promoted, but promoted_issue_path is still '{rendered}'. Materialize it into a real issue before merge.")
+                continue
+            formal_entries = []
+            rendered_paths = []
+            for promoted_issue_path in promoted_issue_paths:
+                if promoted_issue_path.startswith("pending://"):
+                    continue
+                rendered_paths.append(promoted_issue_path)
+                formal_entries.extend(formal_issue_entries.get(promoted_issue_path, []))
+            if not formal_entries:
+                rendered = ", ".join(rendered_paths or promoted_issue_paths)
+                errors.append(f"[FAIL] {candidate_id} in {path.as_posix()} is promoted to {rendered or 'missing'}, but docs/milestones.md has no committed/completed issue entry for that issue.")
+                continue
+            actual_entries = sorted({entry_milestone for entry_milestone, _queue in formal_entries})
+            if milestone not in actual_entries:
+                rendered = ", ".join(rendered_paths or promoted_issue_paths)
+                errors.append(f"[FAIL] {candidate_id} in {path.as_posix()} declares milestone {milestone}, but docs/milestones.md sequences promoted issue {rendered} under {', '.join(actual_entries)}. Keep candidate metadata and milestone queue placement aligned.")
+
+if errors:
+    print("\n".join(errors))
+    sys.exit(1)
+PY
+}
+
+check_milestone_issue_phase_queue_alignment() {
+  python3 - <<'PY'
+import pathlib
+import re
+import sys
+
+root = pathlib.Path(".")
+milestones_path = root / "docs/milestones.md"
+lines = milestones_path.read_text(encoding="utf-8").splitlines()
+
+queue_for_phase = {
+    "in_ibm": "committed_issues",
+    "done_ibm": "committed_issues",
+    "in_dev": "committed_issues",
+    "blocked_dev": "committed_issues",
+    "in_verification": "committed_issues",
+    "completed": "completed_issues",
+}
+
+entries_by_issue_path = {}
+current_milestone = None
+current_queue = None
+current_item = None
+
+for raw in lines:
+    line = raw.strip()
+    m = re.match(r"^##\s+(M-[A-Za-z0-9-]+)\s*$", line)
+    if m:
+        current_milestone = m.group(1)
+        current_queue = None
+        current_item = None
+        continue
+    m = re.match(r"^###\s+(candidate_issues|committed_issues|completed_issues)\s*$", line)
+    if m:
+        current_queue = m.group(1)
+        current_item = None
+        continue
+    m = re.match(r"^\d+\.\s+`(I-[^`]+)`\s*$", line)
+    if m and current_milestone and current_queue in {"committed_issues", "completed_issues"}:
+        current_item = {"issue_id": m.group(1), "milestone": current_milestone, "queue": current_queue}
+        continue
+    m = re.match(r"^\s*-\s*issue_path:\s*(.+?)\s*$", raw)
+    if m and current_item:
+        issue_path = m.group(1).strip().strip("`").strip("'").strip('"').strip()
+        entries_by_issue_path.setdefault(issue_path, []).append(dict(current_item))
+
+errors = []
+
+for issue_path, entries in sorted(entries_by_issue_path.items()):
+    path = root / issue_path
+    if not path.is_file():
+        errors.append(f"[FAIL] docs/milestones.md references missing issue_path {issue_path}")
+        continue
+    text = path.read_text(encoding="utf-8")
+    phase_match = re.search(r"^\s*-\s*phase_state:\s*`?([^`\n]+)`?\s*$", text, re.MULTILINE)
+    if not phase_match:
+        errors.append(f"[FAIL] {issue_path} is referenced from docs/milestones.md but is missing phase_state")
+        continue
+    phase = phase_match.group(1).strip()
+    expected_queue = queue_for_phase.get(phase)
+    if not expected_queue:
+        continue
+    actual_queues = sorted({entry["queue"] for entry in entries})
+    if actual_queues != [expected_queue]:
+        rendered = ", ".join(actual_queues)
+        issue_id = entries[0]["issue_id"]
+        errors.append(
+            f"[FAIL] {issue_id} in {issue_path} has phase_state '{phase}', but docs/milestones.md places it in {rendered}. "
+            f"Move it so it appears only in {expected_queue}."
+        )
+
+if errors:
+    print("\n".join(errors))
+    sys.exit(1)
+PY
+}
+
+check_file_exists() {
+  local file="$1"
+  [[ -f "$file" ]] || fail "missing file: $file"
+}
+
+check_no_tbd() {
+  local file="$1"
+  if rg -n "<TBD>" "$file" >/dev/null 2>&1; then
+    fail "placeholder <TBD> found in $file"
+  fi
+}
+
+check_three_loop_reference() {
+  local file="$1"
+  rg -n --fixed-strings "docs/system/workspace/three-loop-capability-lifecycle.md" "$file" >/dev/null 2>&1 \
+    || fail "missing three-loop lifecycle reference in $file"
+}
+
+check_fixed_string() {
+  local file="$1"
+  local text="$2"
+  local description="$3"
+  rg -n --fixed-strings "$text" "$file" >/dev/null 2>&1 || fail "missing ${description} in $file"
+}
+
+check_entry_naming() {
+  local entry="$1"
+  # 新格式：YYYYMMDD-HHMM--<topic>（时间后双短横线）
+  local new_format="^[0-9]{8}-[0-9]{4}--.+$"
+  # 遗留格式：YYYYMMDD-<topic>（日期后单短横线，topic 可含短横线）
+  local legacy_format="^[0-9]{8}-.+$"
+  
+  if [[ "$entry" =~ $new_format ]]; then
+    return 0
+  elif [[ "$entry" =~ $legacy_format ]]; then
+    warn "pre-brainstorm entry '$entry' uses legacy naming, consider migrating to YYYYMMDD-HHMM--<topic>"
+    return 0
+  else
+    fail "pre-brainstorm entry '$entry' does not match naming convention: YYYYMMDD-HHMM--<topic>"
+    return 1
+  fi
+}
+
+audit_current_protected_branch_merge_receipt() {
+  local branch head_parents commit_body bypass_mode merge_path source_branch
+  branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
+  case "$branch" in
+    main|develop|test-pre-merge-*) ;;
+    *) return 0 ;;
+  esac
+
+  git rev-parse -q --verify HEAD >/dev/null 2>&1 || return 0
+  head_parents="$(git rev-list --parents -n 1 HEAD 2>/dev/null || true)"
+  [[ -n "$head_parents" ]] || return 0
+  if [[ "$(awk '{print NF-1}' <<<"$head_parents")" -lt 2 ]]; then
+    return 0
+  fi
+
+  commit_body="$(git log -1 --format=%B HEAD 2>/dev/null || true)"
+  merge_path="$(sed -n 's/^Freely-Merge-Path:[[:space:]]*//p' <<<"$commit_body" | tail -n 1)"
+  bypass_mode="$(sed -n 's/^Freely-Bypass-Mode:[[:space:]]*//p' <<<"$commit_body" | tail -n 1)"
+  source_branch="$(sed -n 's/^Freely-Source-Branch:[[:space:]]*//p' <<<"$commit_body" | tail -n 1)"
+
+  [[ -n "$merge_path" ]] || {
+    fail "protected branch '$branch' HEAD merge commit is missing Freely-Merge-Path receipt"
+    return 0
+  }
+  [[ -n "$source_branch" ]] || fail "protected branch '$branch' HEAD merge commit is missing Freely-Source-Branch receipt"
+  if protected_branch_source_policy_active_for_head && ! protected_branch_merge_source_allowed "$branch" "$source_branch"; then
+    fail "protected branch '$branch' HEAD merge commit has invalid Freely-Source-Branch '$source_branch'"
+  fi
+
+  case "$merge_path" in
+    merge-guarded|merge-guarded-complete|merge-guarded-break-glass) ;;
+    *) fail "protected branch '$branch' HEAD merge commit has unknown Freely-Merge-Path '$merge_path'" ;;
+  esac
+
+  case "$bypass_mode" in
+    forbidden)
+      return 0
+      ;;
+    break_glass)
+      ;;
+    "")
+      fail "protected branch '$branch' HEAD merge commit is missing Freely-Bypass-Mode receipt"
+      return 0
+      ;;
+    *)
+      fail "protected branch '$branch' HEAD merge commit has invalid Freely-Bypass-Mode '$bypass_mode'"
+      return 0
+      ;;
+  esac
+
+  sed -n 's/^Freely-Break-Glass-Reason:[[:space:]]*//p' <<<"$commit_body" | tail -n 1 | grep -Eq '^(tooling_unavailable|verified_false_negative)$' \
+    || fail "protected branch '$branch' HEAD break-glass merge is missing a valid Freely-Break-Glass-Reason"
+  sed -n 's/^Freely-Blocked-Gate:[[:space:]]*//p' <<<"$commit_body" | tail -n 1 | grep -Eq '^(pre-commit|pre-merge-commit|governance-merge-gate|governance-promotion-gate|pretests-gate|checkpoint-guard)$' \
+    || fail "protected branch '$branch' HEAD break-glass merge is missing a valid Freely-Blocked-Gate"
+  sed -n 's/^Freely-Operation-Scope:[[:space:]]*//p' <<<"$commit_body" | tail -n 1 | grep -Eq '^merge_completion_only$' \
+    || fail "protected branch '$branch' HEAD break-glass merge must declare Freely-Operation-Scope: merge_completion_only"
+  sed -n 's/^Freely-Follow-On-Issue:[[:space:]]*//p' <<<"$commit_body" | tail -n 1 | grep -Eq '^I-[A-Za-z0-9-]+$' \
+    || fail "protected branch '$branch' HEAD break-glass merge is missing a valid Freely-Follow-On-Issue"
+  rg -n '^Freely-Evidence-Ref:[[:space:]]*\S+' <<<"$commit_body" >/dev/null 2>&1 \
+    || fail "protected branch '$branch' HEAD break-glass merge must include at least one Freely-Evidence-Ref"
+}
+
+protected_branch_merge_source_allowed() {
+  local target="$1" source="$2"
+  case "$target" in
+    develop)
+      [[ "$source" == test-pre-merge-* || "$source" == hotfix/* ]]
+      ;;
+    main)
+      [[ "$source" == release/* || "$source" == hotfix/* ]]
+      ;;
+    test-pre-merge-*)
+      [[ "$source" == feature/* || "$source" == hotfix/* || "$source" == feature/premerge-* ]]
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+protected_branch_source_policy_effective_date() {
+  local receipts_path="docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md"
+  [[ -f "$receipts_path" ]] || return 0
+  sed -n 's/^- source_policy_effective_date:[[:space:]]*`\\{0,1\\}\\([0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\).*/\\1/p' "$receipts_path" | head -n 1
+}
+
+protected_branch_source_policy_active_for_head() {
+  local effective_date head_date
+  effective_date="$(protected_branch_source_policy_effective_date)"
+  [[ -n "$effective_date" ]] || return 1
+  head_date="$(git log -1 --format=%cs HEAD 2>/dev/null || true)"
+  [[ -n "$head_date" ]] || return 1
+  [[ "$head_date" > "$effective_date" || "$head_date" == "$effective_date" ]]
+}
+
+audit_recorded_protected_branch_breakglass_receipts() {
+  python3 - <<'PY'
+import pathlib
+import re
+import subprocess
+import sys
+from collections import Counter
+
+root = pathlib.Path(".")
+receipts_path = root / "docs/system/workspace/hooks/protected-branch-breakglass-receipts.md"
+text = receipts_path.read_text(encoding="utf-8")
+
+effective_match = re.search(r"^- audit_effective_date:\s*`?([0-9]{4}-[0-9]{2}-[0-9]{2})`?\s*$", text, re.MULTILINE)
+if not effective_match:
+    print(f"[FAIL] {receipts_path.as_posix()} must declare - audit_effective_date: `YYYY-MM-DD`")
+    sys.exit(1)
+
+effective_date = effective_match.group(1)
+effective_since = f"{effective_date} 00:00:00"
+source_policy_match = re.search(r"^- source_policy_effective_date:\s*`?([0-9]{4}-[0-9]{2}-[0-9]{2})`?\s*$", text, re.MULTILINE)
+source_policy_since = (
+    f"{source_policy_match.group(1)} 00:00:00"
+    if source_policy_match
+    else None
+)
+starts = list(re.finditer(r"^##\s+Receipt:\s+([0-9a-f]{7,40})\s*$", text, re.MULTILINE))
+
+allowed_reasons = {"tooling_unavailable", "verified_false_negative"}
+allowed_scopes = {"merge_completion_only"}
+allowed_gates = {"pre-commit", "pre-merge-commit", "governance-merge-gate", "governance-promotion-gate", "pretests-gate", "checkpoint-guard"}
+allowed_receipt_modes = {"trailer_parity", "legacy_backfill"}
+receipts = {}
+errors = []
+observed_receipts = set()
+
+def merge_source_allowed(target_branch: str, source_branch: str) -> bool:
+    if target_branch == "develop":
+        return source_branch.startswith("test-pre-merge-") or source_branch.startswith("hotfix/")
+    if target_branch == "main":
+        return source_branch.startswith("release/") or source_branch.startswith("hotfix/")
+    if target_branch.startswith("test-pre-merge-"):
+        return (
+            source_branch.startswith("feature/")
+            or source_branch.startswith("hotfix/")
+            or source_branch.startswith("feature/premerge-")
+        )
+    return True
+
+for idx, match in enumerate(starts):
+    commit = match.group(1)
+    end = starts[idx + 1].start() if idx + 1 < len(starts) else len(text)
+    block = text[match.start():end]
+
+    def grab(name: str):
+        m = re.search(rf"^\s*-\s*{re.escape(name)}:\s*(.+?)\s*$", block, re.MULTILINE)
+        if not m:
+            return None
+        return m.group(1).strip().strip("`").strip()
+
+    def grab_list(name: str):
+        m = re.search(rf"^\s*-\s*{re.escape(name)}:\s*$([\s\S]*?)(?=^\s*-\s*[A-Za-z0-9_-]+:|^##\s+Receipt:|\Z)", block, re.MULTILINE)
+        if not m:
+            return []
+        values = []
+        for raw in m.group(1).splitlines():
+            item = re.match(r"^\s*-\s+(.+?)\s*$", raw)
+            if item:
+                values.append(item.group(1).strip().strip("`").strip())
+        return values
+
+    target_branch = grab("target_branch")
+    source_branch = grab("source_branch")
+    receipt_mode = grab("receipt_mode") or "trailer_parity"
+    bypass_mode = grab("bypass_mode")
+    reason = grab("break_glass_reason")
+    blocked_gate = grab("blocked_gate")
+    scope = grab("operation_scope")
+    follow_on_owner = grab("follow_on_owner")
+    evidence_refs = grab_list("evidence_refs")
+
+    if target_branch not in {"develop", "main"} and not (target_branch or "").startswith("test-pre-merge-"):
+        errors.append(f"[FAIL] {receipts_path.as_posix()} receipt {commit} has invalid target_branch '{target_branch}'.")
+    if not source_branch:
+        errors.append(f"[FAIL] {receipts_path.as_posix()} receipt {commit} is missing source_branch.")
+    if receipt_mode not in allowed_receipt_modes:
+        errors.append(f"[FAIL] {receipts_path.as_posix()} receipt {commit} has invalid receipt_mode '{receipt_mode}'.")
+    if bypass_mode != "break_glass":
+        errors.append(f"[FAIL] {receipts_path.as_posix()} receipt {commit} must declare bypass_mode: `break_glass`.")
+    if reason not in allowed_reasons:
+        errors.append(f"[FAIL] {receipts_path.as_posix()} receipt {commit} has invalid break_glass_reason '{reason}'.")
+    if blocked_gate not in allowed_gates:
+        errors.append(f"[FAIL] {receipts_path.as_posix()} receipt {commit} has invalid blocked_gate '{blocked_gate}'.")
+    if scope not in allowed_scopes:
+        errors.append(f"[FAIL] {receipts_path.as_posix()} receipt {commit} has invalid operation_scope '{scope}'.")
+    if not follow_on_owner or not re.match(r"^I-[A-Za-z0-9-]+$", follow_on_owner):
+        errors.append(f"[FAIL] {receipts_path.as_posix()} receipt {commit} is missing a valid follow_on_owner.")
+    if not evidence_refs:
+        errors.append(f"[FAIL] {receipts_path.as_posix()} receipt {commit} must list at least one evidence_ref.")
+
+    receipts[commit] = {
+        "target_branch": target_branch,
+        "source_branch": source_branch,
+        "receipt_mode": receipt_mode,
+        "bypass_mode": bypass_mode,
+        "break_glass_reason": reason,
+        "blocked_gate": blocked_gate,
+        "operation_scope": scope,
+        "follow_on_owner": follow_on_owner,
+        "evidence_refs": evidence_refs,
+    }
+
+branches = ["develop"]
+try:
+    extra_refs = subprocess.check_output(
+        ["git", "for-each-ref", "--format=%(refname:short)", "refs/heads/main", "refs/heads/test-pre-merge-*"],
+        cwd=root,
+        text=True,
+    ).splitlines()
+except subprocess.CalledProcessError:
+    extra_refs = []
+
+for ref in extra_refs:
+    ref = ref.strip()
+    if ref and ref not in branches:
+        branches.append(ref)
+
+for branch in branches:
+    source_policy_commits = set()
+    if source_policy_since:
+        try:
+            source_policy_commits = set(
+                subprocess.check_output(
+                    ["git", "log", branch, "--first-parent", "--merges", "--since", source_policy_since, "--format=%H"],
+                    cwd=root,
+                    text=True,
+                ).splitlines()
+            )
+        except subprocess.CalledProcessError:
+            source_policy_commits = set()
+    try:
+        merge_output = subprocess.check_output(
+            ["git", "log", branch, "--merges", "--since", effective_since, "--format=%H%x00%B%x00"],
+            cwd=root,
+            text=True,
+        )
+    except subprocess.CalledProcessError:
+        continue
+
+    chunks = [chunk for chunk in merge_output.split("\x00") if chunk]
+    for idx in range(0, len(chunks), 2):
+        commit = chunks[idx].strip()
+        body = chunks[idx + 1] if idx + 1 < len(chunks) else ""
+        if not commit:
+            continue
+        subject = body.splitlines()[0].strip() if body else ""
+        target_match = re.match(r"^Merge branch '.*' into (.+?)\s*$", subject)
+        target_branch = target_match.group(1).strip() if target_match else ""
+        if target_branch and target_branch != branch and commit not in receipts:
+            continue
+        if re.search(r"^Freely-Merge-Path:\s+(merge-guarded|merge-guarded-complete)\s*$", body, re.MULTILINE):
+            continue
+        if re.search(r"^Freely-Merge-Path:\s+merge-guarded-break-glass\s*$", body, re.MULTILINE):
+            receipt = receipts.get(commit)
+            if receipt and receipt.get("target_branch") == branch:
+                observed_receipts.add(commit)
+                if commit in source_policy_commits and not merge_source_allowed(branch, receipt.get("source_branch", "")):
+                    errors.append(
+                        f"[FAIL] {receipts_path.as_posix()} receipt {commit} has invalid source_branch '{receipt.get('source_branch')}' for target '{branch}'."
+                    )
+                trailer_source_branch = ""
+                if receipt.get("receipt_mode") == "legacy_backfill":
+                    errors.append(
+                        f"[FAIL] protected branch break-glass merge {commit} on {branch} is trailer-bearing but receipt_mode is legacy_backfill."
+                    )
+                    continue
+                def grab_trailer(name: str):
+                    match = re.search(rf"^{re.escape(name)}:\s*(.+?)\s*$", body, re.MULTILINE)
+                    return match.group(1).strip() if match else ""
+
+                trailer_source_branch = grab_trailer("Freely-Source-Branch")
+                trailer_bypass_mode = grab_trailer("Freely-Bypass-Mode")
+                trailer_reason = grab_trailer("Freely-Break-Glass-Reason")
+                trailer_blocked_gate = grab_trailer("Freely-Blocked-Gate")
+                trailer_scope = grab_trailer("Freely-Operation-Scope")
+                trailer_follow_on_issue = grab_trailer("Freely-Follow-On-Issue")
+                trailer_evidence_refs = re.findall(r"^Freely-Evidence-Ref:\s*(.+?)\s*$", body, re.MULTILINE)
+
+                if commit in source_policy_commits and trailer_source_branch and not merge_source_allowed(branch, trailer_source_branch):
+                    errors.append(
+                        f"[FAIL] protected branch break-glass merge {commit} on {branch} has invalid Freely-Source-Branch '{trailer_source_branch}'."
+                    )
+
+                comparisons = [
+                    ("source_branch", trailer_source_branch, receipt.get("source_branch", "")),
+                    ("bypass_mode", trailer_bypass_mode, receipt.get("bypass_mode", "")),
+                    ("break_glass_reason", trailer_reason, receipt.get("break_glass_reason", "")),
+                    ("blocked_gate", trailer_blocked_gate, receipt.get("blocked_gate", "")),
+                    ("operation_scope", trailer_scope, receipt.get("operation_scope", "")),
+                    ("follow_on_owner", trailer_follow_on_issue, receipt.get("follow_on_owner", "")),
+                ]
+                for field_name, trailer_value, receipt_value in comparisons:
+                    if trailer_value != receipt_value:
+                        errors.append(
+                            f"[FAIL] protected branch break-glass merge {commit} on {branch} has trailer/ledger mismatch for {field_name}: trailer='{trailer_value}' ledger='{receipt_value}'."
+                        )
+
+                if Counter(trailer_evidence_refs) != Counter(receipt.get("evidence_refs", [])):
+                    errors.append(
+                        f"[FAIL] protected branch break-glass merge {commit} on {branch} has trailer/ledger mismatch for evidence_refs."
+                    )
+                continue
+            errors.append(
+                f"[FAIL] protected branch break-glass merge {commit} on {branch} is missing a matching receipt in {receipts_path.as_posix()}."
+            )
+            continue
+        receipt = receipts.get(commit)
+        if receipt and receipt.get("target_branch") == branch:
+            observed_receipts.add(commit)
+            if receipt.get("receipt_mode") == "legacy_backfill":
+                continue
+            errors.append(
+                f"[FAIL] protected branch merge {commit} on {branch} has a trailer_parity receipt in {receipts_path.as_posix()} but the merge commit is missing canonical break-glass trailers."
+            )
+
+for commit, receipt in receipts.items():
+    if receipt.get("target_branch") not in branches:
+        errors.append(
+            f"[FAIL] {receipts_path.as_posix()} receipt {commit} targets unknown branch '{receipt.get('target_branch')}'."
+        )
+        continue
+    if commit not in observed_receipts:
+        errors.append(
+            f"[FAIL] {receipts_path.as_posix()} receipt {commit} does not match any protected-branch merge on {receipt.get('target_branch')} since {effective_since}."
+        )
+
+if errors:
+    print("\n".join(errors))
+    sys.exit(1)
+PY
+}
+
+audit_recorded_protected_branch_merge_receipt_backfills() {
+  python3 - <<'PY'
+import pathlib
+import re
+import subprocess
+import sys
+
+root = pathlib.Path(".")
+receipts_path = root / "docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md"
+text = receipts_path.read_text(encoding="utf-8")
+
+effective_match = re.search(r"^- audit_effective_date:\s*`?([0-9]{4}-[0-9]{2}-[0-9]{2})`?\s*$", text, re.MULTILINE)
+if not effective_match:
+    print(f"[FAIL] {receipts_path.as_posix()} must declare - audit_effective_date: `YYYY-MM-DD`")
+    sys.exit(1)
+
+effective_date = effective_match.group(1)
+effective_since = f"{effective_date} 00:00:00"
+source_policy_match = re.search(r"^- source_policy_effective_date:\s*`?([0-9]{4}-[0-9]{2}-[0-9]{2})`?\s*$", text, re.MULTILINE)
+source_policy_since = (
+    f"{source_policy_match.group(1)} 00:00:00"
+    if source_policy_match
+    else None
+)
+starts = list(re.finditer(r"^##\s+Receipt Gap:\s+([0-9a-f]{7,40})\s*$", text, re.MULTILINE))
+
+entries = {}
+errors = []
+observed = set()
+reachable_protected_merge_commits = set()
+
+def git_body(commit: str) -> str:
+    try:
+        return subprocess.check_output(
+            ["git", "show", "--no-patch", "--format=%B", commit],
+            cwd=root,
+            text=True,
+        )
+    except subprocess.CalledProcessError:
+        return ""
+
+def has_absorbed_ancestry(absorbing_merge: str, ancestor: str) -> bool:
+    try:
+        absorbed_chain = set(
+            subprocess.check_output(
+                ["git", "rev-list", "--first-parent", f"{absorbing_merge}^2"],
+                cwd=root,
+                text=True,
+            ).splitlines()
+        )
+    except subprocess.CalledProcessError:
+        return False
+    return ancestor in absorbed_chain
+
+def merge_source_allowed(target_branch: str, source_branch: str) -> bool:
+    if target_branch == "develop":
+        return source_branch.startswith("test-pre-merge-") or source_branch.startswith("hotfix/")
+    if target_branch == "main":
+        return source_branch.startswith("release/") or source_branch.startswith("hotfix/")
+    if target_branch.startswith("test-pre-merge-"):
+        return (
+            source_branch.startswith("feature/")
+            or source_branch.startswith("hotfix/")
+            or source_branch.startswith("feature/premerge-")
+        )
+    return True
+
+for idx, match in enumerate(starts):
+    commit = match.group(1)
+    end = starts[idx + 1].start() if idx + 1 < len(starts) else len(text)
+    block = text[match.start():end]
+
+    def grab(name: str):
+        m = re.search(rf"^\s*-\s*{re.escape(name)}:\s*(.+?)\s*$", block, re.MULTILINE)
+        if not m:
+            return None
+        return m.group(1).strip().strip("`").strip()
+
+    def grab_list(name: str):
+        m = re.search(rf"^\s*-\s*{re.escape(name)}:\s*$([\s\S]*?)(?=^\s*-\s*[A-Za-z0-9_-]+:|^##\s+Receipt Gap:|\Z)", block, re.MULTILINE)
+        if not m:
+            return []
+        values = []
+        for raw in m.group(1).splitlines():
+            item = re.match(r"^\s*-\s+(.+?)\s*$", raw)
+            if item:
+                values.append(item.group(1).strip().strip("`").strip())
+        return values
+
+    target_branch = grab("target_branch")
+    source_branch = grab("source_branch")
+    validation_mode = grab("validation_mode") or "subject_match"
+    protected_batch_branch = grab("protected_batch_branch")
+    absorbing_protected_merge = grab("absorbing_protected_merge")
+    canonical_merge_path = grab("canonical_merge_path")
+    canonical_bypass_mode = grab("canonical_bypass_mode")
+    follow_on_owner = grab("follow_on_owner")
+    bounded_issue = grab("bounded_issue")
+    verification_ref = grab("verification_ref")
+    evidence_refs = grab_list("evidence_refs")
+
+    valid_target_branch = bool(
+        re.match(
+            r"^(develop|main|test-pre-merge-[A-Za-z0-9._/-]+|feature/[A-Za-z0-9._-]+|release/[A-Za-z0-9._-]+|hotfix/[A-Za-z0-9._-]+)$",
+            target_branch or "",
+        )
+    )
+
+    if not valid_target_branch:
+        errors.append(f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} has invalid target_branch '{target_branch}'.")
+    if validation_mode not in {"subject_match", "unparseable_subject_ancestry"}:
+        errors.append(
+            f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} has invalid validation_mode '{validation_mode}'."
+        )
+    if not source_branch:
+        errors.append(f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} is missing source_branch.")
+    if canonical_merge_path not in {"merge-guarded", "merge-guarded-complete"}:
+        errors.append(f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} has invalid canonical_merge_path '{canonical_merge_path}'.")
+    if canonical_bypass_mode != "forbidden":
+        errors.append(f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} must declare canonical_bypass_mode: `forbidden`.")
+    if not follow_on_owner or not re.match(r"^I-[A-Za-z0-9-]+$", follow_on_owner):
+        errors.append(f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} is missing a valid follow_on_owner.")
+    if not evidence_refs:
+        errors.append(f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} must list at least one evidence_ref.")
+    if validation_mode == "unparseable_subject_ancestry":
+        if not protected_batch_branch:
+            errors.append(
+                f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} must declare protected_batch_branch for validation_mode unparseable_subject_ancestry."
+            )
+        if not absorbing_protected_merge or not re.match(r"^[0-9a-f]{7,40}$", absorbing_protected_merge or ""):
+            errors.append(
+                f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} must declare a valid absorbing_protected_merge for validation_mode unparseable_subject_ancestry."
+            )
+        if protected_batch_branch and source_branch and protected_batch_branch != source_branch:
+            errors.append(
+                f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} must keep source_branch aligned with protected_batch_branch for validation_mode unparseable_subject_ancestry."
+            )
+        if not bounded_issue:
+            errors.append(
+                f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} must declare bounded_issue for validation_mode unparseable_subject_ancestry."
+            )
+        if not verification_ref:
+            errors.append(
+                f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} must declare verification_ref for validation_mode unparseable_subject_ancestry."
+            )
+
+    entries[commit] = {
+        "target_branch": target_branch,
+        "source_branch": source_branch,
+        "validation_mode": validation_mode,
+        "protected_batch_branch": protected_batch_branch,
+        "absorbing_protected_merge": absorbing_protected_merge,
+        "canonical_merge_path": canonical_merge_path,
+        "canonical_bypass_mode": canonical_bypass_mode,
+        "bounded_issue": bounded_issue,
+        "verification_ref": verification_ref,
+    }
+
+branches = ["develop"]
+try:
+    extra_refs = subprocess.check_output(
+        ["git", "for-each-ref", "--format=%(refname:short)", "refs/heads/main", "refs/heads/test-pre-merge-*"],
+        cwd=root,
+        text=True,
+    ).splitlines()
+except subprocess.CalledProcessError:
+    extra_refs = []
+
+for ref in extra_refs:
+    ref = ref.strip()
+    if ref and ref not in branches:
+        branches.append(ref)
+
+for branch in branches:
+    source_policy_commits = set()
+    if source_policy_since:
+        try:
+            source_policy_commits = set(
+                subprocess.check_output(
+                    ["git", "log", branch, "--first-parent", "--merges", "--since", source_policy_since, "--format=%H"],
+                    cwd=root,
+                    text=True,
+                ).splitlines()
+            )
+        except subprocess.CalledProcessError:
+            source_policy_commits = set()
+    try:
+        merge_output = subprocess.check_output(
+            ["git", "log", branch, "--merges", "--since", effective_since, "--format=%H%x00%B%x00"],
+            cwd=root,
+            text=True,
+        )
+    except subprocess.CalledProcessError:
+        continue
+
+    chunks = [chunk for chunk in merge_output.split("\x00") if chunk]
+    for idx in range(0, len(chunks), 2):
+        commit = chunks[idx].strip()
+        body = chunks[idx + 1] if idx + 1 < len(chunks) else ""
+        if not commit:
+            continue
+        reachable_protected_merge_commits.add(commit)
+        subject = body.splitlines()[0].strip() if body else ""
+        target_match = re.match(r"^Merge branch '.*' into (.+?)\s*$", subject)
+        target_branch = target_match.group(1).strip() if target_match else ""
+        if target_branch and target_branch != branch and commit not in entries:
+            continue
+
+        merge_path_match = re.search(r"^Freely-Merge-Path:\s*(.+?)\s*$", body, re.MULTILINE)
+        bypass_mode_match = re.search(r"^Freely-Bypass-Mode:\s*(.+?)\s*$", body, re.MULTILINE)
+        source_branch_match = re.search(r"^Freely-Source-Branch:\s*(.+?)\s*$", body, re.MULTILINE)
+
+        merge_path = merge_path_match.group(1).strip() if merge_path_match else ""
+        bypass_mode = bypass_mode_match.group(1).strip() if bypass_mode_match else ""
+        source_branch = source_branch_match.group(1).strip() if source_branch_match else ""
+
+        if merge_path == "merge-guarded-break-glass":
+            if commit in source_policy_commits and source_branch and not merge_source_allowed(branch, source_branch):
+                errors.append(
+                    f"[FAIL] protected branch merge {commit} on {branch} has invalid Freely-Source-Branch '{source_branch}'."
+                )
+            continue
+
+        entry = entries.get(commit)
+        if merge_path in {"merge-guarded", "merge-guarded-complete"}:
+            if commit in source_policy_commits and not merge_source_allowed(branch, source_branch):
+                errors.append(
+                    f"[FAIL] protected branch merge {commit} on {branch} has invalid Freely-Source-Branch '{source_branch}'."
+                )
+            if entry:
+                observed.add(commit)
+                if commit in source_policy_commits and not merge_source_allowed(branch, entry.get("source_branch", "")):
+                    errors.append(
+                        f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} has invalid source_branch '{entry.get('source_branch')}' for target '{branch}'."
+                    )
+                errors.append(
+                    f"[FAIL] protected branch merge {commit} on {branch} already has canonical trailers and must not declare a receipt-gap backfill in {receipts_path.as_posix()}."
+                )
+            continue
+
+        if not merge_path and not bypass_mode and not source_branch:
+            subject_match = re.search(r"^Merge branch '([^']+)' into ([^\n]+)$", body, re.MULTILINE)
+            if subject_match and subject_match.group(2).strip() != branch and not entry:
+                continue
+            if entry:
+                validation_mode = entry.get("validation_mode", "subject_match")
+                if validation_mode == "unparseable_subject_ancestry":
+                    if entry.get("target_branch") != branch:
+                        continue
+                observed.add(commit)
+                if commit in source_policy_commits and not merge_source_allowed(branch, entry.get("source_branch", "")):
+                    errors.append(
+                        f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} has invalid source_branch '{entry.get('source_branch')}' for target '{branch}'."
+                    )
+                if validation_mode == "unparseable_subject_ancestry":
+                    if subject_match:
+                        errors.append(
+                            f"[FAIL] protected branch merge {commit} on {branch} already has a parseable merge subject and must not use validation_mode unparseable_subject_ancestry."
+                        )
+                        continue
+                    absorbing_commit = entry.get("absorbing_protected_merge", "")
+                    absorbing_body = git_body(absorbing_commit)
+                    absorbing_subject = absorbing_body.splitlines()[0].strip() if absorbing_body else ""
+                    absorbing_target_match = re.match(r"^Merge branch '.*' into (.+?)\s*$", absorbing_subject)
+                    absorbing_merge_path_match = re.search(r"^Freely-Merge-Path:\s*(.+?)\s*$", absorbing_body, re.MULTILINE)
+                    absorbing_bypass_mode_match = re.search(r"^Freely-Bypass-Mode:\s*(.+?)\s*$", absorbing_body, re.MULTILINE)
+                    absorbing_source_match = re.search(r"^Freely-Source-Branch:\s*(.+?)\s*$", absorbing_body, re.MULTILINE)
+                    absorbing_target = absorbing_target_match.group(1).strip() if absorbing_target_match else ""
+                    absorbing_merge_path = absorbing_merge_path_match.group(1).strip() if absorbing_merge_path_match else ""
+                    absorbing_bypass_mode = absorbing_bypass_mode_match.group(1).strip() if absorbing_bypass_mode_match else ""
+                    absorbing_source = absorbing_source_match.group(1).strip() if absorbing_source_match else ""
+                    if not absorbing_target or absorbing_target != branch:
+                        errors.append(
+                            f"[FAIL] protected branch merge {commit} on {branch} has absorbing merge {absorbing_commit} with missing or mismatched protected target."
+                        )
+                        continue
+                    if absorbing_merge_path not in {"merge-guarded", "merge-guarded-complete"} or absorbing_bypass_mode != "forbidden":
+                        errors.append(
+                            f"[FAIL] protected branch merge {commit} on {branch} has absorbing merge {absorbing_commit} without canonical protected merge trailers."
+                        )
+                        continue
+                    if absorbing_source != entry.get("protected_batch_branch"):
+                        errors.append(
+                            f"[FAIL] protected branch merge {commit} on {branch} has absorbing merge {absorbing_commit} source branch '{absorbing_source}' that does not match protected_batch_branch '{entry.get('protected_batch_branch')}'."
+                        )
+                        continue
+                    if not has_absorbed_ancestry(absorbing_commit, commit):
+                        errors.append(
+                            f"[FAIL] protected branch merge {commit} on {branch} is not present in the absorbed ancestry below {absorbing_commit}."
+                        )
+                        continue
+                    continue
+                if not subject_match:
+                    errors.append(
+                        f"[FAIL] protected branch merge {commit} on {branch} is missing canonical trailers and has no parseable merge subject for backfill validation."
+                    )
+                    continue
+                subject_source = subject_match.group(1).strip()
+                subject_target = subject_match.group(2).strip()
+                if subject_source != entry.get("source_branch"):
+                    errors.append(
+                        f"[FAIL] protected branch merge {commit} on {branch} has backfill source_branch mismatch: subject='{subject_source}' ledger='{entry.get('source_branch')}'."
+                    )
+                if subject_target != entry.get("target_branch"):
+                    errors.append(
+                        f"[FAIL] protected branch merge {commit} has backfill target_branch mismatch: subject='{subject_target}' ledger='{entry.get('target_branch')}'."
+                    )
+                continue
+            errors.append(
+                f"[FAIL] protected branch merge {commit} on {branch} is missing canonical Freely merge trailers and has no matching receipt-gap backfill in {receipts_path.as_posix()}."
+            )
+            continue
+
+        if entry:
+            observed.add(commit)
+            errors.append(
+                f"[FAIL] protected branch merge {commit} on {branch} has partial or malformed merge trailers and cannot rely on receipt-gap backfill."
+            )
+
+for commit, entry in entries.items():
+    if commit in observed or entry.get("validation_mode") != "unparseable_subject_ancestry":
+        continue
+    if entry.get("target_branch") in branches:
+        continue
+
+    body = git_body(commit)
+    if not body:
+        continue
+    subject = body.splitlines()[0].strip() if body else ""
+    if re.search(r"^Merge branch '([^']+)' into ([^\n]+)$", subject):
+        errors.append(
+            f"[FAIL] protected branch merge {commit} already has a parseable merge subject and must not use validation_mode unparseable_subject_ancestry."
+        )
+        continue
+
+    merge_path_match = re.search(r"^Freely-Merge-Path:\s*(.+?)\s*$", body, re.MULTILINE)
+    bypass_mode_match = re.search(r"^Freely-Bypass-Mode:\s*(.+?)\s*$", body, re.MULTILINE)
+    source_branch_match = re.search(r"^Freely-Source-Branch:\s*(.+?)\s*$", body, re.MULTILINE)
+    if any(match and match.group(1).strip() for match in (merge_path_match, bypass_mode_match, source_branch_match)):
+        errors.append(
+            f"[FAIL] protected branch merge {commit} already carries canonical merge trailers and must not use validation_mode unparseable_subject_ancestry."
+        )
+        continue
+
+    absorbing_commit = entry.get("absorbing_protected_merge", "")
+    absorbing_body = git_body(absorbing_commit)
+    absorbing_subject = absorbing_body.splitlines()[0].strip() if absorbing_body else ""
+    absorbing_target_match = re.match(r"^Merge branch '.*' into (.+?)\s*$", absorbing_subject)
+    absorbing_merge_path_match = re.search(r"^Freely-Merge-Path:\s*(.+?)\s*$", absorbing_body, re.MULTILINE)
+    absorbing_bypass_mode_match = re.search(r"^Freely-Bypass-Mode:\s*(.+?)\s*$", absorbing_body, re.MULTILINE)
+    absorbing_source_match = re.search(r"^Freely-Source-Branch:\s*(.+?)\s*$", absorbing_body, re.MULTILINE)
+    absorbing_target = absorbing_target_match.group(1).strip() if absorbing_target_match else ""
+    absorbing_merge_path = absorbing_merge_path_match.group(1).strip() if absorbing_merge_path_match else ""
+    absorbing_bypass_mode = absorbing_bypass_mode_match.group(1).strip() if absorbing_bypass_mode_match else ""
+    absorbing_source = absorbing_source_match.group(1).strip() if absorbing_source_match else ""
+    if absorbing_commit not in reachable_protected_merge_commits:
+        errors.append(
+            f"[FAIL] protected branch merge {commit} references absorbing merge {absorbing_commit} that is not reachable from current protected-branch ancestry since {effective_since}."
+        )
+        continue
+    if not absorbing_target or absorbing_target != entry.get("target_branch"):
+        errors.append(
+            f"[FAIL] protected branch merge {commit} has absorbing merge {absorbing_commit} with missing or mismatched protected target."
+        )
+        continue
+    if absorbing_merge_path not in {"merge-guarded", "merge-guarded-complete"} or absorbing_bypass_mode != "forbidden":
+        errors.append(
+            f"[FAIL] protected branch merge {commit} on retired target {entry.get('target_branch')} has absorbing merge {absorbing_commit} without canonical protected merge trailers."
+        )
+        continue
+    if absorbing_source != entry.get("protected_batch_branch"):
+        errors.append(
+            f"[FAIL] protected branch merge {commit} on retired target {entry.get('target_branch')} has absorbing merge {absorbing_commit} source branch '{absorbing_source}' that does not match protected_batch_branch '{entry.get('protected_batch_branch')}'."
+        )
+        continue
+    if not has_absorbed_ancestry(absorbing_commit, commit):
+        errors.append(
+            f"[FAIL] protected branch merge {commit} is not present in the absorbed ancestry below {absorbing_commit}."
+        )
+        continue
+    observed.add(commit)
+
+for commit, entry in entries.items():
+    if commit not in observed:
+        errors.append(
+            f"[FAIL] {receipts_path.as_posix()} receipt gap {commit} does not match any trailerless merge commit reachable from protected-branch ancestry since {effective_since}."
+        )
+
+if errors:
+    print("\n".join(errors))
+    sys.exit(1)
+PY
+}
+
+for file in "${required_files[@]}"; do
+  check_file_exists "$file"
+  check_no_tbd "$file"
+done
+
+for file in "${three_loop_reference_targets[@]}"; do
+  check_file_exists "$file"
+  check_three_loop_reference "$file"
+done
+
+check_fixed_string \
+  "docs/system/workspace/skills/doc-ibm-execution/SKILL.md" \
+  "references/prd-quality-bar.md" \
+  "PRD quality bar reference"
+check_fixed_string \
+  "docs/system/workspace/skills/doc-ibm-execution/SKILL.md" \
+  'pre-tests.md` 和 `tasks.md` 必须从 `prd.md` 自然派生' \
+  "PRD-derived pre-tests/tasks requirement"
+check_fixed_string \
+  "docs/system/workspace/skills/doc-ibm-execution/references/ibm-completion-gate.md" \
+  "prd-quality-bar.md" \
+  "IBM completion gate PRD quality bar linkage"
+check_fixed_string \
+  "docs/system/workspace/skills/doc-ibm-execution/references/issue-materialization-checklist.md" \
+  "prd-quality-bar.md" \
+  "issue materialization PRD quality bar linkage"
+check_fixed_string \
+  "docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md" \
+  "## Minimum structure" \
+  "PRD quality minimum structure section"
+check_fixed_string \
+  "docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md" \
+  '## Bar for `done_ibm`' \
+  "PRD quality done_ibm bar"
+
+entries=()
+while IFS= read -r d; do
+  [[ -d "docs/pre-brainstorms/$d" ]] && entries+=("$d")
+done < <(ls -1 docs/pre-brainstorms/)
+
+if [[ "${#entries[@]}" -eq 0 ]]; then
+  fail "no pre-brainstorm entries found under docs/pre-brainstorms"
+fi
+
+for entry in "${entries[@]}"; do
+  check_entry_naming "$entry"
+  
+  brainstorm="docs/pre-brainstorms/${entry}/brainstorms.md"
+  candidates="docs/pre-brainstorms/${entry}/candidates.md"
+  check_file_exists "$brainstorm"
+  check_file_exists "$candidates"
+  check_no_tbd "$brainstorm"
+  check_no_tbd "$candidates"
+
+  rg -n --fixed-strings "$entry" docs/pre-brainstorms/INDEX.md >/dev/null 2>&1 || fail "INDEX missing entry: $entry"
+  rg -n "promoted_issue_path:" "$candidates" >/dev/null 2>&1 || fail "missing promoted_issue_path in $candidates"
+  rg -n "milestone:" "$candidates" >/dev/null 2>&1 || fail "missing milestone in $candidates"
+  rg -n "session_refs:" "$candidates" >/dev/null 2>&1 || fail "missing session_refs in $candidates"
+  check_v2_candidate_fields "$candidates"
+done
+
+check_candidate_milestone_bindings || errors=$((errors + 1))
+check_milestone_issue_phase_queue_alignment || errors=$((errors + 1))
+audit_current_protected_branch_merge_receipt
+audit_recorded_protected_branch_merge_receipt_backfills || errors=$((errors + 1))
+audit_recorded_protected_branch_breakglass_receipts || errors=$((errors + 1))
+
+if [[ "$errors" -gt 0 ]]; then
+  echo
+  echo "Governance check failed with $errors error(s), $warnings warning(s)."
+  exit 1
+fi
+
+if [[ "$warnings" -gt 0 ]]; then
+  echo
+  echo "Governance check passed with $warnings warning(s)."
+else
+  echo "Governance check passed."
+fi

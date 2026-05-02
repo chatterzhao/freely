@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage:
+  ./bin/test-lane <feature-local|premerge-integration|post-merge-followthrough> -- <command...>
+
+Lane rules:
+  feature-local             run implementation/self-tests in dedicated feature/release/hotfix/premerge worktrees
+  premerge-integration      run pre-mainline integration tests in test-pre-merge-* batches
+  post-merge-followthrough  run real protected-branch followthrough in the target protected worktree
+
+Policy source:
+  docs/LAWS.md §2
+  docs/system/workspace/skills/branch-management/references/pre-test-merge-flow.md
+EOF
+}
+
+fail() {
+  printf '%s\n' "$*" >&2
+  exit 1
+}
+
+protected_branch() {
+  local branch="${1:-}"
+  [[ "$branch" == "main" || "$branch" == "develop" || "$branch" == test-pre-merge-* ]]
+}
+
+feature_local_branch() {
+  local branch="${1:-}"
+  [[ "$branch" == feature/* || "$branch" == release/* || "$branch" == hotfix/* ]]
+}
+
+require_git_worktree() {
+  git rev-parse --is-inside-work-tree >/dev/null 2>&1 || fail "[test-lane] blocked: current directory is not a git worktree."
+}
+
+branch_name() {
+  git rev-parse --abbrev-ref HEAD 2>/dev/null || true
+}
+
+lane="${1:-}"
+[[ -n "$lane" ]] || {
+  usage >&2
+  exit 1
+}
+shift
+
+if [[ "$lane" == "-h" || "$lane" == "--help" ]]; then
+  usage
+  exit 0
+fi
+
+[[ "${1:-}" == "--" ]] || fail "[test-lane] blocked: missing '--' separator before test command."
+shift
+[[ $# -gt 0 ]] || fail "[test-lane] blocked: missing test command after '--'."
+
+require_git_worktree
+branch="$(branch_name)"
+[[ -n "$branch" && "$branch" != "HEAD" ]] || fail "[test-lane] blocked: detached HEAD is not a valid testing lane context."
+
+case "$lane" in
+  feature-local)
+    if protected_branch "$branch"; then
+      fail "[test-lane] blocked: lane=feature-local requires a writable dedicated feature/release/hotfix/premerge worktree; current branch '$branch' is protected. Use premerge-integration on test-pre-merge-* or post-merge-followthrough on the target protected branch."
+    fi
+    if [[ "$branch" != feature/premerge-* ]] && ! feature_local_branch "$branch"; then
+      fail "[test-lane] blocked: lane=feature-local only runs on dedicated feature/release/hotfix/premerge branches; current branch is '$branch'."
+    fi
+    ;;
+  premerge-integration)
+    [[ "$branch" == test-pre-merge-* ]] || fail "[test-lane] blocked: lane=premerge-integration only runs on test-pre-merge-* batches; current branch is '$branch'."
+    ;;
+  post-merge-followthrough)
+    protected_branch "$branch" || fail "[test-lane] blocked: lane=post-merge-followthrough only runs on protected target branches (main, develop, test-pre-merge-*); current branch is '$branch'."
+    ;;
+  *)
+    usage >&2
+    fail "[test-lane] blocked: unsupported lane '$lane'."
+    ;;
+esac
+
+printf '[test-lane] lane=%s branch=%s command=%s\n' "$lane" "$branch" "$1" >&2
+exec "$@"

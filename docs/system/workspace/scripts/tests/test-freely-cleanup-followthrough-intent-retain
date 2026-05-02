@@ -1,0 +1,187 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-cleanup-followthrough-intent.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+OWNED_WT="$TMP_DIR/owned-wt"
+
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260323-0000--sample"
+mkdir -p "$PROJECT/docs/epics/sample/story/issues" "$PROJECT/docs/epics/sample/story/code-reviews"
+
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name "Freely Test"
+git -C "$PROJECT" config user.email "freely@example.com"
+mkdir -p "$PROJECT/.githooks"
+cat >"$PROJECT/.githooks/pre-commit" <<'EOF'
+#!/usr/bin/env bash
+exit 0
+EOF
+chmod +x "$PROJECT/.githooks/pre-commit"
+
+cat >"$PROJECT/.gitignore" <<'EOF'
+.freely/
+EOF
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260323-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260323-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260323-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+cat >"$PROJECT/docs/epics/sample/story/issues/owned-fixture.md" <<'EOF'
+# Issue
+- issue_id: `I-TEST-OWNED-FIXTURE`
+- title: `Owned fixture`
+- phase_state: `in_verification`
+- pre_tests_path: `docs/epics/sample/story/pre-tests.md`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+EOF
+cat >"$PROJECT/docs/epics/sample/story/pre-tests.md" <<'EOF'
+# Pre-Tests: owned fixture
+
+## Unit
+- acceptance target: `Document why the owned fixture does not change unit-testable runtime behavior.`
+- testing layer: `unit`
+- target environment: `feature/owned-fixture`
+- required evidence: `lawful replacement evidence for unchanged unit behavior`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `change_not_touching_this_layer`
+- not_applicable_explanation: `This cleanup fixture only validates retirement behavior and does not alter unit-testable code paths.`
+- replacement_evidence: `The fixture only exercises cleanup followthrough and leaves unit behavior unchanged.`
+
+## Integration
+- acceptance target: `Validate merged-clean cleanup followthrough can retire the owned worktree.`
+- testing layer: `integration`
+- target environment: `feature/owned-fixture`
+- required evidence: `cleanup followthrough replay log`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the cleanup followthrough replay for the merged-clean owned fixture.
+
+## End-to-End
+- acceptance target: `Explain why this fixture has no separate end-to-end runtime surface.`
+- testing layer: `end_to_end`
+- target environment: `feature/owned-fixture`
+- required evidence: `lawful replacement evidence for missing end-to-end surface`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `no_executable_boundary_at_this_layer`
+- not_applicable_explanation: `The fixture only covers a bounded cleanup path and does not expose a user-facing runtime shell.`
+- replacement_evidence: `There is no separate end-to-end runtime boundary in this isolated cleanup fixture.`
+
+## Real-Environment
+- real_environment_status: `pass`
+- real_environment_reason: `This isolated cleanup fixture does not require a real-environment lane.`
+
+## Acceptance Items
+
+### PT-OWNED-FIXTURE
+- id: `PT-OWNED-FIXTURE`
+- requirement: `cleanup followthrough removes merged-clean worktrees once retirement checks pass`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/sample/story/code-reviews/owned-fixture-retirement.md`
+EOF
+cat >"$PROJECT/docs/epics/sample/story/tasks.md" <<'EOF'
+# Tasks
+1. Keep the sample owner visible for cleanup followthrough retirement.
+EOF
+cat >"$PROJECT/docs/epics/sample/story/code-reviews/owned-fixture-retirement.md" <<'EOF'
+# Verification artifact
+EOF
+
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m "init"
+
+bash "$ROOT_DIR/bin/freely" init --project "$PROJECT" --intent "$PROJECT/docs/PROJECT_INTENT.md" --constitution "$PROJECT/docs/CONSTITUTION.md" --ai codex:gpt-5.4:auto --accept-default-autonomy >/dev/null
+
+git -C "$PROJECT" worktree add -q -b feature/owned-fixture "$OWNED_WT" develop
+mkdir -p "$OWNED_WT/.freely/run"
+cat >"$OWNED_WT/.freely/config.env" <<EOF
+PROJECT_ROOT="$OWNED_WT"
+INTENT_FILE="$OWNED_WT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$OWNED_WT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+cat >"$OWNED_WT/owned.txt" <<'EOF'
+owned fixture
+EOF
+git -C "$OWNED_WT" add owned.txt
+git -C "$OWNED_WT" commit -q -m "owned fixture"
+git -C "$PROJECT" merge --no-ff feature/owned-fixture -m "merge owned fixture" >/dev/null
+
+PROMPT="$OWNED_WT/.freely/run/prompt-20260402-131000.txt"
+cat >"$PROMPT" <<EOF
+Dispatch metadata:
+- dispatch_priority: P0
+- parallel_safe: true
+- write_scope: $OWNED_WT
+- intent_kind: cleanup
+- owner_issue: docs/epics/sample/story/issues/owned-fixture.md
+- pre_tests_path: docs/epics/sample/story/pre-tests.md
+- verification_artifact_dir: docs/epics/sample/story/code-reviews
+- required_test_lanes: feature-local
+- required_acceptance_item_ids: cleanup-followthrough
+- minimum_evidence_level: artifact-plus-human-observation
+- target_environment: feature/owned-fixture
+- closeout_gate_command: cleanup followthrough
+- closeout_target_lane: develop
+- closeout_promotion_gate: completion
+- closeout_requires_adequacy: false
+- closeout_review_artifact_policy: none
+
+Branch:
+- \`feature/owned-fixture\`
+
+Worktree:
+- \`$OWNED_WT\`
+EOF
+
+INTAKE_OUTPUT="$(bash "$ROOT_DIR/bin/freely" intake chat --project "$PROJECT" --author cleanup-worker --channel runtime --message "cleanup followthrough")"
+INTAKE_ID="$(printf '%s\n' "$INTAKE_OUTPUT" | sed -n 's/^intake_id: //p')"
+[[ -n "$INTAKE_ID" ]]
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+[[ "$(manager_project_ownership_claim_for_worktree "$PROJECT" "$OWNED_WT")" == "runtime-recorded-owner" ]]
+run_cleanup_followthrough "$PROJECT" "$INTAKE_ID" control followup "" ""
+
+[[ ! -d "$OWNED_WT" ]] || {
+  echo "[FAIL] retire-ready merged worktree should be removed during cleanup followthrough" >&2
+  exit 1
+}
+! git -C "$PROJECT" show-ref --verify --quiet refs/heads/feature/owned-fixture
+
+RESOLUTION_FILE="$PROJECT/.freely/run/interruption-resolution/$INTAKE_ID/resolution.md"
+grep -q 'blocked_reason: none' "$RESOLUTION_FILE"
+grep -q 'cleaned_items:' "$RESOLUTION_FILE"
+grep -q 'feature/owned-fixture @ .*owned-wt' "$RESOLUTION_FILE"
+
+echo "[PASS] cleanup followthrough reclaims retire-ready merged worktrees despite stale local cleanup ownership"

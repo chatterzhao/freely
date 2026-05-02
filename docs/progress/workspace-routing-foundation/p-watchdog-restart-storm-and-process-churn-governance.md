@@ -1,0 +1,27 @@
+# Progress: watchdog-restart-storm-and-process-churn-governance
+
+- issue_id: `I-20260324-0405`
+- title: Watchdog restart-storm and process-churn governance
+- phase_state: `completed`
+- runtime_state: `closed_for_this_batch`
+- summary: 已完成 watchdog restart-storm / process-churn 的 runtime 实现与验证：短窗口 signal 写入 `session-state.env`，watchdog 命中后暂停 blind relaunch 并升级给 manager，`live-status` / `fleet-status` 已暴露摘要；issue 完成，但 worktree 仍待 merge / cleanup / retirement。
+- completed:
+  - freeze raw signal truth in `session-state.env`
+  - freeze no-mirror rule for `workcell-state.env`
+  - freeze manager-owned judgement contract
+  - freeze default thresholds
+  - implement restart-storm/process-churn runtime helpers and persisted signal fields
+  - expose signal summary in `live-status` / `fleet-status`
+  - add runtime tests for signal emission, no-mirror, escalation, and blind-relaunch pause
+- next:
+  - merge this worktree into `develop`
+  - continue cleanup / retirement gating before deleting the worktree or branch
+- fresh_develop_evidence_2026_03_25:
+  - a fresh canonical `develop` manager cycle (`.freely/logs/cycle-20260325-234105.log`) retried OpenAI transport and failed repeatedly with `402 Payment Required` / `{"detail":{"code":"deactivated_workspace"}}`
+  - at the time, that live failure happened while `develop` was still expected to advance scheduler replay candidate `C-20260323-2045-A`, so it temporarily blocked unrelated canonical-supervisor proof work, not only watchdog closeout
+  - this note is now historical provenance only. Current canonical `develop` already absorbed the same-family scheduler contract, so the old replay owner no longer carries the missing watchdog capability and should not stay alive just because this historical failure once referenced it
+- source_lane_audit_2026_03_25:
+  - `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-manager-runtime-process-churn-state-reconcile` still holds one local-only continuation commit (`d2ef386`)
+  - the replay owner already preserves that lane's desired capability in canonical form: broadened `402 payment required` / `deactivated_workspace` auth-failure detection plus no-launch coverage while no slot is ready
+  - disposition: `superseded local source lane`
+  - replay_decision: `do_not_replay_remaining_unique_commit`

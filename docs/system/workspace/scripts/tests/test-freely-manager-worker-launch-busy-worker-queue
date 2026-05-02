@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-worker-busy-queue.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/freely"
+WT_ROOT="$TMP_DIR/freely-worktrees"
+WORKER="$WT_ROOT/feature-worker"
+
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs" "$WT_ROOT"
+cd "$PROJECT"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add README.md
+git commit -q -m init
+git branch feature/worker
+git worktree add "$WORKER" feature/worker >/dev/null
+
+mkdir -p "$WORKER/.freely/run" "$WORKER/.freely/logs"
+sleep 999 >/dev/null 2>&1 &
+ACTIVE_SUP="$!"
+sleep 999 >/dev/null 2>&1 &
+ACTIVE_AI="$!"
+trap 'kill "$ACTIVE_SUP" "$ACTIVE_AI" 2>/dev/null || true; rm -rf "$TMP_DIR"' EXIT
+
+printf '%s' "$ACTIVE_SUP" >"$WORKER/.freely/run/supervisor.pid"
+printf '%s' "$ACTIVE_AI" >"$WORKER/.freely/run/ai.pid"
+cat >"$WORKER/.freely/run/prompt-20260323-210100.txt" <<'EOF'
+worker prompt
+
+Delegated continuation handoff:
+- intake_id=existing message=keep working
+EOF
+
+PROMPT="$PROJECT/.freely/run/worker-prompts/20260323-210101-worker-busy-codex.txt"
+cat >"$PROMPT" <<EOF
+Dispatch metadata:
+- dispatch_priority: P0
+- parallel_safe: true
+- write_scope: $WORKER
+
+Branch:
+- \`feature/worker\`
+
+Worktree:
+- \`$WORKER\`
+EOF
+
+CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260323-210100.md"
+cat >"$CONTINUITY" <<EOF
+# Manager Continuity
+- worker_prompt: \`$PROMPT\`
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+LAUNCH_LOG="$TMP_DIR/launch.log"
+worker_project_is_actively_running() {
+  local project="$1"
+  project_paths_equivalent "$project" "$WORKER"
+}
+worker_project_busy_with_delegated_continuation() {
+  local project="$1"
+  project_paths_equivalent "$project" "$WORKER"
+}
+launch_worker_from_manager_prompt_if_needed() {
+  local _manager_project="$1" prompt_file="$2"
+  basename "$prompt_file" >>"$LAUNCH_LOG"
+  return 0
+}
+
+COUNT="$(FREELY_MANAGER_MAX_PARALLEL_WORKERS=3 manager_runtime_launch_workers_from_latest_handoff "$PROJECT")"
+[[ "$COUNT" == "0" ]]
+if [[ -f "$LAUNCH_LOG" ]]; then
+  echo "[FAIL] busy delegated worker should have been queued instead of relaunched" >&2
+  exit 1
+fi
+
+# shellcheck disable=SC1090
+source "$PROJECT/.freely/run/manager-worker-launch-state.env"
+[[ "${QUEUED_WORKER_PROMPTS:-}" == "$PROMPT" ]]
+
+echo "[PASS] busy delegated worker prompt is queued instead of repeatedly relaunched"

@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TEST_TMP="$(mktemp -d /tmp/freely-merge-guard-push-attempt.XXXXXX)"
+trap 'rm -rf "$TEST_TMP"' EXIT
+
+REPO="$TEST_TMP/repo"
+REMOTE="$TEST_TMP/remote.git"
+mkdir -p "$REPO"
+cd "$REPO"
+
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+git init -q --bare "$REMOTE"
+
+mkdir -p bin docs/system/workspace/scripts/quality docs/system/workspace/scripts/runtime docs/system/workspace/scripts/worktree docs/system/workspace/skills/watchdog-control-plane/scripts docs
+cp "$ROOT_DIR/bin/freely" "$REPO/bin/freely"
+cp "$ROOT_DIR/bin/governance-promotion-gate" "$REPO/bin/governance-promotion-gate"
+cp "$ROOT_DIR/docs/system/workspace/scripts/worktree/merge-guarded" "$REPO/bin/merge-guarded"
+cp "$ROOT_DIR/docs/system/workspace/scripts/quality/governance-promotion-gate" "$REPO/docs/system/workspace/scripts/quality/governance-promotion-gate"
+cp "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely" "$REPO/docs/system/workspace/scripts/runtime/freely"
+cp "$ROOT_DIR/docs/system/workspace/scripts/runtime/session-evidence-resolver.sh" "$REPO/docs/system/workspace/scripts/runtime/session-evidence-resolver.sh"
+cp "$ROOT_DIR/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" "$REPO/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
+cp "$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh" "$REPO/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+chmod +x "$REPO/bin/freely" "$REPO/bin/governance-promotion-gate" "$REPO/bin/merge-guarded" \
+  "$REPO/docs/system/workspace/scripts/quality/governance-promotion-gate" \
+  "$REPO/docs/system/workspace/scripts/runtime/freely" \
+  "$REPO/docs/system/workspace/scripts/runtime/session-evidence-resolver.sh" \
+  "$REPO/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" \
+  "$REPO/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+
+mkdir -p .freely/run
+cat >docs/PROJECT_INTENT.md <<'EOF'
+# Intent
+EOF
+cat >docs/CONSTITUTION.md <<'EOF'
+# Constitution
+EOF
+cat >docs/LAWS.md <<'EOF'
+# Laws
+EOF
+cat >AGENTS.md <<'EOF'
+# Agents
+EOF
+cat >.freely/config.env <<EOF
+PROJECT_ROOT="$REPO"
+INTENT_FILE="$REPO/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$REPO/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+
+echo base > README.md
+git add README.md AGENTS.md docs .freely/config.env bin docs/system
+git commit -q -m "init"
+git remote add origin "$REMOTE"
+git push -q -u origin develop
+
+mkdir -p .git/hooks
+cat >.git/hooks/pre-push <<'EOF'
+#!/usr/bin/env bash
+echo "pre-push test gate blocked delivery" >&2
+exit 1
+EOF
+chmod +x .git/hooks/pre-push
+
+git checkout -q -b feature/demo
+echo feature >> README.md
+git commit -q -am "feature change"
+
+git checkout -q -b test-pre-merge-20260412-demo develop
+./bin/merge-guarded test-pre-merge-20260412-demo feature/demo >/dev/null
+
+git checkout -q develop
+MERGE_OUTPUT="$(./bin/merge-guarded develop test-pre-merge-20260412-demo 2>&1)"
+printf '%s\n' "$MERGE_OUTPUT" | grep -q 'develop merge completed; attempting single push followthrough'
+printf '%s\n' "$MERGE_OUTPUT" | grep -q 'develop push followthrough blocked'
+
+STATUS_OUTPUT="$(./bin/freely develop-push status --project "$REPO")"
+printf '%s\n' "$STATUS_OUTPUT" | grep -q 'develop_push_followthrough_state: push_blocked'
+printf '%s\n' "$STATUS_OUTPUT" | grep -q 'develop_push_followthrough_blocked_reason: push_rejected_by_gate'
+[[ -f "$REPO/.freely/run/develop-push-attempt.env" ]]
+
+echo "[PASS] merge-guarded auto-attempts develop push followthrough exactly once and preserves explicit blocked truth"

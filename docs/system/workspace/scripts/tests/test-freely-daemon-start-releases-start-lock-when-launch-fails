@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+FREELY_SCRIPT="$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+PROJECT_DIR="$(mktemp -d /tmp/test-freely-daemon-start-lock.XXXXXX)"
+LOCK_DIR="$PROJECT_DIR/.freely/run/project-start.lock"
+HARNESS="$(mktemp /tmp/freely-test-harness-daemon.XXXXXX)"
+LOG_FILE="$(mktemp /tmp/harness-daemon.XXXXXX.log)"
+OUTER_LOG="$(mktemp /tmp/harness-daemon-outer.XXXXXX.log)"
+
+cleanup() {
+  rm -f "$HARNESS"
+  rm -f "$LOG_FILE"
+  rm -f "$OUTER_LOG"
+  rm -rf "$PROJECT_DIR"
+}
+trap cleanup EXIT
+
+mkdir -p "$PROJECT_DIR/.freely/run"
+
+cat >"$HARNESS" <<HARNESS_EOF
+#!/usr/bin/env bash
+set -euo pipefail
+FREELY="$FREELY_SCRIPT"
+PROJECT="$PROJECT_DIR"
+LOG="$LOG_FILE"
+
+echo "HARNESS START PID=\$$" > "\$LOG"
+BASH_SOURCE[0]="\$FREELY"
+source "\$FREELY"
+
+resolve_project_or_fail() {
+  printf "%s\n" "\$PROJECT"
+}
+append_runtime_event() { return 0; }
+
+launch_project_runtime_daemon_or_fail() {
+  if [[ -d "\$1/.freely/run/project-start.lock" ]]; then
+    echo "lock_present_during_launch" >> "\$LOG"
+  else
+    echo "lock_absent_during_launch" >> "\$LOG"
+  fi
+  return 1
+}
+
+cmd_daemon_start
+HARNESS_EOF
+
+chmod +x "$HARNESS"
+bash "$HARNESS" >"$OUTER_LOG" 2>&1 &
+child_pid=$!
+
+for _ in 1 2 3 4 5 6 7 8; do
+  sleep 0.5
+  if ! kill -0 "$child_pid" 2>/dev/null; then
+    break
+  fi
+done
+
+if kill -0 "$child_pid" 2>/dev/null; then
+  kill -9 "$child_pid" 2>/dev/null || true
+  exit 1
+fi
+
+wait $child_pid 2>/dev/null || rc=$?
+
+if [[ "$rc" -eq 0 || "$rc" -eq 1 ]]; then
+  if [[ -d "$LOCK_DIR" ]]; then
+    echo "FAIL: start lock not released (rc=$rc)"
+    exit 1
+  fi
+  grep -q 'lock_absent_during_launch' "$LOG_FILE"
+  echo "[PASS] freely daemon start releases start lock when launch fails"
+else
+  echo "FAIL: unexpected exit code $rc"
+  cat "$OUTER_LOG" >&2 || true
+  exit 1
+fi

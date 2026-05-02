@@ -1,0 +1,171 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-cleanup-governance-retirement-worker-directive.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+TARGET_A="$TMP_DIR/project-worktrees/20260421-feature-retire-a"
+TARGET_B="$TMP_DIR/project-worktrees/20260421-test-pre-merge-retire-b"
+
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260327-0000--sample" \
+  "$PROJECT/.freely/run" \
+  "$TARGET_A" \
+  "$TARGET_B"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/docs/milestones.md" <<'EOF'
+# Milestones
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260327-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260327-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260327-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+git -C "$PROJECT" init -q -b develop
+git -C "$PROJECT" config user.name freely-test
+git -C "$PROJECT" config user.email freely-test@example.com
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m "init"
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+
+CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260327-181023.md"
+cat >"$CONTINUITY" <<EOF
+# Manager Continuity
+
+## Primary Judgement
+- route_kind: \`cleanup_governance\`
+- restart_point: \`I-20260421-1330-A retained merged-lane retirement reconcile\`
+- next_action: \`generate a cleanup-only worker handoff instead of waiting again\`
+
+## Cleanup Queue
+1. \`cleanup:I-20260421-1330-A\`
+   - target_paths:
+     - \`$TARGET_A\`
+     - \`$TARGET_B\`
+   - local_branch_disposition: \`retained-with-reason\`
+   - remote_branch_disposition: \`retained-with-reason\`
+EOF
+
+cat >"$PROJECT/.freely/run/manager-worker-launch-state.env" <<EOF
+LAST_MANAGER_CONTINUITY_GENERATED="$CONTINUITY"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED="none"
+LAST_MANAGER_CONTINUITY_CONSUMED="$CONTINUITY"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED="none"
+LAUNCHED_WORKER_PROMPTS="none"
+QUEUED_WORKER_PROMPTS="none"
+MAX_PARALLEL_WORKERS="unbounded"
+ACTIVE_RUNNING_WORKER_COUNT="0"
+AVAILABLE_NEW_WORKER_SLOTS="unbounded"
+UPDATED_AT="2026-03-27T18:10:24Z"
+EOF
+
+build_test_prompt() {
+  local launch_kind="$1"
+  PROJECT_ROOT="$PROJECT" \
+  INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md" \
+  CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md" \
+  AI_TOOL="codex" \
+  AI_MODEL="gpt-5.4" \
+  AI_MODE="auto" \
+  AI_REASONING_EFFORT="medium" \
+  LAUNCH_KIND_SELECTED="$launch_kind" \
+  LAST_DELEGATED_CONTINUATION_PENDING_COUNT="0" \
+  LAST_MANAGER_CONTINUITY_CONSUMED="$CONTINUITY" \
+  bash -lc '
+    source "$1"
+    build_prompt
+  ' _ "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+}
+
+PROMPT_RESUME="$(build_test_prompt "resume")"
+[[ "$PROMPT_RESUME" == *'cleanup_governance retirement worker directive：'* ]]
+[[ "$PROMPT_RESUME" == *'不得再次只写一份同义 manager continuity'* ]]
+[[ "$PROMPT_RESUME" == *'retirement_handoff'* ]]
+[[ "$PROMPT_RESUME" == *"$TARGET_A"* ]]
+[[ "$PROMPT_RESUME" == *"$TARGET_B"* ]]
+
+cat >"$PROJECT/.freely/run/session-handoff.txt" <<'EOF'
+# Session Handoff
+
+- rotation_reason: context_compacted
+- previous_launch_kind: fresh
+EOF
+
+PROMPT_HANDOFF="$(build_test_prompt "fresh_with_handoff")"
+[[ "$PROMPT_HANDOFF" == *'cleanup_governance handoff retirement worker directive：'* ]]
+[[ "$PROMPT_HANDOFF" == *'cleanup worker delegation / worker prompt'* ]]
+
+CONTINUITY_CLEANUP_TARGETS="$PROJECT/.freely/run/manager-continuity-20260327-181024.md"
+cat >"$CONTINUITY_CLEANUP_TARGETS" <<EOF
+# Manager Continuity
+
+## Primary Judgement
+- route_kind: \`cleanup_governance\`
+- restart_point: \`I-20260421-1330-A cleanup followthrough after canonical absorption\`
+- next_action: \`retire the absorbed worktrees now\`
+
+## Cleanup Queue
+1. \`I-20260421-1330-A\`
+   - status: \`ready_for_retirement\`
+   - cleanup_targets:
+     - \`$TARGET_A\`
+     - \`$TARGET_B\`
+EOF
+
+cat >"$PROJECT/.freely/run/manager-worker-launch-state.env" <<EOF
+LAST_MANAGER_CONTINUITY_GENERATED="$CONTINUITY_CLEANUP_TARGETS"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED="none"
+LAST_MANAGER_CONTINUITY_CONSUMED="$CONTINUITY_CLEANUP_TARGETS"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED="none"
+LAUNCHED_WORKER_PROMPTS="none"
+QUEUED_WORKER_PROMPTS="none"
+MAX_PARALLEL_WORKERS="unbounded"
+ACTIVE_RUNNING_WORKER_COUNT="0"
+AVAILABLE_NEW_WORKER_SLOTS="unbounded"
+UPDATED_AT="2026-03-27T18:10:25Z"
+EOF
+CONTINUITY="$CONTINUITY_CLEANUP_TARGETS"
+
+PROMPT_HANDOFF_CLEANUP_TARGETS="$(build_test_prompt "fresh_with_handoff")"
+[[ "$PROMPT_HANDOFF_CLEANUP_TARGETS" == *"$TARGET_A"* ]]
+[[ "$PROMPT_HANDOFF_CLEANUP_TARGETS" == *"$TARGET_B"* ]]
+
+echo "[PASS] cleanup-governance continuity with retained merged targets forces a retirement worker directive in resume and handoff prompts"

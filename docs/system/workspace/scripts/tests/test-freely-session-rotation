@@ -1,0 +1,1065 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-session-rotation.XXXXXX)"
+export FREELY_HOME="$TMP_DIR/freely-home"
+mkdir -p "$FREELY_HOME"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260309-0000--sample" \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/.freely/logs"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260309-0000--sample
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260309-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260309-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="test-compact"
+AI_MODEL=""
+AI_MODE="auto"
+AI_REASONING_EFFORT=""
+CHECK_INTERVAL=1
+RESTART_DELAY=0
+MAX_RESTARTS=2
+IFLOW_MAX_TURNS=100
+MAX_RESUME_STREAK=24
+ROTATE_ON_CONTEXT_COMPACTED=1
+SESSION_HANDOFF_TAIL_LINES=10
+CONTEXT_WARN_RATIO=0.50
+CONTEXT_ROTATE_RATIO=0.70
+EOF
+
+bash "$ROOT_DIR/bin/freely" start --project "$PROJECT" >/dev/null 2>&1 || true
+
+grep -q 'mode=fresh' "$PROJECT/.freely/logs/loop.log"
+if grep -q 'mode=resume' "$PROJECT/.freely/logs/loop.log"; then
+  echo "[FAIL] expected fresh_with_handoff rotation after context compaction, got resume"
+  exit 1
+fi
+
+second_prompt="$(ls "$PROJECT"/.freely/run/prompt-*.txt | sort | sed -n '2p')"
+[[ -n "$second_prompt" ]] || {
+  echo "[FAIL] expected second prompt file"
+  exit 1
+}
+grep -q '会话轮换交接' "$second_prompt"
+grep -q 'previous_context_compacted: 1' "$second_prompt"
+grep -q 'Continuity Guard' "$second_prompt"
+if grep -q 'command not found' "$PROJECT/.freely/logs/loop.log"; then
+  echo "[FAIL] session handoff writer should be shell-safe during fresh_with_handoff"
+  exit 1
+fi
+
+echo "[PASS] freely rotates to fresh_with_handoff after context compaction"
+
+PROJECT_HANDOFF="$TMP_DIR/project-handoff-consumption"
+mkdir -p \
+  "$PROJECT_HANDOFF/docs/pre-brainstorms/20260309-0000--sample" \
+  "$PROJECT_HANDOFF/.freely/run" \
+  "$PROJECT_HANDOFF/.freely/logs"
+
+cat >"$PROJECT_HANDOFF/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT_HANDOFF/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT_HANDOFF/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT_HANDOFF/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT_HANDOFF/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+cat >"$PROJECT_HANDOFF/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260309-0000--sample
+EOF
+
+cat >"$PROJECT_HANDOFF/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+cat >"$PROJECT_HANDOFF/docs/pre-brainstorms/20260309-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT_HANDOFF/docs/pre-brainstorms/20260309-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT_HANDOFF/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT_HANDOFF"
+INTENT_FILE="$PROJECT_HANDOFF/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT_HANDOFF/docs/CONSTITUTION.md"
+AI_TOOL="test-once"
+AI_MODEL=""
+AI_MODE="auto"
+AI_REASONING_EFFORT=""
+CHECK_INTERVAL=1
+RESTART_DELAY=0
+MAX_RESTARTS=1
+IFLOW_MAX_TURNS=100
+MAX_RESUME_STREAK=24
+ROTATE_ON_CONTEXT_COMPACTED=1
+SESSION_HANDOFF_TAIL_LINES=10
+CONTEXT_WARN_RATIO=0.50
+CONTEXT_ROTATE_RATIO=0.70
+EOF
+
+HANDOFF_INTAKE_OUTPUT="$(bash "$ROOT_DIR/bin/freely" intake chat --project "$PROJECT_HANDOFF" --author human --channel chat --message "主管继续检查所有 worktree 并决定下一步")"
+HANDOFF_INTAKE_ID="$(printf '%s\n' "$HANDOFF_INTAKE_OUTPUT" | sed -n 's/^intake_id: //p')"
+[[ -n "$HANDOFF_INTAKE_ID" ]] || {
+  echo "[FAIL] expected delegated handoff intake id"
+  exit 1
+}
+
+HANDOFF_RESOLUTION="$TMP_DIR/manager-handoff-resolution.md"
+cat >"$HANDOFF_RESOLUTION" <<'EOF'
+restart_point: `continuation`
+ownership: `manager`
+handoff_summary: 下一轮主管主循环先做 live-status 和 fleet-status 巡检
+EOF
+
+bash "$ROOT_DIR/bin/freely" intake resolve \
+  --project "$PROJECT_HANDOFF" \
+  --intake-id "$HANDOFF_INTAKE_ID" \
+  --resolved-by interruption-manager-agent \
+  --reaction followup \
+  --classification continuation \
+  --resolution-file "$HANDOFF_RESOLUTION" \
+  --absorption-target handoff://continuation \
+  --status delegated >/dev/null
+
+bash "$ROOT_DIR/bin/freely" start --project "$PROJECT_HANDOFF" >/dev/null 2>&1 || true
+
+first_handoff_prompt="$(ls "$PROJECT_HANDOFF"/.freely/run/prompt-*.txt | sort | head -n 1)"
+[[ -n "$first_handoff_prompt" ]] || {
+  echo "[FAIL] expected prompt file for delegated continuation consumption"
+  exit 1
+}
+grep -q 'Delegated continuation handoff:' "$first_handoff_prompt"
+grep -q "$HANDOFF_INTAKE_ID" "$first_handoff_prompt"
+grep -q "^LAST_DELEGATED_CONTINUATION_PENDING_IDS=\"$HANDOFF_INTAKE_ID\"$" "$PROJECT_HANDOFF/.freely/run/session-state.env"
+grep -q '^LAST_DELEGATED_CONTINUATION_PENDING_COUNT="1"$' "$PROJECT_HANDOFF/.freely/run/session-state.env"
+grep -q "^LAST_DELEGATED_CONTINUATION_CONSUMED_IDS=\"$HANDOFF_INTAKE_ID\"$" "$PROJECT_HANDOFF/.freely/run/session-state.env"
+grep -q '^LAST_DELEGATED_CONTINUATION_CONSUMED_AT="' "$PROJECT_HANDOFF/.freely/run/session-state.env"
+LIVE_STATUS_HANDOFF="$(bash "$ROOT_DIR/bin/freely" live-status --project "$PROJECT_HANDOFF")"
+printf '%s\n' "$LIVE_STATUS_HANDOFF" | grep -q "last_consumed_delegated_continuation_ids: $HANDOFF_INTAKE_ID"
+
+echo "[PASS] freely records delegated continuation pending and consumed evidence"
+
+PROJECT_NO_SESSION="$TMP_DIR/project-no-session"
+mkdir -p \
+  "$PROJECT_NO_SESSION/docs/pre-brainstorms/20260309-0000--sample" \
+  "$PROJECT_NO_SESSION/.freely/run" \
+  "$PROJECT_NO_SESSION/.freely/logs"
+
+cat >"$PROJECT_NO_SESSION/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT_NO_SESSION/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT_NO_SESSION/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT_NO_SESSION/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT_NO_SESSION/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+cat >"$PROJECT_NO_SESSION/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260309-0000--sample
+EOF
+
+cat >"$PROJECT_NO_SESSION/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+cat >"$PROJECT_NO_SESSION/docs/pre-brainstorms/20260309-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT_NO_SESSION/docs/pre-brainstorms/20260309-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT_NO_SESSION/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT_NO_SESSION"
+INTENT_FILE="$PROJECT_NO_SESSION/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT_NO_SESSION/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL=""
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+CHECK_INTERVAL=1
+RESTART_DELAY=0
+MAX_RESTARTS=2
+IFLOW_MAX_TURNS=100
+MAX_RESUME_STREAK=24
+ROTATE_ON_CONTEXT_COMPACTED=1
+SESSION_HANDOFF_TAIL_LINES=10
+CONTEXT_WARN_RATIO=0.50
+CONTEXT_ROTATE_RATIO=0.70
+EOF
+
+mock_bin="$PROJECT_NO_SESSION/mock-bin"
+mkdir -p "$mock_bin"
+cat >"$mock_bin/codex" <<'EOF'
+#!/usr/bin/env bash
+echo "[TEST] mock codex without session id"
+sleep 1
+EOF
+chmod +x "$mock_bin/codex"
+
+PATH="$mock_bin:$PATH" bash "$ROOT_DIR/bin/freely" start --project "$PROJECT_NO_SESSION" >/dev/null 2>&1 || true
+
+grep -q 'reason=missing_resume_evidence' "$PROJECT_NO_SESSION/.freely/logs/loop.log"
+second_no_session_prompt="$(ls "$PROJECT_NO_SESSION"/.freely/run/prompt-*.txt | sort | sed -n '2p')"
+[[ -n "$second_no_session_prompt" ]] || {
+  echo "[FAIL] expected second prompt file for missing resume evidence"
+  exit 1
+}
+grep -q '会话轮换交接' "$second_no_session_prompt"
+
+echo "[PASS] freely rotates to fresh_with_handoff when resume evidence is missing"
+
+PROJECT_CC_SESSION="$TMP_DIR/project-cc-session"
+mkdir -p \
+  "$PROJECT_CC_SESSION/docs/pre-brainstorms/20260309-0000--sample" \
+  "$PROJECT_CC_SESSION/.freely/run" \
+  "$PROJECT_CC_SESSION/.freely/logs"
+
+cat >"$PROJECT_CC_SESSION/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT_CC_SESSION/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT_CC_SESSION/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT_CC_SESSION/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT_CC_SESSION/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+cat >"$PROJECT_CC_SESSION/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260309-0000--sample
+EOF
+
+cat >"$PROJECT_CC_SESSION/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+cat >"$PROJECT_CC_SESSION/docs/pre-brainstorms/20260309-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT_CC_SESSION/docs/pre-brainstorms/20260309-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT_CC_SESSION/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT_CC_SESSION"
+INTENT_FILE="$PROJECT_CC_SESSION/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT_CC_SESSION/docs/CONSTITUTION.md"
+AI_TOOL="cc"
+AI_MODEL=""
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+AI_TOOL_CAPABILITIES=""
+AI_TOOL_POLICY=""
+AI_CAPABILITY_CODEX_MODEL=""
+AI_CAPABILITY_CODEX_SANDBOX=""
+AI_CAPABILITY_CODEX_APPROVAL_POLICY=""
+AI_CAPABILITY_CODEX_CWD_MODE=""
+CHECK_INTERVAL=1
+RESTART_DELAY=0
+MAX_RESTARTS=2
+IFLOW_MAX_TURNS=100
+MAX_RESUME_STREAK=24
+ROTATE_ON_CONTEXT_COMPACTED=1
+SESSION_HANDOFF_TAIL_LINES=10
+CONTEXT_WARN_RATIO=0.50
+CONTEXT_ROTATE_RATIO=0.70
+EOF
+
+mock_bin_cc="$TMP_DIR/bin-cc-session"
+mkdir -p "$mock_bin_cc"
+cat >"$mock_bin_cc/claude" <<'EOF'
+#!/usr/bin/env bash
+echo "[TEST] mock claude session run"
+sleep 1
+EOF
+chmod +x "$mock_bin_cc/claude"
+
+PATH="$mock_bin_cc:$PATH" bash "$ROOT_DIR/bin/freely" start --project "$PROJECT_CC_SESSION" >/dev/null 2>&1 || true
+
+if grep -q 'reason=missing_resume_evidence' "$PROJECT_CC_SESSION/.freely/logs/loop.log"; then
+  echo "[FAIL] cc should use claude session-id continuity instead of missing resume evidence rotation"
+  exit 1
+fi
+grep -q 'mode=resume' "$PROJECT_CC_SESSION/.freely/logs/loop.log"
+grep -Eq '^CLAUDE_SESSION_ID_CURRENT="[0-9a-f-]+"' "$PROJECT_CC_SESSION/.freely/run/session-state.env"
+
+echo "[PASS] freely keeps cc continuity with per-workcell claude session-id"
+
+PROJECT_CC_INVALID_SESSION="$TMP_DIR/project-cc-invalid-session"
+mkdir -p \
+  "$PROJECT_CC_INVALID_SESSION/docs/pre-brainstorms/20260309-0000--sample" \
+  "$PROJECT_CC_INVALID_SESSION/.freely/run" \
+  "$PROJECT_CC_INVALID_SESSION/.freely/logs"
+
+cat >"$PROJECT_CC_INVALID_SESSION/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT_CC_INVALID_SESSION/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT_CC_INVALID_SESSION/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT_CC_INVALID_SESSION/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT_CC_INVALID_SESSION/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+cat >"$PROJECT_CC_INVALID_SESSION/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260309-0000--sample
+EOF
+
+cat >"$PROJECT_CC_INVALID_SESSION/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+cat >"$PROJECT_CC_INVALID_SESSION/docs/pre-brainstorms/20260309-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT_CC_INVALID_SESSION/docs/pre-brainstorms/20260309-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT_CC_INVALID_SESSION/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT_CC_INVALID_SESSION"
+INTENT_FILE="$PROJECT_CC_INVALID_SESSION/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT_CC_INVALID_SESSION/docs/CONSTITUTION.md"
+AI_TOOL="cc-use-codex-cli"
+AI_MODEL=""
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+AI_TOOL_CAPABILITIES="codex-cli"
+AI_TOOL_POLICY="prefer-codex-for-repo-work"
+AI_CAPABILITY_CODEX_MODEL="gpt-5.4"
+AI_CAPABILITY_CODEX_SANDBOX="workspace-write"
+AI_CAPABILITY_CODEX_APPROVAL_POLICY="never"
+AI_CAPABILITY_CODEX_CWD_MODE="project-root"
+CHECK_INTERVAL=1
+RESTART_DELAY=0
+MAX_RESTARTS=1
+IFLOW_MAX_TURNS=100
+MAX_RESUME_STREAK=24
+ROTATE_ON_CONTEXT_COMPACTED=1
+SESSION_HANDOFF_TAIL_LINES=10
+CONTEXT_WARN_RATIO=0.50
+CONTEXT_ROTATE_RATIO=0.70
+EOF
+
+cat >"$PROJECT_CC_INVALID_SESSION/.freely/run/session-state.env" <<'EOF'
+CLAUDE_SESSION_ID_CURRENT="not-a-uuid"
+CLAUDE_SESSION_ID_PREVIOUS="also-not-a-uuid"
+LAST_LAUNCH_KIND="resume"
+LAST_CYCLE_LOG=""
+LAST_CONTEXT_COMPACTED="0"
+LAST_ROUTE_ONLY_HANDOFF="0"
+ROUTE_ONLY_STREAK_CURRENT="0"
+RESUME_STREAK_CURRENT="0"
+EOF
+
+mock_bin_cc_invalid="$TMP_DIR/bin-cc-invalid"
+mkdir -p "$mock_bin_cc_invalid"
+cat >"$mock_bin_cc_invalid/claude" <<'EOF'
+#!/usr/bin/env bash
+printf '%s\n' "$@" >"$TMP_DIR/claude.args"
+echo "[TEST] mock claude invalid-session recovery"
+sleep 1
+EOF
+chmod +x "$mock_bin_cc_invalid/claude"
+
+PATH="$mock_bin_cc_invalid:$PATH" TMP_DIR="$TMP_DIR" bash "$ROOT_DIR/bin/freely" start --project "$PROJECT_CC_INVALID_SESSION" >/dev/null 2>&1 || true
+
+if grep -q '^not-a-uuid$' "$TMP_DIR/claude.args"; then
+  echo "[FAIL] runtime passed invalid claude session-id through to claude" >&2
+  exit 1
+fi
+grep -Eq '^CLAUDE_SESSION_ID_CURRENT="[0-9a-f-]+"' "$PROJECT_CC_INVALID_SESSION/.freely/run/session-state.env"
+
+echo "[PASS] freely regenerates invalid cc session ids before launch"
+
+PROJECT_STREAK="$TMP_DIR/project-streak"
+mkdir -p \
+  "$PROJECT_STREAK/docs/pre-brainstorms/20260309-0000--sample" \
+  "$PROJECT_STREAK/.freely/run" \
+  "$PROJECT_STREAK/.freely/logs"
+
+cat >"$PROJECT_STREAK/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT_STREAK/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT_STREAK/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT_STREAK/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT_STREAK/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+cat >"$PROJECT_STREAK/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260309-0000--sample
+EOF
+
+cat >"$PROJECT_STREAK/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+cat >"$PROJECT_STREAK/docs/pre-brainstorms/20260309-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT_STREAK/docs/pre-brainstorms/20260309-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT_STREAK/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT_STREAK"
+INTENT_FILE="$PROJECT_STREAK/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT_STREAK/docs/CONSTITUTION.md"
+AI_TOOL="test-session"
+AI_MODEL=""
+AI_MODE="auto"
+AI_REASONING_EFFORT=""
+CHECK_INTERVAL=1
+RESTART_DELAY=0
+MAX_RESTARTS=3
+IFLOW_MAX_TURNS=100
+MAX_RESUME_STREAK=1
+ROTATE_ON_CONTEXT_COMPACTED=1
+SESSION_HANDOFF_TAIL_LINES=10
+CONTEXT_WARN_RATIO=0.50
+CONTEXT_ROTATE_RATIO=0.70
+EOF
+
+bash "$ROOT_DIR/bin/freely" start --project "$PROJECT_STREAK" >/dev/null 2>&1 || true
+
+grep -q 'reason=resume_streak_limit' "$PROJECT_STREAK/.freely/logs/loop.log"
+third_prompt="$(ls "$PROJECT_STREAK"/.freely/run/prompt-*.txt | sort | sed -n '3p')"
+[[ -n "$third_prompt" ]] || {
+  echo "[FAIL] expected third prompt file for resume streak rotation"
+  exit 1
+}
+grep -q '会话轮换交接' "$third_prompt"
+
+echo "[PASS] freely rotates to fresh_with_handoff after resume streak limit"
+
+PROJECT_CONTEXT="$TMP_DIR/project-context"
+mkdir -p \
+  "$PROJECT_CONTEXT/docs/pre-brainstorms/20260309-0000--sample" \
+  "$PROJECT_CONTEXT/.freely/run" \
+  "$PROJECT_CONTEXT/.freely/logs"
+
+cat >"$PROJECT_CONTEXT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT_CONTEXT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT_CONTEXT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT_CONTEXT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT_CONTEXT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+cat >"$PROJECT_CONTEXT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260309-0000--sample
+EOF
+
+cat >"$PROJECT_CONTEXT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+cat >"$PROJECT_CONTEXT/docs/pre-brainstorms/20260309-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT_CONTEXT/docs/pre-brainstorms/20260309-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT_CONTEXT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT_CONTEXT"
+INTENT_FILE="$PROJECT_CONTEXT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT_CONTEXT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+CHECK_INTERVAL=1
+RESTART_DELAY=0
+MAX_RESTARTS=2
+IFLOW_MAX_TURNS=100
+MAX_RESUME_STREAK=24
+ROTATE_ON_CONTEXT_COMPACTED=1
+SESSION_HANDOFF_TAIL_LINES=10
+CONTEXT_WARN_RATIO=0.50
+CONTEXT_ROTATE_RATIO=0.70
+EOF
+
+mock_home="$TMP_DIR/home-context"
+mock_bin="$TMP_DIR/bin-context"
+mkdir -p "$mock_home/.codex/sessions/2026/03/16" "$mock_bin"
+cat >"$mock_bin/codex" <<'EOF'
+#!/usr/bin/env bash
+echo "session id: test-context-session"
+echo "[TEST] mock codex with token_count"
+sleep 1
+EOF
+chmod +x "$mock_bin/codex"
+
+cat >"$mock_home/.codex/sessions/2026/03/16/rollout-2026-03-16T18-38-00-test-context-session.jsonl" <<'EOF'
+{"timestamp":"2026-03-17T01:38:00.000Z","type":"event_msg","payload":{"type":"token_count","info":{"total_token_usage":{"input_tokens":80000,"cached_input_tokens":0,"output_tokens":0,"reasoning_output_tokens":0,"total_tokens":80000},"last_token_usage":{"input_tokens":80000,"cached_input_tokens":0,"output_tokens":0,"reasoning_output_tokens":0,"total_tokens":80000},"model_context_window":100000},"rate_limits":null}}
+EOF
+
+HOME="$mock_home" PATH="$mock_bin:$PATH" bash "$ROOT_DIR/bin/freely" start --project "$PROJECT_CONTEXT" >/dev/null 2>&1 || true
+
+grep -q 'reason=context_usage_threshold' "$PROJECT_CONTEXT/.freely/logs/loop.log"
+second_context_prompt="$(ls "$PROJECT_CONTEXT"/.freely/run/prompt-*.txt | sort | sed -n '2p')"
+[[ -n "$second_context_prompt" ]] || {
+  echo "[FAIL] expected second prompt file for context usage rotation"
+  exit 1
+}
+grep -q 'previous_tool_jsonl_path' "$second_context_prompt"
+grep -q 'previous_context_ratio: 0.8000' "$second_context_prompt"
+grep -q 'Continuity Guard' "$second_context_prompt"
+
+echo "[PASS] freely rotates to fresh_with_handoff after high context usage"
+
+PROJECT_WARN="$TMP_DIR/project-warn"
+mkdir -p \
+  "$PROJECT_WARN/docs/pre-brainstorms/20260309-0000--sample" \
+  "$PROJECT_WARN/.freely/run" \
+  "$PROJECT_WARN/.freely/logs"
+
+cat >"$PROJECT_WARN/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT_WARN/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT_WARN/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT_WARN/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT_WARN/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+cat >"$PROJECT_WARN/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260309-0000--sample
+EOF
+
+cat >"$PROJECT_WARN/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+cat >"$PROJECT_WARN/docs/pre-brainstorms/20260309-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT_WARN/docs/pre-brainstorms/20260309-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT_WARN/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT_WARN"
+INTENT_FILE="$PROJECT_WARN/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT_WARN/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+CHECK_INTERVAL=1
+RESTART_DELAY=0
+MAX_RESTARTS=2
+IFLOW_MAX_TURNS=100
+MAX_RESUME_STREAK=24
+ROTATE_ON_CONTEXT_COMPACTED=1
+SESSION_HANDOFF_TAIL_LINES=10
+CONTEXT_WARN_RATIO=0.50
+CONTEXT_ROTATE_RATIO=0.70
+EOF
+
+mock_home_warn="$TMP_DIR/home-warn"
+mock_bin_warn="$TMP_DIR/bin-warn"
+mkdir -p "$mock_home_warn/.codex/sessions/2026/03/16" "$mock_bin_warn"
+cat >"$mock_bin_warn/codex" <<'EOF'
+#!/usr/bin/env bash
+echo "session id: test-warn-session"
+echo "[TEST] mock codex warn"
+sleep 1
+EOF
+chmod +x "$mock_bin_warn/codex"
+
+cat >"$mock_home_warn/.codex/sessions/2026/03/16/rollout-2026-03-16T18-39-00-test-warn-session.jsonl" <<'EOF'
+{"timestamp":"2026-03-17T01:39:00.000Z","type":"event_msg","payload":{"type":"token_count","info":{"total_token_usage":{"input_tokens":55000,"cached_input_tokens":0,"output_tokens":0,"reasoning_output_tokens":0,"total_tokens":55000},"last_token_usage":{"input_tokens":55000,"cached_input_tokens":0,"output_tokens":0,"reasoning_output_tokens":0,"total_tokens":55000},"model_context_window":100000},"rate_limits":null}}
+EOF
+
+HOME="$mock_home_warn" PATH="$mock_bin_warn:$PATH" bash "$ROOT_DIR/bin/freely" start --project "$PROJECT_WARN" >/dev/null 2>&1 || true
+
+if grep -q 'reason=context_usage_threshold' "$PROJECT_WARN/.freely/logs/loop.log"; then
+  echo "[FAIL] expected warn-only context ratio to stay resumable"
+  exit 1
+fi
+second_warn_prompt="$(ls "$PROJECT_WARN"/.freely/run/prompt-*.txt | sort | sed -n '2p')"
+[[ -n "$second_warn_prompt" ]] || {
+  echo "[FAIL] expected second prompt file for context warning"
+  exit 1
+}
+grep -q '上下文容量预警' "$second_warn_prompt"
+grep -q '0.5500' "$second_warn_prompt"
+grep -q '先更新当前阶段对应的 continuity artifact' "$second_warn_prompt"
+
+echo "[PASS] freely warns before rotation when context usage crosses warn threshold"
+
+PROJECT_MANAGER_WARN="$TMP_DIR/project-manager-warn"
+mkdir -p \
+  "$PROJECT_MANAGER_WARN/docs/pre-brainstorms/20260309-0000--sample" \
+  "$PROJECT_MANAGER_WARN/.freely/run" \
+  "$PROJECT_MANAGER_WARN/.freely/logs"
+
+git init -q -b develop "$PROJECT_MANAGER_WARN"
+
+cat >"$PROJECT_MANAGER_WARN/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT_MANAGER_WARN/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT_MANAGER_WARN/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT_MANAGER_WARN/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT_MANAGER_WARN/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+cat >"$PROJECT_MANAGER_WARN/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260309-0000--sample
+EOF
+
+cat >"$PROJECT_MANAGER_WARN/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+cat >"$PROJECT_MANAGER_WARN/docs/pre-brainstorms/20260309-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT_MANAGER_WARN/docs/pre-brainstorms/20260309-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT_MANAGER_WARN/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT_MANAGER_WARN"
+INTENT_FILE="$PROJECT_MANAGER_WARN/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT_MANAGER_WARN/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+CHECK_INTERVAL=1
+RESTART_DELAY=0
+MAX_RESTARTS=2
+IFLOW_MAX_TURNS=100
+MAX_RESUME_STREAK=24
+ROTATE_ON_CONTEXT_COMPACTED=1
+SESSION_HANDOFF_TAIL_LINES=10
+CONTEXT_WARN_RATIO=0.50
+CONTEXT_ROTATE_RATIO=0.70
+EOF
+
+mock_home_manager_warn="$TMP_DIR/home-manager-warn"
+mock_bin_manager_warn="$TMP_DIR/bin-manager-warn"
+mkdir -p "$mock_home_manager_warn/.codex/sessions/2026/03/16" "$mock_bin_manager_warn"
+cat >"$mock_bin_manager_warn/codex" <<'EOF'
+#!/usr/bin/env bash
+echo "session id: test-manager-warn-session"
+echo "[TEST] mock manager codex warn"
+sleep 1
+EOF
+chmod +x "$mock_bin_manager_warn/codex"
+
+cat >"$mock_home_manager_warn/.codex/sessions/2026/03/16/rollout-2026-03-16T18-39-30-test-manager-warn-session.jsonl" <<'EOF'
+{"timestamp":"2026-03-17T01:39:30.000Z","type":"event_msg","payload":{"type":"token_count","info":{"total_token_usage":{"input_tokens":55000,"cached_input_tokens":0,"output_tokens":0,"reasoning_output_tokens":0,"total_tokens":55000},"last_token_usage":{"input_tokens":55000,"cached_input_tokens":0,"output_tokens":0,"reasoning_output_tokens":0,"total_tokens":55000},"model_context_window":100000},"rate_limits":null}}
+EOF
+
+HOME="$mock_home_manager_warn" PATH="$mock_bin_manager_warn:$PATH" bash "$ROOT_DIR/bin/freely" start --project "$PROJECT_MANAGER_WARN" >/dev/null 2>&1 || true
+
+second_manager_warn_prompt="$(ls "$PROJECT_MANAGER_WARN"/.freely/run/prompt-*.txt | sort | sed -n '2p')"
+[[ -n "$second_manager_warn_prompt" ]] || {
+  echo "[FAIL] expected second prompt file for manager context warning"
+  exit 1
+}
+grep -q 'manager continuity: update project-level continuity first' "$second_manager_warn_prompt"
+grep -q 'expected-running worktrees' "$second_manager_warn_prompt"
+
+echo "[PASS] freely uses manager-specific continuity targets under context pressure"
+
+PROJECT_LIMIT="$TMP_DIR/project-limit"
+mkdir -p \
+  "$PROJECT_LIMIT/bin" \
+  "$PROJECT_LIMIT/docs/pre-brainstorms/20260309-0000--sample" \
+  "$PROJECT_LIMIT/.freely/run" \
+  "$PROJECT_LIMIT/.freely/logs"
+
+cat >"$PROJECT_LIMIT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT_LIMIT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT_LIMIT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT_LIMIT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT_LIMIT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+cat >"$PROJECT_LIMIT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260309-0000--sample
+EOF
+
+cat >"$PROJECT_LIMIT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+cat >"$PROJECT_LIMIT/docs/pre-brainstorms/20260309-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT_LIMIT/docs/pre-brainstorms/20260309-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT_LIMIT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT_LIMIT"
+INTENT_FILE="$PROJECT_LIMIT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT_LIMIT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+CHECK_INTERVAL=1
+RESTART_DELAY=0
+MAX_RESTARTS=1
+IFLOW_MAX_TURNS=100
+MAX_RESUME_STREAK=24
+ROTATE_ON_CONTEXT_COMPACTED=1
+SESSION_HANDOFF_TAIL_LINES=10
+CONTEXT_WARN_RATIO=0.50
+CONTEXT_ROTATE_RATIO=0.70
+EOF
+
+cat >"$PROJECT_LIMIT/bin/ai" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+cmd=""
+for arg in "$@"; do
+  case "$arg" in
+    list|whoami|switch|status)
+      cmd="$arg"
+      break
+      ;;
+  esac
+done
+
+case "$cmd" in
+  list)
+    echo '{"accounts":[]}'
+    ;;
+  whoami|status)
+    echo '{"tool":"codex","account":"limited@example.com"}'
+    ;;
+  switch)
+    echo '{"switched": false, "tool": "codex", "account": "unavailable"}'
+    ;;
+  *)
+    echo '{}'
+    ;;
+esac
+EOF
+chmod +x "$PROJECT_LIMIT/bin/ai"
+
+mock_home_limit="$TMP_DIR/home-limit"
+mock_bin_limit="$TMP_DIR/bin-limit"
+mkdir -p "$mock_home_limit/.codex/sessions/2026/03/16" "$mock_bin_limit"
+cat >"$mock_bin_limit/codex" <<'EOF'
+#!/usr/bin/env bash
+echo "session id: test-limit-session"
+echo "[TEST] mock codex rate limit"
+sleep 1
+EOF
+chmod +x "$mock_bin_limit/codex"
+
+reset_at="$(( $(date +%s) + 4 ))"
+cat >"$mock_home_limit/.codex/sessions/2026/03/16/rollout-2026-03-16T18-40-00-test-limit-session.jsonl" <<EOF
+{"timestamp":"2026-03-17T01:40:00.000Z","type":"event_msg","payload":{"type":"token_count","info":null,"rate_limits":{"primary":{"used_percent":100.0,"window_minutes":300,"resets_at":$reset_at},"secondary":{"used_percent":0.0,"window_minutes":10080,"resets_at":$reset_at},"credits":{"has_credits":false,"unlimited":false,"balance":null},"plan_type":null}}}
+EOF
+
+start_epoch="$(date +%s)"
+HOME="$mock_home_limit" PATH="$mock_bin_limit:$PATH" bash "$ROOT_DIR/bin/freely" start --project "$PROJECT_LIMIT" >/dev/null 2>&1 || true
+end_epoch="$(date +%s)"
+
+event_log_limit="$PROJECT_LIMIT/.freely/logs/runtime-events.log"
+if [[ $((end_epoch - start_epoch)) -gt 8 ]]; then
+  echo "[FAIL] expected local runtime to stop promptly after rate-limit defer"
+  exit 1
+fi
+grep -q 'LAST_SLOT_SWITCH_REASON="primary_rate_limit_exhausted"' "$PROJECT_LIMIT/.freely/run/session-state.env"
+grep -q 'event=supervisor_stopping.*reason=primary_rate_limit_exhausted' "$event_log_limit"
+if [[ "$(grep -c 'event=ai_launch_begin' "$event_log_limit")" -ne 1 ]]; then
+  echo "[FAIL] expected rate-limit defer to avoid an extra local relaunch cycle"
+  exit 1
+fi
+
+echo "[PASS] freely defers rate-limit recovery from local runtime to global watchdog"
+
+PROJECT_ROUTE_ONLY="$TMP_DIR/project-route-only"
+mkdir -p \
+  "$PROJECT_ROUTE_ONLY/docs/pre-brainstorms/20260309-0000--sample" \
+  "$PROJECT_ROUTE_ONLY/.freely/run" \
+  "$PROJECT_ROUTE_ONLY/.freely/logs"
+
+cat >"$PROJECT_ROUTE_ONLY/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT_ROUTE_ONLY/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT_ROUTE_ONLY/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT_ROUTE_ONLY/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT_ROUTE_ONLY/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+cat >"$PROJECT_ROUTE_ONLY/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260309-0000--sample
+EOF
+
+cat >"$PROJECT_ROUTE_ONLY/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+cat >"$PROJECT_ROUTE_ONLY/docs/pre-brainstorms/20260309-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT_ROUTE_ONLY/docs/pre-brainstorms/20260309-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT_ROUTE_ONLY/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT_ROUTE_ONLY"
+INTENT_FILE="$PROJECT_ROUTE_ONLY/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT_ROUTE_ONLY/docs/CONSTITUTION.md"
+AI_TOOL="test-route-only"
+AI_MODEL=""
+AI_MODE="auto"
+AI_REASONING_EFFORT=""
+CHECK_INTERVAL=1
+RESTART_DELAY=0
+MAX_RESTARTS=2
+IFLOW_MAX_TURNS=100
+MAX_RESUME_STREAK=24
+MAX_ROUTE_ONLY_STREAK=1
+ROTATE_ON_CONTEXT_COMPACTED=1
+SESSION_HANDOFF_TAIL_LINES=10
+CONTEXT_WARN_RATIO=0.50
+CONTEXT_ROTATE_RATIO=0.70
+EOF
+
+bash "$ROOT_DIR/bin/freely" start --project "$PROJECT_ROUTE_ONLY" >/dev/null 2>&1 || true
+
+grep -q 'reason=route_only_handoff' "$PROJECT_ROUTE_ONLY/.freely/logs/loop.log"
+second_route_prompt="$(ls "$PROJECT_ROUTE_ONLY"/.freely/run/prompt-*.txt | sort | sed -n '2p')"
+[[ -n "$second_route_prompt" ]] || {
+  echo "[FAIL] expected second prompt file for route-only recovery"
+  exit 1
+}
+grep -q '上轮只完成了路由交接' "$second_route_prompt"
+grep -q '你现在承接第二跳' "$second_route_prompt"
+
+echo "[PASS] freely converts route-only handoff into forced second-hop recovery"

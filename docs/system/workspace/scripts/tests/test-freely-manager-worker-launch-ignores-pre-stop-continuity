@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-launch-ignore-pre-stop.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/freely"
+WT_ROOT="$TMP_DIR/freely-worktrees"
+WORKER="$WT_ROOT/feature-worker"
+
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs" "$WT_ROOT"
+cd "$PROJECT"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add README.md
+git commit -q -m init
+git branch feature/worker
+git worktree add "$WORKER" feature/worker >/dev/null
+
+mkdir -p "$WORKER/.freely/run" "$WORKER/.freely/logs"
+cat >"$WORKER/.freely/config.env" <<EOF
+PROJECT_ROOT="$WORKER"
+INTENT_FILE="$WORKER/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$WORKER/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+PROMPT="$PROJECT/.freely/run/worker-prompts/20260420-071010-worker-startup-task-source-patrol-and-reconcile-codex.txt"
+cat >"$PROMPT" <<EOF
+Dispatch metadata:
+- dispatch_priority: P0
+- parallel_safe: false
+- write_scope: $WORKER
+
+Branch:
+- \`feature/worker\`
+
+Worktree:
+- \`$WORKER\`
+EOF
+
+OLD_CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260420-071010.md"
+cat >"$OLD_CONTINUITY" <<EOF
+# Manager Continuity
+- worker_prompt: \`$PROMPT\`
+EOF
+touch -t 202604201410.10 "$OLD_CONTINUITY"
+
+STOP_BOUNDARY="$PROJECT/.freely/run/manager-operator-stop-boundary.env"
+cat >"$STOP_BOUNDARY" <<'EOF'
+OPERATOR_STOP_BOUNDARY_EPOCH="1776694550"
+OPERATOR_STOP_BOUNDARY_RECORDED_AT="2026-04-20T14:15:50Z"
+EOF
+
+NEWER_STUB="$PROJECT/.freely/run/manager-continuity-20260420-071550.md"
+cat >"$NEWER_STUB" <<'EOF'
+# Manager Continuity
+- continuity_written_by: `freely-runtime-startup-stub`
+
+## Worker Delegation
+- referenced_worker_prompts: `none`
+- authoritative_worker_prompts: `none`
+EOF
+touch -t 202604201415.50 "$NEWER_STUB"
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+SELECTED="$(latest_launchable_manager_worker_prompt_continuity_file_for_project "$PROJECT")"
+[[ -z "$SELECTED" ]]
+
+LAUNCH_LOG="$TMP_DIR/launch.log"
+launch_worker_from_manager_prompt_if_needed() {
+  local _manager_project="$1" prompt_file="$2"
+  basename "$prompt_file" >>"$LAUNCH_LOG"
+  return 0
+}
+
+COUNT="$(manager_runtime_launch_workers_from_latest_handoff "$PROJECT")"
+[[ "$COUNT" == "0" ]]
+[[ ! -f "$LAUNCH_LOG" ]]
+
+echo "[PASS] manager launch ignores pre-stop worker prompt continuity after an explicit operator-stop boundary"

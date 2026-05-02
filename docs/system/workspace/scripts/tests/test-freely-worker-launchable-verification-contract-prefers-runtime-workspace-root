@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-worker-workspace-root.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/test-pre-merge-worker"
+mkdir -p "$PROJECT/docs/system/workspace/scripts" "$PROJECT/.freely/run"
+
+cat >"$PROJECT/.freely/run/worker-verification-contract.env" <<EOF
+SOURCE_PROMPT_FILE="$PROJECT/.freely/run/worker-prompts/demo.txt"
+SOURCE_INTAKE_ID="demo"
+TARGET_PROJECT="$PROJECT"
+VERIFICATION_METADATA_PRESENT="true"
+VERIFICATION_METADATA_MISSING_FIELDS=""
+OWNER_ISSUE="$PROJECT/docs/issue.md"
+PRE_TESTS_PATH="$PROJECT/docs/pre-tests.md"
+VERIFICATION_ARTIFACT_DIR="$PROJECT/docs/reviews"
+REQUIRED_TEST_LANES_CSV="premerge-integration"
+REQUIRED_ACCEPTANCE_ITEM_IDS_CSV="ACC-1"
+MINIMUM_EVIDENCE_LEVEL="bounded verification evidence"
+TARGET_ENVIRONMENT="test-pre-merge worktree"
+CLOSEOUT_GATE="manager review"
+CLOSEOUT_GATE_COMMAND="./bin/test-lane premerge-integration -- ./bin/governance-check"
+CLOSEOUT_TARGET_LANE="develop"
+CLOSEOUT_PROMOTION_GATE="manager approval"
+CLOSEOUT_REQUIRES_ADEQUACY="true"
+CLOSEOUT_REVIEW_ARTIFACT_POLICY="write bounded review artifact"
+UPDATED_AT="2026-04-25T00:00:00Z"
+EOF
+
+cat >"$PROJECT/docs/system/workspace/scripts/start-lead-agent.sh" <<'EOF'
+#!/usr/bin/env bash
+echo stale-local-workspace
+EOF
+chmod +x "$PROJECT/docs/system/workspace/scripts/start-lead-agent.sh"
+
+OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    workspace_root_for_project "'"$PROJECT"'"
+  '
+)"
+
+[[ "$OUTPUT" == "$ROOT_DIR/docs/system/workspace" ]]
+
+echo "[PASS] launchable worker verification contract prefers active runtime workspace root"

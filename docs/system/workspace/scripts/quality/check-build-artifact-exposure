@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+log_info() { echo "[INFO] $*" >&2; }
+log_error() { echo "[ERROR] $*" >&2; }
+
+usage() {
+  cat <<'EOF'
+Usage:
+  check-build-artifact-exposure --project <abs_or_rel_path> [--output-dir <abs_or_rel_path>] [--allowlist <abs_or_rel_path>]
+EOF
+}
+
+abs_path() {
+  local path="$1"
+  if [[ "$path" = /* ]]; then
+    printf '%s\n' "$path"
+  else
+    printf '%s\n' "$(cd "$path" 2>/dev/null && pwd -P)"
+  fi
+}
+
+abs_path_allow_missing() {
+  local base="$1" path="$2"
+  if [[ "$path" = /* ]]; then
+    printf '%s\n' "$path"
+  else
+    printf '%s\n' "$base/$path"
+  fi
+}
+
+load_allowlist() {
+  local file="$1"
+  ALLOWLIST_PATTERNS=()
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    case "$line" in
+      ''|[[:space:]]*'#'*) continue ;;
+    esac
+    ALLOWLIST_PATTERNS+=("$line")
+  done < "$file"
+}
+
+path_is_forbidden() {
+  local rel="$1"
+  case "$rel" in
+    *.map|.env|.env.*|auth.json|secrets.json|credentials.json|.npmrc|.pypirc|id_rsa|id_ed25519|*.pem|*.key|*.p12|*.pfx|*.crt|*.cer|*.der|*.csr)
+      return 0
+      ;;
+  esac
+  return 1
+}
+
+path_is_allowlisted() {
+  local rel="$1" pattern
+  for pattern in "${ALLOWLIST_PATTERNS[@]:-}"; do
+    [[ "$rel" == $pattern ]] && return 0
+  done
+  return 1
+}
+
+main() {
+  local project="" output_dir="" allowlist_file="" failed=0 rel file
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$2"; shift 2 ;;
+      --output-dir) output_dir="$2"; shift 2 ;;
+      --allowlist) allowlist_file="$2"; shift 2 ;;
+      --help|-h) usage; exit 0 ;;
+      *) echo "[ERROR] unknown arg: $1" >&2; usage; exit 1 ;;
+    esac
+  done
+
+  [[ -n "$project" ]] || { echo "[ERROR] --project is required" >&2; usage; exit 1; }
+  project="$(abs_path "$project")"
+  [[ -n "$output_dir" ]] || output_dir="dist"
+  [[ -n "$allowlist_file" ]] || allowlist_file="docs/system/workspace/release-build-allowlist.txt"
+  output_dir="$(abs_path_allow_missing "$project" "$output_dir")"
+  allowlist_file="$(abs_path_allow_missing "$project" "$allowlist_file")"
+
+  if [[ ! -d "$output_dir" ]]; then
+    log_info "build artifact audit SKIP: missing $output_dir"
+    exit 0
+  fi
+
+  if [[ ! -f "$allowlist_file" ]]; then
+    log_error "build artifact audit failed: missing allowlist $allowlist_file"
+    exit 1
+  fi
+
+  load_allowlist "$allowlist_file"
+  if [[ "${#ALLOWLIST_PATTERNS[@]}" -eq 0 ]]; then
+    log_error "build artifact audit failed: empty allowlist $allowlist_file"
+    exit 1
+  fi
+
+  while IFS= read -r -d '' file; do
+    rel="${file#$output_dir/}"
+    if path_is_forbidden "$rel"; then
+      log_error "build artifact audit failed: forbidden output artifact $rel"
+      failed=1
+      continue
+    fi
+    if ! path_is_allowlisted "$rel"; then
+      log_error "build artifact audit failed: non-allowlisted output artifact $rel"
+      failed=1
+    fi
+  done < <(find "$output_dir" -type f -print0 | sort -z)
+
+  if [[ "$failed" -ne 0 ]]; then
+    exit 1
+  fi
+
+  log_info "build artifact audit PASS"
+}
+
+main "$@"

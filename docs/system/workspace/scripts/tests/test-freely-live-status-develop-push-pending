@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-live-status-develop-push.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+WT_ROOT="$TMP_DIR/repo-worktrees"
+REMOTE="$TMP_DIR/remote.git"
+
+mkdir -p "$REPO" "$WT_ROOT"
+git init -q -b develop "$REPO"
+git -C "$REPO" config user.name tester
+git -C "$REPO" config user.email tester@example.com
+
+mkdir -p "$REPO/docs" "$REPO/.freely/run"
+cat >"$REPO/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$REPO/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$REPO/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$REPO/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$REPO/.freely/config.env" <<EOF
+PROJECT_ROOT="$REPO"
+INTENT_FILE="$REPO/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$REPO/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+
+echo base >"$REPO/README.md"
+git -C "$REPO" add README.md
+git -C "$REPO" commit -q -m "init"
+
+git init -q --bare "$REMOTE"
+git -C "$REPO" remote add origin "$REMOTE"
+git -C "$REPO" push -q -u origin develop
+
+git -C "$REPO" worktree add -q -b feature/demo "$WT_ROOT/feature-demo" develop
+mkdir -p "$WT_ROOT/feature-demo/.freely/run"
+cat >"$WT_ROOT/feature-demo/.freely/config.env" <<EOF
+PROJECT_ROOT="$WT_ROOT/feature-demo"
+INTENT_FILE="$WT_ROOT/feature-demo/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$WT_ROOT/feature-demo/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+
+echo local >"$REPO/local.txt"
+git -C "$REPO" add local.txt
+git -C "$REPO" commit -q -m "local merge result"
+
+PENDING_OUTPUT="$(TZ="America/Los_Angeles" bash "$ROOT_DIR/bin/freely" live-status --project "$REPO")"
+printf '%s\n' "$PENDING_OUTPUT" | grep -q 'develop_push_followthrough_state: push_pending'
+printf '%s\n' "$PENDING_OUTPUT" | grep -q 'develop_push_followthrough_summary: ahead=1 '
+printf '%s\n' "$PENDING_OUTPUT" | grep -q 'develop_push_followthrough_defer_reason: none'
+printf '%s\n' "$PENDING_OUTPUT" | grep -q 'develop_push_followthrough_push_urgency: immediate'
+printf '%s\n' "$PENDING_OUTPUT" | grep -q 'develop_push_followthrough_resync_required: false'
+
+FEATURE_OUTPUT="$(TZ="America/Los_Angeles" bash "$ROOT_DIR/bin/freely" live-status --project "$WT_ROOT/feature-demo")"
+printf '%s\n' "$FEATURE_OUTPUT" | grep -q 'develop_push_followthrough_state: not_applicable'
+printf '%s\n' "$FEATURE_OUTPUT" | grep -q 'develop_push_followthrough_summary: branch_not_develop canonical_develop_state=push_pending canonical_develop_ahead=1 '
+printf '%s\n' "$FEATURE_OUTPUT" | grep -q 'develop_push_followthrough_push_urgency: none'
+printf '%s\n' "$FEATURE_OUTPUT" | grep -q 'develop_push_followthrough_resync_required: true'
+
+TZ="America/Los_Angeles" bash "$ROOT_DIR/bin/freely" develop-push defer --project "$REPO" --reason post_merge_acceptance --note "post-merge smoke" >/dev/null
+DEFERRED_OUTPUT="$(TZ="America/Los_Angeles" bash "$ROOT_DIR/bin/freely" live-status --project "$REPO")"
+printf '%s\n' "$DEFERRED_OUTPUT" | grep -q 'develop_push_followthrough_state: push_deferred'
+printf '%s\n' "$DEFERRED_OUTPUT" | grep -q 'develop_push_followthrough_defer_reason: post_merge_acceptance'
+printf '%s\n' "$DEFERRED_OUTPUT" | grep -Eq 'develop_push_followthrough_defer_updated_at: .*(PST|PDT)'
+printf '%s\n' "$DEFERRED_OUTPUT" | grep -q 'develop_push_followthrough_summary: ahead=1 '
+printf '%s\n' "$DEFERRED_OUTPUT" | grep -q 'develop_push_followthrough_push_urgency: deferred'
+printf '%s\n' "$DEFERRED_OUTPUT" | grep -q 'develop_push_followthrough_resync_required: false'
+
+DEFERRED_FEATURE_OUTPUT="$(TZ="America/Los_Angeles" bash "$ROOT_DIR/bin/freely" live-status --project "$WT_ROOT/feature-demo")"
+printf '%s\n' "$DEFERRED_FEATURE_OUTPUT" | grep -q 'develop_push_followthrough_summary: branch_not_develop canonical_develop_state=push_deferred canonical_develop_ahead=1 '
+printf '%s\n' "$DEFERRED_FEATURE_OUTPUT" | grep -q 'develop_push_followthrough_resync_required: true'
+
+echo "[PASS] freely live-status surfaces develop push followthrough and explicit defer windows"

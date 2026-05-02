@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-live-status-execution-boundary.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/repo"
+mkdir -p "$PROJECT/.freely/run" "$PROJECT/.codex" "$PROJECT/.githooks" "$PROJECT/docs/pre-brainstorms"
+git -C "$TMP_DIR" init -q "$PROJECT"
+git -C "$PROJECT" config core.hooksPath .githooks
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="high"
+AI_TOOL_ADAPTER="direct"
+AI_TOOL_ADAPTER_POLICY="direct"
+AI_CAPABILITY_CODEX_MODEL="gpt-5.4"
+AI_CAPABILITY_CODEX_SANDBOX="workspace-write"
+AI_CAPABILITY_CODEX_APPROVAL_POLICY="never"
+AI_CAPABILITY_CODEX_CWD_MODE="project-root"
+FREELY_ACTIVATION_CONSENT_STATUS="accepted"
+FREELY_ACTIVATION_CONSENT_RECORDED_AT="2026-04-01T00:00:00Z"
+FREELY_ACTIVATION_CONSENT_RECORDED_VIA="test"
+EOF
+
+cat >"$PROJECT/.codex/config.toml" <<'EOF'
+approval_policy = "never"
+sandbox_mode = "workspace-write"
+[sandbox_workspace_write]
+network_access = false
+EOF
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+LAST_SUPERVISOR_STATE="down"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="operator_stop"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2026-04-01T00:00:00Z"
+DESIRED_RUNTIME_STATE="stopped"
+EOF
+
+LIVE_OUTPUT="$(TZ="America/Los_Angeles" bash "$ROOT_DIR/bin/freely" live-status --project "$PROJECT")"
+
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'execution_boundary_audit_status: pass'
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'execution_boundary_audit_detail: aligned'
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'activation_consent_status: accepted'
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'activation_consent_recorded_at: 2026.03.31 17:00:00 PDT'
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'last_state_updated_at: 2026.03.31 17:00:00 PDT'
+
+echo "[PASS] freely live-status surfaces execution-boundary audit truth"

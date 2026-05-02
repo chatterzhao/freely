@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_HOME="$(mktemp -d /tmp/freely-ai-login-codex-apikey-direct.XXXXXX)"
+trap 'rm -rf "$TMP_HOME"' EXIT
+
+mkdir -p "$TMP_HOME/.codex"
+cat >"$TMP_HOME/.codex/auth.json" <<'EOF'
+{"OPENAI_API_KEY":"sk-before"}
+EOF
+cat >"$TMP_HOME/.codex/config.toml" <<'EOF'
+model = "gpt-5.4"
+
+[projects."/tmp/demo"]
+trust_level = "trusted"
+EOF
+
+HOME="$TMP_HOME" bash "$ROOT_DIR/bin/ai" --quiet --format json login codex apikey \
+  --name alt-provider \
+  --url https://alt.example.com/v1 \
+  --key sk-direct >"$TMP_HOME/login.json"
+
+python3 - <<'PY' "$TMP_HOME"
+import json
+import pathlib
+import sys
+import tomllib
+
+home = pathlib.Path(sys.argv[1])
+payload = json.loads((home / "login.json").read_text(encoding="utf-8"))
+assert payload["logged_in"] is True
+assert payload["slot"] == "apikey-alt-provider-1"
+assert payload["slot_kind"] == "apikey"
+assert payload["provider_id"] == "alt-provider"
+
+auth = json.loads((home / ".codex" / "auth.json").read_text(encoding="utf-8"))
+assert auth["OPENAI_API_KEY"] == "sk-direct"
+
+config_path = home / ".codex" / "config.toml"
+config = tomllib.loads(config_path.read_text(encoding="utf-8"))
+assert config["model"] == "gpt-5.4"
+assert config["model_provider"] == "alt-provider"
+assert config["preferred_auth_method"] == "apikey"
+assert config["projects"]["/tmp/demo"]["trust_level"] == "trusted"
+assert config["model_providers"]["alt-provider"]["name"] == "alt-provider"
+assert config["model_providers"]["alt-provider"]["base_url"] == "https://alt.example.com/v1"
+assert config["model_providers"]["alt-provider"]["wire_api"] == "responses"
+assert config["model_providers"]["alt-provider"]["requires_openai_auth"] is False
+
+backup_files = sorted((home / ".codex").glob("config.toml.backup-*"))
+assert backup_files, "expected config backup"
+backup = tomllib.loads(backup_files[0].read_text(encoding="utf-8"))
+assert backup["model"] == "gpt-5.4"
+assert backup["projects"]["/tmp/demo"]["trust_level"] == "trusted"
+
+auth_backup_files = sorted((home / ".codex").glob("auth.json.backup-*"))
+assert auth_backup_files, "expected auth backup"
+auth_backup = json.loads(auth_backup_files[0].read_text(encoding="utf-8"))
+assert auth_backup["OPENAI_API_KEY"] == "sk-before"
+
+manifest = json.loads((home / ".ai-auth" / "codex-apikey-alt-provider-1" / "manifest.json").read_text(encoding="utf-8"))
+assert manifest["slot_kind"] == "apikey"
+assert manifest["provider_id"] == "alt-provider"
+PY
+
+echo "[PASS] ai login codex apikey accepts direct provider arguments, preserves unrelated live config, and saves a bundled slot"

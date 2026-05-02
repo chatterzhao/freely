@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-load-config-auto-switch-migration.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/.freely" "$PROJECT/docs"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AUTO_SWITCH_SLOT="false"
+AUTO_SWITCH_TOOL="false"
+AI_FALLBACK_TOOLS=""
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+log_warn() { :; }
+
+load_config "$PROJECT"
+
+[[ "${AUTO_SWITCH_SLOT:-}" == "false" ]] || {
+  echo "[FAIL] expected load_config to preserve AUTO_SWITCH_SLOT=false" >&2
+  exit 1
+}
+[[ "${AUTO_SWITCH_TOOL:-}" == "false" ]] || {
+  echo "[FAIL] expected load_config to preserve AUTO_SWITCH_TOOL=false" >&2
+  exit 1
+}
+[[ -z "${AI_FALLBACK_TOOLS:-}" ]] || {
+  echo "[FAIL] expected load_config to preserve an empty AI_FALLBACK_TOOLS" >&2
+  echo "actual=${AI_FALLBACK_TOOLS:-}" >&2
+  exit 1
+}
+grep -q '^AUTO_SWITCH_SLOT="false"$' "$PROJECT/.freely/config.env" || {
+  echo "[FAIL] expected config to keep AUTO_SWITCH_SLOT=false" >&2
+  cat "$PROJECT/.freely/config.env" >&2
+  exit 1
+}
+grep -q '^AUTO_SWITCH_TOOL="false"$' "$PROJECT/.freely/config.env" || {
+  echo "[FAIL] expected config to keep AUTO_SWITCH_TOOL=false" >&2
+  cat "$PROJECT/.freely/config.env" >&2
+  exit 1
+}
+grep -q '^AI_FALLBACK_TOOLS=""$' "$PROJECT/.freely/config.env" || {
+  echo "[FAIL] expected config to keep AI_FALLBACK_TOOLS empty" >&2
+  cat "$PROJECT/.freely/config.env" >&2
+  exit 1
+}
+
+echo "[PASS] load_config preserves explicit auto-switch-off settings"

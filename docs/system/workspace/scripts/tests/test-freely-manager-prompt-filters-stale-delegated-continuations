@@ -1,0 +1,153 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-prompt-fresh-delegated.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260420-0000--sample" \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/.freely/intake/20260418-old" \
+  "$PROJECT/.freely/intake/20260420-new" \
+  "$PROJECT/.freely/intake/20260420-frontdoor"
+
+git init -q -b develop "$PROJECT"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/docs/milestones.md" <<'EOF'
+# Milestones
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260420-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260420-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260420-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+
+cat >"$PROJECT/.freely/run/manager-continuity-20260420-015128.md" <<'EOF'
+# Manager Continuity
+- continuity_id: `20260420-015128`
+EOF
+touch -t 202604200151.28 "$PROJECT/.freely/run/manager-continuity-20260420-015128.md"
+
+cat >"$PROJECT/.freely/intake/20260418-old/meta.env" <<'EOF'
+INTAKE_ID="20260418-old"
+CREATED_AT="2026-04-18T21:00:00Z"
+AUTHOR="human"
+CHANNEL="chat"
+STATUS="delegated"
+CLASSIFICATION="continuation"
+REACTION="followup"
+LINKED_ARTIFACT="pending://interruption-manager-delegation"
+DELEGATED_WORKTREE=""
+SESSION_REFS="[]"
+CLAIMED_BY="interruption-manager-agent"
+CLAIMED_AT="2026-04-18T21:00:01Z"
+ABSORPTION_TARGET="handoff://continuation"
+RESOLUTION_ARTIFACT="/tmp/old-resolution.md"
+EOF
+cat >"$PROJECT/.freely/intake/20260418-old/message.txt" <<'EOF'
+older delegated continuation should not reenter the current manager lane
+EOF
+
+cat >"$PROJECT/.freely/intake/20260420-new/meta.env" <<'EOF'
+INTAKE_ID="20260420-new"
+CREATED_AT="2026-04-20T08:52:00Z"
+AUTHOR="human"
+CHANNEL="chat"
+STATUS="delegated"
+CLASSIFICATION="continuation"
+REACTION="followup"
+LINKED_ARTIFACT="pending://interruption-manager-delegation"
+DELEGATED_WORKTREE=""
+SESSION_REFS="[]"
+CLAIMED_BY="interruption-manager-agent"
+CLAIMED_AT="2026-04-20T08:52:01Z"
+ABSORPTION_TARGET="handoff://continuation"
+RESOLUTION_ARTIFACT="/tmp/new-resolution.md"
+EOF
+cat >"$PROJECT/.freely/intake/20260420-new/message.txt" <<'EOF'
+fresh delegated continuation should remain in scope
+EOF
+
+cat >"$PROJECT/.freely/intake/20260420-frontdoor/meta.env" <<'EOF'
+INTAKE_ID="20260420-frontdoor"
+CREATED_AT="2026-04-20T08:53:00Z"
+AUTHOR="human"
+CHANNEL="chat"
+STATUS="new"
+CLASSIFICATION=""
+REACTION=""
+LINKED_ARTIFACT="pending://unclaimed"
+DELEGATED_WORKTREE=""
+SESSION_REFS="[]"
+CLAIMED_BY=""
+CLAIMED_AT=""
+ABSORPTION_TARGET=""
+RESOLUTION_ARTIFACT=""
+EOF
+cat >"$PROJECT/.freely/intake/20260420-frontdoor/message.txt" <<'EOF'
+fresh front-door intake should stay in the human queue
+EOF
+
+PROMPT_OUTPUT="$(
+  PROJECT_ROOT="$PROJECT" \
+  INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md" \
+  CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md" \
+  AI_TOOL="codex" \
+  AI_MODEL="gpt-5.4" \
+  AI_MODE="auto" \
+  AI_REASONING_EFFORT="medium" \
+  bash -lc '
+    source "$1"
+    build_prompt
+  ' _ "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+)"
+
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'Human chat intake queue:'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q '20260420-frontdoor'
+if printf '%s\n' "$PROMPT_OUTPUT" | grep -q '20260418-old'; then
+  echo "[FAIL] stale delegated continuation leaked into manager prompt" >&2
+  exit 1
+fi
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q '20260420-new'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'fresh delegated continuation should remain in scope'
+
+echo "[PASS] manager prompt keeps delegated continuation focus on items newer than current continuity and leaves delegated items out of the front-door queue"

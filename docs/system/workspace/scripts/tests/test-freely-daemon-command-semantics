@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-daemon-command-semantics.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+DAEMON_START_OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    resolve_project_or_fail() { printf "%s\n" "$1"; }
+    log_info() { :; }
+    launch_project_runtime_daemon_or_fail() { printf "daemon-start:%s\n" "$1"; }
+    main daemon start --project /tmp/freely-project
+  '
+)"
+[[ "$DAEMON_START_OUTPUT" == "daemon-start:/tmp/freely-project" ]]
+
+DAEMON_STOP_OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    resolve_project_or_fail() { printf "%s\n" "$1"; }
+    stop_project_runtime() { printf "stop:%s|reason:%s\n" "$1" "$2"; }
+    main daemon stop --project /tmp/freely-project
+  '
+)"
+[[ "$DAEMON_STOP_OUTPUT" == $'stop:/tmp/freely-project|reason:operator_daemon_stop\nproject: /tmp/freely-project\ndaemon_status: stopped' ]]
+
+DAEMON_STATUS_OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    resolve_project_or_fail() { printf "%s\n" "$1"; }
+    cmd_live_status() { printf "live:%s\n" "$2"; }
+    main daemon status --project /tmp/freely-project
+  '
+)"
+[[ "$DAEMON_STATUS_OUTPUT" == $'control_plane: daemon\nlive:/tmp/freely-project' ]]
+
+DAEMON_LOGS_OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    project="'"$TMP_DIR"'/project"
+    mkdir -p "$project/.freely/logs"
+    printf "event=supervisor_started\n" >"$project/.freely/logs/runtime-events.log"
+    resolve_project_or_fail() { printf "%s\n" "$1"; }
+    main daemon logs --project "$project"
+  '
+)"
+[[ "$DAEMON_LOGS_OUTPUT" == "event=supervisor_started" ]]
+
+echo "[PASS] freely daemon command semantics route to explicit daemon control-plane handlers"

@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-runtime-auth-filter.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+FALSE_LOG="$TMP_DIR/false-positive.log"
+TRUE_LOG="$TMP_DIR/true-positive.log"
+
+cat >"$FALSE_LOG" <<'EOF'
+## Prompt Material
+- docs mention `402 Payment Required`
+- docs mention `subscription_expired`
+- docs mention `Please log in`
+2026-04-24T11:34:32.401071Z ERROR apply_patch verification failed: Failed to read file to update /tmp/example.env: No such file or directory (os error 2)
+EOF
+
+cat >"$TRUE_LOG" <<'EOF'
+2026-04-06T13:49:57Z ERROR codex auth failed: 401 unauthorized
+EOF
+
+bash -lc '
+  set -euo pipefail
+  source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+  if log_has_auth_failure "'"$FALSE_LOG"'"; then
+    echo "[FAIL] prompt/document text should not be classified as an auth failure" >&2
+    exit 1
+  fi
+  log_has_auth_failure "'"$TRUE_LOG"'"
+'
+
+echo "[PASS] runtime auth-failure classification ignores prompt/document text and only consumes runtime error signals"

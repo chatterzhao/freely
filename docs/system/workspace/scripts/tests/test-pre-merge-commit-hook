@@ -1,0 +1,512 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-pre-merge-commit-hook.XXXXXX)"
+PIDS=()
+cleanup() {
+  local pid
+  for pid in "${PIDS[@]:-}"; do
+    kill "$pid" 2>/dev/null || true
+    wait "$pid" 2>/dev/null || true
+  done
+  rm -rf "$TMP_DIR"
+}
+trap cleanup EXIT
+
+REPO="$TMP_DIR/repo"
+mkdir -p \
+  "$REPO/bin" \
+  "$REPO/.githooks" \
+  "$REPO/docs/system/workspace/hooks" \
+  "$REPO/docs/system/workspace/scripts/quality" \
+  "$REPO/docs/system/workspace/scripts/runtime" \
+  "$REPO/docs/system/workspace/skills/watchdog-control-plane/scripts"
+cd "$REPO"
+
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+git config core.hooksPath .githooks
+
+cp "$ROOT_DIR/.githooks/pre-merge-commit" "$REPO/.githooks/pre-merge-commit"
+cp "$ROOT_DIR/bin/governance-merge-gate" "$REPO/bin/governance-merge-gate"
+cp "$ROOT_DIR/bin/pretests-gate" "$REPO/bin/pretests-gate"
+cp "$ROOT_DIR/bin/governance-promotion-gate" "$REPO/bin/governance-promotion-gate"
+cp "$ROOT_DIR/docs/system/workspace/hooks/pre-merge-commit.sh" "$REPO/docs/system/workspace/hooks/pre-merge-commit.sh"
+cp "$ROOT_DIR/docs/system/workspace/scripts/quality/governance-merge-gate" "$REPO/docs/system/workspace/scripts/quality/governance-merge-gate"
+cp "$ROOT_DIR/docs/system/workspace/scripts/quality/pretests-gate" "$REPO/docs/system/workspace/scripts/quality/pretests-gate"
+cp "$ROOT_DIR/docs/system/workspace/scripts/quality/governance-promotion-gate" "$REPO/docs/system/workspace/scripts/quality/governance-promotion-gate"
+cp "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely" "$REPO/docs/system/workspace/scripts/runtime/freely"
+cp "$ROOT_DIR/docs/system/workspace/scripts/runtime/session-evidence-resolver.sh" "$REPO/docs/system/workspace/scripts/runtime/session-evidence-resolver.sh"
+cp "$ROOT_DIR/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" "$REPO/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
+cp "$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh" "$REPO/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+chmod +x \
+  "$REPO/.githooks/pre-merge-commit" \
+  "$REPO/bin/governance-merge-gate" \
+  "$REPO/bin/pretests-gate" \
+  "$REPO/bin/governance-promotion-gate" \
+  "$REPO/docs/system/workspace/hooks/pre-merge-commit.sh" \
+  "$REPO/docs/system/workspace/scripts/quality/governance-merge-gate" \
+  "$REPO/docs/system/workspace/scripts/quality/pretests-gate" \
+  "$REPO/docs/system/workspace/scripts/quality/governance-promotion-gate" \
+  "$REPO/docs/system/workspace/scripts/runtime/freely" \
+  "$REPO/docs/system/workspace/scripts/runtime/session-evidence-resolver.sh" \
+  "$REPO/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" \
+  "$REPO/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+
+write_guarded_state() {
+  local target="$1"
+  local source_branch="$2"
+  local bypass_mode="${3:-forbidden}"
+  cat >"$REPO/.git/freely-guarded-merge-state" <<EOF
+target_branch=$target
+source_branch=$source_branch
+bypass_mode=$bypass_mode
+EOF
+}
+
+mkdir -p "$REPO/docs"
+cat > "$REPO/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-sample
+
+- status: active
+
+### candidate_issues
+1. `C-20260327-2205-A`
+
+### committed_issues
+1. `I-20260327-2205-A`
+   - issue_path: `docs/epics/sample/story/issues/sample.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+
+### completed_issues
+EOF
+
+mkdir -p "$REPO/docs/pre-brainstorms/sample"
+cat > "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2205-A
+- status: proposed
+- milestone: `M-sample`
+- next_action: keep researching the same candidate
+- revisit_trigger: new evidence arrives
+EOF
+
+mkdir -p "$REPO/docs/epics/sample/story/issues"
+cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
+# Issue: sample
+
+- issue_id: `I-20260327-2205-A`
+- phase_state: `in_dev`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+- pre_tests_path: `docs/epics/sample/story/pre-tests.md`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+EOF
+mkdir -p "$REPO/docs/epics/sample/story"
+cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+# Pre-Tests: sample
+
+## Unit
+- acceptance target: `Keep the unit contract explicit even when no unit executable surface is needed.`
+- testing layer: `unit`
+- target environment: `feature/runtime-only-change`
+- required evidence: `documented unit boundary or lawful replacement evidence`
+- blocker taxonomy: `definition_missing`
+1. Record the unit surface that must remain stable.
+
+## Integration
+- acceptance target: `Run the guarded premerge integration path before promotion.`
+- testing layer: `integration`
+- target environment: `test-pre-merge-verification-batch`
+- required evidence: `premerge verification artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the premerge integration path before promotion.
+
+## End-to-End
+- acceptance target: `State why end-to-end is intentionally covered by a more realistic surface.`
+- testing layer: `end_to_end`
+- target environment: `test-pre-merge-verification-batch`
+- required evidence: `replacement evidence recorded in canonical pre-tests`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `covered_by_more_realistic_required_surface`
+- not_applicable_explanation: `This fixture keeps the hook focused on integration adequacy.`
+- replacement_evidence: `Integration acceptance item integration-sample plus the guarded premerge review artifact.`
+
+## Real-Environment
+- real_environment_status: `pass`
+- real_environment_reason: `This guarded premerge fixture does not require an additional real-environment test before merge; protected followthrough remains a separate acceptance surface.`
+
+## Acceptance Items
+
+### Integration command is executed
+- id: `integration-sample`
+- requirement: `The guarded promote must prove the integration command ran.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `Run the guarded premerge integration path before promotion.`
+- case_design: `Merge the authoritative test-pre-merge batch into develop and require an artifact-backed pass item under the owner verification directory before guarded completion succeeds.`
+- evidence_level: `integration`
+- status: `pending`
+- artifact_ref: `pending://integration-sample`
+EOF
+
+echo base > README.md
+git add \
+  README.md \
+  .githooks/pre-merge-commit \
+  bin/governance-merge-gate \
+  bin/pretests-gate \
+  bin/governance-promotion-gate \
+  docs/milestones.md \
+  docs/pre-brainstorms/sample/candidates.md \
+  docs/epics/sample/story/issues/sample.md \
+  docs/epics/sample/story/pre-tests.md \
+  docs/system/workspace/hooks/pre-merge-commit.sh \
+  docs/system/workspace/scripts/quality/governance-merge-gate \
+  docs/system/workspace/scripts/quality/pretests-gate \
+  docs/system/workspace/scripts/quality/governance-promotion-gate \
+  docs/system/workspace/scripts/runtime/freely \
+  docs/system/workspace/scripts/runtime/session-evidence-resolver.sh \
+  docs/system/workspace/scripts/runtime/network-proxy-resolver.sh \
+  docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh
+git commit -q -m "init"
+
+git checkout -q -b feature/runtime-only-change
+mkdir -p docs/system/workspace/scripts/runtime
+cat > docs/system/workspace/scripts/runtime/freely <<'EOF'
+#!/usr/bin/env bash
+echo runtime
+EOF
+chmod +x docs/system/workspace/scripts/runtime/freely
+git add docs/system/workspace/scripts/runtime/freely
+git commit -q -m "runtime-only change"
+
+git checkout -q develop
+if git merge --no-ff feature/runtime-only-change >"$TMP_DIR/stdout" 2>"$TMP_DIR/stderr"; then
+  echo "[FAIL] pre-merge-commit hook should block raw develop merge without guarded handshake" >&2
+  exit 1
+fi
+
+cat "$TMP_DIR/stdout" "$TMP_DIR/stderr" >"$TMP_DIR/raw-merge-output"
+grep -q "Raw develop merges are not an allowed entrypoint" "$TMP_DIR/raw-merge-output"
+grep -q "./bin/merge-guarded" "$TMP_DIR/raw-merge-output"
+git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1
+git merge --abort >/dev/null 2>&1
+
+git merge --no-commit --no-ff feature/runtime-only-change >/dev/null 2>&1
+write_guarded_state develop feature/runtime-only-change
+if FREELY_GUARDED_MERGE_COMPLETION=1 .githooks/pre-merge-commit >"$TMP_DIR/guarded-governance-stdout" 2>"$TMP_DIR/guarded-governance-stderr"; then
+  echo "[FAIL] guarded develop merge should still fail governance materialization without candidate evidence" >&2
+  exit 1
+fi
+cat "$TMP_DIR/guarded-governance-stdout" "$TMP_DIR/guarded-governance-stderr" >"$TMP_DIR/guarded-governance-output"
+grep -q "Merge blocked: develop-bound governance materialization gate failed" "$TMP_DIR/guarded-governance-output"
+grep -q "no candidate-driven lifecycle evidence" "$TMP_DIR/guarded-governance-output"
+git merge --abort >/dev/null 2>&1
+rm -f "$REPO/.git/freely-guarded-merge-state"
+
+git checkout -q -b feature/promotion-owner
+mkdir -p docs/epics/sample/story/code-reviews src
+cat > docs/pre-brainstorms/sample/candidates.md <<'EOF'
+# Candidates
+
+### C-20260327-2205-A
+- status: promoted
+- milestone: `M-sample`
+- promoted_issue_id: `I-20260327-2205-A`
+- promoted_issue_path: `docs/epics/sample/story/issues/sample.md`
+EOF
+cat > docs/epics/sample/story/issues/sample.md <<'EOF'
+# Issue: sample
+
+- issue_id: `I-20260327-2205-A`
+- phase_state: `in_verification`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+EOF
+cat > docs/epics/sample/story/code-reviews/r-sample.md <<'EOF'
+# Review: sample
+
+- issue_id: `I-20260327-2205-A`
+
+## Implementation Decision Note
+
+- decision: `Keep the develop promotion bound to a single active owner.`
+- why_this: `Promotion followthrough is stateful and duplicate owners stomp each other at merge time.`
+- alternatives_considered: `Relying on a clean worktree alone would not distinguish duplicate promotion intents.`
+- boundary_non_goals: `This does not arbitrate unrelated worktrees or non-develop merges.`
+- residual_risk: `Dormant prompts can still exist, but only active workers block phase-1 promotion replay.`
+EOF
+echo "console.log('promotion owner');" > src/sample.js
+git add docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/epics/sample/story/code-reviews/r-sample.md src/sample.js
+git commit -q -m "promotion owner payload"
+
+git checkout -q develop
+SOURCE_WT="$TMP_DIR/source-worker"
+CONFLICT_WT="$TMP_DIR/conflict-worker"
+git worktree add -q "$SOURCE_WT" feature/promotion-owner
+git worktree add -q -b feature/promotion-conflict "$CONFLICT_WT" develop
+
+mkdir -p "$SOURCE_WT/.freely/run" "$CONFLICT_WT/.freely/run"
+cat > "$SOURCE_WT/.freely/run/prompt-20260402-080000.txt" <<EOF
+Worktree:
+- \`$SOURCE_WT\`
+Branch:
+- \`feature/promotion-owner\`
+- intent_kind: promotion
+- intent_target: \`I-20260327-2205-A -> develop\`
+EOF
+cat > "$CONFLICT_WT/.freely/run/prompt-20260402-080100.txt" <<EOF
+Worktree:
+- \`$CONFLICT_WT\`
+Branch:
+- \`feature/promotion-conflict\`
+- intent_kind: promotion
+- intent_target: \`I-20260327-2205-A -> develop\`
+EOF
+
+(
+  cd "$SOURCE_WT"
+  exec bash -lc 'exec -a "codex exec" sleep 300'
+) &
+SOURCE_PID=$!
+PIDS+=("$SOURCE_PID")
+printf '%s\n' "$SOURCE_PID" > "$SOURCE_WT/.freely/run/ai.pid"
+
+(
+  cd "$CONFLICT_WT"
+  exec bash -lc 'exec -a "codex exec" sleep 300'
+) &
+CONFLICT_PID=$!
+PIDS+=("$CONFLICT_PID")
+printf '%s\n' "$CONFLICT_PID" > "$CONFLICT_WT/.freely/run/ai.pid"
+
+set +e
+git merge --no-commit --no-ff feature/promotion-owner >/dev/null 2>&1
+merge_prepare_rc=$?
+set -e
+if [[ "$merge_prepare_rc" -ne 0 ]] && ! git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1; then
+  echo "[FAIL] could not prepare duplicate-ownership merge for pre-merge-commit hook" >&2
+  exit 1
+fi
+write_guarded_state develop feature/promotion-owner
+if FREELY_GUARDED_MERGE_COMPLETION=1 .githooks/pre-merge-commit >"$TMP_DIR/promotion-stdout" 2>"$TMP_DIR/promotion-stderr"; then
+  echo "[FAIL] pre-merge-commit hook should block duplicate develop promotion ownership" >&2
+  exit 1
+fi
+
+cat "$TMP_DIR/promotion-stdout" "$TMP_DIR/promotion-stderr" >"$TMP_DIR/promotion-output"
+grep -q "promotion ownership gate failed" "$TMP_DIR/promotion-output" || {
+  cat "$TMP_DIR/promotion-output" >&2
+  exit 1
+}
+grep -q "duplicate develop promotion ownership is already active" "$TMP_DIR/promotion-output" || {
+  cat "$TMP_DIR/promotion-output" >&2
+  exit 1
+}
+git merge --abort >/dev/null 2>&1
+rm -f "$REPO/.git/freely-guarded-merge-state"
+
+kill "$CONFLICT_PID" 2>/dev/null || true
+wait "$CONFLICT_PID" 2>/dev/null || true
+rm -f "$CONFLICT_WT/.freely/run/ai.pid"
+
+git merge --no-commit --no-ff feature/promotion-owner >/dev/null 2>&1
+write_guarded_state develop feature/promotion-owner
+FREELY_GUARDED_MERGE_COMPLETION=1 .githooks/pre-merge-commit >"$TMP_DIR/promotion-success-stdout" 2>"$TMP_DIR/promotion-success-stderr"
+FREELY_GUARDED_MERGE_COMPLETION=1 git commit -q --no-edit
+git merge-base --is-ancestor feature/promotion-owner develop
+rm -f "$REPO/.git/freely-guarded-merge-state"
+
+git checkout -q -b test-pre-merge-verification-batch develop
+mkdir -p docs/epics/sample/story/code-reviews docs/progress/sample src
+cat > docs/pre-brainstorms/sample/candidates.md <<'EOF'
+# Candidates
+
+### C-20260327-2205-A
+- status: promoted
+- milestone: `M-sample`
+- promoted_issue_id: `I-20260327-2205-A`
+- promoted_issue_path: `docs/epics/sample/story/issues/sample.md`
+EOF
+cat > docs/epics/sample/story/issues/sample.md <<'EOF'
+# Issue: sample
+
+- issue_id: `I-20260327-2205-A`
+- phase_state: `in_verification`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+- pre_tests_path: `docs/epics/sample/story/pre-tests.md`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+EOF
+cat > docs/progress/sample/p-sample.md <<'EOF'
+# Progress: sample
+
+- issue_id: `I-20260327-2205-A`
+- issue_path: `docs/epics/sample/story/issues/sample.md`
+- phase_state: `in_verification`
+EOF
+cat > docs/epics/sample/story/tasks.md <<'EOF'
+# Tasks: sample
+
+- [x] Keep the owner lifecycle binding visible during guarded promote.
+- [x] Record the guarded premerge closeout artifact and adequacy evidence.
+EOF
+cat > docs/epics/sample/story/code-reviews/r-premerge.md <<'EOF'
+# Review: sample
+
+- issue_id: `I-20260327-2205-A`
+
+## Implementation Decision Note
+
+- decision: `Require owner pre-tests adequacy before test-pre-merge batches can promote into develop.`
+- why_this: `Promotion should fail with actionable verification diagnostics instead of relying on manual review.`
+- alternatives_considered: `Trust the batch name alone.`
+- boundary_non_goals: `This fixture does not replace the existing owner/materialization gate.`
+- residual_risk: `Post-merge followthrough still needs its own closeout lane.`
+EOF
+git add docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/epics/sample/story/tasks.md docs/progress/sample/p-sample.md docs/epics/sample/story/code-reviews/r-premerge.md
+git commit -q -m "premerge governance closeout payload"
+
+git checkout -q develop
+git merge --no-commit --no-ff test-pre-merge-verification-batch >/dev/null 2>&1
+write_guarded_state develop test-pre-merge-verification-batch
+if FREELY_GUARDED_MERGE_COMPLETION=1 .githooks/pre-merge-commit >"$TMP_DIR/premerge-adequacy-stdout" 2>"$TMP_DIR/premerge-adequacy-stderr"; then
+  echo "[FAIL] pre-merge-commit hook should block docs-only test-pre-merge closeout promote when owner pre-tests remain pending" >&2
+  exit 1
+fi
+cat "$TMP_DIR/premerge-adequacy-stdout" "$TMP_DIR/premerge-adequacy-stderr" >"$TMP_DIR/premerge-adequacy-output"
+grep -q "owner issue pre-tests are not adequate" "$TMP_DIR/premerge-adequacy-output"
+grep -q "\[execution_missing\]" "$TMP_DIR/premerge-adequacy-output"
+git merge --abort >/dev/null 2>&1
+rm -f "$REPO/.git/freely-guarded-merge-state"
+
+git checkout -q test-pre-merge-verification-batch
+cat > docs/epics/sample/story/pre-tests.md <<'EOF'
+# Pre-Tests: sample
+
+## Unit
+- acceptance target: `Keep the unit contract explicit even when no unit executable surface is needed.`
+- testing layer: `unit`
+- target environment: `feature/promotion-owner`
+- required evidence: `documented unit boundary or lawful replacement evidence`
+- blocker taxonomy: `definition_missing`
+1. Record the unit surface that must remain stable.
+
+## Integration
+- acceptance target: `Run the guarded premerge integration path before promotion.`
+- testing layer: `integration`
+- target environment: `test-pre-merge-verification-batch`
+- required evidence: `premerge verification artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the premerge integration path before promotion.
+
+## End-to-End
+- acceptance target: `State why end-to-end is intentionally covered by a more realistic surface.`
+- testing layer: `end_to_end`
+- target environment: `test-pre-merge-verification-batch`
+- required evidence: `replacement evidence recorded in canonical pre-tests`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `covered_by_more_realistic_required_surface`
+- not_applicable_explanation: `This fixture keeps the hook focused on integration adequacy.`
+- replacement_evidence: `Integration acceptance item integration-sample plus the guarded premerge review artifact.`
+
+## Real-Environment
+- real_environment_status: `pass`
+- real_environment_reason: `This guarded premerge fixture does not require an additional real-environment test before merge; protected followthrough remains a separate acceptance surface.`
+
+## Acceptance Items
+
+### Integration command is executed
+- id: `integration-sample`
+- requirement: `The guarded promote must prove the integration command ran.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `Run the guarded premerge integration path before promotion.`
+- case_design: `Guarded develop completion from the test-pre-merge batch requires a staged review artifact-backed pass item.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/sample/story/code-reviews/r-premerge.md`
+EOF
+git add docs/epics/sample/story/pre-tests.md
+git commit -q -m "complete premerge evidence"
+
+git checkout -q develop
+git merge --no-commit --no-ff test-pre-merge-verification-batch >/dev/null 2>&1
+write_guarded_state develop test-pre-merge-verification-batch
+FREELY_GUARDED_MERGE_COMPLETION=1 .githooks/pre-merge-commit >"$TMP_DIR/premerge-adequacy-success-stdout" 2>"$TMP_DIR/premerge-adequacy-success-stderr"
+FREELY_GUARDED_MERGE_COMPLETION=1 git commit -q --no-edit
+git merge-base --is-ancestor test-pre-merge-verification-batch develop
+rm -f "$REPO/.git/freely-guarded-merge-state"
+
+git checkout -q test-pre-merge-verification-batch
+cat > docs/epics/sample/story/pre-tests.md <<'EOF'
+# Pre-Tests: sample
+
+## Unit
+- acceptance target: `Keep the unit contract explicit even when no unit executable surface is needed.`
+- testing layer: `unit`
+- target environment: `feature/promotion-owner`
+- required evidence: `documented unit boundary or lawful replacement evidence`
+- blocker taxonomy: `definition_missing`
+1. Record the unit surface that must remain stable.
+
+## Integration
+- acceptance target: `Run the guarded premerge integration path before promotion.`
+- testing layer: `integration`
+- target environment: `test-pre-merge-verification-batch`
+- required evidence: `premerge verification artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the premerge integration path before promotion.
+
+## End-to-End
+- acceptance target: `State why end-to-end is intentionally covered by a more realistic surface.`
+- testing layer: `end_to_end`
+- target environment: `test-pre-merge-verification-batch`
+- required evidence: `replacement evidence recorded in canonical pre-tests`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `covered_by_more_realistic_required_surface`
+- not_applicable_explanation: `This fixture keeps the hook focused on integration adequacy.`
+
+## Real-Environment
+- real_environment_status: `pass`
+- real_environment_reason: `This guarded premerge fixture does not require an additional real-environment test before merge; protected followthrough remains a separate acceptance surface.`
+
+## Acceptance Items
+
+### Integration command is executed
+- id: `integration-sample`
+- requirement: `The guarded promote must prove the integration command ran.`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `Run the guarded premerge integration path before promotion.`
+- case_design: `Guarded develop completion from the test-pre-merge batch requires a staged review artifact-backed pass item.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/sample/story/code-reviews/r-premerge.md`
+EOF
+git add docs/epics/sample/story/pre-tests.md
+git commit -q -m "drop replacement evidence"
+set +e
+./bin/pretests-gate --project "$REPO" --issue docs/epics/sample/story/issues/sample.md >"$TMP_DIR/pretests-standalone-stdout" 2>"$TMP_DIR/pretests-standalone-stderr"
+pretests_cmd_rc=$?
+set -e
+if [[ "$pretests_cmd_rc" -eq 0 ]]; then
+  echo "[FAIL] pretests-gate should reject not_applicable sections without replacement evidence" >&2
+  exit 1
+fi
+cat "$TMP_DIR/pretests-standalone-stdout" "$TMP_DIR/pretests-standalone-stderr" >"$TMP_DIR/pretests-standalone-output"
+grep -q "\[verification_state_missing\]" "$TMP_DIR/pretests-standalone-output"
+grep -q "missing replacement_evidence" "$TMP_DIR/pretests-standalone-output"
+
+echo "[PASS] pre-merge-commit hook enforces guarded develop entrypoint, governance materialization, duplicate promotion ownership, and test-pre-merge adequacy"

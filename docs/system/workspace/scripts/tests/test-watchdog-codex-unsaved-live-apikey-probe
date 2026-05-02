@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-watchdog-unsaved-live-apikey.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+HOME_DIR="$TMP_DIR/home"
+MOCK_BIN="$TMP_DIR/mock-bin"
+CODEX_LOG="$TMP_DIR/codex.log"
+mkdir -p \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/bin" \
+  "$PROJECT/docs/system/workspace/skills/watchdog-control-plane/scripts" \
+  "$PROJECT/docs/system/workspace/scripts/runtime" \
+  "$HOME_DIR/.codex" \
+  "$MOCK_BIN"
+
+ln -sf \
+  "$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh" \
+  "$PROJECT/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+ln -sf \
+  "$ROOT_DIR/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" \
+  "$PROJECT/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
+
+cat >"$HOME_DIR/.codex/auth.json" <<'EOF'
+{"OPENAI_API_KEY":"sk-live"}
+EOF
+
+cat >"$HOME_DIR/.codex/config.toml" <<'EOF'
+[projects."/tmp/demo"]
+trust_level = "trusted"
+EOF
+
+cat >"$PROJECT/bin/ai" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+if [[ "${1:-}" == "--quiet" && "${2:-}" == "--format" && "${3:-}" == "json" && "${4:-}" == "whoami" && "${5:-}" == "codex" ]]; then
+  echo '{"tool":"codex","slot":null,"slot_kind":"apikey","provider_id":null,"auth_email":null,"account":null}'
+  exit 0
+fi
+if [[ "${1:-}" == "--quiet" && "${2:-}" == "--format" && "${3:-}" == "json" && "${4:-}" == "list" ]]; then
+  echo '{"accounts":[]}'
+  exit 0
+fi
+exit 97
+EOF
+chmod +x "$PROJECT/bin/ai"
+
+cat >"$MOCK_BIN/codex" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+printf '%s\n' "$*" >>"${CODEX_LOG:?}"
+if [[ "${1:-}" == "exec" ]]; then
+  cat >/dev/null || true
+  printf 'hi\n'
+  exit 0
+fi
+exit 98
+EOF
+chmod +x "$MOCK_BIN/codex"
+
+HOME="$HOME_DIR" \
+PATH="$MOCK_BIN:$PATH" \
+PROJECT_ROOT="$PROJECT" \
+CODEX_LOG="$CODEX_LOG" \
+bash -lc '
+  set -euo pipefail
+  log_info() { :; }
+  log_warn() { :; }
+  log_error() { :; }
+  ai_cli_bin_for_project() { printf "%s\n" "'"$PROJECT"'/bin/ai"; }
+  write_manager_bootstrap_handoff() { :; }
+  source "'"$PROJECT"'/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+  probe_all_codex_slots_and_update_cooldown() { printf "none\n"; }
+  ensure_codex_slot_ready_for_manager "'"$PROJECT"'"
+'
+
+grep -q '^exec ' "$CODEX_LOG"
+
+echo "[PASS] watchdog probes the current live apikey auth even when no saved codex slot matches it"

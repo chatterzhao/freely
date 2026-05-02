@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-live-status-canonical-intent.XXXXXX)"
+TMP_DIR_REAL="$(cd "$TMP_DIR" && pwd -P)"
+
+cleanup() {
+  set +e
+  kill "${SUP_PID:-}" "${AI_PID:-}" 2>/dev/null || true
+  wait "${SUP_PID:-}" 2>/dev/null || true
+  wait "${AI_PID:-}" 2>/dev/null || true
+  rm -rf "$TMP_DIR_REAL"
+}
+
+trap cleanup EXIT
+
+PROJECT="$TMP_DIR/repo"
+WORKER="$TMP_DIR/repo-worktrees/feature-worker"
+PROJECT_REAL="$TMP_DIR_REAL/repo"
+WORKER_REAL="$TMP_DIR_REAL/repo-worktrees/feature-worker"
+
+mkdir -p "$PROJECT/.freely/run" "$PROJECT/docs"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+git init -q "$PROJECT"
+git -C "$PROJECT" config user.email "test@example.com"
+git -C "$PROJECT" config user.name "Test User"
+cat >"$PROJECT/README.md" <<'EOF'
+# repo
+EOF
+git -C "$PROJECT" add README.md
+git -C "$PROJECT" commit -q -m "init"
+git -C "$PROJECT" branch -m develop
+git -C "$PROJECT" worktree add -q -b feature/worker "$WORKER"
+mkdir -p "$WORKER/.freely/run" "$WORKER/docs"
+cat >"$WORKER/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$WORKER/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$WORKER/.freely/config.env" <<EOF
+PROJECT_ROOT="$WORKER"
+INTENT_FILE="$WORKER/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$WORKER/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+cat >"$WORKER/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="up"
+LAST_EXIT_REASON="none"
+LAST_ROLE_HINT="worker"
+LAST_STATE_UPDATED_AT="2026-04-02T15:20:00Z"
+EOF
+cat >"$WORKER/.freely/run/prompt-20260402-152000.txt" <<EOF
+Dispatch metadata:
+- intent_kind: edit
+- intent_target: \`$WORKER\`
+
+Worktree:
+- \`$WORKER\`
+
+Branch:
+- \`feature/worker\`
+EOF
+
+bash -c "exec -a 'runtime/freely start --project $WORKER_REAL' sleep 30" >/dev/null 2>&1 &
+SUP_PID=$!
+bash -c "exec -a 'codex exec -C $WORKER_REAL -m gpt-5.4' sleep 30" >/dev/null 2>&1 &
+AI_PID=$!
+printf '%s' "$SUP_PID" >"$WORKER/.freely/run/supervisor.pid"
+printf '%s' "$AI_PID" >"$WORKER/.freely/run/ai.pid"
+
+OUTPUT="$(bash "$ROOT_DIR/bin/freely" live-status --project "$WORKER")"
+
+grep -q "prompt_intent_target: $WORKER_REAL" <<<"$OUTPUT"
+grep -q "prompt_intent_target_raw: $WORKER" <<<"$OUTPUT"
+
+echo "[PASS] live-status surfaces canonical intent target while preserving raw prompt target"

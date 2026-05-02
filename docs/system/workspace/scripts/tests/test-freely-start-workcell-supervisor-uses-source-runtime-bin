@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-start-workcell-supervisor-source-bin.XXXXXX)"
+SOURCE_PROJECT="$TMP_DIR/source"
+TARGET_PROJECT="$TMP_DIR/target"
+
+mkdir -p "$SOURCE_PROJECT/bin" "$TARGET_PROJECT/bin" "$TARGET_PROJECT/.freely/logs"
+
+cat >"$SOURCE_PROJECT/bin/freely" <<'EOF'
+#!/usr/bin/env bash
+printf 'source_bin %s\n' "$*" 
+EOF
+chmod +x "$SOURCE_PROJECT/bin/freely"
+
+cat >"$TARGET_PROJECT/bin/freely" <<'EOF'
+#!/usr/bin/env bash
+printf 'target_bin %s\n' "$*"
+EOF
+chmod +x "$TARGET_PROJECT/bin/freely"
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+sync_tooling_before_workcell_launch() {
+  return 0
+}
+
+start_workcell_supervisor_async "$TARGET_PROJECT" "$SOURCE_PROJECT"
+
+RECOVERY_LOG="$TARGET_PROJECT/.freely/logs/manager-runtime-recovery.log"
+for _ in $(seq 1 40); do
+  [[ -f "$RECOVERY_LOG" ]] && grep -q 'source_bin start --project' "$RECOVERY_LOG" && break
+  sleep 0.1
+done
+
+grep -q 'source_bin start --project' "$RECOVERY_LOG" || {
+  echo "[FAIL] expected manager-owned launch to use the source project runtime bin" >&2
+  exit 1
+}
+
+if grep -q 'target_bin' "$RECOVERY_LOG"; then
+  echo "[FAIL] target worktree runtime bin should not be used for manager-owned worker launch" >&2
+  exit 1
+fi
+
+echo "[PASS] start_workcell_supervisor_async uses the source runtime bin for manager-owned launches"

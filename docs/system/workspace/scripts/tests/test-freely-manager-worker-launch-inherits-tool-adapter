@@ -1,0 +1,150 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-worker-inherits-adapter.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+WORKER_WT="$TMP_DIR/worker-wt"
+WORKER_WT_REAL=""
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260322-0000--sample" "$PROJECT/.githooks"
+
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name "Freely Test"
+git -C "$PROJECT" config user.email "freely@example.com"
+git -C "$PROJECT" config core.hooksPath .githooks
+
+cat >"$PROJECT/.githooks/pre-commit" <<'EOF'
+#!/usr/bin/env bash
+exit 0
+EOF
+chmod +x "$PROJECT/.githooks/pre-commit"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260322-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260322-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260322-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m "init"
+git -C "$PROJECT" worktree add -q -b feature/test-worker "$WORKER_WT" develop
+WORKER_WT_REAL="$(cd "$WORKER_WT" && pwd -P)"
+
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs" "$WORKER_WT/.freely/run" "$WORKER_WT/.freely/logs"
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_TOOL_ADAPTER="acp"
+AI_TOOL_ADAPTER_POLICY="acp"
+FREELY_ACTIVATION_CONSENT_STATUS="accepted"
+EOF
+
+PROMPT_FILE="$PROJECT/.freely/run/worker-prompts/20260401-190001-worker-inherit-adapter-codex.txt"
+cat >"$PROMPT_FILE" <<EOF
+你现在运行在 Freely 的 worker 工位，不是主管工位。
+
+你的 worktree：
+- \`$WORKER_WT\`
+- branch: \`feature/test-worker\`
+
+继续处理 delegated continuation。
+EOF
+
+CONT_FILE="$PROJECT/.freely/run/manager-continuity-20260401-190001.md"
+cat >"$CONT_FILE" <<EOF
+# Manager Continuity
+
+- delegated worker prompt:
+  - $PROMPT_FILE
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+load_config "$PROJECT"
+
+START_LOG="$TMP_DIR/started.log"
+manager_supervisor_pid_for_project() {
+  return 0
+}
+runtime_ai_pid_hint_for_project() {
+  return 0
+}
+start_workcell_supervisor_async() {
+  echo "$1" >>"$START_LOG"
+}
+
+LAUNCHED="$(manager_runtime_launch_workers_from_latest_handoff "$PROJECT")"
+[[ "$LAUNCHED" == "1" ]] || {
+  echo "[FAIL] expected one launched worker, got $LAUNCHED" >&2
+  exit 1
+}
+
+CONFIG_FILE="$WORKER_WT/.freely/config.env"
+test -f "$CONFIG_FILE" || {
+  echo "[FAIL] expected worker config to be initialized on launch" >&2
+  exit 1
+}
+grep -q '^AI_TOOL="codex"$' "$CONFIG_FILE" || {
+  echo "[FAIL] expected worker init to inherit the manager tool" >&2
+  cat "$CONFIG_FILE" >&2
+  exit 1
+}
+grep -q "^PROJECT_ROOT=\"$WORKER_WT_REAL\"$" "$CONFIG_FILE" || {
+  echo "[FAIL] expected worker init to materialize a full worker project config" >&2
+  cat "$CONFIG_FILE" >&2
+  exit 1
+}
+grep -q '^AI_TOOL_ADAPTER="acp"$' "$CONFIG_FILE" || {
+  echo "[FAIL] expected worker init to inherit the manager adapter truth" >&2
+  cat "$CONFIG_FILE" >&2
+  exit 1
+}
+grep -q '^AI_TOOL_ADAPTER_POLICY="acp"$' "$CONFIG_FILE" || {
+  echo "[FAIL] expected worker init to inherit the manager adapter policy truth" >&2
+  cat "$CONFIG_FILE" >&2
+  exit 1
+}
+grep -q '^FREELY_ACTIVATION_CONSENT_STATUS="accepted"$' "$CONFIG_FILE" || {
+  echo "[FAIL] expected worker init to inherit accepted default autonomy consent via init" >&2
+  cat "$CONFIG_FILE" >&2
+  exit 1
+}
+grep -q "$WORKER_WT" "$START_LOG" || {
+  echo "[FAIL] expected worker supervisor launch to target the worktree" >&2
+  cat "$START_LOG" >&2
+  exit 1
+}
+
+echo "[PASS] manager worker launch initializes missing worker config with inherited tool adapter and policy truth"

@@ -1,0 +1,145 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-network-proxy-oauth-inheritance.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+HOME_DIR="$TMP_DIR/home"
+MOCK_BIN="$TMP_DIR/mock-bin"
+CURL_LOG="$TMP_DIR/curl.log"
+mkdir -p \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/bin" \
+  "$HOME_DIR/.ai-auth/codex-slow@example-com-1" \
+  "$HOME_DIR/.ai-auth/codex-fast@example-com-2" \
+  "$HOME_DIR/.codex" \
+  "$MOCK_BIN"
+
+cat >"$PROJECT/.freely/config.env" <<'EOF'
+FREELY_NETWORK_PROXY_MODE="explicit"
+FREELY_NETWORK_PROXY_URL="socks5://proxy.example:1080"
+FREELY_NO_PROXY="localhost,127.0.0.1"
+EOF
+
+cat >"$PROJECT/bin/ai" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+case " $* " in
+  *" list "*)
+    printf '{"codex-slow@example-com-1":{},"codex-fast@example-com-2":{}}\n'
+    ;;
+  *)
+    printf '{}\n'
+    ;;
+esac
+EOF
+chmod +x "$PROJECT/bin/ai"
+
+cat >"$MOCK_BIN/curl" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+log_file="${CURL_LOG:?}"
+output_file=""
+auth_header=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --connect-timeout|--max-time)
+      shift 2
+      ;;
+    -o)
+      output_file="$2"
+      shift 2
+      ;;
+    -H)
+      if [[ "$2" == Authorization:\ Bearer* ]]; then
+        auth_header="$2"
+      fi
+      shift 2
+      ;;
+    -w)
+      shift 2
+      ;;
+    -s|-S|-sS)
+      shift
+      ;;
+    *)
+      shift
+      ;;
+  esac
+done
+
+token="${auth_header#Authorization: Bearer }"
+printf '%s|%s|%s|%s|%s\n' "${ALL_PROXY:-}" "${HTTP_PROXY:-}" "${HTTPS_PROXY:-}" "${NO_PROXY:-}" "$token" >>"$log_file"
+
+case "$token" in
+  token-slow)
+    printf '{"rate_limits":{"primary":{"used_percent":100.0,"resets_at":4102358400},"secondary":{"used_percent":0.0,"resets_at":0}}}\n' >"$output_file"
+    printf '200'
+    ;;
+  token-fast)
+    printf '{"rate_limits":{"primary":{"used_percent":25.0,"resets_at":0},"secondary":{"used_percent":0.0,"resets_at":0}}}\n' >"$output_file"
+    printf '200'
+    ;;
+  *)
+    printf '{"detail":"unexpected"}\n' >"$output_file"
+    printf '500'
+    exit 7
+    ;;
+esac
+EOF
+chmod +x "$MOCK_BIN/curl"
+
+make_auth_json() {
+  local email="$1" target="$2" access_token="${3:-token-$1}"
+  local payload
+  payload="$(python3 - <<'PY' "$email"
+import base64
+import json
+import sys
+
+payload = base64.urlsafe_b64encode(json.dumps({"email": sys.argv[1]}).encode()).decode().rstrip("=")
+print(payload)
+PY
+)"
+  printf '{"tokens":{"id_token":"x.%s.y","access_token":"%s"}}\n' "$payload" "$access_token" >"$target"
+}
+
+make_auth_json "slow@example.com" "$HOME_DIR/.ai-auth/codex-slow@example-com-1/auth.json" "token-slow"
+make_auth_json "fast@example.com" "$HOME_DIR/.ai-auth/codex-fast@example-com-2/auth.json" "token-fast"
+make_auth_json "old@example.com" "$HOME_DIR/.codex/auth.json" "token-old"
+
+before_sha="$(shasum -a 256 "$HOME_DIR/.codex/auth.json" | awk '{print $1}')"
+
+(
+  export HOME="$HOME_DIR"
+  export PATH="$MOCK_BIN:$PROJECT/bin:$PATH"
+  export CURL_LOG="$CURL_LOG"
+  # shellcheck disable=SC1090
+  source "$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+  log_warn() { :; }
+  log_error() { :; }
+  run_dir_for_project() { printf '%s\n' "$1/.freely/run"; }
+  codex_slot_cooldown_file() { printf '%s\n' "$1/.freely/run/codex-slot-cooldowns.tsv"; }
+  ai_cli_bin_for_project() { printf '%s\n' "$PROJECT/bin/ai"; }
+  codex_oauth_sweep_all_slots "$PROJECT" >"$TMP_DIR/sweep.out"
+)
+
+after_sha="$(shasum -a 256 "$HOME_DIR/.codex/auth.json" | awk '{print $1}')"
+
+grep -qx 'usable:fast@example-com-2' "$TMP_DIR/sweep.out"
+grep -Fq 'socks5://proxy.example:1080|socks5://proxy.example:1080|socks5://proxy.example:1080|localhost,127.0.0.1|token-slow' "$CURL_LOG"
+grep -Fq 'socks5://proxy.example:1080|socks5://proxy.example:1080|socks5://proxy.example:1080|localhost,127.0.0.1|token-fast' "$CURL_LOG"
+if grep -q '127.0.0.1:7890' "$CURL_LOG"; then
+  echo "[FAIL] OAuth path must not inject localhost proxy defaults" >&2
+  exit 1
+fi
+[[ "$before_sha" == "$after_sha" ]]
+[[ -f "$PROJECT/.freely/run/codex-availability-cache.tsv" ]]
+grep -Eq '^slow@example-com-1[[:space:]]+4102358400' "$PROJECT/.freely/run/codex-slot-cooldowns.tsv"
+
+echo "[PASS] freely OAuth sweep inherits project-scoped proxy config and leaves active auth untouched"

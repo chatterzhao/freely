@@ -1,0 +1,152 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-semantic-loop-status.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+WT_ROOT="$TMP_DIR/repo-worktrees"
+WORKER="$WT_ROOT/feature-loop-worker"
+QUIET_SIBLING="$WT_ROOT/feature-missing-run-dir"
+LIVE_STDERR="$TMP_DIR/live.stderr"
+FLEET_STDERR="$TMP_DIR/fleet.stderr"
+LIVE_ACTIVE_STDERR="$TMP_DIR/live-active.stderr"
+
+mkdir -p "$REPO" "$WT_ROOT"
+cd "$REPO"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add README.md
+git commit -q -m "init"
+git branch feature/loop-worker
+git worktree add "$WORKER" feature/loop-worker >/dev/null
+git branch feature/missing-run-dir
+git worktree add "$QUIET_SIBLING" feature/missing-run-dir >/dev/null
+
+mkdir -p "$REPO/.freely/run/worker-prompts" "$REPO/docs"
+mkdir -p "$WORKER/.freely/run"
+cat >"$REPO/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$REPO/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$REPO/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$REPO/.freely/config.env" <<EOF
+PROJECT_ROOT="$REPO"
+INTENT_FILE="$REPO/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$REPO/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+cat >"$REPO/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="up"
+LAST_EXIT_REASON="none"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2026-03-27T18:02:00Z"
+EOF
+
+PROMPT="$REPO/.freely/run/worker-prompts/20260327-180000-worker-loop-codex.txt"
+cat >"$PROMPT" <<EOF
+Worktree:
+- \`$WORKER\`
+Branch:
+- \`feature/loop-worker\`
+dispatch_priority: \`P0\`
+parallel_safe: \`true\`
+write_scope: \`$WORKER\`
+EOF
+
+for ts in 180000 180100 180200; do
+  cat >"$REPO/.freely/run/manager-continuity-20260327-$ts.md" <<EOF
+# Manager Continuity
+- timestamp: \`2026-03-27T${ts:0:2}:${ts:2:2}:${ts:4:2}Z\`
+
+## Governance Gates
+- route_kind: \`manager_patrol\`
+- restart_point: \`continuation\`
+- ownership: \`manager\`
+- next_action: \`consume retained worker prompt\`
+
+## Queue
+- lane: \`dispatchable\`
+- prompt_path: \`$PROMPT\`
+EOF
+done
+touch -t 202603270001.00 "$REPO/.freely/run/manager-continuity-20260327-180000.md"
+touch -t 202603270002.00 "$REPO/.freely/run/manager-continuity-20260327-180100.md"
+touch -t 202603270003.00 "$REPO/.freely/run/manager-continuity-20260327-180200.md"
+
+cat >"$REPO/.freely/run/manager-worker-launch-state.env" <<EOF
+LAST_MANAGER_CONTINUITY_GENERATED="$REPO/.freely/run/manager-continuity-20260327-180200.md"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED="$PROMPT"
+LAST_MANAGER_CONTINUITY_CONSUMED="$REPO/.freely/run/manager-continuity-20260327-180000.md"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED=""
+LAUNCHED_WORKER_PROMPTS=""
+QUEUED_WORKER_PROMPTS=""
+MAX_PARALLEL_WORKERS="unbounded"
+ACTIVE_RUNNING_WORKER_COUNT="0"
+AVAILABLE_NEW_WORKER_SLOTS="unbounded"
+UPDATED_AT="2026-03-27T18:02:00Z"
+EOF
+
+bash "$ROOT_DIR/bin/freely" live-status --project "$REPO" >"$TMP_DIR/live.stdout" 2>"$LIVE_STDERR"
+bash "$ROOT_DIR/bin/freely" fleet-status --project "$REPO" >"$TMP_DIR/fleet.stdout" 2>"$FLEET_STDERR"
+LIVE_OUTPUT="$(cat "$TMP_DIR/live.stdout")"
+FLEET_OUTPUT="$(cat "$TMP_DIR/fleet.stdout")"
+
+if [[ -s "$LIVE_STDERR" || -s "$FLEET_STDERR" ]]; then
+  echo "[FAIL] semantic-loop status surfaces should stay quiet when a sibling worktree lacks .freely/run" >&2
+  sed -n '1,80p' "$LIVE_STDERR" >&2
+  sed -n '1,80p' "$FLEET_STDERR" >&2
+  exit 1
+fi
+
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'semantic_loop_signal_reason: manager_continuity_rewrite_without_state_advance'
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'semantic_loop_signal_summary: repeats=3 latest='
+printf '%s\n' "$FLEET_OUTPUT" | grep -q 'loop=manager_continuity_rewrite_without_state_advance repeats=3'
+
+perl -0pi -e 's/ACTIVE_RUNNING_WORKER_COUNT="0"/ACTIVE_RUNNING_WORKER_COUNT="1"/; s/AVAILABLE_NEW_WORKER_SLOTS="unbounded"/AVAILABLE_NEW_WORKER_SLOTS="0"/' "$REPO/.freely/run/manager-worker-launch-state.env"
+
+bash -c "exec -a 'runtime/freely start --project $WORKER' sleep 30" >/dev/null 2>&1 &
+WORKER_SUP_PID=$!
+bash -c "exec -a 'codex exec -C $WORKER -m gpt-5.4' sleep 30" >/dev/null 2>&1 &
+WORKER_AI_PID=$!
+trap 'kill "$WORKER_SUP_PID" "$WORKER_AI_PID" 2>/dev/null || true; rm -rf "$TMP_DIR"' EXIT
+printf '%s' "$WORKER_SUP_PID" >"$WORKER/.freely/run/supervisor.pid"
+printf '%s' "$WORKER_AI_PID" >"$WORKER/.freely/run/ai.pid"
+
+LIVE_OUTPUT_ACTIVE=""
+for _ in 1 2 3 4 5; do
+  : >"$LIVE_ACTIVE_STDERR"
+  bash "$ROOT_DIR/bin/freely" live-status --project "$REPO" >"$TMP_DIR/live-active.stdout" 2>"$LIVE_ACTIVE_STDERR"
+  LIVE_OUTPUT_ACTIVE="$(cat "$TMP_DIR/live-active.stdout")"
+  if [[ -s "$LIVE_ACTIVE_STDERR" ]]; then
+    echo "[FAIL] active-worker semantic-loop status should not emit stderr" >&2
+    sed -n '1,80p' "$LIVE_ACTIVE_STDERR" >&2
+    exit 1
+  fi
+  if printf '%s\n' "$LIVE_OUTPUT_ACTIVE" | grep -q 'semantic_loop_signal_reason: unavailable'; then
+    break
+  fi
+  sleep 1
+done
+if ! printf '%s\n' "$LIVE_OUTPUT_ACTIVE" | grep -q 'semantic_loop_signal_reason: unavailable'; then
+  echo "[FAIL] semantic loop signal should clear when a worker is already running" >&2
+  exit 1
+fi
+
+kill "$WORKER_SUP_PID" "$WORKER_AI_PID" 2>/dev/null || true
+wait "$WORKER_SUP_PID" 2>/dev/null || true
+wait "$WORKER_AI_PID" 2>/dev/null || true
+
+echo "[PASS] live-status and fleet-status surface conservative manager semantic-loop suspicion without flagging active worker execution"

@@ -1,0 +1,174 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-latest-manager-continuity.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260322-0000--sample" "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs"
+
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name "Freely Test"
+git -C "$PROJECT" config user.email "freely@example.com"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260322-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260322-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260322-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m "init"
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+NEW_PROMPT="$PROJECT/.freely/run/worker-prompts/20260322-0445-worker-runtime-linkage-verify-codex.txt"
+QUEUED_PROMPT="$PROJECT/.freely/run/worker-prompts/20260322-0445-worker-runtime-linkage-queued-codex.txt"
+FROZEN_PROMPT="$PROJECT/.freely/run/worker-prompts/20260322-0445-worker-runtime-linkage-frozen-codex.txt"
+cat >"$NEW_PROMPT" <<EOF
+你现在运行在 Freely 的 worker 工位，不是主管工位。
+
+你的 worktree：
+- \`$PROJECT\`
+- branch: \`develop\`
+
+验证最新 continuity 消费。
+EOF
+cat >"$QUEUED_PROMPT" <<EOF
+你现在运行在 Freely 的 worker 工位，不是主管工位。
+
+你的 worktree：
+- \`$PROJECT\`
+- branch: \`develop\`
+
+验证排队 prompt 可见性。
+EOF
+cat >"$FROZEN_PROMPT" <<EOF
+你现在运行在 Freely 的 worker 工位，不是主管工位。
+
+你的 worktree：
+- \`$PROJECT\`
+- branch: \`develop\`
+
+验证冻结 prompt 不进入 launchable set。
+EOF
+
+NEW_CONT="$PROJECT/.freely/run/manager-continuity-20260322-0445.md"
+cat >"$NEW_CONT" <<EOF
+# Manager Continuity
+
+## Worker Prompts
+- $NEW_PROMPT
+- queue:
+  - $QUEUED_PROMPT
+- frozen_queue:
+  - $FROZEN_PROMPT
+EOF
+
+cat >"$PROJECT/.freely/run/manager-worker-launch-state.env" <<EOF
+LAST_MANAGER_CONTINUITY_GENERATED="$PROJECT/.freely/run/manager-continuity-20260322-0400.md"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED="$PROJECT/.freely/run/worker-prompts/20260322-0400-worker-runtime-linkage-verify-codex.txt"
+LAST_MANAGER_CONTINUITY_CONSUMED="$PROJECT/.freely/run/manager-continuity-20260322-0400.md"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED="$PROJECT/.freely/run/worker-prompts/20260322-0400-worker-runtime-linkage-verify-codex.txt"
+LAUNCHED_WORKER_PROMPTS="$PROJECT/.freely/run/worker-prompts/20260322-0400-worker-runtime-linkage-verify-codex.txt"
+UPDATED_AT="2026-03-22T04:00:00Z"
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+load_config "$PROJECT"
+
+RECOVER_LOG="$TMP_DIR/recover.log"
+RESTART_LOG="$TMP_DIR/restart.log"
+manager_runtime_recover_workers_if_needed() {
+  echo "$1" >>"$RECOVER_LOG"
+  write_manager_worker_launch_state "$1" "$NEW_CONT" "$NEW_PROMPT,$QUEUED_PROMPT" "$NEW_CONT" "$NEW_PROMPT,$QUEUED_PROMPT"
+}
+valid_supervisor_pid_for_project() {
+  [[ "$2" == "12345" ]]
+}
+valid_ai_pid_for_project() {
+  return 1
+}
+valid_interruption_dispatcher_pid_for_project() {
+  return 1
+}
+discover_supervisor_pid() {
+  return 0
+}
+manager_ai_pid_for_project() {
+  return 0
+}
+codex_current_account() {
+  return 0
+}
+ensure_codex_slot_ready_for_manager() {
+  return 0
+}
+restart_manager_supervisor_preserving_handoff() {
+  local project="$1"
+  echo "$project" >>"$RESTART_LOG"
+  printf '12345\n' >"$project/.freely/run/supervisor.pid"
+  manager_runtime_recover_workers_if_needed "$project"
+}
+launch_manager_supervisor() {
+  local project="$1"
+  printf '12345\n' >"$project/.freely/run/supervisor.pid"
+}
+
+mkdir -p "$PROJECT/.freely/run"
+printf '12345\n' >"$PROJECT/.freely/run/supervisor.pid"
+
+ensure_manager_once "$PROJECT" >/dev/null
+
+grep -q "^$PROJECT$" "$RECOVER_LOG"
+grep -q "^$PROJECT$" "$RESTART_LOG"
+BASELINE="$(cmd_baseline_status --project "$PROJECT")"
+LIVE="$(cmd_live_status --project "$PROJECT")"
+printf '%s\n' "$BASELINE" | grep -q "latest_manager_continuity_generated: $NEW_CONT"
+printf '%s\n' "$BASELINE" | grep -q "latest_manager_continuity_consumed: $NEW_CONT"
+printf '%s\n' "$BASELINE" | grep -q "latest_manager_worker_prompts_generated: .*20260322-0445-worker-runtime-linkage-verify-codex.txt"
+printf '%s\n' "$BASELINE" | grep -q "latest_manager_worker_prompts_generated: .*20260322-0445-worker-runtime-linkage-queued-codex.txt"
+printf '%s\n' "$BASELINE" | grep -q "latest_manager_worker_prompts_consumed: .*20260322-0445-worker-runtime-linkage-verify-codex.txt"
+printf '%s\n' "$BASELINE" | grep -q "latest_manager_worker_prompts_consumed: .*20260322-0445-worker-runtime-linkage-queued-codex.txt"
+printf '%s\n' "$LIVE" | grep -q "latest_manager_continuity_generated: $NEW_CONT"
+printf '%s\n' "$LIVE" | grep -q "latest_manager_continuity_consumed: $NEW_CONT"
+printf '%s\n' "$LIVE" | grep -q "latest_manager_worker_prompts_generated: .*20260322-0445-worker-runtime-linkage-verify-codex.txt"
+printf '%s\n' "$LIVE" | grep -q "latest_manager_worker_prompts_generated: .*20260322-0445-worker-runtime-linkage-queued-codex.txt"
+printf '%s\n' "$LIVE" | grep -q "latest_manager_worker_prompts_consumed: .*20260322-0445-worker-runtime-linkage-verify-codex.txt"
+printf '%s\n' "$LIVE" | grep -q "latest_manager_worker_prompts_consumed: .*20260322-0445-worker-runtime-linkage-queued-codex.txt"
+
+echo "[PASS] ensure-manager consumes current-format worker prompts across the watchdog recovery gate"

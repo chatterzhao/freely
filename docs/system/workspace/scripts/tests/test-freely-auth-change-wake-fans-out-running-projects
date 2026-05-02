@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-auth-change-wake.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+HOME_DIR="$TMP_DIR/home"
+PROJECT_A="$TMP_DIR/project-a"
+PROJECT_B="$TMP_DIR/project-b"
+PROJECT_C="$TMP_DIR/project-c"
+mkdir -p "$HOME_DIR" "$PROJECT_A/.freely/run" "$PROJECT_B/.freely/run" "$PROJECT_C/.freely/run"
+
+git init -q -b develop "$PROJECT_A"
+git init -q -b develop "$PROJECT_B"
+git init -q -b develop "$PROJECT_C"
+
+cat >"$PROJECT_A/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT_A"
+INTENT_FILE="$PROJECT_A/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT_A/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+cat >"$PROJECT_B/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT_B"
+INTENT_FILE="$PROJECT_B/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT_B/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+cat >"$PROJECT_C/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT_C"
+INTENT_FILE="$PROJECT_C/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT_C/docs/CONSTITUTION.md"
+AI_TOOL="cc"
+AI_MODEL=""
+AI_MODE="auto"
+EOF
+
+cat >"$PROJECT_A/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="down"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="primary_rate_limit_exhausted"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2026-03-28T00:00:00Z"
+EOF
+
+cat >"$PROJECT_B/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="stopped"
+LAST_SUPERVISOR_STATE="down"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="operator_stop"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2026-03-28T00:00:00Z"
+EOF
+
+cat >"$PROJECT_C/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="down"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="auth_failure"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2026-03-28T00:00:00Z"
+EOF
+
+mkdir -p "$HOME_DIR/.freely"
+cat >"$HOME_DIR/.freely/projects.tsv" <<EOF
+$PROJECT_A	2026-03-28T00:00:00Z
+$PROJECT_B	2026-03-28T00:00:01Z
+$PROJECT_C	2026-03-28T00:00:02Z
+EOF
+
+WAKE_LOG="$TMP_DIR/wake.log"
+
+HOME="$HOME_DIR" bash -lc '
+  set -euo pipefail
+  source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+  cat >"'"$PROJECT_A"'/.freely/run/codex-availability-state.env" <<EOF
+AVAILABILITY_PHASE="all_unavailable"
+BLOCKED_REASON="all_slots_unavailable"
+PREVIOUS_SLOT="slot@example-com-1"
+ACTIVE_SLOT="slot@example-com-1"
+SAVED_SLOTS_FINGERPRINT="abc"
+WAKE_TRIGGER=""
+EARLIEST_SLOT_HINT="slot@example-com-2"
+EARLIEST_RESET_HINT="9999999999"
+EARLIEST_REPROBE_NEXT_AT="9999999999"
+EARLIEST_REPROBE_ATTEMPTS="3"
+EARLIEST_REPROBE_MAX_ATTEMPTS="5"
+LAST_PROBE_AT="2026-03-28T00:00:00Z"
+EOF
+  ensure_manager_once() {
+    printf "%s|force=%s|state_exists=%s\n" "$1" "${FREELY_FORCE_WATCHDOG_REPROBE:-0}" "$(test -f "$1/.freely/run/codex-availability-state.env" && printf yes || printf no)" >>"'"$WAKE_LOG"'"
+  }
+  wake_registered_projects_for_auth_change "codex" "slot@example-com-1" "login_success" >/dev/null
+'
+
+grep -q "^$PROJECT_A|force=1|state_exists=no$" "$WAKE_LOG"
+if grep -q "^$PROJECT_B\$" "$WAKE_LOG"; then
+  echo "[FAIL] stopped project should not be woken by auth-change fan-out" >&2
+  exit 1
+fi
+if grep -q "^$PROJECT_C\$" "$WAKE_LOG"; then
+  echo "[FAIL] non-codex project should not be woken by codex auth-change fan-out" >&2
+  exit 1
+fi
+
+grep -q 'event=auth_change tool=codex' "$HOME_DIR/.freely/auth-change-events.log"
+grep -q 'slot=slot@example-com-1' "$HOME_DIR/.freely/auth-change-events.log"
+
+echo "[PASS] auth-change wake fans out only to registered manager projects that still desire running codex runtime"

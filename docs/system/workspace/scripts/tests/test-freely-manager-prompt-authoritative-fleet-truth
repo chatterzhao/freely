@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-prompt-fleet-truth.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+WT_ROOT="$TMP_DIR/project-worktrees"
+ACTIVE_WT="$WT_ROOT/feature-active"
+RETIRED_WT="$WT_ROOT/feature-retired"
+
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260325-0000--sample" \
+  "$PROJECT/.freely/run" \
+  "$WT_ROOT"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/.gitignore" <<'EOF'
+.freely/
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260325-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260325-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260325-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+git -C "$PROJECT" init -q -b develop
+git -C "$PROJECT" config user.name freely-test
+git -C "$PROJECT" config user.email freely-test@example.com
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m "init"
+
+git -C "$PROJECT" worktree add -b feature/active "$ACTIVE_WT" develop >/dev/null
+
+cat >"$PROJECT/.freely/run/manager-continuity-20260325-000100.md" <<EOF
+# Manager Continuity
+
+## Fleet Inventory
+- path: \`$PROJECT\`
+  - ownership: \`manager\`
+- path: \`$RETIRED_WT\`
+  - ownership: \`cleanup_queue\`
+EOF
+
+PROMPT_OUTPUT="$(
+  PROJECT_ROOT="$PROJECT" \
+  INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md" \
+  CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md" \
+  AI_TOOL="codex" \
+  AI_MODEL="gpt-5.4" \
+  AI_MODE="auto" \
+  AI_REASONING_EFFORT="medium" \
+    bash -lc '
+      source "$1"
+      build_prompt
+    ' _ "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+)"
+
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q '项目级工位真相：'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'authoritative_source: `git worktree list --porcelain`'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'latest_generated_manager_continuity_stale: `true`'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q '## Current Worktree Inventory'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q "$PROJECT"
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q "$ACTIVE_WT"
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q '## Stale Runtime Refs'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q "$RETIRED_WT"
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'rebuild fleet inventory / queue / cleanup sections from the current worktree inventory'
+if printf '%s\n' "$PROMPT_OUTPUT" | grep -q "missing_worktree: \`$PROJECT\`"; then
+  echo "[FAIL] current project path was misclassified as stale due to path alias drift" >&2
+  exit 1
+fi
+
+if printf '%s\n' "$PROMPT_OUTPUT" | grep -A3 '## Current Worktree Inventory' | grep -q "$RETIRED_WT"; then
+  echo "[FAIL] retired worktree leaked into authoritative current worktree inventory" >&2
+  exit 1
+fi
+
+echo "[PASS] manager prompt includes authoritative fleet truth and stale continuity warning"

@@ -1,0 +1,590 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-governance-protected-merge-receipt.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+make_repo() {
+  local repo="$1"
+  mkdir -p "$repo/bin" "$repo/docs/system/workspace/scripts/quality" "$repo/docs/system/workspace/hooks"
+  cd "$repo"
+
+  cp "$ROOT_DIR/bin/governance-check" "$repo/bin/governance-check"
+  cp "$ROOT_DIR/docs/system/workspace/scripts/quality/governance-check" "$repo/docs/system/workspace/scripts/quality/governance-check"
+  chmod +x "$repo/bin/governance-check" "$repo/docs/system/workspace/scripts/quality/governance-check"
+
+  mkdir -p "$repo/docs/system/workspace/skills/doc-ibm-execution/references"
+  mkdir -p "$repo/docs/system/workspace/skills/doc-ibm-execution"
+  mkdir -p "$repo/docs/system/workspace/skills/doc-pre-brainstorm-execution"
+  mkdir -p "$repo/docs/system/workspace/skills/dev-loop-execution"
+  mkdir -p "$repo/docs/system/workspace/skills/auto-loop-orchestrator"
+  mkdir -p "$repo/docs/system/workspace/skills"
+  mkdir -p "$repo/docs/system/workspace/agents"
+  mkdir -p "$repo/docs/pre-brainstorms/20260402-1111--sample-receipt"
+  mkdir -p "$repo/docs/epics/sample/issues"
+
+  cat > "$repo/AGENTS.md" <<'EOF'
+# Agent entry
+EOF
+  cat > "$repo/docs/PROJECT_INTENT.md" <<'EOF'
+# Project Intent
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/LAWS.md" <<'EOF'
+# Laws
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/system/workspace/three-loop-capability-lifecycle.md" <<'EOF'
+# Three Loop Capability Lifecycle
+EOF
+  cat > "$repo/docs/system/workspace/hooks/README.md" <<'EOF'
+# Workspace Hooks
+EOF
+  cat > "$repo/docs/system/workspace/hooks/protected-branch-breakglass-receipts.md" <<'EOF'
+# Protected Branch Break-Glass Receipts
+
+- audit_effective_date: `2099-01-01`
+- source_policy_effective_date: `2099-01-01`
+EOF
+  cat > "$repo/docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md" <<'EOF'
+# Protected Branch Merge Receipt Backfills
+
+- audit_effective_date: `2099-01-01`
+- source_policy_effective_date: `2099-01-01`
+EOF
+  cat > "$repo/docs/system/workspace/scripts/README.md" <<'EOF'
+# Scripts
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/system/workspace/skills/README.md" <<'EOF'
+# Skills
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/system/workspace/agents/lead-agent.md" <<'EOF'
+# Lead Agent
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/system/workspace/agents/manager-agent.md" <<'EOF'
+# Manager Agent
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/system/workspace/agents/worker-agent.md" <<'EOF'
+# Worker Agent
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md" <<'EOF'
+# Skill
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/system/workspace/skills/doc-pre-brainstorm-execution/SKILL.md" <<'EOF'
+# Skill
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/system/workspace/skills/doc-ibm-execution/SKILL.md" <<'EOF'
+# Skill
+See docs/system/workspace/three-loop-capability-lifecycle.md
+references/prd-quality-bar.md
+pre-tests.md` 和 `tasks.md` 必须从 `prd.md` 自然派生
+EOF
+  cat > "$repo/docs/system/workspace/skills/dev-loop-execution/SKILL.md" <<'EOF'
+# Skill
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md" <<'EOF'
+# PRD Quality Bar
+## Minimum structure
+## Bar for `done_ibm`
+EOF
+  cat > "$repo/docs/system/workspace/skills/doc-ibm-execution/references/ibm-completion-gate.md" <<'EOF'
+# IBM Completion Gate
+prd-quality-bar.md
+EOF
+  cat > "$repo/docs/system/workspace/skills/doc-ibm-execution/references/issue-materialization-checklist.md" <<'EOF'
+# Issue Materialization Checklist
+prd-quality-bar.md
+EOF
+  cat > "$repo/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+  cat > "$repo/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# Convergence
+EOF
+  cat > "$repo/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260402-1111--sample-receipt
+
+- 20260402-1111--sample-receipt
+  - brainstorms: docs/pre-brainstorms/20260402-1111--sample-receipt/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260402-1111--sample-receipt/candidates.md
+
+## 收敛
+EOF
+  cat > "$repo/docs/pre-brainstorms/20260402-1111--sample-receipt/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+  cat > "$repo/docs/pre-brainstorms/20260402-1111--sample-receipt/candidates.md" <<'EOF'
+# Candidates
+- id: C-20260402-1111-A
+- candidate_format_version: v2
+- title: sample
+- status: promoted
+- decision_reason: sample
+- acceptance_criteria:
+  - protected branch receipt exists
+- promotion_gate:
+  - issue is materialized
+- open_questions: []
+- acceptance_reviews:
+  - reviewer: codex-mini
+  - mode: subagent
+  - summary: good enough
+  - verdict: pass
+- promoted_issue_path: docs/epics/sample/issues/sample.md
+- milestone: M-20260402-1111-sample
+- session_refs: []
+EOF
+  cat > "$repo/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-20260402-1111-sample
+
+- status: active
+
+### candidate_issues
+
+### committed_issues
+
+1. `I-20260402-1111-A`
+- title: sample owner
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P1
+- issue_path: `docs/epics/sample/issues/sample.md`
+- source_candidates:
+  - `docs/pre-brainstorms/20260402-1111--sample-receipt/candidates.md#c-20260402-1111-a`
+- next_action: implement sample owner
+
+### completed_issues
+
+- none currently
+EOF
+  cat > "$repo/docs/epics/sample/issues/sample.md" <<'EOF'
+# Issue: sample
+
+- issue_id: `I-20260402-1111-A`
+- phase_state: `in_dev`
+- milestone: `M-20260402-1111-sample`
+- source_candidate: `docs/pre-brainstorms/20260402-1111--sample-receipt/candidates.md#c-20260402-1111-a`
+EOF
+}
+
+REPO_BAD="$TMP_DIR/repo-bad"
+make_repo "$REPO_BAD"
+cd "$REPO_BAD"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b feature/raw
+echo raw > RAW.txt
+git add RAW.txt
+git commit -q -m "raw feature"
+git checkout -q develop
+git merge --no-ff --no-edit feature/raw >/dev/null
+
+if ./bin/governance-check >"$TMP_DIR/bad.out" 2>&1; then
+  echo "[FAIL] governance-check should reject protected-branch merge commits without Freely receipt trailers" >&2
+  cat "$TMP_DIR/bad.out" >&2
+  exit 1
+fi
+grep -q "missing Freely-Merge-Path receipt" "$TMP_DIR/bad.out"
+
+REPO_GOOD="$TMP_DIR/repo-good"
+make_repo "$REPO_GOOD"
+cd "$REPO_GOOD"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b test-pre-merge-20260402-receipt
+echo receipt > RECEIPT.txt
+git add RECEIPT.txt
+git commit -q -m "receipt feature"
+git checkout -q develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'test-pre-merge-20260402-receipt' into develop
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: test-pre-merge-20260402-receipt
+EOF
+)" test-pre-merge-20260402-receipt >/dev/null
+
+if ! ./bin/governance-check >"$TMP_DIR/good.out" 2>&1; then
+  cat "$TMP_DIR/good.out" >&2
+  exit 1
+fi
+grep -q "Governance check passed" "$TMP_DIR/good.out"
+
+REPO_BREAK="$TMP_DIR/repo-breakglass"
+make_repo "$REPO_BREAK"
+cd "$REPO_BREAK"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b test-pre-merge-20260402-breakglass
+echo breakglass > BREAKGLASS.txt
+git add BREAKGLASS.txt
+git commit -q -m "breakglass feature"
+git checkout -q develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'test-pre-merge-20260402-breakglass' into develop
+
+Freely-Merge-Path: merge-guarded-break-glass
+Freely-Bypass-Mode: break_glass
+Freely-Source-Branch: test-pre-merge-20260402-breakglass
+Freely-Break-Glass-Reason: verified_false_negative
+Freely-Blocked-Gate: pre-merge-commit
+Freely-Operation-Scope: merge_completion_only
+Freely-Evidence-Ref: docs/epics/sample/code-reviews/r-breakglass.md
+Freely-Follow-On-Issue: I-20260402-0020-A
+EOF
+)" test-pre-merge-20260402-breakglass >/dev/null
+
+BREAK_COMMIT="$(git rev-parse HEAD)"
+cat > "$REPO_BREAK/docs/system/workspace/hooks/protected-branch-breakglass-receipts.md" <<EOF
+# Protected Branch Break-Glass Receipts
+
+- audit_effective_date: \`2026-04-02\`
+
+## Receipt: $BREAK_COMMIT
+
+- target_branch: \`develop\`
+- source_branch: \`test-pre-merge-20260402-breakglass\`
+- receipt_mode: \`trailer_parity\`
+- bypass_mode: \`break_glass\`
+- break_glass_reason: \`verified_false_negative\`
+- blocked_gate: \`pre-merge-commit\`
+- operation_scope: \`merge_completion_only\`
+- follow_on_owner: \`I-20260402-0020-A\`
+- evidence_refs:
+  - \`docs/epics/sample/code-reviews/r-breakglass.md\`
+EOF
+
+if ! ./bin/governance-check >"$TMP_DIR/break.out" 2>&1; then
+  cat "$TMP_DIR/break.out" >&2
+  exit 1
+fi
+grep -q "Governance check passed" "$TMP_DIR/break.out"
+
+REPO_LEGACY="$TMP_DIR/repo-legacy"
+make_repo "$REPO_LEGACY"
+cd "$REPO_LEGACY"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b test-pre-merge-20260402-legacy
+echo legacy > LEGACY.txt
+git add LEGACY.txt
+git commit -q -m "legacy feature"
+git checkout -q develop
+git merge --no-ff --no-edit test-pre-merge-20260402-legacy >/dev/null
+
+LEGACY_COMMIT="$(git rev-parse HEAD)"
+cat > "$REPO_LEGACY/docs/system/workspace/hooks/protected-branch-breakglass-receipts.md" <<EOF
+# Protected Branch Break-Glass Receipts
+
+- audit_effective_date: \`2026-04-02\`
+
+## Receipt: $LEGACY_COMMIT
+
+- target_branch: \`develop\`
+- source_branch: \`test-pre-merge-20260402-legacy\`
+- receipt_mode: \`legacy_backfill\`
+- bypass_mode: \`break_glass\`
+- break_glass_reason: \`tooling_unavailable\`
+- blocked_gate: \`pre-commit\`
+- operation_scope: \`merge_completion_only\`
+- follow_on_owner: \`I-20260402-0020-A\`
+- evidence_refs:
+  - \`docs/epics/sample/issues/sample.md\`
+EOF
+
+git checkout -q -b test-pre-merge-20260402-legacy-head-receipt
+echo head > HEAD.txt
+git add HEAD.txt
+git commit -q -m "head receipt feature"
+git checkout -q develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'test-pre-merge-20260402-legacy-head-receipt' into develop
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: test-pre-merge-20260402-legacy-head-receipt
+EOF
+)" test-pre-merge-20260402-legacy-head-receipt >/dev/null
+
+if ! ./bin/governance-check >"$TMP_DIR/legacy.out" 2>&1; then
+  cat "$TMP_DIR/legacy.out" >&2
+  exit 1
+fi
+grep -q "Governance check passed" "$TMP_DIR/legacy.out"
+
+REPO_MISMATCH="$TMP_DIR/repo-mismatch"
+make_repo "$REPO_MISMATCH"
+cd "$REPO_MISMATCH"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b test-pre-merge-20260402-mismatch
+echo mismatch > MISMATCH.txt
+git add MISMATCH.txt
+git commit -q -m "mismatch feature"
+git checkout -q develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'test-pre-merge-20260402-mismatch' into develop
+
+Freely-Merge-Path: merge-guarded-break-glass
+Freely-Bypass-Mode: break_glass
+Freely-Source-Branch: test-pre-merge-20260402-mismatch
+Freely-Break-Glass-Reason: verified_false_negative
+Freely-Blocked-Gate: pre-merge-commit
+Freely-Operation-Scope: merge_completion_only
+Freely-Evidence-Ref: docs/epics/sample/code-reviews/r-breakglass.md
+Freely-Follow-On-Issue: I-20260402-0020-A
+EOF
+)" test-pre-merge-20260402-mismatch >/dev/null
+
+MISMATCH_COMMIT="$(git rev-parse HEAD)"
+cat > "$REPO_MISMATCH/docs/system/workspace/hooks/protected-branch-breakglass-receipts.md" <<EOF
+# Protected Branch Break-Glass Receipts
+
+- audit_effective_date: \`2026-04-02\`
+
+## Receipt: $MISMATCH_COMMIT
+
+- target_branch: \`develop\`
+- source_branch: \`test-pre-merge-20260402-not-the-same-branch\`
+- receipt_mode: \`trailer_parity\`
+- bypass_mode: \`break_glass\`
+- break_glass_reason: \`verified_false_negative\`
+- blocked_gate: \`pre-merge-commit\`
+- operation_scope: \`merge_completion_only\`
+- follow_on_owner: \`I-20260402-0020-A\`
+- evidence_refs:
+  - \`docs/epics/sample/code-reviews/r-breakglass.md\`
+EOF
+
+if ./bin/governance-check >"$TMP_DIR/mismatch.out" 2>&1; then
+  echo "[FAIL] governance-check should reject break-glass receipts whose ledger fields do not match merge trailers" >&2
+  cat "$TMP_DIR/mismatch.out" >&2
+  exit 1
+fi
+grep -q "trailer/ledger mismatch for source_branch" "$TMP_DIR/mismatch.out"
+
+REPO_BACKFILL_MISUSE="$TMP_DIR/repo-backfill-misuse"
+make_repo "$REPO_BACKFILL_MISUSE"
+cd "$REPO_BACKFILL_MISUSE"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b test-pre-merge-20260402-backfill-misuse
+echo misuse > MISUSE.txt
+git add MISUSE.txt
+git commit -q -m "misuse feature"
+git checkout -q develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'test-pre-merge-20260402-backfill-misuse' into develop
+
+Freely-Merge-Path: merge-guarded-break-glass
+Freely-Bypass-Mode: break_glass
+Freely-Source-Branch: test-pre-merge-20260402-backfill-misuse
+Freely-Break-Glass-Reason: tooling_unavailable
+Freely-Blocked-Gate: pre-commit
+Freely-Operation-Scope: merge_completion_only
+Freely-Evidence-Ref: docs/epics/sample/issues/sample.md
+Freely-Follow-On-Issue: I-20260402-0020-A
+EOF
+)" test-pre-merge-20260402-backfill-misuse >/dev/null
+
+BACKFILL_MISUSE_COMMIT="$(git rev-parse HEAD)"
+cat > "$REPO_BACKFILL_MISUSE/docs/system/workspace/hooks/protected-branch-breakglass-receipts.md" <<EOF
+# Protected Branch Break-Glass Receipts
+
+- audit_effective_date: \`2026-04-02\`
+
+## Receipt: $BACKFILL_MISUSE_COMMIT
+
+- target_branch: \`develop\`
+- source_branch: \`test-pre-merge-20260402-backfill-misuse\`
+- receipt_mode: \`legacy_backfill\`
+- bypass_mode: \`break_glass\`
+- break_glass_reason: \`tooling_unavailable\`
+- blocked_gate: \`pre-commit\`
+- operation_scope: \`merge_completion_only\`
+- follow_on_owner: \`I-20260402-0020-A\`
+- evidence_refs:
+  - \`docs/epics/sample/issues/sample.md\`
+EOF
+
+if ./bin/governance-check >"$TMP_DIR/backfill-misuse.out" 2>&1; then
+  echo "[FAIL] governance-check should reject trailer-bearing break-glass merges that pretend to be legacy_backfill" >&2
+  cat "$TMP_DIR/backfill-misuse.out" >&2
+  exit 1
+fi
+grep -q "receipt_mode is legacy_backfill" "$TMP_DIR/backfill-misuse.out"
+
+REPO_INVALID_SOURCE="$TMP_DIR/repo-invalid-source"
+make_repo "$REPO_INVALID_SOURCE"
+cd "$REPO_INVALID_SOURCE"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b feature/invalid-direct
+echo invalid > INVALID.txt
+git add INVALID.txt
+git commit -q -m "invalid direct feature"
+git checkout -q develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'feature/invalid-direct' into develop
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: feature/invalid-direct
+EOF
+)" feature/invalid-direct >/dev/null
+echo tail > TAIL.txt
+git add TAIL.txt
+git commit -q -m "tail after invalid direct merge"
+cat > "$REPO_INVALID_SOURCE/docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md" <<'EOF'
+# Protected Branch Merge Receipt Backfills
+
+- audit_effective_date: `2026-04-02`
+- source_policy_effective_date: `2026-04-02`
+EOF
+
+if ./bin/governance-check >"$TMP_DIR/invalid-source.out" 2>&1; then
+  echo "[FAIL] governance-check should reject develop receipts whose source branch is not in the test-pre-merge family" >&2
+  cat "$TMP_DIR/invalid-source.out" >&2
+  exit 1
+fi
+grep -q "invalid Freely-Source-Branch 'feature/invalid-direct'" "$TMP_DIR/invalid-source.out"
+
+REPO_FIRST_PARENT="$TMP_DIR/repo-first-parent"
+make_repo "$REPO_FIRST_PARENT"
+cd "$REPO_FIRST_PARENT"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b feature/nested-source
+echo nested > NESTED.txt
+git add NESTED.txt
+git commit -q -m "nested source"
+git checkout -q -b test-pre-merge-20260406-nested-source develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'feature/nested-source' into test-pre-merge-20260406-nested-source
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: feature/nested-source
+EOF
+)" feature/nested-source >/dev/null
+git checkout -q develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'test-pre-merge-20260406-nested-source' into develop
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: test-pre-merge-20260406-nested-source
+EOF
+)" test-pre-merge-20260406-nested-source >/dev/null
+cat > "$REPO_FIRST_PARENT/docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md" <<'EOF'
+# Protected Branch Merge Receipt Backfills
+
+- audit_effective_date: `2026-04-02`
+- source_policy_effective_date: `2026-04-02`
+EOF
+
+if ! ./bin/governance-check >"$TMP_DIR/first-parent.out" 2>&1; then
+  echo "[FAIL] governance-check should ignore nested test-pre-merge merge receipts when auditing develop first-parent history" >&2
+  cat "$TMP_DIR/first-parent.out" >&2
+  exit 1
+fi
+
+REPO_INHERITED_TARGET="$TMP_DIR/repo-inherited-target"
+make_repo "$REPO_INHERITED_TARGET"
+cd "$REPO_INHERITED_TARGET"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b feature/promoted
+echo promoted > PROMOTED.txt
+git add PROMOTED.txt
+git commit -q -m "promoted source"
+git checkout -q -b test-pre-merge-20260406-promoted develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'feature/promoted' into test-pre-merge-20260406-promoted
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: feature/promoted
+EOF
+)" feature/promoted >/dev/null
+git checkout -q develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'test-pre-merge-20260406-promoted' into develop
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: test-pre-merge-20260406-promoted
+EOF
+)" test-pre-merge-20260406-promoted >/dev/null
+git checkout -q -b test-pre-merge-20260406-current develop
+echo current > CURRENT.txt
+git add CURRENT.txt
+git commit -q -m "seed current batch"
+cat > "$REPO_INHERITED_TARGET/docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md" <<'EOF'
+# Protected Branch Merge Receipt Backfills
+
+- audit_effective_date: `2026-04-02`
+- source_policy_effective_date: `2026-04-02`
+EOF
+
+if ! ./bin/governance-check >"$TMP_DIR/inherited-target.out" 2>&1; then
+  echo "[FAIL] governance-check should ignore inherited develop-target merges when auditing a current test-pre-merge batch" >&2
+  cat "$TMP_DIR/inherited-target.out" >&2
+  exit 1
+fi
+
+echo "[PASS] governance-check audits protected-branch merge receipts and break-glass trailers"

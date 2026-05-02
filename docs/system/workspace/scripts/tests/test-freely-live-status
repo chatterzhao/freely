@@ -1,0 +1,244 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-live-status.XXXXXX)"
+TMP_DIR_REAL="$(cd "$TMP_DIR" && pwd -P)"
+
+cleanup() {
+  set +e
+  kill "${SUP_PID:-}" "${DISPATCH_PID:-}" "${AI_PID:-}" "${WORKER_SUP_PID:-}" "${WORKER_AI_PID:-}" 2>/dev/null || true
+  wait "${SUP_PID:-}" 2>/dev/null || true
+  wait "${DISPATCH_PID:-}" 2>/dev/null || true
+  wait "${AI_PID:-}" 2>/dev/null || true
+  wait "${WORKER_SUP_PID:-}" 2>/dev/null || true
+  wait "${WORKER_AI_PID:-}" 2>/dev/null || true
+  rm -rf "$TMP_DIR"
+}
+
+trap cleanup EXIT
+
+PROJECT="$TMP_DIR/repo"
+QUEUE_WT="$TMP_DIR/queued-worktree"
+FROZEN_WT="$TMP_DIR/frozen-worktree"
+mkdir -p "$PROJECT/.freely/run" "$PROJECT/.freely/intake/20260320-000001-demo" "$PROJECT/.freely/run/interruption-resolution/20260320-000000-demo" "$PROJECT/docs/pre-brainstorms"
+mkdir -p "$QUEUE_WT" "$FROZEN_WT"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+FREELY_ACTIVATION_CONSENT_RECORDED_AT="2026-03-20T19:47:46Z"
+EOF
+git init -q "$PROJECT"
+git -C "$PROJECT" config user.email "test@example.com"
+git -C "$PROJECT" config user.name "Test User"
+cat >"$PROJECT/README.md" <<'EOF'
+# repo
+EOF
+git -C "$PROJECT" add README.md
+git -C "$PROJECT" commit -q -m "init"
+git -C "$PROJECT" branch -m develop
+cat >"$PROJECT/.freely/run/session-state.env" <<EOF
+LAST_TOOL_SESSION_ID="session-123"
+LAST_TOOL_JSONL_PATH="$TMP_DIR/session.jsonl"
+LAST_LAUNCH_KIND="resume"
+LAST_ROTATION_REASON="none"
+LAST_CYCLE_LOG="$TMP_DIR/cycle.log"
+LAST_DELEGATED_CONTINUATION_CONSUMED_AT="2026-03-20T19:47:46Z"
+LAST_RESTART_STORM_SIGNAL_AT="2026-03-20T19:47:46Z"
+EOF
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="up"
+LAST_EXIT_REASON="none"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2026-03-20T19:47:46Z"
+EOF
+cat >"$PROJECT/.freely/run/prompt-20260320-194011.txt" <<'EOF'
+你现在接手 Freely 的 worker followthrough，不在主管 `develop` 工位实现。
+执行上下文：
+- CURRENT_BRANCH=feature/research-codex-in-cc-mcp
+审计目标：
+1. 判断这组 dirty 预研产物是否已被 canonical 吸收
+EOF
+cat >"$PROJECT/.freely/run/manager-continuity-20260321-003954.md" <<'EOF'
+# Manager Continuity
+- selected_pool: `human chat / session evidence`
+- next_supervision_priority:
+  - runtime 创建或进入 dedicated worktree
+EOF
+mkdir -p "$PROJECT/.freely/run/worker-prompts"
+WORKTREE_ROOT="$TMP_DIR/repo-worktrees"
+WORKER_PROJECT="$WORKTREE_ROOT/feature-queued"
+git -C "$PROJECT" worktree add -q -b feature/queued "$WORKER_PROJECT"
+mkdir -p "$WORKER_PROJECT/.freely/run"
+QUEUE_PROMPT="$PROJECT/.freely/run/worker-prompts/20260321-004000-worker-queued-codex.txt"
+FROZEN_PROMPT="$PROJECT/.freely/run/worker-prompts/20260321-004100-worker-frozen-codex.txt"
+cat >"$QUEUE_PROMPT" <<'EOF'
+Worktree:
+- `__QUEUE_WT__`
+Branch:
+- `feature/queued`
+intent_kind: cleanup
+intent_target: `feature/queued -> develop`
+EOF
+cat >"$FROZEN_PROMPT" <<'EOF'
+Worktree:
+- `__FROZEN_WT__`
+Branch:
+- `feature/frozen`
+intent_kind: promotion
+intent_target: `feature/frozen -> develop`
+EOF
+perl -0pi -e "s#__QUEUE_WT__#$QUEUE_WT#g; s#__FROZEN_WT__#$FROZEN_WT#g" "$QUEUE_PROMPT" "$FROZEN_PROMPT"
+cat >"$PROJECT/.freely/run/manager-continuity-20260321-004200.md" <<EOF
+# Manager Continuity
+- selected_pool: \`human chat / session evidence\`
+
+## Queue
+- lane: \`dispatchable\`
+  - prompt_path: \`$QUEUE_PROMPT\`
+
+## Frozen Queue
+- lane: \`keep-frozen\`
+  - prompt_path: \`$FROZEN_PROMPT\`
+EOF
+STALE_CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260321-004300.md"
+cat >"$STALE_CONTINUITY" <<'EOF'
+# Manager Continuity
+- selected_pool: `stale runtime artifact`
+
+## Fleet Inventory
+- path: `/tmp/retired-worktree`
+  - ownership: `cleanup_queue`
+EOF
+cat >"$PROJECT/.freely/run/manager-worker-launch-state.env" <<EOF
+LAST_MANAGER_CONTINUITY_GENERATED="$STALE_CONTINUITY"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED="$QUEUE_PROMPT"
+LAST_MANAGER_CONTINUITY_CONSUMED="$STALE_CONTINUITY"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED="$FROZEN_PROMPT"
+LAUNCHED_WORKER_PROMPTS="$FROZEN_PROMPT"
+QUEUED_WORKER_PROMPTS=""
+MAX_PARALLEL_WORKERS="unbounded"
+ACTIVE_RUNNING_WORKER_COUNT="0"
+AVAILABLE_NEW_WORKER_SLOTS="unbounded"
+UPDATED_AT="2026-03-20T19:47:46Z"
+EOF
+cat >"$PROJECT/.freely/intake/20260320-000001-demo/meta.env" <<'EOF'
+INTAKE_ID="20260320-000001-demo"
+CREATED_AT="2026-03-20T19:47:46Z"
+AUTHOR="user"
+CHANNEL="chat"
+STATUS="delegated"
+CLASSIFICATION="control"
+REACTION="interrupt"
+LINKED_ARTIFACT="pending://watchdog-live-status"
+DELEGATED_WORKTREE=""
+SESSION_REFS="[]"
+CLAIMED_BY="manager-agent"
+CLAIMED_AT="2026-03-20T19:47:47Z"
+ABSORPTION_TARGET="pending://watchdog-live-status"
+RESOLUTION_ARTIFACT=""
+EOF
+cat >"$PROJECT/.freely/intake/20260320-000001-demo/message.txt" <<'EOF'
+检查后台谁在跑、在干什么
+EOF
+cat >"$PROJECT/.freely/run/interruption-resolution/20260320-000000-demo/meta.env" <<'EOF'
+INTAKE_ID="20260320-000000-demo"
+CREATED_AT="2026-03-20T19:40:00Z"
+RESOLVED_BY="manager-agent"
+REACTION="interrupt"
+CLASSIFICATION="control"
+ABSORPTION_TARGET="cleanup://merged-worktree-followthrough"
+LINKED_ARTIFACT=""
+DELEGATED_WORKTREE=""
+STATUS="absorbed"
+EOF
+cat >"$PROJECT/.freely/run/interruption-resolution/20260320-000000-demo/resolution.md" <<'EOF'
+# Resolution
+- blocked_reason: none
+EOF
+
+touch "$TMP_DIR/session.jsonl" "$TMP_DIR/cycle.log"
+
+bash -c "exec -a 'runtime/freely start --project $PROJECT' sleep 30" >/dev/null 2>&1 &
+SUP_PID=$!
+bash -c "exec -a 'runtime/freely ensure-interruption-dispatch --project $PROJECT --watch' sleep 30" >/dev/null 2>&1 &
+DISPATCH_PID=$!
+bash -c "exec -a 'codex exec -C $PROJECT -m gpt-5.4' sleep 30" >/dev/null 2>&1 &
+AI_PID=$!
+bash -c "exec -a 'runtime/freely start --project $WORKER_PROJECT' sleep 30" >/dev/null 2>&1 &
+WORKER_SUP_PID=$!
+bash -c "exec -a 'codex exec -C $WORKER_PROJECT -m gpt-5.4' sleep 30" >/dev/null 2>&1 &
+WORKER_AI_PID=$!
+
+printf '%s' "$SUP_PID" >"$PROJECT/.freely/run/supervisor.pid"
+printf '%s' "$DISPATCH_PID" >"$PROJECT/.freely/run/interruption-dispatch.pid"
+printf '%s' "$AI_PID" >"$PROJECT/.freely/run/ai.pid"
+printf '%s' "$WORKER_SUP_PID" >"$WORKER_PROJECT/.freely/run/supervisor.pid"
+printf '%s' "$WORKER_AI_PID" >"$WORKER_PROJECT/.freely/run/ai.pid"
+
+OUTPUT="$(TZ="America/Los_Angeles" bash "$ROOT_DIR/bin/freely" live-status --project "$PROJECT")"
+
+grep -q 'activity_state: ai_active' <<<"$OUTPUT"
+grep -q 'last_supervisor_state: up' <<<"$OUTPUT"
+grep -q 'last_ai_state: up' <<<"$OUTPUT"
+grep -q 'last_exit_reason: none' <<<"$OUTPUT"
+grep -q 'last_state_updated_at: 2026.03.20 12:47:46 PDT' <<<"$OUTPUT"
+grep -q 'activation_consent_recorded_at: 2026.03.20 12:47:46 PDT' <<<"$OUTPUT"
+grep -q 'last_consumed_delegated_continuation_at: 2026.03.20 12:47:46 PDT' <<<"$OUTPUT"
+grep -q 'restart_storm_signal_at: 2026.03.20 12:47:46 PDT' <<<"$OUTPUT"
+grep -q 'blocked_supervision_state: none' <<<"$OUTPUT"
+grep -q 'blocked_supervision_reason: none' <<<"$OUTPUT"
+grep -q 'blocked_supervision_summary: none' <<<"$OUTPUT"
+grep -q 'blocked_supervision_artifact: none' <<<"$OUTPUT"
+grep -q "role=supervisor pid=$SUP_PID" <<<"$OUTPUT"
+grep -q "role=interruption_dispatcher pid=$DISPATCH_PID" <<<"$OUTPUT"
+grep -q "role=ai pid=$AI_PID" <<<"$OUTPUT"
+grep -q 'prompt_file: ' <<<"$OUTPUT"
+grep -q 'prompt_intent_kind: none' <<<"$OUTPUT"
+grep -q 'prompt_intent_target: none' <<<"$OUTPUT"
+grep -q 'prompt_intent_target_raw: none' <<<"$OUTPUT"
+grep -q 'CURRENT_BRANCH=feature/research-codex-in-cc-mcp' <<<"$OUTPUT"
+grep -q 'selected_pool: `human chat / session evidence`' <<<"$OUTPUT"
+grep -q "manager_continuity_file: $PROJECT/.freely/run/manager-continuity-20260321-004200.md" <<<"$OUTPUT"
+grep -q "latest_manager_continuity_generated: $PROJECT/.freely/run/manager-continuity-20260321-004200.md" <<<"$OUTPUT"
+grep -q "latest_manager_continuity_consumed: $PROJECT/.freely/run/manager-continuity-20260321-004200.md" <<<"$OUTPUT"
+grep -q 'last_tool_jsonl_path: ' <<<"$OUTPUT"
+grep -q 'latest_resolution:' <<<"$OUTPUT"
+grep -q 'intake_delegated_items: 1' <<<"$OUTPUT"
+grep -q 'intake_snapshot: none' <<<"$OUTPUT"
+grep -q "latest_manager_worker_prompts_generated: $QUEUE_PROMPT" <<<"$OUTPUT"
+grep -q 'latest_manager_worker_prompts_consumed: none' <<<"$OUTPUT"
+grep -q "latest_manager_worker_prompt_intents_generated: cleanup@$TMP_DIR_REAL/queued-worktree" <<<"$OUTPUT"
+grep -q 'latest_manager_worker_prompt_intents_consumed: none' <<<"$OUTPUT"
+grep -q 'ownership_conflict_state: none' <<<"$OUTPUT"
+grep -q 'ownership_conflict_summary: none' <<<"$OUTPUT"
+grep -q 'active_running_worker_count: 1' <<<"$OUTPUT"
+grep -q 'available_new_worker_slots: unbounded' <<<"$OUTPUT"
+if grep -q '/tmp/retired-worktree' <<<"$OUTPUT"; then
+  echo "[FAIL] live-status surfaced stale retired worktree continuity" >&2
+  exit 1
+fi
+# shellcheck disable=SC1090
+source "$PROJECT/.freely/run/manager-worker-launch-state.env"
+[[ "${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-none}" == "none" || -z "${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-}" ]]
+[[ "${ACTIVE_RUNNING_WORKER_COUNT:-unknown}" == "1" ]]
+[[ "${AVAILABLE_NEW_WORKER_SLOTS:-unknown}" == "unbounded" ]]
+
+echo "[PASS] freely live-status shows current active runtime surface with prompt and deep refs"

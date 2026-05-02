@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-signal-intent-handler.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+FAKE_BIN="$TMP_DIR/bin"
+INTAKE_ID="20260320-000000-test"
+mkdir -p "$PROJECT/.freely/intake/$INTAKE_ID" "$FAKE_BIN"
+
+cat >"$PROJECT/.freely/config.env" <<'EOF'
+AI_MODEL="gpt-5.4"
+AI_REASONING_EFFORT="medium"
+EOF
+
+cat >"$PROJECT/.freely/intake/$INTAKE_ID/meta.env" <<'EOF'
+INTAKE_ID="20260320-000000-test"
+STATUS="classified"
+EOF
+
+cat >"$PROJECT/.freely/intake/$INTAKE_ID/message.txt" <<'EOF'
+检查脏的位置，仔细思考他们是否过时，还是有用但是没提交没合并
+EOF
+
+cat >"$FAKE_BIN/codex" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+cat <<'OUT'
+noise that should be ignored
+INTENT_KIND=audit
+NEEDS_LIVE_INSPECTION=true
+NEEDS_EXECUTION=true
+SCOPE=fleet
+COMPLEXITY=multi-step
+CURRENT_CONTEXT=需要读取当前 fleet 状态后再决定收口动作
+extra trailing noise
+OUT
+EOF
+chmod +x "$FAKE_BIN/codex"
+
+OUTPUT="$(
+  PATH="$FAKE_BIN:$PATH" \
+    bash "$ROOT_DIR/docs/system/workspace/scripts/runtime/signal-intent-handler" \
+      --project "$PROJECT" \
+      --intake-id "$INTAKE_ID"
+)"
+
+grep -q '^INTENT_KIND=audit$' <<<"$OUTPUT"
+grep -q '^NEEDS_LIVE_INSPECTION=true$' <<<"$OUTPUT"
+grep -q '^NEEDS_EXECUTION=true$' <<<"$OUTPUT"
+grep -q '^SCOPE=fleet$' <<<"$OUTPUT"
+grep -q '^COMPLEXITY=multi-step$' <<<"$OUTPUT"
+
+echo "[PASS] signal intent handler filters structured intent output"

@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<USAGE
+Usage:
+  source bin/wt-add [branch] -- <git-add-args>
+
+Examples:
+  source bin/wt-add feature/my-task -- -A
+  source bin/wt-add -- docs/README.md
+
+Notes:
+- Git has no native pre-add hook.
+- This helper performs worktree check/entry before running git add.
+USAGE
+}
+
+freely_wt_self_path() {
+  if [[ -n "${BASH_SOURCE[0]:-}" ]]; then
+    printf '%s\n' "${BASH_SOURCE[0]}"
+    return 0
+  fi
+  if [[ -n "${ZSH_VERSION:-}" ]]; then
+    eval 'printf "%s\n" "${(%):-%x}"'
+    return 0
+  fi
+  return 1
+}
+
+freely_wt_is_sourced() {
+  if [[ -n "${ZSH_VERSION:-}" ]]; then
+    [[ "${ZSH_EVAL_CONTEXT:-}" == *:file* ]]
+    return
+  fi
+  [[ "${BASH_SOURCE[0]:-}" != "$0" ]]
+}
+
+SELF_PATH="$(freely_wt_self_path)" || { echo "Unable to determine wt-add script path." >&2; return 1 2>/dev/null || exit 1; }
+SELF_DIR="$(cd "$(dirname "$SELF_PATH")" && pwd -P)"
+
+if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+  usage
+  return 0 2>/dev/null || exit 0
+fi
+
+if ! freely_wt_is_sourced; then
+  echo "Please run with: source bin/wt-add [branch] -- <git-add-args>" >&2
+  exit 1
+fi
+
+branch=""
+if [[ $# -gt 0 && "$1" != "--" ]]; then
+  branch="$1"
+  shift
+fi
+
+[[ "${1:-}" == "--" ]] || { usage; return 1; }
+shift
+
+# shellcheck disable=SC1091
+source "$SELF_DIR/worktree-common.sh"
+
+if [[ -z "$branch" ]]; then
+  branch="$(freely_wt_current_branch)"
+fi
+
+[[ -n "$branch" ]] || { echo "No branch detected." >&2; return 1; }
+
+if freely_wt_is_test_pre_merge_branch "$branch"; then
+  echo "Add blocked: '$branch' is a test pre-merge batch. Merge source branches for testing, do not stage direct edits here." >&2
+  return 1
+fi
+
+case "$branch" in
+  main|develop)
+    echo "Add blocked: '$branch' is protected. Use feature/release/hotfix worktree." >&2
+    return 1
+    ;;
+esac
+
+if freely_wt_is_primary_worktree; then
+  # shellcheck disable=SC1091
+  source "$SELF_DIR/wt-enter" "$branch"
+fi
+
+git add "$@"
+echo "git add done on branch '$branch' at $(pwd -P)"
+
+# === Scope Check Hint ===
+staged_files=$(git diff --cached --name-only 2>/dev/null || true)
+if [[ -n "$staged_files" ]]; then
+  branch_topic="${branch#*/}"
+  
+  echo ""
+  echo "staged 文件列表："
+  echo "$staged_files" | sed 's/^/  /'
+  echo ""
+  echo "[scope-check] 请确认这些文件一起提交是否符合 git 原子提交原则，是否与分支职责('$branch_topic')匹配。不匹配应拆分提交或创建新 worktree。"
+fi

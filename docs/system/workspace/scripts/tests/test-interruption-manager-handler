@@ -1,0 +1,110 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-interruption-handler.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+run_case() {
+local message="$1"
+local expected_restart="$2"
+local expected_owner="$3"
+local expected_handoff="$4"
+local prompt_expectation="$5"
+local prompt_expectation_mode="${6:-regex}"
+local expect_prompt_capture="${7:-yes}"
+local case_dir="$TMP_DIR/$expected_restart"
+local project="$case_dir/project"
+local fake_bin="$case_dir/bin"
+local intake_id="20260320-000000-test"
+local prompt_capture="$case_dir/prompt.txt"
+mkdir -p "$project/.freely/intake/$intake_id" "$fake_bin"
+
+cat >"$project/.freely/config.env" <<'EOF'
+AI_MODEL="gpt-5.4"
+AI_REASONING_EFFORT="medium"
+EOF
+
+cat >"$project/.freely/intake/$intake_id/meta.env" <<'EOF'
+INTAKE_ID="20260320-000000-test"
+STATUS="classified"
+EOF
+
+printf '%s\n' "$message" >"$project/.freely/intake/$intake_id/message.txt"
+
+cat >"$fake_bin/codex" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+cat >"${PROMPT_CAPTURE:?}"
+cat <<OUT
+noise that should be ignored
+DECISION=delegate
+REACTION=followup
+CLASSIFICATION=control
+RESTART_POINT=${EXPECTED_RESTART:?}
+OWNERSHIP=${EXPECTED_OWNER:?}
+WHY=按意图选择正确主管路由
+HANDOFF=${EXPECTED_HANDOFF:?}
+ANSWER=
+extra trailing noise
+OUT
+EOF
+chmod +x "$fake_bin/codex"
+
+OUTPUT="$(
+  PROMPT_CAPTURE="$prompt_capture" EXPECTED_RESTART="$expected_restart" EXPECTED_OWNER="$expected_owner" EXPECTED_HANDOFF="$expected_handoff" \
+  PATH="$fake_bin:$PATH" \
+    bash "$ROOT_DIR/docs/system/workspace/scripts/runtime/interruption-manager-handler" \
+      --project "$project" \
+      --intake-id "$intake_id"
+)"
+
+grep -q '^DECISION=delegate$' <<<"$OUTPUT"
+grep -q "^RESTART_POINT=$expected_restart$" <<<"$OUTPUT"
+grep -q "^OWNERSHIP=$expected_owner$" <<<"$OUTPUT"
+grep -q "^HANDOFF=$expected_handoff$" <<<"$OUTPUT"
+if [[ "$expect_prompt_capture" == "yes" ]]; then
+  if [[ "$prompt_expectation_mode" == "fixed" ]]; then
+    grep -Fq "$prompt_expectation" "$prompt_capture"
+  else
+    grep -q "$prompt_expectation" "$prompt_capture"
+  fi
+  grep -Fq '`live-status -> fleet-status -> restart-point routing`' "$prompt_capture"
+  grep -Fq '`continuation`、`dev`、`review`、`verification`' "$prompt_capture"
+  if [[ "$expected_restart" == "cleanup" && "$expected_owner" == "worker" ]]; then
+    grep -q 'worktree-maintenance-governance' "$prompt_capture"
+    grep -q '当前 signal 仍应先交接为 cleanup handoff' "$prompt_capture"
+  fi
+else
+  [[ ! -e "$prompt_capture" ]]
+fi
+}
+
+run_case \
+  "检查已经合并到develop的worktree，应该怎么收口" \
+  "cleanup" \
+  "worker" \
+  "检查 merged worktree 是否满足 cleanup 生命周期并执行收口" \
+  '优先按 worktree maintenance 问题理解，而不是泛化成 continuation' \
+  "regex" \
+  "no"
+
+run_case \
+  "你现在是 develop 工位上的主管。先检查所有 worktree、milestones、issues、intake 与 runtime 状态，然后决定下一步该委派什么。" \
+  "continuation" \
+  "manager" \
+  "先做 live-status 与 fleet-status 巡检，再把 blocker materialize 成 continuity 或 worker prompt" \
+  'worktree + milestones + issues + intake + runtime' \
+  'fixed' \
+  "yes"
+
+run_case \
+  "请读取这条普通用户消息，并输出结构化路由决策，不要依赖任何固定短语。" \
+  "dev" \
+  "worker" \
+  "进入当前 issue 的开发执行并更新实现/测试" \
+  'live-status -> fleet-status -> restart-point routing' \
+  'fixed' \
+  "yes"
+
+echo "[PASS] interruption manager handler distinguishes cleanup-only routing from broad supervisor reentry"

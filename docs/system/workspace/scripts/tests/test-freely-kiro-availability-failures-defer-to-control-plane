@@ -1,0 +1,192 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-kiro-availability.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+create_project_fixture() {
+  local project="$1"
+  mkdir -p \
+    "$project/docs/pre-brainstorms/20260331-0000--sample" \
+    "$project/.freely/run" \
+    "$project/.freely/logs"
+
+  git init -q -b feature/test-kiro-availability "$project"
+  git -C "$project" config user.name tester
+  git -C "$project" config user.email tester@example.com
+
+  cat >"$project/README.md" <<'EOF'
+# Test Project
+EOF
+  git -C "$project" add README.md
+  git -C "$project" commit -q -m "init"
+
+  cat >"$project/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+  cat >"$project/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+  cat >"$project/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+  cat >"$project/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+  cat >"$project/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+  cat >"$project/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260331-0000--sample
+EOF
+
+  cat >"$project/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+  cat >"$project/docs/pre-brainstorms/20260331-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+  cat >"$project/docs/pre-brainstorms/20260331-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+  cat >"$project/.freely/config.env" <<EOF
+PROJECT_ROOT="$project"
+INTENT_FILE="$project/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$project/docs/CONSTITUTION.md"
+AI_TOOL="kiro-cli"
+AI_MODEL="auto"
+AI_MODE="auto"
+AI_REASONING_EFFORT=""
+CHECK_INTERVAL=1
+RESTART_DELAY=0
+MAX_RESTARTS=2
+IFLOW_MAX_TURNS=100
+EOF
+}
+
+run_case() {
+  local case_name="$1" expected_reason="$2" output_text="$3"
+  local project="$TMP_DIR/$case_name-project"
+  local mock_bin="$TMP_DIR/$case_name-mock-bin"
+  local output_file="$TMP_DIR/$case_name-output.log"
+  local event_log session_state workcell_state supervisor_pid launch_count availability_state
+
+  create_project_fixture "$project"
+  mkdir -p "$mock_bin"
+
+  cat >"$mock_bin/kiro-cli" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+cat "${KIRO_OUTPUT_FILE:?}"
+exit 0
+EOF
+  chmod +x "$mock_bin/kiro-cli"
+
+  printf '%s\n' "$output_text" >"$output_file"
+
+  PATH="$mock_bin:$PATH" KIRO_OUTPUT_FILE="$output_file" bash "$ROOT_DIR/bin/freely" start --project "$project" >/dev/null 2>&1 || true
+
+  event_log="$project/.freely/logs/runtime-events.log"
+  session_state="$project/.freely/run/session-state.env"
+  workcell_state="$project/.freely/run/workcell-state.env"
+  availability_state="$project/.freely/run/tool-availability-kiro-cli.env"
+
+  [[ -f "$event_log" ]] || {
+    echo "[FAIL] $case_name: expected runtime event log" >&2
+    exit 1
+  }
+  [[ -f "$session_state" ]] || {
+    echo "[FAIL] $case_name: expected session state file" >&2
+    exit 1
+  }
+  [[ -f "$workcell_state" ]] || {
+    echo "[FAIL] $case_name: expected workcell state file" >&2
+    exit 1
+  }
+
+  grep -q "LAST_SLOT_SWITCH_REASON=\"$expected_reason\"" "$session_state" || {
+    echo "[FAIL] $case_name: missing expected slot switch reason $expected_reason" >&2
+    cat "$session_state" >&2
+    exit 1
+  }
+  grep -q "LAST_EXIT_REASON=\"$expected_reason\"" "$workcell_state" || {
+    echo "[FAIL] $case_name: missing expected workcell exit reason $expected_reason" >&2
+    cat "$workcell_state" >&2
+    exit 1
+  }
+  grep -q "event=supervisor_stopping.*reason=$expected_reason" "$event_log" || {
+    echo "[FAIL] $case_name: expected supervisor_stopping reason $expected_reason" >&2
+    cat "$event_log" >&2
+    exit 1
+  }
+  grep -q "event=ai_cycle_finished.*exit_reason=$expected_reason" "$event_log" || {
+    echo "[FAIL] $case_name: expected ai_cycle_finished exit reason $expected_reason" >&2
+    cat "$event_log" >&2
+    exit 1
+  }
+  if grep -q 'exit_reason=ai_exit_rc_0' "$event_log"; then
+    echo "[FAIL] $case_name: kiro availability failure was still recorded as ai_exit_rc_0" >&2
+    cat "$event_log" >&2
+    exit 1
+  fi
+
+  launch_count="$(grep -c 'event=ai_launch_begin' "$event_log")"
+  [[ "$launch_count" -eq 1 ]] || {
+    echo "[FAIL] $case_name: expected exactly one launch, saw $launch_count" >&2
+    cat "$event_log" >&2
+    exit 1
+  }
+
+  if [[ "$expected_reason" == "kiro_monthly_request_limit" ]]; then
+    [[ -f "$availability_state" ]] || {
+      echo "[FAIL] $case_name: expected kiro monthly limit to persist a tool availability state file" >&2
+      exit 1
+    }
+    grep -q '^BLOCKED_REASON="kiro_monthly_request_limit"$' "$availability_state" || {
+      echo "[FAIL] $case_name: expected kiro availability state to preserve the monthly limit reason" >&2
+      cat "$availability_state" >&2
+      exit 1
+    }
+    grep -Eq '^EARLIEST_RESET_HINT="[0-9]+"' "$availability_state" || {
+      echo "[FAIL] $case_name: expected kiro availability state to preserve the parsed reset hint" >&2
+      cat "$availability_state" >&2
+      exit 1
+    }
+  fi
+
+  if [[ -f "$project/.freely/run/supervisor.pid" ]]; then
+    supervisor_pid="$(cat "$project/.freely/run/supervisor.pid" 2>/dev/null || true)"
+    if [[ -n "$supervisor_pid" ]] && kill -0 "$supervisor_pid" 2>/dev/null; then
+      echo "[FAIL] $case_name: supervisor should stop after deferring availability recovery" >&2
+      exit 1
+    fi
+  fi
+
+  bash "$ROOT_DIR/bin/freely" stop --project "$project" >/dev/null 2>&1 || true
+}
+
+run_case \
+  "kiro-monthly-request-limit" \
+  "kiro_monthly_request_limit" \
+  $'Unable to verify subscription status: service error\nMonthly request limit reached'
+
+run_case \
+  "kiro-subscription-service-error" \
+  "kiro_subscription_status_service_error" \
+  $'Unable to verify subscription status: service error'
+
+echo "[PASS] freely classifies kiro availability failures before rc=0 relaunch can loop"

@@ -1,0 +1,285 @@
+#!/usr/bin/env bash
+# Focused repro for live-status already-running-attach false-positive
+#
+# This script exercises the real runtime/freely attach path to reproduce
+# the false-positive already_running_attach scenario observed on develop.
+#
+# Hypothesis to test:
+# 1. A supervisor exits cleanly
+# 2. supervisor.pid file is not cleaned up (or is rewritten)
+# 3. ensure-manager bootstrap finds the stale PID
+# 4. attach logic writes optimistic up/up state
+# 5. No runtime event is emitted
+# 6. live-status reports stale optimistic state
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Navigate up from docs/system/workspace/scripts/tests to project root
+ROOT_DIR="$(cd "$SCRIPT_DIR/../../../../.." && pwd -P)"
+REPRO_ROOT="${SCRIPT_DIR}/repro-attach-workspace"
+TEST_PROJECT="${REPRO_ROOT}/test-project"
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+log_step() { printf "${GREEN}[STEP]${NC} %s\n" "$1"; }
+log_check() { printf "${YELLOW}[CHECK]${NC} %s\n" "$1"; }
+log_error() { printf "${RED}[ERROR]${NC} %s\n" "$1"; }
+log_success() { printf "${GREEN}[SUCCESS]${NC} %s\n" "$1"; }
+
+cleanup() {
+  log_step "Cleaning up repro workspace..."
+  if [[ -d "$TEST_PROJECT" ]]; then
+    bash "${ROOT_DIR}/bin/freely" stop --project "$TEST_PROJECT" 2>/dev/null || true
+  fi
+  rm -rf "$REPRO_ROOT"
+}
+
+trap cleanup EXIT
+
+# Setup test project
+log_step "Setting up test project at $TEST_PROJECT"
+rm -rf "$REPRO_ROOT"
+mkdir -p "$TEST_PROJECT"
+cd "$TEST_PROJECT"
+git init -q
+git config user.email "test@example.com"
+git config user.name "Test User"
+mkdir -p .githooks
+cat > .githooks/pre-commit <<'EOF'
+#!/usr/bin/env bash
+exit 0
+EOF
+chmod +x .githooks/pre-commit
+
+# Create minimal project structure
+mkdir -p docs
+cat > docs/PROJECT_INTENT.md <<'EOF'
+# Test Project Intent
+This is a minimal test project for reproducing the attach false-positive.
+EOF
+
+cat > docs/CONSTITUTION.md <<'EOF'
+# Test Constitution
+Minimal constitution for testing.
+EOF
+
+cat > docs/LAWS.md <<'EOF'
+# Test Laws
+Minimal laws for testing.
+EOF
+
+mkdir -p docs/pre-brainstorms/20260309-0000--sample
+cat > docs/pre-brainstorms/README.md <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+cat > docs/pre-brainstorms/INDEX.md <<'EOF'
+# 预研头脑风暴索引
+- 20260309-0000--sample
+EOF
+
+cat > docs/pre-brainstorms/CONVERGENCE.md <<'EOF'
+# 收敛
+EOF
+
+# Initialize freely
+log_step "Initializing freely for test project"
+INIT_OUTPUT=$("${ROOT_DIR}/bin/freely" init \
+  --project "$TEST_PROJECT" \
+  --intent "$TEST_PROJECT/docs/PROJECT_INTENT.md" \
+  --constitution "$TEST_PROJECT/docs/CONSTITUTION.md" \
+  --ai codex:gpt-5-codex:auto \
+  --accept-default-autonomy 2>&1 || true)
+
+# Verify initialization
+if [[ ! -d "$TEST_PROJECT/.freely" ]]; then
+  log_error "Failed to initialize freely"
+  log_error "Init output:"
+  echo "$INIT_OUTPUT" | while read line; do
+    log_error "  $line"
+  done
+  exit 1
+fi
+
+log_success "Test project initialized"
+
+# Step 1: Start runtime and let it run briefly
+log_step "Step 1: Starting runtime"
+"${ROOT_DIR}/bin/freely" start --project "$TEST_PROJECT" &
+START_PID=$!
+
+# Wait for supervisor to be up
+sleep 2
+
+# Check if supervisor is running
+SUP_PID_FILE="$TEST_PROJECT/.freely/run/supervisor.pid"
+if [[ -f "$SUP_PID_FILE" ]]; then
+  SUP_PID=$(cat "$SUP_PID_FILE")
+  log_check "Supervisor PID: $SUP_PID"
+  if ps -p "$SUP_PID" >/dev/null 2>&1; then
+    log_success "Supervisor is running"
+  else
+    log_error "Supervisor PID file exists but process is not running"
+    exit 1
+  fi
+else
+  log_error "Supervisor PID file not found"
+  exit 1
+fi
+
+# Step 2: Stop runtime cleanly
+log_step "Step 2: Stopping runtime cleanly"
+"${ROOT_DIR}/bin/freely" stop --project "$TEST_PROJECT"
+wait $START_PID 2>/dev/null || true
+
+# Verify clean shutdown
+sleep 1
+WORKCELL_STATE="$TEST_PROJECT/.freely/run/workcell-state.env"
+if [[ -f "$WORKCELL_STATE" ]]; then
+  log_check "Workcell state after stop:"
+  cat "$WORKCELL_STATE" | while read line; do
+    log_check "  $line"
+  done
+  
+  # Check if state is down/down
+  if grep -q "LAST_SUPERVISOR_STATE=\"down\"" "$WORKCELL_STATE" && \
+     grep -q "LAST_AI_STATE=\"down\"" "$WORKCELL_STATE"; then
+    log_success "Runtime stopped cleanly with down/down state"
+  else
+    log_error "Runtime did not write down/down state after stop"
+  fi
+else
+  log_error "Workcell state file not found after stop"
+  exit 1
+fi
+
+# Step 3: Simulate the problematic scenario
+# Option A: Leave supervisor.pid file in place (if cleanup didn't remove it)
+# Option B: Rewrite supervisor.pid with a stale PID
+log_step "Step 3: Setting up false-positive trigger"
+
+# Check if supervisor.pid was cleaned up
+if [[ -f "$SUP_PID_FILE" ]]; then
+  STALE_PID=$(cat "$SUP_PID_FILE")
+  log_check "supervisor.pid file still exists with PID: $STALE_PID"
+  
+  # Check if this PID is still alive (it shouldn't be)
+  if ps -p "$STALE_PID" >/dev/null 2>&1; then
+    log_error "Stale PID is still alive - this is unexpected"
+    exit 1
+  else
+    log_check "Stale PID is not alive (expected)"
+  fi
+else
+  log_check "supervisor.pid was cleaned up (expected behavior)"
+  
+  # For repro purposes, write a stale PID back
+  # Use a PID that might exist but is not a project supervisor
+  STALE_PID=1  # init process, always exists but not a supervisor
+  echo "$STALE_PID" > "$SUP_PID_FILE"
+  log_check "Wrote stale PID $STALE_PID to supervisor.pid for repro"
+fi
+
+# Capture state before attach attempt
+RUNTIME_EVENTS="$TEST_PROJECT/.freely/logs/runtime-events.log"
+LAST_EVENT_BEFORE=$(tail -1 "$RUNTIME_EVENTS" 2>/dev/null || echo "")
+STATE_BEFORE=$(cat "$WORKCELL_STATE")
+
+log_check "State before attach attempt:"
+echo "$STATE_BEFORE" | while read line; do
+  log_check "  $line"
+done
+
+# Step 4: Attempt to start runtime again (should trigger attach logic)
+log_step "Step 4: Attempting to start runtime (should trigger attach check)"
+
+# Start in background and capture output
+START_OUTPUT=$("${ROOT_DIR}/bin/freely" start --project "$TEST_PROJECT" 2>&1 || true)
+log_check "Start command output:"
+echo "$START_OUTPUT" | while read line; do
+  log_check "  $line"
+done
+
+# Wait a moment for any state writes
+sleep 1
+
+# Step 5: Check for false-positive symptoms
+log_step "Step 5: Checking for false-positive already_running_attach"
+
+STATE_AFTER=$(cat "$WORKCELL_STATE")
+LAST_EVENT_AFTER=$(tail -1 "$RUNTIME_EVENTS" 2>/dev/null || echo "")
+
+log_check "State after attach attempt:"
+echo "$STATE_AFTER" | while read line; do
+  log_check "  $line"
+done
+
+# Check for regression symptoms
+REGRESSION_FOUND=0
+
+if echo "$STATE_AFTER" | grep -q "LAST_EXIT_REASON=\"already_running_attach\""; then
+  log_check "Found already_running_attach in state"
+  
+  # Check if state claims up/up
+  if echo "$STATE_AFTER" | grep -q "LAST_SUPERVISOR_STATE=\"up\"" && \
+     echo "$STATE_AFTER" | grep -q "LAST_AI_STATE=\"up\""; then
+    log_check "State claims up/up"
+    
+    # Check if there's a matching runtime event
+    if [[ "$LAST_EVENT_AFTER" == "$LAST_EVENT_BEFORE" ]]; then
+      log_error "REGRESSION CONFIRMED:"
+      log_error "  - State was rewritten to up/up/already_running_attach"
+      log_error "  - No new runtime event was emitted"
+      log_error "  - Last event is still: $LAST_EVENT_BEFORE"
+      REGRESSION_FOUND=1
+    else
+      log_check "New runtime event was emitted: $LAST_EVENT_AFTER"
+    fi
+  fi
+fi
+
+# Step 6: Verify with live-status
+log_step "Step 6: Checking live-status output"
+LIVE_STATUS=$("${ROOT_DIR}/bin/freely" live-status --project "$TEST_PROJECT" 2>&1 || true)
+log_check "live-status output:"
+echo "$LIVE_STATUS" | while read line; do
+  log_check "  $line"
+done
+
+# Check if live-status reports stale optimistic state
+if echo "$LIVE_STATUS" | grep -q "last_supervisor_state: up" && \
+   echo "$LIVE_STATUS" | grep -q "last_ai_state: up" && \
+   echo "$LIVE_STATUS" | grep -q "last_exit_reason: already_running_attach"; then
+  
+  # But check if there's actually a running supervisor
+  if [[ -f "$SUP_PID_FILE" ]]; then
+    CURRENT_PID=$(cat "$SUP_PID_FILE")
+    if ! ps -p "$CURRENT_PID" >/dev/null 2>&1; then
+      log_error "live-status reports up/up but supervisor PID $CURRENT_PID is not running"
+      REGRESSION_FOUND=1
+    fi
+  fi
+fi
+
+# Final verdict
+if [[ $REGRESSION_FOUND -eq 1 ]]; then
+  log_error ""
+  log_error "FALSE-POSITIVE REGRESSION REPRODUCED:"
+  log_error "1. Runtime was stopped cleanly"
+  log_error "2. State was rewritten to up/up/already_running_attach"
+  log_error "3. No runtime event was emitted for this state change"
+  log_error "4. live-status reports stale optimistic state"
+  log_error ""
+  log_error "This confirms the attach logic can write false-positive state"
+  exit 1
+else
+  log_success "No false-positive detected in this run"
+  log_success "Either the regression is not reproducible with this trigger,"
+  log_success "or the attach logic correctly rejected the stale PID"
+  exit 0
+fi

@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-latest-manager-continuity-current-format.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260325-0000--sample" "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs"
+
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name "Freely Test"
+git -C "$PROJECT" config user.email "freely@example.com"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260325-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260325-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260325-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m "init"
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+PROMPT_P0="$PROJECT/.freely/run/worker-prompts/20260325-023343-worker-manager-unconsumed-launchable-prompt-fix-codex.txt"
+PROMPT_P1="$PROJECT/.freely/run/worker-prompts/20260324-235123-worker-manager-no-fixed-cap-dispatch-codex.txt"
+cat >"$PROMPT_P0" <<EOF
+Worktree:
+- \`$PROJECT\`
+Branch:
+- \`develop\`
+EOF
+cat >"$PROMPT_P1" <<EOF
+Worktree:
+- \`$PROJECT\`
+Branch:
+- \`develop\`
+EOF
+
+NEW_CONT="$PROJECT/.freely/run/manager-continuity-20260325-023343.md"
+cat >"$NEW_CONT" <<EOF
+# Manager Continuity
+
+## Worker Delegation
+- prompt_path: \`$PROMPT_P0\`
+- target_worktree: \`$PROJECT\`
+- target_branch: \`develop\`
+- dispatch_priority: \`P0\`
+- parallel_safe: \`true\`
+- write_scope: \`$PROJECT\`
+- intent_kind: \`edit\`
+- intent_target: \`I-20260325-0233-A readiness\`
+
+## Queue / Frozen / Cleanup
+- merge-review queue:
+  - path: \`$PROJECT/worktrees/p1\`
+    - worker_prompt_path: \`$PROMPT_P1\`
+    - dispatch_priority: \`P1\`
+EOF
+
+cat >"$PROJECT/.freely/run/manager-worker-launch-state.env" <<EOF
+LAST_MANAGER_CONTINUITY_GENERATED="$NEW_CONT"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED=""
+LAST_MANAGER_CONTINUITY_CONSUMED="$NEW_CONT"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED=""
+LAUNCHED_WORKER_PROMPTS=""
+QUEUED_WORKER_PROMPTS=""
+UPDATED_AT="2026-03-25T09:55:14Z"
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+load_config "$PROJECT"
+
+manager_worker_launch_state_refresh_for_status "$PROJECT"
+EXPECTED_CSV="$(latest_manager_worker_prompt_csv_from_continuity "$NEW_CONT")"
+BASELINE="$(cmd_baseline_status --project "$PROJECT")"
+LIVE="$(cmd_live_status --project "$PROJECT")"
+
+printf '%s\n' "$BASELINE" | grep -q "latest_manager_worker_prompts_generated: $EXPECTED_CSV"
+printf '%s\n' "$LIVE" | grep -q "latest_manager_worker_prompts_generated: $EXPECTED_CSV"
+
+grep -q "^LAST_MANAGER_WORKER_PROMPTS_GENERATED=\"$EXPECTED_CSV\"$" "$PROJECT/.freely/run/manager-worker-launch-state.env"
+
+echo "[PASS] live-status refreshes current manager continuity prompt truth from the direct worker-delegation handoff format"

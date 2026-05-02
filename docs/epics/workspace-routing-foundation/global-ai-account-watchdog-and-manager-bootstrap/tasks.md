@@ -1,0 +1,30 @@
+# Tasks: global-ai-account-watchdog-and-manager-bootstrap
+
+- [x] materialize global watchdog issue and boundaries
+- [x] add CLI-first ensure-manager entry
+- [x] separate global account recovery from manager/worker duties
+- [x] add live integration test for running-manager bad-account to good-account recovery
+- [x] verify manager restarts and resumes supervision after recovery
+- [x] add script-level regression for account selection before manager bootstrap
+- [x] verify each account switch causes a new codex process launch before continuing
+- [x] probe the current slot and then full saved-slot inventory before any manager bootstrap decision; earliest-reset may remain as debug context but never as the authoritative recovery fallback
+- [x] write structured manager bootstrap handoff before watchdog relaunches the manager
+- [x] let the live test discover a usable account by real probe when no good account is provided
+- [x] make `freely ai switch codex` reuse the same active probe / cooldown update contract as the watchdog path
+- [x] make `ensure-manager --watch` survive all-accounts-cooling waits, retry after failed readiness passes, and re-probe before relaunch
+- [x] serialize manual/auto account switch sweeps so watchdog probe/bootstrap waits for the shared switch lock instead of racing a transient bad account
+- [x] retire cooldown ledger from primary recovery decisions; keep it only as debug evidence or secondary ordering hint
+- [x] route `rate limit`, `deactivated_workspace`, auth failure / invalid auth file, and slot probe failure into one failure-driven full slot sweep path
+- [x] change the all-slots-unavailable path from cooldown-ledger-driven waiting to low-frequency real reprobe, with earliest-reset remaining non-authoritative
+- [x] update runtime / watchdog / ai-cli regressions and live acceptance so they assert slot-sweep-first recovery instead of cooldown-first recovery
+- [x] remove cooldown from all recovery logic, not just primary decision branches
+- [x] enforce a strict no-launch gate while watchdog is sweeping or holding for availability
+- [x] keep manager and workers down when all slots are unavailable, while leaving watchdog alive and observable
+- [x] re-check availability on low-frequency probe and `.ai-auth` inventory changes, then wake manager only after writing handoff
+- [x] rewrite focused regressions and minimal integration coverage around strict probe gating and wake-only recovery
+- [x] make `ai-cli` expose slot as the only identity and report JWT email only as `auth_email` metadata, even when slot label and auth email differ
+- [x] make `freely start` fail fast when interruption dispatcher does not become ready, instead of silently continuing with a partial control-plane
+- [x] make `live-status` treat a live manager watchdog as active control-plane and surface it in `active_processes`
+- [x] keep detached `ensure-manager --watch` and interruption dispatcher alive after manager `auth_failure`, so intake absorption and slot recovery remain script-owned
+- [x] capture partial `codex exec` probe output into `.freely/run` artifacts when a slot probe times out or returns `deactivated_workspace`, so switch-time investigation no longer depends on reproducing the same transient failure interactively
+- [x] stop treating already-observed `402/deactivated_workspace` probe output as generic timeout; return hard-unavailable immediately so slot sweep can move on without waiting for Codex retry fallback to finish

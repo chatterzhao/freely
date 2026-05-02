@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-monitor-pid.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+prompt_file="$TMP_DIR/prompt.txt"
+pid_file="$TMP_DIR/ai.pid"
+log_file="$TMP_DIR/ai.log"
+project_dir="$TMP_DIR/project"
+
+mkdir -p "$project_dir/.freely/run"
+
+cat >"$prompt_file" <<'EOF'
+test prompt
+EOF
+
+cat >"$project_dir/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="starting"
+LAST_ENTRYPOINT_MODE="daemon"
+LAST_ROLE_HINT="worker"
+LAST_STATE_UPDATED_AT="2026-04-19T00:00:00Z"
+LAST_WORKER_VERIFICATION_CONTRACT_FILE=""
+LAST_WORKER_VERIFICATION_METADATA_PRESENT="false"
+LAST_WORKER_VERIFICATION_METADATA_MISSING_FIELDS=""
+LAST_WORKER_OWNER_ISSUE=""
+LAST_WORKER_PRE_TESTS_PATH=""
+LAST_WORKER_VERIFICATION_ARTIFACT_DIR=""
+LAST_WORKER_REQUIRED_TEST_LANES_CSV=""
+LAST_WORKER_REQUIRED_ACCEPTANCE_ITEM_IDS_CSV=""
+LAST_WORKER_MINIMUM_EVIDENCE_LEVEL=""
+LAST_WORKER_TARGET_ENVIRONMENT=""
+LAST_WORKER_CLOSEOUT_GATE=""
+LAST_WORKER_CLOSEOUT_GATE_COMMAND=""
+LAST_WORKER_CLOSEOUT_TARGET_LANE=""
+LAST_WORKER_CLOSEOUT_PROMOTION_GATE=""
+LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY=""
+LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY=""
+EOF
+
+session_id_file="$TMP_DIR/session.id"
+
+bash "$ROOT_DIR/docs/system/workspace/scripts/monitor-ai-cli.sh" \
+  --project "$project_dir" \
+  --tool test-sleep \
+  --model "" \
+  --reasoning-effort "" \
+  --mode auto \
+  --prompt-file "$prompt_file" \
+  --pid-file "$pid_file" \
+  --log-file "$log_file" \
+  --launch-kind fresh \
+  >"$session_id_file" &
+
+monitor_pid=$!
+sleep 1
+
+recorded_pid="$(cat "$pid_file")"
+reported_pid="$(tr -d '\n' <"$session_id_file")"
+
+[[ -n "$recorded_pid" ]]
+[[ "$recorded_pid" == "$reported_pid" ]]
+kill -0 "$recorded_pid" 2>/dev/null
+grep -q 'LAST_AI_STATE="up"' "$project_dir/.freely/run/workcell-state.env"
+grep -q 'LAST_EXIT_REASON="ai_launch_in_flight"' "$project_dir/.freely/run/workcell-state.env"
+grep -q 'LAST_ENTRYPOINT_MODE="daemon"' "$project_dir/.freely/run/workcell-state.env"
+
+wait "$monitor_pid"
+
+printf '%s\n' "$(cat "$log_file")" | grep -q '\[TEST\] mock AI CLI started'
+
+echo "[PASS] monitor writes the real launched pid, preserves entrypoint mode, marks launch-in-flight state, and blocks until exit"

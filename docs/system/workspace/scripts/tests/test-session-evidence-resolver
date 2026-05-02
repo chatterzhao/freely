@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-session-evidence-resolver.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+CLAUDE_CONFIG_DIR="$TMP_DIR/.claude"
+CODEX_HOME="$TMP_DIR/.codex"
+PROJECT_ROOT="$TMP_DIR/project"
+PROJECT_SYMLINK="$TMP_DIR/project-link"
+CLAUDE_SESSION_ID="11111111-2222-4333-8444-555555555555"
+CODEX_THREAD_ID="019d0f86-7c2e-7f50-999f-10cf4935e7ba"
+CLAUDE_PROJECT_KEY="-tmp-freely-session-evidence-resolver.XXXXXX-project"
+
+mkdir -p "$PROJECT_ROOT" \
+  "$CLAUDE_CONFIG_DIR/projects/$CLAUDE_PROJECT_KEY" \
+  "$CODEX_HOME/sessions/2026/03/21"
+ln -s "$PROJECT_ROOT" "$PROJECT_SYMLINK"
+
+# shellcheck disable=SC1091
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/session-evidence-resolver.sh"
+
+resolved_project_key="$(sanitize_claude_project_key "$PROJECT_ROOT")"
+mkdir -p "$CLAUDE_CONFIG_DIR/projects/$resolved_project_key"
+
+CLAUDE_JSONL="$CLAUDE_CONFIG_DIR/projects/$resolved_project_key/$CLAUDE_SESSION_ID.jsonl"
+CODEX_JSONL="$CODEX_HOME/sessions/2026/03/21/rollout-2026-03-21T08-32-51-$CODEX_THREAD_ID.jsonl"
+
+cat >"$CLAUDE_JSONL" <<EOF
+{"type":"assistant","message":{"content":[{"type":"tool_use","name":"mcp__codex-cli__codex","input":{"prompt":"echo test"}}]},"sessionId":"$CLAUDE_SESSION_ID","cwd":"$PROJECT_ROOT"}
+{"type":"user","toolUseResult":"{\"threadId\":\"$CODEX_THREAD_ID\",\"content\":\"ok\"}","mcpMeta":{"structuredContent":{"threadId":"$CODEX_THREAD_ID","content":"ok"}},"sessionId":"$CLAUDE_SESSION_ID","cwd":"$PROJECT_ROOT"}
+EOF
+
+cat >"$CODEX_JSONL" <<'EOF'
+{"type":"event_msg","payload":{"type":"token_count","info":{"total_token_usage":{"total_tokens":10},"model_context_window":1000}}}
+EOF
+
+test "$(find_claude_jsonl_path_for_session "$PROJECT_ROOT" "$CLAUDE_SESSION_ID")" = "$CLAUDE_JSONL"
+test "$(find_claude_jsonl_path_for_session "$PROJECT_SYMLINK" "$CLAUDE_SESSION_ID")" = "$CLAUDE_JSONL"
+test "$(extract_latest_codex_thread_id_from_claude_jsonl "$CLAUDE_JSONL")" = "$CODEX_THREAD_ID"
+
+resolved="$(CLAUDE_CONFIG_DIR="$CLAUDE_CONFIG_DIR" CODEX_HOME="$CODEX_HOME" resolve_cc_session_evidence "$PROJECT_ROOT" "$CLAUDE_SESSION_ID")"
+grep -q "^CLAUDE_JSONL_PATH=\"$CLAUDE_JSONL\"$" <<<"$resolved"
+grep -q '^CODEX_MCP_USED="1"$' <<<"$resolved"
+grep -q "^CODEX_MCP_THREAD_ID=\"$CODEX_THREAD_ID\"$" <<<"$resolved"
+grep -q "^CODEX_MCP_JSONL_PATH=\"$CODEX_JSONL\"$" <<<"$resolved"
+
+echo "[PASS] session evidence resolver finds exact claude and codex jsonl paths"

@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-monitor-codex-switch-gate.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+make_auth_json() {
+  local email="$1" target="$2"
+  local payload
+  payload="$(python3 - <<'PY' "$email"
+import base64
+import json
+import sys
+
+payload = base64.urlsafe_b64encode(json.dumps({"email": sys.argv[1]}).encode()).decode().rstrip("=")
+print(payload)
+PY
+)"
+  printf '{"tokens":{"id_token":"x.%s.y"}}\n' "$payload" >"$target"
+}
+
+project_dir="$TMP_DIR/project"
+prompt_file="$TMP_DIR/prompt.txt"
+pid_file="$TMP_DIR/ai.pid"
+log_file="$TMP_DIR/ai.log"
+mock_bin="$TMP_DIR/bin"
+home_dir="$TMP_DIR/home"
+lock_dir="$TMP_DIR/account-switch.lock"
+launch_log="$TMP_DIR/codex.launch.log"
+mkdir -p "$mock_bin" "$project_dir" "$home_dir/.codex"
+
+cat >"$prompt_file" <<'EOF'
+test prompt
+EOF
+
+cat >"$mock_bin/codex" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+auth_file="${HOME:?}/.codex/auth.json"
+log_file="${MOCK_CODEX_LAUNCH_LOG:?}"
+
+email="$(python3 - <<'PY' "$auth_file"
+import base64
+import json
+import sys
+
+with open(sys.argv[1], "r", encoding="utf-8") as f:
+    data = json.load(f)
+token = data["tokens"]["id_token"].split(".")[1]
+token += "=" * (-len(token) % 4)
+payload = json.loads(base64.urlsafe_b64decode(token.encode()))
+print(payload["email"])
+PY
+)"
+
+printf '%s\n' "$email" >>"$log_file"
+echo "[TEST] mock codex started for $email"
+exit 0
+EOF
+chmod +x "$mock_bin/codex"
+
+make_auth_json "bad@example.com" "$home_dir/.codex/auth.json"
+
+mkdir -p "$lock_dir"
+sleep 3 &
+lock_pid=$!
+cat >"$lock_dir/state.env" <<EOF
+owner_pid=$lock_pid
+started_at=$(date +%s)
+reason=manual_switch_sweep
+command=switch
+target=auto
+EOF
+
+PATH="$mock_bin:$PATH" \
+HOME="$home_dir" \
+TMP_DIR="$TMP_DIR" \
+MOCK_CODEX_LAUNCH_LOG="$launch_log" \
+AI_CLI_SWITCH_LOCK_DIR="$lock_dir" \
+FREELY_ACCOUNT_SWITCH_WAIT_INTERVAL_SECS=1 \
+  bash "$ROOT_DIR/docs/system/workspace/scripts/monitor-ai-cli.sh" \
+    --project "$project_dir" \
+    --tool codex \
+    --model "gpt-5.4" \
+    --reasoning-effort "medium" \
+    --mode auto \
+    --prompt-file "$prompt_file" \
+    --pid-file "$pid_file" \
+    --log-file "$log_file" \
+    --launch-kind fresh \
+    >/dev/null &
+
+monitor_pid=$!
+sleep 1
+
+if [[ -s "$launch_log" ]]; then
+  echo "[FAIL] expected codex launch to stay blocked while slot switch lock is active" >&2
+  exit 1
+fi
+
+make_auth_json "good@example.com" "$home_dir/.codex/auth.json"
+printf '%s\n' "good-slot" >"$home_dir/.codex/active-slot"
+
+wait "$monitor_pid"
+
+grep -q '^good@example.com$' "$launch_log"
+if grep -q '^bad@example.com$' "$launch_log"; then
+  echo "[FAIL] expected first codex launch after switch to use the stabilized auth, not the pre-switch auth" >&2
+  exit 1
+fi
+grep -q '\[WARN\] codex slot switch is already in progress' "$log_file"
+grep -q '\[TEST\] mock codex started for good@example.com' "$log_file"
+
+echo "[PASS] monitor blocks codex launch behind the shared slot switch lock and the first post-switch launch uses the stabilized auth"

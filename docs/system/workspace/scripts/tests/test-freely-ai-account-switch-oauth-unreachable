@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-ai-account-switch-oauth-unreachable.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+HOME_DIR="$TMP_DIR/home"
+FREELY_HOME_DIR="$TMP_DIR/freely-home"
+MOCK_BIN="$TMP_DIR/mock-bin"
+CODEX_LOG="$TMP_DIR/codex.log"
+CURL_LOG="$TMP_DIR/curl.log"
+mkdir -p \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/docs/system/workspace/skills/watchdog-control-plane/scripts" \
+  "$PROJECT/docs/system/workspace/scripts/runtime" \
+  "$HOME_DIR/.ai-auth/codex-test@example-com-1" \
+  "$HOME_DIR/.codex" \
+  "$FREELY_HOME_DIR" \
+  "$MOCK_BIN"
+
+ln -sf \
+  "$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh" \
+  "$PROJECT/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+ln -sf \
+  "$ROOT_DIR/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" \
+  "$PROJECT/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
+
+cat >"$PROJECT/.freely/config.env" <<'EOF'
+FREELY_NETWORK_PROXY_MODE="inherit"
+EOF
+
+python3 - <<'PY' "$HOME_DIR/.ai-auth/codex-test@example-com-1/auth.json"
+import base64
+import json
+import sys
+
+payload = base64.urlsafe_b64encode(json.dumps({"email": "test@example.com"}).encode()).decode().rstrip("=")
+with open(sys.argv[1], "w", encoding="utf-8") as f:
+    json.dump({"tokens": {"id_token": f"x.{payload}.y", "access_token": "token-test", "refresh_token": "refresh-test"}}, f)
+PY
+
+python3 - <<'PY' "$HOME_DIR/.codex/auth.json"
+import base64
+import json
+import sys
+
+payload = base64.urlsafe_b64encode(json.dumps({"email": "old@example.com"}).encode()).decode().rstrip("=")
+with open(sys.argv[1], "w", encoding="utf-8") as f:
+    json.dump({"tokens": {"id_token": f"x.{payload}.y", "access_token": "token-old", "refresh_token": "refresh-old"}}, f)
+PY
+
+cat >"$MOCK_BIN/curl" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+printf 'curl-called\n' >>"${CURL_LOG:?}"
+exit 7
+EOF
+chmod +x "$MOCK_BIN/curl"
+
+cat >"$MOCK_BIN/codex" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+printf '%s\n' "$*" >>"${CODEX_LOG:?}"
+if [[ "${1:-}" == "exec" ]]; then
+  cat >/dev/null || true
+  exit 0
+fi
+exit 99
+EOF
+chmod +x "$MOCK_BIN/codex"
+
+HOME="$HOME_DIR" \
+FREELY_HOME="$FREELY_HOME_DIR" \
+PROJECT_ROOT="$PROJECT" \
+PATH="$MOCK_BIN:$PATH" \
+CODEX_LOG="$CODEX_LOG" \
+CURL_LOG="$CURL_LOG" \
+  bash "$ROOT_DIR/bin/ai" --quiet --format json switch codex >"$TMP_DIR/out.json"
+
+python3 - <<'PY' "$TMP_DIR/out.json"
+import json
+import pathlib
+import sys
+
+data = json.loads(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"))
+assert data["switched"] is True
+assert data["slot"] == "test@example-com-1"
+assert data["status"] == "usable"
+PY
+grep -q '^exec ' "$CODEX_LOG"
+[[ ! -e "$CURL_LOG" || ! -s "$CURL_LOG" ]]
+
+echo "[PASS] freely ai switch codex ignores curl inventory outages and still uses exec-only probing for saved account slots"

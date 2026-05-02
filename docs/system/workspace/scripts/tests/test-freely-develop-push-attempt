@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-develop-push-attempt.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+REMOTE="$TMP_DIR/remote.git"
+MOCK_BIN="$TMP_DIR/mock-bin"
+REAL_GIT="$(command -v git)"
+
+mkdir -p "$REPO"
+git init -q -b develop "$REPO"
+git -C "$REPO" config user.name tester
+git -C "$REPO" config user.email tester@example.com
+
+mkdir -p "$REPO/docs" "$REPO/.freely/run"
+cat >"$REPO/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$REPO/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$REPO/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$REPO/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$REPO/.freely/config.env" <<EOF
+PROJECT_ROOT="$REPO"
+INTENT_FILE="$REPO/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$REPO/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+
+echo base >"$REPO/README.md"
+git -C "$REPO" add README.md
+git -C "$REPO" commit -q -m "init"
+git init -q --bare "$REMOTE"
+git -C "$REPO" remote add origin "$REMOTE"
+git -C "$REPO" push -q -u origin develop
+
+BASE_SHA="$(git -C "$REPO" rev-parse refs/remotes/origin/develop)"
+
+echo one >"$REPO/one.txt"
+git -C "$REPO" add one.txt
+git -C "$REPO" commit -q -m "local merge result one"
+
+mkdir -p "$MOCK_BIN"
+cat >"$MOCK_BIN/git" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+real_git="${REAL_GIT:?}"
+repo="${REPO_UNDER_TEST:?}"
+stale_target="${STALE_REMOTE_REF_TARGET:-}"
+if [[ "${1:-}" == "-C" && "${2:-}" == "$repo" && "${3:-}" == "push" ]]; then
+  "$real_git" "$@"
+  if [[ -n "$stale_target" ]]; then
+    "$real_git" -C "$repo" update-ref refs/remotes/origin/develop "$stale_target"
+  fi
+  exit 0
+fi
+exec "$real_git" "$@"
+EOF
+chmod +x "$MOCK_BIN/git"
+
+SUCCESS_OUTPUT="$(PATH="$MOCK_BIN:$PATH" REAL_GIT="$REAL_GIT" REPO_UNDER_TEST="$REPO" STALE_REMOTE_REF_TARGET="$BASE_SHA" bash "$ROOT_DIR/bin/freely" develop-push attempt --project "$REPO")"
+printf '%s\n' "$SUCCESS_OUTPUT" | grep -q 'attempt_status: pushed'
+printf '%s\n' "$SUCCESS_OUTPUT" | grep -q 'develop_push_followthrough_state: clean'
+[[ ! -f "$REPO/.freely/run/develop-push-attempt.env" ]]
+[[ "$(git -C "$REPO" rev-parse refs/remotes/origin/develop)" == "$(git -C "$REPO" rev-parse HEAD)" ]]
+
+mkdir -p "$REPO/.git/hooks"
+cat >"$REPO/.git/hooks/pre-push" <<'EOF'
+#!/usr/bin/env bash
+echo "pre-push test gate blocked delivery" >&2
+exit 1
+EOF
+chmod +x "$REPO/.git/hooks/pre-push"
+
+echo two >"$REPO/two.txt"
+git -C "$REPO" add two.txt
+git -C "$REPO" commit -q -m "local merge result two"
+
+set +e
+BLOCKED_OUTPUT="$(bash "$ROOT_DIR/bin/freely" develop-push attempt --project "$REPO" 2>&1)"
+BLOCKED_RC=$?
+set -e
+[[ "$BLOCKED_RC" -ne 0 ]]
+printf '%s\n' "$BLOCKED_OUTPUT" | grep -q 'attempt_status: blocked'
+printf '%s\n' "$BLOCKED_OUTPUT" | grep -q 'develop_push_followthrough_state: push_blocked'
+printf '%s\n' "$BLOCKED_OUTPUT" | grep -q 'develop_push_followthrough_blocked_reason: push_rejected_by_gate'
+[[ -f "$REPO/.freely/run/develop-push-attempt.env" ]]
+
+STATUS_OUTPUT="$(bash "$ROOT_DIR/bin/freely" develop-push status --project "$REPO")"
+printf '%s\n' "$STATUS_OUTPUT" | grep -q 'develop_push_followthrough_state: push_blocked'
+printf '%s\n' "$STATUS_OUTPUT" | grep -q 'develop_push_followthrough_blocked_reason: push_rejected_by_gate'
+printf '%s\n' "$STATUS_OUTPUT" | grep -q 'develop_push_followthrough_push_urgency: immediate'
+
+echo "[PASS] freely develop-push attempt succeeds once and writes explicit push_blocked truth on failure"

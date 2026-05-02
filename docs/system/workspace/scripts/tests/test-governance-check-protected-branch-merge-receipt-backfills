@@ -1,0 +1,774 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-governance-protected-merge-backfill.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+make_repo() {
+  local repo="$1"
+  mkdir -p "$repo/bin" "$repo/docs/system/workspace/scripts/quality" "$repo/docs/system/workspace/hooks"
+  cd "$repo"
+
+  cp "$ROOT_DIR/bin/governance-check" "$repo/bin/governance-check"
+  cp "$ROOT_DIR/docs/system/workspace/scripts/quality/governance-check" "$repo/docs/system/workspace/scripts/quality/governance-check"
+  chmod +x "$repo/bin/governance-check" "$repo/docs/system/workspace/scripts/quality/governance-check"
+
+  mkdir -p "$repo/docs/system/workspace/skills/doc-ibm-execution/references"
+  mkdir -p "$repo/docs/system/workspace/skills/doc-ibm-execution"
+  mkdir -p "$repo/docs/system/workspace/skills/doc-pre-brainstorm-execution"
+  mkdir -p "$repo/docs/system/workspace/skills/dev-loop-execution"
+  mkdir -p "$repo/docs/system/workspace/skills/auto-loop-orchestrator"
+  mkdir -p "$repo/docs/system/workspace/skills"
+  mkdir -p "$repo/docs/system/workspace/agents"
+  mkdir -p "$repo/docs/pre-brainstorms/20260404-0640--sample-receipt-gap"
+  mkdir -p "$repo/docs/epics/sample/issues" "$repo/docs/epics/sample/code-reviews"
+
+  cat > "$repo/AGENTS.md" <<'EOF'
+# Agent entry
+EOF
+  cat > "$repo/docs/PROJECT_INTENT.md" <<'EOF'
+# Project Intent
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/LAWS.md" <<'EOF'
+# Laws
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/system/workspace/three-loop-capability-lifecycle.md" <<'EOF'
+# Three Loop Capability Lifecycle
+EOF
+  cat > "$repo/docs/system/workspace/hooks/README.md" <<'EOF'
+# Workspace Hooks
+EOF
+  cat > "$repo/docs/system/workspace/hooks/protected-branch-breakglass-receipts.md" <<'EOF'
+# Protected Branch Break-Glass Receipts
+
+- audit_effective_date: `2099-01-01`
+- source_policy_effective_date: `2099-01-01`
+EOF
+  cat > "$repo/docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md" <<'EOF'
+# Protected Branch Merge Receipt Backfills
+
+- audit_effective_date: `2026-04-04`
+- source_policy_effective_date: `2026-04-04`
+EOF
+  cat > "$repo/docs/system/workspace/scripts/README.md" <<'EOF'
+# Scripts
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/system/workspace/skills/README.md" <<'EOF'
+# Skills
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/system/workspace/agents/lead-agent.md" <<'EOF'
+# Lead Agent
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/system/workspace/agents/manager-agent.md" <<'EOF'
+# Manager Agent
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/system/workspace/agents/worker-agent.md" <<'EOF'
+# Worker Agent
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md" <<'EOF'
+# Skill
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/system/workspace/skills/doc-pre-brainstorm-execution/SKILL.md" <<'EOF'
+# Skill
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/system/workspace/skills/doc-ibm-execution/SKILL.md" <<'EOF'
+# Skill
+See docs/system/workspace/three-loop-capability-lifecycle.md
+references/prd-quality-bar.md
+pre-tests.md` 和 `tasks.md` 必须从 `prd.md` 自然派生
+EOF
+  cat > "$repo/docs/system/workspace/skills/dev-loop-execution/SKILL.md" <<'EOF'
+# Skill
+See docs/system/workspace/three-loop-capability-lifecycle.md
+EOF
+  cat > "$repo/docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md" <<'EOF'
+# PRD Quality Bar
+## Minimum structure
+## Bar for `done_ibm`
+EOF
+  cat > "$repo/docs/system/workspace/skills/doc-ibm-execution/references/ibm-completion-gate.md" <<'EOF'
+# IBM Completion Gate
+prd-quality-bar.md
+EOF
+  cat > "$repo/docs/system/workspace/skills/doc-ibm-execution/references/issue-materialization-checklist.md" <<'EOF'
+# Issue Materialization Checklist
+prd-quality-bar.md
+EOF
+  cat > "$repo/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+  cat > "$repo/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# Convergence
+EOF
+  cat > "$repo/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260404-0640--sample-receipt-gap
+  - brainstorms: docs/pre-brainstorms/20260404-0640--sample-receipt-gap/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260404-0640--sample-receipt-gap/candidates.md
+EOF
+  cat > "$repo/docs/pre-brainstorms/20260404-0640--sample-receipt-gap/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+  cat > "$repo/docs/pre-brainstorms/20260404-0640--sample-receipt-gap/candidates.md" <<'EOF'
+# Candidates
+## C-20260404-0640-A
+- candidate_format_version: `v2`
+- title: sample
+- status: `promoted`
+- decision_reason: sample
+- acceptance_criteria:
+  - protected branch receipt gap is auditable
+- promotion_gate:
+  - issue is materialized
+- open_questions: []
+- acceptance_reviews:
+  - reviewer: `codex-mini`
+    verdict: `supports`
+    note: sample
+- promoted_issue_path: `docs/epics/sample/issues/sample.md`
+- milestone: `M-20260404-0640-sample`
+- session_refs: []
+EOF
+  cat > "$repo/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-20260404-0640-sample
+
+- status: active
+
+### committed_issues
+
+1. `I-20260404-0640-A`
+- title: sample owner
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P1
+- issue_path: `docs/epics/sample/issues/sample.md`
+- source_brainstorm: `docs/pre-brainstorms/20260404-0640--sample-receipt-gap/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260404-0640--sample-receipt-gap/candidates.md`
+- next_action: implement sample owner
+
+### candidate_issues
+
+1. `C-20260404-0640-A`
+- title: sample
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P1
+- promoted_issue_path: `docs/epics/sample/issues/sample.md`
+- source_brainstorm: `docs/pre-brainstorms/20260404-0640--sample-receipt-gap/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260404-0640--sample-receipt-gap/candidates.md`
+- next_action: sample
+- revisit_trigger: sample
+
+### completed_issues
+
+- none currently
+EOF
+  cat > "$repo/docs/epics/sample/issues/sample.md" <<'EOF'
+# Issue: sample
+
+- issue_id: `I-20260404-0640-A`
+- phase_state: `in_dev`
+- milestone: `M-20260404-0640-sample`
+- source_candidate: `docs/pre-brainstorms/20260404-0640--sample-receipt-gap/candidates.md#c-20260404-0640-a`
+EOF
+  cat > "$repo/docs/epics/sample/code-reviews/sample-verification.md" <<'EOF'
+# Verification: sample
+EOF
+}
+
+REPO_BAD="$TMP_DIR/repo-bad"
+make_repo "$REPO_BAD"
+cd "$REPO_BAD"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b feature/raw
+echo raw > RAW.txt
+git add RAW.txt
+git commit -q -m "raw feature"
+git checkout -q develop
+git merge --no-ff --no-edit feature/raw >/dev/null
+echo tail > TAIL.txt
+git add TAIL.txt
+git commit -q -m "tail after raw merge"
+
+if ./bin/governance-check >"$TMP_DIR/bad.out" 2>&1; then
+  echo "[FAIL] governance-check should reject protected-branch merge commits without backfill after the audit effective date" >&2
+  cat "$TMP_DIR/bad.out" >&2
+  exit 1
+fi
+grep -q "missing canonical Freely merge trailers and has no matching receipt-gap backfill" "$TMP_DIR/bad.out"
+
+REPO_GOOD="$TMP_DIR/repo-good"
+make_repo "$REPO_GOOD"
+cd "$REPO_GOOD"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b test-pre-merge-20260404-gap
+echo gap > GAP.txt
+git add GAP.txt
+git commit -q -m "gap feature"
+git checkout -q develop
+git merge --no-ff --no-edit test-pre-merge-20260404-gap >/dev/null
+GOOD_MERGE="$(git rev-parse HEAD)"
+echo tail > TAIL.txt
+git add TAIL.txt
+git commit -q -m "tail after gap merge"
+cat > docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md <<EOF
+# Protected Branch Merge Receipt Backfills
+
+- audit_effective_date: \`2026-04-04\`
+
+## Receipt Gap: $GOOD_MERGE
+
+- target_branch: \`develop\`
+- source_branch: \`test-pre-merge-20260404-gap\`
+- canonical_merge_path: \`merge-guarded\`
+- canonical_bypass_mode: \`forbidden\`
+- follow_on_owner: \`I-20260404-0640-A\`
+- evidence_refs:
+  - \`docs/epics/sample/issues/sample.md\`
+EOF
+
+if ! ./bin/governance-check >"$TMP_DIR/good.out" 2>&1; then
+  cat "$TMP_DIR/good.out" >&2
+  exit 1
+fi
+grep -q "Governance check passed" "$TMP_DIR/good.out"
+
+REPO_FEATURE_TARGET="$TMP_DIR/repo-feature-target"
+make_repo "$REPO_FEATURE_TARGET"
+cd "$REPO_FEATURE_TARGET"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b feature/owner
+echo owner > OWNER.txt
+git add OWNER.txt
+git commit -q -m "owner feature"
+git checkout -q develop
+echo mainline > MAINLINE.txt
+git add MAINLINE.txt
+git commit -q -m "mainline change"
+git checkout -q feature/owner
+git merge --no-ff --no-edit develop >/dev/null
+FEATURE_TARGET_MERGE="$(git rev-parse HEAD)"
+git checkout -q -b test-pre-merge-20260404-owner
+git checkout -q develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'test-pre-merge-20260404-owner' into develop
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: test-pre-merge-20260404-owner
+EOF
+)" test-pre-merge-20260404-owner >/dev/null
+echo tail > TAIL.txt
+git add TAIL.txt
+git commit -q -m "tail after feature-target ancestry gap"
+cat > docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md <<EOF
+# Protected Branch Merge Receipt Backfills
+
+- audit_effective_date: \`2026-04-04\`
+
+## Receipt Gap: $FEATURE_TARGET_MERGE
+
+- target_branch: \`feature/owner\`
+- source_branch: \`develop\`
+- canonical_merge_path: \`merge-guarded\`
+- canonical_bypass_mode: \`forbidden\`
+- follow_on_owner: \`I-20260404-0640-A\`
+- evidence_refs:
+  - \`docs/epics/sample/issues/sample.md\`
+EOF
+
+if ! ./bin/governance-check >"$TMP_DIR/feature-target.out" 2>&1; then
+  cat "$TMP_DIR/feature-target.out" >&2
+  exit 1
+fi
+grep -q "Governance check passed" "$TMP_DIR/feature-target.out"
+
+REPO_TRAILER="$TMP_DIR/repo-trailer"
+make_repo "$REPO_TRAILER"
+cd "$REPO_TRAILER"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b test-pre-merge-20260404-receipt
+echo receipt > RECEIPT.txt
+git add RECEIPT.txt
+git commit -q -m "receipt feature"
+git checkout -q develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'test-pre-merge-20260404-receipt' into develop
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: test-pre-merge-20260404-receipt
+EOF
+)" test-pre-merge-20260404-receipt >/dev/null
+TRAILER_MERGE="$(git rev-parse HEAD)"
+echo tail > TAIL.txt
+git add TAIL.txt
+git commit -q -m "tail after trailer merge"
+cat > docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md <<EOF
+# Protected Branch Merge Receipt Backfills
+
+- audit_effective_date: \`2026-04-04\`
+
+## Receipt Gap: $TRAILER_MERGE
+
+- target_branch: \`develop\`
+- source_branch: \`test-pre-merge-20260404-receipt\`
+- canonical_merge_path: \`merge-guarded\`
+- canonical_bypass_mode: \`forbidden\`
+- follow_on_owner: \`I-20260404-0640-A\`
+- evidence_refs:
+  - \`docs/epics/sample/issues/sample.md\`
+EOF
+
+if ./bin/governance-check >"$TMP_DIR/trailer.out" 2>&1; then
+  echo "[FAIL] governance-check should reject receipt-gap backfills for trailer-bearing protected merges" >&2
+  cat "$TMP_DIR/trailer.out" >&2
+  exit 1
+fi
+grep -q "already has canonical trailers and must not declare a receipt-gap backfill" "$TMP_DIR/trailer.out"
+
+REPO_ANCESTRY="$TMP_DIR/repo-ancestry"
+make_repo "$REPO_ANCESTRY"
+cd "$REPO_ANCESTRY"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b feature/subject-target
+echo nested > NESTED.txt
+git add NESTED.txt
+git commit -q -m "nested feature"
+git checkout -q develop
+echo upstream > UPSTREAM.txt
+git add UPSTREAM.txt
+git commit -q -m "develop advance"
+git checkout -q feature/subject-target
+git merge --no-ff --no-edit develop >/dev/null
+git checkout -q -b test-pre-merge-20260404-subject-target
+git checkout -q develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'test-pre-merge-20260404-subject-target' into develop
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: test-pre-merge-20260404-subject-target
+EOF
+)" test-pre-merge-20260404-subject-target >/dev/null
+echo tail > TAIL.txt
+git add TAIL.txt
+git commit -q -m "tail after ancestry merge"
+
+if ! ./bin/governance-check >"$TMP_DIR/ancestry.out" 2>&1; then
+  echo "[FAIL] governance-check should ignore non-protected-target merge subjects that only appear inside protected ancestry" >&2
+  cat "$TMP_DIR/ancestry.out" >&2
+  exit 1
+fi
+grep -q "Governance check passed" "$TMP_DIR/ancestry.out"
+
+REPO_INVALID_BACKFILL="$TMP_DIR/repo-invalid-backfill"
+make_repo "$REPO_INVALID_BACKFILL"
+cd "$REPO_INVALID_BACKFILL"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b feature/invalid-gap
+echo invalid > INVALID.txt
+git add INVALID.txt
+git commit -q -m "invalid gap feature"
+git checkout -q develop
+git merge --no-ff --no-edit feature/invalid-gap >/dev/null
+INVALID_GAP_MERGE="$(git rev-parse HEAD)"
+cat > docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md <<EOF
+# Protected Branch Merge Receipt Backfills
+
+- audit_effective_date: \`2026-04-04\`
+- source_policy_effective_date: \`2026-04-04\`
+
+## Receipt Gap: $INVALID_GAP_MERGE
+
+- target_branch: \`develop\`
+- source_branch: \`feature/invalid-gap\`
+- canonical_merge_path: \`merge-guarded\`
+- canonical_bypass_mode: \`forbidden\`
+- follow_on_owner: \`I-20260404-0640-A\`
+- evidence_refs:
+  - \`docs/epics/sample/issues/sample.md\`
+EOF
+
+if ./bin/governance-check >"$TMP_DIR/invalid-backfill.out" 2>&1; then
+  echo "[FAIL] governance-check should reject develop receipt-gap backfills whose source branch is not in the test-pre-merge family" >&2
+  cat "$TMP_DIR/invalid-backfill.out" >&2
+  exit 1
+fi
+grep -q "has invalid source_branch 'feature/invalid-gap' for target 'develop'" "$TMP_DIR/invalid-backfill.out"
+
+REPO_GENERIC_GOOD="$TMP_DIR/repo-generic-good"
+make_repo "$REPO_GENERIC_GOOD"
+cd "$REPO_GENERIC_GOOD"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b test-pre-merge-20260404-generic
+echo batch > BATCH.txt
+git add BATCH.txt
+git commit -q -m "batch seed"
+git checkout -q -b feature/generic-source develop
+echo source > SOURCE.txt
+git add SOURCE.txt
+git commit -q -m "source feature"
+git checkout -q test-pre-merge-20260404-generic
+git merge --no-ff -m "Merge" feature/generic-source >/dev/null
+GENERIC_GAP_MERGE="$(git rev-parse HEAD)"
+echo batch-tail > BATCH_TAIL.txt
+git add BATCH_TAIL.txt
+git commit -q -m "batch tail"
+git checkout -q develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'test-pre-merge-20260404-generic' into develop
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: test-pre-merge-20260404-generic
+EOF
+)" test-pre-merge-20260404-generic >/dev/null
+ABSORBING_MERGE="$(git rev-parse HEAD)"
+echo tail > TAIL.txt
+git add TAIL.txt
+git commit -q -m "tail after generic ancestry merge"
+cat > docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md <<EOF
+# Protected Branch Merge Receipt Backfills
+
+- audit_effective_date: \`2026-04-04\`
+- source_policy_effective_date: \`2026-04-04\`
+
+## Receipt Gap: $GENERIC_GAP_MERGE
+
+- validation_mode: \`unparseable_subject_ancestry\`
+- target_branch: \`develop\`
+- source_branch: \`test-pre-merge-20260404-generic\`
+- protected_batch_branch: \`test-pre-merge-20260404-generic\`
+- absorbing_protected_merge: \`$ABSORBING_MERGE\`
+- canonical_merge_path: \`merge-guarded\`
+- canonical_bypass_mode: \`forbidden\`
+- follow_on_owner: \`I-20260404-0640-A\`
+- bounded_issue: \`docs/epics/sample/issues/sample.md\`
+- verification_ref: \`docs/epics/sample/code-reviews/sample-verification.md\`
+- evidence_refs:
+  - \`docs/epics/sample/issues/sample.md\`
+  - \`docs/epics/sample/code-reviews/sample-verification.md\`
+EOF
+
+if ! ./bin/governance-check >"$TMP_DIR/generic-good.out" 2>&1; then
+  cat "$TMP_DIR/generic-good.out" >&2
+  exit 1
+fi
+grep -q "Governance check passed" "$TMP_DIR/generic-good.out"
+
+REPO_GENERIC_RETIRED_TARGET="$TMP_DIR/repo-generic-retired-target"
+make_repo "$REPO_GENERIC_RETIRED_TARGET"
+cd "$REPO_GENERIC_RETIRED_TARGET"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b feature/retired-batch-source develop
+echo batch-source > BATCH_SOURCE.txt
+git add BATCH_SOURCE.txt
+git commit -q -m "batch source seed"
+git checkout -q -b test-pre-merge-20260404-retired
+echo batch > BATCH.txt
+git add BATCH.txt
+git commit -q -m "batch seed"
+git checkout -q -b feature/retired-source feature/retired-batch-source
+echo source > SOURCE.txt
+git add SOURCE.txt
+git commit -q -m "source feature"
+git checkout -q feature/retired-batch-source
+git merge --no-ff -m "Merge" feature/retired-source >/dev/null
+RETIRED_GAP_MERGE="$(git rev-parse HEAD)"
+echo batch-source-tail > BATCH_SOURCE_TAIL.txt
+git add BATCH_SOURCE_TAIL.txt
+git commit -q -m "batch source tail"
+git checkout -q test-pre-merge-20260404-retired
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'feature/retired-batch-source' into test-pre-merge-20260404-retired
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: feature/retired-batch-source
+EOF
+)" feature/retired-batch-source >/dev/null
+RETIRED_ABSORBING_MERGE="$(git rev-parse HEAD)"
+git checkout -q develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'test-pre-merge-20260404-retired' into develop
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: test-pre-merge-20260404-retired
+EOF
+)" test-pre-merge-20260404-retired >/dev/null
+git branch -D test-pre-merge-20260404-retired >/dev/null
+echo tail > TAIL.txt
+git add TAIL.txt
+git commit -q -m "tail after retiring absorbed target"
+cat > docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md <<EOF
+# Protected Branch Merge Receipt Backfills
+
+- audit_effective_date: \`2026-04-04\`
+- source_policy_effective_date: \`2026-04-04\`
+
+## Receipt Gap: $RETIRED_GAP_MERGE
+
+- validation_mode: \`unparseable_subject_ancestry\`
+- target_branch: \`test-pre-merge-20260404-retired\`
+- source_branch: \`feature/retired-batch-source\`
+- protected_batch_branch: \`feature/retired-batch-source\`
+- absorbing_protected_merge: \`$RETIRED_ABSORBING_MERGE\`
+- canonical_merge_path: \`merge-guarded\`
+- canonical_bypass_mode: \`forbidden\`
+- follow_on_owner: \`I-20260404-0640-A\`
+- bounded_issue: \`docs/epics/sample/issues/sample.md\`
+- verification_ref: \`docs/epics/sample/code-reviews/sample-verification.md\`
+- evidence_refs:
+  - \`docs/epics/sample/issues/sample.md\`
+  - \`docs/epics/sample/code-reviews/sample-verification.md\`
+EOF
+
+if ! ./bin/governance-check >"$TMP_DIR/generic-retired-target.out" 2>&1; then
+  cat "$TMP_DIR/generic-retired-target.out" >&2
+  exit 1
+fi
+grep -q "Governance check passed" "$TMP_DIR/generic-retired-target.out"
+
+REPO_GENERIC_WRONG_ABSORB="$TMP_DIR/repo-generic-wrong-absorb"
+make_repo "$REPO_GENERIC_WRONG_ABSORB"
+cd "$REPO_GENERIC_WRONG_ABSORB"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b test-pre-merge-20260404-generic
+echo batch > BATCH.txt
+git add BATCH.txt
+git commit -q -m "batch seed"
+git checkout -q -b feature/generic-source develop
+echo source > SOURCE.txt
+git add SOURCE.txt
+git commit -q -m "source feature"
+git checkout -q test-pre-merge-20260404-generic
+git merge --no-ff -m "Merge" feature/generic-source >/dev/null
+WRONG_ABSORB_GAP_MERGE="$(git rev-parse HEAD)"
+echo batch-tail > BATCH_TAIL.txt
+git add BATCH_TAIL.txt
+git commit -q -m "batch tail"
+git checkout -q develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'test-pre-merge-20260404-generic' into develop
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: test-pre-merge-20260404-generic
+EOF
+)" test-pre-merge-20260404-generic >/dev/null
+REAL_ABSORBING_MERGE="$(git rev-parse HEAD)"
+git checkout -q -b test-pre-merge-20260404-other develop
+echo other > OTHER.txt
+git add OTHER.txt
+git commit -q -m "other batch"
+git checkout -q develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'test-pre-merge-20260404-other' into develop
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: test-pre-merge-20260404-other
+EOF
+)" test-pre-merge-20260404-other >/dev/null
+WRONG_ABSORBING_MERGE="$(git rev-parse HEAD)"
+cat > docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md <<EOF
+# Protected Branch Merge Receipt Backfills
+
+- audit_effective_date: \`2026-04-04\`
+- source_policy_effective_date: \`2026-04-04\`
+
+## Receipt Gap: $WRONG_ABSORB_GAP_MERGE
+
+- validation_mode: \`unparseable_subject_ancestry\`
+- target_branch: \`develop\`
+- source_branch: \`test-pre-merge-20260404-generic\`
+- protected_batch_branch: \`test-pre-merge-20260404-generic\`
+- absorbing_protected_merge: \`$WRONG_ABSORBING_MERGE\`
+- canonical_merge_path: \`merge-guarded\`
+- canonical_bypass_mode: \`forbidden\`
+- follow_on_owner: \`I-20260404-0640-A\`
+- bounded_issue: \`docs/epics/sample/issues/sample.md\`
+- verification_ref: \`docs/epics/sample/code-reviews/sample-verification.md\`
+- evidence_refs:
+  - \`docs/epics/sample/issues/sample.md\`
+  - \`docs/epics/sample/code-reviews/sample-verification.md\`
+EOF
+
+if ./bin/governance-check >"$TMP_DIR/generic-wrong-absorb.out" 2>&1; then
+  echo "[FAIL] governance-check should reject unparseable-subject entries whose absorbing merge source branch does not match the protected batch branch" >&2
+  cat "$TMP_DIR/generic-wrong-absorb.out" >&2
+  exit 1
+fi
+grep -q "absorbing merge" "$TMP_DIR/generic-wrong-absorb.out"
+
+REPO_GENERIC_UNDEREVIDENCED="$TMP_DIR/repo-generic-underevidenced"
+make_repo "$REPO_GENERIC_UNDEREVIDENCED"
+cd "$REPO_GENERIC_UNDEREVIDENCED"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b test-pre-merge-20260404-generic
+echo batch > BATCH.txt
+git add BATCH.txt
+git commit -q -m "batch seed"
+git checkout -q -b feature/generic-source develop
+echo source > SOURCE.txt
+git add SOURCE.txt
+git commit -q -m "source feature"
+git checkout -q test-pre-merge-20260404-generic
+git merge --no-ff -m "Merge" feature/generic-source >/dev/null
+UNDEREVIDENCED_GAP_MERGE="$(git rev-parse HEAD)"
+git checkout -q develop
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'test-pre-merge-20260404-generic' into develop
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: test-pre-merge-20260404-generic
+EOF
+)" test-pre-merge-20260404-generic >/dev/null
+UNDEREVIDENCED_ABSORBING_MERGE="$(git rev-parse HEAD)"
+cat > docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md <<EOF
+# Protected Branch Merge Receipt Backfills
+
+- audit_effective_date: \`2026-04-04\`
+- source_policy_effective_date: \`2026-04-04\`
+
+## Receipt Gap: $UNDEREVIDENCED_GAP_MERGE
+
+- validation_mode: \`unparseable_subject_ancestry\`
+- target_branch: \`develop\`
+- source_branch: \`test-pre-merge-20260404-generic\`
+- protected_batch_branch: \`test-pre-merge-20260404-generic\`
+- absorbing_protected_merge: \`$UNDEREVIDENCED_ABSORBING_MERGE\`
+- canonical_merge_path: \`merge-guarded\`
+- canonical_bypass_mode: \`forbidden\`
+- follow_on_owner: \`I-20260404-0640-A\`
+- evidence_refs:
+  - \`docs/epics/sample/issues/sample.md\`
+EOF
+
+if ./bin/governance-check >"$TMP_DIR/generic-underevidenced.out" 2>&1; then
+  echo "[FAIL] governance-check should reject unparseable-subject entries that omit bounded issue and verification fields" >&2
+  cat "$TMP_DIR/generic-underevidenced.out" >&2
+  exit 1
+fi
+grep -q "bounded_issue" "$TMP_DIR/generic-underevidenced.out"
+
+REPO_GENERIC_PARSEABLE_MISUSE="$TMP_DIR/repo-generic-parseable-misuse"
+make_repo "$REPO_GENERIC_PARSEABLE_MISUSE"
+cd "$REPO_GENERIC_PARSEABLE_MISUSE"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add .
+git commit -q -m "init"
+git checkout -q -b test-pre-merge-20260404-gap
+echo gap > GAP.txt
+git add GAP.txt
+git commit -q -m "gap feature"
+git checkout -q develop
+git merge --no-ff --no-edit test-pre-merge-20260404-gap >/dev/null
+PARSEABLE_MISUSE_MERGE="$(git rev-parse HEAD)"
+echo tail > TAIL.txt
+git add TAIL.txt
+git commit -q -m "tail after parseable misuse"
+cat > docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md <<EOF
+# Protected Branch Merge Receipt Backfills
+
+- audit_effective_date: \`2026-04-04\`
+- source_policy_effective_date: \`2026-04-04\`
+
+## Receipt Gap: $PARSEABLE_MISUSE_MERGE
+
+- validation_mode: \`unparseable_subject_ancestry\`
+- target_branch: \`develop\`
+- source_branch: \`test-pre-merge-20260404-gap\`
+- protected_batch_branch: \`test-pre-merge-20260404-gap\`
+- absorbing_protected_merge: \`$PARSEABLE_MISUSE_MERGE\`
+- canonical_merge_path: \`merge-guarded\`
+- canonical_bypass_mode: \`forbidden\`
+- follow_on_owner: \`I-20260404-0640-A\`
+- bounded_issue: \`docs/epics/sample/issues/sample.md\`
+- verification_ref: \`docs/epics/sample/code-reviews/sample-verification.md\`
+- evidence_refs:
+  - \`docs/epics/sample/issues/sample.md\`
+  - \`docs/epics/sample/code-reviews/sample-verification.md\`
+EOF
+
+if ./bin/governance-check >"$TMP_DIR/generic-parseable-misuse.out" 2>&1; then
+  echo "[FAIL] governance-check should reject unparseable-subject validation mode for merges whose subject is already parseable" >&2
+  cat "$TMP_DIR/generic-parseable-misuse.out" >&2
+  exit 1
+fi
+grep -q "already has a parseable merge subject" "$TMP_DIR/generic-parseable-misuse.out"
+
+echo "[PASS] governance-check audits ordinary protected-branch merge receipt backfills"

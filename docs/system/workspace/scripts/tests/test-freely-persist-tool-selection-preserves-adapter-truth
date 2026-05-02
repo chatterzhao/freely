@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-persist-tool-selection-adapter.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/.freely"
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_TOOL_ADAPTER="acp"
+AI_TOOL_ADAPTER_POLICY="acp"
+AI_TOOL_CAPABILITIES=""
+AI_TOOL_POLICY=""
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+persist_project_tool_selection "$PROJECT" "codex"
+grep -q '^AI_TOOL_ADAPTER="acp"$' "$PROJECT/.freely/config.env" || {
+  echo "[FAIL] expected same-tool reselection to preserve current adapter truth" >&2
+  cat "$PROJECT/.freely/config.env" >&2
+  exit 1
+}
+grep -q '^AI_TOOL_ADAPTER_POLICY="acp"$' "$PROJECT/.freely/config.env" || {
+  echo "[FAIL] expected same-tool reselection to preserve current adapter policy truth" >&2
+  cat "$PROJECT/.freely/config.env" >&2
+  exit 1
+}
+
+persist_project_tool_selection "$PROJECT" "iflow"
+grep -q '^AI_TOOL="iflow"$' "$PROJECT/.freely/config.env" || {
+  echo "[FAIL] expected tool selection to switch to iflow" >&2
+  cat "$PROJECT/.freely/config.env" >&2
+  exit 1
+}
+grep -q '^AI_TOOL_ADAPTER="direct"$' "$PROJECT/.freely/config.env" || {
+  echo "[FAIL] expected cross-tool selection to fall back to the target tool default adapter" >&2
+  cat "$PROJECT/.freely/config.env" >&2
+  exit 1
+}
+grep -q '^AI_TOOL_ADAPTER_POLICY="direct"$' "$PROJECT/.freely/config.env" || {
+  echo "[FAIL] expected cross-tool selection to fall back to the target tool default adapter policy" >&2
+  cat "$PROJECT/.freely/config.env" >&2
+  exit 1
+}
+
+persist_project_tool_selection "$PROJECT" "codex" "direct" "prefer_acp_fallback_direct"
+grep -q '^AI_TOOL="codex"$' "$PROJECT/.freely/config.env" || {
+  echo "[FAIL] expected explicit tool reselection to switch back to codex" >&2
+  cat "$PROJECT/.freely/config.env" >&2
+  exit 1
+}
+grep -q '^AI_TOOL_ADAPTER="direct"$' "$PROJECT/.freely/config.env" || {
+  echo "[FAIL] expected explicit adapter override to be persisted" >&2
+  cat "$PROJECT/.freely/config.env" >&2
+  exit 1
+}
+grep -q '^AI_TOOL_ADAPTER_POLICY="prefer_acp_fallback_direct"$' "$PROJECT/.freely/config.env" || {
+  echo "[FAIL] expected explicit adapter policy override to be persisted" >&2
+  cat "$PROJECT/.freely/config.env" >&2
+  exit 1
+}
+
+echo "[PASS] persist_project_tool_selection preserves same-tool adapter truth and respects explicit policy overrides"

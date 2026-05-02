@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-worker-prompt-verification-metadata.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+WORKER="$TMP_DIR/project-worktrees/feature-worker"
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$WORKER"
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+PROMPT="$PROJECT/.freely/run/worker-prompts/20260408-130000-worker-verification-metadata-codex.txt"
+cat >"$PROMPT" <<EOF
+Worktree:
+- \`$WORKER\`
+Branch:
+- \`feature/worker-verification-metadata-20260408\`
+dispatch_priority: P0
+parallel_safe: true
+write_scope: \`$WORKER\`
+intent_kind: edit
+intent_target: \`$WORKER\`
+Owner-Issue:
+- \`I-20260408-1205-A\`
+Pre-Tests-Path:
+- \`docs/epics/sample/story/pre-tests.md\`
+Verification-Artifact-Dir:
+- \`docs/epics/sample/story/code-reviews\`
+Required-Test-Lanes:
+- \`feature-local\`
+- \`premerge-integration\`
+- \`post-merge-followthrough\`
+Required-Acceptance-Item-Ids:
+- \`unit-parser\`
+- \`integration-lane-enforcement\`
+- \`realenv-dogfood\`
+Minimum-Evidence-Level:
+- \`artifact-plus-human-observation\`
+Target-Environment:
+- \`develop\`
+Closeout-Gate:
+- \`owner-issue verification closeout\`
+Closeout-Gate-Command:
+- \`owner-issue verification closeout\`
+Closeout-Target-Lane:
+- \`post-merge-followthrough\`
+Closeout-Promotion-Gate:
+- \`completion\`
+Closeout-Requires-Adequacy:
+- \`false\`
+Closeout-Review-Artifact-Policy:
+- \`none\`
+EOF
+
+PARTIAL_PROMPT="$PROJECT/.freely/run/worker-prompts/20260408-131500-worker-verification-metadata-partial-codex.txt"
+cat >"$PARTIAL_PROMPT" <<EOF
+Worktree:
+- \`$WORKER\`
+Branch:
+- \`feature/worker-verification-metadata-20260408\`
+dispatch_priority: P0
+parallel_safe: true
+write_scope: \`$WORKER\`
+intent_kind: edit
+intent_target: \`$WORKER\`
+Owner-Issue:
+- \`I-20260408-1205-A\`
+Required-Test-Lanes:
+- \`feature-local\`
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+[[ "$(worker_prompt_owner_issue "$PROMPT")" == "I-20260408-1205-A" ]]
+[[ "$(worker_prompt_pre_tests_path "$PROMPT")" == "docs/epics/sample/story/pre-tests.md" ]]
+[[ "$(worker_prompt_verification_artifact_dir "$PROMPT")" == "docs/epics/sample/story/code-reviews" ]]
+[[ "$(worker_prompt_required_test_lanes_csv "$PROMPT")" == "feature-local,premerge-integration,post-merge-followthrough" ]]
+[[ "$(worker_prompt_required_acceptance_item_ids_csv "$PROMPT")" == "unit-parser,integration-lane-enforcement,realenv-dogfood" ]]
+[[ "$(worker_prompt_minimum_evidence_level "$PROMPT")" == "artifact-plus-human-observation" ]]
+[[ "$(worker_prompt_target_environment "$PROMPT")" == "develop" ]]
+[[ "$(worker_prompt_closeout_gate "$PROMPT")" == "owner-issue verification closeout" ]]
+[[ "$(worker_prompt_closeout_gate_command "$PROMPT")" == "owner-issue verification closeout" ]]
+[[ "$(worker_prompt_closeout_target_lane "$PROMPT")" == "post-merge-followthrough" ]]
+[[ "$(worker_prompt_closeout_promotion_gate "$PROMPT")" == "completion" ]]
+[[ "$(worker_prompt_closeout_requires_adequacy "$PROMPT")" == "false" ]]
+[[ "$(worker_prompt_closeout_review_artifact_policy "$PROMPT")" == "none" ]]
+worker_prompt_has_verification_metadata "$PROMPT"
+[[ -z "$(worker_prompt_verification_metadata_missing_fields_csv "$PROMPT")" ]]
+if worker_prompt_has_verification_metadata "$PARTIAL_PROMPT"; then
+  echo "[FAIL] partial prompt must not satisfy verification metadata contract" >&2
+  exit 1
+fi
+[[ "$(worker_prompt_verification_metadata_missing_fields_csv "$PARTIAL_PROMPT")" == "pre_tests_path,verification_artifact_dir,required_acceptance_item_ids,minimum_evidence_level,target_environment,closeout_gate_command,closeout_target_lane,closeout_promotion_gate,closeout_requires_adequacy,closeout_review_artifact_policy" ]]
+
+echo "[PASS] worker prompt parser reads verification metadata contract"

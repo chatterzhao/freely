@@ -1,0 +1,2 @@
+# Explicitly allowlisted install lifecycle script names.
+# Keep this file empty by default; adding entries is a conscious exception.

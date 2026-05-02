@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-start-ps-foreign-pids.XXXXXX)"
+cleanup() {
+  set +e
+  kill "${SUP_PID:-}" "${DISPATCH_PID:-}" "${WATCHDOG_PID:-}" "${AI_PID:-}" 2>/dev/null || true
+  wait "${SUP_PID:-}" 2>/dev/null || true
+  wait "${DISPATCH_PID:-}" 2>/dev/null || true
+  wait "${WATCHDOG_PID:-}" 2>/dev/null || true
+  wait "${AI_PID:-}" 2>/dev/null || true
+  rm -rf "$TMP_DIR"
+}
+trap cleanup EXIT
+
+PROJECT="$TMP_DIR/repo"
+OTHER_ROOT="$TMP_DIR/other-project"
+FAKE_BIN_DIR="$TMP_DIR/fake-bin"
+mkdir -p "$PROJECT/.freely/run" "$PROJECT/docs/pre-brainstorms" "$OTHER_ROOT" "$FAKE_BIN_DIR"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+
+bash -c "cd '$OTHER_ROOT' && exec -a 'runtime/freely start --project $PROJECT' sleep 30" >/dev/null 2>&1 &
+SUP_PID=$!
+bash -c "cd '$OTHER_ROOT' && exec -a 'runtime/freely ensure-interruption-dispatch --project $PROJECT --watch' sleep 30" >/dev/null 2>&1 &
+DISPATCH_PID=$!
+bash -c "cd '$OTHER_ROOT' && exec -a 'runtime/freely ensure-manager --project $PROJECT --watch' sleep 30" >/dev/null 2>&1 &
+WATCHDOG_PID=$!
+bash -c "cd '$OTHER_ROOT' && exec -a 'codex exec -C $PROJECT -m gpt-5.4' sleep 30" >/dev/null 2>&1 &
+AI_PID=$!
+
+printf '%s' "$SUP_PID" >"$PROJECT/.freely/run/supervisor.pid"
+printf '%s' "$DISPATCH_PID" >"$PROJECT/.freely/run/interruption-dispatch.pid"
+printf '%s' "$WATCHDOG_PID" >"$PROJECT/.freely/run/ensure-manager.pid"
+printf '%s' "$AI_PID" >"$PROJECT/.freely/run/ai.pid"
+
+cat >"$FAKE_BIN_DIR/ps" <<'EOF'
+#!/usr/bin/env bash
+exit 1
+EOF
+chmod +x "$FAKE_BIN_DIR/ps"
+
+FAKE_RUNTIME_BIN="$TMP_DIR/fake-freely"
+cat >"$FAKE_RUNTIME_BIN" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+RUNTIME_BIN="$ROOT_DIR/bin/freely"
+cmd="\${1:-}"
+shift || true
+case "\$cmd" in
+  ensure-interruption-dispatch)
+    exit 0
+    ;;
+  ensure-manager)
+    exec bash "\$RUNTIME_BIN" ensure-manager "\$@"
+    ;;
+  *)
+    exec bash "\$RUNTIME_BIN" "\$cmd" "\$@"
+    ;;
+esac
+EOF
+chmod +x "$FAKE_RUNTIME_BIN"
+
+if PATH="$FAKE_BIN_DIR:$PATH" FREELY_INTERRUPTION_DISPATCH_LAUNCH_BIN="$FAKE_RUNTIME_BIN" bash "$ROOT_DIR/bin/freely" start --project "$PROJECT" >"$TMP_DIR/start.log" 2>&1; then
+  echo "[FAIL] freely start unexpectedly attached to foreign pid files while ps was unavailable" >&2
+  cat "$TMP_DIR/start.log" >&2
+  exit 1
+fi
+
+! grep -q 'already_running_attach' "$PROJECT/.freely/run/workcell-state.env"
+! grep -q 'supervisor_attach_reuse' "$PROJECT/.freely/logs/runtime-events.log"
+kill -0 "$SUP_PID" 2>/dev/null
+kill -0 "$DISPATCH_PID" 2>/dev/null
+kill -0 "$WATCHDOG_PID" 2>/dev/null
+kill -0 "$AI_PID" 2>/dev/null
+
+echo "[PASS] freely start rejects foreign pid files when ps is unavailable"

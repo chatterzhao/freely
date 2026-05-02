@@ -1,0 +1,245 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-exit-contract-worker-truth.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+WT_ROOT="$TMP_DIR/worktrees"
+FEATURE_WT="$WT_ROOT/feature-cleanup"
+
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs" "$WT_ROOT"
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name tester
+git -C "$PROJECT" config user.email tester@example.com
+mkdir -p "$PROJECT/docs"
+
+cat >"$PROJECT/.gitignore" <<'EOF'
+.freely/
+EOF
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+mkdir -p "$PROJECT/docs/epics/demo/cleanup-governance/issues" "$PROJECT/docs/epics/demo/cleanup-governance/code-reviews" "$PROJECT/docs/progress/demo"
+cat >"$PROJECT/docs/epics/demo/cleanup-governance/issues/cleanup-governance.md" <<'EOF'
+# Issue: cleanup-governance
+
+- issue_id: `I-20260424-0315-A`
+- pre_tests_path: `docs/epics/demo/cleanup-governance/pre-tests.md`
+- progress_path: `docs/progress/demo/p-cleanup-governance.md`
+- verification_artifact_dir: `docs/epics/demo/cleanup-governance/code-reviews`
+EOF
+cat >"$PROJECT/docs/epics/demo/cleanup-governance/pre-tests.md" <<'EOF'
+# Pre-tests
+EOF
+cat >"$PROJECT/docs/progress/demo/p-cleanup-governance.md" <<'EOF'
+# Progress
+EOF
+echo base >"$PROJECT/README.md"
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m init
+
+git -C "$PROJECT" worktree add -q -b feature/cleanup "$FEATURE_WT" develop
+echo cleanup >"$FEATURE_WT/cleanup.txt"
+git -C "$FEATURE_WT" add cleanup.txt
+git -C "$FEATURE_WT" commit -q -m "cleanup fixture"
+git -C "$PROJECT" merge --no-ff -m "merge cleanup fixture" feature/cleanup >/dev/null
+echo dirty-followthrough >"$FEATURE_WT/docs/progress/demo/p-cleanup-governance.md"
+
+for wt in "$PROJECT" "$FEATURE_WT"; do
+  mkdir -p "$wt/.freely/run" "$wt/.freely/logs"
+  cat >"$wt/.freely/config.env" <<EOF
+PROJECT_ROOT="$wt"
+INTENT_FILE="$wt/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$wt/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+done
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="ai_exit_rc_0"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2026-04-24T10:18:13Z"
+EOF
+
+cat >"$FEATURE_WT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="stopped"
+LAST_SUPERVISOR_STATE="down"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="operator_stop"
+LAST_ROLE_HINT="worker"
+LAST_STATE_UPDATED_AT="2026-04-24T10:18:13Z"
+EOF
+
+SOURCE_PROMPT="$PROJECT/.freely/run/worker-prompts/20260424-030116-worker-cleanup-authoritative-codex.txt"
+cat >"$SOURCE_PROMPT" <<EOF
+Worktree:
+- \`$FEATURE_WT\`
+Branch:
+- \`feature/cleanup\`
+dispatch_priority: \`P0\`
+parallel_safe: \`false\`
+write_scope: \`$FEATURE_WT/**\`
+intent_kind: \`cleanup\`
+intent_target: \`I-20260424-0315-A retained cleanup followthrough\`
+Owner-Issue:
+- \`$PROJECT/docs/epics/demo/cleanup-governance/issues/cleanup-governance.md\`
+Pre-Tests-Path:
+- \`$PROJECT/docs/epics/demo/cleanup-governance/pre-tests.md\`
+Verification-Artifact-Dir:
+- \`$PROJECT/docs/epics/demo/cleanup-governance/code-reviews\`
+Required-Test-Lanes:
+- \`feature-local\`
+- \`premerge-integration\`
+Required-Acceptance-Item-Ids:
+- \`cleanup-followthrough-closeout\`
+- \`retirement-handoff-required\`
+Minimum-Evidence-Level:
+- \`bounded cleanup evidence\`
+Target-Environment:
+- \`feature/cleanup retained dirty worktree\`
+Closeout-Gate:
+- \`no repair-only closeout\`
+Closeout-Gate-Command:
+- \`./bin/checkpoint-guard\`
+Closeout-Target-Lane:
+- \`cleanup_governance\`
+Closeout-Promotion-Gate:
+- \`manager_review_required\`
+Closeout-Requires-Adequacy:
+- \`true\`
+Closeout-Review-Artifact-Policy:
+- \`reuse owner verification artifact\`
+EOF
+
+cat >"$FEATURE_WT/.freely/run/worker-verification-contract.env" <<EOF
+SOURCE_PROMPT_FILE="$SOURCE_PROMPT"
+SOURCE_INTAKE_ID="intake-demo"
+TARGET_PROJECT="$FEATURE_WT"
+VERIFICATION_METADATA_PRESENT="true"
+VERIFICATION_METADATA_MISSING_FIELDS=""
+OWNER_ISSUE="$PROJECT/docs/epics/demo/cleanup-governance/issues/cleanup-governance.md"
+PRE_TESTS_PATH="$PROJECT/docs/epics/demo/cleanup-governance/pre-tests.md"
+VERIFICATION_ARTIFACT_DIR="$PROJECT/docs/epics/demo/cleanup-governance/code-reviews"
+REQUIRED_TEST_LANES_CSV="feature-local,premerge-integration"
+REQUIRED_ACCEPTANCE_ITEM_IDS_CSV="cleanup-followthrough-closeout,retirement-handoff-required"
+MINIMUM_EVIDENCE_LEVEL="bounded cleanup evidence"
+TARGET_ENVIRONMENT="feature/cleanup retained dirty worktree"
+CLOSEOUT_GATE="no repair-only closeout"
+CLOSEOUT_GATE_COMMAND="./bin/checkpoint-guard"
+CLOSEOUT_TARGET_LANE="cleanup_governance"
+CLOSEOUT_PROMOTION_GATE="manager_review_required"
+CLOSEOUT_REQUIRES_ADEQUACY="true"
+CLOSEOUT_REVIEW_ARTIFACT_POLICY="reuse owner verification artifact"
+UPDATED_AT="2026-04-24T10:14:18Z"
+EOF
+
+NONLAUNCHABLE_PROMPT="$PROJECT/.freely/run/worker-prompts/20260424-031528-worker-cleanup-hygiene-codex.txt"
+cat >"$NONLAUNCHABLE_PROMPT" <<EOF
+Worktree:
+- \`$FEATURE_WT\`
+Branch:
+- \`feature/cleanup\`
+dispatch_priority: \`P0\`
+parallel_safe: \`true\`
+write_scope: \`target-worktree-only: docs/progress/demo/p-cleanup-governance.md\`
+intent_kind: \`cleanup\`
+intent_target: \`worktree-hygiene://feature/cleanup\`
+
+Task:
+1. Audit the dirty followthrough.
+2. Return a bounded hygiene status.
+EOF
+
+CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260424-031528.md"
+cat >"$CONTINUITY" <<EOF
+# Manager Continuity
+
+- generated_at: \`2026-04-24T03:15:28-07:00\`
+- manager_worktree: \`$PROJECT\`
+- manager_branch: \`develop\`
+- selected_tool: \`codex\`
+- patrol_mode: \`fresh_startup_patrol\`
+- source_class: \`continuation\`
+- route_kind: \`cleanup_governance\`
+- restart_point: \`worktree hygiene supervision for feature/cleanup\`
+- ownership: \`manager-owned delegation\`
+- next_action: \`delegate_hygiene_worker\`
+
+## Evidence
+
+- dirty lane:
+  - worktree: \`$FEATURE_WT\`
+  - branch: \`feature/cleanup\`
+  - role: \`cleanup\`
+  - next_action_hint: \`delegate_hygiene_worker\`
+
+## Fleet Inventory
+
+- protected manager lane: \`$PROJECT\` on \`develop\` is \`CLEAN\`; stay supervisor-only.
+- active dirty worker lane: \`$FEATURE_WT\` on \`feature/cleanup\`; dispatch hygiene worker now.
+
+## Worker Dispatch
+
+- worker_prompt: \`$NONLAUNCHABLE_PROMPT\`
+- selected_route: \`worktree_hygiene_supervision\`
+- worker_scope: \`audit dirty batch and return bounded hygiene status\`
+EOF
+
+cat >"$PROJECT/.freely/run/manager-exit-contract.env" <<EOF
+EXIT_KIND="delegate_workers"
+WORKER_PROMPTS_CSV="$NONLAUNCHABLE_PROMPT"
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+ACTION="$(manager_runtime_handle_exit_contract_after_ai_cycle "$PROJECT" "ai_exit_rc_0")"
+[[ "$ACTION" == "delegate_workers" ]] || {
+  echo "[FAIL] expected cleanup autofill from worker verification truth, got $ACTION" >&2
+  exit 1
+}
+
+UPDATED_CSV="$(meta_env_value "$(manager_exit_contract_file "$PROJECT")" "WORKER_PROMPTS_CSV")"
+[[ -n "$UPDATED_CSV" ]] || {
+  echo "[FAIL] expected updated worker prompts csv" >&2
+  exit 1
+}
+
+IFS=',' read -r -a PROMPTS <<<"$UPDATED_CSV"
+MATERIALIZED_PROMPT=""
+for prompt in "${PROMPTS[@]}"; do
+  [[ -f "$prompt" ]] || continue
+  if [[ "$prompt" != "$NONLAUNCHABLE_PROMPT" ]]; then
+    MATERIALIZED_PROMPT="$prompt"
+    break
+  fi
+done
+
+[[ -n "$MATERIALIZED_PROMPT" && -f "$MATERIALIZED_PROMPT" ]] || {
+  echo "[FAIL] expected authoritative cleanup prompt materialized from worker truth" >&2
+  exit 1
+}
+
+worker_prompt_has_verification_metadata "$MATERIALIZED_PROMPT"
+worker_prompt_launchable_for_manager_project "$PROJECT" "$MATERIALIZED_PROMPT"
+grep -Fq "$MATERIALIZED_PROMPT" "$CONTINUITY"
+grep -Fq "cleanup-followthrough-closeout" "$MATERIALIZED_PROMPT"
+grep -q 'manager_exit_contract_autofilled_cleanup_delegate_workers' "$PROJECT/.freely/logs/runtime-events.log"
+
+echo "[PASS] cleanup governance autofill recovers from worker verification truth when continuity only has a nonlaunchable hygiene prompt"

@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-live-status-case-variant.XXXXXX)"
+cleanup() {
+  set +e
+  kill "${SUP_PID:-}" 2>/dev/null || true
+  wait "${SUP_PID:-}" 2>/dev/null || true
+  rm -rf "$TMP_DIR"
+}
+trap cleanup EXIT
+
+PROJECT="$TMP_DIR/ProjectRoot"
+ALT_PROJECT="${PROJECT/ProjectRoot/projectroot}"
+mkdir -p \
+  "$PROJECT/.freely/run/supervisor-identities" \
+  "$PROJECT/.freely/logs" \
+  "$PROJECT/docs/pre-brainstorms"
+
+if python3 - "$PROJECT" "$ALT_PROJECT" <<'PY'
+import os
+import sys
+
+try:
+    same = os.path.samefile(sys.argv[1], sys.argv[2])
+except Exception:
+    same = False
+
+if not same:
+    print("[PASS] skipped: filesystem does not expose case-variant paths as the same project")
+    sys.exit(42)
+PY
+then
+  rc=0
+else
+  rc=$?
+fi
+if [[ "$rc" -eq 42 ]]; then
+  exit 0
+elif [[ "$rc" -ne 0 ]]; then
+  exit "$rc"
+fi
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="test-sleep"
+AI_MODEL=""
+AI_MODE="auto"
+AI_REASONING_EFFORT=""
+EOF
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="starting"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2126-04-19T00:00:00Z"
+EOF
+
+bash -c "cd '$ALT_PROJECT' && exec -a 'runtime/freely daemon-run --project $ALT_PROJECT' sleep 30" >/dev/null 2>&1 &
+SUP_PID=$!
+
+printf '%s' "$SUP_PID" >"$PROJECT/.freely/run/supervisor.pid"
+cat >"$PROJECT/.freely/run/supervisor-identities/supervisor-$SUP_PID.env" <<EOF
+SUPERVISOR_PID="$SUP_PID"
+PROJECT_ROOT="$ALT_PROJECT"
+ENTRYPOINT_MODE="daemon"
+STARTUP_TRUTH_PHASE="published"
+STARTUP_TRUTH_PUBLISHED_AT="2026-04-19T00:00:00Z"
+EOF
+
+OUTPUT="$(bash "$ROOT_DIR/bin/freely" live-status --project "$PROJECT")"
+printf '%s\n' "$OUTPUT" | grep -q "^desired_runtime_state: running$"
+printf '%s\n' "$OUTPUT" | grep -q "^last_supervisor_state: up$"
+printf '%s\n' "$OUTPUT" | grep -q "^last_exit_reason: starting$"
+printf '%s\n' "$OUTPUT" | grep -q "role=supervisor pid=$SUP_PID "
+
+if grep -q 'startup_self_heal_runtime_state_cleared' "$PROJECT/.freely/logs/runtime-events.log" 2>/dev/null; then
+  echo "[FAIL] live-status should not self-heal a same-project daemon runtime down when only the project path casing differs" >&2
+  cat "$PROJECT/.freely/logs/runtime-events.log" >&2
+  exit 1
+fi
+
+echo "[PASS] freely live-status keeps daemon runtime ownership when project path casing differs but samefile matches"

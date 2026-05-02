@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-delegated-continuation-visibility.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260309-0000--sample" \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/.freely/logs" \
+  "$PROJECT/.freely/intake/20260323-220921-sample-delegated"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260309-0000--sample
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260309-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260309-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="test-sleep"
+AI_MODEL=""
+AI_MODE="auto"
+AI_REASONING_EFFORT=""
+CHECK_INTERVAL=1
+RESTART_DELAY=0
+MAX_RESTARTS=1
+IFLOW_MAX_TURNS=100
+MAX_RESUME_STREAK=24
+ROTATE_ON_CONTEXT_COMPACTED=1
+SESSION_HANDOFF_TAIL_LINES=10
+CONTEXT_WARN_RATIO=0.50
+CONTEXT_ROTATE_RATIO=0.70
+EOF
+
+cat >"$PROJECT/.freely/intake/20260323-220921-sample-delegated/meta.env" <<EOF
+INTAKE_ID="20260323-220921-sample-delegated"
+CREATED_AT="2026-03-24T05:09:21Z"
+AUTHOR="manager-runtime-launcher"
+CHANNEL="delegation"
+STATUS="delegated"
+CLASSIFICATION="continuation"
+REACTION="followup"
+LINKED_ARTIFACT="pending://manager-worker-launch"
+DELEGATED_WORKTREE=""
+SESSION_REFS="[]"
+CLAIMED_BY="manager-runtime-launcher"
+CLAIMED_AT="2026-03-24T05:09:21Z"
+ABSORPTION_TARGET="handoff://continuation"
+RESOLUTION_ARTIFACT=""
+EOF
+
+cat >"$PROJECT/.freely/intake/20260323-220921-sample-delegated/message.txt" <<'EOF'
+Delegated continuation handoff for active prompt visibility test.
+EOF
+
+bash "$ROOT_DIR/bin/freely" start --project "$PROJECT" >/dev/null 2>&1 &
+START_PID=$!
+
+for _ in $(seq 1 30); do
+  if [[ -f "$PROJECT/.freely/run/ai.pid" ]]; then
+    break
+  fi
+  sleep 0.2
+done
+
+if [[ ! -f "$PROJECT/.freely/run/ai.pid" ]]; then
+  echo "[FAIL] expected runtime to launch AI pid"
+  kill "$START_PID" >/dev/null 2>&1 || true
+  wait "$START_PID" >/dev/null 2>&1 || true
+  exit 1
+fi
+
+LIVE_STATUS_ACTIVE="$(bash "$ROOT_DIR/bin/freely" live-status --project "$PROJECT")"
+printf '%s\n' "$LIVE_STATUS_ACTIVE" | grep -q '^current_prompt_has_delegated_continuation: 1$'
+printf '%s\n' "$LIVE_STATUS_ACTIVE" | grep -q '^last_consumed_delegated_continuation_ids: 20260323-220921-sample-delegated$'
+printf '%s\n' "$LIVE_STATUS_ACTIVE" | grep -q '^pending_delegated_continuation_ids: none$'
+
+bash "$ROOT_DIR/bin/freely" stop --project "$PROJECT" >/dev/null 2>&1 || true
+wait "$START_PID" >/dev/null 2>&1 || true
+
+LIVE_STATUS_STOPPED="$(bash "$ROOT_DIR/bin/freely" live-status --project "$PROJECT")"
+printf '%s\n' "$LIVE_STATUS_STOPPED" | grep -q '^pending_delegated_continuation_ids: 20260323-220921-sample-delegated$'
+
+echo "[PASS] delegated continuation stays visible as consumed during active prompt and returns to pending after stop"

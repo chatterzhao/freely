@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-worker-prompt-multiline-metadata.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+WORKER_WT="$TMP_DIR/worker-wt"
+mkdir -p "$PROJECT/.freely/run/worker-prompts"
+
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name "Freely Test"
+git -C "$PROJECT" config user.email "freely@example.com"
+echo base >"$PROJECT/README.md"
+git -C "$PROJECT" add README.md
+git -C "$PROJECT" commit -q -m "init"
+git -C "$PROJECT" worktree add -q -b feature/test-worker "$WORKER_WT" develop
+
+mkdir -p "$PROJECT/.freely/run" "$WORKER_WT/.freely/run"
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+cat >"$WORKER_WT/.freely/config.env" <<EOF
+PROJECT_ROOT="$WORKER_WT"
+INTENT_FILE="$WORKER_WT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$WORKER_WT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+PROMPT_FILE="$PROJECT/.freely/run/worker-prompts/20260408-worker-test-codex.txt"
+cat >"$PROMPT_FILE" <<EOF
+Worktree:
+- \`$WORKER_WT\`
+Branch:
+- \`feature/test-worker\`
+dispatch_priority:
+- \`P0\`
+parallel_safe:
+- \`false\`
+write_scope:
+- \`docs/example/**\`
+intent_kind:
+- \`edit\`
+intent_target:
+- \`I-20260408-0001-A\`
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+[[ "$(worker_prompt_dispatch_metadata_value "$PROMPT_FILE" "dispatch_priority")" == "P0" ]]
+[[ "$(worker_prompt_dispatch_metadata_value "$PROMPT_FILE" "parallel_safe")" == "false" ]]
+[[ "$(worker_prompt_dispatch_metadata_value "$PROMPT_FILE" "intent_kind")" == "edit" ]]
+[[ "$(worker_prompt_dispatch_metadata_value "$PROMPT_FILE" "intent_target")" == "I-20260408-0001-A" ]]
+[[ "$(worker_prompt_normalized_intent_kind "$PROMPT_FILE")" == "edit" ]]
+[[ "$(worker_prompt_effective_intent_target "$PROJECT" "$PROMPT_FILE")" == "$WORKER_WT" ]]
+
+echo "[PASS] worker prompt metadata parser accepts multiline manager prompt headers"

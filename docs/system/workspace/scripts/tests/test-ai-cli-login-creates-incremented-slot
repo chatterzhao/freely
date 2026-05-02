@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_HOME="$(mktemp -d /tmp/freely-ai-cli-login-slot.XXXXXX)"
+MOCK_BIN="$TMP_HOME/bin"
+trap 'rm -rf "$TMP_HOME"' EXIT
+
+payload="$(python3 - <<'PY'
+import base64, json
+payload = base64.urlsafe_b64encode(json.dumps({"email":"slot@example.com"}).encode()).decode().rstrip("=")
+print(payload)
+PY
+)"
+
+mkdir -p "$TMP_HOME/.codex" "$TMP_HOME/.ai-auth" "$MOCK_BIN"
+cat >"$MOCK_BIN/codex" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ "${1:-}" != "login" ]]; then
+  exit 7
+fi
+
+printf '{"tokens":{"id_token":"x.%s.y"}}\n' "$MOCK_PAYLOAD" >"$HOME/.codex/auth.json"
+EOF
+chmod +x "$MOCK_BIN/codex"
+
+HOME="$TMP_HOME" PATH="$MOCK_BIN:$PATH" MOCK_PAYLOAD="$payload" bash "$ROOT_DIR/bin/ai" --quiet --format json login codex >"$TMP_HOME/login-1.json"
+HOME="$TMP_HOME" PATH="$MOCK_BIN:$PATH" MOCK_PAYLOAD="$payload" bash "$ROOT_DIR/bin/ai" --quiet --format json login codex >"$TMP_HOME/login-2.json"
+
+test -f "$TMP_HOME/.ai-auth/codex-account-slot@example-com-1/auth.json"
+test -f "$TMP_HOME/.ai-auth/codex-account-slot@example-com-2/auth.json"
+grep -q '"slot": "account-slot@example-com-1"' "$TMP_HOME/login-1.json"
+grep -q '"slot": "account-slot@example-com-2"' "$TMP_HOME/login-2.json"
+grep -q '"slot": "account-slot@example-com-2"' <(HOME="$TMP_HOME" bash "$ROOT_DIR/bin/ai" --quiet --format json whoami codex)
+
+echo "[PASS] ai login codex creates kind-prefixed suffixed auth slots for repeated account logins"

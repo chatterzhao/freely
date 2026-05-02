@@ -1,0 +1,152 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+# shellcheck source=/dev/null
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+usage() {
+  cat <<'USAGE'
+Usage:
+  ./bin/governance-promotion-gate [--project <abs-project>] [--target-branch <branch>] [--source-branch <branch>]
+
+Behavior:
+  - only enforces duplicate promotion ownership for develop-bound merges
+  - derives the source worktree from the source branch when possible
+  - falls back to staged owner issue ids during raw develop merges
+  - no-ops when no active promotion owner can be resolved
+USAGE
+}
+
+git_repo_root_or_pwd() {
+  git -C "$PWD" rev-parse --show-toplevel 2>/dev/null || pwd -P
+}
+
+discover_merge_source_branch() {
+  local project="$1" current_branch="$2"
+  local merge_head branch git_dir merge_msg name_rev
+  git_dir="$(git -C "$project" rev-parse --git-dir 2>/dev/null || true)"
+  merge_msg="${git_dir:+$git_dir/MERGE_MSG}"
+  if [[ -n "$merge_msg" && -f "$merge_msg" ]]; then
+    branch="$(sed -n "s/^Merge branch '\\([^']*\\)'.*/\\1/p" "$merge_msg" | head -n 1)"
+    if [[ -n "$branch" && "$branch" != "$current_branch" ]]; then
+      printf '%s\n' "$branch"
+      return 0
+    fi
+  fi
+  merge_head="$(git -C "$project" rev-parse -q --verify MERGE_HEAD 2>/dev/null || true)"
+  [[ -n "$merge_head" ]] || return 0
+  while IFS= read -r branch; do
+    [[ -n "$branch" ]] || continue
+    [[ "$branch" == "$current_branch" ]] && continue
+    printf '%s\n' "$branch"
+    return 0
+  done < <(git -C "$project" for-each-ref --format='%(refname:short)' --points-at "$merge_head" refs/heads)
+  name_rev="$(git -C "$project" name-rev --name-only --refs='refs/heads/*' "$merge_head" 2>/dev/null || true)"
+  name_rev="${name_rev#refs/heads/}"
+  if [[ -n "$name_rev" && "$name_rev" != "undefined" && "$name_rev" != "$current_branch" ]]; then
+    printf '%s\n' "$name_rev"
+  fi
+}
+
+active_worker_projects_for_signature() {
+  local project="$1" signature="$2"
+  local wt_path current_signature
+  [[ -n "$signature" ]] || return 0
+  while IFS= read -r wt_path; do
+    [[ -n "$wt_path" && -d "$wt_path" ]] || continue
+    [[ "$(role_hint_for_project "$wt_path")" == "worker" ]] || continue
+    worker_project_is_actively_running "$wt_path" || continue
+    current_signature="$(project_current_blocking_intent_signature "$wt_path")"
+    [[ -n "$current_signature" && "$current_signature" == "$signature" ]] || continue
+    printf '%s\n' "$wt_path"
+  done < <(all_repo_worktrees_for_project "$project")
+}
+
+staged_promotion_issue_ids() {
+  local project="$1" rel_path
+  git -C "$project" diff --cached --name-only --diff-filter=ACMR -- \
+    | while IFS= read -r rel_path; do
+        [[ -n "$rel_path" ]] || continue
+        case "$rel_path" in
+          docs/epics/*/issues/*.md|docs/progress/*.md|docs/progress/*/*.md|docs/epics/*/code-reviews/*.md)
+            [[ -f "$project/$rel_path" ]] || continue
+            sed -n 's/^[[:space:]]*-[[:space:]]*issue_id:[[:space:]]*`\\{0,1\\}\\([^`[:space:]]*\\).*/\\1/p' "$project/$rel_path"
+            ;;
+        esac
+      done | awk 'NF { print }' | awk '!seen[$0]++'
+}
+
+emit_conflict_and_exit() {
+  local signature="$1" source_branch="$2" source_worktree="$3" conflicting_worktree="$4"
+  cat <<MSG >&2
+[PROMOTION-GATE] blocked: duplicate develop promotion ownership is already active.
+
+promotion_signature: $signature
+source_branch: ${source_branch:-unknown}
+source_worktree: ${source_worktree:-unknown}
+conflicting_worktree: ${conflicting_worktree:-unknown}
+
+Only one active worker may hold the same develop-bound promotion intent at a time.
+Route this through manager arbitration instead of replaying the merge.
+MSG
+  exit 1
+}
+
+project="$(git_repo_root_or_pwd)"
+target_branch=""
+source_branch=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+    --target-branch) target_branch="${2:-}"; shift 2 ;;
+    --source-branch) source_branch="${2:-}"; shift 2 ;;
+    -h|--help) usage; exit 0 ;;
+    *) log_error "unknown arg: $1"; usage; exit 1 ;;
+  esac
+done
+
+project="$(abs_path_or_fail "$project")"
+target_branch="${target_branch:-$(branch_name_for_project "$project")}"
+[[ "$target_branch" == "develop" || "$target_branch" == "main" ]] || exit 0
+
+current_branch="$(branch_name_for_project "$project")"
+source_branch="${source_branch:-$(discover_merge_source_branch "$project" "$current_branch")}"
+
+source_worktree="$(worktree_path_for_branch "$project" "$source_branch")"
+if [[ -n "$source_worktree" && -d "$source_worktree" ]] && worker_project_is_actively_running "$source_worktree"; then
+  local_match_count=0
+  conflict_worktree=""
+  signature="$(project_current_blocking_intent_signature "$source_worktree")"
+  if [[ "$signature" == promotion@*"-> develop" || "$signature" == promotion@*"-> main" ]]; then
+    while IFS= read -r candidate_worktree; do
+      [[ -n "$candidate_worktree" ]] || continue
+      local_match_count=$((local_match_count + 1))
+      if [[ "$candidate_worktree" != "$source_worktree" && -z "$conflict_worktree" ]]; then
+        conflict_worktree="$candidate_worktree"
+      fi
+    done < <(active_worker_projects_for_signature "$project" "$signature")
+    if (( local_match_count > 1 )) && [[ -n "$conflict_worktree" ]]; then
+      emit_conflict_and_exit "$signature" "$source_branch" "$source_worktree" "$conflict_worktree"
+    fi
+  fi
+  exit 0
+fi
+
+while IFS= read -r issue_id; do
+  [[ -n "$issue_id" ]] || continue
+  local_match_count=0
+  conflict_worktree=""
+  signature="promotion@${issue_id} -> ${target_branch}"
+  while IFS= read -r candidate_worktree; do
+    [[ -n "$candidate_worktree" ]] || continue
+    local_match_count=$((local_match_count + 1))
+    if [[ -z "$conflict_worktree" ]]; then
+      conflict_worktree="$candidate_worktree"
+    fi
+  done < <(active_worker_projects_for_signature "$project" "$signature")
+  if (( local_match_count > 1 )) && [[ -n "$conflict_worktree" ]]; then
+    emit_conflict_and_exit "$signature" "$source_branch" "$source_worktree" "$conflict_worktree"
+  fi
+done < <(staged_promotion_issue_ids "$project")

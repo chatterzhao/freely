@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+cd "$ROOT_DIR"
+
+skill="docs/system/workspace/skills/doc-ibm-execution/SKILL.md"
+gate="docs/system/workspace/skills/doc-ibm-execution/references/ibm-completion-gate.md"
+checklist="docs/system/workspace/skills/doc-ibm-execution/references/issue-materialization-checklist.md"
+bar="docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md"
+
+for file in "$skill" "$gate" "$checklist" "$bar"; do
+  [[ -f "$file" ]] || {
+    echo "[FAIL] missing file: $file"
+    exit 1
+  }
+done
+
+grep -q 'references/prd-quality-bar.md' "$skill"
+grep -q 'pre-tests.md` 和 `tasks.md` 必须从 `prd.md` 自然派生' "$skill"
+grep -q 'prd-quality-bar.md' "$gate"
+grep -q 'prd-quality-bar.md' "$checklist"
+
+for required in \
+  '## Minimum structure' \
+  '## Bar for `done_ibm`' \
+  '`Non-Goals`' \
+  '`Non-Negotiables`' \
+  '`Context Pack`' \
+  '`Decomposition Tree`' \
+  '`Prototype Path`' \
+  '`Eval Plan`' \
+  '`Execution Slices`' \
+  '`Revisit Triggers`' \
+  '`Dev-Loop Handoff`'
+do
+  grep -q "$required" "$bar"
+done
+
+echo "[PASS] doc-ibm PRD quality bar is wired into skill and references"

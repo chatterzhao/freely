@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-workcell-sync-before-launch.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+SOURCE="$TMP_DIR/source"
+TARGET="$TMP_DIR/target"
+mkdir -p "$SOURCE/bin" "$TARGET/bin" "$TARGET/.freely/logs"
+
+cat >"$SOURCE/bin/freely" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+if [[ "${1:-}" == "sync-tooling" ]]; then
+  shift
+  source_project=""
+  project=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --source-project) source_project="$2"; shift 2 ;;
+      --project) project="$2"; shift 2 ;;
+      *) shift ;;
+    esac
+  done
+  cat >"$project/bin/freely" <<'INNER'
+#!/usr/bin/env bash
+set -euo pipefail
+printf 'new\n' >"$PWD/.freely/launch-version.txt"
+sleep 1
+INNER
+  chmod +x "$project/bin/freely"
+  exit 0
+fi
+exit 1
+EOF
+chmod +x "$SOURCE/bin/freely"
+
+cat >"$TARGET/bin/freely" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+printf 'old\n' >"$PWD/.freely/launch-version.txt"
+sleep 1
+EOF
+chmod +x "$TARGET/bin/freely"
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+start_workcell_supervisor_async "$TARGET" "$SOURCE"
+
+for _ in $(seq 1 20); do
+  [[ -f "$TARGET/.freely/launch-version.txt" ]] && break
+  sleep 0.2
+done
+
+[[ -f "$TARGET/.freely/launch-version.txt" ]]
+[[ "$(cat "$TARGET/.freely/launch-version.txt")" == "new" ]]
+
+echo "[PASS] workcell supervisor syncs canonical tooling before launch"

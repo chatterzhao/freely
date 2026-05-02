@@ -1,0 +1,238 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-pretests-retirement-gate.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+WT="$TMP_DIR/wt"
+mkdir -p "$REPO/bin" "$REPO/docs/system/workspace/scripts/quality" "$REPO/docs/epics/sample/story/issues" "$REPO/docs/epics/sample/story/code-reviews" "$WT/.freely/run"
+mkdir -p "$REPO/docs/epics/sample/story"
+
+git init -q -b develop "$REPO"
+git -C "$REPO" config user.name tester
+git -C "$REPO" config user.email tester@example.com
+
+cp "$ROOT_DIR/bin/pretests-gate" "$REPO/bin/pretests-gate"
+cp "$ROOT_DIR/bin/pretests-retirement-gate" "$REPO/bin/pretests-retirement-gate"
+cp "$ROOT_DIR/docs/system/workspace/scripts/quality/pretests-gate" "$REPO/docs/system/workspace/scripts/quality/pretests-gate"
+cp "$ROOT_DIR/docs/system/workspace/scripts/quality/pretests-retirement-gate" "$REPO/docs/system/workspace/scripts/quality/pretests-retirement-gate"
+chmod +x \
+  "$REPO/bin/pretests-gate" \
+  "$REPO/bin/pretests-retirement-gate" \
+  "$REPO/docs/system/workspace/scripts/quality/pretests-gate" \
+  "$REPO/docs/system/workspace/scripts/quality/pretests-retirement-gate"
+
+run_gate() {
+  "$REPO/bin/pretests-retirement-gate" --project "$REPO" --worktree-path "$WT"
+}
+
+cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
+# Issue: sample
+
+- issue_id: `I-sample`
+- phase_state: `completed`
+- pre_tests_path: `docs/epics/sample/story/pre-tests.md`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+EOF
+
+cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+# Pre-tests: sample
+
+## Unit
+- acceptance target: `Document the bounded unit surface for this sample fixture.`
+- testing layer: `unit`
+- target environment: `feature/sample`
+- required evidence: `lawful replacement evidence for the unit surface`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `change_not_touching_this_layer`
+- not_applicable_explanation: `This documentation-only sample does not change unit-testable runtime logic.`
+- replacement_evidence: `The sample issue is documentation-only and keeps unit behavior unchanged.`
+
+## Integration
+- acceptance target: `Run the sample issue-bound integration replay.`
+- testing layer: `integration`
+- target environment: `feature/sample`
+- required evidence: `sample integration replay log`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the sample issue-bound integration replay.
+
+## End-to-End
+- acceptance target: `State why no end-to-end runtime surface exists in this fixture.`
+- testing layer: `end_to_end`
+- target environment: `feature/sample`
+- required evidence: `lawful replacement evidence for missing end-to-end surface`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `no_executable_boundary_at_this_layer`
+- not_applicable_explanation: `This sample repo does not include an end-to-end runtime surface.`
+- replacement_evidence: `The sample repo intentionally omits a runtime shell.`
+
+## Real-Environment
+- real_environment_status: `pass`
+- real_environment_reason: `This isolated fixture does not require real-environment testing.`
+
+## Acceptance Items
+
+### PT-1
+- id: `PT-1`
+- requirement: `sample`
+- evidence_level: `integration`
+- status: `pending`
+- artifact_ref: `pending://sample`
+EOF
+
+cat > "$REPO/docs/epics/sample/story/tasks.md" <<'EOF'
+# Tasks
+1. Keep the sample owner visible for retirement gate validation.
+EOF
+
+cat > "$WT/.freely/run/workcell-state.env" <<'EOF'
+LAST_WORKER_OWNER_ISSUE="I-sample"
+LAST_WORKER_PRE_TESTS_PATH="docs/epics/sample/story/pre-tests.md"
+LAST_WORKER_CLOSEOUT_GATE="pretests-gate"
+LAST_WORKER_CLOSEOUT_GATE_COMMAND="pretests-gate"
+LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY="false"
+LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY="none"
+EOF
+
+if run_gate >"$TMP_DIR/stdout1" 2>"$TMP_DIR/stderr1"; then
+  echo "[FAIL] pretests-retirement-gate should block pending owner pre-tests" >&2
+  exit 1
+fi
+grep -q 'PT-1' "$TMP_DIR/stderr1"
+
+cat > "$REPO/docs/epics/sample/story/code-reviews/pt-1.md" <<'EOF'
+# Verification artifact
+EOF
+
+cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+# Pre-tests: sample
+
+## Unit
+- acceptance target: `Document the bounded unit surface for this sample fixture.`
+- testing layer: `unit`
+- target environment: `feature/sample`
+- required evidence: `lawful replacement evidence for the unit surface`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `change_not_touching_this_layer`
+- not_applicable_explanation: `This documentation-only sample does not change unit-testable runtime logic.`
+- replacement_evidence: `The sample issue is documentation-only and keeps unit behavior unchanged.`
+
+## Integration
+- acceptance target: `Run the sample issue-bound integration replay.`
+- testing layer: `integration`
+- target environment: `feature/sample`
+- required evidence: `sample integration replay log`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the sample issue-bound integration replay.
+
+## End-to-End
+- acceptance target: `State why no end-to-end runtime surface exists in this fixture.`
+- testing layer: `end_to_end`
+- target environment: `feature/sample`
+- required evidence: `lawful replacement evidence for missing end-to-end surface`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `no_executable_boundary_at_this_layer`
+- not_applicable_explanation: `This sample repo does not include an end-to-end runtime surface.`
+- replacement_evidence: `The sample repo intentionally omits a runtime shell.`
+
+## Real-Environment
+- real_environment_status: `pass`
+- real_environment_reason: `This isolated fixture does not require real-environment testing.`
+
+## Acceptance Items
+
+### PT-1
+- id: `PT-1`
+- requirement: `sample`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/sample/story/code-reviews/pt-1.md`
+EOF
+
+run_gate
+
+cat > "$WT/.freely/run/workcell-state.env" <<'EOF'
+LAST_WORKER_OWNER_ISSUE="docs/epics/sample/story/issues/sample.md"
+LAST_WORKER_PRE_TESTS_PATH="docs/epics/sample/story/pre-tests.md"
+LAST_WORKER_CLOSEOUT_GATE="pretests-gate"
+LAST_WORKER_CLOSEOUT_GATE_COMMAND="pretests-gate"
+LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY="false"
+LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY="none"
+EOF
+
+run_gate
+
+rm -f "$WT/.freely/run/workcell-state.env"
+if run_gate >"$TMP_DIR/stdout-missing-state" 2>"$TMP_DIR/stderr-missing-state"; then
+  echo "[FAIL] pretests-retirement-gate should fail closed when worker state is missing" >&2
+  exit 1
+fi
+grep -q 'pretests_retirement_state_missing' "$TMP_DIR/stderr-missing-state"
+
+cat > "$WT/.freely/run/workcell-state.env" <<'EOF'
+LAST_WORKER_PRE_TESTS_PATH="docs/epics/sample/story/pre-tests.md"
+LAST_WORKER_CLOSEOUT_GATE="pretests-gate"
+LAST_WORKER_CLOSEOUT_GATE_COMMAND="pretests-gate"
+LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY="false"
+LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY="none"
+EOF
+if run_gate >"$TMP_DIR/stdout-missing-owner" 2>"$TMP_DIR/stderr-missing-owner"; then
+  echo "[FAIL] pretests-retirement-gate should fail closed when owner metadata is missing" >&2
+  exit 1
+fi
+grep -q 'pretests_retirement_binding_missing' "$TMP_DIR/stderr-missing-owner"
+
+cat > "$WT/.freely/run/workcell-state.env" <<'EOF'
+LAST_WORKER_OWNER_ISSUE="I-sample"
+LAST_WORKER_CLOSEOUT_GATE="pretests-gate"
+LAST_WORKER_CLOSEOUT_GATE_COMMAND="pretests-gate"
+LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY="false"
+LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY="none"
+EOF
+if run_gate >"$TMP_DIR/stdout-missing-pretests" 2>"$TMP_DIR/stderr-missing-pretests"; then
+  echo "[FAIL] pretests-retirement-gate should fail closed when pre-tests metadata is missing" >&2
+  exit 1
+fi
+grep -q 'pretests_retirement_binding_missing' "$TMP_DIR/stderr-missing-pretests"
+
+cat > "$REPO/docs/epics/sample/story/issues/sample-duplicate.md" <<'EOF'
+# Issue: sample duplicate
+
+- issue_id: `I-sample`
+- phase_state: `completed`
+- pre_tests_path: `docs/epics/sample/story/pre-tests.md`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+EOF
+cat > "$WT/.freely/run/workcell-state.env" <<'EOF'
+LAST_WORKER_OWNER_ISSUE="I-sample"
+LAST_WORKER_PRE_TESTS_PATH="docs/epics/sample/story/pre-tests.md"
+LAST_WORKER_CLOSEOUT_GATE="pretests-gate"
+LAST_WORKER_CLOSEOUT_GATE_COMMAND="pretests-gate"
+LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY="false"
+LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY="none"
+EOF
+if run_gate >"$TMP_DIR/stdout-ambiguous-issue" 2>"$TMP_DIR/stderr-ambiguous-issue"; then
+  echo "[FAIL] pretests-retirement-gate should reject ambiguous duplicate issue ids" >&2
+  exit 1
+fi
+grep -q 'pretests_retirement_issue_ambiguous' "$TMP_DIR/stderr-ambiguous-issue"
+rm -f "$REPO/docs/epics/sample/story/issues/sample-duplicate.md"
+
+cat > "$WT/.freely/run/workcell-state.env" <<'EOF'
+LAST_WORKER_OWNER_ISSUE="I-sample"
+LAST_WORKER_PRE_TESTS_PATH="docs/epics/sample/story/pre-tests.md"
+LAST_WORKER_CLOSEOUT_GATE="pretests-gate --require-adequacy"
+LAST_WORKER_CLOSEOUT_GATE_COMMAND="pretests-gate --require-adequacy"
+LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY="true"
+LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY="fresh-staged-owner-review-artifact"
+EOF
+if run_gate >"$TMP_DIR/stdout-structured-closeout-context-missing" 2>"$TMP_DIR/stderr-structured-closeout-context-missing"; then
+  echo "[FAIL] pretests-retirement-gate should fail closed when structured adequacy context is missing" >&2
+  exit 1
+fi
+grep -q 'pretests_retirement_closeout_context_missing' "$TMP_DIR/stderr-structured-closeout-context-missing"
+grep -q 'closeout_target_lane,closeout_promotion_gate' "$TMP_DIR/stderr-structured-closeout-context-missing"
+
+echo "[PASS] pretests-retirement-gate consumes recorded owner issue metadata before retirement"

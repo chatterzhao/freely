@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+cd "$ROOT_DIR"
+
+required_files=(
+  "docs/milestones.md"
+  "docs/system/workspace/agents/lead-agent.md"
+  "docs/system/workspace/tools.md"
+  "docs/system/workspace/scripts/README.md"
+  "docs/system/workspace/scripts/start-lead-agent.sh"
+  "docs/system/workspace/skills/context-source-skill/SKILL.md"
+  "docs/system/workspace/skills/doc-pre-brainstorm-execution/SKILL.md"
+  "docs/system/workspace/skills/doc-ibm-execution/SKILL.md"
+  "docs/system/workspace/skills/dev-loop-execution/SKILL.md"
+  "docs/system/workspace/skills/worktree-maintenance-governance/SKILL.md"
+)
+
+for file in "${required_files[@]}"; do
+  [[ -f "$file" ]] || {
+    echo "[FAIL] missing file: $file"
+    exit 1
+  }
+done
+
+prompt="$(
+  bash docs/system/workspace/scripts/start-lead-agent.sh \
+    --project "$ROOT_DIR" \
+    --intent "$ROOT_DIR/docs/PROJECT_INTENT.md" \
+    --constitution "$ROOT_DIR/docs/CONSTITUTION.md" \
+    --ai codex:auto
+)"
+current_branch="$(git -C "$ROOT_DIR" branch --show-current 2>/dev/null || printf 'unknown')"
+
+printf '%s\n' "$prompt" | grep -q 'lead-agent'
+printf '%s\n' "$prompt" | grep -q 'context-source-skill'
+printf '%s\n' "$prompt" | grep -q '项目治理入口：'
+printf '%s\n' "$prompt" | grep -q "$ROOT_DIR/AGENTS.md"
+printf '%s\n' "$prompt" | grep -q '先遵守 `PROJECT_ROOT/AGENTS.md`'
+printf '%s\n' "$prompt" | grep -q 'docs/milestones.md'
+printf '%s\n' "$prompt" | grep -q 'workspace/agents/lead-agent.md'
+printf '%s\n' "$prompt" | grep -q 'workspace/tools.md'
+printf '%s\n' "$prompt" | grep -q 'workspace/skills/doc-pre-brainstorm-execution/SKILL.md'
+printf '%s\n' "$prompt" | grep -q 'workspace/skills/doc-ibm-execution/SKILL.md'
+printf '%s\n' "$prompt" | grep -q 'workspace/skills/worktree-maintenance-governance/SKILL.md'
+printf '%s\n' "$prompt" | grep -q '工作区治理提醒'
+printf '%s\n' "$prompt" | grep -q 'current_worktree_state:'
+printf '%s\n' "$prompt" | grep -q 'current_project_dirty_entries:'
+printf '%s\n' "$prompt" | grep -q 'checkpoint_required='
+printf '%s\n' "$prompt" | grep -q 'project_worktree_summary:'
+printf '%s\n' "$prompt" | grep -q 'context compacted'
+printf '%s\n' "$prompt" | grep -q '先更新当前阶段对应的 continuity artifact'
+printf '%s\n' "$prompt" | grep -q '使用 subagent 提高效率'
+printf '%s\n' "$prompt" | grep -q 'freely live-status --project'
+printf '%s\n' "$prompt" | grep -q 'fleet-status'
+printf '%s\n' "$prompt" | grep -q 'freely task-source-scan --project'
+printf '%s\n' "$prompt" | grep -q 'standing-source'
+printf '%s\n' "$prompt" | grep -q '需求池至少包括'
+printf '%s\n' "$prompt" | grep -q '当前先看哪个池'
+printf '%s\n' "$prompt" | grep -q 'pre-brainstorm'
+printf '%s\n' "$prompt" | grep -q 'issue-bound brainstorm'
+printf '%s\n' "$prompt" | grep -q 'worktree 维护'
+printf '%s\n' "$prompt" | grep -q 'stacked_merge_chain'
+printf '%s\n' "$prompt" | grep -q 'fleet_closure'
+printf '%s\n' "$prompt" | grep -q 'child -> parent -> merge-prep-from-develop -> develop'
+printf '%s\n' "$prompt" | grep -q '不允许因为本轮不继续实现就跳过'
+printf '%s\n' "$prompt" | grep -q 'revisit_trigger'
+printf '%s\n' "$prompt" | grep -q 'worktree 维护'
+printf '%s\n' "$prompt" | grep -q 'acceptance review'
+printf '%s\n' "$prompt" | grep -q 'state maintenance'
+printf '%s\n' "$prompt" | grep -q '脚本只负责启动和托管 AI'
+
+case "$current_branch" in
+  develop|main|test-pre-merge-*)
+    printf '%s\n' "$prompt" | grep -q 'MANAGER_MODE=true'
+    printf '%s\n' "$prompt" | grep -q '当前分支是受保护主管工位'
+    printf '%s\n' "$prompt" | grep -q '只做主管，不做实现'
+    printf '%s\n' "$prompt" | grep -q 'runtime 可消费的非版本化产物'
+    printf '%s\n' "$prompt" | grep -q '.freely/run/manager-continuity-'
+    printf '%s\n' "$prompt" | grep -q '.freely/run/worker-prompts'
+    printf '%s\n' "$prompt" | grep -q '不会从普通回答里自动提炼 handoff'
+    printf '%s\n' "$prompt" | grep -q '你的最终回答必须列出本轮新写入的 manager continuity / worker prompt 路径'
+    printf '%s\n' "$prompt" | grep -q '在主 handoff artifact 落盘前不要先 spawn subagent'
+    printf '%s\n' "$prompt" | grep -q 'subagent 只能用于不阻塞首个 handoff 的二次核对'
+    printf '%s\n' "$prompt" | grep -q 'candidate stuck'
+    printf '%s\n' "$prompt" | grep -q 'phase orphaned'
+    printf '%s\n' "$prompt" | grep -q 'completion without closure'
+    ;;
+  *)
+    printf '%s\n' "$prompt" | grep -q 'MANAGER_MODE=false'
+    printf '%s\n' "$prompt" | grep -q '默认不要在首跳结束时只输出'
+    printf '%s\n' "$prompt" | grep -q '必须在当前会话内继续执行第二跳'
+    printf '%s\n' "$prompt" | grep -q '保持 worker reentry scope'
+    printf '%s\n' "$prompt" | grep -q '不要写'
+    printf '%s\n' "$prompt" | grep -q '.freely/run/manager-continuity-'
+    if printf '%s\n' "$prompt" | grep -q '至少创建一个 manager continuity 文件'; then
+      echo "[FAIL] worker prompt should not require manager continuity generation" >&2
+      exit 1
+    fi
+    if printf '%s\n' "$prompt" | grep -q 'candidate stuck'; then
+      echo "[FAIL] worker prompt should not include manager patrol checklist" >&2
+      exit 1
+    fi
+    ;;
+esac
+
+echo "[PASS] routing foundation loop artifacts are connected"

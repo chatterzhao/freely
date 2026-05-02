@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-live-status-scan-summary.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms" \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/.freely/logs"
+
+git init -q -b develop "$PROJECT"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+
+cat >"$PROJECT/.freely/run/manager-task-source-scan-latest.json" <<'EOF'
+{
+  "schema_version": "manager-task-source-scan-v1",
+  "generated_at": "2026-04-21T16:20:00Z",
+  "scan_reason": "bootstrap_missing_scan",
+  "surfaces": [
+    {
+      "surface": "active_milestone_queue",
+      "active_count": 2,
+      "summary_lines": [
+        "- milestone=M-1 issue=I-1 next_action=resume",
+        "- milestone=M-1 issue=I-2 next_action=verify"
+      ]
+    },
+    {
+      "surface": "active_progress_queue",
+      "active_count": 1,
+      "summary_lines": [
+        "- issue=I-3 phase_state=in_verification next_action=closeout"
+      ]
+    }
+  ]
+}
+EOF
+
+OUTPUT="$(bash "$ROOT_DIR/bin/freely" live-status --project "$PROJECT")"
+
+printf '%s\n' "$OUTPUT" | grep -q '^scan_summary_state: present$'
+printf '%s\n' "$OUTPUT" | grep -q '^scan_summary_reason: bootstrap_missing_scan$'
+printf '%s\n' "$OUTPUT" | grep -q 'scan_summary_surface_counts: active_milestone_queue=2,active_progress_queue=1'
+printf '%s\n' "$OUTPUT" | grep -q 'scan_summary_top_refs: active_milestone_queue: - milestone=M-1 issue=I-1 next_action=resume || active_progress_queue: - issue=I-3 phase_state=in_verification next_action=closeout'
+
+echo "[PASS] live-status includes advisory scan summary without replacing current-state truth"

@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-slot-switch-lock-status-surface.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/repo"
+LOCK_DIR="$TMP_DIR/slot-switch.lock"
+mkdir -p \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/docs/pre-brainstorms" \
+  "$PROJECT/.githooks" \
+  "$PROJECT/docs/system/workspace" \
+  "$LOCK_DIR"
+git -C "$TMP_DIR" init -q "$PROJECT"
+git -C "$PROJECT" config core.hooksPath .githooks
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/system/workspace/install-lifecycle-allowlist.txt" <<'EOF'
+# allowlist
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="test-sleep"
+AI_MODEL=""
+AI_MODE="auto"
+AI_REASONING_EFFORT=""
+FREELY_ACTIVATION_CONSENT_STATUS="accepted"
+FREELY_ACTIVATION_CONSENT_RECORDED_AT="2026-04-04T21:48:00Z"
+FREELY_ACTIVATION_CONSENT_RECORDED_VIA="test"
+EOF
+
+cat >"$LOCK_DIR/state.env" <<'EOF'
+owner_pid=not-a-pid
+started_at=1712296080
+reason=manual_switch_sweep
+EOF
+
+BASELINE_OUTPUT="$(
+  AI_CLI_SWITCH_LOCK_DIR="$LOCK_DIR" \
+    bash "$ROOT_DIR/bin/freely" baseline-status --project "$PROJECT"
+)"
+LIVE_OUTPUT="$(
+  AI_CLI_SWITCH_LOCK_DIR="$LOCK_DIR" \
+    bash "$ROOT_DIR/bin/freely" live-status --project "$PROJECT"
+)"
+DOCTOR_OUTPUT="$(
+  AI_CLI_SWITCH_LOCK_DIR="$LOCK_DIR" \
+    bash "$ROOT_DIR/bin/freely" doctor --project "$PROJECT"
+)"
+
+printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'current_slot_switch_lock_state: ambiguous'
+printf '%s\n' "$BASELINE_OUTPUT" | grep -q 'current_slot_switch_lock_detail: owner_pid_malformed'
+printf '%s\n' "$BASELINE_OUTPUT" | grep -q "current_slot_switch_lock_path: $LOCK_DIR"
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'current_slot_switch_lock_state: ambiguous'
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'current_slot_switch_lock_reason: manual_switch_sweep'
+printf '%s\n' "$DOCTOR_OUTPUT" | grep -q 'current_slot_switch_lock_owner_pid: not-a-pid'
+printf '%s\n' "$DOCTOR_OUTPUT" | grep -q 'current_slot_switch_lock_started_at: '
+
+echo "[PASS] freely doctor and status surfaces expose the shared slot-switch lock snapshot"

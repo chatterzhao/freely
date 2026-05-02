@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-restart-storm-status.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+WT_ROOT="$TMP_DIR/repo-worktrees"
+WT="$WT_ROOT/feature-demo"
+
+mkdir -p "$REPO" "$WT_ROOT"
+cd "$REPO"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add README.md
+git commit -q -m "init"
+git branch feature/demo
+git worktree add "$WT" feature/demo >/dev/null
+
+mkdir -p "$WT/.freely/run" "$WT/docs"
+cat >"$WT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$WT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$WT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$WT/.freely/config.env" <<EOF
+PROJECT_ROOT="$WT"
+INTENT_FILE="$WT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$WT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+cat >"$WT/.freely/run/session-state.env" <<'EOF'
+LAST_LAUNCH_KIND="resume"
+LAST_PROJECT_DIRTY_ENTRIES="1"
+LAST_RESTART_STORM_WINDOW_SECS="30"
+LAST_RESTART_STORM_COUNT="4"
+LAST_PROCESS_CHURN_PEAK="3"
+LAST_RESTART_STORM_SIGNAL_AT="2026-03-24T04:30:00Z"
+LAST_RESTART_STORM_SIGNAL_REASON="restart_storm_count_threshold"
+LAST_RESTART_STORM_ESCALATED_AT="2026-03-24T04:30:00Z"
+LAST_RESTART_STORM_ESCALATION_TARGET="manager_bootstrap_handoff"
+EOF
+cat >"$WT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="ai_exit_rc_1"
+LAST_ROLE_HINT="worker"
+LAST_STATE_UPDATED_AT="2026-03-24T04:30:00Z"
+EOF
+
+LIVE_OUTPUT="$(TZ="America/Los_Angeles" bash "$ROOT_DIR/bin/freely" live-status --project "$WT")"
+FLEET_OUTPUT="$(bash "$ROOT_DIR/bin/freely" fleet-status --project "$WT")"
+
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'restart_storm_signal_at: 2026.03.23 21:30:00 PDT'
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'last_state_updated_at: 2026.03.23 21:30:00 PDT'
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'restart_storm_signal_reason: restart_storm_count_threshold'
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'restart_storm_signal_summary: window=30s count=4 peak=3'
+printf '%s\n' "$LIVE_OUTPUT" | grep -q 'restart_storm_escalation_target: manager_bootstrap_handoff'
+printf '%s\n' "$FLEET_OUTPUT" | grep -q 'storm=restart_storm_count_threshold window=30s count=4 peak=3'
+
+if grep -q 'RESTART_STORM' "$WT/.freely/run/workcell-state.env"; then
+  echo "[FAIL] workcell-state.env should not mirror restart storm counters"
+  exit 1
+fi
+
+echo "[PASS] freely live-status and fleet-status expose restart storm summary without mirroring counters into workcell-state"

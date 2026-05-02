@@ -1,0 +1,128 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-worker-active-stall.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+WORKER_WT="$TMP_DIR/worker-wt"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260323-0000--sample"
+
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name "Freely Test"
+git -C "$PROJECT" config user.email "freely@example.com"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260323-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260323-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260323-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m "init"
+git -C "$PROJECT" worktree add -q -b feature/test-worker "$WORKER_WT" develop
+WORKER_WT="$(cd "$WORKER_WT" && pwd -P)"
+
+echo worker >"$WORKER_WT/worker-branch.txt"
+git -C "$WORKER_WT" add worker-branch.txt
+git -C "$WORKER_WT" commit -q -m "worker branch divergence"
+
+mkdir -p "$PROJECT/.freely/run" "$WORKER_WT/.freely/run" "$WORKER_WT/.freely/logs"
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+cat >"$WORKER_WT/.freely/config.env" <<EOF
+PROJECT_ROOT="$WORKER_WT"
+INTENT_FILE="$WORKER_WT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$WORKER_WT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+cat >"$WORKER_WT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_ROLE_HINT="worker"
+LAST_EXIT_REASON="ai_exit_rc_0"
+EOF
+echo "12345" >"$WORKER_WT/.freely/run/supervisor.pid"
+echo "54321" >"$WORKER_WT/.freely/run/ai.pid"
+
+PROMPT_FILE="$WORKER_WT/.freely/run/prompt-20260323-183500.txt"
+cat >"$PROMPT_FILE" <<'EOF'
+Worker prompt
+
+Delegated continuation handoff:
+- id=sample status=delegated classification=continuation
+EOF
+
+CYCLE_LOG="$WORKER_WT/.freely/logs/cycle-20260323-183500.log"
+cat >"$CYCLE_LOG" <<'EOF'
+stalled worker output
+EOF
+touch -t 202603231700 "$PROMPT_FILE" "$CYCLE_LOG"
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+REENTRY_LOG="$TMP_DIR/reentry.log"
+manager_runtime_launch_workers_from_latest_handoff() {
+  echo "0"
+}
+valid_supervisor_pid_for_project() {
+  local project="$1" pid="$2"
+  [[ "$project" == "$WORKER_WT" && "$pid" == "12345" ]]
+}
+runtime_ai_pid_hint_for_project() {
+  local project="$1"
+  if [[ "$project" == "$WORKER_WT" ]]; then
+    echo "54321"
+  fi
+}
+request_local_continuation_reentry() {
+  printf '%s|%s\n' "$1" "$2" >>"$REENTRY_LOG"
+}
+
+RECOVERED="$(WORKER_AI_STALL_THRESHOLD_SECS=1 manager_runtime_recover_workers_if_needed "$PROJECT" | tail -n 1)"
+[[ "$RECOVERED" == "1" ]] || {
+  echo "[FAIL] expected one recovered worker, got $RECOVERED" >&2
+  exit 1
+}
+grep -q "$WORKER_WT|runtime-stalled-ai-recovery" "$REENTRY_LOG" || {
+  echo "[FAIL] expected stalled worker recovery reentry" >&2
+  exit 1
+}
+
+echo "[PASS] manager watchdog recovers stalled active worker after delegated continuation prompt"

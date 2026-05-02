@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-watchdog-root.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+mkdir -p "$REPO/docs/system/workspace/skills/watchdog-control-plane/scripts" "$REPO/docs/system/workspace/scripts/runtime"
+cp "$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh" \
+  "$REPO/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+cp "$ROOT_DIR/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" \
+  "$REPO/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
+chmod +x "$REPO/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+
+(
+  cd "$REPO"
+  bash -lc '
+    source docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh
+    test "$SELF_ROOT" = "'"$REPO"'"
+    test "$NETWORK_PROXY_RESOLVER_LIB" = "'"$REPO"'/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
+    test -f "$NETWORK_PROXY_RESOLVER_LIB"
+  '
+)
+
+mkdir -p "$REPO/.git"
+(
+  cd "$REPO/.git"
+  bash -lc '
+    source ../docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh
+    test "$SELF_ROOT" = "'"$REPO"'"
+    test "$NETWORK_PROXY_RESOLVER_LIB" = "'"$REPO"'/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
+    test -f "$NETWORK_PROXY_RESOLVER_LIB"
+  '
+)
+
+echo "[PASS] availability-watchdog resolves runtime helpers from repo root across hook-style cwd changes"

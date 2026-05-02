@@ -1,0 +1,163 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-start-late-fallback-watchdog.XXXXXX)"
+
+cleanup() {
+  set +e
+  if [[ -n "${PROJECT:-}" && -d "${PROJECT:-}" ]]; then
+    bash "$ROOT_DIR/bin/freely" stop --project "$PROJECT" >/dev/null 2>&1 || true
+  fi
+  if [[ -n "${START_PID:-}" ]]; then
+    wait "$START_PID" 2>/dev/null || true
+  fi
+  rm -rf "$TMP_DIR"
+}
+trap cleanup EXIT
+
+PROJECT="$TMP_DIR/project"
+MOCK_BIN="$TMP_DIR/mock-bin"
+KIRO_OUTPUT="$TMP_DIR/kiro-output.log"
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260414-0000--sample" \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/.freely/logs" \
+  "$MOCK_BIN"
+
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name tester
+git -C "$PROJECT" config user.email tester@example.com
+echo base >"$PROJECT/README.md"
+git -C "$PROJECT" add README.md
+git -C "$PROJECT" commit -q -m "init"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260414-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260414-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260414-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="kiro-cli"
+AI_MODEL="auto"
+AI_MODE="auto"
+AI_REASONING_EFFORT=""
+AUTO_SWITCH_TOOL="true"
+AUTO_SWITCH_SLOT="true"
+AI_FALLBACK_TOOLS="cc"
+CHECK_INTERVAL=1
+RESTART_DELAY=0
+MAX_RESTARTS=1
+IFLOW_MAX_TURNS=100
+EOF
+
+cat >"$MOCK_BIN/kiro-cli" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+cat "${KIRO_OUTPUT_FILE:?}"
+exit 0
+EOF
+chmod +x "$MOCK_BIN/kiro-cli"
+
+printf '%s\n' 'Monthly request limit reached' >"$KIRO_OUTPUT"
+
+wait_for_grep() {
+  local pattern="$1" file="$2" tries="${3:-60}"
+  local i
+  for i in $(seq 1 "$tries"); do
+    if [[ -f "$file" ]] && grep -q -- "$pattern" "$file"; then
+      return 0
+    fi
+    sleep 0.5
+  done
+  return 1
+}
+
+wait_for_live_pid() {
+  local file="$1" tries="${2:-60}"
+  local i pid
+  for i in $(seq 1 "$tries"); do
+    if [[ -f "$file" ]]; then
+      pid="$(cat "$file" 2>/dev/null || true)"
+      if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null; then
+        return 0
+      fi
+    fi
+    sleep 0.5
+  done
+  return 1
+}
+
+PATH="$MOCK_BIN:$PATH" KIRO_OUTPUT_FILE="$KIRO_OUTPUT" bash "$ROOT_DIR/bin/freely" start --project "$PROJECT" >/dev/null 2>&1 &
+START_PID=$!
+
+wait_for_grep '^LAST_EXIT_REASON="kiro_monthly_request_limit"$' "$PROJECT/.freely/run/workcell-state.env" || {
+  echo "[FAIL] expected freely start to record the initial kiro availability failure" >&2
+  [[ -f "$PROJECT/.freely/run/workcell-state.env" ]] && cat "$PROJECT/.freely/run/workcell-state.env" >&2
+  exit 1
+}
+
+cat >"$MOCK_BIN/claude" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+sleep 30
+EOF
+chmod +x "$MOCK_BIN/claude"
+
+wait_for_grep '^AI_TOOL="cc"$' "$PROJECT/.freely/config.env" 80 || {
+  echo "[FAIL] expected manager watchdog to switch to fallback tool once claude became available" >&2
+  cat "$PROJECT/.freely/config.env" >&2
+  [[ -f "$PROJECT/.freely/logs/runtime-events.log" ]] && cat "$PROJECT/.freely/logs/runtime-events.log" >&2
+  exit 1
+}
+
+wait_for_live_pid "$PROJECT/.freely/run/supervisor.pid" 80 || {
+  echo "[FAIL] expected fallback supervisor to be running on cc after late tool recovery" >&2
+  [[ -f "$PROJECT/.freely/logs/runtime-events.log" ]] && cat "$PROJECT/.freely/logs/runtime-events.log" >&2
+  exit 1
+}
+
+wait_for_live_pid "$PROJECT/.freely/run/ai.pid" 80 || {
+  echo "[FAIL] expected fallback ai process to be running on cc after late tool recovery" >&2
+  [[ -f "$PROJECT/.freely/logs/runtime-events.log" ]] && cat "$PROJECT/.freely/logs/runtime-events.log" >&2
+  exit 1
+}
+
+grep -q 'event=tool_auto_switch_selected.*active_tool=cc' "$PROJECT/.freely/logs/runtime-events.log" || {
+  echo "[FAIL] expected runtime events to record the fallback tool selection" >&2
+  cat "$PROJECT/.freely/logs/runtime-events.log" >&2
+  exit 1
+}
+
+echo "[PASS] freely start keeps watchdog recovery alive until a late fallback tool becomes available"

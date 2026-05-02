@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-worker-prompt-header.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+WORKER="$TMP_DIR/project-worktrees/feature-worker"
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$WORKER"
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260323-170438.md"
+PROMPT="$PROJECT/.freely/run/worker-prompts/20260323-170438-worker-manager-delegated-continuation-stall-materialization-codex.txt"
+
+cat >"$PROMPT" <<EOF
+You are the worker for candidate C-20260323-1705-A.
+
+Worktree:
+- \`$WORKER\`
+
+Branch:
+- \`feature/worker-prompt-worktree-header-compat-20260323\`
+EOF
+
+cat >"$CONTINUITY" <<EOF
+# Manager Continuity
+- worker_prompt: \`$PROMPT\`
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+RESOLVED="$(worker_prompt_target_worktree "$PROMPT")"
+[[ "$RESOLVED" == "$WORKER" ]]
+worker_prompt_launchable_for_manager_project "$PROJECT" "$PROMPT"
+[[ "$(latest_launchable_manager_continuity_file_for_project "$PROJECT")" == "$CONTINUITY" ]]
+
+echo "[PASS] worker prompt parser accepts Worktree header"

@@ -1,0 +1,702 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PROJECT="$(pwd -P)"
+ISSUE_PATH=""
+STAGED_ONLY=0
+REQUIRE_ADEQUACY=0
+TARGET_LANE=""
+PROMOTION_GATE=""
+
+usage() {
+  cat <<'EOF'
+Usage:
+  pretests-gate [--project <abs_path>] [--issue <issue_path>] [--staged-only]
+                [--require-adequacy] [--target-lane <lane>] [--promotion-gate <gate>]
+
+Purpose:
+  - enforce issue-bound pre-tests acceptance items before an issue is marked completed
+  - reuse the same verdict for standalone checks and git hook gating
+  - when `--require-adequacy` is present, enforce richer adequacy semantics for
+    opted-in Acceptance Items without regressing legacy minimal-schema owners
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --project) PROJECT="$2"; shift 2 ;;
+    --issue) ISSUE_PATH="$2"; shift 2 ;;
+    --staged-only) STAGED_ONLY=1; shift ;;
+    --require-adequacy) REQUIRE_ADEQUACY=1; shift ;;
+    --target-lane) TARGET_LANE="$2"; shift 2 ;;
+    --promotion-gate) PROMOTION_GATE="$2"; shift 2 ;;
+    -h|--help) usage; exit 0 ;;
+    *)
+      echo "unknown arg: $1" >&2
+      usage >&2
+      exit 1
+      ;;
+  esac
+done
+
+[[ -d "$PROJECT" ]] || { echo "project not found: $PROJECT" >&2; exit 1; }
+git -C "$PROJECT" rev-parse --is-inside-work-tree >/dev/null 2>&1 || {
+  echo "not a git worktree: $PROJECT" >&2
+  exit 1
+}
+
+if [[ "$REQUIRE_ADEQUACY" -eq 0 && ( -n "$TARGET_LANE" || -n "$PROMOTION_GATE" ) ]]; then
+  echo "--target-lane/--promotion-gate require --require-adequacy" >&2
+  exit 1
+fi
+
+python3 - "$PROJECT" "$ISSUE_PATH" "$STAGED_ONLY" "$REQUIRE_ADEQUACY" "$TARGET_LANE" "$PROMOTION_GATE" <<'PY'
+import os
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+project = Path(sys.argv[1]).resolve()
+issue_arg = sys.argv[2]
+staged_only = sys.argv[3] == "1"
+require_adequacy = sys.argv[4] == "1"
+target_lane = sys.argv[5]
+promotion_gate = sys.argv[6]
+
+ISSUE_RE = re.compile(r"^docs/epics/.+/issues/[^/]+\.md$")
+REQUIRED_SECTION_NAMES = ("Unit", "Integration", "End-to-End", "Real-Environment")
+REQUIRED_SECTION_SCALARS = (
+    "acceptance target",
+    "testing layer",
+    "target environment",
+    "required evidence",
+)
+REAL_ENV_STATUS_VALUES = {"pass", "fail"}
+VALID_NOT_APPLICABLE_REASONS = {
+    "change_not_touching_this_layer",
+    "no_executable_boundary_at_this_layer",
+    "protected_environment_only",
+    "human_observation_only",
+    "covered_by_more_realistic_required_surface",
+}
+FOLLOW_ON_LIVE_SURFACE_PATTERNS = (
+    "auth switch",
+    "account switch",
+    "slot recovery",
+    "startup recovery",
+    "watchdog",
+    "freely start",
+    "ensure-manager",
+    "bin/ai",
+    "codex exec",
+)
+ADEQUACY_REQUIRED_FIELDS = ("surface_kind", "target_lane", "promotion_gate")
+ADEQUACY_HINT_FIELDS = ("task_refs", "case_design")
+VALID_SURFACE_KINDS = {
+    "unit",
+    "integration",
+    "end_to_end",
+    "real_environment",
+    "post_merge_followthrough",
+}
+VALID_TARGET_LANES = {
+    "feature-local",
+    "premerge-integration",
+    "post-merge-followthrough",
+}
+VALID_PROMOTION_GATES = {
+    "completion",
+    "develop_merge",
+    "retirement",
+}
+
+
+def git_output(*args: str, check: bool = True) -> str:
+    result = subprocess.run(
+        ["git", "-C", str(project), *args],
+        text=True,
+        capture_output=True,
+    )
+    if check and result.returncode != 0:
+        raise RuntimeError(result.stderr.strip() or result.stdout.strip() or f"git {' '.join(args)} failed")
+    return result.stdout
+
+
+def get_head_text(path: str) -> str:
+    result = subprocess.run(
+        ["git", "-C", str(project), "show", f"HEAD:{path}"],
+        text=True,
+        capture_output=True,
+    )
+    if result.returncode != 0:
+        return ""
+    return result.stdout
+
+
+def get_staged_text(path: str) -> str:
+    result = subprocess.run(
+        ["git", "-C", str(project), "show", f":{path}"],
+        text=True,
+        capture_output=True,
+    )
+    if result.returncode != 0:
+        return ""
+    return result.stdout
+
+
+def get_worktree_text(path: str) -> str:
+    target = project / path
+    if not target.exists():
+        return ""
+    return target.read_text()
+
+
+def phase_state(text: str) -> str:
+    match = re.search(r"^- phase_state:\s*`?([^`\n]+)`?\s*$", text, re.MULTILINE)
+    return match.group(1).strip() if match else ""
+
+
+def parse_issue_binding(issue_path: str, text: str) -> tuple[str, str]:
+    def extract(field: str) -> str:
+        match = re.search(rf"^- {re.escape(field)}:\s*`?([^`\n]+)`?\s*$", text, re.MULTILINE)
+        return match.group(1).strip() if match else ""
+
+    pre_tests_path = extract("pre_tests_path")
+    verification_dir = extract("verification_artifact_dir")
+    errors: list[str] = []
+    if not pre_tests_path:
+        errors.append(f"{issue_path}: missing pre_tests_path")
+    elif not Path(pre_tests_path).is_relative_to(Path("docs")) and not pre_tests_path.startswith(".freely/"):
+        errors.append(f"{issue_path}: pre_tests_path must point inside repo, got {pre_tests_path}")
+    if not verification_dir:
+        errors.append(f"{issue_path}: missing verification_artifact_dir")
+    if errors:
+        raise ValueError("\n".join(errors))
+    return pre_tests_path, verification_dir
+
+
+def derive_tasks_path(issue_text: str, pre_tests_path: str) -> str:
+    match = re.search(r"^- tasks_path:\s*`?([^`\n]+)`?\s*$", issue_text, re.MULTILINE)
+    if match:
+        return match.group(1).strip()
+    return str(Path(pre_tests_path).with_name("tasks.md"))
+
+
+def staged_paths() -> list[str]:
+    output = git_output("diff", "--cached", "--name-only", "--diff-filter=ACMR")
+    return [line.strip() for line in output.splitlines() if line.strip()]
+
+
+def path_within_dir(path: str, directory: str) -> bool:
+    normalized_dir = directory.rstrip("/")
+    if not normalized_dir:
+        return False
+    return path == normalized_dir or path.startswith(f"{normalized_dir}/")
+
+
+def staged_blob_exists(path: str) -> bool:
+    result = subprocess.run(
+        ["git", "-C", str(project), "cat-file", "-t", f":{path}"],
+        text=True,
+        capture_output=True,
+    )
+    return result.returncode == 0 and result.stdout.strip() == "blob"
+
+
+def artifact_is_fresh_staged_review_artifact(path: str, verification_dir: str) -> bool:
+    if not path or not verification_dir:
+        return False
+    if not path_within_dir(path, verification_dir):
+        return False
+    if path not in staged_paths():
+        return False
+    return staged_blob_exists(path)
+
+
+def staged_changes_overlap_issue_scope(issue_path: str, issue_text: str) -> bool:
+    try:
+        pre_tests_path, verification_dir = parse_issue_binding(issue_path, issue_text)
+    except ValueError:
+        return False
+    verification_prefix = verification_dir.rstrip("/") + "/"
+    for path in staged_paths():
+        if path == issue_path or path == pre_tests_path:
+            return True
+        if path.startswith(verification_prefix):
+            return True
+    return False
+
+
+def extract_acceptance_sections(text: str) -> list[str]:
+    marker = "## Acceptance Items"
+    if marker not in text:
+        return []
+    acceptance_text = text.split(marker, 1)[1]
+    parts = re.split(r"^###\s+", acceptance_text, flags=re.MULTILINE)
+    sections = []
+    for part in parts[1:]:
+        sections.append("### " + part.strip())
+    return sections
+
+
+def extract_required_sections(text: str) -> dict[str, str]:
+    lines = text.splitlines()
+    sections: dict[str, str] = {}
+    current_name = ""
+    buffer: list[str] = []
+
+    def flush() -> None:
+        nonlocal current_name, buffer
+        if current_name:
+            sections[current_name] = "\n".join(buffer).strip()
+        current_name = ""
+        buffer = []
+
+    for line in lines:
+        match = re.match(r"^##\s+(Unit|Integration|End-to-End|Real-Environment)\s*$", line)
+        if match:
+            flush()
+            current_name = match.group(1)
+            continue
+        if current_name:
+            if re.match(r"^##\s+", line):
+                flush()
+            else:
+                buffer.append(line)
+    flush()
+    return sections
+
+
+def parse_fields(section: str) -> dict[str, str]:
+    fields: dict[str, str] = {}
+    for key in (
+        "id",
+        "requirement",
+        "evidence_level",
+        "status",
+        "artifact_ref",
+        "not_applicable_reason",
+        "not_applicable_explanation",
+        "replacement_evidence",
+        "surface_kind",
+        "target_lane",
+        "promotion_gate",
+        "task_refs",
+        "case_design",
+    ):
+        match = re.search(rf"^- {key}:\s*`?([^`\n]+)`?\s*$", section, re.MULTILINE)
+        if match:
+            fields[key] = match.group(1).strip()
+    return fields
+
+
+def acceptance_item_uses_adequacy_v2(fields: dict[str, str]) -> bool:
+    return any(fields.get(key) for key in (*ADEQUACY_REQUIRED_FIELDS, *ADEQUACY_HINT_FIELDS))
+
+
+def section_has_test_tasks(section_text: str) -> bool:
+    for line in section_text.splitlines():
+        if re.match(r"^\s*\d+\.\s+", line):
+            return True
+    return False
+
+
+def parse_scalar(section_text: str, key: str) -> str:
+    match = re.search(rf"^- {re.escape(key)}:\s*`?([^`\n]+)`?\s*$", section_text, re.MULTILINE)
+    return match.group(1).strip() if match else ""
+
+
+def has_blocker_taxonomy(section_text: str) -> bool:
+    if re.search(r"^- blocker taxonomy:\s*`?([^`\n]+)`?\s*$", section_text, re.MULTILINE):
+        return True
+    if re.search(r"^- blocker taxonomy:\s*$", section_text, re.MULTILINE):
+        return True
+    return False
+
+
+def artifact_exists(path: str, source: str) -> bool:
+    if not path:
+        return False
+    if path.startswith("pending://"):
+        return False
+    if source == "staged":
+        result = subprocess.run(
+            ["git", "-C", str(project), "cat-file", "-e", f":{path}"],
+            text=True,
+            capture_output=True,
+        )
+        return result.returncode == 0
+    fs_path = project / path
+    if fs_path.exists():
+        return True
+    result = subprocess.run(
+        ["git", "-C", str(project), "cat-file", "-e", f":{path}"],
+        text=True,
+        capture_output=True,
+    )
+    return result.returncode == 0
+
+
+def issue_is_follow_on(issue_text: str) -> bool:
+    return bool(re.search(r"^- follow_on_to:\s*`?([^`\n]+)`?\s*$", issue_text, re.MULTILINE))
+
+
+def issue_requires_stronger_live_surface(issue_text: str, pretests_text: str) -> bool:
+    if not issue_is_follow_on(issue_text):
+        return False
+    haystack = f"{issue_text}\n{pretests_text}".lower()
+    return any(pattern in haystack for pattern in FOLLOW_ON_LIVE_SURFACE_PATTERNS)
+
+
+def tasks_text_for_source(path: str, source: str) -> str:
+    return get_staged_text(path) if source == "staged" else get_worktree_text(path)
+
+
+def unchecked_task_lines(text: str) -> list[str]:
+    lines: list[str] = []
+    for raw in text.splitlines():
+        stripped = raw.strip()
+        if re.match(r"^(?:[-*]|\d+\.)\s+\[\s\]\s+", stripped):
+            lines.append(stripped)
+    return lines
+
+
+def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
+    errors: list[str] = []
+    def add_error(code: str, message: str) -> None:
+        errors.append(f"[{code}] {message}")
+
+    try:
+        pre_tests_path, verification_dir = parse_issue_binding(issue_path, issue_text)
+    except ValueError as exc:
+        return str(exc).splitlines()
+
+    tasks_path = derive_tasks_path(issue_text, pre_tests_path)
+
+    pretests_text = get_staged_text(pre_tests_path) if source == "staged" else get_worktree_text(pre_tests_path)
+    if not pretests_text:
+        return [f"[pre_tests_missing] {issue_path}: bound pre-tests file missing or unreadable: {pre_tests_path}"]
+
+    if phase_state(issue_text) == "completed" or require_adequacy:
+        tasks_text = tasks_text_for_source(tasks_path, source)
+        if not tasks_text:
+            add_error(
+                "task_closeout_missing",
+                f"{issue_path}: bound tasks file missing or unreadable: {tasks_path}. "
+                "Completion and guarded promote closeout require the owner task decomposition to remain visible.",
+            )
+        else:
+            unchecked = unchecked_task_lines(tasks_text)
+            if unchecked:
+                add_error(
+                    "task_closeout_incomplete",
+                    f"{tasks_path}: contains unchecked tasks: {'; '.join(unchecked[:3])}. "
+                    "Do not clear completion or guarded promote while owner tasks still show unfinished execution slices.",
+                )
+
+    required_sections = extract_required_sections(pretests_text)
+    for required_name in REQUIRED_SECTION_NAMES:
+        if required_name not in required_sections:
+            add_error("pre_tests_missing", f"{pre_tests_path}: missing required section '## {required_name}'")
+            continue
+        section_text = required_sections[required_name]
+        if required_name == "Real-Environment":
+            real_env_status = parse_scalar(section_text, "real_environment_status")
+            real_env_reason = parse_scalar(section_text, "real_environment_reason")
+            if not real_env_status:
+                add_error(
+                    "pre_tests_missing",
+                    f"{pre_tests_path}: section 'Real-Environment' missing 'real_environment_status'. "
+                    "This chapter is the final real-environment review verdict for the current implementation: record pass or fail, not a placeholder.",
+                )
+            elif real_env_status not in REAL_ENV_STATUS_VALUES:
+                add_error(
+                    "pre_tests_missing",
+                    f"{pre_tests_path}: section 'Real-Environment' uses unsupported real_environment_status {real_env_status}. "
+                    "Use pass when required real-environment testing is done or not needed, and fail when required real-environment testing is still missing or failing.",
+                )
+            if not real_env_reason:
+                add_error(
+                    "verification_state_missing",
+                    f"{pre_tests_path}: section 'Real-Environment' missing 'real_environment_reason'. "
+                    "Do not clear this chapter by only filling the status field; explain whether real-environment testing is complete, unnecessary, or still missing.",
+                )
+            if real_env_status == "fail":
+                add_error(
+                    "execution_missing",
+                    f"{pre_tests_path}: section 'Real-Environment' is fail. "
+                    "Complete the required real-environment testing or explicitly narrow the implementation until this review chapter can truthfully pass.",
+                )
+            continue
+        for key in REQUIRED_SECTION_SCALARS:
+            if not parse_scalar(section_text, key):
+                add_error(
+                    "pre_tests_missing",
+                    f"{pre_tests_path}: section '{required_name}' missing '{key}'",
+                )
+        if not has_blocker_taxonomy(section_text):
+            add_error(
+                "pre_tests_missing",
+                f"{pre_tests_path}: section '{required_name}' missing 'blocker taxonomy'",
+            )
+        not_applicable_reason = parse_scalar(section_text, "not_applicable_reason")
+        not_applicable_explanation = parse_scalar(section_text, "not_applicable_explanation")
+        replacement_evidence = parse_scalar(section_text, "replacement_evidence")
+        if not_applicable_reason:
+            if not_applicable_reason not in VALID_NOT_APPLICABLE_REASONS:
+                add_error(
+                    "pre_tests_missing",
+                    f"{pre_tests_path}: section '{required_name}' uses unsupported not_applicable_reason {not_applicable_reason}",
+                )
+            if not not_applicable_explanation:
+                add_error(
+                    "verification_state_missing",
+                    f"{pre_tests_path}: section '{required_name}' is marked not applicable but missing not_applicable_explanation",
+                )
+            if not replacement_evidence:
+                add_error(
+                    "verification_state_missing",
+                    f"{pre_tests_path}: section '{required_name}' is marked not applicable but missing replacement_evidence",
+                )
+            continue
+        if not section_has_test_tasks(section_text):
+            add_error(
+                "testcase_derivation_missing",
+                f"{pre_tests_path}: section '{required_name}' has no concrete test tasks and no lawful not_applicable_reason. "
+                "List the real test work for this chapter, or record an explicit non-test reason with replacement evidence; do not leave a title-only placeholder.",
+            )
+
+    sections = extract_acceptance_sections(pretests_text)
+    if not sections:
+        return [
+            f"[pre_tests_missing] {pre_tests_path}: missing Acceptance Items. "
+            "This gate expects real test tasks and result writeback for the current owner; you cannot clear it by only filling schema fields."
+        ]
+
+    valid_statuses = {"pass", "not_applicable"}
+    valid_levels = {"mock", "integration", "real_env", "post_merge_dogfood"}
+    acceptance_fields: list[dict[str, str]] = []
+    adequacy_v2_items: list[dict[str, str]] = []
+
+    for section in sections:
+        fields = parse_fields(section)
+        acceptance_fields.append(fields)
+        title_line = section.splitlines()[0] if section.splitlines() else "### <unknown>"
+        for key in ("id", "requirement", "evidence_level"):
+            if not fields.get(key):
+                add_error(
+                    "testcase_derivation_missing",
+                    f"{pre_tests_path}: {title_line} missing {key}. "
+                    "Do not clear this gate by only filling placeholders; define the actual bounded test item for this implementation surface.",
+                )
+        for key in ("status", "artifact_ref"):
+            if not fields.get(key):
+                add_error(
+                    "verification_state_missing",
+                    f"{pre_tests_path}: {title_line} missing {key}. "
+                    "A passing owner still needs real test execution writeback; metadata alone is not enough.",
+                )
+        if not fields:
+            continue
+        evidence_level = fields.get("evidence_level", "")
+        if evidence_level and evidence_level not in valid_levels:
+            add_error(
+                "testcase_derivation_missing",
+                f"{pre_tests_path}: {fields.get('id', title_line)} has unsupported evidence_level {evidence_level}. "
+                "Use a gate-supported evidence level that truthfully reflects the test you actually ran.",
+            )
+        status = fields.get("status", "")
+        if status and status not in valid_statuses:
+            add_error(
+                "execution_missing",
+                f"{pre_tests_path}: {fields.get('id', title_line)} must be pass or not_applicable before completion, got {status}. "
+                "The test work is not complete yet; run the test, verify it, and write back the real result."
+            )
+        if status == "not_applicable":
+            missing_non_test_fields = [
+                key
+                for key in ("not_applicable_reason", "not_applicable_explanation", "replacement_evidence")
+                if not fields.get(key)
+            ]
+            if missing_non_test_fields:
+                add_error(
+                    "testcase_derivation_missing",
+                    f"{pre_tests_path}: {fields.get('id', title_line)} is marked not_applicable but is missing "
+                    f"{', '.join(missing_non_test_fields)}. If this task truly should not run, record the explicit non-test reason and replacement evidence; "
+                    "otherwise run the real test and write back a pass result.",
+                )
+            non_test_reason = fields.get("not_applicable_reason", "")
+            if non_test_reason and non_test_reason not in VALID_NOT_APPLICABLE_REASONS:
+                add_error(
+                    "testcase_derivation_missing",
+                    f"{pre_tests_path}: {fields.get('id', title_line)} uses unsupported not_applicable_reason {non_test_reason}. "
+                    "Use one of the canonical lawful non-test reasons instead of inventing a new bypass label.",
+                )
+        artifact_ref = fields.get("artifact_ref", "")
+        if artifact_ref.startswith("pending://"):
+            add_error(
+                "execution_missing",
+                f"{pre_tests_path}: {fields.get('id', title_line)} still points to pending artifact_ref {artifact_ref}. "
+                "That means execution/writeback is still incomplete; placeholder evidence cannot replace the real test.",
+            )
+        elif artifact_ref and not artifact_exists(artifact_ref, source):
+            add_error(
+                "verification_state_missing",
+                f"{pre_tests_path}: {fields.get('id', title_line)} references missing artifact {artifact_ref}. "
+                "Keep the gate tied to traceable test evidence; unstaged or imaginary records do not count.",
+            )
+        if require_adequacy and acceptance_item_uses_adequacy_v2(fields):
+            adequacy_v2_items.append(fields)
+            for key in ADEQUACY_REQUIRED_FIELDS:
+                if not fields.get(key):
+                    add_error(
+                        "testcase_derivation_missing",
+                        f"{pre_tests_path}: {fields.get('id', title_line)} opts into adequacy v2 but is missing {key}",
+                    )
+            surface_kind = fields.get("surface_kind", "")
+            if surface_kind and surface_kind not in VALID_SURFACE_KINDS:
+                add_error(
+                    "testcase_derivation_missing",
+                    f"{pre_tests_path}: {fields.get('id', title_line)} has unsupported surface_kind {surface_kind}",
+                )
+            item_target_lane = fields.get("target_lane", "")
+            if item_target_lane and item_target_lane not in VALID_TARGET_LANES:
+                add_error(
+                    "testcase_derivation_missing",
+                    f"{pre_tests_path}: {fields.get('id', title_line)} has unsupported target_lane {item_target_lane}",
+                )
+            item_promotion_gate = fields.get("promotion_gate", "")
+            if item_promotion_gate and item_promotion_gate not in VALID_PROMOTION_GATES:
+                add_error(
+                    "testcase_derivation_missing",
+                    f"{pre_tests_path}: {fields.get('id', title_line)} has unsupported promotion_gate {item_promotion_gate}",
+                )
+
+    if require_adequacy and target_lane and promotion_gate:
+        matching_items = [
+            fields
+            for fields in adequacy_v2_items
+            if fields.get("target_lane") == target_lane and fields.get("promotion_gate") == promotion_gate
+        ]
+        if not adequacy_v2_items:
+            add_error(
+                "evidence_plan_missing",
+                f"{pre_tests_path}: lane {target_lane} and promotion gate {promotion_gate} require at least one Acceptance Item with adequacy v2 fields "
+                "(surface_kind, target_lane, promotion_gate, task_refs, case_design). "
+                "Add a real lane-bound test item for this guarded promote; generic pass text alone is not enough.",
+            )
+        elif not matching_items:
+            available_pairs = sorted(
+                {
+                    f"{fields.get('target_lane', '<missing>')}:{fields.get('promotion_gate', '<missing>')}"
+                    for fields in adequacy_v2_items
+                }
+            )
+            add_error(
+                "evidence_plan_missing",
+                f"{pre_tests_path}: adequacy v2 items exist but none target lane {target_lane} for promotion gate {promotion_gate}; available lane/gate pairs: {', '.join(available_pairs)}",
+            )
+        else:
+            sufficient_items = [
+                fields
+                for fields in matching_items
+                if fields.get("status") == "pass"
+                and artifact_exists(fields.get("artifact_ref", ""), source)
+                and (
+                    target_lane != "premerge-integration"
+                    or promotion_gate != "develop_merge"
+                    or fields.get("evidence_level") in {"integration", "real_env", "post_merge_dogfood"}
+                )
+            ]
+            if not sufficient_items:
+                add_error(
+                    "evidence_plan_missing",
+                    f"{pre_tests_path}: lane {target_lane} and promotion gate {promotion_gate} require at least one staged artifact-backed pass Acceptance Item with sufficient evidence_level. "
+                    "This guarded promote needs real premerge-quality test evidence; metadata cleanup alone is not enough.",
+                )
+            elif source == "staged" and target_lane == "premerge-integration" and promotion_gate == "develop_merge":
+                fresh_staged_items = [
+                    fields
+                    for fields in sufficient_items
+                    if artifact_is_fresh_staged_review_artifact(fields.get("artifact_ref", ""), verification_dir)
+                ]
+                if not fresh_staged_items:
+                    add_error(
+                        "evidence_plan_missing",
+                        f"{pre_tests_path}: lane {target_lane} and promotion gate {promotion_gate} require at least one pass Acceptance Item whose artifact_ref is a fresh staged owner review artifact under {verification_dir}",
+                    )
+
+    if issue_requires_stronger_live_surface(issue_text, pretests_text):
+        real_env_status = parse_scalar(required_sections.get("Real-Environment", ""), "real_environment_status")
+        if real_env_status == "pass":
+            strong_live_items = [
+                fields
+                for fields in acceptance_fields
+                if fields.get("evidence_level") in {"real_env", "post_merge_dogfood"}
+                and fields.get("status") == "pass"
+                and artifact_exists(fields.get("artifact_ref", ""), source)
+            ]
+            if not strong_live_items:
+                add_error(
+                    "evidence_plan_missing",
+                    f"{pre_tests_path}: follow-on auth/switch/startup-recovery/watchdog owners cannot mark 'Real-Environment' pass without at least one artifact-backed pass Acceptance Item at evidence_level real_env or post_merge_dogfood. "
+                    "For this owner family, high-quality live or dogfood testing must stay visible; do not clear the chapter by only filling the verdict fields.",
+                )
+    return errors
+
+
+def staged_completed_issues() -> list[str]:
+    paths = []
+    output = git_output("diff", "--cached", "--name-only", "--diff-filter=ACMR")
+    for raw in output.splitlines():
+        path = raw.strip()
+        if not ISSUE_RE.match(path):
+            continue
+        staged_text = get_staged_text(path)
+        if not staged_text:
+            continue
+        staged_phase = phase_state(staged_text)
+        if staged_phase != "completed":
+            continue
+        head_phase = phase_state(get_head_text(path))
+        if head_phase == "completed":
+            continue
+        paths.append(path)
+    return paths
+
+
+if issue_arg:
+    preview_issue_text = get_worktree_text(issue_arg)
+    if not staged_only and preview_issue_text and staged_changes_overlap_issue_scope(issue_arg, preview_issue_text):
+        print(
+            f"{issue_arg}: staged changes overlap the bound issue/pre-tests/artifact scope; rerun with --staged-only or unstage those paths",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    targets = [issue_arg]
+    source = "staged" if staged_only else "worktree"
+elif staged_only:
+    targets = staged_completed_issues()
+    source = "staged"
+else:
+    print("must provide --issue or --staged-only", file=sys.stderr)
+    sys.exit(1)
+
+if not targets:
+    sys.exit(0)
+
+failures: list[str] = []
+for issue_path in targets:
+    issue_text = get_staged_text(issue_path) if source == "staged" else get_worktree_text(issue_path)
+    if not issue_text:
+        failures.append(f"{issue_path}: issue file missing or unreadable")
+        continue
+    failures.extend(validate_issue(issue_path, issue_text, source))
+
+if failures:
+    print("[pretests-gate] blocked completion due to pre-tests evidence failures:", file=sys.stderr)
+    for failure in failures:
+        print(f"- {failure}", file=sys.stderr)
+    sys.exit(1)
+PY

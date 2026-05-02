@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-repair-handoff-missing-resume.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/.freely/run" "$PROJECT/.freely/logs"
+
+cat >"$PROJECT/.freely/run/session-state.env" <<'EOF'
+LAST_TOOL_SESSION_ID=""
+LAST_TOOL_RESUME_TARGET=""
+LAST_TOOL_JSONL_PATH=""
+LAST_LAUNCH_KIND="resume"
+LAST_ROTATION_REASON=""
+LAST_CYCLE_LOG="/tmp/fake-cycle.log"
+LAST_PROMPT_FILE="/tmp/fake-prompt.txt"
+LAST_CONTEXT_COMPACTED="0"
+LAST_CONTEXT_RATIO=""
+LAST_PRIMARY_RATE_LIMIT_USED_PERCENT=""
+LAST_PRIMARY_RATE_LIMIT_RESETS_AT=""
+LAST_SECONDARY_RATE_LIMIT_USED_PERCENT=""
+LAST_SECONDARY_RATE_LIMIT_RESETS_AT=""
+LAST_ROUTE_ONLY_HANDOFF="0"
+ROUTE_ONLY_STREAK_CURRENT="0"
+RESUME_STREAK_CURRENT="1"
+CURRENT_TOOL_SLOT=""
+LAST_SLOT_SWITCH_REASON=""
+LAST_SLOT_SWITCH_AT=""
+LAST_CYCLE_DEBUG_LOG=""
+LAST_CLAUDE_JSONL_PATH=""
+LAST_CODEX_MCP_USED="0"
+LAST_CODEX_MCP_THREAD_ID=""
+LAST_CODEX_MCP_JSONL_PATH=""
+CLAUDE_SESSION_ID_CURRENT=""
+CLAUDE_SESSION_ID_PREVIOUS=""
+LAST_PROJECT_DIRTY_ENTRIES="0"
+LAST_WORKTREE_SUMMARY_TOTAL="1"
+LAST_WORKTREE_SUMMARY_DIRTY="0"
+CHECKPOINT_DRIFT_STREAK_CURRENT="0"
+LAST_DELEGATED_CONTINUATION_PENDING_IDS=""
+LAST_DELEGATED_CONTINUATION_PENDING_COUNT="0"
+LAST_DELEGATED_CONTINUATION_CONSUMED_IDS=""
+LAST_DELEGATED_CONTINUATION_CONSUMED_AT=""
+LAST_RESTART_STORM_WINDOW_SECS="0"
+LAST_RESTART_STORM_COUNT="0"
+LAST_PROCESS_CHURN_PEAK="0"
+LAST_RESTART_STORM_SIGNAL_AT=""
+LAST_RESTART_STORM_SIGNAL_REASON=""
+LAST_RESTART_STORM_ESCALATED_AT=""
+LAST_RESTART_STORM_ESCALATION_TARGET=""
+AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV=""
+EOF
+
+cat >"$PROJECT/.freely/run/session-handoff.txt" <<'EOF'
+# Session Handoff
+
+- rotation_reason: manager_exit_contract_repair
+- previous_launch_kind: resume
+- previous_tool_resume_target: unavailable
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+PROJECT_ROOT="$PROJECT"
+AI_TOOL="codex"
+FIRST_ROUND=true
+load_session_state_or_defaults "$PROJECT"
+
+select_launch_kind
+
+[[ "$LAUNCH_KIND_SELECTED" == "fresh_with_handoff" ]] || {
+  echo "[FAIL] expected manager repair handoff without resume evidence to downgrade launch kind, got $LAUNCH_KIND_SELECTED" >&2
+  exit 1
+}
+[[ "${LAUNCH_ROTATION_REASON:-}" == "missing_resume_evidence" ]] || {
+  echo "[FAIL] expected missing_resume_evidence rotation reason, got ${LAUNCH_ROTATION_REASON:-none}" >&2
+  exit 1
+}
+
+echo "[PASS] manager repair handoff downgrades to fresh_with_handoff when resume evidence is missing"

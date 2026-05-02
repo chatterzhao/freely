@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-stall.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260322-0000--sample" "$PROJECT/.freely/run" "$PROJECT/.freely/logs"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260322-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260322-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260322-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+sleep 999 >/dev/null 2>&1 &
+AI_PID=$!
+echo "$AI_PID" >"$PROJECT/.freely/run/ai.pid"
+echo "$$" >"$PROJECT/.freely/run/supervisor.pid"
+touch "$PROJECT/.freely/logs/cycle-20260322-021412.log"
+touch -t 202603220100 "$PROJECT/.freely/logs/cycle-20260322-021412.log"
+touch "$PROJECT/.freely/run/intake.pending"
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+PREEMPT_LOG="$TMP_DIR/preempt.log"
+RESTART_LOG="$TMP_DIR/restart.log"
+manager_ai_pid_for_project() {
+  echo "$AI_PID"
+}
+request_local_continuation_reentry() {
+  echo "$1|$2" >>"$PREEMPT_LOG"
+  write_preemption_state "$1" "graceful_term" "local_continuation_reentry" "$2" "$AI_PID"
+  kill "$AI_PID" 2>/dev/null || true
+}
+restart_manager_supervisor_preserving_handoff() {
+  echo "$1" >>"$RESTART_LOG"
+}
+write_manager_bootstrap_handoff() {
+  :
+}
+codex_current_account() {
+  echo "test@example.com"
+}
+
+if ! recover_stalled_manager_ai_if_needed "$PROJECT"; then
+  echo "[FAIL] expected stalled manager recovery to trigger" >&2
+  exit 1
+fi
+
+grep -q "$PROJECT|runtime-stalled-ai-recovery" "$PREEMPT_LOG"
+grep -q "$PROJECT" "$RESTART_LOG"
+grep -q '^LAST_PREEMPTION_REASON="local_continuation_reentry"$' "$PROJECT/.freely/run/preemption-state.env"
+grep -q 'event=runtime_stalled_ai_recovery_triggered role=manager reason=manager_ai_stalled_with_pending_intake ai_pid='"$AI_PID"' slot=unknown' "$PROJECT/.freely/logs/runtime-events.log"
+
+echo "[PASS] stalled manager ai with pending intake triggers runtime recovery"

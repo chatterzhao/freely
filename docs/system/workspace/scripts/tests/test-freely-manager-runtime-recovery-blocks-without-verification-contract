@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-recovery-verification-block.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/freely"
+WT_ROOT="$TMP_DIR/freely-worktrees"
+WORKER="$WT_ROOT/feature-worker"
+
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260324-0000--sample" "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs" "$WT_ROOT"
+cd "$PROJECT"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add README.md
+git commit -q -m init
+git branch feature/worker
+git worktree add "$WORKER" feature/worker >/dev/null
+
+for wt in "$PROJECT" "$WORKER"; do
+  mkdir -p "$wt/docs/pre-brainstorms/20260324-0000--sample" "$wt/.freely/run" "$wt/.freely/logs"
+  cat >"$wt/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+  cat >"$wt/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+  cat >"$wt/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+  cat >"$wt/AGENTS.md" <<'EOF'
+# Agents
+EOF
+  cat >"$wt/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+  cat >"$wt/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260324-0000--sample
+EOF
+  cat >"$wt/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+  cat >"$wt/docs/pre-brainstorms/20260324-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+  cat >"$wt/docs/pre-brainstorms/20260324-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+done
+
+echo worker >"$WORKER/worker-branch.txt"
+git -C "$WORKER" add worker-branch.txt
+git -C "$WORKER" commit -q -m "worker branch divergence"
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+cat >"$WORKER/.freely/config.env" <<EOF
+PROJECT_ROOT="$WORKER"
+INTENT_FILE="$WORKER/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$WORKER/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+cat >"$WORKER/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="down"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="unexpected_supervisor_exit"
+LAST_ROLE_HINT="worker"
+LAST_STATE_UPDATED_AT="2026-03-24T00:00:00Z"
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+START_LOG="$TMP_DIR/start.log"
+manager_runtime_launch_workers_from_latest_handoff() {
+  echo "0"
+}
+start_workcell_supervisor_async() {
+  printf '%s\n' "$1" >>"$START_LOG"
+  return 0
+}
+
+RECOVERED="$(manager_runtime_recover_workers_if_needed "$PROJECT" | tail -n 1)"
+[[ "$RECOVERED" == "0" ]] || {
+  echo "[FAIL] recovery must not relaunch worker without verification contract, got $RECOVERED" >&2
+  exit 1
+}
+[[ ! -f "$START_LOG" ]] || {
+  echo "[FAIL] worker without verification contract must not start supervisor" >&2
+  exit 1
+}
+grep -q '^LAST_EXIT_REASON="manager_worker_launch_verification_blocked"$' "$WORKER/.freely/run/workcell-state.env"
+grep -q '^LAST_WORKER_VERIFICATION_METADATA_PRESENT="false"$' "$WORKER/.freely/run/workcell-state.env"
+grep -q '^LAST_WORKER_VERIFICATION_METADATA_MISSING_FIELDS="verification_contract_missing"$' "$WORKER/.freely/run/workcell-state.env"
+
+echo "[PASS] manager recovery blocks expected-running worker without verification contract"

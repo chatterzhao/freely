@@ -1,0 +1,243 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-cleanup-followthrough-pretests-retain.XXXXXX)"
+TMP_DIR_REAL="$(cd "$TMP_DIR" && pwd -P)"
+trap 'rm -rf "$TMP_DIR_REAL"' EXIT
+
+PROJECT="$TMP_DIR_REAL/project"
+WT="$TMP_DIR_REAL/cleanup-wt"
+
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260323-0000--sample"
+
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name "Freely Test"
+git -C "$PROJECT" config user.email "freely@example.com"
+mkdir -p "$PROJECT/.githooks"
+cat >"$PROJECT/.githooks/pre-commit" <<'EOF'
+#!/usr/bin/env bash
+exit 0
+EOF
+chmod +x "$PROJECT/.githooks/pre-commit"
+
+cat >"$PROJECT/.gitignore" <<'EOF'
+.freely/
+EOF
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260323-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260323-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260323-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m "init"
+
+bash "$ROOT_DIR/bin/freely" init --project "$PROJECT" --intent "$PROJECT/docs/PROJECT_INTENT.md" --constitution "$PROJECT/docs/CONSTITUTION.md" --ai codex:gpt-5.4:auto --accept-default-autonomy >/dev/null
+
+mkdir -p "$PROJECT/docs/epics/sample/story/issues" "$PROJECT/docs/epics/sample/story"
+cat >"$PROJECT/docs/epics/sample/story/issues/sample.md" <<'EOF'
+# Issue: sample
+
+- issue_id: `I-sample`
+- phase_state: `completed`
+- pre_tests_path: `docs/epics/sample/story/pre-tests.md`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+EOF
+cat >"$PROJECT/docs/epics/sample/story/pre-tests.md" <<'EOF'
+# Pre-tests: sample
+
+## Unit
+- acceptance target: `Document the bounded unit surface for this sample fixture.`
+- testing layer: `unit`
+- target environment: `feature/sample`
+- required evidence: `lawful replacement evidence for the unit surface`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `change_not_touching_this_layer`
+- not_applicable_explanation: `This documentation-only sample does not change unit-testable runtime logic.`
+- replacement_evidence: `The sample issue is documentation-only and keeps unit behavior unchanged.`
+
+## Integration
+- acceptance target: `Run the sample issue-bound integration replay.`
+- testing layer: `integration`
+- target environment: `feature/sample`
+- required evidence: `sample integration replay log`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the sample issue-bound integration replay.
+
+## End-to-End
+- acceptance target: `State why no end-to-end runtime surface exists in this fixture.`
+- testing layer: `end_to_end`
+- target environment: `feature/sample`
+- required evidence: `lawful replacement evidence for missing end-to-end surface`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `no_executable_boundary_at_this_layer`
+- not_applicable_explanation: `This sample repo does not include an end-to-end runtime surface.`
+- replacement_evidence: `The sample repo intentionally omits a runtime shell.`
+
+## Real-Environment
+- real_environment_status: `pass`
+- real_environment_reason: `This isolated fixture does not require real-environment testing.`
+
+## Acceptance Items
+
+### PT-1
+- id: `PT-1`
+- requirement: `sample`
+- evidence_level: `integration`
+- status: `pending`
+- artifact_ref: `pending://sample`
+EOF
+
+git -C "$PROJECT" add docs/epics/sample/story/issues/sample.md docs/epics/sample/story/pre-tests.md
+git -C "$PROJECT" commit -q -m "owner issue fixtures"
+
+git -C "$PROJECT" worktree add -q -b feature/cleanup-fixture "$WT" develop
+mkdir -p "$WT/.freely/run"
+cat >"$WT/clean.txt" <<'EOF'
+clean fixture
+EOF
+git -C "$WT" add clean.txt
+git -C "$WT" commit -q -m "clean fixture"
+git -C "$PROJECT" merge --no-ff feature/cleanup-fixture -m "merge clean fixture" >/dev/null
+
+cat >"$WT/.freely/run/workcell-state.env" <<'EOF'
+LAST_WORKER_OWNER_ISSUE="I-sample"
+LAST_WORKER_PRE_TESTS_PATH="docs/epics/sample/story/pre-tests.md"
+LAST_WORKER_CLOSEOUT_GATE="pretests-gate"
+LAST_WORKER_CLOSEOUT_GATE_COMMAND="pretests-gate"
+LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY="false"
+LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY="none"
+EOF
+
+INTAKE_OUTPUT="$(bash "$ROOT_DIR/bin/freely" intake chat --project "$PROJECT" --author cleanup-worker --channel runtime --message "cleanup followthrough")"
+INTAKE_ID="$(printf '%s\n' "$INTAKE_OUTPUT" | sed -n 's/^intake_id: //p')"
+[[ -n "$INTAKE_ID" ]]
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+run_cleanup_followthrough "$PROJECT" "$INTAKE_ID" control followup "" ""
+
+[[ -d "$WT" ]] || {
+  echo "[FAIL] cleanup followthrough should retain merged worktree when recorded owner pre-tests remain pending" >&2
+  exit 1
+}
+git -C "$PROJECT" show-ref --verify --quiet refs/heads/feature/cleanup-fixture
+
+RESOLUTION_FILE="$PROJECT/.freely/run/interruption-resolution/$INTAKE_ID/resolution.md"
+grep -q 'blocked_reason: pretests_retirement_blocked' "$RESOLUTION_FILE"
+grep -q 'pretests-retirement-blocked:.*PT-1' "$RESOLUTION_FILE"
+
+mkdir -p "$PROJECT/docs/epics/sample/story/code-reviews"
+cat >"$PROJECT/docs/epics/sample/story/code-reviews/pt-1.md" <<'EOF'
+# Verification artifact
+EOF
+cat >"$PROJECT/docs/epics/sample/story/pre-tests.md" <<'EOF'
+# Pre-tests: sample
+
+## Unit
+- acceptance target: `Document the bounded unit surface for this sample fixture.`
+- testing layer: `unit`
+- target environment: `feature/sample`
+- required evidence: `lawful replacement evidence for the unit surface`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `change_not_touching_this_layer`
+- not_applicable_explanation: `This documentation-only sample does not change unit-testable runtime logic.`
+- replacement_evidence: `The sample issue is documentation-only and keeps unit behavior unchanged.`
+
+## Integration
+- acceptance target: `Run the sample issue-bound integration replay.`
+- testing layer: `integration`
+- target environment: `feature/sample`
+- required evidence: `sample integration replay log`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the sample issue-bound integration replay.
+
+## End-to-End
+- acceptance target: `State why no end-to-end runtime surface exists in this fixture.`
+- testing layer: `end_to_end`
+- target environment: `feature/sample`
+- required evidence: `lawful replacement evidence for missing end-to-end surface`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `no_executable_boundary_at_this_layer`
+- not_applicable_explanation: `This sample repo does not include an end-to-end runtime surface.`
+- replacement_evidence: `The sample repo intentionally omits a runtime shell.`
+
+## Real-Environment
+- real_environment_status: `pass`
+- real_environment_reason: `This isolated fixture does not require real-environment testing.`
+
+## Acceptance Items
+
+### PT-1
+- id: `PT-1`
+- requirement: `sample`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/sample/story/code-reviews/pt-1.md`
+EOF
+
+GATE_WT="$TMP_DIR_REAL/gate-unavailable-wt"
+git -C "$PROJECT" worktree add -q -b feature/cleanup-gate-unavailable "$GATE_WT" develop
+mkdir -p "$GATE_WT/.freely/run"
+cat >"$GATE_WT/gate.txt" <<'EOF'
+gate unavailable fixture
+EOF
+git -C "$GATE_WT" add gate.txt
+git -C "$GATE_WT" commit -q -m "gate unavailable fixture"
+git -C "$PROJECT" merge --no-ff feature/cleanup-gate-unavailable -m "merge gate unavailable fixture" >/dev/null
+cat >"$GATE_WT/.freely/run/workcell-state.env" <<'EOF'
+LAST_WORKER_OWNER_ISSUE="I-sample"
+LAST_WORKER_PRE_TESTS_PATH="docs/epics/sample/story/pre-tests.md"
+LAST_WORKER_CLOSEOUT_GATE="pretests-gate"
+LAST_WORKER_CLOSEOUT_GATE_COMMAND="pretests-gate"
+LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY="false"
+LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY="none"
+EOF
+mkdir -p "$PROJECT/bin"
+cp "$ROOT_DIR/bin/pretests-retirement-gate" "$PROJECT/bin/pretests-retirement-gate"
+chmod -x "$PROJECT/bin/pretests-retirement-gate"
+
+INTAKE_OUTPUT_2="$(bash "$ROOT_DIR/bin/freely" intake chat --project "$PROJECT" --author cleanup-worker --channel runtime --message "cleanup followthrough gate unavailable")"
+INTAKE_ID_2="$(printf '%s\n' "$INTAKE_OUTPUT_2" | sed -n 's/^intake_id: //p')"
+[[ -n "$INTAKE_ID_2" ]]
+
+run_cleanup_followthrough "$PROJECT" "$INTAKE_ID_2" control followup "" ""
+
+[[ -d "$GATE_WT" ]] || {
+  echo "[FAIL] cleanup followthrough should retain merged worktree when retirement gate is unavailable" >&2
+  exit 1
+}
+git -C "$PROJECT" show-ref --verify --quiet refs/heads/feature/cleanup-gate-unavailable
+
+RESOLUTION_FILE_2="$PROJECT/.freely/run/interruption-resolution/$INTAKE_ID_2/resolution.md"
+grep -q 'blocked_reason: pretests_retirement_gate_unavailable' "$RESOLUTION_FILE_2"
+grep -q 'pretests-retirement-gate-unavailable:' "$RESOLUTION_FILE_2"
+
+echo "[PASS] cleanup followthrough retains merged worktree when recorded owner pre-tests block retirement"

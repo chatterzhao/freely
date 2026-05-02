@@ -1,0 +1,260 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-global-restart-restore-memory.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+WT_ROOT="$TMP_DIR/repo-worktrees"
+MANAGER_WT="$REPO"
+WORKER_RUNNING="$WT_ROOT/feature-running"
+WORKER_STOPPED="$WT_ROOT/feature-stopped"
+EXTERNAL_REPO="$TMP_DIR/external-repo"
+GLOBAL_HOME="$TMP_DIR/global-home"
+
+mkdir -p "$REPO" "$WT_ROOT" "$GLOBAL_HOME" "$EXTERNAL_REPO"
+cd "$REPO"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add README.md
+git commit -q -m "init"
+git worktree add -q -b feature/running "$WORKER_RUNNING" develop
+git worktree add -q -b feature/stopped "$WORKER_STOPPED" develop
+
+setup_project() {
+  local project="$1"
+  mkdir -p \
+    "$project/.freely/run" \
+    "$project/.freely/logs" \
+    "$project/docs/pre-brainstorms/20260309-0000--sample"
+
+  cat >"$project/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+  cat >"$project/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+  cat >"$project/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+  cat >"$project/AGENTS.md" <<'EOF'
+# Agents
+EOF
+  cat >"$project/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+  cat >"$project/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+EOF
+  cat >"$project/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+  cat >"$project/docs/pre-brainstorms/20260309-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+  cat >"$project/docs/pre-brainstorms/20260309-0000--sample/candidates.md" <<'EOF'
+# Candidates
+EOF
+  cat >"$project/.freely/config.env" <<EOF
+PROJECT_ROOT="$project"
+INTENT_FILE="$project/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$project/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+}
+
+setup_project "$MANAGER_WT"
+setup_project "$WORKER_RUNNING"
+setup_project "$WORKER_STOPPED"
+(
+  cd "$EXTERNAL_REPO"
+  git init -q -b develop
+  git config user.name tester
+  git config user.email tester@example.com
+  echo external > README.md
+  git add README.md
+  git commit -q -m "init"
+)
+setup_project "$EXTERNAL_REPO"
+
+cat >"$MANAGER_WT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="up"
+LAST_EXIT_REASON="none"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2026-03-28T20:00:00Z"
+EOF
+cat >"$MANAGER_WT/.freely/run/manager-worker-launch-state.env" <<'EOF'
+UPDATED_AT="2026-03-28T20:00:00Z"
+EOF
+
+cat >"$WORKER_RUNNING/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="up"
+LAST_EXIT_REASON="ai_exit_rc_0"
+LAST_ROLE_HINT="worker"
+LAST_STATE_UPDATED_AT="2026-03-28T20:00:00Z"
+EOF
+cat >"$WORKER_RUNNING/.freely/run/worker-continuity-20260328.md" <<'EOF'
+# Worker Continuity
+EOF
+cat >"$WORKER_RUNNING/.freely/run/session-state.env" <<'EOF'
+LAST_LAUNCH_KIND="resume"
+EOF
+mkdir -p "$WORKER_RUNNING/.freely/intake/sample"
+cat >"$WORKER_RUNNING/.freely/intake/sample/meta.env" <<'EOF'
+STATUS="new"
+EOF
+cat >"$WORKER_RUNNING/.freely/intake/sample/message.txt" <<'EOF'
+resume worker
+EOF
+
+cat >"$WORKER_STOPPED/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="stopped"
+LAST_SUPERVISOR_STATE="down"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="operator_stop"
+LAST_ROLE_HINT="worker"
+LAST_STATE_UPDATED_AT="2026-03-28T20:00:00Z"
+EOF
+cat >"$WORKER_STOPPED/.freely/run/session-state.env" <<'EOF'
+LAST_LAUNCH_KIND="fresh"
+EOF
+
+cat >"$EXTERNAL_REPO/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="up"
+LAST_EXIT_REASON="ai_exit_rc_0"
+LAST_ROLE_HINT="worker"
+LAST_STATE_UPDATED_AT="2026-03-28T20:00:00Z"
+EOF
+cat >"$EXTERNAL_REPO/.freely/run/manager-worker-launch-state.env" <<'EOF'
+UPDATED_AT="2026-03-28T20:00:00Z"
+EOF
+
+cat >"$GLOBAL_HOME/projects.tsv" <<EOF
+$MANAGER_WT	2026-03-28T20:00:00Z
+$WORKER_RUNNING	2026-03-28T20:00:00Z
+$WORKER_STOPPED	2026-03-28T20:00:00Z
+$EXTERNAL_REPO	2026-03-28T20:00:00Z
+EOF
+
+COMMAND_OUTPUT="$(
+  FREELY_HOME="$GLOBAL_HOME" bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    stop_project_runtime() { printf "stop:%s|reason:%s\n" "$1" "$2"; }
+    start_project_runtime() { printf "start:%s\n" "$1"; }
+    main restart --project "'"$MANAGER_WT"'" --all-projects
+  '
+)"
+
+[[ "$COMMAND_OUTPUT" == *"stop:$MANAGER_WT|reason:global_restart"* ]]
+[[ "$COMMAND_OUTPUT" == *"stop:$WORKER_RUNNING|reason:global_restart"* ]]
+[[ "$COMMAND_OUTPUT" != *"stop:$WORKER_STOPPED|reason:global_restart"* ]]
+[[ "$COMMAND_OUTPUT" == *"stop:$EXTERNAL_REPO|reason:global_restart"* ]]
+[[ "$COMMAND_OUTPUT" == *"start:$MANAGER_WT"* ]]
+[[ "$COMMAND_OUTPUT" == *"start:$WORKER_RUNNING"* ]]
+[[ "$COMMAND_OUTPUT" != *"start:$WORKER_STOPPED"* ]]
+[[ "$COMMAND_OUTPUT" == *"start:$EXTERNAL_REPO"* ]]
+
+LATEST_MANIFEST="$GLOBAL_HOME/control-plane/restart/latest.json"
+[[ -f "$LATEST_MANIFEST" ]]
+HISTORY_COUNT="$(find "$GLOBAL_HOME/control-plane/restart/history" -maxdepth 1 -type f -name '*.json' | wc -l | tr -d ' ')"
+[[ "$HISTORY_COUNT" == "1" ]]
+
+python3 - "$LATEST_MANIFEST" "$MANAGER_WT" "$WORKER_RUNNING" "$WORKER_STOPPED" "$EXTERNAL_REPO" <<'PY'
+import json
+import sys
+
+manifest_path, manager_wt, running_wt, stopped_wt, external_repo = sys.argv[1:6]
+with open(manifest_path, encoding="utf-8") as handle:
+    manifest = json.load(handle)
+
+assert manifest["manifest_version"] == "global-restart-v1"
+assert manifest["operator_scope"] == "all-projects"
+projects = {entry["project_root"]: entry for entry in manifest["projects"]}
+
+manager = projects[manager_wt]
+running = projects[running_wt]
+stopped = projects[stopped_wt]
+external = projects[external_repo]
+
+assert manager["restore_selected"] is True
+assert running["restore_selected"] is True
+assert stopped["restore_selected"] is False
+assert external["restore_selected"] is True
+assert stopped["operator_stopped"] is True
+assert any(path.endswith("workcell-state.env") for path in running["mandatory_restore_anchors"])
+assert any(path.endswith(".freely/intake") for path in running["mandatory_restore_anchors"])
+assert not any(path.endswith("session-state.env") for path in running["mandatory_restore_anchors"])
+assert any(path.endswith("session-state.env") for path in running["auxiliary_evidence"])
+assert running["continuity_anchor"].endswith("worker-continuity-20260328.md")
+PY
+
+COLLISION_HISTORY="$(
+  FREELY_HOME="$GLOBAL_HOME" bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    global_restart_manifest_timestamp() { printf "20260328T210000Z\n"; }
+    stop_project_runtime() { :; }
+    start_project_runtime() { :; }
+    main restart --project "'"$MANAGER_WT"'" --all-projects >/dev/null
+    main restart --project "'"$MANAGER_WT"'" --all-projects >/dev/null
+    find "'"$GLOBAL_HOME"'/control-plane/restart/history" -maxdepth 1 -type f -name "20260328T210000Z*.json" | sort
+  '
+)"
+[[ "$COLLISION_HISTORY" == *"20260328T210000Z-1.json"* ]]
+[[ "$COLLISION_HISTORY" == *"20260328T210000Z.json"* ]]
+
+mkdir -p "$GLOBAL_HOME/control-plane/restart/history"
+for idx in $(seq -w 1 25); do
+  printf '{}' >"$GLOBAL_HOME/control-plane/restart/history/20260328T2000${idx}Z.json"
+done
+
+FREELY_HOME="$GLOBAL_HOME" bash -lc '
+  set -euo pipefail
+  source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+  prune_global_restart_manifest_history
+'
+
+RETAINED_HISTORY_COUNT="$(find "$GLOBAL_HOME/control-plane/restart/history" -maxdepth 1 -type f -name '*.json' | wc -l | tr -d ' ')"
+[[ "$RETAINED_HISTORY_COUNT" == "20" ]]
+[[ -f "$GLOBAL_HOME/control-plane/restart/history/20260328T200025Z.json" ]]
+[[ ! -f "$GLOBAL_HOME/control-plane/restart/history/20260328T200001Z.json" ]]
+
+cat >"$WORKER_STOPPED/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="down"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="ai_exit_rc_1"
+LAST_ROLE_HINT="worker"
+LAST_STATE_UPDATED_AT="2026-03-28T20:05:00Z"
+EOF
+
+BLOCKED_OUTPUT_FILE="$TMP_DIR/blocked-output.txt"
+if FREELY_HOME="$GLOBAL_HOME" bash -lc '
+  set -euo pipefail
+  source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+  stop_project_runtime() { printf "stop:%s|reason:%s\n" "$1" "$2"; }
+  start_project_runtime() { printf "start:%s\n" "$1"; }
+  main restart --project "'"$MANAGER_WT"'" --all-projects
+' >"$BLOCKED_OUTPUT_FILE" 2>&1; then
+  echo "[FAIL] expected global restart to block when a previously-running project lacks mandatory anchors" >&2
+  exit 1
+fi
+
+BLOCKED_OUTPUT="$(cat "$BLOCKED_OUTPUT_FILE")"
+[[ "$BLOCKED_OUTPUT" == *"blocked_restore_projects: $WORKER_STOPPED"* ]]
+[[ "$BLOCKED_OUTPUT" == *"global_restart_manifest:"* ]]
+
+echo "[PASS] explicit global restart writes durable manifest, excludes operator-stopped projects, blocks missing-anchor replay, and keeps last 20 history files"

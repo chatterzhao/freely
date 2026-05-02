@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-reference-transaction-hook.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+mkdir -p \
+  "$REPO/.githooks" \
+  "$REPO/docs/system/workspace/hooks"
+cd "$REPO"
+
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+git config core.hooksPath .githooks
+
+cp "$ROOT_DIR/.githooks/reference-transaction" "$REPO/.githooks/reference-transaction"
+cp "$ROOT_DIR/docs/system/workspace/hooks/reference-transaction.sh" \
+  "$REPO/docs/system/workspace/hooks/reference-transaction.sh"
+chmod +x \
+  "$REPO/.githooks/reference-transaction" \
+  "$REPO/docs/system/workspace/hooks/reference-transaction.sh"
+
+echo base > README.md
+git add README.md
+git commit -q -m "init"
+DEVELOP_BASE="$(git rev-parse HEAD)"
+
+git checkout -q -b feature/raw-advance
+echo raw > RAW.txt
+git add RAW.txt
+git commit -q -m "raw advance"
+RAW_HEAD="$(git rev-parse HEAD)"
+
+git checkout -q develop
+if git merge --ff-only feature/raw-advance >"$TMP_DIR/ff-only.out" 2>&1; then
+  echo "[FAIL] reference-transaction hook should block protected-branch ff-only advance without canonical receipt" >&2
+  exit 1
+fi
+grep -q "Ref update blocked: protected branch 'develop'" "$TMP_DIR/ff-only.out"
+grep -q "./bin/merge-guarded" "$TMP_DIR/ff-only.out"
+[[ "$(git rev-parse HEAD)" == "$DEVELOP_BASE" ]]
+
+git checkout -q -b test-pre-merge-20260419-reference-receipt
+git checkout -q -b feature/receipt-source develop
+echo receipt > RECEIPT.txt
+git add RECEIPT.txt
+git commit -q -m "receipt source"
+
+git checkout -q test-pre-merge-20260419-reference-receipt
+git merge --no-ff -m "$(cat <<'EOF'
+Merge branch 'feature/receipt-source' into test-pre-merge-20260419-reference-receipt
+
+Freely-Merge-Path: merge-guarded
+Freely-Bypass-Mode: forbidden
+Freely-Source-Branch: feature/receipt-source
+EOF
+)" feature/receipt-source >/dev/null
+
+MERGE_COMMIT="$(git rev-parse HEAD)"
+[[ "$MERGE_COMMIT" != "$DEVELOP_BASE" ]]
+git log -1 --format=%B HEAD | grep -q '^Freely-Merge-Path: merge-guarded$'
+
+echo "[PASS] reference-transaction hook blocks protected-branch ff-only ref updates and preserves receipt-bearing merge commits"

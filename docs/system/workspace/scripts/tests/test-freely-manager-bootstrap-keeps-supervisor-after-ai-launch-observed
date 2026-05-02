@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-bootstrap-ai-observed.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p "$PROJECT/.freely/run" "$PROJECT/.freely/logs" "$PROJECT/docs/pre-brainstorms/20260422-0000--sample"
+
+git init -q -b develop "$PROJECT"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260422-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260422-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260422-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+TRACE_TS="$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="ai_launch_in_flight"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2026-04-22T00:00:00Z"
+EOF
+
+cat >"$PROJECT/.freely/logs/lifecycle-trace.log" <<EOF
+$TRACE_TS seq=1 ph=IN me=A-L010 fr=A-L001 ok=1 checkpoint=L010 stage=supervisor_started supervisor_pid=12345 project=. role_hint=manager entrypoint_mode=daemon
+$TRACE_TS seq=2 ph=IN me=A-L020 fr=A-L010 ok=1 checkpoint=L020 stage=prompt_build_begin supervisor_pid=12345 launch_kind=resume
+$TRACE_TS seq=3 ph=IN me=A-L021 fr=A-L020 ok=1 checkpoint=L021 stage=prompt_build_complete supervisor_pid=12345 launch_kind=resume
+$TRACE_TS seq=4 ph=IN me=A-L022 fr=A-L021 ok=1 checkpoint=L022 stage=manager_startup_continuity_stub_checked supervisor_pid=12345 launch_kind=resume
+$TRACE_TS seq=5 ph=IN me=A-L040 fr=A-L022 ok=1 checkpoint=L040 stage=ai_launch_begin supervisor_pid=12345 tool=codex launch_kind=resume
+$TRACE_TS seq=6 ph=IN me=A-L041 fr=A-L040 ok=1 checkpoint=L041 stage=ai_launch_observed supervisor_pid=12345 tool=codex launch_kind=resume child_pid=54321
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+if ! project_bootstrap_launch_in_flight "$PROJECT" "12345" ""; then
+  echo "[FAIL] expected bootstrap grace to remain in-flight after monitor marks ai_launch_in_flight" >&2
+  exit 1
+fi
+
+if ! supervisor_startup_lifecycle_in_flight "$PROJECT" "12345"; then
+  echo "[FAIL] expected startup lifecycle to remain in-flight after ai_launch_observed until cycle completion" >&2
+  exit 1
+fi
+
+echo "[PASS] manager bootstrap keeps startup in-flight after ai_launch_in_flight and ai_launch_observed"

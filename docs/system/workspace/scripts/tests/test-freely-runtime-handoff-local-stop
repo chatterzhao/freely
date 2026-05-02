@@ -1,0 +1,203 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-runtime-handoff-stop.XXXXXX)"
+cleanup() {
+  set +e
+  if [[ -n "${START_PID:-}" ]]; then
+    wait "$START_PID" 2>/dev/null || true
+  fi
+  if [[ -n "${PROJECT:-}" && -d "${PROJECT:-}" ]]; then
+    bash "$ROOT_DIR/bin/freely" stop --project "$PROJECT" >/dev/null 2>&1 || true
+  fi
+  rm -rf "$TMP_DIR"
+}
+trap cleanup EXIT
+
+PROJECT="$TMP_DIR/project"
+HANDLER_FIXTURE="$TMP_DIR/interruption-handler-fixture"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260408-0000--sample"
+
+git init -q -b feature/test-runtime-handoff-stop "$PROJECT"
+git -C "$PROJECT" config user.name "Freely Test"
+git -C "$PROJECT" config user.email "freely@example.com"
+mkdir -p "$PROJECT/.githooks"
+cat >"$PROJECT/.githooks/pre-commit" <<'EOF'
+#!/usr/bin/env bash
+exit 0
+EOF
+chmod +x "$PROJECT/.githooks/pre-commit"
+
+cat >"$PROJECT/.gitignore" <<'EOF'
+.freely/
+EOF
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260408-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260408-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260408-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m "init"
+
+cat >"$HANDLER_FIXTURE" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+project=""
+intake_id=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --project) project="${2:-}"; shift 2 ;;
+    --intake-id) intake_id="${2:-}"; shift 2 ;;
+    *) shift ;;
+  esac
+done
+message="$(cat "$project/.freely/intake/$intake_id/message.txt")"
+if [[ "$message" == *park-runtime-now* ]]; then
+  cat <<'OUT'
+DECISION=delegate
+REACTION=followup
+CLASSIFICATION=control
+RESTART_POINT=runtime
+OWNERSHIP=runtime
+WHY=这条 signal 要求当前 lane 停车并优雅停机
+HANDOFF=当前 runtime 应停止继续 fresh loop，并把现场停在 parked lane
+ANSWER=
+OUT
+else
+  cat <<'OUT'
+DECISION=answer
+REACTION=followup
+CLASSIFICATION=control
+RESTART_POINT=continuation
+OWNERSHIP=manager
+WHY=unrelated
+HANDOFF=
+ANSWER=ignored
+OUT
+fi
+EOF
+chmod +x "$HANDLER_FIXTURE"
+
+bash "$ROOT_DIR/bin/freely" init --project "$PROJECT" --intent "$PROJECT/docs/PROJECT_INTENT.md" --constitution "$PROJECT/docs/CONSTITUTION.md" --ai codex:gpt-5.4:auto --accept-default-autonomy >/dev/null
+python3 - "$PROJECT/.freely/config.env" <<'PY'
+from pathlib import Path
+import sys
+cfg = Path(sys.argv[1])
+text = cfg.read_text()
+text = text.replace('AI_TOOL="codex"', 'AI_TOOL="test-sleep"', 1)
+cfg.write_text(text)
+PY
+
+FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" start --project "$PROJECT" >/dev/null 2>&1 &
+START_PID=$!
+
+wait_for_grep() {
+  local pattern="$1" file="$2" tries="${3:-60}"
+  local i
+  for i in $(seq 1 "$tries"); do
+    if [[ -f "$file" ]] && grep -q -- "$pattern" "$file"; then
+      return 0
+    fi
+    sleep 0.5
+  done
+  return 1
+}
+
+wait_for_pid_file() {
+  local file="$1" tries="${2:-60}"
+  local i pid
+  for i in $(seq 1 "$tries"); do
+    if [[ -f "$file" ]]; then
+      pid="$(cat "$file" 2>/dev/null || true)"
+      if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null; then
+        return 0
+      fi
+    fi
+    sleep 0.5
+  done
+  return 1
+}
+
+wait_for_pid_file "$PROJECT/.freely/run/supervisor.pid" || {
+  echo "[FAIL] runtime supervisor did not start" >&2
+  exit 1
+}
+wait_for_pid_file "$PROJECT/.freely/run/ai.pid" || {
+  echo "[FAIL] runtime ai did not start" >&2
+  exit 1
+}
+
+SUPERVISOR_PID="$(cat "$PROJECT/.freely/run/supervisor.pid")"
+AI_PID="$(cat "$PROJECT/.freely/run/ai.pid")"
+
+CHAT_OUTPUT="$(FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "park-runtime-now")"
+INTAKE_ID="$(printf '%s\n' "$CHAT_OUTPUT" | sed -n 's/^intake_id: //p')"
+[[ -n "$INTAKE_ID" ]] || {
+  echo "[FAIL] missing runtime handoff intake id" >&2
+  exit 1
+}
+
+wait_for_grep '^STATUS="delegated"$' "$PROJECT/.freely/intake/$INTAKE_ID/meta.env" || {
+  echo "[FAIL] intake was not delegated" >&2
+  exit 1
+}
+wait_for_grep '^ABSORPTION_TARGET="handoff://runtime"$' "$PROJECT/.freely/intake/$INTAKE_ID/meta.env"
+wait_for_grep 'restart_point: `runtime`' "$PROJECT/.freely/run/interruption-resolution/$INTAKE_ID/resolution.md"
+wait_for_grep 'ownership: `runtime`' "$PROJECT/.freely/run/interruption-resolution/$INTAKE_ID/resolution.md"
+wait_for_grep 'event=delegated_runtime_handoff_stop_requested' "$PROJECT/.freely/logs/runtime-events.log"
+wait_for_grep 'event=delegated_runtime_handoff_stop_applied' "$PROJECT/.freely/logs/runtime-events.log"
+wait_for_grep '^DESIRED_RUNTIME_STATE="stopped"$' "$PROJECT/.freely/run/workcell-state.env"
+wait_for_grep '^LAST_SUPERVISOR_STATE="down"$' "$PROJECT/.freely/run/workcell-state.env"
+wait_for_grep '^LAST_AI_STATE="down"$' "$PROJECT/.freely/run/workcell-state.env"
+
+wait "$START_PID"
+
+if kill -0 "$SUPERVISOR_PID" 2>/dev/null; then
+  echo "[FAIL] supervisor should stop after local runtime handoff" >&2
+  exit 1
+fi
+if kill -0 "$AI_PID" 2>/dev/null; then
+  echo "[FAIL] ai should stop after local runtime handoff" >&2
+  exit 1
+fi
+
+sleep 1
+if [[ -f "$PROJECT/.freely/run/supervisor.pid" ]]; then
+  echo "[FAIL] supervisor.pid should be removed after local runtime handoff stop" >&2
+  exit 1
+fi
+if [[ -f "$PROJECT/.freely/run/ai.pid" ]]; then
+  echo "[FAIL] ai.pid should be removed after local runtime handoff stop" >&2
+  exit 1
+fi
+
+echo "[PASS] delegated local runtime handoff parks the lane by stopping supervisor relaunch instead of continuing"

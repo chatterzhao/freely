@@ -1,0 +1,221 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-ensure-manager-defer-switch.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+MOCK_BIN="$TMP_DIR/mock-bin"
+LAUNCH_LOG="$TMP_DIR/launch.log"
+AI_STATE="$TMP_DIR/active-account"
+AI_SWITCH_LOG="$TMP_DIR/ai-switch.log"
+LOCK_DIR="$TMP_DIR/account-switch.lock"
+mkdir -p \
+  "$PROJECT/bin" \
+  "$PROJECT/docs/pre-brainstorms/20260318-0000--sample" \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/.freely/logs" \
+  "$MOCK_BIN"
+
+git init -q -b develop "$PROJECT"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260318-0000--sample
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260318-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260318-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+AUTO_SWITCH_TOOL="true"
+AUTO_SWITCH_SLOT="true"
+CHECK_INTERVAL=1
+RESTART_DELAY=0
+MAX_RESTARTS=2
+IFLOW_MAX_TURNS=100
+MAX_RESUME_STREAK=24
+MAX_ROUTE_ONLY_STREAK=1
+ROTATE_ON_CONTEXT_COMPACTED=1
+SESSION_HANDOFF_TAIL_LINES=10
+CONTEXT_WARN_RATIO=0.50
+CONTEXT_ROTATE_RATIO=0.70
+CHECKPOINT_WARN_DIRTY_ENTRIES=40
+CHECKPOINT_BLOCK_DIRTY_ENTRIES=120
+EOF
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+SUPERVISOR_STATE="down"
+AI_STATE="down"
+EOF
+
+cat >"$PROJECT/bin/ai" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+state_file="${AI_SWITCH_STATE:?}"
+log_file="${AI_SWITCH_LOG:?}"
+printf '%s\n' "$*" >>"$log_file"
+
+cmd=""
+for arg in "$@"; do
+  case "$arg" in
+    switch|whoami|list)
+      cmd="$arg"
+      break
+      ;;
+  esac
+done
+
+case "$cmd" in
+  whoami)
+    if [[ -f "$state_file" ]]; then
+      account="$(cat "$state_file")"
+    else
+      account="worahe3973@outlook-com"
+    fi
+    echo "{\"tool\":\"codex\",\"account\":\"$account\",\"slot\":\"$account\"}"
+    ;;
+  list)
+    echo '{"accounts":["codex-worahe3971@outlook-com","codex-worahe3972@outlook-com","codex-worahe3973@outlook-com"]}'
+    ;;
+  switch)
+    args=("$@")
+    for ((i=0; i<${#args[@]}; i++)); do
+      if [[ "${args[$i]}" == "switch" ]]; then
+        printf '%s' "${args[$((i+2))]}" >"$state_file"
+        echo "{\"switched\": true, \"tool\": \"${args[$((i+1))]}\", \"account\": \"${args[$((i+2))]}\"}"
+        exit 0
+      fi
+    done
+    ;;
+esac
+
+echo '{}'
+EOF
+chmod +x "$PROJECT/bin/ai"
+
+cat >"$MOCK_BIN/launch-freely" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+printf '%s\n' "$*" >>"${LAUNCH_LOG:?}"
+EOF
+chmod +x "$MOCK_BIN/launch-freely"
+
+cat >"$MOCK_BIN/codex" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+current_slot="$(cat "${AI_SWITCH_STATE:?}" 2>/dev/null || true)"
+case "$current_slot" in
+  worahe3971@outlook-com)
+    echo "hi"
+    exit 0
+    ;;
+  worahe3972@outlook-com|worahe3973@outlook-com)
+    echo "You've hit your usage limit. Please try again at Jan 2nd, 2100 12:00 AM."
+    exit 1
+    ;;
+  *)
+    echo "unexpected:$current_slot"
+    exit 7
+    ;;
+esac
+EOF
+chmod +x "$MOCK_BIN/codex"
+
+cat >"$PROJECT/.freely/run/codex-slot-cooldowns.tsv" <<'EOF'
+worahe3972@outlook-com	4102444800
+worahe3973@outlook-com	4102444800
+EOF
+printf 'worahe3973@outlook-com' >"$AI_STATE"
+
+mkdir -p "$LOCK_DIR"
+sleep 4 &
+lock_pid=$!
+cat >"$LOCK_DIR/state.env" <<EOF
+owner_pid=$lock_pid
+started_at=$(date +%s)
+reason=manual_switch_sweep
+command=switch
+target=auto
+EOF
+
+HOME="$TMP_DIR/home" \
+AI_CLI_SWITCH_LOCK_DIR="$LOCK_DIR" \
+AI_SWITCH_STATE="$AI_STATE" \
+AI_SWITCH_LOG="$AI_SWITCH_LOG" \
+LAUNCH_LOG="$LAUNCH_LOG" \
+FREELY_ENSURE_MANAGER_LAUNCH_BIN="$MOCK_BIN/launch-freely" \
+PATH="$MOCK_BIN:$PATH" \
+  bash "$ROOT_DIR/bin/freely" ensure-manager --project "$PROJECT" >/dev/null 2>&1 &
+
+ensure_pid=$!
+sleep 1
+
+if [[ -s "$LAUNCH_LOG" ]]; then
+  echo "[FAIL] expected ensure-manager to defer manager bootstrap while account switch lock is active" >&2
+  exit 1
+fi
+
+if [[ -f "$AI_SWITCH_LOG" ]] && grep -q ' switch ' "$AI_SWITCH_LOG"; then
+  echo "[FAIL] expected ensure-manager to avoid ai account switching while account switch lock is active" >&2
+  exit 1
+fi
+
+if [[ -f "$AI_SWITCH_LOG" ]] && grep -qE ' whoami | list$' "$AI_SWITCH_LOG"; then
+  echo "[FAIL] expected ensure-manager to avoid ai whoami/list reads while account switch lock is active" >&2
+  exit 1
+fi
+
+wait "$ensure_pid"
+
+grep -q 'whoami codex' "$AI_SWITCH_LOG"
+grep -q ' list$' "$AI_SWITCH_LOG"
+grep -q 'switch codex worahe3971@outlook-com --yes' "$AI_SWITCH_LOG"
+grep -q 'start --project '"$PROJECT"'$' "$LAUNCH_LOG"
+grep -q 'worahe3971@outlook-com' "$AI_STATE"
+[[ ! -d "$LOCK_DIR" ]]
+
+echo "[PASS] ensure-manager waits for an in-progress account switch sweep before probing, switching, and bootstrapping manager"

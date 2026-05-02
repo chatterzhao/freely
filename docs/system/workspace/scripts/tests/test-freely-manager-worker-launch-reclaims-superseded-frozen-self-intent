@@ -1,0 +1,146 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-reclaim-superseded-frozen.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/freely"
+WT_ROOT="$TMP_DIR/freely-worktrees"
+WORKER="$WT_ROOT/feature-owner-rebind"
+
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs" "$WT_ROOT"
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name tester
+git -C "$PROJECT" config user.email tester@example.com
+echo base >"$PROJECT/README.md"
+git -C "$PROJECT" add README.md
+git -C "$PROJECT" commit -q -m init
+git -C "$PROJECT" worktree add -q -b feature/owner-rebind "$WORKER" develop
+
+mkdir -p "$PROJECT/.freely/run" "$PROJECT/.freely/logs" "$WORKER/.freely/run" "$WORKER/.freely/logs"
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+cat >"$WORKER/.freely/config.env" <<EOF
+PROJECT_ROOT="$WORKER"
+INTENT_FILE="$WORKER/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$WORKER/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+mkdir -p "$PROJECT/docs" "$WORKER/docs"
+for doc in PROJECT_INTENT CONSTITUTION LAWS; do
+  printf '# %s\n' "$doc" >"$PROJECT/docs/$doc.md"
+  printf '# %s\n' "$doc" >"$WORKER/docs/$doc.md"
+done
+printf '# Agents\n' >"$PROJECT/AGENTS.md"
+printf '# Agents\n' >"$WORKER/AGENTS.md"
+
+cat >"$WORKER/.freely/run/prompt-20260424-020001.txt" <<EOF
+Worktree:
+- \`$WORKER\`
+Branch:
+- \`feature/owner-rebind\`
+dispatch_priority: \`P0\`
+parallel_safe: \`true\`
+write_scope: \`$WORKER\`
+intent_kind: \`edit\`
+intent_target: \`$WORKER\`
+EOF
+
+cat >"$WORKER/.freely/run/workcell-state.env" <<EOF
+DESIRED_RUNTIME_STATE="stopped"
+LAST_SUPERVISOR_STATE="down"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="worker_exit_contract_handoff_needed"
+LAST_ENTRYPOINT_MODE="foreground"
+LAST_ROLE_HINT="worker"
+LAST_STATE_UPDATED_AT="2026-04-24T08:00:01Z"
+EOF
+
+cat >"$WORKER/.freely/run/session.env" <<EOF
+LAST_TOOL_RESUME_TARGET="resume://recorded-self-intent"
+LAST_TOOL_JSONL_PATH=""
+LAST_ROUTE_ONLY_HANDOFF="0"
+EOF
+
+OLD_PROMPT="$PROJECT/.freely/run/worker-prompts/20260424-015500-worker-owner-rebind-codex.txt"
+cat >"$OLD_PROMPT" <<EOF
+Worktree:
+- \`$WORKER\`
+Branch:
+- \`feature/owner-rebind\`
+dispatch_priority: \`P0\`
+parallel_safe: \`true\`
+write_scope: \`$WORKER\`
+intent_kind: \`edit\`
+intent_target: \`$WORKER\`
+EOF
+
+NEW_PROMPT="$PROJECT/.freely/run/worker-prompts/20260424-020000-worker-owner-rebind-codex.txt"
+cat >"$NEW_PROMPT" <<EOF
+Worktree:
+- \`$WORKER\`
+Branch:
+- \`feature/owner-rebind\`
+dispatch_priority: \`P0\`
+parallel_safe: \`true\`
+write_scope: \`$WORKER\`
+intent_kind: \`edit\`
+intent_target: \`$WORKER\`
+
+This prompt supersedes these older prompts for the same retained lane:
+- \`$OLD_PROMPT\`
+EOF
+
+CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260424-020000.md"
+cat >"$CONTINUITY" <<EOF
+# Manager Continuity
+
+## Worker Delegation
+- authoritative_worker_prompts:
+  - \`$NEW_PROMPT\`
+
+## Frozen Queue
+- older_duplicate_prompt:
+  - prompt_path: \`$OLD_PROMPT\`
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+LAUNCH_LOG="$TMP_DIR/launch.log"
+launch_worker_from_manager_prompt_if_needed() {
+  local _manager_project="$1" prompt_file="$2"
+  basename "$prompt_file" >>"$LAUNCH_LOG"
+  return 0
+}
+
+COUNT="$(manager_runtime_launch_workers_from_latest_handoff "$PROJECT")"
+[[ "$COUNT" == "1" ]] || {
+  echo "[FAIL] superseding prompt should reclaim same-lane frozen history, got $COUNT" >&2
+  exit 1
+}
+grep -q '^20260424-020000-worker-owner-rebind-codex.txt$' "$LAUNCH_LOG"
+if grep -q '015500' "$LAUNCH_LOG"; then
+  echo "[FAIL] superseded frozen prompt must not relaunch" >&2
+  exit 1
+fi
+
+# shellcheck disable=SC1090
+source "$PROJECT/.freely/run/manager-worker-launch-state.env"
+[[ "${LAST_MANAGER_CONTINUITY_CONSUMED:-}" == "$CONTINUITY" ]]
+[[ "${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-}" == "$NEW_PROMPT" ]]
+[[ "${ACTIVE_RUNNING_WORKER_COUNT:-}" == "1" ]]
+[[ -z "${QUEUED_WORKER_PROMPTS:-}" ]]
+[[ "${QUEUED_WORKER_PROMPT_BLOCKERS:-none}" == "none" ]]
+
+echo "[PASS] superseding launchable prompt reclaims same-lane frozen history instead of queueing forever"

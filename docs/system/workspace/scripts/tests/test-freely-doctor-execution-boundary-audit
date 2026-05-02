@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-doctor-execution-boundary-audit.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/repo"
+mkdir -p "$PROJECT/.freely/run" "$PROJECT/.codex" "$PROJECT/.githooks" "$PROJECT/docs/pre-brainstorms"
+git -C "$TMP_DIR" init -q "$PROJECT"
+git -C "$PROJECT" config core.hooksPath .githooks
+mkdir -p "$PROJECT/docs/system/workspace"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+
+cat >"$PROJECT/docs/system/workspace/install-lifecycle-allowlist.txt" <<'EOF'
+# empty by default
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="high"
+AI_TOOL_ADAPTER="direct"
+AI_TOOL_ADAPTER_POLICY="direct"
+AI_CAPABILITY_CODEX_MODEL="gpt-5.4"
+AI_CAPABILITY_CODEX_SANDBOX="workspace-write"
+AI_CAPABILITY_CODEX_APPROVAL_POLICY="never"
+AI_CAPABILITY_CODEX_CWD_MODE="project-root"
+EOF
+
+cat >"$PROJECT/.codex/config.toml" <<'EOF'
+approval_policy = "never"
+sandbox_mode = "workspace-write"
+[sandbox_workspace_write]
+network_access = false
+EOF
+
+if bash "$ROOT_DIR/bin/freely" doctor --project "$PROJECT" >"$TMP_DIR/doctor-legacy.out" 2>&1; then
+  echo "expected doctor to fail for legacy auto consent" >&2
+  cat "$TMP_DIR/doctor-legacy.out" >&2
+  exit 1
+fi
+grep -q 'execution_boundary_audit_status: fail' "$TMP_DIR/doctor-legacy.out"
+grep -q 'activation_consent_status=unknown-legacy' "$TMP_DIR/doctor-legacy.out"
+
+cat >>"$PROJECT/.freely/config.env" <<'EOF'
+FREELY_ACTIVATION_CONSENT_STATUS="accepted"
+FREELY_ACTIVATION_CONSENT_RECORDED_AT="2026-04-01T00:00:00Z"
+FREELY_ACTIVATION_CONSENT_RECORDED_VIA="test"
+EOF
+
+bash "$ROOT_DIR/bin/freely" doctor --project "$PROJECT" >"$TMP_DIR/doctor-pass.out" 2>&1
+grep -q 'execution_boundary_audit_status: pass' "$TMP_DIR/doctor-pass.out"
+grep -q 'execution_boundary_audit_detail: aligned' "$TMP_DIR/doctor-pass.out"
+
+cat >"$PROJECT/.codex/config.toml" <<'EOF'
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+[sandbox_workspace_write]
+network_access = false
+EOF
+
+if bash "$ROOT_DIR/bin/freely" doctor --project "$PROJECT" >"$TMP_DIR/doctor-drift.out" 2>&1; then
+  echo "expected doctor to fail for codex approval drift" >&2
+  cat "$TMP_DIR/doctor-drift.out" >&2
+  exit 1
+fi
+grep -q 'execution_boundary_audit_status: fail' "$TMP_DIR/doctor-drift.out"
+grep -q 'codex_approval_policy=on-request expected=never' "$TMP_DIR/doctor-drift.out"
+
+echo "[PASS] freely doctor audits execution-boundary consent and codex posture drift"

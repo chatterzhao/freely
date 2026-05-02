@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+
+OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    project="/tmp/freely-project"
+    RUN_DIR="/tmp/freely-project-run"
+    run_dir_for_project() { printf "%s\n" "$RUN_DIR"; }
+    authoritative_supervisor_pids_for_project() { return 0; }
+    valid_supervisor_pid_for_project() { return 1; }
+    ensure_manager_watchdog_pid_file() { printf "%s\n" "$RUN_DIR/ensure-manager.pid"; }
+    valid_ensure_manager_watchdog_pid_for_project() { return 1; }
+    interruption_dispatcher_pid_file() { printf "%s\n" "$RUN_DIR/interruption-dispatcher.pid"; }
+    valid_interruption_dispatcher_pid_for_project() { return 1; }
+    valid_ai_pid_for_project() { return 0; }
+    mkdir -p "$RUN_DIR"
+    printf "%s\n" "42424" >"$RUN_DIR/ai.pid"
+    printf "%s\n" "43434" >"$RUN_DIR/ensure-manager.pid"
+    printf "%s\n" "44444" >"$RUN_DIR/interruption-dispatcher.pid"
+    if project_has_authoritative_runtime_processes_for_user_precheck "$project"; then
+      printf "unexpected-authoritative-runtime\n"
+      exit 1
+    fi
+    printf "precheck-clear\n"
+  '
+)"
+
+[[ "$OUTPUT" == *"precheck-clear"* ]]
+[[ "$OUTPUT" != *"unexpected-authoritative-runtime"* ]]
+
+echo "[PASS] freely start precheck ignores orphaned ai/watchdog/dispatcher pid files without an authoritative supervisor"

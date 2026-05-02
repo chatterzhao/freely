@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-fleet-status-recorded-ownership-conflict.XXXXXX)"
+TMP_DIR_REAL="$(cd "$TMP_DIR" && pwd -P)"
+
+cleanup() {
+  rm -rf "$TMP_DIR_REAL"
+}
+
+trap cleanup EXIT
+
+PROJECT="$TMP_DIR/repo"
+WT_ROOT="$TMP_DIR/repo-worktrees"
+OWNER_WT="$WT_ROOT/feature-owner"
+BLOCKED_WT="$WT_ROOT/feature-blocked"
+OWNER_WT_REAL="$TMP_DIR_REAL/repo-worktrees/feature-owner"
+
+mkdir -p "$PROJECT/docs" "$PROJECT/.freely/run" "$WT_ROOT"
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+git init -q "$PROJECT"
+git -C "$PROJECT" config user.email "test@example.com"
+git -C "$PROJECT" config user.name "Test User"
+cat >"$PROJECT/README.md" <<'EOF'
+# repo
+EOF
+git -C "$PROJECT" add README.md
+git -C "$PROJECT" commit -q -m "init"
+git -C "$PROJECT" branch -m develop
+git -C "$PROJECT" worktree add -q -b feature/owner "$OWNER_WT"
+git -C "$PROJECT" worktree add -q -b feature/blocked "$BLOCKED_WT"
+
+for wt in "$PROJECT" "$OWNER_WT" "$BLOCKED_WT"; do
+  mkdir -p "$wt/docs" "$wt/.freely/run"
+  cat >"$wt/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+  cat >"$wt/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+  cat >"$wt/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+done
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+for wt in "$OWNER_WT" "$BLOCKED_WT"; do
+  cat >"$wt/.freely/config.env" <<EOF
+PROJECT_ROOT="$wt"
+INTENT_FILE="$wt/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$wt/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+done
+
+cat >"$OWNER_WT/.freely/run/prompt-20260402-182000.txt" <<EOF
+Dispatch metadata:
+- intent_kind: promotion
+- intent_target: \`I-20260402-0455-A -> develop\`
+
+Worktree:
+- \`$OWNER_WT\`
+EOF
+
+cat >"$BLOCKED_WT/.freely/run/prompt-20260402-182100.txt" <<EOF
+Dispatch metadata:
+- intent_kind: promotion
+- intent_target: \`I-20260402-0455-A -> develop\`
+
+Worktree:
+- \`$BLOCKED_WT\`
+EOF
+
+OUTPUT="$(bash "$ROOT_DIR/bin/freely" fleet-status --project "$PROJECT")"
+
+grep -q 'ownership_conflict' <<<"$OUTPUT"
+grep -q 'signature=promotion@I-20260402-0455-A -> develop' <<<"$OUTPUT"
+grep -q "holder_branch=feature/owner" <<<"$OUTPUT"
+grep -q "holder_path=$OWNER_WT_REAL" <<<"$OUTPUT"
+grep -q 'holder_state=recorded-owner' <<<"$OUTPUT"
+grep -q 'holder_status=soft_stale' <<<"$OUTPUT"
+
+echo "[PASS] fleet-status surfaces recorded ownership conflicts for blocked mutate targets"

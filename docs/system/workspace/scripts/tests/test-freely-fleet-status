@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-fleet-status.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+WT_ROOT="$TMP_DIR/repo-worktrees"
+WT="$WT_ROOT/feature-demo"
+
+mkdir -p "$REPO" "$WT_ROOT"
+cd "$REPO"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add README.md
+git commit -q -m "init"
+git branch feature/demo
+git worktree add "$WT" feature/demo >/dev/null
+
+mkdir -p "$WT/.freely/run" "$WT/.freely/logs"
+cat >"$WT/.freely/config.env" <<EOF
+PROJECT_ROOT="$WT"
+INTENT_FILE="$WT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$WT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+cat >"$WT/.freely/run/session-state.env" <<'EOF'
+LAST_LAUNCH_KIND="resume"
+LAST_PROJECT_DIRTY_ENTRIES="3"
+EOF
+printf '12345' >"$WT/.freely/run/supervisor.pid"
+printf '54321' >"$WT/.freely/run/ai.pid"
+echo dirty >"$WT/dirty.txt"
+
+OUTPUT="$(bash "$ROOT_DIR/bin/freely" fleet-status --project "$WT")"
+
+printf '%s\n' "$OUTPUT" | grep -q 'feature/demo'
+printf '%s\n' "$OUTPUT" | grep -q 'DIRTY'
+printf '%s\n' "$OUTPUT" | grep -E 'feature/demo[[:space:]]+\|[[:space:]]+DIRTY[[:space:]]+\|[[:space:]]+none[[:space:]]+\|[[:space:]]+none' >/dev/null
+printf '%s\n' "$OUTPUT" | grep -q 'launch=resume'
+if printf '%s\n' "$OUTPUT" | grep -q 'ownership_conflict'; then
+  echo "[FAIL] fleet-status should not emit ownership_conflict detail when no duplicate owner exists" >&2
+  exit 1
+fi
+
+echo "[PASS] freely fleet-status hides stale runtime pid files"

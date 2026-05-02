@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-monitor-session-state.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+project_dir="$TMP_DIR/project"
+prompt_file="$TMP_DIR/prompt.txt"
+pid_file="$project_dir/.freely/run/ai.pid"
+log_file="$project_dir/.freely/logs/cycle.log"
+mock_bin="$TMP_DIR/bin"
+codex_home="$TMP_DIR/codex-home"
+session_state_file="$project_dir/.freely/run/session-state.env"
+session_id="session-live-123"
+jsonl_path="$codex_home/sessions/2026/04/22/${session_id}.jsonl"
+
+mkdir -p "$mock_bin" "$project_dir/.freely/run" "$project_dir/.freely/logs" "$(dirname "$jsonl_path")"
+
+cat >"$prompt_file" <<'EOF'
+test prompt
+EOF
+
+cat >"$mock_bin/codex" <<'EOF'
+#!/usr/bin/env bash
+printf 'session id: %s\n' "$SESSION_ID"
+printf '{"type":"token_count","info":{"total_tokens":1,"model_context_window":10,"primary":{"used_percent":10,"resets_at":"2026-04-22T19:10:10Z"}}}\n' >"$JSONL_PATH"
+sleep 2
+EOF
+chmod +x "$mock_bin/codex"
+
+PATH="$mock_bin:$PATH" CODEX_HOME="$codex_home" SESSION_ID="$session_id" JSONL_PATH="$jsonl_path" \
+bash "$ROOT_DIR/docs/system/workspace/scripts/monitor-ai-cli.sh" \
+  --project "$project_dir" \
+  --tool codex \
+  --model "gpt-5.4" \
+  --reasoning-effort "medium" \
+  --mode auto \
+  --prompt-file "$prompt_file" \
+  --pid-file "$pid_file" \
+  --log-file "$log_file" \
+  --launch-kind fresh \
+  >/dev/null &
+
+monitor_pid=$!
+
+for _ in $(seq 1 20); do
+  if [[ -f "$session_state_file" ]] \
+    && grep -q "^LAST_TOOL_SESSION_ID=\"$session_id\"$" "$session_state_file" \
+    && grep -q "^LAST_TOOL_RESUME_TARGET=\"$session_id\"$" "$session_state_file" \
+    && grep -q "^LAST_TOOL_JSONL_PATH=\"$jsonl_path\"$" "$session_state_file" \
+    && grep -q "^LAST_CYCLE_LOG=\"$log_file\"$" "$session_state_file" \
+    && grep -q "^LAST_PROMPT_FILE=\"$prompt_file\"$" "$session_state_file"; then
+    break
+  fi
+  sleep 0.2
+done
+
+if [[ ! -f "$session_state_file" ]]; then
+  echo "[FAIL] monitor did not create session-state.env while codex was running" >&2
+  exit 1
+fi
+
+grep -q "^LAST_TOOL_SESSION_ID=\"$session_id\"$" "$session_state_file"
+grep -q "^LAST_TOOL_RESUME_TARGET=\"$session_id\"$" "$session_state_file"
+grep -q "^LAST_TOOL_JSONL_PATH=\"$jsonl_path\"$" "$session_state_file"
+grep -q "^LAST_LAUNCH_KIND=\"fresh\"$" "$session_state_file"
+grep -q "^LAST_CYCLE_LOG=\"$log_file\"$" "$session_state_file"
+grep -q "^LAST_PROMPT_FILE=\"$prompt_file\"$" "$session_state_file"
+
+wait "$monitor_pid"
+
+echo "[PASS] monitor persists running codex session state before the cycle exits"

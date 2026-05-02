@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+HOOK="./.githooks/pre-push"
+TMP_DIR="$(mktemp -d /tmp/freely-pre-push-test.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+pass=0
+fail=0
+
+expect_rc() {
+  local name="$1"
+  local expected_rc="$2"
+  local stdin_payload="$3"
+  local env_flag="${4:-}"
+  local out_file="$TMP_DIR/stdout"
+  local err_file="$TMP_DIR/stderr"
+
+  local rc=0
+  if [[ -n "$env_flag" ]]; then
+    if printf '%s\n' "$stdin_payload" | env "$env_flag" "$HOOK" >"$out_file" 2>"$err_file"; then
+      rc=0
+    else
+      rc=$?
+    fi
+  elif printf '%s\n' "$stdin_payload" | "$HOOK" >"$out_file" 2>"$err_file"; then
+    rc=0
+  else
+    rc=$?
+  fi
+
+  if [[ "$rc" -eq "$expected_rc" ]]; then
+    echo "[PASS] $name"
+    pass=$((pass + 1))
+    return 0
+  fi
+
+  echo "[FAIL] $name (expected rc=$expected_rc, got rc=$rc)"
+  echo "stdout:"
+  sed -n '1,120p' "$out_file"
+  echo "stderr:"
+  sed -n '1,120p' "$err_file"
+  fail=$((fail + 1))
+}
+
+[[ -x "$HOOK" ]] || {
+  echo "[FAIL] hook not executable: $HOOK"
+  exit 1
+}
+
+expect_rc "T-003-01 empty input pass" 0 ""
+expect_rc "T-003-02 block remote develop" 1 "refs/heads/feature/x abc refs/heads/develop def"
+expect_rc "T-003-03 block test-pre-merge batch push" 1 "refs/heads/test-pre-merge-20260327-demo abc refs/heads/test-pre-merge-20260327-demo def"
+expect_rc "T-003-04 block main by default" 1 "refs/heads/feature/x abc refs/heads/main def"
+expect_rc "T-003-05 allow feature same-name push" 0 "refs/heads/feature/x abc refs/heads/feature/x def"
+expect_rc "T-003-06 block feature cross-push to develop" 1 "refs/heads/feature/x abc refs/heads/develop def"
+
+echo
+echo "Result: pass=$pass fail=$fail"
+[[ "$fail" -eq 0 ]]

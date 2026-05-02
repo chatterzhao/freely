@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-worker-launch-capacity.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/freely"
+WT_ROOT="$TMP_DIR/freely-worktrees"
+WORKER_A="$WT_ROOT/feature-a"
+WORKER_B="$WT_ROOT/feature-b"
+WORKER_C="$WT_ROOT/feature-c"
+
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs" "$WT_ROOT"
+cd "$PROJECT"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add README.md
+git commit -q -m init
+git branch feature/a
+git branch feature/b
+git branch feature/c
+git worktree add "$WORKER_A" feature/a >/dev/null
+git worktree add "$WORKER_B" feature/b >/dev/null
+git worktree add "$WORKER_C" feature/c >/dev/null
+
+printf 'worker b\n' >>"$WORKER_B/README.md"
+git -C "$WORKER_B" add README.md
+git -C "$WORKER_B" commit -q -m "worker b change"
+
+printf 'worker c\n' >>"$WORKER_C/README.md"
+git -C "$WORKER_C" add README.md
+git -C "$WORKER_C" commit -q -m "worker c change"
+
+for wt in "$PROJECT" "$WORKER_A" "$WORKER_B" "$WORKER_C"; do
+  mkdir -p "$wt/.freely/run" "$wt/.freely/logs"
+done
+
+sleep 999 >/dev/null 2>&1 &
+ACTIVE_SUP="$!"
+sleep 999 >/dev/null 2>&1 &
+ACTIVE_AI="$!"
+trap 'kill "$ACTIVE_SUP" "$ACTIVE_AI" 2>/dev/null || true; rm -rf "$TMP_DIR"' EXIT
+
+printf '%s' "$ACTIVE_SUP" >"$WORKER_A/.freely/run/supervisor.pid"
+printf '%s' "$ACTIVE_AI" >"$WORKER_A/.freely/run/ai.pid"
+
+PROMPT_B="$PROJECT/.freely/run/worker-prompts/20260323-210001-worker-b-codex.txt"
+PROMPT_C="$PROJECT/.freely/run/worker-prompts/20260323-210002-worker-c-codex.txt"
+cat >"$PROMPT_B" <<EOF
+Dispatch metadata:
+- dispatch_priority: P0
+- parallel_safe: true
+- write_scope: $WORKER_B
+
+Branch:
+- \`feature/b\`
+
+Worktree:
+- \`$WORKER_B\`
+EOF
+cat >"$PROMPT_C" <<EOF
+Dispatch metadata:
+- dispatch_priority: P2
+- parallel_safe: true
+- write_scope: $WORKER_C
+
+Branch:
+- \`feature/c\`
+
+Worktree:
+- \`$WORKER_C\`
+EOF
+
+CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260323-210000.md"
+cat >"$CONTINUITY" <<EOF
+# Manager Continuity
+- worker_prompt: \`$PROMPT_B\`
+- worker_prompt: \`$PROMPT_C\`
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+LAUNCH_LOG="$TMP_DIR/launch.log"
+launch_worker_from_manager_prompt_if_needed() {
+  local _manager_project="$1" prompt_file="$2"
+  basename "$prompt_file" >>"$LAUNCH_LOG"
+  return 0
+}
+
+COUNT="$(manager_runtime_launch_workers_from_latest_handoff "$PROJECT")"
+[[ "$COUNT" == "2" ]]
+grep -q '^20260323-210001-worker-b-codex.txt$' "$LAUNCH_LOG"
+grep -q '^20260323-210002-worker-c-codex.txt$' "$LAUNCH_LOG"
+
+# shellcheck disable=SC1090
+source "$PROJECT/.freely/run/manager-worker-launch-state.env"
+[[ -z "${QUEUED_WORKER_PROMPTS:-}" ]]
+[[ "${MAX_PARALLEL_WORKERS:-}" == "unbounded" ]]
+[[ "${ACTIVE_RUNNING_WORKER_COUNT:-}" == "3" ]]
+[[ "${AVAILABLE_NEW_WORKER_SLOTS:-}" == "unbounded" ]]
+
+echo "[PASS] manager worker launch directly launches parallel-safe prompts without a fixed numeric cap"

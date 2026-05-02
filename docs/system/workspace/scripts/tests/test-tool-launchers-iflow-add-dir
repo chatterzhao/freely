@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-tool-launchers-iflow-add-dir.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+WORKTREES_ROOT="${PROJECT}-worktrees"
+PROMPT_FILE="$TMP_DIR/prompt.txt"
+MOCK_BIN="$TMP_DIR/bin"
+mkdir -p "$PROJECT" "$MOCK_BIN"
+printf 'test prompt\n' >"$PROMPT_FILE"
+
+cat >"$MOCK_BIN/iflow" <<'EOF'
+#!/usr/bin/env bash
+printf '%s\n' "$@" >"${TEST_CAPTURE_FILE:?missing capture file}"
+exit 0
+EOF
+chmod +x "$MOCK_BIN/iflow"
+
+export PATH="$MOCK_BIN:$PATH"
+export TEST_CAPTURE_FILE="$TMP_DIR/iflow-argv.txt"
+
+bash -lc '
+  set -euo pipefail
+  # shellcheck disable=SC1090
+  source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/tool-launchers.sh"
+  tool_run_from_prompt_file \
+    "'"$PROJECT"'" \
+    "iflow" \
+    "" \
+    "" \
+    "" \
+    "auto" \
+    "'"$PROMPT_FILE"'" \
+    "fresh" \
+    "" \
+    "" \
+    "" \
+    "" \
+    "" \
+    "" \
+    "" \
+    ""
+' >/dev/null
+
+grep -q -- '^--add-dir$' "$TMP_DIR/iflow-argv.txt" || {
+  echo "[FAIL] expected iflow launcher to add the sibling worktrees root" >&2
+  cat "$TMP_DIR/iflow-argv.txt" >&2
+  exit 1
+}
+
+grep -q -- "^$WORKTREES_ROOT$" "$TMP_DIR/iflow-argv.txt" || {
+  echo "[FAIL] expected iflow launcher to pass the sibling worktrees root" >&2
+  cat "$TMP_DIR/iflow-argv.txt" >&2
+  exit 1
+}
+
+echo "[PASS] iflow launcher adds the sibling worktrees root to its workspace boundary"

@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-monitor-adapter-dispatch.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+project_dir="$TMP_DIR/project"
+prompt_file="$TMP_DIR/prompt.txt"
+pid_file="$TMP_DIR/ai.pid"
+log_file="$TMP_DIR/ai.log"
+mkdir -p "$project_dir"
+
+cat >"$prompt_file" <<'EOF'
+test prompt
+EOF
+
+bash "$ROOT_DIR/docs/system/workspace/scripts/monitor-ai-cli.sh" \
+  --project "$project_dir" \
+  --tool test-once \
+  --tool-adapter direct \
+  --model "" \
+  --reasoning-effort "" \
+  --mode auto \
+  --prompt-file "$prompt_file" \
+  --pid-file "$pid_file" \
+  --log-file "$log_file" \
+  --launch-kind fresh \
+  >/dev/null
+
+grep -q '\[TEST\] mock AI CLI started' "$log_file"
+
+if bash "$ROOT_DIR/docs/system/workspace/scripts/monitor-ai-cli.sh" \
+  --project "$project_dir" \
+  --tool test-once \
+  --tool-adapter acp \
+  --model "" \
+  --reasoning-effort "" \
+  --mode auto \
+  --prompt-file "$prompt_file" \
+  --pid-file "$pid_file" \
+  --log-file "$log_file" \
+  --launch-kind fresh \
+  >/dev/null 2>&1; then
+  echo "[FAIL] unsupported adapter should not silently fall back to direct"
+  exit 1
+fi
+
+grep -q "unsupported adapter 'acp'" "$log_file"
+
+if bash "$ROOT_DIR/docs/system/workspace/scripts/monitor-ai-cli.sh" \
+  --project "$project_dir" \
+  --tool codex \
+  --tool-adapter acp \
+  --model "" \
+  --reasoning-effort "" \
+  --mode auto \
+  --prompt-file "$prompt_file" \
+  --pid-file "$pid_file" \
+  --log-file "$log_file" \
+  --launch-kind resume \
+  >/dev/null 2>&1; then
+  echo "[FAIL] codex acp resume should be blocked before pretending direct-equivalent parity"
+  exit 1
+fi
+
+grep -q "launch kind 'resume' is not supported for tool 'codex' with adapter 'acp'" "$log_file"
+
+echo "[PASS] monitor dispatches direct adapter, blocks unsupported adapters, and guards codex acp resume semantics"

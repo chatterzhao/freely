@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+
+OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+
+    root="$(mktemp -d /tmp/freely-worker-terminal-idempotent.XXXXXX)"
+    trap "rm -rf \"$root\"" EXIT
+    project="$root/repo"
+    worker="$root/test-pre-merge-worker"
+    mkdir -p "$project/.freely/run" "$project/.freely/logs" "$project/.freely/intake" "$project/.freely/interruption-resolutions"
+    mkdir -p "$worker/.freely/run" "$worker/.freely/logs"
+    : >"$project/.freely/config.env"
+    : >"$worker/.freely/config.env"
+
+    cat >"$worker/.freely/run/worker-exit-contract.env" <<EOF
+EXIT_KIND="worker_done"
+COMPLETION_SUMMARY="Replay passed and is promote-ready for manager review."
+EVIDENCE_PATHS_CSV="$worker/docs/epics/sample/code-reviews/20260425-sample.md"
+EOF
+
+    manager_operator_stop_boundary_epoch_for_project() { printf "1714055970\n"; }
+    latest_patrol_authoritative_manager_continuity_file_for_project() { return 0; }
+
+    REENTRY_LOG="$root/reentry.log"
+    request_local_continuation_reentry() {
+      printf "%s\n" "$2" >>"$REENTRY_LOG"
+    }
+
+    intake_id="$(materialize_manager_worker_terminal_continuation "$project" "$worker" "test-pre-merge-sample" "worker_done")"
+    meta_file="$project/.freely/intake/$intake_id/meta.env"
+    resolution_file="$(meta_env_value "$meta_file" "RESOLUTION_ARTIFACT")"
+    meta_before="$(stat -f "%m" "$meta_file")"
+    resolution_before="$(stat -f "%m" "$resolution_file")"
+
+    sleep 1
+
+    intake_id_again="$(materialize_manager_worker_terminal_continuation "$project" "$worker" "test-pre-merge-sample" "worker_done")"
+    meta_after="$(stat -f "%m" "$meta_file")"
+    resolution_after="$(stat -f "%m" "$resolution_file")"
+    reentry_count="$(wc -l <"$REENTRY_LOG" | tr -d " ")"
+
+    printf "first:%s\n" "$intake_id"
+    printf "second:%s\n" "${intake_id_again:-}"
+    printf "meta_before:%s\n" "$meta_before"
+    printf "meta_after:%s\n" "$meta_after"
+    printf "resolution_before:%s\n" "$resolution_before"
+    printf "resolution_after:%s\n" "$resolution_after"
+    printf "reentry_count:%s\n" "$reentry_count"
+  ' 2>&1
+)"
+
+[[ "$OUTPUT" == *"first:worker-terminal-"* ]]
+[[ "$OUTPUT" == *$'\nsecond:\n'* ]]
+[[ "$OUTPUT" == *$'\nreentry_count:1\n'* ]]
+
+meta_before="$(printf '%s\n' "$OUTPUT" | awk -F: '/^meta_before:/{print $2; exit}')"
+meta_after="$(printf '%s\n' "$OUTPUT" | awk -F: '/^meta_after:/{print $2; exit}')"
+resolution_before="$(printf '%s\n' "$OUTPUT" | awk -F: '/^resolution_before:/{print $2; exit}')"
+resolution_after="$(printf '%s\n' "$OUTPUT" | awk -F: '/^resolution_after:/{print $2; exit}')"
+
+[[ "$meta_before" == "$meta_after" ]]
+[[ "$resolution_before" == "$resolution_after" ]]
+
+echo "[PASS] worker terminal followthrough materialization is idempotent for unchanged delegated continuation"

@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-slot-warning-clean.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+LOCK_DIR="$TMP_DIR/account-switch.lock"
+AI_LOG="$TMP_DIR/ai.log"
+mkdir -p \
+  "$PROJECT/bin" \
+  "$PROJECT/docs/system/workspace/scripts/runtime" \
+  "$PROJECT/docs/system/workspace/skills/watchdog-control-plane/scripts"
+
+ln -sf \
+  "$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh" \
+  "$PROJECT/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+ln -sf \
+  "$ROOT_DIR/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" \
+  "$PROJECT/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
+
+cat >"$PROJECT/bin/ai" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+printf '%s\n' "$*" >>"${AI_LOG:?}"
+echo '{"tool":"codex","slot":"good-slot","auth_email":"good@example.com","account":"good@example.com"}'
+EOF
+chmod +x "$PROJECT/bin/ai"
+
+mkdir -p "$LOCK_DIR"
+sleep 2 &
+lock_pid=$!
+cat >"$LOCK_DIR/state.env" <<EOF
+owner_pid=$lock_pid
+started_at=$(date +%s)
+reason=manual_switch_sweep
+command=switch
+target=auto
+EOF
+
+result="$(
+  AI_LOG="$AI_LOG" \
+  AI_CLI_SWITCH_LOCK_DIR="$LOCK_DIR" \
+  PROJECT_ROOT="$PROJECT" \
+  bash -lc '
+    set -euo pipefail
+    log_warn() { printf "[WARN] %s\n" "$*"; }
+    ai_cli_bin_for_project() { printf "%s\n" "'"$PROJECT"'/bin/ai"; }
+    source "'"$PROJECT"'/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+    codex_current_slot "'"$PROJECT"'"
+  ' 2>"$TMP_DIR/stderr.log"
+)"
+
+[[ "$result" == "good-slot" ]]
+grep -q '\[WARN\] codex slot switch is already in progress' "$TMP_DIR/stderr.log"
+if printf '%s' "$result" | grep -q '\[WARN\]'; then
+  echo "[FAIL] expected warning output to stay off stdout when resolving current slot" >&2
+  exit 1
+fi
+grep -q '^--quiet --format json whoami codex$' "$AI_LOG"
+
+echo "[PASS] current slot resolution keeps switch-lock warnings off machine-readable stdout"

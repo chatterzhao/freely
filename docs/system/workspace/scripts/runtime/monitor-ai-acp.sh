@@ -1,0 +1,326 @@
+#!/usr/bin/env bash
+# monitor-ai-acp.sh: ACP-native AI lifecycle monitor.
+#
+# Replaces PID-based monitor-ai-cli.sh when AI_TOOL_ADAPTER=acp.
+# Delegates to tool-launchers.sh for per-tool ACP syntax.
+#
+# Architecture:
+#   freely → monitor-ai-acp.sh → tool-launchers.sh → run-acp-prompt.py → acp-bridge → claude-agent-acp
+#
+# Completion: session/prompt stopReason="end_turn" (ACP-native, not PID exit).
+# Server persistence: acp-bridge keeps claude-agent-acp alive across cycles.
+# Session persistence: session/resume for cache hits across cycles.
+#
+# Usage: same interface as monitor-ai-cli.sh
+#   monitor-ai-acp.sh --project <path> --tool <name> --prompt-file <path>
+#     [--tool-adapter acp] [--claude-session-id <uuid>] [--tool-resume-target <uuid>]
+#     [--mode auto|step] [--model <id>] [--reasoning-effort <effort>]
+#     [--pid-file <path>] [--log-file <path>] [--debug-log-file <path>]
+#     [--failure-marker-file <path>] [--network-failure-marker-file <path>]
+#     [--launch-kind fresh|resume|fork|fresh_with_handoff]
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+
+# ── Tool launcher integration ──────────────────────────────────────
+
+_load_tool_launchers() {
+  if [[ -f "$SCRIPT_DIR/tool-launchers.sh" ]]; then
+    source "$SCRIPT_DIR/tool-launchers.sh"
+  elif [[ -f "$SCRIPT_DIR/../tool-launchers.sh" ]]; then
+    source "$SCRIPT_DIR/../tool-launchers.sh"
+  else
+    echo "[ERROR] tool-launchers.sh not found" >&2
+    exit 1
+  fi
+}
+
+# ── Bridge management ──────────────────────────────────────────────
+
+_bridge_pid_file() {
+  echo "$1/.freely/run/acp-bridge.pid"
+}
+
+_bridge_socket() {
+  echo "$1/.freely/run/acp-bridge.sock"
+}
+
+_bridge_ensure_running() {
+  local project="$1"
+  local pid_file socket bridge_script
+  pid_file="$(_bridge_pid_file "$project")"
+  socket="$(_bridge_socket "$project")"
+
+  # Already running?
+  if [[ -f "$pid_file" ]]; then
+    local pid
+    pid=$(cat "$pid_file" 2>/dev/null || true)
+    if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null && [[ -S "$socket" ]]; then
+      return 0
+    fi
+    rm -f "$pid_file" "$socket"
+  fi
+
+  bridge_script="$SCRIPT_DIR/acp-bridge.py"
+  [[ -f "$bridge_script" ]] || bridge_script="$(dirname "$SCRIPT_DIR")/runtime/acp-bridge.py"
+  [[ -f "$bridge_script" ]] || {
+    echo "[ERROR] acp-bridge.py not found" >&2
+    return 1
+  }
+
+  python3 "$bridge_script" start --project "$project" >/dev/null 2>&1 || {
+    echo "[ERROR] failed to start ACP bridge" >&2
+    return 1
+  }
+
+  # Wait for socket
+  local waited=0
+  while [[ ! -S "$socket" ]] && (( waited < 50 )); do
+    sleep 0.1
+    waited=$((waited + 1))
+  done
+  [[ -S "$socket" ]] || { echo "[ERROR] bridge socket did not appear" >&2; return 1; }
+}
+
+# ── Error detection ────────────────────────────────────────────────
+
+_detect_acp_failure() {
+  local log_file="$1" failure_marker="$2" network_failure_marker="$3" bridge_lost_marker="$4"
+  [[ -f "$log_file" ]] || return 0
+
+  local _matched
+  if _matched=$(grep -m1 -E '(Connection refused|Connection reset|TLS|timeout|ECONNREFUSED|ENOTFOUND|ETIMEDOUT|socket hang up|proxy|DNS)' "$log_file" 2>/dev/null); then
+    echo "[ACP-detect] network_failure matched: ${_matched:0:200}" >&2
+    [[ -n "$network_failure_marker" ]] && echo "network_failure" > "$network_failure_marker"
+  fi
+
+  if _matched=$(grep -m1 -E '(\b401\b|\b402\b|\b403\b|\b429\b|Unauthorized|Payment Required|insufficient_quota|rate_limit|quota exceeded|InsufficientBalance)' "$log_file" 2>/dev/null); then
+    echo "[ACP-detect] auth_or_rate_limit matched: ${_matched:0:200}" >&2
+    [[ -n "$failure_marker" ]] && echo "auth_or_rate_limit" > "$failure_marker"
+  fi
+
+  # Bridge restart / session lost: session/resume fails with "not found"
+  if _matched=$(grep -m1 -E '(session.*not found|unknown session|no such session|Session not found)' "$log_file" 2>/dev/null); then
+    echo "[ACP-detect] bridge_session_lost matched: ${_matched:0:200}" >&2
+    [[ -n "$bridge_lost_marker" ]] && echo "bridge_session_lost" > "$bridge_lost_marker"
+  fi
+}
+
+# ── Session state (via session-store.py SQLite) ─────────────────────
+
+_persist_session_to_store() {
+  local project="$1" clean_session_id="$2" tool="$3" launch_kind="$4" resume_mode="$5"
+  local db_path="$project/.freely/freely.db"
+  local session_store_py
+  session_store_py="$(dirname "$0")/session-store.py"
+  if [[ ! -f "$session_store_py" ]]; then
+    echo "[WARN] session-store.py not found, cannot persist session" >&2
+    return 1
+  fi
+  local role="${FREELY_ROLE_HINT:-manager}"
+  python3 "$session_store_py" upsert \
+    --db "$db_path" \
+    --session-id "$clean_session_id" \
+    --project "$project" \
+    --tool "$tool" \
+    --role "$role" \
+    --launch-kind "$launch_kind" \
+    --tool-adapter acp \
+    --resume-mode "${resume_mode:-}" \
+    >/dev/null 2>&1 || {
+      echo "[WARN] session-store.py upsert failed for $clean_session_id" >&2
+      return 1
+    }
+}
+
+_mark_session_failed() {
+  local project="$1" session_id="$2" error_reason="$3"
+  local db_path="$project/.freely/freely.db"
+  local session_store_py
+  session_store_py="$(dirname "$0")/session-store.py"
+  if [[ ! -f "$session_store_py" ]]; then
+    return 1
+  fi
+  python3 "$session_store_py" complete \
+    --db "$db_path" \
+    --session-id "$session_id" \
+    --status failed \
+    --error-reason "$error_reason" \
+    >/dev/null 2>&1 || true
+}
+
+_mark_session_completed() {
+  local project="$1" session_id="$2"
+  local db_path="$project/.freely/freely.db"
+  local session_store_py
+  session_store_py="$(dirname "$0")/session-store.py"
+  if [[ ! -f "$session_store_py" ]]; then
+    return 1
+  fi
+  python3 "$session_store_py" complete \
+    --db "$db_path" \
+    --session-id "$session_id" \
+    --status completed \
+    >/dev/null 2>&1 || true
+}
+
+# ── Main ───────────────────────────────────────────────────────────
+
+main() {
+  local project="" tool="" tool_adapter="acp" prompt_file=""
+  local session_id="" resume_target=""
+  local mode="auto" model="" reasoning_effort="" launch_kind="fresh"
+  local pid_file="" log_file="" debug_log_file=""
+  local failure_marker_file="" network_failure_marker_file="" bridge_lost_marker_file=""
+  local tool_capabilities="" tool_policy=""
+  local codex_capability_model="" codex_capability_sandbox="" codex_capability_approval_policy="" codex_capability_cwd_mode=""
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$2"; shift 2 ;;
+      --tool) tool="$2"; shift 2 ;;
+      --tool-adapter) tool_adapter="$2"; shift 2 ;;
+      --prompt-file) prompt_file="$2"; shift 2 ;;
+      --claude-session-id|--session-id) session_id="$2"; shift 2 ;;
+      --tool-resume-target|--resume-target) resume_target="$2"; shift 2 ;;
+      --mode) mode="$2"; shift 2 ;;
+      --model) model="$2"; shift 2 ;;
+      --reasoning-effort) reasoning_effort="$2"; shift 2 ;;
+      --launch-kind) launch_kind="$2"; shift 2 ;;
+      --pid-file) pid_file="$2"; shift 2 ;;
+      --log-file) log_file="$2"; shift 2 ;;
+      --debug-log-file) debug_log_file="$2"; shift 2 ;;
+      --failure-marker-file) failure_marker_file="$2"; shift 2 ;;
+      --network-failure-marker-file) network_failure_marker_file="$2"; shift 2 ;;
+      --bridge-lost-marker-file) bridge_lost_marker_file="$2"; shift 2 ;;
+      --tool-capabilities) tool_capabilities="$2"; shift 2 ;;
+      --tool-policy) tool_policy="$2"; shift 2 ;;
+      --codex-capability-model) codex_capability_model="$2"; shift 2 ;;
+      --codex-capability-sandbox) codex_capability_sandbox="$2"; shift 2 ;;
+      --codex-capability-approval-policy) codex_capability_approval_policy="$2"; shift 2 ;;
+      --codex-capability-cwd-mode) codex_capability_cwd_mode="$2"; shift 2 ;;
+      *) echo "[ERROR] unknown arg: $1" >&2; exit 1 ;;
+    esac
+  done
+
+  [[ -n "$project" && -n "$tool" && -n "$prompt_file" ]] || {
+    echo "[ERROR] missing required args (--project, --tool, --prompt-file)" >&2
+    exit 1
+  }
+  [[ -f "$prompt_file" ]] || { echo "[ERROR] prompt file not found: $prompt_file" >&2; exit 1; }
+
+  # Load tool launchers FIRST so alias settings (model, API key, base URL)
+  # are applied to the environment BEFORE starting the ACP bridge.
+  # This ensures claude-agent-acp inherits the correct per-alias config,
+  # not the user's interactive shell environment variables.
+  _load_tool_launchers || exit 1
+  _apply_tool_alias_settings "$tool"
+
+  # Ensure persistent ACP server is running (inherits env from alias settings)
+  _bridge_ensure_running "$project" || exit 1
+
+  # Write own PID as initial AI PID (freely uses this for liveness)
+  # The bridge PID is the real AI process handle — written below.
+  if [[ -n "$pid_file" ]]; then
+    echo "$$" > "$pid_file"
+  fi
+
+  # Launch ACP via tool abstraction (same pattern as monitor-ai-cli.sh)
+  # run-acp-prompt.py connects to bridge, sends prompt, blocks until stopReason, exits.
+  # The child PID represents the transport, NOT the AI server (which stays alive).
+  (
+    cd "$project"
+    tool_run_from_prompt_file \
+      "$project" "$tool" "$tool_adapter" "$model" "$reasoning_effort" \
+      "$mode" "$prompt_file" "$launch_kind" \
+      "$tool_capabilities" "$tool_policy" \
+      "$codex_capability_model" "$codex_capability_sandbox" \
+      "$codex_capability_approval_policy" "$codex_capability_cwd_mode" \
+      "$debug_log_file" "$session_id" "$resume_target"
+  ) >>"$log_file" 2>&1 &
+
+  local child_pid=$!
+
+  # Write bridge PID as AI PID for liveness checks
+  local bridge_pid
+  bridge_pid=$(cat "$(_bridge_pid_file "$project")" 2>/dev/null || echo "$child_pid")
+  if [[ -n "$pid_file" ]]; then
+    echo "$bridge_pid" > "$pid_file"
+  fi
+
+  echo "$child_pid"
+
+  # ── Monitor loop (transport monitoring, not AI completion detection) ──
+  while kill -0 "$child_pid" 2>/dev/null; do
+    # Live failure detection
+    if [[ -n "$failure_marker_file" || -n "$network_failure_marker_file" || -n "$bridge_lost_marker_file" ]]; then
+      _detect_acp_failure "$log_file" "$failure_marker_file" "$network_failure_marker_file" "$bridge_lost_marker_file"
+      if [[ -f "$failure_marker_file" || -f "$network_failure_marker_file" || -f "$bridge_lost_marker_file" ]]; then
+        kill "$child_pid" 2>/dev/null || true
+        break
+      fi
+    fi
+    sleep 1
+  done
+
+  set +e
+  wait "$child_pid"
+  local child_rc=$?
+  set -e
+
+  # ── Completion detection: stopReason from ACP protocol output ──
+  # Line 1 of log = clean UUID (machine-readable), line 2+ = annotated human log.
+  local session_id_clean session_id_out stop_reason
+  session_id_clean=$(head -1 "$log_file" 2>/dev/null | grep -oE '[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}' | head -1)
+  session_id_out=$(sed -n 's/^session id: //p' "$log_file" | head -n 1)
+  stop_reason=$(grep -o 'stop_reason=[a-z_]*' "$log_file" | head -n 1 | cut -d= -f2)
+
+  if [[ -z "$stop_reason" ]]; then
+    stop_reason="unknown"
+  fi
+
+  # Persist clean session ID to session-store (authoritative source)
+  if [[ -n "$session_id_clean" ]]; then
+    local resume_mode_detected=""
+    if [[ "$launch_kind" == "resume" ]]; then
+      if echo "$session_id_out" | grep -q "(fresh after resume failure)"; then
+        resume_mode_detected="recreated"
+      else
+        resume_mode_detected="native"
+      fi
+    fi
+    _persist_session_to_store "$project" "$session_id_clean" "$tool" "$launch_kind" "$resume_mode_detected"
+  fi
+
+  # Post-exit failure detection
+  local failure_detected=""
+  if [[ -n "$failure_marker_file" || -n "$network_failure_marker_file" || -n "$bridge_lost_marker_file" ]]; then
+    _detect_acp_failure "$log_file" "$failure_marker_file" "$network_failure_marker_file" "$bridge_lost_marker_file"
+    if [[ -f "$failure_marker_file" ]]; then
+      failure_detected="auth_or_rate_limit"
+    elif [[ -f "$bridge_lost_marker_file" ]]; then
+      failure_detected="bridge_session_lost"
+    fi
+  fi
+
+  # Completion verdict: stopReason is the authoritative signal
+  # Session stays active so next cycle can resume (L1 cache hit).
+  # Only mark completed on daemon stop or fresh_with_handoff rotation.
+  if [[ "$stop_reason" == "end_turn" ]]; then
+    echo "[ACP] cycle complete: session=${session_id_clean:-unknown} stopReason=end_turn" >&2
+    exit 0
+  elif [[ -n "$failure_detected" ]]; then
+    # Non-recoverable failure: mark session failed so next launch goes fresh
+    if [[ -n "$session_id_clean" ]]; then
+      _mark_session_failed "$project" "$session_id_clean" "$failure_detected"
+    fi
+    echo "[WARN] ACP cycle failed: session=${session_id_clean:-unknown} reason=$failure_detected" >&2
+    exit 1
+  else
+    # Network failure or unknown: keep session active for retry
+    echo "[WARN] ACP cycle finished with stopReason=$stop_reason (rc=$child_rc)" >&2
+    exit 1
+  fi
+}
+
+main "$@"

@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-launch-skip-retire-ready-merged.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+WT_ROOT="$TMP_DIR/worktrees"
+WORKER="$WT_ROOT/feature-a"
+
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs" "$WT_ROOT"
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name tester
+git -C "$PROJECT" config user.email tester@example.com
+
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260324-0000--sample"
+cat >"$PROJECT/.gitignore" <<'EOF'
+.freely/
+EOF
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260324-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260324-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260324-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+echo base >"$PROJECT/README.md"
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m init
+
+git -C "$PROJECT" worktree add -q -b feature/a "$WORKER" develop
+
+for wt in "$PROJECT" "$WORKER"; do
+  mkdir -p "$wt/.freely/run" "$wt/.freely/logs"
+  cat >"$wt/.freely/config.env" <<EOF
+PROJECT_ROOT="$wt"
+INTENT_FILE="$wt/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$wt/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+done
+
+cat >"$WORKER/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="down"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="operator_stop"
+LAST_ROLE_HINT="worker"
+LAST_STATE_UPDATED_AT="2026-04-21T12:00:00Z"
+EOF
+
+PROMPT="$PROJECT/.freely/run/worker-prompts/20260421-120000-worker-feature-a-codex.txt"
+cat >"$PROMPT" <<EOF
+Worktree:
+- \`$WORKER\`
+Branch:
+- \`feature/a\`
+EOF
+
+CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260421-120000.md"
+cat >"$CONTINUITY" <<EOF
+# Manager Continuity
+
+## Worker Delegation
+- authoritative_worker_prompts:
+  - \`$PROMPT\`
+- launchable_queue:
+  - lane_id: \`I-20260421-1200-A\`
+    dispatch_priority: \`P0\`
+    prompt_path: \`$PROMPT\`
+EOF
+
+git -C "$PROJECT" merge --no-ff -m "merge feature/a" feature/a >/dev/null
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+START_LOG="$TMP_DIR/start.log"
+start_workcell_supervisor_async() {
+  printf '%s\n' "$1" >>"$START_LOG"
+  return 0
+}
+
+LAUNCHED="$(manager_runtime_launch_workers_from_latest_handoff "$PROJECT")"
+[[ "$LAUNCHED" == "0" ]]
+[[ ! -f "$START_LOG" ]]
+grep -q '^DESIRED_RUNTIME_STATE="stopped"$' "$WORKER/.freely/run/workcell-state.env"
+grep -q '^LAST_EXIT_REASON="retire_ready_merged_worker"$' "$WORKER/.freely/run/workcell-state.env"
+
+echo "[PASS] manager worker launch fallback skips retire-ready merged prompts"

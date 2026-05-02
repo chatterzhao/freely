@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-cleanup-followthrough-hard-stale-intent.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+OWNED_WT="$TMP_DIR/owned-wt"
+
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260323-0000--sample"
+
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name "Freely Test"
+git -C "$PROJECT" config user.email "freely@example.com"
+mkdir -p "$PROJECT/.githooks"
+cat >"$PROJECT/.githooks/pre-commit" <<'EOF'
+#!/usr/bin/env bash
+exit 0
+EOF
+chmod +x "$PROJECT/.githooks/pre-commit"
+
+cat >"$PROJECT/.gitignore" <<'EOF'
+.freely/
+EOF
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260323-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260323-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260323-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m "init"
+
+bash "$ROOT_DIR/bin/freely" init --project "$PROJECT" --intent "$PROJECT/docs/PROJECT_INTENT.md" --constitution "$PROJECT/docs/CONSTITUTION.md" --ai codex:gpt-5.4:auto --accept-default-autonomy >/dev/null
+
+git -C "$PROJECT" worktree add -q -b feature/owned-fixture "$OWNED_WT" develop
+mkdir -p "$OWNED_WT/.freely/run"
+cat >"$OWNED_WT/owned.txt" <<'EOF'
+owned fixture
+EOF
+git -C "$OWNED_WT" add owned.txt
+git -C "$OWNED_WT" commit -q -m "owned fixture"
+git -C "$PROJECT" merge --no-ff feature/owned-fixture -m "merge owned fixture" >/dev/null
+
+cat >"$OWNED_WT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="down"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="operator_stop"
+LAST_ROLE_HINT="worker"
+LAST_STATE_UPDATED_AT="2020-01-01T00:00:00Z"
+EOF
+
+PROMPT="$OWNED_WT/.freely/run/prompt-20260402-131000.txt"
+cat >"$PROMPT" <<EOF
+Dispatch metadata:
+- dispatch_priority: P0
+- parallel_safe: true
+- write_scope: $OWNED_WT
+- intent_kind: cleanup
+
+Branch:
+- \`feature/owned-fixture\`
+
+Worktree:
+- \`$OWNED_WT\`
+EOF
+
+touch -t 202001010000 "$PROMPT" "$OWNED_WT/.freely/run/workcell-state.env"
+export FREELY_OWNERSHIP_HARD_STALE_SECS=1
+
+INTAKE_OUTPUT="$(bash "$ROOT_DIR/bin/freely" intake chat --project "$PROJECT" --author cleanup-worker --channel runtime --message "cleanup followthrough")"
+INTAKE_ID="$(printf '%s\n' "$INTAKE_OUTPUT" | sed -n 's/^intake_id: //p')"
+[[ -n "$INTAKE_ID" ]]
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+[[ "$(recorded_worker_ownership_status "$OWNED_WT")" == "hard_stale" ]]
+run_cleanup_followthrough "$PROJECT" "$INTAKE_ID" control followup "" ""
+
+[[ ! -d "$OWNED_WT" ]] || {
+  echo "[FAIL] hard-stale owned merged worktree should be reclaimed during cleanup followthrough" >&2
+  exit 1
+}
+! git -C "$PROJECT" show-ref --verify --quiet refs/heads/feature/owned-fixture
+
+RESOLUTION_FILE="$PROJECT/.freely/run/interruption-resolution/$INTAKE_ID/resolution.md"
+grep -q 'cleaned_items:' "$RESOLUTION_FILE"
+grep -q 'feature/owned-fixture @ .*owned-wt (remote:not-configured)' "$RESOLUTION_FILE"
+
+echo "[PASS] cleanup followthrough reclaims hard-stale merged worktrees instead of retaining stale ownership"

@@ -1,0 +1,186 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+PROJECT="$(pwd -P)"
+WORKTREE_PATH=""
+RUNTIME_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+
+usage() {
+  cat <<'EOF'
+Usage:
+  pretests-retirement-gate --project <abs_path> --worktree-path <abs_path>
+
+Purpose:
+  - consume recorded worker verification metadata during cleanup/retirement
+  - resolve the canonical owner issue bound to the worktree
+  - reuse pretests-gate before a merged clean worktree is retired
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --project) PROJECT="$2"; shift 2 ;;
+    --worktree-path) WORKTREE_PATH="$2"; shift 2 ;;
+    -h|--help) usage; exit 0 ;;
+    *)
+      echo "unknown arg: $1" >&2
+      usage >&2
+      exit 1
+      ;;
+  esac
+done
+
+[[ -d "$PROJECT" ]] || { echo "project not found: $PROJECT" >&2; exit 1; }
+[[ -n "$WORKTREE_PATH" ]] || { echo "missing --worktree-path" >&2; exit 1; }
+[[ -d "$WORKTREE_PATH" ]] || { echo "worktree not found: $WORKTREE_PATH" >&2; exit 1; }
+
+python3 - "$PROJECT" "$WORKTREE_PATH" "$RUNTIME_ROOT" <<'PY'
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+project = Path(sys.argv[1]).resolve()
+worktree = Path(sys.argv[2]).resolve()
+runtime_root = Path(sys.argv[3]).resolve()
+state_file = worktree / ".freely" / "run" / "workcell-state.env"
+pretests_gate = project / "bin" / "pretests-gate"
+if not pretests_gate.exists():
+    pretests_gate = runtime_root / "bin" / "pretests-gate"
+
+
+def parse_env(path: Path) -> dict[str, str]:
+    data: dict[str, str] = {}
+    if not path.exists():
+        return data
+    for raw in path.read_text().splitlines():
+        line = raw.strip()
+        if not line or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        data[key] = value.strip().strip('"')
+    return data
+
+
+def resolve_issue_path(issue_ref: str) -> tuple[str, str]:
+    if not issue_ref:
+        return "", "missing"
+    issue_root = project / "docs" / "epics"
+    if not issue_root.exists():
+        return "", "missing_issue_root"
+    candidate_path = project / issue_ref
+    if issue_ref.startswith("docs/epics/") and candidate_path.exists():
+        return issue_ref, ""
+    pattern = re.compile(rf"^- issue_id:\s*`?{re.escape(issue_ref)}`?\s*$", re.MULTILINE)
+    matches: list[str] = []
+    for issue_file in issue_root.glob("**/issues/*.md"):
+        try:
+            text = issue_file.read_text()
+        except OSError:
+            continue
+        if pattern.search(text):
+            matches.append(issue_file.relative_to(project).as_posix())
+    if not matches:
+        return "", "missing"
+    if len(matches) > 1:
+        return "", "ambiguous:" + ",".join(sorted(matches))
+    return matches[0], ""
+
+
+env = parse_env(state_file)
+owner_issue = env.get("LAST_WORKER_OWNER_ISSUE", "")
+recorded_pre_tests = env.get("LAST_WORKER_PRE_TESTS_PATH", "")
+closeout_gate = env.get("LAST_WORKER_CLOSEOUT_GATE", "")
+closeout_gate_command = env.get("LAST_WORKER_CLOSEOUT_GATE_COMMAND", "")
+closeout_target_lane = env.get("LAST_WORKER_CLOSEOUT_TARGET_LANE", "")
+closeout_promotion_gate = env.get("LAST_WORKER_CLOSEOUT_PROMOTION_GATE", "")
+closeout_requires_adequacy = env.get("LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY", "").lower()
+closeout_review_artifact_policy = env.get("LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY", "")
+
+if not pretests_gate.exists():
+    print(f"[pretests_retirement_missing] missing gate: {pretests_gate}", file=sys.stderr)
+    sys.exit(1)
+if not state_file.exists():
+    print(f"[pretests_retirement_state_missing] missing worker state: {state_file}", file=sys.stderr)
+    sys.exit(1)
+if not owner_issue and not recorded_pre_tests and not closeout_gate and not closeout_gate_command:
+    print("[pretests_retirement_binding_missing] worker state does not record owner issue, pre-tests path, or closeout context", file=sys.stderr)
+    sys.exit(1)
+if not owner_issue:
+    print("[pretests_retirement_binding_missing] worktree recorded cleanup state but owner issue is missing", file=sys.stderr)
+    sys.exit(1)
+if not recorded_pre_tests:
+    print("[pretests_retirement_binding_missing] worktree recorded cleanup state but pre-tests path is missing", file=sys.stderr)
+    sys.exit(1)
+
+missing_closeout_fields: list[str] = []
+if not closeout_gate_command:
+    missing_closeout_fields.append("closeout_gate_command")
+if not closeout_requires_adequacy:
+    missing_closeout_fields.append("closeout_requires_adequacy")
+if not closeout_review_artifact_policy:
+    missing_closeout_fields.append("closeout_review_artifact_policy")
+
+require_adequacy = closeout_requires_adequacy == "true"
+if closeout_requires_adequacy not in ("true", "false", ""):
+    missing_closeout_fields.append("closeout_requires_adequacy")
+if require_adequacy and not closeout_target_lane:
+    missing_closeout_fields.append("closeout_target_lane")
+if require_adequacy and not closeout_promotion_gate:
+    missing_closeout_fields.append("closeout_promotion_gate")
+
+if missing_closeout_fields:
+    legacy_hint = ""
+    if closeout_gate and not closeout_gate_command:
+        legacy_hint = f" legacy_closeout_gate={closeout_gate}"
+    print(
+        "[pretests_retirement_closeout_context_missing] worktree cleanup snapshot is missing structured closeout fields: "
+        + ",".join(missing_closeout_fields)
+        + legacy_hint,
+        file=sys.stderr,
+    )
+    sys.exit(1)
+
+issue_path, issue_error = resolve_issue_path(owner_issue)
+if not issue_path:
+    if issue_error.startswith("ambiguous:"):
+        print(
+            f"[pretests_retirement_issue_ambiguous] owner issue {owner_issue} matched multiple issue docs: {issue_error.split(':', 1)[1]}",
+            file=sys.stderr,
+        )
+    else:
+        print(f"[pretests_retirement_issue_missing] cannot resolve issue path for recorded owner issue {owner_issue}", file=sys.stderr)
+    sys.exit(1)
+
+cmd = [str(pretests_gate), "--project", str(project), "--issue", issue_path]
+if require_adequacy:
+    cmd.append("--require-adequacy")
+    cmd.extend(["--target-lane", closeout_target_lane, "--promotion-gate", closeout_promotion_gate])
+
+result = subprocess.run(cmd, text=True, capture_output=True)
+if result.returncode == 0:
+    sys.exit(0)
+
+combined_output = f"{result.stdout}\n{result.stderr}"
+if require_adequacy:
+    unsupported_markers = (
+        "unknown arg: --require-adequacy",
+        "unrecognized arguments: --require-adequacy",
+        "unsupported option --require-adequacy",
+    )
+    if any(marker in combined_output for marker in unsupported_markers):
+        print(
+            f"[pretests_retirement_adequacy_unsupported] recorded closeout gate requires --require-adequacy but {pretests_gate} does not support it",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+for line in combined_output.splitlines():
+    line = line.strip()
+    if not line:
+        continue
+    if line.startswith("[pretests-gate]"):
+        continue
+    print(line, file=sys.stderr)
+sys.exit(result.returncode)
+PY

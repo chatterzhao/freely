@@ -1,0 +1,442 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-interruption-routing.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+FREELY_HOME="$TMP_DIR/freely-home"
+HANDLER_FIXTURE="$TMP_DIR/interruption-handler-fixture"
+HANDLER_STDERR_DECISION_FIXTURE="$TMP_DIR/interruption-handler-stderr-decision-fixture"
+HANDLER_FAIL_FIXTURE="$TMP_DIR/interruption-handler-fail-fixture"
+HANDLER_TIMEOUT_FIXTURE="$TMP_DIR/interruption-handler-timeout-fixture"
+CLEANUP_WT="$TMP_DIR/cleanup-wt"
+CLEANUP_WT_2="$TMP_DIR/cleanup-wt-2"
+DIRTY_WT="$TMP_DIR/dirty-wt"
+REMOTE_REPO="$TMP_DIR/remote.git"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260320-0000--sample"
+
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name "Freely Test"
+git -C "$PROJECT" config user.email "freely@example.com"
+mkdir -p "$PROJECT/.githooks"
+cat >"$PROJECT/.githooks/pre-commit" <<'EOF'
+#!/usr/bin/env bash
+exit 0
+EOF
+chmod +x "$PROJECT/.githooks/pre-commit"
+
+cat >"$PROJECT/.gitignore" <<'EOF'
+.freely/
+EOF
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260320-0000--sample
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260320-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260320-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m "init"
+git init -q --bare "$REMOTE_REPO"
+git -C "$PROJECT" remote add origin "$REMOTE_REPO"
+git -C "$PROJECT" push -q -u origin develop
+
+cat >"$HANDLER_FIXTURE" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+project=""
+intake_id=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --project) project="${2:-}"; shift 2 ;;
+    --intake-id) intake_id="${2:-}"; shift 2 ;;
+    *) shift ;;
+  esac
+done
+message="$(cat "$project/.freely/intake/$intake_id/message.txt")"
+if [[ "$message" == *后台* ]]; then
+  cat <<'OUT'
+DECISION=answer
+REACTION=followup
+CLASSIFICATION=control
+RESTART_POINT=runtime
+OWNERSHIP=manager
+WHY=这是主管监督面需要先做澄清的问题
+HANDOFF=
+ANSWER=主管先回答当前后台 AI 进程状态
+OUT
+elif [[ "$message" == *worktree* && "$message" == *收口* ]]; then
+  cat <<'OUT'
+DECISION=delegate
+REACTION=followup
+CLASSIFICATION=control
+RESTART_POINT=cleanup
+OWNERSHIP=worker
+WHY=这涉及实际收口动作，需要委派清理
+HANDOFF=检查 merged worktree 是否满足 cleanup 生命周期并执行收口
+ANSWER=
+OUT
+elif [[ "$message" == *主管* && "$message" == *milestones* && "$message" == *issues* && "$message" == *intake* && "$message" == *runtime* ]]; then
+  cat <<'OUT'
+DECISION=delegate
+REACTION=followup
+CLASSIFICATION=control
+RESTART_POINT=continuation
+OWNERSHIP=manager
+WHY=这是新的项目级主管巡检任务，应回到主管主循环做 patrol 与 restart-point routing
+HANDOFF=下一轮主管主循环先做 live-status 和 fleet-status 巡检再决定委派
+ANSWER=
+OUT
+elif [[ "$message" == *continue-current-issue* ]]; then
+  cat <<'OUT'
+DECISION=delegate
+REACTION=followup
+CLASSIFICATION=continuation
+RESTART_POINT=continuation
+OWNERSHIP=worker
+WHY=这条信号应回到当前工位继续推进 active issue
+HANDOFF=围绕当前工位 active issue 继续推进，不要停留在旧 prompt
+ANSWER=
+OUT
+else
+  cat <<'OUT'
+DECISION=delegate
+REACTION=followup
+CLASSIFICATION=discovery
+RESTART_POINT=pre_brainstorm
+OWNERSHIP=worker
+WHY=这件事需要先进入预研收敛
+HANDOFF=进入 pre-brainstorm 分析并产出候选 issue
+ANSWER=
+OUT
+fi
+EOF
+chmod +x "$HANDLER_FIXTURE"
+
+cat >"$HANDLER_STDERR_DECISION_FIXTURE" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+echo "warning: diagnostic stderr that should not void a valid decision" >&2
+cat <<'OUT'
+DECISION=answer
+REACTION=followup
+CLASSIFICATION=control
+RESTART_POINT=runtime
+OWNERSHIP=manager
+WHY=stderr noise should not discard a valid structured answer
+HANDOFF=
+ANSWER=stderr 和有效决策同时存在时，仍应采纳结构化决定
+OUT
+EOF
+chmod +x "$HANDLER_STDERR_DECISION_FIXTURE"
+
+cat >"$HANDLER_FAIL_FIXTURE" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+exit 1
+EOF
+chmod +x "$HANDLER_FAIL_FIXTURE"
+
+cat >"$HANDLER_TIMEOUT_FIXTURE" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+sleep 5
+cat <<'OUT'
+DECISION=delegate
+REACTION=followup
+CLASSIFICATION=discovery
+RESTART_POINT=pre_brainstorm
+OWNERSHIP=worker
+WHY=timeout fixture
+HANDOFF=should not be consumed
+ANSWER=
+OUT
+EOF
+chmod +x "$HANDLER_TIMEOUT_FIXTURE"
+
+cd "$PROJECT"
+FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init --intent "$PROJECT/docs/PROJECT_INTENT.md" --constitution "$PROJECT/docs/CONSTITUTION.md" --ai codex:gpt-5.4:auto --accept-default-autonomy >/dev/null
+
+git -C "$PROJECT" worktree add -q -b feature/cleanup-fixture "$CLEANUP_WT" develop
+git -C "$PROJECT" worktree add -q -b feature/cleanup-fixture-2 "$CLEANUP_WT_2" develop
+git -C "$PROJECT" worktree add -q -b feature/dirty-fixture "$DIRTY_WT" develop
+CLEANUP_WT_REAL="$(cd "$CLEANUP_WT" && pwd -P)"
+CLEANUP_WT_2_REAL="$(cd "$CLEANUP_WT_2" && pwd -P)"
+DIRTY_WT_REAL="$(cd "$DIRTY_WT" && pwd -P)"
+printf 'dirty\n' >"$DIRTY_WT/local-dirty.txt"
+git -C "$PROJECT" push -q -u origin feature/cleanup-fixture
+git -C "$PROJECT" push -q -u origin feature/cleanup-fixture-2
+git -C "$PROJECT" push -q -u origin feature/dirty-fixture
+
+cleanup_dispatcher() {
+  if [[ -f "$PROJECT/.freely/run/interruption-dispatch.pid" ]]; then
+    pid="$(cat "$PROJECT/.freely/run/interruption-dispatch.pid" 2>/dev/null || true)"
+    if [[ -n "${pid:-}" ]]; then
+      kill "$pid" 2>/dev/null || true
+      wait "$pid" 2>/dev/null || true
+    fi
+  fi
+}
+
+wait_for_grep() {
+  local pattern="$1" file="$2" attempts
+  for attempts in $(seq 1 60); do
+    if grep -q "$pattern" "$file" 2>/dev/null; then
+      return 0
+    fi
+    sleep 0.1
+  done
+  echo "[FAIL] pattern not observed after retry: $pattern in $file" >&2
+  [[ -f "$file" ]] && cat "$file" >&2
+  return 1
+}
+trap 'cleanup_dispatcher; rm -rf "$TMP_DIR"' EXIT
+
+CHAT_OUTPUT_ANSWER="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "看看后台AI进程都在做什么？")"
+INTAKE_ID_ANSWER="$(printf '%s\n' "$CHAT_OUTPUT_ANSWER" | sed -n 's/^intake_id: //p')"
+[[ -n "$INTAKE_ID_ANSWER" ]] || {
+  echo "[FAIL] missing answer intake id" >&2
+  exit 1
+}
+wait_for_grep '^STATUS="absorbed"$' ".freely/intake/$INTAKE_ID_ANSWER/meta.env"
+wait_for_grep '^CLASSIFICATION="control"$' ".freely/intake/$INTAKE_ID_ANSWER/meta.env"
+wait_for_grep '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_ANSWER/meta.env"
+wait_for_grep '主管先回答当前后台 AI 进程状态' ".freely/run/interruption-resolution/$INTAKE_ID_ANSWER/resolution.md"
+
+CHAT_OUTPUT_CLEANUP="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "检查已经合并到develop的worktree，应该怎么收口")"
+INTAKE_ID_CLEANUP="$(printf '%s\n' "$CHAT_OUTPUT_CLEANUP" | sed -n 's/^intake_id: //p')"
+[[ -n "$INTAKE_ID_CLEANUP" ]] || {
+  echo "[FAIL] missing cleanup intake id" >&2
+  exit 1
+}
+grep -q '^STATUS="delegated"$' ".freely/intake/$INTAKE_ID_CLEANUP/meta.env"
+grep -q '^CLASSIFICATION="control"$' ".freely/intake/$INTAKE_ID_CLEANUP/meta.env"
+grep -q '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_CLEANUP/meta.env"
+grep -q '^ABSORPTION_TARGET="handoff://cleanup"$' ".freely/intake/$INTAKE_ID_CLEANUP/meta.env"
+grep -q '^LINKED_ARTIFACT="pending://interruption-manager-delegation"$' ".freely/intake/$INTAKE_ID_CLEANUP/meta.env"
+grep -q 'restart_point: `cleanup`' ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
+grep -q 'ownership: `worker`' ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
+grep -q 'handoff_summary: 检查 merged worktree 是否满足 cleanup 生命周期并执行收口' ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"
+if grep -q 'worker_action: `cleanup-followthrough`' ".freely/run/interruption-resolution/$INTAKE_ID_CLEANUP/resolution.md"; then
+  echo "[FAIL] direct cleanup signals should hand off before cleanup followthrough absorption" >&2
+  exit 1
+fi
+[[ -d "$CLEANUP_WT" ]] || {
+  echo "[FAIL] cleanup worktree should still exist before delegated followthrough" >&2
+  exit 1
+}
+[[ -d "$CLEANUP_WT_2" ]] || {
+  echo "[FAIL] second cleanup worktree should still exist before delegated followthrough" >&2
+  exit 1
+}
+if ! git -C "$PROJECT" show-ref --verify --quiet refs/heads/feature/cleanup-fixture; then
+  echo "[FAIL] cleanup branch should still exist before delegated followthrough" >&2
+  exit 1
+fi
+if ! git -C "$PROJECT" show-ref --verify --quiet refs/heads/feature/cleanup-fixture-2; then
+  echo "[FAIL] second cleanup branch should still exist before delegated followthrough" >&2
+  exit 1
+fi
+if ! git --git-dir="$REMOTE_REPO" show-ref --verify --quiet refs/heads/feature/cleanup-fixture; then
+  echo "[FAIL] cleanup remote branch should still exist before delegated followthrough" >&2
+  exit 1
+fi
+if ! git --git-dir="$REMOTE_REPO" show-ref --verify --quiet refs/heads/feature/cleanup-fixture-2; then
+  echo "[FAIL] second cleanup remote branch should still exist before delegated followthrough" >&2
+  exit 1
+fi
+[[ -d "$DIRTY_WT" ]] || {
+  echo "[FAIL] dirty worktree should be retained" >&2
+  exit 1
+}
+if ! git -C "$PROJECT" show-ref --verify --quiet refs/heads/feature/dirty-fixture; then
+  echo "[FAIL] dirty branch should still exist" >&2
+  exit 1
+fi
+if ! git --git-dir="$REMOTE_REPO" show-ref --verify --quiet refs/heads/feature/dirty-fixture; then
+  echo "[FAIL] dirty remote branch should still exist" >&2
+  exit 1
+fi
+
+CHAT_OUTPUT_STDERR_DECISION="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_STDERR_DECISION_FIXTURE" bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "stderr fixture should still produce a valid structured answer")"
+INTAKE_ID_STDERR_DECISION="$(printf '%s\n' "$CHAT_OUTPUT_STDERR_DECISION" | sed -n 's/^intake_id: //p')"
+[[ -n "$INTAKE_ID_STDERR_DECISION" ]] || {
+  echo "[FAIL] missing stderr decision intake id" >&2
+  exit 1
+}
+wait_for_grep '^STATUS="absorbed"$' ".freely/intake/$INTAKE_ID_STDERR_DECISION/meta.env"
+wait_for_grep '^CLASSIFICATION="control"$' ".freely/intake/$INTAKE_ID_STDERR_DECISION/meta.env"
+wait_for_grep 'stderr 和有效决策同时存在时，仍应采纳结构化决定' ".freely/run/interruption-resolution/$INTAKE_ID_STDERR_DECISION/resolution.md"
+
+CHAT_OUTPUT_MANAGER="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "你现在是 develop 工位上的主管。先检查所有 worktree、milestones、issues、intake 与 runtime 状态，然后决定下一步该委派什么。")"
+INTAKE_ID_MANAGER="$(printf '%s\n' "$CHAT_OUTPUT_MANAGER" | sed -n 's/^intake_id: //p')"
+[[ -n "$INTAKE_ID_MANAGER" ]] || {
+  echo "[FAIL] missing manager intake id" >&2
+  exit 1
+}
+wait_for_grep '^STATUS="delegated"$' ".freely/intake/$INTAKE_ID_MANAGER/meta.env"
+wait_for_grep '^CLASSIFICATION="control"$' ".freely/intake/$INTAKE_ID_MANAGER/meta.env"
+wait_for_grep '^ABSORPTION_TARGET="handoff://continuation"$' ".freely/intake/$INTAKE_ID_MANAGER/meta.env"
+wait_for_grep '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_MANAGER/meta.env"
+wait_for_grep 'restart_point: `continuation`' ".freely/run/interruption-resolution/$INTAKE_ID_MANAGER/resolution.md"
+wait_for_grep 'ownership: `manager`' ".freely/run/interruption-resolution/$INTAKE_ID_MANAGER/resolution.md"
+LIVE_STATUS_MANAGER="$(FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" live-status --project "$PROJECT")"
+printf '%s\n' "$LIVE_STATUS_MANAGER" | grep -q "pending_delegated_continuation_ids: $INTAKE_ID_MANAGER"
+
+FREELY_HOME="$FREELY_HOME" bash "$ROOT_DIR/bin/freely" init --project "$DIRTY_WT" --intent "$PROJECT/docs/PROJECT_INTENT.md" --constitution "$PROJECT/docs/CONSTITUTION.md" --ai codex:gpt-5.4:auto --accept-default-autonomy >/dev/null
+python3 - "$DIRTY_WT/.freely/config.env" <<'PY'
+from pathlib import Path
+import sys
+cfg = Path(sys.argv[1])
+text = cfg.read_text()
+text = text.replace('AI_TOOL="codex"', 'AI_TOOL="test-sleep"', 1)
+cfg.write_text(text)
+PY
+FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" ensure-interruption-dispatch --project "$DIRTY_WT" --watch >/dev/null 2>&1 &
+WORKER_DISPATCH_PID=$!
+mkdir -p "$DIRTY_WT/.freely/run"
+cat >"$DIRTY_WT/.freely/run/session-state.env" <<'EOF'
+LAST_TOOL_SESSION_ID="codex-session-current"
+LAST_TOOL_RESUME_TARGET="codex-session-current"
+EOF
+CONT_PID="$(cd "$DIRTY_WT" && bash -lc 'sleep 30 >/dev/null 2>&1 & pid=$!; disown "$pid" 2>/dev/null || true; printf "%s\n" "$pid"')"
+echo "$CONT_PID" >"$DIRTY_WT/.freely/run/ai.pid"
+
+CHAT_OUTPUT_CONT="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat --project "$DIRTY_WT" "continue-current-issue")"
+INTAKE_ID_CONT="$(printf '%s\n' "$CHAT_OUTPUT_CONT" | sed -n 's/^intake_id: //p')"
+[[ -n "$INTAKE_ID_CONT" ]] || {
+  echo "[FAIL] missing continuation intake id" >&2
+  exit 1
+}
+wait_for_grep '^STATUS="delegated"$' "$DIRTY_WT/.freely/intake/$INTAKE_ID_CONT/meta.env"
+wait_for_grep '^CLASSIFICATION="continuation"$' "$DIRTY_WT/.freely/intake/$INTAKE_ID_CONT/meta.env"
+wait_for_grep '^ABSORPTION_TARGET="handoff://continuation"$' "$DIRTY_WT/.freely/intake/$INTAKE_ID_CONT/meta.env"
+wait_for_grep '^SESSION_REFS="\[tool=test-sleep,resume_target=codex-session-current,scope=workcell-current\]"$' "$DIRTY_WT/.freely/intake/$INTAKE_ID_CONT/meta.env"
+wait_for_grep 'restart_point: `continuation`' "$DIRTY_WT/.freely/run/interruption-resolution/$INTAKE_ID_CONT/resolution.md"
+sleep 1
+if kill -0 "$CONT_PID" 2>/dev/null; then
+  echo "[FAIL] delegated continuation should interrupt current ai pid for local re-entry" >&2
+  exit 1
+fi
+wait_for_grep '^LAST_PREEMPTION_MODE="graceful_term"$' "$DIRTY_WT/.freely/run/preemption-state.env"
+wait_for_grep '^LAST_PREEMPTION_REASON="local_continuation_reentry"$' "$DIRTY_WT/.freely/run/preemption-state.env"
+wait_for_grep "^LAST_PREEMPTION_INTAKE_ID=\"$INTAKE_ID_CONT\"$" "$DIRTY_WT/.freely/run/preemption-state.env"
+wait "$CONT_PID" 2>/dev/null || true
+kill "$WORKER_DISPATCH_PID" 2>/dev/null || true
+wait "$WORKER_DISPATCH_PID" 2>/dev/null || true
+
+CHAT_OUTPUT_DELEGATE="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "去重新设计一下 TUI 输入体验")"
+INTAKE_ID_DELEGATE="$(printf '%s\n' "$CHAT_OUTPUT_DELEGATE" | sed -n 's/^intake_id: //p')"
+[[ -n "$INTAKE_ID_DELEGATE" ]] || {
+  echo "[FAIL] missing delegate intake id" >&2
+  exit 1
+}
+wait_for_grep '^STATUS="delegated"$' ".freely/intake/$INTAKE_ID_DELEGATE/meta.env"
+wait_for_grep '^CLASSIFICATION="discovery"$' ".freely/intake/$INTAKE_ID_DELEGATE/meta.env"
+wait_for_grep '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_DELEGATE/meta.env"
+wait_for_grep '^ABSORPTION_TARGET="handoff://pre_brainstorm"$' ".freely/intake/$INTAKE_ID_DELEGATE/meta.env"
+wait_for_grep 'restart_point: `pre_brainstorm`' ".freely/run/interruption-resolution/$INTAKE_ID_DELEGATE/resolution.md"
+wait_for_grep 'handoff_summary: 进入 pre-brainstorm 分析并产出候选 issue' ".freely/run/interruption-resolution/$INTAKE_ID_DELEGATE/resolution.md"
+
+cleanup_dispatcher
+CHAT_OUTPUT_RETRY="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FAIL_FIXTURE" bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "检查worktree")"
+INTAKE_ID_RETRY="$(printf '%s\n' "$CHAT_OUTPUT_RETRY" | sed -n 's/^intake_id: //p')"
+[[ -n "$INTAKE_ID_RETRY" ]] || {
+  echo "[FAIL] missing retry intake id" >&2
+  exit 1
+}
+wait_for_grep '^STATUS="new"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+wait_for_grep '^CLASSIFICATION=""$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+wait_for_grep '^CLAIMED_BY=""$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+wait_for_grep '^LINKED_ARTIFACT="pending://unclassified"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+wait_for_grep '^RESOLUTION_ARTIFACT=""$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+wait_for_grep '^CREATED_AT="' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+
+CREATED_AT_RETRY="$(awk -F '\"' '/^CREATED_AT=/{print $2; exit}' ".freely/intake/$INTAKE_ID_RETRY/meta.env")"
+[[ -n "$CREATED_AT_RETRY" ]] || {
+  echo "[FAIL] missing retry created_at" >&2
+  exit 1
+}
+
+FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" ensure-interruption-dispatch --project "$PROJECT" >/dev/null
+wait_for_grep '^STATUS="delegated"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+wait_for_grep '^CLASSIFICATION="discovery"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+wait_for_grep '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+wait_for_grep '^ABSORPTION_TARGET="handoff://pre_brainstorm"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+wait_for_grep '^CREATED_AT="'"$CREATED_AT_RETRY"'"$' ".freely/intake/$INTAKE_ID_RETRY/meta.env"
+
+CHAT_OUTPUT_TIMEOUT="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_TIMEOUT_FIXTURE" FREELY_INTERRUPTION_HANDLER_TIMEOUT_SECS=1 bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "超时 fixture")"
+INTAKE_ID_TIMEOUT="$(printf '%s\n' "$CHAT_OUTPUT_TIMEOUT" | sed -n 's/^intake_id: //p')"
+[[ -n "$INTAKE_ID_TIMEOUT" ]] || {
+  echo "[FAIL] missing timeout intake id" >&2
+  exit 1
+}
+wait_for_grep '^STATUS="new"$' ".freely/intake/$INTAKE_ID_TIMEOUT/meta.env"
+wait_for_grep '^CLASSIFICATION=""$' ".freely/intake/$INTAKE_ID_TIMEOUT/meta.env"
+wait_for_grep '^CLAIMED_BY=""$' ".freely/intake/$INTAKE_ID_TIMEOUT/meta.env"
+wait_for_grep '^LINKED_ARTIFACT="pending://unclassified"$' ".freely/intake/$INTAKE_ID_TIMEOUT/meta.env"
+wait_for_grep '^RESOLUTION_ARTIFACT=""$' ".freely/intake/$INTAKE_ID_TIMEOUT/meta.env"
+
+CHAT_OUTPUT_STALE="$(FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" chat --project "$PROJECT" "检查已经合并到develop的worktree，应该怎么收口")"
+INTAKE_ID_STALE="$(printf '%s\n' "$CHAT_OUTPUT_STALE" | sed -n 's/^intake_id: //p')"
+[[ -n "$INTAKE_ID_STALE" ]] || {
+  echo "[FAIL] missing stale intake id" >&2
+  exit 1
+}
+bash "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely" intake claim --project "$PROJECT" --intake-id "$INTAKE_ID_STALE" --claimed-by interruption-manager-agent --reaction followup --linked-artifact pending://interruption-manager-triage >/dev/null
+perl -0pi -e 's/CLAIMED_AT=\"[^\"]+\"/CLAIMED_AT=\"2026-03-20T00:00:05Z\"/' ".freely/intake/$INTAKE_ID_STALE/meta.env"
+wait_for_grep '^STATUS="classified"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
+wait_for_grep '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
+wait_for_grep '^LINKED_ARTIFACT="pending://interruption-manager-triage"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
+
+FREELY_HOME="$FREELY_HOME" FREELY_INTERRUPTION_HANDLER_BIN="$HANDLER_FIXTURE" bash "$ROOT_DIR/bin/freely" ensure-interruption-dispatch --project "$PROJECT" >/dev/null
+grep -q '^STATUS="delegated"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
+grep -q '^CLASSIFICATION="control"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
+grep -q '^CLAIMED_BY="interruption-manager-agent"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
+grep -q '^ABSORPTION_TARGET="handoff://cleanup"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
+grep -q '^LINKED_ARTIFACT="pending://interruption-manager-delegation"$' ".freely/intake/$INTAKE_ID_STALE/meta.env"
+grep -q 'restart_point: `cleanup`' ".freely/run/interruption-resolution/$INTAKE_ID_STALE/resolution.md"
+grep -q 'ownership: `worker`' ".freely/run/interruption-resolution/$INTAKE_ID_STALE/resolution.md"
+if grep -q 'worker_action: `cleanup-followthrough`' ".freely/run/interruption-resolution/$INTAKE_ID_STALE/resolution.md"; then
+  echo "[FAIL] cleanup signals should hand off before cleanup followthrough absorption" >&2
+  exit 1
+fi
+
+echo "[PASS] interruption manager routes abstract answer, cleanup handoff, delegated handoff, retries cleanly after handler failure, and recovers cleanup signals as handoffs instead of direct cleanup absorption"

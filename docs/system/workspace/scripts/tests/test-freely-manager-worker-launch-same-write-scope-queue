@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-worker-same-write-scope.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/freely"
+WT_ROOT="$TMP_DIR/freely-worktrees"
+WORKER="$WT_ROOT/feature-worker"
+
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs" "$WT_ROOT"
+cd "$PROJECT"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add README.md
+git commit -q -m init
+git branch feature/worker
+git worktree add "$WORKER" feature/worker >/dev/null
+
+mkdir -p "$WORKER/.freely/run" "$WORKER/.freely/logs"
+
+PROMPT_A="$PROJECT/.freely/run/worker-prompts/20260402-120001-worker-edit-a-codex.txt"
+cat >"$PROMPT_A" <<EOF
+Dispatch metadata:
+- dispatch_priority: P0
+- parallel_safe: true
+- write_scope: $WORKER
+- intent_kind: edit
+- intent_target: \`$WORKER\`
+
+Branch:
+- \`feature/worker\`
+
+Worktree:
+- \`$WORKER\`
+EOF
+
+PROMPT_B="$PROJECT/.freely/run/worker-prompts/20260402-120002-worker-edit-b-codex.txt"
+cat >"$PROMPT_B" <<EOF
+Dispatch metadata:
+- dispatch_priority: P1
+- parallel_safe: true
+- write_scope: $WORKER
+- intent_kind: edit
+- intent_target: \`$WORKER\`
+
+Branch:
+- \`feature/worker\`
+
+Worktree:
+- \`$WORKER\`
+EOF
+
+CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260402-120000.md"
+cat >"$CONTINUITY" <<EOF
+# Manager Continuity
+- worker_prompt: \`$PROMPT_A\`
+- worker_prompt: \`$PROMPT_B\`
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+LAUNCH_LOG="$TMP_DIR/launch.log"
+launch_worker_from_manager_prompt_if_needed() {
+  local _manager_project="$1" prompt_file="$2"
+  basename "$prompt_file" >>"$LAUNCH_LOG"
+  return 0
+}
+
+COUNT="$(FREELY_MANAGER_MAX_PARALLEL_WORKERS=3 manager_runtime_launch_workers_from_latest_handoff "$PROJECT")"
+[[ "$COUNT" == "1" ]]
+[[ "$(cat "$LAUNCH_LOG")" == "$(basename "$PROMPT_A")" ]]
+
+# shellcheck disable=SC1090
+source "$PROJECT/.freely/run/manager-worker-launch-state.env"
+[[ "${LAST_MANAGER_WORKER_PROMPTS_CONSUMED:-}" == "$PROMPT_A" ]]
+[[ "${QUEUED_WORKER_PROMPTS:-}" == "$PROMPT_B" ]]
+
+echo "[PASS] same-write-scope worker prompts queue the later edit lane instead of launching both"

@@ -1,0 +1,115 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-launch-state-writeback.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+WT_ROOT="$TMP_DIR/project-worktrees"
+ACTIVE_WT="$WT_ROOT/feature-active"
+MISSING_WT="$WT_ROOT/feature-missing"
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs" "$PROJECT/docs/pre-brainstorms/20260419-0000--sample" "$WT_ROOT"
+
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name "Freely Test"
+git -C "$PROJECT" config user.email "freely@example.com"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260419-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260419-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260419-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m "init"
+git -C "$PROJECT" branch feature/active
+git -C "$PROJECT" worktree add "$ACTIVE_WT" feature/active >/dev/null
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+ACTIVE_PROMPT="$PROJECT/.freely/run/worker-prompts/20260419-active-worker-codex.txt"
+cat >"$ACTIVE_PROMPT" <<EOF
+Worktree:
+- \`$ACTIVE_WT\`
+Branch:
+- \`feature/active\`
+EOF
+
+STALE_CONT="$PROJECT/.freely/run/manager-continuity-20260419-000001-stale.md"
+FRESH_CONT="$PROJECT/.freely/run/manager-continuity-20260419-000002-fresh.md"
+cat >"$STALE_CONT" <<EOF
+# Manager Continuity
+
+## Fleet Inventory
+- path: \`$MISSING_WT\`
+  - ownership: \`cleanup_queue\`
+EOF
+cat >"$FRESH_CONT" <<EOF
+# Manager Continuity
+
+## Queue
+- lane: \`dispatchable\`
+  - prompt_path: \`$ACTIVE_PROMPT\`
+EOF
+
+cat >"$PROJECT/.freely/run/manager-worker-launch-state.env" <<EOF
+LAST_MANAGER_CONTINUITY_GENERATED="$FRESH_CONT"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED="$ACTIVE_PROMPT"
+LAST_MANAGER_CONTINUITY_CONSUMED="$STALE_CONT"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED="$ACTIVE_PROMPT"
+LAUNCHED_WORKER_PROMPTS="$ACTIVE_PROMPT"
+QUEUED_WORKER_PROMPTS=""
+MAX_PARALLEL_WORKERS="unbounded"
+ACTIVE_RUNNING_WORKER_COUNT="0"
+AVAILABLE_NEW_WORKER_SLOTS="unbounded"
+UPDATED_AT="2026-04-19T00:00:00Z"
+EOF
+
+OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    load_config "'"$PROJECT"'"
+    manager_worker_launch_state_refresh_for_status "'"$PROJECT"'"
+    cat "'"$PROJECT"'/.freely/run/manager-worker-launch-state.env"
+  '
+)"
+
+grep -q "^LAST_MANAGER_CONTINUITY_CONSUMED=\"$FRESH_CONT\"$" <<<"$OUTPUT"
+grep -q "^LAST_MANAGER_WORKER_PROMPTS_CONSUMED=\"$ACTIVE_PROMPT\"$" <<<"$OUTPUT"
+grep -q "^UPDATED_AT=" <<<"$OUTPUT"
+
+echo "[PASS] launch-state refresh persists stale continuity rewrite even without capacity changes"

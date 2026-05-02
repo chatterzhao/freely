@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TEST_TMP="$(mktemp -d /tmp/freely-cli-help-contracts.XXXXXX)"
+trap 'rm -rf "$TEST_TMP"' EXIT
+
+REPO="$TEST_TMP/repo"
+mkdir -p "$REPO/bin" "$REPO/docs/system/workspace/scripts/worktree"
+cd "$REPO"
+
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add README.md
+git commit -q -m "init"
+
+cp "$ROOT_DIR/bin/wt-create" "$ROOT_DIR/bin/wt-enter" "$ROOT_DIR/bin/wt-add" "$ROOT_DIR/bin/worktree-common.sh" "$REPO/bin/"
+cp "$ROOT_DIR/docs/system/workspace/scripts/worktree/wt-create" \
+  "$ROOT_DIR/docs/system/workspace/scripts/worktree/wt-enter" \
+  "$ROOT_DIR/docs/system/workspace/scripts/worktree/wt-add" \
+  "$ROOT_DIR/docs/system/workspace/scripts/worktree/worktree-common.sh" \
+  "$REPO/docs/system/workspace/scripts/worktree/"
+chmod +x "$REPO/bin/"* "$REPO/docs/system/workspace/scripts/worktree/"*
+
+before_branch_count="$(git for-each-ref refs/heads --format='%(refname:short)' | wc -l | tr -d ' ')"
+before_worktree_count="$(git worktree list --porcelain | awk '/^worktree / {count++} END {print count+0}')"
+
+"$REPO/bin/wt-create" --help >"$TEST_TMP/wt-create.out" 2>"$TEST_TMP/wt-create.err"
+grep -q 'Usage:' "$TEST_TMP/wt-create.out"
+[[ ! -s "$TEST_TMP/wt-create.err" ]]
+
+after_branch_count="$(git for-each-ref refs/heads --format='%(refname:short)' | wc -l | tr -d ' ')"
+after_worktree_count="$(git worktree list --porcelain | awk '/^worktree / {count++} END {print count+0}')"
+[[ "$before_branch_count" == "$after_branch_count" ]]
+[[ "$before_worktree_count" == "$after_worktree_count" ]]
+
+"$REPO/bin/wt-enter" --help >"$TEST_TMP/wt-enter-direct.out" 2>"$TEST_TMP/wt-enter-direct.err"
+grep -q 'source bin/wt-enter <branch>' "$TEST_TMP/wt-enter-direct.out"
+[[ ! -s "$TEST_TMP/wt-enter-direct.err" ]]
+
+"$REPO/bin/wt-add" --help >"$TEST_TMP/wt-add-direct.out" 2>"$TEST_TMP/wt-add-direct.err"
+grep -q 'source bin/wt-add \[branch\] -- <git-add-args>' "$TEST_TMP/wt-add-direct.out"
+[[ ! -s "$TEST_TMP/wt-add-direct.err" ]]
+
+bash -lc 'cd "$1"; source ./bin/wt-enter --help' _ "$REPO" >"$TEST_TMP/wt-enter-source.out" 2>"$TEST_TMP/wt-enter-source.err"
+grep -q 'source bin/wt-enter <branch>' "$TEST_TMP/wt-enter-source.out"
+[[ ! -s "$TEST_TMP/wt-enter-source.err" ]]
+
+bash -lc 'cd "$1"; source ./bin/wt-add --help' _ "$REPO" >"$TEST_TMP/wt-add-source.out" 2>"$TEST_TMP/wt-add-source.err"
+grep -q 'source bin/wt-add \[branch\] -- <git-add-args>' "$TEST_TMP/wt-add-source.out"
+[[ ! -s "$TEST_TMP/wt-add-source.err" ]]
+
+"$ROOT_DIR/bin/merge-guarded" --help >"$TEST_TMP/merge-guarded.out" 2>"$TEST_TMP/merge-guarded.err"
+grep -q 'Usage:' "$TEST_TMP/merge-guarded.out"
+[[ ! -s "$TEST_TMP/merge-guarded.err" ]]
+
+"$ROOT_DIR/bin/freely" --help >"$TEST_TMP/freely.out" 2>"$TEST_TMP/freely.err"
+grep -q '^Usage:' "$TEST_TMP/freely.out"
+if grep -q '\[ERROR\] unknown command' "$TEST_TMP/freely.err"; then
+  echo "[FAIL] freely --help should not report unknown command" >&2
+  exit 1
+fi
+
+echo "[PASS] CLI help commands are explicit, side-effect free, and success-returning"

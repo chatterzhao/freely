@@ -1,0 +1,191 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<USAGE
+Usage:
+  ./bin/wt-create <branch> [--base <base-branch>]
+
+Examples:
+  ./bin/wt-create feature/my-task-20260307 --base develop
+  ./bin/wt-create feature/my-child-task-20260307 --base feature/my-parent-task-20260307
+USAGE
+}
+
+if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+  usage
+  exit 0
+fi
+
+branch="${1:-}"
+[[ -n "$branch" ]] || { usage; exit 1; }
+shift || true
+
+base="develop"
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --base)
+      base="${2:-}"
+      [[ -n "$base" ]] || { echo "Missing value for --base" >&2; exit 1; }
+      shift 2
+      ;;
+    *)
+      echo "Unknown argument: $1" >&2
+      usage
+      exit 1
+      ;;
+  esac
+done
+
+ROOT_DIR="$(git rev-parse --show-toplevel)"
+cd "$ROOT_DIR"
+
+source "$ROOT_DIR/bin/worktree-common.sh"
+freely_wt_assert_strict_root
+
+if git show-ref --verify --quiet "refs/heads/$branch"; then
+  echo "Branch already exists: $branch" >&2
+  exit 1
+fi
+
+if ! git show-ref --verify --quiet "refs/heads/$base" && ! git rev-parse --verify --quiet "$base" >/dev/null; then
+  echo "Base branch/ref not found: $base" >&2
+  exit 1
+fi
+
+# ── Issue pre-check: every worktree must correspond to an issue ──
+_extract_issue_key() {
+  local branch="$1"
+  if echo "$branch" | grep -qoE 'raw-[0-9]{14}'; then
+    echo "$branch" | grep -oE 'raw-[0-9]{14}' | head -1
+    return 0
+  fi
+  if echo "$branch" | grep -qoE 'I-[0-9]{8}-[0-9]{4}-[A-Z]'; then
+    echo "$branch" | grep -oE 'I-[0-9]{8}-[0-9]{4}-[A-Z]' | head -1
+    return 0
+  fi
+  return 1
+}
+
+_require_issue_exists() {
+  local branch="$1"
+  local key ts db_path chat_inbox_py
+  key="$(_extract_issue_key "$branch")"
+  [[ -n "$key" ]] || return 0
+
+  db_path="$ROOT_DIR/.freely/chat-inbox.db"
+  chat_inbox_py="$ROOT_DIR/docs/system/workspace/scripts/runtime/chat-inbox.py"
+
+  case "$key" in
+    raw-*)
+      ts="${key#raw-}"
+      # 1. DB consumed=0 (pending)
+      if [[ -f "$db_path" ]] && python3 "$chat_inbox_py" show --db "$db_path" --id "$ts" >/dev/null 2>&1; then
+        local consumed
+        consumed=$(python3 -c "
+import sqlite3
+conn=sqlite3.connect('$db_path')
+r=conn.execute('SELECT consumed FROM chats WHERE id=$ts').fetchone()
+print(r[0] if r else '')
+conn.close()
+" 2>/dev/null || echo "")
+        if [[ "$consumed" == "0" ]]; then
+          return 0
+        fi
+        if [[ "$consumed" == "1" ]]; then
+          if [[ -d "$ROOT_DIR/docs/issues/$key" ]]; then
+            return 0
+          fi
+          echo "警告: chat $key 已标记消费但 issue 缺失，重置为待处理" >&2
+          python3 "$chat_inbox_py" reset --db "$db_path" --id "$ts" >/dev/null 2>&1 || true
+          return 0
+        fi
+      fi
+      # 2. docs/issues/
+      if [[ -d "$ROOT_DIR/docs/issues/$key" ]]; then
+        return 0
+      fi
+      ;;
+    I-*)
+      if [[ -d "$ROOT_DIR/docs/issues/$key" ]]; then
+        return 0
+      fi
+      ;;
+  esac
+
+  echo "拒绝创建工位: 未找到 issue $key" >&2
+  echo "  chat-inbox.db: $( [[ -f "$db_path" ]] && python3 "$chat_inbox_py" show --db "$db_path" --id "$ts" 2>&1 || echo '无' )" >&2
+  echo "  docs/issues/$key: $( [[ -d "$ROOT_DIR/docs/issues/$key" ]] && echo '存在' || echo '无' )" >&2
+  return 1
+}
+
+_materialize_chat_if_needed() {
+  local branch="$1" target_path="$2"
+  local key ts db_path chat_inbox_py
+  key="$(_extract_issue_key "$branch")"
+  [[ "$key" == raw-* ]] || return 0
+  ts="${key#raw-}"
+
+  db_path="$ROOT_DIR/.freely/chat-inbox.db"
+  chat_inbox_py="$ROOT_DIR/docs/system/workspace/scripts/runtime/chat-inbox.py"
+  [[ -f "$db_path" ]] || return 0
+
+  # Check if pending chat exists
+  local consumed
+  consumed=$(python3 -c "
+import sqlite3
+conn=sqlite3.connect('$db_path')
+r=conn.execute('SELECT consumed FROM chats WHERE id=$ts AND chat_type=\"new-issue\"').fetchone()
+print(r[0] if r else '')
+conn.close()
+" 2>/dev/null || echo "")
+
+  if [[ "$consumed" != "0" ]]; then
+    return 0
+  fi
+
+  local issue_dir="$target_path/docs/issues/$key"
+  mkdir -p "$issue_dir"
+
+  if ! python3 "$chat_inbox_py" materialize --db "$db_path" --id "$ts" --target "$issue_dir" >/dev/null 2>&1; then
+    echo "materialize 失败，回滚工位" >&2
+    git -C "$ROOT_DIR" worktree remove "$target_path" --force 2>/dev/null || true
+    git -C "$ROOT_DIR" branch -D "$branch" 2>/dev/null || true
+    return 1
+  fi
+
+  python3 "$chat_inbox_py" consume --db "$db_path" --id "$ts" --materialized-as "$key" >/dev/null 2>&1
+  echo "materialized: chat-inbox → $issue_dir/issue.md"
+
+  # Also materialize pending comments for this issue
+  python3 "$chat_inbox_py" query-by-issue --db "$db_path" --issue-id "$key" --consumed 0 2>/dev/null \
+    | while read -r line; do
+        local comment_id
+        comment_id=$(echo "$line" | cut -f1)
+        [[ -n "$comment_id" ]] || continue
+        python3 "$chat_inbox_py" materialize-comment --db "$db_path" --id "$comment_id" \
+          --issue-file "$issue_dir/issue.md" >/dev/null 2>&1 \
+          && python3 "$chat_inbox_py" consume --db "$db_path" --id "$comment_id" >/dev/null 2>&1
+      done
+}
+
+_require_issue_exists "$branch" || exit 1
+
+target_path="$(freely_wt_resolve_target_path "$branch")"
+mkdir -p "$(freely_wt_root_dir)"
+git worktree add -b "$branch" "$target_path" "$base"
+_materialize_chat_if_needed "$branch" "$target_path" || exit 1
+if [[ -x "$ROOT_DIR/bin/freely" ]]; then
+  FREELY_WT_AUTOCREATE_INTERNAL=1 bash "$ROOT_DIR/bin/freely" sync-tooling --source-project "$ROOT_DIR" --project "$target_path" >/dev/null 2>&1 || true
+fi
+
+cat <<MSG
+Created worktree:
+  $target_path
+Branch:
+  $branch
+Execution base:
+  $base
+Next:
+  cd "$target_path"
+MSG

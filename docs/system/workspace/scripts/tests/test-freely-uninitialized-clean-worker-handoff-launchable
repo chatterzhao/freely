@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-uninitialized-clean-worker-launchable.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+WORKTREE_ROOT="$TMP_DIR/project-worktrees"
+WORKER="$WORKTREE_ROOT/feature-clean-bootstrap-worker"
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$WORKTREE_ROOT"
+
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name "Freely Test"
+git -C "$PROJECT" config user.email "freely@example.com"
+
+cat >"$PROJECT/README.md" <<'EOF'
+# Test
+EOF
+git -C "$PROJECT" add README.md
+git -C "$PROJECT" commit -q -m "init"
+
+git -C "$PROJECT" branch feature/test-worker
+git -C "$PROJECT" worktree add "$WORKER" feature/test-worker >/dev/null
+
+PROMPT="$PROJECT/.freely/run/worker-prompts/20260327-145324-worker-test-codex.txt"
+cat >"$PROMPT" <<EOF
+Worker prompt
+
+Worktree:
+- \`$WORKER\`
+
+Branch:
+- \`feature/test-worker\`
+EOF
+
+CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260327-145324.md"
+cat >"$CONTINUITY" <<EOF
+# Manager Continuity
+- worker_prompt: \`$PROMPT\`
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+if ! worker_prompt_launchable_for_manager_project "$PROJECT" "$PROMPT"; then
+  echo "[FAIL] uninitialized clean worker prompt should remain launchable" >&2
+  exit 1
+fi
+
+if [[ "$(latest_launchable_manager_continuity_file_for_project "$PROJECT")" != "$CONTINUITY" ]]; then
+  echo "[FAIL] uninitialized clean worker continuity should be selected for launch" >&2
+  exit 1
+fi
+
+echo "[PASS] uninitialized clean worker handoff remains launchable"

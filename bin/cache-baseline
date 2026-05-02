@@ -1,0 +1,125 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# cache-baseline: 采集 token 花费基线数据
+# 用法: ./bin/cache-baseline --project <path> [--duration <minutes>] [--output <file>]
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+PROJECT=""
+DURATION=30
+OUTPUT=""
+
+usage() {
+  echo "Usage: cache-baseline --project <path> [--duration <minutes>] [--output <file>]" >&2
+  exit 1
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --project) PROJECT="${2:-}"; shift 2 ;;
+    --duration) DURATION="${2:-30}"; shift 2 ;;
+    --output) OUTPUT="${2:-}"; shift 2 ;;
+    *) usage ;;
+  esac
+done
+
+[[ -n "$PROJECT" && -d "$PROJECT" ]] || usage
+
+EVENTS_LOG="$PROJECT/.freely/logs/runtime-events.log"
+SESSION_DB="$PROJECT/.freely/freely.db"
+SESSION_STORE="$ROOT_DIR/docs/system/workspace/scripts/runtime/session-store.py"
+START_TS=""
+END_TS=""
+
+# 确定时间窗口
+if [[ -f "$EVENTS_LOG" ]]; then
+  START_TS=$(head -1 "$EVENTS_LOG" | cut -d' ' -f1 | sed 's/Z$//')
+  END_TS=$(date -u +%Y-%m-%dT%H:%M:%S)
+fi
+
+# 统计 cycle 数据
+manager_cycles=0
+worker_cycles=0
+resume_count=0
+fresh_count=0
+total_prompt_bytes=0
+cycle_count=0
+sample_prompts=()
+
+while IFS= read -r line; do
+  [[ "$line" == *"cache_metrics"* ]] || continue
+
+  role=$(echo "$line" | grep -o 'role=[^ ]*' | cut -d= -f2)
+  launch_kind=$(echo "$line" | grep -o 'launch_kind=[^ ]*' | cut -d= -f2)
+  prompt_bytes=$(echo "$line" | grep -o 'prompt_bytes=[^ ]*' | cut -d= -f2)
+  resume_streak=$(echo "$line" | grep -o 'resume_streak=[^ ]*' | cut -d= -f2)
+  acp_count=$(echo "$line" | grep -o 'acp_process_count=[^ ]*' | cut -d= -f2)
+  session_count=$(echo "$line" | grep -o 'active_session_count=[^ ]*' | cut -d= -f2)
+
+  [[ -n "$launch_kind" ]] || continue
+
+  if [[ "$role" == "manager" ]]; then
+    manager_cycles=$((manager_cycles + 1))
+  else
+    worker_cycles=$((worker_cycles + 1))
+  fi
+
+  case "$launch_kind" in
+    resume) resume_count=$((resume_count + 1)) ;;
+    fresh|fork|fresh_with_handoff) fresh_count=$((fresh_count + 1)) ;;
+  esac
+
+  if [[ -n "$prompt_bytes" && "$prompt_bytes" =~ ^[0-9]+$ ]]; then
+    total_prompt_bytes=$((total_prompt_bytes + prompt_bytes))
+    cycle_count=$((cycle_count + 1))
+  fi
+
+  sample_prompts+=("{\"launch_kind\":\"$launch_kind\",\"prompt_bytes\":${prompt_bytes:-0},\"resume_streak\":${resume_streak:-0}}")
+done < "$EVENTS_LOG"
+
+# 计算摘要
+avg_prompt_bytes=0
+[[ $cycle_count -gt 0 ]] && avg_prompt_bytes=$((total_prompt_bytes / cycle_count))
+
+total_cycles=$((manager_cycles + worker_cycles))
+l1_hit_rate=0
+[[ $total_cycles -gt 0 ]] && l1_hit_rate=$(echo "scale=2; $resume_count * 100 / $total_cycles" | bc 2>/dev/null || echo "0")
+
+active_sessions=0
+acp_processes=$(pgrep -c "claude-agent-acp" 2>/dev/null || echo "0")
+[[ -f "$SESSION_DB" && -f "$SESSION_STORE" ]] && {
+  active_sessions=$(python3 "$SESSION_STORE" count-active --db "$SESSION_DB" --project "$PROJECT" 2>/dev/null || echo "0")
+}
+
+# 输出 JSON
+samples_json=""
+for i in "${!sample_prompts[@]}"; do
+  [[ $i -gt 0 ]] && samples_json+=","
+  samples_json+="${sample_prompts[$i]}"
+done
+
+cat <<JSON
+{
+  "period": "${DURATION}m",
+  "window_start": "${START_TS:-unavailable}",
+  "window_end": "${END_TS:-unavailable}",
+  "manager_cycles": $manager_cycles,
+  "worker_cycles": $worker_cycles,
+  "total_cycles": $total_cycles,
+  "launch_kinds": {
+    "resume": $resume_count,
+    "fresh_fork_handoff": $fresh_count
+  },
+  "l1_cache_hit_rate_pct": $l1_hit_rate,
+  "avg_prompt_bytes": $avg_prompt_bytes,
+  "total_prompt_bytes": $total_prompt_bytes,
+  "acp_processes": $acp_processes,
+  "active_sessions": $active_sessions,
+  "samples": [$samples_json]
+}
+JSON
+
+if [[ -n "$OUTPUT" ]]; then
+  mkdir -p "$(dirname "$OUTPUT")"
+  exec >"$OUTPUT"
+fi

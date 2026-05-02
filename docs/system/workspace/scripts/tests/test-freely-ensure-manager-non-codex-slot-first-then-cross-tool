@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-ensure-manager-non-codex-slot-first.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+HOME="$TMP_DIR/home"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260331-0000--sample" "$PROJECT/.freely/run" "$PROJECT/.freely/logs" "$HOME/.ai-auth"
+mkdir -p "$HOME/.ai-auth/kiro-cli-default-1" "$HOME/.ai-auth/kiro-cli-default-2"
+printf 'default-1\n' >"$HOME/.ai-auth/.kiro-cli-current-slot"
+
+git init -q -b develop "$PROJECT"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260331-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260331-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260331-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="kiro-cli"
+AI_MODEL="auto"
+AI_MODE="auto"
+AI_REASONING_EFFORT=""
+AUTO_SWITCH_TOOL="true"
+AUTO_SWITCH_SLOT="true"
+AI_FALLBACK_TOOLS="codex,iflow"
+EOF
+
+cat >"$PROJECT/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+SUPERVISOR_STATE="down"
+AI_STATE="down"
+LAST_EXIT_REASON="kiro_monthly_request_limit"
+EOF
+
+# shellcheck disable=SC1090
+HOME="$HOME" source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+launch_log="$TMP_DIR/launch.log"
+
+valid_supervisor_pid_for_project() { return 1; }
+discover_supervisor_pid() { return 0; }
+manager_ai_pid_for_project() { return 0; }
+manager_supervisor_pid_for_project() { return 0; }
+recover_stalled_manager_ai_if_needed() { return 1; }
+ensure_codex_slot_ready_for_manager() { return 1; }
+tool_binary_available_for_auto_recovery() {
+  [[ "$1" == "kiro-cli" || "$1" == "codex" || "$1" == "iflow" ]]
+}
+manager_runtime_recover_workers_if_needed() { return 0; }
+launch_manager_supervisor() {
+  printf '%s tool=%s slot=%s\n' "$1" "$AI_TOOL" "$(runtime_read_tool_current_slot "$1" "$AI_TOOL")" >>"$launch_log"
+}
+log_info() { :; }
+log_warn() { :; }
+log_error() { :; }
+
+HOME="$HOME" ensure_manager_once "$PROJECT" >/dev/null
+
+grep -q '^AI_TOOL="kiro-cli"$' "$PROJECT/.freely/config.env" || {
+  echo "[FAIL] expected same-tool slot recovery to stay on kiro-cli before cross-tool fallback" >&2
+  cat "$PROJECT/.freely/config.env" >&2
+  exit 1
+}
+grep -q '^default-2$' "$HOME/.ai-auth/.kiro-cli-current-slot" || {
+  echo "[FAIL] expected current kiro slot to rotate to the next saved slot" >&2
+  cat "$HOME/.ai-auth/.kiro-cli-current-slot" >&2
+  exit 1
+}
+grep -q "^$PROJECT tool=kiro-cli slot=default-2$" "$launch_log" || {
+  echo "[FAIL] expected manager launch to retry kiro-cli on the next slot before cross-tool fallback" >&2
+  cat "$launch_log" >&2
+  exit 1
+}
+grep -q 'event=tool_auto_switch_selected' "$PROJECT/.freely/logs/runtime-events.log" || {
+  echo "[FAIL] expected same-tool slot recovery event to be recorded" >&2
+  cat "$PROJECT/.freely/logs/runtime-events.log" >&2
+  exit 1
+}
+grep -q 'active_tool=kiro-cli' "$PROJECT/.freely/logs/runtime-events.log" || {
+  echo "[FAIL] expected recovery event to stay on the current tool" >&2
+  cat "$PROJECT/.freely/logs/runtime-events.log" >&2
+  exit 1
+}
+grep -q 'active_slot=default-2' "$PROJECT/.freely/logs/runtime-events.log" || {
+  echo "[FAIL] expected recovery event to point at the next same-tool slot" >&2
+  cat "$PROJECT/.freely/logs/runtime-events.log" >&2
+  exit 1
+}
+
+echo "[PASS] ensure-manager retries the next non-codex slot before cross-tool fallback"

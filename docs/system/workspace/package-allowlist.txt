@@ -1,0 +1,39 @@
+# Freely 打包清单
+# 一行一个文件/目录路径，相对于项目根目录。
+# 目录路径以 / 结尾，递归复制。
+# # 开头的行为注释。
+
+# Agent 角色定义
+docs/system/workspace/agents/
+
+# Skill 定义
+docs/system/workspace/skills/
+
+# Git gate 脚本
+docs/system/workspace/hooks/
+
+# 运行时脚本
+docs/system/workspace/scripts/
+
+# 框架和能力文档
+docs/system/workspace/ibm-framework.md
+docs/system/workspace/three-loop-capability-lifecycle.md
+docs/system/workspace/three-loop-trace-contract.md
+docs/system/workspace/tools.md
+docs/system/workspace/acp-session-architecture.md
+docs/system/workspace/session-lifecycle-protocol.md
+docs/system/workspace/project-agents-contract.md
+docs/system/workspace/README.md
+docs/system/workspace/scan-lifecycle-design.md
+
+# 入口脚本
+bin/
+
+# Git hook 包装层
+.githooks/
+
+# 模板
+templates/
+
+# 工具边界引导
+.freely/tool-boundary-bootstrap.md

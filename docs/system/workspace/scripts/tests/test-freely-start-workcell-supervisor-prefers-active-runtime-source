@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+
+OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+
+    root="$(mktemp -d /tmp/freely-start-workcell-source.XXXXXX)"
+    trap "rm -rf \"$root\"" EXIT
+    manager="$root/manager"
+    target="$root/test-pre-merge-worker"
+    mkdir -p "$manager/.freely" "$target/.freely"
+    sync_log="$root/sync.log"
+    launch_log="$root/launch.log"
+
+    freely_bin_for_project() {
+      printf "%s/bin/freely\n" "$1"
+    }
+    sync_tooling_before_workcell_launch() {
+      printf "sync:%s->%s\n" "$2" "$1" >>"$sync_log"
+    }
+    logs_dir_for_project() {
+      mkdir -p "$1/.freely/logs"
+      printf "%s/.freely/logs\n" "$1"
+    }
+    project_control_plane_entrypoint_mode() {
+      printf "daemon\n"
+    }
+    nohup() {
+      printf "nohup:%s\n" "$*" >>"$launch_log"
+      return 0
+    }
+
+    start_workcell_supervisor_async "$target" "$manager"
+    sleep 0.1
+    cat "$sync_log"
+    cat "$launch_log"
+  ' 2>&1
+)"
+
+printf '%s\n' "$OUTPUT" | grep -F -q "sync:$ROOT_DIR->"
+printf '%s\n' "$OUTPUT" | grep -F -q "$ROOT_DIR/bin/freely"
+
+echo "[PASS] delegated workcell launch prefers active runtime source project"

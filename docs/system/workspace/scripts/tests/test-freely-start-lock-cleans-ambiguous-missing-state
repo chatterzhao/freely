@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-start-lock-ambiguous.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+
+    project="'"$TMP_DIR"'/project"
+    run_dir="$project/.freely/run"
+    lock_dir="$run_dir/project-start.lock"
+    state_file="$lock_dir/state.env"
+    mkdir -p "$lock_dir"
+
+    project_has_active_runtime_processes() { return 1; }
+    append_runtime_event() { printf "event:%s|%s\n" "$2" "$3"; }
+    log_warn() { printf "warn:%s\n" "$*"; }
+    log_error() { printf "error:%s\n" "$*"; }
+
+    if ! acquire_project_start_lock_or_wait "$project" "freely_start"; then
+      printf "lock_acquire_failed\n"
+      exit 1
+    fi
+
+    printf "lock_reacquired\n"
+    cat "$state_file"
+    release_project_start_lock_for_runtime "$project"
+  '
+)"
+
+[[ "$OUTPUT" == *"event:project_start_lock_ambiguous_cleanup|lock_state=ambiguous"* ]]
+[[ "$OUTPUT" == *"warn:removing ambiguous project start lock before freely start"* ]]
+[[ "$OUTPUT" == *"lock_reacquired"* ]]
+[[ "$OUTPUT" == *"reason=\"freely_start\""* ]]
+
+echo "[PASS] freely start lock cleans ambiguous missing-state lock when no runtime is active"

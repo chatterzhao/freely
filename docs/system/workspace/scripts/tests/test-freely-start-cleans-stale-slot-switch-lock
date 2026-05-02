@@ -1,0 +1,112 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-start-stale-slot-switch-lock.XXXXXX)"
+cleanup() {
+  set +e
+  bash "$ROOT_DIR/bin/freely" stop --project "$PROJECT" >/dev/null 2>&1 || true
+  wait "${SUPERVISOR_PID:-}" >/dev/null 2>&1 || true
+  kill "${STALE_PID:-}" 2>/dev/null || true
+  wait "${STALE_PID:-}" >/dev/null 2>&1 || true
+  rm -rf "$TMP_DIR"
+}
+trap cleanup EXIT
+
+PROJECT="$TMP_DIR/project"
+MOCK_BIN="$TMP_DIR/bin"
+LOCK_DIR="$TMP_DIR/slot-switch.lock"
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260309-0000--sample" \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/.freely/logs" \
+  "$MOCK_BIN" \
+  "$LOCK_DIR"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260309-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260309-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260309-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+FREELY_ACTIVATION_CONSENT_STATUS="accepted"
+FREELY_ACTIVATION_CONSENT_RECORDED_AT="2026-04-04T21:48:00Z"
+FREELY_ACTIVATION_CONSENT_RECORDED_VIA="test"
+CHECK_INTERVAL=1
+RESTART_DELAY=1
+MAX_RESTARTS=0
+EOF
+
+cat >"$MOCK_BIN/codex" <<'EOF'
+#!/usr/bin/env bash
+exec sleep 30
+EOF
+chmod +x "$MOCK_BIN/codex"
+
+sleep 1 &
+STALE_PID=$!
+wait "$STALE_PID" || true
+cat >"$LOCK_DIR/state.env" <<EOF
+owner_pid=$STALE_PID
+started_at=$(date +%s)
+reason=manual_switch_sweep
+command=switch
+target=auto
+EOF
+
+PATH="$MOCK_BIN:$PATH" \
+AI_CLI_SWITCH_LOCK_DIR="$LOCK_DIR" \
+  bash "$ROOT_DIR/bin/freely" start --project "$PROJECT" >/dev/null 2>&1 &
+SUPERVISOR_PID=$!
+
+for _ in $(seq 1 10); do
+  [[ ! -d "$LOCK_DIR" ]] && break
+  sleep 1
+done
+
+if [[ -d "$LOCK_DIR" ]]; then
+  echo "[FAIL] expected freely start to remove a stale codex slot-switch lock before boot" >&2
+  exit 1
+fi
+
+for _ in $(seq 1 10); do
+  [[ -f "$PROJECT/.freely/run/ai.pid" ]] && break
+  sleep 1
+done
+
+[[ -f "$PROJECT/.freely/run/ai.pid" ]]
+kill -0 "$SUPERVISOR_PID" 2>/dev/null
+
+echo "[PASS] freely start removes stale codex slot-switch locks before supervisor startup"

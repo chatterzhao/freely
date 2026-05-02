@@ -1,0 +1,1548 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-governance-merge-gate.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+mkdir -p "$REPO/bin" "$REPO/docs/system/workspace/scripts/quality"
+cd "$REPO"
+
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+
+cp "$ROOT_DIR/bin/governance-merge-gate" "$REPO/bin/governance-merge-gate"
+cp "$ROOT_DIR/bin/pretests-gate" "$REPO/bin/pretests-gate"
+cp "$ROOT_DIR/docs/system/workspace/scripts/quality/governance-merge-gate" "$REPO/docs/system/workspace/scripts/quality/governance-merge-gate"
+cp "$ROOT_DIR/docs/system/workspace/scripts/quality/pretests-gate" "$REPO/docs/system/workspace/scripts/quality/pretests-gate"
+chmod +x \
+  "$REPO/bin/governance-merge-gate" \
+  "$REPO/bin/pretests-gate" \
+  "$REPO/docs/system/workspace/scripts/quality/governance-merge-gate" \
+  "$REPO/docs/system/workspace/scripts/quality/pretests-gate"
+
+mkdir -p "$REPO/docs"
+cat > "$REPO/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-sample
+
+- status: active
+
+### candidate_issues
+1. `C-20260327-2205-A`
+
+### committed_issues
+1. `I-20260327-2205-A`
+   - issue_path: `docs/epics/sample/story/issues/sample.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+
+### completed_issues
+EOF
+
+mkdir -p "$REPO/docs/pre-brainstorms/sample"
+cat > "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2205-A
+- status: proposed
+- milestone: `M-sample`
+- next_action: keep researching the same candidate
+- revisit_trigger: new evidence arrives
+EOF
+
+mkdir -p "$REPO/docs/epics/sample/story/issues"
+cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
+# Issue: sample
+
+- issue_id: `I-20260327-2205-A`
+- phase_state: `in_dev`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+- pre_tests_path: `docs/epics/sample/story/pre-tests.md`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+EOF
+mkdir -p "$REPO/docs/epics/sample/story"
+cat > "$REPO/docs/epics/sample/story/tasks.md" <<'EOF'
+# Tasks: sample
+
+- [x] Task 1: Keep the guarded merge sample fixture fully closed out.
+EOF
+
+cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+# Pre-Tests: sample
+
+## Unit
+- acceptance target: `Keep the unit contract explicit even when no unit executable surface is needed.`
+- testing layer: `unit`
+- target environment: `feature/promotion-owner`
+- required evidence: `documented unit boundary or lawful replacement evidence`
+- blocker taxonomy: `definition_missing`
+1. Record the unit surface that must remain stable.
+
+## Integration
+- acceptance target: `Run the guarded premerge integration path before promotion.`
+- testing layer: `integration`
+- target environment: `test-pre-merge-20260408-sample`
+- required evidence: `premerge verification artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the premerge integration path before promotion.
+
+## End-to-End
+- acceptance target: `State why end-to-end is intentionally covered by a more realistic surface.`
+- testing layer: `end_to_end`
+- target environment: `test-pre-merge-20260408-sample`
+- required evidence: `replacement evidence recorded in canonical pre-tests`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `covered_by_more_realistic_required_surface`
+- not_applicable_explanation: `This fixture keeps the gate focused on integration adequacy.`
+- replacement_evidence: `Integration acceptance item integration-sample plus the guarded premerge review artifact.`
+
+## Real-Environment
+- real_environment_status: `pass`
+- real_environment_reason: `This guarded premerge fixture does not require an additional real-environment test before merge; protected followthrough remains a separate acceptance surface.`
+
+## Acceptance Items
+
+### Integration command is executed
+- id: `integration-sample`
+- requirement: `The guarded promote must prove the integration command ran.`
+- evidence_level: `integration`
+- status: `pending`
+- artifact_ref: `pending://integration-sample`
+EOF
+
+echo base > README.md
+git add README.md docs/milestones.md docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/epics/sample/story/tasks.md docs/epics/sample/story/pre-tests.md bin/governance-merge-gate bin/pretests-gate docs/system/workspace/scripts/quality/governance-merge-gate docs/system/workspace/scripts/quality/pretests-gate
+git commit -q -m "init"
+
+mkdir -p "$REPO/src"
+echo "console.log('change');" > "$REPO/src/sample.js"
+git add src/sample.js
+
+if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout1" 2>"$TMP_DIR/stderr1"; then
+  echo "[FAIL] governance-merge-gate should reject develop merges that are not based on a specific issue" >&2
+  exit 1
+fi
+grep -q 'not based on a specific issue' "$TMP_DIR/stdout1"
+
+git reset -q HEAD src/sample.js
+rm -f "$REPO/src/sample.js"
+
+cat >> "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
+
+- note: same candidate keeps being researched
+EOF
+git add docs/pre-brainstorms/sample/candidates.md
+if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout2" 2>"$TMP_DIR/stderr2"; then
+  echo "[FAIL] governance-merge-gate should reject candidate-only develop merges without issue ownership in the diff" >&2
+  exit 1
+fi
+grep -q 'not based on a specific issue' "$TMP_DIR/stdout2"
+
+git reset -q HEAD docs/pre-brainstorms/sample/candidates.md
+git checkout -q -- docs/pre-brainstorms/sample/candidates.md
+
+cat > "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2205-A
+- status: needs_research
+- milestone: `M-sample`
+- next_action: bind the active candidate to the right milestone queue
+- revisit_trigger: new evidence arrives
+EOF
+cat > "$REPO/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-sample
+
+- status: active
+
+### candidate_issues
+1. `C-20260327-2205-A`
+   - next_action: keep researching the same candidate
+   - revisit_trigger: new evidence arrives
+
+### committed_issues
+1. `I-20260327-2205-A`
+   - issue_path: `docs/epics/sample/story/issues/sample.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+
+### completed_issues
+EOF
+mkdir -p "$REPO/docs/progress/sample"
+cat > "$REPO/docs/progress/sample/p-sample.md" <<'EOF'
+# Progress: sample
+
+- issue_id: `I-20260327-2205-A`
+- issue_path: `docs/epics/sample/story/issues/sample.md`
+- phase_state: `in_dev`
+EOF
+git add docs/pre-brainstorms/sample/candidates.md docs/milestones.md docs/progress/sample/p-sample.md
+"$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout2b" 2>"$TMP_DIR/stderr2b"
+grep -q 'passed' "$TMP_DIR/stdout2b"
+
+git reset -q HEAD docs/pre-brainstorms/sample/candidates.md docs/milestones.md docs/progress/sample/p-sample.md
+git checkout -q -- docs/pre-brainstorms/sample/candidates.md
+git checkout -q -- docs/milestones.md
+rm -f "$REPO/docs/progress/sample/p-sample.md"
+
+mkdir -p "$REPO/docs/pre-brainstorms/queuefix"
+cat > "$REPO/docs/pre-brainstorms/queuefix/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2215-A
+- status: needs_research
+- milestone: `M-sample`
+- next_action: bind the active candidate to the right milestone queue
+- revisit_trigger: new evidence arrives
+EOF
+cat > "$REPO/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-sample
+
+- status: active
+
+### candidate_issues
+1. `C-20260327-2205-A`
+   - next_action: keep researching the same candidate
+   - revisit_trigger: new evidence arrives
+2. `C-20260327-2215-A`
+   - next_action: bind the active candidate to the right milestone queue
+   - revisit_trigger: new evidence arrives
+
+### committed_issues
+1. `I-20260327-2205-A`
+   - issue_path: `docs/epics/sample/story/issues/sample.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+
+### completed_issues
+EOF
+mkdir -p "$REPO/docs/progress/sample"
+cat > "$REPO/docs/progress/sample/p-sample.md" <<'EOF'
+# Progress: sample
+
+- issue_id: `I-20260327-2205-A`
+- issue_path: `docs/epics/sample/story/issues/sample.md`
+- phase_state: `in_dev`
+EOF
+git add docs/pre-brainstorms/queuefix/candidates.md docs/milestones.md docs/progress/sample/p-sample.md
+"$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout2c" 2>"$TMP_DIR/stderr2c"
+grep -q 'passed' "$TMP_DIR/stdout2c"
+
+git reset -q HEAD docs/pre-brainstorms/queuefix/candidates.md docs/milestones.md docs/progress/sample/p-sample.md
+git checkout -q -- docs/milestones.md
+rm -f "$REPO/docs/progress/sample/p-sample.md"
+
+mkdir -p "$REPO/docs/progress/sample" "$REPO/src"
+cat > "$REPO/docs/progress/sample/p-sample.md" <<'EOF'
+# Progress: sample
+
+- issue_id: `I-20260327-2205-A`
+- issue_path: `docs/epics/sample/story/issues/sample.md`
+- phase_state: `in_dev`
+EOF
+mkdir -p "$REPO/docs/epics/sample/story/code-reviews"
+cat > "$REPO/docs/epics/sample/story/code-reviews/r-sample.md" <<'EOF'
+# Review: sample
+
+- issue_id: `I-20260327-2205-A`
+
+## Implementation Decision Note
+
+- decision: `Keep the borrowed-owner regression focused on lifecycle ownership rather than failing earlier on missing review evidence.`
+- why_this: `The implementation-bearing negative case should satisfy the staged review artifact requirement first so the gate can reach the unrelated-owner diagnostic it is meant to prove.`
+- alternatives_considered: `Leaving the case without a review artifact now exercises the implementation decision note guard instead of the owner-mismatch path, which weakens the regression's intended coverage.`
+- boundary_non_goals: `This fixture does not change the canonical review artifact contract or widen owner borrowing rules.`
+- residual_risk: `If implementation-bearing detection changes again, this negative case may need another narrow fixture refresh to keep targeting the correct gate branch.`
+EOF
+echo "console.log('mixed implementation change');" > "$REPO/src/mixed.js"
+git add docs/pre-brainstorms/queuefix/candidates.md docs/milestones.md docs/progress/sample/p-sample.md docs/epics/sample/story/code-reviews/r-sample.md src/mixed.js
+"$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout2d" 2>"$TMP_DIR/stderr2d"
+grep -q 'passed' "$TMP_DIR/stdout2d"
+
+git reset -q HEAD docs/pre-brainstorms/queuefix/candidates.md docs/milestones.md docs/progress/sample/p-sample.md docs/epics/sample/story/code-reviews/r-sample.md src/mixed.js
+git checkout -q -- docs/milestones.md
+rm -f "$REPO/docs/progress/sample/p-sample.md" "$REPO/docs/epics/sample/story/code-reviews/r-sample.md" "$REPO/src/mixed.js"
+
+mkdir -p "$REPO/docs/progress/sample"
+cat > "$REPO/docs/progress/sample/p-sample.md" <<'EOF'
+# Progress: sample
+
+- issue_id: `I-20260327-2205-A`
+- issue_path: `docs/epics/sample/story/issues/sample.md`
+- phase_state: `in_dev`
+EOF
+git add docs/progress/sample/p-sample.md
+"$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout3" 2>"$TMP_DIR/stderr3"
+grep -q 'passed' "$TMP_DIR/stdout3"
+
+git reset -q HEAD docs/progress/sample/p-sample.md
+rm -f "$REPO/docs/progress/sample/p-sample.md"
+
+cat > "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2205-A
+- status: promoted
+- milestone: `M-sample`
+- promoted_issue_id: `I-20260327-2205-A`
+- promoted_issue_path: `docs/epics/sample/story/issues/sample.md`
+EOF
+cat >> "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
+
+## note
+
+- direct issue touch on the same promoted lifecycle line
+EOF
+git add docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md
+"$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout3b" 2>"$TMP_DIR/stderr3b"
+grep -q 'passed' "$TMP_DIR/stdout3b"
+
+git reset -q HEAD docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md
+git checkout -q -- docs/pre-brainstorms/sample/candidates.md
+git checkout -q -- docs/epics/sample/story/issues/sample.md
+
+mkdir -p "$REPO/docs/progress/sample"
+cat > "$REPO/docs/progress/sample/p-bad.md" <<'EOF'
+# Progress: bad
+
+- issue_id: `I-missing`
+- issue_path: `docs/epics/sample/story/issues/missing.md`
+- phase_state: `in_dev`
+EOF
+git add docs/progress/sample/p-bad.md
+
+if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout4" 2>"$TMP_DIR/stderr4"; then
+  echo "[FAIL] governance-merge-gate should reject unresolved progress owner issues" >&2
+  exit 1
+fi
+grep -q 'cannot be resolved' "$TMP_DIR/stdout4"
+
+git reset -q HEAD docs/progress/sample/p-bad.md
+rm -f "$REPO/docs/progress/sample/p-bad.md"
+
+mkdir -p "$REPO/docs/pre-brainstorms/absorbed" "$REPO/docs/epics/absorbed/story/issues"
+cat > "$REPO/docs/pre-brainstorms/absorbed/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2301-A
+- status: absorbed
+- milestone: `M-sample`
+- decision_reason: folded into sample owner
+- promoted_issue_path: `docs/epics/absorbed/story/issues/owner.md`
+EOF
+cat > "$REPO/docs/epics/absorbed/story/issues/owner.md" <<'EOF'
+# Issue: owner
+
+- issue_id: `I-20260327-2301`
+- phase_state: `in_dev`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+- verification_artifact_dir: `docs/epics/absorbed/story/code-reviews`
+EOF
+git add docs/pre-brainstorms/absorbed/candidates.md
+
+if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout5" 2>"$TMP_DIR/stderr5"; then
+  echo "[FAIL] governance-merge-gate should reject absorbed candidate-only merges without issue ownership in the diff" >&2
+  exit 1
+fi
+grep -q 'not based on a specific issue' "$TMP_DIR/stdout5"
+
+git reset -q HEAD docs/pre-brainstorms/absorbed/candidates.md
+
+cat > "$REPO/docs/progress/sample/p-sample.md" <<'EOF'
+# Progress: sample
+
+- issue_id: `I-20260327-2205-A`
+- issue_path: `docs/epics/sample/story/issues/sample.md`
+- phase_state: `in_dev`
+EOF
+git add docs/progress/sample/p-sample.md docs/pre-brainstorms/absorbed/candidates.md
+
+if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout6" 2>"$TMP_DIR/stderr6"; then
+  echo "[FAIL] governance-merge-gate should reject absorbed candidates that try to borrow an unrelated issue owner in the same diff" >&2
+  exit 1
+fi
+grep -q 'does not carry its concrete owner issue/progress/review' "$TMP_DIR/stdout6"
+
+git reset -q HEAD docs/progress/sample/p-sample.md docs/pre-brainstorms/absorbed/candidates.md
+rm -f "$REPO/docs/progress/sample/p-sample.md"
+
+mkdir -p "$REPO/docs/pre-brainstorms/promoted" "$REPO/docs/epics/promoted/story/issues"
+cat > "$REPO/docs/pre-brainstorms/promoted/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2401-A
+- status: promoted
+- milestone: `M-sample`
+- promoted_issue_id: `I-20260327-2401-A`
+- promoted_issue_path: `docs/epics/promoted/story/issues/promoted.md`
+EOF
+cat > "$REPO/docs/epics/promoted/story/issues/promoted.md" <<'EOF'
+# Issue: promoted
+
+- issue_id: `I-20260327-2401-A`
+- phase_state: `in_dev`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/promoted/candidates.md#c-20260327-2401-a`
+- verification_artifact_dir: `docs/epics/promoted/story/code-reviews`
+EOF
+cat > "$REPO/docs/progress/sample/p-promoted.md" <<'EOF'
+# Progress: promoted
+
+- issue_id: `I-20260327-2401-A`
+- issue_path: `docs/epics/promoted/story/issues/promoted.md`
+- phase_state: `in_dev`
+EOF
+cat > "$REPO/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-sample
+
+- status: active
+
+### candidate_issues
+1. `C-20260327-2205-A`
+
+### committed_issues
+1. `I-20260327-2205-A`
+   - issue_path: `docs/epics/sample/story/issues/sample.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+2. `I-20260327-2401-A`
+   - issue_path: `docs/epics/promoted/story/issues/promoted.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/promoted/candidates.md#c-20260327-2401-a`
+
+### completed_issues
+EOF
+git add docs/milestones.md docs/pre-brainstorms/promoted/candidates.md docs/epics/promoted/story/issues/promoted.md docs/progress/sample/p-promoted.md
+"$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout7" 2>"$TMP_DIR/stderr7"
+grep -q 'passed' "$TMP_DIR/stdout7"
+
+git reset -q HEAD docs/milestones.md docs/pre-brainstorms/promoted/candidates.md docs/epics/promoted/story/issues/promoted.md docs/progress/sample/p-promoted.md
+git checkout -q -- docs/milestones.md
+rm -f "$REPO/docs/progress/sample/p-promoted.md"
+
+cat > "$REPO/docs/epics/absorbed/story/issues/owner.md" <<'EOF'
+# Issue: owner
+
+- issue_id: `I-20260327-2301-A`
+- phase_state: `in_dev`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/absorbed/candidates.md#c-20260327-2301-a`
+- verification_artifact_dir: `docs/epics/absorbed/story/code-reviews`
+EOF
+cat > "$REPO/docs/progress/sample/p-owner.md" <<'EOF'
+# Progress: owner
+
+- issue_id: `I-20260327-2301-A`
+- issue_path: `docs/epics/absorbed/story/issues/owner.md`
+- phase_state: `in_dev`
+EOF
+cat > "$REPO/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-sample
+
+- status: active
+
+### candidate_issues
+1. `C-20260327-2205-A`
+
+### committed_issues
+1. `I-20260327-2205-A`
+   - issue_path: `docs/epics/sample/story/issues/sample.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+2. `I-20260327-2301-A`
+   - issue_path: `docs/epics/absorbed/story/issues/owner.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/absorbed/candidates.md#c-20260327-2301-a`
+
+### completed_issues
+EOF
+git add docs/milestones.md docs/pre-brainstorms/absorbed/candidates.md docs/epics/absorbed/story/issues/owner.md docs/progress/sample/p-owner.md
+"$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout8" 2>"$TMP_DIR/stderr8"
+grep -q 'passed' "$TMP_DIR/stdout8"
+
+git reset -q HEAD docs/milestones.md docs/pre-brainstorms/absorbed/candidates.md docs/epics/absorbed/story/issues/owner.md docs/progress/sample/p-owner.md
+git checkout -q -- docs/milestones.md
+rm -f "$REPO/docs/progress/sample/p-owner.md"
+
+cat > "$REPO/docs/progress/sample/p-crossed.md" <<'EOF'
+# Progress: crossed
+
+- issue_id: `I-20260327-2205-A`
+- issue_path: `docs/epics/sample/story/issues/sample.md`
+- phase_state: `in_dev`
+EOF
+git add docs/pre-brainstorms/promoted/candidates.md docs/progress/sample/p-crossed.md
+
+if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout9" 2>"$TMP_DIR/stderr9"; then
+  echo "[FAIL] governance-merge-gate should reject promoted candidates that try to use a progress owner from a different lifecycle line" >&2
+  exit 1
+fi
+grep -q 'does not carry its concrete owner issue/progress/review' "$TMP_DIR/stdout9"
+
+git reset -q HEAD docs/pre-brainstorms/promoted/candidates.md docs/progress/sample/p-crossed.md
+rm -rf "$REPO/docs/pre-brainstorms/promoted" "$REPO/docs/epics/promoted"
+rm -f "$REPO/docs/progress/sample/p-crossed.md"
+
+cat > "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2205-A
+- status: promoted
+- milestone: `M-sample`
+- promoted_issue_id: `I-20260327-2205-A`
+- promoted_issue_path: `docs/epics/sample/story/issues/sample.md`
+
+### C-20260327-2205-B
+- status: absorbed
+- milestone: `M-sample`
+- decision_reason: folded into another owner
+- promoted_issue_path: `docs/epics/sample/story/issues/absorbed-owner.md`
+EOF
+cat > "$REPO/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-sample
+
+- status: active
+
+### candidate_issues
+
+### committed_issues
+1. `I-20260327-2205-A`
+   - issue_path: `docs/epics/sample/story/issues/sample.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+
+### completed_issues
+EOF
+cat > "$REPO/docs/progress/sample/p-sample-a.md" <<'EOF'
+# Progress: sample-a
+
+- issue_id: `I-20260327-2205-A`
+- issue_path: `docs/epics/sample/story/issues/sample.md`
+- phase_state: `in_dev`
+EOF
+git add docs/pre-brainstorms/sample/candidates.md docs/milestones.md docs/progress/sample/p-sample-a.md
+
+if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout9b" 2>"$TMP_DIR/stderr9b"; then
+  echo "[FAIL] governance-merge-gate should reject same-file absorbed candidates that try to use a progress owner from a different lifecycle line" >&2
+  exit 1
+fi
+grep -q 'does not carry its concrete owner issue/progress/review' "$TMP_DIR/stdout9b"
+
+git reset -q HEAD docs/pre-brainstorms/sample/candidates.md docs/milestones.md docs/progress/sample/p-sample-a.md
+git checkout -q -- docs/pre-brainstorms/sample/candidates.md docs/milestones.md
+rm -f "$REPO/docs/progress/sample/p-sample-a.md"
+
+cat > "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2205-A
+- status: promoted
+- milestone: `M-sample`
+- promoted_issue_id: `I-20260327-2205-A`
+- promoted_issue_path: `docs/epics/sample/story/issues/sample.md`
+EOF
+cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
+# Issue: sample
+
+- issue_id: `I-20260327-2205-A`
+- phase_state: `in_ibm`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+EOF
+echo "console.log('ibm');" > "$REPO/src/sample.js"
+git add src/sample.js docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md
+if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout10" 2>"$TMP_DIR/stderr10"; then
+  echo "[FAIL] governance-merge-gate should reject capability changes owned by an in_ibm issue" >&2
+  exit 1
+fi
+grep -q "cannot own capability/implementation changes" "$TMP_DIR/stdout10"
+
+git reset -q HEAD src/sample.js docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md
+git checkout -q -- docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md
+rm -f "$REPO/src/sample.js"
+
+cat > "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2205-A
+- status: promoted
+- milestone: `M-sample`
+- promoted_issue_id: `I-20260327-2205-A`
+- promoted_issue_path: `docs/epics/sample/story/issues/sample.md`
+EOF
+cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
+# Issue: sample
+
+- issue_id: `I-20260327-2205-A`
+- phase_state: `in_dev`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+
+## note
+
+- direct issue touch while still in_dev
+EOF
+echo "console.log('dev without progress');" > "$REPO/src/sample.js"
+git add src/sample.js docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md
+if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout11" 2>"$TMP_DIR/stderr11"; then
+  echo "[FAIL] governance-merge-gate should reject capability changes in in_dev without same-line progress" >&2
+  exit 1
+fi
+grep -q "carries no same-line progress artifact" "$TMP_DIR/stdout11"
+
+git reset -q HEAD src/sample.js docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md
+git checkout -q -- docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md
+rm -f "$REPO/src/sample.js"
+
+cat > "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2205-A
+- status: proposed
+- milestone: `M-sample`
+
+### C-20260327-2205-B
+- status: proposed
+- milestone: `M-sample`
+EOF
+git add docs/pre-brainstorms/sample/candidates.md
+git commit -q -m "seed sibling candidate baseline"
+
+cat > "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2205-A
+- status: promoted
+- milestone: `M-sample`
+- promoted_issue_id: `I-20260327-2205-A`
+- promoted_issue_path: `docs/epics/sample/story/issues/sample-a.md`
+
+### C-20260327-2205-B
+- status: proposed
+- milestone: `M-sample`
+EOF
+cat > "$REPO/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-sample
+
+- status: active
+
+### candidate_issues
+
+### committed_issues
+1. `I-20260327-2205-A`
+   - issue_path: `docs/epics/sample/story/issues/sample-a.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+2. `I-20260327-2205-B`
+   - issue_path: `docs/epics/sample/story/issues/sample-b.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-b`
+
+### completed_issues
+EOF
+cat > "$REPO/docs/epics/sample/story/issues/sample-a.md" <<'EOF'
+# Issue: sample-a
+
+- issue_id: `I-20260327-2205-A`
+- phase_state: `in_verification`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+EOF
+cat > "$REPO/docs/epics/sample/story/issues/sample-b.md" <<'EOF'
+# Issue: sample-b
+
+- issue_id: `I-20260327-2205-B`
+- phase_state: `in_dev`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-b`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+EOF
+mkdir -p "$REPO/docs/progress/sample"
+mkdir -p "$REPO/docs/epics/sample/story/code-reviews"
+cat > "$REPO/docs/progress/sample/p-sample-a.md" <<'EOF'
+# Progress: sample-a
+
+- issue_id: `I-20260327-2205-A`
+- issue_path: `docs/epics/sample/story/issues/sample-a.md`
+EOF
+cat > "$REPO/docs/epics/sample/story/code-reviews/r-sample-a.md" <<'EOF'
+# Review: sample-a
+
+- issue_id: `I-20260327-2205-A`
+
+## Implementation Decision Note
+
+- decision: `Keep implementation decision notes in the issue-bound review artifact.`
+- why_this: `Verification-phase implementation work should carry the decision in the same artifact that records review evidence.`
+- alternatives_considered: `Relying on progress alone would not capture the chosen implementation path and rejected options.`
+- boundary_non_goals: `This review note does not replace candidate or IBM rationale.`
+- residual_risk: `Path heuristics may still need calibration when more capability roots are added.`
+EOF
+echo "console.log('verification owner');" > "$REPO/src/sample.js"
+git add src/sample.js docs/pre-brainstorms/sample/candidates.md docs/milestones.md docs/epics/sample/story/issues/sample-a.md docs/progress/sample/p-sample-a.md docs/epics/sample/story/code-reviews/r-sample-a.md
+if ! "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout11b" 2>"$TMP_DIR/stderr11b"; then
+  echo "[FAIL] governance-merge-gate should ignore sibling candidates loaded only as source-candidate context" >&2
+  cat "$TMP_DIR/stdout11b" >&2
+  exit 1
+fi
+
+git reset -q HEAD src/sample.js docs/pre-brainstorms/sample/candidates.md docs/milestones.md docs/epics/sample/story/issues/sample-a.md docs/progress/sample/p-sample-a.md docs/epics/sample/story/code-reviews/r-sample-a.md
+rm -f "$REPO/src/sample.js" \
+  "$REPO/docs/epics/sample/story/issues/sample-a.md" \
+  "$REPO/docs/epics/sample/story/issues/sample-b.md" \
+  "$REPO/docs/progress/sample/p-sample-a.md" \
+  "$REPO/docs/epics/sample/story/code-reviews/r-sample-a.md"
+git checkout -q -- docs/milestones.md
+
+cat > "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2205-A
+- status: promoted
+- milestone: `M-sample`
+- promoted_issue_id: `I-20260327-2205-A`
+- promoted_issue_path: `docs/epics/sample/story/issues/sample.md`
+EOF
+cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
+# Issue: sample
+
+- issue_id: `I-20260327-2205-A`
+- phase_state: `in_verification`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+EOF
+echo "console.log('verification without evidence');" > "$REPO/src/sample.js"
+git add src/sample.js docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md
+if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout12" 2>"$TMP_DIR/stderr12"; then
+  echo "[FAIL] governance-merge-gate should reject capability changes in in_verification without same-line progress/review" >&2
+  exit 1
+fi
+grep -q "carries neither same-line progress nor review evidence" "$TMP_DIR/stdout12"
+
+git reset -q HEAD src/sample.js docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md
+git checkout -q -- docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md
+rm -f "$REPO/src/sample.js"
+
+mkdir -p "$REPO/docs/progress/sample"
+cat > "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2205-A
+- status: promoted
+- milestone: `M-sample`
+- promoted_issue_id: `I-20260327-2205-A`
+- promoted_issue_path: `docs/epics/sample/story/issues/sample.md`
+EOF
+cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
+# Issue: sample
+
+- issue_id: `I-20260327-2205-A`
+- phase_state: `in_dev`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+EOF
+cat > "$REPO/docs/progress/sample/p-sample.md" <<'EOF'
+# Progress: sample
+
+- issue_id: `I-20260327-2205-A`
+- issue_path: `docs/epics/sample/story/issues/sample.md`
+- phase_state: `in_dev`
+EOF
+echo "console.log('dev with progress');" > "$REPO/src/sample.js"
+git add src/sample.js docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/progress/sample/p-sample.md
+if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout13" 2>"$TMP_DIR/stderr13"; then
+  echo "[FAIL] governance-merge-gate should reject implementation-bearing changes without a fresh staged owner review artifact under verification_artifact_dir" >&2
+  exit 1
+fi
+grep -q 'no fresh staged owner review artifact' "$TMP_DIR/stdout13"
+
+cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
+# Issue: sample
+
+- issue_id: `I-20260327-2205-A`
+- phase_state: `in_dev`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+- verification_artifact_dir: `docs`
+EOF
+git add docs/epics/sample/story/issues/sample.md
+if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout13b" 2>"$TMP_DIR/stderr13b"; then
+  echo "[FAIL] governance-merge-gate should reject overly broad verification_artifact_dir values" >&2
+  exit 1
+fi
+grep -q 'too broad or non-canonical' "$TMP_DIR/stdout13b"
+
+git reset -q HEAD src/sample.js docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/progress/sample/p-sample.md
+git checkout -q -- docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md
+rm -f "$REPO/src/sample.js" "$REPO/docs/progress/sample/p-sample.md"
+
+mkdir -p "$REPO/docs/epics/sample/story/code-reviews"
+cat > "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2205-A
+- status: promoted
+- milestone: `M-sample`
+- promoted_issue_id: `I-20260327-2205-A`
+- promoted_issue_path: `docs/epics/sample/story/issues/sample.md`
+EOF
+cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
+# Issue: sample
+
+- issue_id: `I-20260327-2205-A`
+- phase_state: `in_verification`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+EOF
+cat > "$REPO/docs/epics/sample/story/code-reviews/r-sample.md" <<'EOF'
+# Review: sample
+
+- issue_id: `I-20260327-2205-A`
+EOF
+echo "console.log('verification with review');" > "$REPO/src/sample.js"
+git add src/sample.js docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/epics/sample/story/code-reviews/r-sample.md
+if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout14" 2>"$TMP_DIR/stderr14"; then
+  echo "[FAIL] governance-merge-gate should reject review artifacts whose implementation decision note is incomplete" >&2
+  exit 1
+fi
+grep -q 'implementation decision note is incomplete' "$TMP_DIR/stdout14"
+
+git reset -q HEAD src/sample.js docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/epics/sample/story/code-reviews/r-sample.md
+git checkout -q -- docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/milestones.md
+rm -f "$REPO/src/sample.js"
+
+cat > "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2205-A
+- status: promoted
+- milestone: `M-sample`
+- promoted_issue_id: `I-20260327-2205-A`
+- promoted_issue_path: `docs/epics/sample/story/issues/sample.md`
+EOF
+cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
+# Issue: sample
+
+- issue_id: `I-20260327-2205-A`
+- phase_state: `in_verification`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+EOF
+cat > "$REPO/docs/epics/sample/story/code-reviews/r-sample.md" <<'EOF'
+# Review: sample
+
+- issue_id: `I-20260327-2205-A`
+
+## Implementation Decision Note
+
+- decision: `Keep the canonical implementation note inside the issue-bound review artifact.`
+- why_this: `The review artifact already owns verification evidence and residual implementation risk.`
+- alternatives_considered: `A separate decision-summary directory would duplicate lifecycle truth.`
+- boundary_non_goals: `This does not replace candidate or PRD rationale.`
+- residual_risk: `Implementation-bearing path heuristics may need tuning after field use.`
+EOF
+echo "console.log('verification with complete review');" > "$REPO/src/sample.js"
+git add src/sample.js docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/epics/sample/story/code-reviews/r-sample.md
+"$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout14b" 2>"$TMP_DIR/stderr14b"
+grep -q 'passed' "$TMP_DIR/stdout14b"
+
+git reset -q HEAD src/sample.js docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/epics/sample/story/code-reviews/r-sample.md
+git checkout -q -- docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/milestones.md
+rm -f "$REPO/src/sample.js"
+
+cat > "$REPO/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-other
+
+- status: active
+
+### candidate_issues
+1. `C-20260327-2205-A`
+
+### committed_issues
+1. `I-20260327-2205-A`
+   - issue_path: `docs/epics/sample/story/issues/sample.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+
+### completed_issues
+EOF
+cat > "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2205-A
+- status: promoted
+- milestone: `M-sample`
+- promoted_issue_id: `I-20260327-2205-A`
+- promoted_issue_path: `docs/epics/sample/story/issues/sample.md`
+EOF
+cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
+# Issue: sample
+
+- issue_id: `I-20260327-2205-A`
+- phase_state: `in_dev`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+EOF
+cat > "$REPO/docs/progress/sample/p-sample.md" <<'EOF'
+# Progress: sample
+
+- issue_id: `I-20260327-2205-A`
+- issue_path: `docs/epics/sample/story/issues/sample.md`
+- phase_state: `in_dev`
+EOF
+git add docs/milestones.md docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/progress/sample/p-sample.md
+if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout15" 2>"$TMP_DIR/stderr15"; then
+  echo "[FAIL] governance-merge-gate should reject candidates whose declared milestone does not match the milestone queue entry" >&2
+  exit 1
+fi
+grep -q 'declares milestone M-sample' "$TMP_DIR/stdout15"
+grep -q 'M-other' "$TMP_DIR/stdout15"
+
+git reset -q HEAD docs/milestones.md docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/progress/sample/p-sample.md
+git checkout -q -- docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/milestones.md
+rm -f "$REPO/docs/progress/sample/p-sample.md"
+
+cat > "$REPO/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-sample
+
+- status: completed
+
+### candidate_issues
+1. `C-20260327-2205-A`
+
+### committed_issues
+1. `I-20260327-2205-A`
+   - issue_path: `docs/epics/sample/story/issues/sample.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+
+### completed_issues
+EOF
+cat > "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2205-A
+- status: promoted
+- milestone: `M-sample`
+- promoted_issue_id: `I-20260327-2205-A`
+- promoted_issue_path: `docs/epics/sample/story/issues/sample.md`
+EOF
+cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
+# Issue: sample
+
+- issue_id: `I-20260327-2205-A`
+- phase_state: `in_dev`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+EOF
+cat > "$REPO/docs/progress/sample/p-sample.md" <<'EOF'
+# Progress: sample
+
+- issue_id: `I-20260327-2205-A`
+- issue_path: `docs/epics/sample/story/issues/sample.md`
+- phase_state: `in_dev`
+EOF
+git add docs/milestones.md docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/progress/sample/p-sample.md
+if "$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout16" 2>"$TMP_DIR/stderr16"; then
+  echo "[FAIL] governance-merge-gate should reject active candidates placed in completed milestones" >&2
+  exit 1
+fi
+grep -q "declared milestone M-sample has status 'completed'" "$TMP_DIR/stdout16"
+
+git reset -q HEAD docs/milestones.md docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/progress/sample/p-sample.md
+git checkout -q -- docs/pre-brainstorms/sample/candidates.md docs/epics/sample/story/issues/sample.md docs/milestones.md
+rm -f "$REPO/docs/progress/sample/p-sample.md"
+
+mkdir -p "$REPO/docs/pre-brainstorms/completed-provenance" "$REPO/docs/epics/completed/story/issues"
+cat > "$REPO/docs/pre-brainstorms/completed-provenance/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2235-A
+- status: completed
+- milestone: `M-sample`
+- promoted_issue_path: `docs/epics/completed/story/issues/owner.md`
+- legacy_id_mapping: `I-20260327-2235`
+- next_action: keep as historical provenance only
+- completion_note: `The canonical owner is already complete; this diff only repairs candidate-side historical truth.`
+EOF
+cat > "$REPO/docs/epics/completed/story/issues/owner.md" <<'EOF'
+# Issue: completed-owner
+
+- issue_id: `I-20260327-2235`
+- phase_state: `completed`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/completed-provenance/candidates.md#c-20260327-2235-a`
+- verification_artifact_dir: `docs/epics/completed/story/code-reviews`
+EOF
+cat > "$REPO/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-sample
+
+- status: completed
+
+### candidate_issues
+- none currently
+
+### committed_issues
+- none currently
+
+### completed_issues
+1. `I-20260327-2235`
+   - issue_path: `docs/epics/completed/story/issues/owner.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/completed-provenance/candidates.md#c-20260327-2235-a`
+EOF
+git add docs/pre-brainstorms/completed-provenance/candidates.md docs/epics/completed/story/issues/owner.md docs/milestones.md
+"$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout16c" 2>"$TMP_DIR/stderr16c"
+grep -q 'passed' "$TMP_DIR/stdout16c"
+
+git reset -q HEAD docs/pre-brainstorms/completed-provenance/candidates.md docs/epics/completed/story/issues/owner.md docs/milestones.md
+git checkout -q -- docs/milestones.md
+rm -f "$REPO/docs/pre-brainstorms/completed-provenance/candidates.md" "$REPO/docs/epics/completed/story/issues/owner.md"
+
+mkdir -p \
+  "$REPO/docs/pre-brainstorms/completed-provenance" \
+  "$REPO/docs/epics/completed/story/issues" \
+  "$REPO/docs/progress/sample" \
+  "$REPO/docs/epics/sample/story/code-reviews" \
+  "$REPO/docs/system/workspace/hooks"
+cat > "$REPO/docs/pre-brainstorms/completed-provenance/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2235-A
+- status: completed
+- milestone: `M-completed`
+- promoted_issue_path: `docs/epics/completed/story/issues/owner.md`
+- legacy_id_mapping: `I-20260327-2235`
+- next_action: keep as historical provenance only
+- completion_note: `The canonical owner is already complete; this diff only repairs candidate-side historical truth.`
+EOF
+cat > "$REPO/docs/epics/completed/story/issues/owner.md" <<'EOF'
+# Issue: completed-owner
+
+- issue_id: `I-20260327-2235`
+- phase_state: `completed`
+- milestone: `M-completed`
+- source_candidate: `docs/pre-brainstorms/completed-provenance/candidates.md#c-20260327-2235-a`
+- verification_artifact_dir: `docs/epics/completed/story/code-reviews`
+EOF
+cat > "$REPO/docs/progress/sample/p-sample.md" <<'EOF'
+# Progress: sample
+
+- issue_id: `I-20260327-2205-A`
+- issue_path: `docs/epics/sample/story/issues/sample.md`
+EOF
+cat > "$REPO/docs/epics/sample/story/code-reviews/20260327-sample-implementation.md" <<'EOF'
+# Verification: sample-implementation
+
+- issue_id: `I-20260327-2205-A`
+- issue_path: `docs/epics/sample/story/issues/sample.md`
+
+## Implementation Decision Note
+
+- decision: `Keep the sample implementation-bearing change under the active sample owner.`
+- why_this: `This fixture proves completed provenance repairs may travel alongside unrelated implementation work that already has a lawful owner line.`
+- alternatives_considered: `Force the completed provenance candidate to restage its historical owner issue in the same merge; split the metadata repair into a separate merge.`
+- boundary_non_goals: `This fixture does not relax the owner requirements for the implementation-bearing sample change itself.`
+- residual_risk: `If the sample owner loses its progress or review artifact, this mixed diff should fail again.`
+EOF
+cat > "$REPO/docs/system/workspace/hooks/pre-commit.sh" <<'EOF'
+#!/usr/bin/env bash
+echo sample-hook
+EOF
+cat > "$REPO/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-sample
+
+- status: active
+
+### candidate_issues
+1. `C-20260327-2205-A`
+   - next_action: keep researching the same candidate
+   - revisit_trigger: new evidence arrives
+
+### committed_issues
+1. `I-20260327-2205-A`
+   - issue_path: `docs/epics/sample/story/issues/sample.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+
+### completed_issues
+
+## M-completed
+
+- status: completed
+
+### candidate_issues
+- none currently
+
+### committed_issues
+- none currently
+
+### completed_issues
+1. `I-20260327-2235`
+   - issue_path: `docs/epics/completed/story/issues/owner.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/completed-provenance/candidates.md#c-20260327-2235-a`
+EOF
+git add \
+  docs/pre-brainstorms/completed-provenance/candidates.md \
+  docs/epics/completed/story/issues/owner.md \
+  docs/progress/sample/p-sample.md \
+  docs/epics/sample/story/code-reviews/20260327-sample-implementation.md \
+  docs/system/workspace/hooks/pre-commit.sh \
+  docs/milestones.md
+"$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout16d" 2>"$TMP_DIR/stderr16d"
+grep -q 'passed' "$TMP_DIR/stdout16d"
+
+git reset -q HEAD \
+  docs/pre-brainstorms/completed-provenance/candidates.md \
+  docs/epics/completed/story/issues/owner.md \
+  docs/progress/sample/p-sample.md \
+  docs/epics/sample/story/code-reviews/20260327-sample-implementation.md \
+  docs/system/workspace/hooks/pre-commit.sh \
+  docs/milestones.md
+git checkout -q -- docs/milestones.md
+rm -f \
+  "$REPO/docs/pre-brainstorms/completed-provenance/candidates.md" \
+  "$REPO/docs/epics/completed/story/issues/owner.md" \
+  "$REPO/docs/progress/sample/p-sample.md" \
+  "$REPO/docs/epics/sample/story/code-reviews/20260327-sample-implementation.md" \
+  "$REPO/docs/system/workspace/hooks/pre-commit.sh"
+
+mkdir -p "$REPO/docs/pre-brainstorms/statusscope" "$REPO/docs/progress/statusscope"
+cat > "$REPO/docs/pre-brainstorms/statusscope/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2225-A
+- status: promoted
+- milestone: `M-sample`
+- promoted_issue_id: `I-20260327-2225-A`
+- promoted_issue_path: `docs/epics/sample/story/issues/statusscope.md`
+EOF
+cat > "$REPO/docs/epics/sample/story/issues/statusscope.md" <<'EOF'
+# Issue: statusscope
+
+- issue_id: `I-20260327-2225-A`
+- phase_state: `in_verification`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/statusscope/candidates.md#c-20260327-2225-a`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+EOF
+cat > "$REPO/docs/progress/statusscope/p-statusscope.md" <<'EOF'
+# Progress: statusscope
+
+- issue_id: `I-20260327-2225-A`
+- issue_path: `docs/epics/sample/story/issues/statusscope.md`
+- phase_state: `in_verification`
+EOF
+cat > "$REPO/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-sample
+
+- status: active
+
+### candidate_issues
+1. `C-20260327-2225-A`
+   - status: needs_research
+   - next_action: keep researching adjacent backlog ordering
+   - revisit_trigger: another parser regression appears
+
+### committed_issues
+1. `I-20260327-2225-A`
+   - issue_path: `docs/epics/sample/story/issues/statusscope.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/statusscope/candidates.md#c-20260327-2225-a`
+
+### completed_issues
+EOF
+git add docs/pre-brainstorms/statusscope/candidates.md docs/epics/sample/story/issues/statusscope.md docs/progress/statusscope/p-statusscope.md docs/milestones.md
+"$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout16b" 2>"$TMP_DIR/stderr16b"
+grep -q 'passed' "$TMP_DIR/stdout16b"
+
+git reset -q HEAD docs/pre-brainstorms/statusscope/candidates.md docs/epics/sample/story/issues/statusscope.md docs/progress/statusscope/p-statusscope.md docs/milestones.md
+git checkout -q -- docs/milestones.md
+rm -f "$REPO/docs/pre-brainstorms/statusscope/candidates.md" "$REPO/docs/epics/sample/story/issues/statusscope.md" "$REPO/docs/progress/statusscope/p-statusscope.md"
+
+mkdir -p \
+  "$REPO/docs/pre-brainstorms/staged-view" \
+  "$REPO/docs/epics/staged/view/issues" \
+  "$REPO/docs/epics/staged/view/code-reviews" \
+  "$REPO/docs/progress/staged" \
+  "$REPO/src"
+cat > "$REPO/docs/pre-brainstorms/staged-view/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260402-1400-A
+- status: promoted
+- milestone: `M-sample`
+- promoted_issue_id: `I-20260402-1400-A`
+- promoted_issue_path: `docs/epics/staged/view/issues/staged-view.md`
+EOF
+cat > "$REPO/docs/epics/staged/view/issues/staged-view.md" <<'EOF'
+# Issue: staged-view
+
+- issue_id: `I-20260402-1400-A`
+- phase_state: `in_verification`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/staged-view/candidates.md#c-20260402-1400-a`
+- verification_artifact_dir: `docs/epics/staged/view/code-reviews`
+EOF
+cat > "$REPO/docs/progress/staged/p-staged-view.md" <<'EOF'
+# Progress: staged-view
+
+- issue_id: `I-20260402-1400-A`
+- issue_path: `docs/epics/staged/view/issues/staged-view.md`
+- phase_state: `in_verification`
+EOF
+cat > "$REPO/docs/epics/staged/view/code-reviews/20260402-staged-view-verification.md" <<'EOF'
+# Verification: staged-view
+
+- issue_id: `I-20260402-1400-A`
+
+## Implementation Decision Note
+
+- decision: `Use staged index data when governance-merge-gate validates staged develop merges.`
+- why_this: `Protected-branch pre-merge validation runs before new owner artifacts necessarily exist in the working tree.`
+- alternatives_considered: `Keep using working-tree reads only.`
+- boundary_non_goals: `This test only proves staged-path visibility.`
+- residual_risk: `More merge-state edge cases may still need dedicated follow-on coverage.`
+EOF
+cat > "$REPO/src/staged-view.js" <<'EOF'
+console.log('staged view');
+EOF
+cat > "$REPO/docs/milestones.md" <<'EOF'
+# Milestones
+
+## M-sample
+
+- status: active
+
+### candidate_issues
+1. `C-20260327-2205-A`
+
+### committed_issues
+1. `I-20260327-2205-A`
+   - issue_path: `docs/epics/sample/story/issues/sample.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+2. `I-20260402-1400-A`
+   - issue_path: `docs/epics/staged/view/issues/staged-view.md`
+   - source_candidates:
+     - `docs/pre-brainstorms/staged-view/candidates.md#c-20260402-1400-a`
+
+### completed_issues
+EOF
+git add \
+  docs/milestones.md \
+  docs/pre-brainstorms/staged-view/candidates.md \
+  docs/epics/staged/view/issues/staged-view.md \
+  docs/epics/staged/view/code-reviews/20260402-staged-view-verification.md \
+  docs/progress/staged/p-staged-view.md \
+  src/staged-view.js
+rm -f \
+  "$REPO/docs/pre-brainstorms/staged-view/candidates.md" \
+  "$REPO/docs/epics/staged/view/issues/staged-view.md" \
+  "$REPO/docs/epics/staged/view/code-reviews/20260402-staged-view-verification.md" \
+  "$REPO/docs/progress/staged/p-staged-view.md" \
+  "$REPO/src/staged-view.js"
+"$REPO/bin/governance-merge-gate" --staged >"$TMP_DIR/stdout17" 2>"$TMP_DIR/stderr17"
+grep -q 'passed' "$TMP_DIR/stdout17"
+git reset -q HEAD \
+  docs/milestones.md \
+  docs/pre-brainstorms/staged-view/candidates.md \
+  docs/epics/staged/view/issues/staged-view.md \
+  docs/epics/staged/view/code-reviews/20260402-staged-view-verification.md \
+  docs/progress/staged/p-staged-view.md \
+  src/staged-view.js
+git checkout -q -- docs/milestones.md
+
+cat > "$REPO/docs/pre-brainstorms/sample/candidates.md" <<'EOF'
+# Candidates
+
+### C-20260327-2205-A
+- status: promoted
+- milestone: `M-sample`
+- promoted_issue_id: `I-20260327-2205-A`
+- promoted_issue_path: `docs/epics/sample/story/issues/sample.md`
+EOF
+cat > "$REPO/docs/epics/sample/story/issues/sample.md" <<'EOF'
+# Issue: sample
+
+- issue_id: `I-20260327-2205-A`
+- phase_state: `in_verification`
+- milestone: `M-sample`
+- source_candidate: `docs/pre-brainstorms/sample/candidates.md#c-20260327-2205-a`
+- pre_tests_path: `docs/epics/sample/story/pre-tests.md`
+- verification_artifact_dir: `docs/epics/sample/story/code-reviews`
+EOF
+mkdir -p "$REPO/docs/progress/sample" "$REPO/docs/epics/sample/story/code-reviews"
+cat > "$REPO/docs/progress/sample/p-sample.md" <<'EOF'
+# Progress: sample
+
+- issue_id: `I-20260327-2205-A`
+- issue_path: `docs/epics/sample/story/issues/sample.md`
+- phase_state: `in_verification`
+EOF
+cat > "$REPO/docs/epics/sample/story/code-reviews/r-premerge.md" <<'EOF'
+# Review: sample
+
+- issue_id: `I-20260327-2205-A`
+
+## Implementation Decision Note
+
+- decision: `Require owner pre-tests adequacy before test-pre-merge batches can promote into develop.`
+- why_this: `Promotion should fail with actionable verification diagnostics instead of relying on manual review.`
+- alternatives_considered: `Trust the batch name alone.`
+- boundary_non_goals: `This fixture does not replace the existing owner/materialization gate.`
+- residual_risk: `Post-merge followthrough still needs its own closeout lane.`
+EOF
+git add \
+  docs/pre-brainstorms/sample/candidates.md \
+  docs/epics/sample/story/issues/sample.md \
+  docs/progress/sample/p-sample.md \
+  docs/epics/sample/story/code-reviews/r-premerge.md
+if "$REPO/bin/governance-merge-gate" --staged --target-branch develop --source-branch test-pre-merge-20260408-sample >"$TMP_DIR/stdout18" 2>"$TMP_DIR/stderr18"; then
+  echo "[FAIL] governance-merge-gate should reject docs-only test-pre-merge closeout promotes whose owner pre-tests are still pending" >&2
+  exit 1
+fi
+grep -q 'owner issue pre-tests are not adequate' "$TMP_DIR/stdout18"
+grep -q '\[execution_missing\]' "$TMP_DIR/stdout18"
+
+cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+# Pre-Tests: sample
+
+## Unit
+- acceptance target: `Keep the unit contract explicit even when no unit executable surface is needed.`
+- testing layer: `unit`
+- target environment: `feature/promotion-owner`
+- required evidence: `documented unit boundary or lawful replacement evidence`
+- blocker taxonomy: `definition_missing`
+1. Record the unit surface that must remain stable.
+
+## Integration
+- acceptance target: `Run the guarded premerge integration path before promotion.`
+- testing layer: `integration`
+- target environment: `test-pre-merge-20260408-sample`
+- required evidence: `premerge verification artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the premerge integration path before promotion.
+
+## End-to-End
+- acceptance target: `State why end-to-end is intentionally covered by a more realistic surface.`
+- testing layer: `end_to_end`
+- target environment: `test-pre-merge-20260408-sample`
+- required evidence: `replacement evidence recorded in canonical pre-tests`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `covered_by_more_realistic_required_surface`
+- not_applicable_explanation: `This fixture keeps the gate focused on integration adequacy.`
+- replacement_evidence: `Integration acceptance item integration-sample plus the guarded premerge review artifact.`
+
+## Real-Environment
+- real_environment_status: `pass`
+- real_environment_reason: `This guarded premerge fixture does not require an additional real-environment test before merge; protected followthrough remains a separate acceptance surface.`
+
+## Acceptance Items
+
+### Integration command is executed
+- id: `integration-sample`
+- requirement: `The guarded promote must prove the integration command ran.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/sample/story/code-reviews/r-premerge.md`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `task-promote-sample`
+- case_design: `Run the local guarded replay and observe the review artifact before promote.`
+EOF
+git add docs/epics/sample/story/pre-tests.md
+if "$REPO/bin/governance-merge-gate" --staged --target-branch develop --source-branch test-pre-merge-20260408-sample >"$TMP_DIR/stdout18b" 2>"$TMP_DIR/stderr18b"; then
+  echo "[FAIL] governance-merge-gate should reject adequacy-v2 pre-tests that do not cover premerge-integration develop_merge" >&2
+  exit 1
+fi
+grep -q '\[evidence_plan_missing\]' "$TMP_DIR/stdout18b"
+grep -q 'none target lane premerge-integration for promotion gate develop_merge' "$TMP_DIR/stdout18b"
+
+cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+# Pre-Tests: sample
+
+## Unit
+- acceptance target: `Keep the unit contract explicit even when no unit executable surface is needed.`
+- testing layer: `unit`
+- target environment: `feature/promotion-owner`
+- required evidence: `documented unit boundary or lawful replacement evidence`
+- blocker taxonomy: `definition_missing`
+1. Record the unit surface that must remain stable.
+
+## Integration
+- acceptance target: `Run the guarded premerge integration path before promotion.`
+- testing layer: `integration`
+- target environment: `test-pre-merge-20260408-sample`
+- required evidence: `premerge verification artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the premerge integration path before promotion.
+
+## End-to-End
+- acceptance target: `State why end-to-end is intentionally covered by a more realistic surface.`
+- testing layer: `end_to_end`
+- target environment: `test-pre-merge-20260408-sample`
+- required evidence: `replacement evidence recorded in canonical pre-tests`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `covered_by_more_realistic_required_surface`
+- not_applicable_explanation: `This fixture keeps the gate focused on integration adequacy.`
+- replacement_evidence: `Integration acceptance item integration-sample plus the guarded premerge review artifact.`
+
+## Real-Environment
+- real_environment_status: `pass`
+- real_environment_reason: `This guarded premerge fixture does not require an additional real-environment test before merge; protected followthrough remains a separate acceptance surface.`
+
+## Acceptance Items
+
+### Integration command is executed
+- id: `integration-sample`
+- requirement: `The guarded promote must prove the integration command ran.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/sample/story/code-reviews/r-premerge.md`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `task-promote-sample`
+- case_design: `Run the guarded premerge integration path and capture the artifact used to justify develop promote.`
+EOF
+git add docs/epics/sample/story/pre-tests.md
+"$REPO/bin/governance-merge-gate" --staged --target-branch develop --source-branch test-pre-merge-20260408-sample >"$TMP_DIR/stdout18c" 2>"$TMP_DIR/stderr18c"
+grep -q 'passed' "$TMP_DIR/stdout18c"
+
+cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+# Pre-Tests: sample
+
+## Unit
+- acceptance target: `Keep the unit contract explicit even when no unit executable surface is needed.`
+- testing layer: `unit`
+- target environment: `feature/promotion-owner`
+- required evidence: `documented unit boundary or lawful replacement evidence`
+- blocker taxonomy: `definition_missing`
+1. Record the unit surface that must remain stable.
+
+## Integration
+- acceptance target: `Run the guarded premerge integration path before promotion.`
+- testing layer: `integration`
+- target environment: `test-pre-merge-20260408-sample`
+- required evidence: `premerge verification artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the premerge integration path before promotion.
+
+## End-to-End
+- acceptance target: `State why end-to-end is intentionally covered by a more realistic surface.`
+- testing layer: `end_to_end`
+- target environment: `test-pre-merge-20260408-sample`
+- required evidence: `replacement evidence recorded in canonical pre-tests`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `covered_by_more_realistic_required_surface`
+- not_applicable_explanation: `This fixture keeps the gate focused on integration adequacy.`
+- replacement_evidence: `Integration acceptance item integration-sample plus the guarded premerge review artifact.`
+
+## Real-Environment
+- real_environment_status: `pass`
+- real_environment_reason: `This guarded premerge fixture does not require an additional real-environment test before merge; protected followthrough remains a separate acceptance surface.`
+
+## Acceptance Items
+
+### Integration command is executed
+- id: `integration-sample`
+- requirement: `The guarded promote must prove the integration command ran.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/sample/story/code-reviews/r-premerge.md`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `task-promote-sample`
+- case_design: `Run the guarded premerge integration path and capture the artifact used to justify develop promote.`
+EOF
+git add docs/epics/sample/story/pre-tests.md
+cat > "$REPO/docs/epics/sample/story/pre-tests.md" <<'EOF'
+# Pre-Tests: sample
+
+## Unit
+- acceptance target: `Keep the unit contract explicit even when no unit executable surface is needed.`
+- testing layer: `unit`
+- target environment: `feature/promotion-owner`
+- required evidence: `documented unit boundary or lawful replacement evidence`
+- blocker taxonomy: `definition_missing`
+1. Record the unit surface that must remain stable.
+
+## Integration
+- acceptance target: `Run the guarded premerge integration path before promotion.`
+- testing layer: `integration`
+- target environment: `test-pre-merge-20260408-sample`
+- required evidence: `premerge verification artifact`
+- blocker taxonomy: `execution_pending_or_failed`
+1. Run the premerge integration path before promotion.
+
+## End-to-End
+- acceptance target: `State why end-to-end is intentionally covered by a more realistic surface.`
+- testing layer: `end_to_end`
+- target environment: `test-pre-merge-20260408-sample`
+- required evidence: `replacement evidence recorded in canonical pre-tests`
+- blocker taxonomy: `definition_missing`
+- not_applicable_reason: `covered_by_more_realistic_required_surface`
+- not_applicable_explanation: `This fixture keeps the gate focused on integration adequacy.`
+- replacement_evidence: `Integration acceptance item integration-sample plus the guarded premerge review artifact.`
+
+## Real-Environment
+- real_environment_status: `pass`
+- real_environment_reason: `This guarded premerge fixture does not require an additional real-environment test before merge; protected followthrough remains a separate acceptance surface.`
+
+## Acceptance Items
+
+### Integration command is executed
+- id: `integration-sample`
+- requirement: `The guarded promote must prove the integration command ran.`
+- evidence_level: `mock`
+- status: `pass`
+- artifact_ref: `docs/epics/sample/story/code-reviews/r-premerge.md`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `task-promote-sample`
+- case_design: `Unstaged drift tries to weaken the staged adequacy contract.`
+EOF
+"$REPO/bin/governance-merge-gate" --staged --target-branch develop --source-branch test-pre-merge-20260408-sample >"$TMP_DIR/stdout18d" 2>"$TMP_DIR/stderr18d"
+grep -q 'passed' "$TMP_DIR/stdout18d"
+
+echo "[PASS] governance-merge-gate enforces candidate-driven lifecycle evidence"

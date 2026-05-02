@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_HOME="$(mktemp -d /tmp/freely-ai-login-codex-apikey-empty.XXXXXX)"
+trap 'rm -rf "$TMP_HOME"' EXIT
+
+mkdir -p "$TMP_HOME/.codex"
+cat >"$TMP_HOME/.codex/auth.json" <<'EOF'
+{"OPENAI_API_KEY":"sk-before"}
+EOF
+cat >"$TMP_HOME/.codex/config.toml" <<'EOF'
+model = "gpt-5.4"
+EOF
+
+set +e
+printf '\n\n\n' | HOME="$TMP_HOME" bash "$ROOT_DIR/bin/ai" --quiet --format json login codex apikey >"$TMP_HOME/stdout.txt" 2>"$TMP_HOME/stderr.txt"
+rc=$?
+set -e
+
+test "$rc" -eq 2
+grep -q 'Codex API-key login requires provider name, base URL, and API key' "$TMP_HOME/stderr.txt"
+grep -q '"OPENAI_API_KEY":"sk-before"' "$TMP_HOME/.codex/auth.json"
+grep -q 'model = "gpt-5.4"' "$TMP_HOME/.codex/config.toml"
+test "$(find "$TMP_HOME/.codex" -maxdepth 1 -type f -name '*.backup-*' | wc -l | tr -d ' ')" -eq 0
+
+echo "[PASS] ai login codex apikey rejects empty interactive input without mutating live auth surfaces"

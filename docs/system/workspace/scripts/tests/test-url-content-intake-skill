@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd)"
+SCRIPT="$ROOT/docs/system/workspace/skills/url-content-intake/scripts/fetch-url.sh"
+EXTRACT="$ROOT/docs/system/workspace/skills/url-content-intake/scripts/extract-readable-content.sh"
+TMP="$(mktemp -d)"
+trap 'rm -rf "$TMP"' EXIT
+
+FAKE_CURL="$TMP/fake-curl.sh"
+cat >"$FAKE_CURL" <<'EOF'
+#!/usr/bin/env bash
+printf '%s\n' "$@" > "$TEST_ARGS_FILE"
+printf 'body'
+EOF
+chmod +x "$FAKE_CURL"
+
+run_test() {
+  local name="$1"
+  shift
+  echo "[TEST] $name"
+  "$@"
+}
+
+run_test "wechat url uses browser ua headers" bash -lc '
+  export TEST_ARGS_FILE="'"$TMP"'/wechat.args"
+  output=$(CURL_BIN="'"$FAKE_CURL"'" "'"$SCRIPT"'" "https://mp.weixin.qq.com/s/example")
+  [[ "$output" == *"fetch_status=ok"* ]]
+  [[ "$output" == *"content_kind=wechat_article"* ]]
+  grep -q "Mozilla/5.0" "$TEST_ARGS_FILE"
+  grep -q "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8" "$TEST_ARGS_FILE"
+'
+
+run_test "generic url does not force wechat headers" bash -lc '
+  export TEST_ARGS_FILE="'"$TMP"'/generic.args"
+  output=$(CURL_BIN="'"$FAKE_CURL"'" "'"$SCRIPT"'" "https://example.com/post")
+  [[ "$output" == *"fetch_status=ok"* ]]
+  [[ "$output" == *"content_kind=webpage"* ]]
+  ! grep -q "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8" "$TEST_ARGS_FILE"
+'
+
+run_test "unsupported scheme returns unsupported" bash -lc '
+  set +e
+  output=$("'"$SCRIPT"'" "file:///tmp/a" 2>/dev/null)
+  status=$?
+  set -e
+  [[ $status -eq 2 ]]
+  [[ "$output" == *"fetch_status=unsupported"* ]]
+'
+
+run_test "wechat html extracts readable text" bash -lc '
+  sample="'"$TMP"'/sample-wechat.html"
+  cat > "$sample" <<'"'"'EOF'"'"'
+<html><body><div id="js_content"><p>第一段</p><p>第二段 &amp; 第三句</p></div><script>ignored()</script></body></html>
+EOF
+  output=$("'"$EXTRACT"'" "$sample" wechat_article)
+  [[ "$output" == *"第一段"* ]]
+  [[ "$output" == *"第二段 & 第三句"* ]]
+  [[ "$output" != *"ignored"* ]]
+'
+
+echo "[PASS] test-url-content-intake-skill"

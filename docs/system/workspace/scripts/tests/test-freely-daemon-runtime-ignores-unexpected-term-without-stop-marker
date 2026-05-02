@@ -1,0 +1,126 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-daemon-unexpected-term.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260413-0000--sample" \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/.freely/logs"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260413-0000--sample
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260413-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260413-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- candidate_format_version: `v2`
+- status: `promoted`
+- milestone: `M-20260306-workspace-routing-foundation`
+- promoted_issue_path: `docs/epics/sample/issues/sample.md`
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="test-sleep"
+AI_MODEL=""
+AI_MODE="auto"
+AI_REASONING_EFFORT=""
+CHECK_INTERVAL=1
+RESTART_DELAY=1
+MAX_RESTARTS=0
+IFLOW_MAX_TURNS=100
+EOF
+
+bash "$ROOT_DIR/bin/freely" daemon start --project "$PROJECT" >/dev/null
+
+SUPERVISOR_PID=""
+for _ in $(seq 1 50); do
+  if [[ -f "$PROJECT/.freely/run/supervisor.pid" ]]; then
+    SUPERVISOR_PID="$(cat "$PROJECT/.freely/run/supervisor.pid" 2>/dev/null || true)"
+  fi
+  if [[ -n "$SUPERVISOR_PID" ]] && kill -0 "$SUPERVISOR_PID" 2>/dev/null; then
+    break
+  fi
+  sleep 0.2
+done
+
+if [[ -z "$SUPERVISOR_PID" ]] || ! kill -0 "$SUPERVISOR_PID" 2>/dev/null; then
+  echo "[FAIL] daemon start did not leave a live supervisor" >&2
+  exit 1
+fi
+
+kill -TERM "$SUPERVISOR_PID"
+sleep 1
+
+if ! kill -0 "$SUPERVISOR_PID" 2>/dev/null; then
+  echo "[FAIL] unexpected TERM without a stop marker should not tear down daemon supervisor" >&2
+  exit 1
+fi
+
+EVENT_LOG="$PROJECT/.freely/logs/runtime-events.log"
+for _ in $(seq 1 20); do
+  [[ -f "$EVENT_LOG" ]] && grep -q 'event=daemon_signal_ignored .*signal=TERM .*reason=no_stop_marker' "$EVENT_LOG" && break
+  sleep 0.2
+done
+
+grep -q 'event=daemon_signal_ignored .*signal=TERM .*reason=no_stop_marker' "$EVENT_LOG"
+if grep -q 'event=operator_stop_requested .*signal=TERM' "$EVENT_LOG"; then
+  echo "[FAIL] unexpected TERM should not be recorded as operator stop for daemon runtime" >&2
+  cat "$EVENT_LOG" >&2
+  exit 1
+fi
+
+bash "$ROOT_DIR/bin/freely" daemon stop --project "$PROJECT" >/dev/null
+
+for _ in $(seq 1 50); do
+  if ! kill -0 "$SUPERVISOR_PID" 2>/dev/null; then
+    break
+  fi
+  sleep 0.2
+done
+
+if kill -0 "$SUPERVISOR_PID" 2>/dev/null; then
+  echo "[FAIL] explicit daemon stop should still terminate the supervisor" >&2
+  exit 1
+fi
+
+grep -q 'event=operator_stop_requested .*signal=TERM' "$EVENT_LOG"
+
+echo "[PASS] freely daemon ignores unexpected TERM without a stop marker but still honors explicit daemon stop"

@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-rate-limit-watchdog.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+monotonic_ms() {
+  python3 - <<'PY'
+import time
+print(int(time.monotonic() * 1000))
+PY
+}
+
+PROJECT="$TMP_DIR/project"
+MOCK_BIN="$TMP_DIR/mock-bin"
+MOCK_HOME="$TMP_DIR/mock-home"
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260309-0000--sample" \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/.freely/logs" \
+  "$PROJECT/bin" \
+  "$MOCK_BIN" \
+  "$MOCK_HOME/.codex/sessions/2026/03/16"
+
+git init -q "$PROJECT"
+git -C "$PROJECT" checkout -q -b feature/test-rate-limit-watchdog
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# 预研头脑风暴工作区
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# 预研头脑风暴索引
+- 20260309-0000--sample
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# 收敛
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260309-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+- ok
+EOF
+
+cat >"$PROJECT/docs/pre-brainstorms/20260309-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+CHECK_INTERVAL=1
+RESTART_DELAY=0
+MAX_RESTARTS=2
+IFLOW_MAX_TURNS=100
+MAX_RESUME_STREAK=24
+MAX_ROUTE_ONLY_STREAK=1
+ROTATE_ON_CONTEXT_COMPACTED=1
+SESSION_HANDOFF_TAIL_LINES=10
+CONTEXT_WARN_RATIO=0.50
+CONTEXT_ROTATE_RATIO=0.70
+CHECKPOINT_WARN_DIRTY_ENTRIES=40
+CHECKPOINT_BLOCK_DIRTY_ENTRIES=120
+EOF
+
+cat >"$PROJECT/bin/ai" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+case "$*" in
+  *"whoami"*) echo '{"tool":"codex","account":"limited@example.com","slot":"limited@example-com-1"}' ;;
+  *"list"*) echo '{"accounts":[]}' ;;
+  *"switch"*) echo '{"switched": false, "tool":"codex","account":"unavailable"}' ;;
+  *) echo '{}' ;;
+esac
+EOF
+chmod +x "$PROJECT/bin/ai"
+
+cat >"$MOCK_BIN/codex" <<'EOF'
+#!/usr/bin/env bash
+echo "session id: test-limit-session"
+echo "[TEST] mock codex rate limit"
+sleep 1
+EOF
+chmod +x "$MOCK_BIN/codex"
+
+reset_at="$(( $(date +%s) + 4 ))"
+cat >"$MOCK_HOME/.codex/sessions/2026/03/16/rollout-2026-03-16T18-40-00-test-limit-session.jsonl" <<EOF
+{"timestamp":"2026-03-17T01:40:00.000Z","type":"event_msg","payload":{"type":"token_count","info":null,"rate_limits":{"primary":{"used_percent":100.0,"window_minutes":300,"resets_at":$reset_at},"secondary":{"used_percent":0.0,"window_minutes":10080,"resets_at":$reset_at},"credits":{"has_credits":false,"unlimited":false,"balance":null},"plan_type":null}}}
+EOF
+
+start_epoch_ms="$(monotonic_ms)"
+HOME="$MOCK_HOME" PATH="$MOCK_BIN:$PATH" bash "$ROOT_DIR/bin/freely" start --project "$PROJECT" >/dev/null 2>&1 || true
+end_epoch_ms="$(monotonic_ms)"
+
+if (( end_epoch_ms - start_epoch_ms > 4500 )); then
+  echo "[FAIL] expected local runtime to defer rate-limit recovery instead of sleeping locally"
+  exit 1
+fi
+
+grep -q 'LAST_SLOT_SWITCH_REASON="primary_rate_limit_exhausted"' "$PROJECT/.freely/run/session-state.env"
+grep -Eq '^limited@example-com-1[[:space:]][0-9]+' "$PROJECT/.freely/run/codex-slot-cooldowns.tsv"
+
+echo "[PASS] freely start defers codex rate-limit recovery to the watchdog path"

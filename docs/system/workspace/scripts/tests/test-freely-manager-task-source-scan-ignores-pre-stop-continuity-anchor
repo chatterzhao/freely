@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-task-scan-pre-stop.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+
+mkdir -p "$PROJECT/.freely/run" "$PROJECT/docs"
+
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name freely-test
+git -C "$PROJECT" config user.email freely-test@example.com
+cat >"$PROJECT/README.md" <<'EOF'
+# project
+EOF
+git -C "$PROJECT" add README.md
+git -C "$PROJECT" commit -q -m "init"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+
+OLD_CONTINUITY="$PROJECT/.freely/run/manager-continuity-20260420-071010.md"
+cat >"$OLD_CONTINUITY" <<'EOF'
+# Manager Continuity
+- route_kind: `issue_continuation`
+EOF
+touch -t 202604201410.10 "$OLD_CONTINUITY"
+
+cat >"$PROJECT/.freely/run/manager-operator-stop-boundary.env" <<'EOF'
+OPERATOR_STOP_BOUNDARY_EPOCH="9999999999"
+OPERATOR_STOP_BOUNDARY_RECORDED_AT="2286-11-20T17:46:39Z"
+EOF
+
+SCAN_JSON="$PROJECT/.freely/run/manager-task-source-scan-latest.json"
+
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+write_task_source_scan_json_for_project "$PROJECT" "bootstrap_missing_scan" >/dev/null
+
+python3 - "$SCAN_JSON" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], "r", encoding="utf-8") as f:
+    payload = json.load(f)
+
+assert payload["continuity_anchor"] is None
+PY
+
+echo "[PASS] task-source scan omits pre-stop manager continuity as fresh continuity anchor"

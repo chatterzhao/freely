@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-start-active-slot-switch-lock.XXXXXX)"
+cleanup() {
+  set +e
+  kill "${LOCK_PID:-}" 2>/dev/null || true
+  wait "${LOCK_PID:-}" 2>/dev/null || true
+  rm -rf "$TMP_DIR"
+}
+trap cleanup EXIT
+
+PROJECT="$TMP_DIR/project"
+MOCK_BIN="$TMP_DIR/bin"
+LOCK_DIR="$TMP_DIR/slot-switch.lock"
+LAUNCH_LOG="$TMP_DIR/codex.launch.log"
+mkdir -p \
+  "$PROJECT/docs/pre-brainstorms/20260309-0000--sample" \
+  "$PROJECT/.freely/run" \
+  "$PROJECT/.freely/logs" \
+  "$MOCK_BIN" \
+  "$LOCK_DIR"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260309-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260309-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260309-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+EOF
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+FREELY_ACTIVATION_CONSENT_STATUS="accepted"
+FREELY_ACTIVATION_CONSENT_RECORDED_AT="2026-04-04T21:48:00Z"
+FREELY_ACTIVATION_CONSENT_RECORDED_VIA="test"
+CHECK_INTERVAL=1
+RESTART_DELAY=1
+MAX_RESTARTS=0
+EOF
+
+cat >"$MOCK_BIN/codex" <<'EOF'
+#!/usr/bin/env bash
+echo launched >>"${LAUNCH_LOG:?}"
+exit 0
+EOF
+chmod +x "$MOCK_BIN/codex"
+
+sleep 30 &
+LOCK_PID=$!
+cat >"$LOCK_DIR/state.env" <<EOF
+owner_pid=$LOCK_PID
+started_at=$(date +%s)
+reason=manual_switch_sweep
+command=switch
+target=auto
+EOF
+
+if PATH="$MOCK_BIN:$PATH" \
+  AI_CLI_SWITCH_LOCK_DIR="$LOCK_DIR" \
+  LAUNCH_LOG="$LAUNCH_LOG" \
+  FREELY_ACCOUNT_SWITCH_WAIT_SECS=2 \
+  FREELY_ACCOUNT_SWITCH_WAIT_INTERVAL_SECS=1 \
+  bash "$ROOT_DIR/bin/freely" start --project "$PROJECT" >"$TMP_DIR/start.out" 2>&1; then
+  echo "[FAIL] freely start should time out behind an active codex slot-switch lock" >&2
+  cat "$TMP_DIR/start.out" >&2
+  exit 1
+fi
+
+grep -q 'timed out waiting for active codex slot-switch lock before freely start' "$TMP_DIR/start.out"
+[[ -d "$LOCK_DIR" ]]
+if [[ -f "$LAUNCH_LOG" ]]; then
+  echo "[FAIL] codex should not launch while freely start is timing out behind an active slot-switch lock" >&2
+  exit 1
+fi
+
+echo "[PASS] freely start times out cleanly behind an active codex slot-switch lock"

@@ -1,0 +1,125 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-live-status-active-manager-fast-path.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+REPO="$TMP_DIR/repo"
+mkdir -p "$REPO/.freely/run" "$REPO/docs"
+
+cd "$REPO"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+echo base > README.md
+git add README.md
+git commit -q -m "init"
+
+cat >"$REPO/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$REPO/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$REPO/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$REPO/.freely/config.env" <<EOF
+PROJECT_ROOT="$REPO"
+INTENT_FILE="$REPO/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$REPO/docs/CONSTITUTION.md"
+LAW_FILE="$REPO/docs/LAWS.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+AI_REASONING_EFFORT="medium"
+EOF
+cat >"$REPO/.freely/run/workcell-state.env" <<'EOF'
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="up"
+LAST_EXIT_REASON="none"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2026-04-22T16:00:00Z"
+EOF
+cat >"$REPO/.freely/run/manager-worker-launch-state.env" <<EOF
+LAST_MANAGER_CONTINUITY_GENERATED="unavailable"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED="none"
+LAST_MANAGER_CONTINUITY_CONSUMED="unavailable"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED="none"
+LAUNCHED_WORKER_PROMPTS="none"
+QUEUED_WORKER_PROMPTS="none"
+QUEUED_WORKER_PROMPT_BLOCKERS="none"
+MAX_PARALLEL_WORKERS="unbounded"
+ACTIVE_RUNNING_WORKER_COUNT="1"
+AVAILABLE_NEW_WORKER_SLOTS="unbounded"
+UPDATED_AT="2026-04-22T16:00:00Z"
+EOF
+
+bash -c "exec -a 'codex exec -C $REPO -m gpt-5.4' sleep 30" >/dev/null 2>&1 &
+AI_PID=$!
+trap 'kill "$AI_PID" 2>/dev/null || true; rm -rf "$TMP_DIR"' EXIT
+printf '%s' "$AI_PID" >"$REPO/.freely/run/ai.pid"
+
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+manager_worker_launch_state_refresh_for_status() {
+  echo "[FAIL] live-status should not refresh manager worker launch state while manager AI is already running" >&2
+  return 99
+}
+
+fleet_active_ownership_conflicts_summary() {
+  echo "[FAIL] live-status should not scan fleet ownership conflicts while manager AI is already running" >&2
+  return 99
+}
+
+count_active_intake_items() {
+  echo "[FAIL] live-status should not rescan active intake while manager AI is already running" >&2
+  return 99
+}
+
+count_intake_items_by_status() {
+  echo "[FAIL] live-status should not rescan intake status counts while manager AI is already running" >&2
+  return 99
+}
+
+intake_snapshot_for_project() {
+  echo "[FAIL] live-status should not render intake snapshots from a full intake scan while manager AI is already running" >&2
+  return 99
+}
+
+delegated_continuation_ids_for_project() {
+  echo "[FAIL] live-status should not rescan delegated continuation history while manager AI is already running" >&2
+  return 99
+}
+
+task_source_scan_status_summary_for_project() {
+  printf 'none|unavailable|none|none|none\n'
+}
+
+blocked_supervision_snapshot_for_project() {
+  printf 'none|none|none|none\n'
+}
+
+manager_handoff_snapshot_for_project() {
+  printf 'none|none|none|none|none|none|none\n'
+}
+
+manager_continuity_gap_snapshot_for_project() {
+  printf 'none|none|none|none|none|none|none|none\n'
+}
+
+develop_push_followthrough_snapshot_for_project() {
+  printf 'none|none|none|0|0|none|none|none|none|none|none|none|none\n'
+}
+
+OUTPUT="$(cmd_live_status --project "$REPO")"
+
+printf '%s\n' "$OUTPUT" | grep -q 'role_hint: manager'
+printf '%s\n' "$OUTPUT" | grep -q 'active_running_worker_count: 1'
+printf '%s\n' "$OUTPUT" | grep -q 'intake_active_items: 0'
+printf '%s\n' "$OUTPUT" | grep -q 'pending_delegated_continuation_ids: deferred_while_manager_active'
+printf '%s\n' "$OUTPUT" | grep -q "role=ai pid=$AI_PID"
+
+echo "[PASS] live-status skips fleet refresh and uses cached manager launch state while the manager AI is active"

@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-live-status-intent-canonicalize.XXXXXX)"
+TMP_DIR_REAL="$(cd "$TMP_DIR" && pwd -P)"
+trap 'rm -rf "$TMP_DIR_REAL"' EXIT
+
+PROJECT="$TMP_DIR/project"
+WORKER="$TMP_DIR/project-worktrees/feature-worker"
+WORKER_REAL="$TMP_DIR_REAL/project-worktrees/feature-worker"
+mkdir -p "$PROJECT/.freely/run" "$WORKER"
+
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+PROMPT="$PROJECT/.freely/run/prompt-20260402-151500.txt"
+cat >"$PROMPT" <<EOF
+Dispatch metadata:
+- intent_kind: cleanup
+
+Worktree:
+- \`$WORKER\`
+
+Branch:
+- \`feature/live-status-intent-surface-canonicalizes-target\`
+EOF
+
+OUTPUT="$(bash "$ROOT_DIR/bin/freely" live-status --project "$PROJECT")"
+
+grep -q 'prompt_intent_kind: cleanup' <<<"$OUTPUT"
+grep -q "prompt_intent_target: $WORKER_REAL" <<<"$OUTPUT"
+if grep -q "prompt_intent_target: $WORKER"$ <<<"$OUTPUT"; then
+  echo "[FAIL] live-status surfaced non-canonical prompt intent target" >&2
+  exit 1
+fi
+
+echo "[PASS] live-status surfaces canonicalized prompt intent targets"

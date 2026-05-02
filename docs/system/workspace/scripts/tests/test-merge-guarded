@@ -1,0 +1,153 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TEST_TMP="$(mktemp -d /tmp/freely-merge-guard.XXXXXX)"
+PIDS=()
+cleanup() {
+  local pid
+  for pid in "${PIDS[@]:-}"; do
+    kill "$pid" 2>/dev/null || true
+    wait "$pid" 2>/dev/null || true
+  done
+  rm -rf "$TEST_TMP"
+}
+trap cleanup EXIT
+
+REPO="$TEST_TMP/repo"
+mkdir -p "$REPO"
+cd "$REPO"
+
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+cp "$ROOT_DIR/docs/system/workspace/scripts/worktree/merge-guarded" "$REPO/bin-merge-guarded"
+mkdir -p "$REPO/bin" "$REPO/docs/system/workspace/scripts/quality" "$REPO/docs/system/workspace/scripts/runtime" "$REPO/docs/system/workspace/skills/watchdog-control-plane/scripts"
+cp "$ROOT_DIR/bin/governance-promotion-gate" "$REPO/bin/governance-promotion-gate"
+cp "$ROOT_DIR/docs/system/workspace/scripts/quality/governance-promotion-gate" "$REPO/docs/system/workspace/scripts/quality/governance-promotion-gate"
+cp "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely" "$REPO/docs/system/workspace/scripts/runtime/freely"
+cp "$ROOT_DIR/docs/system/workspace/scripts/runtime/session-evidence-resolver.sh" "$REPO/docs/system/workspace/scripts/runtime/session-evidence-resolver.sh"
+cp "$ROOT_DIR/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" "$REPO/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
+cp "$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh" "$REPO/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+chmod +x "$REPO/bin-merge-guarded"
+chmod +x "$REPO/bin/governance-promotion-gate" "$REPO/docs/system/workspace/scripts/quality/governance-promotion-gate" "$REPO/docs/system/workspace/scripts/runtime/freely" "$REPO/docs/system/workspace/scripts/runtime/session-evidence-resolver.sh" "$REPO/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" "$REPO/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+
+echo base > README.md
+git add README.md
+git commit -q -m "init"
+
+git branch main
+git branch test-pre-merge-20260327-demo
+git branch feature/demo
+git branch feature/premerge-demo
+git branch hotfix/demo main
+git branch release/demo develop
+
+git checkout -q feature/demo
+echo feature >> README.md
+git commit -q -am "feature change"
+
+git checkout -q feature/premerge-demo
+echo premerge >> PREMERGE.md
+git add PREMERGE.md
+git commit -q -m "premerge feature change"
+
+git checkout -q hotfix/demo
+echo hotfix >> HOTFIX.md
+git add HOTFIX.md
+git commit -q -m "hotfix change"
+
+git checkout -q test-pre-merge-20260327-demo
+"$REPO/bin-merge-guarded" test-pre-merge-20260327-demo feature/demo >/dev/null
+git merge-base --is-ancestor feature/demo test-pre-merge-20260327-demo
+
+git checkout -q test-pre-merge-20260327-demo
+"$REPO/bin-merge-guarded" test-pre-merge-20260327-demo feature/premerge-demo >/dev/null
+git merge-base --is-ancestor feature/premerge-demo test-pre-merge-20260327-demo
+
+git checkout -q develop
+"$REPO/bin-merge-guarded" develop test-pre-merge-20260327-demo >/dev/null
+git merge-base --is-ancestor test-pre-merge-20260327-demo develop
+git log -1 --format=%B HEAD | grep -q '^Freely-Merge-Path: merge-guarded$'
+git log -1 --format=%B HEAD | grep -q '^Freely-Bypass-Mode: forbidden$'
+git log -1 --format=%B HEAD | grep -q '^Freely-Source-Branch: test-pre-merge-20260327-demo$'
+
+if "$REPO/bin-merge-guarded" develop feature/demo >/dev/null 2>"$TEST_TMP/feature-develop-blocked.err"; then
+  echo "[FAIL] invalid feature -> develop merge unexpectedly allowed" >&2
+  exit 1
+fi
+grep -q "blocked merge" "$TEST_TMP/feature-develop-blocked.err"
+
+git checkout -q test-pre-merge-20260327-demo
+"$REPO/bin-merge-guarded" test-pre-merge-20260327-demo hotfix/demo >/dev/null
+git merge-base --is-ancestor hotfix/demo test-pre-merge-20260327-demo
+
+git checkout -q main
+if "$REPO/bin-merge-guarded" main feature/demo >/dev/null 2>"$TEST_TMP/blocked.err"; then
+  echo "[FAIL] invalid feature -> main merge unexpectedly allowed" >&2
+  exit 1
+fi
+grep -q "blocked merge" "$TEST_TMP/blocked.err"
+
+git checkout -q -b test-pre-merge-20260327-conflict-normal
+printf 'premerge-side\n' > CONFLICT.txt
+git add CONFLICT.txt
+git commit -q -m "seed conflict source"
+
+git checkout -q develop
+printf 'develop-side\n' > CONFLICT.txt
+git add CONFLICT.txt
+git commit -q -m "seed conflict target"
+
+set +e
+"$REPO/bin-merge-guarded" develop test-pre-merge-20260327-conflict-normal >/dev/null 2>"$TEST_TMP/conflict-normal.err"
+conflict_normal_rc=$?
+set -e
+[[ "$conflict_normal_rc" -ne 0 ]] || {
+  echo "[FAIL] merge-guarded should stop on textual conflict and leave merge state for completion" >&2
+  exit 1
+}
+git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1
+printf 'resolved-normal\n' > CONFLICT.txt
+git add CONFLICT.txt
+"$REPO/bin-merge-guarded" complete develop test-pre-merge-20260327-conflict-normal >/dev/null
+git log -1 --format=%B HEAD | grep -q '^Freely-Merge-Path: merge-guarded-complete$'
+git log -1 --format=%B HEAD | grep -q '^Freely-Bypass-Mode: forbidden$'
+git log -1 --format=%B HEAD | grep -q '^Freely-Source-Branch: test-pre-merge-20260327-conflict-normal$'
+
+git checkout -q -b test-pre-merge-20260327-conflict-breakglass
+printf 'breakglass-source\n' > BREAKGLASS.txt
+git add BREAKGLASS.txt
+git commit -q -m "seed break-glass source"
+
+git checkout -q develop
+printf 'breakglass-target\n' > BREAKGLASS.txt
+git add BREAKGLASS.txt
+git commit -q -m "seed break-glass target"
+
+set +e
+"$REPO/bin-merge-guarded" develop test-pre-merge-20260327-conflict-breakglass >/dev/null 2>"$TEST_TMP/conflict-breakglass.err"
+conflict_breakglass_rc=$?
+set -e
+[[ "$conflict_breakglass_rc" -ne 0 ]] || {
+  echo "[FAIL] merge-guarded should leave conflict state for break-glass completion test" >&2
+  exit 1
+}
+git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1
+printf 'resolved-breakglass\n' > BREAKGLASS.txt
+git add BREAKGLASS.txt
+"$REPO/bin-merge-guarded" complete develop test-pre-merge-20260327-conflict-breakglass \
+  --break-glass \
+  --reason verified_false_negative \
+  --blocked-gate pre-merge-commit \
+  --evidence-ref docs/epics/sample/story/code-reviews/r-breakglass.md \
+  --follow-on-issue I-20260402-0020-A >/dev/null
+git log -1 --format=%B HEAD | grep -q '^Freely-Merge-Path: merge-guarded-break-glass$'
+git log -1 --format=%B HEAD | grep -q '^Freely-Bypass-Mode: break_glass$'
+git log -1 --format=%B HEAD | grep -q '^Freely-Break-Glass-Reason: verified_false_negative$'
+git log -1 --format=%B HEAD | grep -q '^Freely-Blocked-Gate: pre-merge-commit$'
+git log -1 --format=%B HEAD | grep -q '^Freely-Operation-Scope: merge_completion_only$'
+git log -1 --format=%B HEAD | grep -q '^Freely-Evidence-Ref: docs/epics/sample/story/code-reviews/r-breakglass.md$'
+git log -1 --format=%B HEAD | grep -q '^Freely-Follow-On-Issue: I-20260402-0020-A$'
+
+echo "[PASS] merge-guarded enforces test-pre-merge family promotion into develop and controlled completion receipts"

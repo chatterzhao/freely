@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-control-plane-pid-source.XXXXXX)"
+cleanup() {
+  set +e
+  kill "${SUP_PID:-}" "${GOOD_DISPATCH_PID:-}" "${BAD_DISPATCH_PID:-}" "${GOOD_WATCHDOG_PID:-}" "${BAD_WATCHDOG_PID:-}" 2>/dev/null || true
+  wait "${SUP_PID:-}" "${GOOD_DISPATCH_PID:-}" "${BAD_DISPATCH_PID:-}" "${GOOD_WATCHDOG_PID:-}" "${BAD_WATCHDOG_PID:-}" 2>/dev/null || true
+  rm -rf "$TMP_DIR"
+}
+trap cleanup EXIT
+
+OUTPUT="$(
+  bash -lc '
+    set -euo pipefail
+    source "'"$ROOT_DIR"'/docs/system/workspace/scripts/runtime/freely"
+    cleanup_inner() {
+      set +e
+      kill "${sup_pid:-}" "${good_dispatch_pid:-}" "${bad_dispatch_pid:-}" "${good_watchdog_pid:-}" "${bad_watchdog_pid:-}" 2>/dev/null || true
+      wait "${sup_pid:-}" "${good_dispatch_pid:-}" "${bad_dispatch_pid:-}" "${good_watchdog_pid:-}" "${bad_watchdog_pid:-}" 2>/dev/null || true
+    }
+    trap cleanup_inner EXIT
+
+    project="'"$TMP_DIR"'/project"
+    mkdir -p "$project/.freely/run/supervisor-identities"
+    cat >"$(workcell_state_file "$project")" <<EOF
+DESIRED_RUNTIME_STATE="running"
+LAST_SUPERVISOR_STATE="up"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="starting"
+LAST_ENTRYPOINT_MODE="daemon"
+LAST_ROLE_HINT="manager"
+EOF
+
+    good_root="'"$ROOT_DIR"'"
+    bad_root="'"$TMP_DIR"'/stale-runtime"
+    mkdir -p "$bad_root/docs/system/workspace/scripts/runtime"
+
+    bash -c "exec -a '\''bash $good_root/docs/system/workspace/scripts/runtime/freely daemon-run --project $project'\'' sleep 30" &
+    sup_pid=$!
+    write_supervisor_identity_truth "$project" "$sup_pid" "daemon"
+
+    bash -c "exec -a '\''bash $good_root/docs/system/workspace/scripts/runtime/freely ensure-interruption-dispatch --project $project --watch'\'' sleep 30" &
+    good_dispatch_pid=$!
+    bash -c "exec -a '\''bash $bad_root/docs/system/workspace/scripts/runtime/freely ensure-interruption-dispatch --project $project --watch'\'' sleep 30" &
+    bad_dispatch_pid=$!
+    bash -c "exec -a '\''bash $good_root/docs/system/workspace/scripts/runtime/freely ensure-manager --project $project --watch --interval 10'\'' sleep 30" &
+    good_watchdog_pid=$!
+    bash -c "exec -a '\''bash $bad_root/docs/system/workspace/scripts/runtime/freely ensure-manager --project $project --watch --interval 10'\'' sleep 30" &
+    bad_watchdog_pid=$!
+
+    valid_interruption_dispatcher_pid_for_project "$project" "$good_dispatch_pid"
+    ! valid_interruption_dispatcher_pid_for_project "$project" "$bad_dispatch_pid"
+    valid_ensure_manager_watchdog_pid_for_project "$project" "$good_watchdog_pid"
+    ! valid_ensure_manager_watchdog_pid_for_project "$project" "$bad_watchdog_pid"
+    printf "ok\n"
+  ' 2>&1
+)"
+
+printf '%s\n' "$OUTPUT" | grep -F -q "ok"
+echo "[PASS] control-plane pid validation prefers authoritative runtime source"

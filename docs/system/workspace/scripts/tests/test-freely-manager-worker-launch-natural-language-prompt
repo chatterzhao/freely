@@ -1,0 +1,198 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TMP_DIR="$(mktemp -d /tmp/freely-manager-worker-launch-natural-language.XXXXXX)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+PROJECT="$TMP_DIR/project"
+WORKER_WT="$TMP_DIR/worker-wt"
+mkdir -p "$PROJECT/docs/pre-brainstorms/20260322-0000--sample"
+
+git init -q -b develop "$PROJECT"
+git -C "$PROJECT" config user.name "Freely Test"
+git -C "$PROJECT" config user.email "freely@example.com"
+
+cat >"$PROJECT/docs/PROJECT_INTENT.md" <<'EOF'
+# Intent
+EOF
+cat >"$PROJECT/docs/CONSTITUTION.md" <<'EOF'
+# Constitution
+EOF
+cat >"$PROJECT/docs/LAWS.md" <<'EOF'
+# Laws
+EOF
+cat >"$PROJECT/AGENTS.md" <<'EOF'
+# Agents
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/README.md" <<'EOF'
+# README
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/INDEX.md" <<'EOF'
+# INDEX
+- 20260322-0000--sample
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/CONVERGENCE.md" <<'EOF'
+# CONVERGENCE
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260322-0000--sample/brainstorms.md" <<'EOF'
+# Brainstorms
+EOF
+cat >"$PROJECT/docs/pre-brainstorms/20260322-0000--sample/candidates.md" <<'EOF'
+# Candidates
+- promoted_issue_path: pending://issue-materialization
+- milestone: pending://milestone-binding
+- session_refs: []
+EOF
+
+git -C "$PROJECT" add .
+git -C "$PROJECT" commit -q -m "init"
+git -C "$PROJECT" worktree add -q -b feature/test-worker "$WORKER_WT" develop
+
+mkdir -p "$PROJECT/.freely/run/worker-prompts" "$PROJECT/.freely/logs" "$WORKER_WT/.freely/run" "$WORKER_WT/.freely/logs"
+cat >"$PROJECT/.freely/config.env" <<EOF
+PROJECT_ROOT="$PROJECT"
+INTENT_FILE="$PROJECT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$PROJECT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+cat >"$WORKER_WT/.freely/config.env" <<EOF
+PROJECT_ROOT="$WORKER_WT"
+INTENT_FILE="$WORKER_WT/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE="$WORKER_WT/docs/CONSTITUTION.md"
+AI_TOOL="codex"
+AI_MODEL="gpt-5.4"
+AI_MODE="auto"
+EOF
+
+PROMPT_FILE="$PROJECT/.freely/run/worker-prompts/20260323-203100-worker-manager-delegated-continuation-stall-codex.txt"
+cat >"$PROMPT_FILE" <<EOF
+dispatch_priority: P0
+parallel_safe: false
+write_scope:
+- docs/pre-brainstorms/20260322-0000--sample/**
+Owner-Issue:
+- \`I-20260322-0000-A\`
+Pre-Tests-Path:
+- \`docs/epics/sample/story/pre-tests.md\`
+Verification-Artifact-Dir:
+- \`docs/epics/sample/story/code-reviews\`
+Required-Test-Lanes:
+- \`feature-local\`
+- \`premerge-integration\`
+Required-Acceptance-Item-Ids:
+- \`integration-cli-smoke\`
+- \`realenv-dogfood\`
+Minimum-Evidence-Level:
+- \`command-plus-artifact\`
+Target-Environment:
+- \`test-pre-merge-sample\`
+Closeout-Gate:
+- \`pretests-gate --require-adequacy\`
+Closeout-Gate-Command:
+- \`pretests-gate --require-adequacy\`
+Closeout-Target-Lane:
+- \`premerge-integration\`
+Closeout-Promotion-Gate:
+- \`develop_merge\`
+Closeout-Requires-Adequacy:
+- \`true\`
+Closeout-Review-Artifact-Policy:
+- \`fresh-staged-owner-review-artifact\`
+
+You are the worker for \`feature/test-worker\` in \`$WORKER_WT\`.
+
+Continue the delegated continuation.
+EOF
+
+CONT_FILE="$PROJECT/.freely/run/manager-continuity-20260323-203100.md"
+cat >"$CONT_FILE" <<EOF
+# Manager Continuity
+
+- worker_prompt: \`$PROMPT_FILE\`
+EOF
+
+cat >"$PROJECT/.freely/run/manager-worker-launch-state.env" <<EOF
+LAST_MANAGER_CONTINUITY_GENERATED="$PROJECT/.freely/run/manager-continuity-20260322-010101.md"
+LAST_MANAGER_WORKER_PROMPTS_GENERATED="$PROJECT/.freely/run/worker-prompts/20260322-010101-worker-manager-delegated-continuation-stall-codex.txt"
+LAST_MANAGER_CONTINUITY_CONSUMED="$PROJECT/.freely/run/manager-continuity-20260322-010101.md"
+LAST_MANAGER_WORKER_PROMPTS_CONSUMED="$PROJECT/.freely/run/worker-prompts/20260322-010101-worker-manager-delegated-continuation-stall-codex.txt"
+LAUNCHED_WORKER_PROMPTS="$PROJECT/.freely/run/worker-prompts/20260322-010101-worker-manager-delegated-continuation-stall-codex.txt"
+UPDATED_AT="2026-03-23T20:31:00Z"
+EOF
+
+# shellcheck disable=SC1090
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
+
+START_LOG="$TMP_DIR/started.log"
+manager_supervisor_pid_for_project() {
+  return 0
+}
+runtime_ai_pid_hint_for_project() {
+  return 0
+}
+start_workcell_supervisor_async() {
+  echo "$1" >>"$START_LOG"
+}
+
+LAUNCHED="$(manager_runtime_launch_workers_from_latest_handoff "$PROJECT")"
+[[ "$LAUNCHED" == "1" ]] || {
+  echo "[FAIL] expected one launched worker, got $LAUNCHED" >&2
+  exit 1
+}
+
+INTAKE_DIR="$(intake_dir_for_project "$WORKER_WT")"
+INTAKE_ID="$(find "$INTAKE_DIR" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | head -n 1)"
+[[ -n "$INTAKE_ID" ]] || {
+  echo "[FAIL] expected one delegated intake item" >&2
+  exit 1
+}
+INTAKE_CONTRACT="$(intake_item_verification_contract_file "$WORKER_WT" "$INTAKE_ID")"
+RUNTIME_CONTRACT="$(worker_verification_contract_state_file "$WORKER_WT")"
+
+grep -q "$WORKER_WT" "$START_LOG"
+grep -q '^DESIRED_RUNTIME_STATE="running"$' "$WORKER_WT/.freely/run/workcell-state.env"
+grep -q "^LAST_MANAGER_CONTINUITY_CONSUMED=\"$CONT_FILE\"$" "$PROJECT/.freely/run/manager-worker-launch-state.env"
+grep -q "^LAST_MANAGER_WORKER_PROMPTS_CONSUMED=\"$PROMPT_FILE\"$" "$PROJECT/.freely/run/manager-worker-launch-state.env"
+[[ "$(worker_prompt_owner_issue "$PROMPT_FILE")" == "I-20260322-0000-A" ]]
+[[ "$(worker_prompt_pre_tests_path "$PROMPT_FILE")" == "docs/epics/sample/story/pre-tests.md" ]]
+[[ "$(worker_prompt_verification_artifact_dir "$PROMPT_FILE")" == "docs/epics/sample/story/code-reviews" ]]
+[[ "$(worker_prompt_required_test_lanes_csv "$PROMPT_FILE")" == "feature-local,premerge-integration" ]]
+[[ "$(worker_prompt_required_acceptance_item_ids_csv "$PROMPT_FILE")" == "integration-cli-smoke,realenv-dogfood" ]]
+[[ "$(worker_prompt_minimum_evidence_level "$PROMPT_FILE")" == "command-plus-artifact" ]]
+[[ "$(worker_prompt_target_environment "$PROMPT_FILE")" == "test-pre-merge-sample" ]]
+[[ "$(worker_prompt_closeout_gate "$PROMPT_FILE")" == "pretests-gate --require-adequacy" ]]
+[[ "$(worker_prompt_closeout_gate_command "$PROMPT_FILE")" == "pretests-gate --require-adequacy" ]]
+[[ "$(worker_prompt_closeout_target_lane "$PROMPT_FILE")" == "premerge-integration" ]]
+[[ "$(worker_prompt_closeout_promotion_gate "$PROMPT_FILE")" == "develop_merge" ]]
+[[ "$(worker_prompt_closeout_requires_adequacy "$PROMPT_FILE")" == "true" ]]
+[[ "$(worker_prompt_closeout_review_artifact_policy "$PROMPT_FILE")" == "fresh-staged-owner-review-artifact" ]]
+grep -q '^VERIFICATION_METADATA_PRESENT="true"$' "$INTAKE_CONTRACT"
+grep -q '^OWNER_ISSUE="I-20260322-0000-A"$' "$INTAKE_CONTRACT"
+grep -q '^PRE_TESTS_PATH="docs/epics/sample/story/pre-tests.md"$' "$INTAKE_CONTRACT"
+grep -q '^REQUIRED_TEST_LANES_CSV="feature-local,premerge-integration"$' "$INTAKE_CONTRACT"
+grep -q '^REQUIRED_ACCEPTANCE_ITEM_IDS_CSV="integration-cli-smoke,realenv-dogfood"$' "$INTAKE_CONTRACT"
+grep -q '^CLOSEOUT_GATE="pretests-gate --require-adequacy"$' "$INTAKE_CONTRACT"
+grep -q '^CLOSEOUT_GATE_COMMAND="pretests-gate --require-adequacy"$' "$INTAKE_CONTRACT"
+grep -q '^CLOSEOUT_TARGET_LANE="premerge-integration"$' "$INTAKE_CONTRACT"
+grep -q '^CLOSEOUT_PROMOTION_GATE="develop_merge"$' "$INTAKE_CONTRACT"
+grep -q '^CLOSEOUT_REQUIRES_ADEQUACY="true"$' "$INTAKE_CONTRACT"
+grep -q '^CLOSEOUT_REVIEW_ARTIFACT_POLICY="fresh-staged-owner-review-artifact"$' "$INTAKE_CONTRACT"
+grep -q "^SOURCE_INTAKE_ID=\"$INTAKE_ID\"$" "$RUNTIME_CONTRACT"
+grep -q '^VERIFICATION_METADATA_PRESENT="true"$' "$RUNTIME_CONTRACT"
+grep -q '^OWNER_ISSUE="I-20260322-0000-A"$' "$RUNTIME_CONTRACT"
+grep -q '^LAST_WORKER_VERIFICATION_METADATA_PRESENT="true"$' "$WORKER_WT/.freely/run/workcell-state.env"
+grep -q '^LAST_WORKER_OWNER_ISSUE="I-20260322-0000-A"$' "$WORKER_WT/.freely/run/workcell-state.env"
+grep -q '^LAST_WORKER_PRE_TESTS_PATH="docs/epics/sample/story/pre-tests.md"$' "$WORKER_WT/.freely/run/workcell-state.env"
+grep -q '^LAST_WORKER_REQUIRED_TEST_LANES_CSV="feature-local,premerge-integration"$' "$WORKER_WT/.freely/run/workcell-state.env"
+grep -q '^LAST_WORKER_REQUIRED_ACCEPTANCE_ITEM_IDS_CSV="integration-cli-smoke,realenv-dogfood"$' "$WORKER_WT/.freely/run/workcell-state.env"
+grep -q '^LAST_WORKER_CLOSEOUT_GATE="pretests-gate --require-adequacy"$' "$WORKER_WT/.freely/run/workcell-state.env"
+grep -q '^LAST_WORKER_CLOSEOUT_GATE_COMMAND="pretests-gate --require-adequacy"$' "$WORKER_WT/.freely/run/workcell-state.env"
+grep -q '^LAST_WORKER_CLOSEOUT_TARGET_LANE="premerge-integration"$' "$WORKER_WT/.freely/run/workcell-state.env"
+grep -q '^LAST_WORKER_CLOSEOUT_PROMOTION_GATE="develop_merge"$' "$WORKER_WT/.freely/run/workcell-state.env"
+grep -q '^LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY="true"$' "$WORKER_WT/.freely/run/workcell-state.env"
+grep -q '^LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY="fresh-staged-owner-review-artifact"$' "$WORKER_WT/.freely/run/workcell-state.env"
+
+echo "[PASS] manager launch linkage accepts natural-language worker prompt contract"
