@@ -11421,7 +11421,10 @@ SESSIONEOF
     return 1
   fi
 
-  log_info "launching worker AI with own ACP subprocess: target=$target_project prompt=$(basename "$prompt_file")"
+  log_info "launching worker AI with own ACP subprocess (loop mode): target=$target_project prompt=$(basename "$prompt_file")"
+  local _worker_next_file
+  _worker_next_file="$(run_dir_for_project "$target_project")/worker-next-prompt.txt"
+  rm -f "$_worker_next_file"
   (
     cd "$target_project" 2>/dev/null || cd "$manager_project"
     export FREELY_ROLE_HINT=worker
@@ -11431,7 +11434,9 @@ SESSIONEOF
       --cwd "$target_project" \
       --prompt-file "$prompt_file" \
       --launch-kind fork \
-      --mode auto
+      --mode auto \
+      --loop \
+      --next-prompt-file "$_worker_next_file"
   ) >> "$worker_cycle_log" 2>&1 &
   _worker_pid=$!
 

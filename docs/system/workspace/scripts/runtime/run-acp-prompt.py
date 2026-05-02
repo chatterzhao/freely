@@ -294,7 +294,9 @@ def parse_args():
     parser.add_argument("--launch-kind", choices=("fresh", "resume", "fork"), default="fresh",
                         help="Session lifecycle state")
     parser.add_argument("--loop", action="store_true",
-                        help="Loop mode: after prompt completes, read next prompt file path from stdin. Send EXIT to stop.")
+                        help="Loop mode: after prompt completes, check --next-prompt-file for the next prompt. Delete after reading. 'EXIT' in file stops the loop.")
+    parser.add_argument("--next-prompt-file", default="",
+                        help="Path to file that contains the next prompt file path (loop mode)")
     return parser.parse_args()
 
 
@@ -432,30 +434,31 @@ def main():
 
         stop_reason = send_prompt(prompt_text, t_start, t_session, launch_kind)
 
-        # Loop mode: keep session alive, read next prompt from stdin
-        if args.loop:
-            import select
+        # Loop mode: keep session alive, wait for next prompt via control file
+        if args.loop and args.next_prompt_file:
+            next_file = Path(args.next_prompt_file)
             while True:
-                # Read next prompt file path from stdin (blocking with timeout)
-                ready, _, _ = select.select([sys.stdin], [], [], 1.0)
-                if not ready:
-                    continue
-                line = sys.stdin.readline()
-                if not line:
-                    break  # EOF
-                line = line.strip()
-                if not line:
-                    continue
-                if line == "EXIT":
-                    break
-                # Read next prompt from file
-                try:
-                    next_text = Path(line).read_text(encoding="utf-8")
-                except Exception as e:
-                    print(f"[WARN] cannot read next prompt file: {line} ({e})", file=sys.stderr, flush=True)
-                    continue
-                stop_reason = send_prompt(next_text, t_start, t_session, launch_kind)
-                t_start = time.time()  # reset timing baseline for next prompt
+                if next_file.exists():
+                    try:
+                        line = next_file.read_text(encoding="utf-8").strip()
+                        next_file.unlink()  # consume the signal
+                    except Exception:
+                        time.sleep(0.5)
+                        continue
+                    if not line:
+                        time.sleep(0.5)
+                        continue
+                    if line == "EXIT":
+                        break
+                    try:
+                        next_text = Path(line).read_text(encoding="utf-8")
+                    except Exception as e:
+                        print(f"[WARN] cannot read next prompt file: {line} ({e})", file=sys.stderr, flush=True)
+                        continue
+                    stop_reason = send_prompt(next_text, t_start, t_session, launch_kind)
+                    t_start = time.time()
+                else:
+                    time.sleep(0.5)  # poll interval
     finally:
         if args.loop:
             try:
