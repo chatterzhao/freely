@@ -1026,14 +1026,14 @@ def _derive_chain_action(current: str, next_station: str | None, blockers: list[
 
 
 def scan_worktree_governance(project: Path) -> list[dict]:
-    """Scan branches and worktrees for governance issues.
+    """Scan branches and worktrees for naming convention and cleanup.
 
-    Principle:
+    Principle (no exceptions):
     - main/develop/tags are permanent — excluded
-    - Naming convention (raw-xxx in branch name) enforced at wt-create time only
-    - For branches WITH issue key: if issue done → "未收口" (needs cleanup)
-    - For branches WITHOUT issue key: show only if dirty/unmerged/has-runtime
-    - Clean merged branches without issue keys → skip (harmless legacy)
+    - ALL other branches MUST contain raw-xxx or I-xxx in the name
+    - If no issue key → 命名不规范，需重命名
+    - If issue key found → check if issue done → 未收口
+    - If issue not done → skip (covered by lifecycle chain trace)
     """
     items = []
 
@@ -1046,8 +1046,7 @@ def scan_worktree_governance(project: Path) -> list[dict]:
     except subprocess.CalledProcessError:
         return items
 
-    # Parse worktree list
-    worktrees: dict[str, dict] = {}  # path → {branch, ...}
+    worktrees: dict[str, dict] = {}
     current_wt = None
     for line in raw.splitlines():
         if line.startswith("worktree "):
@@ -1058,7 +1057,6 @@ def scan_worktree_governance(project: Path) -> list[dict]:
             if branch_ref.startswith("refs/heads/"):
                 worktrees[current_wt]["branch"] = branch_ref[11:]
 
-    # Get all local branches
     try:
         branches_raw = subprocess.check_output(
             ["git", "-C", str(project), "branch", "--format=%(refname:short)"],
@@ -1068,7 +1066,6 @@ def scan_worktree_governance(project: Path) -> list[dict]:
     except subprocess.CalledProcessError:
         all_branches = []
 
-    # Build worktree index by branch
     worktree_by_branch: dict[str, dict] = {}
     project_wt_path = str(project.resolve())
     for wt_path, wt_info in worktrees.items():
@@ -1076,7 +1073,6 @@ def scan_worktree_governance(project: Path) -> list[dict]:
         if branch:
             worktree_by_branch[branch] = wt_info
 
-    # Scan each non-protected branch
     for branch in all_branches:
         if _is_protected_branch(branch):
             continue
@@ -1086,61 +1082,39 @@ def scan_worktree_governance(project: Path) -> list[dict]:
         wt_path = wt_info.get("path", "")
         wt_path_obj = Path(wt_path) if wt_path else None
 
-        # Determine worktree state
-        is_dirty = _worktree_dirty(wt_path_obj) if wt_path_obj else False
-        has_runtime = _worktree_has_runtime(wt_path_obj) if wt_path_obj else False
-        merged_to_develop = _branch_merged_to_develop(project, branch)
-
-        # If this is the project's own worktree, skip
         if wt_path and str(Path(wt_path).resolve()) == project_wt_path:
             continue
 
-        # Determine stage and incomplete reasons
+        is_dirty = _worktree_dirty(wt_path_obj) if wt_path_obj else False
+        merged_to_develop = _branch_merged_to_develop(project, branch)
+
         if not issue_key:
-            # No issue key: naming convention enforced at wt-create time, not retroactively.
-            # Only flag if there's actual cleanup work needed (dirty/unmerged/runtime).
-            if not is_dirty and merged_to_develop and not has_runtime:
-                continue  # clean merged legacy branch — harmless, skip
-            incomplete = []
-            if is_dirty:
-                incomplete.append("worktree_dirty")
-            if merged_to_develop is False:
-                incomplete.append("branch_not_merged_to_develop")
-            if has_runtime and merged_to_develop:
-                incomplete.append("worktree_not_retired")
+            # 命名不规范：必须重命名以包含 issue key
             items.append({
                 "source_family": "worktree_governance",
                 "key": branch,
                 "branch": branch,
                 "worktree_path": wt_path or "无工位",
                 "issue_key": None,
-                "stage": "未收口",
+                "stage": "命名不规范",
                 "dirty": is_dirty,
-                "has_runtime": has_runtime,
                 "merged_to_develop": merged_to_develop,
-                "incomplete": incomplete,
-                "next_action": _derive_governance_action(is_dirty, merged_to_develop, has_runtime),
-                "ready": not is_dirty,
+                "incomplete": ["branch_name_no_issue_key"],
+                "next_action": "确定对应 issue → git branch -m 重命名为 feature/raw-{ts}-{slug} 格式",
+                "ready": False,
             })
             continue
 
-        issue_done = _issue_is_done(project, issue_key)
+        # Has issue key: check if issue is done
+        if not _issue_is_done(project, issue_key):
+            continue  # not done → lifecycle chain trace covers it
 
-        if not issue_done:
-            # Issue not done → skip (covered by issue lifecycle scan)
-            continue
-
-        # Issue is done → 未收口: needs cleanup
         incomplete = []
         if is_dirty:
             incomplete.append("worktree_dirty")
         if merged_to_develop is False:
             incomplete.append("branch_not_merged_to_develop")
-        if has_runtime and merged_to_develop:
-            incomplete.append("worktree_not_retired")
-
-        if not incomplete and not is_dirty and merged_to_develop:
-            # Fully clean — just needs retirement
+        if not incomplete and merged_to_develop:
             incomplete.append("ready_to_retire")
 
         items.append({
@@ -1151,24 +1125,21 @@ def scan_worktree_governance(project: Path) -> list[dict]:
             "issue_key": issue_key,
             "stage": "未收口",
             "dirty": is_dirty,
-            "has_runtime": has_runtime,
             "merged_to_develop": merged_to_develop,
             "incomplete": incomplete,
-            "next_action": _derive_governance_action(is_dirty, merged_to_develop, has_runtime),
+            "next_action": _derive_governance_action(is_dirty, merged_to_develop),
             "ready": not is_dirty,
         })
 
     return items
 
 
-def _derive_governance_action(dirty: bool, merged: bool | None, has_runtime: bool) -> str:
+def _derive_governance_action(dirty: bool, merged: bool | None) -> str:
     if dirty:
         return "提交或丢弃 dirty 修改 → merge 到 develop → 退役工位 → 删分支"
     if merged is False:
         return "merge 到 develop → 退役工位 → 删分支"
-    if has_runtime:
-        return "已 merge，退役工位并删除分支"
-    return "工位已退役但分支仍存在：删除分支"
+    return "已 merge，退役工位并删除分支"
 
 
 def main() -> int:
