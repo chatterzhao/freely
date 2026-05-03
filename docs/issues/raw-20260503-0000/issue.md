@@ -1,5 +1,5 @@
 ---
-local_id: raw-20260503-acp-bridge-crash
+local_id: raw-20260503-0000
 kind: raw
 status: absorbed
 absorbed_into: I-20260503-0000-A
@@ -11,8 +11,8 @@ canonical_issue_path: "docs/epics/workspace-routing-foundation/acp-bridge-crash-
 last_synced_comment_at: {}
 hash: ""
 created_at: "2026-05-03T00:00:00Z"
-updated_at: "2026-05-03T00:00:00Z"
-intake_id: 20260503-acp-bridge-crash
+updated_at: "2026-05-03T00:50:00Z"
+intake_id: 20260503-0000-acp-bridge-crash
 author: human
 channel: chat
 session_refs: []
