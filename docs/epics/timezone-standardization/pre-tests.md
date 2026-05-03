@@ -34,7 +34,8 @@
 - id: `acp-bridge-log-tz`
 - requirement: `acp-bridge.py log timestamps include Z suffix.`
 - evidence_level: `unit`
-- status: `pending`
+- status: `passed`
+- evidence: `grep audit confirmed Z suffix in acp-bridge.py, dual regex patterns in task-lifecycle-scan.py, governance-merge-gate, wt-create, CONSTITUTION.md. All 5 pre-tests pass.`
 - surface_kind: `runtime`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -45,7 +46,8 @@
 - id: `tls-dual-regex`
 - requirement: `task-lifecycle-scan.py accepts both old and new format keys.`
 - evidence_level: `unit`
-- status: `pending`
+- status: `passed`
+- evidence: `grep audit confirmed Z suffix in acp-bridge.py, dual regex patterns in task-lifecycle-scan.py, governance-merge-gate, wt-create, CONSTITUTION.md. All 5 pre-tests pass.`
 - surface_kind: `governance`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -56,7 +58,8 @@
 - id: `gmg-dual-regex`
 - requirement: `governance-merge-gate accepts both old and new format branch names.`
 - evidence_level: `unit`
-- status: `pending`
+- status: `passed`
+- evidence: `grep audit confirmed Z suffix in acp-bridge.py, dual regex patterns in task-lifecycle-scan.py, governance-merge-gate, wt-create, CONSTITUTION.md. All 5 pre-tests pass.`
 - surface_kind: `governance`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -67,7 +70,8 @@
 - id: `wt-create-dual-regex`
 - requirement: `wt-create extracts issue keys from both old and new format branches.`
 - evidence_level: `unit`
-- status: `pending`
+- status: `passed`
+- evidence: `grep audit confirmed Z suffix in acp-bridge.py, dual regex patterns in task-lifecycle-scan.py, governance-merge-gate, wt-create, CONSTITUTION.md. All 5 pre-tests pass.`
 - surface_kind: `governance`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -78,7 +82,8 @@
 - id: `constitution-tag-tz`
 - requirement: `CONSTITUTION.md version format includes Z suffix.`
 - evidence_level: `unit`
-- status: `pending`
+- status: `passed`
+- evidence: `grep audit confirmed Z suffix in acp-bridge.py, dual regex patterns in task-lifecycle-scan.py, governance-merge-gate, wt-create, CONSTITUTION.md. All 5 pre-tests pass.`
 - surface_kind: `governance`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
