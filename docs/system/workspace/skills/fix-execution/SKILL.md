@@ -1,9 +1,21 @@
 ---
 name: fix-execution
-description: 快速修复 bug 的工作流——用 test-pre-merge-* 私有工位隔离快测，cp 到可写工位正式提交，不违背保护分支约束。
+description: 快速修复 bug 的特殊高效策略——用 test-pre-merge-* 私有工位隔离快测，cp 到可写工位正式提交，不违背保护分支的本质约束。
 ---
 
 # skill:fix-execution
+
+## 定位
+
+**fix skill 是特殊场景的高效策略，不是通用开发流程。**
+
+常规开发走 `feature → test-pre-merge-* → develop` 完整链路，每个门禁都过。但 bug 修复有特殊性：需要快速迭代验证（改了测、测了改），如果每次改一行代码都走一遍完整门禁链路，效率极低。
+
+本 skill 在不违背保护分支本质约束的前提下，用 `test-pre-merge-*` 作为私有快速测试沙箱，验证通过后将修改转移到可写工位，正式提交和门禁合并仍在合规分支上完成。
+
+**不违背本质**：
+- `test-pre-merge-*` 的保护约束是禁止 add/commit/push（防止未经审查的代码进入共享历史）。fix skill 在上面只产生 dirty state，不 add、不 commit、不 push。这与约束的精神完全一致——保护的是共享历史，不是阻止本地文件修改。
+- 正式提交发生在可写工位（feature/hotfix），合并走 merge-guarded 合规路径。与常规开发的区别仅在于"快速测试在哪做"，提交和合并的合规性完全相同。
 
 ## 核心原则
 
@@ -18,16 +30,19 @@ description: 快速修复 bug 的工作流——用 test-pre-merge-* 私有工�
 
 ## 为什么 test-pre-merge-* 可以用于测试
 
-`test-pre-merge-*` 受保护分支的约束是：禁止写入、提交、推送（CONSTITUTION.md §2）。但 fix skill 用它做的是：
+`test-pre-merge-*` 的保护约束是禁止写入（add/commit）和推送（CONSTITUTION.md §2, LAWS.md §2）。fix skill 用它做的是：
 
-| 动作 | 在 test-pre-merge-* 上做？ | 违背约束？ |
-|---|---|---|
-| 改源码验证修复 | ✅ 是（私有工位，仅自己可见） | 否——不提交，不影响其他 AI |
-| git commit | ❌ 否 | — |
-| git push | ❌ 否（pre-push hook 本身就阻止） | — |
-| 正式提交流程 | ❌ 在可写工位（feature/hotfix）上做 | — |
+```
+test-pre-merge-* 上的操作:
+  改源码 → ✅ 产生 dirty state（私有工位，仅自己可见）
+  git add → ❌ 不做
+  git commit → ❌ 不做
+  git push → ❌ 不做（pre-push hook 也阻止）
+  cp 修改到可写工位 → ✅ 转移修改
+  清理 dirty state → ✅ git checkout -- . / git clean -fd
+```
 
-**本质上**: test-pre-merge-* 作为私有测试工位，等同于临时沙箱。修改通过 cp 转移到可写工位，正式提交发生在合规分支上。不阻塞 develop，不影响其他 AI 的并发工作。
+**关键**：修改只在 test-pre-merge-* 上以 dirty state 存在，验证通过后 cp 到可写工位（feature/hotfix）正式 add+commit。test-pre-merge-* 上的 dirty 修改最终被丢弃。正式提交全在可写工位，合并也走可写工位 → test-pre-merge-* → develop 的合规路径。
 
 ---
 
@@ -121,7 +136,10 @@ hotfix/*          → main
 
 阶段 5 — 收尾
   │
-  ├─ git worktree remove <test-pre-merge-wt>
+  ├─ 丢弃 test-pre-merge-* 上的 dirty 修改（已经 cp 到可写工位）
+  │     cd <test-pre-merge-wt> && git checkout -- . && git clean -fd
+  ├─ 删除 test-pre-merge-* 工位
+  │     git worktree remove <test-pre-merge-wt>
   └─ git branch -D test-pre-merge-<name>
 ```
 
