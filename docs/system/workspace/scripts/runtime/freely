@@ -11339,9 +11339,18 @@ launch_worker_from_manager_prompt_if_needed() {
   local intake_id supervisor_pid ai_pid runtime_contract_file missing_fields_csv has_any_verification_metadata="0"
   local selected_tool
   target_project="$(materialize_worker_prompt_worktree_if_needed "$manager_project" "$prompt_file")"
-  [[ -n "$target_project" && -d "$target_project" ]] || return 1
-  project_has_authoritative_worktree_path "$manager_project" "$target_project" || return 1
-  ensure_runtime_workcell_initialized_for_launch "$manager_project" "$target_project" || return 1
+  if [[ -z "$target_project" || ! -d "$target_project" ]]; then
+    log_warn "worker DIAG: materialize returned empty or missing (target=$target_project)"
+    return 1
+  fi
+  if ! project_has_authoritative_worktree_path "$manager_project" "$target_project"; then
+    log_warn "worker DIAG: $target_project not in authoritative fleet"
+    return 1
+  fi
+  if ! ensure_runtime_workcell_initialized_for_launch "$manager_project" "$target_project"; then
+    log_warn "worker DIAG: workcell init failed for $target_project"
+    return 1
+  fi
   runtime_probe_project="$target_project"
   prompt_target_worktree="$(worker_prompt_target_worktree "$prompt_file")"
   if [[ -n "$prompt_target_worktree" && -d "$prompt_target_worktree" ]] \
@@ -11360,18 +11369,18 @@ launch_worker_from_manager_prompt_if_needed() {
     has_any_verification_metadata="1"
   fi
   if [[ -n "$missing_fields_csv" && "$has_any_verification_metadata" == "1" ]]; then
-    write_worker_verification_contract_file "$runtime_contract_file" "$prompt_file" "" "$target_project"
-    if [[ -n "$supervisor_pid" || -n "$ai_pid" ]]; then
-      write_workcell_state \
-        "$target_project" \
-        "running" \
-        "$( [[ -n "$supervisor_pid" ]] && printf 'up' || printf 'down' )" \
-        "$( [[ -n "$ai_pid" ]] && printf 'up' || printf 'down' )" \
-        "manager_worker_launch_verification_blocked"
-    else
-      write_workcell_state "$target_project" "stopped" "down" "down" "manager_worker_launch_verification_blocked"
+    log_warn "worker verification metadata incomplete: missing=$missing_fields_csv (prompt=$(basename "$prompt_file"))"
+    # Write a chat-inbox entry so the AI learns what fields are needed
+    local _db_path _chat_py
+    _db_path="$(run_dir_for_project "$manager_project")/../freely.db"
+    _chat_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/chat-inbox.py"
+    if [[ -f "$_chat_py" ]]; then
+      python3 "$_chat_py" add --db "$_db_path" --type "comment" \
+        --issue-id "raw-guidance" \
+        --message "Worker prompt $(basename "$prompt_file") has incomplete verification metadata. Missing fields: $missing_fields_csv. Please add these fields or remove the verification metadata section." \
+        --author "runtime" --channel "worker-guard" >/dev/null 2>&1 || true
     fi
-    return 1
+    # Continue with launch — don't block on incomplete metadata
   fi
   intake_id="$(write_manager_worker_launch_intake "$target_project" "$prompt_file")"
   write_worker_verification_contract_file "$runtime_contract_file" "$prompt_file" "$intake_id" "$target_project"
