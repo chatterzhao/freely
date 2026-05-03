@@ -6,6 +6,23 @@ policy_ref='docs/CONSTITUTION.md §2'
 while read -r local_ref local_sha remote_ref remote_sha; do
   [[ -z "${local_ref:-}" ]] && continue
 
+  # Handle tag refs: allow pushable stages (stable, nightly, hotfix)
+  if [[ "$local_ref" == refs/tags/* ]]; then
+    local_tag="${local_ref#refs/tags/}"
+    case "$local_tag" in
+      *-stable|*-nightly|*-hotfix) continue ;;
+      *)
+        cat >&2 <<MSG
+[HOOK] Push blocked: tag '$local_tag' is not pushable.
+Only stable, nightly, and hotfix tags may be pushed (format: YYYY.MM.DD-HHMM-stage).
+Alpha and beta tags are local-only.
+Policy source: $policy_ref
+MSG
+        exit 1
+        ;;
+    esac
+  fi
+
   local_branch="${local_ref#refs/heads/}"
   remote_branch="${remote_ref#refs/heads/}"
 
@@ -43,7 +60,6 @@ MSG
       continue
       ;;
     feature/*|hotfix/*)
-      # Validate naming convention: must contain raw-xxx or I-xxx key
       if ! echo "$local_branch" | grep -qoE 'raw-[0-9]{8}-[0-9]{4}' && \
          ! echo "$local_branch" | grep -qoE 'I-[0-9]{8}-[0-9]{4}(-[A-Z0-9]+)?'; then
         cat >&2 <<MSG
