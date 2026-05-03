@@ -73,7 +73,7 @@ _require_issue_exists() {
   key="$(_extract_issue_key "$branch")"
   [[ -n "$key" ]] || return 0
 
-  db_path="$ROOT_DIR/.freely/chat-inbox.db"
+  db_path="$ROOT_DIR/.freely/freely.db"
   chat_inbox_py="$ROOT_DIR/docs/system/workspace/scripts/runtime/chat-inbox.py"
 
   case "$key" in
@@ -126,7 +126,7 @@ _materialize_chat_if_needed() {
   [[ "$key" == raw-* ]] || return 0
   ts="${key#raw-}"
 
-  db_path="$ROOT_DIR/.freely/chat-inbox.db"
+  db_path="$ROOT_DIR/.freely/freely.db"
   chat_inbox_py="$ROOT_DIR/docs/system/workspace/scripts/runtime/chat-inbox.py"
   [[ -f "$db_path" ]] || return 0
 
