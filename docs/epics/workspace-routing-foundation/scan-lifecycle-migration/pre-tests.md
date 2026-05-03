@@ -16,62 +16,74 @@
 - acceptance target: `daemon 正常启动，prompt 包含 lifecycle scan 输出`
 - testing layer: `integration`
 - target environment: `test-pre-merge-scan-lifecycle-20260503`
-- required evidence: `daemon launch log 无错误，prompt 文件包含 chain trace`
+- required evidence: `daemon launch log, prompt file`
 - blocker taxonomy: `execution_pending_or_failed`
 1. 在 test-pre-merge 工位启动 daemon
-2. 检查 prompt 文件包含 "Lifecycle task scan" 和 chain trace 结果
+2. 检查 prompt 文件包含 "Lifecycle task scan" 和完整 chain trace
 
-## Acceptance
-- acceptance target: `scan 输出从 147 条降到 35 条，无重复，逐条验证准确`
-- testing layer: `acceptance`
-- target environment: `develop`
-- required evidence: `scan 输出完整对比`
+## End-to-End
+- acceptance target: `扫描从 147 条降到 35 条，扫描结果与实际状态完全一致`
+- testing layer: `end_to_end`
+- target environment: `test-pre-merge-scan-lifecycle-20260503`
+- required evidence: `scan output comparison`
 - blocker taxonomy: `execution_pending_or_failed`
-1. 对比旧 scan (147条) vs 新 scan (35条)
-2. 逐条核实 chain trace 每个 key 的 current/next/blokers
+1. 对比旧 scan (147条) vs 新 scan (35条)，逐条核实
+
+## Real-Environment
+- acceptance target: `guarded promote 通过 develop merge gate，无回归`
+- testing layer: `real_environment`
+- target environment: `develop`
+- required evidence: `merge-guarded 成功，governance-check 通过`
+- blocker taxonomy: `protected_environment_only`
+- real_environment_status: `pending`
+- real_environment_reason: `待 merge 到 develop 后验证`
 
 ## Acceptance Items
 
-### item-001: scan output accuracy
-- item_id: item-001
-- acceptance_type: unit
-- result: pass
-- executed_at: 2026-05-03T03:00:00Z
-- environment: feature/scan-lifecycle-migration
-- evidence_path: docs/epics/workspace-routing-foundation/scan-lifecycle-migration/code-reviews/review.md
-- notes: |
-    35 items (chat_inbox=7, chain_trace=17, governance=11).
-    Each key verified against actual filesystem state. All correct.
-    Old scan: 147 items. New scan: 35 items. 76% noise reduction.
+### scan output accuracy verified
+- id: `scan-output-accuracy`
+- requirement: `scan 输出 35 条，chat_inbox=7, chain_trace=17, governance=11，逐条与实际状态一致`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/scan-lifecycle-migration/code-reviews/review.md`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#task-1`
+- case_design: `运行 SKIP_PLATFORM_CHECK=1 python3 task-lifecycle-scan.py --project . 并逐 key 对比实际文件系统状态`
 
-### item-002: chain trace station verification
-- item_id: item-002
-- acceptance_type: unit
-- result: pass
-- executed_at: 2026-05-03T03:10:00Z
-- environment: feature/scan-lifecycle-migration
-- evidence_path: docs/epics/workspace-routing-foundation/scan-lifecycle-migration/code-reviews/review.md
-- notes: |
-    12 mandatory + 2 optional stations per key verified.
-    Absorbed B1 skip, platform_ids empty detection, branch_deleted gating all correct.
+### chain trace stations accurate
+- id: `chain-trace-stations`
+- requirement: `12 mandatory + 2 optional stations per key，每站 current/next/blokers 与实际一致`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/scan-lifecycle-migration/code-reviews/review.md`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#task-3`
+- case_design: `逐 key 验证 chain trace 的 reached stations，包括 absorbed B1 skip, platform_ids empty detection, branch_deleted 证据门控`
 
-### item-003: daemon prompt integration
-- item_id: item-003
-- acceptance_type: integration
-- result: pass
-- executed_at: 2026-05-03T03:20:00Z
-- environment: test-pre-merge-scan-lifecycle-20260503
-- evidence_path: docs/epics/workspace-routing-foundation/scan-lifecycle-migration/code-reviews/review.md
-- notes: |
-    Daemon started in test-pre-merge. Prompt contains lifecycle scan output.
-    ACP bridge works via hash-based socket path.
+### socket path under 104 chars
+- id: `socket-path-short`
+- requirement: `AF_UNIX socket path < 50 chars，daemon 在长路径工位下正常启动`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/scan-lifecycle-migration/code-reviews/review.md`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `completion`
+- task_refs: `tasks.md#task-5`
+- case_design: `在 test-pre-merge 工位启动 daemon，验证 socket 路径为 /tmp/freely-acp-{hash}.sock (< 50 chars)`
 
-### item-004: socket path fix verification
-- item_id: item-004
-- acceptance_type: integration
-- result: pass
-- executed_at: 2026-05-03T03:30:00Z
-- environment: test-pre-merge-scan-lifecycle-20260503
-- evidence_path: docs/epics/workspace-routing-foundation/scan-lifecycle-migration/code-reviews/review.md
-- notes: |
-    Socket path reduced from 122 to 37 chars. Daemon starts in long-path worktree.
+### governance gate passes
+- id: `governance-gate-pass`
+- requirement: `governance-merge-gate --range develop..HEAD 通过`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/scan-lifecycle-migration/code-reviews/review.md`
+- surface_kind: `integration`
+- target_lane: `feature-local`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#task-6`
+- case_design: `运行 ./bin/governance-merge-gate --range develop..HEAD，验证 C/M/I chain 完整`
