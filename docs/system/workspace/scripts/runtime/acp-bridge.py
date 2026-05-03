@@ -69,7 +69,7 @@ class AcpBridge:
         self.stdin_write_lock = threading.Lock()
 
     def log(self, msg):
-        ts = time.strftime("%Y-%m-%dT%H:%M:%S")
+        ts = time.strftime("%Y-%m-%dT%H:%M:%SZ")
         line = f"[{ts}] {msg}\n"
         try:
             with open(self.log_file, "a") as f:

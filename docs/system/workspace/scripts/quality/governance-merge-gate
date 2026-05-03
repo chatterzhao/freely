@@ -702,15 +702,25 @@ def main() -> int:
         if key_match:
             key_ok = True
         else:
-            key_match = re.search(r"I-[0-9]{8}-[0-9]{4}(-[A-Z0-9]+)?", source_branch)
+            key_match = re.search(r"raw-[0-9]{8}T[0-9]{4,6}Z", source_branch)
             if key_match:
                 key_ok = True
+            else:
+                key_match = re.search(r"I-[0-9]{8}-[0-9]{4}(-[A-Z0-9]+)?", source_branch)
+                if key_match:
+                    key_ok = True
+                else:
+                    key_match = re.search(r"I-[0-9]{8}T[0-9]{4,6}Z(-[A-Z0-9]+)?", source_branch)
+                    if key_match:
+                        key_ok = True
         if not key_ok:
             branch_type = source_branch.split("/")[0] if "/" in source_branch else "unknown"
             errors.append(
                 f"GATE 1: source branch '{source_branch}' does not contain a valid issue key. "
-                f"Feature and hotfix branches must include a raw-YYYYMMDD-HHMM or I-YYYYMMDD-HHMM-X key. "
-                f"Examples: {branch_type}/raw-20260503-0115-acp-bridge-fix, {branch_type}/I-20260503-0115-A-acp-bridge-fix. "
+                f"Feature and hotfix branches must include a raw-YYYYMMDD-HHMM, raw-YYYYMMDDThhmmZ, "
+                f"I-YYYYMMDD-HHMM-X, or I-YYYYMMDDThhmmZ-X key. "
+                f"Examples: {branch_type}/raw-20260503-0115-acp-bridge-fix, "
+                f"{branch_type}/raw-20260503T0115Z-acp-bridge-fix. "
                 f"Use './bin/wt-create {branch_type}/raw-YYYYMMDD-HHMM-slug' to create the worktree with correct naming."
             )
 
@@ -720,9 +730,13 @@ def main() -> int:
     if branch_key_match:
         branch_issue_key = branch_key_match.group(1)
     else:
-        i_key_match = re.search(r"(I-[0-9]{8}-[0-9]{4}(?:-[A-Z0-9]+)?)", source_branch)
-        if i_key_match:
-            branch_issue_key = i_key_match.group(1)
+        branch_key_match = re.search(r"(raw-[0-9]{8}T[0-9]{4,6}Z)", source_branch)
+        if branch_key_match:
+            branch_issue_key = branch_key_match.group(1)
+        else:
+            i_key_match = re.search(r"(I-[0-9]{8}-[0-9]{4}(?:-[A-Z0-9]+)?)", source_branch)
+            if i_key_match:
+                branch_issue_key = i_key_match.group(1)
 
     if args.target_branch == "develop" and branch_issue_key:
         # 2a: SQLite chat-inbox catch-all — ensure matching chat is consumed
@@ -735,6 +749,10 @@ def main() -> int:
                 raw_ts_match = re.match(r"raw-(\d{8}-\d{4})", branch_issue_key)
                 if raw_ts_match:
                     ts_prefix = raw_ts_match.group(1).replace("-", "")
+                else:
+                    raw_ts_match = re.match(r"raw-(\d{8}T\d{4,6}Z)", branch_issue_key)
+                    if raw_ts_match:
+                        ts_prefix = raw_ts_match.group(1).replace("T", "").replace("Z", "")
                     rows = conn.execute(
                         "SELECT id, issue_id, consumed, materialized_as FROM chats "
                         "WHERE CAST(id AS TEXT) LIKE ? AND chat_type = 'new-issue' AND consumed = 0 "
@@ -1355,6 +1373,8 @@ def main() -> int:
     # GATE 6.2: linked issues must have platform_ids in docs/issues/
     for issue_path in sorted(issue_bound_issue_paths):
         matched = re.match(r".*/(I-\d{8}-\d{4}[A-Za-z0-9-]*)\.md$", issue_path)
+        if not matched:
+            matched = re.match(r".*/(I-\d{8}T\d{4,6}Z(?:-[A-Za-z0-9]+)*)\.md$", issue_path)
         if not matched:
             continue
         issue_local_id = matched.group(1)
