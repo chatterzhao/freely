@@ -203,7 +203,7 @@ routing_policy:
 8. `I-20260501-0000-A`
 - title: PR scan surface + FREELY_REPO_PLATFORMS config
 - milestone_state: committed
-- phase_state: `completed`
+- phase_state: `done`
 - priority: P0
 - issue_path: `docs/issues/I-20260501-0000-A/issue.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-scan-pr-platform-config.md`
