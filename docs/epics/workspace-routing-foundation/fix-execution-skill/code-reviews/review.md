@@ -25,3 +25,11 @@
 - alternatives_considered: Keep original (wrong naming, incomplete scenarios); separate skill for each scenario (over-fragmentation).
 - boundary_non_goals: Does not change hook allowlist or merge-guarded branch validation rules.
 - residual_risk: None. Pure documentation correction.
+
+## Correction review round 2 (2026-05-03)
+
+- decision: Approve alignment with CONSTITUTION.md conventions and dual-role clarification.
+- why_this: Previous version used invented names and didn't explain the test-pre-merge-* dual role.
+- alternatives_considered: Leave as-is (confusing); rewrite from scratch (overkill).
+- boundary_non_goals: Does not change branch conventions or merge-guarded behavior.
+- residual_risk: None. Pure documentation correction.
