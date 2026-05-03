@@ -47,7 +47,7 @@ SESSION_CACHE_LIB="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-cach
 
 BUILD_ARTIFACT_AUDIT_SCRIPT="$SELF_ROOT/docs/system/workspace/scripts/quality/check-build-artifact-exposure"
 SUPPLY_CHAIN_AUDIT_SCRIPT="$SELF_ROOT/docs/system/workspace/scripts/quality/check-supply-chain-baseline"
-TASK_SOURCE_SCAN_SCRIPT="$SELF_ROOT/docs/system/workspace/scripts/runtime/task-source-scan.py"
+TASK_SOURCE_SCAN_SCRIPT="$SELF_ROOT/docs/system/workspace/scripts/runtime/task-lifecycle-scan.py"
 
 format_timestamp_local_for_display() {
   local value="${1:-}" epoch=""
@@ -14091,10 +14091,7 @@ task_source_scan_regeneration_reason_for_project() {
 
 write_task_source_scan_json_for_project() {
   local project="$1" regeneration_reason="${2:-manual}"
-  local output_path state_path run_dir tmp_dir generated_at human_snapshot delegated_snapshot milestone_snapshot
-  local pre_brainstorm_snapshot progress_snapshot
-  local human_count delegated_count milestone_count pre_brainstorm_count progress_count
-  local continuity_file active_running_workers project_head
+  local output_path state_path run_dir generated_at active_running_workers project_head
 
   run_dir="$(run_dir_for_project "$project")"
   output_path="$(task_source_scan_json_path_for_project "$project")"
@@ -14102,185 +14099,139 @@ write_task_source_scan_json_for_project() {
   mkdir -p "$run_dir"
 
   generated_at="$(current_timestamp_utc_for_machine)"
-  human_snapshot="$(intake_snapshot_for_project "$project" 8)"
-  delegated_snapshot="$(delegated_continuation_snapshot_for_project "$project" 6)"
-  milestone_snapshot="$(milestone_patrol_seed_snapshot_for_project "$project" 6)"
-  pre_brainstorm_snapshot="$(pre_brainstorm_patrol_seed_snapshot_for_project "$project" 6)"
-  progress_snapshot="$(progress_patrol_seed_snapshot_for_project "$project" 6)"
-  human_count="$(snapshot_item_count_from_prefix "$human_snapshot" "- id=")"
-  delegated_count="$(snapshot_item_count_from_prefix "$delegated_snapshot" "- intake_id=")"
-  milestone_count="$(snapshot_item_count_from_prefix "$milestone_snapshot" "- milestone=")"
-  pre_brainstorm_count="$(snapshot_item_count_from_prefix "$pre_brainstorm_snapshot" "- pre_brainstorm=")"
-  progress_count="$(snapshot_item_count_from_prefix "$progress_snapshot" "- issue=")"
-  continuity_file="$(latest_patrol_authoritative_manager_continuity_file_for_project "$project")"
   active_running_workers="$(manager_semantic_loop_active_worker_count_for_project "$project" 2>/dev/null || true)"
   [[ "$active_running_workers" =~ ^[0-9]+$ ]] || active_running_workers="0"
   project_head="$(task_source_scan_current_project_head_for_project "$project")"
 
-  tmp_dir="$(mktemp -d "${TMPDIR:-/tmp}/freely-task-source-scan.XXXXXX")"
-  printf '%s\n' "$human_snapshot" >"$tmp_dir/human.txt"
-  printf '%s\n' "$delegated_snapshot" >"$tmp_dir/delegated.txt"
-  printf '%s\n' "$milestone_snapshot" >"$tmp_dir/milestone.txt"
-  printf '%s\n' "$pre_brainstorm_snapshot" >"$tmp_dir/pre_brainstorm.txt"
-  printf '%s\n' "$progress_snapshot" >"$tmp_dir/progress.txt"
+  if [[ -f "$TASK_SOURCE_SCAN_SCRIPT" ]]; then
+    SKIP_PLATFORM_CHECK=1 python3 "$TASK_SOURCE_SCAN_SCRIPT" --project "$project" >"$output_path" 2>/dev/null || {
+      log_warn "lifecycle scan failed; falling back to empty scan"
+      printf '{"scan_version":"lifecycle-v2","generated_at":"%s","project_root":"%s","summary":{"total_incomplete":0,"by_stage":{},"ready":0},"items":[]}\n' \
+        "$generated_at" "$project" >"$output_path"
+    }
+  else
+    printf '{"scan_version":"lifecycle-v2","generated_at":"%s","project_root":"%s","summary":{"total_incomplete":0,"by_stage":{},"ready":0},"items":[]}\n' \
+      "$generated_at" "$project" >"$output_path"
+  fi
 
-  python3 - "$output_path" "$project" "$generated_at" "$regeneration_reason" "$active_running_workers" "$human_count" "$delegated_count" "$milestone_count" "$pre_brainstorm_count" "$progress_count" "$continuity_file" "$project_head" "$tmp_dir/human.txt" "$tmp_dir/delegated.txt" "$tmp_dir/milestone.txt" "$tmp_dir/pre_brainstorm.txt" "$tmp_dir/progress.txt" <<'PY'
-import json
-import sys
-
-output_path = sys.argv[1]
-project_root = sys.argv[2]
-generated_at = sys.argv[3]
-regeneration_reason = sys.argv[4]
-active_running_workers = int(sys.argv[5])
-human_count = int(sys.argv[6])
-delegated_count = int(sys.argv[7])
-milestone_count = int(sys.argv[8])
-pre_brainstorm_count = int(sys.argv[9])
-progress_count = int(sys.argv[10])
-continuity_file = sys.argv[11]
-project_head = sys.argv[12] or None
-human_file = sys.argv[13]
-delegated_file = sys.argv[14]
-milestone_file = sys.argv[15]
-pre_brainstorm_file = sys.argv[16]
-progress_file = sys.argv[17]
-
-def read_lines(path):
-    with open(path, "r", encoding="utf-8") as f:
-        return [line.rstrip("\n") for line in f if line.rstrip("\n")]
-
-payload = {
-    "schema_version": "manager-task-source-scan-v1",
-    "generated_at": generated_at,
-    "project_root": project_root,
-    "scan_reason": regeneration_reason,
-    "continuity_anchor": continuity_file or None,
-    "project_head_anchor": project_head,
-    "manager_context": {
-        "active_running_workers": active_running_workers,
-    },
-    "patrol_contract": {
-        "consumer_skill": "context-source-skill",
-        "policy": "scan on idle/replan boundaries, distrust stale ai-written status, verify linked evidence before phase advancement or closeout",
-    },
-    "surfaces": [
-        {
-            "surface": "human_chat_intake",
-            "source_class": "discovery",
-            "active_count": human_count,
-            "trust_level": "runtime_intake_authoritative_for_existence",
-            "needs_reconcile": False,
-            "summary_lines": read_lines(human_file),
-        },
-        {
-            "surface": "delegated_continuation",
-            "source_class": "continuation",
-            "active_count": delegated_count,
-            "trust_level": "advisory_handoff_verify_against_current_continuity",
-            "needs_reconcile": True,
-            "summary_lines": read_lines(delegated_file),
-        },
-        {
-            "surface": "active_milestone_queue",
-            "source_class": "milestone",
-            "active_count": milestone_count,
-            "trust_level": "advisory_status_reconcile_required",
-            "needs_reconcile": True,
-            "summary_lines": read_lines(milestone_file),
-        },
-        {
-            "surface": "active_pre_brainstorm_queue",
-            "source_class": "discovery",
-            "active_count": pre_brainstorm_count,
-            "trust_level": "advisory_candidate_reconcile_required",
-            "needs_reconcile": True,
-            "summary_lines": read_lines(pre_brainstorm_file),
-        },
-        {
-            "surface": "active_progress_queue",
-            "source_class": "continuation",
-            "active_count": progress_count,
-            "trust_level": "advisory_progress_reconcile_required",
-            "needs_reconcile": True,
-            "summary_lines": read_lines(progress_file),
-        },
-    ],
-}
-
-with open(output_path, "w", encoding="utf-8") as f:
-    json.dump(payload, f, indent=2, sort_keys=True, ensure_ascii=False)
-    f.write("\n")
-PY
-
-  rm -rf "$tmp_dir"
   cat >"$state_path" <<EOF
 LAST_TASK_SOURCE_SCAN_JSON="$output_path"
 LAST_TASK_SOURCE_SCAN_REASON="$regeneration_reason"
-LAST_TASK_SOURCE_SCAN_CONTINUITY_ANCHOR="$continuity_file"
-LAST_TASK_SOURCE_SCAN_ACTIVE_RUNNING_WORKERS="$active_running_workers"
 LAST_TASK_SOURCE_SCAN_GENERATED_AT="$generated_at"
 LAST_TASK_SOURCE_SCAN_PROJECT_HEAD="$project_head"
 EOF
-  printf '%s\n' "$output_path"
 }
-
 append_task_source_patrol_seed_if_needed() {
   local scan_json_path scan_reason active_running_workers
-  local human_snapshot delegated_snapshot milestone_snapshot pre_brainstorm_snapshot progress_snapshot
-  local human_count delegated_count milestone_count pre_brainstorm_count progress_count total_active_count
+
   [[ "$(role_hint_for_project "$PROJECT_ROOT")" == "manager" ]] || return 0
   active_running_workers="$(manager_semantic_loop_active_worker_count_for_project "$PROJECT_ROOT" 2>/dev/null || true)"
   [[ "$active_running_workers" =~ ^[0-9]+$ ]] || active_running_workers="0"
   if (( active_running_workers > 0 )); then
     return 0
   fi
+
   scan_reason="$(task_source_scan_regeneration_reason_for_project "$PROJECT_ROOT" 2>/dev/null || true)"
   if [[ -n "$scan_reason" ]]; then
-    scan_json_path="$(write_task_source_scan_json_for_project "$PROJECT_ROOT" "$scan_reason")"
+    write_task_source_scan_json_for_project "$PROJECT_ROOT" "$scan_reason" >/dev/null
   else
-    scan_json_path="$(task_source_scan_json_path_for_project "$PROJECT_ROOT")"
-    [[ -f "$scan_json_path" ]] || scan_json_path="$(write_task_source_scan_json_for_project "$PROJECT_ROOT" "bootstrap_missing_scan")"
+    if [[ ! -f "$(task_source_scan_json_path_for_project "$PROJECT_ROOT")" ]] || [[ ! -s "$(task_source_scan_json_path_for_project "$PROJECT_ROOT")" ]]; then
+      write_task_source_scan_json_for_project "$PROJECT_ROOT" "bootstrap_missing_scan" >/dev/null
+    fi
     scan_reason="reuse_existing_scan"
   fi
-  human_snapshot="$(intake_snapshot_for_project "$PROJECT_ROOT" 8)"
-  delegated_snapshot="$(delegated_continuation_snapshot_for_project "$PROJECT_ROOT" 6)"
-  milestone_snapshot="$(milestone_patrol_seed_snapshot_for_project "$PROJECT_ROOT" 6)"
-  pre_brainstorm_snapshot="$(pre_brainstorm_patrol_seed_snapshot_for_project "$PROJECT_ROOT" 6)"
-  progress_snapshot="$(progress_patrol_seed_snapshot_for_project "$PROJECT_ROOT" 6)"
-  human_count="$(snapshot_item_count_from_prefix "$human_snapshot" "- id=")"
-  delegated_count="$(snapshot_item_count_from_prefix "$delegated_snapshot" "- intake_id=")"
-  milestone_count="$(snapshot_item_count_from_prefix "$milestone_snapshot" "- milestone=")"
-  pre_brainstorm_count="$(snapshot_item_count_from_prefix "$pre_brainstorm_snapshot" "- pre_brainstorm=")"
-  progress_count="$(snapshot_item_count_from_prefix "$progress_snapshot" "- issue=")"
-  total_active_count=$((human_count + delegated_count + milestone_count + pre_brainstorm_count + progress_count))
-  (( total_active_count > 0 )) || return 0
-  cat <<EOF
+  scan_json_path="$(task_source_scan_json_path_for_project "$PROJECT_ROOT")"
 
-Task-source patrol seed:
-- 这是 manager 进入 idle / replan 边界时使用的结构化任务面，不是每轮都应重扫。
-- current_scan_reason: \`$scan_reason\`
-- active_surface_counts: \`human_chat_intake=$human_count delegated_continuation=$delegated_count active_milestone_queue=$milestone_count active_pre_brainstorm_queue=$pre_brainstorm_count active_progress_queue=$progress_count\`
-- machine_readable_scan_json: \`$scan_json_path\`
-- \`lead-agent\` / \`context-source-skill\` 先消费这份 scan json，再决定当前从哪个 source 进入哪条 loop。
-- human interruption / delegated continuation / milestone 状态都只能当 routing hint；是否推进、改写状态、还是回滚标签，必须回到 linked evidence 核对。
-- pre-brainstorm / progress 也只作为 patrol seed；默认要持怀疑态度核对 candidate / issue / worktree / verification 证据。
-- 这些 milestone / issue / progress 状态可能是 AI 之前写的，默认只把它们当作 patrol seed，不当作 completion 证明。
-- 对每个 seed，先核对 linked issue / progress / recovery / worktree 证据，再决定是继续推进、回滚状态、还是改写 next_action。
-- \`candidate_issues\` 默认先回 doc/pre-brainstorm 或 IBM；\`committed_issues\` 才能按 \`phase_state\` 继续 dev / verification / cleanup。
-- 若某项写着进行中但证据缺失，优先做 state reconcile，而不是盲信旧标签。
+  # Parse lifecycle scan JSON and build prompt section
+  python3 - "$scan_json_path" "$scan_reason" <<'PY'
+import json
+import sys
 
-## Surface: active_milestone_queue
-$milestone_snapshot
+scan_path = sys.argv[1]
+scan_reason = sys.argv[2]
 
-## Surface: active_pre_brainstorm_queue
-$pre_brainstorm_snapshot
+try:
+    with open(scan_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+except Exception:
+    print("")
+    sys.exit(0)
 
-## Surface: active_progress_queue
-$progress_snapshot
-EOF
+items = data.get("items", [])
+summary = data.get("summary", {})
+total = summary.get("total_incomplete", 0)
+
+if total == 0:
+    print("")
+    sys.exit(0)
+
+by_stage = summary.get("by_stage", {})
+ready = summary.get("ready", 0)
+
+stage_labels = {
+    "chat_waiting_worktree": "信号: chat 等待工位创建",
+    "chat_ready": "信号: chat 已有工位",
+    "chat_comment_pending": "信号: 评论待同步",
+    "B1_proposed": "B1: raw issue 待进入预研",
+    "B1_brainstorming": "B1: 预研进行中",
+    "B1_candidate": "B1: candidate 待决策",
+    "promoting": "B1→B2: promote 进行中",
+    "B2_active": "B2: 开发进行中",
+    "B2_done": "B2: 实现已完成（待 merge/收口）",
+    "B2_verifying": "B2: 验证中",
+    "absorbed": "已吸收（追踪子 issue 状态）",
+    "dropped": "已丢弃",
+    "orphan_branch": "孤儿分支（无对应 issue）",
+    "\u672a\u6536\u53e3": "分支/工位未收口（issue 已完成）",
+    "\u6536\u53e3": "收口（待平台 close）",
 }
 
+# Build lifecycle-aware patrol seed
+print("")
+print("Lifecycle task scan (lifecycle-v2):")
+print(f"- scan_reason: `{scan_reason}`")
+print(f"- total_incomplete: {total}  items across the raw\u2192I lifecycle chain")
+print(f"- ready_for_work: {ready}  items（已 promote，可进入 B2 或收口）")
+print(f"- by_stage: " + ", ".join(f"{k}={v}" for k, v in sorted(by_stage.items())))
+print(f"- machine_readable_scan_json: `{scan_path}`")
+print("")
+print("\u539f\u5219\uff1a\u5df2\u5b8c\u6210\u7684\u6761\u76ee\u4e0d\u4f1a\u51fa\u73b0\u5728\u8fd9\u91cc\u3002\u4ee5\u4e0b\u6bcf\u4e2a\u6761\u76ee\u90fd\u6709\u5177\u4f53\u7684 incomplete \u539f\u56e0\u548c\u53ef\u6267\u884c\u7684 next_action\u3002")
+print("\u4e0d\u8981\u91cd\u65b0 patrol\uff0c\u76f4\u63a5\u5904\u7406\u4ee5\u4e0b\u6761\u76ee\u3002")
+print("")
+
+# Group by stage
+for stage in ["chat_waiting_worktree", "chat_ready", "chat_comment_pending", "B1_proposed", "B1_brainstorming", "B1_candidate", "promoting", "B2_active", "B2_done", "B2_verifying", "absorbed", "\u672a\u6536\u53e3", "orphan_branch", "\u6536\u53e3"]:
+    stage_items = [it for it in items if it.get("stage") == stage]
+    if not stage_items:
+        continue
+    label = stage_labels.get(stage, stage)
+    print(f"## Stage: {label}")
+    for it in stage_items:
+        incomplete = " ".join(it.get("incomplete", []))
+        next_action = it.get("next_action", "\u68c0\u67e5\u5e76\u5b8c\u6210\u6536\u53e3\u6b65\u9aa4")
+        title = it.get("title", "") or it.get("key", "")
+        children = it.get("children", [])
+        child_ids = ", ".join(c.get("id", "?") for c in children) if children else "\u65e0"
+        is_ready = "ready" if it.get("ready") else "blocked"
+        source_family = it.get("source_family", "")
+        if source_family == "chat_inbox":
+            print(f"  chat_type={it.get('chat_type', '?')}")
+            print(f"  issue_id={it.get('issue_id', '?')}")
+            print(f"  worktree_exists={it.get('worktree_exists', '?')}")
+            print(f"  message_preview={it.get('message_preview', '')[:100]}")
+        print(f"- key={it['key']} stage={stage} ready={is_ready}")
+        print(f"  title={title}")
+        if source_family == "worktree_governance":
+            print(f"  branch={it.get('branch', '?')}")
+            print(f"  worktree_path={it.get('worktree_path', '?')}")
+            print(f"  dirty={it.get('dirty', '?')}")
+            print(f"  merged_to_develop={it.get('merged_to_develop', '?')}")
+        print(f"  incomplete={incomplete}")
+        print(f"  children={child_ids}")
+        print(f"  next_action={next_action}")
+    print("")
+PY
+}
 manager_supervision_alerts() {
   local project="$1" repo_root wt_path branch desired_state role_hint exit_reason supervisor_state ai_state owner next_action anomaly normalized_project normalized_wt_path
   local worker_prompt_file
