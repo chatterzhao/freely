@@ -812,6 +812,17 @@ routing_policy:
 - next_action: Candidate mirror only. `I-20260405-2358-D` is now the canonical owner for audited help/usage contracts and bounded `ai switch --dry-run` result alignment.
 - revisit_trigger: Revisit if help invocations still carry side effects or non-obvious exit semantics, or if `ai switch --dry-run` remains inconsistent with the saved auth inventory on canonical `develop`.
 
+16. `C-20260503T0915Z-enforce-test-pre-merge`
+- title: Enforce test-pre-merge gate for develop-bound merges
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_id: `I-20260503T0915Z-enforce-test-pre-merge`
+- promoted_issue_path: `docs/epics/test-pre-merge-enforcement/issues/I-20260503T0915Z-enforce-test-pre-merge.md`
+- source_brainstorm: `docs/pre-brainstorms/20260503-0915--enforce-test-pre-merge/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260503-0915--enforce-test-pre-merge/candidates.md`
+- next_action: Candidate mirror only. Feature branch ready, test-pre-merge worktree created, pending selfhost verification and merge to develop.
+
 ### completed_issues
 
 1. `I-20260421-1200-A`
