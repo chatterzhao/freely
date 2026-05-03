@@ -2,7 +2,8 @@
 
 - issue_id: I-20260503T0915Z-enforce-test-pre-merge
 - source_candidate: docs/pre-brainstorms/20260503-0915--enforce-test-pre-merge/candidates.md
-- phase_state: proposed
+- phase_state: in_dev
+- verification_artifact_dir: docs/epics/test-pre-merge-enforcement/code-reviews
 - platform_ids:
   github:
     - "180"
