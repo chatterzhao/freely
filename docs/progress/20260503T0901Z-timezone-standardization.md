@@ -1,5 +1,9 @@
 # Progress: Timezone Standardization
 
+- issue_id: I-20260503T0901Z-A
+- issue_path: docs/epics/timezone-standardization/issues/I-20260503T0901Z-A.md
+- phase_state: in_dev
+
 ## Status: Complete (Ready for Merge)
 
 ### Summary
