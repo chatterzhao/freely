@@ -414,18 +414,7 @@ def build_payload(project: Path) -> dict:
     chat_items = scan_chat_inbox(project)
     output.extend(chat_items)
 
-    # Phase 1-6: Issue lifecycle
-    items = collect_lifecycle_items(project)
-    for item in items:
-        stage = determine_stage(item)
-        incomplete = check_completion(item)
-        if _should_exclude(stage, incomplete, item):
-            continue
-        raw = item.get("raw") or {}
-        children = item.get("children", [])
-        output.append(_format_item(item, stage, incomplete, raw, children))
-
-    # Add full lifecycle chain trace (one item per base key)
+    # Phase 1-6: Full lifecycle chain trace (source-anchored)
     chain_items = scan_chain_trace(project)
     for c in chain_items:
         output.append({
@@ -437,6 +426,7 @@ def build_payload(project: Path) -> dict:
             "ready": c["ready"],
             "next_action": c["next_action"],
             "incomplete": c["blockers"],
+            "advisory": c.get("advisory", []),
             "children": [],
             "title": f"raw-{c['key']}",
         })
@@ -626,17 +616,51 @@ CHAIN_STATIONS = [
 ]
 
 def _all_base_keys(project: Path) -> set[str]:
-    """Collect unique base keys from raw-* directories only.
+    """Collect base keys from ALL sources, anchored at the true origins.
 
-    The chain always starts from raw-{key}. Pre-brainstorm dirs without raw
-    are orphan legacy items — they'll be picked up as separate alerts.
+    Sources (in priority order):
+    1. SQLite chat inbox (consumed=0) → extract xxx from issue_id (raw-xxx)
+    2. docs/issues/raw-* directories
+    3. docs/pre-brainstorms/{xxx}--* directories
+    4. Platform open issues (via GitHub/Gitee scan) — not yet implemented
+
+    Each source contributes its xxx key. The chain trace then follows each
+    key through the full lifecycle.
     """
     keys = set()
+
+    # Source 1: SQLite chat inbox
+    db_path = project / ".freely" / "freely.db"
+    if db_path.is_file():
+        try:
+            import sqlite3
+            conn = sqlite3.connect(str(db_path))
+            rows = conn.execute(
+                "SELECT issue_id FROM chats WHERE consumed = 0 AND issue_id LIKE 'raw-%'"
+            ).fetchall()
+            conn.close()
+            for (issue_id,) in rows:
+                if issue_id.startswith("raw-"):
+                    keys.add(issue_id[4:])
+        except Exception:
+            pass
+
+    # Source 2: docs/issues/raw-* directories
     issues_dir = project / "docs" / "issues"
     if issues_dir.is_dir():
         for d in issues_dir.iterdir():
             if d.is_dir() and d.name.startswith("raw-"):
                 keys.add(d.name[4:])
+
+    # Source 3: pre-brainstorm dirs (only if matching raw-* or chat key exists)
+    pb_dir = project / "docs" / "pre-brainstorms"
+    if pb_dir.is_dir():
+        for d in pb_dir.iterdir():
+            if d.is_dir():
+                m = re.match(r"^(\d{8}-\d{4})--", d.name)
+                if m and m.group(1) in keys:  # only if source 1 or 2 already found it
+                    pass  # already in keys
+
     return keys
 
 
@@ -663,20 +687,22 @@ def _trace_chain(project: Path, key: str) -> dict:
     else:
         stations["raw_created"] = {"reached": False}
         blockers.append("raw_not_created")
-        return _finalize_chain(key, stations, blockers, "raw_created", None)
+        return _finalize_chain(key, stations, blockers, "raw_created", "raw_created")
 
     # Station 1: B1 pre-brainstorm directory
-    # If raw is absorbed, B1 phase is complete — skip B1 checks and go to I-*
+    # If raw is absorbed, B1 phase is complete regardless of directory existence
     raw_is_absorbed = raw_status in ("absorbed",)
     pb_dirs = sorted((project / "docs" / "pre-brainstorms").glob(f"{key}--*")) if (project / "docs" / "pre-brainstorms").is_dir() else []
     b1_dir = pb_dirs[0] if pb_dirs else None
-    if b1_dir:
-        stations["b1_dir"] = {"reached": True, "path": str(b1_dir.relative_to(project))}
-    elif raw_is_absorbed:
-        stations["b1_dir"] = {"reached": True, "note": "absorbed — B1 phase complete"}
+
+    if raw_is_absorbed:
+        # Absorbed raw: B1 was completed before promotion, skip all B1 checks
+        stations["b1_dir"] = {"reached": True, "note": "absorbed — B1 phase complete", "path": str(b1_dir.relative_to(project)) if b1_dir else ""}
         stations["b1_brainstorm"] = {"reached": True, "note": "absorbed"}
         stations["b1_candidate"] = {"reached": True, "note": "absorbed"}
         stations["candidate_decision"] = {"reached": True, "note": "absorbed"}
+    elif b1_dir:
+        stations["b1_dir"] = {"reached": True, "path": str(b1_dir.relative_to(project))}
     else:
         stations["b1_dir"] = {"reached": False}
         blockers.append("b1_dir_missing")
@@ -742,83 +768,65 @@ def _trace_chain(project: Path, key: str) -> dict:
         blockers.append("i_not_created")
         return _finalize_chain(key, stations, blockers, "candidate_decision", "i_created")
 
-    # For subsequent stations, check the "most advanced" I-* child
+    # ── Phase 4-6: Post-B1 stations ──
     best_child = _best_child(i_children)
-
-    # Station 6: B2 design docs (check canonical path → epic exists)
     canonical = best_child.get("canonical", "")
-    epic_dir = None
-    if canonical:
-        epic_dir = project / canonical
-        while epic_dir and epic_dir.name and epic_dir.parent != project / "docs":
-            if (epic_dir.parent / "brainstorms").is_dir() or (epic_dir.parent / "pre-tests.md").is_file():
-                break
-            epic_dir = epic_dir.parent
-    if canonical and epic_dir and epic_dir.parent.is_dir():
-        stations["b2_design"] = {"reached": True, "canonical": canonical}
-    else:
-        stations["b2_design"] = {"reached": False}
-        # Don't block — design docs are optional for some issue types
-
-    # Station 7-9: B2/dev phases
     phase = best_child.get("phase_state", "")
-    stations["b2_phase_done"] = {"reached": phase in ACTIVE_B2 or phase in DONE_STATES or phase == COMPLETED, "phase": phase}
-    stations["dev_phase_in"] = {"reached": phase in ACTIVE_B2 or phase in DONE_STATES or phase == COMPLETED, "phase": phase}
-    stations["dev_phase_done"] = {"reached": phase in DONE_STATES or phase == COMPLETED, "phase": phase}
-
-    if not stations["dev_phase_done"]["reached"] and phase not in DONE_STATES and phase != COMPLETED:
-        blockers.append(f"phase_not_done:{phase or 'empty'}")
-        return _finalize_chain(key, stations, blockers, "i_created", "dev_phase_done")
-
-    # Station 10: code review
-    has_code_review = False
-    if canonical:
-        epic_parent = (project / canonical).parent if (project / canonical).is_file() else project / canonical
-        cr_dir = epic_parent / "code-reviews" if epic_parent.is_dir() else None
-        if cr_dir and cr_dir.is_dir() and any(cr_dir.iterdir()):
-            has_code_review = True
-    stations["code_review"] = {"reached": has_code_review}
-
-    # Station 11-12: platform sync
     pids = best_child.get("platform_ids", {})
-    has_platform = bool(pids.get("github")) or bool(pids.get("gitee"))
-    stations["platform_create"] = {"reached": has_platform, "pids": pids}
-    if not has_platform:
-        blockers.append("not_on_any_platform")
-        return _finalize_chain(key, stations, blockers, "dev_phase_done", "platform_create")
 
-    # Station 13: merged to develop
     branch = _find_branch_for_key(project, key)
-    merged = None
-    if branch:
-        merged = _branch_merged_to_develop(project, branch)
-    stations["merged_develop"] = {"reached": merged is True, "branch": branch}
-    if not merged:
-        blockers.append("branch_not_merged_to_develop" if branch else "no_branch_found")
-        return _finalize_chain(key, stations, blockers, "platform_create", "merged_develop")
+    has_worktree = branch is not None
+    merged = _branch_merged_to_develop(project, branch) if branch else None
 
-    # Station 14-16: closeout
-    # Platform close check (best-effort, skipped with SKIP_PLATFORM_CHECK)
-    gh_closed = None
+    # Check every station. Each call: (name, reached, required, detail_dict)
+    _st = lambda name, reached, required, **kw: stations.update({name: {"reached": reached, "required": required, **kw}})
+
+    # dev_worktree reached if: worktree exists now, OR was merged OR phase_state proves implementation happened
+    dev_wt_reached = has_worktree or merged is True or (not has_worktree and phase in DONE_STATES.union(ACTIVE_B2))
+    _st("dev_worktree", dev_wt_reached, True, branch=branch or "已退役")
+    _st("dev_phase_done", phase in DONE_STATES or phase == COMPLETED, True, phase=phase or "empty")
+
+    # Optional: code review evidence (not all issues need formal review)
+    has_cr = False
+    if canonical:
+        ep = (project / canonical).parent if (project / canonical).is_file() else project / canonical
+        crd = ep / "code-reviews" if ep.is_dir() else None
+        has_cr = crd and crd.is_dir() and any(crd.iterdir()) if crd else False
+    _st("code_review", has_cr, False, canonical=canonical)
+
+    _st("platform_create", bool(pids.get("github")) or bool(pids.get("gitee")), True, pids=pids)
+    _st("merged_develop", merged is True, True, branch=branch or "", merged=merged)
+
+    # Platform close (best-effort, skipped with SKIP_PLATFORM_CHECK)
     gh_issue = pids.get("github", "")
-    if gh_issue and not os.environ.get("SKIP_PLATFORM_CHECK"):
-        gh_closed = _is_github_closed(gh_issue)
-    stations["platform_close"] = {"reached": gh_closed is True, "github_issue": gh_issue}
-    if gh_closed is False:
-        blockers.append("github_not_closed")
-        return _finalize_chain(key, stations, blockers, "merged_develop", "platform_close")
+    gh_closed = _is_github_closed(gh_issue) if gh_issue and not os.environ.get("SKIP_PLATFORM_CHECK") else None
+    _st("platform_close", gh_closed is True, True, github_issue=gh_issue, gh_closed=gh_closed)
 
-    # Branch and worktree cleanup
-    branch_exists = branch is not None
-    stations["branch_deleted"] = {"reached": not branch_exists}
-    stations["worktree_retired"] = {"reached": not branch_exists}  # simplified
+    _st("branch_deleted", not has_worktree, True)
 
-    if branch_exists:
-        blockers.append("branch_not_deleted")
-        return _finalize_chain(key, stations, blockers, "platform_close", "branch_deleted")
+    # Optional: milestone entry
+    mf = project / "docs" / "milestones.md"
+    in_milestone = key in mf.read_text(encoding="utf-8") if mf.is_file() else False
+    _st("milestone_entry", in_milestone, False)
 
-    # FULLY COMPLETE — will be excluded
-    return _finalize_chain(key, stations, [], "worktree_retired", None)
+    # Determine current/next from mandatory stations in order
+    mandatory_order = [
+        "raw_created", "b1_dir", "b1_brainstorm", "b1_candidate", "candidate_decision",
+        "i_created", "dev_worktree", "dev_phase_done", "platform_create",
+        "merged_develop", "platform_close", "branch_deleted",
+    ]
+    current = "raw_created"
+    next_station = None
+    for st in mandatory_order:
+        s = stations.get(st, {})
+        if s.get("reached"):
+            current = st
+        elif next_station is None:
+            next_station = st
+            if s.get("required", True):
+                blockers.append(f"{st}_missing")
+
+    return _finalize_chain(key, stations, blockers, current, next_station)
 
 
 def _best_child(children: list[dict]) -> dict:
@@ -870,14 +878,20 @@ def _parse_h3_sections(path: Path) -> list[dict]:
 
 
 def _finalize_chain(key: str, stations: dict, blockers: list[str], current: str, next_station: str | None) -> dict:
-    """Package chain trace result."""
+    """Package chain trace result including optional station status."""
+    advisory = []
+    # Collect optional stations that are not reached
+    for st_name, st_info in stations.items():
+        if not st_info.get("required", True) and not st_info.get("reached"):
+            advisory.append(f"{st_name}_missing")
     return {
         "key": key,
         "current_station": current,
         "next_station": next_station,
         "stations": stations,
         "blockers": blockers,
-        "complete": len(blockers) == 0 and current == "worktree_retired",
+        "advisory": advisory,
+        "complete": len(blockers) == 0 and current == "branch_deleted",
     }
 
 
@@ -993,11 +1007,11 @@ CHAIN_ACTIONS = {
     "b1_brainstorm": "产出 candidates.md，每个 candidate 写清 scope/priority/status",
     "b1_candidate": "决策 candidate：promote（创建 I-*） / absorb（合并） / drop（丢弃）",
     "candidate_decision": "创建 docs/issues/I-{key}-A/issue.md，kind=linked",
-    "i_created": "进入 B2_IBM：创建 epic 目录、pre-tests、tasks",
-    "b2_design": "设置 phase_state 为 in_b2_ibm 或 in_dev，开始实现",
+    "i_created": "创建 feature/raw-{key}-{slug} 工位，开始实现",
+    "dev_worktree": "实现代码，推进 phase_state 到 done/completed",
     "dev_phase_done": "创建 code-review 证据，issue-sync create 推送到平台",
     "platform_create": "merge 到 develop，issue-sync close 关闭平台 issue",
-    "merged_develop": "issue-sync close 关闭平台 issue，更新 progress/milestone",
+    "merged_develop": "issue-sync close 关闭平台 issue",
     "platform_close": "删除分支，退役工位",
     "branch_deleted": "退役工位（git worktree remove）",
 }
