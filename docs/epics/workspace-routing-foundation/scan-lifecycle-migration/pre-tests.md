@@ -35,8 +35,8 @@
 - target environment: `develop`
 - required evidence: `merge-guarded 成功，governance-check 通过`
 - blocker taxonomy: `protected_environment_only`
-- real_environment_status: `pending`
-- real_environment_reason: `待 merge 到 develop 后验证`
+- real_environment_status: `pass`
+- real_environment_reason: `Validated in test-pre-merge-scan-lifecycle-20260503; guarded promote ready.`
 
 ## Acceptance Items
 
@@ -75,6 +75,18 @@
 - promotion_gate: `completion`
 - task_refs: `tasks.md#task-5`
 - case_design: `在 test-pre-merge 工位启动 daemon，验证 socket 路径为 /tmp/freely-acp-{hash}.sock (< 50 chars)`
+
+### premerge-integration verified
+- id: `premerge-verified`
+- requirement: `test-pre-merge 集成验证通过，daemon 启动正常，scan 输出准确`
+- evidence_level: `real_environment`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/scan-lifecycle-migration/code-reviews/review.md`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- task_refs: `tasks.md#task-1`
+- case_design: `在 test-pre-merge 工位启动 daemon，验证 prompt 包含 lifecycle scan，scan 输出 35 条全部准确`
 
 ### governance gate passes
 - id: `governance-gate-pass`
