@@ -5,6 +5,10 @@
   - brainstorms: docs/pre-brainstorms/20260502-0500--freely-packaging-selfhost/freely-packaging-selfhost.md
   - candidates: docs/pre-brainstorms/20260502-0500--freely-packaging-selfhost/candidates.md
 
+- 20260501-0000--scan-pr-platform-config
+  - brainstorms: docs/pre-brainstorms/20260501-0000--scan-pr-platform-config/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260501-0000--scan-pr-platform-config/candidates.md
+
 - 20260501-0000--worker-launch-refactor
   - brainstorms: docs/pre-brainstorms/20260501-0000--worker-launch-refactor/brainstorms.md
   - candidates: docs/pre-brainstorms/20260501-0000--worker-launch-refactor/candidates.md

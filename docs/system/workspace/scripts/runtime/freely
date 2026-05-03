@@ -3588,6 +3588,10 @@ FREELY_ALL_PROXY=""
 FREELY_HTTP_PROXY=""
 FREELY_HTTPS_PROXY=""
 FREELY_NO_PROXY=""
+# Repo platforms for PR/issue scanning. Comma-separated, e.g. "github,gitee".
+# Each platform name maps to its CLI: github→gh, gitee→gitee.
+# Empty = no platform scanning.
+FREELY_REPO_PLATFORMS=""
 FREELY_SECURITY_REVIEW_POLICY="advisory-on-high-risk-or-uncertainty"
 FREELY_SECURITY_REVIEW_SCOPE="execution-boundary-and-reviewer-support"
 EOF
@@ -14108,9 +14112,39 @@ task_source_scan_regeneration_reason_for_project() {
   return 1
 }
 
+# ── PR scanning via configured repo platforms ─────────────────────
+# Reads FREELY_REPO_PLATFORMS (comma-separated, e.g. "github,gitee").
+# Each platform name maps to its CLI: "github"→gh, "gitee"→gitee, etc.
+# Custom platforms can be added by ensuring their CLI supports:
+#   <cli> pr list --json number,title,state,headRefName,baseRefName,url,createdAt
+scan_repo_platform_prs() {
+  local project="$1"
+  local platforms_csv="${FREELY_REPO_PLATFORMS:-}"
+  [[ -n "$platforms_csv" ]] || return 0
+
+  local IFS=","
+  for _platform in $platforms_csv; do
+    [[ -n "$_platform" ]] || continue
+    local _cli="$_platform"
+    case "$_platform" in
+      github) _cli="gh" ;;
+      gitee)  _cli="gitee" ;;
+    esac
+    if ! command -v "$_cli" >/dev/null 2>&1; then
+      continue
+    fi
+    "$_cli" pr list --json number,title,state,headRefName,baseRefName,url,createdAt \
+      --jq '.[] | "\(.number)|\(.title)|\(.state)|\(.headRefName)|\(.baseRefName)|\(.url)|\(.createdAt)"' \
+      2>/dev/null | while IFS= read -r _pr_line; do
+      printf 'pr|%s|%s\n' "$_platform" "$_pr_line"
+    done
+  done
+}
+
 write_task_source_scan_json_for_project() {
   local project="$1" regeneration_reason="${2:-manual}"
   local output_path state_path run_dir generated_at active_running_workers project_head
+  local pr_snapshot pr_count
 
   run_dir="$(run_dir_for_project "$project")"
   output_path="$(task_source_scan_json_path_for_project "$project")"
@@ -14118,6 +14152,8 @@ write_task_source_scan_json_for_project() {
   mkdir -p "$run_dir"
 
   generated_at="$(current_timestamp_utc_for_machine)"
+  pr_snapshot="$(scan_repo_platform_prs "$project")"
+  pr_count="$(snapshot_item_count_from_prefix "$pr_snapshot" "pr|")"
   active_running_workers="$(manager_semantic_loop_active_worker_count_for_project "$project" 2>/dev/null || true)"
   [[ "$active_running_workers" =~ ^[0-9]+$ ]] || active_running_workers="0"
   project_head="$(task_source_scan_current_project_head_for_project "$project")"
@@ -14133,6 +14169,36 @@ write_task_source_scan_json_for_project() {
       "$generated_at" "$project" >"$output_path"
   fi
 
+  # Inject PR snapshot into scan output
+  if [[ -n "$pr_snapshot" ]]; then
+    _scan_pr_tmp="$(mktemp "${TMPDIR:-/tmp}/freely-scan-pr.XXXXXX" 2>/dev/null)"
+    if [[ -n "$_scan_pr_tmp" ]]; then
+      printf '%s\n' "$pr_snapshot" >"$_scan_pr_tmp"
+      python3 - "$output_path" "$_scan_pr_tmp" <<'PRPY'
+import json, sys
+output_path = sys.argv[1]
+pr_tmp_path = sys.argv[2]
+with open(pr_tmp_path) as pf:
+    pr_lines = [l.rstrip() for l in pf if l.rstrip()]
+with open(output_path) as f:
+    data = json.load(f)
+surfaces = data.get('surfaces', [])
+surfaces.append({
+    "surface": "open_pull_requests",
+    "source_class": "discovery",
+    "active_count": len(pr_lines),
+    "trust_level": "advisory_platform_snapshot",
+    "needs_reconcile": False,
+    "summary_lines": pr_lines,
+})
+data["surfaces"] = surfaces
+with open(output_path, "w") as f:
+    json.dump(data, f, indent=2, sort_keys=True, ensure_ascii=False)
+    f.write("\n")
+PRPY
+      rm -f "$_scan_pr_tmp"
+    fi
+  fi
   cat >"$state_path" <<EOF
 LAST_TASK_SOURCE_SCAN_JSON="$output_path"
 LAST_TASK_SOURCE_SCAN_REASON="$regeneration_reason"
