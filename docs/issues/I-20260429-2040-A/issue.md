@@ -2,8 +2,8 @@
 local_id: I-20260429-2040-A
 issue_title: "SQLite chat-inbox staging for protected-branch chat intake"
 kind: linked
-status: in_dev
-phase_state: in_dev
+status: completed
+phase_state: completed
 promoted_from: raw-20260429-2040
 platform_ids: {github: {issue_id: ""}, gitee: {issue_id: ""}}
 primary_platform: github
