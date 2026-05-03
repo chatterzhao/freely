@@ -183,6 +183,20 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/gate-dev-experience-preflight/code-reviews/20260429-gate-dev-experience-preflight-verification.md`
 - next_action: `Merge into develop.`
 
+26. `I-20260503T0915Z-enforce-test-pre-merge`
+- title: Enforce test-pre-merge gate for ALL develop-bound merges
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P0
+- issue_path: `docs/epics/test-pre-merge-enforcement/issues/I-20260503T0915Z-enforce-test-pre-merge.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-enforce-test-pre-merge.md`
+- source_candidate: `docs/pre-brainstorms/20260503-0915--enforce-test-pre-merge/candidates.md#C-20260503T0915Z-enforce-test-pre-merge`
+- branch: `feature/raw-20260503T0915Z-enforce-test-pre-merge`
+- evidence:
+  - `docs/epics/test-pre-merge-enforcement/issues/I-20260503T0915Z-enforce-test-pre-merge.md`
+  - `docs/epics/test-pre-merge-enforcement/code-reviews/rev-20260503-enforce-test-pre-merge.md`
+- next_action: `Merge to test-pre-merge, selfhost verify, then promote to develop.`
+
 
 
 ### committed_issues
@@ -811,6 +825,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260405-2358--cli-command-audit-regressions/candidates.md`
 - next_action: Candidate mirror only. `I-20260405-2358-D` is now the canonical owner for audited help/usage contracts and bounded `ai switch --dry-run` result alignment.
 - revisit_trigger: Revisit if help invocations still carry side effects or non-obvious exit semantics, or if `ai switch --dry-run` remains inconsistent with the saved auth inventory on canonical `develop`.
+
+16. `C-20260503T0915Z-enforce-test-pre-merge`
+- title: Enforce test-pre-merge gate for develop-bound merges
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_id: `I-20260503T0915Z-enforce-test-pre-merge`
+- promoted_issue_path: `docs/epics/test-pre-merge-enforcement/issues/I-20260503T0915Z-enforce-test-pre-merge.md`
+- source_brainstorm: `docs/pre-brainstorms/20260503-0915--enforce-test-pre-merge/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260503-0915--enforce-test-pre-merge/candidates.md`
+- next_action: Candidate mirror only. Feature branch ready, test-pre-merge worktree created, pending selfhost verification and merge to develop.
 
 ### completed_issues
 

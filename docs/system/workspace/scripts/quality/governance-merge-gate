@@ -817,6 +817,25 @@ def main() -> int:
                 except Exception:
                     pass
 
+    is_hotfix_source = bool(source_branch) and source_branch.startswith("hotfix/")
+
+    if is_hotfix_source:
+        # Hotfix source branches skip lifecycle validation (candidates, milestones,
+        # issue chains, progress, reviews, pretests gate). Only GATE 1 (issue key)
+        # and GATE 2 (raw issue materialization) have been validated above.
+        if errors:
+            print("[FAIL] hotfix pre-flight governance gate blocked.")
+            for message in errors:
+                print(f"- {message}")
+            return 1
+        if warnings:
+            print("Hotfix pre-flight governance gate passed with warnings:")
+            for message in warnings:
+                print(f"- {message}")
+        else:
+            print("Hotfix pre-flight governance gate passed.")
+        return 0
+
     allowed_status_guide = [
         "needs_research (还需要继续研究；可停在 milestone candidate_issues，但必须有 next_action 和 revisit_trigger)",
         "blocked (当前 pre-brainstorm 已识别阻塞；可停在 milestone candidate_issues，但必须写清 blocker 后的下一步)",

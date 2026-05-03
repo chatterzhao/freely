@@ -8,6 +8,9 @@
 - 20260501-0000--scan-pr-platform-config
   - brainstorms: docs/pre-brainstorms/20260501-0000--scan-pr-platform-config/brainstorms.md
   - candidates: docs/pre-brainstorms/20260501-0000--scan-pr-platform-config/candidates.md
+- 20260503-0915--enforce-test-pre-merge
+  - brainstorms: docs/pre-brainstorms/20260503-0915--enforce-test-pre-merge/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260503-0915--enforce-test-pre-merge/candidates.md
 
 - 20260501-0000--worker-launch-refactor
   - brainstorms: docs/pre-brainstorms/20260501-0000--worker-launch-refactor/brainstorms.md
