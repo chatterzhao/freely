@@ -14169,6 +14169,9 @@ by_stage = summary.get("by_stage", {})
 ready = summary.get("ready", 0)
 
 stage_labels = {
+    "chat_waiting_worktree": "信号: chat 等待工位创建",
+    "chat_ready": "信号: chat 已有工位",
+    "chat_comment_pending": "信号: 评论待同步",
     "B1_proposed": "B1: raw issue 待进入预研",
     "B1_brainstorming": "B1: 预研进行中",
     "B1_candidate": "B1: candidate 待决策",
@@ -14197,7 +14200,7 @@ print("\u4e0d\u8981\u91cd\u65b0 patrol\uff0c\u76f4\u63a5\u5904\u7406\u4ee5\u4e0b
 print("")
 
 # Group by stage
-for stage in ["B1_proposed", "B1_brainstorming", "B1_candidate", "promoting", "B2_active", "B2_done", "B2_verifying", "absorbed", "\u672a\u6536\u53e3", "orphan_branch", "\u6536\u53e3"]:
+for stage in ["chat_waiting_worktree", "chat_ready", "chat_comment_pending", "B1_proposed", "B1_brainstorming", "B1_candidate", "promoting", "B2_active", "B2_done", "B2_verifying", "absorbed", "\u672a\u6536\u53e3", "orphan_branch", "\u6536\u53e3"]:
     stage_items = [it for it in items if it.get("stage") == stage]
     if not stage_items:
         continue
@@ -14211,6 +14214,11 @@ for stage in ["B1_proposed", "B1_brainstorming", "B1_candidate", "promoting", "B
         child_ids = ", ".join(c.get("id", "?") for c in children) if children else "\u65e0"
         is_ready = "ready" if it.get("ready") else "blocked"
         source_family = it.get("source_family", "")
+        if source_family == "chat_inbox":
+            print(f"  chat_type={it.get('chat_type', '?')}")
+            print(f"  issue_id={it.get('issue_id', '?')}")
+            print(f"  worktree_exists={it.get('worktree_exists', '?')}")
+            print(f"  message_preview={it.get('message_preview', '')[:100]}")
         print(f"- key={it['key']} stage={stage} ready={is_ready}")
         print(f"  title={title}")
         if source_family == "worktree_governance":
