@@ -42,7 +42,7 @@ MSG
       fi
       continue
       ;;
-    feature/*|release/*|hotfix/*)
+    feature/*|hotfix/*)
       # Validate naming convention: must contain raw-xxx or I-xxx key
       if ! echo "$local_branch" | grep -qoE 'raw-[0-9]{8}-[0-9]{4}' && \
          ! echo "$local_branch" | grep -qoE 'I-[0-9]{8}-[0-9]{4}(-[A-Z0-9]+)?'; then
@@ -60,8 +60,17 @@ MSG
       cat >&2 <<MSG
 [HOOK] Push blocked: branch '$local_branch' can only push to the same branch on remote.
 Attempted remote ref: ${remote_ref:-<none>}
-
-Merge/promotion must happen from the target branch worktree, not by pushing across branch names.
+Policy source: $policy_ref
+MSG
+      exit 1
+      ;;
+    release/*)
+      if [[ "$remote_branch" == "$local_branch" ]]; then
+        continue
+      fi
+      cat >&2 <<MSG
+[HOOK] Push blocked: branch '$local_branch' can only push to the same branch on remote.
+Attempted remote ref: ${remote_ref:-<none>}
 Policy source: $policy_ref
 MSG
       exit 1

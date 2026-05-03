@@ -14,7 +14,7 @@ from pathlib import Path
 
 TERMINAL_RAW = {"absorbed", "dropped", "completed"}
 TERMINAL_CANDIDATE = {"absorbed", "dropped", "promoted"}
-ACTIVE_B2 = {"in_b2_ibm", "done_b2_ibm", "in_dev", "blocked_dev"}
+ACTIVE_B2 = {"in_b2_ibm", "done_b2_ibm", "in_dev", "blocked_dev", "in_ibm"}
 COMPLETED = "completed"
 DONE_STATES = {"done", "done_ibm", "completed"}  # all mean "implementation finished"
 
@@ -802,7 +802,9 @@ def _trace_chain(project: Path, key: str) -> dict:
     gh_closed = _is_github_closed(gh_issue) if gh_issue and not os.environ.get("SKIP_PLATFORM_CHECK") else None
     _st("platform_close", gh_closed is True, True, github_issue=gh_issue, gh_closed=gh_closed)
 
-    _st("branch_deleted", not has_worktree, True)
+    # branch_deleted only reached if branch existed (merged) or worktree evidence exists
+    branch_existed = merged is True or (not has_worktree and phase in DONE_STATES.union(ACTIVE_B2))
+    _st("branch_deleted", not has_worktree and branch_existed, True)
 
     # Optional: milestone entry
     mf = project / "docs" / "milestones.md"
@@ -898,10 +900,10 @@ def _finalize_chain(key: str, stations: dict, blockers: list[str], current: str,
 # ── Branch / worktree governance scan ───────────────────
 
 def _is_protected_branch(branch: str) -> bool:
-    """main, develop, and tags are permanent — everything else should correspond to an issue."""
+    """Permanent branches exempt from issue-key naming convention."""
     if branch in ("main", "develop"):
         return True
-    if branch.startswith("refs/tags/"):
+    if branch.startswith(("refs/tags/", "release/", "test-pre-merge-")):
         return True
     return False
 
@@ -1088,8 +1090,18 @@ def scan_worktree_governance(project: Path) -> list[dict]:
         is_dirty = _worktree_dirty(wt_path_obj) if wt_path_obj else False
         merged_to_develop = _branch_merged_to_develop(project, branch)
 
+        # Check worktree directory name too
+        wt_dir_ok = True
+        if wt_path_obj:
+            wt_dir_name = wt_path_obj.name
+            if issue_key:
+                wt_dir_ok = issue_key.replace("raw-", "") in wt_dir_name or issue_key in wt_dir_name
+            # If no issue_key, wt_dir_ok stays True (flagging branch name is enough)
+
         if not issue_key:
-            # 命名不规范：必须重命名以包含 issue key
+            incomplete = ["branch_name_no_issue_key"]
+            if not wt_dir_ok:
+                incomplete.append("worktree_dir_name_no_issue_key")
             items.append({
                 "source_family": "worktree_governance",
                 "key": branch,
@@ -1099,7 +1111,7 @@ def scan_worktree_governance(project: Path) -> list[dict]:
                 "stage": "命名不规范",
                 "dirty": is_dirty,
                 "merged_to_develop": merged_to_develop,
-                "incomplete": ["branch_name_no_issue_key"],
+                "incomplete": incomplete,
                 "next_action": "确定对应 issue → git branch -m 重命名为 feature/raw-{ts}-{slug} 格式",
                 "ready": False,
             })
