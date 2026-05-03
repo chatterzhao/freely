@@ -2,8 +2,8 @@
 local_id: I-20260503-0000-A
 issue_title: "fix: ACP bridge crash resilience with self-healing"
 kind: linked
-status: done
-phase_state: done
+status: completed
+phase_state: completed
 promoted_from: raw-20260503-0000
 platform_ids:
   github:
