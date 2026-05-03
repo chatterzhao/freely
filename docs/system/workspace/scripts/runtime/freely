@@ -9016,6 +9016,11 @@ materialize_worker_prompt_worktree_if_needed() {
   local target_project target_worktree target_branch freely_bin
   target_project="$(worker_prompt_resolved_worktree "$manager_project" "$prompt_file")"
   if [[ -n "$target_project" && -d "$target_project" ]]; then
+    # Worker must never share the manager's own worktree
+    if [[ "$(normalize_runtime_worktree_path "$target_project")" == "$(normalize_runtime_worktree_path "$manager_project")" ]]; then
+      log_warn "worker launch blocked: prompt resolves to manager worktree ($target_project)"
+      return 1
+    fi
     repair_existing_worker_worktree_if_needed "$manager_project" "$target_project" || return 1
     printf '%s\n' "$target_project"
     return 0
