@@ -267,9 +267,9 @@ do_initial_merge() {
 
   echo "[MERGE-GUARD] allowed: $source_branch -> $target"
 
-  # Pre-flight governance gate for feature->test-pre-merge merges.
-  # Runs from the SOURCE worktree so the gate can read feature files on disk.
-  if [[ "$target" == test-pre-merge-* ]] && [[ "$source_branch" == feature/* ]]; then
+  # Pre-flight governance gate for feature/hotfix -> test-pre-merge merges.
+  # Runs from the SOURCE worktree so the gate can read feature/hotfix files on disk.
+  if [[ "$target" == test-pre-merge-* ]] && { [[ "$source_branch" == feature/* ]] || [[ "$source_branch" == hotfix/* ]]; }; then
     local source_wt gate_bin gate_output gate_rc
     source_wt="$(git worktree list --porcelain 2>/dev/null | awk -v branch="$source_branch" '
       /^worktree / { wt=$2 }
@@ -293,12 +293,12 @@ do_initial_merge() {
 ┌─────────────────────────────────────────────────────────────┐
 │  Pre-flight governance gate FAILED for: $source_branch       │
 │                                                             │
-│  Fix these issues in the feature worktree before merging:   │
+│  Fix these issues in the source worktree before merging:   │
 └─────────────────────────────────────────────────────────────┘
 
 $gate_output
 
-Run this check directly in your feature worktree:
+Run this check directly in your source worktree:
   cd "$source_wt" && ./bin/governance-merge-gate --range develop..HEAD
 MSG
         exit 1
