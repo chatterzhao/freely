@@ -102,7 +102,7 @@ def collect_lifecycle_items(project: Path) -> list[dict]:
                 # I-YYYYMMDD-HHMM-A → base_key="YYYYMMDD-HHMM", suffix="A"
                 inner = name[2:]  # "20260428-1737-A"
                 # Split off the suffix letter
-                m = re.match(r"^(\d{8}-\d{4})-([A-Z])$", inner)
+                m = re.match(r"^(\d{8}-\d{4}|\d{8}T\d{4,6}Z)-([A-Z])$", inner)
                 if m:
                     base_key = m.group(1)
                     suffix = m.group(2)
@@ -184,6 +184,7 @@ def _base_key(local_id: str) -> str:
     raw-20260428-1737 → 20260428-1737
     I-20260428-1737-A → 20260428-1737
     I-20260428-1737 → 20260428-1737
+    raw-20260503T0901Z → 20260503T0901Z  (new format)
     """
     inner = local_id
     if inner.startswith("raw-"):
@@ -191,7 +192,8 @@ def _base_key(local_id: str) -> str:
     elif inner.startswith("I-"):
         inner = inner[2:]
     # Strip suffix letter: 20260428-1737-A → 20260428-1737
-    m = re.match(r"^(\d{8}-\d{4})-[A-Z]$", inner)
+    # New format: 20260503T0901Z-A → 20260503T0901Z
+    m = re.match(r"^(\d{8}-\d{4}|\d{8}T\d{4,6}Z)-[A-Z]$", inner)
     if m:
         inner = m.group(1)
     return inner
@@ -657,7 +659,7 @@ def _all_base_keys(project: Path) -> set[str]:
     if pb_dir.is_dir():
         for d in pb_dir.iterdir():
             if d.is_dir():
-                m = re.match(r"^(\d{8}-\d{4})--", d.name)
+                m = re.match(r"^(\d{8}-\d{4}|\d{8}T\d{4,6}Z)--", d.name)
                 if m and m.group(1) in keys:  # only if source 1 or 2 already found it
                     pass  # already in keys
 
@@ -914,7 +916,8 @@ def _extract_issue_key_from_branch(branch: str) -> str | None:
     hotfix/I-20260428-1737-A-bar → I-20260428-1737-A
     test-pre-merge-scan-v3 → None (no issue key)
     """
-    for pattern in [r"(raw-\d{8}-\d{4})", r"(I-\d{8}-\d{4}(?:-[A-Z0-9]+)?)"]:
+    for pattern in [r"(raw-\d{8}-\d{4})", r"(raw-\d{8}T\d{4,6}Z)",
+                    r"(I-\d{8}-\d{4}(?:-[A-Z0-9]+)?)", r"(I-\d{8}T\d{4,6}Z(?:-[A-Z0-9]+)?)"]:
         m = re.search(pattern, branch)
         if m:
             return m.group(1)

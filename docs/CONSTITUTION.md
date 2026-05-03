@@ -109,15 +109,15 @@ Freely 是一个自主循环运行器：
 
 ## 3. 版本命名规则（硬性要求）
 
-版本格式：`YYYY.MM.DD-HHMM-stage`（stage 不可省略）
+版本格式：`YYYY.MM.DD-HHMMZ-stage`（stage 不可省略）
 
 | 版本示例 | 分支 | 阶段 | Tag | 对外 |
 |----------|------|------|-----|------|
-| `2026.03.01-1430-alpha` | `feature/*` | 开发中 | 本地轻量 tag | 否 |
-| `2026.03.01-1430-beta` | `test-pre-merge-*` | 测试集成 | 本地轻量 tag | 否 |
-| `2026.03.01-1430-nightly` | `develop` | 夜间构建 | push tag | 是 |
-| `2026.03.01-1430-stable` | `main` | 正式发布 | push tag | 是 |
-| `2026.03.01-1430-hotfix` | `hotfix/*` | 紧急修复 | push tag | 是 |
+| `2026.03.01-1430Z-alpha` | `feature/*` | 开发中 | 本地轻量 tag | 否 |
+| `2026.03.01-1430Z-beta` | `test-pre-merge-*` | 测试集成 | 本地轻量 tag | 否 |
+| `2026.03.01-1430Z-nightly` | `develop` | 夜间构建 | push tag | 是 |
+| `2026.03.01-1430Z-stable` | `main` | 正式发布 | push tag | 是 |
+| `2026.03.01-1430Z-hotfix` | `hotfix/*` | 紧急修复 | push tag | 是 |
 
 - `alpha`、`beta`：本地 tag，不 push 到 GitHub
 - `nightly`：每日自动构建并 push tag，对外可见
@@ -325,7 +325,7 @@ Freely 必须支持可插拔、可演进、可回滚的模块化架构，并保�
 边界原则：
 1. 未完成备份前不得执行配置修改。
 2. 备份必须唯一且可恢复。
-3. 备份文件名必须保留源文件基名，并包含 UTC 时间戳（`YYYYMMDD-HHMMSS`）与 `.bak` 标记。
+3. 备份文件名必须保留源文件基名，并包含 UTC 时间戳（`YYYYMMDDThhmmssZ`）与 `.bak` 标记。
 4. 备份记录必须可追溯。
 
 说明：

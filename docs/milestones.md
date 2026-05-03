@@ -200,6 +200,19 @@ routing_policy:
   - docs/epics/freely-packaging-selfhost/code-reviews/20260502-packaging-implementation.md
 - next_action: 推进到 test-pre-merge，打包自举验证后 merge 到 develop
 
+8. `I-20260503T0901Z-timezone-standardize`
+- title: Standardize timezone rendering across all 7 locations
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P0
+- issue_path: docs/epics/timezone-standardization/issues/I-20260503T0901Z-timezone-standardize.md
+- progress_path: docs/progress/20260503T0901Z-timezone-standardization.md
+- source_brainstorm: docs/pre-brainstorms/20260503-0901--timezone-standardize/brainstorms.md
+- source_candidates: docs/pre-brainstorms/20260503-0901--timezone-standardize/candidates.md
+- evidence:
+  - docs/epics/timezone-standardization/code-reviews/rev-20260503T0901Z-A.md
+- next_action: test-pre-merge verification, then merge to develop, close GitHub #179
+
 ### candidate_issues
 
 1. `C-20260417-0445-A`
@@ -223,6 +236,17 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260418-1900--runtime-lifecycle-receipt-followthrough/candidates.md`
 - next_action: Candidate mirror only. `I-20260418-1900-A` is now the canonical owner for the runtime lifecycle receipt-ledger followthrough and immediate retirement of the temporary followthrough worktrees.
 - revisit_trigger: Re-open only if canonical develop still surfaces receipt-gap drift after this bounded ledger repair, or if future receipt-ledger closures prove this followthrough pattern needs a reusable owner family.
+
+1. `C-20260503T0901Z-timezone-standardize`
+- title: Standardize timezone rendering across all 7 locations
+- milestone_state: candidate
+- phase_state: `todo_ibm`
+- priority: P0
+- promoted_issue_path: docs/epics/timezone-standardization/issues/I-20260503T0901Z-timezone-standardize.md
+- source_brainstorm: docs/pre-brainstorms/20260503-0901--timezone-standardize/brainstorms.md
+- source_candidates: docs/pre-brainstorms/20260503-0901--timezone-standardize/candidates.md
+- next_action: Candidate mirror only. I-20260503T0901Z-timezone-standardize is already implemented and ready for merge.
+- revisit_trigger: Re-open only if the UTC+Z format is later changed or extended.
 
 1. `C-20260421-1200-A`
 - title: Runtime daemon self-loop followthrough governance
