@@ -172,6 +172,18 @@ conn.close()
 _require_issue_exists "$branch" || exit 1
 
 target_path="$(freely_wt_resolve_target_path "$branch")"
+
+# macOS AF_UNIX socket path limit: 104 bytes
+# acp-bridge.sock lives at <worktree>/.freely/run/acp-bridge.sock
+_socket_path="${target_path}/.freely/run/acp-bridge.sock"
+_socket_len="${#_socket_path}"
+if (( _socket_len > 104 )); then
+  echo "拒绝创建工位：socket 路径超长 (${_socket_len} > 104 字符)" >&2
+  echo "  $_socket_path" >&2
+  echo "  解决方案：将项目移到更短路径，或用 --target 指定短路径" >&2
+  exit 1
+fi
+
 mkdir -p "$(freely_wt_root_dir)"
 git worktree add -b "$branch" "$target_path" "$base"
 _materialize_chat_if_needed "$branch" "$target_path" || exit 1
