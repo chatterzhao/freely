@@ -1,0 +1,19 @@
+# Code Review: fix-execution skill
+
+- issue_id: `I-20260503-0000-B`
+- issue_path: `docs/epics/workspace-routing-foundation/fix-execution-skill/issues/I-20260503-0000-B.md`
+- review_date: `2026-05-03`
+- reviewer: `human`
+- status: `approved`
+- decision: `approve`
+- artifacts_reviewed:
+  - docs/system/workspace/skills/fix-execution/SKILL.md
+  - AGENTS.md
+
+## Implementation Decision Note
+
+- decision: Approve fix-execution skill. Pattern proven in ACP bridge crash resilience hotfix.
+- why_this: Without a standard fix workflow, each bug is handled ad-hoc. Governance written before validation wastes time when fix direction changes.
+- alternatives_considered: No skill (ad-hoc, inconsistent); governance-first workflow (wastes time on wrong fix direction).
+- boundary_non_goals: Does not change merge-guarded or governance gate behavior; does not modify pre-push hook.
+- residual_risk: Skill is advisory; agents may still fix directly on develop. AGENTS.md reference provides the routing signal.

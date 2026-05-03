@@ -93,6 +93,21 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/acp-bridge-crash-resilience/code-reviews/review.md`
 - next_action: `Merge to develop, then release to main.`
 
+10. `I-20260503-0000-B`
+- title: feat: add fix-execution skill for rapid bug fix workflow
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/fix-execution-skill/issues/I-20260503-0000-B.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-fix-execution-skill.md`
+- source_candidates: `docs/pre-brainstorms/20260503-fix-skill/candidates.md`
+- branch: `hotfix/fix-execution-skill`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/fix-execution-skill/issues/I-20260503-0000-B.md`
+  - `docs/progress/workspace-routing-foundation/p-fix-execution-skill.md`
+  - `docs/epics/workspace-routing-foundation/fix-execution-skill/code-reviews/review.md`
+- next_action: `Merge to develop.`
+
 7. `I-20260421-1530-A`
 - title: Live-status scan summary and prompt anchor governance
 - milestone_state: committed

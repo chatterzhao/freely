@@ -106,8 +106,20 @@ Freely 开发 Freely 时，默认先问四件事：
    - Freely 自身产品架构与开发治理，先落开发文档
    - 只有会被 runtime / agent / skill / CLI 长期消费的稳定定义，才进入能力目录
 4. 这棵树是 research-only、merge-ready、companion-only，还是 verified-retirable？
-   - 不要把“已经有 feature worktree”误当成“已经完成 issue materialization”
-   - 不要把“已经 merge”误当成“cleanup 已完成”
+   - 不要把”已经有 feature worktree”误当成”已经完成 issue materialization”
+   - 不要把”已经 merge”误当成”cleanup 已完成”
+
+## Bug 修复：fix skill 快速通道
+
+当发现运行时 bug（daemon crash、restart storm、超时、权限错等），使用 `skill:fix-execution` 快速修复：
+
+- **阶段 1 — 创建 pre 工位隔离测试**：`./bin/wt-create fix-pre-merge/<desc>-<YYYYMMDD> --base develop`。hook 自动复制 runtime 状态，与 develop 等效但不阻塞其他 AI 并发。在 pre 工位上直接改源码、stop/start daemon 验证。
+- **阶段 2 — 决定 fix 即建 hotfix 工位**：`./bin/wt-create hotfix/<desc>-<YYYYMMDD> --base develop`。每个阶段性修复验证通过后，立刻 cp 到 hotfix 工位增量提交，不堆到最后一次。
+- **阶段 3 — 补齐治理**：raw issue → candidate → canonical issue → progress → code-review（`## Implementation Decision Note`）→ milestones.md。
+- **阶段 4 — 门禁合并**：`./bin/merge-guarded develop hotfix/<name>`。
+- **原则**：Fix first, govern later。治理后置。pre 工位隔离测试。fix 工位早期创建、增量提交。
+
+详见 `docs/system/workspace/skills/fix-execution/SKILL.md`
 
 ## 吃自己的狗粮规则（Freely 构建 Freely）
 Freely 必须在 Freely 治理规则下开发，不得有项目特定的例外。
