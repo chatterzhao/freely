@@ -4,6 +4,7 @@
 - source_candidate: docs/pre-brainstorms/20260503-0915--enforce-test-pre-merge/candidates.md
 - phase_state: in_dev
 - verification_artifact_dir: docs/epics/test-pre-merge-enforcement/code-reviews
+- pre_tests_path: `docs/epics/test-pre-merge-enforcement/issues/pre-tests.md`
 - platform_ids:
   github:
     - "180"
