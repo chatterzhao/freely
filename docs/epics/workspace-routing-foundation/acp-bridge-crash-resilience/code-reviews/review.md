@@ -1,10 +1,11 @@
 # Code Review: ACP bridge crash resilience
 
-- reviewer: human
-- date: 2026-05-03
-- status: approved
-- owner_issue: I-20260503-0000-A
-- owner_issue_path: docs/epics/workspace-routing-foundation/acp-bridge-crash-resilience/issues/I-20260503-0000-A.md
+- issue_id: `I-20260503-0000-A`
+- issue_path: `docs/epics/workspace-routing-foundation/acp-bridge-crash-resilience/issues/I-20260503-0000-A.md`
+- review_date: `2026-05-03`
+- reviewer: `human`
+- status: `approved`
+- decision: `approve`
 - artifacts_reviewed:
   - docs/system/workspace/scripts/runtime/acp-bridge.py
   - docs/system/workspace/scripts/runtime/freely
