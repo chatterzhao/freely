@@ -79,7 +79,7 @@
 ### premerge-integration verified
 - id: `premerge-verified`
 - requirement: `test-pre-merge 集成验证通过，daemon 启动正常，scan 输出准确`
-- evidence_level: `real_environment`
+- evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/scan-lifecycle-migration/code-reviews/review.md`
 - surface_kind: `integration`
