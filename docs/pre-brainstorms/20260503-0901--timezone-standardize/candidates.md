@@ -1,15 +1,24 @@
-# Candidate: Timezone Standardization
+# Candidates — 20260503-0901--timezone-standardize
 
-## Source
-raw-20260503-0901 / GitHub #179
+## Context
+- Source brainstorm: `docs/pre-brainstorms/20260503-0901--timezone-standardize/brainstorms.md`
+- Status: `promoted`
+- Route: `implementation-complete-merge-to-develop`
 
-## Decision
-Promote to I-issue. Format spec is well-defined, 7 locations identified, implementation completed.
+## Candidates
+
+### C-20260503T0901Z-timezone-standardize
+- candidate_format_version: `v2`
+- title: `Standardize timezone rendering across all 7 locations`
+- research_only: `false`
+- implementation_ready: `true`
+- status: `promoted`
+- priority: `P0`
+- promoted_issue_id: `I-20260503T0901Z-A`
+- promoted_issue_path: `docs/epics/timezone-standardization/issues/I-20260503T0901Z-A.md`
+- execution_base: `develop`
 
 ## Acceptance Items
 - timezone-001: All new timestamps use UTC+Z
-- timezone-002: Backward compatibility preserved (old format accepted on read)
+- timezone-002: Backward compatibility preserved
 - timezone-003: All 7 locations covered
-
-## Linked Issue
-I-20260503T0901Z-A
