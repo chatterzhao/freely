@@ -132,15 +132,18 @@ hotfix/*          → main
   │
   └─ 增量提交，不堆到最后
 
-阶段 3 — 补齐治理
+阶段 3 — 补齐治理（调用下层 skill）
   │
-  ├─ raw issue → candidate → canonical issue → progress
-  ├─ code-review（必须 ## Implementation Decision Note）
+  ├─ skill:doc-pre-brainstorm-execution → raw → candidate
+  ├─ skill:doc-ibm-execution → candidate → I-* issue → progress
+  ├─ skill:dev-loop-execution → code-review（必须 ## Implementation Decision Note）+ pre-tests
   └─ milestones.md
 
 阶段 4 — 门禁合并
   │
-  ├─ 普通: ./bin/merge-guarded test-pre-merge-<name> feature/<name>
+  ├─ 运行 ./bin/governance-merge-gate --range "develop..HEAD" 只检查本分支
+  ├─ gate 失败：用对应 skill 修复分支自己的错误，预存错误不阻塞
+  ├─ gate 通过：./bin/merge-guarded test-pre-merge-<name> feature/<name>
   │         → 验证 → ./bin/merge-guarded develop test-pre-merge-<name>
   ├─ 紧急: ./bin/merge-guarded develop hotfix/<name>
   └─ 可选: git checkout main && ./bin/merge-guarded main hotfix/<name>
