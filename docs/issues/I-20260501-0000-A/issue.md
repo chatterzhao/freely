@@ -19,3 +19,5 @@ updated_at: "2026-05-03T15:30:00Z"
 session_refs:
   - {tool: ccds, session_id: "20260501-scan-pr-platform", role: "author"}
 ---
+
+- phase_state: `in_verification`

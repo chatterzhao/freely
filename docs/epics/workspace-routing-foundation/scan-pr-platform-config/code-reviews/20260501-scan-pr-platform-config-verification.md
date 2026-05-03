@@ -1,28 +1,27 @@
-# Verification: scan-pr-platform-config
+# Verification: PR scan surface + FREELY_REPO_PLATFORMS config
 
 - issue_id: `I-20260501-0000-A`
 - issue_path: `docs/epics/workspace-routing-foundation/scan-pr-platform-config/issues/I-20260501-0000-A.md`
-- date: `2026-05-01`
-- type: `governance-merge-gate`
-- decision: `pass`
-- why_this: `Hotfix adds PR scan surface with FREELY_REPO_PLATFORMS config. Minimal code change in the freely runtime script.`
-- alternatives_considered:
-  - `Extend task-lifecycle-scan.py instead of bash inline — rejected: lifecycle scan delegates to python; PR data injected after`
-  - `Add PR scan as separate binary — rejected: complexity disproportionate for a config-driven scan`
-- boundary_non_goals:
-  - `Platform auth management (tokens, credentials) — out of scope`
-  - `PR auto-sync or write-back to platforms — not included`
-- residual_risk: `Low. PR scan depends on platform CLIs (gh, gitee) being installed and authenticated. Runtime handles missing CLIs gracefully by skipping.`
+- verification_date: `2026-05-03`
+- verifier: `human`
 
-## Verification Items
+## Scope Verdict
 
-1. **PR scan function**: `scan_repo_platform_prs()` present in `freely` script
-2. **Config**: `FREELY_REPO_PLATFORMS` declared in config template (empty = no PR scanning)
-3. **Surface**: `open_pull_requests` surface with advisory trust level in scan JSON
-4. **Platforms**: github (gh) and gitee (gitee) supported with correct CLI mapping
-5. **Backward compat**: Empty FREELY_REPO_PLATFORMS → no PR data; existing scans unaffected
-6. **Governance**: `./bin/governance-check` — no regressions from this branch
+- `PASS`: `FREELY_REPO_PLATFORMS` 配置变量正确声明
+- `PASS`: `scan_repo_platform_prs()` 函数正确读取 CSV 配置并映射 CLI
+- `PASS`: 空配置时向后兼容（无 PR surface）
+- `PASS`: 非可用 CLI 的平台被跳过
+- `PASS`: governance-check 无新增失败
 
-## Result
+## Commands
 
-PASS
+1. `./bin/governance-check`
+2. `bash -n docs/system/workspace/scripts/runtime/freely`
+
+## Implementation Decision Note
+
+- decision: `为 task-source-scan 增加 open_pull_requests 扫描面，通过 FREELY_REPO_PLATFORMS 配置控制。`
+- why_this: `通过配置而非硬编码支持多平台（github + gitee），最小化向后兼容风险。`
+- alternatives_considered: `硬编码平台列表（不够灵活）；在外部脚本中扫描（增加集成复杂度）。`
+- boundary_non_goals: `不修改现有的扫描逻辑；不引入 issue 同步；不添加新的平台 CLI。`
+- residual_risk: `无 — 空配置时行为不变，配置的平台 CLI 不可用时静默跳过。`
