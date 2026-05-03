@@ -21,7 +21,8 @@ import sys
 import time
 import threading
 
-BRIDGE_TIMEOUT = 900  # max seconds to wait for server response
+BRIDGE_TIMEOUT = int(os.environ.get("ACP_BRIDGE_SESSION_TIMEOUT", "1800"))
+ACP_IDLE_TIMEOUT = int(os.environ.get("ACP_BRIDGE_IDLE_TIMEOUT", "300"))
 
 
 def _runtime_dir(project):
@@ -57,6 +58,9 @@ class AcpBridge:
         self._restarting = False
         self.clients = []  # connected client sockets for notification broadcast
         self.clients_lock = threading.Lock()
+        self.last_activity_ts = time.time()
+        self.activity_lock = threading.Lock()
+        self.stdin_write_lock = threading.Lock()
 
     def log(self, msg):
         ts = time.strftime("%Y-%m-%dT%H:%M:%S")
@@ -211,8 +215,23 @@ class AcpBridge:
                 except json.JSONDecodeError:
                     self.log(f"non-JSON stdout: {line[:200]}")
                     continue
+                with self.activity_lock:
+                    self.last_activity_ts = time.time()
                 self._dispatch(msg)
             except (ValueError, OSError):
+                break
+            except Exception:
+                self.log("unexpected error in stdout reader, shutting down bridge")
+                self.running = False
+                if self.server_proc and self.server_proc.poll() is None:
+                    try:
+                        self.server_proc.terminate()
+                        self.server_proc.wait(timeout=2)
+                    except Exception:
+                        try:
+                            self.server_proc.kill()
+                        except OSError:
+                            pass
                 break
 
     def _read_stderr(self):
@@ -238,10 +257,16 @@ class AcpBridge:
             self._broadcast_notification(msg)
         elif msg_id is not None:
             # Response for unknown request — log for debugging
-            self.log(f"response for unknown id: {msg_id}, result={msg.get('result','')[:100]}")
+            self.log(f"response for unknown id: {msg_id}, result={str(msg.get('result',''))[:100]}")
 
     def _send_request(self, method, params, timeout=BRIDGE_TIMEOUT):
-        """Send JSON-RPC request to server and wait for response."""
+        """Send JSON-RPC request to server and wait for response.
+
+        For session/prompt, uses activity-based idle timeout: the clock resets
+        every time the AI produces output (tool calls, partial text, etc.).
+        Only times out if the AI is completely silent for ACP_IDLE_TIMEOUT seconds.
+        An absolute timeout (BRIDGE_TIMEOUT) still acts as a safety net.
+        """
         with self.server_lock:
             self.request_counter += 1
             req_id = self.request_counter
@@ -258,25 +283,54 @@ class AcpBridge:
             req_line = json.dumps(request, separators=(",", ":"))
             self.log(f"sending: {method} id={req_id}")
 
+        # Write with stdin lock, then release ALL locks before waiting.
+        # This allows concurrent threads to forward permission responses
+        # to server stdin while we wait for the response.
+        with self.stdin_write_lock:
             try:
                 self.server_proc.stdin.write(req_line + "\n")
                 self.server_proc.stdin.flush()
             except (BrokenPipeError, OSError) as e:
-                self.pending.pop(req_id, None)
+                with self.server_lock:
+                    self.pending.pop(req_id, None)
                 raise RuntimeError(f"server stdin write failed: {e}")
 
+        if method == "session/prompt":
+            poll_interval = min(ACP_IDLE_TIMEOUT // 2, 30)
+            deadline = time.time() + timeout
+            while time.time() < deadline:
+                if event.wait(timeout=poll_interval):
+                    break
+                with self.activity_lock:
+                    idle_secs = time.time() - self.last_activity_ts
+                if idle_secs > ACP_IDLE_TIMEOUT:
+                    with self.server_lock:
+                        self.pending.pop(req_id, None)
+                    raise TimeoutError(
+                        f"idle timeout: no AI activity for {idle_secs:.0f}s "
+                        f"(limit={ACP_IDLE_TIMEOUT}s) waiting for {method}"
+                    )
+            if not event.is_set():
+                with self.server_lock:
+                    self.pending.pop(req_id, None)
+                raise TimeoutError(
+                    f"absolute timeout ({timeout}s) waiting for {method}"
+                )
+        else:
             if not event.wait(timeout=timeout):
-                self.pending.pop(req_id, None)
+                with self.server_lock:
+                    self.pending.pop(req_id, None)
                 raise TimeoutError(f"timeout waiting for {method}")
 
-            response = container.get("response", {})
+        response = container.get("response", {})
+        with self.server_lock:
             self.pending.pop(req_id, None)
 
-            if "error" in response:
-                err = response["error"]
-                raise RuntimeError(f"server error: {err.get('message', str(err))}")
+        if "error" in response:
+            err = response["error"]
+            raise RuntimeError(f"server error: {err.get('message', str(err))}")
 
-            return response.get("result", {})
+        return response.get("result", {})
 
     def _broadcast_notification(self, msg):
         """Forward server notification to all connected clients."""
@@ -308,10 +362,17 @@ class AcpBridge:
         return sid
 
     def session_resume(self, session_id, cwd=None):
-        """Resume an existing ACP session."""
+        """Resume an existing ACP session and ensure bypassPermissions is active."""
         params = {"sessionId": session_id, "cwd": cwd or self.project, "mcpServers": []}
         result = self._send_request("session/resume", params, timeout=30)
-        return result.get("sessionId", "")
+        sid = result.get("sessionId", "")
+        if sid:
+            try:
+                self._send_request("session/set_mode", {"sessionId": sid, "modeId": "bypassPermissions"}, timeout=10)
+                self.log(f"session {sid[:12]}... mode set to bypassPermissions after resume")
+            except Exception as e:
+                self.log(f"session/set_mode failed after resume (non-fatal): {e}")
+        return sid
 
     def session_prompt(self, session_id, prompt_text, timeout=900):
         """Send a prompt and wait for response. Returns (stop_reason, response_text)."""
@@ -384,7 +445,7 @@ def handle_client(conn, bridge):
 
                 if "id" not in request:
                     # Client notification — forward to server without waiting for response
-                    with bridge.server_lock:
+                    with bridge.stdin_write_lock:
                         bridge.server_proc.stdin.write(line + "\n")
                         bridge.server_proc.stdin.flush()
                     continue
@@ -392,7 +453,7 @@ def handle_client(conn, bridge):
                 # Client-to-server RESPONSE (has id + result/error, no method):
                 # Forward directly to server stdin without waiting for a server response.
                 if "method" not in request and ("result" in request or "error" in request):
-                    with bridge.server_lock:
+                    with bridge.stdin_write_lock:
                         bridge.server_proc.stdin.write(line + "\n")
                         bridge.server_proc.stdin.flush()
                     continue
@@ -413,17 +474,18 @@ def handle_client(conn, bridge):
                     result = bridge._send_request(method, params,
                         timeout=params.get("timeout", BRIDGE_TIMEOUT))
                     response = {"jsonrpc": "2.0", "id": req_id, "result": result}
-                    # After session/new, immediately set bypassPermissions to
-                    # prevent interactive permission prompts from hanging the AI.
-                    if method == "session/new":
+                    # After session/new or session/resume, immediately set
+                    # bypassPermissions to prevent interactive permission prompts
+                    # from hanging the AI in daemon/non-interactive mode.
+                    if method in ("session/new", "session/resume"):
                         sid = result.get("sessionId", "")
                         if sid:
                             try:
                                 bridge._send_request("session/set_mode",
                                     {"sessionId": sid, "modeId": "bypassPermissions"}, timeout=10)
-                                bridge.log(f"session {sid[:12]}... mode set to bypassPermissions")
+                                bridge.log(f"session {sid[:12]}... mode set to bypassPermissions after {method}")
                             except Exception as e:
-                                bridge.log(f"session/set_mode failed (non-fatal): {e}")
+                                bridge.log(f"session/set_mode failed after {method} (non-fatal): {e}")
                 except TimeoutError as e:
                     response = {"jsonrpc": "2.0", "id": req_id, "error": {"code": -32000, "message": str(e)}}
                 except RuntimeError as e:

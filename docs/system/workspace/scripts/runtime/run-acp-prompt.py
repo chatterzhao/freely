@@ -113,7 +113,7 @@ class SocketTransport(Transport):
         if not os.path.exists(socket_path):
             raise RuntimeError(f"bridge socket not found: {socket_path}")
         self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-        self.sock.settimeout(900)  # match session/prompt timeout
+        self.sock.settimeout(int(os.environ.get("ACP_PROMPT_SOCKET_TIMEOUT", "3600")))
         self.sock.connect(socket_path)
         self._file = self.sock.makefile("r", buffering=1)
         self._write_lock = threading.Lock()
@@ -383,6 +383,18 @@ def main():
             print(f"session id: {session_id}", flush=True)       # line 2: human log
 
         t_session = time.time()
+
+        # Ensure bypassPermissions is active for this session.
+        # The bridge sets this after session/new and session/resume, but
+        # this call is a defense-in-depth for direct (subprocess) mode.
+        try:
+            client.request(
+                "session/set_mode",
+                {"sessionId": session_id, "modeId": "bypassPermissions"},
+                timeout=10,
+            )
+        except Exception:
+            pass
 
         # Model selection
         if args.reasoning_effort:

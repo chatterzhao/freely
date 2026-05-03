@@ -11852,6 +11852,33 @@ _acp_bridge_socket() {
   echo "$(run_dir_for_project "$1")/acp-bridge.sock"
 }
 
+_acp_bridge_health_check() {
+  local project="$1" timeout="${2:-5}" socket
+  socket="$(_acp_bridge_socket "$project")"
+  [[ -S "$socket" ]] || return 1
+  python3 -c "
+import socket, json, sys
+sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+sock.settimeout($timeout)
+try:
+    sock.connect('$socket')
+    sock.sendall(json.dumps({'jsonrpc':'2.0','id':9999,'method':'initialize','params':{'protocolVersion':1,'clientCapabilities':{}}}).encode() + b'\n')
+    data = sock.recv(4096)
+    for line in data.split(b'\n'):
+        line = line.strip()
+        if not line:
+            continue
+        resp = json.loads(line)
+        if resp.get('id') == 9999 and 'result' in resp:
+            sys.exit(0)
+    sys.exit(1)
+except Exception:
+    sys.exit(1)
+finally:
+    sock.close()
+" 2>/dev/null
+}
+
 _ensure_acp_bridge_running() {
   local project="$1"
   local pid_file socket
@@ -11863,7 +11890,10 @@ _ensure_acp_bridge_running() {
     local pid
     pid=$(cat "$pid_file" 2>/dev/null || true)
     if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null && [[ -S "$socket" ]]; then
-      return 0
+      if _acp_bridge_health_check "$project" 5; then
+        return 0
+      fi
+      log_warn "existing ACP bridge (pid=$pid) is alive but failed health check; restarting"
     fi
     rm -f "$pid_file" "$socket"
   fi
