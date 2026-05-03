@@ -6,5 +6,5 @@
 - priority: `P0`
 - type: `refactor`
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `docs/issues/I-20260503-0200-A/issue.md`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/scan-lifecycle-migration/issues/I-20260503-0200-A.md`
 - next_action: `Merge to develop.`
