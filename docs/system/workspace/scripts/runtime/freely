@@ -1318,7 +1318,7 @@ runtime_pid_file_for_role() {
     ai) printf '%s\n' "$(run_dir_for_project "$project")/ai.pid" ;;
     manager_watchdog) printf '%s\n' "$(ensure_manager_watchdog_pid_file "$project")" ;;
     interruption_dispatcher) printf '%s\n' "$(interruption_dispatcher_pid_file "$project")" ;;
-    acp_bridge) printf '%s\n' "$(run_dir_for_project "$project")/acp-bridge.pid" ;;
+    acp_bridge) printf '%s\n' "$(run_dir_for_project "$project")/acp-bridge-$(_acp_bridge_short_hash "$project").pid" ;;
     *) return 1 ;;
   esac
 }
@@ -1354,7 +1354,7 @@ clear_stale_runtime_pid_file_if_invalid() {
   rm -f "$pid_file"
   # ACP bridge owns a Unix socket — clean it alongside the stale PID.
   if [[ "$role" == "acp_bridge" ]]; then
-    rm -f "$(run_dir_for_project "$project")/acp-bridge.sock"
+    rm -f "$(run_dir_for_project "$project")/acp-bridge-$(_acp_bridge_short_hash "$project").sock"
   fi
   append_runtime_event "$project" "startup_self_heal_stale_pid_cleared" \
     "trigger=$trigger" \
@@ -11793,7 +11793,7 @@ _ai_shows_liveness_acp() {
   fi
 
   # Signal 3: ACP bridge socket responsive
-  local bridge_socket="$project/.freely/run/acp-bridge.sock"
+  local bridge_socket="$(run_dir_for_project "$project")/acp-bridge-$(_acp_bridge_short_hash "$project").sock"
   if [[ -S "$bridge_socket" ]]; then
     # Quick socket probe: connect and disconnect (non-blocking check)
     if python3 -c "
@@ -11844,12 +11844,17 @@ _ai_shows_liveness_pid_signals() {
 # The ACP bridge (acp-bridge.py) keeps claude-agent-acp alive across AI cycles.
 # Managed only when AI_TOOL_ADAPTER=acp.
 
+_acp_bridge_short_hash() {
+  local project="$1"
+  printf '%s' "$project" | shasum -a 256 | cut -c1-16
+}
+
 _acp_bridge_pid_file() {
-  echo "$(run_dir_for_project "$1")/acp-bridge.pid"
+  echo "$(run_dir_for_project "$1")/acp-bridge-$(_acp_bridge_short_hash "$1").pid"
 }
 
 _acp_bridge_socket() {
-  echo "$(run_dir_for_project "$1")/acp-bridge.sock"
+  echo "$(run_dir_for_project "$1")/acp-bridge-$(_acp_bridge_short_hash "$1").sock"
 }
 
 _acp_bridge_health_check() {

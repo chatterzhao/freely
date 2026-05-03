@@ -37,12 +37,17 @@ _load_tool_launchers() {
 
 # ── Bridge management ──────────────────────────────────────────────
 
+_bridge_short_hash() {
+  local project="$1"
+  printf '%s' "$project" | shasum -a 256 | cut -c1-16
+}
+
 _bridge_pid_file() {
-  echo "$1/.freely/run/acp-bridge.pid"
+  echo "$1/.freely/run/acp-bridge-$(_bridge_short_hash "$1").pid"
 }
 
 _bridge_socket() {
-  echo "$1/.freely/run/acp-bridge.sock"
+  echo "$1/.freely/run/acp-bridge-$(_bridge_short_hash "$1").sock"
 }
 
 _bridge_ensure_running() {
