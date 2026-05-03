@@ -585,10 +585,10 @@ def scan_worktree_governance(project: Path) -> list[dict]:
 
     Principle:
     - main/develop/tags are permanent — excluded
-    - All other branches must correspond to an issue (raw-xxx or I-xxx in name)
-    - If the issue is done → branch/worktree is "未收口" (needs cleanup)
-    - If the issue is NOT done → skip (covered by issue lifecycle scan)
-    - If no matching issue → "孤儿" (orphan branch)
+    - Naming convention (raw-xxx in branch name) enforced at wt-create time only
+    - For branches WITH issue key: if issue done → "未收口" (needs cleanup)
+    - For branches WITHOUT issue key: show only if dirty/unmerged/has-runtime
+    - Clean merged branches without issue keys → skip (harmless legacy)
     """
     items = []
 
@@ -652,20 +652,30 @@ def scan_worktree_governance(project: Path) -> list[dict]:
 
         # Determine stage and incomplete reasons
         if not issue_key:
-            # Orphan: branch without issue key
+            # No issue key: naming convention enforced at wt-create time, not retroactively.
+            # Only flag if there's actual cleanup work needed (dirty/unmerged/runtime).
+            if not is_dirty and merged_to_develop and not has_runtime:
+                continue  # clean merged legacy branch — harmless, skip
+            incomplete = []
+            if is_dirty:
+                incomplete.append("worktree_dirty")
+            if merged_to_develop is False:
+                incomplete.append("branch_not_merged_to_develop")
+            if has_runtime and merged_to_develop:
+                incomplete.append("worktree_not_retired")
             items.append({
                 "source_family": "worktree_governance",
                 "key": branch,
                 "branch": branch,
                 "worktree_path": wt_path or "无工位",
                 "issue_key": None,
-                "stage": "orphan_branch",
+                "stage": "未收口",
                 "dirty": is_dirty,
                 "has_runtime": has_runtime,
                 "merged_to_develop": merged_to_develop,
-                "incomplete": ["no_issue_key"],
-                "next_action": "无对应 issue：判断是否误创建或需补充 issue",
-                "ready": False,
+                "incomplete": incomplete,
+                "next_action": _derive_governance_action(is_dirty, merged_to_develop, has_runtime),
+                "ready": not is_dirty,
             })
             continue
 
