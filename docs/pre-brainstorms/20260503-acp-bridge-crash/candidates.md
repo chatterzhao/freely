@@ -6,6 +6,7 @@
 - priority: `P0`
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_to: `I-20260503-0000-A`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/acp-bridge-crash-resilience/issues/I-20260503-0000-A.md`
 - source_intake: `raw-20260503-acp-bridge-crash`
 
 ## Problem

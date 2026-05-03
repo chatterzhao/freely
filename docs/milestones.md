@@ -78,6 +78,21 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/stale-start-lock-cleanup/code-reviews/20260502-stale-start-lock-cleanup-verification.md`
 - next_action: `Merge to develop, then release to main.`
 
+9. `I-20260503-0000-A`
+- title: fix: ACP bridge crash resilience with self-healing
+- milestone_state: committed
+- phase_state: `done_ibm`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/acp-bridge-crash-resilience/issues/I-20260503-0000-A.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-acp-bridge-crash-resilience.md`
+- source_candidates: `docs/pre-brainstorms/20260503-acp-bridge-crash/candidates.md`
+- branch: `hotfix/acp-bridge-crash-resilience-20260502`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/acp-bridge-crash-resilience/issues/I-20260503-0000-A.md`
+  - `docs/progress/workspace-routing-foundation/p-acp-bridge-crash-resilience.md`
+  - `docs/epics/workspace-routing-foundation/acp-bridge-crash-resilience/code-reviews/review.md`
+- next_action: `Merge to develop, then release to main.`
+
 7. `I-20260421-1530-A`
 - title: Live-status scan summary and prompt anchor governance
 - milestone_state: committed
