@@ -1,20 +1,20 @@
 # Code Review — Scan Lifecycle Migration
 
 - issue_id: `I-20260503-0200-A`
-- review_date: 2026-05-03
-- reviewer: ai
-- verdict: approved
+- issue_path: `docs/epics/workspace-routing-foundation/scan-lifecycle-migration/issues/I-20260503-0200-A.md`
+- review_date: `2026-05-03`
+- reviewer: `ai`
+- verdict: `approved`
 
 ## Changes Reviewed
-- `task-lifecycle-scan.py`: +600 lines, full lifecycle chain trace
-- `freely`: prompt builder rewritten for lifecycle-aware output
+- `task-lifecycle-scan.py`: chain trace, chat inbox, governance
+- `freely`: prompt builder rewritten
 - `acp-bridge.py`: hash-based socket path
-- `wt-create`: fixed issue key regex, test-pre-merge support
-- `pre-push.sh`: branch naming convention gate
-- `.githooks/post-checkout`: auto pre-init-runtime for test-pre-merge
+- `wt-create`: fixed regex, test-pre-merge support
+- `pre-push.sh`: branch naming gate
+- `.githooks/post-checkout`: auto pre-init-runtime
 
 ## Implementation Decision Note
-- 选择 chain trace 替代旧 flat scan：每个 raw-xxx key 追踪14站
-- mandatory 站点阻塞进度，optional 站点仅报告
-- 分支命名不再豁免旧分支，全部按规范整改
-- socket 路径用 SHA256 hash 避免 AF_UNIX 104字节限制
+- Chain trace replaces flat scan: 12 mandatory + 2 optional stations
+- Branch naming no longer exempts legacy
+- AF_UNIX socket uses SHA256 hash for short path

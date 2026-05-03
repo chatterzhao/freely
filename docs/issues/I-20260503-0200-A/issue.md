@@ -2,8 +2,8 @@
 local_id: I-20260503-0200-A
 issue_title: "scan: switch to task-lifecycle-scan v2 with full lifecycle chain trace"
 kind: linked
-status: completed
-phase_state: completed
+status: in_dev
+phase_state: in_dev
 promoted_from: raw-20260503-0200
 platform_ids:
   github:
@@ -12,18 +12,25 @@ platform_ids:
     issue_id: ""
 primary_platform: github
 canonical_issue_path: "docs/epics/workspace-routing-foundation/scan-lifecycle-migration/issues/I-20260503-0200-A.md"
+last_synced_comment_at: {}
+hash: ""
 created_at: "2026-05-03T02:00:00Z"
 updated_at: "2026-05-03T02:00:00Z"
-session_refs: []
+session_refs:
+  - {tool: ccds, session_id: "20260503-scan-lifecycle", role: "author"}
 ---
 
 ## Pre-Brainstorm Summary
-废弃的 task-source-scan.py 仍在 runtime 中使用，输出147条噪声。
-新版 task-lifecycle-scan.py 已实现但未接入。本次切换到 v2 并增加完整生命周期链条追踪。
+
+废弃的 task-source-scan.py 输出147条噪声。新版 task-lifecycle-scan.py 已实现但从未接入 runtime。
+切换到 v2：完整生命周期链条追踪（12 mandatory + 2 optional stations），Phase 0 信号扫描，
+分支命名规范强制，AF_UNIX socket 路径修复。
 
 ## Scope
-- TASK_SOURCE_SCAN_SCRIPT → task-lifecycle-scan.py
-- Chain trace: 12 mandatory + 2 optional stations per key
-- Chat inbox scan (Phase 0)
-- Branch naming convention enforcement
-- AF_UNIX socket hash-based short path
+
+- task-lifecycle-scan.py: chain trace, chat inbox scan, governance scan
+- freely: prompt builder 重写为 lifecycle-aware 输出
+- acp-bridge.py: hash-based socket path
+- wt-create: fix regex + test-pre-merge support
+- pre-push.sh: branch naming gate
+- .githooks/post-checkout: auto pre-init-runtime
