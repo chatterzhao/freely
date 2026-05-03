@@ -26,11 +26,7 @@ ACP_IDLE_TIMEOUT = int(os.environ.get("ACP_BRIDGE_IDLE_TIMEOUT", "300"))
 
 
 def _short_hash(project: str) -> str:
-    """Deterministic short hash of project path for socket/pid files.
-
-    macOS AF_UNIX sun_path is limited to 104 bytes. Worktree paths easily
-    exceed this, so we use /tmp/freely-acp-<hash>.* instead.
-    """
+    """Deterministic short hash of project path for socket/pid files."""
     import hashlib
     return hashlib.sha256(project.encode()).hexdigest()[:16]
 
@@ -40,11 +36,11 @@ def _runtime_dir(project):
 
 
 def _pid_file(project):
-    return f"/tmp/freely-acp-{_short_hash(project)}.pid"
+    return os.path.join(_runtime_dir(project), f"acp-bridge-{_short_hash(project)}.pid")
 
 
 def _socket_path(project):
-    return f"/tmp/freely-acp-{_short_hash(project)}.sock"
+    return os.path.join(_runtime_dir(project), f"acp-bridge-{_short_hash(project)}.sock")
 
 
 def _log_file(project):

@@ -118,6 +118,20 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/fix-execution-skill/code-reviews/review.md`
 - next_action: `Merge to develop.`
 
+12. `I-20260503-0115-A`
+- title: fix: sync acp-bridge hash-based socket paths across bash and Python
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/acp-bridge-path-sync/issues/I-20260503-0115-A.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-acp-bridge-path-sync.md`
+- branch: `hotfix/acp-bridge-path-mismatch-20260503`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/acp-bridge-path-sync/issues/I-20260503-0115-A.md`
+  - `docs/progress/workspace-routing-foundation/p-acp-bridge-path-sync.md`
+  - `docs/epics/workspace-routing-foundation/acp-bridge-path-sync/code-reviews/review.md`
+- next_action: `Merge to develop, then release to main.`
+
 8. `I-20260421-1530-A`
 - title: Live-status scan summary and prompt anchor governance
 - milestone_state: committed

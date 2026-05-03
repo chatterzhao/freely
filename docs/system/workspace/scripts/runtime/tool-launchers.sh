@@ -698,7 +698,8 @@ tool_run_acp_from_prompt_file() {
   # Resolve alias (cc-ds-flash-auto → claude) before per-tool dispatch
   tool="$(_resolve_tool_family "$tool")"
 
-  local bridge_socket="${project}/.freely/run/acp-bridge.sock"
+  local bridge_socket
+  bridge_socket="$(_bridge_socket "$project")"
 
   case "$tool" in
     codex)
