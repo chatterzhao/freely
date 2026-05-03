@@ -106,8 +106,20 @@ Freely 开发 Freely 时，默认先问四件事：
    - Freely 自身产品架构与开发治理，先落开发文档
    - 只有会被 runtime / agent / skill / CLI 长期消费的稳定定义，才进入能力目录
 4. 这棵树是 research-only、merge-ready、companion-only，还是 verified-retirable？
-   - 不要把“已经有 feature worktree”误当成“已经完成 issue materialization”
-   - 不要把“已经 merge”误当成“cleanup 已完成”
+   - 不要把”已经有 feature worktree”误当成”已经完成 issue materialization”
+   - 不要把”已经 merge”误当成”cleanup 已完成”
+
+## Bug 修复：fix skill 快速通道
+
+当发现运行时 bug，使用 `skill:fix-execution` 快速修复。先判场景：
+
+- **原 feature worktree 还在** → 直接在 feature 上改、提交。走 feature → test-pre-merge-* → develop。
+- **原 feature 已退役（已合并/已删）** → 建 `test-pre-merge-<desc>-<YYYYMMDD>` 私有工位快测（不改不提交不推送，不违背保护约束）。验证通过后 cp 修改到新建的 `feature/*` 或 `hotfix/*` 可写工位，增量提交。
+- **普通 fix** 用 `feature/*` → test-pre-merge-* → develop；**紧急 hotfix** 用 `hotfix/*` → develop。
+- **补齐治理**：raw issue → candidate → canonical issue → progress → code-review（`## Implementation Decision Note`）→ milestones.md。
+- **原则**：Fix first, govern later。test-pre-merge-* 私有测试不违背保护约束。fix 工位早期创建、增量提交。
+
+详见 `docs/system/workspace/skills/fix-execution/SKILL.md`
 
 ## 吃自己的狗粮规则（Freely 构建 Freely）
 Freely 必须在 Freely 治理规则下开发，不得有项目特定的例外。

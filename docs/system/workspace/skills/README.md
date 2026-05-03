@@ -44,6 +44,7 @@
 - `skill:human-interruption-manager-triage` -> `human-interruption-manager-triage/SKILL.md`
 - `skill:signal-intent-understanding` -> `signal-intent-understanding/SKILL.md`
 - `skill:url-content-intake` -> `url-content-intake/SKILL.md`
+- `skill:fix-execution` -> `fix-execution/SKILL.md`
 - `skill:mem9-continuity-bridge` -> `mem9-continuity-bridge/SKILL.md`
 - `skill:tool-cc-codex-mcp-runtime` -> `tool-cc-codex-mcp-runtime/SKILL.md`
 - `skill:agent-execution-safety-review` -> `agent-execution-safety-review/SKILL.md`
