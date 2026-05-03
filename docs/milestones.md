@@ -183,6 +183,20 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/gate-dev-experience-preflight/code-reviews/20260429-gate-dev-experience-preflight-verification.md`
 - next_action: `Merge into develop.`
 
+26. `I-20260503T0915Z-enforce-test-pre-merge`
+- title: Enforce test-pre-merge gate for ALL develop-bound merges
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P0
+- issue_path: `docs/epics/test-pre-merge-enforcement/issues/I-20260503T0915Z-enforce-test-pre-merge.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-enforce-test-pre-merge.md`
+- source_candidate: `docs/pre-brainstorms/20260503-0915--enforce-test-pre-merge/candidates.md#C-20260503T0915Z-enforce-test-pre-merge`
+- branch: `feature/raw-20260503T0915Z-enforce-test-pre-merge`
+- evidence:
+  - `docs/epics/test-pre-merge-enforcement/issues/I-20260503T0915Z-enforce-test-pre-merge.md`
+  - `docs/epics/test-pre-merge-enforcement/code-reviews/rev-20260503-enforce-test-pre-merge.md`
+- next_action: `Merge to test-pre-merge, selfhost verify, then promote to develop.`
+
 
 
 ### committed_issues
