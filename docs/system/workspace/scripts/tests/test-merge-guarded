@@ -78,6 +78,13 @@ if "$REPO/bin-merge-guarded" develop feature/demo >/dev/null 2>"$TEST_TMP/featur
 fi
 grep -q "blocked merge" "$TEST_TMP/feature-develop-blocked.err"
 
+# hotfix -> develop must go through test-pre-merge or break-glass
+if "$REPO/bin-merge-guarded" develop hotfix/demo >/dev/null 2>"$TEST_TMP/hotfix-develop-blocked.err"; then
+  echo "[FAIL] invalid hotfix -> develop merge unexpectedly allowed" >&2
+  exit 1
+fi
+grep -q "blocked merge" "$TEST_TMP/hotfix-develop-blocked.err"
+
 git checkout -q test-pre-merge-20260327-demo
 "$REPO/bin-merge-guarded" test-pre-merge-20260327-demo hotfix/demo >/dev/null
 git merge-base --is-ancestor hotfix/demo test-pre-merge-20260327-demo
@@ -149,5 +156,23 @@ git log -1 --format=%B HEAD | grep -q '^Freely-Blocked-Gate: pre-merge-commit$'
 git log -1 --format=%B HEAD | grep -q '^Freely-Operation-Scope: merge_completion_only$'
 git log -1 --format=%B HEAD | grep -q '^Freely-Evidence-Ref: docs/epics/sample/story/code-reviews/r-breakglass.md$'
 git log -1 --format=%B HEAD | grep -q '^Freely-Follow-On-Issue: I-20260402-0020-A$'
+
+# hotfix -> develop break-glass completion (manual merge start, guarded complete)
+git checkout -q develop
+git merge --no-commit --no-ff hotfix/demo 2>/dev/null || true
+git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1 || {
+  echo "[FAIL] hotfix manual merge should set MERGE_HEAD for break-glass" >&2
+  exit 1
+}
+"$REPO/bin-merge-guarded" complete develop hotfix/demo \
+  --break-glass \
+  --reason tooling_unavailable \
+  --blocked-gate governance-merge-gate \
+  --evidence-ref docs/epics/sample/story/code-reviews/r-hotfix.md \
+  --follow-on-issue I-20260402-0020-A >/dev/null
+git log -1 --format=%B HEAD | grep -q '^Freely-Merge-Path: merge-guarded-break-glass$'
+git log -1 --format=%B HEAD | grep -q '^Freely-Bypass-Mode: break_glass$'
+git log -1 --format=%B HEAD | grep -q '^Freely-Break-Glass-Reason: tooling_unavailable$'
+git log -1 --format=%B HEAD | grep -q '^Freely-Evidence-Ref: docs/epics/sample/story/code-reviews/r-hotfix.md$'
 
 echo "[PASS] merge-guarded enforces test-pre-merge family promotion into develop and controlled completion receipts"
