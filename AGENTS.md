@@ -111,13 +111,13 @@ Freely 开发 Freely 时，默认先问四件事：
 
 ## Bug 修复：fix skill 快速通道
 
-当发现运行时 bug（daemon crash、restart storm、超时、权限错等），使用 `skill:fix-execution` 快速修复：
+当发现运行时 bug，使用 `skill:fix-execution` 快速修复。先判场景：
 
-- **阶段 1 — 创建 pre 工位隔离测试**：`./bin/wt-create fix-pre-merge/<desc>-<YYYYMMDD> --base develop`。hook 自动复制 runtime 状态，与 develop 等效但不阻塞其他 AI 并发。在 pre 工位上直接改源码、stop/start daemon 验证。
-- **阶段 2 — 决定 fix 即建 hotfix 工位**：`./bin/wt-create hotfix/<desc>-<YYYYMMDD> --base develop`。每个阶段性修复验证通过后，立刻 cp 到 hotfix 工位增量提交，不堆到最后一次。
-- **阶段 3 — 补齐治理**：raw issue → candidate → canonical issue → progress → code-review（`## Implementation Decision Note`）→ milestones.md。
-- **阶段 4 — 门禁合并**：`./bin/merge-guarded develop hotfix/<name>`。
-- **原则**：Fix first, govern later。治理后置。pre 工位隔离测试。fix 工位早期创建、增量提交。
+- **原 feature worktree 还在** → 直接在 feature 上修，走正常 feature → test-pre-merge → develop。
+- **原 worktree 已删 / 在 develop/main 测试发现** → 建 `test-pre-merge/<desc>-<YYYYMMDD>` 隔离测试（hook 自动复制 runtime，与 develop 等效但不阻塞 AI 并发）。直接在 test-pre-merge 上改、测。
+- **决定 fix 即建工位**：普通用 `feature/<desc>-<YYYYMMDD>` → test-pre-merge → develop；紧急用 `hotfix/<desc>-<YYYYMMDD>` → 直接到 develop。每个阶段验证通过后 cp 到 fix 工位增量提交。
+- **补齐治理**：raw issue → candidate → canonical issue → progress → code-review（`## Implementation Decision Note`）→ milestones.md。
+- **原则**：Fix first, govern later。治理后置。test-pre-merge 隔离测试。fix 工位早期创建、增量提交。
 
 详见 `docs/system/workspace/skills/fix-execution/SKILL.md`
 
