@@ -96,7 +96,7 @@ routing_policy:
 10. `I-20260503-0000-B`
 - title: feat: add fix-execution skill for rapid bug fix workflow
 - milestone_state: committed
-- phase_state: `done`
+- phase_state: `in_dev`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/fix-execution-skill/issues/I-20260503-0000-B.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-fix-execution-skill.md`
