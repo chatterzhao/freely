@@ -214,6 +214,19 @@ class AcpBridge:
                 self._dispatch(msg)
             except (ValueError, OSError):
                 break
+            except Exception:
+                self.log("unexpected error in stdout reader, shutting down bridge")
+                self.running = False
+                if self.server_proc and self.server_proc.poll() is None:
+                    try:
+                        self.server_proc.terminate()
+                        self.server_proc.wait(timeout=2)
+                    except Exception:
+                        try:
+                            self.server_proc.kill()
+                        except OSError:
+                            pass
+                break
 
     def _read_stderr(self):
         """Log server stderr."""
@@ -238,7 +251,7 @@ class AcpBridge:
             self._broadcast_notification(msg)
         elif msg_id is not None:
             # Response for unknown request — log for debugging
-            self.log(f"response for unknown id: {msg_id}, result={msg.get('result','')[:100]}")
+            self.log(f"response for unknown id: {msg_id}, result={str(msg.get('result',''))[:100]}")
 
     def _send_request(self, method, params, timeout=BRIDGE_TIMEOUT):
         """Send JSON-RPC request to server and wait for response."""
