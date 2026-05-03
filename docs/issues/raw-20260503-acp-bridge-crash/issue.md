@@ -7,7 +7,7 @@ platform_ids:
   github: {}
   gitee: {}
 primary_platform: github
-canonical_issue_path: ""
+canonical_issue_path: "docs/epics/workspace-routing-foundation/acp-bridge-crash-resilience/issues/I-20260503-0000-A.md"
 last_synced_comment_at: {}
 hash: ""
 created_at: "2026-05-03T00:00:00Z"
