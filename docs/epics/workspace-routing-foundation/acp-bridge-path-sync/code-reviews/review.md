@@ -7,12 +7,11 @@
 
 ## Implementation Decision Note
 
-The fix synchronizes hash-based socket/pid paths across all four files in the ACP bridge
-toolchain. The hash approach (SHA256 first 16 hex chars) is retained from commit `805b6d67`
-because it prevents AF_UNIX 104-byte path limit issues on macOS.
-
-The path pattern `.freely/run/acp-bridge-{hash}.*` is used instead of `/tmp/freely-acp-{hash}.*`
-to keep files in the project directory for discoverability.
+- decision: Synchronize hash-based socket/pid paths across all four files in the ACP bridge toolchain using `.freely/run/acp-bridge-{hash}.*` pattern
+- why_this: Commit `805b6d67` changed acp-bridge.py to use hash-based paths but didn't update the three bash scripts that reference those paths. The resulting path mismatch prevented the ACP bridge from being discovered by clients, blocking all daemon AI launches
+- alternatives_considered: (a) Revert acp-bridge.py to non-hash paths — rejected because hash approach is needed for AF_UNIX 104-byte limit on macOS; (b) Use `/tmp/freely-acp-{hash}.*` everywhere — rejected because project-local files are more discoverable and the hash already provides short path protection
+- boundary_non_goals: Does not change the hash algorithm, does not modify ACP protocol behavior, does not affect worker bridge sharing
+- residual_risk: Minimal. The four files now use consistent paths; if any future changes add new references to bridge socket/pid files, they must use the hash-based functions
 
 ## Changes
 
