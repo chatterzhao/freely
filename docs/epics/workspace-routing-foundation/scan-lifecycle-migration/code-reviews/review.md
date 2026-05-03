@@ -15,6 +15,9 @@
 - `.githooks/post-checkout`: auto pre-init-runtime
 
 ## Implementation Decision Note
-- Chain trace replaces flat scan: 12 mandatory + 2 optional stations
-- Branch naming no longer exempts legacy
-- AF_UNIX socket uses SHA256 hash for short path
+
+- decision: `切换到 task-lifecycle-scan v2，用 chain trace 替代旧 flat scan，分支命名不再豁免`
+- why_this: `旧 scan 输出 147 条噪声且已废弃，新 scan 已有实现但未接入。chain trace 按 raw-xxx key 追踪完整生命周期，每条有精确的 current/next/blokers`
+- alternatives_considered: `(1) 修旧 scan — 治标不治本，旧架构无法支持链条追踪；(2) 完全重写 — 成本高，task-lifecycle-scan.py 已有完整基础`
+- boundary_non_goals: `不覆盖外部平台同步（issue-sync），不替代 merge-guarded 门禁`
+- residual_risk: `chat inbox 依赖 freely.db 的 chats 表（pre-init-runtime 拷贝时可能锁表导致0字节），SKIP_PLATFORM_CHECK 跳过平台关闭检查`
