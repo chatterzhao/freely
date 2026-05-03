@@ -11,40 +11,22 @@
   - docs/system/workspace/scripts/runtime/freely
   - docs/system/workspace/scripts/runtime/run-acp-prompt.py
 
-## Decision
+## Implementation Decision Note
 
-Approve the five-layer fix for ACP bridge crash resilience. All root causes
-addressed with self-healing chain that prevents restart storms.
-
-## why_this
-
-Without these fixes, the ACP bridge enters a zombie state (alive process, dead
-reader thread) that causes all AI cycles to timeout after 900s. The restart
-storm renders freely daemon non-functional. Each layer catches failures from
-the layer below, forming a complete self-healing chain.
-
-## alternatives_considered
-
-- **Increase timeout only**: Would mask the permission deadlock and lock contention
-  issues; does not fix root cause.
-- **Manual cleanup**: Requires operator intervention, violates self-healing goal.
-- **Remove bridge entirely**: Loses session persistence (cache hits), increases cost.
-
-## boundary_non_goals
-
-- Does not refactor session-state.env to SQLite (separate follow-on)
-- Does not change the ACP protocol or Claude agent SDK behavior
-- Does not modify tool alias configuration (`cc-ds-flash-auto` settings)
-- Does not add new monitoring/metrics (existing runtime events cover this)
-
-## residual_risk
-
-- Activity-based timeout depends on AI producing streaming output. If the model
-  is completely silent for ACP_IDLE_TIMEOUT (300s), the idle timeout still fires.
-  This is by design — total silence indicates a real problem.
-- `session/set_mode` is called after resume; if it fails silently, the session
-  could still have `default` permissions. Defense-in-depth: called in both
-  `handle_client` and `run-acp-prompt.py`.
+- decision: Approve the five-layer fix for ACP bridge crash resilience. All root
+  causes addressed with self-healing chain that prevents restart storms.
+- why_this: Without these fixes, the ACP bridge enters a zombie state (alive process,
+  dead reader thread) that causes all AI cycles to timeout after 900s. The restart
+  storm renders freely daemon non-functional.
+- alternatives_considered: Increase timeout only (masks root cause, doesn't fix
+  permission deadlock); manual cleanup (violates self-healing); remove bridge entirely
+  (loses session persistence and cache hits).
+- boundary_non_goals: Does not refactor session-state.env to SQLite; does not change
+  ACP protocol or Claude agent SDK behavior; does not modify tool alias configuration.
+- residual_risk: Activity-based timeout depends on streaming output — total silence
+  for ACP_IDLE_TIMEOUT (300s) still fires timeout by design. session/set_mode after
+  resume could fail silently; mitigated by defense-in-depth (called in both
+  handle_client and run-acp-prompt.py).
 
 ## Test evidence
 
