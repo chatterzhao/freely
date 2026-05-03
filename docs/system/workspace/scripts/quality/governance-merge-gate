@@ -804,18 +804,19 @@ def main() -> int:
         issue_bound_candidate_ids.add(source_candidate.candidate_id)
         candidate_driven_evidence.add(source_candidate.candidate_id)
 
-    if not candidate_driven_evidence:
-        errors.append(
-            "This develop-bound merge has no candidate-driven lifecycle evidence. Every worktree must start from pre-brainstorm research and hit a traceable C-* candidate in the merge diff. "
-            "Continue existing research by updating its candidate/issue/progress/review artifacts, or if this is a completed-family reopen, create a new candidate and new issue that records reopen_of_issue and reopen_reason before replaying the merge."
-        )
-
-    if not issue_bound_evidence:
-        errors.append(
-            "This develop-bound merge is not based on a specific issue. Candidate-only evidence is not enough for a develop merge: the merge diff must carry a concrete issue/progress/review owner, and then the C/M/I chain must still validate."
-        )
-
     governance_only_merge = all(is_governance_only_path(path) for path in changed_paths)
+
+    if not governance_only_merge:
+        if not candidate_driven_evidence:
+            errors.append(
+                "This develop-bound merge has no candidate-driven lifecycle evidence. Every worktree must start from pre-brainstorm research and hit a traceable C-* candidate in the merge diff. "
+                "Continue existing research by updating its candidate/issue/progress/review artifacts, or if this is a completed-family reopen, create a new candidate and new issue that records reopen_of_issue and reopen_reason before replaying the merge."
+            )
+
+        if not issue_bound_evidence:
+            errors.append(
+                "This develop-bound merge is not based on a specific issue. Candidate-only evidence is not enough for a develop merge: the merge diff must carry a concrete issue/progress/review owner, and then the C/M/I chain must still validate."
+            )
 
     for candidate in candidate_records:
         status = (candidate.status or "").strip("`").strip()
