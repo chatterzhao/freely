@@ -9,7 +9,8 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - route_kind: `discovery`
 - phase_state: `done_pre_brainstorm`
-- promoted_issue_path: `docs/issues/raw-20260501-0000/issue.md`
+- promoted_to: `I-20260501-0000-A`
+- promoted_issue_path: `docs/issues/I-20260501-0000-A/issue.md`
 - session_refs:
   - {tool: ccds, session_id: "20260501-scan-pr-platform", jsonl_path: "unavailable://manual", role: "author"}
 - acceptance_criteria:

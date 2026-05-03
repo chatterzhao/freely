@@ -200,13 +200,14 @@ routing_policy:
   - docs/epics/freely-packaging-selfhost/code-reviews/20260502-packaging-implementation.md
 - next_action: 推进到 test-pre-merge，打包自举验证后 merge 到 develop
 
-8. `C-20260501-0000-A`
+8. `I-20260501-0000-A`
 - title: PR scan surface + FREELY_REPO_PLATFORMS config
 - milestone_state: committed
-- phase_state: `done_pre_brainstorm`
+- phase_state: `completed`
 - priority: P0
-- source_brainstorm: `docs/pre-brainstorms/20260501-0000--scan-pr-platform-config/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260501-0000--scan-pr-platform-config/candidates.md`
+- issue_path: `docs/issues/I-20260501-0000-A/issue.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-scan-pr-platform-config.md`
+- source_candidate: `docs/pre-brainstorms/20260501-0000--scan-pr-platform-config/candidates.md#C-20260501-0000-A`
 - branch: `hotfix/I-20260501-0000-A-scan-pr-platform-config`
 - next_action: Hotfix merged to develop.
 
