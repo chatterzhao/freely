@@ -1,0 +1,5 @@
+- issue_id: `I-20260503-0200-A`
+- phase_state: `completed`
+- verification_status: `verified`
+- closure_status: `merged-and-verified`
+- next_action: `completed`

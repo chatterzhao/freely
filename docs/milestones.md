@@ -4200,3 +4200,15 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260321-1530--agent-ready-prd-for-freely-flow/candidates.md`
 - evidence: `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`, `docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md`, `docs/system/workspace/scripts/quality/governance-check`, `docs/system/workspace/scripts/tests/test-doc-ibm-prd-quality-bar`
 - completion_note: 已把 AI-ready PRD 的最小质量门槛接入 `doc-ibm-execution` 真源，并补齐 governance-check 与回归测试，确保 IBM 产物中的 `prd.md` 不再只停留在人类摘要
+
+### M-20260306-workspace-routing-foundation
+- status: `active`
+
+### committed_issues
+1. `I-20260503-0200-A`
+   - title: `scan: switch to task-lifecycle-scan v2 with full lifecycle chain trace`
+   - priority: `P0`
+   - phase_state: `completed`
+   - issue_path: `docs/epics/workspace-routing-foundation/scan-lifecycle-migration/issues/I-20260503-0200-A.md`
+   - progress_path: `docs/progress/workspace-routing-foundation/p-scan-lifecycle-migration.md`
+   - next_action: `completed`
