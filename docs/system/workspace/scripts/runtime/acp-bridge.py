@@ -362,10 +362,17 @@ class AcpBridge:
         return sid
 
     def session_resume(self, session_id, cwd=None):
-        """Resume an existing ACP session."""
+        """Resume an existing ACP session and ensure bypassPermissions is active."""
         params = {"sessionId": session_id, "cwd": cwd or self.project, "mcpServers": []}
         result = self._send_request("session/resume", params, timeout=30)
-        return result.get("sessionId", "")
+        sid = result.get("sessionId", "")
+        if sid:
+            try:
+                self._send_request("session/set_mode", {"sessionId": sid, "modeId": "bypassPermissions"}, timeout=10)
+                self.log(f"session {sid[:12]}... mode set to bypassPermissions after resume")
+            except Exception as e:
+                self.log(f"session/set_mode failed after resume (non-fatal): {e}")
+        return sid
 
     def session_prompt(self, session_id, prompt_text, timeout=900):
         """Send a prompt and wait for response. Returns (stop_reason, response_text)."""
