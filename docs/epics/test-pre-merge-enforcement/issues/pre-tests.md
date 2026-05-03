@@ -1,5 +1,7 @@
 # Pre-Tests: Enforce Test-Pre-Merge Gate
 
+- issue_id: I-20260503T0915Z-enforce-test-pre-merge
+
 ## Acceptance Targets
 
 ### AT-001 merge-guarded enforces correct merge direction
