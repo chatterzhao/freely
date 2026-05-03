@@ -44,6 +44,17 @@ test-pre-merge-* 上的操作:
 
 **关键**：修改只在 test-pre-merge-* 上以 dirty state 存在，验证通过后 cp 到可写工位（feature/hotfix）正式 add+commit。test-pre-merge-* 上的 dirty 修改最终被丢弃。正式提交全在可写工位，合并也走可写工位 → test-pre-merge-* → develop 的合规路径。
 
+### test-pre-merge-* 的两层职能
+
+`test-pre-merge-*` 在本项目中承担两层职责，fix skill 主要用第一层：
+
+| 职能 | 说明 | fix skill 用？ |
+|---|---|---|
+| **运行时测试环境** | hook 复制 config.env、freely.db、tool-boundary，与 develop/main 等效。可以 stop/start daemon 做端到端验证。 | ✅ 核心用途 |
+| **Merge 集成验证** | 将 feature/hotfix 分支 merge 进来，检查冲突、处理冲突、验证合并后代码可工作。这是进入 develop 前的最后一道闸。 | ✅ 可写工位走正常路径时经过 |
+
+> fix skill 的快测阶段只用第一层（运行时环境）。第二层（merge 集成）在可写工位走 `feature → test-pre-merge-* → develop` 正常路径时自然经过——冲突在那个阶段被发现和处理。
+
 ---
 
 ## 分支规范速查（全部已有，不发明新名）
