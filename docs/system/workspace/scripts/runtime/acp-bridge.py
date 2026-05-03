@@ -25,16 +25,22 @@ BRIDGE_TIMEOUT = int(os.environ.get("ACP_BRIDGE_SESSION_TIMEOUT", "1800"))
 ACP_IDLE_TIMEOUT = int(os.environ.get("ACP_BRIDGE_IDLE_TIMEOUT", "300"))
 
 
+def _short_hash(project: str) -> str:
+    """Deterministic short hash of project path for socket/pid files."""
+    import hashlib
+    return hashlib.sha256(project.encode()).hexdigest()[:16]
+
+
 def _runtime_dir(project):
     return os.path.join(project, ".freely", "run")
 
 
 def _pid_file(project):
-    return os.path.join(_runtime_dir(project), "acp-bridge.pid")
+    return os.path.join(_runtime_dir(project), f"acp-bridge-{_short_hash(project)}.pid")
 
 
 def _socket_path(project):
-    return os.path.join(_runtime_dir(project), "acp-bridge.sock")
+    return os.path.join(_runtime_dir(project), f"acp-bridge-{_short_hash(project)}.sock")
 
 
 def _log_file(project):

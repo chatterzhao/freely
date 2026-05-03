@@ -50,7 +50,17 @@ routing_policy:
 - why_now: 这批项定义 Freely 如何发现上下文、读取 milestone、并路由到下一跳 skill；如果 milestone 自身不先落盘，Freely 的狗粮链路就是断的
 
 ### committed_issues
-7. `I-20260502-0500-C`
+1. `I-20260503-0200-A`
+- title: scan: switch to task-lifecycle-scan v2 with full lifecycle chain trace
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/scan-lifecycle-migration/issues/I-20260503-0200-A.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-scan-lifecycle-migration.md`
+- source_candidate: `docs/pre-brainstorms/20260503-0200--scan-lifecycle-migration/candidates.md#C-20260503-0200-A`
+- next_action: `Merge to develop.`
+
+8. `I-20260502-0500-C`
 - title: Token 花费优化
 - milestone_state: committed
 - phase_state: `in_dev`
@@ -63,7 +73,7 @@ routing_policy:
   - docs/epics/token-cost-optimization/code-reviews/20260502-phase-0-4-implementation.md
 - next_action: test-pre-merge 验证后 merge develop
 
-8. `I-20260502-1028-A`
+9. `I-20260502-1028-A`
 - title: fix: clean stale start lock before daemon stop
 - milestone_state: committed
 - phase_state: `done`
@@ -78,7 +88,7 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/stale-start-lock-cleanup/code-reviews/20260502-stale-start-lock-cleanup-verification.md`
 - next_action: `Merge to develop, then release to main.`
 
-9. `I-20260503-0000-A`
+10. `I-20260503-0000-A`
 - title: fix: ACP bridge crash resilience with self-healing
 - milestone_state: committed
 - phase_state: `done_ibm`
@@ -93,7 +103,7 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/acp-bridge-crash-resilience/code-reviews/review.md`
 - next_action: `Merge to develop, then release to main.`
 
-10. `I-20260503-0000-B`
+11. `I-20260503-0000-B`
 - title: feat: add fix-execution skill for rapid bug fix workflow
 - milestone_state: committed
 - phase_state: `in_dev`
@@ -108,7 +118,21 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/fix-execution-skill/code-reviews/review.md`
 - next_action: `Merge to develop.`
 
-7. `I-20260421-1530-A`
+12. `I-20260503-0115-A`
+- title: fix: sync acp-bridge hash-based socket paths across bash and Python
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/acp-bridge-path-sync/issues/I-20260503-0115-A.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-acp-bridge-path-sync.md`
+- branch: `hotfix/acp-bridge-path-mismatch-20260503`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/acp-bridge-path-sync/issues/I-20260503-0115-A.md`
+  - `docs/progress/workspace-routing-foundation/p-acp-bridge-path-sync.md`
+  - `docs/epics/workspace-routing-foundation/acp-bridge-path-sync/code-reviews/review.md`
+- next_action: `Merge to develop, then release to main.`
+
+8. `I-20260421-1530-A`
 - title: Live-status scan summary and prompt anchor governance
 - milestone_state: committed
 - phase_state: `in_verification`
@@ -141,7 +165,7 @@ routing_policy:
 
 
 
-24. `I-20260429-2000-A`
+25. `I-20260429-2000-A`
 - title: Gate dev experience: --range pre-flight + secret detection FP fix
 - milestone_state: committed
 - phase_state: `in_dev`
@@ -4195,8 +4219,3 @@ routing_policy:
 - milestone_state: completed
 - phase_state: `completed`
 - priority: P0
-- issue_path: `docs/epics/ai-native-doc-loop/agent-ready-prd-for-freely-flow/issues/agent-ready-prd-for-freely-flow.md`
-- source_brainstorm: `docs/pre-brainstorms/20260321-1530--agent-ready-prd-for-freely-flow/brainstorms.md`
-- source_candidates: `docs/pre-brainstorms/20260321-1530--agent-ready-prd-for-freely-flow/candidates.md`
-- evidence: `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`, `docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md`, `docs/system/workspace/scripts/quality/governance-check`, `docs/system/workspace/scripts/tests/test-doc-ibm-prd-quality-bar`
-- completion_note: 已把 AI-ready PRD 的最小质量门槛接入 `doc-ibm-execution` 真源，并补齐 governance-check 与回归测试，确保 IBM 产物中的 `prd.md` 不再只停留在人类摘要
