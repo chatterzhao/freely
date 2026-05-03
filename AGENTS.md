@@ -113,11 +113,11 @@ Freely 开发 Freely 时，默认先问四件事：
 
 当发现运行时 bug，使用 `skill:fix-execution` 快速修复。先判场景：
 
-- **原 feature worktree 还在** → 直接在 feature 上修，走正常 feature → test-pre-merge → develop。
-- **原 worktree 已删 / 在 develop/main 测试发现** → 建 `test-pre-merge/<desc>-<YYYYMMDD>` 隔离测试（hook 自动复制 runtime，与 develop 等效但不阻塞 AI 并发）。直接在 test-pre-merge 上改、测。
-- **决定 fix 即建工位**：普通用 `feature/<desc>-<YYYYMMDD>` → test-pre-merge → develop；紧急用 `hotfix/<desc>-<YYYYMMDD>` → 直接到 develop。每个阶段验证通过后 cp 到 fix 工位增量提交。
+- **原 feature worktree 还在** → 直接在 feature 上改、提交。走 feature → test-pre-merge-* → develop。
+- **原 feature 已退役（已合并/已删）** → 建 `test-pre-merge-<desc>-<YYYYMMDD>` 私有工位快测（不改不提交不推送，不违背保护约束）。验证通过后 cp 修改到新建的 `feature/*` 或 `hotfix/*` 可写工位，增量提交。
+- **普通 fix** 用 `feature/*` → test-pre-merge-* → develop；**紧急 hotfix** 用 `hotfix/*` → develop。
 - **补齐治理**：raw issue → candidate → canonical issue → progress → code-review（`## Implementation Decision Note`）→ milestones.md。
-- **原则**：Fix first, govern later。治理后置。test-pre-merge 隔离测试。fix 工位早期创建、增量提交。
+- **原则**：Fix first, govern later。test-pre-merge-* 私有测试不违背保护约束。fix 工位早期创建、增量提交。
 
 详见 `docs/system/workspace/skills/fix-execution/SKILL.md`
 
