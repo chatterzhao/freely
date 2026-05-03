@@ -129,10 +129,12 @@ IBM Framework 的 I（Input source）统一为 github/gitee issue。平台 issue
 
 ```
 docs/issues/
-├── raw-{YYYYMMDD}-{HHMM}/             # raw issue：B1_IBM 的 Input（无后缀）
-│   └── issue.md                       # issue 正文 + ## Comments 章节
-└── I-{YYYYMMDD}-{HHMM}-{A,B,C}/      # linked issue：B2_IBM 的产物（一个 raw 可拆多个）
-    └── issue.md                       # 正式 issue 摘要 + ## Comments 章节
+├── raw-{YYYYMMDD-HHMM}/             # raw issue, old format: raw-20260428-1737
+├── raw-{YYYYMMDDThhmmZ}/            # raw issue, new format: raw-20260503T0901Z
+│   └── issue.md                     # issue 正文 + ## Comments 章节
+├── I-{YYYYMMDD-HHMM}-{A,B,C}/      # linked issue, old format: I-20260428-1737-A
+└── I-{YYYYMMDDThhmmZ}-{A,B,C}/     # linked issue, new format: I-20260503T0901Z-A
+    └── issue.md                     # 正式 issue 摘要 + ## Comments 章节
 ```
 
 **raw-* 和 I-* 的关系**：
@@ -156,7 +158,9 @@ chat 插话 / 平台扫描
 
 - raw-* 只存在于 B1 阶段。一旦 promote 为 I-*，raw 的 `status` 变为 `absorbed`，`absorbed_into` 指向 I-*
 - I-* 是 B2 阶段的唯一 issue 标识。后续所有 chat、comment、状态变更都发生在 I-* 上
-- **ID 格式**：`raw-YYYYMMDD-HHMM`（无后缀）/ `C-YYYYMMDD-HHMM-A` / `I-YYYYMMDD-HHMM-A`。一个 raw 可孵化多个 I-*（-A -B -C 后缀）。门禁用 `startswith(raw_key)` 验证父子关系，用 `candidate_key == issue_key`（去前缀）验证 C→I
+- **ID 格式**（旧）：`raw-YYYYMMDD-HHMM` / `C-YYYYMMDD-HHMM-A` / `I-YYYYMMDD-HHMM-A`
+- **ID 格式**（新）：`raw-YYYYMMDDThhmmZ` / `C-YYYYMMDDThhmmZ-A` / `I-YYYYMMDDThhmmZ-A`
+  一个 raw 可孵化多个 I-*（-A -B -C 后缀）。门禁用 `startswith(raw_key)` 验证父子关系，用 `candidate_key == issue_key`（去前缀）验证 C→I。读取时新旧格式均支持。
 - `chat --issue raw-xxx` 会自动检测 `status=absorbed`，路由到 `absorbed_into` 指向的 I-*
 - I-* 采用自包含摘要 + 链接模式：平台 body 包含足够上下文，深水区讨论链接到 B1 产物
 
