@@ -17,3 +17,11 @@
 - alternatives_considered: No skill (ad-hoc, inconsistent); governance-first workflow (wastes time on wrong fix direction).
 - boundary_non_goals: Does not change merge-guarded or governance gate behavior; does not modify pre-push hook.
 - residual_risk: Skill is advisory; agents may still fix directly on develop. AGENTS.md reference provides the routing signal.
+
+## Correction review (2026-05-03)
+
+- decision: Approve naming and scenario corrections. Use existing test-pre-merge convention, add scenario-first routing.
+- why_this: Original version invented fix-pre-merge naming and only covered hotfix path. Real workflow needs both feature/* (regular) and hotfix/* (critical).
+- alternatives_considered: Keep original (wrong naming, incomplete scenarios); separate skill for each scenario (over-fragmentation).
+- boundary_non_goals: Does not change hook allowlist or merge-guarded branch validation rules.
+- residual_risk: None. Pure documentation correction.
