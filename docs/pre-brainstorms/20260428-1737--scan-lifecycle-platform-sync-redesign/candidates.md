@@ -2,7 +2,8 @@
 
 - promoted_issue_path: ""
 - milestone: M-20260306-workspace-routing-foundation
-- session_refs: ""
+- session_refs:
+  - {tool: "manual", session_id: "pre-brainstorm-creation", jsonl_path: "unavailable"}
 
 ## C-20260428-1737-A: 统一生命周期 Scan 模块（task-lifecycle-scan.py）
 

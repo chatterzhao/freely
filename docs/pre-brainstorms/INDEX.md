@@ -1,19 +1,21 @@
 # Pre-brainstorm 索引（IBM Framework B1）
 - 20260502-1028--stale-start-lock-cleanup
   - candidates: docs/pre-brainstorms/20260502-1028--stale-start-lock-cleanup/candidates.md
+- 20260502-0500--freely-packaging-selfhost
+  - brainstorms: docs/pre-brainstorms/20260502-0500--freely-packaging-selfhost/freely-packaging-selfhost.md
+  - candidates: docs/pre-brainstorms/20260502-0500--freely-packaging-selfhost/candidates.md
 
 - 20260501-0000--worker-launch-refactor
   - brainstorms: docs/pre-brainstorms/20260501-0000--worker-launch-refactor/brainstorms.md
   - candidates: docs/pre-brainstorms/20260501-0000--worker-launch-refactor/candidates.md
 
-- 20260430-0000--acp-session-store-and-lifecycle
-  - brainstorms: docs/pre-brainstorms/20260430-0000--acp-session-store-and-lifecycle/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260430-0000--acp-session-store-and-lifecycle/candidates.md
-
 - 20260430-0010--doc-sync-chat-inbox
   - brainstorms: docs/pre-brainstorms/20260430-0010--doc-sync-chat-inbox/brainstorms.md
   - candidates: docs/pre-brainstorms/20260430-0010--doc-sync-chat-inbox/candidates.md
 
+- 20260430-0000--acp-session-store-and-lifecycle
+  - brainstorms: docs/pre-brainstorms/20260430-0000--acp-session-store-and-lifecycle/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260430-0000--acp-session-store-and-lifecycle/candidates.md
 - 20260429-1745--bash32-daemon-compat-fix
   - brainstorms: docs/pre-brainstorms/20260429-1745--bash32-daemon-compat-fix/brainstorms.md
   - candidates: docs/pre-brainstorms/20260429-1745--bash32-daemon-compat-fix/candidates.md
