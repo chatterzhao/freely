@@ -207,7 +207,7 @@ routing_policy:
 - priority: P0
 - source_brainstorm: `docs/pre-brainstorms/20260501-0000--scan-pr-platform-config/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260501-0000--scan-pr-platform-config/candidates.md`
-- branch: `hotfix/scan-pr-platform-config`
+- branch: `hotfix/I-20260501-0000-A-scan-pr-platform-config`
 - next_action: Hotfix merged to develop.
 
 ### candidate_issues
@@ -3580,7 +3580,7 @@ routing_policy:
 - milestone_state: candidate
 - phase_state: `done_pre_brainstorm`
 - priority: P0
-- promoted_issue_path: `docs/pre-brainstorms/20260501-0000--scan-pr-platform-config/brainstorms.md`
+- promoted_issue_path: `docs/issues/raw-20260501-0000/issue.md`
 - source_brainstorm: `docs/pre-brainstorms/20260501-0000--scan-pr-platform-config/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260501-0000--scan-pr-platform-config/candidates.md`
 - next_action: Hotfix merged to develop.
