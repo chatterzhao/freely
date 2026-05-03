@@ -80,3 +80,16 @@
 - evidence_refs:
   - `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/issues/protected-branch-hook-bypass-breakglass-governance.md`
   - `docs/pre-brainstorms/20260402-0020--hook-bypass-breakglass-governance/brainstorms.md`
+
+## Receipt: 3a3e87e2f04039ad5a3d4d8e4913e88f64b2c38b
+
+- target_branch: `develop`
+- source_branch: `hotfix/I-20260501-0000-A-scan-pr-platform-config`
+- receipt_mode: `trailer_parity`
+- bypass_mode: `break_glass`
+- break_glass_reason: `verified_false_negative`
+- blocked_gate: `governance-merge-gate`
+- operation_scope: `merge_completion_only`
+- follow_on_owner: `I-20260501-0000-A`
+- evidence_refs:
+  - `docs/issues/raw-20260501-0000/issue.md`
