@@ -50,11 +50,43 @@ session_refs: []
 - Lines 11893-11896: `_ensure_acp_bridge_running` calls health check before reusing
   existing bridge; on failure, removes stale PID/socket and starts fresh
 
-## Self-healing chain
+## Deeper findings (round 2)
+
+### session/prompt timeout was wall-clock, not idle-based
+The bridge used a single 900s wall-clock timeout for session/prompt. If the AI was
+actively working (streaming output, executing tool calls) the timer still counted down.
+Fixed: activity-based idle timeout — clock resets every time AI produces output.
+Default idle timeout: 300s, absolute safety net: 1800s (env-configurable).
+
+### bypassPermissions not propagated on session/resume
+`handle_client` only called `session/set_mode` with `bypassPermissions` after
+`session/new`. On `session/resume`, the permission mode was not re-applied.
+If the session was created with `default` permissions, resumed cycles would
+have tools stuck pending waiting for interactive approval (which can't happen
+in daemon mode with `--disallowedTools AskUserQuestion`).
+Fixed: `session/set_mode` now called after both `session/new` and `session/resume`.
+
+### server_lock held during wait blocked permission response forwarding
+`_send_request` held `server_lock` during the entire wait (up to 900s). When a
+permission response arrived from the client, `handle_client` (same thread) tried
+to acquire `server_lock` again to forward it to server stdin → non-reentrant
+lock deadlock. Permission responses never reached the server.
+Fixed: split `stdin_write_lock` from `server_lock`. Request setup uses `server_lock`,
+stdin write uses `stdin_write_lock`, and neither is held during the response wait.
+
+### run-acp-prompt.py: defense-in-depth session/set_mode
+Added explicit `session/set_mode` call after session creation in `run-acp-prompt.py`
+to cover both bridge and direct (subprocess) transport modes.
+
+## Full self-healing chain
 
 ```
 dispatch crash → reader thread dies → bridge exits (socket cleaned)
                                          ↓
               _ensure_acp_bridge_running: bridge not running → starts fresh
               _ensure_acp_bridge_running: bridge alive but zombie → health check fails → restart
+              _ensure_acp_bridge_running: fresh bridge → session/new → set_mode bypassPermissions
+              handle_client: session/resume → set_mode bypassPermissions (NEW)
+              _send_request: no locks held during wait → permission responses flow freely (NEW)
+              _send_request: activity-based timeout → AI keeps working if producing output (NEW)
 ```
