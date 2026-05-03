@@ -200,6 +200,19 @@ routing_policy:
   - docs/epics/freely-packaging-selfhost/code-reviews/20260502-packaging-implementation.md
 - next_action: 推进到 test-pre-merge，打包自举验证后 merge 到 develop
 
+8. `I-20260503T0901Z-A`
+- title: Standardize timezone rendering across all 7 locations
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P0
+- issue_path: docs/epics/timezone-standardization/issues/I-20260503T0901Z-A.md
+- progress_path: docs/progress/20260503T0901Z-timezone-standardization.md
+- source_brainstorm: docs/pre-brainstorms/20260503-0901--timezone-standardize/brainstorms.md
+- source_candidates: docs/pre-brainstorms/20260503-0901--timezone-standardize/candidates.md
+- evidence:
+  - docs/epics/timezone-standardization/code-reviews/rev-20260503T0901Z-A.md
+- next_action: test-pre-merge verification, then merge to develop, close GitHub #179
+
 ### candidate_issues
 
 1. `C-20260417-0445-A`
