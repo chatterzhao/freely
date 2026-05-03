@@ -200,12 +200,12 @@ routing_policy:
   - docs/epics/freely-packaging-selfhost/code-reviews/20260502-packaging-implementation.md
 - next_action: 推进到 test-pre-merge，打包自举验证后 merge 到 develop
 
-8. `I-20260503T0901Z-A`
+8. `I-20260503T0901Z-timezone-standardize`
 - title: Standardize timezone rendering across all 7 locations
 - milestone_state: committed
 - phase_state: `in_dev`
 - priority: P0
-- issue_path: docs/epics/timezone-standardization/issues/I-20260503T0901Z-A.md
+- issue_path: docs/epics/timezone-standardization/issues/I-20260503T0901Z-timezone-standardize.md
 - progress_path: docs/progress/20260503T0901Z-timezone-standardization.md
 - source_brainstorm: docs/pre-brainstorms/20260503-0901--timezone-standardize/brainstorms.md
 - source_candidates: docs/pre-brainstorms/20260503-0901--timezone-standardize/candidates.md
@@ -242,10 +242,10 @@ routing_policy:
 - milestone_state: candidate
 - phase_state: `todo_ibm`
 - priority: P0
-- promoted_issue_path: docs/epics/timezone-standardization/issues/I-20260503T0901Z-A.md
+- promoted_issue_path: docs/epics/timezone-standardization/issues/I-20260503T0901Z-timezone-standardize.md
 - source_brainstorm: docs/pre-brainstorms/20260503-0901--timezone-standardize/brainstorms.md
 - source_candidates: docs/pre-brainstorms/20260503-0901--timezone-standardize/candidates.md
-- next_action: Candidate mirror only. I-20260503T0901Z-A is already implemented and ready for merge.
+- next_action: Candidate mirror only. I-20260503T0901Z-timezone-standardize is already implemented and ready for merge.
 - revisit_trigger: Re-open only if the UTC+Z format is later changed or extended.
 
 1. `C-20260421-1200-A`

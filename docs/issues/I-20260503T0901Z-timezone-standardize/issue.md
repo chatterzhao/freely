@@ -1,5 +1,5 @@
 ---
-local_id: I-20260503T0901Z-A
+local_id: I-20260503T0901Z-timezone-standardize
 kind: linked
 status: in_dev
 phase_state: in_dev
@@ -13,8 +13,8 @@ created_at: "2026-05-03T09:01:00Z"
 updated_at: "2026-05-03T09:17:00Z"
 source_candidate: docs/pre-brainstorms/20260503-0901--timezone-standardize/candidates.md
 promoted_from: C-20260503T0901Z-timezone-standardize
-canonical_issue_path: docs/epics/timezone-standardization/issues/I-20260503T0901Z-A.md
+canonical_issue_path: docs/epics/timezone-standardization/issues/I-20260503T0901Z-timezone-standardize.md
 ---
-# I-20260503T0901Z-A: Timezone Standardization
+# I-20260503T0901Z-timezone-standardize: Timezone Standardization
 
 Standardize all timestamp rendering to UTC+Z (ISO 8601 with Z suffix). All 7 locations implemented. See canonical issue for details.

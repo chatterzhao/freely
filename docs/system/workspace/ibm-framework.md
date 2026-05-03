@@ -133,7 +133,7 @@ docs/issues/
 ├── raw-{YYYYMMDDThhmmZ}/            # raw issue, new format: raw-20260503T0901Z
 │   └── issue.md                     # issue 正文 + ## Comments 章节
 ├── I-{YYYYMMDD-HHMM}-{A,B,C}/      # linked issue, old format: I-20260428-1737-A
-└── I-{YYYYMMDDThhmmZ}-{A,B,C}/     # linked issue, new format: I-20260503T0901Z-A
+└── I-{YYYYMMDDThhmmZ}-{A,B,C}/     # linked issue, new format: I-20260503T0901Z-timezone-standardize
     └── issue.md                     # 正式 issue 摘要 + ## Comments 章节
 ```
 

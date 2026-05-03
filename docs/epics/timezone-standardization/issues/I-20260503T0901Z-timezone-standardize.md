@@ -1,5 +1,5 @@
 ---
-local_id: I-20260503T0901Z-A
+local_id: I-20260503T0901Z-timezone-standardize
 kind: linked
 status: in_dev
 phase_state: in_dev
@@ -12,11 +12,11 @@ platform_ids:
 primary_platform: github
 created_at: "2026-05-03T09:01:00Z"
 updated_at: "2026-05-03T09:17:00Z"
-canonical_issue_path: docs/epics/timezone-standardization/issues/I-20260503T0901Z-A.md
+canonical_issue_path: docs/epics/timezone-standardization/issues/I-20260503T0901Z-timezone-standardize.md
 ---
-# I-20260503T0901Z-A: Standardize timezone rendering across all 7 locations
+# I-20260503T0901Z-timezone-standardize: Standardize timezone rendering across all 7 locations
 
-- issue_id: `I-20260503T0901Z-A`
+- issue_id: `I-20260503T0901Z-timezone-standardize`
 - title: `standardize timezone rendering across the entire system`
 - status: `in_dev`
 - priority: `P0`

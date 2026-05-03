@@ -13,9 +13,10 @@
 - research_only: `false`
 - implementation_ready: `true`
 - status: `promoted`
+- milestone: `M-20260503T0901Z-timezone-standardize`
 - priority: `P0`
-- promoted_issue_id: `I-20260503T0901Z-A`
-- promoted_issue_path: `docs/epics/timezone-standardization/issues/I-20260503T0901Z-A.md`
+- promoted_issue_id: `I-20260503T0901Z-timezone-standardize`
+- promoted_issue_path: `docs/epics/timezone-standardization/issues/I-20260503T0901Z-timezone-standardize.md`
 - execution_base: `develop`
 
 ## Acceptance Items
