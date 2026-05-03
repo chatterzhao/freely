@@ -1,8 +1,18 @@
 # Verification: scan-pr-platform-config
 
-- issue: `I-20260501-0000-A`
+- issue_id: `I-20260501-0000-A`
+- issue_path: `docs/epics/workspace-routing-foundation/scan-pr-platform-config/issues/I-20260501-0000-A.md`
 - date: `2026-05-01`
 - type: `governance-merge-gate`
+- decision: `pass`
+- why_this: `Hotfix adds PR scan surface with FREELY_REPO_PLATFORMS config. Minimal code change in the freely runtime script.`
+- alternatives_considered:
+  - `Extend task-lifecycle-scan.py instead of bash inline — rejected: lifecycle scan delegates to python; PR data injected after`
+  - `Add PR scan as separate binary — rejected: complexity disproportionate for a config-driven scan`
+- boundary_non_goals:
+  - `Platform auth management (tokens, credentials) — out of scope`
+  - `PR auto-sync or write-back to platforms — not included`
+- residual_risk: `Low. PR scan depends on platform CLIs (gh, gitee) being installed and authenticated. Runtime handles missing CLIs gracefully by skipping.`
 
 ## Verification Items
 
