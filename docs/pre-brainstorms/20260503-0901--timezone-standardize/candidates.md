@@ -13,7 +13,7 @@
 - research_only: `false`
 - implementation_ready: `true`
 - status: `promoted`
-- milestone: `M-20260503T0901Z-timezone-standardize`
+- milestone: `M-20260306-workspace-routing-foundation`
 - priority: `P0`
 - promoted_issue_id: `I-20260503T0901Z-timezone-standardize`
 - promoted_issue_path: `docs/epics/timezone-standardization/issues/I-20260503T0901Z-timezone-standardize.md`
