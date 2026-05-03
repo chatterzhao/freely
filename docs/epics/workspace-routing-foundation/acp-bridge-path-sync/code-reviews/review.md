@@ -1,6 +1,7 @@
 # Code Review: ACP Bridge Path Sync
 
-- issue: `I-20260503-0115-A`
+- issue_id: `I-20260503-0115-A`
+- issue_path: `docs/epics/workspace-routing-foundation/acp-bridge-path-sync/issues/I-20260503-0115-A.md`
 - reviewed_by: human (zhaoquan)
 - review_date: `2026-05-03T01:15:00Z`
 
