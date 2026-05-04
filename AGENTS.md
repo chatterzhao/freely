@@ -181,3 +181,13 @@ Freely 必须在 Freely 治理规则下开发，不得有项目特定的例外�
 - `git worktree remove ../<your-project-worktrees>/<branch-dir> && git branch -d <branch>`
 - `source ./bin/wt-enter <branch>`
 - `source ./bin/wt-add <branch> -- <git-add-args>`
+
+## 常用工具路径
+
+- `./bin/issue-sync` — 平台 issue 同步（create/close/comment/batch）
+- `./bin/merge-guarded` — 门禁合并
+- `./bin/governance-check` — 治理门禁检查
+- `./bin/wt-create` — 创建 feature worktree
+- `./bin/freely-package` — 打包版本
+- `./bin/issue-index` — Issue 索引管理
+- 这些是独立脚本，直接 `./bin/<name>` 调用，**不是** `./bin/freely <name>` 子命令
