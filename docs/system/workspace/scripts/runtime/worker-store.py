@@ -16,7 +16,7 @@ DB_PATH = None  # set by main()
 
 
 def _now_utc():
-    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
 
 
 def _connect():
