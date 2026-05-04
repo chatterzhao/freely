@@ -1319,7 +1319,7 @@ runtime_pid_file_for_role() {
     ai) printf '%s\n' "$(run_dir_for_project "$project")/ai.pid" ;;
     manager_watchdog) printf '%s\n' "$(ensure_manager_watchdog_pid_file "$project")" ;;
     interruption_dispatcher) printf '%s\n' "$(interruption_dispatcher_pid_file "$project")" ;;
-    acp_bridge) printf '%s\n' "$(run_dir_for_project "$project")/acp-bridge-$(_acp_bridge_short_hash "$project").pid" ;;
+    acp_bridge) printf '%s\n' "/tmp/freely-acp-$(_acp_bridge_short_hash "$project").pid" ;;
     *) return 1 ;;
   esac
 }
