@@ -64,3 +64,25 @@
 - target_lane: `feature-local`
 - promotion_gate: `completion`
 - case_design: `Run ./bin/governance-check and diff errors against origin/develop.`
+
+### Shell syntax is valid (premerge-integration)
+- id: `scan-pr-shell-syntax-premerge`
+- requirement: `freely runtime script passes bash -n syntax check via merge flow.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/scan-pr-platform-config/code-reviews/20260501-scan-pr-platform-config-verification.md`
+- surface_kind: `unit`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- case_design: `bash -n check passes as part of merge-guarded workflow.`
+
+### Governance check passes (premerge-integration)
+- id: `scan-pr-governance-premerge`
+- requirement: `governance-check passes during test-pre-merge -> develop merge.`
+- evidence_level: `integration`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/scan-pr-platform-config/code-reviews/20260501-scan-pr-platform-config-verification.md`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- case_design: `Run governance-check in merge-guarded flow to develop.`

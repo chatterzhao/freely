@@ -10,7 +10,7 @@
 - route_kind: `discovery`
 - phase_state: `done_pre_brainstorm`
 - promoted_to: `I-20260501-0000-A`
-- promoted_issue_path: `docs/issues/I-20260501-0000-A/issue.md`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/scan-pr-platform-config/issues/I-20260501-0000-A.md`
 - session_refs:
   - {tool: ccds, session_id: "20260501-scan-pr-platform", jsonl_path: "unavailable://manual", role: "author"}
 - acceptance_criteria:

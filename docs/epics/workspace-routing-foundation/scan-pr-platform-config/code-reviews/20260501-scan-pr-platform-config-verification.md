@@ -1,18 +1,28 @@
-# Verification: scan-pr-platform-config
+# Code Review: PR scan surface + FREELY_REPO_PLATFORMS config
 
-- issue: `I-20260501-0000-A`
-- date: `2026-05-01`
-- type: `governance-merge-gate`
+- issue_id: `I-20260501-0000-A`
+- issue_path: `docs/epics/workspace-routing-foundation/scan-pr-platform-config/issues/I-20260501-0000-A.md`
+- review_date: `2026-05-03`
+- reviewer: `human`
+- status: `approved`
+- decision: `approve`
+- artifacts_reviewed:
+  - docs/system/workspace/scripts/runtime/freely
+  - docs/epics/workspace-routing-foundation/scan-pr-platform-config/pre-tests.md
+  - docs/pre-brainstorms/20260501-0000--scan-pr-platform-config/candidates.md
 
-## Verification Items
+## Implementation Decision Note
 
-1. **PR scan function**: `scan_repo_platform_prs()` present in `freely` script
-2. **Config**: `FREELY_REPO_PLATFORMS` declared in config template (empty = no PR scanning)
-3. **Surface**: `open_pull_requests` surface with advisory trust level in scan JSON
-4. **Platforms**: github (gh) and gitee (gitee) supported with correct CLI mapping
-5. **Backward compat**: Empty FREELY_REPO_PLATFORMS → no PR data; existing scans unaffected
-6. **Governance**: `./bin/governance-check` — no regressions from this branch
+- decision: Approve the PR scan surface addition. Config-driven, backward compatible.
+- why_this: AI currently discovers PRs by reading files, not through scan.
+  Adding PR scanning enables proactive detection and automated handling.
+- alternatives_considered: Extend task-lifecycle-scan.py instead of bash inline (rejected, complexity); Add PR scan as separate binary (rejected, disproportionate for config-driven scan)
+- boundary_non_goals: Platform auth management; PR auto-sync or write-back to platforms
+- residual_risk: Low. Missing CLIs handled gracefully by skipping.
 
-## Result
+## Test evidence
 
-PASS
+- governance-check: no regressions from this branch
+- bash -n freely: syntax OK
+- FREELY_REPO_PLATFORMS="" → no PR surface (backward compatible)
+- FREELY_REPO_PLATFORMS="github" → PR surface with gh CLI data

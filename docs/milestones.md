@@ -217,9 +217,9 @@ routing_policy:
 8. `I-20260501-0000-A`
 - title: PR scan surface + FREELY_REPO_PLATFORMS config
 - milestone_state: committed
-- phase_state: `done`
+- phase_state: `in_verification`
 - priority: P0
-- issue_path: `docs/issues/I-20260501-0000-A/issue.md`
+- issue_path: `docs/epics/workspace-routing-foundation/scan-pr-platform-config/issues/I-20260501-0000-A.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-scan-pr-platform-config.md`
 - source_candidate: `docs/pre-brainstorms/20260501-0000--scan-pr-platform-config/candidates.md#C-20260501-0000-A`
 - branch: `hotfix/I-20260501-0000-A-scan-pr-platform-config`

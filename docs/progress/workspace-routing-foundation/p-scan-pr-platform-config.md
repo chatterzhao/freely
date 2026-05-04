@@ -1,24 +1,19 @@
-# Progress: scan-pr-platform-config
+# PR scan surface + FREELY_REPO_PLATFORMS config
 
-- issue_id: `I-20260501-0000-A`
-- issue_path: `docs/issues/I-20260501-0000-A/issue.md`
-- title: `PR scan surface + FREELY_REPO_PLATFORMS config`
-- phase_state: `completed`
+- issue: `I-20260501-0000-A`
+- issue_path: `docs/epics/workspace-routing-foundation/scan-pr-platform-config/issues/I-20260501-0000-A.md`
+- candidate: `C-20260501-0000-A`
+- candidate_path: `docs/pre-brainstorms/20260501-0000--scan-pr-platform-config/candidates.md`
 - milestone: `M-20260306-workspace-routing-foundation`
-- branch: `hotfix/I-20260501-0000-A-scan-pr-platform-config`
-- updated_at: `2026-05-01`
-- session_refs:
-  - {tool: ccds, session_id: "20260501-scan-pr-platform", jsonl_path: "unavailable://manual", role: "author"}
-
-## Summary
-
-- Added scan_repo_platform_prs() function to query configured platforms for open PRs
-- Added "open_pull_requests" surface in task-source-scan JSON output
-- Added FREELY_REPO_PLATFORMS config template (comma-separated platforms)
-- Supports github (gh CLI) and gitee (gitee CLI) out of box
-- Empty config = no PR scanning (backward compatible)
+- phase_state: `done_pre_brainstorm`
+- runtime_state: `verified_on_worktree`
+- updated_at: `2026-05-03T15:30:00Z`
+- next_action: `merge_to_develop_via_merge_guarded`
 
 ## Verification
 
-- `./bin/governance-check` (pre-existing failures only, no regressions)
-- Rebase onto latest develop with conflict resolution
+- `FREELY_REPO_PLATFORMS` 配置正确加载到环境变量中
+- 空配置时 `scan_repo_platform_prs()` 立即返回（向后兼容）
+- `github` 映射到 `gh` CLI，`gitee` 映射到 `gitee` CLI
+- PR snapshot 在 task-source-scan JSON 中生成 `open_pull_requests` 表面
+- `governance-check` 无新增失败
