@@ -11476,7 +11476,6 @@ manager_runtime_launch_workers_from_latest_handoff() {
   local launched_count prompt_file prompt_rank prompt_index target_project write_scope
   local parallel_safe active_running_workers available_new_slots max_parallel_workers
   local selected_write_scopes_csv selected_intent_signatures_csv frozen_intent_signatures_csv active_intent_signatures_csv recorded_intent_signatures_csv worker_is_active worker_is_busy prompt_queue_file prompt_signature queued_prompt_blockers terminal_kind
-  reset_project_runtime_discovery_cache "$project"
   continuity_file="$(latest_launchable_manager_worker_prompt_continuity_file_for_project "$project")"
   if [[ -z "$continuity_file" || ! -f "$continuity_file" ]]; then
     continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
