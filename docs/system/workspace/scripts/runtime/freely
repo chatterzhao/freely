@@ -1355,7 +1355,7 @@ clear_stale_runtime_pid_file_if_invalid() {
   rm -f "$pid_file"
   # ACP bridge owns a Unix socket — clean it alongside the stale PID.
   if [[ "$role" == "acp_bridge" ]]; then
-    rm -f "$(run_dir_for_project "$project")/acp-bridge-$(_acp_bridge_short_hash "$project").sock"
+    rm -f "/tmp/freely-acp-$(_acp_bridge_short_hash "$project").sock"
   fi
   append_runtime_event "$project" "startup_self_heal_stale_pid_cleared" \
     "trigger=$trigger" \
@@ -11834,7 +11834,7 @@ _ai_shows_liveness_acp() {
   fi
 
   # Signal 3: ACP bridge socket responsive
-  local bridge_socket="$(run_dir_for_project "$project")/acp-bridge-$(_acp_bridge_short_hash "$project").sock"
+  local bridge_socket="/tmp/freely-acp-$(_acp_bridge_short_hash "$project").sock"
   if [[ -S "$bridge_socket" ]]; then
     # Quick socket probe: connect and disconnect (non-blocking check)
     if python3 -c "
@@ -11891,11 +11891,11 @@ _acp_bridge_short_hash() {
 }
 
 _acp_bridge_pid_file() {
-  echo "$(run_dir_for_project "$1")/acp-bridge-$(_acp_bridge_short_hash "$1").pid"
+  echo "/tmp/freely-acp-$(_acp_bridge_short_hash "$1").pid"
 }
 
 _acp_bridge_socket() {
-  echo "$(run_dir_for_project "$1")/acp-bridge-$(_acp_bridge_short_hash "$1").sock"
+  echo "/tmp/freely-acp-$(_acp_bridge_short_hash "$1").sock"
 }
 
 _acp_bridge_health_check() {

@@ -36,11 +36,11 @@ def _runtime_dir(project):
 
 
 def _pid_file(project):
-    return os.path.join(_runtime_dir(project), f"acp-bridge-{_short_hash(project)}.pid")
+    return f"/tmp/freely-acp-{_short_hash(project)}.pid"
 
 
 def _socket_path(project):
-    return os.path.join(_runtime_dir(project), f"acp-bridge-{_short_hash(project)}.sock")
+    return f"/tmp/freely-acp-{_short_hash(project)}.sock"
 
 
 def _log_file(project):
