@@ -15744,7 +15744,6 @@ ensure_manager_once() {
 
   if [[ "${TOOL_AUTO_RECOVERY_DECISION:-none}" != "selected" ]] \
     && ([[ -n "$current_pid" ]] || project_bootstrap_launch_in_flight_from_unverified_supervisor_hint "$project"); then
-    manager_runtime_recover_workers_if_needed "$project" >/dev/null || true
     log_info "manager supervisor already running (pid=${current_pid:-${supervisor_hint:-unknown}})"
     append_lifecycle_trace "$project" "L232" "manager_supervisor_already_running" \
       "supervisor_pid=${current_pid:-${supervisor_hint:-unknown}}" \
