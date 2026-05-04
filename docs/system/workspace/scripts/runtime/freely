@@ -18076,20 +18076,10 @@ PROTECTEDMSG
       sleep 1
       continue
     fi
-    local recovered_workers
-    watchdog_script="$workspace_root/scripts/runtime/manager-watchdog.sh"
-    if [[ -x "$watchdog_script" ]]; then
-      recovered_workers="$(bash "$watchdog_script" --project "$PROJECT_ROOT" --recover-expected-workers 2>/dev/null || true)"
-    else
-      recovered_workers="$(manager_runtime_recover_workers_if_needed "$PROJECT_ROOT")"
-    fi
-    if [[ "${recovered_workers:-0}" =~ ^[0-9]+$ ]] && (( recovered_workers > 0 )); then
-      log_info "manager runtime auto-recovered $recovered_workers expected-running worker(s) before prompt build"
-      append_runtime_event "$PROJECT_ROOT" "worker_auto_recovered" \
-        "supervisor_pid=$$" \
-        "recovered_workers=$recovered_workers"
-      sleep "${RESTART_DELAY:-2}"
-    fi
+    # Worker auto-recovery deferred to after first AI patrol cycle.
+    # Startup recovery created 3+ simultaneous ACP sessions
+    # (manager + workers) collapsing the bridge in <60s.
+    # Workers now launched via post-AI-cycle handler only.
     exit_if_stop_requested_before_launch
     select_launch_kind
     mode_name="$LAUNCH_KIND_SELECTED"
