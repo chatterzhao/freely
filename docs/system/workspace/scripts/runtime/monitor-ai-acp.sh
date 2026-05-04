@@ -43,11 +43,11 @@ _bridge_short_hash() {
 }
 
 _bridge_pid_file() {
-  echo "$1/.freely/run/acp-bridge-$(_bridge_short_hash "$1").pid"
+  echo "/tmp/freely-acp-$(_bridge_short_hash "$1").pid"
 }
 
 _bridge_socket() {
-  echo "$1/.freely/run/acp-bridge-$(_bridge_short_hash "$1").sock"
+  echo "/tmp/freely-acp-$(_bridge_short_hash "$1").sock"
 }
 
 _bridge_ensure_running() {
