@@ -549,6 +549,7 @@ Usage:
   freely baseline-status [--project <abs_path>]
   freely security-review-brief [--project <abs_path>]
   freely task-source-scan [--project <abs_path>] [--json]
+  freely issue-sync <args>...                   (delegate to bin/issue-sync)
   freely status [--project <abs_path>] [--view baseline|live|fleet|all]
   freely live-status [--project <abs_path>]
   freely fleet-status [--project <abs_path>]
@@ -20148,6 +20149,15 @@ cmd_live_status() {
   echo "- develop_push_followthrough_resync_required: ${develop_push_resync_required}"
 }
 
+cmd_issue_sync() {
+  local issue_sync_bin="$SELF_ROOT/bin/issue-sync"
+  if [[ ! -x "$issue_sync_bin" ]]; then
+    log_error "issue-sync binary not found: $issue_sync_bin"
+    exit 1
+  fi
+  bash "$issue_sync_bin" "$@"
+}
+
 cmd_status() {
   local project="" view="all"
   local -a forwarded=()
@@ -20601,6 +20611,7 @@ main() {
     baseline-status) cmd_baseline_status "$@" ;;
     security-review-brief) cmd_security_review_brief "$@" ;;
     task-source-scan) cmd_task_source_scan "$@" ;;
+    issue-sync) cmd_issue_sync "$@" ;;
     status) cmd_status "$@" ;;
     live-status) cmd_live_status "$@" ;;
     fleet-status) cmd_fleet_status "$@" ;;
