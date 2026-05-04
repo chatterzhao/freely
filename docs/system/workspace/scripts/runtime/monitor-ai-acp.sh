@@ -94,7 +94,7 @@ _detect_acp_failure() {
   [[ -f "$log_file" ]] || return 0
 
   local _matched
-  if _matched=$(grep -m1 -E '(Connection refused|Connection reset|TLS|timeout|ECONNREFUSED|ENOTFOUND|ETIMEDOUT|socket hang up|proxy|DNS)' "$log_file" 2>/dev/null); then
+  if _matched=$(grep -m1 -E '\b(Connection refused|Connection reset by peer|connection refused|connection reset|ECONNREFUSED|ENOTFOUND|ETIMEDOUT|socket hang up|timed out|connection timeout|Connection timed out|dial timeout|i/o timeout|read timeout|deadline exceeded|TLS handshake|TLS alert|TLS error|proxy error|proxy refused|proxy timeout|proxy auth|Could not connect to proxy|DNS error|DNS failure|DNS timeout|DNS resolution|Could not resolve host|name resolution failed|NXDOMAIN)\b' "$log_file" 2>/dev/null); then
     echo "[ACP-detect] network_failure matched: ${_matched:0:200}" >&2
     [[ -n "$network_failure_marker" ]] && echo "network_failure" > "$network_failure_marker"
   fi
