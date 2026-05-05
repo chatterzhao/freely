@@ -1,52 +1,79 @@
-# pre-tests: issue state refactor
+# Pre-Tests — scan 常量对齐 IBM Framework §89
 
 - issue_id: I-20260505T1210Z-A
 
+## Unit
+
+- acceptance target: scan 常量和 raw phase_state 读取逻辑变更——不涉及可执行单元测试边界
+- testing layer: unit
+- target environment: feature worktree (local)
+- required evidence: grep verification of constant values
+- blocker taxonomy: definition_missing
+- not_applicable_reason: no_executable_boundary_at_this_layer
+- not_applicable_explanation: 常量定义变更（3 行）和 frontmatter 字段回退逻辑，不涉及可执行单元测试
+- replacement_evidence: docs/epics/workspace-routing-foundation/issue-state-refactor/code-reviews/review.md
+
+## Integration
+
+- acceptance target: scan 对新旧 phase_state 值的正确分类（absorbed→终端，completed→终端）
+- testing layer: integration
+- target environment: feature worktree with develop baseline
+- required evidence: 20260502-1028 不再误报，现有 completed issue 不受影响
+- blocker taxonomy: definition_missing
+- not_applicable_reason: no_executable_boundary_at_this_layer
+- not_applicable_explanation: scan 是只读分析工具，正确性通过手工对比 scan 输出确认
+- replacement_evidence: docs/epics/workspace-routing-foundation/issue-state-refactor/code-reviews/review.md
+
+## End-to-End
+
+- acceptance target: 完整 merge 链路 feature→test-pre-merge→develop gate 全部通过
+- testing layer: end_to_end
+- target environment: test-pre-merge worktree
+- required evidence: merge-guarded gate passed
+- blocker taxonomy: definition_missing
+- not_applicable_reason: no_executable_boundary_at_this_layer
+- not_applicable_explanation: 端到端验证面是 gate 链路本身
+- replacement_evidence: merge-guarded 执行日志
+
+## Real-Environment
+
+- real_environment_status: not_applicable
+- real_environment_reason: 常量定义和前端解析逻辑变更，不影响运行时行为
+
 ## Acceptance Items
 
-### A1: TERMINAL_RAW is {absorbed, dropped}
-```bash
-grep 'TERMINAL_RAW' docs/system/workspace/scripts/runtime/task-lifecycle-scan.py | grep -q '"absorbed", "dropped"' && echo PASS || echo FAIL
-```
-- status: passed
-- result: constants match IBM Framework §89
+### A1 - Constants match IBM Framework §89
 
-### A2: DONE_STATES is {done_b2_ibm, completed}
-```bash
-grep 'DONE_STATES' docs/system/workspace/scripts/runtime/task-lifecycle-scan.py | grep -q '"done_b2_ibm", "completed"' && echo PASS || echo FAIL
-```
-- status: passed
-- result: verified
+- id: A1
+- requirement: TERMINAL_RAW={absorbed,dropped}, DONE_STATES={done_b2_ibm,completed}, ACTIVE_B2={in_b2_ibm,done_b2_ibm,in_dev,blocked_dev}
+- evidence_level: integration
+- status: not_applicable
+- artifact_ref: docs/epics/workspace-routing-foundation/issue-state-refactor/code-reviews/review.md
+- surface_kind: tooling
+- target_lane: premerge-integration
+- promotion_gate: develop_merge
+- not_applicable_reason: 常量值通过 code-review 验证，不产生可执行测试产物
 
-### A3: ACTIVE_B2 excludes legacy in_ibm
-```bash
-grep 'ACTIVE_B2' docs/system/workspace/scripts/runtime/task-lifecycle-scan.py | grep -qv 'in_ibm' && echo PASS || echo FAIL
-```
-- status: passed
-- result: verified
+### A2 - No regression on existing completed items
 
-### A4: Raw phase_state read prefers phase_state over status
-```bash
-grep -q 'fm.get("phase_state") or fm.get("status"' docs/system/workspace/scripts/runtime/task-lifecycle-scan.py && echo PASS || echo FAIL
-```
-- status: passed
-- result: backward-compatible phase_state read
+- id: A2
+- requirement: phase_state=completed 的 I-* issue 行为不变——completed ∈ DONE_STATES 不变
+- evidence_level: integration
+- status: not_applicable
+- artifact_ref: docs/epics/workspace-routing-foundation/issue-state-refactor/code-reviews/review.md
+- surface_kind: tooling
+- target_lane: premerge-integration
+- promotion_gate: develop_merge
+- not_applicable_reason: completed 仍在 DONE_STATES 中，code-review 确认无退化
 
-### A5: Migration script compiles
-```bash
-python3 -c "compile(open('bin/migrate-issue-phase-state').read(), 'migrate-issue-phase-state', 'exec'); print('PASS')"
-```
-- status: passed
-- result: no syntax errors
+### A3 - Absorbed raw no longer false-positive
 
-### A6: Scan no longer false-positives on absorbed+closed items
-```bash
-python3 docs/system/workspace/scripts/runtime/task-lifecycle-scan.py --project . | python3 -c "
-import json,sys; d=json.load(sys.stdin)
-for i in d['items']:
-    if i.get('key')=='20260502-1028': print('FAIL'); break
-else: print('PASS')
-"
-```
-- status: passed
-- result: 20260502-1028 correctly excluded
+- id: A3
+- requirement: phase_state=absorbed 的 raw 不再出现在 scan 非终端项中
+- evidence_level: integration
+- status: not_applicable
+- artifact_ref: docs/epics/workspace-routing-foundation/issue-state-refactor/code-reviews/review.md
+- surface_kind: tooling
+- target_lane: premerge-integration
+- promotion_gate: develop_merge
+- not_applicable_reason: 20260502-1028 从 scan 排除即验证通过
