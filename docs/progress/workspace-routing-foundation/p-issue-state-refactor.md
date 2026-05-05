@@ -9,3 +9,9 @@ Changes:
 Previous:
 - I-20260505T1210Z-A: scan constants + migration (merged)
 - I-20260505T1210Z-A-B: issue-sync platform_state fix (merged)
+
+Migration (2026-05-05):
+- bin/migrate-issue-phase-state: executed — 190 files migrated
+- raw: status → phase_state, platform_state added
+- I-*: status removed, platform_state added
+- 2 raw: phase_state promoted → absorbed (illegal value fix)
