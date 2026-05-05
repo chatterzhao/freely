@@ -1,0 +1,103 @@
+# candidates: issue 状态字段重构
+
+## C-20260505T1210Z-A: scan 常量对齐 IBM Framework
+
+- candidate_id: C-20260505T1210Z-A
+- title: 修正 scan 的 TERMINAL_RAW / DONE_STATES / ACTIVE_B2 常量
+- scope: task-lifecycle-scan.py 第15-19行
+- non_goals: 不改 scan 逻辑，只改常量
+- priority: P0
+- status: promoted
+- milestone: M-20260306-workspace-routing-foundation
+- promoted_issue_path: pending://I-20260505T1210Z-A
+
+### 改动
+
+- TERMINAL_RAW: 去掉 completed → {absorbed, dropped}
+- DONE_STATES: 去掉 done, done_ibm → {done_b2_ibm, completed}
+- ACTIVE_B2: 去掉 in_ibm → {in_b2_ibm, done_b2_ibm, in_dev, blocked_dev}
+
+### 验证
+
+- scan 不再把 status=closed 的 raw 当 non-terminal
+- scan 识别 done_b2_ibm 为 active 状态
+- 历史 data 兼容（现有 179 个 completed 不受影响）
+
+---
+
+## C-20260505T1210Z-B: issue-sync 只写 platform_state
+
+- candidate_id: C-20260505T1210Z-B
+- title: issue-sync cmd_close/cmd_create 只更新 platform_state
+- scope: bin/issue-sync 第522-543行（cmd_close）, 第377-401行（cmd_create）
+- non_goals: 不改 promote/comment/update 逻辑
+- priority: P0
+- status: promoted
+- milestone: M-20260306-workspace-routing-foundation
+- promoted_issue_path: pending://I-20260505T1210Z-A
+
+### 改动
+
+- cmd_close: _fm_set_str platform_state closed（不写 status）
+- cmd_create: _fm_set_str platform_state open
+- 新增 _fm_set_nested 支持 platform_state 写入
+
+### 验证
+
+- issue-sync close raw-xxx 后 raw 的 status 保持 absorbed
+- I-* 的 phase_state 保持 completed
+- platform_state 正确更新为 open/closed
+
+---
+
+## C-20260505T1210Z-C: governance gate 拦截状态不一致
+
+- candidate_id: C-20260505T1210Z-C
+- title: governance-merge-gate 新增 platform_state vs phase_state 一致性门禁
+- scope: governance-merge-gate 新增 G1/G2/G3
+- non_goals: 不改变已有 gate 的行为
+- priority: P1
+- status: promoted
+- milestone: M-20260306-workspace-routing-foundation
+- promoted_issue_path: pending://I-20260505T1210Z-A
+
+### 门禁规则
+
+| ID | 条件 | 级别 |
+|----|------|------|
+| G1 | phase_state=completed 且 platform_state=open | block merge |
+| G2 | status=proposed 且 platform_state=closed | block |
+| G3 | platform_state 不为空但 platform_ids 为空 | block |
+
+### 验证
+
+- 状态不一致时 merge-guarded 拒绝
+- 正常 issue 不受影响
+
+---
+
+## C-20260505T1210Z-D: 现有 issue 加 platform_state（迁移）
+
+- candidate_id: C-20260505T1210Z-D
+- title: 为所有已有 raw/I-* issue 补充 platform_state 字段
+- scope: 一次性迁移脚本
+- non_goals: 不修改已有 status/phase_state 值
+- priority: P1
+- status: promoted
+- milestone: M-20260306-workspace-routing-foundation
+- promoted_issue_path: pending://I-20260505T1210Z-A
+
+### 算法
+
+```
+for each raw/I-* issue:
+  if platform_ids 非空:
+    query GitHub state → platform_state = open|closed
+  else:
+    platform_state = open  # 默认
+```
+
+### 注意
+
+- 已 absorbed 且平台已关的 raw: platform_state=closed, status=absorbed（符合预期）
+- 已 completed 且平台已关的 I-*: platform_state=closed, phase_state=completed（符合预期）
