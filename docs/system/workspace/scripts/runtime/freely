@@ -18767,19 +18767,23 @@ cmd_start() {
     esac
   done
   project="$(resolve_project_or_fail "$project")"
-  # Validate and write task mode early, before the startup lock
-  [[ -n "$task_mode" ]] && write_task_mode "$project" "$task_mode"
+  # Write task mode: explicit flag or reset to default wait
+  if [[ -n "$task_mode" ]]; then
+    write_task_mode "$project" "$task_mode"
+  else
+    write_task_mode "$project" "wait"
+  fi
   startup_self_heal_machine_state_if_needed "$project" "start_command"
   acquire_project_start_lock_or_wait "$project" "freely_start" || exit 1
   trap "release_project_start_lock_for_runtime '$project'" EXIT
   append_lifecycle_trace "$project" "L001" "start_requested" \
     "entrypoint=foreground" \
     "force=$force" \
-    "task_mode=${task_mode:-default}" \
+    "task_mode=${task_mode:-wait}" \
     "expected_next=L010"
   append_runtime_event "$project" "user_start_command_received" \
     "force=$force" \
-    "task_mode=${task_mode:-default}"
+    "task_mode=${task_mode:-wait}"
   if [[ "$force" == "1" ]]; then
     log_info "forcing project-local runtime rebuild before start"
     stop_project_runtime "$project" "start_force"
@@ -18940,14 +18944,18 @@ cmd_daemon_start() {
     esac
   done
   project="$(resolve_project_or_fail "$project")"
-  [[ -n "$task_mode" ]] && write_task_mode "$project" "$task_mode"
+  if [[ -n "$task_mode" ]]; then
+    write_task_mode "$project" "$task_mode"
+  else
+    write_task_mode "$project" "wait"
+  fi
   startup_self_heal_machine_state_if_needed "$project" "daemon_start_command"
   acquire_project_start_lock_or_wait "$project" "freely_start" || exit 1
   trap "release_project_start_lock_for_runtime '$project'" EXIT
   append_lifecycle_trace "$project" "L001" "start_requested" \
     "entrypoint=daemon" \
     "force=$force" \
-    "task_mode=${task_mode:-default}" \
+    "task_mode=${task_mode:-wait}" \
     "expected_next=L010"
   append_runtime_event "$project" "user_daemon_start_command_received" \
     "force=$force" \
