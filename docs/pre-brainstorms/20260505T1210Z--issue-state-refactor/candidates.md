@@ -7,7 +7,7 @@
 - scope: task-lifecycle-scan.py 第15-19行
 - non_goals: 不改 scan 逻辑，只改常量
 - priority: P0
-- status: proposed
+- status: promoted
 - milestone: M-20260306-workspace-routing-foundation
 - promoted_issue_path: pending://I-20260505T1210Z-A
 
