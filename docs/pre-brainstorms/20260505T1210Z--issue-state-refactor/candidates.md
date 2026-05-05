@@ -56,14 +56,14 @@
 
 - candidate_id: C-20260505T1210Z-C
 - title: governance-merge-gate 新增 platform_state vs phase_state 一致性门禁
-- scope: governance-merge-gate 新增 G1/G2/G3
+- scope: governance-merge-gate 新增 G1/G2/G3 + S1/S2/S3 门禁
 - non_goals: 不改变已有 gate 的行为
 - priority: P1
 - status: proposed
 - milestone: M-20260306-workspace-routing-foundation
 - promoted_issue_path: pending://I-20260505T1210Z-C
 
-### 门禁规则
+### 一致性门禁 (G1-G3)
 
 | ID | 条件 | 级别 |
 |----|------|------|
@@ -71,10 +71,23 @@
 | G2 | status=proposed 且 platform_state=closed | block |
 | G3 | platform_state 不为空但 platform_ids 为空 | block |
 
+### Schema 门禁 (S1-S3)——兜底拦截非法值
+
+| ID | 条件 | 级别 |
+|----|------|------|
+| S1 | raw issue 出现 phase_state 字段 | block |
+| S2 | I-* issue 出现 status 字段 | block |
+| S3 | status/phase_state 值不在合法集合中 | block |
+
+合法值：
+- raw.status ∈ {proposed, absorbed, dropped}
+- I-*.phase_state ∈ {in_b2_ibm, done_b2_ibm, in_dev, blocked_dev, in_verification, completed}
+
 ### 验证
 
-- 状态不一致时 merge-guarded 拒绝
-- 正常 issue 不受影响
+- 写入非法状态值（如 raw status=closed）→ gate 拦截
+- raw 误设 phase_state → gate 拦截
+- I-* 误设 status → gate 拦截
 
 ---
 

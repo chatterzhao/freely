@@ -114,13 +114,39 @@ updated_at: '…'
 session_refs: []
 ```
 
-### D5: 门禁规则
+### D5: Schema 约束——每个字段只能是合法值
+
+防止状态值被误写（如 issue-sync 写入 `closed` 到 raw status），定义每个字段的合法值集合，非法值在任何阶段都应被拦截。
+
+raw issue schema：
+| 字段 | 合法值 | 说明 |
+|------|--------|------|
+| `status` | `proposed` / `absorbed` / `dropped` | B1 消费状态 |
+| `platform_state` | `open` / `closed` / `""` | 平台镜像，空=未同步 |
+| `phase_state` | **禁止出现** | I-* 专用字段 |
+
+I-* issue schema：
+| 字段 | 合法值 | 说明 |
+|------|--------|------|
+| `phase_state` | `in_b2_ibm` / `done_b2_ibm` / `in_dev` / `blocked_dev` / `in_verification` / `completed` | B2 生命周期 |
+| `platform_state` | `open` / `closed` / `""` | 平台镜像 |
+| `status` | **禁止出现** | raw 专用字段 |
+
+兜底位置：
+- **scan**: 扫到非法字段值→输出 `schema_violation`，stage=`invalid`
+- **issue-sync**: 写字段前校验，非法值拒绝写入
+- **merge gate**: merge 前检查所有 I-* 的字段合法性
+
+### D6: 门禁规则
 
 | 规则 | 条件 | 动作 |
 |------|------|------|
-| G1 | phase_state=completed, platform_state=open | **block** merge to develop |
+| G1 | phase_state=completed, platform_state=open | **block** merge |
 | G2 | status=proposed, platform_state=closed | **block** — 平台已关但 B1 未开始 |
-| G3 | I-* 有 platform_state 但无 platform_ids.issue_id | **block** — 状态和 ID 不一致 |
+| G3 | platform_state 不为空但 platform_ids 为空 | **block** |
+| **S1** | **raw 出现 phase_state** | **block** — 字段不属于 raw |
+| **S2** | **I-* 出现 status** | **block** — 字段不属于 I-* |
+| **S3** | **status/phase_state 值不在合法集合中** | **block** — 非法状态值 |
 
 ## 非目标
 
