@@ -776,16 +776,27 @@ def _trace_chain(project: Path, key: str) -> dict:
     phase = best_child.get("phase_state", "")
     pids = best_child.get("platform_ids", {})
 
-    branch = _find_branch_for_key(project, key)
-    has_worktree = branch is not None
-    merged = _branch_merged_to_develop(project, branch) if branch else None
+    branches = _find_all_branches_for_key(project, key)
+    has_worktree = len(branches) > 0
+    # Check merge status of each branch individually — any unmerged branch
+    # is a signal worth surfacing, not a false positive to suppress.
+    branch_statuses = {}
+    any_merged = False
+    for b in branches:
+        b_merged = _branch_merged_to_develop(project, b)
+        branch_statuses[b] = b_merged
+        if b_merged:
+            any_merged = True
 
     # Check every station. Each call: (name, reached, required, detail_dict)
     _st = lambda name, reached, required, **kw: stations.update({name: {"reached": reached, "required": required, **kw}})
 
     # dev_worktree reached if: worktree exists now, OR was merged OR phase_state proves implementation happened
-    dev_wt_reached = has_worktree or merged is True or (not has_worktree and phase in DONE_STATES.union(ACTIVE_B2))
-    _st("dev_worktree", dev_wt_reached, True, branch=branch or "已退役")
+    dev_wt_reached = has_worktree or any_merged or (not has_worktree and phase in DONE_STATES.union(ACTIVE_B2))
+    _st("dev_worktree", dev_wt_reached, True,
+        branches=branch_statuses if branch_statuses else None,
+        branch_hint="已退役" if not has_worktree else None)
+
     _st("dev_phase_done", phase in DONE_STATES or phase == COMPLETED, True, phase=phase or "empty")
 
     # Optional: code review evidence (not all issues need formal review)
@@ -797,16 +808,29 @@ def _trace_chain(project: Path, key: str) -> dict:
     _st("code_review", has_cr, False, canonical=canonical)
 
     _st("platform_create", bool(pids.get("github")) or bool(pids.get("gitee")), True, pids=pids)
-    _st("merged_develop", merged is True, True, branch=branch or "", merged=merged)
+
+    # merged_develop: when branches exist, trust their merge status (at least
+    # one merged = reached). When no branches exist, infer from phase_state.
+    if has_worktree:
+        merged_reached = any_merged
+    else:
+        merged_reached = phase in DONE_STATES.union(ACTIVE_B2)
+    _st("merged_develop", merged_reached, True,
+        branches=branch_statuses if branch_statuses else None,
+        reason=("at least one branch merged" if any_merged else
+                "no branch merged to develop" if has_worktree else
+                "branches deleted — inferred from phase_state"))
 
     # Platform close (best-effort, skipped with SKIP_PLATFORM_CHECK)
     gh_issue = pids.get("github", "")
     gh_closed = _is_github_closed(gh_issue) if gh_issue and not os.environ.get("SKIP_PLATFORM_CHECK") else None
     _st("platform_close", gh_closed is True, True, github_issue=gh_issue, gh_closed=gh_closed)
 
-    # branch_deleted only reached if branch existed (merged) or worktree evidence exists
-    branch_existed = merged is True or (not has_worktree and phase in DONE_STATES.union(ACTIVE_B2))
-    _st("branch_deleted", not has_worktree and branch_existed, True)
+    # branch_deleted: reached when no branches remain for this key.
+    # If branches exist (even stale ones), surface them so the user can decide.
+    branch_existed = any_merged or (not has_worktree and phase in DONE_STATES.union(ACTIVE_B2))
+    _st("branch_deleted", not has_worktree and branch_existed, True,
+        branches=branch_statuses if branch_statuses else None)
 
     # Optional: milestone entry
     mf = project / "docs" / "milestones.md"
@@ -843,19 +867,21 @@ def _best_child(children: list[dict]) -> dict:
     return best
 
 
-def _find_branch_for_key(project: Path, key: str) -> str | None:
-    """Find git branch containing this key."""
+def _find_all_branches_for_key(project: Path, key: str) -> list[str]:
+    """Find ALL git branches containing this key (multiple branches sharing
+    a key is correct — each branch serves a specific purpose for the same issue)."""
+    branches = []
     try:
         raw = subprocess.check_output(
             ["git", "-C", str(project), "branch", "--format=%(refname:short)"],
             text=True, stderr=subprocess.DEVNULL,
         )
-        for branch in raw.splitlines():
-            if key in branch:
-                return branch.strip()
+        for line in raw.splitlines():
+            if key in line.strip():
+                branches.append(line.strip())
     except subprocess.CalledProcessError:
         pass
-    return None
+    return branches
 
 
 def _parse_h3_sections(path: Path) -> list[dict]:
