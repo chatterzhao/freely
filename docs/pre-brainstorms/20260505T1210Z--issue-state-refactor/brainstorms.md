@@ -60,14 +60,14 @@ promote 时 I-* 继承 raw 的 platform_ids，不创建新 issue。
 
 ### D4: 字段分组
 
+raw issue（无 phase_state 字段）：
 ```yaml
 # ── 标识 ──
 local_id: raw-20260505T1210Z
 kind: raw
 
 # ── 状态 ──
-status: proposed                    # raw 专用
-phase_state:                        # I-* 专用（raw 为空）
+status: proposed                    # freely B1 消费状态
 platform_state: open                # 平台镜像
 
 # ── 平台关联 ──
@@ -75,11 +75,9 @@ primary_platform: github
 platform_ids:
   github:
     issue_id: '214'
-    url: https://github.com/…
 
 # ── 生命周期关联 ──
-absorbed_into: I-20260505T1210Z-A   # raw→I-*
-promoted_from: raw-20260505T1210Z   # I-*→raw
+absorbed_into: I-20260505T1210Z-A   # promote 后的目标
 
 # ── 元数据 ──
 issue_title: "…"
@@ -87,6 +85,32 @@ created_at: '…'
 updated_at: '…'
 author: human
 channel: github
+session_refs: []
+```
+
+I-* issue（无 status 字段）：
+```yaml
+# ── 标识 ──
+local_id: I-20260505T1210Z-A
+kind: linked
+
+# ── 状态 ──
+phase_state: in_b2_ibm              # freely B2 开发生命周期
+platform_state: open                # 平台镜像
+
+# ── 平台关联 ──
+primary_platform: github
+platform_ids:
+  github:
+    issue_id: '214'                 # ← 和 raw 共享同一个
+
+# ── 生命周期关联 ──
+promoted_from: raw-20260505T1210Z   # 来源 raw
+
+# ── 元数据 ──
+issue_title: "…"
+created_at: '…'
+updated_at: '…'
 session_refs: []
 ```
 

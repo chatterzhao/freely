@@ -7,7 +7,7 @@
 - scope: task-lifecycle-scan.py 第15-19行
 - non_goals: 不改 scan 逻辑，只改常量
 - priority: P0
-- status: promoted
+- status: proposed
 - milestone: M-20260306-workspace-routing-foundation
 - promoted_issue_path: pending://I-20260505T1210Z-A
 
@@ -16,12 +16,14 @@
 - TERMINAL_RAW: 去掉 completed → {absorbed, dropped}
 - DONE_STATES: 去掉 done, done_ibm → {done_b2_ibm, completed}
 - ACTIVE_B2: 去掉 in_ibm → {in_b2_ibm, done_b2_ibm, in_dev, blocked_dev}
+- 为所有已有 raw/I-* issue 补充 platform_state 字段（一次性迁移脚本）
 
 ### 验证
 
 - scan 不再把 status=closed 的 raw 当 non-terminal
 - scan 识别 done_b2_ibm 为 active 状态
 - 历史 data 兼容（现有 179 个 completed 不受影响）
+- 迁移后所有已有 platform_ids 的 issue 有正确的 platform_state
 
 ---
 
@@ -32,9 +34,9 @@
 - scope: bin/issue-sync 第522-543行（cmd_close）, 第377-401行（cmd_create）
 - non_goals: 不改 promote/comment/update 逻辑
 - priority: P0
-- status: promoted
+- status: proposed
 - milestone: M-20260306-workspace-routing-foundation
-- promoted_issue_path: pending://I-20260505T1210Z-A
+- promoted_issue_path: pending://I-20260505T1210Z-B
 
 ### 改动
 
@@ -57,9 +59,9 @@
 - scope: governance-merge-gate 新增 G1/G2/G3
 - non_goals: 不改变已有 gate 的行为
 - priority: P1
-- status: promoted
+- status: proposed
 - milestone: M-20260306-workspace-routing-foundation
-- promoted_issue_path: pending://I-20260505T1210Z-A
+- promoted_issue_path: pending://I-20260505T1210Z-C
 
 ### 门禁规则
 
@@ -83,7 +85,7 @@
 - scope: 一次性迁移脚本
 - non_goals: 不修改已有 status/phase_state 值
 - priority: P1
-- status: promoted
+- status: proposed
 - milestone: M-20260306-workspace-routing-foundation
 - promoted_issue_path: pending://I-20260505T1210Z-A
 
@@ -101,3 +103,10 @@ for each raw/I-* issue:
 
 - 已 absorbed 且平台已关的 raw: platform_state=closed, status=absorbed（符合预期）
 - 已 completed 且平台已关的 I-*: platform_state=closed, phase_state=completed（符合预期）
+
+---
+
+## 决策记录
+
+- C-D（迁移脚本）→ absorbed into C-A：迁移是实现的一部分，不作为独立 candidate
+- C-A/C-B/C-C 各自 promote 到独立 I-*，按 A→B→C 依赖顺序执行
