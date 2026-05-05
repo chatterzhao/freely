@@ -50,6 +50,16 @@ routing_policy:
 - why_now: 这批项定义 Freely 如何发现上下文、读取 milestone、并路由到下一跳 skill；如果 milestone 自身不先落盘，Freely 的狗粮链路就是断的
 
 ### committed_issues
+0. `I-20260504T1132Z-A`
+- title: raw key 格式统一：所有代码接受 YYYYMMDDTHHMMZ 和 YYYYMMDD-HHMM 双格式
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/raw-key-format-unify/issues/I-20260504T1132Z-A.md`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/raw-key-format-unify/code-reviews`
+- source_candidate: `docs/pre-brainstorms/20260504T1132Z--raw-key-format-unify/candidates.md#C-20260504T1132Z-A`
+- next_action: `Merge to develop, then issue-sync close.`
+
 1. `I-20260503-0200-A`
 - title: scan: switch to task-lifecycle-scan v2 with full lifecycle chain trace
 - milestone_state: committed
