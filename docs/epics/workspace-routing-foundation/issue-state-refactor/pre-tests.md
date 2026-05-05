@@ -83,3 +83,26 @@
 - not_applicable_reason: no_executable_boundary_at_this_layer
 - not_applicable_explanation: 20260502-1028 从 scan 排除即验证通过
 - replacement_evidence: docs/epics/workspace-routing-foundation/issue-state-refactor/code-reviews/review.md
+
+### B1 - issue-sync close preserves raw phase_state
+
+- id: B1
+- requirement: issue-sync close raw-xxx 后 raw phase_state 不变（保持 absorbed）
+- evidence_level: integration
+- status: pass
+- artifact_ref: docs/epics/workspace-routing-foundation/issue-state-refactor/code-reviews/review-B.md
+- surface_kind: integration
+- target_lane: premerge-integration
+- promotion_gate: develop_merge
+
+### B2 - issue-sync create sets platform_state
+
+- id: B2
+- requirement: issue-sync create 后 platform_state=open
+- evidence_level: integration
+- status: pass
+- artifact_ref: docs/epics/workspace-routing-foundation/issue-state-refactor/code-reviews/review-B.md
+- surface_kind: integration
+- target_lane: premerge-integration
+- promotion_gate: develop_merge
+

@@ -1,18 +1,18 @@
 # Tasks — issue state refactor
 
-- issue_id: I-20260505T1210Z-A
+- issue_id: I-20260505T1210Z-A-B
 
-## task-1: scan constants fix
+## task-1: cmd_close fix
 - status: done
-- owner: feature/raw-20260505T1210Z-issue-state-refactor
-- changes: task-lifecycle-scan.py lines 15-19
+- owner: feature/raw-20260505T1210Z-issue-state-refactor-B
+- changes: bin/issue-sync line 540: _fm_set_str platform_state closed
 
-## task-2: raw phase_state read
+## task-2: cmd_create fix
 - status: done
-- owner: feature/raw-20260505T1210Z-issue-state-refactor
-- changes: task-lifecycle-scan.py line 97, line 688
+- owner: feature/raw-20260505T1210Z-issue-state-refactor-B
+- changes: bin/issue-sync line 424: _fm_set_str platform_state open
 
-## task-3: migration script
+## task-3: cmd_promote fix
 - status: done
-- owner: feature/raw-20260505T1210Z-issue-state-refactor
-- changes: bin/migrate-issue-phase-state (new file)
+- owner: feature/raw-20260505T1210Z-issue-state-refactor-B
+- changes: bin/issue-sync line 626: status→phase_state absorbed
