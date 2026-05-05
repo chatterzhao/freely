@@ -732,9 +732,10 @@ def main() -> int:
                 conn = sqlite3.connect(db_path)
                 # Branch key raw-YYYYMMDD-HHMM → chat id is YYYYMMDDHHMMSS
                 # Use LIKE to find chats with matching date+time prefix (ignore seconds)
-                raw_ts_match = re.match(r"raw-(\d{8}-\d{4})", branch_issue_key)
+                # Accept old (YYYYMMDD-HHMM) and new (YYYYMMDDTHHMMZ) formats
+                raw_ts_match = re.match(r"raw-(\d{8}[-T]\d{4}Z?)", branch_issue_key)
                 if raw_ts_match:
-                    ts_prefix = raw_ts_match.group(1).replace("-", "")
+                    ts_prefix = raw_ts_match.group(1).replace("-", "").replace("T", "").replace("Z", "")
                     rows = conn.execute(
                         "SELECT id, issue_id, consumed, materialized_as FROM chats "
                         "WHERE CAST(id AS TEXT) LIKE ? AND chat_type = 'new-issue' AND consumed = 0 "

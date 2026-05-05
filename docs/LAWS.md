@@ -610,7 +610,7 @@ phase-1 break-glass merge commit 仍应包含：
 
 判定规则：
 1. 配置修改前必须备份。
-2. 备份名必须包含源文件基名、`.bak` 标记与 UTC 时间戳（`YYYYMMDD-HHMMSS`）。
+2. 备份名必须包含源文件基名、`.bak` 标记与 UTC 时间戳（`YYYYMMDDTHHMMSSZ`，旧格式 `YYYYMMDD-HHMMSS` 仍兼容）。
 3. 备份路径与恢复目标可追溯。
 
 最小验收证据：

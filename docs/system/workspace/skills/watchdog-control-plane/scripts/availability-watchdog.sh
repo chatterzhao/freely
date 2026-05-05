@@ -128,7 +128,7 @@ write_codex_probe_artifact() {
   local project="$1" slot="$2" status="$3" output="$4"
   local artifacts_dir ts normalized_slot artifact
   artifacts_dir="$(codex_probe_artifacts_dir_for_project "$project")"
-  ts="$(date '+%Y%m%d-%H%M%S')"
+  ts="$(date -u '+%Y%m%dT%H%M%SZ')"
   normalized_slot="$(normalize_codex_slot_name "${slot:-unknown-slot}")"
   mkdir -p "$artifacts_dir"
   artifact="$artifacts_dir/codex-probe-${ts}-${normalized_slot}-${status}.log"
