@@ -9,7 +9,7 @@
 - priority: P0
 - status: promoted
 - milestone: M-20260306-workspace-routing-foundation
-- promoted_issue_path: pending://I-20260505T1210Z-A
+- promoted_issue_path: docs/issues/I-20260505T1210Z-A/issue.md
 
 ### 改动
 
@@ -32,6 +32,8 @@
 - candidate_id: C-20260505T1210Z-B
 - title: issue-sync cmd_close/cmd_create 只更新 platform_state
 - scope: bin/issue-sync 第522-543行（cmd_close）, 第377-401行（cmd_create）
+- next_action: 等待 C-A merge 后 promote
+- revisit_trigger: scan 常量修正合并到 develop
 - non_goals: 不改 promote/comment/update 逻辑
 - priority: P0
 - status: proposed
@@ -57,9 +59,11 @@
 - candidate_id: C-20260505T1210Z-C
 - title: governance-merge-gate 新增 platform_state vs phase_state 一致性门禁
 - scope: governance-merge-gate 新增 G1/G2/G3 + S1/S2/S3 门禁
+- next_action: 等待 C-B merge 后 promote
+- revisit_trigger: issue-sync 修复合并到 develop
 - non_goals: 不改变已有 gate 的行为
 - priority: P1
-- status: proposed
+- status: needs_research
 - milestone: M-20260306-workspace-routing-foundation
 - promoted_issue_path: pending://I-20260505T1210Z-C
 
@@ -98,9 +102,9 @@
 - scope: 一次性迁移脚本
 - non_goals: 不修改已有 status/phase_state 值
 - priority: P1
-- status: proposed
+- status: needs_research
 - milestone: M-20260306-workspace-routing-foundation
-- promoted_issue_path: pending://I-20260505T1210Z-A
+- promoted_issue_path: docs/issues/I-20260505T1210Z-A/issue.md
 
 ### 算法
 
