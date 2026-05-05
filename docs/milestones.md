@@ -53,7 +53,7 @@ routing_policy:
 0. `I-20260504T1132Z-A`
 - title: raw key 格式统一：所有代码接受 YYYYMMDDTHHMMZ 和 YYYYMMDD-HHMM 双格式
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/raw-key-format-unify/issues/I-20260504T1132Z-A.md`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/raw-key-format-unify/code-reviews`
@@ -64,7 +64,7 @@ routing_policy:
 1. `I-20260503-0200-A`
 - title: scan: switch to task-lifecycle-scan v2 with full lifecycle chain trace
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/scan-lifecycle-migration/issues/I-20260503-0200-A.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-scan-lifecycle-migration.md`
@@ -74,7 +74,7 @@ routing_policy:
 8. `I-20260502-0500-C`
 - title: Token 花费优化
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - priority: P0
 - issue_path: docs/epics/token-cost-optimization/issues/token-cost-optimization.md
 - progress_path: docs/progress/token-cost-optimization/p-token-cost-optimization.md
@@ -117,7 +117,7 @@ routing_policy:
 11. `I-20260503-0000-B`
 - title: feat: add fix-execution skill for rapid bug fix workflow
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/fix-execution-skill/issues/I-20260503-0000-B.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-fix-execution-skill.md`
@@ -132,7 +132,7 @@ routing_policy:
 12. `I-20260503-0115-A`
 - title: fix: sync acp-bridge hash-based socket paths across bash and Python
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/acp-bridge-path-sync/issues/I-20260503-0115-A.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-acp-bridge-path-sync.md`
@@ -179,7 +179,7 @@ routing_policy:
 25. `I-20260429-2000-A`
 - title: Gate dev experience: --range pre-flight + secret detection FP fix
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/gate-dev-experience-preflight/issues/I-20260429-2000-A.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-gate-dev-experience-preflight.md`
@@ -197,7 +197,7 @@ routing_policy:
 26. `I-20260503T0915Z-enforce-test-pre-merge`
 - title: Enforce test-pre-merge gate for ALL develop-bound merges
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/test-pre-merge-enforcement/issues/I-20260503T0915Z-enforce-test-pre-merge.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-enforce-test-pre-merge.md`
@@ -215,7 +215,7 @@ routing_policy:
 7. `I-20260502-0500-A`
 - title: Freely 打包与自举验证
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - priority: P0
 - issue_path: docs/epics/freely-packaging-selfhost/issues/freely-packaging-selfhost.md
 - progress_path: docs/progress/freely-packaging-selfhost/p-freely-packaging-selfhost.md
@@ -3835,7 +3835,7 @@ routing_policy:
 1. `I-20260416-0448-A`
 - title: MemArk protected-root bootstrap followthrough governance
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/freely-product-architecture/memark-protected-root-bootstrap-followthrough-governance/issues/memark-protected-root-bootstrap-followthrough-governance.md`
 - progress_path: `docs/progress/freely-product-architecture/p-memark-protected-root-bootstrap-followthrough-governance.md`
