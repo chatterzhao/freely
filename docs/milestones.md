@@ -50,17 +50,6 @@ routing_policy:
 - why_now: 这批项定义 Freely 如何发现上下文、读取 milestone、并路由到下一跳 skill；如果 milestone 自身不先落盘，Freely 的狗粮链路就是断的
 
 ### committed_issues
-0. `I-20260504T1132Z-A`
-- title: raw key 格式统一：所有代码接受 YYYYMMDDTHHMMZ 和 YYYYMMDD-HHMM 双格式
-- milestone_state: committed
-- phase_state: `completed`
-- priority: P0
-- issue_path: `docs/epics/workspace-routing-foundation/raw-key-format-unify/issues/I-20260504T1132Z-A.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/raw-key-format-unify/code-reviews`
-- progress_path: `docs/progress/workspace-routing-foundation/p-raw-key-format-unify.md`
-- source_candidate: `docs/pre-brainstorms/20260504T1132Z--raw-key-format-unify/candidates.md#C-20260504T1132Z-A`
-- next_action: `Merge to develop, then issue-sync close.`
-
 1. `I-20260503-0200-A`
 - title: scan: switch to task-lifecycle-scan v2 with full lifecycle chain trace
 - milestone_state: committed
@@ -849,6 +838,18 @@ routing_policy:
 - next_action: Candidate mirror only. Feature branch ready, test-pre-merge worktree created, pending selfhost verification and merge to develop.
 
 ### completed_issues
+
+0. `I-20260504T1132Z-A`
+- title: raw key 格式统一：所有代码接受 YYYYMMDDTHHMMZ 和 YYYYMMDD-HHMM 双格式
+- milestone_state: completed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/raw-key-format-unify/issues/I-20260504T1132Z-A.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-raw-key-format-unify.md`
+- pretests_path: `docs/epics/workspace-routing-foundation/raw-key-format-unify/pre-tests.md`
+- tasks_path: `docs/epics/workspace-routing-foundation/raw-key-format-unify/tasks.md`
+- source_candidate: `docs/pre-brainstorms/20260504T1132Z--raw-key-format-unify/candidates.md#C-20260504T1132Z-A`
+- completion_note: `18 files changed across code, scripts, and docs. All regex/glob patterns now accept both old (YYYYMMDD-HHMM) and new (YYYYMMDDTHHMMZ) formats. Merged to develop via test-pre-merge. GitHub #203 closed by issue-sync. Worktrees retired.`
 
 1. `I-20260421-1200-A`
 - title: Runtime daemon self-loop followthrough governance
