@@ -5618,7 +5618,7 @@ _route_chat_to_issue() {
 import re, sys
 msg = '''$message'''.lower()
 # Extract potential issue references from message (raw-xxx, I-xxx, #number)
-refs = re.findall(r'(?:raw-[\d-]+|I-[\d-]+[A-Za-z]*)', msg)
+refs = re.findall(r'(?:raw-[\dTZ-]+|I-[\dTZ-]+[A-Za-z]*)', msg)
 if refs:
     print(refs[0])
     sys.exit(0)
