@@ -32,13 +32,13 @@
 - candidate_id: C-20260505T1210Z-B
 - title: issue-sync cmd_close/cmd_create 只更新 platform_state
 - scope: bin/issue-sync 第522-543行（cmd_close）, 第377-401行（cmd_create）
-- next_action: 等待 C-A merge 后 promote
-- revisit_trigger: scan 常量修正合并到 develop
-- non_goals: 不改 promote/comment/update 逻辑
 - priority: P0
-- status: proposed
+- status: needs_research
+- next_action: 等待 C-A merge 到 develop 后 promote
+- revisit_trigger: scan 常量修正合并到 develop
 - milestone: M-20260306-workspace-routing-foundation
 - promoted_issue_path: pending://I-20260505T1210Z-B
+- non_goals: 不改 promote/comment/update 逻辑
 
 ### 改动
 
@@ -95,33 +95,6 @@
 
 ---
 
-## C-20260505T1210Z-D: 现有 issue 加 platform_state（迁移）
-
-- candidate_id: C-20260505T1210Z-D
-- title: 为所有已有 raw/I-* issue 补充 platform_state 字段
-- scope: 一次性迁移脚本
-- non_goals: 不修改已有 status/phase_state 值
-- priority: P1
-- status: needs_research
-- milestone: M-20260306-workspace-routing-foundation
-- promoted_issue_path: docs/issues/I-20260505T1210Z-A/issue.md
-
-### 算法
-
-```
-for each raw/I-* issue:
-  if platform_ids 非空:
-    query GitHub state → platform_state = open|closed
-  else:
-    platform_state = open  # 默认
-```
-
-### 注意
-
-- 已 absorbed 且平台已关的 raw: platform_state=closed, status=absorbed（符合预期）
-- 已 completed 且平台已关的 I-*: platform_state=closed, phase_state=completed（符合预期）
-
----
 
 ## 决策记录
 
