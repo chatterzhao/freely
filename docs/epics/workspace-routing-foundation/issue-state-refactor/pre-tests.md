@@ -106,3 +106,25 @@
 - target_lane: premerge-integration
 - promotion_gate: develop_merge
 
+### C1 - G1 blocks completed+open
+
+- id: C1
+- requirement: phase_state=completed 且 platform_state=open → gate block
+- evidence_level: integration
+- status: pass
+- artifact_ref: docs/epics/workspace-routing-foundation/issue-state-refactor/code-reviews/review-C.md
+- surface_kind: integration
+- target_lane: premerge-integration
+- promotion_gate: develop_merge
+
+### C2 - S3 blocks illegal phase_state
+
+- id: C2
+- requirement: phase_state 不在合法值集合中 → gate block
+- evidence_level: integration
+- status: pass
+- artifact_ref: docs/epics/workspace-routing-foundation/issue-state-refactor/code-reviews/review-C.md
+- surface_kind: integration
+- target_lane: premerge-integration
+- promotion_gate: develop_merge
+
