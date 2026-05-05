@@ -1407,12 +1407,15 @@ def main() -> int:
             continue
         with open(docs_issue_file) as f:
             docs_text = f.read()
-        fm = parse_frontmatter(docs_text) if docs_text.startswith("---") else {}
 
-        phase = fm.get("phase_state", "")
-        platform_state = fm.get("platform_state", "")
-        kind = fm.get("kind", "")
-        has_pids = bool(fm.get("platform_ids", {}).get("github", {}).get("issue_id", ""))
+        # Extract frontmatter fields via regex (avoid full YAML parser)
+        def _fm_get(text, key):
+            m = re.search(rf'^{key}:\s*["\']?(\S+)', text, re.MULTILINE)
+            return m.group(1).strip('"\'') if m else ""
+        phase = _fm_get(docs_text, "phase_state")
+        platform_state = _fm_get(docs_text, "platform_state")
+        kind = _fm_get(docs_text, "kind")
+        has_pids = bool(re.search(r'issue_id:\s*["\']?\d+', docs_text))
 
         # S3: phase_state must be in legal set per kind
         legal_set = LEGAL_RAW_PHASE if kind == "raw" else LEGAL_LINKED_PHASE if kind == "linked" else set()
