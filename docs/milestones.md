@@ -57,6 +57,7 @@ routing_policy:
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/raw-key-format-unify/issues/I-20260504T1132Z-A.md`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/raw-key-format-unify/code-reviews`
+- progress_path: `docs/progress/workspace-routing-foundation/p-raw-key-format-unify.md`
 - source_candidate: `docs/pre-brainstorms/20260504T1132Z--raw-key-format-unify/candidates.md#C-20260504T1132Z-A`
 - next_action: `Merge to develop, then issue-sync close.`
 

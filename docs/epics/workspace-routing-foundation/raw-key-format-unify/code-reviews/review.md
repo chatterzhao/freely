@@ -3,7 +3,7 @@
 - reviewer: `subagent`
 - verdict: `approved`
 - reviewed_at: `2026-05-05T00:00:00Z`
-- owner_issue: `docs/issues/I-20260504T1132Z-A/issue.md`
+- owner_issue: `I-20260504T1132Z-A`
 - candidate_ref: `docs/pre-brainstorms/20260504T1132Z--raw-key-format-unify/candidates.md#C-20260504T1132Z-A`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/raw-key-format-unify/code-reviews`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/raw-key-format-unify/pre-tests.md`
