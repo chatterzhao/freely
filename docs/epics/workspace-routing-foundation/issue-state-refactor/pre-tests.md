@@ -47,7 +47,7 @@
 - id: A1
 - requirement: TERMINAL_RAW={absorbed,dropped}, DONE_STATES={done_b2_ibm,completed}, ACTIVE_B2={in_b2_ibm,done_b2_ibm,in_dev,blocked_dev}
 - evidence_level: integration
-- status: not_applicable
+- status: pass
 - artifact_ref: docs/epics/workspace-routing-foundation/issue-state-refactor/code-reviews/review.md
 - surface_kind: integration
 - target_lane: premerge-integration
