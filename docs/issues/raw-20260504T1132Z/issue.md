@@ -2,7 +2,7 @@
 local_id: raw-20260504T1132Z
 issue_title: "raw key 格式规范重构：统一为 YYYYMMDDTHHMMZ 分钟精度"
 kind: raw
-status: absorbed
+phase_state: absorbed
 absorbed_into: I-20260504T1132Z-A
 platform_ids:
   github:
@@ -15,6 +15,7 @@ intake_id: 20260504T1132Z-raw-key-format
 author: human
 channel: github
 session_refs: []
+platform_state: 
 ---
 
 ## 问题

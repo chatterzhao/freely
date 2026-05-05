@@ -1,7 +1,6 @@
 ---
 local_id: I-20260413-0420-B
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:27:18Z"
 updated_at: "2026-04-27T11:27:18Z"
+platform_state: 
 ---
 
 Canonical `develop` now has the two prerequisite truths for this lane:

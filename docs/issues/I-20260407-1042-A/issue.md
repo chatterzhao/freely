@@ -1,7 +1,6 @@
 ---
 local_id: I-20260407-1042-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:26:06Z"
 updated_at: "2026-04-27T11:26:06Z"
+platform_state: 
 ---
 
 Freely has already contracted durable source families to `human interruption` and `external issue`, but the runtime-facing source contract still exposes the older loose `github issue` wording and does not yet freeze how raw external issues become canonical intake.

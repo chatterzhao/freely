@@ -1,7 +1,6 @@
 ---
 local_id: I-20260321-1835-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:15:56Z"
 updated_at: "2026-04-27T11:15:56Z"
+platform_state: 
 ---
 
 当前 develop merge gate 已经修掉了 hook 时序缺口，但还存在第二层漏洞：

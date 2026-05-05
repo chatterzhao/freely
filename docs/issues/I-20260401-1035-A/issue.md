@@ -1,7 +1,6 @@
 ---
 local_id: I-20260401-1035-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:21:45Z"
 updated_at: "2026-04-27T11:21:45Z"
+platform_state: 
 ---
 
 Freely already protects branch topology and develop-bound merges, but still lacks canonical truth for the interval after a local protected-branch merge and before the corresponding remote push. That gap creates two risks:

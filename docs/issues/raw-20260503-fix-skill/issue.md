@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260503-fix-skill
 kind: raw
-status: absorbed
+phase_state: absorbed
 absorbed_into: I-20260503-0000-B
 platform_ids:
   github: {}
@@ -16,6 +16,7 @@ intake_id: 20260503-fix-skill
 author: human
 channel: chat
 session_refs: []
+platform_state: ''
 ---
 
 Add fix-execution skill for rapid bug fix workflow with pre-merge isolation and incremental hotfix commits.

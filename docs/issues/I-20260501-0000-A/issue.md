@@ -2,7 +2,6 @@
 local_id: I-20260501-0000-A
 issue_title: "PR scan surface + FREELY_REPO_PLATFORMS config"
 kind: linked
-status: in_verification
 phase_state: in_verification
 promoted_from: raw-20260501-0000
 platform_ids:
@@ -18,4 +17,5 @@ created_at: "2026-05-01T00:00:00Z"
 updated_at: "2026-05-03T15:30:00Z"
 session_refs:
   - {tool: ccds, session_id: "20260501-scan-pr-platform", role: "author"}
+platform_state: ''
 ---

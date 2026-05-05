@@ -1,7 +1,6 @@
 ---
 local_id: I-20260402-0540-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:23:00Z"
 updated_at: "2026-04-27T11:23:00Z"
+platform_state: 
 ---
 
 Freely 已经在 pre-brainstorm 和 IBM 层解决了“为什么值得做”和“issue 边界如何冻结”的 thoughtfulness，但在 dev-loop 的实现层还缺一块稳定真源：

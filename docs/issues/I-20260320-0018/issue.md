@@ -1,7 +1,6 @@
 ---
 local_id: I-20260320-0018
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:14:16Z"
 updated_at: "2026-04-27T11:14:16Z"
+platform_state: 
 ---
 
 Freely 的 CLI-first 人类入口已经可用，但默认项目解析仍然需要被固定为：

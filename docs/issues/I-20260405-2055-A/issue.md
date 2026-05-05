@@ -1,7 +1,6 @@
 ---
 local_id: I-20260405-2055-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:25:05Z"
 updated_at: "2026-04-27T11:25:05Z"
+platform_state: 
 ---
 
 Freely 已经为 `freely start` 冻结了 shared codex slot-switch lock 的 startup preflight，也已经为 project command family 冻结了 `restart` 的语义层级；但两者之间仍留了一个真实缺口：当 restart 将要被 active shared lock 阻塞时，当前 project runtime 仍可能先被停掉，再发现下一次启动无法前进。对于 dogfood 中的真实运行项目，这个顺序错误会把“有界失败”升级成“可避免的 runtime 中断”。

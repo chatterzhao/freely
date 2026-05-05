@@ -2,7 +2,6 @@
 local_id: I-20260503-0000-B
 issue_title: 'feat: add fix-execution skill for rapid bug fix workflow'
 kind: linked
-status: completed
 phase_state: completed
 promoted_from: raw-20260503-fix-skill
 platform_ids:

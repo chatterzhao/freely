@@ -1,7 +1,6 @@
 ---
 local_id: I-20260406-1829-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:25:49Z"
 updated_at: "2026-04-27T11:25:49Z"
+platform_state: 
 ---
 
 Freely 已经把 Codex API-key slot bundle、provider-aware probe routing、以及 runtime network-failure taxonomy 分别冻结为 canonical contract，但 dogfood 现场仍暴露一个新边界：

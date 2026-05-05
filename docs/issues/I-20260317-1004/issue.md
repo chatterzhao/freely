@@ -1,7 +1,6 @@
 ---
 local_id: I-20260317-1004
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:13:19Z"
 updated_at: "2026-04-27T11:13:19Z"
+platform_state: 
 ---
 
 `Frontend Probe v0` 在实现中已经暴露出一个独立基础设施缺口：缺少真实 frontend build/runtime baseline，导致后续工作无法从骨架阶段进入可运行宿主阶段。

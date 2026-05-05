@@ -1,7 +1,6 @@
 ---
 local_id: I-20260331-2012-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:21:35Z"
 updated_at: "2026-04-27T11:21:35Z"
+platform_state: 
 ---
 
 Freely 已经把两条规则写成 canonical truth：

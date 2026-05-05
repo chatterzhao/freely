@@ -1,7 +1,6 @@
 ---
 local_id: I-20260417-0445-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:27:54Z"
 updated_at: "2026-04-27T11:27:54Z"
+platform_state: 
 ---
 
 Live process inspection showed the runtime leak was not one isolated leftover pid. The bounded defect was that user-facing start semantics, startup lock truth, same-project watcher discovery, and AI failure cleanup were still loose enough to let repeated starts rebuild or relaunch partial runtime state after users thought the runtime had stopped.

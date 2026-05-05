@@ -1,7 +1,6 @@
 ---
 local_id: I-20260318-1825
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:13:54Z"
 updated_at: "2026-04-27T11:13:54Z"
+platform_state: 
 ---
 
 Freely 已有 checkpoint-guard、fleet-status 与 manager/worker 角色边界，但还缺一条更主动的自治控制面：

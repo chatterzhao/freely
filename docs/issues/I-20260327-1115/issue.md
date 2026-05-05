@@ -1,7 +1,6 @@
 ---
 local_id: I-20260327-1115
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:18:05Z"
 updated_at: "2026-04-27T11:18:05Z"
+platform_state: 
 ---
 
 `I-20260318-1630` 已完成的 canonical contract 建立了：

@@ -1,7 +1,6 @@
 ---
 local_id: I-20260318-1408
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:13:40Z"
 updated_at: "2026-04-27T11:13:40Z"
+platform_state: 
 ---
 
 Freely 已经具备局部的 worker supervision、account switch、session rotation 和 fleet status，但此前仍需要人工提醒才发现主管和 worker 实际已经停摆。这说明 Freely 缺：

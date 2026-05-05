@@ -1,7 +1,6 @@
 ---
 local_id: I-20260405-1415-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:24:28Z"
 updated_at: "2026-04-27T11:24:28Z"
+platform_state: 
 ---
 
 Freely 已经在当前 Codex owner 中冻结了长期方向: tool auth/switch/probe 应逐步抽成 standalone `ai-switch-cli` backend，而 Freely 保持 control plane / orchestration / priority / recovery policy。现在缺的不是“是否要拆”，而是：

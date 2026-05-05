@@ -1,7 +1,6 @@
 ---
 local_id: I-20260405-1805-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:24:42Z"
 updated_at: "2026-04-27T11:24:42Z"
+platform_state: 
 ---
 
 `I-20260405-1615-A` 已经把新的 promote model 冻结成正式 owner，但当前仓库执行的仍是旧规则：

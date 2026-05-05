@@ -13,6 +13,7 @@ canonical_issue_path: docs/epics/workspace-routing-foundation/issue-state-refact
 created_at: '2026-05-05T12:10:02Z'
 updated_at: '2026-05-05T12:10:02Z'
 session_refs: []
+platform_state: 
 ---
 
 ## Scope

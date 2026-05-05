@@ -1,7 +1,6 @@
 ---
 local_id: I-20260413-0420-C
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:27:23Z"
 updated_at: "2026-04-27T11:27:23Z"
+platform_state: 
 ---
 
 Canonical repo truth showed a narrow closeout drift: `I-20260413-0420-B` and `I-20260413-0420-C` were already marked completed in milestone and progress records even though their sibling `tasks.md` files still carried unchecked closeout items.

@@ -1,7 +1,6 @@
 ---
 local_id: I-20260419-0210-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:28:04Z"
 updated_at: "2026-04-27T11:28:04Z"
+platform_state: 
 ---
 
 Freely already declares `./bin/merge-guarded` as the canonical protected-merge entrypoint, but the current enforcement only covers merge-commit creation and merge completion. A real protected-root replay on `2026-04-19` proved that `git merge --ff-only` can still advance `develop` directly to a feature commit because no merge commit is created and `pre-merge-commit` never runs.

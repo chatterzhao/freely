@@ -1,7 +1,6 @@
 ---
 local_id: I-20260408-1200-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:26:13Z"
 updated_at: "2026-04-27T11:26:13Z"
+platform_state: 
 ---
 
 Freely 已经能显式暴露 `push_pending` / `push_deferred`，但还没有冻结更强的 followthrough 语义：

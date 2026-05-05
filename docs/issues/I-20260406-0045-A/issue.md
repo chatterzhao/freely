@@ -1,7 +1,6 @@
 ---
 local_id: I-20260406-0045-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:25:33Z"
 updated_at: "2026-04-27T11:25:33Z"
+platform_state: 
 ---
 
 一次真实的 `feature/* -> test-pre-merge-* -> develop` promote 后，`./bin/governance-check` 在 canonical `develop` 上误报：

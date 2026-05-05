@@ -1,7 +1,6 @@
 ---
 local_id: I-20260411-0217-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:26:36Z"
 updated_at: "2026-04-27T11:26:36Z"
+platform_state: 
 ---
 
 Canonical `develop` is red on a real protected-ancestry receipt-gap class that the existing owner intentionally left out of scope: six trailerless ancestry merges under `test-pre-merge-20260410-preferred-auth-fix` have generic subjects (`Merge`, `Merge fix`, `Merge updates`, `Merge complete pre-brainstorm`) and therefore cannot be validated by the current subject-matched backfill contract.

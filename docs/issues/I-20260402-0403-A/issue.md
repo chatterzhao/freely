@@ -1,7 +1,6 @@
 ---
 local_id: I-20260402-0403-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:22:47Z"
 updated_at: "2026-04-27T11:22:47Z"
+platform_state: 
 ---
 
 Freely already completed the product contract and the first tool-materialization slice, but canonical `develop` still carries legacy tracked bootstrap truth:

@@ -1,7 +1,6 @@
 ---
 local_id: I-20260418-1900-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:27:59Z"
 updated_at: "2026-04-27T11:27:59Z"
+platform_state: 
 ---
 
 Canonical `develop` already absorbed the runtime lifecycle implementation owner and pushed it upstream. The remaining defect is governance-only: post-merge replay found two missing receipt-gap backfills for historical merges inside `test-pre-merge-runtime-lifecycle-20260417`.

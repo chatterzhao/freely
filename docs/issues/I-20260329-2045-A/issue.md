@@ -1,7 +1,6 @@
 ---
 local_id: I-20260329-2045-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:21:17Z"
 updated_at: "2026-04-27T11:21:17Z"
+platform_state: 
 ---
 
 `bin/ai` 的账号成功路径当前暴露了一个独立于账号池可用性和 OAuth 成功率的命令生命周期问题：

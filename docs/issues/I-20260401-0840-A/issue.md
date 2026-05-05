@@ -1,7 +1,6 @@
 ---
 local_id: I-20260401-0840-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:21:42Z"
 updated_at: "2026-04-27T11:21:42Z"
+platform_state: 
 ---
 
 Freely 最早的 availability-manager 研究和 `20260331-1840` brainstorm 都要求同一条恢复状态机：

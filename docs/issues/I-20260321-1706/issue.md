@@ -1,7 +1,6 @@
 ---
 local_id: I-20260321-1706
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:15:34Z"
 updated_at: "2026-04-27T11:15:34Z"
+platform_state: 
 ---
 
 真实狗粮表明：worker 工位在 `operator_stop` 后，`freely chat` 虽然能 durable 接住新 signal，并通过 interruption dispatcher 归类成 delegated continuation / verification handoff，但不会把 worker 主循环重新拉起，导致插话只堆积在 intake，没人真正接棒。

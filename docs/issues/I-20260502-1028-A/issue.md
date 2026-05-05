@@ -2,7 +2,6 @@
 local_id: I-20260502-1028-A
 issue_title: 'fix: clean stale start lock before daemon stop'
 kind: linked
-status: completed
 phase_state: completed
 promoted_from: raw-20260502-1028
 platform_ids:
@@ -22,6 +21,7 @@ session_refs:
 - tool: ccds
   session_id: 20260502-stale-lock
   role: author
+platform_state: 
 ---
 
 ## Summary

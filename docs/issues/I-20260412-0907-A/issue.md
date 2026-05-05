@@ -1,7 +1,6 @@
 ---
 local_id: I-20260412-0907-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:26:53Z"
 updated_at: "2026-04-27T11:26:53Z"
+platform_state: 
 ---
 
 Real dogfooding on 2026-04-12 exposed a narrower follow-on regression in the already completed Codex recovery family:

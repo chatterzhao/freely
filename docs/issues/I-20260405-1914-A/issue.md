@@ -1,7 +1,6 @@
 ---
 local_id: I-20260405-1914-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:24:48Z"
 updated_at: "2026-04-27T11:24:48Z"
+platform_state: 
 ---
 
 当前仓库已经把测试 lane 语义写进 `AGENTS.md`、`LAWS.md` 和 skills，并出现了 `./bin/test-lane` 的实现雏形，但这批能力还没有正式 owner 链路。

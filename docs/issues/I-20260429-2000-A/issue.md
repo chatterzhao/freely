@@ -2,7 +2,6 @@
 local_id: I-20260429-2000-A
 issue_title: 'Gate dev experience: --range pre-flight + secret detection FP fix'
 kind: linked
-status: completed
 phase_state: completed
 promoted_from: raw-20260429-2000
 platform_ids:

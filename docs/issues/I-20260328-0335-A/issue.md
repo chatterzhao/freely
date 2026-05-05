@@ -1,7 +1,6 @@
 ---
 local_id: I-20260328-0335-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:21:04Z"
 updated_at: "2026-04-27T11:21:04Z"
+platform_state: 
 ---
 
 `I-20260323-1705-A` 已经把 manager delegated continuation stall recovery 收紧到 `same-lane busy` 的 lawful wait 边界，但真实 dogfood 继续暴露出更深一层的问题：

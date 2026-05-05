@@ -1,7 +1,6 @@
 ---
 local_id: I-20260413-0208-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:27:07Z"
 updated_at: "2026-04-27T11:27:07Z"
+platform_state: 
 ---
 
 Freely 当前的产品心智与运行时入口 contract 仍存在一条会误导用户和未来 UI 接口的错位：

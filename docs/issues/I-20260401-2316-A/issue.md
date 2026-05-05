@@ -1,7 +1,6 @@
 ---
 local_id: I-20260401-2316-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:22:24Z"
 updated_at: "2026-04-27T11:22:24Z"
+platform_state: 
 ---
 
 `I-20260401-1303-A-2` already froze the activation-consent and tool materialization contract for `cc:auto`. The remaining failure on canonical `develop` is not a new product question; it is a stale test invocation on the `cc:auto + --tool-adapter acp` init path.

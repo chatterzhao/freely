@@ -1,7 +1,6 @@
 ---
 local_id: I-20260405-1215-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:24:14Z"
 updated_at: "2026-04-27T11:24:14Z"
+platform_state: 
 ---
 
 Freely 现在能把 runtime signal 暴露到 Tauri/frontend，但还没有一条稳定的自治声音能力链路。

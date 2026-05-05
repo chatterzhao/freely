@@ -1,7 +1,6 @@
 ---
 local_id: I-20260320-0500
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:14:20Z"
 updated_at: "2026-04-27T11:14:20Z"
+platform_state: 
 ---
 
 Freely 已经要求 pre-brainstorm candidate 进入 milestone，但 candidate 过去缺少稳定的 acceptance boundary，也缺少 promotion 前的规范化独立 review 记录。这样会导致 candidate promotion、IBM materialization 与后续验收边界都依赖临场判断。

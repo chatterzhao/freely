@@ -1,7 +1,6 @@
 ---
 local_id: I-20260403-2041-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:23:15Z"
 updated_at: "2026-04-27T11:23:15Z"
+platform_state: 
 ---
 
 Freely already knows that owner development must stay in sibling feature worktrees, and it already distinguishes project-scoped command semantics from shared/global restart state. What it still lacks is a lawful runtime path for the case where the current operator sandbox cannot write the default `$FREELY_HOME` and cannot run `/bin/ps`.

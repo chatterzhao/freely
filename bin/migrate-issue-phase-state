@@ -2,13 +2,15 @@
 """One-shot migration: rename status→phase_state for raw issues,
 add platform_state to all raw/I-* issues."""
 from pathlib import Path
-import re, subprocess, sys
+import os, re, subprocess, sys
 
 PROJECT = Path(sys.argv[1]) if len(sys.argv) > 1 else Path.cwd()
 ISSUES_DIR = PROJECT / "docs" / "issues"
 
 def github_state(issue_number: str) -> str:
     """Query GitHub issue state. Returns 'open', 'closed', or '' on failure."""
+    if os.environ.get("SKIP_PLATFORM_CHECK"):
+        return ""
     try:
         r = subprocess.run(
             ["gh", "issue", "view", issue_number, "--repo", "chatterzhao/freely",
@@ -32,15 +34,25 @@ for d in sorted(ISSUES_DIR.iterdir()):
     changed = False
     name = d.name
 
-    # 1. Rename status: → phase_state: for raw issues
+    # 1. raw: if phase_state exists, just remove status. Otherwise rename status → phase_state.
     if name.startswith("raw-") and re.search(r'^status:', fm, re.MULTILINE):
-        fm = re.sub(r'^status:', 'phase_state:', fm, flags=re.MULTILINE)
-        changed = True
-        print(f"[migrate] {name}: status → phase_state")
+        if re.search(r'^phase_state:', fm, re.MULTILINE):
+            fm = re.sub(r'^status:.*\n', '', fm, flags=re.MULTILINE)
+            changed = True
+            print(f"[migrate] {name}: removed duplicate status (phase_state exists)")
+        else:
+            fm = re.sub(r'^status:', 'phase_state:', fm, flags=re.MULTILINE)
+            changed = True
+            print(f"[migrate] {name}: status → phase_state")
 
-    # 2. Add platform_state if missing
+    # 2. I-*: remove status field (only phase_state + platform_state remain)
+    if name.startswith("I-") and re.search(r'^status:', fm, re.MULTILINE):
+        fm = re.sub(r'^status:.*\n', '', fm, flags=re.MULTILINE)
+        changed = True
+        print(f"[migrate] {name}: removed status")
+
+    # 3. Add platform_state if missing
     if "platform_state:" not in fm:
-        # Check if platform_ids has a github issue_id
         m = re.search(r'issue_id:\s*["\']?(\d+)["\']?', fm)
         if m and m.group(1):
             state = github_state(m.group(1))

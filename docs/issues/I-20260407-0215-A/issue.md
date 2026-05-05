@@ -1,7 +1,6 @@
 ---
 local_id: I-20260407-0215-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:26:02Z"
 updated_at: "2026-04-27T11:26:02Z"
+platform_state: 
 ---
 
 This owner was opened because canonical root `develop` showed a narrow but reusable self-host supervision gap:

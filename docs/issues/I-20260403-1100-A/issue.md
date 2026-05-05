@@ -1,7 +1,6 @@
 ---
 local_id: I-20260403-1100-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:23:09Z"
 updated_at: "2026-04-27T11:23:09Z"
+platform_state: 
 ---
 
 `develop` 目前累积了一批在旧治理门禁放宽时期进入主线的 legacy governance drift。随着 `governance-merge-gate` 最近多轮收紧，这些历史断裂不再只是“文档有点旧”，而是直接阻塞 canonical `develop` 的 push 和后续 promotion followthrough。

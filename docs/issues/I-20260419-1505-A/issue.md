@@ -1,7 +1,6 @@
 ---
 local_id: I-20260419-1505-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:28:19Z"
 updated_at: "2026-04-27T11:28:19Z"
+platform_state: 
 ---
 
 The checkpoint branch `feature/checkpoint-lifecycle-trace-debuggability-20260419` preserves bounded runtime behavior that `develop` does not yet own:

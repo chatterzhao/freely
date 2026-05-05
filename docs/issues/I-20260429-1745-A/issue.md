@@ -2,7 +2,6 @@
 local_id: I-20260429-1745-A
 issue_title: Fix daemon self-detection suicide + bash 3.2 pipefail crash
 kind: linked
-status: completed
 phase_state: completed
 promoted_from: raw-20260429-1745
 platform_ids:

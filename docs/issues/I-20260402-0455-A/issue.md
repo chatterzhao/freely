@@ -1,7 +1,6 @@
 ---
 local_id: I-20260402-0455-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:22:51Z"
 updated_at: "2026-04-27T11:22:51Z"
+platform_state: 
 ---
 
 Freely 已经有 manager-first worker scheduling、fleet patrol、hygiene alert、cleanup followthrough、issue-bound merge gate 和 PID/session ownership 校验，但这些真相之间还缺一个长期可消费的 ownership surface：

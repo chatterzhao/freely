@@ -1,7 +1,6 @@
 ---
 local_id: I-20260328-0745-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:21:08Z"
 updated_at: "2026-04-27T11:21:08Z"
+platform_state: 
 ---
 
 `live-status` is the current-state entrypoint, but it could surface an internally contradictory answer:

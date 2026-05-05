@@ -1,7 +1,6 @@
 ---
 local_id: I-20260318-0930
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:13:23Z"
 updated_at: "2026-04-27T11:13:23Z"
+platform_state: 
 ---
 
 Freely 当前已经会 worktree 隔离、session handoff、rate-limit account switch，但仍不会像项目负责人一样管理多个工位：

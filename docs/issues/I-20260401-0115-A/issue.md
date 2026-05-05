@@ -1,7 +1,6 @@
 ---
 local_id: I-20260401-0115-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:21:39Z"
 updated_at: "2026-04-27T11:21:39Z"
+platform_state: 
 ---
 
 Freely already turned artifact exposure and execution-boundary review into machine-enforced truth, but one real security baseline topic remains unmaterialized: supply-chain and install-intake hygiene. Right now there is no canonical audit for lockfile presence, risky direct dependency specifiers, install lifecycle hooks, or mutable GitHub Action refs.

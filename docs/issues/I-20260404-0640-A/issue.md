@@ -1,7 +1,6 @@
 ---
 local_id: I-20260404-0640-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:23:39Z"
 updated_at: "2026-04-27T11:23:39Z"
+platform_state: 
 ---
 
 Freely 已经要求 protected-branch merge 写 canonical receipt trailer，也已经对 break-glass merge 建好了 ledger parity audit。但 `develop` ancestry 里仍然出现了一个普通 guarded merge `908a6ad` 没有任何 canonical trailer。当前 `governance-check` 没有对应 ancestry audit，也没有普通 merge 的 backfill 真源，因此这类 gap 只能靠人工 review 暴露。

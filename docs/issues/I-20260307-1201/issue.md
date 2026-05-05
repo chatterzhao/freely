@@ -1,7 +1,6 @@
 ---
 local_id: I-20260307-1201
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:13:15Z"
 updated_at: "2026-04-27T11:13:15Z"
+platform_state: 
 ---
 
 收紧 Freely 自举时的整体路由逻辑，确保：

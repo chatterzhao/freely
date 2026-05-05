@@ -1,7 +1,6 @@
 ---
 local_id: I-20260402-0308-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:22:41Z"
 updated_at: "2026-04-27T11:22:41Z"
+platform_state: 
 ---
 
 `I-20260402-0308-A` already froze the correct rule for human-readable runtime time display: render in the host system timezone and include a timezone label, while preserving UTC naming truth and RFC3339/epoch machine truth. A repo-wide audit found one remaining display leak in the loop log header. The timestamp is already host-local, but it still omits the timezone label.

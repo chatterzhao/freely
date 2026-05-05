@@ -1,7 +1,6 @@
 ---
 local_id: I-20260408-1205-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:26:16Z"
 updated_at: "2026-04-27T11:26:16Z"
+platform_state: 
 ---
 
 `C-20260407-0603-A` was a real research packet, but later work proved it should stay dropped rather than reopen as a mixed-owner governance issue. The remaining develop-bound diff is now only a closure problem: record the retirement decision, carry protected-branch verification evidence, and retire the obsolete dedicated research worktree.

@@ -1,7 +1,6 @@
 ---
 local_id: I-20260412-0225-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:26:51Z"
 updated_at: "2026-04-27T11:26:51Z"
+platform_state: 
 ---
 
 当前 `develop` 门禁已经能 fail-close，但 closeout adequacy contract 仍然分散在三处：

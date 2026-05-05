@@ -1,7 +1,6 @@
 ---
 local_id: I-20260406-1851-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:25:53Z"
 updated_at: "2026-04-27T11:25:53Z"
+platform_state: 
 ---
 
 Freely 还缺一个受治理约束的 Codex-first interactive login contract。当前 dirty implementation 已经证明这条 UX follow-on 足够具体，但它仍悬空在未归档实现树里：

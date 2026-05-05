@@ -1,7 +1,6 @@
 ---
 local_id: I-20260419-0915-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:28:15Z"
 updated_at: "2026-04-27T11:28:15Z"
+platform_state: 
 ---
 
 The whole-app lifecycle model is important enough that Freely should maintain exactly one detailed truth source for it. The active docs refactor already pushes the detailed semantics into `docs/system/workspace/three-loop-capability-lifecycle.md` and reduces other consumer documents to lighter references plus read/sync expectations.

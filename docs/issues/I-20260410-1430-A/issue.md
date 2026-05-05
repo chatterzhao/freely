@@ -1,7 +1,6 @@
 ---
 local_id: I-20260410-1430-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:26:25Z"
 updated_at: "2026-04-27T11:26:25Z"
+platform_state: 
 ---
 
 When switching from an apikey slot to an account slot, the `preferred_auth_method` field is deleted from live `~/.codex/config.toml` but not restored. This happens because account slots have empty `config-auth.toml` fragments.

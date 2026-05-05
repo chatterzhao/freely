@@ -1,7 +1,6 @@
 ---
 local_id: I-20260405-0425-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:24:04Z"
 updated_at: "2026-04-27T11:24:04Z"
+platform_state: 
 ---
 
 Freely 已经有 `./bin/merge-guarded` 作为 merge 真源，但 `develop` 上的 `pre-merge-commit` 仍允许“没有 canonical guarded handshake 的 merge”继续走后续 gate。结果是：

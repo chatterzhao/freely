@@ -2,7 +2,7 @@
 local_id: raw-20260505T1210Z
 issue_title: "issue 状态字段重构：分离 platform_state 和 phase_state，统一 raw/I-* 字段规范"
 kind: raw
-status: proposed
+phase_state: proposed
 platform_ids:
   github:
     issue_id: '214'
@@ -14,6 +14,7 @@ intake_id: 20260505T1210Z-issue-state-refactor
 author: human
 channel: github
 session_refs: []
+platform_state: 
 ---
 
 ## 问题

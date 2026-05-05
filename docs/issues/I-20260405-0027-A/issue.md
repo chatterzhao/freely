@@ -1,7 +1,6 @@
 ---
 local_id: I-20260405-0027-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:23:58Z"
 updated_at: "2026-04-27T11:23:58Z"
+platform_state: 
 ---
 
 Freely 已经把 slot inventory、slot-first recovery、OAuth inventory sweep、launch-time confirmation 和 bounded network taxonomy 分别冻结为 canonical contract，但 Codex live auth truth 仍停留在 `~/.codex/auth.json` copy-in/copy-out。这个模型无法覆盖已经真实存在的 API-key/provider 模式，因为可用性与切换正确性同时依赖：

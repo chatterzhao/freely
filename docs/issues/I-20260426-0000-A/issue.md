@@ -1,7 +1,6 @@
 ---
 local_id: I-20260426-0000-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: '2026-04-29'
 platform_ids:
@@ -22,6 +21,7 @@ created_at: '2026-04-27T11:11:27Z'
 updated_at: '2026-04-27T11:11:27Z'
 phase_state: completed
 issue_title: Add opencode direct launcher and AI_TOOL alias resolution
+platform_state: 
 ---
 
 # Issue: tool-alias-and-opencode-launcher-governance

@@ -1,7 +1,6 @@
 ---
 local_id: I-20260401-1703-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:22:08Z"
 updated_at: "2026-04-27T11:22:08Z"
+platform_state: 
 ---
 
 ACP boundary 已经收口，但 runtime 现在还没有 first-class `adapter axis`。

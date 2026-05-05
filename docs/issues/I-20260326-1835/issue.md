@@ -1,7 +1,6 @@
 ---
 local_id: I-20260326-1835
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:17:40Z"
 updated_at: "2026-04-27T11:17:40Z"
+platform_state: 
 ---
 
 Freely 在自举开发中已经形成了两层真源：

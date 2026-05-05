@@ -1,7 +1,6 @@
 ---
 local_id: I-20260404-0119-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:23:27Z"
 updated_at: "2026-04-27T11:23:27Z"
+platform_state: 
 ---
 
 The active milestone still keeps several completed owners in `committed_issues`. That conflicts with milestone policy and leaves the main orchestration surface with stale sequencing truth.

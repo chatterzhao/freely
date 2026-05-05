@@ -1,7 +1,6 @@
 ---
 local_id: I-20260402-1912-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:23:05Z"
 updated_at: "2026-04-27T11:23:05Z"
+platform_state: 
 ---
 
 `I-20260402-0020-A` 已经把 protected-branch break-glass 的 phase-1 contract 合入 canonical `develop`，但 closeout 后仍有 residual hardening 没有 owner：

@@ -1,7 +1,6 @@
 ---
 local_id: I-20260414-0255-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:27:41Z"
 updated_at: "2026-04-27T11:27:41Z"
+platform_state: 
 ---
 
 真实 `freely start` 重放已经把这条 lane 的问题收敛到一个更窄、更准确的根因：

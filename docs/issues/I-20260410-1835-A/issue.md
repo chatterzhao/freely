@@ -1,7 +1,6 @@
 ---
 local_id: I-20260410-1835-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:26:29Z"
 updated_at: "2026-04-27T11:26:29Z"
+platform_state: 
 ---
 
 The observed miss was not that Freely lacked tests in the abstract. High-level truth already required `Unit / Integration / End-to-End / Real-Environment`, and the gates already checked that those sections existed. The gap was narrower and more serious:

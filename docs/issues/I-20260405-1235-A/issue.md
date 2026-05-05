@@ -1,7 +1,6 @@
 ---
 local_id: I-20260405-1235-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:24:22Z"
 updated_at: "2026-04-27T11:24:22Z"
+platform_state: 
 ---
 
 Freely 已经冻结了 activation consent、默认自治 posture、以及一部分 per-tool materialization，但还缺一条独立 owner 来回答更具体的产品问题：

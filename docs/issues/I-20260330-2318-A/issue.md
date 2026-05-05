@@ -1,7 +1,6 @@
 ---
 local_id: I-20260330-2318-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:21:22Z"
 updated_at: "2026-04-27T11:21:22Z"
+platform_state: 
 ---
 
 `develop` live validation finally proved the false `already_running_attach` path. After a correct `tool_auto_switch_selected previous_tool=kiro-cli active_tool=codex`, the manager bootstrap immediately emitted `supervisor_attach_reuse ... ai_pid_state=missing role_hint=manager` and rewrote workcell state to `running/up/up/already_running_attach`.

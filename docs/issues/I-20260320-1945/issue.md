@@ -1,7 +1,6 @@
 ---
 local_id: I-20260320-1945
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:14:37Z"
 updated_at: "2026-04-27T11:14:37Z"
+platform_state: 
 ---
 
 Freely 已经有 runtime watchdog、manager continuity、interruption intake 和 fleet supervision，但还没有一个统一的“当前态控制面”。

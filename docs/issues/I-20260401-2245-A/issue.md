@@ -1,7 +1,6 @@
 ---
 local_id: I-20260401-2245-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:22:19Z"
 updated_at: "2026-04-27T11:22:19Z"
+platform_state: 
 ---
 
 Freely has already converged on a broader security direction: automation and enforced workflow should replace operator memory wherever possible. But the current repo still has a very practical gap:

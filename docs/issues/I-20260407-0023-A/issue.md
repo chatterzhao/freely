@@ -1,7 +1,6 @@
 ---
 local_id: I-20260407-0023-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:25:59Z"
 updated_at: "2026-04-27T11:25:59Z"
+platform_state: 
 ---
 
 Codex account/apikey bundle truth is already owned, but dogfooding exposed one remaining fallback gap after that owner closed: if the OAuth sweep returns `all_unavailable:*`, Freely still stops before exec-probing saved `apikey-*` slots. That violates the narrower contract that apikey slots use `codex exec` truth and makes no-arg `switch codex` disagree with explicit apikey switching.

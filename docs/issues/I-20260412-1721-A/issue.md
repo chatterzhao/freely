@@ -1,7 +1,6 @@
 ---
 local_id: I-20260412-1721-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:26:59Z"
 updated_at: "2026-04-27T11:26:59Z"
+platform_state: 
 ---
 
 Freely already exposes develop push debt as explicit truth, but it still stops short of automatically handling the current merge's remote-delivery followthrough. That leaves a gap between “merge completed locally” and “this round actually tried to deliver canonical truth to remote.”

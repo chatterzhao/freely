@@ -1,7 +1,6 @@
 ---
 local_id: I-20260419-0333-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:28:11Z"
 updated_at: "2026-04-27T11:28:11Z"
+platform_state: 
 ---
 
 The receipt-only closeout followthrough lane already proved that the main runtime lifecycle implementation had landed. But the preserved checkpoint on `feature/checkpoint-runtime-closeout-selfhost-validation-20260419` still carried real follow-on behavior that was not bound to any lawful owner:

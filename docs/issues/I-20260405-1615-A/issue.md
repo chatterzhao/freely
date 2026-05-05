@@ -1,7 +1,6 @@
 ---
 local_id: I-20260405-1615-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:24:37Z"
 updated_at: "2026-04-27T11:24:37Z"
+platform_state: 
 ---
 
 当前仓库对 `test-pre-merge-*` 仍停留在旧模型：

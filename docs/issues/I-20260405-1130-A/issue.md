@@ -1,7 +1,6 @@
 ---
 local_id: I-20260405-1130-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:24:10Z"
 updated_at: "2026-04-27T11:24:10Z"
+platform_state: 
 ---
 
 Freely already behaves as if project-root `AGENTS.md` were a formal product contract:

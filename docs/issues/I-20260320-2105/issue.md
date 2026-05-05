@@ -1,7 +1,6 @@
 ---
 local_id: I-20260320-2105
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:14:43Z"
 updated_at: "2026-04-27T11:14:43Z"
+platform_state: 
 ---
 
 Freely 已经形成三块状态面：

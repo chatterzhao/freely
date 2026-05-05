@@ -1,7 +1,6 @@
 ---
 local_id: I-20260416-0448-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:27:46Z"
 updated_at: "2026-04-27T11:27:46Z"
+platform_state: 
 ---
 
 Upgraded `memark 0.1.1` replay showed canonical Freely root still missed one narrow bootstrap prerequisite:

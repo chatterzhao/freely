@@ -1,7 +1,6 @@
 ---
 local_id: I-20260319-1715
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:14:08Z"
 updated_at: "2026-04-27T11:14:08Z"
+platform_state: 
 ---
 
 Freely 已经有 human chat intake 的最小闭环，但要真正“用 Freely 开发 Freely”，还必须把这条链变成正式、可恢复、可监督的 canonical issue：

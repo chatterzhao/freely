@@ -1,7 +1,6 @@
 ---
 local_id: I-20260318-1222
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:13:28Z"
 updated_at: "2026-04-27T11:13:28Z"
+platform_state: 
 ---
 
 Freely 已经拥有本地 continuity / recovery / session rotation / multi-worktree supervision，但还没有一个正式的外部共享记忆边界来回答：

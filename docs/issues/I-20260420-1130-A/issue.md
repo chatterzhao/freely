@@ -1,7 +1,6 @@
 ---
 local_id: I-20260420-1130-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:28:37Z"
 updated_at: "2026-04-27T11:28:37Z"
+platform_state: 
 ---
 
 Freely already has multiple places where a manager can discover work, but it still needed a runtime-owned answer to a narrower question: when should those surfaces be rescanned, and when should the current continuity or active worker remain authoritative?

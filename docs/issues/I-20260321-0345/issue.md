@@ -1,7 +1,6 @@
 ---
 local_id: I-20260321-0345
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:15:02Z"
 updated_at: "2026-04-27T11:15:02Z"
+platform_state: 
 ---
 
 Freely 现在已经能通过 runtime watchdog 拉起主管，也能通过 `live-status` / `fleet-status` / worktree skills 观察当前项目状态。

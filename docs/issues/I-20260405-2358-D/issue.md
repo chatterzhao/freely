@@ -1,7 +1,6 @@
 ---
 local_id: I-20260405-2358-D
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:25:29Z"
 updated_at: "2026-04-27T11:25:29Z"
+platform_state: 
 ---
 
 canonical CLI replay still exposes a narrow but important contract gap:

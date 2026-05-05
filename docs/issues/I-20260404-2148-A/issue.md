@@ -1,7 +1,6 @@
 ---
 local_id: I-20260404-2148-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:23:52Z"
 updated_at: "2026-04-27T11:23:52Z"
+platform_state: 
 ---
 
 Canonical `develop` has already shown two distinct truths on 2026-04-04:

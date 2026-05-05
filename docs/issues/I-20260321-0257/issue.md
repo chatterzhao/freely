@@ -1,7 +1,6 @@
 ---
 local_id: I-20260321-0257
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:14:53Z"
 updated_at: "2026-04-27T11:14:53Z"
+platform_state: 
 ---
 
 Freely 已经具备单树 worktree audit、merge-prep、stacked merge-chain 和 retirement handoff，但还缺一层“项目级 fleet closure”。

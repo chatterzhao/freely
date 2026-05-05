@@ -1,7 +1,6 @@
 ---
 local_id: I-20260327-0651
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:17:52Z"
 updated_at: "2026-04-27T11:17:52Z"
+platform_state: 
 ---
 
 Freely runtime 里和代理有关的默认值目前仍然分散在脚本内部，典型问题是把 localhost 代理写死成运行时 fallback。这样会造成三个直接后果：

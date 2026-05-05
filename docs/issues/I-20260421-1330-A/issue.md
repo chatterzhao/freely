@@ -1,7 +1,6 @@
 ---
 local_id: I-20260421-1330-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:28:45Z"
 updated_at: "2026-04-27T11:28:45Z"
+platform_state: 
 ---
 
 The previous runtime repairs already blocked automatic relaunch of merged worker lanes. The remaining failure was subtler: manager patrol still looked at absorbed merged lanes and treated them like current execution capacity.

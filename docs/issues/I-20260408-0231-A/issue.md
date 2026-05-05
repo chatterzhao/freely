@@ -1,7 +1,6 @@
 ---
 local_id: I-20260408-0231-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:26:09Z"
 updated_at: "2026-04-27T11:26:09Z"
+platform_state: 
 ---
 
 `C-20260408-0231-A` started as a two-part packet:

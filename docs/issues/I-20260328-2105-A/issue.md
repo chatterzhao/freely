@@ -1,7 +1,6 @@
 ---
 local_id: I-20260328-2105-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:21:13Z"
 updated_at: "2026-04-27T11:21:13Z"
+platform_state: 
 ---
 
 Freely 已经把 `codex` 的 canonical continuity model 收敛为显式 session-addressed resume，但 `2026-03-28` 的 dogfood 现场证明当前恢复证据判定仍然过弱：

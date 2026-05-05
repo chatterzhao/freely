@@ -1,7 +1,6 @@
 ---
 local_id: I-20260312-0011
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:12:23Z"
 updated_at: "2026-04-27T11:12:23Z"
+platform_state: 
 ---
 
 # Issue: backend-service-contract-and-adapter-taxonomy

@@ -1,7 +1,6 @@
 ---
 local_id: I-20260321-1045
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:15:09Z"
 updated_at: "2026-04-27T11:15:09Z"
+platform_state: 
 ---
 
 现有 `worktree-maintenance-governance` 已能处理单棵树 audit、平面 merge-prep 与 retirement handoff，但 dogfooding 证明还缺少一类高频现实场景：

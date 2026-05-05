@@ -1,7 +1,6 @@
 ---
 local_id: I-20260325-0333-B
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:17:16Z"
 updated_at: "2026-04-27T11:17:16Z"
+platform_state: 
 ---
 
 Freely 已经明确 `pre-tests.md` 是 issue-level acceptance 控制面，但还没有冻结 story-level 质量门禁。结果就是：

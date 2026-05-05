@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260502-1028
 kind: raw
-status: absorbed
+phase_state: absorbed
 absorbed_into: I-20260502-1028-A
 platform_ids:
   github:
@@ -19,6 +19,7 @@ intake_id: 20260502-1028-stale-lock
 author: human
 channel: chat
 session_refs: []
+platform_state: 
 ---
 
 Clean stale start lock before daemon stop: 3-line fix in stop_project_runtime().

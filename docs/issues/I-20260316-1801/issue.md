@@ -1,7 +1,6 @@
 ---
 local_id: I-20260316-1801
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:12:27Z"
 updated_at: "2026-04-27T11:12:27Z"
+platform_state: 
 ---
 
 # Issue: session-lifecycle-rotation-and-handoff-governance

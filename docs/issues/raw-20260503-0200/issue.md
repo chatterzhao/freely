@@ -2,7 +2,7 @@
 local_id: raw-20260503-0200
 issue_title: 'scan: switch to task-lifecycle-scan v2 with full lifecycle chain trace'
 kind: raw
-status: proposed
+phase_state: proposed
 platform_ids:
   github:
     issue_id: '226'

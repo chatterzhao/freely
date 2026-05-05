@@ -1,7 +1,6 @@
 ---
 local_id: I-20260404-0232-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:23:32Z"
 updated_at: "2026-04-27T11:23:32Z"
+platform_state: 
 ---
 
 `test-governance-merge-gate` still carries a mixed unresolved-candidate implementation case from before staged owner review artifacts became mandatory. Once `I-20260401-2354-A` landed, that fixture started failing earlier on missing review evidence.

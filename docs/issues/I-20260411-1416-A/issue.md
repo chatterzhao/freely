@@ -1,7 +1,6 @@
 ---
 local_id: I-20260411-1416-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:26:45Z"
 updated_at: "2026-04-27T11:26:45Z"
+platform_state: 
 ---
 
 当前系统已经把 `pre-tests.md` 用于 completion 和 guarded promote，但 cleanup / retirement 还没有消费同一真源，因此 lifecycle closure 与测试真源仍未闭环。

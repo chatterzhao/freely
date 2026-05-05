@@ -1,7 +1,6 @@
 ---
 local_id: I-20260329-2155-A
 kind: linked
-status: completed
 phase_state: completed
 completed_at: "2026-04-29"
 platform_ids:
@@ -21,6 +20,7 @@ last_synced_comment_at:
 hash: ""
 created_at: "2026-04-27T11:21:19Z"
 updated_at: "2026-04-27T11:21:19Z"
+platform_state: 
 ---
 
 `develop` 根目录现场出现过一个真实的 `auth.json`，而仓库没有任何规则会默认忽略它。这意味着 Freely 当前对本地敏感副产物的治理只覆盖 `.env*`，没有覆盖账号凭证、私钥、证书等常见高风险文件。

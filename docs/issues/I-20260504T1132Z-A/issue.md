@@ -2,7 +2,6 @@
 local_id: I-20260504T1132Z-A
 issue_title: raw key 格式统一：所有代码接受 YYYYMMDDTHHMMZ 和 YYYYMMDD-HHMM 双格式
 kind: linked
-status: completed
 phase_state: completed
 promoted_from: raw-20260504T1132Z
 platform_ids:
@@ -17,6 +16,7 @@ session_refs:
 - tool: ccds
   session_id: 20260505-raw-key-unify
   role: worker
+platform_state: 
 ---
 
 ## Scope
