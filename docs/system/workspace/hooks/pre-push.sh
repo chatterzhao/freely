@@ -44,11 +44,11 @@ MSG
       ;;
     feature/*|hotfix/*)
       # Validate naming convention: must contain raw-xxx or I-xxx key
-      if ! echo "$local_branch" | grep -qoE 'raw-[0-9]{8}-[0-9]{4}' && \
-         ! echo "$local_branch" | grep -qoE 'I-[0-9]{8}-[0-9]{4}(-[A-Z0-9]+)?'; then
+      if ! echo "$local_branch" | grep -qoE 'raw-[0-9]{8}[-T][0-9]{4}Z?' && \
+         ! echo "$local_branch" | grep -qoE 'I-[0-9]{8}[-T][0-9]{4}Z?(-[A-Z0-9]+)?'; then
         cat >&2 <<MSG
 [HOOK] Push blocked: branch '$local_branch' must contain an issue key.
-Format: feature/raw-{YYYYMMDD}-{HHMM}-{slug} or feature/I-{YYYYMMDD}-{HHMM}-{A/B}
+Format: feature/raw-{YYYYMMDD}-{HHMM}-{slug} or feature/raw-{YYYYMMDDTHHMMZ}-{slug}
 Each worktree/branch must correspond to an issue (docs/LAWS.md §2).
 Use 'git branch -m' to rename.
 MSG
