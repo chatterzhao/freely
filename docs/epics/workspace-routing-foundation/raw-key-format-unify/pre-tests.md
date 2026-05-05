@@ -33,8 +33,29 @@
 
 ## Acceptance Items
 
-| id | requirement | evidence_level | status | artifact_ref | surface_kind | target_lane | promotion_gate |
-|----|-------------|---------------|--------|-------------|-------------|-------------|---------------|
-| A1 | All regex patterns accept both old and new formats | command_output | pass | 18 files changed, all patterns verified | regex | premerge-integration | develop_merge |
-| A2 | No regression in scan output for existing items | command_output | pass | scan total unchanged, old items same stage | scan | premerge-integration | develop_merge |
-| A3 | Governance merge gate passes with new format artifacts | gate_output | pass | `governance-merge-gate --range "develop..HEAD"` passed | gate | premerge-integration | develop_merge |
+### A1 - All regex patterns accept both old and new formats
+
+- id: `A1`
+- requirement: `All regex/glob patterns in pre-push.sh, wt-create, scan, merge-gate, freely accept both YYYYMMDD-HHMM and YYYYMMDDTHHMMZ raw key formats`
+- evidence_level: `mock`
+- status: `pass`
+- artifact_ref: `docs/epics/workspace-routing-foundation/raw-key-format-unify/code-reviews/review.md`
+- surface_kind: `regex`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+
+### A2 - No regression in scan output for existing items
+
+- id: `A2`
+- requirement: `task-lifecycle-scan.py output identical for all old-format items; 20260503-0200 unchanged at branch_deleted`
+- evidence_level: `mock`
+- status: `pass`
+- artifact_ref: `scan output: total=134 ready=7, 20260503-0200 stage=branch_deleted`
+
+### A3 - Governance merge gate passes
+
+- id: `A3`
+- requirement: `governance-merge-gate --range "develop..HEAD" passes with new C/M/I chain intact`
+- evidence_level: `mock`
+- status: `pass`
+- artifact_ref: `governance-merge-gate output: passed`
