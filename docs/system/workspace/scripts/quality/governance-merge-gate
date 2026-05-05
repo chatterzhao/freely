@@ -130,7 +130,7 @@ def issue_matches_candidate_identity(
 
 
 def raw_key(raw_id: str) -> Optional[str]:
-    """Extract the shared key from a raw issue local_id: raw-YYYYMMDD-HHMM -> YYYYMMDD-HHMM"""
+    """Extract the shared key from a raw issue local_id: raw-YYYYMMDDTHHMMZ -> YYYYMMDDTHHMMZ"""
     match = re.match(r"^raw-(.+)$", raw_id)
     return match.group(1) if match else None
 
@@ -709,9 +709,9 @@ def main() -> int:
             branch_type = source_branch.split("/")[0] if "/" in source_branch else "unknown"
             errors.append(
                 f"GATE 1: source branch '{source_branch}' does not contain a valid issue key. "
-                f"Feature and hotfix branches must include a raw-YYYYMMDD-HHMM or I-YYYYMMDD-HHMM-X key. "
-                f"Examples: {branch_type}/raw-20260503-0115-acp-bridge-fix, {branch_type}/I-20260503-0115-A-acp-bridge-fix. "
-                f"Use './bin/wt-create {branch_type}/raw-YYYYMMDD-HHMM-slug' to create the worktree with correct naming."
+                f"Feature and hotfix branches must include a raw-YYYYMMDDTHHMMZ or I-YYYYMMDDTHHMMZ-X key (legacy raw-YYYYMMDD-HHMM also accepted). "
+                f"Examples: {branch_type}/raw-20260505T1210Z-scan-b1-fix, {branch_type}/I-20260505T1210Z-A-issue-state-refactor. "
+                f"Use './bin/wt-create {branch_type}/raw-YYYYMMDDTHHMMZ-slug' to create the worktree with correct naming."
             )
 
     # ── GATE 2: raw issue must be materialized from SQLite and on platform ──
