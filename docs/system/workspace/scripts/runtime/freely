@@ -539,8 +539,10 @@ Usage:
   freely ensure-manager [--project <abs_path>] [--watch] [--interval <seconds>]
   freely ensure-interruption-dispatch [--project <abs_path>] [--watch] [--interval <seconds>]
   freely auth-change-wake [--tool <name>] [--slot <slot>] [--reason <reason>]
-  freely start [--project <abs_path>] [--force]
-  freely daemon start [--project <abs_path>] [--force]
+  freely start [--project <abs_path>] [--task-mode auto|wait|id:<scan-id>] [--force]
+  freely daemon start [--project <abs_path>] [--task-mode auto|wait|id:<scan-id>] [--force]
+  freely task-mode set --project <abs_path> --task-mode auto|wait|id:<scan-id> [--force]
+  freely task-mode get --project <abs_path>
   freely daemon stop [--project <abs_path>]
   freely daemon status [--project <abs_path>]
   freely daemon logs [--project <abs_path>] [--follow] [--file runtime-events|lifecycle-trace|loop]
@@ -3593,6 +3595,7 @@ FREELY_NO_PROXY=""
 # Each platform name maps to its CLI: github→gh, gitee→gitee.
 # Empty = no platform scanning.
 FREELY_REPO_PLATFORMS=""
+FREELY_TASK_MODE="wait"
 FREELY_SECURITY_REVIEW_POLICY="advisory-on-high-risk-or-uncertainty"
 FREELY_SECURITY_REVIEW_SCOPE="execution-boundary-and-reviewer-support"
 EOF
@@ -7377,6 +7380,78 @@ ensure_freely_db() {
   if [[ -f "$session_store_py" ]]; then
     python3 "$session_store_py" init --db "$freely_db" >/dev/null 2>&1 || true
   fi
+}
+
+# ── task-mode gate (SQLite) ──────────────────────────────
+
+ensure_task_mode_gate() {
+  local project="$1" config_default="${2:-wait}"
+  local freely_db="$project/.freely/freely.db"
+  local init_mode init_scan_id
+  case "$config_default" in
+    auto) init_mode="auto"; init_scan_id="" ;;
+    wait) init_mode="wait"; init_scan_id="" ;;
+    id:*) init_mode="id"; init_scan_id="${config_default#id:}" ;;
+    *) init_mode="wait"; init_scan_id="" ;;
+  esac
+  python3 -c "
+import sqlite3
+conn = sqlite3.connect('$freely_db')
+conn.execute('''CREATE TABLE IF NOT EXISTS task_mode_gate (
+    id INTEGER PRIMARY KEY CHECK (id = 1),
+    mode TEXT NOT NULL DEFAULT 'wait',
+    task_scan_id TEXT DEFAULT '',
+    updated_at TEXT NOT NULL DEFAULT ''
+)''')
+cur = conn.execute('SELECT COUNT(*) FROM task_mode_gate')
+if cur.fetchone()[0] == 0:
+    conn.execute('''INSERT INTO task_mode_gate (id, mode, task_scan_id, updated_at)
+                    VALUES (1, '$init_mode', '$init_scan_id', datetime('now'))''')
+conn.commit()
+conn.close()
+" 2>/dev/null || true
+}
+
+read_task_mode() {
+  local project="$1"
+  local freely_db="$project/.freely/freely.db"
+  python3 -c "
+import sqlite3
+conn = sqlite3.connect('$freely_db')
+cur = conn.execute('SELECT mode, task_scan_id FROM task_mode_gate WHERE id = 1')
+row = cur.fetchone()
+if row:
+    mode, scan_id = row
+    if mode == 'id' and scan_id:
+        print(f'id:{scan_id}')
+    else:
+        print(mode)
+else:
+    print('wait')
+conn.close()
+" 2>/dev/null || echo 'wait'
+}
+
+write_task_mode() {
+  local project="$1" mode="$2" scan_id="${3:-}"
+  local freely_db="$project/.freely/freely.db"
+  local task_mode task_scan_id
+  case "$mode" in
+    auto) task_mode="auto"; task_scan_id="" ;;
+    wait) task_mode="wait"; task_scan_id="" ;;
+    id:*) task_mode="id"; task_scan_id="${mode#id:}" ;;
+    *) log_error "invalid task-mode: $mode (expected auto|wait|id:<scan-id>)"; return 1 ;;
+  esac
+  python3 <<PY
+import sqlite3
+conn = sqlite3.connect('$freely_db')
+conn.execute("INSERT OR REPLACE INTO task_mode_gate (id, mode, task_scan_id, updated_at) VALUES (1, '$task_mode', '$task_scan_id', datetime('now'))")
+conn.commit()
+conn.close()
+PY
+  append_runtime_event "$project" "task_mode_written" \
+    "mode=$task_mode" \
+    "task_scan_id=${task_scan_id:-none}"
 }
 
 preemption_state_file() {
@@ -13479,6 +13554,36 @@ manager_runtime_handle_exit_contract_after_ai_cycle() {
         printf 'resume_invalid\n'
         return 0
       fi
+      # Task-mode gate: check mode before deciding to stop
+      local _gate_mode _poll_interval
+      _gate_mode="$(read_task_mode "$project")"
+      _poll_interval="${CHECK_INTERVAL:-10}"
+      [[ "$_poll_interval" =~ ^[0-9]+$ ]] || _poll_interval=10
+      case "$_gate_mode" in
+        auto)
+          append_runtime_event "$project" "task_mode_gate_override_stop_ai" \
+            "gate_mode=$_gate_mode" \
+            "stop_reason=${stop_reason:-missing}" \
+            "action=continue_instead_of_stop"
+          printf 'continue\n'
+          return 0
+          ;;
+        wait)
+          append_runtime_event "$project" "task_mode_gate_wait_poll" \
+            "gate_mode=$_gate_mode" \
+            "poll_interval=$_poll_interval"
+          sleep "$_poll_interval"
+          printf 'continue\n'
+          return 0
+          ;;
+        id:*)
+          local _scan_id="${_gate_mode#id:}"
+          write_task_mode "$project" "wait"
+          append_runtime_event "$project" "task_mode_gate_id_completed" \
+            "scan_id=$_scan_id" \
+            "next_mode=wait"
+          ;;
+      esac
       : >"$(stop_marker_file "$project")"
       append_runtime_event "$project" "manager_exit_contract_stop_ai" \
         "stop_reason=${stop_reason}"
@@ -14249,13 +14354,25 @@ append_task_source_patrol_seed_if_needed() {
   fi
   scan_json_path="$(task_source_scan_json_path_for_project "$PROJECT_ROOT")"
 
+  # Inject current task mode before the scan section
+  local _tm_mode _tm_info
+  _tm_mode="$(read_task_mode "$PROJECT_ROOT")"
+  case "$_tm_mode" in
+    auto) _tm_info="task-auto: 自动模式 — 从 scan 中找任务、做任务、收口、循环" ;;
+    wait) _tm_info="task-wait: 等待模式 — 不主动找任务，等待用户通过 task-mode set 指令切换" ;;
+    id:*) _tm_info="task-id: 指定任务模式 — 仅处理 scan-id=${_tm_mode#id:} 的任务，收口后自动切回 wait" ;;
+    *) _tm_info="task-mode: ${_tm_mode:-unknown}" ;;
+  esac
+
   # Parse lifecycle scan JSON and build prompt section
-  python3 - "$scan_json_path" "$scan_reason" <<'PY'
+  python3 - "$scan_json_path" "$scan_reason" "$_tm_mode" "$_tm_info" <<'PY'
 import json
 import sys
 
 scan_path = sys.argv[1]
 scan_reason = sys.argv[2]
+task_mode = sys.argv[3] if len(sys.argv) > 3 else "wait"
+task_mode_info = sys.argv[4] if len(sys.argv) > 4 else ""
 
 try:
     with open(scan_path, "r", encoding="utf-8") as f:
@@ -14294,6 +14411,8 @@ stage_labels = {
 }
 
 # Build lifecycle-aware patrol seed
+print("")
+print(f"## Task Mode: {task_mode_info}")
 print("")
 print("Lifecycle task scan (lifecycle-v2):")
 print(f"- scan_reason: `{scan_reason}`")
@@ -17826,6 +17945,7 @@ PROTECTEDMSG
   append_runtime_event "$project" "start_project_runtime_after_load_config" \
     "entrypoint_mode=$entrypoint_mode"
   ensure_freely_db "$project"
+  ensure_task_mode_gate "$project" "${FREELY_TASK_MODE:-wait}"
   register_project_in_registry "$project"
   append_runtime_event "$project" "start_project_runtime_after_registry" \
     "entrypoint_mode=$entrypoint_mode"
@@ -18637,24 +18757,33 @@ preflight_project_runtime_restart_or_fail() {
 }
 
 cmd_start() {
-  local project="" force="0"
+  local project="" force="0" task_mode=""
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      --task-mode) task_mode="${2:-}"; shift 2 ;;
       --force) force="1"; shift ;;
       *) log_error "unknown arg: $1"; usage; exit 1 ;;
     esac
   done
   project="$(resolve_project_or_fail "$project")"
+  # Write task mode: explicit flag or reset to default wait
+  if [[ -n "$task_mode" ]]; then
+    write_task_mode "$project" "$task_mode"
+  else
+    write_task_mode "$project" "wait"
+  fi
   startup_self_heal_machine_state_if_needed "$project" "start_command"
   acquire_project_start_lock_or_wait "$project" "freely_start" || exit 1
   trap "release_project_start_lock_for_runtime '$project'" EXIT
   append_lifecycle_trace "$project" "L001" "start_requested" \
     "entrypoint=foreground" \
     "force=$force" \
+    "task_mode=${task_mode:-wait}" \
     "expected_next=L010"
   append_runtime_event "$project" "user_start_command_received" \
-    "force=$force"
+    "force=$force" \
+    "task_mode=${task_mode:-wait}"
   if [[ "$force" == "1" ]]; then
     log_info "forcing project-local runtime rebuild before start"
     stop_project_runtime "$project" "start_force"
@@ -18805,24 +18934,32 @@ PY
 }
 
 cmd_daemon_start() {
-  local project="" force="0"
+  local project="" force="0" task_mode=""
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      --task-mode) task_mode="${2:-}"; shift 2 ;;
       --force) force="1"; shift ;;
       *) log_error "unknown arg: $1"; usage; exit 1 ;;
     esac
   done
   project="$(resolve_project_or_fail "$project")"
+  if [[ -n "$task_mode" ]]; then
+    write_task_mode "$project" "$task_mode"
+  else
+    write_task_mode "$project" "wait"
+  fi
   startup_self_heal_machine_state_if_needed "$project" "daemon_start_command"
   acquire_project_start_lock_or_wait "$project" "freely_start" || exit 1
   trap "release_project_start_lock_for_runtime '$project'" EXIT
   append_lifecycle_trace "$project" "L001" "start_requested" \
     "entrypoint=daemon" \
     "force=$force" \
+    "task_mode=${task_mode:-wait}" \
     "expected_next=L010"
   append_runtime_event "$project" "user_daemon_start_command_received" \
-    "force=$force"
+    "force=$force" \
+    "task_mode=${task_mode:-default}"
   # Detect restart storm from previous run and auto-force clean start.
   if [[ "$force" != "1" ]]; then
     local _state_file _exit_reason _storm_count
@@ -18933,6 +19070,44 @@ cmd_daemon_run() {
   done
   project="$(resolve_project_or_fail "$project")"
   start_project_runtime "$project" "daemon"
+}
+
+cmd_task_mode() {
+  local action="" project="" mode="" force="0"
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      set) action="set"; shift ;;
+      get) action="get"; shift ;;
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      --task-mode) mode="${2:-}"; shift 2 ;;
+      --force) force="1"; shift ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+  project="$(resolve_project_or_fail "$project")"
+
+  case "$action" in
+    set)
+      [[ -n "$mode" ]] || { log_error "missing --task-mode"; exit 1; }
+      load_config "$project"
+      ensure_task_mode_gate "$project" "${FREELY_TASK_MODE:-wait}"
+      if [[ "$force" == "1" ]]; then
+        log_info "terminating current AI process before mode switch"
+        stop_project_runtime "$project" "task_mode_force_switch"
+      fi
+      write_task_mode "$project" "$mode"
+      echo "task_mode: $mode"
+      echo "force: $([[ "$force" == "1" ]] && echo 'true' || echo 'false')"
+      ;;
+    get)
+      local current_mode
+      current_mode="$(read_task_mode "$project")"
+      echo "task_mode: $current_mode"
+      ;;
+    *)
+      log_error "expected set or get"; usage; exit 1
+      ;;
+  esac
 }
 
 cmd_restore_work() {
@@ -20044,6 +20219,7 @@ cmd_live_status() {
   echo "activation_consent_status: $(freely_activation_consent_status_for_loaded_config)"
   echo "activation_consent_recorded_at: $(format_timestamp_local_for_display "$(freely_activation_consent_recorded_at_for_loaded_config)")"
   echo "activation_consent_recorded_via: $(freely_activation_consent_recorded_via_for_loaded_config)"
+	echo "task_mode: $(read_task_mode "$project")"
   echo "safeguard_guidance_posture: $(freely_safeguard_guidance_posture_for_loaded_config)"
   echo "runtime_decision_posture: $(freely_runtime_decision_posture_for_loaded_config)"
   echo "minimal_risk_posture: $(freely_minimal_risk_posture_for_loaded_config)"
@@ -20649,6 +20825,7 @@ main() {
     new-session) cmd_new_session "$@" ;;
     restart) cmd_restart "$@" ;;
     restore-work) cmd_restore_work "$@" ;;
+    task-mode) cmd_task_mode "$@" ;;
     baseline-status) cmd_baseline_status "$@" ;;
     security-review-brief) cmd_security_review_brief "$@" ;;
     task-source-scan) cmd_task_source_scan "$@" ;;
