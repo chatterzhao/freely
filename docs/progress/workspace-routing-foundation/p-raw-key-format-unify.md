@@ -1,6 +1,7 @@
 # Progress — raw key 格式统一
 
-- issue: `I-20260504T1132Z-A`
+- issue_id: `I-20260504T1132Z-A`
+- issue_path: `docs/epics/workspace-routing-foundation/raw-key-format-unify/issues/I-20260504T1132Z-A.md`
 - phase_state: `in_dev`
 - updated_at: `2026-05-05T00:00:00Z`
 
