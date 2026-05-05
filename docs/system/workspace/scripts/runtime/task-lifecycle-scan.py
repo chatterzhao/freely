@@ -12,11 +12,13 @@ import argparse, json, os, re, sys, subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 
-TERMINAL_RAW = {"absorbed", "dropped", "completed"}
+# IBM Framework §89: raw.phase_state ∈ {proposed, absorbed, dropped}
+# IBM Framework §89: I-*.phase_state ∈ {in_b2_ibm → done_b2_ibm → in_dev → blocked_dev → in_verification → completed}
+TERMINAL_RAW = {"absorbed", "dropped"}
 TERMINAL_CANDIDATE = {"absorbed", "dropped", "promoted"}
-ACTIVE_B2 = {"in_b2_ibm", "done_b2_ibm", "in_dev", "blocked_dev", "in_ibm"}
+ACTIVE_B2 = {"in_b2_ibm", "done_b2_ibm", "in_dev", "blocked_dev"}
 COMPLETED = "completed"
-DONE_STATES = {"done", "done_ibm", "completed"}  # all mean "implementation finished"
+DONE_STATES = {"done_b2_ibm", "completed"}  # implementation finished (B2 done or fully complete)
 
 
 def now_iso() -> str:
@@ -92,7 +94,7 @@ def collect_lifecycle_items(project: Path) -> list[dict]:
             if name.startswith("raw-"):
                 key = name[4:]  # "raw-20260428-1737" → "20260428-1737"
                 raw_items[key] = {
-                    "raw_id": name, "raw_status": fm.get("status", "proposed"),
+                    "raw_id": name, "raw_status": fm.get("phase_state") or fm.get("status", "proposed"),
                     "raw_file": str(mf.relative_to(project)),
                     "promoted_children": _parse_list(fm.get("promoted_children", "")),
                     "absorbed_into": fm.get("absorbed_into", ""),
@@ -683,7 +685,7 @@ def _trace_chain(project: Path, key: str) -> dict:
     raw_file = raw_dir / "issue.md" if raw_dir.is_dir() else None
     if raw_file and raw_file.is_file():
         fm = parse_frontmatter(raw_file.read_text(encoding="utf-8"))
-        raw_status = fm.get("status", "proposed")
+        raw_status = fm.get("phase_state") or fm.get("status", "proposed")
         absorbed_into = fm.get("absorbed_into", "")
         stations["raw_created"] = {"reached": True, "status": raw_status, "absorbed_into": absorbed_into}
     else:

@@ -733,3 +733,4 @@
 - `20260326-1733--ibm-pretests-real-environment-acceptance-quality`
 - `20260326-1810--freely-layered-architecture-and-tooling-topology`
 - `20260326-1825--deep-refactor-fleet-sequencing`
+20260505T1210Z--issue-state-refactor: issue 状态字段重构
