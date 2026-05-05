@@ -71,17 +71,17 @@
 | G2 | status=proposed 且 platform_state=closed | block |
 | G3 | platform_state 不为空但 platform_ids 为空 | block |
 
-### Schema 门禁 (S1-S3)——兜底拦截非法值
+### Schema 门禁 (S3)——兜底拦截非法值
 
 | ID | 条件 | 级别 |
 |----|------|------|
-| S1 | raw issue 出现 phase_state 字段 | block |
-| S2 | I-* issue 出现 status 字段 | block |
-| S3 | status/phase_state 值不在合法集合中 | block |
+| S3 | phase_state 值不在合法集合中 | block |
 
-合法值：
-- raw.status ∈ {proposed, absorbed, dropped}
+合法值按 kind：
+- raw.phase_state ∈ {proposed, absorbed, dropped}
 - I-*.phase_state ∈ {in_b2_ibm, done_b2_ibm, in_dev, blocked_dev, in_verification, completed}
+
+（S1/S2 不再需要——raw 和 I-* 统一用 phase_state 字段名，无跨字段污染）
 
 ### 验证
 

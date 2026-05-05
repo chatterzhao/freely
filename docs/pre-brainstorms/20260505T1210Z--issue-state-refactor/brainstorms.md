@@ -42,8 +42,8 @@ cmd_close 第540行: `_fm_set_str "$file" "status" "closed"` — 无条件写 st
 
 | 字段 | 归属 | 语义 | 取值 |
 |------|------|------|------|
-| `status` | raw issue | freely B1 消费状态 | proposed / absorbed / dropped |
-| `phase_state` | I-* issue | freely B2 开发生命周期 | in_b2_ibm → done_b2_ibm → in_dev → blocked_dev → in_verification → completed |
+| `phase_state` | raw issue | B1 消费阶段 | proposed / absorbed / dropped |
+| `phase_state` | I-* issue | B2 开发生命周期 | in_b2_ibm → done_b2_ibm → in_dev → blocked_dev → in_verification → completed |
 | `platform_state` | 两者都有 | 平台 issue 镜像 | open / closed |
 
 理由: 平台状态和 freely 内部状态是正交的。平台不区分 raw/I-*。
@@ -52,7 +52,7 @@ cmd_close 第540行: `_fm_set_str "$file" "status" "closed"` — 无条件写 st
 
 - create: 设 platform_state=open
 - close: 设 platform_state=closed
-- 永不死 status 或 phase_state
+- 永不写 phase_state
 
 ### D3: raw 和 I-* 共享平台 issue
 
@@ -60,15 +60,17 @@ promote 时 I-* 继承 raw 的 platform_ids，不创建新 issue。
 
 ### D4: 字段分组
 
-raw issue（无 phase_state 字段）：
+统一使用 `phase_state`——raw 和 I-* 共用一个字段名，不同阶段用不同值：
+
+raw issue：
 ```yaml
 # ── 标识 ──
 local_id: raw-20260505T1210Z
 kind: raw
 
 # ── 状态 ──
-status: proposed                    # freely B1 消费状态
-platform_state: open                # 平台镜像
+phase_state: proposed               # B1: proposed → absorbed → dropped
+platform_state: open                # 平台镜像: open → closed
 
 # ── 平台关联 ──
 primary_platform: github
@@ -77,7 +79,7 @@ platform_ids:
     issue_id: '214'
 
 # ── 生命周期关联 ──
-absorbed_into: I-20260505T1210Z-A   # promote 后的目标
+absorbed_into: I-20260505T1210Z-A
 
 # ── 元数据 ──
 issue_title: "…"
@@ -88,15 +90,15 @@ channel: github
 session_refs: []
 ```
 
-I-* issue（无 status 字段）：
+I-* issue：
 ```yaml
 # ── 标识 ──
 local_id: I-20260505T1210Z-A
 kind: linked
 
 # ── 状态 ──
-phase_state: in_b2_ibm              # freely B2 开发生命周期
-platform_state: open                # 平台镜像
+phase_state: in_b2_ibm              # B2: in_b2_ibm → … → completed
+platform_state: open                # 平台镜像: open → closed
 
 # ── 平台关联 ──
 primary_platform: github
@@ -105,7 +107,7 @@ platform_ids:
     issue_id: '214'                 # ← 和 raw 共享同一个
 
 # ── 生命周期关联 ──
-promoted_from: raw-20260505T1210Z   # 来源 raw
+promoted_from: raw-20260505T1210Z
 
 # ── 元数据 ──
 issue_title: "…"
@@ -118,35 +120,40 @@ session_refs: []
 
 防止状态值被误写（如 issue-sync 写入 `closed` 到 raw status），定义每个字段的合法值集合，非法值在任何阶段都应被拦截。
 
-raw issue schema：
-| 字段 | 合法值 | 说明 |
-|------|--------|------|
-| `status` | `proposed` / `absorbed` / `dropped` | B1 消费状态 |
-| `platform_state` | `open` / `closed` / `""` | 平台镜像，空=未同步 |
-| `phase_state` | **禁止出现** | I-* 专用字段 |
+raw issue phase_state：
+| 值 | 含义 |
+|----|------|
+| `proposed` | B1 待消费 |
+| `absorbed` | 已消费（promote 到 I-*） |
+| `dropped` | 丢弃 |
 
-I-* issue schema：
-| 字段 | 合法值 | 说明 |
-|------|--------|------|
-| `phase_state` | `in_b2_ibm` / `done_b2_ibm` / `in_dev` / `blocked_dev` / `in_verification` / `completed` | B2 生命周期 |
-| `platform_state` | `open` / `closed` / `""` | 平台镜像 |
-| `status` | **禁止出现** | raw 专用字段 |
+I-* issue phase_state（IBM Framework §89）：
+| 值 | 含义 |
+|----|------|
+| `in_b2_ibm` | B2 设计阶段 |
+| `done_b2_ibm` | B2 设计完成 |
+| `in_dev` | 开发中 |
+| `blocked_dev` | 开发阻塞 |
+| `in_verification` | 验证中 |
+| `completed` | 完成 |
 
 兜底位置：
-- **scan**: 扫到非法字段值→输出 `schema_violation`，stage=`invalid`
-- **issue-sync**: 写字段前校验，非法值拒绝写入
-- **merge gate**: merge 前检查所有 I-* 的字段合法性
+- **scan**: 扫到 phase_state 不在合法集合 → `schema_violation`，stage=`invalid`
+- **issue-sync**: 写 phase_state 前校验，非法值拒绝
+- **merge gate**: merge 前检查字段合法性
 
 ### D6: 门禁规则
 
 | 规则 | 条件 | 动作 |
 |------|------|------|
 | G1 | phase_state=completed, platform_state=open | **block** merge |
-| G2 | status=proposed, platform_state=closed | **block** — 平台已关但 B1 未开始 |
-| G3 | platform_state 不为空但 platform_ids 为空 | **block** |
-| **S1** | **raw 出现 phase_state** | **block** — 字段不属于 raw |
-| **S2** | **I-* 出现 status** | **block** — 字段不属于 I-* |
-| **S3** | **status/phase_state 值不在合法集合中** | **block** — 非法状态值 |
+| G2 | phase_state=proposed, platform_state=closed | **block** |
+| G3 | platform_state 不为空但 platform_ids.issue_id 为空 | **block** |
+| S3 | phase_state 值不在合法集合中 | **block** |
+
+合法值按 kind：
+- raw: {proposed, absorbed, dropped}
+- I-*: {in_b2_ibm, done_b2_ibm, in_dev, blocked_dev, in_verification, completed}
 
 ## 非目标
 
