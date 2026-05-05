@@ -197,6 +197,21 @@ routing_policy:
   - `docs/epics/test-pre-merge-enforcement/code-reviews/rev-20260503-enforce-test-pre-merge.md`
 - next_action: `Merge to test-pre-merge, selfhost verify, then promote to develop.`
 
+27. `I-20260505T1210Z-A`
+- title: scan 常量对齐 IBM Framework §89 + 迁移现有 issue
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/issue-state-refactor/issues/I-20260505T1210Z-A.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-issue-state-refactor.md`
+- source_candidate: `docs/pre-brainstorms/20260505T1210Z--issue-state-refactor/candidates.md#C-20260505T1210Z-A`
+- branch: `feature/raw-20260505T1210Z-issue-state-refactor`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/issue-state-refactor/issues/I-20260505T1210Z-A.md`
+  - `docs/epics/workspace-routing-foundation/issue-state-refactor/pre-tests.md`
+  - `docs/epics/workspace-routing-foundation/issue-state-refactor/code-reviews/review.md`
+- next_action: `Merge to develop.`
+
 
 
 ### committed_issues
