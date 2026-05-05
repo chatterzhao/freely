@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+"""One-shot migration: rename status→phase_state for raw issues,
+add platform_state to all raw/I-* issues."""
+from pathlib import Path
+import re, subprocess, sys
+
+PROJECT = Path(sys.argv[1]) if len(sys.argv) > 1 else Path.cwd()
+ISSUES_DIR = PROJECT / "docs" / "issues"
+
+def github_state(issue_number: str) -> str:
+    """Query GitHub issue state. Returns 'open', 'closed', or '' on failure."""
+    try:
+        r = subprocess.run(
+            ["gh", "issue", "view", issue_number, "--repo", "chatterzhao/freely",
+             "--json", "state"], capture_output=True, text=True, timeout=5)
+        return "closed" if "CLOSED" in r.stdout else "open" if "OPEN" in r.stdout else ""
+    except Exception:
+        return ""
+
+count = 0
+for d in sorted(ISSUES_DIR.iterdir()):
+    if not d.is_dir():
+        continue
+    mf = d / "issue.md"
+    if not mf.is_file():
+        continue
+    text = mf.read_text(encoding="utf-8")
+    parts = text.split("---", 2)
+    if len(parts) < 3:
+        continue
+    fm = parts[1]
+    changed = False
+    name = d.name
+
+    # 1. Rename status: → phase_state: for raw issues
+    if name.startswith("raw-") and re.search(r'^status:', fm, re.MULTILINE):
+        fm = re.sub(r'^status:', 'phase_state:', fm, flags=re.MULTILINE)
+        changed = True
+        print(f"[migrate] {name}: status → phase_state")
+
+    # 2. Add platform_state if missing
+    if "platform_state:" not in fm:
+        # Check if platform_ids has a github issue_id
+        m = re.search(r'issue_id:\s*["\']?(\d+)["\']?', fm)
+        if m and m.group(1):
+            state = github_state(m.group(1))
+            fm = fm.rstrip() + f"\nplatform_state: {state}\n"
+        else:
+            fm = fm.rstrip() + "\nplatform_state: ''\n"
+        changed = True
+        print(f"[migrate] {name}: platform_state added")
+
+    if changed:
+        mf.write_text(f"---{fm}---{parts[2]}", encoding="utf-8")
+        count += 1
+
+print(f"[migrate] done: {count} files changed")
