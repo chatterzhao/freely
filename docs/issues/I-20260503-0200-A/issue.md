@@ -1,23 +1,28 @@
 ---
 local_id: I-20260503-0200-A
-issue_title: "scan: switch to task-lifecycle-scan v2 with full lifecycle chain trace"
+issue_title: 'scan: switch to task-lifecycle-scan v2 with full lifecycle chain trace'
 kind: linked
-status: in_dev
-phase_state: in_dev
+status: completed
+phase_state: completed
 promoted_from: raw-20260503-0200
 platform_ids:
   github:
-    issue_id: ""
+    issue_id: '227'
+    url: https://github.com/chatterzhao/freely/issues/227
+    synced_at: '2026-05-05T15:07:57Z'
   gitee:
-    issue_id: ""
+    issue_id: ''
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/scan-lifecycle-migration/issues/I-20260503-0200-A.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/scan-lifecycle-migration/issues/I-20260503-0200-A.md
 last_synced_comment_at: {}
-hash: ""
-created_at: "2026-05-03T02:00:00Z"
-updated_at: "2026-05-03T02:00:00Z"
+hash: ''
+created_at: '2026-05-03T02:00:00Z'
+updated_at: '2026-05-05T15:08:02Z'
 session_refs:
-  - {tool: ccds, session_id: "20260503-scan-lifecycle", role: "author"}
+- tool: ccds
+  session_id: 20260503-scan-lifecycle
+  role: author
+platform_state: closed
 ---
 
 ## Pre-Brainstorm Summary

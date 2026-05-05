@@ -7,19 +7,20 @@ phase_state: done_b2_ibm
 promoted_from: raw-20260430-0010
 platform_ids:
   github:
-    issue_id: ''
+    issue_id: '225'
   gitee:
-    issue_id: ''
+    issue_id: '225'
 primary_platform: github
 canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-04-30T00:10:00Z'
-updated_at: '2026-05-05T11:36:08Z'
+updated_at: '2026-05-05T14:22:37Z'
 session_refs:
 - tool: ccds
   session_id: 20260430-doc-sync
   role: author
+platform_state: open
 ---
 
 - issue_id: `I-20260430-0010-A`
