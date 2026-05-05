@@ -285,7 +285,7 @@ def is_governance_only_path(rel_path: str) -> bool:
         "docs/system/workspace/scan-lifecycle-design.md",
     }:
         return True
-    if rel_path.startswith(("docs/pre-brainstorms/", "docs/epics/", "docs/progress/")):
+    if rel_path.startswith(("docs/pre-brainstorms/", "docs/epics/", "docs/progress/", "docs/issues/")):
         return True
     if rel_path.startswith(("docs/system/workspace/agents/", "docs/system/workspace/skills/", "docs/system/workspace/hooks/")):
         return True
@@ -1391,6 +1391,59 @@ def main() -> int:
             errors.append(
                 f"GATE 6.2: {issue_local_id} has no docs/issues/ entry. "
                 "Run bin/issue-sync-bootstrap to create it before merge."
+            )
+
+    # GATE 7: platform_state vs phase_state consistency + schema validation
+    LEGAL_RAW_PHASE = {"proposed", "absorbed", "dropped"}
+    LEGAL_LINKED_PHASE = {"in_b2_ibm", "done_b2_ibm", "in_dev", "blocked_dev", "in_verification", "completed"}
+
+    for issue_path in sorted(issue_bound_issue_paths):
+        matched = re.match(r".*/(I-\d{8}[-T]\d{4}Z?[A-Za-z0-9-]*)\.md$", issue_path)
+        if not matched:
+            continue
+        issue_local_id = matched.group(1)
+        docs_issue_file = os.path.join(ROOT_DIR, "docs", "issues", issue_local_id, "issue.md")
+        if not os.path.exists(docs_issue_file):
+            continue
+        with open(docs_issue_file) as f:
+            docs_text = f.read()
+
+        # Extract frontmatter fields via regex (avoid full YAML parser)
+        def _fm_get(text, key):
+            m = re.search(rf'^{key}:\s*["\']?(\S+)', text, re.MULTILINE)
+            return m.group(1).strip('"\'') if m else ""
+        phase = _fm_get(docs_text, "phase_state")
+        platform_state = _fm_get(docs_text, "platform_state")
+        kind = _fm_get(docs_text, "kind")
+        has_pids = bool(re.search(r'issue_id:\s*["\']?\d+', docs_text))
+
+        # S3: phase_state must be in legal set per kind
+        legal_set = LEGAL_RAW_PHASE if kind == "raw" else LEGAL_LINKED_PHASE if kind == "linked" else set()
+        if phase and legal_set and phase not in legal_set:
+            errors.append(
+                f"GATE S3: {issue_local_id} has illegal phase_state '{phase}' for kind={kind}. "
+                f"Allowed: {sorted(legal_set)}"
+            )
+
+        # G1: completed but platform still open
+        if phase == "completed" and platform_state == "open":
+            errors.append(
+                f"GATE G1: {issue_local_id} phase_state=completed but platform_state=open. "
+                "Close the platform issue before merge."
+            )
+
+        # G2: proposed raw but platform already closed
+        if kind == "raw" and phase == "proposed" and platform_state == "closed":
+            errors.append(
+                f"GATE G2: {issue_local_id} phase_state=proposed but platform_state=closed. "
+                "Platform issue was closed before B1 even started."
+            )
+
+        # G3: platform_state set but no platform_ids
+        if platform_state and platform_state.strip() and not has_pids:
+            errors.append(
+                f"GATE G3: {issue_local_id} has platform_state='{platform_state}' but no platform_ids.github.issue_id. "
+                "Set platform_ids or clear platform_state."
             )
 
     if errors:

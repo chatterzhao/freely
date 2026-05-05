@@ -1,18 +1,19 @@
 # Tasks — issue state refactor
 
-- issue_id: I-20260505T1210Z-A-B
+- issue_id: I-20260505T1210Z-A-C
 
-## task-1: cmd_close fix
+## task-1: G1 gate
 - status: done
-- owner: feature/raw-20260505T1210Z-issue-state-refactor-B
-- changes: bin/issue-sync line 540: _fm_set_str platform_state closed
+- changes: governance-merge-gate: block phase_state=completed + platform_state=open
 
-## task-2: cmd_create fix
+## task-2: G2 gate
 - status: done
-- owner: feature/raw-20260505T1210Z-issue-state-refactor-B
-- changes: bin/issue-sync line 424: _fm_set_str platform_state open
+- changes: governance-merge-gate: block phase_state=proposed + platform_state=closed
 
-## task-3: cmd_promote fix
+## task-3: G3 gate
 - status: done
-- owner: feature/raw-20260505T1210Z-issue-state-refactor-B
-- changes: bin/issue-sync line 626: status→phase_state absorbed
+- changes: governance-merge-gate: block platform_state set but platform_ids empty
+
+## task-4: S3 gate
+- status: done
+- changes: governance-merge-gate: block illegal phase_state values

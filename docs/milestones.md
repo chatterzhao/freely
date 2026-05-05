@@ -197,6 +197,20 @@ routing_policy:
   - `docs/epics/test-pre-merge-enforcement/code-reviews/rev-20260503-enforce-test-pre-merge.md`
 - next_action: `Merge to test-pre-merge, selfhost verify, then promote to develop.`
 
+29. `I-20260505T1210Z-A-C`
+- title: governance gate state consistency + schema validation
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P1
+- issue_path: `docs/epics/workspace-routing-foundation/issue-state-refactor/issues/I-20260505T1210Z-A-C.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-issue-state-refactor.md`
+- source_candidate: `docs/pre-brainstorms/20260505T1210Z--issue-state-refactor/candidates.md#C-20260505T1210Z-C`
+- branch: `feature/raw-20260505T1210Z-issue-state-refactor-C`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/issue-state-refactor/issues/I-20260505T1210Z-A-C.md`
+  - `docs/epics/workspace-routing-foundation/issue-state-refactor/code-reviews/review-C.md`
+- next_action: `Merge to develop.`
+
 28. `I-20260505T1210Z-A-B`
 - title: issue-sync 只写 platform_state
 - milestone_state: committed
