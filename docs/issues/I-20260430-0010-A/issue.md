@@ -2,8 +2,8 @@
 local_id: I-20260430-0010-A
 issue_title: "Sync docs + fix governance-only paths for architecture docs"
 kind: linked
-status: proposed
-phase_state: in_ibm
+status: completed
+phase_state: done
 promoted_from: raw-20260430-0010
 platform_ids: {github: {issue_id: ""}, gitee: {issue_id: ""}}
 primary_platform: github
