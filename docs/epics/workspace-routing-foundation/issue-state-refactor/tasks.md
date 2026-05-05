@@ -1,6 +1,6 @@
 # Tasks — issue state refactor
 
-- issue_id: I-20260505T1210Z-B
+- issue_id: I-20260505T1210Z-A-B
 
 ## task-1: cmd_close fix
 - status: done

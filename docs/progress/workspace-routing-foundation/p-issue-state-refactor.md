@@ -1,5 +1,5 @@
-- issue_id: I-20260505T1210Z-B
-- issue_path: docs/epics/workspace-routing-foundation/issue-state-refactor/issues/I-20260505T1210Z-B.md
+- issue_id: I-20260505T1210Z-A-B
+- issue_path: docs/epics/workspace-routing-foundation/issue-state-refactor/issues/I-20260505T1210Z-A-B.md
 - phase_state: in_dev
 - phase_stage: B2 implementation
 - candidate_path: docs/pre-brainstorms/20260505T1210Z--issue-state-refactor/candidates.md
