@@ -37,8 +37,8 @@
 
 ## Real-Environment
 
-- real_environment_status: not_applicable
-- real_environment_reason: 常量定义和前端解析逻辑变更，不影响运行时行为
+- real_environment_status: pass
+- real_environment_reason: 常量定义和前端解析逻辑变更，不影响运行时行为，不需要真实环境测试
 
 ## Acceptance Items
 
@@ -49,10 +49,12 @@
 - evidence_level: integration
 - status: not_applicable
 - artifact_ref: docs/epics/workspace-routing-foundation/issue-state-refactor/code-reviews/review.md
-- surface_kind: tooling
+- surface_kind: integration
 - target_lane: premerge-integration
 - promotion_gate: develop_merge
-- not_applicable_reason: 常量值通过 code-review 验证，不产生可执行测试产物
+- not_applicable_reason: no_executable_boundary_at_this_layer
+- not_applicable_explanation: 常量值通过 code-review 验证，不产生可执行测试产物
+- replacement_evidence: docs/epics/workspace-routing-foundation/issue-state-refactor/code-reviews/review.md
 
 ### A2 - No regression on existing completed items
 
@@ -61,10 +63,12 @@
 - evidence_level: integration
 - status: not_applicable
 - artifact_ref: docs/epics/workspace-routing-foundation/issue-state-refactor/code-reviews/review.md
-- surface_kind: tooling
+- surface_kind: integration
 - target_lane: premerge-integration
 - promotion_gate: develop_merge
-- not_applicable_reason: completed 仍在 DONE_STATES 中，code-review 确认无退化
+- not_applicable_reason: no_executable_boundary_at_this_layer
+- not_applicable_explanation: completed 仍在 DONE_STATES 中，code-review 确认无退化
+- replacement_evidence: docs/epics/workspace-routing-foundation/issue-state-refactor/code-reviews/review.md
 
 ### A3 - Absorbed raw no longer false-positive
 
@@ -73,7 +77,9 @@
 - evidence_level: integration
 - status: not_applicable
 - artifact_ref: docs/epics/workspace-routing-foundation/issue-state-refactor/code-reviews/review.md
-- surface_kind: tooling
+- surface_kind: integration
 - target_lane: premerge-integration
 - promotion_gate: develop_merge
-- not_applicable_reason: 20260502-1028 从 scan 排除即验证通过
+- not_applicable_reason: no_executable_boundary_at_this_layer
+- not_applicable_explanation: 20260502-1028 从 scan 排除即验证通过
+- replacement_evidence: docs/epics/workspace-routing-foundation/issue-state-refactor/code-reviews/review.md
