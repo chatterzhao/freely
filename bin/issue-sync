@@ -421,6 +421,7 @@ cmd_create() {
   fi
 
   _scan_state_record_sync "$local_id" "$file"
+  _fm_set_str "$file" "platform_state" "open"
   echo "[issue-sync] create complete: $local_id"
 }
 
@@ -537,7 +538,7 @@ cmd_close() {
     _gitee_call "close" "{\"issue_id\":\"$gitee_id\"}" || true
   fi
 
-  _fm_set_str "$file" "status" "closed"
+  _fm_set_str "$file" "platform_state" "closed"
   _fm_set_str "$file" "updated_at" "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
   echo "[issue-sync] close complete: $local_id"
 }
@@ -622,7 +623,7 @@ COMMENT
   cmd_close "$raw_id" "completed"
 
   # Update raw local state
-  _fm_set_str "$raw_file" "status" "absorbed"
+  _fm_set_str "$raw_file" "phase_state" "absorbed"
 
   echo "[issue-sync] promote-finalize complete: $raw_id closed with $promoted_json"
 }
