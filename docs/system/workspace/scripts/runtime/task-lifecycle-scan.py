@@ -723,19 +723,20 @@ def _trace_chain(project: Path, key: str) -> dict:
             return _finalize_chain(key, stations, blockers, "b1_dir", "b1_brainstorm")
 
         candidates_file = b1_dir / "candidates.md" if b1_dir else None
-        has_candidates = False
         candidate_entries = []
+        all_terminal = True
         if candidates_file and candidates_file.is_file():
             sections = _parse_h3_sections(candidates_file)
             for s in sections:
                 c_status = s.get("status") or s.get("candidate_status", "")
+                candidate_entries.append({
+                    "id": s.get("_section_title", "?"),
+                    "status": c_status,
+                })
                 if c_status not in TERMINAL_CANDIDATE:
-                    has_candidates = True
-                    candidate_entries.append({
-                        "id": s.get("_section_title", "?"),
-                        "status": c_status,
-                    })
-        if has_candidates:
+                    all_terminal = False
+        # b1_candidate reached if candidates file has entries (even if all terminal)
+        if candidate_entries:
             stations["b1_candidate"] = {"reached": True, "entries": candidate_entries}
         else:
             stations["b1_candidate"] = {"reached": False}
@@ -743,8 +744,8 @@ def _trace_chain(project: Path, key: str) -> dict:
             return _finalize_chain(key, stations, blockers, "b1_brainstorm", "b1_candidate")
 
         c_entries = candidate_entries
-        promoted_entries = [c for c in c_entries if c.get("status") == "promoted"]
-        if promoted_entries:
+        decided = [c for c in c_entries if c.get("status") in ("promoted", "absorbed", "dropped")]
+        if decided:
             stations["candidate_decision"] = {"reached": True, "entries": c_entries}
         else:
             stations["candidate_decision"] = {"reached": True, "pending": True}

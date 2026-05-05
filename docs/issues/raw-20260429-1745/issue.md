@@ -4,18 +4,22 @@ kind: raw
 status: absorbed
 absorbed_into: I-20260429-1745-A
 platform_ids:
-  github: {}
+  github:
+    issue_id: '215'
+    url: https://github.com/chatterzhao/freely/issues/215
+    synced_at: '2026-05-05T14:19:41Z'
   gitee: {}
 primary_platform: github
-canonical_issue_path: ""
+canonical_issue_path: ''
 last_synced_comment_at: {}
-hash: ""
-created_at: "2026-04-29T17:45:00Z"
-updated_at: "2026-04-29T17:45:00Z"
+hash: ''
+created_at: '2026-04-29T17:45:00Z'
+updated_at: '2026-05-05T14:21:34Z'
 intake_id: 20260429-1745-bash32-daemon-compat-fix
 author: human
 channel: chat
 session_refs: []
+platform_state: closed
 ---
 
 macOS bash 3.2 兼容性修复：daemon 自检测自杀 + select_launch_kind pipefail 崩溃。

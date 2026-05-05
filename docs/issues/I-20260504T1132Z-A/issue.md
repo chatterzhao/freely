@@ -1,20 +1,22 @@
 ---
 local_id: I-20260504T1132Z-A
-issue_title: "raw key 格式统一：所有代码接受 YYYYMMDDTHHMMZ 和 YYYYMMDD-HHMM 双格式"
+issue_title: raw key 格式统一：所有代码接受 YYYYMMDDTHHMMZ 和 YYYYMMDD-HHMM 双格式
 kind: linked
 status: completed
 phase_state: completed
 promoted_from: raw-20260504T1132Z
 platform_ids:
   github:
-    issue_id: "203"
-    url: "https://github.com/chatterzhao/freely/issues/203"
+    issue_id: '203'
+    url: https://github.com/chatterzhao/freely/issues/203
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/raw-key-format-unify/issues/I-20260504T1132Z-A.md"
-created_at: "2026-05-05T00:00:00Z"
-updated_at: "2026-05-05T00:00:00Z"
+canonical_issue_path: docs/epics/workspace-routing-foundation/raw-key-format-unify/issues/I-20260504T1132Z-A.md
+created_at: '2026-05-05T00:00:00Z'
+updated_at: '2026-05-05T09:54:48Z'
 session_refs:
-  - {tool: ccds, session_id: "20260505-raw-key-unify", role: "worker"}
+- tool: ccds
+  session_id: 20260505-raw-key-unify
+  role: worker
 ---
 
 ## Scope
