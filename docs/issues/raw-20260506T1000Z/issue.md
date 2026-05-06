@@ -8,7 +8,9 @@ platform_ids:
     url: https://github.com/chatterzhao/freely/issues/231
     synced_at: '2026-05-06T17:49:17Z'
 primary_platform: github
-canonical_issue_path: ''
+canonical_issue_path: docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/I-20260506T1000Z-A-task-mode-wait-prelaunch-gate.md
+pre_tests_path: docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/pre-tests.md
+verification_artifact_dir: docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews
 last_synced_comment_at: {}
 hash: ''
 created_at: 2026-05-06 10:00:00+00:00
