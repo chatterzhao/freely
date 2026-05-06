@@ -39,3 +39,32 @@
 
 - real_environment_status: pass
 - real_environment_reason: 本次实现不需要真实环境测试。9 行 bash 条件判断，行为通过 test-pre-merge daemon 启动验证（live-status + lifecycle-trace），切换 auto 模式后正常发射 AI。
+
+## Acceptance Items
+
+### AI-1: wait 模式不发射 AI
+
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- acceptance: daemon start 后 supervisor 仅 L220/L232 polling，无 L020 prompt_build / L040 ai_launch
+- evidence: `lifecycle-trace.log` 持续 60s+ 仅 polling entries
+- status: `pass`
+
+### AI-2: 切 auto 后正常发射
+
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- acceptance: `task-mode set --task-mode auto` 后，下一个 polling 周期检测到模式变化，正常 L020→L021→L040→ai_launch
+- evidence: `lifecycle-trace.log` 显示 prompt_build_complete + ai_launch_begin
+- status: `pass`
+
+### AI-3: worker 不受影响
+
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- acceptance: worker worktree role_hint=worker，前置门禁 role check 跳过，worker 正常执行
+- evidence: code review verification (role_hint guard 逻辑审查)
+- status: `pass`
