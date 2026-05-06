@@ -1209,6 +1209,11 @@ def main() -> int:
             errors.append(f"{issue.path} is missing issue_id, so the develop merge gate cannot bind it into an I-{{issue-id}} chain.")
             continue
 
+        # Raw issues are B1 entry points — they don't have source_candidate.
+        # The raw issue IS the origin of the lifecycle chain.
+        if issue.path.startswith("docs/issues/raw-"):
+            continue
+
         source_candidate_path = anchorless_source_candidate(issue.source_candidate)
         if not source_candidate_path or not path_exists(source_candidate_path):
             errors.append(
