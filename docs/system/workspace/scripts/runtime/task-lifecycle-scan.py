@@ -446,6 +446,10 @@ def build_payload(project: Path) -> dict:
     gov_items = scan_worktree_governance(project)
     output.extend(gov_items)
 
+    # Add remote branch governance items
+    remote_items = scan_remote_branch_governance(project)
+    output.extend(remote_items)
+
     by_stage = {}
     for o in output:
         by_stage[o["stage"]] = by_stage.get(o["stage"], 0) + 1
@@ -1337,6 +1341,107 @@ def _derive_governance_action(dirty: bool, merged: bool | None) -> str:
     if merged is False:
         return "merge 到 develop → 退役工位 → 删分支"
     return "已 merge，退役工位并删除分支"
+
+
+# ── Remote branch governance scan ─────────────────────
+
+def _configured_remotes(project: Path) -> list[str]:
+    """Return list of configured git remotes (github, gitee, etc.)."""
+    try:
+        raw = subprocess.check_output(
+            ["git", "-C", str(project), "remote"], text=True, stderr=subprocess.DEVNULL
+        )
+        return [r.strip() for r in raw.splitlines() if r.strip()]
+    except subprocess.CalledProcessError:
+        return []
+
+
+def _remote_branches(project: Path, remote: str) -> list[dict]:
+    """List branches on a remote, excluding main/develop."""
+    try:
+        raw = subprocess.check_output(
+            ["git", "ls-remote", "--heads", remote], text=True, stderr=subprocess.DEVNULL, cwd=str(project)
+        )
+    except subprocess.CalledProcessError:
+        return []
+    branches = []
+    for line in raw.splitlines():
+        if not line.strip():
+            continue
+        parts = line.split()
+        if len(parts) < 2:
+            continue
+        ref = parts[1]
+        name = ref.replace("refs/heads/", "")
+        if name in ("main", "develop"):
+            continue
+        branches.append({"name": name, "sha": parts[0], "remote": remote})
+    return branches
+
+
+def scan_remote_branch_governance(project: Path) -> list[dict]:
+    """Scan remote branches for governance gaps.
+
+    Checks each remote (github, gitee, etc.):
+      - If branch is merged to develop → ready_to_delete
+      - If branch has issue key and issue is done → stale (unmerged)
+      - If branch has no issue key → 命名不规范
+    """
+    items = []
+    remotes = _configured_remotes(project)
+    for remote in remotes:
+        for rb in _remote_branches(project, remote):
+            branch = rb["name"]
+            issue_key = _extract_issue_key_from_branch(branch)
+            merged_to_develop = _branch_merged_to_develop(project, branch)
+
+            if merged_to_develop:
+                items.append({
+                    "source_family": "remote_branch_governance",
+                    "key": f"{remote}/{branch}",
+                    "remote": remote,
+                    "branch": branch,
+                    "stage": "已合并未清理",
+                    "issue_key": issue_key,
+                    "merged_to_develop": True,
+                    "incomplete": ["remote_branch_not_deleted"],
+                    "ready": True,
+                    "next_action": f"删除远端分支: git push {remote} --delete {branch}",
+                })
+                continue
+
+            # Not merged to develop
+            if not issue_key:
+                items.append({
+                    "source_family": "remote_branch_governance",
+                    "key": f"{remote}/{branch}",
+                    "remote": remote,
+                    "branch": branch,
+                    "stage": "命名不规范",
+                    "issue_key": None,
+                    "merged_to_develop": False,
+                    "incomplete": ["branch_name_no_issue_key"],
+                    "ready": False,
+                    "next_action": f"确定对应 issue → 重命名或删除远端分支 {remote}/{branch}",
+                })
+                continue
+
+            # Has issue key, not merged — check if issue is done
+            if _issue_is_done(project, issue_key):
+                items.append({
+                    "source_family": "remote_branch_governance",
+                    "key": f"{remote}/{branch}",
+                    "remote": remote,
+                    "branch": branch,
+                    "stage": "未收口",
+                    "issue_key": issue_key,
+                    "merged_to_develop": False,
+                    "incomplete": ["remote_branch_not_merged", "issue_done_branch_stale"],
+                    "ready": False,
+                    "next_action": f"issue 已完成但分支未合并: 评估合入 develop 或删除 git push {remote} --delete {branch}",
+                })
+
+    return items
 
 
 def main() -> int:
