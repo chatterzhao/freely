@@ -656,8 +656,13 @@ def _all_base_keys(project: Path) -> set[str]:
             pass
 
     # Source 2: Platform open issues (GitHub/Gitee) — not yet implemented.
-    # When implemented, fetch open issues from configured platforms and
-    # extract date-time keys from issue titles/bodies.
+    # When implemented:
+    #   - Fetch OPEN issues from configured platform repos
+    #   - Issues whose title/body contains raw-{key} → extract key (new raw)
+    #   - Issues whose title/body contains I-{key} → this is an I-* issue,
+    #     already promoted; extract its raw parent key for chain tracing
+    #   - CLOSED issues → skip (completed, silent)
+    #   - Only OPEN issues enter the scan; closing is the terminal station
 
     return keys
 
