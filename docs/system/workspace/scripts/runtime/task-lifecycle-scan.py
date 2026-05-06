@@ -554,17 +554,22 @@ def scan_chat_inbox(project: Path) -> list[dict]:
         issue_id = chat.get("issue_id", "")
         msg = (chat.get("message", "") or "")[:200]
 
-        # Check if a worktree exists for this issue
+        # Check if a worktree exists for this issue (cross-format matching)
         worktree_exists = False
         if issue_id:
+            key = issue_id.replace("raw-", "")
+            variants = _normalize_key_variants(key)
             try:
                 branches = subprocess.check_output(
                     ["git", "-C", str(project), "branch", "--format=%(refname:short)"],
                     text=True, stderr=subprocess.DEVNULL,
                 )
                 for branch in branches.splitlines():
-                    if issue_id.replace("raw-", "") in branch or issue_id in branch:
-                        worktree_exists = True
+                    for v in variants:
+                        if v in branch:
+                            worktree_exists = True
+                            break
+                    if worktree_exists:
                         break
             except subprocess.CalledProcessError:
                 pass
@@ -751,8 +756,14 @@ def _trace_chain(project: Path, key: str) -> dict:
             blockers.append("candidate_not_decided")
             return _finalize_chain(key, stations, blockers, "b1_candidate", "candidate_decision")
 
-    # Station 5: I-{key}-* created
-    i_dirs = sorted((project / "docs" / "issues").glob(f"I-{key}-*"))
+    # Station 5: I-{key}-* created — try both format variants
+    variants = _normalize_key_variants(key)
+    i_dirs = []
+    for v in variants:
+        i_dirs.extend(sorted((project / "docs" / "issues").glob(f"I-{v}-*")))
+    # Deduplicate (same dir matched by multiple variants)
+    seen = set()
+    i_dirs = [d for d in i_dirs if not (d.name in seen or seen.add(d.name))]
     i_children = []
     for i_dir in i_dirs:
         i_file = i_dir / "issue.md"
@@ -882,9 +893,34 @@ def _best_child(children: list[dict]) -> dict:
     return best
 
 
+def _normalize_key_variants(key: str) -> list[str]:
+    """Return all format variants of a date-time key for cross-format matching.
+
+    Old format: YYYYMMDD-HHMM  (e.g. 20260503-0915)
+    New format: YYYYMMDDTHHMMZ (e.g. 20260503T0915Z)
+    Bare:       YYYYMMDDHHMMSS (e.g. 20260430222144) — left as-is
+
+    Returns [key] plus any reasonable variants so substring matches work
+    across the old→new format migration boundary.
+    """
+    variants = [key]
+    # Old → New: 20260503-0915 → 20260503T0915Z
+    m = re.match(r'^(\d{8})-(\d{4})$', key)
+    if m:
+        variants.append(f"{m.group(1)}T{m.group(2)}Z")
+        return variants
+    # New → Old: 20260503T0915Z → 20260503-0915
+    m = re.match(r'^(\d{8})T(\d{4})Z$', key)
+    if m:
+        variants.append(f"{m.group(1)}-{m.group(2)}")
+    return variants
+
+
 def _find_all_branches_for_key(project: Path, key: str) -> list[str]:
     """Find ALL git branches containing this key (multiple branches sharing
-    a key is correct — each branch serves a specific purpose for the same issue)."""
+    a key is correct — each branch serves a specific purpose for the same issue).
+    Tries both old and new format variants for cross-format matching."""
+    variants = _normalize_key_variants(key)
     branches = []
     try:
         raw = subprocess.check_output(
@@ -892,8 +928,10 @@ def _find_all_branches_for_key(project: Path, key: str) -> list[str]:
             text=True, stderr=subprocess.DEVNULL,
         )
         for line in raw.splitlines():
-            if key in line.strip():
-                branches.append(line.strip())
+            for v in variants:
+                if v in line.strip():
+                    branches.append(line.strip())
+                    break
     except subprocess.CalledProcessError:
         pass
     return branches
