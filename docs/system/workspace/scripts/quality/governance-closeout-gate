@@ -82,6 +82,68 @@ def _platform_comments_github(issue_number: str, repo: str = "chatterzhao/freely
         return []
 
 
+def _platform_comments_gitee(issue_number: str, repo: str = "") -> list[dict] | None:
+    """Fetch comments from Gitee issue via API. Returns None if unreachable."""
+    try:
+        # Resolve repo from git remotes if not provided
+        if not repo:
+            try:
+                import subprocess as sp
+                raw = sp.check_output(["git", "remote", "-v"], text=True, stderr=sp.DEVNULL)
+                for line in raw.splitlines():
+                    parts = line.split()
+                    if len(parts) < 2:
+                        continue
+                    m = re.search(r"gitee[^:/]*[:/]([^/\s]+/[^/\s]+?)(?:\.git)?$", parts[1])
+                    if m:
+                        repo = m.group(1)
+                        break
+            except Exception:
+                pass
+        if not repo:
+            return None
+
+        # Resolve token
+        token = os.environ.get("GITEE_ACCESS_TOKEN") or os.environ.get("GITEE_TOKEN")
+        if not token:
+            token_paths = [
+                os.path.expanduser("~/.freely/config.env"),
+                os.path.expanduser("~/.config/freely/config.env"),
+            ]
+            for tp in token_paths:
+                if os.path.isfile(tp):
+                    with open(tp) as f:
+                        for line in f:
+                            if "=" in line:
+                                k, v = line.split("=", 1)
+                                if k.strip() in ("GITEE_ACCESS_TOKEN", "GITEE_TOKEN"):
+                                    token = v.strip().strip('"').strip("'")
+                                    break
+                    if token:
+                        break
+
+        if not token:
+            return None
+
+        import urllib.request, urllib.error
+        url = f"https://gitee.com/api/v5/repos/{repo}/issues/{issue_number}/comments?per_page=100"
+        req = urllib.request.Request(url)
+        req.add_header("Authorization", f"token {token}")
+        req.add_header("Accept", "application/json")
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            raw_data = json.loads(resp.read().decode())
+        comments = []
+        for c in raw_data:
+            comments.append({
+                "id": str(c.get("id", "")),
+                "body": (c.get("body") or "")[:80],
+                "created_at": c.get("created_at", ""),
+            })
+        return comments
+    except Exception:
+        return None
+
+
 def _platform_issue_ids(issue_file: Path) -> dict[str, str]:
     """Extract platform issue numbers from issue.md frontmatter."""
     if not issue_file.is_file():
@@ -164,23 +226,30 @@ def run_closeout_gate(project: Path, issue_id: str) -> dict:
     # ── Check 3: platform → docs/issues ──
     plat_ids = _platform_issue_ids(issue_file) if issue_file else {}
     for plat, issue_num in plat_ids.items():
-        if plat == "github" and issue_num:
-            gh_comments = _platform_comments_github(issue_num)
-            if gh_comments is None:
-                warns.append(f"github: API unreachable, skipping comment check")
-                continue
-            missing_from_local = []
-            for gc in gh_comments:
-                gc_id = str(gc["id"])
-                if gc_id not in [ic.get("github_comment_id") for ic in issue_comments]:
-                    missing_from_local.append(gc)
-            if missing_from_local:
-                blocks.append(f"github→docs/issues: {len(missing_from_local)} platform comments missing locally")
-                details["github_missing_local"] = [
-                    {"id": c["id"], "preview": c.get("body", "")[:80]} for c in missing_from_local
-                ]
-            else:
-                details[f"{plat}_ok"] = f"all {len(gh_comments)} github comments in issue.md"
+        if not issue_num:
+            continue
+        if plat == "github":
+            plat_comments = _platform_comments_github(issue_num)
+            comment_id_field = "github_comment_id"
+        elif plat == "gitee":
+            plat_comments = _platform_comments_gitee(issue_num)
+            comment_id_field = "gitee_comment_id"
+        else:
+            continue
+
+        if plat_comments is None:
+            warns.append(f"{plat}: API unreachable, skipping comment check")
+            continue
+
+        local_ids = {ic.get(comment_id_field) for ic in issue_comments if ic.get(comment_id_field)}
+        missing_from_local = [c for c in plat_comments if str(c["id"]) not in local_ids]
+        if missing_from_local:
+            blocks.append(f"{plat}→docs/issues: {len(missing_from_local)} platform comments missing locally")
+            details[f"{plat}_missing_local"] = [
+                {"id": c["id"], "preview": c.get("body", "")[:80]} for c in missing_from_local
+            ]
+        else:
+            details[f"{plat}_ok"] = f"all {len(plat_comments)} {plat} comments in issue.md"
 
     # ── Check 4: docs/issues → platform (warn only) ──
     synced_ids = set()
