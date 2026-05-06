@@ -660,7 +660,17 @@ def _all_base_keys(project: Path) -> set[str]:
         except Exception:
             pass
 
-    # Source 2: Platform open issues (GitHub/Gitee) — not yet implemented.
+    # Source 2: Milestone committed_issues — extract parent keys from I-* entries.
+    # Once a key is discovered (from any source), the chain trace finds ALL
+    # project artifacts matching that key: raw dirs, I-* dirs, B1 dirs,
+    # branches, platform issues. The milestone is where active I-* items
+    # that predate chat_inbox are tracked.
+    mf = project / "docs" / "milestones.md"
+    if mf.is_file():
+        for m in re.finditer(r'I-(\d{8}[-T]\d{4}Z?)-[A-Z]', mf.read_text(encoding="utf-8")):
+            keys.add(m.group(1))
+
+    # Source 3: Platform open issues (GitHub/Gitee) — not yet implemented.
     # When implemented:
     #   - Fetch OPEN issues from configured platform repos
     #   - Issues whose title/body contains raw-{key} → extract key (new raw)
@@ -693,9 +703,18 @@ def _trace_chain(project: Path, key: str) -> dict:
         absorbed_into = fm.get("absorbed_into", "")
         stations["raw_created"] = {"reached": True, "status": raw_status, "absorbed_into": absorbed_into}
     else:
-        stations["raw_created"] = {"reached": False}
-        blockers.append("raw_not_created")
-        return _finalize_chain(key, stations, blockers, "raw_created", "raw_created")
+        # Raw file missing. If B1 or I-* children exist, the raw was once created
+        # (key came from milestone or platform) — infer and continue tracing.
+        i_dirs = list((project / "docs" / "issues").glob(f"I-{key}-*"))
+        b1_dirs = list((project / "docs" / "pre-brainstorms").glob(f"{key}--*")) if (project / "docs" / "pre-brainstorms").is_dir() else []
+        if i_dirs or b1_dirs:
+            raw_status = "inferred"
+            absorbed_into = ""
+            stations["raw_created"] = {"reached": True, "status": "inferred", "note": "raw file missing, inferred from I-* or B1 children"}
+        else:
+            stations["raw_created"] = {"reached": False}
+            blockers.append("raw_not_created")
+            return _finalize_chain(key, stations, blockers, "raw_created", "raw_created")
 
     # Station 1: B1 pre-brainstorm directory
     # If raw is absorbed, B1 phase is complete regardless of directory existence
