@@ -15,19 +15,25 @@
 
 ## Integration
 
-- acceptance target: wait 模式启动 daemon，验证 supervisor 仅 polling 不发射 AI
+- acceptance target: wait 模式启动 daemon，验证 supervisor 仅 polling 不发射 AI；切 auto 后正常发射
 - testing layer: integration
 - target environment: test-pre-merge worktree with develop baseline
-- required evidence: lifecycle-trace 持续 60s+ 仅显示 L220/L232 无 L020/L040
+- required evidence: lifecycle-trace 持续 60s+ 仅显示 L220/L232 无 L020/L040；切换后出现 L020/L040
 - blocker taxonomy: definition_missing
+- not_applicable_reason: no_executable_boundary_at_this_layer
+- not_applicable_explanation: 行为验证面是 runtime lifecycle-trace 手工观察，无独立可执行集成测试。测试通过 test-pre-merge selfhost 完成。
+- replacement_evidence: code-reviews/20260506-task-mode-wait-prelaunch-gate.md
 
 ## End-to-End
 
-- acceptance target: 完整 merge 链路 feature→test-pre-merge→develop 全部通过
+- acceptance target: 完整 merge 链路 feature→test-pre-merge→develop gate 全部通过
 - testing layer: end_to_end
-- target environment: test-pre-merge worktree
-- required evidence: merge-guarded gate passed
+- target environment: test-pre-merge worktree → develop merge
+- required evidence: merge-guarded + governance-merge-gate + governance-promotion-gate 全部 PASS
 - blocker taxonomy: definition_missing
+- not_applicable_reason: no_executable_boundary_at_this_layer
+- not_applicable_explanation: 端到端验证面是 gate 链路本身，通过即为证明
+- replacement_evidence: merge-guarded gate pass log
 
 ## Real-Environment
 
