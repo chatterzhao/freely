@@ -384,12 +384,14 @@ def parse_issue_file(rel_path: str) -> IssueRecord:
     text = read_repo_text(rel_path)
 
     def grab(name: str) -> Optional[str]:
-        # Try bullet format: "- key: value" (I-* issues)
+        # Try bullet format: "- key: value" (I-* issues, top-level bullet)
         match = re.search(rf"^\s*-\s*{re.escape(name)}:\s*(.+?)\s*$", text, re.MULTILINE)
         if match:
             return normalize_scalar(match.group(1))
-        # Try YAML format: "key: value" (raw-* issues)
-        match = re.search(rf"^\s*{re.escape(name)}:\s*(.+?)\s*$", text, re.MULTILINE)
+        # Try YAML format: "key: value" at line start (raw-* issues).
+        # Must be top-level (no leading whitespace) to avoid matching
+        # nested fields like platform_ids.github.issue_id.
+        match = re.search(rf"^{re.escape(name)}:\s*(.+?)\s*$", text, re.MULTILINE)
         return normalize_scalar(match.group(1)) if match else None
 
     issue_id = grab("issue_id") or grab("local_id")
