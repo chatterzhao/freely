@@ -384,24 +384,47 @@ def parse_issue_file(rel_path: str) -> IssueRecord:
     text = read_repo_text(rel_path)
 
     def grab(name: str) -> Optional[str]:
-        # Try bullet format: "- key: value" (I-* issues, top-level bullet)
+        # Try bullet format: "- key: value" (canonical I-* issues, top-level bullet)
         match = re.search(rf"^\s*-\s*{re.escape(name)}:\s*(.+?)\s*$", text, re.MULTILINE)
         if match:
             return normalize_scalar(match.group(1))
-        # Try YAML format: "key: value" at line start (raw-* issues).
+        # Try YAML format: "key: value" at line start (raw-* and linked I-* issues).
         # Must be top-level (no leading whitespace) to avoid matching
         # nested fields like platform_ids.github.issue_id.
         match = re.search(rf"^{re.escape(name)}:\s*(.+?)\s*$", text, re.MULTILINE)
         return normalize_scalar(match.group(1)) if match else None
 
     issue_id = grab("issue_id") or grab("local_id")
+    phase_state = grab("phase_state")
+    milestone = normalize_milestone(grab("milestone"))
+    source_candidate = grab("source_candidate")
+    verification_artifact_dir = grab("verification_artifact_dir")
+
+    # Linked I-* issues in docs/issues/ point to canonical I-* in docs/epics/.
+    # Follow canonical_issue_path to read authoritative governance fields.
+    if rel_path.startswith("docs/issues/I-"):
+        canonical = grab("canonical_issue_path")
+        if canonical and path_exists(canonical):
+            try:
+                canonical_text = read_repo_text(canonical)
+                def cgrab(name: str) -> Optional[str]:
+                    m = re.search(rf"^\s*-\s*{re.escape(name)}:\s*(.+?)\s*$", canonical_text, re.MULTILINE)
+                    return normalize_scalar(m.group(1)) if m else None
+                # Canonical fields override linked fields (which may be absent or stale)
+                phase_state = cgrab("phase_state") or phase_state
+                milestone = normalize_milestone(cgrab("milestone")) or milestone
+                source_candidate = cgrab("source_candidate") or source_candidate
+                verification_artifact_dir = cgrab("verification_artifact_dir") or verification_artifact_dir
+            except Exception:
+                pass  # canonical unreachable, use linked fields as-is
+
     return IssueRecord(
         path=rel_path,
         issue_id=issue_id,
-        phase_state=grab("phase_state"),
-        milestone=normalize_milestone(grab("milestone")),
-        source_candidate=grab("source_candidate"),
-        verification_artifact_dir=grab("verification_artifact_dir"),
+        phase_state=phase_state,
+        milestone=milestone,
+        source_candidate=source_candidate,
+        verification_artifact_dir=verification_artifact_dir,
     )
 
 
@@ -1545,6 +1568,29 @@ def main() -> int:
                 f"GATE G3: {issue_local_id} has platform_state='{platform_state}' but no platform_ids.github.issue_id. "
                 "Set platform_ids or clear platform_state."
             )
+
+    # ── GATE: Comment closeout (pre-merge, before issue-sync close) ──
+    db_path = os.path.join(ROOT_DIR, ".freely", "freely.db")
+    if os.path.isfile(db_path) and touched_issue_records:
+        try:
+            conn = sqlite3.connect(db_path)
+            for issue in touched_issue_records:
+                iid = issue.issue_id
+                if not iid:
+                    continue
+                # Check for unconsumed comments targeting this issue
+                count = conn.execute(
+                    "SELECT COUNT(*) FROM chats WHERE consumed = 0 AND chat_type = 'comment' AND (issue_id = ? OR issue_id = ?)",
+                    (iid, iid)
+                ).fetchone()[0]
+                if count > 0:
+                    errors.append(
+                        f"GATE comment-closeout: {iid} in {issue.path} has {count} unconsumed comment(s) in chat-inbox. "
+                        f"Consume (append to issue.md), discard (consumed=-1), or promote to new raw issue before merging."
+                    )
+            conn.close()
+        except Exception:
+            pass  # SQLite check is best-effort
 
     if errors:
         print("[FAIL] develop merge governance gate blocked.")
