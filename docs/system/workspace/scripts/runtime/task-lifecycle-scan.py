@@ -796,17 +796,24 @@ def _trace_chain(project: Path, key: str) -> dict:
                 "platform_ids": _extract_platform_ids(fm),
             })
 
-    # Absorbed raw with absorbed_into target: follow the link.
-    # The I-* lives under the absorbing issue's key, not this key.
-    if not i_children and raw_is_absorbed and absorbed_into:
-        target_dir = project / "docs" / "issues" / absorbed_into
-        if (target_dir / "issue.md").is_file():
-            stations["i_created"] = {"reached": True, "note": f"absorbed into {absorbed_into}", "target_exists": True}
-            # Chain is complete — the absorbing target carries the lifecycle.
-            return _finalize_chain(key, stations, blockers, "absorbed_complete", None)
+    # Absorbed raw: chain ends at absorption regardless of I-* children.
+    # The absorbing target owns the lifecycle from here.
+    if raw_is_absorbed:
+        if absorbed_into:
+            target_dir = project / "docs" / "issues" / absorbed_into
+            if (target_dir / "issue.md").is_file():
+                stations["i_created"] = {"reached": True, "note": f"absorbed into {absorbed_into}"}
+                if i_children:
+                    stations["i_created"]["children"] = i_children
+                return _finalize_chain(key, stations, blockers, "absorbed_complete", None)
+            else:
+                blockers.append("absorbed_target_missing")
+                return _finalize_chain(key, stations, blockers, "candidate_decision", "i_created")
         else:
-            blockers.append("absorbed_target_missing")
-            return _finalize_chain(key, stations, blockers, "candidate_decision", "i_created")
+            # Absorbed without explicit target — still terminal
+            if i_children:
+                stations["i_created"] = {"reached": True, "children": i_children}
+            return _finalize_chain(key, stations, blockers, "absorbed_complete", None)
 
     if i_children:
         stations["i_created"] = {"reached": True, "children": i_children}
