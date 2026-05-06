@@ -37,3 +37,9 @@ wait 模式 supervisor 不 build prompt、不 launch AI，仅轮询 task_mode_ga
 ## 修复方案
 
 Supervisor 主循环 `select_launch_kind` 前增加 manager 专属前置门禁：`read_task_mode=wait` → `sleep CHECK_INTERVAL` → `continue`。
+
+## Governance
+
+- pre_tests_path: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/pre-tests.md`
+- verification_artifact_dir: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews`
+- canonical_issue_path: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/I-20260506T1000Z-A-task-mode-wait-prelaunch-gate.md`
