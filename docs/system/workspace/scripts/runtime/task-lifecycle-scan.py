@@ -626,29 +626,27 @@ CHAIN_STATIONS = [
 ]
 
 def _all_base_keys(project: Path) -> set[str]:
-    """Collect base keys from true origins only — chat_inbox and raw-* dirs.
+    """Collect base keys from true origins only.
 
-    Design principle: history is grandfathered. Items that completed before the
-    raw-issue convention existed do NOT need raw issues backfilled. The scan
-    only traces keys that have a real entry point:
-      1. chat_inbox (consumed=0) → unconsumed incoming issues
-      2. docs/issues/raw-* → existing raw issues in the current lifecycle
-      3. Platform open issues (via GitHub/Gitee API) — future
+    True origins (the only places a raw issue is born):
+      1. chats table (consumed=0, chat_type='new-issue') → human/AI creates via chat
+      2. Platform API (GitHub/Gitee open issues) → external user opens issue
 
-    B1 dirs and I-* dirs are NOT independent sources — they are downstream
-    artifacts. If a key has a B1 dir but no raw-* or chat entry, it predates
-    the convention and should not appear in scan output.
+    docs/issues/raw-* is NOT an origin — it is a localization created downstream
+    by wt-create (materializing from chat_inbox) or issue-sync (syncing from platform).
+    The chain trace checks raw-* existence at station 0, but key discovery must
+    come from the real entry points.
     """
     keys = set()
 
-    # Source 1: SQLite chat inbox (unconsumed only)
+    # Source 1: SQLite chat inbox (unconsumed new-issue entries)
     db_path = project / ".freely" / "freely.db"
     if db_path.is_file():
         try:
             import sqlite3
             conn = sqlite3.connect(str(db_path))
             rows = conn.execute(
-                "SELECT issue_id FROM chats WHERE consumed = 0 AND issue_id LIKE 'raw-%'"
+                "SELECT issue_id FROM chats WHERE consumed = 0 AND chat_type = 'new-issue'"
             ).fetchall()
             conn.close()
             for (issue_id,) in rows:
@@ -657,16 +655,9 @@ def _all_base_keys(project: Path) -> set[str]:
         except Exception:
             pass
 
-    # Source 2: docs/issues/raw-* directories (existing raw issues)
-    issues_dir = project / "docs" / "issues"
-    if issues_dir.is_dir():
-        for d in issues_dir.iterdir():
-            if d.is_dir() and d.name.startswith("raw-"):
-                keys.add(d.name[4:])
-
-    # Source 3: pre-brainstorm dirs — validation only, not a key source.
-    # B1 dirs without raw-* or chat entry are historical (grandfathered).
-    # The merge gate enforces raw-issue creation going forward.
+    # Source 2: Platform open issues (GitHub/Gitee) — not yet implemented.
+    # When implemented, fetch open issues from configured platforms and
+    # extract date-time keys from issue titles/bodies.
 
     return keys
 
