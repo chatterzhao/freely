@@ -43,6 +43,11 @@ while read -r old_oid new_oid refname; do
     continue
   fi
 
+  # No-op: ref points to the same commit (e.g. git reset --hard HEAD)
+  if [[ "$old_oid" == "$new_oid" ]]; then
+    continue
+  fi
+
   if commit_is_merge_commit "$new_oid" && commit_has_canonical_receipt "$new_oid"; then
     continue
   fi
