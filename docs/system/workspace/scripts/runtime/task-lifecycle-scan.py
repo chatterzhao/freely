@@ -421,6 +421,11 @@ def build_payload(project: Path) -> dict:
     # Phase 1-6: Full lifecycle chain trace (source-anchored)
     chain_items = scan_chain_trace(project)
     for c in chain_items:
+        # Derive title from available station data
+        title = f"raw-{c['key']}"
+        st = c.get("stations", {})
+        if st.get("i_created") and st["i_created"].get("children"):
+            title = st["i_created"]["children"][0].get("id", title)
         output.append({
             "source_family": "chain_trace",
             "key": c["key"],
@@ -432,7 +437,8 @@ def build_payload(project: Path) -> dict:
             "incomplete": c["blockers"],
             "advisory": c.get("advisory", []),
             "children": [],
-            "title": f"raw-{c['key']}",
+            "title": title,
+            "paths": c.get("paths", {}),
         })
 
     # Add worktree governance items
@@ -548,17 +554,22 @@ def scan_chat_inbox(project: Path) -> list[dict]:
         issue_id = chat.get("issue_id", "")
         msg = (chat.get("message", "") or "")[:200]
 
-        # Check if a worktree exists for this issue
+        # Check if a worktree exists for this issue (cross-format matching)
         worktree_exists = False
         if issue_id:
+            key = issue_id.replace("raw-", "")
+            variants = _normalize_key_variants(key)
             try:
                 branches = subprocess.check_output(
                     ["git", "-C", str(project), "branch", "--format=%(refname:short)"],
                     text=True, stderr=subprocess.DEVNULL,
                 )
                 for branch in branches.splitlines():
-                    if issue_id.replace("raw-", "") in branch or issue_id in branch:
-                        worktree_exists = True
+                    for v in variants:
+                        if v in branch:
+                            worktree_exists = True
+                            break
+                    if worktree_exists:
                         break
             except subprocess.CalledProcessError:
                 pass
@@ -620,27 +631,27 @@ CHAIN_STATIONS = [
 ]
 
 def _all_base_keys(project: Path) -> set[str]:
-    """Collect base keys from ALL sources, anchored at the true origins.
+    """Collect base keys from true origins only.
 
-    Sources (in priority order):
-    1. SQLite chat inbox (consumed=0) → extract xxx from issue_id (raw-xxx)
-    2. docs/issues/raw-* directories
-    3. docs/pre-brainstorms/{xxx}--* directories
-    4. Platform open issues (via GitHub/Gitee scan) — not yet implemented
+    True origins (the only places a raw issue is born):
+      1. chats table (consumed=0, chat_type='new-issue') → human/AI creates via chat
+      2. Platform API (GitHub/Gitee open issues) → external user opens issue
 
-    Each source contributes its xxx key. The chain trace then follows each
-    key through the full lifecycle.
+    docs/issues/raw-* is NOT an origin — it is a localization created downstream
+    by wt-create (materializing from chat_inbox) or issue-sync (syncing from platform).
+    The chain trace checks raw-* existence at station 0, but key discovery must
+    come from the real entry points.
     """
     keys = set()
 
-    # Source 1: SQLite chat inbox
+    # Source 1: SQLite chat inbox (unconsumed new-issue entries)
     db_path = project / ".freely" / "freely.db"
     if db_path.is_file():
         try:
             import sqlite3
             conn = sqlite3.connect(str(db_path))
             rows = conn.execute(
-                "SELECT issue_id FROM chats WHERE consumed = 0 AND issue_id LIKE 'raw-%'"
+                "SELECT issue_id FROM chats WHERE consumed = 0 AND chat_type = 'new-issue'"
             ).fetchall()
             conn.close()
             for (issue_id,) in rows:
@@ -649,21 +660,24 @@ def _all_base_keys(project: Path) -> set[str]:
         except Exception:
             pass
 
-    # Source 2: docs/issues/raw-* directories
-    issues_dir = project / "docs" / "issues"
-    if issues_dir.is_dir():
-        for d in issues_dir.iterdir():
-            if d.is_dir() and d.name.startswith("raw-"):
-                keys.add(d.name[4:])
+    # Source 2: Milestone committed_issues — extract parent keys from I-* entries.
+    # Once a key is discovered (from any source), the chain trace finds ALL
+    # project artifacts matching that key: raw dirs, I-* dirs, B1 dirs,
+    # branches, platform issues. The milestone is where active I-* items
+    # that predate chat_inbox are tracked.
+    mf = project / "docs" / "milestones.md"
+    if mf.is_file():
+        for m in re.finditer(r'I-(\d{8}[-T]\d{4}Z?)-[A-Z]', mf.read_text(encoding="utf-8")):
+            keys.add(m.group(1))
 
-    # Source 3: pre-brainstorm dirs (only if matching raw-* or chat key exists)
-    pb_dir = project / "docs" / "pre-brainstorms"
-    if pb_dir.is_dir():
-        for d in pb_dir.iterdir():
-            if d.is_dir():
-                m = re.match(r"^(\d{8}[-T]\d{4}Z?)--", d.name)
-                if m and m.group(1) in keys:  # only if source 1 or 2 already found it
-                    pass  # already in keys
+    # Source 3: Platform open issues (GitHub/Gitee) — not yet implemented.
+    # When implemented:
+    #   - Fetch OPEN issues from configured platform repos
+    #   - Issues whose title/body contains raw-{key} → extract key (new raw)
+    #   - Issues whose title/body contains I-{key} → this is an I-* issue,
+    #     already promoted; extract its raw parent key for chain tracing
+    #   - CLOSED issues → skip (completed, silent)
+    #   - Only OPEN issues enter the scan; closing is the terminal station
 
     return keys
 
@@ -689,9 +703,18 @@ def _trace_chain(project: Path, key: str) -> dict:
         absorbed_into = fm.get("absorbed_into", "")
         stations["raw_created"] = {"reached": True, "status": raw_status, "absorbed_into": absorbed_into}
     else:
-        stations["raw_created"] = {"reached": False}
-        blockers.append("raw_not_created")
-        return _finalize_chain(key, stations, blockers, "raw_created", "raw_created")
+        # Raw file missing. If B1 or I-* children exist, the raw was once created
+        # (key came from milestone or platform) — infer and continue tracing.
+        i_dirs = list((project / "docs" / "issues").glob(f"I-{key}-*"))
+        b1_dirs = list((project / "docs" / "pre-brainstorms").glob(f"{key}--*")) if (project / "docs" / "pre-brainstorms").is_dir() else []
+        if i_dirs or b1_dirs:
+            raw_status = "inferred"
+            absorbed_into = ""
+            stations["raw_created"] = {"reached": True, "status": "inferred", "note": "raw file missing, inferred from I-* or B1 children"}
+        else:
+            stations["raw_created"] = {"reached": False}
+            blockers.append("raw_not_created")
+            return _finalize_chain(key, stations, blockers, "raw_created", "raw_created")
 
     # Station 1: B1 pre-brainstorm directory
     # If raw is absorbed, B1 phase is complete regardless of directory existence
@@ -752,8 +775,14 @@ def _trace_chain(project: Path, key: str) -> dict:
             blockers.append("candidate_not_decided")
             return _finalize_chain(key, stations, blockers, "b1_candidate", "candidate_decision")
 
-    # Station 5: I-{key}-* created
-    i_dirs = sorted((project / "docs" / "issues").glob(f"I-{key}-*"))
+    # Station 5: I-{key}-* created — try both format variants
+    variants = _normalize_key_variants(key)
+    i_dirs = []
+    for v in variants:
+        i_dirs.extend(sorted((project / "docs" / "issues").glob(f"I-{v}-*")))
+    # Deduplicate (same dir matched by multiple variants)
+    seen = set()
+    i_dirs = [d for d in i_dirs if not (d.name in seen or seen.add(d.name))]
     i_children = []
     for i_dir in i_dirs:
         i_file = i_dir / "issue.md"
@@ -766,6 +795,26 @@ def _trace_chain(project: Path, key: str) -> dict:
                 "canonical": fm.get("canonical_issue_path", ""),
                 "platform_ids": _extract_platform_ids(fm),
             })
+
+    # Absorbed raw: chain ends at absorption regardless of I-* children.
+    # The absorbing target owns the lifecycle from here.
+    if raw_is_absorbed:
+        if absorbed_into:
+            target_dir = project / "docs" / "issues" / absorbed_into
+            if (target_dir / "issue.md").is_file():
+                stations["i_created"] = {"reached": True, "note": f"absorbed into {absorbed_into}"}
+                if i_children:
+                    stations["i_created"]["children"] = i_children
+                return _finalize_chain(key, stations, blockers, "absorbed_complete", None)
+            else:
+                blockers.append("absorbed_target_missing")
+                return _finalize_chain(key, stations, blockers, "candidate_decision", "i_created")
+        else:
+            # Absorbed without explicit target — still terminal
+            if i_children:
+                stations["i_created"] = {"reached": True, "children": i_children}
+            return _finalize_chain(key, stations, blockers, "absorbed_complete", None)
+
     if i_children:
         stations["i_created"] = {"reached": True, "children": i_children}
     else:
@@ -870,9 +919,34 @@ def _best_child(children: list[dict]) -> dict:
     return best
 
 
+def _normalize_key_variants(key: str) -> list[str]:
+    """Return all format variants of a date-time key for cross-format matching.
+
+    Old format: YYYYMMDD-HHMM  (e.g. 20260503-0915)
+    New format: YYYYMMDDTHHMMZ (e.g. 20260503T0915Z)
+    Bare:       YYYYMMDDHHMMSS (e.g. 20260430222144) — left as-is
+
+    Returns [key] plus any reasonable variants so substring matches work
+    across the old→new format migration boundary.
+    """
+    variants = [key]
+    # Old → New: 20260503-0915 → 20260503T0915Z
+    m = re.match(r'^(\d{8})-(\d{4})$', key)
+    if m:
+        variants.append(f"{m.group(1)}T{m.group(2)}Z")
+        return variants
+    # New → Old: 20260503T0915Z → 20260503-0915
+    m = re.match(r'^(\d{8})T(\d{4})Z$', key)
+    if m:
+        variants.append(f"{m.group(1)}-{m.group(2)}")
+    return variants
+
+
 def _find_all_branches_for_key(project: Path, key: str) -> list[str]:
     """Find ALL git branches containing this key (multiple branches sharing
-    a key is correct — each branch serves a specific purpose for the same issue)."""
+    a key is correct — each branch serves a specific purpose for the same issue).
+    Tries both old and new format variants for cross-format matching."""
+    variants = _normalize_key_variants(key)
     branches = []
     try:
         raw = subprocess.check_output(
@@ -880,19 +954,25 @@ def _find_all_branches_for_key(project: Path, key: str) -> list[str]:
             text=True, stderr=subprocess.DEVNULL,
         )
         for line in raw.splitlines():
-            if key in line.strip():
-                branches.append(line.strip())
+            for v in variants:
+                if v in line.strip():
+                    branches.append(line.strip())
+                    break
     except subprocess.CalledProcessError:
         pass
     return branches
 
 
 def _parse_h3_sections(path: Path) -> list[dict]:
-    """Parse ### sections from a markdown file, extracting key-value fields."""
+    """Parse ## and ### sections from a markdown file, extracting key-value fields.
+
+    candidates.md uses ## for candidate entries (with status/priority/scope fields)
+    and ### for subsections. Both levels must be parsed to find promoted/absorbed/dropped.
+    """
     if not path.is_file():
         return []
     text = path.read_text(encoding="utf-8")
-    parts = re.split(r"^###\s+(.+)$", text, flags=re.MULTILINE)
+    parts = re.split(r"^(?:#{2,3})\s+(.+)$", text, flags=re.MULTILINE)
     sections = []
     for idx in range(1, len(parts), 2):
         title = parts[idx].strip()
@@ -924,7 +1004,7 @@ def _finalize_chain(key: str, stations: dict, blockers: list[str], current: str,
         "stations": stations,
         "blockers": blockers,
         "advisory": advisory,
-        "complete": len(blockers) == 0 and current == "branch_deleted",
+        "complete": len(blockers) == 0 and current in ("branch_deleted", "absorbed_complete"),
     }
 
 
@@ -1016,6 +1096,7 @@ def scan_chain_trace(project: Path) -> list[dict]:
       - next_station: first missing/incomplete station
       - blockers: what's preventing progress
       - ready: whether the item can be worked on (past candidate_decision)
+      - paths: file paths for quick location (raw_file, b1_dir, i_files)
     """
     keys = _all_base_keys(project)
     results = []
@@ -1023,6 +1104,8 @@ def scan_chain_trace(project: Path) -> list[dict]:
         trace = _trace_chain(project, key)
         if trace["complete"]:
             continue  # fully closed — silent
+        # Collect file paths from station data for quick location
+        paths = _collect_paths(key, trace["stations"], project)
         results.append({
             "key": key,
             "stage": trace["current_station"],
@@ -1031,6 +1114,7 @@ def scan_chain_trace(project: Path) -> list[dict]:
             "ready": trace["current_station"] not in ("raw_created", "b1_dir", "b1_brainstorm", "b1_candidate", "candidate_decision"),
             "next_action": _derive_chain_action(trace["current_station"], trace["next_station"], trace["blockers"]),
             "stations": {k: v for k, v in trace["stations"].items() if v.get("reached")},
+            "paths": paths,
         })
     return results
 
@@ -1056,6 +1140,24 @@ def _derive_chain_action(current: str, next_station: str | None, blockers: list[
         return CHAIN_ACTIONS[next_station]
     if blockers:
         return f"解决阻塞: {', '.join(blockers)}"
+
+
+def _collect_paths(key: str, stations: dict, project: Path) -> dict:
+    """Extract file paths from station data so scan output includes location info."""
+    paths = {}
+    # Raw issue
+    raw_dir = project / "docs" / "issues" / f"raw-{key}"
+    if (raw_dir / "issue.md").is_file():
+        paths["raw_file"] = str((raw_dir / "issue.md").relative_to(project))
+    # B1 directory
+    b1_info = stations.get("b1_dir", {})
+    if b1_info.get("path"):
+        paths["b1_dir"] = b1_info["path"]
+    # I-* issue files
+    i_dirs = sorted((project / "docs" / "issues").glob(f"I-{key}-*"))
+    if i_dirs:
+        paths["i_files"] = [str((d / "issue.md").relative_to(project)) for d in i_dirs if (d / "issue.md").is_file()]
+    return paths
     return "收口完成"
 
 
