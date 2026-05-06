@@ -3,6 +3,7 @@ local_id: raw-20260501-0000
 issue_title: "PR scan surface + FREELY_REPO_PLATFORMS config"
 kind: raw
 phase_state: absorbed
+absorbed_into: I-20260501-0000-A
 promoted_to: C-20260501-0000-A
 platform_ids:
   github:
