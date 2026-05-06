@@ -439,6 +439,7 @@ def build_payload(project: Path) -> dict:
             "children": [],
             "title": title,
             "paths": c.get("paths", {}),
+            "pending_comments": c.get("pending_comments", 0),
         })
 
     # Add worktree governance items
@@ -581,13 +582,21 @@ def scan_chat_inbox(project: Path) -> list[dict]:
                 if not worktree_exists
                 else "工位已存在，chat 应已同步到 worktree docs/issues/"
             )
+            incomplete = ["chat_unconsumed"]
         else:
+            # Check if the target issue exists (for comments, the issue may not exist yet)
+            target_issue_dir = project / "docs" / "issues" / issue_id if issue_id else None
+            issue_exists = target_issue_dir and target_issue_dir.is_dir() if target_issue_dir else False
             stage = "chat_comment_pending"
-            next_action = (
-                f"AI 在对应工位追加评论到 docs/issues/{issue_id}/issue.md → chat-inbox consume"
-                if worktree_exists
-                else f"无工位：等待工位创建后同步评论到 docs/issues/{issue_id}/"
-            )
+            if worktree_exists:
+                next_action = f"AI 在对应工位追加评论到 docs/issues/{issue_id}/issue.md → chat-inbox consume"
+                incomplete = ["chat_unconsumed"]
+            elif not issue_exists:
+                next_action = f"目标 issue {issue_id} 不存在——需先创建工位和 raw issue，评论才能消费"
+                incomplete = ["chat_unconsumed", "target_issue_missing"]
+            else:
+                next_action = f"无工位：等待工位创建后同步评论到 docs/issues/{issue_id}/"
+                incomplete = ["chat_unconsumed"]
 
         items.append({
             "source_family": "chat_inbox",
@@ -596,10 +605,11 @@ def scan_chat_inbox(project: Path) -> list[dict]:
             "chat_type": chat_type,
             "issue_id": issue_id,
             "worktree_exists": worktree_exists,
-            "incomplete": ["chat_unconsumed"],
+            "incomplete": incomplete,
             "ready": worktree_exists,
             "next_action": next_action,
             "message_preview": msg,
+            "issue_exists": issue_exists if chat_type == "comment" else None,
         })
     return items
 
@@ -1106,6 +1116,25 @@ def _worktree_branch(worktree_path: Path) -> str | None:
         return None
 
 
+def _pending_comments_for_key(project: Path, key: str) -> int:
+    """Count unconsumed comments in chats table targeting raw-{key} or I-{key}-*."""
+    db_path = project / ".freely" / "freely.db"
+    if not db_path.is_file():
+        return 0
+    try:
+        import sqlite3
+        conn = sqlite3.connect(str(db_path))
+        # Match raw-{key} exactly, or I-{key}-* pattern, or any issue_id containing the key
+        count = conn.execute(
+            "SELECT COUNT(*) FROM chats WHERE consumed = 0 AND chat_type = 'comment' AND (issue_id = ? OR issue_id LIKE ?)",
+            (f"raw-{key}", f"I-{key}-%")
+        ).fetchone()[0]
+        conn.close()
+        return count
+    except Exception:
+        return 0
+
+
 def scan_chain_trace(project: Path) -> list[dict]:
     """Trace the full lifecycle chain for every unique base key.
 
@@ -1115,6 +1144,7 @@ def scan_chain_trace(project: Path) -> list[dict]:
       - blockers: what's preventing progress
       - ready: whether the item can be worked on (past candidate_decision)
       - paths: file paths for quick location (raw_file, b1_dir, i_files)
+      - pending_comments: count of unconsumed comments for this key
     """
     keys = _all_base_keys(project)
     results = []
@@ -1124,6 +1154,8 @@ def scan_chain_trace(project: Path) -> list[dict]:
             continue  # fully closed — silent
         # Collect file paths from station data for quick location
         paths = _collect_paths(key, trace["stations"], project)
+        # Check for unconsumed comments targeting this issue
+        pending = _pending_comments_for_key(project, key)
         results.append({
             "key": key,
             "stage": trace["current_station"],
@@ -1133,6 +1165,7 @@ def scan_chain_trace(project: Path) -> list[dict]:
             "next_action": _derive_chain_action(trace["current_station"], trace["next_station"], trace["blockers"]),
             "stations": {k: v for k, v in trace["stations"].items() if v.get("reached")},
             "paths": paths,
+            "pending_comments": pending,
         })
     return results
 

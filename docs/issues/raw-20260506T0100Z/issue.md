@@ -1,4 +1,5 @@
 ---
+local_id: raw-20260506T0100Z
 phase_state: proposed
 kind: raw
 source_family: chat_inbox
