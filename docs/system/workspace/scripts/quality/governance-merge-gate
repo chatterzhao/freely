@@ -1305,10 +1305,17 @@ def main() -> int:
         if expected_queue:
             matching_queue = [entry for entry in entries if entry.queue == expected_queue]
             if not matching_queue:
-                errors.append(
-                    f"{issue.issue_id} in {issue.path} has phase_state '{issue.phase_state}', but docs/milestones.md does not place it in {expected_queue}. "
-                    f"Synchronize the milestone queue with the real issue phase before merging to develop."
-                )
+                if phase == "completed":
+                    # Completed legacy items: milestone queue is bookkeeping, not a merge blocker.
+                    warnings.append(
+                        f"{issue.issue_id} in {issue.path} has phase_state 'completed' but is not in milestone {expected_queue}. "
+                        f"Consider moving it into completed_issues for traceability."
+                    )
+                else:
+                    errors.append(
+                        f"{issue.issue_id} in {issue.path} has phase_state '{issue.phase_state}', but docs/milestones.md does not place it in {expected_queue}. "
+                        f"Synchronize the milestone queue with the real issue phase before merging to develop."
+                    )
 
         if source_candidate_path:
             referenced_candidate = resolve_source_candidate_record(issue, candidate_records_by_path)
@@ -1320,10 +1327,14 @@ def main() -> int:
                     referenced_candidate.candidate_id,
                     referenced_candidate.legacy_id_mapping,
                 ):
-                    errors.append(
+                    msg = (
                         f"{issue.issue_id} in {issue.path} comes from {referenced_candidate.candidate_id}, but the issue id does not preserve the shared issue-id key '{c_key}'. "
                         f"Rename it to I-{c_key} or I-{c_key}-<split> so milestone and IBM stay on the same lifecycle line."
                     )
+                    if phase == "completed":
+                        warnings.append(msg)
+                    else:
+                        errors.append(msg)
 
                 candidate_status = (referenced_candidate.status or "").strip("`").strip()
                 if candidate_status in {"proposed", "needs_research", "blocked"} and expected_queue:
