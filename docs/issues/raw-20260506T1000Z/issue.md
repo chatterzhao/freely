@@ -3,18 +3,21 @@ local_id: raw-20260506T1000Z
 kind: raw
 phase_state: proposed
 platform_ids:
-  github: "229"
+  github:
+    issue_id: '231'
+    url: https://github.com/chatterzhao/freely/issues/231
+    synced_at: '2026-05-06T17:49:17Z'
 primary_platform: github
-canonical_issue_path: ""
+canonical_issue_path: ''
 last_synced_comment_at: {}
-hash: ""
-created_at: 2026-05-06T10:00:00Z
-updated_at: 2026-05-06T10:00:00Z
-intake_id: ""
+hash: ''
+created_at: 2026-05-06 10:00:00+00:00
+updated_at: '2026-05-06T17:49:17Z'
+intake_id: ''
 author: zhaoquan
 channel: github
 session_refs: []
-platform_state: ''
+platform_state: open
 ---
 
 ## 问题
