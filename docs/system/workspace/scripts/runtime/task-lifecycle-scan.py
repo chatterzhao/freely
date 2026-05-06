@@ -796,24 +796,42 @@ def _trace_chain(project: Path, key: str) -> dict:
                 "platform_ids": _extract_platform_ids(fm),
             })
 
-    # Absorbed raw: chain ends at absorption regardless of I-* children.
-    # The absorbing target owns the lifecycle from here.
+    # Absorbed raw: chain may be complete, but cross-validate with children.
+    # Don't let a single absorbed flag suppress active children or missing targets.
     if raw_is_absorbed:
         if absorbed_into:
             target_dir = project / "docs" / "issues" / absorbed_into
             if (target_dir / "issue.md").is_file():
-                stations["i_created"] = {"reached": True, "note": f"absorbed into {absorbed_into}"}
-                if i_children:
-                    stations["i_created"]["children"] = i_children
-                return _finalize_chain(key, stations, blockers, "absorbed_complete", None)
+                target_fm = parse_frontmatter((target_dir / "issue.md").read_text(encoding="utf-8"))
+                target_phase = target_fm.get("phase_state", "")
+                if target_phase in DONE_STATES or target_phase == COMPLETED:
+                    # Target is done — absorption is fully resolved.
+                    stations["i_created"] = {"reached": True, "note": f"absorbed into {absorbed_into} (done)"}
+                    if i_children:
+                        stations["i_created"]["children"] = i_children
+                    return _finalize_chain(key, stations, blockers, "absorbed_complete", None)
+                else:
+                    # Target exists but is NOT done — surface the inconsistency.
+                    blockers.append(f"absorbed_target_not_done:{absorbed_into}={target_phase}")
+                    if i_children:
+                        stations["i_created"] = {"reached": True, "children": i_children}
+                        # Continue tracing children normally — they carry the real lifecycle.
+                    else:
+                        stations["i_created"] = {"reached": False}
+                        return _finalize_chain(key, stations, blockers, "candidate_decision", "i_created")
             else:
                 blockers.append("absorbed_target_missing")
+                stations["i_created"] = {"reached": False}
                 return _finalize_chain(key, stations, blockers, "candidate_decision", "i_created")
         else:
-            # Absorbed without explicit target — still terminal
-            if i_children:
-                stations["i_created"] = {"reached": True, "children": i_children}
-            return _finalize_chain(key, stations, blockers, "absorbed_complete", None)
+            # Absorbed without target — don't assume terminal.
+            # If I-* children exist, they carry the real lifecycle. Trace them.
+            if not i_children:
+                blockers.append("absorbed_no_target_no_children")
+                stations["i_created"] = {"reached": False}
+                return _finalize_chain(key, stations, blockers, "candidate_decision", "i_created")
+            # Has children — fall through to normal tracing below.
+            stations["i_created"] = {"reached": True, "children": i_children, "note": "raw=absorbed but children exist — tracing children"}
 
     if i_children:
         stations["i_created"] = {"reached": True, "children": i_children}
