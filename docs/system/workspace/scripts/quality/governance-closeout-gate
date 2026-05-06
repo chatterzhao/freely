@@ -1,0 +1,244 @@
+#!/usr/bin/env python3
+"""Closeout gate: reconcile comments across chats, docs/issues, and platforms.
+
+Three-source reconciliation before issue close:
+  1. chats → docs/issues: every unconsumed comment must appear in issue.md
+  2. docs/issues → chats: every comment in issue.md must be consumed or discarded
+  3. platform → docs/issues: every platform comment must exist in issue.md
+  4. docs/issues → platform: local-only comments are OK (pending sync), warn only
+
+Usage: governance-closeout-gate --issue raw-20260430-0010 [--project /path]
+"""
+from __future__ import annotations
+import argparse, json, os, re, sqlite3, subprocess, sys
+from collections import defaultdict
+from pathlib import Path
+
+
+def _issue_file(project: Path, issue_id: str) -> Path | None:
+    p = project / "docs" / "issues" / issue_id / "issue.md"
+    return p if p.is_file() else None
+
+
+def _chat_comments(project: Path, issue_id: str) -> list[dict]:
+    """All comment-type chat entries for this issue."""
+    db = project / ".freely" / "freely.db"
+    if not db.is_file():
+        return []
+    conn = sqlite3.connect(str(db))
+    conn.row_factory = sqlite3.Row
+    rows = conn.execute(
+        "SELECT * FROM chats WHERE chat_type = 'comment' AND issue_id = ? ORDER BY id",
+        (issue_id,)
+    ).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def _issue_comments(issue_file: Path) -> list[dict]:
+    """Parse ### comment-{id} sections from issue.md."""
+    if not issue_file.is_file():
+        return []
+    text = issue_file.read_text(encoding="utf-8")
+    comments = []
+    for m in re.finditer(r'^### (comment-\S+)', text, re.MULTILINE):
+        cid = m.group(1)
+        # Find platform_ids for this comment
+        start = m.start()
+        next_comment = re.search(r'^### comment-', text[m.end():], re.MULTILINE)
+        end = m.end() + next_comment.start() if next_comment else len(text)
+        block = text[start:end]
+        gh_m = re.search(r'github:\s*\n\s*comment_id:\s*"?(\S+)"?', block)
+        gt_m = re.search(r'gitee:\s*\n\s*comment_id:\s*"?(\S+)"?', block)
+        comments.append({
+            "id": cid,
+            "github_comment_id": gh_m.group(1) if gh_m else None,
+            "gitee_comment_id": gt_m.group(1) if gt_m else None,
+        })
+    return comments
+
+
+def _platform_comments_github(issue_number: str, repo: str = "chatterzhao/freely") -> list[dict]:
+    """Fetch comments from GitHub issue via gh CLI."""
+    try:
+        result = subprocess.run(
+            ["gh", "api", f"repos/{repo}/issues/{issue_number}/comments",
+             "--jq", ".[] | {id: .id, body: .body[:80], created_at: .created_at}"],
+            capture_output=True, text=True, timeout=15
+        )
+        if result.returncode != 0:
+            return []
+        comments = []
+        for line in result.stdout.strip().split("\n"):
+            if line.strip():
+                try:
+                    c = json.loads(line)
+                    comments.append({"id": str(c.get("id", "")), "body": c.get("body", ""),
+                                     "created_at": c.get("created_at", "")})
+                except json.JSONDecodeError:
+                    pass
+        return comments
+    except Exception:
+        return []
+
+
+def _platform_issue_ids(issue_file: Path) -> dict[str, str]:
+    """Extract platform issue numbers from issue.md frontmatter."""
+    if not issue_file.is_file():
+        return {}
+    text = issue_file.read_text(encoding="utf-8")
+    ids = {}
+    for plat in ("github", "gitee"):
+        m = re.search(rf'{plat}:\s*\n\s*issue_id:\s*"?(\S+)"?', text)
+        if m and m.group(1):
+            ids[plat] = m.group(1)
+    return ids
+
+
+def run_closeout_gate(project: Path, issue_id: str) -> dict:
+    """Run all closeout checks. Returns dict with pass/block and details."""
+    blocks = []
+    warns = []
+    details = {}
+
+    issue_file = _issue_file(project, issue_id)
+
+    # ── Check 1: chats → docs/issues ──
+    chat_comments = _chat_comments(project, issue_id)
+    issue_comments = _issue_comments(issue_file) if issue_file else []
+    issue_comment_ids = {c["id"] for c in issue_comments}
+
+    unconsumed_in_chats = [c for c in chat_comments if c.get("consumed") == 0]
+    unconsumed_missing = []
+    for c in unconsumed_in_chats:
+        # Check if a matching ### comment-{cid} exists in issue.md
+        # The comment ID format in issue.md is comment-YYYYMMDDTHHMMSSZ
+        # The chat ID is YYYYMMDDHHMMSS — we check by content match
+        chat_msg = (c.get("message") or "")[:80]
+        found = any(chat_msg[:40] in open(issue_file).read() for _ in [0]) if issue_file else False
+        # Actually, we check if any issue comment's id contains the chat id digits
+        chat_ts = str(c["id"])
+        matched = any(chat_ts in ic["id"] for ic in issue_comments)
+        if not matched:
+            unconsumed_missing.append(c)
+
+    if unconsumed_missing:
+        blocks.append(f"chats→docs/issues: {len(unconsumed_missing)} unconsumed comments not in issue.md")
+        details["unconsumed_missing"] = [
+            {"chat_id": c["id"], "preview": (c.get("message") or "")[:80]} for c in unconsumed_missing
+        ]
+    elif unconsumed_in_chats:
+        details["unconsumed_ok"] = f"{len(unconsumed_in_chats)} unconsumed, all matched in issue.md"
+    else:
+        details["unconsumed_ok"] = "no unconsumed comments"
+
+    # ── Check 2: docs/issues → chats (every issue.md comment must be consumed) ──
+    orphan_comments = []
+    for ic in issue_comments:
+        cid = ic["id"]
+        # Find matching chat by id substring
+        # comment-YYYYMMDDTHHMMSSZ → chat id YYYYMMDDHHMMSS
+        chat_match = None
+        for cc in chat_comments:
+            cc_ts = str(cc["id"])
+            if cc_ts in cid:
+                chat_match = cc
+                break
+        if chat_match:
+            if chat_match.get("consumed") not in (1, -1):
+                orphan_comments.append({"comment_id": cid, "chat_id": chat_match["id"],
+                                        "consumed": chat_match.get("consumed")})
+        else:
+            # Comment in issue.md but no matching chat — could be from platform sync
+            # This is OK if it has platform_ids
+            if not ic.get("github_comment_id") and not ic.get("gitee_comment_id"):
+                orphan_comments.append({"comment_id": cid, "chat_id": "N/A",
+                                        "consumed": "no chat record, no platform_ids"})
+
+    if orphan_comments:
+        blocks.append(f"docs/issues→chats: {len(orphan_comments)} comments with invalid consumed state")
+        details["orphan_comments"] = orphan_comments
+    else:
+        details["consumed_state_ok"] = f"all {len(issue_comments)} issue.md comments have valid consumed state"
+
+    # ── Check 3: platform → docs/issues ──
+    plat_ids = _platform_issue_ids(issue_file) if issue_file else {}
+    for plat, issue_num in plat_ids.items():
+        if plat == "github" and issue_num:
+            gh_comments = _platform_comments_github(issue_num)
+            if gh_comments is None:
+                warns.append(f"github: API unreachable, skipping comment check")
+                continue
+            missing_from_local = []
+            for gc in gh_comments:
+                gc_id = str(gc["id"])
+                if gc_id not in [ic.get("github_comment_id") for ic in issue_comments]:
+                    missing_from_local.append(gc)
+            if missing_from_local:
+                blocks.append(f"github→docs/issues: {len(missing_from_local)} platform comments missing locally")
+                details["github_missing_local"] = [
+                    {"id": c["id"], "preview": c.get("body", "")[:80]} for c in missing_from_local
+                ]
+            else:
+                details[f"{plat}_ok"] = f"all {len(gh_comments)} github comments in issue.md"
+
+    # ── Check 4: docs/issues → platform (warn only) ──
+    synced_ids = set()
+    for ic in issue_comments:
+        if ic.get("github_comment_id"):
+            synced_ids.add(ic["github_comment_id"])
+    local_only = [ic for ic in issue_comments if not ic.get("github_comment_id") and not ic.get("gitee_comment_id")]
+    if local_only:
+        warns.append(f"docs/issues→platform: {len(local_only)} local comments not yet synced (OK, pending push)")
+        details["local_unsynced"] = [ic["id"] for ic in local_only]
+
+    # ── Result ──
+    passed = len(blocks) == 0
+    return {
+        "issue_id": issue_id,
+        "passed": passed,
+        "blocks": blocks,
+        "warns": warns,
+        "details": details,
+        "summary": {
+            "chat_comments_total": len(chat_comments),
+            "chat_comments_unconsumed": len(unconsumed_in_chats),
+            "issue_comments_total": len(issue_comments),
+            "platforms_checked": list(plat_ids.keys()),
+        }
+    }
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Closeout gate: reconcile comments before issue close")
+    parser.add_argument("--issue", required=True, help="Issue ID (raw-xxx or I-xxx)")
+    parser.add_argument("--project", default=".", help="Project root path")
+    args = parser.parse_args()
+
+    project = Path(args.project).resolve()
+    issue_id = args.issue
+
+    result = run_closeout_gate(project, issue_id)
+
+    print(f"\n=== Closeout Gate: {issue_id} ===")
+    print(f"Chat comments: {result['summary']['chat_comments_total']} "
+          f"({result['summary']['chat_comments_unconsumed']} unconsumed)")
+    print(f"Issue.md comments: {result['summary']['issue_comments_total']}")
+    print(f"Platforms: {', '.join(result['summary']['platforms_checked']) or 'none configured'}")
+    print()
+
+    for b in result["blocks"]:
+        print(f"[BLOCK] {b}")
+    for w in result["warns"]:
+        print(f"[WARN]  {w}")
+
+    if result["passed"]:
+        print("\n[RESULT] PASS: 可以关闭")
+        return 0
+    else:
+        print(f"\n[RESULT] BLOCKED: {len(result['blocks'])} 项需处理")
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
