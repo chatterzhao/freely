@@ -268,6 +268,18 @@ routing_policy:
 - branch: `hotfix/I-20260501-0000-A-scan-pr-platform-config`
 - next_action: Hotfix merged to develop.
 
+28. `I-20260506T1000Z-A`
+- title: task_mode=wait supervisor 前置门禁
+- milestone_state: committed
+- phase_state: `in_verification`
+- priority: P0
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/I-20260506T1000Z-A-task-mode-wait-prelaunch-gate.md`
+- source_candidate: `docs/pre-brainstorms/20260506T1000Z--task-mode-wait-prelaunch-gate/candidates.md#C-20260506T1000Z-A`
+- branch: `feature/raw-20260506T1000Z-task-mode-wait-prelaunch-gate`
+- evidence:
+  - `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260506-task-mode-wait-prelaunch-gate.md`
+- next_action: `Merge to develop.`
+
 ### candidate_issues
 
 1. `C-20260417-0445-A`
