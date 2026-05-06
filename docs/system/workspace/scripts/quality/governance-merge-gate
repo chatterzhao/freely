@@ -1293,6 +1293,8 @@ def main() -> int:
             errors.extend(raw_errors)
             continue
 
+        phase = normalized_phase(issue.phase_state)
+
         source_candidate_path = anchorless_source_candidate(issue.source_candidate)
         if not source_candidate_path or not path_exists(source_candidate_path):
             errors.append(
