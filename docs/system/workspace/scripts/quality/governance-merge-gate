@@ -384,12 +384,18 @@ def parse_issue_file(rel_path: str) -> IssueRecord:
     text = read_repo_text(rel_path)
 
     def grab(name: str) -> Optional[str]:
+        # Try bullet format: "- key: value" (I-* issues)
         match = re.search(rf"^\s*-\s*{re.escape(name)}:\s*(.+?)\s*$", text, re.MULTILINE)
+        if match:
+            return normalize_scalar(match.group(1))
+        # Try YAML format: "key: value" (raw-* issues)
+        match = re.search(rf"^\s*{re.escape(name)}:\s*(.+?)\s*$", text, re.MULTILINE)
         return normalize_scalar(match.group(1)) if match else None
 
+    issue_id = grab("issue_id") or grab("local_id")
     return IssueRecord(
         path=rel_path,
-        issue_id=grab("issue_id"),
+        issue_id=issue_id,
         phase_state=grab("phase_state"),
         milestone=normalize_milestone(grab("milestone")),
         source_candidate=grab("source_candidate"),
@@ -528,9 +534,25 @@ def anchorless_source_candidate(source_candidate: Optional[str]) -> Optional[str
 
 
 def build_issue_index() -> Dict[str, IssueRecord]:
-    output = git("ls-files", "docs/epics/**/issues/*.md")
+    # Canonical issue files in epics/
+    try:
+        output = git("ls-files", "docs/epics/**/issues/*.md")
+        paths = [line.strip() for line in output.splitlines() if line.strip()]
+    except Exception:
+        paths = []
+    # Also scan docs/issues/ for raw-* and I-* linked issue files.
+    # These are the lifecycle entry points created by chat-inbox and wt-create.
+    issues_dir = os.path.join(ROOT_DIR, "docs", "issues")
+    if os.path.isdir(issues_dir):
+        for d in sorted(os.listdir(issues_dir)):
+            if d.startswith("raw-") or d.startswith("I-"):
+                mf = os.path.join(issues_dir, d, "issue.md")
+                if os.path.isfile(mf):
+                    rel = os.path.relpath(mf, ROOT_DIR)
+                    if rel not in paths:
+                        paths.append(rel)
     result: Dict[str, IssueRecord] = {}
-    for path in [line.strip() for line in output.splitlines() if line.strip()]:
+    for path in paths:
         result[path] = parse_issue_file(path)
     return result
 
@@ -620,7 +642,7 @@ def main() -> int:
     changed_paths = changed_paths_from_args(args)
     candidate_paths: Set[str] = {p for p in changed_paths if p.startswith("docs/pre-brainstorms/") and p.endswith("/candidates.md")}
     touched_candidate_paths: Set[str] = set(candidate_paths)
-    issue_paths: Set[str] = {p for p in changed_paths if re.match(r"docs/epics/.+/issues/.+\.md$", p)}
+    issue_paths: Set[str] = {p for p in changed_paths if re.match(r"docs/epics/.+/issues/.+\.md$", p) or re.match(r"docs/issues/(raw-|I-).+/issue\.md$", p)}
     progress_paths: Set[str] = {p for p in changed_paths if re.match(r"docs/progress/.+\.md$", p)}
     review_paths: Set[str] = {p for p in changed_paths if re.match(r"docs/epics/.+/code-reviews/.+\.md$", p)}
     milestones_changed = "docs/milestones.md" in changed_paths
@@ -866,14 +888,24 @@ def main() -> int:
 
     for issue_path in sorted(issue_paths):
         issue = issues_index.get(issue_path)
-        if issue and issue.source_candidate:
+        if not issue:
+            continue
+        # Raw issues (docs/issues/raw-*) are the lifecycle entry point.
+        # They don't have source_candidate — they ARE the source.
+        # I-* issues must have source_candidate linking back to a candidate.
+        is_raw_issue = issue.path.startswith("docs/issues/raw-")
+        if is_raw_issue or issue.source_candidate:
             issue_bound_evidence.add(issue.issue_id or issue.path)
             issue_bound_issue_paths.add(issue.path)
             owner_issue_records[issue.path] = issue
-            source_candidate = resolve_source_candidate_record(issue, candidate_records_by_path)
-            if source_candidate:
-                issue_bound_candidate_ids.add(source_candidate.candidate_id)
-                candidate_driven_evidence.add(source_candidate.candidate_id)
+            if not is_raw_issue:
+                source_candidate = resolve_source_candidate_record(issue, candidate_records_by_path)
+                if source_candidate:
+                    issue_bound_candidate_ids.add(source_candidate.candidate_id)
+                    candidate_driven_evidence.add(source_candidate.candidate_id)
+            else:
+                # Raw issues contribute to lifecycle evidence directly
+                candidate_driven_evidence.add(issue.issue_id or issue.path)
 
     for progress in progress_records:
         owner_issue = None
@@ -1224,6 +1256,10 @@ def main() -> int:
             owner_issue = issues_index.get(owner_issue_path)
             if not owner_issue:
                 continue
+            # Raw issues (B1 input) have their own valid phases (proposed/absorbed/dropped).
+            # Skip the B2 execution-phase check for raw issues.
+            if owner_issue.path.startswith("docs/issues/raw-"):
+                continue
             phase = normalized_phase(owner_issue.phase_state)
             if phase not in capability_owner_phases:
                 errors.append(
@@ -1257,6 +1293,9 @@ def main() -> int:
         for owner_issue_path in sorted(issue_bound_issue_paths):
             owner_issue = owner_issue_records.get(owner_issue_path) or issues_index.get(owner_issue_path)
             if not owner_issue:
+                continue
+            # Raw issues (B1 input) don't need verification_artifact_dir.
+            if owner_issue.path.startswith("docs/issues/raw-"):
                 continue
 
             verification_dir = normalize_scalar(owner_issue.verification_artifact_dir or "")
