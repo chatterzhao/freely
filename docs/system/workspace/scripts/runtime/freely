@@ -18200,6 +18200,15 @@ PROTECTEDMSG
     # (manager + workers) collapsing the bridge in <60s.
     # Workers now launched via post-AI-cycle handler only.
     exit_if_stop_requested_before_launch
+    # Task-mode wait gate: skip AI launch when manager is in wait mode and poll until mode changes
+    if [[ "$(role_hint_for_project "$PROJECT_ROOT")" == "manager" ]]; then
+      local _pre_tm
+      _pre_tm="$(read_task_mode "$PROJECT_ROOT")"
+      if [[ "$_pre_tm" == "wait" ]]; then
+        sleep "${CHECK_INTERVAL:-10}"
+        continue
+      fi
+    fi
     select_launch_kind
     mode_name="$LAUNCH_KIND_SELECTED"
     # Process terminated workers once per cycle (not every watchdog tick)
