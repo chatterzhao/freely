@@ -421,6 +421,11 @@ def build_payload(project: Path) -> dict:
     # Phase 1-6: Full lifecycle chain trace (source-anchored)
     chain_items = scan_chain_trace(project)
     for c in chain_items:
+        # Derive title from available station data
+        title = f"raw-{c['key']}"
+        st = c.get("stations", {})
+        if st.get("i_created") and st["i_created"].get("children"):
+            title = st["i_created"]["children"][0].get("id", title)
         output.append({
             "source_family": "chain_trace",
             "key": c["key"],
@@ -432,7 +437,8 @@ def build_payload(project: Path) -> dict:
             "incomplete": c["blockers"],
             "advisory": c.get("advisory", []),
             "children": [],
-            "title": f"raw-{c['key']}",
+            "title": title,
+            "paths": c.get("paths", {}),
         })
 
     # Add worktree governance items
@@ -620,20 +626,22 @@ CHAIN_STATIONS = [
 ]
 
 def _all_base_keys(project: Path) -> set[str]:
-    """Collect base keys from ALL sources, anchored at the true origins.
+    """Collect base keys from true origins only — chat_inbox and raw-* dirs.
 
-    Sources (in priority order):
-    1. SQLite chat inbox (consumed=0) → extract xxx from issue_id (raw-xxx)
-    2. docs/issues/raw-* directories
-    3. docs/pre-brainstorms/{xxx}--* directories
-    4. Platform open issues (via GitHub/Gitee scan) — not yet implemented
+    Design principle: history is grandfathered. Items that completed before the
+    raw-issue convention existed do NOT need raw issues backfilled. The scan
+    only traces keys that have a real entry point:
+      1. chat_inbox (consumed=0) → unconsumed incoming issues
+      2. docs/issues/raw-* → existing raw issues in the current lifecycle
+      3. Platform open issues (via GitHub/Gitee API) — future
 
-    Each source contributes its xxx key. The chain trace then follows each
-    key through the full lifecycle.
+    B1 dirs and I-* dirs are NOT independent sources — they are downstream
+    artifacts. If a key has a B1 dir but no raw-* or chat entry, it predates
+    the convention and should not appear in scan output.
     """
     keys = set()
 
-    # Source 1: SQLite chat inbox
+    # Source 1: SQLite chat inbox (unconsumed only)
     db_path = project / ".freely" / "freely.db"
     if db_path.is_file():
         try:
@@ -649,21 +657,16 @@ def _all_base_keys(project: Path) -> set[str]:
         except Exception:
             pass
 
-    # Source 2: docs/issues/raw-* directories
+    # Source 2: docs/issues/raw-* directories (existing raw issues)
     issues_dir = project / "docs" / "issues"
     if issues_dir.is_dir():
         for d in issues_dir.iterdir():
             if d.is_dir() and d.name.startswith("raw-"):
                 keys.add(d.name[4:])
 
-    # Source 3: pre-brainstorm dirs (only if matching raw-* or chat key exists)
-    pb_dir = project / "docs" / "pre-brainstorms"
-    if pb_dir.is_dir():
-        for d in pb_dir.iterdir():
-            if d.is_dir():
-                m = re.match(r"^(\d{8}[-T]\d{4}Z?)--", d.name)
-                if m and m.group(1) in keys:  # only if source 1 or 2 already found it
-                    pass  # already in keys
+    # Source 3: pre-brainstorm dirs — validation only, not a key source.
+    # B1 dirs without raw-* or chat entry are historical (grandfathered).
+    # The merge gate enforces raw-issue creation going forward.
 
     return keys
 
@@ -766,6 +769,19 @@ def _trace_chain(project: Path, key: str) -> dict:
                 "canonical": fm.get("canonical_issue_path", ""),
                 "platform_ids": _extract_platform_ids(fm),
             })
+
+    # Absorbed raw with absorbed_into target: follow the link.
+    # The I-* lives under the absorbing issue's key, not this key.
+    if not i_children and raw_is_absorbed and absorbed_into:
+        target_dir = project / "docs" / "issues" / absorbed_into
+        if (target_dir / "issue.md").is_file():
+            stations["i_created"] = {"reached": True, "note": f"absorbed into {absorbed_into}", "target_exists": True}
+            # Chain is complete — the absorbing target carries the lifecycle.
+            return _finalize_chain(key, stations, blockers, "absorbed_complete", None)
+        else:
+            blockers.append("absorbed_target_missing")
+            return _finalize_chain(key, stations, blockers, "candidate_decision", "i_created")
+
     if i_children:
         stations["i_created"] = {"reached": True, "children": i_children}
     else:
@@ -888,11 +904,15 @@ def _find_all_branches_for_key(project: Path, key: str) -> list[str]:
 
 
 def _parse_h3_sections(path: Path) -> list[dict]:
-    """Parse ### sections from a markdown file, extracting key-value fields."""
+    """Parse ## and ### sections from a markdown file, extracting key-value fields.
+
+    candidates.md uses ## for candidate entries (with status/priority/scope fields)
+    and ### for subsections. Both levels must be parsed to find promoted/absorbed/dropped.
+    """
     if not path.is_file():
         return []
     text = path.read_text(encoding="utf-8")
-    parts = re.split(r"^###\s+(.+)$", text, flags=re.MULTILINE)
+    parts = re.split(r"^(?:#{2,3})\s+(.+)$", text, flags=re.MULTILINE)
     sections = []
     for idx in range(1, len(parts), 2):
         title = parts[idx].strip()
@@ -924,7 +944,7 @@ def _finalize_chain(key: str, stations: dict, blockers: list[str], current: str,
         "stations": stations,
         "blockers": blockers,
         "advisory": advisory,
-        "complete": len(blockers) == 0 and current == "branch_deleted",
+        "complete": len(blockers) == 0 and current in ("branch_deleted", "absorbed_complete"),
     }
 
 
@@ -1016,6 +1036,7 @@ def scan_chain_trace(project: Path) -> list[dict]:
       - next_station: first missing/incomplete station
       - blockers: what's preventing progress
       - ready: whether the item can be worked on (past candidate_decision)
+      - paths: file paths for quick location (raw_file, b1_dir, i_files)
     """
     keys = _all_base_keys(project)
     results = []
@@ -1023,6 +1044,8 @@ def scan_chain_trace(project: Path) -> list[dict]:
         trace = _trace_chain(project, key)
         if trace["complete"]:
             continue  # fully closed — silent
+        # Collect file paths from station data for quick location
+        paths = _collect_paths(key, trace["stations"], project)
         results.append({
             "key": key,
             "stage": trace["current_station"],
@@ -1031,6 +1054,7 @@ def scan_chain_trace(project: Path) -> list[dict]:
             "ready": trace["current_station"] not in ("raw_created", "b1_dir", "b1_brainstorm", "b1_candidate", "candidate_decision"),
             "next_action": _derive_chain_action(trace["current_station"], trace["next_station"], trace["blockers"]),
             "stations": {k: v for k, v in trace["stations"].items() if v.get("reached")},
+            "paths": paths,
         })
     return results
 
@@ -1056,6 +1080,24 @@ def _derive_chain_action(current: str, next_station: str | None, blockers: list[
         return CHAIN_ACTIONS[next_station]
     if blockers:
         return f"解决阻塞: {', '.join(blockers)}"
+
+
+def _collect_paths(key: str, stations: dict, project: Path) -> dict:
+    """Extract file paths from station data so scan output includes location info."""
+    paths = {}
+    # Raw issue
+    raw_dir = project / "docs" / "issues" / f"raw-{key}"
+    if (raw_dir / "issue.md").is_file():
+        paths["raw_file"] = str((raw_dir / "issue.md").relative_to(project))
+    # B1 directory
+    b1_info = stations.get("b1_dir", {})
+    if b1_info.get("path"):
+        paths["b1_dir"] = b1_info["path"]
+    # I-* issue files
+    i_dirs = sorted((project / "docs" / "issues").glob(f"I-{key}-*"))
+    if i_dirs:
+        paths["i_files"] = [str((d / "issue.md").relative_to(project)) for d in i_dirs if (d / "issue.md").is_file()]
+    return paths
     return "收口完成"
 
 
