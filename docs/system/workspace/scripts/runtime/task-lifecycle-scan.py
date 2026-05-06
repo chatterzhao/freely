@@ -581,13 +581,21 @@ def scan_chat_inbox(project: Path) -> list[dict]:
                 if not worktree_exists
                 else "工位已存在，chat 应已同步到 worktree docs/issues/"
             )
+            incomplete = ["chat_unconsumed"]
         else:
+            # Check if the target issue exists (for comments, the issue may not exist yet)
+            target_issue_dir = project / "docs" / "issues" / issue_id if issue_id else None
+            issue_exists = target_issue_dir and target_issue_dir.is_dir() if target_issue_dir else False
             stage = "chat_comment_pending"
-            next_action = (
-                f"AI 在对应工位追加评论到 docs/issues/{issue_id}/issue.md → chat-inbox consume"
-                if worktree_exists
-                else f"无工位：等待工位创建后同步评论到 docs/issues/{issue_id}/"
-            )
+            if worktree_exists:
+                next_action = f"AI 在对应工位追加评论到 docs/issues/{issue_id}/issue.md → chat-inbox consume"
+                incomplete = ["chat_unconsumed"]
+            elif not issue_exists:
+                next_action = f"目标 issue {issue_id} 不存在——需先创建工位和 raw issue，评论才能消费"
+                incomplete = ["chat_unconsumed", "target_issue_missing"]
+            else:
+                next_action = f"无工位：等待工位创建后同步评论到 docs/issues/{issue_id}/"
+                incomplete = ["chat_unconsumed"]
 
         items.append({
             "source_family": "chat_inbox",
@@ -596,10 +604,11 @@ def scan_chat_inbox(project: Path) -> list[dict]:
             "chat_type": chat_type,
             "issue_id": issue_id,
             "worktree_exists": worktree_exists,
-            "incomplete": ["chat_unconsumed"],
+            "incomplete": incomplete,
             "ready": worktree_exists,
             "next_action": next_action,
             "message_preview": msg,
+            "issue_exists": issue_exists if chat_type == "comment" else None,
         })
     return items
 
