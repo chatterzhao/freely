@@ -1,10 +1,12 @@
----
-issue_id: I-20260506T1000Z-A
-issue_path: docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/I-20260506T1000Z-A-task-mode-wait-prelaunch-gate.md
-reviewer: human
-review_date: 2026-05-06
-status: verified
----
+# Code Review: task-mode wait pre-launch gate
+
+- issue_id: `I-20260506T1000Z-A`
+- issue_path: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/I-20260506T1000Z-A-task-mode-wait-prelaunch-gate.md`
+- review_date: `2026-05-06`
+- reviewer: `human`
+- status: `verified`
+- source_branch: `feature/raw-20260506T1000Z-task-mode-wait-prelaunch-gate`
+- source_candidate: `docs/pre-brainstorms/20260506T1000Z--task-mode-wait-prelaunch-gate/candidates.md#C-20260506T1000Z-A`
 
 ## Implementation Decision Note
 
