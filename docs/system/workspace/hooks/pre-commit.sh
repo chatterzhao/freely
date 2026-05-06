@@ -31,7 +31,7 @@ _scan_staged_for_secrets() {
       if grep -qE "$pattern" "$file" 2>/dev/null; then
         # Check for false positives: file paths in .md docs
         # (e.g. task-source-scan-*) can match sk-* key patterns.
-        # If every match is inside backtick-quoted markdown, skip.
+        # If every match is inside quoting or part of a file-path line, skip.
         local false_positive=0
         if [[ "$file" == *.md ]]; then
           local matches matched_text
@@ -39,10 +39,33 @@ _scan_staged_for_secrets() {
           false_positive=1
           while IFS= read -r matched_text; do
             [[ -n "$matched_text" ]] || continue
-            if ! grep -qE "\`[^\`]*${matched_text}[^\`]*\`" "$file" 2>/dev/null; then
-              false_positive=0
-              break
+            # Check backtick quoting
+            if grep -qE "\`[^\`]*${matched_text}[^\`]*\`" "$file" 2>/dev/null; then
+              continue
             fi
+            # Check double-quote quoting
+            if grep -qE "\"[^\"]*${matched_text}[^\"]*\"" "$file" 2>/dev/null; then
+              continue
+            fi
+            # Check if match is only on lines that look like file path refs
+            # (unquoted YAML values like field: docs/.../file.md)
+            local match_lines
+            match_lines="$(grep -n "${matched_text}" "$file" 2>/dev/null | cut -d: -f1 || true)"
+            local all_path_lines=1
+            while IFS= read -r line_no; do
+              [[ -n "$line_no" ]] || continue
+              local line_content
+              line_content="$(sed -n "${line_no}p" "$file" 2>/dev/null || true)"
+              if ! echo "$line_content" | grep -qE "(docs/|\.md|\.py|\.sh|\.json)"; then
+                all_path_lines=0
+                break
+              fi
+            done <<< "$match_lines"
+            if [[ "$all_path_lines" -eq 1 ]]; then
+              continue
+            fi
+            false_positive=0
+            break
           done <<< "$matches"
         fi
         if [[ "$false_positive" -eq 1 ]]; then
