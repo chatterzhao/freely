@@ -41,6 +41,28 @@ routing_policy:
 - unresolved candidate or issue never disappears just because the current round chose another priority; keep it in the appropriate queue with an explicit restart condition
 
 
+
+## M-20260506T1200Z-A
+
+- title: Skill rename to B1_IBM/B2_IBM + I→B→M skeleton
+- status: active
+
+### candidate_issues
+1. `C-20260506T1200Z-A`
+- milestone: M-20260506T1200Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260506T1200Z-A/issue.md`
+- source_candidates: `docs/pre-brainstorms/20260506-ibm-skill-rename/candidates.md`
+
+### committed_issues
+1. `I-20260506T1200Z-A`
+- title: Skill rename to B1_IBM/B2_IBM + I→B→M skeleton
+- milestone_state: committed
+- phase_state: `in_dev`
+- issue_path: `docs/issues/I-20260506T1200Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260506-ibm-skill-rename/candidates.md`
+- verification_artifact_dir: `docs/epics/ibm-skill-rename/code-reviews`
+
 ## M-20260506T1230Z-A
 
 - title: wt-create dual worktree creation
