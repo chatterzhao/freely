@@ -43,6 +43,22 @@ routing_policy:
 
 
 
+## M-20260507T0100Z-A
+- title: fix-execution branch naming
+- status: active
+### candidate_issues
+1. `C-20260507T0100Z-A`
+- milestone: M-20260507T0100Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260507T0100Z-A/issue.md`
+### committed_issues
+1. `I-20260507T0100Z-A`
+- title: fix-execution branch naming
+- milestone_state: committed
+- phase_state: `in_dev`
+- issue_path: `docs/issues/I-20260507T0100Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260507-fix-branch-naming/candidates.md`
+- verification_artifact_dir: `docs/epics/fix-branch-naming/code-reviews`
 ## M-20260506T1400Z-A
 
 - title: merge-guarded fix/* whitelist
