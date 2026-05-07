@@ -45,7 +45,7 @@ Freely doc-loop 的治理框架。每个工作项经历两个 IBM 阶段——B1
 - AI **永远不直接读平台内容**——只读本地 `docs/issues/` 中的副本。平台内容由 scan 脚本下载一次
 - 详细路由见 `context-source-skill` 和 `docs/system/workspace/three-loop-capability-lifecycle.md`
 
-**B1 回答**：这个值得做吗？排在哪？边界是什么？
+**B1_IBM 回答**：这个值得做吗？排在哪？边界是什么？
 
 **目录**：`docs/pre-brainstorms/{b1-id}/`
 
@@ -69,7 +69,7 @@ Freely doc-loop 的治理框架。每个工作项经历两个 IBM 阶段——B1
 | B | Brainstorm | 实现前置设计。读实现面、读验收标准、评估替代方案。产物：`brainstorms/b-{issue-name}.md` |
 | M | Map | 实现设计落地为完整目录结构和文档集 |
 
-**B2 回答**：怎么做？怎么验收？替代方案是什么？
+**B2_IBM 回答**：怎么做？怎么验收？替代方案是什么？
 
 **目录**：`docs/epics/{epic-name}/{story-name}/`
 
@@ -114,8 +114,8 @@ milestone 是 B1_IBM 和 B2_IBM 之间的排序与承接层。
 IBM Framework 定义 **doc-loop 内的治理生命周期**。Three-Loop 定义 **AI 的执行路由**（auto/doc/dev loop）。两者正交：
 
 ```
-B1  ←→  doc-loop pre-brainstorm 子循环
-B2  ←→  doc-loop IBM 子循环（设计）+ dev-loop（实现）
+B1_IBM  ←→  doc-loop pre-brainstorm 子循环
+B2_IBM  ←→  doc-loop IBM 子循环（设计）+ dev-loop（实现）
 auto-loop ←→ 信号捕获、B1/B2 之间的 routing、completion/verification/cleanup/retirement
 ```
 
@@ -157,11 +157,11 @@ chat 插话 / 平台扫描
                  status: completed
 ```
 
-- raw-* 只存在于 B1 阶段。一旦 promote 为 I-*，raw 的 `status` 变为 `absorbed`，`absorbed_into` 指向 I-*
-- I-* 是 B2 阶段的唯一 issue 标识。后续所有 chat、comment、状态变更都发生在 I-* 上
+- raw-* 只存在于 B1_IBM 阶段。一旦 promote 为 I-*，raw 的 `status` 变为 `absorbed`，`absorbed_into` 指向 I-*
+- I-* 是 B2_IBM 阶段的唯一 issue 标识。后续所有 chat、comment、状态变更都发生在 I-* 上
 - **ID 格式**：`raw-YYYYMMDDTHHMMZ`（新，ISO 8601）/ `raw-YYYYMMDD-HHMM`（旧，仍兼容）。C-* 和 I-* 在此基础上加 `-A`/`-B`/`-C` 后缀。一个 raw 可孵化多个 I-*。门禁用 `startswith(raw_key)` 验证父子关系，用 `candidate_key == issue_key`（去前缀）验证 C→I
 - `chat --issue raw-xxx` 会自动检测 `status=absorbed`，路由到 `absorbed_into` 指向的 I-*
-- I-* 采用自包含摘要 + 链接模式：平台 body 包含足够上下文，深水区讨论链接到 B1 产物
+- I-* 采用自包含摘要 + 链接模式：平台 body 包含足够上下文，深水区讨论链接到 B1_IBM 产物
 
 ### 平台隔离
 
