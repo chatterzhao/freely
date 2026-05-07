@@ -38,7 +38,7 @@ feat-execution 在不同阶段调用下层 skill：
 ### 阶段 1：B1_IBM 预研
 ```
 1. 创建工位:
-   ./bin/wt-create --raw-key <key> --prefix feature \
+   ./bin/wt-create --raw-key <key> \
      --skill docs/system/workspace/skills/feat-execution/SKILL.md \
      --slug <slug>
 
