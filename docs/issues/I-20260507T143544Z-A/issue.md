@@ -5,7 +5,7 @@ status: in_verification
 phase_state: in_verification
 promoted_from: raw-20260507T143544Z
 source_candidate: docs/pre-brainstorms/20260507T143544Z--intercept-guard/candidates.md
-canonical_issue_path: docs/issues/I-20260507T143544Z-A/issue.md
+canonical_issue_path: ""
 platform_ids: {}
 primary_platform: ""
 last_synced_comment_at: {}
