@@ -6,6 +6,7 @@ phase_state: proposed
 platform_ids:
   github: "240"
 primary_platform: github
+source_candidate: docs/pre-brainstorms/20260506-wt-create-dual/candidates.md
 created_at: 2026-05-06T12:30:00Z
 updated_at: 2026-05-06T12:30:00Z
 author: zhaoquan
