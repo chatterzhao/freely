@@ -4,21 +4,28 @@ set -euo pipefail
 usage() {
   cat <<USAGE
 Usage:
-  ./bin/wt-create --raw-key <key> --skill <path> --slug <slug> [--base <branch>]
+  ./bin/wt-create --raw-key <key> --source <source> --skill <path> --slug <slug> [--base <branch>]
   ./bin/wt-create <branch> [--base <base-branch>]    (legacy, single worktree)
 
 Required:
-  --raw-key <key>   Raw issue key (YYYYMMDDTHHMMZ format)
-  --skill   <path>  Relative path to the governing skill SKILL.md.
-                      Must be one of:
-                        docs/system/workspace/skills/fix-execution/SKILL.md
-                        docs/system/workspace/skills/feat-execution/SKILL.md
-                      AI: Read this skill first — it teaches you the workflow,
-                      branch naming convention, and which sub-skills to invoke.
-  --slug    <slug>  Short descriptive slug for the worktree
+  --raw-key <key>     Raw issue key (YYYYMMDDTHHMMZ format)
+  --source  <source>  Where the raw issue comes from:
+                        chat-inbox  — freely.db chats 表
+                        platform    — GitHub/Gitee OPEN issue
+                      AI: search the scan file for this raw-key to find its
+                      source_family. Scan file is at:
+                        .freely/runs/manager-task-source-scan-latest.json
+                      If not found, wt-create auto-runs scan once.
+  --skill   <path>    Relative path to the governing skill SKILL.md.
+                        Must be one of:
+                          docs/system/workspace/skills/fix-execution/SKILL.md
+                          docs/system/workspace/skills/feat-execution/SKILL.md
+                        AI: Read this skill first — it teaches you the workflow,
+                        branch naming convention, and which sub-skills to invoke.
+  --slug    <slug>    Short descriptive slug for the worktree
 
 Optional:
-  --base <branch>   Base branch (default: develop)
+  --base <branch>     Base branch (default: develop)
 
 What it creates:
   1. test-pre-merge-{raw-key}-{slug}  ← based on --base (develop)
@@ -30,11 +37,11 @@ What it creates:
   This makes {prefix}/* → test-pre-merge a fast-forward merge.
 
 Examples:
-  ./bin/wt-create --raw-key 20260506T1000Z \
+  ./bin/wt-create --raw-key 20260506T1000Z --source platform \
     --skill docs/system/workspace/skills/fix-execution/SKILL.md \
     --slug task-mode-wait-prelaunch-gate
 
-  ./bin/wt-create --raw-key 20260506T1000Z \
+  ./bin/wt-create --raw-key 20260506T1000Z --source chat-inbox \
     --skill docs/system/workspace/skills/feat-execution/SKILL.md \
     --slug new-auth-module
 
@@ -51,6 +58,7 @@ fi
 # ── Argument parsing ─────────────────────────────────────
 
 raw_key=""
+source_val=""
 skill_path=""
 slug=""
 base="develop"
@@ -61,6 +69,11 @@ while [[ $# -gt 0 ]]; do
     --raw-key)
       raw_key="${2:-}"
       [[ -n "$raw_key" ]] || { echo "Missing value for --raw-key" >&2; exit 1; }
+      shift 2
+      ;;
+    --source)
+      source_val="${2:-}"
+      [[ -n "$source_val" ]] || { echo "Missing value for --source" >&2; exit 1; }
       shift 2
       ;;
     --skill)
@@ -84,21 +97,13 @@ while [[ $# -gt 0 ]]; do
       exit 1
       ;;
     *)
-      # Legacy: positional branch argument
       legacy_branch="$1"
       shift
       while [[ $# -gt 0 ]]; do
         case "$1" in
           --base)
-            base="${2:-}"
-            [[ -n "$base" ]] || { echo "Missing value for --base" >&2; exit 1; }
-            shift 2
-            ;;
-          *)
-            echo "Unknown argument: $1" >&2
-            usage
-            exit 1
-            ;;
+            base="${2:-}"; shift 2 ;;
+          *) echo "Unknown argument: $1" >&2; usage; exit 1 ;;
         esac
       done
       break
@@ -109,31 +114,53 @@ done
 # ── Validate new interface ───────────────────────────────
 
 using_new=0
-if [[ -n "$raw_key" || -n "$skill_path" || -n "$slug" ]]; then
+if [[ -n "$raw_key" || -n "$source_val" || -n "$skill_path" || -n "$slug" ]]; then
   if [[ -z "$raw_key" ]]; then
-    echo "Missing required: --raw-key" >&2
-    echo "Usage: ./bin/wt-create --raw-key <key> --skill <path> --slug <slug>" >&2
+    echo "Missing required: --raw-key" >&2; usage; exit 1
+  fi
+  if [[ -z "$source_val" ]]; then
+    cat <<MSG >&2
+Missing required: --source
+
+  --source tells wt-create where the raw issue comes from:
+    chat-inbox  — freely.db chats 表 (chat_type=new-issue, consumed=0)
+    platform    — GitHub/Gitee OPEN issue
+
+  AI: search for this raw-key in the scan file to find its source_family:
+    .freely/runs/manager-task-source-scan-latest.json
+
+  If the scan file doesn't have this key, wt-create will auto-run scan once.
+
+Usage: ./bin/wt-create --raw-key <key> --source <source> --skill <path> --slug <slug>
+MSG
     exit 1
   fi
   if [[ -z "$skill_path" ]]; then
     echo "Missing required: --skill" >&2
-    echo "" >&2
-    echo "  --skill tells wt-create which skill governs this worktree." >&2
-    echo "  Read the skill first — it teaches you the workflow and branch naming." >&2
-    echo "" >&2
     echo "  Valid values:" >&2
     echo "    docs/system/workspace/skills/fix-execution/SKILL.md   (bug fixes)" >&2
     echo "    docs/system/workspace/skills/feat-execution/SKILL.md  (new features)" >&2
-    echo "" >&2
-    echo "Usage: ./bin/wt-create --raw-key <key> --skill <path> --slug <slug>" >&2
+    echo "Usage: ./bin/wt-create --raw-key <key> --source <source> --skill <path> --slug <slug>" >&2
     exit 1
   fi
   if [[ -z "$slug" ]]; then
-    echo "Missing required: --slug" >&2
-    echo "Usage: ./bin/wt-create --raw-key <key> --skill <path> --slug <slug>" >&2
-    exit 1
+    echo "Missing required: --slug" >&2; usage; exit 1
   fi
   using_new=1
+fi
+
+# ── Validate source value ───────────────────────────────
+
+if [[ "$using_new" -eq 1 ]]; then
+  case "$source_val" in
+    chat-inbox|platform) ;;
+    *)
+      echo "Invalid --source '$source_val'. Must be 'chat-inbox' or 'platform'." >&2
+      echo "  chat-inbox — raw issue comes from freely.db chats table" >&2
+      echo "  platform   — raw issue comes from GitHub/Gitee OPEN issue" >&2
+      exit 1
+      ;;
+  esac
 fi
 
 # ── Derive prefix from --skill path ──────────────────────
@@ -144,12 +171,9 @@ if [[ "$using_new" -eq 1 ]]; then
     *feat-execution/SKILL.md)  prefix="feature" ;;
     *)
       echo "Unrecognized --skill path: $skill_path" >&2
-      echo "" >&2
-      echo "  --skill must be a relative path to one of:" >&2
+      echo "  Must be one of:" >&2
       echo "    docs/system/workspace/skills/fix-execution/SKILL.md" >&2
       echo "    docs/system/workspace/skills/feat-execution/SKILL.md" >&2
-      echo "" >&2
-      echo "  AI: Read this skill file first to understand the workflow." >&2
       exit 1
       ;;
   esac
@@ -159,9 +183,9 @@ fi
 
 if [[ "$using_new" -eq 1 ]]; then
   if echo "$raw_key" | grep -qE '^[0-9]{8}T[0-9]{4,6}Z$'; then
-    : # valid new format
+    : # valid
   elif echo "$raw_key" | grep -qE '^[0-9]{8}-[0-9]{4}$'; then
-    echo "警告: raw-key '$raw_key' uses legacy format YYYYMMDD-HHMM. Prefer YYYYMMDDTHHMMZ." >&2
+    echo "警告: raw-key '$raw_key' uses legacy format. Prefer YYYYMMDDTHHMMZ." >&2
   else
     echo "Invalid raw-key format '$raw_key'. Expected YYYYMMDDTHHMMZ (e.g., 20260506T1000Z)." >&2
     exit 1
@@ -220,6 +244,58 @@ _extract_issue_key() {
   return 1
 }
 
+# ── Scan matching: verify raw-key exists in scan with correct source ──
+
+_scan_json_path() {
+  printf '%s\n' "$ROOT_DIR/.freely/runs/manager-task-source-scan-latest.json"
+}
+
+_scan_lookup() {
+  local raw_key="$1"
+  local scan_file; scan_file="$(_scan_json_path)"
+  [[ -f "$scan_file" ]] || return 1
+  python3 -c "
+import json, sys
+with open('$scan_file') as f:
+    data = json.load(f)
+for item in data:
+    if item.get('key') == '$raw_key':
+        print(item.get('source_family', ''))
+        sys.exit(0)
+sys.exit(1)
+" 2>/dev/null
+}
+
+_run_scan_once() {
+  local scan_py="$ROOT_DIR/docs/system/workspace/scripts/runtime/task-lifecycle-scan.py"
+  [[ -f "$scan_py" ]] || return 1
+  echo "Scan file missing raw-key $raw_key, running scan once..." >&2
+  python3 "$scan_py" --project "$ROOT_DIR" --json > "$(_scan_json_path)" 2>/dev/null || true
+}
+
+# ── Pull helpers (unified) ────────────────────────────────
+
+_pull_raw_issue() {
+  local raw_key="$1" source="$2"
+  case "$source" in
+    chat-inbox)
+      # Materialize from chat-inbox (already handled by _materialize_chat_if_needed)
+      return 0
+      ;;
+    platform)
+      if [[ -x "$ROOT_DIR/bin/raw-issue-pull" ]]; then
+        local result
+        result=$("$ROOT_DIR/bin/raw-issue-pull" --raw-key "$raw_key" 2>/dev/null || true)
+        if echo "$result" | grep -q '"local_id"'; then
+          echo "raw-issue-pull: materialized raw-$raw_key from platform" >&2
+          return 0
+        fi
+      fi
+      return 1
+      ;;
+  esac
+}
+
 _require_issue_exists() {
   local branch="$1"
   local key ts db_path chat_inbox_py
@@ -232,7 +308,46 @@ _require_issue_exists() {
   case "$key" in
     raw-*)
       ts="${key#raw-}"
-      # Source 1: chat-inbox (local SQLite)
+
+      # ── Scan matching (new: validate --source against scan) ──
+      if [[ "$using_new" -eq 1 ]]; then
+        local scan_source; scan_source="$(_scan_lookup "$raw_key" || true)"
+        if [[ -z "$scan_source" ]]; then
+          _run_scan_once
+          scan_source="$(_scan_lookup "$raw_key" || true)"
+          if [[ -z "$scan_source" ]]; then
+            echo "拒绝创建工位: raw-$raw_key 在 scan 中未找到" >&2
+            echo "  Scan file: $(_scan_json_path)" >&2
+            echo "  Source: $source_val" >&2
+            echo "  请先创建 raw issue（chat-inbox 或平台），确认它能被 scan 发现后再创建工位。" >&2
+            return 1
+          fi
+        fi
+        if [[ "$scan_source" != "$source_val" ]]; then
+          echo "拒绝创建工位: raw-$raw_key 在 scan 中的 source_family 是 '$scan_source'，但传入了 --source '$source_val'" >&2
+          echo "  Scan file: $(_scan_json_path)" >&2
+          echo "  请检查 raw-key 是否匹配正确的来源。" >&2
+          return 1
+        fi
+      fi
+
+      # ── Pull (materialize from authoritative source) ──
+      if [[ "$using_new" -eq 1 ]]; then
+        if ! _pull_raw_issue "$raw_key" "$source_val"; then
+          echo "拒绝创建工位: 无法从 $source_val 拉取 raw-$raw_key" >&2
+          return 1
+        fi
+      else
+        # Legacy: check chat-inbox + local directory
+        if [[ -f "$db_path" ]] && python3 "$chat_inbox_py" show --db "$db_path" --id "$ts" >/dev/null 2>&1; then
+          return 0
+        fi
+        if [[ -d "$ROOT_DIR/docs/issues/$key" ]]; then
+          return 0
+        fi
+      fi
+
+      # Source 1: chat-inbox (already handled by pull in new mode)
       if [[ -f "$db_path" ]] && python3 "$chat_inbox_py" show --db "$db_path" --id "$ts" >/dev/null 2>&1; then
         local consumed
         consumed=$(python3 -c "
@@ -254,18 +369,8 @@ conn.close()
           return 0
         fi
       fi
-      # Source 2: docs/issues/ (local)
       if [[ -d "$ROOT_DIR/docs/issues/$key" ]]; then
         return 0
-      fi
-      # Source 3: platform pull (GitHub/Gitee)
-      if [[ -x "$ROOT_DIR/bin/raw-issue-pull" ]]; then
-        local pull_result
-        pull_result=$("$ROOT_DIR/bin/raw-issue-pull" --raw-key "$ts" 2>/dev/null || true)
-        if echo "$pull_result" | grep -q '"local_id"'; then
-          echo "raw-issue-pull: materialized $key from platform"
-          return 0
-        fi
       fi
       ;;
     I-*)
@@ -354,15 +459,11 @@ _require_issue_exists "$fix_branch" || exit 1
 # ── Create worktree(s) ───────────────────────────────────
 
 if [[ "$using_new" -eq 1 ]]; then
-  # ── New interface: create two worktrees ────────────────
-
-  # 1. Create test-pre-merge based on develop (or --base)
   tp_target="$(freely_wt_resolve_target_path "$test_pre_merge_branch")"
   echo "=== Step 1/2: Creating test-pre-merge worktree ==="
   _create_worktree "$test_pre_merge_branch" "$tp_target" "$base"
   echo "  test-pre-merge: $tp_target"
 
-  # 2. Create fix/feature based on test-pre-merge
   fix_target="$(freely_wt_resolve_target_path "$fix_branch")"
   echo ""
   echo "=== Step 2/2: Creating ${prefix} worktree (parented on test-pre-merge) ==="
@@ -382,6 +483,7 @@ if [[ "$using_new" -eq 1 ]]; then
 ║  branch:          $fix_branch
 ║  base:            $test_pre_merge_branch
 ║  skill:           ${skill_path}
+║  source:          ${source_val}
 ╠══════════════════════════════════════════════════════════╣
 ║  Merge chain:                                           ║
 ║    $fix_branch → $test_pre_merge_branch (fast-forward)
@@ -389,7 +491,6 @@ if [[ "$using_new" -eq 1 ]]; then
 ╚══════════════════════════════════════════════════════════╝
 MSG
 else
-  # ── Legacy interface: single worktree ─────────────────
   tp_target="$(freely_wt_resolve_target_path "$fix_branch")"
   _create_worktree "$fix_branch" "$tp_target" "$base"
 
