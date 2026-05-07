@@ -37,3 +37,11 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 [[ -z "$target" ]] && target="$ROOT_DIR/docs/issues/raw-${raw_key}"
 
 python3 "$ROOT_DIR/docs/system/workspace/scripts/sync/platform-adapter.py" pull "$raw_key" "$target"
+
+# After pull: sync to all configured platforms (fill missing platform_ids)
+if [[ -x "$ROOT_DIR/bin/issue-sync" ]]; then
+  local local_id="raw-${raw_key}"
+  if [[ -f "$target/issue.md" ]]; then
+    "$ROOT_DIR/bin/issue-sync" create "$local_id" 2>/dev/null || true
+  fi
+fi
