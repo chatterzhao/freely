@@ -12,6 +12,8 @@ channel: github
 session_refs: []
 pre_tests_path: docs/epics/merge-guarded-fix-whitelist/verification/pre-tests.md
 verification_artifact_dir: docs/epics/merge-guarded-fix-whitelist/code-reviews
+pre_tests_path: docs/epics/merge-guarded-fix-whitelist/verification/pre-tests.md
+verification_artifact_dir: docs/epics/merge-guarded-fix-whitelist/code-reviews
 ---
 
 ## 问题
@@ -19,3 +21,6 @@ merge-guarded 只接受 feature/* 和 hotfix/* → test-pre-merge-*，fix/* 不�
 
 ## 修复
 validate_merge_direction + pre-flight gate 增加 fix/* 支持。
+
+- pre_tests_path: `docs/epics/merge-guarded-fix-whitelist/verification/pre-tests.md`
+- verification_artifact_dir: `docs/epics/merge-guarded-fix-whitelist/code-reviews`
