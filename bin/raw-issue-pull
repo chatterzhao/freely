@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# raw-issue-pull: pull a raw issue from platform (GitHub/Gitee) to local docs/issues/
+set -euo pipefail
+
+usage() {
+  cat <<USAGE
+Usage:
+  ./bin/raw-issue-pull --raw-key <key> [--target <dir>]
+
+Pull a raw issue from platform by matching raw-{key} in OPEN issue titles.
+Materializes to docs/issues/raw-{key}/issue.md with proper platform_ids.
+
+Options:
+  --raw-key <key>   Raw issue key (YYYYMMDDTHHMMZ format)
+  --target  <dir>   Target directory (default: docs/issues/raw-{key}/)
+
+Example:
+  ./bin/raw-issue-pull --raw-key 20260506T1000Z
+USAGE
+}
+
+raw_key=""
+target=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --raw-key) raw_key="${2:-}"; shift 2 ;;
+    --target)  target="${2:-}"; shift 2 ;;
+    --help|-h) usage; exit 0 ;;
+    *) echo "Unknown: $1" >&2; usage; exit 1 ;;
+  esac
+done
+
+[[ -n "$raw_key" ]] || { echo "Missing --raw-key" >&2; usage; exit 1; }
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+[[ -z "$target" ]] && target="$ROOT_DIR/docs/issues/raw-${raw_key}"
+
+python3 "$ROOT_DIR/docs/system/workspace/scripts/sync/platform-adapter.py" pull "$raw_key" "$target"
