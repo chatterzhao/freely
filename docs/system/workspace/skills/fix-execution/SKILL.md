@@ -117,7 +117,7 @@ hotfix/*          → main
 ```
 阶段 1 — wt-create 一次性创建两个工位
   │
-  ├─ ./bin/wt-create --raw-key <key> --prefix fix \
+  ├─ ./bin/wt-create --raw-key <key> \
   │     --skill docs/system/workspace/skills/fix-execution/SKILL.md \
   │     --slug <slug>
   │
@@ -125,7 +125,7 @@ hotfix/*          → main
   │   ├─ test-pre-merge-{raw-key}-{slug}  (基于 develop)
   │   └─ fix/raw-{raw-key}-{slug}         (基于 test-pre-merge)
   │
-  ├─ 紧急 hotfix: --prefix feature 换为 hotfix 分支名（手动创建）
+  ├─ 紧急 hotfix: 手动创建 hotfix 分支
   │
   ├─ 在 test-pre-merge 工位中改源码 → stop/start daemon → 验证
   ├─ 深挖根因链，反复迭代
