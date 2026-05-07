@@ -442,6 +442,10 @@ def build_payload(project: Path) -> dict:
             "pending_comments": c.get("pending_comments", 0),
         })
 
+    # Phase: Platform open issues (GitHub/Gitee) — source_family=platform
+    platform_items = scan_platform_issues(project)
+    output.extend(platform_items)
+
     # Add worktree governance items
     gov_items = scan_worktree_governance(project)
     output.extend(gov_items)
@@ -684,15 +688,16 @@ def _all_base_keys(project: Path) -> set[str]:
         for m in re.finditer(r'I-(\d{8}[-T]\d{4}Z?)-[A-Z]', mf.read_text(encoding="utf-8")):
             keys.add(m.group(1))
 
-    # Source 3: Platform open issues (GitHub/Gitee)
-    _keys_from_platform(keys)
-
     return keys
 
 
-def _keys_from_platform(keys: set[str]) -> None:
-    """Scan GitHub and Gitee for OPEN issues containing raw-{key} or I-{key}."""
+def scan_platform_issues(project: Path) -> list[dict]:
+    """Scan GitHub and Gitee for OPEN issues containing raw-{key} or I-{key}.
+    Returns items with source_family='platform' for wt-create --source platform matching.
+    """
     import json as _json2
+    items: list[dict] = []
+    seen: set[str] = set()
 
     # ── GitHub ──
     try:
@@ -705,11 +710,24 @@ def _keys_from_platform(keys: set[str]) -> None:
             for issue in _json2.loads(result.stdout):
                 title = issue.get("title", "")
                 body = issue.get("body", "")
+                number = str(issue.get("number", ""))
                 combined = f"{title}\n{body}"
-                for m in re.finditer(r"(?:^|\W)(raw-\d{8}T\d{4,6}Z)", combined, re.MULTILINE):
-                    keys.add(m.group(1))
-                for m in re.finditer(r"(?:^|\W)(I-\d{8}T\d{4,6}Z(?:-[A-Z0-9]+)?)", combined, re.MULTILINE):
-                    keys.add(m.group(1))
+                for m in re.finditer(r"(?:^|\W)(raw-(\d{8}T\d{4,6}Z))", combined, re.MULTILINE):
+                    key = m.group(2)
+                    if key not in seen:
+                        seen.add(key)
+                        items.append({
+                            "source_family": "platform",
+                            "key": key,
+                            "stage": "platform_open",
+                            "platform": "github",
+                            "issue_number": number,
+                            "title": title,
+                            "ready": True,
+                            "incomplete": [],
+                            "next_action": "wt-create --source platform --raw-key " + key,
+                            "next_station": "raw_created",
+                        })
     except Exception:
         pass
 
@@ -726,13 +744,27 @@ def _keys_from_platform(keys: set[str]) -> None:
                 for issue in issues:
                     title = issue.get("title", "")
                     body = issue.get("body", "")
+                    number = str(issue.get("number", issue.get("id", "")))
                     combined = f"{title}\n{body}"
-                    for m in re.finditer(r"(?:^|\W)(raw-\d{8}T\d{4,6}Z)", combined, re.MULTILINE):
-                        keys.add(m.group(1))
-                    for m in re.finditer(r"(?:^|\W)(I-\d{8}T\d{4,6}Z(?:-[A-Z0-9]+)?)", combined, re.MULTILINE):
-                        keys.add(m.group(1))
+                    for m in re.finditer(r"(?:^|\W)(raw-(\d{8}T\d{4,6}Z))", combined, re.MULTILINE):
+                        key = m.group(2)
+                        if key not in seen:
+                            seen.add(key)
+                            items.append({
+                                "source_family": "platform",
+                                "key": key,
+                                "stage": "platform_open",
+                                "platform": "gitee",
+                                "issue_number": number,
+                                "title": title,
+                                "ready": True,
+                                "next_action": "wt-create --source platform --raw-key " + key,
+                                "next_station": "raw_created",
+                            })
     except Exception:
         pass
+
+    return items
 
 
 def _trace_chain(project: Path, key: str) -> dict:
