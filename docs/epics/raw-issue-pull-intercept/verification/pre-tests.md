@@ -45,3 +45,34 @@
 ## Real-Environment
 - real_environment_status: `pass`
 - real_environment_reason: `Shell script change. Merge success through guarded chain is verification.`
+
+## Acceptance Items
+### AT-001 develop block
+- id: `develop-block`
+- requirement: `raw-issue-pull blocks on develop/main branches`  
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- evidence_level: `manual`
+- status: `pass`
+- artifact_ref: `bin/raw-issue-pull line 42-47`
+
+### AT-002 branch mismatch
+- id: `branch-mismatch`
+- requirement: `raw-issue-pull blocks when branch does not contain raw-key`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- evidence_level: `manual`
+- status: `pass`
+- artifact_ref: `bin/raw-issue-pull line 49-52`
+
+### AT-003 cli dispatch
+- id: `cli-dispatch`
+- requirement: `bin/freely raw-issue-pull routes to cmd_raw_issue_pull`
+- surface_kind: `integration`
+- target_lane: `premerge-integration`
+- promotion_gate: `develop_merge`
+- evidence_level: `manual`
+- status: `pass`
+- artifact_ref: `freely runtime line 20844`
