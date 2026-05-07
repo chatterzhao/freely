@@ -551,6 +551,8 @@ Usage:
   freely baseline-status [--project <abs_path>]
   freely security-review-brief [--project <abs_path>]
   freely task-source-scan [--project <abs_path>] [--json]
+  freely task-scan [--project <abs_path>] [--json]
+  freely raw-issue-pull --raw-key <key> [--project <abs_path>] [--target <dir>]
   freely issue-sync <args>...                   (delegate to bin/issue-sync)
   freely status [--project <abs_path>] [--view baseline|live|fleet|all]
   freely live-status [--project <abs_path>]

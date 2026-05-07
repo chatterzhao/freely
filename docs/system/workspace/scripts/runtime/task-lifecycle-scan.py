@@ -684,16 +684,55 @@ def _all_base_keys(project: Path) -> set[str]:
         for m in re.finditer(r'I-(\d{8}[-T]\d{4}Z?)-[A-Z]', mf.read_text(encoding="utf-8")):
             keys.add(m.group(1))
 
-    # Source 3: Platform open issues (GitHub/Gitee) — not yet implemented.
-    # When implemented:
-    #   - Fetch OPEN issues from configured platform repos
-    #   - Issues whose title/body contains raw-{key} → extract key (new raw)
-    #   - Issues whose title/body contains I-{key} → this is an I-* issue,
-    #     already promoted; extract its raw parent key for chain tracing
-    #   - CLOSED issues → skip (completed, silent)
-    #   - Only OPEN issues enter the scan; closing is the terminal station
+    # Source 3: Platform open issues (GitHub/Gitee)
+    _keys_from_platform(keys)
 
     return keys
+
+
+def _keys_from_platform(keys: set[str]) -> None:
+    """Scan GitHub and Gitee for OPEN issues containing raw-{key} or I-{key}."""
+    import json as _json2
+
+    # ── GitHub ──
+    try:
+        result = subprocess.run(
+            ["gh", "issue", "list", "--state", "open", "--limit", "100",
+             "--json", "number,title,body"],
+            capture_output=True, text=True, timeout=15
+        )
+        if result.returncode == 0:
+            for issue in _json2.loads(result.stdout):
+                title = issue.get("title", "")
+                body = issue.get("body", "")
+                combined = f"{title}\n{body}"
+                for m in re.finditer(r"(?:^|\W)(raw-\d{8}T\d{4,6}Z)", combined, re.MULTILINE):
+                    keys.add(m.group(1))
+                for m in re.finditer(r"(?:^|\W)(I-\d{8}T\d{4,6}Z(?:-[A-Z0-9]+)?)", combined, re.MULTILINE):
+                    keys.add(m.group(1))
+    except Exception:
+        pass
+
+    # ── Gitee ──
+    try:
+        gitee_py = str(Path(__file__).resolve().parent / "gitee-issue.py")
+        if os.path.isfile(gitee_py):
+            result = subprocess.run(
+                [sys.executable, gitee_py, "list", "--state", "open", "--per-page", "50"],
+                capture_output=True, text=True, timeout=15
+            )
+            if result.returncode == 0:
+                issues = _json2.loads(result.stdout)
+                for issue in issues:
+                    title = issue.get("title", "")
+                    body = issue.get("body", "")
+                    combined = f"{title}\n{body}"
+                    for m in re.finditer(r"(?:^|\W)(raw-\d{8}T\d{4,6}Z)", combined, re.MULTILINE):
+                        keys.add(m.group(1))
+                    for m in re.finditer(r"(?:^|\W)(I-\d{8}T\d{4,6}Z(?:-[A-Z0-9]+)?)", combined, re.MULTILINE):
+                        keys.add(m.group(1))
+    except Exception:
+        pass
 
 
 def _trace_chain(project: Path, key: str) -> dict:

@@ -14,7 +14,7 @@ Required:
                         platform    — GitHub/Gitee OPEN issue
                       AI: search the scan file for this raw-key to find its
                       source_family. Scan file is at:
-                        .freely/runs/manager-task-source-scan-latest.json
+                        .freely/run/manager-task-source-scan-latest.json
                       If not found, wt-create auto-runs scan once.
   --skill   <path>    Relative path to the governing skill SKILL.md.
                         Must be one of:
@@ -127,7 +127,7 @@ Missing required: --source
     platform    — GitHub/Gitee OPEN issue
 
   AI: search for this raw-key in the scan file to find its source_family:
-    .freely/runs/manager-task-source-scan-latest.json
+    .freely/run/manager-task-source-scan-latest.json
 
   If the scan file doesn't have this key, wt-create will auto-run scan once.
 
@@ -247,7 +247,7 @@ _extract_issue_key() {
 # ── Scan matching: verify raw-key exists in scan with correct source ──
 
 _scan_json_path() {
-  printf '%s\n' "$ROOT_DIR/.freely/runs/manager-task-source-scan-latest.json"
+  printf '%s\n' "$ROOT_DIR/.freely/run/manager-task-source-scan-latest.json"
 }
 
 _scan_lookup() {
@@ -270,6 +270,7 @@ _run_scan_once() {
   local scan_py="$ROOT_DIR/docs/system/workspace/scripts/runtime/task-lifecycle-scan.py"
   [[ -f "$scan_py" ]] || return 1
   echo "Scan file missing raw-key $raw_key, running scan once..." >&2
+  mkdir -p "$(dirname "$(_scan_json_path)")"
   python3 "$scan_py" --project "$ROOT_DIR" --json > "$(_scan_json_path)" 2>/dev/null || true
 }
 
