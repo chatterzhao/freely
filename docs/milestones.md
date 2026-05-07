@@ -40,6 +40,29 @@ routing_policy:
 - issue_path_present: route by `phase_state` into issue-bound brainstorm, IBM, continuation, dev-loop, or completion verification
 - unresolved candidate or issue never disappears just because the current round chose another priority; keep it in the appropriate queue with an explicit restart condition
 
+
+## M-20260506T1230Z-A
+
+- title: wt-create dual worktree creation
+- status: active
+
+### candidate_issues
+1. `C-20260506T1230Z-A`
+- milestone: M-20260506T1230Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260506T1230Z-A/issue.md`
+- source_candidates: `docs/pre-brainstorms/20260506-wt-create-dual/candidates.md`
+- decision: wt-create dual worktree creation
+
+### committed_issues
+1. `I-20260506T1230Z-A`
+- title: wt-create dual worktree creation
+- milestone_state: committed
+- phase_state: `in_dev`
+- issue_path: `docs/issues/I-20260506T1230Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260506-wt-create-dual/candidates.md`
+- verification_artifact_dir: `docs/epics/wt-create-dual/code-reviews`
+
 ## M-20260306-workspace-routing-foundation
 
 - title: Workspace routing foundation for Freely dogfooding

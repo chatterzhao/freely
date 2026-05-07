@@ -2,5 +2,5 @@
 
 - status: promoted
 - milestone: M-20260506T1230Z-A
-- promoted_issue_path: `docs/issues/raw-20260506T1230Z/issue.md`
-- decision: wt-create dual worktree creation — single call creates both test-pre-merge and fix/feature worktrees
+- promoted_issue_path: `docs/issues/I-20260506T1230Z-A/issue.md`
+- decision: wt-create dual worktree creation
