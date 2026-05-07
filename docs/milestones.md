@@ -43,6 +43,22 @@ routing_policy:
 
 
 
+## M-20260507T0200Z-A
+- title: promoted gate fix
+- status: active
+### candidate_issues
+1. `C-20260507T0200Z-A`
+- milestone: M-20260507T0200Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260507T0200Z-A/issue.md`
+### committed_issues
+1. `I-20260507T0200Z-A`
+- title: promoted gate fix
+- milestone_state: committed
+- phase_state: `in_dev`
+- issue_path: `docs/issues/I-20260507T0200Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260507-promoted-gate-fix/candidates.md`
+- verification_artifact_dir: `docs/epics/promoted-gate-fix/code-reviews`
 ## M-20260507T0100Z-A
 - title: fix-execution branch naming
 - status: active
