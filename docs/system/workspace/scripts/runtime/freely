@@ -20386,6 +20386,15 @@ cmd_issue_sync() {
   bash "$issue_sync_bin" "$@"
 }
 
+cmd_raw_issue_pull() {
+  local raw_issue_pull_bin="$SELF_ROOT/bin/raw-issue-pull"
+  if [[ ! -x "$raw_issue_pull_bin" ]]; then
+    log_error "raw-issue-pull binary not found: $raw_issue_pull_bin"
+    exit 1
+  fi
+  bash "$raw_issue_pull_bin" "$@"
+}
+
 cmd_status() {
   local project="" view="all"
   local -a forwarded=()
@@ -20841,6 +20850,7 @@ main() {
     security-review-brief) cmd_security_review_brief "$@" ;;
     task-source-scan) cmd_task_source_scan "$@" ;;
     issue-sync) cmd_issue_sync "$@" ;;
+    raw-issue-pull) cmd_raw_issue_pull "$@" ;;
     status) cmd_status "$@" ;;
     live-status) cmd_live_status "$@" ;;
     fleet-status) cmd_fleet_status "$@" ;;
