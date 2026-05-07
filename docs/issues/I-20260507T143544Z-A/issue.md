@@ -1,10 +1,10 @@
 ---
 local_id: I-20260507T143544Z-A
 kind: linked
-status: in_dev
-phase_state: in_dev
+status: in_verification
+phase_state: in_verification
 promoted_from: raw-20260507T143544Z
-candidate_ref: docs/pre-brainstorms/20260507T143544Z--intercept-guard/candidates.md#c-20260507t143544z-a-raw-issue-pull-工位拦截
+source_candidate: docs/pre-brainstorms/20260507T143544Z--intercept-guard/candidates.md
 canonical_issue_path: docs/issues/I-20260507T143544Z-A/issue.md
 platform_ids: {}
 primary_platform: ""
@@ -16,8 +16,8 @@ intake_id: ""
 author: zhaoquan
 channel: feat-execution
 session_refs: []
-pre_tests_path: ""
-verification_artifact_dir: ""
+pre_tests_path: docs/epics/raw-issue-pull-intercept/verification/pre-tests.md
+verification_artifact_dir: docs/epics/raw-issue-pull-intercept/code-reviews
 ---
 
 # I-20260507T143544Z-A: raw-issue-pull 工位拦截
