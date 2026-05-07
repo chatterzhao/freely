@@ -42,6 +42,27 @@ routing_policy:
 
 
 
+
+## M-20260506T1400Z-A
+
+- title: merge-guarded fix/* whitelist
+- status: active
+
+### candidate_issues
+1. `C-20260506T1400Z-A`
+- milestone: M-20260506T1400Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260506T1400Z-A/issue.md`
+
+### committed_issues
+1. `I-20260506T1400Z-A`
+- title: merge-guarded fix/* whitelist
+- milestone_state: committed
+- phase_state: `in_dev`
+- issue_path: `docs/issues/I-20260506T1400Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260506-merge-guarded-fix/candidates.md`
+- verification_artifact_dir: `docs/epics/merge-guarded-fix-whitelist/code-reviews`
+
 ## M-20260506T1200Z-A
 
 - title: Skill rename to B1_IBM/B2_IBM + I→B→M skeleton
