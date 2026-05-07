@@ -15,6 +15,7 @@
 - target environment: `fix/raw-20260507T0300Z-gate1-timestamp-check`
 - required evidence: `gate output`
 - blocker taxonomy: `execution_pending_or_failed`
+1. Run `./bin/governance-merge-gate --range develop..HEAD`
 ## End-to-End
 - acceptance target: `fix→test-pre-merge→develop merge passes`
 - testing layer: `end_to_end`
