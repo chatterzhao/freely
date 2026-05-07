@@ -10,7 +10,7 @@
 ## Boundary leak discovered during implementation
 
 - 当前 issue 中暴露出新的治理问题或新的产品边界
-- 结论：在 issue / `progress` 里记录影响与 blocker，返回 `next_recommended_route=doc-pre-brainstorm-execution`
+- 结论：在 issue / `progress` 里记录影响与 blocker，返回 `next_recommended_route=doc-B1_IBM-execution`
 
 ## Derived worktree promotion
 

@@ -6,7 +6,7 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
 # skill:auto-loop-orchestrator
 
 ## 首段闭环主链
-`sh/ps1 -> external AI CLI tool -> lead-agent -> context-source-skill -> doc-pre-brainstorm-execution | doc-ibm-execution | dev-loop-execution | manager-owned verification / cleanup route`
+`sh/ps1 -> external AI CLI tool -> lead-agent -> context-source-skill -> doc-B1_IBM-execution | doc-B2_IBM-execution | dev-loop-execution | manager-owned verification / cleanup route`
 
 约束：
 - Freely 当前编排的是外部 AI CLI 工具，而不是自研 AI CLI runtime。
@@ -14,7 +14,7 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
 - `manager-agent` 与 `worker-agent` 是显式角色定义，建议落点：
   - `docs/system/workspace/agents/manager-agent.md`
   - `docs/system/workspace/agents/worker-agent.md`
-- `context-source-skill`、`doc-pre-brainstorm-execution`、`doc-ibm-execution`、`dev-loop-execution` 是 skills。
+- `context-source-skill`、`doc-B1_IBM-execution`、`doc-B2_IBM-execution`、`dev-loop-execution` 是 skills。
 - skill 名称表达职责，不用 loop 前缀表达归属。
 - `docs/system/workspace/` 是能力真源；`bin/`、`.githooks/` 等是运行时落点。
 - `sh` / `ps1` 的定义源应位于 `docs/system/workspace/scripts/`。
@@ -29,8 +29,8 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
 3. manager / patrol 轮次先把 standing/event source 扫描成 machine-readable `manager-task-source-scan-latest.json`，作为本轮路由的结构化输入。
 4. `lead-agent` 调用 `skill:context-source-skill`，基于当前来源、scan json、milestone、工具清单与上下文做 usable issue 判定，并组装下一跳提示词。
 5. 根据 `context-source-skill` 的结果分流：
-   - 无稳定 issue 边界 -> `skill:doc-pre-brainstorm-execution`
-   - issue-bound brainstorm / mapping / governance -> `skill:doc-ibm-execution`
+   - 无稳定 issue 边界 -> `skill:doc-B1_IBM-execution`
+   - issue-bound brainstorm / mapping / governance -> `skill:doc-B2_IBM-execution`
    - ready issue / in-progress -> `skill:dev-loop-execution`
    - `completion_verification` / `cleanup_governance` -> 留在 `auto-loop` 侧做 manager-owned judgement / handoff，必要时委派 worker 或 `skill:worktree-maintenance-governance`
 6. 各 loop skill 在环内完成自己的工作，并把状态、阻塞、完成或恢复上下文回流给 `auto-loop`；不要求下游 skill 直接“调用 auto-loop 的某个子 skill”。
@@ -145,7 +145,7 @@ Freely 的角色组织遵循四层：
 不要把上述四层全部硬塞到同一个 prompt 或单一 skill 中。
 
 ## pre-brainstorms 触发
-当任一条件成立时，经 `context-source-skill` 判定后进入 `doc-pre-brainstorm-execution`：
+当任一条件成立时，经 `context-source-skill` 判定后进入 `doc-B1_IBM-execution`：
 - 问题来源已发现，但 `epic/story/milestone` 尚未收敛。
 - 验收边界不清，无法直接进入 `dev-loop`。
 - 需要跨工具或子代理进行分歧收敛。

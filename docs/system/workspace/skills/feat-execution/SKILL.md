@@ -1,6 +1,6 @@
 ---
 name: feat-execution
-description: 新功能/大型改动的完整开发流程——B1预研→B2 IBM→dev实现→门禁合并，与 fix-execution 同级抽象。
+description: 新功能/大型改动的完整开发流程——B1_IBM预研→B2_IBM→dev实现→门禁合并，与 fix-execution 同级抽象。
 ---
 
 # skill:feat-execution
@@ -14,21 +14,21 @@ description: 新功能/大型改动的完整开发流程——B1预研→B2 IBM�
 | | fix-execution | feat-execution |
 |---|---|---|
 | 适用 | bug fix、小改动 | 新功能、大型重构 |
-| 流程 | test-pre-merge 沙箱 → cp → commit | B1→B2→dev→merge 完整链路 |
-| 治理 | 后置 | 前置（B1 即开始） |
+| 流程 | test-pre-merge 沙箱 → cp → commit | B1_IBM→B2_IBM→dev→merge 完整链路 |
+| 治理 | 后置 | 前置（B1_IBM 即开始） |
 
 ## 下层 skill
 
 feat-execution 在不同阶段调用下层 skill：
 
-1. `skill:doc-pre-brainstorm-execution` — B1：raw issue → brainstorms.md → candidates.md
-2. `skill:doc-ibm-execution` — B2_IBM：candidate → materialize I-* issue → milestone → ready for dev
+1. `skill:doc-B1_IBM-execution` — B1_IBM：raw issue → brainstorms.md → candidates.md
+2. `skill:doc-B2_IBM-execution` — B2_IBM：candidate → materialize I-* issue → milestone → ready for dev
 3. `skill:dev-loop-execution` — dev-loop：实现 + pre-tests + code-review + progress 回写
 
 ## 核心原则
 
-- B1 预研阶段就写治理文档（brainstorms.md + candidates.md）
-- B2 materialize 后才能开始写代码
+- B1_IBM 预研阶段就写治理文档（brainstorms.md + candidates.md）
+- B2_IBM materialize 后才能开始写代码
 - dev-loop 产出 pre-tests + code-review 证据
 - 合并走 feature → test-pre-merge → develop 完整链路
 - 不跳过门禁
@@ -46,7 +46,7 @@ feat-execution 在不同阶段调用下层 skill：
    ├─ test-pre-merge-{raw-key}-{slug}   (基于 develop)
    └─ feature/raw-{raw-key}-{slug}      (基于 test-pre-merge)
 
-2. skill:doc-pre-brainstorm-execution
+2. skill:doc-B1_IBM-execution
    → 写 docs/pre-brainstorms/{key}--{slug}/brainstorms.md
    → 写 candidates.md，每个 candidate 标注 promote/absorb/drop
    → 更新 INDEX.md
@@ -54,9 +54,9 @@ feat-execution 在不同阶段调用下层 skill：
 3. candidate 决策：promote → 进入 B2_IBM
 ```
 
-### 阶段 2：B2 IBM
+### 阶段 2：B2_IBM
 ```
-1. skill:doc-ibm-execution
+1. skill:doc-B2_IBM-execution
    → materialize I-* issue
    → 写 docs/epics/{epic}/issues/I-{key}.md
    → 写 prd.md / tasks.md / pre-tests.md
@@ -102,7 +102,7 @@ feat-execution 在不同阶段调用下层 skill：
 
 ## 硬性规则
 
-- 不要跳过 B1 → B2 → dev → merge 任一阶段
+- 不要跳过 B1_IBM → B2_IBM → dev → merge 任一阶段
 - 不要在 develop 上直接开发
 - feature worktree 必须用 ./bin/wt-create 创建
 - 门禁必须过，不过就修，不绕过

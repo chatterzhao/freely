@@ -23,7 +23,7 @@ description: 评估并约束 mem9 作为 Freely 可选连续性后端的接入�
 1. 先读取对应 issue 与 pre-brainstorm，确认这条研究到底是在评估什么边界。
 2. 先列出本地权威事实源，再决定哪些 continuity artifact 可以外发。
 3. 给出清晰的 `local-only` / `local + mem9` 运行边界。
-4. 若后续要进入实现，继续把结果交给 `doc-ibm-execution` 或 `dev-loop-execution`，不要在 skill 内偷跑实现。
+4. 若后续要进入实现，继续把结果交给 `doc-B2_IBM-execution` 或 `dev-loop-execution`，不要在 skill 内偷跑实现。
 
 ## 完成判定
 

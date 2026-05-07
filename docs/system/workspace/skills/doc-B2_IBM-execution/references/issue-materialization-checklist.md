@@ -3,7 +3,7 @@
 ## Entry checks
 
 - 当前输入已经是 milestone-owned issue，或 candidate 已被 milestone 接纳并进入某个 `M-{issue-id}`
-- 若仍只是未绑定 milestone 的 pre-brainstorm candidate：回到 `doc-pre-brainstorm-execution`
+- 若仍只是未绑定 milestone 的 pre-brainstorm candidate：回到 `doc-B1_IBM-execution`
 - 若来源 candidate 是 `candidate_format_version: v2`，先读取其 `acceptance_criteria`、`promotion_gate`、`open_questions`、`acceptance_reviews`
 
 ## Identity and materialization contract
@@ -28,7 +28,7 @@
 任一未稳定：
 
 - 停止写正式 IBM 产物
-- 回到 `doc-pre-brainstorm-execution`
+- 回到 `doc-B1_IBM-execution`
 
 ## Required artifacts
 

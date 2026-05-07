@@ -471,12 +471,12 @@ ${role_scope_rule_5b_escaped}
 10. 读取 workspace 下的 agent 与 skill 时，统一按相对路径理解，例如：
    - \`workspace/agents/lead-agent.md\`
    - \`workspace/skills/context-source-skill/SKILL.md\`
-   - \`workspace/skills/doc-pre-brainstorm-execution/SKILL.md\`
-   - \`workspace/skills/doc-ibm-execution/SKILL.md\`
+   - \`workspace/skills/doc-B1_IBM-execution/SKILL.md\`
+   - \`workspace/skills/doc-B2_IBM-execution/SKILL.md\`
    - \`workspace/skills/dev-loop-execution/SKILL.md\`
 10A. 除非当前工具明确暴露了兼容的原生 skill tool，否则所有 \`skill:<name>\` 都按“去读对应 \`SKILL.md\` 并照此执行”解释。
-11. 若没有稳定 issue 边界，下一跳应阅读 \`workspace/skills/doc-pre-brainstorm-execution/SKILL.md\`。
-12. 若已有稳定 issue 边界但文档仍需 issue-bound 收敛，下一跳应阅读 \`workspace/skills/doc-ibm-execution/SKILL.md\`。
+11. 若没有稳定 issue 边界，下一跳应阅读 \`workspace/skills/doc-B1_IBM-execution/SKILL.md\`。
+12. 若已有稳定 issue 边界但文档仍需 issue-bound 收敛，下一跳应阅读 \`workspace/skills/doc-B2_IBM-execution/SKILL.md\`。
 13. 若 issue 已 ready 或 in-progress，且文档和验收边界足够，下一跳应阅读 \`workspace/skills/dev-loop-execution/SKILL.md\`。
 13A. 若当前 route 已收敛为 \`completion_verification\` 或 \`cleanup_governance\`，不要把它伪装成新的 doc-loop / dev-loop；优先由主管在当前 \`auto-loop\` 侧产出 verification / cleanup judgement、continuity 与 handoff，必要时再委派 worker。
 13B. 若当前问题本身是 worktree 维护：例如“哪些 worktree 已完成 / 哪些该 merge / 哪些只应退休或保留 research-only / 当前所有 worktree 这轮哪些该 cleanup”，优先阅读 \`workspace/skills/worktree-maintenance-governance/SKILL.md\`，先完成 \`audit / merge_prep / stacked_merge_chain / fleet_closure / retirement_handoff\` 判断，再决定是否进入 doc/dev-loop。

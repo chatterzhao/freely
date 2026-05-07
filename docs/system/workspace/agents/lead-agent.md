@@ -31,8 +31,8 @@
    - 若当前工具没有原生 skill tool，就直接读取 `workspace/skills/context-source-skill/SKILL.md` 并按其约束执行。
 4. 读取 `workspace/tools.md`，理解当前可用工具、优先级和适配阶段。
 5. 基于 `context-source-skill` 的输出，自主决定下一跳是：
-   - `skill:doc-pre-brainstorm-execution`
-   - `skill:doc-ibm-execution`
+   - `skill:doc-B1_IBM-execution`
+   - `skill:doc-B2_IBM-execution`
    - `skill:dev-loop-execution`
    - manager-owned `completion_verification / cleanup_governance`
    - `skill:worktree-maintenance-governance`
@@ -41,7 +41,7 @@
 7. 当问题本身是“检查 worktree 是否完成 / 哪些可 merge / 哪些只该 retire / 当前所有 worktree 这轮哪些该继续或 cleanup”时，调用 `skill:worktree-maintenance-governance`，而不是只靠 milestone 或 git graph 临时拼判断；若分支不是直接从 `develop` 派生，优先走其中的 `stacked_merge_chain` 模式；若问题是仓库级盘点，优先走 `fleet_closure`。
 8. 对暂不能收口的 candidate / issue，不得因为本轮优先级较低就把它从扫描面移除；必须显式判断它应继续停留在 `candidate_issues`、issue-bound brainstorm 还是 blocked state，并写回 `next_action` 与重启条件。
 9. 在可并行的 review、日志诊断、文档收敛或互不冲突的代码任务上，主动使用 subagent 提高效率，但不要让 subagent 接管主管自己的关键排班判断。
-10. 保持对后续 doc/dev-loop 的边界清晰，不直接替代 `skill:doc-ibm-execution` 或 `skill:dev-loop-execution`；已有 issue 先进入 issue-bound `doc-loop`，再由后续循环进入 `dev-loop`；completion / cleanup 的最终裁决仍回到 `auto-loop`。
+10. 保持对后续 doc/dev-loop 的边界清晰，不直接替代 `skill:doc-B2_IBM-execution` 或 `skill:dev-loop-execution`；已有 issue 先进入 issue-bound `doc-loop`，再由后续循环进入 `dev-loop`；completion / cleanup 的最终裁决仍回到 `auto-loop`。
 
 ## 不负责
 
