@@ -19,6 +19,14 @@ protected_branch_name() {
   printf '%s\n' "${refname#refs/heads/}"
 }
 
+wt_managed_branch_ref() {
+  local refname="$1"
+  case "$refname" in
+    refs/heads/feature/*|refs/heads/hotfix/*|refs/heads/fix/*|refs/heads/test-pre-merge-*) return 0 ;;
+  esac
+  return 1
+}
+
 commit_has_canonical_receipt() {
   local commit="$1"
   local body=""
@@ -37,9 +45,28 @@ commit_is_merge_commit() {
 
 while read -r old_oid new_oid refname; do
   [[ -n "${refname:-}" ]] || continue
+
+  # ── Branch creation guard: block manual git worktree add for managed branches ──
+  if [[ "$old_oid" == "$zero_oid" ]]; then
+    if wt_managed_branch_ref "$refname"; then
+      if [[ "${FREELY_WT_CREATE:-}" != "1" ]]; then
+        branch_name="$(protected_branch_name "$refname")"
+        cat <<MSG >&2
+[HOOK] Branch creation blocked: '$branch_name' must be created through ./bin/wt-create.
+Direct 'git worktree add' / 'git branch' for feature/*, hotfix/*, fix/*, and test-pre-merge-* branches is not allowed.
+Use './bin/wt-create --raw-key <key> --prefix <fix|feature> --skill <path> --slug <slug>' instead.
+This ensures every worktree has a valid issue, correct naming, and governance traceability.
+Policy source: docs/CONSTITUTION.md §2, docs/LAWS.md §2
+MSG
+        exit 1
+      fi
+    fi
+    continue
+  fi
+
   protected_branch_ref "$refname" || continue
 
-  if [[ "$old_oid" == "$zero_oid" || "$new_oid" == "$zero_oid" ]]; then
+  if [[ "$new_oid" == "$zero_oid" ]]; then
     continue
   fi
 
