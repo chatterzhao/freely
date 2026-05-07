@@ -177,8 +177,192 @@ def update_issue(local_id: str, platform_issue_id: str, title: str = "", body: s
     return results
 
 
+# ---- raw-issue-pull: find and materialize raw issues from platforms ----
+
+def search_raw_issue(raw_key: str) -> dict[str, dict]:
+    """Search all platforms for an OPEN issue matching raw-{key}.
+    Returns {platform: {issue_number, title, url}} or empty dict if not found.
+    """
+    results = {}
+    for platform in available_platforms():
+        try:
+            if platform == "github":
+                repo = _gh_repo()
+                if not repo:
+                    continue
+                result = _gh("issue", "list", "--repo", repo, "--state", "open",
+                           "--search", f"raw-{raw_key} in:title", "--limit", "5",
+                           "--json", "number,title,url", check=False)
+                if result.returncode == 0 and result.stdout.strip():
+                    issues = json.loads(result.stdout)
+                    for issue in issues:
+                        title = issue.get("title", "")
+                        if f"RAW-{raw_key}" in title or f"raw-{raw_key}" in title:
+                            results[platform] = {
+                                "issue_number": str(issue["number"]),
+                                "title": title,
+                                "url": issue.get("url", ""),
+                            }
+                            break
+            elif platform == "gitee":
+                result = subprocess.run(
+                    [sys.executable, str(RUNTIME_DIR / "gitee-issue.py"),
+                     "--repo", _gitee_repo(), "list", "--state", "open", "--limit", "50"],
+                    capture_output=True, text=True
+                )
+                if result.returncode == 0:
+                    try:
+                        issues = json.loads(result.stdout)
+                    except Exception:
+                        issues = []
+                    for issue in issues:
+                        title = issue.get("title", "")
+                        if f"RAW-{raw_key}" in title or f"raw-{raw_key}" in title:
+                            results[platform] = {
+                                "issue_number": str(issue.get("number", issue.get("id", ""))),
+                                "title": title,
+                                "url": issue.get("html_url", issue.get("url", "")),
+                            }
+                            break
+        except Exception:
+            continue
+    return results
+
+
+def fetch_issue(platform: str, issue_number: str) -> dict:
+    """Fetch full issue details from a platform.
+    Returns dict with title, body, created_at, updated_at, labels, state or empty dict on failure.
+    """
+    try:
+        if platform == "github":
+            repo = _gh_repo()
+            result = _gh("issue", "view", issue_number, "--repo", repo,
+                       "--json", "title,body,createdAt,updatedAt,labels,state",
+                       check=False)
+            if result.returncode == 0 and result.stdout.strip():
+                data = json.loads(result.stdout)
+                return {
+                    "title": data.get("title", ""),
+                    "body": data.get("body", ""),
+                    "created_at": data.get("createdAt", ""),
+                    "updated_at": data.get("updatedAt", ""),
+                    "labels": [l["name"] for l in data.get("labels", [])],
+                    "state": data.get("state", "").upper(),
+                }
+        elif platform == "gitee":
+            result = subprocess.run(
+                [sys.executable, str(RUNTIME_DIR / "gitee-issue.py"),
+                 "--repo", _gitee_repo(), "get", issue_number],
+                capture_output=True, text=True
+            )
+            if result.returncode == 0:
+                data = json.loads(result.stdout)
+                return {
+                    "title": data.get("title", ""),
+                    "body": data.get("body", ""),
+                    "created_at": data.get("created_at", ""),
+                    "updated_at": data.get("updated_at", ""),
+                    "labels": [l.get("name", "") for l in data.get("labels", [])],
+                    "state": data.get("state", "").upper(),
+                }
+    except Exception:
+        pass
+    return {}
+
+
+def pull_raw_issue(raw_key: str, target_dir: Path) -> Optional[dict]:
+    """Find raw issue on platform, fetch it, and materialize to target_dir/issue.md.
+    Returns the materialized issue dict with path and platform_ids, or None if not found.
+    """
+    # 1. Search on all platforms
+    results = search_raw_issue(raw_key)
+    if not results:
+        return None
+
+    # 2. Use primary platform first, fall back to any
+    platform = "github" if "github" in results else next(iter(results))
+    info = results[platform]
+    issue_number = info["issue_number"]
+
+    # 3. Fetch full issue details
+    details = fetch_issue(platform, issue_number)
+    if not details:
+        return None
+
+    # 4. Materialize to docs/issues/raw-{key}/issue.md
+    target_dir.mkdir(parents=True, exist_ok=True)
+    issue_file = target_dir / "issue.md"
+
+    # Build platform_ids
+    platform_ids = {}
+    for plat, plat_info in results.items():
+        platform_ids[plat] = {
+            "issue_id": plat_info["issue_number"],
+            "url": plat_info.get("url", ""),
+            "synced_at": "",
+        }
+
+    # Parse phase from labels
+    phase = "proposed"
+    for label in details.get("labels", []):
+        if label.startswith("phase/"):
+            phase = label.replace("phase/", "")
+            break
+
+    # Write issue.md with proper frontmatter
+    frontmatter = {
+        "local_id": f"raw-{raw_key}",
+        "kind": "raw",
+        "status": "proposed",
+        "phase_state": phase,
+        "platform_ids": platform_ids,
+        "primary_platform": platform,
+        "canonical_issue_path": "",
+        "last_synced_comment_at": {},
+        "hash": "",
+        "created_at": details.get("created_at", ""),
+        "updated_at": details.get("updated_at", ""),
+        "intake_id": "",
+        "author": "platform",
+        "channel": platform,
+        "session_refs": [],
+    }
+
+    import yaml
+    fm_str = yaml.dump(frontmatter, default_flow_style=False, allow_unicode=True, sort_keys=False).strip()
+    body = details.get("body", "")
+    # Remove frontmatter from body if present (GH issue body may contain old frontmatter)
+    if body.startswith("---"):
+        parts = body.split("---", 2)
+        body = parts[2].strip() if len(parts) >= 3 else body
+
+    issue_file.write_text(f"---\n{fm_str}\n---\n\n{body}\n", encoding="utf-8")
+
+    return {
+        "path": str(issue_file),
+        "local_id": f"raw-{raw_key}",
+        "platform": platform,
+        "issue_number": issue_number,
+        "platform_ids": platform_ids,
+    }
+
+
 # CLI entry point for testing
 if __name__ == "__main__":
-    print(f"Available platforms: {available_platforms()}")
-    print(f"GitHub repo: {_gh_repo()}")
-    print(f"Gitee repo: {_gitee_repo()}")
+    if len(sys.argv) > 1 and sys.argv[1] == "search":
+        raw_key = sys.argv[2] if len(sys.argv) > 2 else ""
+        result = search_raw_issue(raw_key)
+        print(json.dumps(result, indent=2))
+    elif len(sys.argv) > 1 and sys.argv[1] == "fetch":
+        platform, num = sys.argv[2], sys.argv[3]
+        result = fetch_issue(platform, num)
+        print(json.dumps(result, indent=2))
+    elif len(sys.argv) > 1 and sys.argv[1] == "pull":
+        raw_key = sys.argv[2]
+        target = Path(sys.argv[3]) if len(sys.argv) > 3 else Path(f"docs/issues/raw-{raw_key}")
+        result = pull_raw_issue(raw_key, target)
+        print(json.dumps(result, indent=2, default=str))
+    else:
+        print(f"Available platforms: {available_platforms()}")
+        print(f"GitHub repo: {_gh_repo()}")
+        print(f"Gitee repo: {_gitee_repo()}")

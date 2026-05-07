@@ -209,6 +209,7 @@ _require_issue_exists() {
   case "$key" in
     raw-*)
       ts="${key#raw-}"
+      # Source 1: chat-inbox (local SQLite)
       if [[ -f "$db_path" ]] && python3 "$chat_inbox_py" show --db "$db_path" --id "$ts" >/dev/null 2>&1; then
         local consumed
         consumed=$(python3 -c "
@@ -230,8 +231,18 @@ conn.close()
           return 0
         fi
       fi
+      # Source 2: docs/issues/ (local)
       if [[ -d "$ROOT_DIR/docs/issues/$key" ]]; then
         return 0
+      fi
+      # Source 3: platform pull (GitHub/Gitee)
+      if [[ -x "$ROOT_DIR/bin/raw-issue-pull" ]]; then
+        local pull_result
+        pull_result=$("$ROOT_DIR/bin/raw-issue-pull" --raw-key "$ts" 2>/dev/null || true)
+        if echo "$pull_result" | grep -q '"local_id"'; then
+          echo "raw-issue-pull: materialized $key from platform"
+          return 0
+        fi
       fi
       ;;
     I-*)
