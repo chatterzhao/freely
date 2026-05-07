@@ -43,6 +43,22 @@ routing_policy:
 
 
 
+## M-20260507T0300Z-A
+- title: GATE 1 timestamp check
+- status: active
+### candidate_issues
+1. `C-20260507T0300Z-A`
+- milestone: M-20260507T0300Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260507T0300Z-A/issue.md`
+### committed_issues
+1. `I-20260507T0300Z-A`
+- title: GATE 1 timestamp check
+- milestone_state: committed
+- phase_state: `in_dev`
+- issue_path: `docs/issues/I-20260507T0300Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260507-gate1-timestamp/candidates.md`
+- verification_artifact_dir: `docs/epics/gate1-timestamp/code-reviews`
 ## M-20260507T0200Z-A
 - title: promoted gate fix
 - status: active
