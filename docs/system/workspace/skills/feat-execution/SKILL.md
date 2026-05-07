@@ -35,15 +35,23 @@ feat-execution 在不同阶段调用下层 skill：
 
 ## 工作流
 
-### 阶段 1：B1 预研
+### 阶段 1：B1_IBM 预研
 ```
-1. 创建 feature/raw-{key}-{slug} worktree (./bin/wt-create)
+1. 创建工位:
+   ./bin/wt-create --raw-key <key> --prefix feature \
+     --skill docs/system/workspace/skills/feat-execution/SKILL.md \
+     --slug <slug>
+
+   自动创建:
+   ├─ test-pre-merge-{raw-key}-{slug}   (基于 develop)
+   └─ feature/raw-{raw-key}-{slug}      (基于 test-pre-merge)
+
 2. skill:doc-pre-brainstorm-execution
    → 写 docs/pre-brainstorms/{key}--{slug}/brainstorms.md
    → 写 candidates.md，每个 candidate 标注 promote/absorb/drop
    → 更新 INDEX.md
    → 更新 milestones.md candidate_issues
-3. candidate 决策：promote → 进入 B2
+3. candidate 决策：promote → 进入 B2_IBM
 ```
 
 ### 阶段 2：B2 IBM
