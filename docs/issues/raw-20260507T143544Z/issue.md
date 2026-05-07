@@ -24,6 +24,9 @@ source_candidate: docs/pre-brainstorms/20260507T143544Z--intercept-guard/candida
 platform_state: open
 ---
 
+- pre_tests_path: `docs/epics/raw-issue-pull-intercept/verification/pre-tests.md`
+- verification_artifact_dir: `docs/epics/raw-issue-pull-intercept/code-reviews`
+
 ## 问题
 
 `bin/raw-issue-pull` 目前有 3 个缺陷：

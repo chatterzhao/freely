@@ -22,6 +22,10 @@ verification_artifact_dir: docs/epics/raw-issue-pull-intercept/code-reviews
 
 # I-20260507T143544Z-A: raw-issue-pull 工位拦截
 
+- pre_tests_path: `docs/epics/raw-issue-pull-intercept/verification/pre-tests.md`
+- verification_artifact_dir: `docs/epics/raw-issue-pull-intercept/code-reviews`
+- source_candidate: `docs/pre-brainstorms/20260507T143544Z--intercept-guard/candidates.md`
+
 ## 实现
 - `bin/raw-issue-pull`: 分支拦截 + 修复 bash bug
 - `docs/system/workspace/scripts/runtime/freely`: CLI dispatch 路由
