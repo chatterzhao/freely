@@ -117,7 +117,7 @@ hotfix/*          → main
 ```
 阶段 1 — wt-create 一次性创建两个工位
   │
-  ├─ ./bin/wt-create --raw-key <key> \
+  ├─ ./bin/wt-create --raw-key <key> --source <source> \
   │     --skill docs/system/workspace/skills/fix-execution/SKILL.md \
   │     --slug <slug>
   │
