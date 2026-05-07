@@ -14,11 +14,11 @@ description: 在 Freely 仓库内治理和修改 `docs/system/workspace/skills/*
 ## 不负责
 
 - 不替代通用 `skill-creator`
-- 不替代 `doc-pre-brainstorm-execution` 或 `doc-ibm-execution`
+- 不替代 `doc-B1_IBM-execution` 或 `doc-B2_IBM-execution`
 
 ## 工作流
 
-1. 若 skill 改动边界尚未收敛，先进入 `doc-pre-brainstorm-execution`。
+1. 若 skill 改动边界尚未收敛，先进入 `doc-B1_IBM-execution`。
 2. 需要通用 skill 设计准则时，读取系统 skill `/home/devbox/.codex/skills/.system/skill-creator/SKILL.md`。
 3. 修改 skill 时同时检查：
    - 当前 `SKILL.md`

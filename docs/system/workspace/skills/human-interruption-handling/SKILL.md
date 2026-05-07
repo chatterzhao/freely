@@ -16,7 +16,7 @@ description: 处理 human interruption intake。接收 manager 已 claim 的插�
 ## 不负责
 
 - 不替代 `manager-agent` 做 notice / claim / delegate / scheduling。
-- 不直接替代 `doc-pre-brainstorm-execution`、`doc-ibm-execution`、`dev-loop-execution`。
+- 不直接替代 `doc-B1_IBM-execution`、`doc-B2_IBM-execution`、`dev-loop-execution`。
 - 不在 protected manager 工位直接落 worker 级长期产物。
 - 不直接执行 runtime kill / restart；这仍由 runtime/scripts 执行。
 
@@ -64,7 +64,7 @@ description: 处理 human interruption intake。接收 manager 已 claim 的插�
    - 为什么使用该 reaction
    - 推荐的 absorption target
    - 若有下游 worker，给出最小 handoff
-5. 若 absorption 为 discovery，交给 `skill:doc-pre-brainstorm-execution`。
+5. 若 absorption 为 discovery，交给 `skill:doc-B1_IBM-execution`。
 6. 若 absorption 为 continuation，交给当前 issue / recovery / dev 路径。
 7. 若 absorption 为 control，交给 runtime / manager continuity。
 8. 若 absorption 为 noise，生成 resolution note 并回写原因。

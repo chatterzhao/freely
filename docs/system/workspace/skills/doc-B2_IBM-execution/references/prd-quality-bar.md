@@ -1,6 +1,6 @@
 # PRD Quality Bar
 
-`doc-ibm-execution` 中的 `prd.md` 不是面向人类回忆的摘要，而是给后续 AI 和人类共同消费的执行控制面。
+`doc-B2_IBM-execution` 中的 `prd.md` 不是面向人类回忆的摘要，而是给后续 AI 和人类共同消费的执行控制面。
 
 ## Minimum structure
 

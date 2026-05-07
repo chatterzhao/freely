@@ -4,8 +4,8 @@
 
 以下目标 skill 都会写仓库：
 
-- `doc-pre-brainstorm-execution`
-- `doc-ibm-execution`
+- `doc-B1_IBM-execution`
+- `doc-B2_IBM-execution`
 - `dev-loop-execution`
 - `workspace-skill-governance`
 
