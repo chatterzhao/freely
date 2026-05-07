@@ -113,20 +113,25 @@ hotfix/*          → main
 ### 场景 B：原 feature 已退役
 
 ```
-阶段 1 — 建 test-pre-merge-* 私有工位快测
+阶段 1 — wt-create 一次性创建两个工位
   │
-  ├─ ./bin/wt-create test-pre-merge-<desc>-<YYYYMMDD> --base develop
-  ├─ ./bin/pre-init-runtime --pre-project <path>  # 复制 runtime 状态
-  ├─ 直接改源码 → stop/start daemon → 验证
+  ├─ ./bin/wt-create --raw-key <key> --prefix fix \
+  │     --skill docs/system/workspace/skills/fix-execution/SKILL.md \
+  │     --slug <slug>
+  │
+  │   自动创建:
+  │   ├─ test-pre-merge-{raw-key}-{slug}  (基于 develop)
+  │   └─ fix/raw-{raw-key}-{slug}         (基于 test-pre-merge)
+  │
+  ├─ 紧急 hotfix: --prefix feature 换为 hotfix 分支名（手动创建）
+  │
+  ├─ 在 test-pre-merge 工位中改源码 → stop/start daemon → 验证
   ├─ 深挖根因链，反复迭代
   └─ 此阶段不 commit、不 push、不写治理文档
 
-阶段 2 — 决定 fix 即建可写工位，增量 cp
+阶段 2 — 增量 cp 到可写工位，commit
   │
-  ├─ 普通: ./bin/wt-create feature/<desc>-<YYYYMMDD> --base develop
-  │   紧急: ./bin/wt-create hotfix/<desc>-<YYYYMMDD> --base develop
-  │
-  ├─ 每个阶段性修复验证通过后立刻 cp + commit:
+  ├─ 每个阶段性修复验证通过后 cp + commit:
   │     cp <test-pre-merge-wt>/path/to/file <fix-wt>/path/to/file
   │     cd <fix-wt> && git commit -m "fix: <阶段性描述>"
   │
@@ -143,7 +148,8 @@ hotfix/*          → main
   │
   ├─ 运行 ./bin/governance-merge-gate --range "develop..HEAD" 只检查本分支
   ├─ gate 失败：用对应 skill 修复分支自己的错误，预存错误不阻塞
-  ├─ gate 通过：./bin/merge-guarded test-pre-merge-<name> feature/<name>
+  ├─ gate 通过：fix 基于 test-pre-merge → merge 为 fast-forward
+  │     ./bin/merge-guarded test-pre-merge-<name> fix/<name>
   │         → 验证 → ./bin/merge-guarded develop test-pre-merge-<name>
   ├─ 紧急: ./bin/merge-guarded develop hotfix/<name>
   └─ 可选: git checkout main && ./bin/merge-guarded main hotfix/<name>
