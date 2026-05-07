@@ -279,7 +279,34 @@ _pull_raw_issue() {
   local raw_key="$1" source="$2"
   case "$source" in
     chat-inbox)
-      # Materialize from chat-inbox (already handled by _materialize_chat_if_needed)
+      local ts db_path chat_inbox_py
+      ts="${raw_key}"
+      db_path="$ROOT_DIR/.freely/freely.db"
+      chat_inbox_py="$ROOT_DIR/docs/system/workspace/scripts/runtime/chat-inbox.py"
+      [[ -f "$db_path" ]] || { echo "chat-inbox DB not found: $db_path" >&2; return 1; }
+
+      # Check if chat with this id exists and is unconsumed
+      local consumed
+      consumed=$(python3 -c "
+import sqlite3
+conn=sqlite3.connect('$db_path')
+r=conn.execute('SELECT consumed FROM chats WHERE id=$ts AND chat_type=\"new-issue\"').fetchone()
+print(r[0] if r else '')
+conn.close()
+" 2>/dev/null || echo "")
+      if [[ "$consumed" != "0" ]]; then
+        echo "chat-inbox: no unconsumed new-issue chat found for id=$ts" >&2
+        return 1
+      fi
+
+      local issue_dir="$ROOT_DIR/docs/issues/raw-${raw_key}"
+      mkdir -p "$issue_dir"
+      if ! python3 "$chat_inbox_py" materialize --db "$db_path" --id "$ts" --target "$issue_dir" >/dev/null 2>&1; then
+        echo "chat-inbox: materialize failed for id=$ts" >&2
+        return 1
+      fi
+      python3 "$chat_inbox_py" consume --db "$db_path" --id "$ts" --materialized-as "raw-${raw_key}" >/dev/null 2>&1
+      echo "pull: materialized raw-$raw_key from chat-inbox → $issue_dir/issue.md" >&2
       return 0
       ;;
     platform)
@@ -287,13 +314,60 @@ _pull_raw_issue() {
         local result
         result=$("$ROOT_DIR/bin/raw-issue-pull" --raw-key "$raw_key" 2>/dev/null || true)
         if echo "$result" | grep -q '"local_id"'; then
-          echo "raw-issue-pull: materialized raw-$raw_key from platform" >&2
+          echo "pull: materialized raw-$raw_key from platform" >&2
           return 0
         fi
       fi
       return 1
       ;;
   esac
+}
+
+# ── After pull: ensure platform_ids on all configured platforms ──
+
+_fill_platform_ids() {
+  local raw_key="$1"
+  local issue_file="$ROOT_DIR/docs/issues/raw-${raw_key}/issue.md"
+  [[ -f "$issue_file" ]] || return 0
+
+  # Check if any configured platform is missing
+  local needs_sync=0
+  if [[ -n "${GH_REPO:-}" ]] || gh repo view --json nameWithOwner -q '.nameWithOwner' >/dev/null 2>&1; then
+    local gh_id
+    gh_id=$(python3 -c "
+import yaml
+with open('$issue_file') as f: c=f.read()
+parts=c.split('---',2)
+fm=yaml.safe_load(parts[1]) if len(parts)>=3 else {}
+ids=fm.get('platform_ids',{}) or {}
+gh=ids.get('github',{}) or {}
+print(gh.get('issue_id',''))
+" 2>/dev/null || true)
+    if [[ -z "$gh_id" || "$gh_id" == "None" ]]; then
+      needs_sync=1
+    fi
+  fi
+  if [[ -n "${GITEE_TOKEN:-}" ]]; then
+    local gt_id
+    gt_id=$(python3 -c "
+import yaml
+with open('$issue_file') as f: c=f.read()
+parts=c.split('---',2)
+fm=yaml.safe_load(parts[1]) if len(parts)>=3 else {}
+ids=fm.get('platform_ids',{}) or {}
+gt=ids.get('gitee',{}) or {}
+print(gt.get('issue_id',''))
+" 2>/dev/null || true)
+    if [[ -z "$gt_id" || "$gt_id" == "None" ]]; then
+      needs_sync=1
+    fi
+  fi
+
+  if [[ "$needs_sync" -eq 1 ]] && [[ -x "$ROOT_DIR/bin/issue-sync" ]]; then
+    echo "补齐 platform_ids: issue-sync create raw-$raw_key" >&2
+    "$ROOT_DIR/bin/issue-sync" create "raw-$raw_key" >/dev/null 2>&1 || true
+    echo "platform_ids 已补齐" >&2
+  fi
 }
 
 _require_issue_exists() {
@@ -337,6 +411,8 @@ _require_issue_exists() {
           echo "拒绝创建工位: 无法从 $source_val 拉取 raw-$raw_key" >&2
           return 1
         fi
+        # ── Step 6: fill platform_ids on all configured platforms ──
+        _fill_platform_ids "$raw_key"
       else
         # Legacy: check chat-inbox + local directory
         if [[ -f "$db_path" ]] && python3 "$chat_inbox_py" show --db "$db_path" --id "$ts" >/dev/null 2>&1; then
