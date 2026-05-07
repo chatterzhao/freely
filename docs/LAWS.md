@@ -119,8 +119,8 @@
 
 执行技能：
 - `skill:context-source-skill`
-- `skill:doc-pre-brainstorm-execution`
-- `skill:doc-ibm-execution`
+- `skill:doc-B1_IBM-execution`
+- `skill:doc-B2_IBM-execution`
 - `skill:dev-loop-execution`
 
 ---
@@ -139,7 +139,7 @@
 - reroute 到 `pre-brainstorm` 的原因与证据
 
 执行技能：
-- `skill:doc-ibm-execution`
+- `skill:doc-B2_IBM-execution`
 - `skill:dev-loop-execution`
 - `skill:laws-enforcer`
 
@@ -179,8 +179,8 @@
 
 执行技能：
 - `skill:laws-enforcer`
-- `skill:doc-pre-brainstorm-execution`
-- `skill:doc-ibm-execution`
+- `skill:doc-B1_IBM-execution`
+- `skill:doc-B2_IBM-execution`
 
 ---
 
@@ -546,8 +546,8 @@ phase-1 break-glass merge commit 仍应包含：
 - 路由与状态链路记录
 
 执行技能：
-- `skill:doc-pre-brainstorm-execution`
-- `skill:doc-ibm-execution`
+- `skill:doc-B1_IBM-execution`
+- `skill:doc-B2_IBM-execution`
 - `skill:dev-loop-execution`
 - `skill:auto-loop-orchestrator`
 - `skill:laws-enforcer`

@@ -139,8 +139,8 @@ hotfix/*          → main
 
 阶段 3 — 补齐治理（调用下层 skill）
   │
-  ├─ skill:doc-pre-brainstorm-execution → raw → candidate
-  ├─ skill:doc-ibm-execution → candidate → I-* issue → progress
+  ├─ skill:doc-B1_IBM-execution → raw → candidate
+  ├─ skill:doc-B2_IBM-execution → candidate → I-* issue → progress
   ├─ skill:dev-loop-execution → code-review（必须 ## Implementation Decision Note）+ pre-tests
   └─ milestones.md
 

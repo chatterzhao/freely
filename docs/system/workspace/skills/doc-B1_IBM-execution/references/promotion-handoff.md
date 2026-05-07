@@ -11,7 +11,7 @@
 ## Output
 
 - `status=completed`
-- `next_recommended_route=doc-ibm-execution`
+- `next_recommended_route=doc-B2_IBM-execution`
 - 最小 issue 上下文摘要
 
 ## Anti-patterns

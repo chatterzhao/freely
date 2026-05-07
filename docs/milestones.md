@@ -41,6 +41,28 @@ routing_policy:
 - unresolved candidate or issue never disappears just because the current round chose another priority; keep it in the appropriate queue with an explicit restart condition
 
 
+
+## M-20260506T1200Z-A
+
+- title: Skill rename to B1_IBM/B2_IBM + I→B→M skeleton
+- status: active
+
+### candidate_issues
+1. `C-20260506T1200Z-A`
+- milestone: M-20260506T1200Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260506T1200Z-A/issue.md`
+- source_candidates: `docs/pre-brainstorms/20260506-ibm-skill-rename/candidates.md`
+
+### committed_issues
+1. `I-20260506T1200Z-A`
+- title: Skill rename to B1_IBM/B2_IBM + I→B→M skeleton
+- milestone_state: committed
+- phase_state: `in_dev`
+- issue_path: `docs/issues/I-20260506T1200Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260506-ibm-skill-rename/candidates.md`
+- verification_artifact_dir: `docs/epics/ibm-skill-rename/code-reviews`
+
 ## M-20260506T1230Z-A
 
 - title: wt-create dual worktree creation
@@ -2056,10 +2078,10 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/candidates.md`
 - evidence:
-  - `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`
-  - `docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md`
-  - `docs/system/workspace/skills/doc-ibm-execution/references/ibm-completion-gate.md`
-  - `docs/system/workspace/skills/doc-ibm-execution/references/issue-materialization-checklist.md`
+  - `docs/system/workspace/skills/doc-B2_IBM-execution/SKILL.md`
+  - `docs/system/workspace/skills/doc-B2_IBM-execution/references/prd-quality-bar.md`
+  - `docs/system/workspace/skills/doc-B2_IBM-execution/references/ibm-completion-gate.md`
+  - `docs/system/workspace/skills/doc-B2_IBM-execution/references/issue-materialization-checklist.md`
   - `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/code-reviews/20260325-story-level-pre-tests-quality-gate-governance-verification.md`
 - completion_note: Story-level `pre-tests.md` 质量 gate 已进入 capability truth，最小 blocker taxonomy 已冻结为 `definition_missing`、`commands_only`、`evidence_plan_missing`、`execution_pending_or_failed`，verification 已 pass
 
@@ -2413,10 +2435,10 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260326-1733--ibm-pretests-real-environment-acceptance-quality/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260326-1733--ibm-pretests-real-environment-acceptance-quality/candidates.md`
 - evidence:
-  - `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`
-  - `docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md`
-  - `docs/system/workspace/skills/doc-ibm-execution/references/ibm-completion-gate.md`
-  - `docs/system/workspace/skills/doc-ibm-execution/references/issue-materialization-checklist.md`
+  - `docs/system/workspace/skills/doc-B2_IBM-execution/SKILL.md`
+  - `docs/system/workspace/skills/doc-B2_IBM-execution/references/prd-quality-bar.md`
+  - `docs/system/workspace/skills/doc-B2_IBM-execution/references/ibm-completion-gate.md`
+  - `docs/system/workspace/skills/doc-B2_IBM-execution/references/issue-materialization-checklist.md`
   - `docs/progress/workspace-routing-foundation/p-ibm-pretests-executable-acceptance-quality-governance.md`
   - `docs/epics/workspace-routing-foundation/ibm-pretests-executable-acceptance-quality-governance/code-reviews/20260326-ibm-pretests-executable-acceptance-quality-governance-verification.md`
 - completion_note: IBM 真源现在要求 `pre-tests.md` 默认写出可恢复的 executable acceptance contract，并对 Freely 自治能力明确 integration、application-native real-environment、end-to-end dogfood 三类 post-merge 验收面；verification review 模板统一与 machine-readable schema 继续留给后续 lifecycle
@@ -3549,21 +3571,21 @@ routing_policy:
 - completion_note: 已落地来源判定、milestone 扫描与 usable issue 决策规则
 
 5. `C-20260306-1103`
-- title: `doc-pre-brainstorm-execution.md`
+- title: `doc-B1_IBM-execution.md`
 - milestone_state: completed
 - phase_state: `completed`
 - priority: P0
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/bootstrap-routing-foundation-artifacts/issues/doc-pre-brainstorm-execution-bootstrap.md`
-- evidence: `docs/system/workspace/skills/doc-pre-brainstorm-execution/SKILL.md`
+- promoted_issue_path: `docs/epics/workspace-routing-foundation/bootstrap-routing-foundation-artifacts/issues/doc-B1_IBM-execution-bootstrap.md`
+- evidence: `docs/system/workspace/skills/doc-B1_IBM-execution/SKILL.md`
 - completion_note: 已落地 docs 前置收敛环，负责 pre-brainstorm 产物与 milestone 原子同步
 
 6. `C-20260306-1104`
-- title: `doc-ibm-execution.md` 与 `dev-loop-execution.md` 的外循环接驳边界
+- title: `doc-B2_IBM-execution.md` 与 `dev-loop-execution.md` 的外循环接驳边界
 - milestone_state: completed
 - phase_state: `completed`
 - priority: P0
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/bootstrap-routing-foundation-artifacts/issues/doc-loop-dev-loop-handoff-bootstrap.md`
-- evidence: `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`, `docs/system/workspace/skills/dev-loop-execution/SKILL.md`
+- evidence: `docs/system/workspace/skills/doc-B2_IBM-execution/SKILL.md`, `docs/system/workspace/skills/dev-loop-execution/SKILL.md`
 - completion_note: 已收紧 issue-bound `IBM+G` 与 `DDD` 的接驳边界，状态交换统一回流给 auto-loop
 
 7. `C-20260306-1105`
@@ -3583,7 +3605,7 @@ routing_policy:
 - issue_path: `docs/epics/workspace-routing-foundation/stage-prefixed-progress-identifier/issues/stage-prefixed-progress-identifier.md`
 - source_brainstorm: `docs/pre-brainstorms/20260308-1630--stage-prefixed-progress-identifier/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260308-1630--stage-prefixed-progress-identifier/candidates.md`
-- evidence: `docs/LAWS.md`, `docs/PROJECT_INTENT.md`, `docs/milestones.md`, `docs/system/workspace/skills/context-source-skill/SKILL.md`, `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`, `docs/system/workspace/skills/dev-loop-execution/SKILL.md`
+- evidence: `docs/LAWS.md`, `docs/PROJECT_INTENT.md`, `docs/milestones.md`, `docs/system/workspace/skills/context-source-skill/SKILL.md`, `docs/system/workspace/skills/doc-B2_IBM-execution/SKILL.md`, `docs/system/workspace/skills/dev-loop-execution/SKILL.md`
 - completion_note: 已把 `phase_state` 收敛为 Freely 自举阶段的主执行标识，并统一 `done_ibm -> in_dev` handoff 与 milestone 路由口径
 
 7. `I-20260308-1931`

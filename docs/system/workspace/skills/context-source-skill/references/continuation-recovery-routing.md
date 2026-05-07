@@ -8,7 +8,7 @@
 
 ## Issue
 
-- docs 不足：`doc-ibm-execution`
+- docs 不足：`doc-B2_IBM-execution`
 - docs 足够：`dev-loop-execution`
 
 ## Recovery

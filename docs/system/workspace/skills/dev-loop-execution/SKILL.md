@@ -62,7 +62,7 @@ description: 执行 milestone-owned ready issue 的 AI-native 实现、测试与
 3. 若会触发恢复或重跑，补充当前 `runtime_state` 与 `session_refs`。
 4. 返回：
    - `status=reroute_required`
-   - `next_recommended_route=doc-pre-brainstorm-execution`
+   - `next_recommended_route=doc-B1_IBM-execution`
    - 新问题证据摘要
 
 ### 情景 D：实现依赖未合并父分支

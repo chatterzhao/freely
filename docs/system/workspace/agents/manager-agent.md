@@ -185,7 +185,7 @@
 
 6. `choose absorption target`
 - 主管负责决定加工结果最终进入哪类 canonical pool：
-  - discovery -> `doc-pre-brainstorm-execution`
+  - discovery -> `doc-B1_IBM-execution`
   - continuation -> 当前 issue / progress / recovery
   - control -> runtime / manager continuity
   - noise -> resolution note / continuity

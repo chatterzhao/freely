@@ -2,12 +2,12 @@
 
 ## Candidate issues
 
-- 边界仍不稳、仍需研究：`doc-pre-brainstorm-execution`
-- candidate 已清晰且可 materialize：`doc-ibm-execution`
+- 边界仍不稳、仍需研究：`doc-B1_IBM-execution`
+- candidate 已清晰且可 materialize：`doc-B2_IBM-execution`
 
 ## Committed issues
 
-- 缺 `b-issue/prd/pre-tests/tasks`：`doc-ibm-execution`
+- 缺 `b-issue/prd/pre-tests/tasks`：`doc-B2_IBM-execution`
 - docs 足够且 `phase_state` 为 `done_ibm` 或 `in_dev`：`dev-loop-execution`
 - 若处于 `in_verification`：只做校验和回写，不重开实现
 

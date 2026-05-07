@@ -9,7 +9,7 @@ description: 对当前输入做来源分层、可执行性判定、workspace 准
 
 - 把当前输入归类为 `discovery`、`milestone` 或 `continuation`。
 - 在 `discovery` 里进一步区分 durable source family，至少覆盖 `human interruption` 与 `external issue`，并保持它们的消费/去重语义不混淆。
-- 选择下一跳：`doc-pre-brainstorm-execution`、`doc-ibm-execution`、`dev-loop-execution`、`worktree-maintenance-governance`、`recovery-subagent-governance`，或显式返回 manager-owned 的 `completion_verification / cleanup_governance` 路由。
+- 选择下一跳：`doc-B1_IBM-execution`、`doc-B2_IBM-execution`、`dev-loop-execution`、`worktree-maintenance-governance`、`recovery-subagent-governance`，或显式返回 manager-owned 的 `completion_verification / cleanup_governance` 路由。
 - 判断本轮是否需要先准备 dedicated worktree。
 
 ## 不负责
@@ -53,7 +53,7 @@ description: 对当前输入做来源分层、可执行性判定、workspace 准
    - canonical linkage 比外部 labels/comments 更有决定性
    - `source issue` 是 intake lineage，不自动等于长期 public tracking surface
    - discard/accept 之后的 source closeout 由 canonical owner truth 决定，不由外部状态单独驱动
-   - 若 `task-source-scan` 给出 `github_raw_issue` / `gitee_raw_issue`，默认把它当 fresh intake，下一跳优先是 `doc-pre-brainstorm-execution`
+   - 若 `task-source-scan` 给出 `github_raw_issue` / `gitee_raw_issue`，默认把它当 fresh intake，下一跳优先是 `doc-B1_IBM-execution`
    - 若 `task-source-scan` 给出 `github_linked_open_issue` / `gitee_linked_open_issue`，默认把它当已消费 lineage 的 drift / continuation signal；先回 canonical milestone / issue / progress truth，判断是 continuation、closeout drift，还是 publication linkage drift，而不是再新开一轮 intake
 5. 若输入命中 milestone，读取 [milestone-routing.md](references/milestone-routing.md) 决定是继续 pre-brainstorm、进入 IBM、进入 dev-loop，还是仅做 completion verification。
 6. 若输入来自 issue/progress/recovery 或系统监控，读取 [continuation-recovery-routing.md](references/continuation-recovery-routing.md) 判断是否必须先恢复，而不是直接继续原阶段。

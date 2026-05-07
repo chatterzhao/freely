@@ -21,7 +21,7 @@
 
 ## Output hints
 
-- `discovery` 通常先去 `doc-pre-brainstorm-execution`
+- `discovery` 通常先去 `doc-B1_IBM-execution`
 - `chat_intake`（来自 freely.db 的未消费 chat）
   - 仍属于 `discovery`
   - 默认首跳：AI 判断 → 有价值的创建工位（wt-create 自动 materialize），噪声标记 consumed=-1
@@ -29,7 +29,7 @@
 - `human interruption` 与 `external issue` 是默认 durable source families，但它们的 consumption / dedupe / closeout 规则不同，不能因为都属于 `discovery` 就混成一个来源池
 - `github_raw_issue` / `gitee_raw_issue`
   - 仍属于 `discovery`
-  - 默认首跳：`doc-pre-brainstorm-execution`
+  - 默认首跳：`doc-B1_IBM-execution`
   - 语义：外部原始 issue 仍未被 canonical milestone / issue linkage 消费，需要先做 intake / 预研 / 接纳或丢弃判断
 - `github_linked_open_issue` / `gitee_linked_open_issue`
   - 仍属于 `discovery`，但不是 fresh intake
