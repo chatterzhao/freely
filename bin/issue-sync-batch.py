@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""issue-sync-batch: sync milestone issues to GitHub/Gitee.
-Called by bin/issue-sync-bootstrap or run standalone.
-Usage: python3 issue-sync-batch.py --repo chatterzhao/freely --batch 50 --issues-dir docs/issues
+"""DEPRECATED: Use `bin/issue-sync batch` instead.
+This script is kept for reference only. Redirecting to issue-sync...
 """
+import sys, os, subprocess
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.exit(subprocess.call([os.path.join(ROOT, "bin", "issue-sync"), "batch"]))
 import subprocess, os, re, sys, argparse
 
 # Load freely_user_env for credential resolution (same as gitee-issue.py)
