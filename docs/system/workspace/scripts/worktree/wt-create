@@ -4,32 +4,37 @@ set -euo pipefail
 usage() {
   cat <<USAGE
 Usage:
-  ./bin/wt-create --raw-key <key> --prefix <prefix> --skill <path> --slug <slug> [--base <branch>]
+  ./bin/wt-create --raw-key <key> --skill <path> --slug <slug> [--base <branch>]
   ./bin/wt-create <branch> [--base <base-branch>]    (legacy, single worktree)
 
-Required (new interface):
-  --raw-key <key>    Raw issue key (YYYYMMDDTHHMMZ format)
-  --prefix  <p>      Branch prefix: fix | feature.
-                       AI reads --skill first to determine the correct prefix
-                       from the skill's branch spec table.
-  --skill   <path>   Relative path to the governing skill SKILL.md
-  --slug    <slug>   Short descriptive slug
+Required:
+  --raw-key <key>   Raw issue key (YYYYMMDDTHHMMZ format)
+  --skill   <path>  Relative path to the governing skill SKILL.md.
+                      Must be one of:
+                        docs/system/workspace/skills/fix-execution/SKILL.md
+                        docs/system/workspace/skills/feat-execution/SKILL.md
+                      AI: Read this skill first — it teaches you the workflow,
+                      branch naming convention, and which sub-skills to invoke.
+  --slug    <slug>  Short descriptive slug for the worktree
 
 Optional:
-  --base <branch>    Base branch (default: develop)
+  --base <branch>   Base branch (default: develop)
 
 What it creates:
   1. test-pre-merge-{raw-key}-{slug}  ← based on --base (develop)
   2. {prefix}/raw-{raw-key}-{slug}    ← based on ① (test-pre-merge)
+     prefix is derived from --skill:
+       fix-execution   → fix/raw-{raw-key}-{slug}
+       feat-execution  → feature/raw-{raw-key}-{slug}
 
   This makes {prefix}/* → test-pre-merge a fast-forward merge.
 
 Examples:
-  ./bin/wt-create --raw-key 20260506T1000Z --prefix fix \
+  ./bin/wt-create --raw-key 20260506T1000Z \
     --skill docs/system/workspace/skills/fix-execution/SKILL.md \
     --slug task-mode-wait-prelaunch-gate
 
-  ./bin/wt-create --raw-key 20260506T1000Z --prefix feature \
+  ./bin/wt-create --raw-key 20260506T1000Z \
     --skill docs/system/workspace/skills/feat-execution/SKILL.md \
     --slug new-auth-module
 
@@ -46,7 +51,6 @@ fi
 # ── Argument parsing ─────────────────────────────────────
 
 raw_key=""
-prefix=""
 skill_path=""
 slug=""
 base="develop"
@@ -57,11 +61,6 @@ while [[ $# -gt 0 ]]; do
     --raw-key)
       raw_key="${2:-}"
       [[ -n "$raw_key" ]] || { echo "Missing value for --raw-key" >&2; exit 1; }
-      shift 2
-      ;;
-    --prefix)
-      prefix="${2:-}"
-      [[ -n "$prefix" ]] || { echo "Missing value for --prefix" >&2; exit 1; }
       shift 2
       ;;
     --skill)
@@ -110,23 +109,47 @@ done
 # ── Validate new interface ───────────────────────────────
 
 using_new=0
-if [[ -n "$raw_key" || -n "$prefix" || -n "$skill_path" || -n "$slug" ]]; then
-  if [[ -z "$raw_key" || -z "$prefix" || -z "$skill_path" || -z "$slug" ]]; then
-    echo "All --raw-key, --prefix, --skill, --slug are required together." >&2
-    usage
+if [[ -n "$raw_key" || -n "$skill_path" || -n "$slug" ]]; then
+  if [[ -z "$raw_key" ]]; then
+    echo "Missing required: --raw-key" >&2
+    echo "Usage: ./bin/wt-create --raw-key <key> --skill <path> --slug <slug>" >&2
+    exit 1
+  fi
+  if [[ -z "$skill_path" ]]; then
+    echo "Missing required: --skill" >&2
+    echo "" >&2
+    echo "  --skill tells wt-create which skill governs this worktree." >&2
+    echo "  Read the skill first — it teaches you the workflow and branch naming." >&2
+    echo "" >&2
+    echo "  Valid values:" >&2
+    echo "    docs/system/workspace/skills/fix-execution/SKILL.md   (bug fixes)" >&2
+    echo "    docs/system/workspace/skills/feat-execution/SKILL.md  (new features)" >&2
+    echo "" >&2
+    echo "Usage: ./bin/wt-create --raw-key <key> --skill <path> --slug <slug>" >&2
+    exit 1
+  fi
+  if [[ -z "$slug" ]]; then
+    echo "Missing required: --slug" >&2
+    echo "Usage: ./bin/wt-create --raw-key <key> --skill <path> --slug <slug>" >&2
     exit 1
   fi
   using_new=1
 fi
 
-# ── Validate prefix ──────────────────────────────────────
+# ── Derive prefix from --skill path ──────────────────────
 
 if [[ "$using_new" -eq 1 ]]; then
-  case "$prefix" in
-    fix|feature) ;;
+  case "$skill_path" in
+    *fix-execution/SKILL.md)   prefix="fix" ;;
+    *feat-execution/SKILL.md)  prefix="feature" ;;
     *)
-      echo "Invalid prefix '$prefix'. Must be 'fix' or 'feature'." >&2
-      echo "Read the --skill file to determine the correct prefix from its branch spec table." >&2
+      echo "Unrecognized --skill path: $skill_path" >&2
+      echo "" >&2
+      echo "  --skill must be a relative path to one of:" >&2
+      echo "    docs/system/workspace/skills/fix-execution/SKILL.md" >&2
+      echo "    docs/system/workspace/skills/feat-execution/SKILL.md" >&2
+      echo "" >&2
+      echo "  AI: Read this skill file first to understand the workflow." >&2
       exit 1
       ;;
   esac
