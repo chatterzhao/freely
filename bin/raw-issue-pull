@@ -11,11 +11,11 @@ Pull a raw issue from platform by matching raw-{key} in OPEN issue titles.
 Materializes to docs/issues/raw-{key}/issue.md with proper platform_ids.
 
 Options:
-  --raw-key <key>   Raw issue key (YYYYMMDDTHHMMZ format)
+  --raw-key <key>   Raw issue key (YYYYMMDDTHHMMSSZ format)
   --target  <dir>   Target directory (default: docs/issues/raw-{key}/)
 
 Example:
-  ./bin/raw-issue-pull --raw-key 20260506T1000Z
+  ./bin/raw-issue-pull --raw-key 20260506T100035Z
 USAGE
 }
 
@@ -36,12 +36,28 @@ done
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 [[ -z "$target" ]] && target="$ROOT_DIR/docs/issues/raw-${raw_key}"
 
+# ── Worktree / branch interception ─────────────────────────
+# Only allow pull from a worktree whose branch name contains the raw-key.
+current_branch="$(git -C "$ROOT_DIR" rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
+
+case "$current_branch" in
+  develop|main)
+    echo "拒绝: 不能在受保护分支 '$current_branch' 上执行 raw-issue-pull。" >&2
+    echo "请先切换到包含 raw-${raw_key} 的工位分支。" >&2
+    exit 1
+    ;;
+esac
+
+if [[ "$current_branch" != *"$raw_key"* ]]; then
+  echo "拒绝: 当前分支 '$current_branch' 不包含 raw-key '$raw_key'。" >&2
+  echo "raw-issue-pull 只能在包含该 raw-key 的工位分支中执行。" >&2
+  exit 1
+fi
+
 python3 "$ROOT_DIR/docs/system/workspace/scripts/sync/platform-adapter.py" pull "$raw_key" "$target"
 
 # After pull: sync to all configured platforms (fill missing platform_ids)
-if [[ -x "$ROOT_DIR/bin/issue-sync" ]]; then
-  local local_id="raw-${raw_key}"
-  if [[ -f "$target/issue.md" ]]; then
-    "$ROOT_DIR/bin/issue-sync" create "$local_id" 2>/dev/null || true
-  fi
+local_id="raw-${raw_key}"
+if [[ -x "$ROOT_DIR/bin/issue-sync" ]] && [[ -f "$target/issue.md" ]]; then
+  "$ROOT_DIR/bin/issue-sync" create "$local_id" 2>/dev/null || true
 fi

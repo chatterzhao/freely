@@ -43,6 +43,23 @@ routing_policy:
 
 
 
+## M-20260507T143544Z-A
+- title: raw-issue-pull interception guard
+- status: active
+### candidate_issues
+1. `C-20260507T143544Z-A`
+- milestone: M-20260507T143544Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260507T143544Z-A/issue.md`
+### committed_issues
+1. `I-20260507T143544Z-A`
+- title: raw-issue-pull interception guard + CLI dispatch
+- milestone_state: committed
+- phase_state: `in_dev`
+- issue_path: `docs/issues/I-20260507T143544Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260507T143544Z--intercept-guard/candidates.md`
+- verification_artifact_dir: `docs/epics/raw-issue-pull-intercept/code-reviews`
+
 ## M-20260507T0700Z-A
 - title: unified platform layer
 - status: active
