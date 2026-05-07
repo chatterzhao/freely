@@ -18,6 +18,9 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+pre_tests_path: docs/epics/source-param/verification/pre-tests.md
+verification_artifact_dir: docs/epics/source-param/code-reviews
+source_candidate: docs/pre-brainstorms/20260507-source-param/candidates.md
 ---
 
 ## 背景
@@ -140,3 +143,6 @@ _pull_raw_issue() {
 - #233：原始 scan+pull 设计（步骤 5-7）
 - #240：双工位创建
 - #243：统一仓库平台层
+
+- pre_tests_path: `docs/epics/source-param/verification/pre-tests.md`
+- verification_artifact_dir: `docs/epics/source-param/code-reviews`
