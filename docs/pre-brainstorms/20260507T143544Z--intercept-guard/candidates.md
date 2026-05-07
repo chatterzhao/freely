@@ -1,0 +1,24 @@
+# Candidates
+
+## C-20260507T143544Z-A: raw-issue-pull 工位拦截
+
+- candidate_format_version: v2
+- title: raw-issue-pull 添加工位/分支拦截校验 + CLI dispatch
+- status: promoted
+- decision_reason: 已验证缺少工位校验导致可从 develop 任意拉取 issue，安全风险明确
+- next_action: B2_IBM materialize → 实现代码
+- revisit_trigger: N/A（已 promote）
+- acceptance_criteria:
+  - develop/main 分支上拒绝执行 raw-issue-pull
+  - 当前分支名不包含 raw-key 时拒绝
+  - CLI dispatch 可用
+  - bash `local` bug 修复
+- promotion_gate:
+  - 代码实现完成
+  - 从 feature 工位分支可正常 pull 本 issue
+  - 从不匹配分支被拒绝
+- open_questions: []
+- acceptance_reviews: []
+- promoted_issue_path: docs/issues/I-20260507T143544Z-A/issue.md
+- milestone: 2026-05-07
+- session_refs: []
