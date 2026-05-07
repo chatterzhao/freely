@@ -52,7 +52,7 @@ validate_merge_direction() {
 
   if [[ "$target" == test-pre-merge-* ]]; then
     case "$source_branch" in
-      feature/*|hotfix/*|feature/premerge-*) allowed=1 ;;
+      fix/*|feature/*|hotfix/*|feature/premerge-*) allowed=1 ;;
     esac
   else
     case "$target" in
@@ -76,6 +76,7 @@ validate_merge_direction() {
   source: $source_branch
 
 Allowed:
+  fix/* -> test-pre-merge-*
   feature/* -> test-pre-merge-*
   hotfix/* -> test-pre-merge-*
   feature/premerge-* -> test-pre-merge-*
@@ -269,7 +270,7 @@ do_initial_merge() {
 
   # Pre-flight governance gate for feature/hotfix -> test-pre-merge merges.
   # Runs from the SOURCE worktree so the gate can read feature/hotfix files on disk.
-  if [[ "$target" == test-pre-merge-* ]] && { [[ "$source_branch" == feature/* ]] || [[ "$source_branch" == hotfix/* ]]; }; then
+  if [[ "$target" == test-pre-merge-* ]] && { [[ "$source_branch" == fix/* ]] || [[ "$source_branch" == feature/* ]] || [[ "$source_branch" == hotfix/* ]]; }; then
     local source_wt gate_bin gate_output gate_rc
     source_wt="$(git worktree list --porcelain 2>/dev/null | awk -v branch="$source_branch" '
       /^worktree / { wt=$2 }
