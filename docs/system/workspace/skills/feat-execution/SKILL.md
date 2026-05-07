@@ -104,5 +104,6 @@ feat-execution 在不同阶段调用下层 skill：
 
 - 不要跳过 B1_IBM → B2_IBM → dev → merge 任一阶段
 - 不要在 develop 上直接开发
+- 分支名必须以 `feature/` 为前缀，工位名必须包含 `feature`
 - feature worktree 必须用 ./bin/wt-create 创建
 - 门禁必须过，不过就修，不绕过

@@ -64,12 +64,14 @@ test-pre-merge-* 上的操作:
 | `main` | ❌ | ❌ | 发布目标 |
 | `develop` | ❌ | ❌ | 集成目标 |
 | `test-pre-merge-*` | ❌ | ❌ | 预集成验证批次 / 私有测试沙箱 |
-| `feature/*` | ✅ | ✅ | 功能开发 / 普通 fix |
+| `fix/*` | ✅ | ✅ | bug 修复专用 |
+| `feature/*` | ✅ | ✅ | 功能开发 |
 | `feature/premerge-*` | ✅ | ✅ | 冲突收敛（格式: `feature/premerge-YYYYMMDDTHHMMZ--<topic>`） |
 | `hotfix/*` | ✅ | ✅ | 紧急 fix，可直达 develop |
 
 合并路径（来自 merge-guarded）:
 ```
+fix/*             → test-pre-merge-* → develop
 feature/*         → test-pre-merge-* → develop
 feature/premerge-* → test-pre-merge-* → develop
 hotfix/*          → test-pre-merge-* → develop  (或 hotfix/* → develop 直达)
@@ -85,13 +87,13 @@ hotfix/*          → main
 | 原 feature 工位 | 做法 |
 |---|---|
 | **还在** | 直接在 feature 上改 → 测 → 提交。走 feature → test-pre-merge-* → develop |
-| **已退役（已合并/已删）** | 建 `test-pre-merge-*` 私有工位快测 → cp 到新建的 `feature/*` 或 `hotfix/*` |
+| **已退役（已合并/已删）** | 建 `test-pre-merge-*` 私有工位快测 → cp 到新建的 `fix/*` 或 `hotfix/*` |
 
 ### 再判严重程度
 
 | 类型 | 分支 | 合并路径 |
 |---|---|---|
-| 普通 fix | `feature/<desc>-<YYYYMMDD>` | feature → test-pre-merge-* → develop |
+| 普通 fix | `fix/raw-{raw-key}-{slug}` | fix → test-pre-merge-* → develop |
 | 紧急 hotfix | `hotfix/<desc>-<YYYYMMDD>` | hotfix → develop（可跳过 test-pre-merge-*） |
 
 ---
@@ -167,7 +169,7 @@ hotfix/*          → main
 
 ## 硬性规则
 
-- **不发明新分支名**。只用 `feature/*`、`feature/premerge-*`、`hotfix/*`、`test-pre-merge-*`。
+- **不发明新分支名**。只用 `fix/*`、`feature/*`、`feature/premerge-*`、`hotfix/*`、`test-pre-merge-*`。
 - **test-pre-merge-* 上不 commit、不 push**。只改源码快速测试，修改全部 cp 到可写工位。
 - **fix 工位早期创建**，增量 cp + commit，不堆到最后。
 - **原 feature 还在就直接在上面修**，不新建工位。
