@@ -39,4 +39,4 @@
 - promotion_gate: develop_merge
 - evidence_level: integration
 - status: pass
-- artifact_ref: docs/epics/timestamp-seconds-upgrade/code-reviews/review.md
+- artifact_ref: docs/epics/timestamp-seconds-upgrade/code-reviews/closeout-review.md

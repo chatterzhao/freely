@@ -1,12 +1,14 @@
 ---
 local_id: I-20260507T143545Z-A
 kind: linked
-status: in_verification
-phase_state: in_verification
+status: completed
+phase_state: completed
 promoted_from: raw-20260507T143545Z
 source_candidate: docs/pre-brainstorms/20260507T143545Z--timestamp-seconds-upgrade/candidates.md
 canonical_issue_path: ""
-platform_ids: {}
+platform_ids:
+  github:
+    issue_id: '248'
 primary_platform: ""
 last_synced_comment_at: {}
 hash: ""
