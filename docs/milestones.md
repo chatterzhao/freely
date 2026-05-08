@@ -60,6 +60,24 @@ routing_policy:
 - source_candidate: `docs/pre-brainstorms/20260508T005431Z--skill-standardize/candidates.md`
 - verification_artifact_dir: `docs/epics/skill-standardize/code-reviews`
 
+## M-20260508T004541Z-A
+- title: skill ref cleanup
+- status: active
+### candidate_issues
+1. `C-20260508T004541Z-A`
+- milestone: M-20260508T004541Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260508T004541Z-A/issue.md`
+### committed_issues
+1. `I-20260508T004541Z-A`
+- title: skill ref cleanup
+- milestone_state: committed
+- phase_state: `in_verification`
+- issue_path: `docs/issues/I-20260508T004541Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260508T004541Z--skill-ref-cleanup/candidates.md`
+- verification_artifact_dir: `docs/epics/skill-ref-cleanup/code-reviews`
+
+
 ## M-20260508T011858Z-A
 - title: skill gate alignment
 - status: active
