@@ -4603,3 +4603,18 @@ routing_policy:
 - milestone_state: completed
 - phase_state: `completed`
 - priority: P0
+
+## M-20260508T111130Z-A
+- title: reference-transaction delete fix
+- status: active
+### candidate_issues
+1. `C-20260508T111130Z-A`
+- milestone: M-20260508T111130Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260508T111130Z-A/issue.md`
+### committed_issues
+1. `I-20260508T111130Z-A`
+- title: reference-transaction hook delete fix
+- milestone_state: committed
+- phase_state: `in_dev`
+- issue_path: `docs/issues/I-20260508T111130Z-A/issue.md`
