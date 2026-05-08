@@ -35,11 +35,48 @@ B2_IBM 不创建 I-{key}。milestone 已经准备好了。
 
 | 产物 | 要求 |
 |------|------|
-| `issues/{name}.md` | 正式 I-* issue 文档，含 frontmatter（phase_state、source_candidate、milestone、verification_artifact_dir） |
-| `prd.md` | AI-ready 最小结构：Goal → Dev-Loop Handoff |
-| `pre-tests.md` | 含 `## Acceptance Items`，每个 item 有 id/requirement/evidence_level/status/artifact_ref。对 `test-pre-merge → develop` guarded promote 的 owner，至少一条 item 含 v2 adequacy 字段：surface_kind、target_lane、promotion_gate（=develop_merge）、task_refs、case_design |
-| `tasks.md` | T-00X 任务分解，关联 owner issue |
-| `code-reviews/` | 含 Implementation Decision Note（decision/why_this/alternatives_considered/boundary_non_goals/residual_risk） |
+| `issues/{name}.md` | I-* issue 文档，完整格式见下方示例 |
+| `prd.md` | Goal → Dev-Loop Handoff |
+| `pre-tests.md` | 结构见 `skill:dev-loop-execution` 情景 D |
+| `tasks.md` | 任务分解，关联 owner issue |
+| `code-reviews/` | Implementation Decision Note（decision/why_this/alternatives_considered/boundary_non_goals/residual_risk） |
+
+**I-* issue 完整示例**（`docs/issues/I-{key}-A/issue.md`）：
+
+```markdown
+---
+local_id: I-20260508T011858Z-A
+kind: linked
+status: in_dev
+phase_state: in_dev
+promoted_from: raw-20260508T011858Z
+source_candidate: docs/pre-brainstorms/20260508T011858Z--skill-gate-alignment/candidates.md
+canonical_issue_path: ""
+platform_ids: {}
+primary_platform: ""
+last_synced_comment_at: {}
+hash: ""
+created_at: 2026-05-08T01:18:58Z
+updated_at: 2026-05-08T01:18:58Z
+intake_id: ""
+author: zhaoquan
+channel: feat-execution
+session_refs: []
+pre_tests_path: docs/epics/skill-gate-alignment/verification/pre-tests.md
+verification_artifact_dir: docs/epics/skill-gate-alignment/code-reviews
+---
+
+# I-20260508T011858Z-A: skill 引导与门禁对齐
+
+- source_candidate: `docs/pre-brainstorms/20260508T011858Z--skill-gate-alignment/candidates.md`
+- pre_tests_path: `docs/epics/skill-gate-alignment/verification/pre-tests.md`
+- verification_artifact_dir: `docs/epics/skill-gate-alignment/code-reviews`
+
+## 实现
+...
+```
+
+注意 `canonical_issue_path` 为空避免自引用；YAML frontmatter 和正文 bullet 字段都需要写关键字段。
 
 ### 完成自检
 
