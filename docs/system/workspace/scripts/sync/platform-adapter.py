@@ -320,15 +320,19 @@ def pull_raw_issue(raw_key: str, target_dir: Path) -> Optional[dict]:
     if not details:
         return None
 
-    # 3a. Standardize title: derive key from platform created_at
-    created_at = details.get("created_at", "")
-    standard_key = _created_at_to_key(created_at) if created_at else None
-    if standard_key and standard_key != raw_key:
-        new_title = info["title"].replace(f"raw-{raw_key}", f"raw-{standard_key}")
-        if new_title != info["title"]:
-            _update_issue_title(platform, issue_number, new_title)
-            raw_key = standard_key
-            target_dir = target_dir.parent / f"raw-{raw_key}"
+    # 3a. Standardize title only when it lacks the canonical raw-key.
+    # If title already has raw-{raw_key}, it is the truth source — skip.
+    title = info.get("title", "")
+    title_has_key = f"raw-{raw_key}" in title or f"RAW-{raw_key}" in title
+    if not title_has_key:
+        created_at = details.get("created_at", "")
+        standard_key = _created_at_to_key(created_at) if created_at else None
+        if standard_key and standard_key != raw_key:
+            new_title = title.replace(f"raw-{raw_key}", f"raw-{standard_key}")
+            if new_title != title:
+                _update_issue_title(platform, issue_number, new_title)
+                raw_key = standard_key
+                target_dir = target_dir.parent / f"raw-{raw_key}"
 
     # 4. Materialize to docs/issues/raw-{key}/issue.md
     target_dir.mkdir(parents=True, exist_ok=True)
