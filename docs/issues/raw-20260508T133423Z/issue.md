@@ -40,3 +40,6 @@ case "$current_branch" in
 
 1. `raw-issue-pull` 第 41 行：`-C "$ROOT_DIR"` 删掉，用当前目录
 2. `platform-adapter.py` 第 326 行：标题已有 `raw-{raw_key}` 时跳过标准化
+
+- pre_tests_path: docs/epics/raw-issue-pull-git-cwd/verification/pre-tests.md
+- verification_artifact_dir: docs/epics/raw-issue-pull-git-cwd/code-reviews
