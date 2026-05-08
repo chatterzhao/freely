@@ -38,7 +38,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 
 # ── Worktree / branch interception ─────────────────────────
 # Only allow pull from a worktree whose branch name contains the raw-key.
-current_branch="$(git -C "$ROOT_DIR" rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
+current_branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
 
 case "$current_branch" in
   develop|main)
