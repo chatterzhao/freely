@@ -40,3 +40,13 @@
 - evidence_level: integration
 - status: pass
 - artifact_ref: docs/epics/timestamp-seconds-upgrade/code-reviews/review.md
+
+### AT-002 closeout verification
+- id: closeout-verification
+- requirement: phase_state→completed, platform_ids added, GitHub #248 closed
+- surface_kind: governance
+- target_lane: premerge-integration
+- promotion_gate: develop_merge
+- evidence_level: review
+- status: pass
+- artifact_ref: docs/epics/timestamp-seconds-upgrade/code-reviews/closeout-review.md
