@@ -270,6 +270,37 @@ def fetch_issue(platform: str, issue_number: str) -> dict:
     return {}
 
 
+def _created_at_to_key(created_at: str) -> Optional[str]:
+    """Convert platform created_at to standard raw key.
+    "2026-05-06T10:00:35Z" → "20260506T100035Z"
+    """
+    try:
+        from datetime import datetime, timezone
+        dt = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
+        return dt.strftime("%Y%m%dT%H%M%SZ")
+    except Exception:
+        return None
+
+
+def _update_issue_title(platform: str, issue_number: str, new_title: str) -> bool:
+    """Update issue title on platform. Returns True on success."""
+    try:
+        if platform == "github":
+            _gh("issue", "edit", "--repo", _gh_repo(), issue_number, "--title", new_title)
+            return True
+        elif platform == "gitee":
+            result = subprocess.run(
+                [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
+                 "--repo", _gitee_repo(), "update", issue_number,
+                 "--title", new_title],
+                capture_output=True, text=True
+            )
+            return result.returncode == 0
+    except Exception:
+        pass
+    return False
+
+
 def pull_raw_issue(raw_key: str, target_dir: Path) -> Optional[dict]:
     """Find raw issue on platform, fetch it, and materialize to target_dir/issue.md.
     Returns the materialized issue dict with path and platform_ids, or None if not found.
@@ -288,6 +319,16 @@ def pull_raw_issue(raw_key: str, target_dir: Path) -> Optional[dict]:
     details = fetch_issue(platform, issue_number)
     if not details:
         return None
+
+    # 3a. Standardize title: derive key from platform created_at
+    created_at = details.get("created_at", "")
+    standard_key = _created_at_to_key(created_at) if created_at else None
+    if standard_key and standard_key != raw_key:
+        new_title = info["title"].replace(f"raw-{raw_key}", f"raw-{standard_key}")
+        if new_title != info["title"]:
+            _update_issue_title(platform, issue_number, new_title)
+            raw_key = standard_key
+            target_dir = target_dir.parent / f"raw-{raw_key}"
 
     # 4. Materialize to docs/issues/raw-{key}/issue.md
     target_dir.mkdir(parents=True, exist_ok=True)
