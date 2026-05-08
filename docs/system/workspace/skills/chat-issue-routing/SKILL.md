@@ -1,3 +1,8 @@
+---
+name: chat-issue-routing
+description: 将 `freely chat` 消息路由到正确的 issue，判断属于哪个已有 issue 还是需要新建 raw issue。
+---
+
 # chat-issue-routing
 
 将 `freely chat` 消息路由到正确的 issue。
