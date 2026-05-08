@@ -43,6 +43,24 @@ routing_policy:
 
 
 
+## M-20260508T120000Z-A
+- title: wt-create fix
+- status: active
+### candidate_issues
+1. `C-20260508T120000Z-A`
+- milestone: M-20260508T120000Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260508T120000Z-A/issue.md`
+### committed_issues
+1. `I-20260508T120000Z-A`
+- title: wt-create fix
+- milestone_state: committed
+- phase_state: `in_verification`
+- issue_path: `docs/issues/I-20260508T120000Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260508T120000Z--wt-create-fix/candidates.md`
+- verification_artifact_dir: `docs/epics/wt-create-fix/code-reviews`
+
+
 ## M-20260507T143546Z-A
 - title: platform pull title standardization
 - status: active
