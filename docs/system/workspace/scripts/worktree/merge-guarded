@@ -291,16 +291,24 @@ do_initial_merge() {
       if [[ "$gate_rc" -ne 0 ]]; then
         cat >&2 <<MSG
 
-┌─────────────────────────────────────────────────────────────┐
-│  Pre-flight governance gate FAILED for: $source_branch       │
-│                                                             │
-│  Fix these issues in the source worktree before merging:   │
-└─────────────────────────────────────────────────────────────┘
+┌─ Merge blocked ─────────────────────────────────────────┐
+│  在修复具体错误之前，先自我诊断 IBM 阶段:                │
+│                                                        │
+│  B1 only (needs_research): 仅研究，不应 merge。         │
+│    若候选人是 promoted: 需先完成 B2_IBM（创建 I-*）。     │
+│  B2 (in_b2_ibm/in_dev): 需完成 dev-loop evidence。       │
+│  dev-loop done: 检查下方具体错误。                       │
+│                                                        │
+│  读对应 skill 了解完整工作流:                            │
+│    fix 工位 → skill:fix-execution                       │
+│    feature 工位 → skill:feat-execution                  │
+│                                                        │
+│  用 --range dry-run 预检（不触发 ref update）:           │
+│    cd "$source_wt"                                       │
+│    ./bin/governance-merge-gate --range develop..HEAD    │
+└────────────────────────────────────────────────────────┘
 
 $gate_output
-
-Run this check directly in your source worktree:
-  cd "$source_wt" && ./bin/governance-merge-gate --range develop..HEAD
 MSG
         exit 1
       fi
