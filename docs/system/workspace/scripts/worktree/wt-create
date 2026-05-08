@@ -233,11 +233,11 @@ done
 
 _extract_issue_key() {
   local branch="$1"
-  if echo "$branch" | grep -qoE 'raw-[0-9]{8}[-T][0-9]{4}Z?'; then
-    echo "$branch" | grep -oE 'raw-[0-9]{8}[-T][0-9]{4}Z?' | head -1
+  if echo "$branch" | grep -qoE 'raw-[0-9]{8}[-T][0-9]{4,6}Z?'; then
+    echo "$branch" | grep -oE 'raw-[0-9]{8}[-T][0-9]{4,6}Z?' | head -1
     return 0
   fi
-  if echo "$branch" | grep -qoE 'I-[0-9]{8}[-T][0-9]{4}Z?(-[A-Z0-9]+)?'; then
+  if echo "$branch" | grep -qoE 'I-[0-9]{8}[-T][0-9]{4,6}Z?(-[A-Z0-9]+)?'; then
     echo "$branch" | grep -oE 'I-[0-9]{8}[-T][0-9]{4}Z?(-[A-Z0-9]+)?' | head -1
     return 0
   fi
@@ -258,7 +258,8 @@ _scan_lookup() {
 import json, sys
 with open('$scan_file') as f:
     data = json.load(f)
-for item in data:
+items = data if isinstance(data, list) else data.get('items', [])
+for item in items:
     if item.get('key') == '$raw_key':
         print(item.get('source_family', ''))
         sys.exit(0)
