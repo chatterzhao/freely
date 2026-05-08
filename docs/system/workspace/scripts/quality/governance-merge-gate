@@ -1396,7 +1396,7 @@ def main() -> int:
     capability_changed_paths = [path for path in changed_paths if not is_governance_only_path(path)]
     implementation_changed_paths = [path for path in changed_paths if is_implementation_bearing_path(path)]
     if capability_changed_paths:
-        capability_owner_phases = {"in_dev", "blocked_dev", "in_verification", "completed"}
+        capability_owner_phases = {"completed"}
         for owner_issue_path in sorted(issue_bound_issue_paths):
             owner_issue = issues_index.get(owner_issue_path)
             if not owner_issue:
@@ -1409,7 +1409,7 @@ def main() -> int:
             if phase not in capability_owner_phases:
                 errors.append(
                     f"{owner_issue.issue_id or owner_issue.path} in {owner_issue.path} has phase_state '{owner_issue.phase_state}', which cannot own capability/implementation changes in a develop-bound merge. "
-                    f"First advance the lifecycle to an execution phase like in_dev / blocked_dev / in_verification, or keep this merge governance-only."
+                    f"Complete verification and advance phase_state to 'completed' before merging, or keep this merge governance-only."
                 )
             # 历史遗留豁免：phase_state 为 completed 的 issue 允许后补 capability changes
             # 这些是历史 issue，之前已完成但后来有后续修复合并进来
