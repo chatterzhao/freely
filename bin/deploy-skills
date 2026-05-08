@@ -1,70 +1,135 @@
 #!/usr/bin/env bash
-# deploy-skills: deploy project skills to ~/.claude/skills/ for Claude Code
+# deploy-skills: deploy project skills to AI tool skill directories
 set -euo pipefail
 
 usage() {
   cat <<USAGE
-Usage: ./bin/deploy-skills [--dry-run]
+Usage: ./bin/deploy-skills [--tools <name,...>] [--dry-run]
 
-Deploy all skills from docs/system/workspace/skills/ to ~/.claude/skills/
-so Claude Code's Skill tool can invoke them via skill:<name>.
+Deploy all skills from docs/system/workspace/skills/ to AI tool skill directories
+so tools can invoke them via skill:<name>.
 
 Options:
-  --dry-run  Show what would be deployed without writing.
+  --tools <tools>  Comma-separated tool names (default: from FREELY_TOOLS or "claude")
+  --dry-run        Show what would be deployed without writing.
+
+Supported tools:
+  claude  → ~/.claude/skills/
+  codex   → ~/.codex/skills/
+
+Examples:
+  ./bin/deploy-skills --tools claude,codex
+  ./bin/deploy-skills --tools claude --dry-run
 USAGE
 }
 
 dry_run=0
-[[ "${1:-}" == "--dry-run" ]] && { dry_run=1; shift; }
+tools=""
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --tools)
+      tools="${2:-}"
+      [[ -n "$tools" ]] || { echo "Missing value for --tools" >&2; exit 1; }
+      shift 2
+      ;;
+    --dry-run)
+      dry_run=1
+      shift
+      ;;
+    --help|-h)
+      usage; exit 0
+      ;;
+    *)
+      echo "Unknown: $1" >&2; usage; exit 1
+      ;;
+  esac
+done
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 SRC="$ROOT_DIR/docs/system/workspace/skills"
-DST="${HOME}/.claude/skills"
-
 [[ -d "$SRC" ]] || { echo "Skill source directory not found: $SRC" >&2; exit 1; }
 
-deployed=0
-failed=0
-updated=0
+# Resolve default tools: --tools flag > FREELY_TOOLS env > ~/.freely/config.env > claude
+if [[ -z "$tools" ]]; then
+  tools="${FREELY_TOOLS:-}"
+fi
+if [[ -z "$tools" ]]; then
+  for config in "${HOME}/.freely/config.env" "${HOME}/.config/freely/config.env"; do
+    if [[ -f "$config" ]]; then
+      tools=$(grep "^FREELY_TOOLS=" "$config" 2>/dev/null | cut -d= -f2 | tr -d '"' | tr -d "'" || true)
+      [[ -n "$tools" ]] && break
+    fi
+  done
+fi
+[[ -z "$tools" ]] && tools="claude"
 
-for skill_dir in "$SRC"/*/; do
-  skill_md="${skill_dir}SKILL.md"
-  [[ -f "$skill_md" ]] || continue
+# Map tool name to skill directory
+tool_dir() {
+  case "$1" in
+    claude) echo "${HOME}/.claude/skills" ;;
+    codex)  echo "${HOME}/.codex/skills" ;;
+    *)      echo "" ;;
+  esac
+}
 
-  name=$(head -20 "$skill_md" | grep "^name:" | head -1 | sed 's/^name:\s*//' | xargs)
-  [[ -z "$name" ]] && { echo "SKIP ${skill_dir}: missing name in frontmatter" >&2; failed=$((failed + 1)); continue; }
+deploy_to() {
+  local tool_name="$1" dst="$2"
+  local deployed=0 failed=0 updated=0
 
-  dst="$DST/$name"
+  echo "=== $tool_name → $dst ==="
 
-  if [[ "$dry_run" -eq 1 ]]; then
-    if [[ -d "$dst" ]]; then
-      if ! diff -rq "$skill_dir" "$dst" >/dev/null 2>&1; then
-        echo "UPDATE  $name"
+  for skill_dir in "$SRC"/*/; do
+    skill_md="${skill_dir}SKILL.md"
+    [[ -f "$skill_md" ]] || continue
+
+    name=$(head -20 "$skill_md" | grep "^name:" | head -1 | sed 's/^name:\s*//' | xargs)
+    [[ -z "$name" ]] && { echo "SKIP ${skill_dir}: missing name in frontmatter" >&2; failed=$((failed + 1)); continue; }
+
+    local_dst="$dst/$name"
+
+    if [[ "$dry_run" -eq 1 ]]; then
+      if [[ -d "$local_dst" ]]; then
+        if ! diff -rq "$skill_dir" "$local_dst" >/dev/null 2>&1; then
+          echo "  UPDATE  $name"
+        else
+          echo "  OK     $name"
+        fi
       else
-        echo "OK     $name"
+        echo "  CREATE  $name"
+      fi
+      deployed=$((deployed + 1))
+      continue
+    fi
+
+    if [[ -d "$local_dst" ]]; then
+      if ! diff -rq "$skill_dir" "$local_dst" >/dev/null 2>&1; then
+        rm -rf "$local_dst"
+        mkdir -p "$local_dst"
+        cp -r "$skill_dir"* "$local_dst/"
+        echo "  UPDATE  $name"
+        updated=$((updated + 1))
       fi
     else
-      echo "CREATE  $name"
+      mkdir -p "$local_dst"
+      cp -r "$skill_dir"* "$local_dst/"
+      echo "  CREATE  $name"
     fi
     deployed=$((deployed + 1))
+  done
+
+  echo "  deployed=$deployed  updated=$updated  failed=$failed"
+  echo ""
+}
+
+# Parse comma-separated tools and deploy to each
+IFS=',' read -ra TOOL_LIST <<< "$tools"
+for t in "${TOOL_LIST[@]}"; do
+  t=$(echo "$t" | xargs)  # trim whitespace
+  d=$(tool_dir "$t")
+  if [[ -z "$d" ]]; then
+    echo "SKIP unsupported tool: $t" >&2
     continue
   fi
-
-  if [[ -d "$dst" ]]; then
-    if ! diff -rq "$skill_dir" "$dst" >/dev/null 2>&1; then
-      rm -rf "$dst"
-      mkdir -p "$dst"
-      cp -r "$skill_dir"* "$dst/"
-      echo "UPDATE  $name"
-      updated=$((updated + 1))
-    fi
-  else
-    mkdir -p "$dst"
-    cp -r "$skill_dir"* "$dst/"
-    echo "CREATE  $name"
-  fi
-  deployed=$((deployed + 1))
+  deploy_to "$t" "$d"
 done
-
-echo ""
-echo "deployed=$deployed  updated=$updated  failed=$failed"
