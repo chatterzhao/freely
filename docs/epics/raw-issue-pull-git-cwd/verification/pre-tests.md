@@ -3,6 +3,7 @@
 ## Unit
 - acceptance target: branch check uses current worktree
 - testing layer: unit
+- target environment: feature worktree
 - required evidence: fix worktree passes, develop blocked
 - blocker taxonomy: execution_pending_or_failed
 - not_applicable_reason: no_executable_boundary_at_this_layer
@@ -11,6 +12,7 @@
 ## Integration
 - acceptance target: wt-create --source platform pull succeeds
 - testing layer: integration
+- target environment: develop merge chain
 - required evidence: pull output shows "materialized"
 - blocker taxonomy: execution_pending_or_failed
 - not_applicable_reason: no_executable_boundary_at_this_layer
@@ -19,6 +21,7 @@
 ## End-to-End
 - acceptance target: fix → merge → develop
 - testing layer: end_to_end
+- target environment: develop merge chain
 - required evidence: merge receipts
 - blocker taxonomy: execution_pending_or_failed
 - not_applicable_reason: change_not_touching_this_layer
