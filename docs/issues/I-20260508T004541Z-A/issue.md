@@ -20,11 +20,14 @@ pre_tests_path: docs/epics/skill-ref-cleanup/verification/pre-tests.md
 verification_artifact_dir: docs/epics/skill-ref-cleanup/code-reviews
 ---
 
-# I-20260508T004541Z-A: skill ref cleanup
+# I-20260508T004541Z-A: skill 引用全局改为 skill:name
 
 - source_candidate: docs/pre-brainstorms/20260508T004541Z--skill-ref-cleanup/candidates.md
 - pre_tests_path: docs/epics/skill-ref-cleanup/verification/pre-tests.md
 - verification_artifact_dir: docs/epics/skill-ref-cleanup/code-reviews
 
 ## 实现
-- lead-agent.md: skill 引用改为 dual-mode
+- deploy-skills: --tools claude,codex comma-separated, FREELY_TOOLS env
+- start-lead-agent.sh: 14 refs → skill:name
+- compose-context-source-prompt.sh: 4 refs → skill:name
+- tool-launchers.sh: 2 refs → skill:name
