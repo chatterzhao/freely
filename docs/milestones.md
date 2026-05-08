@@ -60,6 +60,24 @@ routing_policy:
 - source_candidate: `docs/pre-brainstorms/20260508T005431Z--skill-standardize/candidates.md`
 - verification_artifact_dir: `docs/epics/skill-standardize/code-reviews`
 
+## M-20260508T011858Z-A
+- title: skill gate alignment
+- status: active
+### candidate_issues
+1. `C-20260508T011858Z-A`
+- milestone: M-20260508T011858Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260508T011858Z-A/issue.md`
+### committed_issues
+1. `I-20260508T011858Z-A`
+- title: skill gate alignment
+- milestone_state: committed
+- phase_state: `in_verification`
+- issue_path: `docs/issues/I-20260508T011858Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260508T011858Z--skill-gate-alignment/candidates.md`
+- verification_artifact_dir: `docs/epics/skill-gate-alignment/code-reviews`
+
+
 ## M-20260507T0700Z-A
 - title: unified platform layer
 - status: active

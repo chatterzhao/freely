@@ -65,7 +65,71 @@ description: 执行 milestone-owned ready issue 的 AI-native 实现、测试与
    - `next_recommended_route=doc-B1_IBM-execution`
    - 新问题证据摘要
 
-### 情景 D：实现依赖未合并父分支
+### 情景 D：pre-tests.md 结构
+
+pre-tests.md 是验证计划，不是门禁表单。写真正会执行的测试，引用实际存在的测试产物。
+
+**必需章节**：
+
+| 章节 | 内容 |
+|------|------|
+| `## Unit` | 单元级测试目标 |
+| `## Integration` | 集成测试目标 |
+| `## End-to-End` | 端到端验证 |
+| `## Real-Environment` | 真实环境结论（含 `real_environment_status` 和 `real_environment_reason`） |
+| `## Acceptance Items` | 可追踪的验收项 |
+
+**范例**：
+
+```markdown
+# Pre-Tests: <功能名>
+- issue_id: I-{key}-A
+
+## Unit
+- acceptance target: <具体要验证什么>
+- testing layer: unit
+- target environment: <feature worktree>
+- required evidence: <测试通过的判定标准>
+- blocker taxonomy: execution_pending_or_failed
+- not_applicable_reason: no_executable_boundary_at_this_layer
+- not_applicable_explanation: <为什么这层不能用自动化测试，以及怎样替代验证>
+- replacement_evidence: <实际执行的替代验证方式和结果>
+
+## Integration
+- acceptance target: <集成面要验证什么>
+- testing layer: integration
+- target environment: <test-pre-merge worktree 或等价面>
+- required evidence: <集成测试通过的判定标准>
+- blocker taxonomy: execution_pending_or_failed
+
+## End-to-End
+- acceptance target: feature→test-pre-merge→develop merge passes
+- testing layer: end_to_end
+- target environment: develop-bound guarded merge chain
+- required evidence: guarded merge receipts
+- blocker taxonomy: execution_pending_or_failed
+
+## Real-Environment
+- real_environment_status: pass
+- real_environment_reason: <真实环境验证结果>
+
+## Acceptance Items
+### AT-001 <验收项名>
+- id: <唯一标识>
+- requirement: <验收条件>
+- surface_kind: integration
+- target_lane: premerge-integration
+- promotion_gate: develop_merge
+- evidence_level: integration
+- status: pass
+- artifact_ref: <指向实际测试产物文件，如 test 脚本或 test 输出日志，不要指向源代码>
+```
+
+`not_applicable_reason` 取值：`change_not_touching_this_layer`、`no_executable_boundary_at_this_layer`、`protected_environment_only`、`human_observation_only`、`covered_by_more_realistic_required_surface`。
+`evidence_level` 取值：`mock`、`integration`、`real_env`、`post_merge_dogfood`。
+`artifact_ref` 指向测试产物文件（测试脚本、运行日志），不是源码行号。
+
+### 情景 E：实现依赖未合并父分支
 
 这样做：
 1. 保留 issue 上携带的 `execution_base`、`integration_target`、`depends_on`。
