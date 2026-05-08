@@ -47,6 +47,10 @@ while read -r old_oid new_oid refname; do
   [[ -n "${refname:-}" ]] || continue
 
   # ── Branch creation guard: block manual git worktree add for managed branches ──
+  # Skip aborted/no-op transactions where both oids are zero
+  if [[ "$old_oid" == "$zero_oid" && "$new_oid" == "$zero_oid" ]]; then
+    continue
+  fi
   if [[ "$old_oid" == "$zero_oid" ]]; then
     if wt_managed_branch_ref "$refname"; then
       if [[ "${FREELY_WT_CREATE:-}" != "1" ]]; then
