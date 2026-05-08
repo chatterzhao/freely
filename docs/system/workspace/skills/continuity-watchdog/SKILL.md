@@ -105,5 +105,5 @@ continuity artifact 必须遵循 loop 分层：
 ## References
 
 - `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
-- `docs/system/workspace/skills/recovery-subagent-governance/SKILL.md`
-- `docs/system/workspace/skills/context-source-skill/references/continuation-recovery-routing.md`
+- `../recovery-subagent-governance/SKILL.md`
+- `../context-source-skill/references/continuation-recovery-routing.md`

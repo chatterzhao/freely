@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+# deploy-skills: deploy project skills to ~/.claude/skills/ for Claude Code
+set -euo pipefail
+
+usage() {
+  cat <<USAGE
+Usage: ./bin/deploy-skills [--dry-run]
+
+Deploy all skills from docs/system/workspace/skills/ to ~/.claude/skills/
+so Claude Code's Skill tool can invoke them via skill:<name>.
+
+Options:
+  --dry-run  Show what would be deployed without writing.
+USAGE
+}
+
+dry_run=0
+[[ "${1:-}" == "--dry-run" ]] && { dry_run=1; shift; }
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+SRC="$ROOT_DIR/docs/system/workspace/skills"
+DST="${HOME}/.claude/skills"
+
+[[ -d "$SRC" ]] || { echo "Skill source directory not found: $SRC" >&2; exit 1; }
+
+deployed=0
+failed=0
+updated=0
+
+for skill_dir in "$SRC"/*/; do
+  skill_md="${skill_dir}SKILL.md"
+  [[ -f "$skill_md" ]] || continue
+
+  name=$(head -20 "$skill_md" | grep "^name:" | head -1 | sed 's/^name:\s*//' | xargs)
+  [[ -z "$name" ]] && { echo "SKIP ${skill_dir}: missing name in frontmatter" >&2; failed=$((failed + 1)); continue; }
+
+  dst="$DST/$name"
+
+  if [[ "$dry_run" -eq 1 ]]; then
+    if [[ -d "$dst" ]]; then
+      if [[ "$skill_md" -nt "$dst/SKILL.md" ]] || ! diff -rq "$skill_dir" "$dst" >/dev/null 2>&1; then
+        echo "UPDATE  $name"
+      else
+        echo "OK     $name"
+      fi
+    else
+      echo "CREATE  $name"
+    fi
+    deployed=$((deployed + 1))
+    continue
+  fi
+
+  if [[ -d "$dst" ]]; then
+    if [[ "$skill_md" -nt "$dst/SKILL.md" ]] || ! diff -rq "$skill_dir" "$dst" >/dev/null 2>&1; then
+      rm -rf "$dst"
+      mkdir -p "$dst"
+      cp -r "$skill_dir"* "$dst/"
+      echo "UPDATE  $name"
+      updated=$((updated + 1))
+    fi
+  else
+    mkdir -p "$dst"
+    cp -r "$skill_dir"* "$dst/"
+    echo "CREATE  $name"
+  fi
+  deployed=$((deployed + 1))
+done
+
+echo ""
+echo "deployed=$deployed  updated=$updated  failed=$failed"
