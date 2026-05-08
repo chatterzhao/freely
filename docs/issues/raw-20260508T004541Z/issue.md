@@ -5,21 +5,26 @@ status: proposed
 phase_state: proposed
 platform_ids:
   github:
-    issue_id: "250"
+    issue_id: '250'
     url: https://github.com/chatterzhao/freely/issues/250
-    synced_at: ""
+    synced_at: ''
 primary_platform: github
-canonical_issue_path: ""
+canonical_issue_path: ''
 last_synced_comment_at: {}
-hash: ""
-created_at: "2026-05-08T00:45:41Z"
-updated_at: "2026-05-08T00:45:41Z"
-intake_id: ""
+hash: ''
+created_at: '2026-05-08T00:45:41Z'
+updated_at: '2026-05-08T00:45:41Z'
+intake_id: ''
 author: platform
 channel: github
 session_refs: []
+pre_tests_path: docs/epics/skill-ref-cleanup/verification/pre-tests.md
+verification_artifact_dir: docs/epics/skill-ref-cleanup/code-reviews
 platform_state: open
 ---
+
+- pre_tests_path: docs/epics/skill-ref-cleanup/verification/pre-tests.md
+- verification_artifact_dir: docs/epics/skill-ref-cleanup/code-reviews
 
 ## 背景
 
@@ -27,4 +32,4 @@ platform_state: open
 
 ## 改动
 
-将 30 个文件中的路径引用改为 skill 名。
+将项目文件中路径引用改为 skill 名。deploy-skills 支持多工具部署。
