@@ -551,12 +551,15 @@ if [[ "$using_new" -eq 1 ]]; then
   if [[ "$using_new" -eq 1 ]]; then
     echo ""
     echo "=== Pulling raw issue from inside ${prefix} worktree ==="
-    if ( cd "$fix_target" && _pull_raw_issue "$raw_key" "$source_val" ); then
-      _fill_platform_ids "$raw_key"
-    else
-      echo "警告: pull 失败，请进入工位后手动执行:" >&2
-      echo "  cd $fix_target && ./bin/raw-issue-pull --raw-key $raw_key" >&2
+    if ! ( cd "$fix_target" && _pull_raw_issue "$raw_key" "$source_val" ); then
+      echo "拒绝创建工位: pull 失败，无法从 $source_val 拉取 raw-$raw_key" >&2
+      git -C "$ROOT_DIR" worktree remove "$fix_target" --force 2>/dev/null || true
+      git -C "$ROOT_DIR" worktree remove "$tp_target" --force 2>/dev/null || true
+      git -C "$ROOT_DIR" branch -D "$fix_branch" 2>/dev/null || true
+      git -C "$ROOT_DIR" branch -D "$test_pre_merge_branch" 2>/dev/null || true
+      return 1
     fi
+    _fill_platform_ids "$raw_key"
   fi
 
   cat <<MSG
