@@ -43,6 +43,23 @@ routing_policy:
 
 
 
+## M-20260508T005431Z-A
+- title: skill standardization
+- status: active
+### candidate_issues
+1. `C-20260508T005431Z-A`
+- milestone: M-20260508T005431Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260508T005431Z-A/issue.md`
+### committed_issues
+1. `I-20260508T005431Z-A`
+- title: skill standardization
+- milestone_state: committed
+- phase_state: `in_verification`
+- issue_path: `docs/issues/I-20260508T005431Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260508T005431Z--skill-standardize/candidates.md`
+- verification_artifact_dir: `docs/epics/skill-standardize/code-reviews`
+
 ## M-20260507T0700Z-A
 - title: unified platform layer
 - status: active
