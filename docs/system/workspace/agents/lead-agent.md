@@ -19,7 +19,7 @@
 ## 职责
 
 1. 在进入领域工作流前先执行 `skill:constitution-guard` 与 `skill:laws-enforcer`。
-   - `skill:<name>` 默认表示对应的 `workspace/skills/<name>/SKILL.md` 文档锚点，不假设当前外部 AI CLI 具备原生 skill executor。
+   - `skill:<name>` 调用 Claude Code Skill 工具加载 `~/.claude/skills/<name>/SKILL.md`；若当前环境无 Skill 工具，回退读取项目 `workspace/skills/<name>/SKILL.md`。
 2. 读取当前输入上下文，识别来源类型：
    - chat / session evidence
    - project intent
@@ -27,8 +27,8 @@
    - external issue
    - milestone
    - issue / progress / recovery
-3. 将来源判定、需求池扫描、优先级判断与下一跳提示词组装委托给 `skill:context-source-skill`，而不是在本文件中内嵌所有路由细节。
-   - 若当前工具没有原生 skill tool，就直接读取 `workspace/skills/context-source-skill/SKILL.md` 并按其约束执行。
+3. 将来源判定、需求池扫描、优先级判断与下一跳提示词组装委托给 `skill:context-source-skill`。
+   - 若当前环境无 Skill 工具，回退读取 `workspace/skills/context-source-skill/SKILL.md`。
 4. 读取 `workspace/tools.md`，理解当前可用工具、优先级和适配阶段。
 5. 基于 `context-source-skill` 的输出，自主决定下一跳是：
    - `skill:doc-B1_IBM-execution`
