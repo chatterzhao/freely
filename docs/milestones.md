@@ -59,6 +59,23 @@ routing_policy:
 - issue_path: `docs/issues/I-20260508T005431Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260508T005431Z--skill-standardize/candidates.md`
 - verification_artifact_dir: `docs/epics/skill-standardize/code-reviews`
+## M-20260507T143545Z-A
+- title: timestamp seconds upgrade
+- status: active
+### candidate_issues
+1. `C-20260507T143545Z-A`
+- milestone: M-20260507T143545Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260507T143545Z-A/issue.md`
+- next_action: B2_IBM materialize → 修改 12 处正则 + 增强 normalize_key_variants
+### committed_issues
+1. `I-20260507T143545Z-A`
+- title: timestamp seconds upgrade
+- milestone_state: committed
+- phase_state: `in_verification`
+- issue_path: `docs/issues/I-20260507T143545Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260507T143545Z--timestamp-seconds-upgrade/candidates.md`
+- verification_artifact_dir: `docs/epics/timestamp-seconds-upgrade/code-reviews`
 
 ## M-20260508T004541Z-A
 - title: skill ref cleanup

@@ -34,7 +34,7 @@ def main():
     if os.path.exists(args.milestones):
         with open(args.milestones) as f:
             content = f.read()
-        pattern = r'`I-(\d{8}[-T]\d{4}Z?[A-Za-z0-9-]*)`'
+        pattern = r'`I-(\d{8}[-T]\d{4,6}Z?[A-Za-z0-9-]*)`'
         for m in sorted(set(re.findall(pattern, content))):
             issue_ids.append(f'I-{m}')
 
