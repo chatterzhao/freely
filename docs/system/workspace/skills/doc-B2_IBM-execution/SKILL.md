@@ -41,6 +41,46 @@ B2_IBM 不创建 I-{key}。milestone 已经准备好了。
 | `tasks.md` | T-00X 任务分解，关联 owner issue |
 | `code-reviews/` | 含 Implementation Decision Note（decision/why_this/alternatives_considered/boundary_non_goals/residual_risk） |
 
+**I-* issue 完整示例**（`docs/issues/I-{key}-A/issue.md`）：
+
+```markdown
+---
+local_id: I-20260508T011858Z-A
+kind: linked
+status: in_dev
+phase_state: in_dev
+promoted_from: raw-20260508T011858Z
+source_candidate: docs/pre-brainstorms/20260508T011858Z--skill-gate-alignment/candidates.md
+canonical_issue_path: ""
+platform_ids: {}
+primary_platform: ""
+last_synced_comment_at: {}
+hash: ""
+created_at: 2026-05-08T01:18:58Z
+updated_at: 2026-05-08T01:18:58Z
+intake_id: ""
+author: zhaoquan
+channel: feat-execution
+session_refs: []
+pre_tests_path: docs/epics/skill-gate-alignment/verification/pre-tests.md
+verification_artifact_dir: docs/epics/skill-gate-alignment/code-reviews
+---
+
+# I-20260508T011858Z-A: skill 引导与门禁对齐
+
+- source_candidate: `docs/pre-brainstorms/20260508T011858Z--skill-gate-alignment/candidates.md`
+- pre_tests_path: `docs/epics/skill-gate-alignment/verification/pre-tests.md`
+- verification_artifact_dir: `docs/epics/skill-gate-alignment/code-reviews`
+
+## 实现
+...
+```
+
+要点：
+- YAML frontmatter 和正文 bullet 字段**都需要写**关键字段（`source_candidate`、`pre_tests_path`、`verification_artifact_dir`）
+- `canonical_issue_path` 指向该 issue 的 canonical 位置；如果 issue 本身就在 canonical 路径，设为空字符串 `""` 避免自引用
+- `phase_state` 初始 `in_dev`，实现完成后更新为 `in_verification`
+
 ### 完成自检
 
 - [ ] I-{key} issue `phase_state = done_b2_ibm`

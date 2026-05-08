@@ -39,6 +39,53 @@ B1_IBM 不创建 raw issue。wt-create 已经准备好了。
 3. 更新 `docs/milestones.md` → candidate_issues 队列
 4. Candidate status：`proposed → needs_research → blocked → promoted / absorbed / dropped`
 
+**candidates.md 完整示例**（promoted 状态）：
+
+```markdown
+# Candidates
+
+## C-20260508T011858Z-A: skill 引导与门禁对齐
+
+- candidate_format_version: v2
+- title: 审查 skill 引导与门禁标准的差距
+- status: promoted
+- decision_reason: #247/#251 开发中反复被门禁拦截，根因是 skill 引导缺失
+- next_action: 修改 doc-B1/doc-B2/dev-loop skill → 合并
+- revisit_trigger: N/A（已 promote）
+- acceptance_criteria:
+  - doc-B1: candidate 格式示例完整可用
+  - doc-B2: I-* issue 示例覆盖全部必需字段
+  - dev-loop: pre-tests 结构和产物要求清晰
+- promotion_gate: 三个 skill 修改完成且语法无误
+- open_questions: []
+- acceptance_reviews:
+  - reviewer: claude-opus-4.7
+  - mode: subagent
+  - summary: 审查 #247/#251 门禁拦截历史，确认 skill 修改方向正确
+  - verdict: pass
+- promoted_issue_path: docs/issues/I-20260508T011858Z-A/issue.md
+- milestone: M-20260508T011858Z-A
+- session_refs: []
+```
+
+**milestones.md 对应条目**：
+
+```markdown
+## M-20260508T011858Z-A
+- title: skill gate alignment
+- status: active
+### candidate_issues
+1. `C-20260508T011858Z-A`
+- milestone: M-20260508T011858Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260508T011858Z-A/issue.md`
+```
+
+要点：
+- `milestone` 必须使用 `M-{key}-A` 格式（与 candidate 的 key 一致），不能写纯日期
+- `acceptance_reviews` 至少一条 review 记录，含 reviewer/mode/summary/verdict
+- candidates.md 和 milestones.md 中的 milestone 名称必须一致
+
 ### 完成自检
 
 - [ ] `brainstorms.md` 包含 discovery、research、decision
