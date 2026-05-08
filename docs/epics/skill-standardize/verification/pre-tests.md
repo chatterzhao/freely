@@ -44,4 +44,4 @@
 - promotion_gate: develop_merge
 - evidence_level: integration
 - status: pass
-- artifact_ref: bin/deploy-skills
+- artifact_ref: docs/epics/skill-standardize/code-reviews/review.md
