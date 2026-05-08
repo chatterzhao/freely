@@ -95,6 +95,13 @@ pre-tests.md 是验证计划，不是门禁表单。写真正会执行的测试�
 - not_applicable_explanation: <为什么这层不能用自动化测试，以及怎样替代验证>
 - replacement_evidence: <实际执行的替代验证方式和结果>
 
+## Integration
+- acceptance target: <集成面要验证什么>
+- testing layer: integration
+- target environment: <test-pre-merge worktree 或等价面>
+- required evidence: <集成测试通过的判定标准>
+- blocker taxonomy: execution_pending_or_failed
+
 ## End-to-End
 - acceptance target: feature→test-pre-merge→develop merge passes
 - testing layer: end_to_end
