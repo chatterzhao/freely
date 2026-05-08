@@ -34,16 +34,23 @@ done
 [[ -n "$raw_key" ]] || { echo "Missing --raw-key" >&2; usage; exit 1; }
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
-[[ -z "$target" ]] && target="$ROOT_DIR/docs/issues/raw-${raw_key}"
+[[ -z "$target" ]] && target="$(pwd)/docs/issues/raw-${raw_key}"
 
 # ── Worktree / branch interception ─────────────────────────
-# Only allow pull from a worktree whose branch name contains the raw-key.
-current_branch="$(git -C "$ROOT_DIR" rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
+# Only allow pull from fix/* or feature/* worktree whose branch contains the raw-key.
+current_branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
 
 case "$current_branch" in
   develop|main)
     echo "拒绝: 不能在受保护分支 '$current_branch' 上执行 raw-issue-pull。" >&2
-    echo "请先切换到包含 raw-${raw_key} 的工位分支。" >&2
+    echo "请先切换到包含 raw-${raw_key} 的 fix/feature 工位分支。" >&2
+    exit 1
+    ;;
+  fix/*|feature/*)
+    ;;
+  *)
+    echo "拒绝: raw-issue-pull 只能在 fix/* 或 feature/* 工位中执行。" >&2
+    echo "当前分支: '$current_branch'" >&2
     exit 1
     ;;
 esac
