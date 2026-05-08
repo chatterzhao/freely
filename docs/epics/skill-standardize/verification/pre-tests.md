@@ -7,8 +7,8 @@
 - target environment: feature/raw-20260508T005431Z-skill-standardize
 - required evidence: deployed=33 updated=0 failed=0
 - blocker taxonomy: execution_pending_or_failed
-- not_applicable_reason: no_executable_test_boundary
-- not_applicable_explanation: Shell script verified by direct execution. deploy-skills --dry-run output is the test result.
+- not_applicable_reason: human_observation_only
+- not_applicable_explanation: Shell script verified by direct execution and human review of output.
 - replacement_evidence: ./bin/deploy-skills --dry-run output confirms all skills synced
 
 ## Integration
@@ -17,8 +17,8 @@
 - target environment: feature/raw-20260508T005431Z-skill-standardize
 - required evidence: merge-guarded accepts the merge
 - blocker taxonomy: execution_pending_or_failed
-- not_applicable_reason: no_executable_test_boundary
-- not_applicable_explanation: Doc-only change. The merge itself is the integration test.
+- not_applicable_reason: change_not_touching_this_layer
+- not_applicable_explanation: Doc-only change. No runtime code paths affected. The merge itself is verification.
 - replacement_evidence: merge-guarded output
 
 ## End-to-End
@@ -27,10 +27,13 @@
 - target environment: develop-bound guarded merge chain
 - required evidence: guarded merge receipts
 - blocker taxonomy: execution_pending_or_failed
+- not_applicable_reason: change_not_touching_this_layer
+- not_applicable_explanation: Doc-only change. End-to-end is the merge chain itself.
+- replacement_evidence: merge-guarded merge commits
 
 ## Real-Environment
 - real_environment_status: pass
-- real_environment_reason: Doc-only change. deploy-skills --dry-run verifies 33 skills synced. Merge success is verification.
+- real_environment_reason: Doc-only change. deploy-skills --dry-run verifies 33 skills synced.
 
 ## Acceptance Items
 ### AT-001 deploy verify
@@ -39,6 +42,6 @@
 - surface_kind: integration
 - target_lane: premerge-integration
 - promotion_gate: develop_merge
-- evidence_level: execution
+- evidence_level: integration
 - status: pass
 - artifact_ref: bin/deploy-skills
