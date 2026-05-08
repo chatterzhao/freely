@@ -43,6 +43,16 @@ routing_policy:
 
 
 
+## M-20260507T143545Z-A
+- title: timestamp seconds upgrade
+- status: active
+### candidate_issues
+1. `C-20260507T143545Z-A`
+- milestone: M-20260507T143545Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260507T143545Z-A/issue.md`
+- next_action: B2_IBM materialize → 修改 12 处正则 + 增强 normalize_key_variants
+
 ## M-20260507T0700Z-A
 - title: unified platform layer
 - status: active
