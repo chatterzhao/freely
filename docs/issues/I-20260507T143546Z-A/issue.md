@@ -1,12 +1,14 @@
 ---
 local_id: I-20260507T143546Z-A
 kind: linked
-status: in_verification
-phase_state: in_verification
+status: completed
+phase_state: completed
 promoted_from: raw-20260507T143546Z
 source_candidate: docs/pre-brainstorms/20260507T143546Z--platform-pull-standardize/candidates.md
 canonical_issue_path: ""
-platform_ids: {}
+platform_ids:
+  github:
+    issue_id: '249'
 primary_platform: ""
 created_at: 2026-05-07T14:35:46Z
 session_refs: []
