@@ -18,13 +18,16 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+pre_tests_path: docs/epics/platform-pull-standardize/verification/pre-tests.md
+verification_artifact_dir: docs/epics/platform-pull-standardize/code-reviews
 platform_state: open
 ---
 
-## 问题
+- pre_tests_path: docs/epics/platform-pull-standardize/verification/pre-tests.md
+- verification_artifact_dir: docs/epics/platform-pull-standardize/code-reviews
 
-当用户手动在 GitHub/Gitee 创建 issue 时，标题中的 raw key 可能缺秒或格式不规范。平台 API 返回的 `created_at` 是精确到秒的，可用于标准化。
+## 问题
+用户手动创建的 issue 标题 key 可能缺秒，需自动标准化。
 
 ## 修复
-
-在 `platform-adapter.py pull_raw_issue()` 中，拿到平台 `created_at` 后与标题中的 key 比较，不一致则用平台 API 修正标题。
+pull 时用平台 created_at 标准化标题 key。
