@@ -104,7 +104,7 @@ def collect_lifecycle_items(project: Path) -> list[dict]:
                 # I-YYYYMMDDTHHMMZ-A (new) or I-YYYYMMDD-HHMM-A (old)
                 # → base_key="YYYYMMDDTHHMMZ" or "YYYYMMDD-HHMM", suffix="A"
                 inner = name[2:]
-                m = re.match(r"^(\d{8}[-T]\d{4}Z?)-([A-Z])$", inner)
+                m = re.match(r"^(\d{8}[-T]\d{4,6}Z?)-([A-Z])$", inner)
                 if m:
                     base_key = m.group(1)
                     suffix = m.group(2)
@@ -195,7 +195,7 @@ def _base_key(local_id: str) -> str:
     elif inner.startswith("I-"):
         inner = inner[2:]
     # Strip suffix letter (old: 20260428-1737-A, new: 20260504T1132Z-A)
-    m = re.match(r"^(\d{8}[-T]\d{4}Z?)-[A-Z]$", inner)
+    m = re.match(r"^(\d{8}[-T]\d{4,6}Z?)-[A-Z]$", inner)
     if m:
         inner = m.group(1)
     return inner
@@ -685,7 +685,7 @@ def _all_base_keys(project: Path) -> set[str]:
     # that predate chat_inbox are tracked.
     mf = project / "docs" / "milestones.md"
     if mf.is_file():
-        for m in re.finditer(r'I-(\d{8}[-T]\d{4}Z?)-[A-Z]', mf.read_text(encoding="utf-8")):
+        for m in re.finditer(r'I-(\d{8}[-T]\d{4,6}Z?)-[A-Z]', mf.read_text(encoding="utf-8")):
             keys.add(m.group(1))
 
     return keys
@@ -1025,23 +1025,30 @@ def _best_child(children: list[dict]) -> dict:
 def _normalize_key_variants(key: str) -> list[str]:
     """Return all format variants of a date-time key for cross-format matching.
 
-    Old format: YYYYMMDD-HHMM  (e.g. 20260503-0915)
-    New format: YYYYMMDDTHHMMZ (e.g. 20260503T0915Z)
-    Bare:       YYYYMMDDHHMMSS (e.g. 20260430222144) — left as-is
+    Old format:    YYYYMMDD-HHMM    (e.g. 20260503-0915)
+    Old w/ secs:   YYYYMMDD-HHMMSS  (e.g. 20260503-091530)
+    New format:    YYYYMMDDTHHMMZ   (e.g. 20260503T0915Z)
+    New w/ secs:   YYYYMMDDTHHMMSSZ (e.g. 20260503T091530Z)
+    Bare:          YYYYMMDDHHMMSS   (e.g. 20260430222144)
 
     Returns [key] plus any reasonable variants so substring matches work
-    across the old→new format migration boundary.
+    across format migration boundaries (old↔new, bare↔new, with/without seconds).
     """
     variants = [key]
-    # Old → New: 20260503-0915 → 20260503T0915Z
-    m = re.match(r'^(\d{8})-(\d{4})$', key)
+    # Old → New: 20260503-0915 → 20260503T0915Z, 20260503-091530 → 20260503T091530Z
+    m = re.match(r'^(\d{8})-(\d{4,6})$', key)
     if m:
         variants.append(f"{m.group(1)}T{m.group(2)}Z")
         return variants
-    # New → Old: 20260503T0915Z → 20260503-0915
-    m = re.match(r'^(\d{8})T(\d{4})Z$', key)
+    # New → Old: 20260503T0915Z → 20260503-0915, 20260503T091530Z → 20260503-091530
+    m = re.match(r'^(\d{8})T(\d{4,6})Z$', key)
     if m:
         variants.append(f"{m.group(1)}-{m.group(2)}")
+        return variants
+    # Bare → New: 20260430222144 → 20260430T222144Z
+    m = re.match(r'^(\d{8})(\d{6})$', key)
+    if m:
+        variants.append(f"{m.group(1)}T{m.group(2)}Z")
     return variants
 
 
@@ -1129,7 +1136,7 @@ def _extract_issue_key_from_branch(branch: str) -> str | None:
     hotfix/I-20260428-1737-A-bar → I-20260428-1737-A
     test-pre-merge-scan-v3 → None (no issue key)
     """
-    for pattern in [r"(raw-\d{8}[-T]\d{4}Z?)", r"(I-\d{8}[-T]\d{4}Z?(?:-[A-Z0-9]+)?)"]:
+    for pattern in [r"(raw-\d{8}[-T]\d{4,6}Z?)", r"(I-\d{8}[-T]\d{4,6}Z?(?:-[A-Z0-9]+)?)"]:
         m = re.search(pattern, branch)
         if m:
             return m.group(1)
