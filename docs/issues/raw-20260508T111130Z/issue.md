@@ -8,6 +8,8 @@ platform_ids:
     issue_id: '256'
     url: https://github.com/chatterzhao/freely/issues/256
 primary_platform: github
+pre_tests_path: docs/epics/reference-transaction-delete-fix/verification/pre-tests.md
+verification_artifact_dir: docs/epics/reference-transaction-delete-fix/code-reviews
 ---
 
 # raw-20260508T111130Z: reference-transaction hook 误拦截 branch delete
