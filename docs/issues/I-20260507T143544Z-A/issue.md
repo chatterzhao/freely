@@ -1,12 +1,14 @@
 ---
 local_id: I-20260507T143544Z-A
 kind: linked
-status: in_verification
-phase_state: in_verification
+status: completed
+phase_state: completed
 promoted_from: raw-20260507T143544Z
 source_candidate: docs/pre-brainstorms/20260507T143544Z--intercept-guard/candidates.md
 canonical_issue_path: ""
-platform_ids: {}
+platform_ids:
+  github:
+    issue_id: '247'
 primary_platform: ""
 last_synced_comment_at: {}
 hash: ""
