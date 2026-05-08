@@ -14,6 +14,9 @@ verification_artifact_dir: docs/epics/reference-transaction-delete-fix/code-revi
 
 # raw-20260508T111130Z: reference-transaction hook 误拦截 branch delete
 
+- pre_tests_path: docs/epics/reference-transaction-delete-fix/verification/pre-tests.md
+- verification_artifact_dir: docs/epics/reference-transaction-delete-fix/code-reviews
+
 ## 问题
 
 `git branch -d` 删除已合并的 `test-pre-merge-*` 分支时被 reference-transaction hook 拦截。
