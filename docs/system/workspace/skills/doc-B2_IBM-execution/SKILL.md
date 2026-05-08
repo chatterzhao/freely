@@ -35,11 +35,11 @@ B2_IBM 不创建 I-{key}。milestone 已经准备好了。
 
 | 产物 | 要求 |
 |------|------|
-| `issues/{name}.md` | 正式 I-* issue 文档，含 frontmatter（phase_state、source_candidate、milestone、verification_artifact_dir） |
-| `prd.md` | AI-ready 最小结构：Goal → Dev-Loop Handoff |
-| `pre-tests.md` | 含 `## Acceptance Items`，每个 item 有 id/requirement/evidence_level/status/artifact_ref。对 `test-pre-merge → develop` guarded promote 的 owner，至少一条 item 含 v2 adequacy 字段：surface_kind、target_lane、promotion_gate（=develop_merge）、task_refs、case_design |
-| `tasks.md` | T-00X 任务分解，关联 owner issue |
-| `code-reviews/` | 含 Implementation Decision Note（decision/why_this/alternatives_considered/boundary_non_goals/residual_risk） |
+| `issues/{name}.md` | I-* issue 文档，完整格式见下方示例 |
+| `prd.md` | Goal → Dev-Loop Handoff |
+| `pre-tests.md` | 结构见 `skill:dev-loop-execution` 情景 D |
+| `tasks.md` | 任务分解，关联 owner issue |
+| `code-reviews/` | Implementation Decision Note（decision/why_this/alternatives_considered/boundary_non_goals/residual_risk） |
 
 **I-* issue 完整示例**（`docs/issues/I-{key}-A/issue.md`）：
 
@@ -76,10 +76,7 @@ verification_artifact_dir: docs/epics/skill-gate-alignment/code-reviews
 ...
 ```
 
-要点：
-- YAML frontmatter 和正文 bullet 字段**都需要写**关键字段（`source_candidate`、`pre_tests_path`、`verification_artifact_dir`）
-- `canonical_issue_path` 指向该 issue 的 canonical 位置；如果 issue 本身就在 canonical 路径，设为空字符串 `""` 避免自引用
-- `phase_state` 初始 `in_dev`，实现完成后更新为 `in_verification`
+注意 `canonical_issue_path` 为空避免自引用；YAML frontmatter 和正文 bullet 字段都需要写关键字段。
 
 ### 完成自检
 

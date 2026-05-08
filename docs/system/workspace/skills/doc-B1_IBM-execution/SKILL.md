@@ -34,12 +34,11 @@ B1_IBM 不创建 raw issue。wt-create 已经准备好了。
 
 ### M：Milestone — candidate + 队列
 
-1. 从 brainstorms.md 收敛结论产出 `candidates.md`
-2. 每个 candidate 标注：status、milestone、promoted_issue_path、decision
-3. 更新 `docs/milestones.md` → candidate_issues 队列
-4. Candidate status：`proposed → needs_research → blocked → promoted / absorbed / dropped`
+1. 从 brainstorms.md 收敛结论产出 `candidates.md`，格式见下方示例
+2. 更新 `docs/milestones.md` → candidate_issues 队列
+3. Candidate 路径：`proposed → needs_research → blocked → promoted / absorbed / dropped`
 
-**candidates.md 完整示例**（promoted 状态）：
+**candidates.md 示例**（promoted 状态）：
 
 ```markdown
 # Candidates
@@ -81,10 +80,7 @@ B1_IBM 不创建 raw issue。wt-create 已经准备好了。
 - promoted_issue_path: `docs/issues/I-20260508T011858Z-A/issue.md`
 ```
 
-要点：
-- `milestone` 必须使用 `M-{key}-A` 格式（与 candidate 的 key 一致），不能写纯日期
-- `acceptance_reviews` 至少一条 review 记录，含 reviewer/mode/summary/verdict
-- candidates.md 和 milestones.md 中的 milestone 名称必须一致
+注意 `milestone` 使用 `M-{key}-A` 格式，与 candidate 的 key 一致。candidates.md 和 milestones.md 中的 milestone 名称必须一致。
 
 ### 完成自检
 

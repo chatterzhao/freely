@@ -118,11 +118,9 @@ pre-tests.md 是验证计划，不是门禁表单。写真正会执行的测试�
 - artifact_ref: <指向实际测试产物文件，如 test 脚本或 test 输出日志，不要指向源代码>
 ```
 
-要点：
-- 如果某项测试不适用，用 `not_applicable_reason` 说明原因，只能取：`change_not_touching_this_layer`、`no_executable_boundary_at_this_layer`、`protected_environment_only`、`human_observation_only`、`covered_by_more_realistic_required_surface`
-- `evidence_level` 只能取：`mock`、`integration`、`real_env`、`post_merge_dogfood`
-- `artifact_ref` 指向**测试产物文件**（测试脚本、运行日志、截图），不是源码行号
-- 每个 section 要么有具体测试任务，要么有合法的 `not_applicable_reason`
+`not_applicable_reason` 取值：`change_not_touching_this_layer`、`no_executable_boundary_at_this_layer`、`protected_environment_only`、`human_observation_only`、`covered_by_more_realistic_required_surface`。
+`evidence_level` 取值：`mock`、`integration`、`real_env`、`post_merge_dogfood`。
+`artifact_ref` 指向测试产物文件（测试脚本、运行日志），不是源码行号。
 
 ### 情景 E：实现依赖未合并父分支
 
