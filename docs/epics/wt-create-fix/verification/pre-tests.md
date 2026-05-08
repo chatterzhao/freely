@@ -39,4 +39,4 @@
 - promotion_gate: develop_merge
 - evidence_level: integration
 - status: pass
-- artifact_ref: docs/epics/wt-create-fix/code-reviews/review.md
+- artifact_ref: docs/epics/wt-create-fix/code-reviews/closeout-review.md
