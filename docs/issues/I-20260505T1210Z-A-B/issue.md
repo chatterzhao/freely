@@ -2,7 +2,7 @@
 local_id: I-20260505T1210Z-A-B
 issue_title: "issue-sync 只写 platform_state，不碰 phase_state"
 kind: linked
-phase_state: in_b2_ibm
+phase_state: completed
 promoted_from: raw-20260505T1210Z
 platform_ids:
   github:
