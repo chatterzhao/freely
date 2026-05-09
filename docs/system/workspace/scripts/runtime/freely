@@ -1931,12 +1931,12 @@ manager_bootstrap_handoff_file() {
 
 manager_exit_contract_file() {
   local project="$1"
-  echo ""  # deprecated — use handoffs table
+  :
 }
 
 worker_exit_contract_file() {
   local project="$1"
-  echo ""  # deprecated — use handoffs table
+  :
 }
 
 manager_operator_stop_boundary_file() {
@@ -5583,10 +5583,10 @@ _check_issue_active_and_signal() {
   local canonical_path phase
   canonical_path=""
   if [[ -f "$project/docs/issues/$target_issue/issue.md" ]]; then
-    canonical_path=$(sed -n 's/^canonical_issue_path: "\(.*\)"/\1/p' "$project/docs/issues/$target_issue/issue.md" 2>/dev/null || echo "")
+    canonical_path=$(sed -n 's/^canonical_issue_path: "\(.*\)"/\1/p' "$project/docs/issues/$target_issue/issue.md" 2>/dev/null || :)
   fi
   if [[ -n "$canonical_path" && -f "$project/$canonical_path" ]]; then
-    phase=$(sed -n 's/^- phase_state: `\([^`]*\)`/\1/p' "$project/$canonical_path" 2>/dev/null || echo "")
+    phase=$(sed -n 's/^- phase_state: `\([^`]*\)`/\1/p' "$project/$canonical_path" 2>/dev/null || :)
     case "$phase" in
       in_b2|in_b2_ibm|done_b2|done_b2_ibm|in_dev|blocked_dev|in_verification)
         log_info "target issue $target_issue is active ($phase), triggering urgent signal"
@@ -5605,13 +5605,13 @@ _route_chat_to_issue() {
   local issues_index matched_id
   issues_index="$project/docs/issues/ISSUES.md"
 
-  [[ -f "$issues_index" ]] || { echo ""; return 0; }
+  [[ -f "$issues_index" ]] || { :; return 0; }
 
   # Script-based: extract significant words from message, match against issue titles
   local words
   words=$(echo "$message" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9-' '\n' | grep -v '^.$' | head -20)
   if [[ -z "$words" ]]; then
-    echo ""
+    :
     return 0
   fi
 
@@ -13053,7 +13053,7 @@ append_manager_exit_contract_directive_if_needed() {
   cat <<EOF
 
 Manager exit contract（硬性要求）：
-- 在本轮结束前，必须通过 handoff.py 写入 exit contract。不再使用 env 文件。
+- 在本轮结束前，必须通过 handoff.py 写入 exit contract。
 - _handoff_py="docs/system/workspace/scripts/runtime/handoff.py"
 - _db_path="\$(dirname "\$(dirname "\$PWD")")/freely.db"  # or hardcode .freely/freely.db
 
