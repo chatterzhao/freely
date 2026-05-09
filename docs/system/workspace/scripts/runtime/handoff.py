@@ -34,7 +34,6 @@ def init_db():
     conn = _connect()
     conn.executescript("""
         DROP TABLE IF EXISTS worker_delegation;
-        DELETE FROM handoffs WHERE status = 'pending' AND created_at < datetime('now','-1 hour');
         CREATE TABLE IF NOT EXISTS handoffs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             handoff_id TEXT NOT NULL UNIQUE,
@@ -60,6 +59,7 @@ def init_db():
         CREATE INDEX IF NOT EXISTS idx_handoffs_raw_key ON handoffs(raw_key);
         CREATE INDEX IF NOT EXISTS idx_handoffs_worktree ON handoffs(worktree);
         CREATE INDEX IF NOT EXISTS idx_handoffs_parent ON handoffs(parent_handoff_id);
+        DELETE FROM handoffs WHERE status = 'pending' AND created_at < datetime('now','-1 hour');
     """)
     conn.commit()
     conn.close()
