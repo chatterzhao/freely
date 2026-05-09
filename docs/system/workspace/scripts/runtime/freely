@@ -11857,7 +11857,19 @@ manager_runtime_launch_workers_after_ai_cycle_if_needed() {
   local _worker_csv _prompt_file _launched_count _handoff_py _db_path _handoff_id
   _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
   _db_path="$(run_dir_for_project "$project")/../freely.db"
-  _worker_csv="$(meta_env_value "$(manager_exit_contract_file "$project")" "WORKER_PROMPTS_CSV" 2>/dev/null || true)"
+  _worker_csv=""
+  if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
+    _worker_csv=$(python3 "$_handoff_py" --db "$_db_path" list --role worker --status pending 2>/dev/null | python3 -c "
+import json,sys
+try:
+    rows=json.load(sys.stdin)
+    files=[r.get('prompt_file','') for r in rows if r.get('prompt_file')]
+    print(','.join(files))
+except: pass
+" 2>/dev/null || true)
+  fi
+  # Fallback: old exit-contract.env
+  [[ -n "$_worker_csv" ]] || _worker_csv="$(meta_env_value "$(manager_exit_contract_file "$project")" "WORKER_PROMPTS_CSV" 2>/dev/null || true)"
   _launched_count=0
   if [[ -n "$_worker_csv" ]]; then
     local IFS=","
