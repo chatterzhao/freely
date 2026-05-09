@@ -33,6 +33,7 @@ def _connect():
 def init_db():
     conn = _connect()
     conn.executescript("""
+        DROP TABLE IF EXISTS worker_delegation;
         CREATE TABLE IF NOT EXISTS handoffs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             handoff_id TEXT NOT NULL UNIQUE,
@@ -174,31 +175,6 @@ def mark_stale(timeout_minutes=30):
     conn.close()
 
 
-def migrate_from_worker_delegation(project_root):
-    """Migrate existing worker_delegation records to handoffs table."""
-    conn = _connect()
-    try:
-        rows = conn.execute("SELECT * FROM worker_delegation WHERE status != 'pending'").fetchall()
-        for r in rows:
-            d = dict(r)
-            conn.execute(
-                """INSERT OR IGNORE INTO handoffs
-                   (handoff_id, role, raw_key, worktree, branch, prompt_file,
-                    intent_kind, status, exit_kind, session_id,
-                    launched_at, completed_at, created_at, updated_at)
-                   VALUES (?, 'worker', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                (d.get('delegation_id', ''), d.get('owner_issue', ''),
-                 d.get('worktree', ''), d.get('branch', ''),
-                 d.get('prompt_file', ''), d.get('intent_kind', ''),
-                 d.get('status', 'completed'), d.get('exit_kind', ''),
-                 d.get('session_id', ''), d.get('launched_at', ''),
-                 d.get('completed_at', ''), d.get('created_at', ''),
-                 d.get('updated_at', '')))
-        conn.commit()
-    except sqlite3.OperationalError:
-        pass  # worker_delegation table may not exist
-    conn.close()
-
 
 # --- CLI ---
 def main():
@@ -246,10 +222,6 @@ def main():
     p_latest = sub.add_parser("latest-manager")
     p_latest.add_argument("--db", required=True)
 
-    p_migrate = sub.add_parser("migrate")
-    p_migrate.add_argument("--db", required=True)
-    p_migrate.add_argument("--project", required=True)
-
     p_stale = sub.add_parser("mark-stale")
     p_stale.add_argument("--db", required=True)
     p_stale.add_argument("--timeout-minutes", type=int, default=30)
@@ -282,9 +254,6 @@ def main():
     elif args.cmd == "latest-manager":
         r = latest_manager()
         print(json.dumps(r, indent=2) if r else "null")
-    elif args.cmd == "migrate":
-        migrate_from_worker_delegation(args.project)
-        print("migrated")
     elif args.cmd == "mark-stale":
         mark_stale(args.timeout_minutes)
         print("ok")
