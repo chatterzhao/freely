@@ -13053,40 +13053,33 @@ append_manager_exit_contract_directive_if_needed() {
   cat <<EOF
 
 Manager exit contract（硬性要求）：
-- 在本轮结束前，必须写出且只写出一个 manager exit contract 文件：
-  - \`$contract_file\`
-- 文件必须采用 shell env 键值格式，并且 \`EXIT_KIND\` 只能是以下三者之一：
-  - \`stop_ai\`
-  - \`resume_manager\`
-  - \`delegate_workers\`
-- 三者必须且只能出现一个；不得混写，不得留空，不得让 runtime 自己猜。
+- 在本轮结束前，必须通过 handoff.py 写入 exit contract。不再使用 env 文件。
+- _handoff_py="docs/system/workspace/scripts/runtime/handoff.py"
+- _db_path="\$(dirname "\$(dirname "\$PWD")")/freely.db"  # or hardcode .freely/freely.db
 
-允许格式：
-1. stop_ai
-\`\`\`env
-EXIT_KIND="stop_ai"
-STOP_REASON="<human_pause|manager_blocked_no_safe_next_step|all_scan_closed|operator_stop_boundary|other-bounded-reason>"
-\`\`\`
+三种出口：
 
-2. resume_manager
-\`\`\`env
-EXIT_KIND="resume_manager"
-RESTART_POINT="<exact restart point>"
-NEXT_ACTION="<exact next action>"
-WHY_NOT_STOP="<why AI must continue>"
-WHY_NOT_DELEGATE="<why not dispatch workers yet>"
-\`\`\`
+1. stop_ai — 不写 handoff，exit kind 通过 runtime 信号传递
 
-3. delegate_workers
-\`\`\`env
-EXIT_KIND="delegate_workers"
-WORKER_PROMPTS_CSV="/abs/path/worker-a.txt,/abs/path/worker-b.txt"
+2. resume_manager — 不写 handoff，exit kind 通过 runtime 信号传递
+
+3. delegate_workers — 调用 handoff.py：
+\`\`\`bash
+# 先写 manager 自己的记录
+MANAGER_HID=\$(python3 \$_handoff_py --db \$_db_path insert \\
+  --role manager --raw-key <key> --prompt-file <continuity_path>)
+
+# 每个 worker 写一条记录，parent 指向 manager
+python3 \$_handoff_py --db \$_db_path insert \\
+  --role worker --raw-key <key> --worktree <abs_path> --branch fix/raw-<key>-<slug> \\
+  --prompt-file <worker_prompt_path> --parent "\$MANAGER_HID"
 \`\`\`
+- worktree 必须是绝对路径，branch 必须是 fix/* 或 feature/*
+- parent_handoff_id 关联到 manager 记录
 
 规则：
-- 如果派多个 worker，也仍然只属于 \`delegate_workers\` 这一种出口。
-- 如果你认为自己无能为力、被人要求暂停、或所有 scan 已收口，也必须明确写 \`stop_ai\`，而不是沉默结束。
-- 如果当前仍有 \`expected_running_worktree_down/degraded\` 且 \`owner=runtime-owned\` 的 worker 未收口（当前计数：\`${unresolved_workers}\`），本轮禁止写 \`stop_ai\`；必须先让 runtime 继续恢复、委派或完成 cleanup 判定。
+- stop_ai 和 resume_manager 不写 handoff
+- delegate_workers 必须用 handoff.py insert
 - 如果你本轮还没把出口合同写完整，就不算完成；runtime 会用同一个 resume target 拉你回来补合同。
 EOF
 }
@@ -13563,6 +13556,8 @@ manager_runtime_handle_exit_contract_after_ai_cycle() {
           return 0
         fi
       fi
+      # Sync valid exit contract to handoffs table
+      sync_exit_contract_to_handoffs "$project" || true
       ;;
     execution_network_transient|execution_network_persistent|proxy_config_invalid)
       [[ -f "$(manager_exit_contract_file "$project")" ]] || {
