@@ -17988,11 +17988,10 @@ PROTECTEDMSG
   # Initialize SQLite worker delegation store + migrate old exit contracts
   local _handoff_py _worker_db_path
   _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
-  _worker_db_path="$(run_dir_for_project "$project")/../freely.db"
+  _db_path="$(run_dir_for_project "$project")/../freely.db"
   if [[ -f "$_handoff_py" ]]; then
-    python3 "$_handoff_py" --db "$_worker_db_path" init >/dev/null 2>&1 || true
-    python3 "$_handoff_py" --db "$_worker_db_path" migrate --project "$project" >/dev/null 2>&1 || true
-    python3 "$_handoff_py" --db "$_worker_db_path" mark-stale --timeout-minutes 30 >/dev/null 2>&1 || true
+    python3 "$_handoff_py" --db "$_db_path" init >/dev/null 2>&1 || true
+    python3 "$_handoff_py" --db "$_db_path" mark-stale --timeout-minutes 30 >/dev/null 2>&1 || true
   fi
 
   local sdir run_dir logs_dir sup_pid_file child_pid_file loop_log
