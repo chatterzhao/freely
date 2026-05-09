@@ -105,7 +105,7 @@
 - not_applicable_reason: change_not_touching_this_layer
 - not_applicable_explanation: test-freely-manager-worker-launch-linkage 需要 ACP bridge，与本 bash prefix 改动无关
 - replacement_evidence: merge-guarded 输出确认
-- artifact_ref: test-freely-manager-worker-launch-linkage
+- artifact_ref: docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage
 - surface_kind: integration
 - target_lane: feature-local
 - promotion_gate: completion
@@ -118,7 +118,7 @@
 - not_applicable_reason: change_not_touching_this_layer
 - not_applicable_explanation: exit-contract 测试需要 ACP bridge，与本 bash prefix 改动无关。WORKER_PROMPTS_NOT_LAUNCHABLE 路径已存在（L13177）
 - replacement_evidence: merge-guarded 输出确认
-- artifact_ref: test-freely-manager-exit-contract-autodelegates-cleanup-when-existing-prompt-is-nonlaunchable
+- artifact_ref: docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-autodelegates-cleanup-when-existing-prompt-is-nonlaunchable
 - surface_kind: integration
 - target_lane: feature-local
 - promotion_gate: completion
@@ -128,7 +128,7 @@
 - requirement: 完整 fix → test-pre-merge → develop 验证
 - evidence_level: integration
 - status: pass
-- artifact_ref: docs/system/workspace/scripts/tests/test-freely-worker-prompt-protected-branch-rejected
+- artifact_ref: docs/epics/worker-launch-writable-redirect/code-reviews/closeout-review.md
 - surface_kind: integration
 - target_lane: premerge-integration
 - promotion_gate: develop_merge
