@@ -4729,3 +4729,33 @@ routing_policy:
 - milestone_state: committed
 - phase_state: `in_dev`
 - issue_path: `docs/issues/I-20260509T090210Z-A/issue.md`
+
+## M-20260509T022152Z-A
+- title: worker launch branch check
+- status: active
+### candidate_issues
+1. `C-20260509T022152Z-A`
+- milestone: M-20260509T022152Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260509T022152Z-A/issue.md`
+### committed_issues
+1. `I-20260509T022152Z-A`
+- title: worker launch branch check
+- milestone_state: committed
+- phase_state: `in_dev`
+- issue_path: `docs/issues/I-20260509T022152Z-A/issue.md`
+
+## M-20260509T024559Z-A
+- title: multi-project isolation
+- status: active
+### candidate_issues
+1. `C-20260509T024559Z-A`
+- milestone: M-20260509T024559Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260509T024559Z-A/issue.md`
+### committed_issues
+1. `I-20260509T024559Z-A`
+- title: multi-project isolation architecture
+- milestone_state: committed
+- phase_state: `in_b2_ibm`
+- issue_path: `docs/issues/I-20260509T024559Z-A/issue.md`
