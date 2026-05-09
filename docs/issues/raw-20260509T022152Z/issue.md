@@ -9,7 +9,9 @@ platform_ids:
     url: https://github.com/chatterzhao/freely/issues/264
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
+canonical_issue_path: docs/issues/I-20260509T022152Z-A/issue.md
+pre_tests_path: docs/epics/worker-launch-writable-redirect/pre-tests.md
+verification_artifact_dir: docs/epics/worker-launch-writable-redirect/code-reviews
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-09T02:22:01Z'
@@ -19,6 +21,9 @@ author: platform
 channel: github
 session_refs: []
 ---
+
+- pre_tests_path: `docs/epics/worker-launch-writable-redirect/pre-tests.md`
+- verification_artifact_dir: `docs/epics/worker-launch-writable-redirect/code-reviews`
 
 ## 根因链
 
@@ -45,5 +50,3 @@ Manager AI 写 continuity → delegate worker to develop（保护分支）
 
 - #261: worker prompt 加入 companion 工位信息（提示层）
 - 本 issue: runtime 自动重定向（执行层）
-- pre_tests_path: docs/epics/worker-launch-branch-check/verification/pre-tests.md
-- verification_artifact_dir: docs/epics/worker-launch-branch-check/code-reviews
