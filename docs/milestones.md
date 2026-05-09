@@ -4714,3 +4714,22 @@ routing_policy:
 - milestone_state: committed
 - phase_state: `in_b2_ibm`
 - issue_path: `docs/issues/I-20260508T225041Z-A/issue.md`
+
+## M-20260509T022152Z-A
+- title: Worker launch 验证 target 必须是 fix/feature
+- status: completed
+### candidate_issues
+1. `C-20260509T022152Z-A`
+- milestone: M-20260509T022152Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260509T022152Z-A/issue.md`
+### completed_issues
+1. `I-20260509T022152Z-A`
+- title: worker_prompt_launchable 拒绝非 fix/feature 工位
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260509T022152Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260509T022152Z--worker-launch-writable-redirect/candidates.md`
+- pretests_path: `docs/epics/worker-launch-writable-redirect/pre-tests.md`
+- tasks_path: `docs/epics/worker-launch-writable-redirect/tasks.md`
+- completion_note: `worker_prompt_launchable_for_manager_project now rejects protected branch targets. Unit test 7/7 PASS. Fix merged to develop via companion branch fix/raw-20260509T022152Z-worker-launch-branch-check (commit 56e11a39). Governance docs on writable-redirect branch pending merge.`
