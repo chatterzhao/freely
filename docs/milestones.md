@@ -4714,3 +4714,18 @@ routing_policy:
 - milestone_state: committed
 - phase_state: `in_b2_ibm`
 - issue_path: `docs/issues/I-20260508T225041Z-A/issue.md`
+
+## M-20260509T090210Z-A
+- title: handoff SQLite refactor
+- status: active
+### candidate_issues
+1. `C-20260509T090210Z-A`
+- milestone: M-20260509T090210Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260509T090210Z-A/issue.md`
+### committed_issues
+1. `I-20260509T090210Z-A`
+- title: handoff SQLite refactor
+- milestone_state: committed
+- phase_state: `in_dev`
+- issue_path: `docs/issues/I-20260509T090210Z-A/issue.md`

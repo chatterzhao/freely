@@ -11845,38 +11845,34 @@ manager_runtime_launch_workers_after_ai_cycle_if_needed() {
     return 0
   fi
 
-  # SQLite guard: don't launch if workers are still running
-  local _worker_store_py _db_path _has_running
-  _worker_store_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/worker-store.py"
+  local _worker_csv _prompt_file _launched_count _handoff_py _db_path _handoff_id
+  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
   _db_path="$(run_dir_for_project "$project")/../freely.db"
-  if [[ -f "$_worker_store_py" && -f "$_db_path" ]]; then
-    _has_running=$(python3 "$_worker_store_py" --db "$_db_path" has-running 2>/dev/null || echo "false")
-    if [[ "$_has_running" == "true" ]]; then
-      log_info "worker launch deferred: existing workers still running (SQLite guard)"
-      printf '0\n'
-      return 0
-    fi
-  fi
-
-  local _worker_csv _prompt_file _launched_count
   _worker_csv="$(meta_env_value "$(manager_exit_contract_file "$project")" "WORKER_PROMPTS_CSV" 2>/dev/null || true)"
   _launched_count=0
   if [[ -n "$_worker_csv" ]]; then
     local IFS=","
     for _prompt_file in $_worker_csv; do
       [[ -n "$_prompt_file" && -f "$_prompt_file" ]] || continue
+      # INSERT pending handoff record, get handoff_id for status tracking
+      _handoff_id=""
+      if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
+        _handoff_id=$(python3 "$_handoff_py" --db "$_db_path" insert \
+          --role worker --raw-key "$(echo "$_prompt_file" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1)" \
+          --prompt-file "$_prompt_file" 2>/dev/null || true)
+      fi
       if launch_worker_from_manager_prompt_if_needed "$project" "$_prompt_file"; then
         _launched_count=$((_launched_count + 1))
-        log_info "worker launched via exit_contract: $(basename "$_prompt_file")"
-        if [[ -f "$_worker_store_py" && -f "$_db_path" ]]; then
-          python3 "$_worker_store_py" --db "$_db_path" update-status \
-            --prompt-file "$_prompt_file" --status "launched" >/dev/null 2>&1 || true
+        log_info "worker launched: $(basename "$_prompt_file")"
+        if [[ -n "$_handoff_id" && -f "$_handoff_py" && -f "$_db_path" ]]; then
+          python3 "$_handoff_py" --db "$_db_path" update \
+            --handoff-id "$_handoff_id" --status "launched" >/dev/null 2>&1 || true
         fi
       else
         log_warn "worker launch failed: $(basename "$_prompt_file")"
-        if [[ -f "$_worker_store_py" && -f "$_db_path" ]]; then
-          python3 "$_worker_store_py" --db "$_db_path" update-status \
-            --prompt-file "$_prompt_file" --status "failed" --exit-kind "launch_failed" >/dev/null 2>&1 || true
+        if [[ -n "$_handoff_id" && -f "$_handoff_py" && -f "$_db_path" ]]; then
+          python3 "$_handoff_py" --db "$_db_path" update \
+            --handoff-id "$_handoff_id" --status "rejected" --exit-kind "launch_failed" >/dev/null 2>&1 || true
         fi
       fi
     done
@@ -17986,13 +17982,12 @@ PROTECTEDMSG
     "entrypoint_mode=$entrypoint_mode"
 
   # Initialize SQLite worker delegation store + migrate old exit contracts
-  local _worker_store_py _worker_db_path
-  _worker_store_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/worker-store.py"
-  _worker_db_path="$(run_dir_for_project "$project")/../freely.db"
-  if [[ -f "$_worker_store_py" ]]; then
-    python3 "$_worker_store_py" --db "$_worker_db_path" init >/dev/null 2>&1 || true
-    python3 "$_worker_store_py" --db "$_worker_db_path" migrate --project "$project" >/dev/null 2>&1 || true
-    python3 "$_worker_store_py" --db "$_worker_db_path" mark-stale --timeout-minutes 30 >/dev/null 2>&1 || true
+  local _handoff_py _worker_db_path
+  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  _db_path="$(run_dir_for_project "$project")/../freely.db"
+  if [[ -f "$_handoff_py" ]]; then
+    python3 "$_handoff_py" --db "$_db_path" init >/dev/null 2>&1 || true
+    python3 "$_handoff_py" --db "$_db_path" mark-stale --timeout-minutes 30 >/dev/null 2>&1 || true
   fi
 
   local sdir run_dir logs_dir sup_pid_file child_pid_file loop_log
