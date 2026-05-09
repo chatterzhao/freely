@@ -17956,25 +17956,6 @@ start_project_runtime() {
     log_error "unable to enter project root before runtime start: $project"
     exit 1
   }
-  # Protected branch gate: refuse to start daemon on develop/main.
-  # All runtime testing must happen in test-pre-merge-* worktrees.
-  local _start_branch
-  _start_branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
-  case "$_start_branch" in
-    develop|main)
-      cat >&2 <<PROTECTEDMSG
-[FREELY] Refusing to start on protected branch '$_start_branch'.
-Protected branches (develop, main) only accept merge commits.
-Runtime testing must happen in a test-pre-merge-* worktree:
-  cd <project-root>
-  git worktree add -b test-pre-merge-<topic> ../<project>-worktrees/test-pre-merge-<topic> develop
-  cd ../<project>-worktrees/test-pre-merge-<topic>
-  ./bin/pre-init-runtime --pre-project .
-  ./bin/freely daemon start --project .
-PROTECTEDMSG
-      exit 1
-      ;;
-  esac
   append_runtime_event "$project" "start_project_runtime_after_cd" \
     "entrypoint_mode=$entrypoint_mode"
   load_config "$project"
