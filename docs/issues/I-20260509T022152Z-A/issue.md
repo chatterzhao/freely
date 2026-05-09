@@ -1,8 +1,8 @@
 ---
 local_id: I-20260509T022152Z-A
 kind: linked
-status: in_dev
-phase_state: in_dev
+status: completed
+phase_state: completed
 promoted_from: raw-20260509T022152Z
 source_candidate: docs/pre-brainstorms/20260509T022152Z--worker-launch-writable-redirect/candidates.md
 canonical_issue_path: ""

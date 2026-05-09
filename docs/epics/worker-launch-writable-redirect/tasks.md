@@ -24,4 +24,5 @@
 
 ## Post-merge
 
-- [ ] 从当前 fix worktree merge-guarded 到 test-pre-merge → develop
+- [x] 从当前 fix worktree merge-guarded 到 test-pre-merge → develop
+  - merge already completed; fix commit d5dd570c confirmed in develop
