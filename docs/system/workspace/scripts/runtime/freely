@@ -1931,12 +1931,12 @@ manager_bootstrap_handoff_file() {
 
 manager_exit_contract_file() {
   local project="$1"
-  echo "$(run_dir_for_project "$project")/manager-exit-contract.env"
+  echo ""  # deprecated — use handoffs table
 }
 
 worker_exit_contract_file() {
   local project="$1"
-  echo "$(run_dir_for_project "$project")/worker-exit-contract.env"
+  echo ""  # deprecated — use handoffs table
 }
 
 manager_operator_stop_boundary_file() {
