@@ -11890,7 +11890,7 @@ except: pass
       if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
         _handoff_id=$(python3 "$_handoff_py" --db "$_db_path" insert \
           --role worker --raw-key "$(echo "$_prompt_file" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1)" \
-          --prompt-file "$_prompt_file" 2>/dev/null || true)
+          --prompt-file "$_prompt_file" --created-by manager --consumed-by worker 2>/dev/null || true)
       fi
       if launch_worker_from_manager_prompt_if_needed "$project" "$_prompt_file"; then
         _launched_count=$((_launched_count + 1))
@@ -13077,17 +13077,21 @@ Manager exit contract（硬性要求）：
 
 3. delegate_workers — 调用 handoff.py：
 \`\`\`bash
-# 先写 manager 自己的记录
+# 先写 manager 自己的记录（manager 创建给自己消费的连续性记录）
 MANAGER_HID=\$(python3 \$_handoff_py --db \$_db_path insert \\
-  --role manager --raw-key <key> --prompt-file <continuity_path>)
+  --role manager --raw-key <key> --prompt-file <continuity_path> \\
+  --created-by manager --consumed-by manager)
 
 # 每个 worker 写一条记录，parent 指向 manager
 python3 \$_handoff_py --db \$_db_path insert \\
   --role worker --raw-key <key> --worktree <abs_path> --branch fix/raw-<key>-<slug> \\
-  --prompt-file <worker_prompt_path> --parent "\$MANAGER_HID"
+  --prompt-file <worker_prompt_path> --parent "\$MANAGER_HID" \\
+  --created-by manager --consumed-by worker
 \`\`\`
 - worktree 必须是绝对路径，branch 必须是 fix/* 或 feature/*
 - parent_handoff_id 关联到 manager 记录
+- --created-by 记录创建者角色 (manager|worker)
+- --consumed-by 记录消费者角色 (manager|worker)
 
 规则：
 - stop_ai 和 resume_manager 不写 handoff
