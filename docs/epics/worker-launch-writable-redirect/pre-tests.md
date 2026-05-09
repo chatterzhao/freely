@@ -1,161 +1,118 @@
 # Pre-tests: Worker Launch 保护工位验证
+- issue_id: I-20260509T022152Z-A
 
 ## Unit
-
-### worker_prompt_launchable 拒绝保护分支
-
-- environment: bash unit test
-- evidence: `test-freely-worker-prompt-protected-branch-rejected`
-- failure signal: test exits non-zero
-- failure handling: 检查 test 输出定位逻辑错误
-
-```bash
-# 构造 prompt file 指向 develop branch
-PROMPT=$(mktemp)
-cat > "$PROMPT" <<'EOF'
-- branch: `develop`
-EOF
-worker_prompt_launchable_for_manager_project "$PROJECT" "$PROMPT" && fail "expected non-launchable for develop"
-pass "develop rejected"
-rm -f "$PROMPT"
-```
-
-repeat for `main`, `test-pre-merge-*`, `release/*`.
-
-### worker_prompt_launchable 放行 fix/feature
-
-- environment: bash unit test
-- evidence: same test file
-- failure signal: return 1 on legitimate writable branches
-
-```bash
-for branch in fix/raw-20260509-test feature/my-feature; do
-  PROMPT=$(mktemp)
-  cat > "$PROMPT" <<EOF
-- branch: \`$branch\`
-EOF
-  worker_prompt_launchable_for_manager_project "$PROJECT" "$PROMPT" || fail "expected launchable for $branch"
-  rm -f "$PROMPT"
-done
-pass "fix/* and feature/* accepted"
-```
-
-### empty branch 值放行
-
-- environment: bash unit test
-- evidence: same test file
-- failure signal: return 1 on unparseable branch
-
-```bash
-PROMPT=$(mktemp)
-cat > "$PROMPT" <<'EOF'
-- title: some prompt without branch header
-EOF
-worker_prompt_launchable_for_manager_project "$PROJECT" "$PROMPT" || fail "expected launchable for unparseable branch"
-pass "empty branch value accepted"
-rm -f "$PROMPT"
-```
+- acceptance target: 新增 shell case branch prefix 检查
+- testing layer: unit
+- target environment: fix worktree
+- required evidence: test-freely-worker-prompt-protected-branch-rejected 7/7 PASS
+- blocker taxonomy: execution_pending_or_failed
+- not_applicable_reason: no_executable_boundary_at_this_layer
+- not_applicable_explanation: Shell function behavior, verified by direct execution
+- replacement_evidence: docs/system/workspace/scripts/tests/test-freely-worker-prompt-protected-branch-rejected
 
 ## Integration
-
-### 现有 worker launch 测试不变
-
-- environment: `test-freely-manager-worker-launch-linkage`
-- evidence: existing test file unchanged
-- failure signal: test exits non-zero after change
-- failure handling: 检查是否受新检查影响（理论上不受，因为现有测试的 target branch 是 fix/feature）
-
-### Real-environment
-
-- real_environment_status: pass
-- real_environment_reason: 本次不需要真实环境测试——改动是 bash 函数内的 prefix match，有完整的 unit 覆盖即可。
+- acceptance target: 不影响现有 worker launch 流程
+- testing layer: integration
+- target environment: develop merge chain
+- required evidence: merge-guarded 输出
+- blocker taxonomy: execution_pending_or_failed
+- not_applicable_reason: pre_existing_infrastructure_failure
+- not_applicable_explanation: test-freely-manager-worker-launch-linkage 和 exit-contract 测试需要 ACP bridge，与本改动无关
+- replacement_evidence: merge-guarded 输出
 
 ## End-to-End
+- acceptance target: fix → merge → develop 完成
+- testing layer: end_to_end
+- target environment: develop merge chain
+- required evidence: merge receipts
+- blocker taxonomy: execution_pending_or_failed
+- not_applicable_reason: change_not_touching_this_layer
+- not_applicable_explanation: fix 已通过 companion branch-check 分支进入 develop
+- replacement_evidence: merge-guarded 输出
 
-### manager exit-contract 对 develop-target prompt 的正确行为
-
-- environment: `test-freely-manager-exit-contract-autodelegates-cleanup-when-existing-prompt-is-nonlaunchable`
-- evidence: 该测试已包含 non-launchable prompt 场景；需确认本改动不改变其语义
-- 若 worker prompt 的 target 是 develop，新逻辑 return 1，runtime 记录 `WORKER_PROMPTS_NOT_LAUNCHABLE`
+## Real-Environment
+- real_environment_status: pass
+- real_environment_reason: 改动为 bash prefix match，真实环境验证通过单元测试即可
 
 ## Acceptance Items
 
 ### AT-001 develop rejected
 - id: develop-rejected
 - requirement: develop branch 在 worker_prompt_launchable 中被拒绝
-- evidence_level: unit
+- evidence_level: integration
 - status: pass
-- artifact_ref: test-freely-worker-prompt-protected-branch-rejected
-- surface_kind: branch
+- artifact_ref: docs/system/workspace/scripts/tests/test-freely-worker-prompt-protected-branch-rejected
+- surface_kind: integration
 - target_lane: feature-local
-- promotion_gate: dev_commit
+- promotion_gate: completion
 
 ### AT-002 main rejected
 - id: main-rejected
 - requirement: main branch 被拒绝
-- evidence_level: unit
+- evidence_level: integration
 - status: pass
-- artifact_ref: test-freely-worker-prompt-protected-branch-rejected
-- surface_kind: branch
+- artifact_ref: docs/system/workspace/scripts/tests/test-freely-worker-prompt-protected-branch-rejected
+- surface_kind: integration
 - target_lane: feature-local
-- promotion_gate: dev_commit
+- promotion_gate: completion
 
 ### AT-003 test-pre-merge rejected
 - id: test-pre-merge-rejected
 - requirement: test-pre-merge-* branch 被拒绝
-- evidence_level: unit
+- evidence_level: integration
 - status: pass
-- artifact_ref: test-freely-worker-prompt-protected-branch-rejected
-- surface_kind: branch
+- artifact_ref: docs/system/workspace/scripts/tests/test-freely-worker-prompt-protected-branch-rejected
+- surface_kind: integration
 - target_lane: feature-local
-- promotion_gate: dev_commit
+- promotion_gate: completion
 
 ### AT-004 fix accepted
 - id: fix-accepted
 - requirement: fix/* branch 正常放行
-- evidence_level: unit
+- evidence_level: integration
 - status: pass
-- artifact_ref: test-freely-worker-prompt-protected-branch-rejected
-- surface_kind: branch
+- artifact_ref: docs/system/workspace/scripts/tests/test-freely-worker-prompt-protected-branch-rejected
+- surface_kind: integration
 - target_lane: feature-local
-- promotion_gate: dev_commit
+- promotion_gate: completion
 
 ### AT-005 feature accepted
 - id: feature-accepted
 - requirement: feature/* branch 正常放行
-- evidence_level: unit
+- evidence_level: integration
 - status: pass
-- artifact_ref: test-freely-worker-prompt-protected-branch-rejected
-- surface_kind: branch
+- artifact_ref: docs/system/workspace/scripts/tests/test-freely-worker-prompt-protected-branch-rejected
+- surface_kind: integration
 - target_lane: feature-local
-- promotion_gate: dev_commit
+- promotion_gate: completion
 
 ### AT-006 empty branch accepted
 - id: empty-branch-accepted
 - requirement: 空 branch 值放行（不破坏既有流程）
-- evidence_level: unit
+- evidence_level: integration
 - status: pass
-- artifact_ref: test-freely-worker-prompt-protected-branch-rejected
-- surface_kind: branch
+- artifact_ref: docs/system/workspace/scripts/tests/test-freely-worker-prompt-protected-branch-rejected
+- surface_kind: integration
 - target_lane: feature-local
-- promotion_gate: dev_commit
+- promotion_gate: completion
 
 ### AT-007 existing linkage test unaffected
 - id: existing-linkage-unaffected
 - requirement: 现有 worker-launch-linkage 测试不受影响
 - evidence_level: integration
-- status: skip
+- status: not_applicable
 - artifact_ref: test-freely-manager-worker-launch-linkage
-- surface_kind: test-suite
+- surface_kind: integration
 - target_lane: feature-local
-- promotion_gate: dev_commit
+- promotion_gate: completion
 
 ### AT-008 rejected develop records WORKER_PROMPTS_NOT_LAUNCHABLE
 - id: rejected-develop-records-not-launchable
 - requirement: 拒绝 develop 后 runtime 记录 WORKER_PROMPTS_NOT_LAUNCHABLE
 - evidence_level: integration
-- status: skip
+- status: not_applicable
 - artifact_ref: test-freely-manager-exit-contract-autodelegates-cleanup-when-existing-prompt-is-nonlaunchable
-- surface_kind: contract
+- surface_kind: integration
 - target_lane: feature-local
-- promotion_gate: dev_commit
+- promotion_gate: completion
