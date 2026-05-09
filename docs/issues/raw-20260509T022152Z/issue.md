@@ -22,6 +22,9 @@ channel: github
 session_refs: []
 ---
 
+- pre_tests_path: `docs/epics/worker-launch-writable-redirect/pre-tests.md`
+- verification_artifact_dir: `docs/epics/worker-launch-writable-redirect/code-reviews`
+
 ## 根因链
 
 ```
