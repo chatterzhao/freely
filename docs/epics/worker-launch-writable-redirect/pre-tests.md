@@ -122,3 +122,13 @@
 - surface_kind: integration
 - target_lane: feature-local
 - promotion_gate: completion
+
+### AT-009 fix merge to develop
+- id: fix-merge-to-develop
+- requirement: 完整 fix → test-pre-merge → develop 验证
+- evidence_level: integration
+- status: pass
+- artifact_ref: docs/system/workspace/scripts/tests/test-freely-worker-prompt-protected-branch-rejected
+- surface_kind: integration
+- target_lane: premerge-integration
+- promotion_gate: develop_merge
