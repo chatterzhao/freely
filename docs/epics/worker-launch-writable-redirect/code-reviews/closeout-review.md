@@ -16,5 +16,5 @@ Evidence:
 
 Outcome:
 - phase_state → completed
-- Governance docs on this branch need merge through test-pre-merge → develop
-- Worktree cleanup: pending (fix branch + worktree can be removed after docs merge)
+- Governance docs merged to develop (commit 8ac916f7) via test-pre-merge
+- Worktree cleanup: pending (fix branch + worktree can be removed)
