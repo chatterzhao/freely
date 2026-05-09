@@ -80,13 +80,82 @@ rm -f "$PROMPT"
 
 ## Acceptance Items
 
-| id | requirement | evidence_level | status | artifact_ref | surface_kind | target_lane | promotion_gate |
-|----|-------------|---------------|--------|-------------|-------------|-------------|----------------|
-| AI-01 | develop branch 在 worker_prompt_launchable 中被拒绝 | unit | pass | `test-freely-worker-prompt-protected-branch-rejected` | branch | feature-local | dev_commit |
-| AI-02 | main branch 被拒绝 | unit | pass | same test | branch | feature-local | dev_commit |
-| AI-03 | test-pre-merge-* branch 被拒绝 | unit | pass | same test | branch | feature-local | dev_commit |
-| AI-04 | fix/* branch 正常放行 | unit | pass | same test | branch | feature-local | dev_commit |
-| AI-05 | feature/* branch 正常放行 | unit | pass | same test | branch | feature-local | dev_commit |
-| AI-06 | 空 branch 值放行（不破坏既有流程） | unit | pass | same test | branch | feature-local | dev_commit |
-| AI-07 | 现有 worker-launch-linkage 测试不受影响 | integration | skip | `test-freely-manager-worker-launch-linkage` | test-suite | feature-local | dev_commit |
-| AI-08 | 拒绝 develop 后 runtime 记录 WORKER_PROMPTS_NOT_LAUNCHABLE | integration | skip | `test-freely-manager-exit-contract-autodelegates-cleanup-when-existing-prompt-is-nonlaunchable` | contract | feature-local | dev_commit |
+### AT-001 develop rejected
+- id: develop-rejected
+- requirement: develop branch 在 worker_prompt_launchable 中被拒绝
+- evidence_level: unit
+- status: pass
+- artifact_ref: test-freely-worker-prompt-protected-branch-rejected
+- surface_kind: branch
+- target_lane: feature-local
+- promotion_gate: dev_commit
+
+### AT-002 main rejected
+- id: main-rejected
+- requirement: main branch 被拒绝
+- evidence_level: unit
+- status: pass
+- artifact_ref: test-freely-worker-prompt-protected-branch-rejected
+- surface_kind: branch
+- target_lane: feature-local
+- promotion_gate: dev_commit
+
+### AT-003 test-pre-merge rejected
+- id: test-pre-merge-rejected
+- requirement: test-pre-merge-* branch 被拒绝
+- evidence_level: unit
+- status: pass
+- artifact_ref: test-freely-worker-prompt-protected-branch-rejected
+- surface_kind: branch
+- target_lane: feature-local
+- promotion_gate: dev_commit
+
+### AT-004 fix accepted
+- id: fix-accepted
+- requirement: fix/* branch 正常放行
+- evidence_level: unit
+- status: pass
+- artifact_ref: test-freely-worker-prompt-protected-branch-rejected
+- surface_kind: branch
+- target_lane: feature-local
+- promotion_gate: dev_commit
+
+### AT-005 feature accepted
+- id: feature-accepted
+- requirement: feature/* branch 正常放行
+- evidence_level: unit
+- status: pass
+- artifact_ref: test-freely-worker-prompt-protected-branch-rejected
+- surface_kind: branch
+- target_lane: feature-local
+- promotion_gate: dev_commit
+
+### AT-006 empty branch accepted
+- id: empty-branch-accepted
+- requirement: 空 branch 值放行（不破坏既有流程）
+- evidence_level: unit
+- status: pass
+- artifact_ref: test-freely-worker-prompt-protected-branch-rejected
+- surface_kind: branch
+- target_lane: feature-local
+- promotion_gate: dev_commit
+
+### AT-007 existing linkage test unaffected
+- id: existing-linkage-unaffected
+- requirement: 现有 worker-launch-linkage 测试不受影响
+- evidence_level: integration
+- status: skip
+- artifact_ref: test-freely-manager-worker-launch-linkage
+- surface_kind: test-suite
+- target_lane: feature-local
+- promotion_gate: dev_commit
+
+### AT-008 rejected develop records WORKER_PROMPTS_NOT_LAUNCHABLE
+- id: rejected-develop-records-not-launchable
+- requirement: 拒绝 develop 后 runtime 记录 WORKER_PROMPTS_NOT_LAUNCHABLE
+- evidence_level: integration
+- status: skip
+- artifact_ref: test-freely-manager-exit-contract-autodelegates-cleanup-when-existing-prompt-is-nonlaunchable
+- surface_kind: contract
+- target_lane: feature-local
+- promotion_gate: dev_commit
