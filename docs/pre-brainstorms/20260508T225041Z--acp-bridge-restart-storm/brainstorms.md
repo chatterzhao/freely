@@ -1,112 +1,85 @@
-# Brainstorm: ACP Bridge Restart Storm
+# Brainstorm: Worker Prompt 保护工位阻塞
 
 - 来源: raw-20260508T225041Z (#261)
-- 日期: 2026-05-08
+- 日期: 2026-05-08，基于实际运行 7 小时数据
+- 范围: 阻塞问题（缓存命中问题见 #263）
 
-## 成功标准
+## 阻塞现象
 
-Freely auto-loop 的正常工作流程：
+daemon 运行 7 小时，生成 17 个 worker prompt，0 个执行成功。20+ 次 restart storm。
 
-```
-scan(找任务) → manager patrol(写 continuity + worker prompt)
-  → worker 读 prompt 执行
-    → worker 产出 handoff 交还 manager
-      → 循环
-```
+## 阻塞根因
 
-### 主管-worker 交互模式
+Worker prompt 的 `Worktree:` 字段指向 `test-pre-merge-*`（保护分支），但 prompt 没有告诉 AI：
 
-主管和 worker 通过**交接文档**交互，不是直接 IPC：
+1. 当前工位是否可写
+2. 对应的可写工位在哪（wt-create 创建的配对工位）
+3. 如果不可写，应该如何操作
 
-1. manager 写 `manager-continuity-{ts}.md`（分析结论、委派决策）
-2. manager 写 `worker-prompts/{ts}-worker-{task}-{tool}.txt`（具体任务、工位、分支）
-3. runtime 读取 worker prompt，启动 `claude-agent-acp` session 执行
-4. worker 完成后写 handoff artifact
-5. manager 下一轮 patrol 消费 handoff，更新 continuity
+AI 在 cycle log 中已诊断出问题（`WORKER_PROMPTS_NOT_LAUNCHABLE`），但不知道配对工位路径。
 
-### ACP 的用途：缓存命中
-
-ACP bridge 保持 `claude-agent-acp` 进程存活，目的是 **session resume** 而非 fresh start：
-- resume → 上次 session 的 prompt cache 命中 → 快、便宜
-- fresh start → 无 cache → 慢、贵
-- 当前：每次 `end_turn` 后 `claude-agent-acp` 退出 → session 丢失 → 下次只能 fresh start
-- 期望：`claude-agent-acp` 在 `end_turn` 后保持存活，等待下一个 prompt
-
-## Discovery
-
-daemon 运行 3 小时内触发 6 次 restart storm。三个症状指向同一根因：
-
-### 症状 1：storm 频繁
-
-30s 内 3+ 次 `claude-agent-acp` 重启触发 storm 保护。
-
-### 症状 2：缓存命中率为 0
-
-所有 cycle log 显示 `CACHE: input=0 cache_hit=0 output=0`——session 从来没能 resume，每次都是 fresh start。
-
-### 症状 3：worker 产出无法完成
-
-17 个 worker prompt 被生成，但 storm 在 runtime dispatch 前就中断了 session。worker prompt 停留在文件系统，从未被实际执行。
-
-## Research
-
-### claude-agent-acp 生命周期
+**死循环路径**：
 
 ```
-bridge Popen claude-agent-acp --permission-mode bypassPermissions
-  → initialize handshake
-  → session/new 或 session/resume
-  → session/prompt
-  → AI 处理（tool calls 多轮）
-  → end_turn（stop_reason=end_turn）
-  → claude-agent-acp 进程退出（stdout 关闭）
-  → bridge _ensure_server_alive() 检测 poll() != None
-  → 重新 Popen + initialize
+manager patrol → 生成 worker prompt（target: test-pre-merge）
+  → runtime 尝试 launch → WORKER_PROMPTS_NOT_LAUNCHABLE
+    → AI 报告错误 → end_turn → claude-agent-acp 退出
+      → bridge 重启 → daemon 再次 patrol
+        → 再次生成 worker prompt → 再次失败 → 循环
 ```
 
-`claude-agent-acp` 在 `end_turn` 后**必然退出**。这是 ACP 协议设计——每个 session 结束进程即退出。
+## 正常 vs 异常 Storm
 
-### 为何进程退出是问题
+### 正常 restart（不应计为 storm）
 
-不是 "crash" 问题，是 **session 连续性** 问题：
+- AI 完成一轮工作后正常退出（`end_turn`，有产出）
+- bridge 重启 server 准备下一轮
+- 间隔 > 30s
 
-| | 当前（进程退出） | 期望（进程存活） |
-|---|---------------|---------------|
-| 下一个 prompt | 新 Popen → initialize → session/new | session/prompt |
-| 缓存 | cold start，cache miss | warm，cache hit |
-| 延迟 | +2-5s initialize overhead | 即时响应 |
-| storm 风险 | 快速 cycle 累积重启计数 | 无进程 churn |
+### 异常 storm（应该计为 storm）
 
-### Storm 触发路径
+- AI 启动后 5 秒内退出（无产出）
+- 连续 3+ 次/30s
+- 当前 case：WORKER_PROMPTS_NOT_LAUNCHABLE 导致快速退出
 
-1. `claude-agent-acp` 启动后立即退出（空转，`CACHE: input=0 output=0`）
-2. bridge 检测到死进程，立即重启
-3. 新进程同样立即退出
-4. 3 次/30s → daemon storm 保护触发
-5. supervised hold → 等待 cooldown → bootstrap handoff
+## 阻塞原因总结
 
-空转原因可能是 `claude-agent-acp` 初始化阶段的问题（API key、model、session 状态），不是 bridge 问题。
+**唯一阻塞原因**：Worker prompt 生成时没有包含配对可写工位信息。
+
+wt-create 创建的是配对工位：
+- `test-pre-merge-{key}-{slug}` + `fix/raw-{key}-{slug}`（fix-execution）
+- `test-pre-merge-{key}-{slug}` + `feature/raw-{key}-{slug}`（feat-execution）
+
+但 prompt 生成代码（freely L9518-9522）只写入了 test-pre-merge 路径，没有：
+1. 检查目标工位是否可写
+2. 查找配对可写工位
+3. 在 prompt 中写入 cd 路径
+
+## 工位写规则
+
+| Skill | test-pre-merge | fix/feature |
+|-------|---------------|-------------|
+| fix-execution | 可临时修改测试（dirty only，不 commit） | 正式提交 |
+| feat-execution | 不可修改 | 所有开发+提交 |
 
 ## Decision
 
-目标：让 `claude-agent-acp` 在 `end_turn` 后保持存活，等待下一个 prompt。
+### 本 issue 修复
 
-### 首选：bridge 保持 server 存活
+在 worker prompt 生成代码（freely L9518 附近）加入：
+1. 检查 `$primary_branch` 是否为 `test-pre-merge-*`
+2. 如果是，通过 `git worktree list --porcelain` 查找包含相同 raw-key 的 `fix/*` 或 `feature/*` 分支
+3. 在 prompt 中明确写入配对可写工位路径和写规则
 
-如果 ACP 协议支持 "一个进程多个 session"——在 `end_turn` 后不退出，等待新的 `session/new`。bridge 在 `_ensure_server_alive()` 中检测到进程存活即复用，不重启。
+### 不做（本 issue）
 
-**风险**：`claude-agent-acp` 可能不支持多 session 模式。需要验证。
+- 不修改 storm 阈值
+- 不修改 `claude-agent-acp` 行为
+- 不处理缓存命中问题（见 #263）
+- 不改变 worker prompt 的整体生成架构
 
-### 备选 A：bridge cooldown（降级方案）
+## 后续相关 issue
 
-如果 `claude-agent-acp` 必须退出，bridge 在重启间加入指数退避 cooldown（10s → 20s → 40s，max 120s），避免触发 daemon storm。不解决缓存命中问题，但至少消除 storm。
-
-### 备选 B：daemon 层区分退出原因
-
-daemon 区分 "正常 end_turn 退出" vs "异常空转退出"。正常退出不计入 storm 计数。需要 bridge 向 daemon 报告退出原因。
-
-### 不做
-
-- 不修改 `claude-agent-acp` 源码（外部依赖）
-- 不改变 manager-worker handoff 模式
-- 不削弱 daemon storm 保护参数
+- #263: ACP session cache 命中率 0%
+- worker 在 fix/feature 自动 cd（runtime 层改进）
+- storm 检测区分正常/异常退出

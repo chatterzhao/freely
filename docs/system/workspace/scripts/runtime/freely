@@ -9520,6 +9520,33 @@ materialize_cleanup_worker_prompt_from_manager_continuity_if_needed() {
     printf -- '- `%s`\n' "$primary_path"
     printf 'Branch:\n'
     printf -- '- `%s`\n' "$primary_branch"
+
+    # 如果是保护工位，查找配对的可写工位
+    if [[ "$primary_branch" == test-pre-merge-* ]]; then
+      local raw_key companion_wt companion_branch
+      raw_key="$(echo "$primary_branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1)"
+      if [[ -n "$raw_key" ]]; then
+        companion_wt="$(git -C "$ROOT_DIR" worktree list --porcelain 2>/dev/null | awk -v key="$raw_key" '
+          /^worktree / { wt=$2 }
+          /^branch/ && $2 ~ "refs/heads/(fix|feature)/raw-"key"-" { print wt; exit }
+        ')"
+        companion_branch="$(git -C "$ROOT_DIR" worktree list --porcelain 2>/dev/null | awk -v key="$raw_key" '
+          /^branch/ && $2 ~ "refs/heads/(fix|feature)/raw-"key"-" { sub("refs/heads/","",$2); print $2; exit }
+        ')"
+      fi
+      if [[ -n "$companion_wt" ]]; then
+        printf '\n## 工位可写性\n'
+        printf '当前工位是 test-pre-merge（保护工位，不可 add/commit/push）。\n'
+        printf '配对的**可写工位**已存在：\n'
+        printf -- '- 路径: `%s`\n' "$companion_wt"
+        printf -- '- 分支: `%s`\n' "$companion_branch"
+        if [[ "$companion_branch" == fix/* ]]; then
+          printf 'fix-execution 模式: test-pre-merge 可临时修改测试（dirty only），实际提交需 cd 到上述路径后 commit。\n'
+        elif [[ "$companion_branch" == feature/* ]]; then
+          printf 'feat-execution 模式: 所有开发和提交需在 feature 工位进行，不在当前工位修改。\n'
+        fi
+      fi
+    fi
     printf 'dispatch_priority: `P0`\n'
     printf 'parallel_safe: `false`\n'
     printf 'write_scope:\n'

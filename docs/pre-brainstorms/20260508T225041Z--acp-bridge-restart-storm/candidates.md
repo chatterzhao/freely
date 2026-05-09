@@ -1,26 +1,26 @@
 # Candidates
 
-## C-20260508T225041Z-A: ACP bridge restart cooldown
+## C-20260508T225041Z-A: worker prompt 写入配对可写工位信息
 
 - candidate_format_version: v2
-- title: acp-bridge.py 重启加 cooldown 防 storm
+- title: Worker prompt 自动包含配对 fix/feature 工位路径和写规则
 - status: promoted
-- decision_reason: storm 根因是 claude-agent-acp 快速退出时 bridge 连续重启。加 cooldown 最直接有效，不依赖外部 daemon 参数调整。
+- decision_reason: prompt 只写 test-pre-merge 路径，AI 不知道可写工位在哪，导致 WORKER_PROMPTS_NOT_LAUNCHABLE 死循环
 - promoted_issue_path: docs/issues/I-20260508T225041Z-A/issue.md
 - milestone: M-20260508T225041Z-A
 - next_action: B2_IBM → dev-loop → merge
-- revisit_trigger: 如果 cooldown 后仍有 storm，再考虑 daemon 层策略调整
+- revisit_trigger: 如果加入配对工位信息后仍有 storm，再考虑 runtime 层自动重定向
 - acceptance_criteria:
-  - bridge 在 server 快速退出时等待 cooldown 而非立即重启
-  - cooldown 期间 socket 保持可用，新请求触发重启
-  - 3次/30s 快速退出不再触发
+  - prompt 生成时检测 target 是否为 test-pre-merge
+  - 自动通过 `git worktree list` 查找配对 fix/feature 工位
+  - prompt 中明确写出可写工位 cd 路径
+  - fix 和 feat 两种 skill 的写规则分别说明
 - promotion_gate:
-  - 不改变 ACP 协议交互
-  - 不修改 claude-agent-acp 行为
-  - cooldown 参数可配置（环境变量），默认 10s
+  - 不改变 worker prompt 的整体生成架构
+  - 不修改 daemon storm 参数
+  - 兼容已有 wt-create 配对工位
 - open_questions:
-  - cooldown 是否应该指数退避？
-  - 是否需要区分正常 end_turn vs 异常退出？
+  - 如果配对工位不存在（已被删除），提示是否要 wt-create 新建？
 - acceptance_reviews:
   - reviewer: claude-opus-4.7
   - verdict: pass
