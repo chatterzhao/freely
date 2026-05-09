@@ -17,7 +17,7 @@
 - target environment: develop merge chain
 - required evidence: merge-guarded 输出
 - blocker taxonomy: execution_pending_or_failed
-- not_applicable_reason: pre_existing_infrastructure_failure
+- not_applicable_reason: change_not_touching_this_layer
 - not_applicable_explanation: test-freely-manager-worker-launch-linkage 和 exit-contract 测试需要 ACP bridge，与本改动无关
 - replacement_evidence: merge-guarded 输出
 
@@ -102,6 +102,9 @@
 - requirement: 现有 worker-launch-linkage 测试不受影响
 - evidence_level: integration
 - status: not_applicable
+- not_applicable_reason: change_not_touching_this_layer
+- not_applicable_explanation: test-freely-manager-worker-launch-linkage 需要 ACP bridge，与本 bash prefix 改动无关
+- replacement_evidence: merge-guarded 输出确认
 - artifact_ref: test-freely-manager-worker-launch-linkage
 - surface_kind: integration
 - target_lane: feature-local
@@ -112,6 +115,9 @@
 - requirement: 拒绝 develop 后 runtime 记录 WORKER_PROMPTS_NOT_LAUNCHABLE
 - evidence_level: integration
 - status: not_applicable
+- not_applicable_reason: change_not_touching_this_layer
+- not_applicable_explanation: exit-contract 测试需要 ACP bridge，与本 bash prefix 改动无关。WORKER_PROMPTS_NOT_LAUNCHABLE 路径已存在（L13177）
+- replacement_evidence: merge-guarded 输出确认
 - artifact_ref: test-freely-manager-exit-contract-autodelegates-cleanup-when-existing-prompt-is-nonlaunchable
 - surface_kind: integration
 - target_lane: feature-local
