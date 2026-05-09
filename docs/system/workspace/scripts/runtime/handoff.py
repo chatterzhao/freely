@@ -61,6 +61,11 @@ def init_db():
         CREATE INDEX IF NOT EXISTS idx_handoffs_parent ON handoffs(parent_handoff_id);
         DELETE FROM handoffs WHERE status = 'pending' AND datetime(created_at) < datetime('now','-1 hour');
     """)
+    for col in ('created_by', 'consumed_by'):
+        try:
+            conn.execute(f"ALTER TABLE handoffs ADD COLUMN {col} TEXT DEFAULT ''")
+        except sqlite3.OperationalError:
+            pass
     conn.commit()
     conn.close()
 
