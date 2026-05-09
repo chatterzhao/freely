@@ -11868,8 +11868,6 @@ try:
 except: pass
 " 2>/dev/null || true)
   fi
-  # Fallback: old exit-contract.env
-  [[ -n "$_worker_csv" ]] || _worker_csv="$(meta_env_value "$(manager_exit_contract_file "$project")" "WORKER_PROMPTS_CSV" 2>/dev/null || true)"
   _launched_count=0
   if [[ -n "$_worker_csv" ]]; then
     local IFS=","
