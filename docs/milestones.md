@@ -4714,3 +4714,18 @@ routing_policy:
 - milestone_state: committed
 - phase_state: `in_b2_ibm`
 - issue_path: `docs/issues/I-20260508T225041Z-A/issue.md`
+
+## M-20260509T022152Z-A
+- title: Worker launch 验证 target 必须是 fix/feature
+- status: active
+### candidate_issues
+1. `C-20260509T022152Z-A`
+- milestone: M-20260509T022152Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260509T022152Z-A/issue.md`
+### committed_issues
+1. `I-20260509T022152Z-A`
+- title: worker_prompt_launchable 拒绝非 fix/feature 工位
+- milestone_state: committed
+- phase_state: `done_b2_ibm`
+- issue_path: `docs/issues/I-20260509T022152Z-A/issue.md`
