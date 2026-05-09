@@ -9704,6 +9704,15 @@ worker_prompt_launchable_for_manager_project() {
     return 1
   fi
   target_branch="$(worker_prompt_target_branch "$prompt_file")"
+  if [[ -n "$target_branch" ]]; then
+    case "$target_branch" in
+      fix/*|feature/*) ;;  # OK — writable worktree branches
+      *)
+        log_info "worker target branch '${target_branch}' is a protected branch; worker must target fix/* or feature/*. Manager should update continuity to delegate to a writable worktree."
+        return 1
+        ;;
+    esac
+  fi
   if worker_project_is_absorbed_merged_lane "$manager_project" "$resolved_worktree" "$target_branch"; then
     # Cleanup workers targeting merged worktrees should still be launchable
     # so the AI can execute the actual cleanup (git worktree remove, etc.)
