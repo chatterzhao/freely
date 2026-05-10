@@ -15955,7 +15955,8 @@ ensure_manager_once() {
       "trigger=bootstrap_ai_grace_unverified_supervisor_hint" \
       "supervisor_pid=${supervisor_hint:-unknown}" \
       "next=keep_current_supervisor"
-  elif [[ "$same_tool_blocked" != "1" && -n "$current_pid" ]] && [[ -z "$current_ai_pid" ]]; then
+  elif [[ "$same_tool_blocked" != "1" && -n "$current_pid" ]] && [[ -z "$current_ai_pid" ]] \
+    && [[ "$(read_task_mode "$project")" != "wait" ]]; then
     log_warn "manager supervisor is idle after recovery gate passed; restarting manager with the latest handoff"
     append_lifecycle_trace "$project" "L223" "manager_idle_supervisor_restart" \
       "trigger=supervisor_alive_ai_missing_after_grace" \
