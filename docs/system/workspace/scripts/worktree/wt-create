@@ -535,65 +535,62 @@ _require_issue_exists "$fix_branch" || exit 1
 
 # ── Create worktree(s) ───────────────────────────────────
 
-if [[ "$using_new" -eq 1 ]]; then
-  tp_target="$(freely_wt_resolve_target_path "$test_pre_merge_branch")"
-  echo "=== Step 1/2: Creating test-pre-merge worktree ==="
-  _create_worktree "$test_pre_merge_branch" "$tp_target" "$base"
-  echo "  test-pre-merge: $tp_target"
-
+  if [[ "$using_new" -eq 1 ]]; then
   fix_target="$(freely_wt_resolve_target_path "$fix_branch")"
-  echo ""
-  echo "=== Step 2/2: Creating ${prefix} worktree (parented on test-pre-merge) ==="
-  _create_worktree "$fix_branch" "$fix_target" "$test_pre_merge_branch"
-  echo "  ${prefix}: $fix_target"
+  echo "=== Step 1/2: Creating ${prefix} worktree ==="
+  _create_worktree "$fix_branch" "$fix_target" "$base"
+  echo "  ${prefix}: $fix_target (base: $base)"
 
-  # ── Pull raw issue from inside the fix/feature worktree ──
-  # raw-issue-pull requires branch name containing raw-key (not develop).
+  # Pull raw issue from inside the fix/feature worktree
   if [[ "$using_new" -eq 1 ]]; then
     echo ""
     echo "=== Pulling raw issue from inside ${prefix} worktree ==="
     if ! ( cd "$fix_target" && _pull_raw_issue "$raw_key" "$source_val" ); then
-      echo "拒绝创建工位: pull 失败，无法从 $source_val 拉取 raw-$raw_key" >&2
+      echo "拒绝创建工位: pull 失败" >&2
       git -C "$ROOT_DIR" worktree remove "$fix_target" --force 2>/dev/null || true
-      git -C "$ROOT_DIR" worktree remove "$tp_target" --force 2>/dev/null || true
       git -C "$ROOT_DIR" branch -D "$fix_branch" 2>/dev/null || true
-      git -C "$ROOT_DIR" branch -D "$test_pre_merge_branch" 2>/dev/null || true
       return 1
     fi
     _fill_platform_ids "$raw_key"
   fi
+
+  tp_target="$(freely_wt_resolve_target_path "$test_pre_merge_branch")"
+  echo ""
+  echo "=== Step 2/2: Creating test-pre-merge worktree (for testing) ==="
+  _create_worktree "$test_pre_merge_branch" "$tp_target" "$fix_branch"
+  echo "  test-pre-merge: $tp_target (base: $fix_branch)"
 
   cat <<MSG
 
 ╔══════════════════════════════════════════════════════════╗
 ║  Worktrees created                                      ║
 ╠══════════════════════════════════════════════════════════╣
-║  test-pre-merge:  $tp_target
-║  branch:          $test_pre_merge_branch
-║  base:            $base
-║                                                        ║
 ║  ${prefix} worktree:     $fix_target
 ║  branch:          $fix_branch
-║  base:            $test_pre_merge_branch
+║  base:            $base
 ║  skill:           ${skill_path}
 ║  source:          ${source_val}
+║                                                        ║
+║  test-pre-merge (testing): $tp_target
+║  branch:          $test_pre_merge_branch
+║  base:            $fix_branch
 ╠══════════════════════════════════════════════════════════╣
 ║  Merge chain:                                           ║
-║    $fix_branch → $test_pre_merge_branch (fast-forward)
-║    $test_pre_merge_branch → develop
+║    $fix_branch → $test_pre_merge_branch → develop
+║                                                        ║
+║  测试用 test-pre-merge，删除不影响 ${prefix} 工位        ║
 ╚══════════════════════════════════════════════════════════╝
 MSG
+
   cat <<REMINDER
 
 ┌─ 下一步 ───────────────────────────────────────────────┐
-│  工位创建成功。进入 ${prefix} 工位后:                       │
+│  进入 ${prefix} 工位开发:                                  │
 │    cd $fix_target                                        │
-│                                                          │
-│  仔细阅读 ${skill_name} skill 及其引用的 skill:              │
-│    ${skill_path}                                          │
-│                                                          │
-│  按 skill 工作流进行实现                                   │
-└────────────────────────────────────────────────────────┘
+│  测试时进入 test-pre-merge 工位:                          │
+│    cd $tp_target                                         │
+│  仔细阅读 skill: ${skill_path}                             │
+└──────────────────────────────────────────────────────────┘
 REMINDER
 else
   tp_target="$(freely_wt_resolve_target_path "$fix_branch")"
