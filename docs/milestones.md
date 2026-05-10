@@ -4734,19 +4734,34 @@ routing_policy:
 - tasks_path: `docs/epics/worker-launch-writable-redirect/tasks.md`
 - completion_note: `worker_prompt_launchable_for_manager_project now rejects protected branch targets. Unit test 7/7 PASS. Fix merged to develop via companion branch fix/raw-20260509T022152Z-worker-launch-branch-check (commit 56e11a39). Governance docs on writable-redirect branch pending merge.`
 
+## M-20260510T0112Z-A
+- title: raw issue 正文注入治理提醒
+- status: active
+### candidate_issues
+1. `C-20260510T0112Z-A`
+- milestone: M-20260510T0112Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260510T0112Z-A/issue.md`
+### committed_issues
+1. `I-20260510T0112Z-A`
+- title: raw issue 正文注入治理提醒
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260510T0112Z-A/issue.md`
+
 ## M-20260509T090210Z-A
 - title: handoff SQLite refactor
-- status: active
+- status: completed
 ### candidate_issues
 1. `C-20260509T090210Z-A`
 - milestone: M-20260509T090210Z-A
-- status: promoted
+- status: completed
 - promoted_issue_path: `docs/issues/I-20260509T090210Z-A/issue.md`
 ### committed_issues
 1. `I-20260509T090210Z-A`
 - title: handoff SQLite refactor
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260509T090210Z-A/issue.md`
 
 ## M-20260509T024559Z-A
