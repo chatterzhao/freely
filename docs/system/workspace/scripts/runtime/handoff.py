@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """handoff.py: SQLite CRUD for manager-worker handoff state.
 
-One table (handoffs), one role field (manager|worker). Replaces
-file-based exit-contract.env + worker-prompts/*.txt as launch data source.
+One table (handoffs), role field (manager|worker) + created_by/consumed_by provenance.
+Replaces file-based exit-contract.env + worker-prompts/*.txt as launch data source.
 """
 
 import argparse
@@ -44,6 +44,8 @@ def init_db():
             prompt_file TEXT NOT NULL,
             parent_handoff_id TEXT DEFAULT '',
             intent_kind TEXT DEFAULT '',
+            created_by TEXT DEFAULT '',
+            consumed_by TEXT DEFAULT '',
             status TEXT NOT NULL DEFAULT 'pending'
                 CHECK(status IN ('pending','launched','completed','rejected','blocked')),
             exit_kind TEXT DEFAULT '',
@@ -57,22 +59,29 @@ def init_db():
         CREATE INDEX IF NOT EXISTS idx_handoffs_raw_key ON handoffs(raw_key);
         CREATE INDEX IF NOT EXISTS idx_handoffs_worktree ON handoffs(worktree);
         CREATE INDEX IF NOT EXISTS idx_handoffs_parent ON handoffs(parent_handoff_id);
+        DELETE FROM handoffs WHERE status = 'pending' AND datetime(created_at) < datetime('now','-1 hour');
     """)
+    for col in ('created_by', 'consumed_by'):
+        try:
+            conn.execute(f"ALTER TABLE handoffs ADD COLUMN {col} TEXT DEFAULT ''")
+        except sqlite3.OperationalError:
+            pass
     conn.commit()
     conn.close()
 
 
 def insert(role, raw_key, prompt_file, worktree="", branch="",
-           parent_handoff_id="", intent_kind=""):
+           parent_handoff_id="", intent_kind="", created_by="", consumed_by=""):
     conn = _connect()
     hid = _now_utc().replace("T", "").replace("Z", "").replace("-", "").replace(":", "") + "-" + uuid.uuid4().hex[:6]
     now = _now_utc()
     conn.execute(
         """INSERT INTO handoffs (handoff_id, role, raw_key, worktree, branch,
-           prompt_file, parent_handoff_id, intent_kind, status, created_at, updated_at)
-           VALUES (?,?,?,?,?,?,?,?,'pending',?,?)""",
+           prompt_file, parent_handoff_id, intent_kind, created_by, consumed_by,
+           status, created_at, updated_at)
+           VALUES (?,?,?,?,?,?,?,?,?,?,'pending',?,?)""",
         (hid, role, raw_key, worktree, branch, prompt_file,
-         parent_handoff_id, intent_kind, now, now))
+         parent_handoff_id, intent_kind, created_by, consumed_by, now, now))
     conn.commit()
     conn.close()
     return hid
@@ -194,6 +203,8 @@ def main():
     p_insert.add_argument("--branch", default="")
     p_insert.add_argument("--parent", default="")
     p_insert.add_argument("--intent-kind", default="")
+    p_insert.add_argument("--created-by", default="")
+    p_insert.add_argument("--consumed-by", default="")
 
     p_update = sub.add_parser("update")
     p_update.add_argument("--db", required=True)
@@ -234,7 +245,8 @@ def main():
         print("ok")
     elif args.cmd == "insert":
         hid = insert(args.role, args.raw_key, args.prompt_file,
-                     args.worktree, args.branch, args.parent, args.intent_kind)
+                     args.worktree, args.branch, args.parent, args.intent_kind,
+                     args.created_by, args.consumed_by)
         print(hid)
     elif args.cmd == "update":
         update_status(args.handoff_id, args.status, args.exit_kind, args.session_id)
