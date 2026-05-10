@@ -7400,12 +7400,17 @@ conn.execute('''CREATE TABLE IF NOT EXISTS task_mode_gate (
     id INTEGER PRIMARY KEY CHECK (id = 1),
     mode TEXT NOT NULL DEFAULT 'wait',
     task_scan_id TEXT DEFAULT '',
+    mode_just_switched INTEGER NOT NULL DEFAULT 0,
     updated_at TEXT NOT NULL DEFAULT ''
 )''')
 cur = conn.execute('SELECT COUNT(*) FROM task_mode_gate')
 if cur.fetchone()[0] == 0:
     conn.execute('''INSERT INTO task_mode_gate (id, mode, task_scan_id, updated_at)
                     VALUES (1, '$init_mode', '$init_scan_id', datetime('now'))''')
+try:
+    conn.execute('ALTER TABLE task_mode_gate ADD COLUMN mode_just_switched INTEGER NOT NULL DEFAULT 0')
+except:
+    pass
 conn.commit()
 conn.close()
 " 2>/dev/null || true
@@ -7444,7 +7449,11 @@ write_task_mode() {
   python3 <<PY
 import sqlite3
 conn = sqlite3.connect('$freely_db')
-conn.execute("INSERT OR REPLACE INTO task_mode_gate (id, mode, task_scan_id, updated_at) VALUES (1, '$task_mode', '$task_scan_id', datetime('now'))")
+cur = conn.execute("SELECT mode FROM task_mode_gate WHERE id = 1")
+old = cur.fetchone()
+old_mode = old[0] if old else ''
+changed = 1 if old_mode and old_mode != '$task_mode' else 0
+conn.execute("INSERT OR REPLACE INTO task_mode_gate (id, mode, task_scan_id, mode_just_switched, updated_at) VALUES (1, '$task_mode', '$task_scan_id', ?, datetime('now'))", (changed,))
 conn.commit()
 conn.close()
 PY
@@ -15957,13 +15966,23 @@ ensure_manager_once() {
       "next=keep_current_supervisor"
   elif [[ "$same_tool_blocked" != "1" && -n "$current_pid" ]] && [[ -z "$current_ai_pid" ]] \
     && [[ "$(read_task_mode "$project")" != "wait" ]]; then
-    log_warn "manager supervisor is idle after recovery gate passed; restarting manager with the latest handoff"
-    append_lifecycle_trace "$project" "L223" "manager_idle_supervisor_restart" \
-      "trigger=supervisor_alive_ai_missing_after_grace" \
-      "supervisor_pid=${current_pid:-unknown}" \
-      "next=restart_manager_supervisor"
-    restart_manager_supervisor_preserving_handoff "$project"
-    current_pid=""
+    local _just_switched
+    _just_switched=$(python3 -c "import sqlite3; conn = sqlite3.connect('$freely_db'); cur = conn.execute('SELECT mode_just_switched FROM task_mode_gate WHERE id = 1'); row = cur.fetchone(); print(row[0] if row else 0); conn.execute('UPDATE task_mode_gate SET mode_just_switched = 0 WHERE id = 1 AND mode_just_switched = 1'); conn.commit(); conn.close()" 2>/dev/null || echo 0)
+    if [[ "$_just_switched" == "1" ]]; then
+      log_info "task_mode just switched; keeping supervisor pid=$current_pid alive for one cycle"
+      append_lifecycle_trace "$project" "L224" "manager_keepalive" \
+        "trigger=mode_just_switched_grace" \
+        "supervisor_pid=${current_pid:-unknown}" \
+        "next=keep_current_supervisor"
+    else
+      log_warn "manager supervisor is idle after recovery gate passed; restarting manager with the latest handoff"
+      append_lifecycle_trace "$project" "L223" "manager_idle_supervisor_restart" \
+        "trigger=supervisor_alive_ai_missing_after_grace" \
+        "supervisor_pid=${current_pid:-unknown}" \
+        "next=restart_manager_supervisor"
+      restart_manager_supervisor_preserving_handoff "$project"
+      current_pid=""
+    fi
   fi
 
   prepare_manager_cross_tool_fallback_if_needed "$project" "$same_tool_blocked" >/dev/null || true
