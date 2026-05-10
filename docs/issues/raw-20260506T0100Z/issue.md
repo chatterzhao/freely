@@ -3,7 +3,16 @@ local_id: raw-20260506T0100Z
 phase_state: proposed
 kind: raw
 source_family: chat_inbox
-created: 2026-05-06T01:00:00Z
+created: 2026-05-06 01:00:00+00:00
+platform_ids:
+  github:
+    issue_id: '274'
+    url: https://github.com/chatterzhao/freely/issues/274
+    synced_at: '2026-05-10T09:29:04Z'
+updated_at: '2026-05-10T09:29:04Z'
+primary_platform: github
+created_at: '2026-05-10T09:29:04Z'
+platform_state: open
 ---
 
 # raw-20260506T0100Z: scan 盲区——文档链解析错误和断链导致漏扫

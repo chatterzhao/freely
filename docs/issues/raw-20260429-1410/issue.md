@@ -2,18 +2,22 @@
 local_id: raw-20260429-1410
 kind: raw
 phase_state: proposed
-platform_ids: {}
-primary_platform: ""
-canonical_issue_path: ""
+platform_ids:
+  github:
+    issue_id: '276'
+    url: https://github.com/chatterzhao/freely/issues/276
+    synced_at: '2026-05-10T09:29:24Z'
+primary_platform: github
+canonical_issue_path: ''
 last_synced_comment_at: {}
-hash: ""
-created_at: 2026-04-29T14:10:06Z
-updated_at: 2026-04-29T14:10:06Z
+hash: ''
+created_at: 2026-04-29 14:10:06+00:00
+updated_at: '2026-05-10T09:29:24Z'
 intake_id: 20260429-071005-docs-system-workspace-scripts-ut
 author: zhaoquan
 channel: supervisor
 session_refs: []
-platform_state: ''
+platform_state: open
 ---
 
 # 任务：检查项目大文件并重构

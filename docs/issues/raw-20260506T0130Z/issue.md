@@ -3,7 +3,16 @@ local_id: raw-20260506T0130Z
 phase_state: proposed
 kind: raw
 source_family: chat_inbox
-created: 2026-05-06T01:30:00Z
+created: 2026-05-06 01:30:00+00:00
+platform_ids:
+  github:
+    issue_id: '277'
+    url: https://github.com/chatterzhao/freely/issues/277
+    synced_at: '2026-05-10T09:29:31Z'
+updated_at: '2026-05-10T09:29:31Z'
+primary_platform: github
+created_at: '2026-05-10T09:29:31Z'
+platform_state: open
 ---
 
 # raw-20260506T0130Z: scan key 格式归一化——旧 HHMM ↔ 新 THHMMZ 互认

@@ -5,16 +5,19 @@ status: proposed
 phase_state: proposed
 source_candidate: docs/pre-brainstorms/20260506-merge-guarded-fix/candidates.md
 platform_ids:
-  github: "236"
+  github:
+    issue_id: '273'
+    url: https://github.com/chatterzhao/freely/issues/273
+    synced_at: '2026-05-10T09:28:57Z'
 primary_platform: github
-created_at: 2026-05-06T14:00:00Z
+created_at: 2026-05-06 14:00:00+00:00
 author: zhaoquan
 channel: github
 session_refs: []
 pre_tests_path: docs/epics/merge-guarded-fix-whitelist/verification/pre-tests.md
 verification_artifact_dir: docs/epics/merge-guarded-fix-whitelist/code-reviews
-pre_tests_path: docs/epics/merge-guarded-fix-whitelist/verification/pre-tests.md
-verification_artifact_dir: docs/epics/merge-guarded-fix-whitelist/code-reviews
+updated_at: '2026-05-10T09:28:57Z'
+platform_state: open
 ---
 
 ## 问题

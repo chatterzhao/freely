@@ -4,15 +4,20 @@ kind: raw
 status: proposed
 phase_state: proposed
 platform_ids:
-  github: "237"
+  github:
+    issue_id: '278'
+    url: https://github.com/chatterzhao/freely/issues/278
+    synced_at: '2026-05-10T09:29:40Z'
 primary_platform: github
-created_at: 2026-05-07T01:00:00Z
+created_at: 2026-05-07 01:00:00+00:00
 author: zhaoquan
 channel: github
 session_refs: []
 pre_tests_path: docs/epics/fix-branch-naming/verification/pre-tests.md
 verification_artifact_dir: docs/epics/fix-branch-naming/code-reviews
 source_candidate: docs/pre-brainstorms/20260507-fix-branch-naming/candidates.md
+updated_at: '2026-05-10T09:29:40Z'
+platform_state: open
 ---
 
 ## 问题

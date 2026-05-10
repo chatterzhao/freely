@@ -4,16 +4,20 @@ kind: raw
 status: proposed
 phase_state: proposed
 platform_ids:
-  github: "240"
+  github:
+    issue_id: '280'
+    url: https://github.com/chatterzhao/freely/issues/280
+    synced_at: '2026-05-10T09:29:50Z'
 primary_platform: github
 source_candidate: docs/pre-brainstorms/20260506-wt-create-dual/candidates.md
-created_at: 2026-05-06T12:30:00Z
-updated_at: 2026-05-06T12:30:00Z
+created_at: 2026-05-06 12:30:00+00:00
+updated_at: '2026-05-10T09:29:50Z'
 author: zhaoquan
 channel: github
 session_refs: []
 pre_tests_path: docs/epics/wt-create-dual/verification/pre-tests.md
 verification_artifact_dir: docs/epics/wt-create-dual/code-reviews
+platform_state: open
 ---
 
 ## 问题
