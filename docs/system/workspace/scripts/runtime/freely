@@ -654,11 +654,7 @@ ensure_repo_hooks_enabled_or_fail() {
     exit 1
   fi
 
-  if [[ ! -d "$repo_root/.githooks" ]]; then
-    log_error "cannot enable hooks: missing $repo_root/.githooks"
-    exit 1
-  fi
-
+  mkdir -p "$repo_root/.githooks"
   git -C "$repo_root" config core.hooksPath .githooks
   log_info "enabled git hooks: $repo_root/.githooks"
 }
@@ -16999,6 +16995,7 @@ cmd_init() {
   ensure_project_agents_md "$project"
   ensure_install_lifecycle_allowlist_file "$project"
   ensure_repo_hooks_enabled_or_fail "$project"
+  sync_repo_hook_assets_from_source "$SELF_ROOT" "$project"
   write_config "$project" "$intent" "$constitution" "$tool" "$model" "$mode" "$reasoning_effort" "$tool_adapter" "$tool_adapter_policy" "$tool_capabilities" "$tool_policy" "$codex_capability_model" "$codex_capability_sandbox" "$codex_capability_approval_policy" "$codex_capability_cwd_mode" "$force"
   record_default_autonomy_contract "$project" "$mode" "$FREELY_INIT_CONSENT_STATUS" "$FREELY_INIT_CONSENT_RECORDED_AT" "$FREELY_INIT_CONSENT_RECORDED_VIA"
   if tool_requires_project_codex_config "$tool" "$tool_capabilities"; then
