@@ -665,12 +665,12 @@ validate_project_branch_names() {
   repo_root="$(git_root_for_path "$project")"
   [[ -z "$repo_root" ]] && return 0
   git -C "$repo_root" fetch --all 2>/dev/null || true
-  bad_branches=$(git -C "$repo_root" branch -a 2>/dev/null | sed 's/^[* ]*//; s|remotes/[^/]*/||' | sort -u | while read -r branch; do
+  bad_branches=$(git -C "$repo_root" branch -a 2>/dev/null | sed 's/^[*+ ]*//; s/^  *//; s|remotes/[^/]*/||' | sort -u | while read -r branch; do
     [[ -z "$branch" ]] && continue
+    [[ "$branch" == *"->"* || "$branch" == *"/HEAD" ]] && continue
     [[ "$branch" == "main" || "$branch" == "develop" ]] && continue
     [[ "$branch" == fix/* || "$branch" == feature/* || "$branch" == hotfix/* ]] && continue
     [[ "$branch" == test-pre-merge-* || "$branch" == feature/premerge-* ]] && continue
-    [[ "$branch" == *"/HEAD" ]] && continue
     printf '%s\n' "$branch"
   done)
   if [[ -n "$bad_branches" ]]; then
