@@ -17011,12 +17011,17 @@ cmd_init() {
   local freely_db="$project/.freely/freely.db"
   local chat_inbox_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/chat-inbox.py"
   local session_store_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-store.py"
+  local handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
   if [[ -f "$chat_inbox_py" ]]; then
     python3 "$chat_inbox_py" init --db "$freely_db" >/dev/null 2>&1 || true
   fi
   if [[ -f "$session_store_py" ]]; then
     python3 "$session_store_py" init --db "$freely_db" >/dev/null 2>&1 || true
   fi
+  if [[ -f "$handoff_py" ]]; then
+    python3 "$handoff_py" init --db "$freely_db" >/dev/null 2>&1 || true
+  fi
+  ensure_task_mode_gate "$project" "wait"
   log_info "initialized: $(config_file "$project")"
   load_config "$project"
   echo "activation_consent_status: $(freely_activation_consent_status_for_loaded_config)"
