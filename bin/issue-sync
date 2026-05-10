@@ -575,6 +575,20 @@ cmd_close() {
   gh_id=$(_gh_issue_number "$file")
   gitee_id=$(_gitee_resolve_issue_number "$file" "$local_id")
 
+  # Fallback: if I-* has no platform_ids, trace up to raw-* parent
+  local kind="$(_fm_get "$file" "kind")"
+  if [[ -z "$gh_id" && -z "$gitee_id" && "$kind" == "linked" ]]; then
+    local parent_id="$(_fm_get "$file" "promoted_from")"
+    if [[ -n "$parent_id" ]]; then
+      local parent_file="$ISSUES_DIR/$parent_id/issue.md"
+      if [[ -f "$parent_file" ]]; then
+        gh_id=$(_gh_issue_number "$parent_file")
+        gitee_id=$(_gitee_resolve_issue_number "$parent_file" "$parent_id")
+        echo "[issue-sync] close fallback: using parent $parent_id platform_ids (gh=$gh_id, gitee=$gitee_id)"
+      fi
+    fi
+  fi
+
   if [[ -n "${GH_REPO:-}" && -n "$gh_id" ]]; then
     echo "[issue-sync] GitHub: closing #$gh_id"
     _gh_close "$gh_id" "$reason"
