@@ -685,7 +685,7 @@ validate_project_branch_names() {
     log_error "  test-pre-merge-*"
     log_error "  develop, main"
     log_error ""
-    log_error "请重命名或删除不合规分支，或使用 --skip-branch-check 跳过。"
+    log_error "请重命名或删除不合规分支后重试。"
     exit 1
   fi
 }
