@@ -13086,7 +13086,7 @@ Manager exit contract（硬性要求）：
 # 先写 manager 自己的记录（manager 创建给自己消费的连续性记录）
 MANAGER_HID=\$(python3 \$_handoff_py --db \$_db_path insert \\
   --role manager --raw-key <key> --prompt-file <continuity_path> \\
-  --created-by manager --consumed-by manager)
+  --created-by manager --consumed-by manager --exit-kind delegate_workers)
 
 # 每个 worker 写一条记录，parent 指向 manager
 python3 \$_handoff_py --db \$_db_path insert \\
@@ -13098,10 +13098,10 @@ python3 \$_handoff_py --db \$_db_path insert \\
 - parent_handoff_id 关联到 manager 记录
 - --created-by 记录创建者角色 (manager|worker)
 - --consumed-by 记录消费者角色 (manager|worker)
+- --exit-kind 记录出口类型：delegate_workers / resume_manager / stop_ai
 
 规则：
-- stop_ai 和 resume_manager 不写 handoff
-- delegate_workers 必须用 handoff.py insert
+- delegate_workers 必须用 handoff.py insert，manager 记录要带 --exit-kind delegate_workers
 - 如果你本轮还没把出口合同写完整，就不算完成；runtime 会用同一个 resume target 拉你回来补合同。
 EOF
 }

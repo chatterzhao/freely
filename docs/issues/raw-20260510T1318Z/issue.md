@@ -1,0 +1,14 @@
+---
+local_id: raw-20260510T1318Z
+kind: raw
+phase_state: proposed
+platform_ids:
+  github:
+    issue_id: '288'
+    url: https://github.com/chatterzhao/freely/issues/288
+primary_platform: github
+---
+## 问题
+handoff.py insert 不支持 exit_kind，AI prompt 没告诉 AI 写 exit_kind。
+## 修复
+insert 加 exit_kind 参数 + CLI + AI prompt 示例。
