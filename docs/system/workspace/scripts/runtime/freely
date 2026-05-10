@@ -1927,12 +1927,12 @@ manager_bootstrap_handoff_file() {
 
 manager_exit_contract_file() {
   local project="$1"
-  :
+  echo "$(run_dir_for_project "$project")/manager-exit-contract.env"
 }
 
 worker_exit_contract_file() {
   local project="$1"
-  :
+  echo "$(state_dir "$project")/worker-exit-contract.env"
 }
 
 manager_operator_stop_boundary_file() {
