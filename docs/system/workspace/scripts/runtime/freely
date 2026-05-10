@@ -660,8 +660,7 @@ ensure_repo_hooks_enabled_or_fail() {
 }
 
 validate_project_branch_names() {
-  local project="$1" skip_check="${2:-false}" repo_root bad_branches branch
-  [[ "$skip_check" == "true" ]] && return 0
+  local project="$1" repo_root bad_branches branch
   repo_root="$(git_root_for_path "$project")"
   [[ -z "$repo_root" ]] && return 0
   git -C "$repo_root" fetch --all 2>/dev/null || true
@@ -16988,7 +16987,7 @@ build_prompt() {
 }
 
 cmd_init() {
-  local project="" intent="" constitution="" ai_spec="" tool_adapter_arg="" tool_adapter_policy_arg="" reasoning_effort="" force="false" accept_default_autonomy="false" skip_branch_check="false"
+  local project="" intent="" constitution="" ai_spec="" tool_adapter_arg="" tool_adapter_policy_arg="" reasoning_effort="" force="false" accept_default_autonomy="false"
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
@@ -16999,7 +16998,6 @@ cmd_init() {
       --tool-adapter-policy) tool_adapter_policy_arg="${2:-}"; shift 2 ;;
       --reasoning-effort) reasoning_effort="${2:-}"; shift 2 ;;
       --accept-default-autonomy) accept_default_autonomy="true"; shift ;;
-      --skip-branch-check) skip_branch_check="true"; shift ;;
       --force) force="true"; shift ;;
       *) log_error "unknown arg: $1"; usage; exit 1 ;;
     esac
@@ -17013,7 +17011,7 @@ cmd_init() {
   [[ -d "$project" ]] || { log_error "project not found: $project"; exit 1; }
   [[ -f "$intent" ]] || { log_error "intent file not found: $intent"; exit 1; }
   [[ -f "$constitution" ]] || { log_error "constitution file not found: $constitution"; exit 1; }
-  validate_project_branch_names "$project" "$skip_branch_check"
+  validate_project_branch_names "$project"
   ai_spec="$(resolve_ai_spec_for_project_or_global "$project" "$ai_spec")" || {
     log_error "missing --ai and no project/global default AI configured"
     log_error "set --ai explicitly, or define AI_TOOL/AI_MODEL/AI_MODE in $(global_config_file)"
