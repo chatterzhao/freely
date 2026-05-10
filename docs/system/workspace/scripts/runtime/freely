@@ -3550,6 +3550,7 @@ write_config() {
 PROJECT_ROOT="$project"
 INTENT_FILE="$intent"
 CONSTITUTION_FILE="$constitution"
+FREELY_HOME="$SELF_ROOT"
 AI_TOOL="$tool"
 AI_MODEL="$model"
 AI_MODE="$mode"
