@@ -1662,6 +1662,10 @@ def main() -> int:
         print("Allowed candidate statuses before merge:")
         for message in allowed_status_guide:
             print(f"- {message}")
+        print()
+        print("提示：门禁不通过通常是因为事情还没做完，或者做完了但没更新对应的文档/状态字段。")
+        print("请检查：1) 代码改动是否已完成  2) candidate/issue 的 status/phase_state 是否已更新")
+        print("  3) milestones.md 是否已反映当前状态  4) code-review + pre-tests 是否已产出")
         if warnings:
             print()
             print("Warnings:")
