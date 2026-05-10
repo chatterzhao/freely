@@ -71,17 +71,18 @@ def init_db():
 
 
 def insert(role, raw_key, prompt_file, worktree="", branch="",
-           parent_handoff_id="", intent_kind="", created_by="", consumed_by=""):
+           parent_handoff_id="", intent_kind="", created_by="", consumed_by="",
+           exit_kind=""):
     conn = _connect()
     hid = _now_utc().replace("T", "").replace("Z", "").replace("-", "").replace(":", "") + "-" + uuid.uuid4().hex[:6]
     now = _now_utc()
     conn.execute(
         """INSERT INTO handoffs (handoff_id, role, raw_key, worktree, branch,
            prompt_file, parent_handoff_id, intent_kind, created_by, consumed_by,
-           status, created_at, updated_at)
-           VALUES (?,?,?,?,?,?,?,?,?,?,'pending',?,?)""",
+           exit_kind, status, created_at, updated_at)
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,'pending',?,?)""",
         (hid, role, raw_key, worktree, branch, prompt_file,
-         parent_handoff_id, intent_kind, created_by, consumed_by, now, now))
+         parent_handoff_id, intent_kind, created_by, consumed_by, exit_kind, now, now))
     conn.commit()
     conn.close()
     return hid
@@ -205,6 +206,7 @@ def main():
     p_insert.add_argument("--intent-kind", default="")
     p_insert.add_argument("--created-by", default="")
     p_insert.add_argument("--consumed-by", default="")
+    p_insert.add_argument("--exit-kind", default="")
 
     p_update = sub.add_parser("update")
     p_update.add_argument("--db", required=True)
@@ -246,7 +248,7 @@ def main():
     elif args.cmd == "insert":
         hid = insert(args.role, args.raw_key, args.prompt_file,
                      args.worktree, args.branch, args.parent, args.intent_kind,
-                     args.created_by, args.consumed_by)
+                     args.created_by, args.consumed_by, args.exit_kind)
         print(hid)
     elif args.cmd == "update":
         update_status(args.handoff_id, args.status, args.exit_kind, args.session_id)
