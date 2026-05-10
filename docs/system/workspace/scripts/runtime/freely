@@ -660,10 +660,12 @@ ensure_repo_hooks_enabled_or_fail() {
 }
 
 validate_project_branch_names() {
-  local project="$1" repo_root bad_branches branch
+  local project="$1" repo_root bad_branches branch wt_list worktrees_root
   repo_root="$(git_root_for_path "$project")"
   [[ -z "$repo_root" ]] && return 0
   git -C "$repo_root" fetch --all 2>/dev/null || true
+  worktrees_root="$(dirname "$repo_root")/$(basename "$repo_root")-worktrees"
+  wt_list=$(git -C "$repo_root" worktree list --porcelain 2>/dev/null | awk '/^worktree /{print $2}' | sort -u)
   bad_branches=$(git -C "$repo_root" branch -a 2>/dev/null | sed 's/^[*+ ]*//; s/^  *//; s|remotes/[^/]*/||' | sort -u | while read -r branch; do
     [[ -z "$branch" ]] && continue
     [[ "$branch" == *"->"* || "$branch" == *"/HEAD" ]] && continue
@@ -678,14 +680,39 @@ validate_project_branch_names() {
       [[ -n "$branch" ]] && log_error "  - $branch"
     done <<< "$bad_branches"
     log_error ""
-    log_error "freely 支持的分支名格式:"
-    log_error "  fix/raw-{YYYYMMDDTHHMMZ}-{slug}"
-    log_error "  feature/raw-{YYYYMMDDTHHMMZ}-{slug}"
-    log_error "  hotfix/*"
-    log_error "  test-pre-merge-*"
-    log_error "  develop, main"
+    log_error "freely 支持: fix/raw-{ts}-{slug}  feature/raw-{ts}-{slug}  hotfix/*  test-pre-merge-*  develop  main"
     log_error ""
-    log_error "请重命名或删除不合规分支后重试。"
+    log_error "修复步骤（将旧分支转为合规工位）:"
+    local _ts; _ts=$(date -u +"%Y%m%dT%H%MZ")
+    while IFS= read -r branch; do
+      [[ -n "$branch" ]] || continue
+      local _slug; _slug=$(echo "$branch" | sed 's/[^a-zA-Z0-9]/-/g' | sed 's/--*/-/g')
+      log_error "  git -C \"$repo_root\" branch -m \"$branch\" \"fix/raw-${_ts}-${_slug}\""
+      log_error "  git -C \"$repo_root\" worktree add \"$worktrees_root/fix-raw-${_ts}-${_slug}\" \"fix/raw-${_ts}-${_slug}\""
+      log_error "  git -C \"$repo_root\" worktree add \"$worktrees_root/test-pre-merge-${_ts}-${_slug}\" -b \"test-pre-merge-${_ts}-${_slug}\" \"fix/raw-${_ts}-${_slug}\""
+      log_error ""
+    done <<< "$bad_branches"
+    exit 1
+  fi
+  # Check managed branches have worktrees
+  local missing_wt
+  missing_wt=$(git -C "$repo_root" branch 2>/dev/null | sed 's/^[*+ ]*//' | while read -r branch; do
+    [[ -z "$branch" ]] && continue
+    [[ "$branch" == fix/* || "$branch" == feature/* || "$branch" == hotfix/* ]] || continue
+    local found=0
+    while IFS= read -r wt; do
+      [[ -n "$wt" ]] && [[ "$(git -C "$wt" rev-parse --abbrev-ref HEAD 2>/dev/null)" == "$branch" ]] && { found=1; break; }
+    done <<< "$wt_list"
+    [[ "$found" -eq 0 ]] && printf '%s\n' "$branch"
+  done)
+  if [[ -n "$missing_wt" ]]; then
+    log_error "以下分支缺少对应工位:"
+    while IFS= read -r branch; do
+      [[ -n "$branch" ]] && log_error "  - $branch"
+    done <<< "$missing_wt"
+    log_error ""
+    log_error "freely 要求每个 fix/feature 分支都有专属 worktree。"
+    log_error "请用 wt-create 创建工位，或删除已合并的分支。"
     exit 1
   fi
 }
