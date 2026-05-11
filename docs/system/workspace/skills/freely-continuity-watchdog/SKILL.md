@@ -1,11 +1,11 @@
 ---
-name: freely-freely-continuity-watchdog
+name: freely-continuity-watchdog
 description: 管理 Freely 的上下文连续性监督，覆盖 context warn、context rotate、fresh_with_handoff、continuity artifact 选择与旧会话证据按需引用边界。
 ---
 
-# skill:freely-freely-continuity-watchdog
+# skill:freely-continuity-watchdog
 
-> 这是 `skill:freely-freely-watchdog-control-plane` 的 continuity watchdog 子模块。
+> 这是 `skill:freely-watchdog-control-plane` 的 continuity watchdog 子模块。
 
 ## 何时使用
 

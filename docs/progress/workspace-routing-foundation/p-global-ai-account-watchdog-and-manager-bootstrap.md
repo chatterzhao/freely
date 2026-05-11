@@ -160,7 +160,7 @@
   - `bash docs/system/workspace/scripts/tests/test-freely-start-requires-interruption-dispatcher-ready` pass
   - `bash docs/system/workspace/scripts/tests/test-freely-auth-failure-keeps-control-plane-alive` pass
 - 2026-03-26 slot probe timeout observability continuation rerun:
-  - `bash -n docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh` pass
+  - `bash -n docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh` pass
   - `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-timeout-artifact` pass
   - `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-defers-during-account-switch` pass
   - `bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch` pass

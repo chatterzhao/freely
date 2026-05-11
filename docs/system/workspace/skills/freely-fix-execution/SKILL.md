@@ -1,9 +1,9 @@
 ---
-name: freely-freely-fix-execution
+name: freely-fix-execution
 description: 快速修复 bug 的特殊高效策略——用 test-pre-merge-* 私有工位隔离快测，cp 到可写工位正式提交，不违背保护分支的本质约束。
 ---
 
-# skill:freely-freely-fix-execution
+# skill:freely-fix-execution
 
 ## 定位
 
@@ -121,7 +121,7 @@ hotfix/*          → main
 阶段 1 — wt-create 一次性创建两个工位
   │
   ├─ ./bin/wt-create --raw-key <key> --source <source> \
-  │     --skill docs/system/workspace/skills/freely-freely-fix-execution/SKILL.md \
+  │     --skill docs/system/workspace/skills/freely-fix-execution/SKILL.md \
   │     --slug <slug>
   │
   │   自动创建:
@@ -144,9 +144,9 @@ hotfix/*          → main
 
 阶段 3 — 补齐治理（调用下层 skill）
   │
-  ├─ skill:freely-freely-doc-B1_IBM-execution → raw → candidate
-  ├─ skill:freely-freely-doc-B2_IBM-execution → candidate → I-* issue → progress
-  ├─ skill:freely-freely-dev-loop-execution → code-review（必须 ## Implementation Decision Note）+ pre-tests
+  ├─ skill:freely-doc-B1_IBM-execution → raw → candidate
+  ├─ skill:freely-doc-B2_IBM-execution → candidate → I-* issue → progress
+  ├─ skill:freely-dev-loop-execution → code-review（必须 ## Implementation Decision Note）+ pre-tests
   └─ milestones.md
 
 阶段 4 — 门禁合并

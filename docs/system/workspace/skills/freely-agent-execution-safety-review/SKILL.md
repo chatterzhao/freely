@@ -1,9 +1,9 @@
 ---
-name: freely-freely-agent-execution-safety-review
+name: freely-agent-execution-safety-review
 description: 在 Freely workspace 中执行 execution-boundary review，并在不退化成用户逐步批准的前提下输出 reviewer-backed security decision support 与 machine-readable evidence。
 ---
 
-# skill:freely-freely-agent-execution-safety-review
+# skill:freely-agent-execution-safety-review
 
 ## 何时使用
 

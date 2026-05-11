@@ -11,11 +11,11 @@ AI_LOG="$TMP_DIR/ai.log"
 mkdir -p \
   "$PROJECT/bin" \
   "$PROJECT/docs/system/workspace/scripts/runtime" \
-  "$PROJECT/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts"
+  "$PROJECT/docs/system/workspace/skills/freely-watchdog-control-plane/scripts"
 
 ln -sf \
-  "$ROOT_DIR/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh" \
-  "$PROJECT/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh"
+  "$ROOT_DIR/docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh" \
+  "$PROJECT/docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh"
 ln -sf \
   "$ROOT_DIR/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" \
   "$PROJECT/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
@@ -47,7 +47,7 @@ result="$(
     set -euo pipefail
     log_warn() { printf "[WARN] %s\n" "$*"; }
     ai_cli_bin_for_project() { printf "%s\n" "'"$PROJECT"'/bin/ai"; }
-    source "'"$PROJECT"'/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh"
+    source "'"$PROJECT"'/docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh"
     codex_current_slot "'"$PROJECT"'"
   ' 2>"$TMP_DIR/stderr.log"
 )"

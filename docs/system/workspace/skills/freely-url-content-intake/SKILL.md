@@ -1,9 +1,9 @@
 ---
-name: freely-freely-url-content-intake
+name: freely-url-content-intake
 description: 当输入是 URL 时，识别平台并调用 skill 自带脚本抓取正文或返回结构化失败信息。
 ---
 
-# skill:freely-freely-url-content-intake
+# skill:freely-url-content-intake
 
 ## 何时使用
 

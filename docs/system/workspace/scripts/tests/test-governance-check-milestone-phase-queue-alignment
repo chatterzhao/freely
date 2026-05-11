@@ -17,8 +17,8 @@ chmod +x "$REPO/bin/governance-check" "$REPO/docs/system/workspace/scripts/quali
 mkdir -p "$REPO/docs/system/workspace/skills/doc-ibm-execution/references"
 mkdir -p "$REPO/docs/system/workspace/skills/doc-ibm-execution"
 mkdir -p "$REPO/docs/system/workspace/skills/doc-pre-brainstorm-execution"
-mkdir -p "$REPO/docs/system/workspace/skills/freely-freely-dev-loop-execution"
-mkdir -p "$REPO/docs/system/workspace/skills/freely-freely-auto-loop-orchestrator"
+mkdir -p "$REPO/docs/system/workspace/skills/freely-dev-loop-execution"
+mkdir -p "$REPO/docs/system/workspace/skills/freely-auto-loop-orchestrator"
 mkdir -p "$REPO/docs/system/workspace/skills"
 mkdir -p "$REPO/docs/system/workspace/agents"
 mkdir -p "$REPO/docs/system/workspace/hooks"
@@ -90,7 +90,7 @@ cat > "$REPO/docs/system/workspace/agents/worker-agent.md" <<'EOF'
 See docs/system/workspace/three-loop-capability-lifecycle.md
 EOF
 
-cat > "$REPO/docs/system/workspace/skills/freely-freely-auto-loop-orchestrator/SKILL.md" <<'EOF'
+cat > "$REPO/docs/system/workspace/skills/freely-auto-loop-orchestrator/SKILL.md" <<'EOF'
 # Skill
 See docs/system/workspace/three-loop-capability-lifecycle.md
 EOF
@@ -107,7 +107,7 @@ references/prd-quality-bar.md
 pre-tests.md` 和 `tasks.md` 必须从 `prd.md` 自然派生
 EOF
 
-cat > "$REPO/docs/system/workspace/skills/freely-freely-dev-loop-execution/SKILL.md" <<'EOF'
+cat > "$REPO/docs/system/workspace/skills/freely-dev-loop-execution/SKILL.md" <<'EOF'
 # Skill
 See docs/system/workspace/three-loop-capability-lifecycle.md
 EOF

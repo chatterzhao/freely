@@ -1,9 +1,9 @@
 ---
-name: freely-freely-auto-loop-orchestrator
+name: freely-auto-loop-orchestrator
 description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 lead-agent、上下文判定，再进入 sibling 的 doc-loop 或 dev-loop，并回到发现阶段。当 AI 运行自主持续交付循环时使用。
 ---
 
-# skill:freely-freely-auto-loop-orchestrator
+# skill:freely-auto-loop-orchestrator
 
 ## 首段闭环主链
 `sh/ps1 -> external AI CLI tool -> lead-agent -> freely-context-source-skill -> freely-doc-B1_IBM-execution | freely-doc-B2_IBM-execution | freely-dev-loop-execution | manager-owned verification / cleanup route`
@@ -24,15 +24,15 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
 - 若本 skill 的 routing、restart point、completion / verification / cleanup / recovery judgement 语义变化，必须先同步检查该真源，再更新本 skill。
 
 ## 工作流
-1. 先执行固定前置门禁：`skill:freely-freely-constitution-guard` -> `skill:freely-freely-laws-enforcer`。
+1. 先执行固定前置门禁：`skill:freely-constitution-guard` -> `skill:freely-laws-enforcer`。
 2. `system/workspace/scripts` 中定义的 `sh` / `ps1` 启动外部 AI CLI 工具，并进入 `lead-agent`。
 3. manager / patrol 轮次先把 standing/event source 扫描成 machine-readable `manager-task-source-scan-latest.json`，作为本轮路由的结构化输入。
-4. `lead-agent` 调用 `skill:freely-freely-context-source-skill`，基于当前来源、scan json、milestone、工具清单与上下文做 usable issue 判定，并组装下一跳提示词。
+4. `lead-agent` 调用 `skill:freely-context-source-skill`，基于当前来源、scan json、milestone、工具清单与上下文做 usable issue 判定，并组装下一跳提示词。
 5. 根据 `freely-context-source-skill` 的结果分流：
-   - 无稳定 issue 边界 -> `skill:freely-freely-doc-B1_IBM-execution`
-   - issue-bound brainstorm / mapping / governance -> `skill:freely-freely-doc-B2_IBM-execution`
-   - ready issue / in-progress -> `skill:freely-freely-dev-loop-execution`
-   - `completion_verification` / `cleanup_governance` -> 留在 `auto-loop` 侧做 manager-owned judgement / handoff，必要时委派 worker 或 `skill:freely-freely-worktree-maintenance-governance`
+   - 无稳定 issue 边界 -> `skill:freely-doc-B1_IBM-execution`
+   - issue-bound brainstorm / mapping / governance -> `skill:freely-doc-B2_IBM-execution`
+   - ready issue / in-progress -> `skill:freely-dev-loop-execution`
+   - `completion_verification` / `cleanup_governance` -> 留在 `auto-loop` 侧做 manager-owned judgement / handoff，必要时委派 worker 或 `skill:freely-worktree-maintenance-governance`
 6. 各 loop skill 在环内完成自己的工作，并把状态、阻塞、完成或恢复上下文回流给 `auto-loop`；不要求下游 skill 直接“调用 auto-loop 的某个子 skill”。
 7. `system/workspace/hooks` 中定义的 hook 规则按安装流程投影到根目录 `.githooks/` 运行时位置。
 8. 当状态跨环迁移时，按 `docs/LAWS.md` 第 2C 章同步更新候选项 / milestone / issue / progress / recovery / session evidence。
@@ -93,7 +93,7 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
   - 主管先判断它与当前主线是兼容、纠偏、阻塞、冲突，还是只是建议
   - 再决定 direct answer、queue、freeze、analysis delegation 或 execution delegation
 19. 主管不把 raw signal 直接广播给所有 worker；只把加工后的 handoff 分发给目标 ownership。
-20. 当 standing source 的重点问题是 sequencing / queue drift / state maintenance，而不是业务边界本身时，主管应优先委派 `skill:freely-freely-milestone-planning-state-maintenance`，而不是让业务 worker 顺手补 milestone。
+20. 当 standing source 的重点问题是 sequencing / queue drift / state maintenance，而不是业务边界本身时，主管应优先委派 `skill:freely-milestone-planning-state-maintenance`，而不是让业务 worker 顺手补 milestone。
 21. 对 worker 工位的 `human interruption`：
   - `freely chat` 先完成 durable intake 与 interruption classification
   - 若结果已收敛成当前工位的 worker-owned `continuation` / `verification` handoff，且当前 worker runtime 因 `operator_stop` 停止

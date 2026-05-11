@@ -2,8 +2,8 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd)"
-SCRIPT="$ROOT/docs/system/workspace/skills/freely-freely-url-content-intake/scripts/fetch-url.sh"
-EXTRACT="$ROOT/docs/system/workspace/skills/freely-freely-url-content-intake/scripts/extract-readable-content.sh"
+SCRIPT="$ROOT/docs/system/workspace/skills/freely-url-content-intake/scripts/fetch-url.sh"
+EXTRACT="$ROOT/docs/system/workspace/skills/freely-url-content-intake/scripts/extract-readable-content.sh"
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 

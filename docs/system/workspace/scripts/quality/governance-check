@@ -24,10 +24,10 @@ three_loop_reference_targets=(
   "docs/system/workspace/agents/lead-agent.md"
   "docs/system/workspace/agents/manager-agent.md"
   "docs/system/workspace/agents/worker-agent.md"
-  "docs/system/workspace/skills/freely-freely-auto-loop-orchestrator/SKILL.md"
+  "docs/system/workspace/skills/freely-auto-loop-orchestrator/SKILL.md"
   "docs/system/workspace/skills/doc-pre-brainstorm-execution/SKILL.md"
   "docs/system/workspace/skills/doc-ibm-execution/SKILL.md"
-  "docs/system/workspace/skills/freely-freely-dev-loop-execution/SKILL.md"
+  "docs/system/workspace/skills/freely-dev-loop-execution/SKILL.md"
 )
 
 errors=0

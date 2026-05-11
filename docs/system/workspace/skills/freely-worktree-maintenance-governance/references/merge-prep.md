@@ -70,4 +70,4 @@
 - merge-prep 可以合法检查 sibling worktree 的 dirty / readiness / conflict 面，但这不自动授予当前 actor 跨树 mutate authority；发现 blocker 后必须先回 manager arbitration
 - 当存在“两个分支都碰相近功能”时，默认先保留设计更优、验证更强、边界更清楚的那条；另一条只允许 salvage 差异，不允许把主线拉回旧设计
 - 若只是共享真源叠加语义，先按顺序 merge，不提前进入 `premerge`
-- 若已出现高风险冲突，再切 `skill:freely-freely-premerge-reconcile`
+- 若已出现高风险冲突，再切 `skill:freely-premerge-reconcile`

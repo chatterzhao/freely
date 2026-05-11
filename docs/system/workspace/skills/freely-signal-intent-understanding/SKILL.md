@@ -1,9 +1,9 @@
 ---
-name: freely-freely-signal-intent-understanding
+name: freely-signal-intent-understanding
 description: 在 manager routing 之前，先把 signal 想推进什么、是否需要 live inspection、是否需要 analysis/execution 这些最小意图结构收敛出来。当主管面对 interruption、review、test、runtime anomaly 或 standing-source derived signal 时使用。
 ---
 
-# skill:freely-freely-signal-intent-understanding
+# skill:freely-signal-intent-understanding
 
 ## 目标
 

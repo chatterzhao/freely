@@ -1,9 +1,9 @@
 ---
-name: freely-freely-mem9-continuity-bridge
+name: freely-mem9-continuity-bridge
 description: 评估并约束 mem9 作为 Freely 可选连续性后端的接入边界，确保本地治理事实源始终优先。
 ---
 
-# skill:freely-freely-mem9-continuity-bridge
+# skill:freely-mem9-continuity-bridge
 
 ## 职责
 

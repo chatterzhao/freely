@@ -30,7 +30,7 @@ seconds_until_epoch() {
   fi
 }
 
-source "$ROOT_DIR/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh"
+source "$ROOT_DIR/docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh"
 
 now="$(date +%s)"
 earliest_reset=$((now + 1))

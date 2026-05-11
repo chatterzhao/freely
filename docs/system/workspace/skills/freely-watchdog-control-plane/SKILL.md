@@ -1,9 +1,9 @@
 ---
-name: freely-freely-watchdog-control-plane
+name: freely-watchdog-control-plane
 description: 统一 Freely 的外层监督与恢复控制面，覆盖 availability watchdog、runtime watchdog 与 continuity watchdog 的职责边界，并提供可复用的 watchdog 脚本模块。
 ---
 
-# skill:freely-freely-watchdog-control-plane
+# skill:freely-watchdog-control-plane
 
 ## 何时使用
 
@@ -25,7 +25,7 @@ description: 统一 Freely 的外层监督与恢复控制面，覆盖 availabili
 
 代码真源：
 - `scripts/availability-watchdog.sh`
-- `skill:freely-freely-ai-cli-availability-manager` 作为窄入口说明
+- `skill:freely-ai-cli-availability-manager` 作为窄入口说明
 
 不负责：
 - Freely 的 milestone / issue / worktree 编排
@@ -64,7 +64,7 @@ description: 统一 Freely 的外层监督与恢复控制面，覆盖 availabili
 
 事实来源：
 - `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/**`
-- `skill:freely-freely-continuity-watchdog`
+- `skill:freely-continuity-watchdog`
 
 不负责：
 - account switch
@@ -91,6 +91,6 @@ description: 统一 Freely 的外层监督与恢复控制面，覆盖 availabili
 
 ## 下一跳
 
-- 若需要账号探测/切号实现细节：继续看 `skill:freely-freely-ai-cli-availability-manager`
+- 若需要账号探测/切号实现细节：继续看 `skill:freely-ai-cli-availability-manager`
 - 若需要 Freely runtime 监督策略：继续看 `docs/system/workspace/scripts/runtime/freely`
-- 若需要 continuity 触发边界：继续看 `skill:freely-freely-continuity-watchdog`
+- 若需要 continuity 触发边界：继续看 `skill:freely-continuity-watchdog`

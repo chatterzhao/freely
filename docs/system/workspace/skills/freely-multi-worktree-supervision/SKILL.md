@@ -1,9 +1,9 @@
 ---
-name: freely-freely-multi-worktree-supervision
+name: freely-multi-worktree-supervision
 description: 当需要像项目负责人一样同时监督多个 Freely worktree、安排哪些工位继续开发、哪些先 checkpoint、哪些进入集成批次时使用。
 ---
 
-# skill:freely-freely-multi-worktree-supervision
+# skill:freely-multi-worktree-supervision
 
 ## 何时使用
 

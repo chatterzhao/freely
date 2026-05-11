@@ -1,9 +1,9 @@
 ---
-name: freely-freely-human-interruption-handling
+name: freely-human-interruption-handling
 description: 处理 human interruption intake。接收 manager 已 claim 的插话，结合当前项目上下文做深度解释，产出 resolution artifact、worker handoff 和 canonical absorption 建议。
 ---
 
-# skill:freely-freely-human-interruption-handling
+# skill:freely-human-interruption-handling
 
 ## 职责
 
@@ -64,7 +64,7 @@ description: 处理 human interruption intake。接收 manager 已 claim 的插�
    - 为什么使用该 reaction
    - 推荐的 absorption target
    - 若有下游 worker，给出最小 handoff
-5. 若 absorption 为 discovery，交给 `skill:freely-freely-doc-B1_IBM-execution`。
+5. 若 absorption 为 discovery，交给 `skill:freely-doc-B1_IBM-execution`。
 6. 若 absorption 为 continuation，交给当前 issue / recovery / dev 路径。
 7. 若 absorption 为 control，交给 runtime / manager continuity。
 8. 若 absorption 为 noise，生成 resolution note 并回写原因。

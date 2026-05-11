@@ -1,9 +1,9 @@
 ---
-name: freely-freely-candidate-acceptance-review
+name: freely-candidate-acceptance-review
 description: 对 pre-brainstorm candidate 的 acceptance boundary 做独立评审，重点审 `acceptance_criteria`、`promotion_gate`、`open_questions` 与 `acceptance_reviews`。适用于 candidate 准备 promotion 或影响大边界时。
 ---
 
-# skill:freely-freely-candidate-acceptance-review
+# skill:freely-candidate-acceptance-review
 
 ## 目标
 

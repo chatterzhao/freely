@@ -18,7 +18,7 @@
 
 ## Implemented Slice
 
-1. Materialize `docs/system/workspace/skills/freely-freely-url-content-intake/` as a shareable skill bundle.
+1. Materialize `docs/system/workspace/skills/freely-url-content-intake/` as a shareable skill bundle.
 2. Keep WeChat article fetch and generic HTTP(S) fetch logic inside bundled scripts rather than scattered repo helpers.
 3. Add focused regression coverage for header strategy, structured failures, and readable extraction.
 
@@ -33,7 +33,7 @@
 - closure_evidence:
   - `develop` commits `fb1044f`, `232b273`
   - `docs/epics/workspace-routing-foundation/freely-url-content-intake-skill-and-wechat-fetch-governance/code-reviews/20260401-freely-url-content-intake-skill-verification.md`
-  - `docs/system/workspace/skills/freely-freely-url-content-intake/SKILL.md`
+  - `docs/system/workspace/skills/freely-url-content-intake/SKILL.md`
   - `docs/system/workspace/scripts/tests/test-freely-url-content-intake-skill`
 
 ## Next Action

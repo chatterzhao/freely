@@ -1,9 +1,9 @@
 ---
-name: freely-freely-workspace-skill-governance
+name: freely-workspace-skill-governance
 description: 在 Freely 仓库内治理和修改 `docs/system/workspace/skills/**`。当任务直接新增、拆分、重构或校准 workspace skill、其 references、scripts 或 skill 索引时使用。
 ---
 
-# skill:freely-freely-workspace-skill-governance
+# skill:freely-workspace-skill-governance
 
 ## 职责
 

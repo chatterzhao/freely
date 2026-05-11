@@ -1,9 +1,9 @@
 ---
-name: freely-freely-worktree-maintenance-governance
+name: freely-worktree-maintenance-governance
 description: 当主管需要核清单个 worktree 的真实状态、为多条 worktree 制定安全 merge 顺序、处理存在父子依赖的 stacked merge-chain、做全仓 fleet closure 审计，或处理 companion/obsolete worktree 的 salvage_then_retire 时使用。
 ---
 
-# skill:freely-freely-worktree-maintenance-governance
+# skill:freely-worktree-maintenance-governance
 
 ## 何时使用
 
@@ -23,8 +23,8 @@ description: 当主管需要核清单个 worktree 的真实状态、为多条 wo
 
 ## 工作流
 
-1. 先跑 `skill:freely-freely-constitution-guard` 和 `skill:freely-freely-laws-enforcer`
-2. 若当前承担项目级判断，先结合 `skill:freely-freely-multi-worktree-supervision` 读取工位总览
+1. 先跑 `skill:freely-constitution-guard` 和 `skill:freely-laws-enforcer`
+2. 若当前承担项目级判断，先结合 `skill:freely-multi-worktree-supervision` 读取工位总览
 3. 再根据当前问题选择 `audit / merge_prep / stacked_merge_chain / fleet_closure / retirement_handoff`
 4. 结论必须落成清晰分类或顺序：
    - `merge-ready`
@@ -34,8 +34,8 @@ description: 当主管需要核清单个 worktree 的真实状态、为多条 wo
 5. 对进入 retirement / cleanup 的分支，必须同时给出本地与远程 branch disposition：
    - `deleted`
    - `retained-with-reason`
-5. 若问题只是创建/进入/删除 worktree，回到 `skill:freely-freely-branch-management`
-6. 若问题已经升级为高风险文本冲突收敛，切到 `skill:freely-freely-premerge-reconcile`
+5. 若问题只是创建/进入/删除 worktree，回到 `skill:freely-branch-management`
+6. 若问题已经升级为高风险文本冲突收敛，切到 `skill:freely-premerge-reconcile`
 7. 若是仓库级 fleet closure，必须允许“本轮只闭环其中一部分 worktree”；未闭环工位继续保留可见 disposition，而不是为了追求清空而误删
 
 ## Research worktree policy

@@ -6,7 +6,7 @@ SELF_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
 source "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely"
 # shellcheck disable=SC1091
 source "$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-launchers.sh"
-WATCHDOG_AVAILABILITY_LIB="$SELF_ROOT/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh"
+WATCHDOG_AVAILABILITY_LIB="$SELF_ROOT/docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh"
 
 ai_cli_bin_for_project() {
   local project="$1"

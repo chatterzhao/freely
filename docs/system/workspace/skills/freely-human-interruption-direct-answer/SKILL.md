@@ -1,9 +1,9 @@
 ---
-name: freely-freely-human-interruption-direct-answer
+name: freely-human-interruption-direct-answer
 description: 处理高注意力、低业务价值、无需进入长期主线的人类插话。典型场景是查询后台 AI 进程状态；由 runtime interruption dispatcher 直接 claim 和回答。
 ---
 
-# skill:freely-freely-human-interruption-direct-answer
+# skill:freely-human-interruption-direct-answer
 
 ## 职责
 
@@ -34,4 +34,4 @@ description: 处理高注意力、低业务价值、无需进入长期主线的�
 
 - 这是 runtime interruption control plane 的特例，不是第二个主管。
 - 只允许处理窄范围的 direct-answer control query。
-- 若查询超出 runtime 可直接回答的边界，应留给主主管或 `skill:freely-freely-human-interruption-handling`。
+- 若查询超出 runtime 可直接回答的边界，应留给主主管或 `skill:freely-human-interruption-handling`。

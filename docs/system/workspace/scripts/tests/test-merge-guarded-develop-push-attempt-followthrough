@@ -15,7 +15,7 @@ git config user.name tester
 git config user.email tester@example.com
 git init -q --bare "$REMOTE"
 
-mkdir -p bin docs/system/workspace/scripts/quality docs/system/workspace/scripts/runtime docs/system/workspace/scripts/worktree docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts docs
+mkdir -p bin docs/system/workspace/scripts/quality docs/system/workspace/scripts/runtime docs/system/workspace/scripts/worktree docs/system/workspace/skills/freely-watchdog-control-plane/scripts docs
 cp "$ROOT_DIR/bin/freely" "$REPO/bin/freely"
 cp "$ROOT_DIR/bin/governance-promotion-gate" "$REPO/bin/governance-promotion-gate"
 cp "$ROOT_DIR/docs/system/workspace/scripts/worktree/merge-guarded" "$REPO/bin/merge-guarded"
@@ -23,13 +23,13 @@ cp "$ROOT_DIR/docs/system/workspace/scripts/quality/governance-promotion-gate" "
 cp "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely" "$REPO/docs/system/workspace/scripts/runtime/freely"
 cp "$ROOT_DIR/docs/system/workspace/scripts/runtime/session-evidence-resolver.sh" "$REPO/docs/system/workspace/scripts/runtime/session-evidence-resolver.sh"
 cp "$ROOT_DIR/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" "$REPO/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
-cp "$ROOT_DIR/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh" "$REPO/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh"
+cp "$ROOT_DIR/docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh" "$REPO/docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh"
 chmod +x "$REPO/bin/freely" "$REPO/bin/governance-promotion-gate" "$REPO/bin/merge-guarded" \
   "$REPO/docs/system/workspace/scripts/quality/governance-promotion-gate" \
   "$REPO/docs/system/workspace/scripts/runtime/freely" \
   "$REPO/docs/system/workspace/scripts/runtime/session-evidence-resolver.sh" \
   "$REPO/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" \
-  "$REPO/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh"
+  "$REPO/docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh"
 
 mkdir -p .freely/run
 cat >docs/PROJECT_INTENT.md <<'EOF'

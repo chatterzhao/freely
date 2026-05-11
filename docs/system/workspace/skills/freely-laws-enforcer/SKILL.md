@@ -1,9 +1,9 @@
 ---
-name: freely-freely-laws-enforcer
+name: freely-laws-enforcer
 description: 执行和验证法律级别的工作流和验收标准。当 AI 需要将宪法约束转换为 doc-loop、dev-loop、auto-loop 输出和完成证据的操作检查时使用。
 ---
 
-# skill:freely-freely-laws-enforcer
+# skill:freely-laws-enforcer
 
 ## 工作流
 1. 识别当前任务适用的法律章节。

@@ -57,7 +57,7 @@ prompt_no_issue="$(
 printf '%s\n' "$prompt_with_issue" | grep -q "$with_issue_chat"
 printf '%s\n' "$prompt_with_issue" | grep -q 'workspace/skills/doc-ibm-execution/SKILL.md'
 printf '%s\n' "$prompt_with_issue" | grep -q 'issue-bound 文档收敛'
-printf '%s\n' "$prompt_with_issue" | grep -q 'workspace/skills/freely-freely-dev-loop-execution/SKILL.md'
+printf '%s\n' "$prompt_with_issue" | grep -q 'workspace/skills/freely-dev-loop-execution/SKILL.md'
 test ! -s "$TMP_DIR/with-issue.stderr"
 
 printf '%s\n' "$prompt_no_issue" | grep -q "$no_issue_chat"

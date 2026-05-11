@@ -262,8 +262,8 @@ import pathlib
 import sys
 
 payload = json.loads(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"))
-assert payload["recommended_skill"] == "freely-freely-auto-loop-orchestrator"
-assert payload["routing_skill"] == "freely-freely-context-source-skill"
+assert payload["recommended_skill"] == "freely-auto-loop-orchestrator"
+assert payload["routing_skill"] == "freely-context-source-skill"
 
 sources = payload["sources"]
 

@@ -1,9 +1,9 @@
 ---
-name: freely-freely-constitution-guard
+name: freely-constitution-guard
 description: 在自主执行前后强制执行宪法硬性约束。当 AI 规划或完成开发、合并、发布或恢复操作时使用，必须保证分支/worktree、架构和治理边界保持合规。
 ---
 
-# skill:freely-freely-constitution-guard
+# skill:freely-constitution-guard
 
 ## 工作流
 1. 在执行前运行宪法预检。

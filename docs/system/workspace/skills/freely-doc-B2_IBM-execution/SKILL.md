@@ -1,9 +1,9 @@
 ---
-name: freely-freely-doc-B2_IBM-execution
+name: freely-doc-B2_IBM-execution
 description: B2_IBM：I→B→M 第二阶段。从 milestone committed_issues 取 I-{key}，经 Brainstorm 实现设计，产出 Map（prd/pre-tests/tasks/code-review）交付 dev-loop。
 ---
 
-# skill:freely-freely-doc-B2_IBM-execution
+# skill:freely-doc-B2_IBM-execution
 
 ## I→B→M 骨架
 
@@ -37,7 +37,7 @@ B2_IBM 不创建 I-{key}。milestone 已经准备好了。
 |------|------|
 | `issues/{name}.md` | I-* issue 文档，完整格式见下方示例 |
 | `prd.md` | Goal → Dev-Loop Handoff |
-| `pre-tests.md` | 结构见 `skill:freely-freely-dev-loop-execution` 情景 D |
+| `pre-tests.md` | 结构见 `skill:freely-dev-loop-execution` 情景 D |
 | `tasks.md` | 任务分解，关联 owner issue |
 | `code-reviews/` | Implementation Decision Note（decision/why_this/alternatives_considered/boundary_non_goals/residual_risk） |
 
@@ -85,7 +85,7 @@ verification_artifact_dir: docs/epics/skill-gate-alignment/code-reviews
 - [ ] tasks.md 存在且任务已分解
 - [ ] code-reviews/ 含 Implementation Decision Note
 - [ ] milestones.md committed_issues 条目已更新
-- [ ] 下一跳明确：进入 `skill:freely-freely-dev-loop-execution`
+- [ ] 下一跳明确：进入 `skill:freely-dev-loop-execution`
 
 phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
 

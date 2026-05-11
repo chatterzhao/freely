@@ -1,9 +1,9 @@
 ---
-name: freely-freely-recovery-subagent-governance
+name: freely-recovery-subagent-governance
 description: 强制恢复耦合和子代理治理约束。当 AI 委托任务、恢复中断工作、或需要保持分支/worktree 上下文和所有权边界时使用。
 ---
 
-# skill:freely-freely-recovery-subagent-governance
+# skill:freely-recovery-subagent-governance
 
 ## 工作流
 1. 记录活跃分支/worktree/会话上下文。
@@ -24,7 +24,7 @@ description: 强制恢复耦合和子代理治理约束。当 AI 委托任务、
    - 技术上可 resume，但已出现 `context compacted`、缺少最小 resume evidence、连续 resume 退化或命中本地轮换阈值：允许走 `fresh_with_handoff`
    - 已不能 resume：按桥接恢复重启
 8. `fresh_with_handoff` 的最小交接面应尽量包含上一轮 `tool_session_id`、cycle log 路径、branch/worktree、触发 fresh 的原因，以及最近一段输出摘录。
-9. 涉及 `context warn`、`context rotate`、`fresh_with_handoff` 的 continuity 边界时，交由 `skill:freely-freely-continuity-watchdog` 作为优先事实源。
+9. 涉及 `context warn`、`context rotate`、`fresh_with_handoff` 的 continuity 边界时，交由 `skill:freely-continuity-watchdog` 作为优先事实源。
 10. 需要恢复路径示例时读取 [recovery-examples.md](references/recovery-examples.md)。
 11. 如上下文所有权模糊则阻止继续。
 

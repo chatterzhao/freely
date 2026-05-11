@@ -1,9 +1,9 @@
 ---
-name: freely-freely-config-backup-guard
+name: freely-config-backup-guard
 description: 强制配置修改前的必要备份。当 AI 修改任何配置文件时使用，在编辑前创建可追溯的备份和恢复路径。
 ---
 
-# skill:freely-freely-config-backup-guard
+# skill:freely-config-backup-guard
 
 ## 工作流
 

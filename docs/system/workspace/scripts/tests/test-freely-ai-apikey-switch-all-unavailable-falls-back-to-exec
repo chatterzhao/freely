@@ -12,7 +12,7 @@ MOCK_BIN="$TMP_DIR/mock-bin"
 CODEX_LOG="$TMP_DIR/codex.log"
 mkdir -p \
   "$PROJECT/.freely/run" \
-  "$PROJECT/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts" \
+  "$PROJECT/docs/system/workspace/skills/freely-watchdog-control-plane/scripts" \
   "$PROJECT/docs/system/workspace/scripts/runtime" \
   "$HOME_DIR/.ai-auth/codex-account-limited@example-com-1" \
   "$HOME_DIR/.ai-auth/codex-apikey-custom-1" \
@@ -21,8 +21,8 @@ mkdir -p \
   "$MOCK_BIN"
 
 ln -sf \
-  "$ROOT_DIR/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh" \
-  "$PROJECT/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh"
+  "$ROOT_DIR/docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh" \
+  "$PROJECT/docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh"
 ln -sf \
   "$ROOT_DIR/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" \
   "$PROJECT/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"

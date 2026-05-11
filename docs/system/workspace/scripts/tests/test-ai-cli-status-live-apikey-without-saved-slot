@@ -12,14 +12,14 @@ CODEX_LOG="$TMP_DIR/codex.log"
 
 mkdir -p \
   "$PROJECT/.freely/run" \
-  "$PROJECT/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts" \
+  "$PROJECT/docs/system/workspace/skills/freely-watchdog-control-plane/scripts" \
   "$PROJECT/docs/system/workspace/scripts/runtime" \
   "$HOME_DIR/.codex" \
   "$MOCK_BIN"
 
 ln -sf \
-  "$ROOT_DIR/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh" \
-  "$PROJECT/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh"
+  "$ROOT_DIR/docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh" \
+  "$PROJECT/docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh"
 ln -sf \
   "$ROOT_DIR/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" \
   "$PROJECT/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"

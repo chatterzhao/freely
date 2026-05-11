@@ -10,7 +10,7 @@ HOME="$TMP_DIR/home"
 mkdir -p "$PROJECT/.freely/run" "$HOME/.ai-auth/codex-slot-a" "$HOME/.ai-auth/codex-slot-b" "$HOME/.ai-auth/codex-slot-c"
 
 # shellcheck disable=SC1090
-HOME="$HOME" source "$ROOT_DIR/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh"
+HOME="$HOME" source "$ROOT_DIR/docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh"
 
 codex_slot_is_available_now() {
   local slot="${2:-}"

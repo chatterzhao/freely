@@ -1334,10 +1334,10 @@ ai_cli_bin_for_project() {
 source_watchdog_script_or_fail() {
   local project="$1"
   local watchdog_script=""
-  if [[ -f "$project/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh" ]]; then
-    watchdog_script="$project/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh"
-  elif [[ -f "$(dirname "$0")/../docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh" ]]; then
-    watchdog_script="$(dirname "$0")/../docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh"
+  if [[ -f "$project/docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh" ]]; then
+    watchdog_script="$project/docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh"
+  elif [[ -f "$(dirname "$0")/../docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh" ]]; then
+    watchdog_script="$(dirname "$0")/../docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh"
   fi
 
   if [[ -z "$watchdog_script" ]]; then

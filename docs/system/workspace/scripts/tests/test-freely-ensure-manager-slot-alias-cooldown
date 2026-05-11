@@ -285,7 +285,7 @@ seconds_until_epoch() {
   fi
 }
 
-source "$ROOT_DIR/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh"
+source "$ROOT_DIR/docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh"
 
 current_identity="$(codex_current_cooldown_identity "$PROJECT")"
 [[ "$current_identity" == "same@example-com-1" ]]

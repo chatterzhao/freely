@@ -1,9 +1,9 @@
 ---
-name: freely-freely-feat-execution
+name: freely-feat-execution
 description: 新功能/大型改动的完整开发流程——B1_IBM预研→B2_IBM→dev实现→门禁合并，与 freely-fix-execution 同级抽象。
 ---
 
-# skill:freely-freely-feat-execution
+# skill:freely-feat-execution
 
 ## 定位
 
@@ -21,9 +21,9 @@ description: 新功能/大型改动的完整开发流程——B1_IBM预研→B2_
 
 freely-feat-execution 在不同阶段调用下层 skill：
 
-1. `skill:freely-freely-doc-B1_IBM-execution` — B1_IBM：raw issue → brainstorms.md → candidates.md
-2. `skill:freely-freely-doc-B2_IBM-execution` — B2_IBM：candidate → materialize I-* issue → milestone → ready for dev
-3. `skill:freely-freely-dev-loop-execution` — dev-loop：实现 + pre-tests + code-review + progress 回写
+1. `skill:freely-doc-B1_IBM-execution` — B1_IBM：raw issue → brainstorms.md → candidates.md
+2. `skill:freely-doc-B2_IBM-execution` — B2_IBM：candidate → materialize I-* issue → milestone → ready for dev
+3. `skill:freely-dev-loop-execution` — dev-loop：实现 + pre-tests + code-review + progress 回写
 
 ## 核心原则
 
@@ -39,14 +39,14 @@ freely-feat-execution 在不同阶段调用下层 skill：
 ```
 1. 创建工位:
    ./bin/wt-create --raw-key <key> --source <source> \
-     --skill docs/system/workspace/skills/freely-freely-feat-execution/SKILL.md \
+     --skill docs/system/workspace/skills/freely-feat-execution/SKILL.md \
      --slug <slug>
 
    自动创建:
    ├─ fix/raw-{raw-key}-{slug}         (基于 develop，永久开发工位)
    └─ test-pre-merge-{raw-key}-{slug}  (基于 feature，临时测试工位)
 
-2. skill:freely-freely-doc-B1_IBM-execution
+2. skill:freely-doc-B1_IBM-execution
    → 写 docs/pre-brainstorms/{key}--{slug}/brainstorms.md
    → 写 candidates.md，每个 candidate 标注 promote/absorb/drop
    → 更新 INDEX.md
@@ -56,7 +56,7 @@ freely-feat-execution 在不同阶段调用下层 skill：
 
 ### 阶段 2：B2_IBM
 ```
-1. skill:freely-freely-doc-B2_IBM-execution
+1. skill:freely-doc-B2_IBM-execution
    → materialize I-* issue
    → 写 docs/epics/{epic}/issues/I-{key}.md
    → 写 prd.md / tasks.md / pre-tests.md
@@ -67,7 +67,7 @@ freely-feat-execution 在不同阶段调用下层 skill：
 
 ### 阶段 3：Dev 实现
 ```
-1. skill:freely-freely-dev-loop-execution
+1. skill:freely-dev-loop-execution
    → 在 feature worktree 实现
    → 写 pre-tests 并运行
    → 写 code-review（含 Implementation Decision Note）

@@ -1,9 +1,9 @@
 ---
-name: freely-freely-dev-loop-execution
+name: freely-dev-loop-execution
 description: 执行 milestone-owned ready issue 的 AI-native 实现、测试与进度回写。
 ---
 
-# skill:freely-freely-dev-loop-execution
+# skill:freely-dev-loop-execution
 
 ## 职责
 

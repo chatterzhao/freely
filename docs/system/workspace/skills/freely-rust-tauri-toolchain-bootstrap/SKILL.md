@@ -1,9 +1,9 @@
 ---
-name: freely-freely-rust-tauri-toolchain-bootstrap
+name: freely-rust-tauri-toolchain-bootstrap
 description: 当 Rust 或 Tauri 项目缺少 cargo/rustc/rustup，或默认 rustup 下载不稳定时，基于 Rust/Cargo/Tauri 官方机制和 rsproxy 镜像完成可复用的 toolchain bootstrap。
 ---
 
-# skill:freely-freely-rust-tauri-toolchain-bootstrap
+# skill:freely-rust-tauri-toolchain-bootstrap
 
 ## 何时使用
 

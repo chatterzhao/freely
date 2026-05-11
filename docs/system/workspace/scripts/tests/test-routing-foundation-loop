@@ -10,11 +10,11 @@ required_files=(
   "docs/system/workspace/tools.md"
   "docs/system/workspace/scripts/README.md"
   "docs/system/workspace/scripts/start-lead-agent.sh"
-  "docs/system/workspace/skills/freely-freely-context-source-skill/SKILL.md"
+  "docs/system/workspace/skills/freely-context-source-skill/SKILL.md"
   "docs/system/workspace/skills/doc-pre-brainstorm-execution/SKILL.md"
   "docs/system/workspace/skills/doc-ibm-execution/SKILL.md"
-  "docs/system/workspace/skills/freely-freely-dev-loop-execution/SKILL.md"
-  "docs/system/workspace/skills/freely-freely-worktree-maintenance-governance/SKILL.md"
+  "docs/system/workspace/skills/freely-dev-loop-execution/SKILL.md"
+  "docs/system/workspace/skills/freely-worktree-maintenance-governance/SKILL.md"
 )
 
 for file in "${required_files[@]}"; do
@@ -34,7 +34,7 @@ prompt="$(
 current_branch="$(git -C "$ROOT_DIR" branch --show-current 2>/dev/null || printf 'unknown')"
 
 printf '%s\n' "$prompt" | grep -q 'lead-agent'
-printf '%s\n' "$prompt" | grep -q 'freely-freely-context-source-skill'
+printf '%s\n' "$prompt" | grep -q 'freely-context-source-skill'
 printf '%s\n' "$prompt" | grep -q '项目治理入口：'
 printf '%s\n' "$prompt" | grep -q "$ROOT_DIR/AGENTS.md"
 printf '%s\n' "$prompt" | grep -q '先遵守 `PROJECT_ROOT/AGENTS.md`'
@@ -43,7 +43,7 @@ printf '%s\n' "$prompt" | grep -q 'workspace/agents/lead-agent.md'
 printf '%s\n' "$prompt" | grep -q 'workspace/tools.md'
 printf '%s\n' "$prompt" | grep -q 'workspace/skills/doc-pre-brainstorm-execution/SKILL.md'
 printf '%s\n' "$prompt" | grep -q 'workspace/skills/doc-ibm-execution/SKILL.md'
-printf '%s\n' "$prompt" | grep -q 'workspace/skills/freely-freely-worktree-maintenance-governance/SKILL.md'
+printf '%s\n' "$prompt" | grep -q 'workspace/skills/freely-worktree-maintenance-governance/SKILL.md'
 printf '%s\n' "$prompt" | grep -q '工作区治理提醒'
 printf '%s\n' "$prompt" | grep -q 'current_worktree_state:'
 printf '%s\n' "$prompt" | grep -q 'current_project_dirty_entries:'

@@ -111,7 +111,7 @@ Freely 开发 Freely 时，默认先问四件事：
 
 ## Bug 修复：fix skill 快速通道
 
-当发现运行时 bug，使用 `skill:freely-freely-fix-execution` 快速修复。先判场景：
+当发现运行时 bug，使用 `skill:freely-fix-execution` 快速修复。先判场景：
 
 - **原 feature worktree 还在** → 直接在 feature 上改、提交。走 feature → test-pre-merge-* → develop。
 - **原 feature 已退役（已合并/已删）** → 建 `test-pre-merge-<desc>-<YYYYMMDD>` 私有工位快测（不改不提交不推送，不违背保护约束）。验证通过后 cp 修改到新建的 `feature/*` 或 `hotfix/*` 可写工位，增量提交。
@@ -119,13 +119,13 @@ Freely 开发 Freely 时，默认先问四件事：
 - **补齐治理**：raw issue → candidate → canonical issue → progress → code-review（`## Implementation Decision Note`）→ milestones.md。
 - **原则**：Fix first, govern later。test-pre-merge-* 私有测试不违背保护约束。fix 工位早期创建、增量提交。
 
-详见 `skill:freely-freely-fix-execution`
+详见 `skill:freely-fix-execution`
 
 ## Skill 管理
 
 - 本项目 skill 定义在 `docs/system/workspace/skills/`，已通过 `./bin/deploy-skills` 部署到 `~/.claude/skills/` 供 Claude Code Skill 工具调用。
 - **修改任何 skill 后，必须立即执行 `./bin/deploy-skills`**，否则改动不会对当前及后续会话生效。
-- 项目文件中引用 skill 时只用 skill 名（如 `skill:freely-freely-feat-execution`），不写路径；skill 文件内部互相引用除外。
+- 项目文件中引用 skill 时只用 skill 名（如 `skill:freely-feat-execution`），不写路径；skill 文件内部互相引用除外。
 - skill 内部跨 skill 引用使用相对路径（如 `../other-skill/SKILL.md`），不使用项目绝对路径。
 
 ## 吃自己的狗粮规则（Freely 构建 Freely）

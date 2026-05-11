@@ -116,7 +116,7 @@ PROMPT_RESUME="$(build_test_prompt "resume" "0" "$CONTINUITY_OLD")"
 [[ "$PROMPT_RESUME" == *'route_kind: `completion_verification`'* ]]
 [[ "$PROMPT_RESUME" == *'restart_point: `runtime followthrough is the only remaining open thread`'* ]]
 [[ "$PROMPT_RESUME" == *'next_action: `stay on runtime followthrough instead of restarting milestone patrol`'* ]]
-[[ "$PROMPT_RESUME" == *'workspace/skills/freely-freely-worktree-maintenance-governance/SKILL.md'* ]]
+[[ "$PROMPT_RESUME" == *'workspace/skills/freely-worktree-maintenance-governance/SKILL.md'* ]]
 
 PROMPT_PENDING="$(build_test_prompt "resume" "1" "$CONTINUITY_OLD")"
 if [[ "$PROMPT_PENDING" == *'已消费 manager continuity 续接：'* ]]; then
@@ -163,6 +163,6 @@ EOF
 PROMPT_HANDOFF="$(build_test_prompt "fresh_with_handoff" "0" "$CONTINUITY_OLD")"
 [[ "$PROMPT_HANDOFF" == *'manager continuity handoff 续接：'* ]]
 [[ "$PROMPT_HANDOFF" == *"$CONTINUITY_NEW"* ]]
-[[ "$PROMPT_HANDOFF" == *'workspace/skills/freely-freely-worktree-maintenance-governance/SKILL.md'* ]]
+[[ "$PROMPT_HANDOFF" == *'workspace/skills/freely-worktree-maintenance-governance/SKILL.md'* ]]
 
 echo "[PASS] manager resume prompt stays anchored to current manager continuity across resume and handoff paths"

@@ -26,7 +26,7 @@ EOF
 
 HOME="$HOME_DIR" AI_LOG="$AI_LOG" bash -lc '
   set -euo pipefail
-  source "'"$ROOT_DIR"'/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh"
+  source "'"$ROOT_DIR"'/docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh"
   ai_cli_bin_for_project() { printf "%s\n" "'"$PROJECT_DIR"'/bin/ai"; }
   wait_for_codex_slot_switch_idle() { return 0; }
   log_warn() { return 0; }

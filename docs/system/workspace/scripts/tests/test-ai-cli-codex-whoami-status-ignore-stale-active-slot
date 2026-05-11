@@ -13,12 +13,12 @@ mkdir -p \
   "$HOME_DIR/.ai-auth/codex-stale-account-slot" \
   "$HOME_DIR/.ai-auth/codex-stale-apikey-slot" \
   "$PROJECT/.freely/run" \
-  "$PROJECT/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts" \
+  "$PROJECT/docs/system/workspace/skills/freely-watchdog-control-plane/scripts" \
   "$PROJECT/docs/system/workspace/scripts/runtime"
 
 ln -sf \
-  "$ROOT_DIR/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh" \
-  "$PROJECT/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh"
+  "$ROOT_DIR/docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh" \
+  "$PROJECT/docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh"
 ln -sf \
   "$ROOT_DIR/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" \
   "$PROJECT/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"

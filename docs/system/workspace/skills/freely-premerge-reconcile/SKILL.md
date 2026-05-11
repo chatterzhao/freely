@@ -1,9 +1,9 @@
 ---
-name: freely-freely-premerge-reconcile
+name: freely-premerge-reconcile
 description: 在不回退治理的情况下协调高风险合并冲突。当临时验证批次 merge 到 `test-pre-merge-*` 失败或语义回归风险出现时使用；从活跃测试批次创建临时 premerge 分支，按语义意图解决，合并回该测试批次，并清理。
 ---
 
-# skill:freely-freely-premerge-reconcile
+# skill:freely-premerge-reconcile
 
 ## 触发条件
 - 正常合并到某个 `test-pre-merge-*` 批次因高冲突文件失败。
@@ -28,7 +28,7 @@ description: 在不回退治理的情况下协调高风险合并冲突。当临�
 4. 仅合并回原测试批次：
    - `git checkout <active-test-pre-merge-branch>`
    - `git merge --no-ff feature/premerge-...`
-5. 通过 `skill:freely-freely-branch-management` 检查清单运行语义回归检查。
+5. 通过 `skill:freely-branch-management` 检查清单运行语义回归检查。
 6. 清理：
    - 删除 premerge 分支和 worktree
    - 在进度/恢复笔记中记录结果。

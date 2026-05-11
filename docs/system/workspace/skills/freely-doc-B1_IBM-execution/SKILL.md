@@ -1,9 +1,9 @@
 ---
-name: freely-freely-doc-B1_IBM-execution
+name: freely-doc-B1_IBM-execution
 description: B1_IBM：I→B→M 第一阶段。消费 wt-create 准备的 raw issue，经 Brainstorm 发散收敛产出 candidate，进入 Milestone 候选队列。
 ---
 
-# skill:freely-freely-doc-B1_IBM-execution
+# skill:freely-doc-B1_IBM-execution
 
 ## I→B→M 骨架
 

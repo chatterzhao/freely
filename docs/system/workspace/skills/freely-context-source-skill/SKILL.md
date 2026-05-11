@@ -1,9 +1,9 @@
 ---
-name: freely-freely-context-source-skill
+name: freely-context-source-skill
 description: 对当前输入做来源分层、可执行性判定、workspace 准备判断与下一跳组装，为 lead-agent 产出自治编排结果。
 ---
 
-# skill:freely-freely-context-source-skill
+# skill:freely-context-source-skill
 
 ## 职责
 

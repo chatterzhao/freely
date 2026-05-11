@@ -12,14 +12,14 @@ CODEX_LOG="$TMP_DIR/codex.log"
 mkdir -p \
   "$PROJECT/.freely/run" \
   "$PROJECT/bin" \
-  "$PROJECT/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts" \
+  "$PROJECT/docs/system/workspace/skills/freely-watchdog-control-plane/scripts" \
   "$PROJECT/docs/system/workspace/scripts/runtime" \
   "$HOME_DIR/.codex" \
   "$MOCK_BIN"
 
 ln -sf \
-  "$ROOT_DIR/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh" \
-  "$PROJECT/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh"
+  "$ROOT_DIR/docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh" \
+  "$PROJECT/docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh"
 ln -sf \
   "$ROOT_DIR/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" \
   "$PROJECT/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
@@ -72,7 +72,7 @@ bash -lc '
   log_error() { :; }
   ai_cli_bin_for_project() { printf "%s\n" "'"$PROJECT"'/bin/ai"; }
   write_manager_bootstrap_handoff() { :; }
-  source "'"$PROJECT"'/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh"
+  source "'"$PROJECT"'/docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh"
   probe_all_codex_slots_and_update_cooldown() { printf "none\n"; }
   ensure_codex_slot_ready_for_manager "'"$PROJECT"'"
 '

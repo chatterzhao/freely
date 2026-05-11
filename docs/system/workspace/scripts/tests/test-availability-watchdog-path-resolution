@@ -6,17 +6,17 @@ TMP_DIR="$(mktemp -d /tmp/freely-watchdog-root.XXXXXX)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
 REPO="$TMP_DIR/repo"
-mkdir -p "$REPO/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts" "$REPO/docs/system/workspace/scripts/runtime"
-cp "$ROOT_DIR/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh" \
-  "$REPO/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh"
+mkdir -p "$REPO/docs/system/workspace/skills/freely-watchdog-control-plane/scripts" "$REPO/docs/system/workspace/scripts/runtime"
+cp "$ROOT_DIR/docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh" \
+  "$REPO/docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh"
 cp "$ROOT_DIR/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" \
   "$REPO/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
-chmod +x "$REPO/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh"
+chmod +x "$REPO/docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh"
 
 (
   cd "$REPO"
   bash -lc '
-    source docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh
+    source docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh
     test "$SELF_ROOT" = "'"$REPO"'"
     test "$NETWORK_PROXY_RESOLVER_LIB" = "'"$REPO"'/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
     test -f "$NETWORK_PROXY_RESOLVER_LIB"
@@ -27,7 +27,7 @@ mkdir -p "$REPO/.git"
 (
   cd "$REPO/.git"
   bash -lc '
-    source ../docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh
+    source ../docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh
     test "$SELF_ROOT" = "'"$REPO"'"
     test "$NETWORK_PROXY_RESOLVER_LIB" = "'"$REPO"'/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
     test -f "$NETWORK_PROXY_RESOLVER_LIB"

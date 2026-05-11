@@ -21,7 +21,7 @@ bash -lc '
   log_info() { :; }
   log_warn() { :; }
   log_error() { :; }
-  source "'"$ROOT_DIR"'/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh"
+  source "'"$ROOT_DIR"'/docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh"
   codex_current_slot() { echo ""; }
   codex_current_slot_kind() { echo ""; }
   codex_current_identity_hint() { echo ""; }

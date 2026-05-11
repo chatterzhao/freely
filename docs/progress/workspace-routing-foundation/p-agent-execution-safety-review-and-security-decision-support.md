@@ -23,7 +23,7 @@
 3. `baseline-status` and `live-status` expose `execution_boundary_audit_status` and `execution_boundary_audit_detail`.
 4. `live-status` exposes advisory security review policy / scope truth.
 5. `freely security-review-brief` emits machine-readable reviewer / committee guidance from execution-boundary truth.
-6. `skill:freely-freely-agent-execution-safety-review` freezes the `none -> single-reviewer -> decision-committee` ladder and evidence writeback fields for future reviewer-backed continuation.
+6. `skill:freely-agent-execution-safety-review` freezes the `none -> single-reviewer -> decision-committee` ladder and evidence writeback fields for future reviewer-backed continuation.
 
 ## Verification Evidence
 

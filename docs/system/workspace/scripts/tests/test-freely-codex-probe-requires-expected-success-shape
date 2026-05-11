@@ -5,7 +5,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
 TMP_DIR="$(mktemp -d /tmp/freely-codex-probe-success-shape.XXXXXX)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
-source "$ROOT_DIR/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh"
+source "$ROOT_DIR/docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh"
 
 good_output=$'OpenAI Codex v0.120.0 (research preview)\n--------\nuser\nhi\ncodex\nhello there\ntokens used\n14,136\n'
 no_response_output=$'OpenAI Codex v0.120.0 (research preview)\n--------\nuser\nhi\ntokens used\n14,136\n'

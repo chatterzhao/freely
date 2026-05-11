@@ -1,11 +1,11 @@
 ---
-name: freely-freely-ai-cli-availability-manager
+name: freely-ai-cli-availability-manager
 description: Watchdog 控制面中的 availability 子模块，负责 AI CLI 工具的账号可用性、切号、限流检测与恢复探测。
 ---
 
-# skill:freely-freely-ai-cli-availability-manager
+# skill:freely-ai-cli-availability-manager
 
-> 这是 `skill:freely-freely-watchdog-control-plane` 的 availability watchdog 子模块。
+> 这是 `skill:freely-watchdog-control-plane` 的 availability watchdog 子模块。
 
 ## 触发条件
 
@@ -20,7 +20,7 @@ description: Watchdog 控制面中的 availability 子模块，负责 AI CLI 工
 ```
 freely-auto-loop-orchestrator 准备启动 AI CLI
     ↓
-调用 skill:freely-freely-ai-cli-availability-manager
+调用 skill:freely-ai-cli-availability-manager
     ↓
 读取当前活跃 account 配置
     ↓

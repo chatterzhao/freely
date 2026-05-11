@@ -106,7 +106,7 @@ PROMPT_OUTPUT="$(
 printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'Human chat intake queue:'
 printf '%s\n' "$PROMPT_OUTPUT" | grep -q "$INTAKE_ID"
 printf '%s\n' "$PROMPT_OUTPUT" | grep -q '现在需要检查前端技术栈'
-printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'skill:freely-freely-human-interruption-handling'
+printf '%s\n' "$PROMPT_OUTPUT" | grep -q 'skill:freely-human-interruption-handling'
 
 CLAIM_OUTPUT="$(bash "$ROOT_DIR/bin/freely" intake claim --project "$PROJECT" --intake-id "$INTAKE_ID" --claimed-by manager --reaction followup --classification discovery --linked-artifact 'pending://brainstorm-handoff')"
 printf '%s\n' "$CLAIM_OUTPUT" | grep -q 'status: classified'

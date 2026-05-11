@@ -12,7 +12,7 @@
 
 ## Summary
 
-- 2026-03-26 canonical closeout verification rechecked `bash docs/system/workspace/scripts/tests/test-freely-session-rotation`, `./bin/governance-check`, `docs/system/workspace/tools.md`, `docs/system/workspace/skills/freely-freely-continuity-watchdog/SKILL.md`, `docs/system/workspace/skills/freely-freely-watchdog-control-plane/SKILL.md`, `docs/system/workspace/skills/freely-freely-recovery-subagent-governance/SKILL.md`, and the issue trigger matrix. The closeout judgement is now frozen as `completed`: the warn/rotate/runtime-handoff boundary is canonical, manager-vs-worker continuity targets are explicit, and prior session evidence paths are fallback-only by default.
+- 2026-03-26 canonical closeout verification rechecked `bash docs/system/workspace/scripts/tests/test-freely-session-rotation`, `./bin/governance-check`, `docs/system/workspace/tools.md`, `docs/system/workspace/skills/freely-continuity-watchdog/SKILL.md`, `docs/system/workspace/skills/freely-watchdog-control-plane/SKILL.md`, `docs/system/workspace/skills/freely-recovery-subagent-governance/SKILL.md`, and the issue trigger matrix. The closeout judgement is now frozen as `completed`: the warn/rotate/runtime-handoff boundary is canonical, manager-vs-worker continuity targets are explicit, and prior session evidence paths are fallback-only by default.
 - This writeback closes the governance/control-plane contract itself. Future adoption of official Codex compaction primitives or new continuity formats should materialize as new lifecycle work, not reopen this issue.
 
 ## Verification
@@ -21,6 +21,6 @@
 - `./bin/governance-check`
 - `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/references/trigger-owner-matrix.md`
 - `docs/system/workspace/tools.md`
-- `docs/system/workspace/skills/freely-freely-continuity-watchdog/SKILL.md`
-- `docs/system/workspace/skills/freely-freely-watchdog-control-plane/SKILL.md`
-- `docs/system/workspace/skills/freely-freely-recovery-subagent-governance/SKILL.md`
+- `docs/system/workspace/skills/freely-continuity-watchdog/SKILL.md`
+- `docs/system/workspace/skills/freely-watchdog-control-plane/SKILL.md`
+- `docs/system/workspace/skills/freely-recovery-subagent-governance/SKILL.md`

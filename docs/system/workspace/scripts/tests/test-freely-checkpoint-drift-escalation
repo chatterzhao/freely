@@ -106,6 +106,6 @@ done
 
 grep -q 'Worktree hygiene intervention:' "$prompt_file"
 grep -q 'checkpoint_drift_streak: 1' "$prompt_file"
-grep -q 'skill:freely-freely-worktree-hygiene-supervision' "$prompt_file"
+grep -q 'skill:freely-worktree-hygiene-supervision' "$prompt_file"
 
 echo "[PASS] freely escalates repeated checkpoint drift into hygiene intervention"

@@ -11,7 +11,7 @@ mkdir -p \
   "$REPO/docs/system/workspace/hooks" \
   "$REPO/docs/system/workspace/scripts/quality" \
   "$REPO/docs/system/workspace/scripts/runtime" \
-  "$REPO/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts"
+  "$REPO/docs/system/workspace/skills/freely-watchdog-control-plane/scripts"
 cd "$REPO"
 
 git init -q -b develop
@@ -28,7 +28,7 @@ cp "$ROOT_DIR/docs/system/workspace/scripts/quality/governance-promotion-gate" "
 cp "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely" "$REPO/docs/system/workspace/scripts/runtime/freely"
 cp "$ROOT_DIR/docs/system/workspace/scripts/runtime/session-evidence-resolver.sh" "$REPO/docs/system/workspace/scripts/runtime/session-evidence-resolver.sh"
 cp "$ROOT_DIR/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" "$REPO/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"
-cp "$ROOT_DIR/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh" "$REPO/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh"
+cp "$ROOT_DIR/docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh" "$REPO/docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh"
 cp "$ROOT_DIR/docs/system/workspace/scripts/worktree/worktree-common.sh" "$REPO/bin/worktree-common.sh"
 
 chmod +x \
@@ -40,7 +40,7 @@ chmod +x \
   "$REPO/docs/system/workspace/scripts/runtime/freely" \
   "$REPO/docs/system/workspace/scripts/runtime/session-evidence-resolver.sh" \
   "$REPO/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" \
-  "$REPO/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh"
+  "$REPO/docs/system/workspace/skills/freely-watchdog-control-plane/scripts/availability-watchdog.sh"
 
 echo base > README.md
 git add .

@@ -1,19 +1,19 @@
 ---
-name: freely-freely-branch-management
+name: freely-branch-management
 description: 管理 Freely 风格开发的完整自主分支生命周期，支持默认 feature worktree 与依赖未合并父分支的派生 worktree。
 ---
 
-# skill:freely-freely-branch-management
+# skill:freely-branch-management
 
 ## 工作流
 
-1. 先跑固定门禁：`skill:freely-freely-constitution-guard` -> `skill:freely-freely-laws-enforcer`。
+1. 先跑固定门禁：`skill:freely-constitution-guard` -> `skill:freely-laws-enforcer`。
 2. 按场景选择唯一 reference：
    - 功能开发 / 派生 worktree：读 [feature-worktree-flow.md](references/feature-worktree-flow.md)
    - 临时验证批次与 promote：读 [pre-test-merge-flow.md](references/pre-test-merge-flow.md)，其中 `test-pre-merge-*` 表示临时测试批次前缀族
    - 发布 / 热修 / 标签：读 [release-hotfix-flow.md](references/release-hotfix-flow.md) 和 [release-tag-policy.md](references/release-tag-policy.md)
    - 清理：读 [cleanup-lifecycle.md](references/cleanup-lifecycle.md)
-3. 若冲突复杂或回滚风险出现，停止并切换到 `skill:freely-freely-premerge-reconcile`。
+3. 若冲突复杂或回滚风险出现，停止并切换到 `skill:freely-premerge-reconcile`。
 
 ## 硬性规则
 - 绝不绕过要求的 `TEST`、评审和进度/恢复证据将功能分支直接推送或违规合并到 `develop`。

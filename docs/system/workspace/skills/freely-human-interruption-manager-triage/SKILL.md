@@ -1,9 +1,9 @@
 ---
-name: freely-freely-human-interruption-manager-triage
+name: freely-human-interruption-manager-triage
 description: 主管型插话处理 agent 的最小 routing 技能。基于主管职责，判断这条 signal 该由主管先回答，还是应委派到后续处理链。
 ---
 
-# skill:freely-freely-human-interruption-manager-triage
+# skill:freely-human-interruption-manager-triage
 
 ## 职责
 
