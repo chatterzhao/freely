@@ -1,82 +1,86 @@
 # Agent 上下文入口
 
-本文件由 Freely 初始化时生成，是 AI 代理的项目级入口。如果本文件与核心文档冲突，以核心文档为准。
+本文件由 Freely 初始化时生成，是 AI 代理的项目级入口。与核心文档冲突时以核心文档为准。
 
-## 权威来源（按优先级排序）
-1. `docs/CONSTITUTION.md`（硬性约束）
-2. `docs/LAWS.md`（操作规则）
-3. `docs/PROJECT_INTENT.md`（产品方向）
-4. `AGENTS.md`（仅入口指引，不得覆盖 1-3）
+## 权威来源（优先级）
+1. `docs/CONSTITUTION.md`（硬性约束 — freely init 自动生成模板）
+2. `docs/LAWS.md`（操作规则 — freely init 自动生成模板）
+3. `docs/PROJECT_INTENT.md`（产品方向 — freely init 自动生成模板）
+4. `AGENTS.md`（本文件，入口指引，不得覆盖 1-3）
 
-> 如果上述文件缺失，`freely init --force` 会自动生成模板。
+## Freely Skill 能力表
 
-## Freely 运行时能力
-
-本项目由 Freely 管理。以下能力由已安装的 Freely 版本提供，相关脚本和 skill 位于 `$FREELY_HOME/` 下。**不要在项目仓库中修改这些能力文件**——需要改能力时，应到 Freely 自己的仓库去改。
-
-### 工位与分支
-- 分支命名：`fix/raw-{YYYYMMDDTHHMMZ}-{slug}` 或 `feature/raw-{YYYYMMDDTHHMMZ}-{slug}`
-- 创建合规工位：`wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>`
-- 或者手动：`git worktree add -b <branch> <path> develop`，然后立即 `freely sync-tooling --source-project <root> --project <path>`
-- 合并链：`fix/feature → test-pre-merge-* → develop`（测试通过后可直接 `fix/feature → develop`）
-- `test-pre-merge-*` 是临时测试工位，用完即删，不可 commit/push
-- `main`/`develop` 只接受 merge，不可直接 commit
-- Worktree 目录放在项目同级 `<project>-worktrees/` 下
-
-### Skill 体系
-所有 skill 以 `freely-` 前缀命名，通过 `skill:<name>` 引用。skill 文件位于 `$FREELY_HOME/docs/system/workspace/skills/`。
+所有 skill 以 `freely-` 前缀命名，通过 `skill:<name>` 引用。
 
 | Skill | 用途 |
 |---|---|
-| `freely-fix-execution` | bug 修复工作流 |
-| `freely-feat-execution` | 功能开发工作流 |
-| `freely-dev-loop-execution` | 开发循环（code review + pre-tests） |
+| `freely-auto-loop-orchestrator` | AI 自主持续交付循环编排 |
+| `freely-context-source-skill` | 来源分层、可执行判定、下一跳组装 |
+| `freely-fix-execution` | Bug 快速修复（test-pre-merge 快测 → cp 到可写工位） |
+| `freely-feat-execution` | 新功能完整开发流程 |
+| `freely-dev-loop-execution` | 实现 + code-review + pre-tests + 进度回写 |
 | `freely-doc-B1_IBM-execution` | IBM B1：raw issue → candidate → milestone |
-| `freely-doc-B2_IBM-execution` | IBM B2：candidate → I-issue → 实现 |
-| `freely-branch-management` | 分支生命周期（创建/合并/退役/清理） |
-| `freely-auto-loop-orchestrator` | 自主循环编排 |
-| `freely-worktree-maintenance-governance` | 工位退役与 fleet 收口 |
-| `freely-context-source-skill` | 上下文来源路由与 patrol 判断 |
-| `freely-multi-worktree-supervision` | 多工位并发监督 |
-| `freely-premerge-reconcile` | premerge 冲突收敛 |
+| `freely-doc-B2_IBM-execution` | IBM B2：candidate → I-issue → 实现设计 |
+| `freely-branch-management` | 分支/工位生命周期（创建/合并/退役/清理） |
+| `freely-worktree-maintenance-governance` | 工位状态审计、merge 顺序、fleet closure |
+| `freely-worktree-hygiene-supervision` | 工位脏状态预警、checkpoint 漂移 |
+| `freely-multi-worktree-supervision` | 多工位并发监督与排程 |
+| `freely-premerge-reconcile` | 高风险 merge 冲突收敛 |
+| `freely-milestone-planning-state-maintenance` | milestone 队列维护与排序 |
+| `freely-candidate-acceptance-review` | Candidate 边界独立评审 |
+| `freely-constitution-guard` | 宪法约束强制执行 |
+| `freely-laws-enforcer` | 法律级操作检查与验收 |
+| `freely-watchdog-control-plane` | 可用性/runtime/continuity 监督控制面 |
+| `freely-continuity-watchdog` | 上下文连续性（warn/rotate/handoff） |
+| `freely-ai-cli-availability-manager` | AI CLI 账号可用性、切号、限流恢复 |
+| `freely-recovery-subagent-governance` | 恢复耦合与子代理边界约束 |
+| `freely-module-interface-governance` | 可插拔模块与接口版本治理 |
+| `freely-config-backup-guard` | 配置修改前强制备份 |
+| `freely-workspace-skill-governance` | Skill 自身的新增/拆分/重构治理 |
+| `freely-human-interruption-manager-triage` | 人类插话的主管级路由判定 |
+| `freely-human-interruption-handling` | 人类插话深度处理 |
+| `freely-human-interruption-direct-answer` | 低价值插话直接回答 |
+| `freely-signal-intent-understanding` | Signal 意图结构收敛 |
+| `freely-chat-issue-routing` | Chat 消息→已有 issue 路由 |
+| `freely-url-content-intake` | URL 内容抓取 |
+| `freely-agent-execution-safety-review` | Execution-boundary 安全评审 |
+| `freely-tool-cc-codex-mcp-runtime` | Claude Code + Codex MCP 安装配置 |
+| `freely-rust-tauri-toolchain-bootstrap` | Rust/Tauri toolchain 引导 |
+| `freely-mem9-continuity-bridge` | Mem9 连续性后端接入边界 |
 
-### IBM Framework 路由
-- B1_IBM：外部输入（GitHub/Gitee issue、chat 插话）→ 预研 → candidate → milestone
-- B2_IBM：milestone committed_issues → I-issue → 实现 → code-review + pre-tests → merge
-- 详见 `$FREELY_HOME/docs/system/workspace/ibm-framework.md`
+## 工位与分支
+- 分支命名：`fix/raw-{YYYYMMDDTHHMMZ}-{slug}` / `feature/raw-{YYYYMMDDTHHMMZ}-{slug}`
+- 创建工位：`wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>`
+- 合并链：`fix/feature → test-pre-merge-* → develop`（测试通过后可直达 develop）
+- `test-pre-merge-*` 是临时测试面，用完即删，不可 commit/push
+- `main`/`develop` 只接受 merge，不可直接 commit
 
-### 门禁工具
-- `merge-guarded` — 保护分支合并，自动检查 merge direction + governance gate + push
-- `governance-merge-gate` — 合并前检查 raw/C/M/I 生命周期完整性
-- `governance-check` — 治理状态检查
+## 门禁
+- `merge-guarded` — 保护分支合并（自动 governance gate + push）
+- `governance-merge-gate` — raw/C/M/I 生命周期完整性
 - `pretests-gate` — pre-tests 证据验证
-- `issue-sync` — 平台 issue 同步（create/update/close）
+- `issue-sync` — 平台 issue 同步
 
-### Manager ↔ Worker 交接
-- Manager 委派 worker：`handoff.py insert --role worker --created-by manager --consumed-by worker`
-- Worker 汇报完成：`handoff.py update --handoff-id <id> --status completed --exit-kind worker_done`
-- Worker 汇报阻塞：`handoff.py update --handoff-id <id> --status blocked --exit-kind worker_blocked --blocked-reason "..." --next-action "..."`
-- 所有 handoff 记录在项目根目录 `.freely/freely.db`（中心数据库）
-- 一个工位同一时间只允许一个活跃 worker
+## Manager ↔ Worker 交接
+- Manager: `handoff.py insert --role worker --created-by manager --consumed-by worker`
+- Worker: `handoff.py update --handoff-id <id> --status completed --exit-kind worker_done`
+- 中心 DB: `.freely/freely.db`，同工位只允许一个活跃 worker
 
-### Daemon
-- 启动：`freely daemon start --project <path> [--task-mode auto|wait]`
-- 停止：`freely daemon stop --project <path>`
-- 状态：`freely daemon status --project <path>`
-- task-mode 为 `wait` 时 AI 不启动，需 `freely task-mode set --task-mode auto` 切换
+## Daemon
+- `freely daemon start --project <path> [--task-mode auto|wait]`
+- `freely daemon stop --project <path>`
+- `freely task-mode set --project <path> --task-mode auto`
 
 ## 项目文档结构
-- `docs/CONSTITUTION.md` — 项目宪法（freely init 自动生成模板）
-- `docs/LAWS.md` — 操作规则（freely init 自动生成模板）
-- `docs/PROJECT_INTENT.md` — 项目意图（freely init 自动生成模板）
+- `docs/PROJECT_INTENT.md` / `CONSTITUTION.md` / `LAWS.md` — 项目治理核心（缺失时 init 自动生成）
 - `docs/pre-brainstorms/` — B1 候选议题
-- `docs/issues/` — raw 和 I-* issue
-- `docs/epics/` — code review + pre-tests 产物
+- `docs/issues/` — raw / I-* issue
+- `docs/epics/` — code-review + pre-tests
 - `docs/milestones.md` — 里程碑追踪
 
 ## 禁止
-- 不在 `main`/`develop` 上直接 add/commit/push
+- 不在 `main`/`develop` 上直接 commit
 - 不绕过 `merge-guarded` 或 `governance-merge-gate`
 - 不在 `test-pre-merge-*` 上 commit/push
-- 不同工位之间不直接用 `cp`/`stash` 转移文件（用 `git merge` 或 commit 到分支再 merge）
-- Hook/gate bypass 默认违规，不可自行决定 `--no-verify` 或等效绕过
+- 不跨工位用 `cp`/`stash` 转移文件
+- 不自行决定 `--no-verify` 绕过 hook
