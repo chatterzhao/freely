@@ -28,15 +28,15 @@ Freely 能力通过 `skill:<name>` 引用。skill 内部包含完整工作流，
 | Bug 修复 | `freely-fix-execution` |
 | 功能开发 | `freely-feat-execution` |
 | 实现 + code-review + pre-tests | `freely-dev-loop-execution` |
-| 新问题入库（raw → candidate → milestone） | `freely-doc-B1_IBM-execution` |
-| Issue 落地（candidate → I-issue → 实现设计） | `freely-doc-B2_IBM-execution` |
+| raw issue → Brainstorm → candidate → milestone | `freely-doc-B1_IBM-execution` |
+| milestone I-issue → Brainstorm → prd/pre-tests/code-review | `freely-doc-B2_IBM-execution` |
 | 分支/工位创建、合并、退役、清理 | `freely-branch-management` |
 | 多工位并发监督与排程 | `freely-multi-worktree-supervision` |
 | Merge 冲突收敛 | `freely-premerge-reconcile` |
 | 人类插话路由判定 | `freely-human-interruption-manager-triage` |
 | AI CLI 账号/切号/限流 | `freely-ai-cli-availability-manager` |
 
-> 完整 skill 列表见 `$FREELY_HOME/docs/system/workspace/skills/`。
+> 完整 skill 列表见 `$FREELY_HOME/docs/system/workspace/skills/`。每个 skill 的详细步骤见对应 SKILL.md。
 
 ## Manager 出口决策
 
@@ -63,11 +63,9 @@ Worker 被分配后自行按 skill 执行，完成后通过 handoff 汇报结果
 问题从发现到合并的标准路径：
 
 ```
-raw issue → B1_IBM (freely-doc-B1_IBM-execution) → candidate
-         → B2_IBM (freely-doc-B2_IBM-execution) → I-issue
-         → dev-loop (freely-dev-loop-execution) → code-review + pre-tests
-         → merge → develop
+raw issue → B1_IBM → candidate → B2_IBM → I-issue → dev-loop → merge → develop
 ```
+> 各阶段详情见对应 skill: `freely-doc-B1_IBM-execution`、`freely-doc-B2_IBM-execution`、`freely-dev-loop-execution`。
 
 ## 分支规范
 

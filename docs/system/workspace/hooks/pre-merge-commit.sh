@@ -5,34 +5,45 @@ branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
 # Protected branches that only accept merge: develop, main
 [[ "$branch" == "develop" || "$branch" == "main" ]] || exit 0
 
-# FREELY_SKIP_IBM_GATE: skip IBM governance gate, keep merge state check
-if [[ "${FREELY_SKIP_IBM_GATE:-0}" == "1" ]]; then
-  require_valid_guarded_merge_state() {
-    load_guarded_state || {
-      cat <<MSG
-[HOOK] Merge blocked: canonical guarded merge state is missing or malformed.
-Re-run the merge through ./bin/merge-guarded.
-Policy source: docs/LAWS.md §2, §2D
-MSG
-      exit 1
-    }
-    if [[ "${FREELY_GUARDED_MERGE_COMPLETION:-0}" != "1" ]]; then
-      cat <<MSG
-[HOOK] Merge blocked: guarded merge completion handshake marker missing.
-Policy source: docs/LAWS.md §2D
-MSG
-      exit 1
-    fi
-  }
-  require_valid_guarded_merge_state
-  echo "[HOOK] IBM governance gate skipped (FREELY_SKIP_IBM_GATE=1)"
-  exit 0
-fi
-
 project_root="$(git rev-parse --show-toplevel 2>/dev/null || pwd -P)"
 guarded_state_path="$(git rev-parse --git-dir 2>/dev/null || true)"
 if [[ -n "$guarded_state_path" ]]; then
   guarded_state_path="$guarded_state_path/freely-guarded-merge-state"
+fi
+
+# FREELY_SKIP_IBM_GATE: skip IBM governance gate, keep merge state check
+if [[ "${FREELY_SKIP_IBM_GATE:-0}" == "1" ]]; then
+  load_guarded_state() {
+    [[ -n "$guarded_state_path" && -f "$guarded_state_path" ]] || return 1
+    guarded_state_target=""
+    guarded_state_source=""
+    guarded_state_bypass=""
+    while IFS='=' read -r key value; do
+      case "$key" in
+        target_branch) guarded_state_target="$value" ;;
+        source_branch) guarded_state_source="$value" ;;
+        bypass_mode) guarded_state_bypass="$value" ;;
+      esac
+    done <"$guarded_state_path"
+    [[ -n "$guarded_state_target" && -n "$guarded_state_source" && -n "$guarded_state_bypass" ]] || return 1
+  }
+  load_guarded_state || {
+    cat <<MSG
+[HOOK] Merge blocked: canonical guarded merge state is missing or malformed.
+Re-run the merge through ./bin/merge-guarded.
+Policy source: docs/LAWS.md §2, §2D
+MSG
+    exit 1
+  }
+  if [[ "${FREELY_GUARDED_MERGE_COMPLETION:-0}" != "1" ]]; then
+    cat <<MSG
+[HOOK] Merge blocked: guarded merge completion handshake marker missing.
+Policy source: docs/LAWS.md §2D
+MSG
+    exit 1
+  fi
+  echo "[HOOK] IBM governance gate skipped (FREELY_SKIP_IBM_GATE=1)"
+  exit 0
 fi
 
 break_glass_reason="${FREELY_BREAK_GLASS_REASON:-}"
