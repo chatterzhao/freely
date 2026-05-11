@@ -98,7 +98,8 @@ raw issue → B1_IBM (freely-doc-B1_IBM-execution) → candidate
 
 > 即使跳过 IBM，也必须通过 `merge-guarded` 合并到 develop。禁止绕过的含义是"禁止跳过运行时安全检查"，不是"禁止跳过文档工作"。
 >
-> 临时绕过的 git 命令：`git -c core.hooksPath="" commit` 或 `git push --no-verify`。仅在以上"可跳过"场景使用。
+> IBM 门禁临时绕过：`FREELY_SKIP_IBM_GATE=1`。仅跳过 governance gate，分支保护仍然生效。仅在以上"可跳过"场景使用。
+> **禁止使用 `core.hooksPath=""` 或 `--no-verify`**——它们绕过所有保护（包括 develop 禁止 commit），不是合法的 IBM 绕过方式。只有 break-glass（`docs/LAWS.md §2D`）可以使用完整的 guarded merge completion。
 
 ## 禁止
 
