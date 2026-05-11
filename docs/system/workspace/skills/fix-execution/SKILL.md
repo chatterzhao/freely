@@ -71,10 +71,13 @@ test-pre-merge-* 上的操作:
 
 合并路径（来自 merge-guarded）:
 ```
-fix/*             → test-pre-merge-* → develop
-feature/*         → test-pre-merge-* → develop
-feature/premerge-* → test-pre-merge-* → develop
-hotfix/*          → test-pre-merge-* → develop  (或 hotfix/* → develop 直达)
+fix/*             → test-pre-merge-* (测试)
+fix/*             → develop (测试通过后直接合并)
+feature/*         → test-pre-merge-* (测试)
+feature/*         → develop (测试通过后直接合并)
+test-pre-merge-*  → develop
+feature/premerge-* → test-pre-merge-*
+hotfix/*          → develop (直达)
 hotfix/*          → main
 ```
 
@@ -150,9 +153,10 @@ hotfix/*          → main
   │
   ├─ 运行 ./bin/governance-merge-gate --range "develop..HEAD" 只检查本分支
   ├─ gate 失败：用对应 skill 修复分支自己的错误，预存错误不阻塞
-  ├─ gate 通过：fix 和 test-pre-merge 同基于 develop → merge 为 fast-forward
+  ├─ gate 通过：merge fix 到 test-pre-merge 测试
   │     ./bin/merge-guarded test-pre-merge-<name> fix/<name>
-  │         → 验证 → ./bin/merge-guarded develop test-pre-merge-<name>
+  │         → 在 test-pre-merge 中测试验证
+  │         → 测试通过后 ./bin/merge-guarded develop fix/<name>
   ├─ 紧急: ./bin/merge-guarded develop hotfix/<name>
   └─ 可选: git checkout main && ./bin/merge-guarded main hotfix/<name>
 

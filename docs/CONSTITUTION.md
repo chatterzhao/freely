@@ -18,7 +18,7 @@ Freely 是一个自主循环运行器：
 - `main` 仅用于发布，必须保持稳定。
 - `develop` 是长期开发集成分支，也是 `feature/*` 的默认父分支。
 - `test-pre-merge-*` 是临时预集成验证批次分支前缀；仅在组合验证、短周期集成验收、复杂冲突收敛或发布前预演时启用。每次启用前必须先从当前 `develop` 新建全新批次；旧批次若存在，先删除。
-- `feature/*` 分支从 `develop` 创建；其正常 develop-bound promote 路径先进入对应的 `test-pre-merge-*` family，再由该 family 进入 `develop`。`feature/* -> develop` 不再是正常路径。
+- `feature/*` 分支从 `develop` 创建。测试时 merge 到 `test-pre-merge-*`（临时测试面），测试通过后从 `feature/*` 直接 merge 到 `develop`。`test-pre-merge-*` 不参与最终合并链。
 - `release/*` 分支从 `develop` 创建用于发布冻结，然后合并到 `main` 并回合并到 `develop`。
 - `hotfix/*` 分支从 `main` 创建，然后合并到 `main` 和 `develop`。
 
@@ -101,7 +101,7 @@ Freely 是一个自主循环运行器：
 | main | ✅ | ❌ | release/*, hotfix/* | - | 发布/热修复入口 |
 | develop | ✅ | ❌ | test-pre-merge-*, hotfix/* | - | 默认开发集成入口；正常 promote 只接受 `test-pre-merge-*` family 或 `hotfix/*` |
 | test-pre-merge-* | ❌ | ❌ | feature/*, hotfix/*, feature/premerge-* | - | 临时预集成验证批次；必须从当前 develop 新建，用完立即删除 |
-| feature/* | ✅ 同名 | ✅ worktree | - | test-pre-merge-* | 从 develop 创建，develop-bound 变更先进入对应测试批次 |
+| feature/* | ✅ 同名 | ✅ worktree | - | test-pre-merge-* (测试) | 从 develop 创建；测试通过后直接合并到 develop |
 | release/* | ✅ 同名 | ✅ worktree | - | main, develop | 从 develop 创建 |
 | hotfix/* | ✅ 同名 | ✅ worktree | - | main, develop | 从 main 创建 |
 

@@ -80,7 +80,7 @@ feat-execution 在不同阶段调用下层 skill：
 2. merge feature → test-pre-merge
 3. 运行 pre-tests + governance-merge-gate --range
 4. gate 失败 → 修复分支自己的错误 → 重试
-5. gate 通过 → merge test-pre-merge → develop (merge-guarded)
+5. gate 通过 → merge feature → develop (merge-guarded，测试通过后直接从 feature 合并)
 6. issue-sync close
 ```
 
