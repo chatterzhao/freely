@@ -50,6 +50,24 @@ Manager 每轮 patrol 结束后必须做出口决策：
 
 Worker 被分配后自行按 skill 执行，完成后通过 handoff 汇报结果。
 
+## IBM 生命周期
+
+问题从发现到合并的标准路径：
+
+```
+raw issue → B1_IBM (freely-doc-B1_IBM-execution) → candidate
+         → B2_IBM (freely-doc-B2_IBM-execution) → I-issue
+         → dev-loop (freely-dev-loop-execution) → code-review + pre-tests
+         → merge → develop
+```
+
+## 分支规范
+
+- 命名：`fix/raw-{YYYYMMDDTHHMMZ}-{slug}` / `feature/raw-{YYYYMMDDTHHMMZ}-{slug}`
+- 创建：`wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>`
+- 合并：`fix/feature → test-pre-merge-* → develop`（测试通过后可直达 develop）
+- `test-pre-merge-*` 临时测试面，用完即删，不可 commit/push
+
 ## 自动兜底
 
 以下机制自动触发，AI 正常操作即可，做错会被拦截：
