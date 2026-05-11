@@ -883,7 +883,7 @@ run_dir_for_project() {
 
 project_db_path() {
   local project="${1:-$PROJECT_ROOT}"
-  echo "$(project_db_path "$project")"
+  echo ""$project/.freely/freely.db""
 }
 
 supervisor_identity_dir_for_project() {
@@ -3487,7 +3487,7 @@ ensure_runtime_tool_session_anchor() {
     # Non-ACP mode: scan the tool's session dir for JSONL files.
     if [[ -z "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
       if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
-        local _acp_db="$(project_db_path "$project")"
+        local _acp_db=""$project/.freely/freely.db""
         local _session_store_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-store.py"
         if [[ -f "$_session_store_py" && -f "$_acp_db" ]]; then
           local _acp_sid
@@ -3511,7 +3511,7 @@ ensure_runtime_tool_session_anchor() {
     fi
     # Resume evidence: ACP mode checks session-store (SQLite); non-ACP checks JSONL.
     if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
-      local _acp_evidence_db="$(project_db_path "$project")"
+      local _acp_evidence_db=""$project/.freely/freely.db""
       local _acp_evidence_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-store.py"
       if [[ -f "$_acp_evidence_py" && -f "$_acp_evidence_db" ]]; then
         local _acp_evidence_sid
@@ -5573,7 +5573,7 @@ _write_chat_to_issue() {
   local project="$1" intake_id="$2" author="$3" channel="$4" message="$5" session_refs="$6" created_at="$7"
   local target_issue chat_type issue_id db_path chat_id worktrees_root worktree_found
 
-  db_path="$(project_db_path "$project")"
+  db_path=""$project/.freely/freely.db""
   target_issue="${FREELY_CHAT_TARGET_ISSUE:-}"
 
   if [[ -n "$target_issue" ]]; then
@@ -7433,7 +7433,7 @@ EOF
 # Lazy-init freely.db on startup so existing projects don't need manual re-init.
 ensure_freely_db() {
   local project="$1"
-  local freely_db="$(project_db_path "$project")"
+  local freely_db=""$project/.freely/freely.db""
   local chat_inbox_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/chat-inbox.py"
   local session_store_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-store.py"
   if [[ -f "$chat_inbox_py" && ! -f "$freely_db" ]]; then
@@ -7448,7 +7448,7 @@ ensure_freely_db() {
 
 ensure_task_mode_gate() {
   local project="$1" config_default="${2:-wait}"
-  local freely_db="$(project_db_path "$project")"
+  local freely_db=""$project/.freely/freely.db""
   local init_mode init_scan_id
   case "$config_default" in
     auto) init_mode="auto"; init_scan_id="" ;;
@@ -7481,7 +7481,7 @@ conn.close()
 
 read_task_mode() {
   local project="$1"
-  local freely_db="$(project_db_path "$project")"
+  local freely_db=""$project/.freely/freely.db""
   python3 -c "
 import sqlite3
 conn = sqlite3.connect('$freely_db')
@@ -7501,7 +7501,7 @@ conn.close()
 
 write_task_mode() {
   local project="$1" mode="$2" scan_id="${3:-}"
-  local freely_db="$(project_db_path "$project")"
+  local freely_db=""$project/.freely/freely.db""
   local task_mode task_scan_id
   case "$mode" in
     auto) task_mode="auto"; task_scan_id="" ;;
@@ -11571,7 +11571,7 @@ launch_worker_from_manager_prompt_if_needed() {
     log_warn "worker verification metadata incomplete: missing=$missing_fields_csv (prompt=$(basename "$prompt_file"))"
     # Write a chat-inbox entry so the AI learns what fields are needed
     local _db_path _chat_py
-    _db_path="$(project_db_path "$manager_project")"
+    _db_path=""$manager_project/.freely/freely.db""
     _chat_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/chat-inbox.py"
     if [[ -f "$_chat_py" ]]; then
       python3 "$_chat_py" add --db "$_db_path" --type "comment" \
@@ -11937,7 +11937,7 @@ manager_runtime_launch_workers_after_ai_cycle_if_needed() {
 
   local _worker_csv _prompt_file _launched_count _handoff_py _db_path _handoff_id
   _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
-  _db_path="$(project_db_path "$project")"
+  _db_path=""$project/.freely/freely.db""
   _worker_csv=""
   if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
     _worker_csv=$(python3 "$_handoff_py" list --db "$_db_path" --role worker --status pending 2>/dev/null | python3 -c "
@@ -13240,7 +13240,7 @@ sync_exit_contract_to_handoffs() {
   kind="$(manager_exit_contract_kind "$project" 2>/dev/null || true)"
   local _handoff_py _db_path latest_mgr
   _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
-  _db_path="$(project_db_path "$project")"
+  _db_path=""$project/.freely/freely.db""
   if [[ ! -f "$_handoff_py" || ! -f "$_db_path" ]]; then
     return 0
   fi
@@ -13274,7 +13274,7 @@ manager_exit_contract_kind() {
   fi
   local _handoff_py _db_path
   _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
-  _db_path="$(project_db_path "$project")"
+  _db_path=""$project/.freely/freely.db""
   if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
     local pending_workers
     pending_workers=$(python3 "$_handoff_py" list --db "$_db_path" --role worker --status pending 2>/dev/null | python3 -c "import json,sys; rows=json.load(sys.stdin); print(len(rows))" 2>/dev/null || echo "0")
@@ -13311,7 +13311,7 @@ validate_manager_exit_contract_for_project() {
   if [[ ! -f "$contract_file" ]]; then
     local _handoff_py _db_path
     _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
-    _db_path="$(project_db_path "$project")"
+    _db_path=""$project/.freely/freely.db""
     if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
       local pending_workers worker_prompts_list
       pending_workers=$(python3 "$_handoff_py" list --db "$_db_path" --role worker --status pending 2>/dev/null | python3 -c "
@@ -13398,7 +13398,7 @@ autofill_manager_exit_contract_for_cleanup_delegate_workers_if_possible() {
 
   local _handoff_py _db_path _raw_key _hid
   _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
-  _db_path="$(project_db_path "$project")"
+  _db_path=""$project/.freely/freely.db""
   if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
     _raw_key=$(echo "$continuity_file" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || echo "autofill")
     local IFS=","
@@ -13445,7 +13445,7 @@ autofill_manager_exit_contract_for_continuity_resume_if_possible() {
 
   local _handoff_py _db_path _raw_key
   _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
-  _db_path="$(project_db_path "$project")"
+  _db_path=""$project/.freely/freely.db""
   if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
     _raw_key=$(echo "$continuity_file" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || echo "autofill")
     python3 "$_handoff_py" insert --db "$_db_path" \
@@ -15078,7 +15078,7 @@ select_launch_kind() {
     # Query session-store for active session (authoritative source).
     local session_store_py sid
     session_store_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-store.py"
-    local _acp_db="$(project_db_path "$PROJECT_ROOT")"
+    local _acp_db=""$PROJECT_ROOT/.freely/freely.db""
     if [[ -f "$session_store_py" && -f "$_acp_db" ]]; then
       sid=$(python3 "$session_store_py" get-active \
         --db "$_acp_db" \
@@ -17125,7 +17125,7 @@ cmd_init() {
   rm -f "$(session_state_file "$project")" "$(handoff_file "$project")"
   write_workcell_state "$project" "stopped" "down" "down" "initialized"
   # Initialize freely.db (chats + sessions tables)
-  local freely_db="$(project_db_path "$project")"
+  local freely_db=""$project/.freely/freely.db""
   local chat_inbox_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/chat-inbox.py"
   local session_store_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-store.py"
   local handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
@@ -18190,7 +18190,7 @@ start_project_runtime() {
   # Initialize SQLite worker delegation store + migrate old exit contracts
   local _handoff_py _worker_db_path
   _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
-  _db_path="$(project_db_path "$project")"
+  _db_path=""$project/.freely/freely.db""
   if [[ -f "$_handoff_py" ]]; then
     python3 "$_handoff_py" init --db "$_db_path" >/dev/null 2>&1 || true
     python3 "$_handoff_py" mark-stale --db "$_db_path" --timeout-minutes 30 >/dev/null 2>&1 || true
@@ -18866,7 +18866,7 @@ start_project_runtime() {
     # Cache metrics for token cost optimization observability
     local _cache_acp_count _cache_active_sessions
     _cache_acp_count=$(pgrep -c "claude-agent-acp" 2>/dev/null || echo "0")
-    _cache_active_sessions=$(python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/session-store.py" count-active --db "$(project_db_path "$project")" --project "$project" 2>/dev/null || echo "0")
+    _cache_active_sessions=$(python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/session-store.py" count-active --db ""$project/.freely/freely.db"" --project "$project" 2>/dev/null || echo "0")
     append_runtime_event "$project" "cache_metrics" \
       "supervisor_pid=$$" \
       "role=${LAST_ROLE_HINT:-unknown}" \
