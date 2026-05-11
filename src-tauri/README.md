@@ -24,7 +24,7 @@ bun run tauri:dev:probe
 
 `rust:preflight` verifies that `cargo`, `rustc`, and `rustup` are available.
 If any of them are missing, the script prints the exact missing commands plus the next suggested install/retry steps.
-Preferred bootstrap path is `skill:rust-tauri-toolchain-bootstrap`, which uses `rsproxy` instead of the default rustup host.
+Preferred bootstrap path is `skill:freely-freely-rust-tauri-toolchain-bootstrap`, which uses `rsproxy` instead of the default rustup host.
 
 `rust:preflight:test` verifies that the preflight guidance itself still covers the missing-command summary, install hint, shell reload hint, and retry commands.
 

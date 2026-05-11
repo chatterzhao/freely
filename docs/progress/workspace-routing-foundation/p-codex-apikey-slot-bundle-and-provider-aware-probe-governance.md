@@ -30,7 +30,7 @@
 - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/tasks.md`
 - `docs/system/workspace/scripts/runtime/ai-cli`
 - `docs/system/workspace/scripts/runtime/file-backup.sh`
-- `docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh`
+- `docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh`
 - `docs/system/workspace/scripts/tests/test-ai-cli-login-creates-incremented-slot`
 - `docs/system/workspace/scripts/tests/test-ai-cli-codex-apikey-slot-bundle-switch`
 - `docs/system/workspace/scripts/tests/test-freely-ai-account-switch`

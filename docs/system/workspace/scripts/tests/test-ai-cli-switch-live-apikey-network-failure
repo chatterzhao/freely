@@ -9,11 +9,11 @@ setup_project() {
   local project="$1"
   mkdir -p \
     "$project/.freely/run" \
-    "$project/docs/system/workspace/skills/watchdog-control-plane/scripts" \
+    "$project/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts" \
     "$project/docs/system/workspace/scripts/runtime"
   ln -sf \
-    "$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh" \
-    "$project/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+    "$ROOT_DIR/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh" \
+    "$project/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh"
   ln -sf \
     "$ROOT_DIR/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh" \
     "$project/docs/system/workspace/scripts/runtime/network-proxy-resolver.sh"

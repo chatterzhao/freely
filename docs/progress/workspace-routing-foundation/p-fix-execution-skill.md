@@ -1,7 +1,7 @@
-# fix-execution skill
+# freely-fix-execution skill
 
 - issue: `I-20260503-0000-B`
-- issue_path: `docs/epics/workspace-routing-foundation/fix-execution-skill/issues/I-20260503-0000-B.md`
+- issue_path: `docs/epics/workspace-routing-foundation/freely-fix-execution-skill/issues/I-20260503-0000-B.md`
 - candidate: `C-20260503-0000-B`
 - candidate_path: `docs/pre-brainstorms/20260503-fix-skill/candidates.md`
 - milestone: `M-20260306-workspace-routing-foundation`

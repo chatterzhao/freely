@@ -9,14 +9,14 @@
 - 默认运行工位：`feature/*`
 - 上游：`manager-agent` 的 delegation handoff，或本工位 runtime 的恢复重启
 - 下游：
-  - `skill:doc-B1_IBM-execution`
-  - `skill:doc-B2_IBM-execution`
-  - `skill:dev-loop-execution`
-  - `skill:worktree-hygiene-supervision`
+  - `skill:freely-freely-doc-B1_IBM-execution`
+  - `skill:freely-freely-doc-B2_IBM-execution`
+  - `skill:freely-freely-dev-loop-execution`
+  - `skill:freely-freely-worktree-hygiene-supervision`
 - worker 角色在三个 loop 中的归宿与生命周期细节见 `docs/system/workspace/three-loop-capability-lifecycle.md`
   - 该文档是 whole-app lifecycle / logic 的唯一细节真源；worker 在判断自己处于 doc/dev 哪个 loop、何时回证 outer judgement、何时必须 reroute 前必须按其语义工作
   - 若 worker handoff 或 execution contract 改变了 three-loop 语义，必须先同步检查该真源，再更新本文件或下游 skill
-  - `skill:continuity-watchdog`
+  - `skill:freely-freely-continuity-watchdog`
 
 ## 职责
 
@@ -51,7 +51,7 @@
 - `manager-agent` 负责任务编排与委派
 - `manager-agent` 负责 completion / verification / cleanup judgment
 - `runtime` 负责账号切换、sleep/recheck、进程重启
-- `continuity-watchdog` 负责 `context warn`、`fresh_with_handoff` 与 continuity artifact 边界
+- `freely-continuity-watchdog` 负责 `context warn`、`fresh_with_handoff` 与 continuity artifact 边界
 - `worker-agent` 只对自己的 issue 执行结果负责
 - `worker-agent` 默认只在被委派的 `Worktree` / `Branch` / `intent_target` 内 mutate
 - `worker-agent` 不宣布 terminal completion；只把 evidence 交回 `auto-loop`

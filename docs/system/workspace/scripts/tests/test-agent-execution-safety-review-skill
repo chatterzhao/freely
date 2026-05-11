@@ -3,9 +3,9 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
 
-SKILL="$ROOT_DIR/docs/system/workspace/skills/agent-execution-safety-review/SKILL.md"
-LADDER="$ROOT_DIR/docs/system/workspace/skills/agent-execution-safety-review/references/decision-ladder.md"
-WRITEBACK="$ROOT_DIR/docs/system/workspace/skills/agent-execution-safety-review/references/evidence-writeback.md"
+SKILL="$ROOT_DIR/docs/system/workspace/skills/freely-freely-agent-execution-safety-review/SKILL.md"
+LADDER="$ROOT_DIR/docs/system/workspace/skills/freely-freely-agent-execution-safety-review/references/decision-ladder.md"
+WRITEBACK="$ROOT_DIR/docs/system/workspace/skills/freely-freely-agent-execution-safety-review/references/evidence-writeback.md"
 RUNTIME="$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
 SKILLS_INDEX="$ROOT_DIR/docs/system/workspace/skills/README.md"
 
@@ -18,6 +18,6 @@ grep -q 'security_review_mode' "$SKILL"
 grep -q 'decision-committee' "$LADDER"
 grep -q 'recommended_review_scope' "$WRITEBACK"
 grep -q 'security-review-brief) cmd_security_review_brief' "$RUNTIME"
-grep -q 'skill:agent-execution-safety-review' "$SKILLS_INDEX"
+grep -q 'skill:freely-freely-agent-execution-safety-review' "$SKILLS_INDEX"
 
 echo "[PASS] agent execution safety review skill is materialized and wired into runtime"

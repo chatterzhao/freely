@@ -365,7 +365,7 @@ EOF
   - `machine_readable_scan_json`
   - `./bin/freely live-status --project <project>`
   - `workspace/agents/lead-agent.md`
-  - `skill:context-source-skill`
+  - `skill:freely-freely-context-source-skill`
 - 在写出 primary manager continuity 前，不要整文件读取 `docs/milestones.md`，不要并行展开多个 skill，也不要为每个 surface 预读 issue / progress / pre-brainstorm 原文。
 - 首轮先用 `machine_readable_scan_json` 的 active counts 和 summary 选出至多一个 highest-leverage source；只对该 source 做定点核对，再写 primary manager continuity。
 - primary manager continuity 必须先回答四件事：`route_kind`、`restart_point`、`ownership`、`next_action`。如果证据仍不足，再把“需要补读的具体文档路径”写进 continuity / queue，而不是在首轮继续扩读。
@@ -378,7 +378,7 @@ EOF
 - 结构化巡检入口：machine_readable_scan_json（若 prompt 尾部已给出路径，先消费该 json）
 - workspace 根：$workspace_root
 - 首跳代理：workspace/agents/lead-agent.md
-- 巡检技能：skill:context-source-skill
+- 巡检技能：skill:freely-freely-context-source-skill
 
 按需再读，不要在首轮默认展开：
 - 项目意图：$intent
@@ -435,9 +435,9 @@ ${initial_read_targets_escaped}
 
 执行要求：
 1. 先遵守 \`PROJECT_ROOT/AGENTS.md\`；它是当前目标项目的治理入口，不要在 workspace 能力文档里重复发明第二套项目规则。
-2. 再完成 \`skill:constitution-guard\` 与 \`skill:laws-enforcer\` 预检：默认做法是阅读 \`skill:constitution-guard\` 与 \`skill:laws-enforcer\` 并按其约束执行；不要假设存在可直接调用的 \`skill\` 工具。
+2. 再完成 \`skill:freely-freely-constitution-guard\` 与 \`skill:freely-freely-laws-enforcer\` 预检：默认做法是阅读 \`skill:freely-freely-constitution-guard\` 与 \`skill:freely-freely-laws-enforcer\` 并按其约束执行；不要假设存在可直接调用的 \`skill\` 工具。
 3. 进入 \`lead-agent\`，不要绕过首跳代理。
-4. 先运行 \`./bin/freely task-source-scan --project $project --json\`，把最新 scan JSON 当作 standing-source 现场，再由 \`lead-agent\` 参照 \`skill:context-source-skill\` 完成优先级判断与下一跳提示词组装；若当前工具没有原生 skill executor，就直接读取该技能文档并在当前会话按它执行。
+4. 先运行 \`./bin/freely task-source-scan --project $project --json\`，把最新 scan JSON 当作 standing-source 现场，再由 \`lead-agent\` 参照 \`skill:freely-freely-context-source-skill\` 完成优先级判断与下一跳提示词组装；若当前工具没有原生 skill executor，就直接读取该技能文档并在当前会话按它执行。
 4A. 若 runtime 在 prompt 尾部附加了 \`machine_readable_scan_json\`，优先把它当作本轮 idle / replan patrol 的结构化入口；仅当该 json 缺失、过时或不足以裁决时，才回退到重新运行 \`task-source-scan\`。其中状态只算 routing hint，phase judgement 仍需回到 linked evidence 核对。
 ${startup_bounded_patrol_rule_escaped}
 5. 若当前轮次承担项目级监督职责，先基于项目级工位视图做排班、冻结、集成与 cleanup 判断；不要直接把自己降级成单工位写代码代理。
@@ -445,8 +445,8 @@ ${role_scope_rule_5a_escaped}
 ${role_scope_rule_5b_escaped}
 6. 在可并行的 doc-loop、verification、review、日志诊断或互不冲突的代码任务上，使用 subagent 提高效率。
 6A. \`task-source-scan\` 的推荐消费方式：
-   - 默认技能：\`auto-loop-orchestrator\`
-   - 来源解释技能：\`context-source-skill\`
+   - 默认技能：\`freely-auto-loop-orchestrator\`
+   - 来源解释技能：\`freely-context-source-skill\`
    - 先看 JSON 里的 \`sources[]\`、\`restart_point\`、\`status_markers\`、\`next_action\`
    - 不要把 scan 当成最终裁决；它是 patrol 输入，不替代 issue/progress/milestone 真相
 6B. 不要在每轮都机械重跑 scan。优先在这些时机运行：
@@ -470,16 +470,16 @@ ${role_scope_rule_5b_escaped}
 9. 不要把路由当作脚本硬编码分支；脚本只负责启动和托管 AI，会话中的需求发现与路由判断由你完成。
 10. 读取 workspace 下的 agent 与 skill 时，统一按相对路径理解，例如：
    - \`workspace/agents/lead-agent.md\`
-   - \`skill:context-source-skill\`
-   - \`skill:doc-B1_IBM-execution\`
-   - \`skill:doc-B2_IBM-execution\`
-   - \`skill:dev-loop-execution\`
+   - \`skill:freely-freely-context-source-skill\`
+   - \`skill:freely-freely-doc-B1_IBM-execution\`
+   - \`skill:freely-freely-doc-B2_IBM-execution\`
+   - \`skill:freely-freely-dev-loop-execution\`
 10A. 除非当前工具明确暴露了兼容的原生 skill tool，否则所有 \`skill:<name>\` 都按“去读对应 \`SKILL.md\` 并照此执行”解释。
-11. 若没有稳定 issue 边界，下一跳应阅读 \`skill:doc-B1_IBM-execution\`。
-12. 若已有稳定 issue 边界但文档仍需 issue-bound 收敛，下一跳应阅读 \`skill:doc-B2_IBM-execution\`。
-13. 若 issue 已 ready 或 in-progress，且文档和验收边界足够，下一跳应阅读 \`skill:dev-loop-execution\`。
+11. 若没有稳定 issue 边界，下一跳应阅读 \`skill:freely-freely-doc-B1_IBM-execution\`。
+12. 若已有稳定 issue 边界但文档仍需 issue-bound 收敛，下一跳应阅读 \`skill:freely-freely-doc-B2_IBM-execution\`。
+13. 若 issue 已 ready 或 in-progress，且文档和验收边界足够，下一跳应阅读 \`skill:freely-freely-dev-loop-execution\`。
 13A. 若当前 route 已收敛为 \`completion_verification\` 或 \`cleanup_governance\`，不要把它伪装成新的 doc-loop / dev-loop；优先由主管在当前 \`auto-loop\` 侧产出 verification / cleanup judgement、continuity 与 handoff，必要时再委派 worker。
-13B. 若当前问题本身是 worktree 维护：例如“哪些 worktree 已完成 / 哪些该 merge / 哪些只应退休或保留 research-only / 当前所有 worktree 这轮哪些该 cleanup”，优先阅读 \`skill:worktree-maintenance-governance\`，先完成 \`audit / merge_prep / stacked_merge_chain / fleet_closure / retirement_handoff\` 判断，再决定是否进入 doc/dev-loop。
+13B. 若当前问题本身是 worktree 维护：例如“哪些 worktree 已完成 / 哪些该 merge / 哪些只应退休或保留 research-only / 当前所有 worktree 这轮哪些该 cleanup”，优先阅读 \`skill:freely-freely-worktree-maintenance-governance\`，先完成 \`audit / merge_prep / stacked_merge_chain / fleet_closure / retirement_handoff\` 判断，再决定是否进入 doc/dev-loop。
 13C. 若当前目标分支不是直接从 \`develop\` 派生，而是依赖未合并父分支，不要直接给出“并入 develop”的结论；先按 \`child -> parent -> merge-prep-from-develop -> develop\` 的 stacked merge-chain 逐层检查。
 14. 你需要解释为什么选择当前工具、为什么当前池优先，以及为什么选择当前下一跳。
 15. 你负责产出工具选择与下一跳提示词；CLI 的具体无交互启动参数由 Freely runtime 按 \`workspace/tools.md\` 与 \`workspace/scripts/monitor-ai-cli.sh\` 的约定执行，不要自行发明另一套命令格式。

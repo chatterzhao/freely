@@ -302,8 +302,8 @@ do_initial_merge() {
 │  dev-loop done: 检查下方具体错误。                       │
 │                                                        │
 │  读对应 skill 了解完整工作流:                            │
-│    fix 工位 → skill:fix-execution                       │
-│    feature 工位 → skill:feat-execution                  │
+│    fix 工位 → skill:freely-freely-fix-execution                       │
+│    feature 工位 → skill:freely-freely-feat-execution                  │
 │                                                        │
 │  用 --range dry-run 预检（不触发 ref update）:           │
 │    cd "$source_wt"                                       │

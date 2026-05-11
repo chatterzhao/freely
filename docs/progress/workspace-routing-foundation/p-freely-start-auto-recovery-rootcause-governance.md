@@ -21,9 +21,9 @@ IBM 已完成 materialization。当前 issue 仍处于 feature lane 的 `dev-loo
 **Checkpoint 2026-04-14T18:28:01-07:00**:
 - source_class=`continuation`
 - route_kind=`dev_loop`
-- target_skill=`dev-loop-execution`
+- target_skill=`freely-dev-loop-execution`
 - selected_tool=`codex`
-- why_selected=`当前输入同时命中项目级 AGENTS 首跳、fresh-session `context_compacted` handoff、delegated continuation `healthcheck15`，以及当前 milestone/progress 都把 `I-20260414-0255-A` 标成 `in_dev`；在 `MANAGER_MODE=false` 且当前仍位于 owner feature worktree 的前提下，优先级最高的需求池是 progress/recovery continuation，其次才是 milestone closeout、tests/reviews 与 promote 准备，因此保持 worker reentry scope，在当前会话直接继续 `dev-loop-execution` 是最小正确动作`
+- why_selected=`当前输入同时命中项目级 AGENTS 首跳、fresh-session `context_compacted` handoff、delegated continuation `healthcheck15`，以及当前 milestone/progress 都把 `I-20260414-0255-A` 标成 `in_dev`；在 `MANAGER_MODE=false` 且当前仍位于 owner feature worktree 的前提下，优先级最高的需求池是 progress/recovery continuation，其次才是 milestone closeout、tests/reviews 与 promote 准备，因此保持 worker reentry scope，在当前会话直接继续 `freely-dev-loop-execution` 是最小正确动作`
 - priority_pools:
   - `progress / recovery`
   - `human chat / session evidence`
@@ -58,7 +58,7 @@ IBM 已完成 materialization。当前 issue 仍处于 feature lane 的 `dev-loo
 **Checkpoint 2026-04-14T18:12:53-07:00**:
 - source_class=`continuation`
 - route_kind=`dev_loop`
-- target_skill=`dev-loop-execution`
+- target_skill=`freely-dev-loop-execution`
 - selected_tool=`codex`
 - why_selected=`当前输入先命中项目级 AGENTS 首跳治理、delegated continuation `healthcheck11/12/13`、以及 fresh-session `context_compacted` handoff；milestone 和 progress 都明确当前 owner issue 仍是 `in_dev`，因此最小正确动作是在当前 worktree 继续 dev-loop continuity，先补 recovery/run-dir 证据，再做与当前脏改动直接对应的 feature-local verification`
 - workspace_action=`continue_current_worktree`
@@ -87,7 +87,7 @@ IBM 已完成 materialization。当前 issue 仍处于 feature lane 的 `dev-loo
 **Checkpoint 2026-04-14T17:35:00-07:00**:
 - source_class=`continuation`
 - route_kind=`dev_loop`
-- target_skill=`dev-loop-execution`
+- target_skill=`freely-dev-loop-execution`
 - selected_tool=`codex`
 - why_selected=`用户指出当前坏号已漂移到 worahe1000；真实重放后确认更深一层退化不是 failure label，而是 codex after-failure next-slot 仍会先看 availability cache，导致 1012 / a1018-1 这类 saved slot 被预跳过；当前最小正确动作是在现有 worktree 内把 after-failure contract 收紧为“严格按 saved-slot 顺序逐个运行”`
 - workspace_action=`continue_current_worktree`
@@ -106,7 +106,7 @@ IBM 已完成 materialization。当前 issue 仍处于 feature lane 的 `dev-loo
 **Checkpoint 2026-04-14T17:25:00-07:00**:
 - source_class=`continuation`
 - route_kind=`dev_loop`
-- target_skill=`dev-loop-execution`
+- target_skill=`freely-dev-loop-execution`
 - selected_tool=`codex`
 - why_selected=`真实环境重复启动后确认，旧问题不是 failure label 分类，而是 codex 运行期 after-failure recovery 仍走了 hi-probe/saved-slot 特例，导致 slot 内循环可能回绕且拖慢跨工具外循环；当前最小正确动作是在现有 worktree 内把 codex after-failure 收回统一 next-slot contract，并用真实 freely start 回放验收`
 - workspace_action=`continue_current_worktree`
@@ -129,7 +129,7 @@ IBM 已完成 materialization。当前 issue 仍处于 feature lane 的 `dev-loo
 **Checkpoint 2026-04-14T17:07:00-07:00**:
 - source_class=`continuation`
 - route_kind=`dev_loop`
-- target_skill=`dev-loop-execution`
+- target_skill=`freely-dev-loop-execution`
 - selected_tool=`codex`
 - why_selected=`当前输入以 progress、delegated continuation 与 fresh handoff 为主；issue 边界和 IBM 产物稳定，且 AI_TOOL 仍为 codex，所以最小正确动作是在当前 worktree 内继续 dev-loop continuity，而不是切到新的 doc-loop 或 manager route`
 - workspace_action=`continue_current_worktree`
@@ -157,7 +157,7 @@ IBM 已完成 materialization。当前 issue 仍处于 feature lane 的 `dev-loo
 **Checkpoint 2026-04-14T08:45:36-07:00**:
 - source_class=`continuation`
 - route_kind=`dev_loop`
-- target_skill=`dev-loop-execution`
+- target_skill=`freely-dev-loop-execution`
 - selected_tool=`codex`
 - why_selected=`当前来源是 progress + delegated continuation；issue 边界和 docs 已完整，但 milestone/tasks 仍显示 feature-lane closeout 未完成，因此最小正确动作是继续当前 worktree 的 dev-loop continuity 与状态同步，而不是提前宣布 verification 结束`
 - workspace_action=`continue_current_worktree`
@@ -185,7 +185,7 @@ IBM 已完成 materialization。当前 issue 仍处于 feature lane 的 `dev-loo
 **Checkpoint 2026-04-14T08:11:53-07:00**:
 - source_class=`continuation`
 - route_kind=`dev_loop`
-- target_skill=`dev-loop-execution`
+- target_skill=`freely-dev-loop-execution`
 - selected_tool=`codex`
 - why_selected=`当前 issue 已有稳定边界且需要直接继续仓库内实现、测试和进度回写`
 - workspace_action=`continue_current_worktree`

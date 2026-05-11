@@ -72,7 +72,7 @@ if [[ "$expect_prompt_capture" == "yes" ]]; then
   grep -Fq '`live-status -> fleet-status -> restart-point routing`' "$prompt_capture"
   grep -Fq '`continuation`、`dev`、`review`、`verification`' "$prompt_capture"
   if [[ "$expected_restart" == "cleanup" && "$expected_owner" == "worker" ]]; then
-    grep -q 'worktree-maintenance-governance' "$prompt_capture"
+    grep -q 'freely-freely-worktree-maintenance-governance' "$prompt_capture"
     grep -q '当前 signal 仍应先交接为 cleanup handoff' "$prompt_capture"
   fi
 else

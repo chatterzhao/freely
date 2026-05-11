@@ -10,7 +10,7 @@
 - 角色边界：
   - `workspace/agents/manager-agent.md`
   - `workspace/agents/worker-agent.md`
-- 下游：`skill:context-source-skill`
+- 下游：`skill:freely-freely-context-source-skill`
 - 工具清单：`workspace/tools.md`
 - 三个 loop 下首跳路由与能力归宿细节见 `docs/system/workspace/three-loop-capability-lifecycle.md`
   - 该文档是 whole-app lifecycle / logic 的唯一细节真源；首跳在做 route_kind、loop placement 与 manager-owned judgement 分流前必须先按它理解全局地图
@@ -18,7 +18,7 @@
 
 ## 职责
 
-1. 在进入领域工作流前先执行 `skill:constitution-guard` 与 `skill:laws-enforcer`。
+1. 在进入领域工作流前先执行 `skill:freely-freely-constitution-guard` 与 `skill:freely-freely-laws-enforcer`。
    - `skill:<name>` 调用 Claude Code Skill 工具加载 `~/.claude/skills/<name>/SKILL.md`；若当前环境无 Skill 工具，回退读取项目 `workspace/skills/<name>/SKILL.md`。
 2. 读取当前输入上下文，识别来源类型：
    - chat / session evidence
@@ -27,21 +27,21 @@
    - external issue
    - milestone
    - issue / progress / recovery
-3. 将来源判定、需求池扫描、优先级判断与下一跳提示词组装委托给 `skill:context-source-skill`。
-   - 若当前环境无 Skill 工具，回退读取 `workspace/skills/context-source-skill/SKILL.md`。
+3. 将来源判定、需求池扫描、优先级判断与下一跳提示词组装委托给 `skill:freely-freely-context-source-skill`。
+   - 若当前环境无 Skill 工具，回退读取 `workspace/skills/freely-freely-context-source-skill/SKILL.md`。
 4. 读取 `workspace/tools.md`，理解当前可用工具、优先级和适配阶段。
-5. 基于 `context-source-skill` 的输出，自主决定下一跳是：
-   - `skill:doc-B1_IBM-execution`
-   - `skill:doc-B2_IBM-execution`
-   - `skill:dev-loop-execution`
+5. 基于 `freely-context-source-skill` 的输出，自主决定下一跳是：
+   - `skill:freely-freely-doc-B1_IBM-execution`
+   - `skill:freely-freely-doc-B2_IBM-execution`
+   - `skill:freely-freely-dev-loop-execution`
    - manager-owned `completion_verification / cleanup_governance`
-   - `skill:worktree-maintenance-governance`
+   - `skill:freely-freely-worktree-maintenance-governance`
    - 以及应由哪个外部 AI CLI 工具承接下一跳
 6. 当当前轮次承担项目级监督职责时，先判断哪些 worktree 应继续 dev-loop、哪些只做 doc-loop、哪些冻结等待上游、哪些进入 verification / cleanup / retirement judgement。
-7. 当问题本身是“检查 worktree 是否完成 / 哪些可 merge / 哪些只该 retire / 当前所有 worktree 这轮哪些该继续或 cleanup”时，调用 `skill:worktree-maintenance-governance`，而不是只靠 milestone 或 git graph 临时拼判断；若分支不是直接从 `develop` 派生，优先走其中的 `stacked_merge_chain` 模式；若问题是仓库级盘点，优先走 `fleet_closure`。
+7. 当问题本身是“检查 worktree 是否完成 / 哪些可 merge / 哪些只该 retire / 当前所有 worktree 这轮哪些该继续或 cleanup”时，调用 `skill:freely-freely-worktree-maintenance-governance`，而不是只靠 milestone 或 git graph 临时拼判断；若分支不是直接从 `develop` 派生，优先走其中的 `stacked_merge_chain` 模式；若问题是仓库级盘点，优先走 `fleet_closure`。
 8. 对暂不能收口的 candidate / issue，不得因为本轮优先级较低就把它从扫描面移除；必须显式判断它应继续停留在 `candidate_issues`、issue-bound brainstorm 还是 blocked state，并写回 `next_action` 与重启条件。
 9. 在可并行的 review、日志诊断、文档收敛或互不冲突的代码任务上，主动使用 subagent 提高效率，但不要让 subagent 接管主管自己的关键排班判断。
-10. 保持对后续 doc/dev-loop 的边界清晰，不直接替代 `skill:doc-B2_IBM-execution` 或 `skill:dev-loop-execution`；已有 issue 先进入 issue-bound `doc-loop`，再由后续循环进入 `dev-loop`；completion / cleanup 的最终裁决仍回到 `auto-loop`。
+10. 保持对后续 doc/dev-loop 的边界清晰，不直接替代 `skill:freely-freely-doc-B2_IBM-execution` 或 `skill:freely-freely-dev-loop-execution`；已有 issue 先进入 issue-bound `doc-loop`，再由后续循环进入 `dev-loop`；completion / cleanup 的最终裁决仍回到 `auto-loop`。
 
 ## 不负责
 
@@ -49,15 +49,15 @@
 - 不直接定义 dev-loop 的实现与测试步骤
 - 不把 milestone、brainstorm、progress 的完整状态机硬编码在这里
 - 不在脚本里预先写死“某输入必须走哪个工具”
-- 不自己扫描需求池并决定当前该从哪个池找活，这个职责归 `context-source-skill`
+- 不自己扫描需求池并决定当前该从哪个池找活，这个职责归 `freely-context-source-skill`
 
 ## 首跳协议
 
 1. 启动器把项目路径、宪法路径、意图路径、AI 规格作为最小输入面交给外部 AI CLI 工具。
 2. `lead-agent` 接管后，先做治理门禁预检。
-3. 将当前 `input_context`、`docs/milestones.md` 与 `workspace/tools.md` 作为首跳判定输入交给 `context-source-skill`。
+3. 将当前 `input_context`、`docs/milestones.md` 与 `workspace/tools.md` 作为首跳判定输入交给 `freely-context-source-skill`。
    - 对 `docs/milestones.md` 这类大型文档，先用已有 patrol seed、标题定位或分段读取缩小范围，不默认整文件硬读。
-4. 接收 `context-source-skill` 的输出：
+4. 接收 `freely-context-source-skill` 的输出：
    - 来源判定
    - usable issue 结论
    - 建议下一跳工具

@@ -9,17 +9,17 @@
 - 默认运行工位：`develop` / `main` / `test-pre-merge-*`
 - 上游：`workspace/scripts/start-lead-agent.sh`
 - 下游：
-  - `skill:auto-loop-orchestrator`
-  - `skill:context-source-skill`
-  - `skill:multi-worktree-supervision`
-  - `skill:worktree-hygiene-supervision`
-  - `skill:worktree-maintenance-governance`
+  - `skill:freely-freely-auto-loop-orchestrator`
+  - `skill:freely-freely-context-source-skill`
+  - `skill:freely-freely-multi-worktree-supervision`
+  - `skill:freely-freely-worktree-hygiene-supervision`
+  - `skill:freely-freely-worktree-maintenance-governance`
 - 主管角色在三个 loop 中的归宿与生命周期细节见 `docs/system/workspace/three-loop-capability-lifecycle.md`
   - 该文档是 whole-app lifecycle / logic 的唯一细节真源；主管在做 loop placement、restart point、completion / verification / cleanup / recovery judgment 前必须先阅读并按其语义裁决
   - 若主管相关 prompt、routing 或 judgement contract 改变了 three-loop 语义，必须先同步检查该真源，再更新本文件
-  - `skill:watchdog-control-plane`
-  - `skill:continuity-watchdog`
-  - `skill:agent-execution-safety-review`
+  - `skill:freely-freely-watchdog-control-plane`
+  - `skill:freely-freely-continuity-watchdog`
+  - `skill:freely-freely-agent-execution-safety-review`
 
 ## 职责
 
@@ -106,7 +106,7 @@
    - 若这些字段缺失或不完整，runtime 仍会把缺口 machine-readably 暴露在 worker verification contract state 中；主管不应假定 launch 后缺口会自动消失
    - `Worktree:` header 只是输入锚点，不是最终 ownership 判重键；凡是进入 `write_scope`、`intent_target`、queue/freeze 或 recovery 比较的 worktree 路径，都必须先 canonicalize 成真实路径（例如 `pwd -P` / runtime normalized path）
    - 对会产生 mutate authority 的 lane，还必须写出 `intent_kind` 与 `intent_target`；`inspect-anywhere` 合法，但 `mutate-only-with-lease`
-13. 当主管收到“检查所有 worktree / 哪些可以 merge / 哪些已经只剩 retirement handoff / 这轮哪些该 cleanup”这类问题时，优先调用 `skill:worktree-maintenance-governance`，把问题明确落到 `audit / merge_prep / stacked_merge_chain / fleet_closure / retirement_handoff` 之一。
+13. 当主管收到“检查所有 worktree / 哪些可以 merge / 哪些已经只剩 retirement handoff / 这轮哪些该 cleanup”这类问题时，优先调用 `skill:freely-freely-worktree-maintenance-governance`，把问题明确落到 `audit / merge_prep / stacked_merge_chain / fleet_closure / retirement_handoff` 之一。
 14. 对 `external issue / milestones / candidates / issue / progress / recovery` 这类 standing source，除了普通路由外，还要判断是否需要专门的 source-governance 或 milestone/state-maintenance worker 做 sequencing 与 drift reconcile。
 15. 对 source completeness 负责，而不只是对“当前 signal 是否有回应”负责：
    - 推荐把 `./bin/freely task-source-scan --project <project> --json` 作为 standing-source inventory 的统一脚本入口；它输出的是 patrol 输入，不是最终真相裁决
@@ -131,7 +131,7 @@
 ## 与其他角色的边界
 
 - `runtime` 管生存：切号、等待、重启、恢复
-- `watchdog-control-plane` 管 watchdog owner taxonomy：availability / runtime / continuity
+- `freely-watchdog-control-plane` 管 watchdog owner taxonomy：availability / runtime / continuity
 - `worker-agent` 管执行：doc-loop / dev-loop / verification evidence
 - `manager-agent` 管编排与裁决：发现、判断、委派、完成判定、合并、清理
 - sibling dirty、cleanup followthrough、promotion in flight 这类跨 worktree signal 的 ownership-aware routing 也属于 `manager-agent`
@@ -142,7 +142,7 @@
 当主管看到任意新 signal 时，必须遵守下面的固定顺序：
 
 例外：
-- runtime interruption dispatcher 可先调用 `skill:human-interruption-manager-triage`。
+- runtime interruption dispatcher 可先调用 `skill:freely-freely-human-interruption-manager-triage`。
 - 但 dispatcher 只负责及时接住 `human interruption` 这类高优先级 event source，不替代主主管完成完整排班。
 
 1. `notice`
@@ -154,7 +154,7 @@
 
 3. `intent understanding`
 - 不从 raw signal 直接跳进执行桶。
-- 先通过 `skill:signal-intent-understanding` 或等价推理收敛最小意图结构：
+- 先通过 `skill:freely-freely-signal-intent-understanding` 或等价推理收敛最小意图结构：
   - `intent_kind`
   - `needs_live_inspection`
   - `needs_execution`
@@ -178,14 +178,14 @@
 
 5. `delegate analysis or execution`
 - 主管把这件事交给合适的 specialized analysis / worker / runtime owner。
-- 对 `human interruption`，可委派 `skill:human-interruption-handling` 做深度解释。
+- 对 `human interruption`，可委派 `skill:freely-freely-human-interruption-handling` 做深度解释。
 - 对需要先读现场、再决定动作的 signal，应先进入 analysis 路径。
 - 对边界已经清楚的 signal，可直接进入 execution 路径。
 - 除非缺失的是高风险外部事实且无法通过现有真源恢复，否则主管不应把项目级判断默认退化为“先问人再说”。
 
 6. `choose absorption target`
 - 主管负责决定加工结果最终进入哪类 canonical pool：
-  - discovery -> `doc-B1_IBM-execution`
+  - discovery -> `freely-doc-B1_IBM-execution`
   - continuation -> 当前 issue / progress / recovery
   - control -> runtime / manager continuity
   - noise -> resolution note / continuity

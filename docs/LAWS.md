@@ -18,8 +18,8 @@
 - 回流后下一轮输入状态记录
 
 执行技能：
-- `skill:auto-loop-orchestrator`
-- `skill:laws-enforcer`
+- `skill:freely-freely-auto-loop-orchestrator`
+- `skill:freely-freely-laws-enforcer`
 
 ---
 
@@ -93,11 +93,11 @@
 - 该临时落点只用于当前研究阶段；正式目录启用后，证据必须回到规范路径
 
 执行技能：
-- `skill:branch-management`
-- `skill:multi-worktree-supervision`
-- `skill:worktree-maintenance-governance`
-- `skill:premerge-reconcile`
-- `skill:constitution-guard`
+- `skill:freely-freely-branch-management`
+- `skill:freely-freely-multi-worktree-supervision`
+- `skill:freely-freely-worktree-maintenance-governance`
+- `skill:freely-freely-premerge-reconcile`
+- `skill:freely-freely-constitution-guard`
 
 ---
 
@@ -118,10 +118,10 @@
 - 路由决定与下一跳记录
 
 执行技能：
-- `skill:context-source-skill`
-- `skill:doc-B1_IBM-execution`
-- `skill:doc-B2_IBM-execution`
-- `skill:dev-loop-execution`
+- `skill:freely-freely-context-source-skill`
+- `skill:freely-freely-doc-B1_IBM-execution`
+- `skill:freely-freely-doc-B2_IBM-execution`
+- `skill:freely-freely-dev-loop-execution`
 
 ---
 
@@ -139,9 +139,9 @@
 - reroute 到 `pre-brainstorm` 的原因与证据
 
 执行技能：
-- `skill:doc-B2_IBM-execution`
-- `skill:dev-loop-execution`
-- `skill:laws-enforcer`
+- `skill:freely-freely-doc-B2_IBM-execution`
+- `skill:freely-freely-dev-loop-execution`
+- `skill:freely-freely-laws-enforcer`
 
 ---
 
@@ -178,9 +178,9 @@
 - 若命中 whole-app lifecycle 真源例外，还需证明引用面已回退为摘要/引用，而不是继续平行维护细节
 
 执行技能：
-- `skill:laws-enforcer`
-- `skill:doc-B1_IBM-execution`
-- `skill:doc-B2_IBM-execution`
+- `skill:freely-freely-laws-enforcer`
+- `skill:freely-freely-doc-B1_IBM-execution`
+- `skill:freely-freely-doc-B2_IBM-execution`
 
 ---
 
@@ -360,9 +360,9 @@ phase-1 break-glass merge commit 仍应包含：
 - `Freely-Follow-On-Issue`（仅 `break_glass` 时）
 
 执行技能：
-- `skill:branch-management`
-- `skill:constitution-guard`
-- `skill:laws-enforcer`
+- `skill:freely-freely-branch-management`
+- `skill:freely-freely-constitution-guard`
+- `skill:freely-freely-laws-enforcer`
 
 ---
 
@@ -377,8 +377,8 @@ phase-1 break-glass merge commit 仍应包含：
 - tag 列表与分支映射记录
 
 执行技能：
-- `skill:branch-management`
-- `skill:laws-enforcer`
+- `skill:freely-freely-branch-management`
+- `skill:freely-freely-laws-enforcer`
 
 ---
 
@@ -393,8 +393,8 @@ phase-1 break-glass merge commit 仍应包含：
 - 修订说明（如有）
 
 执行技能：
-- `skill:constitution-guard`
-- `skill:laws-enforcer`
+- `skill:freely-freely-constitution-guard`
+- `skill:freely-freely-laws-enforcer`
 
 ---
 
@@ -410,8 +410,8 @@ phase-1 break-glass merge commit 仍应包含：
 - 等价证据索引（若未落规范路径）
 
 执行技能：
-- `skill:constitution-guard`
-- `skill:laws-enforcer`
+- `skill:freely-freely-constitution-guard`
+- `skill:freely-freely-laws-enforcer`
 
 ---
 
@@ -427,8 +427,8 @@ phase-1 break-glass merge commit 仍应包含：
 - 会话隔离与监控记录
 
 执行技能：
-- `skill:constitution-guard`
-- `skill:recovery-subagent-governance`
+- `skill:freely-freely-constitution-guard`
+- `skill:freely-freely-recovery-subagent-governance`
 
 ---
 
@@ -442,8 +442,8 @@ phase-1 break-glass merge commit 仍应包含：
 - 运行配置与模式记录
 
 执行技能：
-- `skill:constitution-guard`
-- `skill:laws-enforcer`
+- `skill:freely-freely-constitution-guard`
+- `skill:freely-freely-laws-enforcer`
 
 ---
 
@@ -462,8 +462,8 @@ phase-1 break-glass merge commit 仍应包含：
 - 账号切换或 reset backoff 记录（如适用）
 
 执行技能：
-- `skill:recovery-subagent-governance`
-- `skill:auto-loop-orchestrator`
+- `skill:freely-freely-recovery-subagent-governance`
+- `skill:freely-freely-auto-loop-orchestrator`
 
 ---
 
@@ -477,8 +477,8 @@ phase-1 break-glass merge commit 仍应包含：
 - 输入参数白名单检查记录
 
 执行技能：
-- `skill:constitution-guard`
-- `skill:laws-enforcer`
+- `skill:freely-freely-constitution-guard`
+- `skill:freely-freely-laws-enforcer`
 
 ---
 
@@ -499,8 +499,8 @@ phase-1 break-glass merge commit 仍应包含：
 - 违例记录与修复记录
 
 执行技能：
-- `skill:laws-enforcer`
-- `skill:dev-loop-execution`
+- `skill:freely-freely-laws-enforcer`
+- `skill:freely-freely-dev-loop-execution`
 
 ---
 
@@ -527,8 +527,8 @@ phase-1 break-glass merge commit 仍应包含：
 - 如存在能力化分流，提供独立 pre-brainstorm 证据
 
 执行技能：
-- `skill:laws-enforcer`
-- `skill:constitution-guard`
+- `skill:freely-freely-laws-enforcer`
+- `skill:freely-freely-constitution-guard`
 
 ---
 
@@ -546,11 +546,11 @@ phase-1 break-glass merge commit 仍应包含：
 - 路由与状态链路记录
 
 执行技能：
-- `skill:doc-B1_IBM-execution`
-- `skill:doc-B2_IBM-execution`
-- `skill:dev-loop-execution`
-- `skill:auto-loop-orchestrator`
-- `skill:laws-enforcer`
+- `skill:freely-freely-doc-B1_IBM-execution`
+- `skill:freely-freely-doc-B2_IBM-execution`
+- `skill:freely-freely-dev-loop-execution`
+- `skill:freely-freely-auto-loop-orchestrator`
+- `skill:freely-freely-laws-enforcer`
 
 ---
 
@@ -566,8 +566,8 @@ phase-1 break-glass merge commit 仍应包含：
 - 回退决策记录
 
 执行技能：
-- `skill:recovery-subagent-governance`
-- `skill:laws-enforcer`
+- `skill:freely-freely-recovery-subagent-governance`
+- `skill:freely-freely-laws-enforcer`
 
 ---
 
@@ -584,8 +584,8 @@ phase-1 break-glass merge commit 仍应包含：
 - 共享热点串行窗口或排序记录
 
 执行技能：
-- `skill:recovery-subagent-governance`
-- `skill:laws-enforcer`
+- `skill:freely-freely-recovery-subagent-governance`
+- `skill:freely-freely-laws-enforcer`
 
 ---
 
@@ -602,7 +602,7 @@ phase-1 break-glass merge commit 仍应包含：
 - 合约测试记录
 
 执行技能：
-- `skill:module-interface-governance`
+- `skill:freely-freely-module-interface-governance`
 
 ---
 
@@ -617,7 +617,7 @@ phase-1 break-glass merge commit 仍应包含：
 - 备份文件路径与时间记录
 
 执行技能：
-- `skill:config-backup-guard`
+- `skill:freely-freely-config-backup-guard`
 
 ---
 
@@ -633,17 +633,17 @@ phase-1 break-glass merge commit 仍应包含：
 - 自举治理检查记录
 
 执行技能：
-- `skill:constitution-guard`
-- `skill:branch-management`
-- `skill:laws-enforcer`
+- `skill:freely-freely-constitution-guard`
+- `skill:freely-freely-branch-management`
+- `skill:freely-freely-laws-enforcer`
 
 ---
 
 ## 附录 A. 执行路由（固定顺序）
 
 默认执行链：
-1. `skill:constitution-guard`（硬约束门禁）
-2. `skill:laws-enforcer`（法律门禁与证据校验）
+1. `skill:freely-freely-constitution-guard`（硬约束门禁）
+2. `skill:freely-freely-laws-enforcer`（法律门禁与证据校验）
 3. 业务技能（`auto/doc/dev/branch/...`；若独立调用，也必须先执行前两步）
 
 说明：

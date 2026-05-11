@@ -3,9 +3,9 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
 
-WATCHDOG_SKILL="$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/SKILL.md"
-WATCHDOG_LIB="$ROOT_DIR/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
-CONTINUITY_SKILL="$ROOT_DIR/docs/system/workspace/skills/continuity-watchdog/SKILL.md"
+WATCHDOG_SKILL="$ROOT_DIR/docs/system/workspace/skills/freely-freely-watchdog-control-plane/SKILL.md"
+WATCHDOG_LIB="$ROOT_DIR/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh"
+CONTINUITY_SKILL="$ROOT_DIR/docs/system/workspace/skills/freely-freely-continuity-watchdog/SKILL.md"
 RUNTIME_SCRIPT="$ROOT_DIR/docs/system/workspace/scripts/runtime/freely"
 MANAGER_AGENT="$ROOT_DIR/docs/system/workspace/agents/manager-agent.md"
 WORKER_AGENT="$ROOT_DIR/docs/system/workspace/agents/worker-agent.md"
@@ -16,11 +16,11 @@ SKILLS_INDEX="$ROOT_DIR/docs/system/workspace/skills/README.md"
 [[ -f "$CONTINUITY_SKILL" ]]
 
 grep -q 'source "\$WATCHDOG_AVAILABILITY_LIB"' "$RUNTIME_SCRIPT"
-grep -q 'skill:watchdog-control-plane' "$SKILLS_INDEX"
-grep -q 'skill:continuity-watchdog' "$SKILLS_INDEX"
-grep -q 'skill:watchdog-control-plane' "$MANAGER_AGENT"
-grep -q 'skill:continuity-watchdog' "$MANAGER_AGENT"
-grep -q 'skill:continuity-watchdog' "$WORKER_AGENT"
+grep -q 'skill:freely-freely-watchdog-control-plane' "$SKILLS_INDEX"
+grep -q 'skill:freely-freely-continuity-watchdog' "$SKILLS_INDEX"
+grep -q 'skill:freely-freely-watchdog-control-plane' "$MANAGER_AGENT"
+grep -q 'skill:freely-freely-continuity-watchdog' "$MANAGER_AGENT"
+grep -q 'skill:freely-freely-continuity-watchdog' "$WORKER_AGENT"
 grep -q 'freely live-status' "$WATCHDOG_SKILL"
 grep -q 'live-status) cmd_live_status' "$RUNTIME_SCRIPT"
 

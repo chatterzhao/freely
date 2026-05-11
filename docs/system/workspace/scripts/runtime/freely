@@ -27,7 +27,7 @@ log_info() { echo "$(_log_ts) [INFO] $*" >&2; }
 log_warn() { echo "$(_log_ts) [WARN] $*" >&2; }
 log_error() { echo "$(_log_ts) [ERROR] $*" >&2; }
 
-WATCHDOG_CONTROL_PLANE_SKILL_ROOT="$SELF_ROOT/docs/system/workspace/skills/watchdog-control-plane"
+WATCHDOG_CONTROL_PLANE_SKILL_ROOT="$SELF_ROOT/docs/system/workspace/skills/freely-watchdog-control-plane"
 WATCHDOG_AVAILABILITY_LIB="$WATCHDOG_CONTROL_PLANE_SKILL_ROOT/scripts/availability-watchdog.sh"
 [[ -f "$WATCHDOG_AVAILABILITY_LIB" ]] || {
   echo "[ERROR] missing watchdog availability module: $WATCHDOG_AVAILABILITY_LIB" >&2
@@ -9610,9 +9610,9 @@ materialize_cleanup_worker_prompt_from_manager_continuity_if_needed() {
         printf -- '- 路径: `%s`\n' "$companion_wt"
         printf -- '- 分支: `%s`\n' "$companion_branch"
         if [[ "$companion_branch" == fix/* ]]; then
-          printf 'fix-execution 模式: test-pre-merge 可临时修改测试（dirty only），实际提交需 cd 到上述路径后 commit。\n'
+          printf 'freely-fix-execution 模式: test-pre-merge 可临时修改测试（dirty only），实际提交需 cd 到上述路径后 commit。\n'
         elif [[ "$companion_branch" == feature/* ]]; then
-          printf 'feat-execution 模式: 所有开发和提交需在 feature 工位进行，不在当前工位修改。\n'
+          printf 'freely-feat-execution 模式: 所有开发和提交需在 feature 工位进行，不在当前工位修改。\n'
         fi
       fi
     fi
@@ -9780,16 +9780,16 @@ worker_prompt_launchable_for_manager_project() {
     develop)
       if [[ "$(worker_prompt_normalized_intent_kind "$prompt_file")" != "cleanup" ]]; then
         log_warn "worker_prompt_launchable: rejected branch '$target_branch' — non-cleanup worker must run on fix/* or feature/*"
-        log_warn "  如果工位不存在，用 wt-create 创建: ./bin/wt-create --raw-key <key> --source platform --skill fix-execution --slug <slug>"
+        log_warn "  如果工位不存在，用 wt-create 创建: ./bin/wt-create --raw-key <key> --source platform --skill freely-fix-execution --slug <slug>"
         log_warn "  参数不清楚用 ./bin/wt-create --help"
-        log_warn "  如果工位不存在，用 wt-create 创建: ./bin/wt-create --raw-key <key> --source platform --skill fix-execution --slug <slug>"
+        log_warn "  如果工位不存在，用 wt-create 创建: ./bin/wt-create --raw-key <key> --source platform --skill freely-fix-execution --slug <slug>"
         log_warn "  参数不清楚用 ./bin/wt-create --help"
         return 1
       fi
       ;;
     *)
       log_warn "worker_prompt_launchable: rejected branch '$target_branch' — worker must run on fix/* or feature/*"
-        log_warn "  如果工位不存在，用 wt-create 创建: ./bin/wt-create --raw-key <key> --source platform --skill fix-execution --slug <slug>"
+        log_warn "  如果工位不存在，用 wt-create 创建: ./bin/wt-create --raw-key <key> --source platform --skill freely-fix-execution --slug <slug>"
         log_warn "  参数不清楚用 ./bin/wt-create --help"
       return 1
       ;;
@@ -13138,7 +13138,7 @@ append_manager_consumed_continuity_resume_focus_if_needed() {
   printf -- '- 不要默认重做完整的主管首跳 patrol / 里程碑全扫描。\n'
   printf -- '- 先严格承接这份 continuity 的 `route_kind / restart_point / next_action / next_supervision_priority`。\n'
   printf -- '- 对 manager-owned `completion_verification / cleanup_governance`，本轮目标不是再写一份同义 continuity；必须优先推进其中已经写明的 maintenance / replay / retirement followthrough。\n'
-  printf -- '- 若当前问题实质是 worktree merge / cleanup / retirement / fleet sequencing，先按 `workspace/skills/worktree-maintenance-governance/SKILL.md` 执行，而不是回到新的 broad patrol。\n'
+  printf -- '- 若当前问题实质是 worktree merge / cleanup / retirement / fleet sequencing，先按 `workspace/skills/freely-worktree-maintenance-governance/SKILL.md` 执行，而不是回到新的 broad patrol。\n'
   printf -- '- 只有当你已经推进了当前 continuity 指定的 followthrough，或发现缺少某项 runtime / governance capability 必须先修复时，才允许写下一份 continuity。\n'
   printf -- '- 只有出现以下情况时，才允许扩回全量巡检：\n'
   printf -- '  - 有新的 delegated continuation / fresh intake\n'
@@ -13181,7 +13181,7 @@ append_cleanup_governance_retirement_worker_directive_if_needed() {
   printf '\n%s：\n' "$focus_label"
   printf -- '- 这份 continuity 已经把当前 lane 稳定判成 `cleanup_governance`，且 retained merged worktree 仍在 authoritative fleet 中。\n'
   printf -- '- 本轮不得再次只写一份同义 manager continuity，也不得继续停留在“等待显式证据”。\n'
-  printf -- '- 必须改走 `workspace/skills/worktree-maintenance-governance/SKILL.md` 的 `retirement_handoff`，并产出可消费的 cleanup worker delegation / worker prompt。\n'
+  printf -- '- 必须改走 `workspace/skills/freely-worktree-maintenance-governance/SKILL.md` 的 `retirement_handoff`，并产出可消费的 cleanup worker delegation / worker prompt。\n'
   printf -- '- worker prompt 至少要把下面这些 retained target 作为 cleanup/retirement 目标写进 `Worktree:` / `write_scope` / `intent_target`：\n'
   while IFS= read -r target_path; do
     [[ -n "$target_path" ]] || continue
@@ -14111,7 +14111,7 @@ Worktree hygiene intervention:
 - checkpoint_drift_streak: ${streak}
 - checkpoint_drift_threshold: ${threshold}
 - 当前工位已连续多轮处于 dirty/checkpoint 漂移，不应继续扩写实现。
-- 先执行 \`skill:worktree-hygiene-supervision\`。
+- 先执行 \`skill:freely-worktree-hygiene-supervision\`。
 - 先更新当前阶段 continuity artifact、补最小验证、切原子 checkpoint commit；若 scope 已混杂，先按 ownership 分流到 dedicated worktree。
 - 若你是主管，优先委派 hygiene 收口；若你是 worker，优先收口当前 issue，再继续下一批。
 EOF
@@ -14160,7 +14160,7 @@ append_human_chat_intake_if_needed() {
 Human chat intake queue:
 - 以下 human/project-facing interruptions 已 durable 写入 intake 队列。
 - 对每条 pending intake，先 \`claim\`，再选择 \`steer/followup/collect/interrupt/noise\`。
-- 使用 \`skill:human-interruption-handling\` 生成 resolution artifact / handoff，不要让主管自己承担深度解释。
+- 使用 \`skill:freely-human-interruption-handling\` 生成 resolution artifact / handoff，不要让主管自己承担深度解释。
 - 若最终 absorption 为新的 \`discovery\`，再走 \`doc-pre-brainstorm-execution\`，不要在主管工位直接落仓库产物。
 - intake item 只有在被吸收进 recovery / issue / pre-brainstorm / milestone 后，才算处理完成。
 
@@ -15069,7 +15069,7 @@ append_manager_hygiene_alert_if_needed() {
 Worktree hygiene alert:
 - 以下 worker 工位已进入 checkpoint / dirty-budget 漂移。
 - 在继续普通排班前，先判断是否应委派 hygiene 收口、冻结、cleanup 或分流。
-- 优先使用 \`skill:worktree-hygiene-supervision\` 形成清晰 delegation handoff，而不是继续让原 worker 横向扩 scope。
+- 优先使用 \`skill:freely-worktree-hygiene-supervision\` 形成清晰 delegation handoff，而不是继续让原 worker 横向扩 scope。
 
 $alerts
 EOF
@@ -20173,8 +20173,8 @@ cmd_task_source_scan() {
   else
     echo "project: $project"
     echo "task_source_scan: $latest_file"
-    echo "recommended_skill: auto-loop-orchestrator"
-    echo "routing_skill: context-source-skill"
+    echo "recommended_skill: freely-auto-loop-orchestrator"
+    echo "routing_skill: freely-context-source-skill"
     python3 - "$latest_file" <<'PY'
 import json
 import sys

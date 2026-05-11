@@ -51,7 +51,7 @@ Freely 是一个自主循环运行器：
 
 `premerge` 临时分支规则（用于复杂冲突收敛，不新增长期分支层级）：
 - 分支名固定使用：`feature/premerge-YYYYMMDDTHHMMZ--<topic>`（旧格式 `YYYYMMDD-HHMM` 仍兼容）。
-- 必须从当前活跃的 `test-pre-merge-*` 批次创建；若当前没有测试批次，则先从 `develop` 创建新的 `test-pre-merge-*`，再进入 `premerge`（具体命令步骤由 `skill:premerge-reconcile` 定义）。
+- 必须从当前活跃的 `test-pre-merge-*` 批次创建；若当前没有测试批次，则先从 `develop` 创建新的 `test-pre-merge-*`，再进入 `premerge`（具体命令步骤由 `skill:freely-freely-premerge-reconcile` 定义）。
 - 仅在以下场景使用：
   - 多个 `feature/*` 串行并入 `test-pre-merge-*` 时出现复杂冲突，且无法在单次 merge 中稳定解决。
   - 历史分支过旧，常规 merge 风险过高，需要通过 `cherry-pick` 方式回收有效提交。
@@ -229,7 +229,7 @@ CLI (核心) → API (可选) → UI (可选)
 
 说明：
 - 具体接口设计见各 skill 的 CLI 参考文档。
-- AI Agent 调用约定见 `skill:auto-loop-orchestrator`。
+- AI Agent 调用约定见 `skill:freely-freely-auto-loop-orchestrator`。
 
 ### 10.2 Freely 产品形态边界（硬性要求）
 
@@ -252,7 +252,7 @@ Freely 遵循三个 loop 的方法论。
 A:auto-loop（外循环）
 ├── 发现与路由 Issue
 ├── 进入 D:doc-loop（前置收敛 / B2_IBM 文档收敛）
-├── 或进入 D:dev-loop-execution（开发实现环）
+├── 或进入 D:freely-dev-loop-execution（开发实现环）
 ├── 基于 canonical evidence 做 completion / verification / cleanup judgment
 └── 吸收结果并进入下一轮
 ```
@@ -289,7 +289,7 @@ Freely 必须在可并行场景下支持子代理委托，但保持单编排者�
 
 说明：
 - 具体验收门与证据口径见 `docs/LAWS.md` 第 12 章。
-- 具体执行步骤见 `skill:recovery-subagent-governance`。
+- 具体执行步骤见 `skill:freely-freely-recovery-subagent-governance`。
 
 ## 13. 并行开发的领域模型（硬性要求）
 
@@ -302,7 +302,7 @@ Freely 必须同时强制物理领域与逻辑领域，以降低并行开发的�
 
 说明：
 - 具体验收门与证据口径见 `docs/LAWS.md` 第 13 章。
-- 具体执行步骤见 `skill:recovery-subagent-governance` 与 `skill:laws-enforcer`。
+- 具体执行步骤见 `skill:freely-freely-recovery-subagent-governance` 与 `skill:freely-freely-laws-enforcer`。
 
 ## 14. 可插拔模块架构与接口版本控制（硬性要求）
 
@@ -316,7 +316,7 @@ Freely 必须支持可插拔、可演进、可回滚的模块化架构，并保�
 
 说明：
 - 具体验收门与证据口径见 `docs/LAWS.md` 第 14 章。
-- 具体执行步骤见 `skill:module-interface-governance`。
+- 具体执行步骤见 `skill:freely-freely-module-interface-governance`。
 
 ## 15. 变更前配置备份（硬性要求）
 
@@ -330,7 +330,7 @@ Freely 必须支持可插拔、可演进、可回滚的模块化架构，并保�
 
 说明：
 - 具体验收门与证据口径见 `docs/LAWS.md` 第 15 章。
-- 具体执行步骤见 `skill:config-backup-guard`。
+- 具体执行步骤见 `skill:freely-freely-config-backup-guard`。
 
 ## 16. Freely 自举开发（硬性要求）
 
@@ -344,4 +344,4 @@ Freely 在开发 Freely 本身时必须遵守与托管项目一致的治理边�
 
 说明：
 - 具体验收门与证据口径见 `docs/LAWS.md` 第 16 章。
-- 具体执行步骤见 `skill:constitution-guard`、`skill:branch-management`、`skill:laws-enforcer`。
+- 具体执行步骤见 `skill:freely-freely-constitution-guard`、`skill:freely-freely-branch-management`、`skill:freely-freely-laws-enforcer`。

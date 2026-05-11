@@ -642,10 +642,10 @@ tool_run_direct_from_prompt_file() {
       exec bash -lc "cat <<'EOF'
 [TEST] mock AI CLI started
 selected_tool = test-route-only
-target_skill_or_loop = skill:doc-B2_IBM-execution
+target_skill_or_loop = skill:freely-freely-doc-B2_IBM-execution
 \`next_prompt\`：
 ```text
-你现在承接第二跳，直接进入 skill:doc-B2_IBM-execution 并修改真实文档产物。
+你现在承接第二跳，直接进入 skill:freely-freely-doc-B2_IBM-execution 并修改真实文档产物。
 ```
 EOF
 sleep 1"

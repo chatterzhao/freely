@@ -39,7 +39,7 @@ bash -lc '
   log_error(){ :; }
   seconds_until_epoch(){ printf "0\n"; }
   ai_cli_bin_for_project(){ printf "%s\n" "'"$ROOT_DIR"'/bin/ai"; }
-  source "'"$ROOT_DIR"'/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+  source "'"$ROOT_DIR"'/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh"
   codex_probe_current_slot_now "'"$PROJECT"'" >/dev/null
 ' &
 

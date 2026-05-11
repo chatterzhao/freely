@@ -22,7 +22,7 @@ bash -lc '
   log_info() { :; }
   log_warn() { :; }
   log_error() { printf "%s\n" "$*" >&2; }
-  source "'"$ROOT_DIR"'/docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh"
+  source "'"$ROOT_DIR"'/docs/system/workspace/skills/freely-freely-watchdog-control-plane/scripts/availability-watchdog.sh"
   codex_current_slot() { echo "same@example-com-1"; }
   codex_current_slot_kind() { echo "account"; }
   codex_current_identity_hint() { echo "same@example-com-1"; }

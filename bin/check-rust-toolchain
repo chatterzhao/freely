@@ -28,7 +28,7 @@ if [[ "$missing" -ne 0 ]]; then
   printf 'Missing commands: %s\n' "${missing_cmds[*]}"
   echo
   echo "Suggested next step:"
-  echo "  1. Follow skill:rust-tauri-toolchain-bootstrap"
+  echo "  1. Follow skill:freely-freely-rust-tauri-toolchain-bootstrap"
   echo "  2. Preferred mirrored rustup install:"
   echo "     export RUSTUP_DIST_SERVER=https://rsproxy.cn"
   echo "     export RUSTUP_UPDATE_ROOT=https://rsproxy.cn/rustup"

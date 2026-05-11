@@ -17,40 +17,40 @@
 - 交叉引用顺序应遵循宪法/法律章节顺序 `1..16` 以减少阅读摩擦。
 
 入口技能：
-- `skill:constitution-guard` -> `constitution-guard/SKILL.md`
-- `skill:laws-enforcer` -> `laws-enforcer/SKILL.md`
-- `skill:auto-loop-orchestrator` -> `auto-loop-orchestrator/SKILL.md`
-- `skill:candidate-acceptance-review` -> `candidate-acceptance-review/SKILL.md`
-- `skill:milestone-planning-state-maintenance` -> `milestone-planning-state-maintenance/SKILL.md`
-- `skill:doc-B1_IBM-execution` -> `doc-B1_IBM-execution/SKILL.md`
-- `skill:doc-B2_IBM-execution` -> `doc-B2_IBM-execution/SKILL.md`
-- `skill:dev-loop-execution` -> `dev-loop-execution/SKILL.md`
-- `skill:workspace-skill-governance` -> `workspace-skill-governance/SKILL.md`
-- `skill:branch-management` -> `branch-management/SKILL.md`
-- `skill:multi-worktree-supervision` -> `multi-worktree-supervision/SKILL.md`
-- `skill:worktree-hygiene-supervision` -> `worktree-hygiene-supervision/SKILL.md`
-- `skill:worktree-maintenance-governance` -> `worktree-maintenance-governance/SKILL.md`
-- `skill:premerge-reconcile` -> `premerge-reconcile/SKILL.md`
-- `skill:recovery-subagent-governance` -> `recovery-subagent-governance/SKILL.md`
-- `skill:module-interface-governance` -> `module-interface-governance/SKILL.md`
-- `skill:config-backup-guard` -> `config-backup-guard/SKILL.md`
-- `skill:rust-tauri-toolchain-bootstrap` -> `rust-tauri-toolchain-bootstrap/SKILL.md`
-- `skill:watchdog-control-plane` -> `watchdog-control-plane/SKILL.md`
-- `skill:continuity-watchdog` -> `continuity-watchdog/SKILL.md`
-- `skill:ai-cli-availability-manager` -> `ai-cli-availability-manager/SKILL.md`
-- `skill:agent-execution-safety-review` -> `agent-execution-safety-review/SKILL.md`
-- `skill:human-interruption-handling` -> `human-interruption-handling/SKILL.md`
-- `skill:human-interruption-direct-answer` -> `human-interruption-direct-answer/SKILL.md`
-- `skill:human-interruption-manager-triage` -> `human-interruption-manager-triage/SKILL.md`
-- `skill:signal-intent-understanding` -> `signal-intent-understanding/SKILL.md`
-- `skill:url-content-intake` -> `url-content-intake/SKILL.md`
-- `skill:fix-execution` -> `fix-execution/SKILL.md`
-- `skill:mem9-continuity-bridge` -> `mem9-continuity-bridge/SKILL.md`
-- `skill:tool-cc-codex-mcp-runtime` -> `tool-cc-codex-mcp-runtime/SKILL.md`
-- `skill:agent-execution-safety-review` -> `agent-execution-safety-review/SKILL.md`
+- `skill:freely-freely-constitution-guard` -> `freely-constitution-guard/SKILL.md`
+- `skill:freely-freely-laws-enforcer` -> `freely-laws-enforcer/SKILL.md`
+- `skill:freely-freely-auto-loop-orchestrator` -> `freely-auto-loop-orchestrator/SKILL.md`
+- `skill:freely-freely-candidate-acceptance-review` -> `freely-candidate-acceptance-review/SKILL.md`
+- `skill:freely-freely-milestone-planning-state-maintenance` -> `freely-milestone-planning-state-maintenance/SKILL.md`
+- `skill:freely-freely-doc-B1_IBM-execution` -> `freely-doc-B1_IBM-execution/SKILL.md`
+- `skill:freely-freely-doc-B2_IBM-execution` -> `freely-doc-B2_IBM-execution/SKILL.md`
+- `skill:freely-freely-dev-loop-execution` -> `freely-dev-loop-execution/SKILL.md`
+- `skill:freely-freely-workspace-skill-governance` -> `freely-workspace-skill-governance/SKILL.md`
+- `skill:freely-freely-branch-management` -> `freely-branch-management/SKILL.md`
+- `skill:freely-freely-multi-worktree-supervision` -> `freely-multi-worktree-supervision/SKILL.md`
+- `skill:freely-freely-worktree-hygiene-supervision` -> `freely-worktree-hygiene-supervision/SKILL.md`
+- `skill:freely-freely-worktree-maintenance-governance` -> `freely-worktree-maintenance-governance/SKILL.md`
+- `skill:freely-freely-premerge-reconcile` -> `freely-premerge-reconcile/SKILL.md`
+- `skill:freely-freely-recovery-subagent-governance` -> `freely-recovery-subagent-governance/SKILL.md`
+- `skill:freely-freely-module-interface-governance` -> `freely-module-interface-governance/SKILL.md`
+- `skill:freely-freely-config-backup-guard` -> `freely-config-backup-guard/SKILL.md`
+- `skill:freely-freely-rust-tauri-toolchain-bootstrap` -> `freely-rust-tauri-toolchain-bootstrap/SKILL.md`
+- `skill:freely-freely-watchdog-control-plane` -> `freely-watchdog-control-plane/SKILL.md`
+- `skill:freely-freely-continuity-watchdog` -> `freely-continuity-watchdog/SKILL.md`
+- `skill:freely-freely-ai-cli-availability-manager` -> `freely-ai-cli-availability-manager/SKILL.md`
+- `skill:freely-freely-agent-execution-safety-review` -> `freely-agent-execution-safety-review/SKILL.md`
+- `skill:freely-freely-human-interruption-handling` -> `freely-human-interruption-handling/SKILL.md`
+- `skill:freely-freely-human-interruption-direct-answer` -> `freely-human-interruption-direct-answer/SKILL.md`
+- `skill:freely-freely-human-interruption-manager-triage` -> `freely-human-interruption-manager-triage/SKILL.md`
+- `skill:freely-freely-signal-intent-understanding` -> `freely-signal-intent-understanding/SKILL.md`
+- `skill:freely-freely-url-content-intake` -> `freely-url-content-intake/SKILL.md`
+- `skill:freely-freely-fix-execution` -> `freely-fix-execution/SKILL.md`
+- `skill:freely-freely-mem9-continuity-bridge` -> `freely-mem9-continuity-bridge/SKILL.md`
+- `skill:freely-freely-tool-cc-codex-mcp-runtime` -> `freely-tool-cc-codex-mcp-runtime/SKILL.md`
+- `skill:freely-freely-agent-execution-safety-review` -> `freely-agent-execution-safety-review/SKILL.md`
 
 执行顺序（默认）：
-1. `constitution-guard`（预检门禁）
-2. `laws-enforcer`（验收门禁）
+1. `freely-constitution-guard`（预检门禁）
+2. `freely-laws-enforcer`（验收门禁）
 3. 领域工作流技能（`auto/doc/dev/branch/multi-worktree`）
-4. 异常技能（`premerge-reconcile`）按需使用
+4. 异常技能（`freely-premerge-reconcile`）按需使用

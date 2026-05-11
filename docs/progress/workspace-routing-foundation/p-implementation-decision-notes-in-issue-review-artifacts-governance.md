@@ -19,7 +19,7 @@
 ## Implemented Slice
 
 1. Added a focused pre-brainstorm candidate and materialized it as `I-20260401-2354-A`.
-2. Wrote the canonical contract into `LAWS`, `dev-loop-execution`, and IBM issue materialization checklist.
+2. Wrote the canonical contract into `LAWS`, `freely-dev-loop-execution`, and IBM issue materialization checklist.
 3. Added a dev-loop reference that tells authors exactly what the note must contain and where it belongs.
 4. Extended `governance-merge-gate` to require a staged owner review artifact with a complete note for implementation-bearing diffs.
 5. Added merge-gate regressions for missing review, missing note fields, and complete note pass behavior.

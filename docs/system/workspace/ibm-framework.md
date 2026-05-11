@@ -43,7 +43,7 @@ Freely doc-loop 的治理框架。每个工作项经历两个 IBM 阶段——B1
 - chat 写入时若有对应工位，则直接同步到 worktree 的 `docs/issues/`，跳过暂存
 - 其他信号（runtime anomaly、review 发现）：通过 chat 插话进入，同上
 - AI **永远不直接读平台内容**——只读本地 `docs/issues/` 中的副本。平台内容由 scan 脚本下载一次
-- 详细路由见 `context-source-skill` 和 `docs/system/workspace/three-loop-capability-lifecycle.md`
+- 详细路由见 `freely-context-source-skill` 和 `docs/system/workspace/three-loop-capability-lifecycle.md`
 
 **B1_IBM 回答**：这个值得做吗？排在哪？边界是什么？
 

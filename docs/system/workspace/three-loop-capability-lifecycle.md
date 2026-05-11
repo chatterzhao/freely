@@ -37,7 +37,7 @@ sequenceDiagram
         AUTO->>AUTO: [脚本 do]：<br/>提供最新 task-source-scan JSON<br/>供主管做 standing-source first-hop
         AUTO->>AUTO: [主管AI do]：<br/>notice 来源<br/>需要时先 claim
         AUTO->>AUTO: [主管AI do]：<br/>读取真相<br/>做 intent understanding
-        AUTO->>AUTO: [主管AI do]：<br/>调用 context-source-skill<br/>做 source classification<br/>区分 discovery / milestone / continuation
+        AUTO->>AUTO: [主管AI do]：<br/>调用 freely-context-source-skill<br/>做 source classification<br/>区分 discovery / milestone / continuation
         AUTO->>AUTO: [主管AI do]：<br/>识别 restart point<br/>判断复用/新开/冻结/退休工位
         AUTO->>AUTO: [主管AI do]：<br/>判断进入哪个 loop / gate
         AUTO->>AUTO: [主管AI do]：<br/>需要时把 candidate 接入 milestone 的 M-*<br/>未收口 candidate 继续留在 candidate_issues 可见队列

@@ -20,7 +20,7 @@ export const mockSnapshot: ProbeSnapshot = {
     },
   ],
   terminalTargets: [{ terminalTarget: "run-1:pty-0", sessionId: "session-1" }],
-  governanceSummary: ["laws-enforcer passed", "constitution-guard passed"],
+  governanceSummary: ["freely-laws-enforcer passed", "freely-constitution-guard passed"],
   recoverySummary: [],
   lastEventId: "event-1",
 };
