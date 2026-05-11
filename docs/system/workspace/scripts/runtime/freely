@@ -11956,6 +11956,30 @@ except: pass
           --role worker --raw-key "$(echo "$_prompt_file" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1)" \
           --prompt-file "$_prompt_file" --created-by manager --consumed-by worker 2>/dev/null || true)
       fi
+      # Inject handoff metadata so worker can report completion to manager's central DB
+      if [[ -n "$_handoff_id" && -f "$_prompt_file" ]]; then
+        cat >> "$_prompt_file" <<WORKER_HANDOFF_INJECT
+
+---
+
+## 完成汇报（硬性要求）
+
+你的 handoff 记录存储在 manager 的中心数据库中。工作完成后必须更新状态：
+
+\`\`\`bash
+python3 ${_handoff_py} update --db ${_db_path} \\
+  --handoff-id ${_handoff_id} --status completed --exit-kind worker_done
+\`\`\`
+
+如果被阻塞无法继续:
+\`\`\`bash
+python3 ${_handoff_py} update --db ${_db_path} \\
+  --handoff-id ${_handoff_id} --status blocked --exit-kind worker_blocked
+\`\`\`
+
+不更新状态会被 manager 视为超时。
+WORKER_HANDOFF_INJECT
+      fi
       if launch_worker_from_manager_prompt_if_needed "$project" "$_prompt_file"; then
         _launched_count=$((_launched_count + 1))
         log_info "worker launched: $(basename "$_prompt_file")"
