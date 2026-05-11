@@ -338,9 +338,13 @@ MSG
   FREELY_GUARDED_MERGE_COMPLETION=1 GIT_EDITOR=: git merge --continue
   local continue_rc=$?
   set -e
-  if [[ "$continue_rc" -eq 0 ]]; then
+  if ! git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1; then
     cleanup_guarded_state
     attempt_develop_push_followthrough_if_needed "$target"
+    if [[ "$continue_rc" -ne 0 ]]; then
+      echo "[MERGE-GUARD] warning: merge commit created but git merge --continue returned $continue_rc (non-critical)" >&2
+    fi
+    return 0
   fi
   return "$continue_rc"
 }
@@ -434,9 +438,13 @@ do_completion() {
     local continue_rc=$?
     set -e
   fi
-  if [[ "$continue_rc" -eq 0 ]]; then
+  if ! git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1; then
     cleanup_guarded_state
     attempt_develop_push_followthrough_if_needed "$target"
+    if [[ "$continue_rc" -ne 0 ]]; then
+      echo "[MERGE-GUARD] warning: merge commit created but git merge --continue returned $continue_rc (non-critical)" >&2
+    fi
+    return 0
   fi
   return "$continue_rc"
 }
