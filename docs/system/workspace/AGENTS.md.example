@@ -38,12 +38,53 @@ Freely 能力通过 `skill:<name>` 引用。AI 按场景选择：
 
 > 完整 skill 列表见 `$FREELY_HOME/docs/system/workspace/skills/`。skill 内部已包含完整工作流步骤，AI 按 skill 执行即可，不要在 prompt 里重写。
 
-## Manager ↔ Worker 交接
+## Manager 工作流
 
-- **委派**: Manager 决定 delegate_workers 后，用 `handoff.py insert` 为每个 worker 创建记录，指定 worktree 和 branch
-- **汇报**: Worker 完成后用 `handoff.py update` 更新状态（completed/blocked），写清完成摘要或阻塞原因
-- **约束**: 同一 worktree 同时只允许一个活跃 worker；Manager 分配前先检查工位是否空闲
-- 所有记录在项目根目录 `.freely/freely.db`
+### 启动后第一跳
+1. 读 scan 结果：`freely task-source-scan --project <path> --json` 或看 `.freely/run/manager-task-source-scan-latest.json`
+2. 有任务 → 选 skill 开工。无任务 → 判断是否需要 cleanup/收口
+3. 需要更多上下文时，先 patrol（读 milestone、issue、worktree 状态）
+
+### 每轮结束：出口决策
+Manager 完成一轮 patrol 后必须做出出口决策：
+
+| 决策 | 条件 | 动作 |
+|---|---|---|
+| `stop_ai` | 无待办、无 worker 运行、已达停止标准 | 不写 handoff，退出 |
+| `resume_manager` | 有待办但当前轮无法完成，需下一轮继续 | 写 continuity 文件 |
+| `delegate_workers` | 有可委派的任务 | handoff.py insert worker 记录 |
+
+### 委派 Worker
+```bash
+handoff.py insert --role worker --raw-key <key> --worktree <abs_path> \
+  --branch fix/raw-<key>-<slug> --prompt-file <worker_prompt_path> \
+  --created-by manager --consumed-by worker --exit-kind delegate_workers
+```
+
+## Worker 工作流
+
+Worker 拿到 prompt 后：
+1. 进入指定 worktree：`cd <worktree_path>`
+2. 按 prompt 中的 skill 引用执行（如 `skill:freely-fix-execution`）
+3. 完成后汇报：
+```bash
+handoff.py update --handoff-id <id> --status completed --exit-kind worker_done \
+  --completion-summary "<完成内容摘要>"
+```
+4. 遇到阻塞汇报：
+```bash
+handoff.py update --handoff-id <id> --status blocked --exit-kind worker_blocked \
+  --blocked-reason "<阻塞原因>" --next-action "<建议主管下一步>"
+```
+
+**约束**: 同一 worktree 只允许一个活跃 worker。Manager 分配前自动检查。
+
+## 工位与分支
+
+- 创建工位：`wt-create --raw-key <key> --source platform --skill <skill-name> --slug <slug>`
+- 分支命名：`fix/raw-{YYYYMMDDTHHMMZ}-{slug}` / `feature/raw-{YYYYMMDDTHHMMZ}-{slug}`
+- 合并：`fix/feature → test-pre-merge-* → develop`（测试通过后可直接 `fix/feature → develop`）
+- `test-pre-merge-*` 是临时测试面，用完即删
 
 ## 自动兜底（AI 不需要操心）
 
