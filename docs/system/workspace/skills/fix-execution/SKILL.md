@@ -122,8 +122,8 @@ hotfix/*          → main
   │     --slug <slug>
   │
   │   自动创建:
-  │   ├─ test-pre-merge-{raw-key}-{slug}  (基于 develop)
-  │   └─ fix/raw-{raw-key}-{slug}         (基于 test-pre-merge)
+  │   ├─ fix/raw-{raw-key}-{slug}         (基于 develop，永久开发工位)
+  │   └─ test-pre-merge-{raw-key}-{slug}  (基于 fix，临时测试工位)
   │
   ├─ 紧急 hotfix: 手动创建 hotfix 分支
   │
@@ -150,7 +150,7 @@ hotfix/*          → main
   │
   ├─ 运行 ./bin/governance-merge-gate --range "develop..HEAD" 只检查本分支
   ├─ gate 失败：用对应 skill 修复分支自己的错误，预存错误不阻塞
-  ├─ gate 通过：fix 基于 test-pre-merge → merge 为 fast-forward
+  ├─ gate 通过：fix 和 test-pre-merge 同基于 develop → merge 为 fast-forward
   │     ./bin/merge-guarded test-pre-merge-<name> fix/<name>
   │         → 验证 → ./bin/merge-guarded develop test-pre-merge-<name>
   ├─ 紧急: ./bin/merge-guarded develop hotfix/<name>

@@ -43,8 +43,8 @@ feat-execution 在不同阶段调用下层 skill：
      --slug <slug>
 
    自动创建:
-   ├─ test-pre-merge-{raw-key}-{slug}   (基于 develop)
-   └─ feature/raw-{raw-key}-{slug}      (基于 test-pre-merge)
+   ├─ fix/raw-{raw-key}-{slug}         (基于 develop，永久开发工位)
+   └─ test-pre-merge-{raw-key}-{slug}  (基于 feature，临时测试工位)
 
 2. skill:doc-B1_IBM-execution
    → 写 docs/pre-brainstorms/{key}--{slug}/brainstorms.md
