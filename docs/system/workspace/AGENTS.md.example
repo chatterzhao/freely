@@ -10,103 +10,59 @@
 
 ## 工作入口
 
-Freely daemon 启动后会自动 patrol + scan，产出任务列表。AI 的工作来源：
+Freely daemon 启动后自动 patrol + scan。AI 的工作来源：
 
-1. **Scan 结果** — daemon 自动扫描 GitHub/Gitee issue、milestone、candidate，产出待办。Manager 启动后先读 scan
-2. **人类插话** — 通过 `freely chat --project <path> <message>` 或 `freely intake chat` 提交
+1. **Scan 结果** — daemon 自动扫描 GitHub/Gitee issue、milestone、candidate，产出待办
+2. **人类插话** — 通过 `freely chat` 或 `freely intake chat` 提交
 3. **Continuity** — 上一轮未完成的工作通过 continuity 文件接续
-4. **自己发现** — patrol 过程中发现的新问题，创建 raw issue 进入 IBM 流程
+4. **自己发现** — patrol 过程中发现新问题，创建 raw issue 进入 IBM 流程
 
-## 工作流程（按场景选 Skill）
+## Skill 路由（按场景选）
 
-Freely 能力通过 `skill:<name>` 引用。AI 按场景选择：
+Freely 能力通过 `skill:<name>` 引用。skill 内部包含完整工作流，AI 按 skill 执行即可，不要在本文件中重写。
 
-| 场景 | Skill | 触发条件 |
-|---|---|---|
-| 开始工作 | `freely-context-source-skill` | 每次启动，判定来源和下一跳 |
-| 自主循环 | `freely-auto-loop-orchestrator` | Manager 持续 patrol → 判断 → 委派 |
-| Bug 修复 | `freely-fix-execution` | 发现运行时 bug，快速修复 |
-| 功能开发 | `freely-feat-execution` | 新功能/大改动，完整流程 |
-| 写代码 | `freely-dev-loop-execution` | 实现 + code-review + pre-tests |
-| 新问题入库 | `freely-doc-B1_IBM-execution` | raw issue → candidate → milestone |
-| Issue 落地 | `freely-doc-B2_IBM-execution` | candidate → I-issue → 实现设计 |
-| 分支管理 | `freely-branch-management` | 创建/合并/退役/清理工位 |
-| 工位监督 | `freely-multi-worktree-supervision` | 多工位并发，排程与状态审计 |
-| 冲突收敛 | `freely-premerge-reconcile` | merge 冲突无法自动解决 |
-| 人类插话 | `freely-human-interruption-manager-triage` | 人类发来消息，主管先判定 |
-| 账号问题 | `freely-ai-cli-availability-manager` | AI CLI 限流/切号/恢复 |
+| 场景 | Skill |
+|---|---|
+| 每次启动，判定来源和下一跳 | `freely-context-source-skill` |
+| Manager 持续 patrol → 判断 → 委派 | `freely-auto-loop-orchestrator` |
+| Bug 修复 | `freely-fix-execution` |
+| 功能开发 | `freely-feat-execution` |
+| 实现 + code-review + pre-tests | `freely-dev-loop-execution` |
+| 新问题入库（raw → candidate → milestone） | `freely-doc-B1_IBM-execution` |
+| Issue 落地（candidate → I-issue → 实现设计） | `freely-doc-B2_IBM-execution` |
+| 分支/工位创建、合并、退役、清理 | `freely-branch-management` |
+| 多工位并发监督与排程 | `freely-multi-worktree-supervision` |
+| Merge 冲突收敛 | `freely-premerge-reconcile` |
+| 人类插话路由判定 | `freely-human-interruption-manager-triage` |
+| AI CLI 账号/切号/限流 | `freely-ai-cli-availability-manager` |
 
-> 完整 skill 列表见 `$FREELY_HOME/docs/system/workspace/skills/`。skill 内部已包含完整工作流步骤，AI 按 skill 执行即可，不要在 prompt 里重写。
+> 完整 skill 列表见 `$FREELY_HOME/docs/system/workspace/skills/`。
 
-## Manager 工作流
+## Manager 出口决策
 
-### 启动后第一跳
-1. 读 scan 结果：`freely task-source-scan --project <path> --json` 或看 `.freely/run/manager-task-source-scan-latest.json`
-2. 有任务 → 选 skill 开工。无任务 → 判断是否需要 cleanup/收口
-3. 需要更多上下文时，先 patrol（读 milestone、issue、worktree 状态）
+Manager 每轮 patrol 结束后必须做出口决策：
 
-### 每轮结束：出口决策
-Manager 完成一轮 patrol 后必须做出出口决策：
+| 决策 | 条件 |
+|---|---|
+| `stop_ai` | 无待办，已达停止标准 |
+| `resume_manager` | 有待办但需下一轮继续 |
+| `delegate_workers` | 有可委派任务，分配 worker |
 
-| 决策 | 条件 | 动作 |
-|---|---|---|
-| `stop_ai` | 无待办、无 worker 运行、已达停止标准 | 不写 handoff，退出 |
-| `resume_manager` | 有待办但当前轮无法完成，需下一轮继续 | 写 continuity 文件 |
-| `delegate_workers` | 有可委派的任务 | handoff.py insert worker 记录 |
+Worker 被分配后自行按 skill 执行，完成后通过 handoff 汇报结果。
 
-### 委派 Worker
-```bash
-handoff.py insert --role worker --raw-key <key> --worktree <abs_path> \
-  --branch fix/raw-<key>-<slug> --prompt-file <worker_prompt_path> \
-  --created-by manager --consumed-by worker --exit-kind delegate_workers
-```
+## 自动兜底
 
-## Worker 工作流
+以下机制自动触发，AI 正常操作即可，做错会被拦截：
 
-Worker 拿到 prompt 后：
-1. 进入指定 worktree：`cd <worktree_path>`
-2. 按 prompt 中的 skill 引用执行（如 `skill:freely-fix-execution`）
-3. 完成后汇报：
-```bash
-handoff.py update --handoff-id <id> --status completed --exit-kind worker_done \
-  --completion-summary "<完成内容摘要>"
-```
-4. 遇到阻塞汇报：
-```bash
-handoff.py update --handoff-id <id> --status blocked --exit-kind worker_blocked \
-  --blocked-reason "<阻塞原因>" --next-action "<建议主管下一步>"
-```
-
-**约束**: 同一 worktree 只允许一个活跃 worker。Manager 分配前自动检查。
-
-## 工位与分支
-
-- 创建工位：`wt-create --raw-key <key> --source platform --skill <skill-name> --slug <slug>`
-- 分支命名：`fix/raw-{YYYYMMDDTHHMMZ}-{slug}` / `feature/raw-{YYYYMMDDTHHMMZ}-{slug}`
-- 合并：`fix/feature → test-pre-merge-* → develop`（测试通过后可直接 `fix/feature → develop`）
-- `test-pre-merge-*` 是临时测试面，用完即删
-
-## 自动兜底（AI 不需要操心）
-
-以下机制由 Freely 运行时自动触发，AI 正常操作即可，做错了会被拦截：
-
-- **Git hooks** — `main`/`develop` 直接 commit 被拦截；`test-pre-merge-*` commit/push 被拦截
-- **merge-guarded** — 保护分支合并前自动检查 merge direction + governance gate
-- **pretests-gate** — issue 完成前自动检查 pre-tests 证据
-- **governance-merge-gate** — merge 前自动检查 raw/C/M/I 生命周期完整性
-- **Daemon patrol + scan** — 自动扫描平台 issue 和本地 milestone，产出待办
-- **restart storm 保护** — 进程异常频繁重启自动暂停
-
-## 项目文档结构
-- `docs/CONSTITUTION.md` / `LAWS.md` / `PROJECT_INTENT.md` — 治理核心
-- `docs/pre-brainstorms/` — B1 候选议题
-- `docs/issues/` — raw / I-* issue
-- `docs/epics/` — code-review + pre-tests
-- `docs/milestones.md` — 里程碑追踪
+- Git hooks — 保护分支直接 commit 被拦截
+- merge-guarded — 合并前自动检查方向+门禁
+- governance-merge-gate — raw/C/M/I 生命周期完整性
+- Daemon patrol + scan — 自动扫描，产出待办
+- restart storm 保护 — 异常频繁重启自动暂停
 
 ## 禁止
+
 - 不在 `main`/`develop` 上直接 commit
 - 不绕过 `merge-guarded`
 - 不在 `test-pre-merge-*` 上 commit/push
 - 不跨工位用 `cp`/`stash` 转移文件
-- 不自行 `--no-verify` 绕过 hook
