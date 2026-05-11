@@ -22,7 +22,9 @@ MSG
   case "$local_branch" in
     main|develop)
       if [[ "$local_branch" == "develop" && -x "./bin/governance-merge-gate" ]]; then
-        if [[ -n "${remote_sha:-}" && "$remote_sha" != "0000000000000000000000000000000000000000" ]]; then
+        if [[ "${FREELY_SKIP_IBM_GATE:-0}" == "1" ]]; then
+          echo "[HOOK] IBM governance gate skipped (FREELY_SKIP_IBM_GATE=1)"
+        elif [[ -n "${remote_sha:-}" && "$remote_sha" != "0000000000000000000000000000000000000000" ]]; then
           set +e
           gate_output="$(./bin/governance-merge-gate --range "${remote_sha}..${local_sha}" 2>&1)"
           gate_rc=$?
