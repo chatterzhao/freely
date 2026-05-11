@@ -88,13 +88,17 @@ raw issue → B1_IBM (freely-doc-B1_IBM-execution) → candidate
 
 ## 何时可跳过 IBM 仪式
 
-**永远不能直接在 `main`/`develop` 上 commit。** "跳过"仅指不需要 raw issue → candidate → I-issue 这条 IBM 链，但仍在工位中修改、通过 merge-guarded 合并。
+IBM 仪式（raw issue → candidate → I-issue）仅在下述情况可跳过。**任何时候都不能绕过 develop 保护和 merge 门禁。**
 
-判断标准：**改动是否影响运行时行为。**
+跳过 IBM 的条件（同时满足）：
+1. 改动不创建新文件，不修改脚本/skill/hook/门禁/配置/依赖
+2. 改动不改变任何运行时行为
+3. 仅限于：修 typo、改标题、仅改注释、纯格式调整
 
-- 改标题、修 typo、仅改注释、纯格式调整 → 不影响运行时 → 可跳过 IBM，在工位改完 merge 即可
-- 改 skill、改脚本、改 hook、改门禁、改配置、改包依赖 → 影响运行时 → 必须走完整 IBM
-- 不确定是否影响运行时 → 走完整 IBM
+满足 → `FREELY_SKIP_IBM_GATE=1` 跳过 IBM gate，但仍在工位改、走 merge-guarded
+不满足 → 走完整 IBM 流程
+
+**严格禁止**：`core.hooksPath=""`、`--no-verify`、或任何其他绕过 hook 的方式。这些绕过全部保护（包括禁止 develop commit），不存在合法使用场景。违反即治理违规。
 
 > 即使跳过 IBM，也必须通过 `merge-guarded` 合并到 develop。禁止绕过的含义是"禁止跳过运行时安全检查"，不是"禁止跳过文档工作"。
 >
