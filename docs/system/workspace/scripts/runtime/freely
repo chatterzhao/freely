@@ -11892,6 +11892,38 @@ manager_runtime_launch_workers_from_latest_handoff() {
   printf '%s\n' "$launched_count"
 }
 
+worktree_has_active_worker() {
+  local project="$1" worktree="$2"
+  [[ -n "$worktree" && -d "$worktree" ]] || return 1
+  local _handoff_py _db_path
+  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  _db_path="$project/.freely/freely.db"
+  [[ -f "$_handoff_py" && -f "$_db_path" ]] || return 1
+  local active_records sup_pid
+  active_records=$(python3 "$_handoff_py" list --db "$_db_path" --role worker --status pending 2>/dev/null)
+  active_records+=$(python3 "$_handoff_py" list --db "$_db_path" --role worker --status launched 2>/dev/null)
+  local matching
+  matching=$(echo "$active_records" | python3 -c "
+import json,sys
+for r in json.load(sys.stdin):
+    if r.get('worktree','') == '$worktree':
+        print(r.get('handoff_id',''))
+" 2>/dev/null)
+  [[ -z "$matching" ]] && return 1
+  sup_pid=$(cat "$worktree/.freely/run/supervisor.pid" 2>/dev/null || true)
+  if [[ -n "$sup_pid" ]] && kill -0 "$sup_pid" 2>/dev/null; then
+    return 0
+  fi
+  local hid
+  for hid in $matching; do
+    [[ -n "$hid" ]] || continue
+    python3 "$_handoff_py" update --db "$_db_path" --handoff-id "$hid" \
+      --status blocked --exit-kind stale_pid \
+      --blocked-reason "worker process no longer alive" >/dev/null 2>&1 || true
+  done
+  return 1
+}
+
 manager_runtime_launch_workers_after_ai_cycle_if_needed() {
   # ── Worker launch after manager AI cycle ──────────────────────────
   #
@@ -11954,6 +11986,13 @@ except: pass
     local IFS=","
     for _prompt_file in $_worker_csv; do
       [[ -n "$_prompt_file" && -f "$_prompt_file" ]] || continue
+      # Guard: skip if worktree already has an active worker
+      local _target_worktree
+      _target_worktree="$(worker_prompt_target_worktree "$_prompt_file" 2>/dev/null || true)"
+      if [[ -n "$_target_worktree" ]] && worktree_has_active_worker "$project" "$_target_worktree"; then
+        log_warn "worker skipped: worktree busy — $_target_worktree"
+        continue
+      fi
       # INSERT pending handoff record, get handoff_id for status tracking
       _handoff_id=""
       if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
