@@ -49,6 +49,10 @@ def init_db():
             status TEXT NOT NULL DEFAULT 'pending'
                 CHECK(status IN ('pending','launched','completed','rejected','blocked')),
             exit_kind TEXT DEFAULT '',
+            completion_summary TEXT DEFAULT '',
+            blocked_reason TEXT DEFAULT '',
+            next_action TEXT DEFAULT '',
+            evidence_paths TEXT DEFAULT '',
             session_id TEXT DEFAULT '',
             launched_at TEXT DEFAULT '',
             completed_at TEXT DEFAULT '',
@@ -61,7 +65,7 @@ def init_db():
         CREATE INDEX IF NOT EXISTS idx_handoffs_parent ON handoffs(parent_handoff_id);
         DELETE FROM handoffs WHERE status = 'pending' AND datetime(created_at) < datetime('now','-1 hour');
     """)
-    for col in ('created_by', 'consumed_by'):
+    for col in ('created_by', 'consumed_by', 'completion_summary', 'blocked_reason', 'next_action', 'evidence_paths'):
         try:
             conn.execute(f"ALTER TABLE handoffs ADD COLUMN {col} TEXT DEFAULT ''")
         except sqlite3.OperationalError:
@@ -72,23 +76,28 @@ def init_db():
 
 def insert(role, raw_key, prompt_file, worktree="", branch="",
            parent_handoff_id="", intent_kind="", created_by="", consumed_by="",
-           exit_kind=""):
+           exit_kind="", completion_summary="", blocked_reason="",
+           next_action="", evidence_paths=""):
     conn = _connect()
     hid = _now_utc().replace("T", "").replace("Z", "").replace("-", "").replace(":", "") + "-" + uuid.uuid4().hex[:6]
     now = _now_utc()
     conn.execute(
         """INSERT INTO handoffs (handoff_id, role, raw_key, worktree, branch,
            prompt_file, parent_handoff_id, intent_kind, created_by, consumed_by,
-           exit_kind, status, created_at, updated_at)
-           VALUES (?,?,?,?,?,?,?,?,?,?,?,'pending',?,?)""",
+           exit_kind, completion_summary, blocked_reason, next_action, evidence_paths,
+           status, created_at, updated_at)
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'pending',?,?)""",
         (hid, role, raw_key, worktree, branch, prompt_file,
-         parent_handoff_id, intent_kind, created_by, consumed_by, exit_kind, now, now))
+         parent_handoff_id, intent_kind, created_by, consumed_by, exit_kind,
+         completion_summary, blocked_reason, next_action, evidence_paths, now, now))
     conn.commit()
     conn.close()
     return hid
 
 
-def update_status(handoff_id, status, exit_kind="", session_id=""):
+def update_status(handoff_id, status, exit_kind="", session_id="",
+                  completion_summary="", blocked_reason="",
+                  next_action="", evidence_paths=""):
     conn = _connect()
     now = _now_utc()
     cols = ["status=?", "updated_at=?"]
@@ -105,6 +114,18 @@ def update_status(handoff_id, status, exit_kind="", session_id=""):
     if session_id:
         cols.append("session_id=?")
         params.insert(-1, session_id)
+    if completion_summary:
+        cols.append("completion_summary=?")
+        params.insert(-1, completion_summary)
+    if blocked_reason:
+        cols.append("blocked_reason=?")
+        params.insert(-1, blocked_reason)
+    if next_action:
+        cols.append("next_action=?")
+        params.insert(-1, next_action)
+    if evidence_paths:
+        cols.append("evidence_paths=?")
+        params.insert(-1, evidence_paths)
     sql = f"UPDATE handoffs SET {', '.join(cols)} WHERE handoff_id=?"
     conn.execute(sql, params)
     conn.commit()
@@ -207,6 +228,10 @@ def main():
     p_insert.add_argument("--created-by", default="")
     p_insert.add_argument("--consumed-by", default="")
     p_insert.add_argument("--exit-kind", default="")
+    p_insert.add_argument("--completion-summary", default="")
+    p_insert.add_argument("--blocked-reason", default="")
+    p_insert.add_argument("--next-action", default="")
+    p_insert.add_argument("--evidence-paths", default="")
 
     p_update = sub.add_parser("update")
     p_update.add_argument("--db", required=True)
@@ -214,6 +239,10 @@ def main():
     p_update.add_argument("--status", required=True)
     p_update.add_argument("--exit-kind", default="")
     p_update.add_argument("--session-id", default="")
+    p_update.add_argument("--completion-summary", default="")
+    p_update.add_argument("--blocked-reason", default="")
+    p_update.add_argument("--next-action", default="")
+    p_update.add_argument("--evidence-paths", default="")
 
     p_get = sub.add_parser("get")
     p_get.add_argument("--db", required=True)
@@ -248,10 +277,14 @@ def main():
     elif args.cmd == "insert":
         hid = insert(args.role, args.raw_key, args.prompt_file,
                      args.worktree, args.branch, args.parent, args.intent_kind,
-                     args.created_by, args.consumed_by, args.exit_kind)
+                     args.created_by, args.consumed_by, args.exit_kind,
+                     args.completion_summary, args.blocked_reason,
+                     args.next_action, args.evidence_paths)
         print(hid)
     elif args.cmd == "update":
-        update_status(args.handoff_id, args.status, args.exit_kind, args.session_id)
+        update_status(args.handoff_id, args.status, args.exit_kind, args.session_id,
+                      args.completion_summary, args.blocked_reason,
+                      args.next_action, args.evidence_paths)
         print("ok")
     elif args.cmd == "get":
         r = get(args.handoff_id)

@@ -11972,14 +11972,16 @@ except: pass
 你的 handoff 记录存储在 manager 的中心数据库中。工作完成后必须更新状态：
 
 \`\`\`bash
+# 完成时:
 python3 ${_handoff_py} update --db ${_db_path} \\
-  --handoff-id ${_handoff_id} --status completed --exit-kind worker_done
-\`\`\`
+  --handoff-id ${_handoff_id} --status completed --exit-kind worker_done \\
+  --completion-summary "<简要描述完成了什么>"
 
-如果被阻塞无法继续:
-\`\`\`bash
+# 被阻塞无法继续时（务必写清原因和建议）:
 python3 ${_handoff_py} update --db ${_db_path} \\
-  --handoff-id ${_handoff_id} --status blocked --exit-kind worker_blocked
+  --handoff-id ${_handoff_id} --status blocked --exit-kind worker_blocked \\
+  --blocked-reason "<阻塞原因>" \\
+  --next-action "<主管下一步应做什么>"
 \`\`\`
 
 不更新状态会被 manager 视为超时。
