@@ -12991,6 +12991,7 @@ build_manager_exit_contract_repair_fresh_with_handoff_prompt() {
 - 如果 scan 显示 backlog 非空，而你没有形成新的 manager continuity 或合法 worker delegation，这一轮视为失败。
 - 如果当前没有 launchable worker prompt，就必须用 continuity 把当前 manager-owned restart point / next_action 写清，再写 \`EXIT_KIND=\"resume_manager\"\`。
 - 只有当前 manager lane 已经明确闭合且 scan/source 也证明可以安全停下时，才允许 \`EXIT_KIND=\"stop_ai\"\`。
+- 如果 scan 暂时没有发现待办任务，这不是错误。写 \`EXIT_KIND=\"stop_ai\"\`，在 continuity 里说明原因。如果你认为项目可能有工作要做但 scan 没扫到，在 continuity 里提示：这可能是棕地项目，可以通过 \`freely chat --new-issue "需求描述"\` 插话创建新任务，或在 GitHub/Gitee 上创建 raw issue，下一次 patrol scan 就会扫到。
 
 本轮禁止事项：
 - 不要重做完整 lead-agent 首跳。
