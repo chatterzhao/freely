@@ -86,18 +86,23 @@ raw issue → B1_IBM (freely-doc-B1_IBM-execution) → candidate
 - Daemon patrol + scan — 自动扫描，产出待办
 - restart storm 保护 — 异常频繁重启自动暂停
 
-## 何时可绕过门禁
+## 何时可跳过 IBM 仪式
 
-核心原则：**不需要任何测试的改动可以绕过。一旦改动需要测试——哪怕只跑一次——就必须走完整 IBM 流程。**
+**永远不能直接在 `main`/`develop` 上 commit。** "跳过"仅指不需要 raw issue → candidate → I-issue 这条 IBM 链，但仍在工位中修改、通过 merge-guarded 合并。
 
-AI 按语义判断：
-- 改标题、修 typo、补注释 → 可绕过，直接 commit
-- 改 skill、改脚本、改 hook、改门禁逻辑 → 不可绕过，走 `raw issue → 工位 → merge-guarded`
-- 如果不确定要不要测试 → 默认不走绕过
+判断标准：**改动是否影响运行时行为。**
+
+- 改标题、修 typo、仅改注释、纯格式调整 → 不影响运行时 → 可跳过 IBM，在工位改完 merge 即可
+- 改 skill、改脚本、改 hook、改门禁、改配置、改包依赖 → 影响运行时 → 必须走完整 IBM
+- 不确定是否影响运行时 → 走完整 IBM
+
+> 即使跳过 IBM，也必须通过 `merge-guarded` 合并到 develop。禁止绕过的含义是"禁止跳过运行时安全检查"，不是"禁止跳过文档工作"。
+>
+> 临时绕过的 git 命令：`git -c core.hooksPath="" commit` 或 `git push --no-verify`。仅在以上"可跳过"场景使用。
 
 ## 禁止
 
-- 不在 `main`/`develop` 上直接 commit
+- 不在 `main`/`develop` 上直接 commit（永远禁止，无论什么理由）
 - 不绕过 `merge-guarded`
 - 不在 `test-pre-merge-*` 上 commit/push
 - 不跨工位用 `cp`/`stash` 转移文件
