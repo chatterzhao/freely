@@ -13217,7 +13217,16 @@ sync_exit_contract_to_handoffs() {
   fi
   case "$kind" in
     delegate_workers)
-      latest_mgr=$(python3 "$_handoff_py" --db "$_db_path" latest-manager 2>/dev/null | python3 -c "import json,sys; r=json.load(sys.stdin); print(r.get('handoff_id',''))" 2>/dev/null || true)
+      latest_mgr=$(python3 -c "
+import sqlite3, os
+db='$_db_path'
+if os.path.exists(db):
+    conn=sqlite3.connect(db)
+    conn.row_factory=sqlite3.Row
+    row=conn.execute(\"SELECT handoff_id FROM handoffs WHERE role='manager' ORDER BY created_at DESC LIMIT 1\").fetchone()
+    conn.close()
+    if row: print(row['handoff_id'])
+" 2>/dev/null || true)
       if [[ -z "$latest_mgr" ]]; then
         append_runtime_event "$project" "sync_exit_contract_to_handoffs_missing_manager_record" "kind=$kind"
       fi
