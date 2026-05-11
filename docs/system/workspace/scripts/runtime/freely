@@ -7401,19 +7401,64 @@ EOF
 ensure_project_agents_md() {
   local project="$1"
   local agents_file="$project/AGENTS.md"
-  [[ -f "$agents_file" ]] && return 0
+  local template="$SELF_ROOT/docs/system/workspace/AGENTS.md.example"
 
-  cat >"$agents_file" <<'EOF'
+  if [[ ! -f "$agents_file" ]]; then
+    if [[ -f "$template" ]]; then
+      cp "$template" "$agents_file"
+    else
+      cat >"$agents_file" <<'EOF'
 # Project Agent Entry
 
 This file is the project-level governance entrypoint for Freely.
+Read `docs/system/workspace/AGENTS.md.example` in the Freely installation for the full template.
+EOF
+    fi
+    return 0
+  fi
 
-Rules:
-- Always read this file before executing project work.
-- Treat this repository as the current target project.
-- Reusable Freely capabilities live under `docs/system/workspace/**` and `bin/**`.
-- Capability docs must not replace this project-level governance file.
-- If this project ships Freely capabilities, consume them from `docs/system/workspace/**` after reading this file.
+  # Append Freely section to existing AGENTS.md
+  if grep -q 'Freely 运行时能力' "$agents_file" 2>/dev/null; then
+    return 0
+  fi
+
+  cat >>"$agents_file" <<'EOF'
+
+---
+
+## Freely 运行时能力（由 freely init 追加）
+
+以下能力由已安装的 Freely 版本提供，不应在项目仓库中修改：
+
+### Skill 体系
+所有 skill 以 `freely-` 前缀命名:
+- `freely-fix-execution` — bug 修复工作流
+- `freely-feat-execution` — 功能开发工作流
+- `freely-dev-loop-execution` — 开发循环（code review + pre-tests）
+- `freely-doc-B1_IBM-execution` / `freely-doc-B2_IBM-execution` — IBM 治理
+- `freely-branch-management` — 分支管理
+- `freely-auto-loop-orchestrator` — 自主循环编排
+
+### 工位与分支
+- 创建工位: `wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>`
+- 分支命名: `fix/raw-{ts}-{slug}` 或 `feature/raw-{ts}-{slug}`
+- 合并链: `fix/feature → test-pre-merge-* → develop`
+- test-pre-merge-* 是临时测试面，用完即删
+
+### 门禁
+- `merge-guarded` — 保护分支合并
+- `governance-merge-gate` — 治理检查
+- `pretests-gate` — pre-tests 证据
+
+### 交接（Manager ↔ Worker）
+- Manager: `handoff.py insert --role worker --created-by manager --consumed-by worker`
+- Worker: `handoff.py update --handoff-id <id> --status completed --exit-kind worker_done`
+- 中心 DB: 项目根目录 `.freely/freely.db`
+
+### 禁止
+- 不在 `main`/`develop` 上直接 commit
+- 不绕过 merge-guarded
+- 不在 test-pre-merge-* 上 commit/push
 EOF
 }
 
