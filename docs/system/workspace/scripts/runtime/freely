@@ -11935,7 +11935,7 @@ manager_runtime_launch_workers_after_ai_cycle_if_needed() {
   _db_path="$(run_dir_for_project "$project")/../freely.db"
   _worker_csv=""
   if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
-    _worker_csv=$(python3 "$_handoff_py" --db "$_db_path" list --role worker --status pending 2>/dev/null | python3 -c "
+    _worker_csv=$(python3 "$_handoff_py" list --db "$_db_path" --role worker --status pending 2>/dev/null | python3 -c "
 import json,sys
 try:
     rows=json.load(sys.stdin)
@@ -11952,7 +11952,7 @@ except: pass
       # INSERT pending handoff record, get handoff_id for status tracking
       _handoff_id=""
       if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
-        _handoff_id=$(python3 "$_handoff_py" --db "$_db_path" insert \
+        _handoff_id=$(python3 "$_handoff_py" insert --db "$_db_path" \
           --role worker --raw-key "$(echo "$_prompt_file" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1)" \
           --prompt-file "$_prompt_file" --created-by manager --consumed-by worker 2>/dev/null || true)
       fi
@@ -11960,13 +11960,13 @@ except: pass
         _launched_count=$((_launched_count + 1))
         log_info "worker launched: $(basename "$_prompt_file")"
         if [[ -n "$_handoff_id" && -f "$_handoff_py" && -f "$_db_path" ]]; then
-          python3 "$_handoff_py" --db "$_db_path" update \
+          python3 "$_handoff_py" update --db "$_db_path" \
             --handoff-id "$_handoff_id" --status "launched" >/dev/null 2>&1 || true
         fi
       else
         log_warn "worker launch failed: $(basename "$_prompt_file")"
         if [[ -n "$_handoff_id" && -f "$_handoff_py" && -f "$_db_path" ]]; then
-          python3 "$_handoff_py" --db "$_db_path" update \
+          python3 "$_handoff_py" update --db "$_db_path" \
             --handoff-id "$_handoff_id" --status "rejected" --exit-kind "launch_failed" >/dev/null 2>&1 || true
         fi
       fi
@@ -13142,12 +13142,12 @@ Manager exit contract（硬性要求）：
 3. delegate_workers — 调用 handoff.py：
 \`\`\`bash
 # 先写 manager 自己的记录（manager 创建给自己消费的连续性记录）
-MANAGER_HID=\$(python3 \$_handoff_py --db \$_db_path insert \\
+MANAGER_HID=\$(python3 \$_handoff_py insert --db \$_db_path \\
   --role manager --raw-key <key> --prompt-file <continuity_path> \\
   --created-by manager --consumed-by manager --exit-kind delegate_workers)
 
 # 每个 worker 写一条记录，parent 指向 manager
-python3 \$_handoff_py --db \$_db_path insert \\
+python3 \$_handoff_py insert --db \$_db_path \\
   --role worker --raw-key <key> --worktree <abs_path> --branch fix/raw-<key>-<slug> \\
   --prompt-file <worker_prompt_path> --parent "\$MANAGER_HID" \\
   --created-by manager --consumed-by worker
@@ -13248,13 +13248,13 @@ manager_exit_contract_kind() {
   _db_path="$(run_dir_for_project "$project")/../freely.db"
   if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
     local pending_workers
-    pending_workers=$(python3 "$_handoff_py" --db "$_db_path" list --role worker --status pending 2>/dev/null | python3 -c "import json,sys; rows=json.load(sys.stdin); print(len(rows))" 2>/dev/null || echo "0")
+    pending_workers=$(python3 "$_handoff_py" list --db "$_db_path" --role worker --status pending 2>/dev/null | python3 -c "import json,sys; rows=json.load(sys.stdin); print(len(rows))" 2>/dev/null || echo "0")
     if [[ "${pending_workers:-0}" -gt 0 ]]; then
       echo "delegate_workers"
       return 0
     fi
     local latest_mgr
-    latest_mgr=$(python3 "$_handoff_py" --db "$_db_path" latest-manager 2>/dev/null | python3 -c "import json,sys; r=json.load(sys.stdin); print(r.get('exit_kind',''))" 2>/dev/null || true)
+    latest_mgr=$(python3 "$_handoff_py" latest-manager --db "$_db_path" 2>/dev/null | python3 -c "import json,sys; r=json.load(sys.stdin); print(r.get('exit_kind',''))" 2>/dev/null || true)
     if [[ -n "$latest_mgr" ]]; then
       echo "$latest_mgr"
       return 0
@@ -13285,7 +13285,7 @@ validate_manager_exit_contract_for_project() {
     _db_path="$(run_dir_for_project "$project")/../freely.db"
     if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
       local pending_workers worker_prompts_list
-      pending_workers=$(python3 "$_handoff_py" --db "$_db_path" list --role worker --status pending 2>/dev/null | python3 -c "
+      pending_workers=$(python3 "$_handoff_py" list --db "$_db_path" --role worker --status pending 2>/dev/null | python3 -c "
 import json,sys
 try:
     rows=json.load(sys.stdin)
@@ -13375,7 +13375,7 @@ autofill_manager_exit_contract_for_cleanup_delegate_workers_if_possible() {
     local IFS=","
     for _prompt_file in $worker_prompts_csv; do
       [[ -n "$_prompt_file" && -f "$_prompt_file" ]] || continue
-      python3 "$_handoff_py" --db "$_db_path" insert \
+      python3 "$_handoff_py" insert --db "$_db_path" \
         --role worker --raw-key "$_raw_key" \
         --prompt-file "$_prompt_file" --created-by manager --consumed-by worker \
         --intent-kind cleanup 2>/dev/null || true
@@ -13419,7 +13419,7 @@ autofill_manager_exit_contract_for_continuity_resume_if_possible() {
   _db_path="$(run_dir_for_project "$project")/../freely.db"
   if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
     _raw_key=$(echo "$continuity_file" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || echo "autofill")
-    python3 "$_handoff_py" --db "$_db_path" insert \
+    python3 "$_handoff_py" insert --db "$_db_path" \
       --role manager --raw-key "$_raw_key" \
       --prompt-file "$continuity_file" --created-by manager --consumed-by manager \
       --intent-kind resume 2>/dev/null || true
@@ -18163,8 +18163,8 @@ start_project_runtime() {
   _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
   _db_path="$(run_dir_for_project "$project")/../freely.db"
   if [[ -f "$_handoff_py" ]]; then
-    python3 "$_handoff_py" --db "$_db_path" init >/dev/null 2>&1 || true
-    python3 "$_handoff_py" --db "$_db_path" mark-stale --timeout-minutes 30 >/dev/null 2>&1 || true
+    python3 "$_handoff_py" init --db "$_db_path" >/dev/null 2>&1 || true
+    python3 "$_handoff_py" mark-stale --db "$_db_path" --timeout-minutes 30 >/dev/null 2>&1 || true
   fi
 
   local sdir run_dir logs_dir sup_pid_file child_pid_file loop_log
