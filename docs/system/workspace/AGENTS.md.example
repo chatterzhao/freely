@@ -50,6 +50,14 @@ Manager 每轮 patrol 结束后必须做出口决策：
 
 Worker 被分配后自行按 skill 执行，完成后通过 handoff 汇报结果。
 
+## 命名约定
+
+`raw-key` 是 `YYYYMMDDTHHMMZ` 格式的时间戳。`raw-{raw-key}` 即 `raw-YYYYMMDDTHHMMZ`，就是 raw issue 的 local_id。
+
+例如 `raw-key=20260511T1029Z` → raw issue id = `raw-20260511T1029Z`。
+
+分支名和工位名中的 `raw-{raw-key}` 都遵循这个规则。
+
 ## IBM 生命周期
 
 问题从发现到合并的标准路径：
