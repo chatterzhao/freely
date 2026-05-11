@@ -3,6 +3,21 @@
 
 本文件是 Freely 自举开发时的主动扫描入口，用来承接已进入活跃范围的 candidate / issue。
 
+## M-20260511T0245Z-A
+- title: DB 路径统一
+- status: active
+### candidate_issues
+1. `C-20260511T0245Z-A`
+- milestone: M-20260511T0245Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260511T0245Z-A/issue.md`
+### committed_issues
+1. `I-20260511T0245Z-A`
+- title: DB 路径统一
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260511T0245Z-A/issue.md`
+
 ## M-20260511T0229Z-A
 - title: worker prompt 注入 handoff 汇报指令
 - status: active
