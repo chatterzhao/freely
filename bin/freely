@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+# Resolve symlinks so PATH-launched freely finds the correct version directory
+_SCRIPT="$(python3 -c "import os,sys; print(os.path.realpath(sys.argv[1]))" "${BASH_SOURCE[0]}")"
+ROOT_DIR="$(cd "$(dirname "$_SCRIPT")/.." && pwd -P)"
 exec bash "$ROOT_DIR/docs/system/workspace/scripts/runtime/freely" "$@"
