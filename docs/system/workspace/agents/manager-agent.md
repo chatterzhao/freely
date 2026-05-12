@@ -62,6 +62,14 @@
    - 下一步动作：`delegate / runtime_recovery_requested / freeze / merge / cleanup`
    - 一旦 `ownership + restart_point + next_action` 已经稳定，优先产出具体 worker handoff；不要继续停留在 manager-only patrol
    - completion / verification / cleanup 的最终裁决仍留在主管；worker 只负责带回 evidence，不负责宣布 terminal completion
+
+4a. 工位创建由主管决策、runtime 执行：
+   - 主管负责判断何时需要新工位（新 issue、新 feature、fix 等）
+   - 主管在 worker prompt 中指定 `Worktree:`（目标绝对路径）和 `Branch:`（目标分支名）
+   - runtime 在消费 worker prompt 时，若目标工位不存在，自动调用 `./bin/wt-create <branch> --base develop` 创建工位并同步 tooling
+   - 主管不需要自己运行 `wt-create`——只负责在 worker prompt 中写对路径和分支名
+   - `Branch:` 格式：`fix/raw-{key}-{slug}` 或 `feature/raw-{key}-{slug}`，其中 `{key}` 是 `YYYYMMDDTHHMMZ` 格式
+   - 主管仍负责确保 issue 存在、raw-key 有效——runtime 的 auto-create 是执行机制，不替代治理判断
 5. 对任意新 signal：
    - 识别它来自 `event source` 还是 `standing source`
    - 先做最小 `intent understanding`

@@ -13276,14 +13276,30 @@ handoff.py 路径和 DB：
 当前 handoff_id 从 session-handoff.txt 或 latest-manager 查询获取。
 
 ───────────────
+委派前检查（delegate_workers 必须做）
+───────────────
+1. 查询 blocked worker 状态：
+   python3 $HP list --db $DB --role worker --status blocked
+   检查每个 blocked worker 的 exit_kind 和 blocked_reason：
+   - assessment / retirement / superseded → 该 worker 已结束，需要重新委派或清理
+   - worker_blocked（可恢复） → 评估是否 re-dispatch
+
+2. 查询已完成但工作树未清理的 worker：
+   python3 $HP list --db $DB --role worker --status completed
+
+3. 根据 blocked worker 的 worktree 字段，检查对应工位是否仍存在、是否有未提交改动。
+
+───────────────
 1. stop_ai
 ───────────────
+条件：没有待处理的 blocked worker、没有 scan backlog、没有 dirty worktree 需要关注。
 python3 $HP update --db $DB --handoff-id <handoff_id> --status completed \
   --exit-kind stop_ai --stop-reason "<停止的具体原因>"
 
 ───────────────
 2. resume_manager
 ───────────────
+条件：有问题需要继续分析（dirty worktree、blocked worker 需要人工判断等），但还不能委派。
 python3 $HP update --db $DB --handoff-id <handoff_id> --status completed \
   --exit-kind resume_manager \
   --restart-point "<重入起点描述>" \
@@ -13294,21 +13310,53 @@ python3 $HP update --db $DB --handoff-id <handoff_id> --status completed \
 ───────────────
 3. delegate_workers
 ───────────────
-manager 记录：
-python3 $HP update --db $DB --handoff-id <handoff_id> --status completed \
-  --exit-kind delegate_workers \
-  --worker-prompts-csv "/abs/path/worker1.txt,/abs/path/worker2.txt"
+条件：有明确可委派的工作（dirty worktree 需要 commit、analysis 需要执行等），且你知道目标 worktree 路径和 branch 名称。
 
-每个 worker 记录（insert 新记录，parent 指向 manager）：
-python3 $HP insert --db $DB --role worker --raw-key <key> \
-  --worktree <abs_path> --branch fix/raw-<key>-<slug> \
-  --prompt-file <worker_prompt_path> --parent <manager_handoff_id> \
-  --created-by manager --consumed-by worker --exit-kind ""
-- worktree 必须是绝对路径，branch 必须是 fix/* 或 feature/*
+步骤 A：为每个 worker 创建 prompt 文件
+  文件路径：.freely/run/worker-prompts/<timestamp>-worker-<slug>.txt
+
+  文件必须包含以下 header（每行一个，格式为 "Key: value" 或 "Key:\n- value"）：
+
+  Worktree:
+  - /absolute/path/to/worktree
+  Branch:
+  - fix/raw-YYYYMMDDTHHMMZ-<slug>
+  dispatch_priority: P2
+  parallel_safe: true
+  write_scope: worktree
+  intent_kind: edit
+  intent_target: <简短描述>
+
+  然后是 ## Task 部分，描述具体要做什么。
+
+  规则：
+  - Worktree 和 Branch header 是必需的——runtime 用它们定位或创建工位
+  - 如果 worktree 不存在：runtime 会自动调用 ./bin/wt-create 创建
+  - Manager 不需要自己运行 wt-create——只需在 prompt 里写对 Worktree 和 Branch
+  - intent_kind 可选值：edit（代码改动）、cleanup（合并/收口）、promotion（发布/升级）
+  - parallel_safe: true 表示可以和其他 worker 并行运行
+  - write_scope: worktree 表示只在自己的工位内写
+
+步骤 B：写 manager exit contract
+  python3 $HP update --db $DB --handoff-id <handoff_id> --status completed \
+    --exit-kind delegate_workers \
+    --worker-prompts-csv "/abs/path/worker1.txt,/abs/path/worker2.txt"
+
+步骤 C：为每个 worker insert 手牌记录
+  python3 $HP insert --db $DB --role worker --raw-key <key> \
+    --worktree <abs_path> --branch fix/raw-<key>-<slug> \
+    --prompt-file <worker_prompt_path> --parent <manager_handoff_id> \
+    --created-by manager --consumed-by worker --exit-kind ""
+
+步骤 D：runtime 在下一轮会自动：
+  - 读取 worker_prompts_csv → 检查每个 worker prompt → launch_worker_from_manager_prompt
+  - 如果 worktree 不存在 → 自动调用 wt-create 创建工位 → 同步 tooling → 启动 worker AI
+  - Worker 完成后 → 更新 handoffs 表 → Manager 下轮 patrol 消费结果
 
 规则：
 - 所有三种出口必须调用 handoff.py update，无一例外
 - 如果你本轮还没写完整 exit contract，runtime 会用同一个 resume target 拉你回来补
+- 不要写 "why_not_delegate: runtime does not support" —— runtime 完整支持 worker 委派
 EOF
 }
 
