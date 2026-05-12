@@ -15042,14 +15042,19 @@ manager_hygiene_alerts() {
 manager_runtime_recover_workers_if_needed() {
   local project="$1" repo_root wt_path branch desired_state role_hint exit_reason supervisor_state recovered latest_continuity_file normalized_project normalized_wt_path
   local worker_signature worker_prompt_file terminal_kind terminal_exit_reason handoff_prompt_file allow_terminal_handoff_absorb terminal_intake_id
+  local skip_continuity_recovery="${2:-false}"
   repo_root="$(git -C "$project" rev-parse --show-toplevel 2>/dev/null || true)"
   [[ -n "$repo_root" ]] || return 0
   [[ "$(effective_runtime_role_for_project "$project")" == "manager" ]] || return 0
 
-  reset_project_runtime_discovery_cache "$project"
-  latest_continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
-  recovered="$(manager_runtime_launch_workers_from_latest_handoff "$project")"
-  [[ "$recovered" =~ ^[0-9]+$ ]] || recovered=0
+  # Continuity-based recovery (deprecated old path): skip on first patrol cycle
+  # because fleet cache is not populated until build_prompt runs.
+  if [[ "$skip_continuity_recovery" != "true" ]]; then
+    reset_project_runtime_discovery_cache "$project"
+    latest_continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
+    recovered="$(manager_runtime_launch_workers_from_latest_handoff "$project")"
+    [[ "$recovered" =~ ^[0-9]+$ ]] || recovered=0
+  fi
   normalized_project="$(normalize_runtime_worktree_path "$project")"
   while IFS='|' read -r wt_path branch; do
     [[ -n "$wt_path" ]] || continue
@@ -18634,10 +18639,12 @@ start_project_runtime() {
       sleep 1
       continue
     fi
-    # Worker auto-recovery deferred to after first AI patrol cycle.
-    # Startup recovery created 3+ simultaneous ACP sessions
+    # FIRST_ROUND guard: continuity-based worker recovery
+    # (manager_runtime_launch_workers_from_latest_handoff) is skipped on the
+    # first cycle because the fleet cache isn't populated until build_prompt
+    # runs. Startup recovery created 3+ simultaneous ACP sessions
     # (manager + workers) collapsing the bridge in <60s.
-    # Workers now launched via post-AI-cycle handler only.
+    # Workers are launched via post-AI-cycle handler (delegate_workers exit contract).
     exit_if_stop_requested_before_launch
     # Task-mode wait gate: skip AI launch when manager is in wait mode
     if [[ "$(role_hint_for_project "$PROJECT_ROOT")" == "manager" ]]; then
@@ -18651,7 +18658,9 @@ start_project_runtime() {
     select_launch_kind
     mode_name="$LAUNCH_KIND_SELECTED"
     # Process terminated workers once per cycle (not every watchdog tick)
-    manager_runtime_recover_workers_if_needed "$PROJECT_ROOT" >/dev/null || true
+    # On first cycle, skip continuity-based recovery — fleet cache not populated yet.
+    # Workers are launched via post-AI-cycle handler (delegate_workers exit contract).
+    manager_runtime_recover_workers_if_needed "$PROJECT_ROOT" "$FIRST_ROUND" >/dev/null || true
     ensure_runtime_tool_session_anchor "$AI_TOOL" "$mode_name" "$PROJECT_ROOT"
     # Persist session anchor immediately so SIGTERM-killed sessions can resume
     _persist_session_anchor_early "$PROJECT_ROOT" "$AI_TOOL"
