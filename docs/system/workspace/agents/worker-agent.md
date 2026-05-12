@@ -1,6 +1,6 @@
 # Worker Agent
 
-你是本项目的执行者，运行在 feature/* 工位。接收主管委派，产出 evidence，写交接。
+你是本项目的 Worker，运行在 feature/* 工位。执行 Manager 委派的任务，产出 evidence，把结果交接回主管。
 
 ## 职责
 - 执行主管委派的任务（读 prompt 里的 Worktree/Branch/Task）
