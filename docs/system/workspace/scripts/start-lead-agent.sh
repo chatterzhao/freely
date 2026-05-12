@@ -277,12 +277,9 @@ manager_continuity_path="$project/.freely/run/manager-continuity-${artifact_stam
 worker_prompt_dir="$project/.freely/run/worker-prompts"
 worker_prompt_path_example="$worker_prompt_dir/${artifact_stamp}-worker-<slug>-${ai_tool}.txt"
 manager_artifact_rule=""
-role_scope_rule_5a="5A. 当 \`MANAGER_MODE=false\` 且当前分支是 \`feature/*\` 时，不要把 \`./bin/freely live-status --project $project\`、\`./bin/freely fleet-status --project $project\`、根 \`develop\` 的 live-status/fleet-state，或项目级 patrol 当作默认首跳；保持 worker reentry scope，只在当前工位问题直接需要时读取最小必要证据。"
-role_scope_rule_5b="5B. 当 \`MANAGER_MODE=false\` 且当前分支是 \`feature/*\` 时，不要写 \`.freely/run/manager-continuity-*.md\`、\`.freely/run/worker-prompts/*.txt\`、cleanup queue 或其他 manager-only handoff 产物；worker 只回写本工位 issue / progress / recovery / worker continuity / verification evidence。"
-additional_requirements="$(cat <<'EOF'
-- 若 `MANAGER_MODE=false` 且当前分支是 `feature/*`，当前会话保持 worker scope：不要升级成项目级监督者；若发现需要主管裁决的 fleet / merge / cleanup 问题，只记录 evidence 与 reroute 建议。
-EOF
-)"
+	role_scope_rule_5a="5A. 你是 Worker Agent（见 workspace/agents/worker-agent.md）。保持 worker scope，不升级成主管。"
+	role_scope_rule_5b="5B. 只回写本工位产物。发现需主管裁决的问题只记录 evidence + reroute。"
+tadditional_requirements="- Agent 角色定义：workspace/agents/worker-agent.md"
 startup_bounded_patrol_rule=""
 initial_read_targets="$(cat <<EOF
 - 项目治理入口：$project/AGENTS.md
@@ -296,99 +293,38 @@ initial_read_targets="$(cat <<EOF
 EOF
 )"
 
-if [[ "$prompt_role" == "manager" ]]; then
-  manager_mode="true"
-  execution_rule_15="15. 当前分支是受保护主管工位；你不得在当前 worktree 直接修改受版本管理的仓库产物。"
-  execution_rule_16="16. 若 \`selected_tool\` 与当前运行中的 \`AI_TOOL\` 相同，也不要在当前会话内直接执行第二跳实现；你必须先选择或创建对应 feature worktree，并把执行权委派到那个工位的 worker AI/tool 进程。"
-  execution_rule_17="17. 你在当前会话中的交付应是监督判断、delegation handoff、需要启动的 worker 命令与 continuity 留痕；只有 worker 工位可以继续实际 doc-loop / dev-loop。"
-  role_scope_rule_5a="5A. 若当前轮次承担项目级监督职责，先读取 \`./bin/freely live-status --project $project\`，把它当作 supervisor / dispatcher / AI 当前态入口；只有在它提示需要继续深挖时，才展开 \`fleet-status\`、prompt、continuity、jsonl 等细节。"
-  role_scope_rule_5b="$(cat <<'EOF'
-5B. 若本轮是主管被 runtime 重新激活后的第一轮，先做一轮 patrol：
-   - `live-status -> fleet-status -> milestone / issue / progress / recovery`
-   - 主动寻找 `candidate stuck`、`phase orphaned`、`completion without closure`
-   - 若 `live-status` 暴露 `develop_push_followthrough_push_urgency=immediate|deferred` 或 `develop_push_followthrough_resync_required=true`，先判断 push/resync followthrough 是否应前置
-   - 对 owner / verification / promotion / cleanup / stale-batch retirement 这类 latest-develop-sensitive judgment，不得在 canonical `develop` 未同步时直接下结论
-   - 把发现结果加工为 `ownership + restart_point + next_action`
+	if [[ "$prompt_role" == "manager" ]]; then
+	  manager_mode="true"
+	  execution_rule_15="15. 你是 Manager Agent（见 workspace/agents/manager-agent.md）。不得直接 commit——通过委派 Worker。"
+	  execution_rule_16="16. 交付物：continuity + worker prompt + handoff.py update。自主决策优先级和分批。"
+	  execution_rule_17="17. subagent 并行不冲突的任务。runtime-owned 问题交给 runtime。"
+	  role_scope_rule_5a=""
+	  role_scope_rule_5b=""
+	  manager_artifact_rule="$(cat <<EOF
+Worker prompt 格式（runtime 解析 Worktree:/Branch: header）：
+\\`\\`\\`
+Worktree:
+- /abs/path/to/worktree
+Branch:
+- fix/raw-{key}-{slug}
+dispatch_priority: P2
+parallel_safe: true
+write_scope: worktree
+intent_kind: edit|cleanup|promotion
+intent_target: <简短描述>
+\\`\\`\\`
 EOF
 )"
-  manager_artifact_rule="$(cat <<EOF
-18. 当前轮次若形成了 manager judgement / worker delegation / cleanup queue，你必须把它 materialize 成 runtime 可消费的非版本化产物，不能只停在自然语言回答。
-19. 至少创建一个 manager continuity 文件：\`$manager_continuity_path\`。
-20. 若需要委派 worker，再在 \`$worker_prompt_dir\` 下创建 worker prompt 文件；命名格式参考：\`$worker_prompt_path_example\`。
-21. 每个 worker prompt 除正文外，必须带 machine-readable header：
-   - \`Worktree:\`
-   - \`- \\\`/abs/path/to/target-worktree\\\`\`
-   - \`Branch:\`
-   - \`- \\\`feature/target-branch\\\`\`
-   自然语言说明可以补充，但不能替代这两个 header。
-22. manager continuity 必须显式引用每个 worker prompt 的绝对路径；runtime 只会从 continuity 中消费这些 \`.freely/run/worker-prompts/*.txt\` 路径，不会从普通回答里自动提炼 handoff。
-23. 若本轮存在多个 lane，worker prompt 不能只写业务内容；每个 prompt 还必须附带最小 dispatch metadata：\`dispatch_priority\`、\`parallel_safe\`、\`write_scope\`。若该 prompt 会授予 mutate authority，还必须补 machine-readable \`intent_kind\` 与 \`intent_target\`，明确当前 lane 取得的是 \`edit\`、\`cleanup\` 还是 \`promotion\` authority。若 lane 因 same-lane busy guard、显式 freeze、写域冲突或 supersede 暂不派发，未派发 lane 也必须留在 manager continuity 的 queue / frozen queue 中。
-24. 对会产生 mutate authority 的 lane，worker prompt 还必须附带 machine-readable ownership metadata：\`intent_kind\`、\`intent_target\`。\`write_scope\` 只用于 launch-time scheduling，不替代长期 mutate ownership truth。
-25. 若 worker lane 需要承担 verification / closeout 义务，worker prompt 还必须附带 machine-readable verification metadata：
-   - \`Owner-Issue:\`
-   - \`Pre-Tests-Path:\`
-   - \`Verification-Artifact-Dir:\`
-   - \`Required-Test-Lanes:\`
-   - \`Required-Acceptance-Item-Ids:\`
-   - \`Minimum-Evidence-Level:\`
-   - \`Target-Environment:\`
-   - \`Closeout-Gate:\`
-   - \`Closeout-Gate-Command:\`
-   - \`Closeout-Target-Lane:\`
-   - \`Closeout-Promotion-Gate:\`
-   - \`Closeout-Requires-Adequacy:\`
-   - \`Closeout-Review-Artifact-Policy:\`
-   其中 \`Required-Test-Lanes\` 与 \`Required-Acceptance-Item-Ids\` 必须写成可枚举列表；不得只写“see issue”或“follow pre-tests”.
-   runtime 会把这组字段结构化写入 delegated intake 与 worker runtime state，所以不要把它们写成只适合人眼理解的散文。
-26. 若本轮结论是 manager-only cleanup queue、暂不发 worker，也仍然必须写 manager continuity，至少包含：fleet inventory、route_kind / restart_point / ownership / next_action、cleanup queue 或 frozen queue、以及 next supervision priority。
-27. 你的最终回答必须列出本轮新写入的 manager continuity / worker prompt 路径；若没有写这些产物，就不算完成主管交付。
-28. 若当前输入包含 delegated continuation、cleanup followthrough、或明确的 project-level restart point，在主 handoff artifact 落盘前不要先 spawn subagent，也不要先等待子任务结果。
-29. 先用当前已足够的现场证据写出 primary manager continuity / worker prompts；subagent 只能用于不阻塞首个 handoff 的二次核对或次优先研究。
+	  additional_requirements="- Agent 角色定义：workspace/agents/manager-agent.md"
+	  startup_bounded_patrol_rule=""
+	  initial_read_targets="$(cat <<EOF
+- 项目治理：$project/AGENTS.md
+- Manager Agent：$workspace_root/agents/manager-agent.md
+- 当前态：./bin/freely live-status --project $project
+- Scan：machine_readable_scan_json
+- workspace：$workspace_root
 EOF
 )"
-  additional_requirements="$(cat <<'EOF'
-- 若当前轮次承担项目级监督职责，先基于工位快照安排继续开发、冻结、验证、合并和清理顺序。
-- 可并行且互不阻塞的任务，使用 subagent 提高效率。
-- 若 `CURRENT_BRANCH` 是 `develop/main/test-pre-merge-*`，当前会话只做主管，不做实现；实现必须委派到 feature worktree。
-- 若工位视图缺少准确 issue/phase，不要伪造；先把该工位视为需要进一步核对的监督对象。
-- 若当前 AI 响应已经结束、目标进程已退出、命中限额/认证失败、或发生 `context compacted` 需要新进程续接，这类问题一律视为 `runtime-owned`。
-- 主管只输出恢复判定和委派；worker 只回写 blocker / continuity；真正的切号、sleep/recheck 和新进程启动由 Freely runtime / scripts 处理。
-- 若你编写 shell 命令给 `zsh` 执行，不要把 `status` 当作临时变量名；它在 `zsh` 中是只读特殊变量。需要保存退出码时统一改用 `exit_code`、`cmd_status` 等非保留名字。
-- 若活跃 owner 的 issue / progress / pre-tests 只存在于某个 dirty feature worktree，不要在 root `develop` 里直接读取同名相对路径并把 `No such file or directory` 当成 owner 缺失；应先锚定该 feature worktree，再从那个工位读取 owner 真相并生成 handoff。
-EOF
-)"
-  startup_bounded_patrol_rule="$(cat <<'EOF'
-启动首轮有界巡检契约：
-- 若当前没有 launchable manager continuity、也没有 active worker，先把这轮视为 `fresh_startup_patrol`，不要直接展开全量治理阅读。
-- `fresh_startup_patrol` 的首批必读证据只允许包含：
-  - `PROJECT_ROOT/AGENTS.md`
-  - `machine_readable_scan_json`
-  - `./bin/freely live-status --project <project>`
-  - `workspace/agents/lead-agent.md`
-  - `skill:freely-context-source-skill`
-- 在写出 primary manager continuity 前，不要整文件读取 `docs/milestones.md`，不要并行展开多个 skill，也不要为每个 surface 预读 issue / progress / pre-brainstorm 原文。
-- 首轮先用 `machine_readable_scan_json` 的 active counts 和 summary 选出至多一个 highest-leverage source；只对该 source 做定点核对，再写 primary manager continuity。
-- primary manager continuity 必须先回答四件事：`route_kind`、`restart_point`、`ownership`、`next_action`。如果证据仍不足，再把“需要补读的具体文档路径”写进 continuity / queue，而不是在首轮继续扩读。
-- 若 scan json 已经证明 backlog 非空，但首轮没有形成 continuity 或 worker prompt，这一轮应视为失败；不要把“继续读更多文档”当作默认下一步。
-EOF
-)"
-  initial_read_targets="$(cat <<EOF
-- 项目治理入口：$project/AGENTS.md
-- runtime 当前态入口：./bin/freely live-status --project $project
-- 结构化巡检入口：machine_readable_scan_json（若 prompt 尾部已给出路径，先消费该 json）
-- workspace 根：$workspace_root
-- 首跳代理：workspace/agents/lead-agent.md
-- 巡检技能：skill:freely-context-source-skill
-
-按需再读，不要在首轮默认展开：
-- 项目意图：$intent
-- 宪法：$constitution
-- 里程碑扫描入口：$project/docs/milestones.md
-- 工具清单：workspace/tools.md
-- 技能索引：workspace/skills/README.md
-EOF
-)"
-fi
 
 escape_prompt_backticks() {
   local value="${1-}"
