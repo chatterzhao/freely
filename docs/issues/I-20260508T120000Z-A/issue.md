@@ -5,12 +5,14 @@ status: completed
 phase_state: completed
 promoted_from: raw-20260508T120000Z
 source_candidate: docs/pre-brainstorms/20260508T120000Z--wt-create-fix/candidates.md
-canonical_issue_path: ""
+canonical_issue_path: ''
 platform_ids:
   github:
     issue_id: '253'
 pre_tests_path: docs/epics/wt-create-fix/verification/pre-tests.md
 verification_artifact_dir: docs/epics/wt-create-fix/code-reviews
+platform_state: closed
+updated_at: '2026-05-12T04:46:12Z'
 ---
 
 # I-20260508T120000Z-A: wt-create fix

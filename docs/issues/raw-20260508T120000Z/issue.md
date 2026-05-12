@@ -14,11 +14,12 @@ canonical_issue_path: docs/issues/I-20260508T120000Z-A/issue.md
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-08T12:00:00Z'
-updated_at: '2026-05-08T12:00:00Z'
+updated_at: '2026-05-12T04:46:22Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 # raw-20260508T120000Z: wt-create fix
