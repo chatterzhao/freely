@@ -291,7 +291,7 @@ def parse_args():
     parser.add_argument("--reasoning-effort", default="", help="Reasoning effort hint")
     parser.add_argument("--session-id", default="", help="Desired session UUID for new sessions")
     parser.add_argument("--resume", default="", help="Session ID to resume via session/resume")
-    parser.add_argument("--launch-kind", choices=("fresh", "resume", "fork"), default="fresh",
+    parser.add_argument("--launch-kind", choices=("fresh", "resume", "fork", "prompt"), default="fresh",
                         help="Session lifecycle state")
     parser.add_argument("--loop", action="store_true",
                         help="Loop mode: after prompt completes, check --next-prompt-file for the next prompt. Delete after reading. 'EXIT' in file stops the loop.")
@@ -356,6 +356,15 @@ def main():
                 session_id = session_result["sessionId"]
                 print(session_id, flush=True)                                             # line 1: clean UUID
                 print(f"session id: {session_id} (fresh after resume failure)", flush=True) # line 2: human log
+
+        elif launch_kind == "prompt" and resume_target:
+            # Multi-turn within same session: session already exists from fresh/resume.
+            # Just set session_id — prompt will be sent via send_prompt() below.
+            session_id = resume_target
+            print(session_id, flush=True)                                   # line 1: clean UUID
+            print(f"session id: {session_id} (prompt)", flush=True)         # line 2: human log
+            # Use a minimal session_result stub for bypassPermissions check below
+            session_result = {"sessionId": session_id}
 
         elif launch_kind == "fork":
             # Worker forks from parent: gets own session, inherits context via prompt.

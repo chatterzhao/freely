@@ -15276,14 +15276,18 @@ select_launch_kind() {
       if [[ -n "$sid" ]] && is_valid_uuid "$sid"; then
         CLAUDE_SESSION_ID_CURRENT="$sid"
         LAST_TOOL_SESSION_ID="$sid"
-        LAUNCH_KIND_SELECTED="resume"
-        LAUNCH_ROTATION_REASON="acp_session_persists"
+        # Same daemon lifecycle, session alive → multi-turn via session/prompt
+        if [[ "${FREELY_ACP_FIRST_LAUNCH_DONE:-0}" == "1" ]]; then
+          LAUNCH_KIND_SELECTED="prompt"
+          LAUNCH_ROTATION_REASON="acp_session_prompt_turn"
+        else
+          LAUNCH_KIND_SELECTED="resume"
+          LAUNCH_ROTATION_REASON="acp_session_persists"
+        fi
         return 0
       fi
     fi
     # No active session in session-store → fresh launch.
-    # (Do NOT fall back to in-memory CLAUDE_SESSION_ID_CURRENT;
-    # session-store is the authoritative source for ACP mode.)
     LAUNCH_KIND_SELECTED="fresh"
     LAUNCH_ROTATION_REASON="acp_first_launch"
     return 0
@@ -17199,6 +17203,20 @@ build_prompt() {
   local workspace_root
   if [[ "${FREELY_TEST_FAIL_BUILD_PROMPT:-0}" == "1" ]]; then
     return 1
+  fi
+  # Delta mode: ACP prompt turn — session remembers context, only send delta
+  if [[ "${LAUNCH_KIND_SELECTED:-}" == "prompt" ]]; then
+    cat <<PROMPT_DELTA
+=== 本轮 delta（会话已记住你的角色和历史） ===
+上一轮 exit_kind: ${LAST_WORKCELL_EXIT_REASON:-unknown}
+请基于 session 历史继续工作。先读 fleet 和 scan 更新，再决定下一步。
+写 exit contract 到 handoffs 表。
+PROMPT_DELTA
+    append_fleet_supervision_if_needed
+    append_task_source_patrol_seed_if_needed
+    append_manager_exit_contract_directive_if_needed "$PROJECT_ROOT"
+    append_worker_exit_contract_directive_if_needed "$PROJECT_ROOT"
+    return 0
   fi
   workspace_root="$(workspace_root_for_project "$PROJECT_ROOT")"
   # Inject agent role definition at prompt start (stable prefix, cached by AI tool)
@@ -19144,6 +19162,9 @@ start_project_runtime() {
       LAST_WORKCELL_EXIT_REASON="manager_worker_launch_after_ai_cycle"
       write_workcell_state "$PROJECT_ROOT" "running" "up" "down" "$LAST_WORKCELL_EXIT_REASON"
     fi
+
+    # Mark first ACP launch done → subsequent cycles use session/prompt for multi-turn
+    FREELY_ACP_FIRST_LAUNCH_DONE=1
 
     restart_count=$((restart_count + 1))
     if [[ "${MAX_RESTARTS:-0}" -gt 0 && "$restart_count" -gt "${MAX_RESTARTS:-0}" ]]; then
