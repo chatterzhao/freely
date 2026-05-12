@@ -1983,6 +1983,31 @@ handoff_file() {
   echo "$(run_dir_for_project "$project")/session-handoff.txt"
 }
 
+_db_exit_contract_field() {
+  local project="$1" role="$2" field="$3" _handoff_py _db_path
+  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  _db_path=""$project/.freely/freely.db""
+  [[ -f "$_handoff_py" && -f "$_db_path" ]] || return 1
+  if [[ "$role" == "manager" ]]; then
+    python3 "$_handoff_py" latest-manager --db "$_db_path" 2>/dev/null | python3 -c "
+import json,sys
+try:
+    r=json.load(sys.stdin)
+    print(r.get('$field',''))
+except: pass
+" 2>/dev/null
+  else
+    python3 "$_handoff_py" list --db "$_db_path" --role worker --status completed 2>/dev/null | python3 -c "
+import json,sys
+try:
+    rows=json.load(sys.stdin)
+    latest=rows[0] if rows else {}
+    print(latest.get('$field',''))
+except: pass
+" 2>/dev/null
+  fi
+}
+
 manager_bootstrap_handoff_file() {
   local project="$1"
   echo "$(run_dir_for_project "$project")/manager-bootstrap-handoff.txt"
@@ -1990,12 +2015,12 @@ manager_bootstrap_handoff_file() {
 
 manager_exit_contract_file() {
   local project="$1"
-  echo "$(run_dir_for_project "$project")/manager-exit-contract.env"
+  echo "$(run_dir_for_project "$project")/manager-exit-contract.env.deprecated"
 }
 
 worker_exit_contract_file() {
   local project="$1"
-  echo "$(state_dir "$project")/worker-exit-contract.env"
+  echo "$(state_dir "$project")/worker-exit-contract.env.deprecated"
 }
 
 manager_operator_stop_boundary_file() {
@@ -5762,20 +5787,20 @@ materialize_manager_worker_terminal_continuation() {
   local contract_file intake_id created_at meta_file resolution_dir resolution_artifact
   local contract_summary manager_next_action linked_artifact content intake_message
   local owner_issue artifact_dir closeout_target_lane closeout_gate_command closeout_promotion_gate evidence_paths_csv
-  contract_file="$(worker_exit_contract_file "$worker_project")"
-  [[ -f "$contract_file" ]] || return 1
+  # contract reads from DB; verification metadata falls back to verification contract
+  manager_exit_contract_kind "$project" >/dev/null 2>&1 || return 1
 
   case "$terminal_kind" in
     worker_done)
-      contract_summary="$(meta_env_value "$contract_file" "COMPLETION_SUMMARY")"
+      contract_summary="$(_db_exit_contract_field "$project" worker completion_summary)"
       manager_next_action="Consume this completed worker result before broad patrol, then decide manager-owned closeout, merge judgement, retirement, or next dispatch."
       ;;
     worker_blocked)
-      contract_summary="$(meta_env_value "$contract_file" "BLOCKED_REASON")"
+      contract_summary="$(_db_exit_contract_field "$project" worker blocked_reason)"
       manager_next_action="Consume this blocked worker result before broad patrol, then decide manager-owned unblock, re-dispatch, or bounded stop."
       ;;
     worker_handoff_needed)
-      contract_summary="$(meta_env_value "$contract_file" "HANDOFF_REASON")"
+      contract_summary="$(_db_exit_contract_field "$project" worker handoff_reason)"
       manager_next_action="Consume this worker handoff before broad patrol, then decide manager-owned followthrough or next dispatch."
       ;;
     *)
@@ -5795,7 +5820,7 @@ materialize_manager_worker_terminal_continuation() {
   [[ -n "$closeout_gate_command" ]] || closeout_gate_command="$(meta_env_value "$(worker_verification_contract_file "$worker_project")" "CLOSEOUT_GATE_COMMAND")"
   closeout_promotion_gate="$(meta_env_value "$contract_file" "CLOSEOUT_PROMOTION_GATE")"
   [[ -n "$closeout_promotion_gate" ]] || closeout_promotion_gate="$(meta_env_value "$(worker_verification_contract_file "$worker_project")" "CLOSEOUT_PROMOTION_GATE")"
-  evidence_paths_csv="$(meta_env_value "$contract_file" "EVIDENCE_PATHS_CSV")"
+  evidence_paths_csv="$(_db_exit_contract_field "$project" worker evidence_paths)"
 
   intake_id="$(manager_worker_terminal_continuation_intake_id "$project" "$branch" "$terminal_kind" "$worker_project")"
   meta_file="$(intake_item_meta_file "$project" "$intake_id")"
@@ -10728,10 +10753,8 @@ authoritative_worker_prompt_file_for_project() {
 }
 
 worker_exit_contract_next_action_prompt_file_for_project() {
-  local project="$1" contract_file next_action_for_manager
-  contract_file="$(worker_exit_contract_file "$project")"
-  [[ -f "$contract_file" ]] || return 1
-  next_action_for_manager="$(meta_env_value "$contract_file" "NEXT_ACTION_FOR_MANAGER")"
+  local project="$1" next_action_for_manager
+  next_action_for_manager="$(_db_exit_contract_field "$project" worker next_action)"
   [[ -n "$next_action_for_manager" ]] || return 1
   printf '%s\n' "$next_action_for_manager" | awk '
     {
@@ -11809,7 +11832,7 @@ manager_runtime_launch_workers_from_latest_handoff() {
       terminal_kind="$(worker_exit_contract_kind "$target_project" || true)"
       if [[ "$terminal_kind" == "worker_handoff_needed" ]]; then
         if launch_worker_from_manager_prompt_if_needed "$project" "$prompt_file"; then
-          rm -f "$(worker_exit_contract_file "$target_project")"
+          # contract cleanup deprecated
           append_runtime_event "$project" "worker_exit_contract_handoff_absorbed" \
             "worktree=$target_project" \
             "branch=$(worker_prompt_target_branch "$prompt_file")" \
@@ -12928,7 +12951,7 @@ prepend_exit_contract_repair_focus_if_needed() {
 Repair-first override:
 - 当前轮次是 worker exit contract repair。先补齐缺失或无效的 worker exit contract，再做任何其它扩展阅读、实现或 broad patrol。
 - 继续沿用当前 worker issue 边界，不要重开 manager patrol，也不要把自己提升成主管。
-- 必须在本轮结束前写出有效的 $(worker_exit_contract_file "$project")；否则 runtime 会继续按同一 resume target 拉回修复。
+- 必须在本轮结束前通过 handoff.py update 写入有效的 worker exit contract；否则 runtime 会继续按同一 resume target 拉回修复。
 - handoff_evidence: \`${handoff_path}\`
 
 EOF
@@ -12938,7 +12961,7 @@ EOF
 Repair-first override:
 - 当前轮次是 manager exit contract repair。先补齐缺失或无效的 manager exit contract，再做新的 delegation、cleanup judgement 或 broad patrol。
 - 继续沿用当前 manager 上下文，不要忽略 repair contract 去重跑首轮排班。
-- 必须在本轮结束前写出有效的 $(manager_exit_contract_file "$project")；否则 runtime 会继续按同一 resume target 拉回修复。
+- 必须在本轮结束前通过 handoff.py update 写入有效的 manager exit contract；否则 runtime 会继续按同一 resume target 拉回修复。
 - handoff_evidence: \`${handoff_path}\`
 
 EOF
@@ -13281,13 +13304,13 @@ EOF
 }
 
 append_worker_exit_contract_directive_if_needed() {
-  local project="$1" contract_file
+  local project="$1"
   [[ "$(effective_runtime_role_for_project "$project")" == "worker" ]] || return 0
-  contract_file="$(worker_exit_contract_file "$project")"
+
   cat <<EOF
 
 Worker exit contract（硬性要求）：
-- 在本轮结束前，必须写出且只写出一个 worker exit contract 文件：
+- 在本轮结束前，调用 handoff.py update 写入 handoffs 表：
   - \`$contract_file\`
 - 文件必须采用 shell env 键值格式，并且 \`EXIT_KIND\` 只能是以下三者之一：
   - \`worker_done\`
@@ -13323,42 +13346,11 @@ EOF
 }
 
 sync_exit_contract_to_handoffs() {
-  local project="$1" kind
-  kind="$(manager_exit_contract_kind "$project" 2>/dev/null || true)"
-  local _handoff_py _db_path latest_mgr
-  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
-  _db_path=""$project/.freely/freely.db""
-  if [[ ! -f "$_handoff_py" || ! -f "$_db_path" ]]; then
-    return 0
-  fi
-  case "$kind" in
-    delegate_workers)
-      latest_mgr=$(python3 -c "
-import sqlite3, os
-db='$_db_path'
-if os.path.exists(db):
-    conn=sqlite3.connect(db)
-    conn.row_factory=sqlite3.Row
-    row=conn.execute(\"SELECT handoff_id FROM handoffs WHERE role='manager' ORDER BY created_at DESC LIMIT 1\").fetchone()
-    conn.close()
-    if row: print(row['handoff_id'])
-" 2>/dev/null || true)
-      if [[ -z "$latest_mgr" ]]; then
-        append_runtime_event "$project" "sync_exit_contract_to_handoffs_missing_manager_record" "kind=$kind"
-      fi
-      ;;
-    stop_ai|resume_manager|*)
-      return 0
-      ;;
-  esac
+  return 0
 }
 
 manager_exit_contract_kind() {
   local project="$1" contract_file
-  contract_file="$(manager_exit_contract_file "$project")"
-  if [[ -f "$contract_file" ]]; then
-    meta_env_value "$contract_file" "EXIT_KIND" && return 0
-  fi
   local _handoff_py _db_path
   _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
   _db_path=""$project/.freely/freely.db""
@@ -13392,16 +13384,14 @@ manager_exit_contract_has_launchable_worker_prompt() {
 }
 
 validate_manager_exit_contract_for_project() {
-  local project="$1" contract_file kind missing_csv=""
+  local project="$1" kind="" missing_csv=""
   local stop_reason restart_point next_action why_not_stop why_not_delegate worker_prompts_csv
-  contract_file="$(manager_exit_contract_file "$project")"
-  if [[ ! -f "$contract_file" ]]; then
-    local _handoff_py _db_path
-    _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
-    _db_path=""$project/.freely/freely.db""
-    if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
-      local pending_workers worker_prompts_list
-      pending_workers=$(python3 "$_handoff_py" list --db "$_db_path" --role worker --status pending 2>/dev/null | python3 -c "
+  local _handoff_py _db_path
+  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  _db_path=""$project/.freely/freely.db""
+  if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
+    local pending_workers worker_prompts_list
+    pending_workers=$(python3 "$_handoff_py" list --db "$_db_path" --role worker --status pending 2>/dev/null | python3 -c "
 import json,sys
 try:
     rows=json.load(sys.stdin)
@@ -13409,17 +13399,17 @@ try:
     print(','.join(files))
 except: pass
 " 2>/dev/null || true)
-      if [[ -n "$pending_workers" ]]; then
-        worker_prompts_csv="$pending_workers"
-        kind="delegate_workers"
-      fi
+    if [[ -n "$pending_workers" ]]; then
+      worker_prompts_csv="$pending_workers"
+      kind="delegate_workers"
     fi
     if [[ -z "$kind" ]]; then
-      printf 'missing_file\n'
-      return 1
+      kind="$(_db_exit_contract_field "$project" manager exit_kind)"
     fi
-  else
-    kind="$(meta_env_value "$contract_file" "EXIT_KIND")"
+  fi
+  if [[ -z "$kind" ]]; then
+    printf 'missing_file\n'
+    return 1
   fi
   case "$kind" in
     stop_ai|resume_manager|delegate_workers) ;;
@@ -13428,14 +13418,12 @@ except: pass
       return 1
       ;;
   esac
-  if [[ -f "$contract_file" ]]; then
-    stop_reason="$(meta_env_value "$contract_file" "STOP_REASON")"
-    restart_point="$(meta_env_value "$contract_file" "RESTART_POINT")"
-    next_action="$(meta_env_value "$contract_file" "NEXT_ACTION")"
-    why_not_stop="$(meta_env_value "$contract_file" "WHY_NOT_STOP")"
-    why_not_delegate="$(meta_env_value "$contract_file" "WHY_NOT_DELEGATE")"
-    worker_prompts_csv="$(meta_env_value "$contract_file" "WORKER_PROMPTS_CSV")"
-  fi
+  stop_reason="$(_db_exit_contract_field "$project" manager stop_reason)"
+  restart_point="$(_db_exit_contract_field "$project" manager restart_point)"
+  next_action="$(_db_exit_contract_field "$project" manager next_action)"
+  why_not_stop="$(_db_exit_contract_field "$project" manager why_not_stop)"
+  why_not_delegate="$(_db_exit_contract_field "$project" manager why_not_delegate)"
+  worker_prompts_csv="$(_db_exit_contract_field "$project" manager worker_prompts_csv)"
   case "$kind" in
     stop_ai)
       [[ -n "$stop_reason" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "STOP_REASON")"
@@ -13548,10 +13536,19 @@ autofill_manager_exit_contract_for_continuity_resume_if_possible() {
 }
 
 worker_exit_contract_kind() {
-  local project="$1" contract_file
-  contract_file="$(worker_exit_contract_file "$project")"
-  [[ -f "$contract_file" ]] || return 1
-  meta_env_value "$contract_file" "EXIT_KIND"
+  local project="$1" _handoff_py _db_path
+  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  _db_path=""$project/.freely/freely.db""
+  [[ -f "$_handoff_py" && -f "$_db_path" ]] || return 1
+  python3 "$_handoff_py" list --db "$_db_path" --role worker --status completed 2>/dev/null | python3 -c "
+import json,sys
+try:
+    rows=json.load(sys.stdin)
+    r=rows[0] if rows else {}
+    kind=r.get("exit_kind","")
+    print(kind) if kind else None
+except: pass
+" 2>/dev/null || return 1
 }
 
 worker_project_has_terminal_exit_contract() {
@@ -13564,14 +13561,13 @@ worker_project_has_terminal_exit_contract() {
 }
 
 validate_worker_exit_contract_for_project() {
-  local project="$1" contract_file kind missing_csv=""
+  local project="$1" kind="" missing_csv=""
   local completion_summary evidence_paths_csv blocked_reason handoff_reason next_action_for_manager
-  contract_file="$(worker_exit_contract_file "$project")"
-  [[ -f "$contract_file" ]] || {
+  kind="$(_db_exit_contract_field "$project" worker exit_kind)"
+  [[ -n "$kind" ]] || {
     printf 'missing_file\n'
     return 1
   }
-  kind="$(meta_env_value "$contract_file" "EXIT_KIND")"
   case "$kind" in
     worker_done|worker_blocked|worker_handoff_needed) ;;
     *)
@@ -13579,11 +13575,11 @@ validate_worker_exit_contract_for_project() {
       return 1
       ;;
   esac
-  completion_summary="$(meta_env_value "$contract_file" "COMPLETION_SUMMARY")"
-  evidence_paths_csv="$(meta_env_value "$contract_file" "EVIDENCE_PATHS_CSV")"
-  blocked_reason="$(meta_env_value "$contract_file" "BLOCKED_REASON")"
-  handoff_reason="$(meta_env_value "$contract_file" "HANDOFF_REASON")"
-  next_action_for_manager="$(meta_env_value "$contract_file" "NEXT_ACTION_FOR_MANAGER")"
+  completion_summary="$(_db_exit_contract_field "$project" worker completion_summary)"
+  evidence_paths_csv="$(_db_exit_contract_field "$project" worker evidence_paths)"
+  blocked_reason="$(_db_exit_contract_field "$project" worker blocked_reason)"
+  handoff_reason="$(_db_exit_contract_field "$project" worker handoff_reason)"
+  next_action_for_manager="$(_db_exit_contract_field "$project" worker next_action)"
   case "$kind" in
     worker_done)
       [[ -n "$completion_summary" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "COMPLETION_SUMMARY")"
@@ -13649,10 +13645,10 @@ write_manager_resume_handoff() {
     resume_target="$(meta_env_value "$session_file" "LAST_TOOL_RESUME_TARGET")"
   fi
   route_kind="$(manager_continuity_resume_focus_route_kind "$continuity_file" || true)"
-  restart_point="$(meta_env_value "$contract_file" "RESTART_POINT")"
-  next_action="$(meta_env_value "$contract_file" "NEXT_ACTION")"
-  why_not_stop="$(meta_env_value "$contract_file" "WHY_NOT_STOP")"
-  why_not_delegate="$(meta_env_value "$contract_file" "WHY_NOT_DELEGATE")"
+  restart_point="$(_db_exit_contract_field "$project" manager restart_point)"
+  next_action="$(_db_exit_contract_field "$project" manager next_action)"
+  why_not_stop="$(_db_exit_contract_field "$project" manager why_not_stop)"
+  why_not_delegate="$(_db_exit_contract_field "$project" manager why_not_delegate)"
   cat >"$(handoff_file "$project")" <<EOF
 # Session Handoff
 
@@ -13792,8 +13788,8 @@ worker_exit_contract_done_is_repair_only_cleanup_escape() {
   local project="$1" contract_file summary evidence_paths_csv
   worker_exit_contract_repair_round_requires_cleanup_reentry "$project" || return 1
   contract_file="$(worker_exit_contract_file "$project")"
-  summary="$(meta_env_value "$contract_file" "COMPLETION_SUMMARY")"
-  evidence_paths_csv="$(meta_env_value "$contract_file" "EVIDENCE_PATHS_CSV")"
+  summary="$(_db_exit_contract_field "$project" worker completion_summary)"
+  evidence_paths_csv="$(_db_exit_contract_field "$project" worker evidence_paths)"
   worker_exit_contract_summary_is_repair_only "$summary" || return 1
   worker_exit_contract_evidence_is_internal_repair_only "$project" "$evidence_paths_csv"
 }
@@ -13837,10 +13833,10 @@ manager_runtime_handle_exit_contract_after_ai_cycle() {
         fi
       fi
       # Sync valid exit contract to handoffs table
-      sync_exit_contract_to_handoffs "$project" || true
+      # sync_exit_contract_to_handoffs deprecated: DB is primary store
       ;;
     execution_network_transient|execution_network_persistent|proxy_config_invalid)
-      [[ -f "$(manager_exit_contract_file "$project")" ]] || {
+      manager_exit_contract_kind "$project" >/dev/null 2>&1 || {
         printf 'continue\n'
         return 0
       }
@@ -13857,7 +13853,7 @@ manager_runtime_handle_exit_contract_after_ai_cycle() {
       ;;
   esac
   kind="$(manager_exit_contract_kind "$project" || true)"
-  stop_reason="$(meta_env_value "$(manager_exit_contract_file "$project")" "STOP_REASON")"
+  stop_reason="$(_db_exit_contract_field "$project" manager stop_reason)"
   case "$kind" in
     stop_ai)
       if manager_has_unresolved_expected_running_workers "$project"; then
@@ -13934,13 +13930,13 @@ manager_runtime_handle_exit_contract_after_ai_cycle() {
       write_manager_resume_handoff \
         "$project" \
         "manager_exit_contract_resume" \
-        "restart_point=$(meta_env_value "$(manager_exit_contract_file "$project")" "RESTART_POINT");next_action=$(meta_env_value "$(manager_exit_contract_file "$project")" "NEXT_ACTION")"
+        "restart_point=$(_db_exit_contract_field "$project" manager restart_point);next_action=$(_db_exit_contract_field "$project" manager next_action)"
       append_runtime_event "$project" "manager_exit_contract_resume" \
-        "restart_point=$(meta_env_value "$(manager_exit_contract_file "$project")" "RESTART_POINT")"
+        "restart_point=$(_db_exit_contract_field "$project" manager restart_point)"
       printf 'resume_manager\n'
       ;;
     delegate_workers)
-      worker_prompts_csv="$(meta_env_value "$(manager_exit_contract_file "$project")" "WORKER_PROMPTS_CSV")"
+      worker_prompts_csv="$(_db_exit_contract_field "$project" manager worker_prompts_csv)"
       append_runtime_event "$project" "manager_exit_contract_delegate_workers" \
         "worker_prompts_csv=${worker_prompts_csv:-none}"
       printf 'delegate_workers\n'
@@ -13997,28 +13993,28 @@ worker_runtime_handle_exit_contract_after_ai_cycle() {
         write_workcell_state "$project" "running" "up" "down" "worker_exit_contract_invalid"
         append_runtime_event "$project" "worker_exit_contract_invalid" \
           "details=repair_only_worker_done" \
-          "summary=$(meta_env_value "$(worker_exit_contract_file "$project")" "COMPLETION_SUMMARY")"
+          "summary=$(_db_exit_contract_field "$project" worker completion_summary)"
         printf 'resume_invalid\n'
         return 0
       fi
       : >"$(stop_marker_file "$project")"
       write_workcell_state "$project" "stopped" "down" "down" "worker_exit_contract_done"
       append_runtime_event "$project" "worker_exit_contract_done" \
-        "summary=$(meta_env_value "$(worker_exit_contract_file "$project")" "COMPLETION_SUMMARY")"
+        "summary=$(_db_exit_contract_field "$project" worker completion_summary)"
       printf 'stop_ai\n'
       ;;
     worker_blocked)
       : >"$(stop_marker_file "$project")"
       write_workcell_state "$project" "stopped" "down" "down" "worker_exit_contract_blocked"
       append_runtime_event "$project" "worker_exit_contract_blocked" \
-        "blocked_reason=$(meta_env_value "$(worker_exit_contract_file "$project")" "BLOCKED_REASON")"
+        "blocked_reason=$(_db_exit_contract_field "$project" worker blocked_reason)"
       printf 'stop_ai\n'
       ;;
     worker_handoff_needed)
       : >"$(stop_marker_file "$project")"
       write_workcell_state "$project" "stopped" "down" "down" "worker_exit_contract_handoff_needed"
       append_runtime_event "$project" "worker_exit_contract_handoff_needed" \
-        "handoff_reason=$(meta_env_value "$(worker_exit_contract_file "$project")" "HANDOFF_REASON")"
+        "handoff_reason=$(_db_exit_contract_field "$project" worker handoff_reason)"
       printf 'stop_ai\n'
       ;;
     *)
@@ -14982,7 +14978,7 @@ manager_runtime_recover_workers_if_needed() {
         if [[ -n "$handoff_prompt_file" && -f "$handoff_prompt_file" ]]; then
           log_info "manager runtime absorbs terminal worker handoff into followthrough prompt: branch=${branch:-unknown} prompt=$handoff_prompt_file path=$wt_path"
           if launch_worker_from_manager_prompt_if_needed "$project" "$handoff_prompt_file"; then
-            rm -f "$(worker_exit_contract_file "$wt_path")"
+            # contract cleanup deprecated
             append_runtime_event "$project" "worker_exit_contract_handoff_absorbed" \
               "worktree=$wt_path" \
               "branch=${branch:-unknown}" \
@@ -18592,10 +18588,10 @@ start_project_runtime() {
       "expected_next=L040"
     case "$(role_hint_for_project "$PROJECT_ROOT")" in
       manager)
-        rm -f "$(manager_exit_contract_file "$PROJECT_ROOT")"
+        # contract cleanup deprecated
         ;;
       worker)
-        rm -f "$(worker_exit_contract_file "$PROJECT_ROOT")"
+        # contract cleanup deprecated
         ;;
     esac
     if [[ -n "$delegated_pending_ids" ]] && grep -q '^Delegated continuation handoff:' "$prompt_file" 2>/dev/null; then
@@ -19152,7 +19148,7 @@ cmd_new_session() {
   fi
   # Also clear handoff and continuity files
   rm -f "$(handoff_file "$project")" 2>/dev/null || true
-  rm -f "$(manager_exit_contract_file "$project")" 2>/dev/null || true
+  # contract cleanup deprecated
   # Write force-fresh marker so select_launch_kind skips JSONL fallback
   mkdir -p "$(dirname "$state_file")"
   echo 'FORCE_FRESH=true' > "$state_file"
