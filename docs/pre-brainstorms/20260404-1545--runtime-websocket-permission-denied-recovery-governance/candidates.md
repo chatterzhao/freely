@@ -34,7 +34,7 @@
     summary: `The failure is narrower than generic network taxonomy. Fresh evidence shows prompt assembly can recover while claim/continuity truth still does not converge, so the blocked-state contract must cover websocket denial, slot-switch busy, and local process exhaustion before runtime behavior is changed.`
     verdict: `promote_to_issue`
 - priority: P1
-- status: todo_ibm
+- status: promoted
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md`
 - next_action: Candidate mirror only. `I-20260405-2136-A` is now the canonical owner for prompt-visible-but-unclaimed runtime supervision; continue all follow-on implementation and verification from the issue-bound package instead of this pre-brainstorm candidate.

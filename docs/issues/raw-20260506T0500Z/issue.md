@@ -3,7 +3,16 @@ local_id: raw-20260506T0500Z
 phase_state: proposed
 kind: raw
 source_family: chat_inbox
-created: 2026-05-06T05:00:00Z
+created: 2026-05-06 05:00:00+00:00
+platform_ids:
+  github:
+    issue_id: '275'
+    url: https://github.com/chatterzhao/freely/issues/275
+    synced_at: '2026-05-10T09:29:11Z'
+updated_at: '2026-05-10T09:29:11Z'
+primary_platform: github
+created_at: '2026-05-10T09:29:11Z'
+platform_state: open
 ---
 
 # raw-20260506T0500Z: scan 增加远端分支治理面

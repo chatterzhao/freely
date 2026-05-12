@@ -2,18 +2,22 @@
 local_id: raw-20260429-1413
 kind: raw
 phase_state: proposed
-platform_ids: {}
-primary_platform: ""
-canonical_issue_path: ""
+platform_ids:
+  github:
+    issue_id: '286'
+    url: https://github.com/chatterzhao/freely/issues/286
+    synced_at: '2026-05-10T09:30:35Z'
+primary_platform: github
+canonical_issue_path: ''
 last_synced_comment_at: {}
-hash: ""
-created_at: 2026-04-29T14:13:37Z
-updated_at: 2026-04-29T14:13:37Z
+hash: ''
+created_at: 2026-04-29 14:13:37+00:00
+updated_at: '2026-05-10T09:30:35Z'
 intake_id: 20260429-071337-docs-system-workspace-scripts-ut
 author: zhaoquan
 channel: supervisor
 session_refs: []
-platform_state: ''
+platform_state: open
 ---
 
 写一个脚本 docs/system/workspace/scripts/util/count-lines.sh：

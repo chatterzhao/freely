@@ -13,6 +13,7 @@ revisit_trigger: 无
 ---
 
 ## C-20260502-0500-A
+- status: promoted
 
 # Candidate: 打包与自举验证
 

@@ -19,7 +19,7 @@
   - 明确这条问题应归属 runtime recovery / observability，还是应吸收到 start-restart control-plane semantics 产品线
   - 若需要 follow-on，拆清“stall detector contract”“delegated backlog absorption”“runtime event naming semantics”是否应分成独立 owner
 - priority: P0
-- status: materialized
+- status: promoted
 - milestone: M-20260306-workspace-routing-foundation
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/manager-supervision-quiet-period-stall-signal-governance/issues/manager-supervision-quiet-period-stall-signal-governance.md`
 - decision_reason: 现阶段证据已足以确认 primary owner 是 manager delegated-supervision quiet-period heartbeat contract，而不是旧 `same-lane busy` issue 的 verification 尾巴，也不是纯 observability 命名问题。该问题已经满足独立 issue materialization 条件。

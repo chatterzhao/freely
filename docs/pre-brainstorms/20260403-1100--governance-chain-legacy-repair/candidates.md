@@ -4,7 +4,7 @@
 
 - candidate_format_version: `v2`
 - title: Governance chain legacy repair for develop push unblock
-- status: completed
+- status: promoted
 - decision_reason: 当前真正缺的不是单个字段修补，而是一个能承接 legacy governance drift 与历史 child repair slices 的 canonical owner；该 owner 已完成真相修复并转入历史留痕。
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md`
 - promoted_issue_id: `I-20260403-1100-A`

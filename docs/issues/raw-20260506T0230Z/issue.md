@@ -3,7 +3,16 @@ local_id: raw-20260506T0230Z
 phase_state: proposed
 kind: raw
 source_family: chat_inbox
-created: 2026-05-06T02:30:00Z
+created: 2026-05-06 02:30:00+00:00
+platform_ids:
+  github:
+    issue_id: '281'
+    url: https://github.com/chatterzhao/freely/issues/281
+    synced_at: '2026-05-10T09:29:55Z'
+updated_at: '2026-05-10T09:29:55Z'
+primary_platform: github
+created_at: '2026-05-10T09:29:55Z'
+platform_state: open
 ---
 
 # raw-20260506T0230Z: governance-merge-gate 应识别 raw issue 作为生命周期入口

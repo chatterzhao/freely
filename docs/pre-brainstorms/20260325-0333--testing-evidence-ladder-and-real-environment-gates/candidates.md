@@ -42,8 +42,8 @@
     summary: `This is broader than stale pre-test-merge governance and protected acceptance routing. It needs its own candidate so Freely can turn dogfood-exposed test gaps into a reusable capability contract.`
     verdict: `ready_for_pre_brainstorm`
 - priority: P0
-- status: proposed
-- decision_reason: 这条能力已经在多个候选和多个 runtime bug 中反复侧面出现，但边界比 `pre-test-merge` 或某条单独 issue 更高层。先单独建 candidate，避免继续把测试能力混成各 issue 的附属说明。
+- status: needs_research
+- decision_reason: 首个切口 C-20260325-0333-B 已 materialize 完成。本 umbrella 继续承接 testing evidence ladder、gate mapping 与 real-environment harness contract 的后续切口，待 B 验证稳定后决定下一跳。
 - promoted_issue_path: `pending://testing-evidence-ladder-and-real-environment-gates`
 - milestone: `docs/milestones.md#M-20260306-workspace-routing-foundation`
 - next_action: 保持 umbrella candidate active。首个切口已由 `C-20260325-0333-B` materialize 成 issue；本 candidate 继续承接 ladder / harness / runtime mirror 的后续切口

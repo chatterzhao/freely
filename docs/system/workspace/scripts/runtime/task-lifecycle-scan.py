@@ -1074,15 +1074,16 @@ def _find_all_branches_for_key(project: Path, key: str) -> list[str]:
 
 
 def _parse_h3_sections(path: Path) -> list[dict]:
-    """Parse ## and ### sections from a markdown file, extracting key-value fields.
+    """Parse #, ## and ### sections from a markdown file, extracting key-value fields.
 
-    candidates.md uses ## for candidate entries (with status/priority/scope fields)
-    and ### for subsections. Both levels must be parsed to find promoted/absorbed/dropped.
+    candidates.md uses #/## for candidate entries (with status/priority/scope fields)
+    and ### for subsections. All three levels must be parsed to find promoted/absorbed/dropped.
+    Older candidates use flat `# Title` format; newer ones use `##`/`###` sections.
     """
     if not path.is_file():
         return []
     text = path.read_text(encoding="utf-8")
-    parts = re.split(r"^(?:#{2,3})\s+(.+)$", text, flags=re.MULTILINE)
+    parts = re.split(r"^(?:#{1,3})\s+(.+)$", text, flags=re.MULTILINE)
     sections = []
     for idx in range(1, len(parts), 2):
         title = parts[idx].strip()

@@ -2,7 +2,7 @@
 local_id: I-20260501-0000-A
 issue_title: "PR scan surface + FREELY_REPO_PLATFORMS config"
 kind: linked
-phase_state: in_verification
+phase_state: completed
 promoted_from: raw-20260501-0000
 platform_ids:
   github:

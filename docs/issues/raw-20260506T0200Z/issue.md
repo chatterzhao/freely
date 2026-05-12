@@ -3,7 +3,16 @@ local_id: raw-20260506T0200Z
 phase_state: proposed
 kind: raw
 source_family: chat_inbox
-created: 2026-05-06T02:00:00Z
+created: 2026-05-06 02:00:00+00:00
+platform_ids:
+  github:
+    issue_id: '284'
+    url: https://github.com/chatterzhao/freely/issues/284
+    synced_at: '2026-05-10T09:30:21Z'
+updated_at: '2026-05-10T09:30:21Z'
+primary_platform: github
+created_at: '2026-05-10T09:30:21Z'
+platform_state: open
 ---
 
 # raw-20260506T0200Z: 评论消费链路——DB → issue.md → 平台 三段状态追踪

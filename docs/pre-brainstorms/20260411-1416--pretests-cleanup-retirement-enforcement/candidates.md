@@ -6,6 +6,7 @@
 - session_refs: []
 - id: `C-20260411-1416-A`
 - name: `pre-tests-cleanup-and-retirement-enforcement-governance`
+- status: promoted
 - problem_statement: `completed` 与 `test-pre-merge-* -> develop` 已有 pre-tests gate，但 cleanup/retirement 尚未统一消费 issue-bound `pre-tests.md`，导致 lifecycle closure 与测试真源未完全一致。
 - scope:
   - 新增 cleanup/retirement 前的 pre-tests gate
