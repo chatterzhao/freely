@@ -13380,41 +13380,70 @@ append_worker_exit_contract_directive_if_needed() {
 
   cat <<'EOF'
 
-Worker exit contract（硬性要求）：
-- 在本轮结束前，调用 handoff.py update 写入出口状态到 DB（handoffs 表）。
-- DB 路径：.freely/freely.db
-- 当前 handoff_id 从 session-handoff.txt 或 handoff.py list 查询获取。
+## 工作交接
 
-───────────────
-1. worker_done
-───────────────
-python3 docs/system/workspace/scripts/runtime/handoff.py update \
-  --db .freely/freely.db --handoff-id <handoff_id> --status completed \
+你的工作无论什么结果，最终都归为以下三种交接。先判断你的情况属于哪一种，再按格式写入 DB。
+
+交接字段必须写清楚——主管靠这些字段理解发生了什么、决定下一步。
+空字段等于没交接。
+
+DB: .freely/freely.db
+HP: docs/system/workspace/scripts/runtime/handoff.py
+当前 handoff_id 从 session-handoff.txt 或 handoff.py list 查询获取。
+
+──────────────────────────────────────
+1. worker_done —— 任务已完成
+──────────────────────────────────────
+
+适用于：
+- 自己完成了委派的任务
+- 发现任务已经被完成了（比如工位已合并到 develop、代码已被别人提交等）
+- 工位不存在但对应的分支已合并 → 任务客观上已完成，写清楚"已合并，无需再处理"
+
+python3 $HP update --db $DB --handoff-id <handoff_id> --status completed \
   --exit-kind worker_done \
-  --completion-summary "<完成描述>" \
-  --evidence-paths "/abs/path/a.md,/abs/path/b.txt"
+  --completion-summary "<具体完成了什么，或为什么判断任务已完成>" \
+  --evidence-paths "/abs/path/evidence.md"
 
-───────────────
-2. worker_blocked
-───────────────
-python3 docs/system/workspace/scripts/runtime/handoff.py update \
-  --db .freely/freely.db --handoff-id <handoff_id> --status completed \
+completion-summary 必填。必须让主管看得懂。
+
+──────────────────────────────────────
+2. worker_blocked —— 被阻塞，需要主管介入
+──────────────────────────────────────
+
+适用于：
+- 遇到无法自行解决的问题（权限不够、依赖缺失、环境错误等）
+- 工位存在但无法继续工作
+- 任何你试过了但搞不定的情况
+
+python3 $HP update --db $DB --handoff-id <handoff_id> --status completed \
   --exit-kind worker_blocked \
-  --blocked-reason "<阻塞原因>" \
-  --next-action "<主管下一步动作>"
+  --blocked-reason "<具体阻塞了什么、为什么无法自行解决>" \
+  --next-action "<建议主管下一步做什么>"
 
-───────────────
-3. worker_handoff_needed
-───────────────
-python3 docs/system/workspace/scripts/runtime/handoff.py update \
-  --db .freely/freely.db --handoff-id <handoff_id> --status completed \
+blocked-reason 和 next-action 必填。不要只写"阻塞了"三个字。
+
+──────────────────────────────────────
+3. worker_handoff_needed —— 需要主管审核或决策
+──────────────────────────────────────
+
+适用于：
+- 工作做完了但需要主管审核后才能继续
+- 发现一个问题但不确定是否应该处理、如何处理
+- 需要主管做决策才能继续
+
+python3 $HP update --db $DB --handoff-id <handoff_id> --status completed \
   --exit-kind worker_handoff_needed \
-  --handoff-reason "<交接原因>" \
-  --next-action "<主管下一步动作>"
+  --handoff-reason "<背景：做了什么、为什么需要主管决策>" \
+  --next-action "<主管需要决策什么>"
 
+handoff-reason 和 next-action 必填。
+
+──────────────────────────────────────
 规则：
-- 所有三种出口必须调用 handoff.py update，无一例外
-- 如果你还没写完整 exit contract，runtime 会用同一个 resume target 拉你回来补
+- 无论哪种情况，必须调用 handoff.py update
+- 字段不写清楚 = 主管看不懂 = 浪费一轮 patrol
+- runtime 会检查你的交接，如果无效会用同一个 resume target 拉你回来补
 EOF
 }
 

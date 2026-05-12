@@ -63,3 +63,26 @@
 - 当前 issue 已推进到下一阶段或产出明确 blocker
 - 本工位状态和 continuity 已更新
 - 没有把项目级监督职责带入 worker 工位
+
+## 交接类型
+
+无论工作结果如何，最终都归为以下三种交接之一。worker 必须先诊断自己的情况，再选择对应类型向主管交接。
+
+### worker_done — 任务完成
+- 自己完成了委派任务
+- 或发现任务客观上已完成（工位已合并、代码已被提交等）
+- 必须写 `completion-summary`：具体说明完成了什么、或为什么判断已完成
+- 附带 `evidence-paths` 指向证据文件
+
+### worker_blocked — 阻塞，需主管介入
+- 遇到无法自行解决的问题
+- 必须写 `blocked-reason`：阻塞了什么、为什么无法自行解决
+- 必须写 `next-action`：建议主管下一步做什么
+
+### worker_handoff_needed — 需主管审核/决策
+- 工作完成但需要主管审核
+- 或发现需要主管做决策的问题
+- 必须写 `handoff-reason`：背景和为什么需要决策
+- 必须写 `next-action`：主管需要决策什么
+
+以上三种交接通过 `handoff.py update` 写入 handoffs 表，具体 CLI 格式见 runtime prompt 模板。
