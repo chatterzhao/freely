@@ -279,7 +279,10 @@ worker_prompt_path_example="$worker_prompt_dir/${artifact_stamp}-worker-<slug>-$
 manager_artifact_rule=""
 	role_scope_rule_5a="5A. 你是 Worker Agent（见 workspace/agents/worker-agent.md）。保持 worker scope，不升级成主管。"
 	role_scope_rule_5b="5B. 只回写本工位产物。发现需主管裁决的问题只记录 evidence + reroute。"
-tadditional_requirements="- Agent 角色定义：workspace/agents/worker-agent.md"
+worker_agent_def="$(cat "$workspace_root/agents/worker-agent.md" 2>/dev/null || true)"
+	additional_requirements="=== Agent 角色定义 ===
+${worker_agent_def}
+==="
 startup_bounded_patrol_rule=""
 initial_read_targets="$(cat <<EOF
 - 项目治理入口：$project/AGENTS.md
@@ -315,7 +318,10 @@ intent_target: <简短描述>
 \\`\\`\\`
 EOF
 )"
-	  additional_requirements="- Agent 角色定义：workspace/agents/manager-agent.md"
+	  manager_agent_def="$(cat "$workspace_root/agents/manager-agent.md" 2>/dev/null || true)"
+	  additional_requirements="=== Agent 角色定义 ===
+${manager_agent_def}
+==="
 	  startup_bounded_patrol_rule=""
 	  initial_read_targets="$(cat <<EOF
 - 项目治理：$project/AGENTS.md
