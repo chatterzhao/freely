@@ -331,6 +331,7 @@ ${manager_agent_def}
 - workspace：$workspace_root
 EOF
 )"
+	fi
 
 escape_prompt_backticks() {
   local value="${1-}"
