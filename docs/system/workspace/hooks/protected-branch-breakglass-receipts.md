@@ -93,3 +93,18 @@
 - follow_on_owner: `I-20260501-0000-A`
 - evidence_refs:
   - `docs/issues/raw-20260501-0000/issue.md`
+
+## Receipt: bc6a1dcb5ebd1ad6e90ac49ee5225eb6816d53c3
+
+- target_branch: `develop`
+- source_branch: `feature/raw-20260508T120000Z-wt-create-fix`
+- receipt_mode: `trailer_parity`
+- bypass_mode: `break_glass`
+- break_glass_reason: `verified_false_negative`
+- blocked_gate: `governance-merge-gate`
+- operation_scope: `merge_completion_only`
+- follow_on_owner: `I-20260508T120000Z-A`
+- evidence_refs:
+  - `docs/epics/wt-create-fix/code-reviews/closeout-review.md`
+  - `docs/epics/wt-create-fix/verification/pre-tests.md`
+  - `docs/issues/raw-20260508T120000Z/issue.md`
