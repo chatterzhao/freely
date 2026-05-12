@@ -20,7 +20,7 @@ B2_IBM 是 IBM Framework 第二阶段。I（Input）从 milestone committed_issu
 从 `docs/milestones.md` → committed_issues 获取 I-{key}。
 I-{key} 由 B1_IBM 阶段 promote 而来，已排期、已有 priority、已有正式 issue 文档。
 
-B2_IBM 不创建 I-{key}。milestone 已经准备好了。
+B2_IBM 不创建 I-{key}。
 
 ### B：Brainstorm — 实现前置设计
 
