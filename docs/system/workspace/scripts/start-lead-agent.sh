@@ -349,16 +349,16 @@ initial_read_targets_escaped="$(escape_prompt_backticks "$initial_read_targets")
 
 # Delta mode: minimal resume prompt
 if [[ "$delta_mode" == "true" ]]; then
-  cat <<'DELTA'
+  cat <<DELTA
 你现在继续 Freely 会话。
 
 本轮是 resume——完整对话历史已在 session 中，不要重新开始 patrol。
 优先消费上轮 continuity 中锚定的 route_kind 和 next_action。
-检查是否有新的 intake items 或 delegated continuation 需要处理。
 按 exit contract directive 要求在结束前写出退出合同。
 
-角色规则和读取约定已在 session 历史中，无需重新读取 AGENTS.md / constitution / laws，
-除非当前任务需要重新核实某个具体规则。
+=== Agent 角色定义（每轮必须重新确认） ===
+${manager_agent_def:-${worker_agent_def:-}}
+===
 DELTA
   exit 0
 fi
