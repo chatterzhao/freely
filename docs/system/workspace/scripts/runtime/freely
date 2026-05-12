@@ -553,6 +553,7 @@ Usage:
   freely task-source-scan [--project <abs_path>] [--json]
   freely task-scan [--project <abs_path>] [--json]
   freely raw-issue-pull --raw-key <key> [--project <abs_path>] [--target <dir>]
+  freely feedback --title <text> --body <text> [--severity P0|P1|P2]   (create raw issue on Freely itself)
   freely issue-sync <args>...                   (delegate to bin/issue-sync)
   freely status [--project <abs_path>] [--view baseline|live|fleet|all]
   freely live-status [--project <abs_path>]
@@ -19745,6 +19746,74 @@ submit_human_frontdoor_message() {
   printf '%s\n' "$intake_output"
 }
 
+cmd_feedback() {
+  local title="" body="" severity="P2" project="" freely_root="" raw_key="" stamp="" issue_dir="" issue_file=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --title) title="${2:-}"; shift 2 ;;
+      --body) body="${2:-}"; shift 2 ;;
+      --severity) severity="${2:-}"; shift 2 ;;
+      --help|-h) cat <<HELP; return 0
+Usage: freely feedback --title <text> --body <text> [--severity P0|P1|P2]
+
+Create a raw issue on the Freely project itself (dogfooding feedback loop).
+The issue is created in Freely's own docs/issues/ and synced to configured platforms.
+
+Options:
+  --title <text>     Required. Issue title.
+  --body <text>      Required. Issue body/description.
+  --severity <level> Priority: P0 (critical), P1 (high), P2 (default).
+HELP
+        ;;
+      --*) log_error "unknown option: $1"; return 1 ;;
+      *) break ;;
+    esac
+  done
+
+  [[ -n "$title" ]] || { log_error "--title is required"; return 1; }
+  [[ -n "$body" ]] || { log_error "--body is required"; return 1; }
+  case "$severity" in
+    P0|P1|P2) ;;
+    *) log_error "--severity must be P0, P1, or P2"; return 1 ;;
+  esac
+
+  # Determine Freely project root from SELF_ROOT (packaged freely IS the freely project)
+  freely_root="$SELF_ROOT"
+  [[ -d "$freely_root" ]] || freely_root="$HOME/.freely"
+  [[ -d "$freely_root/docs/issues" ]] || mkdir -p "$freely_root/docs/issues"
+
+  stamp=$(date -u +%Y%m%dT%H%M%SZ)
+  raw_key="$stamp"
+  issue_dir="$freely_root/docs/issues/raw-$raw_key"
+  mkdir -p "$issue_dir"
+  issue_file="$issue_dir/issue.md"
+
+  cat > "$issue_file" <<ISSUE_EOF
+---
+kind: raw
+priority: ${severity}
+status: open
+source: chat-inbox
+created_at: "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+title: "${title}"
+---
+
+${body}
+ISSUE_EOF
+
+  echo "[feedback] raw issue created: raw-$raw_key"
+  echo "[feedback] file: $issue_file"
+
+  # Sync to platforms via issue-sync
+  if [[ -x "$freely_root/bin/issue-sync" ]]; then
+    echo "[feedback] syncing to platforms..."
+    "$freely_root/bin/issue-sync" create "raw-$raw_key" 2>&1 || true
+    echo "[feedback] sync complete"
+  fi
+
+  printf 'raw-%s\n' "$raw_key"
+}
+
 cmd_tui() {
   local project="" once="0" input=""
   while [[ $# -gt 0 ]]; do
@@ -21183,6 +21252,7 @@ main() {
     doctor) cmd_doctor "$@" ;;
     security-review-brief) cmd_security_review_brief "$@" ;;
     chat) cmd_chat "$@" ;;
+    feedback) cmd_feedback "$@" ;;
     tui) cmd_tui "$@" ;;
     intake)
       local subcmd="${1:-}"
