@@ -12985,20 +12985,19 @@ manager_exit_contract_repair_prompt_expected_continuity_file() {
 }
 
 build_manager_exit_contract_repair_fresh_with_handoff_prompt() {
-  local project="$1" expected_continuity contract_file handoff_path live_status_cmd scan_json_path latest_continuity
-  expected_continuity="$(manager_exit_contract_repair_prompt_expected_continuity_file "$project")"
-  contract_file="$(manager_exit_contract_file "$project")"
-  handoff_path="$(handoff_file "$project")"
-  live_status_cmd="./bin/freely live-status --project $project"
-  scan_json_path="$(task_source_scan_json_path_for_project "$project")"
-  latest_continuity="$(latest_generated_manager_continuity_file_for_project "$project")"
-  [[ -n "$latest_continuity" && -f "$latest_continuity" ]] || latest_continuity="none"
+  local project=”$1” expected_continuity handoff_path live_status_cmd scan_json_path latest_continuity
+  expected_continuity=”$(manager_exit_contract_repair_prompt_expected_continuity_file “$project”)”
+  handoff_path=”$(handoff_file “$project”)”
+  live_status_cmd=”./bin/freely live-status --project $project”
+  scan_json_path=”$(task_source_scan_json_path_for_project “$project”)”
+  latest_continuity=”$(latest_generated_manager_continuity_file_for_project “$project”)”
+  [[ -n “$latest_continuity” && -f “$latest_continuity” ]] || latest_continuity=”none”
 
   cat <<EOF
 你当前处于受限修复轮次，不是新的主管首跳巡检。
 
 当前轮次目的：
-- 上一轮 manager 已经 \`rc=0\` 退出，但没有留下合法的 manager exit contract。
+- 上一轮 manager 已经 \`rc=0\` 退出，但没有通过 handoff.py update 写入合法的 manager exit contract。
 - 这次因为缺少可验证 resume evidence，runtime 改走 \`fresh_with_handoff\`；但你的职责仍然是修复当前 manager lane，而不是重做 broad patrol。
 
 本轮只允许先读这些最小现场：
@@ -13010,16 +13009,16 @@ build_manager_exit_contract_repair_fresh_with_handoff_prompt() {
 
 硬性收口要求：
 - 先写 manager continuity 文件：\`$expected_continuity\`
-- 再写 manager exit contract 文件：\`$contract_file\`
+- 再用 handoff.py update 写入 exit contract 到 DB（handoffs 表）
 - 如果 scan 显示 backlog 非空，而你没有形成新的 manager continuity 或合法 worker delegation，这一轮视为失败。
-- 如果当前没有 launchable worker prompt，就必须用 continuity 把当前 manager-owned restart point / next_action 写清，再写 \`EXIT_KIND=\"resume_manager\"\`。
-- 只有当前 manager lane 已经明确闭合且 scan/source 也证明可以安全停下时，才允许 \`EXIT_KIND=\"stop_ai\"\`。
-- 如果 scan 暂时没有发现待办任务，这不是错误。写 \`EXIT_KIND=\"stop_ai\"\`，在 continuity 里说明原因。如果你认为项目可能有工作要做但 scan 没扫到，在 continuity 里提示：这可能是棕地项目，可以通过 \`freely chat --new-issue "需求描述"\` 插话创建新任务，或在 GitHub/Gitee 上创建 raw issue，下一次 patrol scan 就会扫到。
+- 如果当前没有 launchable worker prompt，就必须用 continuity 把当前 manager-owned restart point / next_action 写清，再用 handoff.py update --exit-kind resume_manager 写入 DB。
+- 只有当前 manager lane 已经明确闭合且 scan/source 也证明可以安全停下时，才允许 --exit-kind stop_ai。
+- 如果 scan 暂时没有发现待办任务，这不是错误。写 --exit-kind stop_ai，在 continuity 里说明原因。如果你认为项目可能有工作要做但 scan 没扫到，在 continuity 里提示：这可能是棕地项目，可以通过 \`freely chat --new-issue “需求描述”\` 插话创建新任务，或在 GitHub/Gitee 上创建 raw issue，下一次 patrol scan 就会扫到。
 
 本轮禁止事项：
 - 不要重做完整 lead-agent 首跳。
 - 不要先展开 \`docs/milestones.md\` 全文、全量 fleet 巡检或多 source broad patrol。
-- 不要把“继续多读一些文档”当作默认下一步；先把 continuity 和 exit contract 落盘。
+- 不要把”继续多读一些文档”当作默认下一步；先把 continuity 和 exit contract 写进 DB。
 
 manager continuity 文件：\`$expected_continuity\`
 EOF
@@ -13260,46 +13259,56 @@ append_cleanup_governance_retirement_worker_directive_if_needed() {
 }
 
 append_manager_exit_contract_directive_if_needed() {
-  local project="$1" contract_file unresolved_workers
+  local project="$1" unresolved_workers
   [[ "$(effective_runtime_role_for_project "$project")" == "manager" ]] || return 0
-  contract_file="$(manager_exit_contract_file "$project")"
   unresolved_workers="$(manager_unresolved_expected_running_worker_count "$project")"
   [[ "${unresolved_workers:-0}" =~ ^[0-9]+$ ]] || unresolved_workers="0"
-  cat <<EOF
+  cat <<'EOF'
 
 Manager exit contract（硬性要求）：
-- 在本轮结束前，必须通过 handoff.py 写入 exit contract。
-- _handoff_py="docs/system/workspace/scripts/runtime/handoff.py"
-- _db_path="\$(dirname "\$(dirname "\$PWD")")/freely.db"  # or hardcode .freely/freely.db
+- 在本轮结束前，调用 handoff.py update 写入出口状态到 DB（handoffs 表）。
+- 所有三种出口都必须写，不存在"不写 handoff"的情况。
 
-三种出口：
+handoff.py 路径和 DB：
+  HP="docs/system/workspace/scripts/runtime/handoff.py"
+  DB=".freely/freely.db"
 
-1. stop_ai — 不写 handoff，exit kind 通过 runtime 信号传递
+当前 handoff_id 从 session-handoff.txt 或 latest-manager 查询获取。
 
-2. resume_manager — 不写 handoff，exit kind 通过 runtime 信号传递
+───────────────
+1. stop_ai
+───────────────
+python3 $HP update --db $DB --handoff-id <handoff_id> --status completed \
+  --exit-kind stop_ai --stop-reason "<停止的具体原因>"
 
-3. delegate_workers — 调用 handoff.py：
-\`\`\`bash
-# 先写 manager 自己的记录（manager 创建给自己消费的连续性记录）
-MANAGER_HID=\$(python3 \$_handoff_py insert --db \$_db_path \\
-  --role manager --raw-key <key> --prompt-file <continuity_path> \\
-  --created-by manager --consumed-by manager --exit-kind delegate_workers)
+───────────────
+2. resume_manager
+───────────────
+python3 $HP update --db $DB --handoff-id <handoff_id> --status completed \
+  --exit-kind resume_manager \
+  --restart-point "<重入起点描述>" \
+  --next-action "<下一步动作>" \
+  --why-not-stop "<为什么还不能停止>" \
+  --why-not-delegate "<为什么不能委派worker>"
 
-# 每个 worker 写一条记录，parent 指向 manager
-python3 \$_handoff_py insert --db \$_db_path \\
-  --role worker --raw-key <key> --worktree <abs_path> --branch fix/raw-<key>-<slug> \\
-  --prompt-file <worker_prompt_path> --parent "\$MANAGER_HID" \\
-  --created-by manager --consumed-by worker
-\`\`\`
+───────────────
+3. delegate_workers
+───────────────
+manager 记录：
+python3 $HP update --db $DB --handoff-id <handoff_id> --status completed \
+  --exit-kind delegate_workers \
+  --worker-prompts-csv "/abs/path/worker1.txt,/abs/path/worker2.txt"
+
+每个 worker 记录（insert 新记录，parent 指向 manager）：
+python3 $HP insert --db $DB --role worker --raw-key <key> \
+  --worktree <abs_path> --branch fix/raw-<key>-<slug> \
+  --prompt-file <worker_prompt_path> --parent <manager_handoff_id> \
+  --created-by manager --consumed-by worker --exit-kind ""
 - worktree 必须是绝对路径，branch 必须是 fix/* 或 feature/*
-- parent_handoff_id 关联到 manager 记录
-- --created-by 记录创建者角色 (manager|worker)
-- --consumed-by 记录消费者角色 (manager|worker)
-- --exit-kind 记录出口类型：delegate_workers / resume_manager / stop_ai
 
 规则：
-- delegate_workers 必须用 handoff.py insert，manager 记录要带 --exit-kind delegate_workers
-- 如果你本轮还没把出口合同写完整，就不算完成；runtime 会用同一个 resume target 拉你回来补合同。
+- 所有三种出口必须调用 handoff.py update，无一例外
+- 如果你本轮还没写完整 exit contract，runtime 会用同一个 resume target 拉你回来补
 EOF
 }
 
@@ -13307,41 +13316,43 @@ append_worker_exit_contract_directive_if_needed() {
   local project="$1"
   [[ "$(effective_runtime_role_for_project "$project")" == "worker" ]] || return 0
 
-  cat <<EOF
+  cat <<'EOF'
 
 Worker exit contract（硬性要求）：
-- 在本轮结束前，调用 handoff.py update 写入 handoffs 表：
-  - \`$contract_file\`
-- 文件必须采用 shell env 键值格式，并且 \`EXIT_KIND\` 只能是以下三者之一：
-  - \`worker_done\`
-  - \`worker_blocked\`
-  - \`worker_handoff_needed\`
+- 在本轮结束前，调用 handoff.py update 写入出口状态到 DB（handoffs 表）。
+- DB 路径：.freely/freely.db
+- 当前 handoff_id 从 session-handoff.txt 或 handoff.py list 查询获取。
 
-允许格式：
+───────────────
 1. worker_done
-\`\`\`env
-EXIT_KIND="worker_done"
-COMPLETION_SUMMARY="<what completed>"
-EVIDENCE_PATHS_CSV="/abs/path/a.md,/abs/path/b.txt"
-\`\`\`
+───────────────
+python3 docs/system/workspace/scripts/runtime/handoff.py update \
+  --db .freely/freely.db --handoff-id <handoff_id> --status completed \
+  --exit-kind worker_done \
+  --completion-summary "<完成描述>" \
+  --evidence-paths "/abs/path/a.md,/abs/path/b.txt"
 
+───────────────
 2. worker_blocked
-\`\`\`env
-EXIT_KIND="worker_blocked"
-BLOCKED_REASON="<bounded blocker>"
-NEXT_ACTION_FOR_MANAGER="<exact manager next action>"
-\`\`\`
+───────────────
+python3 docs/system/workspace/scripts/runtime/handoff.py update \
+  --db .freely/freely.db --handoff-id <handoff_id> --status completed \
+  --exit-kind worker_blocked \
+  --blocked-reason "<阻塞原因>" \
+  --next-action "<主管下一步动作>"
 
+───────────────
 3. worker_handoff_needed
-\`\`\`env
-EXIT_KIND="worker_handoff_needed"
-HANDOFF_REASON="<why manager must reschedule>"
-NEXT_ACTION_FOR_MANAGER="<exact manager next action>"
-\`\`\`
+───────────────
+python3 docs/system/workspace/scripts/runtime/handoff.py update \
+  --db .freely/freely.db --handoff-id <handoff_id> --status completed \
+  --exit-kind worker_handoff_needed \
+  --handoff-reason "<交接原因>" \
+  --next-action "<主管下一步动作>"
 
 规则：
-- 如果你还没把 worker exit contract 写完整，就不算完成；runtime 会用同一个 resume target 拉你回来补合同。
-- 不要让 runtime 猜你的完成、阻塞或交接意图。
+- 所有三种出口必须调用 handoff.py update，无一例外
+- 如果你还没写完整 exit contract，runtime 会用同一个 resume target 拉你回来补
 EOF
 }
 
@@ -13350,8 +13361,7 @@ sync_exit_contract_to_handoffs() {
 }
 
 manager_exit_contract_kind() {
-  local project="$1" contract_file
-  local _handoff_py _db_path
+  local project="$1" _handoff_py _db_path
   _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
   _db_path=""$project/.freely/freely.db""
   if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
