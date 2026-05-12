@@ -12988,6 +12988,7 @@ manager_exit_contract_repair_prompt_expected_continuity_file() {
 build_manager_exit_contract_repair_fresh_with_handoff_prompt() {
   local project=”$1” expected_continuity handoff_path live_status_cmd scan_json_path latest_continuity
   expected_continuity=”$(manager_exit_contract_repair_prompt_expected_continuity_file “$project”)”
+  manager_agent_def="$(cat "$(workspace_root_for_project "$project")/agents/manager-agent.md" 2>/dev/null || true)"
   handoff_path=”$(handoff_file “$project”)”
   live_status_cmd=”./bin/freely live-status --project $project”
   scan_json_path=”$(task_source_scan_json_path_for_project “$project”)”
@@ -12996,6 +12997,10 @@ build_manager_exit_contract_repair_fresh_with_handoff_prompt() {
 
   cat <<EOF
 你当前处于受限修复轮次，不是新的主管首跳巡检。
+
+=== Agent 角色定义 ===
+${manager_agent_def}
+===
 
 当前轮次目的：
 - 上一轮 manager 已经 \`rc=0\` 退出，但没有通过 handoff.py update 写入合法的 manager exit contract。
