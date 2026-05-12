@@ -17203,7 +17203,7 @@ build_prompt() {
   workspace_root="$(workspace_root_for_project "$PROJECT_ROOT")"
   # Inject agent role definition at prompt start (stable prefix, cached by AI tool)
   local _prompt_role _agent_def
-  _prompt_role="$(prompt_role_for_project "$PROJECT_ROOT" "$(git -C "$PROJECT_ROOT" branch --show-current 2>/dev/null || true)")"
+  _prompt_role="$(effective_runtime_role_for_project "$PROJECT_ROOT" "$(git -C "$PROJECT_ROOT" branch --show-current 2>/dev/null || true)")"
   if [[ "$_prompt_role" == "manager" ]]; then
     _agent_def="$(cat "$workspace_root/agents/manager-agent.md" 2>/dev/null || true)"
   else
