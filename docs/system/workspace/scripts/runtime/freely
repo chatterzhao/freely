@@ -19865,10 +19865,29 @@ HELP
     *) log_error "--severity must be P0, P1, or P2"; return 1 ;;
   esac
 
-  # Determine Freely project root from SELF_ROOT (packaged freely IS the freely project)
-  freely_root="$SELF_ROOT"
-  [[ -d "$freely_root" ]] || freely_root="$HOME/.freely"
-  [[ -d "$freely_root/docs/issues" ]] || mkdir -p "$freely_root/docs/issues"
+  # Determine Freely project root:
+  # 1. If current dir is a Freely project (has docs/CONSTITUTION.md), use its git root
+  # 2. Try FREELY_HOME parent (usually ~/code/freely when installed from source)
+  # 3. Fall back to SELF_ROOT (packaged install, read-only)
+  freely_root=""
+  local _candidate
+  _candidate="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+  if [[ -n "$_candidate" && -f "$_candidate/docs/CONSTITUTION.md" ]]; then
+    freely_root="$_candidate"
+  fi
+  if [[ -z "$freely_root" ]]; then
+    _candidate="${FREELY_HOME:-}"
+    [[ -n "$_candidate" ]] && _candidate="$(cd "$_candidate/../.." 2>/dev/null && pwd -P || true)"
+    if [[ -n "$_candidate" && -f "$_candidate/docs/CONSTITUTION.md" ]]; then
+      freely_root="$_candidate"
+    fi
+  fi
+  # Fallback: SELF_ROOT (packaged install). read-only, warn user.
+  if [[ -z "$freely_root" ]]; then
+    freely_root="$SELF_ROOT"
+    echo "[feedback] WARNING: using packaged install path (read-only). Consider running from Freely git repo." >&2
+  fi
+  mkdir -p "$freely_root/docs/issues"
 
   stamp=$(date -u +%Y%m%dT%H%M%SZ)
   raw_key="$stamp"
