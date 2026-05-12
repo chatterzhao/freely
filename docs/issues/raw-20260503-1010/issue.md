@@ -1,7 +1,9 @@
 ---
+local_id: raw-20260503-1010
 kind: raw
 priority: high
 status: open
+phase_state: proposed
 source: chat-inbox
 created_at: "2026-05-03T10:10:00Z"
 title: "fix: SQLite busy_timeout=0 causes concurrent write failures"

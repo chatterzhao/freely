@@ -12,7 +12,7 @@ platform_ids:
 pre_tests_path: docs/epics/wt-create-fix/verification/pre-tests.md
 verification_artifact_dir: docs/epics/wt-create-fix/code-reviews
 platform_state: closed
-updated_at: '2026-05-12T04:46:12Z'
+updated_at: '2026-05-12T14:23:43Z'
 ---
 
 # I-20260508T120000Z-A: wt-create fix

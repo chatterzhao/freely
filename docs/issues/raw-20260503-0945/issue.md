@@ -1,7 +1,9 @@
 ---
+local_id: raw-20260503-0945
 kind: raw
 priority: high
 status: open
+phase_state: proposed
 source: platform
 platform_ids:
   gitee:
