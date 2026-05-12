@@ -26,7 +26,11 @@
 退出前调用 handoff.py update 写入出口状态。三种出口：
 1. **stop_ai** — 无事可做。必写 `--stop-reason`
 2. **resume_manager** — 需继续分析。必写 `--restart-point` `--next-action` `--why-not-stop` `--why-not-delegate`
-3. **delegate_workers** — 委派 Worker。先创建 worker prompt 文件再写 `--worker-prompts-csv`
+3. **delegate_workers** — 委派 Worker：
+   - 先创建 worker prompt 文件到 .freely/run/worker-prompts/
+   - 写 CSV：`--worker-prompts-csv "/abs/path/worker1.txt,/abs/path/worker2.txt"`
+   - 为每个 worker insert：`handoff.py insert --role worker --worktree <path> --branch <branch> --prompt-file <path>`
+   - 例：`python3 $HP update --db $DB --handoff-id <id> --status completed --exit-kind delegate_workers --worker-prompts-csv "/path/w1.txt,/path/w2.txt"`
 
 Worker prompt 必需 header：
 ```
