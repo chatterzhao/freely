@@ -261,7 +261,13 @@ with open('$scan_file') as f:
     data = json.load(f)
 items = data if isinstance(data, list) else data.get('items', [])
 for item in items:
+    # Try exact key match first
     if item.get('key') == '$raw_key':
+        print(item.get('source_family', ''))
+        sys.exit(0)
+    # Try issue_id match: raw-{key} == issue_id
+    issue_id = item.get('issue_id', '') or ''
+    if issue_id == 'raw-$raw_key':
         print(item.get('source_family', ''))
         sys.exit(0)
 sys.exit(1)
@@ -386,37 +392,37 @@ _require_issue_exists() {
     raw-*)
       ts="${key#raw-}"
 
-      # ── Scan matching (new: validate --source against scan) ──
+      # ── Scan matching (new: validate --source against scan, fallback to dir/DB) ──
+      local scan_found=0
       if [[ "$using_new" -eq 1 ]]; then
         local scan_source; scan_source="$(_scan_lookup "$raw_key" || true)"
         if [[ -z "$scan_source" ]]; then
           _run_scan_once
           scan_source="$(_scan_lookup "$raw_key" || true)"
-          if [[ -z "$scan_source" ]]; then
-            echo "拒绝创建工位: raw-$raw_key 在 scan 中未找到" >&2
-            echo "  Scan file: $(_scan_json_path)" >&2
-            echo "  Source: $source_val" >&2
-            echo "  请先创建 raw issue（chat-inbox 或平台），确认它能被 scan 发现后再创建工位。" >&2
-            return 1
-          fi
         fi
-        if [[ "$scan_source" != "$source_val" ]]; then
-          echo "拒绝创建工位: raw-$raw_key 在 scan 中的 source_family 是 '$scan_source'，但传入了 --source '$source_val'" >&2
-          echo "  Scan file: $(_scan_json_path)" >&2
-          echo "  请检查 raw-key 是否匹配正确的来源。" >&2
-          return 1
+        if [[ -n "$scan_source" ]]; then
+          scan_found=1
+          if [[ "$scan_source" != "$source_val" ]]; then
+            echo "警告: raw-$raw_key 在 scan 中的 source_family 是 '$scan_source'，但传入了 --source '$source_val'" >&2
+            echo "  将尝试从本地目录或 chat-inbox 加载，跳过 scan 来源校验。" >&2
+            scan_found=0
+          fi
         fi
       fi
 
-      # ── Pull is deferred to after fix/feature worktree creation ──
-      # (raw-issue-pull requires branch name containing raw-key, not develop)
-      if [[ "$using_new" -ne 1 ]]; then
-        # Legacy: check chat-inbox + local directory
-        if [[ -f "$db_path" ]] && python3 "$chat_inbox_py" show --db "$db_path" --id "$ts" >/dev/null 2>&1; then
-          return 0
-        fi
+      # ── Fallback: check local issue directory or chat-inbox DB ──
+      if [[ "$scan_found" -ne 1 ]]; then
         if [[ -d "$ROOT_DIR/docs/issues/$key" ]]; then
-          return 0
+          : # issue dir exists, proceed
+        elif [[ -f "$db_path" ]] && python3 "$chat_inbox_py" show --db "$db_path" --id "$ts" >/dev/null 2>&1; then
+          : # chat exists in inbox, proceed
+        else
+          echo "拒绝创建工位: raw-$raw_key 未找到" >&2
+          echo "  Scan file: $(_scan_json_path)" >&2
+          echo "  docs/issues/$key: $( [[ -d "$ROOT_DIR/docs/issues/$key" ]] && echo '存在' || echo '无' )" >&2
+          echo "  chat-inbox: $( python3 "$chat_inbox_py" show --db "$db_path" --id "$ts" 2>&1 || echo '无' )" >&2
+          echo "  请先创建 raw issue（chat-inbox 或平台），确认 issue.md 存在或 chat 未被消费后再创建工位。" >&2
+          return 1
         fi
       fi
 

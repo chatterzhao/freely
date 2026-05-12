@@ -5,21 +5,22 @@ status: completed
 phase_state: completed
 promoted_from: raw-20260508T005431Z
 source_candidate: docs/pre-brainstorms/20260508T005431Z--skill-standardize/candidates.md
-canonical_issue_path: ""
+canonical_issue_path: ''
 platform_ids:
   github:
     issue_id: '251'
-primary_platform: ""
+primary_platform: ''
 last_synced_comment_at: {}
-hash: ""
-created_at: 2026-05-08T00:54:56Z
-updated_at: 2026-05-08T00:54:56Z
-intake_id: ""
+hash: ''
+created_at: 2026-05-08 00:54:56+00:00
+updated_at: '2026-05-12T04:46:05Z'
+intake_id: ''
 author: zhaoquan
 channel: feat-execution
 session_refs: []
 pre_tests_path: docs/epics/skill-standardize/verification/pre-tests.md
 verification_artifact_dir: docs/epics/skill-standardize/code-reviews
+platform_state: closed
 ---
 
 # I-20260508T005431Z-A: 规范 skill 使用
