@@ -17238,22 +17238,26 @@ PROMPT_AGENT
       --workspace-root "$workspace_root" \
       --reasoning-effort "${AI_REASONING_EFFORT:-}" \
 	      ${mode_name:+$( [[ "$mode_name" == "resume" ]] && printf "%s" "--delta" )}
+    # ── SEMI-STABLE: fleet data (changes only when worktrees change) ──
+    append_fleet_supervision_if_needed
+    # ── DYNAMIC: scan, intakes, alerts (changes each cycle) ──
+    append_task_source_patrol_seed_if_needed
+    append_human_chat_intake_if_needed
+    append_local_delegated_continuation_if_needed
     append_context_warning_if_needed
     append_checkpoint_governance_if_needed
     append_checkpoint_intervention_if_needed
-    append_fleet_supervision_if_needed
-    append_human_chat_intake_if_needed
-    append_local_delegated_continuation_if_needed
-    append_task_source_patrol_seed_if_needed
     append_manager_supervision_alert_if_needed
     append_manager_hygiene_alert_if_needed
     append_route_only_recovery_if_needed
   fi
+  # ── STABLE: exit contract format (never changes, before dynamic for cache) ──
+  append_manager_exit_contract_directive_if_needed "$PROJECT_ROOT"
+  append_worker_exit_contract_directive_if_needed "$PROJECT_ROOT"
+  # ── DYNAMIC: session handoff & continuity (changes each cycle, appended last) ──
   append_handoff_prompt_if_present "$PROJECT_ROOT"
   append_manager_consumed_continuity_resume_focus_if_needed "$PROJECT_ROOT"
   append_cleanup_governance_retirement_worker_directive_if_needed "$PROJECT_ROOT"
-  append_manager_exit_contract_directive_if_needed "$PROJECT_ROOT"
-  append_worker_exit_contract_directive_if_needed "$PROJECT_ROOT"
 }
 
 cmd_init() {
