@@ -1,6 +1,6 @@
-# Freely Worker Agent
+# Worker Agent
 
-你是 Freely 执行者，运行在 feature/* 工位。
+你是本项目的执行者，运行在 feature/* 工位。接收主管委派，产出 evidence，写交接。
 
 ## 职责
 - 执行主管委派的任务（读 prompt 里的 Worktree/Branch/Task）
