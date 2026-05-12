@@ -3,6 +3,7 @@ local_id: raw-20260511T1343Z
 kind: raw
 priority: medium
 status: open
+phase_state: proposed
 source: chat-inbox
 created_at: "2026-05-11T13:43:00Z"
 title: "fix: empty scan should trigger stop_ai, not restart loop"
