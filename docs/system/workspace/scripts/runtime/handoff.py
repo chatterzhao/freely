@@ -53,6 +53,12 @@ def init_db():
             blocked_reason TEXT DEFAULT '',
             next_action TEXT DEFAULT '',
             evidence_paths TEXT DEFAULT '',
+            stop_reason TEXT DEFAULT '',
+            restart_point TEXT DEFAULT '',
+            why_not_stop TEXT DEFAULT '',
+            why_not_delegate TEXT DEFAULT '',
+            worker_prompts_csv TEXT DEFAULT '',
+            handoff_reason TEXT DEFAULT '',
             session_id TEXT DEFAULT '',
             launched_at TEXT DEFAULT '',
             completed_at TEXT DEFAULT '',
@@ -65,7 +71,10 @@ def init_db():
         CREATE INDEX IF NOT EXISTS idx_handoffs_parent ON handoffs(parent_handoff_id);
         DELETE FROM handoffs WHERE status = 'pending' AND datetime(created_at) < datetime('now','-1 hour');
     """)
-    for col in ('created_by', 'consumed_by', 'completion_summary', 'blocked_reason', 'next_action', 'evidence_paths'):
+    for col in ('created_by', 'consumed_by', 'completion_summary', 'blocked_reason',
+                'next_action', 'evidence_paths',
+                'stop_reason', 'restart_point', 'why_not_stop', 'why_not_delegate',
+                'worker_prompts_csv', 'handoff_reason'):
         try:
             conn.execute(f"ALTER TABLE handoffs ADD COLUMN {col} TEXT DEFAULT ''")
         except sqlite3.OperationalError:
@@ -77,7 +86,9 @@ def init_db():
 def insert(role, raw_key, prompt_file, worktree="", branch="",
            parent_handoff_id="", intent_kind="", created_by="", consumed_by="",
            exit_kind="", completion_summary="", blocked_reason="",
-           next_action="", evidence_paths=""):
+           next_action="", evidence_paths="",
+           stop_reason="", restart_point="", why_not_stop="", why_not_delegate="",
+           worker_prompts_csv="", handoff_reason=""):
     conn = _connect()
     hid = _now_utc().replace("T", "").replace("Z", "").replace("-", "").replace(":", "") + "-" + uuid.uuid4().hex[:6]
     now = _now_utc()
@@ -85,11 +96,15 @@ def insert(role, raw_key, prompt_file, worktree="", branch="",
         """INSERT INTO handoffs (handoff_id, role, raw_key, worktree, branch,
            prompt_file, parent_handoff_id, intent_kind, created_by, consumed_by,
            exit_kind, completion_summary, blocked_reason, next_action, evidence_paths,
+           stop_reason, restart_point, why_not_stop, why_not_delegate,
+           worker_prompts_csv, handoff_reason,
            status, created_at, updated_at)
-           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'pending',?,?)""",
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'pending',?,?)""",
         (hid, role, raw_key, worktree, branch, prompt_file,
          parent_handoff_id, intent_kind, created_by, consumed_by, exit_kind,
-         completion_summary, blocked_reason, next_action, evidence_paths, now, now))
+         completion_summary, blocked_reason, next_action, evidence_paths,
+         stop_reason, restart_point, why_not_stop, why_not_delegate,
+         worker_prompts_csv, handoff_reason, now, now))
     conn.commit()
     conn.close()
     return hid
@@ -97,7 +112,9 @@ def insert(role, raw_key, prompt_file, worktree="", branch="",
 
 def update_status(handoff_id, status, exit_kind="", session_id="",
                   completion_summary="", blocked_reason="",
-                  next_action="", evidence_paths=""):
+                  next_action="", evidence_paths="",
+                  stop_reason="", restart_point="", why_not_stop="", why_not_delegate="",
+                  worker_prompts_csv="", handoff_reason=""):
     conn = _connect()
     now = _now_utc()
     cols = ["status=?", "updated_at=?"]
@@ -108,24 +125,14 @@ def update_status(handoff_id, status, exit_kind="", session_id="",
     if status in ("completed", "rejected", "blocked"):
         cols.append("completed_at=?")
         params.insert(-1, now)
-    if exit_kind:
-        cols.append("exit_kind=?")
-        params.insert(-1, exit_kind)
-    if session_id:
-        cols.append("session_id=?")
-        params.insert(-1, session_id)
-    if completion_summary:
-        cols.append("completion_summary=?")
-        params.insert(-1, completion_summary)
-    if blocked_reason:
-        cols.append("blocked_reason=?")
-        params.insert(-1, blocked_reason)
-    if next_action:
-        cols.append("next_action=?")
-        params.insert(-1, next_action)
-    if evidence_paths:
-        cols.append("evidence_paths=?")
-        params.insert(-1, evidence_paths)
+    for field in ("exit_kind", "session_id", "completion_summary", "blocked_reason",
+                  "next_action", "evidence_paths",
+                  "stop_reason", "restart_point", "why_not_stop", "why_not_delegate",
+                  "worker_prompts_csv", "handoff_reason"):
+        val = locals().get(field, "")
+        if val:
+            cols.append(f"{field}=?")
+            params.insert(-1, val)
     sql = f"UPDATE handoffs SET {', '.join(cols)} WHERE handoff_id=?"
     conn.execute(sql, params)
     conn.commit()
@@ -232,6 +239,12 @@ def main():
     p_insert.add_argument("--blocked-reason", default="")
     p_insert.add_argument("--next-action", default="")
     p_insert.add_argument("--evidence-paths", default="")
+    p_insert.add_argument("--stop-reason", default="")
+    p_insert.add_argument("--restart-point", default="")
+    p_insert.add_argument("--why-not-stop", default="")
+    p_insert.add_argument("--why-not-delegate", default="")
+    p_insert.add_argument("--worker-prompts-csv", default="")
+    p_insert.add_argument("--handoff-reason", default="")
 
     p_update = sub.add_parser("update")
     p_update.add_argument("--db", required=True)
@@ -243,6 +256,12 @@ def main():
     p_update.add_argument("--blocked-reason", default="")
     p_update.add_argument("--next-action", default="")
     p_update.add_argument("--evidence-paths", default="")
+    p_update.add_argument("--stop-reason", default="")
+    p_update.add_argument("--restart-point", default="")
+    p_update.add_argument("--why-not-stop", default="")
+    p_update.add_argument("--why-not-delegate", default="")
+    p_update.add_argument("--worker-prompts-csv", default="")
+    p_update.add_argument("--handoff-reason", default="")
 
     p_get = sub.add_parser("get")
     p_get.add_argument("--db", required=True)
@@ -279,12 +298,16 @@ def main():
                      args.worktree, args.branch, args.parent, args.intent_kind,
                      args.created_by, args.consumed_by, args.exit_kind,
                      args.completion_summary, args.blocked_reason,
-                     args.next_action, args.evidence_paths)
+                     args.next_action, args.evidence_paths,
+                     args.stop_reason, args.restart_point, args.why_not_stop,
+                     args.why_not_delegate, args.worker_prompts_csv, args.handoff_reason)
         print(hid)
     elif args.cmd == "update":
         update_status(args.handoff_id, args.status, args.exit_kind, args.session_id,
                       args.completion_summary, args.blocked_reason,
-                      args.next_action, args.evidence_paths)
+                      args.next_action, args.evidence_paths,
+                      args.stop_reason, args.restart_point, args.why_not_stop,
+                      args.why_not_delegate, args.worker_prompts_csv, args.handoff_reason)
         print("ok")
     elif args.cmd == "get":
         r = get(args.handoff_id)
