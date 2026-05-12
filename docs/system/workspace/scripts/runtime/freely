@@ -13277,18 +13277,31 @@ handoff.py 路径和 DB：
 当前 handoff_id 从 session-handoff.txt 或 latest-manager 查询获取。
 
 ───────────────
-委派前检查（delegate_workers 必须做）
+委派前检查（delegate_workers 必须做；resume_manager 也建议做）
 ───────────────
 1. 查询 blocked worker 状态：
    python3 $HP list --db $DB --role worker --status blocked
-   检查每个 blocked worker 的 exit_kind 和 blocked_reason：
-   - assessment / retirement / superseded → 该 worker 已结束，需要重新委派或清理
-   - worker_blocked（可恢复） → 评估是否 re-dispatch
+   对每个 blocked worker，读取 blocked_reason 和 next_action 字段，分析根因：
+
+   常见 blocked_reason 含义和应对：
+   - "Worker launched but did not complete within N min timeout" →
+       该 worker 超时。检查其 worktree 是否仍存在。
+       如果同任务已超时 ≥3 次 → 标记为 superseded，重新评估是否需要新方案。
+       如果是首次超时且工位存在 → 可以 re-dispatch。
+   - "assessment" / "retirement" / "superseded" →
+       该 worker 是被主管主动关闭的，任务已完成或放弃。
+       不需要 re-dispatch，只需清理工位（如果还存在）。
+   - 包含具体错误描述（如 "worktree not found"）→
+       分析原因后决定：修复工位后 re-dispatch、或标记 superseded 放弃。
+
+   重要：不要看到 blocked 就盲重试。先读 blocked_reason，再做判断。
+   同一 worker 连续 blocked ≥3 次 → 关闭旧手牌，创建新 prompt 或放弃。
 
 2. 查询已完成但工作树未清理的 worker：
    python3 $HP list --db $DB --role worker --status completed
 
-3. 根据 blocked worker 的 worktree 字段，检查对应工位是否仍存在、是否有未提交改动。
+3. 根据 blocked worker 的 worktree 字段，检查对应工位是否仍存在。
+   如果工位已被删除（git worktree remove）→ 该 worker 任务已失效，标记 superseded。
 
 ───────────────
 1. stop_ai

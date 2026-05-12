@@ -203,12 +203,17 @@ def children_of(parent_handoff_id):
 
 def mark_stale(timeout_minutes=30):
     conn = _connect()
+    now = _now_utc()
     now_dt = datetime.now(timezone.utc)
     cutoff = now_dt.replace(minute=now_dt.minute - timeout_minutes).strftime("%Y-%m-%dT%H:%M:%SZ")
+    # Write blocked_reason so manager has context to analyze
     conn.execute(
-        "UPDATE handoffs SET status='blocked', exit_kind='timeout', updated_at=? "
+        "UPDATE handoffs SET status='blocked', exit_kind='worker_blocked',"
+        " blocked_reason='Worker launched but did not complete within ' || ? || ' min timeout (launched_at=' || launched_at || ')',"
+        " next_action='Manager: check if worker worktree still exists and is accessible. If the same task has timed out repeatedly, close this handoff and re-assess.',"
+        " updated_at=? "
         "WHERE role='worker' AND status='launched' AND launched_at < ?",
-        (_now_utc(), cutoff))
+        (str(timeout_minutes), now, cutoff))
     conn.commit()
     conn.close()
 
