@@ -44,4 +44,4 @@
 - promotion_gate: develop_merge
 - evidence_level: integration
 - status: pass
-- artifact_ref: docs/epics/skill-gate-alignment/code-reviews/review.md
+- artifact_ref: docs/epics/skill-gate-alignment/code-reviews/closeout-review.md + review.md##Gate Alignment Verification

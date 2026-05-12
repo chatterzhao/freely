@@ -23,7 +23,7 @@ wt-create 从两个来源拉取 raw issue 并物化到工位：
 
 **关键**：Source 1 来的 raw issue 还没有 `platform_ids`（尚未 push 到平台）。B1_IBM 不关心来源，只消费 `docs/issues/raw-{key}/issue.md`。
 
-B1_IBM 不创建 raw issue。wt-create 已经准备好了。
+B1_IBM 不创建 raw issue。
 
 ### B：Brainstorm — 发散→收敛→决策
 
