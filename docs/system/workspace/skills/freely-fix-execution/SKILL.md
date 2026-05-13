@@ -104,11 +104,16 @@ hotfix/*          → main
 
 ## 工作流
 
+### 前置：审视 issue 价值与时效性
+
+进入任何场景前，先审视 raw issue 是否过时、是否仍有价值、是否已被其他变更覆盖。若已无价值，不执行 fix 流程，写交接回主管说明理由。
+
 ### 场景 A：原 feature worktree 还在
 
 ```
 原 feature worktree（可写）
   │
+  ├─ 前置检查通过（issue 仍有价值）
   ├─ 直接在上面改源码
   ├─ stop → start daemon → 验证
   ├─ 迭代到修复稳定
@@ -120,6 +125,8 @@ hotfix/*          → main
 
 ```
 阶段 1 — wt-create 一次性创建两个工位
+  │
+  ├─ 前置检查通过（issue 仍有价值）
   │
   ├─ ./bin/wt-create --raw-key <key> --source <source> \
   │     --skill docs/system/workspace/skills/freely-fix-execution/SKILL.md \
