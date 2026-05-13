@@ -766,6 +766,23 @@ routing_policy:
 - branch: `hotfix/I-20260501-0000-A-scan-pr-platform-config`
 - next_action: Hotfix merged to develop.
 
+### committed_issues
+
+30. `I-20260513T010343Z-A`
+- title: raw key seconds format cleanup — 4 regex fixes + 10+ doc updates
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P1
+- issue_path: `docs/issues/I-20260513T010343Z-A/issue.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-raw-key-seconds-cleanup-followthrough.md`
+- source_candidate: `docs/pre-brainstorms/20260513T010343Z--raw-key-seconds-cleanup-followthrough/candidates.md#C-20260513T010343Z-A`
+- branch: `feature/raw-20260513T010343Z-raw-key-seconds-cleanup`
+- evidence:
+  - `docs/issues/I-20260513T010343Z-A/issue.md`
+  - `docs/issues/raw-20260513T010343Z/issue.md`
+  - `docs/progress/workspace-routing-foundation/p-raw-key-seconds-cleanup-followthrough.md`
+- next_action: `Merge to test-pre-merge, selfhost verify, then promote to develop.`
+
 ### candidate_issues
 
 1. `C-20260417-0445-A`
@@ -1377,21 +1394,6 @@ routing_policy:
 - source_brainstorm: `docs/pre-brainstorms/20260503-0915--enforce-test-pre-merge/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260503-0915--enforce-test-pre-merge/candidates.md`
 - next_action: Candidate mirror only. Feature branch ready, test-pre-merge worktree created, pending selfhost verification and merge to develop.
-
-30. `I-20260513T010343Z-A`
-- title: raw key seconds format cleanup — 4 regex fixes + 10+ doc updates
-- milestone_state: committed
-- phase_state: `in_dev`
-- priority: P1
-- issue_path: `docs/issues/I-20260513T010343Z-A/issue.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-raw-key-seconds-cleanup-followthrough.md`
-- source_candidate: `docs/pre-brainstorms/20260513T010343Z--raw-key-seconds-cleanup-followthrough/candidates.md#C-20260513T010343Z-A`
-- branch: `feature/raw-20260513T010343Z-raw-key-seconds-cleanup`
-- evidence:
-  - `docs/issues/I-20260513T010343Z-A/issue.md`
-  - `docs/issues/raw-20260513T010343Z/issue.md`
-  - `docs/progress/workspace-routing-foundation/p-raw-key-seconds-cleanup-followthrough.md`
-- next_action: `Merge to test-pre-merge, selfhost verify, then promote to develop.`
 
 ### completed_issues
 
