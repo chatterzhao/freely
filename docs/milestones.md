@@ -4999,11 +4999,11 @@ routing_policy:
 - milestone: M-20260508T225041Z-A
 - status: promoted
 - promoted_issue_path: `docs/issues/I-20260508T225041Z-A/issue.md`
-### committed_issues
+### completed_issues
 1. `I-20260508T225041Z-A`
 - title: ACP bridge restart cooldown
-- milestone_state: committed
-- phase_state: `in_b2_ibm`
+- milestone_state: completed
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T225041Z-A/issue.md`
 
 ## M-20260509T022152Z-A
