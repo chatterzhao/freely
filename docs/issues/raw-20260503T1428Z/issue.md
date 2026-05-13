@@ -1,7 +1,9 @@
 ---
+local_id: raw-20260503T1428Z
 kind: raw
-priority: P1
+phase_state: proposed
 status: open
+priority: P1
 source: platform
 platform_ids:
   github:
