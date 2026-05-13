@@ -1,0 +1,294 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+source "$(dirname "${BASH_SOURCE[0]}")/worktree-common.sh"
+
+ISSUES_DIR="$ROOT_DIR/docs/issues"
+FORCE=false
+SKIP_PLATFORM=false
+DRY_RUN=false
+
+usage() {
+  cat <<USAGE
+Usage:
+  ./bin/wt-close <branch> [--force] [--skip-platform] [--dry-run]
+
+Close a worktree: validate phase_state, close platform issue, remove worktree+branch.
+
+Arguments:
+  <branch>           Branch name (e.g. feature/raw-20260513T081743Z-wt-close)
+                      or worktree path (e.g. /path/to/worktree)
+
+Options:
+  --force            Skip phase_state and pretests-retirement checks
+  --skip-platform    Skip platform issue close
+  --dry-run          Print what would be done, don't execute
+
+Examples:
+  ./bin/wt-close feature/raw-20260513T081743Z-wt-close
+  ./bin/wt-close /path/to/worktree --force
+  ./bin/wt-close fix/raw-20260513T075904Z-merge-guarded-phase-state --skip-platform
+USAGE
+}
+
+# ── Frontmatter helpers (inline, matches issue-sync pattern) ──
+
+_fm_get() {
+  local file="$1" key="$2"
+  python3 -c "
+import yaml, sys
+with open('$file') as f: content = f.read()
+if not content.startswith('---'): sys.exit(0)
+parts = content.split('---', 2)
+if len(parts) < 3: sys.exit(0)
+fm = yaml.safe_load(parts[1]) or {}
+val = fm.get('$key','')
+if isinstance(val, dict):
+  import json; print(json.dumps(val))
+elif isinstance(val, list):
+  import json; print(json.dumps(val))
+elif val is not None:
+  print(val)
+" 2>/dev/null || true
+}
+
+_fm_set_str() {
+  local file="$1" key="$2" value="$3"
+  python3 -c "
+import yaml
+with open('$file') as f: content = f.read()
+parts = content.split('---', 2)
+fm = yaml.safe_load(parts[1]) if len(parts) >= 3 else {}
+fm['$key'] = '$value'
+new_fm = yaml.dump(fm, default_flow_style=False, allow_unicode=True, sort_keys=False).strip()
+body = parts[2] if len(parts) >= 3 else ''
+with open('$file', 'w') as f: f.write('---\n' + new_fm + '\n---' + body)
+" 2>/dev/null || true
+}
+
+# ── Branch/issue resolution ──
+
+_resolve_branch() {
+  local input="$1"
+  if [[ -d "$input" ]]; then
+    git worktree list --porcelain | awk -v wt="$input" '
+      $1=="worktree" && $2==wt {found=1}
+      found && $1=="branch" {print $2; exit}
+    ' | sed 's|^refs/heads/||'
+    return 0
+  fi
+  echo "$input"
+}
+
+_resolve_worktree_path() {
+  local branch="$1"
+  local existing
+  existing="$(freely_wt_existing_for_branch "$branch")"
+  if [[ -n "$existing" ]]; then
+    echo "$existing"
+    return 0
+  fi
+  return 1
+}
+
+_extract_issue_id() {
+  local branch="$1"
+  if echo "$branch" | grep -qoE 'raw-[0-9]{8}[-T][0-9]{4,6}Z?'; then
+    echo "$branch" | grep -oE 'raw-[0-9]{8}[-T][0-9]{4,6}Z?' | head -1
+    return 0
+  fi
+  if echo "$branch" | grep -qoE 'I-[0-9]{8}[-T][0-9]{4,6}Z?(-[A-Z0-9]+)?'; then
+    echo "$branch" | grep -oE 'I-[0-9]{8}[-T][0-9]{4}Z?(-[A-Z0-9]+)?' | head -1
+    return 0
+  fi
+  return 1
+}
+
+_is_protected_branch() {
+  local branch="$1"
+  case "$branch" in
+    main|develop|test-pre-merge-*) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+# ── Dry-run logging ──
+
+_dry() {
+  echo "[DRY-RUN] $*"
+}
+
+# ── Parse args ──
+
+args=()
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --force) FORCE=true; shift ;;
+    --skip-platform) SKIP_PLATFORM=true; shift ;;
+    --dry-run) DRY_RUN=true; shift ;;
+    --help|-h) usage; exit 0 ;;
+    -*) echo "Unknown: $1" >&2; usage; exit 1 ;;
+    *) args+=("$1"); shift ;;
+  esac
+done
+
+set -- "${args[@]}"
+input="${1:-}"
+
+if [[ -z "$input" ]]; then
+  echo "Error: missing <branch> or <worktree-path>" >&2
+  usage
+  exit 1
+fi
+
+# ── Resolve branch ──
+branch="$(_resolve_branch "$input")"
+if [[ -z "$branch" ]]; then
+  echo "Error: could not resolve branch from '$input'" >&2
+  exit 1
+fi
+echo "wt-close: branch = $branch"
+
+# ── Guard: protected branch (test-pre-merge is disposable, skip checks) ──
+if [[ "$branch" == test-pre-merge-* ]]; then
+  echo "wt-close: test-pre-merge branch (disposable), skipping checks and platform close"
+  SKIP_PLATFORM=true
+  FORCE=true
+elif _is_protected_branch "$branch"; then
+  echo "Error: '$branch' is a protected branch, cannot close" >&2
+  exit 1
+fi
+
+# ── Resolve worktree path ──
+wt_path="$(_resolve_worktree_path "$branch")"
+if [[ -z "$wt_path" ]]; then
+  echo "Error: no worktree found for branch '$branch'" >&2
+  exit 1
+fi
+echo "wt-close: worktree = $wt_path"
+
+# ── Extract issue id ──
+issue_id="$(_extract_issue_id "$branch")" || true
+if [[ -z "$issue_id" ]]; then
+  echo "Warning: could not extract issue id from branch '$branch'" >&2
+  echo "  Skipping phase_state check and platform close." >&2
+fi
+
+# ── Phase 1: Checks ──
+
+if [[ -n "$issue_id" ]]; then
+  issue_file="$ISSUES_DIR/$issue_id/issue.md"
+fi
+
+if [[ "$FORCE" == false && -n "$issue_id" && -f "${issue_file:-}" ]]; then
+  phase_state="$(_fm_get "$issue_file" "phase_state")"
+  if [[ -z "$phase_state" || "$phase_state" != "completed" ]]; then
+    echo "Error: $issue_id phase_state='${phase_state:-<empty>}', not 'completed'" >&2
+    echo "  Use --force to skip this check." >&2
+    exit 1
+  fi
+  echo "wt-close: phase_state=completed ✓"
+
+  # pretests-retirement-gate check
+  if [[ -x "$ROOT_DIR/bin/pretests-retirement-gate" ]]; then
+    if "$ROOT_DIR/bin/pretests-retirement-gate" "$wt_path" 2>/dev/null; then
+      echo "wt-close: pretests-retirement-gate passed ✓"
+    else
+      echo "Error: pretests-retirement-gate failed for $wt_path" >&2
+      echo "  Use --force to skip this check." >&2
+      exit 1
+    fi
+  fi
+elif [[ "$FORCE" == true ]]; then
+  echo "wt-close: --force, skipping checks"
+fi
+
+# ── Phase 2: Platform close ──
+
+if [[ "$SKIP_PLATFORM" == false && -n "$issue_id" && -f "${issue_file:-}" ]]; then
+  if [[ "$DRY_RUN" == true ]]; then
+    _dry "./bin/issue-sync close $issue_id completed"
+  else
+    echo "wt-close: closing platform issue for $issue_id..."
+    if "$ROOT_DIR/bin/issue-sync" close "$issue_id" completed 2>&1; then
+      echo "wt-close: platform issue closed ✓"
+
+      _fm_set_str "$issue_file" "platform_state" "closed"
+      _fm_set_str "$issue_file" "updated_at" "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+      echo "wt-close: frontmatter updated (platform_state=closed)"
+    else
+      echo "Warning: issue-sync close failed for $issue_id, continuing..." >&2
+    fi
+  fi
+elif [[ "$SKIP_PLATFORM" == true ]]; then
+  echo "wt-close: --skip-platform, skipping platform close"
+fi
+
+# ── Phase 3: phase_state force-update ──
+
+if [[ "$FORCE" == true && -n "$issue_id" && -f "${issue_file:-}" ]]; then
+  current_phase="$(_fm_get "$issue_file" "phase_state")"
+  if [[ "$current_phase" != "completed" ]]; then
+    if [[ "$DRY_RUN" == true ]]; then
+      _dry "update $issue_file phase_state=completed"
+    else
+      _fm_set_str "$issue_file" "phase_state" "completed"
+      _fm_set_str "$issue_file" "updated_at" "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+      echo "wt-close: force-updated phase_state=completed"
+    fi
+  fi
+fi
+
+# ── Phase 4: Remote branch delete ──
+
+remotes=()
+while IFS= read -r remote; do
+  remotes+=("$remote")
+done < <(git remote 2>/dev/null || true)
+
+if [[ ${#remotes[@]} -gt 0 ]]; then
+  for remote in "${remotes[@]}"; do
+    if git fetch "$remote" "$branch" 2>/dev/null; then
+      if [[ "$DRY_RUN" == true ]]; then
+        _dry "git push $remote --delete $branch"
+      else
+        echo "wt-close: deleting remote branch '$branch' on '$remote'..."
+        git push "$remote" --delete "$branch" 2>/dev/null || true
+      fi
+    fi
+  done
+fi
+
+# ── Phase 5: Worktree remove ──
+
+if [[ "$DRY_RUN" == true ]]; then
+  _dry "git worktree remove $wt_path"
+else
+  echo "wt-close: removing worktree $wt_path..."
+  if git worktree remove "$wt_path" 2>/dev/null; then
+    echo "wt-close: worktree removed ✓"
+  else
+    echo "Warning: worktree has dirty/untracked files, retrying with --force..." >&2
+    git worktree remove --force "$wt_path" 2>/dev/null || {
+      echo "Error: could not remove worktree $wt_path, remove manually" >&2
+      exit 1
+    }
+  fi
+fi
+
+# ── Phase 6: Local branch delete ──
+
+if [[ "$DRY_RUN" == true ]]; then
+  _dry "git branch -d $branch"
+else
+  echo "wt-close: deleting branch $branch..."
+  if git branch -d "$branch" 2>/dev/null; then
+    echo "wt-close: branch deleted ✓"
+  else
+    echo "Warning: branch '$branch' not fully merged, using -D..." >&2
+    git branch -D "$branch" 2>/dev/null || true
+  fi
+fi
+
+echo "wt-close: done ✓"
