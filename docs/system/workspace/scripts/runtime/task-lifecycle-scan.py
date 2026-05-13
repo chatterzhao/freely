@@ -1027,8 +1027,7 @@ def _normalize_key_variants(key: str) -> list[str]:
 
     Old format:    YYYYMMDD-HHMM    (e.g. 20260503-0915)
     Old w/ secs:   YYYYMMDD-HHMMSS  (e.g. 20260503-091530)
-    New format:    YYYYMMDDTHHMMZ   (e.g. 20260503T0915Z)
-    New w/ secs:   YYYYMMDDTHHMMSSZ (e.g. 20260503T091530Z)
+    New format:    YYYYMMDDTHHMM[SS]Z (e.g. 20260503T0915Z or 20260503T091530Z)
     Bare:          YYYYMMDDHHMMSS   (e.g. 20260430222144)
 
     Returns [key] plus any reasonable variants so substring matches work

@@ -13339,7 +13339,7 @@ python3 $HP update --db $DB --handoff-id <handoff_id> --status completed \
   Worktree:
   - /absolute/path/to/worktree
   Branch:
-  - fix/raw-YYYYMMDDTHHMMZ-<slug>
+  - fix/raw-YYYYMMDDTHHMM[SS]Z-<slug>
   dispatch_priority: P2
   parallel_safe: true
   write_scope: worktree
