@@ -88,8 +88,8 @@ _scan_staged_for_secrets() {
 │  Remove secrets and use environment variables or .gitignore │
 │  protected config files instead.                             │
 │                                                             │
-│  If this is a false positive, use:                          │
-│    git commit --no-verify                                   │
+│  False positives should be fixed by excluding the file or        │
+│  refining the pattern. Hooks must not be bypassed.              │
 └─────────────────────────────────────────────────────────────┘
 MSG
     return 1
