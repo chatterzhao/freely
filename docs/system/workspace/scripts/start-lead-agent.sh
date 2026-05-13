@@ -303,9 +303,7 @@ EOF
 	  execution_rule_17="17. subagent 并行不冲突的任务。runtime-owned 问题交给 runtime。"
 	  role_scope_rule_5a=""
 	  role_scope_rule_5b=""
-	  manager_artifact_rule="$(cat <<EOF
-Worker prompt 格式（runtime 解析 Worktree:/Branch: header）：
-\\`\\`\\`
+	  manager_artifact_rule="\`\`\`
 Worktree:
 - /abs/path/to/worktree
 Branch:
@@ -315,9 +313,7 @@ parallel_safe: true
 write_scope: worktree
 intent_kind: edit|cleanup|promotion
 intent_target: <简短描述>
-\\`\\`\\`
-EOF
-)"
+\`\`\`"
 	  manager_agent_def="$(cat "$workspace_root/agents/manager-agent.md" 2>/dev/null || true)"
 	  additional_requirements="=== Agent 角色定义 ===
 ${manager_agent_def}
