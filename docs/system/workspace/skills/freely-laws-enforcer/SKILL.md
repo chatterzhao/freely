@@ -9,7 +9,7 @@ description: 执行和验证法律级别的工作流和验收标准。当 AI 需
 1. 识别当前任务适用的法律章节。
 2. 选择必需的执行技能路由。
 3. 验证必需的产物和状态。
-4. 若触及 protected-branch bypass，强制核对 `docs/LAWS.md` §2D 的白名单、receipt 字段和 follow-on duty。
+4. hook/gate bypass 永久禁止。`FREELY_SKIP_IBM_GATE=1` 是唯一合法豁免，仅跳过 IBM 文档门禁。
 5. 如法律验收证据缺失则阻止完成。
 6. 生成关联产物的完成摘要。
 
