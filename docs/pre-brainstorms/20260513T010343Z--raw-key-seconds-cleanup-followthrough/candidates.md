@@ -14,4 +14,4 @@
   - 3 个 skill 文件 + pre-push.sh 格式文字已更新
   - grep -rn THHMMZ（不含 [SS]/SS）在 docs/system/ 中仅剩 2 处 task-lifecycle-scan.py 注释（文档性，非格式规范）
 - promoted_issue_path: docs/issues/I-20260513T010343Z-A/issue.md
-- milestone: M-20260513T010343Z-A
+- milestone: M-20260306-workspace-routing-foundation
