@@ -1,5 +1,6 @@
 ---
 local_id: raw-20260513T075904Z
+phase_state: proposed
 kind: raw
 priority: P1
 status: open
