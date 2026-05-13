@@ -27,6 +27,7 @@ B1_IBM 不创建 raw issue。
 
 ### B：Brainstorm — 发散→收敛→决策
 
+0. 审视 issue 价值与时效性：确认该 raw issue 仍值得投入。检查其提出时间、是否已被其他 issue/candidate 覆盖、当前项目阶段是否仍相关。若认为已过时或价值不足，写入 brainstorms.md 的 discovery 部分说明理由并标记 dropped，直接终止 B1_IBM 流程。
 1. 读取 `docs/issues/raw-{key}/issue.md`（Input）
 2. 读取边界文档：CONSTITUTION.md、LAWS.md、PROJECT_INTENT.md
 3. 读取依赖：已有 milestones.md、相关 epics
