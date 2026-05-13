@@ -513,19 +513,19 @@ def scan_classification(project: Path, platform_data: dict) -> list[dict]:
         title = issue.get("title", "")
         body = issue.get("body", "")
         combined = f"{title}\n{body}"
+        raw_key = None
         for m in re.finditer(r"(?:^|\W)(raw-(\d{8}T\d{4,6}Z))", combined, re.MULTILINE):
-            key = m.group(2)
-            if key:
-                break
-        else:
-            continue
+            raw_key = m.group(2)
+            break
         items.append({
-            "source_family": "classification", "key": f"raw-{num}",
+            "source_family": "classification",
+            "key": f"gh-{num}",
             "stage": "platform_only",
-            "detail": f"平台 # {num}: {title[:60]}",
+            "detail": f"#{num}: {title[:60]}",
             "platform_issue": num,
             "incomplete": ["no_local_raw"],
-            "ready": True, "next_action": f"./bin/wt-create --source platform --raw-key {key} --slug …",
+            "ready": True,
+            "next_action": f"./bin/wt-create --source platform --raw-key {raw_key} --slug …" if raw_key else f"gh issue view {num} --repo chatterzhao/freely",
         })
 
     # ── Dedup: same base key + same stage → one record ──
@@ -843,22 +843,25 @@ def scan_platform_issues(project: Path, platform_data: dict) -> list[dict]:
         body = issue.get("body", "")
         number = str(issue.get("number", ""))
         combined = f"{title}\n{body}"
+        raw_key = None
         for m in re.finditer(r"(?:^|\W)(raw-(\d{8}T\d{4,6}Z))", combined, re.MULTILINE):
-            key = m.group(2)
-            if key not in seen:
-                seen.add(key)
-                items.append({
-                    "source_family": "platform",
-                    "key": key,
-                    "stage": "platform_open",
-                    "platform": "github",
-                    "issue_number": number,
-                    "title": title,
-                    "ready": True,
-                    "incomplete": [],
-                    "next_action": "wt-create --source platform --raw-key " + key,
-                    "next_station": "raw_created",
-                })
+            raw_key = m.group(2)
+            break
+        key = raw_key if raw_key else f"gh-{number}"
+        if key not in seen:
+            seen.add(key)
+            items.append({
+                "source_family": "platform",
+                "key": key,
+                "stage": "platform_open",
+                "platform": "github",
+                "issue_number": number,
+                "title": title,
+                "ready": True,
+                "incomplete": [],
+                "next_action": f"wt-create --source platform --raw-key {raw_key}" if raw_key else f"gh issue view {number}",
+                "next_station": "raw_created" if raw_key else "",
+            })
 
     # ── Gitee ──
     if not os.environ.get("SKIP_PLATFORM_CHECK"):
