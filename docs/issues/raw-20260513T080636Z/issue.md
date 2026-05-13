@@ -3,6 +3,7 @@ local_id: raw-20260513T080636Z
 kind: raw
 phase_state: proposed
 status: proposed
+source_candidate: docs/pre-brainstorms/20260513T080636Z--acp-phase-state-cleanup/candidates.md#C-20260513T080636Z-A
 priority: P2
 source: platform
 created_at: '2026-05-13T09:49:13Z'
