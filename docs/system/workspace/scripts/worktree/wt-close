@@ -225,18 +225,17 @@ elif [[ "$SKIP_PLATFORM" == true ]]; then
   echo "wt-close: --skip-platform, skipping platform close"
 fi
 
-# ── Phase 3: phase_state force-update ──
+# ── Phase 3: Force-close trace (--force only) ──
 
 if [[ "$FORCE" == true && -n "$issue_id" && -f "${issue_file:-}" ]]; then
-  current_phase="$(_fm_get "$issue_file" "phase_state")"
-  if [[ "$current_phase" != "completed" ]]; then
-    if [[ "$DRY_RUN" == true ]]; then
-      _dry "update $issue_file phase_state=completed"
-    else
-      _fm_set_str "$issue_file" "phase_state" "completed"
-      _fm_set_str "$issue_file" "updated_at" "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-      echo "wt-close: force-updated phase_state=completed"
-    fi
+  ts="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+  if [[ "$DRY_RUN" == true ]]; then
+    _dry "write force_closed trace to $issue_file"
+  else
+    _fm_set_str "$issue_file" "force_closed_at" "$ts"
+    _fm_set_str "$issue_file" "force_closed_reason" "wt-close --force: worktree retired without completed phase_state"
+    _fm_set_str "$issue_file" "updated_at" "$ts"
+    echo "wt-close: force-closed $issue_id (force_closed trace written to frontmatter)"
   fi
 fi
 
