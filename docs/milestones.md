@@ -1378,6 +1378,21 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260503-0915--enforce-test-pre-merge/candidates.md`
 - next_action: Candidate mirror only. Feature branch ready, test-pre-merge worktree created, pending selfhost verification and merge to develop.
 
+30. `I-20260513T010343Z-A`
+- title: raw key seconds format cleanup — 4 regex fixes + 10+ doc updates
+- milestone_state: committed
+- phase_state: `in_dev`
+- priority: P1
+- issue_path: `docs/issues/I-20260513T010343Z-A/issue.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-raw-key-seconds-cleanup-followthrough.md`
+- source_candidate: `docs/pre-brainstorms/20260513T010343Z--raw-key-seconds-cleanup-followthrough/candidates.md#C-20260513T010343Z-A`
+- branch: `feature/raw-20260513T010343Z-raw-key-seconds-cleanup`
+- evidence:
+  - `docs/issues/I-20260513T010343Z-A/issue.md`
+  - `docs/issues/raw-20260513T010343Z/issue.md`
+  - `docs/progress/workspace-routing-foundation/p-raw-key-seconds-cleanup-followthrough.md`
+- next_action: `Merge to test-pre-merge, selfhost verify, then promote to develop.`
+
 ### completed_issues
 
 0. `I-20260504T1132Z-A`
@@ -4153,21 +4168,6 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/worker-active-reentry-for-manager-delegated-continuation-governance/issues/worker-active-reentry-for-manager-delegated-continuation-governance.md`
   - `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
 - completion_note: 当前 candidate 的旧 blocker 已被 canonical `develop` 否定并吸收：dispatch metadata 已成为 runtime contract，固定 numeric launch cap 已退场，parallel-safe prompts 会直接 launch，queue 只保留给 same-lane busy、单 wave 非并行限制与 `write_scope` 冲突。后续若要继续做更强的 scheduler fairness / quota / transaction 语义，应新开 lifecycle，而不是复活这条已收口的 research。
-
-30. `I-20260513T010343Z-A`
-- title: raw key seconds format cleanup — 4 regex fixes + 10+ doc updates
-- milestone_state: committed
-- phase_state: `in_dev`
-- priority: P1
-- issue_path: `docs/issues/I-20260513T010343Z-A/issue.md`
-- progress_path: `docs/progress/workspace-routing-foundation/p-raw-key-seconds-cleanup-followthrough.md`
-- source_candidate: `docs/pre-brainstorms/20260513T010343Z--raw-key-seconds-cleanup-followthrough/candidates.md#C-20260513T010343Z-A`
-- branch: `feature/raw-20260513T010343Z-raw-key-seconds-cleanup`
-- evidence:
-  - `docs/issues/I-20260513T010343Z-A/issue.md`
-  - `docs/issues/raw-20260513T010343Z/issue.md`
-  - `docs/progress/workspace-routing-foundation/p-raw-key-seconds-cleanup-followthrough.md`
-- next_action: `Merge to test-pre-merge, selfhost verify, then promote to develop.`
 
 1. `C-20260501-0000-A`
 - title: PR scan surface + FREELY_REPO_PLATFORMS config

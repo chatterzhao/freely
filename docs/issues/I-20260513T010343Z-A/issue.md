@@ -15,7 +15,7 @@ updated_at: '2026-05-13T01:03:43Z'
 promoted_from: C-20260513T010343Z-A
 source_candidate: docs/pre-brainstorms/20260513T010343Z--raw-key-seconds-cleanup-followthrough/candidates.md#C-20260513T010343Z-A
 pre_tests_path: ''
-verification_artifact_dir: 'docs/issues/I-20260513T010343Z-A/verification/'
+verification_artifact_dir: 'docs/epics/workspace-routing-foundation/raw-key-seconds-cleanup/code-reviews/'
 platform_state: open
 ---
 
