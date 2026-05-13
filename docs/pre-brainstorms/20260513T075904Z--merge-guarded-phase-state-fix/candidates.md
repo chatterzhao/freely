@@ -5,4 +5,5 @@
 - scope: merge-guarded _sync_issues_changed_in_merge reads fm.get('phase_state', fm.get('status', ''))
 - priority: P1
 - status: promoted
+- milestone: M-20260513T075904Z-A
 - promoted_issue_id: I-20260513T075904Z-A
