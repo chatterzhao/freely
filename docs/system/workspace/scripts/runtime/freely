@@ -19069,6 +19069,13 @@ start_project_runtime() {
         log_info "normalized rc=1→0: clean SessionEnd detected in debug log"
       fi
     fi
+    # Normalize rc=1→0: end_turn received before disconnect (Broken pipe tolerance)
+    if [[ "${rc:-0}" != "0" && -f "$cycle_log" ]]; then
+      if grep -q 'stop_reason=end_turn' "$cycle_log" 2>/dev/null; then
+        rc=0
+        log_info "normalized rc=1→0: end_turn received before disconnect"
+      fi
+    fi
     LAST_WORKCELL_EXIT_REASON="${slot_switch_reason:-${rate_limit_reason:-${network_failure_reason:-ai_exit_rc_${rc}}}}"
     write_workcell_state "$project" "running" "up" "down" "$LAST_WORKCELL_EXIT_REASON"
     materialize_blocked_supervision_truth_if_needed "$PROJECT_ROOT" "$prompt_file" "$LAST_WORKCELL_EXIT_REASON" "$cycle_log"

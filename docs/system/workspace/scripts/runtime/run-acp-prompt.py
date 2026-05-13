@@ -485,6 +485,8 @@ def main():
                 else:
                     time.sleep(0.5)  # poll interval
     finally:
+        if stop_reason == "end_turn" and not args.loop:
+            time.sleep(2)  # grace period for bridge to finish sending notifications
         if args.loop:
             try:
                 client.request("session/close", {"sessionId": session_id}, timeout=10)

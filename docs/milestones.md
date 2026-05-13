@@ -33,6 +33,21 @@
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260513T080636Z-A/issue.md`
 
+## M-20260503T1428Z-A
+- title: bridge disconnect fix — end_turn grace period + broken pipe tolerance
+- status: active
+### candidate_issues
+1. `C-20260503T1428Z-A`
+- milestone: M-20260503T1428Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260503T1428Z-A/issue.md`
+### completed_issues
+1. `I-20260503T1428Z-A`
+- title: bridge disconnect fix
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260503T1428Z-A/issue.md`
+
 ## M-20260511T0731Z-A
 - title: 同工位并发防护
 - status: active
