@@ -3,6 +3,7 @@ local_id: I-20260513T075904Z-A
 kind: linked
 phase_state: completed
 promoted_from: raw-20260513T075904Z
+source_candidate: docs/issues/raw-20260513T075904Z/issue.md
 verification_artifact_dir: docs/epics/merge-guarded-phase-state-fix/code-reviews
 pre_tests_path: docs/epics/merge-guarded-phase-state-fix/verification/pre-tests.md
 platform_ids:

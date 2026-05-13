@@ -1,5 +1,5 @@
 # Code Review
-- issue_id: raw-20260513T075904Z
+- issue_id: I-20260513T075904Z-A
 ## Implementation Decision Note
 - decision: merge-guarded post-merge sync reads `phase_state` with `status` fallback
 - why_this: I-* linked issues use `phase_state` as authoritative field since state refactoring (2026-05-05); `fm.get('status')` returns empty for all migrated issues, so `linked/completed` never matched
