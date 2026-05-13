@@ -1,0 +1,18 @@
+---
+local_id: I-20260513T080636Z-A
+kind: linked
+phase_state: completed
+promoted_from: raw-20260513T080636Z
+source_candidate: docs/pre-brainstorms/20260513T080636Z--acp-phase-state-cleanup/candidates.md#C-20260513T080636Z-A
+verification_artifact_dir: docs/epics/acp-phase-state-cleanup/code-reviews
+pre_tests_path: docs/epics/acp-phase-state-cleanup/verification/pre-tests.md
+platform_ids:
+  github:
+    issue_id: '330'
+    url: https://github.com/chatterzhao/freely/issues/330
+    synced_at: '2026-05-13T08:06:45Z'
+primary_platform: github
+platform_state: open
+---
+
+# I-20260513T080636Z-A: update stale ACP issue phase_state to completed
