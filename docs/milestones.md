@@ -11,10 +11,10 @@
 - milestone: M-20260513T075904Z-A
 - status: promoted
 - promoted_issue_path: `docs/issues/I-20260513T075904Z-A/issue.md`
-### committed_issues
+### completed_issues
 1. `I-20260513T075904Z-A`
 - title: merge-guarded post-merge sync phase_state fix
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260513T075904Z-A/issue.md`
 
