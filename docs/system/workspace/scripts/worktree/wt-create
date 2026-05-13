@@ -25,13 +25,11 @@ Optional:
   --base <branch>     Base branch (default: develop)
 
 What it creates:
-  1. test-pre-merge-{raw-key}-{slug}  ← based on --base (develop)
-  2. {prefix}/raw-{raw-key}-{slug}    ← based on ① (test-pre-merge)
+  1. {prefix}/raw-{raw-key}-{slug}    ← based on --base (develop), the permanent dev worktree
      prefix is derived from --skill:
        freely-fix-execution   → fix/raw-{raw-key}-{slug}
        freely-feat-execution  → feature/raw-{raw-key}-{slug}
-
-  This makes {prefix}/* → test-pre-merge a fast-forward merge.
+  2. test-pre-merge-{raw-key}-{slug}  ← based on ①, discardable testing sandbox
 
 Examples:
   ./bin/wt-create --raw-key 20260506T100035Z --source platform \
@@ -582,9 +580,9 @@ _require_issue_exists "$fix_branch" || exit 1
 ║  base:            $fix_branch
 ╠══════════════════════════════════════════════════════════╣
 ║  Merge chain:                                           ║
-║    $fix_branch → $test_pre_merge_branch → develop
+║    $fix_branch → develop
 ║                                                        ║
-║  测试用 test-pre-merge，删除不影响 ${prefix} 工位        ║
+║  test-pre-merge 是丢弃的测试沙箱，不参与合并链             ║
 ╚══════════════════════════════════════════════════════════╝
 MSG
 
