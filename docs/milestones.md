@@ -536,7 +536,7 @@ routing_policy:
 30. `I-20260513T010343Z-A`
 - title: raw key seconds format cleanup — 4 regex fixes + 10+ doc updates
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - priority: P1
 - issue_path: `docs/issues/I-20260513T010343Z-A/issue.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-raw-key-seconds-cleanup-followthrough.md`
