@@ -148,7 +148,7 @@ Freely 必须在 Freely 治理规则下开发，不得有项目特定的例外�
 - 若当前项目的 Freely runtime 已在运行，优先通过 `./bin/freely chat --project <project-root> <message>` 这类 human interruption / intake 入口指导它继续开发；不要绕过 runtime 另造一套平行调度。
 - 若在插话驱动的开发过程中发现 bug、缺口或新的能力沉淀点，仍按同一治理规则处理：必要时让 Freely 创建/进入 dedicated worktree 修复、验证、合并到 `develop`、重启 runtime，再继续通过 interruption 推进。
 - 优先使用预检 + 可操作的修复方案，而非重复的权限提示。
-- Hook/gate bypass 默认禁止，不得自行决定 `--no-verify` 或等效绕过。break-glass 不是"改动小、赶时间、文档麻烦"时的快捷通道：LAWS.md §2D §10 列举的禁止情形（赶时间、已人工看过、只是 docs/cleanup）一律不成立。gate 报文档缺失就去修文档，gate 报测试缺失就去补测试；不要用 `verified_false_negative` 包装"我不认同门禁判断"。仅当 gate 的事实断言本身与当前 merge diff 不一致（如 gate 声称某文件缺失但该文件确实存在于 diff 中）时，才可能构成合法 break-glass。所有 break-glass 必须按 LAWS.md §2D 的白名单理由、证据字段和最小作用域执行。
+- Hook/gate bypass 永久禁止，不得自行决定 `--no-verify` 或等效绕过。`FREELY_SKIP_IBM_GATE=1` 是唯一合法豁免，仅跳过 IBM 文档门禁。gate 报文档缺失就去修文档，gate 报测试缺失就去补测试；gate 误判应修正 gate 模式，不得绕过。
 - 当主管委派 worker 时，worker prompt 必须带稳定的 machine-readable `Worktree:` 与 `Branch:` header；自然语言说明可以补充，但不能替代 runtime 可消费的目标工位锚点。
 - 若主管同轮排多个 lane，worker prompt 还必须带 `dispatch_priority`、`parallel_safe`、`write_scope`；超出 capacity 或冲突的 lane 只能进入 queue / frozen queue，不得直接 launch。
 
