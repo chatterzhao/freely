@@ -46,12 +46,6 @@ MSG
   exit 0
 fi
 
-break_glass_reason="${FREELY_BREAK_GLASS_REASON:-}"
-break_glass_blocked_gate="${FREELY_BLOCKED_GATE:-}"
-break_glass_follow_on_issue="${FREELY_FOLLOW_ON_ISSUE:-}"
-break_glass_operation_scope="${FREELY_OPERATION_SCOPE:-}"
-break_glass_evidence_refs="${FREELY_EVIDENCE_REFS:-}"
-
 load_guarded_state() {
   [[ -n "$guarded_state_path" && -f "$guarded_state_path" ]] || return 1
   guarded_state_target=""
@@ -115,71 +109,6 @@ MSG
 
 require_valid_guarded_merge_state
 
-if [[ -n "$break_glass_reason$break_glass_blocked_gate$break_glass_follow_on_issue$break_glass_operation_scope$break_glass_evidence_refs" ]]; then
-  case "$break_glass_reason" in
-    tooling_unavailable|verified_false_negative) ;;
-    *)
-      cat <<MSG
-[HOOK] Merge blocked: unsupported break-glass reason '$break_glass_reason'.
-
-Policy source: docs/LAWS.md §2D
-MSG
-      exit 1
-      ;;
-  esac
-
-  case "$break_glass_blocked_gate" in
-    pre-commit|pre-merge-commit|governance-merge-gate|governance-promotion-gate|pretests-gate|checkpoint-guard) ;;
-    *)
-      cat <<MSG
-[HOOK] Merge blocked: unsupported break-glass blocked gate '$break_glass_blocked_gate'.
-
-Policy source: docs/LAWS.md §2D
-MSG
-      exit 1
-      ;;
-  esac
-
-  if [[ "$break_glass_operation_scope" != "merge_completion_only" ]]; then
-    cat <<MSG
-[HOOK] Merge blocked: break-glass scope must be 'merge_completion_only'.
-
-Policy source: docs/LAWS.md §2D
-MSG
-    exit 1
-  fi
-
-  if [[ -z "$break_glass_follow_on_issue" || -z "$break_glass_evidence_refs" ]]; then
-    cat <<MSG
-[HOOK] Merge blocked: break-glass requires follow-on issue and at least one evidence reference.
-
-Policy source: docs/LAWS.md §2D
-MSG
-    exit 1
-  fi
-
-  if [[ "$guarded_state_bypass" != "break_glass" ]]; then
-    cat <<MSG
-[HOOK] Merge blocked: guarded merge completion state does not authorize break-glass completion.
-Policy source: docs/LAWS.md §2D
-MSG
-    exit 1
-  fi
-
-  cat <<MSG
-[HOOK] Break-glass acknowledged for develop merge completion.
-
-- reason: $break_glass_reason
-- blocked_gate: $break_glass_blocked_gate
-- operation_scope: $break_glass_operation_scope
-- follow_on_issue: $break_glass_follow_on_issue
-- evidence_refs: $break_glass_evidence_refs
-
-Policy source: docs/LAWS.md §2D
-MSG
-  exit 0
-fi
-
 if git diff --cached --quiet --diff-filter=ACMR --; then
   exit 0
 fi
@@ -199,8 +128,7 @@ if [[ "$gate_rc" -ne 0 ]]; then
 
 $gate_output
 
-Fix the candidate -> milestone -> IBM issue chain in the source writable worktree, and make sure the owner pre-tests reflect real test work or lawful non-test waivers with traceable evidence before rerunning the guarded merge from the canonical lane. Do not clear this gate by only filling metadata.
-Only use break-glass if this failure matches docs/LAWS.md §2D and the merge can stay within merge_completion_only scope.
+Fix the candidate -> milestone -> IBM issue chain in the source writable worktree before rerunning the guarded merge.
 Policy source: docs/LAWS.md §2C, §2D
 MSG
   exit "$gate_rc"
@@ -224,7 +152,6 @@ if [[ "$promotion_rc" -ne 0 ]]; then
 $promotion_output
 
 Let the current promotion owner finish or reclaim ownership through manager arbitration before merging to develop.
-Only use break-glass if this failure matches docs/LAWS.md §2D and the merge can stay within merge_completion_only scope.
 MSG
   exit "$promotion_rc"
 fi
