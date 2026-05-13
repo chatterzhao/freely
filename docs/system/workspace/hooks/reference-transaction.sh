@@ -32,7 +32,7 @@ commit_has_canonical_receipt() {
   local body=""
   body="$(git show --no-patch --format=%B "$commit" 2>/dev/null || true)"
   [[ -n "$body" ]] || return 1
-  grep -Eq '^Freely-Merge-Path: (merge-guarded|merge-guarded-complete|merge-guarded-break-glass)$' <<<"$body"
+  grep -Eq '^Freely-Merge-Path: (merge-guarded|merge-guarded-complete)$' <<<"$body"
 }
 
 commit_is_merge_commit() {

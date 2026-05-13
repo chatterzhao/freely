@@ -93,11 +93,11 @@ MSG
   }
 
   case "$merge_path" in
-    merge-guarded|merge-guarded-complete|merge-guarded-break-glass) ;;
+    merge-guarded|merge-guarded-complete) ;;
     *)
       cat <<MSG
 [HOOK] Commit blocked: invalid Freely-Merge-Path '$merge_path'.
-Valid: merge-guarded, merge-guarded-complete, merge-guarded-break-glass
+Valid: merge-guarded, merge-guarded-complete
 Policy source: docs/LAWS.md §2D
 MSG
       exit 1
@@ -113,11 +113,11 @@ MSG
   }
 
   case "$bypass_mode" in
-    forbidden|break_glass) ;;
+    forbidden) ;;
     *)
       cat <<MSG
 [HOOK] Commit blocked: invalid Freely-Bypass-Mode '$bypass_mode'.
-Valid: forbidden, break_glass
+Valid: forbidden
 Policy source: docs/LAWS.md §2D
 MSG
       exit 1
@@ -132,83 +132,4 @@ MSG
     exit 1
   }
 
-  if [[ "$bypass_mode" == "break_glass" ]]; then
-    break_glass_reason="$(printf '%s\n' "$msg" | grep -E '^Freely-Break-Glass-Reason:' | tail -1 | sed 's/^Freely-Break-Glass-Reason: *//')"
-    blocked_gate="$(printf '%s\n' "$msg" | grep -E '^Freely-Blocked-Gate:' | tail -1 | sed 's/^Freely-Blocked-Gate: *//')"
-    operation_scope="$(printf '%s\n' "$msg" | grep -E '^Freely-Operation-Scope:' | tail -1 | sed 's/^Freely-Operation-Scope: *//')"
-    follow_on_issue="$(printf '%s\n' "$msg" | grep -E '^Freely-Follow-On-Issue:' | tail -1 | sed 's/^Freely-Follow-On-Issue: *//')"
-
-    [[ -n "$break_glass_reason" ]] || {
-      cat <<MSG
-[HOOK] Commit blocked: break-glass requires Freely-Break-Glass-Reason trailer.
-Policy source: docs/LAWS.md §2D
-MSG
-      exit 1
-    }
-
-    case "$break_glass_reason" in
-      tooling_unavailable|verified_false_negative) ;;
-      *)
-        cat <<MSG
-[HOOK] Commit blocked: unsupported break-glass reason '$break_glass_reason'.
-Valid: tooling_unavailable, verified_false_negative
-Policy source: docs/LAWS.md §2D
-MSG
-        exit 1
-        ;;
-    esac
-
-    [[ -n "$blocked_gate" ]] || {
-      cat <<MSG
-[HOOK] Commit blocked: break-glass requires Freely-Blocked-Gate trailer.
-Policy source: docs/LAWS.md §2D
-MSG
-      exit 1
-    }
-
-    case "$blocked_gate" in
-      pre-commit|pre-merge-commit|governance-merge-gate|governance-promotion-gate|pretests-gate|checkpoint-guard) ;;
-      *)
-        cat <<MSG
-[HOOK] Commit blocked: unsupported break-glass blocked gate '$blocked_gate'.
-Valid: pre-commit, pre-merge-commit, governance-merge-gate, governance-promotion-gate, pretests-gate, checkpoint-guard
-Policy source: docs/LAWS.md §2D
-MSG
-        exit 1
-        ;;
-    esac
-
-    [[ -n "$operation_scope" ]] || {
-      cat <<MSG
-[HOOK] Commit blocked: break-glass requires Freely-Operation-Scope trailer.
-Policy source: docs/LAWS.md §2D
-MSG
-      exit 1
-    }
-
-    if [[ "$operation_scope" != "merge_completion_only" ]]; then
-      cat <<MSG
-[HOOK] Commit blocked: break-glass scope must be 'merge_completion_only'.
-Policy source: docs/LAWS.md §2D
-MSG
-      exit 1
-    fi
-
-    [[ -n "$follow_on_issue" ]] || {
-      cat <<MSG
-[HOOK] Commit blocked: break-glass requires Freely-Follow-On-Issue trailer.
-Policy source: docs/LAWS.md §2D
-MSG
-      exit 1
-    }
-
-    evidence_count="$(printf '%s\n' "$msg" | grep -cE '^Freely-Evidence-Ref:' || true)"
-    [[ "$evidence_count" -gt 0 ]] || {
-      cat <<MSG
-[HOOK] Commit blocked: break-glass requires at least one Freely-Evidence-Ref trailer.
-Policy source: docs/LAWS.md §2D
-MSG
-      exit 1
-    }
-  fi
 fi

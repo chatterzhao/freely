@@ -104,12 +104,10 @@ IBM 仪式（raw issue → candidate → I-issue）仅在下述情况可跳过�
 满足 → `FREELY_SKIP_IBM_GATE=1` 跳过 IBM gate，但仍在工位改、走 merge-guarded
 不满足 → 走完整 IBM 流程
 
-**严格禁止**：`core.hooksPath=""`、`--no-verify`、或任何其他绕过 hook 的方式。这些绕过全部保护（包括禁止 develop commit），不存在合法使用场景。违反即治理违规。
+**严格禁止**：`core.hooksPath=""`、`--no-verify`、或任何其他绕过 hook 的方式。永久禁止，无例外。
 
-> 即使跳过 IBM，也必须通过 `merge-guarded` 合并到 develop。禁止绕过的含义是"禁止跳过运行时安全检查"，不是"禁止跳过文档工作"。
->
-> IBM 门禁临时绕过：`FREELY_SKIP_IBM_GATE=1`。仅跳过 governance gate，分支保护仍然生效。仅在以上"可跳过"场景使用。
-> **禁止使用 `core.hooksPath=""` 或 `--no-verify`**——它们绕过所有保护（包括 develop 禁止 commit），不是合法的 IBM 绕过方式。只有 break-glass（`docs/LAWS.md §2D`）可以使用完整的 guarded merge completion。
+> IBM 门禁临时绕过：`FREELY_SKIP_IBM_GATE=1`。这是唯一合法的 bypass。仅跳过 governance gate，分支保护仍然生效。仅在以上"可跳过"场景使用。
+> **禁止使用 `core.hooksPath=""` 或 `--no-verify`**——它们绕过所有保护，不存在合法使用场景。
 
 ## 禁止
 

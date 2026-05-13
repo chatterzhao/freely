@@ -46,8 +46,8 @@ Freely 是一个自主循环运行器：
 - `PRE_TEST` 与 `TEST` 的职责边界由 `docs/LAWS.md` 第 2 章与第 11 章定义。
 - develop-bound 能力若先进入 `test-pre-merge-*`，验证通过后应由当前权威 `test-pre-merge-*` 批次并入 `develop`，并保留来源 feature / bundle 追溯证据；不得绕回 `feature/* -> develop` 继续保留第二条正常路径。
 - `test-pre-merge-*` 的退出形态固定为：验证结束后立即删除；若同一能力仍要继续验证，只能从当前 `develop` 重新创建新批次。
-- `main` / `develop` / `test-pre-merge-*` 上，hook/gate bypass 默认违规；只有 `docs/LAWS.md` 明确定义的 break-glass 白名单场景，才允许最小化例外路径。
-- 合法 break-glass 也必须留下可追溯 receipt，并在后续 canonical gate 中可被审计；个人判断“这次应该没问题”不能构成 protected-branch bypass 的依据。
+- `main` / `develop` / `test-pre-merge-*` 上，hook/gate bypass 永久禁止。`FREELY_SKIP_IBM_GATE=1` 是唯一合法豁免。
+“这次应该没问题”不能构成 protected-branch bypass 的依据。
 
 `premerge` 临时分支规则（用于复杂冲突收敛，不新增长期分支层级）：
 - 分支名固定使用：`feature/premerge-YYYYMMDDTHHMM[SS]Z--<topic>`（旧格式 `YYYYMMDD-HHMM` 仍兼容）。
@@ -91,7 +91,7 @@ Freely 是一个自主循环运行器：
 5. 执行：
 - Git 钩子应在本地工作流中强制分支保护。
 - 钩子拒绝消息必须指向本宪法章节作为策略来源。
-- 受保护分支上的 hook/gate bypass（包括但不限于 `--no-verify`）默认违规；只有 `docs/LAWS.md` 明确定义的 break-glass 白名单场景才允许临时豁免。
+- 受保护分支上的 hook/gate bypass（包括但不限于 `--no-verify`）永久禁止。无例外。
 - break-glass 不能仅凭个人口头判断成立；必须留下可审计证据，并且后续 canonical 治理检查必须能识别该次豁免。
 - 执行步骤以 `docs/system/workspace/skills/` 为执行事实源（How）；技能路由与验收门以 `docs/LAWS.md` 为准。
 - **分支规则表**：
