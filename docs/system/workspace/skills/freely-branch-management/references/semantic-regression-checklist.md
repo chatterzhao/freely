@@ -11,10 +11,9 @@
 - 在项目根目录内创建 worktree 必须保持禁止。
 
 3. Pre-brainstorms 命名意图：
-- 新记录 ID 使用 `YYYYMMDDTHHMMZ--<topic>`。
+- 新记录 ID 使用 `YYYYMMDDTHHMM[SS]Z--<topic>`。
 
-4. Premerge 策略意图：
-- 临时协调分支名使用 `feature/premerge-YYYYMMDDTHHMMZ--<topic>`。
+- 临时协调分支名使用 `feature/premerge-YYYYMMDDTHHMM[SS]Z--<topic>`。
 - 协调流程从 `test-pre-merge-*` 批次开始并合并回所属批次。
 
 5. 决策方法：

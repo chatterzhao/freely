@@ -50,7 +50,7 @@ Freely 是一个自主循环运行器：
 - 合法 break-glass 也必须留下可追溯 receipt，并在后续 canonical gate 中可被审计；个人判断“这次应该没问题”不能构成 protected-branch bypass 的依据。
 
 `premerge` 临时分支规则（用于复杂冲突收敛，不新增长期分支层级）：
-- 分支名固定使用：`feature/premerge-YYYYMMDDTHHMMZ--<topic>`（旧格式 `YYYYMMDD-HHMM` 仍兼容）。
+- 分支名固定使用：`feature/premerge-YYYYMMDDTHHMM[SS]Z--<topic>`（旧格式 `YYYYMMDD-HHMM` 仍兼容）。
 - 必须从当前活跃的 `test-pre-merge-*` 批次创建；若当前没有测试批次，则先从 `develop` 创建新的 `test-pre-merge-*`，再进入 `premerge`（具体命令步骤由 `skill:freely-premerge-reconcile` 定义）。
 - 仅在以下场景使用：
   - 多个 `feature/*` 串行并入 `test-pre-merge-*` 时出现复杂冲突，且无法在单次 merge 中稳定解决。

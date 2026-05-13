@@ -623,7 +623,7 @@ def scan_chat_inbox(project: Path) -> list[dict]:
 
 
 # ── Full lifecycle chain trace ──────────────────────────
-# The invariant key (YYYYMMDDTHHMMZ or YYYYMMDD-HHMM) flows through every station:
+# The invariant key (YYYYMMDDTHHMM[SS]Z or YYYYMMDD-HHMM[SS]) flows through every station:
 #   raw-{key} → {key}--* (B1 dir) → C-{key}-* (candidate) → I-{key}-* (issue)
 #   → M-* (milestone) → branch → platform → closeout
 

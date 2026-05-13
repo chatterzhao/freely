@@ -66,7 +66,7 @@ test-pre-merge-* 上的操作:
 | `test-pre-merge-*` | ❌ | ❌ | 预集成验证批次 / 私有测试沙箱 |
 | `fix/*` | ✅ | ✅ | bug 修复专用 |
 | `feature/*` | ✅ | ✅ | 功能开发 |
-| `feature/premerge-*` | ✅ | ✅ | 冲突收敛（格式: `feature/premerge-YYYYMMDDTHHMMZ--<topic>`） |
+| `feature/premerge-*` | ✅ | ✅ | 冲突收敛（格式: `feature/premerge-YYYYMMDDTHHMM[SS]Z--<topic>`） |
 | `hotfix/*` | ✅ | ✅ | 紧急 fix，可直达 develop |
 
 合并路径（来自 merge-guarded）:

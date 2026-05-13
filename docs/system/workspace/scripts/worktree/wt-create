@@ -8,7 +8,7 @@ Usage:
   ./bin/wt-create <branch> [--base <base-branch>]    (legacy, single worktree)
 
 Required:
-  --raw-key <key>     Raw issue key (YYYYMMDDTHHMMZ format)
+  --raw-key <key>     Raw issue key (YYYYMMDDTHHMM[SS]Z format, e.g. 20260513T010343Z)
   --source  <source>  Where the raw issue comes from:
                         chat-inbox  — freely.db chats 表
                         platform    — GitHub/Gitee OPEN issue
@@ -34,10 +34,10 @@ What it creates:
   This makes {prefix}/* → test-pre-merge a fast-forward merge.
 
 Examples:
-  ./bin/wt-create --raw-key 20260506T1000Z --source platform \
+  ./bin/wt-create --raw-key 20260506T100035Z --source platform \
     --skill freely-fix-execution --slug task-mode-wait-prelaunch-gate
 
-  ./bin/wt-create --raw-key 20260506T1000Z --source chat-inbox \
+  ./bin/wt-create --raw-key 20260506T100035Z --source chat-inbox \
     --skill freely-feat-execution --slug new-auth-module
 
 Legacy:
@@ -185,10 +185,10 @@ fi
 if [[ "$using_new" -eq 1 ]]; then
   if echo "$raw_key" | grep -qE '^[0-9]{8}T[0-9]{4,6}Z$'; then
     : # valid
-  elif echo "$raw_key" | grep -qE '^[0-9]{8}-[0-9]{4}$'; then
-    echo "警告: raw-key '$raw_key' uses legacy format. Prefer YYYYMMDDTHHMMZ." >&2
+  elif echo "$raw_key" | grep -qE '^[0-9]{8}-[0-9]{4,6}$'; then
+    echo "警告: raw-key '$raw_key' uses legacy format. Prefer YYYYMMDDTHHMM[SS]Z." >&2
   else
-    echo "Invalid raw-key format '$raw_key'. Expected YYYYMMDDTHHMMZ (e.g., 20260506T1000Z)." >&2
+    echo "Invalid raw-key format '$raw_key'. Expected YYYYMMDDTHHMM[SS]Z (e.g., 20260513T010343Z)." >&2
     exit 1
   fi
 fi
