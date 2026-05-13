@@ -3,6 +3,21 @@
 
 本文件是 Freely 自举开发时的主动扫描入口，用来承接已进入活跃范围的 candidate / issue。
 
+## M-20260513T080636Z-A
+- title: stale ACP issue phase_state cleanup
+- status: active
+### candidate_issues
+1. `C-20260513T080636Z-A`
+- milestone: M-20260513T080636Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260513T080636Z-A/issue.md`
+### completed_issues
+1. `I-20260513T080636Z-A`
+- title: update stale ACP issue phase_state to completed
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260513T080636Z-A/issue.md`
+
 ## M-20260511T0731Z-A
 - title: 同工位并发防护
 - status: active
