@@ -50,7 +50,7 @@ MSG
          ! echo "$local_branch" | grep -qoE 'I-[0-9]{8}[-T][0-9]{4,6}Z?(-[A-Z0-9]+)?'; then
         cat >&2 <<MSG
 [HOOK] Push blocked: branch '$local_branch' must contain an issue key.
-Format: feature/raw-{YYYYMMDD}-{HHMM}-{slug} or feature/raw-{YYYYMMDDTHHMMZ}-{slug}
+Format: feature/raw-{YYYYMMDD}-{HHMM[SS]}-{slug} or feature/raw-{YYYYMMDDTHHMM[SS]Z}-{slug}
 Each worktree/branch must correspond to an issue (docs/LAWS.md §2).
 Use 'git branch -m' to rename.
 MSG

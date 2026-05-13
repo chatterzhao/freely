@@ -9664,7 +9664,7 @@ materialize_cleanup_worker_prompt_from_manager_continuity_if_needed() {
     # 如果是保护工位，查找配对的可写工位
     if [[ "$primary_branch" == test-pre-merge-* ]]; then
       local raw_key companion_wt companion_branch
-      raw_key="$(echo "$primary_branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1)"
+      raw_key="$(echo "$primary_branch" | grep -oE '[0-9]{8}T[0-9]{4,6}Z' | head -1)"
       if [[ -n "$raw_key" ]]; then
         companion_wt="$(git -C "$ROOT_DIR" worktree list --porcelain 2>/dev/null | awk -v key="$raw_key" '
           /^worktree / { wt=$2 }
@@ -12066,7 +12066,7 @@ except: pass
       _handoff_id=""
       if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
         _handoff_id=$(python3 "$_handoff_py" insert --db "$_db_path" \
-          --role worker --raw-key "$(echo "$_prompt_file" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1)" \
+          --role worker --raw-key "$(echo "$_prompt_file" | grep -oE '[0-9]{8}T[0-9]{4,6}Z' | head -1)" \
           --prompt-file "$_prompt_file" --created-by manager --consumed-by worker 2>/dev/null || true)
       fi
       # Inject handoff metadata so worker can report completion to manager's central DB
@@ -13339,7 +13339,7 @@ python3 $HP update --db $DB --handoff-id <handoff_id> --status completed \
   Worktree:
   - /absolute/path/to/worktree
   Branch:
-  - fix/raw-YYYYMMDDTHHMMZ-<slug>
+  - fix/raw-YYYYMMDDTHHMM[SS]Z-<slug>
   dispatch_priority: P2
   parallel_safe: true
   write_scope: worktree
@@ -13581,7 +13581,7 @@ autofill_manager_exit_contract_for_cleanup_delegate_workers_if_possible() {
   _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
   _db_path=""$project/.freely/freely.db""
   if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
-    _raw_key=$(echo "$continuity_file" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || echo "autofill")
+    _raw_key=$(echo "$continuity_file" | grep -oE '[0-9]{8}T[0-9]{4,6}Z' | head -1 || echo "autofill")
     local IFS=","
     for _prompt_file in $worker_prompts_csv; do
       [[ -n "$_prompt_file" && -f "$_prompt_file" ]] || continue
@@ -13628,7 +13628,7 @@ autofill_manager_exit_contract_for_continuity_resume_if_possible() {
   _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
   _db_path=""$project/.freely/freely.db""
   if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
-    _raw_key=$(echo "$continuity_file" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || echo "autofill")
+    _raw_key=$(echo "$continuity_file" | grep -oE '[0-9]{8}T[0-9]{4,6}Z' | head -1 || echo "autofill")
     python3 "$_handoff_py" insert --db "$_db_path" \
       --role manager --raw-key "$_raw_key" \
       --prompt-file "$continuity_file" --created-by manager --consumed-by manager \

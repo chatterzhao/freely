@@ -542,6 +542,12 @@ routing_policy:
 - intent: 把首跳路由治理候选正式纳入 milestone，避免 Freely 自己继续依赖悬空 candidate 工作
 - why_now: 这批项定义 Freely 如何发现上下文、读取 milestone、并路由到下一跳 skill；如果 milestone 自身不先落盘，Freely 的狗粮链路就是断的
 
+### candidate_issues
+1. `C-20260513T010343Z-A`
+- milestone: M-20260306-workspace-routing-foundation
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260513T010343Z-A/issue.md`
+
 ### committed_issues
 1. `I-20260503-0200-A`
 - title: scan: switch to task-lifecycle-scan v2 with full lifecycle chain trace
@@ -552,6 +558,21 @@ routing_policy:
 - progress_path: `docs/progress/workspace-routing-foundation/p-scan-lifecycle-migration.md`
 - source_candidate: `docs/pre-brainstorms/20260503-0200--scan-lifecycle-migration/candidates.md#C-20260503-0200-A`
 - next_action: `Merge to develop.`
+
+30. `I-20260513T010343Z-A`
+- title: raw key seconds format cleanup — 4 regex fixes + 10+ doc updates
+- milestone_state: committed
+- phase_state: `completed`
+- priority: P1
+- issue_path: `docs/issues/I-20260513T010343Z-A/issue.md`
+- progress_path: `docs/progress/workspace-routing-foundation/p-raw-key-seconds-cleanup-followthrough.md`
+- source_candidate: `docs/pre-brainstorms/20260513T010343Z--raw-key-seconds-cleanup-followthrough/candidates.md#C-20260513T010343Z-A`
+- branch: `feature/raw-20260513T010343Z-raw-key-seconds-cleanup`
+- evidence:
+  - `docs/issues/I-20260513T010343Z-A/issue.md`
+  - `docs/issues/raw-20260513T010343Z/issue.md`
+  - `docs/progress/workspace-routing-foundation/p-raw-key-seconds-cleanup-followthrough.md`
+- next_action: `Merge to test-pre-merge, selfhost verify, then promote to develop.`
 
 8. `I-20260502-0500-C`
 - title: Token 花费优化

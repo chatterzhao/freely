@@ -60,7 +60,7 @@ scan 没有发现任务时，写 `stop_ai` 并说明原因。不要循环重启�
 
 ## 命名约定
 
-`raw-key` 是 `YYYYMMDDTHHMMZ` 格式的时间戳。`raw-{raw-key}` 即 `raw-YYYYMMDDTHHMMZ`，就是 raw issue 的 local_id。
+`raw-key` 是 `YYYYMMDDTHHMM[SS]Z` 格式的时间戳。`raw-{raw-key}` 即 `raw-YYYYMMDDTHHMM[SS]Z`，就是 raw issue 的 local_id。
 
 例如 `raw-key=20260511T1029Z` → raw issue id = `raw-20260511T1029Z`。
 
@@ -77,7 +77,7 @@ raw issue → B1_IBM → candidate → B2_IBM → I-issue → dev-loop → merge
 
 ## 分支规范
 
-- 命名：`fix/raw-{YYYYMMDDTHHMMZ}-{slug}` / `feature/raw-{YYYYMMDDTHHMMZ}-{slug}`
+- 命名：`fix/raw-{YYYYMMDDTHHMM[SS]Z}-{slug}` / `feature/raw-{YYYYMMDDTHHMM[SS]Z}-{slug}`
 - 创建：`wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>`
 - 合并：`fix/feature → test-pre-merge-* → develop`（测试通过后可直达 develop）
 - `test-pre-merge-*` 临时测试面，用完即删，不可 commit/push
