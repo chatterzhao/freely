@@ -2,7 +2,7 @@
 local_id: I-20260513T010343Z-A
 kind: linked
 status: commited
-phase_state: in_dev
+phase_state: completed
 platform_ids:
   github:
     issue_id: '326'

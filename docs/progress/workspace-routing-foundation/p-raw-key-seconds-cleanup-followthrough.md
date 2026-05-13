@@ -1,7 +1,7 @@
 # Progress — 秒级 raw key 格式清理跟进
 
 - issue_id: `I-20260513T010343Z-A`
-- phase_state: `in_dev`
+- phase_state: `completed`
 - updated_at: `2026-05-13T01:03:43Z`
 
 ## Status
