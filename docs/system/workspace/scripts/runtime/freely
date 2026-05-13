@@ -18385,6 +18385,9 @@ ensure_no_active_supervisor_conflict() {
 start_project_runtime() {
   local project="$1" entrypoint_mode="${2:-foreground}"
   local WORKCELL_ENTRYPOINT_MODE_OVERRIDE="$entrypoint_mode"
+  local sup_pid_file child_pid_file
+  sup_pid_file="$(run_dir_for_project "$project")/supervisor.pid"
+  child_pid_file="$(run_dir_for_project "$project")/ai.pid"
   append_runtime_event "$project" "start_project_runtime_enter" \
     "entrypoint_mode=$entrypoint_mode"
   # When process inspection is unavailable, runtime ownership falls back to cwd checks.
