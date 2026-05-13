@@ -329,7 +329,8 @@ def _stage_from_linked(linked: dict) -> str:
 
 # ── Completion checklist ─────────────────────────────────
 
-def check_completion(item: dict) -> list[str]:
+def check_completion(item: dict, platform_data: dict) -> list[str]:
+    open_set = platform_data.get("open_set", set())
     """Return list of incomplete items. Empty list = fully complete (exclude from output).
 
     Highest authority: platform CLOSED. If all platform issues are confirmed closed,
@@ -344,7 +345,7 @@ def check_completion(item: dict) -> list[str]:
         if raw.get("raw_status") not in TERMINAL_RAW:
             raw_pids = raw.get("platform_ids", {})
             if raw_pids.get("github"):
-                raw_gh = _is_github_closed(raw_pids["github"])
+                raw_gh = _is_github_closed_lookup(raw_pids["github"], platform_data)
                 if raw_gh is True:
                     pass  # closed = done, skip all checks
                 elif raw_gh is False:
@@ -369,7 +370,7 @@ def check_completion(item: dict) -> list[str]:
         has_any_platform = False
         if pids.get("github"):
             has_any_platform = True
-            gh_closed = _is_github_closed(pids["github"])
+            gh_closed = _is_github_closed_lookup(pids["github"], platform_data)
             if gh_closed is not True:  # False or None
                 all_confirmed_closed = False
                 if gh_closed is False:
@@ -393,20 +394,150 @@ def check_completion(item: dict) -> list[str]:
     return incomplete
 
 
-def _is_github_closed(issue_number: str) -> bool | None:
-    """Check if a GitHub issue is closed. Returns None if can't check (no gh CLI or timeout)."""
-    # Skip if gh not available or running in background
+def fetch_open_platform_issues(project: Path) -> dict:
+    """Fetch OPEN GitHub issues in a single batch call.
+    Returns {"open_set": set[str], "open_issues": list[dict]}.
+    open_issues has number, title, body for raw-key extraction.
+    """
+    import json as _json2
+    result = {"open_set": set(), "open_issues": []}
+    if os.environ.get("SKIP_PLATFORM_CHECK"):
+        return result
+    try:
+        proc = subprocess.run(
+            ["gh", "issue", "list", "--state", "open", "--limit", "1000",
+             "--json", "number,title,body", "--repo", "chatterzhao/freely"],
+            capture_output=True, text=True, timeout=15
+        )
+        if proc.returncode == 0:
+            for issue in _json2.loads(proc.stdout):
+                num = str(issue.get("number", ""))
+                result["open_set"].add(num)
+                result["open_issues"].append(issue)
+    except Exception:
+        pass
+    return result
+    try:
+        proc = subprocess.run(
+            ["gh", "issue", "list", "--state", "all", "--limit", "1000",
+             "--json", "number,title,body,state", "--repo", "chatterzhao/freely"],
+            capture_output=True, text=True, timeout=15
+        )
+        if proc.returncode == 0:
+            issues = _json2.loads(proc.stdout)
+            for issue in issues:
+                num = str(issue.get("number", ""))
+                state = issue.get("state", "")
+                result["all"][num] = state
+                if state == "OPEN":
+                    result["open"].add(num)
+                result["issues"].append(issue)
+    except Exception:
+        pass
+    return result
+
+
+def _is_github_closed_lookup(issue_number: str, platform_data: dict) -> bool | None:
+    """Check if issue is NOT in the OPEN set.
+    Returns True if not open, False if OPEN, None if skipped.
+    """
     if os.environ.get("SKIP_PLATFORM_CHECK"):
         return None
-    try:
-        result = subprocess.run(
-            ["gh", "issue", "view", str(issue_number),
-             "--repo", "chatterzhao/freely", "--json", "state"],
-            capture_output=True, text=True, timeout=5
-        )
-        return '"CLOSED"' in result.stdout
-    except Exception:
-        return None  # unknown, don't flag as incomplete
+    open_set: set = platform_data.get("open_set", set())
+    return str(issue_number) not in open_set
+
+
+def scan_classification(project: Path, platform_data: dict) -> list[dict]:
+    """Phase 1: Classify local issues against platform state.
+    Both sides only OPEN. Same issue in both → one record.
+    Only differences produce actionable items.
+    """
+    open_set: set = platform_data.get("open_set", set())
+    seen_in_local: set = set()
+    items = []
+    issues_dir = project / "docs" / "issues"
+    if not issues_dir.is_dir():
+        return items
+
+    for d in sorted(issues_dir.iterdir()):
+        if not d.is_dir():
+            continue
+        mf = d / "issue.md"
+        if not mf.is_file():
+            continue
+        fm = parse_frontmatter(mf.read_text(encoding="utf-8"))
+        pids = _extract_platform_ids(fm)
+        gh_id = pids.get("github", "")
+        name = d.name
+        phase = fm.get("phase_state", "") or fm.get("status", "")
+        source = "raw" if name.startswith("raw-") else "linked" if name.startswith("I-") else "other"
+
+        if gh_id:
+            seen_in_local.add(gh_id)
+            is_open = gh_id in open_set
+            if is_open:
+                if phase == "completed":
+                    items.append({
+                        "source_family": "classification", "key": name,
+                        "stage": "state_mismatch",
+                        "detail": "本地已完成但平台仍 OPEN",
+                        "platform_issue": gh_id,
+                        "incomplete": ["platform_open_but_local_completed"],
+                        "ready": False, "next_action": "关闭平台 issue 或重新打开本地",
+                    })
+            else:
+                if phase != "completed" and phase not in TERMINAL_RAW:
+                    items.append({
+                        "source_family": "classification", "key": name,
+                        "stage": "local_needs_closeout",
+                        "detail": "平台已不 OPEN，本地未完成",
+                        "platform_issue": gh_id,
+                        "incomplete": ["platform_done_local_not_completed"],
+                        "ready": False, "next_action": "完成本地工作后同步关闭",
+                    })
+        else:
+            if source == "raw" and phase not in TERMINAL_RAW and phase not in ("absorbed", "dropped"):
+                items.append({
+                    "source_family": "classification", "key": name,
+                    "stage": "local_only",
+                    "detail": "本地有 raw 但平台无对应 issue",
+                    "incomplete": ["no_platform_counterpart"],
+                    "ready": True, "next_action": "推送到平台建立对应",
+                })
+
+    # Reverse: platform OPEN issues with gh_id not seen in local
+    for issue in platform_data.get("open_issues", []):
+        num = str(issue.get("number", ""))
+        if num in seen_in_local:
+            continue
+        title = issue.get("title", "")
+        body = issue.get("body", "")
+        combined = f"{title}\n{body}"
+        for m in re.finditer(r"(?:^|\W)(raw-(\d{8}T\d{4,6}Z))", combined, re.MULTILINE):
+            key = m.group(2)
+            if key:
+                break
+        else:
+            continue
+        items.append({
+            "source_family": "classification", "key": f"raw-{num}",
+            "stage": "platform_only",
+            "detail": f"平台 # {num}: {title[:60]}",
+            "platform_issue": num,
+            "incomplete": ["no_local_raw"],
+            "ready": True, "next_action": f"./bin/wt-create --source platform --raw-key {key} --slug …",
+        })
+
+    # ── Dedup: same base key + same stage → one record ──
+    deduped: dict = {}
+    for it in items:
+        base = _base_key(it["key"])
+        stage = it["stage"]
+        dedup_key = f"{base}|{stage}"
+        if dedup_key in deduped:
+            continue
+        deduped[dedup_key] = it
+    return list(deduped.values())
 
 
 # ── Main ─────────────────────────────────────────────────
@@ -414,12 +545,19 @@ def _is_github_closed(issue_number: str) -> bool | None:
 def build_payload(project: Path) -> dict:
     output = []
 
+    # Phase 0: Batch OPEN platform issues (1 API)
+    platform_data = fetch_open_platform_issues(project)
+
     # Phase 0: Input gate — chat inbox
     chat_items = scan_chat_inbox(project)
     output.extend(chat_items)
 
-    # Phase 1-6: Full lifecycle chain trace (source-anchored)
-    chain_items = scan_chain_trace(project)
+    # Phase 1: Local vs Platform classification
+    class_items = scan_classification(project, platform_data)
+    output.extend(class_items)
+
+    # Phase 3: Lifecycle chain trace (zero API — uses platform_data)
+    chain_items = scan_chain_trace(project, platform_data)
     for c in chain_items:
         # Derive title from available station data
         title = f"raw-{c['key']}"
@@ -443,16 +581,17 @@ def build_payload(project: Path) -> dict:
         })
 
     # Phase: Platform open issues (GitHub/Gitee) — source_family=platform
-    platform_items = scan_platform_issues(project)
+    platform_items = scan_platform_issues(project, platform_data)
     output.extend(platform_items)
 
     # Add worktree governance items
     gov_items = scan_worktree_governance(project)
     output.extend(gov_items)
 
-    # Add remote branch governance items
-    remote_items = scan_remote_branch_governance(project)
-    output.extend(remote_items)
+    # Add remote branch governance items (skip if platform check disabled)
+    if not os.environ.get("SKIP_PLATFORM_CHECK"):
+        remote_items = scan_remote_branch_governance(project)
+        output.extend(remote_items)
 
     by_stage = {}
     for o in output:
@@ -691,83 +830,74 @@ def _all_base_keys(project: Path) -> set[str]:
     return keys
 
 
-def scan_platform_issues(project: Path) -> list[dict]:
-    """Scan GitHub and Gitee for OPEN issues containing raw-{key} or I-{key}.
-    Returns items with source_family='platform' for wt-create --source platform matching.
+def scan_platform_issues(project: Path, platform_data: dict) -> list[dict]:
+    """Scan platform data for OPEN issues containing raw-{key} or I-{key}.
+    Uses pre-loaded batch data instead of per-item API calls.
     """
-    import json as _json2
     items: list[dict] = []
     seen: set[str] = set()
 
-    # ── GitHub ──
-    try:
-        result = subprocess.run(
-            ["gh", "issue", "list", "--state", "open", "--limit", "100",
-             "--json", "number,title,body"],
-            capture_output=True, text=True, timeout=15
-        )
-        if result.returncode == 0:
-            for issue in _json2.loads(result.stdout):
-                title = issue.get("title", "")
-                body = issue.get("body", "")
-                number = str(issue.get("number", ""))
-                combined = f"{title}\n{body}"
-                for m in re.finditer(r"(?:^|\W)(raw-(\d{8}T\d{4,6}Z))", combined, re.MULTILINE):
-                    key = m.group(2)
-                    if key not in seen:
-                        seen.add(key)
-                        items.append({
-                            "source_family": "platform",
-                            "key": key,
-                            "stage": "platform_open",
-                            "platform": "github",
-                            "issue_number": number,
-                            "title": title,
-                            "ready": True,
-                            "incomplete": [],
-                            "next_action": "wt-create --source platform --raw-key " + key,
-                            "next_station": "raw_created",
-                        })
-    except Exception:
-        pass
+    # ── GitHub (from batch data — zero API calls) ──
+    for issue in platform_data.get("open_issues", []):
+        title = issue.get("title", "")
+        body = issue.get("body", "")
+        number = str(issue.get("number", ""))
+        combined = f"{title}\n{body}"
+        for m in re.finditer(r"(?:^|\W)(raw-(\d{8}T\d{4,6}Z))", combined, re.MULTILINE):
+            key = m.group(2)
+            if key not in seen:
+                seen.add(key)
+                items.append({
+                    "source_family": "platform",
+                    "key": key,
+                    "stage": "platform_open",
+                    "platform": "github",
+                    "issue_number": number,
+                    "title": title,
+                    "ready": True,
+                    "incomplete": [],
+                    "next_action": "wt-create --source platform --raw-key " + key,
+                    "next_station": "raw_created",
+                })
 
     # ── Gitee ──
-    try:
-        gitee_py = str(Path(__file__).resolve().parent / "gitee-issue.py")
-        if os.path.isfile(gitee_py):
-            result = subprocess.run(
-                [sys.executable, gitee_py, "list", "--state", "open", "--per-page", "50"],
-                capture_output=True, text=True, timeout=15
-            )
-            if result.returncode == 0:
-                issues = _json2.loads(result.stdout)
-                for issue in issues:
-                    title = issue.get("title", "")
-                    body = issue.get("body", "")
-                    number = str(issue.get("number", issue.get("id", "")))
-                    combined = f"{title}\n{body}"
-                    for m in re.finditer(r"(?:^|\W)(raw-(\d{8}T\d{4,6}Z))", combined, re.MULTILINE):
-                        key = m.group(2)
-                        if key not in seen:
-                            seen.add(key)
-                            items.append({
-                                "source_family": "platform",
-                                "key": key,
-                                "stage": "platform_open",
-                                "platform": "gitee",
-                                "issue_number": number,
-                                "title": title,
-                                "ready": True,
-                                "next_action": "wt-create --source platform --raw-key " + key,
-                                "next_station": "raw_created",
-                            })
-    except Exception:
-        pass
+    if not os.environ.get("SKIP_PLATFORM_CHECK"):
+        try:
+            gitee_py = str(Path(__file__).resolve().parent / "gitee-issue.py")
+            if os.path.isfile(gitee_py):
+                result = subprocess.run(
+                    [sys.executable, gitee_py, "list", "--state", "open", "--per-page", "50"],
+                    capture_output=True, text=True, timeout=15
+                )
+                if result.returncode == 0:
+                    issues = json.loads(result.stdout)
+                    for issue in issues:
+                        title = issue.get("title", "")
+                        body = issue.get("body", "")
+                        number = str(issue.get("number", issue.get("id", "")))
+                        combined = f"{title}\n{body}"
+                        for m in re.finditer(r"(?:^|\W)(raw-(\d{8}T\d{4,6}Z))", combined, re.MULTILINE):
+                            key = m.group(2)
+                            if key not in seen:
+                                seen.add(key)
+                                items.append({
+                                    "source_family": "platform",
+                                    "key": key,
+                                    "stage": "platform_open",
+                                    "platform": "gitee",
+                                    "issue_number": number,
+                                    "title": title,
+                                    "ready": True,
+                                    "next_action": "wt-create --source platform --raw-key " + key,
+                                    "next_station": "raw_created",
+                                })
+        except Exception:
+            pass
 
     return items
 
 
-def _trace_chain(project: Path, key: str) -> dict:
+def _trace_chain(project: Path, key: str, platform_data: dict) -> dict:
     """Trace one key through all lifecycle stations.
 
     Returns dict with:
@@ -978,7 +1108,7 @@ def _trace_chain(project: Path, key: str) -> dict:
 
     # Platform close (best-effort, skipped with SKIP_PLATFORM_CHECK)
     gh_issue = pids.get("github", "")
-    gh_closed = _is_github_closed(gh_issue) if gh_issue and not os.environ.get("SKIP_PLATFORM_CHECK") else None
+    gh_closed = _is_github_closed_lookup(gh_issue, platform_data) if gh_issue else None
     _st("platform_close", gh_closed is True, True, github_issue=gh_issue, gh_closed=gh_closed)
 
     # branch_deleted: reached when no branches remain for this key.
@@ -1217,7 +1347,7 @@ def _pending_comments_for_key(project: Path, key: str) -> int:
         return 0
 
 
-def scan_chain_trace(project: Path) -> list[dict]:
+def scan_chain_trace(project: Path, platform_data: dict) -> list[dict]:
     """Trace the full lifecycle chain for every unique base key.
 
     Returns one item per key with:
@@ -1231,7 +1361,7 @@ def scan_chain_trace(project: Path) -> list[dict]:
     keys = _all_base_keys(project)
     results = []
     for key in sorted(keys):
-        trace = _trace_chain(project, key)
+        trace = _trace_chain(project, key, platform_data)
         if trace["complete"]:
             continue  # fully closed — silent
         # Collect file paths from station data for quick location
