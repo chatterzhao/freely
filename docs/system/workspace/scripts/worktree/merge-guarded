@@ -45,29 +45,31 @@ protected_branch() {
   return 1
 }
 
+blocked_merge_branch() {
+  local branch="$1"
+  case "$branch" in
+    test-pre-merge-*) return 0 ;;
+  esac
+  return 1
+}
+
 validate_merge_direction() {
   local target="$1"
   local source_branch="$2"
   local allowed=0
 
-  if [[ "$target" == test-pre-merge-* ]]; then
-    case "$source_branch" in
-      fix/*|feature/*|hotfix/*|feature/premerge-*) allowed=1 ;;
-    esac
-  else
-    case "$target" in
-      develop)
-        case "$source_branch" in
-          fix/*|feature/*|hotfix/*|test-pre-merge-*) allowed=1 ;;
-        esac
-        ;;
-      main)
-        case "$source_branch" in
-          release/*|hotfix/*) allowed=1 ;;
-        esac
-        ;;
-    esac
-  fi
+  case "$target" in
+    develop)
+      case "$source_branch" in
+        fix/*|feature/*|hotfix/*) allowed=1 ;;
+      esac
+      ;;
+    main)
+      case "$source_branch" in
+        release/*|hotfix/*) allowed=1 ;;
+      esac
+      ;;
+  esac
 
   if [[ "$allowed" != "1" ]]; then
     cat <<MSG >&2
@@ -76,12 +78,8 @@ validate_merge_direction() {
   source: $source_branch
 
 Allowed:
-  fix/* -> test-pre-merge-*   (testing)
-  feature/* -> test-pre-merge-*
-  fix/* -> develop            (after tests pass)
+  fix/* -> develop
   feature/* -> develop
-  test-pre-merge-* -> develop
-  hotfix/* -> test-pre-merge-*  (or direct)
   hotfix/* -> develop
   release/* -> main
   hotfix/* -> main
@@ -267,55 +265,12 @@ do_initial_merge() {
 
   check_branch_context "$target"
   validate_merge_direction "$target" "$source_branch"
+  blocked_merge_branch "$target" && fail "blocked_merge: target '$target' is blocked from merge operations"
+  blocked_merge_branch "$source_branch" && fail "blocked_merge: source '$source_branch' is blocked from merge operations"
 
   echo "[MERGE-GUARD] allowed: $source_branch -> $target"
 
-  # Pre-flight governance gate for feature/hotfix -> test-pre-merge merges.
-  # Runs from the SOURCE worktree so the gate can read feature/hotfix files on disk.
-  if [[ "$target" == test-pre-merge-* ]] && { [[ "$source_branch" == fix/* ]] || [[ "$source_branch" == feature/* ]] || [[ "$source_branch" == hotfix/* ]]; }; then
-    local source_wt gate_bin gate_output gate_rc
-    source_wt="$(git worktree list --porcelain 2>/dev/null | awk -v branch="$source_branch" '
-      /^worktree / { wt=$2 }
-      /^branch/ && $2 == "refs/heads/'"$source_branch"'" { print wt; exit }
-    ')"
-    if [[ -n "$source_wt" && -x "$source_wt/bin/governance-merge-gate" ]]; then
-      gate_bin="$source_wt/bin/governance-merge-gate"
-    elif [[ -x "./bin/governance-merge-gate" ]]; then
-      gate_bin="./bin/governance-merge-gate"
-    else
-      gate_bin=""
-    fi
-    if [[ -n "$gate_bin" ]]; then
-      set +e
-      gate_output="$("$gate_bin" --range "develop..${source_branch}" 2>&1)"
-      gate_rc=$?
-      set -e
-      if [[ "$gate_rc" -ne 0 ]]; then
-        cat >&2 <<MSG
-
-┌─ Merge blocked ─────────────────────────────────────────┐
-│  在修复具体错误之前，先自我诊断 IBM 阶段:                │
-│                                                        │
-│  B1 only (needs_research): 仅研究，不应 merge。         │
-│    若候选人是 promoted: 需先完成 B2_IBM（创建 I-*）。     │
-│  B2 (in_b2_ibm/in_dev): 需完成 dev-loop evidence。       │
-│  dev-loop done: 检查下方具体错误。                       │
-│                                                        │
-│  读对应 skill 了解完整工作流:                            │
-│    fix 工位 → skill:freely-fix-execution                       │
-│    feature 工位 → skill:freely-feat-execution                  │
-│                                                        │
-│  用 --range dry-run 预检（不触发 ref update）:           │
-│    cd "$source_wt"                                       │
-│    ./bin/governance-merge-gate --range develop..HEAD    │
-└────────────────────────────────────────────────────────┘
-
-$gate_output
-MSG
-        exit 1
-      fi
-    fi
-  fi
+  run_promotion_gate_if_needed "$target" "$source_branch"
 
   run_promotion_gate_if_needed "$target" "$source_branch"
 
@@ -393,6 +348,8 @@ do_completion() {
   done
 
   check_branch_context "$target"
+  blocked_merge_branch "$target" && fail "blocked_merge: target '$target' is blocked from merge operations"
+  blocked_merge_branch "$source_branch" && fail "blocked_merge: source '$source_branch' is blocked from merge operations"
   if [[ "$bypass_mode" != "break_glass" ]]; then
     validate_merge_direction "$target" "$source_branch"
   fi

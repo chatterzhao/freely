@@ -30,7 +30,7 @@ freely-feat-execution 在不同阶段调用下层 skill：
 - B1_IBM 预研阶段就写治理文档（brainstorms.md + candidates.md）
 - B2_IBM materialize 后才能开始写代码
 - dev-loop 产出 pre-tests + code-review 证据
-- 合并走 feature → test-pre-merge → develop 完整链路
+- 合并走 feature → develop 完整链路
 - 不跳过门禁
 
 ## 工作流
@@ -43,8 +43,8 @@ freely-feat-execution 在不同阶段调用下层 skill：
      --slug <slug>
 
    自动创建:
-   ├─ fix/raw-{raw-key}-{slug}         (基于 develop，永久开发工位)
-   └─ test-pre-merge-{raw-key}-{slug}  (基于 feature，临时测试工位)
+   ├─ feature/raw-{raw-key}-{slug}     (基于 develop，永久开发工位)
+   └─ test-pre-merge-{raw-key}-{slug}  (基于 feature，丢弃式测试沙箱)
 
 2. skill:freely-doc-B1_IBM-execution
    → 写 docs/pre-brainstorms/{key}--{slug}/brainstorms.md
@@ -76,20 +76,17 @@ freely-feat-execution 在不同阶段调用下层 skill：
 
 ### 阶段 4：门禁合并
 ```
-1. 创建 test-pre-merge-{topic} 工位
-2. merge feature → test-pre-merge
-3. 运行 pre-tests + governance-merge-gate --range
-4. gate 失败 → 修复分支自己的错误 → 重试
-5. gate 通过 → merge feature → develop (merge-guarded，测试通过后直接从 feature 合并)
-6. issue-sync close
+1. 运行 pre-tests + governance-merge-gate --range
+2. gate 失败 → 修复分支自己的错误 → 重试
+3. gate 通过 → merge feature → develop (merge-guarded)
+4. issue-sync close
 ```
 
 ### 阶段 5：收口
 ```
 1. 更新 issue phase_state → completed
 2. 更新 milestones.md
-3. 清理 test-pre-merge 工位
-4. raw issue → absorbed/dropped
+3. raw issue → absorbed/dropped
 ```
 
 ## Gate 处理
