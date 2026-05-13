@@ -26,4 +26,5 @@ platform_state: open
 - decision: 所有 YYYYMMDDTHHMMZ 改为 YYYYMMDDTHHMM[SS]Z，regex [0-9]{6} → [0-9]{4,6}
 - why_this: I-20260507T143545Z-A 的 timestamp-seconds-upgrade 未完成，遗留 14 处
 - alternatives_considered: 不改 docs（拒绝：docs 与代码不一致会导致混淆）
+- boundary_non_goals: 不改变 raw key 整体格式规范，仅修复遗漏
 - residual_risk: 无——只是提升 regex 兼容性 + 修正文档描述
