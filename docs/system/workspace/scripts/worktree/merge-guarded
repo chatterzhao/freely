@@ -230,13 +230,13 @@ _sync_issues_changed_in_merge() {
     local issue_file="$issues_dir/$local_id/issue.md"
     [[ -f "$issue_file" ]] || continue
 
-    local kind status absorbed
+    local kind phase_status absorbed
     kind=$(python3 -c "import yaml; f=open('$issue_file'); c=f.read(); p=c.split('---',2); fm=yaml.safe_load(p[1]) if len(p)>=3 else {}; print(fm.get('kind',''))" 2>/dev/null || true)
-    status=$(python3 -c "import yaml; f=open('$issue_file'); c=f.read(); p=c.split('---',2); fm=yaml.safe_load(p[1]) if len(p)>=3 else {}; print(fm.get('status',''))" 2>/dev/null || true)
+    phase_status=$(python3 -c "import yaml; f=open('$issue_file'); c=f.read(); p=c.split('---',2); fm=yaml.safe_load(p[1]) if len(p)>=3 else {}; print(fm.get('phase_state', fm.get('status','')))" 2>/dev/null || true)
 
-    case "$kind/$status" in
+    case "$kind/$phase_status" in
       raw/absorbed|raw/dropped)
-        echo "[MERGE-GUARD] issue-sync close $local_id (status=$status)"
+        echo "[MERGE-GUARD] issue-sync close $local_id (phase=$phase_status)"
         "$PWD/bin/issue-sync" close "$local_id" "completed" || true
         synced=$((synced + 1))
         ;;
