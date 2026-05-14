@@ -12048,17 +12048,7 @@ manager_runtime_launch_workers_after_ai_cycle_if_needed() {
   local _worker_csv _prompt_file _launched_count _handoff_py _db_path _handoff_id
   _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
   _db_path=""$project/.freely/freely.db""
-  _worker_csv=""
-  if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
-    _worker_csv=$(python3 "$_handoff_py" list --db "$_db_path" --role worker --status pending 2>/dev/null | python3 -c "
-import json,sys
-try:
-    rows=json.load(sys.stdin)
-    files=[r.get('prompt_file','') for r in rows if r.get('prompt_file')]
-    print(','.join(files))
-except: pass
-" 2>/dev/null || true)
-  fi
+  _worker_csv="$(_db_exit_contract_field "$project" manager worker_prompts_csv)"
   _launched_count=0
   if [[ -n "$_worker_csv" ]]; then
     local IFS=","
