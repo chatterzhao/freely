@@ -1,7 +1,9 @@
 ---
 kind: raw
+local_id: raw-20260503T1235Z
 issue_id: "186"
 priority: P1
+phase_state: absorbed
 status: closed
 source: platform
 platform_ids:
