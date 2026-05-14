@@ -947,7 +947,31 @@ routing_policy:
 - branch: `hotfix/I-20260501-0000-A-scan-pr-platform-config`
 - next_action: Hotfix merged to develop.
 
+9. `I-20260503T1235Z-A`
+- title: feat: add skip_continuity_recovery guard for first-round worker startup
+- milestone_state: committed
+- phase_state: `completed`
+- priority: P0
+- issue_path: `docs/issues/I-20260503T1235Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260503-1235--auto-recovery-race/candidates.md#C-20260503T1235Z-A`
+- branch: `feature/raw-20260503T1235Z-auto-recovery-race`
+- evidence:
+  - `docs/system/workspace/scripts/runtime/freely`
+  - `docs/issues/I-20260503T1235Z-A/issue.md`
+- next_action: `Merge to develop.`
+
 ### candidate_issues
+
+1. `C-20260503T1235Z-A`
+- title: Defer worker auto-recovery to after first AI patrol
+- milestone_state: candidate
+- phase_state: `promoted`
+- priority: P0
+- promoted_issue_path: `docs/issues/I-20260503T1235Z-A/issue.md`
+- source_brainstorm: `docs/pre-brainstorms/20260503-1235--auto-recovery-race/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260503-1235--auto-recovery-race/candidates.md`
+- next_action: 已实现，合并到 develop。
+- revisit_trigger: 若修改后仍出现启动期 worker launch 失败则重新评估。
 
 1. `C-20260417-0445-A`
 - title: Runtime start/stop lifecycle and process leak governance
