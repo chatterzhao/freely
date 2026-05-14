@@ -222,7 +222,7 @@ tool_supported_adapters() {
     codex)
       printf 'direct\nacp\n'
       ;;
-    kiro-cli|iflow|cc|cc-use-codex-cli|claude|opencode|test-sleep|test-compact|test-once|test-session|test-route-only|test-scripted)
+    kiro-cli|iflow|cc|cc-use-codex-cli|claude|opencode|oc-run-ds-flash-auto|test-sleep|test-compact|test-once|test-session|test-route-only|test-scripted)
       printf 'direct\nacp\n'
       ;;
     *)
@@ -268,7 +268,7 @@ _resolve_tool_family() {
   local tool="$1"
   # Known binaries: return as-is
   case "$tool" in
-    codex|claude|cc|cc-use-codex-cli|kiro-cli|iflow|opencode) printf '%s\n' "$tool"; return 0 ;;
+    codex|claude|cc|cc-use-codex-cli|kiro-cli|iflow|opencode|oc-run-ds-flash-auto) printf '%s\n' "$tool"; return 0 ;;
   esac
   # Try zsh alias resolution
   local resolved
@@ -754,7 +754,7 @@ tool_run_acp_from_prompt_file() {
       esac
       exec python3 "$RUNTIME_ACP_PROMPT_CLIENT" "${acp_args[@]}"
       ;;
-    opencode)
+    opencode|oc-run-ds-flash-auto)
       [[ -f "$RUNTIME_ACP_PROMPT_CLIENT" ]] || {
         echo "[ERROR] missing ACP prompt client: $RUNTIME_ACP_PROMPT_CLIENT" >&2
         return 1

@@ -3254,7 +3254,7 @@ _resolve_tool_family() {
   local tool="$1"
   # Known tool families: return as-is
   case "$tool" in
-    codex|claude|cc|cc-use-codex-cli|kiro-cli|iflow|opencode) printf '%s\n' "$tool"; return 0 ;;
+    codex|claude|cc|cc-use-codex-cli|kiro-cli|iflow|opencode|oc-run-ds-flash-auto) printf '%s\n' "$tool"; return 0 ;;
   esac
   # Unknown: try zsh alias resolution
   local resolved
@@ -17437,7 +17437,7 @@ tool_default_adapter_for_runtime() {
 tool_supported_adapters_for_runtime() {
   local tool="$1"
   case "$tool" in
-    codex|opencode)
+    codex|opencode|oc-run-ds-flash-auto)
       printf 'direct\nacp\n'
       ;;
     kiro-cli|iflow|cc|cc-use-codex-cli|test-sleep|test-compact|test-once|test-session|test-route-only|test-scripted)
