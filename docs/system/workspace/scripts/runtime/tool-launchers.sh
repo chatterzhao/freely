@@ -306,7 +306,7 @@ _apply_tool_alias_settings() {
   [[ -n "$resolved" ]] || return 0
   # Export env var assignments from alias prefix (e.g. OPENCODE_CONFIG=... opencode)
   local remainder="$resolved"
-  while [[ "$remainder" =~ ^[[:space:]]*([a-zA-Z_][a-zA-Z0-9_]*)= ]]; then
+  while [[ "$remainder" =~ ^[[:space:]]*([a-zA-Z_][a-zA-Z0-9_]*)= ]]; do
     local var_name="${BASH_REMATCH[1]}"
     local rest="${remainder#*=}"
     if [[ "$rest" =~ ^\"([^\"]*)\"[[:space:]]*(.*) ]]; then

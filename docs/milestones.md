@@ -3,6 +3,21 @@
 
 本文件是 Freely 自举开发时的主动扫描入口，用来承接已进入活跃范围的 candidate / issue。
 
+## M-20260514T050327Z-A
+- title: while/then typo fix
+- status: active
+### candidate_issues
+1. `C-20260514T050327Z-A`
+- milestone: M-20260514T050327Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260514T050327Z-A/issue.md`
+### completed_issues
+1. `I-20260514T050327Z-A`
+- title: fix while/then typo
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260514T050327Z-A/issue.md'
+
 ## M-20260514T022352Z-A
 - title: remove hardcoded cc-ds-auto alias
 - status: active
