@@ -98,7 +98,7 @@ extract_tool_session_id_from_log_if_present() {
     opencode)
       sed -n 's/.*service=session id=\(ses_[A-Za-z0-9_]*\).*/\1/p' "$current_log_file" | head -n 1
       ;;
-    cc|cc-ds-auto|cc-use-codex-cli|claude|codex|opencode)
+    cc|cc-use-codex-cli|claude|codex|opencode)
       # Delegate to session-cache module; fall back to inline extraction.
       if declare -f session_extract_id_from_log >/dev/null 2>&1; then
         session_extract_id_from_log "$current_tool" "$current_log_file"
