@@ -5,14 +5,15 @@
 ### C-20260503-1235-A: 将 continuity-based worker recovery 推迟到首次 AI patrol 之后
 
 - title: `Defer manager_runtime_launch_workers_from_latest_handoff to after first AI patrol cycle`
-- status: `ready`
+- status: `promoted`
 - adoption_type: `code_change`
 - decision_reason: Root cause 已确认——`manager_runtime_recover_workers_if_needed` 在第一个 AI cycle 完成前调用 `manager_runtime_launch_workers_from_latest_handoff`（已标记为废弃旧路径），此时 fleet cache 未填充，worker launch 必然失败。该旧路径调用从未被移除，注释与代码不一致。
-- promoted_issue_path: `docs/issues/raw-20260503T1235Z/issue.md`
-- milestone: `M-20260306-workspace-routing-foundation`（暂定，根据实际 milestone 调整）
+- promoted_issue_path: `docs/issues/I-20260503-1235-A/issue.md`
+- milestone: `M-20260306-workspace-routing-foundation`
 - source_brainstorm: `docs/pre-brainstorms/20260503-1235--auto-recovery-race/brainstorms.md`
-- session_refs: []
-- next_action: 实现以下修改到 `docs/system/workspace/scripts/runtime/freely`
+- session_refs:
+  - {tool: ccds, session_id: "20260503-auto-recovery-race", role: "author"}
+- next_action: 已完成实现，合并到 develop。
 - revisit_trigger: 若修改后仍出现启动期 worker launch 失败，或后续重构移除了 `manager_runtime_launch_workers_from_latest_handoff`，则重新评估。
 
 ---
