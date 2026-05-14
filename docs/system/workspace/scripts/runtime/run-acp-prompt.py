@@ -311,7 +311,7 @@ def main():
     if args.bridge_socket:
         transport = SocketTransport(args.bridge_socket)
     elif args.agent:
-        agent_cmd = [args.agent]
+        agent_cmd = args.agent.split()
         transport = SubprocessTransport(agent_cmd)
     else:
         print("[ERROR] must specify --bridge-socket or --agent", file=sys.stderr, flush=True)

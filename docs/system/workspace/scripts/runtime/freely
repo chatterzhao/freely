@@ -17437,7 +17437,7 @@ tool_default_adapter_for_runtime() {
 tool_supported_adapters_for_runtime() {
   local tool="$1"
   case "$tool" in
-    codex)
+    codex|opencode)
       printf 'direct\nacp\n'
       ;;
     kiro-cli|iflow|cc|cc-use-codex-cli|test-sleep|test-compact|test-once|test-session|test-route-only|test-scripted)

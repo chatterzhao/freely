@@ -222,7 +222,7 @@ tool_supported_adapters() {
     codex)
       printf 'direct\nacp\n'
       ;;
-    kiro-cli|iflow|cc|cc-use-codex-cli|claude|test-sleep|test-compact|test-once|test-session|test-route-only|test-scripted)
+    kiro-cli|iflow|cc|cc-use-codex-cli|claude|opencode|test-sleep|test-compact|test-once|test-session|test-route-only|test-scripted)
       printf 'direct\nacp\n'
       ;;
     *)
@@ -753,6 +753,20 @@ tool_run_acp_from_prompt_file() {
           ;;
       esac
       exec python3 "$RUNTIME_ACP_PROMPT_CLIENT" "${acp_args[@]}"
+      ;;
+    opencode)
+      [[ -f "$RUNTIME_ACP_PROMPT_CLIENT" ]] || {
+        echo "[ERROR] missing ACP prompt client: $RUNTIME_ACP_PROMPT_CLIENT" >&2
+        return 1
+      }
+      exec python3 "$RUNTIME_ACP_PROMPT_CLIENT" \
+        --agent 'opencode acp' \
+        --cwd "$project" \
+        --prompt-file "$prompt_file" \
+        --mode "$mode" \
+        --model "$model" \
+        --launch-kind "$launch_kind" \
+        --reasoning-effort "$reasoning_effort"
       ;;
     *)
       echo "[ERROR] unsupported ACP launcher for tool: $tool" >&2
