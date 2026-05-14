@@ -3,7 +3,7 @@ kind: raw
 local_id: raw-20260503T1235Z
 priority: P1
 phase_state: absorbed
-absorbed_into: docs/issues/I-20260503T1235Z-A/issue.md
+absorbed_into: I-20260503T1235Z-A
 status: closed
 source: platform
 platform_ids:
