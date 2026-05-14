@@ -5198,3 +5198,12 @@ routing_policy:
 - milestone_state: committed
 - phase_state: `in_b2_ibm`
 - issue_path: `docs/issues/I-20260509T024559Z-A/issue.md`
+
+## M-20260514T103532Z-A
+- title: agent handoff protocol v2
+- status: active
+### candidate_issues
+1. `C-20260514T103532Z-A`
+- milestone: M-20260514T103532Z-A
+- status: proposed
+- next_action: 完成 B2_IBM materialize，进入 dev-loop
