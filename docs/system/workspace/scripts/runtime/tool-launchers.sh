@@ -222,7 +222,7 @@ tool_supported_adapters() {
     codex)
       printf 'direct\nacp\n'
       ;;
-    kiro-cli|iflow|cc|cc-use-codex-cli|claude|opencode|oc-run-ds-flash-auto|test-sleep|test-compact|test-once|test-session|test-route-only|test-scripted)
+    kiro-cli|iflow|cc|cc-use-codex-cli|claude|opencode|test-sleep|test-compact|test-once|test-session|test-route-only|test-scripted)
       printf 'direct\nacp\n'
       ;;
     *)
@@ -266,20 +266,31 @@ tool_adapter_supports_launch_kind() {
 # e.g. cc-ds-auto -> claude, ccglm -> claude. Returns original if no alias found.
 _resolve_tool_family() {
   local tool="$1"
-  # Known binaries: return as-is
   case "$tool" in
-    codex|claude|cc|cc-use-codex-cli|kiro-cli|iflow|opencode|oc-run-ds-flash-auto) printf '%s\n' "$tool"; return 0 ;;
+    codex|claude|cc|cc-use-codex-cli|kiro-cli|iflow|opencode) printf '%s\n' "$tool"; return 0 ;;
   esac
-  # Try zsh alias resolution
   local resolved
   resolved=$(${SHELL:-bash} -ic "alias '$tool' 2>/dev/null" 2>/dev/null | sed -n "s/^${tool}='\\(.*\\)'$/\\1/p")
   if [[ -n "$resolved" ]]; then
-    local binary="${resolved%% *}"
+    # Strip leading env var assignments (VAR=val VAR2=val2 ... binary)
+    local stripped="$resolved"
+    while [[ "$stripped" =~ ^[[:space:]]*[a-zA-Z_][a-zA-Z0-9_]*= ]]; do
+      local rest="${stripped#*=}"
+      # Skip past the value (handle quoted and unquoted values)
+      if [[ "$rest" =~ ^\"([^\"]*)\"[[:space:]]*(.*) ]]; then
+        stripped="${BASH_REMATCH[2]}"
+      elif [[ "$rest" =~ ^\'([^\']*)\'[[:space:]]*(.*) ]]; then
+        stripped="${BASH_REMATCH[2]}"
+      else
+        rest="${rest#*[[:space:]]}"
+        stripped="$rest"
+      fi
+    done
+    local binary="${stripped%% *}"
     case "$binary" in
       claude|codex|kiro-cli|iflow|opencode) printf '%s\n' "$binary"; return 0 ;;
     esac
   fi
-  # Unresolved: return original
   printf '%s\n' "$tool"
 }
 
@@ -288,14 +299,30 @@ _resolve_tool_family() {
 _apply_tool_alias_settings() {
   local tool="$1"
   local resolved alias_path
-  # Only resolve if not a known binary name
   case "$tool" in
     codex|claude|cc|cc-use-codex-cli|kiro-cli|iflow|opencode) return 0 ;;
   esac
   resolved=$(${SHELL:-bash} -ic "alias '$tool' 2>/dev/null" 2>/dev/null | sed -n "s/^${tool}='\\(.*\\)'$/\\1/p")
   [[ -n "$resolved" ]] || return 0
-  # Extract --settings <path> from the alias
-  alias_path=$(echo "$resolved" | sed -n 's/.*--settings \([^ ]*\).*/\1/p')
+  # Export env var assignments from alias prefix (e.g. OPENCODE_CONFIG=... opencode)
+  local remainder="$resolved"
+  while [[ "$remainder" =~ ^[[:space:]]*([a-zA-Z_][a-zA-Z0-9_]*)= ]]; then
+    local var_name="${BASH_REMATCH[1]}"
+    local rest="${remainder#*=}"
+    if [[ "$rest" =~ ^\"([^\"]*)\"[[:space:]]*(.*) ]]; then
+      export "$var_name"="${BASH_REMATCH[1]}"
+      remainder="${BASH_REMATCH[2]}"
+    elif [[ "$rest" =~ ^\'([^\']*)\'[[:space:]]*(.*) ]]; then
+      export "$var_name"="${BASH_REMATCH[1]}"
+      remainder="${BASH_REMATCH[2]}"
+    else
+      local val="${rest%%[[:space:]]*}"
+      export "$var_name"="$val"
+      remainder="${rest#*[[:space:]]}"
+    fi
+  done
+  # Extract --settings <path> from the remainder (after env prefix stripped)
+  alias_path=$(echo "$remainder" | sed -n 's/.*--settings \([^ ]*\).*/\1/p')
   [[ -n "$alias_path" ]] || return 0
   # Expand ~ to $HOME
   alias_path="${alias_path/#\~/$HOME}"
@@ -754,7 +781,7 @@ tool_run_acp_from_prompt_file() {
       esac
       exec python3 "$RUNTIME_ACP_PROMPT_CLIENT" "${acp_args[@]}"
       ;;
-    opencode|oc-run-ds-flash-auto)
+    opencode)
       [[ -f "$RUNTIME_ACP_PROMPT_CLIENT" ]] || {
         echo "[ERROR] missing ACP prompt client: $RUNTIME_ACP_PROMPT_CLIENT" >&2
         return 1
