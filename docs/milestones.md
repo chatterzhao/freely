@@ -3,6 +3,21 @@
 
 本文件是 Freely 自举开发时的主动扫描入口，用来承接已进入活跃范围的 candidate / issue。
 
+## M-20260514T005740Z-A
+- title: alias env prefix resolution fix
+- status: active
+### candidate_issues
+1. `C-20260514T005740Z-A`
+- milestone: M-20260514T005740Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260514T005740Z-A/issue.md`
+### completed_issues
+1. `I-20260514T005740Z-A`
+- title: generalize alias env prefix resolution
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260514T005740Z-A/issue.md`
+
 ## M-20260514T001746Z-A
 - title: StdioTransport for opencode ACP
 - status: active
