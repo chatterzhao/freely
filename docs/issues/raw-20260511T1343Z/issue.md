@@ -2,19 +2,12 @@
 local_id: raw-20260511T1343Z
 kind: raw
 priority: medium
-status: open
+phase_state: open
 phase_state: proposed
 source: chat-inbox
-created_at: '2026-05-11T13:43:00Z'
-title: 'fix: empty scan should trigger stop_ai, not restart loop'
-platform_ids:
-  github:
-    issue_id: '352'
-    url: https://github.com/chatterzhao/freely/issues/352
-    synced_at: '2026-05-15T18:24:56Z'
-updated_at: '2026-05-15T18:24:56Z'
-primary_platform: github
-platform_state: open
+created_at: "2026-05-11T13:43:00Z"
+title: "fix: empty scan should trigger stop_ai, not restart loop"
+platform_state: ''
 ---
 
 ## 问题

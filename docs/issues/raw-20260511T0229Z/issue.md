@@ -7,6 +7,7 @@ platform_ids:
     issue_id: '295'
     url: https://github.com/chatterzhao/freely/issues/295
 primary_platform: github
+platform_state: closed
 ---
 ## 问题
 Worker 不知道 manager 中心 DB 路径和自己 handoff ID，无法汇报完成。
