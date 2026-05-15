@@ -9,16 +9,17 @@
 - next_action: 完成 B2_IBM materialize，产出 I-* issue 进入 dev-loop
 - revisit_trigger: B2_IBM 完成后
 - acceptance_criteria:
-  - handoffs 表新增 previous_worker_handoff_id 字段，raw_key 作为隐式 thread_id（不新增独立字段）
-  - parent_handoff_id 和 previous_worker_handoff_id 均由 runtime 在 insert 时写入（不再依赖 AI）
-  - consumed_by 在 manager 创建新 handoff 时由 runtime 自动标记（所有 unconsumed worker 批量消费）
-  - WORKER_HANDOFF_INJECT 注入完整上下文（PARENT_HANDOFF_ID、PREVIOUS_WORKER_HANDOFF_ID + 上一轮 worker 的 completion_summary/evidence_paths、同 raw_key 线程历史摘要）
-  - AI 不再调用 handoff.py CLI，改为在回复末尾输出 ` ```handoff ` JSON 块，由 Runtime 解析写入
-  - AI 只输出它负责的 7 个字段（exit_kind, reason, restart_point, next_action, completion_summary, evidence_paths, worker_prompts_csv），Runtime 合并其余 18 个字段
-  - launcher 和 validator 合一为 consume_delegate_workers 函数
+  - handoffs 表新增 previous_worker_handoff_id、last_activity_at 字段，均由 runtime 管理
+  - 所有 Runtime 状态 UPDATE 加乐观锁 `WHERE status='<期望当前状态>'`
+  - mark_stale 基于 `last_activity_at` 不活跃检测（非墙钟总运行时长）：log 更新/PID 存活/socket 心跳任一信号持续 → 不触发。Worker 慢但活跃不超时
+  - AI 不再调用 handoff.py CLI，改为在回复末尾输出 ` ```handoff ` JSON 块，由 Runtime 解析写入（AI 只输出 7 个字段，Runtime 合并其余字段）
+  - auto-consume 在 manager 新 handoff 创建时自动触发：消费当前 raw_key 下所有 status IN (completed,blocked,rejected) AND consumed_by='' 的 worker 记录
+  - 修复 handoff 携带结构化字段（repair_target_role, repair_target_handoff_id, validation_errors_json），替代自然语言散文
+  - 上下文注入分层：Manager 获得线程历史 + fleet + scan + 未消费 worker 列表；Worker 仅获得 Task + 结构化 HANDOFF_INJECT（handoff_id + parent + previous_worker + 前序 completion_summary 截断）
+  - launcher 和 validator 合一为 consume_delegate_workers
   - worktree_has_active_worker 只查 launched 状态
-  - 旧 handoff.py update/insert 指令从 agent docs 中删除
-  - 状态机文档化：6 个 status 值，10 个合法转换，每个有守卫条件
+  - 状态机文档化：6 status 值 + 10 合法转换 + 守卫条件 + 乐观锁
+  - 旧 handoff.py update/insert 指令从 agent docs 删除
 - promotion_gate: #343 四个 bug 在新的 protocol 实现后全部消除
 - open_questions: []
 - acceptance_reviews: []

@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 760" font-family="system-ui,-apple-system,sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#64748B"/>
+    </marker>
+    <marker id="arrow-auto" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#7C3AED"/>
+    </marker>
+    <marker id="arrow-error" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#DC2626"/>
+    </marker>
+    <linearGradient id="header" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1E293B"/>
+      <stop offset="100%" stop-color="#334155"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1100" height="760" fill="#F8FAFC" rx="8"/>
+
+  <!-- Title -->
+  <rect x="0" y="0" width="1100" height="44" fill="url(#header)" rx="8"/>
+  <rect x="0" y="32" width="1100" height="12" fill="url(#header)"/>
+  <text x="550" y="28" text-anchor="middle" fill="#F1F5F9" font-size="17" font-weight="700">Handoff 状态机 — Worker 完整状态转换 (Manager: pending → completed)</text>
+
+  <!-- ============================================================ -->
+  <!-- Worker State Machine -->
+  <!-- ============================================================ -->
+
+  <!-- State: pending (center top) -->
+  <ellipse cx="550" cy="110" rx="52" ry="24" fill="#F1F5F9" stroke="#64748B" stroke-width="2"/>
+  <text x="550" y="116" text-anchor="middle" font-size="13" font-weight="700" fill="#334155">pending</text>
+
+  <!-- State: launched (left) -->
+  <ellipse cx="200" cy="240" rx="52" ry="24" fill="#DBEAFE" stroke="#2563EB" stroke-width="2"/>
+  <text x="200" y="246" text-anchor="middle" font-size="13" font-weight="700" fill="#1E40AF">launched</text>
+
+  <!-- State: rejected (right) -->
+  <ellipse cx="900" cy="240" rx="52" ry="24" fill="#FEE2E2" stroke="#DC2626" stroke-width="2"/>
+  <text x="900" y="246" text-anchor="middle" font-size="13" font-weight="700" fill="#991B1B">rejected</text>
+
+  <!-- State: consumed (extreme right, skip transition) -->
+  <ellipse cx="900" cy="110" rx="52" ry="24" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="2"/>
+  <text x="900" y="116" text-anchor="middle" font-size="13" font-weight="700" fill="#4B5563">consumed</text>
+
+  <!-- State: completed (bottom left) -->
+  <ellipse cx="300" cy="400" rx="56" ry="26" fill="#DCFCE7" stroke="#16A34A" stroke-width="2"/>
+  <text x="300" y="406" text-anchor="middle" font-size="13" font-weight="700" fill="#14532D">completed</text>
+
+  <!-- State: blocked (bottom center) -->
+  <ellipse cx="550" cy="400" rx="52" ry="26" fill="#FEF3C7" stroke="#D97706" stroke-width="2"/>
+  <text x="550" y="406" text-anchor="middle" font-size="13" font-weight="700" fill="#78350F">blocked</text>
+
+  <!-- State: consumed (bottom) -->
+  <ellipse cx="800" cy="400" rx="56" ry="26" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="2"/>
+  <text x="800" y="406" text-anchor="middle" font-size="13" font-weight="700" fill="#4B5563">consumed</text>
+
+  <!-- ============================================================ -->
+  <!-- Transitions -->
+  <!-- ============================================================ -->
+
+  <!-- pending → launched -->
+  <path d="M510,125 C450,150 350,180 252,228" stroke="#2563EB" stroke-width="1.8" fill="none" marker-end="url(#arrow)"/>
+  <text x="340" y="168" font-size="10" fill="#2563EB" font-weight="600">[worktree 存在] launch 成功</text>
+  <text x="340" y="182" font-size="9.5" fill="#64748B">Runtime: consume_delegate_workers</text>
+
+  <!-- pending → rejected -->
+  <path d="M590,125 C650,150 750,180 848,228" stroke="#DC2626" stroke-width="1.8" fill="none" marker-end="url(#arrow-error)"/>
+  <text x="670" y="168" font-size="10" fill="#DC2626" font-weight="600">[worktree 不存在] launch 失败</text>
+  <text x="670" y="182" font-size="9.5" fill="#64748B">Runtime: consume_delegate_workers</text>
+
+  <!-- pending → consumed (direct) -->
+  <path d="M590,96 C680,82 780,88 848,102" stroke="#9CA3AF" stroke-width="1.8" fill="none" marker-end="url(#arrow)" stroke-dasharray="6,3"/>
+  <text x="720" y="82" font-size="10" fill="#6B7280" font-weight="600">[工位已删/issue 已关] 无意义记录</text>
+  <text x="720" y="96" font-size="9.5" fill="#64748B">Runtime: 消费时直接标记</text>
+
+  <!-- launched → completed -->
+  <path d="M230,262 C250,300 270,350 285,380" stroke="#16A34A" stroke-width="1.8" fill="none" marker-end="url(#arrow)"/>
+  <text x="252" y="330" font-size="10" fill="#16A34A" font-weight="600">[worker AI 正常退出] WHERE status='launched'</text>
+  <text x="252" y="344" font-size="9.5" fill="#64748B">worker_done / worker_handoff_needed</text>
+
+  <!-- launched → blocked -->
+  <path d="M240,254 C300,290 400,340 498,388" stroke="#D97706" stroke-width="1.8" fill="none" marker-end="url(#arrow)"/>
+  <text x="350" y="325" font-size="10" fill="#D97706" font-weight="600">[worker AI 受阻] worker_blocked (WHERE launched)</text>
+  <text x="350" y="339" font-size="9.5" fill="#64748B">或 [不活跃] last_activity_at 超阈值 (非总运行时长)</text>
+
+  <!-- launched → rejected (pid dead) -->
+  <path d="M230,225 C280,200 370,195 848,232" stroke="#DC2626" stroke-width="1.5" fill="none" marker-end="url(#arrow-error)" stroke-dasharray="5,3"/>
+  <text x="540" y="205" font-size="9.5" fill="#DC2626" font-weight="600">[pid 死进程] worktree_has_active_worker 检测</text>
+
+  <!-- completed → consumed -->
+  <path d="M356,400 C420,404 550,404 744,400" stroke="#7C3AED" stroke-width="1.8" fill="none" marker-end="url(#arrow-auto)"/>
+  <text x="550" y="394" font-size="10" fill="#7C3AED" font-weight="600">[manager 创建新 handoff] 自动消费</text>
+
+  <!-- blocked → consumed -->
+  <path d="M602,400 C670,402 730,402 744,400" stroke="#7C3AED" stroke-width="1.8" fill="none" marker-end="url(#arrow-auto)"/>
+  <text x="670" y="394" font-size="9.5" fill="#7C3AED" font-weight="600">[manager 新 handoff]</text>
+
+  <!-- rejected → consumed -->
+  <path d="M895,265 C920,310 880,360 840,385" stroke="#7C3AED" stroke-width="1.8" fill="none" marker-end="url(#arrow-auto)"/>
+  <text x="910" y="335" font-size="9.5" fill="#7C3AED" font-weight="600">[manager 新 handoff]</text>
+
+  <!-- ============================================================ -->
+  <!-- Manager State Machine (small, right side) -->
+  <!-- ============================================================ -->
+
+  <rect x="30" y="480" width="1040" height="100" rx="6" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1"/>
+  <text x="50" y="502" font-size="12" font-weight="700" fill="#334155">Manager 状态 (简单: pending → completed)</text>
+
+  <ellipse cx="250" cy="545" rx="48" ry="22" fill="#F1F5F9" stroke="#64748B" stroke-width="1.8"/>
+  <text x="250" y="550" text-anchor="middle" font-size="12" font-weight="700" fill="#334155">pending</text>
+
+  <ellipse cx="550" cy="545" rx="56" ry="22" fill="#DCFCE7" stroke="#16A34A" stroke-width="1.8"/>
+  <text x="550" y="550" text-anchor="middle" font-size="12" font-weight="700" fill="#14532D">completed</text>
+
+  <path d="M300,545 L492,545" stroke="#16A34A" stroke-width="1.8" fill="none" marker-end="url(#arrow)"/>
+  <text x="395" y="538" font-size="10" fill="#16A34A" font-weight="600">[AI 输出合法 handoff JSON]</text>
+  <text x="395" y="566" font-size="9.5" fill="#64748B">parse_handoff_json 成功 → INSERT 时 status=completed</text>
+
+  <!-- ============================================================ -->
+  <!-- Legend -->
+  <!-- ============================================================ -->
+
+  <rect x="30" y="600" width="1040" height="145" rx="6" fill="#1E293B"/>
+  <text x="50" y="622" font-size="12" font-weight="700" fill="#F1F5F9">图例</text>
+
+  <line x1="50" y1="645" x2="110" y2="645" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="120" y="649" font-size="10.5" fill="#94A3B8">实线 = Runtime 驱动转换</text>
+
+  <line x1="270" y1="645" x2="330" y2="645" stroke="#DC2626" stroke-width="2" marker-end="url(#arrow-error)"/>
+  <text x="340" y="649" font-size="10.5" fill="#94A3B8">红色 = 失败/拒绝路径</text>
+
+  <line x1="500" y1="645" x2="560" y2="645" stroke="#7C3AED" stroke-width="2" marker-end="url(#arrow-auto)"/>
+  <text x="570" y="649" font-size="10.5" fill="#94A3B8">紫色 = 自动消费 (manager 新 handoff 触发)</text>
+
+  <line x1="710" y1="645" x2="770" y2="645" stroke="#9CA3AF" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="6,3"/>
+  <text x="780" y="649" font-size="10.5" fill="#94A3B8">虚线 = 特殊路径</text>
+
+  <ellipse cx="784" cy="672" rx="12" ry="8" fill="#F1F5F9" stroke="#64748B" stroke-width="1"/>
+  <text x="802" y="676" font-size="10.5" fill="#94A3B8">pending</text>
+  <ellipse cx="870" cy="672" rx="12" ry="8" fill="#DBEAFE" stroke="#2563EB" stroke-width="1"/>
+  <text x="888" y="676" font-size="10.5" fill="#94A3B8">launched</text>
+  <ellipse cx="958" cy="672" rx="12" ry="8" fill="#DCFCE7" stroke="#16A34A" stroke-width="1"/>
+  <text x="976" y="676" font-size="10.5" fill="#94A3B8">completed</text>
+  <ellipse cx="626" cy="696" rx="12" ry="8" fill="#FEF3C7" stroke="#D97706" stroke-width="1"/>
+  <text x="644" y="700" font-size="10.5" fill="#94A3B8">blocked</text>
+  <ellipse cx="714" cy="696" rx="12" ry="8" fill="#FEE2E2" stroke="#DC2626" stroke-width="1"/>
+  <text x="732" y="700" font-size="10.5" fill="#94A3B8">rejected</text>
+  <ellipse cx="804" cy="696" rx="12" ry="8" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1"/>
+  <text x="822" y="700" font-size="10.5" fill="#94A3B8">consumed (终态)</text>
+
+  <text x="50" y="730" font-size="10.5" fill="#64748B">所有状态转换由 Runtime 驱动。AI 不直接操作状态。状态 UPDATE 均加 WHERE status='期望当前状态' 乐观锁——并发操作只有一个成功。</text>
+</svg>

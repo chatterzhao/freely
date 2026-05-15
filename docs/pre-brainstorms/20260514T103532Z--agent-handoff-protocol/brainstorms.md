@@ -4,6 +4,30 @@
 - 日期: 2026-05-14
 - 基于: #343 handoff pipeline disconnect 根因分析、handoffs 表实际使用情况审视
 
+## 成功标准
+
+Manager 和 Worker 协作良好的样子：**双方不直接通信，以 handoffs 表为唯一共享媒介，经由 Runtime 完成所有状态推进。**
+
+具体而言——
+
+- Manager 按 `manager-agent.md` 的表格规范，在回复末尾产出 ` ```handoff ` JSON 块。Runtime 解析、验证、合并字段后写入 DB，按 `exit_kind` 分发到对应的 `consume_*` 方法执行状态转换。Manager 无需关心 Worker 是否在线、如何启动——Runtime 替它完成。
+- Worker 按 `worker-agent.md` 的表格规范产出 JSON。Worker 不知道 Manager 的 patrol 周期、不知道舰队全局——它只管执行 Task 并汇报。Worker 的完成、受阻、请求决策，全部通过 Runtime 转为 handoffs 表的状态变更，Manager 下一轮 patrol 自然可见。
+- 同一 raw_key 下的所有 Manager/Worker 记录构成一条完整线程，`parent_handoff_id` 串联因果，`previous_worker_handoff_id` 串联前序。任何时候查询线程历史，能看到完整的"谁委派了谁、谁完成了什么、谁消费了谁"。
+- 任何一端的 JSON 不合格，Runtime 插入结构化修复 handoff（`repair_target_role` + `validation_errors_json`），Manager 下一轮 patrol 定位并重拉，不依赖人类推断。
+- Worker 持续慢但 log/PID/socket 有活跃信号 → 不超时。真正不响应时，`last_activity_at` 触发 `mark_stale → blocked`，Manager 介入重新委派或收口。
+- 所有状态推进由 Runtime 的乐观锁 WHERE 子句保证——两个并发操作只有一个成功，不会出现"上一个状态被下一个覆盖"。
+
+**一句话**：Manager 和 Worker 各写各的 JSON，Runtime 保证每条 JSON 变成一个确定性的状态转换，双方在 handoffs 表里看见彼此的工作。
+
+## 可视化参考
+
+| 图 | 内容 |
+|----|------|
+| [handoff-architecture.svg](handoff-architecture.svg) | 整体架构与数据流：Agent Docs → AI → Runtime → DB → Worker Launch 五层结构 |
+| [handoff-state-machine.svg](handoff-state-machine.svg) | 完整状态机：6 个 status 值、10 个合法转换、每个的触发条件与守卫 |
+| [handoff-sequence.svg](handoff-sequence.svg) | 完整时序泳道图：Manager AI / Runtime / Worker AI / DB / Prompt File 五泳道，25 个标注步骤 |
+| [handoff-thread-model.svg](handoff-thread-model.svg) | 线程模型：3 轮 Manager-Worker 对话中 raw_key / parent_handoff_id / previous_worker_handoff_id 的关联关系 |
+
 ## 数据库重建
 
 handoffs 表是 manager 和 worker 的唯一共享交接媒介。当前已投入使用（manager 125 条、worker 301 条），但在字段语义上存在冗余——5 个原因字段语义完全重叠。重构后削为 1 个 `reason`，同时启用 `consumed` 状态。
@@ -37,6 +61,7 @@ CREATE TABLE handoffs (
   created_by TEXT DEFAULT '',
   consumed_by TEXT DEFAULT '',
   launched_at TEXT DEFAULT '',
+  last_activity_at TEXT DEFAULT '',
   completed_at TEXT DEFAULT '',
   created_at TEXT NOT NULL DEFAULT '',
   updated_at TEXT NOT NULL DEFAULT ''
@@ -47,6 +72,7 @@ CREATE INDEX idx_handoffs_raw_key ON handoffs(raw_key);
 CREATE INDEX idx_handoffs_worktree ON handoffs(worktree);
 CREATE INDEX idx_handoffs_parent ON handoffs(parent_handoff_id);
 CREATE INDEX idx_handoffs_prev_worker ON handoffs(previous_worker_handoff_id);
+CREATE INDEX idx_handoffs_worktree_status ON handoffs(worktree, status);
 ```
 
 ### 字段变更说明
@@ -71,7 +97,7 @@ CREATE INDEX idx_handoffs_prev_worker ON handoffs(previous_worker_handoff_id);
 
 `restart_point` 和 `next_action` 语义不同不做合并——前者给 Runtime 指明续接阶段（pre_brainstorm / IBM / dev / verification / recovery / cleanup），后者给对端 Agent 指明建议动作（delegate / freeze / merge / cleanup）。
 
-### 线程模型
+### 线程模型 (图: [handoff-thread-model.svg](handoff-thread-model.svg))
 
 **不新增 `thread_id` 字段。`raw_key` 就是线程分组键。**
 
@@ -82,6 +108,8 @@ CREATE INDEX idx_handoffs_prev_worker ON handoffs(previous_worker_handoff_id);
 **`previous_worker_handoff_id`：串联同线程的多轮 worker**
 
 同一线程内，当 manager 创建第 N+1 个 worker 时，`previous_worker_handoff_id` 指向第 N 个 worker 的 `handoff_id`。新 worker 的 WORKER_HANDOFF_INJECT 注入上一轮 worker 的 `completion_summary` + `evidence_paths`，使后续 worker 了解前序工作的产出。
+
+并行委派场景（同一 delegate_workers 批次多个 worker）：它们共享同一个 `parent_handoff_id`，各自独立完成。下一轮 worker 的 `previous_worker_handoff_id` 取最近一条 completed worker。多个并行 worker 的整合由 Manager 负责——Manager 在下一轮 prompt 的 Task 中综合前序产出。
 
 `previous_worker_handoff_id` 由 Runtime 在 `consume_delegate_workers` 中自动填充：查询同 `raw_key` 下最近一条 `role=worker AND status=completed` 的记录，将其 `handoff_id` 写入。无前序 worker 则为 `""`。
 
@@ -174,7 +202,7 @@ def parse_handoff_json(ai_reply, context):
     dispatch_consume(record)
 ```
 
-## Runtime 消费
+## Runtime 消费 (图: [handoff-sequence.svg](handoff-sequence.svg))
 
 Runtime 解析 ` ```handoff ` 块 → `json.loads()` → 按 `exit_kind` 分发给解耦的消费方法。
 
@@ -244,7 +272,9 @@ Runtime 解析 ` ```handoff ` 块 → `json.loads()` → 按 `exit_kind` 分发�
 
 **统一的消费触发规则：** 当 Runtime 为 manager 创建新的 handoff 记录时（无论是 delegate_workers、resume_manager 还是 stop_ai），自动将当前 raw_key 下所有 `status IN ('completed','blocked','rejected') AND consumed_by=''` 的 worker 记录标记为 `status='consumed', consumed_by='manager'`。
 
-这意味着：manager 的每一次 patrol → exit → 新 handoff 创建动作，自动"签收"了上一轮所有未消费的 worker 产出。不依赖 AI 逐条标记 consumed。
+manager 新 handoff 创建时，当前 raw_key 下尚未 launch 的 worker 还不存在（正在 INSERT），已存在的 completed/blocked/rejected worker 必然是上一轮遗留的。时序天然正确：创建新 → 消费旧。
+
+如果 Runtime 崩溃在 INSERT manager 和 INSERT worker 之间：manager 记录已写入（含 worker_prompts_csv），Manager 下轮 patrol 读出 → 对比 handoffs 表发现 workers 缺失 → 重新创建。不丢数据。
 
 ## 验证与修复闭环
 
@@ -267,16 +297,23 @@ AI 省略的字段（non-required for that exit_kind）默认为 `""`，不触�
 
 ### 修复 handoff
 
-Runtime 插入一条 `role=manager` 的 handoff 记录（Reason + Next Action 直接写在 `reason` 和 `next_action` 中，Manager 下轮 patrol 自然消费）:
+Runtime 验证失败 → 插入一条 `role=manager` 的修复 handoff 记录，携带结构化字段：
 
 ```
 exit_kind=resume_manager
-reason=上一轮 [manager/worker] 的 handoff JSON 不达标: [具体字段]。请定位该角色，要求其根据 agent doc 表格重新生成。
 restart_point=recovery
-next_action=定位产出不合格 JSON 的角色，按对应场景表格补全字段后重新输出
+repair_target_role: "manager" | "worker"  ← 谁产出了不合格的 JSON
+repair_target_handoff_id: <hid>  ← 出问题的 handoff 记录
+validation_errors_json: [{"field":"worker_prompts_csv","error":"required for delegate_workers"}]  ← 具体哪些字段不达标
+reason: 自动生成，简述验证失败原因
+next_action: 自动生成，根据 repair_target_role 给出操作指引
 ```
 
-Manager 下轮 patrol 消费这条修复 handoff → 定位问题角色 → 重新拉起该角色 → 角色带着 repair context 重新判断场景、按表格规范重新产出 JSON。
+修复 handoff 是一条普通 handoff 记录，走统一的 Manager patrol 消费路径。Manager 看到结构化字段后：
+- `repair_target_role=worker`：检查对应 worker 的 prompt 是否完整，worker-agent.md 的 JSON 格式说明是否清晰，然后重新拉起该 worker
+- `repair_target_role=manager`：知道自己上一轮输出的 JSON 格式有问题，按 validation_errors_json 修正后重新输出
+
+改进点：原文的修复 handoff 用自然语言描述错误（"请找到该角色，告诉它..."），Manager 需要从散文里推断信息。现在改为结构化字段——`repair_target_role`、`repair_target_handoff_id`、`validation_errors_json`——Manager 直接读取字段值即可定位问题，不需要推断。
 
 ## 字段所有权
 
@@ -303,11 +340,12 @@ Manager 下轮 patrol 消费这条修复 handoff → 定位问题角色 → 重�
 | `created_by` | Runtime | 谁创建 |
 | `consumed_by` | Runtime | 谁消费（自动标记） |
 | `launched_at` | Runtime | worker 启动时 |
+| `last_activity_at` | Runtime | worker 最近一次可观测活跃时间（log mtime / socket heartbeat / PID 存活），用于不活跃检测而非总运行时长判断 |
 | `completed_at` | Runtime | completed/blocked/rejected/consumed 时 |
 | `created_at` | Runtime | insert 时 |
 | `updated_at` | Runtime | 每次 update 时 |
 
-## 状态机
+## 状态机 (图: [handoff-state-machine.svg](handoff-state-machine.svg))
 
 ### Worker 状态转换
 
@@ -350,7 +388,7 @@ Manager 下轮 patrol 消费这条修复 handoff → 定位问题角色 → 重�
 | `pending` | `rejected` | launch 失败 / worktree 不存在 |
 | `pending` | `consumed` | worker 记录已无意义（工位已删、issue 已关等） |
 | `launched` | `completed` | worker_done / worker_handoff_needed |
-| `launched` | `blocked` | worker_blocked / stale timeout (mark_stale) |
+| `launched` | `blocked` | worker_blocked / 不活跃超时 (mark_stale: last_activity_at 超过阈值) |
 | `launched` | `rejected` | pid 检查发现死进程 |
 | `completed` | `consumed` | manager 创建新 handoff → 自动消费 |
 | `blocked` | `consumed` | manager 创建新 handoff → 自动消费 |
@@ -361,9 +399,32 @@ Manager 下轮 patrol 消费这条修复 handoff → 定位问题角色 → 重�
 - `pending → launched` 仅当 worktree 存在且 worker prompt 可读取
 - `pending → rejected` 仅当 worktree 不存在或 launch 失败
 - `launched → completed` 仅当 worker AI 正常退出
-- `launched → blocked` 仅当 worker AI 受阻或超时
+- `launched → blocked` 仅当 worker AI 明确受阻（worker_blocked JSON），或 `last_activity_at` 超过不活跃阈值（Runtime 无法检测到任何活跃信号：log 不更新、PID 不响应、socket 无心跳）。Worker 持续慢但 log 在更新 → 不触发，AI 慢是可接受的
 - `→ consumed` 是终态。consumed 不可再转换为任何其他状态
 - manager 记录只有 `pending → completed`，不需要 consumed（manager 不被他者消费）
+
+### 乐观锁（状态更新竞态防御）
+
+`consume_worker_done` 和 `mark_stale` 可能对同一条 launched 记录并发执行。所有 Runtime 执行的状态 UPDATE 必须加 `WHERE status='<期望的当前状态>'` 条件，并检查 affected rows：
+
+```sql
+-- consume_worker_done: 只有 launched 状态的 worker 才能标记为 completed
+UPDATE handoffs SET status='completed', completion_summary=?, evidence_paths=?, updated_at=?
+WHERE handoff_id=? AND status='launched'
+
+-- mark_stale: launched 但 last_activity_at 超过不活跃阈值（不是总运行时长）才标记为 blocked
+-- Runtime 在每次检测到 Worker 活跃（log 更新/PID 存活/socket 心跳）时更新 last_activity_at
+UPDATE handoffs SET status='blocked', exit_kind='worker_blocked',
+  reason='Worker 不活跃超过阈值: last_activity_at=' || last_activity_at, updated_at=?
+WHERE role='worker' AND status='launched' AND last_activity_at < ?
+
+-- auto-consume: 只有非 consumed 终态的 worker 才能消费
+UPDATE handoffs SET status='consumed', consumed_by='manager', updated_at=?
+WHERE raw_key=? AND role='worker'
+AND status IN ('completed','blocked','rejected') AND consumed_by=''
+```
+
+两个并发操作中只有第一个到达的会成功（affected_rows=1），第二个 affected_rows=0 → 记录 warning 日志但不报错。所有状态变更都有明确的当前状态前提——"completed" 不会凭空变成 "blocked"。
 
 ## 与 #343 的关系
 
@@ -382,15 +443,57 @@ Manager 下轮 patrol 消费这条修复 handoff → 定位问题角色 → 重�
 
 | 文件 | 改动 |
 |------|------|
-| `handoff.py` | 旧表 DROP，新表 CREATE。`reason` 替代 5 个旧字段，新增 `previous_worker_handoff_id`。`status` CHECK 增加 `consumed`。新增 `handoff.py parse` 子命令（提取 ` ```handoff ` 块，验证，合并 Runtime 字段，dispatch consume_*）。 |
-| `freely-agent-manager.md` | 替换旧"交接"章节为新"交接 JSON"章节：3 列表格（delegate_workers / resume_manager / stop_ai），AI 只输出它负责的字段，省略 = Runtime 填默认值 |
-| `freely-agent-worker.md` | 替换旧"交接"章节为新"交接 JSON"章节：3 列表格（worker_done / worker_handoff_needed / worker_blocked），AI 只输出它负责的字段 |
-| `freely` — `build_prompt` | 注入当前 handoff 上下文：线程历史（同 raw_key 最近 5 条记录摘要）、上一轮 worker 的 completion_summary + evidence_paths（如有 `previous_worker_handoff_id`）、未消费 worker 列表。删除 `append_*_exit_contract_directive_if_needed` 中的 `handoff.py update` 指令，替换为 JSON 输出指令。 |
-| `freely` — `WORKER_HANDOFF_INJECT` | 注入 handoff_id + parent_handoff_id + previous_worker_handoff_id + 上一轮 worker 的 completion_summary。不再注入 `handoff.py update` bash 命令——worker 改输出 JSON。 |
-| `freely` — exit contract handler | 替换为 `parse_handoff_json` + `consume_*` 方法。移除 `validate_manager_exit_contract_for_project` 对旧字段的检查。所有 `consume_*` 方法统一在创建新 manager handoff 时自动消费 unconsumed worker。 |
-| `freely` — `worktree_has_active_worker` | 只查 `status=launched` |
+| `handoff.py` | 旧表 DROP，新表 CREATE。`reason` 替代 5 个旧字段，新增 `previous_worker_handoff_id`、`last_activity_at`。`status` CHECK 增加 `consumed`。所有 UPDATE 加 `WHERE status='<期望当前状态>'` 乐观锁。`mark_stale` 改为检查 `last_activity_at`。新增 `handoff.py parse` 子命令。 |
+| `freely-agent-manager.md` | 替换旧"交接"章节为新"交接 JSON"章节：3 列表格，AI 只输出它负责的字段 |
+| `freely-agent-worker.md` | 替换旧"交接"章节为新"交接 JSON"章节：3 列表格，AI 只输出它负责的字段 |
+| `freely` — `build_prompt` | Manager 注入：线程历史（同 raw_key 最近 10 条摘要）+ 未消费 worker 列表 + fleet/scan。Worker 注入：仅 Task + agent doc + WORKER_HANDOFF_INJECT。删除旧 `handoff.py update` CLI 指令。 |
+| `freely` — `WORKER_HANDOFF_INJECT` | 注入结构化字段：handoff_id + parent_handoff_id + previous_worker_handoff_id + 上一轮 worker 的 completion_summary（截断 80 字）。不再注入线程历史和 bash 命令。 |
+| `freely` — exit contract handler | 替换为 `parse_handoff_json` + `consume_*` 方法 + 乐观锁 WHERE 子句。auto-consume 在 manager 新 handoff 创建时自动触发。修复 handoff 携带 `repair_target_role` + `repair_target_handoff_id` + `validation_errors_json` 结构化字段。 |
+| `freely` — `worktree_has_active_worker` | 只查 `status=launched`；检测到活跃信号时 UPDATE `last_activity_at` |
 
-## 设计决策记录
+## 上下文注入策略（Manager vs Worker 职责分离）
+
+Manager 和 Worker 的职责不同，注入的上下文也应不同。Manager 需要全局视野做编排决策，Worker 只需知道自己的任务和前序产出。
+
+### Manager Prompt 注入（全量上下文）
+
+```
+build_prompt() 为 Manager 注入:
+  1. manager-agent.md（角色定义 + JSON 输出规范表格）
+  2. 线程历史：同 raw_key 最近 10 条 handoff 记录摘要
+     - 每条摘要: handoff_id, role, exit_kind, reason(截断50字), status, created_at
+     - Manager 需要全线程视野来做 patrol 决策
+  3. 未消费 worker 列表: handoff_id, exit_kind, completion_summary, reason, next_action
+  4. 当前 fleet 状态 + scan 数据
+  5. Manager exit contract directive（JSON 输出格式 + 3 种 exit_kind 表格）
+```
+
+### Worker Prompt 注入（最小上下文）
+
+```
+build_prompt() 为 Worker 注入:
+  1. worker-agent.md（角色定义 + JSON 输出规范表格）
+  2. Task 内容（从 prompt 文件读取）
+  3. WORKER_HANDOFF_INJECT（结构化字段注入）:
+     - handoff_id: <自己的>
+     - parent_handoff_id: <Manager 委派记录，含 reason 字段>
+     - previous_worker_handoff_id: <上一轮 worker 的 completion_summary（截断 80 字）>
+     // 不注入: 完整线程历史、同 raw_key 最近 N 条摘要
+     // Worker 只需知道"前序做了什么"，线程历史是 Manager 巡逻需要的信息
+```
+
+**Token 预算对比：**
+
+| | Manager | Worker |
+|--|---------|--------|
+| Agent doc | ~800 tokens | ~500 tokens |
+| 线程历史 | ~500 tokens (10 条摘要) | 0 |
+| 前序 Worker 上下文 | 0 (从 handoffs 表查) | ~200 tokens |
+| Fleet/Scan | ~2000 tokens | 0 |
+| Task | 0 | ~1000 tokens |
+| **合计** | ~3500 tokens | ~1800 tokens |
+
+Worker 不读线程历史、不读 fleet、不读 scan——只读自己的 Task + 前序 Worker 的产出摘要。Worker 不需要理解全局态势来做决策，它只执行 Manager 分配的一个原子任务。
 
 1. **JSON 块格式**：` ```handoff `。不与普通 ` ```json ` 代码块混淆，grep 精准提取。编辑器高亮不是问题——块内容就是合法 JSON。
 
