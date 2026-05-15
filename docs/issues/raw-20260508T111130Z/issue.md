@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260508T111130Z
 kind: raw
-status: proposed
+phase_state: proposed
 phase_state: proposed
 platform_ids:
   github:
@@ -10,6 +10,7 @@ platform_ids:
 primary_platform: github
 pre_tests_path: docs/epics/reference-transaction-delete-fix/verification/pre-tests.md
 verification_artifact_dir: docs/epics/reference-transaction-delete-fix/code-reviews
+platform_state: closed
 ---
 
 # raw-20260508T111130Z: reference-transaction hook 误拦截 branch delete

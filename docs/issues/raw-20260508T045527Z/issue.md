@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260508T045527Z
 kind: raw
-status: proposed
+phase_state: proposed
 phase_state: proposed
 platform_ids:
   github:
@@ -9,6 +9,7 @@ platform_ids:
     url: https://github.com/chatterzhao/freely/issues/254
     synced_at: ''
 primary_platform: github
+platform_state: closed
 ---
 ## 问题
 
