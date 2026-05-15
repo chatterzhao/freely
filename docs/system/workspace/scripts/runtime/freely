@@ -18394,18 +18394,11 @@ active_runtime_attach_reusable_for_project() {
     return 1
   fi
 
-  # Don't reuse a supervisor stuck in a restart storm.
-  local _state_file _storm_count
-  _state_file="$(session_state_file "$project")"
-  if [[ -f "$_state_file" ]]; then
-    unset LAST_RESTART_STORM_COUNT
-    source "$_state_file" 2>/dev/null || true
-    _storm_count="${LAST_RESTART_STORM_COUNT:-0}"
-    if [[ "$_storm_count" =~ ^[0-9]+$ ]] && (( _storm_count > 0 )); then
-      log_warn "project supervisor pid=$old_pid is in a restart storm (count=$_storm_count); refusing to attach, falling back to fresh start"
-      return 1
-    fi
-  fi
+  # Never reuse an old supervisor — stop cleanly then fresh start
+  log_info "found existing supervisor pid=$old_pid; running daemon stop for clean restart"
+  bash "$SELF_ROOT/bin/freely" daemon stop --project "$project" 2>/dev/null || true
+  sleep 2
+  return 1
 
   if [[ "$attach_ai_pid_state" == "confirmed_running" || "$attach_ai_pid_state" == "bootstrap_in_flight" ]]; then
     :
