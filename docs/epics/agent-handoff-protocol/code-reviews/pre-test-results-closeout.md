@@ -4,6 +4,8 @@ kind: verification
 phase_state: completed
 ---
 
+- issue_id: I-20260514T103532Z-A
+
 # Pre-Test Results: Agent Handoff Protocol v2 Closeout
 
 **Date**: 2026-05-15T17:49:19Z

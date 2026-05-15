@@ -4,7 +4,7 @@
 
 - candidate_format_version: v2
 - title: 设计 agent handoff protocol v2 — 字段语义、状态机、线程模型、消费语义
-- status: promoted
+- status: completed
 - decision_reason: #343 的 validator/launcher 断开暴露了 handoffs 表作为交接媒介的协议层缺失。parent_handoff_id 闲置、consumed_by 无用、无线程模型、WORKER_HANDOFF_INJECT 不完整——这些不是孤立 bug，而是协议设计不完整的症状
 - next_action: 完成 B2_IBM materialize，产出 I-* issue 进入 dev-loop
 - revisit_trigger: B2_IBM 完成后
