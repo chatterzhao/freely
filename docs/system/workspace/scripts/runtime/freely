@@ -7486,9 +7486,9 @@ EOF
 - `pretests-gate` — pre-tests 证据
 
 ### 交接（Manager ↔ Worker）
-- Manager: `handoff.py insert --role worker --created-by manager --consumed-by worker`
-- Worker: `handoff.py update --handoff-id <id> --status completed --exit-kind worker_done`
-- 中心 DB: 项目根目录 `.freely/freely.db`
+- Manager 在回复末尾输出 ` ```handoff ` JSON 块（delegate_workers/resume_manager/stop_ai）
+- Worker 在回复末尾输出 ` ```handoff ` JSON 块（worker_done/worker_blocked/worker_handoff_needed）
+- Runtime 自动解析 JSON 并写入中心 DB: `.freely/freely.db`
 
 ### 禁止
 - 不在 `main`/`develop` 上直接 commit
@@ -12052,9 +12052,13 @@ manager_runtime_launch_workers_after_ai_cycle_if_needed() {
   fi
 
   local _worker_csv _prompt_file _launched_count _handoff_py _db_path _handoff_id
+  local _prev_worker_id _prev_worker_summary _raw_key _parent_handoff_id _is_followthrough
   _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
   _db_path=""$project/.freely/freely.db""
   _worker_csv="$(_db_exit_contract_field "$project" manager worker_prompts_csv)"
+  # Get parent handoff_id (latest manager record)
+  _parent_handoff_id=$(python3 "$_handoff_py" latest-manager --db "$_db_path" 2>/dev/null | \
+    python3 -c "import json,sys; print(json.load(sys.stdin).get('handoff_id',''))" 2>/dev/null || echo "")
   _launched_count=0
   if [[ -n "$_worker_csv" ]]; then
     local IFS=","
@@ -12067,22 +12071,59 @@ manager_runtime_launch_workers_after_ai_cycle_if_needed() {
         log_warn "worker skipped: worktree busy — $_target_worktree"
         continue
       fi
-      # INSERT pending handoff record, get handoff_id for status tracking
+      # Extract raw_key from prompt filename
+      _raw_key="$(echo "$_prompt_file" | grep -oE '[0-9]{8}T[0-9]{4,6}Z' | head -1)"
+      # Compute previous_worker_handoff_id: latest completed worker for same raw_key
+      _prev_worker_id=""
+      _prev_worker_summary=""
+      if [[ -n "$_raw_key" ]]; then
+        local _prev_json
+        _prev_json=$(python3 "$_handoff_py" latest-completed-worker --db "$_db_path" --raw-key "$_raw_key" 2>/dev/null || true)
+        _prev_worker_id=$(echo "$_prev_json" | python3 -c "import json,sys; print(json.load(sys.stdin).get('handoff_id',''))" 2>/dev/null || echo "")
+        _prev_worker_summary=$(echo "$_prev_json" | python3 -c "import json,sys; print(json.load(sys.stdin).get('completion_summary',''))" 2>/dev/null || echo "")
+      fi
+      # Determine if followthrough (worktree had prior completed worker) or fresh fork
+      _is_followthrough="false"
+      if [[ -n "$_target_worktree" ]]; then
+        local _existing_completed
+        _existing_completed=$(python3 "$_handoff_py" active-workers --db "$_db_path" --worktree "$_target_worktree" 2>/dev/null | \
+          python3 -c "import json,sys; rows=json.load(sys.stdin); print(len(rows))" 2>/dev/null || echo "0")
+        # Check if worktree has completed workers (not launched)
+        local _completed_count
+        _completed_count=$(python3 -c "
+import json,subprocess,sys
+r=subprocess.run([sys.executable,'$_handoff_py','list','--db','$_db_path','--role','worker','--status','completed'],
+                 capture_output=True,text=True,timeout=5)
+rows=json.loads(r.stdout) if r.returncode==0 else []
+print(sum(1 for r in rows if r.get('worktree','')=='$_target_worktree'))
+" 2>/dev/null || echo "0")
+        [[ "${_completed_count:-0}" -gt 0 ]] && _is_followthrough="true"
+      fi
+      # INSERT pending handoff record with computed prev_worker
       _handoff_id=""
       if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
         _handoff_id=$(python3 "$_handoff_py" insert --db "$_db_path" \
-          --role worker --raw-key "$(echo "$_prompt_file" | grep -oE '[0-9]{8}T[0-9]{4,6}Z' | head -1)" \
-          --prompt-file "$_prompt_file" --created-by manager --consumed-by worker 2>/dev/null || true)
+          --role worker --raw-key "$_raw_key" \
+          --prompt-file "$_prompt_file" --worktree "$_target_worktree" \
+          --created-by manager --consumed-by worker \
+          --parent "$_parent_handoff_id" --prev-worker "$_prev_worker_id" 2>/dev/null || true)
       fi
-      # Inject structured handoff context (fork-only; delta turns skip this)
-      if [[ -n "$_handoff_id" && -f "$_prompt_file" ]]; then
+      # WORKER_HANDOFF_INJECT: only on fork (first launch), not on delta followthrough
+      if [[ -n "$_handoff_id" && -f "$_prompt_file" && "$_is_followthrough" != "true" ]]; then
+        local _prev_summary_truncated
+        _prev_summary_truncated="${_prev_worker_summary:0:80}"
         cat >> "$_prompt_file" <<WORKER_HANDOFF_INJECT
 
 ---
 
-## 完成汇报（硬性要求）
+## Handoff 上下文
 
-完成后在回复末尾输出 ```handoff JSON 块，Runtime 自动解析写入 DB。JSON 格式见 worker-agent.md 交接章节。
+- handoff_id: ${_handoff_id}
+- parent_handoff_id: ${_parent_handoff_id}
+- previous_worker_handoff_id: ${_prev_worker_id:-无}
+- 上一轮 Worker 产出: ${_prev_summary_truncated:-无}
+- 完成后在回复末尾输出 \`\`\`handoff JSON 块，Runtime 自动解析写入 DB
+- JSON 格式见 worker-agent.md 交接章节（3 种 exit_kind 表格）
 
 WORKER_HANDOFF_INJECT
       fi
@@ -12943,7 +12984,7 @@ prepend_exit_contract_repair_focus_if_needed() {
 Repair-first override:
 - 当前轮次是 worker exit contract repair。先补齐缺失或无效的 worker exit contract，再做任何其它扩展阅读、实现或 broad patrol。
 - 继续沿用当前 worker issue 边界，不要重开 manager patrol，也不要把自己提升成主管。
-- 必须在本轮结束前通过 handoff.py update 写入有效的 worker exit contract；否则 runtime 会继续按同一 resume target 拉回修复。
+- 必须在本轮结束前在回复末尾输出有效的 ```handoff JSON 块；否则 runtime 会继续按同一 resume target 拉回修复。
 - handoff_evidence: \`${handoff_path}\`
 
 EOF
@@ -12953,7 +12994,7 @@ EOF
 Repair-first override:
 - 当前轮次是 manager exit contract repair。先补齐缺失或无效的 manager exit contract，再做新的 delegation、cleanup judgement 或 broad patrol。
 - 继续沿用当前 manager 上下文，不要忽略 repair contract 去重跑首轮排班。
-- 必须在本轮结束前通过 handoff.py update 写入有效的 manager exit contract；否则 runtime 会继续按同一 resume target 拉回修复。
+- 必须在本轮结束前在回复末尾输出有效的 ```handoff JSON 块；否则 runtime 会继续按同一 resume target 拉回修复。
 - handoff_evidence: \`${handoff_path}\`
 
 EOF
@@ -12994,7 +13035,7 @@ ${manager_agent_def}
 ===
 
 当前轮次目的：
-- 上一轮 manager 已经 \`rc=0\` 退出，但没有通过 handoff.py update 写入合法的 manager exit contract。
+- 上一轮 manager 已经 \`rc=0\` 退出，但没有输出合法的 handoff JSON。
 - 这次因为缺少可验证 resume evidence，runtime 改走 \`fresh_with_handoff\`；但你的职责仍然是修复当前 manager lane，而不是重做 broad patrol。
 
 本轮只允许先读这些最小现场：
@@ -13006,11 +13047,11 @@ ${manager_agent_def}
 
 硬性收口要求：
 - 先写 manager continuity 文件：\`$expected_continuity\`
-- 再用 handoff.py update 写入 exit contract 到 DB（handoffs 表）
+- 再在回复末尾输出 \`\`\`handoff JSON 块（resume_manager 或 stop_ai）
 - 如果 scan 显示 backlog 非空，而你没有形成新的 manager continuity 或合法 worker delegation，这一轮视为失败。
-- 如果当前没有 launchable worker prompt，就必须用 continuity 把当前 manager-owned restart point / next_action 写清，再用 handoff.py update --exit-kind resume_manager 写入 DB。
-- 只有当前 manager lane 已经明确闭合且 scan/source 也证明可以安全停下时，才允许 --exit-kind stop_ai。
-- 如果 scan 暂时没有发现待办任务，这不是错误。写 --exit-kind stop_ai，在 continuity 里说明原因。如果你认为项目可能有工作要做但 scan 没扫到，在 continuity 里提示：这可能是棕地项目，可以通过 \`freely chat --new-issue “需求描述”\` 插话创建新任务，或在 GitHub/Gitee 上创建 raw issue，下一次 patrol scan 就会扫到。
+- 如果当前没有 launchable worker prompt，就必须用 continuity 把当前 manager-owned restart point / next_action 写清，再输出 resume_manager JSON。
+- 只有当前 manager lane 已经明确闭合且 scan/source 也证明可以安全停下时，才允许输出 stop_ai JSON。
+- 如果 scan 暂时没有发现待办任务，这不是错误。输出 stop_ai JSON，在 continuity 里说明原因。如果你认为项目可能有工作要做但 scan 没扫到，在 continuity 里提示：这可能是棕地项目，可以通过 \`freely chat --new-issue “需求描述”\` 插话创建新任务，或在 GitHub/Gitee 上创建 raw issue，下一次 patrol scan 就会扫到。
 
 本轮禁止事项：
 - 不要重做完整 lead-agent 首跳。
@@ -13709,7 +13750,7 @@ EOF
 write_manager_resume_handoff() {
   local project="$1" reason="$2" details="$3"
   local contract_file session_file resume_target continuity_file route_kind restart_point next_action
-  local why_not_stop why_not_delegate
+  local resume_reason
   contract_file="$(manager_exit_contract_file "$project")"
   session_file="$(session_state_file "$project")"
   continuity_file="$(latest_patrol_authoritative_manager_continuity_file_for_project "$project")"
@@ -13721,8 +13762,7 @@ write_manager_resume_handoff() {
   route_kind="$(manager_continuity_resume_focus_route_kind "$continuity_file" || true)"
   restart_point="$(_db_exit_contract_field "$project" manager restart_point)"
   next_action="$(_db_exit_contract_field "$project" manager next_action)"
-  why_not_stop="$(_db_exit_contract_field "$project" manager reason)"
-  why_not_delegate="$(_db_exit_contract_field "$project" manager reason)"
+  resume_reason="$(_db_exit_contract_field "$project" manager reason)"
   cat >"$(handoff_file "$project")" <<EOF
 # Session Handoff
 
@@ -13738,8 +13778,7 @@ write_manager_resume_handoff() {
 - route_kind: ${route_kind:-unknown}
 - restart_point: ${restart_point:-unknown}
 - next_action: ${next_action:-unknown}
-- why_not_stop: ${why_not_stop:-unknown}
-- why_not_delegate: ${why_not_delegate:-unknown}
+- reason: ${resume_reason:-unknown}
 - details: ${details:-none}
 
 ## What To Handle First
@@ -13985,7 +14024,12 @@ manager_runtime_handle_exit_contract_after_ai_cycle() {
           ;;
       esac
       : >"$(stop_marker_file "$project")"
-      python3 "$_handoff_py" auto-consume --db "$_db_path" --raw-key "$_raw_key" >/dev/null 2>&1 || true
+      # Auto-consume on stop_ai
+      local _hp_stop _db_stop _rk_stop
+      _hp_stop="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+      _db_stop="$project/.freely/freely.db"
+      _rk_stop="$(_db_exit_contract_field "$project" manager raw_key 2>/dev/null || echo "")"
+      [[ -n "$_rk_stop" && -f "$_hp_stop" ]] && python3 "$_hp_stop" auto-consume --db "$_db_stop" --raw-key "$_rk_stop" >/dev/null 2>&1 || true
       append_runtime_event "$project" "manager_exit_contract_stop_ai" \
         "stop_reason=${stop_reason}"
       printf 'stop_ai\n'
@@ -14030,9 +14074,11 @@ manager_runtime_handle_exit_contract_after_ai_cycle() {
     delegate_workers)
       worker_prompts_csv="$(_db_exit_contract_field "$project" manager worker_prompts_csv)"
       # Auto-consume previous unconsumed workers on new manager handoff
-      local _raw_key
-      _raw_key="$(_db_exit_contract_field "$project" manager raw_key)"
-      [[ -n "$_raw_key" ]] && python3 "$_handoff_py" auto-consume --db "$_db_path" --raw-key "$_raw_key" >/dev/null 2>&1 || true
+      local _hp_del _db_del _rk_del
+      _hp_del="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+      _db_del="$project/.freely/freely.db"
+      _rk_del="$(_db_exit_contract_field "$project" manager raw_key 2>/dev/null || echo "")"
+      [[ -n "$_rk_del" && -f "$_hp_del" ]] && python3 "$_hp_del" auto-consume --db "$_db_del" --raw-key "$_rk_del" >/dev/null 2>&1 || true
       append_runtime_event "$project" "manager_exit_contract_delegate_workers" \
         "worker_prompts_csv=${worker_prompts_csv:-none}"
       printf 'delegate_workers\n'
@@ -14213,6 +14259,7 @@ EOF
 }
 
 append_checkpoint_governance_if_needed() {
+  [[ "$(role_hint_for_project "$PROJECT_ROOT")" == "manager" ]] || return 0
   local dirty_entries warn_threshold block_threshold checkpoint_json checkpoint_required reason_codes scope_count story_scope_count
   dirty_entries="${LAST_PROJECT_DIRTY_ENTRIES:-0}"
   warn_threshold="${CHECKPOINT_WARN_DIRTY_ENTRIES:-40}"
@@ -14269,6 +14316,8 @@ EOF
 }
 
 append_fleet_supervision_if_needed() {
+  # Manager-only: fleet data is noise for workers
+  [[ "$(role_hint_for_project "$PROJECT_ROOT")" == "manager" ]] || return 0
   local fleet_snapshot fleet_truth_markdown
   fleet_snapshot="$(fleet_status_text_for_project "$PROJECT_ROOT")"
   fleet_truth_markdown="$(manager_prompt_fleet_truth_markdown_for_project "$PROJECT_ROOT")"
@@ -14320,6 +14369,7 @@ EOF
 }
 
 append_local_delegated_continuation_if_needed() {
+  [[ "$(role_hint_for_project "$PROJECT_ROOT")" == "manager" ]] || return 0
   local snapshot
   snapshot="$(delegated_continuation_snapshot_for_project "$PROJECT_ROOT" 3)"
   [[ -n "$snapshot" ]] || return 0
@@ -17266,9 +17316,10 @@ build_prompt() {
     cat <<PROMPT_DELTA
 === 本轮 delta（会话已记住你的角色和历史） ===
 上一轮 exit_kind: ${LAST_WORKCELL_EXIT_REASON:-unknown}
-请基于 session 历史继续工作。先读 fleet 和 scan 更新，再决定下一步。
-写 exit contract 到 handoffs 表。
+请基于 session 历史继续工作。先读 handoffs 更新，再决定下一步。
+写 ```handoff JSON 到回复末尾。
 PROMPT_DELTA
+    append_manager_handoff_context_if_needed "$PROJECT_ROOT"
     append_fleet_supervision_if_needed
     append_task_source_patrol_seed_if_needed
     append_manager_exit_contract_directive_if_needed "$PROJECT_ROOT"
@@ -17329,10 +17380,73 @@ PROMPT_AGENT
     append_manager_hygiene_alert_if_needed
     append_route_only_recovery_if_needed
   fi
+  # ── MANAGER-ONLY: handoff context (thread history + unconsumed workers) ──
+  append_manager_handoff_context_if_needed "$PROJECT_ROOT"
   # ── DYNAMIC: session handoff & continuity (changes each cycle, appended last) ──
   append_handoff_prompt_if_present "$PROJECT_ROOT"
   append_manager_consumed_continuity_resume_focus_if_needed "$PROJECT_ROOT"
   append_cleanup_governance_retirement_worker_directive_if_needed "$PROJECT_ROOT"
+}
+
+# append_manager_handoff_context_if_needed: inject thread history + unconsumed worker list for Manager patrol.
+# Worker does NOT receive this — it only gets Task + agent doc + HANDOFF_INJECT.
+append_manager_handoff_context_if_needed() {
+  local project="$1"
+  [[ "$(effective_runtime_role_for_project "$project")" == "manager" ]] || return 0
+  local _handoff_py _db_path
+  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  _db_path="$project/.freely/freely.db"
+  [[ -f "$_handoff_py" && -f "$_db_path" ]] || return 0
+
+  # Unconsumed workers: completed/blocked/rejected with consumed_by=''
+  local unconsumed
+  unconsumed=$(python3 -c "
+import json,subprocess,sys
+hp='$_handoff_py'; db='$_db_path'
+unconsumed=[]
+for st in ['completed','blocked','rejected']:
+    r=subprocess.run([sys.executable,hp,'list','--db',db,'--role','worker','--status',st],
+                     capture_output=True,text=True,timeout=5)
+    if r.returncode==0:
+        rows=json.loads(r.stdout)
+        unconsumed.extend([r for r in rows if not r.get('consumed_by','')])
+for r in unconsumed[:10]:
+    print(f\"- {r.get('handoff_id','?')[:20]} exit={r.get('exit_kind','?')} status={r.get('status','?')} summary={r.get('completion_summary','')[:60]} reason={r.get('reason','')[:60]} next_action={r.get('next_action','')[:60]}\")
+if not unconsumed:
+    print('(无未消费的 Worker 汇报)')
+" 2>/dev/null || echo "(查询失败)")
+
+  # Thread history: recent handoff records (all roles, grouped by raw_key)
+  local thread_summary
+  thread_summary=$(python3 -c "
+import json,subprocess,sys
+hp='$_handoff_py'; db='$_db_path'
+rows=[]
+for role in ['manager','worker']:
+    for st in ['completed','consumed']:
+        r=subprocess.run([sys.executable,hp,'list','--db',db,'--role',role,'--status',st],
+                         capture_output=True,text=True,timeout=5)
+        if r.returncode==0:
+            rows.extend(json.loads(r.stdout))
+rows.sort(key=lambda r: r.get('created_at',''), reverse=True)
+for r in rows[:10]:
+    print(f\"- {r.get('handoff_id','?')[:20]} role={r.get('role','?')} exit={r.get('exit_kind','?')} status={r.get('status','?')} raw_key={r.get('raw_key','?')[:20]} reason={r.get('reason','')[:50]} created={r.get('created_at','')[:19]}\")
+if not rows:
+    print('(无线程历史)')
+" 2>/dev/null || echo "(查询失败)")
+
+  cat <<EOF
+
+## Handoff 上下文（仅 Manager 可见）
+
+### 未消费 Worker 汇报
+${unconsumed}
+
+### 近期 Worker 线程历史
+${thread_summary}
+
+处理原则：先消费未消费的 Worker 汇报（读 completion_summary/reason/next_action 做决策），再看 scan 找新任务。
+EOF
 }
 
 cmd_init() {
