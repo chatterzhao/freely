@@ -5,22 +5,23 @@ status: in_dev
 phase_state: completed
 promoted_from: raw-20260514T103532Z
 source_candidate: docs/pre-brainstorms/20260514T103532Z--agent-handoff-protocol/candidates.md
-canonical_issue_path: ""
+canonical_issue_path: ''
 platform_ids:
   github:
-    issue_id: "344"
+    issue_id: '344'
     url: https://github.com/chatterzhao/freely/issues/344
 primary_platform: github
 last_synced_comment_at: {}
-hash: ""
-created_at: 2026-05-14T10:35:32Z
-updated_at: 2026-05-14T10:35:32Z
-intake_id: ""
+hash: ''
+created_at: 2026-05-14 10:35:32+00:00
+updated_at: '2026-05-15T17:53:44Z'
+intake_id: ''
 author: zhaoquan
 channel: freely-feat-execution
 session_refs: []
 pre_tests_path: docs/epics/agent-handoff-protocol/verification/pre-tests.md
 verification_artifact_dir: docs/epics/agent-handoff-protocol/code-reviews
+platform_state: closed
 ---
 
 # I-20260514T103532Z-A: agent handoff protocol v2
