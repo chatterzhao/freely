@@ -18,6 +18,7 @@ channel: fix-execution
 session_refs: []
 pre_tests_path: docs/epics/worker-launch-writable-redirect/pre-tests.md
 verification_artifact_dir: docs/epics/worker-launch-writable-redirect/code-reviews
+platform_state: ''
 ---
 
 # I-20260509T022152Z-A: worker launch 验证 target 必须是 fix/feature
