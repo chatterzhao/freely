@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260507T0730Z
 kind: raw
-status: proposed
+phase_state: proposed
 phase_state: proposed
 platform_ids:
   github:
@@ -21,6 +21,7 @@ session_refs: []
 pre_tests_path: docs/epics/source-param/verification/pre-tests.md
 verification_artifact_dir: docs/epics/source-param/code-reviews
 source_candidate: docs/pre-brainstorms/20260507-source-param/candidates.md
+platform_state: open
 ---
 
 ## 背景

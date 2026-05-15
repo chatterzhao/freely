@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260506T1400Z
 kind: raw
-status: proposed
+phase_state: proposed
 phase_state: proposed
 source_candidate: docs/pre-brainstorms/20260506-merge-guarded-fix/candidates.md
 platform_ids:
