@@ -12132,13 +12132,13 @@ WORKER_HANDOFF_INJECT
         log_info "worker launched: $(basename "$_prompt_file")"
         if [[ -n "$_handoff_id" && -f "$_handoff_py" && -f "$_db_path" ]]; then
           python3 "$_handoff_py" update --db "$_db_path" \
-            --handoff-id "$_handoff_id" --status "launched" >/dev/null 2>&1 || true
+            --handoff-id "$_handoff_id" --status "launched" --expected-status "pending" >/dev/null 2>&1 || true
         fi
       else
         log_warn "worker launch failed: $(basename "$_prompt_file")"
         if [[ -n "$_handoff_id" && -f "$_handoff_py" && -f "$_db_path" ]]; then
           python3 "$_handoff_py" update --db "$_db_path" \
-            --handoff-id "$_handoff_id" --status "rejected" --exit-kind "launch_failed" >/dev/null 2>&1 || true
+            --handoff-id "$_handoff_id" --status "rejected" --expected-status "pending" --exit-kind "launch_failed" >/dev/null 2>&1 || true
         fi
       fi
     done
