@@ -734,3 +734,7 @@
 - `20260326-1810--freely-layered-architecture-and-tooling-topology`
 - `20260326-1825--deep-refactor-fleet-sequencing`
 20260505T1210Z--issue-state-refactor: issue 状态字段重构
+
+- 20260514T103532Z--agent-handoff-protocol
+  - brainstorms: docs/pre-brainstorms/20260514T103532Z--agent-handoff-protocol/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260514T103532Z--agent-handoff-protocol/candidates.md

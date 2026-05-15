@@ -1,0 +1,165 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 820" font-family="system-ui,-apple-system,sans-serif">
+  <defs>
+    <marker id="arrow-blue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#2563EB"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#059669"/>
+    </marker>
+    <marker id="arrow-amber" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#D97706"/>
+    </marker>
+    <marker id="arrow-gray" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#6B7280"/>
+    </marker>
+    <marker id="arrow-violet" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#7C3AED"/>
+    </marker>
+    <linearGradient id="header-grad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1E293B"/>
+      <stop offset="100%" stop-color="#334155"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1100" height="820" fill="#F8FAFC" rx="8"/>
+
+  <!-- Title -->
+  <rect x="0" y="0" width="1100" height="52" fill="url(#header-grad)" rx="8"/>
+  <rect x="0" y="40" width="1100" height="12" fill="url(#header-grad)"/>
+  <text x="550" y="33" text-anchor="middle" fill="#F1F5F9" font-size="18" font-weight="700">Agent Handoff Protocol — 整体架构与数据流</text>
+
+  <!-- ============================================================ -->
+  <!-- LAYER 1: Protocol Contract (Agent Docs) -->
+  <!-- ============================================================ -->
+
+  <!-- Box: Agent Docs Layer -->
+  <rect x="30" y="68" width="1040" height="130" rx="6" fill="#EFF6FF" stroke="#93C5FD" stroke-width="1.5"/>
+  <text x="50" y="90" font-size="13" font-weight="700" fill="#1E40AF">协议契约层 — Agent Docs 定义 JSON 输出规范</text>
+
+  <!-- manager-agent.md -->
+  <rect x="50" y="102" width="490" height="82" rx="5" fill="#DBEAFE" stroke="#60A5FA" stroke-width="1"/>
+  <text x="70" y="122" font-size="12" font-weight="700" fill="#1E3A5F">freely-agent-manager.md</text>
+  <text x="70" y="140" font-size="10.5" fill="#374151">exit_kind: delegate_workers | resume_manager | stop_ai</text>
+  <text x="70" y="156" font-size="10.5" fill="#374151">AI 输出字段: exit_kind, reason, worker_prompts_csv,</text>
+  <text x="70" y="172" font-size="10.5" fill="#374151">  restart_point, next_action (completion_summary/evidence_paths 省略)</text>
+
+  <!-- worker-agent.md -->
+  <rect x="560" y="102" width="490" height="82" rx="5" fill="#DBEAFE" stroke="#60A5FA" stroke-width="1"/>
+  <text x="580" y="122" font-size="12" font-weight="700" fill="#1E3A5F">freely-agent-worker.md</text>
+  <text x="580" y="140" font-size="10.5" fill="#374151">exit_kind: worker_done | worker_blocked | worker_handoff_needed</text>
+  <text x="580" y="156" font-size="10.5" fill="#374151">AI 输出字段: exit_kind, reason, completion_summary,</text>
+  <text x="580" y="172" font-size="10.5" fill="#374151">  evidence_paths, next_action (worker_prompts_csv/restart_point 省略)</text>
+
+  <!-- Arrow: inject into prompt -->
+  <line x1="295" y1="198" x2="295" y2="228" stroke="#2563EB" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+  <line x1="805" y1="198" x2="805" y2="228" stroke="#2563EB" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+
+  <!-- ============================================================ -->
+  <!-- LAYER 2: AI Agents -->
+  <!-- ============================================================ -->
+
+  <rect x="30" y="232" width="1040" height="95" rx="6" fill="#F0FDF4" stroke="#86EFAC" stroke-width="1.5"/>
+  <text x="50" y="254" font-size="13" font-weight="700" fill="#166534">AI 执行层 — Agent 按规范在回复末尾输出 ```handoff JSON 块</text>
+
+  <!-- Manager AI -->
+  <rect x="50" y="268" width="490" height="48" rx="5" fill="#DCFCE7" stroke="#4ADE80" stroke-width="1"/>
+  <text x="70" y="288" font-size="12" font-weight="700" fill="#14532D">Manager AI (develop 工位，多轮 patrol 同会话)</text>
+  <text x="70" y="305" font-size="10.5" fill="#374151">handoffs(监督) + scan(发现,已过滤活跃Worker) → 决策 → 输出 JSON</text>
+
+  <!-- Worker AI -->
+  <rect x="560" y="268" width="490" height="48" rx="5" fill="#DCFCE7" stroke="#4ADE80" stroke-width="1"/>
+  <text x="580" y="288" font-size="12" font-weight="700" fill="#14532D">Worker AI (feature 工位，fork 创建→delta 继续)</text>
+  <text x="580" y="305" font-size="10.5" fill="#374151">执行 Task → followthrough delta turn 继续 → 输出 done/blocked/handoff JSON</text>
+
+  <!-- Arrow: AI outputs JSON -->
+  <line x1="295" y1="316" x2="295" y2="358" stroke="#059669" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+  <line x1="805" y1="316" x2="805" y2="358" stroke="#059669" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+
+  <!-- ============================================================ -->
+  <!-- LAYER 3: Runtime (freely script) -->
+  <!-- ============================================================ -->
+
+  <rect x="30" y="360" width="1040" height="165" rx="6" fill="#FFF7ED" stroke="#FDBA74" stroke-width="1.5"/>
+  <text x="50" y="382" font-size="13" font-weight="700" fill="#9A3412">Runtime 引擎层 — freely 脚本：解析 JSON → 验证 → 合并字段 → 写入 DB（乐观锁） → 分发消费 → auto-consume</text>
+
+  <!-- parse_handoff_json -->
+  <rect x="50" y="396" width="320" height="58" rx="4" fill="#FED7AA" stroke="#F97316" stroke-width="1"/>
+  <text x="70" y="414" font-size="11" font-weight="700" fill="#7C2D12">parse_handoff_json()</text>
+  <text x="70" y="430" font-size="10" fill="#374151">1. grep 提取 ```handoff 代码块</text>
+  <text x="70" y="444" font-size="10" fill="#374151">2. json.loads() 解析</text>
+  <text x="70" y="458" font-size="10" fill="#374151">3. 按 exit_kind 验证必填字段</text>
+
+  <!-- Merge -->
+  <rect x="390" y="396" width="280" height="58" rx="4" fill="#FED7AA" stroke="#F97316" stroke-width="1"/>
+  <text x="410" y="414" font-size="11" font-weight="700" fill="#7C2D12">Runtime 字段合并</text>
+  <text x="410" y="430" font-size="10" fill="#374151">AI 字段 (7个) + Runtime 字段 (18个)</text>
+  <text x="410" y="444" font-size="10" fill="#374151">→ 完整 25 字段记录</text>
+  <text x="410" y="458" font-size="10" fill="#374151">handoff_id/role/raw_key/status/created_at...</text>
+
+  <!-- Dispatch -->
+  <rect x="690" y="396" width="360" height="58" rx="4" fill="#FED7AA" stroke="#F97316" stroke-width="1"/>
+  <text x="710" y="414" font-size="11" font-weight="700" fill="#7C2D12">dispatch consume_*()</text>
+  <text x="710" y="430" font-size="10" fill="#374151">delegate_workers → consume_delegate_workers</text>
+  <text x="710" y="444" font-size="10" fill="#374151">resume_manager   → consume_resume_manager</text>
+  <text x="710" y="458" font-size="10" fill="#374151">stop_ai / worker_done / worker_blocked / ...</text>
+
+  <!-- Arrows between Runtime stages -->
+  <line x1="370" y1="425" x2="388" y2="425" stroke="#D97706" stroke-width="1.2" marker-end="url(#arrow-amber)"/>
+  <line x1="670" y1="425" x2="688" y2="425" stroke="#D97706" stroke-width="1.2" marker-end="url(#arrow-amber)"/>
+
+  <!-- Invalid → repair -->
+  <rect x="50" y="464" width="1000" height="56" rx="4" fill="#FEE2E2" stroke="#FCA5A5" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="70" y="482" font-size="10.5" font-weight="700" fill="#991B1B">验证失败 → 插入结构化修复 handoff: repair_target_role + repair_target_handoff_id + validation_errors_json</text>
+  <text x="70" y="498" font-size="10" fill="#7F1D1D">Manager 下轮 patrol 读字段即可定位（不需推断）→ 重新拉起问题角色 → 角色按 validation_errors 修正 JSON</text>
+  <text x="70" y="514" font-size="9.5" fill="#991B1B">所有 status UPDATE 加 WHERE status='<期望当前状态>' 乐观锁，防 mark_stale / worker_done 并发覆盖</text>
+
+  <!-- Arrow: Runtime write to DB -->
+  <line x1="550" y1="525" x2="550" y2="568" stroke="#D97706" stroke-width="1.5" marker-end="url(#arrow-amber)"/>
+
+  <!-- ============================================================ -->
+  <!-- LAYER 4: Database -->
+  <!-- ============================================================ -->
+
+  <rect x="30" y="570" width="1040" height="110" rx="6" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.5"/>
+  <text x="50" y="592" font-size="13" font-weight="700" fill="#374151">持久化层 — SQLite handoffs 表</text>
+
+  <rect x="50" y="604" width="1000" height="66" rx="4" fill="#E5E7EB" stroke="#9CA3AF" stroke-width="1"/>
+  <text x="70" y="622" font-size="10.5" font-weight="700" fill="#374151">handoffs 表 (25 字段)</text>
+  <text x="70" y="640" font-size="10" fill="#4B5563">主键: handoff_id | 角色: role IN (manager,worker) | 线程: raw_key | 关联: parent_handoff_id / previous_worker_handoff_id</text>
+  <text x="70" y="657" font-size="10" fill="#4B5563">状态: status IN (pending,launched,completed,rejected,blocked,consumed) | AI字段: exit_kind,reason,restart_point,next_action,completion_summary,evidence_paths,worker_prompts_csv</text>
+  <text x="70" y="673" font-size="9.5" fill="#6B7280">scan 过滤: idx_handoffs_worktree_status 查 worktree=? AND status='launched' → 命中排除; raw_key 兜底</text>
+
+  <!-- ============================================================ -->
+  <!-- LAYER 5: Worker Launch -->
+  <!-- ============================================================ -->
+
+  <rect x="30" y="695" width="1040" height="60" rx="6" fill="#F5F3FF" stroke="#C4B5FD" stroke-width="1.5"/>
+  <text x="50" y="717" font-size="13" font-weight="700" fill="#5B21B6">Worker 启动机制</text>
+
+  <rect x="50" y="728" width="380" height="20" rx="3" fill="#EDE9FE"/>
+  <text x="70" y="742" font-size="10" fill="#4C1D95">WORKER_HANDOFF_INJECT: handoff_id + parent + prev_worker + completion(截断)</text>
+  <rect x="390" y="728" width="300" height="20" rx="3" fill="#EDE9FE"/>
+  <text x="410" y="742" font-size="10" fill="#4C1D95">fork(首启/重建) | prompt delta turn(继续)</text>
+  <rect x="710" y="728" width="340" height="20" rx="3" fill="#EDE9FE"/>
+  <text x="730" y="742" font-size="10" fill="#4C1D95">worktree_has_active_worker (只查 launched)</text>
+
+  <!-- ============================================================ -->
+  <!-- LEGEND -->
+  <!-- ============================================================ -->
+  <rect x="30" y="768" width="1040" height="44" rx="6" fill="#1E293B"/>
+  <text x="50" y="793" font-size="10.5" fill="#94A3B8">
+    协议契约 (Agent Docs)
+  </text>
+  <rect x="180" y="780" width="14" height="14" rx="3" fill="#DBEAFE" stroke="#60A5FA" stroke-width="0.5"/>
+  <text x="200" y="793" font-size="10.5" fill="#94A3B8">→ AI 执行</text>
+  <rect x="270" y="780" width="14" height="14" rx="3" fill="#DCFCE7" stroke="#4ADE80" stroke-width="0.5"/>
+  <text x="290" y="793" font-size="10.5" fill="#94A3B8">→ Runtime 引擎</text>
+  <rect x="390" y="780" width="14" height="14" rx="3" fill="#FED7AA" stroke="#F97316" stroke-width="0.5"/>
+  <text x="410" y="793" font-size="10.5" fill="#94A3B8">→ 数据库存储</text>
+  <rect x="510" y="780" width="14" height="14" rx="3" fill="#E5E7EB" stroke="#9CA3AF" stroke-width="0.5"/>
+  <text x="530" y="793" font-size="10.5" fill="#94A3B8">→ Worker 启动</text>
+  <rect x="630" y="780" width="14" height="14" rx="3" fill="#EDE9FE"/>
+  <text x="650" y="793" font-size="10.5" fill="#94A3B8">—— 修复路径 (虚线)</text>
+  <rect x="780" y="780" width="14" height="14" rx="3" fill="#FEE2E2" stroke="#FCA5A5" stroke-width="0.5"/>
+</svg>

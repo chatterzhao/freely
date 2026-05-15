@@ -1,0 +1,168 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 620" font-family="system-ui,-apple-system,sans-serif">
+  <defs>
+    <marker id="a-par" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5 Z" fill="#2563EB"/></marker>
+    <marker id="a-prev" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5 Z" fill="#7C3AED"/></marker>
+    <marker id="a-raw" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5 Z" fill="#6B7280"/></marker>
+    <linearGradient id="hdr" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1E293B"/><stop offset="100%" stop-color="#334155"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1100" height="620" fill="#F8FAFC" rx="8"/>
+  <rect x="0" y="0" width="1100" height="44" fill="url(#hdr)" rx="8"/>
+  <rect x="0" y="32" width="1100" height="12" fill="url(#hdr)"/>
+  <text x="550" y="28" text-anchor="middle" fill="#F1F5F9" font-size="17" font-weight="700">Handoff 线程模型 — 同一 raw_key 下多轮 Manager-Worker 对话的记录关联</text>
+
+  <!-- Explanation -->
+  <text x="550" y="70" text-anchor="middle" font-size="11" fill="#475569">raw_key (例如 "20260514T103532Z") = 一个 issue 的线程标识。同 raw_key 下所有记录构成该线程的完整历史。</text>
+
+  <!-- ============================================================ -->
+  <!-- ROUND 1: Manager + Worker A -->
+  <!-- ============================================================ -->
+
+  <!-- Phase label -->
+  <rect x="20" y="90" width="1060" height="22" rx="3" fill="#EFF6FF"/>
+  <text x="550" y="105" text-anchor="middle" font-size="11" font-weight="700" fill="#1E40AF">第 1 轮: Manager 委派 Worker A → Worker A 完成</text>
+
+  <!-- Manager R1 -->
+  <rect x="40" y="122" width="220" height="72" rx="5" fill="#DBEAFE" stroke="#60A5FA" stroke-width="1.5"/>
+  <text x="55" y="142" font-size="10.5" font-weight="700" fill="#1E3A5F">Manager Handoff (R1)</text>
+  <text x="55" y="158" font-size="9.5" fill="#4B5563" font-family="monospace">handoff_id: M-001</text>
+  <text x="55" y="174" font-size="9.5" fill="#4B5563" font-family="monospace">raw_key: 20260514T103532Z</text>
+  <text x="55" y="190" font-size="9.5" fill="#4B5563" font-family="monospace">exit_kind: delegate_workers</text>
+
+  <!-- Worker A -->
+  <rect x="440" y="122" width="240" height="72" rx="5" fill="#DCFCE7" stroke="#4ADE80" stroke-width="1.5"/>
+  <text x="455" y="142" font-size="10.5" font-weight="700" fill="#14532D">Worker A</text>
+  <text x="455" y="158" font-size="9.5" fill="#4B5563" font-family="monospace">handoff_id: W-A</text>
+  <text x="455" y="174" font-size="9.5" fill="#4B5563" font-family="monospace">raw_key: 20260514T103532Z</text>
+  <text x="455" y="190" font-size="9.5" fill="#4B5563" font-family="monospace">exit_kind: worker_done</text>
+
+  <!-- parent_handoff_id: M-001 → W-A -->
+  <path d="M265,158 L435,158" stroke="#2563EB" stroke-width="2" fill="none" marker-end="url(#a-par)"/>
+  <rect x="300" y="140" width="120" height="16" rx="3" fill="#2563EB" opacity="0.15"/>
+  <text x="360" y="152" text-anchor="middle" font-size="8.5" fill="#2563EB" font-weight="600">parent_handoff_id</text>
+
+  <!-- previous_worker_handoff_id: W-A = "" (first worker) -->
+  <text x="560" y="202" font-size="8.5" fill="#9CA3AF" font-family="monospace">previous_worker_handoff_id: ""</text>
+
+  <!-- ============================================================ -->
+  <!-- ROUND 2: Manager + Worker B (follow-up) -->
+  <!-- ============================================================ -->
+
+  <rect x="20" y="230" width="1060" height="22" rx="3" fill="#EFF6FF"/>
+  <text x="550" y="245" text-anchor="middle" font-size="11" font-weight="700" fill="#1E40AF">第 2 轮: Manager 读取 Worker A 结果 → 委派 Worker B 继续推进</text>
+
+  <!-- Manager R2 -->
+  <rect x="40" y="262" width="220" height="72" rx="5" fill="#DBEAFE" stroke="#60A5FA" stroke-width="1.5"/>
+  <text x="55" y="282" font-size="10.5" font-weight="700" fill="#1E3A5F">Manager Handoff (R2)</text>
+  <text x="55" y="298" font-size="9.5" fill="#4B5563" font-family="monospace">handoff_id: M-002</text>
+  <text x="55" y="314" font-size="9.5" fill="#4B5563" font-family="monospace">raw_key: 20260514T103532Z</text>
+  <text x="55" y="330" font-size="9.5" fill="#4B5563" font-family="monospace">exit_kind: delegate_workers</text>
+
+  <!-- Worker B -->
+  <rect x="440" y="262" width="240" height="72" rx="5" fill="#DCFCE7" stroke="#4ADE80" stroke-width="1.5"/>
+  <text x="455" y="282" font-size="10.5" font-weight="700" fill="#14532D">Worker B</text>
+  <text x="455" y="298" font-size="9.5" fill="#4B5563" font-family="monospace">handoff_id: W-B</text>
+  <text x="455" y="314" font-size="9.5" fill="#4B5563" font-family="monospace">raw_key: 20260514T103532Z</text>
+  <text x="455" y="330" font-size="9.5" fill="#4B5563" font-family="monospace">exit_kind: worker_handoff_needed</text>
+
+  <!-- parent_handoff_id: M-002 → W-B -->
+  <path d="M265,298 L435,298" stroke="#2563EB" stroke-width="2" fill="none" marker-end="url(#a-par)"/>
+  <rect x="300" y="280" width="120" height="16" rx="3" fill="#2563EB" opacity="0.15"/>
+  <text x="360" y="292" text-anchor="middle" font-size="8.5" fill="#2563EB" font-weight="600">parent_handoff_id</text>
+
+  <!-- previous_worker_handoff_id: W-A → W-B -->
+  <path d="M560,200 C600,220 620,240 560,290" stroke="#7C3AED" stroke-width="1.8" fill="none" marker-end="url(#a-prev)" stroke-dasharray="5,3"/>
+  <rect x="500" y="245" width="120" height="16" rx="3" fill="#7C3AED" opacity="0.15"/>
+  <text x="560" y="257" text-anchor="middle" font-size="8.5" fill="#7C3AED" font-weight="600">previous_worker_handoff_id</text>
+
+  <!-- ============================================================ -->
+  <!-- ROUND 3: Manager + Worker C (final) -->
+  <!-- ============================================================ -->
+
+  <rect x="20" y="370" width="1060" height="22" rx="3" fill="#EFF6FF"/>
+  <text x="550" y="385" text-anchor="middle" font-size="11" font-weight="700" fill="#1E40AF">第 3 轮: Manager 读 Worker B 的决策请求 → 决策后委派 Worker C → 最终 stop_ai</text>
+
+  <!-- Manager R3 -->
+  <rect x="40" y="402" width="220" height="72" rx="5" fill="#DBEAFE" stroke="#60A5FA" stroke-width="1.5"/>
+  <text x="55" y="422" font-size="10.5" font-weight="700" fill="#1E3A5F">Manager Handoff (R3)</text>
+  <text x="55" y="438" font-size="9.5" fill="#4B5563" font-family="monospace">handoff_id: M-003</text>
+  <text x="55" y="454" font-size="9.5" fill="#4B5563" font-family="monospace">raw_key: 20260514T103532Z</text>
+  <text x="55" y="470" font-size="9.5" fill="#4B5563" font-family="monospace">exit_kind: delegate_workers</text>
+
+  <!-- Worker C -->
+  <rect x="440" y="402" width="240" height="72" rx="5" fill="#DCFCE7" stroke="#4ADE80" stroke-width="1.5"/>
+  <text x="455" y="422" font-size="10.5" font-weight="700" fill="#14532D">Worker C</text>
+  <text x="455" y="438" font-size="9.5" fill="#4B5563" font-family="monospace">handoff_id: W-C</text>
+  <text x="455" y="454" font-size="9.5" fill="#4B5563" font-family="monospace">raw_key: 20260514T103532Z</text>
+  <text x="455" y="470" font-size="9.5" fill="#4B5563" font-family="monospace">exit_kind: worker_done</text>
+
+  <!-- parent_handoff_id: M-003 → W-C -->
+  <path d="M265,438 L435,438" stroke="#2563EB" stroke-width="2" fill="none" marker-end="url(#a-par)"/>
+  <rect x="300" y="420" width="120" height="16" rx="3" fill="#2563EB" opacity="0.15"/>
+  <text x="360" y="432" text-anchor="middle" font-size="8.5" fill="#2563EB" font-weight="600">parent_handoff_id</text>
+
+  <!-- previous_worker_handoff_id: W-B → W-C -->
+  <path d="M560,340 C600,360 620,390 560,430" stroke="#7C3AED" stroke-width="1.8" fill="none" marker-end="url(#a-prev)" stroke-dasharray="5,3"/>
+  <rect x="500" y="380" width="120" height="16" rx="3" fill="#7C3AED" opacity="0.15"/>
+  <text x="560" y="392" text-anchor="middle" font-size="8.5" fill="#7C3AED" font-weight="600">previous_worker_handoff_id</text>
+
+  <!-- Manager Final (stop_ai) -->
+  <rect x="40" y="500" width="220" height="56" rx="5" fill="#E0E7FF" stroke="#818CF8" stroke-width="1.5"/>
+  <text x="55" y="518" font-size="10.5" font-weight="700" fill="#312E81">Manager Handoff (Final)</text>
+  <text x="55" y="534" font-size="9.5" fill="#4B5563" font-family="monospace">handoff_id: M-004</text>
+  <text x="55" y="550" font-size="9.5" fill="#4B5563" font-family="monospace">exit_kind: stop_ai</text>
+
+  <!-- parent_handoff_id: M-004 → M-003 (manager chain) -->
+  <path d="M150,490 C150,485 150,480 150,478" stroke="#2563EB" stroke-width="1.5" fill="none" stroke-dasharray="4,2"/>
+  <text x="265" y="482" font-size="8.5" fill="#2563EB">parent_handoff_id (manager chain)</text>
+
+  <!-- Consumed marking (auto by Runtime) -->
+  <rect x="440" y="500" width="240" height="56" rx="5" fill="#F3F4F6" stroke="#9CA3AF" stroke-width="1.5"/>
+  <text x="455" y="518" font-size="10.5" font-weight="700" fill="#374151">自动消费 (Runtime)</text>
+  <text x="455" y="534" font-size="9.5" fill="#4B5563" font-family="monospace">W-A → consumed (by M-002 创建时)</text>
+  <text x="455" y="550" font-size="9.5" fill="#4B5563" font-family="monospace">W-B, W-C → consumed (by M-004 创建时)</text>
+
+  <!-- ============================================================ -->
+  <!-- Thread grouping -->
+  <!-- ============================================================ -->
+  <rect x="710" y="100" width="370" height="460" rx="8" fill="none" stroke="#6B7280" stroke-width="2" stroke-dasharray="8,4"/>
+  <text x="895" y="125" text-anchor="middle" font-size="12" font-weight="700" fill="#4B5563">线程分组: raw_key</text>
+  <text x="895" y="142" text-anchor="middle" font-size="10" fill="#6B7280" font-family="monospace">= "20260514T103532Z"</text>
+
+  <!-- Thread query example -->
+  <rect x="730" y="160" width="330" height="78" rx="4" fill="#F3F4F6"/>
+  <text x="745" y="180" font-size="9.5" font-weight="700" fill="#374151">查询线程历史:</text>
+  <text x="745" y="198" font-size="9" fill="#4B5563" font-family="monospace">handoff.py list-key --raw-key 20260514T103532Z</text>
+  <text x="745" y="215" font-size="9" fill="#4B5563" font-family="monospace">→ 返回 M-001, W-A, M-002, W-B, M-003, W-C, M-004</text>
+  <text x="745" y="232" font-size="9" fill="#4B5563" font-family="monospace">→ 按 created_at 排序 = 完整对话时间线</text>
+
+  <!-- WORKER_HANDOFF_INJECT context -->
+  <rect x="730" y="250" width="330" height="120" rx="4" fill="#F5F3FF"/>
+  <text x="745" y="270" font-size="9.5" font-weight="700" fill="#5B21B6">Worker B 的 HANDOFF_INJECT 收到:</text>
+  <text x="745" y="288" font-size="9" fill="#4B5563">• handoff_id: W-B (自己的)</text>
+  <text x="745" y="304" font-size="9" fill="#4B5563">• parent_handoff_id: M-002 (谁创建了我)</text>
+  <text x="745" y="320" font-size="9" fill="#4B5563">• previous_worker_handoff_id: W-A</text>
+  <text x="745" y="336" font-size="9" fill="#4B5563">• 上一轮 Worker A 的 completion_summary:</text>
+  <text x="755" y="352" font-size="8.5" fill="#6B7280">"修改 handoff.py 新增 reason 字段"</text>
+  <text x="745" y="367" font-size="9" fill="#4B5563">• 线程摘要: 同 raw_key 最近 5 条记录</text>
+
+  <!-- Legend -->
+  <rect x="730" y="385" width="330" height="160" rx="6" fill="#1E293B"/>
+  <text x="750" y="408" font-size="11" font-weight="700" fill="#F1F5F9">字段关系说明</text>
+
+  <line x1="750" y1="430" x2="810" y2="430" stroke="#2563EB" stroke-width="2" marker-end="url(#a-par)"/>
+  <text x="820" y="434" font-size="10" fill="#94A3B8">parent_handoff_id: 谁创建了这条记录</text>
+
+  <line x1="750" y1="455" x2="810" y2="455" stroke="#7C3AED" stroke-width="1.8" marker-end="url(#a-prev)" stroke-dasharray="5,3"/>
+  <text x="820" y="459" font-size="10" fill="#94A3B8">previous_worker_handoff_id: 同线程上一轮 worker</text>
+
+  <line x1="750" y1="480" x2="810" y2="480" stroke="#6B7280" stroke-width="1.5"/>
+  <text x="820" y="484" font-size="10" fill="#94A3B8">raw_key: 所有记录共享的线程标识</text>
+
+  <text x="750" y="508" font-size="10" fill="#94A3B8">parent 链: Manager → Worker → Manager → Worker</text>
+  <text x="750" y="526" font-size="10" fill="#94A3B8">previous 链: Worker A → Worker B → Worker C</text>
+  <text x="750" y="544" font-size="10" fill="#94A3B8">raw_key 组: 所有记录 ∈ 同一条线程</text>
+
+</svg>
