@@ -7,6 +7,7 @@ source_candidate: docs/pre-brainstorms/20260508T111130Z--reference-transaction-d
 verification_artifact_dir: docs/epics/reference-transaction-delete-fix/code-reviews
 pre_tests_path: docs/epics/reference-transaction-delete-fix/verification/pre-tests.md
 platform_ids: {}
+platform_state: ''
 ---
 
 # I-20260508T111130Z-A: reference-transaction hook delete fix
