@@ -7,6 +7,7 @@ platform_ids:
     issue_id: '272'
     url: https://github.com/chatterzhao/freely/issues/272
 primary_platform: github
+platform_state: closed
 ---
 ## 问题
 

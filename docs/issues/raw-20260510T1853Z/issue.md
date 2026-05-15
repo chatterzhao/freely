@@ -1,17 +1,9 @@
 ---
 local_id: raw-20260510T1853Z
 kind: raw
-title: 'fix: init branch check should also verify worktree'
 phase_state: proposed
-platform_ids:
-  github:
-    issue_id: '350'
-    url: https://github.com/chatterzhao/freely/issues/350
-    synced_at: '2026-05-15T18:24:44Z'
-updated_at: '2026-05-15T18:24:44Z'
-primary_platform: github
-created_at: '2026-05-15T18:24:44Z'
-platform_state: open
+platform_ids: {}
+platform_state: ''
 ---
 ## 问题
 init 分支校验只检查命名，不检查 worktree。提示缺少具体修复命令。
