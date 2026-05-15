@@ -5,17 +5,17 @@
 
 ## M-20260514T103532Z-A
 - title: agent handoff protocol v2 — JSON 协议 + 状态机 + 线程模型
-- status: active
+- status: completed
 ### candidate_issues
 1. `C-20260514T103532Z-A`
 - milestone: M-20260514T103532Z-A
 - status: promoted
 - promoted_issue_path: `docs/issues/I-20260514T103532Z-A/issue.md`
-### committed_issues
+### completed_issues
 1. `I-20260514T103532Z-A`
 - title: agent handoff protocol v2
-- milestone_state: active
-- phase_state: `done_b2_ibm`
+- milestone_state: completed
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260514T103532Z-A/issue.md`
 
 ## M-20260514T050327Z-A
@@ -5214,11 +5214,3 @@ routing_policy:
 - phase_state: `in_b2_ibm`
 - issue_path: `docs/issues/I-20260509T024559Z-A/issue.md`
 
-## M-20260514T103532Z-A
-- title: agent handoff protocol v2
-- status: active
-### candidate_issues
-1. `C-20260514T103532Z-A`
-- milestone: M-20260514T103532Z-A
-- status: proposed
-- next_action: 完成 B2_IBM materialize，进入 dev-loop

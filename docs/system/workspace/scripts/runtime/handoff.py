@@ -71,6 +71,9 @@ def init_db():
             completion_summary TEXT DEFAULT '',
             evidence_paths TEXT DEFAULT '',
             worker_prompts_csv TEXT DEFAULT '',
+            repair_target_role TEXT DEFAULT '',
+            repair_target_handoff_id TEXT DEFAULT '',
+            validation_errors_json TEXT DEFAULT '[]',
             session_id TEXT DEFAULT '',
             created_by TEXT DEFAULT '',
             consumed_by TEXT DEFAULT '',
@@ -111,7 +114,7 @@ def insert(role, raw_key, prompt_file, worktree="", branch="",
            exit_kind, reason, restart_point, next_action,
            completion_summary, evidence_paths, worker_prompts_csv,
            status, created_at, updated_at)
-           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'pending',?,?)""",
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'pending',?,?)""",
         (hid, role, raw_key, worktree, branch, prompt_file,
          parent_handoff_id, previous_worker_handoff_id,
          intent_kind, created_by, consumed_by, exit_kind,
@@ -123,12 +126,12 @@ def insert(role, raw_key, prompt_file, worktree="", branch="",
     return hid
 
 
-def update_status(handoff_id, status, expected_status=None, exit_kind="",
+def update_status(handoff_id, status, expected_status, exit_kind="",
                   session_id="", reason="", restart_point="", next_action="",
                   completion_summary="", evidence_paths="",
                   worker_prompts_csv=""):
-    """Update status with optimistic locking. If expected_status is set,
-    UPDATE uses WHERE status=expected_status and checks affected rows."""
+    """Update status with mandatory optimistic locking.
+    UPDATE always uses WHERE status=expected_status."""
     conn = _connect()
     now = _now_utc()
     cols = ["status=?", "updated_at=?"]
@@ -158,11 +161,9 @@ def update_status(handoff_id, status, expected_status=None, exit_kind="",
             cols.append(f"{field}=?")
             params.append(val)
 
-    where = "handoff_id=?"
+    where = "handoff_id=? AND status=?"
     params.append(handoff_id)
-    if expected_status:
-        where += " AND status=?"
-        params.insert(-1, expected_status)
+    params.append(expected_status)
 
     sql = f"UPDATE handoffs SET {', '.join(cols)} WHERE {where}"
     cur = conn.execute(sql, params)
@@ -419,27 +420,39 @@ def parse_handoff_json(reply_text, context):
          record["launched_at"], record["last_activity_at"],
          record["completed_at"], record["created_at"], record["updated_at"]))
     conn.commit()
+    # Manager records auto-complete (patrol ended when JSON was output)
+    if record["role"] == "manager":
+        now = _now_utc()
+        conn.execute(
+            "UPDATE handoffs SET status='completed', completed_at=?, updated_at=? WHERE handoff_id=?",
+            (now, now, record["handoff_id"]))
+        conn.commit()
+        record["status"] = "completed"
     conn.close()
 
     return record, record["exit_kind"], []
 
 
 def insert_repair_handoff(repair_target_role, repair_target_handoff_id, validation_errors, raw_key):
-    """Insert a structured repair handoff for Manager to consume."""
+    """Insert a structured repair handoff for Manager to consume.
+    Stores repair_target_role, repair_target_handoff_id, validation_errors_json as structured columns,
+    not buried in natural-language text. Manager reads the columns directly."""
     conn = _connect()
     hid = (_now_utc().replace("T", "").replace("Z", "").replace("-", "").replace(":", "")
            + "-" + uuid.uuid4().hex[:6])
     now = _now_utc()
     errors_json = json.dumps(validation_errors, ensure_ascii=False)
-    reason = f"Agent [{repair_target_role}] 输出的 handoff JSON 验证失败。handoff_id: {repair_target_handoff_id}"
-    next_action = (f"检查 {repair_target_role} 的 prompt 和 JSON 格式。"
-                   f"验证错误: {errors_json}")
+    reason = f"Agent [{repair_target_role}] 输出无效 handoff JSON。"
+    next_action = f"检查 {repair_target_role} 的 prompt 和 JSON 格式。验证错误见 validation_errors_json 字段。"
     conn.execute(
         """INSERT INTO handoffs (handoff_id, role, raw_key, prompt_file,
            parent_handoff_id, status, exit_kind, restart_point, reason, next_action,
+           repair_target_role, repair_target_handoff_id, validation_errors_json,
            created_by, created_at, updated_at)
-           VALUES (?,?,'repair','',?,'pending','resume_manager','recovery',?,?,'runtime',?,?)""",
-        (hid, "manager", repair_target_handoff_id, reason, next_action, now, now))
+           VALUES (?,?,'repair','',?,'pending','resume_manager','recovery',?,?,
+           ?,?,?,'runtime',?,?)""",
+        (hid, "manager", repair_target_handoff_id, reason, next_action,
+         repair_target_role, repair_target_handoff_id, errors_json, now, now))
     conn.commit()
     conn.close()
     return hid
@@ -513,6 +526,10 @@ def main():
     p_latest = sub.add_parser("latest-manager")
     p_latest.add_argument("--db", required=True)
 
+    p_prev = sub.add_parser("latest-completed-worker")
+    p_prev.add_argument("--db", required=True)
+    p_prev.add_argument("--raw-key", required=True)
+
     p_stale = sub.add_parser("mark-stale")
     p_stale.add_argument("--db", required=True)
     p_stale.add_argument("--inactivity-minutes", type=int, default=15)
@@ -567,6 +584,9 @@ def main():
         print(json.dumps(rows, indent=2, ensure_ascii=False))
     elif args.cmd == "has-active-worker":
         print("true" if has_active_worker_for_worktree(args.worktree) else "false")
+    elif args.cmd == "latest-completed-worker":
+        r = latest_completed_worker(args.raw_key)
+        print(json.dumps(r, indent=2, ensure_ascii=False) if r else "null")
     elif args.cmd == "latest-manager":
         r = latest_manager()
         print(json.dumps(r, indent=2, ensure_ascii=False) if r else "null")
