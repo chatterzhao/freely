@@ -1,8 +1,9 @@
 ---
 local_id: raw-20260508T005431Z
 kind: raw
-status: proposed
-phase_state: proposed
+status: closed
+phase_state: absorbed
+close_reason: merged_develop_missing
 platform_ids:
   github:
     issue_id: '251'
@@ -13,14 +14,14 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-08T00:54:56Z'
-updated_at: '2026-05-08T00:54:56Z'
+updated_at: '2026-05-15T18:25:07Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
 pre_tests_path: docs/epics/skill-standardize/verification/pre-tests.md
 verification_artifact_dir: docs/epics/skill-standardize/code-reviews
-platform_state: open
+platform_state: closed
 ---
 
 - pre_tests_path: docs/epics/skill-standardize/verification/pre-tests.md

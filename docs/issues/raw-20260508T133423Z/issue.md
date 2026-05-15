@@ -1,19 +1,25 @@
 ---
 local_id: raw-20260508T133423Z
 kind: raw
+title: 'fix: raw-issue-pull git path resolution error on non-root CWD'
 status: proposed
 phase_state: proposed
-platform_ids: {}
-primary_platform: ''
+platform_ids:
+  github:
+    issue_id: '348'
+    url: https://github.com/chatterzhao/freely/issues/348
+    synced_at: '2026-05-15T18:24:34Z'
+primary_platform: github
 canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-08T13:34:23Z'
-updated_at: '2026-05-10T00:00:00Z'
+updated_at: '2026-05-15T18:24:34Z'
 intake_id: ''
 author: zhaoquan
 channel: local
 session_refs: []
+platform_state: open
 ---
 
 ## 问题
