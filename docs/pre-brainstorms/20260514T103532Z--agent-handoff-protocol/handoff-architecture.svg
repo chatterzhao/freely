@@ -139,10 +139,10 @@
 
   <rect x="50" y="728" width="380" height="20" rx="3" fill="#EDE9FE"/>
   <text x="70" y="742" font-size="10" fill="#4C1D95">WORKER_HANDOFF_INJECT: handoff_id + parent + prev_worker + completion(截断)</text>
-  <rect x="390" y="728" width="280" height="20" rx="3" fill="#EDE9FE"/>
-  <text x="410" y="742" font-size="10" fill="#4C1D95">launch_worker_from_manager_prompt</text>
-  <rect x="690" y="728" width="360" height="20" rx="3" fill="#EDE9FE"/>
-  <text x="710" y="742" font-size="10" fill="#4C1D95">worktree_has_active_worker (只查 launched 状态去重)</text>
+  <rect x="390" y="728" width="300" height="20" rx="3" fill="#EDE9FE"/>
+  <text x="410" y="742" font-size="10" fill="#4C1D95">fork(首启/重建) | prompt delta turn(继续)</text>
+  <rect x="710" y="728" width="340" height="20" rx="3" fill="#EDE9FE"/>
+  <text x="730" y="742" font-size="10" fill="#4C1D95">worktree_has_active_worker (只查 launched)</text>
 
   <!-- ============================================================ -->
   <!-- LEGEND -->

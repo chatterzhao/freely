@@ -5806,11 +5806,11 @@ materialize_manager_worker_terminal_continuation() {
       manager_next_action="Consume this completed worker result before broad patrol, then decide manager-owned closeout, merge judgement, retirement, or next dispatch."
       ;;
     worker_blocked)
-      contract_summary="$(_db_exit_contract_field "$project" worker blocked_reason)"
+      contract_summary="$(_db_exit_contract_field "$project" worker reason)"
       manager_next_action="Consume this blocked worker result before broad patrol, then decide manager-owned unblock, re-dispatch, or bounded stop."
       ;;
     worker_handoff_needed)
-      contract_summary="$(_db_exit_contract_field "$project" worker handoff_reason)"
+      contract_summary="$(_db_exit_contract_field "$project" worker reason)"
       manager_next_action="Consume this worker handoff before broad patrol, then decide manager-owned followthrough or next dispatch."
       ;;
     *)
@@ -11977,9 +11977,9 @@ worktree_has_active_worker() {
   _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
   _db_path="$project/.freely/freely.db"
   [[ -f "$_handoff_py" && -f "$_db_path" ]] || return 1
+  # Only check launched — pending is transient (created and launched atomically in consume_delegate_workers)
   local active_records sup_pid
-  active_records=$(python3 "$_handoff_py" list --db "$_db_path" --role worker --status pending 2>/dev/null)
-  active_records+=$(python3 "$_handoff_py" list --db "$_db_path" --role worker --status launched 2>/dev/null)
+  active_records=$(python3 "$_handoff_py" list --db "$_db_path" --role worker --status launched 2>/dev/null)
   local matching
   matching=$(echo "$active_records" | python3 -c "
 import json,sys
@@ -11990,14 +11990,20 @@ for r in json.load(sys.stdin):
   [[ -z "$matching" ]] && return 1
   sup_pid=$(cat "$worktree/.freely/run/supervisor.pid" 2>/dev/null || true)
   if [[ -n "$sup_pid" ]] && kill -0 "$sup_pid" 2>/dev/null; then
+    # Update last_activity_at on liveness check
+    local hid
+    for hid in $matching; do
+      [[ -n "$hid" ]] || continue
+      python3 "$_handoff_py" update-last-activity --db "$_db_path" --handoff-id "$hid" >/dev/null 2>&1 || true
+    done
     return 0
   fi
   local hid
   for hid in $matching; do
     [[ -n "$hid" ]] || continue
     python3 "$_handoff_py" update --db "$_db_path" --handoff-id "$hid" \
-      --status blocked --exit-kind stale_pid \
-      --blocked-reason "worker process no longer alive" >/dev/null 2>&1 || true
+      --status blocked --expected-status launched --exit-kind stale_pid \
+      --reason "worker process no longer alive" >/dev/null 2>&1 || true
   done
   return 1
 }
@@ -12068,7 +12074,7 @@ manager_runtime_launch_workers_after_ai_cycle_if_needed() {
           --role worker --raw-key "$(echo "$_prompt_file" | grep -oE '[0-9]{8}T[0-9]{4,6}Z' | head -1)" \
           --prompt-file "$_prompt_file" --created-by manager --consumed-by worker 2>/dev/null || true)
       fi
-      # Inject handoff metadata so worker can report completion to manager's central DB
+      # Inject structured handoff context (fork-only; delta turns skip this)
       if [[ -n "$_handoff_id" && -f "$_prompt_file" ]]; then
         cat >> "$_prompt_file" <<WORKER_HANDOFF_INJECT
 
@@ -12076,22 +12082,8 @@ manager_runtime_launch_workers_after_ai_cycle_if_needed() {
 
 ## 完成汇报（硬性要求）
 
-你的 handoff 记录存储在 manager 的中心数据库中。工作完成后必须更新状态：
+完成后在回复末尾输出 ```handoff JSON 块，Runtime 自动解析写入 DB。JSON 格式见 worker-agent.md 交接章节。
 
-\`\`\`bash
-# 完成时:
-python3 ${_handoff_py} update --db ${_db_path} \\
-  --handoff-id ${_handoff_id} --status completed --exit-kind worker_done \\
-  --completion-summary "<简要描述完成了什么>"
-
-# 被阻塞无法继续时（务必写清原因和建议）:
-python3 ${_handoff_py} update --db ${_db_path} \\
-  --handoff-id ${_handoff_id} --status blocked --exit-kind worker_blocked \\
-  --blocked-reason "<阻塞原因>" \\
-  --next-action "<主管下一步应做什么>"
-\`\`\`
-
-不更新状态会被 manager 视为超时。
 WORKER_HANDOFF_INJECT
       fi
       if launch_worker_from_manager_prompt_if_needed "$project" "$_prompt_file"; then
@@ -13271,69 +13263,25 @@ append_manager_exit_contract_directive_if_needed() {
   cat <<'EOF'
 
 Manager exit contract（硬性要求）：
-- 在本轮结束前，调用 handoff.py update 写入出口状态到 DB（handoffs 表）。
-- 所有三种出口都必须写，不存在"不写 handoff"的情况。
+- 在本轮回复末尾输出 ```handoff JSON 块，Runtime 解析后统一写入 DB。
+- 只输出表格里列出的字段。不填的字段省略——Runtime 自动填默认值。
+- 所有三种出口都必须输出 JSON。
 
-handoff.py 路径和 DB：
-  HP="docs/system/workspace/scripts/runtime/handoff.py"
-  DB=".freely/freely.db"
-
-当前 handoff_id 从 session-handoff.txt 或 latest-manager 查询获取。
+HP="docs/system/workspace/scripts/runtime/handoff.py"
+DB=".freely/freely.db"
 
 ───────────────
-委派前检查（delegate_workers 必须做；resume_manager 也建议做）
+委派前检查
 ───────────────
-1. 查询 blocked worker 状态：
-   python3 $HP list --db $DB --role worker --status blocked
-   对每个 blocked worker，读取 blocked_reason 和 next_action 字段，分析根因：
-
-   常见 blocked_reason 含义和应对：
-   - "Worker launched but did not complete within N min timeout" →
-       该 worker 超时。检查其 worktree 是否仍存在。
-       如果同任务已超时 ≥3 次 → 标记为 superseded，重新评估是否需要新方案。
-       如果是首次超时且工位存在 → 可以 re-dispatch。
-   - "assessment" / "retirement" / "superseded" →
-       该 worker 是被主管主动关闭的，任务已完成或放弃。
-       不需要 re-dispatch，只需清理工位（如果还存在）。
-   - 包含具体错误描述（如 "worktree not found"）→
-       分析原因后决定：修复工位后 re-dispatch、或标记 superseded 放弃。
-
-   重要：不要看到 blocked 就盲重试。先读 blocked_reason，再做判断。
-   同一 worker 连续 blocked ≥3 次 → 关闭旧手牌，创建新 prompt 或放弃。
-
-2. 查询已完成但工作树未清理的 worker：
-   python3 $HP list --db $DB --role worker --status completed
-
-3. 根据 blocked worker 的 worktree 字段，检查对应工位是否仍存在。
-   如果工位已被删除（git worktree remove）→ 该 worker 任务已失效，标记 superseded。
+python3 $HP list --db $DB --role worker --status blocked
+python3 $HP list --db $DB --role worker --status completed
+对 blocked worker：读 reason + next_action，判断根因后 re-dispatch 或 superseded。
+同一 worker 连续 blocked ≥3 次 → 关闭旧手牌。
 
 ───────────────
-1. stop_ai
+1. delegate_workers — 委派 Worker
 ───────────────
-条件：没有待处理的 blocked worker、没有 scan backlog、没有 dirty worktree 需要关注。
-python3 $HP update --db $DB --handoff-id <handoff_id> --status completed \
-  --exit-kind stop_ai --stop-reason "<停止的具体原因>"
-
-───────────────
-2. resume_manager
-───────────────
-条件：有问题需要继续分析（dirty worktree、blocked worker 需要人工判断等），但还不能委派。
-python3 $HP update --db $DB --handoff-id <handoff_id> --status completed \
-  --exit-kind resume_manager \
-  --restart-point "<重入起点描述>" \
-  --next-action "<下一步动作>" \
-  --why-not-stop "<为什么还不能停止>" \
-  --why-not-delegate "<为什么不能委派worker>"
-
-───────────────
-3. delegate_workers
-───────────────
-条件：有明确可委派的工作（dirty worktree 需要 commit、analysis 需要执行等），且你知道目标 worktree 路径和 branch 名称。
-
-步骤 A：为每个 worker 创建 prompt 文件
-  文件路径：.freely/run/worker-prompts/<timestamp>-worker-<slug>.txt
-
-  文件必须包含以下 header（每行一个，格式为 "Key: value" 或 "Key:\n- value"）：
+步骤 A：创建 worker prompt 文件（.freely/run/worker-prompts/<ts>-worker-<slug>.txt），包含 header：
 
   Worktree:
   - /absolute/path/to/worktree
@@ -13345,36 +13293,43 @@ python3 $HP update --db $DB --handoff-id <handoff_id> --status completed \
   intent_kind: edit
   intent_target: <简短描述>
 
-  然后是 ## Task 部分，描述具体要做什么。
+  然后 ## Task 描述具体要做什么。
 
-  规则：
-  - Worktree 和 Branch header 是必需的——runtime 用它们定位或创建工位
-  - 如果 worktree 不存在：runtime 会自动调用 ./bin/wt-create 创建
-  - Manager 不需要自己运行 wt-create——只需在 prompt 里写对 Worktree 和 Branch
-  - intent_kind 可选值：edit（代码改动）、cleanup（合并/收口）、promotion（发布/升级）
-  - parallel_safe: true 表示可以和其他 worker 并行运行
-  - write_scope: worktree 表示只在自己的工位内写
+步骤 B：在回复末尾输出 JSON：
 
-步骤 B：写 manager exit contract
-  python3 $HP update --db $DB --handoff-id <handoff_id> --status completed \
-    --exit-kind delegate_workers \
-    --worker-prompts-csv "/abs/path/worker1.txt,/abs/path/worker2.txt"
+```handoff
+{
+  "exit_kind": "delegate_workers",
+  "reason": "<为什么委派这些 worker>",
+  "worker_prompts_csv": "/abs/path/w1.txt,/abs/path/w2.txt"
+}
+```
 
-步骤 C：为每个 worker insert 手牌记录
-  python3 $HP insert --db $DB --role worker --raw-key <key> \
-    --worktree <abs_path> --branch fix/raw-<key>-<slug> \
-    --prompt-file <worker_prompt_path> --parent <manager_handoff_id> \
-    --created-by manager --consumed-by worker --exit-kind ""
+Runtime 自动：读 worker_prompts_csv → 去重 → 解析 header → INSERT worker → launch (fork 或 delta)
 
-步骤 D：runtime 在下一轮会自动：
-  - 读取 worker_prompts_csv → 检查每个 worker prompt → launch_worker_from_manager_prompt
-  - 如果 worktree 不存在 → 自动调用 wt-create 创建工位 → 同步 tooling → 启动 worker AI
-  - Worker 完成后 → 更新 handoffs 表 → Manager 下轮 patrol 消费结果
+───────────────
+2. resume_manager — 需继续分析
+───────────────
 
-规则：
-- 所有三种出口必须调用 handoff.py update，无一例外
-- 如果你本轮还没写完整 exit contract，runtime 会用同一个 resume target 拉你回来补
-- 不要写 "why_not_delegate: runtime does not support" —— runtime 完整支持 worker 委派
+```handoff
+{
+  "exit_kind": "resume_manager",
+  "reason": "<为什么不能停也不能委派>",
+  "restart_point": "pre_brainstorm",
+  "next_action": "<下一步做什么>"
+}
+```
+
+───────────────
+3. stop_ai — 无事可做
+───────────────
+
+```handoff
+{
+  "exit_kind": "stop_ai",
+  "reason": "<为什么停止>"
+}
+```
 EOF
 }
 
@@ -13386,72 +13341,86 @@ append_worker_exit_contract_directive_if_needed() {
 
 ## 工作交接
 
-你的工作无论什么结果，最终都归为以下三种交接。先判断你的情况属于哪一种，再按格式写入 DB。
-
-交接字段必须写清楚——主管靠这些字段理解发生了什么、决定下一步。
-空字段等于没交接。
-
-DB: .freely/freely.db
-HP: docs/system/workspace/scripts/runtime/handoff.py
-当前 handoff_id 从 session-handoff.txt 或 handoff.py list 查询获取。
+在回复末尾输出 ```handoff JSON 块，Runtime 解析后写入 DB。只输出表格里列出的字段。
 
 ──────────────────────────────────────
 1. worker_done —— 任务已完成
 ──────────────────────────────────────
 
-适用于：
-- 自己完成了委派的任务
-- 发现任务已经被完成了（比如工位已合并到 develop、代码已被别人提交等）
-- 工位不存在但对应的分支已合并 → 任务客观上已完成，写清楚"已合并，无需再处理"
-
-python3 $HP update --db $DB --handoff-id <handoff_id> --status completed \
-  --exit-kind worker_done \
-  --completion-summary "<具体完成了什么，或为什么判断任务已完成>" \
-  --evidence-paths "/abs/path/evidence.md"
-
-completion-summary 必填。必须让主管看得懂。
+```handoff
+{
+  "exit_kind": "worker_done",
+  "completion_summary": "<具体完成了什么>",
+  "evidence_paths": "/abs/path/evidence.md"
+}
+```
 
 ──────────────────────────────────────
-2. worker_blocked —— 被阻塞，需要主管介入
+2. worker_blocked —— 被阻塞
 ──────────────────────────────────────
 
-适用于：
-- 遇到无法自行解决的问题（权限不够、依赖缺失、环境错误等）
-- 工位存在但无法继续工作
-- 任何你试过了但搞不定的情况
-
-python3 $HP update --db $DB --handoff-id <handoff_id> --status completed \
-  --exit-kind worker_blocked \
-  --blocked-reason "<具体阻塞了什么、为什么无法自行解决>" \
-  --next-action "<建议主管下一步做什么>"
-
-blocked-reason 和 next-action 必填。不要只写"阻塞了"三个字。
+```handoff
+{
+  "exit_kind": "worker_blocked",
+  "reason": "<具体阻塞了什么>",
+  "next_action": "<建议主管下一步做什么>"
+}
+```
 
 ──────────────────────────────────────
-3. worker_handoff_needed —— 需要主管审核或决策
+3. worker_handoff_needed —— 需主管决策
 ──────────────────────────────────────
 
-适用于：
-- 工作做完了但需要主管审核后才能继续
-- 发现一个问题但不确定是否应该处理、如何处理
-- 需要主管做决策才能继续
-
-python3 $HP update --db $DB --handoff-id <handoff_id> --status completed \
-  --exit-kind worker_handoff_needed \
-  --handoff-reason "<背景：做了什么、为什么需要主管决策>" \
-  --next-action "<主管需要决策什么>"
-
-handoff-reason 和 next-action 必填。
+```handoff
+{
+  "exit_kind": "worker_handoff_needed",
+  "reason": "<背景：为什么需要主管决策>",
+  "next_action": "<主管需要决策什么>"
+}
+```
 
 ──────────────────────────────────────
 规则：
-- 无论哪种情况，必须调用 handoff.py update
+- 必须输出 ```handoff JSON 块
 - 字段不写清楚 = 主管看不懂 = 浪费一轮 patrol
-- runtime 会检查你的交接，如果无效会用同一个 resume target 拉你回来补
+- Runtime 检查交接，无效会用 resume target 拉回来补
 EOF
 }
 
 sync_exit_contract_to_handoffs() {
+  return 0
+}
+
+# parse_handoff_json_reply: extract ```handoff JSON from AI cycle log, parse via handoff.py, dispatch consume_*.
+# Returns: "ok:<exit_kind>" on success, "repair:<errors_json>" on failure.
+# Side effects: INSERTs handoff record + dispatches consume_* (all inside handoff.py parse).
+parse_handoff_json_reply() {
+  local project="$1" cycle_log="$2" role="$3" raw_key="$4" prompt_file="$5"
+  local _handoff_py _db_path _reply_text _result _action _exit_kind
+  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  _db_path="$project/.freely/freely.db"
+  [[ -f "$_handoff_py" && -f "$_db_path" ]] || { printf 'repair:["handoff_py_or_db_missing"]\n'; return 1; }
+  # Extract tail of cycle log (handoff JSON is at end of AI reply)
+  if [[ -n "$cycle_log" && -f "$cycle_log" ]]; then
+    _reply_text="$(tail -c 32768 "$cycle_log" 2>/dev/null || true)"
+  else
+    _reply_text=""
+  fi
+  if [[ -z "$_reply_text" ]]; then
+    printf 'repair:["empty_reply"]\n'
+    return 1
+  fi
+  _result=$(python3 "$_handoff_py" parse --db "$_db_path" --reply-text "$_reply_text" \
+    --role "$role" --raw-key "$raw_key" --prompt-file "$prompt_file" 2>/dev/null || true)
+  _action=$(echo "$_result" | python3 -c "import json,sys; print(json.load(sys.stdin).get('action','error'))" 2>/dev/null || echo "error")
+  if [[ "$_action" == "repair" ]]; then
+    local _errors
+    _errors=$(echo "$_result" | python3 -c "import json,sys; print(json.dumps(json.load(sys.stdin).get('errors',[])))" 2>/dev/null || echo "[]")
+    printf 'repair:%s\n' "$_errors"
+    return 1
+  fi
+  _exit_kind="${_action:-unknown}"
+  printf 'ok:%s\n' "$_exit_kind"
   return 0
 }
 
@@ -13523,11 +13492,11 @@ except: pass
       return 1
       ;;
   esac
-  stop_reason="$(_db_exit_contract_field "$project" manager stop_reason)"
+  stop_reason="$(_db_exit_contract_field "$project" manager reason)"
   restart_point="$(_db_exit_contract_field "$project" manager restart_point)"
   next_action="$(_db_exit_contract_field "$project" manager next_action)"
-  why_not_stop="$(_db_exit_contract_field "$project" manager why_not_stop)"
-  why_not_delegate="$(_db_exit_contract_field "$project" manager why_not_delegate)"
+  why_not_stop="$(_db_exit_contract_field "$project" manager reason)"
+  why_not_delegate="$(_db_exit_contract_field "$project" manager reason)"
   worker_prompts_csv="$(_db_exit_contract_field "$project" manager worker_prompts_csv)"
   case "$kind" in
     stop_ai)
@@ -13682,8 +13651,8 @@ validate_worker_exit_contract_for_project() {
   esac
   completion_summary="$(_db_exit_contract_field "$project" worker completion_summary)"
   evidence_paths_csv="$(_db_exit_contract_field "$project" worker evidence_paths)"
-  blocked_reason="$(_db_exit_contract_field "$project" worker blocked_reason)"
-  handoff_reason="$(_db_exit_contract_field "$project" worker handoff_reason)"
+  blocked_reason="$(_db_exit_contract_field "$project" worker reason)"
+  handoff_reason="$(_db_exit_contract_field "$project" worker reason)"
   next_action_for_manager="$(_db_exit_contract_field "$project" worker next_action)"
   case "$kind" in
     worker_done)
@@ -13752,8 +13721,8 @@ write_manager_resume_handoff() {
   route_kind="$(manager_continuity_resume_focus_route_kind "$continuity_file" || true)"
   restart_point="$(_db_exit_contract_field "$project" manager restart_point)"
   next_action="$(_db_exit_contract_field "$project" manager next_action)"
-  why_not_stop="$(_db_exit_contract_field "$project" manager why_not_stop)"
-  why_not_delegate="$(_db_exit_contract_field "$project" manager why_not_delegate)"
+  why_not_stop="$(_db_exit_contract_field "$project" manager reason)"
+  why_not_delegate="$(_db_exit_contract_field "$project" manager reason)"
   cat >"$(handoff_file "$project")" <<EOF
 # Session Handoff
 
@@ -13901,44 +13870,55 @@ worker_exit_contract_done_is_repair_only_cleanup_escape() {
 
 manager_runtime_handle_exit_contract_after_ai_cycle() {
   local project="$1" exit_reason="${2:-}" missing_csv="" kind="" worker_prompts_csv="" stop_reason="" unresolved_workers="" cleanup_followthrough_intake_id="" cleanup_followthrough_output="" cleanup_followthrough_detail=""
+  local parse_result parse_ok raw_key cycle_log
   [[ "$(effective_runtime_role_for_project "$project")" == "manager" ]] || {
     printf 'continue\n'
     return 0
   }
   case "$exit_reason" in
     ai_exit_rc_0)
-      if ! missing_csv="$(validate_manager_exit_contract_for_project "$project")"; then
-        if ! manager_cycle_has_effective_output_evidence "$project"; then
-          write_manager_exit_contract_repair_handoff "$project" "manager_empty_success_cycle" "${missing_csv:-missing_file};effective_output_evidence=absent"
-          write_workcell_state "$project" "running" "up" "down" "manager_empty_success_cycle"
-          append_runtime_event "$project" "manager_empty_success_cycle_detected" \
-            "details=${missing_csv:-missing_file}" \
-            "jsonl_path=$(meta_env_value "$(session_state_file "$project")" "LAST_TOOL_JSONL_PATH")" \
-            "resume_target=${LAST_TOOL_RESUME_TARGET:-unavailable}"
-          printf 'resume_invalid\n'
-          return 0
+      # ── New path: parse ```handoff JSON from AI reply ──
+      cycle_log="${LAST_CYCLE_LOG:-}"
+      raw_key="manager-patrol"
+      parse_result="$(parse_handoff_json_reply "$project" "$cycle_log" "manager" "$raw_key" "" 2>/dev/null || true)"
+      parse_ok="${parse_result%%:*}"
+      if [[ "$parse_ok" == "ok" ]]; then
+        kind="${parse_result#ok:}"
+        append_runtime_event "$project" "manager_handoff_json_parsed" "exit_kind=$kind"
+      else
+        # Fallback: old validation path for backward compat
+        if ! missing_csv="$(validate_manager_exit_contract_for_project "$project")"; then
+          if ! manager_cycle_has_effective_output_evidence "$project"; then
+            write_manager_exit_contract_repair_handoff "$project" "manager_empty_success_cycle" "${missing_csv:-missing_file};effective_output_evidence=absent"
+            write_workcell_state "$project" "running" "up" "down" "manager_empty_success_cycle"
+            append_runtime_event "$project" "manager_empty_success_cycle_detected" \
+              "details=${missing_csv:-missing_file}" \
+              "jsonl_path=$(meta_env_value "$(session_state_file "$project")" "LAST_TOOL_JSONL_PATH")" \
+              "resume_target=${LAST_TOOL_RESUME_TARGET:-unavailable}"
+            printf 'resume_invalid\n'
+            return 0
+          fi
+          if autofill_manager_exit_contract_for_cleanup_delegate_workers_if_possible "$project" "${missing_csv:-missing_file}"; then
+            append_runtime_event "$project" "manager_exit_contract_delegate_workers_autofilled" \
+              "details=${missing_csv:-missing_file}"
+            printf 'delegate_workers\n'
+            return 0
+          fi
+          if autofill_manager_exit_contract_for_continuity_resume_if_possible "$project" "${missing_csv:-missing_file}"; then
+            append_runtime_event "$project" "manager_exit_contract_resume_autofilled" \
+              "details=${missing_csv:-missing_file}"
+          else
+            write_manager_exit_contract_repair_handoff "$project" "manager_exit_contract_invalid" "${missing_csv:-missing_file}"
+            write_workcell_state "$project" "running" "up" "down" "manager_exit_contract_invalid"
+            append_runtime_event "$project" "manager_exit_contract_invalid" \
+              "details=${missing_csv:-missing_file}" \
+              "resume_target=${LAST_TOOL_RESUME_TARGET:-unavailable}"
+            printf 'resume_invalid\n'
+            return 0
+          fi
         fi
-        if autofill_manager_exit_contract_for_cleanup_delegate_workers_if_possible "$project" "${missing_csv:-missing_file}"; then
-          append_runtime_event "$project" "manager_exit_contract_delegate_workers_autofilled" \
-            "details=${missing_csv:-missing_file}"
-          printf 'delegate_workers\n'
-          return 0
-        fi
-        if autofill_manager_exit_contract_for_continuity_resume_if_possible "$project" "${missing_csv:-missing_file}"; then
-          append_runtime_event "$project" "manager_exit_contract_resume_autofilled" \
-            "details=${missing_csv:-missing_file}"
-        else
-          write_manager_exit_contract_repair_handoff "$project" "manager_exit_contract_invalid" "${missing_csv:-missing_file}"
-          write_workcell_state "$project" "running" "up" "down" "manager_exit_contract_invalid"
-          append_runtime_event "$project" "manager_exit_contract_invalid" \
-            "details=${missing_csv:-missing_file}" \
-            "resume_target=${LAST_TOOL_RESUME_TARGET:-unavailable}"
-          printf 'resume_invalid\n'
-          return 0
-        fi
+        kind="$(manager_exit_contract_kind "$project" || true)"
       fi
-      # Sync valid exit contract to handoffs table
-      # sync_exit_contract_to_handoffs deprecated: DB is primary store
       ;;
     execution_network_transient|execution_network_persistent|proxy_config_invalid)
       manager_exit_contract_kind "$project" >/dev/null 2>&1 || {
@@ -13957,8 +13937,8 @@ manager_runtime_handle_exit_contract_after_ai_cycle() {
       return 0
       ;;
   esac
-  kind="$(manager_exit_contract_kind "$project" || true)"
-  stop_reason="$(_db_exit_contract_field "$project" manager stop_reason)"
+  [[ -n "$kind" ]] || kind="$(manager_exit_contract_kind "$project" || true)"
+  stop_reason="$(_db_exit_contract_field "$project" manager reason)"
   case "$kind" in
     stop_ai)
       if manager_has_unresolved_expected_running_workers "$project"; then
@@ -14005,6 +13985,7 @@ manager_runtime_handle_exit_contract_after_ai_cycle() {
           ;;
       esac
       : >"$(stop_marker_file "$project")"
+      python3 "$_handoff_py" auto-consume --db "$_db_path" --raw-key "$_raw_key" >/dev/null 2>&1 || true
       append_runtime_event "$project" "manager_exit_contract_stop_ai" \
         "stop_reason=${stop_reason}"
       printf 'stop_ai\n'
@@ -14036,12 +14017,22 @@ manager_runtime_handle_exit_contract_after_ai_cycle() {
         "$project" \
         "manager_exit_contract_resume" \
         "restart_point=$(_db_exit_contract_field "$project" manager restart_point);next_action=$(_db_exit_contract_field "$project" manager next_action)"
+      # Auto-consume on resume too
+      local _hp_resume _db_resume _rk_resume
+      _hp_resume="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+      _db_resume="$project/.freely/freely.db"
+      _rk_resume="$(_db_exit_contract_field "$project" manager raw_key)"
+      [[ -n "$_rk_resume" && -f "$_hp_resume" ]] && python3 "$_hp_resume" auto-consume --db "$_db_resume" --raw-key "$_rk_resume" >/dev/null 2>&1 || true
       append_runtime_event "$project" "manager_exit_contract_resume" \
         "restart_point=$(_db_exit_contract_field "$project" manager restart_point)"
       printf 'resume_manager\n'
       ;;
     delegate_workers)
       worker_prompts_csv="$(_db_exit_contract_field "$project" manager worker_prompts_csv)"
+      # Auto-consume previous unconsumed workers on new manager handoff
+      local _raw_key
+      _raw_key="$(_db_exit_contract_field "$project" manager raw_key)"
+      [[ -n "$_raw_key" ]] && python3 "$_handoff_py" auto-consume --db "$_db_path" --raw-key "$_raw_key" >/dev/null 2>&1 || true
       append_runtime_event "$project" "manager_exit_contract_delegate_workers" \
         "worker_prompts_csv=${worker_prompts_csv:-none}"
       printf 'delegate_workers\n'
@@ -14063,14 +14054,27 @@ worker_runtime_handle_exit_contract_after_ai_cycle() {
   contract_file="$(worker_exit_contract_file "$project")"
   case "$exit_reason" in
     ai_exit_rc_0)
-      if ! missing_csv="$(validate_worker_exit_contract_for_project "$project")"; then
-        write_worker_exit_contract_repair_handoff "$project" "worker_exit_contract_invalid" "${missing_csv:-missing_file}"
-        write_workcell_state "$project" "running" "up" "down" "worker_exit_contract_invalid"
-        append_runtime_event "$project" "worker_exit_contract_invalid" \
-          "details=${missing_csv:-missing_file}" \
-          "resume_target=${LAST_TOOL_RESUME_TARGET:-unavailable}"
-        printf 'resume_invalid\n'
-        return 0
+      # ── New path: parse ```handoff JSON from worker AI reply ──
+      local _w_cycle_log _w_raw_key _w_parse_result _w_parse_ok
+      _w_cycle_log="${LAST_CYCLE_LOG:-}"
+      _w_raw_key="$(_db_exit_contract_field "$project" worker raw_key 2>/dev/null || echo "")"
+      _w_parse_result="$(parse_handoff_json_reply "$project" "$_w_cycle_log" "worker" "$_w_raw_key" "" 2>/dev/null || true)"
+      _w_parse_ok="${_w_parse_result%%:*}"
+      if [[ "$_w_parse_ok" == "ok" ]]; then
+        kind="${_w_parse_result#ok:}"
+        append_runtime_event "$project" "worker_handoff_json_parsed" "exit_kind=$kind"
+      else
+        # Fallback: old validation
+        if ! missing_csv="$(validate_worker_exit_contract_for_project "$project")"; then
+          write_worker_exit_contract_repair_handoff "$project" "worker_exit_contract_invalid" "${missing_csv:-missing_file}"
+          write_workcell_state "$project" "running" "up" "down" "worker_exit_contract_invalid"
+          append_runtime_event "$project" "worker_exit_contract_invalid" \
+            "details=${missing_csv:-missing_file}" \
+            "resume_target=${LAST_TOOL_RESUME_TARGET:-unavailable}"
+          printf 'resume_invalid\n'
+          return 0
+        fi
+        kind="$(worker_exit_contract_kind "$project" || true)"
       fi
       ;;
     execution_network_transient|execution_network_persistent|proxy_config_invalid)
@@ -14112,14 +14116,14 @@ worker_runtime_handle_exit_contract_after_ai_cycle() {
       : >"$(stop_marker_file "$project")"
       write_workcell_state "$project" "stopped" "down" "down" "worker_exit_contract_blocked"
       append_runtime_event "$project" "worker_exit_contract_blocked" \
-        "blocked_reason=$(_db_exit_contract_field "$project" worker blocked_reason)"
+        "blocked_reason=$(_db_exit_contract_field "$project" worker reason)"
       printf 'stop_ai\n'
       ;;
     worker_handoff_needed)
       : >"$(stop_marker_file "$project")"
       write_workcell_state "$project" "stopped" "down" "down" "worker_exit_contract_handoff_needed"
       append_runtime_event "$project" "worker_exit_contract_handoff_needed" \
-        "handoff_reason=$(_db_exit_contract_field "$project" worker handoff_reason)"
+        "handoff_reason=$(_db_exit_contract_field "$project" worker reason)"
       printf 'stop_ai\n'
       ;;
     *)
@@ -14744,6 +14748,55 @@ with open(output_path, "w") as f:
     f.write("\n")
 PRPY
       rm -f "$_scan_pr_tmp"
+      # Post-process: filter scan items that have active workers
+      local _handoff_py _db_path
+      _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+      _db_path="$project/.freely/freely.db"
+      if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
+        python3 - "$output_path" "$_handoff_py" "$_db_path" <<'SCANFILTER'
+import json, sys, subprocess
+output_path = sys.argv[1]
+hp = sys.argv[2]
+db = sys.argv[3]
+with open(output_path) as f:
+    data = json.load(f)
+items = data.get('items', [])
+filtered = []
+for it in items:
+    wt = it.get('worktree_path', '')
+    raw_key = it.get('key', '')
+    has_active = False
+    # Check worktree first (most precise)
+    if wt:
+        r = subprocess.run([sys.executable, hp, 'has-active-worker', '--db', db, '--worktree', wt],
+                          capture_output=True, text=True, timeout=5)
+        has_active = (r.stdout.strip() == 'true')
+    # Fallback: check raw_key
+    if not has_active and raw_key:
+        r = subprocess.run([sys.executable, hp, 'list-key', '--db', db, '--raw-key', raw_key],
+                          capture_output=True, text=True, timeout=5)
+        try:
+            records = json.loads(r.stdout)
+            has_active = any(rec.get('status') == 'launched' for rec in records)
+        except: pass
+    if not has_active:
+        filtered.append(it)
+# Update summary
+by_stage = {}
+ready = 0
+for it in filtered:
+    s = it.get('stage', 'unknown')
+    by_stage[s] = by_stage.get(s, 0) + 1
+    if it.get('ready'):
+        ready += 1
+data['items'] = filtered
+data['summary'] = {'total_incomplete': len(filtered), 'by_stage': by_stage, 'ready': ready}
+data['scan_filter'] = {'filtered_by_active_worker': len(items) - len(filtered)}
+with open(output_path, 'w') as f:
+    json.dump(data, f, indent=2, sort_keys=True, ensure_ascii=False)
+    f.write('\n')
+SCANFILTER
+      fi
     fi
   fi
   cat >"$state_path" <<EOF
