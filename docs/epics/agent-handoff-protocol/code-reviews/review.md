@@ -1,7 +1,7 @@
 - issue_id: I-20260514T103532Z-A
 - issue_path: docs/issues/I-20260514T103532Z-A/issue.md
 
-# Implementation Decision Note: Agent Handoff Protocol v2
+## Implementation Decision Note
 
 - decision: AI 不再直接调用 handoff.py update/insert（CLI 命令），改为在回复末尾输出 ```handoff JSON 块，由 Runtime 统一解析、验证、合并字段后写入 DB 并分发消费。
 - why_this: 当前 AI 分步执行 CLI 命令（Step B handoff.py update 写 manager exit contract，Step C handoff.py insert 逐条创建 worker 记录）之间无原子性保证——Step B 做了 Step C 没做会导致 validator 读 worker_prompts_csv 为空、launcher 读 pending worker 也为空（#343）。AI→JSON→Runtime 模型下，AI 只输出一个 JSON，Runtime 做唯一一次解析写入——不存在分步不一致的可能性。另外，JSON 格式比 CLI 参数列表更适合 AI 输出，CLI 的 5 个字段映射到单一的 reason 字段后，JSON 的 key-value 结构更自然。
