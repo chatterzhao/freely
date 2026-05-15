@@ -9899,7 +9899,7 @@ worker_prompt_matches_active_authoritative_worker() {
 
 runtime_script_for_project() {
   local project="$1"
-  printf '%s\n' "$project/docs/system/workspace/scripts/runtime/freely"
+  printf '%s\n' "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely"
 }
 
 worker_runtime_control_plane_needs_manager_source_rebind() {
@@ -15591,24 +15591,7 @@ select_launch_kind() {
 
 workspace_root_for_project() {
   local project="$1"
-  local candidate start_script
-  if worker_project_has_launchable_verification_contract "$project"; then
-    echo "$SELF_ROOT/docs/system/workspace"
-    return 0
-  fi
-  candidate="$project/docs/system/workspace"
-  start_script="$candidate/scripts/start-lead-agent.sh"
-  if [[ -d "$candidate" && -f "$start_script" ]]; then
-    if command -v rg >/dev/null 2>&1; then
-      if rg -q -- '--workspace-root' "$start_script" 2>/dev/null && rg -q -- '--reasoning-effort' "$start_script" 2>/dev/null; then
-        echo "$candidate"
-        return 0
-      fi
-    elif grep -q -- '--workspace-root' "$start_script" 2>/dev/null && grep -q -- '--reasoning-effort' "$start_script" 2>/dev/null; then
-      echo "$candidate"
-      return 0
-    fi
-  fi
+  # SELF_ROOT always points to the running freely — install, repo, or worktree
   echo "$SELF_ROOT/docs/system/workspace"
 }
 
