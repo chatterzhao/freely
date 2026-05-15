@@ -8,6 +8,7 @@ milestone: M-20260506T1230Z-A
 verification_artifact_dir: docs/epics/wt-create-dual/code-reviews
 pre_tests_path: docs/epics/wt-create-dual/verification/pre-tests.md
 platform_ids: {}
+platform_state: ''
 ---
 
 # I-20260506T1230Z-A: wt-create Dual Worktree Creation

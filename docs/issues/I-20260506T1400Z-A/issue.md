@@ -8,6 +8,7 @@ milestone: M-20260506T1400Z-A
 verification_artifact_dir: docs/epics/merge-guarded-fix-whitelist/code-reviews
 pre_tests_path: docs/epics/merge-guarded-fix-whitelist/verification/pre-tests.md
 platform_ids: {}
+platform_state: ''
 ---
 
 # I-20260506T1400Z-A: merge-guarded fix/* whitelist

@@ -14,6 +14,7 @@ created_at: 2026-05-07T14:35:46Z
 session_refs: []
 pre_tests_path: docs/epics/platform-pull-standardize/verification/pre-tests.md
 verification_artifact_dir: docs/epics/platform-pull-standardize/code-reviews
+platform_state: closed
 ---
 
 # I-20260507T143546Z-A: platform pull 标题标准化
