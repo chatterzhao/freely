@@ -19,6 +19,47 @@ Manager 和 Worker 协作良好的样子：**双方不直接通信，以 handoff
 
 **一句话**：Manager 和 Worker 各写各的 JSON，Runtime 保证每条 JSON 变成一个确定性的状态转换，双方在 handoffs 表里看见彼此的工作。
 
+## 会话模型
+
+Manager 和 Worker 都是**多轮连续会话**，共同规律是：`fork` 创建 → `prompt`（delta turn）继续 → 上下文满或异常时 `fresh_with_handoff` 重建。
+
+**关于 fork 的澄清**：`fork` 生成全新的 session UUID，Worker 写入自己的会话文件，与 Manager 会话完全隔离。`SESSION_PARENT_ID` 只记录谱系——Worker 知道自己"从哪来"。Worker 看到的是 `worker-agent.md`，不是 `manager-agent.md`。fork 继承的是 ACP 层面的 prompt 缓存（KV cache），不是会话内容。Worker 不会误以为自己是主管。
+
+**Manager：一个跨 patrol 的连续会话，管理所有 issue 和所有 Worker。** 首次启动 `fresh`/`fresh_with_handoff`。后续每轮 patrol 复用同一个 ACP 会话（`prompt`，delta 模式），只注入本轮变化（fleet 更新、scan 新增、handoffs 表新记录）。一个 Manager 会话同时面对多个 issue 的多个 Worker——它不需要在会话里记住每个 issue 的细节，因为 handoffs 表是它的外部记忆。每轮 patrol 从 handoffs 表查询所有 issue 的最新状态，按 `raw_key` 线程逐个处理。上下文接近上限或异常退出时 `fresh_with_handoff`——开新会话，handoff 连续性工件恢复状态。
+
+为什么不按 issue 拆分 Manager 会话？因为 patrol 本身就是跨 issue 的全局决策——哪些 issue 应该排队、哪些可以并行委派、哪个 Worker 的结果影响哪个 issue 的下一步——这些判断需要知道全局。按 issue 拆分会把全局视野切成碎片，每个"子 Manager"只看到自己的 issue，无法做跨 issue 的优先级和资源决策。handoffs 表承担了 per-issue 的状态存储，Manager 会话承担了跨 issue 的编排决策，各司其职。
+
+**Worker：每个 worktree 一个持续会话。** 首次委派时 Runtime 以 `fork` 模式从 Manager 会话分出（`SESSION_PARENT_ID` 指向 Manager），Worker 获得独立的会话但继承 Manager 的上下文缓存。Worker 在 worktree 上工作——
+- 做完输出 `worker_done` → 会话暂停，但**不关闭**
+- 受阻输出 `worker_blocked` → 会话暂停，Manager 介入
+- 需要请示输出 `worker_handoff_needed` → Runtime 生成 followthrough prompt，Manager 下一轮 patrol 读 handoffs 看到后，以 **delta turn（`prompt`）** 向同一个 Worker 会话发送纠正/澄清/继续的指令。Worker 在同一会话里继续，保留之前的代码理解和对话历史
+- Worker 真正死了（PID 不存活、log 不更新、socket 无心跳）→ 会话失效，Manager 可重新委派（新的 `fork` 会话）
+
+**一个 worktree 上的多轮对话**是常态：Manager 委派 → Worker 请示 → Manager 在 delta turn 里澄清 → Worker 继续 → Worker 说完成 → Manager 审查后追加要求 → Worker 在同一会话里补充。这就像两个人持续聊天，Manager 发消息（delta turn），Worker 回消息（handoff JSON），直到 Manager 判定这个 worktree 的工作完成，调用 `wt-close` 关闭 worktree 和 Worker 会话。
+
+**Worker 数量与 worktree 的关系：** 一个 Worker 绑定一个 worktree，一个 worktree 同时最多一个活跃 Worker（`worktree_has_active_worker` 检查 `status=launched`）。Manager 可同时委派多个 Worker 到不同 worktree 并行工作，每个 Worker 有自己独立的持续会话。
+
+**Manager 如何同时管理多个 Worker：** Manager 不记忆每个 Worker 的会话细节——它每轮 patrol 从 handoffs 表查询所有未消费 Worker 的状态（completed/blocked/rejected），这是 Manager 的唯一 Worker 信息源。Manager 不需要 track "Worker X 在聊什么"，只需要看到"completed 的读完做决策、blocked 的判断是重试还是收口、launched 的检查活跃度"。所有 Worker 的产出最终汇入 handoffs 表，Manager 按 raw_key 线程逐个处理。
+
+**会话何时结束：** Worker 会话在 worktree 被 close（合并到 develop 或废弃删除）时结束。Manager 调用 `wt-close`，Runtime 关闭 Worker 进程和 ACP 会话。Worker 不是自己"做完就关"——它做完汇报后会话保持，等待 Manager 确认收口或追加指令。Manager 是唯一有权结束 Worker 会话的角色。
+
+## Manager 的信息双通道：handoffs + scan
+
+Manager 有两个信息源，职责不同——
+
+**handoffs 表（监督通道）**：告诉 Manager"已经委派了什么、进展如何"。每轮 patrol 必查：completed 的需要消费决策、blocked 的需要判断重试或收口、launched 的需要检查活跃度、pending 的可能是崩溃残留。
+
+**scan（发现通道）**：告诉 Manager"项目里还有什么没做的"。扫描 issue 生命周期（raw→I→B1→B2→merge），但**排除已有活跃 Worker 的条目**。过滤逻辑：
+
+1. scan 条目有 `worktree_path` → 用 worktree 路径查 handoffs：`WHERE worktree=? AND role='worker' AND status='launched'`。worktree 路径本身就包含 raw_key，且 `idx_handoffs_worktree_status` 索引保证记录多也不慢。
+2. scan 条目无 worktree（如 chat 条目尚未创建工位）→ 用 `raw_key` 查：`WHERE raw_key=? AND role='worker' AND status='launched'`。
+
+任一命中 → 该条目被排除。Manager 拿到的 scan 已经是过滤后的，不需要自己交叉验证。
+
+**Worker 一旦不活跃，缺口就重新出现**：Worker 完成（completed）、受阻（blocked）、被拒（rejected）、或会话死亡后——handoffs 表不再有 `status=launched` 的记录，该 issue 对应的条目在下一轮 scan 中重新浮出。Manager 看到它时，需要结合 handoffs 线程历史判断：是继续推进（followthrough）、收口关闭、还是重新委派。
+
+**时序门控**：当有活跃 Worker 时，Runtime 跳过 scan 注入——Manager 应该先专注监督已有 Worker，处理完它们的汇报再找新任务。没有活跃 Worker 时才注入 scan，此时 scan 结果必然全是"尚无 Worker 在跑"的条目。
+
 ## 可视化参考
 
 | 图 | 内容 |
@@ -107,7 +148,7 @@ CREATE INDEX idx_handoffs_worktree_status ON handoffs(worktree, status);
 
 **`previous_worker_handoff_id`：串联同线程的多轮 worker**
 
-同一线程内，当 manager 创建第 N+1 个 worker 时，`previous_worker_handoff_id` 指向第 N 个 worker 的 `handoff_id`。新 worker 的 WORKER_HANDOFF_INJECT 注入上一轮 worker 的 `completion_summary` + `evidence_paths`，使后续 worker 了解前序工作的产出。
+同一线程内，当 manager 对同一个 worktree 发起第 N+1 轮交互时（followthrough prompt），`previous_worker_handoff_id` 指向第 N 轮的 worker handoff 记录。Worker 的 ACP 会话持续存在，新 handoff 记录标记新一轮工作。
 
 并行委派场景（同一 delegate_workers 批次多个 worker）：它们共享同一个 `parent_handoff_id`，各自独立完成。下一轮 worker 的 `previous_worker_handoff_id` 取最近一条 completed worker。多个并行 worker 的整合由 Manager 负责——Manager 在下一轮 prompt 的 Task 中综合前序产出。
 
@@ -223,9 +264,15 @@ Runtime 解析 ` ```handoff ` 块 → `json.loads()` → 按 `exit_kind` 分发�
    b. 解析 worktree / branch / intent_kind from prompt headers
    c. INSERT worker 记录:
       - parent_handoff_id = 当前 manager handoff_id
+      - previous_worker_handoff_id = 同 raw_key 最近一条 completed worker 的 handoff_id
       - status = pending
       - created_by = runtime
-   d. launch worker → UPDATE status = launched
+   d. 判断启动模式:
+      - worktree 已有 ACP 会话（session-store.get-active 返回有效 session_id）
+        → LAUNCH_KIND_SELECTED="prompt"（delta turn, 同一 Worker 会话继续）
+      - worktree 无会话或会话已失效
+        → LAUNCH_KIND_SELECTED="fork"（从 Manager 会话继承缓存, 首次或重建）
+   e. launch worker → UPDATE status = launched
 ```
 
 ### consume_resume_manager(json)
@@ -257,8 +304,9 @@ Runtime 解析 ` ```handoff ` 块 → `json.loads()` → 按 `exit_kind` 分发�
 ### consume_worker_handoff_needed(json)
 
 ```
-1. UPDATE worker 记录: status = completed
-2. 不自动标记 consumed。manager 下轮 patrol 看到 → 决策 → 创建新 handoff → 自动消费。
+1. UPDATE worker 记录: status = completed（Worker 会话保持活跃，不关闭）
+2. Runtime 生成 followthrough prompt：从 worker 的 reason/next_action 提取上下文
+3. 不自动标记 consumed。Manager 下轮 patrol 看到 handoff_needed → 以 delta turn（prompt）向同一 Worker 会话发送 followthrough → 新 handoff 创建时自动消费本轮记录。
 ```
 
 ### consume_worker_blocked(json)
@@ -310,7 +358,7 @@ next_action: 自动生成，根据 repair_target_role 给出操作指引
 ```
 
 修复 handoff 是一条普通 handoff 记录，走统一的 Manager patrol 消费路径。Manager 看到结构化字段后：
-- `repair_target_role=worker`：检查对应 worker 的 prompt 是否完整，worker-agent.md 的 JSON 格式说明是否清晰，然后重新拉起该 worker
+- `repair_target_role=worker`：检查对应 worker 的 prompt 是否完整，agent doc 的 JSON 说明是否清晰，然后以 delta turn 向同一 Worker 会话发送修正指令（Worker 会话持续存在，不重建）
 - `repair_target_role=manager`：知道自己上一轮输出的 JSON 格式有问题，按 validation_errors_json 修正后重新输出
 
 改进点：原文的修复 handoff 用自然语言描述错误（"请找到该角色，告诉它..."），Manager 需要从散文里推断信息。现在改为结构化字段——`repair_target_role`、`repair_target_handoff_id`、`validation_errors_json`——Manager 直接读取字段值即可定位问题，不需要推断。
@@ -447,7 +495,7 @@ AND status IN ('completed','blocked','rejected') AND consumed_by=''
 | `freely-agent-manager.md` | 替换旧"交接"章节为新"交接 JSON"章节：3 列表格，AI 只输出它负责的字段 |
 | `freely-agent-worker.md` | 替换旧"交接"章节为新"交接 JSON"章节：3 列表格，AI 只输出它负责的字段 |
 | `freely` — `build_prompt` | Manager 注入：线程历史（同 raw_key 最近 10 条摘要）+ 未消费 worker 列表 + fleet/scan。Worker 注入：仅 Task + agent doc + WORKER_HANDOFF_INJECT。删除旧 `handoff.py update` CLI 指令。 |
-| `freely` — `WORKER_HANDOFF_INJECT` | 注入结构化字段：handoff_id + parent_handoff_id + previous_worker_handoff_id + 上一轮 worker 的 completion_summary（截断 80 字）。不再注入线程历史和 bash 命令。 |
+| `freely` — `WORKER_HANDOFF_INJECT` | 仅在 fork（首次启动或会话重建）时注入：handoff_id + parent_handoff_id + previous_worker_handoff_id + 上一轮 completion_summary（截断 80 字）。delta turn 不注入——会话已有上下文。 |
 | `freely` — exit contract handler | 替换为 `parse_handoff_json` + `consume_*` 方法 + 乐观锁 WHERE 子句。auto-consume 在 manager 新 handoff 创建时自动触发。修复 handoff 携带 `repair_target_role` + `repair_target_handoff_id` + `validation_errors_json` 结构化字段。 |
 | `freely` — `worktree_has_active_worker` | 只查 `status=launched`；检测到活跃信号时 UPDATE `last_activity_at` |
 
@@ -468,7 +516,9 @@ build_prompt() 为 Manager 注入:
   5. Manager exit contract directive（JSON 输出格式 + 3 种 exit_kind 表格）
 ```
 
-### Worker Prompt 注入（最小上下文）
+### Worker Prompt 注入（区分 fork 与 delta）
+
+**fork（首次启动或会话重建）：**
 
 ```
 build_prompt() 为 Worker 注入:
@@ -477,9 +527,15 @@ build_prompt() 为 Worker 注入:
   3. WORKER_HANDOFF_INJECT（结构化字段注入）:
      - handoff_id: <自己的>
      - parent_handoff_id: <Manager 委派记录，含 reason 字段>
-     - previous_worker_handoff_id: <上一轮 worker 的 completion_summary（截断 80 字）>
+     - previous_worker_handoff_id: <上一轮 completion_summary（截断 80 字）>
      // 不注入: 完整线程历史、同 raw_key 最近 N 条摘要
-     // Worker 只需知道"前序做了什么"，线程历史是 Manager 巡逻需要的信息
+```
+
+**delta turn（同一 Worker 会话继续，followthrough/纠正/澄清）：**
+
+```
+Runtime 只发送 followthrough prompt 内容（Manager 在 handoff 里写的 next_action/reason）。
+Worker 的 ACP 会话已记住 agent doc + Task + 历史对话，不需重新注入。
 ```
 
 **Token 预算对比：**

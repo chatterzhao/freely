@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1320" font-family="system-ui,-apple-system,sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1360" font-family="system-ui,-apple-system,sans-serif">
   <defs>
     <marker id="a-mgr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#2563EB"/></marker>
     <marker id="a-run" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#D97706"/></marker>
@@ -36,11 +36,11 @@
   <text x="1020" y="79" text-anchor="middle" fill="#FFF" font-size="12" font-weight="700">Worker Prompt 文件</text>
 
   <!-- Lifelines -->
-  <line x1="115" y1="92" x2="115" y2="1300" stroke="#2563EB" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.4"/>
-  <line x1="325" y1="92" x2="325" y2="1300" stroke="#D97706" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.4"/>
-  <line x1="535" y1="92" x2="535" y2="1300" stroke="#059669" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.4"/>
-  <line x1="745" y1="92" x2="745" y2="1300" stroke="#6B7280" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.4"/>
-  <line x1="1020" y1="92" x2="1020" y2="1300" stroke="#475569" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.4"/>
+  <line x1="115" y1="92" x2="115" y2="1340" stroke="#2563EB" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.4"/>
+  <line x1="325" y1="92" x2="325" y2="1340" stroke="#D97706" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.4"/>
+  <line x1="535" y1="92" x2="535" y2="1340" stroke="#059669" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.4"/>
+  <line x1="745" y1="92" x2="745" y2="1340" stroke="#6B7280" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.4"/>
+  <line x1="1020" y1="92" x2="1020" y2="1340" stroke="#475569" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.4"/>
 
   <!-- ============================================================ -->
   <!-- PHASE 1: Manager Patrol -->
@@ -134,23 +134,27 @@
   <path d="M335,572 L1010,572" stroke="#D97706" stroke-width="1.2" fill="none" marker-end="url(#a-run)"/>
   <text x="600" y="568" font-size="8.5" fill="#D97706">⑬ WORKER_HANDOFF_INJECT → prompt 文件追加 handoff_id + parent + prev_worker + completion</text>
 
-  <!-- 2.13 Launch worker -->
-  <path d="M335,586 L525,586" stroke="#D97706" stroke-width="1.5" fill="none" marker-end="url(#a-run)"/>
-  <text x="400" y="582" font-size="8.5" fill="#D97706">⑭ launch_worker_from_manager_prompt</text>
+  <!-- 2.13 Decide fork vs prompt -->
+  <rect x="245" y="584" width="220" height="18" rx="3" fill="#EDE9FE"/>
+  <text x="355" y="597" text-anchor="middle" font-size="9" fill="#5B21B6">⑭ 判断启动模式: session-store 有会话→prompt(delta) / 无→fork</text>
 
-  <!-- 2.14 UPDATE → launched -->
-  <path d="M335,600 L735,600" stroke="#D97706" stroke-width="1.2" fill="none" marker-end="url(#a-run)"/>
-  <text x="460" y="596" font-size="8.5" fill="#D97706">⑮ UPDATE worker status=launched (WHERE status='pending')</text>
+  <!-- 2.14 Launch worker -->
+  <path d="M335,606 L525,606" stroke="#D97706" stroke-width="1.5" fill="none" marker-end="url(#a-run)"/>
+  <text x="400" y="602" font-size="8.5" fill="#D97706">⑮ launch_worker (fork 新会话或 prompt delta turn)</text>
 
-  <!-- 2.15 Auto-consume (deferred: after all workers launched) -->
-  <path d="M335,616 L735,616" stroke="#7C3AED" stroke-width="1.8" fill="none" marker-end="url(#a-run)" stroke-dasharray="4,2"/>
-  <text x="460" y="612" font-size="8.5" fill="#7C3AED">⑯ manager 新 handoff 创建触发 auto-consume: 消费上一轮 unconsumed worker</text>
+  <!-- 2.15 UPDATE → launched -->
+  <path d="M335,620 L735,620" stroke="#D97706" stroke-width="1.2" fill="none" marker-end="url(#a-run)"/>
+  <text x="460" y="616" font-size="8.5" fill="#D97706">⑯ UPDATE worker status=launched (WHERE status='pending')</text>
+
+  <!-- 2.16 Auto-consume -->
+  <path d="M335,636 L735,636" stroke="#7C3AED" stroke-width="1.8" fill="none" marker-end="url(#a-run)" stroke-dasharray="4,2"/>
+  <text x="460" y="632" font-size="8.5" fill="#7C3AED">⑰ manager 新 handoff 创建触发 auto-consume: 消费上一轮 unconsumed worker</text>
 
   <!-- ============================================================ -->
   <!-- PHASE 3: Worker Execution -->
   <!-- ============================================================ -->
-  <rect x="20" y="638" width="1160" height="24" rx="4" fill="#059669" opacity="0.12"/>
-  <text x="600" y="655" text-anchor="middle" font-size="12" font-weight="700" fill="#14532D">Phase 3: Worker 接收任务 → 执行 → 汇报</text>
+  <rect x="20" y="658" width="1160" height="24" rx="4" fill="#059669" opacity="0.12"/>
+  <text x="600" y="675" text-anchor="middle" font-size="12" font-weight="700" fill="#14532D">Phase 3: Worker 接收任务 → 执行 → 汇报 (fork 首启 / delta 继续)</text>
 
   <!-- 3.1 build_prompt for worker -->
   <rect x="245" y="648" width="160" height="18" rx="3" fill="#FED7AA"/>
@@ -175,7 +179,7 @@
   <!-- ============================================================ -->
   <!-- PHASE 4: Runtime Parse Worker Result -->
   <!-- ============================================================ -->
-  <rect x="20" y="794" width="1160" height="24" rx="4" fill="#D97706" opacity="0.08"/>
+  <rect x="20" y="814" width="1160" height="24" rx="4" fill="#D97706" opacity="0.08"/>
   <text x="600" y="811" text-anchor="middle" font-size="12" font-weight="700" fill="#9A3412">Phase 4: Runtime 解析 Worker JSON → 更新状态</text>
 
   <!-- 4.1 parse_handoff_json -->
@@ -197,7 +201,7 @@
   <!-- ============================================================ -->
   <!-- PHASE 5: Next Manager Patrol -->
   <!-- ============================================================ -->
-  <rect x="20" y="926" width="1160" height="24" rx="4" fill="#2563EB" opacity="0.12"/>
+  <rect x="20" y="946" width="1160" height="24" rx="4" fill="#2563EB" opacity="0.12"/>
   <text x="600" y="943" text-anchor="middle" font-size="12" font-weight="700" fill="#1E40AF">Phase 5: Manager 下轮 Patrol → 消费 Worker 结果</text>
 
   <!-- 5.1 Manager sees completed workers -->
@@ -227,7 +231,7 @@
   <!-- ============================================================ -->
   <!-- EDGE CASES -->
   <!-- ============================================================ -->
-  <rect x="20" y="1080" width="1160" height="210" rx="6" fill="#1E293B"/>
+  <rect x="20" y="1100" width="1160" height="220" rx="6" fill="#1E293B"/>
   <text x="50" y="1104" font-size="12" font-weight="700" fill="#F1F5F9">边界情况</text>
 
   <!-- Case 1: Repair -->

@@ -64,13 +64,13 @@
 
   <!-- Manager AI -->
   <rect x="50" y="268" width="490" height="48" rx="5" fill="#DCFCE7" stroke="#4ADE80" stroke-width="1"/>
-  <text x="70" y="288" font-size="12" font-weight="700" fill="#14532D">Manager AI (develop 工位)</text>
-  <text x="70" y="305" font-size="10.5" fill="#374151">巡逻舰队 → 读 handoffs 表 → 决策 → 输出 delegate/resume/stop JSON</text>
+  <text x="70" y="288" font-size="12" font-weight="700" fill="#14532D">Manager AI (develop 工位，多轮 patrol 同会话)</text>
+  <text x="70" y="305" font-size="10.5" fill="#374151">handoffs(监督) + scan(发现,已过滤活跃Worker) → 决策 → 输出 JSON</text>
 
   <!-- Worker AI -->
   <rect x="560" y="268" width="490" height="48" rx="5" fill="#DCFCE7" stroke="#4ADE80" stroke-width="1"/>
-  <text x="580" y="288" font-size="12" font-weight="700" fill="#14532D">Worker AI (feature 工位)</text>
-  <text x="580" y="305" font-size="10.5" fill="#374151">执行任务 → 产出 evidence → 输出 done/blocked/handoff_needed JSON</text>
+  <text x="580" y="288" font-size="12" font-weight="700" fill="#14532D">Worker AI (feature 工位，fork 创建→delta 继续)</text>
+  <text x="580" y="305" font-size="10.5" fill="#374151">执行 Task → followthrough delta turn 继续 → 输出 done/blocked/handoff JSON</text>
 
   <!-- Arrow: AI outputs JSON -->
   <line x1="295" y1="316" x2="295" y2="358" stroke="#059669" stroke-width="1.5" marker-end="url(#arrow-green)"/>
@@ -128,6 +128,7 @@
   <text x="70" y="622" font-size="10.5" font-weight="700" fill="#374151">handoffs 表 (25 字段)</text>
   <text x="70" y="640" font-size="10" fill="#4B5563">主键: handoff_id | 角色: role IN (manager,worker) | 线程: raw_key | 关联: parent_handoff_id / previous_worker_handoff_id</text>
   <text x="70" y="657" font-size="10" fill="#4B5563">状态: status IN (pending,launched,completed,rejected,blocked,consumed) | AI字段: exit_kind,reason,restart_point,next_action,completion_summary,evidence_paths,worker_prompts_csv</text>
+  <text x="70" y="673" font-size="9.5" fill="#6B7280">scan 过滤: idx_handoffs_worktree_status 查 worktree=? AND status='launched' → 命中排除; raw_key 兜底</text>
 
   <!-- ============================================================ -->
   <!-- LAYER 5: Worker Launch -->
