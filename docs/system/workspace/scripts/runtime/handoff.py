@@ -420,6 +420,14 @@ def parse_handoff_json(reply_text, context):
          record["launched_at"], record["last_activity_at"],
          record["completed_at"], record["created_at"], record["updated_at"]))
     conn.commit()
+    # Manager records auto-complete (patrol ended when JSON was output)
+    if record["role"] == "manager":
+        now = _now_utc()
+        conn.execute(
+            "UPDATE handoffs SET status='completed', completed_at=?, updated_at=? WHERE handoff_id=?",
+            (now, now, record["handoff_id"]))
+        conn.commit()
+        record["status"] = "completed"
     conn.close()
 
     return record, record["exit_kind"], []
