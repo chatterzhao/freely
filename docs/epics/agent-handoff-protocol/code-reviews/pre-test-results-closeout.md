@@ -1,3 +1,9 @@
+---
+owner_issue: I-20260514T103532Z-A
+kind: verification
+phase_state: completed
+---
+
 # Pre-Test Results: Agent Handoff Protocol v2 Closeout
 
 **Date**: 2026-05-15T17:49:19Z
@@ -109,6 +115,14 @@
 | Scan filtering | AI-9 | ✅ |
 | HANDOFF_INJECT fork-only | AI-10 | ✅ |
 | E2E regression | AI-11a–AI-11i | ✅ |
+
+## Implementation Decision Note
+
+- **decision**: 将 handoff protocol v2 合并到 develop
+- **why_this**: 全部 11 项验收标准 (AI-1 至 AI-11) 通过，77/77 检查点全部绿色，验证了 schema 结构、JSON 解析、管理/Worker 输出规范、乐观锁、auto-consume、不活跃检测、结构化修复、scan 过滤、HANDOFF_INJECT fork-only 注入和端到端回归
+- **alternatives_considered**: 无 — 本次 closeout 不涉及架构重新决策，仅执行预测试验收
+- **boundary_non_goals**: 不修改 ACP bridge、fleet supervision、wt-close 生命周期，不与 GitHub Actions 或 #343 的 ACP 修复耦合
+- **residual_risk**: 低 — #343 的四个 bug 在新协议下不复存在，全流程 delegate_workers → worker_done → manager 消费已通过 AI-11 端到端回归验证
 
 ## Evidence
 
