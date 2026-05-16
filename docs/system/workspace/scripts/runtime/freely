@@ -12132,13 +12132,13 @@ WORKER_HANDOFF_INJECT
         log_info "worker launched: $(basename "$_prompt_file")"
         if [[ -n "$_handoff_id" && -f "$_handoff_py" && -f "$_db_path" ]]; then
           python3 "$_handoff_py" update --db "$_db_path" \
-            --handoff-id "$_handoff_id" --status "launched" >/dev/null 2>&1 || true
+            --handoff-id "$_handoff_id" --status "launched" --expected-status "pending" >/dev/null 2>&1 || true
         fi
       else
         log_warn "worker launch failed: $(basename "$_prompt_file")"
         if [[ -n "$_handoff_id" && -f "$_handoff_py" && -f "$_db_path" ]]; then
           python3 "$_handoff_py" update --db "$_db_path" \
-            --handoff-id "$_handoff_id" --status "rejected" --exit-kind "launch_failed" >/dev/null 2>&1 || true
+            --handoff-id "$_handoff_id" --status "rejected" --expected-status "pending" --exit-kind "launch_failed" >/dev/null 2>&1 || true
         fi
       fi
     done
@@ -18394,27 +18394,8 @@ active_runtime_attach_reusable_for_project() {
     return 1
   fi
 
-  # Never reuse an old supervisor — stop cleanly then fresh start
-  log_info "found existing supervisor pid=$old_pid; running daemon stop for clean restart"
-  bash "$SELF_ROOT/bin/freely" daemon stop --project "$project" 2>/dev/null || true
-  sleep 2
-  return 1
-
-  if [[ "$attach_ai_pid_state" == "confirmed_running" || "$attach_ai_pid_state" == "bootstrap_in_flight" ]]; then
-    :
-  elif [[ "$role_hint" == "worker" ]] && supervisor_startup_truth_ready_for_project "$project" "$old_pid"; then
-    log_warn "project supervisor pid=$old_pid is live, worker startup truth is ready, and ai pid is ${attach_ai_pid_state}; attaching to preserve the active runtime"
-    attach_ai_pid_state="startup_truth_ready"
-  elif [[ "$role_hint" == "worker" ]] && project_runtime_should_keep_running "$project"; then
-    :
-  else
-    log_warn "project supervisor pid=$old_pid is live but ${role_hint} ai pid is ${attach_ai_pid_state}; falling back to project-local repair"
-    return 1
-  fi
-
-  LAST_ATTACH_REUSE_SUPERVISOR_PID="$old_pid"
-  LAST_ATTACH_REUSE_AI_PID_STATE="$attach_ai_pid_state"
-  log_info "project runtime/control-plane already up; reusing supervisor pid=$old_pid"
+  # Supervisor is running and healthy — daemon is already up, nothing to do
+  log_info "project daemon already running (supervisor pid=$old_pid, ai=${attach_ai_pid_state})"
   return 0
 }
 
@@ -19424,7 +19405,7 @@ cmd_start() {
     child_pid_file="$run_dir/ai.pid"
     mkdir -p "$run_dir"
     if active_runtime_attach_reusable_for_project "$project" "$sup_pid_file" "$child_pid_file"; then
-      emit_supervisor_attach_reuse_truth "$project"
+      log_info "daemon already running, attach skipped"
       return 0
     fi
     reject_repeated_user_start_if_running "$project" "start"
@@ -19434,6 +19415,9 @@ cmd_start() {
   # Clear old supervisor identity so the new one can write fresh.
   # Old identity has stale PID → watchdog rejects new supervisor.
   rm -f "$(supervisor_identity_dir_for_project "$project")/supervisor.env" 2>/dev/null || true
+  if [[ -x "$project/bin/deploy-skills" ]]; then
+    "$project/bin/deploy-skills" || log_warn "deploy-skills exited $? (non-fatal)"
+  fi
   start_project_runtime "$project" "foreground"
 }
 
@@ -19616,7 +19600,7 @@ cmd_daemon_start() {
     child_pid_file="$run_dir/ai.pid"
     mkdir -p "$run_dir"
     if active_runtime_attach_reusable_for_project "$project" "$sup_pid_file" "$child_pid_file"; then
-      emit_supervisor_attach_reuse_truth "$project"
+      log_info "daemon already running, attach skipped"
       release_project_start_lock_for_runtime "$project"
       trap - EXIT
       echo "project: $project"
@@ -19629,6 +19613,9 @@ cmd_daemon_start() {
   fi
   append_runtime_event "$project" "user_daemon_start_precheck_clear" \
     "force=$force"
+  if [[ -x "$project/bin/deploy-skills" ]]; then
+    "$project/bin/deploy-skills" || log_warn "deploy-skills exited $? (non-fatal)"
+  fi
   release_project_start_lock_for_runtime "$project"
   trap - EXIT
   launch_project_runtime_daemon_or_fail "$project"

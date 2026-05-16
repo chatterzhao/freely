@@ -66,3 +66,9 @@ title: "design: agent handoff protocol — handoffs 表作为 manager-worker 交
 3. 多轮 manager-worker 对话的连续性机制（thread_id, parent_handoff_id, previous_worker_handoff_id）
 4. 消费语义：主管如何标记已读，runtime 如何自动推进状态
 5. Worker Prompt 注入的完整上下文
+
+---
+
+## 吸收子修复：SELF_ROOT 自动检测（#345）
+
+开发过程中发现 `workspace_root_for_project` / `runtime_script_for_project` 返回项目路径导致安装版 Worker 加载旧脚本。`SELF_ROOT` 已能自动检测启动位置，修复在 38903ab8、3554b7b6。此修复吸收进 I-20260514T103532Z-A，不再另开工位。
