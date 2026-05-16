@@ -51,20 +51,26 @@ Manager 的任务来自两个不同的数据源，每个 patrol 必须按顺序�
 | stage | 含义 | 行动 | 出口 |
 |-------|------|------|------|
 | `local_only` (ready) | 本地有 issue 文档但未推到平台 | 委派 worker 用 `./bin/issue-sync create` 推送 | `delegate_workers` |
-| `local_needs_closeout` (ready) | 平台 issue 已关闭，本地 phase_state 未更新 | 委派 worker 批量更新 phase_state → completed | `delegate_workers` |
-| `branch_deleted` (ready) | 分支已删除，issue 需标记为 absorbed | 委派 worker 批量更新 phase_state → absorbed | `delegate_workers` |
-| `platform_create` (ready) | 平台有 OPEN issue 但本地无工位 | 委派 worker 用 `wt-create` 开工位 | `delegate_workers` |
+| `local_needs_closeout` (ready) | 平台 issue 已关闭，本地 phase_state 未更新 | **先 wt-create 开工位**，再委派 worker 批量更新 phase_state | `delegate_workers` |
+| `branch_deleted` (ready) | 分支已删除，issue 需标记为 absorbed | **先 wt-create 开工位**，再委派 worker 批量更新 phase_state | `delegate_workers` |
+| `platform_create` (ready) | 平台有 OPEN issue 但本地无工位 | **先 wt-create 开工位**，再委派 worker | `delegate_workers` |
 | `raw_created` | raw issue 已创建待 B1 | 自己判断价值后路由到 B1 或委派 worker | `resume_manager` 或 `delegate_workers` |
 | `b1_candidate` | 有候选待决策 promote/absorb/drop | 自己评估后写入 candidate 文件 | `resume_manager` |
 | `chat_waiting_worktree` | 用户 chat 请求开工位 | 评估价值 → 开工位或关闭 | `resume_manager` |
 
 ### 委派 Worker 的步骤
 
-1. **写 Worker prompt 文件**（`.freely/run/worker-prompts/<timestamp>-worker-<slug>.txt`）：
-   - 必须包含 header: Worktree、Branch、`rationale: "因为{X}，所以做{Y}"`
+**关键：Worker prompt 中的 Worktree 路径必须真实存在，否则 Worker 无法启动。**
+
+1. **确认或创建工位**：
+   - 如果目标 worktree 已存在 → 跳过
+   - 如果目标 worktree 不存在 → 先用 `./bin/wt-create` 创建
+   - 如果任务不需要工位（如纯 scan 查询）→ 用 develop 作为 Worktree
+2. **写 Worker prompt 文件**（`.freely/run/worker-prompts/<timestamp>-worker-<slug>.txt`）：
+   - header: Worktree（**绝对路径，必须已存在**）、Branch、`rationale: "因为{X}，所以做{Y}"`
    - 包含具体 Task 步骤
-2. **输出 handoff JSON**：`exit_kind: "delegate_workers"`，`worker_prompts_csv` 指向 prompt 文件路径
-3. Runtime 自动解析 handoff → INSERT worker 记录 → launch worker
+3. **输出 handoff JSON**：`exit_kind: "delegate_workers"`，`worker_prompts_csv` 指向 prompt 文件路径
+4. Runtime 自动解析 handoff → INSERT worker 记录 → launch worker
 
 ### 收口判断
 
