@@ -79,6 +79,10 @@ MSG
     continue
   fi
 
+  if [[ "${FREELY_SKIP_IBM_GATE:-0}" == "1" ]]; then
+    continue
+  fi
+
   if commit_is_merge_commit "$new_oid" && commit_has_canonical_receipt "$new_oid"; then
     continue
   fi
