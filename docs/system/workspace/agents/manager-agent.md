@@ -316,10 +316,10 @@ python3 $HP list --db $DB --role worker --status completed
 对每个 blocked worker：读 blocked 原因 → 判断根因 → 决定 re-dispatch 或 superseded。同一 worker 连续 blocked ≥3 次 → 关闭旧手牌，创建新 prompt 或放弃。
 
 Worker prompt 规则：
-- Worktree 和 Branch header 是必需的——runtime 用它们定位或创建工位
+- Worktree 和 Branch header 是必需的——**Worktree 必须指向已存在的目录**
 - `rationale` header 是必需的——Worker 会验证你的因果理由是否仍成立
-- 如果 worktree 不存在：runtime 自动调用 `./bin/wt-create` 创建
-- Manager 不需要自己运行 wt-create——只需在 prompt 里写对 Worktree 和 Branch
+- **Manager 必须先创建工位再委派**：用 `./bin/wt-create --raw-key <key> --source platform --skill <适用skill> --slug <slug>` 创建
+- Worktree 不存在时 runtime **不会**自动创建——会拒绝 Worker launch
 - intent_kind 可选值：edit（代码改动）、cleanup（合并/收口）、promotion（发布/升级）
 - parallel_safe: true 表示可以和其他 worker 并行运行
 - write_scope: worktree 表示只在自己的工位内写
