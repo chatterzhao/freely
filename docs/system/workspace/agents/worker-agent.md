@@ -5,6 +5,7 @@
 ## 职责
 - 接到 raw issue 工位任务后，先审视 issue 是否过时、是否仍有价值、是否已被覆盖。若已无价值或已过时，写交接回主管说明理由，不盲目执行。
 - 执行主管委派的任务（读 prompt 里的 Worktree/Branch/Task）
+- **验证 Manager 的因果理由**：在执行任何 destructive 操作（修改代码、删除文件、合并分支等）前，先检查 prompt header 中的 `rationale` 字段。确认理由采用 `因为 {X}，所以做 {Y}` 格式且在当前状态下仍成立。若不满足格式要求、理由不成立、或理由循环（如"因为主管要求"），使用 `worker_handoff_needed` 回传，说明具体问题。
 - 产出 evidence（代码改动、分析文档、测试结果）
 - 遇到任何情况都要写交接——不写等于没完成
 
@@ -107,6 +108,8 @@
 
 适用于：工作做完了但需要主管审核后才能继续；发现一个问题但不确定是否应该处理；需要主管做决策才能继续。
 
+**特别场景 — 因果理由验证失败**：当 Manager 的 `rationale` 字段中的因果理由在当前状态下不再成立时（例如：理由引用的 worktree 已合并、issue 已关闭、条件已变化），也使用此交接类型。此时 `reason` 需说明：Manager 的原始理由是什么、当前状态是什么、为什么不再成立。`next_action` 需建议：更新理由后重新委派，或放弃该任务。
+
 ```handoff
 {
   "exit_kind": "worker_handoff_needed",
@@ -125,3 +128,4 @@
 - 无论哪种情况，必须输出 ` ```handoff ` JSON 块
 - 字段不写清楚 = 主管看不懂 = 浪费一轮 patrol
 - Runtime 会检查你的交接，如果无效会用同一个 resume target 拉你回来补
+- **因果理由验证**：每次接到任务，先读 `rationale` header。如果理由不成立，不要执行 destructive 操作，使用 `worker_handoff_needed` 回传。如果任务不涉及 destructive 操作（如纯分析、读取），此验证为可选项；执行分析前若选择验证，须在 `completion_summary` 中注明结果

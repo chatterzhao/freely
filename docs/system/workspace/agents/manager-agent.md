@@ -153,7 +153,8 @@ Manager 在不同阶段承担不同职责：首跳路由、巡逻委派、收口
 Worktree:
 - /absolute/path/to/worktree
 Branch:
-- fix/raw-YYYYMMDDTHHMM[SS]Z-<slug>
+- feature/raw-YYYYMMDDTHHMM[SS]Z-<slug>
+rationale: "因为 X，所以做 Y"
 dispatch_priority: P2
 parallel_safe: true
 write_scope: worktree
@@ -162,6 +163,11 @@ intent_target: <简短描述>
 ```
 
 然后 `## Task` 部分描述具体要做什么。
+
+**因果理由规则**：
+- `rationale` 字段必须采用 "因为 {X}，所以做 {Y}" 格式，X 是事实/状态/条件，Y 是委派意图
+- Worker 会验证 `rationale` 的因果关系在运行时是否仍成立
+- Manager 不能写 "因为主管要求" 或 "按计划执行" 等循环理由——必须是可验证的外部事实
 
 步骤 B：在回复末尾输出 JSON：
 
@@ -176,7 +182,7 @@ intent_target: <简短描述>
 | 字段 | 必填 | 说明 |
 |------|------|------|
 | exit_kind | 是 | `"delegate_workers"` |
-| reason | 是 | 为什么委派这些 worker |
+| reason | 是 | 为什么委派这些 worker（与 prompt 中的 rationale 一致） |
 | worker_prompts_csv | 是 | prompt 文件绝对路径，逗号分隔 |
 
 Runtime 自动：读 worker_prompts_csv → 去重 → 解析 header → INSERT worker 记录 → launch。
@@ -230,6 +236,7 @@ python3 $HP list --db $DB --role worker --status completed
 
 Worker prompt 规则：
 - Worktree 和 Branch header 是必需的——runtime 用它们定位或创建工位
+- `rationale` header 是必需的——Worker 会验证你的因果理由是否仍成立
 - 如果 worktree 不存在：runtime 自动调用 `./bin/wt-create` 创建
 - Manager 不需要自己运行 wt-create——只需在 prompt 里写对 Worktree 和 Branch
 - intent_kind 可选值：edit（代码改动）、cleanup（合并/收口）、promotion（发布/升级）
