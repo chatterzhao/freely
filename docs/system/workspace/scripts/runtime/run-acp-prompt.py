@@ -319,6 +319,7 @@ def main():
     t_transport = time.time()
 
     client = ACPClient(transport=transport, mode=args.mode)
+    stop_reason = "error"  # prevent UnboundLocalError in finally block
     try:
         # Handshake
         client.request(
