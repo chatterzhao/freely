@@ -246,14 +246,39 @@ while IFS= read -r remote; do
   remotes+=("$remote")
 done < <(git remote 2>/dev/null || true)
 
+_gitee_remote() {
+  local remote="$1"
+  git remote get-url "$remote" 2>/dev/null | grep -qi "gitee"
+}
+
+_gitee_branch_delete() {
+  local branch="$1"
+  local gitee_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/gitee-issue.py"
+  [[ -f "$gitee_py" ]] || return 1
+  python3 "$gitee_py" delete-branch "$branch" 2>/dev/null
+}
+
 if [[ ${#remotes[@]} -gt 0 ]]; then
   for remote in "${remotes[@]}"; do
     if git fetch "$remote" "$branch" 2>/dev/null; then
       if [[ "$DRY_RUN" == true ]]; then
-        _dry "git push $remote --delete $branch"
+        if _gitee_remote "$remote"; then
+          _dry "gitee-issue.py delete-branch $branch"
+        else
+          _dry "git push $remote --delete $branch"
+        fi
       else
         echo "wt-close: deleting remote branch '$branch' on '$remote'..."
-        git push "$remote" --delete "$branch" 2>/dev/null || true
+        if _gitee_remote "$remote"; then
+          if _gitee_branch_delete "$branch"; then
+            echo "wt-close: gitee branch deleted via API ✓"
+          else
+            echo "wt-close: gitee API delete failed, trying git push --delete..."
+            git push "$remote" --delete "$branch" 2>/dev/null || true
+          fi
+        else
+          git push "$remote" --delete "$branch" 2>/dev/null || true
+        fi
       fi
     fi
   done
