@@ -2,7 +2,7 @@
 local_id: raw-20260505T1210Z
 issue_title: "issue 状态字段重构：分离 platform_state 和 phase_state，统一 raw/I-* 字段规范"
 kind: raw
-phase_state: proposed
+phase_state: closed
 platform_ids:
   github:
     issue_id: '214'
