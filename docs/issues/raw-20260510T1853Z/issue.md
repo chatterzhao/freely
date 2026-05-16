@@ -2,8 +2,15 @@
 local_id: raw-20260510T1853Z
 kind: raw
 phase_state: proposed
-platform_ids: {}
-platform_state: ''
+platform_ids:
+  github:
+    issue_id: '376'
+    url: https://github.com/chatterzhao/freely/issues/376
+    synced_at: '2026-05-16T13:22:28Z'
+platform_state: open
+updated_at: '2026-05-16T13:22:28Z'
+primary_platform: github
+created_at: '2026-05-16T13:22:28Z'
 ---
 ## 问题
 init 分支校验只检查命名，不检查 worktree。提示缺少具体修复命令。
