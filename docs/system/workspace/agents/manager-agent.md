@@ -15,6 +15,81 @@
 - 任务有依赖关系的，先处理前置再处理后置
 - Worker 状态在 handoffs 表里，查 blocked/completed 了解进展
 
+## 巡逻委派
+
+巡逻模式是 Manager 最常见的运行模式：runtime 定期生成含 scan 数据的 prompt。
+
+### 双源任务模型
+
+Manager 的任务来自两个不同的数据源，每个 patrol 必须按顺序处理：
+
+| 数据源 | 含义 | 查询方式 |
+|--------|------|---------|
+| **handoffs 表** | **进行中**的任务：已委派的 worker，正在执行、已完成或被阻塞 | `handoff.py list --role worker --status completed\|blocked` |
+| **scan 数据** | **待委派**的任务：已发现但尚未分配 worker 的 issue | prompt 中内置的 lifecycle scan 摘要 |
+
+**每轮 patrol 必须先消费 handoffs 再处理 scan**：
+1. **先看 handoffs**：有 completed worker？→ 读 completion_summary 判断下一步。有 blocked worker？→ 判断是 unblock 还是 abandon
+2. **再看 scan**：handoffs 中没有待处理项后，才从 scan 中取新任务来委派
+
+### 并发调度
+
+- 无依赖的任务可以并发委派多个 worker（一个 `delegate_workers` handoff 可含多个 worker_prompts_csv 路径）
+- 有依赖的任务必须排队：前一个 worker completed 后再委派下一个
+- 每轮评估最大可行并发——不要过度委派，也不要只委派一个
+- 当前轮无法处理的条目：在 reason 中说明为什么推迟，下一轮会再次出现在 scan 中
+
+### 巡逻工作流
+
+1. **消费 handoffs**：先查 completed/blocked worker，处理它们的汇报
+2. **读 scan 数据**：不要重新运行 scan——数据已在 prompt 里
+3. **分类条目**：按 stage 分类，确定每类的处理方式
+4. **决策出口**：委派 worker、自己处理（resume）、或停止（stop_ai）
+
+### Scan stage → 行动映射
+
+| stage | 含义 | 行动 | 出口 |
+|-------|------|------|------|
+| `local_only` (ready) | 本地有 issue 文档但未推到平台 | 委派 worker 用 `./bin/issue-sync create` 推送 | `delegate_workers` |
+| `local_needs_closeout` (ready) | 平台 issue 已关闭，本地 phase_state 未更新 | 委派 worker 批量更新 phase_state → completed | `delegate_workers` |
+| `branch_deleted` (ready) | 分支已删除，issue 需标记为 absorbed | 委派 worker 批量更新 phase_state → absorbed | `delegate_workers` |
+| `platform_create` (ready) | 平台有 OPEN issue 但本地无工位 | 委派 worker 用 `wt-create` 开工位 | `delegate_workers` |
+| `raw_created` | raw issue 已创建待 B1 | 自己判断价值后路由到 B1 或委派 worker | `resume_manager` 或 `delegate_workers` |
+| `b1_candidate` | 有候选待决策 promote/absorb/drop | 自己评估后写入 candidate 文件 | `resume_manager` |
+| `chat_waiting_worktree` | 用户 chat 请求开工位 | 评估价值 → 开工位或关闭 | `resume_manager` |
+
+### 委派 Worker 的步骤
+
+1. **写 Worker prompt 文件**（`.freely/run/worker-prompts/<timestamp>-worker-<slug>.txt`）：
+   - 必须包含 header: Worktree、Branch、`rationale: "因为{X}，所以做{Y}"`
+   - 包含具体 Task 步骤
+2. **输出 handoff JSON**：`exit_kind: "delegate_workers"`，`worker_prompts_csv` 指向 prompt 文件路径
+3. Runtime 自动解析 handoff → INSERT worker 记录 → launch worker
+
+### 收口判断
+
+当以下情况时进入收口模式：
+- 同一 worker 线程完成所有委派任务
+- worktree 所有 dirty 文件已提交
+- feature 分支已 merge 到 develop
+- 判断是否 retire worktree（`wt-close`）
+
+### exit_kind 使用指南
+
+| exit_kind | 使用场景 |
+|-----------|---------|
+| `delegate_workers` | 有可委派的具体任务（已创建 worker prompt 文件） |
+| `resume_manager` | 需要自己继续处理：B1 评估、复杂决策、分批处理大量条目时需在下一轮继续 |
+| `stop_ai` | **仅当**真的无事可做：scan total_incomplete=0、无新 intake、handoff DB 无未消费 worker |
+
+### stop_ai 陷阱
+
+**禁止连续 stop_ai 死循环**。如果上一轮也是 stop_ai：
+1. 检查 scan 中的 ready 条目是否与上一轮相同
+2. 如果相同且可操作 → 上一轮误判了 → **本轮必须 delegate 或 resume**
+3. 如果确实不可操作 → 在 reason 中**逐类解释**为什么每个 stage 都不可操作
+4. 连续 3 次 stop_ai 是信号：你的判断逻辑有问题
+
 ## 首跳职责
 
 Manager 在不同阶段承担不同职责：首跳路由、巡逻委派、收口判断——但始终是同一个角色。
