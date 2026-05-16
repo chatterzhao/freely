@@ -13556,7 +13556,7 @@ except: pass
       if [[ -n "$worker_prompts_csv" ]] && ! manager_exit_contract_has_launchable_worker_prompt "$project" "$worker_prompts_csv"; then
         missing_csv="$(csv_append_unique_item "$missing_csv" "WORKER_PROMPTS_NOT_LAUNCHABLE")"
       fi
-      [[ -z "$stop_reason$restart_point$next_action$why_not_stop$why_not_delegate" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "exclusive_fields_conflict")"
+      [[ -z "$restart_point$next_action$why_not_stop$why_not_delegate" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "exclusive_fields_conflict")"
       ;;
   esac
   if [[ -n "$missing_csv" ]]; then
