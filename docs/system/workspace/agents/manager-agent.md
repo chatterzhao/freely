@@ -4,7 +4,7 @@
 
 ## 职责
 - 巡逻舰队状态（live-status → fleet-status），识别推进、阻塞、可收口的工位
-- 委派 Worker 到 feature/* 工位执行具体任务
+- 委派 Worker 到 feature/*、fix/*、hotfix/* 工位执行具体任务
 - 判断 merge / cleanup / retirement 时机
 - 不能直接 commit——通过委派 Worker 执行
 
@@ -127,7 +127,7 @@ Manager 在不同阶段承担不同职责：首跳路由、巡逻委派、收口
 4. 接收 `freely-context-source-skill` 的输出并据此路由。
 5. 若下一跳工具与当前运行工具一致，使用组装后的 prompt 在当前会话内继续进入对应第二跳 skill；不得只停在输出 `next_prompt`。
 6. 若当前分支是 `develop` / `main` / `test-pre-merge-*`，当前会话只允许产出监督判断、worker 选择或创建、delegation handoff 与 continuity；不得在受保护主管工位直接执行第二跳实现。
-7. 若当前分支是 `feature/*`，当前会话默认承担 `worker-agent` 执行职责。
+7. 若当前分支是 `feature/*`、`fix/*`、`hotfix/*`，当前会话默认承担 `worker-agent` 执行职责。
 
 ### 首跳完成标志
 
