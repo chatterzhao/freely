@@ -11,9 +11,11 @@ platform_ids:
     issue_id: '365'
     url: https://github.com/chatterzhao/freely/issues/365
     synced_at: '2026-05-16T09:59:26Z'
-updated_at: '2026-05-16T09:59:26Z'
+updated_at: '2026-05-16T14:21:22Z'
 primary_platform: github
-platform_state: open
+platform_state: closed
+force_closed_at: '2026-05-16T14:21:22Z'
+force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
 ---
 
 ## 背景
