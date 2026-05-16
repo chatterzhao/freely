@@ -437,6 +437,7 @@ def main():
             )
             t_done = time.time()
             stop_reason = prompt_result.get("stopReason", "unknown")
+            print()  # ensure newline before stop_reason marker
             print(f"stop_reason={stop_reason}", flush=True)
 
             prompt_kb = len(prompt_text.encode("utf-8")) / 1024

@@ -319,7 +319,7 @@ def auto_consume(raw_key):
 
 def extract_handoff_block(text):
     """Extract the first ```handoff fenced block from AI reply text."""
-    m = re.search(r'```handoff\s*\n(.*?)\n```', text, re.DOTALL)
+    m = re.search(r'```handoff\s*\n(.*?)\n```[^\n]*', text, re.DOTALL)
     if not m:
         return None
     return m.group(1).strip()
