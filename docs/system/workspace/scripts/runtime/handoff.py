@@ -91,6 +91,36 @@ def init_db():
         CREATE INDEX IF NOT EXISTS idx_handoffs_worktree_status ON handoffs(worktree, status);
         DELETE FROM handoffs WHERE status = 'pending' AND datetime(created_at) < datetime('now','-1 hour');
     """)
+    # ── Schema migration: add columns missing in older DBs ──
+    existing = {row[1] for row in conn.execute("PRAGMA table_info(handoffs)")}
+    for col_name, col_def in [
+        ("previous_worker_handoff_id", "TEXT DEFAULT ''"),
+        ("last_activity_at", "TEXT DEFAULT ''"),
+        ("repair_target_role", "TEXT DEFAULT ''"),
+        ("repair_target_handoff_id", "TEXT DEFAULT ''"),
+        ("validation_errors_json", "TEXT DEFAULT '[]'"),
+        ("reason", "TEXT DEFAULT ''"),
+    ]:
+        if col_name not in existing:
+            try:
+                conn.execute(f"ALTER TABLE handoffs ADD COLUMN {col_name} {col_def}")
+            except Exception:
+                pass
+    # Consolidate deprecated reason columns into unified reason
+    if "blocked_reason" in existing and "reason" in existing:
+        try:
+            conn.execute(
+                "UPDATE handoffs SET reason = blocked_reason "
+                "WHERE reason = '' AND blocked_reason != ''")
+        except Exception:
+            pass
+    if "handoff_reason" in existing and "reason" in existing:
+        try:
+            conn.execute(
+                "UPDATE handoffs SET reason = handoff_reason "
+                "WHERE reason = '' AND handoff_reason != ''")
+        except Exception:
+            pass
     conn.commit()
     conn.close()
 
