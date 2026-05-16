@@ -13536,20 +13536,19 @@ except: pass
   stop_reason="$(_db_exit_contract_field "$project" manager reason)"
   restart_point="$(_db_exit_contract_field "$project" manager restart_point)"
   next_action="$(_db_exit_contract_field "$project" manager next_action)"
-  why_not_stop="$(_db_exit_contract_field "$project" manager reason)"
-  why_not_delegate="$(_db_exit_contract_field "$project" manager reason)"
+  why_not_stop=""  # unified reason field, old why_not_stop column removed
+  why_not_delegate=""  # unified reason field, old why_not_delegate column removed
   worker_prompts_csv="$(_db_exit_contract_field "$project" manager worker_prompts_csv)"
   case "$kind" in
     stop_ai)
       [[ -n "$stop_reason" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "STOP_REASON")"
-      [[ -z "$restart_point$next_action$why_not_stop$why_not_delegate$worker_prompts_csv" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "exclusive_fields_conflict")"
+      [[ -z "$restart_point$next_action$worker_prompts_csv" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "exclusive_fields_conflict")"
       ;;
     resume_manager)
       [[ -n "$restart_point" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "RESTART_POINT")"
       [[ -n "$next_action" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "NEXT_ACTION")"
-      [[ -n "$why_not_stop" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "WHY_NOT_STOP")"
-      [[ -n "$why_not_delegate" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "WHY_NOT_DELEGATE")"
-      [[ -z "$stop_reason$worker_prompts_csv" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "exclusive_fields_conflict")"
+      # why_not_stop/why_not_delegate removed in reason-unify (#344), skip
+      [[ -z "$worker_prompts_csv" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "exclusive_fields_conflict")"
       ;;
     delegate_workers)
       [[ -n "$worker_prompts_csv" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "WORKER_PROMPTS_CSV")"
