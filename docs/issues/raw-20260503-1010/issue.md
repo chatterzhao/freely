@@ -2,12 +2,18 @@
 local_id: raw-20260503-1010
 kind: raw
 priority: high
-phase_state: open
 phase_state: proposed
 source: chat-inbox
-created_at: "2026-05-03T10:10:00Z"
-title: "fix: SQLite busy_timeout=0 causes concurrent write failures"
-platform_state: ''
+created_at: '2026-05-03T10:10:00Z'
+title: 'fix: SQLite busy_timeout=0 causes concurrent write failures'
+platform_state: open
+platform_ids:
+  github:
+    issue_id: '373'
+    url: https://github.com/chatterzhao/freely/issues/373
+    synced_at: '2026-05-16T13:21:36Z'
+updated_at: '2026-05-16T13:21:36Z'
+primary_platform: github
 ---
 ## 问题
 chat-inbox.py 和 session-store.py 设了 WAL 但 busy_timeout=0。

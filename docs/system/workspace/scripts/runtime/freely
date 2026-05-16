@@ -9261,9 +9261,11 @@ materialize_worker_prompt_worktree_if_needed() {
   target_worktree="$(worker_prompt_target_worktree "$prompt_file")"
   target_branch="$(worker_prompt_target_branch "$prompt_file")"
 
+  # Try wt-create first (governance-compliant), fall back to raw git worktree add
   if [[ -x "$manager_project/bin/wt-create" ]]; then
-    bash "$manager_project/bin/wt-create" "$target_branch" --base develop >/dev/null 2>&1 || return 1
-  else
+    bash "$manager_project/bin/wt-create" "$target_branch" --base develop >/dev/null 2>&1 || true
+  fi
+  if [[ ! -d "$target_worktree" ]]; then
     git -C "$manager_project" worktree add -b "$target_branch" "$target_worktree" develop >/dev/null 2>&1 || return 1
     freely_bin="$(freely_bin_for_project "$manager_project")"
     if [[ -x "$freely_bin" ]]; then

@@ -2,7 +2,7 @@
 local_id: raw-20260516T121409Z
 kind: raw
 priority: P2
-status: open
+phase_state: dropped
 source: chat-inbox
 created_at: '2026-05-16T12:14:09Z'
 title: manager-agent.md 缺少巡逻模式行为规范，导致 Manager 面对 scan 数据只输出 stop_ai
@@ -13,7 +13,6 @@ platform_ids:
     synced_at: '2026-05-16T12:14:17Z'
 updated_at: '2026-05-16T12:59:11Z'
 primary_platform: github
-phase_state: closed
 platform_state: closed
 force_closed_at: '2026-05-16T12:59:11Z'
 force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
