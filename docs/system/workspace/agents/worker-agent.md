@@ -8,6 +8,59 @@
 - 产出 evidence（代码改动、分析文档、测试结果）
 - 遇到任何情况都要写交接——不写等于没完成
 
+## 可用技能
+
+按角色归属的技能列表。技能文件在 `docs/system/workspace/skills/<name>/`。
+
+### Worker 专属技能
+
+| 技能 | 用途 |
+|------|------|
+| `freely-dev-loop-execution` | milestone issue 的实现、测试与进度回写 |
+| `freely-doc-B1_IBM-execution` | raw issue → brainstorm → candidate |
+| `freely-doc-B2_IBM-execution` | milestone issue → prd/pre-tests/tasks/code-review |
+| `freely-fix-execution` | bug 快速修复流程 |
+| `freely-url-content-intake` | URL 内容抓取与结构化 |
+| `freely-rust-tauri-toolchain-bootstrap` | Rust/Tauri toolchain 引导 |
+| `freely-tool-cc-codex-mcp-runtime` | Codex MCP 运行时安装配置 |
+| `freely-workspace-skill-governance` | skill 新增/拆分/重构/校准 |
+| `freely-mem9-continuity-bridge` | mem9 连续性后端接入 |
+
+### Worker/Manager 共享技能
+
+| 技能 | 用途 |
+|------|------|
+| `freely-constitution-guard` | 宪法硬性约束门禁（预检） |
+| `freely-laws-enforcer` | 法律级验收检查 |
+| `freely-context-source-skill` | 输入来源判定与下一跳路由 |
+| `freely-auto-loop-orchestrator` | 自主持续交付循环编排 |
+| `freely-agent-execution-safety-review` | 执行边界安全评审 |
+| `freely-config-backup-guard` | 配置修改前强制备份 |
+
+## 可用工具
+
+### 代码与文档修改
+
+| 工具 | 用途 | 条件 |
+|------|------|------|
+| `git` | 版本控制所有操作 | 随时可用 |
+| `./bin/issue-sync` | 平台 issue 同步 | 需要同步 GitHub issue 时 |
+| `./bin/deploy-skills` | 部署 skill 到 AI 工具目录 | 修改 skill 后 |
+
+### 门禁与验证
+
+| 工具 | 用途 | 条件 |
+|------|------|------|
+| `./bin/governance-check` | 治理门禁检查 | 提交或合并前 |
+| `./bin/test-pre-push-hook` | 预推送 hook 测试 | hook 有问题时 |
+
+### 项目内文件操作
+
+| 工具 | 用途 | 条件 |
+|------|------|------|
+| `./bin/wt-add <branch> -- <git-add-args>` | 按 worktree 安全 add | 需要分步 add 时 |
+| `python3 handoff.py list --db .freely/freely.db` | 查询交接表 | 需要检查历史交接 |
+
 ## 交接
 
 **不再调用 `handoff.py update`。** 在回复末尾输出 ` ```handoff ` JSON 块，Runtime 解析后统一写入数据库。

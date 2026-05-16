@@ -16,38 +16,45 @@
 - Worktree 卫生门禁命令：`./bin/wt-status-all`（合并/提升/发布前必须全部 `CLEAN`；cleanup 需保证 target 自身安全，并显式跳过 unrelated dirty / busy worktree）。
 - 交叉引用顺序应遵循宪法/法律章节顺序 `1..16` 以减少阅读摩擦。
 
-入口技能：
-- `skill:freely-constitution-guard` -> `freely-constitution-guard/SKILL.md`
-- `skill:freely-laws-enforcer` -> `freely-laws-enforcer/SKILL.md`
-- `skill:freely-auto-loop-orchestrator` -> `freely-auto-loop-orchestrator/SKILL.md`
-- `skill:freely-candidate-acceptance-review` -> `freely-candidate-acceptance-review/SKILL.md`
-- `skill:freely-milestone-planning-state-maintenance` -> `freely-milestone-planning-state-maintenance/SKILL.md`
-- `skill:freely-doc-B1_IBM-execution` -> `freely-doc-B1_IBM-execution/SKILL.md`
-- `skill:freely-doc-B2_IBM-execution` -> `freely-doc-B2_IBM-execution/SKILL.md`
-- `skill:freely-dev-loop-execution` -> `freely-dev-loop-execution/SKILL.md`
-- `skill:freely-workspace-skill-governance` -> `freely-workspace-skill-governance/SKILL.md`
-- `skill:freely-branch-management` -> `freely-branch-management/SKILL.md`
-- `skill:freely-multi-worktree-supervision` -> `freely-multi-worktree-supervision/SKILL.md`
-- `skill:freely-worktree-hygiene-supervision` -> `freely-worktree-hygiene-supervision/SKILL.md`
-- `skill:freely-worktree-maintenance-governance` -> `freely-worktree-maintenance-governance/SKILL.md`
-- `skill:freely-premerge-reconcile` -> `freely-premerge-reconcile/SKILL.md`
-- `skill:freely-recovery-subagent-governance` -> `freely-recovery-subagent-governance/SKILL.md`
-- `skill:freely-module-interface-governance` -> `freely-module-interface-governance/SKILL.md`
-- `skill:freely-config-backup-guard` -> `freely-config-backup-guard/SKILL.md`
-- `skill:freely-rust-tauri-toolchain-bootstrap` -> `freely-rust-tauri-toolchain-bootstrap/SKILL.md`
-- `skill:freely-watchdog-control-plane` -> `freely-watchdog-control-plane/SKILL.md`
-- `skill:freely-continuity-watchdog` -> `freely-continuity-watchdog/SKILL.md`
-- `skill:freely-ai-cli-availability-manager` -> `freely-ai-cli-availability-manager/SKILL.md`
-- `skill:freely-agent-execution-safety-review` -> `freely-agent-execution-safety-review/SKILL.md`
-- `skill:freely-human-interruption-handling` -> `freely-human-interruption-handling/SKILL.md`
-- `skill:freely-human-interruption-direct-answer` -> `freely-human-interruption-direct-answer/SKILL.md`
-- `skill:freely-human-interruption-manager-triage` -> `freely-human-interruption-manager-triage/SKILL.md`
-- `skill:freely-signal-intent-understanding` -> `freely-signal-intent-understanding/SKILL.md`
-- `skill:freely-url-content-intake` -> `freely-url-content-intake/SKILL.md`
-- `skill:freely-fix-execution` -> `freely-fix-execution/SKILL.md`
-- `skill:freely-mem9-continuity-bridge` -> `freely-mem9-continuity-bridge/SKILL.md`
-- `skill:freely-tool-cc-codex-mcp-runtime` -> `freely-tool-cc-codex-mcp-runtime/SKILL.md`
-- `skill:freely-agent-execution-safety-review` -> `freely-agent-execution-safety-review/SKILL.md`
+## 技能角色归属
+
+每个技能标注所属角色：`M` = Manager, `W` = Worker, `A` = All。
+
+| 角色 | 技能 | 用途 |
+|------|------|------|
+| A | `freely-constitution-guard` | 宪法硬性约束门禁（预检） |
+| A | `freely-laws-enforcer` | 法律级验收检查 |
+| A | `freely-context-source-skill` | 输入来源判定与下一跳路由 |
+| A | `freely-auto-loop-orchestrator` | 自主持续交付循环编排 |
+| A | `freely-agent-execution-safety-review` | 执行边界安全评审 |
+| A | `freely-config-backup-guard` | 配置修改前强制备份 |
+| M | `freely-multi-worktree-supervision` | 同时监督多个 worktree |
+| M | `freely-worktree-maintenance-governance` | worktree 状态核单与 merge 顺序 |
+| M | `freely-worktree-hygiene-supervision` | 单个 worktree 卫生与提交边界 |
+| M | `freely-premerge-reconcile` | 合并冲突高风险协调 |
+| M | `freely-milestone-planning-state-maintenance` | 里程碑状态维护与排序 |
+| M | `freely-branch-management` | 完整自主分支生命周期 |
+| M | `freely-feat-execution` | 新功能完整开发流程编排 |
+| M | `freely-candidate-acceptance-review` | candidate acceptance 独立评审 |
+| M | `freely-watchdog-control-plane` | 外层监督与恢复控制面 |
+| M | `freely-continuity-watchdog` | 上下文连续性监督 |
+| M | `freely-ai-cli-availability-manager` | AI CLI 工具可用性管理 |
+| M | `freely-signal-intent-understanding` | signal 意图收敛 |
+| M | `freely-human-interruption-manager-triage` | 插话的主管级 routing |
+| M | `freely-human-interruption-handling` | 插话深度处理 |
+| M | `freely-human-interruption-direct-answer` | 插话直接回答(低价值) |
+| M | `freely-chat-issue-routing` | chat 消息路由到正确 issue |
+| M | `freely-recovery-subagent-governance` | 恢复耦合与子代理治理 |
+| M | `freely-module-interface-governance` | 模块接口版本治理 |
+| W | `freely-dev-loop-execution` | milestone issue 的实现与测试 |
+| W | `freely-doc-B1_IBM-execution` | raw issue → brainstorm → candidate |
+| W | `freely-doc-B2_IBM-execution` | milestone issue → prd/tasks/code-review |
+| W | `freely-fix-execution` | bug 快速修复流程 |
+| W | `freely-url-content-intake` | URL 内容抓取与结构化 |
+| W | `freely-rust-tauri-toolchain-bootstrap` | Rust/Tauri toolchain 引导 |
+| W | `freely-tool-cc-codex-mcp-runtime` | Codex MCP 运行时安装配置 |
+| W | `freely-workspace-skill-governance` | skill 新增/拆分/重构/校准 |
+| W | `freely-mem9-continuity-bridge` | mem9 连续性后端接入 |
 
 执行顺序（默认）：
 1. `freely-constitution-guard`（预检门禁）
