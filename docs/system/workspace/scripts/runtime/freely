@@ -13698,17 +13698,17 @@ validate_worker_exit_contract_for_project() {
     worker_done)
       [[ -n "$completion_summary" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "COMPLETION_SUMMARY")"
       [[ -n "$evidence_paths_csv" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "EVIDENCE_PATHS_CSV")"
-      [[ -z "$blocked_reason$handoff_reason$next_action_for_manager" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "exclusive_fields_conflict")"
+      [[ -z "$next_action_for_manager" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "exclusive_fields_conflict")"
       ;;
     worker_blocked)
       [[ -n "$blocked_reason" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "BLOCKED_REASON")"
       [[ -n "$next_action_for_manager" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "NEXT_ACTION_FOR_MANAGER")"
-      [[ -z "$completion_summary$evidence_paths_csv$handoff_reason" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "exclusive_fields_conflict")"
+      [[ -z "$completion_summary$evidence_paths_csv" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "exclusive_fields_conflict")"
       ;;
     worker_handoff_needed)
       [[ -n "$handoff_reason" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "HANDOFF_REASON")"
       [[ -n "$next_action_for_manager" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "NEXT_ACTION_FOR_MANAGER")"
-      [[ -z "$completion_summary$evidence_paths_csv$blocked_reason" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "exclusive_fields_conflict")"
+      [[ -z "$completion_summary$evidence_paths_csv" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "exclusive_fields_conflict")"
       ;;
   esac
   if [[ -n "$missing_csv" ]]; then
