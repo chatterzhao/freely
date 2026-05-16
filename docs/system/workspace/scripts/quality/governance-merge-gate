@@ -829,6 +829,31 @@ def main() -> int:
             m = re.match(r"^(?:raw-|C-|I-)?(\d{8}[-T]\d{4}Z?)", key)
             return m.group(1) if m else None
 
+        def _gate1_mismatch_msg(
+            branch_key: str,
+            branch_ts: str,
+            item_label: str,
+            item_path: str,
+            item_ts: str,
+        ) -> str:
+            return (
+                f"GATE 1: timestamp mismatch in {item_path}\n"
+                f"  branch key: {branch_key} ({branch_ts})\n"
+                f"  {item_label} ({item_ts})\n"
+                f"\n"
+                f"  诊断步骤:\n"
+                f"  1. 检查格式: 文件名和 frontmatter local_id 是否符合\n"
+                f"     raw-YYYYMMDDTHHMM[SS]Z 或 I-YYYYMMDDTHHMM[SS]Z-X\n"
+                f"  2. 格式正确但仍被拦截，考虑:\n"
+                f"     a. 工位不是通过 wt-create 创建 → 分支 key 不正确\n"
+                f"     b. 一个工位处理了多个 raw issue → 违反一个工位一个 issue\n"
+                f"        (docs/LAWS.md)\n"
+                f"  3. 如确认多个 issue 混入:\n"
+                f"     - 用 wt-create --raw-key <被混入的key> 创建独立工位\n"
+                f"     - 将属于该 issue 的实现迁移到新工位\n"
+                f"     - 从当前工位移除不属于本工位的 issue 文件\n"
+            )
+
         branch_ts = _extract_ts(branch_issue_key)
         if branch_ts:
             for candidate in candidate_records:
@@ -837,11 +862,10 @@ def main() -> int:
                     c_ts = _extract_ts(c_key)
                     if c_ts and not c_ts.startswith(branch_ts) and not branch_ts.startswith(c_ts):
                         if c_ts.rstrip("Z") != branch_ts.rstrip("Z"):
-                            errors.append(
-                                f"GATE 1: timestamp mismatch — branch key '{branch_issue_key}' ({branch_ts}) "
-                                f"vs candidate {candidate.candidate_id} ({c_ts}) in {candidate.path}. "
-                                f"The raw/C/I lifecycle must share the same date-time key."
-                            )
+                            errors.append(_gate1_mismatch_msg(
+                                branch_issue_key, branch_ts,
+                                f"candidate {candidate.candidate_id}", candidate.path, c_ts,
+                            ))
             for issue_path in sorted(issue_paths):
                 iid_match = re.search(r"((?:raw|I)-\d{8}T\d{4,6}Z(?:-[A-Z0-9]+)?)", issue_path)
                 if iid_match:
@@ -849,11 +873,10 @@ def main() -> int:
                     i_ts = _extract_ts(iid)
                     if i_ts and not i_ts.startswith(branch_ts) and not branch_ts.startswith(i_ts):
                         if i_ts.rstrip("Z") != branch_ts.rstrip("Z"):
-                            errors.append(
-                                f"GATE 1: timestamp mismatch — branch key '{branch_issue_key}' ({branch_ts}) "
-                                f"vs issue {iid} ({i_ts}) in {issue_path}. "
-                                f"The raw/C/I lifecycle must share the same date-time key."
-                            )
+                            errors.append(_gate1_mismatch_msg(
+                                branch_issue_key, branch_ts,
+                                f"issue {iid}", issue_path, i_ts,
+                            ))
 
     if args.target_branch == "develop" and branch_issue_key:
         # 2a: SQLite chat-inbox catch-all — ensure matching chat is consumed
