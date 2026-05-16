@@ -2,7 +2,7 @@
 kind: raw
 local_id: raw-20260516T095920Z
 priority: P2
-phase_state: proposed
+phase_state: closed
 source: chat-inbox
 created_at: '2026-05-16T09:59:20Z'
 title: worker validate_worker_exit_contract 残留旧 reason 字段名，三个 exit_kind 排他性检查全坏
