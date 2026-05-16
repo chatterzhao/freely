@@ -2,7 +2,8 @@
 local_id: I-20260513T010343Z-A
 kind: linked
 status: commited
-phase_state: completed
+phase_state: absorbed
+absorbed_at: "2026-05-16T14:27:11Z"
 platform_ids:
   github:
     issue_id: '326'

@@ -1,7 +1,8 @@
 ---
 local_id: I-20260503T1428Z-A
 kind: linked
-phase_state: completed
+phase_state: absorbed
+absorbed_at: "2026-05-16T14:27:11Z"
 promoted_from: raw-20260503T1428Z
 source_candidate: docs/pre-brainstorms/20260503T1428Z--bridge-disconnect/candidates.md#C-20260503T1428Z-A
 verification_artifact_dir: docs/epics/bridge-disconnect-fix/code-reviews

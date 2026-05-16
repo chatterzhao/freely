@@ -2,7 +2,8 @@
 local_id: I-20260507T143544Z-A
 kind: linked
 status: completed
-phase_state: completed
+phase_state: absorbed
+absorbed_at: "2026-05-16T14:27:11Z"
 promoted_from: raw-20260507T143544Z
 source_candidate: docs/pre-brainstorms/20260507T143544Z--intercept-guard/candidates.md
 canonical_issue_path: ""

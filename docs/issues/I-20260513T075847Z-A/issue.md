@@ -1,7 +1,8 @@
 ---
 local_id: I-20260513T075847Z-A
 kind: linked
-phase_state: completed
+phase_state: absorbed
+absorbed_at: "2026-05-16T14:27:11Z"
 promoted_from: raw-20260513T075847Z
 source_candidate: docs/pre-brainstorms/20260513T075847Z--scan-non-rawkey-visibility/candidates.md#C-20260513T075847Z-A
 verification_artifact_dir: docs/epics/scan-non-rawkey-visibility/code-reviews

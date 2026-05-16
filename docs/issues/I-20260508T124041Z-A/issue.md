@@ -1,7 +1,7 @@
 ---
 local_id: I-20260508T124041Z-A
 kind: linked
-phase_state: in_dev
+phase_state: absorbed
 promoted_from: raw-20260508T124041Z
 source_candidate: docs/pre-brainstorms/20260508T124041Z--wt-create-pull-after-worktree/candidates.md#C-20260508T124041Z-A
 verification_artifact_dir: docs/epics/wt-create-pull-after-worktree/code-reviews
