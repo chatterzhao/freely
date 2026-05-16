@@ -6,6 +6,12 @@ policy_ref='docs/CONSTITUTION.md §2'
 while read -r local_ref local_sha remote_ref remote_sha; do
   [[ -z "${local_ref:-}" ]] && continue
 
+  # Allow remote branch deletion (git push --delete). git sends
+  # all-zero local_sha for delete operations; local_ref may be "(delete)".
+  if [[ "$local_sha" == "0000000000000000000000000000000000000000" ]]; then
+    continue
+  fi
+
   local_branch="${local_ref#refs/heads/}"
   remote_branch="${remote_ref#refs/heads/}"
 
