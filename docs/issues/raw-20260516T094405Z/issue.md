@@ -1,5 +1,6 @@
 ---
 kind: raw
+local_id: raw-20260516T094405Z
 priority: P2
 status: open
 source: chat-inbox
