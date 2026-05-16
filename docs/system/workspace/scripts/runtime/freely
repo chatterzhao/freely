@@ -9211,7 +9211,7 @@ worker_prompt_can_materialize_missing_worktree() {
   [[ -n "$target_worktree" && -n "$target_branch" ]] || return 1
   [[ ! -d "$target_worktree" ]] || return 1
   case "$target_branch" in
-    feature/*|feature/premerge-*|test-pre-merge-*|hotfix/*|release/*) ;;
+    feature/*|fix/*|feature/premerge-*|test-pre-merge-*|hotfix/*|release/*) ;;
     *) return 1 ;;
   esac
   normalized_parent="$(cd "$(dirname "$target_worktree")" 2>/dev/null && pwd -P)" || return 1
