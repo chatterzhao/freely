@@ -4,26 +4,38 @@ set -euo pipefail
 
 usage() {
   cat <<USAGE
-Usage: ./bin/deploy-skills [--tools <name,...>] [--dry-run]
+Usage: ./bin/deploy-skills [--tools <name,...>] [--force] [--dry-run]
 
 Deploy all skills from docs/system/workspace/skills/ to AI tool skill directories
 so tools can invoke them via skill:<name>.
 
 Options:
-  --tools <tools>  Comma-separated tool names (default: from FREELY_TOOLS or "claude")
+  --tools <tools>  Comma-separated tool names (default: AI_TOOL from project config,
+                    or FREELY_TOOLS env, or global config, or "claude")
+  --force          Force overwrite even if content is identical
   --dry-run        Show what would be deployed without writing.
 
 Supported tools:
-  claude  → ~/.claude/skills/
-  codex   → ~/.codex/skills/
+  claude*     → ~/.claude/skills/
+  codex*      → ~/.codex/skills/
+  oc-*        → ~/.config/opencode/skills/  (if project .opencode/ not found)
+  opencode    → ~/.config/opencode/skills/  (if project .opencode/ not found)
+  cc*         → (not yet supported)
+  iflow*      → (not yet supported)
+  kiro-cli*   → (not yet supported)
+
+Project-local override: if tool directory exists under <project-root>/.opencode/skills/,
+skills are deployed there instead of global config.
 
 Examples:
   ./bin/deploy-skills --tools claude,codex
-  ./bin/deploy-skills --tools claude --dry-run
+  ./bin/deploy-skills --tools oc-acp-ds-flash-auto --force
+  ./bin/deploy-skills --dry-run
 USAGE
 }
 
 dry_run=0
+force=0
 tools=""
 
 while [[ $# -gt 0 ]]; do
@@ -32,6 +44,10 @@ while [[ $# -gt 0 ]]; do
       tools="${2:-}"
       [[ -n "$tools" ]] || { echo "Missing value for --tools" >&2; exit 1; }
       shift 2
+      ;;
+    --force)
+      force=1
+      shift
       ;;
     --dry-run)
       dry_run=1
@@ -50,7 +66,17 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 SRC="$ROOT_DIR/docs/system/workspace/skills"
 [[ -d "$SRC" ]] || { echo "Skill source directory not found: $SRC" >&2; exit 1; }
 
-# Resolve default tools: --tools flag > FREELY_TOOLS env > ~/.freely/config.env > claude
+# Resolve default tools: --tools flag > AI_TOOL from project config > FREELY_TOOLS env > global config > claude
+if [[ -z "$tools" ]]; then
+  # Try project-local config first
+  project_cfg="$ROOT_DIR/.freely/config.env"
+  if [[ -f "$project_cfg" ]]; then
+    local_ai_tool=$(grep "^AI_TOOL=" "$project_cfg" 2>/dev/null | head -1 | cut -d= -f2 | tr -d '"' | tr -d "'" | xargs || true)
+    if [[ -n "$local_ai_tool" ]]; then
+      tools="$local_ai_tool"
+    fi
+  fi
+fi
 if [[ -z "$tools" ]]; then
   tools="${FREELY_TOOLS:-}"
 fi
@@ -66,16 +92,28 @@ fi
 
 # Map tool name to skill directory
 tool_dir() {
-  case "$1" in
-    claude) echo "${HOME}/.claude/skills" ;;
-    codex)  echo "${HOME}/.codex/skills" ;;
-    *)      echo "" ;;
+  local tool="$1"
+  case "$tool" in
+    claude*) echo "${HOME}/.claude/skills" ;;
+    codex*)  echo "${HOME}/.codex/skills" ;;
+    oc-*|opencode)
+      # Prefer project-local .opencode/skills/ over global
+      if [[ -d "$ROOT_DIR/.opencode/skills" ]]; then
+        echo "$ROOT_DIR/.opencode/skills"
+      else
+        echo "${HOME}/.config/opencode/skills"
+      fi
+      ;;
+    cc*)     echo "" ;;
+    iflow*)  echo "" ;;
+    kiro-cli*) echo "" ;;
+    *)       echo "" ;;
   esac
 }
 
 deploy_to() {
   local tool_name="$1" dst="$2"
-  local deployed=0 failed=0 updated=0
+  local deployed=0 failed=0 updated=0 skipped=0
 
   echo "=== $tool_name → $dst ==="
 
@@ -92,6 +130,8 @@ deploy_to() {
       if [[ -d "$local_dst" ]]; then
         if ! diff -rq "$skill_dir" "$local_dst" >/dev/null 2>&1; then
           echo "  UPDATE  $name"
+        elif [[ "$force" -eq 1 ]]; then
+          echo "  UPDATE  $name (force)"
         else
           echo "  OK     $name"
         fi
@@ -109,6 +149,15 @@ deploy_to() {
         cp -r "$skill_dir"* "$local_dst/"
         echo "  UPDATE  $name"
         updated=$((updated + 1))
+      elif [[ "$force" -eq 1 ]]; then
+        rm -rf "$local_dst"
+        mkdir -p "$local_dst"
+        cp -r "$skill_dir"* "$local_dst/"
+        echo "  UPDATE  $name (force)"
+        updated=$((updated + 1))
+      else
+        echo "  OK     $name"
+        skipped=$((skipped + 1))
       fi
     else
       mkdir -p "$local_dst"
@@ -118,18 +167,26 @@ deploy_to() {
     deployed=$((deployed + 1))
   done
 
-  echo "  deployed=$deployed  updated=$updated  failed=$failed"
+  echo "  deployed=$deployed  updated=$updated  skipped=$skipped  failed=$failed"
   echo ""
 }
 
 # Parse comma-separated tools and deploy to each
+unknown_tools=""
 IFS=',' read -ra TOOL_LIST <<< "$tools"
 for t in "${TOOL_LIST[@]}"; do
   t=$(echo "$t" | xargs)  # trim whitespace
   d=$(tool_dir "$t")
   if [[ -z "$d" ]]; then
-    echo "SKIP unsupported tool: $t" >&2
+    unknown_tools="$unknown_tools $t"
     continue
   fi
   deploy_to "$t" "$d"
 done
+
+if [[ -n "$unknown_tools" ]]; then
+  echo "ERROR: unsupported tools:$unknown_tools" >&2
+  echo "Supported tools: claude*, codex*, oc-*, opencode" >&2
+  echo "Unsupported (no mapping): cc*, iflow*, kiro-cli*" >&2
+  exit 1
+fi
