@@ -13771,7 +13771,7 @@ write_manager_resume_handoff() {
 - worktree_path: $project
 
 ## Continue Current Manager Lane
-- reason: ${reason:-manager_exit_contract_resume}
+- reason: ${resume_reason:-manager_exit_contract_resume}
 - contract_file: $contract_file
 - continuity_file: ${continuity_file:-none}
 - route_kind: ${route_kind:-unknown}
