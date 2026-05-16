@@ -19,7 +19,7 @@ from freely_user_env import value as freely_env_value
 
 
 DEFAULT_API_BASE = "https://gitee.com/api/v5"
-COMMAND_NAMES = {"list", "get", "create", "update", "comment", "close", "reopen"}
+COMMAND_NAMES = {"list", "get", "create", "update", "comment", "close", "reopen", "delete-branch"}
 DEFAULT_API_TIMEOUT_SECS = 15.0
 
 
@@ -158,6 +158,21 @@ def repo_path_post(repo: str, suffix: str = "") -> str:
 
 def repo_name(repo: str) -> str:
     return repo.split("/", 1)[1]
+
+
+def repo_path_branch(repo: str, branch: str) -> str:
+    """Path for branch ref operations (DELETE)."""
+    owner, name = repo.split("/", 1)
+    return f"/repos/{owner}/{name}/git/refs/heads/{branch}"
+
+
+def cmd_delete_branch(args: argparse.Namespace) -> object:
+    repo = detect_repo(args.repo)
+    return api_request(
+        method="DELETE",
+        path=repo_path_branch(repo, args.branch),
+        auth_required=True,
+    )
 
 
 def cmd_list(args: argparse.Namespace) -> object:
@@ -318,6 +333,10 @@ def build_parser() -> argparse.ArgumentParser:
     reopen_parser.add_argument("number", type=int)
     reopen_parser.add_argument("--comment")
     reopen_parser.set_defaults(func=cmd_reopen)
+
+    delete_branch_parser = subparsers.add_parser("delete-branch")
+    delete_branch_parser.add_argument("branch", help="Branch name to delete (e.g. feature/raw-20260514T103532Z-foo)")
+    delete_branch_parser.set_defaults(func=cmd_delete_branch)
     return parser
 
 

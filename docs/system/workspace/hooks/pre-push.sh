@@ -6,6 +6,12 @@ policy_ref='docs/CONSTITUTION.md §2'
 while read -r local_ref local_sha remote_ref remote_sha; do
   [[ -z "${local_ref:-}" ]] && continue
 
+  # Allow remote branch deletion (git push --delete). git sends
+  # all-zero local_sha for delete operations; local_ref may be "(delete)".
+  if [[ "$local_sha" == "0000000000000000000000000000000000000000" ]]; then
+    continue
+  fi
+
   local_branch="${local_ref#refs/heads/}"
   remote_branch="${remote_ref#refs/heads/}"
 
@@ -44,7 +50,7 @@ MSG
       fi
       continue
       ;;
-    feature/*|hotfix/*)
+    feature/*|hotfix/*|fix/*)
       # Validate naming convention: must contain raw-xxx or I-xxx key
       if ! echo "$local_branch" | grep -qoE 'raw-[0-9]{8}[-T][0-9]{4,6}Z?' && \
          ! echo "$local_branch" | grep -qoE 'I-[0-9]{8}[-T][0-9]{4,6}Z?(-[A-Z0-9]+)?'; then
