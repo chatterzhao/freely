@@ -9261,16 +9261,18 @@ materialize_worker_prompt_worktree_if_needed() {
   target_worktree="$(worker_prompt_target_worktree "$prompt_file")"
   target_branch="$(worker_prompt_target_branch "$prompt_file")"
 
-  # Try wt-create first (governance-compliant), fall back to raw git worktree add
+  # Only wt-create is allowed — it ensures governance traceability.
+  # Failure here means Manager must create the worktree before delegating.
   if [[ -x "$manager_project/bin/wt-create" ]]; then
-    bash "$manager_project/bin/wt-create" "$target_branch" --base develop >/dev/null 2>&1 || true
-  fi
-  if [[ ! -d "$target_worktree" ]]; then
-    git -C "$manager_project" worktree add -b "$target_branch" "$target_worktree" develop >/dev/null 2>&1 || return 1
-    freely_bin="$(freely_bin_for_project "$manager_project")"
-    if [[ -x "$freely_bin" ]]; then
-      bash "$freely_bin" sync-tooling --source-project "$manager_project" --project "$target_worktree" >/dev/null 2>&1 || true
+    if ! bash "$manager_project/bin/wt-create" "$target_branch" --base develop 2>&1; then
+      log_warn "worker worktree auto-materialize blocked: wt-create failed for branch=$target_branch"
+      log_warn "  Manager must create the worktree before delegating:"
+      log_warn "  ./bin/wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>"
+      return 1
     fi
+  else
+    log_warn "worker worktree auto-materialize blocked: wt-create not found"
+    return 1
   fi
 
   reset_project_runtime_discovery_cache "$manager_project"
@@ -11619,7 +11621,12 @@ launch_worker_from_manager_prompt_if_needed() {
   local selected_tool
   target_project="$(materialize_worker_prompt_worktree_if_needed "$manager_project" "$prompt_file")"
   if [[ -z "$target_project" || ! -d "$target_project" ]]; then
-    log_warn "worker DIAG: materialize returned empty or missing (target=$target_project)"
+    log_warn "worker launch BLOCKED: worktree does not exist (target=$target_project)"
+    log_warn "  Manager must create the worktree before delegating workers."
+    log_warn "  Use: ./bin/wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>"
+    append_runtime_event "$manager_project" "worker_launch_blocked_worktree_missing" \
+      "prompt_file=$prompt_file" \
+      "target=$target_project"
     return 1
   fi
   if ! project_has_authoritative_worktree_path "$manager_project" "$target_project"; then
