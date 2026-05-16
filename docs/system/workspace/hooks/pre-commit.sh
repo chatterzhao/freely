@@ -198,6 +198,12 @@ fi
 
 case "$branch" in
   main|develop)
+    # Allow governance-automated commits (wt-close frontmatter, issue-sync,
+    # lifecycle closeout, etc.) via FREELY_SKIP_IBM_GATE=1.
+    if [[ "${FREELY_SKIP_IBM_GATE:-0}" == "1" ]]; then
+      echo "[HOOK] IBM governance gate skipped (FREELY_SKIP_IBM_GATE=1)"
+      exit 0
+    fi
     if git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1; then
       if [[ "${FREELY_GUARDED_MERGE_COMPLETION:-0}" == "1" ]]; then
         require_valid_guarded_completion_state
