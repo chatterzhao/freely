@@ -7,6 +7,7 @@ milestone: M-20260507T0200Z-A
 verification_artifact_dir: docs/epics/promoted-gate-fix/code-reviews
 pre_tests_path: docs/epics/promoted-gate-fix/verification/pre-tests.md
 platform_ids: {}
+platform_state: ''
 ---
 # I-20260507T0200Z-A: promoted gate fix
 - pre_tests_path: `docs/epics/promoted-gate-fix/verification/pre-tests.md`

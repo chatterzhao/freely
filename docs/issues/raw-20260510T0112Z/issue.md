@@ -8,6 +8,7 @@ platform_ids:
     url: https://github.com/chatterzhao/freely/issues/271
     synced_at: ''
 primary_platform: github
+platform_state: closed
 ---
 ## 问题
 

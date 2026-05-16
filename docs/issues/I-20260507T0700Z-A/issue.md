@@ -7,6 +7,7 @@ milestone: M-20260507T0700Z-A
 verification_artifact_dir: docs/epics/unified-platform/code-reviews
 pre_tests_path: docs/epics/unified-platform/verification/pre-tests.md
 platform_ids: {}
+platform_state: ''
 ---
 # I-20260507T0700Z-A: unified platform layer
 - pre_tests_path: `docs/epics/unified-platform/verification/pre-tests.md`

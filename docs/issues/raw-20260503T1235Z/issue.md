@@ -4,7 +4,7 @@ local_id: raw-20260503T1235Z
 priority: P1
 phase_state: absorbed
 absorbed_into: I-20260503T1235Z-A
-status: closed
+phase_state: closed
 source: platform
 platform_ids:
   github:
@@ -13,6 +13,7 @@ platform_ids:
     repo: freely
 created_at: "2026-05-03T12:39:03Z"
 title: "fix: defer worker auto-recovery to after first AI patrol"
+platform_state: closed
 ---
 
 ## Root Cause

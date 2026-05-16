@@ -8,6 +8,7 @@ milestone: M-20260507T0100Z-A
 verification_artifact_dir: docs/epics/fix-branch-naming/code-reviews
 pre_tests_path: docs/epics/fix-branch-naming/verification/pre-tests.md
 platform_ids: {}
+platform_state: ''
 ---
 
 # I-20260507T0100Z-A: fix-execution branch naming

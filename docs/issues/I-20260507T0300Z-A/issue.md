@@ -7,6 +7,7 @@ milestone: M-20260507T0300Z-A
 verification_artifact_dir: docs/epics/gate1-timestamp/code-reviews
 pre_tests_path: docs/epics/gate1-timestamp/verification/pre-tests.md
 platform_ids: {}
+platform_state: ''
 ---
 # I-20260507T0300Z-A: GATE 1 timestamp check
 - pre_tests_path: `docs/epics/gate1-timestamp/verification/pre-tests.md`

@@ -6,6 +6,7 @@ promoted_from: raw-20260508T154706Z
 source_candidate: docs/pre-brainstorms/20260508T154706Z--skill-name-reminder/candidates.md#C-20260508T154706Z-A
 verification_artifact_dir: docs/epics/skill-name-reminder/code-reviews
 pre_tests_path: docs/epics/skill-name-reminder/verification/pre-tests.md
+platform_state: ''
 ---
 # I-20260508T154706Z-A
 - pre_tests_path: docs/epics/skill-name-reminder/verification/pre-tests.md

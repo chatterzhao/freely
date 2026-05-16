@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260509T022152Z
 kind: raw
-status: proposed
+phase_state: proposed
 phase_state: proposed
 platform_ids:
   github:
@@ -20,6 +20,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 - pre_tests_path: `docs/epics/worker-launch-writable-redirect/pre-tests.md`

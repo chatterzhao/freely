@@ -2,7 +2,7 @@
 local_id: raw-20260511T133433Z
 kind: raw
 priority: high
-status: open
+phase_state: open
 phase_state: proposed
 source: platform
 platform_ids:
@@ -12,6 +12,7 @@ platform_ids:
     repo: freely
 created_at: "2026-05-11T13:34:33Z"
 title: "fix: .githooks/* wrappers bash 3.2 precedence bug blocks all ref updates"
+platform_state: closed
 ---
 
 ## 问题

@@ -2,11 +2,12 @@
 local_id: raw-20260503-1010
 kind: raw
 priority: high
-status: open
+phase_state: open
 phase_state: proposed
 source: chat-inbox
 created_at: "2026-05-03T10:10:00Z"
 title: "fix: SQLite busy_timeout=0 causes concurrent write failures"
+platform_state: ''
 ---
 ## 问题
 chat-inbox.py 和 session-store.py 设了 WAL 但 busy_timeout=0。

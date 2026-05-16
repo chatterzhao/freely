@@ -6,6 +6,7 @@ promoted_from: raw-20260509T024559Z
 source_candidate: docs/pre-brainstorms/20260509T024559Z--multi-project-isolation/candidates.md#C-20260509T024559Z-A
 verification_artifact_dir: docs/epics/multi-project-isolation/code-reviews
 pre_tests_path: docs/epics/multi-project-isolation/verification/pre-tests.md
+platform_state: ''
 ---
 # I-20260509T024559Z-A: multi-project isolation architecture
 - pre_tests_path: docs/epics/multi-project-isolation/verification/pre-tests.md

@@ -7,6 +7,7 @@ platform_ids:
     issue_id: '288'
     url: https://github.com/chatterzhao/freely/issues/288
 primary_platform: github
+platform_state: closed
 ---
 ## 问题
 handoff.py insert 不支持 exit_kind，AI prompt 没告诉 AI 写 exit_kind。

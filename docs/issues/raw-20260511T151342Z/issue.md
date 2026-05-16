@@ -2,7 +2,7 @@
 local_id: raw-20260511T151342Z
 kind: raw
 priority: medium
-status: open
+phase_state: open
 phase_state: proposed
 source: platform
 platform_ids:
@@ -12,6 +12,7 @@ platform_ids:
     repo: freely
 created_at: "2026-05-11T15:13:42Z"
 title: "fix: merge-guarded returns non-zero exit on successful merge"
+platform_state: closed
 ---
 ## 问题
 merge-guarded 在 merge 成功后仍返回 exit 1。原因：用 git merge --continue 返回值判断成功，

@@ -3,6 +3,7 @@ local_id: raw-20260510T1853Z
 kind: raw
 phase_state: proposed
 platform_ids: {}
+platform_state: ''
 ---
 ## 问题
 init 分支校验只检查命名，不检查 worktree。提示缺少具体修复命令。

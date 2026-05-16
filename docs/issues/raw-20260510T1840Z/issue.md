@@ -4,6 +4,7 @@ kind: raw
 phase_state: proposed
 platform_ids: {}
 primary_platform: ''
+platform_state: ''
 ---
 ## 问题
 init --skip-branch-check 可绕过分支校验，daemon start 不检查。

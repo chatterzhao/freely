@@ -20,6 +20,7 @@ channel: feat-execution
 session_refs: []
 pre_tests_path: docs/epics/skill-ref-cleanup/verification/pre-tests.md
 verification_artifact_dir: docs/epics/skill-ref-cleanup/code-reviews
+platform_state: closed
 ---
 
 # I-20260508T004541Z-A: skill 引用全局改为 skill:name

@@ -2,7 +2,7 @@
 local_id: raw-20260503-0915
 kind: raw
 priority: high
-status: open
+phase_state: open
 phase_state: proposed
 source: platform
 platform_ids:
@@ -12,6 +12,7 @@ platform_ids:
     repo: freely
 created_at: "2026-05-03T09:15:00Z"
 title: "feat: enforce test-pre-merge before develop merge"
+platform_state: open
 ---
 ## 问题
 hotfix→develop 跳过 test-pre-merge，pretests-gate 不触发。

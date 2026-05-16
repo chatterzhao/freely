@@ -2,7 +2,7 @@
 local_id: raw-20260503-0945
 kind: raw
 priority: high
-status: open
+phase_state: open
 phase_state: proposed
 source: platform
 platform_ids:
@@ -10,6 +10,7 @@ platform_ids:
     issue_id: "IJKTEJ"
 created_at: "2026-05-03T09:45:00Z"
 title: "feat: migrate scan results and issue-sync state to SQLite"
+platform_state: ''
 ---
 ## 问题
 scan JSON 和 .scan-state 分散两处，后者误在 git-tracked 目录。

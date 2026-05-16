@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260507T143544Z
 kind: raw
-status: proposed
+phase_state: proposed
 phase_state: proposed
 platform_ids:
   github:

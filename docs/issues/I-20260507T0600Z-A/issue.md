@@ -7,6 +7,7 @@ milestone: M-20260507T0600Z-A
 verification_artifact_dir: docs/epics/raw-issue-pull/code-reviews
 pre_tests_path: docs/epics/raw-issue-pull/verification/pre-tests.md
 platform_ids: {}
+platform_state: ''
 ---
 # I-20260507T0600Z-A: raw-issue-pull
 - pre_tests_path: `docs/epics/raw-issue-pull/verification/pre-tests.md`

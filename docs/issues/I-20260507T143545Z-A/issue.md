@@ -20,6 +20,7 @@ channel: feat-execution
 session_refs: []
 pre_tests_path: docs/epics/timestamp-seconds-upgrade/verification/pre-tests.md
 verification_artifact_dir: docs/epics/timestamp-seconds-upgrade/code-reviews
+platform_state: closed
 ---
 
 # I-20260507T143545Z-A: 时间戳格式带秒升级

@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260508T133423Z
 kind: raw
-status: proposed
+phase_state: proposed
 phase_state: proposed
 platform_ids: {}
 primary_platform: ''
@@ -14,6 +14,7 @@ intake_id: ''
 author: zhaoquan
 channel: local
 session_refs: []
+platform_state: ''
 ---
 
 ## 问题

@@ -3,7 +3,7 @@ local_id: raw-20260513T075904Z
 phase_state: proposed
 kind: raw
 priority: P1
-status: open
+phase_state: open
 source: chat-inbox
 created_at: '2026-05-13T07:59:04Z'
 title: 'merge-guarded: _sync_issues_changed_in_merge reads fm.get(''status'') but

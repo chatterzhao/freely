@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260508T120000Z
 kind: raw
-status: absorbed
+phase_state: absorbed
 phase_state: absorbed
 absorbed_into: I-20260508T120000Z-A
 platform_ids:

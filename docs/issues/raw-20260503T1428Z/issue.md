@@ -2,7 +2,7 @@
 local_id: raw-20260503T1428Z
 kind: raw
 phase_state: proposed
-status: open
+phase_state: open
 priority: P1
 source: platform
 platform_ids:
@@ -12,6 +12,7 @@ platform_ids:
     repo: freely
 created_at: "2026-05-03T21:29:35Z"
 title: "fix: run-acp-prompt.py disconnects before bridge finishes"
+platform_state: closed
 ---
 
 ## Root Cause
