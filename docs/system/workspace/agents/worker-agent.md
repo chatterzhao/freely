@@ -93,6 +93,14 @@
 |------|------|------|
 | `./bin/wt-add <branch> -- <git-add-args>` | 按 worktree 安全 add | 需要分步 add 时 |
 | `python3 handoff.py list --db .freely/freely.db` | 查询交接表 | 需要检查历史交接 |
+| `./bin/freely feedback --title "..." --body "..."` | 创建新 raw issue | 发现不相关的 bug、需独立追踪的问题 |
+
+### 何时创建新 raw issue
+
+执行 Task 时发现的问题，按以下规则处理：
+- **不相关的 bug** → 创建 raw issue 记录，**不中断当前任务**
+- **当前任务依赖的前置条件不满足** → `worker_handoff_needed` 报告 Manager
+- **不要**把发现的问题顺手修了——那是另一个 raw issue 的范围
 
 ## 交接
 
