@@ -2,8 +2,8 @@
 local_id: raw-20260503-0930
 kind: raw
 priority: medium
-phase_state: open
-phase_state: proposed
+phase_state: completed
+phase_state: completed
 source: platform
 platform_ids:
   github:
@@ -23,3 +23,4 @@ platform_state: open
 - Webhook receiver endpoint
 - 验证签名
 - 触发 issue-sync
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
