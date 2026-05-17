@@ -18769,10 +18769,25 @@ start_project_runtime() {
     }
   fi
 
-  # ERR trap: capture the failing command before set -e exits the loop.
-  # Without this, any unguarded non-zero return silently crashes the supervisor
-  # with LAST_WORKCELL_EXIT_REASON="supervisor_exit" and no trace of what failed.
-  trap 'LAST_WORKCELL_EXIT_REASON="set_e_exit_cmd=${BASH_COMMAND%% *}@${BASH_SOURCE##*/}:${LINENO}_rc_$?"' ERR
+  # ERR trap: capture crash → auto-report as raw issue via freely feedback.
+  # Desensitized: no user paths, no prompt content, no session IDs.
+  _on_supervisor_err() {
+    local _err_cmd _err_line _err_rc _err_reason _msg
+    _err_cmd="${BASH_COMMAND%% *}"
+    _err_line="${LINENO}"
+    _err_rc="$?"
+    _err_reason="set_e_exit_cmd=${_err_cmd}@${BASH_SOURCE##*/}:${_err_line}_rc_${_err_rc}"
+    LAST_WORKCELL_EXIT_REASON="$_err_reason"
+    if [[ -x "$SELF_ROOT/bin/freely" ]]; then
+      _msg="supervisor crash: ${_err_cmd} at ${BASH_SOURCE##*/}:${_err_line} (rc=${_err_rc})
+last_exit_reason_before_crash: ${LAST_WORKCELL_EXIT_REASON:-none}
+tool: ${AI_TOOL:-unknown}
+adapter: ${AI_TOOL_ADAPTER:-unknown}
+launch_kind: ${mode_name:-unknown}"
+      "$SELF_ROOT/bin/freely" feedback --title "supervisor crash: ${_err_cmd} rc=${_err_rc}" --body "$_msg" >/dev/null 2>&1 || true
+    fi
+  }
+  trap '_on_supervisor_err' ERR
   while true; do
     # Re-load session state each cycle so resume/fork decisions see latest values
     load_session_state_or_defaults "$project"
