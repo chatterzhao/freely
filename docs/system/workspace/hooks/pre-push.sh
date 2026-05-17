@@ -12,6 +12,11 @@ while read -r local_ref local_sha remote_ref remote_sha; do
     continue
   fi
 
+  # Allow tag pushes (git push <remote> <tagname>)
+  if [[ "$local_ref" == refs/tags/* ]]; then
+    continue
+  fi
+
   local_branch="${local_ref#refs/heads/}"
   remote_branch="${remote_ref#refs/heads/}"
 
