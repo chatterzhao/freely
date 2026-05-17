@@ -2,7 +2,8 @@
 local_id: raw-20260517T063046Z
 kind: raw
 status: proposed
-phase_state: proposed
+phase_state: absorbed
+absorbed_at: "2026-05-17T07:50:00Z"
 platform_ids:
   github:
     issue_id: '440'

@@ -12,6 +12,8 @@ platform_ids:
     synced_at: '2026-05-17T06:58:41Z'
 updated_at: '2026-05-17T06:58:41Z'
 primary_platform: github
+phase_state: absorbed
+absorbed_at: "2026-05-17T07:50:00Z"
 platform_state: open
 ---
 
