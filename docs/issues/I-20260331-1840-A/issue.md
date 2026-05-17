@@ -2,26 +2,25 @@
 local_id: I-20260331-1840-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "73"
-    url: "https://github.com/chatterzhao/freely/issues/73"
-    synced_at: "2026-04-27T11:21:32Z"
-
+    issue_id: '73'
+    url: https://github.com/chatterzhao/freely/issues/73
+    synced_at: '2026-04-27T11:21:32Z'
   gitee:
-    issue_id: "IJFO7C"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO7C"
-    synced_at: "2026-04-27T13:15:23Z"
+    issue_id: IJFO7C
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO7C
+    synced_at: '2026-04-27T13:15:23Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/issues/multi-tool-auto-switch-v1-codex-fallback-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/issues/multi-tool-auto-switch-v1-codex-fallback-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:21:32Z"
-hash: ""
-created_at: "2026-04-27T11:21:32Z"
-updated_at: "2026-04-27T11:21:32Z"
-platform_state: 
+  github: '2026-04-27T11:21:32Z'
+hash: ''
+created_at: '2026-04-27T11:21:32Z'
+updated_at: '2026-05-17T11:59:29Z'
+platform_state: closed
 ---
 
 Freely 最早的 availability-manager 研究和 `20260331-1840` brainstorm 都要求同一条恢复状态机：

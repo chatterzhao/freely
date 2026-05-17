@@ -2,26 +2,25 @@
 local_id: I-20260407-1042-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "125"
-    url: "https://github.com/chatterzhao/freely/issues/125"
-    synced_at: "2026-04-27T11:26:06Z"
-
+    issue_id: '125'
+    url: https://github.com/chatterzhao/freely/issues/125
+    synced_at: '2026-04-27T11:26:06Z'
   gitee:
-    issue_id: "IJFO9A"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO9A"
-    synced_at: "2026-04-27T13:16:49Z"
+    issue_id: IJFO9A
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO9A
+    synced_at: '2026-04-27T13:16:49Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/issues/github-first-external-issue-source-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/issues/github-first-external-issue-source-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:26:06Z"
-hash: ""
-created_at: "2026-04-27T11:26:06Z"
-updated_at: "2026-04-27T11:26:06Z"
-platform_state: 
+  github: '2026-04-27T11:26:06Z'
+hash: ''
+created_at: '2026-04-27T11:26:06Z'
+updated_at: '2026-05-17T12:03:22Z'
+platform_state: closed
 ---
 
 Freely has already contracted durable source families to `human interruption` and `external issue`, but the runtime-facing source contract still exposes the older loose `github issue` wording and does not yet freeze how raw external issues become canonical intake.

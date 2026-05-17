@@ -2,26 +2,25 @@
 local_id: I-20260401-1308-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "80"
-    url: "https://github.com/chatterzhao/freely/issues/80"
-    synced_at: "2026-04-27T11:21:56Z"
-
+    issue_id: '80'
+    url: https://github.com/chatterzhao/freely/issues/80
+    synced_at: '2026-04-27T11:21:56Z'
   gitee:
-    issue_id: "IJFO7K"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO7K"
-    synced_at: "2026-04-27T13:15:38Z"
+    issue_id: IJFO7K
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO7K
+    synced_at: '2026-04-27T13:15:38Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md
 last_synced_comment_at:
-  github: "2026-04-27T11:21:56Z"
-hash: ""
-created_at: "2026-04-27T11:21:56Z"
-updated_at: "2026-04-27T11:21:56Z"
-platform_state: 
+  github: '2026-04-27T11:21:56Z'
+hash: ''
+created_at: '2026-04-27T11:21:56Z'
+updated_at: '2026-05-17T11:59:48Z'
+platform_state: closed
 ---
 
 Freely has already converged on a broader security direction: automation and enforced workflow should replace operator memory wherever possible. But the current repo still has a very practical gap:

@@ -2,26 +2,25 @@
 local_id: I-20260416-0448-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "150"
-    url: "https://github.com/chatterzhao/freely/issues/150"
-    synced_at: "2026-04-27T11:27:46Z"
-
+    issue_id: '150'
+    url: https://github.com/chatterzhao/freely/issues/150
+    synced_at: '2026-04-27T11:27:46Z'
   gitee:
-    issue_id: "IJFOA2"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFOA2"
-    synced_at: "2026-04-27T13:17:23Z"
+    issue_id: IJFOA2
+    url: https://gitee.com/zhaoquan/freely/issues/IJFOA2
+    synced_at: '2026-04-27T13:17:23Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/freely-product-architecture/memark-protected-root-bootstrap-followthrough-governance/issues/memark-protected-root-bootstrap-followthrough-governance.md"
+canonical_issue_path: docs/epics/freely-product-architecture/memark-protected-root-bootstrap-followthrough-governance/issues/memark-protected-root-bootstrap-followthrough-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:27:46Z"
-hash: ""
-created_at: "2026-04-27T11:27:46Z"
-updated_at: "2026-04-27T11:27:46Z"
-platform_state: 
+  github: '2026-04-27T11:27:46Z'
+hash: ''
+created_at: '2026-04-27T11:27:46Z'
+updated_at: '2026-05-17T12:04:38Z'
+platform_state: closed
 ---
 
 Upgraded `memark 0.1.1` replay showed canonical Freely root still missed one narrow bootstrap prerequisite:

@@ -2,26 +2,25 @@
 local_id: I-20260329-2045-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "68"
-    url: "https://github.com/chatterzhao/freely/issues/68"
-    synced_at: "2026-04-27T11:21:17Z"
-
+    issue_id: '68'
+    url: https://github.com/chatterzhao/freely/issues/68
+    synced_at: '2026-04-27T11:21:17Z'
   gitee:
-    issue_id: "IJFO76"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO76"
-    synced_at: "2026-04-27T13:15:16Z"
+    issue_id: IJFO76
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO76
+    synced_at: '2026-04-27T13:15:16Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/ai-auth-change-wake-command-lifecycle-governance/issues/ai-auth-change-wake-command-lifecycle-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/ai-auth-change-wake-command-lifecycle-governance/issues/ai-auth-change-wake-command-lifecycle-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:21:17Z"
-hash: ""
-created_at: "2026-04-27T11:21:17Z"
-updated_at: "2026-04-27T11:21:17Z"
-platform_state: 
+  github: '2026-04-27T11:21:17Z'
+hash: ''
+created_at: '2026-04-27T11:21:17Z'
+updated_at: '2026-05-17T11:59:02Z'
+platform_state: closed
 ---
 
 `bin/ai` 的账号成功路径当前暴露了一个独立于账号池可用性和 OAuth 成功率的命令生命周期问题：

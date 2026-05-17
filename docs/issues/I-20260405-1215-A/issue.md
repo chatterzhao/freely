@@ -2,26 +2,25 @@
 local_id: I-20260405-1215-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "106"
-    url: "https://github.com/chatterzhao/freely/issues/106"
-    synced_at: "2026-04-27T11:24:14Z"
-
+    issue_id: '106'
+    url: https://github.com/chatterzhao/freely/issues/106
+    synced_at: '2026-04-27T11:24:14Z'
   gitee:
-    issue_id: "IJFO8L"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO8L"
-    synced_at: "2026-04-27T13:16:20Z"
+    issue_id: IJFO8L
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO8L
+    synced_at: '2026-04-27T13:16:20Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/issues/runtime-audio-notifier-and-sound-semantics-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/issues/runtime-audio-notifier-and-sound-semantics-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:24:14Z"
-hash: ""
-created_at: "2026-04-27T11:24:14Z"
-updated_at: "2026-04-27T11:24:14Z"
-platform_state: 
+  github: '2026-04-27T11:24:14Z'
+hash: ''
+created_at: '2026-04-27T11:24:14Z'
+updated_at: '2026-05-17T12:01:50Z'
+platform_state: closed
 ---
 
 Freely 现在能把 runtime signal 暴露到 Tauri/frontend，但还没有一条稳定的自治声音能力链路。

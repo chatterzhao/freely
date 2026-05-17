@@ -2,26 +2,25 @@
 local_id: I-20260402-0540-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "92"
-    url: "https://github.com/chatterzhao/freely/issues/92"
-    synced_at: "2026-04-27T11:23:00Z"
-
+    issue_id: '92'
+    url: https://github.com/chatterzhao/freely/issues/92
+    synced_at: '2026-04-27T11:23:00Z'
   gitee:
-    issue_id: "IJFO80"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO80"
-    synced_at: "2026-04-27T13:16:00Z"
+    issue_id: IJFO80
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO80
+    synced_at: '2026-04-27T13:16:00Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/runtime-loop-log-timezone-label-followthrough-governance/issues/runtime-loop-log-timezone-label-followthrough-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/runtime-loop-log-timezone-label-followthrough-governance/issues/runtime-loop-log-timezone-label-followthrough-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:23:00Z"
-hash: ""
-created_at: "2026-04-27T11:23:00Z"
-updated_at: "2026-04-27T11:23:00Z"
-platform_state: 
+  github: '2026-04-27T11:23:00Z'
+hash: ''
+created_at: '2026-04-27T11:23:00Z'
+updated_at: '2026-05-17T12:00:37Z'
+platform_state: closed
 ---
 
 Freely 已经在 pre-brainstorm 和 IBM 层解决了“为什么值得做”和“issue 边界如何冻结”的 thoughtfulness，但在 dev-loop 的实现层还缺一块稳定真源：
