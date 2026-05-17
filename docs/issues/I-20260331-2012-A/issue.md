@@ -2,26 +2,25 @@
 local_id: I-20260331-2012-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "74"
-    url: "https://github.com/chatterzhao/freely/issues/74"
-    synced_at: "2026-04-27T11:21:35Z"
-
+    issue_id: '74'
+    url: https://github.com/chatterzhao/freely/issues/74
+    synced_at: '2026-04-27T11:21:35Z'
   gitee:
-    issue_id: "IJFO7E"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO7E"
-    synced_at: "2026-04-27T13:15:29Z"
+    issue_id: IJFO7E
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO7E
+    synced_at: '2026-04-27T13:15:29Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/active-milestone-placement-and-consumption-gate-governance/issues/active-milestone-placement-and-consumption-gate-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/active-milestone-placement-and-consumption-gate-governance/issues/active-milestone-placement-and-consumption-gate-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:21:35Z"
-hash: ""
-created_at: "2026-04-27T11:21:35Z"
-updated_at: "2026-04-27T11:21:35Z"
-platform_state: 
+  github: '2026-04-27T11:21:35Z'
+hash: ''
+created_at: '2026-04-27T11:21:35Z'
+updated_at: '2026-05-17T11:59:34Z'
+platform_state: closed
 ---
 
 Freely 已经把两条规则写成 canonical truth：
