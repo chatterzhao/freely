@@ -1,22 +1,48 @@
 ---
-kind: raw
 local_id: raw-20260516T095920Z
-priority: P2
+kind: raw
+status: closed
 phase_state: completed
-source: chat-inbox
-created_at: '2026-05-16T09:59:20Z'
-title: worker validate_worker_exit_contract 残留旧 reason 字段名，三个 exit_kind 排他性检查全坏
+updated_at: '2026-05-16T12:00:00Z'
+closeout_note: "修复已合并到 develop，fix worktree 已退休"
 platform_ids:
   github:
     issue_id: '365'
     url: https://github.com/chatterzhao/freely/issues/365
-    synced_at: '2026-05-16T09:59:26Z'
-updated_at: '2026-05-17T04:38:31Z'
+    synced_at: ''
 primary_platform: github
-platform_state: closed
-force_closed_at: '2026-05-17T04:38:31Z'
-force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
+canonical_issue_path: ''
+last_synced_comment_at: {}
+hash: ''
+created_at: '2026-05-16T09:59:34Z'
+updated_at: '2026-05-16T09:59:34Z'
+intake_id: ''
+author: platform
+channel: github
+session_refs: []
 ---
+
+## raw-20260516T095920Z
+
+| Field | Value |
+|-------|-------|
+| local_id | `raw-20260516T095920Z` |
+| kind | `raw` |
+| status | `open` |
+| phase | `none` |
+| canonical | `none` |
+| created | 2026-05-16T09:59:20Z |
+| updated | unknown |
+
+---
+
+> **Freely 治理**：这是 raw issue `raw-20260516T095920Z`。实现前请用 `wt-create --raw-key 20260516T095920Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
+kind: raw
+priority: P2
+status: open
+source: chat-inbox
+created_at: "2026-05-16T09:59:20Z"
+title: "worker validate_worker_exit_contract 残留旧 reason 字段名，三个 exit_kind 排他性检查全坏"
 
 ## 背景
 
