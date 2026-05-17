@@ -2,7 +2,7 @@
 kind: raw
 local_id: raw-20260503T1235Z
 priority: P1
-phase_state: closed
+phase_state: completed
 absorbed_into: I-20260503T1235Z-A
 phase_state: closed
 source: platform
