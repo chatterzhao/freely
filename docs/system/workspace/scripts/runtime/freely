@@ -15393,8 +15393,8 @@ select_launch_kind() {
         LAST_TOOL_SESSION_ID="$sid"
         # Same daemon lifecycle, session alive → multi-turn via session/prompt
         if [[ "${FREELY_ACP_FIRST_LAUNCH_DONE:-0}" == "1" ]]; then
-          LAUNCH_KIND_SELECTED="prompt"
-          LAUNCH_ROTATION_REASON="acp_session_prompt_turn"
+          LAUNCH_KIND_SELECTED="resume"
+          LAUNCH_ROTATION_REASON="acp_session_persists"
         else
           LAUNCH_KIND_SELECTED="resume"
           LAUNCH_ROTATION_REASON="acp_session_persists"
