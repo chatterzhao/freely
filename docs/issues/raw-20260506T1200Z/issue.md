@@ -2,6 +2,7 @@
 local_id: raw-20260506T1200Z
 kind: raw
 phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 phase_state: completed
 platform_ids:
   github:
@@ -31,4 +32,3 @@ I→B→M 骨架未被下层 skill 强制消费。
 
 - pre_tests_path: `docs/epics/ibm-skill-rename/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/ibm-skill-rename/code-reviews`
-closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）

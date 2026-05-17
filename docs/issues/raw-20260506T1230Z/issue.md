@@ -2,6 +2,7 @@
 local_id: raw-20260506T1230Z
 kind: raw
 phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 phase_state: completed
 platform_ids:
   github:
@@ -29,4 +30,3 @@ fix→test-pre-merge 变为 fast-forward。
 
 - pre_tests_path: `docs/epics/wt-create-dual/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/wt-create-dual/code-reviews`
-closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）

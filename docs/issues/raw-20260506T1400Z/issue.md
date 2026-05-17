@@ -2,6 +2,7 @@
 local_id: raw-20260506T1400Z
 kind: raw
 phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 phase_state: completed
 source_candidate: docs/pre-brainstorms/20260506-merge-guarded-fix/candidates.md
 platform_ids:
@@ -28,4 +29,3 @@ validate_merge_direction + pre-flight gate 增加 fix/* 支持。
 
 - pre_tests_path: `docs/epics/merge-guarded-fix-whitelist/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/merge-guarded-fix-whitelist/code-reviews`
-closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）

@@ -1,6 +1,7 @@
 ---
 local_id: raw-20260506T0230Z
 phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 kind: raw
 source_family: chat_inbox
 created: 2026-05-06 02:30:00+00:00
@@ -38,4 +39,3 @@ governance-merge-gate 应接受 raw issue 作为合法生命周期起点：
 - diff 中有 raw-* issue → 生命周期证据成立
 - raw issue 有 phase_state ∈ {proposed, absorbed, dropped} → 合法
 - raw issue 可以通过 candidate 或直接 promote 到 I-*
-closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）

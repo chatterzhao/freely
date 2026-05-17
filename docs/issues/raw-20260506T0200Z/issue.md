@@ -1,6 +1,7 @@
 ---
 local_id: raw-20260506T0200Z
 phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 kind: raw
 source_family: chat_inbox
 created: 2026-05-06 02:00:00+00:00
@@ -65,4 +66,3 @@ issue.md ### comment-{id}
 
 - scan 输出中 `chat_comment_pending` 标注目标 issue 是否存在
 - 完善 `_count_unsynced` 逻辑（当前无数据可测，留占位）
-closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）

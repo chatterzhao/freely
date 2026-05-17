@@ -1,6 +1,7 @@
 ---
 local_id: raw-20260506T0500Z
 phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 kind: raw
 source_family: chat_inbox
 created: 2026-05-06 05:00:00+00:00
@@ -54,4 +55,3 @@ scan 的 `scan_worktree_governance` 只用 `git branch` 查本地分支，远端
 ### 本地分支检查保留
 
 现有 `scan_worktree_governance` 不变，继续检查本地 worktree 和分支状态。
-closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）

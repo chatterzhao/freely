@@ -1,6 +1,7 @@
 ---
 local_id: raw-20260506T0130Z
 phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 kind: raw
 source_family: chat_inbox
 created: 2026-05-06 01:30:00+00:00
@@ -43,4 +44,3 @@ scan 的 `_find_all_branches_for_key` 和 worktree 检测用 substring 匹配，
 
 - 裸时间戳 key 匹配 — 这些是 `freely chat --new-issue` 自动生成的 chat ID，无分支可匹配属于正常
 - chat_inbox 数据迁移
-closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
