@@ -5230,3 +5230,15 @@ routing_policy:
 - phase_state: `in_b2_ibm`
 - issue_path: `docs/issues/I-20260509T024559Z-A/issue.md`
 
+## M-20260517T083030Z-A
+- title: supervisor crash false positive on bash rc=0
+- status: active
+### candidate_issues
+1. `C-20260517T083030Z-A`
+- milestone: M-20260517T083030Z-A
+- status: needs_research
+- decision_reason: bash 以 rc=0（成功）退出被判定为 crash，需先研究 supervisor crash 检测逻辑才能确定修复方案
+- next_action: 研究 supervisor 源码中 crash 检测的代码路径，确定 rc=0 是否应被过滤
+- revisit_trigger: 完成 supervisor crash 检测逻辑研究后重新评估
+- source_candidate: `docs/pre-brainstorms/20260517T083030Z--supervisor-bash-rc0-crash/candidates.md`
+
