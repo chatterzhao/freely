@@ -1,8 +1,9 @@
 ---
 local_id: raw-20260507T143545Z
 kind: raw
-phase_state: closed
-phase_state: proposed
+phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
+updated_at: 2026-05-17T04:47:25Z
 platform_ids:
   github:
     issue_id: '248'
@@ -13,7 +14,6 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-07T14:35:45Z'
-updated_at: '2026-05-07T14:35:45Z'
 intake_id: ''
 author: platform
 channel: github
