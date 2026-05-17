@@ -5241,6 +5241,17 @@ routing_policy:
 - phase_state: `in_b2_ibm`
 - issue_path: `docs/issues/I-20260509T024559Z-A/issue.md`
 
+## M-20260517T082422Z-A
+- title: supervisor bash rc=0 crash (absorbed)
+- status: active
+### candidate_issues
+1. `C-20260517T082422Z-A`
+- milestone: M-20260517T082422Z-A
+- status: absorbed
+- absorbed_by: C-20260517T083030Z-A
+- decision_reason: raw-20260517T082422Z (GitHub #502) 已被已有 pre-brainstorms 覆盖，吸收到 C-20260517T083030Z-A
+- source_candidate: `docs/pre-brainstorms/20260517T082422Z--supervisor-bash-rc0-crash/candidates.md`
+
 ## M-20260517T083030Z-A
 - title: supervisor crash false positive on bash rc=0
 - status: active
