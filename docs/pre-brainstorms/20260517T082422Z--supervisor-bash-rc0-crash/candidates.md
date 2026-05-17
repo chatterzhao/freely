@@ -4,9 +4,9 @@
 
 - candidate_format_version: v2
 - title: supervisor bash rc=0 crash（吸收到已有 candidate）
-- status: absorbed
+- status: needs_research
 - decision_reason: `raw-20260517T082422Z` (GitHub #502) 是 supervisor bash rc=0 crash 主题的最早实例，但已被 3 个后续 pre-brainstorm（082453Z、083030Z、083200Z）覆盖，其中 C-20260517T083030Z-A 已进入 M-20260517T083030Z-A 候选队列。此 raw issue 无需单独推进。
-- absorbed_by: C-20260517T083030Z-A
+- absorbed_by: C-20260517T083030Z-A (needs_research, no I-issue yet)
 - next_action: 无（已吸收到 C-20260517T083030Z-A）
 - revisit_trigger: 当 C-20260517T083030Z-A 完成根因研究后，确认是否还有 082422Z 独有的信息未被覆盖
 - acceptance_criteria:
