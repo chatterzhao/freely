@@ -2,26 +2,25 @@
 local_id: I-20260406-1829-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "121"
-    url: "https://github.com/chatterzhao/freely/issues/121"
-    synced_at: "2026-04-27T11:25:49Z"
-
+    issue_id: '121'
+    url: https://github.com/chatterzhao/freely/issues/121
+    synced_at: '2026-04-27T11:25:49Z'
   gitee:
-    issue_id: "IJFO94"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO94"
-    synced_at: "2026-04-27T13:16:43Z"
+    issue_id: IJFO94
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO94
+    synced_at: '2026-04-27T13:16:43Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/codex-current-live-apikey-bootstrap-without-saved-slot-governance/issues/codex-current-live-apikey-bootstrap-without-saved-slot-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/codex-current-live-apikey-bootstrap-without-saved-slot-governance/issues/codex-current-live-apikey-bootstrap-without-saved-slot-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:25:49Z"
-hash: ""
-created_at: "2026-04-27T11:25:49Z"
-updated_at: "2026-04-27T11:25:49Z"
-platform_state: 
+  github: '2026-04-27T11:25:49Z'
+hash: ''
+created_at: '2026-04-27T11:25:49Z'
+updated_at: '2026-05-17T12:03:01Z'
+platform_state: closed
 ---
 
 Freely 已经把 Codex API-key slot bundle、provider-aware probe routing、以及 runtime network-failure taxonomy 分别冻结为 canonical contract，但 dogfood 现场仍暴露一个新边界：

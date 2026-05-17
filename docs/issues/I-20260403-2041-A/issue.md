@@ -2,26 +2,25 @@
 local_id: I-20260403-2041-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "95"
-    url: "https://github.com/chatterzhao/freely/issues/95"
-    synced_at: "2026-04-27T11:23:15Z"
-
+    issue_id: '95'
+    url: https://github.com/chatterzhao/freely/issues/95
+    synced_at: '2026-04-27T11:23:15Z'
   gitee:
-    issue_id: "IJFO85"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO85"
-    synced_at: "2026-04-27T13:16:04Z"
+    issue_id: IJFO85
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO85
+    synced_at: '2026-04-27T13:16:04Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/issues/worktree-tool-boundary-bootstrap-governance.md"
+canonical_issue_path: docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/issues/worktree-tool-boundary-bootstrap-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:23:15Z"
-hash: ""
-created_at: "2026-04-27T11:23:15Z"
-updated_at: "2026-04-27T11:23:15Z"
-platform_state: 
+  github: '2026-04-27T11:23:15Z'
+hash: ''
+created_at: '2026-04-27T11:23:15Z'
+updated_at: '2026-05-17T12:00:51Z'
+platform_state: closed
 ---
 
 Freely already knows that owner development must stay in sibling feature worktrees, and it already distinguishes project-scoped command semantics from shared/global restart state. What it still lacks is a lawful runtime path for the case where the current operator sandbox cannot write the default `$FREELY_HOME` and cannot run `/bin/ps`.

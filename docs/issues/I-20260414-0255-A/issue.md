@@ -2,26 +2,25 @@
 local_id: I-20260414-0255-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "149"
-    url: "https://github.com/chatterzhao/freely/issues/149"
-    synced_at: "2026-04-27T11:27:41Z"
-
+    issue_id: '149'
+    url: https://github.com/chatterzhao/freely/issues/149
+    synced_at: '2026-04-27T11:27:41Z'
   gitee:
-    issue_id: "IJFOA1"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFOA1"
-    synced_at: "2026-04-27T13:17:22Z"
+    issue_id: IJFOA1
+    url: https://gitee.com/zhaoquan/freely/issues/IJFOA1
+    synced_at: '2026-04-27T13:17:22Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/issues/freely-start-auto-recovery-rootcause-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/issues/freely-start-auto-recovery-rootcause-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:27:41Z"
-hash: ""
-created_at: "2026-04-27T11:27:41Z"
-updated_at: "2026-04-27T11:27:41Z"
-platform_state: 
+  github: '2026-04-27T11:27:41Z'
+hash: ''
+created_at: '2026-04-27T11:27:41Z'
+updated_at: '2026-05-17T12:04:52Z'
+platform_state: closed
 ---
 
 真实 `freely start` 重放已经把这条 lane 的问题收敛到一个更窄、更准确的根因：

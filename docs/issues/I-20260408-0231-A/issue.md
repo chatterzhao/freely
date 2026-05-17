@@ -2,26 +2,25 @@
 local_id: I-20260408-0231-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "126"
-    url: "https://github.com/chatterzhao/freely/issues/126"
-    synced_at: "2026-04-27T11:26:09Z"
-
+    issue_id: '126'
+    url: https://github.com/chatterzhao/freely/issues/126
+    synced_at: '2026-04-27T11:26:09Z'
   gitee:
-    issue_id: "IJFO9B"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO9B"
-    synced_at: "2026-04-27T13:16:51Z"
+    issue_id: IJFO9B
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO9B
+    synced_at: '2026-04-27T13:16:51Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/issues/runtime-concurrent-start-stop-followthrough-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/issues/runtime-concurrent-start-stop-followthrough-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:26:09Z"
-hash: ""
-created_at: "2026-04-27T11:26:09Z"
-updated_at: "2026-04-27T11:26:09Z"
-platform_state: 
+  github: '2026-04-27T11:26:09Z'
+hash: ''
+created_at: '2026-04-27T11:26:09Z'
+updated_at: '2026-05-17T12:03:26Z'
+platform_state: closed
 ---
 
 `C-20260408-0231-A` started as a two-part packet:

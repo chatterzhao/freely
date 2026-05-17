@@ -2,25 +2,24 @@
 local_id: I-20260405-2302-A
 kind: linked
 phase_state: absorbed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "114"
-    url: "https://github.com/chatterzhao/freely/issues/114"
-    synced_at: "2026-04-27T11:25:11Z"
-
+    issue_id: '114'
+    url: https://github.com/chatterzhao/freely/issues/114
+    synced_at: '2026-04-27T11:25:11Z'
   gitee:
-    issue_id: "IJFO8U"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO8U"
-    synced_at: "2026-04-27T13:16:33Z"
+    issue_id: IJFO8U
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO8U
+    synced_at: '2026-04-27T13:16:33Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/freely-product-architecture/worktree-helper-shell-source-compatibility-governance/issues/worktree-helper-shell-source-compatibility-governance.md"
+canonical_issue_path: docs/epics/freely-product-architecture/worktree-helper-shell-source-compatibility-governance/issues/worktree-helper-shell-source-compatibility-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:25:11Z"
-hash: ""
-created_at: "2026-04-27T11:25:11Z"
-updated_at: "2026-04-27T11:25:11Z"
-platform_state: 
+  github: '2026-04-27T11:25:11Z'
+hash: ''
+created_at: '2026-04-27T11:25:11Z'
+updated_at: '2026-05-17T12:02:40Z'
+platform_state: closed
 ---
 
 Freely 已经把 worktree boundary、`wt-create`、`sync-tooling` 与 `post-checkout` auto-bootstrap 冻结为 canonical contract，但当前 dogfood 又暴露出一个新的 CLI-first regression：

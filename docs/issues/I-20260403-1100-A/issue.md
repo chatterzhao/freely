@@ -2,26 +2,25 @@
 local_id: I-20260403-1100-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "94"
-    url: "https://github.com/chatterzhao/freely/issues/94"
-    synced_at: "2026-04-27T11:23:09Z"
-
+    issue_id: '94'
+    url: https://github.com/chatterzhao/freely/issues/94
+    synced_at: '2026-04-27T11:23:09Z'
   gitee:
-    issue_id: "IJFO84"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO84"
-    synced_at: "2026-04-27T13:16:03Z"
+    issue_id: IJFO84
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO84
+    synced_at: '2026-04-27T13:16:03Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md
 last_synced_comment_at:
-  github: "2026-04-27T11:23:09Z"
-hash: ""
-created_at: "2026-04-27T11:23:09Z"
-updated_at: "2026-04-27T11:23:09Z"
-platform_state: 
+  github: '2026-04-27T11:23:09Z'
+hash: ''
+created_at: '2026-04-27T11:23:09Z'
+updated_at: '2026-05-17T12:00:45Z'
+platform_state: closed
 ---
 
 `develop` 目前累积了一批在旧治理门禁放宽时期进入主线的 legacy governance drift。随着 `governance-merge-gate` 最近多轮收紧，这些历史断裂不再只是“文档有点旧”，而是直接阻塞 canonical `develop` 的 push 和后续 promotion followthrough。

@@ -2,26 +2,25 @@
 local_id: I-20260412-0225-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "138"
-    url: "https://github.com/chatterzhao/freely/issues/138"
-    synced_at: "2026-04-27T11:26:51Z"
-
+    issue_id: '138'
+    url: https://github.com/chatterzhao/freely/issues/138
+    synced_at: '2026-04-27T11:26:51Z'
   gitee:
-    issue_id: "IJFO9P"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO9P"
-    synced_at: "2026-04-27T13:17:06Z"
+    issue_id: IJFO9P
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO9P
+    synced_at: '2026-04-27T13:17:06Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:26:51Z"
-hash: ""
-created_at: "2026-04-27T11:26:51Z"
-updated_at: "2026-04-27T11:26:51Z"
-platform_state: 
+  github: '2026-04-27T11:26:51Z'
+hash: ''
+created_at: '2026-04-27T11:26:51Z'
+updated_at: '2026-05-17T12:04:19Z'
+platform_state: closed
 ---
 
 当前 `develop` 门禁已经能 fail-close，但 closeout adequacy contract 仍然分散在三处：

@@ -2,26 +2,25 @@
 local_id: I-20260408-1200-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "127"
-    url: "https://github.com/chatterzhao/freely/issues/127"
-    synced_at: "2026-04-27T11:26:13Z"
-
+    issue_id: '127'
+    url: https://github.com/chatterzhao/freely/issues/127
+    synced_at: '2026-04-27T11:26:13Z'
   gitee:
-    issue_id: "IJFO9C"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO9C"
-    synced_at: "2026-04-27T13:16:52Z"
+    issue_id: IJFO9C
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO9C
+    synced_at: '2026-04-27T13:16:52Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:26:13Z"
-hash: ""
-created_at: "2026-04-27T11:26:13Z"
-updated_at: "2026-04-27T11:26:13Z"
-platform_state: 
+  github: '2026-04-27T11:26:13Z'
+hash: ''
+created_at: '2026-04-27T11:26:13Z'
+updated_at: '2026-05-17T12:03:30Z'
+platform_state: closed
 ---
 
 Freely 已经能显式暴露 `push_pending` / `push_deferred`，但还没有冻结更强的 followthrough 语义：

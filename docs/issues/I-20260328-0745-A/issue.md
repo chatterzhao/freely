@@ -2,26 +2,25 @@
 local_id: I-20260328-0745-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "66"
-    url: "https://github.com/chatterzhao/freely/issues/66"
-    synced_at: "2026-04-27T11:21:08Z"
-
+    issue_id: '66'
+    url: https://github.com/chatterzhao/freely/issues/66
+    synced_at: '2026-04-27T11:21:08Z'
   gitee:
-    issue_id: "IJFO74"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO74"
-    synced_at: "2026-04-27T13:15:13Z"
+    issue_id: IJFO74
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO74
+    synced_at: '2026-04-27T13:15:13Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/live-status-current-runtime-state-reconciliation-governance/issues/live-status-current-runtime-state-reconciliation-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/live-status-current-runtime-state-reconciliation-governance/issues/live-status-current-runtime-state-reconciliation-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:21:08Z"
-hash: ""
-created_at: "2026-04-27T11:21:08Z"
-updated_at: "2026-04-27T11:21:08Z"
-platform_state: 
+  github: '2026-04-27T11:21:08Z'
+hash: ''
+created_at: '2026-04-27T11:21:08Z'
+updated_at: '2026-05-17T11:58:53Z'
+platform_state: closed
 ---
 
 `live-status` is the current-state entrypoint, but it could surface an internally contradictory answer:

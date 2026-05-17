@@ -2,26 +2,25 @@
 local_id: I-20260402-0403-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "90"
-    url: "https://github.com/chatterzhao/freely/issues/90"
-    synced_at: "2026-04-27T11:22:47Z"
-
+    issue_id: '90'
+    url: https://github.com/chatterzhao/freely/issues/90
+    synced_at: '2026-04-27T11:22:47Z'
   gitee:
-    issue_id: "IJFO7X"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO7X"
-    synced_at: "2026-04-27T13:15:53Z"
+    issue_id: IJFO7X
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO7X
+    synced_at: '2026-04-27T13:15:53Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/freely-product-architecture/canonical-product-posture-bootstrap-reconciliation-governance/issues/canonical-product-posture-bootstrap-reconciliation-governance.md"
+canonical_issue_path: docs/epics/freely-product-architecture/canonical-product-posture-bootstrap-reconciliation-governance/issues/canonical-product-posture-bootstrap-reconciliation-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:22:47Z"
-hash: ""
-created_at: "2026-04-27T11:22:47Z"
-updated_at: "2026-04-27T11:22:47Z"
-platform_state: 
+  github: '2026-04-27T11:22:47Z'
+hash: ''
+created_at: '2026-04-27T11:22:47Z'
+updated_at: '2026-05-17T12:00:27Z'
+platform_state: closed
 ---
 
 Freely already completed the product contract and the first tool-materialization slice, but canonical `develop` still carries legacy tracked bootstrap truth:

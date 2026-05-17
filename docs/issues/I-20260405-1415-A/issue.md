@@ -2,26 +2,25 @@
 local_id: I-20260405-1415-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "108"
-    url: "https://github.com/chatterzhao/freely/issues/108"
-    synced_at: "2026-04-27T11:24:28Z"
-
+    issue_id: '108'
+    url: https://github.com/chatterzhao/freely/issues/108
+    synced_at: '2026-04-27T11:24:28Z'
   gitee:
-    issue_id: "IJFO8N"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO8N"
-    synced_at: "2026-04-27T13:16:23Z"
+    issue_id: IJFO8N
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO8N
+    synced_at: '2026-04-27T13:16:23Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:24:28Z"
-hash: ""
-created_at: "2026-04-27T11:24:28Z"
-updated_at: "2026-04-27T11:24:28Z"
-platform_state: 
+  github: '2026-04-27T11:24:28Z'
+hash: ''
+created_at: '2026-04-27T11:24:28Z'
+updated_at: '2026-05-17T12:01:58Z'
+platform_state: closed
 ---
 
 Freely 已经在当前 Codex owner 中冻结了长期方向: tool auth/switch/probe 应逐步抽成 standalone `ai-switch-cli` backend，而 Freely 保持 control plane / orchestration / priority / recovery policy。现在缺的不是“是否要拆”，而是：

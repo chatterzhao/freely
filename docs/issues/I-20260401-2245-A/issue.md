@@ -2,26 +2,25 @@
 local_id: I-20260401-2245-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "85"
-    url: "https://github.com/chatterzhao/freely/issues/85"
-    synced_at: "2026-04-27T11:22:19Z"
-
+    issue_id: '85'
+    url: https://github.com/chatterzhao/freely/issues/85
+    synced_at: '2026-04-27T11:22:19Z'
   gitee:
-    issue_id: "IJFO7R"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO7R"
-    synced_at: "2026-04-27T13:15:44Z"
+    issue_id: IJFO7R
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO7R
+    synced_at: '2026-04-27T13:15:44Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/build-artifact-exposure-and-release-allowlist-audit-governance/issues/build-artifact-exposure-and-release-allowlist-audit-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/build-artifact-exposure-and-release-allowlist-audit-governance/issues/build-artifact-exposure-and-release-allowlist-audit-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:22:19Z"
-hash: ""
-created_at: "2026-04-27T11:22:19Z"
-updated_at: "2026-04-27T11:22:19Z"
-platform_state: 
+  github: '2026-04-27T11:22:19Z'
+hash: ''
+created_at: '2026-04-27T11:22:19Z'
+updated_at: '2026-05-17T12:00:01Z'
+platform_state: closed
 ---
 
 Freely has already converged on a broader security direction: automation and enforced workflow should replace operator memory wherever possible. But the current repo still has a very practical gap:

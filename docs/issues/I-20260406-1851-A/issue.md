@@ -2,26 +2,25 @@
 local_id: I-20260406-1851-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "122"
-    url: "https://github.com/chatterzhao/freely/issues/122"
-    synced_at: "2026-04-27T11:25:53Z"
-
+    issue_id: '122'
+    url: https://github.com/chatterzhao/freely/issues/122
+    synced_at: '2026-04-27T11:25:53Z'
   gitee:
-    issue_id: "IJFO95"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO95"
-    synced_at: "2026-04-27T13:16:44Z"
+    issue_id: IJFO95
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO95
+    synced_at: '2026-04-27T13:16:44Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/codex-interactive-login-and-apikey-input-flow-governance/issues/codex-interactive-login-and-apikey-input-flow-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/codex-interactive-login-and-apikey-input-flow-governance/issues/codex-interactive-login-and-apikey-input-flow-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:25:53Z"
-hash: ""
-created_at: "2026-04-27T11:25:53Z"
-updated_at: "2026-04-27T11:25:53Z"
-platform_state: 
+  github: '2026-04-27T11:25:53Z'
+hash: ''
+created_at: '2026-04-27T11:25:53Z'
+updated_at: '2026-05-17T12:03:06Z'
+platform_state: closed
 ---
 
 Freely 还缺一个受治理约束的 Codex-first interactive login contract。当前 dirty implementation 已经证明这条 UX follow-on 足够具体，但它仍悬空在未归档实现树里：

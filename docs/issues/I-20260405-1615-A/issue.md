@@ -2,26 +2,25 @@
 local_id: I-20260405-1615-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "110"
-    url: "https://github.com/chatterzhao/freely/issues/110"
-    synced_at: "2026-04-27T11:24:37Z"
-
+    issue_id: '110'
+    url: https://github.com/chatterzhao/freely/issues/110
+    synced_at: '2026-04-27T11:24:37Z'
   gitee:
-    issue_id: "IJFO8Q"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO8Q"
-    synced_at: "2026-04-27T13:16:28Z"
+    issue_id: IJFO8Q
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO8Q
+    synced_at: '2026-04-27T13:16:28Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:24:37Z"
-hash: ""
-created_at: "2026-04-27T11:24:37Z"
-updated_at: "2026-04-27T11:24:37Z"
-platform_state: 
+  github: '2026-04-27T11:24:37Z'
+hash: ''
+created_at: '2026-04-27T11:24:37Z'
+updated_at: '2026-05-17T12:02:07Z'
+platform_state: closed
 ---
 
 当前仓库对 `test-pre-merge-*` 仍停留在旧模型：

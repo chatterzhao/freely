@@ -2,26 +2,25 @@
 local_id: I-20260406-0045-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "118"
-    url: "https://github.com/chatterzhao/freely/issues/118"
-    synced_at: "2026-04-27T11:25:33Z"
-
+    issue_id: '118'
+    url: https://github.com/chatterzhao/freely/issues/118
+    synced_at: '2026-04-27T11:25:33Z'
   gitee:
-    issue_id: "IJFO90"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO90"
-    synced_at: "2026-04-27T13:16:39Z"
+    issue_id: IJFO90
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO90
+    synced_at: '2026-04-27T13:16:39Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/governance-check-protected-merge-history-source-policy-governance/issues/governance-check-protected-merge-history-source-policy-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/governance-check-protected-merge-history-source-policy-governance/issues/governance-check-protected-merge-history-source-policy-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:25:33Z"
-hash: ""
-created_at: "2026-04-27T11:25:33Z"
-updated_at: "2026-04-27T11:25:33Z"
-platform_state: 
+  github: '2026-04-27T11:25:33Z'
+hash: ''
+created_at: '2026-04-27T11:25:33Z'
+updated_at: '2026-05-17T12:02:49Z'
+platform_state: closed
 ---
 
 一次真实的 `feature/* -> test-pre-merge-* -> develop` promote 后，`./bin/governance-check` 在 canonical `develop` 上误报：
