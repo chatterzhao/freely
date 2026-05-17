@@ -15,8 +15,8 @@
 - promotion_gate: N/A（absorbed）
 - open_questions: []
 - acceptance_reviews: []
-- promoted_issue_path: ""
-- milestone: M-20260517T082422Z-A
+- promoted_issue_path: docs/pre-brainstorms/20260517T083030Z--supervisor-bash-rc0-crash/candidates.md
+- milestone: M-20260517T083030Z-A
 - session_refs:
   - tool: cc
     session_id: "20260517101640-3a1654"
