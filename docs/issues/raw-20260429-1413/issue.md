@@ -2,6 +2,7 @@
 local_id: raw-20260429-1413
 kind: raw
 phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 platform_ids:
   github:
     issue_id: '286'
@@ -25,4 +26,3 @@ platform_state: open
 2. 按行数降序排列
 3. 输出格式：`行数 文件路径`
 完成后提交。
-closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）

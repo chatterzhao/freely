@@ -2,6 +2,7 @@
 local_id: raw-20260429-1410
 kind: raw
 phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 platform_ids:
   github:
     issue_id: '276'
@@ -44,4 +45,3 @@ liveness 检测、monitor dispatch）抽取到新模块 `docs/system/workspace/s
 1. 每个重构步骤先 plan，再执行
 2. 重构后确保 `bash -n` 语法检查通过
 3. 保留原有所有功能，不改变行为
-closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
