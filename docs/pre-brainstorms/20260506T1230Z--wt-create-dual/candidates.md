@@ -4,7 +4,7 @@
 
 - candidate_format_version: v2
 - title: wt-create dual worktree creation（B1 物料化确认）
-- status: absorbed
+- status: needs_research
 - decision_reason: 全部实现（code review、pre-tests、tasks、wt-create 脚本）已在并发开发中完成，当前代码库已支持双工位创建
 - next_action: 确认吸收，关闭 B1 流程，原始 raw issue #280 已关闭
 - revisit_trigger: N/A（已 absorbed）
