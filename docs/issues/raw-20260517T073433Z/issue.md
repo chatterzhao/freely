@@ -2,11 +2,11 @@
 kind: raw
 local_id: raw-20260517T073433Z
 priority: P2
-status: open
+status: closed
 source: chat-inbox
 created_at: '2026-05-17T07:34:34Z'
 title: 时间戳生成处缺少 Z 时区标识，应统一使用 UTC+Z 格式
-phase_state: proposed
+phase_state: absorbed
 platform_ids:
   github:
     issue_id: '448'
@@ -14,7 +14,8 @@ platform_ids:
     synced_at: '2026-05-17T07:34:43Z'
 updated_at: '2026-05-17T07:34:43Z'
 primary_platform: github
-platform_state: open
+platform_state: closed
+absorbed_at: "2026-05-17T08:37:00Z"
 ---
 
 ## 问题

@@ -2,11 +2,11 @@
 kind: raw
 local_id: raw-20260517T071929Z
 priority: P2
-status: open
+status: closed
 source: chat-inbox
 created_at: '2026-05-17T07:19:29Z'
 title: freely-package 版本号缺少时分，同天多次打包会覆盖
-phase_state: proposed
+phase_state: absorbed
 platform_ids:
   github:
     issue_id: '447'
@@ -14,7 +14,8 @@ platform_ids:
     synced_at: '2026-05-17T07:19:35Z'
 updated_at: '2026-05-17T07:19:35Z'
 primary_platform: github
-platform_state: open
+platform_state: closed
+absorbed_at: "2026-05-17T08:37:00Z"
 ---
 
 ## 问题
