@@ -2,25 +2,24 @@
 local_id: I-20260410-1835-B
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "132"
-    url: "https://github.com/chatterzhao/freely/issues/132"
-    synced_at: "2026-04-27T11:26:33Z"
-
+    issue_id: '132'
+    url: https://github.com/chatterzhao/freely/issues/132
+    synced_at: '2026-04-27T11:26:33Z'
   gitee:
-    issue_id: "IJFO9H"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO9H"
-    synced_at: "2026-04-27T13:16:59Z"
+    issue_id: IJFO9H
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO9H
+    synced_at: '2026-04-27T13:16:59Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/codex-real-exec-switch-and-after-failure-recovery-governance/issues/codex-real-exec-switch-and-after-failure-recovery-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/codex-real-exec-switch-and-after-failure-recovery-governance/issues/codex-real-exec-switch-and-after-failure-recovery-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:26:33Z"
-hash: ""
-created_at: "2026-04-27T11:26:33Z"
-updated_at: "2026-04-27T11:26:33Z"
-platform_state: 
+  github: '2026-04-27T11:26:33Z'
+hash: ''
+created_at: '2026-04-27T11:26:33Z'
+updated_at: '2026-05-17T08:01:59Z'
+platform_state: closed
 ---
 
 Real dogfooding on 2026-04-12 exposed a narrower follow-on regression in the already completed Codex recovery family:

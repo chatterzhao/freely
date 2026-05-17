@@ -1,9 +1,9 @@
 ---
 local_id: I-20260505T1210Z-A
-issue_title: "修正 scan 常量对齐 IBM Framework §89 + 迁移现有 issue"
+issue_title: 修正 scan 常量对齐 IBM Framework §89 + 迁移现有 issue
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
+absorbed_at: '2026-05-16T14:27:11Z'
 promoted_from: raw-20260505T1210Z
 platform_ids:
   github:
@@ -12,9 +12,9 @@ platform_ids:
 primary_platform: github
 canonical_issue_path: docs/epics/workspace-routing-foundation/issue-state-refactor/issues/I-20260505T1210Z-A.md
 created_at: '2026-05-05T12:10:02Z'
-updated_at: '2026-05-05T12:10:02Z'
+updated_at: '2026-05-17T08:02:19Z'
 session_refs: []
-platform_state: 
+platform_state: closed
 ---
 
 ## Scope

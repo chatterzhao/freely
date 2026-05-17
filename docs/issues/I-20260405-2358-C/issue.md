@@ -2,25 +2,24 @@
 local_id: I-20260405-2358-C
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "116"
-    url: "https://github.com/chatterzhao/freely/issues/116"
-    synced_at: "2026-04-27T11:25:22Z"
-
+    issue_id: '116'
+    url: https://github.com/chatterzhao/freely/issues/116
+    synced_at: '2026-04-27T11:25:22Z'
   gitee:
-    issue_id: "IJFO8X"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO8X"
-    synced_at: "2026-04-27T13:16:36Z"
+    issue_id: IJFO8X
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO8X
+    synced_at: '2026-04-27T13:16:36Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/cli-wrapper-packaging-and-regression-surface-governance/issues/cli-wrapper-packaging-and-regression-surface-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/cli-wrapper-packaging-and-regression-surface-governance/issues/cli-wrapper-packaging-and-regression-surface-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:25:22Z"
-hash: ""
-created_at: "2026-04-27T11:25:22Z"
-updated_at: "2026-04-27T11:25:22Z"
-platform_state: 
+  github: '2026-04-27T11:25:22Z'
+hash: ''
+created_at: '2026-04-27T11:25:22Z'
+updated_at: '2026-05-17T08:01:52Z'
+platform_state: closed
 ---
 
 本轮 `bin/` 全量命令审计已经证明，Freely 现在的 CLI 能力不只是 runtime 语义问题，还存在一层更前置的包装层回归：

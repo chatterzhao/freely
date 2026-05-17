@@ -2,25 +2,24 @@
 local_id: I-20260401-1545-A-01
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "82"
-    url: "https://github.com/chatterzhao/freely/issues/82"
-    synced_at: "2026-04-27T11:22:02Z"
-
+    issue_id: '82'
+    url: https://github.com/chatterzhao/freely/issues/82
+    synced_at: '2026-04-27T11:22:02Z'
   gitee:
-    issue_id: "IJFO7N"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO7N"
-    synced_at: "2026-04-27T13:15:40Z"
+    issue_id: IJFO7N
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO7N
+    synced_at: '2026-04-27T13:15:40Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/codex-acp-fresh-path-prototype/issues/codex-acp-fresh-path-prototype.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/codex-acp-fresh-path-prototype/issues/codex-acp-fresh-path-prototype.md
 last_synced_comment_at:
-  github: "2026-04-27T11:22:02Z"
-hash: ""
-created_at: "2026-04-27T11:22:02Z"
-updated_at: "2026-04-27T11:22:02Z"
-platform_state: 
+  github: '2026-04-27T11:22:02Z'
+hash: ''
+created_at: '2026-04-27T11:22:02Z'
+updated_at: '2026-05-17T08:01:41Z'
+platform_state: closed
 ---
 
 ACP 边界已经冻结，runtime `adapter axis` 也已经 materialize 到 config / dispatch / status truth。下一步如果继续停在抽象层，只会重复“ACP 可不可以”而不产生真实判断。

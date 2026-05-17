@@ -2,26 +2,25 @@
 local_id: I-20260405-2358-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "115"
-    url: "https://github.com/chatterzhao/freely/issues/115"
-    synced_at: "2026-04-27T11:25:15Z"
-
+    issue_id: '115'
+    url: https://github.com/chatterzhao/freely/issues/115
+    synced_at: '2026-04-27T11:25:15Z'
   gitee:
-    issue_id: "IJFO8W"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO8W"
-    synced_at: "2026-04-27T13:16:35Z"
+    issue_id: IJFO8W
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO8W
+    synced_at: '2026-04-27T13:16:35Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md"
+canonical_issue_path: docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:25:15Z"
-hash: ""
-created_at: "2026-04-27T11:25:15Z"
-updated_at: "2026-04-27T11:25:15Z"
-platform_state: 
+  github: '2026-04-27T11:25:15Z'
+hash: ''
+created_at: '2026-04-27T11:25:15Z'
+updated_at: '2026-05-17T08:01:49Z'
+platform_state: closed
 ---
 
 Upgraded `memark 0.1.1` replay showed canonical Freely root still missed one narrow bootstrap prerequisite:

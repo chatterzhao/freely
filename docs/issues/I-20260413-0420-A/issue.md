@@ -2,26 +2,25 @@
 local_id: I-20260413-0420-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "144"
-    url: "https://github.com/chatterzhao/freely/issues/144"
-    synced_at: "2026-04-27T11:27:13Z"
-
+    issue_id: '144'
+    url: https://github.com/chatterzhao/freely/issues/144
+    synced_at: '2026-04-27T11:27:13Z'
   gitee:
-    issue_id: "IJFO9V"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO9V"
-    synced_at: "2026-04-27T13:17:14Z"
+    issue_id: IJFO9V
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO9V
+    synced_at: '2026-04-27T13:17:14Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/issues/runtime-startup-authority-and-readiness-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/issues/runtime-startup-authority-and-readiness-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:27:13Z"
-hash: ""
-created_at: "2026-04-27T11:27:13Z"
-updated_at: "2026-04-27T11:27:13Z"
-platform_state: 
+  github: '2026-04-27T11:27:13Z'
+hash: ''
+created_at: '2026-04-27T11:27:13Z'
+updated_at: '2026-05-17T08:02:02Z'
+platform_state: closed
 ---
 
 Canonical `develop` now has the two prerequisite truths for this lane:

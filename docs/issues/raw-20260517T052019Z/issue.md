@@ -1,5 +1,6 @@
 ---
 kind: raw
+local_id: raw-20260517T052019Z
 priority: P2
 status: closed
 source: chat-inbox
@@ -12,6 +13,9 @@ platform_ids:
     synced_at: '2026-05-17T05:20:24Z'
 updated_at: '2026-05-17T06:18:54Z'
 primary_platform: github
+phase_state: absorbed
+absorbed_into: I-20260413-0420-A
+absorbed_at: "2026-05-17T07:50:00Z"
 platform_state: open
 ---
 

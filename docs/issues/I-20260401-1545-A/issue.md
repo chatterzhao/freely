@@ -2,26 +2,25 @@
 local_id: I-20260401-1545-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "81"
-    url: "https://github.com/chatterzhao/freely/issues/81"
-    synced_at: "2026-04-27T11:21:59Z"
-
+    issue_id: '81'
+    url: https://github.com/chatterzhao/freely/issues/81
+    synced_at: '2026-04-27T11:21:59Z'
   gitee:
-    issue_id: "IJFO7L"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO7L"
-    synced_at: "2026-04-27T13:15:39Z"
+    issue_id: IJFO7L
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO7L
+    synced_at: '2026-04-27T13:15:39Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/acp-optional-adapter-boundary-governance/issues/acp-optional-adapter-boundary-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/acp-optional-adapter-boundary-governance/issues/acp-optional-adapter-boundary-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:21:59Z"
-hash: ""
-created_at: "2026-04-27T11:21:59Z"
-updated_at: "2026-04-27T11:21:59Z"
-platform_state: 
+  github: '2026-04-27T11:21:59Z'
+hash: ''
+created_at: '2026-04-27T11:21:59Z'
+updated_at: '2026-05-17T08:01:39Z'
+platform_state: closed
 ---
 
 ACP 边界已经冻结，runtime `adapter axis` 也已经 materialize 到 config / dispatch / status truth。下一步如果继续停在抽象层，只会重复“ACP 可不可以”而不产生真实判断。
