@@ -3,6 +3,7 @@ local_id: raw-20260517T0600Z
 kind: raw
 status: closed
 phase_state: absorbed
+absorbed_at: "2026-05-17T08:37:00Z"
 platform_ids:
   github:
     issue_id: '414'

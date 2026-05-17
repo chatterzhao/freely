@@ -3,6 +3,7 @@ kind: raw
 local_id: raw-20260517T0610Z
 title: merge skill-standardize branch to develop
 phase_state: absorbed
+absorbed_at: "2026-05-17T08:37:00Z"
 priority: P2
 source: manager
 platform_ids:

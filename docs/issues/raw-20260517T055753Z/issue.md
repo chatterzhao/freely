@@ -2,6 +2,7 @@
 local_id: raw-20260517T055753Z
 kind: raw
 phase_state: absorbed
+absorbed_at: "2026-05-17T08:37:00Z"
 priority: P2
 status: closed
 source: chat-inbox
