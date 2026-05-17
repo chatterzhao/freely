@@ -215,6 +215,17 @@ Manager 在不同阶段承担不同职责：首跳路由、巡逻委派、收口
 | `./bin/governance-check` | 治理门禁检查 | 合并前 |
 | `./bin/test-pre-push-hook` | 预推送 hook 测试 | hook 有问题时 |
 | `./bin/freely doctor` | 项目健康诊断 | 环境异常时 |
+| `./bin/freely feedback --title "..." --body "..."` | 创建新 raw issue 到平台 | 发现 bug、识别新改进、需独立追踪时 |
+
+### 何时创建新 raw issue
+
+以下情况**必须**创建新 raw issue（用 `freely feedback`），而不是在现有 issue 里顺手修：
+- 发现 bug 或运行时异常（如 worker 反复 launch_blocked、restart_storm 等）
+- Worker 汇报的问题超出当前工位范围，需独立工位
+- 需要独立 `wt-create` 开工位的改动
+- 任何跨多个 issue 的模式性问题
+
+创建 raw issue 后，在 handoff reason 中记录 issue ID，让后续 patrol 能追踪。
 
 ## 交接
 
