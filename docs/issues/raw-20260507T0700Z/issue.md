@@ -1,8 +1,8 @@
 ---
 local_id: raw-20260507T0700Z
 kind: raw
-phase_state: proposed
-phase_state: proposed
+phase_state: completed
+phase_state: completed
 platform_ids:
   github:
     issue_id: '243'
@@ -13,7 +13,7 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-07T10:30:15Z'
-updated_at: '2026-05-07T10:30:15Z'
+updated_at: 2026-05-17T04:47:25Z
 intake_id: ''
 author: platform
 channel: github
@@ -88,3 +88,4 @@ freely → unified platform layer
 
 - pre_tests_path: `docs/epics/unified-platform/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/unified-platform/code-reviews`
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）

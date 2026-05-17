@@ -1,8 +1,8 @@
 ---
 local_id: raw-20260507T0730Z
 kind: raw
-phase_state: proposed
-phase_state: proposed
+phase_state: completed
+phase_state: completed
 platform_ids:
   github:
     issue_id: '244'
@@ -13,7 +13,7 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-07T10:46:27Z'
-updated_at: '2026-05-07T10:50:39Z'
+updated_at: 2026-05-17T04:47:25Z
 intake_id: ''
 author: platform
 channel: github
@@ -147,3 +147,4 @@ _pull_raw_issue() {
 
 - pre_tests_path: `docs/epics/source-param/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/source-param/code-reviews`
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）

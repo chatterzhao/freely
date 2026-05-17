@@ -1,8 +1,8 @@
 ---
 local_id: raw-20260506T1400Z
 kind: raw
-phase_state: proposed
-phase_state: proposed
+phase_state: completed
+phase_state: completed
 source_candidate: docs/pre-brainstorms/20260506-merge-guarded-fix/candidates.md
 platform_ids:
   github:
@@ -16,7 +16,7 @@ channel: github
 session_refs: []
 pre_tests_path: docs/epics/merge-guarded-fix-whitelist/verification/pre-tests.md
 verification_artifact_dir: docs/epics/merge-guarded-fix-whitelist/code-reviews
-updated_at: '2026-05-10T09:28:57Z'
+updated_at: 2026-05-17T04:47:25Z
 platform_state: open
 ---
 
@@ -28,3 +28,4 @@ validate_merge_direction + pre-flight gate 增加 fix/* 支持。
 
 - pre_tests_path: `docs/epics/merge-guarded-fix-whitelist/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/merge-guarded-fix-whitelist/code-reviews`
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
