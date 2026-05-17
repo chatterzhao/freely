@@ -1,7 +1,8 @@
 ---
 local_id: I-20260426-0000-A
 kind: linked
-phase_state: completed
+phase_state: absorbed
+absorbed_at: "2026-05-16T14:27:11Z"
 completed_at: '2026-04-29'
 platform_ids:
   github:
@@ -19,7 +20,8 @@ last_synced_comment_at:
 hash: ''
 created_at: '2026-04-27T11:11:27Z'
 updated_at: '2026-04-27T11:11:27Z'
-phase_state: completed
+phase_state: absorbed
+absorbed_at: "2026-05-16T14:27:11Z"
 issue_title: Add opencode direct launcher and AI_TOOL alias resolution
 platform_state: 
 ---

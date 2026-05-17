@@ -1,7 +1,7 @@
 ---
 local_id: I-20260508T133423Z-A
 kind: linked
-phase_state: completed
+phase_state: absorbed
 promoted_from: raw-20260508T133423Z
 source_candidate: docs/pre-brainstorms/20260508T133423Z--raw-issue-pull-git-cwd/candidates.md#C-20260508T133423Z-A
 verification_artifact_dir: docs/epics/raw-issue-pull-git-cwd/code-reviews

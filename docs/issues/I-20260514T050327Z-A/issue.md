@@ -1,7 +1,8 @@
 ---
 local_id: I-20260514T050327Z-A
 kind: linked
-phase_state: completed
+phase_state: absorbed
+absorbed_at: "2026-05-16T14:27:11Z"
 promoted_from: raw-20260514T050327Z
 source_candidate: docs/pre-brainstorms/20260514T050327Z--while-then-typo/candidates.md#C-20260514T050327Z-A
 verification_artifact_dir: docs/epics/while-then-typo/code-reviews

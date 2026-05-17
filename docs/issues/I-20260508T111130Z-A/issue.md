@@ -1,7 +1,7 @@
 ---
 local_id: I-20260508T111130Z-A
 kind: linked
-phase_state: in_dev
+phase_state: absorbed
 promoted_from: raw-20260508T111130Z
 source_candidate: docs/pre-brainstorms/20260508T111130Z--reference-transaction-delete-fix/candidates.md#C-20260508T111130Z-A
 verification_artifact_dir: docs/epics/reference-transaction-delete-fix/code-reviews

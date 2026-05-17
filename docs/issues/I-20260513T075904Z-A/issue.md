@@ -1,7 +1,8 @@
 ---
 local_id: I-20260513T075904Z-A
 kind: linked
-phase_state: completed
+phase_state: absorbed
+absorbed_at: "2026-05-16T14:27:11Z"
 promoted_from: raw-20260513T075904Z
 source_candidate: docs/pre-brainstorms/20260513T075904Z--merge-guarded-phase-state-fix/candidates.md#C-20260513T075904Z-A
 verification_artifact_dir: docs/epics/merge-guarded-phase-state-fix/code-reviews

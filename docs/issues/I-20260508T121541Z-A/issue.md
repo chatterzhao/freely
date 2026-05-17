@@ -1,7 +1,7 @@
 ---
 local_id: I-20260508T121541Z-A
 kind: linked
-phase_state: completed
+phase_state: absorbed
 promoted_from: raw-20260508T121541Z
 source_candidate: docs/pre-brainstorms/20260508T121541Z--platform-adapter-title-key/candidates.md#C-20260508T121541Z-A
 verification_artifact_dir: docs/epics/platform-adapter-title-key/code-reviews

@@ -1,7 +1,7 @@
 ---
 local_id: I-20260405-2302-A
 kind: linked
-phase_state: completed
+phase_state: absorbed
 completed_at: "2026-04-29"
 platform_ids:
   github:
