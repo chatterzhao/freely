@@ -2,7 +2,7 @@
 local_id: raw-20260517T0600Z
 kind: raw
 status: proposed
-phase_state: closed
+phase_state: proposed
 platform_ids:
   github:
     issue_id: '414'

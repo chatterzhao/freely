@@ -1,5 +1,7 @@
 ---
+local_id: raw-20260517T055154Z
 kind: raw
+phase_state: proposed
 priority: P2
 status: open
 source: chat-inbox
