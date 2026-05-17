@@ -1,7 +1,7 @@
 ---
 kind: raw
 priority: P2
-status: open
+status: closed
 source: chat-inbox
 created_at: '2026-05-17T08:21:11Z'
 title: 'supervisor crash: bash rc=0'
@@ -12,7 +12,9 @@ platform_ids:
     synced_at: '2026-05-17T08:21:18Z'
 updated_at: '2026-05-17T08:21:18Z'
 primary_platform: github
-platform_state: open
+platform_state: closed
+phase_state: absorbed
+absorbed_at: "2026-05-17T08:37:00Z"
 ---
 
 supervisor crash: bash at freely:18777 (rc=0)

@@ -1,7 +1,7 @@
 ---
 kind: raw
 priority: P2
-status: open
+status: closed
 source: chat-inbox
 created_at: '2026-05-17T08:22:33Z'
 title: 实现跨模型 cache 命中率检测模块，支持 Anthropic/DeepSeek/OpenAI 等多提供商
@@ -12,7 +12,9 @@ platform_ids:
     synced_at: '2026-05-17T08:22:41Z'
 updated_at: '2026-05-17T08:22:41Z'
 primary_platform: github
-platform_state: open
+platform_state: closed
+phase_state: absorbed
+absorbed_at: "2026-05-17T08:37:00Z"
 ---
 
 ## 背景
