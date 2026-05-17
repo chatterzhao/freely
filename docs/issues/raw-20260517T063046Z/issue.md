@@ -4,7 +4,7 @@ kind: raw
 status: proposed
 phase_state: absorbed
 absorbed_into: I-20260413-0420-A
-absorbed_at: "2026-05-17T07:50:00Z"
+absorbed_at: '2026-05-17T07:50:00Z'
 platform_ids:
   github:
     issue_id: '440'
@@ -15,12 +15,14 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-17T06:30:59Z'
-updated_at: '2026-05-17T06:30:59Z'
+updated_at: '2026-05-17T08:34:15Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
+platform_state: closed
+force_closed_at: '2026-05-17T08:34:15Z'
+force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
 ---
 
 ## raw-20260517T063046Z
