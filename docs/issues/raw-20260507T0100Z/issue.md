@@ -2,6 +2,7 @@
 local_id: raw-20260507T0100Z
 kind: raw
 phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 phase_state: completed
 platform_ids:
   github:
@@ -28,4 +29,3 @@ fix-execution SKILL.md 分支规范表中普通 fix 的分支前缀是 feature/ 
 
 - pre_tests_path: `docs/epics/fix-branch-naming/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/fix-branch-naming/code-reviews`
-closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）

@@ -2,6 +2,7 @@
 local_id: raw-20260507T0200Z
 kind: raw
 phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 platform_ids:
   github:
     issue_id: '282'
@@ -22,4 +23,3 @@ promoted candidate M 检查绕过
 
 - pre_tests_path: `docs/epics/promoted-gate-fix/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/promoted-gate-fix/code-reviews`
-closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）

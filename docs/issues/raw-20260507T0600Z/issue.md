@@ -2,6 +2,7 @@
 local_id: raw-20260507T0600Z
 kind: raw
 phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 platform_ids:
   github:
     issue_id: '279'
@@ -22,4 +23,3 @@ platform_state: open
 
 - pre_tests_path: `docs/epics/raw-issue-pull/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/raw-issue-pull/code-reviews`
-closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
