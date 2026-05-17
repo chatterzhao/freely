@@ -5281,3 +5281,14 @@ routing_policy:
   - 若是预期行为：记录文档并建议日志降级
 - source_candidate: `docs/pre-brainstorms/20260517T083200Z--supervisor-crash-bash-rc0/candidates.md`
 
+## M-20260517T082350Z-A
+- title: supervisor bash rc=0 crash (absorbed)
+- status: active
+### candidate_issues
+1. `C-20260517T082350Z-A`
+- milestone: M-20260517T082350Z-A
+- status: absorbed
+- absorbed_by: C-20260517T083030Z-A
+- decision_reason: raw-20260517T082350Z (GitHub #501) 已被已有 pre-brainstorms 覆盖，吸收到 C-20260517T083030Z-A
+- source_candidate: `docs/pre-brainstorms/20260517T082350Z--supervisor-bash-rc0-crash/candidates.md`
+
