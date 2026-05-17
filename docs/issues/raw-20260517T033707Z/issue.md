@@ -1,10 +1,18 @@
 ---
 id: raw-20260517T033707Z
 kind: raw
-title: "batch closeout round 5: remaining lifecycle items"
+title: 'batch closeout round 5: remaining lifecycle items'
 phase_state: proposed
 source: manager
-created_at: "2026-05-17T03:37:07Z"
+created_at: '2026-05-17T03:37:07Z'
+platform_ids:
+  github:
+    issue_id: '394'
+    url: https://github.com/chatterzhao/freely/issues/394
+    synced_at: '2026-05-17T04:46:27Z'
+updated_at: '2026-05-17T04:46:27Z'
+primary_platform: github
+platform_state: open
 ---
 
 # batch closeout round 5

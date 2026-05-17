@@ -10,7 +10,7 @@ platform_ids:
     issue_id: '387'
     url: https://github.com/chatterzhao/freely/issues/387
     synced_at: '2026-05-17T04:30:47Z'
-updated_at: '2026-05-17T04:30:47Z'
+updated_at: 2026-05-17T04:47:25Z
 primary_platform: github
 platform_state: open
 ---
@@ -20,3 +20,4 @@ last_exit_reason_before_crash: set_e_exit_cmd=bash@freely:18777_rc_0
 tool: oc-acp-ds-flash-auto
 adapter: acp
 launch_kind: fresh
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）

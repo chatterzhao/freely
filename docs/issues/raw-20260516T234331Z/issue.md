@@ -10,7 +10,7 @@ platform_ids:
     issue_id: '380'
     url: https://github.com/chatterzhao/freely/issues/380
     synced_at: '2026-05-16T23:43:36Z'
-updated_at: '2026-05-16T23:43:36Z'
+updated_at: 2026-05-17T04:47:25Z
 primary_platform: github
 platform_state: open
 ---
@@ -57,3 +57,4 @@ platform_state: open
 
 - `docs/system/workspace/scripts/runtime/freely`：runtime 失败点改为 INSERT handoff
 - `docs/system/workspace/scripts/runtime/handoff.py`：支持 `role=runtime` 的 handoff INSERT
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
