@@ -13,7 +13,7 @@ platform_ids:
     url: https://github.com/chatterzhao/freely/issues/342
 primary_platform: github
 platform_state: closed
-updated_at: '2026-05-17T12:06:39Z'
+updated_at: '2026-05-17T12:26:28Z'
 ---
 
 # I-20260514T050327Z-A: fix while/then typo
