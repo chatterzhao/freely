@@ -13,7 +13,7 @@ platform_ids:
     url: https://github.com/chatterzhao/freely/issues/339
 primary_platform: github
 platform_state: closed
-updated_at: '2026-05-17T12:06:33Z'
+updated_at: '2026-05-17T12:26:23Z'
 ---
 
 # I-20260514T001746Z-A: StdioTransport for run-acp-prompt.py

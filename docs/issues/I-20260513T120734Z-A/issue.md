@@ -13,7 +13,7 @@ platform_ids:
     url: https://github.com/chatterzhao/freely/issues/323
 primary_platform: github
 platform_state: closed
-updated_at: '2026-05-17T12:06:29Z'
+updated_at: '2026-05-17T12:26:18Z'
 ---
 
 # I-20260513T120734Z-A: increase RESTART_STORM_COUNT 4→10
