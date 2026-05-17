@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260510T1318Z
 kind: raw
-phase_state: closed
+phase_state: completed
 platform_ids:
   github:
     issue_id: '288'
