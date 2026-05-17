@@ -1,8 +1,8 @@
 ---
 local_id: raw-20260517T0600Z
 kind: raw
-status: proposed
-phase_state: proposed
+status: closed
+phase_state: absorbed
 platform_ids:
   github:
     issue_id: '414'
@@ -13,7 +13,7 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-17T05:03:13Z'
-updated_at: '2026-05-17T05:30:00Z'
+updated_at: '2026-05-17T06:18:54Z'
 intake_id: ''
 author: platform
 channel: github
@@ -39,7 +39,7 @@ platform_state: open
 kind: raw
 local_id: raw-20260517T0600Z
 title: 'develop closeout ops: push + dirty state commit'
-phase_state: proposed
+phase_state: absorbed
 priority: P1
 source: manager
 develop has 1 unpushed commit and 2 dirty entries. Push develop, commit dirty scan-state and new raw issue dir.

@@ -1,7 +1,7 @@
 ---
 kind: raw
 priority: P2
-status: open
+status: closed
 source: chat-inbox
 created_at: '2026-05-17T05:35:37Z'
 title: 'supervisor crash: bash rc=0'
@@ -10,7 +10,7 @@ platform_ids:
     issue_id: '425'
     url: https://github.com/chatterzhao/freely/issues/425
     synced_at: '2026-05-17T05:35:44Z'
-updated_at: '2026-05-17T05:35:44Z'
+updated_at: '2026-05-17T06:18:54Z'
 primary_platform: github
 platform_state: open
 ---
