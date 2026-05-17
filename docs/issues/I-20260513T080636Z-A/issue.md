@@ -14,7 +14,7 @@ platform_ids:
     synced_at: '2026-05-13T08:06:45Z'
 primary_platform: github
 platform_state: closed
-updated_at: '2026-05-17T12:06:24Z'
+updated_at: '2026-05-17T12:26:12Z'
 ---
 
 # I-20260513T080636Z-A: update stale ACP issue phase_state to completed

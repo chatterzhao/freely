@@ -14,7 +14,7 @@ platform_ids:
     synced_at: '2026-05-13T07:58:50Z'
 primary_platform: github
 platform_state: closed
-updated_at: '2026-05-17T12:06:14Z'
+updated_at: '2026-05-17T12:26:00Z'
 ---
 
 # I-20260513T075847Z-A: scan emits platform_only items for non-raw-key issues

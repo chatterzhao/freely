@@ -3,19 +3,19 @@ local_id: I-20260508T011858Z-A
 kind: linked
 status: completed
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
+absorbed_at: '2026-05-16T14:27:11Z'
 promoted_from: raw-20260508T011858Z
 source_candidate: docs/pre-brainstorms/20260508T011858Z--skill-gate-alignment/candidates.md
-canonical_issue_path: ""
+canonical_issue_path: ''
 platform_ids:
   github:
     issue_id: '252'
-primary_platform: ""
+primary_platform: ''
 last_synced_comment_at: {}
-hash: ""
-created_at: 2026-05-08T01:18:58Z
-updated_at: 2026-05-08T01:18:58Z
-intake_id: ""
+hash: ''
+created_at: 2026-05-08 01:18:58+00:00
+updated_at: '2026-05-17T12:25:47Z'
+intake_id: ''
 author: zhaoquan
 channel: feat-execution
 session_refs: []

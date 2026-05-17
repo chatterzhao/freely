@@ -14,7 +14,7 @@ platform_ids:
     synced_at: '2026-05-13T07:59:10Z'
 primary_platform: github
 platform_state: closed
-updated_at: '2026-05-17T12:06:20Z'
+updated_at: '2026-05-17T12:26:07Z'
 ---
 
 # I-20260513T075904Z-A: merge-guarded post-merge sync phase_state fix

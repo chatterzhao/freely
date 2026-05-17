@@ -19,7 +19,7 @@ last_synced_comment_at:
   github: '2026-04-27T11:11:27Z'
 hash: ''
 created_at: '2026-04-27T11:11:27Z'
-updated_at: '2026-05-17T12:06:01Z'
+updated_at: '2026-05-17T12:25:14Z'
 issue_title: Add opencode direct launcher and AI_TOOL alias resolution
 platform_state: closed
 ---
