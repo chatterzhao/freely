@@ -2,26 +2,25 @@
 local_id: I-20260418-1900-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "152"
-    url: "https://github.com/chatterzhao/freely/issues/152"
-    synced_at: "2026-04-27T11:27:59Z"
-
+    issue_id: '152'
+    url: https://github.com/chatterzhao/freely/issues/152
+    synced_at: '2026-04-27T11:27:59Z'
   gitee:
-    issue_id: "IJFOA4"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFOA4"
-    synced_at: "2026-04-27T13:17:30Z"
+    issue_id: IJFOA4
+    url: https://gitee.com/zhaoquan/freely/issues/IJFOA4
+    synced_at: '2026-04-27T13:17:30Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:27:59Z"
-hash: ""
-created_at: "2026-04-27T11:27:59Z"
-updated_at: "2026-04-27T11:27:59Z"
-platform_state: 
+  github: '2026-04-27T11:27:59Z'
+hash: ''
+created_at: '2026-04-27T11:27:59Z'
+updated_at: '2026-05-17T12:04:48Z'
+platform_state: closed
 ---
 
 Canonical `develop` already absorbed the runtime lifecycle implementation owner and pushed it upstream. The remaining defect is governance-only: post-merge replay found two missing receipt-gap backfills for historical merges inside `test-pre-merge-runtime-lifecycle-20260417`.
