@@ -3,6 +3,7 @@ local_id: raw-20260503-0915
 kind: raw
 priority: high
 phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 phase_state: completed
 source: platform
 platform_ids:
@@ -22,4 +23,3 @@ hotfix→develop 跳过 test-pre-merge，pretests-gate 不触发。
 - 所有合并到 develop 必须先通过 test-pre-merge
 - hotfix 分支也需要走 test-pre-merge
 - 仅在紧急时可绕过（须有理由记录）
-closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）

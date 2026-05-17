@@ -3,6 +3,7 @@ local_id: raw-20260503-0945
 kind: raw
 priority: high
 phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 source: platform
 platform_ids:
   gitee:
@@ -42,4 +43,3 @@ scan 是唯一真相源，不需要额外渠道。
 协调：GitHub #190 (freely start --task <scan-id>) 需要 scan 有统一的 scan-id。
 建议 scan 入 SQLite 时用 PRIMARY KEY 作为 scan-id。
 两个 issue 配合：IJKTEJ 做 scan→SQLite 重构 → #190 做 --task 模式。
-closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
