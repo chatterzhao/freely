@@ -4,7 +4,7 @@ description: 打包与自举验证——从 develop 打包可独立运行的 Fre
 type: candidate
 phase_state: promoted
 priority: P0
-promoted_issue_path: ""
+promoted_issue_path: docs/issues/I-20260502-0500-A/issue.md
 milestone: current
 session_refs:
   - {tool: "manual", session_id: "pre-brainstorm-creation", jsonl_path: "unavailable"}
