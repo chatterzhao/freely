@@ -1,19 +1,19 @@
 ---
 local_id: raw-20260513T075904Z
-phase_state: closed
 kind: raw
+phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 priority: P1
-phase_state: open
 source: chat-inbox
 created_at: '2026-05-13T07:59:04Z'
 title: 'merge-guarded: _sync_issues_changed_in_merge reads fm.get(''status'') but
   I-* issues use phase_state'
+updated_at: 2026-05-17T04:47:25Z
 platform_ids:
   github:
     issue_id: '329'
     url: https://github.com/chatterzhao/freely/issues/329
     synced_at: '2026-05-13T07:59:10Z'
-updated_at: '2026-05-13T07:59:10Z'
 primary_platform: github
 platform_state: open
 ---
