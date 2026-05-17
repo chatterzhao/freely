@@ -2,26 +2,25 @@
 local_id: I-20260406-1105-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "120"
-    url: "https://github.com/chatterzhao/freely/issues/120"
-    synced_at: "2026-04-27T11:25:43Z"
-
+    issue_id: '120'
+    url: https://github.com/chatterzhao/freely/issues/120
+    synced_at: '2026-04-27T11:25:43Z'
   gitee:
-    issue_id: "IJFO92"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO92"
-    synced_at: "2026-04-27T13:16:42Z"
+    issue_id: IJFO92
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO92
+    synced_at: '2026-04-27T13:16:42Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/milestone-completed-queue-closeout-governance/issues/milestone-completed-queue-closeout-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/milestone-completed-queue-closeout-governance/issues/milestone-completed-queue-closeout-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:25:43Z"
-hash: ""
-created_at: "2026-04-27T11:25:43Z"
-updated_at: "2026-04-27T11:25:43Z"
-platform_state: 
+  github: '2026-04-27T11:25:43Z'
+hash: ''
+created_at: '2026-04-27T11:25:43Z'
+updated_at: '2026-05-17T12:02:57Z'
+platform_state: closed
 ---
 
 The active milestone still keeps several completed owners in `committed_issues`. That conflicts with milestone policy and leaves the main orchestration surface with stale sequencing truth.
