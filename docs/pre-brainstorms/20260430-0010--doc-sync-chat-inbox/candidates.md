@@ -3,7 +3,7 @@
 ### C-20260430-0010-A
 
 - title: `Sync docs + fix governance-only paths for architecture docs`
-- status: `proposed`
+- status: `promoted`
 - promoted_issue_path: `docs/issues/I-20260430-0010-A/issue.md`
 - scope: 文档同步 + governance-only 路径修复
 - priority: `P1`

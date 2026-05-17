@@ -2,7 +2,7 @@
 local_id: raw-20260517T0600Z
 kind: raw
 status: proposed
-phase_state: proposed
+phase_state: closed
 platform_ids:
   github:
     issue_id: '414'
@@ -13,11 +13,12 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-17T05:03:13Z'
-updated_at: '2026-05-17T05:03:13Z'
+updated_at: '2026-05-17T05:30:00Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 ## raw-20260517T0600Z

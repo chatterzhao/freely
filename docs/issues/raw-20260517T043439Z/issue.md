@@ -3,7 +3,7 @@ local_id: raw-20260517T043439Z
 kind: raw
 priority: P2
 status: open
-phase_state: proposed
+phase_state: closed
 source: chat-inbox
 created_at: '2026-05-17T04:34:39Z'
 title: 'supervisor crash: bash rc=0'
@@ -12,9 +12,9 @@ platform_ids:
     issue_id: '388'
     url: https://github.com/chatterzhao/freely/issues/388
     synced_at: '2026-05-17T04:34:45Z'
-updated_at: '2026-05-17T04:34:45Z'
+updated_at: '2026-05-17T05:30:00Z'
 primary_platform: github
-platform_state: open
+platform_state: closed
 canonical_issue_path: ''
 ---
 
