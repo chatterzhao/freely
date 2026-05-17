@@ -2,26 +2,25 @@
 local_id: I-20260401-2354-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "87"
-    url: "https://github.com/chatterzhao/freely/issues/87"
-    synced_at: "2026-04-27T11:22:28Z"
-
+    issue_id: '87'
+    url: https://github.com/chatterzhao/freely/issues/87
+    synced_at: '2026-04-27T11:22:28Z'
   gitee:
-    issue_id: "IJFO7T"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO7T"
-    synced_at: "2026-04-27T13:15:48Z"
+    issue_id: IJFO7T
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO7T
+    synced_at: '2026-04-27T13:15:48Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/issues/implementation-decision-notes-in-issue-review-artifacts-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/issues/implementation-decision-notes-in-issue-review-artifacts-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:22:28Z"
-hash: ""
-created_at: "2026-04-27T11:22:28Z"
-updated_at: "2026-04-27T11:22:28Z"
-platform_state: 
+  github: '2026-04-27T11:22:28Z'
+hash: ''
+created_at: '2026-04-27T11:22:28Z'
+updated_at: '2026-05-17T12:00:13Z'
+platform_state: closed
 ---
 
 Freely 已经在 pre-brainstorm 和 IBM 层解决了“为什么值得做”和“issue 边界如何冻结”的 thoughtfulness，但在 dev-loop 的实现层还缺一块稳定真源：
