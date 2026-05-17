@@ -2,26 +2,25 @@
 local_id: I-20260410-1835-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "131"
-    url: "https://github.com/chatterzhao/freely/issues/131"
-    synced_at: "2026-04-27T11:26:29Z"
-
+    issue_id: '131'
+    url: https://github.com/chatterzhao/freely/issues/131
+    synced_at: '2026-04-27T11:26:29Z'
   gitee:
-    issue_id: "IJFO9G"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO9G"
-    synced_at: "2026-04-27T13:16:58Z"
+    issue_id: IJFO9G
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO9G
+    synced_at: '2026-04-27T13:16:58Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/auth-switch-real-environment-and-e2e-adequacy-governance/issues/auth-switch-real-environment-and-e2e-adequacy-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/auth-switch-real-environment-and-e2e-adequacy-governance/issues/auth-switch-real-environment-and-e2e-adequacy-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:26:29Z"
-hash: ""
-created_at: "2026-04-27T11:26:29Z"
-updated_at: "2026-04-27T11:26:29Z"
-platform_state: 
+  github: '2026-04-27T11:26:29Z'
+hash: ''
+created_at: '2026-04-27T11:26:29Z'
+updated_at: '2026-05-17T08:01:56Z'
+platform_state: closed
 ---
 
 The observed miss was not that Freely lacked tests in the abstract. High-level truth already required `Unit / Integration / End-to-End / Real-Environment`, and the gates already checked that those sections existed. The gap was narrower and more serious:

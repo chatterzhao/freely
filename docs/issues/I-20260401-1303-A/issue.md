@@ -2,26 +2,25 @@
 local_id: I-20260401-1303-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "78"
-    url: "https://github.com/chatterzhao/freely/issues/78"
-    synced_at: "2026-04-27T11:21:49Z"
-
+    issue_id: '78'
+    url: https://github.com/chatterzhao/freely/issues/78
+    synced_at: '2026-04-27T11:21:49Z'
   gitee:
-    issue_id: "IJFO7I"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO7I"
-    synced_at: "2026-04-27T13:15:34Z"
+    issue_id: IJFO7I
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO7I
+    synced_at: '2026-04-27T13:15:34Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/freely-product-architecture/default-autonomy-activation-consent-and-tool-policy-governance/issues/default-autonomy-activation-consent-and-tool-policy-governance.md"
+canonical_issue_path: docs/epics/freely-product-architecture/default-autonomy-activation-consent-and-tool-policy-governance/issues/default-autonomy-activation-consent-and-tool-policy-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:21:49Z"
-hash: ""
-created_at: "2026-04-27T11:21:49Z"
-updated_at: "2026-04-27T11:21:49Z"
-platform_state: 
+  github: '2026-04-27T11:21:49Z'
+hash: ''
+created_at: '2026-04-27T11:21:49Z'
+updated_at: '2026-05-17T08:01:34Z'
+platform_state: closed
 ---
 
 完成 `I-20260401-1303-A-2` 的当前 materialization slice 后，当前 worktree 只剩两条红测，而且它们都不再属于 security/materialization：
