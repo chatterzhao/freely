@@ -2,26 +2,25 @@
 local_id: I-20260419-1505-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "156"
-    url: "https://github.com/chatterzhao/freely/issues/156"
-    synced_at: "2026-04-27T11:28:19Z"
-
+    issue_id: '156'
+    url: https://github.com/chatterzhao/freely/issues/156
+    synced_at: '2026-04-27T11:28:19Z'
   gitee:
-    issue_id: "IJFOAA"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFOAA"
-    synced_at: "2026-04-27T13:17:35Z"
+    issue_id: IJFOAA
+    url: https://gitee.com/zhaoquan/freely/issues/IJFOAA
+    synced_at: '2026-04-27T13:17:35Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/issues/runtime-supervisor-attach-reuse-followthrough-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/issues/runtime-supervisor-attach-reuse-followthrough-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:28:19Z"
-hash: ""
-created_at: "2026-04-27T11:28:19Z"
-updated_at: "2026-04-27T11:28:19Z"
-platform_state: 
+  github: '2026-04-27T11:28:19Z'
+hash: ''
+created_at: '2026-04-27T11:28:19Z'
+updated_at: '2026-05-17T12:05:27Z'
+platform_state: closed
 ---
 
 The checkpoint branch `feature/checkpoint-lifecycle-trace-debuggability-20260419` preserves bounded runtime behavior that `develop` does not yet own:

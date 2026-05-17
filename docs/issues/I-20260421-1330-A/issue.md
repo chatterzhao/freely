@@ -2,26 +2,25 @@
 local_id: I-20260421-1330-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "161"
-    url: "https://github.com/chatterzhao/freely/issues/161"
-    synced_at: "2026-04-27T11:28:45Z"
-
+    issue_id: '161'
+    url: https://github.com/chatterzhao/freely/issues/161
+    synced_at: '2026-04-27T11:28:45Z'
   gitee:
-    issue_id: "IJFOAI"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFOAI"
-    synced_at: "2026-04-27T13:17:42Z"
+    issue_id: IJFOAI
+    url: https://gitee.com/zhaoquan/freely/issues/IJFOAI
+    synced_at: '2026-04-27T13:17:42Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/issues/absorbed-merged-lane-routing-followthrough-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/issues/absorbed-merged-lane-routing-followthrough-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:28:45Z"
-hash: ""
-created_at: "2026-04-27T11:28:45Z"
-updated_at: "2026-04-27T11:28:45Z"
-platform_state: 
+  github: '2026-04-27T11:28:45Z'
+hash: ''
+created_at: '2026-04-27T11:28:45Z'
+updated_at: '2026-05-17T12:05:51Z'
+platform_state: closed
 ---
 
 The previous runtime repairs already blocked automatic relaunch of merged worker lanes. The remaining failure was subtler: manager patrol still looked at absorbed merged lanes and treated them like current execution capacity.

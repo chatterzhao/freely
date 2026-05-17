@@ -2,26 +2,25 @@
 local_id: I-20260419-1630-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "157"
-    url: "https://github.com/chatterzhao/freely/issues/157"
-    synced_at: "2026-04-27T11:28:25Z"
-
+    issue_id: '157'
+    url: https://github.com/chatterzhao/freely/issues/157
+    synced_at: '2026-04-27T11:28:25Z'
   gitee:
-    issue_id: "IJFOAB"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFOAB"
-    synced_at: "2026-04-27T13:17:36Z"
+    issue_id: IJFOAB
+    url: https://gitee.com/zhaoquan/freely/issues/IJFOAB
+    synced_at: '2026-04-27T13:17:36Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/issues/runtime-startup-self-healing-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/issues/runtime-startup-self-healing-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:28:25Z"
-hash: ""
-created_at: "2026-04-27T11:28:25Z"
-updated_at: "2026-04-27T11:28:25Z"
-platform_state: 
+  github: '2026-04-27T11:28:25Z'
+hash: ''
+created_at: '2026-04-27T11:28:25Z'
+updated_at: '2026-05-17T12:05:32Z'
+platform_state: closed
 ---
 
 Protected-root replay on `2026-04-19` showed a narrower startup seam than the existing runtime owners cover:

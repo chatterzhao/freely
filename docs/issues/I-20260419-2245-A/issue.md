@@ -2,26 +2,25 @@
 local_id: I-20260419-2245-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "158"
-    url: "https://github.com/chatterzhao/freely/issues/158"
-    synced_at: "2026-04-27T11:28:30Z"
-
+    issue_id: '158'
+    url: https://github.com/chatterzhao/freely/issues/158
+    synced_at: '2026-04-27T11:28:30Z'
   gitee:
-    issue_id: "IJFOAC"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFOAC"
-    synced_at: "2026-04-27T13:17:38Z"
+    issue_id: IJFOAC
+    url: https://gitee.com/zhaoquan/freely/issues/IJFOAC
+    synced_at: '2026-04-27T13:17:38Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/runtime-claude-launch-and-session-evidence-governance/issues/runtime-claude-launch-and-session-evidence-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/runtime-claude-launch-and-session-evidence-governance/issues/runtime-claude-launch-and-session-evidence-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:28:30Z"
-hash: ""
-created_at: "2026-04-27T11:28:30Z"
-updated_at: "2026-04-27T11:28:30Z"
-platform_state: 
+  github: '2026-04-27T11:28:30Z'
+hash: ''
+created_at: '2026-04-27T11:28:30Z'
+updated_at: '2026-05-17T12:05:38Z'
+platform_state: closed
 ---
 
 Manual replay narrowed the tool-switch failure to two concrete seams:

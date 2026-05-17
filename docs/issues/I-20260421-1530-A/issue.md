@@ -2,26 +2,25 @@
 local_id: I-20260421-1530-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "162"
-    url: "https://github.com/chatterzhao/freely/issues/162"
-    synced_at: "2026-04-27T11:28:50Z"
-
+    issue_id: '162'
+    url: https://github.com/chatterzhao/freely/issues/162
+    synced_at: '2026-04-27T11:28:50Z'
   gitee:
-    issue_id: "IJFOAJ"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFOAJ"
-    synced_at: "2026-04-27T13:17:43Z"
+    issue_id: IJFOAJ
+    url: https://gitee.com/zhaoquan/freely/issues/IJFOAJ
+    synced_at: '2026-04-27T13:17:43Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/issues/live-status-scan-summary-and-prompt-anchor-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/issues/live-status-scan-summary-and-prompt-anchor-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:28:50Z"
-hash: ""
-created_at: "2026-04-27T11:28:50Z"
-updated_at: "2026-04-27T11:28:50Z"
-platform_state: 
+  github: '2026-04-27T11:28:50Z'
+hash: ''
+created_at: '2026-04-27T11:28:50Z'
+updated_at: '2026-05-17T12:05:56Z'
+platform_state: closed
 ---
 
 Freely already had two valid but separate truths:

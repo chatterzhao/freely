@@ -3,7 +3,7 @@ local_id: I-20260513T010343Z-A
 kind: linked
 status: commited
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
+absorbed_at: '2026-05-16T14:27:11Z'
 platform_ids:
   github:
     issue_id: '326'
@@ -12,12 +12,12 @@ platform_ids:
 primary_platform: github
 canonical_issue_path: docs/pre-brainstorms/20260513T010343Z--raw-key-seconds-cleanup-followthrough/candidates.md
 created_at: '2026-05-13T01:03:43Z'
-updated_at: '2026-05-13T01:03:43Z'
+updated_at: '2026-05-17T12:06:09Z'
 promoted_from: C-20260513T010343Z-A
 source_candidate: docs/pre-brainstorms/20260513T010343Z--raw-key-seconds-cleanup-followthrough/candidates.md#C-20260513T010343Z-A
 pre_tests_path: ''
-verification_artifact_dir: 'docs/epics/workspace-routing-foundation/raw-key-seconds-cleanup/code-reviews/'
-platform_state: open
+verification_artifact_dir: docs/epics/workspace-routing-foundation/raw-key-seconds-cleanup/code-reviews/
+platform_state: closed
 ---
 
 # I-20260513T010343Z-A: 秒级 raw key 格式清理
