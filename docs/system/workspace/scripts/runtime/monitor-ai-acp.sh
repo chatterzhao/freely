@@ -274,9 +274,9 @@ main() {
   set -e
 
   # ── Completion detection: stopReason from ACP protocol output ──
-  # Line 1 of log = clean UUID (machine-readable), line 2+ = annotated human log.
+  # Search entire file for clean UUID — cycle log line 1 may be blank.
   local session_id_clean session_id_out stop_reason
-  session_id_clean=$(head -1 "$log_file" 2>/dev/null | grep -oE '[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}' | head -1)
+  session_id_clean=$(grep -oE '[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}' "$log_file" 2>/dev/null | head -1)
   session_id_out=$(sed -n 's/^session id: //p' "$log_file" | head -n 1)
   stop_reason=$(grep -o 'stop_reason=[a-z_]*' "$log_file" | head -n 1 | cut -d= -f2)
 
