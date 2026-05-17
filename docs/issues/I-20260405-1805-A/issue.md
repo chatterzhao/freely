@@ -2,26 +2,25 @@
 local_id: I-20260405-1805-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "111"
-    url: "https://github.com/chatterzhao/freely/issues/111"
-    synced_at: "2026-04-27T11:24:42Z"
-
+    issue_id: '111'
+    url: https://github.com/chatterzhao/freely/issues/111
+    synced_at: '2026-04-27T11:24:42Z'
   gitee:
-    issue_id: "IJFO8R"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO8R"
-    synced_at: "2026-04-27T13:16:29Z"
+    issue_id: IJFO8R
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO8R
+    synced_at: '2026-04-27T13:16:29Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/test-pre-merge-family-promotion-gate-enforcement-governance/issues/test-pre-merge-family-promotion-gate-enforcement-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/test-pre-merge-family-promotion-gate-enforcement-governance/issues/test-pre-merge-family-promotion-gate-enforcement-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:24:42Z"
-hash: ""
-created_at: "2026-04-27T11:24:42Z"
-updated_at: "2026-04-27T11:24:42Z"
-platform_state: 
+  github: '2026-04-27T11:24:42Z'
+hash: ''
+created_at: '2026-04-27T11:24:42Z'
+updated_at: '2026-05-17T12:02:13Z'
+platform_state: closed
 ---
 
 `I-20260405-1615-A` 已经把新的 promote model 冻结成正式 owner，但当前仓库执行的仍是旧规则：
