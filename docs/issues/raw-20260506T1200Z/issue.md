@@ -1,9 +1,9 @@
 ---
 local_id: raw-20260506T1200Z
 kind: raw
-phase_state: completed
-closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
-phase_state: completed
+phase_state: absorbed
+closeout_note: B1_IBM materialization confirmed absorbed — all three fix items completed by concurrent work
+absorbed_into: I-20260506T1200Z-A
 platform_ids:
   github:
     issue_id: '285'

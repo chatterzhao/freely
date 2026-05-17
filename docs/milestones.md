@@ -697,6 +697,12 @@ routing_policy:
 - status: promoted
 - promoted_issue_path: `docs/issues/I-20260506T1200Z-A/issue.md`
 - source_candidates: `docs/pre-brainstorms/20260506-ibm-skill-rename/candidates.md`
+2. `C-20260506T1200Z-A` (B1_IBM materialization)
+- milestone: M-20260506T1200Z-A
+- status: absorbed
+- source_candidates: `docs/pre-brainstorms/20260506T1200Z--ibm-skill-rename/candidates.md`
+- decision_reason: B1_IBM materialization confirmed all three fix items completed by concurrent work
+- pre_brainstorm_path: `docs/pre-brainstorms/20260506T1200Z--ibm-skill-rename/`
 
 ### committed_issues
 1. `I-20260506T1200Z-A`
