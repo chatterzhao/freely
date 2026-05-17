@@ -2,7 +2,7 @@
 local_id: I-20260430-0010-A
 issue_title: Sync docs + fix governance-only paths for architecture docs
 kind: linked
-phase_state: done_b2_ibm
+phase_state: closed
 promoted_from: raw-20260430-0010
 platform_ids:
   github:

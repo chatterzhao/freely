@@ -2,7 +2,7 @@
 local_id: raw-20260505T2310Z
 issue_title: "fix: secret detection false positive on file paths with sk- prefix"
 kind: raw
-phase_state: proposed
+phase_state: closed
 platform_ids:
   github:
     issue_id: '228'
