@@ -725,6 +725,12 @@ routing_policy:
 - promoted_issue_path: `docs/issues/I-20260506T1230Z-A/issue.md`
 - source_candidates: `docs/pre-brainstorms/20260506-wt-create-dual/candidates.md`
 - decision: wt-create dual worktree creation
+2. `C-20260506T1230Z-A` (B1_IBM materialization)
+- milestone: M-20260506T1230Z-A
+- status: absorbed
+- source_candidates: `docs/pre-brainstorms/20260506T1230Z--wt-create-dual/candidates.md`
+- decision_reason: 全部实现已在并发开发中完成，当前代码库已支持双工位创建
+- pre_brainstorm_path: `docs/pre-brainstorms/20260506T1230Z--wt-create-dual/`
 
 ### committed_issues
 1. `I-20260506T1230Z-A`
