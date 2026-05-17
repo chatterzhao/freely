@@ -2,9 +2,9 @@
 local_id: raw-20260516T095920Z
 kind: raw
 status: closed
-phase_state: completed
+phase_state: dropped
 updated_at: '2026-05-16T12:00:00Z'
-closeout_note: "修复已合并到 develop，fix worktree 已退休"
+closeout_note: "fix directly merged to develop via fix/raw-20260512T0915Z-worker-blocked-reason without I-* lifecycle chain"
 platform_ids:
   github:
     issue_id: '365'
