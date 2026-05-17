@@ -2,26 +2,25 @@
 local_id: I-20260402-1912-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "93"
-    url: "https://github.com/chatterzhao/freely/issues/93"
-    synced_at: "2026-04-27T11:23:05Z"
-
+    issue_id: '93'
+    url: https://github.com/chatterzhao/freely/issues/93
+    synced_at: '2026-04-27T11:23:05Z'
   gitee:
-    issue_id: "IJFO82"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO82"
-    synced_at: "2026-04-27T13:16:02Z"
+    issue_id: IJFO82
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO82
+    synced_at: '2026-04-27T13:16:02Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md
 last_synced_comment_at:
-  github: "2026-04-27T11:23:05Z"
-hash: ""
-created_at: "2026-04-27T11:23:05Z"
-updated_at: "2026-04-27T11:23:05Z"
-platform_state: 
+  github: '2026-04-27T11:23:05Z'
+hash: ''
+created_at: '2026-04-27T11:23:05Z'
+updated_at: '2026-05-17T12:00:41Z'
+platform_state: closed
 ---
 
 `I-20260402-0020-A` 已经把 protected-branch break-glass 的 phase-1 contract 合入 canonical `develop`，但 closeout 后仍有 residual hardening 没有 owner：
