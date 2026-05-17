@@ -5292,3 +5292,14 @@ routing_policy:
 - decision_reason: raw-20260517T082350Z (GitHub #501) 已被已有 pre-brainstorms 覆盖，吸收到 C-20260517T083030Z-A
 - source_candidate: `docs/pre-brainstorms/20260517T082350Z--supervisor-bash-rc0-crash/candidates.md`
 
+
+## M-20260517T082317Z-A
+- title: supervisor bash rc=0 crash (absorbed)
+- status: active
+### candidate_issues
+1. `C-20260517T082317Z-A`
+- milestone: M-20260517T082317Z-A
+- status: absorbed
+- absorbed_by: C-20260517T083030Z-A
+- decision_reason: raw-20260517T082317Z (GitHub #500) 已被已有 pre-brainstorms 覆盖，吸收到 C-20260517T083030Z-A；属同一 supervisor crash 假阳性事件的最早上报实例（08:23:17Z）
+- source_candidate: `docs/pre-brainstorms/20260517T082317Z--supervisor-bash-rc0-crash/candidates.md`
