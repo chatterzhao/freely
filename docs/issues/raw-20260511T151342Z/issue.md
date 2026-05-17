@@ -2,7 +2,7 @@
 local_id: raw-20260511T151342Z
 kind: raw
 priority: medium
-phase_state: closed
+phase_state: completed
 phase_state: proposed
 source: platform
 platform_ids:
