@@ -18772,7 +18772,7 @@ start_project_runtime() {
   # ERR trap: capture the failing command before set -e exits the loop.
   # Without this, any unguarded non-zero return silently crashes the supervisor
   # with LAST_WORKCELL_EXIT_REASON="supervisor_exit" and no trace of what failed.
-  trap 'LAST_WORKCELL_EXIT_REASON="set_e_exit_${BASH_SOURCE##*/}:${LINENO}_rc_$?"' ERR
+  trap 'LAST_WORKCELL_EXIT_REASON="set_e_exit_cmd=${BASH_COMMAND%% *}@${BASH_SOURCE##*/}:${LINENO}_rc_$?"' ERR
   while true; do
     # Re-load session state each cycle so resume/fork decisions see latest values
     load_session_state_or_defaults "$project"
