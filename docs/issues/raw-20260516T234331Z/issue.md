@@ -1,7 +1,7 @@
 ---
 kind: raw
 priority: P2
-status: open
+status: closed
 source: chat-inbox
 created_at: '2026-05-16T23:43:31Z'
 title: 统一反馈机制：Runtime/Worker 都通过 handoff 记录向 Manager 汇报，Manager 消费 unconsumed 记录形成闭环
@@ -10,9 +10,9 @@ platform_ids:
     issue_id: '380'
     url: https://github.com/chatterzhao/freely/issues/380
     synced_at: '2026-05-16T23:43:36Z'
-updated_at: 2026-05-17T05:30:00Z
+updated_at: '2026-05-17T06:18:54Z'
 primary_platform: github
-phase_state: closed
+phase_state: absorbed
 platform_state: closed
 
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）---

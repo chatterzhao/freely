@@ -1,7 +1,7 @@
 ---
 kind: raw
 priority: P2
-status: open
+status: closed
 source: chat-inbox
 created_at: '2026-05-17T05:06:50Z'
 title: 'worker 使用非标准 exit_kind: completed，应为 worker_done'
@@ -10,9 +10,9 @@ platform_ids:
     issue_id: '417'
     url: https://github.com/chatterzhao/freely/issues/417
     synced_at: '2026-05-17T05:06:57Z'
-updated_at: '2026-05-17T05:30:00Z'
+updated_at: '2026-05-17T06:18:54Z'
 primary_platform: github
-phase_state: closed
+phase_state: absorbed
 platform_state: closed
 ---
 
