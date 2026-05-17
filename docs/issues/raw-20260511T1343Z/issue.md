@@ -2,7 +2,8 @@
 local_id: raw-20260511T1343Z
 kind: raw
 priority: medium
-phase_state: proposed
+phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 source: chat-inbox
 created_at: '2026-05-11T13:43:00Z'
 title: 'fix: empty scan should trigger stop_ai, not restart loop'
@@ -12,7 +13,7 @@ platform_ids:
     issue_id: '370'
     url: https://github.com/chatterzhao/freely/issues/370
     synced_at: '2026-05-16T13:20:51Z'
-updated_at: '2026-05-16T13:20:51Z'
+updated_at: 2026-05-17T04:47:25Z
 primary_platform: github
 ---
 

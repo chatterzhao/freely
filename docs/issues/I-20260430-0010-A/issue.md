@@ -2,8 +2,10 @@
 local_id: I-20260430-0010-A
 issue_title: Sync docs + fix governance-only paths for architecture docs
 kind: linked
-phase_state: closed
+phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 promoted_from: raw-20260430-0010
+updated_at: 2026-05-17T04:47:25Z
 platform_ids:
   github:
     issue_id: '225'
@@ -14,7 +16,6 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-04-30T00:10:00Z'
-updated_at: '2026-05-05T14:22:37Z'
 session_refs:
 - tool: ccds
   session_id: 20260430-doc-sync

@@ -1,7 +1,8 @@
 ---
 local_id: raw-20260429-1410
 kind: raw
-phase_state: proposed
+phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 platform_ids:
   github:
     issue_id: '276'
@@ -12,7 +13,7 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: 2026-04-29 14:10:06+00:00
-updated_at: '2026-05-10T09:29:24Z'
+updated_at: 2026-05-17T04:47:25Z
 intake_id: 20260429-071005-docs-system-workspace-scripts-ut
 author: zhaoquan
 channel: supervisor

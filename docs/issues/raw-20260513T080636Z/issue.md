@@ -1,12 +1,14 @@
 ---
 local_id: raw-20260513T080636Z
 kind: raw
-phase_state: closed
+phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 source_candidate: docs/pre-brainstorms/20260513T080636Z--acp-phase-state-cleanup/candidates.md#C-20260513T080636Z-A
 priority: P2
 source: platform
 created_at: '2026-05-13T09:49:13Z'
 title: '[RAW-20260513T080636Z] raw-20260513T080636Z'
+updated_at: 2026-05-17T04:47:25Z
 platform_ids:
   github:
     issue_id: '330'

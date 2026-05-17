@@ -2,7 +2,8 @@
 local_id: raw-20260503-0945
 kind: raw
 priority: high
-phase_state: proposed
+phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 source: platform
 platform_ids:
   gitee:
@@ -14,7 +15,7 @@ platform_ids:
 created_at: '2026-05-03T09:45:00Z'
 title: 'feat: migrate scan results and issue-sync state to SQLite'
 platform_state: open
-updated_at: '2026-05-16T13:22:19Z'
+updated_at: 2026-05-17T04:47:25Z
 primary_platform: github
 ---
 ## 问题

@@ -1,7 +1,8 @@
 ---
 local_id: raw-20260507T0600Z
 kind: raw
-phase_state: proposed
+phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 platform_ids:
   github:
     issue_id: '279'
@@ -14,7 +15,7 @@ session_refs: []
 pre_tests_path: docs/epics/raw-issue-pull/verification/pre-tests.md
 verification_artifact_dir: docs/epics/raw-issue-pull/code-reviews
 source_candidate: docs/pre-brainstorms/20260507-raw-issue-pull/candidates.md
-updated_at: '2026-05-10T09:29:46Z'
+updated_at: 2026-05-17T04:47:25Z
 platform_state: open
 ---
 ## raw-issue-pull

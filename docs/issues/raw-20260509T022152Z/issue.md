@@ -2,7 +2,8 @@
 local_id: raw-20260509T022152Z
 kind: raw
 phase_state: completed
-phase_state: proposed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
+updated_at: 2026-05-17T04:47:25Z
 platform_ids:
   github:
     issue_id: '264'
@@ -15,7 +16,6 @@ verification_artifact_dir: docs/epics/worker-launch-writable-redirect/code-revie
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-09T02:22:01Z'
-updated_at: '2026-05-09T02:22:01Z'
 intake_id: ''
 author: platform
 channel: github

@@ -6,7 +6,15 @@ promoted_from: raw-20260513T224509Z
 source_candidate: docs/pre-brainstorms/20260513T224509Z--sup-pid-file-fix/candidates.md#C-20260513T224509Z-A
 verification_artifact_dir: docs/epics/sup-pid-file-fix/code-reviews
 pre_tests_path: docs/epics/sup-pid-file-fix/verification/pre-tests.md
-platform_state: ''
+platform_state: open
+platform_ids:
+  github:
+    issue_id: '408'
+    url: https://github.com/chatterzhao/freely/issues/408
+    synced_at: '2026-05-17T04:48:48Z'
+updated_at: '2026-05-17T04:48:48Z'
+primary_platform: github
+created_at: '2026-05-17T04:48:48Z'
 ---
 
 # I-20260513T224509Z-A: define sup_pid_file in start_project_runtime

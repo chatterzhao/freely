@@ -1,11 +1,12 @@
 ---
 kind: raw
+phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 local_id: raw-20260503T1235Z
 priority: P1
-phase_state: completed
 absorbed_into: I-20260503T1235Z-A
-phase_state: closed
 source: platform
+updated_at: 2026-05-17T04:47:25Z
 platform_ids:
   github:
     issue_id: "186"

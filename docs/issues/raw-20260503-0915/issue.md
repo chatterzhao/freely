@@ -2,8 +2,9 @@
 local_id: raw-20260503-0915
 kind: raw
 priority: high
-phase_state: open
-phase_state: proposed
+phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
+phase_state: completed
 source: platform
 platform_ids:
   github:

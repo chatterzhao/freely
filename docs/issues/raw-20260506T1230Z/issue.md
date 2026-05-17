@@ -1,8 +1,9 @@
 ---
 local_id: raw-20260506T1230Z
 kind: raw
-phase_state: proposed
-phase_state: proposed
+phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
+phase_state: completed
 platform_ids:
   github:
     issue_id: '280'
@@ -11,7 +12,7 @@ platform_ids:
 primary_platform: github
 source_candidate: docs/pre-brainstorms/20260506-wt-create-dual/candidates.md
 created_at: 2026-05-06 12:30:00+00:00
-updated_at: '2026-05-10T09:29:50Z'
+updated_at: 2026-05-17T04:47:25Z
 author: zhaoquan
 channel: github
 session_refs: []
