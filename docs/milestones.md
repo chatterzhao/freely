@@ -5230,3 +5230,20 @@ routing_policy:
 - phase_state: `in_b2_ibm`
 - issue_path: `docs/issues/I-20260509T024559Z-A/issue.md`
 
+## M-20260517T083200Z-A
+- title: supervisor crash — investigate rc=0 crash detection
+- status: active
+### candidate_issues
+1. `C-20260517T083200Z-A`
+- milestone: M-20260517T083200Z-A
+- status: needs_research
+- decision_reason: `raw-20260517T083200Z` reports supervisor crash with bash rc=0 — clean exit misclassified as crash
+- next_action: 读取 supervisor 与 ACP bridge 源码，确认 crash 检测逻辑中 exit code 的判定位置
+- revisit_trigger: 当 supervisor 和 ACP bridge 的 crash/exit_code 判定逻辑已被阅读和理解后重新评估
+- acceptance_criteria:
+  - 已定位 rc=0 被误报的具体代码位置
+  - 已确认是 supervisor bug、ACP bridge 透传问题、还是预期行为
+  - 若是 bug：产出修复路径
+  - 若是预期行为：记录文档并建议日志降级
+- source_candidate: `docs/pre-brainstorms/20260517T083200Z--supervisor-crash-bash-rc0/candidates.md`
+
