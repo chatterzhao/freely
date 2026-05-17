@@ -5,7 +5,7 @@ kind: linked
 phase_state: completed
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 promoted_from: raw-20260430-0010
-updated_at: 2026-05-17T04:47:25Z
+updated_at: '2026-05-17T04:55:54Z'
 platform_ids:
   github:
     issue_id: '225'
@@ -20,7 +20,7 @@ session_refs:
 - tool: ccds
   session_id: 20260430-doc-sync
   role: author
-platform_state: open
+platform_state: closed
 ---
 
 - issue_id: `I-20260430-0010-A`
