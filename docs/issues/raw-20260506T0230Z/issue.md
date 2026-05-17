@@ -1,6 +1,6 @@
 ---
 local_id: raw-20260506T0230Z
-phase_state: proposed
+phase_state: completed
 kind: raw
 source_family: chat_inbox
 created: 2026-05-06 02:30:00+00:00
@@ -9,7 +9,7 @@ platform_ids:
     issue_id: '281'
     url: https://github.com/chatterzhao/freely/issues/281
     synced_at: '2026-05-10T09:29:55Z'
-updated_at: '2026-05-10T09:29:55Z'
+updated_at: 2026-05-17T04:47:25Z
 primary_platform: github
 created_at: '2026-05-10T09:29:55Z'
 platform_state: open
@@ -38,3 +38,4 @@ governance-merge-gate 应接受 raw issue 作为合法生命周期起点：
 - diff 中有 raw-* issue → 生命周期证据成立
 - raw issue 有 phase_state ∈ {proposed, absorbed, dropped} → 合法
 - raw issue 可以通过 candidate 或直接 promote 到 I-*
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）

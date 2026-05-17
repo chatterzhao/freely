@@ -1,6 +1,6 @@
 ---
 local_id: raw-20260506T0100Z
-phase_state: proposed
+phase_state: completed
 kind: raw
 source_family: chat_inbox
 created: 2026-05-06 01:00:00+00:00
@@ -9,7 +9,7 @@ platform_ids:
     issue_id: '274'
     url: https://github.com/chatterzhao/freely/issues/274
     synced_at: '2026-05-10T09:29:04Z'
-updated_at: '2026-05-10T09:29:04Z'
+updated_at: 2026-05-17T04:47:25Z
 primary_platform: github
 created_at: '2026-05-10T09:29:04Z'
 platform_state: open
@@ -43,3 +43,4 @@ key 发现只有两个来源：chat_inbox + `docs/issues/raw-*` 目录。当 raw
 - **不覆盖 test-pre-merge 分支** — 受 `_is_protected_branch` 保护，显式排除
 - **不覆盖 milestone 专属 entry** — milestone committed_issues 是另一条治理路径
 - **不管没有文档链的裸 git 分支** — 没有 raw → B1 → I 链的分支由 `scan_worktree_governance` 处理
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
