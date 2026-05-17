@@ -4501,6 +4501,17 @@ routing_policy:
 - next_action: 在 standalone mode 与 skill projection 明确后进入 IBM，正式定义 OpenClaw 只作为 optional adapter/profile 的边界
 - revisit_trigger: 当 OpenClaw 借力边界必须被正式冻结或替换时重新唤起
 
+8. `C-20260517T082453Z-A`
+- title: supervisor bash rc=0 crash — 进程正常退出与 crash 分类歧义
+- milestone_state: candidate
+- phase_state: `in_pre_brainstorm`
+- priority: P2
+- promoted_issue_path: ""
+- source_brainstorm: `docs/pre-brainstorms/20260517T082453Z--supervisor-bash-rc0-crash/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260517T082453Z--supervisor-bash-rc0-crash/candidates.md`
+- next_action: 查阅 ACP adapter 退出溯源代码；确认 set_e_exit_cmd 标签生成逻辑；复现场景验证 rc=0 退出分类范围
+- revisit_trigger: 当重启风暴计数器应排除 rc=0 退出，或 supervisor 日志持续出现 rc=0 crash 标志时重新唤起
+
 ### completed_issues
 
 1. `I-20260312-0011`
