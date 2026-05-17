@@ -49,6 +49,10 @@ def parse_frontmatter(text: str) -> dict:
             in_platform_ids = False
             current_platform = ""
             continue
+        # Root-level line (no leading whitespace) exits platform_ids nesting
+        if in_platform_ids and line and not line[0].isspace():
+            in_platform_ids = False
+            current_platform = ""
         if ":" not in stripped:
             continue
         key, _, val = stripped.partition(":")
