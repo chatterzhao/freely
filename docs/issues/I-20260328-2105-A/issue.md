@@ -2,26 +2,25 @@
 local_id: I-20260328-2105-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "67"
-    url: "https://github.com/chatterzhao/freely/issues/67"
-    synced_at: "2026-04-27T11:21:13Z"
-
+    issue_id: '67'
+    url: https://github.com/chatterzhao/freely/issues/67
+    synced_at: '2026-04-27T11:21:13Z'
   gitee:
-    issue_id: "IJFO75"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO75"
-    synced_at: "2026-04-27T13:15:14Z"
+    issue_id: IJFO75
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO75
+    synced_at: '2026-04-27T13:15:14Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/codex-verified-resume-evidence-governance/issues/codex-verified-resume-evidence-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/codex-verified-resume-evidence-governance/issues/codex-verified-resume-evidence-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:21:13Z"
-hash: ""
-created_at: "2026-04-27T11:21:13Z"
-updated_at: "2026-04-27T11:21:13Z"
-platform_state: 
+  github: '2026-04-27T11:21:13Z'
+hash: ''
+created_at: '2026-04-27T11:21:13Z'
+updated_at: '2026-05-17T11:58:58Z'
+platform_state: closed
 ---
 
 Freely 已经把 `codex` 的 canonical continuity model 收敛为显式 session-addressed resume，但 `2026-03-28` 的 dogfood 现场证明当前恢复证据判定仍然过弱：
