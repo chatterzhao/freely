@@ -4,7 +4,7 @@
 
 - candidate_format_version: v2
 - title: Defer worker auto-recovery to after first AI patrol cycle
-- status: promoted
+- status: needs_research
 - adoption_type: code_change
 - decision_reason: Root cause 已确认——`manager_runtime_recover_workers_if_needed` 在第一个 AI cycle 完成前调用 `manager_runtime_launch_workers_from_latest_handoff`（已标记为废弃旧路径），此时 fleet cache 未填充，worker launch 必然失败。该旧路径调用从未被移除，注释与代码不一致。BUG 已在 `auto-recovery-race` worktree 修复完成。
 - promoted_issue_path: `docs/issues/I-20260503T1235Z-A/issue.md`
