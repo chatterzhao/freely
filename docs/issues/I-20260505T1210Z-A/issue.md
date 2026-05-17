@@ -12,7 +12,7 @@ platform_ids:
 primary_platform: github
 canonical_issue_path: docs/epics/workspace-routing-foundation/issue-state-refactor/issues/I-20260505T1210Z-A.md
 created_at: '2026-05-05T12:10:02Z'
-updated_at: '2026-05-17T08:02:19Z'
+updated_at: '2026-05-17T08:42:23Z'
 session_refs: []
 platform_state: closed
 ---
