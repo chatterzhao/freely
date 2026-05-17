@@ -2,7 +2,8 @@
 local_id: raw-20260506T1200Z
 kind: raw
 phase_state: absorbed
-closeout_note: B1_IBM materialization confirmed absorbed — all three fix items completed by concurrent work
+closeout_note: B1_IBM materialization confirmed absorbed — all three fix items completed
+  by concurrent work
 absorbed_into: I-20260506T1200Z-A
 platform_ids:
   github:
@@ -16,8 +17,8 @@ channel: github
 session_refs: []
 pre_tests_path: docs/epics/ibm-skill-rename/verification/pre-tests.md
 verification_artifact_dir: docs/epics/ibm-skill-rename/code-reviews
-updated_at: 2026-05-17T04:47:25Z
-platform_state: open
+updated_at: '2026-05-17T11:37:39Z'
+platform_state: closed
 ---
 
 ## 问题

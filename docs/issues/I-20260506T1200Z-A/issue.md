@@ -8,7 +8,8 @@ milestone: M-20260506T1200Z-A
 verification_artifact_dir: docs/epics/ibm-skill-rename/code-reviews
 pre_tests_path: docs/epics/ibm-skill-rename/verification/pre-tests.md
 platform_ids: {}
-platform_state: ''
+platform_state: closed
+updated_at: '2026-05-17T11:38:16Z'
 ---
 
 # I-20260506T1200Z-A: Skill rename to B1_IBM/B2_IBM

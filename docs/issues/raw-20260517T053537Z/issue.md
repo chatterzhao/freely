@@ -11,12 +11,12 @@ platform_ids:
     issue_id: '425'
     url: https://github.com/chatterzhao/freely/issues/425
     synced_at: '2026-05-17T05:35:44Z'
-updated_at: '2026-05-17T06:18:54Z'
+updated_at: '2026-05-17T11:37:22Z'
 primary_platform: github
 phase_state: absorbed
 absorbed_into: I-20260413-0420-A
-absorbed_at: "2026-05-17T07:50:00Z"
-platform_state: open
+absorbed_at: '2026-05-17T07:50:00Z'
+platform_state: closed
 ---
 
 supervisor crash: bash at freely:18777 (rc=0)
