@@ -1,4 +1,8 @@
 # Pre-brainstorm 索引（IBM Framework B1）
+- 20260503-1235--auto-recovery-b1
+  - brainstorms: docs/pre-brainstorms/20260503-1235--auto-recovery-b1/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260503-1235--auto-recovery-b1/candidates.md
+  - promoted_issue: docs/issues/I-20260503T1235Z-A/issue.md
 - 20260502-1028--stale-start-lock-cleanup
   - candidates: docs/pre-brainstorms/20260502-1028--stale-start-lock-cleanup/candidates.md
 - 20260502-0500--freely-packaging-selfhost

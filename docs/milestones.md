@@ -989,6 +989,8 @@ routing_policy:
 - evidence:
   - `docs/system/workspace/scripts/runtime/freely`
   - `docs/issues/I-20260503T1235Z-A/issue.md`
+  - `docs/pre-brainstorms/20260503-1235--auto-recovery-b1/brainstorms.md` (B1 materialization)
+  - `docs/pre-brainstorms/20260503-1235--auto-recovery-b1/candidates.md` (B1 materialization)
 - next_action: `Merge to develop.`
 
 ### candidate_issues
@@ -1000,6 +1002,7 @@ routing_policy:
 - priority: P0
 - promoted_issue_path: `docs/issues/I-20260503T1235Z-A/issue.md`
 - source_brainstorm: `docs/pre-brainstorms/20260503-1235--auto-recovery-race/brainstorms.md`
+- source_brainstorm_b1: `docs/pre-brainstorms/20260503-1235--auto-recovery-b1/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260503-1235--auto-recovery-race/candidates.md`
 - next_action: 已实现，合并到 develop。
 - revisit_trigger: 若修改后仍出现启动期 worker launch 失败则重新评估。
