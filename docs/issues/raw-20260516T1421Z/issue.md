@@ -2,6 +2,7 @@
 local_id: raw-20260516T1421Z
 kind: raw
 phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 platform_ids:
   github:
     issue_id: '378'
@@ -28,4 +29,3 @@ platform_state: open
 - platform_create=1：平台 open issue 创建工作流
 
 Source: lifecycle-v2 scan 2026-05-16T14:21:18Z
-closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）

@@ -3,6 +3,7 @@ local_id: raw-20260517T003441Z
 kind: raw
 status: proposed
 phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 platform_ids:
   github:
     issue_id: '381'
@@ -65,4 +66,3 @@ if [[ "$local_ref" == refs/tags/* ]]; then
     continue
 fi
 ```
-closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
