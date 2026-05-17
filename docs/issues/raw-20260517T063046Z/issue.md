@@ -3,6 +3,7 @@ local_id: raw-20260517T063046Z
 kind: raw
 status: proposed
 phase_state: absorbed
+absorbed_into: "cleanup-and-closeout-batch"
 absorbed_at: "2026-05-17T07:50:00Z"
 platform_ids:
   github:
