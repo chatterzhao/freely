@@ -2,26 +2,25 @@
 local_id: I-20260413-0208-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "143"
-    url: "https://github.com/chatterzhao/freely/issues/143"
-    synced_at: "2026-04-27T11:27:07Z"
-
+    issue_id: '143'
+    url: https://github.com/chatterzhao/freely/issues/143
+    synced_at: '2026-04-27T11:27:07Z'
   gitee:
-    issue_id: "IJFO9U"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO9U"
-    synced_at: "2026-04-27T13:17:13Z"
+    issue_id: IJFO9U
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO9U
+    synced_at: '2026-04-27T13:17:13Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/issues/foreground-background-runtime-entrypoint-semantics-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/issues/foreground-background-runtime-entrypoint-semantics-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:27:07Z"
-hash: ""
-created_at: "2026-04-27T11:27:07Z"
-updated_at: "2026-04-27T11:27:07Z"
-platform_state: 
+  github: '2026-04-27T11:27:07Z'
+hash: ''
+created_at: '2026-04-27T11:27:07Z'
+updated_at: '2026-05-17T12:04:44Z'
+platform_state: closed
 ---
 
 Freely 当前的产品心智与运行时入口 contract 仍存在一条会误导用户和未来 UI 接口的错位：

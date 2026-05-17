@@ -2,26 +2,25 @@
 local_id: I-20260412-0907-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
-completed_at: "2026-04-29"
+absorbed_at: '2026-05-16T14:27:11Z'
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "139"
-    url: "https://github.com/chatterzhao/freely/issues/139"
-    synced_at: "2026-04-27T11:26:53Z"
-
+    issue_id: '139'
+    url: https://github.com/chatterzhao/freely/issues/139
+    synced_at: '2026-04-27T11:26:53Z'
   gitee:
-    issue_id: "IJFO9Q"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO9Q"
-    synced_at: "2026-04-27T13:17:08Z"
+    issue_id: IJFO9Q
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO9Q
+    synced_at: '2026-04-27T13:17:08Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/codex-probe-success-shape-and-quota-slot-recovery-governance/issues/codex-probe-success-shape-and-quota-slot-recovery-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/codex-probe-success-shape-and-quota-slot-recovery-governance/issues/codex-probe-success-shape-and-quota-slot-recovery-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:26:53Z"
-hash: ""
-created_at: "2026-04-27T11:26:53Z"
-updated_at: "2026-04-27T11:26:53Z"
-platform_state: 
+  github: '2026-04-27T11:26:53Z'
+hash: ''
+created_at: '2026-04-27T11:26:53Z'
+updated_at: '2026-05-17T12:04:24Z'
+platform_state: closed
 ---
 
 Real dogfooding on 2026-04-12 exposed a narrower follow-on regression in the already completed Codex recovery family:
