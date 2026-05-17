@@ -2,6 +2,7 @@
 local_id: raw-20260509T024559Z
 kind: raw
 phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 phase_state: completed
 platform_ids:
   github:
@@ -74,4 +75,3 @@ cd /path/to/freely
 ./bin/freely daemon start --task-mode auto --project /path/to/freely
 ```
 和其他项目无区别。
-closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）

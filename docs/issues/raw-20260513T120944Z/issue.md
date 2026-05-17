@@ -2,6 +2,7 @@
 local_id: raw-20260513T120944Z
 kind: raw
 phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 phase_state: completed
 platform_ids:
   github:
@@ -114,4 +115,3 @@ Unify to a single bypass: `FREELY_SKIP_IBM_GATE=1`. Remove break-glass entirely.
 
 ### Test changes (8 files)
 17-24. Test scripts with break-glass test cases
-closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）

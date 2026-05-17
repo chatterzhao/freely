@@ -2,6 +2,7 @@
 local_id: raw-20260510T1840Z
 kind: raw
 phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 platform_ids:
   github:
     issue_id: '371'
@@ -16,4 +17,3 @@ created_at: '2026-05-16T13:21:00Z'
 init --skip-branch-check 可绕过分支校验，daemon start 不检查。
 ## 修复
 移除 skip，init 和 daemon start 都强制检查，不绕过。
-closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）

@@ -2,6 +2,7 @@
 local_id: raw-20260511T0245Z
 kind: raw
 phase_state: completed
+closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 platform_ids:
   github:
     issue_id: '374'
@@ -16,4 +17,3 @@ created_at: '2026-05-16T13:21:56Z'
 freely.db 路径构造分散在 19 处，格式不统一。
 ## 修复
 抽出 project_db_path()，所有地方统一调用。
-closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
