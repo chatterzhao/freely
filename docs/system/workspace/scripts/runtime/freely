@@ -14919,31 +14919,15 @@ append_task_source_patrol_seed_if_needed() {
     *) _tm_info="task-mode: ${_tm_mode:-unknown}" ;;
   esac
 
-  # For task-mode id:*, resolve effective scan — check existing scan first,
-  # re-run with --raw-key if the key is missing.
+  # For task-mode id:*, always use filtered scan.
   local _effective_scan_path="$scan_json_path"
   if [[ "$_tm_mode" == id:* ]]; then
     local _raw_key="${_tm_mode#id:}"
     _raw_key="${_raw_key#raw-}"
-    if [[ -f "$scan_json_path" ]] && python3 - "
-import json
-try:
-    with open('$scan_json_path') as f:
-        data = json.load(f)
-    for it in data.get('items', []):
-        if it.get('key') == '$_raw_key':
-            exit(0)
-    exit(1)
-except:
-    exit(1)
-" 2>/dev/null; then
-      :  # existing scan has the key, use it
-    else
-      local _id_scan_path="${scan_json_path%.json}-id-scan.json"
-      SKIP_PLATFORM_CHECK=1 python3 "$TASK_SOURCE_SCAN_SCRIPT" --project "$PROJECT_ROOT" --raw-key "$_raw_key" > "$_id_scan_path" 2>/dev/null || true
-      if [[ -s "$_id_scan_path" ]]; then
-        _effective_scan_path="$_id_scan_path"
-      fi
+    local _id_scan_path="${scan_json_path%.json}-id-scan.json"
+    SKIP_PLATFORM_CHECK=1 python3 "$TASK_SOURCE_SCAN_SCRIPT" --project "$PROJECT_ROOT" --raw-key "$_raw_key" > "$_id_scan_path" 2>/dev/null || true
+    if [[ -s "$_id_scan_path" ]]; then
+      _effective_scan_path="$_id_scan_path"
     fi
   fi
 
