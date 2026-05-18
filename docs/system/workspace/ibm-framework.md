@@ -144,23 +144,23 @@ ID 格式：`raw-YYYYMMDDTHHMM[SS]Z`（新，推荐）或 `raw-YYYYMMDD-HHMM`（
 chat 插话 / 平台扫描
         │
         ▼
-   raw-*        kind: raw, status: proposed
+   raw-*        kind: raw, phase_state: proposed
    B1_IBM       预研收敛 → candidate
         │
    ┌────┼────────────┐
    │    │            │
-  drop absorb      promote → I-*   kind: linked, status: proposed
+  drop absorb      promote → I-*   kind: linked, phase_state: in_b2_ibm
                       │           B2_IBM 实现设计 → Map 产物
                       │
                  merge to develop
                       │
-                 status: completed
+                 phase_state: completed
 ```
 
-- raw-* 只存在于 B1_IBM 阶段。一旦 promote 为 I-*，raw 的 `status` 变为 `absorbed`，`absorbed_into` 指向 I-*
+- raw-* 只存在于 B1_IBM 阶段。一旦 promote 为 I-*，raw 的 `phase_state` 变为 `absorbed`，`absorbed_into` 指向 I-*
 - I-* 是 B2_IBM 阶段的唯一 issue 标识。后续所有 chat、comment、状态变更都发生在 I-* 上
 - **ID 格式**：`raw-YYYYMMDDTHHMM[SS]Z`（新，ISO 8601）/ `raw-YYYYMMDD-HHMM`（旧，仍兼容）。C-* 和 I-* 在此基础上加 `-A`/`-B`/`-C` 后缀。一个 raw 可孵化多个 I-*。门禁用 `startswith(raw_key)` 验证父子关系，用 `candidate_key == issue_key`（去前缀）验证 C→I
-- `chat --issue raw-xxx` 会自动检测 `status=absorbed`，路由到 `absorbed_into` 指向的 I-*
+- `chat --issue raw-xxx` 会自动检测 `phase_state=absorbed`，路由到 `absorbed_into` 指向的 I-*
 - I-* 采用自包含摘要 + 链接模式：平台 body 包含足够上下文，深水区讨论链接到 B1_IBM 产物
 
 ### 平台隔离
@@ -181,7 +181,7 @@ chat 插话 / 平台扫描
 - 如果是新话题（`--new-issue`）：AI 创建工位 → wt-create 自动 materialize 到 worktree 的 `docs/issues/`
 - 如果是已有 issue 的评论（`--issue <id>`）：AI 在 worktree 中追加评论
 - 噪声（如"你好"）：标记 consumed=-1 丢弃
-- 如果 `--issue raw-xxx` 但该 raw 已被 promote（`status=absorbed`）：自动路由到 `absorbed_into` 指向的 I-*
+- 如果 `--issue raw-xxx` 但该 raw 已被 promote（`phase_state=absorbed`）：自动路由到 `absorbed_into` 指向的 I-*
 - skill 只做路由，不做价值判断。最终 promote/absorb/drop 由 B1_IBM 决定
 
 ### issue 生命周期中的 sync 触发点
