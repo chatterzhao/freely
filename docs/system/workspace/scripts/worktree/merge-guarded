@@ -58,13 +58,15 @@ validate_merge_direction() {
     develop)
       case "$source_branch" in
         fix/*|feature/*|hotfix/*) allowed=1 ;;
-      esac
-      ;;
+      esac ;;
+    fix/*|feature/*|hotfix/*)
+      case "$source_branch" in
+        develop) allowed=1 ;;
+      esac ;;
     main)
       case "$source_branch" in
         release/*|hotfix/*) allowed=1 ;;
-      esac
-      ;;
+      esac ;;
   esac
 
   if [[ "$allowed" != "1" ]]; then
@@ -74,9 +76,9 @@ validate_merge_direction() {
   source: $source_branch
 
 Allowed:
-  fix/* -> develop
-  feature/* -> develop
-  hotfix/* -> develop
+  fix/* <-> develop
+  feature/* <-> develop
+  hotfix/* <-> develop
   release/* -> main
   hotfix/* -> main
 MSG
