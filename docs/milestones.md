@@ -5318,3 +5318,14 @@ routing_policy:
 - absorbed_by: C-20260517T083030Z-A
 - decision_reason: raw-20260517T082317Z (GitHub #500) 已被已有 pre-brainstorms 覆盖，吸收到 C-20260517T083030Z-A；属同一 supervisor crash 假阳性事件的最早上报实例（08:23:17Z）
 - source_candidate: `docs/pre-brainstorms/20260517T082317Z--supervisor-bash-rc0-crash/candidates.md`
+
+
+## M-20260518T020345Z-A
+- title: freely comment 命令 — 封装评论写入 + phase_state 重定向与防御
+- status: active
+### candidate_issues
+1. `C-20260518T020345Z-A`
+- milestone: M-20260518T020345Z-A
+- status: needs_research
+- decision_reason: GitHub #538 提出对外 CLI 接口需求，复用现有 _write_chat_to_issue 基础设施
+- source_candidate: `docs/pre-brainstorms/20260518T020345Z--freely-comment/candidates.md`

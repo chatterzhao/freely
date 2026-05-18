@@ -1,4 +1,7 @@
 # Pre-brainstorm 索引（IBM Framework B1）
+- 20260518T020345Z--freely-comment
+  - brainstorms: docs/pre-brainstorms/20260518T020345Z--freely-comment/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260518T020345Z--freely-comment/candidates.md
 - 20260503-1235--auto-recovery-b1
   - brainstorms: docs/pre-brainstorms/20260503-1235--auto-recovery-b1/brainstorms.md
   - candidates: docs/pre-brainstorms/20260503-1235--auto-recovery-b1/candidates.md
