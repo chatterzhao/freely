@@ -1,4 +1,5 @@
 ---
+local_id: raw-20260517T030000Z
 id: raw-20260517T030000Z
 kind: raw
 title: 'batch closeout round 4: remaining lifecycle items'
