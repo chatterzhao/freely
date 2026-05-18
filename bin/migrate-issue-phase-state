@@ -1,11 +1,18 @@
 #!/usr/bin/env python3
-"""One-shot migration: rename status→phase_state for raw issues,
-add platform_state to all raw/I-* issues."""
+"""Migration: eliminate residual `status` field, ensure `phase_state` + `platform_state`.
+
+Idempotent. Safe to run multiple times.
+- raw-*: if both status + phase_state → remove status (keep phase_state)
+- raw-*: if only status → rename to phase_state
+- I-*: if status exists → remove it (phase_state is canonical)
+- all: add platform_state if missing
+"""
 from pathlib import Path
 import re, subprocess, sys
 
 PROJECT = Path(sys.argv[1]) if len(sys.argv) > 1 else Path.cwd()
 ISSUES_DIR = PROJECT / "docs" / "issues"
+
 
 def github_state(issue_number: str) -> str:
     """Query GitHub issue state. Returns 'open', 'closed', or '' on failure."""
@@ -16,6 +23,7 @@ def github_state(issue_number: str) -> str:
         return "closed" if "CLOSED" in r.stdout else "open" if "OPEN" in r.stdout else ""
     except Exception:
         return ""
+
 
 count = 0
 for d in sorted(ISSUES_DIR.iterdir()):
@@ -32,15 +40,30 @@ for d in sorted(ISSUES_DIR.iterdir()):
     changed = False
     name = d.name
 
-    # 1. Rename status: → phase_state: for raw issues
-    if name.startswith("raw-") and re.search(r'^status:', fm, re.MULTILINE):
-        fm = re.sub(r'^status:', 'phase_state:', fm, flags=re.MULTILINE)
-        changed = True
-        print(f"[migrate] {name}: status → phase_state")
+    has_status = bool(re.search(r'^status:', fm, re.MULTILINE))
+    has_phase = "phase_state:" in fm
+
+    # 1. Eliminate status field
+    if name.startswith("raw-"):
+        if has_status and has_phase:
+            # Both exist → remove redundant status
+            fm = re.sub(r'^status:.*\n', '', fm, flags=re.MULTILINE)
+            changed = True
+            print(f"[migrate] {name}: removed redundant status (phase_state exists)")
+        elif has_status and not has_phase:
+            # Only status → rename to phase_state
+            fm = re.sub(r'^status:', 'phase_state:', fm, flags=re.MULTILINE)
+            changed = True
+            print(f"[migrate] {name}: status → phase_state")
+    elif name.startswith("I-"):
+        if has_status:
+            # I-* uses phase_state exclusively → remove status
+            fm = re.sub(r'^status:.*\n', '', fm, flags=re.MULTILINE)
+            changed = True
+            print(f"[migrate] {name}: removed status (I-* uses phase_state)")
 
     # 2. Add platform_state if missing
     if "platform_state:" not in fm:
-        # Check if platform_ids has a github issue_id
         m = re.search(r'issue_id:\s*["\']?(\d+)["\']?', fm)
         if m and m.group(1):
             state = github_state(m.group(1))

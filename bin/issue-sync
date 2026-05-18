@@ -231,12 +231,11 @@ _platform_title() {
 
 _issue_body() {
   local file="$1" local_id="$2"
-  local kind status title canon phase created updated
+  local kind phase title canon created updated
   kind=$(_fm_get "$file" "kind")
-  status=$(_fm_get "$file" "status")
+  phase=$(_fm_get "$file" "phase_state")
   title=$(_issue_title "$file" "$local_id")
   canon=$(_fm_get "$file" "canonical_issue_path")
-  phase=$(_fm_get "$file" "phase_state")
   created=$(_fm_get "$file" "created_at")
   updated=$(_fm_get "$file" "updated_at")
 
@@ -247,8 +246,7 @@ _issue_body() {
 |-------|-------|
 | local_id | \`${local_id}\` |
 | kind | \`${kind:-unknown}\` |
-| status | \`${status:-unknown}\` |
-| phase | \`${phase:-none}\` |
+| phase_state | \`${phase:-none}\` |
 | canonical | \`${canon:-none}\` |
 | created | ${created:-unknown} |
 | updated | ${updated:-unknown} |
@@ -266,13 +264,11 @@ BODY
 
 _labels() {
   local file="$1"
-  local kind status phase labels
+  local kind phase labels
   kind=$(_fm_get "$file" "kind")
-  status=$(_fm_get "$file" "status")
   phase=$(_fm_get "$file" "phase_state")
   labels="kind/${kind:-unknown}"
   [[ -n "$phase" && "$phase" != "None" ]] && labels="$labels,phase/$phase"
-  [[ -n "$status" && "$status" != "None" && "$status" != "$phase" ]] && labels="$labels,status/$status"
   printf '%s\n' "$labels"
 }
 
@@ -708,9 +704,9 @@ cmd_batch() {
 
     case "$kind" in
       raw)
-        local status; status=$(_fm_get "$issue_file" "status")
-        if [[ "$status" == "absorbed" || "$status" == "dropped" ]]; then
-          echo "[issue-sync] batch: close $local_id (status=$status)"
+        local phase_state; phase_state=$(_fm_get "$issue_file" "phase_state")
+        if [[ "$phase_state" == "absorbed" || "$phase_state" == "dropped" ]]; then
+          echo "[issue-sync] batch: close $local_id (phase_state=$phase_state)"
           cmd_close "$local_id" "completed" || true
         elif ! _already_on_platform "$issue_file" "github" 2>/dev/null; then
           echo "[issue-sync] batch: create $local_id (raw, not on platform)"
@@ -763,16 +759,15 @@ cmd_scan() {
     local_id=$(basename "$dir")
     [[ "$local_id" == raw-* || "$local_id" == I-* ]] || continue
 
-    local kind status phase
+    local kind phase
     kind=$(_fm_get "$issue_file" "kind")
-    status=$(_fm_get "$issue_file" "status")
     phase=$(_fm_get "$issue_file" "phase_state")
 
     if [[ "$kind" == "linked" ]] && _changed_since_last_sync "$local_id" "$issue_file"; then
       echo "  UPDATE $local_id  kind=$kind phase=$phase  $(_issue_title "$issue_file" "$local_id")"
       found=1
     elif [[ "$kind" == "raw" ]] && ! _already_on_platform "$issue_file" "github" 2>/dev/null; then
-      echo "  CREATE $local_id  kind=$kind status=$status  $(_issue_title "$issue_file" "$local_id")"
+      echo "  CREATE $local_id  kind=$kind phase=$phase  $(_issue_title "$issue_file" "$local_id")"
       found=1
     fi
   done < <(find "$ISSUES_DIR" -name "issue.md" -print0 2>/dev/null)
@@ -787,7 +782,6 @@ cmd_status() {
 
   echo "local_id:        $local_id"
   echo "kind:            $(_fm_get "$file" "kind")"
-  echo "status:          $(_fm_get "$file" "status")"
   echo "phase_state:     $(_fm_get "$file" "phase_state")"
   echo "issue_title:     $(_issue_title "$file" "$local_id")"
   echo "primary_platform: $(_fm_get "$file" "primary_platform")"

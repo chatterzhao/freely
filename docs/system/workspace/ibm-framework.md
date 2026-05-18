@@ -243,7 +243,6 @@ body 结构（I-*）：
 local_id: I-20260426-1423
 issue_title: "Add opencode direct launcher and AI_TOOL alias resolution"
 kind: linked
-status: completed
 phase_state: completed
 promoted_from: raw-20260426-0001            # I-* 专有：来源 raw issue
 absorbed_into: ""                           # raw-* 专有：被哪个 I-* 吸收
@@ -288,8 +287,8 @@ session_refs:
 | `local_id` | string | 本地唯一 ID，`raw-{ts}` 或 `I-{ts}` |
 | `issue_title` | string | 人类可读标题，用于平台 issue 标题 |
 | `kind` | raw\|linked | raw = B1_IBM 输入，linked = B2_IBM 正式 issue |
-| `status` | string | proposed\|in_dev\|in_verification\|completed\|absorbed\|dropped |
-| `phase_state` | string | B2_IBM 阶段：in_b2_ibm\|in_dev\|in_verification\|completed |
+| `phase_state` | string | 治理生命周期。<br>raw-*: proposed\|absorbed\|dropped<br>I-*: in_b2_ibm\|done_b2_ibm\|in_dev\|blocked_dev\|in_verification\|completed |
+| `platform_state` | string | 平台同步状态：open\|closed。由 issue-sync create/close 自动管理 |
 | `promoted_from` | string | I-* 专有：来源 raw-* 的 local_id |
 | `absorbed_into` | string | raw-* 专有：被 promote 到哪个 I-* |
 | `platform_ids` | dict | 每个平台的 issue_id、url、synced_at |
