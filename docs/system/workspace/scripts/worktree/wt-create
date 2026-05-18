@@ -515,6 +515,24 @@ conn.close()
       done
 }
 
+# _mark_raw_issue_absorbed: after successful worktree creation, mark the
+# raw issue as absorbed so scan stops showing it and comment routing works.
+_mark_raw_issue_absorbed() {
+  local raw_key="$1"
+  local issue_file="$ROOT_DIR/docs/issues/raw-${raw_key}/issue.md"
+  [[ -f "$issue_file" ]] || { echo "warning: issue file not found: $issue_file" >&2; return 0; }
+  python3 -c "
+import yaml
+with open('$issue_file') as f: c = f.read()
+p = c.split('---', 2)
+if len(p) < 3: exit(1)
+fm = yaml.safe_load(p[1]) or {}
+fm['phase_state'] = 'absorbed'
+new_fm = yaml.dump(fm, default_flow_style=False, allow_unicode=True, sort_keys=False).strip()
+with open('$issue_file', 'w') as f: f.write('---\n' + new_fm + '\n---' + p[2])
+" 2>/dev/null && echo "phase_state: absorbed → raw-${raw_key}" || echo "warning: failed to update phase_state for raw-${raw_key}" >&2
+}
+
 # ── Create worktree helper ───────────────────────────────
 
 _create_worktree() {
@@ -556,6 +574,7 @@ _require_issue_exists "$fix_branch" || exit 1
       return 1
     fi
     _fill_platform_ids "$raw_key"
+    _mark_raw_issue_absorbed "$raw_key"
   fi
 
   tp_target="$(freely_wt_resolve_target_path "$test_pre_merge_branch")"
