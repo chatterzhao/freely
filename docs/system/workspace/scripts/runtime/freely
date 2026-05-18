@@ -9857,19 +9857,18 @@ worker_prompt_launchable_for_manager_project() {
     return 1
   fi
   target_branch="$(worker_prompt_target_branch "$prompt_file")"
-  # Worker must run on fix/* or feature/*. develop allowed only for cleanup.
+  # Worker must run on fix/* or feature/*. develop allowed for cleanup/edit/checkpoint/closeout.
   case "$target_branch" in
     fix/*|feature/*) ;;
-    hotfix/*) ;;  # emergency fixes
-    develop)
-      if [[ "$(worker_prompt_normalized_intent_kind "$prompt_file")" != "cleanup" ]]; then
-        log_warn "worker_prompt_launchable: rejected branch '$target_branch' — non-cleanup worker must run on fix/* or feature/*"
-        log_warn "  如果工位不存在，用 wt-create 创建: ./bin/wt-create --raw-key <key> --source platform --skill freely-fix-execution --slug <slug>"
-        log_warn "  参数不清楚用 ./bin/wt-create --help"
-        log_warn "  如果工位不存在，用 wt-create 创建: ./bin/wt-create --raw-key <key> --source platform --skill freely-fix-execution --slug <slug>"
-        log_warn "  参数不清楚用 ./bin/wt-create --help"
-        return 1
-      fi
+    hotfix/*) ;;
+    develop|"")
+      local _intent; _intent="$(worker_prompt_normalized_intent_kind "$prompt_file")"
+      case "$_intent" in
+        cleanup|edit|checkpoint|closeout) ;;  # allowed on develop
+        *)
+          log_warn "worker_prompt_launchable: rejected develop worker intent=$_intent"
+          return 1 ;;
+      esac
       ;;
     *)
       log_warn "worker_prompt_launchable: rejected branch '$target_branch' — worker must run on fix/* or feature/*"
