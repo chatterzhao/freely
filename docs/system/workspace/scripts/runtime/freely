@@ -13915,6 +13915,40 @@ worker_exit_contract_done_is_repair_only_cleanup_escape() {
   worker_exit_contract_evidence_is_internal_repair_only "$project" "$evidence_paths_csv"
 }
 
+# _manager_auto_consume_workers: extract raw_keys from worker_prompts_csv,
+# call auto_consume for each unique raw_key so consumed_by becomes 'manager'.
+_manager_auto_consume_workers() {
+  local project="$1"
+  local _worker_csv _hp _db _prompt_file _rk _consumed
+  _worker_csv="$(_db_exit_contract_field "$project" manager worker_prompts_csv 2>/dev/null || echo "")"
+  _hp="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  _db="$project/.freely/freely.db"
+  [[ -f "$_hp" && -f "$_db" ]] || return 0
+  _consumed=0
+  if [[ -n "$_worker_csv" ]]; then
+    local _seen_rk=""
+    for _prompt_file in $(printf '%s\n' "$_worker_csv" | tr ',' '\n'); do
+      [[ -n "$_prompt_file" ]] || continue
+      _rk=$(echo "$_prompt_file" | grep -oE '[0-9]{8}T[0-9]{4,6}Z' | head -1)
+      [[ -n "$_rk" ]] || continue
+      # Dedup: same raw_key may appear across multiple prompt files
+      [[ "$_seen_rk" == *"|$_rk|"* ]] && continue
+      _seen_rk="$_seen_rk|$_rk|"
+      python3 "$_hp" auto-consume --db "$_db" --raw-key "$_rk" >/dev/null 2>&1 || true
+      _consumed=$((_consumed + 1))
+    done
+  fi
+  # If no worker_prompts_csv (stop_ai / resume without delegation),
+  # still consume any pending workers for the current task-mode raw_key
+  if [[ "$_consumed" -eq 0 ]]; then
+    local _tm_mode _rk
+    _tm_mode="$(read_task_mode "$project")"
+    case "$_tm_mode" in
+      id:*) _rk="${_tm_mode#id:}"; python3 "$_hp" auto-consume --db "$_db" --raw-key "$_rk" >/dev/null 2>&1 || true ;;
+    esac
+  fi
+}
+
 manager_runtime_handle_exit_contract_after_ai_cycle() {
   local project="$1" exit_reason="${2:-}" missing_csv="" kind="" worker_prompts_csv="" stop_reason="" unresolved_workers="" cleanup_followthrough_intake_id="" cleanup_followthrough_output="" cleanup_followthrough_detail=""
   local parse_result parse_ok raw_key cycle_log
@@ -14032,12 +14066,8 @@ manager_runtime_handle_exit_contract_after_ai_cycle() {
           ;;
       esac
       : >"$(stop_marker_file "$project")"
-      # Auto-consume on stop_ai
-      local _hp_stop _db_stop _rk_stop
-      _hp_stop="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
-      _db_stop="$project/.freely/freely.db"
-      _rk_stop="$(_db_exit_contract_field "$project" manager raw_key 2>/dev/null || echo "")"
-      [[ -n "$_rk_stop" && -f "$_hp_stop" ]] && python3 "$_hp_stop" auto-consume --db "$_db_stop" --raw-key "$_rk_stop" >/dev/null 2>&1 || true
+      # Auto-consume: extract raw_keys from worker_prompts_csv, consume each
+      _manager_auto_consume_workers "$project"
       append_runtime_event "$project" "manager_exit_contract_stop_ai" \
         "stop_reason=${stop_reason}"
       printf 'stop_ai\n'
@@ -14069,24 +14099,16 @@ manager_runtime_handle_exit_contract_after_ai_cycle() {
         "$project" \
         "manager_exit_contract_resume" \
         "restart_point=$(_db_exit_contract_field "$project" manager restart_point);next_action=$(_db_exit_contract_field "$project" manager next_action)"
-      # Auto-consume on resume too
-      local _hp_resume _db_resume _rk_resume
-      _hp_resume="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
-      _db_resume="$project/.freely/freely.db"
-      _rk_resume="$(_db_exit_contract_field "$project" manager raw_key)"
-      [[ -n "$_rk_resume" && -f "$_hp_resume" ]] && python3 "$_hp_resume" auto-consume --db "$_db_resume" --raw-key "$_rk_resume" >/dev/null 2>&1 || true
+      # Auto-consume: extract raw_keys from worker_prompts_csv, consume each
+      _manager_auto_consume_workers "$project"
       append_runtime_event "$project" "manager_exit_contract_resume" \
         "restart_point=$(_db_exit_contract_field "$project" manager restart_point)"
       printf 'resume_manager\n'
       ;;
     delegate_workers)
       worker_prompts_csv="$(_db_exit_contract_field "$project" manager worker_prompts_csv)"
-      # Auto-consume previous unconsumed workers on new manager handoff
-      local _hp_del _db_del _rk_del
-      _hp_del="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
-      _db_del="$project/.freely/freely.db"
-      _rk_del="$(_db_exit_contract_field "$project" manager raw_key 2>/dev/null || echo "")"
-      [[ -n "$_rk_del" && -f "$_hp_del" ]] && python3 "$_hp_del" auto-consume --db "$_db_del" --raw-key "$_rk_del" >/dev/null 2>&1 || true
+      # Auto-consume: extract raw_keys from worker_prompts_csv, consume each
+      _manager_auto_consume_workers "$project"
       append_runtime_event "$project" "manager_exit_contract_delegate_workers" \
         "worker_prompts_csv=${worker_prompts_csv:-none}"
       printf 'delegate_workers\n'
