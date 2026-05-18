@@ -14919,20 +14919,40 @@ append_task_source_patrol_seed_if_needed() {
     *) _tm_info="task-mode: ${_tm_mode:-unknown}" ;;
   esac
 
-  # For task-mode id:*, always use filtered scan.
-  local _effective_scan_path="$scan_json_path"
+  # For task-mode id:*, run filtered scan and merge into main scan by key.
+  # Other keys are unaffected. If filtered scan is empty, old entries for
+  # this key are removed — signalling the task is no longer actionable.
   if [[ "$_tm_mode" == id:* ]]; then
     local _raw_key="${_tm_mode#id:}"
     _raw_key="${_raw_key#raw-}"
-    local _id_scan_path="${scan_json_path%.json}-id-scan.json"
-    SKIP_PLATFORM_CHECK=1 python3 "$TASK_SOURCE_SCAN_SCRIPT" --project "$PROJECT_ROOT" --raw-key "$_raw_key" > "$_id_scan_path" 2>/dev/null || true
-    if [[ -s "$_id_scan_path" ]]; then
-      _effective_scan_path="$_id_scan_path"
+    local _tmp_scan="/tmp/freely-id-scan-$$.json"
+    SKIP_PLATFORM_CHECK=1 python3 "$TASK_SOURCE_SCAN_SCRIPT" --project "$PROJECT_ROOT" --raw-key "$_raw_key" > "$_tmp_scan" 2>/dev/null || true
+    if [[ -f "$_tmp_scan" ]]; then
+      python3 - "$scan_json_path" "$_tmp_scan" "$_raw_key" <<'PY'
+import json, sys
+main_path, tmp_path, raw_key = sys.argv[1], sys.argv[2], sys.argv[3]
+with open(main_path) as f: main = json.load(f)
+with open(tmp_path) as f: tmp = json.load(f)
+# Remove old items for this key, add new filtered ones
+main["items"] = [it for it in main.get("items",[]) if it.get("key") != raw_key]
+main["items"].extend(tmp.get("items", []))
+# Update summary
+items = main["items"]
+main["summary"]["total_incomplete"] = len(items)
+by_stage = {}
+for it in items:
+    s = it.get("stage","?")
+    by_stage[s] = by_stage.get(s, 0) + 1
+main["summary"]["by_stage"] = by_stage
+main["summary"]["ready"] = sum(1 for it in items if it.get("ready"))
+with open(main_path, "w") as f: json.dump(main, f, indent=2, sort_keys=True, ensure_ascii=False)
+PY
+      rm -f "$_tmp_scan"
     fi
   fi
 
   # Parse lifecycle scan JSON and build prompt section
-  python3 - "$_effective_scan_path" "$scan_reason" "$_tm_mode" "$_tm_info" <<'PY'
+  python3 - "$scan_json_path" "$scan_reason" "$_tm_mode" "$_tm_info" <<'PY'
 import json
 import sys
 
