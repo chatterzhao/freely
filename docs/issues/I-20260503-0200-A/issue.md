@@ -3,7 +3,7 @@ local_id: I-20260503-0200-A
 issue_title: 'scan: switch to task-lifecycle-scan v2 with full lifecycle chain trace'
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
+absorbed_at: '2026-05-16T14:27:11Z'
 promoted_from: raw-20260503-0200
 platform_ids:
   github:
@@ -17,7 +17,7 @@ canonical_issue_path: docs/epics/workspace-routing-foundation/scan-lifecycle-mig
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-03T02:00:00Z'
-updated_at: '2026-05-05T15:08:02Z'
+updated_at: '2026-05-17T12:25:18Z'
 session_refs:
 - tool: ccds
   session_id: 20260503-scan-lifecycle
