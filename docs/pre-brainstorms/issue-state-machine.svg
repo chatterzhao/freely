@@ -1,0 +1,227 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1050" font-family="monospace" font-size="12">
+  <defs>
+    <marker id="arrow-script" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#22c55e"/>
+    </marker>
+    <marker id="arrow-ai" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#f59e0b"/>
+    </marker>
+    <marker id="arrow-gap" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#ef4444"/>
+    </marker>
+    <filter id="shadow">
+      <feDropShadow dx="1" dy="1" stdDeviation="1" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- background -->
+  <rect width="1400" height="1050" fill="#0f172a" rx="8"/>
+
+  <!-- title -->
+  <text x="700" y="28" text-anchor="middle" fill="#f8fafc" font-size="16" font-weight="bold">Issue 状态全域流转图 — 三类数据实体 × 状态机 × 变更点位</text>
+
+  <!-- ====== SECTION 1: chats.consumed (script complete) ====== -->
+  <text x="20" y="58" fill="#94a3b8" font-size="11">1. chats 表 consumed 字段 (freely.db)</text>
+
+  <!-- chats consumed state box -->
+  <rect x="20" y="68" width="200" height="90" rx="6" fill="#064e3b" stroke="#22c55e" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="120" y="88" text-anchor="middle" fill="#22c55e" font-size="12" font-weight="bold">chats.consumed</text>
+  <text x="120" y="106" text-anchor="middle" fill="#86efac" font-size="10">取值: 0, 1, -1</text>
+  <text x="120" y="122" text-anchor="middle" fill="#86efac" font-size="10">驱动: 100% 脚本</text>
+  <text x="120" y="138" text-anchor="middle" fill="#4ade80" font-size="9">状态: ✅ 无断档</text>
+
+  <!-- chats transitions -->
+  <rect x="260" y="68" width="180" height="40" rx="4" fill="#0f172a" stroke="#22c55e" stroke-width="1"/>
+  <text x="350" y="85" text-anchor="middle" fill="#86efac" font-size="9">0 → 1 (consume)</text>
+  <text x="350" y="100" text-anchor="middle" fill="#64748b" font-size="8">chat-inbox.py consume()</text>
+
+  <rect x="260" y="118" width="180" height="40" rx="4" fill="#0f172a" stroke="#22c55e" stroke-width="1"/>
+  <text x="350" y="135" text-anchor="middle" fill="#86efac" font-size="9">1/0 → -1 (discard)</text>
+  <text x="350" y="150" text-anchor="middle" fill="#64748b" font-size="8">chat-inbox.py discard()</text>
+
+  <!-- trigger list -->
+  <rect x="480" y="68" width="340" height="90" rx="4" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+  <text x="490" y="86" fill="#64748b" font-size="9">触发点:</text>
+  <text x="490" y="102" fill="#86efac" font-size="9">• wt-create → _pull_raw_issue</text>
+  <text x="490" y="118" fill="#86efac" font-size="9">• freely daemon → direct sync (worktree存在时)</text>
+  <text x="490" y="134" fill="#86efac" font-size="9">• governance-merge-gate (pre-merge自动)</text>
+  <text x="490" y="150" fill="#86efac" font-size="9">• 所有调用方均有明确触发条件</text>
+
+  <!-- ====== SECTION 2: raw-* phase_state (mixed, many gaps) ====== -->
+  <text x="20" y="195" fill="#94a3b8" font-size="11">2. raw-* issue.md phase_state</text>
+
+  <!-- raw proposed -->
+  <rect x="20" y="210" width="160" height="50" rx="6" fill="#1e3a5f" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>
+  <text x="100" y="232" text-anchor="middle" fill="#60a5fa" font-size="13" font-weight="bold">proposed</text>
+  <text x="100" y="250" text-anchor="middle" fill="#94a3b8" font-size="9">初始状态（待消费）</text>
+
+  <!-- raw absorbed -->
+  <rect x="280" y="210" width="160" height="50" rx="6" fill="#064e3b" stroke="#22c55e" stroke-width="2" filter="url(#shadow)"/>
+  <text x="360" y="232" text-anchor="middle" fill="#4ade80" font-size="13" font-weight="bold">absorbed</text>
+  <text x="360" y="250" text-anchor="middle" fill="#94a3b8" font-size="9">终端状态（已吸收）</text>
+
+  <!-- raw dropped -->
+  <rect x="540" y="210" width="160" height="50" rx="6" fill="#450a0a" stroke="#ef4444" stroke-width="2" filter="url(#shadow)"/>
+  <text x="620" y="232" text-anchor="middle" fill="#f87171" font-size="13" font-weight="bold">dropped</text>
+  <text x="620" y="250" text-anchor="middle" fill="#94a3b8" font-size="9">终端状态（已丢弃）</text>
+
+  <!-- transition arrows for raw -->
+  <!-- proposed → absorbed: issue-sync promote-finalize -->
+  <line x1="160" y1="235" x2="278" y2="235" stroke="#22c55e" stroke-width="2" marker-end="url(#arrow-script)"/>
+  <text x="220" y="228" text-anchor="middle" fill="#22c55e" font-size="8">issue-sync</text>
+  <text x="220" y="242" text-anchor="middle" fill="#22c55e" font-size="7">promote-finalize</text>
+
+  <!-- proposed → absorbed: wt-create (GAP) -->
+  <path d="M 80 260 L 80 300 L 360 300 L 360 262" fill="none" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrow-gap)"/>
+  <text x="220" y="318" text-anchor="middle" fill="#ef4444" font-size="8">🔴 断档: wt-create 消费后不更新 phase_state</text>
+  <text x="220" y="332" text-anchor="middle" fill="#ef4444" font-size="7">(chat-inbox &amp; platform 两条路径均缺失)</text>
+
+  <!-- proposed → dropped (GAP) -->
+  <line x1="180" y1="215" x2="450" y2="215" stroke="#ef4444" stroke-width="1" stroke-dasharray="6,3"/>
+  <text x="315" y="198" text-anchor="middle" fill="#ef4444" font-size="8">🔴 断档: 无脚本触发</text>
+  <text x="315" y="190" text-anchor="middle" fill="#ef4444" font-size="7">全靠 AI 语义</text>
+
+  <!-- in_dev etc (不规范值) -->
+  <rect x="760" y="210" width="160" height="50" rx="6" fill="#3b0764" stroke="#a855f7" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="840" y="232" text-anchor="middle" fill="#c084fc" font-size="11">in_dev / completed...</text>
+  <text x="840" y="248" text-anchor="middle" fill="#94a3b8" font-size="8">🔴 不规范值</text>
+
+  <line x1="680" y1="235" x2="758" y2="235" stroke="#a855f7" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="720" y="228" text-anchor="middle" fill="#a855f7" font-size="7">AI 误写入</text>
+
+  <!-- gap summary box for raw -->
+  <rect x="760" y="285" width="260" height="82" rx="4" fill="#450a0a" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="770" y="302" fill="#f87171" font-size="10" font-weight="bold">raw-* 断档汇总</text>
+  <text x="770" y="320" fill="#fca5a5" font-size="8">① materialize 不写 phase_state</text>
+  <text x="770" y="338" fill="#fca5a5" font-size="8">② wt-create 不更新 phase_state</text>
+  <text x="770" y="356" fill="#fca5a5" font-size="8">③ proposed→dropped 无脚本触发</text>
+
+  <!-- ====== SECTION 3: platform_state (script complete) ====== -->
+  <text x="20" y="395" fill="#94a3b8" font-size="11">3. platform_state (raw-* &amp; I-* issue.md)</text>
+
+  <rect x="20" y="410" width="160" height="50" rx="6" fill="#064e3b" stroke="#22c55e" stroke-width="2" filter="url(#shadow)"/>
+  <text x="100" y="432" text-anchor="middle" fill="#4ade80" font-size="13" font-weight="bold">open</text>
+  <text x="100" y="450" text-anchor="middle" fill="#94a3b8" font-size="9">issue-sync create</text>
+
+  <line x1="180" y1="435" x2="250" y2="435" stroke="#22c55e" stroke-width="2" marker-end="url(#arrow-script)"/>
+
+  <rect x="260" y="410" width="160" height="50" rx="6" fill="#450a0a" stroke="#ef4444" stroke-width="2" filter="url(#shadow)"/>
+  <text x="340" y="432" text-anchor="middle" fill="#f87171" font-size="13" font-weight="bold">closed</text>
+  <text x="340" y="450" text-anchor="middle" fill="#94a3b8" font-size="9">issue-sync close</text>
+
+  <rect x="480" y="410" width="260" height="50" rx="4" fill="#0f172a" stroke="#22c55e" stroke-width="1"/>
+  <text x="490" y="430" fill="#86efac" font-size="9">驱动: 100% 脚本</text>
+  <text x="490" y="448" fill="#86efac" font-size="9">状态: ✅ 无断档</text>
+
+  <!-- ====== SECTION 4: I-* phase_state (all AI, all gaps) ====== -->
+  <text x="20" y="500" fill="#94a3b8" font-size="11">4. I-* issue.md phase_state</text>
+
+  <!-- I-* state chain -->
+  <rect x="20" y="515" width="130" height="44" rx="5" fill="#1e3a5f" stroke="#3b82f6" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="85" y="535" text-anchor="middle" fill="#60a5fa" font-size="10">in_b2_ibm</text>
+  <text x="85" y="552" text-anchor="middle" fill="#64748b" font-size="7">B2 分析中</text>
+
+  <rect x="180" y="515" width="130" height="44" rx="5" fill="#1e3a5f" stroke="#3b82f6" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="245" y="535" text-anchor="middle" fill="#60a5fa" font-size="10">done_b2_ibm</text>
+  <text x="245" y="552" text-anchor="middle" fill="#64748b" font-size="7">B2 分析完成</text>
+
+  <rect x="340" y="515" width="130" height="44" rx="5" fill="#1e3a5f" stroke="#3b82f6" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="405" y="535" text-anchor="middle" fill="#60a5fa" font-size="10">in_dev</text>
+  <text x="405" y="552" text-anchor="middle" fill="#64748b" font-size="7">开发中</text>
+
+  <rect x="500" y="515" width="130" height="44" rx="5" fill="#1e3a5f" stroke="#3b82f6" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="565" y="535" text-anchor="middle" fill="#60a5fa" font-size="10">blocked_dev</text>
+  <text x="565" y="552" text-anchor="middle" fill="#64748b" font-size="7">开发受阻</text>
+
+  <rect x="660" y="515" width="130" height="44" rx="5" fill="#1e3a5f" stroke="#3b82f6" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="725" y="535" text-anchor="middle" fill="#60a5fa" font-size="10">in_verification</text>
+  <text x="725" y="552" text-anchor="middle" fill="#64748b" font-size="7">验证中</text>
+
+  <rect x="820" y="515" width="130" height="44" rx="5" fill="#064e3b" stroke="#22c55e" stroke-width="2" filter="url(#shadow)"/>
+  <text x="885" y="535" text-anchor="middle" fill="#4ade80" font-size="10">completed</text>
+  <text x="885" y="552" text-anchor="middle" fill="#64748b" font-size="7">完成（终端）</text>
+
+  <!-- arrows between I-* states -->
+  <line x1="150" y1="537" x2="178" y2="537" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arrow-ai)"/>
+  <line x1="310" y1="537" x2="338" y2="537" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arrow-ai)"/>
+  <line x1="470" y1="537" x2="498" y2="537" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arrow-ai)"/>
+  <line x1="630" y1="537" x2="658" y2="537" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arrow-ai)"/>
+  <line x1="790" y1="537" x2="818" y2="537" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arrow-ai)"/>
+
+  <!-- gap label -->
+  <rect x="1000" y="515" width="260" height="44" rx="4" fill="#450a0a" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="1010" y="533" fill="#f87171" font-size="10" font-weight="bold">🔴 全部 AI 语义驱动</text>
+  <text x="1010" y="550" fill="#fca5a5" font-size="8">全部6个转换零脚本触发点</text>
+
+  <!-- potential script triggers -->
+  <rect x="20" y="575" width="1360" height="60" rx="4" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+  <text x="35" y="593" fill="#64748b" font-size="9">可脚本化的点:</text>
+  <text x="35" y="610" fill="#86efac" font-size="8">• wt-create I-*工位 → in_dev</text>
+  <text x="250" y="610" fill="#86efac" font-size="8">• merge-guarded 成功 → done_b2_ibm / in_verification</text>
+  <text x="580" y="610" fill="#86efac" font-size="8">• wt-close → completed</text>
+  <text x="780" y="610" fill="#f59e0b" font-size="8">• * → blocked_dev（需AI语义判断阻塞原因）</text>
+
+  <!-- ====== SECTION 5: candidate status (all AI) ====== -->
+  <text x="20" y="665" fill="#94a3b8" font-size="11">5. candidate C-* status (docs/pre-brainstorms/)</text>
+
+  <rect x="20" y="680" width="130" height="44" rx="5" fill="#1e3a5f" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="85" y="700" text-anchor="middle" fill="#60a5fa" font-size="10">proposed</text>
+  <text x="85" y="717" text-anchor="middle" fill="#64748b" font-size="7">新建候选</text>
+
+  <rect x="170" y="680" width="130" height="44" rx="5" fill="#1e3a5f" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="235" y="700" text-anchor="middle" fill="#60a5fa" font-size="10">needs_research</text>
+  <text x="235" y="717" text-anchor="middle" fill="#64748b" font-size="7">需进一步研究</text>
+
+  <rect x="320" y="680" width="130" height="44" rx="5" fill="#1e3a5f" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="385" y="700" text-anchor="middle" fill="#60a5fa" font-size="10">blocked</text>
+  <text x="385" y="717" text-anchor="middle" fill="#64748b" font-size="7">被阻塞</text>
+
+  <rect x="470" y="680" width="130" height="44" rx="5" fill="#064e3b" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="535" y="700" text-anchor="middle" fill="#4ade80" font-size="10">promoted</text>
+  <text x="535" y="717" text-anchor="middle" fill="#64748b" font-size="7">已提升</text>
+
+  <rect x="620" y="680" width="130" height="44" rx="5" fill="#450a0a" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="685" y="700" text-anchor="middle" fill="#f87171" font-size="10">absorbed</text>
+  <text x="685" y="717" text-anchor="middle" fill="#64748b" font-size="7">已吸收</text>
+
+  <rect x="770" y="680" width="130" height="44" rx="5" fill="#450a0a" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="835" y="700" text-anchor="middle" fill="#f87171" font-size="10">dropped</text>
+  <text x="835" y="717" text-anchor="middle" fill="#64748b" font-size="7">已丢弃</text>
+
+  <!-- arrows -->
+  <line x1="940" y1="700" x2="1000" y2="700" stroke="#ef4444" stroke-width="1.5" marker-end="url(#arrow-gap)"/>
+  <rect x="1010" y="678" width="260" height="44" rx="4" fill="#450a0a" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="1020" y="696" fill="#f87171" font-size="10" font-weight="bold">🔴 全部 AI 语义驱动</text>
+  <text x="1020" y="713" fill="#fca5a5" font-size="8">6个状态零脚本触发点</text>
+
+  <rect x="20" y="740" width="1360" height="42" rx="4" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+  <text x="35" y="758" fill="#64748b" font-size="9">可脚本化的点:</text>
+  <text x="35" y="774" fill="#86efac" font-size="8">• scan 创建 candidate → proposed</text>
+  <text x="290" y="774" fill="#86efac" font-size="8">• issue-sync promote 成功 → promoted</text>
+  <text x="560" y="774" fill="#86efac" font-size="8">• promote-finalize → absorbed</text>
+  <text x="770" y="774" fill="#f59e0b" font-size="8">• * → needs_research/dropped（需AI语义）</text>
+
+  <!-- ====== SECTION 6: Comment write defense ====== -->
+  <text x="20" y="815" fill="#94a3b8" font-size="11">6. 评论写入防御（_record_chat_interaction 入口）</text>
+
+  <rect x="20" y="830" width="1360" height="72" rx="4" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+  <text x="35" y="848" fill="#f8fafc" font-size="10" font-weight="bold">写入前检查（脚本防御，不依赖AI语义）:</text>
+  <text x="35" y="868" fill="#f87171" font-size="9">① target phase_state ∈ {absorbed, dropped} → REFUSE: "该 raw issue 已消费，请将评论写入 I-* 子 issue"</text>
+  <text x="35" y="886" fill="#f87171" font-size="9">② target platform_state = closed → REFUSE: "该 issue 已在平台关闭"</text>
+  <text x="35" y="904" fill="#4ade80" font-size="9">③ raw issue 有 absorbed_into 字段 → REDIRECT: 自动将评论写入 I-* 子 issue</text>
+
+  <!-- ====== SECTION 7: wt-create 改造入口 ====== -->
+  <text x="20" y="935" fill="#94a3b8" font-size="11">7. wt-create 状态更新（创建工位成功后自动触发）</text>
+
+  <rect x="20" y="950" width="1360" height="72" rx="4" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+  <text x="35" y="968" fill="#f8fafc" font-size="10" font-weight="bold">wt-create --source {chat-inbox|platform} 成功后:</text>
+  <text x="35" y="986" fill="#4ade80" font-size="9">① source=chat-inbox → chats.consumed=1 (已有) + 更新 raw issue phase_state=absorbed (新增)</text>
+  <text x="35" y="1002" fill="#4ade80" font-size="9">② source=platform → 更新 raw issue phase_state=consumed/absorbed (新增)</text>
+  <text x="35" y="1018" fill="#4ade80" font-size="9">③ 无论 source，如果同一 raw-key 已有工位，拒绝创建 (已有 _require_issue_exists 防御)</text>
+
+  <!-- legend -->
+  <rect x="20" y="1025" width="1360" height="20" rx="2"/>
+  <text x="35" y="1040" fill="#22c55e" font-size="8">── 脚本驱动（明确触发点）</text>
+  <text x="260" y="1040" fill="#f59e0b" font-size="8">── AI 语义驱动</text>
+  <text x="420" y="1040" fill="#ef4444" font-size="8">- - - 断档（无触发点）</text>
+</svg>
