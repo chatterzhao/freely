@@ -168,7 +168,83 @@ attempt_develop_push_followthrough_if_needed() {
   _sync_issues_changed_in_merge
 }
 
-# _sync_issues_changed_in_merge: after merge to develop, push local issue
+# _sync_issues_changed_in_merge: after merge to develop, update local
+# phase_state and push platform state changes.
+_sync_issues_changed_in_merge() {
+  local issues_dir="$PWD/docs/issues"
+  [[ -d "$issues_dir" ]] || return 0
+  [[ -x "$PWD/bin/issue-sync" ]] || return 0
+
+  local parent_sha
+  parent_sha=$(git rev-parse HEAD^ 2>/dev/null || true)
+  [[ -n "$parent_sha" ]] || return 0
+
+  local changed_issues synced=0
+  changed_issues=$(git diff --name-only "$parent_sha" HEAD -- "$issues_dir" | grep 'issue\.md$' | sed 's|docs/issues/||' | sed 's|/issue\.md$||' | sort -u)
+  [[ -n "$changed_issues" ]] || return 0
+
+  for local_id in $changed_issues; do
+    local issue_file="$issues_dir/$local_id/issue.md"
+    [[ -f "$issue_file" ]] || continue
+
+    local kind phase_status
+    kind=$(python3 -c "import yaml; f=open('$issue_file'); c=f.read(); p=c.split('---',2); fm=yaml.safe_load(p[1]) if len(p)>=3 else {}; print(fm.get('kind',''))" 2>/dev/null || true)
+    phase_status=$(python3 -c "import yaml; f=open('$issue_file'); c=f.read(); p=c.split('---',2); fm=yaml.safe_load(p[1]) if len(p)>=3 else {}; print(fm.get('phase_state', fm.get('status','')))" 2>/dev/null || true)
+
+    case "$kind/$phase_status" in
+      raw/proposed|raw/"")
+        _update_issue_phase "$issue_file" "absorbed"
+        echo "[MERGE-GUARD] issue-sync close $local_id (phase=absorbed)"
+        "$PWD/bin/issue-sync" close "$local_id" "completed" || true
+        synced=$((synced + 1))
+        ;;
+      linked/in_dev|linked/in_b2_ibm|linked/done_b2_ibm)
+        _update_issue_phase "$issue_file" "in_verification"
+        echo "[MERGE-GUARD] issue-sync update $local_id (phase=in_verification)"
+        "$PWD/bin/issue-sync" update "$local_id" || true
+        synced=$((synced + 1))
+        ;;
+      raw/absorbed|raw/dropped)
+        echo "[MERGE-GUARD] issue-sync close $local_id (phase=$phase_status)"
+        "$PWD/bin/issue-sync" close "$local_id" "completed" || true
+        synced=$((synced + 1))
+        ;;
+      linked/completed)
+        echo "[MERGE-GUARD] issue-sync update + close $local_id (phase=completed)"
+        "$PWD/bin/issue-sync" update "$local_id" || true
+        "$PWD/bin/issue-sync" close "$local_id" "completed" || true
+        synced=$((synced + 1))
+        ;;
+      linked/*)
+        echo "[MERGE-GUARD] issue-sync update $local_id"
+        "$PWD/bin/issue-sync" update "$local_id" || true
+        synced=$((synced + 1))
+        ;;
+    esac
+  done
+
+  if [[ "$synced" -gt 0 ]]; then
+    echo "[MERGE-GUARD] synced $synced issue(s) to platforms"
+  fi
+}
+
+# _update_issue_phase: set phase_state on an issue.md file.
+_update_issue_phase() {
+  local file="$1" new_phase="$2"
+  python3 -c "
+import yaml
+with open('$file') as f: c = f.read()
+p = c.split('---', 2)
+if len(p) >= 3:
+    fm = yaml.safe_load(p[1]) or {}
+    fm['phase_state'] = '$new_phase'
+    new_fm = yaml.dump(fm, default_flow_style=False, allow_unicode=True, sort_keys=False).strip()
+    with open('$file', 'w') as f: f.write('---
+' + new_fm + '
+---' + p[2])
+" 2>/dev/null || true
+}
+
 # state changes to platforms. Only runs for issues in the merge diff.
 _sync_issues_changed_in_merge() {
   local issues_dir="$PWD/docs/issues"
@@ -193,6 +269,36 @@ _sync_issues_changed_in_merge() {
     phase_status=$(python3 -c "import yaml; f=open('$issue_file'); c=f.read(); p=c.split('---',2); fm=yaml.safe_load(p[1]) if len(p)>=3 else {}; print(fm.get('phase_state', fm.get('status','')))" 2>/dev/null || true)
 
     case "$kind/$phase_status" in
+      raw/proposed|raw/"")
+        python3 -c "
+import yaml
+with open('$issue_file') as f: c = f.read()
+p = c.split('---', 2)
+if len(p) >= 3:
+    fm = yaml.safe_load(p[1]) or {}
+    fm['phase_state'] = 'absorbed'
+    new_fm = yaml.dump(fm, default_flow_style=False, allow_unicode=True, sort_keys=False).strip()
+    with open('$issue_file', 'w') as f: f.write('---\n' + new_fm + '\n---' + p[2])
+" 2>/dev/null || true
+        echo "[MERGE-GUARD] issue-sync close $local_id (phase=absorbed)"
+        "$PWD/bin/issue-sync" close "$local_id" "completed" || true
+        synced=$((synced + 1))
+        ;;
+      linked/in_dev|linked/in_b2_ibm|linked/done_b2_ibm)
+        python3 -c "
+import yaml
+with open('$issue_file') as f: c = f.read()
+p = c.split('---', 2)
+if len(p) >= 3:
+    fm = yaml.safe_load(p[1]) or {}
+    fm['phase_state'] = 'in_verification'
+    new_fm = yaml.dump(fm, default_flow_style=False, allow_unicode=True, sort_keys=False).strip()
+    with open('$issue_file', 'w') as f: f.write('---\n' + new_fm + '\n---' + p[2])
+" 2>/dev/null || true
+        echo "[MERGE-GUARD] issue-sync update $local_id (phase=in_verification)"
+        "$PWD/bin/issue-sync" update "$local_id" || true
+        synced=$((synced + 1))
+        ;;
       raw/absorbed|raw/dropped)
         echo "[MERGE-GUARD] issue-sync close $local_id (phase=$phase_status)"
         "$PWD/bin/issue-sync" close "$local_id" "completed" || true
