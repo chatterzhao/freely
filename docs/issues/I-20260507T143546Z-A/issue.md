@@ -2,19 +2,20 @@
 local_id: I-20260507T143546Z-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
+absorbed_at: '2026-05-16T14:27:11Z'
 promoted_from: raw-20260507T143546Z
 source_candidate: docs/pre-brainstorms/20260507T143546Z--platform-pull-standardize/candidates.md
-canonical_issue_path: ""
+canonical_issue_path: ''
 platform_ids:
   github:
     issue_id: '249'
-primary_platform: ""
-created_at: 2026-05-07T14:35:46Z
+primary_platform: ''
+created_at: 2026-05-07 14:35:46+00:00
 session_refs: []
 pre_tests_path: docs/epics/platform-pull-standardize/verification/pre-tests.md
 verification_artifact_dir: docs/epics/platform-pull-standardize/code-reviews
 platform_state: closed
+updated_at: '2026-05-17T12:25:37Z'
 ---
 
 # I-20260507T143546Z-A: platform pull 标题标准化

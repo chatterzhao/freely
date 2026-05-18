@@ -2,19 +2,19 @@
 local_id: I-20260507T143544Z-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
+absorbed_at: '2026-05-16T14:27:11Z'
 promoted_from: raw-20260507T143544Z
 source_candidate: docs/pre-brainstorms/20260507T143544Z--intercept-guard/candidates.md
-canonical_issue_path: ""
+canonical_issue_path: ''
 platform_ids:
   github:
     issue_id: '247'
-primary_platform: ""
+primary_platform: ''
 last_synced_comment_at: {}
-hash: ""
-created_at: 2026-05-07T14:35:44Z
-updated_at: 2026-05-07T14:35:44Z
-intake_id: ""
+hash: ''
+created_at: 2026-05-07 14:35:44+00:00
+updated_at: '2026-05-17T12:25:30Z'
+intake_id: ''
 author: zhaoquan
 channel: feat-execution
 session_refs: []
