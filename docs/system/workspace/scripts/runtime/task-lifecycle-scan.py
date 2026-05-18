@@ -546,7 +546,7 @@ def scan_classification(project: Path, platform_data: dict) -> list[dict]:
 
 # ── Main ─────────────────────────────────────────────────
 
-def build_payload(project: Path) -> dict:
+def build_payload(project: Path, raw_key: str = "") -> dict:
     output = []
 
     # Phase 0: Batch OPEN platform issues (1 API)
@@ -561,7 +561,7 @@ def build_payload(project: Path) -> dict:
     output.extend(class_items)
 
     # Phase 3: Lifecycle chain trace (zero API — uses platform_data)
-    chain_items = scan_chain_trace(project, platform_data)
+    chain_items = scan_chain_trace(project, platform_data, raw_key_filter=raw_key)
     for c in chain_items:
         # Derive title from available station data
         title = f"raw-{c['key']}"
@@ -596,6 +596,11 @@ def build_payload(project: Path) -> dict:
     if not os.environ.get("SKIP_PLATFORM_CHECK"):
         remote_items = scan_remote_branch_governance(project)
         output.extend(remote_items)
+
+    # When raw_key is specified, filter output to only items matching this key.
+    # This ensures the prompt builder gets only the targeted raw→I chain.
+    if raw_key:
+        output = [o for o in output if _matches_raw_key_filter(o, raw_key)]
 
     by_stage = {}
     for o in output:
@@ -791,18 +796,14 @@ CHAIN_STATIONS = [
     ("worktree_retired","工位退役",                 "worktree removed"),
 ]
 
-def _all_base_keys(project: Path) -> set[str]:
+def _all_base_keys(project: Path, raw_key_filter: str = "") -> set[str]:
     """Collect base keys from true origins only.
 
-    True origins (the only places a raw issue is born):
-      1. chats table (consumed=0, chat_type='new-issue') → human/AI creates via chat
-      2. Platform API (GitHub/Gitee open issues) → external user opens issue
-
-    docs/issues/raw-* is NOT an origin — it is a localization created downstream
-    by wt-create (materializing from chat_inbox) or issue-sync (syncing from platform).
-    The chain trace checks raw-* existence at station 0, but key discovery must
-    come from the real entry points.
+    When raw_key_filter is set, only return that one key — used by --raw-key scan.
     """
+    if raw_key_filter:
+        return {raw_key_filter}
+
     keys = set()
 
     # Source 1: SQLite chat inbox (unconsumed new-issue entries)
@@ -1354,7 +1355,7 @@ def _pending_comments_for_key(project: Path, key: str) -> int:
         return 0
 
 
-def scan_chain_trace(project: Path, platform_data: dict) -> list[dict]:
+def scan_chain_trace(project: Path, platform_data: dict, raw_key_filter: str = "") -> list[dict]:
     """Trace the full lifecycle chain for every unique base key.
 
     Returns one item per key with:
@@ -1365,7 +1366,7 @@ def scan_chain_trace(project: Path, platform_data: dict) -> list[dict]:
       - paths: file paths for quick location (raw_file, b1_dir, i_files)
       - pending_comments: count of unconsumed comments for this key
     """
-    keys = _all_base_keys(project)
+    keys = _all_base_keys(project, raw_key_filter=raw_key_filter)
     results = []
     for key in sorted(keys):
         trace = _trace_chain(project, key, platform_data)
@@ -1558,6 +1559,19 @@ def _derive_governance_action(dirty: bool, merged: bool | None) -> str:
     return "已 merge，退役工位并删除分支"
 
 
+def _matches_raw_key_filter(item: dict, raw_key: str) -> bool:
+    """Check if an item belongs to the specified raw_key."""
+    # Direct key match
+    if item.get("key") == raw_key:
+        return True
+    # raw_id match (raw_id = "raw-20260518T040847Z")
+    rid = item.get("raw_id", "")
+    if rid.startswith("raw-") and rid[4:] == raw_key:
+        return True
+    # platform items store key as gh-{number}, match via raw_id
+    return False
+
+
 # ── Remote branch governance scan ─────────────────────
 
 def _configured_remotes(project: Path) -> list[str]:
@@ -1663,9 +1677,14 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--project", required=True)
     parser.add_argument("--json", action="store_true", default=True)
+    parser.add_argument("--raw-key", default="", help="只扫描指定 raw key（如 20260518T040847Z），不传时全量扫描")
     args = parser.parse_args()
     project = Path(args.project).resolve()
-    payload = build_payload(project)
+    raw_key = args.raw_key
+    # Strip raw- prefix if present
+    if raw_key.startswith("raw-"):
+        raw_key = raw_key[4:]
+    payload = build_payload(project, raw_key=raw_key)
     json.dump(payload, sys.stdout, indent=2, sort_keys=True, ensure_ascii=False)
     sys.stdout.write("\n")
     return 0
