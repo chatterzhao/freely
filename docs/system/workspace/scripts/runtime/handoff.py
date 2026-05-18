@@ -156,12 +156,29 @@ def insert(role, raw_key, prompt_file, worktree="", branch="",
     return hid
 
 
+def _validate_terminal_fields(status, exit_kind, reason, consumed_by):
+    """Validate mandatory fields for terminal states. Returns error string or None."""
+    if status == "rejected" and not reason:
+        return "rejected handoff requires --reason (why was it rejected? e.g. 'develop rejected: only cleanup allowed')"
+    if status == "blocked" and not reason:
+        return "blocked handoff requires --reason (what blocked it? e.g. 'stale_pid: worker process died')"
+    if status in ("rejected", "blocked", "completed") and not exit_kind:
+        return "terminal status '{}' requires --exit-kind (e.g. launch_failed, stale_pid, completed)".format(status)
+    if status == "consumed" and not consumed_by:
+        return "consumed handoff requires --consumed-by (who consumed it? e.g. 'manager')"
+    return None
+
+
 def update_status(handoff_id, status, expected_status, exit_kind="",
                   session_id="", reason="", restart_point="", next_action="",
                   completion_summary="", evidence_paths="",
                   worker_prompts_csv=""):
     """Update status with mandatory optimistic locking.
     UPDATE always uses WHERE status=expected_status."""
+    err = _validate_terminal_fields(status, exit_kind, reason, "")
+    if err:
+        sys.stderr.write("[handoff] VALIDATION ERROR: {}\n".format(err))
+        sys.stderr.write("[handoff] handoff_id={} status={}\n".format(handoff_id, status))
     conn = _connect()
     now = _now_utc()
     cols = ["status=?", "updated_at=?"]
