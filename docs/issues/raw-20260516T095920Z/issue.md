@@ -1,7 +1,6 @@
 ---
 local_id: raw-20260516T095920Z
 kind: raw
-status: closed
 phase_state: dropped
 updated_at: '2026-05-16T12:00:00Z'
 closeout_note: "fix directly merged to develop via fix/raw-20260512T0915Z-worker-blocked-reason without I-* lifecycle chain"
@@ -20,6 +19,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 ## raw-20260516T095920Z

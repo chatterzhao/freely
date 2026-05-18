@@ -1,7 +1,7 @@
 ---
 kind: raw
 priority: P2
-status: open
+phase_state: open
 source: chat-inbox
 created_at: '2026-05-17T08:03:25Z'
 title: 'supervisor crash: bash rc=0'

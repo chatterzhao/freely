@@ -1,7 +1,6 @@
 ---
 local_id: raw-20260517T083030Z
 kind: raw
-status: proposed
 phase_state: proposed
 platform_ids:
   github:
@@ -18,6 +17,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: open
 ---
 
 ## raw-20260517T083030Z

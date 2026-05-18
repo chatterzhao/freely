@@ -1,7 +1,6 @@
 ---
 local_id: I-20260506T1200Z-A
 kind: linked
-status: completed
 phase_state: absorbed
 source_candidate: docs/pre-brainstorms/20260506-ibm-skill-rename/candidates.md
 milestone: M-20260506T1200Z-A

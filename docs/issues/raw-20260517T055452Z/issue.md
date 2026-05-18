@@ -5,7 +5,6 @@ phase_state: absorbed
 absorbed_into: I-20260413-0420-A
 absorbed_at: "2026-05-17T08:37:00Z"
 priority: P2
-status: closed
 source: chat-inbox
 created_at: '2026-05-17T05:54:52Z'
 title: 'supervisor crash: bash rc=0'

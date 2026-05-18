@@ -1,7 +1,6 @@
 ---
 local_id: I-20260509T022152Z-A
 kind: linked
-status: completed
 phase_state: absorbed
 promoted_from: raw-20260509T022152Z
 source_candidate: docs/pre-brainstorms/20260509T022152Z--worker-launch-writable-redirect/candidates.md

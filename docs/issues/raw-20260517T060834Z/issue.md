@@ -1,7 +1,6 @@
 ---
 local_id: raw-20260517T060834Z
 kind: raw
-status: closed
 phase_state: absorbed
 absorbed_into: I-20260413-0420-A
 absorbed_at: "2026-05-17T08:37:00Z"
@@ -20,6 +19,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 ## raw-20260517T060834Z

@@ -1,7 +1,6 @@
 ---
 local_id: raw-20260517T003441Z
 kind: raw
-status: proposed
 phase_state: completed
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 platform_ids:
@@ -19,6 +18,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: open
 ---
 
 ## raw-20260517T003441Z

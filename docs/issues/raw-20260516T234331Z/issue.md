@@ -1,7 +1,6 @@
 ---
 kind: raw
 priority: P2
-status: closed
 source: chat-inbox
 created_at: '2026-05-16T23:43:31Z'
 title: 统一反馈机制：Runtime/Worker 都通过 handoff 记录向 Manager 汇报，Manager 消费 unconsumed 记录形成闭环
