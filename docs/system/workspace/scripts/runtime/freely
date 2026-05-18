@@ -9863,18 +9863,14 @@ worker_prompt_launchable_for_manager_project() {
     hotfix/*) ;;  # emergency fixes
     develop)
       if [[ "$(worker_prompt_normalized_intent_kind "$prompt_file")" != "cleanup" ]]; then
-        log_warn "worker_prompt_launchable: rejected branch '$target_branch' — non-cleanup worker must run on fix/* or feature/*"
-        log_warn "  如果工位不存在，用 wt-create 创建: ./bin/wt-create --raw-key <key> --source platform --skill freely-fix-execution --slug <slug>"
-        log_warn "  参数不清楚用 ./bin/wt-create --help"
-        log_warn "  如果工位不存在，用 wt-create 创建: ./bin/wt-create --raw-key <key> --source platform --skill freely-fix-execution --slug <slug>"
-        log_warn "  参数不清楚用 ./bin/wt-create --help"
+        LAUNCH_REJECT_REASON="develop rejected: only cleanup intent allowed, got '$(worker_prompt_normalized_intent_kind "$prompt_file")'"
+        log_warn "worker_prompt_launchable: $LAUNCH_REJECT_REASON"
         return 1
       fi
       ;;
     *)
-      log_warn "worker_prompt_launchable: rejected branch '$target_branch' — worker must run on fix/* or feature/*"
-        log_warn "  如果工位不存在，用 wt-create 创建: ./bin/wt-create --raw-key <key> --source platform --skill freely-fix-execution --slug <slug>"
-        log_warn "  参数不清楚用 ./bin/wt-create --help"
+      LAUNCH_REJECT_REASON="rejected: branch='$target_branch' not fix/*|feature/*|hotfix/* — create a worktree with wt-create"
+      log_warn "worker_prompt_launchable: $LAUNCH_REJECT_REASON"
       return 1
       ;;
   esac
@@ -12144,10 +12140,11 @@ WORKER_HANDOFF_INJECT
             --handoff-id "$_handoff_id" --status "launched" --expected-status "pending" >/dev/null 2>&1 || true
         fi
       else
-        log_warn "worker launch failed: $(basename "$_prompt_file")"
+        log_warn "worker launch failed: $(basename "$_prompt_file") — ${LAUNCH_REJECT_REASON:-launchable check failed}"
         if [[ -n "$_handoff_id" && -f "$_handoff_py" && -f "$_db_path" ]]; then
           python3 "$_handoff_py" update --db "$_db_path" \
-            --handoff-id "$_handoff_id" --status "rejected" --expected-status "pending" --exit-kind "launch_failed" >/dev/null 2>&1 || true
+            --handoff-id "$_handoff_id" --status "rejected" --expected-status "pending" --exit-kind "launch_failed" \
+            --reason "${LAUNCH_REJECT_REASON:-launchable check failed}" >/dev/null 2>&1 || true
         fi
       fi
     done
