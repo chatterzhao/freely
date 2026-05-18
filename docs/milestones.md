@@ -5326,6 +5326,7 @@ routing_policy:
 ### candidate_issues
 1. `C-20260518T020345Z-A`
 - milestone: M-20260518T020345Z-A
-- status: needs_research
+- status: promoted
 - decision_reason: GitHub #538 提出对外 CLI 接口需求，复用现有 _write_chat_to_issue 基础设施
 - source_candidate: `docs/pre-brainstorms/20260518T020345Z--freely-comment/candidates.md`
+- promoted_issue_path: docs/issues/I-20260518T020345Z-A/issue.md
