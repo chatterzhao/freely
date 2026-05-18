@@ -2,7 +2,7 @@
 local_id: I-20260514T001746Z-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
+absorbed_at: '2026-05-16T14:27:11Z'
 promoted_from: raw-20260514T001746Z
 source_candidate: docs/pre-brainstorms/20260514T001746Z--stdio-transport/candidates.md#C-20260514T001746Z-A
 verification_artifact_dir: docs/epics/stdio-transport/code-reviews
@@ -12,7 +12,8 @@ platform_ids:
     issue_id: '339'
     url: https://github.com/chatterzhao/freely/issues/339
 primary_platform: github
-platform_state: open
+platform_state: closed
+updated_at: '2026-05-17T12:26:23Z'
 ---
 
 # I-20260514T001746Z-A: StdioTransport for run-acp-prompt.py
