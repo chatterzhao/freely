@@ -2,7 +2,7 @@
 local_id: I-20260514T050327Z-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
+absorbed_at: '2026-05-16T14:27:11Z'
 promoted_from: raw-20260514T050327Z
 source_candidate: docs/pre-brainstorms/20260514T050327Z--while-then-typo/candidates.md#C-20260514T050327Z-A
 verification_artifact_dir: docs/epics/while-then-typo/code-reviews
@@ -12,7 +12,8 @@ platform_ids:
     issue_id: '342'
     url: https://github.com/chatterzhao/freely/issues/342
 primary_platform: github
-platform_state: open
+platform_state: closed
+updated_at: '2026-05-17T12:26:28Z'
 ---
 
 # I-20260514T050327Z-A: fix while/then typo

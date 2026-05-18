@@ -44,7 +44,8 @@ Manager 的任务来自两个不同的数据源，每个 patrol 必须按顺序�
 1. **消费 handoffs**：先查 completed/blocked worker，处理它们的汇报
 2. **读 scan 数据**：不要重新运行 scan——数据已在 prompt 里
 3. **分类条目**：按 stage 分类，确定每类的处理方式
-4. **决策出口**：委派 worker、自己处理（resume）、或停止（stop_ai）
+4. **委派前逐条过时检查**：① phase_state 已是 absorbed/dropped？跳过 ② 已有同名 fix/feature 分支？复用不重建 ③ 已有 B1/B2 产出？推进不重做 ④ 平台已关但本地未同步？走 closeout 不走开发流程
+5. **决策出口**：委派 worker、自己处理（resume）、或停止（stop_ai）
 
 ### Scan stage → 行动映射
 

@@ -2,7 +2,7 @@
 local_id: I-20260513T075904Z-A
 kind: linked
 phase_state: absorbed
-absorbed_at: "2026-05-16T14:27:11Z"
+absorbed_at: '2026-05-16T14:27:11Z'
 promoted_from: raw-20260513T075904Z
 source_candidate: docs/pre-brainstorms/20260513T075904Z--merge-guarded-phase-state-fix/candidates.md#C-20260513T075904Z-A
 verification_artifact_dir: docs/epics/merge-guarded-phase-state-fix/code-reviews
@@ -13,7 +13,8 @@ platform_ids:
     url: https://github.com/chatterzhao/freely/issues/329
     synced_at: '2026-05-13T07:59:10Z'
 primary_platform: github
-platform_state: open
+platform_state: closed
+updated_at: '2026-05-17T12:26:07Z'
 ---
 
 # I-20260513T075904Z-A: merge-guarded post-merge sync phase_state fix
