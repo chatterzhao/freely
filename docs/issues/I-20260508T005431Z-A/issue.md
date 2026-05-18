@@ -1,7 +1,6 @@
 ---
 local_id: I-20260508T005431Z-A
 kind: linked
-status: completed
 phase_state: completed
 promoted_from: raw-20260508T005431Z
 source_candidate: docs/pre-brainstorms/20260508T005431Z--skill-standardize/candidates.md

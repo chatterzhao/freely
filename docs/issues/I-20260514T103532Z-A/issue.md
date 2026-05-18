@@ -1,7 +1,6 @@
 ---
 local_id: I-20260514T103532Z-A
 kind: linked
-status: in_dev
 phase_state: completed
 promoted_from: raw-20260514T103532Z
 source_candidate: docs/pre-brainstorms/20260514T103532Z--agent-handoff-protocol/candidates.md

@@ -199,7 +199,7 @@ def materialize(db_path: str, chat_id: int, target_dir: str) -> bool:
             f"---\n"
             f"local_id: {issue_id}\n"
             f"kind: raw\n"
-            f"status: proposed\n"
+            f"phase_state: proposed\n"
             f"platform_ids: {{}}\n"
             f"primary_platform: \"\"\n"
             f"canonical_issue_path: \"\"\n"

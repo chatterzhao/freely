@@ -2,7 +2,6 @@
 kind: raw
 local_id: raw-20260517T073433Z
 priority: P2
-status: open
 source: chat-inbox
 created_at: '2026-05-17T07:34:34Z'
 title: 时间戳生成处缺少 Z 时区标识，应统一使用 UTC+Z 格式

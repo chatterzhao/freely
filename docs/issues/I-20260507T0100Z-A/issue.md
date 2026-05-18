@@ -1,7 +1,6 @@
 ---
 local_id: I-20260507T0100Z-A
 kind: linked
-status: completed
 phase_state: in_dev
 source_candidate: docs/pre-brainstorms/20260507-fix-branch-naming/candidates.md
 milestone: M-20260507T0100Z-A

@@ -1,7 +1,7 @@
 ---
 kind: raw
 priority: P2
-status: open
+phase_state: open
 source: chat-inbox
 created_at: '2026-05-17T09:33:15Z'
 title: session UUID 提取用 head -1 读到空行，导致 session 永不被持久化，cache 命中率为零

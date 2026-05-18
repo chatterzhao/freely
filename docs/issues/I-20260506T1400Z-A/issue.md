@@ -1,7 +1,6 @@
 ---
 local_id: I-20260506T1400Z-A
 kind: linked
-status: completed
 phase_state: in_dev
 source_candidate: docs/pre-brainstorms/20260506-merge-guarded-fix/candidates.md
 milestone: M-20260506T1400Z-A

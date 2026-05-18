@@ -358,7 +358,6 @@ def pull_raw_issue(raw_key: str, target_dir: Path) -> Optional[dict]:
     frontmatter = {
         "local_id": f"raw-{raw_key}",
         "kind": "raw",
-        "status": "proposed",
         "phase_state": phase,
         "platform_ids": platform_ids,
         "primary_platform": platform,

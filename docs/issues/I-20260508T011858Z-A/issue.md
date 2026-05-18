@@ -1,7 +1,6 @@
 ---
 local_id: I-20260508T011858Z-A
 kind: linked
-status: completed
 phase_state: absorbed
 absorbed_at: "2026-05-16T14:27:11Z"
 promoted_from: raw-20260508T011858Z

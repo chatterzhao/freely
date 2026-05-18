@@ -2,7 +2,6 @@
 kind: raw
 local_id: raw-20260517T053537Z
 priority: P2
-status: closed
 source: chat-inbox
 created_at: '2026-05-17T05:35:37Z'
 title: 'supervisor crash: bash rc=0'

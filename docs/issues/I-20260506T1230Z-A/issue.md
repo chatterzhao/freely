@@ -1,7 +1,6 @@
 ---
 local_id: I-20260506T1230Z-A
 kind: linked
-status: completed
 phase_state: in_dev
 source_candidate: docs/pre-brainstorms/20260506-wt-create-dual/candidates.md
 milestone: M-20260506T1230Z-A

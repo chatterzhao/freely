@@ -20074,8 +20074,8 @@ HELP
 ---
 kind: raw
 priority: ${severity}
-status: open
-source: chat-inbox
+phase_state: proposed
+source: feedback
 created_at: "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 title: "${title}"
 ---

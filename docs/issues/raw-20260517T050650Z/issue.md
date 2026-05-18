@@ -1,7 +1,6 @@
 ---
 kind: raw
 priority: P2
-status: closed
 source: chat-inbox
 created_at: '2026-05-17T05:06:50Z'
 title: 'worker 使用非标准 exit_kind: completed，应为 worker_done'
