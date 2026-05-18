@@ -17,9 +17,12 @@
   - 消息写入 freely.db → materialize → consume
   - 在 usage 中可见
 - promotion_gate: cmd_comment 实现完成、main case 路由就绪、usage 更新
-- open_questions:
-  - 是否需要在 --issue 接受 raw-key 简写（如 `20260518T020345Z` 而非 `raw-20260518T020345Z`）？
-- acceptance_reviews: []
+- open_questions: []
+- acceptance_reviews:
+  - reviewer: claude-opus-4.7
+    mode: subagent
+    summary: B1 research confirmed the freely comment command is well-scoped, reuses existing _write_chat_to_issue infrastructure, and has clear boundaries. Recommend promotion to B2.
+    verdict: pass
 - promoted_issue_path: ""
 - milestone: M-20260518T020345Z-A
 - session_refs: []
