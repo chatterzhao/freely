@@ -12,11 +12,14 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-19T19:08:38Z'
-updated_at: '2026-05-19T19:08:38Z'
+updated_at: '2026-05-19T19:19:32Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
+force_closed_at: '2026-05-19T19:19:32Z'
+force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
 ---
 
 ## raw-20260519T190823Z
