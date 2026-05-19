@@ -8,7 +8,8 @@ platform_ids:
     url: https://github.com/chatterzhao/freely/issues/612
     synced_at: ''
 primary_platform: github
-canonical_issue_path: ''
+canonical_issue_path: docs/issues/I-20260514T103532Z-A/issue.md
+absorbed_into: I-20260514T103532Z-A
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-19T03:35:43Z'
