@@ -5329,3 +5329,14 @@ routing_policy:
 - status: needs_research
 - decision_reason: GitHub #538 提出对外 CLI 接口需求，复用现有 _write_chat_to_issue 基础设施
 - source_candidate: `docs/pre-brainstorms/20260518T020345Z--freely-comment/candidates.md`
+
+
+## M-20260518T020406Z-A
+- title: chats 表扩展 conversation_id + chat-message 类型 + scan 对齐
+- status: active
+### candidate_issues
+1. `C-20260518T020406Z-A`
+- milestone: M-20260518T020406Z-A
+- status: needs_research
+- decision_reason: Raw issue #539 提出 chat 体系的第三个类型（chat-message），依赖的 #538 freely comment 已合并到 develop，comment 基础设施可用。改动范围明确（不新增表），向后兼容（conversation_id=0 默认值）。
+- source_candidate: `docs/pre-brainstorms/20260518T020406Z--chat-conversation-extension/candidates.md`
