@@ -357,9 +357,9 @@ def auto_consume(raw_key):
     conn = _connect()
     now = _now_utc()
     cur = conn.execute(
-        "UPDATE handoffs SET status='consumed', consumed_by='manager', updated_at=?, completed_at=? "
+        "UPDATE handoffs SET status='consumed', updated_at=?, completed_at=? "
         "WHERE raw_key=? AND role='worker' "
-        "AND status IN ('completed','blocked','rejected') AND consumed_by=''",
+        "AND status IN ('completed','blocked','rejected')",
         (now, now, raw_key))
     affected = cur.rowcount
     conn.commit()

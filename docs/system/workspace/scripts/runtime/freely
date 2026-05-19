@@ -17522,7 +17522,7 @@ append_manager_handoff_context_if_needed() {
   _db_path="$project/.freely/freely.db"
   [[ -f "$_handoff_py" && -f "$_db_path" ]] || return 0
 
-  # Unconsumed workers: completed/blocked/rejected with consumed_by=''
+  # Unconsumed workers: status not 'consumed' (consumed_by is routing)
   local unconsumed
   unconsumed=$(python3 -c "
 import json,subprocess,sys
@@ -17533,7 +17533,7 @@ for st in ['completed','blocked','rejected']:
                      capture_output=True,text=True,timeout=5)
     if r.returncode==0:
         rows=json.loads(r.stdout)
-        unconsumed.extend([r for r in rows if not r.get('consumed_by','')])
+        unconsumed.extend([r for r in rows if r.get('status','') != 'consumed'])
 for r in unconsumed[:10]:
     print(f\"- {r.get('handoff_id','?')[:20]} exit={r.get('exit_kind','?')} status={r.get('status','?')} summary={r.get('completion_summary','')[:60]} reason={r.get('reason','')[:60]} next_action={r.get('next_action','')[:60]}\")
 if not unconsumed:
