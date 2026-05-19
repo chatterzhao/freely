@@ -1,4 +1,12 @@
 # Pre-brainstorm 索引（IBM Framework B1）
+- 20260519T145435Z--supervisor-crash-batch2
+  - brainstorms: docs/pre-brainstorms/20260519T145435Z--supervisor-crash-batch2/brainstorms.md
+- 20260519T015638Z--stale-pid
+  - brainstorms: docs/pre-brainstorms/20260519T015638Z--stale-pid/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260519T015638Z--stale-pid/candidates.md
+- 20260519T004246Z--agent-docs-fix
+  - brainstorms: docs/pre-brainstorms/20260519T004246Z--agent-docs-fix/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260519T004246Z--agent-docs-fix/candidates.md
 - 20260518T020345Z--freely-comment
   - brainstorms: docs/pre-brainstorms/20260518T020345Z--freely-comment/brainstorms.md
   - candidates: docs/pre-brainstorms/20260518T020345Z--freely-comment/candidates.md

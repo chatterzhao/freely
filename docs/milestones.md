@@ -5347,3 +5347,129 @@ routing_policy:
 - milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260518T020406Z-A/issue.md`
+
+## M-20260519T004246Z-A
+- title: agent 文档修复 — handoff 必填/互斥字段对齐 + 路径修正
+- status: active
+### candidate_issues
+1. `C-20260519T004246Z-A`
+- milestone: M-20260519T004246Z-A
+- status: needs_research
+- decision_reason: raw-20260519T004246Z (GitHub #581) 报告 agent 文档中 4 个致命 handoff 字段一致性问题，验证后 #1 (handoff.py REQUIRED_FIELDS 缺 evidence_paths) 仍需修复，#2-#4 已在前次 hygiene checkpoint 中修复
+- next_action: handoff.py REQUIRED_FIELDS 增加 evidence_paths，覆盖 validate_handoff_json 对缺失 evidence_paths 的拒绝逻辑
+- revisit_trigger: 当 handoff.py evidence_paths 验证就位后重新评估
+- acceptance_criteria:
+  - handoff.py REQUIRED_FIELDS worker_done 增加 evidence_paths
+  - validate_handoff_json 准确拒绝缺失 evidence_paths 的 worker_done
+  - 不影响其他 exit_kind 的字段验证
+- source_candidate: `docs/pre-brainstorms/20260519T004246Z--agent-docs-fix/candidates.md`
+
+## M-20260519T015638Z-A
+- title: systematic stale_pid — worker process exits before handoff
+- status: active
+### candidate_issues
+1. `C-20260519T015638Z-A`
+- milestone: M-20260519T015638Z-A
+- status: needs_research
+- decision_reason: raw-20260519T015638Z (GitHub #601) 报告 21 次连续 worker stale_pid 退出，影响所有活跃 worktree，导致 fleet cleanup 停摆。需 root cause 研究
+- next_action: 研究 supervisor/ACP 交互时序，确定 stale_pid 是 mark_stale 假阳性还是 ACP disconnect 所致
+- revisit_trigger: 完成 worker launch/handoff 全链路时序研究后重新评估
+- acceptance_criteria:
+  - 确定 root cause 代码位置
+  - 短期缓解措施（如调整 mark_stale 超时）
+  - 长期修复方案
+- source_candidate: `docs/pre-brainstorms/20260519T015638Z--stale-pid/candidates.md`
+
+## M-20260519T011323Z-A
+- title: supervisor bash rc=0 crash (absorbed)
+- status: active
+### candidate_issues
+1. `C-20260519T011323Z-A`
+- milestone: M-20260519T011323Z-A
+- status: absorbed
+- absorbed_by: C-20260517T083030Z-A
+- decision_reason: raw-20260519T011323Z (GitHub #598) 已被已有 pre-brainstorms 覆盖，吸收到 C-20260517T083030Z-A
+- source_candidate: `docs/pre-brainstorms/20260519T145435Z--supervisor-crash-batch2/brainstorms.md`
+
+## M-20260519T091827Z-A
+- title: supervisor bash rc=0 crash (absorbed)
+- status: active
+### candidate_issues
+1. `C-20260519T091827Z-A`
+- milestone: M-20260519T091827Z-A
+- status: absorbed
+- absorbed_by: C-20260517T083030Z-A
+- decision_reason: raw-20260519T091827Z (GitHub #647) 已被已有 pre-brainstorms 覆盖，吸收到 C-20260517T083030Z-A
+- source_candidate: `docs/pre-brainstorms/20260519T145435Z--supervisor-crash-batch2/brainstorms.md`
+
+## M-20260519T094157Z-A
+- title: supervisor bash rc=0 crash (absorbed)
+- status: active
+### candidate_issues
+1. `C-20260519T094157Z-A`
+- milestone: M-20260519T094157Z-A
+- status: absorbed
+- absorbed_by: C-20260517T083030Z-A
+- decision_reason: raw-20260519T094157Z (GitHub #648) 已被已有 pre-brainstorms 覆盖，吸收到 C-20260517T083030Z-A
+- source_candidate: `docs/pre-brainstorms/20260519T145435Z--supervisor-crash-batch2/brainstorms.md`
+
+## M-20260519T102151Z-A
+- title: supervisor bash rc=0 crash (absorbed)
+- status: active
+### candidate_issues
+1. `C-20260519T102151Z-A`
+- milestone: M-20260519T102151Z-A
+- status: absorbed
+- absorbed_by: C-20260517T083030Z-A
+- decision_reason: raw-20260519T102151Z (GitHub #651) 已被已有 pre-brainstorms 覆盖，吸收到 C-20260517T083030Z-A
+- source_candidate: `docs/pre-brainstorms/20260519T145435Z--supervisor-crash-batch2/brainstorms.md`
+
+## M-20260519T113307Z-A
+- title: supervisor bash rc=0 crash (absorbed)
+- status: active
+### candidate_issues
+1. `C-20260519T113307Z-A`
+- milestone: M-20260519T113307Z-A
+- status: absorbed
+- absorbed_by: C-20260517T083030Z-A
+- decision_reason: raw-20260519T113307Z (GitHub #653) 已被已有 pre-brainstorms 覆盖，吸收到 C-20260517T083030Z-A
+- source_candidate: `docs/pre-brainstorms/20260519T145435Z--supervisor-crash-batch2/brainstorms.md`
+
+## M-20260519T130500Z-A
+- title: supervisor bash rc=0 crash (absorbed)
+- status: active
+### candidate_issues
+1. `C-20260519T130500Z-A`
+- milestone: M-20260519T130500Z-A
+- status: absorbed
+- absorbed_by: C-20260517T083030Z-A
+- decision_reason: raw-20260519T130500Z (GitHub #654) 已被已有 pre-brainstorms 覆盖，吸收到 C-20260517T083030Z-A
+- source_candidate: `docs/pre-brainstorms/20260519T145435Z--supervisor-crash-batch2/brainstorms.md`
+
+## M-20260519T145453Z-A
+- title: supervisor bash rc=0 crash (absorbed)
+- status: active
+### candidate_issues
+1. `C-20260519T145453Z-A`
+- milestone: M-20260519T145453Z-A
+- status: absorbed
+- absorbed_by: C-20260517T083030Z-A
+- decision_reason: raw-20260519T145453Z (GitHub #656) 已被已有 pre-brainstorms 覆盖，吸收到 C-20260517T083030Z-A
+- source_candidate: `docs/pre-brainstorms/20260519T145435Z--supervisor-crash-batch2/brainstorms.md`
+
+## M-20260519T145435Z-A
+- title: consumed_by routing + auto_consume deferred to wt-close
+- status: active
+### candidate_issues
+1. `C-20260519T145435Z-A`
+- milestone: M-20260519T145435Z-A
+- status: needs_research
+- decision_reason: raw-20260519T145435Z (GitHub #655) 提出 consumed_by 路由字段设计 + auto_consume 应从 Manager runtime 移到 wt-close。与 handoff 协议核心有关
+- next_action: 评审 handoff.py 中 consumed_by 设置逻辑和 auto_consume 的调用位置，确定改动范围和兼容性
+- revisit_trigger: handoff 消费时序设计评审完成后重新评估
+- acceptance_criteria:
+  - consumed_by INSERT 时设为 manager（而非 worker）
+  - auto_consume 从 Manager runtime 移到 wt-close
+  - wt-close 按 branch 提取 raw_key 执行 auto_consume
+  - 不影响已有 DB 记录
+- source_candidate: （本 worktree 直接设计实现）
