@@ -73,7 +73,7 @@ validate_merge_direction() {
   if [[ "$allowed" == "1" ]]; then
     case "$source_branch" in
       fix/*|feature/*|hotfix/*)
-        if ! echo "$source_branch" | grep -qE '(raw-[0-9]{8}[-T][0-9]{4,6}Z|I-[0-9]{8}[-T][0-9]{4,6}Z)'; then
+        if ! echo "$source_branch" | grep -qE '(raw-|I-)?[0-9]{8}[-T][0-9]{4,6}Z[-]'; then
           cat <<'BRANCH_BLOCK' >&2
 [MERGE-GUARD] BLOCKED: branch name missing raw-key.
 

@@ -90,20 +90,17 @@ while read -r old_oid new_oid refname; do
 MSG
         exit 1
       fi
-      # Validate branch name contains raw-key (test-pre-merge is exempt)
-      case "$branch_name" in
-        test-pre-merge-*) ;;  # disposable testing sandbox
-        *)
-          if ! echo "$branch_name" | grep -qE '(raw-[0-9]{8}[-T][0-9]{4,6}Z|I-[0-9]{8}[-T][0-9]{4,6}Z)'; then
-            cat <<'NAME_BLOCK' >&2
+      # Validate branch name contains raw-key for all managed branches
+      # fix/feature/hotfix: raw-YYYYMMDDTHHMMSSZ-slug
+      # test-pre-merge: test-pre-merge-YYYYMMDDTHHMMSSZ-slug
+      if ! echo "$branch_name" | grep -qE '(raw-|I-)?[0-9]{8}[-T][0-9]{4,6}Z[-]'; then
+        cat <<'NAME_BLOCK' >&2
 [HOOK] Branch name rejected: '$branch_name'
 
-  fix/feature/hotfix 分支名必须含 raw-YYYYMMDDTHHMMSSZ key。
+  所有 fix/feature/hotfix/test-pre-merge 分支名必须含 raw-key (YYYYMMDDTHHMMSSZ)。
 NAME_BLOCK
-            exit 1
-          fi
-          ;;
-      esac
+        exit 1
+      fi
     fi
     continue
   fi
