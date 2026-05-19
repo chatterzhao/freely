@@ -109,6 +109,28 @@ Freely 开发 Freely 时，默认先问四件事：
    - 不要把”已经有 feature worktree”误当成”已经完成 issue materialization”
    - 不要把”已经 merge”误当成”cleanup 已完成”
 
+## 核心开发流程
+
+所有代码改动（feature、fix、hotfix）必须走完整流程，develop 禁止直接写入：
+
+```
+raw issue → wt-create → B1:IBM|B2:IBM → dev → merge-guarded → wt-close
+```
+
+| 步骤 | 操作 | 谁执行 |
+|------|------|--------|
+| 1. 创建 raw issue | `./bin/freely feedback --title "..." --body "..."` 或 chat 插话 | 开发者 |
+| 2. 开工位 | `./bin/wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>` | Manager/开发者 |
+| 3. B1 或 B2 | B1:IBM（预研→candidate→milestone）或 B2:IBM（实现→epic→tasks） | skill 执行 |
+| 4. 开发 | 在 fix/feature 工位提交、测试 | Worker |
+| 5. 合并 | `./bin/merge-guarded develop <feature-branch>` | Worker/Manager |
+| 6. 关工位 | `./bin/wt-close <branch>` 清理工位+分支 | Worker/Manager |
+
+- Manager 负责步骤 1-2 和决策，Worker 负责步骤 3-6 执行
+- 步骤 4-6 由 Worker 在 skill 约束下完成，完成后写 handoff JSON 汇报
+- wt-close 会自动消费该工位的所有 worker handoff
+- **禁止在 develop 上直接修改、提交**——那是受保护主管工位
+
 ## Bug 修复：fix skill 快速通道
 
 当发现运行时 bug，使用 `skill:freely-fix-execution` 快速修复。先判场景：
