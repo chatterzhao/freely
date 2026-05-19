@@ -69,20 +69,21 @@ validate_merge_direction() {
       esac ;;
   esac
 
-  # Validate branch name contains raw-key for fix/feature/hotfix
+  # Validate branch name contains raw-key for fix/feature/hotfix — BLOCK on mismatch
   if [[ "$allowed" == "1" ]]; then
     case "$source_branch" in
       fix/*|feature/*|hotfix/*)
         if ! echo "$source_branch" | grep -qE '(raw-[0-9]{8}[-T][0-9]{4,6}Z|I-[0-9]{8}[-T][0-9]{4,6}Z)'; then
-          cat <<'BRANCH_WARN' >&2
-[MERGE-GUARD] ⚠️  branch name missing raw-key.
+          cat <<'BRANCH_BLOCK' >&2
+[MERGE-GUARD] BLOCKED: branch name missing raw-key.
 
-  分支名必须包含 raw-YYYYMMDDTHHMMZ 或 I-YYYYMMDDTHHMMZ 格式的 key。
-  正确格式: fix/raw-{key}-{slug} 或 feature/raw-{key}-{slug}
+  '$source_branch' 不含 raw-YYYYMMDDTHHMMSSZ 或 I-YYYYMMDDTHHMMSSZ-X 格式的 key。
+  正确格式: fix/raw-{key}-{slug}
 
-  请通过 wt-create 创建分支以确保命名合规。
-  手动创建分支需要 FREELY_WT_CREATE=1，且仅限紧急修复场景。
-BRANCH_WARN
+  请通过 wt-create 创建分支。
+  文档: docs/LAWS.md §2D
+BRANCH_BLOCK
+          allowed=0
         fi
         ;;
     esac
