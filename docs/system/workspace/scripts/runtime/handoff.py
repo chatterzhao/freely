@@ -77,6 +77,8 @@ def init_db():
             session_id TEXT DEFAULT '',
             created_by TEXT DEFAULT '',
             consumed_by TEXT DEFAULT '',
+            send_to_ai TEXT NOT NULL DEFAULT 'pending'
+                CHECK(send_to_ai IN ('pending','success','fail')),
             launched_at TEXT DEFAULT '',
             last_activity_at TEXT DEFAULT '',
             completed_at TEXT DEFAULT '',
@@ -89,6 +91,7 @@ def init_db():
         CREATE INDEX IF NOT EXISTS idx_handoffs_parent ON handoffs(parent_handoff_id);
         CREATE INDEX IF NOT EXISTS idx_handoffs_prev_worker ON handoffs(previous_worker_handoff_id);
         CREATE INDEX IF NOT EXISTS idx_handoffs_worktree_status ON handoffs(worktree, status);
+        CREATE INDEX IF NOT EXISTS idx_handoffs_send_to_ai ON handoffs(send_to_ai);
         DELETE FROM handoffs WHERE status = 'pending' AND datetime(created_at) < datetime('now','-1 hour');
     """)
     # ── Schema migration: add columns missing in older DBs ──
@@ -100,6 +103,7 @@ def init_db():
         ("repair_target_handoff_id", "TEXT DEFAULT ''"),
         ("validation_errors_json", "TEXT DEFAULT '[]'"),
         ("reason", "TEXT DEFAULT ''"),
+        ("send_to_ai", "TEXT NOT NULL DEFAULT 'pending'"),
     ]:
         if col_name not in existing:
             try:
@@ -143,8 +147,8 @@ def insert(role, raw_key, prompt_file, worktree="", branch="",
            intent_kind, created_by, consumed_by,
            exit_kind, reason, restart_point, next_action,
            completion_summary, evidence_paths, worker_prompts_csv,
-           status, created_at, updated_at)
-           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'pending',?,?)""",
+           status, send_to_ai, created_at, updated_at)
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'pending','pending',?,?)""",
         (hid, role, raw_key, worktree, branch, prompt_file,
          parent_handoff_id, previous_worker_handoff_id,
          intent_kind, created_by, consumed_by, exit_kind,
@@ -349,6 +353,35 @@ def mark_stale(inactivity_minutes=15):
     conn.commit()
     conn.close()
     return affected
+
+
+def update_send_to_ai(handoff_id, send_to_ai_val):
+    """Update the send_to_ai delivery status. Called by runtime after session/prompt.
+    send_to_ai_val: 'success' | 'fail' """
+    conn = _connect()
+    cur = conn.execute(
+        "UPDATE handoffs SET send_to_ai=?, updated_at=? WHERE handoff_id=?",
+        (send_to_ai_val, _now_utc(), handoff_id))
+    affected = cur.rowcount
+    conn.commit()
+    conn.close()
+    return affected
+
+
+def list_pending_delivery(consumed_by_val=None):
+    """Query handoffs pending delivery to AI consumer.
+    Returns records with send_to_ai IN ('pending','fail'), optionally filtered by consumed_by."""
+    conn = _connect()
+    if consumed_by_val:
+        rows = conn.execute(
+            "SELECT * FROM handoffs WHERE send_to_ai IN ('pending','fail') AND consumed_by=? "
+            "ORDER BY created_at ASC", (consumed_by_val,)).fetchall()
+    else:
+        rows = conn.execute(
+            "SELECT * FROM handoffs WHERE send_to_ai IN ('pending','fail') "
+            "ORDER BY created_at ASC").fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
 
 
 def auto_consume(raw_key):
@@ -762,6 +795,15 @@ def main():
     p_extract = sub.add_parser("extract")
     p_extract.add_argument("--reply-text", required=True)
 
+    p_pending = sub.add_parser("list-pending-delivery")
+    p_pending.add_argument("--db", required=True)
+    p_pending.add_argument("--consumed-by", default="")
+
+    p_send_ai = sub.add_parser("update-send-to-ai")
+    p_send_ai.add_argument("--db", required=True)
+    p_send_ai.add_argument("--handoff-id", required=True)
+    p_send_ai.add_argument("--send-to-ai", required=True, choices=["success", "fail"])
+
     args = parser.parse_args()
     DB_PATH = getattr(args, 'db', None) or ':memory:'
 
@@ -834,6 +876,12 @@ def main():
         else:
             print(json.dumps({"action": exit_kind, "fields": ai_fields_or_errors},
                              ensure_ascii=False))
+    elif args.cmd == "list-pending-delivery":
+        rows = list_pending_delivery(args.consumed_by or None)
+        print(json.dumps(rows, indent=2, ensure_ascii=False))
+    elif args.cmd == "update-send-to-ai":
+        affected = update_send_to_ai(args.handoff_id, args.send_to_ai)
+        print(f"ok affected={affected}")
     else:
         parser.print_help()
 

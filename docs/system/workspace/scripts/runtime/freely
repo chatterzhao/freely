@@ -15501,13 +15501,13 @@ select_launch_kind() {
       if [[ -n "$sid" ]] && is_valid_uuid "$sid"; then
         CLAUDE_SESSION_ID_CURRENT="$sid"
         LAST_TOOL_SESSION_ID="$sid"
-        # Same daemon lifecycle, session alive → multi-turn via session/prompt
+        # Same daemon lifecycle, session alive → multi-turn via prompt (delta)
         if [[ "${FREELY_ACP_FIRST_LAUNCH_DONE:-0}" == "1" ]]; then
-          LAUNCH_KIND_SELECTED="resume"
-          LAUNCH_ROTATION_REASON="acp_session_persists"
+          LAUNCH_KIND_SELECTED="prompt"
+          LAUNCH_ROTATION_REASON="acp_multi_turn_delta"
         else
-          LAUNCH_KIND_SELECTED="resume"
-          LAUNCH_ROTATION_REASON="acp_session_persists"
+          LAUNCH_KIND_SELECTED="fresh"
+          LAUNCH_ROTATION_REASON="acp_first_launch"
         fi
         return 0
       fi
@@ -17430,19 +17430,27 @@ PROMPT_DELTA
     return 0
   fi
   workspace_root="$(workspace_root_for_project "$PROJECT_ROOT")"
-  # Inject agent role definition at prompt start (stable prefix, cached by AI tool)
-  local _prompt_role _agent_def
-  _prompt_role="$(effective_runtime_role_for_project "$PROJECT_ROOT")"
-  if [[ "$_prompt_role" == "manager" ]]; then
-    _agent_def="$(cat "$workspace_root/agents/manager-agent.md" 2>/dev/null || true)"
-  else
-    _agent_def="$(cat "$workspace_root/agents/worker-agent.md" 2>/dev/null || true)"
-  fi
-  if [[ -n "$_agent_def" ]]; then
-    cat <<PROMPT_AGENT
+  # Inject agent role definition at prompt start.
+  # Fresh/fork: full definition. Prompt (multi-turn): session remembers, skip.
+  if [[ "${LAUNCH_KIND_SELECTED:-}" != "prompt" ]]; then
+    local _prompt_role _agent_def
+    _prompt_role="$(effective_runtime_role_for_project "$PROJECT_ROOT")"
+    if [[ "$_prompt_role" == "manager" ]]; then
+      _agent_def="$(cat "$workspace_root/agents/manager-agent.md" 2>/dev/null || true)"
+    else
+      _agent_def="$(cat "$workspace_root/agents/worker-agent.md" 2>/dev/null || true)"
+    fi
+    if [[ -n "$_agent_def" ]]; then
+      cat <<PROMPT_AGENT
 === Agent 角色定义 ===
 ${_agent_def}
 ===
+
+PROMPT_AGENT
+    fi
+  else
+    cat <<PROMPT_AGENT
+=== 本轮 delta（会话已记住你的角色和历史） ===
 
 PROMPT_AGENT
   fi
@@ -17469,19 +17477,20 @@ PROMPT_AGENT
 	      ${mode_name:+$( [[ "$mode_name" == "resume" ]] && printf "%s" "--delta" )}
     # ── SEMI-STABLE: fleet data (changes only when worktrees change) ──
     append_fleet_supervision_if_needed
-    # ── STABLE: exit contract format (never changes) ──
-    append_manager_exit_contract_directive_if_needed "$PROJECT_ROOT"
-    append_worker_exit_contract_directive_if_needed "$PROJECT_ROOT"
+    # ── STABLE: exit contract format (never changes). Skip for prompt (session remembers). ──
+    if [[ "${LAUNCH_KIND_SELECTED:-}" != "prompt" ]]; then
+      append_manager_exit_contract_directive_if_needed "$PROJECT_ROOT"
+      append_worker_exit_contract_directive_if_needed "$PROJECT_ROOT"
+    fi
     # ── DYNAMIC: scan, intakes, alerts (changes each cycle) ──
-    # Suppress scan when handoff backlog >= 5 (except task-mode id:)
+    # Warn when pending delivery backlog but always include scan data
     if [[ "${MANAGER_HANDOFF_BACKLOG_COUNT:-0}" -ge 5 ]] && [[ "$(read_task_mode "$PROJECT_ROOT")" != id:* ]]; then
       cat <<BACKLOG_NOTE
 
-handoffs 积压 ${MANAGER_HANDOFF_BACKLOG_COUNT} 条（≥5），本轮跳过 scan——先清积压。
+⚠️ 待送达消息 ${MANAGER_HANDOFF_BACKLOG_COUNT} 条（≥5）。先处理上面的 Worker 汇报，再看 scan 决定是否委派新任务。
 BACKLOG_NOTE
-    else
-      append_task_source_patrol_seed_if_needed
     fi
+    append_task_source_patrol_seed_if_needed
     append_human_chat_intake_if_needed
     append_local_delegated_continuation_if_needed
     append_context_warning_if_needed
@@ -17509,27 +17518,24 @@ append_manager_handoff_context_if_needed() {
   _db_path="$project/.freely/freely.db"
   [[ -f "$_handoff_py" && -f "$_db_path" ]] || return 0
 
-  # Unconsumed workers: status not 'consumed' (consumed_by is routing)
-  local unconsumed
-  unconsumed=$(python3 -c "
+  # Pending delivery: send_to_ai IN ('pending','fail'), consumed_by=manager
+  # These are worker messages not yet delivered to the Manager AI.
+  local pending_delivery pending_delivery_count
+  pending_delivery=$(python3 -c "
 import json,subprocess,sys
 hp='$_handoff_py'; db='$_db_path'
-unconsumed=[]
-for st in ['completed','blocked','rejected']:
-    r=subprocess.run([sys.executable,hp,'list','--db',db,'--role','worker','--status',st],
-                     capture_output=True,text=True,timeout=5)
-    if r.returncode==0:
-        rows=json.loads(r.stdout)
-        unconsumed.extend([r for r in rows if r.get('status','') != 'consumed'])
-for r in unconsumed[:10]:
+r=subprocess.run([sys.executable,hp,'list-pending-delivery','--db',db,'--consumed-by','manager'],
+                 capture_output=True,text=True,timeout=5)
+rows=json.loads(r.stdout) if r.returncode==0 else []
+for r in rows[:10]:
     print(f\"- {r.get('handoff_id','?')[:20]} exit={r.get('exit_kind','?')} status={r.get('status','?')} summary={r.get('completion_summary','')[:60]} reason={r.get('reason','')[:60]} next_action={r.get('next_action','')[:60]}\")
-if not unconsumed:
-    print('(无未消费的 Worker 汇报)')
-print(f'UNCONSUMED_COUNT={len(unconsumed)}', flush=True)
-" 2>/dev/null || echo "UNCONSUMED_COUNT=0")
+if not rows:
+    print('(无待送达的 Worker 汇报)')
+print(f'PENDING_DELIVERY_COUNT={len(rows)}', flush=True)
+" 2>/dev/null || echo "PENDING_DELIVERY_COUNT=0")
 
-  # Extract unconsumed count for backlog gating
-  MANAGER_HANDOFF_BACKLOG_COUNT=$(echo "$unconsumed" | grep -o 'UNCONSUMED_COUNT=[0-9]*' | cut -d= -f2)
+  # Extract pending delivery count for backlog gating
+  MANAGER_HANDOFF_BACKLOG_COUNT=$(echo "$pending_delivery" | grep -o 'PENDING_DELIVERY_COUNT=[0-9]*' | cut -d= -f2)
   [[ "${MANAGER_HANDOFF_BACKLOG_COUNT:-0}" =~ ^[0-9]+$ ]] || MANAGER_HANDOFF_BACKLOG_COUNT=0
 
   # Thread history: recent handoff records (all roles, grouped by raw_key)
@@ -17555,13 +17561,13 @@ if not rows:
 
 ## Handoff 上下文（仅 Manager 可见）
 
-### 未消费 Worker 汇报
+### Worker 汇报（待你处理）
 ${unconsumed}
 
 ### 近期 Worker 线程历史
 ${thread_summary}
 
-处理原则：先消费未消费的 Worker 汇报（读 completion_summary/reason/next_action 做决策），再看 scan 找新任务。
+处理原则：先读上面的 Worker 汇报（Runtime 投递给你的消息），读 completion_summary/reason/next_action 做决策。消息看完后如果无事可做再看 scan 找新任务。
 EOF
 }
 
@@ -19454,13 +19460,36 @@ launch_kind: ${mode_name:-unknown}"
         ;;
     esac
 
+    # ── Mark pending-delivery messages as delivered after successful AI cycle ──
+    # The AI just saw all send_to_ai=pending/fail messages in its prompt.
+    # Update them to success so they won't be re-delivered next cycle.
+    if [[ "$exit_contract_action" != "resume_invalid" && "$exit_contract_action" != "" ]]; then
+      _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+      _handoff_db="$PROJECT_ROOT/.freely/freely.db"
+      if [[ -f "$_handoff_py" && -f "$_handoff_db" ]]; then
+        python3 -c "
+import json,subprocess,sys
+hp='$_handoff_py'; db='$_handoff_db'
+r=subprocess.run([sys.executable,hp,'list-pending-delivery','--db',db,'--consumed-by','manager'],
+                 capture_output=True,text=True,timeout=5)
+rows=json.loads(r.stdout) if r.returncode==0 else []
+for row in rows:
+    hid=row.get('handoff_id','')
+    if hid:
+        subprocess.run([sys.executable,hp,'update-send-to-ai','--db',db,'--handoff-id',hid,'--send-to-ai','success'],
+                       capture_output=True,timeout=5)
+print(f'send_to_ai=success updated={len(rows)}', flush=True)
+" >/dev/null 2>&1 || true
+      fi
+    fi
+
     if [[ "$exit_contract_action" == "delegate_workers" ]]; then
       manager_runtime_launch_workers_after_ai_cycle_if_needed "$PROJECT_ROOT" "$LAST_WORKCELL_EXIT_REASON" >/dev/null
       LAST_WORKCELL_EXIT_REASON="manager_worker_launch_after_ai_cycle"
       write_workcell_state "$PROJECT_ROOT" "running" "up" "down" "$LAST_WORKCELL_EXIT_REASON"
     fi
 
-    # Mark first ACP launch done → subsequent cycles use session/prompt for multi-turn
+    # Mark first ACP launch done → subsequent cycles use prompt mode for multi-turn delta
     FREELY_ACP_FIRST_LAUNCH_DONE=1
 
     restart_count=$((restart_count + 1))
