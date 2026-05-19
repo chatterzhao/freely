@@ -4,11 +4,10 @@
 
 - candidate_format_version: v2
 - title: wt-create dual worktree creation（B1 物料化确认）
-- status: absorbed
-- absorbed_by: `bin/wt-create` (dual worktree creation implemented: dev worktree + test-pre-merge sandbox)
-- decision_reason: 全部实现（code review、pre-tests、tasks、wt-create 脚本）已在并发开发中完成，当前代码库已支持双工位创建
-- next_action: 确认吸收，关闭 B1 流程，原始 raw issue #280 已关闭
-- revisit_trigger: N/A（已 absorbed）
+- status: needs_research
+- decision_reason: wt-create 是现有工具，无对应 I-* issue，无法满足 governance-merge-gate 对 absorbed 候选必须附带 canonical owner issue 的要求
+- next_action: 待后续 B1 预研确定是否需要对 wt-create 双工位创建功能单独提出 I-* issue
+- revisit_trigger: 当 governance-merge-gate 规则放宽，或 wt-create 双工位创建行为发生语义变更时重新评估
 - acceptance_criteria:
   - brainstorms.md 覆盖 discovery/convergence/decision → 已完成
   - milestone 同步更新 → 待本 B1 提交完成
