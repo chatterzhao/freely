@@ -92,7 +92,7 @@
 | 工具 | 用途 | 条件 |
 |------|------|------|
 | `./bin/wt-add <branch> -- <git-add-args>` | 按 worktree 安全 add | 需要分步 add 时 |
-| `python3 handoff.py list --db .freely/freely.db` | 查询交接表 | 需要检查历史交接 |
+| `python3 docs/system/workspace/scripts/runtime/handoff.py list --db .freely/freely.db` | 查询交接表 | 需要检查历史交接 |
 | `./bin/freely feedback --title "..." --body "..."` | 创建新 raw issue | 发现不相关的 bug、需独立追踪的问题 |
 
 ### 何时创建新 raw issue
@@ -124,7 +124,9 @@
 |------|------|------|
 | exit_kind | 是 | `"worker_done"` |
 | completion_summary | 是 | 具体完成了什么。必须让主管看得懂 |
-| evidence_paths | 否 | 证据文件路径，逗号分隔 |
+| evidence_paths | 是 | 证据文件路径，逗号分隔。runtime 验证必填 |
+| **互斥** | — | `worker_done` **禁止**带 `next_action`。runtime 会拒绝 |
+
 
 ### 2. worker_blocked — 被阻塞，需主管介入
 
@@ -143,6 +145,8 @@
 | exit_kind | 是 | `"worker_blocked"` |
 | reason | 是 | 具体阻塞了什么。不要只写"阻塞了"三个字 |
 | next_action | 是 | 建议主管下一步做什么 |
+| **互斥** | — | `worker_blocked` **禁止**带 `completion_summary` 或 `evidence_paths`。runtime 会拒绝 |
+
 
 ### 3. worker_handoff_needed — 需主管审核或决策
 
@@ -163,6 +167,8 @@
 | exit_kind | 是 | `"worker_handoff_needed"` |
 | reason | 是 | 背景和为什么需要主管决策 |
 | next_action | 是 | 主管需要决策什么 |
+| **互斥** | — | `worker_handoff_needed` **禁止**带 `completion_summary` 或 `evidence_paths`。runtime 会拒绝 |
+
 
 ## 规则
 - 无论哪种情况，必须输出 ` ```handoff ` JSON 块
