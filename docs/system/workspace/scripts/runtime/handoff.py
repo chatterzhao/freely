@@ -370,16 +370,26 @@ def auto_consume(raw_key):
 # ── JSON parse & dispatch ─────────────────────────────────────────
 
 def extract_handoff_block(text):
-    """Extract the first ```handoff fenced block from AI reply text."""
+    """Extract the first handoff fenced block from AI reply text.
+    Accepts ```handoff (canonical) and ```json (common AI output)."""
     # Strip ACP event lines that may be interleaved with the AI reply
     cleaned = re.sub(r'^\[ACP [^\n]*\n', '', text, flags=re.MULTILINE)
     # Strip trailing ACP/CACHE/TIMING metadata lines
     cleaned = re.sub(r'\n\[(ACP|CACHE|TIMING)[^\n]*', '', cleaned)
-    # Find handoff fence — tolerate missing/extra trailing text after ```
+    # Try ```handoff fence first (canonical)
     m = re.search(r'```handoff\s*\n(.*?)\n\s*```', cleaned, re.DOTALL)
     if not m:
-        # Fallback: no closing ``` — use everything after ```handoff to end
         m = re.search(r'```handoff\s*\n(.*)', cleaned, re.DOTALL)
+    # Fallback: ```json fence (AI often writes this instead)
+    if not m:
+        for json_m in re.finditer(r'```json\s*\n(\{.*?\})\n\s*```', cleaned, re.DOTALL):
+            try:
+                candidate = json.loads(json_m.group(1))
+                if 'exit_kind' in candidate:
+                    m = json_m
+                    break
+            except Exception:
+                continue
     if not m:
         return None
     raw = m.group(1).strip()
