@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260519T175836Z
 kind: raw
-phase_state: in_dev
+phase_state: dropped
 platform_ids:
   github:
     issue_id: '661'
@@ -17,6 +17,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+dropped_reason: Implementation merged to develop. send_to_ai field + ACP prompt mode
+  + build_prompt delta mode.
 ---
 
 ## raw-20260519T175836Z
