@@ -1,1 +1,17 @@
-fatal: path 'docs/issues/raw-20260517T231837Z/issue.md' exists on disk, but not in 'MERGE_HEAD'
+---
+kind: raw
+priority: P3
+phase_state: proposed
+title: raw issue metadata stub (empty body)
+platform_state: open
+platform_ids:
+  github:
+    issue_id: '599'
+    url: https://github.com/chatterzhao/freely/issues/599
+    synced_at: '2026-05-19T01:47:54Z'
+updated_at: '2026-05-19T01:47:54Z'
+primary_platform: github
+created_at: '2026-05-19T01:47:54Z'
+---
+
+raw issue from 2026-05-17 scan — no original body content captured.
