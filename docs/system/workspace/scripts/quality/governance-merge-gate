@@ -654,7 +654,7 @@ def candidate_has_canonical_owner_line(
 VALID_RAW_PHASES = {"proposed", "absorbed", "dropped"}
 
 
-def _validate_raw_issue(issue: IssueRecord) -> list[str]:
+def _validate_raw_issue(issue: IssueRecord, changed_paths: list = None) -> list[str]:
     """Validate a raw-* issue meets B1 entry-point requirements.
 
     Checks:
@@ -698,6 +698,28 @@ def _validate_raw_issue(issue: IssueRecord) -> list[str]:
             errors.append(
                 f"{iid} in {issue.path}: phase_state is 'absorbed' but no absorbed_into field. "
                 f"Set absorbed_into to the canonical I-* issue that absorbs this raw."
+            )
+
+    # 4. Dropped validation: prevent using "dropped" as a shortcut for completed code merges.
+    # dropped means the issue was abandoned — not "I finished the code and merged it."
+    if phase == "dropped" and changed_paths:
+        code_files_in_merge = [
+            p for p in changed_paths
+            if not p.startswith("docs/issues/")
+            and not p.startswith("docs/pre-brainstorms/")
+            and not p.startswith("docs/milestones.md")
+            and not p.startswith("AGENTS.md")
+            and not p.startswith("docs/system/workspace/agents/")
+        ]
+        if code_files_in_merge:
+            errors.append(
+                f"{iid} in {issue.path}: phase_state is 'dropped' but the merge contains "
+                f"{len(code_files_in_merge)} code file(s) beyond docs/issues/ or agent docs. "
+                f"dropped means the issue was abandoned without code changes. "
+                f"If code was implemented and merged, use 'absorbed' (with absorbed_into pointing to the I-* issue) "
+                f"or go through B1→candidate→I-* chain. "
+                f"Code files in merge: {', '.join(code_files_in_merge[:5])}"
+                f"{'...' if len(code_files_in_merge) > 5 else ''}"
             )
 
     return errors
@@ -1350,7 +1372,7 @@ def main() -> int:
         # Raw issues are B1 entry points — they don't have source_candidate.
         # Instead, validate raw-specific requirements.
         if issue.path.startswith("docs/issues/raw-"):
-            raw_errors = _validate_raw_issue(issue)
+            raw_errors = _validate_raw_issue(issue, changed_paths)
             errors.extend(raw_errors)
             continue
 
