@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260519T033529Z
 kind: raw
-phase_state: completed
+phase_state: absorbed
 platform_ids:
   github:
     issue_id: '612'
