@@ -14830,7 +14830,7 @@ write_task_source_scan_json_for_project() {
   if [[ -f "$TASK_SOURCE_SCAN_SCRIPT" ]]; then
     local _scan_args=(--project "$project")
     [[ -n "$raw_key" ]] && _scan_args+=(--raw-key "$raw_key")
-    SKIP_PLATFORM_CHECK=1 python3 "$TASK_SOURCE_SCAN_SCRIPT" "${_scan_args[@]}" >"$output_path" 2>/dev/null || {
+    python3 "$TASK_SOURCE_SCAN_SCRIPT" "${_scan_args[@]}" >"$output_path" 2>/dev/null || {
       log_warn "lifecycle scan failed; falling back to empty scan"
       printf '{"scan_version":"lifecycle-v2","generated_at":"%s","project_root":"%s","summary":{"total_incomplete":0,"by_stage":{},"ready":0},"items":[]}\n' \
         "$generated_at" "$project" >"$output_path"
@@ -14964,7 +14964,7 @@ append_task_source_patrol_seed_if_needed() {
     local _raw_key="${_tm_mode#id:}"
     _raw_key="${_raw_key#raw-}"
     local _tmp_scan="/tmp/freely-id-scan-$$.json"
-    SKIP_PLATFORM_CHECK=1 python3 "$TASK_SOURCE_SCAN_SCRIPT" --project "$PROJECT_ROOT" --raw-key "$_raw_key" > "$_tmp_scan" 2>/dev/null || true
+    python3 "$TASK_SOURCE_SCAN_SCRIPT" --project "$PROJECT_ROOT" --raw-key "$_raw_key" > "$_tmp_scan" 2>/dev/null || true
     if [[ -f "$_tmp_scan" ]]; then
       python3 - "$scan_json_path" "$_tmp_scan" "$_raw_key" <<'PY'
 import json, sys
