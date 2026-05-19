@@ -1,9 +1,9 @@
 ---
 local_id: I-20260419-0915-A
 kind: linked
-phase_state: absorbed
+phase_state: completed
 absorbed_at: '2026-05-16T14:27:11Z'
-completed_at: '2026-04-29'
+completed_at: "2026-05-19T23:20:00Z"
 platform_ids:
   github:
     issue_id: '155'
