@@ -369,24 +369,64 @@ def auto_consume(raw_key):
 
 # ── JSON parse & dispatch ─────────────────────────────────────────
 
+def _strip_json_comments(text):
+    """Strip // line comments from JSON/JSON5 text so json.loads can parse it."""
+    # Remove // comments (but not inside strings)
+    result = []
+    in_string = False
+    escape = False
+    i = 0
+    while i < len(text):
+        ch = text[i]
+        if escape:
+            result.append(ch)
+            escape = False
+            i += 1
+            continue
+        if ch == '\\' and in_string:
+            result.append(ch)
+            escape = True
+            i += 1
+            continue
+        if ch == '"':
+            in_string = not in_string
+            result.append(ch)
+            i += 1
+            continue
+        if not in_string and ch == '/' and i + 1 < len(text) and text[i + 1] == '/':
+            # Skip to end of line
+            i += 2
+            while i < len(text) and text[i] != '\n':
+                i += 1
+            continue
+        result.append(ch)
+        i += 1
+    return ''.join(result)
+
+
 def extract_handoff_block(text):
     """Extract the first handoff fenced block from AI reply text.
-    Fence is ```json (canonical); ```handoff accepted as legacy fallback."""
+    Fence: ```json5 (canonical), ```json (previous), ```handoff (legacy)."""
     # Strip ACP event lines that may be interleaved with the AI reply
     cleaned = re.sub(r'^\[ACP [^\n]*\n', '', text, flags=re.MULTILINE)
     # Strip trailing ACP/CACHE/TIMING metadata lines
     cleaned = re.sub(r'\n\[(ACP|CACHE|TIMING)[^\n]*', '', cleaned)
-    # Try ```json fence (canonical) — AI writes json format with handoff content
-    for json_m in re.finditer(r'```json\s*\n(\{.*?\})\n\s*```', cleaned, re.DOTALL):
-        try:
-            candidate = json.loads(json_m.group(1))
-            if 'exit_kind' in candidate:
-                m = json_m
-                break
-        except Exception:
-            continue
-    else:
-        m = None
+
+    m = None
+    # Try ```json5 (canonical) and ```json (compat), in order
+    for fence in ('json5', 'json'):
+        for json_m in re.finditer(rf'```{fence}\s*\n(\{{.*?\}})\n\s*```', cleaned, re.DOTALL):
+            try:
+                raw_block = json_m.group(1)
+                candidate = json.loads(_strip_json_comments(raw_block))
+                if 'exit_kind' in candidate:
+                    m = json_m
+                    break
+            except Exception:
+                continue
+        if m:
+            break
+
     # Fallback: ```handoff fence (legacy)
     if not m:
         m = re.search(r'```handoff\s*\n(.*?)\n\s*```', cleaned, re.DOTALL)
@@ -400,15 +440,50 @@ def extract_handoff_block(text):
     brace_end = raw.rfind('}')
     if brace_start >= 0 and brace_end > brace_start:
         raw = raw[brace_start:brace_end + 1]
-    return raw.strip()
+    return _strip_json_comments(raw).strip()
 
 
 def validate_handoff_json(ai_fields):
     """Validate AI-produced handoff JSON. Returns (ok, errors)."""
     errors = []
     exit_kind = ai_fields.get('exit_kind', '')
-    # Natural-language alias: "completed" maps to worker_done
-    ALIAS_MAP = {'completed': 'worker_done'}
+    # AI writes natural-language exit_kind; normalize to canonical values.
+    ALIAS_MAP = {
+        # → worker_done
+        'completed':                 'worker_done',
+        'success':                   'worker_done',
+        'partial':                   'worker_done',
+        'normal':                    'worker_done',
+        'completed_no_op':           'worker_done',
+        'clean_success':             'worker_done',
+        'completed_with_findings':   'worker_done',
+        'partial_success':           'worker_done',
+        'completed_s_hint':          'worker_done',
+        'completed_with_evidence':   'worker_done',
+        'done':                      'worker_done',
+        'completed_idle':            'worker_done',
+        'completed_independent':     'worker_done',
+        'complete':                  'worker_done',
+        'task_already_done':         'worker_done',
+        'noop':                      'worker_done',
+        'ok':                        'worker_done',
+        'good':                      'worker_done',
+        'all_done':                  'worker_done',
+        # → worker_blocked
+        'blocked':                   'worker_blocked',
+        'stuck':                     'worker_blocked',
+        'cannot_proceed':            'worker_blocked',
+        # → worker_handoff_needed
+        'awaiting_review':           'worker_handoff_needed',
+        'needs_research':            'worker_handoff_needed',
+        'transition':                'worker_handoff_needed',
+        'needs_input':               'worker_handoff_needed',
+        'requires_manager':          'worker_handoff_needed',
+        # → stop_ai (manager: patrol found nothing to do)
+        'idle':                      'stop_ai',
+        # → delegate_workers
+        'dispatch':                  'delegate_workers',
+    }
     if exit_kind in ALIAS_MAP:
         ai_fields['exit_kind'] = ALIAS_MAP[exit_kind]
         exit_kind = ALIAS_MAP[exit_kind]
@@ -419,6 +494,18 @@ def validate_handoff_json(ai_fields):
     for field in REQUIRED_FIELDS.get(exit_kind, []):
         val = ai_fields.get(field, '')
         if not val or val == '':
+            # Fallback: AI often writes 'summary'/'completion_summary' for blocked/needed exits
+            if field == 'reason' and exit_kind in ('worker_blocked', 'worker_handoff_needed'):
+                fallback = ai_fields.get('completion_summary', '')
+                if fallback and fallback != '':
+                    ai_fields['reason'] = fallback
+                    continue
+            if field == 'next_action' and exit_kind in ('worker_blocked', 'worker_handoff_needed'):
+                # AI often omits next_action; derive from reason or set default
+                reason_text = ai_fields.get('reason', '')
+                if reason_text and reason_text != '':
+                    ai_fields['next_action'] = 'see reason'
+                    continue
             errors.append({"field": field, "error": f"required for {exit_kind}, got '{val}'"})
 
     # Delegate: verify worker_prompts_csv paths exist
@@ -525,6 +612,35 @@ def parse_handoff_json(reply_text, context):
     conn.close()
 
     return record, record["exit_kind"], []
+
+
+def extract_handoff_json(reply_text):
+    """Extract and validate handoff JSON from reply text WITHOUT any DB side effects.
+
+    Returns (exit_kind, ai_fields) on success, or (None, errors_list) on failure.
+    For stale_pid handler and other scenarios where we only need to parse, not insert.
+    """
+    block = extract_handoff_block(reply_text)
+    if not block:
+        return None, [{"field": "handoff_block", "error": "no handoff block found"}]
+    try:
+        ai_fields = json.loads(block)
+    except json.JSONDecodeError as e:
+        return None, [{"field": "parse", "error": str(e)}]
+    # Normalize field aliases
+    FIELD_ALIASES = {
+        'summary': 'completion_summary',
+        'artifacts': 'evidence_paths',
+        'next_worker_suggestion': 'next_action',
+    }
+    for alias, canonical in FIELD_ALIASES.items():
+        val = ai_fields.get(alias)
+        if val is not None and val != '' and val != [] and not ai_fields.get(canonical):
+            ai_fields[canonical] = ai_fields.pop(alias)
+    ok, errors = validate_handoff_json(ai_fields)
+    if not ok:
+        return None, errors
+    return ai_fields.get('exit_kind', ''), ai_fields
 
 
 def insert_repair_handoff(repair_target_role, repair_target_handoff_id, validation_errors, raw_key):
@@ -643,8 +759,11 @@ def main():
     p_parse.add_argument("--raw-key", default="")
     p_parse.add_argument("--prompt-file", default="")
 
+    p_extract = sub.add_parser("extract")
+    p_extract.add_argument("--reply-text", required=True)
+
     args = parser.parse_args()
-    DB_PATH = args.db
+    DB_PATH = getattr(args, 'db', None) or ':memory:'
 
     if args.cmd == "init":
         init_db()
@@ -706,6 +825,14 @@ def main():
             print(json.dumps({"action": "repair", "errors": errors}, ensure_ascii=False))
         else:
             print(json.dumps({"action": action, "handoff_id": record["handoff_id"]},
+                             ensure_ascii=False))
+    elif args.cmd == "extract":
+        exit_kind, ai_fields_or_errors = extract_handoff_json(args.reply_text)
+        if exit_kind is None:
+            print(json.dumps({"action": "repair", "errors": ai_fields_or_errors},
+                             ensure_ascii=False))
+        else:
+            print(json.dumps({"action": exit_kind, "fields": ai_fields_or_errors},
                              ensure_ascii=False))
     else:
         parser.print_help()
