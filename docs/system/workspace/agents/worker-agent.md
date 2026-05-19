@@ -110,7 +110,7 @@
 
 ## 交接
 
-**不再调用 `handoff.py update`。** 在回复末尾输出 ` ```handoff ` JSON 块，Runtime 解析后统一写入数据库。
+**不再调用 `handoff.py update`。** 在回复末尾输出 ` ```json ` JSON 块，Runtime 解析后统一写入数据库。
 
 只输出你负责的字段。省略的字段 Runtime 自动填默认值。
 
@@ -118,7 +118,7 @@
 
 适用于：自己完成了委派的任务；发现任务已被别人完成（工位已合并等）；工位不存在但对应分支已合并。
 
-```handoff
+```json
 {
   "exit_kind": "worker_done",
   "completion_summary": "<具体完成了什么，或为什么判断任务已完成>",
@@ -138,7 +138,7 @@
 
 适用于：遇到无法自行解决的问题（权限不够、依赖缺失、环境错误等）；工位存在但无法继续工作。
 
-```handoff
+```json
 {
   "exit_kind": "worker_blocked",
   "reason": "<具体阻塞了什么、为什么无法自行解决>",
@@ -160,7 +160,7 @@
 
 **特别场景 — 因果理由验证失败**：当 Manager 的 `rationale` 字段中的因果理由在当前状态下不再成立时（例如：理由引用的 worktree 已合并、issue 已关闭、条件已变化），也使用此交接类型。此时 `reason` 需说明：Manager 的原始理由是什么、当前状态是什么、为什么不再成立。`next_action` 需建议：更新理由后重新委派，或放弃该任务。
 
-```handoff
+```json
 {
   "exit_kind": "worker_handoff_needed",
   "reason": "<背景：做了什么、为什么需要主管决策>",
@@ -177,7 +177,7 @@
 
 
 ## 规则
-- 无论哪种情况，必须输出 ` ```handoff ` JSON 块
+- 无论哪种情况，必须输出 ` ```json ` JSON 块
 - 字段不写清楚 = 主管看不懂 = 浪费一轮 patrol
 - Runtime 会检查你的交接，如果无效会用同一个 resume target 拉你回来补
 - **因果理由验证**：每次接到任务，先读 `rationale` header。如果理由不成立，不要执行 destructive 操作，使用 `worker_handoff_needed` 回传。如果任务不涉及 destructive 操作（如纯分析、读取），此验证为可选项；执行分析前若选择验证，须在 `completion_summary` 中注明结果

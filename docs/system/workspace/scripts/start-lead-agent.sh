@@ -299,7 +299,7 @@ EOF
 	if [[ "$prompt_role" == "manager" ]]; then
 	  manager_mode="true"
 	  execution_rule_15="15. 你是 Manager Agent（见 workspace/agents/manager-agent.md）。不得直接 commit——通过委派 Worker。"
-	  execution_rule_16="16. 交付物：continuity + worker prompt + 在回复末尾输出 \`\`\`handoff JSON 块。自主决策优先级和分批。"
+	  execution_rule_16="16. 交付物：continuity + worker prompt + 在回复末尾输出 \`\`\`json (handoff 内容) 块。自主决策优先级和分批。"
 	  execution_rule_17="17. subagent 并行不冲突的任务。runtime-owned 问题交给 runtime。"
 	  role_scope_rule_5a=""
 	  role_scope_rule_5b=""

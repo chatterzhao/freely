@@ -371,25 +371,27 @@ def auto_consume(raw_key):
 
 def extract_handoff_block(text):
     """Extract the first handoff fenced block from AI reply text.
-    Accepts ```handoff (canonical) and ```json (common AI output)."""
+    Fence is ```json (canonical); ```handoff accepted as legacy fallback."""
     # Strip ACP event lines that may be interleaved with the AI reply
     cleaned = re.sub(r'^\[ACP [^\n]*\n', '', text, flags=re.MULTILINE)
     # Strip trailing ACP/CACHE/TIMING metadata lines
     cleaned = re.sub(r'\n\[(ACP|CACHE|TIMING)[^\n]*', '', cleaned)
-    # Try ```handoff fence first (canonical)
-    m = re.search(r'```handoff\s*\n(.*?)\n\s*```', cleaned, re.DOTALL)
+    # Try ```json fence (canonical) — AI writes json format with handoff content
+    for json_m in re.finditer(r'```json\s*\n(\{.*?\})\n\s*```', cleaned, re.DOTALL):
+        try:
+            candidate = json.loads(json_m.group(1))
+            if 'exit_kind' in candidate:
+                m = json_m
+                break
+        except Exception:
+            continue
+    else:
+        m = None
+    # Fallback: ```handoff fence (legacy)
     if not m:
-        m = re.search(r'```handoff\s*\n(.*)', cleaned, re.DOTALL)
-    # Fallback: ```json fence (AI often writes this instead)
-    if not m:
-        for json_m in re.finditer(r'```json\s*\n(\{.*?\})\n\s*```', cleaned, re.DOTALL):
-            try:
-                candidate = json.loads(json_m.group(1))
-                if 'exit_kind' in candidate:
-                    m = json_m
-                    break
-            except Exception:
-                continue
+        m = re.search(r'```handoff\s*\n(.*?)\n\s*```', cleaned, re.DOTALL)
+        if not m:
+            m = re.search(r'```handoff\s*\n(.*)', cleaned, re.DOTALL)
     if not m:
         return None
     raw = m.group(1).strip()
