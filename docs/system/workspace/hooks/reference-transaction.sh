@@ -64,13 +64,38 @@ Policy source: docs/CONSTITUTION.md §2, docs/LAWS.md §2
 MSG
         exit 1
       fi
+      # FREELY_WT_CREATE=1 bypass: warn that this is for wt-create internal use only
+      branch_name="$(protected_branch_name "$refname")"
+      if ! echo "$branch_name" | grep -qE '(raw-[0-9]{8}[-T][0-9]{4,6}Z|I-[0-9]{8}[-T][0-9]{4,6}Z)'; then
+        cat <<'WT_WARN' >&2
+[HOOK] ⚠️  FREELY_WT_CREATE=1 — branch name missing raw-key.
+
+  FREELY_WT_CREATE 仅允许 wt-create 内部使用以创建合规分支名。
+  手动设置此变量并创建不合规分支名属于绕过行为。
+
+  正确做法: ./bin/wt-create --raw-key <key> --slug <slug>
+  文档: docs/LAWS.md §2D
+WT_WARN
+      fi
     fi
     continue
   fi
 
   protected_branch_ref "$refname" || continue
 
+  # Branch deletion: block for managed branches
   if [[ "$new_oid" == "$zero_oid" ]]; then
+    if wt_managed_branch_ref "$refname"; then
+      branch_name="$(protected_branch_name "$refname")"
+      cat <<'DELETE_WARN' >&2
+[HOOK] ⚠️  branch deletion: '$branch_name'
+
+  fix/feature/hotfix 分支不应手动删除。请使用:
+    ./bin/wt-close --branch '$branch_name'
+
+  文档: docs/LAWS.md §2D
+DELETE_WARN
+    fi
     continue
   fi
 
