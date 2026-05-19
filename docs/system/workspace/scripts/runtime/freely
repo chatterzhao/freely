@@ -15501,10 +15501,10 @@ select_launch_kind() {
       if [[ -n "$sid" ]] && is_valid_uuid "$sid"; then
         CLAUDE_SESSION_ID_CURRENT="$sid"
         LAST_TOOL_SESSION_ID="$sid"
-        # Same daemon lifecycle, session alive → multi-turn via prompt (delta)
+        # Same daemon lifecycle, session alive → resume with delta prompt
         if [[ "${FREELY_ACP_FIRST_LAUNCH_DONE:-0}" == "1" ]]; then
-          LAUNCH_KIND_SELECTED="prompt"
-          LAUNCH_ROTATION_REASON="acp_multi_turn_delta"
+          LAUNCH_KIND_SELECTED="resume"
+          LAUNCH_ROTATION_REASON="acp_session_persists"
         else
           LAUNCH_KIND_SELECTED="fresh"
           LAUNCH_ROTATION_REASON="acp_first_launch"
@@ -17432,7 +17432,7 @@ PROMPT_DELTA
   workspace_root="$(workspace_root_for_project "$PROJECT_ROOT")"
   # Inject agent role definition at prompt start.
   # Fresh/fork: full definition. Prompt (multi-turn): session remembers, skip.
-  if [[ "${LAUNCH_KIND_SELECTED:-}" != "prompt" ]]; then
+  if [[ "${LAUNCH_KIND_SELECTED:-}" != "resume" ]]; then
     local _prompt_role _agent_def
     _prompt_role="$(effective_runtime_role_for_project "$PROJECT_ROOT")"
     if [[ "$_prompt_role" == "manager" ]]; then
@@ -17478,7 +17478,7 @@ PROMPT_AGENT
     # ── SEMI-STABLE: fleet data (changes only when worktrees change) ──
     append_fleet_supervision_if_needed
     # ── STABLE: exit contract format (never changes). Skip for prompt (session remembers). ──
-    if [[ "${LAUNCH_KIND_SELECTED:-}" != "prompt" ]]; then
+    if [[ "${LAUNCH_KIND_SELECTED:-}" != "resume" ]]; then
       append_manager_exit_contract_directive_if_needed "$PROJECT_ROOT"
       append_worker_exit_contract_directive_if_needed "$PROJECT_ROOT"
     fi
