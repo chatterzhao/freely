@@ -7,6 +7,7 @@ candidate: C-20260506T1000Z-A
 title: supervisor 主循环 select_launch_kind 前添加 task_mode=wait 门禁
 created_at: '2026-05-19T16:32:43Z'
 updated_at: '2026-05-19T16:36:35Z'
+source_candidate: docs/pre-brainstorms/20260506T1000Z--wt-create-raw-key-refactor/candidates.md#C-20260506T1000Z-A
 ---
 
 ## I-20260506T1000Z-A
