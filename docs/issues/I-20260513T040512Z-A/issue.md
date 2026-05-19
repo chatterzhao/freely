@@ -1,7 +1,7 @@
 ---
 local_id: I-20260513T040512Z-A
 kind: i_issue
-phase_state: in_dev
+phase_state: completed
 promoted_from: raw-20260513T040512Z
 source_candidate: docs/pre-brainstorms/20260513T040512Z--task-lifecycle-scan-batch/candidates.md
 milestone: M-20260513T040512Z-A
