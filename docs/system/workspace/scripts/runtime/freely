@@ -5606,18 +5606,33 @@ write_intake_item() {
 # Otherwise create a new raw issue.
 _write_chat_to_issue() {
   local project="$1" intake_id="$2" author="$3" channel="$4" message="$5" session_refs="$6" created_at="$7"
-  local target_issue chat_type issue_id db_path chat_id worktrees_root worktree_found
+  local target_issue chat_type issue_id db_path chat_id worktrees_root worktree_found conversation_id
 
   db_path=""$project/.freely/freely.db""
   target_issue="${FREELY_CHAT_TARGET_ISSUE:-}"
+  conversation="${FREELY_CHAT_CONVERSATION:-}"
+  new_conversation="${FREELY_CHAT_NEW_CONVERSATION:-}"
 
-  if [[ -n "$target_issue" ]]; then
+  if [[ "$conversation" == "true" ]]; then
+    chat_type="chat-message"
+    issue_id=""
+    if [[ "$new_conversation" == "true" ]]; then
+      conversation_id=0  # first message — auto-updated to own id by chat-inbox.py
+    else
+      # Check for active (unconsumed) conversation
+      conversation_id=$(python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/chat-inbox.py" \
+        query-active-conversation --db "$db_path" 2>/dev/null || true)
+      conversation_id="${conversation_id:-0}"
+    fi
+  elif [[ -n "$target_issue" ]]; then
     chat_type="comment"
     issue_id="$target_issue"
+    conversation_id=0
   else
     chat_type="new-issue"
     # issue_id will be set after INSERT returns the chat id
     issue_id=""
+    conversation_id=0
   fi
 
   # Step 1: INSERT into freely.db chats table
@@ -5629,7 +5644,8 @@ _write_chat_to_issue() {
     --author "$author" \
     --channel "$channel" \
     --session-refs "$session_refs" \
-    --intake-id "$intake_id" 2>/dev/null) || {
+    --intake-id "$intake_id" \
+    --conversation-id "$conversation_id" 2>/dev/null) || {
       log_error "failed to write chat to freely.db"
       return 1
     }
@@ -5641,11 +5657,22 @@ _write_chat_to_issue() {
       --db "$db_path" --id "$chat_id" --issue-id "$issue_id" >/dev/null 2>&1 || true
   fi
 
-  log_info "chat recorded: freely.db id=$chat_id type=$chat_type issue_id=$issue_id"
+  # For chat-message: if conversation_id was 0 (first message), the Python add_chat
+  # already auto-updated conversation_id to the chat_id
+  if [[ "$chat_type" == "chat-message" ]]; then
+    if [[ "$conversation_id" -eq 0 ]]; then
+      # Read back the auto-updated conversation_id
+      conversation_id="$chat_id"
+    fi
+    issue_id="conv-$conversation_id"
+  fi
+
+  log_info "chat recorded: freely.db id=$chat_id type=$chat_type issue_id=$issue_id${conversation:+ conversation_id=$conversation_id}"
 
   # Step 2: Try direct sync if a worktree exists for this issue
+  # Skip for chat-message — conversation messages need AI judgment before materialization
   worktrees_root="${project}-worktrees"
-  if [[ -d "$worktrees_root" ]]; then
+  if [[ "$chat_type" != "chat-message" && -d "$worktrees_root" ]]; then
     worktree_found=$(find "$worktrees_root" -maxdepth 1 -type d -name "*${issue_id}*" 2>/dev/null | head -1)
     if [[ -n "$worktree_found" && -d "$worktree_found/docs/issues/$issue_id" ]]; then
       if [[ "$chat_type" == "new-issue" ]]; then
@@ -20035,12 +20062,14 @@ cmd_security_review_brief() {
 }
 
 cmd_chat() {
-  local project="" message="" target_issue="" new_issue="" urgent=""
+  local project="" message="" target_issue="" new_issue="" urgent="" conversation="" new_conversation=""
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
       --issue) target_issue="${2:-}"; shift 2 ;;
       --new-issue) new_issue="true"; shift ;;
+      --conversation) conversation="true"; shift ;;
+      --new) new_conversation="true"; shift ;;
       --urgent) urgent="true"; shift ;;
       --help|-h) usage; exit 0 ;;
       *)
@@ -20055,11 +20084,18 @@ cmd_chat() {
   done
   [[ -n "$message" ]] || { usage; exit 1; }
   project="$(resolve_project_or_fail "$project" 1)"
-  submit_human_frontdoor_message "$project" human chat "$message" "$target_issue" "$new_issue" "$urgent"
+
+  # --new only valid with --conversation
+  if [[ "$new_conversation" == "true" && "$conversation" != "true" ]]; then
+    log_error "--new is only valid with --conversation"
+    exit 1
+  fi
+
+  submit_human_frontdoor_message "$project" human chat "$message" "$target_issue" "$new_issue" "$urgent" "$conversation" "$new_conversation"
 }
 
 submit_human_frontdoor_message() {
-  local project="$1" author="$2" channel="$3" message="$4" target_issue="$5" new_issue="$6" urgent="$7"
+  local project="$1" author="$2" channel="$3" message="$4" target_issue="$5" new_issue="$6" urgent="$7" conversation="$8" new_conversation="$9"
   local had_active_runtime intake_output intake_args
   had_active_runtime="0"
   if [[ -n "$(manager_supervisor_pid_for_project "$project")" || -n "$(runtime_ai_pid_hint_for_project "$project")" ]]; then
@@ -20070,6 +20106,8 @@ submit_human_frontdoor_message() {
   [[ -n "$target_issue" ]] && intake_args+=(--issue "$target_issue")
   [[ "$new_issue" == "true" ]] && intake_args+=(--new-issue)
   [[ "$urgent" == "true" ]] && intake_args+=(--urgent)
+  [[ "$conversation" == "true" ]] && intake_args+=(--conversation)
+  [[ "$new_conversation" == "true" ]] && intake_args+=(--new)
   intake_output="$(cmd_intake_chat "${intake_args[@]}")"
   if [[ "$had_active_runtime" != "1" ]]; then
     ensure_interruption_dispatch_once "$project"
@@ -20212,7 +20250,7 @@ cmd_tui() {
 }
 
 cmd_intake_chat() {
-  local project="" message="" message_file="" author="human" channel="chat" intake_id="" target_issue="" urgent="" new_issue=""
+  local project="" message="" message_file="" author="human" channel="chat" intake_id="" target_issue="" urgent="" new_issue="" conversation="" new_conversation=""
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
@@ -20222,6 +20260,8 @@ cmd_intake_chat() {
       --channel) channel="${2:-}"; shift 2 ;;
       --issue) target_issue="${2:-}"; shift 2 ;;
       --new-issue) new_issue="true"; shift ;;
+      --conversation) conversation="true"; shift ;;
+      --new) new_conversation="true"; shift ;;
       --urgent) urgent="true"; shift ;;
       *) log_error "unknown arg: $1"; usage; exit 1 ;;
     esac
@@ -20233,8 +20273,22 @@ cmd_intake_chat() {
   fi
   [[ -n "$message" ]] || { log_error "missing --message or --message-file"; exit 1; }
 
-  # Default to --new-issue when neither --issue nor --new-issue is specified
-  if [[ -z "$target_issue" && "$new_issue" != "true" ]]; then
+  # Conversation mode validation
+  if [[ "$conversation" == "true" ]]; then
+    if [[ -n "$target_issue" ]]; then
+      log_error "--conversation and --issue are mutually exclusive"
+      exit 1
+    fi
+    if [[ "$new_issue" == "true" ]]; then
+      log_error "--conversation and --new-issue are mutually exclusive"
+      exit 1
+    fi
+    export FREELY_CHAT_CONVERSATION="true"
+    [[ "$new_conversation" == "true" ]] && export FREELY_CHAT_NEW_CONVERSATION="true"
+  fi
+
+  # Default to --new-issue when neither --issue, --new-issue, nor --conversation is specified
+  if [[ -z "$target_issue" && "$new_issue" != "true" && "$conversation" != "true" ]]; then
     new_issue="true"
   fi
   if [[ -n "$target_issue" && "$new_issue" == "true" ]]; then
@@ -20260,6 +20314,7 @@ cmd_intake_chat() {
   echo "intake_path: $(intake_dir_for_project "$project")/$intake_id"
   [[ -n "$target_issue" ]] && echo "target_issue: $target_issue"
   [[ -n "$urgent" ]] && echo "urgent: true"
+  [[ "$conversation" == "true" ]] && echo "conversation: true"
 }
 
 cmd_intake_claim() {
