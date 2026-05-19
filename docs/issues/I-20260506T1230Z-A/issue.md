@@ -15,6 +15,8 @@ platform_state: ''
 wt-create creates test-pre-merge + fix/feature worktrees in a single call.
 fix is based on test-pre-merge for fast-forward merge.
 
+B1 materialization candidate `C-20260506T1230Z-A` absorbed — `docs/pre-brainstorms/20260506T1230Z--wt-create-dual/candidates.md` confirmed dual worktree creation is already implemented by wt-create.
+
 - pre_tests_path: `docs/epics/wt-create-dual/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/wt-create-dual/code-reviews`
 - issue_id: `I-20260506T1230Z-A`
