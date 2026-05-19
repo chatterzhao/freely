@@ -24,7 +24,7 @@
   - Phase 0 失败时的 fallback 行为是否需要可配置
 - acceptance_reviews: []
 - promoted_issue_path: ""
-- milestone: M-20260306-workspace-routing-foundation
+- milestone: M-20260513T040512Z-A
 - session_refs:
   - tool: claude-code
   - session_id: 20260519162405-c2dfea
