@@ -114,6 +114,12 @@
 
 只输出你负责的字段。省略的字段 Runtime 自动填默认值。
 
+### 硬性 JSON 约束
+
+exit_kind 只用这三个词：`worker_done` `worker_blocked` `worker_handoff_needed`。禁止用 `completed` `blocked` `success` `partial` `done` `complete` `ok` `normal` `noop`。
+
+`worker_done` 不可包含 `next_action`。`worker_blocked` 和 `worker_handoff_needed` 不可包含 `completion_summary`、`evidence_paths`。
+
 ### 1. worker_done — 任务已完成
 
 适用于：自己完成了委派的任务；发现任务已被别人完成（工位已合并等）；工位不存在但对应分支已合并。

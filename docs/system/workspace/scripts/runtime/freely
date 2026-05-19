@@ -7513,8 +7513,8 @@ EOF
 - `pretests-gate` — pre-tests 证据
 
 ### 交接（Manager ↔ Worker）
-- Manager 在回复末尾输出 ` ```handoff ` JSON 块（delegate_workers/resume_manager/stop_ai）
-- Worker 在回复末尾输出 ` ```handoff ` JSON 块（worker_done/worker_blocked/worker_handoff_needed）
+- Manager 在回复末尾输出 ` ```json ` 交接块（delegate_workers/resume_manager/stop_ai）
+- Worker 在回复末尾输出 ` ```json ` 交接块（worker_done/worker_blocked/worker_handoff_needed）
 - Runtime 自动解析 JSON 并写入中心 DB: `.freely/freely.db`
 
 ### 禁止
@@ -12053,18 +12053,45 @@ for r in json.load(sys.stdin):
     done
     return 0
   fi
-  local hid
+  local hid raw_key_for_worker _w_cycle_log _w_extract_result _w_action _w_cs _w_reason _w_next
   for hid in $matching; do
     [[ -n "$hid" ]] || continue
-    # Try to parse worker handoff from cycle log before marking stale
-    local _w_cycle_log _w_parse_result
-    _w_cycle_log="$(ls -t "$(logs_dir_for_project "$project")/cycle-worker-"*.log 2>/dev/null | head -1)"
+    # Extract raw_key from the DB record for this handoff
+    raw_key_for_worker=$(python3 "$_handoff_py" get --db "$_db_path" --handoff-id "$hid" 2>/dev/null | \
+      python3 -c "import json,sys; r=json.load(sys.stdin); print(r.get('raw_key',''))" 2>/dev/null || echo "")
+    # Try to parse worker handoff from cycle log before marking stale.
+    # Find the cycle log whose session_id prefix appears in this worker's handoff record.
+    # Fallback: search cycle-worker logs for the raw_key timestamp pattern.
+    _w_cycle_log=""
+    if [[ -n "$raw_key_for_worker" ]]; then
+      _w_cycle_log="$(grep -l "$raw_key_for_worker" "$(logs_dir_for_project "$project")"/cycle-worker-*.log 2>/dev/null | tail -1)"
+    fi
+    # If not found by raw_key, use latest cycle-worker log as fallback
+    [[ -z "$_w_cycle_log" || ! -f "$_w_cycle_log" ]] && \
+      _w_cycle_log="$(ls -t "$(logs_dir_for_project "$project")"/cycle-worker-*.log 2>/dev/null | head -1)"
     if [[ -n "$_w_cycle_log" && -f "$_w_cycle_log" ]]; then
-      _w_parse_result="$(parse_handoff_json_reply "$project" "$_w_cycle_log" "worker" "$raw_key" "" 2>/dev/null || true)"
-      if [[ "$_w_parse_result" == ok:* ]]; then
+      _w_extract_result="$(python3 "$_handoff_py" extract --reply-text "$(tail -c 32768 "$_w_cycle_log" 2>/dev/null)" 2>/dev/null || true)"
+      _w_action=$(echo "$_w_extract_result" | python3 -c "import json,sys; print(json.load(sys.stdin).get('action','error'))" 2>/dev/null || echo "error")
+      if [[ "$_w_action" == "worker_done" ]]; then
+        _w_cs=$(echo "$_w_extract_result" | python3 -c "import json,sys; print(json.load(sys.stdin).get('fields',{}).get('completion_summary',''))" 2>/dev/null || echo "")
         python3 "$_handoff_py" update --db "$_db_path" --handoff-id "$hid" \
-          --status completed --expected-status launched --exit-kind "${_w_parse_result#ok:}" \
+          --status completed --expected-status launched --exit-kind worker_done \
+          --completion-summary "${_w_cs:0:2000}" \
           --reason "worker completed, handoff parsed from cycle log" >/dev/null 2>&1 || true
+        continue
+      elif [[ "$_w_action" == "worker_blocked" ]]; then
+        _w_reason=$(echo "$_w_extract_result" | python3 -c "import json,sys; print(json.load(sys.stdin).get('fields',{}).get('reason',''))" 2>/dev/null || echo "")
+        _w_next=$(echo "$_w_extract_result" | python3 -c "import json,sys; print(json.load(sys.stdin).get('fields',{}).get('next_action',''))" 2>/dev/null || echo "")
+        python3 "$_handoff_py" update --db "$_db_path" --handoff-id "$hid" \
+          --status blocked --expected-status launched --exit-kind worker_blocked \
+          --reason "${_w_reason:0:2000}" --next-action "${_w_next:0:2000}" >/dev/null 2>&1 || true
+        continue
+      elif [[ "$_w_action" == "worker_handoff_needed" ]]; then
+        _w_reason=$(echo "$_w_extract_result" | python3 -c "import json,sys; print(json.load(sys.stdin).get('fields',{}).get('reason',''))" 2>/dev/null || echo "")
+        _w_next=$(echo "$_w_extract_result" | python3 -c "import json,sys; print(json.load(sys.stdin).get('fields',{}).get('next_action',''))" 2>/dev/null || echo "")
+        python3 "$_handoff_py" update --db "$_db_path" --handoff-id "$hid" \
+          --status completed --expected-status launched --exit-kind worker_handoff_needed \
+          --reason "${_w_reason:0:2000}" --next-action "${_w_next:0:2000}" >/dev/null 2>&1 || true
         continue
       fi
     fi
@@ -12172,27 +12199,45 @@ print(sum(1 for r in rows if r.get('worktree','')=='$_target_worktree'))
         _handoff_id=$(python3 "$_handoff_py" insert --db "$_db_path" \
           --role worker --raw-key "$_raw_key" \
           --prompt-file "$_prompt_file" --worktree "$_target_worktree" \
-          --created-by manager --consumed-by worker \
+          --created-by manager --consumed-by manager \
           --parent "$_parent_handoff_id" --prev-worker "$_prev_worker_id" 2>/dev/null || true)
       fi
-      # WORKER_HANDOFF_INJECT: always inject handoff reminder
+      # WORKER_HANDOFF_INJECT: JSON5 template (quoted to protect backticks) + vars
       if [[ -n "$_handoff_id" && -f "$_prompt_file" ]]; then
         local _prev_summary_truncated
         _prev_summary_truncated="${_prev_worker_summary:0:80}"
-        cat >> "$_prompt_file" <<WORKER_HANDOFF_INJECT
+        cat >> "$_prompt_file" <<'WORKER_HANDOFF_INJECT'
 
 ---
 
-## Handoff 上下文
+在回复末尾输出 ```json5 代码块：
+
+```json5
+{
+  // exit_kind 只允许三个值，禁止用 completed blocked success partial done complete ok normal noop
+  //   "worker_done"              — 任务已完成
+  //   "worker_blocked"           — 被阻塞，需主管介入
+  //   "worker_handoff_needed"    — 需主管审核或决策
+  "exit_kind": "worker_done",
+
+  // worker_done 时填下面两个，不要填 reason/next_action
+  "completion_summary": "...",   // 具体完成了什么
+  "evidence_paths": "...",       // 证据文件绝对路径
+
+  // worker_blocked / worker_handoff_needed 时填下面两个，不要填 completion_summary/evidence_paths
+  "reason": "...",               // 阻塞原因或背景
+  "next_action": "..."           // 建议主管做什么决策
+}
+```
+
+WORKER_HANDOFF_INJECT
+        cat >> "$_prompt_file" <<EOF
 
 - handoff_id: ${_handoff_id}
 - parent_handoff_id: ${_parent_handoff_id}
-- previous_worker_handoff_id: ${_prev_worker_id:-无}
-- 上一轮 Worker 产出: ${_prev_summary_truncated:-无}
-- 完成后在回复末尾输出 \`\`\`json (handoff 内容) JSON 块，Runtime 自动解析写入 DB
-- JSON 格式见 worker-agent.md 交接章节（3 种 exit_kind 表格）
+- 上轮产出: ${_prev_summary_truncated:-无}
 
-WORKER_HANDOFF_INJECT
+EOF
       fi
       if launch_worker_from_manager_prompt_if_needed "$project" "$_prompt_file"; then
         _launched_count=$((_launched_count + 1))
@@ -13371,72 +13416,27 @@ append_manager_exit_contract_directive_if_needed() {
   [[ "${unresolved_workers:-0}" =~ ^[0-9]+$ ]] || unresolved_workers="0"
   cat <<'EOF'
 
-Manager exit contract（硬性要求）：
-- 在本轮回复末尾输出 ```json (handoff 内容) JSON 块，Runtime 解析后统一写入 DB。
-- 只输出表格里列出的字段。不填的字段省略——Runtime 自动填默认值。
-- 所有三种出口都必须输出 JSON。
+委派前查 blocked/completed：
+```
+python3 docs/system/workspace/scripts/runtime/handoff.py list --db .freely/freely.db --role worker --status blocked
+python3 docs/system/workspace/scripts/runtime/handoff.py list --db .freely/freely.db --role worker --status completed
+```
 
-HP="docs/system/workspace/scripts/runtime/handoff.py"
-DB=".freely/freely.db"
+在回复末尾输出 ```json5 代码块：
 
-───────────────
-委派前检查
-───────────────
-python3 $HP list --db $DB --role worker --status blocked
-python3 $HP list --db $DB --role worker --status completed
-对 blocked worker：读 reason + next_action，判断根因后 re-dispatch 或 superseded。
-同一 worker 连续 blocked ≥3 次 → 关闭旧手牌。
-
-───────────────
-1. delegate_workers — 委派 Worker
-───────────────
-步骤 A：创建 worker prompt 文件（.freely/run/worker-prompts/<ts>-worker-<slug>.txt），包含 header：
-
-  Worktree:
-  - /absolute/path/to/worktree
-  Branch:
-  - fix/raw-YYYYMMDDTHHMM[SS]Z-<slug>
-  dispatch_priority: P2
-  parallel_safe: true
-  write_scope: worktree
-  intent_kind: edit
-  intent_target: <简短描述>
-
-  然后 ## Task 描述具体要做什么。
-
-步骤 B：在回复末尾输出 JSON：
-
-```handoff
+```json5
 {
+  // exit_kind 只允许三个值，禁止用 completed done success partial normal idle continue wait
+  //   "delegate_workers"    — 委派 Worker（已创建 prompt 文件）
+  //   "resume_manager"      — 需继续分析（不能停也不能委派）
+  //   "stop_ai"             — 无事可做（无未消费 worker、无 scan backlog、无 dirty。禁止连续）
   "exit_kind": "delegate_workers",
-  "reason": "<为什么委派这些 worker>",
-  "worker_prompts_csv": "/abs/path/w1.txt,/abs/path/w2.txt"
-}
-```
 
-Runtime 自动：读 worker_prompts_csv → 去重 → 解析 header → INSERT worker → launch (fork 或 delta)
-
-───────────────
-2. resume_manager — 需继续分析
-───────────────
-
-```handoff
-{
-  "exit_kind": "resume_manager",
-  "reason": "<为什么不能停也不能委派>",
-  "restart_point": "pre_brainstorm",
-  "next_action": "<下一步做什么>"
-}
-```
-
-───────────────
-3. stop_ai — 无事可做
-───────────────
-
-```handoff
-{
-  "exit_kind": "stop_ai",
-  "reason": "<为什么停止>"
+  // 下面三个字段按 exit_kind 选填：
+  "reason": "...",               // delegate/resume/stop 都要
+  "worker_prompts_csv": "...",   // 仅 delegate_workers：prompt 文件绝对路径，逗号分隔
+  "restart_point": "...",        // 仅 resume_manager：pre_brainstorm | IBM | dev | verification | recovery | cleanup
+  "next_action": "..."           // 仅 resume_manager：下一步做什么
 }
 ```
 EOF
@@ -13448,51 +13448,25 @@ append_worker_exit_contract_directive_if_needed() {
 
   cat <<'EOF'
 
-## 工作交接
+在回复末尾输出 ```json5 代码块：
 
-在回复末尾输出 ```json (handoff 内容) JSON 块，Runtime 解析后写入 DB。只输出表格里列出的字段。
-
-──────────────────────────────────────
-1. worker_done —— 任务已完成
-──────────────────────────────────────
-
-```handoff
+```json5
 {
+  // exit_kind 只允许三个值，禁止用 completed done success partial complete ok normal noop
+  //   "worker_done"              — 任务已完成
+  //   "worker_blocked"           — 被阻塞，需主管介入
+  //   "worker_handoff_needed"    — 需主管审核或决策
   "exit_kind": "worker_done",
-  "completion_summary": "<具体完成了什么>",
-  "evidence_paths": "/abs/path/evidence.md"
+
+  // worker_done 时填下面两个，不要填 reason/next_action
+  "completion_summary": "...",   // 具体完成了什么
+  "evidence_paths": "...",       // 证据文件绝对路径
+
+  // worker_blocked / worker_handoff_needed 时填下面两个，不要填 completion_summary/evidence_paths
+  "reason": "...",               // 阻塞原因或背景
+  "next_action": "..."           // 建议主管做什么决策
 }
 ```
-
-──────────────────────────────────────
-2. worker_blocked —— 被阻塞
-──────────────────────────────────────
-
-```handoff
-{
-  "exit_kind": "worker_blocked",
-  "reason": "<具体阻塞了什么>",
-  "next_action": "<建议主管下一步做什么>"
-}
-```
-
-──────────────────────────────────────
-3. worker_handoff_needed —— 需主管决策
-──────────────────────────────────────
-
-```handoff
-{
-  "exit_kind": "worker_handoff_needed",
-  "reason": "<背景：为什么需要主管决策>",
-  "next_action": "<主管需要决策什么>"
-}
-```
-
-──────────────────────────────────────
-规则：
-- 必须输出 ```json (handoff 内容) JSON 块
-- 字段不写清楚 = 主管看不懂 = 浪费一轮 patrol
-- Runtime 检查交接，无效会用 resume target 拉回来补
 EOF
 }
 
@@ -13663,7 +13637,7 @@ autofill_manager_exit_contract_for_cleanup_delegate_workers_if_possible() {
       [[ -n "$_prompt_file" && -f "$_prompt_file" ]] || continue
       python3 "$_handoff_py" insert --db "$_db_path" \
         --role worker --raw-key "$_raw_key" \
-        --prompt-file "$_prompt_file" --created-by manager --consumed-by worker \
+        --prompt-file "$_prompt_file" --created-by manager --consumed-by manager \
         --intent-kind cleanup 2>/dev/null || true
     done
   fi
@@ -14125,8 +14099,6 @@ manager_runtime_handle_exit_contract_after_ai_cycle() {
           ;;
       esac
       : >"$(stop_marker_file "$project")"
-      # Auto-consume: extract raw_keys from worker_prompts_csv, consume each
-      _manager_auto_consume_workers "$project"
       append_runtime_event "$project" "manager_exit_contract_stop_ai" \
         "stop_reason=${stop_reason}"
       printf 'stop_ai\n'
@@ -14158,16 +14130,12 @@ manager_runtime_handle_exit_contract_after_ai_cycle() {
         "$project" \
         "manager_exit_contract_resume" \
         "restart_point=$(_db_exit_contract_field "$project" manager restart_point);next_action=$(_db_exit_contract_field "$project" manager next_action)"
-      # Auto-consume: extract raw_keys from worker_prompts_csv, consume each
-      _manager_auto_consume_workers "$project"
       append_runtime_event "$project" "manager_exit_contract_resume" \
         "restart_point=$(_db_exit_contract_field "$project" manager restart_point)"
       printf 'resume_manager\n'
       ;;
     delegate_workers)
       worker_prompts_csv="$(_db_exit_contract_field "$project" manager worker_prompts_csv)"
-      # Auto-consume: extract raw_keys from worker_prompts_csv, consume each
-      _manager_auto_consume_workers "$project"
       append_runtime_event "$project" "manager_exit_contract_delegate_workers" \
         "worker_prompts_csv=${worker_prompts_csv:-none}"
       printf 'delegate_workers\n'

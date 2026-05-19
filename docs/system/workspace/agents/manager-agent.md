@@ -237,6 +237,10 @@ Manager 在不同阶段承担不同职责：首跳路由、巡逻委派、收口
 
 只输出你负责的字段。省略的字段 Runtime 自动填默认值。
 
+### 硬性 JSON 约束
+
+exit_kind 只用这三个词：`delegate_workers` `resume_manager` `stop_ai`。禁止用 `completed` `done` `success` `partial` `normal` `idle` `continue` `wait`。
+
 ### 1. delegate_workers — 委派 Worker
 
 条件：有明确可委派的工作（dirty worktree 需要 commit、analysis 需要执行等），且你知道目标 worktree 路径和 branch 名称。
