@@ -1,15 +1,14 @@
 ---
 local_id: raw-20260519T033529Z
 kind: raw
-phase_state: absorbed
+phase_state: dropped
 platform_ids:
   github:
     issue_id: '612'
     url: https://github.com/chatterzhao/freely/issues/612
     synced_at: ''
 primary_platform: github
-canonical_issue_path: docs/issues/I-20260514T103532Z-A/issue.md
-absorbed_into: I-20260514T103532Z-A
+canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-19T03:35:43Z'
