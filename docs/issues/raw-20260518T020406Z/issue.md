@@ -1,8 +1,8 @@
 ---
 local_id: raw-20260518T020406Z
 kind: raw
-phase_state: absorbed
-absorbed_into: C-20260518T020406Z-A
+phase_state: completed
+absorbed_into: ''
 platform_ids:
   github:
     issue_id: '539'
@@ -27,7 +27,7 @@ platform_state: closed
 |-------|-------|
 | local_id | `raw-20260518T020406Z` |
 | kind | `raw` |
-| phase_state | `proposed` |
+| phase_state | `completed` |
 | canonical | `none` |
 | created | 2026-05-18T02:04:06Z |
 | updated | unknown |
@@ -37,7 +37,7 @@ platform_state: closed
 > **Freely 治理**：这是 raw issue `raw-20260518T020406Z`。实现前请用 `wt-create --raw-key 20260518T020406Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
 kind: raw
 priority: P2
-phase_state: absorbed
+phase_state: completed
 source: feedback
 created_at: "2026-05-18T02:04:06Z"
 title: "chats 表扩展 conversation_id + chat-message 类型 + scan 对齐"
