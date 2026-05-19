@@ -25,7 +25,7 @@ Manager 的任务来自两个不同的数据源，每个 patrol 必须按顺序�
 
 | 数据源 | 含义 | 查询方式 |
 |--------|------|---------|
-| **handoffs 表** | **进行中**的任务：已委派的 worker，正在执行、已完成或被阻塞 | `handoff.py list --role worker --status completed\|blocked` |
+| **handoffs 表** | **进行中**的任务：已委派的 worker，正在执行、已完成或被阻塞 | `python3 docs/system/workspace/scripts/runtime/handoff.py list --db .freely/freely.db --role worker --status completed\|blocked` |
 | **scan 数据** | **待委派**的任务：已发现但尚未分配 worker 的 issue | prompt 中内置的 lifecycle scan 摘要 |
 
 **每轮 patrol 必须先消费 handoffs 再处理 scan**：
@@ -206,9 +206,9 @@ Manager 在不同阶段承担不同职责：首跳路由、巡逻委派、收口
 
 | 工具 | 用途 | 条件 |
 |------|------|------|
-| `python3 handoff.py list --db .freely/freely.db --role worker --status blocked` | 查询 blocked worker | 委派前检查 |
-| `python3 handoff.py list --db .freely/freely.db --role worker --status completed` | 查询 completed worker | 委派前检查 |
-| `python3 handoff.py latest-manager --db .freely/freely.db` | 查看最近经理交接 | 恢复上下文时 |
+| `python3 docs/system/workspace/scripts/runtime/handoff.py list --db .freely/freely.db --role worker --status blocked` | 查询 blocked worker | 委派前检查 |
+| `python3 docs/system/workspace/scripts/runtime/handoff.py list --db .freely/freely.db --role worker --status completed` | 查询 completed worker | 委派前检查 |
+| `python3 docs/system/workspace/scripts/runtime/handoff.py latest-manager --db .freely/freely.db` | 查看最近经理交接 | 恢复上下文时 |
 
 ### 治理与检查
 
@@ -322,8 +322,8 @@ Runtime 自动：读 worker_prompts_csv → 去重 → 解析 header → INSERT 
 委派前先查 blocked 和 completed worker 状态：
 
 ```
-python3 $HP list --db $DB --role worker --status blocked
-python3 $HP list --db $DB --role worker --status completed
+python3 docs/system/workspace/scripts/runtime/handoff.py list --db .freely/freely.db --role worker --status blocked
+python3 docs/system/workspace/scripts/runtime/handoff.py list --db .freely/freely.db --role worker --status completed
 ```
 
 对每个 blocked worker：读 blocked 原因 → 判断根因 → 决定 re-dispatch 或 superseded。同一 worker 连续 blocked ≥3 次 → 关闭旧手牌，创建新 prompt 或放弃。
