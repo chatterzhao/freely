@@ -242,7 +242,7 @@ main() {
       "$codex_capability_model" "$codex_capability_sandbox" \
       "$codex_capability_approval_policy" "$codex_capability_cwd_mode" \
       "$debug_log_file" "$session_id" "$resume_target"
-  ) >>"$log_file" 2>&1 &
+  ) >>"$log_file" 2>>"${debug_log_file:-/dev/null}" &
 
   local child_pid=$!
 

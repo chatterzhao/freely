@@ -200,7 +200,7 @@ class ACPClient:
                 try:
                     message = json.loads(raw_line)
                 except json.JSONDecodeError:
-                    print(f"[WARN] non-JSON output: {raw_line[:200]}", file=sys.stderr, flush=True)
+                    print(f"[WARN] non-JSON output: {raw_line[:200]}", flush=True)
                     continue
                 self._handle_message(message)
         except Exception:
@@ -241,11 +241,11 @@ class ACPClient:
         elif update_kind == "tool_call":
             title = update.get("title") or update.get("toolCallId") or "tool_call"
             status = update.get("status", "pending")
-            print(f"\n[ACP tool_call] {title} ({status})", flush=True)
+            print(f"\n[ACP tool_call] {title} ({status})", file=sys.stderr, flush=True)
         elif update_kind == "tool_call_update":
             tool_call_id = update.get("toolCallId", "unknown")
             status = update.get("status", "pending")
-            print(f"\n[ACP tool_call_update] {tool_call_id} ({status})", flush=True)
+            print(f"\n[ACP tool_call_update] {tool_call_id} ({status})", file=sys.stderr, flush=True)
 
     def _handle_permission_request(self, message):
         request_id = message.get("id")
@@ -314,7 +314,7 @@ def main():
         agent_cmd = args.agent.split()
         transport = SubprocessTransport(agent_cmd)
     else:
-        print("[ERROR] must specify --bridge-socket or --agent", file=sys.stderr, flush=True)
+        print("[ERROR] must specify --bridge-socket or --agent", flush=True)
         sys.exit(1)
     t_transport = time.time()
 
@@ -349,7 +349,7 @@ def main():
                 print(session_id, flush=True)                                # line 1: clean UUID for machine parsing
                 print(f"session id: {session_id} (resumed)", flush=True)     # line 2: human log
             except Exception as e:
-                print(f"[WARN] session/resume failed ({e}), falling back to session/new", file=sys.stderr, flush=True)
+                print(f"[WARN] session/resume failed ({e}), falling back to session/new", flush=True)
                 new_params = {"cwd": cwd, "mcpServers": []}
                 if args.session_id:
                     new_params["sessionId"] = args.session_id
@@ -442,7 +442,7 @@ def main():
             print(f"stop_reason={stop_reason}", flush=True)
 
             prompt_kb = len(prompt_text.encode("utf-8")) / 1024
-            print(f"[TIMING] transport_connect={(t_session - t_start):.1f}s session_new={0:.1f}s prompt_wait={(t_done - t_before):.1f}s total={(t_done - t_start):.1f}s prompt_size={prompt_kb:.1f}kb", file=sys.stderr, flush=True)
+            print(f"[TIMING] transport_connect={(t_session - t_start):.1f}s session_new={0:.1f}s prompt_wait={(t_done - t_before):.1f}s total={(t_done - t_start):.1f}s prompt_size={prompt_kb:.1f}kb", flush=True)
 
             usage = prompt_result.get("usage") or {}
             # Supports both Anthropic and DeepSeek cache field names
@@ -452,11 +452,11 @@ def main():
             output_tokens = usage.get("output_tokens") or usage.get("completion_tokens") or 0
             total_tokens = usage.get("total_tokens", 0)
             cache_msg = f"[CACHE] session_id={session_id} launch_kind={launch_kind} prompt_bytes={len(prompt_text.encode('utf-8'))} input={input_tokens} cache_hit={cache_hit} cache_miss={cache_miss} output={output_tokens} total={total_tokens}"
-            print(cache_msg, file=sys.stderr, flush=True)
+            print(cache_msg, flush=True)
             print(cache_msg, flush=True)  # also to stdout (cycle log) for easy inspection
 
             if stop_reason != "end_turn":
-                print(f"[WARN] ACP prompt finished with stopReason={stop_reason}", file=sys.stderr, flush=True)
+                print(f"[WARN] ACP prompt finished with stopReason={stop_reason}", flush=True)
             return stop_reason
 
         stop_reason = send_prompt(prompt_text, t_start, t_session, launch_kind)
@@ -480,7 +480,7 @@ def main():
                     try:
                         next_text = Path(line).read_text(encoding="utf-8")
                     except Exception as e:
-                        print(f"[WARN] cannot read next prompt file: {line} ({e})", file=sys.stderr, flush=True)
+                        print(f"[WARN] cannot read next prompt file: {line} ({e})", flush=True)
                         continue
                     stop_reason = send_prompt(next_text, t_start, t_session, launch_kind)
                     t_start = time.time()
@@ -501,5 +501,5 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as exc:
-        print(f"[ERROR] {exc}", file=sys.stderr, flush=True)
+        print(f"[ERROR] {exc}", flush=True)
         sys.exit(1)
