@@ -15817,7 +15817,9 @@ launch_manager_supervisor() {
     bash "$launch_bin" "$launch_mode_command" --project "$project" </dev/null >/dev/null 2>&1
     return 0
   fi
-  nohup bash "$launch_bin" "$launch_mode_command" --project "$project" </dev/null >/dev/null 2>&1 &
+  local _restart_mode; _restart_mode="$(read_task_mode "$project")"
+  [[ "$_restart_mode" == "auto" || "$_restart_mode" == "wait" || "$_restart_mode" == id:* ]] || _restart_mode="auto"
+  nohup bash "$launch_bin" "$launch_mode_command" --project "$project" --task-mode "$_restart_mode" </dev/null >/dev/null 2>&1 &
   disown "$!" 2>/dev/null || true
 }
 
