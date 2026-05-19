@@ -11756,7 +11756,7 @@ SESSIONEOF
         --mode auto \
         --loop \
         --next-prompt-file "$_worker_next_file"
-    ) >> "$worker_cycle_log" 2>&1 &
+    ) >> "$worker_cycle_log" 2>> "${worker_cycle_log}.debug" &
     _worker_pid=$!
     mkdir -p "$(run_dir_for_project "$target_project")"
     echo "$_worker_pid" > "$(run_dir_for_project "$target_project")/ai.pid"
@@ -11783,7 +11783,7 @@ SESSIONEOF
       --mode auto \
       --loop \
       --next-prompt-file "$_worker_next_file"
-  ) >> "$worker_cycle_log" 2>&1 &
+  ) >> "$worker_cycle_log" 2>> "${worker_cycle_log}.debug" &
   _worker_pid=$!
 
   # Record worker PID for liveness tracking
