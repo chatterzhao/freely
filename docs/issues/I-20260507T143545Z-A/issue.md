@@ -1,7 +1,8 @@
 ---
 local_id: I-20260507T143545Z-A
 kind: linked
-phase_state: absorbed
+phase_state: completed
+completed_at: "2026-05-19T23:20:00Z"
 absorbed_at: '2026-05-16T14:27:11Z'
 promoted_from: raw-20260507T143545Z
 source_candidate: docs/pre-brainstorms/20260507T143545Z--timestamp-seconds-upgrade/candidates.md
