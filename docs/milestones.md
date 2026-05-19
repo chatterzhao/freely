@@ -5347,3 +5347,14 @@ routing_policy:
 - milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260518T020406Z-A/issue.md`
+
+
+## M-20260519T035908Z-A
+- title: Consolidate 11 duplicate supervisor crash raw issues
+- status: active
+### candidate_issues
+1. `C-20260519T035908Z-A`
+- milestone: M-20260519T035908Z-A
+- status: needs_research
+- decision_reason: B1 decision to consolidate 11 duplicate "supervisor crash: bash rc=0" raw issues into one
+- source_candidate: `docs/pre-brainstorms/20260519T035908Z--consolidate-supervisor-crash/candidates.md`
