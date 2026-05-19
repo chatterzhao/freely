@@ -756,6 +756,14 @@ routing_policy:
 - status: promoted
 - promoted_issue_path: `docs/issues/I-20260513T010343Z-A/issue.md`
 
+2. `C-20260513T040512Z-A`
+- milestone: M-20260306-workspace-routing-foundation
+- status: needs_research
+- decision_reason: raw-20260513T040512Z (GitHub #327) task-lifecycle-scan O(n) API 性能问题，1+3 批量化方案明确
+- next_action: 进入 B2_IBM materialize C-20260513T040512Z-A
+- revisit_trigger: B2_IBM materialize 完成后重新评估
+- source_candidate: `docs/pre-brainstorms/20260513T040512Z--task-lifecycle-scan-batch/candidates.md#C-20260513T040512Z-A`
+
 ### committed_issues
 1. `I-20260503-0200-A`
 - title: scan: switch to task-lifecycle-scan v2 with full lifecycle chain trace
