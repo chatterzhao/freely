@@ -5489,3 +5489,7 @@ routing_policy:
   - 修改点在 select_launch_kind 之前，不影响已有 stop_ai handler
   - task_mode=auto 或 id:<scan-id> 时行为不变
 - source_candidate: `docs/pre-brainstorms/20260506T1000Z--wt-create-raw-key-refactor/brainstorms.md`
+### committed_issues
+1. `I-20260506T1000Z-A`
+- title: supervisor 主循环 select_launch_kind 前添加 task_mode=wait 门禁
+- milestone_state: committed
