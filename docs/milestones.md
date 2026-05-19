@@ -5491,3 +5491,24 @@ routing_policy:
 - milestone_state: b2_ibm
 - phase_state: `b2_ibm`
 - issue_path: `docs/issues/I-20260513T040512Z-A/issue.md`
+
+## M-20260506T1000Z-A
+- title: supervisor 主循环前置 task_mode wait 门禁
+- status: active
+### candidate_issues
+1. `C-20260506T1000Z-A`
+- milestone: M-20260506T1000Z-A
+- status: promoted
+- decision_reason: raw-20260506T1000Z 描述的 wait 模式空转是已知设计缺失；前置读 task_mode → sleep → continue 方案改动边界清晰、风险极低
+- next_action: 进入 B2_IBM materialize，产出 I-* issue
+- revisit_trigger: N/A（已 promote）
+- acceptance_criteria:
+  - task_mode=wait 时 supervisor 不 build prompt、不 launch AI
+  - 修改点在 select_launch_kind 之前，不影响已有 stop_ai handler
+  - task_mode=auto 或 id:<scan-id> 时行为不变
+- source_candidate: `docs/pre-brainstorms/20260506T1000Z--wt-create-raw-key-refactor/brainstorms.md`
+### committed_issues
+1. `I-20260506T1000Z-A`
+- title: supervisor 主循环 select_launch_kind 前添加 task_mode=wait 门禁
+- milestone_state: committed
+- issue_path: `docs/issues/I-20260506T1000Z-A/issue.md`

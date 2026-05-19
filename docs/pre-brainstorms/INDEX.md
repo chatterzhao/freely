@@ -1,4 +1,7 @@
 # Pre-brainstorm 索引（IBM Framework B1）
+- 20260506T1000Z--wt-create-raw-key-refactor
+  - brainstorms: docs/pre-brainstorms/20260506T1000Z--wt-create-raw-key-refactor/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260506T1000Z--wt-create-raw-key-refactor/candidates.md
 - 20260519T145435Z--supervisor-crash-batch2
   - brainstorms: docs/pre-brainstorms/20260519T145435Z--supervisor-crash-batch2/brainstorms.md
 - 20260519T015638Z--stale-pid
