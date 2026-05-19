@@ -1,7 +1,7 @@
 ---
 local_id: I-20260519T004246Z-A
 kind: i_issue
-phase_state: b2_ibm
+phase_state: in_dev
 promoted_from: raw-20260519T004246Z
 source_candidate: docs/pre-brainstorms/20260519T004246Z--agent-docs-fix/candidates.md
 canonical_issue_path: ''

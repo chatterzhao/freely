@@ -27,7 +27,7 @@ REQUIRED_FIELDS = {
     'delegate_workers':       ['reason', 'worker_prompts_csv'],
     'resume_manager':         ['reason', 'restart_point', 'next_action'],
     'stop_ai':                ['reason'],
-    'worker_done':            ['completion_summary'],
+    'worker_done':            ['completion_summary', 'evidence_paths'],
     'worker_blocked':         ['reason', 'next_action'],
     'worker_handoff_needed':  ['reason', 'next_action'],
 }
