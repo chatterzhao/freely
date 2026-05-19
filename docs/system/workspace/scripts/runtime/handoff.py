@@ -27,7 +27,7 @@ REQUIRED_FIELDS = {
     'delegate_workers':       ['reason', 'worker_prompts_csv'],
     'resume_manager':         ['reason', 'restart_point', 'next_action'],
     'stop_ai':                ['reason'],
-    'worker_done':            ['completion_summary', 'evidence_paths'],
+    'worker_done':            ['completion_summary'],
     'worker_blocked':         ['reason', 'next_action'],
     'worker_handoff_needed':  ['reason', 'next_action'],
 }
@@ -443,6 +443,17 @@ def parse_handoff_json(reply_text, context):
         ai_fields = json.loads(block)
     except json.JSONDecodeError as e:
         return None, "repair", [{"field": "parse", "error": str(e)}]
+
+    # Normalize common AI field name variants to protocol names
+    FIELD_ALIASES = {
+        'summary': 'completion_summary',
+        'artifacts': 'evidence_paths',
+        'next_worker_suggestion': 'next_action',
+    }
+    for alias, canonical in FIELD_ALIASES.items():
+        val = ai_fields.get(alias)
+        if val is not None and val != '' and val != [] and not ai_fields.get(canonical):
+            ai_fields[canonical] = ai_fields.pop(alias)
 
     ok, errors = validate_handoff_json(ai_fields)
     if not ok:
