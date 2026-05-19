@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260518T000117Z
 kind: raw
-phase_state: proposed
+phase_state: absorbed
 platform_ids:
   github:
     issue_id: '534'
@@ -17,10 +17,11 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
+platform_state: closed
 priority: P1
 source: chat-inbox
 title: 消除 status 字段残留，统一为 platform_state + phase_state 双字段
+completed_at: '2026-05-19T01:26:43Z'
 ---
 
 ## 背景
