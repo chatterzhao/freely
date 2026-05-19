@@ -1,0 +1,133 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Test: validate_handoff_json enforces evidence_paths for worker_done
+# REQUIRED_FIELDS['worker_done'] = ['completion_summary', 'evidence_paths']
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+HANDOFF_PY="$ROOT_DIR/docs/system/workspace/scripts/runtime/handoff.py"
+
+pass=0
+fail=0
+
+assert_ok () {
+  local desc="$1" json="$2"
+  result=$(python3 -c "
+import sys; sys.path.insert(0, '$ROOT_DIR/docs/system/workspace/scripts/runtime')
+from handoff import validate_handoff_json
+ok, errors = validate_handoff_json($json)
+print(ok)
+print(errors)
+")
+  ok_line=$(echo "$result" | head -1)
+  if [ "$ok_line" = "True" ]; then
+    echo "  PASS: $desc"
+    pass=$((pass + 1))
+  else
+    echo "  FAIL: $desc — expected True, got $ok_line"
+    echo "    errors: $(echo "$result" | tail -1)"
+    fail=$((fail + 1))
+  fi
+}
+
+assert_reject () {
+  local desc="$1" json="$2" expected_field="$3"
+  result=$(python3 -c "
+import sys; sys.path.insert(0, '$ROOT_DIR/docs/system/workspace/scripts/runtime')
+from handoff import validate_handoff_json
+ok, errors = validate_handoff_json($json)
+print(ok)
+import json; print(json.dumps(errors))
+")
+  ok_line=$(echo "$result" | head -1)
+  errors_json=$(echo "$result" | tail -1)
+  if [ "$ok_line" != "True" ]; then
+    if echo "$errors_json" | python3 -c "import sys,json; sys.exit(0) if any(e.get('field') == '$expected_field' for e in json.loads(sys.stdin.read())) else sys.exit(1)" 2>/dev/null; then
+      echo "  PASS: $desc"
+      pass=$((pass + 1))
+    else
+      echo "  FAIL: $desc — expected error on field '$expected_field', but errors: $errors_json"
+      fail=$((fail + 1))
+    fi
+  else
+    echo "  FAIL: $desc — expected rejection, got ok=True"
+    fail=$((fail + 1))
+  fi
+}
+
+assert_ok_unaffected () {
+  local desc="$1" json="$2"
+  result=$(python3 -c "
+import sys; sys.path.insert(0, '$ROOT_DIR/docs/system/workspace/scripts/runtime')
+from handoff import validate_handoff_json
+ok, errors = validate_handoff_json($json)
+print(ok)
+")
+  ok_line=$(echo "$result" | head -1)
+  if [ "$ok_line" = "True" ]; then
+    echo "  PASS: $desc"
+    pass=$((pass + 1))
+  else
+    echo "  FAIL: $desc — expected True (unaffected by evidence_paths), got $ok_line"
+    fail=$((fail + 1))
+  fi
+}
+
+echo "=== TC1: missing evidence_paths → rejected ==="
+assert_reject \
+  "missing evidence_paths" \
+  '{"exit_kind": "worker_done", "completion_summary": "task completed"}' \
+  "evidence_paths"
+
+echo "=== TC2: valid worker_done with evidence_paths → accepted ==="
+assert_ok \
+  "with evidence_paths" \
+  '{"exit_kind": "worker_done", "completion_summary": "task completed", "evidence_paths": "/path/to/evidence.md"}'
+
+echo "=== TC3: multi-line evidence_paths → accepted ==="
+assert_ok \
+  "multi-line evidence_paths" \
+  '{"exit_kind": "worker_done", "completion_summary": "task completed", "evidence_paths": "/path/a.md\n/path/b.md"}'
+
+echo "=== TC4: other exit_kinds unaffected ==="
+assert_ok_unaffected \
+  "worker_blocked with reason/next_action" \
+  '{"exit_kind": "worker_blocked", "reason": "blocked", "next_action": "check"}'
+assert_ok_unaffected \
+  "worker_handoff_needed with reason/next_action" \
+  '{"exit_kind": "worker_handoff_needed", "reason": "needs review", "next_action": "check"}'
+# delegate_workers requires real paths; create a temp file
+DELEGATE_PROMPT=$(mktemp /tmp/delegate-prompt.XXXXXX.md)
+assert_ok_unaffected \
+  "delegate_workers with reason/worker_prompts_csv" \
+  '{"exit_kind": "delegate_workers", "reason": "delegating", "worker_prompts_csv": "'"$DELEGATE_PROMPT"'"}'
+assert_ok_unaffected \
+  "stop_ai with reason" \
+  '{"exit_kind": "stop_ai", "reason": "idle"}'
+
+echo "=== TC5: missing both completion_summary and evidence_paths → two errors ==="
+result=$(python3 -c "
+import sys; sys.path.insert(0, '$ROOT_DIR/docs/system/workspace/scripts/runtime')
+from handoff import validate_handoff_json
+ok, errors = validate_handoff_json({'exit_kind': 'worker_done'})
+print(ok)
+import json; print(json.dumps(errors))
+")
+ok_line=$(echo "$result" | head -1)
+errors_json=$(echo "$result" | tail -1)
+fields=$(echo "$errors_json" | python3 -c "import sys,json; print('|'.join(sorted(e['field'] for e in json.loads(sys.stdin.readline()))))" 2>/dev/null || echo "")
+if [ "$ok_line" != "True" ] && echo "$fields" | grep -q "completion_summary" && echo "$fields" | grep -q "evidence_paths"; then
+  echo "  PASS: both completion_summary and evidence_paths rejected (fields: $fields)"
+  pass=$((pass + 1))
+else
+  echo "  FAIL: expected errors for both completion_summary and evidence_paths, got ok=$ok_line fields=$fields"
+  fail=$((fail + 1))
+fi
+
+echo ""
+echo "=== Summary ==="
+echo "  Passed: $pass"
+echo "  Failed: $fail"
+if [ "$fail" -gt 0 ]; then
+  exit 1
+fi
