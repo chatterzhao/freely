@@ -5480,8 +5480,14 @@ routing_policy:
 ### candidate_issues
 1. `C-20260513T040512Z-A`
 - milestone: M-20260513T040512Z-A
-- status: needs_research
+- status: promoted
 - decision_reason: raw-20260513T040512Z (GitHub #327) task-lifecycle-scan O(n) API 性能问题，1+3 批量化方案明确
-- next_action: 进入 B2_IBM materialize C-20260513T040512Z-A
+- next_action: B2 materialized, entering dev-loop
 - revisit_trigger: B2_IBM materialize 完成后重新评估
 - source_candidate: `docs/pre-brainstorms/20260513T040512Z--task-lifecycle-scan-batch/candidates.md#C-20260513T040512Z-A`
+### committed_issues
+1. `I-20260513T040512Z-A`
+- title: task-lifecycle-scan 批量化 — 1+3 阶段扫描替代 O(n) API 逐项查询
+- milestone_state: b2_ibm
+- phase_state: `b2_ibm`
+- issue_path: `docs/issues/I-20260513T040512Z-A/issue.md`

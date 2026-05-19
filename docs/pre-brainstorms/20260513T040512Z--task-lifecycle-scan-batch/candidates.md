@@ -4,9 +4,9 @@
 
 - candidate_format_version: v2
 - title: task-lifecycle-scan 批量化 — 1+3 阶段扫描替代 O(n) API 逐项查询
-- status: needs_research
+- status: promoted
 - decision_reason: raw-20260513T040512Z (GitHub #327) 提出 task-lifecycle-scan.py 的 O(n) API 性能问题，1+3 阶段批量化方案明确且风险可控
-- next_action: 进入 B2_IBM materialize 为 I-* issue，实现 Phase 0-3 的代码变更
+- next_action: B2 materialized, entering dev-loop
 - revisit_trigger: B2_IBM 完成 materialize 后重新评估
 - acceptance_criteria:
   - Phase 0: `gh issue list --state all --limit 1000` 批量抓取替代逐项查询
