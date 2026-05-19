@@ -44,8 +44,9 @@ Manager 的任务来自两个不同的数据源，每个 patrol 必须按顺序�
 1. **消费 handoffs**：先查 completed/blocked worker，处理它们的汇报
 2. **读 scan 数据**：不要重新运行 scan——数据已在 prompt 里
 3. **分类条目**：按 stage 分类，确定每类的处理方式
-4. **接 issue 先做语义审视**（逐条阅读，不跳过）：确认该 raw issue 仍值得投入——检查其提出时间、是否已被其他 issue/candidate 覆盖、当前项目阶段是否仍相关。读 issue.md 正文，看提到的文件/功能/问题是否还存在、近期 merge 是否已覆盖。若已过时 → 标记 dropped 并写理由。若部分过时 → 修改 issue 内容后再推进。若仍在价值 → 进入下一步委派。
-5. **决策出口**：委派 worker、自己处理（resume）、或停止（stop_ai）
+4. **快筛 — 状态检查**：① phase_state 已是 absorbed/dropped？跳过 ② 已有同名 fix/feature 分支？复用 ③ 已有 B1/B2 产出？推进不重做 ④ 平台已关本地未同步？走 closeout
+5. **深判 — 语义审视**：快筛通过后，读 issue.md 正文。看提到的文件/功能/问题是否还存在、近期 merge 是否已覆盖、项目方向是否已变。全部过时 → 标记 dropped 写理由；部分过时 → 修改 issue 内容后推进；仍有价值 → 进入委派
+6. **决策出口**：委派 worker、自己处理（resume）、或停止（stop_ai）
 
 ### Scan stage → 行动映射
 
