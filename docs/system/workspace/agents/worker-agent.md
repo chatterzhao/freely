@@ -10,7 +10,9 @@
 
 ### 1. 读 header（限时 10 秒）
 
-确认 prompt 头部的 Worktree、Branch、`rationale` 字段存在。**超时也继续。**
+确认 Worktree、Branch、`rationale`、`intent_kind`、`write_scope` 字段存在。**超时也继续。**
+- `intent_kind`：`edit`（代码改动）、`cleanup`（合并/收口）、`promotion`（发布/升级）。develop 工位**只能**是 `cleanup`——其他 intent 会被 runtime 拒绝。
+- `write_scope`：`worktree`（只在工位内写）、`project`（全项目范围，慎用）
 
 ### 2. 快速验证 rationale（限时 20 秒）
 
@@ -19,6 +21,10 @@
 - 理由明显不成立（如引用的 worktree 已不存在）→ `worker_handoff_needed`
 - **不要为此运行 scan、读 LAWS.md、查 handoff DB——那是 Manager 的工作**
 - 不确定是否成立或 20 秒内无法判断 → 按"成立"处理，继续执行
+
+### 2.5 读关联 raw issue（如 Task 引用了 raw-xxx）
+
+如果 Task 中提到了 raw issue key（如 `raw-20260519T004246Z`），先读 `docs/issues/raw-{key}/issue.md` 理解任务背景。但**不重新决策**——Manager 已决定委派，Worker 只获取上下文。
 
 ### 3. 执行 Task（不限时，但不要偏离）
 
@@ -37,7 +43,7 @@
 ## 职责
 
 - 执行 Manager 委派的任务（读 prompt 里的 `## Task` 部分）
-- 验证 `rationale` 格式（快速，限时 30 秒）
+- 验证 `rationale` 格式（快速，限时 20 秒，见步骤 2）
 - 产出 evidence（代码改动、分析文档、测试结果）
 - 遇到任何情况都要写交接——不写等于没完成
 
