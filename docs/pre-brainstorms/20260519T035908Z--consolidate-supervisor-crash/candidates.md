@@ -7,6 +7,7 @@
 - **route_kind**: pre_brainstorm
 - **phase_state**: in_pre_brainstorm
 - **priority**: P2
+- **status**: needs_research
 - **problem**: 11 raw issues from 11 occurrences of the same supervisor crash (bash rc=0)
 - **why_now**: Duplicates waste tracking capacity; need consolidation before further analysis
 - **decision_reason**: B1_IBM decision: consolidate to P2. 10+ duplicate "supervisor crash: bash rc=0" raw issues from the same root cause. Keep raw-20260519T035908Z as canonical, absorb all others. Fix branch `fix/raw-20260519T035908Z-consolidate-supervisor-crash` created for analysis and consolidation.
