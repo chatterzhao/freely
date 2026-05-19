@@ -3,7 +3,7 @@ local_id: raw-20260517T053948Z
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260413-0420-A
-absorbed_at: "2026-05-17T08:37:00Z"
+absorbed_at: '2026-05-17T08:37:00Z'
 priority: P2
 source: chat-inbox
 created_at: '2026-05-17T05:39:48Z'
@@ -13,9 +13,9 @@ platform_ids:
     issue_id: '426'
     url: https://github.com/chatterzhao/freely/issues/426
     synced_at: '2026-05-17T05:39:55Z'
-updated_at: '2026-05-17T06:18:54Z'
+updated_at: '2026-05-19T23:32:20Z'
 primary_platform: github
-platform_state: open
+platform_state: closed
 ---
 
 supervisor crash: bash at freely:18777 (rc=0)
