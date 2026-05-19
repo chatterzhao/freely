@@ -44,7 +44,7 @@ protected_branch() {
 blocked_merge_branch() {
   local branch="$1"
   case "$branch" in
-    test-pre-merge-*) return 0 ;;
+    # test-pre-merge-* is allowed as merge target (for testing), blocked as source below
   esac
   return 1
 }
@@ -57,9 +57,9 @@ validate_merge_direction() {
   case "$target" in
     develop)
       case "$source_branch" in
-        fix/*|feature/*|hotfix/*) allowed=1 ;;
+        fix/*|feature/*|feat/*|hotfix/*) allowed=1 ;;
       esac ;;
-    fix/*|feature/*|hotfix/*)
+    fix/*|feature/*|feat/*|hotfix/*)
       case "$source_branch" in
         develop) allowed=1 ;;
       esac ;;
@@ -67,12 +67,31 @@ validate_merge_direction() {
       case "$source_branch" in
         release/*|hotfix/*) allowed=1 ;;
       esac ;;
+    test-pre-merge-*)
+      # test-pre-merge is a disposable test sandbox. Other branches can merge
+      # INTO it for testing, but it can never merge OUT to anywhere.
+      case "$source_branch" in
+        fix/*|feature/*|feat/*|hotfix/*|develop) allowed=1 ;;
+      esac ;;
+  esac
+
+  # test-pre-merge can never be a merge source (can't merge out to anywhere)
+  case "$source_branch" in
+    test-pre-merge-*)
+      cat <<'TEST_BLOCK' >&2
+[MERGE-GUARD] blocked: test-pre-merge-* cannot be a merge source.
+
+  test-pre-merge-* 是一次性测试沙箱，不允许合并到任何目标。
+  正确流程: fix/* → test-pre-merge-*（测试）→ 验证通过 → fix/* → develop
+TEST_BLOCK
+      return 1
+      ;;
   esac
 
   # Validate branch name contains raw-key for fix/feature/hotfix — BLOCK on mismatch
   if [[ "$allowed" == "1" ]]; then
     case "$source_branch" in
-      fix/*|feature/*|hotfix/*)
+      fix/*|feature/*|feat/*|hotfix/*)
         if ! echo "$source_branch" | grep -qE '(raw-|I-)?[0-9]{8}[-T][0-9]{4,6}Z[-]'; then
           cat <<'BRANCH_BLOCK' >&2
 [MERGE-GUARD] BLOCKED: branch name missing raw-key.
@@ -96,9 +115,11 @@ BRANCH_BLOCK
   source: $source_branch
 
 Allowed:
-  fix/raw-{key}-{slug} <-> develop
   feature/raw-{key}-{slug} <-> develop
-  hotfix/raw-{key}-{slug} <-> develop
+  feat/raw-{key}-{slug} <-> develop
+  feature/raw-{key}-{slug} <-> develop
+  hotfeature/raw-{key}-{slug} <-> develop
+  feat/raw-{key}-{slug} <-> develop
   release/* -> main
   hotfix/* -> main
 MSG
