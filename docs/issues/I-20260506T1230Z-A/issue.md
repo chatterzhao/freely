@@ -1,7 +1,7 @@
 ---
 local_id: I-20260506T1230Z-A
 kind: linked
-phase_state: in_dev
+phase_state: absorbed
 source_candidate: docs/pre-brainstorms/20260506-wt-create-dual/candidates.md
 milestone: M-20260506T1230Z-A
 verification_artifact_dir: docs/epics/wt-create-dual/code-reviews

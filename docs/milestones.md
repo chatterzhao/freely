@@ -736,7 +736,7 @@ routing_policy:
 1. `I-20260506T1230Z-A`
 - title: wt-create dual worktree creation
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `absorbed`
 - issue_path: `docs/issues/I-20260506T1230Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260506-wt-create-dual/candidates.md`
 - verification_artifact_dir: `docs/epics/wt-create-dual/code-reviews`
