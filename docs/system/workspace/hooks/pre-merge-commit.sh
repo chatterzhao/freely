@@ -42,6 +42,19 @@ Policy source: docs/LAWS.md §2D
 MSG
     exit 1
   fi
+  cat <<'GATE_WARN' >&2
+[HOOK] ⚠️  FREELY_SKIP_IBM_GATE=1 — IBM governance gate SKIPPED.
+
+  仅以下 2 种情况允许绕过 IBM governance gate:
+    1. docs-only 变更（agent 文档、skills、治理文档——不改运行时代码）
+    2. 批量 closeout / 数据迁移 / YAML 规范化（机械操作，不改变行为）
+
+  代码修改（含紧急修复）必须走完整流程:
+    wt-create → skill:freely-fix-execution → dev → merge-guarded
+
+  本次绕过已记录。如非上述 2 种情况，请立即回退并走正常流程。
+  文档: docs/LAWS.md §2D
+GATE_WARN
   echo "[HOOK] IBM governance gate skipped (FREELY_SKIP_IBM_GATE=1)"
   exit 0
 fi
