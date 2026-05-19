@@ -27,6 +27,30 @@ wt_managed_branch_ref() {
   return 1
 }
 
+_caller_is_wt_create() {
+  # Walk process ancestry: check if wt-create is in the parent chain.
+  # git worktree add runs git-under-hook → this hook → check if any ancestor is wt-create.
+  local pid ppid cmd
+  pid=$PPID
+  while [[ "$pid" -gt 1 ]]; do
+    cmd=$(ps -o comm= -p "$pid" 2>/dev/null || true)
+    case "$cmd" in
+      wt-create|bash*)  # bash* covers "bash ./bin/wt-create" invocation
+        # Verify by checking if the process command line contains wt-create
+        local full_cmd
+        full_cmd=$(ps -o args= -p "$pid" 2>/dev/null || true)
+        case "$full_cmd" in
+          *wt-create*) return 0 ;;
+        esac
+        ;;
+    esac
+    ppid=$(ps -o ppid= -p "$pid" 2>/dev/null | tr -d ' ' || true)
+    [[ -n "$ppid" && "$ppid" -gt 0 ]] || break
+    pid=$ppid
+  done
+  return 1
+}
+
 commit_has_canonical_receipt() {
   local commit="$1"
   local body=""
@@ -53,30 +77,33 @@ while read -r old_oid new_oid refname; do
   fi
   if [[ "$old_oid" == "$zero_oid" ]]; then
     if wt_managed_branch_ref "$refname"; then
-      if [[ "${FREELY_WT_CREATE:-}" != "1" ]]; then
-        branch_name="$(protected_branch_name "$refname")"
+      branch_name="$(protected_branch_name "$refname")"
+      # Only allow wt-create to create managed branches — verify caller via process tree
+      if ! _caller_is_wt_create; then
         cat <<MSG >&2
-[HOOK] Branch creation blocked: '$branch_name' must be created through ./bin/wt-create.
-Direct 'git worktree add' / 'git branch' for feature/*, hotfix/*, fix/*, and test-pre-merge-* branches is not allowed.
-Use './bin/wt-create --raw-key <key> --prefix <fix|feature> --skill <path> --slug <slug>' instead.
-This ensures every worktree has a valid issue, correct naming, and governance traceability.
-Policy source: docs/CONSTITUTION.md §2, docs/LAWS.md §2
+[HOOK] Branch creation blocked: '$branch_name'
+
+  fix/feature/hotfix/test-pre-merge 分支禁止手动创建。
+  唯一入口: ./bin/wt-create --raw-key <key> --slug <slug>
+
+  文档: docs/LAWS.md §2D
 MSG
         exit 1
       fi
-      # FREELY_WT_CREATE=1 bypass: warn that this is for wt-create internal use only
-      branch_name="$(protected_branch_name "$refname")"
-      if ! echo "$branch_name" | grep -qE '(raw-[0-9]{8}[-T][0-9]{4,6}Z|I-[0-9]{8}[-T][0-9]{4,6}Z)'; then
-        cat <<'WT_WARN' >&2
-[HOOK] ⚠️  FREELY_WT_CREATE=1 — branch name missing raw-key.
+      # Validate branch name contains raw-key (test-pre-merge is exempt)
+      case "$branch_name" in
+        test-pre-merge-*) ;;  # disposable testing sandbox
+        *)
+          if ! echo "$branch_name" | grep -qE '(raw-[0-9]{8}[-T][0-9]{4,6}Z|I-[0-9]{8}[-T][0-9]{4,6}Z)'; then
+            cat <<'NAME_BLOCK' >&2
+[HOOK] Branch name rejected: '$branch_name'
 
-  FREELY_WT_CREATE 仅允许 wt-create 内部使用以创建合规分支名。
-  手动设置此变量并创建不合规分支名属于绕过行为。
-
-  正确做法: ./bin/wt-create --raw-key <key> --slug <slug>
-  文档: docs/LAWS.md §2D
-WT_WARN
-      fi
+  fix/feature/hotfix 分支名必须含 raw-YYYYMMDDTHHMMSSZ key。
+NAME_BLOCK
+            exit 1
+          fi
+          ;;
+      esac
     fi
     continue
   fi
