@@ -371,10 +371,24 @@ def auto_consume(raw_key):
 
 def extract_handoff_block(text):
     """Extract the first ```handoff fenced block from AI reply text."""
-    m = re.search(r'```handoff\s*\n(.*?)\n```[^\n]*', text, re.DOTALL)
+    # Strip ACP event lines that may be interleaved with the AI reply
+    cleaned = re.sub(r'^\[ACP [^\n]*\n', '', text, flags=re.MULTILINE)
+    # Strip trailing ACP/CACHE/TIMING metadata lines
+    cleaned = re.sub(r'\n\[(ACP|CACHE|TIMING)[^\n]*', '', cleaned)
+    # Find handoff fence — tolerate missing/extra trailing text after ```
+    m = re.search(r'```handoff\s*\n(.*?)\n\s*```', cleaned, re.DOTALL)
+    if not m:
+        # Fallback: no closing ``` — use everything after ```handoff to end
+        m = re.search(r'```handoff\s*\n(.*)', cleaned, re.DOTALL)
     if not m:
         return None
-    return m.group(1).strip()
+    raw = m.group(1).strip()
+    # Extract JSON object boundaries if raw contains extra trailing text
+    brace_start = raw.find('{')
+    brace_end = raw.rfind('}')
+    if brace_start >= 0 and brace_end > brace_start:
+        raw = raw[brace_start:brace_end + 1]
+    return raw.strip()
 
 
 def validate_handoff_json(ai_fields):
