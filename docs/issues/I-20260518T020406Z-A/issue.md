@@ -1,7 +1,7 @@
 ---
 local_id: I-20260518T020406Z-A
 kind: linked
-phase_state: absorbed
+phase_state: completed
 promoted_from: raw-20260518T020406Z
 source_candidate: docs/pre-brainstorms/20260518T020406Z--chat-conversation-extension/candidates.md
 canonical_issue_path: ''
@@ -13,13 +13,13 @@ primary_platform: github
 last_synced_comment_at: {}
 hash: ''
 created_at: 2026-05-18 02:04:06+00:00
-updated_at: '2026-05-19T00:00:00Z'
+updated_at: '2026-05-19T00:03:00Z'
 intake_id: ''
 author: zhaoquan
 channel: manager-promotion
 session_refs: []
 pre_tests_path: ''
-verification_artifact_dir: ''
+verification_artifact_dir: 'docs/epics/chat-conversation-extension/implementation/code-reviews'
 platform_state: closed
 ---
 
