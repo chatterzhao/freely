@@ -16073,8 +16073,8 @@ manager_supervisor_between_rounds_relaunch_in_flight() {
   (( state_updated_epoch > 0 )) || return 1
 
   now_epoch="$(date +%s)"
-  grace_secs="${FREELY_MANAGER_BETWEEN_ROUNDS_GRACE_SECS:-12}"
-  [[ "$grace_secs" =~ ^[0-9]+$ ]] || grace_secs=12
+  grace_secs="${FREELY_MANAGER_BETWEEN_ROUNDS_GRACE_SECS:-60}"
+  [[ "$grace_secs" =~ ^[0-9]+$ ]] || grace_secs=60
   (( now_epoch - state_updated_epoch <= grace_secs ))
 }
 
@@ -19424,7 +19424,10 @@ launch_kind: ${mode_name:-unknown}"
     FIRST_ROUND=false
 
     log_warn "ai process exited rc=$rc (pid=${child_pid:-unknown}, session_id=${tool_session_id:-unavailable}, context_compacted=$context_compacted, context_ratio=${context_ratio:-unavailable}, jsonl_path=${tool_jsonl_path:-unavailable}, primary_rate_limit_used_percent=${primary_rate_limit_used_percent:-unavailable}, primary_rate_limit_resets_at=${primary_rate_limit_resets_at:-unavailable}, secondary_rate_limit_used_percent=${secondary_rate_limit_used_percent:-unavailable}, secondary_rate_limit_resets_at=${secondary_rate_limit_resets_at:-unavailable}, route_only_handoff=${route_only_handoff})"
-    rm -f "$child_pid_file"
+    # ACP mode: bridge persists across cycles — keep child_pid_file so watchdog knows AI is alive
+    if [[ "${AI_TOOL_ADAPTER:-direct}" != "acp" ]]; then
+      rm -f "$child_pid_file"
+    fi
 
     local exit_contract_action
     exit_contract_action="$(project_runtime_handle_exit_contract_after_ai_cycle "$PROJECT_ROOT" "$LAST_WORKCELL_EXIT_REASON")"
