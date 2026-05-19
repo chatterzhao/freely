@@ -12163,8 +12163,8 @@ print(sum(1 for r in rows if r.get('worktree','')=='$_target_worktree'))
           --created-by manager --consumed-by worker \
           --parent "$_parent_handoff_id" --prev-worker "$_prev_worker_id" 2>/dev/null || true)
       fi
-      # WORKER_HANDOFF_INJECT: only on fork (first launch), not on delta followthrough
-      if [[ -n "$_handoff_id" && -f "$_prompt_file" && "$_is_followthrough" != "true" ]]; then
+      # WORKER_HANDOFF_INJECT: always inject handoff reminder
+      if [[ -n "$_handoff_id" && -f "$_prompt_file" ]]; then
         local _prev_summary_truncated
         _prev_summary_truncated="${_prev_worker_summary:0:80}"
         cat >> "$_prompt_file" <<WORKER_HANDOFF_INJECT
