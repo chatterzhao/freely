@@ -1,12 +1,12 @@
 ---
 local_id: I-20260506T1000Z-A
 kind: i_issue
-phase_state: b2_ibm
+phase_state: in_dev
 milestone: M-20260506T1000Z-A
 candidate: C-20260506T1000Z-A
 title: supervisor 主循环 select_launch_kind 前添加 task_mode=wait 门禁
 created_at: '2026-05-19T16:32:43Z'
-updated_at: '2026-05-19T16:32:43Z'
+updated_at: '2026-05-19T16:36:35Z'
 ---
 
 ## I-20260506T1000Z-A
@@ -15,7 +15,7 @@ updated_at: '2026-05-19T16:32:43Z'
 |-------|-------|
 | local_id | `I-20260506T1000Z-A` |
 | kind | `i_issue` |
-| phase_state | `b2_ibm` |
+| phase_state | `in_dev` |
 | milestone | `M-20260506T1000Z-A` |
 | candidate | `C-20260506T1000Z-A` |
 | created | 2026-05-19 16:32:43+00:00 |
