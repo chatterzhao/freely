@@ -334,12 +334,6 @@ def _stage_from_linked(linked: dict) -> str:
 # ── Completion checklist ─────────────────────────────────
 
 def check_completion(item: dict, platform_data: dict) -> list[str]:
-    open_set = platform_data.get("open_set", set())
-    """Return list of incomplete items. Empty list = fully complete (exclude from output).
-
-    Highest authority: platform CLOSED. If all platform issues are confirmed closed,
-    the item is complete regardless of local state.
-    """
     incomplete = []
     raw = item.get("raw")
     children = item.get("children", [])
@@ -399,64 +393,61 @@ def check_completion(item: dict, platform_data: dict) -> list[str]:
 
 
 def fetch_open_platform_issues(project: Path) -> dict:
-    """Fetch OPEN GitHub issues in a single batch call.
-    Returns {"open_set": set[str], "open_issues": list[dict]}.
-    open_issues has number, title, body for raw-key extraction.
+    """Fetch ALL GitHub issues in a single batch call.
+    Returns {
+      "all": dict[str, str],      # number → state (e.g. "OPEN", "CLOSED")
+      "open_set": set[str],        # numbers of open issues
+      "open_issues": list[dict],   # open issue objects
+      "issues": list[dict],        # all issue objects with number, title, body, state
+    }
     """
-    import json as _json2
-    result = {"open_set": set(), "open_issues": []}
-    if os.environ.get("SKIP_PLATFORM_CHECK"):
-        return result
-    try:
-        proc = subprocess.run(
-            ["gh", "issue", "list", "--state", "open", "--limit", "1000",
-             "--json", "number,title,body", "--repo", "chatterzhao/freely"],
-            capture_output=True, text=True, timeout=15
-        )
-        if proc.returncode == 0:
-            for issue in _json2.loads(proc.stdout):
-                num = str(issue.get("number", ""))
-                result["open_set"].add(num)
-                result["open_issues"].append(issue)
-    except Exception:
-        pass
-    return result
+    result = {
+        "all": {},
+        "open_set": set(),
+        "open_issues": [],
+        "issues": [],
+    }
     try:
         proc = subprocess.run(
             ["gh", "issue", "list", "--state", "all", "--limit", "1000",
-             "--json", "number,title,body,state", "--repo", "chatterzhao/freely"],
+             "--json", "number,title,body,state"],
             capture_output=True, text=True, timeout=15
         )
         if proc.returncode == 0:
-            issues = _json2.loads(proc.stdout)
-            for issue in issues:
+            for issue in json.loads(proc.stdout):
                 num = str(issue.get("number", ""))
                 state = issue.get("state", "")
                 result["all"][num] = state
-                if state == "OPEN":
-                    result["open"].add(num)
                 result["issues"].append(issue)
+                if state == "OPEN":
+                    result["open_set"].add(num)
+                    result["open_issues"].append(issue)
     except Exception:
-        pass
+        pass  # fallback: empty platform_data, downstream checks will return None
     return result
 
 
 def _is_github_closed_lookup(issue_number: str, platform_data: dict) -> bool | None:
-    """Check if issue is NOT in the OPEN set.
-    Returns True if not open, False if OPEN, None if skipped.
-    """
-    if os.environ.get("SKIP_PLATFORM_CHECK"):
-        return None
-    open_set: set = platform_data.get("open_set", set())
-    return str(issue_number) not in open_set
+    """Check issue state from platform_all dict — zero API calls.
+    Returns True if CLOSED/MERGED, False if OPEN, None if unknown."""
+    platform_all: dict = platform_data.get("all", {})
+    state = platform_all.get(str(issue_number))
+    if state is not None:
+        return state != "OPEN"
+    return None
 
 
 def scan_classification(project: Path, platform_data: dict) -> list[dict]:
-    """Phase 1: Classify local issues against platform state.
-    Both sides only OPEN. Same issue in both → one record.
-    Only differences produce actionable items.
+    """Phase 1+2: Classify local issues vs platform state + reverse discovery.
+
+    Phase 1: Local vs platform classification:
+      - pid in platform_all with matching state → consistent (skip)
+      - pid in platform_all with different state → state_mismatch
+      - pid not in platform_all → local_only
+
+    Phase 2: Reverse discovery — platform issues referencing raw-{key} not in local.
     """
-    open_set: set = platform_data.get("open_set", set())
+    platform_all: dict = platform_data.get("all", {})
     seen_in_local: set = set()
     items = []
     issues_dir = project / "docs" / "issues"
@@ -475,29 +466,34 @@ def scan_classification(project: Path, platform_data: dict) -> list[dict]:
         name = d.name
         phase = fm.get("phase_state", "") or fm.get("status", "")
         source = "raw" if name.startswith("raw-") else "linked" if name.startswith("I-") else "other"
+        local_platform_state = fm.get("platform_state", "").upper()
 
         if gh_id:
             seen_in_local.add(gh_id)
-            is_open = gh_id in open_set
-            if is_open:
-                if phase == "completed":
+            plat_state = platform_all.get(gh_id, "").upper()
+            if plat_state:
+                if local_platform_state and local_platform_state != plat_state:
+                    # Phase 1: State mismatch
                     items.append({
                         "source_family": "classification", "key": name,
                         "stage": "state_mismatch",
-                        "detail": "本地已完成但平台仍 OPEN",
+                        "detail": f"本地状态={local_platform_state}, 平台状态={plat_state}",
                         "platform_issue": gh_id,
-                        "incomplete": ["platform_open_but_local_completed"],
-                        "ready": False, "next_action": "关闭平台 issue 或重新打开本地",
+                        "incomplete": ["platform_state_mismatch"],
+                        "ready": False,
+                        "next_action": "同步本地平台状态或关闭平台 issue",
                     })
+                # Consistent state → no action
             else:
-                if phase != "completed" and phase not in TERMINAL_RAW:
+                # gh_id not in platform_all → local_only
+                if source in ("raw", "linked") and phase not in TERMINAL_RAW and phase not in ("absorbed", "dropped"):
                     items.append({
                         "source_family": "classification", "key": name,
-                        "stage": "local_needs_closeout",
-                        "detail": "平台已不 OPEN，本地未完成",
-                        "platform_issue": gh_id,
-                        "incomplete": ["platform_done_local_not_completed"],
-                        "ready": False, "next_action": "完成本地工作后同步关闭",
+                        "stage": "local_only",
+                        "detail": "本地有 issue 但平台无对应",
+                        "incomplete": ["no_platform_counterpart"],
+                        "ready": True,
+                        "next_action": "推送到平台建立对应",
                     })
         else:
             if source == "raw" and phase not in TERMINAL_RAW and phase not in ("absorbed", "dropped"):
@@ -509,8 +505,8 @@ def scan_classification(project: Path, platform_data: dict) -> list[dict]:
                     "ready": True, "next_action": "推送到平台建立对应",
                 })
 
-    # Reverse: platform OPEN issues with gh_id not seen in local
-    for issue in platform_data.get("open_issues", []):
+    # Phase 2: Reverse discovery — platform issues with raw-{key} not in local
+    for issue in platform_data.get("issues", []):
         num = str(issue.get("number", ""))
         if num in seen_in_local:
             continue
@@ -521,6 +517,10 @@ def scan_classification(project: Path, platform_data: dict) -> list[dict]:
         for m in re.finditer(r"(?:^|\W)(raw-(\d{8}T\d{4,6}Z))", combined, re.MULTILINE):
             raw_key = m.group(2)
             break
+        if raw_key:
+            raw_dir = project / "docs" / "issues" / f"raw-{raw_key}"
+            if raw_dir.is_dir():
+                continue  # raw exists locally → skip
         items.append({
             "source_family": "classification",
             "key": f"gh-{num}",
@@ -529,10 +529,10 @@ def scan_classification(project: Path, platform_data: dict) -> list[dict]:
             "platform_issue": num,
             "incomplete": ["no_local_raw"],
             "ready": True,
-            "next_action": f"./bin/wt-create --source platform --raw-key {raw_key} --slug …" if raw_key else f"gh issue view {num} --repo chatterzhao/freely",
+            "next_action": f"./bin/wt-create --source platform --raw-key {raw_key} --slug ..." if raw_key else f"gh issue view {num}",
         })
 
-    # ── Dedup: same base key + same stage → one record ──
+    # Dedup: same base key + same stage → one record
     deduped: dict = {}
     for it in items:
         base = _base_key(it["key"])
@@ -592,10 +592,9 @@ def build_payload(project: Path, raw_key: str = "") -> dict:
     gov_items = scan_worktree_governance(project)
     output.extend(gov_items)
 
-    # Add remote branch governance items (skip if platform check disabled)
-    if not os.environ.get("SKIP_PLATFORM_CHECK"):
-        remote_items = scan_remote_branch_governance(project)
-        output.extend(remote_items)
+    # Add remote branch governance items
+    remote_items = scan_remote_branch_governance(project)
+    output.extend(remote_items)
 
     # When raw_key is specified, filter output to only items matching this key.
     # This ensures the prompt builder gets only the targeted raw→I chain.
@@ -907,38 +906,37 @@ def scan_platform_issues(project: Path, platform_data: dict) -> list[dict]:
             })
 
     # ── Gitee ──
-    if not os.environ.get("SKIP_PLATFORM_CHECK"):
-        try:
-            gitee_py = str(Path(__file__).resolve().parent / "gitee-issue.py")
-            if os.path.isfile(gitee_py):
-                result = subprocess.run(
-                    [sys.executable, gitee_py, "list", "--state", "open", "--per-page", "50"],
-                    capture_output=True, text=True, timeout=15
-                )
-                if result.returncode == 0:
-                    issues = json.loads(result.stdout)
-                    for issue in issues:
-                        title = issue.get("title", "")
-                        body = issue.get("body", "")
-                        number = str(issue.get("number", issue.get("id", "")))
-                        combined = f"{title}\n{body}"
-                        for m in re.finditer(r"(?:^|\W)(raw-(\d{8}T\d{4,6}Z))", combined, re.MULTILINE):
-                            key = m.group(2)
-                            if key not in seen:
-                                seen.add(key)
-                                items.append({
-                                    "source_family": "platform",
-                                    "key": key,
-                                    "stage": "platform_open",
-                                    "platform": "gitee",
-                                    "issue_number": number,
-                                    "title": title,
-                                    "ready": True,
-                                    "next_action": "wt-create --source platform --raw-key " + key,
-                                    "next_station": "raw_created",
-                                })
-        except Exception:
-            pass
+    try:
+        gitee_py = str(Path(__file__).resolve().parent / "gitee-issue.py")
+        if os.path.isfile(gitee_py):
+            result = subprocess.run(
+                [sys.executable, gitee_py, "list", "--state", "open", "--per-page", "50"],
+                capture_output=True, text=True, timeout=15
+            )
+            if result.returncode == 0:
+                issues = json.loads(result.stdout)
+                for issue in issues:
+                    title = issue.get("title", "")
+                    body = issue.get("body", "")
+                    number = str(issue.get("number", issue.get("id", "")))
+                    combined = f"{title}\n{body}"
+                    for m in re.finditer(r"(?:^|\W)(raw-(\d{8}T\d{4,6}Z))", combined, re.MULTILINE):
+                        key = m.group(2)
+                        if key not in seen:
+                            seen.add(key)
+                            items.append({
+                                "source_family": "platform",
+                                "key": key,
+                                "stage": "platform_open",
+                                "platform": "gitee",
+                                "issue_number": number,
+                                "title": title,
+                                "ready": True,
+                                "next_action": "wt-create --source platform --raw-key " + key,
+                                "next_station": "raw_created",
+                            })
+    except Exception:
+        pass
 
     return items
 
@@ -1152,7 +1150,7 @@ def _trace_chain(project: Path, key: str, platform_data: dict) -> dict:
                 "no branch merged to develop" if has_worktree else
                 "branches deleted — inferred from phase_state"))
 
-    # Platform close (best-effort, skipped with SKIP_PLATFORM_CHECK)
+    # Platform close (best-effort check from batch data)
     gh_issue = pids.get("github", "")
     gh_closed = _is_github_closed_lookup(gh_issue, platform_data) if gh_issue else None
     _st("platform_close", gh_closed is True, True, github_issue=gh_issue, gh_closed=gh_closed)
