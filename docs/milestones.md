@@ -5493,3 +5493,4 @@ routing_policy:
 1. `I-20260506T1000Z-A`
 - title: supervisor 主循环 select_launch_kind 前添加 task_mode=wait 门禁
 - milestone_state: committed
+- issue_path: `docs/issues/I-20260506T1000Z-A/issue.md`
