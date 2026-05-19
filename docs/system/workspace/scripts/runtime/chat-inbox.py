@@ -47,6 +47,12 @@ def _connect(db_path: str) -> sqlite3.Connection:
 
 def init_db(db_path: str) -> None:
     conn = _connect(db_path)
+    # Migration: add conversation_id column if missing (safe for existing DBs)
+    try:
+        conn.execute("ALTER TABLE chats ADD COLUMN conversation_id INTEGER DEFAULT 0")
+    except sqlite3.OperationalError:
+        pass  # column already exists
+
     conn.execute(
         """
         CREATE TABLE IF NOT EXISTS chats (
@@ -60,7 +66,8 @@ def init_db(db_path: str) -> None:
             session_refs TEXT DEFAULT '[]',
             intake_id TEXT DEFAULT '',
             materialized_as TEXT DEFAULT '',
-            created_at TEXT NOT NULL DEFAULT ''
+            created_at TEXT NOT NULL DEFAULT '',
+            conversation_id INTEGER DEFAULT 0
         )
         """
     )
@@ -83,9 +90,13 @@ def add_chat(
     channel: str = "chat",
     session_refs: str = "[]",
     intake_id: str = "",
+    conversation_id: int = 0,
 ) -> int:
     """Insert a chat record. Returns the chat id (UTC timestamp).
     Retries on PRIMARY KEY collision (+1 second, up to 3 times).
+
+    For chat-message type: if conversation_id is 0, it's the first message in a
+    new conversation, so conversation_id is auto-updated to the inserted id.
     """
     chat_id = _utc_timestamp()
     conn = _connect(db_path)
@@ -93,11 +104,19 @@ def add_chat(
         try:
             conn.execute(
                 "INSERT INTO chats (id, chat_type, issue_id, author, channel, "
-                "message, consumed, session_refs, intake_id, created_at) "
-                "VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?, ?)",
+                "message, consumed, session_refs, intake_id, created_at, "
+                "conversation_id) "
+                "VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?)",
                 (chat_id, chat_type, issue_id, author, channel,
-                 message, session_refs, intake_id, _now_utc()),
+                 message, session_refs, intake_id, _now_utc(),
+                 conversation_id),
             )
+            # First message in a conversation: update conversation_id to own id
+            if chat_type == "chat-message" and conversation_id == 0:
+                conn.execute(
+                    "UPDATE chats SET conversation_id = ? WHERE id = ?",
+                    (chat_id, chat_id),
+                )
             conn.commit()
             conn.close()
             return chat_id
@@ -174,6 +193,130 @@ def discard(db_path: str, chat_id: int) -> bool:
 
 def reset(db_path: str, chat_id: int) -> bool:
     return _update_consumed(db_path, chat_id, 0)
+
+
+def update_conversation_id(db_path: str, chat_id: int, conversation_id: int) -> bool:
+    """Set conversation_id for a chat record. Returns True if changed."""
+    conn = _connect(db_path)
+    conn.execute(
+        "UPDATE chats SET conversation_id = ? WHERE id = ?",
+        (conversation_id, chat_id),
+    )
+    changed = conn.total_changes > 0
+    conn.commit()
+    conn.close()
+    return changed
+
+
+def query_active_conversation_id(db_path: str) -> int | None:
+    """Find the latest active (unconsumed) conversation_id.
+    Returns the conversation_id if found, None otherwise.
+    """
+    conn = _connect(db_path)
+    row = conn.execute(
+        "SELECT conversation_id FROM chats WHERE chat_type = 'chat-message' "
+        "AND consumed = 0 AND conversation_id > 0 "
+        "ORDER BY id DESC LIMIT 1"
+    ).fetchone()
+    conn.close()
+    return row[0] if row else None
+
+
+def query_conversation_messages(db_path: str, conversation_id: int) -> list[dict]:
+    """Return all unconsumed messages in a conversation, oldest first."""
+    conn = _connect(db_path)
+    conn.row_factory = sqlite3.Row
+    rows = conn.execute(
+        "SELECT * FROM chats WHERE conversation_id = ? AND consumed = 0 "
+        "ORDER BY id ASC",
+        (conversation_id,),
+    ).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def consume_conversation(
+    db_path: str,
+    conversation_id: int,
+    action: str,
+    target: str,
+) -> int:
+    """Batch-consume all messages in a conversation.
+
+    Actions:
+      "materialize"             — merge all messages into a single raw issue
+      "materialize-all-as-comment" — append each message sequentially to target
+
+    Returns count of consumed messages.
+    """
+    messages = query_conversation_messages(db_path, conversation_id)
+    if not messages:
+        return 0
+
+    count = 0
+    if action == "materialize":
+        # Merge all messages into a single raw issue
+        combined = "\n---\n".join(
+            m.get("message", "") for m in messages
+        )
+        issue_id = f"raw-{messages[0]['id']}"
+        first = messages[0]
+        author = first.get("author", "human")
+        channel = first.get("channel", "chat")
+        created_at = first.get("created_at", _now_utc())
+        session_refs = first.get("session_refs", "[]")
+        intake_id = first.get("intake_id", "")
+
+        os.makedirs(target, exist_ok=True)
+        issue_file = os.path.join(target, "issue.md")
+
+        with open(issue_file, "w", encoding="utf-8") as f:
+            f.write(
+                f"---\n"
+                f"local_id: {issue_id}\n"
+                f"kind: raw\n"
+                f"phase_state: proposed\n"
+                f"platform_ids: {{}}\n"
+                f"primary_platform: \"\"\n"
+                f"canonical_issue_path: \"\"\n"
+                f"last_synced_comment_at: {{}}\n"
+                f"hash: \"\"\n"
+                f"created_at: {created_at}\n"
+                f"updated_at: {created_at}\n"
+                f"intake_id: {intake_id}\n"
+                f"author: {author}\n"
+                f"channel: {channel}\n"
+                f"session_refs: {session_refs}\n"
+                f"---\n\n"
+                f"{combined}\n"
+            )
+
+        # Consume all messages
+        for m in messages:
+            consume(db_path, m["id"], issue_id)
+            count += 1
+
+    elif action == "materialize-all-as-comment":
+        for m in messages:
+            author = m.get("author", "human")
+            channel = m.get("channel", "chat")
+            created_at = m.get("created_at", _now_utc())
+            message = m.get("message", "")
+
+            comment_id = f"comment-{created_at.replace(':', '').replace('-', '')}"
+            os.makedirs(os.path.dirname(target), exist_ok=True)
+
+            with open(target, "a", encoding="utf-8") as f:
+                f.write(
+                    f"\n### {comment_id}\n"
+                    f"{{source: chat, author: {author}, channel: {channel}}}\n\n"
+                    f"{message}\n"
+                )
+
+            consume(db_path, m["id"])
+            count += 1
+
+    return count
 
 
 def materialize(db_path: str, chat_id: int, target_dir: str) -> bool:
@@ -258,6 +401,7 @@ def _main() -> int:
     p.add_argument("--channel", default="chat")
     p.add_argument("--session-refs", default="[]")
     p.add_argument("--intake-id", default="")
+    p.add_argument("--conversation-id", type=int, default=0)
 
     p = sub.add_parser("list")
     p.add_argument("--db", required=True)
@@ -285,6 +429,20 @@ def _main() -> int:
     p = sub.add_parser("reset")
     p.add_argument("--db", required=True)
     p.add_argument("--id", type=int, required=True, dest="chat_id")
+
+    p = sub.add_parser("update-conversation-id")
+    p.add_argument("--db", required=True)
+    p.add_argument("--id", type=int, required=True, dest="chat_id")
+    p.add_argument("--conversation-id", type=int, required=True)
+
+    p = sub.add_parser("query-active-conversation")
+    p.add_argument("--db", required=True)
+
+    p = sub.add_parser("consume-conversation")
+    p.add_argument("--db", required=True)
+    p.add_argument("--conversation-id", type=int, required=True)
+    p.add_argument("--action", required=True, choices=["materialize", "materialize-all-as-comment"])
+    p.add_argument("--target", required=True)
 
     p = sub.add_parser("show")
     p.add_argument("--db", required=True)
@@ -314,6 +472,7 @@ def _main() -> int:
         chat_id = add_chat(
             args.db, args.chat_type, args.issue_id, args.message,
             args.author, args.channel, args.session_refs, args.intake_id,
+            args.conversation_id,
         )
         print(chat_id)
         return 0
@@ -361,6 +520,21 @@ def _main() -> int:
         ok = reset(args.db, args.chat_id)
         print("OK" if ok else "NOT_FOUND")
         return 0 if ok else 1
+
+    if args.cmd == "update-conversation-id":
+        ok = update_conversation_id(args.db, args.chat_id, args.conversation_id)
+        print("OK" if ok else "NOT_FOUND")
+        return 0 if ok else 1
+
+    if args.cmd == "query-active-conversation":
+        cid = query_active_conversation_id(args.db)
+        print(cid if cid is not None else "")
+        return 0
+
+    if args.cmd == "consume-conversation":
+        count = consume_conversation(args.db, args.conversation_id, args.action, args.target)
+        print(count)
+        return 0
 
     if args.cmd == "show":
         chat = show(args.db, args.chat_id)

@@ -685,9 +685,11 @@ def scan_chat_inbox(project: Path) -> list[dict]:
     """Scan .freely/freely.db for unconsumed chats.
 
     Trigger point 3 from chat-inbox-sqlite design:
-    - SELECT consumed=0 → present to AI for judgment
+    - SELECT consumed=0 AND (conversation_id=0 OR conversation_id IS NULL) → individual chats
+    - SELECT conversation_id > 0 GROUP BY conversation_id → conversation groups
     - AI decides: create worktree (wt-create auto-materializes) |
                   add as comment to existing issue |
+                  consume_conversation() for conversation batch |
                   discard as noise (consumed=-1)
     """
     items = []
@@ -698,12 +700,42 @@ def scan_chat_inbox(project: Path) -> list[dict]:
         import sqlite3
         conn = sqlite3.connect(str(db_path))
         conn.row_factory = sqlite3.Row
+
+        # ── Individual chats (exclude conversation messages) ──
         rows = conn.execute(
-            "SELECT * FROM chats WHERE consumed = 0 ORDER BY id ASC LIMIT 50"
+            "SELECT * FROM chats WHERE consumed = 0 "
+            "AND (conversation_id = 0 OR conversation_id IS NULL) "
+            "ORDER BY id ASC LIMIT 50"
         ).fetchall()
+
+        # ── Conversation groups (conversation_id > 0, unconsumed) ──
+        conv_rows = conn.execute(
+            "SELECT conversation_id, COUNT(*) as msg_count, "
+            "MIN(created_at) as first_msg, MIN(id) as first_id "
+            "FROM chats WHERE consumed = 0 AND conversation_id > 0 "
+            "GROUP BY conversation_id ORDER BY MIN(id) ASC"
+        ).fetchall()
+
         conn.close()
     except Exception:
         return items
+
+    # Process conversation groups first
+    for cr in conv_rows:
+        conv = dict(cr)
+        items.append({
+            "source_family": "chat_conversation_pending",
+            "key": f"conv-{conv['conversation_id']}",
+            "stage": "chat_conversation_pending",
+            "conversation_id": conv["conversation_id"],
+            "message_count": conv["msg_count"],
+            "first_message_at": conv["first_msg"] or "",
+            "incomplete": ["conversation_unconsumed"],
+            "ready": True,
+            "next_action": "AI 判断 → consume_conversation() 批量消费 → materialize / comment / discard",
+        })
+
+    # Process individual chats
 
     for r in rows:
         chat = dict(r)
@@ -738,6 +770,12 @@ def scan_chat_inbox(project: Path) -> list[dict]:
                 if not worktree_exists
                 else "工位已存在，chat 应已同步到 worktree docs/issues/"
             )
+            incomplete = ["chat_unconsumed"]
+        elif chat_type == "chat-message":
+            # chat-message with conversation_id=0 or NULL shouldn't normally appear
+            # (auto-updated to own id), but handle defensively
+            stage = "chat_conversation_pending"
+            next_action = "AI 判断 → 关联到现有对话或标记为单条消息处理"
             incomplete = ["chat_unconsumed"]
         else:
             # Check if the target issue exists (for comments, the issue may not exist yet)

@@ -5337,6 +5337,13 @@ routing_policy:
 ### candidate_issues
 1. `C-20260518T020406Z-A`
 - milestone: M-20260518T020406Z-A
-- status: needs_research
-- decision_reason: Raw issue #539 提出 chat 体系的第三个类型（chat-message），依赖的 #538 freely comment 已合并到 develop，comment 基础设施可用。改动范围明确（不新增表），向后兼容（conversation_id=0 默认值）。
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260518T020406Z-A/issue.md`
+- decision_reason: Raw issue #539 提出 chat 体系的第三个类型（chat-message），依赖的 #538 freely comment 已合并到 develop，comment 基础设施可用。改动范围明确（不新增表），向后兼容（conversation_id=0 默认值）。B2 实现已通过代码审查。
 - source_candidate: `docs/pre-brainstorms/20260518T020406Z--chat-conversation-extension/candidates.md`
+### committed_issues
+1. `I-20260518T020406Z-A`
+- title: chats 表扩展 conversation_id + chat-message 类型 + scan 对齐
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260518T020406Z-A/issue.md`
