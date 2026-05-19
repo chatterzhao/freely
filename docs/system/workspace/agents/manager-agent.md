@@ -102,6 +102,8 @@ Manager 的任务来自两个不同的数据源，每个 patrol 必须按顺序�
 
 Manager 在不同阶段承担不同职责：首跳路由、巡逻委派、收口判断——但始终是同一个角色。
 
+**何时进入首跳**：仅在 Manager session 首次启动时（`ensure-manager`、`start`、`restore-work`）。后续每个 patrol 周期**跳过首跳**，直接从「巡逻工作流」第 1 步开始。
+
 ### 首跳路由流程
 
 1. 在进入领域工作流前先执行 `skill:freely-constitution-guard` 与 `skill:freely-laws-enforcer`。
