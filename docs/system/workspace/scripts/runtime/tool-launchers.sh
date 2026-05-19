@@ -246,8 +246,8 @@ tool_supported_launch_kinds_for_adapter() {
       printf 'fresh\nfork\nfresh_with_handoff\n'
       ;;
     *:acp)
-      # ACP native: all three session states supported
-      printf 'fresh\nresume\nfork\nfresh_with_handoff\n'
+      # ACP native: session states + prompt (multi-turn delta)
+      printf 'fresh\nresume\nfork\nfresh_with_handoff\nprompt\n'
       ;;
     *)
       # direct mode (DEPRECATED: will be removed when ACP is stable)
@@ -770,9 +770,13 @@ tool_run_acp_from_prompt_file() {
         resume)
           [[ -n "$tool_resume_target" ]] && acp_args+=(--resume "$tool_resume_target")
           ;;
+        prompt)
+          # Multi-turn delta: session alive, just send prompt.
+          # Pass session_id as --resume; run-acp-prompt --launch-kind prompt
+          # sets session_id from it and calls send_prompt() directly.
+          [[ -n "$claude_session_id" ]] && acp_args+=(--resume "$claude_session_id")
+          ;;
         fork)
-          # Fork: worker gets own session, inherits parent context via prompt.
-          # Pass parent session ID as resume target for context reference.
           [[ -n "$tool_resume_target" ]] && acp_args+=(--resume "$tool_resume_target")
           ;;
         fresh|fresh_with_handoff)
