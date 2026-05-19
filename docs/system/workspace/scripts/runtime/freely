@@ -12056,6 +12056,18 @@ for r in json.load(sys.stdin):
   local hid
   for hid in $matching; do
     [[ -n "$hid" ]] || continue
+    # Try to parse worker handoff from cycle log before marking stale
+    local _w_cycle_log _w_parse_result
+    _w_cycle_log="$(ls -t "$(logs_dir_for_project "$project")/cycle-worker-"*.log 2>/dev/null | head -1)"
+    if [[ -n "$_w_cycle_log" && -f "$_w_cycle_log" ]]; then
+      _w_parse_result="$(parse_handoff_json_reply "$project" "$_w_cycle_log" "worker" "$raw_key" "" 2>/dev/null || true)"
+      if [[ "$_w_parse_result" == ok:* ]]; then
+        python3 "$_handoff_py" update --db "$_db_path" --handoff-id "$hid" \
+          --status completed --expected-status launched --exit-kind "${_w_parse_result#ok:}" \
+          --reason "worker completed, handoff parsed from cycle log" >/dev/null 2>&1 || true
+        continue
+      fi
+    fi
     python3 "$_handoff_py" update --db "$_db_path" --handoff-id "$hid" \
       --status blocked --expected-status launched --exit-kind stale_pid \
       --reason "worker process no longer alive" >/dev/null 2>&1 || true
