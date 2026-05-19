@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260518T020406Z
 kind: raw
-phase_state: proposed
+phase_state: absorbed
 platform_ids:
   github:
     issue_id: '539'
@@ -12,7 +12,7 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-18T02:04:19Z'
-updated_at: '2026-05-18T23:50:07Z'
+updated_at: '2026-05-19T00:49:00Z'
 intake_id: ''
 author: platform
 channel: github
