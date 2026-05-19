@@ -83,18 +83,21 @@ WT_WARN
 
   protected_branch_ref "$refname" || continue
 
-  # Branch deletion: block for managed branches
+  # Branch deletion: BLOCK for managed branches — must use wt-close
   if [[ "$new_oid" == "$zero_oid" ]]; then
     if wt_managed_branch_ref "$refname"; then
       branch_name="$(protected_branch_name "$refname")"
-      cat <<'DELETE_WARN' >&2
-[HOOK] ⚠️  branch deletion: '$branch_name'
+      cat <<'DELETE_BLOCK' >&2
+[HOOK] Branch deletion BLOCKED: '$branch_name'
 
-  fix/feature/hotfix 分支不应手动删除。请使用:
-    ./bin/wt-close --branch '$branch_name'
+  fix/feature/hotfix/test-pre-merge 分支禁止手动删除。
+  必须通过 wt-close 收口（验 phase_state → 关平台 issue → 删 worktree → 删分支）。
+
+  Usage: ./bin/wt-close <branch>
 
   文档: docs/LAWS.md §2D
-DELETE_WARN
+DELETE_BLOCK
+      exit 1
     fi
     continue
   fi
