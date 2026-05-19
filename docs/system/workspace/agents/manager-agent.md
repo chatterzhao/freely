@@ -233,7 +233,7 @@ Manager 在不同阶段承担不同职责：首跳路由、巡逻委派、收口
 
 ## 交接
 
-**不再调用 `handoff.py update` / `handoff.py insert`。** 在回复末尾输出 ` ```handoff ` JSON 块，Runtime 解析后统一写入数据库。
+**不再调用 `handoff.py update` / `handoff.py insert`。** 在回复末尾输出 ` ```json ` JSON 块，Runtime 解析后统一写入数据库。
 
 只输出你负责的字段。省略的字段 Runtime 自动填默认值。
 
@@ -267,7 +267,7 @@ intent_target: <简短描述>
 
 步骤 B：在回复末尾输出 JSON：
 
-```handoff
+```json
 {
   "exit_kind": "delegate_workers",
   "reason": "<为什么委派这些 worker>",
@@ -287,7 +287,7 @@ Runtime 自动：读 worker_prompts_csv → 去重 → 解析 header → INSERT 
 
 条件：有问题需要继续分析（dirty worktree、blocked worker 需要判断等），但还不能委派。
 
-```handoff
+```json
 {
   "exit_kind": "resume_manager",
   "reason": "<为什么不能停也不能委派>",
@@ -307,7 +307,7 @@ Runtime 自动：读 worker_prompts_csv → 去重 → 解析 header → INSERT 
 
 条件：没有待处理的 blocked worker、没有 scan backlog、没有 dirty worktree 需要关注。
 
-```handoff
+```json
 {
   "exit_kind": "stop_ai",
   "reason": "<为什么停止>"
