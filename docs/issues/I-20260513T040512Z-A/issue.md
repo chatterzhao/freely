@@ -21,7 +21,7 @@ author: zhaoquan
 channel: freely-feat-execution
 session_refs: []
 pre_tests_path: docs/issues/I-20260513T040512Z-A/pre-tests.md
-verification_artifact_dir: ''
+verification_artifact_dir: 'docs/issues/I-20260513T040512Z-A/'
 platform_state: open
 ---
 

@@ -23,7 +23,7 @@
   - Phase 0 的 gh issue list --limit 1000 是否足以覆盖当前 repo （当前远未达到，但需确认）
   - Phase 0 失败时的 fallback 行为是否需要可配置
 - acceptance_reviews: []
-- promoted_issue_path: ""
+- promoted_issue_path: "docs/issues/I-20260513T040512Z-A/issue.md"
 - milestone: M-20260513T040512Z-A
 - session_refs:
   - tool: claude-code
