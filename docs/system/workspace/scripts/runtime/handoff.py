@@ -381,6 +381,11 @@ def validate_handoff_json(ai_fields):
     """Validate AI-produced handoff JSON. Returns (ok, errors)."""
     errors = []
     exit_kind = ai_fields.get('exit_kind', '')
+    # Natural-language alias: "completed" maps to worker_done
+    ALIAS_MAP = {'completed': 'worker_done'}
+    if exit_kind in ALIAS_MAP:
+        ai_fields['exit_kind'] = ALIAS_MAP[exit_kind]
+        exit_kind = ALIAS_MAP[exit_kind]
     if exit_kind not in VALID_EXIT_KINDS:
         errors.append({"field": "exit_kind", "error": f"invalid value '{exit_kind}'"})
         return False, errors
