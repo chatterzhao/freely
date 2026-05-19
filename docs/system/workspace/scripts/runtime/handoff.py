@@ -24,9 +24,9 @@ VALID_EXIT_KINDS = {
 
 # Fields required per exit_kind (empty = not required)
 REQUIRED_FIELDS = {
-    'delegate_workers':       ['worker_prompts_csv'],
-    'resume_manager':         ['restart_point', 'next_action'],
-    'stop_ai':                [],
+    'delegate_workers':       ['reason', 'worker_prompts_csv'],
+    'resume_manager':         ['reason', 'restart_point', 'next_action'],
+    'stop_ai':                ['reason'],
     'worker_done':            ['completion_summary'],
     'worker_blocked':         ['reason', 'next_action'],
     'worker_handoff_needed':  ['reason', 'next_action'],
