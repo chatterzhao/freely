@@ -17494,7 +17494,15 @@ PROMPT_AGENT
     append_manager_exit_contract_directive_if_needed "$PROJECT_ROOT"
     append_worker_exit_contract_directive_if_needed "$PROJECT_ROOT"
     # ── DYNAMIC: scan, intakes, alerts (changes each cycle) ──
-    append_task_source_patrol_seed_if_needed
+    # Suppress scan when handoff backlog >= 5 (except task-mode id:)
+    if [[ "${MANAGER_HANDOFF_BACKLOG_COUNT:-0}" -ge 5 ]] && [[ "$(read_task_mode "$PROJECT_ROOT")" != id:* ]]; then
+      cat <<BACKLOG_NOTE
+
+handoffs 积压 ${MANAGER_HANDOFF_BACKLOG_COUNT} 条（≥5），本轮跳过 scan——先清积压。
+BACKLOG_NOTE
+    else
+      append_task_source_patrol_seed_if_needed
+    fi
     append_human_chat_intake_if_needed
     append_local_delegated_continuation_if_needed
     append_context_warning_if_needed
@@ -17538,7 +17546,12 @@ for r in unconsumed[:10]:
     print(f\"- {r.get('handoff_id','?')[:20]} exit={r.get('exit_kind','?')} status={r.get('status','?')} summary={r.get('completion_summary','')[:60]} reason={r.get('reason','')[:60]} next_action={r.get('next_action','')[:60]}\")
 if not unconsumed:
     print('(无未消费的 Worker 汇报)')
-" 2>/dev/null || echo "(查询失败)")
+print(f'UNCONSUMED_COUNT={len(unconsumed)}', flush=True)
+" 2>/dev/null || echo "UNCONSUMED_COUNT=0")
+
+  # Extract unconsumed count for backlog gating
+  MANAGER_HANDOFF_BACKLOG_COUNT=$(echo "$unconsumed" | grep -o 'UNCONSUMED_COUNT=[0-9]*' | cut -d= -f2)
+  [[ "${MANAGER_HANDOFF_BACKLOG_COUNT:-0}" =~ ^[0-9]+$ ]] || MANAGER_HANDOFF_BACKLOG_COUNT=0
 
   # Thread history: recent handoff records (all roles, grouped by raw_key)
   local thread_summary
