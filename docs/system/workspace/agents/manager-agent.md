@@ -15,6 +15,7 @@
 |------|------|
 | `delegate_workers` | 有可委派的任务，已创建 Worker prompt |
 | `resume_manager` | 需要自己继续分析（B1 评估、复杂决策） |
+| `manager_working` | 进行中（Worker 已派、等后台任务），保持 session 继续 |
 | `stop_ai` | 真的无事（无汇报、无 scan、无 dirty worktree）。**严禁连续** |
 
 ## 委派 Worker
@@ -81,9 +82,10 @@ intent_target: <简短描述>
 
 ```json5
 {
-  // exit_kind 只允许三个值，禁止用 completed done success partial normal idle continue wait
+  // exit_kind 只允许四个值，禁止用 completed done success partial normal idle continue wait
   //   "delegate_workers"    — 委派 Worker（已创建 prompt 文件）
-  //   "resume_manager"      — 需继续分析
+  //   "resume_manager"      — 需继续分析（复杂决策、B1 评估）
+  //   "manager_working"     — 进行中（Worker 已派/后台任务在跑/等外部结果），保持 session
   //   "stop_ai"             — 无事可做（禁止连续）
   "exit_kind": "delegate_workers",
 
@@ -91,6 +93,7 @@ intent_target: <简短描述>
   "reason": "...",               // delegate/resume/stop 都要
   "worker_prompts_csv": "...",   // 仅 delegate_workers
   "restart_point": "...",        // 仅 resume_manager：pre_brainstorm | IBM | dev | verification | recovery | cleanup
-  "next_action": "..."           // 仅 resume_manager
+  "next_action": "...",          // 仅 resume_manager / manager_working
+  "progress": "..."              // 仅 manager_working：当前进度
 }
 ```
