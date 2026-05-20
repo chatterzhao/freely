@@ -878,27 +878,34 @@ def main() -> int:
 
         branch_ts = _extract_ts(branch_issue_key)
         if branch_ts:
-            for candidate in candidate_records:
-                c_key = candidate_key(candidate.candidate_id)
-                if c_key:
-                    c_ts = _extract_ts(c_key)
-                    if c_ts and not c_ts.startswith(branch_ts) and not branch_ts.startswith(c_ts):
-                        if c_ts.rstrip("Z") != branch_ts.rstrip("Z"):
-                            errors.append(_gate1_mismatch_msg(
-                                branch_issue_key, branch_ts,
-                                f"candidate {candidate.candidate_id}", candidate.path, c_ts,
-                            ))
-            for issue_path in sorted(issue_paths):
-                iid_match = re.search(r"((?:raw|I)-\d{8}T\d{4,6}Z(?:-[A-Z0-9]+)?)", issue_path)
-                if iid_match:
-                    iid = iid_match.group(1)
-                    i_ts = _extract_ts(iid)
-                    if i_ts and not i_ts.startswith(branch_ts) and not branch_ts.startswith(i_ts):
-                        if i_ts.rstrip("Z") != branch_ts.rstrip("Z"):
-                            errors.append(_gate1_mismatch_msg(
-                                branch_issue_key, branch_ts,
-                                f"issue {iid}", issue_path, i_ts,
-                            ))
+            # Only check candidates actually modified by this merge. Batch
+            # operations (e.g., closeout) touch issue metadata without modifying
+            # candidates; their timestamps naturally differ from the branch key
+            # and should not trigger false rejections.
+            if touched_candidate_paths:
+                for candidate in candidate_records:
+                    if candidate.path not in touched_candidate_paths:
+                        continue
+                    c_key = candidate_key(candidate.candidate_id)
+                    if c_key:
+                        c_ts = _extract_ts(c_key)
+                        if c_ts and not c_ts.startswith(branch_ts) and not branch_ts.startswith(c_ts):
+                            if c_ts.rstrip("Z") != branch_ts.rstrip("Z"):
+                                errors.append(_gate1_mismatch_msg(
+                                    branch_issue_key, branch_ts,
+                                    f"candidate {candidate.candidate_id}", candidate.path, c_ts,
+                                ))
+                for issue_path in sorted(issue_paths):
+                    iid_match = re.search(r"((?:raw|I)-\d{8}T\d{4,6}Z(?:-[A-Z0-9]+)?)", issue_path)
+                    if iid_match:
+                        iid = iid_match.group(1)
+                        i_ts = _extract_ts(iid)
+                        if i_ts and not i_ts.startswith(branch_ts) and not branch_ts.startswith(i_ts):
+                            if i_ts.rstrip("Z") != branch_ts.rstrip("Z"):
+                                errors.append(_gate1_mismatch_msg(
+                                    branch_issue_key, branch_ts,
+                                    f"issue {iid}", issue_path, i_ts,
+                                ))
 
     if args.target_branch == "develop" and branch_issue_key:
         # 2a: SQLite chat-inbox catch-all — ensure matching chat is consumed
