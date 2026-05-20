@@ -14,12 +14,12 @@ canonical_issue_path: docs/epics/workspace-routing-foundation/fix-execution-skil
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-03T01:00:00Z'
-updated_at: '2026-05-17T11:52:35Z'
+updated_at: '2026-05-20T06:57:10Z'
 intake_id: 20260503-fix-skill
 author: human
 channel: chat
 session_refs: []
-platform_state: open
+platform_state: closed
 ---
 
 Add fix-execution skill for rapid bug fix workflow with pre-merge isolation and incremental hotfix commits.

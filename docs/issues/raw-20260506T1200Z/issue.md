@@ -17,7 +17,7 @@ channel: github
 session_refs: []
 pre_tests_path: docs/epics/ibm-skill-rename/verification/pre-tests.md
 verification_artifact_dir: docs/epics/ibm-skill-rename/code-reviews
-updated_at: '2026-05-17T11:37:39Z'
+updated_at: '2026-05-20T06:56:41Z'
 platform_state: closed
 ---
 

@@ -14,12 +14,12 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-02T10:28:00Z'
-updated_at: '2026-05-05T11:53:41Z'
+updated_at: '2026-05-20T06:56:32Z'
 intake_id: 20260502-1028-stale-lock
 author: human
 channel: chat
 session_refs: []
-platform_state: 
+platform_state: closed
 ---
 
 Clean stale start lock before daemon stop: 3-line fix in stop_project_runtime().

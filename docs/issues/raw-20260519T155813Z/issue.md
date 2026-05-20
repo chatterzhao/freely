@@ -12,13 +12,14 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-19T15:58:28Z'
-updated_at: '2026-05-19T15:58:28Z'
+updated_at: '2026-05-20T06:57:48Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
 dropped_reason: Fix merged to develop via fix/raw-20260519T155813Z-launchable-reason.
   Runtime bug fix.
+platform_state: closed
 ---
 
 ## raw-20260519T155813Z
