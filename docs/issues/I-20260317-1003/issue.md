@@ -2,25 +2,24 @@
 local_id: I-20260317-1003
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "12"
-    url: "https://github.com/chatterzhao/freely/issues/12"
-    synced_at: "2026-04-27T11:12:42Z"
-
+    issue_id: '12'
+    url: https://github.com/chatterzhao/freely/issues/12
+    synced_at: '2026-04-27T11:12:42Z'
   gitee:
-    issue_id: "IJFO50"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO50"
-    synced_at: "2026-04-27T13:13:53Z"
+    issue_id: IJFO50
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO50
+    synced_at: '2026-04-27T13:13:53Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/frontend-probe-dogfooding-loop/incremental-dogfooding-gate-for-backend-increments/issues/incremental-dogfooding-gate-for-backend-increments.md"
+canonical_issue_path: docs/epics/frontend-probe-dogfooding-loop/incremental-dogfooding-gate-for-backend-increments/issues/incremental-dogfooding-gate-for-backend-increments.md
 last_synced_comment_at:
-  github: "2026-04-27T11:12:42Z"
-hash: ""
-created_at: "2026-04-27T11:12:42Z"
-updated_at: "2026-04-27T11:12:42Z"
-platform_state: 
+  github: '2026-04-27T11:12:42Z'
+hash: ''
+created_at: '2026-04-27T11:12:42Z'
+updated_at: '2026-04-27T11:12:42Z'
+platform_state: open
 ---
 
 # Issue: incremental-dogfooding-gate-for-backend-increments

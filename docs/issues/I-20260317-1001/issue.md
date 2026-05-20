@@ -2,25 +2,24 @@
 local_id: I-20260317-1001
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "11"
-    url: "https://github.com/chatterzhao/freely/issues/11"
-    synced_at: "2026-04-27T11:12:36Z"
-
+    issue_id: '11'
+    url: https://github.com/chatterzhao/freely/issues/11
+    synced_at: '2026-04-27T11:12:36Z'
   gitee:
-    issue_id: "IJFO4Y"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO4Y"
-    synced_at: "2026-04-27T13:13:51Z"
+    issue_id: IJFO4Y
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO4Y
+    synced_at: '2026-04-27T13:13:51Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md"
+canonical_issue_path: docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md
 last_synced_comment_at:
-  github: "2026-04-27T11:12:36Z"
-hash: ""
-created_at: "2026-04-27T11:12:36Z"
-updated_at: "2026-04-27T11:12:36Z"
-platform_state: 
+  github: '2026-04-27T11:12:36Z'
+hash: ''
+created_at: '2026-04-27T11:12:36Z'
+updated_at: '2026-04-27T11:12:36Z'
+platform_state: open
 ---
 
 # Issue: frontend-probe-v0

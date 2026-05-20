@@ -2,25 +2,24 @@
 local_id: I-20260318-1825
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "20"
-    url: "https://github.com/chatterzhao/freely/issues/20"
-    synced_at: "2026-04-27T11:13:54Z"
-
+    issue_id: '20'
+    url: https://github.com/chatterzhao/freely/issues/20
+    synced_at: '2026-04-27T11:13:54Z'
   gitee:
-    issue_id: "IJFO5E"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO5E"
-    synced_at: "2026-04-27T13:14:04Z"
+    issue_id: IJFO5E
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO5E
+    synced_at: '2026-04-27T13:14:04Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/worktree-hygiene-supervision-control-plane/issues/worktree-hygiene-supervision-control-plane.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/worktree-hygiene-supervision-control-plane/issues/worktree-hygiene-supervision-control-plane.md
 last_synced_comment_at:
-  github: "2026-04-27T11:13:54Z"
-hash: ""
-created_at: "2026-04-27T11:13:54Z"
-updated_at: "2026-04-27T11:13:54Z"
-platform_state: 
+  github: '2026-04-27T11:13:54Z'
+hash: ''
+created_at: '2026-04-27T11:13:54Z'
+updated_at: '2026-04-27T11:13:54Z'
+platform_state: open
 ---
 
 Freely 已有 checkpoint-guard、fleet-status 与 manager/worker 角色边界，但还缺一条更主动的自治控制面：
