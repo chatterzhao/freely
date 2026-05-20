@@ -686,21 +686,39 @@ COMMENT
 }
 
 cmd_batch() {
-  local last_scan changed=0 synced=0
+  local last_scan total=0 synced=0 batch_size=10 batch_count=0
   last_scan=$(_scan_state_get "last_sync_at")
   echo "[issue-sync] batch: last sync = ${last_scan:-never}"
 
-  # Find all issue.md files modified since last sync
+  # Collect all issue files into an array first (use temp file to preserve null bytes)
+  local _tmp
+  _tmp=$(mktemp /tmp/issue-sync-batch.XXXXXX)
+  find "$ISSUES_DIR" -name "issue.md" -print0 2>/dev/null > "$_tmp"
   while IFS= read -r -d '' issue_file; do
+    [[ -n "$issue_file" ]] || continue
     local dir local_id
     dir=$(dirname "$issue_file")
     local_id=$(basename "$dir")
-    # Skip non-issue dirs
     [[ "$local_id" == raw-* || "$local_id" == I-* ]] || continue
+    issue_files+=("$issue_file")
+    total=$((total + 1))
+  done < "$_tmp"
+  rm -f "$_tmp"
+
+  if [[ "$total" -eq 0 ]]; then
+    echo "[issue-sync] batch: no issues found"
+    return 0
+  fi
+
+  echo "[issue-sync] batch: $total issue(s) to process, batch_size=$batch_size"
+
+  for issue_file in "${issue_files[@]}"; do
+    local dir local_id
+    dir=$(dirname "$issue_file")
+    local_id=$(basename "$dir")
 
     local kind
     kind=$(_fm_get "$issue_file" "kind")
-    changed=1
 
     case "$kind" in
       raw)
@@ -727,12 +745,17 @@ cmd_batch() {
         ;;
     esac
     synced=$((synced + 1))
-  done < <(find "$ISSUES_DIR" -name "issue.md" -print0 2>/dev/null)
+    batch_count=$((batch_count + 1))
 
-  if [[ "$changed" -eq 0 ]]; then
-    echo "[issue-sync] batch: no changed issues"
-  else
-    echo "[issue-sync] batch: $synced issue(s) processed"
+    # Progress output every batch_size issues (keeps stream alive for Terminal)
+    if [[ $((batch_count % batch_size)) -eq 0 ]]; then
+      echo "[issue-sync] progress: $synced/$total"
+    fi
+  done
+
+  # Final progress if not at batch boundary
+  if [[ $((synced % batch_size)) -ne 0 ]]; then
+    echo "[issue-sync] progress: $synced/$total"
   fi
 
   # Update scan state
@@ -753,7 +776,11 @@ cmd_scan() {
   echo ""
   echo "Changed issues since last sync:"
   local found=0
+  local _scan_tmp
+  _scan_tmp=$(mktemp /tmp/issue-sync-scan.XXXXXX)
+  find "$ISSUES_DIR" -name "issue.md" -print0 2>/dev/null > "$_scan_tmp"
   while IFS= read -r -d '' issue_file; do
+    [[ -n "$issue_file" ]] || continue
     local dir local_id
     dir=$(dirname "$issue_file")
     local_id=$(basename "$dir")
@@ -770,7 +797,8 @@ cmd_scan() {
       echo "  CREATE $local_id  kind=$kind phase=$phase  $(_issue_title "$issue_file" "$local_id")"
       found=1
     fi
-  done < <(find "$ISSUES_DIR" -name "issue.md" -print0 2>/dev/null)
+  done < "$_scan_tmp"
+  rm -f "$_scan_tmp"
 
   [[ "$found" -eq 0 ]] && echo "  (none)"
 }
