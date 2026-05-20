@@ -19,7 +19,7 @@ last_synced_comment_at:
 hash: ''
 created_at: '2026-04-27T11:25:22Z'
 updated_at: '2026-05-17T08:01:52Z'
-platform_state: closed
+platform_state: open
 ---
 
 本轮 `bin/` 全量命令审计已经证明，Freely 现在的 CLI 能力不只是 runtime 语义问题，还存在一层更前置的包装层回归：

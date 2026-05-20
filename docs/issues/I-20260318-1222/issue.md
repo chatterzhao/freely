@@ -2,25 +2,24 @@
 local_id: I-20260318-1222
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "16"
-    url: "https://github.com/chatterzhao/freely/issues/16"
-    synced_at: "2026-04-27T11:13:28Z"
-
+    issue_id: '16'
+    url: https://github.com/chatterzhao/freely/issues/16
+    synced_at: '2026-04-27T11:13:28Z'
   gitee:
-    issue_id: "IJFO55"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO55"
-    synced_at: "2026-04-27T13:13:58Z"
+    issue_id: IJFO55
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO55
+    synced_at: '2026-04-27T13:13:58Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/mem9-continuity-bridge/issues/mem9-continuity-bridge.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/mem9-continuity-bridge/issues/mem9-continuity-bridge.md
 last_synced_comment_at:
-  github: "2026-04-27T11:13:28Z"
-hash: ""
-created_at: "2026-04-27T11:13:28Z"
-updated_at: "2026-04-27T11:13:28Z"
-platform_state: 
+  github: '2026-04-27T11:13:28Z'
+hash: ''
+created_at: '2026-04-27T11:13:28Z'
+updated_at: '2026-04-27T11:13:28Z'
+platform_state: open
 ---
 
 Freely 已经拥有本地 continuity / recovery / session rotation / multi-worktree supervision，但还没有一个正式的外部共享记忆边界来回答：

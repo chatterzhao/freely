@@ -2,25 +2,24 @@
 local_id: I-20260321-1045
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "34"
-    url: "https://github.com/chatterzhao/freely/issues/34"
-    synced_at: "2026-04-27T11:15:09Z"
-
+    issue_id: '34'
+    url: https://github.com/chatterzhao/freely/issues/34
+    synced_at: '2026-04-27T11:15:09Z'
   gitee:
-    issue_id: "IJFO5V"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO5V"
-    synced_at: "2026-04-27T13:14:28Z"
+    issue_id: IJFO5V
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO5V
+    synced_at: '2026-04-27T13:14:28Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/stacked-worktree-merge-chain-governance/issues/stacked-worktree-merge-chain-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/stacked-worktree-merge-chain-governance/issues/stacked-worktree-merge-chain-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:15:09Z"
-hash: ""
-created_at: "2026-04-27T11:15:09Z"
-updated_at: "2026-04-27T11:15:09Z"
-platform_state: 
+  github: '2026-04-27T11:15:09Z'
+hash: ''
+created_at: '2026-04-27T11:15:09Z'
+updated_at: '2026-04-27T11:15:09Z'
+platform_state: open
 ---
 
 现有 `worktree-maintenance-governance` 已能处理单棵树 audit、平面 merge-prep 与 retirement handoff，但 dogfooding 证明还缺少一类高频现实场景：

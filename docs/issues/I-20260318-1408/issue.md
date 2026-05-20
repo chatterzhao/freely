@@ -2,25 +2,24 @@
 local_id: I-20260318-1408
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "18"
-    url: "https://github.com/chatterzhao/freely/issues/18"
-    synced_at: "2026-04-27T11:13:40Z"
-
+    issue_id: '18'
+    url: https://github.com/chatterzhao/freely/issues/18
+    synced_at: '2026-04-27T11:13:40Z'
   gitee:
-    issue_id: "IJFO59"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO59"
-    synced_at: "2026-04-27T13:14:02Z"
+    issue_id: IJFO59
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO59
+    synced_at: '2026-04-27T13:14:02Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md
 last_synced_comment_at:
-  github: "2026-04-27T11:13:40Z"
-hash: ""
-created_at: "2026-04-27T11:13:40Z"
-updated_at: "2026-04-27T11:13:40Z"
-platform_state: 
+  github: '2026-04-27T11:13:40Z'
+hash: ''
+created_at: '2026-04-27T11:13:40Z'
+updated_at: '2026-04-27T11:13:40Z'
+platform_state: open
 ---
 
 Freely 已经具备局部的 worker supervision、account switch、session rotation 和 fleet status，但此前仍需要人工提醒才发现主管和 worker 实际已经停摆。这说明 Freely 缺：

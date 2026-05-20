@@ -2,25 +2,24 @@
 local_id: I-20260316-1801
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "9"
-    url: "https://github.com/chatterzhao/freely/issues/9"
-    synced_at: "2026-04-27T11:12:27Z"
-
+    issue_id: '9'
+    url: https://github.com/chatterzhao/freely/issues/9
+    synced_at: '2026-04-27T11:12:27Z'
   gitee:
-    issue_id: "IJFO4V"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO4V"
-    synced_at: "2026-04-27T13:13:49Z"
+    issue_id: IJFO4V
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO4V
+    synced_at: '2026-04-27T13:13:49Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/session-lifecycle-rotation-and-handoff-governance/issues/session-lifecycle-rotation-and-handoff-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/session-lifecycle-rotation-and-handoff-governance/issues/session-lifecycle-rotation-and-handoff-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:12:27Z"
-hash: ""
-created_at: "2026-04-27T11:12:27Z"
-updated_at: "2026-04-27T11:12:27Z"
-platform_state: 
+  github: '2026-04-27T11:12:27Z'
+hash: ''
+created_at: '2026-04-27T11:12:27Z'
+updated_at: '2026-04-27T11:12:27Z'
+platform_state: open
 ---
 
 # Issue: session-lifecycle-rotation-and-handoff-governance

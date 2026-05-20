@@ -2,25 +2,24 @@
 local_id: I-20260321-2010
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "42"
-    url: "https://github.com/chatterzhao/freely/issues/42"
-    synced_at: "2026-04-27T11:16:07Z"
-
+    issue_id: '42'
+    url: https://github.com/chatterzhao/freely/issues/42
+    synced_at: '2026-04-27T11:16:07Z'
   gitee:
-    issue_id: "IJFO66"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO66"
-    synced_at: "2026-04-27T13:14:39Z"
+    issue_id: IJFO66
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO66
+    synced_at: '2026-04-27T13:14:39Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/issues/explicit-session-addressed-resume-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/issues/explicit-session-addressed-resume-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:16:07Z"
-hash: ""
-created_at: "2026-04-27T11:16:07Z"
-updated_at: "2026-04-27T11:16:07Z"
-platform_state: 
+  github: '2026-04-27T11:16:07Z'
+hash: ''
+created_at: '2026-04-27T11:16:07Z'
+updated_at: '2026-04-27T11:16:07Z'
+platform_state: open
 ---
 
 Freely 现在对不同工具的会话续接模型不一致：

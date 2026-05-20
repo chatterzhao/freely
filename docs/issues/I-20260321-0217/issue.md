@@ -2,25 +2,24 @@
 local_id: I-20260321-0217
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "31"
-    url: "https://github.com/chatterzhao/freely/issues/31"
-    synced_at: "2026-04-27T11:14:48Z"
-
+    issue_id: '31'
+    url: https://github.com/chatterzhao/freely/issues/31
+    synced_at: '2026-04-27T11:14:48Z'
   gitee:
-    issue_id: "IJFO5R"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO5R"
-    synced_at: "2026-04-27T13:14:24Z"
+    issue_id: IJFO5R
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO5R
+    synced_at: '2026-04-27T13:14:24Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/claude-code-codex-mcp-runtime-governance/issues/claude-code-codex-mcp-runtime-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/claude-code-codex-mcp-runtime-governance/issues/claude-code-codex-mcp-runtime-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:14:48Z"
-hash: ""
-created_at: "2026-04-27T11:14:48Z"
-updated_at: "2026-04-27T11:14:48Z"
-platform_state: 
+  github: '2026-04-27T11:14:48Z'
+hash: ''
+created_at: '2026-04-27T11:14:48Z'
+updated_at: '2026-04-27T11:14:48Z'
+platform_state: open
 ---
 
 Freely 已经支持多个顶层 AI tool，但 `Claude Code` 仍缺两类关键治理能力：

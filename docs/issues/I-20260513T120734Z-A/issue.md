@@ -1,7 +1,8 @@
 ---
 local_id: I-20260513T120734Z-A
 kind: linked
-phase_state: absorbed
+phase_state: completed
+completed_at: "2026-05-19T23:20:00Z"
 absorbed_at: '2026-05-16T14:27:11Z'
 promoted_from: raw-20260513T120734Z
 source_candidate: docs/pre-brainstorms/20260513T120734Z--process-churn-peak-fix/candidates.md#C-20260513T120734Z-A

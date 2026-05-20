@@ -2,25 +2,24 @@
 local_id: I-20260319-2315
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "24"
-    url: "https://github.com/chatterzhao/freely/issues/24"
-    synced_at: "2026-04-27T11:14:12Z"
-
+    issue_id: '24'
+    url: https://github.com/chatterzhao/freely/issues/24
+    synced_at: '2026-04-27T11:14:12Z'
   gitee:
-    issue_id: "IJFO5I"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO5I"
-    synced_at: "2026-04-27T13:14:09Z"
+    issue_id: IJFO5I
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO5I
+    synced_at: '2026-04-27T13:14:09Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/cli-tui-human-interruption-input/issues/cli-tui-human-interruption-input.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/cli-tui-human-interruption-input/issues/cli-tui-human-interruption-input.md
 last_synced_comment_at:
-  github: "2026-04-27T11:14:12Z"
-hash: ""
-created_at: "2026-04-27T11:14:12Z"
-updated_at: "2026-04-27T11:14:12Z"
-platform_state: 
+  github: '2026-04-27T11:14:12Z'
+hash: ''
+created_at: '2026-04-27T11:14:12Z'
+updated_at: '2026-04-27T11:14:12Z'
+platform_state: open
 ---
 
 Freely 需要一个真正可用的 CLI 前台插话入口，但这个入口必须继续服从既有 human interruption 架构：

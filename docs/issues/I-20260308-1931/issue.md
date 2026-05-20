@@ -2,25 +2,24 @@
 local_id: I-20260308-1931
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "7"
-    url: "https://github.com/chatterzhao/freely/issues/7"
-    synced_at: "2026-04-27T11:12:18Z"
-
+    issue_id: '7'
+    url: https://github.com/chatterzhao/freely/issues/7
+    synced_at: '2026-04-27T11:12:18Z'
   gitee:
-    issue_id: "IJFO4S"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO4S"
-    synced_at: "2026-04-27T13:13:46Z"
+    issue_id: IJFO4S
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO4S
+    synced_at: '2026-04-27T13:13:46Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/business-block-vs-system-crash-recovery/issues/business-block-vs-system-crash-recovery.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/business-block-vs-system-crash-recovery/issues/business-block-vs-system-crash-recovery.md
 last_synced_comment_at:
-  github: "2026-04-27T11:12:18Z"
-hash: ""
-created_at: "2026-04-27T11:12:18Z"
-updated_at: "2026-04-27T11:12:18Z"
-platform_state: 
+  github: '2026-04-27T11:12:18Z'
+hash: ''
+created_at: '2026-04-27T11:12:18Z'
+updated_at: '2026-04-27T11:12:18Z'
+platform_state: open
 ---
 
 # Issue: business-block-vs-system-crash-recovery

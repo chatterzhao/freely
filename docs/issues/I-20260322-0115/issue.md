@@ -2,25 +2,24 @@
 local_id: I-20260322-0115
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "44"
-    url: "https://github.com/chatterzhao/freely/issues/44"
-    synced_at: "2026-04-27T11:16:20Z"
-
+    issue_id: '44'
+    url: https://github.com/chatterzhao/freely/issues/44
+    synced_at: '2026-04-27T11:16:20Z'
   gitee:
-    issue_id: "IJFO68"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO68"
-    synced_at: "2026-04-27T13:14:42Z"
+    issue_id: IJFO68
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO68
+    synced_at: '2026-04-27T13:14:42Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/issues/cli-first-entrypoint-and-observability-surface-unification.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/issues/cli-first-entrypoint-and-observability-surface-unification.md
 last_synced_comment_at:
-  github: "2026-04-27T11:16:20Z"
-hash: ""
-created_at: "2026-04-27T11:16:20Z"
-updated_at: "2026-04-27T11:16:20Z"
-platform_state: 
+  github: '2026-04-27T11:16:20Z'
+hash: ''
+created_at: '2026-04-27T11:16:20Z'
+updated_at: '2026-04-27T11:16:20Z'
+platform_state: open
 ---
 
 Freely 已经有：

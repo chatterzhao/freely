@@ -2,25 +2,24 @@
 local_id: I-20260318-0930
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "15"
-    url: "https://github.com/chatterzhao/freely/issues/15"
-    synced_at: "2026-04-27T11:13:23Z"
-
+    issue_id: '15'
+    url: https://github.com/chatterzhao/freely/issues/15
+    synced_at: '2026-04-27T11:13:23Z'
   gitee:
-    issue_id: "IJFO53"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO53"
-    synced_at: "2026-04-27T13:13:56Z"
+    issue_id: IJFO53
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO53
+    synced_at: '2026-04-27T13:13:56Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/checkpoint-commit-and-multi-worktree-supervision-governance/issues/checkpoint-commit-and-multi-worktree-supervision-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/checkpoint-commit-and-multi-worktree-supervision-governance/issues/checkpoint-commit-and-multi-worktree-supervision-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:13:23Z"
-hash: ""
-created_at: "2026-04-27T11:13:23Z"
-updated_at: "2026-04-27T11:13:23Z"
-platform_state: 
+  github: '2026-04-27T11:13:23Z'
+hash: ''
+created_at: '2026-04-27T11:13:23Z'
+updated_at: '2026-04-27T11:13:23Z'
+platform_state: open
 ---
 
 Freely 当前已经会 worktree 隔离、session handoff、rate-limit account switch，但仍不会像项目负责人一样管理多个工位：

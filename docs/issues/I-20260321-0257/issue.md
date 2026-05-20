@@ -2,25 +2,24 @@
 local_id: I-20260321-0257
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "32"
-    url: "https://github.com/chatterzhao/freely/issues/32"
-    synced_at: "2026-04-27T11:14:53Z"
-
+    issue_id: '32'
+    url: https://github.com/chatterzhao/freely/issues/32
+    synced_at: '2026-04-27T11:14:53Z'
   gitee:
-    issue_id: "IJFO5S"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO5S"
-    synced_at: "2026-04-27T13:14:25Z"
+    issue_id: IJFO5S
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO5S
+    synced_at: '2026-04-27T13:14:25Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/worktree-fleet-governance-closure/issues/worktree-fleet-governance-closure.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/worktree-fleet-governance-closure/issues/worktree-fleet-governance-closure.md
 last_synced_comment_at:
-  github: "2026-04-27T11:14:53Z"
-hash: ""
-created_at: "2026-04-27T11:14:53Z"
-updated_at: "2026-04-27T11:14:53Z"
-platform_state: 
+  github: '2026-04-27T11:14:53Z'
+hash: ''
+created_at: '2026-04-27T11:14:53Z'
+updated_at: '2026-04-27T11:14:53Z'
+platform_state: open
 ---
 
 Freely 已经具备单树 worktree audit、merge-prep、stacked merge-chain 和 retirement handoff，但还缺一层“项目级 fleet closure”。

@@ -2,25 +2,24 @@
 local_id: I-20260319-1715
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "23"
-    url: "https://github.com/chatterzhao/freely/issues/23"
-    synced_at: "2026-04-27T11:14:08Z"
-
+    issue_id: '23'
+    url: https://github.com/chatterzhao/freely/issues/23
+    synced_at: '2026-04-27T11:14:08Z'
   gitee:
-    issue_id: "IJFO5H"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO5H"
-    synced_at: "2026-04-27T13:14:08Z"
+    issue_id: IJFO5H
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO5H
+    synced_at: '2026-04-27T13:14:08Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/human-chat-intake-and-manager-delegation/issues/human-chat-intake-and-manager-delegation.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/human-chat-intake-and-manager-delegation/issues/human-chat-intake-and-manager-delegation.md
 last_synced_comment_at:
-  github: "2026-04-27T11:14:08Z"
-hash: ""
-created_at: "2026-04-27T11:14:08Z"
-updated_at: "2026-04-27T11:14:08Z"
-platform_state: 
+  github: '2026-04-27T11:14:08Z'
+hash: ''
+created_at: '2026-04-27T11:14:08Z'
+updated_at: '2026-04-27T11:14:08Z'
+platform_state: open
 ---
 
 Freely 已经有 human chat intake 的最小闭环，但要真正“用 Freely 开发 Freely”，还必须把这条链变成正式、可恢复、可监督的 canonical issue：

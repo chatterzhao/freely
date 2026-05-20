@@ -2,25 +2,24 @@
 local_id: I-20260324-0415
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "53"
-    url: "https://github.com/chatterzhao/freely/issues/53"
-    synced_at: "2026-04-27T11:17:09Z"
-
+    issue_id: '53'
+    url: https://github.com/chatterzhao/freely/issues/53
+    synced_at: '2026-04-27T11:17:09Z'
   gitee:
-    issue_id: "IJFO6L"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO6L"
-    synced_at: "2026-04-27T13:14:55Z"
+    issue_id: IJFO6L
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO6L
+    synced_at: '2026-04-27T13:14:55Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md
 last_synced_comment_at:
-  github: "2026-04-27T11:17:09Z"
-hash: ""
-created_at: "2026-04-27T11:17:09Z"
-updated_at: "2026-04-27T11:17:09Z"
-platform_state: 
+  github: '2026-04-27T11:17:09Z'
+hash: ''
+created_at: '2026-04-27T11:17:09Z'
+updated_at: '2026-04-27T11:17:09Z'
+platform_state: open
 ---
 
 Freely 已经具备多种观察面：

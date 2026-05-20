@@ -2,25 +2,24 @@
 local_id: I-20260322-1801
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "50"
-    url: "https://github.com/chatterzhao/freely/issues/50"
-    synced_at: "2026-04-27T11:16:52Z"
-
+    issue_id: '50'
+    url: https://github.com/chatterzhao/freely/issues/50
+    synced_at: '2026-04-27T11:16:52Z'
   gitee:
-    issue_id: "IJFO6I"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO6I"
-    synced_at: "2026-04-27T13:14:51Z"
+    issue_id: IJFO6I
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO6I
+    synced_at: '2026-04-27T13:14:51Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/issues/pre-test-merge-responsibility-usage-and-lifecycle-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/issues/pre-test-merge-responsibility-usage-and-lifecycle-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:16:52Z"
-hash: ""
-created_at: "2026-04-27T11:16:52Z"
-updated_at: "2026-04-27T11:16:52Z"
-platform_state: 
+  github: '2026-04-27T11:16:52Z'
+hash: ''
+created_at: '2026-04-27T11:16:52Z'
+updated_at: '2026-04-27T11:16:52Z'
+platform_state: open
 ---
 
 Freely 这次不是遇到一次性 merge 事故，而是暴露出 `pre-test-merge` 作为治理对象的定义不完整：

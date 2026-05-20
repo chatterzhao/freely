@@ -2,25 +2,24 @@
 local_id: I-20260327-0651
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "60"
-    url: "https://github.com/chatterzhao/freely/issues/60"
-    synced_at: "2026-04-27T11:17:52Z"
-
+    issue_id: '60'
+    url: https://github.com/chatterzhao/freely/issues/60
+    synced_at: '2026-04-27T11:17:52Z'
   gitee:
-    issue_id: "IJFO6V"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO6V"
-    synced_at: "2026-04-27T13:15:05Z"
+    issue_id: IJFO6V
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO6V
+    synced_at: '2026-04-27T13:15:05Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/issues/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/issues/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:17:52Z"
-hash: ""
-created_at: "2026-04-27T11:17:52Z"
-updated_at: "2026-04-27T11:17:52Z"
-platform_state: 
+  github: '2026-04-27T11:17:52Z'
+hash: ''
+created_at: '2026-04-27T11:17:52Z'
+updated_at: '2026-04-27T11:17:52Z'
+platform_state: open
 ---
 
 Freely runtime 里和代理有关的默认值目前仍然分散在脚本内部，典型问题是把 localhost 代理写死成运行时 fallback。这样会造成三个直接后果：

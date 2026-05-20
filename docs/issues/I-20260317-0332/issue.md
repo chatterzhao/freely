@@ -2,25 +2,24 @@
 local_id: I-20260317-0332
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "10"
-    url: "https://github.com/chatterzhao/freely/issues/10"
-    synced_at: "2026-04-27T11:12:32Z"
-
+    issue_id: '10'
+    url: https://github.com/chatterzhao/freely/issues/10
+    synced_at: '2026-04-27T11:12:32Z'
   gitee:
-    issue_id: "IJFO4X"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO4X"
-    synced_at: "2026-04-27T13:13:50Z"
+    issue_id: IJFO4X
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO4X
+    synced_at: '2026-04-27T13:13:50Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/issues/rust-tauri-probe-bridge-v1.md"
+canonical_issue_path: docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/issues/rust-tauri-probe-bridge-v1.md
 last_synced_comment_at:
-  github: "2026-04-27T11:12:32Z"
-hash: ""
-created_at: "2026-04-27T11:12:32Z"
-updated_at: "2026-04-27T11:12:32Z"
-platform_state: 
+  github: '2026-04-27T11:12:32Z'
+hash: ''
+created_at: '2026-04-27T11:12:32Z'
+updated_at: '2026-04-27T11:12:32Z'
+platform_state: open
 ---
 
 # Issue: frontend-runtime-baseline-for-probe

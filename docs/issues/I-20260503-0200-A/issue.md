@@ -2,7 +2,8 @@
 local_id: I-20260503-0200-A
 issue_title: 'scan: switch to task-lifecycle-scan v2 with full lifecycle chain trace'
 kind: linked
-phase_state: absorbed
+phase_state: completed
+completed_at: "2026-05-19T23:20:00Z"
 absorbed_at: '2026-05-16T14:27:11Z'
 promoted_from: raw-20260503-0200
 platform_ids:

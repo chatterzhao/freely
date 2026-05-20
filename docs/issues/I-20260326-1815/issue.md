@@ -2,25 +2,24 @@
 local_id: I-20260326-1815
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "57"
-    url: "https://github.com/chatterzhao/freely/issues/57"
-    synced_at: "2026-04-27T11:17:35Z"
-
+    issue_id: '57'
+    url: https://github.com/chatterzhao/freely/issues/57
+    synced_at: '2026-04-27T11:17:35Z'
   gitee:
-    issue_id: "IJFO6R"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO6R"
-    synced_at: "2026-04-27T13:15:01Z"
+    issue_id: IJFO6R
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO6R
+    synced_at: '2026-04-27T13:15:01Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/ibm-pretests-executable-acceptance-quality-governance/issues/ibm-pretests-executable-acceptance-quality-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/ibm-pretests-executable-acceptance-quality-governance/issues/ibm-pretests-executable-acceptance-quality-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:17:35Z"
-hash: ""
-created_at: "2026-04-27T11:17:35Z"
-updated_at: "2026-04-27T11:17:35Z"
-platform_state: 
+  github: '2026-04-27T11:17:35Z'
+hash: ''
+created_at: '2026-04-27T11:17:35Z'
+updated_at: '2026-04-27T11:17:35Z'
+platform_state: open
 ---
 
 Freely 已经把 `pre-tests.md` 定义成 issue-level acceptance 控制面，也把 verification 收敛成 integration / acceptance-first。但当前 enforcement 仍然不够强：

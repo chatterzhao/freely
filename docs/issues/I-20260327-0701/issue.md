@@ -2,25 +2,24 @@
 local_id: I-20260327-0701
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "61"
-    url: "https://github.com/chatterzhao/freely/issues/61"
-    synced_at: "2026-04-27T11:17:58Z"
-
+    issue_id: '61'
+    url: https://github.com/chatterzhao/freely/issues/61
+    synced_at: '2026-04-27T11:17:58Z'
   gitee:
-    issue_id: "IJFO6X"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO6X"
-    synced_at: "2026-04-27T13:15:06Z"
+    issue_id: IJFO6X
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO6X
+    synced_at: '2026-04-27T13:15:06Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/issues/pre-tests-evidence-binding-and-completion-gate-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/issues/pre-tests-evidence-binding-and-completion-gate-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:17:58Z"
-hash: ""
-created_at: "2026-04-27T11:17:58Z"
-updated_at: "2026-04-27T11:17:58Z"
-platform_state: 
+  github: '2026-04-27T11:17:58Z'
+hash: ''
+created_at: '2026-04-27T11:17:58Z'
+updated_at: '2026-04-27T11:17:58Z'
+platform_state: open
 ---
 
 The observed miss was not that Freely lacked tests in the abstract. High-level truth already required `Unit / Integration / End-to-End / Real-Environment`, and the gates already checked that those sections existed. The gap was narrower and more serious:
