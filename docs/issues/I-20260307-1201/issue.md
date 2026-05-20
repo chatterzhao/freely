@@ -2,25 +2,24 @@
 local_id: I-20260307-1201
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "13"
-    url: "https://github.com/chatterzhao/freely/issues/13"
-    synced_at: "2026-04-27T11:13:15Z"
-
+    issue_id: '13'
+    url: https://github.com/chatterzhao/freely/issues/13
+    synced_at: '2026-04-27T11:13:15Z'
   gitee:
-    issue_id: "IJFO4C"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO4C"
-    synced_at: "2026-04-27T13:13:09Z"
+    issue_id: IJFO4C
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO4C
+    synced_at: '2026-04-27T13:13:09Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/source-routing-and-derived-worktree-governance/issues/source-routing-and-derived-worktree-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/source-routing-and-derived-worktree-governance/issues/source-routing-and-derived-worktree-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:13:15Z"
-hash: ""
-created_at: "2026-04-27T11:13:15Z"
-updated_at: "2026-04-27T11:13:15Z"
-platform_state: 
+  github: '2026-04-27T11:13:15Z'
+hash: ''
+created_at: '2026-04-27T11:13:15Z'
+updated_at: '2026-04-27T11:13:15Z'
+platform_state: open
 ---
 
 收紧 Freely 自举时的整体路由逻辑，确保：

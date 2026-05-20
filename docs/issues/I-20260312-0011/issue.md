@@ -2,25 +2,24 @@
 local_id: I-20260312-0011
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "8"
-    url: "https://github.com/chatterzhao/freely/issues/8"
-    synced_at: "2026-04-27T11:12:23Z"
-
+    issue_id: '8'
+    url: https://github.com/chatterzhao/freely/issues/8
+    synced_at: '2026-04-27T11:12:23Z'
   gitee:
-    issue_id: "IJFO4U"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO4U"
-    synced_at: "2026-04-27T13:13:48Z"
+    issue_id: IJFO4U
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO4U
+    synced_at: '2026-04-27T13:13:48Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/issues/backend-service-contract-and-adapter-taxonomy.md"
+canonical_issue_path: docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/issues/backend-service-contract-and-adapter-taxonomy.md
 last_synced_comment_at:
-  github: "2026-04-27T11:12:23Z"
-hash: ""
-created_at: "2026-04-27T11:12:23Z"
-updated_at: "2026-04-27T11:12:23Z"
-platform_state: 
+  github: '2026-04-27T11:12:23Z'
+hash: ''
+created_at: '2026-04-27T11:12:23Z'
+updated_at: '2026-04-27T11:12:23Z'
+platform_state: open
 ---
 
 # Issue: backend-service-contract-and-adapter-taxonomy

@@ -2,25 +2,24 @@
 local_id: I-20260308-1245
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "5"
-    url: "https://github.com/chatterzhao/freely/issues/5"
-    synced_at: "2026-04-27T11:12:11Z"
-
+    issue_id: '5'
+    url: https://github.com/chatterzhao/freely/issues/5
+    synced_at: '2026-04-27T11:12:11Z'
   gitee:
-    issue_id: "IJFO4H"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO4H"
-    synced_at: "2026-04-27T13:13:14Z"
+    issue_id: IJFO4H
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO4H
+    synced_at: '2026-04-27T13:13:14Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/issues/internal-frontend-backend-architecture-review.md"
+canonical_issue_path: docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/issues/internal-frontend-backend-architecture-review.md
 last_synced_comment_at:
-  github: "2026-04-27T11:12:11Z"
-hash: ""
-created_at: "2026-04-27T11:12:11Z"
-updated_at: "2026-04-27T11:12:11Z"
-platform_state: 
+  github: '2026-04-27T11:12:11Z'
+hash: ''
+created_at: '2026-04-27T11:12:11Z'
+updated_at: '2026-04-27T11:12:11Z'
+platform_state: open
 ---
 
 # Issue: internal-frontend-backend-architecture-review

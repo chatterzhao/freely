@@ -2,25 +2,24 @@
 local_id: I-20260308-1631
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "6"
-    url: "https://github.com/chatterzhao/freely/issues/6"
-    synced_at: "2026-04-27T11:12:15Z"
-
+    issue_id: '6'
+    url: https://github.com/chatterzhao/freely/issues/6
+    synced_at: '2026-04-27T11:12:15Z'
   gitee:
-    issue_id: "IJFO4I"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO4I"
-    synced_at: "2026-04-27T13:13:15Z"
+    issue_id: IJFO4I
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO4I
+    synced_at: '2026-04-27T13:13:15Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/stage-prefixed-progress-identifier/issues/stage-prefixed-progress-identifier.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/stage-prefixed-progress-identifier/issues/stage-prefixed-progress-identifier.md
 last_synced_comment_at:
-  github: "2026-04-27T11:12:15Z"
-hash: ""
-created_at: "2026-04-27T11:12:15Z"
-updated_at: "2026-04-27T11:12:15Z"
-platform_state: 
+  github: '2026-04-27T11:12:15Z'
+hash: ''
+created_at: '2026-04-27T11:12:15Z'
+updated_at: '2026-04-27T11:12:15Z'
+platform_state: open
 ---
 
 # Issue: stage-prefixed-progress-identifier
