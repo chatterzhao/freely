@@ -1,21 +1,21 @@
 ---
 local_id: raw-20260504T1132Z
-issue_title: "raw key 格式规范重构：统一为 YYYYMMDDTHHMMZ 分钟精度"
+issue_title: raw key 格式规范重构：统一为 YYYYMMDDTHHMMZ 分钟精度
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260504T1132Z-A
 platform_ids:
   github:
-    issue_id: "203"
-    url: "https://github.com/chatterzhao/freely/issues/203"
+    issue_id: '203'
+    url: https://github.com/chatterzhao/freely/issues/203
 primary_platform: github
-created_at: "2026-05-04T11:32:00Z"
-updated_at: "2026-05-05T00:00:00Z"
+created_at: '2026-05-04T11:32:00Z'
+updated_at: '2026-05-20T06:56:05Z'
 intake_id: 20260504T1132Z-raw-key-format
 author: human
 channel: github
 session_refs: []
-platform_state: 
+platform_state: closed
 ---
 
 ## 问题
