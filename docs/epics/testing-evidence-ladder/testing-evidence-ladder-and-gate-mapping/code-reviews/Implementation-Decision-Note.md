@@ -4,6 +4,8 @@ owner_issue: I-20260519-0333-C
 
 # Implementation Decision Note: Testing Evidence Ladder and Gate Mapping (Slice 2)
 
+- issue_id: I-20260519-0333-C
+
 ## Implementation Decision Note
 
 - **decision**: Materialize Slice 2 of C-20260325-0333-A as standalone B2_IBM artifacts — freeze the testing evidence ladder names, escalation rules, completion/retirement gate mapping, and artifact-plane evidence closeout schema. Do not gate on Slice 3 (real-environment harness) readiness.
