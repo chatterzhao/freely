@@ -11749,7 +11749,7 @@ SESSIONEOF
 
   local _manager_bridge_socket _worker_pid
   _manager_bridge_socket="$(_acp_bridge_socket "$manager_project")"
-  if [[ ! -S "$_manager_bridge_socket" ]]; then
+  if [[ ! -S "$_manager_bridge_socket" || -n "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
     log_warn "manager bridge socket not found; falling back to --agent mode (opencode)"
     local _worker_next_file
     _worker_next_file="$(run_dir_for_project "$target_project")/worker-next-prompt.txt"
