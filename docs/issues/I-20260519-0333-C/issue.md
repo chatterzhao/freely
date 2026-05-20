@@ -2,7 +2,7 @@
 local_id: I-20260519-0333-C
 issue_title: 'Testing evidence ladder and gate mapping'
 kind: linked
-phase_state: done_b2_ibm
+phase_state: completed
 promoted_from: 'pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates'
 source_candidate: 'docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/candidates.md#C-20260325-0333-A'
 milestone: M-20260306-workspace-routing-foundation
@@ -12,7 +12,7 @@ tasks_path: docs/epics/testing-evidence-ladder/testing-evidence-ladder-and-gate-
 verification_artifact_dir: docs/epics/testing-evidence-ladder/testing-evidence-ladder-and-gate-mapping/code-reviews
 platform_ids: {}
 platform_state: closed
-updated_at: '2026-05-19T00:00:00Z'
+updated_at: '2026-05-19T22:35:00Z'
 session_refs:
   - tool: cc
     session_id: 20260519-testing-evidence-ladder-slice2-b2
@@ -55,4 +55,4 @@ Materialize Slice 2 of C-20260325-0333-A umbrella: freeze the testing evidence l
 
 ## Next Action
 
-Ready for dev-loop execution: implement the PRD, satisfy pre-tests.md AT-001 through AT-006, then close with verification artifact.
+Dev-loop execution complete. All AT-001 through AT-006 are satisfied and verified. IBM references updated to consume ladder vocabulary by reference.

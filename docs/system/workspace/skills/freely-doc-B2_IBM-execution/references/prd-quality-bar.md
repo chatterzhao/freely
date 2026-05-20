@@ -78,6 +78,19 @@
   - 用什么判断成败
   - 下一步如何切片
 
+## Testing Ladder Reference
+
+PRDs MUST consume the five-level testing evidence ladder by reference — do not redefine levels locally.
+
+Refer to `docs/epics/testing-evidence-ladder/testing-evidence-ladder-and-gate-mapping/prd.md` for:
+
+- **Five evidence levels**: script regression, integration, end-to-end scenario, application-native real-environment, protected-env post-merge acceptance.
+- **Completion/retirement gate mapping**: per issue class, the minimum evidence level required.
+- **Escalation rules**: lower levels cannot satisfy gates requiring higher levels.
+- **Artifact-plane evidence closeout schema**: how `pre-tests.md` completion evidence is formatted.
+
+The `pre-tests.md` `evidence_level` field in acceptance items MUST use the ladder level names from this reference, not ad-hoc labels.
+
 ## Failure signs
 
 出现以下任一情况，说明 PRD 仍未达标：

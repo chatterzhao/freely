@@ -15,22 +15,22 @@ This slice is purely documentary — it freezes vocabulary, rules, and mappings 
 
 ### Acceptance Item Review
 
-- [ ] Five ladder levels each have non-overlapping: default purpose, promotion trigger, what it can prove, what it cannot replace
-- [ ] Escalation rules enumerate the minimum evidence level for each issue family
-- [ ] Completion verification minimum evidence is defined per issue class
-- [ ] Worktree retirement minimum evidence is defined per issue class
-- [ ] Artifact-plane evidence closeout schema is defined
-- [ ] Blocker taxonomy distinguishes evidence_gap from execution_pending
-- [ ] IBM reference documents consume ladder vocabulary without redefining it
+- [x] Five ladder levels each have non-overlapping: default purpose, promotion trigger, what it can prove, what it cannot replace
+- [x] Escalation rules enumerate the minimum evidence level for each issue family
+- [x] Completion verification minimum evidence is defined per issue class
+- [x] Worktree retirement minimum evidence is defined per issue class
+- [x] Artifact-plane evidence closeout schema is defined
+- [x] Blocker taxonomy distinguishes evidence_gap from execution_pending
+- [x] IBM reference documents consume ladder vocabulary without redefining it
 
 ## End-to-End
 
 ### Traceability Walkthrough
 
-- [ ] Given the issue class taxonomy, each class maps to a minimum evidence level for both completion and retirement
-- [ ] Given an artifact-plane closeout, a reviewer can determine whether the minimum evidence level was met
-- [ ] Given a blocker with taxonomy label, a consumer can distinguish "tests not yet run" from "tests not yet defined"
-- [ ] Given a ladder level definition, a reader can determine what it does and does not prove
+- [x] Given the issue class taxonomy, each class maps to a minimum evidence level for both completion and retirement
+- [x] Given an artifact-plane closeout, a reviewer can determine whether the minimum evidence level was met
+- [x] Given a blocker with taxonomy label, a consumer can distinguish "tests not yet run" from "tests not yet defined"
+- [x] Given a ladder level definition, a reader can determine what it does and does not prove
 
 ## Real-Environment
 
@@ -44,7 +44,7 @@ N/A — this slice produces frozen definitions and mappings only. No runtime com
 - requirement: All five ladder levels (script regression, integration, end-to-end scenario, application-native real-environment, protected-env post-merge acceptance) are defined with non-overlapping boundaries
 - adequacy: Each level has explicit default purpose, promotion trigger, what it can prove, what it cannot replace
 - evidence_level: integration (document review)
-- status: pending
+- status: completed
 
 ### AT-002: Escalation rules
 
@@ -52,7 +52,7 @@ N/A — this slice produces frozen definitions and mappings only. No runtime com
 - requirement: Escalation rules enumerate for each issue family the minimum evidence level
 - adequacy: Enumeration covers at least: documentation-only changes, script/tooling changes, internal governance changes, manager/runtime changes, watchdog/control-plane changes
 - evidence_level: integration (document review)
-- status: pending
+- status: completed
 
 ### AT-003: Completion gate minimum evidence
 
@@ -60,7 +60,7 @@ N/A — this slice produces frozen definitions and mappings only. No runtime com
 - requirement: completion verification maps each issue class to a minimum evidence level; absence of that level blocks completion declaration
 - adequacy: Mapping covers all issue classes from AT-002; blocker taxonomy distinguishes level-not-met from execution-pending
 - evidence_level: integration (document review)
-- status: pending
+- status: completed
 
 ### AT-004: Retirement gate minimum evidence
 
@@ -68,7 +68,7 @@ N/A — this slice produces frozen definitions and mappings only. No runtime com
 - requirement: worktree retirement maps each issue class to a minimum evidence level
 - adequacy: Mapping covers all issue classes from AT-002; a worktree cannot be retired if its minimum evidence level is unsatisfied
 - evidence_level: integration (document review)
-- status: pending
+- status: completed
 
 ### AT-005: Artifact-plane evidence closeout schema
 
@@ -76,7 +76,7 @@ N/A — this slice produces frozen definitions and mappings only. No runtime com
 - requirement: The closeout evidence schema defines the minimal summary shape that pre-tests.md completion evidence must produce, referencing artifact plane as canonical truth
 - adequacy: Schema includes acceptance item references, evidence level met/not-met per AT, closeout verdict, and artifact plane ref
 - evidence_level: integration (document review)
-- status: pending
+- status: completed
 
 ### AT-006: IBM reference consumption
 
@@ -84,4 +84,4 @@ N/A — this slice produces frozen definitions and mappings only. No runtime com
 - requirement: IBM references (ibm-completion-gate.md, prd-quality-bar.md, issue-materialization-checklist.md) consume the ladder vocabulary without redefining it
 - adequacy: Each reference either imports the ladder by reference (preferred) or includes a stable pointer; no local redefinition of ladder levels
 - evidence_level: integration (document review)
-- status: pending
+- status: completed
