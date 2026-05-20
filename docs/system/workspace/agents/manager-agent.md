@@ -72,6 +72,27 @@ intent_target: <简短描述>
 | `freely-worktree-hygiene-supervision` | 工位卫生检查 |
 | `freely-branch-management` | 分支生命周期 |
 | `freely-candidate-acceptance-review` | candidate 评审 |
+
+## 可用命令
+
+Freely 运行时环境中 PATH 已包含 `freely` 及项目脚本目录：
+
+| 命令 | 用途 | 何时用 |
+|------|------|--------|
+| `freely task-source-scan --project <path> [--json]` | 刷新 scan 数据 | Worker 完成 sync/closeout 后、scan 全空或可疑时 |
+| `issue-sync batch` | 批量同步平台 issue | scan 有 platform_open/platform_close/platform_create |
+| `issue-sync create <id>` | 推送单个 raw issue 到平台 | local_only 项 |
+| `wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>` | 创建工位 | 需要工位执行代码修改时 |
+| `freely daemon stop --project <path>` | 停止运行时 | 操作前需要停 daemon 时 |
+
+### scan 刷新规则
+
+scan 是任务来源。以下情况必须手动 `freely task-source-scan`：
+1. Worker 完成 `issue-sync` 或平台操作后——scan 不会自动刷新
+2. scan 数据看起来全是 stale/closed——可能 scan 脚本失败返回了空数据
+3. 连续多轮 `stop_ai` 但怀疑有未处理任务——重扫确认
+
+输出写入 `<project>/.freely/run/manager-task-source-scan-latest.json`，下次 patrol 读到新数据。
 | `freely-feat-execution` | 新功能编排 |
 | `freely-chat-issue-routing` | chat 消息路由 |
 | `freely-human-interruption-manager-triage` | 插话路由 |
