@@ -42,11 +42,11 @@
     summary: `This is broader than stale pre-test-merge governance and protected acceptance routing. It needs its own candidate so Freely can turn dogfood-exposed test gaps into a reusable capability contract.`
     verdict: `ready_for_pre_brainstorm`
 - priority: P0
-- status: needs_research
-- decision_reason: Slice 1 (C-20260325-0333-B) 已完成并验证通过。Slice 2 已 materialize 为 I-20260519-0333-C（testing evidence ladder and gate mapping），B2_IBM 产物已就绪，进入 dev-loop 实现阶段。
+- status: promoted
+- decision_reason: Slice 1 (C-20260325-0333-B) 已完成并验证通过。Slice 2 (I-20260519-0333-C, testing evidence ladder and gate mapping) 已完成 dev-loop 实现，B2_IBM 产物已验证验收，slice 通过全部验收标准。
 - promoted_issue_path: `docs/issues/I-20260519-0333-C/issue.md`
 - milestone: `docs/milestones.md#M-20260306-workspace-routing-foundation`
-- next_action: Slice 2 (I-20260519-0333-C) 的 B2_IBM materialization 已完成，进入 dev-loop 实现。剩余切口的 Slice 3（real-environment harness contract）和 runtime mirror 推迟到后续 umbrella 决策。
+- next_action: Slice 2 (I-20260519-0333-C) 已完成 dev-loop 实现并 closed。剩余切口的 Slice 3（real-environment harness contract）和 runtime mirror 推迟到后续 umbrella 决策。
 - revisit_trigger: 当 I-20260519-0333-C dev-loop 完成后，评估是否需要继续 Slice 3（real-environment harness contract），或将 umbrella candidate 标记为 partially_absorbed。
 - session_refs:
   - tool: codex
