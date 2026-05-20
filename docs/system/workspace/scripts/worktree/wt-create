@@ -416,8 +416,10 @@ _require_issue_exists() {
             platform_result=$(python3 "$ROOT_DIR/docs/system/workspace/scripts/sync/platform-adapter.py" search "$raw_key" 2>/dev/null || echo "{}")
             if [[ "$platform_result" != "{}" && "$platform_result" != "" ]]; then
               : # found on platform, proceed
+            elif [[ -d "$ROOT_DIR/docs/issues/$key" ]]; then
+              : # exists locally (local_only — will be pushed to platform by worker)
             else
-              echo "拒绝创建工位: raw-$raw_key not found on platform" >&2
+              echo "拒绝创建工位: raw-$raw_key not found on platform or local" >&2
               echo "  先在平台创建 raw issue:" >&2
               echo "    freely feedback --repo <user/repo> --title '...' --body '...'" >&2
               echo "  或: gh issue create --repo <user/repo> --title '[RAW-$raw_key] ...' --body '...'" >&2
