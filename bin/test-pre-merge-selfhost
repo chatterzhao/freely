@@ -5,13 +5,63 @@ shopt -s nullglob
 # test-pre-merge-selfhost: 打包当前分支并用它开发 Freely，验证自举
 #
 # 这是 merge 到 develop 的前置门禁。
-# 从 test-pre-merge 分支打包 Freely，用打包版本启动 daemon，
-# 验证它能正常完成一个 Manager cycle（patrol → 判断 → 产出）。
+# 执行顺序: 打包 → install → doctor → daemon start → Manager cycle → daemon stop
+#
+# 用法:
+#   ./bin/test-pre-merge-selfhost [--timeout <秒>] [PROJECT_DIR]
+#
+# 退出码:
+#   0  全部通过
+#   1  打包失败
+#   2  install 失败
+#   3  doctor 失败
+#   4  daemon 启动失败
+#   5  Manager cycle 超时或失败
+#   6  daemon 停止失败
+#   7  参数错误
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 PACKAGE_DIR=""
-PROJECT="${1:-$ROOT_DIR}"
-VERSION="test-$(date -u +%Y%m%d-%H%M%S)"
+PROJECT=""
+TIMEOUT=300
+VERSION="$(date -u +%Y%m%d)-nightly"
+
+# 解析参数
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --timeout)
+      if [[ -z "${2:-}" || ! "$2" =~ ^[0-9]+$ ]]; then
+        echo "[ERROR] --timeout requires a numeric value (seconds)" >&2
+        exit 7
+      fi
+      TIMEOUT="$2"; shift 2 ;;
+    --timeout=*)
+      val="${1#*=}"
+      if [[ ! "$val" =~ ^[0-9]+$ ]]; then
+        echo "[ERROR] --timeout requires a numeric value (seconds)" >&2
+        exit 7
+      fi
+      TIMEOUT="$val"; shift ;;
+    -*)
+      echo "[ERROR] unknown option: $1" >&2
+      echo "Usage: ./bin/test-pre-merge-selfhost [--timeout <秒>] [PROJECT_DIR]" >&2
+      exit 7 ;;
+    *)
+      PROJECT="$1"; shift ;;
+  esac
+done
+
+PROJECT="${PROJECT:-$ROOT_DIR}"
+
+step_ok() {
+  echo "[selfhost-test] step OK: $1"
+}
+
+step_fail() {
+  local code="$1" msg="$2"
+  echo "[selfhost-test] FAIL: $msg" >&2
+  exit "$code"
+}
 
 cleanup() {
   if [[ -n "${PACKAGE_DIR:-}" && -d "$PACKAGE_DIR" ]]; then
@@ -20,38 +70,53 @@ cleanup() {
 }
 trap cleanup EXIT
 
-echo "[selfhost-test] packaging $VERSION from $ROOT_DIR ..."
+# === Step 1: 打包 ===
+echo "[selfhost-test] === Step 1/5: packaging $VERSION from $ROOT_DIR ==="
 PACKAGE_DIR="$(mktemp -d /tmp/freely-selfhost-test.XXXXXX)"
 
-"$ROOT_DIR/bin/freely-package" --version "$VERSION" --output "$PACKAGE_DIR" 2>&1 | tail -1
+if ! "$ROOT_DIR/bin/freely-package" --version "$VERSION" --output "$PACKAGE_DIR" 2>&1; then
+  step_fail 1 "packaging failed for version $VERSION"
+fi
+step_ok "packaging"
 
-echo "[selfhost-test] starting packaged freely daemon on $PROJECT ..."
+# === Step 2: Install ===
+echo "[selfhost-test] === Step 2/5: installing packaged Freely ==="
 PACKAGED_FREELY="$PACKAGE_DIR/bin/freely"
-
 if [[ ! -x "$PACKAGED_FREELY" ]]; then
-  echo "[selfhost-test] FAIL: packaged freely not found at $PACKAGED_FREELY"
-  exit 1
+  step_fail 2 "packaged freely entry point not found at $PACKAGED_FREELY"
 fi
 
-# 启动 daemon
+step_ok "install"
+
+# === Step 3: Doctor ===
+echo "[selfhost-test] === Step 3/5: running freely doctor ==="
+DOCTOR_OUTPUT=$("$PACKAGED_FREELY" doctor --project "$PROJECT" 2>&1) || true
+echo "$DOCTOR_OUTPUT"
+
+# 检查 doctor 输出是否有 FAIL
+if echo "$DOCTOR_OUTPUT" | grep -qi "fail\|error"; then
+  step_fail 3 "doctor check reported failures"
+fi
+step_ok "doctor"
+
+# === Step 4: Daemon start & Manager cycle ===
+echo "[selfhost-test] === Step 4/5: starting packaged daemon ==="
 DAEMON_OUTPUT=$("$PACKAGED_FREELY" daemon start --project "$PROJECT" 2>&1)
 echo "$DAEMON_OUTPUT"
 
 # 提取 supervisor PID
 SUPERVISOR_PID=$(echo "$DAEMON_OUTPUT" | grep "supervisor_pid:" | awk '{print $2}')
 if [[ -z "${SUPERVISOR_PID:-}" ]]; then
-  echo "[selfhost-test] FAIL: cannot determine supervisor PID"
-  exit 1
+  step_fail 4 "cannot determine supervisor PID from daemon start output"
 fi
 echo "[selfhost-test] supervisor PID: $SUPERVISOR_PID"
 
-# 等待第一个 Manager cycle 完成 (最多 5 分钟)
-echo "[selfhost-test] waiting for first Manager cycle ..."
+# 等待第一个 Manager cycle
+echo "[selfhost-test] waiting for first Manager cycle (timeout: ${TIMEOUT}s) ..."
 WAITED=0
-MAX_WAIT=300
 CYCLE_DONE=0
 
-while [[ $WAITED -lt $MAX_WAIT ]]; do
+while [[ $WAITED -lt $TIMEOUT ]]; do
   sleep 10
   WAITED=$((WAITED + 10))
 
@@ -66,20 +131,40 @@ while [[ $WAITED -lt $MAX_WAIT ]]; do
 
   # supervisor 还活着吗
   if ! kill -0 "$SUPERVISOR_PID" 2>/dev/null; then
-    echo "[selfhost-test] FAIL: supervisor died before completing first cycle"
-    tail -20 "$PROJECT/.freely/logs/runtime-events.log" 2>/dev/null || true
-    exit 1
+    echo "[selfhost-test] supervisor died before completing first cycle — runtime log:" >&2
+    tail -30 "$PROJECT/.freely/logs/runtime-events.log" 2>/dev/null || true
+    step_fail 5 "supervisor died prematurely"
   fi
 done
 
 if [[ $CYCLE_DONE -eq 0 ]]; then
-  echo "[selfhost-test] FAIL: timeout waiting for first cycle ($MAX_WAIT s)"
+  echo "[selfhost-test] FAIL: timeout waiting for first cycle (${TIMEOUT}s)"
   "$PACKAGED_FREELY" daemon stop --project "$PROJECT" 2>/dev/null || true
-  exit 1
+  step_fail 5 "Manager cycle timeout"
 fi
 
-echo "[selfhost-test] first cycle detected — stopping daemon ..."
-"$PACKAGED_FREELY" daemon stop --project "$PROJECT" 2>/dev/null || true
+echo "[selfhost-test] first Manager cycle detected"
+step_ok "Manager cycle"
 
-echo "[selfhost-test] PASS: packaged $VERSION successfully developed Freely"
+# === Step 5: Daemon stop ===
+echo "[selfhost-test] === Step 5/5: stopping daemon ==="
+if ! "$PACKAGED_FREELY" daemon stop --project "$PROJECT" 2>/dev/null; then
+  step_fail 6 "daemon stop failed"
+fi
+
+# 确认 supervisor 已退出
+if kill -0 "$SUPERVISOR_PID" 2>/dev/null; then
+  echo "[selfhost-test] waiting for supervisor to exit ..."
+  sleep 3
+  if kill -0 "$SUPERVISOR_PID" 2>/dev/null; then
+    step_fail 6 "supervisor still running after stop"
+  fi
+fi
+step_ok "daemon stop"
+
+echo ""
+echo "[selfhost-test] =============================="
+echo "[selfhost-test] ALL STEPS PASSED"
+echo "[selfhost-test] packaged version: $VERSION"
+echo "[selfhost-test] =============================="
 exit 0

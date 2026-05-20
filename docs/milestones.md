@@ -969,15 +969,22 @@ routing_policy:
 7. `I-20260502-0500-A`
 - title: Freely 打包与自举验证
 - milestone_state: committed
-- phase_state: `completed`
+- phase_state: `in_dev`
 - priority: P0
-- issue_path: docs/epics/freely-packaging-selfhost/issues/freely-packaging-selfhost.md
+- issue_path: docs/issues/I-20260502-0500-A/issue.md
 - progress_path: docs/progress/freely-packaging-selfhost/p-freely-packaging-selfhost.md
-- source_brainstorm: docs/pre-brainstorms/20260502-0500--freely-packaging-selfhost/freely-packaging-selfhost.md
+- pretests_path: docs/epics/freely-packaging-selfhost/pre-tests.md
+- tasks_path: docs/epics/freely-packaging-selfhost/tasks.md
+- source_brainstorm: docs/pre-brainstorms/20260502-0500--freely-packaging-selfhost/brainstorms.md
 - source_candidates: docs/pre-brainstorms/20260502-0500--freely-packaging-selfhost/candidates.md
 - evidence:
+  - docs/epics/freely-packaging-selfhost/brainstorms/b-packaging-selfhost.md
+  - docs/epics/freely-packaging-selfhost/prd.md
+  - docs/epics/freely-packaging-selfhost/pre-tests.md
+  - docs/epics/freely-packaging-selfhost/tasks.md
   - docs/epics/freely-packaging-selfhost/code-reviews/20260502-packaging-implementation.md
-- next_action: 推进到 test-pre-merge，打包自举验证后 merge 到 develop
+  - docs/epics/freely-packaging-selfhost/code-reviews/Implementation-Decision-Note.md
+- next_action: dev-loop implementation: enhance bin/freely-package and bin/test-pre-merge-selfhost
 
 8. `I-20260501-0000-A`
 - title: PR scan surface + FREELY_REPO_PLATFORMS config
