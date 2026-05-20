@@ -55,22 +55,37 @@ MSG
   本次绕过已记录。如非上述 2 种情况，请立即回退并走正常流程。
   文档: docs/LAWS.md §2D
 GATE_WARN
-  # Enforce: only skip for docs/cleanup/format — reject if implementation code is changed
-  local impl_files
-  impl_files=$(git diff --cached --name-only --diff-filter=ACMR 2>/dev/null | grep -E '^bin/|^docs/system/workspace/scripts/|^docs/system/workspace/hooks/|^src/|^apps/|^crates/|^packages/|^frontend/|^gui/|^tui/|^tauri/' || true)
-  if [[ -n "$impl_files" ]]; then
-    cat <<MSG
-[HOOK] FREELY_SKIP_IBM_GATE 拒绝：合并 diff 包含实现代码变更，不可绕过 IBM gate。
 
-  变更文件:
-$(echo "$impl_files" | sed 's/^/    /')
+  # Delegate to governance-merge-gate with --skip-ibm-gate for path validation.
+  # The gate has canonical path definitions (is_governance_only_path) that
+  # work for both Freely and non-Freely projects via env var configuration.
+  if [[ ! -x "./bin/governance-merge-gate" ]]; then
+    cat <<MSG
+[HOOK] FREELY_SKIP_IBM_GATE=1 but governance-merge-gate not found at ./bin/governance-merge-gate.
+Install the gate or remove FREELY_SKIP_IBM_GATE=1 to use the full governance path.
+MSG
+    exit 1
+  fi
+
+  set +e
+  gate_output="$(./bin/governance-merge-gate --staged --target-branch "$branch" --source-branch "$guarded_state_source" --skip-ibm-gate 2>&1)"
+  gate_rc=$?
+  set -e
+
+  if [[ "$gate_rc" -ne 0 ]]; then
+    cat <<MSG
+[HOOK] FREELY_SKIP_IBM_GATE 拒绝：governance-merge-gate 检测到实现代码变更，不可绕过 IBM gate。
+
+$gate_output
 
   FREELY_SKIP_IBM_GATE=1 仅限 docs/cleanup/format 等治理型变更。
   实现变更必须走完整 raw→C→M→I 治理链。
   文档: docs/LAWS.md §2D
 MSG
-    exit 1
+    exit "$gate_rc"
   fi
+
+  echo "$gate_output"
   echo "[HOOK] IBM governance gate skipped (FREELY_SKIP_IBM_GATE=1)"
   exit 0
 fi

@@ -21,28 +21,36 @@ IMPLEMENTATION_DECISION_NOTE_FIELDS = (
     "boundary_non_goals",
     "residual_risk",
 )
+_ENV_IMPL_PREFIXES = os.environ.get("FREELY_IMPLEMENTATION_PATH_PREFIXES", "")
 IMPLEMENTATION_PATH_PREFIXES = (
-    "bin/",
-    "docs/system/",
-    "src/",
-    "apps/",
-    "crates/",
-    "packages/",
-    "frontend/",
-    "gui/",
-    "tui/",
-    "tauri/",
+    tuple(_ENV_IMPL_PREFIXES.split(":")) if _ENV_IMPL_PREFIXES
+    else (
+        "bin/",
+        "docs/system/",
+        "src/",
+        "apps/",
+        "crates/",
+        "packages/",
+        "frontend/",
+        "gui/",
+        "tui/",
+        "tauri/",
+    )
 )
-IMPLEMENTATION_PATH_FILES = {
-    "Cargo.toml",
-    "Cargo.lock",
-    "package.json",
-    "bun.lock",
-    "bun.lockb",
-    "tsconfig.json",
-    "vite.config.ts",
-    "vite.config.js",
-}
+_ENV_IMPL_FILES = os.environ.get("FREELY_IMPLEMENTATION_PATH_FILES", "")
+IMPLEMENTATION_PATH_FILES = (
+    set(_ENV_IMPL_FILES.split(":")) if _ENV_IMPL_FILES
+    else {
+        "Cargo.toml",
+        "Cargo.lock",
+        "package.json",
+        "bun.lock",
+        "bun.lockb",
+        "tsconfig.json",
+        "vite.config.ts",
+        "vite.config.js",
+    }
+)
 PRETESTS_GATE_BIN = os.path.join(ROOT_DIR, "bin", "pretests-gate")
 
 
@@ -732,6 +740,7 @@ def main() -> int:
     parser.add_argument("--range", help="Validate changed governance artifacts in the given git revision range.")
     parser.add_argument("--target-branch", default="develop", help="Target branch for the guarded merge or push.")
     parser.add_argument("--source-branch", default="", help="Source branch for guarded merge verification.")
+    parser.add_argument("--skip-ibm-gate", action="store_true", help="Skip IBM governance lifecycle validation. Only check that changed paths are governance-only (no implementation code).")
     args = parser.parse_args()
     USE_STAGED_VIEW = bool(args.staged)
     if args.range:
@@ -745,6 +754,23 @@ def main() -> int:
     progress_paths: Set[str] = {p for p in changed_paths if re.match(r"docs/progress/.+\.md$", p)}
     review_paths: Set[str] = {p for p in changed_paths if re.match(r"docs/epics/.+/code-reviews/.+\.md$", p)}
     milestones_changed = "docs/milestones.md" in changed_paths
+
+    # ── SKIP IBM GATE: skip lifecycle validation, only check governance-only ──
+    if args.skip_ibm_gate:
+        non_governance_paths = [p for p in changed_paths if not is_governance_only_path(p)]
+        if non_governance_paths:
+            print("[FAIL] FREELY_SKIP_IBM_GATE=1 but merge contains implementation changes.")
+            print("FREELY_SKIP_IBM_GATE=1 is only allowed for governance-only changes:")
+            print("  - docs/ (pre-brainstorms, epics, progress, issues, system/workspace/skills, system/workspace/hooks)")
+            print("  - AGENTS.md, docs/CONSTITUTION.md, docs/LAWS.md, docs/PROJECT_INTENT.md, docs/milestones.md")
+            print()
+            print("Implementation changes must go through the full raw/C/M/I lifecycle.")
+            print("Non-governance paths in this diff:")
+            for p in non_governance_paths:
+                print(f"  - {p}")
+            return 1
+        print("[SKIP-IBM-GATE] All changed paths are governance-only. IBM gate skipped.")
+        return 0
 
     milestones = parse_milestones()
     milestone_by_issue_path: Dict[str, List[MilestoneEntry]] = {}
