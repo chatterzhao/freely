@@ -1,6 +1,6 @@
 ---
 local_id: raw-20260514T001746Z
-phase_state: in_dev
+phase_state: proposed
 source: governance-repair
 title: "auto-materialize raw issue for promoted C-20260514T001746Z"
 ---
