@@ -1,8 +1,23 @@
 ---
 local_id: raw-20260513T075847Z
+kind: raw
 phase_state: proposed
-source: governance-repair
-title: "auto-materialize raw issue for promoted C-20260513T075847Z"
+platform_ids:
+  github:
+    issue_id: '1215'
+    url: https://github.com/chatterzhao/freely/issues/1215
+    synced_at: ''
+primary_platform: github
+canonical_issue_path: ''
+last_synced_comment_at: {}
+hash: ''
+created_at: '2026-05-20T10:25:01Z'
+updated_at: '2026-05-20T10:30:34Z'
+intake_id: ''
+author: platform
+channel: github
+session_refs: []
+platform_state: open
 ---
 
 Governance gate GATE 6.3 requires every promoted candidate to have a matching
