@@ -3,6 +3,7 @@ issue_id: raw-20260519T111207Z
 kind: raw
 priority: P1
 phase_state: absorbed
+absorbed_into: I-20260413-0420-A
 source: feedback
 created_at: '2026-05-19T11:12:07Z'
 title: handoff字段alias+evidence_paths可选
