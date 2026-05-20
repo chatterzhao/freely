@@ -24,7 +24,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 PACKAGE_DIR=""
 PROJECT=""
 TIMEOUT=300
-VERSION="test-$(date -u +%Y%m%d-%H%M%S)"
+VERSION="$(date -u +%Y%m%d)-nightly"
 
 # 解析参数
 while [[ $# -gt 0 ]]; do
