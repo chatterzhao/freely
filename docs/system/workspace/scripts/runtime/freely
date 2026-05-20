@@ -3692,7 +3692,6 @@ FREELY_NO_PROXY=""
 # Each platform name maps to its CLI: github→gh, gitee→gitee.
 # Empty = no platform scanning.
 FREELY_REPO_PLATFORMS=""
-FREELY_TASK_MODE="wait"
 FREELY_SECURITY_REVIEW_POLICY="advisory-on-high-risk-or-uncertainty"
 FREELY_SECURITY_REVIEW_SCOPE="execution-boundary-and-reviewer-support"
 EOF
@@ -18673,7 +18672,7 @@ start_project_runtime() {
   append_runtime_event "$project" "start_project_runtime_after_load_config" \
     "entrypoint_mode=$entrypoint_mode"
   ensure_freely_db "$project"
-  ensure_task_mode_gate "$project" "${FREELY_TASK_MODE:-wait}"
+  ensure_task_mode_gate "$project" "wait"
   register_project_in_registry "$project"
   append_runtime_event "$project" "start_project_runtime_after_registry" \
     "entrypoint_mode=$entrypoint_mode"
@@ -19893,7 +19892,7 @@ cmd_task_mode() {
     set)
       [[ -n "$mode" ]] || { log_error "missing --task-mode"; exit 1; }
       load_config "$project"
-      ensure_task_mode_gate "$project" "${FREELY_TASK_MODE:-wait}"
+      ensure_task_mode_gate "$project" "wait"
       if [[ "$force" == "1" ]]; then
         log_info "terminating current AI process before mode switch"
         stop_project_runtime "$project" "task_mode_force_switch"
