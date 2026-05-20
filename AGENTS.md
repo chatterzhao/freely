@@ -119,7 +119,8 @@ raw issue → wt-create → B1:IBM|B2:IBM → dev → merge-guarded → wt-close
 
 | 步骤 | 操作 | 谁执行 |
 |------|------|--------|
-| 1. 创建 raw issue | `./bin/freely feedback --title "..." --body "..."` 或 chat 插话 | 开发者 |
+| 1. 创建 raw issue | `./bin/freely feedback --repo <user/repo> --title "..." --body "..."` 或 chat 插话 | 开发者 |
+|    | Freely 自举时: `./bin/freely feedback --repo chatterzhao/freely --title "..." --body "..."` 或读 `.freely/config.env` 的 `FREELY_REPO_URL` | |
 | 2. 开工位 | `./bin/wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>` | Manager/开发者 |
 | 3. B1 或 B2 | B1:IBM（预研→candidate→milestone）或 B2:IBM（实现→epic→tasks） | skill 执行 |
 | 4. 开发 | 在 fix/feature 工位提交、测试 | Worker |
