@@ -2,20 +2,23 @@
 # 一行一个文件/目录路径，相对于项目根目录。
 # 目录路径以 / 结尾，递归复制。
 # # 开头的行为注释。
+#
+# 维护责任: 每个 section 标注了维护 Owner。新增 workspace 产品文件时
+# 必须同时更新此清单，否则打包产物将遗漏。
 
-# Agent 角色定义
+# Owner: workspace-governance — Agent 角色定义
 docs/system/workspace/agents/
 
-# Skill 定义
+# Owner: workspace-governance — Skill 定义
 docs/system/workspace/skills/
 
-# Git gate 脚本
+# Owner: workspace-governance — Git gate 脚本
 docs/system/workspace/hooks/
 
-# 运行时脚本
+# Owner: runtime-maintainer — 运行时脚本
 docs/system/workspace/scripts/
 
-# 框架和能力文档
+# Owner: workspace-governance — 框架和能力文档
 docs/system/workspace/ibm-framework.md
 docs/system/workspace/three-loop-capability-lifecycle.md
 docs/system/workspace/three-loop-trace-contract.md
@@ -26,14 +29,14 @@ docs/system/workspace/project-agents-contract.md
 docs/system/workspace/README.md
 docs/system/workspace/scan-lifecycle-design.md
 
-# 入口脚本
+# Owner: tooling-maintainer — 入口脚本
 bin/
 
-# Git hook 包装层
+# Owner: tooling-maintainer — Git hook 包装层
 .githooks/
 
-# 模板
+# Owner: templates-maintainer — 模板
 templates/
 
-# 工具边界引导
+# Owner: runtime-maintainer — 工具边界引导
 .freely/tool-boundary-bootstrap.md
