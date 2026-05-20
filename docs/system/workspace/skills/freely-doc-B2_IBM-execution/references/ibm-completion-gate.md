@@ -70,3 +70,16 @@
 - `execution_base`
 - `integration_target`
 - `depends_on`
+
+## Evidence Level Integration
+
+This gate consumes the five-level testing evidence ladder by reference — do not redefine levels locally.
+
+Refer to `docs/epics/testing-evidence-ladder/testing-evidence-ladder-and-gate-mapping/prd.md` for:
+
+- **Five evidence levels**: script regression, integration, end-to-end scenario, application-native real-environment, protected-env post-merge acceptance. Each level has a defined default purpose, promotion trigger, what it can prove, and what it cannot replace.
+- **Completion gate minimum evidence**: per issue class, the minimum `evidence_level` required before `phase_state: completed` may be set.
+- **Retirement gate minimum evidence**: per issue class, the minimum `evidence_level` required before a worktree may be retired.
+- **Blocker taxonomy**: `evidence_gap` (level not met) vs `execution_pending` (tests defined but not yet run).
+
+Acceptance items in `pre-tests.md` MUST set `evidence_level` to one of the five ladder levels. A lower level passing does NOT satisfy a gate that requires a higher level.

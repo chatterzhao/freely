@@ -132,3 +132,21 @@ Issue front matter 还应显式绑定：
   - route semantics:
     - `test-pre-merge-*`: 主线前临时验证，承担预检运行测试 / 预测试 merge / develop-bound canonical promote；若失败则回到 dedicated writable worktree 修复
     - `develop`: 已进入主线后的 completion verification，不承担主线前预测试
+
+## Evidence level check
+
+Acceptance items MUST reference the five-level testing evidence ladder by name — do not redefine levels locally.
+
+Refer to `docs/epics/testing-evidence-ladder/testing-evidence-ladder-and-gate-mapping/prd.md` for:
+
+- **Five evidence levels**: script regression, integration, end-to-end scenario, application-native real-environment, protected-env post-merge acceptance.
+- **Completion verification minimum evidence**: per issue class, the minimum `evidence_level` required before `phase_state: completed` may be set.
+- **Worktree retirement minimum evidence**: per issue class, the minimum `evidence_level` required before a worktree may be retired.
+- **Escalation rules**: lower levels cannot satisfy gates requiring higher levels.
+- **Blocker taxonomy extension**: `evidence_gap` (level not met) vs `execution_pending` (tests defined but not yet run).
+
+Checklist:
+
+- [ ] Every acceptance item `evidence_level` uses a valid ladder level name
+- [ ] The minimum evidence level for the issue class is satisfied before completion
+- [ ] Blocker taxonomy distinguishes level-not-met from execution-pending
