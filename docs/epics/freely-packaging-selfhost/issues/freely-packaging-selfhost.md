@@ -2,7 +2,7 @@
 
 - issue_id: I-20260502-0500-A
 - source_candidate: docs/pre-brainstorms/20260502-0500--freely-packaging-selfhost/candidates.md#c-20260502-0500-a
-- phase_state: done_b2_ibm
+- phase_state: in_dev
 - milestone: current
 - pretests_path: docs/epics/freely-packaging-selfhost/pre-tests.md
 - tasks_path: docs/epics/freely-packaging-selfhost/tasks.md

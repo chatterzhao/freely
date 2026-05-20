@@ -969,7 +969,7 @@ routing_policy:
 7. `I-20260502-0500-A`
 - title: Freely 打包与自举验证
 - milestone_state: committed
-- phase_state: `done_b2_ibm`
+- phase_state: `in_dev`
 - priority: P0
 - issue_path: docs/issues/I-20260502-0500-A/issue.md
 - progress_path: docs/progress/freely-packaging-selfhost/p-freely-packaging-selfhost.md
