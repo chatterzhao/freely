@@ -14834,11 +14834,21 @@ write_task_source_scan_json_for_project() {
   if [[ -f "$TASK_SOURCE_SCAN_SCRIPT" ]]; then
     local _scan_args=(--project "$project")
     [[ -n "$raw_key" ]] && _scan_args+=(--raw-key "$raw_key")
-    python3 "$TASK_SOURCE_SCAN_SCRIPT" "${_scan_args[@]}" >"$output_path" 2>/dev/null || {
-      log_warn "lifecycle scan failed; falling back to empty scan"
-      printf '{"scan_version":"lifecycle-v2","generated_at":"%s","project_root":"%s","summary":{"total_incomplete":0,"by_stage":{},"ready":0},"items":[]}\n' \
-        "$generated_at" "$project" >"$output_path"
-    }
+    local _scan_stderr
+    _scan_stderr="$(mktemp "$run_dir/task-lifecycle-scan.stderr.XXXXXX")"
+    if python3 "$TASK_SOURCE_SCAN_SCRIPT" "${_scan_args[@]}" >"$output_path" 2>"$_scan_stderr"; then
+      rm -f "$_scan_stderr"
+    else
+      log_warn "lifecycle scan failed; stderr saved to $_scan_stderr"
+      # Keep old scan if exists — never overwrite with empty on failure
+      if [[ -f "$output_path" && -s "$output_path" ]]; then
+        : # preserve existing scan
+      else
+        # First-time failure or empty old file: write minimal error marker
+        printf '{"scan_version":"lifecycle-v2","generated_at":"%s","project_root":"%s","summary":{"total_incomplete":0,"by_stage":{},"ready":0},"scan_error":true,"error_log":"%s","items":[]}\n' \
+          "$generated_at" "$project" "$_scan_stderr" >"$output_path"
+      fi
+    fi
   else
     printf '{"scan_version":"lifecycle-v2","generated_at":"%s","project_root":"%s","summary":{"total_incomplete":0,"by_stage":{},"ready":0},"items":[]}\n' \
       "$generated_at" "$project" >"$output_path"
