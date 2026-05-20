@@ -2,7 +2,7 @@
 
 - issue_id: I-20260502-0500-A
 - issue_path: docs/epics/freely-packaging-selfhost/issues/freely-packaging-selfhost.md
-- phase_state: completed
+- phase_state: in_dev
 
 ## B2_IBM 完成
 
@@ -39,6 +39,11 @@ B2 产物已提交:
 - Doctor 验证: 打包版本的 freely doctor 全部 PASS
 - 自举验证流程 (test-pre-merge-selfhost): Step 1-3 PASS (打包 → install → doctor)
 - Step 4-5 (daemon start → Manager cycle → daemon stop): 需要 test-pre-merge 批次环境，在 feature worktree 中无法完整模拟多分支场景
+
+### T-005: test-pre-merge 批次自举验证 (2026-05-20)
+- 批次: test-pre-merge-20260520T064427Z-packaging-selfhost-verify
+- 状态: 🔄 验证执行中（待 test-pre-merge 验收结果）
+- 执行命令: `./bin/test-pre-merge-selfhost --timeout 300`
 
 ## 验收状态
 

@@ -984,7 +984,7 @@ routing_policy:
   - docs/epics/freely-packaging-selfhost/tasks.md
   - docs/epics/freely-packaging-selfhost/code-reviews/20260502-packaging-implementation.md
   - docs/epics/freely-packaging-selfhost/code-reviews/Implementation-Decision-Note.md
-- next_action: dev-loop implementation: enhance bin/freely-package and bin/test-pre-merge-selfhost
+- next_action: test-pre-merge 批次自举验证中（AT-004/005/009）。验证通过后更新 phase_state 为 completed。
 
 8. `I-20260501-0000-A`
 - title: PR scan surface + FREELY_REPO_PLATFORMS config
