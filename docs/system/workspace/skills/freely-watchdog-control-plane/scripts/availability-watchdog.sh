@@ -512,13 +512,16 @@ PY
 }
 
 codex_saved_slots_include_kind() {
-  local project="$1" expected_kind="$2" candidate kind
+  local project="$1" expected_kind="$2" candidate kind slots
+  slots="$(codex_saved_slots "$project")"
   while IFS= read -r candidate; do
     [[ -n "$candidate" ]] || continue
     kind="$(codex_saved_slot_kind "$candidate")"
     [[ "$kind" == "$expected_kind" ]] || continue
     return 0
-  done < <(codex_saved_slots "$project")
+  done <<EOF
+$slots
+EOF
   return 1
 }
 
