@@ -55,6 +55,22 @@ MSG
   本次绕过已记录。如非上述 2 种情况，请立即回退并走正常流程。
   文档: docs/LAWS.md §2D
 GATE_WARN
+  # Enforce: only skip for docs/cleanup/format — reject if implementation code is changed
+  local impl_files
+  impl_files=$(git diff --cached --name-only --diff-filter=ACMR 2>/dev/null | grep -E '^bin/|^docs/system/workspace/scripts/|^docs/system/workspace/hooks/|^src/|^apps/|^crates/|^packages/|^frontend/|^gui/|^tui/|^tauri/' || true)
+  if [[ -n "$impl_files" ]]; then
+    cat <<MSG
+[HOOK] FREELY_SKIP_IBM_GATE 拒绝：合并 diff 包含实现代码变更，不可绕过 IBM gate。
+
+  变更文件:
+$(echo "$impl_files" | sed 's/^/    /')
+
+  FREELY_SKIP_IBM_GATE=1 仅限 docs/cleanup/format 等治理型变更。
+  实现变更必须走完整 raw→C→M→I 治理链。
+  文档: docs/LAWS.md §2D
+MSG
+    exit 1
+  fi
   echo "[HOOK] IBM governance gate skipped (FREELY_SKIP_IBM_GATE=1)"
   exit 0
 fi
