@@ -297,8 +297,9 @@ def is_governance_only_path(rel_path: str) -> bool:
         return True
     if rel_path.startswith(("docs/system/workspace/agents/", "docs/system/workspace/skills/", "docs/system/workspace/hooks/")):
         return True
-    if rel_path.startswith(("docs/system/workspace/scripts/quality/", "docs/system/workspace/scripts/worktree/", "docs/system/workspace/scripts/runtime/")):
+    if rel_path.startswith(("docs/system/workspace/scripts/quality/", "docs/system/workspace/scripts/worktree/", "docs/system/workspace/scripts/runtime/", "docs/system/workspace/scripts/tests/")):
         return True
+    # Legacy catch: test-governance-* at the top of tests/ (backward compat)
     if re.match(r"docs/system/workspace/scripts/tests/test-governance-[^/]+$", rel_path):
         return True
     return False
