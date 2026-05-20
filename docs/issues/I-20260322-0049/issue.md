@@ -2,25 +2,24 @@
 local_id: I-20260322-0049
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "43"
-    url: "https://github.com/chatterzhao/freely/issues/43"
-    synced_at: "2026-04-27T11:16:13Z"
-
+    issue_id: '43'
+    url: https://github.com/chatterzhao/freely/issues/43
+    synced_at: '2026-04-27T11:16:13Z'
   gitee:
-    issue_id: "IJFO67"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO67"
-    synced_at: "2026-04-27T13:14:40Z"
+    issue_id: IJFO67
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO67
+    synced_at: '2026-04-27T13:14:40Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/manager-continuation-handoff-consumption-governance/issues/manager-continuation-handoff-consumption-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/manager-continuation-handoff-consumption-governance/issues/manager-continuation-handoff-consumption-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:16:13Z"
-hash: ""
-created_at: "2026-04-27T11:16:13Z"
-updated_at: "2026-04-27T11:16:13Z"
-platform_state: 
+  github: '2026-04-27T11:16:13Z'
+hash: ''
+created_at: '2026-04-27T11:16:13Z'
+updated_at: '2026-04-27T11:16:13Z'
+platform_state: open
 ---
 
 Freely 已经解决了 manager delegated continuation 的：

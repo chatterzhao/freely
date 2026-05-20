@@ -2,25 +2,24 @@
 local_id: I-20260321-1925
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "41"
-    url: "https://github.com/chatterzhao/freely/issues/41"
-    synced_at: "2026-04-27T11:16:01Z"
-
+    issue_id: '41'
+    url: https://github.com/chatterzhao/freely/issues/41
+    synced_at: '2026-04-27T11:16:01Z'
   gitee:
-    issue_id: "IJFO65"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO65"
-    synced_at: "2026-04-27T13:14:38Z"
+    issue_id: IJFO65
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO65
+    synced_at: '2026-04-27T13:14:38Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/manager-chat-reentry-and-cleanup-misrouting-governance/issues/manager-chat-reentry-and-cleanup-misrouting-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/manager-chat-reentry-and-cleanup-misrouting-governance/issues/manager-chat-reentry-and-cleanup-misrouting-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:16:01Z"
-hash: ""
-created_at: "2026-04-27T11:16:01Z"
-updated_at: "2026-04-27T11:16:01Z"
-platform_state: 
+  github: '2026-04-27T11:16:01Z'
+hash: ''
+created_at: '2026-04-27T11:16:01Z'
+updated_at: '2026-04-27T11:16:01Z'
+platform_state: open
 ---
 
 Freely 当前已经有：

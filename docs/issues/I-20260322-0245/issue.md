@@ -2,25 +2,24 @@
 local_id: I-20260322-0245
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "47"
-    url: "https://github.com/chatterzhao/freely/issues/47"
-    synced_at: "2026-04-27T11:16:38Z"
-
+    issue_id: '47'
+    url: https://github.com/chatterzhao/freely/issues/47
+    synced_at: '2026-04-27T11:16:38Z'
   gitee:
-    issue_id: "IJFO6E"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO6E"
-    synced_at: "2026-04-27T13:14:47Z"
+    issue_id: IJFO6E
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO6E
+    synced_at: '2026-04-27T13:14:47Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/runtime-worker-launch-linkage-and-stall-recovery-governance/issues/runtime-worker-launch-linkage-and-stall-recovery-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/runtime-worker-launch-linkage-and-stall-recovery-governance/issues/runtime-worker-launch-linkage-and-stall-recovery-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:16:38Z"
-hash: ""
-created_at: "2026-04-27T11:16:38Z"
-updated_at: "2026-04-27T11:16:38Z"
-platform_state: 
+  github: '2026-04-27T11:16:38Z'
+hash: ''
+created_at: '2026-04-27T11:16:38Z'
+updated_at: '2026-04-27T11:16:38Z'
+platform_state: open
 ---
 
 Freely 最新 dogfood 证明：

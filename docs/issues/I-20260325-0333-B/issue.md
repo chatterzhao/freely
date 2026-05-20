@@ -2,25 +2,24 @@
 local_id: I-20260325-0333-B
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "54"
-    url: "https://github.com/chatterzhao/freely/issues/54"
-    synced_at: "2026-04-27T11:17:16Z"
-
+    issue_id: '54'
+    url: https://github.com/chatterzhao/freely/issues/54
+    synced_at: '2026-04-27T11:17:16Z'
   gitee:
-    issue_id: "IJFO6M"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO6M"
-    synced_at: "2026-04-27T13:14:56Z"
+    issue_id: IJFO6M
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO6M
+    synced_at: '2026-04-27T13:14:56Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/issues/story-level-pre-tests-quality-gate-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/issues/story-level-pre-tests-quality-gate-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:17:16Z"
-hash: ""
-created_at: "2026-04-27T11:17:16Z"
-updated_at: "2026-04-27T11:17:16Z"
-platform_state: 
+  github: '2026-04-27T11:17:16Z'
+hash: ''
+created_at: '2026-04-27T11:17:16Z'
+updated_at: '2026-04-27T11:17:16Z'
+platform_state: open
 ---
 
 Freely 已经明确 `pre-tests.md` 是 issue-level acceptance 控制面，但还没有冻结 story-level 质量门禁。结果就是：
