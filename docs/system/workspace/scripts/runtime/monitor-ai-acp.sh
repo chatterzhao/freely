@@ -104,8 +104,8 @@ _detect_acp_failure() {
     [[ -n "$failure_marker" ]] && echo "auth_or_rate_limit" > "$failure_marker"
   fi
 
-  # Bridge restart / session lost: session/resume fails with "not found"
-  if _matched=$(grep -m1 -E '(session.*not found|unknown session|no such session|Session not found)' "$log_file" 2>/dev/null); then
+  # Bridge restart / session lost: session died, exited unexpectedly, or not found
+  if _matched=$(grep -m1 -E '(session.*not found|unknown session|no such session|Session not found|exited unexpectedly|ProcessTransport.*not ready)' "$log_file" 2>/dev/null); then
     echo "[ACP-detect] bridge_session_lost matched: ${_matched:0:200}" >&2
     [[ -n "$bridge_lost_marker" ]] && echo "bridge_session_lost" > "$bridge_lost_marker"
   fi
