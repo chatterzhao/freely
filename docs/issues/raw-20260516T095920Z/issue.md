@@ -2,8 +2,9 @@
 local_id: raw-20260516T095920Z
 kind: raw
 phase_state: dropped
-updated_at: '2026-05-16T12:00:00Z'
-closeout_note: "fix directly merged to develop via fix/raw-20260512T0915Z-worker-blocked-reason without I-* lifecycle chain"
+updated_at: '2026-05-20T06:54:51Z'
+closeout_note: fix directly merged to develop via fix/raw-20260512T0915Z-worker-blocked-reason
+  without I-* lifecycle chain
 platform_ids:
   github:
     issue_id: '365'
@@ -14,7 +15,6 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-16T09:59:34Z'
-updated_at: '2026-05-16T09:59:34Z'
 intake_id: ''
 author: platform
 channel: github
