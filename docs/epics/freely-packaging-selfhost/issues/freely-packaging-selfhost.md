@@ -2,9 +2,9 @@
 
 - issue_id: I-20260502-0500-A
 - source_candidate: docs/pre-brainstorms/20260502-0500--freely-packaging-selfhost/candidates.md#c-20260502-0500-a
-- phase_state: in_dev
+- phase_state: completed
 - milestone: current
-- pretests_path: docs/epics/freely-packaging-selfhost/pre-tests.md
+- pre_tests_path: docs/epics/freely-packaging-selfhost/pre-tests.md
 - tasks_path: docs/epics/freely-packaging-selfhost/tasks.md
 - verification_artifact_dir: docs/epics/freely-packaging-selfhost/code-reviews
 
