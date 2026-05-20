@@ -2,25 +2,24 @@
 local_id: I-20260326-1835
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "58"
-    url: "https://github.com/chatterzhao/freely/issues/58"
-    synced_at: "2026-04-27T11:17:40Z"
-
+    issue_id: '58'
+    url: https://github.com/chatterzhao/freely/issues/58
+    synced_at: '2026-04-27T11:17:40Z'
   gitee:
-    issue_id: "IJFO6S"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO6S"
-    synced_at: "2026-04-27T13:15:03Z"
+    issue_id: IJFO6S
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO6S
+    synced_at: '2026-04-27T13:15:03Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:17:40Z"
-hash: ""
-created_at: "2026-04-27T11:17:40Z"
-updated_at: "2026-04-27T11:17:40Z"
-platform_state: 
+  github: '2026-04-27T11:17:40Z'
+hash: ''
+created_at: '2026-04-27T11:17:40Z'
+updated_at: '2026-04-27T11:17:40Z'
+platform_state: open
 ---
 
 Freely 在自举开发中已经形成了两层真源：

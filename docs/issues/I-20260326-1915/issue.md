@@ -2,25 +2,24 @@
 local_id: I-20260326-1915
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "59"
-    url: "https://github.com/chatterzhao/freely/issues/59"
-    synced_at: "2026-04-27T11:17:45Z"
-
+    issue_id: '59'
+    url: https://github.com/chatterzhao/freely/issues/59
+    synced_at: '2026-04-27T11:17:45Z'
   gitee:
-    issue_id: "IJFO6U"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO6U"
-    synced_at: "2026-04-27T13:15:04Z"
+    issue_id: IJFO6U
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO6U
+    synced_at: '2026-04-27T13:15:04Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/deep-refactor-fleet-sequencing-governance/issues/deep-refactor-fleet-sequencing-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/deep-refactor-fleet-sequencing-governance/issues/deep-refactor-fleet-sequencing-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:17:45Z"
-hash: ""
-created_at: "2026-04-27T11:17:45Z"
-updated_at: "2026-04-27T11:17:45Z"
-platform_state: 
+  github: '2026-04-27T11:17:45Z'
+hash: ''
+created_at: '2026-04-27T11:17:45Z'
+updated_at: '2026-04-27T11:17:45Z'
+platform_state: open
 ---
 
 Freely 在准备 broad/deep refactor 时，真实 fleet 一度同时存在：

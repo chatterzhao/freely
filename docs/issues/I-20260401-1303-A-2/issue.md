@@ -19,7 +19,7 @@ last_synced_comment_at:
 hash: ''
 created_at: '2026-04-27T11:21:52Z'
 updated_at: '2026-05-17T08:01:36Z'
-platform_state: closed
+platform_state: open
 ---
 
 完成 `I-20260401-1303-A-2` 的当前 materialization slice 后，当前 worktree 只剩两条红测，而且它们都不再属于 security/materialization：

@@ -2,25 +2,24 @@
 local_id: I-20260327-1115
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "62"
-    url: "https://github.com/chatterzhao/freely/issues/62"
-    synced_at: "2026-04-27T11:18:05Z"
-
+    issue_id: '62'
+    url: https://github.com/chatterzhao/freely/issues/62
+    synced_at: '2026-04-27T11:18:05Z'
   gitee:
-    issue_id: "IJFO6Y"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO6Y"
-    synced_at: "2026-04-27T13:15:08Z"
+    issue_id: IJFO6Y
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO6Y
+    synced_at: '2026-04-27T13:15:08Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/issues/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/issues/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:18:05Z"
-hash: ""
-created_at: "2026-04-27T11:18:05Z"
-updated_at: "2026-04-27T11:18:05Z"
-platform_state: 
+  github: '2026-04-27T11:18:05Z'
+hash: ''
+created_at: '2026-04-27T11:18:05Z'
+updated_at: '2026-04-27T11:18:05Z'
+platform_state: open
 ---
 
 `I-20260318-1630` 已完成的 canonical contract 建立了：
