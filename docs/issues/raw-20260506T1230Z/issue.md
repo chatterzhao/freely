@@ -2,7 +2,7 @@
 local_id: raw-20260506T1230Z
 kind: raw
 phase_state: absorbed
-absorbed_into: unknown
+absorbed_into: I-20260506T1230Z-A
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 platform_ids:
   github:
