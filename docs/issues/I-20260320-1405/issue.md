@@ -2,25 +2,24 @@
 local_id: I-20260320-1405
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "28"
-    url: "https://github.com/chatterzhao/freely/issues/28"
-    synced_at: "2026-04-27T11:14:31Z"
-
+    issue_id: '28'
+    url: https://github.com/chatterzhao/freely/issues/28
+    synced_at: '2026-04-27T11:14:31Z'
   gitee:
-    issue_id: "IJFO5O"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO5O"
-    synced_at: "2026-04-27T13:14:19Z"
+    issue_id: IJFO5O
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO5O
+    synced_at: '2026-04-27T13:14:19Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/worktree-maintenance-governance/issues/worktree-maintenance-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/worktree-maintenance-governance/issues/worktree-maintenance-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:14:31Z"
-hash: ""
-created_at: "2026-04-27T11:14:31Z"
-updated_at: "2026-04-27T11:14:31Z"
-platform_state: 
+  github: '2026-04-27T11:14:31Z'
+hash: ''
+created_at: '2026-04-27T11:14:31Z'
+updated_at: '2026-04-27T11:14:31Z'
+platform_state: open
 ---
 
 Freely 现有技能已经覆盖：

@@ -2,25 +2,24 @@
 local_id: I-20260321-1745
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "39"
-    url: "https://github.com/chatterzhao/freely/issues/39"
-    synced_at: "2026-04-27T11:15:49Z"
-
+    issue_id: '39'
+    url: https://github.com/chatterzhao/freely/issues/39
+    synced_at: '2026-04-27T11:15:49Z'
   gitee:
-    issue_id: "IJFO62"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO62"
-    synced_at: "2026-04-27T13:14:35Z"
+    issue_id: IJFO62
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO62
+    synced_at: '2026-04-27T13:14:35Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/active-lifecycle-boundary-and-dogfooding-capability-discovery/issues/active-lifecycle-boundary-and-dogfooding-capability-discovery.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/active-lifecycle-boundary-and-dogfooding-capability-discovery/issues/active-lifecycle-boundary-and-dogfooding-capability-discovery.md
 last_synced_comment_at:
-  github: "2026-04-27T11:15:49Z"
-hash: ""
-created_at: "2026-04-27T11:15:49Z"
-updated_at: "2026-04-27T11:15:49Z"
-platform_state: 
+  github: '2026-04-27T11:15:49Z'
+hash: ''
+created_at: '2026-04-27T11:15:49Z'
+updated_at: '2026-04-27T11:15:49Z'
+platform_state: open
 ---
 
 Freely 当前仍缺少一条稳定的生命周期边界语义，导致团队会反复争论：

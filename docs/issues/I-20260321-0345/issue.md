@@ -2,25 +2,24 @@
 local_id: I-20260321-0345
 kind: linked
 phase_state: completed
-completed_at: "2026-04-29"
+completed_at: '2026-04-29'
 platform_ids:
   github:
-    issue_id: "33"
-    url: "https://github.com/chatterzhao/freely/issues/33"
-    synced_at: "2026-04-27T11:15:02Z"
-
+    issue_id: '33'
+    url: https://github.com/chatterzhao/freely/issues/33
+    synced_at: '2026-04-27T11:15:02Z'
   gitee:
-    issue_id: "IJFO5U"
-    url: "https://gitee.com/zhaoquan/freely/issues/IJFO5U"
-    synced_at: "2026-04-27T13:14:26Z"
+    issue_id: IJFO5U
+    url: https://gitee.com/zhaoquan/freely/issues/IJFO5U
+    synced_at: '2026-04-27T13:14:26Z'
 primary_platform: github
-canonical_issue_path: "docs/epics/workspace-routing-foundation/manager-reactivation-and-fleet-patrol-governance/issues/manager-reactivation-and-fleet-patrol-governance.md"
+canonical_issue_path: docs/epics/workspace-routing-foundation/manager-reactivation-and-fleet-patrol-governance/issues/manager-reactivation-and-fleet-patrol-governance.md
 last_synced_comment_at:
-  github: "2026-04-27T11:15:02Z"
-hash: ""
-created_at: "2026-04-27T11:15:02Z"
-updated_at: "2026-04-27T11:15:02Z"
-platform_state: 
+  github: '2026-04-27T11:15:02Z'
+hash: ''
+created_at: '2026-04-27T11:15:02Z'
+updated_at: '2026-04-27T11:15:02Z'
+platform_state: open
 ---
 
 Freely 现在已经能通过 runtime watchdog 拉起主管，也能通过 `live-status` / `fleet-status` / worktree skills 观察当前项目状态。
