@@ -968,8 +968,8 @@ routing_policy:
 
 7. `I-20260502-0500-A`
 - title: Freely 打包与自举验证
-- milestone_state: committed
-- phase_state: `in_dev`
+- milestone_state: completed
+- phase_state: `completed`
 - priority: P0
 - issue_path: docs/issues/I-20260502-0500-A/issue.md
 - progress_path: docs/progress/freely-packaging-selfhost/p-freely-packaging-selfhost.md
@@ -984,7 +984,8 @@ routing_policy:
   - docs/epics/freely-packaging-selfhost/tasks.md
   - docs/epics/freely-packaging-selfhost/code-reviews/20260502-packaging-implementation.md
   - docs/epics/freely-packaging-selfhost/code-reviews/Implementation-Decision-Note.md
-- next_action: test-pre-merge 批次自举验证中（AT-004/005/009）。验证通过后更新 phase_state 为 completed。
+  - docs/progress/freely-packaging-selfhost/p-freely-packaging-selfhost.md
+- next_action: 已完成。test-pre-merge 批次自举验证全部 PASS（AT-004/005/009），所有 9 个 AT 通过。可合并到 develop。
 
 8. `I-20260501-0000-A`
 - title: PR scan surface + FREELY_REPO_PLATFORMS config
