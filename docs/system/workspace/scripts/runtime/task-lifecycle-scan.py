@@ -411,7 +411,7 @@ def fetch_open_platform_issues(project: Path) -> dict:
         proc = subprocess.run(
             ["gh", "issue", "list", "--state", "all", "--limit", "5000",
              "--json", "number,title,body,state"],
-            capture_output=True, text=True, timeout=15
+            capture_output=True, text=True, timeout=30
         )
         if proc.returncode == 0:
             for issue in json.loads(proc.stdout):
@@ -911,7 +911,7 @@ def scan_platform_issues(project: Path, platform_data: dict) -> list[dict]:
         if os.path.isfile(gitee_py):
             result = subprocess.run(
                 [sys.executable, gitee_py, "list", "--state", "open", "--per-page", "50"],
-                capture_output=True, text=True, timeout=15
+                capture_output=True, text=True, timeout=30
             )
             if result.returncode == 0:
                 issues = json.loads(result.stdout)
