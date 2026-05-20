@@ -34,7 +34,22 @@ MSG
     main|develop)
       if [[ "$local_branch" == "develop" && -x "./bin/governance-merge-gate" ]]; then
         if [[ "${FREELY_SKIP_IBM_GATE:-0}" == "1" ]]; then
-          echo "[HOOK] IBM governance gate skipped (FREELY_SKIP_IBM_GATE=1)"
+          echo "[HOOK] FREELY_SKIP_IBM_GATE=1 — validating governance-only paths via governance-merge-gate --skip-ibm-gate"
+          set +e
+          gate_output="$(./bin/governance-merge-gate --range "develop..HEAD" --skip-ibm-gate 2>&1)"
+          gate_rc=$?
+          set -e
+          if [[ "$gate_rc" -ne 0 ]]; then
+            cat >&2 <<MSG
+[HOOK] Push blocked: FREELY_SKIP_IBM_GATE=1 but governance-merge-gate detected implementation changes.
+
+$gate_output
+
+FREELY_SKIP_IBM_GATE=1 is only allowed for governance-only changes.
+MSG
+            exit "$gate_rc"
+          fi
+          echo "$gate_output"
         elif [[ -n "${remote_sha:-}" && "$remote_sha" != "0000000000000000000000000000000000000000" ]]; then
           set +e
           gate_output="$(./bin/governance-merge-gate --range "${remote_sha}..${local_sha}" 2>&1)"

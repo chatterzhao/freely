@@ -207,8 +207,8 @@ if FREELY_GUARDED_MERGE_COMPLETION=1 .githooks/pre-merge-commit >"$TMP_DIR/guard
   exit 1
 fi
 cat "$TMP_DIR/guarded-governance-stdout" "$TMP_DIR/guarded-governance-stderr" >"$TMP_DIR/guarded-governance-output"
-grep -q "Merge blocked: develop-bound governance materialization gate failed" "$TMP_DIR/guarded-governance-output"
-grep -q "no candidate-driven lifecycle evidence" "$TMP_DIR/guarded-governance-output"
+grep -q "protected-branch governance materialization gate failed" "$TMP_DIR/guarded-governance-output"
+grep -q "GATE 1: source branch" "$TMP_DIR/guarded-governance-output"
 git merge --abort >/dev/null 2>&1
 rm -f "$REPO/.git/freely-guarded-merge-state"
 
