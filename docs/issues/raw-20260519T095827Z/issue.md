@@ -1,7 +1,9 @@
 ---
+issue_id: raw-20260519T095827Z
 kind: raw
 priority: P1
 phase_state: absorbed
+absorbed_into: I-20260413-0420-A
 source: feedback
 created_at: '2026-05-19T09:58:27Z'
 title: '统一handoff栅栏格式: fence用json，语义用handoff'
