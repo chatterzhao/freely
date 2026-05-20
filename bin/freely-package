@@ -29,6 +29,20 @@ EOF
   exit 1
 }
 
+# 版本号格式校验
+validate_version() {
+  local ver="$1"
+  if [[ "$ver" =~ ^[0-9]{8}-nightly$ ]]; then
+    return 0
+  fi
+  if [[ "$ver" =~ ^[0-9]{4}\.[0-9]{1,2}\.[0-9]{1,2}-stable$ ]]; then
+    return 0
+  fi
+  echo "[ERROR] invalid version format: $ver" >&2
+  echo "  expected: YYYYMMDD-nightly or YYYY.MM.DD-stable" >&2
+  exit 1
+}
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --version) VERSION="${2:-}"; shift 2 ;;
@@ -44,6 +58,9 @@ if [[ -z "$OUTPUT" ]]; then
   OUTPUT="$HOME/.freely/versions/$VERSION"
 fi
 
+# 校验版本号格式
+validate_version "$VERSION"
+
 echo "[package] version: $VERSION"
 echo "[package] output: $OUTPUT"
 
@@ -53,6 +70,7 @@ mkdir -p "$OUTPUT"
 
 # 按 allowlist 复制文件
 copied=0
+missing=0
 while IFS= read -r line; do
   # 跳过空行和注释
   [[ -n "$line" ]] || continue
@@ -70,7 +88,8 @@ while IFS= read -r line; do
       copied=$((copied + count))
       echo "  dir  $line ($count files)"
     else
-      echo "  [WARN] missing dir: $line"
+      echo "  [ERROR] missing dir: $line" >&2
+      missing=$((missing + 1))
     fi
   else
     # 文件
@@ -80,15 +99,42 @@ while IFS= read -r line; do
       cp "$src" "$dst"
       copied=$((copied + 1))
     else
-      echo "  [WARN] missing file: $line"
+      echo "  [ERROR] missing file: $line" >&2
+      missing=$((missing + 1))
     fi
   fi
 done < "$ALLOWLIST"
+
+if [[ $missing -gt 0 ]]; then
+  echo "[ERROR] $missing allowlist path(s) not found — packaging aborted" >&2
+  rm -rf "$OUTPUT"
+  exit 1
+fi
 
 # 写入版本文件
 echo "FREELY_VERSION=$VERSION" > "$OUTPUT/.freely_version"
 echo "FREELY_PACKAGED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$OUTPUT/.freely_version"
 echo "FREELY_PACKAGED_FROM=$(git -C "$ROOT_DIR" rev-parse --short HEAD 2>/dev/null || echo 'unknown')" >> "$OUTPUT/.freely_version"
 
+# 完整性验证：确认 allowlist 中所有路径都存在
+verify_ok=0
+while IFS= read -r line; do
+  [[ -n "$line" ]] || continue
+  [[ "$line" != "#"* ]] || continue
+
+  target="$OUTPUT/$line"
+  if [[ ! -e "$target" ]]; then
+    echo "  [VERIFY FAIL] $line" >&2
+    verify_ok=1
+  fi
+done < "$ALLOWLIST"
+
+if [[ $verify_ok -ne 0 ]]; then
+  echo "[ERROR] integrity verification failed — some allowlist paths missing in output" >&2
+  rm -rf "$OUTPUT"
+  exit 1
+fi
+
 echo "[package] done: $copied files → $OUTPUT"
 echo "[package] version: $VERSION"
+echo "[package] integrity: verified"
