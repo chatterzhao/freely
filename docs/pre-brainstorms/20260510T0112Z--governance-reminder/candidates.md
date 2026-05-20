@@ -8,6 +8,7 @@
 - decision_reason: 当前 raw issue 正文没有 governance 提示，消费者容易在错误工位实现
 - promoted_issue_path: docs/issues/I-20260510T0112Z-A/issue.md
 - milestone: M-20260510T0112Z-A
+- completion_note: I-20260510T0112Z-A 已完成 closeout，raw issue 治理提醒注入已吸收到 develop
 - next_action: B2_IBM → dev-loop → merge
 - acceptance_criteria:
   - issue-sync _issue_body 对 kind=raw 注入治理提醒
