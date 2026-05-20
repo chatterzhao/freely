@@ -311,16 +311,16 @@ main() {
   # Completion verdict: stopReason is the authoritative signal
   # Session stays active so next cycle can resume (L1 cache hit).
   # Only mark completed on daemon stop or fresh_with_handoff rotation.
-  if [[ "$stop_reason" == "end_turn" ]]; then
-    echo "[ACP] cycle complete: session=${session_id_clean:-unknown} stopReason=end_turn" >&2
-    exit 0
-  elif [[ -n "$failure_detected" ]]; then
+  if [[ -n "$failure_detected" ]]; then
     # Non-recoverable failure: mark session failed so next launch goes fresh
     if [[ -n "$session_id_clean" ]]; then
       _mark_session_failed "$project" "$session_id_clean" "$failure_detected"
     fi
     echo "[WARN] ACP cycle failed: session=${session_id_clean:-unknown} reason=$failure_detected" >&2
     exit 1
+  elif [[ "$stop_reason" == "end_turn" ]]; then
+    echo "[ACP] cycle complete: session=${session_id_clean:-unknown} stopReason=end_turn" >&2
+    exit 0
   else
     # Network failure or unknown: keep session active for retry
     echo "[WARN] ACP cycle finished with stopReason=$stop_reason (rc=$child_rc)" >&2
