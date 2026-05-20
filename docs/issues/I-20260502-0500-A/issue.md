@@ -1,9 +1,9 @@
 ---
 local_id: I-20260502-0500-A
-issue_title: 'Freely 打包与自举验证'
+issue_title: Freely 打包与自举验证
 kind: linked
 phase_state: completed
-promoted_from: 'pre-brainstorms/20260502-0500--freely-packaging-selfhost'
+promoted_from: pre-brainstorms/20260502-0500--freely-packaging-selfhost
 pre_tests_path: docs/epics/freely-packaging-selfhost/pre-tests.md
 tasks_path: docs/epics/freely-packaging-selfhost/tasks.md
 verification_artifact_dir: docs/epics/freely-packaging-selfhost/code-reviews
@@ -17,12 +17,12 @@ canonical_issue_path: docs/epics/freely-packaging-selfhost/issues/freely-packagi
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-02T05:00:00Z'
-updated_at: '2026-05-20T01:39:47Z'
+updated_at: '2026-05-20T06:51:33Z'
 session_refs:
 - tool: ccds
   session_id: 20260502-packaging-selfhost-b2
   role: author
-platform_state: ''
+platform_state: closed
 ---
 
 ## Summary
