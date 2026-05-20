@@ -510,6 +510,8 @@ def scan_classification(project: Path, platform_data: dict) -> list[dict]:
         num = str(issue.get("number", ""))
         if num in seen_in_local:
             continue
+        if issue.get("state") != "OPEN":
+            continue  # closed platform issues need no local counterpart
         title = issue.get("title", "")
         body = issue.get("body", "")
         combined = f"{title}\n{body}"
