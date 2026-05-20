@@ -17415,7 +17415,7 @@ build_prompt() {
   fi
   # Delta mode: ACP prompt turn — session remembers context, only send delta
   if [[ "${LAUNCH_KIND_SELECTED:-}" == "prompt" ]]; then
-    cat <<PROMPT_DELTA
+    cat <<'PROMPT_DELTA'
 === 本轮 delta（会话已记住你的角色和历史） ===
 上一轮 exit_kind: ${LAST_WORKCELL_EXIT_REASON:-unknown}
 请基于 session 历史继续工作。先读 handoffs 更新，再决定下一步。
@@ -17561,7 +17561,7 @@ if not rows:
 ## Handoff 上下文（仅 Manager 可见）
 
 ### Worker 汇报（待你处理）
-${unconsumed}
+${pending_delivery}
 
 ### 近期 Worker 线程历史
 ${thread_summary}
