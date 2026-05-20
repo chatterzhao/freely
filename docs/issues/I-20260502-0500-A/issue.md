@@ -2,7 +2,7 @@
 local_id: I-20260502-0500-A
 issue_title: 'Freely 打包与自举验证'
 kind: linked
-phase_state: in_dev
+phase_state: completed
 promoted_from: 'pre-brainstorms/20260502-0500--freely-packaging-selfhost'
 pre_tests_path: docs/epics/freely-packaging-selfhost/pre-tests.md
 tasks_path: docs/epics/freely-packaging-selfhost/tasks.md
