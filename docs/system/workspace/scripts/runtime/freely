@@ -13462,10 +13462,11 @@ append_worker_exit_contract_directive_if_needed() {
 
 ```json5
 {
-  // exit_kind 只允许三个值，禁止用 completed done success partial complete ok normal noop
+  // exit_kind 只允许四个值，禁止用 completed done success partial resume_manager delegate_workers stop_ai
   //   "worker_done"              — 任务已完成
   //   "worker_blocked"           — 被阻塞，需主管介入
   //   "worker_handoff_needed"    — 需主管审核或决策
+  //   "worker_working"           — 进行中（后台任务在跑/等外部结果），保持 session 继续
   "exit_kind": "worker_done",
 
   // worker_done 时填下面两个，不要填 reason/next_action
@@ -13475,6 +13476,10 @@ append_worker_exit_contract_directive_if_needed() {
   // worker_blocked / worker_handoff_needed 时填下面两个，不要填 completion_summary/evidence_paths
   "reason": "...",               // 阻塞原因或背景
   "next_action": "..."           // 建议主管做什么决策
+
+  // worker_working 时填下面两个，不要填 completion_summary/evidence_paths
+  "progress": "...",             // 当前进度（如 "issue-sync batch: 310/639"）
+  "next_action": "..."           // 下一步（如 "继续等待 batch 完成"）
 }
 ```
 EOF
