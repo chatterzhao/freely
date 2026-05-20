@@ -553,7 +553,7 @@ Usage:
   freely task-source-scan [--project <abs_path>] [--json]
   freely task-scan [--project <abs_path>] [--json]
   freely raw-issue-pull --raw-key <key> [--project <abs_path>] [--target <dir>]
-  freely feedback --title <text> --body <text> [--severity P0|P1|P2]   (create raw issue on Freely itself)
+  freely feedback --repo <user/repo|url> --title <text> --body <text> [--severity P0|P1|P2]   (create raw issue on GitHub)
   freely issue-sync <args>...                   (delegate to bin/issue-sync)
   freely status [--project <abs_path>] [--view baseline|live|fleet|all]
   freely live-status [--project <abs_path>]
@@ -18915,7 +18915,9 @@ last_exit_reason_before_crash: ${LAST_WORKCELL_EXIT_REASON:-none}
 tool: ${AI_TOOL:-unknown}
 adapter: ${AI_TOOL_ADAPTER:-unknown}
 launch_kind: ${mode_name:-unknown}"
-      "$SELF_ROOT/bin/freely" feedback --title "supervisor crash: ${_err_cmd} rc=${_err_rc}" --body "$_msg" >/dev/null 2>&1 || true
+      if [[ -n "${FREELY_REPO_URL:-}" ]]; then
+        "$SELF_ROOT/bin/freely" feedback --repo "$FREELY_REPO_URL" --title "supervisor crash: ${_err_cmd} rc=${_err_rc}" --body "$_msg" >/dev/null 2>&1 || true
+      fi
     fi
   }
   trap '_on_supervisor_err' ERR
@@ -20177,23 +20179,41 @@ submit_human_frontdoor_message() {
   printf '%s\n' "$intake_output"
 }
 
+# Resolve user/repo or GitHub URL to canonical user/repo form.
+# Accepted: user/repo, https://github.com/user/repo.git, git@github.com:user/repo.git
+_resolve_gh_repo() {
+  local input="$1"
+  # user/repo → user/repo
+  if [[ "$input" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then echo "$input"; return 0; fi
+  # https://github.com/user/repo.git → user/repo
+  if [[ "$input" =~ github\.com/([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+) ]]; then echo "${BASH_REMATCH[1]%.git}"; return 0; fi
+  # git@github.com:user/repo.git → user/repo
+  if [[ "$input" =~ github\.com:([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+) ]]; then echo "${BASH_REMATCH[1]%.git}"; return 0; fi
+  return 1
+}
+
 cmd_feedback() {
-  local title="" body="" severity="P2" project="" freely_root="" raw_key="" stamp="" issue_dir="" issue_file=""
+  local title="" body="" severity="P2" repo="" raw_key="" stamp="" resolved_repo="" gh_result gh_url
   while [[ $# -gt 0 ]]; do
     case "$1" in
+      --repo) repo="${2:-}"; shift 2 ;;
       --title) title="${2:-}"; shift 2 ;;
       --body) body="${2:-}"; shift 2 ;;
       --severity) severity="${2:-}"; shift 2 ;;
       --help|-h) cat <<HELP; return 0
-Usage: freely feedback --title <text> --body <text> [--severity P0|P1|P2]
+Usage: freely feedback --repo <user/repo|url> --title <text> --body <text> [--severity P0|P1|P2]
 
-Create a raw issue on the Freely project itself (dogfooding feedback loop).
-The issue is created in Freely's own docs/issues/ and synced to configured platforms.
+Create a raw issue on the specified GitHub repository.
 
 Options:
-  --title <text>     Required. Issue title.
-  --body <text>      Required. Issue body/description.
-  --severity <level> Priority: P0 (critical), P1 (high), P2 (default).
+  --repo <user/repo|url>  Required. GitHub repo (user/repo, https://..., or git@...).
+  --title <text>          Required. Issue title.
+  --body <text>           Required. Issue body/description.
+  --severity <level>      Priority: P0 (critical), P1 (high), P2 (default).
+
+Examples:
+  freely feedback --repo chatterzhao/freely --title "bug" --body "..."
+  freely feedback --repo https://github.com/user/project.git --title "bug" --body "..."
 HELP
         ;;
       --*) log_error "unknown option: $1"; return 1 ;;
@@ -20208,57 +20228,37 @@ HELP
     *) log_error "--severity must be P0, P1, or P2"; return 1 ;;
   esac
 
-  # Determine Freely project root:
-  # 1. If current dir is a Freely project (has docs/CONSTITUTION.md), use its git root
-  # 2. Try FREELY_HOME parent (usually ~/code/freely when installed from source)
-  # 3. Fall back to SELF_ROOT (packaged install, read-only)
-  freely_root=""
-  local _candidate
-  _candidate="$(git rev-parse --show-toplevel 2>/dev/null || true)"
-  if [[ -n "$_candidate" && -f "$_candidate/docs/CONSTITUTION.md" ]]; then
-    freely_root="$_candidate"
+  # Resolve repo: --repo flag takes priority, then FREELY_REPO_URL env/config
+  if [[ -n "$repo" ]]; then
+    resolved_repo="$(_resolve_gh_repo "$repo")" || { log_error "invalid --repo format: $repo"; return 1; }
+  elif [[ -n "${FREELY_REPO_URL:-}" ]]; then
+    resolved_repo="$FREELY_REPO_URL"
+  elif [[ -f "$SELF_ROOT/.freely/config.env" ]]; then
+    # shellcheck disable=SC1090
+    source "$SELF_ROOT/.freely/config.env"
+    resolved_repo="${FREELY_REPO_URL:-}"
   fi
-  if [[ -z "$freely_root" ]]; then
-    _candidate="${FREELY_HOME:-}"
-    [[ -n "$_candidate" ]] && _candidate="$(cd "$_candidate/../.." 2>/dev/null && pwd -P || true)"
-    if [[ -n "$_candidate" && -f "$_candidate/docs/CONSTITUTION.md" ]]; then
-      freely_root="$_candidate"
-    fi
-  fi
-  # Fallback: SELF_ROOT (packaged install). read-only, warn user.
-  if [[ -z "$freely_root" ]]; then
-    freely_root="$SELF_ROOT"
-    echo "[feedback] WARNING: using packaged install path (read-only). Consider running from Freely git repo." >&2
-  fi
-  mkdir -p "$freely_root/docs/issues"
+
+  [[ -n "$resolved_repo" ]] || { log_error "no repo specified: use --repo or set FREELY_REPO_URL in .freely/config.env"; return 1; }
 
   stamp=$(date -u +%Y%m%dT%H%M%SZ)
   raw_key="$stamp"
-  issue_dir="$freely_root/docs/issues/raw-$raw_key"
-  mkdir -p "$issue_dir"
-  issue_file="$issue_dir/issue.md"
 
-  cat > "$issue_file" <<ISSUE_EOF
----
-kind: raw
-priority: ${severity}
-phase_state: proposed
-source: feedback
-created_at: "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-title: "${title}"
----
+  if ! command -v gh &>/dev/null; then
+    log_error "gh (GitHub CLI) not found — cannot create issue"
+    return 1
+  fi
 
-${body}
-ISSUE_EOF
-
-  echo "[feedback] raw issue created: raw-$raw_key"
-  echo "[feedback] file: $issue_file"
-
-  # Sync to platforms via issue-sync
-  if [[ -x "$freely_root/bin/issue-sync" ]]; then
-    echo "[feedback] syncing to platforms..."
-    "$freely_root/bin/issue-sync" create "raw-$raw_key" 2>&1 || true
-    echo "[feedback] sync complete"
+  gh_result=$(gh issue create --repo "$resolved_repo" \
+    --title "[RAW-${stamp}] ${title}" \
+    --body "${body}" \
+    --label "kind/raw,phase/proposed" 2>&1)
+  gh_url=$(printf '%s\n' "$gh_result" | grep -o 'https://github.com/[^ ]*' | head -1)
+  if [[ -n "$gh_url" ]]; then
+    echo "[feedback] raw issue created: raw-${raw_key}"
+    echo "[feedback] url: ${gh_url}"
+  else
+    echo "[feedback] WARNING: gh issue create output: $gh_result" >&2
   fi
 
   printf 'raw-%s\n' "$raw_key"
