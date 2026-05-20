@@ -18902,10 +18902,14 @@ start_project_runtime() {
   # ERR trap: capture crash → auto-report as raw issue via freely feedback.
   # Desensitized: no user paths, no prompt content, no session IDs.
   _on_supervisor_err() {
-    local _err_cmd _err_line _err_rc _err_reason _msg
+    local _err_rc=$?
+    if [[ "$_err_rc" -eq 0 ]]; then
+      LAST_WORKCELL_EXIT_REASON="set_e_exit_cmd=unknown@${BASH_SOURCE##*/}:${1:-0}_rc_0"
+      return
+    fi
+    local _err_cmd _err_line _err_reason _msg
     _err_cmd="${BASH_COMMAND%% *}"
-    _err_line="${LINENO}"
-    _err_rc="$?"
+    _err_line="${1:-${LINENO}}"
     _err_reason="set_e_exit_cmd=${_err_cmd}@${BASH_SOURCE##*/}:${_err_line}_rc_${_err_rc}"
     LAST_WORKCELL_EXIT_REASON="$_err_reason"
     if [[ -x "$SELF_ROOT/bin/freely" ]]; then
@@ -18919,7 +18923,7 @@ launch_kind: ${mode_name:-unknown}"
       fi
     fi
   }
-  trap '_on_supervisor_err' ERR
+  trap '_on_supervisor_err $LINENO' ERR
   while true; do
     # Re-load session state each cycle so resume/fork decisions see latest values
     load_session_state_or_defaults "$project"
