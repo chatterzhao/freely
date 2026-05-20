@@ -2796,6 +2796,26 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/code-reviews/20260325-story-level-pre-tests-quality-gate-governance-verification.md`
 - completion_note: Story-level `pre-tests.md` 质量 gate 已进入 capability truth，最小 blocker taxonomy 已冻结为 `definition_missing`、`commands_only`、`evidence_plan_missing`、`execution_pending_or_failed`，verification 已 pass
 
+1. `I-20260519-0333-C`
+- title: Testing evidence ladder and gate mapping
+- milestone_state: committed
+- phase_state: `done_b2_ibm`
+- priority: P0
+- issue_path: `docs/issues/I-20260519-0333-C/issue.md`
+- pre_tests_path: `docs/epics/testing-evidence-ladder/testing-evidence-ladder-and-gate-mapping/pre-tests.md`
+- tasks_path: `docs/epics/testing-evidence-ladder/testing-evidence-ladder-and-gate-mapping/tasks.md`
+- verification_artifact_dir: `docs/epics/testing-evidence-ladder/testing-evidence-ladder-and-gate-mapping/code-reviews`
+- source_candidate: `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/candidates.md#C-20260325-0333-A`
+- source_brainstorm: `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/brainstorms.md`
+- source_candidates: `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/candidates.md`
+- evidence:
+  - `docs/epics/testing-evidence-ladder/testing-evidence-ladder-and-gate-mapping/prd.md`
+  - `docs/epics/testing-evidence-ladder/testing-evidence-ladder-and-gate-mapping/pre-tests.md`
+  - `docs/epics/testing-evidence-ladder/testing-evidence-ladder-and-gate-mapping/tasks.md`
+  - `docs/epics/testing-evidence-ladder/testing-evidence-ladder-and-gate-mapping/code-reviews/Implementation-Decision-Note.md`
+  - `docs/issues/I-20260519-0333-C/issue.md`
+- next_action: Enter dev-loop: implement PRD, satisfy pre-tests.md AT-001 through AT-006, then close with verification artifact.
+
 1. `I-20260331-2012-A`
 - title: Active milestone placement and consumption gate governance
 - milestone_state: completed
@@ -3983,13 +4003,13 @@ routing_policy:
 14. `C-20260325-0333-A`
 - title: Testing evidence ladder and real-environment gates for Freely
 - milestone_state: candidate
-- phase_state: `in_pre_brainstorm`
+- phase_state: `in_materialization`
 - priority: P0
-- promoted_issue_path: `pending://testing-evidence-ladder-and-real-environment-gates`
+- promoted_issue_path: `docs/issues/I-20260519-0333-C/issue.md`
 - source_brainstorm: `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/candidates.md`
-- next_action: Keep the umbrella candidate visible while the first story-level `pre-tests.md` quality gate owner closes, then choose the next testing slice.
-- revisit_trigger: Revisit once `C-20260325-0333-B` closes and writes back whether the next slice should be evidence ladder mapping, real-environment harness, or another testing governance cut.
+- next_action: Slice 2 materialization (I-20260519-0333-C) is in B2_IBM complete state; proceed to dev-loop execution. Remaining slices (real-environment harness, runtime mirror) deferred to follow-on umbrella decisions.
+- revisit_trigger: Revisit when I-20260519-0333-C dev-loop completes or real-environment harness dependency solidifies.
 
 15. `C-20260331-1837-A`
 - title: Worker first-hop role boundary regression in prompt generation and follow-on reentry

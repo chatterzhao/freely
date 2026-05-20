@@ -43,11 +43,11 @@
     verdict: `ready_for_pre_brainstorm`
 - priority: P0
 - status: needs_research
-- decision_reason: 首个切口 C-20260325-0333-B 已 materialize 完成。本 umbrella 继续承接 testing evidence ladder、gate mapping 与 real-environment harness contract 的后续切口，待 B 验证稳定后决定下一跳。
-- promoted_issue_path: `pending://testing-evidence-ladder-and-real-environment-gates`
+- decision_reason: Slice 1 (C-20260325-0333-B) 已完成并验证通过。Slice 2 已 materialize 为 I-20260519-0333-C（testing evidence ladder and gate mapping），B2_IBM 产物已就绪，进入 dev-loop 实现阶段。
+- promoted_issue_path: `docs/issues/I-20260519-0333-C/issue.md`
 - milestone: `docs/milestones.md#M-20260306-workspace-routing-foundation`
-- next_action: 保持 umbrella candidate active。首个切口已由 `C-20260325-0333-B` materialize 成 issue；本 candidate 继续承接 ladder / harness / runtime mirror 的后续切口
-- revisit_trigger: 当首个 issue 已完成并写回 story-level `pre-tests.md` 质量 gate 后，继续判断下一跳是 ladder / gate mapping 还是 real-environment harness contract
+- next_action: Slice 2 (I-20260519-0333-C) 的 B2_IBM materialization 已完成，进入 dev-loop 实现。剩余切口的 Slice 3（real-environment harness contract）和 runtime mirror 推迟到后续 umbrella 决策。
+- revisit_trigger: 当 I-20260519-0333-C dev-loop 完成后，评估是否需要继续 Slice 3（real-environment harness contract），或将 umbrella candidate 标记为 partially_absorbed。
 - session_refs:
   - tool: codex
   - session_id: current-thread
