@@ -5717,3 +5717,19 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260521T144550Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260521T144550Z--run-acp-prompt-remove-bypass/candidates.md#C-20260521T144550Z-A`
+## M-20260521T222919Z-A
+- title: dynamic scan stage prompt builder
+- status: active
+### candidate_issues
+1. `C-20260521T222919Z-A`
+- milestone: M-20260521T222919Z-A
+- status: promoted
+- decision_reason: raw-20260521T222919Z (GitHub #2097) — scan stages not in prompt whitelist, 0 items shown
+- next_action: completed
+### completed_issues
+1. `I-20260521T222919Z-A`
+- title: dynamic scan stage prompt builder
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260521T222919Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260521T222919Z--scan-stage-prompt-mismatch/candidates.md#C-20260521T222919Z-A`
