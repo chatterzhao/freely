@@ -5569,3 +5569,21 @@ routing_policy:
 - next_action: acceptance review → B2_IBM materialize，确认 append_manager_handoff_context_if_needed 插入点和 dispatch result 字段
 - revisit_trigger: acceptance review 完成后进入 B2_IBM
 - source_candidate: `docs/pre-brainstorms/20260521T014556Z--worker-dispatch-feedback/candidates.md#C-20260521T014556Z-A`
+
+## M-20260521T032154Z-A
+- title: supervisor crash — _on_supervisor_err 递归 ERR trap 假阳性
+- status: active
+### candidate_issues
+1. `C-20260521T032154Z-A`
+- milestone: M-20260521T032154Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260521T032154Z-A/issue.md`
+- decision_reason: raw-20260521T032154Z (GitHub #1523) 在 ERR trap handler 内部 `[[ "$_err_rc" -eq 0 ]]` 触发递归 ERR trap，BASH_COMMAND 错位导致 benign check 失败，生成假阳性 crash 报告。根因已定位，修复方案 A（提前捕获 BASH_COMMAND）。
+- next_action: dev-loop implementation
+- revisit_trigger: dev-loop 完成后进入 verification
+- source_candidate: `docs/pre-brainstorms/raw-20260521T032154Z--supervisor-crash-set-e-exit-cmd/candidates.md#C-20260521T032154Z-A`
+### committed_issues
+1. `I-20260521T032154Z-A`
+- milestone: M-20260521T032154Z-A
+- phase_state: done_b2_ibm
+- issue_path: `docs/issues/I-20260521T032154Z-A/issue.md`
