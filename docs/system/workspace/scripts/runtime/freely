@@ -15094,7 +15094,7 @@ total = summary.get("total_incomplete", 0)
 by_stage = summary.get("by_stage", {})
 ready = summary.get("ready", 0)
 
-# When task_mode is id:raw-xxx, filter items to only the targeted raw key's chain
+# When task_mode is id:raw-xxx, filter items to only the targeted raw key\'s chain
 # and recalc summary so the stage-grouped output below only shows that one item.
 if task_mode.startswith("id:"):
     _raw_key = task_mode[3:]
@@ -15115,34 +15115,34 @@ if total == 0:
     print("")
     sys.exit(0)
 
-	# Build lifecycle-aware patrol seed
-	print("")
-	print(f"## Task Mode: {task_mode_info}")
-	print("")
-	print("Lifecycle task scan (lifecycle-v2):")
-	print(f"- scan_reason: `{scan_reason}`")
-	print(f"- total_incomplete: {total}  items across the raw\u2192I lifecycle chain")
-	print(f"- ready_for_work: {ready}  items（已 promote，可进入 B2 或收口）")
-	print(f"- by_stage: " + ", ".join(f"{k}={v}" for k, v in sorted(by_stage.items())))
-	print(f"- machine_readable_scan_json: `{scan_path}`")
-	print("")
-	print("原则：已完成的条目不会出现在这里。每个条目都有具体的 incomplete 原因和 next_action。")
-	print("")
+# Build lifecycle-aware patrol seed
+print("")
+print(f"## Task Mode: {task_mode_info}")
+print("")
+print("Lifecycle task scan (lifecycle-v2):")
+print(f"- scan_reason: `{scan_reason}`")
+print(f"- total_incomplete: {total}  items across the raw\u2192I lifecycle chain")
+print(f"- ready_for_work: {ready}  items\uff08\u5df2 promote\uff0c\u53ef\u8fdb\u5165 B2 \u6216\u6536\u53e3\uff09")
+print(f"- by_stage: " + ", ".join(f"{k}={v}" for k, v in sorted(by_stage.items())))
+print(f"- machine_readable_scan_json: `{scan_path}`")
+print("")
+print("\u539f\u5219\uff1a\u5df2\u5b8c\u6210\u7684\u6761\u76ee\u4e0d\u4f1a\u51fa\u73b0\u5728\u8fd9\u91cc\u3002\u6bcf\u4e2a\u6761\u76ee\u90fd\u6709\u5177\u4f53\u7684 incomplete \u539f\u56e0\u548c next_action\u3002")
+print("")
 
-	# Group by stage — dynamically from scan data, sorted by item count (most first)
-	stage_order = sorted(by_stage.keys(), key=lambda s: -by_stage.get(s, 0))
-	for stage in stage_order:
-	    stage_items = [it for it in items if it.get("stage") == stage]
-	    if not stage_items:
-	        continue
-	    # Show ready items first, limit per stage to keep prompt manageable
-	    stage_items.sort(key=lambda it: (0 if it.get("ready") else 1, it.get("key", "")))
-	    label = stage
-	    shown = len(stage_items)
-	    if len(stage_items) > 30:
-	        stage_items = stage_items[:30]
-	    print(f"## Stage: {label} ({shown} items, showing {len(stage_items)})")
-	    for it in stage_items:
+# Group by stage \u2014 dynamically from scan data, sorted by item count (most first)
+stage_order = sorted(by_stage.keys(), key=lambda s: -by_stage.get(s, 0))
+for stage in stage_order:
+    stage_items = [it for it in items if it.get("stage") == stage]
+    if not stage_items:
+        continue
+    # Show ready items first, limit per stage to keep prompt manageable
+    stage_items.sort(key=lambda it: (0 if it.get("ready") else 1, it.get("key", "")))
+    label = stage
+    shown = len(stage_items)
+    if len(stage_items) > 30:
+        stage_items = stage_items[:30]
+    print(f"## Stage: {label} ({shown} items, showing {len(stage_items)})")
+    for it in stage_items:
         incomplete = " ".join(it.get("incomplete", []))
         next_action = it.get("next_action", "\u68c0\u67e5\u5e76\u5b8c\u6210\u6536\u53e3\u6b65\u9aa4")
         title = it.get("title", "") or it.get("key", "")
@@ -15166,6 +15166,7 @@ if total == 0:
         print(f"  children={child_ids}")
         print(f"  next_action={next_action}")
     print("")
+
 PY
 }
 manager_supervision_alerts() {
