@@ -7,11 +7,11 @@ set -euo pipefail
 #   ./bin/freely-package --version <ver> [--output <dir>]
 #
 # 版本号:
-#   nightly:  YYYYMMDD-nightly
+#   nightly:  YYYYMMDDTHHMMZ-nightly
 #   stable:   YYYY.MM.DD-stable
 #
 # 示例:
-#   ./bin/freely-package --version 20260501-nightly
+#   ./bin/freely-package --version 20260501T1207Z-nightly
 #   ./bin/freely-package --version 2026.05.01-stable --output ~/.freely/versions/2026.05.01-stable
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
@@ -23,7 +23,7 @@ usage() {
   cat <<'EOF'
 Usage: freely-package --version <ver> [--output <dir>]
 
-  --version <ver>  版本号 (YYYYMMDD-nightly 或 YYYY.MM.DD-stable)
+  --version <ver>  版本号 (YYYYMMDDTHHMMZ-nightly 或 YYYY.MM.DD-stable)
   --output <dir>   输出目录 (默认: ~/.freely/versions/<ver>)
 EOF
   exit 1
@@ -32,14 +32,14 @@ EOF
 # 版本号格式校验
 validate_version() {
   local ver="$1"
-  if [[ "$ver" =~ ^[0-9]{8}-nightly$ ]]; then
+  if [[ "$ver" =~ ^[0-9]{8}T[0-9]{4}Z-nightly$ ]]; then
     return 0
   fi
   if [[ "$ver" =~ ^[0-9]{4}\.[0-9]{1,2}\.[0-9]{1,2}-stable$ ]]; then
     return 0
   fi
   echo "[ERROR] invalid version format: $ver" >&2
-  echo "  expected: YYYYMMDD-nightly or YYYY.MM.DD-stable" >&2
+  echo "  expected: YYYYMMDDTHHMMZ-nightly or YYYY.MM.DD-stable" >&2
   exit 1
 }
 

@@ -5633,3 +5633,20 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260521T115809Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260521T115809Z--merge-message-forbidden-branch-name/candidates.md#C-20260521T115809Z-A`
+
+## M-20260521T121158Z-A
+- title: package version timestamp format
+- status: active
+### candidate_issues
+1. `C-20260521T121158Z-A`
+- milestone: M-20260521T121158Z-A
+- status: promoted
+- decision_reason: raw-20260521T121158Z (GitHub #1859) — nightly version format needs hour-minute for same-day rebuilds
+- next_action: completed, merge to develop
+### completed_issues
+1. `I-20260521T121158Z-A`
+- title: package version timestamp format
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260521T121158Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260521T121158Z--package-version-timestamp-format/candidates.md#C-20260521T121158Z-A`
