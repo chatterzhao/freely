@@ -5540,3 +5540,15 @@ routing_policy:
 - title: supervisor 主循环 select_launch_kind 前添加 task_mode=wait 门禁
 - milestone_state: committed
 - issue_path: `docs/issues/I-20260506T1000Z-A/issue.md`
+
+## M-20260521T014556Z-A
+- title: Manager 委派结果即时反馈
+- status: active
+### candidate_issues
+1. `C-20260521T014556Z-A`
+- milestone: M-20260521T014556Z-A
+- status: needs_research
+- decision_reason: raw-20260521T014556Z (GitHub #1520) Manager 委派 Worker 后无即时反馈，dispatch launch_failed/stale_pid/初始化超时结果需下一轮 passive 消费才知道，导致 15+ 轮空等
+- next_action: acceptance review → B2_IBM materialize，确认 append_manager_handoff_context_if_needed 插入点和 dispatch result 字段
+- revisit_trigger: acceptance review 完成后进入 B2_IBM
+- source_candidate: `docs/pre-brainstorms/20260521T014556Z--worker-dispatch-feedback/candidates.md#C-20260521T014556Z-A`
