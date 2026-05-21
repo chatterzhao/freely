@@ -1429,18 +1429,18 @@ def scan_chain_trace(project: Path, platform_data: dict, raw_key_filter: str = "
 
 
 CHAIN_ACTIONS = {
-    "raw_created": "创建 B1 预研目录 {key}--<slug>，写入 brainstorms.md",
-    "b1_dir": "在 B1 目录中写入 brainstorms.md",
-    "b1_brainstorm": "产出 candidates.md，每个 candidate 写清 scope/priority/status",
-    "b1_candidate": "决策 candidate：promote（创建 I-*） / absorb（合并） / drop（丢弃）",
-    "candidate_decision": "创建 docs/issues/I-{key}-A/issue.md，kind=linked",
-    "i_created": "创建 feature/raw-{key}-{slug} 工位，开始实现",
-    "dev_worktree": "实现代码，推进 phase_state 到 done/completed",
-    "dev_phase_done": "创建 code-review 证据，issue-sync create 推送到平台",
-    "platform_create": "issue-sync create 推送本地 issue 到平台",
-    "merged_develop": "issue-sync close 关闭平台 issue",
-    "platform_close": "issue-sync close 关闭平台 issue",
-    "branch_deleted": "退役工位（git worktree remove）",
+    "raw_created": "cmd: wt-create --raw-key {key} --source platform --skill freely-fix-execution --slug b1 ; skill: freely-doc-B1_IBM-execution",
+    "b1_dir": "cmd: wt-create --raw-key {key} --source platform --skill freely-doc-B1_IBM-execution --slug b1 ; 在工位中写入 brainstorms.md",
+    "b1_brainstorm": "产出 candidates.md，每个 candidate 写清 scope/priority/status ; skill: freely-doc-B1_IBM-execution",
+    "b1_candidate": "决策 candidate：promote（创建 I-*） / absorb（合并） / drop（丢弃）; skill: freely-candidate-acceptance-review",
+    "candidate_decision": "cmd: wt-create --raw-key {key} --source platform --skill freely-feat-execution --slug impl ; skill: freely-feat-execution",
+    "i_created": "cmd: wt-create --raw-key {key} --source platform --skill freely-feat-execution --slug impl ; skill: freely-dev-loop-execution",
+    "dev_worktree": "在工位中实现代码，推进 phase_state 到 done/completed ; skill: freely-dev-loop-execution",
+    "dev_phase_done": "cmd: wt-create --raw-key {key} --source platform --skill freely-fix-execution --slug close ; issue-sync create 推送到平台 ; git commit ; wt-close",
+    "platform_create": "cmd: wt-create --raw-key {key} --source platform --skill freely-fix-execution --slug sync ; issue-sync create {key} ; git commit -m 'sync: push {key} to platform' ; wt-close",
+    "merged_develop": "cmd: wt-create --raw-key {key} --source platform --skill freely-fix-execution --slug close ; issue-sync close {key} ; wt-close",
+    "platform_close": "cmd: wt-create --raw-key {key} --source platform --skill freely-fix-execution --slug close ; issue-sync close {key} ; git commit -m 'close: {key} completed' ; wt-close",
+    "branch_deleted": "cmd: issue-sync close {key}",
 }
 
 
