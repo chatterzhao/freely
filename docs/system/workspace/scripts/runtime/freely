@@ -11623,6 +11623,27 @@ ensure_runtime_workcell_initialized_for_launch() {
   upsert_config_key "$target_project" "AI_TOOL_ADAPTER_POLICY" "$tool_adapter_policy"
 }
 
+manager_record_worker_pid_for_launch() {
+  local target_project="$1" worker_pid="$2" prompt_file="$3"
+  local freely_db handoff_id
+  freely_db="$target_project/.freely/freely.db"
+  [[ -f "$freely_db" ]] || return 0
+  handoff_id="$(python3 -c "
+import sqlite3
+conn = sqlite3.connect('$freely_db')
+row = conn.execute(
+  \"SELECT handoff_id FROM handoffs WHERE prompt_file=? AND role='worker' AND status IN ('pending','launched') ORDER BY created_at DESC LIMIT 1\",
+  ('$prompt_file',)).fetchone()
+conn.close()
+print(row[0] if row else '')
+" 2>/dev/null || true)"
+  [[ -n "$handoff_id" ]] || return 0
+  python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py" \
+    --db "$freely_db" update-worker-pid \
+    --handoff-id "$handoff_id" \
+    --worker-pid "$worker_pid" >/dev/null 2>&1 || true
+}
+
 launch_worker_from_manager_prompt_if_needed() {
   # ── Worker AI launch ──────────────────────────────────────────────
   #
@@ -11774,6 +11795,7 @@ SESSIONEOF
     _worker_pid=$!
     mkdir -p "$(run_dir_for_project "$target_project")"
     echo "$_worker_pid" > "$(run_dir_for_project "$target_project")/ai.pid"
+    manager_record_worker_pid_for_launch "$target_project" "$_worker_pid" "$prompt_file"
     append_runtime_event "$manager_project" "worker_launched_directly_agent_fallback" \
       "worker_pid=$_worker_pid" \
       "target_project=$target_project" \
@@ -11803,6 +11825,7 @@ SESSIONEOF
   # Record worker PID for liveness tracking
   mkdir -p "$(run_dir_for_project "$target_project")"
   echo "$_worker_pid" > "$(run_dir_for_project "$target_project")/ai.pid"
+  manager_record_worker_pid_for_launch "$target_project" "$_worker_pid" "$prompt_file"
 
   append_runtime_event "$manager_project" "worker_launched_directly" \
     "worker_pid=$_worker_pid" \
@@ -16160,6 +16183,66 @@ manager_supervisor_waiting_on_active_workers() {
   (( active_worker_count > 0 ))
 }
 
+manager_scan_stale_worker_pids() {
+  local project="$1" freely_db raw_key scanned_count=0 marked_count=0
+  freely_db="$project/.freely/freely.db"
+  [[ -f "$freely_db" ]] || return 0
+  raw_key="$(echo "$(git -C "$project" rev-parse --abbrev-ref HEAD 2>/dev/null)" | grep -oE '[0-9]{8}T[0-9]{4,6}Z' | head -1)"
+  [[ -n "$raw_key" ]] || return 0
+
+  local result
+  result="$(python3 -c "
+import sqlite3, os
+from datetime import datetime, timezone
+conn = sqlite3.connect('$freely_db')
+rows = conn.execute(
+  \"SELECT handoff_id, worker_pid FROM handoffs \"
+  \"WHERE role='worker' AND status='launched' AND worker_pid != '' AND worker_pid IS NOT NULL \"
+  \"AND raw_key=? ORDER BY created_at ASC\",
+  ('$raw_key',)
+).fetchall()
+marked = []
+scanned = len(rows)
+for hid, pid_str in rows:
+  if not pid_str or not pid_str.strip().isdigit():
+    continue
+  pid = int(pid_str.strip())
+  try:
+    os.kill(pid, 0)
+  except OSError:
+    marked.append(hid)
+if marked:
+  now = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+  for hid in marked:
+    conn.execute(
+      \"UPDATE handoffs SET status='blocked', exit_kind='stale_pid', \"
+      \"reason='Worker PID kill -0 failed, marking stale_pid', \"
+      \"next_action='Manager: check worker worktree and re-dispatch', \"
+      \"completed_at=?, updated_at=? \"
+      \"WHERE handoff_id=? AND status='launched'\",
+      (now, now, hid)
+    )
+conn.commit()
+conn.close()
+print(f'{scanned},{len(marked)}')
+" 2>/dev/null || echo "0,0")"
+
+  scanned_count="${result%,*}"
+  marked_count="${result#*,}"
+  [[ "$scanned_count" =~ ^[0-9]+$ ]] || scanned_count=0
+  [[ "$marked_count" =~ ^[0-9]+$ ]] || marked_count=0
+
+  if (( marked_count > 0 )); then
+    log_warn "manager stale-pid scan: marked $marked_count stale worker(s) out of $scanned_count scanned"
+    append_lifecycle_trace "$project" "L225" "manager_stale_pid_scan" \
+      "scanned=$scanned_count" \
+      "marked_stale=$marked_count" \
+      "trigger=kill_zero_failed" \
+      "next=re_evaluate_keepalive"
+  fi
+  return 0
+}
+
 project_bootstrap_launch_in_flight_from_unverified_supervisor_hint() {
   local project="$1"
   local supervisor_hint=""
@@ -18974,6 +19057,12 @@ launch_kind: ${mode_name:-unknown}"
   while true; do
     # Re-load session state each cycle so resume/fork decisions see latest values
     load_session_state_or_defaults "$project"
+
+    # Scan for stale worker PIDs before keepalive decisions
+    if [[ "$(effective_runtime_role_for_project "$project")" == "manager" ]]; then
+      manager_scan_stale_worker_pids "$project" || true
+    fi
+
     local ts prompt_file cycle_log cycle_debug_log mode_name watchdog_script workspace_root
     local delegated_pending_ids delegated_pending_count delegated_consumed_ids delegated_consumed_at
     if [[ "$stop_requested" -eq 1 || -f "$(stop_marker_file "$project")" ]]; then
