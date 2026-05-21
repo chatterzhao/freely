@@ -275,6 +275,27 @@ _resolve_type_expansion() {
   fi
 }
 
+# _strip_env_prefix: strip leading VAR=val assignments from an alias expansion.
+# Handles VAR=val, VAR="quoted val", VAR='quoted val' patterns.
+_strip_env_prefix() {
+  local val="$1"
+  while [[ "$val" =~ ^[[:space:]]*[a-zA-Z_][a-zA-Z0-9_]*= ]]; do
+    val="${val#*=}"
+    if [[ "$val" == \"* ]]; then
+      val="${val#\"}"           # strip opening quote
+      val="${val#*\"}"          # skip to after closing quote
+      val="${val# }"            # strip trailing space
+    elif [[ "$val" == \'* ]]; then
+      val="${val#\'}"
+      val="${val#*\'}"
+      val="${val# }"
+    else
+      val="${val#*[[:space:]]}" # unquoted: skip to next space
+    fi
+  done
+  printf '%s\n' "$val"
+}
+
 # _resolve_tool_family: resolve any alias/function/binary to known tool family.
 # Uses `type` for unified cross-shell resolution. No hardcoded prefix lists needed.
 # Supports recursive aliases (alias → another alias → binary).
@@ -294,18 +315,18 @@ _resolve_tool_family() {
     fi
   fi
   if [[ -n "${expansion:-}" ]]; then
-    binary="${expansion%% *}"
+    binary="$(_strip_env_prefix "$expansion")"
+    binary="${binary%% *}"
     binary=$(basename "$binary" 2>/dev/null || echo "$binary")
     case "$binary" in
       claude)  printf 'claude\n'; return 0 ;;
       codex|kiro-cli|iflow|opencode) printf '%s\n' "$binary"; return 0 ;;
       *)
-        # Binary not recognized — might be another alias (recursive alias).
-        # Try one level of recursive resolution.
         local rec_expansion rec_binary
         rec_expansion=$(_resolve_type_expansion "$binary")
         if [[ -n "${rec_expansion:-}" ]]; then
-          rec_binary="${rec_expansion%% *}"
+          rec_binary="$(_strip_env_prefix "$rec_expansion")"
+          rec_binary="${rec_binary%% *}"
           rec_binary=$(basename "$rec_binary" 2>/dev/null || echo "$rec_binary")
           case "$rec_binary" in
             claude)  printf 'claude\n'; return 0 ;;
@@ -323,12 +344,9 @@ _resolve_tool_family() {
 _apply_tool_alias_settings() {
   local tool="$1"
   local resolved alias_path
-  # Fast path: known tool names have no alias settings
   case "$tool" in
     codex|claude|cc|cc-use-codex-cli|kiro-cli|iflow|opencode) return 0 ;;
   esac
-  # Resolve via `type`. Reuse _resolve_type_expansion for alias detection.
-  # Recursive: if expansion is itself an alias, unwrap one level.
   resolved=$(_resolve_type_expansion "$tool")
   [[ -n "$resolved" ]] || return 0
   local first_binary="${resolved%% *}"
@@ -339,28 +357,33 @@ _apply_tool_alias_settings() {
   fi
   # Export env var assignments from alias prefix (e.g. OPENCODE_CONFIG=... opencode)
   local remainder="$resolved"
-  while [[ "$remainder" =~ ^[[:space:]]*([a-zA-Z_][a-zA-Z0-9_]*)= ]]; do
-    local var_name="${BASH_REMATCH[1]}"
-    local rest="${remainder#*=}"
-    if [[ "$rest" =~ ^\"([^\"]*)\"[[:space:]]*(.*) ]]; then
-      export "$var_name"="${BASH_REMATCH[1]}"
-      remainder="${BASH_REMATCH[2]}"
-    elif [[ "$rest" =~ ^\'([^\']*)\'[[:space:]]*(.*) ]]; then
-      export "$var_name"="${BASH_REMATCH[1]}"
-      remainder="${BASH_REMATCH[2]}"
+  while [[ "$remainder" =~ ^[[:space:]]*[a-zA-Z_][a-zA-Z0-9_]*= ]]; do
+    local var_name="${remainder%%=*}"
+    var_name="${var_name##* }"  # strip leading spaces
+    remainder="${remainder#*=}"
+    if [[ "$remainder" == \"* ]]; then
+      remainder="${remainder#\"}"
+      local var_val="${remainder%%\"*}"
+      export "$var_name"="$var_val"
+      remainder="${remainder#*\"}"
+      remainder="${remainder# }"
+    elif [[ "$remainder" == \'* ]]; then
+      remainder="${remainder#\'}"
+      local var_val="${remainder%%\'*}"
+      export "$var_name"="$var_val"
+      remainder="${remainder#*\'}"
+      remainder="${remainder# }"
     else
-      local val="${rest%%[[:space:]]*}"
-      export "$var_name"="$val"
-      remainder="${rest#*[[:space:]]}"
+      local var_val="${remainder%%[[:space:]]*}"
+      export "$var_name"="$var_val"
+      remainder="${remainder#*[[:space:]]}"
     fi
   done
-  # Extract --settings <path> from the remainder (after env prefix stripped)
+  # Extract --settings <path> from the remainder
   alias_path=$(echo "$remainder" | sed -n 's/.*--settings \([^ ]*\).*/\1/p')
   [[ -n "$alias_path" ]] || return 0
-  # Expand ~ to $HOME
   alias_path="${alias_path/#\~/$HOME}"
   [[ -f "$alias_path" ]] || return 0
-  # Read env vars and permission mode from settings JSON and export them
   while IFS='=' read -r key value; do
     [[ -n "$key" ]] || continue
     export "$key"="$value"
@@ -372,11 +395,9 @@ try:
     env = d.get('env', {})
     for k, v in env.items():
         print(f'{k}={v}')
-    # Export permissionMode for Claude Code SDK
     pm = d.get('permissionMode', '')
     if pm:
         print(f'CLAUDE_CODE_PERMISSION_MODE={pm}')
-    # Also export the settings file path itself (bash var, not Python f-string ref)
     settings_file = '${alias_path}'
     print(f'CLAUDE_CODE_SETTINGS_FILE={settings_file}')
 except: pass

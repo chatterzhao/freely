@@ -3260,6 +3260,18 @@ _resolve_type_expansion() {
   fi
 }
 
+# _strip_env_prefix: strip leading VAR=val assignments from an alias expansion.
+_strip_env_prefix() {
+  local val="$1"
+  while [[ "$val" =~ ^[[:space:]]*[a-zA-Z_][a-zA-Z0-9_]*= ]]; do
+    val="${val#*=}"
+    if [[ "$val" == \"* ]]; then val="${val#\"}"; val="${val#*\"}"; val="${val# }"
+    elif [[ "$val" == \'* ]]; then val="${val#\'}"; val="${val#*\'}"; val="${val# }"
+    else val="${val#*[[:space:]]}"; fi
+  done
+  printf '%s\n' "$val"
+}
+
 # _resolve_tool_family: resolve any alias/function/binary to known tool family.
 # Uses `type` for unified cross-shell resolution. No hardcoded prefix lists needed.
 # Supports recursive aliases (alias → another alias → binary).
@@ -3278,7 +3290,8 @@ _resolve_tool_family() {
     fi
   fi
   if [[ -n "${expansion:-}" ]]; then
-    binary="${expansion%% *}"
+    binary="$(_strip_env_prefix "$expansion")"
+    binary="${binary%% *}"
     binary=$(basename "$binary" 2>/dev/null || echo "$binary")
     case "$binary" in
       claude)  printf 'claude\n'; return 0 ;;
@@ -3287,7 +3300,8 @@ _resolve_tool_family() {
         local rec_expansion rec_binary
         rec_expansion=$(_resolve_type_expansion "$binary")
         if [[ -n "${rec_expansion:-}" ]]; then
-          rec_binary="${rec_expansion%% *}"
+          rec_binary="$(_strip_env_prefix "$rec_expansion")"
+          rec_binary="${rec_binary%% *}"
           rec_binary=$(basename "$rec_binary" 2>/dev/null || echo "$rec_binary")
           case "$rec_binary" in
             claude)  printf 'claude\n'; return 0 ;;
