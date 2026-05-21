@@ -5599,3 +5599,14 @@ routing_policy:
 - milestone: M-20260521T032154Z-A
 - phase_state: done_b2_ibm
 - issue_path: `docs/issues/I-20260521T032154Z-A/issue.md`
+
+## M-20260521T095313Z-A
+- title: AI_TOOL alias type-based resolution
+- status: active
+### committed_issues
+1. `I-20260521T095313Z-A`
+- title: use type instead of alias for AI_TOOL alias resolution
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260521T095313Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260521T095313Z--type-based-alias-resolution/candidates.md#C-20260521T095313Z-A`
