@@ -5667,3 +5667,20 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260521T122729Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260521T122729Z--type-resolution-env-var-prefix/candidates.md#C-20260521T122729Z-A`
+
+## M-20260521T132714Z-A
+- title: daemon stop kills ACP bridge
+- status: active
+### candidate_issues
+1. `C-20260521T132714Z-A`
+- milestone: M-20260521T132714Z-A
+- status: promoted
+- decision_reason: raw-20260521T132714Z (GitHub #2061) — daemon stop didn't kill ACP bridge, blocking restart
+- next_action: completed, merge to develop
+### completed_issues
+1. `I-20260521T132714Z-A`
+- title: daemon stop kills ACP bridge
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260521T132714Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260521T132714Z--daemon-stop-kill-acp-bridge/candidates.md#C-20260521T132714Z-A`
