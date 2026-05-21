@@ -752,10 +752,12 @@ parse_ai_spec() {
     exit 1
   }
 
-  case "$tool" in
+  local resolved_family
+  resolved_family="$(_resolve_tool_family "$tool")"
+  case "$resolved_family" in
     codex|kiro-cli|iflow|claude|cc|cc-use-codex-cli|opencode) ;;
     *)
-      log_warn "tool '$tool' not in known list, passing through for alias resolution"
+      log_warn "tool '$tool' resolved to unknown family '$resolved_family', continuing anyway"
       ;;
   esac
 
