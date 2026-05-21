@@ -18492,6 +18492,17 @@ stop_project_runtime() {
       terminate_pid_with_graceful_wait "$sp" "project supervisor during stop"
     done < <(printf '%s\n' "$supervisor_candidates" | awk '!seen[$0]++')
   fi
+  # Stop ACP bridge by tracked pid (belt-and-suspenders before the case below)
+  local _bridge_pid_file _bridge_pid
+  _bridge_pid_file="$(_acp_bridge_pid_file "$project")"
+  if [[ -f "$_bridge_pid_file" ]]; then
+    _bridge_pid="$(cat "$_bridge_pid_file" 2>/dev/null || true)"
+    if [[ -n "$_bridge_pid" ]] && kill -0 "$_bridge_pid" 2>/dev/null; then
+      terminate_pid_with_graceful_wait "$_bridge_pid" "project acp bridge during stop"
+    fi
+    rm -f "$_bridge_pid_file"
+  fi
+  rm -f "$(_acp_bridge_socket "$project")"
   if [[ "$(role_hint_for_project "$project")" == "manager" ]]; then
     materialize_missing_required_manager_continuity_fallback "$project" "$stop_reason" || true
     if stop_reason_records_manager_operator_boundary "$stop_reason"; then
