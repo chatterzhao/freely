@@ -5684,3 +5684,20 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260521T132714Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260521T132714Z--daemon-stop-kill-acp-bridge/candidates.md#C-20260521T132714Z-A`
+
+## M-20260521T135911Z-A
+- title: permission unification in JSON config
+- status: active
+### candidate_issues
+1. `C-20260521T135911Z-A`
+- milestone: M-20260521T135911Z-A
+- status: promoted
+- decision_reason: raw-20260521T135911Z (GitHub #2065) — bypassPermissions hardcoded in bridge causes opencode errors
+- next_action: completed, merge to develop
+### completed_issues
+1. `I-20260521T135911Z-A`
+- title: permission unification in JSON config
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260521T135911Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260521T135911Z--permission-unify-json-config/candidates.md#C-20260521T135911Z-A`

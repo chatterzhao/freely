@@ -395,7 +395,8 @@ try:
     env = d.get('env', {})
     for k, v in env.items():
         print(f'{k}={v}')
-    pm = d.get('permissionMode', '')
+    # Read permission mode: top-level 'permissionMode' or nested 'permissions.defaultMode'
+    pm = d.get('permissionMode', '') or d.get('permissions', {}).get('defaultMode', '')
     if pm:
         print(f'CLAUDE_CODE_PERMISSION_MODE={pm}')
     settings_file = '${alias_path}'
@@ -517,7 +518,7 @@ Freely runtime policy:
 - Allowed sibling worktrees root: ${worktrees_root:-unavailable}
 - ${cwd_guidance#- }
 - When continuing an existing Codex MCP thread, preserve the same repository-root cwd and the same non-interactive approval policy unless the task explicitly requires a stricter mode.
-- The current runtime is non-interactive when permission mode is bypassPermissions; do not ask the user for confirmations that the runtime has already pre-approved.
+- The current runtime is non-interactive; permissions are configured by the tool-native config. Do not ask the user for confirmations.
 - Current cc policy: ${policy:-default}
 EOF
 }
@@ -654,9 +655,6 @@ tool_run_direct_from_prompt_file() {
       if [[ "$tool" == "cc" && "$claude_home_mode" == "project" ]]; then
         claude_home="$(ensure_claude_runtime_home_for_launch "$project")"
       fi
-      if [[ "$mode" == "auto" ]]; then
-        args+=(--permission-mode bypassPermissions)
-      fi
       [[ -n "$worktrees_root" ]] && args+=(--add-dir "$worktrees_root")
       [[ -n "$debug_log_file" ]] && args+=(--debug-file "$debug_log_file")
       # Session strategy: use the session-cache module if available.
@@ -702,9 +700,6 @@ tool_run_direct_from_prompt_file() {
       [[ -n "$project" ]] && args+=("--dir" "$project")
       if [[ "$launch_kind" == "resume" ]] && [[ -n "$tool_resume_target" ]]; then
         args+=("-s" "$tool_resume_target")
-      fi
-      if [[ "$mode" == "auto" ]]; then
-        args+=(--dangerously-skip-permissions)
       fi
       exec opencode "${tool_extra_args[@]:-}" "${args[@]}" "$(cat "$prompt_file")"
       ;;

@@ -82,10 +82,9 @@ class AcpBridge:
         self.log(f"starting ACP server: {self.acp_bin}")
         # Inherit environment but let explicitly-set vars (from alias settings) win
         env = os.environ.copy()
-        # Always bypass permissions in daemon mode — the ACP client handles
-        # permission decisions via session/request_permission protocol.
+        # Permission mode is handled by tool-native config (JSON settings file).
         self.server_proc = subprocess.Popen(
-            [self.acp_bin, "--permission-mode", "bypassPermissions"],
+            [self.acp_bin],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -137,7 +136,7 @@ class AcpBridge:
         # Restart
         env = os.environ.copy()
         self.server_proc = subprocess.Popen(
-            [self.acp_bin, "--permission-mode", "bypassPermissions"],
+            [self.acp_bin],
             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             text=True, bufsize=1, env=env,
         )
@@ -195,7 +194,7 @@ class AcpBridge:
         # Start new process (no initialize yet — lazy, done on first request)
         env = os.environ.copy()
         self.server_proc = subprocess.Popen(
-            [self.acp_bin, "--permission-mode", "bypassPermissions"],
+            [self.acp_bin],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -353,32 +352,18 @@ class AcpBridge:
                 self.clients.remove(sock)
 
     def session_new(self, session_id=None, cwd=None):
-        """Create a new ACP session and set bypassPermissions mode."""
+        """Create a new ACP session. Permission mode is set by tool-native config."""
         params = {"cwd": cwd or self.project, "mcpServers": []}
         if session_id:
             params["sessionId"] = session_id
         result = self._send_request("session/new", params, timeout=30)
-        sid = result.get("sessionId", "")
-        # Immediately set bypassPermissions to avoid interactive permission hangs
-        try:
-            self._send_request("session/set_mode", {"sessionId": sid, "modeId": "bypassPermissions"}, timeout=10)
-            self.log(f"session {sid[:12]}... mode set to bypassPermissions")
-        except Exception as e:
-            self.log(f"session/set_mode failed (non-fatal): {e}")
-        return sid
+        return result.get("sessionId", "")
 
     def session_resume(self, session_id, cwd=None):
-        """Resume an existing ACP session and ensure bypassPermissions is active."""
+        """Resume an existing ACP session. Permission mode is set by tool-native config."""
         params = {"sessionId": session_id, "cwd": cwd or self.project, "mcpServers": []}
         result = self._send_request("session/resume", params, timeout=30)
-        sid = result.get("sessionId", "")
-        if sid:
-            try:
-                self._send_request("session/set_mode", {"sessionId": sid, "modeId": "bypassPermissions"}, timeout=10)
-                self.log(f"session {sid[:12]}... mode set to bypassPermissions after resume")
-            except Exception as e:
-                self.log(f"session/set_mode failed after resume (non-fatal): {e}")
-        return sid
+        return result.get("sessionId", "")
 
     def session_prompt(self, session_id, prompt_text, timeout=900):
         """Send a prompt and wait for response. Returns (stop_reason, response_text)."""
@@ -480,18 +465,6 @@ def handle_client(conn, bridge):
                     result = bridge._send_request(method, params,
                         timeout=params.get("timeout", BRIDGE_TIMEOUT))
                     response = {"jsonrpc": "2.0", "id": req_id, "result": result}
-                    # After session/new or session/resume, immediately set
-                    # bypassPermissions to prevent interactive permission prompts
-                    # from hanging the AI in daemon/non-interactive mode.
-                    if method in ("session/new", "session/resume"):
-                        sid = result.get("sessionId", "")
-                        if sid:
-                            try:
-                                bridge._send_request("session/set_mode",
-                                    {"sessionId": sid, "modeId": "bypassPermissions"}, timeout=10)
-                                bridge.log(f"session {sid[:12]}... mode set to bypassPermissions after {method}")
-                            except Exception as e:
-                                bridge.log(f"session/set_mode failed after {method} (non-fatal): {e}")
                 except TimeoutError as e:
                     response = {"jsonrpc": "2.0", "id": req_id, "error": {"code": -32000, "message": str(e)}}
                 except RuntimeError as e:

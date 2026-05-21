@@ -12524,7 +12524,7 @@ try:
         d = json.load(f)
     for k, v in d.get('env', {}).items():
         print(f'{k}={v}')
-    pm = d.get('permissionMode', '')
+    pm = d.get('permissionMode', '') or d.get('permissions', {}).get('defaultMode', '')
     if pm:
         print(f'CLAUDE_CODE_PERMISSION_MODE={pm}')
 except: pass
