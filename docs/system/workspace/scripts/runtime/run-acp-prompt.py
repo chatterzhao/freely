@@ -364,7 +364,7 @@ def main():
             session_id = resume_target
             print(session_id, flush=True)                                   # line 1: clean UUID
             print(f"session id: {session_id} (prompt)", flush=True)         # line 2: human log
-            # Use a minimal session_result stub for bypassPermissions check below
+            # session_result for prompt-mode multi-turn
             session_result = {"sessionId": session_id}
 
         elif launch_kind == "fork":
@@ -393,18 +393,6 @@ def main():
             print(f"session id: {session_id}", flush=True)       # line 2: human log
 
         t_session = time.time()
-
-        # Ensure bypassPermissions is active for this session.
-        # The bridge sets this after session/new and session/resume, but
-        # this call is a defense-in-depth for direct (subprocess) mode.
-        try:
-            client.request(
-                "session/set_mode",
-                {"sessionId": session_id, "modeId": "bypassPermissions"},
-                timeout=10,
-            )
-        except Exception:
-            pass
 
         # Model selection
         if args.reasoning_effort:
