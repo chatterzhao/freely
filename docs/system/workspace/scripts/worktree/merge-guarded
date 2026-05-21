@@ -304,7 +304,7 @@ do_initial_merge() {
   run_promotion_gate_if_needed "$target" "$source_branch"
 
   local merge_message
-  merge_message="$(render_merge_message "merge-guarded" "forbidden" "$source_branch" "" "" "")"
+  merge_message="$(render_merge_message "merge-guarded" "$source_branch")"
 
   set +e
   git merge --no-commit --no-ff "$source_branch"
