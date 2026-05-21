@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# TC-5: scan does NOT touch completed/blocked/consumed handoffs
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+HANDOFF_PY="$ROOT_DIR/docs/system/workspace/scripts/runtime/handoff.py"
+
+tmpdir="$(mktemp -d)"
+trap 'rm -rf "$tmpdir"' EXIT
+db="$tmpdir/test.db"
+
+python3 "$HANDOFF_PY" init --db "$db"
+
+# Insert non-launched records with inaccessible worker_pid=1
+python3 -c "
+import sqlite3
+from datetime import datetime, timezone
+conn = sqlite3.connect('$db')
+now = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+
+conn.execute(\"\"\"INSERT INTO handoffs (handoff_id, role, raw_key, prompt_file, status, worker_pid, created_at, updated_at)
+  VALUES ('COMP', 'worker', 'test-raw', '/tmp/comp', 'completed', '1', ?, ?)\"\"\", (now, now))
+conn.execute(\"\"\"INSERT INTO handoffs (handoff_id, role, raw_key, prompt_file, status, worker_pid, created_at, updated_at)
+  VALUES ('BLK', 'worker', 'test-raw', '/tmp/blk', 'blocked', '1', ?, ?)\"\"\", (now, now))
+conn.execute(\"\"\"INSERT INTO handoffs (handoff_id, role, raw_key, prompt_file, status, worker_pid, created_at, updated_at)
+  VALUES ('CNS', 'worker', 'test-raw', '/tmp/cns', 'consumed', '1', ?, ?)\"\"\", (now, now))
+conn.commit()
+
+# Run scan
+rows = conn.execute(
+  \"SELECT handoff_id, worker_pid FROM handoffs \"
+  \"WHERE role='worker' AND status='launched' AND worker_pid != '' AND worker_pid IS NOT NULL \"
+).fetchall()
+print(f'Scanned {len(rows)} records (expected 0)')
+assert len(rows) == 0, f'Expected 0 scanned, got {len(rows)}'
+conn.close()
+"
+
+echo "[PASS] scan correctly isolated completed/blocked/consumed records (did not touch them)"

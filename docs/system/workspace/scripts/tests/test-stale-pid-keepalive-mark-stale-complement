@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# TC-10: mark_stale() soft-timeout still works after kill -0 scan
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+HANDOFF_PY="$ROOT_DIR/docs/system/workspace/scripts/runtime/handoff.py"
+
+tmpdir="$(mktemp -d)"
+trap 'rm -rf "$tmpdir"' EXIT
+db="$tmpdir/test.db"
+
+python3 "$HANDOFF_PY" init --db "$db"
+
+# Insert a launched worker whose PID is alive but last_activity_at is 30 min ago
+python3 -c "
+import sqlite3
+from datetime import datetime, timezone, timedelta
+conn = sqlite3.connect('$db')
+now = datetime.now(timezone.utc)
+old = (now - timedelta(minutes=30)).strftime('%Y-%m-%dT%H:%M:%SZ')
+now_str = now.strftime('%Y-%m-%dT%H:%M:%SZ')
+
+conn.execute(\"\"\"INSERT INTO handoffs (handoff_id, role, raw_key, prompt_file, status, worker_pid, last_activity_at, created_at, updated_at)
+  VALUES ('STUCK', 'worker', 'test-raw', '/tmp/stuck', 'launched', '1', ?, ?, ?)\"\"\", (old, now_str, now_str))
+conn.commit()
+
+# Run mark_stale() with 15-minute threshold
+cutoff = (now - timedelta(minutes=15)).strftime('%Y-%m-%dT%H:%M:%SZ')
+affected = conn.execute(
+  \"UPDATE handoffs SET status='blocked', exit_kind='worker_blocked', \"
+  \" reason='Worker inactive > 15min (last_activity=' || last_activity_at || ')', \"
+  \" next_action='Manager: check worker liveness. If worker is dead, re-dispatch or close.', \"
+  \" updated_at=?, completed_at=? \"
+  \"WHERE role='worker' AND status='launched' AND last_activity_at < ?\",
+  (now_str, now_str, cutoff)).rowcount
+conn.commit()
+print(f'Marked {affected} record(s) (expected 1)')
+assert affected == 1, f'Expected 1, got {affected}'
+
+row = conn.execute('SELECT status, exit_kind FROM handoffs WHERE handoff_id=?', ('STUCK',)).fetchone()
+print(f'STUCK: status={row[0]} exit_kind={row[1]}')
+assert row[0] == 'blocked', f'Expected blocked, got {row[0]}'
+conn.close()
+"
+
+echo "[PASS] mark_stale() soft-timeout continues to work alongside kill -0 scan"

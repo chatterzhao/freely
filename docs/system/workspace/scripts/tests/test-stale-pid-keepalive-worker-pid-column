@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+# TC-1: handoff DB schema migration adds worker_pid column
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+HANDOFF_PY="$ROOT_DIR/docs/system/workspace/scripts/runtime/handoff.py"
+
+pass=0
+fail=0
+
+# Create temp DB
+tmpdir="$(mktemp -d)"
+trap 'rm -rf "$tmpdir"' EXIT
+db="$tmpdir/test.db"
+
+# Initialize handoff schema
+python3 "$HANDOFF_PY" init --db "$db"
+
+# Verify worker_pid column exists
+col_exists="$(python3 -c "
+import sqlite3
+conn = sqlite3.connect('$db')
+cols = {row[1] for row in conn.execute('PRAGMA table_info(handoffs)')}
+conn.close()
+print('yes' if 'worker_pid' in cols else 'no')
+")"
+if [[ "$col_exists" == "yes" ]]; then
+  echo "[PASS] worker_pid column exists in handoffs table"
+  pass=$((pass + 1))
+else
+  echo "[FAIL] worker_pid column NOT found in handoffs table"
+  fail=$((fail + 1))
+fi
+
+# Verify default value
+default_type="$(python3 -c "
+import sqlite3
+conn = sqlite3.connect('$db')
+for row in conn.execute('PRAGMA table_info(handoffs)'):
+  if row[1] == 'worker_pid':
+    print(f'type={row[2]} default={row[4]}')
+conn.close()
+")"
+expected="type=TEXT default=''"
+if [[ "$default_type" == *"TEXT"* ]]; then
+  echo "[PASS] worker_pid column type: $default_type"
+  pass=$((pass + 1))
+else
+  echo "[FAIL] worker_pid column type mismatch: $default_type (expected TEXT)"
+  fail=$((fail + 1))
+fi
+
+# Insert a handoff record and update worker_pid
+python3 -c "
+import sqlite3
+from datetime import datetime, timezone
+conn = sqlite3.connect('$db')
+now = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+hid = 'test-hid-1'
+conn.execute(\"\"\"INSERT INTO handoffs (handoff_id, role, raw_key, prompt_file, status, created_at, updated_at)
+  VALUES (?, 'worker', 'test-raw', '/tmp/test', 'launched', ?, ?)\"\"\", (hid, now, now))
+conn.execute(\"UPDATE handoffs SET worker_pid='12345' WHERE handoff_id=?\", (hid,))
+conn.commit()
+row = conn.execute('SELECT worker_pid FROM handoffs WHERE handoff_id=?', (hid,)).fetchone()
+conn.close()
+assert row[0] == '12345', f'Expected 12345, got {row[0]}'
+print('ok')
+"
+echo "[PASS] worker_pid INSERT/UPDATE roundtrip works"
+pass=$((pass + 1))
+
+echo "=== RESULT: $pass pass, $fail fail ==="
+exit $((fail > 0 ? 1 : 0))

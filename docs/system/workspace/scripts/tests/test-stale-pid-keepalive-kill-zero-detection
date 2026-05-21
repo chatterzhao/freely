@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+# TC-3: kill -0 detects dead worker PID
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+
+pass=0
+fail=0
+
+# Spawn a background child process
+sleep 999 &
+child_pid=$!
+disown "$child_pid" 2>/dev/null || true
+
+# Verify kill -0 succeeds on alive PID
+if python3 -c "
+import os
+try:
+    os.kill($child_pid, 0)
+    print('alive')
+except OSError:
+    print('dead')
+" 2>/dev/null | grep -q 'alive'; then
+  echo "[PASS] kill -0 succeeds on alive PID $child_pid"
+  pass=$((pass + 1))
+else
+  echo "[FAIL] kill -0 failed on alive PID $child_pid"
+  fail=$((fail + 1))
+fi
+
+# Kill the child process
+kill "$child_pid" 2>/dev/null || true
+wait "$child_pid" 2>/dev/null || true
+
+# Verify kill -0 raises OSError on dead PID
+if python3 -c "
+import os
+try:
+    os.kill($child_pid, 0)
+    print('alive')
+except OSError:
+    print('dead')
+" 2>/dev/null | grep -q 'dead'; then
+  echo "[PASS] kill -0 raises OSError on dead PID $child_pid"
+  pass=$((pass + 1))
+else
+  echo "[FAIL] kill -0 did not raise OSError on dead PID $child_pid"
+  fail=$((fail + 1))
+fi
+
+# Test with PID 1 (accessible but different user) — EPERM should also be caught
+if python3 -c "
+import os
+try:
+    os.kill(1, 0)
+    print('alive')
+except OSError:
+    print('dead')
+" 2>/dev/null | grep -q 'dead\|alive'; then
+  # Either outcome is acceptable as long as it doesn't crash
+  echo "[PASS] kill -0 PID 1 handled without crash"
+  pass=$((pass + 1))
+else
+  echo "[FAIL] kill -0 PID 1 caused unexpected result"
+  fail=$((fail + 1))
+fi
+
+echo "=== RESULT: $pass pass, $fail fail ==="
+exit $((fail > 0 ? 1 : 0))

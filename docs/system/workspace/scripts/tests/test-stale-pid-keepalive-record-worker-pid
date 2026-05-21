@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# TC-2: worker PID recorded at launch time (INTEGRATION — manual test)
+# This test requires a running manager project with worker delegation.
+# Steps:
+# 1. Set up a minimal manager project with a prompt_file delegation
+# 2. Insert a pending worker handoff in the handoff DB
+# 3. Mock launch_worker_from_manager_prompt_if_needed to capture _worker_pid
+# 4. Query handoff DB for worker_pid
+#
+# Manual execution:
+#   TEST_PROJECT=/path/to/worker-worktree ./test-stale-pid-keepalive-record-worker-pid
+#
+# Expected:
+#   - worker_pid matches actual OS PID of launched background process
+#   - status remains launched
+
+echo "[SKIP] TC-2: integration test — run manually with a real manager project"
+echo "  export TEST_PROJECT=<worker-worktree> && bash $0"

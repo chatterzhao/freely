@@ -108,6 +108,7 @@ def init_db():
         ("validation_errors_json", "TEXT DEFAULT '[]'"),
         ("reason", "TEXT DEFAULT ''"),
         ("send_to_ai", "TEXT NOT NULL DEFAULT 'pending'"),
+        ("worker_pid", "TEXT DEFAULT ''"),
     ]:
         if col_name not in existing:
             try:
@@ -383,6 +384,37 @@ def list_pending_delivery(consumed_by_val=None):
     else:
         rows = conn.execute(
             "SELECT * FROM handoffs WHERE send_to_ai IN ('pending','fail') "
+            "ORDER BY created_at ASC").fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def update_worker_pid(handoff_id, worker_pid):
+    """Record worker OS PID for kill -0 scanning."""
+    conn = _connect()
+    now = _now_utc()
+    cur = conn.execute(
+        "UPDATE handoffs SET worker_pid=?, updated_at=? WHERE handoff_id=? AND status IN ('pending','launched')",
+        (str(worker_pid), now, handoff_id))
+    affected = cur.rowcount
+    conn.commit()
+    conn.close()
+    return affected
+
+
+def get_launched_workers_with_pids(raw_key=None):
+    """Fetch all launched worker handoffs that have a worker_pid set."""
+    conn = _connect()
+    if raw_key:
+        rows = conn.execute(
+            "SELECT handoff_id, worker_pid, worktree, session_id, prompt_file FROM handoffs "
+            "WHERE role='worker' AND status='launched' AND worker_pid != '' AND worker_pid IS NOT NULL "
+            "AND raw_key=? ORDER BY created_at ASC",
+            (raw_key,)).fetchall()
+    else:
+        rows = conn.execute(
+            "SELECT handoff_id, worker_pid, worktree, session_id, prompt_file FROM handoffs "
+            "WHERE role='worker' AND status='launched' AND worker_pid != '' AND worker_pid IS NOT NULL "
             "ORDER BY created_at ASC").fetchall()
     conn.close()
     return [dict(r) for r in rows]
@@ -808,6 +840,15 @@ def main():
     p_send_ai.add_argument("--handoff-id", required=True)
     p_send_ai.add_argument("--send-to-ai", required=True, choices=["success", "fail"])
 
+    p_update_pid = sub.add_parser("update-worker-pid")
+    p_update_pid.add_argument("--db", required=True)
+    p_update_pid.add_argument("--handoff-id", required=True)
+    p_update_pid.add_argument("--worker-pid", required=True)
+
+    p_launched = sub.add_parser("get-launched-pids")
+    p_launched.add_argument("--db", required=True)
+    p_launched.add_argument("--raw-key", default="")
+
     args = parser.parse_args()
     DB_PATH = getattr(args, 'db', None) or ':memory:'
 
@@ -886,6 +927,12 @@ def main():
     elif args.cmd == "update-send-to-ai":
         affected = update_send_to_ai(args.handoff_id, args.send_to_ai)
         print(f"ok affected={affected}")
+    elif args.cmd == "update-worker-pid":
+        affected = update_worker_pid(args.handoff_id, args.worker_pid)
+        print(f"ok affected={affected}")
+    elif args.cmd == "get-launched-pids":
+        rows = get_launched_workers_with_pids(args.raw_key or None)
+        print(json.dumps(rows, indent=2, ensure_ascii=False))
     else:
         parser.print_help()
 

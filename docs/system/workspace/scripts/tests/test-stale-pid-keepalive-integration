@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# TC-7: keepalive chain integration — stale workers unblock supervisor (INTEGRATION — manual test)
+# This test requires a running manager with a delegated worker handoff in launched status.
+# Steps:
+# 1. Set up a manager project with a delegated worker handoff in 'launched' status
+# 2. Set worker_pid to a dead PID
+# 3. Run the manager keepalive decision chain
+# 4. Verify the supervisor is NOT kept alive for "waiting on active workers"
+# 5. Verify the handoff DB is updated with stale_pid before decision returns
+#
+# Manual execution:
+#   TEST_PROJECT=/path/to/manager-worktree ./test-stale-pid-keepalive-integration
+#
+# Expected:
+#   - stale PID detected and marked as blocked/stale_pid
+#   - supervisor moves to next keepalive check or stop decision
+
+echo "[SKIP] TC-7: integration test — run manually with a real manager project"
+echo "  export TEST_PROJECT=<manager-worktree> && bash $0"
