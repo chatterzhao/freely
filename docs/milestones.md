@@ -5733,3 +5733,19 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260521T222919Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260521T222919Z--scan-stage-prompt-mismatch/candidates.md#C-20260521T222919Z-A`
+## M-20260521T230423Z-A
+- title: restrict active-worker scan skip
+- status: active
+### candidate_issues
+1. `C-20260521T230423Z-A`
+- milestone: M-20260521T230423Z-A
+- status: promoted
+- decision_reason: raw-20260521T230423Z (GitHub #2100) — active worker guard blocked scan in all paths
+- next_action: completed
+### completed_issues
+1. `I-20260521T230423Z-A`
+- title: restrict active-worker scan skip
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260521T230423Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260521T230423Z--scan-active-worker-guard-fix/candidates.md#C-20260521T230423Z-A`
