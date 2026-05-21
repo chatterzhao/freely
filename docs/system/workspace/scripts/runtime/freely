@@ -17559,7 +17559,7 @@ import json,subprocess,sys
 hp='$_handoff_py'; db='$_db_path'
 rows=[]
 for role in ['manager','worker']:
-    for st in ['completed','consumed','blocked','rejected']:
+    for st in ['completed','consumed']:
         r=subprocess.run([sys.executable,hp,'list','--db',db,'--role',role,'--status',st],
                          capture_output=True,text=True,timeout=5)
         if r.returncode==0:
@@ -17571,6 +17571,31 @@ if not rows:
     print('(无线程历史)')
 " 2>/dev/null || echo "(查询失败)")
 
+  # Worker errors: recent blocked/rejected workers that need attention
+  local worker_errors
+  worker_errors=$(python3 -c "
+import json,subprocess,sys
+hp='$_handoff_py'; db='$_db_path'
+rows=[]
+for st in ['blocked','rejected']:
+    r=subprocess.run([sys.executable,hp,'list','--db',db,'--role','worker','--status',st],
+                     capture_output=True,text=True,timeout=5)
+    if r.returncode==0:
+        rows.extend(json.loads(r.stdout))
+# Only recent (last 60 min) and not yet consumed by manager
+recent=[r for r in rows if r.get('created_at','') >= '$(date -u -v-60M +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -d \"60 minutes ago\" +%Y-%m-%dT%H:%M:%SZ)' and r.get('consumed_by','') != 'manager']
+for r in recent[:8]:
+    hid=r.get('handoff_id','?')[:25]
+    st=r.get('status','?')
+    ek=r.get('exit_kind','?')
+    reason=r.get('reason','')[:80]
+    ts=r.get('created_at','')[:16]
+    print(f'- \`{hid}\` → {ek}: {reason} ({ts})')
+    print(f'  查询: handoff.py show --db .freely/freely.db --handoff-id {hid}')
+if not recent:
+    print('(无异常)')
+" 2>/dev/null || echo "(查询失败)")
+
   cat <<EOF
 
 ## Handoff 上下文（仅 Manager 可见）
@@ -17578,10 +17603,13 @@ if not rows:
 ### Worker 汇报（待你处理）
 ${pending_delivery}
 
+### Worker 异常（需处理）
+${worker_errors}
+
 ### 近期 Worker 线程历史
 ${thread_summary}
 
-处理原则：先读上面的 Worker 汇报（Runtime 投递给你的消息），读 completion_summary/reason/next_action 做决策。消息看完后如果无事可做再看 scan 找新任务。
+处理原则：先读上面的 Worker 汇报（Runtime 投递给你的消息），读 completion_summary/reason/next_action 做决策。异常 Worker 要及时清理（stale_pid → 退休工位释放资源）。消息看完后如果无事可做再看 scan 找新任务。
 EOF
 }
 
