@@ -262,33 +262,57 @@ tool_adapter_supports_launch_kind() {
   printf '%s\n' "$(tool_supported_launch_kinds_for_adapter "$tool" "$adapter")" | tr ',' '\n' | sed 's/^ *//; s/ *$//' | grep -Fxq "$launch_kind"
 }
 
-# _resolve_tool_family: resolve alias to known tool family binary.
-# e.g. cc-ds-auto -> claude, ccglm -> claude. Returns original if no alias found.
+# _resolve_type_expansion: resolve a name via `type`, return the expansion.
+# Handles zsh ("is an alias for") and bash ("is aliased to") formats.
+# Returns nothing if the name is not an alias.
+_resolve_type_expansion() {
+  local name="$1" type_output
+  type_output=$(${SHELL:-bash} -ic "type '$name' 2>&1" 2>/dev/null) || true
+  if echo "$type_output" | grep -q 'is an alias for'; then
+    echo "$type_output" | sed 's/.*is an alias for //'
+  elif echo "$type_output" | grep -q 'is aliased to'; then
+    echo "$type_output" | sed 's/.*is aliased to .//; s/.$//'
+  fi
+}
+
+# _resolve_tool_family: resolve any alias/function/binary to known tool family.
+# Uses `type` for unified cross-shell resolution. No hardcoded prefix lists needed.
+# Supports recursive aliases (alias → another alias → binary).
 _resolve_tool_family() {
   local tool="$1"
   case "$tool" in
     codex|claude|cc|cc-use-codex-cli|kiro-cli|iflow|opencode) printf '%s\n' "$tool"; return 0 ;;
   esac
-  local resolved
-  resolved=$(${SHELL:-bash} -ic "alias '$tool' 2>/dev/null" 2>/dev/null | sed -n "s/^${tool}='\\(.*\\)'$/\\1/p")
-  if [[ -n "$resolved" ]]; then
-    # Strip leading env var assignments (VAR=val VAR2=val2 ... binary)
-    local stripped="$resolved"
-    while [[ "$stripped" =~ ^[[:space:]]*[a-zA-Z_][a-zA-Z0-9_]*= ]]; do
-      local rest="${stripped#*=}"
-      # Skip past the value (handle quoted and unquoted values)
-      if [[ "$rest" =~ ^\"([^\"]*)\"[[:space:]]*(.*) ]]; then
-        stripped="${BASH_REMATCH[2]}"
-      elif [[ "$rest" =~ ^\'([^\']*)\'[[:space:]]*(.*) ]]; then
-        stripped="${BASH_REMATCH[2]}"
-      else
-        rest="${rest#*[[:space:]]}"
-        stripped="$rest"
-      fi
-    done
-    local binary="${stripped%% *}"
+  local expansion binary
+  expansion=$(_resolve_type_expansion "$tool")
+  if [[ -z "${expansion:-}" ]]; then
+    # Not an alias — try as a binary path
+    local bin_output
+    bin_output=$(${SHELL:-bash} -ic "type '$tool' 2>&1" 2>/dev/null) || true
+    if echo "$bin_output" | grep -q ' is /'; then
+      expansion=$(echo "$bin_output" | sed 's/.* is //')
+    fi
+  fi
+  if [[ -n "${expansion:-}" ]]; then
+    binary="${expansion%% *}"
+    binary=$(basename "$binary" 2>/dev/null || echo "$binary")
     case "$binary" in
-      claude|codex|kiro-cli|iflow|opencode) printf '%s\n' "$binary"; return 0 ;;
+      claude)  printf 'claude\n'; return 0 ;;
+      codex|kiro-cli|iflow|opencode) printf '%s\n' "$binary"; return 0 ;;
+      *)
+        # Binary not recognized — might be another alias (recursive alias).
+        # Try one level of recursive resolution.
+        local rec_expansion rec_binary
+        rec_expansion=$(_resolve_type_expansion "$binary")
+        if [[ -n "${rec_expansion:-}" ]]; then
+          rec_binary="${rec_expansion%% *}"
+          rec_binary=$(basename "$rec_binary" 2>/dev/null || echo "$rec_binary")
+          case "$rec_binary" in
+            claude)  printf 'claude\n'; return 0 ;;
+            codex|kiro-cli|iflow|opencode) printf '%s\n' "$rec_binary"; return 0 ;;
+          esac
+        fi
+        ;;
     esac
   fi
   printf '%s\n' "$tool"
@@ -299,11 +323,20 @@ _resolve_tool_family() {
 _apply_tool_alias_settings() {
   local tool="$1"
   local resolved alias_path
+  # Fast path: known tool names have no alias settings
   case "$tool" in
     codex|claude|cc|cc-use-codex-cli|kiro-cli|iflow|opencode) return 0 ;;
   esac
-  resolved=$(${SHELL:-bash} -ic "alias '$tool' 2>/dev/null" 2>/dev/null | sed -n "s/^${tool}='\\(.*\\)'$/\\1/p")
+  # Resolve via `type`. Reuse _resolve_type_expansion for alias detection.
+  # Recursive: if expansion is itself an alias, unwrap one level.
+  resolved=$(_resolve_type_expansion "$tool")
   [[ -n "$resolved" ]] || return 0
+  local first_binary="${resolved%% *}"
+  if [[ ! "$first_binary" =~ ^(claude|codex|kiro-cli|iflow|opencode)$ ]]; then
+    local rec_resolved
+    rec_resolved=$(_resolve_type_expansion "$first_binary")
+    [[ -n "$rec_resolved" ]] && resolved="$rec_resolved"
+  fi
   # Export env var assignments from alias prefix (e.g. OPENCODE_CONFIG=... opencode)
   local remainder="$resolved"
   while [[ "$remainder" =~ ^[[:space:]]*([a-zA-Z_][a-zA-Z0-9_]*)= ]]; do
@@ -343,8 +376,9 @@ try:
     pm = d.get('permissionMode', '')
     if pm:
         print(f'CLAUDE_CODE_PERMISSION_MODE={pm}')
-    # Also export the settings file path itself
-    print(f'CLAUDE_CODE_SETTINGS_FILE={alias_path}')
+    # Also export the settings file path itself (bash var, not Python f-string ref)
+    settings_file = '${alias_path}'
+    print(f'CLAUDE_CODE_SETTINGS_FILE={settings_file}')
 except: pass
 " 2>/dev/null)
 }
