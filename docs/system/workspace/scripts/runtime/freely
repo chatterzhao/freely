@@ -15004,13 +15004,18 @@ LAST_TASK_SOURCE_SCAN_PROJECT_HEAD="$project_head"
 EOF
 }
 append_task_source_patrol_seed_if_needed() {
-  local scan_json_path scan_reason active_running_workers
+  local scan_json_path scan_reason active_running_workers skip_if_active="${1:-}"
 
   [[ "$(role_hint_for_project "$PROJECT_ROOT")" == "manager" ]] || return 0
-  active_running_workers="$(manager_semantic_loop_active_worker_count_for_project "$PROJECT_ROOT" 2>/dev/null || true)"
-  [[ "$active_running_workers" =~ ^[0-9]+$ ]] || active_running_workers="0"
-  if (( active_running_workers > 0 )); then
-    return 0
+  # Only skip scan for active workers in prompt (delta) path — the Manager
+  # already has full context from the fresh cycle and should process worker
+  # results first. Fresh/fork cycles always show scan for full task visibility.
+  if [[ "$skip_if_active" == "skip_if_active" ]]; then
+    active_running_workers="$(manager_semantic_loop_active_worker_count_for_project "$PROJECT_ROOT" 2>/dev/null || true)"
+    [[ "$active_running_workers" =~ ^[0-9]+$ ]] || active_running_workers="0"
+    if (( active_running_workers > 0 )); then
+      return 0
+    fi
   fi
 
   scan_reason="$(task_source_scan_regeneration_reason_for_project "$PROJECT_ROOT" 2>/dev/null || true)"
@@ -17548,7 +17553,7 @@ build_prompt() {
 PROMPT_DELTA
     append_manager_handoff_context_if_needed "$PROJECT_ROOT"
     append_fleet_supervision_if_needed
-    append_task_source_patrol_seed_if_needed
+    append_task_source_patrol_seed_if_needed skip_if_active
     append_manager_exit_contract_directive_if_needed "$PROJECT_ROOT"
     append_worker_exit_contract_directive_if_needed "$PROJECT_ROOT"
     return 0
