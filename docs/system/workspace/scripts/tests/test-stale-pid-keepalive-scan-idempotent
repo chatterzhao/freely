@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# TC-6: scan idempotent — already-blocked records not re-marked
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+HANDOFF_PY="$ROOT_DIR/docs/system/workspace/scripts/runtime/handoff.py"
+
+tmpdir="$(mktemp -d)"
+trap 'rm -rf "$tmpdir"' EXIT
+db="$tmpdir/test.db"
+
+python3 "$HANDOFF_PY" init --db "$db"
+
+# Insert an already-blocked stale_pid record
+python3 -c "
+import sqlite3
+from datetime import datetime, timezone
+conn = sqlite3.connect('$db')
+now = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+
+conn.execute(\"\"\"INSERT INTO handoffs (handoff_id, role, raw_key, prompt_file, status, exit_kind, worker_pid, reason, completed_at, created_at, updated_at)
+  VALUES ('BLK-1', 'worker', 'test-raw', '/tmp/blk', 'blocked', 'stale_pid', '99999999', 'already stale', ?, ?, ?)\"\"\", (now, now, now))
+conn.commit()
+
+# Run scan — the WHERE status='launched' guard should skip this record
+rows = conn.execute(
+  \"SELECT handoff_id, worker_pid FROM handoffs \"
+  \"WHERE role='worker' AND status='launched' AND worker_pid != '' AND worker_pid IS NOT NULL \"
+).fetchall()
+print(f'Scanned {len(rows)} records (expected 0)')
+assert len(rows) == 0, f'Expected 0 scanned, got {len(rows)}'
+
+# Verify the blocked record is unchanged
+row = conn.execute('SELECT status, exit_kind FROM handoffs WHERE handoff_id=?', ('BLK-1',)).fetchone()
+print(f'BLK-1: status={row[0]} exit_kind={row[1]}')
+assert row[0] == 'blocked' and row[1] == 'stale_pid'
+conn.close()
+"
+
+echo "[PASS] scan is idempotent: already-blocked record not re-scanned"

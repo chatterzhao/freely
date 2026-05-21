@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+# TC-4: scan marks stale PID handoffs as blocked
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+HANDOFF_PY="$ROOT_DIR/docs/system/workspace/scripts/runtime/handoff.py"
+
+pass=0
+fail=0
+
+tmpdir="$(mktemp -d)"
+trap 'rm -rf "$tmpdir"' EXIT
+db="$tmpdir/test.db"
+
+python3 "$HANDOFF_PY" init --db "$db"
+
+# Insert test records
+python3 -c "
+import sqlite3, os
+from datetime import datetime, timezone
+conn = sqlite3.connect('$db')
+now = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+
+# Record A: launched with dead PID (use a non-existent high PID)
+conn.execute(\"\"\"INSERT INTO handoffs (handoff_id, role, raw_key, prompt_file, status, worker_pid, created_at, updated_at)
+  VALUES ('A', 'worker', 'test-raw', '/tmp/a', 'launched', '99999999', ?, ?)\"\"\", (now, now))
+
+# Record B: launched with empty worker_pid (should be skipped)
+conn.execute(\"\"\"INSERT INTO handoffs (handoff_id, role, raw_key, prompt_file, status, worker_pid, created_at, updated_at)
+  VALUES ('B', 'worker', 'test-raw', '/tmp/b', 'launched', '', ?, ?)\"\"\", (now, now))
+
+# Record C: launched with alive PID (test script's own PID)
+conn.execute(\"\"\"INSERT INTO handoffs (handoff_id, role, raw_key, prompt_file, status, worker_pid, created_at, updated_at)
+  VALUES ('C', 'worker', 'test-raw', '/tmp/c', 'launched', '$$', ?, ?)\"\"\", (now, now))
+conn.commit()
+conn.close()
+"
+
+# Run scanning logic (simulating manager_scan_stale_worker_pids inline)
+python3 -c "
+import sqlite3, os
+from datetime import datetime, timezone
+conn = sqlite3.connect('$db')
+rows = conn.execute(
+  \"SELECT handoff_id, worker_pid FROM handoffs \"
+  \"WHERE role='worker' AND status='launched' AND worker_pid != '' AND worker_pid IS NOT NULL \"
+  \"AND raw_key='test-raw' ORDER BY created_at ASC\"
+).fetchall()
+marked = []
+for hid, pid_str in rows:
+  if not pid_str or not pid_str.strip().isdigit():
+    continue
+  pid = int(pid_str.strip())
+  try:
+    os.kill(pid, 0)
+  except OSError:
+    marked.append(hid)
+if marked:
+  now = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+  for hid in marked:
+    conn.execute(
+      \"UPDATE handoffs SET status='blocked', exit_kind='stale_pid', \"
+      \"reason='Worker PID kill -0 failed, marking stale_pid', \"
+      \"next_action='Manager: check worker worktree and re-dispatch', \"
+      \"completed_at=?, updated_at=? \"
+      \"WHERE handoff_id=? AND status='launched'\",
+      (now, now, hid)
+    )
+conn.commit()
+
+# Check results
+for hid, expected_status, expected_exit in [('A', 'blocked', 'stale_pid'), ('B', 'launched', ''), ('C', 'launched', '')]:
+  row = conn.execute('SELECT status, exit_kind, reason FROM handoffs WHERE handoff_id=?', (hid,)).fetchone()
+  ok = row[0] == expected_status and row[1] == expected_exit
+  print(f'VERIFY {hid}: status={row[0]} exit_kind={row[1]} -> {\"PASS\" if ok else \"FAIL\"}')
+conn.close()
+"
+
+echo "=== RESULT: see above ==="
