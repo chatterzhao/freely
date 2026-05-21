@@ -9319,6 +9319,10 @@ branch_is_merged_into_develop() {
   [[ "$target_branch" != "develop" ]] || return 1
   git -C "$project" show-ref --verify --quiet "refs/heads/$target_branch" 2>/dev/null || return 1
   git -C "$project" show-ref --verify --quiet "refs/heads/develop" 2>/dev/null || return 1
+  # Branch must have unique commits beyond develop — empty/new branches are NOT merged
+  local ahead
+  ahead=$(git -C "$project" rev-list --count "develop..$target_branch" 2>/dev/null || echo "0")
+  [[ "$ahead" -gt 0 ]] || return 1
   git -C "$project" merge-base --is-ancestor "refs/heads/$target_branch" "refs/heads/develop" 2>/dev/null
 }
 
