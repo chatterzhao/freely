@@ -5544,13 +5544,13 @@ routing_policy:
 ## M-20260521T012042Z-A
 - title: Manager keepalive stale-pid 扫描 + Worker ACP 初始化超时自愈
 - status: active
-- phase_state: needs_research (sub-problem 2) / dev_complete (sub-problem 1)
 ### candidate_issues
 1. `C-20260521T012042Z-A`
 - milestone: M-20260521T012042Z-A
-- status: dev_complete_sub1
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260521T012042Z-A/issue.md`
 - decision_reason: raw-20260521T012042Z (GitHub #1519) 来自 2026-05-20 Runtime Crash Postmortem。两个子问题：keepalive 不扫描 launched worker + ACP 初始化超时无自愈。子问题 1 有明确 fix 方向，子问题 2 与 C-20260519T015638Z-A 重叠需协调。
-- next_action: 子问题 2 与 C-20260519T015638Z-A 协调研究；子问题 1 dev 实现完成，等待 merge-guarded 合并到 develop
+- next_action: 子问题 2 与 C-20260519T015638Z-A 协调研究；子问题 1 合并到 develop
 - revisit_trigger: 子问题 1 merge 验证完成；子问题 2 根因研究有结论时整体 promote
 - acceptance_criteria:
   - [done] Manager keepalive 扫描所有 launched worker，kill -0 失败标记 stale_pid（实现完成，全部单元测试通过，见 `docs/progress/stale-pid-keepalive/p-I-20260521T012042Z-A.md`）

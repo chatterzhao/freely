@@ -4,7 +4,7 @@
 
 - candidate_format_version: v2
 - title: Manager keepalive 扫描 launched worker + Worker ACP 初始化超时自愈
-- status: promoted_sub1
+- status: promoted
 - priority: P1
 - source_raw: `raw-20260521T012042Z` (GitHub #1519)
 - decision_reason: 2026-05-20 Runtime Crash Postmortem 暴露两个关联的 worker 生命周期管理缺陷。子问题 1（keepalive 不扫描）有明确修复方向；子问题 2（ACP init 超时）与 C-20260519T015638Z-A 重叠需协调。合并为一个 candidate 因为共享同一代码域且修复链互补。
@@ -41,7 +41,7 @@
 - overlap / dependency:
   - C-20260519T015638Z-A (systematic stale_pid, gh-601): 研究 worker 在产出 handoff 前退出的根因。子问题 1 互补，子问题 2 重叠需协调。
 - acceptance_reviews: []
-- promoted_issue_path: ""
+- promoted_issue_path: "docs/issues/I-20260521T012042Z-A/issue.md"
 - milestone: M-20260521T012042Z-A
 - session_refs:
   - tool: claude-code
