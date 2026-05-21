@@ -5616,3 +5616,20 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260521T095313Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260521T095313Z--type-based-alias-resolution/candidates.md#C-20260521T095313Z-A`
+
+## M-20260521T115809Z-A
+- title: merge-guarded source branch name fix
+- status: active
+### candidate_issues
+1. `C-20260521T115809Z-A`
+- milestone: M-20260521T115809Z-A
+- status: promoted
+- decision_reason: raw-20260521T115809Z (GitHub #1820) — merge commit shows "forbidden" as source branch. One-line fix to remove extra parameter.
+- next_action: completed, merge to develop
+### completed_issues
+1. `I-20260521T115809Z-A`
+- title: merge-guarded source branch name fix
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260521T115809Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260521T115809Z--merge-message-forbidden-branch-name/candidates.md#C-20260521T115809Z-A`
