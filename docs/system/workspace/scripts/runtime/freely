@@ -17559,7 +17559,7 @@ import json,subprocess,sys
 hp='$_handoff_py'; db='$_db_path'
 rows=[]
 for role in ['manager','worker']:
-    for st in ['completed','consumed']:
+    for st in ['completed','consumed','blocked','rejected']:
         r=subprocess.run([sys.executable,hp,'list','--db',db,'--role',role,'--status',st],
                          capture_output=True,text=True,timeout=5)
         if r.returncode==0:
