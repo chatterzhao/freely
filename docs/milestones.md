@@ -5603,7 +5603,13 @@ routing_policy:
 ## M-20260521T095313Z-A
 - title: AI_TOOL alias type-based resolution
 - status: active
-### committed_issues
+### candidate_issues
+1. `C-20260521T095313Z-A`
+- milestone: M-20260521T095313Z-A
+- status: promoted
+- decision_reason: raw-20260521T095313Z (GitHub #1770) — AI_TOOL alias resolution fails for non-hardcoded patterns. Use type command instead of alias for unified cross-shell resolution.
+- next_action: completed, merge to develop
+### completed_issues
 1. `I-20260521T095313Z-A`
 - title: use type instead of alias for AI_TOOL alias resolution
 - milestone_state: completed
