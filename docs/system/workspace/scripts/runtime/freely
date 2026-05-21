@@ -752,10 +752,12 @@ parse_ai_spec() {
     exit 1
   }
 
-  case "$tool" in
+  local resolved_family
+  resolved_family="$(_resolve_tool_family "$tool")"
+  case "$resolved_family" in
     codex|kiro-cli|iflow|claude|cc|cc-use-codex-cli|opencode) ;;
     *)
-      log_warn "tool '$tool' not in known list, passing through for alias resolution"
+      log_warn "tool '$tool' resolved to unknown family '$resolved_family', continuing anyway"
       ;;
   esac
 
@@ -3246,33 +3248,53 @@ PY
   fi
 }
 
-# _resolve_tool_family: resolve alias to known tool family binary.
-# User creates any alias (e.g. cc-ds-auto, ccglm). Freely detects the
-# actual binary and applies the correct session/resume convention.
-# No code changes needed when adding new aliases.
+# _resolve_type_expansion: resolve a name via `type`, return the expansion.
+# Handles zsh ("is an alias for") and bash ("is aliased to") formats.
+_resolve_type_expansion() {
+  local name="$1" type_output
+  type_output=$(${SHELL:-bash} -ic "type '$name' 2>&1" 2>/dev/null) || true
+  if echo "$type_output" | grep -q 'is an alias for'; then
+    echo "$type_output" | sed 's/.*is an alias for //'
+  elif echo "$type_output" | grep -q 'is aliased to'; then
+    echo "$type_output" | sed 's/.*is aliased to .//; s/.$//'
+  fi
+}
+
+# _resolve_tool_family: resolve any alias/function/binary to known tool family.
+# Uses `type` for unified cross-shell resolution. No hardcoded prefix lists needed.
+# Supports recursive aliases (alias → another alias → binary).
 _resolve_tool_family() {
   local tool="$1"
   case "$tool" in
     codex|claude|cc|cc-use-codex-cli|kiro-cli|iflow|opencode) printf '%s\n' "$tool"; return 0 ;;
   esac
-  local resolved
-  resolved=$(${SHELL:-bash} -ic "alias '$tool' 2>/dev/null" 2>/dev/null | sed -n "s/^${tool}='\\(.*\\)'$/\\1/p")
-  if [[ -n "$resolved" ]]; then
-    local stripped="$resolved"
-    while [[ "$stripped" =~ ^[[:space:]]*[a-zA-Z_][a-zA-Z0-9_]*= ]]; do
-      local rest="${stripped#*=}"
-      if [[ "$rest" =~ ^\"([^\"]*)\"[[:space:]]*(.*) ]]; then
-        stripped="${BASH_REMATCH[2]}"
-      elif [[ "$rest" =~ ^\'([^\']*)\'[[:space:]]*(.*) ]]; then
-        stripped="${BASH_REMATCH[2]}"
-      else
-        rest="${rest#*[[:space:]]}"
-        stripped="$rest"
-      fi
-    done
-    local binary="${stripped%% *}"
+  local expansion binary
+  expansion=$(_resolve_type_expansion "$tool")
+  if [[ -z "${expansion:-}" ]]; then
+    local bin_output
+    bin_output=$(${SHELL:-bash} -ic "type '$tool' 2>&1" 2>/dev/null) || true
+    if echo "$bin_output" | grep -q ' is /'; then
+      expansion=$(echo "$bin_output" | sed 's/.* is //')
+    fi
+  fi
+  if [[ -n "${expansion:-}" ]]; then
+    binary="${expansion%% *}"
+    binary=$(basename "$binary" 2>/dev/null || echo "$binary")
     case "$binary" in
-      claude|codex|kiro-cli|iflow|opencode) printf '%s\n' "$binary"; return 0 ;;
+      claude)  printf 'claude\n'; return 0 ;;
+      codex|kiro-cli|iflow|opencode) printf '%s\n' "$binary"; return 0 ;;
+      *)
+        local rec_expansion rec_binary
+        rec_expansion=$(_resolve_type_expansion "$binary")
+        if [[ -n "${rec_expansion:-}" ]]; then
+          rec_binary="${rec_expansion%% *}"
+          rec_binary=$(basename "$rec_binary" 2>/dev/null || echo "$rec_binary")
+          case "$rec_binary" in
+            claude)  printf 'claude\n'; return 0 ;;
+            codex|kiro-cli|iflow|opencode) printf '%s\n' "$rec_binary"; return 0 ;;
+          esac
+        fi
+        ;;
     esac
   fi
   printf '%s\n' "$tool"

@@ -5599,3 +5599,20 @@ routing_policy:
 - milestone: M-20260521T032154Z-A
 - phase_state: done_b2_ibm
 - issue_path: `docs/issues/I-20260521T032154Z-A/issue.md`
+
+## M-20260521T095313Z-A
+- title: AI_TOOL alias type-based resolution
+- status: active
+### candidate_issues
+1. `C-20260521T095313Z-A`
+- milestone: M-20260521T095313Z-A
+- status: promoted
+- decision_reason: raw-20260521T095313Z (GitHub #1770) — AI_TOOL alias resolution fails for non-hardcoded patterns. Use type command instead of alias for unified cross-shell resolution.
+- next_action: completed, merge to develop
+### completed_issues
+1. `I-20260521T095313Z-A`
+- title: use type instead of alias for AI_TOOL alias resolution
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260521T095313Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260521T095313Z--type-based-alias-resolution/candidates.md#C-20260521T095313Z-A`
