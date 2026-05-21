@@ -5650,3 +5650,20 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260521T121158Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260521T121158Z--package-version-timestamp-format/candidates.md#C-20260521T121158Z-A`
+
+## M-20260521T122729Z-A
+- title: env var prefix stripping for alias resolution
+- status: active
+### candidate_issues
+1. `C-20260521T122729Z-A`
+- milestone: M-20260521T122729Z-A
+- status: promoted
+- decision_reason: raw-20260521T122729Z (GitHub #1917) — OpenCode alias expansion has env var prefix that regex couldn't strip
+- next_action: completed, merge to develop
+### completed_issues
+1. `I-20260521T122729Z-A`
+- title: env var prefix stripping
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260521T122729Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260521T122729Z--type-resolution-env-var-prefix/candidates.md#C-20260521T122729Z-A`
