@@ -531,7 +531,7 @@ def scan_classification(project: Path, platform_data: dict) -> list[dict]:
             "platform_issue": num,
             "incomplete": ["no_local_raw"],
             "ready": True,
-            "next_action": f"./bin/wt-create --source platform --raw-key {raw_key} --slug ..." if raw_key else f"gh issue view {num}",
+            "next_action": f"raw-issue-pull --raw-key {raw_key}" if raw_key else f"issue-sync create raw-{num} ; gh issue view {num}",
         })
 
     # Dedup: same base key + same stage → one record
@@ -903,7 +903,7 @@ def scan_platform_issues(project: Path, platform_data: dict) -> list[dict]:
                 "title": title,
                 "ready": True,
                 "incomplete": [],
-                "next_action": f"wt-create --source platform --raw-key {raw_key}" if raw_key else f"gh issue view {number}",
+                "next_action": f"raw-issue-pull --raw-key {raw_key} ; wt-create --source platform --raw-key {raw_key}" if raw_key else f"issue-sync create raw-{number}",
                 "next_station": "raw_created" if raw_key else "",
             })
 
@@ -1437,9 +1437,9 @@ CHAIN_ACTIONS = {
     "i_created": "创建 feature/raw-{key}-{slug} 工位，开始实现",
     "dev_worktree": "实现代码，推进 phase_state 到 done/completed",
     "dev_phase_done": "创建 code-review 证据，issue-sync create 推送到平台",
-    "platform_create": "merge 到 develop，issue-sync close 关闭平台 issue",
+    "platform_create": "issue-sync create 推送本地 issue 到平台",
     "merged_develop": "issue-sync close 关闭平台 issue",
-    "platform_close": "删除分支，退役工位",
+    "platform_close": "issue-sync close 关闭平台 issue",
     "branch_deleted": "退役工位（git worktree remove）",
 }
 
