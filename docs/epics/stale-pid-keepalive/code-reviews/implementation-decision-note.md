@@ -1,3 +1,6 @@
+---
+owner_issue: I-20260521T012042Z-A
+---
 ## Implementation Decision Note
 
 - decision: `在 keepalive supervisor 循环中增加 manager_scan_stale_worker_pids，对 launched worker PID 执行 kill -0 检测；handoff DB 加 worker_pid 字段，launch 时记录 PID，kill -0 失败标记 stale_pid`

@@ -1,3 +1,6 @@
+---
+owner_issue: I-20260521T012042Z-A
+---
 # Code Review: PRD — Manager keepalive kill -0 scanning
 
 **Reviewer:** B2_IBM (design review mode)
