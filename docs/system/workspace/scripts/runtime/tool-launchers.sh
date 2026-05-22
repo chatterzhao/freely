@@ -242,8 +242,8 @@ tool_supported_launch_kinds_for_adapter() {
   tool="$(_resolve_tool_family "$tool")"
   case "$tool:$adapter" in
     codex:acp)
-      # codex-acp does not yet support resume; fork = fresh + parent context
-      printf 'fresh\nfork\nfresh_with_handoff\n'
+      # codex-acp supports full ACP session lifecycle (Zed codex-acp)
+      printf 'fresh\nresume\nfork\nfresh_with_handoff\nprompt\n'
       ;;
     *:acp)
       # ACP native: session states + prompt (multi-turn delta)
