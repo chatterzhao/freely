@@ -301,6 +301,11 @@ _strip_env_prefix() {
 # Supports recursive aliases (alias → another alias → binary).
 _resolve_tool_family() {
   local tool="$1"
+  # Strip slot suffix: codex-apikey-xxx → codex, claude-account-xxx → claude
+  case "$tool" in
+    *-apikey-*) tool="${tool%%-apikey-*}" ;;
+    *-account-*) tool="${tool%%-account-*}" ;;
+  esac
   case "$tool" in
     codex|claude|cc|cc-use-codex-cli|kiro-cli|iflow|opencode) printf '%s\n' "$tool"; return 0 ;;
   esac
