@@ -17896,7 +17896,7 @@ tool_default_adapter_for_runtime() {
     printf '\n'
     return 0
   }
-  printf 'direct\n'
+  printf 'acp\n'
 }
 
 tool_supported_adapters_for_runtime() {
