@@ -1084,44 +1084,7 @@ cmd_login() {
         auth_mode="$(codex_prompt_login_mode)"
       fi
       if [[ "$auth_mode" == "apikey" ]]; then
-        local provider_name base_url api_key
-        local _login_line
-        local _login_index=0
-        while IFS= read -r _login_line; do
-          case "$_login_index" in
-            0) provider_name="$_login_line" ;;
-            1) base_url="$_login_line" ;;
-            2) api_key="$_login_line" ;;
-          esac
-          _login_index=$((_login_index + 1))
-        done < <(codex_collect_apikey_login_inputs)
-        if [[ -z "$provider_name" || -z "$base_url" || -z "$api_key" ]]; then
-          log_error "Codex API-key login requires provider name, base URL, and API key."
-          exit 2
-        fi
-        [[ "$DRY_RUN" == "true" ]] && {
-          log_info "[DRY-RUN] Would write codex API-key auth for provider '$provider_name' at '$base_url'"
-          return 0
-        }
-        codex_write_live_apikey_bundle "$provider_name" "$base_url" "$api_key"
-
-        local auth_file slot target_dir kind provider_id
-        auth_file="$(codex_live_auth_file)"
-        kind="$(codex_live_auth_kind "$auth_file")"
-        slot="$(resolve_codex_slot_name "$auth_file")"
-        target_dir="$(auth_slot_dir "codex" "$slot")"
-        provider_id="$(codex_effective_provider_id_for_kind "$kind" "$(codex_effective_live_provider_id "$auth_file")")"
-        codex_save_live_bundle_to_slot "$slot" "$target_dir"
-        write_tool_active_slot "codex" "$slot"
-        [[ -n "$provider_id" ]] && log_info "Provider: $provider_id"
-        log_info "Slot kind: $kind"
-        log_info "Slot: $slot"
-        log_info "Location: $target_dir"
-        notify_freely_auth_change "codex" "$slot" "login_success"
-
-        if [[ "$FORMAT" == "json" ]]; then
-          echo "{\"logged_in\": true, \"tool\": \"codex\", \"slot\": \"$slot\", \"slot_kind\": $(json_string_or_null "$kind"), \"provider_id\": $(json_string_or_null "$provider_id"), \"auth_email\": null, \"account\": null, \"saved\": true}"
-        fi
+        _login_apikey_alias "$tool"
         return 0
       fi
 
@@ -1178,11 +1141,10 @@ cmd_login() {
 # Slot dir: ~/.ai-auth/{tool}-apikey-{name}/settings.json
 # Alias:    {tool}-apikey-{name}="claude --settings {slot_dir}/settings.json"
 _login_apikey_alias() {
-  local tool="$1" slot_name slot_dir alias_name rc_file settings_path
+  local tool="$1" slot_name slot_dir alias_name rc_file config_file
   slot_name="${LOGIN_PROVIDER_NAME:-default}"
   slot_dir="$(auth_slot_dir "$tool" "apikey-${slot_name}")"
   alias_name="${tool}-apikey-${slot_name}"
-  settings_path="$slot_dir/settings.json"
 
   [[ "$DRY_RUN" == "true" ]] && {
     log_info "[DRY-RUN] Would create apikey slot: $slot_dir"
@@ -1190,60 +1152,39 @@ _login_apikey_alias() {
     return 0
   }
 
-  # Required: --url and --key
-  [[ -n "$LOGIN_BASE_URL" ]] || { log_error "apikey login requires --url <base_url>"; exit 2; }
-  [[ -n "$LOGIN_API_KEY" ]] || { log_error "apikey login requires --key <api_key>"; exit 2; }
-
   mkdir -p "$slot_dir"
 
-  # Generate settings file from parameters (not copy)
+  # Create empty template files (user fills in content)
   case "$tool" in
     claude|cc|cc-use-codex-cli)
-      local _model="${LOGIN_PROVIDER_NAME:-gpt-5.5}"
-      # If --name looks like a model name, use it as model
-      python3 - "$settings_path" "$LOGIN_BASE_URL" "$LOGIN_API_KEY" "$_model" <<'PY'
-import json, sys
-path, url, key, model = sys.argv[1:]
-d = {
-    "env": {
-        "ANTHROPIC_BASE_URL": url,
-        "ANTHROPIC_AUTH_TOKEN": key,
-        "ANTHROPIC_MODEL": model,
-        "ANTHROPIC_DEFAULT_OPUS_MODEL": model,
-        "ANTHROPIC_DEFAULT_SONNET_MODEL": model,
-        "ANTHROPIC_DEFAULT_HAIKU_MODEL": model.replace("gpt-5.5", "gpt-5.4").replace("deepseek-v4-pro", "deepseek-v4-flash")
-    },
-    "permissions": {"defaultMode": "bypassPermissions", "deny": [
-        "Bash(git push --force origin main:*)",
-        "Bash(git push --force origin develop:*)"
-    ]}
+      config_file="$slot_dir/settings.json"
+      cat > "$config_file" <<'JSON'
+{
+  "env": {},
+  "permissions": {"defaultMode": "bypassPermissions"}
 }
-with open(path, 'w') as f:
-    json.dump(d, f, indent=2, ensure_ascii=False)
-PY
+JSON
       ;;
     opencode)
-      local _model="${LOGIN_PROVIDER_NAME:-opencode/deepseek-v4-flash-free}"
-      python3 - "$settings_path" "$LOGIN_BASE_URL" "$LOGIN_API_KEY" "$_model" <<'PY'
-import json, sys
-path, url, key, model = sys.argv[1:]
-d = {
-    "permission": "allow",
-    "model": model,
-    "provider": {
-        "opencode": {
-            "api_key": key,
-            "base_url": url,
-            "models": {model.split("/")[-1] if "/" in model else model: {}}
-        }
-    }
+      config_file="$slot_dir/settings.json"
+      cat > "$config_file" <<'JSON'
+{
+  "permission": "allow",
+  "provider": {}
 }
-with open(path, 'w') as f:
-    json.dump(d, f, indent=2, ensure_ascii=False)
-PY
+JSON
+      ;;
+    codex)
+      config_file="$slot_dir/config.toml"
+      echo '{"OPENAI_API_KEY": ""}' > "$slot_dir/auth.json"
+      cat > "$config_file" <<'TOML'
+model_provider = ""
+
+[model_providers]
+TOML
       ;;
     *)
-      log_error "apikey settings generation not implemented for tool: $tool"
+      log_error "apikey not implemented for tool: $tool"
       exit 2
       ;;
   esac
@@ -1257,20 +1198,31 @@ PY
   if ! grep -qF "alias $alias_name=" "$rc_file" 2>/dev/null; then
     case "$tool" in
       claude|cc|cc-use-codex-cli)
-        echo "alias $alias_name=\"claude --settings $settings_path\"" >> "$rc_file" ;;
+        echo "alias $alias_name=\"claude --settings $config_file\"" >> "$rc_file" ;;
       opencode)
-        echo "alias $alias_name='OPENCODE_CONFIG=\"$settings_path\" opencode'" >> "$rc_file" ;;
+        echo "alias $alias_name='OPENCODE_CONFIG=\"$config_file\" opencode'" >> "$rc_file" ;;
+      codex)
+        echo "alias $alias_name='cd $slot_dir && codex'" >> "$rc_file" ;;
     esac
     log_info "Alias added: $alias_name"
   else
     log_info "Alias already exists: $alias_name"
   fi
 
-  # Remind about manual edits
-  log_info "Settings file: $settings_path"
-  log_info "Edit it to add: effort level, subagent model, additional permissions, etc."
-
   notify_freely_auth_change "$tool" "apikey-${slot_name}" "login_success"
+
+  # Remind user to edit config
+  echo ""
+  log_info "============================================"
+  log_info "Slot created successfully!"
+  log_info "  Tool:   $tool (apikey)"
+  log_info "  Alias:  $alias_name"
+  log_info "  Config: $config_file"
+  log_info ""
+  log_info ">>> Please edit the config file above to add"
+  log_info "    your API key, base URL, model, etc."
+  log_info "============================================"
+  echo ""
 }
 
 # 保存当前登录
