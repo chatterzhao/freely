@@ -1360,7 +1360,7 @@ slot_probe() {
   local prompt_file output_file rc pid slept partial_output
   prompt_file="$(mktemp)"
   output_file="$(mktemp)"
-  printf 'hi\n' >"$prompt_file"
+  printf 'say hi\n' >"$prompt_file"
   rc=0
 
   (
@@ -1443,7 +1443,7 @@ codex_probe_current_slot_now() {
   current_slot="$(codex_current_slot "$project" || true)"
   prompt_file="$(mktemp)"
   output_file="$(mktemp)"
-  printf 'hi\n' >"$prompt_file"
+  printf 'say hi\n' >"$prompt_file"
   rc=0
 
   # Run codex exec with project-scoped proxy resolution and timeout.
