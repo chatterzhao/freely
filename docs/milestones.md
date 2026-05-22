@@ -14,7 +14,7 @@
 ### completed_issues
 1. `I-20260430-0010-A`
 - title: Sync docs + fix governance-only paths for architecture docs
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260430-0010-A/issue.md`
 
@@ -30,7 +30,7 @@
 ### completed_issues
 1. `I-20260514T103532Z-A`
 - title: agent handoff protocol v2
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260514T103532Z-A/issue.md`
 
@@ -45,7 +45,7 @@
 ### completed_issues
 1. `I-20260514T050327Z-A`
 - title: fix while/then typo
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260514T050327Z-A/issue.md'
 
@@ -60,7 +60,7 @@
 ### completed_issues
 1. `I-20260514T022352Z-A`
 - title: remove hardcoded cc-ds-auto alias
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260514T022352Z-A/issue.md`
 
@@ -75,7 +75,7 @@
 ### completed_issues
 1. `I-20260514T005740Z-A`
 - title: generalize alias env prefix resolution
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260514T005740Z-A/issue.md`
 
@@ -90,7 +90,7 @@
 ### completed_issues
 1. `I-20260514T001746Z-A`
 - title: StdioTransport for opencode ACP
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260514T001746Z-A/issue.md`
 
@@ -105,7 +105,7 @@
 ### completed_issues
 1. `I-20260513T224509Z-A`
 - title: define sup_pid_file in start_project_runtime
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260513T224509Z-A/issue.md`
 
@@ -120,7 +120,7 @@
 ### completed_issues
 1. `I-20260513T160637Z-A`
 - title: start-lead-agent.sh backtick fix
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260513T160637Z-A/issue.md`
 
@@ -135,7 +135,7 @@
 ### completed_issues
 1. `I-20260513T120734Z-A`
 - title: increase RESTART_STORM_COUNT 4→10
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260513T120734Z-A/issue.md`
 
@@ -150,7 +150,7 @@
 ### completed_issues
 1. `I-20260513T075847Z-A`
 - title: scan emits platform_only for non-raw-key issues
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260513T075847Z-A/issue.md`
 
@@ -165,7 +165,7 @@
 ### completed_issues
 1. `I-20260513T075904Z-A`
 - title: merge-guarded post-merge sync phase_state fix
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260513T075904Z-A/issue.md`
 
@@ -180,7 +180,7 @@
 ### completed_issues
 1. `I-20260513T080636Z-A`
 - title: update stale ACP issue phase_state to completed
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260513T080636Z-A/issue.md`
 
@@ -195,7 +195,7 @@
 ### completed_issues
 1. `I-20260503T1428Z-A`
 - title: bridge disconnect fix
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260503T1428Z-A/issue.md`
 
@@ -210,7 +210,7 @@
 ### committed_issues
 1. `I-20260511T0731Z-A`
 - title: 同工位并发防护
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260511T0731Z-A/issue.md`
 
@@ -225,7 +225,7 @@
 ### committed_issues
 1. `I-20260511T0407Z-A`
 - title: handoff 表加 worker 汇报字段
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260511T0407Z-A/issue.md`
 
@@ -240,7 +240,7 @@
 ### committed_issues
 1. `I-20260511T0245Z-A`
 - title: DB 路径统一
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260511T0245Z-A/issue.md`
 
@@ -255,7 +255,7 @@
 ### committed_issues
 1. `I-20260511T0229Z-A`
 - title: worker prompt 注入 handoff 汇报指令
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260511T0229Z-A/issue.md`
 
@@ -270,7 +270,7 @@
 ### committed_issues
 1. `I-20260511T0019Z-A`
 - title: sync 管道改直接 SQLite 查询
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260511T0019Z-A/issue.md`
 
@@ -285,7 +285,7 @@
 ### committed_issues
 1. `I-20260510T1853Z-A`
 - title: 分支+工位完整性检查
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260510T1853Z-A/issue.md`
 
@@ -300,7 +300,7 @@
 ### committed_issues
 1. `I-20260510T1840Z-A`
 - title: 分支校验不可绕过
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260510T1840Z-A/issue.md`
 
@@ -315,7 +315,7 @@
 ### committed_issues
 1. `I-20260510T1339Z-A`
 - title: wt-create 创建顺序重构
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260510T1339Z-A/issue.md`
 
@@ -330,7 +330,7 @@
 ### committed_issues
 1. `I-20260510T1326Z-A`
 - title: init 分支名校验
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260510T1326Z-A/issue.md`
 
@@ -345,7 +345,7 @@
 ### committed_issues
 1. `I-20260510T1318Z-A`
 - title: handoff.py insert 支持 exit_kind
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260510T1318Z-A/issue.md`
 
@@ -360,7 +360,7 @@
 ### committed_issues
 1. `I-20260510T0856Z-A`
 - title: mode_just_switched 豁免
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260510T0856Z-A/issue.md`
 
@@ -375,7 +375,7 @@
 ### committed_issues
 1. `I-20260510T0112Z-A`
 - title: L223 task_mode wait 判断修复
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260510T0112Z-A/issue.md`
 
@@ -390,7 +390,7 @@
 ### committed_issues
 1. `I-20260508T045527Z-A`
 - title: 删除废弃扫描脚本
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T045527Z-A/issue.md`
 
@@ -405,7 +405,7 @@
 ### committed_issues
 1. `I-20260508T050922Z-A`
 - title: 门禁收口链路修复
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T050922Z-A/issue.md`
 
@@ -460,7 +460,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260508T120000Z-A`
 - title: wt-create fix
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260508T120000Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260508T120000Z--wt-create-fix/candidates.md`
@@ -478,7 +478,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260507T143546Z-A`
 - title: platform pull title standardization
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260507T143546Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507T143546Z--platform-pull-standardize/candidates.md`
@@ -495,7 +495,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260508T005431Z-A`
 - title: skill standardization
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260508T005431Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260508T005431Z--skill-standardize/candidates.md`
@@ -512,7 +512,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260507T143545Z-A`
 - title: timestamp seconds upgrade
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260507T143545Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507T143545Z--timestamp-seconds-upgrade/candidates.md`
@@ -529,7 +529,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260508T004541Z-A`
 - title: skill ref cleanup
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260508T004541Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260508T004541Z--skill-ref-cleanup/candidates.md`
@@ -547,7 +547,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260508T011858Z-A`
 - title: skill gate alignment
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260508T011858Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260508T011858Z--skill-gate-alignment/candidates.md`
@@ -564,7 +564,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260507T143544Z-A`
 - title: raw-issue-pull interception guard + CLI dispatch
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `in_dev`
 - issue_path: `docs/issues/I-20260507T143544Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507T143544Z--intercept-guard/candidates.md`
@@ -581,7 +581,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260507T0700Z-A`
 - title: unified platform layer
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `in_dev`
 - issue_path: `docs/issues/I-20260507T0700Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507-unified-platform/candidates.md`
@@ -597,7 +597,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260507T0730Z-A`
 - title: wt-create --source parameter
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `in_dev`
 - issue_path: `docs/issues/I-20260507T0730Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507-source-param/candidates.md`
@@ -613,7 +613,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260507T0600Z-A`
 - title: raw-issue-pull
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `in_dev`
 - issue_path: `docs/issues/I-20260507T0600Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507-raw-issue-pull/candidates.md`
@@ -629,7 +629,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260507T0300Z-A`
 - title: GATE 1 timestamp check
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `in_dev`
 - issue_path: `docs/issues/I-20260507T0300Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507-gate1-timestamp/candidates.md`
@@ -645,7 +645,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260507T0200Z-A`
 - title: promoted gate fix
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `in_dev`
 - issue_path: `docs/issues/I-20260507T0200Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507-promoted-gate-fix/candidates.md`
@@ -661,7 +661,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260507T0100Z-A`
 - title: fix-execution branch naming
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `in_dev`
 - issue_path: `docs/issues/I-20260507T0100Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507-fix-branch-naming/candidates.md`
@@ -680,7 +680,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260506T1400Z-A`
 - title: merge-guarded fix/* whitelist
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `in_dev`
 - issue_path: `docs/issues/I-20260506T1400Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260506-merge-guarded-fix/candidates.md`
@@ -707,7 +707,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260506T1200Z-A`
 - title: Skill rename to B1_IBM/B2_IBM + I→B→M skeleton
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `in_dev`
 - issue_path: `docs/issues/I-20260506T1200Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260506-ibm-skill-rename/candidates.md`
@@ -735,7 +735,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260506T1230Z-A`
 - title: wt-create dual worktree creation
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `absorbed`
 - issue_path: `docs/issues/I-20260506T1230Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260506-wt-create-dual/candidates.md`
@@ -759,7 +759,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260503-0200-A`
 - title: scan: switch to task-lifecycle-scan v2 with full lifecycle chain trace
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/scan-lifecycle-migration/issues/I-20260503-0200-A.md`
@@ -769,7 +769,7 @@ routing_policy:
 
 30. `I-20260513T010343Z-A`
 - title: raw key seconds format cleanup — 4 regex fixes + 10+ doc updates
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/issues/I-20260513T010343Z-A/issue.md`
@@ -784,7 +784,7 @@ routing_policy:
 
 8. `I-20260502-0500-C`
 - title: Token 花费优化
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: docs/epics/token-cost-optimization/issues/token-cost-optimization.md
@@ -797,7 +797,7 @@ routing_policy:
 
 9. `I-20260502-1028-A`
 - title: fix: clean stale start lock before daemon stop
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `done`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/stale-start-lock-cleanup/issues/I-20260502-1028-A.md`
@@ -812,7 +812,7 @@ routing_policy:
 
 10. `I-20260503-0000-A`
 - title: fix: ACP bridge crash resilience with self-healing
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `done_ibm`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/acp-bridge-crash-resilience/issues/I-20260503-0000-A.md`
@@ -827,7 +827,7 @@ routing_policy:
 
 11. `I-20260503-0000-B`
 - title: feat: add fix-execution skill for rapid bug fix workflow
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/fix-execution-skill/issues/I-20260503-0000-B.md`
@@ -842,7 +842,7 @@ routing_policy:
 
 12. `I-20260503-0115-A`
 - title: fix: sync acp-bridge hash-based socket paths across bash and Python
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/acp-bridge-path-sync/issues/I-20260503-0115-A.md`
@@ -856,7 +856,7 @@ routing_policy:
 
 8. `I-20260421-1530-A`
 - title: Live-status scan summary and prompt anchor governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `in_verification`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/issues/live-status-scan-summary-and-prompt-anchor-governance.md`
@@ -889,7 +889,7 @@ routing_policy:
 
 25. `I-20260429-2000-A`
 - title: Gate dev experience: --range pre-flight + secret detection FP fix
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/gate-dev-experience-preflight/issues/I-20260429-2000-A.md`
@@ -907,7 +907,7 @@ routing_policy:
 
 26. `I-20260503T0915Z-enforce-test-pre-merge`
 - title: Enforce test-pre-merge gate for ALL develop-bound merges
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/test-pre-merge-enforcement/issues/I-20260503T0915Z-enforce-test-pre-merge.md`
@@ -921,7 +921,7 @@ routing_policy:
 
 29. `I-20260505T1210Z-A-C`
 - title: governance gate state consistency + schema validation
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `in_dev`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/issue-state-refactor/issues/I-20260505T1210Z-A-C.md`
@@ -935,7 +935,7 @@ routing_policy:
 
 28. `I-20260505T1210Z-A-B`
 - title: issue-sync 只写 platform_state
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `in_dev`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/issue-state-refactor/issues/I-20260505T1210Z-A-B.md`
@@ -949,7 +949,7 @@ routing_policy:
 
 27. `I-20260505T1210Z-A`
 - title: scan 常量对齐 IBM Framework §89 + 迁移现有 issue
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `in_dev`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/issue-state-refactor/issues/I-20260505T1210Z-A.md`
@@ -968,7 +968,7 @@ routing_policy:
 
 7. `I-20260502-0500-A`
 - title: Freely 打包与自举验证
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: docs/issues/I-20260502-0500-A/issue.md
@@ -989,7 +989,7 @@ routing_policy:
 
 8. `I-20260501-0000-A`
 - title: PR scan surface + FREELY_REPO_PLATFORMS config
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `in_verification`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/scan-pr-platform-config/issues/I-20260501-0000-A.md`
@@ -1000,7 +1000,7 @@ routing_policy:
 
 9. `I-20260503T1235Z-A`
 - title: feat: add skip_continuity_recovery guard for first-round worker startup
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/issues/I-20260503T1235Z-A/issue.md`
@@ -1641,7 +1641,7 @@ routing_policy:
 
 0. `I-20260504T1132Z-A`
 - title: raw key 格式统一：所有代码接受 YYYYMMDDTHHMMZ 和 YYYYMMDD-HHMM 双格式
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/raw-key-format-unify/issues/I-20260504T1132Z-A.md`
@@ -1653,7 +1653,7 @@ routing_policy:
 
 1. `I-20260421-1200-A`
 - title: Runtime daemon self-loop followthrough governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
@@ -1667,7 +1667,7 @@ routing_policy:
 
 1. `I-20260419-0915-A`
 - title: Three-loop lifecycle single-source governance followthrough
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
@@ -1682,7 +1682,7 @@ routing_policy:
 
 1. `I-20260421-1330-A`
 - title: Absorbed merged lane routing followthrough governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/issues/absorbed-merged-lane-routing-followthrough-governance.md`
@@ -1724,7 +1724,7 @@ routing_policy:
 
 1. `I-20260413-0420-D`
 - title: Manager startup continuity materialization governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/issues/manager-startup-continuity-materialization-governance.md`
@@ -1750,7 +1750,7 @@ routing_policy:
 
 1. `I-20260413-0420-A`
 - title: Runtime startup authority and readiness governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/issues/runtime-startup-authority-and-readiness-governance.md`
@@ -1772,7 +1772,7 @@ routing_policy:
 
 1. `I-20260413-0420-C`
 - title: Runtime startup root-cause packet governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-startup-root-cause-packet-governance/issues/runtime-startup-root-cause-packet-governance.md`
@@ -1792,7 +1792,7 @@ routing_policy:
 
 1. `I-20260413-0420-B`
 - title: Manager startup continuity contract governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/issues/manager-startup-continuity-contract-governance.md`
@@ -1810,7 +1810,7 @@ routing_policy:
 
 1. `I-20260413-0208-A`
 - title: Foreground/background runtime entrypoint semantics governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/issues/foreground-background-runtime-entrypoint-semantics-governance.md`
@@ -1831,7 +1831,7 @@ routing_policy:
 
 1. `I-20260412-1845-A`
 - title: Runtime forensic time alignment and stall recovery observability governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/issues/runtime-forensic-time-alignment-and-stall-recovery-observability-governance.md`
@@ -1868,7 +1868,7 @@ routing_policy:
 - completion_note: The bounded develop push followthrough is now canonical: guarded `develop` merges expose one explicit attempt, blocked deliveries write `push_blocked`, and the current owner has already been merged and delivered to `origin/develop`.
 1. `I-20260411-1415-A`
 - title: Pre-tests adequacy item schema materialization governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/issues/pretests-adequacy-item-schema-materialization-governance.md`
@@ -1887,7 +1887,7 @@ routing_policy:
 - completion_note: `Adequacy-v2 schema, guarded develop promote sufficiency, owner-scoped staged review freshness, and explicit premerge-integration develop-merge coverage are all closed in the feature lane. Replay to canonical develop is the next step; this lane no longer needs more implementation work.`
 1. `I-20260411-1414-A`
 - title: Launch-time verification contract hard gate governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/launch-time-verification-contract-hard-gate-governance/issues/launch-time-verification-contract-hard-gate-governance.md`
@@ -1911,7 +1911,7 @@ routing_policy:
 - completion_note: `The runtime now fails closed on incomplete launch-time verification contracts, preserves machine-readable blocked diagnostics, and refreshes stale discovery before delegated launch; the next lifecycle step is guarded premerge promotion into develop.`
 1. `I-20260411-1416-A`
 - title: Pre-tests cleanup and retirement enforcement governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/issues/pre-tests-cleanup-and-retirement-enforcement-governance.md`
@@ -1927,7 +1927,7 @@ routing_policy:
 - completion_note: `Cleanup and retirement now consume the recorded issue-bound pre-tests truth, retain merged worktrees when closure evidence is missing, and escalate retained cleanup through manager continuation; the next lifecycle step is guarded premerge promotion into develop.`
 1. `I-20260411-1417-A`
 - title: Stale pre-brainstorm truth reconcile governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/stale-prebrainstorm-truth-reconcile-governance/issues/stale-prebrainstorm-truth-reconcile-governance.md`
@@ -1939,7 +1939,7 @@ routing_policy:
 - completion_note: `The representative stale-truth reconcile batch is now canonical on develop, and future stale-pattern work should open a fresh bounded follow-on owner instead of reopening this one.`
 1. `I-20260408-0231-A`
 - title: Runtime concurrent start-stop followthrough governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/issues/runtime-concurrent-start-stop-followthrough-governance.md`
@@ -1961,7 +1961,7 @@ routing_policy:
 
 1. `I-20260411-0217-A`
 - title: Protected-merge unparseable-subject receipt-gap governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
@@ -1978,7 +1978,7 @@ routing_policy:
 
 1. `I-20260410-1430-A`
 - title: Fix preferred_auth_method lost when switching to account slot
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/preferred-auth-method-account-switch-fix.md`
@@ -1992,7 +1992,7 @@ routing_policy:
 
 1. `I-20260405-2358-D`
 - title: CLI help and dry-run contract followthrough governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/cli-help-and-dry-run-contract-followthrough-governance/issues/cli-help-and-dry-run-contract-followthrough-governance.md`
@@ -2013,7 +2013,7 @@ routing_policy:
 
 1. `I-20260407-0215-A`
 - title: Runtime self-host continuity gap and status truth governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
@@ -2033,7 +2033,7 @@ routing_policy:
 
 1. `I-20260408-1200-A`
 - title: Develop push followthrough escalation governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md`
@@ -2054,7 +2054,7 @@ routing_policy:
 
 1. `I-20260405-1415-A`
 - title: ai-switch-cli extraction threshold and skeleton disposition governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
@@ -2071,7 +2071,7 @@ routing_policy:
 
 1. `I-20260409-1715-A`
 - title: Runtime evidence provenance research retirement followthrough governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-evidence-provenance-research-retirement-followthrough-governance/issues/runtime-evidence-provenance-research-retirement-followthrough-governance.md`
@@ -2091,7 +2091,7 @@ routing_policy:
 
 1. `I-20260408-1205-A`
 - title: Verification contract and premerge adequacy governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
@@ -2111,7 +2111,7 @@ routing_policy:
 
 2. `I-20260407-0023-A`
 - title: Codex auto switch probe apikey fallback governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/codex-auto-switch-probe-apikey-fallback-governance/issues/codex-auto-switch-probe-apikey-fallback-governance.md`
@@ -2127,7 +2127,7 @@ routing_policy:
 
 3. `I-20260412-0225-A`
 - title: Structured closeout gate context and fresh review evidence governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md`
@@ -2154,7 +2154,7 @@ routing_policy:
 
 3. `I-20260410-1835-B`
 - title: Codex real exec switch and after-failure recovery governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/codex-real-exec-switch-and-after-failure-recovery-governance/issues/codex-real-exec-switch-and-after-failure-recovery-governance.md`
@@ -2176,7 +2176,7 @@ routing_policy:
 
 2. `I-20260406-1829-A`
 - title: Codex current-live apikey bootstrap without saved-slot inventory governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/codex-current-live-apikey-bootstrap-without-saved-slot-governance/issues/codex-current-live-apikey-bootstrap-without-saved-slot-governance.md`
@@ -2196,7 +2196,7 @@ routing_policy:
 
 3. `I-20260406-1851-A`
 - title: Codex interactive login and API-key input flow governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/codex-interactive-login-and-apikey-input-flow-governance/issues/codex-interactive-login-and-apikey-input-flow-governance.md`
@@ -2218,7 +2218,7 @@ routing_policy:
 
 4. `I-20260406-0901-A`
 - title: Codex reconnect probe fast-fail and runtime network classification governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/issues/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
@@ -2242,7 +2242,7 @@ routing_policy:
 
 1. `I-20260406-1105-A`
 - title: Milestone completed-queue closeout governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/milestone-completed-queue-closeout-governance/issues/milestone-completed-queue-closeout-governance.md`
@@ -2260,7 +2260,7 @@ routing_policy:
 
 2. `I-20260406-0045-A`
 - title: Governance-check protected-merge history source policy governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/governance-check-protected-merge-history-source-policy-governance/issues/governance-check-protected-merge-history-source-policy-governance.md`
@@ -2279,7 +2279,7 @@ routing_policy:
 
 3. `I-20260405-2358-C`
 - title: CLI wrapper packaging and regression-surface governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/cli-wrapper-packaging-and-regression-surface-governance/issues/cli-wrapper-packaging-and-regression-surface-governance.md`
@@ -2296,7 +2296,7 @@ routing_policy:
 
 4. `I-20260404-1545-A`
 - title: Runtime blocked intake and continuity truth governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md`
@@ -2313,7 +2313,7 @@ routing_policy:
 
 5. `I-20260405-1914-A`
 - title: Test lane routing and enforcement governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/test-lane-routing-and-enforcement-governance/issues/test-lane-routing-and-enforcement-governance.md`
@@ -2327,7 +2327,7 @@ routing_policy:
 
 6. `I-20260405-1805-A`
 - title: Test-pre-merge family promotion gate enforcement governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/test-pre-merge-family-promotion-gate-enforcement-governance/issues/test-pre-merge-family-promotion-gate-enforcement-governance.md`
@@ -2341,7 +2341,7 @@ routing_policy:
 
 7. `I-20260405-1615-A`
 - title: Feature-owned test-pre-merge family promotion model governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md`
@@ -2355,7 +2355,7 @@ routing_policy:
 
 8. `I-20260404-0640-A`
 - title: Protected-branch merge receipt gap followthrough
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
@@ -2373,7 +2373,7 @@ routing_policy:
 - completion_note: `Canonical develop now audits trailerless protected-ancestry merges by their actual merge subject, so gap 70ef97d and the same-day receiptless ancestry set pass under the ordinary backfill ledger. The blocker-triage branch/worktree was retired after post-merge verification passed.`
 9. `I-20260404-2148-A`
 - title: Slot-switch startup preflight and lock observability governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
@@ -2394,7 +2394,7 @@ routing_policy:
 - completion_note: `Canonical develop now enforces bounded slot-switch startup preflight and lock observability, and the closeout lane recorded the ordinary protected-merge receipt gap repair plus post-merge verification before retirement.`
 3. `I-20260405-1215-A`
 - title: Runtime audio notifier and sound semantics governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/issues/runtime-audio-notifier-and-sound-semantics-governance.md`
@@ -2416,7 +2416,7 @@ routing_policy:
 - completion_note: `Canonical develop now emits stable AudioCueRequested events for the bounded manager/worker start-and-complete matrix, and the bundled probe host ships the four standard wav assets without widening into fallback playback or transcript-listener semantics.`
 4. `I-20260405-0027-A`
 - title: Codex API-key slot bundle and provider-aware probe governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
@@ -2439,7 +2439,7 @@ routing_policy:
 - completion_note: `Canonical develop now treats Codex auth as a bundle of auth truth plus provider-aware config fragment, preserves cross-kind account/apikey switching semantics, and keeps exec-only apikey probing separate from OAuth-backed account inventory without widening into non-Codex parity or standalone extraction.`
 5. `I-20260405-2055-A`
 - title: Restart slot-switch preflight preserves active runtime governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/restart-slot-switch-preflight-preserves-active-runtime-governance/issues/restart-slot-switch-preflight-preserves-active-runtime-governance.md`
@@ -2468,7 +2468,7 @@ routing_policy:
 
 1. `I-20260402-0020-A`
 - title: Hook bypass break-glass governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/issues/protected-branch-hook-bypass-breakglass-governance.md`
@@ -2478,7 +2478,7 @@ routing_policy:
 - completion_note: `Canonical develop absorbed protected-branch break-glass governance through receipt-bearing merge 52f55c0, and the closeout lane recorded both historical break-glass receipts and post-merge verification evidence.`
 2. `I-20260403-1100-A`
 - title: Governance chain legacy repair for develop push unblock
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md`
@@ -2494,7 +2494,7 @@ routing_policy:
 - completion_note: The 2026-04-04 truth-repair merge restored the missing `1100` owner artifacts, retired deleted `1200/1201/1202/1203` slices to historical status, and cleared dangling canonical references. Any future governance-chain backfill must reopen from current `develop` as a new lifecycle instead of reviving `1100` as an active owner.
 3. `I-20260403-2245-A`
 - title: Sandbox-compatible runtime bootstrap and operator-state governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/issues/sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
@@ -2517,7 +2517,7 @@ routing_policy:
 - completion_note: Canonical `develop` absorbed the sandbox-compatible operator-state fallback and the degraded PID ownership followthrough through merges `1eddbcd` and `45bed28`; this closeout lane only writes back completed lifecycle truth so future sandbox/runtime gaps reopen as new owners on current `develop`.
 4. `I-20260404-0119-A`
 - title: Governance merge gate milestone status followthrough governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md`
@@ -2537,7 +2537,7 @@ routing_policy:
 - completion_note: Canonical `develop` absorbed the narrow `parse_milestones()` queue-scope repair through merge `908a6ad`; this closeout lane only writes back completed lifecycle truth so any future nested-field parser regressions reopen as new owners on current `develop`.
 5. `I-20260404-0232-A`
 - title: Governance merge gate review-aware regression alignment governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/issues/governance-merge-gate-review-aware-regression-alignment-governance.md`
@@ -2557,7 +2557,7 @@ routing_policy:
 - completion_note: Canonical `develop` absorbed the review-aware mixed-regression fixture refresh and the same-file borrowed-owner block restoration through merge `0bb78ce`; this closeout lane only writes back completed lifecycle truth so future merge-gate residuals reopen as new owners on current `develop`.
 6. `I-20260404-1405-A`
 - title: Manager bootstrap prompt publication without continuity materialization governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
@@ -2573,7 +2573,7 @@ routing_policy:
 - completion_note: Canonical `develop` absorbed the bounded bootstrap grace fix and the `## Worker Dispatch` continuity parser repair through merge `8d29609`; this closeout lane only realigns milestone, issue, and progress truth so future restart-churn work reopens as a new owner instead of reviving `1405`.
 1. `I-20260402-0455-A`
 - title: Worktree exclusive ownership and promotion lease governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/issues/worktree-exclusive-ownership-and-promotion-lease-governance.md`
@@ -2593,7 +2593,7 @@ routing_policy:
 
 2. `I-20260401-2354-A`
 - title: Implementation decision notes in issue-bound review artifacts
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/issues/implementation-decision-notes-in-issue-review-artifacts-governance.md`
@@ -2612,7 +2612,7 @@ routing_policy:
 
 2. `I-20260401-1831-A`
 - title: Worker reactivation and local reentry residual runtime governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/worker-reactivation-and-local-reentry-residual-runtime-governance/issues/worker-reactivation-and-local-reentry-residual-runtime-governance.md`
@@ -2630,7 +2630,7 @@ routing_policy:
 
 1. `I-20260402-0540-A`
 - title: Runtime loop log timezone label followthrough governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-loop-log-timezone-label-followthrough-governance/issues/runtime-loop-log-timezone-label-followthrough-governance.md`
@@ -2646,7 +2646,7 @@ routing_policy:
 
 1. `I-20260401-1545-A`
 - title: ACP optional adapter boundary governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/acp-optional-adapter-boundary-governance/issues/acp-optional-adapter-boundary-governance.md`
@@ -2660,7 +2660,7 @@ routing_policy:
 
 2. `I-20260401-2245-A`
 - title: Build artifact exposure and release allowlist audit governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/build-artifact-exposure-and-release-allowlist-audit-governance/issues/build-artifact-exposure-and-release-allowlist-audit-governance.md`
@@ -2678,7 +2678,7 @@ routing_policy:
 
 3. `I-20260402-0308-A`
 - title: Runtime human-readable time display governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md`
@@ -2697,7 +2697,7 @@ routing_policy:
 
 3. `I-20260401-0115-A`
 - title: Supply-chain baseline and install-intake audit governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/supply-chain-baseline-and-install-intake-audit-governance/issues/supply-chain-baseline-and-install-intake-audit-governance.md`
@@ -2717,7 +2717,7 @@ routing_policy:
 
 3. `I-20260401-1308-A`
 - title: Agent execution safety review and security decision support
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md`
@@ -2741,7 +2741,7 @@ routing_policy:
 
 2. `I-20260401-1703-A`
 - title: Runtime adapter axis and per-tool adapter selection
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-adapter-axis-and-per-tool-adapter-selection/issues/runtime-adapter-axis-and-per-tool-adapter-selection.md`
@@ -2755,7 +2755,7 @@ routing_policy:
 
 3. `I-20260401-1545-A-01`
 - title: Codex ACP fresh-path prototype
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/codex-acp-fresh-path-prototype/issues/codex-acp-fresh-path-prototype.md`
@@ -2769,7 +2769,7 @@ routing_policy:
 
 1. `I-20260328-2105-A`
 - title: Codex verified resume evidence governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/codex-verified-resume-evidence-governance/issues/codex-verified-resume-evidence-governance.md`
@@ -2783,7 +2783,7 @@ routing_policy:
 
 1. `I-20260325-0333-B`
 - title: Story-level pre-tests quality gate governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/issues/story-level-pre-tests-quality-gate-governance.md`
@@ -2799,7 +2799,7 @@ routing_policy:
 
 1. `I-20260519-0333-C`
 - title: Testing evidence ladder and gate mapping
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `done_b2_ibm`
 - priority: P0
 - issue_path: `docs/issues/I-20260519-0333-C/issue.md`
@@ -2819,7 +2819,7 @@ routing_policy:
 
 1. `I-20260331-2012-A`
 - title: Active milestone placement and consumption gate governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/active-milestone-placement-and-consumption-gate-governance/issues/active-milestone-placement-and-consumption-gate-governance.md`
@@ -2833,7 +2833,7 @@ routing_policy:
 
 1. `I-20260331-1840-A`
 - title: Multi-tool availability manager governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/issues/multi-tool-auto-switch-v1-codex-fallback-governance.md`
@@ -2847,7 +2847,7 @@ routing_policy:
 
 1. `I-20260401-0840-A`
 - title: All-tools unified slot contract governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/issues/all-tools-unified-slot-contract-governance.md`
@@ -2861,7 +2861,7 @@ routing_policy:
 
 1. `I-20260330-2358-A`
 - title: Runtime network failure taxonomy and bounded recovery governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-network-failure-taxonomy-and-bounded-recovery-governance/issues/runtime-network-failure-taxonomy-and-bounded-recovery-governance.md`
@@ -2875,7 +2875,7 @@ routing_policy:
 
 1. `I-20260331-1830-A`
 - title: Kiro CLI runtime availability failure governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/kiro-cli-runtime-availability-failure-governance/issues/kiro-cli-runtime-availability-failure-governance.md`
@@ -2889,7 +2889,7 @@ routing_policy:
 
 1. `I-20260330-2318-A`
 - title: Manager attach reuse missing-AI repair governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/manager-attach-reuse-missing-ai-repair-governance/issues/manager-attach-reuse-missing-ai-repair-governance.md`
@@ -2903,7 +2903,7 @@ routing_policy:
 
 1. `I-20260321-1835-A`
 - title: Develop merge issue binding and C/M/I gate governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/develop-merge-issue-binding-and-cmi-governance/issues/develop-merge-issue-binding-and-cmi-governance.md`
@@ -2918,7 +2918,7 @@ routing_policy:
 
 1. `I-20260324-0415`
 - title: Application-native runtime observation contract and observability planes
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
@@ -2931,7 +2931,7 @@ routing_policy:
 
 1. `I-20260327-0651`
 - title: Project-scoped network proxy configuration and launcher inheritance governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/issues/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance.md`
@@ -2943,7 +2943,7 @@ routing_policy:
 
 2. `I-20260327-0701`
 - title: Pre-tests evidence binding and completion gate governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/issues/pre-tests-evidence-binding-and-completion-gate-governance.md`
@@ -2955,7 +2955,7 @@ routing_policy:
 
 3. `I-20260410-1835-A`
 - title: Auth switch real-environment and end-to-end adequacy governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/auth-switch-real-environment-and-e2e-adequacy-governance/issues/auth-switch-real-environment-and-e2e-adequacy-governance.md`
@@ -2970,7 +2970,7 @@ routing_policy:
 
 3. `I-20260327-1115`
 - title: OAuth slot inventory sweep and launch-time confirmation governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/issues/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance.md`
@@ -2982,7 +2982,7 @@ routing_policy:
 
 1. `I-20260307-1201`
 - title: 源分类、milestone-owned issue 与派生 worktree 路由治理
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/source-routing-and-derived-worktree-governance/issues/source-routing-and-derived-worktree-governance.md`
@@ -2995,7 +2995,7 @@ routing_policy:
 
 2. `I-20260319-0018`
 - title: Token-efficient session continuity and rotation governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
@@ -3008,7 +3008,7 @@ routing_policy:
 
 3. `I-20260319-0148`
 - title: Context-compaction continuity guard salvage
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/context-compaction-continuity-guard-salvage/issues/context-compaction-continuity-guard-salvage.md`
@@ -3021,7 +3021,7 @@ routing_policy:
 
 2. `I-20260321-0217`
 - title: Claude Code tool profiles and Codex MCP session evidence governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/claude-code-codex-mcp-runtime-governance/issues/claude-code-codex-mcp-runtime-governance.md`
@@ -3034,7 +3034,7 @@ routing_policy:
 
 3. `I-20260321-1745`
 - title: Active lifecycle boundary and dogfooding capability discovery
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/active-lifecycle-boundary-and-dogfooding-capability-discovery/issues/active-lifecycle-boundary-and-dogfooding-capability-discovery.md`
@@ -3047,7 +3047,7 @@ routing_policy:
 
 4. `I-20260322-1801`
 - title: pre-test-merge responsibility, usage, and lifecycle governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/issues/pre-test-merge-responsibility-usage-and-lifecycle-governance.md`
@@ -3064,7 +3064,7 @@ routing_policy:
 
 5. `I-20260321-1515`
 - title: Remote branch retirement governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/remote-branch-retirement-governance/issues/remote-branch-retirement-governance.md`
@@ -3077,7 +3077,7 @@ routing_policy:
 
 6. `I-20260321-0257`
 - title: Worktree fleet governance closure
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/worktree-fleet-governance-closure/issues/worktree-fleet-governance-closure.md`
@@ -3090,7 +3090,7 @@ routing_policy:
 
 7. `I-20260329-2045-A`
 - title: AI auth-change wake command lifecycle governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/ai-auth-change-wake-command-lifecycle-governance/issues/ai-auth-change-wake-command-lifecycle-governance.md`
@@ -3104,7 +3104,7 @@ routing_policy:
 
 8. `I-20260329-2155-A`
 - title: Sensitive local artifact ignore governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P2
 - issue_path: `docs/epics/workspace-routing-foundation/sensitive-local-artifact-ignore-governance/issues/sensitive-local-artifact-ignore-governance.md`
@@ -3118,7 +3118,7 @@ routing_policy:
 
 9. `I-20260327-2006-A`
 - title: Project command semantics and explicit restore-work governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/issues/project-command-semantics-and-restore-work-governance.md`
@@ -3132,7 +3132,7 @@ routing_policy:
 
 10. `I-20260327-2006-A-global-restart`
 - title: Global restart restore memory governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/global-restart-restore-memory-governance/issues/global-restart-restore-memory-governance.md`
@@ -3147,7 +3147,7 @@ routing_policy:
 
 7. `I-20260318-1630`
 - title: Global AI account watchdog and manager bootstrap
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
@@ -3160,7 +3160,7 @@ routing_policy:
 
 2. `I-20260326-1815`
 - title: IBM pre-tests executable acceptance quality governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/ibm-pretests-executable-acceptance-quality-governance/issues/ibm-pretests-executable-acceptance-quality-governance.md`
@@ -3177,7 +3177,7 @@ routing_policy:
 
 3. `I-20260326-1915`
 - title: Deep-refactor fleet sequencing governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/deep-refactor-fleet-sequencing-governance/issues/deep-refactor-fleet-sequencing-governance.md`
@@ -3191,7 +3191,7 @@ routing_policy:
 
 4. `I-20260326-1835`
 - title: Manager owner stance and source-patrol completeness governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md`
@@ -3211,7 +3211,7 @@ routing_policy:
 
 3. `I-20260322-0445`
 - title: Latest manager continuity worker consumption governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
@@ -3229,7 +3229,7 @@ routing_policy:
 
 4. `I-20260405-1505-A`
 - title: Manager semantic-loop active-worker suppression governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/manager-semantic-loop-active-worker-suppression-governance/issues/manager-semantic-loop-active-worker-suppression-governance.md`
@@ -3243,7 +3243,7 @@ routing_policy:
 
 4. `I-20260326-0445`
 - title: Manager-delegated intake absorption closure governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/manager-delegated-intake-absorption-closure-governance/issues/manager-delegated-intake-absorption-closure-governance.md`
@@ -3256,7 +3256,7 @@ routing_policy:
 
 5. `I-20260328-0745-A`
 - title: Live-status current runtime state reconciliation governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/live-status-current-runtime-state-reconciliation-governance/issues/live-status-current-runtime-state-reconciliation-governance.md`
@@ -3269,7 +3269,7 @@ routing_policy:
 
 6. `I-20260324-0405`
 - title: Watchdog restart-storm and process-churn governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/watchdog-restart-storm-and-process-churn-governance/issues/watchdog-restart-storm-and-process-churn-governance.md`
@@ -3283,7 +3283,7 @@ routing_policy:
 
 7. `I-20260412-1230-A`
 - title: Historical completed-queue identity followthrough governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/historical-completed-queue-identity-followthrough-governance/issues/historical-completed-queue-identity-followthrough-governance.md`
@@ -3298,7 +3298,7 @@ routing_policy:
 
 8. `I-20260320-1945`
 - title: Watchdog live status surface and manager supervision
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/watchdog-live-status-surface-and-manager-supervision/issues/watchdog-live-status-surface-and-manager-supervision.md`
@@ -3310,7 +3310,7 @@ routing_policy:
 
 8. `I-20260320-2105`
 - title: Baseline-status command and status family governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/baseline-status-command-and-status-family-governance/issues/baseline-status-command-and-status-family-governance.md`
@@ -3322,7 +3322,7 @@ routing_policy:
 
 8. `I-20260324-0405`
 - title: 三个 loop 的并列关系与 terminal governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/three-loops-sibling-relationship-and-terminal-governance/issues/three-loops-sibling-relationship-and-terminal-governance.md`
@@ -3335,7 +3335,7 @@ routing_policy:
 
 9. `I-20260322-0115`
 - title: CLI-first entrypoint and observability surface unification
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/issues/cli-first-entrypoint-and-observability-surface-unification.md`
@@ -3348,7 +3348,7 @@ routing_policy:
 
 10. `I-20260322-0135`
 - title: Integration-acceptance-first IBM and verification governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/integration-acceptance-first-verification-governance/issues/integration-acceptance-first-verification-governance.md`
@@ -3361,7 +3361,7 @@ routing_policy:
 
 11. `I-20260322-0228`
 - title: Manager delegation after sufficient patrol evidence governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/manager-delegation-after-sufficient-patrol-evidence-governance/issues/manager-delegation-after-sufficient-patrol-evidence-governance.md`
@@ -3374,7 +3374,7 @@ routing_policy:
 
 12. `I-20260322-0412`
 - title: Worker active reentry for manager-delegated continuation governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/worker-active-reentry-for-manager-delegated-continuation-governance/issues/worker-active-reentry-for-manager-delegated-continuation-governance.md`
@@ -3387,7 +3387,7 @@ routing_policy:
 
 13. `I-20260318-0930`
 - title: Checkpoint commit and multi-worktree supervision governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/checkpoint-commit-and-multi-worktree-supervision-governance/issues/checkpoint-commit-and-multi-worktree-supervision-governance.md`
@@ -3400,7 +3400,7 @@ routing_policy:
 
 14. `I-20260318-1408`
 - title: Manager self-supervision and autonomous recovery
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md`
@@ -3412,7 +3412,7 @@ routing_policy:
 
 15. `I-20260308-0101`
 - title: 状态联动、流程标识词典与 session evidence 传播治理
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/state-sync-and-session-evidence-governance/issues/state-sync-and-session-evidence-governance.md`
@@ -3426,7 +3426,7 @@ routing_policy:
 
 16. `I-20260318-1825`
 - title: Worktree hygiene supervision control plane
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/worktree-hygiene-supervision-control-plane/issues/worktree-hygiene-supervision-control-plane.md`
@@ -3438,7 +3438,7 @@ routing_policy:
 
 17. `I-20260321-0345`
 - title: Manager reactivation and fleet patrol governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/manager-reactivation-and-fleet-patrol-governance/issues/manager-reactivation-and-fleet-patrol-governance.md`
@@ -3451,7 +3451,7 @@ routing_policy:
 
 18. `I-20260321-1045`
 - title: Stacked worktree merge-chain governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/stacked-worktree-merge-chain-governance/issues/stacked-worktree-merge-chain-governance.md`
@@ -3463,7 +3463,7 @@ routing_policy:
 
 19. `I-20260426-0000-A`
 - title: Add opencode direct launcher and AI_TOOL alias resolution
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - completed_at: `2026-04-28`
 - priority: P1
@@ -3480,7 +3480,7 @@ routing_policy:
 
 20. `I-20260418-1900-A`
 - title: Runtime lifecycle receipt followthrough governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - completed_at: `2026-04-28`
 - priority: P1
@@ -3500,7 +3500,7 @@ routing_policy:
 
 21. `I-20260419-0333-A`
 - title: Runtime closeout selfhost validation followthrough governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - completed_at: `2026-04-28`
 - priority: P1
@@ -3528,7 +3528,7 @@ routing_policy:
 
 22. `I-20260414-0255-A`
 - title: Freely start after-failure recovery handoff race root cause fix
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - completed_at: `2026-04-28`
 - priority: P1
@@ -3553,7 +3553,7 @@ routing_policy:
 
 23. `I-20260417-0445-A`
 - title: Runtime start/stop lifecycle and process leak governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - completed_at: `2026-04-28`
 - priority: P0
@@ -3591,7 +3591,7 @@ routing_policy:
 
 24. `I-20260413-1640-A`
 - title: Tasks closeout completion and adequacy gate governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - completed_at: `2026-04-28`
 - priority: P1
@@ -3760,7 +3760,7 @@ routing_policy:
 
 10. `C-20260325-0525-A`
 - title: Retire cooldown-driven recovery and make slot sweep canonical
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
@@ -4071,7 +4071,7 @@ routing_policy:
 
 1. `I-20260419-0210-A`
 - title: Protected-branch ref-only entrypoint enforcement governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `in_verification`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/protected-branch-ref-only-entrypoint-enforcement-governance/issues/protected-branch-ref-only-entrypoint-enforcement-governance.md`
@@ -4088,7 +4088,7 @@ routing_policy:
 
 2. `I-20260405-0425-A`
 - title: Develop guarded merge entrypoint enforcement governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/develop-guarded-merge-entrypoint-enforcement-governance/issues/develop-guarded-merge-entrypoint-enforcement-governance.md`
@@ -4104,7 +4104,7 @@ routing_policy:
 
 2. `I-20260402-1912-A`
 - title: Protected-branch merge receipt hardening
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md`
@@ -4115,7 +4115,7 @@ routing_policy:
 
 2. `I-20260323-1705-A`
 - title: Manager delegated continuation stall recovery governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/manager-delegated-continuation-stall-recovery-governance/issues/manager-delegated-continuation-stall-recovery-governance.md`
@@ -4129,7 +4129,7 @@ routing_policy:
 
 2. `I-20260401-1035-A`
 - title: Materialize develop push-pending governance after protected-branch merge
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/develop-push-pending-guard-governance/issues/develop-push-pending-guard-governance.md`
@@ -4144,7 +4144,7 @@ routing_policy:
 
 3. `I-20260322-0115`
 - title: CLI-first entrypoint and observability surface unification
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/issues/cli-first-entrypoint-and-observability-surface-unification.md`
@@ -4160,7 +4160,7 @@ routing_policy:
 
 4. `I-20260321-1925`
 - title: Manager chat reentry and cleanup misrouting governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/manager-chat-reentry-and-cleanup-misrouting-governance/issues/manager-chat-reentry-and-cleanup-misrouting-governance.md`
@@ -4171,7 +4171,7 @@ routing_policy:
 
 5. `I-20260322-0049`
 - title: Manager continuation handoff consumption governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/manager-continuation-handoff-consumption-governance/issues/manager-continuation-handoff-consumption-governance.md`
@@ -4182,7 +4182,7 @@ routing_policy:
 
 6. `I-20260322-0245`
 - title: Runtime worker launch linkage and stall recovery governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-worker-launch-linkage-and-stall-recovery-governance/issues/runtime-worker-launch-linkage-and-stall-recovery-governance.md`
@@ -4193,7 +4193,7 @@ routing_policy:
 
 7. `I-20260321-2010`
 - title: Explicit session-addressed resume governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/issues/explicit-session-addressed-resume-governance.md`
@@ -4204,7 +4204,7 @@ routing_policy:
 
 8. `I-20260321-1715`
 - title: Manager watchdog trigger and drift reconcile governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md`
@@ -4218,7 +4218,7 @@ routing_policy:
 
 7. `I-20260328-0335-A`
 - title: Manager supervision quiet-period stall-signal governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/manager-supervision-quiet-period-stall-signal-governance/issues/manager-supervision-quiet-period-stall-signal-governance.md`
@@ -4232,7 +4232,7 @@ routing_policy:
 
 4. `I-20260321-1706`
 - title: Chat-triggered worker runtime reactivation governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/chat-triggered-worker-runtime-reactivation-governance/issues/chat-triggered-worker-runtime-reactivation-governance.md`
@@ -4243,7 +4243,7 @@ routing_policy:
 
 5. `I-20260319-1715`
 - title: CLI-first human chat intake and manager delegation loop
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/human-chat-intake-and-manager-delegation/issues/human-chat-intake-and-manager-delegation.md`
@@ -4254,7 +4254,7 @@ routing_policy:
 
 6. `I-20260319-2315`
 - title: CLI TUI interruption input box for Freely
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/cli-tui-human-interruption-input/issues/cli-tui-human-interruption-input.md`
@@ -4265,7 +4265,7 @@ routing_policy:
 
 7. `I-20260320-1405`
 - title: Worktree maintenance governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/worktree-maintenance-governance/issues/worktree-maintenance-governance.md`
@@ -4276,7 +4276,7 @@ routing_policy:
 
 8. `I-20260318-1222`
 - title: Mem9 shared memory evaluation for Freely continuity plane
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P2
 - issue_path: `docs/epics/workspace-routing-foundation/mem9-continuity-bridge/issues/mem9-continuity-bridge.md`
@@ -4286,7 +4286,7 @@ routing_policy:
 
 9. `C-20260306-1101`
 - title: `lead-agent.md`
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/bootstrap-routing-foundation-artifacts/issues/lead-agent-bootstrap.md`
@@ -4295,7 +4295,7 @@ routing_policy:
 
 10. `C-20260306-1102`
 - title: `context-source-skill.md`
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/bootstrap-routing-foundation-artifacts/issues/context-source-skill-bootstrap.md`
@@ -4304,7 +4304,7 @@ routing_policy:
 
 5. `C-20260306-1103`
 - title: `doc-B1_IBM-execution.md`
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/bootstrap-routing-foundation-artifacts/issues/doc-B1_IBM-execution-bootstrap.md`
@@ -4313,7 +4313,7 @@ routing_policy:
 
 6. `C-20260306-1104`
 - title: `doc-B2_IBM-execution.md` 与 `dev-loop-execution.md` 的外循环接驳边界
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/bootstrap-routing-foundation-artifacts/issues/doc-loop-dev-loop-handoff-bootstrap.md`
@@ -4322,7 +4322,7 @@ routing_policy:
 
 7. `C-20260306-1105`
 - title: 现有 `auto-loop-orchestrator` skill 对齐到首段闭环模型
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/bootstrap-routing-foundation-artifacts/issues/auto-loop-orchestrator-bootstrap.md`
@@ -4331,7 +4331,7 @@ routing_policy:
 
 6. `I-20260308-1631`
 - title: 阶段前缀式主进度标识治理
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/stage-prefixed-progress-identifier/issues/stage-prefixed-progress-identifier.md`
@@ -4342,7 +4342,7 @@ routing_policy:
 
 7. `I-20260308-1931`
 - title: 业务阻塞状态与系统崩溃恢复定位治理
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/business-block-vs-system-crash-recovery/issues/business-block-vs-system-crash-recovery.md`
@@ -4353,7 +4353,7 @@ routing_policy:
 
 8. `C-20260319-0220-A`
 - title: Watchdog umbrella term and sub-control-plane taxonomy
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
@@ -4362,7 +4362,7 @@ routing_policy:
 
 9. `I-20260320-0512`
 - title: Milestone planning and state maintenance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/milestone-planning-and-state-maintenance/issues/milestone-planning-and-state-maintenance.md`
@@ -4372,7 +4372,7 @@ routing_policy:
 
 11. `C-20260319-0220-C`
 - title: Historical watchdog productization worktree retirement handoff
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - promoted_issue_path: `pending://issue-materialization`
@@ -4381,7 +4381,7 @@ routing_policy:
 
 12. `I-20260316-1801`
 - title: Auto-run session lifecycle rotation and handoff governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/session-lifecycle-rotation-and-handoff-governance/issues/session-lifecycle-rotation-and-handoff-governance.md`
@@ -4392,7 +4392,7 @@ routing_policy:
 
 11. `I-20260320-0018`
 - title: Default project resolution and authorized project memory for CLI-first interruption entrypoints
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/default-project-resolution-and-authorized-project-memory/issues/default-project-resolution-and-authorized-project-memory.md`
@@ -4402,7 +4402,7 @@ routing_policy:
 - completion_note: 默认项目解析已由共享 runtime resolver 覆盖，并通过 cwd auto-resolution 与单一已授权项目回退回归锁定；后续如需多项目切换能力，应从新的 candidate materialize，不要继续扩大本条 completed issue
 11. `I-20260320-0500`
 - title: Candidate acceptance review governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/candidate-acceptance-review-governance/issues/candidate-acceptance-review-governance.md`
@@ -4413,7 +4413,7 @@ routing_policy:
 
 12. `C-20260323-2045-A`
 - title: Add capacity-aware queueing for manager worker prompt sets
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-worker-launch-linkage-and-stall-recovery-governance/issues/runtime-worker-launch-linkage-and-stall-recovery-governance.md`
@@ -4559,7 +4559,7 @@ routing_policy:
 
 1. `I-20260312-0011`
 - title: Backend Service Contract and Adapter Taxonomy
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/issues/backend-service-contract-and-adapter-taxonomy.md`
@@ -4573,7 +4573,7 @@ routing_policy:
 
 2. `C-20260304-501`
 - title: Freely-on-OpenClaw profile 最小落地
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - promoted_issue_path: `docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/issues/backend-service-contract-and-adapter-taxonomy.md`
@@ -4583,7 +4583,7 @@ routing_policy:
 
 1. `I-20260419-1505-A`
 - title: Runtime supervisor attach reuse followthrough governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/issues/runtime-supervisor-attach-reuse-followthrough-governance.md`
@@ -4592,7 +4592,7 @@ routing_policy:
 
 1. `I-20260419-1630-A`
 - title: Runtime startup self-healing governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/issues/runtime-startup-self-healing-governance.md`
@@ -4601,7 +4601,7 @@ routing_policy:
 
 1. `I-20260419-2245-A`
 - title: Runtime Claude launch and session evidence governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/runtime-claude-launch-and-session-evidence-governance/issues/runtime-claude-launch-and-session-evidence-governance.md`
@@ -4610,7 +4610,7 @@ routing_policy:
 
 1. `I-20260412-0907-A`
 - title: Codex probe success shape and quota slot recovery governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/codex-probe-success-shape-and-quota-slot-recovery-governance/issues/codex-probe-success-shape-and-quota-slot-recovery-governance.md`
@@ -4619,7 +4619,7 @@ routing_policy:
 
 1. `I-20260407-1042-A`
 - title: GitHub-first external issue source governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/issues/github-first-external-issue-source-governance.md`
@@ -4628,7 +4628,7 @@ routing_policy:
 
 1. `I-20260420-1130-A`
 - title: Manager task-source scan idle/replan boundary governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/issues/manager-task-source-scan-idle-replan-boundary-governance.md`
@@ -4637,7 +4637,7 @@ routing_policy:
 
 1. `I-20260429-1745-A`
 - title: Fix daemon self-detection suicide + bash 3.2 pipefail crash
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/bash32-daemon-compat-fix/issues/I-20260429-1745-A.md`
@@ -4646,7 +4646,7 @@ routing_policy:
 
 1. `I-20260429-2040-A`
 - title: SQLite chat-inbox staging for protected-branch chat intake
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/chat-inbox-sqlite/issues/I-20260429-2040-A.md`
@@ -4666,7 +4666,7 @@ routing_policy:
 
 1. `I-20260416-0448-A`
 - title: MemArk protected-root bootstrap followthrough governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/freely-product-architecture/memark-protected-root-bootstrap-followthrough-governance/issues/memark-protected-root-bootstrap-followthrough-governance.md`
@@ -4680,7 +4680,7 @@ routing_policy:
 
 1. `I-20260405-1235-A`
 - title: Tool authorization bootstrap and post-consent materialization governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
@@ -4697,7 +4697,7 @@ routing_policy:
 
 1. `I-20260405-2358-A`
 - title: Fresh-project bootstrap and baseline scoping followthrough governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
@@ -4721,7 +4721,7 @@ routing_policy:
 
 2. `I-20260403-2041-A`
 - title: Worktree tool boundary bootstrap governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/issues/worktree-tool-boundary-bootstrap-governance.md`
@@ -4736,7 +4736,7 @@ routing_policy:
 
 2. `I-20260405-2302-A`
 - title: Worktree helper shell source compatibility governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/freely-product-architecture/worktree-helper-shell-source-compatibility-governance/issues/worktree-helper-shell-source-compatibility-governance.md`
@@ -4765,7 +4765,7 @@ routing_policy:
 
 2. `I-20260405-cli-output-style-A`
 - title: AGENTS project entry and output style governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P2
 - issue_path: `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/issues/agents-cli-output-style-experiment-governance.md`
@@ -4786,7 +4786,7 @@ routing_policy:
 
 3. `I-20260405-1130-A`
 - title: Project-level AGENTS bootstrap and management contract governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/freely-product-architecture/project-level-agents-bootstrap-and-management-contract-governance/issues/project-level-agents-bootstrap-and-management-contract-governance.md`
@@ -4806,7 +4806,7 @@ routing_policy:
 
 3. `I-20260402-0403-A`
 - title: Canonical product posture bootstrap reconciliation governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/freely-product-architecture/canonical-product-posture-bootstrap-reconciliation-governance/issues/canonical-product-posture-bootstrap-reconciliation-governance.md`
@@ -4826,7 +4826,7 @@ routing_policy:
 
 1. `I-20260326-1810`
 - title: Freely layered architecture and tooling topology
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/freely-product-architecture/freely-layered-architecture-and-tooling-topology/issues/freely-layered-architecture-and-tooling-topology.md`
@@ -4838,7 +4838,7 @@ routing_policy:
 
 2. `I-20260401-2316-A`
 - title: CC ACP init autonomy consent test followthrough governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/freely-product-architecture/cc-acp-init-autonomy-consent-test-followthrough-governance/issues/cc-acp-init-autonomy-consent-test-followthrough-governance.md`
@@ -4854,7 +4854,7 @@ routing_policy:
 
 3. `I-20260401-1303-A`
 - title: Default autonomy activation consent and posture truth governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/freely-product-architecture/default-autonomy-activation-consent-and-tool-policy-governance/issues/default-autonomy-activation-consent-and-tool-policy-governance.md`
@@ -4869,7 +4869,7 @@ routing_policy:
 
 4. `I-20260401-1303-A-2`
 - title: Freely tool autonomy policy materialization governance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/issues/freely-tool-autonomy-policy-materialization-governance.md`
@@ -4969,7 +4969,7 @@ routing_policy:
 
 1. `I-20260317-1003`
 - title: Incremental Dogfooding Gate for Backend Increments
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/frontend-probe-dogfooding-loop/incremental-dogfooding-gate-for-backend-increments/issues/incremental-dogfooding-gate-for-backend-increments.md`
@@ -4985,7 +4985,7 @@ routing_policy:
 
 2. `I-20260308-1245`
 - title: Freely 内部前后端架构复评与可插拔协议边界
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/issues/internal-frontend-backend-architecture-review.md`
@@ -4998,7 +4998,7 @@ routing_policy:
 
 2. `I-20260317-1001`
 - title: Frontend/Backend Boundary Contract v1 for Frontend Probe
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md`
@@ -5011,7 +5011,7 @@ routing_policy:
 
 3. `I-20260317-0332`
 - title: Rust/Tauri Probe Bridge v1
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/issues/rust-tauri-probe-bridge-v1.md`
@@ -5025,7 +5025,7 @@ routing_policy:
 
 4. `I-20260308-1244-03`
 - title: Frontend Probe v0
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0/issues/frontend-probe-v0.md`
@@ -5039,7 +5039,7 @@ routing_policy:
 
 5. `I-20260317-1004`
 - title: Frontend Runtime Baseline for Probe
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-runtime-baseline-for-probe/issues/frontend-runtime-baseline-for-probe.md`
@@ -5069,7 +5069,7 @@ routing_policy:
 
 1. `I-20260318-1246`
 - title: URL 内容摄取 skill 与微信公众号抓取治理
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/url-content-intake-skill-and-wechat-fetch-governance/issues/url-content-intake-skill-and-wechat-fetch-governance.md`
@@ -5105,7 +5105,7 @@ routing_policy:
 
 1. `I-20260321-1530`
 - title: Agent-ready PRD architecture for Freely IBM flow
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - priority: P0
 
@@ -5120,7 +5120,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260508T111130Z-A`
 - title: reference-transaction hook delete fix
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `in_dev`
 - issue_path: `docs/issues/I-20260508T111130Z-A/issue.md`
 
@@ -5135,7 +5135,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260508T124041Z-A`
 - title: wt-create pull deferred to after worktree creation
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `in_dev`
 - issue_path: `docs/issues/I-20260508T124041Z-A/issue.md`
 
@@ -5150,7 +5150,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260508T133423Z-A`
 - title: raw-issue-pull target to pwd + fix/feature guard
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T133423Z-A/issue.md`
 
@@ -5165,7 +5165,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260508T121541Z-A`
 - title: platform-adapter title key fix
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T121541Z-A/issue.md`
 
@@ -5180,7 +5180,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260508T154706Z-A`
 - title: wt-create skill name + post-creation reminder
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T154706Z-A/issue.md`
 
@@ -5195,13 +5195,13 @@ routing_policy:
 ### committed_issues
 1. `I-20260508T232413Z-A`
 - title: merge-guarded IBM phase guidance
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `in_dev`
 - issue_path: `docs/issues/I-20260508T232413Z-A/issue.md`
 
 1. `I-20260508T154706Z-A`
 - title: wt-create skill name + post-creation reminder
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T154706Z-A/issue.md`
 
@@ -5216,7 +5216,7 @@ routing_policy:
 ### completed_issues
 1. `I-20260508T225041Z-A`
 - title: ACP bridge restart cooldown
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T225041Z-A/issue.md`
 
@@ -5231,7 +5231,7 @@ routing_policy:
 ### completed_issues
 1. `I-20260509T022152Z-A`
 - title: worker_prompt_launchable 拒绝非 fix/feature 工位
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260509T022152Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260509T022152Z--worker-launch-writable-redirect/candidates.md`
@@ -5250,7 +5250,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260510T0112Z-A`
 - title: raw issue 正文注入治理提醒
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260510T0112Z-A/issue.md`
 
@@ -5265,7 +5265,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260509T090210Z-A`
 - title: handoff SQLite refactor
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260509T090210Z-A/issue.md`
 
@@ -5280,7 +5280,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260509T024559Z-A`
 - title: multi-project isolation architecture
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `in_b2_ibm`
 - issue_path: `docs/issues/I-20260509T024559Z-A/issue.md`
 
@@ -5372,7 +5372,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260518T020406Z-A`
 - title: chats 表扩展 conversation_id + chat-message 类型 + scan 对齐
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260518T020406Z-A/issue.md`
 
@@ -5538,7 +5538,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260506T1000Z-A`
 - title: supervisor 主循环 select_launch_kind 前添加 task_mode=wait 门禁
-- milestone_state: completed
+- milestone_state: committed
 - issue_path: `docs/issues/I-20260506T1000Z-A/issue.md`
 
 ## M-20260521T012042Z-A
@@ -5566,7 +5566,7 @@ routing_policy:
 ### completed_issues
 1. `I-20260521T012042Z-A`
 - title: Manager keepalive stale-pid scanning
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260521T012042Z-A/issue.md`
 
@@ -5612,7 +5612,7 @@ routing_policy:
 ### completed_issues
 1. `I-20260521T095313Z-A`
 - title: use type instead of alias for AI_TOOL alias resolution
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260521T095313Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260521T095313Z--type-based-alias-resolution/candidates.md#C-20260521T095313Z-A`
@@ -5629,7 +5629,7 @@ routing_policy:
 ### completed_issues
 1. `I-20260521T115809Z-A`
 - title: merge-guarded source branch name fix
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260521T115809Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260521T115809Z--merge-message-forbidden-branch-name/candidates.md#C-20260521T115809Z-A`
@@ -5646,7 +5646,7 @@ routing_policy:
 ### completed_issues
 1. `I-20260521T121158Z-A`
 - title: package version timestamp format
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260521T121158Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260521T121158Z--package-version-timestamp-format/candidates.md#C-20260521T121158Z-A`
@@ -5663,7 +5663,7 @@ routing_policy:
 ### completed_issues
 1. `I-20260521T122729Z-A`
 - title: env var prefix stripping
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260521T122729Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260521T122729Z--type-resolution-env-var-prefix/candidates.md#C-20260521T122729Z-A`
@@ -5680,7 +5680,7 @@ routing_policy:
 ### completed_issues
 1. `I-20260521T132714Z-A`
 - title: daemon stop kills ACP bridge
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260521T132714Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260521T132714Z--daemon-stop-kill-acp-bridge/candidates.md#C-20260521T132714Z-A`
@@ -5697,7 +5697,7 @@ routing_policy:
 ### completed_issues
 1. `I-20260521T135911Z-A`
 - title: permission unification in JSON config
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260521T135911Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260521T135911Z--permission-unify-json-config/candidates.md#C-20260521T135911Z-A`
@@ -5713,7 +5713,7 @@ routing_policy:
 ### completed_issues
 1. `I-20260521T144550Z-A`
 - title: remove bypassPermissions from run-acp-prompt.py
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260521T144550Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260521T144550Z--run-acp-prompt-remove-bypass/candidates.md#C-20260521T144550Z-A`
@@ -5729,7 +5729,7 @@ routing_policy:
 ### completed_issues
 1. `I-20260521T222919Z-A`
 - title: dynamic scan stage prompt builder
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260521T222919Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260521T222919Z--scan-stage-prompt-mismatch/candidates.md#C-20260521T222919Z-A`
@@ -5745,7 +5745,7 @@ routing_policy:
 ### completed_issues
 1. `I-20260521T230423Z-A`
 - title: restrict active-worker scan skip
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260521T230423Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260521T230423Z--scan-active-worker-guard-fix/candidates.md#C-20260521T230423Z-A`
@@ -5761,7 +5761,7 @@ routing_policy:
 ### completed_issues
 1. `I-20260522T002426Z-A`
 - title: crash report dedup
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260522T002426Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260522T002426Z--crash-dedup-comment-not-new-issue/candidates.md#C-20260522T002426Z-A`
@@ -5777,7 +5777,7 @@ routing_policy:
 ### completed_issues
 1. `I-20260521T234624Z-A`
 - title: prevent recursive ERR trap
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260521T234624Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260521T234624Z--opencode-high-failure-rate/candidates.md#C-20260521T234624Z-A`
@@ -5793,7 +5793,7 @@ routing_policy:
 ### completed_issues
 1. `I-20260522T030835Z-A`
 - title: ai-cli apikey alias
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260522T030835Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260522T030835Z--ai-cli-apikey-alias-switch/candidates.md#C-20260522T030835Z-A`
@@ -5809,7 +5809,7 @@ routing_policy:
 ### completed_issues
 1. `I-20260522T035043Z-A`
 - title: codex apikey unified
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260522T035043Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260522T035043Z--ai-cli-codex-apikey/candidates.md#C-20260522T035043Z-A`
@@ -5825,7 +5825,7 @@ routing_policy:
 ### completed_issues
 1. `I-20260522T042725Z-A`
 - title: apikey full slot name
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260522T042725Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260522T042725Z--apikey-full-slot-name-fixes/candidates.md#C-20260522T042725Z-A`
@@ -5841,7 +5841,20 @@ routing_policy:
 ### completed_issues
 1. `I-20260522T044515Z-A`
 - title: generic slot probe
-- milestone_state: completed
+- milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260522T044515Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260522T044515Z--slot-probe-generic-hi/candidates.md#C-20260522T044515Z-A`
+## M-20260522T045227Z-A
+- title: probe say hi
+- status: active
+### candidate_issues
+1. `C-20260522T045227Z-A`
+- milestone: M-20260522T045227Z-A
+- status: promoted
+### committed_issues
+1. `I-20260522T045227Z-A`
+- title: probe say hi
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260522T045227Z-A/issue.md`
