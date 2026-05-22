@@ -204,6 +204,31 @@ elif [[ "$FORCE" == true ]]; then
   echo "wt-close: --force, skipping checks"
 fi
 
+# ── Guard: refuse to modify issue files on protected branches ──
+
+_guard_branch=$(git -C "$ROOT_DIR" rev-parse --abbrev-ref HEAD 2>/dev/null || true)
+case "$_guard_branch" in
+  main|develop|test-pre-merge-*)
+    printf >&2 '%s\n' \
+      "Error: wt-close refuses to modify files on protected branch: $_guard_branch" \
+      "" \
+      "Protected branches (main, develop, test-pre-merge-*) must not be modified directly." \
+      "wt-close writes issue frontmatter and commits — this must happen from a writable branch." \
+      "" \
+      "Workflow:" \
+      "  1. Ensure the main repo is on a non-protected branch (any fix/* or feature/* worktree)" \
+      "  2. Or run wt-close from inside a fix/feature worktree: cd <worktree> && ./bin/wt-close <branch>" \
+      "" \
+      "Full cycle reference:" \
+      "  skill:freely-fix-execution or skill:freely-feat-execution" \
+      "  → wt-create → fix in fix/feature worktree" \
+      "  → merge-guarded test-pre-merge-* <fix-or-feature-branch>   (test)" \
+      "  → merge-guarded develop <fix-or-feature-branch>            (merge)" \
+      "  → wt-close"
+    exit 1
+    ;;
+esac
+
 # ── Phase 2: Platform close ──
 
 if [[ "$SKIP_PLATFORM" == false && -n "$issue_id" && -f "${issue_file:-}" ]]; then

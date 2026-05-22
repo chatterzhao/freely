@@ -632,16 +632,64 @@ _require_issue_exists "$fix_branch" || exit 1
 ╚══════════════════════════════════════════════════════════╝
 MSG
 
-  cat <<REMINDER
+  case "$prefix" in
+    fix)
+      cat <<REMINDER
+
+┌─ 下一步 ──────────────────────────────────────────────┐
+│  请遵循 skill:${skill_name} 开展工作                        │
+│                                                          │
+│  进入 ${prefix} 工位开发:                                  │
+│    cd $fix_target                                        │
+│  测试时进入 test-pre-merge 工位:                          │
+│    cd $tp_target                                         │
+│                                                          │
+│  Fix first, govern later (代码先行, 治理后置):             │
+│    1. 在 test-pre-merge-* 改源码, stop/start daemon 验证    │
+│    2. cp 修改到 fix 工位, git commit                       │
+│    3. skill:freely-doc-B1_IBM-execution → raw → candidate  │
+│    4. skill:freely-doc-B2_IBM-execution → I-* → milestone  │
+│    5. skill:freely-dev-loop-execution → code-review + pre-tests │
+│    6. merge-guarded test-pre-merge-* <fix-branch>  (test)  │
+│    7. merge-guarded develop <fix-branch>            (merge) │
+│    8. wt-close <fix-branch>                               │
+└──────────────────────────────────────────────────────────┘
+REMINDER
+      ;;
+    feature)
+      cat <<REMINDER
+
+┌─ 下一步 ──────────────────────────────────────────────┐
+│  请遵循 skill:${skill_name} 开展工作                        │
+│                                                          │
+│  进入 ${prefix} 工位开发:                                  │
+│    cd $fix_target                                        │
+│  测试时进入 test-pre-merge 工位:                          │
+│    cd $tp_target                                         │
+│                                                          │
+│  Govern first, then code (治理先行, 代码后置):            │
+│    1. skill:freely-doc-B1_IBM-execution → raw → brainstorms → candidates │
+│    2. skill:freely-doc-B2_IBM-execution → materialize I-* → milestone │
+│    3. skill:freely-dev-loop-execution → implement + code-review + pre-tests │
+│    4. merge-guarded test-pre-merge-* <feature-branch>  (test) │
+│    5. merge-guarded develop <feature-branch>            (merge) │
+│    6. wt-close <feature-branch>                          │
+└──────────────────────────────────────────────────────────┘
+REMINDER
+      ;;
+    *)
+      cat <<REMINDER
 
 ┌─ 下一步 ───────────────────────────────────────────────┐
-│  进入 ${prefix} 工位开发:                                  │
+│  进入工位开发:                                            │
 │    cd $fix_target                                        │
 │  测试时进入 test-pre-merge 工位:                          │
 │    cd $tp_target                                         │
 │  仔细阅读 skill: ${skill_path}                             │
 └──────────────────────────────────────────────────────────┘
 REMINDER
+      ;;
+  esac
 else
   tp_target="$(freely_wt_resolve_target_path "$fix_branch")"
   _create_worktree "$fix_branch" "$tp_target" "$base"

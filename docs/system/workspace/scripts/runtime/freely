@@ -5718,6 +5718,14 @@ _write_chat_to_issue() {
 
   log_info "chat recorded: freely.db id=$chat_id type=$chat_type issue_id=$issue_id${conversation:+ conversation_id=$conversation_id}"
 
+  if [[ "$chat_type" == "new-issue" ]]; then
+    log_info "[chat] raw issue created: $issue_id"
+    log_info "[chat] Next: create a worktree to fix or implement:"
+    log_info "[chat]   Bug fix:  wt-create --raw-key ${chat_id} --source chat-inbox --skill freely-fix-execution --slug <slug>"
+    log_info "[chat]   Feature:  wt-create --raw-key ${chat_id} --source chat-inbox --skill freely-feat-execution --slug <slug>"
+    log_info "[chat] Then follow the skill: skill:freely-fix-execution (Fix first) or skill:freely-feat-execution (Govern first)"
+  fi
+
   # Step 2: Try direct sync if a worktree exists for this issue
   # Skip for chat-message — conversation messages need AI judgment before materialization
   worktrees_root="${project}-worktrees"
@@ -20472,6 +20480,14 @@ HELP
   if [[ -n "$gh_url" ]]; then
     echo "[feedback] raw issue created: raw-${raw_key}"
     echo "[feedback] url: ${gh_url}"
+    echo "[feedback]"
+    echo "[feedback] Next: create a worktree to fix or implement:"
+    echo "[feedback]   Bug fix:  wt-create --raw-key ${raw_key} --source platform --skill freely-fix-execution --slug <slug>"
+    echo "[feedback]   Feature:  wt-create --raw-key ${raw_key} --source platform --skill freely-feat-execution --slug <slug>"
+    echo "[feedback]"
+    echo "[feedback] After wt-create, follow the skill to complete the work:"
+    echo "[feedback]   skill:freely-fix-execution  — Fix first, govern later"
+    echo "[feedback]   skill:freely-feat-execution — Govern first, then code"
   else
     echo "[feedback] WARNING: gh issue create output: $gh_result" >&2
   fi
@@ -20591,6 +20607,17 @@ cmd_intake_chat() {
   [[ -n "$target_issue" ]] && echo "target_issue: $target_issue"
   [[ -n "$urgent" ]] && echo "urgent: true"
   [[ "$conversation" == "true" ]] && echo "conversation: true"
+  if [[ "$new_issue" == "true" ]]; then
+    echo ""
+    echo "[chat] The daemon will create a raw issue from this intake."
+    echo "[chat] After the raw issue appears (check docs/issues/ or daemon log), run:"
+    echo "[chat]   Bug fix:  wt-create --raw-key <raw-key> --source chat-inbox --skill freely-fix-execution --slug <slug>"
+    echo "[chat]   Feature:  wt-create --raw-key <raw-key> --source chat-inbox --skill freely-feat-execution --slug <slug>"
+    echo "[chat]"
+    echo "[chat] Then follow the skill to complete the work:"
+    echo "[chat]   skill:freely-fix-execution  — Fix first, govern later"
+    echo "[chat]   skill:freely-feat-execution — Govern first, then code"
+  fi
 }
 
 cmd_intake_claim() {
