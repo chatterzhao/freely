@@ -5765,3 +5765,19 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260522T002426Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260522T002426Z--crash-dedup-comment-not-new-issue/candidates.md#C-20260522T002426Z-A`
+## M-20260521T234624Z-A
+- title: prevent recursive ERR trap
+- status: active
+### candidate_issues
+1. `C-20260521T234624Z-A`
+- milestone: M-20260521T234624Z-A
+- status: promoted
+- decision_reason: raw-20260521T234624Z (GitHub #2102) — recursive ERR trap obscured real crash cause
+- next_action: completed
+### completed_issues
+1. `I-20260521T234624Z-A`
+- title: prevent recursive ERR trap
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260521T234624Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260521T234624Z--opencode-high-failure-rate/candidates.md#C-20260521T234624Z-A`

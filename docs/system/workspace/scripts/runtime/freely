@@ -19072,6 +19072,15 @@ start_project_runtime() {
   # ERR trap: capture crash → auto-report as raw issue via freely feedback.
   # Desensitized: no user paths, no prompt content, no session IDs.
   _on_supervisor_err() {
+    # Prevent recursive ERR trap: disable errexit while handling crash.
+    # Without this, any failing command inside the handler re-triggers ERR,
+    # causing "supervisor crash: bash at freely:19074 (rc=1)" recursive reports.
+    set +e
+    # Guard against re-entry (ERR trap may fire again during exit/cleanup)
+    if [[ -n "${_FREELY_CRASH_HANDLER_ACTIVE:-}" ]]; then
+      return 0
+    fi
+    _FREELY_CRASH_HANDLER_ACTIVE=1
     local _err_rc=$?
     local _err_cmd _err_line _err_reason _msg
     _err_cmd="${BASH_COMMAND%% *}"
