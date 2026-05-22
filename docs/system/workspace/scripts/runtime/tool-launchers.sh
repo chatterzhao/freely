@@ -792,7 +792,8 @@ tool_run_acp_from_prompt_file() {
       local codex_acp_bin
       codex_acp_bin="$(ensure_codex_acp_binary_for_launch)" || return 1
       # codex-acp bridge socket (separate from claude bridge)
-      local codex_bridge_socket="${project}/.freely/run/acp-codex-bridge.sock"
+      local _hash; _hash=$(printf "%s" "$project" | shasum -a 256 | cut -c1-16)
+      local codex_bridge_socket="/tmp/freely-acp-$_hash.sock"
       freely_apply_project_network_proxy_env "$project"
       exec python3 "$RUNTIME_ACP_PROMPT_CLIENT" \
         --bridge-socket "$codex_bridge_socket" \
