@@ -6003,3 +6003,19 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260522T085354Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260522T085354Z--fix-codex-account-config/candidates.md#C-20260522T085354Z-A`
+## M-20260522T091606Z-A
+- title: default adapter acp
+- status: active
+### candidate_issues
+1. `C-20260522T091606Z-A`
+- milestone: M-20260522T091606Z-A
+- status: promoted
+- decision_reason: raw-20260522T091606Z (GitHub #2124)
+- next_action: completed
+### committed_issues
+1. `I-20260522T091606Z-A`
+- title: default adapter acp
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260522T091606Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260522T091606Z--default-adapter-acp/candidates.md#C-20260522T091606Z-A`
