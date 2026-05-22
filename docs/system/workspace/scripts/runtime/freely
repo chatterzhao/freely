@@ -19089,7 +19089,20 @@ tool: ${AI_TOOL:-unknown}
 adapter: ${AI_TOOL_ADAPTER:-unknown}
 launch_kind: ${mode_name:-unknown}"
       if [[ -n "${FREELY_REPO_URL:-}" ]]; then
-        "$SELF_ROOT/bin/freely" feedback --repo "$FREELY_REPO_URL" --title "supervisor crash: ${_err_cmd} rc=${_err_rc}" --body "$_msg" >/dev/null 2>&1 || true
+        local _crash_title _existing_issue _ts
+        _crash_title="supervisor crash: ${_err_cmd} rc=${_err_rc}"
+        _ts="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+        # Search for existing OPEN issue with same crash signature
+        _existing_issue=$(gh issue list --repo "$FREELY_REPO_URL" --state open --search "$_crash_title" --limit 1 --json number --jq '.[0].number' 2>/dev/null || true)
+        if [[ -n "$_existing_issue" && "$_existing_issue" =~ ^[0-9]+$ ]]; then
+          # Append comment to existing issue
+          gh issue comment "$_existing_issue" --repo "$FREELY_REPO_URL" \
+            --body "Recurred at ${_ts}:
+${_msg}" >/dev/null 2>&1 || true
+        else
+          # No existing issue — create new one
+          "$SELF_ROOT/bin/freely" feedback --repo "$FREELY_REPO_URL" --title "$_crash_title" --body "$_msg" >/dev/null 2>&1 || true
+        fi
       fi
     fi
   }
