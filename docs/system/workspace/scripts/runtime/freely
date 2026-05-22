@@ -17781,6 +17781,43 @@ cmd_init() {
   IFS='|' read -r tool model mode <<<"$parsed"
   tool_adapter_policy="$(resolve_tool_adapter_policy_for_project_or_global "$project" "$tool" "$tool_adapter_policy_arg" "$tool_adapter_arg")"
   tool_adapter="$(resolve_tool_adapter_for_project_or_global "$project" "$tool" "$tool_adapter_arg" "$tool_adapter_policy")"
+
+  # ACP binary pre-flight check (default adapter is now acp)
+  if [[ "$tool_adapter" == "acp" ]]; then
+    case "$tool" in
+      codex)
+        local codex_acp_bin="${FREELY_CODEX_ACP_BIN:-}"
+        if [[ -z "$codex_acp_bin" ]]; then
+          local _ver="${FREELY_CODEX_ACP_VERSION:-0.11.1}"
+          local _triplet; _triplet="$(uname -s):$(uname -m)"
+          case "$_triplet" in
+            Darwin:arm64) _triplet="aarch64-apple-darwin" ;;
+            Darwin:x86_64) _triplet="x86_64-apple-darwin" ;;
+            Linux:aarch64|Linux:arm64) _triplet="aarch64-unknown-linux-gnu" ;;
+            Linux:x86_64) _triplet="x86_64-unknown-linux-gnu" ;;
+            *) log_error "Unsupported platform for codex-acp: $_triplet"; exit 1 ;;
+          esac
+          codex_acp_bin="$HOME/.cache/freely/acp/codex-acp/$_ver/$_triplet/codex-acp"
+        fi
+        if [[ ! -x "$codex_acp_bin" ]]; then
+          log_error "ACP binary (codex-acp) not found: $codex_acp_bin"
+          log_error "Required for tool: $tool (adapter: acp)"
+          log_error "Install codex-acp or set FREELY_CODEX_ACP_BIN"
+          exit 1
+        fi
+        ;;
+      *)
+        local _acp_bin="${FREELY_CLAUDE_ACP_BIN:-claude-agent-acp}"
+        if ! command -v "$_acp_bin" >/dev/null 2>&1; then
+          log_error "ACP binary not found: $_acp_bin"
+          log_error "Required for tool: $tool (adapter: acp)"
+          log_error "Install claude-agent-acp or set FREELY_CLAUDE_ACP_BIN"
+          exit 1
+        fi
+        ;;
+    esac
+  fi
+
   tool_capabilities="$(tool_default_capabilities_for_runtime "$tool")"
   tool_policy="$(tool_default_policy_for_runtime "$tool")"
   codex_capability_model="$(codex_capability_default_model_for_runtime "$tool")"
