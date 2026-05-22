@@ -1082,26 +1082,25 @@ tool_save_generic() {
 # 登录
 cmd_login() {
   local tool="$1" auth_mode="${2:-}"
-  
+
+  # ── apikey: unified across ALL tools ──
+  if [[ "$auth_mode" == "apikey" ]]; then
+    _login_apikey_alias "$tool"
+    return 0
+  fi
+
+  # ── account (or default): per-tool ──
   case "$tool" in
     codex)
       if [[ -z "$auth_mode" ]]; then
         auth_mode="$(codex_prompt_login_mode)"
       fi
-      if [[ "$auth_mode" == "apikey" ]]; then
-        _login_apikey_alias "$tool"
-        return 0
-      fi
-
       if [[ "$auth_mode" != "account" ]]; then
-        log_error "Unsupported codex auth mode: $auth_mode"
+        log_error "Unsupported codex auth mode: $auth_mode (use: account, apikey)"
         exit 2
       fi
-
       log_info "Launching codex login..."
       codex login
-      
-      # 登录成功后自动保存
       if [[ -f "$(codex_live_auth_file)" ]]; then
         local auth_file slot target_dir account kind provider_id
         auth_file="$(codex_live_auth_file)"
@@ -1118,7 +1117,6 @@ cmd_login() {
         log_info "Slot: $slot"
         log_info "Location: $target_dir"
         notify_freely_auth_change "codex" "$slot" "login_success"
-
         if [[ "$FORMAT" == "json" ]]; then
           echo "{\"logged_in\": true, \"tool\": \"codex\", \"slot\": \"$slot\", \"slot_kind\": $(json_string_or_null "$kind"), \"provider_id\": $(json_string_or_null "$provider_id"), \"auth_email\": $(json_string_or_null "$account"), \"account\": $(json_string_or_null "$account"), \"saved\": true}"
         fi
@@ -1129,11 +1127,7 @@ cmd_login() {
       log_info "iflow auth material still comes from environment/config; slot container created for scheduler compatibility."
       ;;
     kiro-cli|cc|cc-use-codex-cli|opencode|claude)
-      if [[ "$auth_mode" == "apikey" ]]; then
-        _login_apikey_alias "$tool"
-      else
-        tool_login_generic "$tool"
-      fi
+      tool_login_generic "$tool"
       ;;
     *)
       log_error "Unknown tool: $tool"
