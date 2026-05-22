@@ -5939,3 +5939,19 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260522T075012Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260522T075012Z--fix-help-text/candidates.md#C-20260522T075012Z-A`
+## M-20260522T075839Z-A
+- title: switch auto-extract tool
+- status: active
+### candidate_issues
+1. `C-20260522T075839Z-A`
+- milestone: M-20260522T075839Z-A
+- status: promoted
+- decision_reason: raw-20260522T075839Z (GitHub #2120)
+- next_action: completed
+### committed_issues
+1. `I-20260522T075839Z-A`
+- title: switch auto-extract tool
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260522T075839Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260522T075839Z--switch-auto-extract-tool/candidates.md#C-20260522T075839Z-A`
