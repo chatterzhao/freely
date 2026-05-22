@@ -17987,7 +17987,13 @@ tool_default_adapter_for_runtime() {
 
 tool_supported_adapters_for_runtime() {
   local tool="$1"
-  case "$tool" in
+  # Strip slot suffix to get base tool: codex-apikey-xxx → codex
+  local base_tool="$tool"
+  case "$base_tool" in
+    *-apikey-*) base_tool="${base_tool%%-apikey-*}" ;;
+    *-account-*) base_tool="${base_tool%%-account-*}" ;;
+  esac
+  case "$base_tool" in
     codex|opencode)
       printf 'direct\nacp\n'
       ;;
