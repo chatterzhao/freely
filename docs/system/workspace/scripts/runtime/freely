@@ -4214,7 +4214,12 @@ runtime_write_tool_current_slot() {
 
 runtime_tool_slot_dir() {
   local tool="$1" slot="$2"
-  printf '%s\n' "$(runtime_tool_auth_dir)/${tool}-${slot}"
+  # slot already includes tool prefix (full name) → use as-is
+  if [[ "$slot" == ${tool}-* ]]; then
+    printf '%s\n' "$(runtime_tool_auth_dir)/${slot}"
+  else
+    printf '%s\n' "$(runtime_tool_auth_dir)/${tool}-${slot}"
+  fi
 }
 
 runtime_list_tool_slots() {
@@ -4222,7 +4227,8 @@ runtime_list_tool_slots() {
   auth_dir="$(runtime_tool_auth_dir)"
   prefix="${tool}-"
   [[ -d "$auth_dir" ]] || return 0
-  ls -1 "$auth_dir" 2>/dev/null | grep "^${prefix}" | sed "s/^${prefix}//" || true
+  # Return full directory names
+  ls -1 "$auth_dir" 2>/dev/null | grep "^${prefix}" || true
 }
 
 runtime_default_singleton_slot_for_tool() {

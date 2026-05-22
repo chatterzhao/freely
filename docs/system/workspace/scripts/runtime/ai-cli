@@ -89,13 +89,19 @@ auth_slot_prefix() {
 
 auth_slot_dir() {
   local tool="$1" slot="$2"
-  printf '%s\n' "$(auth_slot_prefix "$tool")$slot"
+  # slot already includes tool prefix (full name) → use as-is
+  if [[ "$slot" == ${tool}-* ]]; then
+    printf '%s\n' "$AUTH_DIR/$slot"
+  else
+    printf '%s\n' "$(auth_slot_prefix "$tool")$slot"
+  fi
 }
 
 list_tool_slots() {
   local tool="$1" prefix
   prefix="$(basename "$(auth_slot_prefix "$tool")")"
-  ls -1 "$AUTH_DIR" 2>/dev/null | grep "^${prefix}" | sed "s/^${prefix}//" || true
+  # Return full directory names (no prefix strip)
+  ls -1 "$AUTH_DIR" 2>/dev/null | grep "^${prefix}" || true
 }
 
 tool_active_slot_file() {
