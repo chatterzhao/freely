@@ -1344,7 +1344,7 @@ cmd_switch() {
   local tool=""
 
   if [[ -z "$slot" ]]; then
-    _cmd_switch_auto_codex
+    _cmd_switch_auto
     return $?
   fi
 
@@ -1384,7 +1384,62 @@ cmd_switch() {
       ;;
   esac
 }
-# 自动探测并切换 codex slot
+# Auto-switch: probe all tools in priority order, switch to first usable slot
+_cmd_switch_auto() {
+  local project="${PROJECT_ROOT:-$(pwd)}"
+  [[ "$DRY_RUN" == "true" ]] && { log_info "[DRY-RUN] Would auto-detect and switch to best available slot"; return 0; }
+
+  # Build tool priority: current tool first, then fallback list
+  local current_tool priority_list
+  current_tool="$(_extract_tool_from_slot "$(read_tool_active_slot "${AI_TOOL%%-*}")" 2>/dev/null || true)"
+  [[ -z "$current_tool" ]] && current_tool="${AI_TOOL%%-*}"
+  [[ -z "$current_tool" || "$current_tool" == "oc" ]] && current_tool="codex"
+
+  local fallback="${AI_FALLBACK_TOOLS:-codex,claude,opencode,kiro-cli,cc-use-codex-cli}"
+  priority_list="$current_tool"
+  local _visited=" $current_tool "
+  IFS=',' read -ra _fb <<< "$fallback"
+  for _t in "${_fb[@]}"; do
+    _t="$(echo "$_t" | xargs)"
+    [[ "$_visited" == *" $_t "* ]] && continue
+    priority_list+=" $_t"
+    _visited+="$_t "
+  done
+
+  local _attempted_slots=""
+  for tool in $priority_list; do
+    local slots
+    slots=$(list_tool_slots "$tool" 2>/dev/null || true)
+    [[ -z "$slots" ]] && continue
+    for slot in $slots; do
+      [[ -z "$slot" ]] && continue
+      # Skip previously attempted
+      [[ "$_attempted_slots" == *"|$slot|"* ]] && continue
+      _attempted_slots+="|$slot|"
+
+      local slot_dir; slot_dir="$(auth_slot_dir "$tool" "$slot")"
+      [[ -d "$slot_dir" ]] || continue
+
+      local result
+      result=$(slot_probe "$project" "$tool" "$slot_dir" 5 2>/dev/null || echo "unknown_error")
+      case "$result" in
+        usable)
+          log_info "Auto-switch: $slot (usable)"
+          cmd_switch "$slot"
+          return 0
+          ;;
+        rate_limited:*|deactivated_workspace|auth_failure|network_failure|unknown_error)
+          log_warn "Auto-switch: $slot skipped ($result)"
+          ;;
+      esac
+    done
+  done
+
+  log_error "No usable slot found across tools: $priority_list"
+  return 4
+}
+
+# 自动探测并切换 codex slot (legacy — replaced by _cmd_switch_auto above)
 run_dir_for_project() {
   local project="$1"
   printf '%s\n' "$project/.freely/run"
