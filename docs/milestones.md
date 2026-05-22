@@ -5781,3 +5781,19 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260521T234624Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260521T234624Z--opencode-high-failure-rate/candidates.md#C-20260521T234624Z-A`
+## M-20260522T030835Z-A
+- title: ai-cli apikey alias
+- status: active
+### candidate_issues
+1. `C-20260522T030835Z-A`
+- milestone: M-20260522T030835Z-A
+- status: promoted
+- decision_reason: raw-20260522T030835Z (GitHub #2105) — apikey login for non-codex tools needs alias approach
+- next_action: completed
+### completed_issues
+1. `I-20260522T030835Z-A`
+- title: ai-cli apikey alias
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260522T030835Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260522T030835Z--ai-cli-apikey-alias-switch/candidates.md#C-20260522T030835Z-A`

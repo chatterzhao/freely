@@ -24,6 +24,8 @@ DRY_RUN=false
 LOGIN_PROVIDER_NAME=""
 LOGIN_BASE_URL=""
 LOGIN_API_KEY=""
+LOGIN_SETTINGS_FILE=""
+SWITCH_PROJECT=""
 
 # 颜色
 RED='\033[0;31m'
@@ -1158,14 +1160,117 @@ cmd_login() {
       tool_login_generic "$tool"
       log_info "iflow auth material still comes from environment/config; slot container created for scheduler compatibility."
       ;;
-    kiro-cli|cc|cc-use-codex-cli|opencode)
-      tool_login_generic "$tool"
+    kiro-cli|cc|cc-use-codex-cli|opencode|claude)
+      if [[ "$auth_mode" == "apikey" ]]; then
+        _login_apikey_alias "$tool"
+      else
+        tool_login_generic "$tool"
+      fi
       ;;
     *)
       log_error "Unknown tool: $tool"
       exit 2
       ;;
   esac
+}
+
+# _login_apikey_alias: create apikey slot with settings file + shell alias.
+# Slot dir: ~/.ai-auth/{tool}-apikey-{name}/settings.json
+# Alias:    {tool}-apikey-{name}="claude --settings {slot_dir}/settings.json"
+_login_apikey_alias() {
+  local tool="$1" slot_name slot_dir alias_name rc_file settings_path
+  slot_name="${LOGIN_PROVIDER_NAME:-default}"
+  slot_dir="$(auth_slot_dir "$tool" "apikey-${slot_name}")"
+  alias_name="${tool}-apikey-${slot_name}"
+  settings_path="$slot_dir/settings.json"
+
+  [[ "$DRY_RUN" == "true" ]] && {
+    log_info "[DRY-RUN] Would create apikey slot: $slot_dir"
+    log_info "[DRY-RUN] Would add alias: $alias_name"
+    return 0
+  }
+
+  # Required: --url and --key
+  [[ -n "$LOGIN_BASE_URL" ]] || { log_error "apikey login requires --url <base_url>"; exit 2; }
+  [[ -n "$LOGIN_API_KEY" ]] || { log_error "apikey login requires --key <api_key>"; exit 2; }
+
+  mkdir -p "$slot_dir"
+
+  # Generate settings file from parameters (not copy)
+  case "$tool" in
+    claude|cc|cc-use-codex-cli)
+      local _model="${LOGIN_PROVIDER_NAME:-gpt-5.5}"
+      # If --name looks like a model name, use it as model
+      python3 - "$settings_path" "$LOGIN_BASE_URL" "$LOGIN_API_KEY" "$_model" <<'PY'
+import json, sys
+path, url, key, model = sys.argv[1:]
+d = {
+    "env": {
+        "ANTHROPIC_BASE_URL": url,
+        "ANTHROPIC_AUTH_TOKEN": key,
+        "ANTHROPIC_MODEL": model,
+        "ANTHROPIC_DEFAULT_OPUS_MODEL": model,
+        "ANTHROPIC_DEFAULT_SONNET_MODEL": model,
+        "ANTHROPIC_DEFAULT_HAIKU_MODEL": model.replace("gpt-5.5", "gpt-5.4").replace("deepseek-v4-pro", "deepseek-v4-flash")
+    },
+    "permissions": {"defaultMode": "bypassPermissions", "deny": [
+        "Bash(git push --force origin main:*)",
+        "Bash(git push --force origin develop:*)"
+    ]}
+}
+with open(path, 'w') as f:
+    json.dump(d, f, indent=2, ensure_ascii=False)
+PY
+      ;;
+    opencode)
+      local _model="${LOGIN_PROVIDER_NAME:-opencode/deepseek-v4-flash-free}"
+      python3 - "$settings_path" "$LOGIN_BASE_URL" "$LOGIN_API_KEY" "$_model" <<'PY'
+import json, sys
+path, url, key, model = sys.argv[1:]
+d = {
+    "permission": "allow",
+    "model": model,
+    "provider": {
+        "opencode": {
+            "api_key": key,
+            "base_url": url,
+            "models": {model.split("/")[-1] if "/" in model else model: {}}
+        }
+    }
+}
+with open(path, 'w') as f:
+    json.dump(d, f, indent=2, ensure_ascii=False)
+PY
+      ;;
+    *)
+      log_error "apikey settings generation not implemented for tool: $tool"
+      exit 2
+      ;;
+  esac
+
+  write_tool_active_slot "$tool" "apikey-${slot_name}"
+  log_info "Slot created: $slot_dir"
+  log_info "Active slot: apikey-${slot_name}"
+
+  # Add alias to shell rc
+  rc_file="${FREELY_SHELL_RC_FILE:-$HOME/.zshrc}"
+  if ! grep -qF "alias $alias_name=" "$rc_file" 2>/dev/null; then
+    case "$tool" in
+      claude|cc|cc-use-codex-cli)
+        echo "alias $alias_name=\"claude --settings $settings_path\"" >> "$rc_file" ;;
+      opencode)
+        echo "alias $alias_name='OPENCODE_CONFIG=\"$settings_path\" opencode'" >> "$rc_file" ;;
+    esac
+    log_info "Alias added: $alias_name"
+  else
+    log_info "Alias already exists: $alias_name"
+  fi
+
+  # Remind about manual edits
+  log_info "Settings file: $settings_path"
+  log_info "Edit it to add: effort level, subagent model, additional permissions, etc."
+
+  notify_freely_auth_change "$tool" "apikey-${slot_name}" "login_success"
 }
 
 # 保存当前登录
@@ -1292,11 +1397,23 @@ cmd_switch() {
       fi
       return "$rc"
       ;;
-    iflow|kiro-cli|cc|cc-use-codex-cli|opencode)
+    iflow|kiro-cli|cc|cc-use-codex-cli|opencode|claude)
       if [[ -z "$slot" ]]; then
-        tool_switch_auto_generic "$tool"
-      else
-        tool_switch_direct_generic "$tool" "$slot"
+        slot="$(first_tool_slot_or_singleton "$tool")"
+      fi
+      tool_switch_direct_generic "$tool" "$slot"
+      # For apikey slots: update project config.env AI_TOOL to alias name
+      if [[ "$slot" == apikey-* && -n "${SWITCH_PROJECT:-}" ]]; then
+        local alias_name="${tool}-${slot}"
+        local cfg="${SWITCH_PROJECT}/.freely/config.env"
+        if [[ -f "$cfg" ]]; then
+          if grep -q "^AI_TOOL=" "$cfg" 2>/dev/null; then
+            sed -i '' "s/^AI_TOOL=.*/AI_TOOL=\"$alias_name\"/" "$cfg"
+          else
+            echo "AI_TOOL=\"$alias_name\"" >> "$cfg"
+          fi
+          log_info "Updated AI_TOOL in config.env: $alias_name"
+        fi
       fi
       ;;
     *)
@@ -1887,6 +2004,8 @@ main() {
       --name) LOGIN_PROVIDER_NAME="$2"; shift 2 ;;
       --url) LOGIN_BASE_URL="$2"; shift 2 ;;
       --key) LOGIN_API_KEY="$2"; shift 2 ;;
+      --settings-file) LOGIN_SETTINGS_FILE="$2"; shift 2 ;;
+      --project) SWITCH_PROJECT="$2"; shift 2 ;;
       --help|-h) show_help; exit 0 ;;
       -*)
         log_error "Unknown option: $1"
