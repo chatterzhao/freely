@@ -5829,3 +5829,19 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260522T042725Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260522T042725Z--apikey-full-slot-name-fixes/candidates.md#C-20260522T042725Z-A`
+## M-20260522T044515Z-A
+- title: generic slot probe
+- status: active
+### candidate_issues
+1. `C-20260522T044515Z-A`
+- milestone: M-20260522T044515Z-A
+- status: promoted
+- decision_reason: raw-20260522T044515Z (GitHub #2110)
+- next_action: completed
+### completed_issues
+1. `I-20260522T044515Z-A`
+- title: generic slot probe
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260522T044515Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260522T044515Z--slot-probe-generic-hi/candidates.md#C-20260522T044515Z-A`
