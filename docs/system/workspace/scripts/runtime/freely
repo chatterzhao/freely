@@ -4357,8 +4357,8 @@ append_unique_tool_to_stream() {
 
 runtime_builtin_auto_recovery_tool_priority() {
   printf 'codex\n'
-  printf 'cc\n'
-  printf 'iflow\n'
+  printf 'claude\n'
+  printf 'opencode\n'
   printf 'kiro-cli\n'
   printf 'cc-use-codex-cli\n'
 }
