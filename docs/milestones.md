@@ -5955,3 +5955,19 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260522T075839Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260522T075839Z--switch-auto-extract-tool/candidates.md#C-20260522T075839Z-A`
+## M-20260522T081853Z-A
+- title: update fallback priority
+- status: active
+### candidate_issues
+1. `C-20260522T081853Z-A`
+- milestone: M-20260522T081853Z-A
+- status: promoted
+- decision_reason: raw-20260522T081853Z (GitHub #2121)
+- next_action: completed
+### committed_issues
+1. `I-20260522T081853Z-A`
+- title: update fallback priority
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260522T081853Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260522T081853Z--update-fallback-tools/candidates.md#C-20260522T081853Z-A`
