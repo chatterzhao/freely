@@ -5749,3 +5749,19 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260521T230423Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260521T230423Z--scan-active-worker-guard-fix/candidates.md#C-20260521T230423Z-A`
+## M-20260522T002426Z-A
+- title: crash report dedup
+- status: active
+### candidate_issues
+1. `C-20260522T002426Z-A`
+- milestone: M-20260522T002426Z-A
+- status: promoted
+- decision_reason: raw-20260522T002426Z (GitHub #2103) — 950+ duplicate crash issues flooding tracker
+- next_action: completed
+### completed_issues
+1. `I-20260522T002426Z-A`
+- title: crash report dedup
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260522T002426Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260522T002426Z--crash-dedup-comment-not-new-issue/candidates.md#C-20260522T002426Z-A`
