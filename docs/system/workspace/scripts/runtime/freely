@@ -12504,17 +12504,56 @@ _ensure_acp_bridge_running() {
   pid_file="$(_acp_bridge_pid_file "$project")"
   socket="$(_acp_bridge_socket "$project")"
 
+  # Determine the correct ACP binary for the current tool
+  local acp_bin="claude-agent-acp"
+  local base_tool="${AI_TOOL%%-*}"  # codex-apikey-xxx → codex
+  case "$base_tool" in
+    codex)
+      if [[ -n "${FREELY_CODEX_ACP_BIN:-}" ]]; then
+        acp_bin="$FREELY_CODEX_ACP_BIN"
+      else
+        local _ver="${FREELY_CODEX_ACP_VERSION:-0.11.1}"
+        local _triplet; _triplet="$(uname -s):$(uname -m)"
+        case "$_triplet" in
+          Darwin:arm64) _triplet="aarch64-apple-darwin" ;;
+          Darwin:x86_64) _triplet="x86_64-apple-darwin" ;;
+          Linux:aarch64|Linux:arm64) _triplet="aarch64-unknown-linux-gnu" ;;
+          Linux:x86_64) _triplet="x86_64-unknown-linux-gnu" ;;
+          *) _triplet="" ;;
+        esac
+        if [[ -n "$_triplet" ]]; then
+          acp_bin="$HOME/.cache/freely/acp/codex-acp/$_ver/$_triplet/codex-acp"
+        fi
+      fi
+      [[ -n "$acp_bin" && -x "$acp_bin" ]] || {
+        log_warn "codex-acp binary not found at $acp_bin, falling back to claude-agent-acp"
+        acp_bin="claude-agent-acp"
+      }
+      ;;
+    *) acp_bin="${FREELY_CLAUDE_ACP_BIN:-claude-agent-acp}" ;;
+  esac
+
+  # Store the binary path so we can detect tool changes across cycles
+  local acp_bin_file="${pid_file}.bin"
+
   # Already running?
   if [[ -f "$pid_file" ]]; then
     local pid
     pid=$(cat "$pid_file" 2>/dev/null || true)
     if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null && [[ -S "$socket" ]]; then
-      if _acp_bridge_health_check "$project" 5; then
+      # Check if the running bridge uses the right binary
+      local running_bin=""
+      [[ -f "$acp_bin_file" ]] && running_bin=$(cat "$acp_bin_file" 2>/dev/null || true)
+      if [[ -n "$running_bin" && "$running_bin" != "$acp_bin" ]]; then
+        log_info "ACP bridge binary changed ($running_bin → $acp_bin), restarting"
+        _stop_acp_bridge "$project"
+      elif _acp_bridge_health_check "$project" 5; then
         return 0
+      else
+        log_warn "existing ACP bridge (pid=$pid) is alive but failed health check; restarting"
       fi
-      log_warn "existing ACP bridge (pid=$pid) is alive but failed health check; restarting"
     fi
-    rm -f "$pid_file" "$socket"
+    rm -f "$pid_file" "$socket" "$acp_bin_file"
   fi
 
   local bridge_script="$SELF_ROOT/docs/system/workspace/scripts/runtime/acp-bridge.py"
@@ -12558,9 +12597,11 @@ except: pass
 
   # Use --foreground (no fork) + & to avoid child-process lifecycle issues
   local bridge_log; bridge_log="$(run_dir_for_project "$project")/acp-bridge.log"
-  python3 "$bridge_script" start --project "$project" --foreground </dev/null >>"$bridge_log" 2>&1 &
+  python3 "$bridge_script" start --project "$project" --acp-bin "$acp_bin" --foreground </dev/null >>"$bridge_log" 2>&1 &
   disown "$!" 2>/dev/null || true
   # Note: bridge writes its own PID file during start_server, don't overwrite it
+  # Record the binary path so we can detect tool changes across cycles
+  printf '%s\n' "$acp_bin" > "$acp_bin_file" 2>/dev/null || true
 
   # Wait for readiness
   local waited=0
