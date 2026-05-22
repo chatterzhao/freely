@@ -16,6 +16,9 @@ FILE_BACKUP_LIB="$SELF_ROOT/docs/system/workspace/scripts/runtime/file-backup.sh
 }
 source "$FILE_BACKUP_LIB"
 
+TOOL_LAUNCHERS_LIB="$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-launchers.sh"
+[[ -f "$TOOL_LAUNCHERS_LIB" ]] && source "$TOOL_LAUNCHERS_LIB"
+
 # 全局选项
 YES_MODE=false
 FORMAT="text"
@@ -967,6 +970,51 @@ PY
   chmod 600 "$auth_file"
 }
 
+# Check ACP binary availability for a tool. Blocks if missing.
+_require_acp_binary() {
+  local tool="$1"
+  case "$tool" in
+    codex)
+      if declare -f ensure_codex_acp_binary_for_launch >/dev/null 2>&1; then
+        ensure_codex_acp_binary_for_launch >/dev/null 2>&1 || {
+          log_error "ACP binary (codex-acp) not available for tool: $tool"
+          log_error "Please install codex-acp or set FREELY_CODEX_ACP_BIN"
+          return 1
+        }
+      else
+        local bin="${FREELY_CODEX_ACP_BIN:-}"
+        if [[ -z "$bin" ]]; then
+          local version="${FREELY_CODEX_ACP_VERSION:-0.11.1}"
+          local triplet; triplet="$(uname -s):$(uname -m)"
+          case "$triplet" in
+            Darwin:arm64) triplet="aarch64-apple-darwin" ;;
+            Darwin:x86_64) triplet="x86_64-apple-darwin" ;;
+            Linux:aarch64|Linux:arm64) triplet="aarch64-unknown-linux-gnu" ;;
+            Linux:x86_64) triplet="x86_64-unknown-linux-gnu" ;;
+            *) log_error "Unsupported platform for codex-acp: $triplet"; return 1 ;;
+          esac
+          bin="$HOME/.cache/freely/acp/codex-acp/$version/$triplet/codex-acp"
+        fi
+        if [[ ! -x "$bin" ]]; then
+          log_error "ACP binary (codex-acp) not found: $bin"
+          log_error "Please install codex-acp or set FREELY_CODEX_ACP_BIN"
+          return 1
+        fi
+      fi
+      ;;
+    *)
+      local acp_bin="${FREELY_CLAUDE_ACP_BIN:-claude-agent-acp}"
+      if ! command -v "$acp_bin" >/dev/null 2>&1; then
+        log_error "ACP binary not found: $acp_bin"
+        log_error "Required for tool: $tool (adapter: acp)"
+        log_error "Please install claude-agent-acp or set FREELY_CLAUDE_ACP_BIN"
+        return 1
+      fi
+      ;;
+  esac
+  return 0
+}
+
 # 初始化
 cmd_init() {
   mkdir -p "$AUTH_DIR"
@@ -1085,6 +1133,7 @@ cmd_login() {
 
   # ── apikey: unified across ALL tools ──
   if [[ "$auth_mode" == "apikey" ]]; then
+    _require_acp_binary "$tool" || exit 1
     _login_apikey_alias "$tool"
     return 0
   fi
@@ -1349,6 +1398,7 @@ cmd_switch() {
   fi
 
   tool="$(_extract_tool_from_slot "$slot")"
+  _require_acp_binary "$tool" || exit 1
 
   case "$tool" in
     codex)

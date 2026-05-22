@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+
+# Source the full ai-cli to get _require_acp_binary + its dependencies
+# (ai-cli sources tool-launchers.sh which provides ensure_codex_acp_binary_for_launch)
+source "$ROOT_DIR/docs/system/workspace/scripts/runtime/ai-cli" 2>/dev/null || true
+
+failures=0
+
+# Test 1: claude tool finds claude-agent-acp
+echo "=== Test 1: claude tool finds ACP binary ==="
+if _require_acp_binary claude 2>/dev/null; then
+  echo "[PASS] claude ACP binary found"
+else
+  echo "[FAIL] claude ACP binary not found"
+  failures=$((failures+1))
+fi
+
+# Test 2: opencode tool uses same binary
+echo "=== Test 2: opencode tool finds ACP binary ==="
+if _require_acp_binary opencode 2>/dev/null; then
+  echo "[PASS] opencode ACP binary found"
+else
+  echo "[FAIL] opencode ACP binary not found"
+  failures=$((failures+1))
+fi
+
+# Test 3: codex tool with codex-acp
+echo "=== Test 3: codex tool finds codex-acp ==="
+if _require_acp_binary codex 2>/dev/null; then
+  echo "[PASS] codex ACP binary found"
+else
+  echo "[FAIL] codex ACP binary not found"
+  failures=$((failures+1))
+fi
+
+# Test 4: missing binary is blocked
+echo "=== Test 4: missing binary blocked ==="
+if FREELY_CLAUDE_ACP_BIN="/nonexistent/acp" _require_acp_binary claude 2>/dev/null; then
+  echo "[FAIL] missing binary should be blocked"
+  failures=$((failures+1))
+else
+  echo "[PASS] missing binary blocked"
+fi
+
+# Test 5: missing codex binary blocked
+echo "=== Test 5: missing codex binary blocked ==="
+if FREELY_CODEX_ACP_BIN="/nonexistent/codex-acp" _require_acp_binary codex 2>/dev/null; then
+  echo "[FAIL] missing codex binary should be blocked"
+  failures=$((failures+1))
+else
+  echo "[PASS] missing codex binary blocked"
+fi
+
+# Test 6: kiro-cli finds ACP binary
+echo "=== Test 6: kiro-cli tool finds ACP binary ==="
+if _require_acp_binary kiro-cli 2>/dev/null; then
+  echo "[PASS] kiro-cli ACP binary found"
+else
+  echo "[FAIL] kiro-cli ACP binary not found"
+  failures=$((failures+1))
+fi
+
+if [[ "$failures" -eq 0 ]]; then
+  echo ""
+  echo "[PASS] test-acp-binary-check-require-available"
+else
+  echo ""
+  echo "[FAIL] $failures test(s) failed"
+  exit 1
+fi
