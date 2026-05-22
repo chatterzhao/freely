@@ -4225,6 +4225,64 @@ runtime_list_tool_slots() {
   ls -1 "$auth_dir" 2>/dev/null | grep "^${prefix}" | sed "s/^${prefix}//" || true
 }
 
+# ── Apikey-mode slot helpers ──────────────────────────────
+# Apikey slots use alias-based config: slot dir holds settings file,
+# alias points to it, switch = change AI_TOOL in config.env.
+
+_slot_is_apikey_mode() {
+  local slot_name="$1"
+  [[ "$slot_name" == apikey-* ]] || [[ "$slot_name" == *-apikey-* ]]
+}
+
+# Return the full alias name for an apikey slot.
+# slot dir: {tool}-apikey-{name} → alias: same as dir name
+_slot_alias_name() {
+  local tool="$1" slot_name="$2"
+  printf '%s-%s\n' "$tool" "$slot_name"
+}
+
+# Create a new apikey slot:
+#   1. mkdir ~/.ai-auth/{tool}-apikey-{name}/
+#   2. cp settings_file into it
+#   3. add alias to ~/.zshrc (if not already present)
+#   4. update project config.env AI_TOOL
+slot_create_apikey() {
+  local tool="$1" slot_name="$2" settings_file="$3" project="${4:-}"
+  local auth_dir slot_dir alias_name alias_line
+  auth_dir="$(runtime_tool_auth_dir)"
+  slot_dir="$auth_dir/${tool}-${slot_name}"
+  alias_name="${tool}-${slot_name}"
+
+  [[ -d "$auth_dir" ]] || mkdir -p "$auth_dir"
+  [[ -f "$settings_file" ]] || { log_error "settings file not found: $settings_file"; return 1; }
+  [[ "$slot_name" == apikey-* ]] || { log_error "apikey slot name must start with 'apikey-': $slot_name"; return 1; }
+
+  mkdir -p "$slot_dir"
+  cp "$settings_file" "$slot_dir/settings.json"
+  log_info "apikey slot created: $slot_dir"
+
+  # Add alias to shell rc if not already present
+  local rc_file
+  rc_file="${FREELY_SHELL_RC_FILE:-$HOME/.zshrc}"
+  if ! grep -qF "alias $alias_name=" "$rc_file" 2>/dev/null; then
+    local alias_cmd
+    case "$tool" in
+      claude)   alias_cmd="alias $alias_name=\"claude --settings $slot_dir/settings.json\"" ;;
+      opencode) alias_cmd="alias $alias_name=\"OPENCODE_CONFIG=$slot_dir/settings.json opencode\"" ;;
+      codex)    alias_cmd="alias $alias_name=\"codex --config $slot_dir/settings.json\"" ;;
+      *)        log_error "unsupported tool for apikey slot: $tool"; return 1 ;;
+    esac
+    echo "$alias_cmd" >> "$rc_file"
+    log_info "alias added to $rc_file: $alias_cmd"
+  fi
+
+  # Update project config
+  if [[ -n "$project" ]]; then
+    upsert_config_key "$project" "AI_TOOL" "$alias_name"
+    log_info "AI_TOOL updated in config.env: $alias_name"
+  fi
+}
+
 runtime_default_singleton_slot_for_tool() {
   printf 'default-1\n'
 }
@@ -4543,14 +4601,21 @@ attempt_runtime_auto_recovery_after_failure() {
 
 persist_project_tool_selection() {
   local project="$1" tool="$2" requested_adapter="${3:-}" requested_adapter_policy="${4:-}"
-  local model reasoning_effort tool_adapter tool_adapter_policy tool_capabilities tool_policy
+  local model reasoning_effort tool_adapter tool_adapter_policy tool_capabilities tool_policy effective_tool
+  effective_tool="$tool"
+  # If the selected slot is apikey mode, use full alias name (tool-slot) as AI_TOOL.
+  # This makes the runtime resolve it via alias → type → settings chain.
+  local _recovery_slot="${TOOL_AUTO_RECOVERY_SLOT:-}"
+  if [[ -n "$_recovery_slot" ]] && _slot_is_apikey_mode "$_recovery_slot"; then
+    effective_tool="$(_slot_alias_name "$tool" "$_recovery_slot")"
+  fi
   model="$(resolve_project_tool_model_selection "$project" "$tool")"
   reasoning_effort="$(resolve_project_tool_reasoning_effort_selection "$project" "$tool")"
   tool_adapter_policy="$(resolve_project_tool_adapter_policy_selection "$project" "$tool" "$requested_adapter_policy" "$requested_adapter")"
   tool_adapter="$(resolve_project_tool_adapter_selection "$project" "$tool" "$requested_adapter" "$tool_adapter_policy")"
   tool_capabilities="$(tool_default_capabilities_for_runtime "$tool")"
   tool_policy="$(tool_default_policy_for_runtime "$tool")"
-  upsert_config_key "$project" "AI_TOOL" "$tool"
+  upsert_config_key "$project" "AI_TOOL" "$effective_tool"
   upsert_config_key "$project" "AI_MODEL" "$model"
   upsert_config_key "$project" "AI_REASONING_EFFORT" "$reasoning_effort"
   upsert_config_key "$project" "AI_TOOL_ADAPTER" "$tool_adapter"
