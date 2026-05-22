@@ -1352,6 +1352,88 @@ select_earliest_reset_codex_slot_any() {
 # Exit code:
 #   0 for usable or rate limited
 #   1 for other probe failures
+# ── Generic slot probe (all tools) ──────────────────────────
+# Runs "hi" via tool's non-interactive mode, checks output for success.
+# Returns: usable | rate_limited:N | deactivated_workspace | network_failure | unknown_error
+slot_probe() {
+  local project="$1" tool="$2" slot_dir="$3" timeout_secs="${4:-15}"
+  local prompt_file output_file rc pid slept partial_output
+  prompt_file="$(mktemp)"
+  output_file="$(mktemp)"
+  printf 'hi\n' >"$prompt_file"
+  rc=0
+
+  (
+    cd "$project"
+    freely_apply_project_network_proxy_env "$project"
+    case "$tool" in
+      claude|cc|cc-use-codex-cli)
+        claude -p --settings "$slot_dir/settings.json" <"$prompt_file" &
+        ;;
+      opencode)
+        OPENCODE_CONFIG="$slot_dir/settings.json" opencode run "$(cat "$prompt_file")" &
+        ;;
+      codex)
+        codex exec --skip-git-repo-check -C "$project" --dangerously-bypass-approvals-and-sandbox - <"$prompt_file" &
+        ;;
+      *)
+        rm -f "$prompt_file" "$output_file"
+        printf 'unsupported_tool\n'
+        return 1
+        ;;
+    esac
+    pid=$!
+    wait "$pid" 2>/dev/null || true
+  ) >"$output_file" 2>&1 &
+  pid=$!
+
+  slept=0
+  while [[ $slept -lt $timeout_secs ]]; do
+    partial_output="$(cat "$output_file" 2>/dev/null || true)"
+    if _slot_probe_output_is_success "$partial_output"; then
+      kill "$pid" 2>/dev/null; wait "$pid" 2>/dev/null
+      rm -f "$prompt_file" "$output_file"
+      printf 'usable\n'; return 0
+    fi
+    if _slot_probe_output_has_error "$partial_output" "deactivated\|workspace deactivated"; then
+      kill "$pid" 2>/dev/null; wait "$pid" 2>/dev/null
+      rm -f "$prompt_file" "$output_file"
+      printf 'deactivated_workspace\n'; return 0
+    fi
+    if _slot_probe_output_has_error "$partial_output" "rate.limit\|429\|too many requests"; then
+      kill "$pid" 2>/dev/null; wait "$pid" 2>/dev/null
+      rm -f "$prompt_file" "$output_file"
+      printf 'rate_limited:0\n'; return 0
+    fi
+    if _slot_probe_output_has_error "$partial_output" "401\|402\|403\|unauthorized\|payment required\|insufficient"; then
+      kill "$pid" 2>/dev/null; wait "$pid" 2>/dev/null
+      rm -f "$prompt_file" "$output_file"
+      printf 'auth_failure\n'; return 0
+    fi
+    if _slot_probe_output_has_error "$partial_output" "timeout\|connection refused\|network\|DNS\|resolve"; then
+      kill "$pid" 2>/dev/null; wait "$pid" 2>/dev/null
+      rm -f "$prompt_file" "$output_file"
+      printf 'network_failure\n'; return 0
+    fi
+    sleep 1; slept=$((slept + 1))
+  done
+  kill "$pid" 2>/dev/null; wait "$pid" 2>/dev/null
+  rm -f "$prompt_file" "$output_file"
+  printf 'unknown_error\n'
+}
+
+_slot_probe_output_is_success() {
+  local out="$1"
+  [[ -n "$out" ]] || return 1
+  # Any non-empty, non-error output after "hi" is success
+  ! _slot_probe_output_has_error "$out" "error\|Error\|failed\|Failed"
+}
+
+_slot_probe_output_has_error() {
+  local out="$1" pattern="$2"
+  [[ -n "$out" ]] && echo "$out" | grep -qi "$pattern"
+}
+
 codex_probe_current_slot_now() {
   local project="$1" probe_lock_reason="${2:-codex_exec_probe}" probe_activity_label="${3:-codex exec probe}" prompt_file output_file rc timeout_secs="${CODEX_PROBE_TIMEOUT:-15}" probe_lock_held=0
   local current_slot artifact_path partial_output
