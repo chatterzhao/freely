@@ -1,0 +1,7 @@
+- issue_id: I-20260522T020249Z-A
+- kind: feat
+- phase_state: completed
+- milestone: M-20260522T020249Z-A
+- source_candidate: docs/pre-brainstorms/20260522T020249Z--slot-apikey-alias-switch/candidates.md#C-20260522T020249Z-A
+- verification_artifact_dir: docs/epics/slot-apikey-alias-switch/code-reviews
+- canonical_issue_path: docs/issues/I-20260522T020249Z-A/issue.md

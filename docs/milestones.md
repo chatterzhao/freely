@@ -565,7 +565,7 @@ routing_policy:
 1. `I-20260507T143544Z-A`
 - title: raw-issue-pull interception guard + CLI dispatch
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260507T143544Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507T143544Z--intercept-guard/candidates.md`
 - verification_artifact_dir: `docs/epics/raw-issue-pull-intercept/code-reviews`
@@ -582,7 +582,7 @@ routing_policy:
 1. `I-20260507T0700Z-A`
 - title: unified platform layer
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260507T0700Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507-unified-platform/candidates.md`
 - verification_artifact_dir: `docs/epics/unified-platform/code-reviews`
@@ -598,7 +598,7 @@ routing_policy:
 1. `I-20260507T0730Z-A`
 - title: wt-create --source parameter
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260507T0730Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507-source-param/candidates.md`
 - verification_artifact_dir: `docs/epics/source-param/code-reviews`
@@ -614,7 +614,7 @@ routing_policy:
 1. `I-20260507T0600Z-A`
 - title: raw-issue-pull
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260507T0600Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507-raw-issue-pull/candidates.md`
 - verification_artifact_dir: `docs/epics/raw-issue-pull/code-reviews`
@@ -630,7 +630,7 @@ routing_policy:
 1. `I-20260507T0300Z-A`
 - title: GATE 1 timestamp check
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260507T0300Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507-gate1-timestamp/candidates.md`
 - verification_artifact_dir: `docs/epics/gate1-timestamp/code-reviews`
@@ -646,7 +646,7 @@ routing_policy:
 1. `I-20260507T0200Z-A`
 - title: promoted gate fix
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260507T0200Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507-promoted-gate-fix/candidates.md`
 - verification_artifact_dir: `docs/epics/promoted-gate-fix/code-reviews`
@@ -662,7 +662,7 @@ routing_policy:
 1. `I-20260507T0100Z-A`
 - title: fix-execution branch naming
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260507T0100Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507-fix-branch-naming/candidates.md`
 - verification_artifact_dir: `docs/epics/fix-branch-naming/code-reviews`
@@ -681,7 +681,7 @@ routing_policy:
 1. `I-20260506T1400Z-A`
 - title: merge-guarded fix/* whitelist
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260506T1400Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260506-merge-guarded-fix/candidates.md`
 - verification_artifact_dir: `docs/epics/merge-guarded-fix-whitelist/code-reviews`
@@ -708,7 +708,7 @@ routing_policy:
 1. `I-20260506T1200Z-A`
 - title: Skill rename to B1_IBM/B2_IBM + I→B→M skeleton
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260506T1200Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260506-ibm-skill-rename/candidates.md`
 - verification_artifact_dir: `docs/epics/ibm-skill-rename/code-reviews`
@@ -922,7 +922,7 @@ routing_policy:
 29. `I-20260505T1210Z-A-C`
 - title: governance gate state consistency + schema validation
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/issue-state-refactor/issues/I-20260505T1210Z-A-C.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-issue-state-refactor.md`
@@ -936,7 +936,7 @@ routing_policy:
 28. `I-20260505T1210Z-A-B`
 - title: issue-sync 只写 platform_state
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/issue-state-refactor/issues/I-20260505T1210Z-A-B.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-issue-state-refactor.md`
@@ -950,7 +950,7 @@ routing_policy:
 27. `I-20260505T1210Z-A`
 - title: scan 常量对齐 IBM Framework §89 + 迁移现有 issue
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/issue-state-refactor/issues/I-20260505T1210Z-A.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-issue-state-refactor.md`
@@ -5121,7 +5121,7 @@ routing_policy:
 1. `I-20260508T111130Z-A`
 - title: reference-transaction hook delete fix
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T111130Z-A/issue.md`
 
 ## M-20260508T124041Z-A
@@ -5136,7 +5136,7 @@ routing_policy:
 1. `I-20260508T124041Z-A`
 - title: wt-create pull deferred to after worktree creation
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T124041Z-A/issue.md`
 
 ## M-20260508T133423Z-A
@@ -5196,7 +5196,7 @@ routing_policy:
 1. `I-20260508T232413Z-A`
 - title: merge-guarded IBM phase guidance
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T232413Z-A/issue.md`
 
 1. `I-20260508T154706Z-A`
@@ -5781,3 +5781,19 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260521T234624Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260521T234624Z--opencode-high-failure-rate/candidates.md#C-20260521T234624Z-A`
+## M-20260522T020249Z-A
+- title: apikey slot alias switch
+- status: active
+### candidate_issues
+1. `C-20260522T020249Z-A`
+- milestone: M-20260522T020249Z-A
+- status: promoted
+- decision_reason: raw-20260522T020249Z (GitHub #2104) — apikey slots need alias-based switch, not tool-native config writes
+- next_action: implement CLI commands and watchdog integration
+### committed_issues
+1. `I-20260522T020249Z-A`
+- title: apikey slot alias switch
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260522T020249Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260522T020249Z--slot-apikey-alias-switch/candidates.md#C-20260522T020249Z-A`
