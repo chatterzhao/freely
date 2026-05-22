@@ -5907,3 +5907,19 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260522T071901Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260522T071901Z--slot-full-name-final-fixes/candidates.md#C-20260522T071901Z-A`
+## M-20260522T072450Z-A
+- title: fix list double prefix
+- status: active
+### candidate_issues
+1. `C-20260522T072450Z-A`
+- milestone: M-20260522T072450Z-A
+- status: promoted
+- decision_reason: raw-20260522T072450Z (GitHub #2118)
+- next_action: completed
+### committed_issues
+1. `I-20260522T072450Z-A`
+- title: fix list double prefix
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260522T072450Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260522T072450Z--fix-list-double-prefix/candidates.md#C-20260522T072450Z-A`

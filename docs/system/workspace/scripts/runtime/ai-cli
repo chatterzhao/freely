@@ -1647,7 +1647,7 @@ cmd_list() {
   
   while IFS= read -r line; do
     [[ -z "$line" ]] && continue
-    accounts+=("$tool-$line")
+    accounts+=("$line")
   done < <(list_tool_slots "$tool")
   
   if [[ ${#accounts[@]} -eq 0 ]]; then
