@@ -1421,17 +1421,23 @@ _cmd_switch_auto() {
       [[ -d "$slot_dir" ]] || continue
 
       local result
-      result=$(slot_probe "$project" "$tool" "$slot_dir" 5 2>/dev/null || echo "unknown_error")
-      case "$result" in
-        usable)
-          log_info "Auto-switch: $slot (usable)"
-          cmd_switch "$slot"
-          return 0
-          ;;
-        rate_limited:*|deactivated_workspace|auth_failure|network_failure|unknown_error)
-          log_warn "Auto-switch: $slot skipped ($result)"
-          ;;
+      probe_ok=0; _out="$(mktemp)"
+      case "$tool" in
+        claude|cc|cc-use-codex-cli)
+          echo "say hi" | perl -e '"'"'alarm 10; exec @ARGV'"'"' claude -p --settings "$slot_dir/settings.json" >"$_out" 2>&1 && probe_ok=1 ;;
+        opencode)
+          perl -e '"'"'alarm 10; exec @ARGV'"'"' bash -c "OPENCODE_CONFIG='"'"'$slot_dir/settings.json'"'"' opencode run '"'"'say hi'"'"'" >"$_out" 2>&1 && probe_ok=1 ;;
+        codex)
+          perl -e '"'"'alarm 10; exec @ARGV'"'"' bash -c "cd '"'"'$slot_dir'"'"' && codex exec '"'"'say hi'"'"' --skip-git-repo-check" >"$_out" 2>&1 && probe_ok=1 ;;
       esac
+      rm -f "$_out"
+      if [[ "$probe_ok" == "1" ]]; then
+        log_info "Auto-switch: $slot (usable)"
+        cmd_switch "$slot"
+        return 0
+      else
+        log_warn "Auto-switch: $slot skipped"
+      fi
     done
   done
 
