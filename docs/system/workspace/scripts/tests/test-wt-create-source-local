@@ -1,0 +1,115 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+
+failures=0
+
+WT_CREATE="$ROOT_DIR/docs/system/workspace/scripts/worktree/wt-create"
+
+# Test 1: --source local is a valid option in validation
+echo "=== Test 1: --source local accepted ==="
+if grep -q "chat-inbox|platform|local" "$WT_CREATE"; then
+  echo "[PASS] --source local is a valid option"
+else
+  echo "[FAIL] --source local not found"
+  failures=$((failures+1))
+fi
+
+# Test 2: _pull_raw_issue has local case
+echo "=== Test 2: _pull_raw_issue supports local ==="
+if grep -A2 'local)' "$WT_CREATE" | grep -q "already exists locally\|docs/issues"; then
+  echo "[PASS] _pull_raw_issue has local handler"
+else
+  echo "[FAIL] _pull_raw_issue missing local handler"
+  failures=$((failures+1))
+fi
+
+# Test 3: chat-inbox error suggests --source platform when issue exists on disk
+echo "=== Test 3: chat-inbox error suggests --source platform ==="
+if grep -q "使用.*--source platform" "$WT_CREATE"; then
+  echo "[PASS] chat-inbox error suggests --source platform"
+else
+  echo "[FAIL] missing --source platform suggestion"
+  failures=$((failures+1))
+fi
+
+# Test 4: legacy mode output includes standard/legacy mode descriptions
+echo "=== Test 4: legacy output has standard/legacy mode lines ==="
+if grep -q "wt-create 标准模式:" "$WT_CREATE" && grep -q "wt-create legacy 模式:" "$WT_CREATE"; then
+  echo "[PASS] legacy output describes both modes"
+else
+  echo "[FAIL] missing mode descriptions"
+  failures=$((failures+1))
+fi
+
+# Test 5: legacy mode shows correct scenarios
+echo "=== Test 5: legacy mode shows correct scenarios ==="
+if grep -q "已有 fix|hotfix|feature 开发工位但缺 test-pre-merge" "$WT_CREATE"; then
+  echo "[PASS] legacy shows test-pre-merge补建 scenario"
+else
+  echo "[FAIL] missing test-pre-merge补建 scenario"
+  failures=$((failures+1))
+fi
+if grep -q "纯文档修改" "$WT_CREATE"; then
+  echo "[PASS] legacy shows 纯文档修改 scenario"
+else
+  echo "[FAIL] missing 纯文档修改 scenario"
+  failures=$((failures+1))
+fi
+if grep -q "创建 develop 分支\|init develop" "$WT_CREATE"; then
+  echo "[PASS] legacy shows init develop scenario"
+else
+  echo "[FAIL] missing init develop scenario"
+  failures=$((failures+1))
+fi
+if grep -q "release 分支" "$WT_CREATE"; then
+  echo "[PASS] legacy shows release scenario"
+else
+  echo "[FAIL] missing release scenario"
+  failures=$((failures+1))
+fi
+
+# Test 6: standard mode shows correct scenarios and format
+echo "=== Test 6: standard mode format ==="
+if grep -q "fix|hotfix|feature.*test-pre-merge" "$WT_CREATE"; then
+  echo "[PASS] standard mode mentions fix|hotfix|feature + test-pre-merge"
+else
+  echo "[FAIL] missing fix|hotfix|feature in standard mode"
+  failures=$((failures+1))
+fi
+
+# Test 7: REMINDER section references skill name
+echo "=== Test 7: REMINDER references skill name ==="
+if grep -q 'skill:\${skill_name}' "$WT_CREATE" || grep -q 'skill:.*skill_name' "$WT_CREATE"; then
+  echo "[PASS] REMINDER includes skill name variable"
+elif grep -q '请遵循 skill' "$WT_CREATE"; then
+  echo "[PASS] REMINDER includes skill reference text"
+else
+  echo "[FAIL] missing skill reference in REMINDER"
+  failures=$((failures+1))
+fi
+
+# Test 8: REMINDER has fix and feature branches with correct IBM steps
+echo "=== Test 8: REMINDER has fix/feature specific steps ==="
+if grep -q "Fix first, govern later" "$WT_CREATE"; then
+  echo "[PASS] fix branch has 'Fix first, govern later'"
+else
+  echo "[FAIL] missing fix guidance"
+  failures=$((failures+1))
+fi
+if grep -q "Govern first, then code" "$WT_CREATE"; then
+  echo "[PASS] feature branch has 'Govern first, then code'"
+else
+  echo "[FAIL] missing feature guidance"
+  failures=$((failures+1))
+fi
+
+if [[ "$failures" -eq 0 ]]; then
+  echo ""
+  echo "[PASS] test-wt-create-source-local"
+else
+  echo ""
+  echo "[FAIL] $failures test(s) failed"
+  exit 1
+fi

@@ -4,21 +4,17 @@ set -euo pipefail
 usage() {
   cat <<USAGE
 Usage:
-  ./bin/wt-create --raw-key <key> --source <source> --skill <path> --slug <slug> [--base <branch>]
-  ./bin/wt-create <branch> [--base <base-branch>]    (legacy, single worktree)
+  ./bin/wt-create --raw-key <key> --source <platform|chat-inbox> --skill <freely-fix-execution|freely-feat-execution> --slug <slug> [--base <branch>]
+  ./bin/wt-create <branch> [--base <base-branch>]    (legacy: 补建 test-pre-merge-*、纯文档、init develop、release 分支)
 
 Required:
   --raw-key <key>     Raw issue key (YYYYMMDDTHHMM[SS]Z format, e.g. 20260513T010343Z)
-  --source  <source>  Where the raw issue comes from:
-                        chat-inbox  — freely.db chats 表
+  --source  <platform|chat-inbox>
                         platform    — GitHub/Gitee OPEN issue
-                      AI: search the scan file for this raw-key to find its
-                      source_family. Scan file is at:
-                        .freely/run/manager-task-source-scan-latest.json
-                      If not found, wt-create auto-runs scan once.
-  --skill   <name>    Skill name: 'freely-fix-execution' or 'freely-feat-execution'.
-                        AI: After wt-create, read this skill and its references
-                        to learn the workflow, branch naming, and sub-skills.
+                        chat-inbox  — freely.db chats 表
+  --skill   <freely-fix-execution|freely-feat-execution>
+                        freely-fix-execution  — 快速修复 bug
+                        freely-feat-execution — 新功能/大型改动
   --slug    <slug>    Short descriptive slug for the worktree
 
 Optional:
@@ -152,11 +148,12 @@ fi
 
 if [[ "$using_new" -eq 1 ]]; then
   case "$source_val" in
-    chat-inbox|platform) ;;
+    chat-inbox|platform|local) ;;
     *)
-      echo "Invalid --source '$source_val'. Must be 'chat-inbox' or 'platform'." >&2
+      echo "Invalid --source '$source_val'. Must be 'chat-inbox', 'platform', or 'local'." >&2
       echo "  chat-inbox — raw issue comes from freely.db chats table" >&2
       echo "  platform   — raw issue comes from GitHub/Gitee OPEN issue" >&2
+      echo "  local      — raw issue exists in docs/issues/raw-<key>/" >&2
       exit 1
       ;;
   esac
@@ -327,6 +324,15 @@ conn.close()
       fi
       return 1
       ;;
+    local)
+      # Issue already exists in docs/issues/, just verify
+      if [[ -f "$ROOT_DIR/docs/issues/raw-${raw_key}/issue.md" ]]; then
+        echo "pull: raw-$raw_key already exists locally" >&2
+        return 0
+      fi
+      echo "pull: raw-$raw_key not found in docs/issues/" >&2
+      return 1
+      ;;
   esac
 }
 
@@ -432,8 +438,25 @@ _require_issue_exists() {
               : # chat exists in inbox, proceed
             else
               echo "拒绝创建工位: raw-$raw_key not found in chat-inbox" >&2
-              echo "  先通过 freely chat 提交消息创建 chat-inbox raw issue" >&2
-              echo "  创建后重试: wt-create --raw-key $raw_key --source chat-inbox --skill <skill> --slug <slug>" >&2
+              if [[ -d "$ROOT_DIR/docs/issues/raw-$raw_key" ]]; then
+                echo "  但发现 issue 文件存在于 docs/issues/raw-$raw_key/" >&2
+                echo "  请使用 --source platform（本地 issue 文件作为 platform 创建工位）:" >&2
+                echo "    wt-create --raw-key $raw_key --source platform --skill <skill> --slug <slug>" >&2
+              else
+                echo "  先通过 freely chat 提交消息创建 chat-inbox raw issue" >&2
+                echo "  创建后重试: wt-create --raw-key $raw_key --source chat-inbox --skill <skill> --slug <slug>" >&2
+              fi
+              return 1
+            fi
+            ;;
+          local)
+            if [[ -d "$ROOT_DIR/docs/issues/$key" ]]; then
+              : # exists locally
+            else
+              echo "拒绝创建工位: raw-$raw_key not found in docs/issues/" >&2
+              echo "  先在 docs/issues/raw-$raw_key/ 创建 issue.md" >&2
+              echo "  或: freely feedback --repo <user/repo> --title '...' --body '...'" >&2
+              echo "  创建后重试: wt-create --raw-key $raw_key --source local --skill <skill> --slug <slug>" >&2
               return 1
             fi
             ;;
@@ -632,16 +655,64 @@ _require_issue_exists "$fix_branch" || exit 1
 ╚══════════════════════════════════════════════════════════╝
 MSG
 
-  cat <<REMINDER
+  case "$prefix" in
+    fix)
+      cat <<REMINDER
+
+┌─ 下一步 ──────────────────────────────────────────────┐
+│  请遵循 skill:${skill_name} 开展工作                        │
+│                                                          │
+│  进入 ${prefix} 工位开发:                                  │
+│    cd $fix_target                                        │
+│  测试时进入 test-pre-merge 工位:                          │
+│    cd $tp_target                                         │
+│                                                          │
+│  Fix first, govern later (代码先行, 治理后置):             │
+│    1. 在 test-pre-merge-* 改源码, stop/start daemon 验证    │
+│    2. cp 修改到 fix 工位, git commit                       │
+│    3. skill:freely-doc-B1_IBM-execution → raw → candidate  │
+│    4. skill:freely-doc-B2_IBM-execution → I-* → milestone  │
+│    5. skill:freely-dev-loop-execution → code-review + pre-tests │
+│    6. merge-guarded test-pre-merge-* <fix-branch>  (test)  │
+│    7. merge-guarded develop <fix-branch>            (merge) │
+│    8. wt-close <fix-branch>                               │
+└──────────────────────────────────────────────────────────┘
+REMINDER
+      ;;
+    feature)
+      cat <<REMINDER
+
+┌─ 下一步 ──────────────────────────────────────────────┐
+│  请遵循 skill:${skill_name} 开展工作                        │
+│                                                          │
+│  进入 ${prefix} 工位开发:                                  │
+│    cd $fix_target                                        │
+│  测试时进入 test-pre-merge 工位:                          │
+│    cd $tp_target                                         │
+│                                                          │
+│  Govern first, then code (治理先行, 代码后置):            │
+│    1. skill:freely-doc-B1_IBM-execution → raw → brainstorms → candidates │
+│    2. skill:freely-doc-B2_IBM-execution → materialize I-* → milestone │
+│    3. skill:freely-dev-loop-execution → implement + code-review + pre-tests │
+│    4. merge-guarded test-pre-merge-* <feature-branch>  (test) │
+│    5. merge-guarded develop <feature-branch>            (merge) │
+│    6. wt-close <feature-branch>                          │
+└──────────────────────────────────────────────────────────┘
+REMINDER
+      ;;
+    *)
+      cat <<REMINDER
 
 ┌─ 下一步 ───────────────────────────────────────────────┐
-│  进入 ${prefix} 工位开发:                                  │
+│  进入工位开发:                                            │
 │    cd $fix_target                                        │
 │  测试时进入 test-pre-merge 工位:                          │
 │    cd $tp_target                                         │
 │  仔细阅读 skill: ${skill_path}                             │
 └──────────────────────────────────────────────────────────┘
 REMINDER
+      ;;
+  esac
 else
   tp_target="$(freely_wt_resolve_target_path "$fix_branch")"
   _create_worktree "$fix_branch" "$tp_target" "$base"
@@ -653,7 +724,11 @@ Branch:
   $fix_branch
 Execution base:
   $base
-Next:
-  cd "$tp_target"
+
+  wt-create 标准模式: --raw-key <key> --source <platform|chat-inbox> --skill <freely-fix-execution|freely-feat-execution> --slug <slug>
+    使用场景：从 raw issue 创建 fix|hotfix|feature + test-pre-merge 工位对，走完整 IBM 治理链路
+  wt-create legacy 模式: <branch>
+    使用场景：已有 fix|hotfix|feature 开发工位但缺 test-pre-merge-<raw-key>-<slug> 时补建测试工位、
+              纯文档修改（无需测试+治理）、项目初始化创建 develop 分支、gitflow 发版创建 release 分支
 MSG
 fi

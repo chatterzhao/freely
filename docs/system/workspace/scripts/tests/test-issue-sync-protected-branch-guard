@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TEST_TMP="$(mktemp -d /tmp/freely-issue-sync-guard.XXXXXX)"
+trap 'rm -rf "$TEST_TMP"' EXIT
+
+REPO="$TEST_TMP/repo"
+mkdir -p "$REPO"
+cd "$REPO"
+git init -q -b develop
+git config user.name tester
+git config user.email tester@example.com
+
+# Copy issue-sync
+mkdir -p bin docs/issues/raw-20260522T000000Z
+cp "$ROOT_DIR/bin/issue-sync" bin/issue-sync
+chmod +x bin/issue-sync
+
+# Create a raw issue
+cat > docs/issues/raw-20260522T000000Z/issue.md <<'EOF'
+---
+local_id: raw-20260522T000000Z
+kind: raw
+phase_state: proposed
+primary_platform: github
+---
+# Test issue
+EOF
+
+git add -A && git commit -q -m "init"
+
+# Create branches
+git branch main
+git branch test-pre-merge-20260522-demo
+git branch fix/raw-20260522-demo
+
+failures=0
+
+# Test 1: block on develop
+echo "=== Test 1: block on develop ==="
+if ./bin/issue-sync close raw-20260522T000000Z 2>"$TEST_TMP/err1"; then
+  echo "[FAIL] issue-sync on develop not blocked"
+  failures=$((failures+1))
+else
+  grep -q "protected branch" "$TEST_TMP/err1" && echo "[PASS] blocked on develop" || { echo "[FAIL] wrong error"; failures=$((failures+1)); }
+fi
+
+# Test 2: block on main
+echo "=== Test 2: block on main ==="
+git checkout -q main
+if ./bin/issue-sync close raw-20260522T000000Z 2>"$TEST_TMP/err2"; then
+  echo "[FAIL] issue-sync on main not blocked"
+  failures=$((failures+1))
+else
+  grep -q "protected branch" "$TEST_TMP/err2" && echo "[PASS] blocked on main" || { echo "[FAIL] wrong error"; failures=$((failures+1)); }
+fi
+
+# Test 3: block on test-pre-merge-*
+echo "=== Test 3: block on test-pre-merge-* ==="
+git checkout -q test-pre-merge-20260522-demo
+# Need to make it look like a real test-pre-merge branch (needs a base commit)
+echo test > test.txt && git add test.txt && git commit -q -m "test commit"
+if ./bin/issue-sync close raw-20260522T000000Z 2>"$TEST_TMP/err3"; then
+  echo "[FAIL] issue-sync on test-pre-merge-* not blocked"
+  failures=$((failures+1))
+else
+  grep -q "protected branch" "$TEST_TMP/err3" && echo "[PASS] blocked on test-pre-merge-*" || { echo "[FAIL] wrong error"; failures=$((failures+1)); }
+fi
+
+# Test 4: allow on fix/raw-*
+echo "=== Test 4: allow on fix/raw-* ==="
+git checkout -q fix/raw-20260522-demo
+# issue-sync close tries to contact GitHub, so it may fail with network error
+# but we only care that the guard didn't block it
+if ./bin/issue-sync close raw-20260522T000000Z 2>"$TEST_TMP/err4"; then
+  echo "[PASS] allowed on fix/raw-*"
+elif grep -q "protected branch" "$TEST_TMP/err4"; then
+  echo "[FAIL] fix/raw-* blocked by guard"
+  failures=$((failures+1))
+else
+  # Non-guard failure (e.g. no GitHub) is acceptable — guard didn't block
+  echo "[PASS] allowed on fix/raw-* (guard passed, downstream failure OK)"
+fi
+
+if [[ "$failures" -eq 0 ]]; then
+  echo ""
+  echo "[PASS] test-issue-sync-protected-branch-guard"
+else
+  echo ""
+  echo "[FAIL] $failures test(s) failed"
+  exit 1
+fi

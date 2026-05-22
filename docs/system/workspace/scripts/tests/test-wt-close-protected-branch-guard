@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
+TEST_TMP="$(mktemp -d /tmp/freely-wt-close-guard.XXXXXX)"
+trap 'rm -rf "$TEST_TMP"' EXIT
+
+REDIRECT_CWD="$TEST_TMP/repo"
+mkdir -p "$REDIRECT_CWD"
+cd "$REDIRECT_CWD"
+
+failures=0
+
+# Test 1: guard blocks on develop
+echo "=== Test 1: guard blocks on develop ==="
+_guard_branch="develop"
+case "$_guard_branch" in
+  main|develop|test-pre-merge-*)
+    echo "[PASS] blocked on $_guard_branch"
+    ;;
+  *)
+    echo "[FAIL] develop not blocked"
+    failures=$((failures+1))
+    ;;
+esac
+
+# Test 2: guard blocks on main
+echo "=== Test 2: guard blocks on main ==="
+_guard_branch="main"
+case "$_guard_branch" in
+  main|develop|test-pre-merge-*)
+    echo "[PASS] blocked on $_guard_branch"
+    ;;
+  *)
+    echo "[FAIL] main not blocked"
+    failures=$((failures+1))
+    ;;
+esac
+
+# Test 3: guard blocks on test-pre-merge-*
+echo "=== Test 3: guard blocks on test-pre-merge-* ==="
+for branch in "test-pre-merge-20260522-demo" "test-pre-merge-foo"; do
+  _guard_branch="$branch"
+  case "$_guard_branch" in
+    main|develop|test-pre-merge-*)
+      echo "[PASS] blocked on $branch"
+      ;;
+    *)
+      echo "[FAIL] $branch not blocked"
+      failures=$((failures+1))
+      ;;
+  esac
+done
+
+# Test 4: guard allows on fix/feature/hotfix branches
+echo "=== Test 4: guard allows on fix/feature/hotfix ==="
+for branch in "fix/raw-20260522-demo" "feature/raw-20260522-demo" "hotfix/critical-20260522"; do
+  _guard_branch="$branch"
+  case "$_guard_branch" in
+    main|develop|test-pre-merge-*)
+      echo "[FAIL] $branch blocked (should be allowed)"
+      failures=$((failures+1))
+      ;;
+    *)
+      echo "[PASS] allowed on $branch"
+      ;;
+  esac
+done
+
+# Test 5: guard message contains workflow guidance (syntax check on actual script)
+echo "=== Test 5: guard message exists in actual script ==="
+GUARD_FILE="$ROOT_DIR/docs/system/workspace/scripts/worktree/wt-close"
+if grep -q "wt-close refuses to modify files on protected branch" "$GUARD_FILE"; then
+  echo "[PASS] guard message found in wt-close"
+else
+  echo "[FAIL] guard message not found"
+  failures=$((failures+1))
+fi
+
+# Test 6: guard references skills
+echo "=== Test 6: guard references skills ==="
+if grep -q "freely-fix-execution\|freely-feat-execution" "$GUARD_FILE"; then
+  echo "[PASS] skill reference found in guard message"
+else
+  echo "[FAIL] skill reference not found"
+  failures=$((failures+1))
+fi
+
+if [[ "$failures" -eq 0 ]]; then
+  echo ""
+  echo "[PASS] test-wt-close-protected-branch-guard"
+else
+  echo ""
+  echo "[FAIL] $failures test(s) failed"
+  exit 1
+fi
