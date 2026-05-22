@@ -1907,7 +1907,7 @@ Commands:
   login <tool> [mode]     Login and auto-save auth slot (`mode`: `account|apikey`)
   save <tool> [slot]      Save current login (auto-detect next slot if not specified)
   switch [tool] [slot]    Switch to slot. No slot = auto-probe and switch only to a usable slot
-  list                    List all saved slots
+  list [tool]             List all saved slots
   whoami [tool]           Show current logged-in slot
   status [tool]           Show current status
   delete <tool> <slot>    Delete a slot
@@ -1917,9 +1917,9 @@ Options:
   --format FORMAT         Output format: text|json|yaml
   --quiet, -q             Quiet mode
   --dry-run               Simulate without changes
-  --name NAME             Provider id/name for `login codex apikey`
-  --url URL               Base URL for `login codex apikey`
-  --key KEY               API key for `login codex apikey`
+  --name NAME             Provider id/name for `login <tool> apikey`
+  --url URL               Base URL for `login <tool> apikey`
+  --key KEY               API key for `login <tool> apikey`
 
 Exit codes:
   0 = success
@@ -1937,6 +1937,10 @@ Examples:
   freely ai switch codex                    # Refresh saved auth inventory, then switch if a slot is currently usable
   freely ai switch codex other@email-com-2  # Switch to specific slot
   freely ai switch other@email-com-2 --yes  # Switch to specific slot (default tool: codex)
+  freely ai login claude apikey --name my-provider
+  freely ai login opencode apikey --name my-provider
+  freely ai switch claude claude-apikey-my-provider --project . --yes
+
   freely ai list --format json
 EOF
 }
