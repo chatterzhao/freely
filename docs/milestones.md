@@ -5890,3 +5890,20 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260522T053702Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260522T053702Z--cmd-login-apikey-unified-top/candidates.md#C-20260522T053702Z-A`
+
+## M-20260522T071901Z-A
+- title: slot full-name final fixes
+- status: active
+### candidate_issues
+1. `C-20260522T071901Z-A`
+- milestone: M-20260522T071901Z-A
+- status: promoted
+- decision_reason: raw-20260522T071901Z (GitHub #2117) — slot full-name refactoring left two prefix-matching gaps
+- next_action: completed, merge to develop
+### committed_issues
+1. `I-20260522T071901Z-A`
+- title: slot full-name final fixes
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260522T071901Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260522T071901Z--slot-full-name-final-fixes/candidates.md#C-20260522T071901Z-A`

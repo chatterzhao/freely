@@ -483,8 +483,8 @@ codex_effective_live_provider_id() {
 codex_infer_slot_kind_from_slot() {
   local slot="${1:-}"
   case "$slot" in
-    account-*) printf 'account\n' ;;
-    apikey-*) printf 'apikey\n' ;;
+    *-account-*|account-*) printf 'account\n' ;;
+    *-apikey-*|apikey-*) printf 'apikey\n' ;;
     *) printf 'legacy\n' ;;
   esac
 }
@@ -1354,17 +1354,16 @@ cmd_switch() {
         slot="$(first_tool_slot_or_singleton "$tool")"
       fi
       tool_switch_direct_generic "$tool" "$slot"
-      # For apikey slots: update project config.env AI_TOOL to alias name
+      # For apikey slots: update project config.env AI_TOOL (slot is full directory name)
       if [[ "$slot" == *-apikey-* && -n "${SWITCH_PROJECT:-}" ]]; then
-        local alias_name="${tool}-${slot}"
         local cfg="${SWITCH_PROJECT}/.freely/config.env"
         if [[ -f "$cfg" ]]; then
           if grep -q "^AI_TOOL=" "$cfg" 2>/dev/null; then
-            sed -i '' "s/^AI_TOOL=.*/AI_TOOL=\"$alias_name\"/" "$cfg"
+            sed -i '' "s/^AI_TOOL=.*/AI_TOOL=\"$slot\"/" "$cfg"
           else
-            echo "AI_TOOL=\"$alias_name\"" >> "$cfg"
+            echo "AI_TOOL=\"$slot\"" >> "$cfg"
           fi
-          log_info "Updated AI_TOOL in config.env: $alias_name"
+          log_info "Updated AI_TOOL in config.env: $slot"
         fi
       fi
       ;;
