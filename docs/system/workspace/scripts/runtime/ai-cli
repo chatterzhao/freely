@@ -24,7 +24,6 @@ DRY_RUN=false
 LOGIN_PROVIDER_NAME=""
 LOGIN_BASE_URL=""
 LOGIN_API_KEY=""
-LOGIN_SETTINGS_FILE=""
 SWITCH_PROJECT=""
 
 # 颜色
@@ -1142,9 +1141,10 @@ cmd_login() {
 # Alias:    {tool}-apikey-{name}="claude --settings {slot_dir}/settings.json"
 _login_apikey_alias() {
   local tool="$1" slot_name slot_dir alias_name rc_file config_file
-  slot_name="${LOGIN_PROVIDER_NAME:-default}"
-  slot_dir="$(auth_slot_dir "$tool" "apikey-${slot_name}")"
-  alias_name="${tool}-apikey-${slot_name}"
+  # Full slot name = directory name: {tool}-apikey-{name}
+  slot_name="${tool}-apikey-${LOGIN_PROVIDER_NAME:-default}"
+  slot_dir="$AUTH_DIR/$slot_name"
+  alias_name="$slot_name"
 
   [[ "$DRY_RUN" == "true" ]] && {
     log_info "[DRY-RUN] Would create apikey slot: $slot_dir"
@@ -1189,9 +1189,9 @@ TOML
       ;;
   esac
 
-  write_tool_active_slot "$tool" "apikey-${slot_name}"
+  write_tool_active_slot "$tool" "$slot_name"
   log_info "Slot created: $slot_dir"
-  log_info "Active slot: apikey-${slot_name}"
+  log_info "Active slot: $slot_name"
 
   # Add alias to shell rc
   rc_file="${FREELY_SHELL_RC_FILE:-$HOME/.zshrc}"
@@ -1209,7 +1209,7 @@ TOML
     log_info "Alias already exists: $alias_name"
   fi
 
-  notify_freely_auth_change "$tool" "apikey-${slot_name}" "login_success"
+  notify_freely_auth_change "$tool" "$slot_name" "login_success"
 
   # Remind user to edit config
   echo ""
@@ -1355,7 +1355,7 @@ cmd_switch() {
       fi
       tool_switch_direct_generic "$tool" "$slot"
       # For apikey slots: update project config.env AI_TOOL to alias name
-      if [[ "$slot" == apikey-* && -n "${SWITCH_PROJECT:-}" ]]; then
+      if [[ "$slot" == *-apikey-* && -n "${SWITCH_PROJECT:-}" ]]; then
         local alias_name="${tool}-${slot}"
         local cfg="${SWITCH_PROJECT}/.freely/config.env"
         if [[ -f "$cfg" ]]; then
@@ -1956,7 +1956,6 @@ main() {
       --name) LOGIN_PROVIDER_NAME="$2"; shift 2 ;;
       --url) LOGIN_BASE_URL="$2"; shift 2 ;;
       --key) LOGIN_API_KEY="$2"; shift 2 ;;
-      --settings-file) LOGIN_SETTINGS_FILE="$2"; shift 2 ;;
       --project) SWITCH_PROJECT="$2"; shift 2 ;;
       --help|-h) show_help; exit 0 ;;
       -*)
@@ -1980,7 +1979,7 @@ main() {
     save) cmd_save "${ARGS[0]}" "${ARGS[1]:-}" ;;
     switch)
       case "${ARGS[0]:-}" in
-        codex|iflow|kiro-cli|cc|cc-use-codex-cli|opencode)
+        codex|iflow|kiro-cli|cc|cc-use-codex-cli|opencode|claude)
           cmd_switch "${ARGS[0]}" "${ARGS[1]:-}"
           ;;
         "")

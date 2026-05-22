@@ -5813,3 +5813,19 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260522T035043Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260522T035043Z--ai-cli-codex-apikey/candidates.md#C-20260522T035043Z-A`
+## M-20260522T042725Z-A
+- title: apikey full slot name
+- status: active
+### candidate_issues
+1. `C-20260522T042725Z-A`
+- milestone: M-20260522T042725Z-A
+- status: promoted
+- decision_reason: raw-20260522T042725Z (GitHub #2109)
+- next_action: completed
+### completed_issues
+1. `I-20260522T042725Z-A`
+- title: apikey full slot name
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260522T042725Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260522T042725Z--apikey-full-slot-name-fixes/candidates.md#C-20260522T042725Z-A`

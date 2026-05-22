@@ -4543,14 +4543,22 @@ attempt_runtime_auto_recovery_after_failure() {
 
 persist_project_tool_selection() {
   local project="$1" tool="$2" requested_adapter="${3:-}" requested_adapter_policy="${4:-}"
-  local model reasoning_effort tool_adapter tool_adapter_policy tool_capabilities tool_policy
+  local model reasoning_effort tool_adapter tool_adapter_policy tool_capabilities tool_policy effective_tool
+  effective_tool="$tool"
+  # If switching to an apikey slot, AI_TOOL must be the full slot directory name
+  # (e.g. claude-apikey-ai98pro), not just the tool family (claude).
+  # The runtime resolves it via alias → type → settings chain.
+  local _slot="${TOOL_AUTO_RECOVERY_SLOT:-}"
+  if [[ "$_slot" == *-apikey-* ]]; then
+    effective_tool="$_slot"
+  fi
   model="$(resolve_project_tool_model_selection "$project" "$tool")"
   reasoning_effort="$(resolve_project_tool_reasoning_effort_selection "$project" "$tool")"
   tool_adapter_policy="$(resolve_project_tool_adapter_policy_selection "$project" "$tool" "$requested_adapter_policy" "$requested_adapter")"
   tool_adapter="$(resolve_project_tool_adapter_selection "$project" "$tool" "$requested_adapter" "$tool_adapter_policy")"
   tool_capabilities="$(tool_default_capabilities_for_runtime "$tool")"
   tool_policy="$(tool_default_policy_for_runtime "$tool")"
-  upsert_config_key "$project" "AI_TOOL" "$tool"
+  upsert_config_key "$project" "AI_TOOL" "$effective_tool"
   upsert_config_key "$project" "AI_MODEL" "$model"
   upsert_config_key "$project" "AI_REASONING_EFFORT" "$reasoning_effort"
   upsert_config_key "$project" "AI_TOOL_ADAPTER" "$tool_adapter"
