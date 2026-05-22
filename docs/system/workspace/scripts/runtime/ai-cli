@@ -1358,11 +1358,13 @@ cmd_switch() {
       codex_switch_lock_release
       if [[ "$rc" -eq 0 ]]; then
         notify_freely_auth_change "codex" "$slot" "switch_success"
-        if [[ "$slot" == *-apikey-* && -n "${SWITCH_PROJECT:-}" ]]; then
+        if [[ -n "${SWITCH_PROJECT:-}" ]]; then
           local _cfg="${SWITCH_PROJECT}/.freely/config.env"
+          local _ai_tool_val="$slot"
+          [[ "$slot" == *-account-* ]] && _ai_tool_val="codex"
           if [[ -f "$_cfg" ]]; then
-            grep -q "^AI_TOOL=" "$_cfg" 2>/dev/null               && sed -i '' "s/^AI_TOOL=.*/AI_TOOL="$slot"/" "$_cfg"               || echo "AI_TOOL="$slot"" >> "$_cfg"
-            log_info "Updated AI_TOOL in config.env: $slot"
+            grep -q "^AI_TOOL=" "$_cfg" 2>/dev/null && sed -i '' "s/^AI_TOOL=.*/AI_TOOL=\"$_ai_tool_val\"/" "$_cfg" || echo "AI_TOOL=\"$_ai_tool_val\"" >> "$_cfg"
+            log_info "Updated AI_TOOL in config.env: $_ai_tool_val"
           fi
         fi
       fi
