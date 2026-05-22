@@ -1084,44 +1084,7 @@ cmd_login() {
         auth_mode="$(codex_prompt_login_mode)"
       fi
       if [[ "$auth_mode" == "apikey" ]]; then
-        local provider_name base_url api_key
-        local _login_line
-        local _login_index=0
-        while IFS= read -r _login_line; do
-          case "$_login_index" in
-            0) provider_name="$_login_line" ;;
-            1) base_url="$_login_line" ;;
-            2) api_key="$_login_line" ;;
-          esac
-          _login_index=$((_login_index + 1))
-        done < <(codex_collect_apikey_login_inputs)
-        if [[ -z "$provider_name" || -z "$base_url" || -z "$api_key" ]]; then
-          log_error "Codex API-key login requires provider name, base URL, and API key."
-          exit 2
-        fi
-        [[ "$DRY_RUN" == "true" ]] && {
-          log_info "[DRY-RUN] Would write codex API-key auth for provider '$provider_name' at '$base_url'"
-          return 0
-        }
-        codex_write_live_apikey_bundle "$provider_name" "$base_url" "$api_key"
-
-        local auth_file slot target_dir kind provider_id
-        auth_file="$(codex_live_auth_file)"
-        kind="$(codex_live_auth_kind "$auth_file")"
-        slot="$(resolve_codex_slot_name "$auth_file")"
-        target_dir="$(auth_slot_dir "codex" "$slot")"
-        provider_id="$(codex_effective_provider_id_for_kind "$kind" "$(codex_effective_live_provider_id "$auth_file")")"
-        codex_save_live_bundle_to_slot "$slot" "$target_dir"
-        write_tool_active_slot "codex" "$slot"
-        [[ -n "$provider_id" ]] && log_info "Provider: $provider_id"
-        log_info "Slot kind: $kind"
-        log_info "Slot: $slot"
-        log_info "Location: $target_dir"
-        notify_freely_auth_change "codex" "$slot" "login_success"
-
-        if [[ "$FORMAT" == "json" ]]; then
-          echo "{\"logged_in\": true, \"tool\": \"codex\", \"slot\": \"$slot\", \"slot_kind\": $(json_string_or_null "$kind"), \"provider_id\": $(json_string_or_null "$provider_id"), \"auth_email\": null, \"account\": null, \"saved\": true}"
-        fi
+        _login_apikey_alias "$tool"
         return 0
       fi
 
@@ -1242,6 +1205,22 @@ with open(path, 'w') as f:
     json.dump(d, f, indent=2, ensure_ascii=False)
 PY
       ;;
+    codex)
+      local _provider="${LOGIN_PROVIDER_NAME:-custom}"
+      python3 - "$slot_dir/auth.json" "$LOGIN_API_KEY" <<'PY'
+import json, sys
+path, key = sys.argv[1:]
+with open(path, 'w') as f:
+    json.dump({"OPENAI_API_KEY": key}, f, indent=2)
+PY
+      cat > "$slot_dir/config.toml" <<TOML
+model_provider = "$_provider"
+
+[model_providers.$_provider]
+name = "$_provider"
+base_url = "$LOGIN_BASE_URL"
+TOML
+      ;;
     *)
       log_error "apikey settings generation not implemented for tool: $tool"
       exit 2
@@ -1260,6 +1239,8 @@ PY
         echo "alias $alias_name=\"claude --settings $settings_path\"" >> "$rc_file" ;;
       opencode)
         echo "alias $alias_name='OPENCODE_CONFIG=\"$settings_path\" opencode'" >> "$rc_file" ;;
+      codex)
+        echo "alias $alias_name='cd $slot_dir && codex'" >> "$rc_file" ;;
     esac
     log_info "Alias added: $alias_name"
   else
