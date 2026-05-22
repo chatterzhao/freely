@@ -1323,57 +1323,67 @@ sync_current_auth() {
   fi
 }
 
+# Extract tool from full slot name (e.g. claude-apikey-xxx → claude)
+_extract_tool_from_slot() {
+  local slot="$1"
+  if [[ "$slot" == *-apikey-* ]]; then
+    printf '%s\n' "${slot%%-apikey-*}"
+  elif [[ "$slot" == *-account-* ]]; then
+    printf '%s\n' "${slot%%-account-*}"
+  else
+    printf '%s\n' "${slot%%-*}"
+  fi
+}
+
 # 切换 slot
 # Usage:
 #   switch <tool> <slot>  - 切换到指定 slot
 #   switch <tool>         - 自动探测，切换到可用的或最早恢复的
 cmd_switch() {
-  local tool="$1"
-  local slot="${2:-}"
-  local rc=0
+  local slot="${1:-}"
+  local tool=""
+
+  if [[ -z "$slot" ]]; then
+    _cmd_switch_auto_codex
+    return $?
+  fi
+
+  tool="$(_extract_tool_from_slot "$slot")"
 
   case "$tool" in
     codex)
-      # 如果没有指定 slot，自动探测
-      if [[ -z "$slot" ]]; then
-        _cmd_switch_auto_codex
-        rc=$?
-        return "$rc"
-      fi
       codex_switch_lock_acquire "explicit_switch" "switch" "$slot" || exit 1
       _cmd_switch_codex_direct_unlocked "$tool" "$slot"
-      rc=$?
+      local rc=$?
       codex_switch_lock_release
       if [[ "$rc" -eq 0 ]]; then
         notify_freely_auth_change "codex" "$slot" "switch_success"
+        if [[ "$slot" == *-apikey-* && -n "${SWITCH_PROJECT:-}" ]]; then
+          local _cfg="${SWITCH_PROJECT}/.freely/config.env"
+          if [[ -f "$_cfg" ]]; then
+            grep -q "^AI_TOOL=" "$_cfg" 2>/dev/null               && sed -i '' "s/^AI_TOOL=.*/AI_TOOL="$slot"/" "$_cfg"               || echo "AI_TOOL="$slot"" >> "$_cfg"
+            log_info "Updated AI_TOOL in config.env: $slot"
+          fi
+        fi
       fi
       return "$rc"
       ;;
-    iflow|kiro-cli|cc|cc-use-codex-cli|opencode|claude)
-      if [[ -z "$slot" ]]; then
-        slot="$(first_tool_slot_or_singleton "$tool")"
-      fi
+    claude|cc|cc-use-codex-cli|opencode|iflow|kiro-cli)
       tool_switch_direct_generic "$tool" "$slot"
-      # For apikey slots: update project config.env AI_TOOL (slot is full directory name)
       if [[ "$slot" == *-apikey-* && -n "${SWITCH_PROJECT:-}" ]]; then
         local cfg="${SWITCH_PROJECT}/.freely/config.env"
         if [[ -f "$cfg" ]]; then
-          if grep -q "^AI_TOOL=" "$cfg" 2>/dev/null; then
-            sed -i '' "s/^AI_TOOL=.*/AI_TOOL=\"$slot\"/" "$cfg"
-          else
-            echo "AI_TOOL=\"$slot\"" >> "$cfg"
-          fi
+          grep -q "^AI_TOOL=" "$cfg" 2>/dev/null             && sed -i '' "s/^AI_TOOL=.*/AI_TOOL="$slot"/" "$cfg"             || echo "AI_TOOL="$slot"" >> "$cfg"
           log_info "Updated AI_TOOL in config.env: $slot"
         fi
       fi
       ;;
     *)
-      log_error "Unknown tool: $tool"
+      log_error "Unknown tool '"'"'$tool'"'"' extracted from slot '"'"'$slot'"'"'"
       exit 2
       ;;
   esac
 }
-
 # 自动探测并切换 codex slot
 run_dir_for_project() {
   local project="$1"
@@ -1906,7 +1916,7 @@ Commands:
   init                    Initialize slot manager
   login <tool> [mode]     Login and auto-save auth slot (`mode`: `account|apikey`)
   save <tool> [slot]      Save current login (auto-detect next slot if not specified)
-  switch [tool] [slot]    Switch to slot. No slot = auto-probe and switch only to a usable slot
+  switch [slot]             Switch to slot (auto-extracts tool from name)
   list [tool]             List all saved slots
   whoami [tool]           Show current logged-in slot
   status [tool]           Show current status
@@ -1934,9 +1944,6 @@ Examples:
   freely ai login codex apikey
   freely ai login codex apikey --name custom --url https://api.openai.com/v1 --key sk-...
   freely ai whoami
-  freely ai switch codex                    # Refresh saved auth inventory, then switch if a slot is currently usable
-  freely ai switch codex other@email-com-2  # Switch to specific slot
-  freely ai switch other@email-com-2 --yes  # Switch to specific slot (default tool: codex)
   freely ai login claude apikey --name my-provider
   freely ai login opencode apikey --name my-provider
   freely ai switch claude claude-apikey-my-provider --project . --yes
@@ -1981,18 +1988,8 @@ main() {
     login) cmd_login "${ARGS[0]}" "${ARGS[1]:-}" ;;
     save) cmd_save "${ARGS[0]}" "${ARGS[1]:-}" ;;
     switch)
-      case "${ARGS[0]:-}" in
-        codex|iflow|kiro-cli|cc|cc-use-codex-cli|opencode|claude)
-          cmd_switch "${ARGS[0]}" "${ARGS[1]:-}"
-          ;;
-        "")
-          cmd_switch "codex" ""
-          ;;
-        *)
-          log_warn "No ai tool name provided; defaulting to codex. If the target slot belongs to another tool, switch may fail."
-          cmd_switch "codex" "${ARGS[0]}"
-          ;;
-      esac
+      # slot name is self-describing: {tool}-apikey-{name} or {tool}-account-{name}
+      cmd_switch "${ARGS[0]:-}"
       ;;
     list) cmd_list "${ARGS[0]:-codex}" ;;
     whoami) cmd_whoami "${ARGS[0]:-codex}" ;;
