@@ -5111,11 +5111,16 @@ write_project_codex_config() {
 
   local template
   template="$(cat <<'EOF'
-# Freely project-level Codex config
+# Freely 项目级 Codex 配置
 # Reference: https://developers.openai.com/codex/config-reference/
 #
-# 由 freely init 管理，每个 worktree 继承相同配置。
+# 实际完整配置在 slot 目录: __FREELY_SLOT_DIR__/config.toml
+# 本文件仅放项目级覆盖字段，方便用户快速修改。
+# 其余字段（openai_base_url / auth / provider）在 slot 配置中。
 # 修改后生效于下次 codex session，无需重启 freely。
+
+# ── 默认模型 ── (方便快速修改，会覆盖 slot 的 model)
+model = "gpt-5.5"
 
 # ── 批准策略 ──────────────────────────────────────────
 # "never"        — 自动批准所有操作（Freely auto 模式默认）
@@ -5150,6 +5155,8 @@ EOF
 )"
   template="${template/__FREELY_APPROVAL_POLICY__/$approval_policy}"
   template="${template/__FREELY_WORKTREES_ROOT__/$root}"
+  local slot_dir="$HOME/.ai-auth/${AI_TOOL:-codex}"
+  template="${template/__FREELY_SLOT_DIR__/$slot_dir}"
   printf '%s\n' "$template" >"$cfg"
 
   log_info "manual: trust this project in ~/.codex/config.toml if Codex has not yet marked it trusted"
