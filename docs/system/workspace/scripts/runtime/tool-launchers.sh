@@ -115,7 +115,7 @@ wait_for_codex_slot_switch_idle_before_launch() {
 }
 
 codex_acp_version_for_launch() {
-  printf '%s\n' "${FREELY_CODEX_ACP_VERSION:-0.11.1}"
+  printf '%s\n' "${FREELY_CODEX_ACP_VERSION:-0.15.0}"
 }
 
 codex_acp_platform_triplet_for_launch() {
