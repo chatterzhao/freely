@@ -12618,6 +12618,70 @@ except: pass
     if [[ -d "$_slot_dir" ]]; then
       _bridge_env+=("CODEX_HOME=$_slot_dir")
       log_info "ACP bridge: CODEX_HOME=$_slot_dir"
+
+      # Ensure sandbox writable_roots includes project dir + worktrees dir.
+      # Both are required for codex to create/edit worktrees outside the project root.
+      local _project_name _project_parent _wt_dir _slot_cfg _need_append _roots_content
+      _project_name=$(basename "$project")
+      _project_parent=$(dirname "$project")
+      _wt_dir="${_project_parent}/${_project_name}-worktrees"
+      _slot_cfg="$_slot_dir/config.toml"
+
+      if [[ -f "$_slot_cfg" ]]; then
+        _need_append=0
+        # Check if project dir is in writable_roots
+        if ! grep -qF "\"$project\"" "$_slot_cfg" 2>/dev/null; then
+          _need_append=1
+        fi
+        # Check if worktrees dir is in writable_roots
+        if ! grep -qF "\"$_wt_dir\"" "$_slot_cfg" 2>/dev/null; then
+          _need_append=1
+        fi
+
+        if [[ "$_need_append" -eq 1 ]]; then
+          # Parse existing writable_roots, append missing paths
+          python3 -c "
+import re, sys
+cfg_path = '$_slot_cfg'
+project = '$project'
+wt_dir = '$_wt_dir'
+
+with open(cfg_path) as f:
+    content = f.read()
+
+# Find or create [sandbox] section with writable_roots
+roots_match = re.search(r'^\[sandbox\]\s*\n(.*?)(?=\n\[|\Z)', content, re.DOTALL | re.MULTILINE)
+writable_match = re.search(r'^writable_roots\s*=\s*\[(.*?)\]', content, re.MULTILINE)
+
+existing = []
+if writable_match:
+    raw = writable_match.group(1)
+    existing = [x.strip().strip('\"') for x in raw.split(',') if x.strip()]
+
+added = []
+for need in [project, wt_dir]:
+    if need not in existing:
+        existing.append(need)
+        added.append(need)
+
+if added:
+    new_roots = '[' + ', '.join(f'\"{r}\"' for r in existing) + ']'
+    if writable_match:
+        content = content[:writable_match.start()] + 'writable_roots = ' + new_roots + content[writable_match.end():]
+    else:
+        # No writable_roots yet, add under [sandbox] or create section
+        if roots_match:
+            insert_pos = roots_match.end()
+            content = content[:insert_pos] + f'writable_roots = {new_roots}\n' + content[insert_pos:]
+        else:
+            content += f'\n[sandbox]\nwritable_roots = {new_roots}\n'
+
+    with open(cfg_path, 'w') as f:
+        f.write(content)
+    log_info 'ACP bridge: appended to writable_roots: ' + ', '.join(added)
+" 2>/dev/null
+        fi
+      fi
     fi
   fi
 
