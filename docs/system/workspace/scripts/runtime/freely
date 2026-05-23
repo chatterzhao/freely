@@ -12598,40 +12598,30 @@ except: pass
       ;;
   esac
 
-  # ── codex: sync slot config to ~/.codex/ so codex-acp reads it ──
-  # codex-acp v0.11.1 reads from ~/.codex/config.toml, not CODEX_HOME or CWD.
-  # Backup original, copy slot config, restore on stop.
+  # ── codex: set CODEX_HOME to slot dir ──
+  # Codex reads config.toml + auth.json from $CODEX_HOME.
+  # No file copying to ~/.codex/ needed.
   if [[ "$base_tool" == "codex" ]]; then
     local _codex_resolved; _codex_resolved=$(${SHELL:-bash} -ic "alias '$tool_name' 2>/dev/null" 2>/dev/null | sed -n "s/^${tool_name}='\\(.*\\)'$/\\1/p")
     local _slot_dir
-    _slot_dir=$(echo "$_codex_resolved" | sed -n 's/.*cd \([^ ]*\).*/\1/p')
+    _slot_dir=$(echo "$_codex_resolved" | sed -n 's/.*CODEX_HOME="\([^"]*\)".*/\1/p')
     _slot_dir="${_slot_dir/#\~/$HOME}"
     if [[ -z "$_slot_dir" || ! -d "$_slot_dir" ]]; then
       _slot_dir="$HOME/.ai-auth/$tool_name"
     fi
     if [[ -d "$_slot_dir" ]]; then
-      # Backup ~/.codex/config.toml and auth.json
-      if [[ -f "$HOME/.codex/config.toml" ]]; then
-        cp "$HOME/.codex/config.toml" "$HOME/.codex/config.toml.freely.bak" 2>/dev/null || true
-      fi
-      if [[ -f "$HOME/.codex/auth.json" ]]; then
-        cp "$HOME/.codex/auth.json" "$HOME/.codex/auth.json.freely.bak" 2>/dev/null || true
-      fi
-      # Copy slot config to ~/.codex/
-      if [[ -f "$_slot_dir/config.toml" ]]; then
-        cp "$_slot_dir/config.toml" "$HOME/.codex/config.toml" 2>/dev/null && \
-          log_info "ACP bridge: synced $_slot_dir/config.toml → ~/.codex/config.toml"
-      fi
-      if [[ -f "$_slot_dir/auth.json" ]]; then
-        cp "$_slot_dir/auth.json" "$HOME/.codex/auth.json" 2>/dev/null && \
-          log_info "ACP bridge: synced $_slot_dir/auth.json → ~/.codex/auth.json"
-      fi
+      _bridge_env+=("CODEX_HOME=$_slot_dir")
+      log_info "ACP bridge: CODEX_HOME=$_slot_dir"
     fi
   fi
 
   # Use --foreground (no fork) + & to avoid child-process lifecycle issues
   local bridge_log; bridge_log="$(run_dir_for_project "$project")/acp-bridge.log"
-  env "${_bridge_env[@]}" python3 "$bridge_script" start --project "$project" --acp-bin "$acp_bin" --foreground </dev/null >>"$bridge_log" 2>&1 &
+  if [[ ${#_bridge_env[@]} -gt 0 ]]; then
+    env "${_bridge_env[@]}" python3 "$bridge_script" start --project "$project" --acp-bin "$acp_bin" --foreground </dev/null >>"$bridge_log" 2>&1 &
+  else
+    python3 "$bridge_script" start --project "$project" --acp-bin "$acp_bin" --foreground </dev/null >>"$bridge_log" 2>&1 &
+  fi
   disown "$!" 2>/dev/null || true
   # Note: bridge writes its own PID file during start_server, don't overwrite it
   # Record the binary path so we can detect tool changes across cycles
