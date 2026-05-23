@@ -4533,6 +4533,7 @@ attempt_runtime_auto_recovery_after_failure() {
     fi
     fallback_slot="${TOOL_AUTO_RECOVERY_SLOT:-}"
     persist_project_tool_selection "$project" "$candidate"
+    runtime_clear_session_state_for_fresh_launch "$project"
     load_config "$project"
     record_tool_auto_switch_event "$project" "$current_tool" "$candidate" "${fallback_slot:-}" "${failure_reason:-runtime_error_auto_recovery}" "" "false" "selected" "" "active_runtime_supervisor"
     RUNTIME_AUTO_RECOVERY_TOOL="$candidate"
@@ -4542,10 +4543,21 @@ attempt_runtime_auto_recovery_after_failure() {
 
   if [[ -n "$origin_tool" && "$origin_tool" != "$current_tool" ]]; then
     persist_project_tool_selection "$project" "$origin_tool"
+    runtime_clear_session_state_for_fresh_launch "$project"
     load_config "$project"
     RUNTIME_AUTO_RECOVERY_TOOL="$origin_tool"
   fi
   return 1
+}
+
+runtime_clear_session_state_for_fresh_launch() {
+  local project="$1"
+  local _state_file
+  _state_file="$(session_state_file "$project")"
+  if [[ -f "$_state_file" ]]; then
+    sed -i '' '/^LAST_TOOL_SESSION_ID=/d; /^LAST_TOOL_RESUME_TARGET=/d' "$_state_file" 2>/dev/null || true
+    log_info "cross-tool switch: cleared session state for fresh launch"
+  fi
 }
 
 persist_project_tool_selection() {
@@ -4897,12 +4909,7 @@ prepare_manager_cross_tool_fallback_if_needed() {
     persist_project_tool_selection "$project" "$fallback_tool"
     # Kill old ACP bridge immediately so next cycle starts with new tool's binary
     _stop_acp_bridge "$project"
-    # Clear session state so next launch is fresh (cross-tool session IDs are incompatible)
-    local _state_file; _state_file="$(session_state_file "$project")"
-    if [[ -f "$_state_file" ]]; then
-      sed -i '' '/^LAST_TOOL_SESSION_ID=/d; /^LAST_TOOL_RESUME_TARGET=/d' "$_state_file" 2>/dev/null || true
-      log_info "cross-tool switch: cleared session state for fresh launch on $fallback_tool"
-    fi
+    runtime_clear_session_state_for_fresh_launch "$project"
     record_tool_auto_switch_event "$project" "$current_tool" "$fallback_tool" "${fallback_slot:-}" "$last_exit_reason"
     # Record switch in tool_switch_events table for session/bridge handling
     local _db; _db="$project/.freely/freely.db"
@@ -4919,6 +4926,7 @@ prepare_manager_cross_tool_fallback_if_needed() {
   if [[ -n "$earliest_tool" && -n "$earliest_reset" ]]; then
     persist_project_tool_selection "$project" "$earliest_tool"
     _stop_acp_bridge "$project"
+    runtime_clear_session_state_for_fresh_launch "$project"
     [[ -n "$earliest_slot" ]] && runtime_write_tool_current_slot "$earliest_tool" "$earliest_slot"
     record_tool_auto_switch_event "$project" "$current_tool" "$earliest_tool" "${earliest_slot:-}" "all_tools_unavailable" "$earliest_reset" "true" "waiting" "${earliest_slot:-}"
     load_config "$project"
@@ -9335,6 +9343,7 @@ worker_runtime_reconcile_selected_tool_from_contract_if_needed() {
   [[ -n "$current_tool" ]] || current_tool="${AI_TOOL:-}"
   [[ "$selected_tool" == "$current_tool" ]] && return 0
   persist_project_tool_selection "$project" "$selected_tool"
+  runtime_clear_session_state_for_fresh_launch "$project"
   return 0
 }
 
@@ -10159,6 +10168,7 @@ rebind_active_worker_runtime_control_plane_if_needed() {
   selected_tool="$(worker_prompt_selected_tool "$prompt_file")"
   if [[ -n "$selected_tool" ]]; then
     persist_project_tool_selection "$target_project" "$selected_tool"
+    runtime_clear_session_state_for_fresh_launch "$target_project"
   fi
   runtime_contract_file="$(worker_verification_contract_state_file "$target_project")"
   supervisor_pid="$(manager_supervisor_pid_for_project "$runtime_probe_project")"
@@ -11871,6 +11881,7 @@ launch_worker_from_manager_prompt_if_needed() {
   selected_tool="$(worker_prompt_selected_tool "$prompt_file")"
   if [[ -n "$selected_tool" ]]; then
     persist_project_tool_selection "$target_project" "$selected_tool"
+    runtime_clear_session_state_for_fresh_launch "$target_project"
   fi
   runtime_contract_file="$(worker_verification_contract_state_file "$target_project")"
   supervisor_pid="$(manager_supervisor_pid_for_project "$runtime_probe_project")"
@@ -18240,6 +18251,7 @@ cmd_set_tool() {
   project="$(resolve_project_or_fail "$project")"
   load_config "$project"
   persist_project_tool_selection "$project" "$tool" "$tool_adapter_arg" "$tool_adapter_policy_arg"
+  runtime_clear_session_state_for_fresh_launch "$project"
   load_config "$project"
   materialize_project_tooling_for_loaded_config "$project" "true"
   load_config "$project"
