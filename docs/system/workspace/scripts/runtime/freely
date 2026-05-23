@@ -12598,19 +12598,34 @@ except: pass
       ;;
   esac
 
-  # ── codex: set CODEX_HOME to slot dir (codex-acp reads config.toml + auth.json from there) ──
+  # ── codex: sync slot config to ~/.codex/ so codex-acp reads it ──
+  # codex-acp v0.11.1 reads from ~/.codex/config.toml, not CODEX_HOME or CWD.
+  # Backup original, copy slot config, restore on stop.
   if [[ "$base_tool" == "codex" ]]; then
     local _codex_resolved; _codex_resolved=$(${SHELL:-bash} -ic "alias '$tool_name' 2>/dev/null" 2>/dev/null | sed -n "s/^${tool_name}='\\(.*\\)'$/\\1/p")
     local _slot_dir
-    # Extract slot dir from alias: CODEX_HOME="<dir>" ...
-    _slot_dir=$(echo "$_codex_resolved" | sed -n 's/.*CODEX_HOME="\([^"]*\)".*/\1/p')
+    _slot_dir=$(echo "$_codex_resolved" | sed -n 's/.*cd \([^ ]*\).*/\1/p')
     _slot_dir="${_slot_dir/#\~/$HOME}"
     if [[ -z "$_slot_dir" || ! -d "$_slot_dir" ]]; then
       _slot_dir="$HOME/.ai-auth/$tool_name"
     fi
     if [[ -d "$_slot_dir" ]]; then
-      _bridge_env+=("CODEX_HOME=$_slot_dir")
-      log_info "ACP bridge: CODEX_HOME=$_slot_dir"
+      # Backup ~/.codex/config.toml and auth.json
+      if [[ -f "$HOME/.codex/config.toml" ]]; then
+        cp "$HOME/.codex/config.toml" "$HOME/.codex/config.toml.freely.bak" 2>/dev/null || true
+      fi
+      if [[ -f "$HOME/.codex/auth.json" ]]; then
+        cp "$HOME/.codex/auth.json" "$HOME/.codex/auth.json.freely.bak" 2>/dev/null || true
+      fi
+      # Copy slot config to ~/.codex/
+      if [[ -f "$_slot_dir/config.toml" ]]; then
+        cp "$_slot_dir/config.toml" "$HOME/.codex/config.toml" 2>/dev/null && \
+          log_info "ACP bridge: synced $_slot_dir/config.toml → ~/.codex/config.toml"
+      fi
+      if [[ -f "$_slot_dir/auth.json" ]]; then
+        cp "$_slot_dir/auth.json" "$HOME/.codex/auth.json" 2>/dev/null && \
+          log_info "ACP bridge: synced $_slot_dir/auth.json → ~/.codex/auth.json"
+      fi
     fi
   fi
 
