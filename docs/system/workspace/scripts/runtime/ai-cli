@@ -1412,6 +1412,18 @@ cmd_switch() {
     return $?
   fi
 
+  # Auto-detect project from PWD when --project not specified
+  if [[ -z "${SWITCH_PROJECT:-}" ]]; then
+    local _pwd="$PWD"
+    while [[ "$_pwd" != "/" ]]; do
+      if [[ -f "$_pwd/.freely/config.env" ]]; then
+        SWITCH_PROJECT="$_pwd"
+        break
+      fi
+      _pwd="$(dirname "$_pwd")"
+    done
+  fi
+
   tool="$(_extract_tool_from_slot "$slot")"
   _require_acp_binary "$tool" || exit 1
 
