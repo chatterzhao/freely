@@ -74,3 +74,8 @@ __pycache__/
 .claude/settings.local.json
 .claude/scheduled_tasks.lock
 docs/issues/raw-*/
+
+# AI tool project configs (managed by freely, not user-edited)
+.codex/
+.opencode/
+.claude/
