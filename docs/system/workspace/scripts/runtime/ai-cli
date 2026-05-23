@@ -345,7 +345,7 @@ resolve_codex_slot_name() {
     *)
       account="$(extract_codex_account "$auth_file")"
       [[ -n "$account" ]] || return 1
-      base_slot="account-$(printf '%s' "$account" | sed 's/[^A-Za-z0-9._@-]/-/g; s/\./-/g')"
+      base_slot="codex-account-$(printf '%s' "$account" | sed 's/[^A-Za-z0-9._@-]/-/g; s/\./-/g')"
       ;;
   esac
   next_slot_name "codex" "$base_slot"
