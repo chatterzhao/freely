@@ -12453,6 +12453,17 @@ except Exception:
     fi
   fi
 
+  # Signal 4: bridge log shows fatal/unrecoverable error.
+  # Even though the process and socket are alive, a session stuck on
+  # UsageLimitExceeded / auth failure / quota exceeded is not making progress.
+  # Return inactive → supervisor ends cycle → POST-cycle detection → auto-switch.
+  local bridge_log; bridge_log="$(run_dir_for_project "$project")/acp-bridge.log"
+  if [[ -f "$bridge_log" ]]; then
+    if rg -qi 'UsageLimitExceeded|quota exceeded|billing hard limit' "$bridge_log" 2>/dev/null; then
+      return 1
+    fi
+  fi
+
   return 1
 }
 
