@@ -4832,6 +4832,12 @@ prepare_manager_cross_tool_fallback_if_needed() {
 
   if [[ -n "${fallback_tool:-}" ]]; then
     persist_project_tool_selection "$project" "$fallback_tool"
+    # Clear session state so next launch is fresh (cross-tool session IDs are incompatible)
+    local _state_file; _state_file="$(session_state_file "$project")"
+    if [[ -f "$_state_file" ]]; then
+      sed -i '' '/^LAST_TOOL_SESSION_ID=/d; /^LAST_TOOL_RESUME_TARGET=/d' "$_state_file" 2>/dev/null || true
+      log_info "cross-tool switch: cleared session state for fresh launch on $fallback_tool"
+    fi
     record_tool_auto_switch_event "$project" "$current_tool" "$fallback_tool" "${fallback_slot:-}" "$last_exit_reason"
     load_config "$project"
     TOOL_AUTO_RECOVERY_DECISION="selected"
