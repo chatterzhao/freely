@@ -4105,7 +4105,7 @@ require_default_autonomy_activation_consent() {
 runtime_default_model_for_tool() {
   local tool="$1"
   case "$tool" in
-    codex) printf 'gpt-5.4\n' ;;
+    codex) printf 'gpt-5.5\n' ;;
     kiro-cli) printf 'auto\n' ;;
     *) printf '\n' ;;
   esac
@@ -17898,7 +17898,7 @@ cmd_init() {
   codex_capability_approval_policy="$(codex_capability_default_approval_policy_for_runtime "$tool")"
   codex_capability_cwd_mode="$(codex_capability_default_cwd_mode_for_runtime "$tool")"
   if [[ "$tool" == "codex" ]]; then
-    [[ -n "$model" ]] || model="gpt-5.4"
+    [[ -n "$model" ]] || model="gpt-5.5"
     [[ -n "$reasoning_effort" ]] || reasoning_effort="medium"
   elif [[ "$tool" == "cc" || "$tool" == "cc-use-codex-cli" ]]; then
     [[ -n "$reasoning_effort" ]] || reasoning_effort="medium"
@@ -18125,7 +18125,7 @@ tool_default_policy_for_runtime() {
 codex_capability_default_model_for_runtime() {
   local tool="$1"
   case "$tool" in
-    cc-use-codex-cli) printf 'gpt-5.4\n' ;;
+    cc-use-codex-cli) printf 'gpt-5.5\n' ;;
     *) printf '\n' ;;
   esac
 }
