@@ -1197,7 +1197,7 @@ cmd_login() {
           if [[ -f "$_project_dir/.freely/config.env" ]]; then
             local _cfg="$_project_dir/.freely/config.env"
             local _ai_tool_val="$slot"
-            [[ "$slot" == *-account-* ]] && _ai_tool_val="codex"
+            # (removed: account slots now use full slot name via CODEX_HOME)
             if [[ -f "$_cfg" ]]; then
               grep -q "^AI_TOOL=" "$_cfg" 2>/dev/null && sed -i '' "s/^AI_TOOL=.*/AI_TOOL=\"$_ai_tool_val\"/" "$_cfg" || echo "AI_TOOL=\"$_ai_tool_val\"" >> "$_cfg"
               log_info "Updated AI_TOOL in config.env: $_ai_tool_val"
@@ -1484,7 +1484,7 @@ cmd_switch() {
         if [[ -n "${SWITCH_PROJECT:-}" ]]; then
           local _cfg="${SWITCH_PROJECT}/.freely/config.env"
           local _ai_tool_val="$slot"
-          [[ "$slot" == *-account-* ]] && _ai_tool_val="codex"
+          # (removed: account slots now use full slot name via CODEX_HOME)
           if [[ -f "$_cfg" ]]; then
             grep -q "^AI_TOOL=" "$_cfg" 2>/dev/null && sed -i '' "s/^AI_TOOL=.*/AI_TOOL=\"$_ai_tool_val\"/" "$_cfg" || echo "AI_TOOL=\"$_ai_tool_val\"" >> "$_cfg"
             log_info "Updated AI_TOOL in config.env: $_ai_tool_val"
