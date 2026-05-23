@@ -1794,22 +1794,36 @@ _cmd_switch_codex_direct_unlocked() {
 
 # 列出 slots
 cmd_list() {
-  local tool="${1:-codex}"
+  local tool="${1:-}"
   local accounts=()
-  if [[ "$tool" == "codex" ]]; then
-    codex_switch_lock_wait_for_idle || exit 1
+
+  if [[ -z "$tool" || "$tool" == "all" ]]; then
+    # List slots for all tools
+    while IFS= read -r line; do
+      [[ -z "$line" ]] && continue
+      accounts+=("$line")
+    done < <(ls -1 "$AUTH_DIR" 2>/dev/null | grep -- '.-.' || true)
+
+    if [[ ${#accounts[@]} -eq 0 ]]; then
+      log_info "No slots found for any tool."
+      return
+    fi
+  else
+    if [[ "$tool" == "codex" ]]; then
+      codex_switch_lock_wait_for_idle || exit 1
+    fi
+
+    while IFS= read -r line; do
+      [[ -z "$line" ]] && continue
+      accounts+=("$line")
+    done < <(list_tool_slots "$tool")
+
+    if [[ ${#accounts[@]} -eq 0 ]]; then
+      log_info "No slots found for $tool."
+      return
+    fi
   fi
-  
-  while IFS= read -r line; do
-    [[ -z "$line" ]] && continue
-    accounts+=("$line")
-  done < <(list_tool_slots "$tool")
-  
-  if [[ ${#accounts[@]} -eq 0 ]]; then
-    log_info "No slots found for $tool."
-    return
-  fi
-  
+
   case "$FORMAT" in
     json)
       echo -n "{\"accounts\": ["
@@ -2062,7 +2076,7 @@ Commands:
   login <tool> [mode]     Login and auto-save auth slot (`mode`: `account|apikey`)
   save <tool> [slot]      Save current login (auto-detect next slot if not specified)
   switch [slot]             Switch to slot (auto-extracts tool from name)
-  list [tool]             List all saved slots
+  list [tool]             List saved slots (default: all tools; specify a tool name to filter)
   whoami [tool]           Show current logged-in slot
   status [tool]           Show current status
   delete <tool> <slot>    Delete a slot
@@ -2136,7 +2150,7 @@ main() {
       # slot name is self-describing: {tool}-apikey-{name} or {tool}-account-{name}
       cmd_switch "${ARGS[0]:-}"
       ;;
-    list) cmd_list "${ARGS[0]:-codex}" ;;
+    list) cmd_list "${ARGS[0]:-}" ;;
     whoami) cmd_whoami "${ARGS[0]:-codex}" ;;
     status) cmd_status "${ARGS[0]:-codex}" ;;
     delete) cmd_delete "${ARGS[0]}" "${ARGS[1]}" ;;
