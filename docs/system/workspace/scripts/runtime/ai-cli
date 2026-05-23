@@ -330,7 +330,7 @@ next_slot_name() {
 }
 
 resolve_codex_slot_name() {
-  local auth_file="$1" requested_slot="${2:-}"
+  local auth_file="$1" requested_slot="${2:-}" tool="${3:-codex}"
   local kind account provider_id base_slot
   if [[ -n "$requested_slot" ]]; then
     printf '%s\n' "$requested_slot"
@@ -340,15 +340,15 @@ resolve_codex_slot_name() {
   case "$kind" in
     apikey)
       provider_id="$(codex_effective_provider_id_for_kind "$kind" "$(codex_effective_live_provider_id "$auth_file")")"
-      base_slot="apikey-$(printf '%s' "$provider_id" | sed 's/[^A-Za-z0-9._-]/-/g; s/\./-/g')"
+      base_slot="${tool}-apikey-$(printf '%s' "$provider_id" | sed 's/[^A-Za-z0-9._-]/-/g; s/\./-/g')"
       ;;
     *)
       account="$(extract_codex_account "$auth_file")"
       [[ -n "$account" ]] || return 1
-      base_slot="codex-account-$(printf '%s' "$account" | sed 's/[^A-Za-z0-9._@-]/-/g; s/\./-/g')"
+      base_slot="${tool}-account-$(printf '%s' "$account" | sed 's/[^A-Za-z0-9._@-]/-/g; s/\./-/g')"
       ;;
   esac
-  next_slot_name "codex" "$base_slot"
+  next_slot_name "$tool" "$base_slot"
 }
 
 json_string_or_null() {
@@ -1167,8 +1167,8 @@ cmd_login() {
         local auth_file slot target_dir account kind provider_id
         auth_file="$(codex_live_auth_file)"
         kind="$(codex_live_auth_kind "$auth_file")"
-        slot="$(resolve_codex_slot_name "$auth_file")"
-        target_dir="$(auth_slot_dir "codex" "$slot")"
+        slot="$(resolve_codex_slot_name "$auth_file" "" "$tool")"
+        target_dir="$(auth_slot_dir "$tool" "$slot")"
         account="$(extract_codex_account "$auth_file")"
         provider_id="$(codex_effective_provider_id_for_kind "$kind" "$(codex_effective_live_provider_id "$auth_file")")"
         codex_save_live_bundle_to_slot "$slot" "$target_dir"
@@ -1365,7 +1365,7 @@ cmd_save() {
         log_info "Detected auth email: $actual_account"
       fi
 
-      slot="$(resolve_codex_slot_name "$auth_file" "$slot")"
+      slot="$(resolve_codex_slot_name "$auth_file" "$slot" "$tool")"
       local target_dir
       target_dir="$(auth_slot_dir "codex" "$slot")"
 
