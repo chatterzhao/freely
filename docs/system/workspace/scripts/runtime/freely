@@ -12463,21 +12463,34 @@ except Exception:
     fi
   fi
 
-  # Signal 4: bridge log shows fatal/unrecoverable error.
-  # A session stuck on usage limit, network failure, or auth error
-  # looks alive but is not making progress.
-  # Return inactive → supervisor ends cycle → POST-cycle detection → auto-switch.
-  local bridge_log; bridge_log="$(run_dir_for_project "$project")/acp-bridge.log"
-  if [[ -f "$bridge_log" ]]; then
-    if rg -qi 'UsageLimitExceeded|quota exceeded|billing hard limit|403 Forbidden|401 Unauthorized|invalid.*api.?key|incorrect.*api.?key|api.?key.*invalid' "$bridge_log" 2>/dev/null; then
-      return 1
-    fi
-    # Network failure cascade: Transport channel closed, certificate errors,
-    # HandshakeFailure, websocket connect failures — these block progress.
-    if rg -qi 'Transport channel closed|HandshakeFailure|received fatal alert|certificate not valid|certificate expired|worker quit with fatal' "$bridge_log" 2>/dev/null; then
-      return 1
-    fi
+  # Signal 4: unified fatal error detection from bridge log.
+  # Covers usage_limit, auth_failure, network_failure — any error that
+  # makes the current session unable to make progress.
+  if _acp_bridge_has_fatal_error "$project"; then
+    return 1
   fi
+
+  return 1
+}
+
+# ── Unified ACP Fatal Error Detection ──────────────────────────────
+# Single entry point for detecting unrecoverable errors in the bridge log.
+# Used by Signal 4 (mid-cycle) and POST-cycle exit reason classification.
+# Returns error_class: usage_limit | auth_failure | network_failure | unknown
+
+_acp_bridge_has_fatal_error() {
+  local project="$1"
+  local bridge_log; bridge_log="$(run_dir_for_project "$project")/acp-bridge.log"
+  [[ -f "$bridge_log" ]] || return 1
+
+  # Usage / quota limit (account-level hard cap)
+  rg -qi 'UsageLimitExceeded|quota exceeded|billing hard limit|usage limit.*try again' "$bridge_log" 2>/dev/null && return 0
+
+  # Auth failure (invalid/expired API key or token)
+  rg -qi '403 Forbidden|401 Unauthorized|invalid.*api.?key|incorrect.*api.?key|api.?key.*invalid|Failed to refresh token' "$bridge_log" 2>/dev/null && return 0
+
+  # Network / transport failure cascade (certificate, handshake, channel)
+  rg -qi 'Transport channel closed|HandshakeFailure|received fatal alert|certificate not valid|certificate expired|worker quit with fatal' "$bridge_log" 2>/dev/null && return 0
 
   return 1
 }
