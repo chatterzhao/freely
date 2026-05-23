@@ -853,7 +853,15 @@ codex_save_live_bundle_to_slot() {
     provider_id="$(codex_effective_provider_id_for_kind "$kind" "$(codex_effective_live_provider_id "$auth_file")")"
     codex_write_fragment_toml_from_live_config "$config_fragment"
   else
-    : >"$config_fragment"
+    # Account mode: copy the live config.toml so the slot is self-contained
+    local _live_config
+    _live_config="$(codex_live_config_file)"
+    if [[ -f "$_live_config" ]]; then
+      cp "$_live_config" "$target_dir/config.toml"
+      chmod 600 "$target_dir/config.toml"
+    else
+      : >"$config_fragment"
+    fi
   fi
 
   codex_write_slot_manifest "$slot" "$target_dir" "$kind" "$account" "$provider_id"
@@ -1166,6 +1174,34 @@ cmd_login() {
         log_info "Slot: $slot"
         log_info "Location: $target_dir"
         notify_freely_auth_change "codex" "$slot" "login_success"
+
+        # Generate shell alias for account mode (same format as apikey mode)
+        local _rc_file _alias_name
+        _rc_file="${FREELY_SHELL_RC_FILE:-$HOME/.zshrc}"
+        _alias_name="$slot"
+        if ! grep -qF "alias $_alias_name=" "$_rc_file" 2>/dev/null; then
+          echo "alias $_alias_name='CODEX_HOME=\"$target_dir\" codex'" >> "$_rc_file"
+          log_info "Alias added: $_alias_name"
+        else
+          log_info "Alias already exists: $_alias_name"
+        fi
+
+        # Auto-detect project from PWD and update AI_TOOL in config.env
+        local _project_dir="$PWD"
+        while [[ "$_project_dir" != "/" ]]; do
+          if [[ -f "$_project_dir/.freely/config.env" ]]; then
+            local _cfg="$_project_dir/.freely/config.env"
+            local _ai_tool_val="$slot"
+            [[ "$slot" == *-account-* ]] && _ai_tool_val="codex"
+            if [[ -f "$_cfg" ]]; then
+              grep -q "^AI_TOOL=" "$_cfg" 2>/dev/null && sed -i '' "s/^AI_TOOL=.*/AI_TOOL=\"$_ai_tool_val\"/" "$_cfg" || echo "AI_TOOL=\"$_ai_tool_val\"" >> "$_cfg"
+              log_info "Updated AI_TOOL in config.env: $_ai_tool_val"
+            fi
+            break
+          fi
+          _project_dir="$(dirname "$_project_dir")"
+        done
+
         if [[ "$FORMAT" == "json" ]]; then
           echo "{\"logged_in\": true, \"tool\": \"codex\", \"slot\": \"$slot\", \"slot_kind\": $(json_string_or_null "$kind"), \"provider_id\": $(json_string_or_null "$provider_id"), \"auth_email\": $(json_string_or_null "$account"), \"account\": $(json_string_or_null "$account"), \"saved\": true}"
         fi
