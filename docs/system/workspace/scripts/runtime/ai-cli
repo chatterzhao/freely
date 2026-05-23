@@ -860,6 +860,9 @@ codex_save_live_bundle_to_slot() {
 model = "gpt-5.5"
 model_provider = "OpenAI"
 model_reasoning_effort = "medium"
+approval_policy = "never"
+sandbox_mode = "workspace-write"
+network_access = "enabled"
 
 [model_providers.OpenAI]
 name = "OpenAI"
@@ -1282,8 +1285,11 @@ JSON
 
 model = ""
 model_provider = "OpenAI"
-openai_base_url = ""
 model_reasoning_effort = "medium"
+approval_policy = "never"
+sandbox_mode = "workspace-write"
+network_access = "enabled"
+openai_base_url = ""
 
 [model_providers.OpenAI]
 name = "OpenAI"
