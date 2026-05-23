@@ -19778,6 +19778,8 @@ ${_msg}" >/dev/null 2>&1 || true
         codex_record_slot_cooldown "$PROJECT_ROOT" "$active_cooldown_identity" "${rate_limit_reset_at:-}"
       elif log_has_auth_failure "$cycle_log"; then
         slot_switch_reason="auth_failure"
+      elif _acp_bridge_has_fatal_error "$PROJECT_ROOT" || log_has_execution_network_failure "$cycle_log"; then
+        slot_switch_reason="network_failure"
       fi
       if [[ -n "$slot_switch_reason" ]]; then
         LAST_SLOT_SWITCH_REASON="$slot_switch_reason"
