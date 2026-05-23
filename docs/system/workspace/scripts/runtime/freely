@@ -12441,6 +12441,9 @@ _ai_shows_liveness_acp() {
     local proc_state
     proc_state=$(ps -o state= -p "$ai_pid" 2>/dev/null | tr -d ' ')
     if [[ "$proc_state" == "R" || "$proc_state" == "S" ]]; then
+      # Check for fatal errors before returning active — a process that
+      # is technically alive but stuck on unrecoverable errors is not healthy.
+      _acp_bridge_has_fatal_error "$project" && return 1
       return 0
     fi
   fi
@@ -12459,13 +12462,14 @@ try:
 except Exception:
     sys.exit(1)
 " 2>/dev/null; then
+      # Check for fatal errors before returning active (same reason as Signal 2)
+      _acp_bridge_has_fatal_error "$project" && return 1
       return 0
     fi
   fi
 
   # Signal 4: unified fatal error detection from bridge log.
-  # Covers usage_limit, auth_failure, network_failure — any error that
-  # makes the current session unable to make progress.
+  # (Fallback when neither process nor socket signals are available.)
   if _acp_bridge_has_fatal_error "$project"; then
     return 1
   fi
