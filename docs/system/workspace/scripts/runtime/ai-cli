@@ -853,15 +853,20 @@ codex_save_live_bundle_to_slot() {
     provider_id="$(codex_effective_provider_id_for_kind "$kind" "$(codex_effective_live_provider_id "$auth_file")")"
     codex_write_fragment_toml_from_live_config "$config_fragment"
   else
-    # Account mode: copy the live config.toml so the slot is self-contained
-    local _live_config
-    _live_config="$(codex_live_config_file)"
-    if [[ -f "$_live_config" ]]; then
-      cp "$_live_config" "$target_dir/config.toml"
-      chmod 600 "$target_dir/config.toml"
-    else
-      : >"$config_fragment"
-    fi
+    # Account mode: generate official OpenAI config directly in slot.
+    # Account mode uses official OpenAI (no custom URL), so config is fixed.
+    cat > "$target_dir/config.toml" <<'TOMLEOF'
+# Codex slot config — account mode (official OpenAI)
+model = "gpt-5.4"
+model_provider = "OpenAI"
+model_reasoning_effort = "medium"
+
+[model_providers.OpenAI]
+name = "OpenAI"
+wire_api = "responses"
+requires_openai_auth = true
+TOMLEOF
+    chmod 600 "$target_dir/config.toml"
   fi
 
   codex_write_slot_manifest "$slot" "$target_dir" "$kind" "$account" "$provider_id"
