@@ -4556,7 +4556,7 @@ persist_project_tool_selection() {
   # (e.g. claude-apikey-ai98pro), not just the tool family (claude).
   # The runtime resolves it via alias → type → settings chain.
   local _slot="${TOOL_AUTO_RECOVERY_SLOT:-}"
-  if [[ "$_slot" == *-apikey-* ]]; then
+  if [[ "$_slot" == *-apikey-* || "$_slot" == *-account-* ]]; then
     effective_tool="$_slot"
   fi
   model="$(resolve_project_tool_model_selection "$project" "$tool")"
