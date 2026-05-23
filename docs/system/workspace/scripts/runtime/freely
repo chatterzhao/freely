@@ -12541,7 +12541,7 @@ _ensure_acp_bridge_running() {
       if [[ -n "${FREELY_CODEX_ACP_BIN:-}" ]]; then
         acp_bin="$FREELY_CODEX_ACP_BIN"
       else
-        local _ver="${FREELY_CODEX_ACP_VERSION:-0.11.1}"
+        local _ver="${FREELY_CODEX_ACP_VERSION:-0.15.0}"
         local _triplet; _triplet="$(uname -s):$(uname -m)"
         case "$_triplet" in
           Darwin:arm64) _triplet="aarch64-apple-darwin" ;;
@@ -17954,7 +17954,7 @@ cmd_init() {
       codex)
         local codex_acp_bin="${FREELY_CODEX_ACP_BIN:-}"
         if [[ -z "$codex_acp_bin" ]]; then
-          local _ver="${FREELY_CODEX_ACP_VERSION:-0.11.1}"
+          local _ver="${FREELY_CODEX_ACP_VERSION:-0.15.0}"
           local _triplet; _triplet="$(uname -s):$(uname -m)"
           case "$_triplet" in
             Darwin:arm64) _triplet="aarch64-apple-darwin" ;;
