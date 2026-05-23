@@ -857,7 +857,7 @@ codex_save_live_bundle_to_slot() {
     # Account mode uses official OpenAI (no custom URL), so config is fixed.
     cat > "$target_dir/config.toml" <<'TOMLEOF'
 # Codex slot config — account mode (official OpenAI)
-model = "gpt-5.4"
+model = "gpt-5.5"
 model_provider = "OpenAI"
 model_reasoning_effort = "medium"
 
