@@ -1266,7 +1266,7 @@ TOML
       opencode)
         echo "alias $alias_name='OPENCODE_CONFIG=\"$config_file\" opencode'" >> "$rc_file" ;;
       codex)
-        echo "alias $alias_name='cd $slot_dir && codex'" >> "$rc_file" ;;
+        echo "alias $alias_name='CODEX_HOME=\"$slot_dir\" codex'" >> "$rc_file" ;;
     esac
     log_info "Alias added: $alias_name"
   else
@@ -1507,7 +1507,7 @@ _cmd_switch_auto() {
         opencode)
           perl -e '"'"'alarm 10; exec @ARGV'"'"' bash -c "OPENCODE_CONFIG='"'"'$slot_dir/settings.json'"'"' opencode run '"'"'say hi'"'"'" >"$_out" 2>&1 && probe_ok=1 ;;
         codex)
-          perl -e '"'"'alarm 10; exec @ARGV'"'"' bash -c "cd '"'"'$slot_dir'"'"' && codex exec '"'"'say hi'"'"' --skip-git-repo-check" >"$_out" 2>&1 && probe_ok=1 ;;
+          perl -e '"'"'alarm 10; exec @ARGV'"'"' bash -c "CODEX_HOME='"'"'$slot_dir'"'"' codex exec '"'"'say hi'"'"' --skip-git-repo-check" >"$_out" 2>&1 && probe_ok=1 ;;
       esac
       rm -f "$_out"
       if [[ "$probe_ok" == "1" ]]; then

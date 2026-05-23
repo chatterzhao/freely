@@ -12598,46 +12598,25 @@ except: pass
       ;;
   esac
 
-  # ── codex: resolve alias → slot dir → auth.json + config.toml ──
+  # ── codex: set CODEX_HOME to slot dir (codex-acp reads config.toml + auth.json from there) ──
   if [[ "$base_tool" == "codex" ]]; then
     local _codex_resolved; _codex_resolved=$(${SHELL:-bash} -ic "alias '$tool_name' 2>/dev/null" 2>/dev/null | sed -n "s/^${tool_name}='\\(.*\\)'$/\\1/p")
     local _slot_dir
-    # Extract slot dir from alias: cd <dir> && codex
-    _slot_dir=$(echo "$_codex_resolved" | sed -n 's/.*cd \([^ ]*\).*/\1/p')
+    # Extract slot dir from alias: CODEX_HOME="<dir>" ...
+    _slot_dir=$(echo "$_codex_resolved" | sed -n 's/.*CODEX_HOME="\([^"]*\)".*/\1/p')
     _slot_dir="${_slot_dir/#\~/$HOME}"
     if [[ -z "$_slot_dir" || ! -d "$_slot_dir" ]]; then
-      # Fallback: derive from tool name directly
       _slot_dir="$HOME/.ai-auth/$tool_name"
     fi
     if [[ -d "$_slot_dir" ]]; then
-      if [[ -f "$_slot_dir/auth.json" ]]; then
-        local _api_key
-        _api_key=$(python3 -c "import json; d=json.load(open('$_slot_dir/auth.json')); print(d.get('OPENAI_API_KEY',''))" 2>/dev/null || true)
-        if [[ -n "$_api_key" ]]; then
-          _bridge_env+=("OPENAI_API_KEY=$_api_key")
-        fi
-      fi
-      if [[ -f "$_slot_dir/config.toml" ]]; then
-        local _base_url
-        _base_url=$(python3 -c "
-import sys
-try: import tomllib
-except: import tomli as tomllib
-with open('$_slot_dir/config.toml','rb') as f: c = tomllib.load(f)
-url = c.get('openai_base_url','') or c.get('model_providers',{}).get('OpenAI',{}).get('base_url','')
-print(url)
-" 2>/dev/null || true)
-        if [[ -n "$_base_url" ]]; then
-          _bridge_env+=("OPENAI_BASE_URL=$_base_url")
-        fi
-      fi
+      _bridge_env+=("CODEX_HOME=$_slot_dir")
+      log_info "ACP bridge: CODEX_HOME=$_slot_dir"
     fi
   fi
 
   # Use --foreground (no fork) + & to avoid child-process lifecycle issues
   local bridge_log; bridge_log="$(run_dir_for_project "$project")/acp-bridge.log"
   env "${_bridge_env[@]}" python3 "$bridge_script" start --project "$project" --acp-bin "$acp_bin" --foreground </dev/null >>"$bridge_log" 2>&1 &
-  disown "$!" 2>/dev/null || true
   disown "$!" 2>/dev/null || true
   # Note: bridge writes its own PID file during start_server, don't overwrite it
   # Record the binary path so we can detect tool changes across cycles
