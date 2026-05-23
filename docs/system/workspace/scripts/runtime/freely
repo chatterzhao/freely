@@ -12464,12 +12464,17 @@ except Exception:
   fi
 
   # Signal 4: bridge log shows fatal/unrecoverable error.
-  # Even though the process and socket are alive, a session stuck on
-  # UsageLimitExceeded / auth failure / quota exceeded is not making progress.
+  # A session stuck on usage limit, network failure, or auth error
+  # looks alive but is not making progress.
   # Return inactive → supervisor ends cycle → POST-cycle detection → auto-switch.
   local bridge_log; bridge_log="$(run_dir_for_project "$project")/acp-bridge.log"
   if [[ -f "$bridge_log" ]]; then
-    if rg -qi 'UsageLimitExceeded|quota exceeded|billing hard limit' "$bridge_log" 2>/dev/null; then
+    if rg -qi 'UsageLimitExceeded|quota exceeded|billing hard limit|403 Forbidden|401 Unauthorized|invalid.*api.?key|incorrect.*api.?key|api.?key.*invalid' "$bridge_log" 2>/dev/null; then
+      return 1
+    fi
+    # Network failure cascade: Transport channel closed, certificate errors,
+    # HandshakeFailure, websocket connect failures — these block progress.
+    if rg -qi 'Transport channel closed|HandshakeFailure|received fatal alert|certificate not valid|certificate expired|worker quit with fatal' "$bridge_log" 2>/dev/null; then
       return 1
     fi
   fi
