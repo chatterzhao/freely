@@ -7305,6 +7305,29 @@ log_codex_rate_limit_reset_at() {
   date -v+"${fallback_seconds}"S +%s 2>/dev/null || date -d "@$(( $(date +%s) + fallback_seconds ))" +%s 2>/dev/null || printf '%s\n' "$(( $(date +%s) + fallback_seconds ))"
 }
 
+# Check ACP bridge log for usage/rate limit signals that cycle log may miss.
+# codex-acp stderr goes to bridge log, not cycle log.
+log_has_acp_usage_limit() {
+  local project="$1"
+  local bridge_log; bridge_log="$(run_dir_for_project "$project")/acp-bridge.log"
+  [[ -f "$bridge_log" ]] || return 1
+  rg -qi 'UsageLimitExceeded|usage limit|rate_limit_exceeded|quota exceeded|billing.*limit|try again|insufficient.*(balance|credit|quota)|429.*Rate|Rate.*429' "$bridge_log" 2>/dev/null
+}
+
+log_acp_rate_limit_reset_at() {
+  local project="$1" reset_at="" fallback_seconds bridge_log
+  bridge_log="$(run_dir_for_project "$project")/acp-bridge.log"
+  [[ -f "$bridge_log" ]] || return 1
+  reset_at="$(rg -i 'try again at' "$bridge_log" 2>/dev/null | grep -oE '[0-9]{1,2}:[0-9]{2}\s*(AM|PM)' | head -1 || true)"
+  if [[ -n "$reset_at" ]]; then
+    printf '%s\n' "$reset_at"
+    return 0
+  fi
+  fallback_seconds="${CODEX_RATE_LIMIT_FALLBACK_COOLDOWN_SECS:-300}"
+  [[ "$fallback_seconds" =~ ^[0-9]+$ ]] || fallback_seconds=300
+  date -v+"${fallback_seconds}"S +%s 2>/dev/null || printf '%s\n' "$(( $(date +%s) + fallback_seconds ))"
+}
+
 tool_prefers_resume_evidence() {
   local tool="$1"
   tool_prefers_explicit_resume_target "$tool"
@@ -19710,9 +19733,9 @@ ${_msg}" >/dev/null 2>&1 || true
       elif [[ -n "$rate_limit_reason" ]]; then
         slot_switch_reason="$rate_limit_reason"
         codex_record_slot_cooldown "$PROJECT_ROOT" "$active_cooldown_identity" "${rate_limit_reset_at:-}"
-      elif log_has_codex_usage_limit "$cycle_log"; then
+      elif log_has_codex_usage_limit "$cycle_log" || log_has_acp_usage_limit "$PROJECT_ROOT"; then
         slot_switch_reason="primary_rate_limit_exhausted"
-        rate_limit_reset_at="$(log_codex_rate_limit_reset_at "$cycle_log" || true)"
+        rate_limit_reset_at="$(log_codex_rate_limit_reset_at "$cycle_log" || log_acp_rate_limit_reset_at "$PROJECT_ROOT" || true)"
         codex_record_slot_cooldown "$PROJECT_ROOT" "$active_cooldown_identity" "${rate_limit_reset_at:-}"
       elif log_has_auth_failure "$cycle_log"; then
         slot_switch_reason="auth_failure"
