@@ -4283,7 +4283,7 @@ runtime_next_tool_slot_after_current() {
 tool_supports_auto_same_tool_slot_recovery() {
   local tool="$1"
   case "$tool" in
-    codex|kiro-cli|iflow|cc|cc-use-codex-cli|opencode) return 0 ;;
+    codex|claude|cc|cc-use-codex-cli|opencode|kiro-cli|iflow) return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -4292,9 +4292,10 @@ tool_command_name_for_auto_recovery() {
   local tool="$1"
   case "$tool" in
     codex) printf 'codex\n' ;;
+    claude|cc|cc-use-codex-cli) printf 'claude\n' ;;
+    opencode) printf 'opencode\n' ;;
     kiro-cli) printf 'kiro-cli\n' ;;
     iflow) printf 'iflow\n' ;;
-    cc|cc-use-codex-cli) printf 'claude\n' ;;
     *) printf '\n' ;;
   esac
 }
