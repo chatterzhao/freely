@@ -414,7 +414,7 @@ codex_slot_manifest_file() {
 
 codex_slot_config_fragment_file() {
   local slot="$1"
-  printf '%s\n' "$(auth_slot_dir "codex" "$slot")/config-auth.toml"
+  printf '%s\n' "$(auth_slot_dir "codex" "$slot")/config.toml"
 }
 
 codex_live_auth_kind() {
@@ -840,7 +840,7 @@ codex_save_live_bundle_to_slot() {
   local slot="$1" target_dir="$2"
   local auth_file config_fragment kind account provider_id
   auth_file="$(codex_live_auth_file)"
-  config_fragment="$target_dir/config-auth.toml"
+  config_fragment="$target_dir/config.toml"
   kind="$(codex_live_auth_kind "$auth_file")"
   account="$(extract_codex_account "$auth_file")"
   provider_id=""
