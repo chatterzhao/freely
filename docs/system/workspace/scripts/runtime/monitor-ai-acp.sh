@@ -109,7 +109,7 @@ _detect_acp_failure() {
   # "Session not found" to its stderr (bridge log), but run-acp-prompt.py only
   # reports "server error: Internal error" to the cycle log.
   local bridge_log
-  bridge_log="$(dirname "$log_file")/../acp-bridge.log"
+  bridge_log="$(dirname "$log_file")/../run/acp-bridge.log"
   if _matched=$(grep -m1 -E '(session.*not found|unknown session|no such session|Session not found|exited unexpectedly|ProcessTransport.*not ready|idle timeout)' "$log_file" "$bridge_log" 2>/dev/null); then
     echo "[ACP-detect] bridge_session_lost matched: ${_matched:0:200}" >&2
     [[ -n "$bridge_lost_marker" ]] && echo "bridge_session_lost" > "$bridge_lost_marker"
