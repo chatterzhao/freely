@@ -166,10 +166,16 @@ fi
 # ── Resolve worktree path ──
 wt_path="$(_resolve_worktree_path "$branch")"
 if [[ -z "$wt_path" ]]; then
-  echo "Error: no worktree found for branch '$branch'" >&2
-  exit 1
+  if [[ "$FORCE" == true ]]; then
+    echo "wt-close: --force, no worktree found for '$branch' (orphaned branch cleanup)"
+  else
+    echo "Error: no worktree found for branch '$branch'" >&2
+    echo "  Use --force to close an orphaned branch (worktree already removed)." >&2
+    exit 1
+  fi
+else
+  echo "wt-close: worktree = $wt_path"
 fi
-echo "wt-close: worktree = $wt_path"
 
 # ── Extract issue id ──
 issue_id="$(_extract_issue_id "$branch")" || true
@@ -341,19 +347,23 @@ if [[ -n "$_raw_key" && -f "$_handoff_py" && -f "$_handoff_db" ]]; then
   echo "wt-close: consumed ${_consumed:-0} handoffs for $_raw_key"
 fi
 
-if [[ "$DRY_RUN" == true ]]; then
-  _dry "git worktree remove $wt_path"
-else
-  echo "wt-close: removing worktree $wt_path..."
-  if git worktree remove "$wt_path" 2>/dev/null; then
-    echo "wt-close: worktree removed ✓"
+if [[ -n "$wt_path" ]]; then
+  if [[ "$DRY_RUN" == true ]]; then
+    _dry "git worktree remove $wt_path"
   else
-    echo "Warning: worktree has dirty/untracked files, retrying with --force..." >&2
-    git worktree remove --force "$wt_path" 2>/dev/null || {
-      echo "Error: could not remove worktree $wt_path, remove manually" >&2
-      exit 1
-    }
+    echo "wt-close: removing worktree $wt_path..."
+    if git worktree remove "$wt_path" 2>/dev/null; then
+      echo "wt-close: worktree removed ✓"
+    else
+      echo "Warning: worktree has dirty/untracked files, retrying with --force..." >&2
+      git worktree remove --force "$wt_path" 2>/dev/null || {
+        echo "Error: could not remove worktree $wt_path, remove manually" >&2
+        exit 1
+      }
+    fi
   fi
+elif [[ "$FORCE" == true ]]; then
+  echo "wt-close: no worktree to remove (orphaned branch cleanup)"
 fi
 
 # ── Phase 6: Local branch delete ──
