@@ -393,6 +393,20 @@ def main():
 
         t_session = time.time()
 
+        # Ensure bypassPermissions is active for this session.
+        # Ensure permission mode matches tool-native config (JSON settings file).
+        # The bridge sets this after session/new and session/resume, but
+        # this call is defense-in-depth for direct (subprocess) mode.
+        _perm_mode = os.environ.get("CLAUDE_CODE_PERMISSION_MODE", "bypassPermissions")
+        try:
+            client.request(
+                "session/set_mode",
+                {"sessionId": session_id, "modeId": _perm_mode},
+                timeout=10,
+            )
+        except Exception:
+            pass
+
         # Model selection
         if args.reasoning_effort:
             print(
