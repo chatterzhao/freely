@@ -1,5 +1,6 @@
 # Code Review — acp-tool-switch-integration
 
+- **owner_issue**: `docs/issues/I-20260524T053214Z-A/issue.md`
 - **reviewer**: claude-opus-4.7
 - **mode**: subagent
 - **verdict**: pass

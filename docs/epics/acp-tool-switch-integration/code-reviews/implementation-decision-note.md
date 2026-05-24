@@ -1,5 +1,6 @@
 # Implementation Decision Note — I-20260524T053214Z-A
 
+- **owner_issue**: `docs/issues/I-20260524T053214Z-A/issue.md`
 - **decision**: 在 ACP 路径中接入 `tool_switch_events`，不引入新抽象
 - **why_this**: `tool_switch_events` 表是已实现的统一真相源，只需补齐 ACP 路径的 4 个集成断点。改动最小（118 行），全部在已有代码路径内
 - **alternatives_considered**:
