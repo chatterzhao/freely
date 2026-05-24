@@ -13345,7 +13345,7 @@ write_session_handoff() {
 
   # Cross-tool context: when tool changed, pass previous session evidence
   local CROSS_TOOL_CONTEXT="none" CROSS_TOOL_EVIDENCE_PATH="none" CROSS_TOOL_HINT="none"
-  local _ctx_record; _ctx_record="$(_tool_switch_read_latest "$freely_db")"
+  local _ctx_record; _ctx_record="$(_tool_switch_read_latest "$project/.freely/freely.db")"
   if [[ -n "$_ctx_record" ]]; then
     local _ctx_cross; _ctx_cross=$(echo "$_ctx_record" | cut -d'|' -f8)
     if [[ "$_ctx_cross" == "1" ]]; then
