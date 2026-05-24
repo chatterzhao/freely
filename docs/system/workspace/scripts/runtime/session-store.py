@@ -448,7 +448,12 @@ def tool_switch_read_latest(db_path: str) -> dict | None:
         "SELECT * FROM tool_switch_events WHERE status = 'succeeded' ORDER BY id DESC LIMIT 1"
     ).fetchone()
     conn.close()
-    return dict(row) if row else None
+    if row is None:
+        return None
+    cols = ["id","created_at","trigger_error","old_tool","old_session_id",
+            "old_jsonl_path","old_cycle_log","new_tool","new_session_id",
+            "cross_tool","status"]
+    return dict(zip(cols, row))
 
 
 if __name__ == "__main__":
