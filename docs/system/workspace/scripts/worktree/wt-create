@@ -294,7 +294,7 @@ _pull_raw_issue() {
       consumed=$(python3 -c "
 import sqlite3
 conn=sqlite3.connect('$db_path')
-r=conn.execute('SELECT consumed FROM chats WHERE id=$ts AND chat_type=\"new-issue\"').fetchone()
+r=conn.execute('SELECT consumed FROM chats WHERE id=? AND chat_type=\"new-issue\"', ('$ts',)).fetchone()
 print(r[0] if r else '')
 conn.close()
 " 2>/dev/null || echo "")
@@ -479,7 +479,7 @@ _require_issue_exists() {
         consumed=$(python3 -c "
 import sqlite3
 conn=sqlite3.connect('$db_path')
-r=conn.execute('SELECT consumed FROM chats WHERE id=$ts').fetchone()
+r=conn.execute('SELECT consumed FROM chats WHERE id=?', ('$ts',)).fetchone()
 print(r[0] if r else '')
 conn.close()
 " 2>/dev/null || echo "")
@@ -533,7 +533,7 @@ _materialize_chat_if_needed() {
   consumed=$(python3 -c "
 import sqlite3
 conn=sqlite3.connect('$db_path')
-r=conn.execute('SELECT consumed FROM chats WHERE id=$ts AND chat_type=\"new-issue\"').fetchone()
+r=conn.execute('SELECT consumed FROM chats WHERE id=? AND chat_type=\"new-issue\"', ('$ts',)).fetchone()
 print(r[0] if r else '')
 conn.close()
 " 2>/dev/null || echo "")

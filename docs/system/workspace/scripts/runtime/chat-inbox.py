@@ -29,8 +29,54 @@ def _now_utc() -> str:
 
 
 def _utc_timestamp() -> int:
-    """Return current UTC timestamp as YYYYMMDDHHMMSS integer."""
+    """Return current UTC timestamp as YYYYMMDDHHMMSS integer (DB internal format).
+
+    Note: External interfaces (issue_id, wt-create, scan keys) use ISO format
+    YYYYMMDDTHHMMSSZ. Use _bare_to_iso() and _iso_to_bare() for conversion.
+    """
     return int(datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S"))
+
+
+def _bare_to_iso(raw: str) -> str:
+    """Normalize a bare-numeric YYYYMMDDHHMMSS to ISO YYYYMMDDTHHMMSSZ."""
+    raw = raw.strip()
+    if len(raw) == 14 and raw.isdigit():
+        return f"{raw[:8]}T{raw[8:]}Z"
+    return raw
+
+
+def _iso_to_bare(val: str) -> str:
+    """Convert ISO YYYYMMDDTHHMM[SS]Z to bare numeric YYYYMMDDHHMMSS."""
+    val = val.strip()
+    if len(val) >= 14 and val[8] == "T" and val[-1] == "Z":
+        return val[:8] + val[9:-1]
+    return val
+
+
+def _norm_id_for_db(val: str) -> str:
+    """Accept both ISO and bare, return bare numeric for DB lookups."""
+    val = val.strip()
+    # Already bare: 14 digits
+    if len(val) == 14 and val.isdigit():
+        return val
+    # ISO format: convert to bare (handles 14-16 char ISO keys)
+    if len(val) >= 14 and val[8] == "T" and val[-1] == "Z":
+        return _iso_to_bare(val)
+    return val
+
+
+def _advance_bare_ts(ts: int, seconds: int = 1) -> int:
+    """Advance a bare numeric timestamp by N seconds."""
+    try:
+        ts_str = str(ts)
+        if len(ts_str) == 14:
+            from datetime import timedelta
+            dt = datetime.strptime(ts_str, "%Y%m%d%H%M%S").replace(tzinfo=timezone.utc)
+            dt += timedelta(seconds=seconds)
+            return int(dt.strftime("%Y%m%d%H%M%S"))
+    except ValueError:
+        pass
+    return ts + seconds
 
 
 def _connect(db_path: str) -> sqlite3.Connection:
@@ -91,14 +137,15 @@ def add_chat(
     session_refs: str = "[]",
     intake_id: str = "",
     conversation_id: int = 0,
-) -> int:
-    """Insert a chat record. Returns the chat id (UTC timestamp).
-    Retries on PRIMARY KEY collision (+1 second, up to 3 times).
+) -> str:
+    """Insert a chat record. Returns the chat id as ISO-format string (20260524T222142Z).
 
-    For chat-message type: if conversation_id is 0, it's the first message in a
-    new conversation, so conversation_id is auto-updated to the inserted id.
+    The DB stores the id as bare numeric INTEGER; the return value is ISO for
+    direct use in issue_id, wt-create hints, and directory naming.
+
+    Retries on PRIMARY KEY collision (advances 1 second, up to 3 times).
     """
-    chat_id = _utc_timestamp()
+    chat_id = _utc_timestamp()  # bare numeric int
     conn = _connect(db_path)
     for attempt in range(3):
         try:
@@ -111,7 +158,6 @@ def add_chat(
                  message, session_refs, intake_id, _now_utc(),
                  conversation_id),
             )
-            # First message in a conversation: update conversation_id to own id
             if chat_type == "chat-message" and conversation_id == 0:
                 conn.execute(
                     "UPDATE chats SET conversation_id = ? WHERE id = ?",
@@ -119,15 +165,16 @@ def add_chat(
                 )
             conn.commit()
             conn.close()
-            return chat_id
+            # Return ISO format for external use
+            return _bare_to_iso(str(chat_id))
         except sqlite3.IntegrityError:
             if attempt < 2:
-                chat_id += 1
+                chat_id = _advance_bare_ts(chat_id, 1)
                 continue
             conn.close()
             raise
     conn.close()
-    return chat_id
+    return _bare_to_iso(str(chat_id))
 
 
 def query_pending(db_path: str, limit: int = 50) -> list[dict]:
@@ -161,42 +208,68 @@ def query_by_issue(
     return [dict(r) for r in rows]
 
 
-def show(db_path: str, chat_id: int) -> dict | None:
+def _try_find_chat(conn, chat_id: str):
+    """Find chat by id, trying both ISO and bare numeric formats in DB."""
+    bare = _norm_id_for_db(chat_id)
+    row = conn.execute(
+        "SELECT * FROM chats WHERE id = ?", (bare,)
+    ).fetchone()
+    if row:
+        return row
+    # Try the alternate format
+    alt = _bare_to_iso(bare) if bare.isdigit() and len(bare) == 14 else _iso_to_bare(bare)
+    if alt != bare:
+        return conn.execute(
+            "SELECT * FROM chats WHERE id = ?", (alt,)
+        ).fetchone()
+    return None
+
+
+def show(db_path: str, chat_id: str) -> dict | None:
+    """Look up a chat by id. Accepts both ISO (20260524T222142Z) and bare (20260524222142)."""
     conn = _connect(db_path)
     conn.row_factory = sqlite3.Row
-    row = conn.execute(
-        "SELECT * FROM chats WHERE id = ?", (chat_id,)
-    ).fetchone()
+    row = _try_find_chat(conn, chat_id)
     conn.close()
     return dict(row) if row else None
 
 
-def _update_consumed(db_path: str, chat_id: int, value: int, materialized_as: str = "") -> bool:
+def _update_consumed(db_path: str, chat_id: str, value: int, materialized_as: str = "") -> bool:
+    norm_id = _norm_id_for_db(chat_id)
     conn = _connect(db_path)
     conn.execute(
         "UPDATE chats SET consumed = ?, materialized_as = ? WHERE id = ?",
-        (value, materialized_as, chat_id),
+        (value, materialized_as, norm_id),
     )
+    if conn.total_changes == 0:
+        # Try alternate format (bare ↔ ISO)
+        alt = _bare_to_iso(norm_id) if (len(norm_id) == 14 and norm_id.isdigit()) else _iso_to_bare(norm_id)
+        if alt != norm_id:
+            conn.execute(
+                "UPDATE chats SET consumed = ?, materialized_as = ? WHERE id = ?",
+                (value, materialized_as, alt),
+            )
     changed = conn.total_changes > 0
     conn.commit()
     conn.close()
     return changed
 
 
-def consume(db_path: str, chat_id: int, materialized_as: str = "") -> bool:
+def consume(db_path: str, chat_id: str, materialized_as: str = "") -> bool:
     return _update_consumed(db_path, chat_id, 1, materialized_as)
 
 
-def discard(db_path: str, chat_id: int) -> bool:
+def discard(db_path: str, chat_id: str) -> bool:
     return _update_consumed(db_path, chat_id, -1)
 
 
-def reset(db_path: str, chat_id: int) -> bool:
+def reset(db_path: str, chat_id: str) -> bool:
     return _update_consumed(db_path, chat_id, 0)
 
 
-def update_conversation_id(db_path: str, chat_id: int, conversation_id: int) -> bool:
+def update_conversation_id(db_path: str, chat_id: str, conversation_id: int) -> bool:
     """Set conversation_id for a chat record. Returns True if changed."""
+    chat_id = _norm_id_for_db(chat_id)
     conn = _connect(db_path)
     conn.execute(
         "UPDATE chats SET conversation_id = ? WHERE id = ?",
@@ -319,7 +392,7 @@ def consume_conversation(
     return count
 
 
-def materialize(db_path: str, chat_id: int, target_dir: str) -> bool:
+def materialize(db_path: str, chat_id: str, target_dir: str) -> bool:
     """Create docs/issues/{issue_id}/issue.md from a chat record.
     Returns True on success.
     """
@@ -360,7 +433,7 @@ def materialize(db_path: str, chat_id: int, target_dir: str) -> bool:
     return True
 
 
-def materialize_comment(db_path: str, chat_id: int, issue_file: str) -> bool:
+def materialize_comment(db_path: str, chat_id: str, issue_file: str) -> bool:
     """Append a comment chat to an existing issue.md file."""
     chat = show(db_path, chat_id)
     if not chat:
@@ -414,25 +487,25 @@ def _main() -> int:
 
     p = sub.add_parser("consume")
     p.add_argument("--db", required=True)
-    p.add_argument("--id", type=int, required=True, dest="chat_id")
+    p.add_argument("--id", type=str, required=True, dest="chat_id")
     p.add_argument("--materialized-as", default="")
 
     p = sub.add_parser("_update_issue_id")
     p.add_argument("--db", required=True)
-    p.add_argument("--id", type=int, required=True, dest="chat_id")
+    p.add_argument("--id", type=str, required=True, dest="chat_id")
     p.add_argument("--issue-id", required=True)
 
     p = sub.add_parser("discard")
     p.add_argument("--db", required=True)
-    p.add_argument("--id", type=int, required=True, dest="chat_id")
+    p.add_argument("--id", type=str, required=True, dest="chat_id")
 
     p = sub.add_parser("reset")
     p.add_argument("--db", required=True)
-    p.add_argument("--id", type=int, required=True, dest="chat_id")
+    p.add_argument("--id", type=str, required=True, dest="chat_id")
 
     p = sub.add_parser("update-conversation-id")
     p.add_argument("--db", required=True)
-    p.add_argument("--id", type=int, required=True, dest="chat_id")
+    p.add_argument("--id", type=str, required=True, dest="chat_id")
     p.add_argument("--conversation-id", type=int, required=True)
 
     p = sub.add_parser("query-active-conversation")
@@ -446,16 +519,16 @@ def _main() -> int:
 
     p = sub.add_parser("show")
     p.add_argument("--db", required=True)
-    p.add_argument("--id", type=int, required=True, dest="chat_id")
+    p.add_argument("--id", type=str, required=True, dest="chat_id")
 
     p = sub.add_parser("materialize")
     p.add_argument("--db", required=True)
-    p.add_argument("--id", type=int, required=True, dest="chat_id")
+    p.add_argument("--id", type=str, required=True, dest="chat_id")
     p.add_argument("--target", required=True)
 
     p = sub.add_parser("materialize-comment")
     p.add_argument("--db", required=True)
-    p.add_argument("--id", type=int, required=True, dest="chat_id")
+    p.add_argument("--id", type=str, required=True, dest="chat_id")
     p.add_argument("--issue-file", required=True)
 
     args = parser.parse_args()
