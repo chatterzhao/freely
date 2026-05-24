@@ -302,9 +302,9 @@ main() {
   # ── Completion detection: stopReason from ACP protocol output ──
   # Search entire file for clean UUID — cycle log line 1 may be blank.
   local session_id_clean session_id_out stop_reason
-  session_id_clean=$(grep -oE '[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}' "$log_file" 2>/dev/null | head -1)
-  session_id_out=$(sed -n 's/^session id: //p' "$log_file" | head -n 1)
-  stop_reason=$(grep -o 'stop_reason=[a-z_]*' "$log_file" | head -n 1 | cut -d= -f2)
+  session_id_clean=$(grep -oE '[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}' "$log_file" 2>/dev/null | head -1 || true)
+  session_id_out=$(sed -n 's/^session id: //p' "$log_file" | head -n 1 || true)
+  stop_reason=$(grep -o 'stop_reason=[a-z_]*' "$log_file" | head -n 1 | cut -d= -f2 || true)
 
   if [[ -z "$stop_reason" ]]; then
     stop_reason="unknown"
@@ -320,10 +320,10 @@ main() {
         resume_mode_detected="native"
       fi
     fi
-    _persist_session_to_store "$project" "$session_id_clean" "$tool" "$launch_kind" "$resume_mode_detected"
+    _persist_session_to_store "$project" "$session_id_clean" "$tool" "$launch_kind" "$resume_mode_detected" || true
     # Write back new session ID to tool_switch_events so _tool_switch_launch_kind()
     # can find it and return "resume" on subsequent cycles.
-    _tool_switch_writeback_session_id "$project" "$session_id_clean"
+    _tool_switch_writeback_session_id "$project" "$session_id_clean" || true
   fi
 
   # Post-exit failure detection
