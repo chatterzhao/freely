@@ -47,6 +47,41 @@ def _log_file(project):
     return os.path.join(_runtime_dir(project), "acp-bridge.log")
 
 
+def _truncate_log(log_file):
+    """Truncate bridge log so stale errors from prior runs don't pollute detection."""
+    try:
+        with open(log_file, "w") as f:
+            pass
+    except OSError:
+        pass
+
+
+def _kill_descendants(parent_pid):
+    """Kill a process and all its descendants to prevent orphan process leaks."""
+    import signal as _signal
+    try:
+        parent = subprocess.run(
+            ["pgrep", "-P", str(parent_pid)],
+            capture_output=True, text=True, timeout=5,
+        )
+        for child_pid in parent.stdout.strip().split():
+            if child_pid:
+                _kill_descendants(int(child_pid))
+    except Exception:
+        pass
+    try:
+        os.kill(parent_pid, _signal.SIGTERM)
+    except OSError:
+        pass
+    # Wait briefly for graceful exit, then force kill
+    try:
+        os.waitpid(parent_pid, os.WNOHANG)
+        time.sleep(0.5)
+        os.kill(parent_pid, _signal.SIGKILL)
+    except OSError:
+        pass
+
+
 class AcpBridge:
     """Relays JSON-RPC between Unix socket clients and claude-agent-acp stdin/stdout."""
 
@@ -79,6 +114,7 @@ class AcpBridge:
 
     def start_server(self):
         """Launch claude-agent-acp and initialize handshake."""
+        _truncate_log(self.log_file)
         self.log(f"starting ACP server: {self.acp_bin}")
         # Inherit environment but let explicitly-set vars (from alias settings) win
         env = os.environ.copy()
@@ -125,9 +161,9 @@ class AcpBridge:
         if self.server_proc:
             try: self.server_proc.stdin.close()
             except OSError: pass
-            try: self.server_proc.terminate(); self.server_proc.wait(timeout=2)
-            except subprocess.TimeoutExpired: self.server_proc.kill(); self.server_proc.wait()
+            _kill_descendants(self.server_proc.pid)
         self.server_proc = None
+        _truncate_log(self.log_file)
         self.server_ready.clear()
         # Clear stale pending requests
         with self.server_lock:
@@ -178,14 +214,10 @@ class AcpBridge:
                 stale.stdin.close()
             except OSError:
                 pass
-            try:
-                stale.terminate()
-                stale.wait(timeout=2)
-            except subprocess.TimeoutExpired:
-                stale.kill()
-                stale.wait()
+            _kill_descendants(stale.pid)
         self.server_proc = None
         self.server_ready.clear()
+        _truncate_log(self.log_file)
         # Clear pending requests — their callers will get TimeoutError
         with self.server_lock:
             for req_id, (event, _container) in list(self.pending.items()):
@@ -386,19 +418,15 @@ class AcpBridge:
         return self._send_request("session/set_model", params, timeout=10)
 
     def stop_server(self):
-        """Gracefully stop the server."""
+        """Gracefully stop the server and all descendant processes."""
         self.running = False
         if self.server_proc:
             try:
                 self.server_proc.stdin.close()
             except OSError:
                 pass
-            try:
-                self.server_proc.terminate()
-                self.server_proc.wait(timeout=5)
-            except subprocess.TimeoutExpired:
-                self.server_proc.kill()
-                self.server_proc.wait()
+            # Kill entire process group to clean up orphaned Claude SDK children
+            _kill_descendants(self.server_proc.pid)
         if os.path.exists(self.socket_path):
             os.unlink(self.socket_path)
         pid_file = _pid_file(self.project)
