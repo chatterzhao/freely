@@ -15954,9 +15954,12 @@ select_launch_kind() {
     FRESH_LAUNCH_FIRST_AT="$first_at"
   }
 
+  # Cross-tool switch detection: if tool changed, force fresh launch.
+  # Must run BEFORE handoff_rotation_reason case so all paths benefit.
+  local _ts_launch; _ts_launch="$(_tool_switch_launch_kind "$PROJECT_ROOT")"
+
   case "$handoff_rotation_reason" in
     manager_exit_contract_repair|worker_exit_contract_repair)
-      local _ts_launch; _ts_launch="$(_tool_switch_launch_kind "$PROJECT_ROOT")"
       if [[ "$_ts_launch" == "resume" && -n "$resume_target_before_launch" ]] && tool_has_resume_evidence "$AI_TOOL" "$PROJECT_ROOT" && [[ -z "${AUTO_RECOVERY_ORIGIN_TOOL:-}" || "${AUTO_RECOVERY_ORIGIN_TOOL:-}" == "$AI_TOOL" ]]; then
         LAUNCH_KIND_SELECTED="resume"
         LAUNCH_ROTATION_REASON=""
@@ -15968,6 +15971,14 @@ select_launch_kind() {
       return 0
       ;;
   esac
+
+  # Cross-tool switch: force fresh, don't try resume from old tool's session
+  if [[ "$_ts_launch" == "fresh" ]]; then
+    LAUNCH_KIND_SELECTED="fresh_with_handoff"
+    LAUNCH_ROTATION_REASON="cross_tool_switch"
+    _check_fresh_launch_circuit_breaker
+    return 0
+  fi
 
   if [[ "${FIRST_ROUND:-true}" == true ]] \
     && [[ ! -f "$(handoff_file "$PROJECT_ROOT")" ]] \
