@@ -13340,6 +13340,27 @@ write_session_handoff() {
   branch="$(git -C "$project" branch --show-current 2>/dev/null || true)"
   tail_lines="${SESSION_HANDOFF_TAIL_LINES:-80}"
 
+  # Cross-tool context: when tool changed, pass previous session evidence
+  local CROSS_TOOL_CONTEXT="none" CROSS_TOOL_EVIDENCE_PATH="none" CROSS_TOOL_HINT="none"
+  local _ctx_record; _ctx_record="$(_tool_switch_read_latest "$freely_db")"
+  if [[ -n "$_ctx_record" ]]; then
+    local _ctx_cross; _ctx_cross=$(echo "$_ctx_record" | cut -d'|' -f8)
+    if [[ "$_ctx_cross" == "1" ]]; then
+      local _ctx_jsonl; _ctx_jsonl=$(echo "$_ctx_record" | cut -d'|' -f4)
+      local _ctx_clog; _ctx_clog=$(echo "$_ctx_record" | cut -d'|' -f5)
+      CROSS_TOOL_CONTEXT="cross_tool"
+      if [[ -n "$_ctx_jsonl" && "$_ctx_jsonl" != "none" ]]; then
+        CROSS_TOOL_EVIDENCE_PATH="$_ctx_jsonl"
+      elif [[ -n "$_ctx_clog" && "$_ctx_clog" != "none" ]]; then
+        CROSS_TOOL_EVIDENCE_PATH="$_ctx_clog"
+      else
+        CROSS_TOOL_EVIDENCE_PATH="${LAST_CYCLE_LOG:-none}"
+      fi
+      local _ctx_old_tool; _ctx_old_tool=$(echo "$_ctx_record" | cut -d'|' -f2)
+      CROSS_TOOL_HINT="ä¸ä¸è½®ä½¿ç¨ $_ctx_old_toolï¼å·²åæ¢å° ${AI_TOOL:-unknown}ãè¯·åèä¸ä¸è½®ä¼è¯è¯æ®ï¼${CROSS_TOOL_EVIDENCE_PATH}ï¼ç»§ç»­å·¥ä½ã"
+    fi
+  fi
+
   cat >"$out_file" <<EOF
 # Session Handoff
 
