@@ -1492,7 +1492,7 @@ cmd_switch() {
           local _ai_tool_val="$slot"
           # (removed: account slots now use full slot name via CODEX_HOME)
           if [[ -f "$_cfg" ]]; then
-            local _old_tool; _old_tool=$(grep "^AI_TOOL=" "$_cfg" 2>/dev/null | sed 's/AI_TOOL="\(.*\)"/\1/')
+            local _old_tool; _old_tool=$(grep "^AI_TOOL=" "$_cfg" 2>/dev/null | head -1 | sed 's/^AI_TOOL="//; s/"$//; s/".*$//')
             grep -q "^AI_TOOL=" "$_cfg" 2>/dev/null && sed -i '' "s/^AI_TOOL=.*/AI_TOOL=\"$_ai_tool_val\"/" "$_cfg" || echo "AI_TOOL=\"$_ai_tool_val\"" >> "$_cfg"
             log_info "Updated AI_TOOL in config.env: $_ai_tool_val"
             # Record switch in tool_switch_events table
@@ -1515,7 +1515,7 @@ m.tool_switch_atomic_write('$_db', 'switch_command', '$_old_tool', '', '', '', '
       if [[ "$slot" == *-apikey-* && -n "${SWITCH_PROJECT:-}" ]]; then
         local cfg="${SWITCH_PROJECT}/.freely/config.env"
         if [[ -f "$cfg" ]]; then
-          local _old_tool; _old_tool=$(grep "^AI_TOOL=" "$cfg" 2>/dev/null | sed 's/AI_TOOL="\(.*\)"/\1/')
+          local _old_tool; _old_tool=$(grep "^AI_TOOL=" "$cfg" 2>/dev/null | head -1 | sed 's/^AI_TOOL="//; s/"$//; s/".*$//')
           grep -q "^AI_TOOL=" "$cfg" 2>/dev/null             && sed -i '' "s/^AI_TOOL=.*/AI_TOOL="$slot"/" "$cfg"             || echo "AI_TOOL="$slot"" >> "$cfg"
           log_info "Updated AI_TOOL in config.env: $slot"
           local _db; _db="${SWITCH_PROJECT}/.freely/freely.db"
