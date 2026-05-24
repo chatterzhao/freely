@@ -4747,6 +4747,69 @@ manager_bootstrap_runtime_expected() {
   return 1
 }
 
+# ── tool_switch_events helpers ──────────────────────────────────
+# Read latest switch record from DB. Returns pipe-delimited string:
+#   trigger_error|old_tool|old_session_id|old_jsonl|old_cycle_log|new_tool|new_session_id|cross_tool
+# Returns empty if no record exists.
+_tool_switch_read_latest() {
+  local db_path="$1"
+  local session_store_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-store.py"
+  [[ -f "$db_path" && -f "$session_store_py" ]] || return 1
+  python3 -c "
+from importlib.machinery import SourceFileLoader
+m = SourceFileLoader('session_store', '$session_store_py').load_module()
+r = m.tool_switch_read_latest('$db_path')
+if r:
+    print('|'.join(str(r.get(k,'')) for k in [
+        'trigger_error','old_tool','old_session_id','old_jsonl_path','old_cycle_log',
+        'new_tool','new_session_id','cross_tool'
+    ]))
+" 2>/dev/null || true
+}
+
+# Atomic write: stale all previous + insert new succeeded.
+_tool_switch_atomic_write() {
+  local db_path="$1" trigger_error="$2" old_tool="$3" old_session_id="$4"
+  local old_jsonl="$5" old_cycle_log="$6" new_tool="$7" new_session_id="$8"
+  local session_store_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-store.py"
+  [[ -f "$db_path" && -f "$session_store_py" ]] || return 1
+  python3 -c "
+from importlib.machinery import SourceFileLoader
+m = SourceFileLoader('session_store', '$session_store_py').load_module()
+m.tool_switch_atomic_write('$db_path', '$trigger_error', '$old_tool', '$old_session_id',
+    '$old_jsonl', '$old_cycle_log', '$new_tool', '$new_session_id')
+" 2>/dev/null || true
+}
+
+# Determine launch kind from latest switch record.
+# Returns: fresh|resume  (fresh means session/new needed)
+_tool_switch_launch_kind() {
+  local project="$1"
+  local db_path; db_path="$project/.freely/freely.db"
+  local record
+  record="$(_tool_switch_read_latest "$db_path")" || { printf 'fresh\n'; return 0; }
+  [[ -n "$record" ]] || { printf 'fresh\n'; return 0; }
+
+  IFS='|' read -r _trig _old_tool _old_sid _old_jsonl _old_clog _new_tool _new_sid _cross_tool <<<"$record"
+  local current_tool="${AI_TOOL:-}"
+  if [[ -z "$current_tool" ]]; then
+    printf 'fresh\n'; return 0
+  fi
+
+  # Compare base tool names to detect cross-tool change since last record
+  local base_current="${current_tool%%-*}"
+  local base_recorded="${_new_tool%%-*}"
+  if [[ "$base_current" != "$base_recorded" ]]; then
+    printf 'fresh\n'; return 0  # cross-tool → force fresh
+  fi
+
+  # Same tool: try resume if old session ID exists
+  if [[ -n "$_new_sid" ]]; then
+    printf 'resume\n'; return 0
+  fi
+  printf 'fresh\n'
+}
+
 prepare_manager_same_tool_slot_recovery_if_needed() {
   local project="$1"
   local current_tool last_exit_reason supervisor_pid ai_pid
@@ -4841,6 +4904,13 @@ prepare_manager_cross_tool_fallback_if_needed() {
       log_info "cross-tool switch: cleared session state for fresh launch on $fallback_tool"
     fi
     record_tool_auto_switch_event "$project" "$current_tool" "$fallback_tool" "${fallback_slot:-}" "$last_exit_reason"
+    # Record switch in tool_switch_events table for session/bridge handling
+    local _db; _db="$project/.freely/freely.db"
+    local _old_sid _old_jsonl _old_clog
+    _old_sid="${LAST_TOOL_SESSION_ID:-}"
+    _old_jsonl="${LAST_TOOL_JSONL_PATH:-}"
+    _old_clog="${LAST_CYCLE_LOG:-}"
+    _tool_switch_atomic_write "$_db" "$last_exit_reason" "$current_tool" "$_old_sid" "$_old_jsonl" "$_old_clog" "$fallback_tool" ""
     load_config "$project"
     TOOL_AUTO_RECOVERY_DECISION="selected"
     return 0
@@ -12772,6 +12842,16 @@ if added:
   [[ -S "$socket" ]] || { log_warn "ACP bridge socket did not appear"; return 1; }
 
   append_runtime_event "$project" "acp_bridge_started" "bridge_pid=$(cat "$pid_file" 2>/dev/null || echo unknown)"
+  # Record startup in tool_switch_events for session continuity tracking
+  local _ts_db; _ts_db="$project/.freely/freely.db"
+  local _ts_old_tool=""
+  if [[ -f "$_ts_db" ]]; then
+    local _ts_record; _ts_record="$(_tool_switch_read_latest "$_ts_db")"
+    if [[ -n "$_ts_record" ]]; then
+      _ts_old_tool="$(echo "$_ts_record" | cut -d'|' -f6)"  # new_tool from last record
+    fi
+  fi
+  _tool_switch_atomic_write "$_ts_db" "startup" "$_ts_old_tool" "" "" "" "${AI_TOOL:-}" ""
 }
 
 _stop_acp_bridge() {
@@ -15855,7 +15935,8 @@ select_launch_kind() {
 
   case "$handoff_rotation_reason" in
     manager_exit_contract_repair|worker_exit_contract_repair)
-      if [[ -n "$resume_target_before_launch" ]] && tool_has_resume_evidence "$AI_TOOL" "$PROJECT_ROOT" && [[ -z "${AUTO_RECOVERY_ORIGIN_TOOL:-}" || "${AUTO_RECOVERY_ORIGIN_TOOL:-}" == "$AI_TOOL" ]]; then
+      local _ts_launch; _ts_launch="$(_tool_switch_launch_kind "$PROJECT_ROOT")"
+      if [[ "$_ts_launch" == "resume" && -n "$resume_target_before_launch" ]] && tool_has_resume_evidence "$AI_TOOL" "$PROJECT_ROOT" && [[ -z "${AUTO_RECOVERY_ORIGIN_TOOL:-}" || "${AUTO_RECOVERY_ORIGIN_TOOL:-}" == "$AI_TOOL" ]]; then
         LAUNCH_KIND_SELECTED="resume"
         LAUNCH_ROTATION_REASON=""
       else

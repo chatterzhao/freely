@@ -78,6 +78,26 @@ def init_db(db_path: str) -> None:
     conn.execute(
         "CREATE INDEX IF NOT EXISTS idx_parent ON sessions(parent_session_id)"
     )
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS tool_switch_events (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
+            trigger_error TEXT NOT NULL DEFAULT 'startup',
+            old_tool TEXT NOT NULL DEFAULT '',
+            old_session_id TEXT NOT NULL DEFAULT '',
+            old_jsonl_path TEXT NOT NULL DEFAULT '',
+            old_cycle_log TEXT NOT NULL DEFAULT '',
+            new_tool TEXT NOT NULL DEFAULT '',
+            new_session_id TEXT NOT NULL DEFAULT '',
+            cross_tool INTEGER NOT NULL DEFAULT 0,
+            status TEXT NOT NULL DEFAULT 'succeeded'
+        )
+        """
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_switch_status ON tool_switch_events(status)"
+    )
     conn.commit()
     conn.close()
 
@@ -381,6 +401,54 @@ def _main() -> int:
         return 0
 
     return 1
+
+
+# ── tool_switch_events CRUD ──────────────────────────────────────
+# Atomic: stale all previous records, insert new one in a single transaction.
+# On failure the table is unchanged — previous records remain valid.
+
+
+def tool_switch_atomic_write(
+    db_path: str,
+    trigger_error: str = "startup",
+    old_tool: str = "",
+    old_session_id: str = "",
+    old_jsonl_path: str = "",
+    old_cycle_log: str = "",
+    new_tool: str = "",
+    new_session_id: str = "",
+) -> None:
+    """Stale all previous records, then insert new succeeded record."""
+    cross_tool = 0
+    if old_tool and new_tool:
+        base_old = old_tool.split("-")[0] if "-" in old_tool else old_tool
+        base_new = new_tool.split("-")[0] if "-" in new_tool else new_tool
+        cross_tool = 1 if base_old != base_new else 0
+
+    conn = _connect(db_path)
+    conn.execute("UPDATE tool_switch_events SET status = 'stale' WHERE status != 'stale'")
+    conn.execute(
+        """
+        INSERT INTO tool_switch_events
+            (trigger_error, old_tool, old_session_id, old_jsonl_path, old_cycle_log,
+             new_tool, new_session_id, cross_tool, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'succeeded')
+        """,
+        (trigger_error, old_tool, old_session_id, old_jsonl_path, old_cycle_log,
+         new_tool, new_session_id, cross_tool),
+    )
+    conn.commit()
+    conn.close()
+
+
+def tool_switch_read_latest(db_path: str) -> dict | None:
+    """Read the latest succeeded record. Returns None if table is empty."""
+    conn = _connect(db_path)
+    row = conn.execute(
+        "SELECT * FROM tool_switch_events WHERE status = 'succeeded' ORDER BY id DESC LIMIT 1"
+    ).fetchone()
+    conn.close()
+    return dict(row) if row else None
 
 
 if __name__ == "__main__":
