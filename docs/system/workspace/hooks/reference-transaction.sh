@@ -51,6 +51,28 @@ _caller_is_wt_create() {
   return 1
 }
 
+_caller_is_wt_close() {
+  # Walk process ancestry: check if wt-close is in the parent chain.
+  local pid ppid cmd
+  pid=$PPID
+  while [[ "$pid" -gt 1 ]]; do
+    cmd=$(ps -o comm= -p "$pid" 2>/dev/null || true)
+    case "$cmd" in
+      wt-close|bash*)
+        local full_cmd
+        full_cmd=$(ps -o args= -p "$pid" 2>/dev/null || true)
+        case "$full_cmd" in
+          *wt-close*) return 0 ;;
+        esac
+        ;;
+    esac
+    ppid=$(ps -o ppid= -p "$pid" 2>/dev/null | tr -d ' ' || true)
+    [[ -n "$ppid" && "$ppid" -gt 0 ]] || break
+    pid=$ppid
+  done
+  return 1
+}
+
 commit_has_canonical_receipt() {
   local commit="$1"
   local body=""
@@ -105,11 +127,14 @@ NAME_BLOCK
     continue
   fi
 
-  protected_branch_ref "$refname" || continue
-
-  # Branch deletion: BLOCK for managed branches — must use wt-close
+  # Branch deletion: BLOCK for ALL managed branches — must use wt-close
+  # Checked BEFORE protected_branch_ref guard so fix/feature/hotfix are also covered.
   if [[ "$new_oid" == "$zero_oid" ]]; then
     if wt_managed_branch_ref "$refname"; then
+      # Allow wt-close to delete managed branches
+      if _caller_is_wt_close; then
+        continue
+      fi
       branch_name="$(protected_branch_name "$refname")"
       cat <<'DELETE_BLOCK' >&2
 [HOOK] Branch deletion BLOCKED: '$branch_name'
@@ -125,6 +150,8 @@ DELETE_BLOCK
     fi
     continue
   fi
+
+  protected_branch_ref "$refname" || continue
 
   # No-op: ref points to the same commit (e.g. git reset --hard HEAD)
   if [[ "$old_oid" == "$new_oid" ]]; then
