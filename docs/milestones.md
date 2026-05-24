@@ -4464,7 +4464,7 @@ routing_policy:
 - status: active
 - source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
 - source_candidates: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md`
-- intent: 把跨 pre-brainstorm / 跨 feature 分支的架构结论收敛进单一里程碑，停止悬空讨论，再按 milestone 顺序创建后续专用 worktree 落 IBM 与实现；该收敛批次以前置 issue `I-20260308-1245` 的边界复评结论为基础，不替代它。
+- intent: 把跨 pre-brainstorm / 跨 feature 分支的架构结论收敛进单一里程碑，停止悬空讨论，按 scan/handoffs 优先级选择任务创建后续专用 worktree 落 IBM 与实现；该收敛批次以前置 issue `I-20260308-1245` 的边界复评结论为基础，不替代它。
 - why_now: Freely 正在吃自己的狗粮开发自己；如果架构、控制面、standalone/OpenClaw、human intervention 等候选持续分散在多个分支和 pre-brainstorm 中，auto-loop 与人工协作都会缺少统一编排入口，同时也会与现有 frontend-probe milestone 的边界复评形成重复编排。
 
 ### committed_issues

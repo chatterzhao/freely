@@ -1,6 +1,6 @@
 ---
 name: freely-dev-loop-execution
-description: 执行 milestone-owned ready issue 的实现、测试与进度回写。
+description: 执行 scan-selected 或 handoff-continued ready issue 的实现、测试与进度回写。
 ---
 
 # skill:freely-dev-loop-execution
