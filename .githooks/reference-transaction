@@ -3,11 +3,9 @@ set -euo pipefail
 
 ROOT_DIR="$(git rev-parse --show-toplevel 2>/dev/null || { cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P; })"
 HOOK_NAME="$(basename "$0")"
-# Prefer in-repo hook scripts (freely self-development)
 if [[ -x "$ROOT_DIR/docs/system/workspace/hooks/${HOOK_NAME}.sh" ]]; then
   exec bash "$ROOT_DIR/docs/system/workspace/hooks/${HOOK_NAME}.sh" "$@"
 fi
-# Fall back to installed freely (external projects)
 FREELY_HOME="$(source "$ROOT_DIR/.freely/config.env" 2>/dev/null && printf '%s' "${FREELY_HOME:-}")"
 if [[ -n "${FREELY_HOME:-}" && -x "$FREELY_HOME/docs/system/workspace/hooks/${HOOK_NAME}.sh" ]]; then
   exec bash "$FREELY_HOME/docs/system/workspace/hooks/${HOOK_NAME}.sh" "$@"

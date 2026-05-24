@@ -1,6 +1,30 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# ── Fleet audit: detect orphaned managed branches ──
+_fleet_audit_orphans() {
+  local branch worktree_path issue_count=0
+  while IFS= read -r branch; do
+    [[ -n "$branch" ]] || continue
+    # Check if branch has an active worktree
+    worktree_path=$(git worktree list --porcelain 2>/dev/null | awk -v br="refs/heads/$branch" '
+      $1=="worktree" {wt=$2}
+      $1=="branch" && $2==br {print wt; exit}
+    ')
+    if [[ -z "$worktree_path" ]]; then
+      if [[ $issue_count -eq 0 ]]; then
+        echo "[freely] WARNING: Orphaned managed branches detected (no active worktree):" >&2
+      fi
+      echo "  - $branch (use wt-close or wt-close --force to clean up)" >&2
+      ((issue_count++))
+    fi
+  done < <(git branch --list 'fix/*' 'feature/*' 'hotfix/*' 'test-pre-merge-*' 2>/dev/null | sed 's/^[* ]*//')
+  if [[ $issue_count -gt 0 ]]; then
+    echo "" >&2
+  fi
+}
+_fleet_audit_orphans
+
 # ── Secret detection gate ──────────────────────────────────────
 # Scans staged files for API keys, tokens, and credentials before commit.
 # Patterns: Anthropic/OpenAI/DeepSeek keys, generic high-entropy tokens.

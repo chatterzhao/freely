@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+# git-worktree-guard: intercept git worktree remove for managed worktrees.
+# Source this in your shell or symlink as a git wrapper.
+#
+# Usage: source bin/git-worktree-guard  (installs git() function)
+#        or: export PATH="bin:$PATH"     (uses this script as git wrapper)
+
+set -euo pipefail
+
+_is_managed_worktree() {
+  local path="$1"
+  # Check if the worktree path matches the freely worktrees pattern
+  case "$path" in
+    */-freely-worktrees/*|*-freely-worktrees/*|*/freely-worktrees/*) return 0 ;;
+  esac
+  # Check for .freely marker in the worktree
+  if [[ -d "$path/.freely" ]]; then
+    return 0
+  fi
+  return 1
+}
+
+_worktree_remove_guard() {
+  local args=("$@")
+  local target=""
+  local i
+  
+  # Find the target worktree path in arguments
+  for ((i=0; i<${#args[@]}; i++)); do
+    case "${args[$i]}" in
+      --force|-f) continue ;;
+      --*) ((i++)) ; continue ;;
+      *) target="${args[$i]}"; break ;;
+    esac
+  done
+  
+  if [[ -z "$target" ]]; then
+    # No target found, delegate to real git
+    command git worktree remove "$@"
+    return $?
+  fi
+  
+  # Resolve to absolute path if needed
+  if [[ ! -d "$target" ]]; then
+    # Might be a relative path; try to resolve
+    local abs_target
+    abs_target="$(cd "$target" 2>/dev/null && pwd -P || echo "$target")"
+    if [[ -d "$abs_target" ]]; then
+      target="$abs_target"
+    fi
+  fi
+  
+  if _is_managed_worktree "$target"; then
+    cat >&2 <<'BLOCK'
+[freely] git worktree remove BLOCKED for managed worktree.
+
+  Managed worktrees must be closed through wt-close:
+    ./bin/wt-close <branch>
+  
+  For emergency cleanup (corrupted/abandoned worktree):
+    ./bin/wt-close --force <branch> --reason "why force close"
+
+  If you absolutely must use raw git:
+    \command git worktree remove "$@"
+BLOCK
+    return 1
+  fi
+  
+  # Not managed, delegate to real git
+  command git worktree remove "$@"
+}
+
+# If sourced, install git() function wrapper
+if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
+  # Being sourced — install git() wrapper
+  if ! declare -f _original_git >/dev/null 2>&1; then
+    eval '_original_git() { command git "$@"; }'
+  fi
+  git() {
+    if [[ "$1" == "worktree" && "$2" == "remove" ]]; then
+      _worktree_remove_guard "${@:2}"
+      return $?
+    fi
+    _original_git "$@"
+  }
+else
+  # Being executed directly — not supported (must be sourced)
+  echo "git-worktree-guard: must be sourced, not executed" >&2
+  echo "  source bin/git-worktree-guard" >&2
+  exit 1
+fi
