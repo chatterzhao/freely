@@ -1,6 +1,6 @@
 ---
 name: freely-feat-execution
-description: 新功能/大型改动的完整开发流程——B1_IBM预研→B2_IBM→dev实现→门禁合并，与 freely-fix-execution 同级抽象。
+description: 新功能/大型改动的完整开发流程——获取issue→wt-create→B1_IBM预研→B2_IBM→dev(fix|hotfix|feature)实现→test-pre-merge-*验证→dry-run门禁→dev合并develop→wt-close，与 freely-fix-execution 同级抽象。
 ---
 
 # skill:freely-feat-execution
@@ -14,7 +14,7 @@ description: 新功能/大型改动的完整开发流程——B1_IBM预研→B2_
 | | freely-fix-execution | freely-feat-execution |
 |---|---|---|
 | 适用 | bug fix、小改动 | 新功能、大型重构 |
-| 流程 | test-pre-merge 沙箱 → cp → commit | B1_IBM→B2_IBM→dev→merge 完整链路 |
+| 流程 | test-pre-merge 沙箱 → cp → commit | 获取issue→wt-create→B1_IBM→B2_IBM→dev(fix\|hotfix\|feature)→test-pre-merge-*验证→dry-run门禁→dev合并develop |
 | 治理 | 后置 | 前置（B1_IBM 即开始） |
 
 ## 下层 skill
@@ -74,19 +74,27 @@ freely-feat-execution 在不同阶段调用下层 skill：
    → 更新 progress phase_state → in_dev → in_verification
 ```
 
-### 阶段 4：门禁合并
+### 阶段 4：test-pre-merge 验证
 ```
-1. 运行 pre-tests + governance-merge-gate --range
+1. dev 合并到 test-pre-merge-{raw-key}-* → 在 test 工位启动项目测试
+2. 有问题 → dev(fix|hotfix|feature) 修改 → 合并到 test → 重启测试（反复至达标）
+3. phase_state → in_verification
+```
+
+### 阶段 5：门禁合并
+```
+1. 运行 pre-tests + dry-run 门禁检查
 2. gate 失败 → 修复分支自己的错误 → 重试
-3. gate 通过 → merge feature → develop (merge-guarded)
+3. gate 通过 → dev 合并到 develop (merge-guarded)（非 test 合并到 develop）
 4. issue-sync close
 ```
 
-### 阶段 5：收口
+### 阶段 6：收口
 ```
 1. 更新 issue phase_state → completed
 2. 更新 milestones.md
 3. raw issue → absorbed/dropped
+4. wt-close
 ```
 
 ## Gate 处理
@@ -99,7 +107,7 @@ freely-feat-execution 在不同阶段调用下层 skill：
 
 ## 硬性规则
 
-- 不要跳过 B1_IBM → B2_IBM → dev → merge 任一阶段
+- 不要跳过 获取issue→wt-create→B1_IBM→B2_IBM→dev(fix|hotfix|feature)→test-pre-merge-*验证→dry-run门禁→dev合并develop 任一阶段
 - 不要在 develop 上直接开发
 - 分支名必须以 `feature/` 为前缀，工位名必须包含 `feature`
 - feature worktree 必须用 ./bin/wt-create 创建

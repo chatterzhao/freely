@@ -78,7 +78,7 @@ hotfix/*          → main
 
 | 分支类型 | 默认 base | 说明 |
 |---|---|---|
-| `feature/*` | develop | 标准功能开发，走完整 B1→B2→dev→merge 链路 |
+| `feature/*` | develop | 标准功能开发，走完整 获取issue→wt-create→B1→B2→dev→test-pre-merge-*验证→dry-run门禁→develop 链路 |
 | `fix/*` | develop | bug 修复，从 develop 派生，合并回 develop |
 | `hotfix/*` | main | 紧急修复，从 main 的标签派生，合并回 main 和 develop |
 
