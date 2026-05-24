@@ -15866,6 +15866,13 @@ EOF
   fi
 }
 
+normalize_acp_launch_kind() {
+  case "${1:-}" in
+    fresh_with_handoff) printf 'fresh\n' ;;
+    *) printf '%s\n' "${1:-fresh}" ;;
+  esac
+}
+
 select_launch_kind() {
   local handoff_rotation_reason=""
   local resume_target_before_launch=""
@@ -19714,7 +19721,7 @@ ${_msg}" >/dev/null 2>&1 || true
         --network-failure-marker-file "$network_failure_marker_file" \
         --failure-marker-file "$failure_marker_file" \
         "${_adapter_extra_args[@]}" \
-        --launch-kind "$mode_name"
+        --launch-kind "$(normalize_acp_launch_kind "$mode_name")"
     } >>"$loop_log" 2>&1
     local rc=$?
     set -e
