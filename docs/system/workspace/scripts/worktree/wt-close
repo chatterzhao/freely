@@ -6,6 +6,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/worktree-common.sh"
 
 ISSUES_DIR="$ROOT_DIR/docs/issues"
 FORCE=false
+FORCE_REASON=""
 SKIP_PLATFORM=false
 DRY_RUN=false
 
@@ -22,6 +23,7 @@ Arguments:
 
 Options:
   --force            Skip phase_state and pretests-retirement checks
+  --reason <text>    Reason for force-close (used with --force)
   --skip-platform    Skip platform issue close
   --dry-run          Print what would be done, don't execute
 
@@ -125,6 +127,7 @@ args=()
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --force) FORCE=true; shift ;;
+    --reason) FORCE_REASON="$2"; shift 2 ;;
     --skip-platform) SKIP_PLATFORM=true; shift ;;
     --dry-run) DRY_RUN=true; shift ;;
     --help|-h) usage; exit 0 ;;
@@ -258,7 +261,7 @@ if [[ "$FORCE" == true && -n "$issue_id" && -f "${issue_file:-}" ]]; then
     _dry "write force_closed trace to $issue_file"
   else
     _fm_set_str "$issue_file" "force_closed_at" "$ts"
-    _fm_set_str "$issue_file" "force_closed_reason" "wt-close --force: worktree retired without completed phase_state"
+    _fm_set_str "$issue_file" "force_closed_reason" "${FORCE_REASON:-wt-close --force: worktree retired without completed phase_state}"
     _fm_set_str "$issue_file" "updated_at" "$ts"
     echo "wt-close: force-closed $issue_id (force_closed trace written to frontmatter)"
   fi
