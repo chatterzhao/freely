@@ -1,9 +1,13 @@
+---
+owner_issue: I-20260524T053214Z-A
+issue_id: I-20260524T053214Z-A
+---
 # Code Review — acp-tool-switch-integration
 
-- **owner_issue**: `docs/issues/I-20260524T053214Z-A/issue.md`
-- **reviewer**: claude-opus-4.7
-- **mode**: subagent
-- **verdict**: pass
+- issue_id: I-20260524T053214Z-A
+- reviewer: claude-opus-4.7
+- mode: subagent
+- verdict: pass
 - **commits reviewed**: 4c146655, 7bd478b4
 
 ## Review Scope

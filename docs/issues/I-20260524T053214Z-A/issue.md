@@ -18,6 +18,8 @@ channel: freely-fix-execution
 session_refs: []
 pre_tests_path: docs/issues/raw-20260524T053214Z/pre-tests.md
 verification_artifact_dir: docs/epics/acp-tool-switch-integration/code-reviews
+milestone: M-20260524T053214Z-A
+milestone_state: committed
 ---
 
 # I-20260524T053214Z-A: ACP session 生命周期接入 tool_switch_events
