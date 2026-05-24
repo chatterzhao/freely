@@ -361,6 +361,7 @@ def main():
         elif launch_kind == "prompt" and resume_target:
             # Multi-turn within same session: session already exists from fresh/resume.
             # Just set session_id — prompt will be sent via send_prompt() below.
+            # If session was lost (bridge restart), send_prompt() will fall back to session/new.
             session_id = resume_target
             print(session_id, flush=True)                                   # line 1: clean UUID
             print(f"session id: {session_id} (prompt)", flush=True)         # line 2: human log
@@ -447,7 +448,22 @@ def main():
                 print(f"[WARN] ACP prompt finished with stopReason={stop_reason}", flush=True)
             return stop_reason
 
-        stop_reason = send_prompt(prompt_text, t_start, t_session, launch_kind)
+        try:
+            stop_reason = send_prompt(prompt_text, t_start, t_session, launch_kind)
+        except Exception as prompt_exc:
+            # session/prompt failed — session may have been lost (bridge restart).
+            # Fall back to session/new and retry once.
+            print(f"[WARN] session/prompt failed ({prompt_exc}), falling back to session/new", flush=True)
+            new_params = {"cwd": cwd, "mcpServers": []}
+            if args.session_id:
+                new_params["sessionId"] = args.session_id
+            session_result = client.request("session/new", new_params, timeout=30)
+            session_id = session_result["sessionId"]
+            print(session_id, flush=True)                                                      # line 1: clean UUID
+            print(f"session id: {session_id} (fresh after prompt failure)", flush=True)         # line 2: human log
+            t_session = time.time()
+            launch_kind = "fresh"
+            stop_reason = send_prompt(prompt_text, t_start, t_session, launch_kind)
 
         # Loop mode: keep session alive, wait for next prompt via control file
         if args.loop and args.next_prompt_file:

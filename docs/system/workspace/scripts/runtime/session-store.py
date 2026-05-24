@@ -102,6 +102,28 @@ def init_db(db_path: str) -> None:
     conn.close()
 
 
+def _validate_required_fields(session_id: str, project: str, tool: str, role: str) -> None:
+    """Validate required fields before writing to DB. Raises ValueError on failure."""
+    if not session_id or not isinstance(session_id, str):
+        raise ValueError("session_id is required and must be a non-empty string")
+    if not is_valid_uuid_str(session_id):
+        raise ValueError(f"session_id must be a valid UUID: {session_id}")
+    if not project or not isinstance(project, str):
+        raise ValueError("project is required and must be a non-empty string")
+    if not tool or not isinstance(tool, str):
+        raise ValueError("tool is required and must be a non-empty string")
+    if role not in ("manager", "worker"):
+        raise ValueError(f"role must be 'manager' or 'worker', got: {role}")
+
+
+def is_valid_uuid_str(s: str) -> bool:
+    """Check if string looks like a valid UUID."""
+    import re
+    return bool(re.match(
+        r'^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$',
+        s, re.IGNORECASE))
+
+
 def upsert_session(
     db_path: str,
     session_id: str,
@@ -116,6 +138,7 @@ def upsert_session(
     metadata: dict | None = None,
 ) -> str:
     """Insert or update a session record. Returns the session_id on success."""
+    _validate_required_fields(session_id, project, tool, role)
     now = _now_utc()
     meta_json = json.dumps(metadata or {}, separators=(",", ":"))
     conn = _connect(db_path)
@@ -320,6 +343,10 @@ def _main() -> int:
     p.add_argument("--db", required=True)
     p.add_argument("--project", required=True)
 
+    p = sub.add_parser("tool-switch-update-sid")
+    p.add_argument("--db", required=True)
+    p.add_argument("--new-session-id", required=True)
+
     args = parser.parse_args()
     if not args.cmd:
         parser.print_help()
@@ -400,6 +427,11 @@ def _main() -> int:
         print(f"{n}")
         return 0
 
+    if args.cmd == "tool-switch-update-sid":
+        ok = tool_switch_update_session_id(args.db, args.new_session_id)
+        print("OK" if ok else "NOT_FOUND")
+        return 0 if ok else 1
+
     return 1
 
 
@@ -419,6 +451,10 @@ def tool_switch_atomic_write(
     new_session_id: str = "",
 ) -> None:
     """Stale all previous records, then insert new succeeded record."""
+    if not db_path:
+        raise ValueError("db_path is required")
+    if not new_tool:
+        raise ValueError("new_tool is required for tool_switch_atomic_write")
     cross_tool = 0
     if old_tool and new_tool:
         base_old = old_tool.split("-")[0] if "-" in old_tool else old_tool
@@ -454,6 +490,26 @@ def tool_switch_read_latest(db_path: str) -> dict | None:
             "old_jsonl_path","old_cycle_log","new_tool","new_session_id",
             "cross_tool","status"]
     return dict(zip(cols, row))
+
+
+def tool_switch_update_session_id(db_path: str, new_session_id: str) -> bool:
+    """Update the latest succeeded record's new_session_id field.
+    Called after session/new completes to close the feedback loop.
+    Returns True if a record was updated."""
+    if not db_path:
+        raise ValueError("db_path is required")
+    if not new_session_id or not isinstance(new_session_id, str):
+        raise ValueError("new_session_id is required and must be a non-empty string")
+    conn = _connect(db_path)
+    conn.execute(
+        "UPDATE tool_switch_events SET new_session_id = ? "
+        "WHERE status = 'succeeded' AND id = (SELECT MAX(id) FROM tool_switch_events WHERE status = 'succeeded')",
+        (new_session_id,),
+    )
+    changed = conn.total_changes > 0
+    conn.commit()
+    conn.close()
+    return changed
 
 
 if __name__ == "__main__":

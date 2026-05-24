@@ -104,9 +104,18 @@ _detect_acp_failure() {
     [[ -n "$failure_marker" ]] && echo "auth_or_rate_limit" > "$failure_marker"
   fi
 
-  # Bridge restart / session lost: session died, exited unexpectedly, or not found
-  if _matched=$(grep -m1 -E '(session.*not found|unknown session|no such session|Session not found|exited unexpectedly|ProcessTransport.*not ready|idle timeout)' "$log_file" 2>/dev/null); then
+  # Bridge restart / session lost: session died, exited unexpectedly, or not found.
+  # Check BOTH the cycle log AND the bridge log — claude-agent-acp writes
+  # "Session not found" to its stderr (bridge log), but run-acp-prompt.py only
+  # reports "server error: Internal error" to the cycle log.
+  local bridge_log
+  bridge_log="$(dirname "$log_file")/../run/acp-bridge.log"
+  if _matched=$(grep -m1 -E '(session.*not found|unknown session|no such session|Session not found|exited unexpectedly|ProcessTransport.*not ready|idle timeout)' "$log_file" "$bridge_log" 2>/dev/null); then
     echo "[ACP-detect] bridge_session_lost matched: ${_matched:0:200}" >&2
+    [[ -n "$bridge_lost_marker" ]] && echo "bridge_session_lost" > "$bridge_lost_marker"
+  elif _matched=$(grep -m1 -E '(Internal error|Resource not found|server error)' "$log_file" 2>/dev/null); then
+    # ACP errors that indicate session/bridge issues but use opaque error codes.
+    echo "[ACP-detect] bridge_session_lost (acp_error) matched: ${_matched:0:200}" >&2
     [[ -n "$bridge_lost_marker" ]] && echo "bridge_session_lost" > "$bridge_lost_marker"
   fi
 }
@@ -166,6 +175,23 @@ _mark_session_completed() {
     --db "$db_path" \
     --session-id "$session_id" \
     --status completed \
+    >/dev/null 2>&1 || true
+}
+
+_tool_switch_writeback_session_id() {
+  local project="$1" new_session_id="$2"
+  local db_path="$project/.freely/freely.db"
+  local session_store_py
+  session_store_py="$(dirname "$0")/session-store.py"
+  if [[ ! -f "$session_store_py" ]]; then
+    return 1
+  fi
+  if [[ -z "$new_session_id" ]]; then
+    return 1
+  fi
+  python3 "$session_store_py" tool-switch-update-sid \
+    --db "$db_path" \
+    --new-session-id "$new_session_id" \
     >/dev/null 2>&1 || true
 }
 
@@ -295,6 +321,9 @@ main() {
       fi
     fi
     _persist_session_to_store "$project" "$session_id_clean" "$tool" "$launch_kind" "$resume_mode_detected"
+    # Write back new session ID to tool_switch_events so _tool_switch_launch_kind()
+    # can find it and return "resume" on subsequent cycles.
+    _tool_switch_writeback_session_id "$project" "$session_id_clean"
   fi
 
   # Post-exit failure detection

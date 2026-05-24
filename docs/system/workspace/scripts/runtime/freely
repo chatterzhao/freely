@@ -12566,6 +12566,9 @@ _acp_bridge_has_fatal_error() {
   # Network / transport failure cascade (certificate, handshake, channel)
   rg -qi 'Transport channel closed|HandshakeFailure|received fatal alert|certificate not valid|certificate expired|worker quit with fatal' "$bridge_log" 2>/dev/null && return 0
 
+  # Session lost (bridge restart, process death, or backend eviction)
+  rg -qi 'Session not found|Internal error|Resource not found' "$bridge_log" 2>/dev/null && return 0
+
   return 1
 }
 
@@ -15870,7 +15873,9 @@ select_launch_kind() {
   resume_target_before_launch="$(tool_runtime_resume_target_before_launch "$AI_TOOL" "$PROJECT_ROOT")"
 
   # ACP mode: session identity stored in session-store (SQLite).
-  # Query it directly — no cycle log parsing, no tool directory scanning.
+  # tool_switch_events is the unified truth source for session continuity —
+  # consulted FIRST, before session-store, to detect cross-tool switches and
+  # bridge restarts that invalidated old sessions.
   if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
     # Fork: worker inherits parent session context.
     if [[ -n "${SESSION_PARENT_ID:-}" && -z "${CLAUDE_SESSION_ID_CURRENT:-}" \
@@ -15882,6 +15887,14 @@ select_launch_kind() {
         LAST_TOOL_RESUME_TARGET="${SESSION_PARENT_ID:-}"
         return 0
       fi
+    fi
+    # Check tool_switch_events FIRST — before querying session-store.
+    # If the tool changed or the bridge restarted, force fresh launch.
+    local _ts_launch; _ts_launch="$(_tool_switch_launch_kind "$PROJECT_ROOT")"
+    if [[ "$_ts_launch" == "fresh" ]]; then
+      LAUNCH_KIND_SELECTED="fresh_with_handoff"
+      LAUNCH_ROTATION_REASON="cross_tool_switch"
+      return 0
     fi
     # Query session-store for active session (authoritative source).
     local session_store_py sid

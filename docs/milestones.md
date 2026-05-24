@@ -3,6 +3,21 @@
 
 本文件是 Freely 自举开发时的主动扫描入口，用来承接已进入活跃范围的 candidate / issue。
 
+## M-20260524T053214Z-A
+- title: ACP session 生命周期接入 tool_switch_events
+- status: active
+### candidate_issues
+1. `C-20260524T053214Z-A`
+- milestone: M-20260524T053214Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260524T053214Z-A/issue.md`
+### committed_issues
+1. `I-20260524T053214Z-A`
+- title: ACP session 生命周期接入 tool_switch_events
+- milestone_state: committed
+- phase_state: `in_dev`
+- issue_path: `docs/issues/I-20260524T053214Z-A/issue.md`
+
 ## M-20260430-0010-A
 - title: Sync docs + fix governance-only paths for architecture docs
 - status: completed
