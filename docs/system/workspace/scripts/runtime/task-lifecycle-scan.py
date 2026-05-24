@@ -797,7 +797,7 @@ def scan_chat_inbox(project: Path) -> list[dict]:
         bare_id = str(chat["id"])
         iso_key = f"{bare_id[:8]}T{bare_id[8:]}Z" if len(bare_id) == 14 and bare_id.isdigit() else bare_id
         items.append({
-            "source_family": "chat_inbox",
+            "source_family": "chat-inbox",
             "key": iso_key,
             "stage": stage,
             "chat_type": chat_type,
