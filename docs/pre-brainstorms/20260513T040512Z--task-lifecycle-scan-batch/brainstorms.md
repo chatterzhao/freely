@@ -13,7 +13,7 @@
 原始 `I-20260503-0200-A`（scan lifecycle migration）完成了链跟踪、信号扫描、分支治理、socket 修复，但未解决 per-item API 调用性能问题。本 issue 是其性能优化的自然延续，不属于重复。
 
 ### 当前为什么不能直接进入 B2_IBM
-- 属于新功能/大型改动（`freely-feat-execution`），必须走 B1_IBM → B2_IBM → dev → merge 完整链路
+- 属于新功能/大型改动（`freely-feat-execution`），必须走 B1_IBM → B2_IBM → dev(fix|hotfix|feature) → test-pre-merge-* 验证 → dry-run门禁 → dev合并develop 完整链路
 - 需要一个独立 candidate 以便在 milestone 中排队和追踪
 
 ## Research

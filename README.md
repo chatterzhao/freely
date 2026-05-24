@@ -55,8 +55,8 @@ chmod +x ./bin/test-pre-push-hook
 
 功能交付分支策略：
 
-- `feature/* -> develop` 作为默认开发集成路径
-- `feature/* -> test-pre-merge-* -> develop` 仅在需要临时预集成验证时使用，测试批次必须从当前 `develop` 新建并在验证结束后删除
+- `feature/* -> test-pre-merge-* -> develop` 为标准开发集成路径（test-pre-merge 是进入 develop 的强制验证阶段）
+- `feature/* -> develop` 作为正常路径被阻止（CONSTITUTION.md §2）
 - 直接推送/合并到 `develop` 被本地 hook 策略阻止
 
 标准 worktree 创建方式（从项目根目录执行）：

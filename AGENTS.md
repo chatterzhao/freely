@@ -114,7 +114,7 @@ Freely 开发 Freely 时，默认先问四件事：
 所有代码改动（feature、fix、hotfix）必须走完整流程，develop 禁止直接写入：
 
 ```
-raw issue → wt-create → B1:IBM|B2:IBM → dev → merge-guarded → wt-close
+raw issue → wt-create → B1:IBM|B2:IBM → dev(fix|hotfix|feature) → test-pre-merge-* 验证 → merge-guarded → wt-close
 ```
 
 | 步骤 | 操作 | 谁执行 |
