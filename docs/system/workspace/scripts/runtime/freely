@@ -13360,7 +13360,7 @@ write_session_handoff() {
         CROSS_TOOL_EVIDENCE_PATH="${LAST_CYCLE_LOG:-none}"
       fi
       local _ctx_old_tool; _ctx_old_tool=$(echo "$_ctx_record" | cut -d'|' -f2)
-      CROSS_TOOL_HINT="ä¸ä¸è½®ä½¿ç¨ $_ctx_old_toolï¼å·²åæ¢å° ${AI_TOOL:-unknown}ãè¯·åèä¸ä¸è½®ä¼è¯è¯æ®ï¼${CROSS_TOOL_EVIDENCE_PATH}ï¼ç»§ç»­å·¥ä½ã"
+      CROSS_TOOL_HINT="Previous tool was $_ctx_old_tool, switched to ${AI_TOOL:-unknown}. Reference the previous session evidence (${CROSS_TOOL_EVIDENCE_PATH}) to continue work."
     fi
   fi
 
