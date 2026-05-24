@@ -252,7 +252,7 @@ class ACPClient:
         params = message.get("params", {})
         options = params.get("options", [])
         if self.mode == "auto":
-            preferred_kinds = ("allow_once", "allow_always")
+            preferred_kinds = ("allow_always", "allow_once")
         else:
             preferred_kinds = ("reject_once", "reject_always")
 
@@ -360,10 +360,8 @@ def main():
 
         elif launch_kind == "prompt" and resume_target:
             # Multi-turn within same session: session already exists from fresh/resume.
-            # Just set session_id — prompt will be sent via send_prompt() below.
             # If session was lost (bridge restart), send_prompt() will fall back to session/new.
             session_id = resume_target
-            print(session_id, flush=True)                                   # line 1: clean UUID
             print(f"session id: {session_id} (prompt)", flush=True)         # line 2: human log
             # session_result for prompt-mode multi-turn
             session_result = {"sessionId": session_id}

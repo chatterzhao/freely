@@ -108,26 +108,30 @@ _detect_acp_failure() {
     [[ -n "$failure_marker" ]] && echo "auth_or_rate_limit" > "$failure_marker"
   fi
 
-  # Bridge restart / session lost: session died, exited unexpectedly, or not found.
-  # Check BOTH the cycle log AND the bridge log — claude-agent-acp writes
-  # "Session not found" to its stderr (bridge log), but run-acp-prompt.py only
-  # reports "server error: Internal error" to the cycle log.
+  # Bridge unrecoverable failure: bridge process died or became unresponsive.
+  # Session loss (Session not found) is NOT a kill trigger — run-acp-prompt.py
+  # handles it internally by falling back to session/new. Killing during the
+  # fallback creates a death loop where the next cycle repeats the same pattern.
   #
   # Scan only NEW content (since cycle start) to avoid matching stale errors
   # from previous cycles. Uses byte offset recorded at launch time.
   local bridge_log
   bridge_log="$(dirname "$log_file")/../run/acp-bridge.log"
-  if _matched=$(_grep_new_only "$bridge_log" "$bridge_log_offset" -m1 -E '(session.*not found|unknown session|no such session|Session not found|exited unexpectedly|ProcessTransport.*not ready|idle timeout)' 2>/dev/null) && [[ -n "$_matched" ]]; then
+  if _matched=$(_grep_new_only "$bridge_log" "$bridge_log_offset" -m1 -E '(exited unexpectedly|ProcessTransport.*not ready|idle timeout)' 2>/dev/null) && [[ -n "$_matched" ]]; then
     echo "[ACP-detect] bridge_session_lost matched: ${_matched:0:200}" >&2
     [[ -n "$bridge_lost_marker" ]] && echo "bridge_session_lost" > "$bridge_lost_marker"
-  elif _matched=$(grep -m1 -E '(session.*not found|unknown session|no such session|Session not found|exited unexpectedly|ProcessTransport.*not ready|idle timeout)' "$log_file" 2>/dev/null) && [[ -n "$_matched" ]]; then
-    # Cycle log is freshly created per cycle, so full grep is safe.
+  elif _matched=$(grep -m1 -E '(exited unexpectedly|ProcessTransport.*not ready|idle timeout)' "$log_file" 2>/dev/null) && [[ -n "$_matched" ]]; then
     echo "[ACP-detect] bridge_session_lost matched: ${_matched:0:200}" >&2
     [[ -n "$bridge_lost_marker" ]] && echo "bridge_session_lost" > "$bridge_lost_marker"
-  elif _matched=$(grep -m1 -E '(Internal error|Resource not found|server error)' "$log_file" 2>/dev/null); then
-    # ACP errors that indicate session/bridge issues but use opaque error codes.
-    echo "[ACP-detect] bridge_session_lost (acp_error) matched: ${_matched:0:200}" >&2
-    [[ -n "$bridge_lost_marker" ]] && echo "bridge_session_lost" > "$bridge_lost_marker"
+  fi
+
+  # Session-not-found is recoverable (run-acp-prompt.py falls back to session/new).
+  # Log it for observability but do NOT kill the process.
+  local _session_lost_warn
+  if _session_lost_warn=$(_grep_new_only "$bridge_log" "$bridge_log_offset" -m1 -E '(session.*not found|unknown session|no such session|Session not found)' 2>/dev/null) && [[ -n "$_session_lost_warn" ]]; then
+    echo "[ACP-detect] session_lost (recoverable, fallback expected): ${_session_lost_warn:0:200}" >&2
+  elif _session_lost_warn=$(grep -m1 -E '(session.*not found|unknown session|no such session|Session not found)' "$log_file" 2>/dev/null) && [[ -n "$_session_lost_warn" ]]; then
+    echo "[ACP-detect] session_lost (recoverable, fallback expected): ${_session_lost_warn:0:200}" >&2
   fi
 }
 
@@ -340,6 +344,17 @@ main() {
   local session_id_clean session_id_out stop_reason
   session_id_clean=$(grep -oE '[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}' "$log_file" 2>/dev/null | head -1 || true)
   session_id_out=$(sed -n 's/^session id: //p' "$log_file" | head -n 1 || true)
+
+  # If session/prompt fell back to session/new, the first bare UUID in the log
+  # is the stale resume target. Use the NEW session ID from the fallback instead.
+  if echo "$session_id_out" | grep -qE '\(fresh after (prompt|resume) failure\)'; then
+    local _fallback_sid
+    _fallback_sid=$(echo "$session_id_out" | grep -oE '[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}' | head -1 || true)
+    if [[ -n "$_fallback_sid" ]]; then
+      session_id_clean="$_fallback_sid"
+    fi
+  fi
+
   stop_reason=$(grep -o 'stop_reason=[a-z_]*' "$log_file" | head -n 1 | cut -d= -f2 || true)
 
   if [[ -z "$stop_reason" ]]; then
