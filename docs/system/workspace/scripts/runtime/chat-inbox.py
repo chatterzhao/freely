@@ -574,11 +574,19 @@ def _main() -> int:
         return 0 if ok else 1
 
     if args.cmd == "_update_issue_id":
+        norm_id = _norm_id_for_db(args.chat_id)
         conn = _connect(args.db)
         conn.execute(
             "UPDATE chats SET issue_id = ? WHERE id = ?",
-            (args.issue_id, args.chat_id),
+            (args.issue_id, norm_id),
         )
+        if conn.total_changes == 0:
+            alt = _bare_to_iso(norm_id) if (len(norm_id) == 14 and norm_id.isdigit()) else _iso_to_bare(norm_id)
+            if alt != norm_id:
+                conn.execute(
+                    "UPDATE chats SET issue_id = ? WHERE id = ?",
+                    (args.issue_id, alt),
+                )
         conn.commit()
         conn.close()
         print("OK")

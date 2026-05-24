@@ -289,12 +289,13 @@ _pull_raw_issue() {
       chat_inbox_py="$ROOT_DIR/docs/system/workspace/scripts/runtime/chat-inbox.py"
       [[ -f "$db_path" ]] || { echo "chat-inbox DB not found: $db_path" >&2; return 1; }
 
-      # Check if chat with this id exists and is unconsumed
-      local consumed
+      # Check if chat with this id exists and is unconsumed (normalize ISO->bare for DB)
+      local consumed ts_bare
+      ts_bare=$(echo "$ts" | tr -d 'TZ')
       consumed=$(python3 -c "
 import sqlite3
 conn=sqlite3.connect('$db_path')
-r=conn.execute('SELECT consumed FROM chats WHERE id=? AND chat_type=\"new-issue\"', ('$ts',)).fetchone()
+r=conn.execute('SELECT consumed FROM chats WHERE id=? AND chat_type=\"new-issue\"', ('$ts_bare',)).fetchone()
 print(r[0] if r else '')
 conn.close()
 " 2>/dev/null || echo "")
@@ -475,11 +476,12 @@ _require_issue_exists() {
 
       # Source 1: chat-inbox (already handled by pull in new mode)
       if [[ -f "$db_path" ]] && python3 "$chat_inbox_py" show --db "$db_path" --id "$ts" >/dev/null 2>&1; then
-        local consumed
+        local consumed ts_bare
+        ts_bare=$(echo "$ts" | tr -d 'TZ')
         consumed=$(python3 -c "
 import sqlite3
 conn=sqlite3.connect('$db_path')
-r=conn.execute('SELECT consumed FROM chats WHERE id=?', ('$ts',)).fetchone()
+r=conn.execute('SELECT consumed FROM chats WHERE id=?', ('$ts_bare',)).fetchone()
 print(r[0] if r else '')
 conn.close()
 " 2>/dev/null || echo "")
@@ -529,11 +531,12 @@ _materialize_chat_if_needed() {
   chat_inbox_py="$ROOT_DIR/docs/system/workspace/scripts/runtime/chat-inbox.py"
   [[ -f "$db_path" ]] || return 0
 
-  local consumed
+  local consumed ts_bare
+  ts_bare=$(echo "$ts" | tr -d 'TZ')
   consumed=$(python3 -c "
 import sqlite3
 conn=sqlite3.connect('$db_path')
-r=conn.execute('SELECT consumed FROM chats WHERE id=? AND chat_type=\"new-issue\"', ('$ts',)).fetchone()
+r=conn.execute('SELECT consumed FROM chats WHERE id=? AND chat_type=\"new-issue\"', ('$ts_bare',)).fetchone()
 print(r[0] if r else '')
 conn.close()
 " 2>/dev/null || echo "")
@@ -552,7 +555,7 @@ conn.close()
     return 1
   fi
 
-  python3 "$chat_inbox_py" consume --db "$db_path" --id "$ts" --materialized-as "$key" >/dev/null 2>&1
+  # Do NOT consume here — _pull_raw_issue is the single consumption point
   echo "materialized: chat-inbox → $issue_dir/issue.md"
 
   python3 "$chat_inbox_py" query-by-issue --db "$db_path" --issue-id "$key" --consumed 0 2>/dev/null \
