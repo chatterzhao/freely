@@ -58,7 +58,7 @@
 | `freely-fix-execution` | intent_kind=edit,merge 的 bug 修复 |
 | `freely-doc-B1_IBM-execution` | raw issue → brainstorm → candidate |
 | `freely-doc-B2_IBM-execution` | I-issue → prd/pre-tests/tasks/code-review |
-| `freely-dev-loop-execution` | milestone ready issue 实现 |
+| `freely-dev-loop-execution` | scan-selected / handoff-continued ready issue 实现 |
 | `freely-branch-management` | 合并、分支生命周期 |
 | `freely-worktree-maintenance-governance` | wt-close、工位治理 |
 | `freely-worktree-hygiene-supervision` | 工位清理、dirty 修复 |
