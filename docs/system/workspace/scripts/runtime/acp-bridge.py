@@ -23,6 +23,7 @@ import threading
 
 BRIDGE_TIMEOUT = int(os.environ.get("ACP_BRIDGE_SESSION_TIMEOUT", "1800"))
 ACP_IDLE_TIMEOUT = int(os.environ.get("ACP_BRIDGE_IDLE_TIMEOUT", "900"))
+ACP_PERMISSION_MODE = os.environ.get("CLAUDE_CODE_PERMISSION_MODE", "bypassPermissions")
 
 
 def _short_hash(project: str) -> str:
@@ -118,9 +119,10 @@ class AcpBridge:
         self.log(f"starting ACP server: {self.acp_bin}")
         # Inherit environment but let explicitly-set vars (from alias settings) win
         env = os.environ.copy()
-        # Permission mode is handled by tool-native config (JSON settings file).
+        # Bypass permissions in daemon mode — the ACP client handles
+        # permission decisions via session/request_permission protocol.
         self.server_proc = subprocess.Popen(
-            [self.acp_bin],
+            [self.acp_bin, "--permission-mode", ACP_PERMISSION_MODE],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -172,7 +174,7 @@ class AcpBridge:
         # Restart
         env = os.environ.copy()
         self.server_proc = subprocess.Popen(
-            [self.acp_bin],
+            [self.acp_bin, "--permission-mode", ACP_PERMISSION_MODE],
             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             text=True, bufsize=1, env=env,
         )
@@ -226,7 +228,7 @@ class AcpBridge:
         # Start new process (no initialize yet — lazy, done on first request)
         env = os.environ.copy()
         self.server_proc = subprocess.Popen(
-            [self.acp_bin],
+            [self.acp_bin, "--permission-mode", ACP_PERMISSION_MODE],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -384,18 +386,30 @@ class AcpBridge:
                 self.clients.remove(sock)
 
     def session_new(self, session_id=None, cwd=None):
-        """Create a new ACP session. Permission mode is set by tool-native config."""
+        """Create a new ACP session and set bypassPermissions mode."""
         params = {"cwd": cwd or self.project, "mcpServers": []}
         if session_id:
             params["sessionId"] = session_id
         result = self._send_request("session/new", params, timeout=30)
-        return result.get("sessionId", "")
+        sid = result.get("sessionId", "")
+        # Immediately set bypassPermissions to avoid interactive permission hangs
+        try:
+            self._send_request("session/set_mode", {"sessionId": sid, "modeId": ACP_PERMISSION_MODE}, timeout=10)
+            self.log(f"session {sid[:12]}... mode set to bypassPermissions")
+        except Exception as e:
+            self.log(f"session/set_mode failed (non-fatal): {e}")
+        return sid
 
     def session_resume(self, session_id, cwd=None):
-        """Resume an existing ACP session. Permission mode is set by tool-native config."""
+        """Resume an existing ACP session and ensure bypassPermissions is active."""
         params = {"sessionId": session_id, "cwd": cwd or self.project, "mcpServers": []}
         result = self._send_request("session/resume", params, timeout=30)
-        return result.get("sessionId", "")
+        sid = result.get("sessionId", "")
+        try:
+            self._send_request("session/set_mode", {"sessionId": sid, "modeId": ACP_PERMISSION_MODE}, timeout=10)
+        except Exception:
+            pass
+        return sid
 
     def session_prompt(self, session_id, prompt_text, timeout=900):
         """Send a prompt and wait for response. Returns (stop_reason, response_text)."""
