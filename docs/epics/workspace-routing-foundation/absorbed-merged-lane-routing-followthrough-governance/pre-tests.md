@@ -29,8 +29,8 @@
 - target environment: `guarded feature -> test-pre-merge -> develop replay`
 - required evidence: `merge receipts plus develop-side runtime observation`
 - blocker taxonomy: `execution_pending_or_failed`
-1. Merge `feature/absorbed-merged-scan-routing-fix-20260421` into `test-pre-merge-20260421-absorbed-merged-scan-routing-fix` via `./bin/merge-guarded`.
-2. Merge `test-pre-merge-20260421-absorbed-merged-scan-routing-fix` into `develop` via `./bin/merge-guarded`.
+1. Merge `feature/absorbed-merged-scan-routing-fix-20260421` into `test-pre-merge-20260421-absorbed-merged-scan-routing-fix` via `./bin/pr-merge-guarded`.
+2. Merge `test-pre-merge-20260421-absorbed-merged-scan-routing-fix` into `develop` via `./bin/pr-merge-guarded`.
 3. On canonical `develop`, run `./bin/freely daemon start`.
 4. Observe that Freely selects a real launchable task, completes it to the current-project success standard, closes the temporary worktree, and continues to another task.
 

@@ -33,7 +33,7 @@
 - acceptance target: `guarded promote 通过 develop merge gate，无回归`
 - testing layer: `real_environment`
 - target environment: `develop`
-- required evidence: `merge-guarded 成功，governance-check 通过`
+- required evidence: `pr-merge-guarded 成功，governance-check 通过`
 - blocker taxonomy: `protected_environment_only`
 - real_environment_status: `pass`
 - real_environment_reason: `Validated in test-pre-merge-scan-lifecycle-20260503; guarded promote ready.`

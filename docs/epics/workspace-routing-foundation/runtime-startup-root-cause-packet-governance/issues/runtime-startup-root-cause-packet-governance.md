@@ -73,8 +73,8 @@
 - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-pretests-gate`
 - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
 - `./bin/test-lane premerge-integration -- ./bin/governance-check`
-- `./bin/merge-guarded test-pre-merge-20260413-runtime-startup-authority-follow-on-packet feature/runtime-foreground-double-start-regression-20260413`
-- `./bin/merge-guarded develop test-pre-merge-20260413-runtime-startup-authority-follow-on-packet`
+- `./bin/pr-merge-guarded test-pre-merge-20260413-runtime-startup-authority-follow-on-packet feature/runtime-foreground-double-start-regression-20260413`
+- `./bin/pr-merge-guarded develop test-pre-merge-20260413-runtime-startup-authority-follow-on-packet`
 
 ## Next
 

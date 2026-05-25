@@ -34,14 +34,14 @@
 - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
 - `./bin/governance-check`
 - `./bin/wt-create test-pre-merge-20260412-structured-closeout-gate-review-evidence --base develop`
-- `./bin/merge-guarded test-pre-merge-20260412-structured-closeout-gate-review-evidence feature/structured-closeout-gate-and-review-evidence-followon-20260412`
-- `./bin/merge-guarded develop test-pre-merge-20260412-structured-closeout-gate-review-evidence`
+- `./bin/pr-merge-guarded test-pre-merge-20260412-structured-closeout-gate-review-evidence feature/structured-closeout-gate-and-review-evidence-followon-20260412`
+- `./bin/pr-merge-guarded develop test-pre-merge-20260412-structured-closeout-gate-review-evidence`
 - `./bin/wt-create test-pre-merge-20260412-structured-closeout-gate-review-evidence-replay --base develop`
-- `./bin/merge-guarded test-pre-merge-20260412-structured-closeout-gate-review-evidence-replay feature/structured-closeout-gate-and-review-evidence-followon-20260412`
-- `./bin/merge-guarded develop test-pre-merge-20260412-structured-closeout-gate-review-evidence-replay`
+- `./bin/pr-merge-guarded test-pre-merge-20260412-structured-closeout-gate-review-evidence-replay feature/structured-closeout-gate-and-review-evidence-followon-20260412`
+- `./bin/pr-merge-guarded develop test-pre-merge-20260412-structured-closeout-gate-review-evidence-replay`
 - `./bin/wt-create test-pre-merge-20260412-structured-closeout-gate-review-evidence-final --base develop`
-- `./bin/merge-guarded test-pre-merge-20260412-structured-closeout-gate-review-evidence-final feature/structured-closeout-gate-and-review-evidence-followon-20260412`
-- `./bin/merge-guarded develop test-pre-merge-20260412-structured-closeout-gate-review-evidence-final`
+- `./bin/pr-merge-guarded test-pre-merge-20260412-structured-closeout-gate-review-evidence-final feature/structured-closeout-gate-and-review-evidence-followon-20260412`
+- `./bin/pr-merge-guarded develop test-pre-merge-20260412-structured-closeout-gate-review-evidence-final`
 - `git log -1 --format=%H develop`
 
 ## Next Action

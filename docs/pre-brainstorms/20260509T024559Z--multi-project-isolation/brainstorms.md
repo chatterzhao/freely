@@ -95,7 +95,7 @@ Manager patrol:
 
 ## 门禁防跨项目
 
-merge-guarded 增加检查:
+pr-merge-guarded 增加检查:
 ```bash
 # 验证 source branch 的 worktree 在 project_root 的 worktrees 下
 if ! project_path_is_under_worktrees_root "$project_root" "$source_worktree"; then
@@ -128,7 +128,7 @@ Manager **永远不在 test-pre-merge 或 fix/feature 工位中 cd**——它只
 | looks_like_project_root | 保留 | 项目识别 |
 | daemon 绑定 test 工位 | **移除** | daemon 从 project root 运行 |
 | worker_prompt_resolved_worktree | **重写** | 增加 raw-key 搜索 + 归属验证 |
-| merge-guarded 不检查项目边界 | **增加** | 跨项目防护 |
+| pr-merge-guarded 不检查项目边界 | **增加** | 跨项目防护 |
 
 ## ACP Bridge 隔离分析
 

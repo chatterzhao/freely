@@ -32,7 +32,7 @@
 - `bash docs/system/workspace/scripts/tests/test-cli-help-contracts`
 - `bash docs/system/workspace/scripts/tests/test-ai-cli-switch-dry-run-contract`
 - `bash docs/system/workspace/scripts/tests/test-wt-wrapper-shell-source-compatibility`
-- `bash docs/system/workspace/scripts/tests/test-merge-guarded`
+- `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded`
 - `bash docs/system/workspace/scripts/tests/test-freely-ai-apikey-switch-oauth-unreachable-falls-back-to-exec`
 - `bash docs/system/workspace/scripts/tests/test-ai-cli-switch-default-tool`
 - `./bin/ai --quiet --format json --dry-run switch codex`

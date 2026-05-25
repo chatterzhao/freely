@@ -6,7 +6,7 @@ closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch ro
 priority: P1
 source: chat-inbox
 created_at: '2026-05-13T07:59:04Z'
-title: 'merge-guarded: _sync_issues_changed_in_merge reads fm.get(''status'') but
+title: 'pr-merge-guarded: _sync_issues_changed_in_merge reads fm.get(''status'') but
   I-* issues use phase_state'
 updated_at: 2026-05-17T04:47:25Z
 platform_ids:
@@ -20,7 +20,7 @@ platform_state: open
 
 ## Bug
 
-`docs/system/workspace/scripts/worktree/merge-guarded:235` 在 post-merge sync 中读的是 `fm.get('status')`，但 I-* linked issue 的 frontmatter 字段是 `phase_state`，不是 `status`。
+`docs/system/workspace/scripts/worktree/pr-merge-guarded:235` 在 post-merge sync 中读的是 `fm.get('status')`，但 I-* linked issue 的 frontmatter 字段是 `phase_state`，不是 `status`。
 
 ## Impact
 
@@ -30,7 +30,7 @@ platform_state: open
 
 ## Location
 
-`docs/system/workspace/scripts/worktree/merge-guarded` lines 233-254:
+`docs/system/workspace/scripts/worktree/pr-merge-guarded` lines 233-254:
 
 ```bash
 status=$(python3 -c "... fm.get('status','')")  # ← BUG: should also check phase_state

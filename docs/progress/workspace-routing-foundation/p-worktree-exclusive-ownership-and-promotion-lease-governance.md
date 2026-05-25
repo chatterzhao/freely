@@ -32,7 +32,7 @@
 9. `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-intent-retain`
 10. `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-hard-stale-intent-reclaim`
 11. `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
-12. `bash docs/system/workspace/scripts/tests/test-merge-guarded`
+12. `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded`
 13. `git diff --check`
 14. `./bin/governance-check`
 15. `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/code-reviews/20260402-worktree-exclusive-ownership-and-promotion-lease-verification.md`

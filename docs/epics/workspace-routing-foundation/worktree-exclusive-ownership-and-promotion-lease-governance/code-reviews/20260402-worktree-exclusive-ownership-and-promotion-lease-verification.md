@@ -21,7 +21,7 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-intent-retain`
 - `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-hard-stale-intent-reclaim`
 - `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
-- `bash docs/system/workspace/scripts/tests/test-merge-guarded`
+- `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded`
 - `git diff --check`
 - `./bin/governance-check`
 
@@ -36,7 +36,7 @@
 
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/hooks/pre-merge-commit.sh`
-- `docs/system/workspace/scripts/worktree/merge-guarded`
+- `docs/system/workspace/scripts/worktree/pr-merge-guarded`
 - `docs/system/workspace/agents/manager-agent.md`
 - `docs/system/workspace/agents/worker-agent.md`
 - `docs/system/workspace/three-loop-capability-lifecycle.md`
@@ -58,7 +58,7 @@
   - `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-intent-retain`
   - `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-hard-stale-intent-reclaim`
   - `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
-  - `bash docs/system/workspace/scripts/tests/test-merge-guarded`
+  - `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded`
   - `git diff --check`
   - `./bin/governance-check`
 

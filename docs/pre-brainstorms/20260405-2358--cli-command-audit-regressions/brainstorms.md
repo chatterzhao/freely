@@ -82,7 +82,7 @@ Freely 当前进入 `cli first` 审计阶段，本轮在 dedicated feature workt
   - 结果：返回 `Please run with: source bin/wt-enter <branch>`，没有标准 `--help` 契约。
 - `./bin/wt-add --help`
   - 结果：返回 `Please run with: source bin/wt-add [branch] -- <git-add-args>`，没有标准 `--help` 契约。
-- `./bin/merge-guarded --help`
+- `./bin/pr-merge-guarded --help`
   - 结果：打印 usage，但退出码仍为 1，而不是 clean help 成功返回。
 - `./bin/ai list --format json`
   - 结果：成功列出保存的 slots。
@@ -99,7 +99,7 @@ Freely 当前进入 `cli first` 审计阶段，本轮在 dedicated feature workt
 
 1. 这组问题已经不再是“wrapper 可执行位”本身，而是 help / usage / dry-run / exit-code contract 的一致性缺口。
 2. `wt-create --help` 的问题具备副作用风险，因为它会误走 branch/worktree 创建路径，而不是停在帮助输出。
-3. `merge-guarded --help`、`wt-enter --help`、`wt-add --help` 暴露的是 command ergonomics 与 CLI-first contract 不一致，不应继续依赖操作者记忆。
+3. `pr-merge-guarded --help`、`wt-enter --help`、`wt-add --help` 暴露的是 command ergonomics 与 CLI-first contract 不一致，不应继续依赖操作者记忆。
 4. `ai switch codex --dry-run --format json` 的失败不适合归到 fresh-project bootstrap，也不应直接等同于 runtime/control-plane 生命周期问题；它更像 ai command surface 的 follow-on contract 漂移。
 5. 因此这批证据应独立成新的 candidate，而不是继续扩大 `C-20260405-2358-A/B/C` 的边界。
 

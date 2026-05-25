@@ -56,7 +56,7 @@
 
 1. 定义 Manager-only 工具（wt-create, deploy-skills, freely-package）
 2. 定义 Worker-only 工具（dev-loop 相关）
-3. 定义共享工具（merge-guarded, wt-close, issue-sync）
+3. 定义共享工具（pr-merge-guarded, wt-close, issue-sync）
 4. Agent doc 明确："你只能使用你的角色允许的工具"
 
 ### 影响

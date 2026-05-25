@@ -21,7 +21,7 @@
 
 1. `bash docs/system/workspace/scripts/tests/test-reference-transaction-hook` passes and reproduces the exact blocked `ff-only` path plus the allowed receipt-bearing merge case.
 2. The new gate lives at `.githooks/reference-transaction` and `docs/system/workspace/hooks/reference-transaction.sh`.
-3. `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`, `bash docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt`, `bash docs/system/workspace/scripts/tests/test-merge-guarded`, `git diff --check`, and `./bin/governance-check` all pass after the ref gate lands.
+3. `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`, `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded-hooked-initial-merge-receipt`, `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded`, `git diff --check`, and `./bin/governance-check` all pass after the ref gate lands.
 4. Hook documentation now records ref-only protected-branch enforcement separately from merge-commit gating.
 
 ## Next Action

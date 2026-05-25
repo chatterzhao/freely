@@ -8,7 +8,7 @@
 - blocker taxonomy: execution_pending_or_failed
 - not_applicable_reason: no_executable_boundary_at_this_layer
 - not_applicable_explanation: Shell output, verified by direct inspection
-- replacement_evidence: merge-guarded 输出验证
+- replacement_evidence: pr-merge-guarded 输出验证
 ## Integration
 - acceptance target: merge blocked with clear IBM guidance
 - testing layer: integration
@@ -17,7 +17,7 @@
 - blocker taxonomy: execution_pending_or_failed
 - not_applicable_reason: no_executable_boundary_at_this_layer
 - not_applicable_explanation: 集成通过实际 merge 验证
-- replacement_evidence: merge-guarded 输出
+- replacement_evidence: pr-merge-guarded 输出
 ## End-to-End
 - acceptance target: fix → merge → develop
 - testing layer: end_to_end
@@ -26,7 +26,7 @@
 - blocker taxonomy: execution_pending_or_failed
 - not_applicable_reason: change_not_touching_this_layer
 - not_applicable_explanation: 合并即验证
-- replacement_evidence: merge-guarded 输出
+- replacement_evidence: pr-merge-guarded 输出
 ## Real-Environment
 - real_environment_status: pass
 - real_environment_reason: 输出格式直接确认

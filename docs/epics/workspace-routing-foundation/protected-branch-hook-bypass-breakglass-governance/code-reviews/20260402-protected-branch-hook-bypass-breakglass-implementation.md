@@ -16,7 +16,7 @@
 
 ## Implementation Decision Note
 
-- decision: `Treat protected-branch bypass as a narrow completion-route governance problem and solve it with a shared contract across LAWS, hooks, merge-guarded, and governance-check instead of trying to make local Git hooks physically unbypassable.`
+- decision: `Treat protected-branch bypass as a narrow completion-route governance problem and solve it with a shared contract across LAWS, hooks, pr-merge-guarded, and governance-check instead of trying to make local Git hooks physically unbypassable.`
 - why_this: `Git client-side hooks can always be skipped, so the reliable control surface is not “make bypass impossible” but “make non-whitelisted bypass detectable, low-scope, and owed to a follow-on owner”. This keeps Freely honest about host limits while still closing the governance gap that enabled ad hoc judgment.`
 - alternatives_considered: `Considered only documenting the policy, or only adding a stronger merge wrapper, or trying to outlaw bypass entirely at skill level. Documentation alone would not catch future regressions; wrapper-only would still leave raw commits unaudited; skill-only would create a non-canonical policy surface.`
 - boundary_non_goals: `This owner does not add server-side enforcement, rewrite all branch governance, or legitimize general-purpose bypass. Phase-1 only covers protected-branch merge completion and requires merge_completion_only scope.`
@@ -26,8 +26,8 @@
 
 1. `bash docs/system/workspace/scripts/tests/test-pre-commit-hook`
 2. `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
-3. `bash docs/system/workspace/scripts/tests/test-merge-guarded`
-4. `bash docs/system/workspace/scripts/tests/test-merge-guarded-breakglass-hook-completion`
+3. `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded`
+4. `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded-breakglass-hook-completion`
 5. `bash docs/system/workspace/scripts/tests/test-governance-check-candidate-v2`
 6. `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
 7. `git diff --check`

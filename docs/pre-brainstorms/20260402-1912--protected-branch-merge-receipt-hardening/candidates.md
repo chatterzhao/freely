@@ -8,7 +8,7 @@
 - why_now:
   - canonical `develop` 已经 close out 原 break-glass owner，再继续往那条 owner 里塞 residual hardening 会破坏边界
   - 根目录 `develop` 当前出现未归属 staged 改动，说明这条 follow-on 如果不物化，后续仍会以 dirty root patch 的形式反复出现
-  - staged patch 中对 `merge-guarded` / `governance-merge-gate` / receipt tests 的调整方向互相掺杂，必须先收成一个明确 owner 再决定实现
+  - staged patch 中对 `pr-merge-guarded` / `governance-merge-gate` / receipt tests 的调整方向互相掺杂，必须先收成一个明确 owner 再决定实现
 - acceptance_criteria:
   - 证明 follow-on 仅覆盖 `merge_completion_only`、handshake hardening、receipt/ledger parity audit 和相关 regression coverage
   - 明确根目录 staged patch 中哪些变化是 residual hardening signal，哪些是应直接丢弃的 regression 或 unrelated revert

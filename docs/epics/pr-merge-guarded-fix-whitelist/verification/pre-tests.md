@@ -1,12 +1,12 @@
-# Pre-Tests: merge-guarded fix/* whitelist
+# Pre-Tests: pr-merge-guarded fix/* whitelist
 
 - issue_id: raw-20260506T1400Z
 
 ## Unit
-- acceptance target: `merge-guarded accepts fix/* → test-pre-merge-* direction`
+- acceptance target: `pr-merge-guarded accepts fix/* → test-pre-merge-* direction`
 - testing layer: `unit`
-- target environment: `feature/raw-20260506T1400Z-merge-guarded-bootstrap`
-- required evidence: `merge-guarded validation output`
+- target environment: `feature/raw-20260506T1400Z-pr-merge-guarded-bootstrap`
+- required evidence: `pr-merge-guarded validation output`
 - blocker taxonomy: `execution_pending_or_failed`
 1. Verify fix/* is in case pattern
 
@@ -14,7 +14,7 @@
 - acceptance target: `fix/* → test-pre-merge merge succeeds`
 - testing layer: `integration`
 - target environment: `test-pre-merge-mg-bootstrap-20260507`
-- required evidence: `merge-guarded merge success`
+- required evidence: `pr-merge-guarded merge success`
 - blocker taxonomy: `execution_pending_or_failed`
 1. Merge fix branch into test-pre-merge
 
@@ -34,12 +34,12 @@
 
 ### AT-001 fix/* support
 - id: `fix-support`
-- requirement: `merge-guarded accepts fix/* → test-pre-merge-* direction`
+- requirement: `pr-merge-guarded accepts fix/* → test-pre-merge-* direction`
 - surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
 - task_refs: ``
-- case_design: `Merge fix/* branch into test-pre-merge via merge-guarded.`
+- case_design: `Merge fix/* branch into test-pre-merge via pr-merge-guarded.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/merge-guarded-fix-whitelist/code-reviews/review.md`
+- artifact_ref: `docs/epics/pr-merge-guarded-fix-whitelist/code-reviews/review.md`

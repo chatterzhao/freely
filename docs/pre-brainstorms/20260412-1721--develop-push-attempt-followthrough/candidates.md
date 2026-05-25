@@ -19,7 +19,7 @@
   - a blocked attempt writes explicit followthrough truth instead of silently leaving generic `push_pending`
   - blocked attempt truth distinguishes governance/hook block from remote-or-network failure
   - the system does not introduce hidden auto-push or retry-until-success behavior
-- fix_approach: Materialize a new follow-on owner, add `freely develop-push attempt`, teach the develop push state model about `push_blocked`, and let `merge-guarded` trigger exactly one post-merge attempt in `develop`.
+- fix_approach: Materialize a new follow-on owner, add `freely develop-push attempt`, teach the develop push state model about `push_blocked`, and let `pr-merge-guarded` trigger exactly one post-merge attempt in `develop`.
 - priority: `P0`
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`

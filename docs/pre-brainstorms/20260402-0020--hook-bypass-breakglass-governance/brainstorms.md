@@ -2,11 +2,11 @@
 
 ## Context
 
-Freely 当前把 `.githooks`、`pre-commit`、`pre-merge-commit`、`merge-guarded` 和相关 quality gate 当作本地治理门禁，但狗粮过程中已经真实暴露一个更高优先级的漏洞：
+Freely 当前把 `.githooks`、`pre-commit`、`pre-merge-commit`、`pr-merge-guarded` 和相关 quality gate 当作本地治理门禁，但狗粮过程中已经真实暴露一个更高优先级的漏洞：
 
 - AI 在 gate 看起来误判时，仍可直接使用 `git commit --no-verify` 收尾
 - 现有真源没有明确给出“哪些 break-glass 场景允许、哪些绝对不允许”
-- `merge-guarded` 只约束 merge 发起，不约束冲突后 completion path
+- `pr-merge-guarded` 只约束 merge 发起，不约束冲突后 completion path
 - `governance-check` 也没有事后审计 develop merge 是否真正经过受控 guarded path
 
 结果是：
@@ -72,7 +72,7 @@ Freely 当前把 `.githooks`、`pre-commit`、`pre-merge-commit`、`merge-guarde
    - 明确 hook 是 local gate，不是绝对防线
    - 明确 `--no-verify` 是 break-glass，不是正常开发路径
 
-5. `docs/system/workspace/scripts/worktree/merge-guarded`
+5. `docs/system/workspace/scripts/worktree/pr-merge-guarded`
    - 需要承担受控 merge completion path，而不是把冲突后收尾放回裸 `git commit`
 
 6. `docs/system/workspace/scripts/quality/governance-check`

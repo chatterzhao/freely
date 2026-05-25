@@ -23,9 +23,9 @@
 
 1. merge-governance residual hardening
    - `docs/system/workspace/scripts/quality/governance-merge-gate`
-   - `docs/system/workspace/scripts/worktree/merge-guarded`
+   - `docs/system/workspace/scripts/worktree/pr-merge-guarded`
    - `docs/system/workspace/scripts/tests/test-governance-merge-gate`
-   - `docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt`
+   - `docs/system/workspace/scripts/tests/test-pr-merge-guarded-hooked-initial-merge-receipt`
 2. watchdog path-resolution revert
    - `docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh`
    - `docs/system/workspace/scripts/tests/test-availability-watchdog-path-resolution`

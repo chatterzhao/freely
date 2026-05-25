@@ -18,7 +18,7 @@
 - blocker taxonomy: `execution_pending_or_failed`
 1. Run `bash docs/system/workspace/scripts/tests/test-freely-develop-push-attempt`.
 2. Run `bash docs/system/workspace/scripts/tests/test-freely-live-status-develop-push-blocked`.
-3. Run `bash docs/system/workspace/scripts/tests/test-merge-guarded-develop-push-attempt-followthrough`.
+3. Run `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded-develop-push-attempt-followthrough`.
 4. Run `bash docs/system/workspace/scripts/tests/test-pre-push-hook`.
 5. Run `./bin/governance-check`.
 6. Run `git diff --check`.

@@ -15,11 +15,11 @@
 - acceptance target: 不影响现有 worker launch 流程
 - testing layer: integration
 - target environment: develop merge chain
-- required evidence: merge-guarded 输出
+- required evidence: pr-merge-guarded 输出
 - blocker taxonomy: execution_pending_or_failed
 - not_applicable_reason: change_not_touching_this_layer
 - not_applicable_explanation: test-freely-manager-worker-launch-linkage 和 exit-contract 测试需要 ACP bridge，与本改动无关
-- replacement_evidence: merge-guarded 输出
+- replacement_evidence: pr-merge-guarded 输出
 
 ## End-to-End
 - acceptance target: fix → merge → develop 完成
@@ -29,7 +29,7 @@
 - blocker taxonomy: execution_pending_or_failed
 - not_applicable_reason: change_not_touching_this_layer
 - not_applicable_explanation: fix 已通过 companion branch-check 分支进入 develop
-- replacement_evidence: merge-guarded 输出
+- replacement_evidence: pr-merge-guarded 输出
 
 ## Real-Environment
 - real_environment_status: pass
@@ -104,7 +104,7 @@
 - status: not_applicable
 - not_applicable_reason: change_not_touching_this_layer
 - not_applicable_explanation: test-freely-manager-worker-launch-linkage 需要 ACP bridge，与本 bash prefix 改动无关
-- replacement_evidence: merge-guarded 输出确认
+- replacement_evidence: pr-merge-guarded 输出确认
 - artifact_ref: docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage
 - surface_kind: integration
 - target_lane: feature-local
@@ -117,7 +117,7 @@
 - status: not_applicable
 - not_applicable_reason: change_not_touching_this_layer
 - not_applicable_explanation: exit-contract 测试需要 ACP bridge，与本 bash prefix 改动无关。WORKER_PROMPTS_NOT_LAUNCHABLE 路径已存在（L13177）
-- replacement_evidence: merge-guarded 输出确认
+- replacement_evidence: pr-merge-guarded 输出确认
 - artifact_ref: docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-autodelegates-cleanup-when-existing-prompt-is-nonlaunchable
 - surface_kind: integration
 - target_lane: feature-local

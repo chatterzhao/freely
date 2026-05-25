@@ -19,11 +19,11 @@
 ## Commands
 
 1. `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
-2. `bash docs/system/workspace/scripts/tests/test-merge-guarded-breakglass-hook-completion`
-3. `bash docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt`
+2. `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded-breakglass-hook-completion`
+3. `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded-hooked-initial-merge-receipt`
 4. `bash docs/system/workspace/scripts/tests/test-pre-commit-hook`
 5. `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
-6. `bash docs/system/workspace/scripts/tests/test-merge-guarded`
+6. `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded`
 7. `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
 8. `git diff --check`
 9. `./bin/governance-check`
@@ -42,10 +42,10 @@
 - canonical_merge_target: `develop`
 - post_merge_replay:
   - `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
-  - `bash docs/system/workspace/scripts/tests/test-merge-guarded-breakglass-hook-completion`
-  - `bash docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt`
+  - `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded-breakglass-hook-completion`
+  - `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded-hooked-initial-merge-receipt`
   - `bash docs/system/workspace/scripts/tests/test-pre-commit-hook`
   - `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
-  - `bash docs/system/workspace/scripts/tests/test-merge-guarded`
+  - `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded`
   - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
   - `./bin/governance-check`

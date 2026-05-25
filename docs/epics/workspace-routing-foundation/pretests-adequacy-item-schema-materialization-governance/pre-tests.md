@@ -81,7 +81,7 @@
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
 - task_refs: `Replay guarded premerge promotion on a test-pre-merge batch and confirm the owner now carries a distinct develop-merge adequacy statement with fresh staged review evidence.`
-- case_design: `Merge the feature lane into a disposable test-pre-merge batch through merge-guarded, run premerge-integration gate regressions there, and use the resulting verification artifact to prove the lane/gate pair is now explicitly covered.`
+- case_design: `Merge the feature lane into a disposable test-pre-merge batch through pr-merge-guarded, run premerge-integration gate regressions there, and use the resulting verification artifact to prove the lane/gate pair is now explicitly covered.`
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/code-reviews/20260411-pretests-adequacy-item-schema-materialization-verification.md`

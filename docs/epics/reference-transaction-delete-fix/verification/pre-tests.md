@@ -17,7 +17,7 @@
 - blocker taxonomy: execution_pending_or_failed
 - not_applicable_reason: no_executable_boundary_at_this_layer
 - not_applicable_explanation: 集成验证通过实际 merge 流程
-- replacement_evidence: merge-guarded 成功输出
+- replacement_evidence: pr-merge-guarded 成功输出
 ## End-to-End
 - acceptance target: full fix → merge → develop works
 - testing layer: end_to_end
@@ -26,7 +26,7 @@
 - blocker taxonomy: execution_pending_or_failed
 - not_applicable_reason: change_not_touching_this_layer
 - not_applicable_explanation: Hook 修复，合并即端到端验证
-- replacement_evidence: merge-guarded 成功输出
+- replacement_evidence: pr-merge-guarded 成功输出
 ## Real-Environment
 - real_environment_status: pass
 - real_environment_reason: git branch -d 直接验证通过

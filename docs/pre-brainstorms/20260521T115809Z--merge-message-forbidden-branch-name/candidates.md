@@ -1,7 +1,7 @@
 # Candidates
 
 ## C-20260521T115809Z-A
-- title: merge-guarded source branch name shows forbidden instead of actual branch
+- title: pr-merge-guarded source branch name shows forbidden instead of actual branch
 - priority: P1
 - status: promoted
 - milestone: M-20260521T115809Z-A

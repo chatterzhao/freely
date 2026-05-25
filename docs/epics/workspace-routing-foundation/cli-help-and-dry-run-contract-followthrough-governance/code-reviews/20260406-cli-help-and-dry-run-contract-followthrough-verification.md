@@ -19,14 +19,14 @@
 
 1. `bash docs/system/workspace/scripts/tests/test-cli-help-contracts`
    - 结果：通过
-   - 说明：覆盖 `wt-create`、`wt-enter`、`wt-add`、`merge-guarded`、`freely` 的 help surface；同时证明 `wt-create --help` 不创建 branch/worktree。
+   - 说明：覆盖 `wt-create`、`wt-enter`、`wt-add`、`pr-merge-guarded`、`freely` 的 help surface；同时证明 `wt-create --help` 不创建 branch/worktree。
 2. `./bin/wt-create --help`
    - 结果：通过
    - 说明：直接返回 usage，退出码 `0`。
 3. `bash -lc 'source ./bin/wt-enter --help'`
    - 结果：通过
    - 说明：sourced helper help 直接返回 usage，退出码 `0`。
-4. `./bin/merge-guarded --help`
+4. `./bin/pr-merge-guarded --help`
    - 结果：通过
    - 说明：usage-only invocation 退出码 `0`。
 5. `./bin/freely --help`
@@ -43,7 +43,7 @@
    - 说明：真实 HOME 下返回单个 inventory 摘要结果，不再长时间等待 probe timeout。
 9. `bash docs/system/workspace/scripts/tests/test-wt-wrapper-shell-source-compatibility`
    - 结果：通过
-10. `bash docs/system/workspace/scripts/tests/test-merge-guarded`
+10. `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded`
     - 结果：通过
 11. `bash docs/system/workspace/scripts/tests/test-freely-ai-apikey-switch-oauth-unreachable-falls-back-to-exec`
     - 结果：通过

@@ -533,7 +533,7 @@
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
 - task_refs: `tasks.md#T-42`
-- case_design: `Verify issue-sync create writes platform_ids to frontmatter. Verify update pushes title/body/labels. Verify promote closes raw + creates I-* with cross-refs. Verify merge-guarded triggers sync on changed issues.`
+- case_design: `Verify issue-sync create writes platform_ids to frontmatter. Verify update pushes title/body/labels. Verify promote closes raw + creates I-* with cross-refs. Verify pr-merge-guarded triggers sync on changed issues.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260428-issue-platform-sync-architecture.md`
 
 ### PT-43

@@ -15,11 +15,11 @@
 - acceptance target: gate passes for this doc-only merge
 - testing layer: integration
 - target environment: feature/raw-20260508T005431Z-skill-standardize
-- required evidence: merge-guarded accepts the merge
+- required evidence: pr-merge-guarded accepts the merge
 - blocker taxonomy: execution_pending_or_failed
 - not_applicable_reason: change_not_touching_this_layer
 - not_applicable_explanation: Doc-only change. No runtime code paths affected. The merge itself is verification.
-- replacement_evidence: merge-guarded output
+- replacement_evidence: pr-merge-guarded output
 
 ## End-to-End
 - acceptance target: feature→test-pre-merge→develop merge passes
@@ -29,7 +29,7 @@
 - blocker taxonomy: execution_pending_or_failed
 - not_applicable_reason: change_not_touching_this_layer
 - not_applicable_explanation: Doc-only change. End-to-end is the merge chain itself.
-- replacement_evidence: merge-guarded merge commits
+- replacement_evidence: pr-merge-guarded merge commits
 
 ## Real-Environment
 - real_environment_status: pass

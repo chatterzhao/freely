@@ -26,7 +26,7 @@ platform_state: closed
 `I-20260405-1615-A` 已经把新的 promote model 冻结成正式 owner，但当前仓库执行的仍是旧规则：
 
 1. `CONSTITUTION` / `LAWS` / `pre-test-merge-flow.md` 仍允许或默认 `feature/* -> develop`。
-2. `merge-guarded` tests 仍阻止 `test-pre-merge-* -> develop`。
+2. `pr-merge-guarded` tests 仍阻止 `test-pre-merge-* -> develop`。
 3. 如果只改文档不改 gate，或者只改 gate 不改文档，就会在同一时间保留两套互相冲突的合法路径。
 
 因此这条 owner 的职责不是重新研究 promote model，而是把新模型接到治理真源和 protected-branch gate 上，并让 regression tests 一起对齐。

@@ -17,7 +17,7 @@
 - blocker taxonomy: execution_pending_or_failed
 - not_applicable_reason: no_executable_boundary_at_this_layer
 - not_applicable_explanation: 集成需 daemon 运行验证
-- replacement_evidence: merge-guarded 输出
+- replacement_evidence: pr-merge-guarded 输出
 ## End-to-End
 - acceptance target: worker launched on fix/feature, rejected on develop/test-pre-merge
 - testing layer: end_to_end
@@ -26,7 +26,7 @@
 - blocker taxonomy: execution_pending_or_failed
 - not_applicable_reason: change_not_touching_this_layer
 - not_applicable_explanation: 合并即验证
-- replacement_evidence: merge-guarded 输出
+- replacement_evidence: pr-merge-guarded 输出
 ## Real-Environment
 - real_environment_status: pass
 - real_environment_reason: case 语句检查通过

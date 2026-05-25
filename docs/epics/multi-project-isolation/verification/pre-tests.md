@@ -17,7 +17,7 @@
 - blocker taxonomy: execution_pending_or_failed
 - not_applicable_reason: change_not_touching_this_layer
 - not_applicable_explanation: 设计阶段合并即验证
-- replacement_evidence: merge-guarded 输出
+- replacement_evidence: pr-merge-guarded 输出
 ## End-to-End
 - acceptance target: architecture adopted
 - testing layer: end_to_end
@@ -26,7 +26,7 @@
 - blocker taxonomy: execution_pending_or_failed
 - not_applicable_reason: change_not_touching_this_layer
 - not_applicable_explanation: 设计阶段
-- replacement_evidence: merge-guarded 输出
+- replacement_evidence: pr-merge-guarded 输出
 ## Real-Environment
 - real_environment_status: pass
 - real_environment_reason: 设计阶段无需真实环境测试

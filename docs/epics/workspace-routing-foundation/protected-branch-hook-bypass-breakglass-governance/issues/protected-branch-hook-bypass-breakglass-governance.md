@@ -18,14 +18,14 @@
   - `docs/epics/workspace-routing-foundation/develop-merge-issue-binding-and-cmi-governance/issues/develop-merge-issue-binding-and-cmi-governance.md`
   - `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/issues/worktree-exclusive-ownership-and-promotion-lease-governance.md`
   - `docs/system/workspace/hooks/README.md`
-  - `docs/system/workspace/scripts/worktree/merge-guarded`
+  - `docs/system/workspace/scripts/worktree/pr-merge-guarded`
   - `docs/system/workspace/scripts/quality/governance-check`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
 ## Why
 
-Freely 当前已经有 protected-branch hooks、`merge-guarded`、develop-bound governance merge gate 与 promotion ownership gate，但还缺一个更高层的 canonical contract：
+Freely 当前已经有 protected-branch hooks、`pr-merge-guarded`、develop-bound governance merge gate 与 promotion ownership gate，但还缺一个更高层的 canonical contract：
 
 1. 哪些 hook/gate bypass 永远非法
 2. 哪些极端场景才允许 break-glass
@@ -55,7 +55,7 @@ Freely 当前已经有 protected-branch hooks、`merge-guarded`、develop-bound 
 1. `CONSTITUTION` 明确写出 protected-branch hook/gate bypass 默认违规，只有 break-glass 白名单例外。
 2. `LAWS` 成为唯一的 break-glass whitelist truth，至少冻结 reason taxonomy、前置条件、required evidence、forbidden examples 与 follow-on duty。
 3. `AGENTS`、`hooks/README`、relevant skills 只作为入口提醒与执行消费，不再自行发明允许场景。
-4. `merge-guarded` 的冲突后 completion path 有明确的受控 contract，不再默认回退到裸 `git commit`。
+4. `pr-merge-guarded` 的冲突后 completion path 有明确的受控 contract，不再默认回退到裸 `git commit`。
 5. `governance-check` 或等价 quality gate 定义 develop-bound bypass audit contract，使未经授权 bypass 在后续 canonical 检查中可见。
 6. issue-bound artifacts 明确记录当前两条 merge 的判断：`27faa2e` 可干净逆转，`a10f6d8` 可逆但会与 writeback 产物冲突，因此“能撤”与“应该立即撤”必须分开。
 
@@ -80,7 +80,7 @@ Freely 当前已经有 protected-branch hooks、`merge-guarded`、develop-bound 
 - `docs/system/workspace/hooks/protected-branch-breakglass-receipts.md`
 - `docs/system/workspace/hooks/pre-commit.sh`
 - `docs/system/workspace/hooks/pre-merge-commit.sh`
-- `docs/system/workspace/scripts/worktree/merge-guarded`
+- `docs/system/workspace/scripts/worktree/pr-merge-guarded`
 - `docs/system/workspace/scripts/quality/governance-check`
 - `docs/system/workspace/three-loop-capability-lifecycle.md`
 - `docs/progress/workspace-routing-foundation/p-protected-branch-hook-bypass-breakglass-governance.md`
@@ -92,9 +92,9 @@ Freely 当前已经有 protected-branch hooks、`merge-guarded`、develop-bound 
 - `bash docs/system/workspace/scripts/tests/test-governance-check-candidate-v2`
 - `bash docs/system/workspace/scripts/tests/test-pre-commit-hook`
 - `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
-- `bash docs/system/workspace/scripts/tests/test-merge-guarded`
-- `bash docs/system/workspace/scripts/tests/test-merge-guarded-breakglass-hook-completion`
-- `bash docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt`
+- `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded`
+- `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded-breakglass-hook-completion`
+- `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded-hooked-initial-merge-receipt`
 - `bash docs/system/workspace/scripts/tests/test-availability-watchdog-path-resolution`
 - `./bin/governance-check`
 

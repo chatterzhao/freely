@@ -8,12 +8,12 @@ hotfix→develop merges currently skip test-pre-merge verification. The pre-test
 All branches merging to develop (feature, hotfix, release) must pass through test-pre-merge verification OR provide adequate break-glass evidence.
 
 ## Questions
-- Should this be a gate on merge-guarded that checks for test-pre-merge evidence?
+- Should this be a gate on pr-merge-guarded that checks for test-pre-merge evidence?
 - Or should hotfix have a different verification path that's lighter than full self-host?
 - What's the minimum verification for hotfix (which is supposed to be fast)?
 
 ## Direction
-- Option A: Gate merge-guarded to require test-pre-merge evidence for all non-hotfix merges
+- Option A: Gate pr-merge-guarded to require test-pre-merge evidence for all non-hotfix merges
 - Option B: Add hotfix-specific verification path (e.g., pre-test run without full self-host)
 - Option C: Make self-host verification more reliable (fix the env init issue)
 

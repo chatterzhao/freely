@@ -85,7 +85,7 @@ freely-feat-execution 在不同阶段调用下层 skill：
 ```
 1. 运行 pre-tests + dry-run 门禁检查
 2. gate 失败 → 修复分支自己的错误 → 重试
-3. gate 通过 → dev 合并到 develop (merge-guarded)（非 test 合并到 develop）
+3. gate 通过 → dev 合并到 develop (pr-merge-guarded)（非 test 合并到 develop）
 4. issue-sync close
 ```
 

@@ -19,7 +19,7 @@
 - `docs/LAWS.md`
 - `AGENTS.md`
 - `docs/system/workspace/hooks/README.md`
-- `docs/system/workspace/scripts/worktree/merge-guarded`
+- `docs/system/workspace/scripts/worktree/pr-merge-guarded`
 - `docs/system/workspace/scripts/quality/governance-check`
 - relevant governance skills
 
@@ -42,7 +42,7 @@
 
 - `pre-commit` 阻止 `develop/main/test-pre-merge-*` 上直接开发，但可被 `--no-verify` 跳过
 - `pre-merge-commit` 会在 `develop` merge 时运行 governance merge gate 和 promotion gate，但同样属于可被跳过的 client-side hook
-- `merge-guarded` 当前只负责 merge 发起，没有封装冲突后的 completion path
+- `pr-merge-guarded` 当前只负责 merge 发起，没有封装冲突后的 completion path
 - `governance-check` 目前不检查 develop merge 是否存在未授权 bypass
 
 ## Decomposition Tree
@@ -90,7 +90,7 @@
 先冻结 contract，再实现最小 enforcement：
 
 1. 文档真源冻结
-2. `merge-guarded` completion path 设计
+2. `pr-merge-guarded` completion path 设计
 3. `governance-check` bypass audit 设计
 
 ## Eval Plan

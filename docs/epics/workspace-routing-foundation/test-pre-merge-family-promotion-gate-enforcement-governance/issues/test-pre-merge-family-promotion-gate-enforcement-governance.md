@@ -27,7 +27,7 @@
 `I-20260405-1615-A` 已经把新的 promote model 冻结成正式 owner，但当前仓库执行的仍是旧规则：
 
 1. `CONSTITUTION` / `LAWS` / `pre-test-merge-flow.md` 仍允许或默认 `feature/* -> develop`。
-2. `merge-guarded` tests 仍阻止 `test-pre-merge-* -> develop`。
+2. `pr-merge-guarded` tests 仍阻止 `test-pre-merge-* -> develop`。
 3. 如果只改文档不改 gate，或者只改 gate 不改文档，就会在同一时间保留两套互相冲突的合法路径。
 
 因此这条 owner 的职责不是重新研究 promote model，而是把新模型接到治理真源和 protected-branch gate 上，并让 regression tests 一起对齐。
@@ -40,7 +40,7 @@
    - `docs/system/workspace/skills/branch-management/references/pre-test-merge-flow.md`
    - 必要的 related skills / `AGENTS.md`
 2. 同步更新 protected-branch promotion gate enforcement：
-   - `merge-guarded`
+   - `pr-merge-guarded`
    - 相关 hooks
    - 相关 governance gate / tests 中与 merge source 语义直接耦合的部分
 3. 让 `test-pre-merge-*` family 成为 `develop` 的 canonical promote source family，并保持 `hotfix/* -> develop` 合法。
@@ -62,7 +62,7 @@
    - `develop` 的正常 promote source 是 `test-pre-merge-*` family 与 `hotfix/*`
    - `feature/* -> develop` 作为正常路径被阻止
    - `test-pre-merge-*` family 覆盖 single-feature 与 explicit multi-bundle 语义
-3. `merge-guarded` 与直接相关 tests 同步表达相同 source-branch semantics。
+3. `pr-merge-guarded` 与直接相关 tests 同步表达相同 source-branch semantics。
 4. 本 owner 不扩大到 lifecycle automation、manifest generation、paired create。
 5. 文档和脚本对齐后，后续 lifecycle automation owner 不需要再回头改 promote source 的高层定义。
 
@@ -83,7 +83,7 @@
 ## Verification
 
 - `./bin/governance-check`
-- review the updated `CONSTITUTION` / `LAWS` / `pre-test-merge-flow.md` together with `merge-guarded`
+- review the updated `CONSTITUTION` / `LAWS` / `pre-test-merge-flow.md` together with `pr-merge-guarded`
 - confirm the owner still excludes lifecycle automation
 
 ## Completion
@@ -98,10 +98,10 @@
 - `docs/system/workspace/hooks/README.md`
 - `docs/system/workspace/hooks/pre-merge-commit.sh`
 - `docs/system/workspace/scripts/quality/governance-check`
-- `docs/system/workspace/scripts/worktree/merge-guarded`
-- `docs/system/workspace/scripts/tests/test-merge-guarded`
-- `docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt`
-- `docs/system/workspace/scripts/tests/test-merge-guarded-breakglass-hook-completion`
+- `docs/system/workspace/scripts/worktree/pr-merge-guarded`
+- `docs/system/workspace/scripts/tests/test-pr-merge-guarded`
+- `docs/system/workspace/scripts/tests/test-pr-merge-guarded-hooked-initial-merge-receipt`
+- `docs/system/workspace/scripts/tests/test-pr-merge-guarded-breakglass-hook-completion`
 - `docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
 - `docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt-backfills`
 - `docs/system/workspace/skills/branch-management/references/pre-test-merge-flow.md`

@@ -98,13 +98,13 @@
     session_id: `current-thread`
     jsonl_path: `unavailable://codex-thread-only`
     role: `author`
-- problem: canonical CLI surface replay still exposes a narrow but real contract gap beyond the already-completed wrapper-packaging owner. `wt-create --help` misroutes into branch creation instead of a safe help path, `wt-enter --help` and `wt-add --help` do not expose a standard help contract, `merge-guarded --help` prints usage but exits non-zero, and `ai switch codex --dry-run --format json` can return `No slots found or all probing failed` even while `whoami/status` prove an active apikey slot exists.
+- problem: canonical CLI surface replay still exposes a narrow but real contract gap beyond the already-completed wrapper-packaging owner. `wt-create --help` misroutes into branch creation instead of a safe help path, `wt-enter --help` and `wt-add --help` do not expose a standard help contract, `pr-merge-guarded --help` prints usage but exits non-zero, and `ai switch codex --dry-run --format json` can return `No slots found or all probing failed` even while `whoami/status` prove an active apikey slot exists.
 - why_now:
   - these are first-hop command-surface contracts in a CLI-first product, so help and dry-run semantics are part of the product behavior, not operator trivia
   - `wt-create --help` is not just noisy; it currently attempts the creation path and therefore carries avoidable side-effect risk
   - the affected commands span workspace helpers, guarded merge tooling, and ai switching, so the remaining gap is broader than one single wrapper but still much narrower than runtime/control-plane lifecycle work
 - acceptance_criteria:
-  - `wt-create --help`, `wt-enter --help`, `wt-add --help`, and `merge-guarded --help` all expose explicit, side-effect-free help behavior with success exit codes where the command is only asking for usage
+  - `wt-create --help`, `wt-enter --help`, `wt-add --help`, and `pr-merge-guarded --help` all expose explicit, side-effect-free help behavior with success exit codes where the command is only asking for usage
   - the root `freely` command exposes a deliberate top-level help/usage contract instead of relying on ambiguous “missing command” behavior
   - `ai switch codex --dry-run --format json` reports a stable, machine-consumable result that remains consistent with `ai list` / `whoami` / `status` when saved apikey slots exist
 - promotion_gate:

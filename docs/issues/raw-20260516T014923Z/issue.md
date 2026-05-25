@@ -94,8 +94,8 @@ title: "Freely Agent 规范重构：合并 lead-agent、skill 角色归属、too
 
 方案：
 - 每个 agent 定义增加 `## 可用工具` 章节
-- Manager 工具：live-status、fleet-status、task-source-scan、handoff.py、wt-create、merge-guarded 等
-- Worker 工具：git、bin/issue-sync、bin/merge-guarded 等（执行级工具）
+- Manager 工具：live-status、fleet-status、task-source-scan、handoff.py、wt-create、pr-merge-guarded 等
+- Worker 工具：git、bin/issue-sync、bin/pr-merge-guarded 等（执行级工具）
 - 标注每个工具的使用条件和风险
 
 ### 4. 引用

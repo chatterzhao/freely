@@ -17,7 +17,7 @@
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/code-reviews`
 - depends_on:
   - `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/issues/protected-branch-hook-bypass-breakglass-governance.md`
-  - `docs/system/workspace/scripts/worktree/merge-guarded`
+  - `docs/system/workspace/scripts/worktree/pr-merge-guarded`
   - `docs/system/workspace/scripts/quality/governance-check`
   - `docs/system/workspace/scripts/quality/governance-merge-gate`
 - session_refs:
@@ -36,7 +36,7 @@
 
 同时，canonical `develop` 根目录出现的一组 staged patch 已证明这个 residual signal 真实存在，但那组 patch 本身掺杂了 regression：
 
-- 它试图删除 `test-merge-guarded-hooked-initial-merge-receipt`
+- 它试图删除 `test-pr-merge-guarded-hooked-initial-merge-receipt`
 - 它试图删除 `governance-merge-gate` 的 staged-view coverage
 - 它还混入了对已吸收 watchdog 修复的回退
 
@@ -87,27 +87,27 @@
 ## Current Evidence
 
 - `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/issues/protected-branch-hook-bypass-breakglass-governance.md`
-- `docs/system/workspace/scripts/worktree/merge-guarded`
+- `docs/system/workspace/scripts/worktree/pr-merge-guarded`
 - `docs/system/workspace/scripts/quality/governance-check`
 - `docs/system/workspace/scripts/quality/governance-merge-gate`
 - `docs/system/workspace/hooks/protected-branch-breakglass-receipts.md`
-- `docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt`
-- `docs/system/workspace/scripts/tests/test-merge-guarded-breakglass-hook-completion`
+- `docs/system/workspace/scripts/tests/test-pr-merge-guarded-hooked-initial-merge-receipt`
+- `docs/system/workspace/scripts/tests/test-pr-merge-guarded-breakglass-hook-completion`
 - `docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
 - `docs/system/workspace/scripts/tests/test-pre-commit-hook`
 - `docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
-- `docs/system/workspace/scripts/tests/test-merge-guarded`
+- `docs/system/workspace/scripts/tests/test-pr-merge-guarded`
 - `docs/system/workspace/scripts/tests/test-governance-merge-gate`
 - `./bin/governance-check`
 
 ## Verification
 
 - `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
-- `bash docs/system/workspace/scripts/tests/test-merge-guarded-breakglass-hook-completion`
-- `bash docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt`
+- `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded-breakglass-hook-completion`
+- `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded-hooked-initial-merge-receipt`
 - `bash docs/system/workspace/scripts/tests/test-pre-commit-hook`
 - `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
-- `bash docs/system/workspace/scripts/tests/test-merge-guarded`
+- `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded`
 - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
 - `git diff --check`
 - `./bin/governance-check`
@@ -124,10 +124,10 @@
 - canonical_merge_target: `develop`
 - post_merge_acceptance:
   - `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
-  - `bash docs/system/workspace/scripts/tests/test-merge-guarded-breakglass-hook-completion`
-  - `bash docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt`
+  - `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded-breakglass-hook-completion`
+  - `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded-hooked-initial-merge-receipt`
   - `bash docs/system/workspace/scripts/tests/test-pre-commit-hook`
   - `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
-  - `bash docs/system/workspace/scripts/tests/test-merge-guarded`
+  - `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded`
   - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
   - `./bin/governance-check`

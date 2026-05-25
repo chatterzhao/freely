@@ -100,7 +100,7 @@ skill: freely-fix-execution   ← 新增必填字段
 | intent_kind | 含义 | 允许操作 | 举例 |
 |-------------|------|---------|------|
 | `edit` | 代码/文档修改 | 写文件、提交 | 修 bug、加功能、改文档 |
-| `merge` | 合并分支 | merge-guarded | feature → develop |
+| `merge` | 合并分支 | pr-merge-guarded | feature → develop |
 | `closeout` | 批量收口 | issue-sync close、wt-close | 关闭 issue、退役工位 |
 | `sync` | 平台同步 | issue-sync create/update | 推送 issue 到 GitHub |
 | `cleanup` | 治理清理 | 删除过期分支、工位 | 清理 test-pre-merge |
@@ -125,7 +125,7 @@ skill: freely-fix-execution   ← 新增必填字段
 | 工具 | Manager | Worker |
 |------|---------|--------|
 | wt-create | ✅ | ❌（由 Manager 创建工位后委派） |
-| merge-guarded | ✅ | ✅（Worker 执行合并） |
+| pr-merge-guarded | ✅ | ✅（Worker 执行合并） |
 | wt-close | ✅ | ✅ |
 | issue-sync | ✅ | ✅ |
 | deploy-skills | ✅ | ❌ |

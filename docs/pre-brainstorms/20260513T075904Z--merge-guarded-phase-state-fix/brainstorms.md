@@ -1,8 +1,8 @@
-# Brainstorm: merge-guarded post-merge sync phase_state fix
+# Brainstorm: pr-merge-guarded post-merge sync phase_state fix
 
 ## Issue
 
-`merge-guarded:235` reads `fm.get('status')` but I-* issues use `phase_state`.
+`pr-merge-guarded:235` reads `fm.get('status')` but I-* issues use `phase_state`.
 `linked/completed` case never matches. GitHub issues never auto-closed post-merge.
 
 ## Fix

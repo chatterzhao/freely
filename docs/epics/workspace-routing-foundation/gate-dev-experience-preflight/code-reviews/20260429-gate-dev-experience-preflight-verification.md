@@ -8,7 +8,7 @@
 ## Scope Verdict
 
 - `PASS`: --range 从 develop 可读 feature 分支新文件
-- `PASS`: merge-guarded 预检正确拦截无文档分支
+- `PASS`: pr-merge-guarded 预检正确拦截无文档分支
 - `PASS`: milestones.md 提交不触发 sk- 误报
 - `PASS`: 三处改动均为基础设施改进，无运行时行为变化
 

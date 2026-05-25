@@ -170,7 +170,7 @@
 - issue_path: `docs/issues/I-20260513T075847Z-A/issue.md`
 
 ## M-20260513T075904Z-A
-- title: merge-guarded post-merge sync phase_state fix
+- title: pr-merge-guarded post-merge sync phase_state fix
 - status: active
 ### candidate_issues
 1. `C-20260513T075904Z-A`
@@ -179,7 +179,7 @@
 - promoted_issue_path: `docs/issues/I-20260513T075904Z-A/issue.md`
 ### completed_issues
 1. `I-20260513T075904Z-A`
-- title: merge-guarded post-merge sync phase_state fix
+- title: pr-merge-guarded post-merge sync phase_state fix
 - milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260513T075904Z-A/issue.md`
@@ -683,7 +683,7 @@ routing_policy:
 - verification_artifact_dir: `docs/epics/fix-branch-naming/code-reviews`
 ## M-20260506T1400Z-A
 
-- title: merge-guarded fix/* whitelist
+- title: pr-merge-guarded fix/* whitelist
 - status: active
 
 ### candidate_issues
@@ -694,12 +694,12 @@ routing_policy:
 
 ### committed_issues
 1. `I-20260506T1400Z-A`
-- title: merge-guarded fix/* whitelist
+- title: pr-merge-guarded fix/* whitelist
 - milestone_state: committed
 - phase_state: `in_dev`
 - issue_path: `docs/issues/I-20260506T1400Z-A/issue.md`
-- source_candidate: `docs/pre-brainstorms/20260506-merge-guarded-fix/candidates.md`
-- verification_artifact_dir: `docs/epics/merge-guarded-fix-whitelist/code-reviews`
+- source_candidate: `docs/pre-brainstorms/20260506-pr-merge-guarded-fix/candidates.md`
+- verification_artifact_dir: `docs/epics/pr-merge-guarded-fix-whitelist/code-reviews`
 
 ## M-20260506T1200Z-A
 
@@ -2602,7 +2602,7 @@ routing_policy:
   - `bash docs/system/workspace/scripts/tests/test-freely-fleet-status`
   - `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-hard-stale-intent-reclaim`
   - `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
-  - `bash docs/system/workspace/scripts/tests/test-merge-guarded`
+  - `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded`
   - `./bin/governance-check`
 - completion_note: Canonical `develop` now has a shared phase-1 ownership truth for runtime status, manager launch/recovery, cleanup followthrough, and promotion gating, so duplicate mutate intents no longer rely on PID-only courtesy checks.
 
@@ -4115,7 +4115,7 @@ routing_policy:
   - `docs/progress/workspace-routing-foundation/p-develop-guarded-merge-entrypoint-enforcement-governance.md`
   - `docs/epics/workspace-routing-foundation/develop-guarded-merge-entrypoint-enforcement-governance/code-reviews/20260405-develop-guarded-merge-entrypoint-enforcement-verification.md`
   - `docs/epics/workspace-routing-foundation/develop-guarded-merge-entrypoint-enforcement-governance/code-reviews/20260405-develop-guarded-merge-entrypoint-canonical-closeout-verification.md`
-- completion_note: canonical `develop` now enforces `./bin/merge-guarded` as the required merge entrypoint; later expansion to other protected branch families should reopen as a narrower follow-on.
+- completion_note: canonical `develop` now enforces `./bin/pr-merge-guarded` as the required merge entrypoint; later expansion to other protected branch families should reopen as a narrower follow-on.
 
 2. `I-20260402-1912-A`
 - title: Protected-branch merge receipt hardening
@@ -5209,7 +5209,7 @@ routing_policy:
 - promoted_issue_path: `docs/issues/I-20260508T232413Z-A/issue.md`
 ### committed_issues
 1. `I-20260508T232413Z-A`
-- title: merge-guarded IBM phase guidance
+- title: pr-merge-guarded IBM phase guidance
 - milestone_state: committed
 - phase_state: `in_dev`
 - issue_path: `docs/issues/I-20260508T232413Z-A/issue.md`
@@ -5633,7 +5633,7 @@ routing_policy:
 - source_candidate: `docs/pre-brainstorms/20260521T095313Z--type-based-alias-resolution/candidates.md#C-20260521T095313Z-A`
 
 ## M-20260521T115809Z-A
-- title: merge-guarded source branch name fix
+- title: pr-merge-guarded source branch name fix
 - status: active
 ### candidate_issues
 1. `C-20260521T115809Z-A`
@@ -5643,7 +5643,7 @@ routing_policy:
 - next_action: completed, merge to develop
 ### completed_issues
 1. `I-20260521T115809Z-A`
-- title: merge-guarded source branch name fix
+- title: pr-merge-guarded source branch name fix
 - milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260521T115809Z-A/issue.md`

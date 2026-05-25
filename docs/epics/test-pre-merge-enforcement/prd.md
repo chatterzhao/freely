@@ -9,6 +9,6 @@ hotfix → develop merges skip test-pre-merge verification. The pre-test adequac
 3. Break-glass documented per LAWS.md §2D
 
 ## Scope
-- merge-guarded: add pre-merge verification check
+- pr-merge-guarded: add pre-merge verification check
 - governance-merge-gate: enforcement logic
 - Documentation: hotfix verification policy

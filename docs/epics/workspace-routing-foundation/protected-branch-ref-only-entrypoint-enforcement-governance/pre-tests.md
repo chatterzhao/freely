@@ -18,8 +18,8 @@
 - blocker taxonomy: `execution_pending_or_failed`
 1. Run `bash docs/system/workspace/scripts/tests/test-reference-transaction-hook`.
 2. Run `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`.
-3. Run `bash docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt`.
-4. Run `bash docs/system/workspace/scripts/tests/test-merge-guarded`.
+3. Run `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded-hooked-initial-merge-receipt`.
+4. Run `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded`.
 5. Run `git diff --check`.
 6. Run `./bin/governance-check`.
 
@@ -29,8 +29,8 @@
 - target environment: `guarded protected-branch merge chain`
 - required evidence: `guarded merge receipts plus verification artifact`
 - blocker taxonomy: `execution_pending_or_failed`
-1. Merge `feature/protected-branch-ff-only-gate-20260419` into a disposable `test-pre-merge-*` branch via `./bin/merge-guarded`.
-2. Merge that `test-pre-merge-*` branch into `develop` via `./bin/merge-guarded`.
+1. Merge `feature/protected-branch-ff-only-gate-20260419` into a disposable `test-pre-merge-*` branch via `./bin/pr-merge-guarded`.
+2. Merge that `test-pre-merge-*` branch into `develop` via `./bin/pr-merge-guarded`.
 3. Confirm the protected-root merge path accepts the receipt-bearing merge commit while rejecting non-receipted ref-only updates.
 
 ## Real-Environment
@@ -69,7 +69,7 @@
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
 - task_refs: `tasks.md#2,tasks.md#3,tasks.md#4`
-- case_design: `Run the focused reference-transaction and guarded merge regressions in the feature lane, then replay the feature through a disposable test-pre-merge branch into develop via merge-guarded and require the protected branch to accept only the receipt-bearing merge commit.`
+- case_design: `Run the focused reference-transaction and guarded merge regressions in the feature lane, then replay the feature through a disposable test-pre-merge branch into develop via pr-merge-guarded and require the protected branch to accept only the receipt-bearing merge commit.`
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/protected-branch-ref-only-entrypoint-enforcement-governance/code-reviews/20260419-protected-branch-ref-only-entrypoint-enforcement-verification.md`

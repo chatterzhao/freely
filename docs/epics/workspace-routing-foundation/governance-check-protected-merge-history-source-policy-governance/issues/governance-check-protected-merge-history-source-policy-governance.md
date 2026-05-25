@@ -38,8 +38,8 @@
 ## Non-Goals
 
 1. 不重写 merge receipt schema。
-2. 不改 `merge-guarded` 的 receipt 内容。
-3. 不在本 owner 内顺手修 `merge-guarded` 的 already-up-to-date return-path 问题。
+2. 不改 `pr-merge-guarded` 的 receipt 内容。
+3. 不在本 owner 内顺手修 `pr-merge-guarded` 的 already-up-to-date return-path 问题。
 
 ## Acceptance
 

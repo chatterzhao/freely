@@ -13,7 +13,7 @@
 ## Why This
 
 1. 旧模型把 `test-pre-merge-*` 写成 shadow batch / replay 证据面，已经不能支撑“develop 只接收经过 develop-like 预集成测试的树”这个目标。
-2. 现在直接改 `merge-guarded` / hook / `governance-check`，会把未冻结的 promote model 反向固化到实现里。
+2. 现在直接改 `pr-merge-guarded` / hook / `governance-check`，会把未冻结的 promote model 反向固化到实现里。
 3. 现在直接拆多个 owner，也会让 gate enforcement issue 和 lifecycle automation issue各自带着不同的前提开工。
 
 ## Current Model Tension
@@ -45,4 +45,4 @@
 1. `enforce test-pre-merge family promotion gate`
 2. `automate test-pre-merge family lifecycle`
 
-在这之前，任何“顺手改一下 hook / merge-guarded / wrapper”都不算合规完成路径。
+在这之前，任何“顺手改一下 hook / pr-merge-guarded / wrapper”都不算合规完成路径。

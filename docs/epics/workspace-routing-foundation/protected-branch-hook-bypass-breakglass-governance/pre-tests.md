@@ -28,7 +28,7 @@
 
 ### AT-004 guarded completion contract frozen
 
-- acceptance target: `merge-guarded` 冲突后 completion path 的受控 contract 被写明
+- acceptance target: `pr-merge-guarded` 冲突后 completion path 的受控 contract 被写明
 - testing layer: IBM review
 - target environment: issue-bound artifacts
 - required evidence: `issue + prd + tasks`
@@ -52,10 +52,10 @@
 
 ### AT-007 guarded completion handshake enforced
 
-- acceptance target: protected-branch merge completion 只能通过 `merge-guarded complete` 的 hook handshake 继续，不能裸 `git commit`
+- acceptance target: protected-branch merge completion 只能通过 `pr-merge-guarded complete` 的 hook handshake 继续，不能裸 `git commit`
 - testing layer: integration
 - target environment: isolated git repo with hooks enabled
-- required evidence: `test-pre-commit-hook + test-merge-guarded-breakglass-hook-completion`
+- required evidence: `test-pre-commit-hook + test-pr-merge-guarded-breakglass-hook-completion`
 - blocker taxonomy: `execution_pending_or_failed`
 
 ### AT-008 receipt audit enforced
@@ -68,10 +68,10 @@
 
 ### AT-009 guarded completion receipt path enforced
 
-- acceptance target: `merge-guarded` 正常 completion 和 break-glass completion 都会写入 machine-readable receipt
+- acceptance target: `pr-merge-guarded` 正常 completion 和 break-glass completion 都会写入 machine-readable receipt
 - testing layer: integration
 - target environment: isolated git repo
-- required evidence: `test-merge-guarded`
+- required evidence: `test-pr-merge-guarded`
 - blocker taxonomy: `execution_pending_or_failed`
 
 ## Acceptance Items
@@ -123,7 +123,7 @@
 - requirement: `Protected-branch merge completion must go through the guarded hook handshake instead of a raw commit path.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/system/workspace/scripts/tests/test-merge-guarded-breakglass-hook-completion`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-pr-merge-guarded-breakglass-hook-completion`
 
 ### AT-008
 - id: `AT-008`
@@ -134,7 +134,7 @@
 
 ### AT-009
 - id: `AT-009`
-- requirement: `merge-guarded normal and break-glass completion paths must both write machine-readable receipts.`
+- requirement: `pr-merge-guarded normal and break-glass completion paths must both write machine-readable receipts.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/system/workspace/scripts/tests/test-merge-guarded`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-pr-merge-guarded`

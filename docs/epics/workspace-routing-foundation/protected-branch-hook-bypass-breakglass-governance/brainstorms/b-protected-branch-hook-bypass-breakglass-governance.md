@@ -60,7 +60,7 @@ Freely 现有治理把 `.githooks` 与 develop-bound gates 当作受保护分支
 
 冻结可执行 contract：
 
-- `merge-guarded` 不能只负责 merge 发起，还要定义冲突后的 completion path
+- `pr-merge-guarded` 不能只负责 merge 发起，还要定义冲突后的 completion path
 - `governance-check` 要能审计 bypass receipt
 - hook 继续是本地 gate，但要明确“它不是绝对防线”
 

@@ -47,7 +47,7 @@ title: "governance gate dropped 被滥用作 fix 合并捷径"
 
 门禁允许 `phase_state=dropped` 作为 B1 终态放行。但实际使用中，完成了代码修改后直接标 `dropped` 绕过 IBM 治理链。
 
-今天 4 个 fix 全是：代码写完了 → merge-guarded 合并 → raw issue 标 dropped。dropped 语义是丢弃不推进，但实际代码已合并推进了。
+今天 4 个 fix 全是：代码写完了 → pr-merge-guarded 合并 → raw issue 标 dropped。dropped 语义是丢弃不推进，但实际代码已合并推进了。
 
 ## 修复方向
 

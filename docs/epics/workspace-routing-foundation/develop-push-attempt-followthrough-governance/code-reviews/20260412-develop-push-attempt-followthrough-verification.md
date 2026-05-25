@@ -9,7 +9,7 @@
 
 ## Implementation Decision Note
 
-- decision: `Add one explicit develop push attempt action plus explicit push_blocked truth, and trigger the attempt once from merge-guarded after a successful develop merge.`
+- decision: `Add one explicit develop push attempt action plus explicit push_blocked truth, and trigger the attempt once from pr-merge-guarded after a successful develop merge.`
 - why_this: `This closes the gap between local develop merge completion and remote delivery without moving transport into hooks or adding retry-until-success behavior.`
 - alternatives_considered:
   - `Keep push handling fully manual after merge.` Rejected because it leaves canonical delivery debt easy to forget and indistinguishable from blocked attempts.
@@ -25,10 +25,10 @@
 
 1. `bash docs/system/workspace/scripts/tests/test-freely-develop-push-attempt`
 2. `bash docs/system/workspace/scripts/tests/test-freely-live-status-develop-push-blocked`
-3. `bash docs/system/workspace/scripts/tests/test-merge-guarded-develop-push-attempt-followthrough`
+3. `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded-develop-push-attempt-followthrough`
 4. `bash docs/system/workspace/scripts/tests/test-freely-live-status-develop-push-pending`
 5. `bash docs/system/workspace/scripts/tests/test-wt-fleet-status-develop-push-pending`
-6. `bash docs/system/workspace/scripts/tests/test-merge-guarded`
+6. `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded`
 7. `bash docs/system/workspace/scripts/tests/test-pre-push-hook`
 8. `./bin/governance-check`
 9. `git diff --check`

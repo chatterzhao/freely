@@ -39,7 +39,7 @@
 - target environment: `test-pre-merge-runtime-lifecycle-20260417`
 - required evidence: `guarded merge replay plus premerge verification artifact`
 - blocker taxonomy: `execution_pending_or_failed`
-1. Run `./bin/merge-guarded test-pre-merge-runtime-lifecycle-20260417 feature/runtime-process-leak-20260417`.
+1. Run `./bin/pr-merge-guarded test-pre-merge-runtime-lifecycle-20260417 feature/runtime-process-leak-20260417`.
 2. Re-run the focused regression set in `premerge-integration` on the disposable batch.
 3. Run `./bin/test-lane premerge-integration -- ./bin/governance-check`.
 
@@ -124,7 +124,7 @@
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
 - task_refs: `tasks.md#6`
-- case_design: `Merge feature/runtime-process-leak-20260417 into test-pre-merge-runtime-lifecycle-20260417 with merge-guarded, rerun the focused regression set plus governance-check there, and record the replay in a closeout verification artifact the develop gate can consume.`
+- case_design: `Merge feature/runtime-process-leak-20260417 into test-pre-merge-runtime-lifecycle-20260417 with pr-merge-guarded, rerun the focused regression set plus governance-check there, and record the replay in a closeout verification artifact the develop gate can consume.`
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260419-runtime-start-stop-lifecycle-and-process-leak-develop-promote-verification.md`

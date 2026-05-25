@@ -16,7 +16,7 @@
 - `docs/system/workspace/agents/manager-agent.md`
 - `docs/system/workspace/skills/multi-worktree-supervision/references/manager-reactivation-patrol.md`
 - `docs/system/workspace/scripts/runtime/freely`
-- `docs/system/workspace/scripts/worktree/merge-guarded`
+- `docs/system/workspace/scripts/worktree/pr-merge-guarded`
 
 ## Non-Goals
 

@@ -42,7 +42,7 @@
 8. `bash docs/system/workspace/scripts/tests/test-freely-runtime-effective-worker-role-from-contract`
 9. `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-between-rounds-relaunch-grace`
 10. `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-while-worker-active`
-11. `./bin/merge-guarded test-pre-merge-runtime-lifecycle-followthrough-20260424 feature/runtime-target-worker-role-and-starting-stuck-recovery-20260424`
+11. `./bin/pr-merge-guarded test-pre-merge-runtime-lifecycle-followthrough-20260424 feature/runtime-target-worker-role-and-starting-stuck-recovery-20260424`
 12. `bash docs/system/workspace/scripts/tests/test-freely-runtime-effective-worker-role-from-contract`
 13. `bash docs/system/workspace/scripts/tests/test-freely-delegated-worker-starting-stuck-reclaim`
 

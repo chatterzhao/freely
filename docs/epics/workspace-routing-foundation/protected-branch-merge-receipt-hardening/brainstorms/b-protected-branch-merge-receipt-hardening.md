@@ -14,7 +14,7 @@
 
 ### keep-as-signal
 
-- `merge-guarded` 的 initial merge / completion boundary 仍值得单独 harden
+- `pr-merge-guarded` 的 initial merge / completion boundary 仍值得单独 harden
 - `governance-check` 的 receipt / ledger parity audit 仍值得增强
 - `governance-merge-gate` staged/touched relevance 仍需要更明确 regression coverage
 
@@ -25,9 +25,9 @@
 
 ### drop-as-regression
 
-- 把 `merge-guarded` 初始 merge 改回 `git merge --no-ff -m ...`
+- 把 `pr-merge-guarded` 初始 merge 改回 `git merge --no-ff -m ...`
   - 这会绕开当前通过 `--no-commit` + controlled continue 写 receipt 的路径
-- 删除 `test-merge-guarded-hooked-initial-merge-receipt`
+- 删除 `test-pr-merge-guarded-hooked-initial-merge-receipt`
   - 这是直接删除当前 canonical safety net
 - 删除 `governance-merge-gate` staged-view parsing与对应测试
   - 这会把 “staged merge 之前 owner artifact 只在 index 中存在” 的边界退化掉

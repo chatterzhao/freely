@@ -1,8 +1,8 @@
 # Candidates
 
 ## C-20260513T075904Z-A
-- title: merge-guarded post-merge sync should read phase_state for linked issues
-- scope: merge-guarded _sync_issues_changed_in_merge reads fm.get('phase_state', fm.get('status', ''))
+- title: pr-merge-guarded post-merge sync should read phase_state for linked issues
+- scope: pr-merge-guarded _sync_issues_changed_in_merge reads fm.get('phase_state', fm.get('status', ''))
 - priority: P1
 - status: promoted
 - milestone: M-20260513T075904Z-A

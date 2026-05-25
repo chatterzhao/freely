@@ -28,7 +28,7 @@
 - required evidence: guarded merge receipts
 - not_applicable_reason: change_not_touching_this_layer
 - not_applicable_explanation: Shell 脚本修改，合并即端到端验证
-- replacement_evidence: merge-guarded 成功输出
+- replacement_evidence: pr-merge-guarded 成功输出
 - blocker taxonomy: execution_pending_or_failed
 
 ## Real-Environment

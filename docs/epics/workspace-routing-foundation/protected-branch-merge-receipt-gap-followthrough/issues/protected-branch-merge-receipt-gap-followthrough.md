@@ -17,7 +17,7 @@
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/code-reviews`
 - depends_on:
   - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md`
-  - `docs/system/workspace/scripts/worktree/merge-guarded`
+  - `docs/system/workspace/scripts/worktree/pr-merge-guarded`
   - `docs/system/workspace/scripts/quality/governance-check`
   - `docs/system/workspace/hooks/protected-branch-breakglass-receipts.md`
 - session_refs:
@@ -40,7 +40,7 @@ Freely 已经要求 protected-branch merge 写 canonical receipt trailer，也�
 1. 不重开 break-glass whitelist 或 break-glass receipt policy。
 2. 不重写现有 merge 历史。
 3. 不把 backfill ledger 变成正常 merge 缺 trailer 的常规路径。
-4. 不修改 `merge-guarded` 的 canonical trailer 字段集。
+4. 不修改 `pr-merge-guarded` 的 canonical trailer 字段集。
 
 ## Acceptance
 

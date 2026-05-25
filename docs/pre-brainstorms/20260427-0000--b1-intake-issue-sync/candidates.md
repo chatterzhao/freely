@@ -96,7 +96,7 @@ bin/issue-sync status <local-id>        # 查看同步状态
 | 生命周期事件 | 触发 gate/hook | sync 动作 |
 |-------------|---------------|----------|
 | chat 插话 | `freely chat` 执行后 → 写本地 comment → sync | `issue-sync comment` |
-| candidate promoted | `merge-guarded` 或 governance hook 检测到 status=promoted | `issue-sync create` 创建里程碑 issue |
+| candidate promoted | `pr-merge-guarded` 或 governance hook 检测到 status=promoted | `issue-sync create` 创建里程碑 issue |
 | B2 IBM 完成 | phase_state 变为 `done_b2_ibm` | `issue-sync update` 更新 issue body（scope + acceptance） |
 | 进入 dev-loop | phase_state 变为 `in_dev` | `issue-sync comment` "implementation started" |
 | 进入 verification | phase_state 变为 `in_verification` | `issue-sync comment` "verification in progress" |

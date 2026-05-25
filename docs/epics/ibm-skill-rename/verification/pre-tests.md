@@ -26,8 +26,8 @@
 - target environment: `develop-bound guarded merge chain`
 - required evidence: `guarded merge receipts`
 - blocker taxonomy: `execution_pending_or_failed`
-1. Merge feature into test-pre-merge via ./bin/merge-guarded.
-2. Merge test-pre-merge into develop via ./bin/merge-guarded.
+1. Merge feature into test-pre-merge via ./bin/pr-merge-guarded.
+2. Merge test-pre-merge into develop via ./bin/pr-merge-guarded.
 
 ## Real-Environment
 - real_environment_status: `pass`
@@ -54,7 +54,7 @@
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
 - task_refs: ``
-- case_design: `Merge feature into test-pre-merge, then test-pre-merge into develop via merge-guarded.`
+- case_design: `Merge feature into test-pre-merge, then test-pre-merge into develop via pr-merge-guarded.`
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/ibm-skill-rename/code-reviews/review.md`

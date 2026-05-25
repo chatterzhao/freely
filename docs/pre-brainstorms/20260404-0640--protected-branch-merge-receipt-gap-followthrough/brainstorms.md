@@ -33,7 +33,7 @@
 ## Non-Goals
 
 - 不重写 merge 历史。
-- 不重新定义 `merge-guarded` 正常路径的 trailer contract。
+- 不重新定义 `pr-merge-guarded` 正常路径的 trailer contract。
 - 不扩展到 break-glass policy 本身。
 - 不把 receipt gap 伪装成“允许普通 merge 没 trailer”。
 
