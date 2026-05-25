@@ -598,6 +598,10 @@ def build_payload(project: Path, raw_key: str = "") -> dict:
     remote_items = scan_remote_branch_governance(project)
     output.extend(remote_items)
 
+    # Platform sync batch grouping — combine all sync-related items into one batch
+    ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    output = add_platform_sync_batch(output, ts)
+
     # When raw_key is specified, filter output to only items matching this key.
     # This ensures the prompt builder gets only the targeted raw→I chain.
     if raw_key:
@@ -1432,26 +1436,74 @@ def scan_chain_trace(project: Path, platform_data: dict, raw_key_filter: str = "
 
 
 CHAIN_ACTIONS = {
-    "raw_created": "cmd: wt-create --raw-key {key} --source platform --skill freely-fix-execution --slug b1 ; skill: freely-doc-B1_IBM-execution",
-    "b1_dir": "cmd: wt-create --raw-key {key} --source platform --skill freely-doc-B1_IBM-execution --slug b1 ; 在工位中写入 brainstorms.md",
-    "b1_brainstorm": "产出 candidates.md，每个 candidate 写清 scope/priority/status ; skill: freely-doc-B1_IBM-execution",
-    "b1_candidate": "决策 candidate：promote（创建 I-*） / absorb（合并） / drop（丢弃）; skill: freely-candidate-acceptance-review",
-    "candidate_decision": "cmd: wt-create --raw-key {key} --source platform --skill freely-feat-execution --slug impl ; skill: freely-feat-execution",
-    "i_created": "cmd: wt-create --raw-key {key} --source platform --skill freely-feat-execution --slug impl ; skill: freely-dev-loop-execution",
-    "dev_worktree": "在工位中实现代码，推进 phase_state 到 done/completed ; skill: freely-dev-loop-execution",
-    "dev_phase_done": "cmd: wt-create --raw-key {key} --source platform --skill freely-fix-execution --slug close ; issue-sync create 推送到平台 ; git commit ; wt-close",
-    "platform_create": "cmd: wt-create --raw-key {key} --source platform --skill freely-fix-execution --slug sync ; issue-sync create {key} ; git commit -m 'sync: push {key} to platform' ; wt-close",
-    "merged_develop": "cmd: wt-create --raw-key {key} --source platform --skill freely-fix-execution --slug close ; issue-sync close {key} ; wt-close",
-    "platform_close": "cmd: wt-create --raw-key {key} --source platform --skill freely-fix-execution --slug close ; issue-sync close {key} ; git commit -m 'close: {key} completed' ; wt-close",
-    "branch_deleted": "cmd: issue-sync close {key}",
+    "raw_created": "[manager] wt-create --raw-key {key} --source platform --skill freely-fix-execution --slug b1\n[worker] skill:freely-doc-B1_IBM-execution → brainstorms.md → candidates.md",
+    "b1_dir": "[worker] skill:freely-doc-B1_IBM-execution → 工位已存在，写入 brainstorms.md",
+    "b1_brainstorm": "[worker] skill:freely-doc-B1_IBM-execution → 产出 candidates.md",
+    "b1_candidate": "[worker] skill:freely-candidate-acceptance-review → 决策 promote/absorb/drop",
+    "candidate_decision": "[manager] wt-create --raw-key {key} --source platform --skill freely-feat-execution --slug impl\n[worker] skill:freely-feat-execution → materialize I-* → dev-loop",
+    "i_created": "[manager] wt-create --raw-key {key} --source platform --skill freely-feat-execution --slug impl\n[worker] skill:freely-dev-loop-execution → 推进 phase_state",
+    "dev_worktree": "[worker] skill:freely-dev-loop-execution → 工位已存在，推进 phase_state",
+    "dev_phase_done": "[worker] skill:freely-dev-loop-execution → issue-sync create → git commit → wt-close",
+    "platform_create": "[manager] wt-create --raw-key {key} --source platform --skill freely-fix-execution --slug sync\n[worker] issue-sync create → git commit → wt-close",
+    "merged_develop": "[manager] wt-create --raw-key {key} --source platform --skill freely-fix-execution --slug close\n[worker] issue-sync close → wt-close",
+    "platform_close": "[manager] wt-create --raw-key {key} --source platform --skill freely-fix-execution --slug close\n[worker] issue-sync close → git commit → wt-close",
+    "branch_deleted": "[manager] wt-create --raw-key {key} --source platform --skill freely-fix-execution --slug sync\n[worker] issue-sync close → git commit → wt-close",
 }
 
 
+def add_platform_sync_batch(items: list[dict], ts: str) -> list[dict]:
+    """Collect platform sync items into one batch entry.
+
+    Stages that belong to platform_sync_batch:
+      - platform_open: platform has an issue not yet in local
+      - platform_only: platform issue with raw key but no local raw
+      - state_mismatch: local and platform states differ
+      - local_only: local issue not yet on platform
+
+    Removes individual items and creates a single batch item as the
+    first (highest priority) result.
+    """
+    sync_stages = {"platform_open", "platform_only", "state_mismatch", "local_only"}
+    sync_items = [it for it in items if it.get("stage") in sync_stages]
+    remaining = [it for it in items if it.get("stage") not in sync_stages]
+
+    if not sync_items:
+        return items
+
+    pull_count = sum(1 for it in sync_items if it.get("stage") in ("platform_open", "platform_only"))
+    push_count = sum(1 for it in sync_items if it.get("stage") == "local_only")
+    reconcile_count = sum(1 for it in sync_items if it.get("stage") == "state_mismatch")
+    comment_count = sum(1 for it in sync_items if it.get("stage") == "pending_comments")
+
+    batch_item = {
+        "key": f"platform-sync-batch-{ts}",
+        "stage": "platform_sync_batch",
+        "source_family": "platform_sync",
+        "ready": True,
+        "priority": "P0_highest",
+        "incomplete": [],
+        "next_action": f"[manager] wt-create --raw-key {ts} --source platform --skill freely-fix-execution --slug platform-sync\n[worker] issue-sync batch → git commit → wt-close",
+        "sync_summary": {
+            "total": pull_count + push_count + reconcile_count,
+            "pull": pull_count,
+            "push": push_count,
+            "reconcile_state": reconcile_count,
+            "pending_comments": comment_count,
+            "platforms": ["github", "gitee"],
+        },
+    }
+
+    return [batch_item] + remaining
+
+
 def _derive_chain_action(current: str, next_station: str | None, blockers: list[str]) -> str:
+    if current in CHAIN_ACTIONS:
+        return CHAIN_ACTIONS[current]
     if next_station and next_station in CHAIN_ACTIONS:
         return CHAIN_ACTIONS[next_station]
     if blockers:
         return f"解决阻塞: {', '.join(blockers)}"
+    return ""
 
 
 def _collect_paths(key: str, stations: dict, project: Path) -> dict:

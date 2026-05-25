@@ -15534,6 +15534,17 @@ for stage in stage_order:
         print(f"  next_action={next_action}")
     print("")
 
+    print("## 行为契约：scan next_action 处理规则")
+    print("")
+    print("- `next_action` 以 `[manager]` 开头 → Manager **必须自己执行 Terminal 命令**")
+    print("  - Manager 唯一能力：wt-create（创建工位，不修改 develop 跟踪文件）")
+    print("  - 执行 wt-create 后 → 工位就绪 → delegate_workers 委派 Worker")
+    print("- `next_action` 以 `[worker]` 开头 → Manager **必须委派 Worker** 到对应工位")
+    print("  - 如果工位已存在（没有 `[manager]` 段）：直接委派")
+    print("  - 如果工位刚由 wt-create 创建：委派到新工位")
+    print("- **platform_sync_batch 优先级最高** — 出现在 scan 第一条时必须优先处理")
+    print("- 只有当**所有 ready 条目都没有可执行的 `[manager]` 或 `[worker]`** 时，才允许 stop_ai")
+    print("")
 PY
 }
 manager_supervision_alerts() {
