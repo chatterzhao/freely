@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# pr-create-guarded: pull latest develop → handle conflicts → dry-run gate → push → create PR
+#
+# Usage:
+#   ./bin/pr-create-guarded [--title <title>] [--body <body>] [--base <branch>]
+#
+# Must be run inside a fix/raw-* or feature/raw-* worktree.
+
+ROOT_DIR="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+[[ -n "$ROOT_DIR" ]] || { echo "ERROR: not in a git repository" >&2; exit 1; }
+cd "$ROOT_DIR"
+
+current_branch="$(git rev-parse --abbrev-ref HEAD)"
+case "$current_branch" in
+  develop|main|test-pre-merge-*)
+    echo "拒绝: 不能在受保护分支 '$current_branch' 上执行 pr-create-guarded。" >&2
+    echo "请在 fix/raw-* 或 feature/raw-* 工位中执行。" >&2
+    exit 1
+    ;;
+esac
+
+title="${1:-}"
+body="${2:-}"
+base="${3:-develop}"
+
+echo "=== pr-create-guarded: $current_branch → $base ==="
+echo ""
+
+# ── Step 1: Pull latest develop into current branch ──
+echo "Step 1/4: pulling latest $base into $current_branch..."
+if ! git pull origin "$base" 2>&1; then
+  cat >&2 <<CONFLICT
+========================================
+冲突: $base 合并到 $current_branch 时出现冲突
+
+请在当前工位中手动解决冲突:
+  git mergetool 或手动编辑冲突文件
+  git add <resolved-files>
+  git commit
+
+然后重新运行:
+  ./bin/pr-create-guarded
+========================================
+CONFLICT
+  exit 1
+fi
+echo ""
+
+# ── Step 2: dry-run merge gate ──
+echo "Step 2/4: dry-run merge gate..."
+if [[ -x "$ROOT_DIR/bin/pr-merge-guarded" ]]; then
+  "$ROOT_DIR/bin/pr-merge-guarded" --dry-run "$base" "$current_branch"
+  if [[ $? -ne 0 ]]; then
+    echo ""
+    echo "dry-run 门禁未通过。请修复后重试。"
+    exit 1
+  fi
+else
+  # Fallback: run governance-merge-gate directly
+  echo "[WARN] pr-merge-guarded not found, running governance-merge-gate directly..."
+  if [[ -x "$ROOT_DIR/bin/governance-merge-gate" ]]; then
+    "$ROOT_DIR/bin/governance-merge-gate" --range "$base..HEAD"
+  fi
+fi
+echo ""
+
+# ── Step 3: Push current branch ──
+echo "Step 3/4: pushing $current_branch..."
+git push origin "$current_branch" 2>&1
+echo ""
+
+# ── Step 4: Create PR ──
+echo "Step 4/4: creating pull request..."
+if ! command -v gh >/dev/null 2>&1; then
+  echo "ERROR: gh (GitHub CLI) not found. Please install gh and create the PR manually." >&2
+  exit 1
+fi
+
+gh_pr_args=()
+[[ -n "$title" ]] && gh_pr_args+=(--title "$title")
+[[ -n "$body" ]] && gh_pr_args+=(--body "$body")
+
+gh pr create --head "$current_branch" --base "$base" "${gh_pr_args[@]}"
