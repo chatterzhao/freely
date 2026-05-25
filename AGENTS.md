@@ -114,21 +114,31 @@ Freely 开发 Freely 时，默认先问四件事：
 所有代码改动（feature、fix、hotfix）必须走完整流程，develop 禁止直接写入：
 
 ```
-raw issue → wt-create → B1:IBM|B2:IBM → dev(fix|hotfix|feature) → test-pre-merge-* 验证 → pr-merge-guarded → wt-close
+阶段1: 问题发现（scan / chat / 平台 issue）
+阶段2: 创建 raw issue（freely feedback / chat --new-issue）
+阶段3: 创建工位（wt-create --raw-key ... --source ... --skill ... --slug ...）
+阶段4: B1_IBM 预研（brainstorm → candidate → promote/absorb/drop）
+阶段5: B2_IBM 设计（I-* → prd/pre-tests/tasks/code-reviews）
+阶段6: Dev 实现（dev-loop-execution → 写代码 → 跑 pre-tests → commit）
+阶段7: 提 PR（pr-create-guarded → pull develop → 冲突处理 → dry-run gate → push → gh pr create）
+阶段8: 门禁合并（pr-merge-guarded develop <pr-branch> → PR gate → promotion gate → merge → develop-push）
+阶段9: 收口（wt-close → issue-sync close → 清理）
 ```
 
 | 步骤 | 操作 | 谁执行 |
 |------|------|--------|
-| 1. 创建 raw issue | `./bin/freely feedback --repo <user/repo> --title "..." --body "..."` 或 chat 插话 | 开发者 |
-|    | Freely 自举时: `./bin/freely feedback --repo chatterzhao/freely --title "..." --body "..."` 或读 `.freely/config.env` 的 `FREELY_REPO_URL` | |
-| 2. 开工位 | `./bin/wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>` | Manager/开发者 |
-| 3. B1 或 B2 | B1:IBM（预研→candidate→milestone）或 B2:IBM（实现→epic→tasks） | skill 执行 |
-| 4. 开发 | 在 fix/feature 工位提交、测试 | Worker |
-| 5. 合并 | `./bin/pr-merge-guarded develop <feature-branch>` | Worker/Manager |
-| 6. 关工位 | `./bin/wt-close <branch>` 清理工位+分支 | Worker/Manager |
+| 1. 问题发现 | scan / chat / 平台 issue | Manager/开发者 |
+| 2. 创建 raw issue | `./bin/freely feedback ...` 或 chat --new-issue | Manager/开发者 |
+| 3. 开工位 | `./bin/wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>` | Manager/开发者 |
+| 4. B1_IBM 预研 | B1:IBM（brainstorm→candidate→milestone） | skill 执行 |
+| 5. B2_IBM 设计 | B2:IBM（I-*→prd/pre-tests/tasks/code-reviews） | skill 执行 |
+| 6. Dev 实现 | dev-loop-execution → 写代码 → 跑 pre-tests → commit | Worker |
+| 7. 提 PR | `./bin/pr-create-guarded` → pull develop → 冲突处理 → dry-run gate → push → gh pr create | Worker/Manager |
+| 8. 门禁合并 | `./bin/pr-merge-guarded develop <pr-branch>` → PR gate → promotion gate → merge | Worker/Manager |
+| 9. 关工位 | `./bin/wt-close <branch>` 清理工位+分支 | Worker/Manager |
 
-- Manager 负责步骤 1-2 和决策，Worker 负责步骤 3-6 执行
-- 步骤 4-6 由 Worker 在 skill 约束下完成，完成后写 handoff JSON 汇报
+- Manager 负责步骤 1-3 和决策，Worker 负责步骤 4-9 执行
+- 步骤 4-9 由 Worker 在 skill 约束下完成，完成后写 handoff JSON 汇报
 - wt-close 会自动消费该工位的所有 worker handoff
 - **禁止在 develop 上直接修改、提交**——那是受保护主管工位
 
