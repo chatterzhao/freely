@@ -539,9 +539,9 @@ Usage:
   freely ensure-manager [--project <abs_path>] [--watch] [--interval <seconds>]
   freely ensure-interruption-dispatch [--project <abs_path>] [--watch] [--interval <seconds>]
   freely auth-change-wake [--tool <name>] [--slot <slot>] [--reason <reason>]
-  freely start [--project <abs_path>] [--task-mode auto|wait|id:<scan-id>] [--force]
-  freely daemon start [--project <abs_path>] [--task-mode auto|wait|id:<scan-id>] [--force]
-  freely task-mode set --project <abs_path> --task-mode auto|wait|id:<scan-id> [--force]
+  freely start [--project <abs_path>] [--task-mode auto|wait|listen|id:<scan-id>] [--force]
+  freely daemon start [--project <abs_path>] [--task-mode auto|wait|listen|id:<scan-id>] [--force]
+  freely task-mode set --project <abs_path> --task-mode auto|wait|listen|id:<scan-id> [--force]
   freely task-mode get --project <abs_path>
   freely daemon stop [--project <abs_path>]
   freely daemon status [--project <abs_path>]
@@ -7787,8 +7787,9 @@ write_task_mode() {
   case "$mode" in
     auto) task_mode="auto"; task_scan_id="" ;;
     wait) task_mode="wait"; task_scan_id="" ;;
+    listen) task_mode="listen"; task_scan_id="" ;;
     id:*) task_mode="id"; task_scan_id="${mode#id:}" ;;
-    *) log_error "invalid task-mode: $mode (expected auto|wait|id:<scan-id>)"; return 1 ;;
+    *) log_error "invalid task-mode: $mode (expected auto|wait|listen|id:<scan-id>)"; return 1 ;;
   esac
   python3 <<PY
 import sqlite3
@@ -14466,9 +14467,35 @@ manager_runtime_handle_exit_contract_after_ai_cycle() {
       [[ "$_poll_interval" =~ ^[0-9]+$ ]] || _poll_interval=10
       case "$_gate_mode" in
         auto)
-          local _override_count _override_file _max_retries
+          local _override_count _override_file _max_retries _scan_json_path _ready_count _hint_file
           _override_file="$project/.freely/run/auto-stop-ai-override-count"
+          _hint_file="$project/.freely/run/auto-retry-hint.txt"
           _max_retries=2
+          # Check scan for ready items
+          _scan_json_path="$(task_source_scan_json_path_for_project "$project")"
+          _ready_count=0
+          if [[ -f "$_scan_json_path" && -s "$_scan_json_path" ]]; then
+            _ready_count="$(python3 -c "
+import json
+with open('$_scan_json_path') as f: data=json.load(f)
+items=data if isinstance(data,list) else data.get('items',[])
+ready=sum(1 for i in items if i.get('ready'))
+print(ready)
+" 2>/dev/null || echo 0)"
+          fi
+          if [[ "$_ready_count" -eq 0 ]]; then
+            # No ready items — legitimate stop_ai, switch to listen mode
+            write_task_mode "$project" "listen"
+            append_runtime_event "$project" "task_mode_gate_stop_ai_to_listen" \
+              "gate_mode=auto" \
+              "ready_count=$_ready_count" \
+              "action=switch_to_listen"
+            rm -f "$_override_file"
+            rm -f "$_hint_file"
+            printf 'continue\n'
+            return 0
+          fi
+          # Scan has ready items — unexpected stop_ai, retry with hints
           _override_count=0
           if [[ -f "$_override_file" ]]; then
             _override_count=$(cat "$_override_file" 2>/dev/null || echo 0)
@@ -14480,17 +14507,39 @@ manager_runtime_handle_exit_contract_after_ai_cycle() {
               "gate_mode=auto" \
               "override_count=$_override_count" \
               "max_retries=$_max_retries" \
+              "ready_count=$_ready_count" \
               "action=switch_to_wait"
             rm -f "$_override_file"
+            rm -f "$_hint_file"
+            log_warn "auto mode: stop_ai returned ${_override_count} times with ${_ready_count} ready scan items; degraded to wait"
             sleep "$_poll_interval"
             printf 'continue\n'
             return 0
           fi
           printf '%d\n' "$_override_count" > "$_override_file"
+          # Write enrichment hint
+          if [[ "$_override_count" -eq 1 ]]; then
+            cat > "$_hint_file" <<HINTEOF
+[AUTO-MODE RETRY] Previous cycle returned stop_ai but scan has ${_ready_count} actionable items.
+Review each item's next_action field carefully:
+- Items with [manager] prefix require you to run wt-create
+- Items with [worker] prefix require you to delegate a worker
+- Do not stop_ai while actionable items exist in the scan.
+HINTEOF
+          else
+            cat > "$_hint_file" <<HINTEOF
+[AUTO-MODE RETRY #2 - FINAL WARNING] Two consecutive cycles returned stop_ai with actionable scan items.
+You MUST either: (a) delegate_workers for items with [worker] next_action,
+(b) resume_manager if you need more analysis,
+(c) report a specific blocker if you genuinely cannot proceed.
+Returning stop_ai again will switch to wait mode requiring human intervention.
+HINTEOF
+          fi
           append_runtime_event "$project" "task_mode_gate_override_stop_ai" \
             "gate_mode=$_gate_mode" \
             "override_count=$_override_count" \
             "max_retries=$_max_retries" \
+            "ready_count=$_ready_count" \
             "stop_reason=${stop_reason:-missing}" \
             "action=continue_instead_of_stop"
           sleep "$_poll_interval"
@@ -15372,6 +15421,7 @@ append_task_source_patrol_seed_if_needed() {
   case "$_tm_mode" in
     auto) _tm_info="task-auto: 自动模式 — 从 scan 中找任务、做任务、收口、循环" ;;
     wait) _tm_info="task-wait: 等待模式 — 不主动找任务，等待用户通过 task-mode set 指令切换" ;;
+    listen) _tm_info="task-listen: 监听模式 — 定期 scan，发现任务后自动切换到 auto" ;;
     id:*) _tm_info="task-id: 指定任务模式 — 仅处理 scan-id=${_tm_mode#id:} 的任务，收口后自动切回 wait" ;;
     *) _tm_info="task-mode: ${_tm_mode:-unknown}" ;;
   esac
@@ -18007,6 +18057,11 @@ BACKLOG_NOTE
     append_manager_hygiene_alert_if_needed
     append_route_only_recovery_if_needed
   fi
+  # ── AUTO-RETRY HINT: inject enrichment hint if present, then clean it up ──
+  if [[ -f "$PROJECT_ROOT/.freely/run/auto-retry-hint.txt" ]]; then
+    cat "$PROJECT_ROOT/.freely/run/auto-retry-hint.txt"
+    rm -f "$PROJECT_ROOT/.freely/run/auto-retry-hint.txt"
+  fi
   # ── MANAGER-ONLY: handoff context (thread history + unconsumed workers) ──
   append_manager_handoff_context_if_needed "$PROJECT_ROOT"
   # ── DYNAMIC: session handoff & continuity (changes each cycle, appended last) ──
@@ -19572,10 +19627,36 @@ ${_msg}" >/dev/null 2>&1 || true
     # (manager + workers) collapsing the bridge in <60s.
     # Workers are launched via post-AI-cycle handler (delegate_workers exit contract).
     exit_if_stop_requested_before_launch
-    # Task-mode wait gate: skip AI launch when manager is in wait mode
+    # Task-mode gate: listen/wait — skip AI launch when manager is in non-auto modes
     if [[ "$(role_hint_for_project "$PROJECT_ROOT")" == "manager" ]]; then
       local _pre_tm
       _pre_tm="$(read_task_mode "$PROJECT_ROOT")"
+      # Listen mode: scan-only polling, no AI
+      if [[ "$_pre_tm" == "listen" ]]; then
+        local _listen_interval _scan_json_path _ready_count
+        _listen_interval="${LISTEN_INTERVAL:-300}"
+        _scan_json_path="$(task_source_scan_json_path_for_project "$PROJECT_ROOT")"
+        # Run scan
+        python3 "$TASK_SOURCE_SCAN_SCRIPT" \
+          --project "$PROJECT_ROOT" --json > "$_scan_json_path" 2>/dev/null || true
+        # Check for ready items
+        _ready_count="$(python3 -c "
+import json
+with open('$_scan_json_path') as f: data=json.load(f)
+items=data if isinstance(data,list) else data.get('items',[])
+ready=sum(1 for i in items if i.get('ready'))
+print(ready)
+" 2>/dev/null || echo 0)"
+        if [[ "$_ready_count" -gt 0 ]]; then
+          write_task_mode "$PROJECT_ROOT" "auto"
+          log_info "listen->auto: scan found $_ready_count ready items"
+          continue
+        fi
+        log_info "listen: scan empty, sleeping ${_listen_interval}s"
+        sleep "$_listen_interval"
+        continue
+      fi
+      # Wait mode: simple sleep poll
       if [[ "$_pre_tm" == "wait" ]]; then
         sleep "${CHECK_INTERVAL:-10}"
         continue
