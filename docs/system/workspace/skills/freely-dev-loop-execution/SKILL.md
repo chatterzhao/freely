@@ -151,5 +151,6 @@ pre-tests.md 是验证计划，不是门禁表单。写真正会执行的测试�
 ## 完成判定
 
 - 当前 dev-loop 产物、测试、issue、milestone、progress 已一致，并已把 evidence 交回外层判断。
+- 开发完成后通过 pr-create-guarded 提 PR，进入门禁合并流程。
 - 若有依赖父分支，已明确后续 restack / promote 要求。
 - terminal completion / cleanup / retirement 仍由 `auto-loop` 判定。

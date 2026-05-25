@@ -90,6 +90,8 @@ Freely doc-loop 的治理框架。每个工作项经历两个 IBM 阶段——B1
 
 **对应 three-loop**：doc-loop 的 IBM 子循环（`three-loop-capability-lifecycle.md` 行 61-78），完成后进入 dev-loop（行 79-105）
 
+**完成后衔接**：B2_IBM 完成后，进入 Dev 实现 → pr-create-guarded（提 PR）→ pr-merge-guarded（门禁合并）→ wt-close（收口）
+
 ## B1_IBM 与 B2_IBM
 
 | | B1_IBM | B2_IBM |
