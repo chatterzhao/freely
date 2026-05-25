@@ -83,6 +83,8 @@ Freely 运行时环境中 PATH 已包含 `freely` 及项目脚本目录：
 | `issue-sync batch` | 批量同步平台 issue | scan 有 platform_open/platform_close/platform_create |
 | `issue-sync create <id>` | 推送单个 raw issue 到平台 | local_only 项 |
 | `wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>` | 创建工位 | 需要工位执行代码修改时 |
+| `pr-create-guarded` | 创建 PR（pull develop→冲突处理→dry-run gate→push→gh pr create） | dev 完成后 |
+| `pr-merge-guarded develop <pr-branch>` | 门禁合并（PR gate→promotion gate→merge→develop-push） | 合并准备就绪时 |
 | `freely daemon stop --project <path>` | 停止运行时 | 操作前需要停 daemon 时 |
 
 ### scan 刷新规则

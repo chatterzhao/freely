@@ -11,7 +11,7 @@
 | intent_kind | 含义 | 必须调用的 skill |
 |-------------|------|-----------------|
 | `edit` | 代码/文档修改 | `skill:freely-dev-loop-execution` |
-| `merge` | 合并到 develop | `skill:freely-branch-management`（含 pr-merge-guarded） |
+| `merge` | 合并到 develop | `skill:freely-branch-management`（含 pr-create-guarded / pr-merge-guarded） |
 | `closeout` | 批量收口关闭 | `skill:freely-worktree-maintenance-governance`（含 wt-close） |
 | `sync` | 平台同步 | `./bin/issue-sync`（直接用工具） |
 | `cleanup` | 清理过期资源 | `skill:freely-worktree-hygiene-supervision` |
