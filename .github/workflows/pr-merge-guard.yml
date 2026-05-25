@@ -1,16 +1,16 @@
 # CI guard: block GitHub Merge button and enforce the correct merge workflow.
 # This workflow ensures PRs targeting develop are merged only through
-# the merge-guarded script, not via the GitHub web UI or API directly.
+# the pr-merge-guarded script, not via the GitHub web UI or API directly.
 #
 # How to merge correctly:
 #   1. Get at least one approval review on this PR.
-#   2. Run merge-guarded locally or via the CI runner:
+#   2. Run pr-merge-guarded locally or via the CI runner:
 #       cd /path/to/repo
-#       docs/system/workspace/scripts/worktree/merge-guarded develop <source-branch>
+#       docs/system/workspace/scripts/worktree/pr-merge-guarded develop <source-branch>
 #
 # For raw/fix branches:
 #   The fix/dev workflow must go through test-pre-merge first, then
-#   merge-guarded to develop. See docs/milestones.md for detail.
+#   pr-merge-guarded to develop. See docs/milestones.md for detail.
 
 name: PR Merge Guard
 
@@ -54,17 +54,17 @@ jobs:
           echo "  CI GUARD: This PR cannot be merged via GitHub UI"
           echo "================================================================"
           echo ""
-          echo "To merge this PR correctly, use the merge-guarded script:"
+          echo "To merge this PR correctly, use the pr-merge-guarded script:"
           echo ""
           echo "  1. Ensure the PR has at least one approval review."
           echo "  2. Clone/checkout the target repository."
           echo "  3. Run:"
           echo ""
-          echo "     docs/system/workspace/scripts/worktree/merge-guarded \\"
+          echo "     docs/system/workspace/scripts/worktree/pr-merge-guarded \\"
           echo "       develop ${{ github.head_ref }}"
           echo ""
           echo "This guard only blocks the GitHub merge button; the correct"
-          echo "workflow is always available through merge-guarded."
+          echo "workflow is always available through pr-merge-guarded."
           echo ""
           echo "For questions, see docs/milestones.md or docs/system/workspace/"
           echo "================================================================"

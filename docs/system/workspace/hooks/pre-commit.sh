@@ -161,7 +161,7 @@ require_valid_guarded_completion_state() {
   load_guarded_state || {
     cat <<MSG
 [HOOK] Commit blocked: guarded merge completion state is missing or malformed.
-Re-run the merge through ./bin/merge-guarded so hooks can verify a canonical completion handshake.
+Re-run the merge through ./bin/pr-merge-guarded so hooks can verify a canonical completion handshake.
 Policy source: docs/LAWS.md §2D
 MSG
     exit 1
@@ -202,7 +202,7 @@ if freely_wt_is_test_pre_merge_branch "$branch"; then
 [HOOK] Commit blocked: raw merge completion on '$branch' is forbidden.
 Use the guarded completion path instead:
 
-  ./bin/merge-guarded complete "$branch" <source-branch>
+  ./bin/pr-merge-guarded complete "$branch" <source-branch>
 
 Policy source: docs/LAWS.md §2D
 MSG
@@ -240,7 +240,7 @@ case "$branch" in
 [HOOK] Commit blocked: raw merge completion on '$branch' is forbidden.
 Use the guarded completion path instead:
 
-  ./bin/merge-guarded complete "$branch" <source-branch>
+  ./bin/pr-merge-guarded complete "$branch" <source-branch>
 
 Do not finish protected-branch merges with bare 'git commit' or equivalent bypass.
 Policy source: docs/LAWS.md §2D

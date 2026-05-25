@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
-
+echo "[WARN] merge-guarded is deprecated. Use pr-merge-guarded instead." >&2
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
-exec bash "$ROOT_DIR/docs/system/workspace/scripts/worktree/merge-guarded" "$@"
+exec bash "$ROOT_DIR/bin/pr-merge-guarded" "$@"
