@@ -1115,7 +1115,8 @@ def _trace_chain(project: Path, key: str, platform_data: dict) -> dict:
     pids = best_child.get("platform_ids", {})
 
     branches = _find_all_branches_for_key(project, key)
-    has_worktree = len(branches) > 0
+    worktrees = _find_worktrees_for_key(project, key)
+    has_worktree = len(worktrees) > 0  # physical worktree dir, not just branch ref
     # Check merge status of each branch individually — any unmerged branch
     # is a signal worth surfacing, not a false positive to suppress.
     branch_statuses = {}
@@ -1253,6 +1254,30 @@ def _find_all_branches_for_key(project: Path, key: str) -> list[str]:
     except subprocess.CalledProcessError:
         pass
     return branches
+
+
+def _find_worktrees_for_key(project: Path, key: str) -> list[str]:
+    """Find actual git worktree directories containing this key.
+    Unlike _find_all_branches_for_key, this only checks physical worktree
+    directories (git worktree list), not branches that may exist without
+    a worktree directory."""
+    variants = _normalize_key_variants(key)
+    worktrees = []
+    try:
+        raw = subprocess.check_output(
+            ["git", "-C", str(project), "worktree", "list", "--porcelain"],
+            text=True, stderr=subprocess.DEVNULL,
+        )
+        for line in raw.splitlines():
+            if line.startswith("branch refs/heads/"):
+                branch = line.replace("branch refs/heads/", "").strip()
+                for v in variants:
+                    if v in branch:
+                        worktrees.append(branch)
+                        break
+    except subprocess.CalledProcessError:
+        pass
+    return worktrees
 
 
 def _parse_h3_sections(path: Path) -> list[dict]:
@@ -1417,17 +1442,28 @@ def scan_chain_trace(project: Path, platform_data: dict, raw_key_filter: str = "
         trace = _trace_chain(project, key, platform_data)
         if trace["complete"]:
             continue  # fully closed — silent
+        # Detect actual worktree existence for this key
+        wt_branches = _find_worktrees_for_key(project, key)
+        has_actual_wt = len(wt_branches) > 0
         # Collect file paths from station data for quick location
         paths = _collect_paths(key, trace["stations"], project)
         # Check for unconsumed comments targeting this issue
         pending = _pending_comments_for_key(project, key)
+        # Pick worktree-aware next_action template
+        current_station = trace["current_station"]
+        wt_suffixed_stages = {"b1_dir", "b1_brainstorm", "dev_worktree"}
+        if current_station in wt_suffixed_stages and not has_actual_wt:
+            wt_key = current_station + "_no_wt"
+            next_action = CHAIN_ACTIONS.get(wt_key, "").replace("{key}", key) if wt_key in CHAIN_ACTIONS else ""
+        else:
+            next_action = _derive_chain_action(current_station, trace["next_station"], trace["blockers"], key)
         results.append({
             "key": key,
-            "stage": trace["current_station"],
+            "stage": current_station,
             "next_station": trace["next_station"],
             "blockers": trace["blockers"],
-            "ready": trace["current_station"] not in ("raw_created", "b1_dir", "b1_brainstorm", "b1_candidate", "candidate_decision"),
-            "next_action": _derive_chain_action(trace["current_station"], trace["next_station"], trace["blockers"]),
+            "ready": current_station not in ("raw_created", "b1_dir", "b1_brainstorm", "b1_candidate", "candidate_decision"),
+            "next_action": next_action,
             "stations": {k: v for k, v in trace["stations"].items() if v.get("reached")},
             "paths": paths,
             "pending_comments": pending,
@@ -1438,16 +1474,19 @@ def scan_chain_trace(project: Path, platform_data: dict, raw_key_filter: str = "
 CHAIN_ACTIONS = {
     "raw_created": "[manager] wt-create --raw-key {key} --source platform --skill freely-fix-execution --slug b1\n[worker] skill:freely-doc-B1_IBM-execution → brainstorms.md → candidates.md",
     "b1_dir": "[worker] skill:freely-doc-B1_IBM-execution → 工位已存在，写入 brainstorms.md",
-    "b1_brainstorm": "[worker] skill:freely-doc-B1_IBM-execution → 产出 candidates.md",
+    "b1_dir_no_wt": "[manager] wt-create --raw-key {key} --source local --skill freely-fix-execution --slug b1\n[worker] skill:freely-doc-B1_IBM-execution → 写入 brainstorms.md",
+    "b1_brainstorm": "[worker] skill:freely-doc-B1_IBM-execution → 工位已存在，产出 candidates.md",
+    "b1_brainstorm_no_wt": "[manager] wt-create --raw-key {key} --source local --skill freely-fix-execution --slug b1\n[worker] skill:freely-doc-B1_IBM-execution → 产出 candidates.md",
     "b1_candidate": "[worker] skill:freely-candidate-acceptance-review → 决策 promote/absorb/drop",
     "candidate_decision": "[manager] wt-create --raw-key {key} --source platform --skill freely-feat-execution --slug impl\n[worker] skill:freely-feat-execution → materialize I-* → dev-loop",
     "i_created": "[manager] wt-create --raw-key {key} --source platform --skill freely-feat-execution --slug impl\n[worker] skill:freely-dev-loop-execution → 推进 phase_state",
     "dev_worktree": "[worker] skill:freely-dev-loop-execution → 工位已存在，推进 phase_state",
+    "dev_worktree_no_wt": "[manager] wt-create --raw-key {key} --source local --skill freely-fix-execution --slug work\n[worker] skill:freely-dev-loop-execution → 推进 phase_state",
     "dev_phase_done": "[worker] skill:freely-dev-loop-execution → issue-sync create → git commit → wt-close",
     "platform_create": "[manager] wt-create --raw-key {key} --source platform --skill freely-fix-execution --slug sync\n[worker] issue-sync create → git commit → wt-close",
     "merged_develop": "[manager] wt-create --raw-key {key} --source platform --skill freely-fix-execution --slug close\n[worker] issue-sync close → wt-close",
-    "platform_close": "[manager] wt-create --raw-key {key} --source platform --skill freely-fix-execution --slug close\n[worker] issue-sync close → git commit → wt-close",
-    "branch_deleted": "[manager] wt-create --raw-key {key} --source platform --skill freely-fix-execution --slug sync\n[worker] issue-sync close → git commit → wt-close",
+    "platform_close": "[manager] freely feedback --repo chatterzhao/freely --title \"Close platform issue: {key}\" --body \"Close the platform issue corresponding to the locally completed issue {key}.\"\n  → 拿到 raw-{key} → wt-create --raw-key {key} --source platform --skill freely-fix-execution --slug close\n[worker] issue-sync close → git commit → wt-close",
+    "branch_deleted": "[manager] freely feedback --repo chatterzhao/freely --title \"Sync close after branch deletion: {key}\" --body \"Sync and close the platform issue for {key} after local branch has been deleted.\"\n  → 拿到 raw-{key} → wt-create --raw-key {key} --source platform --skill freely-fix-execution --slug sync\n[worker] issue-sync close → git commit → wt-close",
 }
 
 
@@ -1482,7 +1521,7 @@ def add_platform_sync_batch(items: list[dict], ts: str) -> list[dict]:
         "ready": True,
         "priority": "P0_highest",
         "incomplete": [],
-        "next_action": f"[manager] wt-create --raw-key {ts} --source platform --skill freely-fix-execution --slug platform-sync\n[worker] issue-sync batch → git commit → wt-close",
+        "next_action": f"[manager] freely feedback --repo chatterzhao/freely --title \"Platform sync batch: sync {pull_count + push_count + reconcile_count} items\" --body \"Batch sync task discovered by scan.\\npull={pull_count} push={push_count} reconcile={reconcile_count}\\nplatforms: github, gitee\"\n  → 拿到 raw-{{real_key}} → wt-create --raw-key {{real_key}} --source platform --skill freely-fix-execution --slug platform-sync\n[worker] issue-sync batch → git commit → wt-close",
         "sync_summary": {
             "total": pull_count + push_count + reconcile_count,
             "pull": pull_count,
@@ -1496,14 +1535,20 @@ def add_platform_sync_batch(items: list[dict], ts: str) -> list[dict]:
     return [batch_item] + remaining
 
 
-def _derive_chain_action(current: str, next_station: str | None, blockers: list[str]) -> str:
+def _derive_chain_action(current: str, next_station: str | None, blockers: list[str], key: str = "") -> str:
+    template = ""
     if current in CHAIN_ACTIONS:
-        return CHAIN_ACTIONS[current]
-    if next_station and next_station in CHAIN_ACTIONS:
-        return CHAIN_ACTIONS[next_station]
-    if blockers:
+        template = CHAIN_ACTIONS[current]
+    elif next_station and next_station in CHAIN_ACTIONS:
+        template = CHAIN_ACTIONS[next_station]
+    elif blockers:
         return f"解决阻塞: {', '.join(blockers)}"
-    return ""
+    else:
+        return ""
+    # Substitute {key} placeholder with actual key value
+    if key and "{key}" in template:
+        template = template.replace("{key}", key)
+    return template
 
 
 def _collect_paths(key: str, stations: dict, project: Path) -> dict:
