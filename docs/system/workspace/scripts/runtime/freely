@@ -13991,6 +13991,11 @@ except: pass
       return 1
       ;;
   esac
+  # Reset auto-mode stop_ai override counter when manager does productive work
+  if [[ "$kind" != "stop_ai" ]]; then
+    rm -f "$project/.freely/run/auto-stop-ai-override-count" 2>/dev/null || true
+  fi
+
   stop_reason="$(_db_exit_contract_field "$project" manager reason)"
   restart_point="$(_db_exit_contract_field "$project" manager restart_point)"
   next_action="$(_db_exit_contract_field "$project" manager next_action)"
@@ -14491,10 +14496,34 @@ manager_runtime_handle_exit_contract_after_ai_cycle() {
       [[ "$_poll_interval" =~ ^[0-9]+$ ]] || _poll_interval=10
       case "$_gate_mode" in
         auto)
+          local _override_count _override_file _max_retries
+          _override_file="$project/.freely/run/auto-stop-ai-override-count"
+          _max_retries=2
+          _override_count=0
+          if [[ -f "$_override_file" ]]; then
+            _override_count=$(cat "$_override_file" 2>/dev/null || echo 0)
+          fi
+          _override_count=$((_override_count + 1))
+          if [[ $_override_count -gt $_max_retries ]]; then
+            write_task_mode "$project" "wait"
+            append_runtime_event "$project" "task_mode_gate_auto_degraded_to_wait" \
+              "gate_mode=auto" \
+              "override_count=$_override_count" \
+              "max_retries=$_max_retries" \
+              "action=switch_to_wait"
+            rm -f "$_override_file"
+            sleep "$_poll_interval"
+            printf 'continue\n'
+            return 0
+          fi
+          printf '%d\n' "$_override_count" > "$_override_file"
           append_runtime_event "$project" "task_mode_gate_override_stop_ai" \
             "gate_mode=$_gate_mode" \
+            "override_count=$_override_count" \
+            "max_retries=$_max_retries" \
             "stop_reason=${stop_reason:-missing}" \
             "action=continue_instead_of_stop"
+          sleep "$_poll_interval"
           printf 'continue\n'
           return 0
           ;;
