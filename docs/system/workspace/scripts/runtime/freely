@@ -12425,23 +12425,14 @@ print(sum(1 for r in rows if r.get('worktree','')=='$_target_worktree'))
 
 ---
 
-在回复末尾输出 ```json5 代码块：
+在回复末尾输出 ```json5 代码块，格式见 docs/system/workspace/agents/worker-agent.md §交接 JSON：
 
 ```json5
 {
-  // exit_kind 只允许三个值，禁止用 completed blocked success partial done complete ok normal noop
-  //   "worker_done"              — 任务已完成
-  //   "worker_blocked"           — 被阻塞，需主管介入
-  //   "worker_handoff_needed"    — 需主管审核或决策
   "exit_kind": "worker_done",
-
-  // worker_done 时填下面两个，不要填 reason/next_action
-  "completion_summary": "...",   // 具体完成了什么
-  "evidence_paths": "...",       // 证据文件绝对路径
-
-  // worker_blocked / worker_handoff_needed 时填下面两个，不要填 completion_summary/evidence_paths
-  "reason": "...",               // 阻塞原因或背景
-  "next_action": "..."           // 建议主管做什么决策
+  "completion_summary": "...",
+  "evidence_paths": "...",
+  "consumed_by": "worker"
 }
 ```
 
@@ -13833,21 +13824,14 @@ python3 docs/system/workspace/scripts/runtime/handoff.py list --db .freely/freel
 python3 docs/system/workspace/scripts/runtime/handoff.py list --db .freely/freely.db --role worker --status completed
 ```
 
-在回复末尾输出 ```json5 代码块：
+在回复末尾输出 ```json5 代码块，格式见 docs/system/workspace/agents/manager-agent.md §交接 JSON：
 
 ```json5
 {
-  // exit_kind 只允许三个值，禁止用 completed done success partial normal idle continue wait
-  //   "delegate_workers"    — 委派 Worker（已创建 prompt 文件）
-  //   "resume_manager"      — 需继续分析（不能停也不能委派）
-  //   "stop_ai"             — 无事可做（无未消费 worker、无 scan backlog、无 dirty。禁止连续）
   "exit_kind": "delegate_workers",
-
-  // 下面三个字段按 exit_kind 选填：
-  "reason": "...",               // delegate/resume/stop 都要
-  "worker_prompts_csv": "...",   // 仅 delegate_workers：prompt 文件绝对路径，逗号分隔
-  "restart_point": "...",        // 仅 resume_manager：pre_brainstorm | IBM | dev | verification | recovery | cleanup
-  "next_action": "..."           // 仅 resume_manager：下一步做什么
+  "reason": "...",
+  "worker_prompts_csv": "...",
+  "consumed_by": "manager"
 }
 ```
 EOF
@@ -13859,28 +13843,14 @@ append_worker_exit_contract_directive_if_needed() {
 
   cat <<'EOF'
 
-在回复末尾输出 ```json5 代码块：
+在回复末尾输出 ```json5 代码块，格式见 docs/system/workspace/agents/worker-agent.md §交接 JSON：
 
 ```json5
 {
-  // exit_kind 只允许四个值，禁止用 completed done success partial resume_manager delegate_workers stop_ai
-  //   "worker_done"              — 任务已完成
-  //   "worker_blocked"           — 被阻塞，需主管介入
-  //   "worker_handoff_needed"    — 需主管审核或决策
-  //   "worker_working"           — 进行中（后台任务在跑/等外部结果），保持 session 继续
   "exit_kind": "worker_done",
-
-  // worker_done 时填下面两个，不要填 reason/next_action
-  "completion_summary": "...",   // 具体完成了什么
-  "evidence_paths": "...",       // 证据文件绝对路径
-
-  // worker_blocked / worker_handoff_needed 时填下面两个，不要填 completion_summary/evidence_paths
-  "reason": "...",               // 阻塞原因或背景
-  "next_action": "..."           // 建议主管做什么决策
-
-  // worker_working 时填下面两个，不要填 completion_summary/evidence_paths
-  "progress": "...",             // 当前进度（如 "issue-sync batch: 310/639"）
-  "next_action": "..."           // 下一步（如 "继续等待 batch 完成"）
+  "completion_summary": "...",
+  "evidence_paths": "...",
+  "consumed_by": "worker"
 }
 ```
 EOF

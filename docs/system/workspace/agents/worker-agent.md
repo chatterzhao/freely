@@ -47,7 +47,13 @@
 
   // worker_blocked / worker_handoff_needed 时填下面两个，不要填 completion_summary/evidence_paths
   "reason": "...",               // 阻塞原因或背景
-  "next_action": "..."           // 建议主管做什么决策
+  "next_action": "...",          // 建议主管做什么决策
+
+  // 谁应该消费这份 handoff：
+  //   "manager"  — Manager 在下一次 patrol 消费
+  //   "worker"   — Worker 领取执行
+  //   "runtime"  — Runtime supervisor 处理
+  "consumed_by": "worker"
 }
 ```
 

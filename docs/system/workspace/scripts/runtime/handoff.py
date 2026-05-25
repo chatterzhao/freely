@@ -634,7 +634,7 @@ def parse_handoff_json(reply_text, context):
         "status": "pending",
         "session_id": context.get("session_id", ""),
         "created_by": "runtime",
-        "consumed_by": "",
+        "consumed_by": ai_fields.get("consumed_by") or context.get("role", "manager"),
         "launched_at": "",
         "last_activity_at": "",
         "completed_at": "",
