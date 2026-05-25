@@ -12,7 +12,7 @@ platform_ids:
     issue_id: '388'
     url: https://github.com/chatterzhao/freely/issues/388
     synced_at: '2026-05-17T04:34:45Z'
-updated_at: '2026-05-20T06:53:56Z'
+updated_at: '2026-05-25T03:26:28Z'
 primary_platform: github
 platform_state: closed
 canonical_issue_path: ''
