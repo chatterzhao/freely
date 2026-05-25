@@ -608,6 +608,12 @@ _create_worktree() {
 
 _require_issue_exists "$fix_branch" || exit 1
 
+# ── Sync local develop with remote ───────────────────────
+echo "=== Syncing local develop with origin ==="
+git fetch origin develop 2>/dev/null && git update-ref refs/heads/develop refs/remotes/origin/develop 2>/dev/null \
+  && echo "  develop updated to $(git rev-parse --short develop)" \
+  || echo "  warning: sync failed, proceeding with local develop"
+
 # ── Create worktree(s) ───────────────────────────────────
 
   if [[ "$using_new" -eq 1 ]]; then

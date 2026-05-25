@@ -4,14 +4,15 @@ set -euo pipefail
 usage() {
   cat <<'USAGE'
 Usage:
-  ./bin/merge-guarded <target-branch> <source-branch>
-  ./bin/merge-guarded complete <target-branch> <source-branch>
+  ./bin/pr-merge-guarded <target-branch> <source-branch> [--dry-run]
+  ./bin/pr-merge-guarded complete <target-branch> <source-branch>
 
 Behavior:
   - non-interactive policy gate before merge
   - blocks invalid merge direction immediately
   - writes protected-branch merge receipts into merge commit messages
   - supports a controlled conflict completion path
+  - --dry-run: run all gates but skip git merge/issue-sync/develop-push
   - gate bypass (--no-verify, etc.) is permanently forbidden
 USAGE
 }
@@ -291,16 +292,25 @@ if len(p) >= 3:
 do_initial_merge() {
   local target="$1"
   local source_branch="$2"
+  local dry_run="${3:-0}"
+
+  # ── Fetch latest target branch ──
+  echo "[MERGE-GUARD] fetching latest $target from origin..."
+  git fetch origin "$target" 2>/dev/null || echo "[MERGE-GUARD] warning: fetch failed, proceeding with local state" >&2
 
   check_branch_context "$target"
   validate_merge_direction "$target" "$source_branch"
   blocked_merge_branch "$target" && fail "blocked_merge: target '$target' is blocked from merge operations"
   blocked_merge_branch "$source_branch" && fail "blocked_merge: source '$source_branch' is blocked from merge operations"
 
-  echo "[MERGE-GUARD] allowed: $source_branch -> $target"
+  if [[ "$dry_run" == "1" ]]; then
+    echo "[MERGE-GUARD] --dry-run: validating gates without actual merge for $source_branch -> $target"
+  else
+    echo "[MERGE-GUARD] allowed: $source_branch -> $target"
+  fi
 
   # ── PR review gate (develop target only) ──────────────────────────────
-  if [[ "$target" == "develop" ]] && command -v gh &>/dev/null; then
+  if [[ "$target" == "develop" && "$dry_run" != "1" ]] && command -v gh &>/dev/null; then
     if [[ -z "${FREELY_SKIP_PR_GATE:-}" ]]; then
       local pr_number
       pr_number="$(gh pr list --head "$source_branch" --state OPEN --json number -q '.[0].number' 2>/dev/null || true)"
@@ -331,10 +341,14 @@ do_initial_merge() {
 
   run_promotion_gate_if_needed "$target" "$source_branch"
 
-  run_promotion_gate_if_needed "$target" "$source_branch"
+  # ── Dry run: skip merge, issue-sync, and develop-push ──
+  if [[ "$dry_run" == "1" ]]; then
+    echo "[MERGE-GUARD] --dry-run complete: all gates passed. (merge/sync/push skipped)"
+    return 0
+  fi
 
   local merge_message
-  merge_message="$(render_merge_message "merge-guarded" "$source_branch")"
+  merge_message="$(render_merge_message "pr-merge-guarded" "$source_branch")"
 
   set +e
   git merge --no-commit --no-ff "$source_branch"
@@ -406,6 +420,18 @@ main() {
     exit 1
   fi
 
+  local dry_run=0
+  local args=()
+  for a in "$@"; do
+    if [[ "$a" == "--dry-run" ]]; then
+      dry_run=1
+    else
+      args+=("$a")
+    fi
+  done
+  set -- "${args[@]}"
+  subcommand="${1:-}"
+
   if [[ "$subcommand" == "complete" ]]; then
     shift
     if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
@@ -423,7 +449,7 @@ main() {
   local target="$subcommand"
   local source_branch="${2:-}"
   [[ -n "$target" && -n "$source_branch" ]] || { usage; exit 1; }
-  do_initial_merge "$target" "$source_branch"
+  do_initial_merge "$target" "$source_branch" "$dry_run"
 }
 
 main "$@"
