@@ -106,7 +106,7 @@ Freely 已经有 manager-first worker scheduling、fleet patrol、hygiene alert�
 - `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-intent-retain`
 - `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-hard-stale-intent-reclaim`
 - `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
-- `bash docs/system/workspace/scripts/tests/test-merge-guarded`
+- `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded`
 - `git diff --check`
 - `./bin/governance-check`
 
@@ -126,7 +126,7 @@ Freely 已经有 manager-first worker scheduling、fleet patrol、hygiene alert�
   - `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-intent-retain`
   - `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-hard-stale-intent-reclaim`
   - `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
-  - `bash docs/system/workspace/scripts/tests/test-merge-guarded`
+  - `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded`
   - `git diff --check`
   - `./bin/governance-check`
 

@@ -1,11 +1,11 @@
 # Candidates
 
-## C-20260506T1400Z-A: merge-guarded fix/* whitelist
+## C-20260506T1400Z-A: pr-merge-guarded fix/* whitelist
 
 - candidate_format_version: v2
-- title: merge-guarded fix/* whitelist
+- title: pr-merge-guarded fix/* whitelist
 - status: needs_research
-- decision_reason: fix-execution skill 产出 fix/* 分支需要合法 merge 路径进入 test-pre-merge-*；merge-guarded 当前只允许 feature/* 和 hotfix/*，fix/* 被阻断
+- decision_reason: fix-execution skill 产出 fix/* 分支需要合法 merge 路径进入 test-pre-merge-*；pr-merge-guarded 当前只允许 feature/* 和 hotfix/*，fix/* 被阻断
 - next_action: 已 materialize 为 I-20260506T1400Z-A，进入 dev-loop 实现
 - revisit_trigger: N/A（已 promote）
 - acceptance_criteria:

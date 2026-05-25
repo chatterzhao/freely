@@ -13,7 +13,7 @@
 - why_now: Freely 自己的主管位就是必须在主环境里验收的真实案例。若不先把这条路由冻结清楚，后续会持续出现“在 protected env 里测出问题，但修复归属与 promote 方式不清”的治理漂移。
 - acceptance_hint:
   - 明确区分 `develop-only completion verification` 与 `test-pre-merge-* batch acceptance`
-  - `merge-guarded` / cleanup gate / patrol gate 至少有一层能可靠阻止 dirty protected env 直接 promote
+  - `pr-merge-guarded` / cleanup gate / patrol gate 至少有一层能可靠阻止 dirty protected env 直接 promote
   - `test-pre-merge-*` 明确是临时预集成验证批次，同时也是 `develop` 的 canonical promote family；不得再把旧 replay-only 模型当现行规则
   - 当前批次进入 `develop` 前，必须有足够 evidence 证明 protected env 没有留下未回流、未归属的实现差异
   - Freely 主管位这类主环境验收场景被明确覆盖，而不是只处理普通 feature 测试

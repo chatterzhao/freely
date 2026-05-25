@@ -19,7 +19,7 @@
 
 - `docs/CONSTITUTION.md`
 - `docs/LAWS.md`
-- `docs/system/workspace/scripts/worktree/merge-guarded`
+- `docs/system/workspace/scripts/worktree/pr-merge-guarded`
 - `docs/system/workspace/hooks/pre-push.sh`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/worktree/worktree-common.sh`
@@ -164,7 +164,7 @@
 - 允许 runtime / cleanup 清晰识别 family
 
 需要单独验证的一点：
-- 现有 `governance-check`、`merge-guarded`、worktree path 派生、hook 正则是否允许 `test-pre-merge/<topic>` 这种 slash 形式；若不允许，则应改为：
+- 现有 `governance-check`、`pr-merge-guarded`、worktree path 派生、hook 正则是否允许 `test-pre-merge/<topic>` 这种 slash 形式；若不允许，则应改为：
   - `test-pre-merge-foo-bar-20260405-1615`
   - rebuild: `test-pre-merge-foo-bar-20260405-1615-r2`
 
@@ -229,7 +229,7 @@
 - 若法律最终升级为“feature 必经自己的 `test-pre-merge` lane”，则没有 active verified batch receipt 的 feature 不得 promote 到 `develop`
 
 适合落点：
-- `./bin/merge-guarded` 的 develop promotion 入口
+- `./bin/pr-merge-guarded` 的 develop promotion 入口
 - `governance-check` 对 merge receipt / issue evidence / verification artifact 的审计
 
 文档不足之处：
@@ -337,7 +337,7 @@
 
 优先 enforcement 落点：
 
-1. `merge-guarded`
+1. `pr-merge-guarded`
 2. `governance-check` / `governance-promotion-gate`
 3. `wt-create` / 后续 batch-create wrapper
 4. runtime / fleet-status 对 stale batch 与 active batch family 的暴露
@@ -351,7 +351,7 @@
    - 冻结 single / multi 的 promote 语义
    - 对齐 `CONSTITUTION` / `LAWS` / branch-management references
 2. issue B: `protected branch gate enforcement for test-pre-merge family`
-   - 调整 `merge-guarded`
+   - 调整 `pr-merge-guarded`
    - 调整相关 hook / `governance-check`
    - 增加 shell regression tests
 3. issue C: `test-pre-merge family lifecycle automation`
@@ -366,7 +366,7 @@
 - 若来源 `develop` 已前进、或 evidence 断裂、或 batch 与当前 target 已不再权威，则该 `test-pre-merge-*` 不能继续被当成有效验证面
 
 适合落点：
-- `merge-guarded` 在 promote 前做 freshness check
+- `pr-merge-guarded` 在 promote 前做 freshness check
 - `governance-check` 做离线审计
 - runtime / `fleet-status` / `live-status` 明确把此类 batch 标成 stale
 
@@ -416,7 +416,7 @@
 
 第一层：轻量 wrapper / gate
 - `test-lane`
-- `merge-guarded`
+- `pr-merge-guarded`
 - 未来的 test-pre-merge create / cleanup helper
 
 第二层：hook
@@ -438,7 +438,7 @@
 若后续决定升级成“feature 必经 test-pre-merge lane”，最稳的推进顺序不是先改 `wt-create` 自动配对，而是：
 
 1. 先在治理上定清是否 mandatory
-2. 再把 `merge-guarded` 变成真正的 promotion gate
+2. 再把 `pr-merge-guarded` 变成真正的 promotion gate
 3. 再补 freshness / stale check
 4. 再补 create / cleanup helper
 5. 最后才决定 `wt-create` 是否默认 eager paired creation
@@ -450,7 +450,7 @@
 1. Freely 是否真的要把“每个 feature 必经独立 test-pre-merge lane”升级为新的全局默认法律
 2. 若答案是要：
    - `wt-create` 是否新增 paired creation 开关
-   - 还是 `merge-guarded` / promote 流程在缺失 active batch 时拒绝继续并提示创建
+   - 还是 `pr-merge-guarded` / promote 流程在缺失 active batch 时拒绝继续并提示创建
 3. batch family 的 canonical naming 与 rebuild suffix 应如何落到 hook / regex / cleanup 规则
 4. `wt-remove` / cleanup 流程是否需要新增“按 feature family 清理 test-pre-merge members”的能力
 

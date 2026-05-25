@@ -4,10 +4,10 @@
 
 ### AT-001 raw develop merge is blocked before downstream gates
 
-- acceptance target: `develop` 上没有 canonical guarded handshake 的 merge commit 会被 `pre-merge-commit` 立即拒绝，并明确提示改用 `./bin/merge-guarded`
+- acceptance target: `develop` 上没有 canonical guarded handshake 的 merge commit 会被 `pre-merge-commit` 立即拒绝，并明确提示改用 `./bin/pr-merge-guarded`
 - testing layer: focused regression
 - target environment: `docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
-- required evidence: `raw merge blocked with merge-guarded guidance`
+- required evidence: `raw merge blocked with pr-merge-guarded guidance`
 - blocker taxonomy: `execution_pending_or_failed`
 
 ### AT-002 guarded handshake still reaches governance materialization gate
@@ -26,11 +26,11 @@
 - required evidence: `duplicate develop promotion ownership is already active`
 - blocker taxonomy: `execution_pending_or_failed`
 
-### AT-004 canonical merge-guarded paths remain valid under real hooks
+### AT-004 canonical pr-merge-guarded paths remain valid under real hooks
 
-- acceptance target: `merge-guarded` 正常初始 merge 与 break-glass completion 继续通过真实 hook
+- acceptance target: `pr-merge-guarded` 正常初始 merge 与 break-glass completion 继续通过真实 hook
 - testing layer: governance
-- target environment: `docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt` plus `docs/system/workspace/scripts/tests/test-merge-guarded-breakglass-hook-completion`
+- target environment: `docs/system/workspace/scripts/tests/test-pr-merge-guarded-hooked-initial-merge-receipt` plus `docs/system/workspace/scripts/tests/test-pr-merge-guarded-breakglass-hook-completion`
 - required evidence: `normal receipt path pass` and `break-glass completion pass`
 - blocker taxonomy: `execution_pending_or_failed`
 
@@ -38,7 +38,7 @@
 
 ### AT-001
 - id: `AT-001`
-- requirement: `Raw develop merge commits without the canonical guarded handshake fail closed and point to ./bin/merge-guarded.`
+- requirement: `Raw develop merge commits without the canonical guarded handshake fail closed and point to ./bin/pr-merge-guarded.`
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
@@ -59,7 +59,7 @@
 
 ### AT-004
 - id: `AT-004`
-- requirement: `Canonical merge-guarded initial merge and break-glass completion still pass under the real hook contract.`
+- requirement: `Canonical pr-merge-guarded initial merge and break-glass completion still pass under the real hook contract.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-pr-merge-guarded-hooked-initial-merge-receipt`

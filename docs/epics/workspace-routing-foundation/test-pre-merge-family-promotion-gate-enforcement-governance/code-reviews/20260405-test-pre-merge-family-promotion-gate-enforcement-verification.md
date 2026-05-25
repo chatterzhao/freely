@@ -16,9 +16,9 @@
 
 ## Commands
 
-1. `bash docs/system/workspace/scripts/tests/test-merge-guarded`
-2. `bash docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt`
-3. `bash docs/system/workspace/scripts/tests/test-merge-guarded-breakglass-hook-completion`
+1. `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded`
+2. `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded-hooked-initial-merge-receipt`
+3. `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded-breakglass-hook-completion`
 4. `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
 5. `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt-backfills`
 6. `./bin/governance-check`
@@ -28,6 +28,6 @@
 
 - decision: `Update the guarded merge source policy and the protected-ancestry receipt audit in the same transaction, with the same effective-date compatibility boundary.`
 - why_this: `The underlying bug was policy drift between what merges were allowed now and what merge history was audited against. Treating them as one owner is the only way to keep protected-branch behavior coherent.`
-- alternatives_considered: `Considered leaving governance-check permissive for compatibility and relying only on merge-guarded going forward. That would allow old-style direct feature merges to remain silently acceptable in later protected ancestry, which defeats the user’s requirement that develop accept only tested premerge batches as the normal path.`
+- alternatives_considered: `Considered leaving governance-check permissive for compatibility and relying only on pr-merge-guarded going forward. That would allow old-style direct feature merges to remain silently acceptable in later protected ancestry, which defeats the user’s requirement that develop accept only tested premerge batches as the normal path.`
 - boundary_non_goals: `This verification does not assert paired worktree creation, stale visualization, or multi-bundle manifest tooling.`
 - residual_risk: `Direct raw git merges that bypass the guarded entrypoint can still create drift until all local workflows consistently use the enforced wrappers and hooks.`

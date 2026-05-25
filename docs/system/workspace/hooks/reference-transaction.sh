@@ -78,7 +78,7 @@ commit_has_canonical_receipt() {
   local body=""
   body="$(git show --no-patch --format=%B "$commit" 2>/dev/null || true)"
   [[ -n "$body" ]] || return 1
-  grep -Eq '^Freely-Merge-Path: (merge-guarded|merge-guarded-complete)$' <<<"$body"
+  grep -Eq '^Freely-Merge-Path: (pr-merge-guarded|pr-merge-guarded-complete)$' <<<"$body"
 }
 
 commit_is_merge_commit() {
@@ -170,7 +170,7 @@ DELETE_BLOCK
   cat <<MSG >&2
 [HOOK] Ref update blocked: protected branch '$branch_name' cannot advance to commit '$new_oid' without a canonical protected-merge receipt.
 Direct fast-forward, reset, and other ref-only updates are not lawful protected-branch merge entrypoints.
-Create a receipt-bearing protected merge commit through ./bin/merge-guarded instead.
+Create a receipt-bearing protected merge commit through ./bin/pr-merge-guarded instead.
 Policy source: docs/CONSTITUTION.md §2, docs/LAWS.md §2
 MSG
   exit 1

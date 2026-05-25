@@ -13,7 +13,7 @@
 ## Summary
 
 - This owner exists because `develop` still allowed a manual raw `git merge` to pass as long as the staged merge content satisfied downstream gates.
-- The repair is to require the canonical `merge-guarded` handshake before `pre-merge-commit` runs governance or promotion checks.
+- The repair is to require the canonical `pr-merge-guarded` handshake before `pre-merge-commit` runs governance or promotion checks.
 - The implementation must keep the existing guarded normal path and guarded break-glass completion path green under real hooks.
 
 ## Current Work
@@ -26,9 +26,9 @@
 ## Verification Evidence
 
 1. `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
-2. `bash docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt`
-3. `bash docs/system/workspace/scripts/tests/test-merge-guarded-breakglass-hook-completion`
-4. `bash docs/system/workspace/scripts/tests/test-merge-guarded`
+2. `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded-hooked-initial-merge-receipt`
+3. `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded-breakglass-hook-completion`
+4. `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded`
 5. `git diff --check`
 6. `./bin/governance-check`
 7. `git log -1 --format=%B HEAD`

@@ -23,7 +23,7 @@ platform_state: closed
 
 ## 背景
 
-当前 merge-guarded 报错输出缺少对 AI 工作流的引导。AI 反复 merge→fail→fix→merge，而不是先 dry-run 定位问题。
+当前 pr-merge-guarded 报错输出缺少对 AI 工作流的引导。AI 反复 merge→fail→fix→merge，而不是先 dry-run 定位问题。
 
 ## 期望行为
 
@@ -39,7 +39,7 @@ merge 失败时应引导 AI 做三步：
 
 ## 改动
 
-merge-guarded 第 292-303 行报错输出改为：
+pr-merge-guarded 第 292-303 行报错输出改为：
 
 ```
 ┌─ Merge blocked ─────────────────────────────────────────┐
@@ -61,7 +61,7 @@ merge-guarded 第 292-303 行报错输出改为：
 
 <具体的 gate 错误>
 
-修复后在 source worktree 重试: cd <worktree> && ./bin/merge-guarded ...
+修复后在 source worktree 重试: cd <worktree> && ./bin/pr-merge-guarded ...
 ```
 - pre_tests_path: docs/epics/merge-error-ibm-guide/verification/pre-tests.md
 - verification_artifact_dir: docs/epics/merge-error-ibm-guide/code-reviews

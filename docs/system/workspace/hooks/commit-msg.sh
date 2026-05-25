@@ -93,11 +93,11 @@ MSG
   }
 
   case "$merge_path" in
-    merge-guarded|merge-guarded-complete) ;;
+    pr-merge-guarded|pr-merge-guarded-complete) ;;
     *)
       cat <<MSG
 [HOOK] Commit blocked: invalid Freely-Merge-Path '$merge_path'.
-Valid: merge-guarded, merge-guarded-complete
+Valid: pr-merge-guarded, pr-merge-guarded-complete
 Policy source: docs/LAWS.md §2D
 MSG
       exit 1

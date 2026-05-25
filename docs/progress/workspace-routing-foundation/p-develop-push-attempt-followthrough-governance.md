@@ -20,7 +20,7 @@ This bounded follow-on turns develop push followthrough from pure visible debt i
 - materialized the new pre-brainstorm, candidate, issue, pre-tests, task, and progress package
 - added `push_blocked` attempt truth and bounded blocked-reason writeback in `freely`
 - added `freely develop-push attempt` and preserved existing defer semantics
-- updated `merge-guarded` to auto-attempt current merge followthrough once after successful `develop` merges
+- updated `pr-merge-guarded` to auto-attempt current merge followthrough once after successful `develop` merges
 - updated fleet/runtime/manager/patrol truth surfaces to distinguish `push_pending` from `push_blocked`
 - added focused regressions for attempt success, blocked writeback, and guarded merge auto-trigger
 

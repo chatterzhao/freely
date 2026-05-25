@@ -7,7 +7,7 @@
 ## Why This
 
 1. 当前冲突点是同一个语义面：谁能 merge 到 `develop`。
-2. `CONSTITUTION` / `LAWS` / `pre-test-merge-flow.md` 和 `merge-guarded` / tests 都在表达同一套 source-branch 规则。
+2. `CONSTITUTION` / `LAWS` / `pre-test-merge-flow.md` 和 `pr-merge-guarded` / tests 都在表达同一套 source-branch 规则。
 3. 分拆成两个 owner 只会产生临时双真相，而不会减少复杂度。
 
 ## Frozen Boundary

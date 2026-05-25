@@ -16,7 +16,7 @@
 
 ## Slice 3: Runtime and verification implementation
 
-- [x] Route protected-branch merge completion through `merge-guarded complete` with receipt trailers and break-glass field validation.
+- [x] Route protected-branch merge completion through `pr-merge-guarded complete` with receipt trailers and break-glass field validation.
 - [x] Block raw protected-branch merge completion in `pre-commit` unless it comes from the guarded completion path.
 - [x] Validate break-glass handshake fields in `pre-merge-commit` before allowing protected-branch completion.
 - [x] Audit protected-branch merge receipts and break-glass ledger entries in `governance-check`.

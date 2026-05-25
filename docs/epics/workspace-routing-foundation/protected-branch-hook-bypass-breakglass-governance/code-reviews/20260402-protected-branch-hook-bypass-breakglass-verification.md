@@ -12,8 +12,8 @@
 
 - `bash docs/system/workspace/scripts/tests/test-pre-commit-hook`
 - `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
-- `bash docs/system/workspace/scripts/tests/test-merge-guarded`
-- `bash docs/system/workspace/scripts/tests/test-merge-guarded-breakglass-hook-completion`
+- `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded`
+- `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded-breakglass-hook-completion`
 - `bash docs/system/workspace/scripts/tests/test-governance-check-candidate-v2`
 - `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
 - `git diff --check`
@@ -21,7 +21,7 @@
 
 ## Results
 
-1. Protected-branch merge completion now has a controlled handshake path; raw `git commit` completion is blocked while `merge-guarded complete ... --break-glass` succeeds only when hooks see the required machine-readable fields.
+1. Protected-branch merge completion now has a controlled handshake path; raw `git commit` completion is blocked while `pr-merge-guarded complete ... --break-glass` succeeds only when hooks see the required machine-readable fields.
 2. Break-glass governance is auditable after the fact: merge commit trailers and the receipt ledger agree on reason, blocked gate, operation scope, follow-on owner, and evidence refs.
 3. The lifecycle contract now explicitly treats break-glass as a narrow exception route inside the existing three-loop model rather than an informal operator escape hatch.
 
@@ -34,7 +34,7 @@
 - `docs/system/workspace/hooks/protected-branch-breakglass-receipts.md`
 - `docs/system/workspace/hooks/pre-commit.sh`
 - `docs/system/workspace/hooks/pre-merge-commit.sh`
-- `docs/system/workspace/scripts/worktree/merge-guarded`
+- `docs/system/workspace/scripts/worktree/pr-merge-guarded`
 - `docs/system/workspace/scripts/quality/governance-check`
 - `docs/system/workspace/three-loop-capability-lifecycle.md`
 
@@ -53,7 +53,7 @@
 - canonical_replay:
   - `bash docs/system/workspace/scripts/tests/test-pre-commit-hook`
   - `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
-  - `bash docs/system/workspace/scripts/tests/test-merge-guarded-breakglass-hook-completion`
-  - `bash docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt`
+  - `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded-breakglass-hook-completion`
+  - `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded-hooked-initial-merge-receipt`
   - `bash docs/system/workspace/scripts/tests/test-availability-watchdog-path-resolution`
   - `./bin/governance-check`

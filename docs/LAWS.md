@@ -303,7 +303,7 @@ flowchart LR
 3. `FREELY_SKIP_IBM_GATE=1` 是唯一合法的门禁豁免机制：仅跳过 IBM governance 文档门禁，保留安全/分支保护门禁。仅限 docs/cleanup/format 等结构上不需要 IBM lifecycle 证据的变更。
 4. `--no-verify`、`git commit --no-verify`、`git merge --no-verify` 或任何等价手动绕过手段永久禁止。
 5. 受控 completion path 不能只靠环境变量自报身份；必须同时留下 hook 可验证的 machine-readable guarded completion state。
-6. `merge-guarded` 是 protected-branch merge receipt 的唯一 canonical 入口。所有 protected-branch merge 必须通过此路径。
+6. `pr-merge-guarded` 是 protected-branch merge receipt 的唯一 canonical 入口。所有 protected-branch merge 必须通过此路径。
 7. `governance-check` 或等价 canonical quality gate 必须能审计当前 protected-branch merge receipt；缺少 receipt 或 receipt 不完整时，不得宣称治理完成。
 8. 下列情形永远不能构成合法 bypass：
    - 赶时间、想先合并再说

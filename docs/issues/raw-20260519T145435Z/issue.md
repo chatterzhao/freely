@@ -22,7 +22,7 @@ author: platform
 channel: github
 session_refs: []
 <<<<<<< HEAD
-dropped_reason: Fix merged directly to develop via merge-guarded. Runtime bug fix
+dropped_reason: Fix merged directly to develop via pr-merge-guarded. Runtime bug fix
   does not warrant full B1→I-* chain.
 =======
 >>>>>>> fix/raw-20260519T145435Z-consumed-by-auto-consume

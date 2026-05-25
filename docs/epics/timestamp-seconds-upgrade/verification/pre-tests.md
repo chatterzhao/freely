@@ -17,7 +17,7 @@
 - blocker taxonomy: execution_pending_or_failed
 - not_applicable_reason: no_executable_boundary_at_this_layer
 - not_applicable_explanation: 门禁假阳性只能通过实际合并验证
-- replacement_evidence: merge-guarded 成功输出
+- replacement_evidence: pr-merge-guarded 成功输出
 ## End-to-End
 - acceptance target: merge passes
 - testing layer: end_to_end
@@ -26,7 +26,7 @@
 - blocker taxonomy: execution_pending_or_failed
 - not_applicable_reason: change_not_touching_this_layer
 - not_applicable_explanation: 正则修改，合并即端到端验证
-- replacement_evidence: merge-guarded 输出
+- replacement_evidence: pr-merge-guarded 输出
 ## Real-Environment
 - real_environment_status: pass
 - real_environment_reason: 正则修改，grep 零遗漏验证通过

@@ -92,7 +92,7 @@
 ┌─ Phase 5: 验证 + 完成 ───────────────────────────────────────────┐
 │                                                                    │
 │  [AI] worker 完成验证: phase_state=in_verification → completed    │
-│  [脚本] merge-guarded hook:                                       │
+│  [脚本] pr-merge-guarded hook:                                       │
 │    issue-sync update I-xxx（更新 phase label）                     │
 │    issue-sync close I-xxx（GitHub + Gitee CLOSED）                │
 │  [脚本] milestones.md 移到 completed_issues                        │

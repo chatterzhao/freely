@@ -67,5 +67,5 @@ Freely already exposes develop push debt as explicit truth, but it still stops s
   - `docs/epics/workspace-routing-foundation/develop-push-attempt-followthrough-governance/pre-tests.md`
   - `docs/epics/workspace-routing-foundation/develop-push-attempt-followthrough-governance/tasks.md`
   - `docs/system/workspace/scripts/runtime/freely`
-  - `docs/system/workspace/scripts/worktree/merge-guarded`
+  - `docs/system/workspace/scripts/worktree/pr-merge-guarded`
   - `docs/system/workspace/hooks/pre-push.sh`

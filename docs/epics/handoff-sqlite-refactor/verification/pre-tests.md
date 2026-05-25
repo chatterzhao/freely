@@ -26,7 +26,7 @@
 - blocker taxonomy: execution_pending_or_failed
 - not_applicable_reason: change_not_touching_this_layer
 - not_applicable_explanation: e2e 需 #264 完成后验证
-- replacement_evidence: merge-guarded 输出
+- replacement_evidence: pr-merge-guarded 输出
 ## Real-Environment
 - real_environment_status: pass
 - real_environment_reason: handoff.py CLI 测试通过

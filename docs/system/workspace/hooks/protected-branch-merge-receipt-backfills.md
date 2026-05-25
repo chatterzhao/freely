@@ -3,7 +3,7 @@
 本文件记录普通 protected-branch merge 缺 canonical trailer 时的事后 backfill 证据。
 
 使用规则：
-- 只记录普通 `merge-guarded` / `merge-guarded-complete` merge commit 的 receipt gap
+- 只记录普通 `pr-merge-guarded` / `pr-merge-guarded-complete` merge commit 的 receipt gap
 - 不记录 break-glass merge；break-glass 仍使用 `protected-branch-breakglass-receipts.md`
 - 只用于“merge 已经发生，历史不可改写，但 canonical trailer 缺失”的例外修复
 - 不能把本 ledger 当成未来正常 merge 缺 trailer 的常规入口
@@ -45,7 +45,7 @@
 
 - target_branch: `test-pre-merge-runtime-lifecycle-followthrough-20260418`
 - source_branch: `feature/runtime-lifecycle-receipt-followthrough-20260418`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260418-1900-A`
 - evidence_refs:
@@ -56,7 +56,7 @@
 
 - target_branch: `test-pre-merge-runtime-lifecycle-followthrough-20260418`
 - source_branch: `feature/runtime-lifecycle-receipt-followthrough-20260418`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260418-1900-A`
 - evidence_refs:
@@ -67,7 +67,7 @@
 
 - target_branch: `test-pre-merge-runtime-lifecycle-followthrough-20260418`
 - source_branch: `feature/runtime-lifecycle-receipt-followthrough-20260418`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260418-1900-A`
 - evidence_refs:
@@ -78,7 +78,7 @@
 
 - target_branch: `test-pre-merge-runtime-lifecycle-followthrough-20260418`
 - source_branch: `feature/runtime-lifecycle-receipt-followthrough-20260418`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260418-1900-A`
 - evidence_refs:
@@ -89,7 +89,7 @@
 
 - target_branch: `test-pre-merge-runtime-lifecycle-20260417`
 - source_branch: `feature/runtime-process-leak-20260417`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260418-1900-A`
 - evidence_refs:
@@ -100,7 +100,7 @@
 
 - target_branch: `test-pre-merge-runtime-lifecycle-20260417`
 - source_branch: `feature/runtime-process-leak-20260417`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260418-1900-A`
 - evidence_refs:
@@ -114,7 +114,7 @@
 - source_branch: `feature/runtime-process-leak-20260417`
 - protected_batch_branch: `feature/runtime-process-leak-20260417`
 - absorbing_protected_merge: `48a4224750bbc4131ea8eb86a6213252417aa7ca`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260417-0445-A`
 - bounded_issue: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
@@ -130,7 +130,7 @@
 - source_branch: `feature/runtime-process-leak-20260417`
 - protected_batch_branch: `feature/runtime-process-leak-20260417`
 - absorbing_protected_merge: `48a4224750bbc4131ea8eb86a6213252417aa7ca`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260417-0445-A`
 - bounded_issue: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
@@ -142,7 +142,7 @@
 
 - target_branch: `test-pre-merge-runtime-lifecycle-20260417`
 - source_branch: `feature/runtime-process-leak-20260417`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260417-0445-A`
 - evidence_refs:
@@ -153,7 +153,7 @@
 
 - target_branch: `test-pre-merge-runtime-lifecycle-20260417`
 - source_branch: `feature/runtime-process-leak-20260417`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260417-0445-A`
 - evidence_refs:
@@ -164,7 +164,7 @@
 
 - target_branch: `test-pre-merge-runtime-lifecycle-20260417`
 - source_branch: `feature/runtime-process-leak-20260417`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260417-0445-A`
 - evidence_refs:
@@ -175,7 +175,7 @@
 
 - target_branch: `test-pre-merge-runtime-lifecycle-20260417`
 - source_branch: `feature/runtime-process-leak-20260417`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260417-0445-A`
 - evidence_refs:
@@ -186,7 +186,7 @@
 
 - target_branch: `test-pre-merge-runtime-lifecycle-20260417`
 - source_branch: `feature/lifecycle-trace-debuggability-20260416`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260417-0445-A`
 - evidence_refs:
@@ -197,7 +197,7 @@
 
 - target_branch: `develop`
 - source_branch: `feature/governance-merge-gate-milestone-status-followthrough-20260404-011904`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260404-0640-A`
 - evidence_refs:
@@ -208,7 +208,7 @@
 
 - target_branch: `develop`
 - source_branch: `feature/governance-1100-closeout-20260404-0648`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260404-0640-A`
 - evidence_refs:
@@ -219,7 +219,7 @@
 
 - target_branch: `develop`
 - source_branch: `feature/protected-branch-merge-receipt-backfill-20260404-0710`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260404-0640-A`
 - evidence_refs:
@@ -230,7 +230,7 @@
 
 - target_branch: `develop`
 - source_branch: `feature/develop-push-governance-blocker-triage-20260404-0745`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260404-0640-A`
 - evidence_refs:
@@ -241,7 +241,7 @@
 
 - target_branch: `develop`
 - source_branch: `feature/develop-push-governance-blocker-triage-20260404-0745`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260404-0640-A`
 - evidence_refs:
@@ -252,7 +252,7 @@
 
 - target_branch: `develop`
 - source_branch: `feature/develop-push-governance-blocker-triage-20260404-0745`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260404-0640-A`
 - evidence_refs:
@@ -263,7 +263,7 @@
 
 - target_branch: `develop`
 - source_branch: `feature/cli-output-style-optimization-20260405-1000`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260405-cli-output-style-A`
 - evidence_refs:
@@ -274,7 +274,7 @@
 
 - target_branch: `develop`
 - source_branch: `feature/cli-output-style-optimization-20260405-1000`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260405-cli-output-style-A`
 - evidence_refs:
@@ -285,7 +285,7 @@
 
 - target_branch: `develop`
 - source_branch: `feature/slot-switch-startup-preflight-governance-20260404-2138`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260404-2148-A`
 - evidence_refs:
@@ -297,7 +297,7 @@
 
 - target_branch: `develop`
 - source_branch: `feature/slot-switch-startup-preflight-closeout-20260404-2335`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260404-2148-A`
 - evidence_refs:
@@ -309,7 +309,7 @@
 
 - target_branch: `develop`
 - source_branch: `feature/worktree-tool-boundary-bootstrap-closeout-20260405-1700`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260404-0640-A`
 - evidence_refs:
@@ -322,7 +322,7 @@
 
 - target_branch: `develop`
 - source_branch: `feature/worktree-tool-boundary-bootstrap-closeout-20260405-1700`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260403-2041-A`
 - evidence_refs:
@@ -333,7 +333,7 @@
 
 - target_branch: `test-pre-merge-20260408-verification-and-develop-push`
 - source_branch: `feature/develop-push-followthrough-escalation-20260408-1200`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260408-1200-A`
 - evidence_refs:
@@ -347,7 +347,7 @@
 - source_branch: `test-pre-merge-20260410-preferred-auth-fix`
 - protected_batch_branch: `test-pre-merge-20260410-preferred-auth-fix`
 - absorbing_protected_merge: `aeca22048b2b63e2a5a3a4318e912dd0f71ee368`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260411-0217-A`
 - bounded_issue: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
@@ -364,7 +364,7 @@
 - source_branch: `test-pre-merge-20260410-preferred-auth-fix`
 - protected_batch_branch: `test-pre-merge-20260410-preferred-auth-fix`
 - absorbing_protected_merge: `aeca22048b2b63e2a5a3a4318e912dd0f71ee368`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260411-0217-A`
 - bounded_issue: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
@@ -381,7 +381,7 @@
 - source_branch: `test-pre-merge-20260410-preferred-auth-fix`
 - protected_batch_branch: `test-pre-merge-20260410-preferred-auth-fix`
 - absorbing_protected_merge: `aeca22048b2b63e2a5a3a4318e912dd0f71ee368`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260411-0217-A`
 - bounded_issue: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
@@ -398,7 +398,7 @@
 - source_branch: `test-pre-merge-20260410-preferred-auth-fix`
 - protected_batch_branch: `test-pre-merge-20260410-preferred-auth-fix`
 - absorbing_protected_merge: `aeca22048b2b63e2a5a3a4318e912dd0f71ee368`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260411-0217-A`
 - bounded_issue: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
@@ -415,7 +415,7 @@
 - source_branch: `test-pre-merge-20260410-preferred-auth-fix`
 - protected_batch_branch: `test-pre-merge-20260410-preferred-auth-fix`
 - absorbing_protected_merge: `aeca22048b2b63e2a5a3a4318e912dd0f71ee368`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260411-0217-A`
 - bounded_issue: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
@@ -432,7 +432,7 @@
 - source_branch: `test-pre-merge-20260410-preferred-auth-fix`
 - protected_batch_branch: `test-pre-merge-20260410-preferred-auth-fix`
 - absorbing_protected_merge: `aeca22048b2b63e2a5a3a4318e912dd0f71ee368`
-- canonical_merge_path: `merge-guarded`
+- canonical_merge_path: `pr-merge-guarded`
 - canonical_bypass_mode: `forbidden`
 - follow_on_owner: `I-20260411-0217-A`
 - bounded_issue: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`

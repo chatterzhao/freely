@@ -28,8 +28,8 @@
 
 1. `bash docs/system/workspace/scripts/tests/test-pre-commit-hook`
 2. `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
-3. `bash docs/system/workspace/scripts/tests/test-merge-guarded`
-4. `bash docs/system/workspace/scripts/tests/test-merge-guarded-breakglass-hook-completion`
+3. `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded`
+4. `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded-breakglass-hook-completion`
 5. `bash docs/system/workspace/scripts/tests/test-governance-check-candidate-v2`
 6. `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
 7. `git diff --check`
@@ -47,9 +47,9 @@
   - `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/code-reviews/20260402-protected-branch-hook-bypass-breakglass-verification.md`
   - `bash docs/system/workspace/scripts/tests/test-pre-commit-hook`
   - `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
-  - `bash docs/system/workspace/scripts/tests/test-merge-guarded`
-  - `bash docs/system/workspace/scripts/tests/test-merge-guarded-breakglass-hook-completion`
-  - `bash docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt`
+  - `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded`
+  - `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded-breakglass-hook-completion`
+  - `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded-hooked-initial-merge-receipt`
   - `bash docs/system/workspace/scripts/tests/test-availability-watchdog-path-resolution`
   - `bash docs/system/workspace/scripts/tests/test-governance-check-candidate-v2`
   - `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`

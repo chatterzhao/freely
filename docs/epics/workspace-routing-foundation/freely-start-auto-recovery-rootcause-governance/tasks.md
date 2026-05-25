@@ -48,7 +48,7 @@
 
 **Owner**: promotion  
 **Scope**: `test-pre-merge-20260414-freely-start-auto-recovery-rootcause`
-**Description**: Assemble the current owner into a disposable test-pre-merge batch via `merge-guarded`.
+**Description**: Assemble the current owner into a disposable test-pre-merge batch via `pr-merge-guarded`.
 **Evidence**: guarded premerge merge commit `ca6ef7a8`.
 **Closeout**: `[x] feature absorbed into current test-pre-merge batch`
 

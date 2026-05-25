@@ -25,7 +25,7 @@ platform_state: closed
 
 ## 问题
 
-执行 `./bin/merge-guarded develop fix/raw-20260521T095313Z-type-based-alias-resolution` 后，合并提交信息为：
+执行 `./bin/pr-merge-guarded develop fix/raw-20260521T095313Z-type-based-alias-resolution` 后，合并提交信息为：
 
 ```
 Merge branch forbidden into develop
@@ -47,4 +47,4 @@ Freely-Source-Branch: forbidden
 
 ## 修复方向
 
-在 `docs/system/workspace/scripts/worktree/merge-guarded` 中定位 `render_merge_message` 调用，确保传入正确的 source branch 名称。
+在 `docs/system/workspace/scripts/worktree/pr-merge-guarded` 中定位 `render_merge_message` 调用，确保传入正确的 source branch 名称。

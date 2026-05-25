@@ -22,4 +22,4 @@ session_refs: []
 platform_state: closed
 ---
 
-Gate dev experience improvements: --range pre-flight, merge-guarded integration, secret detection FP fix.
+Gate dev experience improvements: --range pre-flight, pr-merge-guarded integration, secret detection FP fix.

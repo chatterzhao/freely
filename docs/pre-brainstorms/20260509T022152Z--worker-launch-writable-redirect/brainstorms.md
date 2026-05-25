@@ -62,7 +62,7 @@ daemon 运行 7 小时，17 个 worker prompt，0 个执行成功，20+ 次 rest
 4. git stash pop
 5. 补全 IBM governance artifacts（若缺）
 6. git add + commit
-7. merge-guarded fix→test-pre-merge→develop
+7. pr-merge-guarded fix→test-pre-merge→develop
 ```
 
 **feat-execution 模式**：

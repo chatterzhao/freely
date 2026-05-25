@@ -114,7 +114,7 @@ Freely 开发 Freely 时，默认先问四件事：
 所有代码改动（feature、fix、hotfix）必须走完整流程，develop 禁止直接写入：
 
 ```
-raw issue → wt-create → B1:IBM|B2:IBM → dev(fix|hotfix|feature) → test-pre-merge-* 验证 → merge-guarded → wt-close
+raw issue → wt-create → B1:IBM|B2:IBM → dev(fix|hotfix|feature) → test-pre-merge-* 验证 → pr-merge-guarded → wt-close
 ```
 
 | 步骤 | 操作 | 谁执行 |
@@ -124,7 +124,7 @@ raw issue → wt-create → B1:IBM|B2:IBM → dev(fix|hotfix|feature) → test-p
 | 2. 开工位 | `./bin/wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>` | Manager/开发者 |
 | 3. B1 或 B2 | B1:IBM（预研→candidate→milestone）或 B2:IBM（实现→epic→tasks） | skill 执行 |
 | 4. 开发 | 在 fix/feature 工位提交、测试 | Worker |
-| 5. 合并 | `./bin/merge-guarded develop <feature-branch>` | Worker/Manager |
+| 5. 合并 | `./bin/pr-merge-guarded develop <feature-branch>` | Worker/Manager |
 | 6. 关工位 | `./bin/wt-close <branch>` 清理工位+分支 | Worker/Manager |
 
 - Manager 负责步骤 1-2 和决策，Worker 负责步骤 3-6 执行
@@ -215,7 +215,7 @@ Freely 必须在 Freely 治理规则下开发，不得有项目特定的例外�
 ## 常用工具路径
 
 - `./bin/issue-sync` — 平台 issue 同步（create/close/comment/batch）
-- `./bin/merge-guarded` — 门禁合并
+- `./bin/pr-merge-guarded` — 门禁合并
 - `./bin/governance-check` — 治理门禁检查
 - `./bin/wt-create` — 创建 feature worktree
 - `./bin/freely-package` — 打包版本

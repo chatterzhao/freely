@@ -26,7 +26,7 @@ canonical CLI replay still exposes a narrow but important contract gap:
 
 1. `wt-create --help` currently enters the creation path and can reach Git side effects before failing.
 2. `wt-enter --help` and `wt-add --help` do not expose an explicit sourced-help success path.
-3. `merge-guarded --help` and top-level `freely --help` print usage but still signal error.
+3. `pr-merge-guarded --help` and top-level `freely --help` print usage but still signal error.
 4. `ai switch codex --dry-run --format json` still runs the heavy auto-probe flow, so the output is not a bounded dry-run contract.
 
 Thes

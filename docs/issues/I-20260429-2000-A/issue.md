@@ -30,7 +30,7 @@ Three minimal infrastructure improvements to the gate system.
 
 ## Scope
 
-governance-merge-gate --range, merge-guarded pre-flight, pre-commit FP fix.
+governance-merge-gate --range, pr-merge-guarded pre-flight, pre-commit FP fix.
 
 ## References
 

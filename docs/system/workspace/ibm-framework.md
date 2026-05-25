@@ -192,7 +192,7 @@ chat 插话 / 平台扫描
 | raw issue 创建（wt-create materialize） | `issue-sync create` | wt-create 内部调用 |
 | candidate promoted → I-* | `issue-sync promote` | B1_IBM 收口时脚本调用 |
 | phase_state 变更 | `issue-sync update` | daemon worker 完成状态更新后 |
-| merge 到 develop | `issue-sync close`（关闭已完成的 I-*） | `merge-guarded` post-merge hook |
+| merge 到 develop | `issue-sync close`（关闭已完成的 I-*） | `pr-merge-guarded` post-merge hook |
 | cleanup 完成 | `issue-sync close` | daemon worker 收口 |
 
 ### 平台 issue 格式

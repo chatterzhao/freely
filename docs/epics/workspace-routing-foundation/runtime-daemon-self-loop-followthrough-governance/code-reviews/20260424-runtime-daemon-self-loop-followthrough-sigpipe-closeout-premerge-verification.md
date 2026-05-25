@@ -9,14 +9,14 @@
 
 ## Scope Verdict
 
-- `PASS`: the SIGPIPE closeout repair was replayed through the disposable protected lane with a lawful `./bin/merge-guarded` merge from `feature/runtime-sigpipe-supervisor-closeout-20260424`.
+- `PASS`: the SIGPIPE closeout repair was replayed through the disposable protected lane with a lawful `./bin/pr-merge-guarded` merge from `feature/runtime-sigpipe-supervisor-closeout-20260424`.
 - `PASS`: the same focused regression set that exercises closed-pipe worktree summary, early-awk supervisor discovery, and early-return manager continuity selection passed on the premerge lane as well.
 - `PASS`: this staged review is the required develop-bound evidence for the same-owner guarded promote. It does not claim canonical `develop` acceptance yet; it only proves the protected assembly lane carries the bounded repair and fresh owner evidence together.
 - `PENDING`: guarded merge into canonical `develop` plus a fresh `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely` replay still need to confirm retained cleanup closeout and next-task continuation on the canonical runtime path.
 
 ## Commands
 
-1. `../../freely/bin/merge-guarded test-pre-merge-runtime-sigpipe-supervisor-closeout-20260424 feature/runtime-sigpipe-supervisor-closeout-20260424`
+1. `../../freely/bin/pr-merge-guarded test-pre-merge-runtime-sigpipe-supervisor-closeout-20260424 feature/runtime-sigpipe-supervisor-closeout-20260424`
 2. `bash docs/system/workspace/scripts/tests/test-freely-worktree-summary-tolerates-closed-pipe`
 3. `bash docs/system/workspace/scripts/tests/test-freely-discover-supervisor-pid-sigpipe-guard`
 4. `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-continuity-discovery-tolerates-closed-pipe`

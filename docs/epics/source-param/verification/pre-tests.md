@@ -22,8 +22,8 @@
 - target environment: `develop-bound guarded merge chain`
 - required evidence: `guarded merge receipts`
 - blocker taxonomy: `execution_pending_or_failed`
-1. Merge feature into test-pre-merge via merge-guarded
-2. Merge test-pre-merge into develop via merge-guarded
+1. Merge feature into test-pre-merge via pr-merge-guarded
+2. Merge test-pre-merge into develop via pr-merge-guarded
 ## Real-Environment
 - real_environment_status: `pass`
 - real_environment_reason: `Script change. Merge success is verification.`

@@ -1,4 +1,4 @@
-# Tasks: merge-guarded fix/* whitelist
+# Tasks: pr-merge-guarded fix/* whitelist
 
 ### T-001 validate_merge_direction
 - description: Add fix/* to case pattern

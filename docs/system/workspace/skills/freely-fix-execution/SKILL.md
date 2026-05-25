@@ -15,7 +15,7 @@ description: 快速修复 bug 的特殊高效策略——用 test-pre-merge-* �
 
 **不违背本质**：
 - `test-pre-merge-*` 的保护约束是禁止 add/commit/push（防止未经审查的代码进入共享历史）。fix skill 在上面只产生 dirty state，不 add、不 commit、不 push。这与约束的精神完全一致——保护的是共享历史，不是阻止本地文件修改。
-- 正式提交发生在可写工位（feature/hotfix），合并走 merge-guarded 合规路径。与常规开发的区别仅在于"快速测试在哪做"，提交和合并的合规性完全相同。
+- 正式提交发生在可写工位（feature/hotfix），合并走 pr-merge-guarded 合规路径。与常规开发的区别仅在于"快速测试在哪做"，提交和合并的合规性完全相同。
 
 ## 核心原则
 
@@ -66,7 +66,7 @@ test-pre-merge-* 上的操作:
 | `feature/premerge-*` | ✅ | ✅ | 冲突收敛（格式: `feature/premerge-YYYYMMDDTHHMM[SS]Z--<topic>`） |
 | `hotfix/*` | ✅ | ✅ | 紧急 fix，可直达 develop |
 
-合并路径（来自 merge-guarded）:
+合并路径（来自 pr-merge-guarded）:
 ```
 fix/*             → develop
 feature/*         → develop
@@ -160,9 +160,9 @@ hotfix/*          → main
   │
   ├─ 运行 ./bin/governance-merge-gate --range "develop..HEAD" 只检查本分支
   ├─ gate 失败：用对应 skill 修复分支自己的错误，预存错误不阻塞
-  ├─ gate 通过：./bin/merge-guarded develop fix/<name>
-  ├─ 紧急: ./bin/merge-guarded develop hotfix/<name>
-  └─ 可选: git checkout main && ./bin/merge-guarded main hotfix/<name>
+  ├─ gate 通过：./bin/pr-merge-guarded develop fix/<name>
+  ├─ 紧急: ./bin/pr-merge-guarded develop hotfix/<name>
+  └─ 可选: git checkout main && ./bin/pr-merge-guarded main hotfix/<name>
 
 阶段 5 — 收尾
   │
@@ -183,7 +183,7 @@ hotfix/*          → main
 - **原 feature 还在就直接在上面修**，不新建工位。
 - **治理后置**，验证通过再写。
 - **根因深挖**，不修表面症状。
-- **不跳过门禁**，用 merge-guarded。
+- **不跳过门禁**，用 pr-merge-guarded。
 
 ## 门禁常见坑速查
 

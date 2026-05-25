@@ -50,7 +50,7 @@ Freely 已经正式允许某些 issue 声明 `post-merge acceptance`，并且刚
 - 若通过 helper 进入 add 流程，会阻止 `main` / `develop` / `test-pre-merge-*`
 - 但这不是 Git 原生 hook，只是“走规范入口时的保护”
 
-3. `docs/system/workspace/scripts/worktree/merge-guarded`
+3. `docs/system/workspace/scripts/worktree/pr-merge-guarded`
 - 当前 canonical 方向已经收紧为：
   - `feature/* -> test-pre-merge-*`
   - `test-pre-merge-* -> develop`
@@ -120,8 +120,8 @@ Freely 已经正式允许某些 issue 声明 `post-merge acceptance`，并且刚
 
 ## 更可能的落点
 
-- `docs/system/workspace/scripts/worktree/merge-guarded`
-- `docs/system/workspace/scripts/tests/test-merge-guarded`
+- `docs/system/workspace/scripts/worktree/pr-merge-guarded`
+- `docs/system/workspace/scripts/tests/test-pr-merge-guarded`
 - `docs/system/workspace/hooks/pre-commit.sh`
 - `docs/system/workspace/scripts/worktree/wt-add`
 - `docs/system/workspace/skills/branch-management/references/pre-test-merge-flow.md`

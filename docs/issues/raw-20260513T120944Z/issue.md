@@ -50,7 +50,7 @@ Currently there are three parallel gate bypass mechanisms, creating confusion an
 
 | Mechanism | Legitimate? | Reality |
 |-----------|------------|---------|
-| `FREELY_SKIP_IBM_GATE=1` | ✅ Designed correctly | Skips IBM doc gate only, keeps all other gates, requires merge-guarded |
+| `FREELY_SKIP_IBM_GATE=1` | ✅ Designed correctly | Skips IBM doc gate only, keeps all other gates, requires pr-merge-guarded |
 | break-glass (`verified_false_negative`/`tooling_unavailable`) | ❌ De facto illegitimate | Used as label to bypass gates without fixing root cause. Gate false positives should be fixed, not bypassed |
 | `--no-verify` | ❌ Always illegal | CONSTITUTION/LAWS/AGENTS all forbid it, yet `pre-commit.sh:92` actively suggests it |
 
@@ -62,8 +62,8 @@ Unify to a single bypass: `FREELY_SKIP_IBM_GATE=1`. Remove break-glass entirely.
 
 - `docs/system/workspace/hooks/pre-merge-commit.sh`: delete break-glass env var reads (lines 49-53) + break-glass validation block (lines 118-176)
 - `docs/system/workspace/hooks/commit-msg.sh`: delete `Freely-Break-Glass-Reason`, `Freely-Blocked-Gate`, `Freely-Operation-Scope`, `Freely-Evidence-Ref`, `Freely-Follow-On-Issue` trailer validation (lines 135-213)
-- `docs/system/workspace/hooks/reference-transaction.sh`: remove `merge-guarded-break-glass` pattern
-- `docs/system/workspace/scripts/worktree/merge-guarded`: remove `--break-glass` flag, break-glass validation, break-glass receipt trailers
+- `docs/system/workspace/hooks/reference-transaction.sh`: remove `pr-merge-guarded-break-glass` pattern
+- `docs/system/workspace/scripts/worktree/pr-merge-guarded`: remove `--break-glass` flag, break-glass validation, break-glass receipt trailers
 - `docs/system/workspace/scripts/quality/governance-check`: remove break-glass audit functions
 - `docs/system/workspace/hooks/protected-branch-breakglass-receipts.md`: delete entire file
 - `docs/LAWS.md` §2D: remove break-glass whitelist, receipt fields, follow-on duty
@@ -74,7 +74,7 @@ Unify to a single bypass: `FREELY_SKIP_IBM_GATE=1`. Remove break-glass entirely.
 
 ### Fix (--no-verify elimination)
 
-- `docs/system/workspace/hooks/pre-commit.sh:92`: replace `git commit --no-verify` with guidance to use `FREELY_SKIP_IBM_GATE=1` through merge-guarded
+- `docs/system/workspace/hooks/pre-commit.sh:92`: replace `git commit --no-verify` with guidance to use `FREELY_SKIP_IBM_GATE=1` through pr-merge-guarded
 - `docs/system/workspace/hooks/README.md`: update --no-verify references
 - `docs/system/workspace/AGENTS.md.example`: clarify --no-verify permanently forbidden
 
@@ -97,7 +97,7 @@ Unify to a single bypass: `FREELY_SKIP_IBM_GATE=1`. Remove break-glass entirely.
 2. `docs/system/workspace/hooks/pre-merge-commit.sh` — remove break-glass
 3. `docs/system/workspace/hooks/commit-msg.sh` — remove break-glass trailer validation
 4. `docs/system/workspace/hooks/reference-transaction.sh` — remove break-glass pattern
-5. `docs/system/workspace/scripts/worktree/merge-guarded` — remove --break-glass
+5. `docs/system/workspace/scripts/worktree/pr-merge-guarded` — remove --break-glass
 6. `docs/system/workspace/scripts/quality/governance-check` — remove break-glass audit
 
 ### File deletion (1 file)

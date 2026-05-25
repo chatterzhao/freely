@@ -9,8 +9,8 @@
 - residual_risk: `Existing issues lack issue_title frontmatter; _issue_title() fallback chain covers this. Gitee operations untested (token-dependent).`
 
 ## Verification
-- bash -n: `pass` (freely, merge-guarded, issue-sync)
+- bash -n: `pass` (freely, pr-merge-guarded, issue-sync)
 - bin/issue-sync status I-20260426-0000-A: `pass` (reads frontmatter, shows platform_ids)
 - chat --issue raw-* redirect: `pass` (detects absorbed_into, routes to I-*)
-- merge-guarded post-merge sync: `pass` (detects changed issues in merge diff)
+- pr-merge-guarded post-merge sync: `pass` (detects changed issues in merge diff)
 - ISSUES.md deleted: `pass` (no code references, 0 grep hits)

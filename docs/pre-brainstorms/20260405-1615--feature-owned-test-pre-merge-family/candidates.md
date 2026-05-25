@@ -18,7 +18,7 @@
   - 明确 multi bundle 是否允许直接 promote 到 `develop`，以及它与 single-feature lane 的闭环关系
   - 明确 multi bundle 的最小 manifest contract，至少包含 `base_develop_sha`、成员 feature 列表、成员 sha、merge 顺序
   - 明确 stale / rebuild / cleanup 的判定边界，尤其是 single family 与 multi bundle 的区别
-  - 明确哪些内容必须由 `merge-guarded` / hook / `governance-check` / runtime status machine-enforce，不能只留在文档
+  - 明确哪些内容必须由 `pr-merge-guarded` / hook / `governance-check` / runtime status machine-enforce，不能只留在文档
 - promotion_gate:
   - 证明当前问题不是单纯命名或 skill 文案问题，而是 develop promotion model 本身的治理缺口
   - 证明 single-feature promote 与显式 multi bundle promote 的边界足够清晰，不会形成第二种前缀或第二套平行治理
@@ -28,7 +28,7 @@
   - single-feature lane 是否必须在 feature 创建后立刻 eager materialize，还是进入 promote/integration 阶段时 lazy materialize
   - multi bundle 直接 promote 时，成员 feature 是否仍要求已有独立 single-lane receipt，还是 bundle receipt 即构成该轮唯一 promote evidence
   - multi bundle 的 manifest 应落在 merge receipt、artifact file，还是两者都要
-  - stale detection 应先落在 `merge-guarded`，还是先由 runtime/status 暴露再由 gate 阻断
+  - stale detection 应先落在 `pr-merge-guarded`，还是先由 runtime/status 暴露再由 gate 阻断
 - acceptance_reviews:
   - reviewer: `codex-self-review`
     verdict: `supports`

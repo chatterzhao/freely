@@ -30,7 +30,7 @@ if [[ "${FREELY_SKIP_IBM_GATE:-0}" == "1" ]]; then
   load_guarded_state || {
     cat <<MSG
 [HOOK] Merge blocked: canonical guarded merge state is missing or malformed.
-Re-run the merge through ./bin/merge-guarded.
+Re-run the merge through ./bin/pr-merge-guarded.
 Policy source: docs/LAWS.md §2, §2D
 MSG
     exit 1
@@ -50,7 +50,7 @@ MSG
     2. 批量 closeout / 数据迁移 / YAML 规范化（机械操作，不改变行为）
 
   代码修改（含紧急修复）必须走完整流程:
-    wt-create → skill:freely-fix-execution → dev → merge-guarded
+    wt-create → skill:freely-fix-execution → dev → pr-merge-guarded
 
   本次绕过已记录。如非上述 2 种情况，请立即回退并走正常流程。
   文档: docs/LAWS.md §2D
@@ -109,7 +109,7 @@ require_valid_guarded_merge_state() {
   load_guarded_state || {
     cat <<MSG
 [HOOK] Merge blocked: canonical guarded merge state is missing or malformed.
-Raw develop merges are not an allowed entrypoint. Re-run the merge through ./bin/merge-guarded so hooks can verify the canonical handshake.
+Raw develop merges are not an allowed entrypoint. Re-run the merge through ./bin/pr-merge-guarded so hooks can verify the canonical handshake.
 Policy source: docs/LAWS.md §2, §2D
 MSG
     exit 1
@@ -118,7 +118,7 @@ MSG
   if [[ "${FREELY_GUARDED_MERGE_COMPLETION:-0}" != "1" ]]; then
     cat <<MSG
 [HOOK] Merge blocked: canonical guarded merge handshake marker is missing.
-Raw develop merges are not an allowed entrypoint. Re-run the merge through ./bin/merge-guarded.
+Raw develop merges are not an allowed entrypoint. Re-run the merge through ./bin/pr-merge-guarded.
 Policy source: docs/LAWS.md §2, §2D
 MSG
     exit 1

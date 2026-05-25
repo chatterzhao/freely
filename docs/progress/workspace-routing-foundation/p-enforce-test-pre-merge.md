@@ -16,7 +16,7 @@ Implement test-pre-merge enforcement gate for all develop-bound merges. Hotfix p
 
 ## Current Status
 
-- merge-guarded gate script updated to require test-pre-merge verification
+- pr-merge-guarded gate script updated to require test-pre-merge verification
 - governance-merge-gate updated for test-pre-merge promotion checks
 - Hotfix exemption path validated
 - Ready for test-pre-merge selfhost verification

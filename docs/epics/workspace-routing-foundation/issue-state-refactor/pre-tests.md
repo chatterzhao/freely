@@ -29,11 +29,11 @@
 - acceptance target: 完整 merge 链路 feature→test-pre-merge→develop gate 全部通过
 - testing layer: end_to_end
 - target environment: test-pre-merge worktree
-- required evidence: merge-guarded gate passed
+- required evidence: pr-merge-guarded gate passed
 - blocker taxonomy: definition_missing
 - not_applicable_reason: no_executable_boundary_at_this_layer
 - not_applicable_explanation: 端到端验证面是 gate 链路本身
-- replacement_evidence: merge-guarded 执行日志
+- replacement_evidence: pr-merge-guarded 执行日志
 
 ## Real-Environment
 

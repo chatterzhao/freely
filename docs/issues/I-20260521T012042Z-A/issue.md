@@ -12,7 +12,7 @@
 
 - feature branch: `feature/raw-20260521T012042Z-stale-pid-keepalive`
 - implementation commit: `36e1b480`
-- merged to develop: pending (merge-guarded)
+- merged to develop: pending (pr-merge-guarded)
 
 ## Deliverables
 

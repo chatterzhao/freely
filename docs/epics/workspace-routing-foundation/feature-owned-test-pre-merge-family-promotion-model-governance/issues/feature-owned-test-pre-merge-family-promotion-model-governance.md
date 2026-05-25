@@ -34,7 +34,7 @@
 这已经不只是命名或流程提示问题，而是 develop promotion model 本身没有冻结：
 
 - 如果 `feature/*` 仍能直接进 `develop`，就始终存在“忘记先过 develop-like 预集成 lane”的制度逃逸面。
-- 如果多个 feature 要并行做集成验证，又没有统一的 single-feature / multi-bundle 语义，就会让 `merge-guarded`、hook、`governance-check`、runtime/status 在不同地方各自发明自己的模型。
+- 如果多个 feature 要并行做集成验证，又没有统一的 single-feature / multi-bundle 语义，就会让 `pr-merge-guarded`、hook、`governance-check`、runtime/status 在不同地方各自发明自己的模型。
 - 如果在 owner issue 之前就直接改 `CONSTITUTION` / `LAWS` / gate 实现，后续很容易出现“脚本已经固化，治理模型却还没定”的反向耦合。
 
 因此这条 owner 的职责是先冻结 promote model，再把 gate enforcement、lifecycle automation、tooling UX 留给后续 issue。
@@ -57,7 +57,7 @@
 
 ## Non-Goals
 
-1. 不在本 owner 内直接修改 `CONSTITUTION`、`LAWS`、`merge-guarded`、hook 或 `governance-check`。
+1. 不在本 owner 内直接修改 `CONSTITUTION`、`LAWS`、`pr-merge-guarded`、hook 或 `governance-check`。
 2. 不在本 owner 内承诺具体 wrapper、命令名、manifest 文件格式或 test runner 接口。
 3. 不在本 owner 内把所有测试 lane 直接做成 executable enforcement。
 4. 不把 `test-pre-merge-*` 升级为长期开发主线或长期真相面。

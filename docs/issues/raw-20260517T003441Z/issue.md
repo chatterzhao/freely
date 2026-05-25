@@ -56,7 +56,7 @@ Hook 的 `case` 分支只识别 `feature/*|hotfix/*|fix/*` 和 `main|develop`，
 
 ## 正确流程
 
-应在 fix 工位中修改 `docs/system/workspace/hooks/pre-push.sh`，经 merge-guarded 合入 develop。本次因需要立即打 tag 而违规直接修改——记录此 issue 作为治理追溯。
+应在 fix 工位中修改 `docs/system/workspace/hooks/pre-push.sh`，经 pr-merge-guarded 合入 develop。本次因需要立即打 tag 而违规直接修改——记录此 issue 作为治理追溯。
 
 ## 技术细节
 

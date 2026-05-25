@@ -172,7 +172,7 @@
 
 ## 2026-04-21 09:25 PDT Develop Push Followthrough Tracking Refresh Verification
 
-- `FAIL`: canonical `develop` self-host replay showed `merge-guarded` had already pushed successfully, but local branch truth still reported `develop...origin/develop [ahead 73]`; manager therefore kept surfacing `develop_push_followthrough_state=push_pending` and never cleared that gating fact before cleanup sequencing.
+- `FAIL`: canonical `develop` self-host replay showed `pr-merge-guarded` had already pushed successfully, but local branch truth still reported `develop...origin/develop [ahead 73]`; manager therefore kept surfacing `develop_push_followthrough_state=push_pending` and never cleared that gating fact before cleanup sequencing.
 - `PASS`: `develop-push attempt` now rewrites the local upstream tracking ref to the pushed `HEAD` immediately after a successful push, so later `develop_push_followthrough_snapshot_for_project()` reads `clean` instead of replaying stale ahead-count truth.
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-develop-push-attempt`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-live-status-develop-push-pending`
@@ -566,7 +566,7 @@ All commands passed again in the feature worktree during this worker continuatio
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-refreshes-stale-discovery-cache`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-skips-retire-ready-merged-prompt`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-absorbed-merged-dirty-worker`
-- `PASS`: replayed `feature/manager-followthrough-handoff-resume-20260421 -> test-pre-merge-20260421-manager-followthrough-handoff-resume` through `./bin/merge-guarded`; the protected test lane stayed green on the representative same-owner regressions.
+- `PASS`: replayed `feature/manager-followthrough-handoff-resume-20260421 -> test-pre-merge-20260421-manager-followthrough-handoff-resume` through `./bin/pr-merge-guarded`; the protected test lane stayed green on the representative same-owner regressions.
 - `PENDING`: absorb this repair into canonical `develop`, then complete the required self-host daemon acceptance and temporary lane retirement.
 
 ## 2026-04-21 08:31 PDT Manager Launch-State Supersession Verification
@@ -590,7 +590,7 @@ All commands passed again in the feature worktree during this worker continuatio
 
 ## Next Action
 
-1. Replay `feature/manager-exit-contract-expected-worker-guard-20260421 -> test-pre-merge-20260421-manager-exit-contract-expected-worker-guard -> develop` through `./bin/merge-guarded` with this refreshed owner evidence included.
+1. Replay `feature/manager-exit-contract-expected-worker-guard-20260421 -> test-pre-merge-20260421-manager-exit-contract-expected-worker-guard -> develop` through `./bin/pr-merge-guarded` with this refreshed owner evidence included.
 2. On canonical `develop`, run `./bin/freely daemon start` until one task completes to the current-project success standard, its temporary worktree closes lawfully, and the daemon proceeds to the next task.
 3. Retire the temporary feature/test-pre-merge lanes for this stop-guard followthrough after canonical replay succeeds.
 
@@ -722,7 +722,7 @@ All commands passed again in the feature worktree during this worker continuatio
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-discover-supervisor-pid-sigpipe-guard`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-continuity-discovery-tolerates-closed-pipe`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-ignores-pre-stop-continuity`
-- `PASS`: replayed the same focused regression set on protected lane `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-test-pre-merge-runtime-sigpipe-supervisor-closeout` after a lawful `./bin/merge-guarded` merge from `feature/runtime-sigpipe-supervisor-closeout-20260424`.
+- `PASS`: replayed the same focused regression set on protected lane `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-test-pre-merge-runtime-sigpipe-supervisor-closeout` after a lawful `./bin/pr-merge-guarded` merge from `feature/runtime-sigpipe-supervisor-closeout-20260424`.
 - `FAIL`: the next guarded merge into canonical `develop` is blocked only by missing same-owner lifecycle materialization in the diff, not by code or test failure.
 - `PENDING`: rerun guarded promote into `develop`, then replay canonical `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely` to confirm retained cleanup closeout is consumed without another SIGPIPE stall and runtime continues to the next task source.
 

@@ -86,7 +86,7 @@
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
 - task_refs: `Replay the daemon-focused verification batch on a disposable test-pre-merge branch created from develop, and use that replay to prove guarded promotion adequacy for the explicit daemon control plane.`
-- case_design: `Merge the feature lane into a disposable test-pre-merge batch through merge-guarded, rerun the foreground and daemon regressions plus governance-check there, and use the resulting verification artifact to prove the develop-bound lane/gate pair is explicitly covered.`
+- case_design: `Merge the feature lane into a disposable test-pre-merge batch through pr-merge-guarded, rerun the foreground and daemon regressions plus governance-check there, and use the resulting verification artifact to prove the develop-bound lane/gate pair is explicitly covered.`
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-closeout-verification.md`

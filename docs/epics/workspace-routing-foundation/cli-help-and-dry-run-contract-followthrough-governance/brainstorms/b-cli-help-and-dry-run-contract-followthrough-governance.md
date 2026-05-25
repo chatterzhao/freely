@@ -4,7 +4,7 @@
 
 This owner only handles the remaining command-surface contract gaps from the canonical CLI replay:
 
-1. explicit `--help` behavior for `wt-create`, `wt-enter`, `wt-add`, `merge-guarded`, and top-level `freely`
+1. explicit `--help` behavior for `wt-create`, `wt-enter`, `wt-add`, `pr-merge-guarded`, and top-level `freely`
 2. a bounded dry-run result for `ai switch codex --dry-run --format json`
 
 ## Why This Is A Separate Lifecycle

@@ -16,6 +16,6 @@ updated_at: '2026-05-17T04:48:25Z'
 primary_platform: github
 created_at: '2026-05-17T04:48:25Z'
 ---
-# I-20260508T232413Z-A: merge-guarded IBM 阶段引导
+# I-20260508T232413Z-A: pr-merge-guarded IBM 阶段引导
 - pre_tests_path: docs/epics/merge-error-ibm-guide/verification/pre-tests.md
 - verification_artifact_dir: docs/epics/merge-error-ibm-guide/code-reviews

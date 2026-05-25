@@ -10,11 +10,11 @@ closeout 之后 root `develop` 又出现一组未归属 staged patch，说明 pr
 
 ## Product Surface
 
-- `docs/system/workspace/scripts/worktree/merge-guarded`
+- `docs/system/workspace/scripts/worktree/pr-merge-guarded`
 - `docs/system/workspace/hooks/pre-merge-commit.sh`
 - `docs/system/workspace/scripts/quality/governance-check`
 - `docs/system/workspace/scripts/quality/governance-merge-gate`
-- `docs/system/workspace/scripts/tests/test-merge-guarded*`
+- `docs/system/workspace/scripts/tests/test-pr-merge-guarded*`
 - `docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
 - `docs/system/workspace/scripts/tests/test-governance-merge-gate`
 
@@ -35,7 +35,7 @@ closeout 之后 root `develop` 又出现一组未归属 staged patch，说明 pr
 ## Context Pack
 
 - canonical `develop` 当前已经有 guarded completion 与 break-glass receipt contract
-- `test-merge-guarded-hooked-initial-merge-receipt` 证明真实 pre-merge hooks 下，初始 merge 仍能保留 receipt
+- `test-pr-merge-guarded-hooked-initial-merge-receipt` 证明真实 pre-merge hooks 下，初始 merge 仍能保留 receipt
 - `governance-merge-gate --staged` 当前有 staged-view coverage，防止 protected-branch pre-merge 只看 working tree
 - root staged patch 试图回退上面两点，因此 follow-on 必须先冻结 regression boundary
 
@@ -60,7 +60,7 @@ root staged patch 必须先被分类：
 
 ### Completion-only truth
 
-- break-glass short-circuit 只能服务 `merge-guarded complete`
+- break-glass short-circuit 只能服务 `pr-merge-guarded complete`
 - initial clean merge 仍必须走 canonical guarded merge path
 - 不允许通过“更直接的 merge message 写法”绕开 current completion semantics
 
@@ -120,7 +120,7 @@ root staged patch 必须先被分类：
 ## Guarded Completion Handshake Truth
 
 - protected-branch merge completion 不能只靠 `FREELY_*` env 自报身份
-- `merge-guarded` 必须在 `git merge --continue` 前写出 git-dir scoped guarded completion state
+- `pr-merge-guarded` 必须在 `git merge --continue` 前写出 git-dir scoped guarded completion state
 - `pre-commit` / `pre-merge-commit` 必须同时验证：
   - `FREELY_GUARDED_MERGE_COMPLETION=1`
   - active `MERGE_HEAD`

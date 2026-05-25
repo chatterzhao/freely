@@ -15,11 +15,11 @@
 - acceptance target: merge chain feature→test-pre-merge 通过
 - testing layer: integration
 - target environment: test-pre-merge worktree
-- required evidence: merge-guarded 输出无错误
+- required evidence: pr-merge-guarded 输出无错误
 - blocker taxonomy: execution_pending_or_failed
 - not_applicable_reason: change_not_touching_this_layer
 - not_applicable_explanation: 纯文档修改，无运行时集成面
-- replacement_evidence: merge-guarded 成功输出
+- replacement_evidence: pr-merge-guarded 成功输出
 
 ## End-to-End
 - acceptance target: feature→test-pre-merge→develop merge passes
@@ -29,7 +29,7 @@
 - blocker taxonomy: execution_pending_or_failed
 - not_applicable_reason: change_not_touching_this_layer
 - not_applicable_explanation: 文档修改，端到端验证即合并链本身
-- replacement_evidence: merge-guarded merge commits
+- replacement_evidence: pr-merge-guarded merge commits
 
 ## Real-Environment
 - real_environment_status: pass

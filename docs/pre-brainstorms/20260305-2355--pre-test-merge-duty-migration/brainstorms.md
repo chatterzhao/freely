@@ -110,7 +110,7 @@
 
 ### T3. Merge Guard 路径测试
 
-- 脚本：`bin/test-merge-guarded`
+- 脚本：`bin/test-pr-merge-guarded`
 - 目标：
   - 允许 `feature/* -> develop`
   - 允许 `hotfix/* -> test-pre-merge-*`
@@ -121,10 +121,10 @@
 
 ## 已执行验证
 
-- `bash -n .githooks/post-checkout .githooks/pre-commit .githooks/pre-push bin/merge-guarded bin/test-pre-push-hook bin/test-worktree-entry-flow bin/test-merge-guarded bin/worktree-common.sh bin/wt-add bin/wt-enter`
+- `bash -n .githooks/post-checkout .githooks/pre-commit .githooks/pre-push bin/pr-merge-guarded bin/test-pre-push-hook bin/test-worktree-entry-flow bin/test-pr-merge-guarded bin/worktree-common.sh bin/wt-add bin/wt-enter`
 - `./bin/test-pre-push-hook`
 - `./bin/test-worktree-entry-flow`
-- `./bin/test-merge-guarded`
+- `./bin/test-pr-merge-guarded`
 
 结果：
 - 全部通过

@@ -28,7 +28,7 @@ canonical CLI replay still exposes a narrow but important contract gap:
 
 1. `wt-create --help` currently enters the creation path and can reach Git side effects before failing.
 2. `wt-enter --help` and `wt-add --help` do not expose an explicit sourced-help success path.
-3. `merge-guarded --help` and top-level `freely --help` print usage but still signal error.
+3. `pr-merge-guarded --help` and top-level `freely --help` print usage but still signal error.
 4. `ai switch codex --dry-run --format json` still runs the heavy auto-probe flow, so the output is not a bounded dry-run contract.
 
 These are CLI-first product behaviors, not operator trivia. If the first-hop command contracts stay ambiguous, later end-to-end validation keeps mixing genuine product failures with avoidable surface noise.
@@ -51,7 +51,7 @@ These are CLI-first product behaviors, not operator trivia. If the first-hop com
 
 1. `./bin/wt-create --help` exits `0`, prints usage, and does not attempt branch/worktree creation.
 2. `source ./bin/wt-enter --help` and `source ./bin/wt-add --help` exit `0` with explicit usage text, while direct execution still rejects them.
-3. `./bin/merge-guarded --help` and `./bin/freely --help` exit `0` with deliberate usage output.
+3. `./bin/pr-merge-guarded --help` and `./bin/freely --help` exit `0` with deliberate usage output.
 4. `./bin/ai --quiet --format json --dry-run switch codex` returns one stable JSON object that reflects saved-slot inventory and does not require long-running probe completion.
 5. Focused regressions and governance checks pass in the dedicated feature worktree.
 
@@ -60,7 +60,7 @@ These are CLI-first product behaviors, not operator trivia. If the first-hop com
 - `./bin/wt-create --help`
 - `bash -lc 'source ./bin/wt-enter --help'`
 - `bash -lc 'source ./bin/wt-add --help'`
-- `./bin/merge-guarded --help`
+- `./bin/pr-merge-guarded --help`
 - `./bin/freely --help`
 - `./bin/ai --quiet --format json --dry-run switch codex`
 - `./bin/governance-check`

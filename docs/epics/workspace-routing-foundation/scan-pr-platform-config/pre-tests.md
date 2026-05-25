@@ -36,10 +36,10 @@
 - acceptance target: `The hotfix merge carries PR scan without regression.`
 - testing layer: `real_environment`
 - target environment: `develop`
-- required evidence: `merge-guarded completion plus governance-check`
+- required evidence: `pr-merge-guarded completion plus governance-check`
 - blocker taxonomy: `protected_environment_only`
 - real_environment_status: `pass`
-- real_environment_reason: `Hotfix merge to develop via merge-guarded; governance-check verifies no regressions.`
+- real_environment_reason: `Hotfix merge to develop via pr-merge-guarded; governance-check verifies no regressions.`
 
 ## Acceptance Items
 
@@ -74,7 +74,7 @@
 - surface_kind: `unit`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
-- case_design: `bash -n check passes as part of merge-guarded workflow.`
+- case_design: `bash -n check passes as part of pr-merge-guarded workflow.`
 
 ### Governance check passes (premerge-integration)
 - id: `scan-pr-governance-premerge`
@@ -85,4 +85,4 @@
 - surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
-- case_design: `Run governance-check in merge-guarded flow to develop.`
+- case_design: `Run governance-check in pr-merge-guarded flow to develop.`

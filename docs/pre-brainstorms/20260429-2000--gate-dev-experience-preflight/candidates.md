@@ -4,7 +4,7 @@
 
 - title: `Gate dev experience: --range pre-flight + secret detection FP fix`
 - status: `promoted`
-- scope: governance-merge-gate --range 文件读取修复、merge-guarded 预检集成、pre-commit 密钥检测误报修复
+- scope: governance-merge-gate --range 文件读取修复、pr-merge-guarded 预检集成、pre-commit 密钥检测误报修复
 - priority: `P1`
 - type: `improvement`
 - milestone: `M-20260306-workspace-routing-foundation`
@@ -15,7 +15,7 @@
   - {tool: ccds, session_id: "20260429-gate-dev-exp", jsonl_path: "unavailable://manual", role: "author"}
 - acceptance_criteria:
   - --range 从 develop 可以读取 feature 分支的新文件
-  - merge-guarded 在 feature→test-pre-merge 时自动预检
+  - pr-merge-guarded 在 feature→test-pre-merge 时自动预检
   - milestones.md 提交不再触发密钥误报
 - promotion_gate: `governance-merge-gate`
 - open_questions: []

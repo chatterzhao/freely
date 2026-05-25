@@ -7,7 +7,7 @@
 1. `docs/CONSTITUTION.md` 仍允许 `feature/*` 直接作为 `develop` 的默认 promote source。
 2. `docs/LAWS.md` 仍把 `test-pre-merge-*` 写成 replay 证据面，而不是 develop 前的必经 promote family。
 3. `pre-test-merge-flow.md` 仍明确写着 shadow batch / not promote unit。
-4. `merge-guarded` 和相关 tests 也仍阻止 `test-pre-merge-* -> develop`，并允许 `feature/* -> develop`。
+4. `pr-merge-guarded` 和相关 tests 也仍阻止 `test-pre-merge-* -> develop`，并允许 `feature/* -> develop`。
 
 这说明下一个 follow-on 不能只改文档，也不能只改脚本。
 
@@ -17,7 +17,7 @@
 
 1. 宪法/法律会先声明新模型，但实际 gate 仍执行旧模型，产生短期双真相。
 2. 反过来若脚本先改，旧文档又会把新的 enforcement 解释成“实现偏差”。
-3. `merge-guarded`、hook、`governance-check` 的判定词典本来就依赖 `CONSTITUTION` / `LAWS` / references 的 merge source 语义，拆开后很容易返工。
+3. `pr-merge-guarded`、hook、`governance-check` 的判定词典本来就依赖 `CONSTITUTION` / `LAWS` / references 的 merge source 语义，拆开后很容易返工。
 
 因此更稳的收敛是：
 
@@ -42,7 +42,7 @@
 2. `docs/LAWS.md`
 3. `docs/system/workspace/skills/branch-management/references/pre-test-merge-flow.md`
 4. 必要的 `SKILL.md` / `AGENTS.md` / lane reference 对齐
-5. `docs/system/workspace/scripts/worktree/merge-guarded`
+5. `docs/system/workspace/scripts/worktree/pr-merge-guarded`
 6. 相关 hook / governance gate / tests 中与 merge source 语义直接耦合的部分
 
 ### 不应包含

@@ -14,7 +14,7 @@
 
 - acceptance target: `develop` accepts `test-pre-merge-*` family and `hotfix/*`, and blocks `feature/*` as the normal path
 - testing layer: focused regression
-- target environment: `merge-guarded` plus related hook/gate tests
+- target environment: `pr-merge-guarded` plus related hook/gate tests
 - required evidence: `source-branch regression`
 - blocker taxonomy: `execution_pending_or_failed`
 
@@ -52,7 +52,7 @@
 - requirement: `The owner targets develop source-branch enforcement around test-pre-merge family promotion semantics.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/system/workspace/scripts/tests/test-merge-guarded`
+- artifact_ref: `docs/system/workspace/scripts/tests/test-pr-merge-guarded`
 
 ### AT-003
 - id: `AT-003`

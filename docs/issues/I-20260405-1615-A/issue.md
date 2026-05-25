@@ -32,7 +32,7 @@ platform_state: closed
 这已经不只是命名或流程提示问题，而是 develop promotion model 本身没有冻结：
 
 - 如果 `feature/*` 仍能直接进 `develop`，就始终存在“忘记先过 develop-like 预集成 lane”的制度逃逸面。
-- 如果多个 feature 要并行做集成验证，又没有统一的 single-feature / multi-bundle 语义，就会让 `merge-guarded`、hook、`governance-check`、runtime/status 在不同地方各自发明自己的模型。
+- 如果多个 feature 要并行做集成验证，又没有统一的 single-feature / multi-bundle 语义，就会让 `pr-merge-guarded`、hook、`governance-check`、runtime/status 在不同地方各自发明自己的模型。
 - 如果在 owner issue 之前就直接
 
 canonical: docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md

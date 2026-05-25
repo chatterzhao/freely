@@ -12,11 +12,11 @@ platform_ids:
     owner: chatterzhao
     repo: freely
 created_at: "2026-05-11T15:13:42Z"
-title: "fix: merge-guarded returns non-zero exit on successful merge"
+title: "fix: pr-merge-guarded returns non-zero exit on successful merge"
 platform_state: closed
 ---
 ## 问题
-merge-guarded 在 merge 成功后仍返回 exit 1。原因：用 git merge --continue 返回值判断成功，
+pr-merge-guarded 在 merge 成功后仍返回 exit 1。原因：用 git merge --continue 返回值判断成功，
 而非检查 MERGE_HEAD 是否已被清理。
 
 ## 修复

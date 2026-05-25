@@ -9,8 +9,8 @@
 
 1. `bash docs/system/workspace/scripts/tests/test-reference-transaction-hook`
 2. `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
-3. `bash docs/system/workspace/scripts/tests/test-merge-guarded-hooked-initial-merge-receipt`
-4. `bash docs/system/workspace/scripts/tests/test-merge-guarded`
+3. `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded-hooked-initial-merge-receipt`
+4. `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded`
 5. `git diff --check`
 6. `./bin/governance-check`
 

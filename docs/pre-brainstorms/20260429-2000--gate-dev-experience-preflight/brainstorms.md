@@ -15,7 +15,7 @@
 1. governance-merge-gate 已有 `--range` 参数但不可用：从 develop 分支运行时，
    无法读取 feature 分支的新文件（`read_repo_text` 只从文件系统读取）。
 
-2. merge-guarded 在 feature→test-pre-merge 时不做事先检查，
+2. pr-merge-guarded 在 feature→test-pre-merge 时不做事先检查，
    等 merge 完成才知道门禁失败。
 
 3. 密钥检测对 `.md` 文件中反引号内的路径名误报。
@@ -23,13 +23,13 @@
 ## 决策
 
 1. governance-merge-gate --range：增加从 git source ref 读取文件的后备路径。
-2. merge-guarded：feature→test-pre-merge 时先跑 --range 预检。
+2. pr-merge-guarded：feature→test-pre-merge 时先跑 --range 预检。
 3. pre-commit：.md 文件中反引号内的匹配跳过。
 
 ## 替代方案
 
 - 完全移除密钥检测的 sk- 模式：风险太大，可能放过真正的密钥。
-- 在 merge-guarded 中做完整的 test-pre-merge 预演：太重量级。
+- 在 pr-merge-guarded 中做完整的 test-pre-merge 预演：太重量级。
 
 ## 结论
 

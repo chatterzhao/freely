@@ -26,7 +26,7 @@
 - blocker taxonomy: execution_pending_or_failed
 - not_applicable_reason: change_not_touching_this_layer
 - not_applicable_explanation: Bug fix, merge is verification
-- replacement_evidence: merge-guarded output
+- replacement_evidence: pr-merge-guarded output
 ## Real-Environment
 - real_environment_status: pass
 - real_environment_reason: Fix enables all subsequent worktree creation
