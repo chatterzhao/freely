@@ -20,7 +20,7 @@ Supported tools:
   codex*      → ~/.codex/skills/
   oc-*        → ~/.config/opencode/skills/  (if project .opencode/ not found)
   opencode    → ~/.config/opencode/skills/  (if project .opencode/ not found)
-  cc*         → (not yet supported)
+  cc*         → ~/.claude/skills/
   iflow*      → (not yet supported)
   kiro-cli*   → (not yet supported)
 
@@ -186,7 +186,7 @@ done
 
 if [[ -n "$unknown_tools" ]]; then
   echo "ERROR: unsupported tools:$unknown_tools" >&2
-  echo "Supported tools: claude*, codex*, oc-*, opencode" >&2
+  echo "Supported tools: claude*, codex*, oc-*, opencode, cc*" >&2
   echo "Unsupported (no mapping): iflow*, kiro-cli*" >&2
   exit 1
 fi

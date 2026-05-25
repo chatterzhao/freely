@@ -1,0 +1,9 @@
+- issue_id: I-20260521T095313Z-A
+- issue_path: docs/issues/I-20260521T095313Z-A/issue.md
+- scope: bin/deploy-skills cc\* usage text and supported tools list
+- change: updated `cc* → (not yet supported)` to `cc* → ~/.claude/skills/` in usage text and error message
+- verification: |
+    - `bash -n bin/deploy-skills` — syntax OK
+    - `./bin/deploy-skills --help` — cc* maps to ~/.claude/skills/ in usage output
+    - `./bin/deploy-skills --dry-run --tools cc-test` — resolved to /Users/zhaoyu/.claude/skills/
+    - `./bin/deploy-skills --dry-run --tools unknown-tool 2>&1` — error includes cc* in supported list
