@@ -124,3 +124,15 @@ scan 是任务来源。以下情况必须手动 `freely task-source-scan`：
   "consumed_by": "manager"
 }
 ```
+
+## scan next_action 行为契约
+
+`next_action` 遵循 `[manager]` / `[worker]` 两级分工契约，与 runtime prompt "行为契约：scan next_action 处理规则" 一致：
+
+| 前缀 | 责任方 | 行为 |
+|------|--------|------|
+| `[manager]` | Manager **自己执行** | 唯一能力：`wt-create`。执行后工位就绪，委派 Worker。 |
+| `[worker]` | Manager **委派 Worker** | 工位已存在时直接委派；刚由 wt-create 创建时委派到新工位。 |
+
+- `platform_sync_batch` 优先级最高，出现在 scan 第一条时必须优先处理。
+- 只有当**所有 ready 条目都没有可执行的 `[manager]` 或 `[worker]`** 时，才允许 `stop_ai`。
