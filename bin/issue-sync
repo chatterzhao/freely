@@ -14,10 +14,10 @@
 #   I-*:  [I-20260426-0000-A] <title>   labels: kind/linked, phase/<state>
 #
 # Lifecycle:
-#   chat → raw-* → B1_IBM → promoted → I-* → B2_IBM → merge → completed
-#              ↓                                    ↓
-#         issue-sync create                   issue-sync update
-#         issue-sync close (after promote)    issue-sync close (after merge)
+#   chat → raw-* → B1_IBM → promoted → I-* → B2_IBM → pr-create-guarded → pr-merge-guarded → completed
+#              ↓                                                                       ↓
+#         issue-sync create                                                      issue-sync update
+#         issue-sync close (after promote)                                       issue-sync close (after merge)
 #
 # Usage:
 #   bin/issue-sync create  <local_id>     Create platform issue (idempotent)
@@ -867,10 +867,9 @@ main() {
         "  1. feedback → create raw issue in docs/issues/" \
         "  2. wt-create --raw-key <key> --skill <freely-fix-execution|freely-feat-execution> --slug <slug>" \
         "  3. Fix/develop in fix/* or feature/* worktree → git commit" \
-        "  4. merge-guarded test-pre-merge-* <fix-or-feature-branch>   (test)" \
-        "  5. If tests fail → fix in fix/feature, merge-guarded test-pre-merge-* again" \
-        "  6. If tests pass → merge-guarded develop <fix-or-feature-branch>   (merge)" \
-        "  7. wt-close <branch>" \
+        "  4. pr-create-guarded → pull develop → 冲突处理 → dry-run gate → push → gh pr create" \
+        "  5. pr-merge-guarded develop <branch> → PR gate → promotion gate → merge" \
+        "  6. wt-close <branch>" \
         "" \
         "Or to invoke from a worktree directly:" \
         "  issue-sync --project /path/to/worktree <action> <local_id>"
