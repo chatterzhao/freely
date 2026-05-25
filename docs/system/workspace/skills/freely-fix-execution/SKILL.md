@@ -183,7 +183,7 @@ hotfix/*          → main
 - **原 feature 还在就直接在上面修**，不新建工位。
 - **治理后置**，验证通过再写。
 - **根因深挖**，不修表面症状。
-- **不跳过门禁**，用 pr-merge-guarded。
+- **不跳过门禁**，用 pr-create-guarded / pr-merge-guarded。
 
 ## 门禁常见坑速查
 

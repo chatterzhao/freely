@@ -104,3 +104,4 @@ phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
 5. 写 code-review（含 Implementation Decision Note）
 6. 更新 milestones.md committed_issues
 7. 若发现边界外新问题：返回 `next_recommended_route=freely-doc-B1_IBM-execution`
+8. B2_IBM 完成后，进入 dev-loop 实现 → pr-create-guarded（提 PR）→ pr-merge-guarded（门禁合并）→ wt-close（收口）
