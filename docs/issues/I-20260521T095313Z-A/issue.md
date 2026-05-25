@@ -10,4 +10,5 @@
     Replace shell-dependent `alias` command with `type` for unified
     alias/function/binary resolution in _resolve_tool_family and
     _apply_tool_alias_settings. Fix Python f-string bug that prevented
-    CLAUDE_CODE_SETTINGS_FILE export. Fix deploy-skills cc* mapping.
+    CLAUDE_CODE_SETTINGS_FILE export. Fix deploy-skills cc* mapping
+    (usage text and supported tools error message).
