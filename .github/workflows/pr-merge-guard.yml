@@ -1,0 +1,72 @@
+# CI guard: block GitHub Merge button and enforce the correct merge workflow.
+# This workflow ensures PRs targeting develop are merged only through
+# the merge-guarded script, not via the GitHub web UI or API directly.
+#
+# How to merge correctly:
+#   1. Get at least one approval review on this PR.
+#   2. Run merge-guarded locally or via the CI runner:
+#       cd /path/to/repo
+#       docs/system/workspace/scripts/worktree/merge-guarded develop <source-branch>
+#
+# For raw/fix branches:
+#   The fix/dev workflow must go through test-pre-merge first, then
+#   merge-guarded to develop. See docs/milestones.md for detail.
+
+name: PR Merge Guard
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check branch name contains raw-key
+        id: check_raw_key
+        run: |
+          BRANCH="${{ github.head_ref }}"
+          if echo "$BRANCH" | grep -qE 'raw-[0-9]{8}T[0-9]{6}Z'; then
+            echo "raw_key_found=true" >> "$GITHUB_OUTPUT"
+            echo "[GUARD] raw-key detected in branch name: $BRANCH"
+          else
+            echo "raw_key_found=false" >> "$GITHUB_OUTPUT"
+            echo "[GUARD] branch name '$BRANCH' does not contain a raw-key pattern"
+          fi
+
+      - name: Validate merge direction
+        id: check_direction
+        run: |
+          HEAD="${{ github.head_ref }}"
+          BASE="${{ github.base_ref }}"
+          if echo "$HEAD" | grep -qE '^fix/' && [ "$BASE" = "develop" ]; then
+            echo "direction_valid=true" >> "$GITHUB_OUTPUT"
+            echo "[GUARD] merge direction valid: $HEAD -> $BASE"
+          else
+            echo "direction_valid=false" >> "$GITHUB_OUTPUT"
+            echo "[GUARD] merge direction: $HEAD -> $BASE (expected fix/* -> develop)"
+          fi
+
+      - name: Block merge and show instructions
+        run: |
+          echo ""
+          echo "================================================================"
+          echo "  CI GUARD: This PR cannot be merged via GitHub UI"
+          echo "================================================================"
+          echo ""
+          echo "To merge this PR correctly, use the merge-guarded script:"
+          echo ""
+          echo "  1. Ensure the PR has at least one approval review."
+          echo "  2. Clone/checkout the target repository."
+          echo "  3. Run:"
+          echo ""
+          echo "     docs/system/workspace/scripts/worktree/merge-guarded \\"
+          echo "       develop ${{ github.head_ref }}"
+          echo ""
+          echo "This guard only blocks the GitHub merge button; the correct"
+          echo "workflow is always available through merge-guarded."
+          echo ""
+          echo "For questions, see docs/milestones.md or docs/system/workspace/"
+          echo "================================================================"
+          echo ""
+          exit 1
