@@ -14,7 +14,7 @@ canonical_issue_path: docs/epics/workspace-routing-foundation/fix-execution-skil
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-03T01:00:00Z'
-updated_at: '2026-05-20T06:57:10Z'
+updated_at: '2026-05-25T03:28:51Z'
 intake_id: 20260503-fix-skill
 author: human
 channel: chat

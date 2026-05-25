@@ -14,7 +14,7 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-04-29T20:40:00Z'
-updated_at: '2026-05-20T06:53:24Z'
+updated_at: '2026-05-25T03:26:06Z'
 intake_id: 20260429-2040-chat-inbox-sqlite
 author: human
 channel: chat
