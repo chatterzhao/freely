@@ -277,9 +277,17 @@ _resolve_type_expansion() {
 
 # _strip_env_prefix: strip leading VAR=val assignments from an alias expansion.
 # Handles VAR=val, VAR="quoted val", VAR='quoted val' patterns.
+# Uses case-based prefix matching instead of bash regex for portability.
 _strip_env_prefix() {
   local val="$1"
-  while [[ "$val" =~ ^[[:space:]]*[a-zA-Z_][a-zA-Z0-9_]*= ]]; do
+  while true; do
+    # Trim leading whitespace
+    val="${val#"${val%%[![:space:]]*}"}"
+    # Check if the next token looks like an env var assignment (VAR=)
+    case "$val" in
+      [a-zA-Z_]*=*) ;;
+      *) break ;;
+    esac
     val="${val#*=}"
     if [[ "$val" == \"* ]]; then
       val="${val#\"}"           # strip opening quote
@@ -362,7 +370,12 @@ _apply_tool_alias_settings() {
   fi
   # Export env var assignments from alias prefix (e.g. OPENCODE_CONFIG=... opencode)
   local remainder="$resolved"
-  while [[ "$remainder" =~ ^[[:space:]]*[a-zA-Z_][a-zA-Z0-9_]*= ]]; do
+  while true; do
+    local _trimmed="${remainder#"${remainder%%[![:space:]]*}"}"
+    case "$_trimmed" in
+      [a-zA-Z_]*=*) ;;
+      *) break ;;
+    esac
     local var_name="${remainder%%=*}"
     var_name="${var_name##* }"  # strip leading spaces
     remainder="${remainder#*=}"
