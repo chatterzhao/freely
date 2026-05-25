@@ -115,6 +115,12 @@ scan 是任务来源。以下情况必须手动 `freely task-source-scan`：
   "worker_prompts_csv": "...",   // 仅 delegate_workers
   "restart_point": "...",        // 仅 resume_manager：pre_brainstorm | IBM | dev | verification | recovery | cleanup
   "next_action": "...",          // 仅 resume_manager / manager_working
-  "progress": "..."              // 仅 manager_working：当前进度
+  "progress": "...",             // 仅 manager_working：当前进度
+
+  // 谁应该消费这份 handoff：
+  //   "manager"  — Manager 在下一次 patrol 消费
+  //   "worker"   — Worker 领取执行
+  //   "runtime"  — Runtime supervisor 处理
+  "consumed_by": "manager"
 }
 ```
