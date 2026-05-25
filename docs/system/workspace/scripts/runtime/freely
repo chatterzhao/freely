@@ -18279,6 +18279,33 @@ cmd_init() {
   register_project_in_registry "$project"
   rm -f "$(session_state_file "$project")" "$(handoff_file "$project")"
   write_workcell_state "$project" "stopped" "down" "down" "initialized"
+  # ── Write project .gitignore with template ignore rule ──
+  local gitignore="$project/.gitignore"
+  if [[ ! -f "$gitignore" || "$force" == "true" ]]; then
+    cat >"$gitignore" <<'EOF'
+templates/*.template
+EOF
+  fi
+
+  # ── Copy project templates to docs/ ──
+  local template_dir="$SELF_ROOT/templates"
+  if [[ -d "$template_dir" ]]; then
+    for tmpl in "$template_dir"/*.md.template; do
+      [[ -f "$tmpl" ]] || continue
+      base_name="${tmpl##*/}"
+      target_name="${base_name%.template}"
+      target_file="$project/docs/$target_name"
+      if [[ -f "$target_file" && "$force" != "true" ]]; then
+        log_info "skip: $target_file already exists (use --force to overwrite)"
+      else
+        cp "$tmpl" "$target_file"
+        project_dir_name="$(basename "$project")"
+        sed -i '' "s/\$(project_name)/$project_dir_name/g" "$target_file"
+        log_info "created: $target_file from template"
+      fi
+    done
+  fi
+
   # Initialize freely.db (chats + sessions tables)
   local freely_db=""$project/.freely/freely.db""
   local chat_inbox_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/chat-inbox.py"
