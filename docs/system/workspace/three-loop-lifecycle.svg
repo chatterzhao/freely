@@ -138,8 +138,9 @@
   <path d="M270,590 C270,615 440,615 440,590" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#loop-arrow)"/>
   <text x="355" y="608" text-anchor="middle" font-size="9" fill="#888">↻ 未 ready → 继续设计</text>
 
-  <!-- doc-loop 返回 auto -->
-  <text x="245" y="660" text-anchor="middle" font-size="10" fill="#16a34a">↓ return to auto-loop dispatch</text>
+  <!-- doc-loop → dispatch → dev-loop 顺序路由 -->
+  <text x="245" y="650" text-anchor="middle" font-size="10" fill="#16a34a">↓ return to auto-loop dispatch</text>
+  <text x="245" y="668" text-anchor="middle" font-size="9" fill="#64748b">dispatch 顺序路由: doc-loop → dev-loop (串行)</text>
 
   <!-- ===== DEV-LOOP 泳道 ===== -->
   <rect x="490" y="440" width="430" height="240" rx="8" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.5"/>
