@@ -68,9 +68,9 @@ test-pre-merge-* 上的操作:
 
 合并路径（来自 pr-merge-guarded）:
 ```
-fix/*             → develop
-feature/*         → develop
-hotfix/*          → develop
+fix/*             → test-pre-merge → pr-create-guarded → pr-merge-guarded
+feature/*         → test-pre-merge → pr-create-guarded → pr-merge-guarded
+hotfix/*          → main + develop (pr-merge-guarded)
 hotfix/*          → main
 ```
 

@@ -152,7 +152,7 @@ Freely 开发 Freely 时，默认先问四件事：
 
 - **原 feature worktree 还在** → 直接在 feature 上改、提交。走 feature → test-pre-merge-* → pr-create-guarded → pr-merge-guarded → develop。
 - **原 feature 已退役（已合并/已删）** → 建 `test-pre-merge-<desc>-<YYYYMMDD>` 私有工位快测（不改不提交不推送，不违背保护约束）。验证通过后 cp 修改到新建的 `feature/*` 或 `hotfix/*` 可写工位，增量提交。
-- **普通 fix** 用 `feature/*` → test-pre-merge-* → develop；**紧急 hotfix** 用 `hotfix/*` → develop。
+- **普通 fix** 用 `feature/*` → test-pre-merge-* → pr-create-guarded → pr-merge-guarded → develop；**紧急 hotfix** 用 `hotfix/*` → develop（hotfix 从 main 创建，可跳过 test-pre-merge）。
 - **补齐治理**：raw issue → candidate → canonical issue → progress → code-review（`## Implementation Decision Note`）→ milestones.md。
 - **原则**：Fix first, govern later。test-pre-merge-* 私有测试不违背保护约束。fix 工位早期创建、增量提交。
 
