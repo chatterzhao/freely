@@ -4,7 +4,7 @@ kind: raw
 phase_state: completed
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 phase_state: completed
-source_candidate: docs/pre-brainstorms/20260506-pr-merge-guarded-fix/candidates.md
+source_candidate: docs/pre-brainstorms/20260506-merge-guarded-fix/candidates.md
 platform_ids:
   github:
     issue_id: '273'
@@ -15,8 +15,8 @@ created_at: 2026-05-06 14:00:00+00:00
 author: zhaoquan
 channel: github
 session_refs: []
-pre_tests_path: docs/epics/pr-merge-guarded-fix-whitelist/verification/pre-tests.md
-verification_artifact_dir: docs/epics/pr-merge-guarded-fix-whitelist/code-reviews
+pre_tests_path: docs/epics/merge-guarded-fix-whitelist/verification/pre-tests.md
+verification_artifact_dir: docs/epics/merge-guarded-fix-whitelist/code-reviews
 updated_at: 2026-05-17T04:47:25Z
 platform_state: open
 ---
@@ -27,5 +27,5 @@ pr-merge-guarded 只接受 feature/* 和 hotfix/* → test-pre-merge-*，fix/* �
 ## 修复
 validate_merge_direction + pre-flight gate 增加 fix/* 支持。
 
-- pre_tests_path: `docs/epics/pr-merge-guarded-fix-whitelist/verification/pre-tests.md`
-- verification_artifact_dir: `docs/epics/pr-merge-guarded-fix-whitelist/code-reviews`
+- pre_tests_path: `docs/epics/merge-guarded-fix-whitelist/verification/pre-tests.md`
+- verification_artifact_dir: `docs/epics/merge-guarded-fix-whitelist/code-reviews`
