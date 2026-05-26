@@ -20,6 +20,12 @@ while read -r local_ref local_sha remote_ref remote_sha; do
   local_branch="${local_ref#refs/heads/}"
   remote_branch="${remote_ref#refs/heads/}"
 
+  # Audit log for FREELY_SKIP usage
+  if [[ -n "${FREELY_SKIP_CREATE_GATE:-}" || -n "${FREELY_SKIP_IBM_GATE:-}" ]]; then
+    mkdir -p .freely/logs
+    echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) SKIP_GATE branch=$local_branch reason=${FREELY_SKIP_CREATE_GATE:-IBM_GATE}" >> .freely/logs/skip-gate.log
+  fi
+
   if [[ "$local_branch" == test-pre-merge-* ]]; then
     cat >&2 <<MSG
 [HOOK] Push blocked: test pre-merge batch '$local_branch' is local-only.
@@ -81,6 +87,15 @@ Each worktree/branch must correspond to an issue (docs/LAWS.md §2).
 Use 'git branch -m' to rename.
 MSG
         exit 1
+      fi
+      # Check if pr-create-gate has passed on this branch
+      if [[ -z "${FREELY_SKIP_CREATE_GATE:-}" ]]; then
+        if [[ ! -f ".freely/run/pr-create-gate-passed" ]]; then
+          echo "[HOOK] WARNING: pr-create-gate has not been run on this branch." >&2
+          echo "  Run pr-create-guarded before pushing:" >&2
+          echo "    ./bin/pr-create-guarded" >&2
+          echo "  To skip (not recommended): export FREELY_SKIP_CREATE_GATE=1" >&2
+        fi
       fi
       if [[ "$remote_branch" == "$local_branch" ]]; then
         continue
