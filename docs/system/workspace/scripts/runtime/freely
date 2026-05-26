@@ -12730,8 +12730,11 @@ _ensure_acp_bridge_running() {
     *)
       local _resolved; _resolved=$(${SHELL:-bash} -ic "alias '$tool_name' 2>/dev/null" 2>/dev/null | sed -n "s/^${tool_name}='\\(.*\\)'$/\\1/p")
       if [[ -n "$_resolved" ]]; then
-        # Extract --settings <path>
+        # Extract config path from alias (Claude: --settings, OpenCode: OPENCODE_CONFIG=)
         local _alias_path; _alias_path=$(echo "$_resolved" | sed -n 's/.*--settings \([^ ]*\).*/\1/p')
+        if [[ -z "$_alias_path" ]]; then
+          _alias_path=$(echo "$_resolved" | sed -n 's/.*OPENCODE_CONFIG="\([^"]*\)".*/\1/p')
+        fi
         _alias_path="${_alias_path/#\~/$HOME}"
         if [[ -n "$_alias_path" && -f "$_alias_path" ]]; then
           while IFS='=' read -r key value; do
@@ -12744,7 +12747,11 @@ try:
         d = json.load(f)
     for k, v in d.get('env', {}).items():
         print(f'{k}={v}')
+    # Claude: permissionMode / permissions.defaultMode
     pm = d.get('permissionMode', '') or d.get('permissions', {}).get('defaultMode', '')
+    # OpenCode: permission field
+    if not pm:
+        pm = d.get('permission', '')
     if pm:
         print(f'CLAUDE_CODE_PERMISSION_MODE={pm}')
 except: pass

@@ -397,7 +397,10 @@ def main():
         # Ensure permission mode matches tool-native config (JSON settings file).
         # The bridge sets this after session/new and session/resume, but
         # this call is defense-in-depth for direct (subprocess) mode.
-        _perm_mode = os.environ.get("CLAUDE_CODE_PERMISSION_MODE", "bypassPermissions")
+        _perm_mode = os.environ.get("CLAUDE_CODE_PERMISSION_MODE", "")
+        if not _perm_mode:
+            print("[run-acp-prompt] WARNING: CLAUDE_CODE_PERMISSION_MODE not set. Check ~/.ai-auth/<tool>/settings.json", file=sys.stderr)
+            _perm_mode = "default"
         try:
             client.request(
                 "session/set_mode",
