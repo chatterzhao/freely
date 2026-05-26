@@ -1,0 +1,192 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 900" width="1400" height="900">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#555"/>
+    </marker>
+    <marker id="arrow-blue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#16a34a"/>
+    </marker>
+    <marker id="loop-arrow" markerWidth="6" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <path d="M0,0 L6,2.5 L0,5 Z" fill="#888"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1400" height="900" fill="#fafbfc"/>
+
+  <!-- 三 loop 标签 -->
+  <text x="20" y="30" font-size="16" font-weight="bold" fill="#1e293b">Freely Three-Loop Capability Lifecycle</text>
+  <text x="20" y="52" font-size="12" fill="#64748b">feedback → wt-create → B1→B2→dev → test-pre-merge → pr-create-guarded → pr-merge-guarded → wt-close</text>
+
+  <!-- ===== AUTO-LOOP 泳道 ===== -->
+  <rect x="10" y="70" width="1380" height="340" rx="8" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
+  <text x="22" y="94" font-size="14" font-weight="bold" fill="#1d4ed8">auto-loop (主管调度)</text>
+  <text x="160" y="94" font-size="11" fill="#64748b">task-mode: auto / wait / listen — driven by scan + handoff</text>
+
+  <!-- === Gate 1: Intake === -->
+  <rect x="30" y="110" width="130" height="80" rx="6" fill="white" stroke="#60a5fa" stroke-width="2"/>
+  <text x="95" y="135" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e40af">intake</text>
+  <text x="95" y="152" text-anchor="middle" font-size="10" fill="#475569">scan items</text>
+  <text x="95" y="166" text-anchor="middle" font-size="10" fill="#475569">chat / platform</text>
+  <text x="95" y="180" text-anchor="middle" font-size="9" fill="#94a3b8">阶段1</text>
+
+  <line x1="160" y1="150" x2="195" y2="150" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- === Gate 2: Routing === -->
+  <rect x="200" y="110" width="130" height="80" rx="6" fill="white" stroke="#60a5fa" stroke-width="2"/>
+  <text x="265" y="135" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e40af">routing</text>
+  <text x="265" y="152" text-anchor="middle" font-size="10" fill="#475569">freely feedback</text>
+  <text x="265" y="166" text-anchor="middle" font-size="10" fill="#475569">wt-create</text>
+  <text x="265" y="180" text-anchor="middle" font-size="9" fill="#94a3b8">阶段2-3</text>
+
+  <line x1="330" y1="150" x2="365" y2="150" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- === Gate 3: Dispatch === -->
+  <rect x="370" y="110" width="150" height="80" rx="6" fill="white" stroke="#60a5fa" stroke-width="2"/>
+  <text x="445" y="135" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e40af">dispatch</text>
+  <text x="445" y="152" text-anchor="middle" font-size="10" fill="#475569">scan next_action</text>
+  <text x="445" y="166" text-anchor="middle" font-size="10" fill="#475569">delegate_workers</text>
+  <text x="445" y="180" text-anchor="middle" font-size="9" fill="#94a3b8">阶段4-6入口</text>
+
+  <!-- Dispatch 分叉 -->
+  <line x1="520" y1="150" x2="560" y2="150" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- === Gate 4: Test Gate === -->
+  <rect x="565" y="110" width="140" height="80" rx="6" fill="white" stroke="#16a34a" stroke-width="2"/>
+  <text x="635" y="135" text-anchor="middle" font-size="12" font-weight="bold" fill="#166534">test gate</text>
+  <text x="635" y="152" text-anchor="middle" font-size="10" fill="#475569">merge→test-</text>
+  <text x="635" y="166" text-anchor="middle" font-size="10" fill="#475569">pre-merge→e2e</text>
+  <text x="635" y="180" text-anchor="middle" font-size="9" fill="#94a3b8">阶段7</text>
+
+  <!-- Test gate inner loop -->
+  <path d="M570,195 C570,225 700,225 700,195" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#loop-arrow)"/>
+  <text x="635" y="218" text-anchor="middle" font-size="9" fill="#888">↻ fail → back to dev-loop</text>
+
+  <line x1="705" y1="150" x2="740" y2="150" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- === Gate 5: PR-Create === -->
+  <rect x="745" y="110" width="140" height="80" rx="6" fill="white" stroke="#2563eb" stroke-width="2"/>
+  <text x="815" y="135" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e40af">pr-create</text>
+  <text x="815" y="152" text-anchor="middle" font-size="10" fill="#475569">pr-create-guarded</text>
+  <text x="815" y="166" text-anchor="middle" font-size="10" fill="#475569">pull→dry-run→push→PR</text>
+  <text x="815" y="180" text-anchor="middle" font-size="9" fill="#94a3b8">阶段8</text>
+
+  <!-- PR-create inner loop -->
+  <path d="M750,195 C750,225 880,225 880,195" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#loop-arrow)"/>
+  <text x="815" y="218" text-anchor="middle" font-size="9" fill="#888">↻ conflict/gate fail → resolve</text>
+
+  <line x1="885" y1="150" x2="920" y2="150" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- === Gate 6: PR Review === -->
+  <rect x="925" y="110" width="120" height="80" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <text x="985" y="135" text-anchor="middle" font-size="12" font-weight="bold" fill="#92400e">PR review</text>
+  <text x="985" y="152" text-anchor="middle" font-size="10" fill="#475569">CI check</text>
+  <text x="985" y="166" text-anchor="middle" font-size="10" fill="#475569">approval</text>
+  <text x="985" y="180" text-anchor="middle" font-size="9" fill="#94a3b8">阶段9 · 外部</text>
+
+  <line x1="1045" y1="150" x2="1080" y2="150" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- === Gate 7: PR-Merge === -->
+  <rect x="1085" y="110" width="140" height="80" rx="6" fill="white" stroke="#2563eb" stroke-width="2"/>
+  <text x="1155" y="135" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e40af">pr-merge</text>
+  <text x="1155" y="152" text-anchor="middle" font-size="10" fill="#475569">pr-merge-guarded</text>
+  <text x="1155" y="166" text-anchor="middle" font-size="10" fill="#475569">PR→promo→merge→push</text>
+  <text x="1155" y="180" text-anchor="middle" font-size="9" fill="#94a3b8">阶段10</text>
+
+  <!-- PR-merge inner loop -->
+  <path d="M1090,195 C1090,225 1220,225 1220,195" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#loop-arrow)"/>
+  <text x="1155" y="218" text-anchor="middle" font-size="9" fill="#888">↻ gate fail → back to dev-loop</text>
+
+  <line x1="1225" y1="150" x2="1260" y2="150" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- === Gate 8: Closeout === -->
+  <rect x="1265" y="110" width="110" height="80" rx="6" fill="#dbeafe" stroke="#93c5fd" stroke-width="2"/>
+  <text x="1320" y="135" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e40af">closeout</text>
+  <text x="1320" y="152" text-anchor="middle" font-size="10" fill="#475569">wt-close</text>
+  <text x="1320" y="166" text-anchor="middle" font-size="10" fill="#475569">issue-sync close</text>
+  <text x="1320" y="180" text-anchor="middle" font-size="9" fill="#94a3b8">阶段11</text>
+
+  <!-- Closeout 回到 intake -->
+  <path d="M1320,190 L1320,340 Q1320,360 1300,360 L95,360 Q75,360 75,340 L75,195" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrow)"/>
+  <text x="700" y="378" text-anchor="middle" font-size="10" fill="#94a3b8">下一轮 scan</text>
+
+  <!-- ===== DOC-LOOP 泳道 ===== -->
+  <rect x="30" y="440" width="430" height="240" rx="8" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
+  <text x="42" y="464" font-size="14" font-weight="bold" fill="#15803d">doc-loop (文档设计)</text>
+  <text x="220" y="464" font-size="11" fill="#64748b">触发: auto-loop dispatch → worker → B1/B2</text>
+
+  <!-- B1 -->
+  <rect x="50" y="485" width="180" height="100" rx="6" fill="white" stroke="#4ade80" stroke-width="2"/>
+  <text x="140" y="508" text-anchor="middle" font-size="12" font-weight="bold" fill="#166534">B1_IBM</text>
+  <text x="140" y="525" text-anchor="middle" font-size="10" fill="#475569">brainstorm → converge</text>
+  <text x="140" y="540" text-anchor="middle" font-size="10" fill="#475569">candidate → promote</text>
+  <text x="140" y="557" text-anchor="middle" font-size="9" fill="#94a3b8">阶段4</text>
+  <path d="M55,590 C55,615 225,615 225,590" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#loop-arrow)"/>
+  <text x="140" y="608" text-anchor="middle" font-size="9" fill="#888">↻ 边界未稳 → 继续</text>
+
+  <line x1="230" y1="535" x2="260" y2="535" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- B2 -->
+  <rect x="265" y="485" width="180" height="100" rx="6" fill="white" stroke="#4ade80" stroke-width="2"/>
+  <text x="355" y="508" text-anchor="middle" font-size="12" font-weight="bold" fill="#166534">B2_IBM</text>
+  <text x="355" y="525" text-anchor="middle" font-size="10" fill="#475569">design → pre-tests</text>
+  <text x="355" y="540" text-anchor="middle" font-size="10" fill="#475569">prd / tasks / reviews</text>
+  <text x="355" y="557" text-anchor="middle" font-size="9" fill="#94a3b8">阶段5</text>
+  <path d="M270,590 C270,615 440,615 440,590" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#loop-arrow)"/>
+  <text x="355" y="608" text-anchor="middle" font-size="9" fill="#888">↻ 未 ready → 继续设计</text>
+
+  <!-- doc-loop → dispatch → dev-loop 顺序路由 -->
+  <text x="245" y="650" text-anchor="middle" font-size="10" fill="#16a34a">↓ return to auto-loop dispatch</text>
+  <text x="245" y="668" text-anchor="middle" font-size="9" fill="#64748b">dispatch 顺序路由: doc-loop → dev-loop (串行)</text>
+
+  <!-- ===== DEV-LOOP 泳道 ===== -->
+  <rect x="490" y="440" width="430" height="240" rx="8" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.5"/>
+  <text x="502" y="464" font-size="14" font-weight="bold" fill="#b91c1c">dev-loop (开发实现)</text>
+  <text x="680" y="464" font-size="11" fill="#64748b">触发: auto-loop dispatch → worker → dev-loop-execution</text>
+
+  <!-- Implement -->
+  <rect x="510" y="485" width="180" height="90" rx="6" fill="white" stroke="#f87171" stroke-width="2"/>
+  <text x="600" y="508" text-anchor="middle" font-size="12" font-weight="bold" fill="#991b1b">implement</text>
+  <text x="600" y="525" text-anchor="middle" font-size="10" fill="#475569">写代码 → test-lane</text>
+  <text x="600" y="540" text-anchor="middle" font-size="10" fill="#475569">feature-local</text>
+  <text x="600" y="555" text-anchor="middle" font-size="9" fill="#94a3b8">阶段6</text>
+  <path d="M515,580 C515,600 685,600 685,580" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#loop-arrow)"/>
+  <text x="600" y="596" text-anchor="middle" font-size="9" fill="#888">↻ fail → fix → re-test</text>
+
+  <line x1="690" y1="530" x2="720" y2="530" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Evidence -->
+  <rect x="725" y="485" width="180" height="90" rx="6" fill="white" stroke="#f87171" stroke-width="2"/>
+  <text x="815" y="508" text-anchor="middle" font-size="12" font-weight="bold" fill="#991b1b">evidence</text>
+  <text x="815" y="525" text-anchor="middle" font-size="10" fill="#475569">progress → code-review</text>
+  <text x="815" y="540" text-anchor="middle" font-size="10" fill="#475569">implementation note</text>
+  <text x="815" y="555" text-anchor="middle" font-size="9" fill="#94a3b8">阶段6</text>
+
+  <!-- dev-loop 返回 auto -->
+  <text x="705" y="660" text-anchor="middle" font-size="10" fill="#b91c1c">↓ return to auto-loop test gate</text>
+
+  <!-- ===== 命令封装说明 ===== -->
+  <rect x="30" y="710" width="1340" height="80" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="50" y="735" font-size="12" font-weight="bold" fill="#475569">命令封装（gate 命令名 → 内部调用）:</text>
+  <text x="50" y="758" font-size="10" fill="#64748b">wt-create → git fetch + update-ref + worktree add + test-pre-merge worktree</text>
+  <text x="50" y="775" font-size="10" fill="#64748b">pr-create-guarded → git pull develop + pr-merge-guarded --dry-run + git push + gh pr create</text>
+  <text x="800" y="758" font-size="10" fill="#64748b">pr-merge-guarded → fetch + validate direction + PR gate + promotion gate + git merge --no-ff + issue-sync + develop-push</text>
+  <text x="800" y="775" font-size="10" fill="#64748b">wt-close → issue-sync close + milestone update + git branch -d + git push --delete + worktree remove</text>
+
+  <!-- 图例 -->
+  <rect x="30" y="805" width="1340" height="55" rx="6" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="50" y="828" font-size="11" font-weight="bold" fill="#475569">inner loops:</text>
+  <path d="M140,823 C140,845 240,845 240,823" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#loop-arrow)"/>
+  <text x="250" y="828" font-size="10" fill="#888">↻ 内部小循环（fail → fix → retry）</text>
+  <text x="500" y="828" font-size="11" font-weight="bold" fill="#475569">colors:</text>
+  <rect x="550" y="818" width="16" height="12" rx="2" fill="#eff6ff" stroke="#93c5fd" stroke-width="1"/>
+  <text x="572" y="828" font-size="10" fill="#64748b">auto</text>
+  <rect x="610" y="818" width="16" height="12" rx="2" fill="#f0fdf4" stroke="#86efac" stroke-width="1"/>
+  <text x="632" y="828" font-size="10" fill="#64748b">doc</text>
+  <rect x="670" y="818" width="16" height="12" rx="2" fill="#fef2f2" stroke="#fca5a5" stroke-width="1"/>
+  <text x="692" y="828" font-size="10" fill="#64748b">dev</text>
+  <text x="780" y="828" font-size="10" fill="#94a3b8">━━ dash = 流程主线&nbsp;&nbsp;--- dash = 回环</text>
+</svg>
