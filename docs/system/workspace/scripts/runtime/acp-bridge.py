@@ -23,7 +23,11 @@ import threading
 
 BRIDGE_TIMEOUT = int(os.environ.get("ACP_BRIDGE_SESSION_TIMEOUT", "1800"))
 ACP_IDLE_TIMEOUT = int(os.environ.get("ACP_BRIDGE_IDLE_TIMEOUT", "900"))
-ACP_PERMISSION_MODE = os.environ.get("CLAUDE_CODE_PERMISSION_MODE", "bypassPermissions")
+_perm = os.environ.get("CLAUDE_CODE_PERMISSION_MODE", "")
+if not _perm:
+    import sys
+    print("[acp-bridge] WARNING: CLAUDE_CODE_PERMISSION_MODE not set. Permission mode defaults to empty. Check ~/.ai-auth/<tool>/settings.json", file=sys.stderr)
+ACP_PERMISSION_MODE = _perm or "default"
 
 
 def _short_hash(project: str) -> str:
