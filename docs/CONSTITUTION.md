@@ -18,7 +18,7 @@ Freely 是一个自主循环运行器：
 - `main` 仅用于发布，必须保持稳定。
 - `develop` 是长期开发集成分支，也是 `feature/*` 的默认父分支。
 - `test-pre-merge-*` 是临时预集成验证批次分支前缀；仅在组合验证、短周期集成验收、复杂冲突收敛或发布前预演时启用。每次启用前必须先从当前 `develop` 新建全新批次；旧批次若存在，先删除。
-- `feature/*` 分支从 `develop` 创建。测试时 merge 到 `test-pre-merge-*`（临时测试面），测试通过后从 `feature/*` 直接 merge 到 `develop`。`test-pre-merge-*` 不参与最终合并链。
+- `feature/*` 分支从 `develop` 创建。测试时 merge 到 `test-pre-merge-*`（临时测试面），测试通过后通过 `pr-create-guarded` 提 PR，经 review 后由 `pr-merge-guarded` 合并到 `develop`。`test-pre-merge-*` 不参与最终合并链。
 - `release/*` 分支从 `develop` 创建用于发布冻结，然后合并到 `main` 并回合并到 `develop`。
 - `hotfix/*` 分支从 `main` 创建，然后合并到 `main` 和 `develop`。
 
@@ -37,7 +37,7 @@ Freely 是一个自主循环运行器：
 - 不稳定的变更不得合并到 `main`。
 - `main` 只接受来自 `release/*` 或 `hotfix/*` 的合并。
 - `develop` 是功能交付的默认目标分支；进入 `develop` 前必须满足要求的 `TEST`、评审与进度/恢复证据。
-- `develop` 的正常 promote source 只接受 `test-pre-merge-*` family 与 `hotfix/*`；`feature/* -> develop` 作为正常路径被阻止。
+- `develop` 的正常 promote source 只接受 `test-pre-merge-*` family 与 `hotfix/*`；`feature/* -> develop` 作为正常路径被阻止；`feature/*` 必须通过 `pr-merge-guarded` 经 PR review 和门禁检查后合并到 `develop`。
 - `test-pre-merge-*` 仍是临时验证路径，但它同时是进入 `develop` 的 canonical promote family；其 merge receipt 必须能追溯到来源 feature 或 explicit multi-bundle 的组装证据。
 - `develop` 不得承担“尚未进入主线前的预测试环境”职责；需要主线前集成验证时，应使用 `test-pre-merge-*`，而不是在 `develop` 上先做预检。
 - `feature/*` 的实现自测与局部回归默认留在其 dedicated worktree；只有需要受保护分支真实集成面的测试，才切换到 `test-pre-merge-*` 或目标 protected branch 的 canonical worktree。
@@ -101,7 +101,7 @@ Freely 是一个自主循环运行器：
 | main | ✅ | ❌ | release/*, hotfix/* | - | 发布/热修复入口 |
 | develop | ✅ | ❌ | test-pre-merge-*, hotfix/* | - | 默认开发集成入口；正常 promote 只接受 `test-pre-merge-*` family 或 `hotfix/*` |
 | test-pre-merge-* | ❌ | ❌ | feature/*, hotfix/*, feature/premerge-* | - | 临时预集成验证批次；必须从当前 develop 新建，用完立即删除 |
-| feature/* | ✅ 同名 | ✅ worktree | - | test-pre-merge-* (测试) | 从 develop 创建；测试通过后直接合并到 develop |
+| feature/* | ✅ 同名 | ✅ worktree | - | test-pre-merge-* (测试) → pr-create-guarded (PR) → pr-merge-guarded (合并) | 从 develop 创建；测试通过后通过 pr-create-guarded → pr-merge-guarded 合并到 develop |
 | release/* | ✅ 同名 | ✅ worktree | - | main, develop | 从 develop 创建 |
 | hotfix/* | ✅ 同名 | ✅ worktree | - | main, develop | 从 main 创建 |
 

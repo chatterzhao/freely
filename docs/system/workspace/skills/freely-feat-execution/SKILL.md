@@ -30,7 +30,7 @@ freely-feat-execution 在不同阶段调用下层 skill：
 - B1_IBM 预研阶段就写治理文档（brainstorms.md + candidates.md）
 - B2_IBM materialize 后才能开始写代码
 - dev-loop 产出 pre-tests + code-review 证据
-- 合并走 feature → develop 完整链路
+- 合并走 feature → test-pre-merge → pr-create-guarded → pr-merge-guarded develop 完整链路
 - 不跳过门禁
 
 ## 工作流

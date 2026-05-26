@@ -244,8 +244,9 @@ else
         "Full cycle reference:" \
         "  skill:freely-fix-execution or skill:freely-feat-execution" \
         "  → wt-create → fix in fix/feature worktree" \
-        "  → merge-guarded test-pre-merge-* <fix-or-feature-branch>   (test)" \
-        "  → merge-guarded develop <fix-or-feature-branch>            (merge)" \
+        "  → merge fix-branch into test-pre-merge-* worktree          (test)" \
+        "  → pr-create-guarded (pull develop → dry-run gate → push → PR)" \
+        "  → pr-merge-guarded develop <fix-or-feature-branch>         (merge)" \
         "  → wt-close"
       exit 1
       ;;
