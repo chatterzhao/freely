@@ -12,8 +12,11 @@
 
 1. 从 `main` 创建 `hotfix/*`
 2. 在 `hotfix/*` dedicated worktree 中完成修复
-3. 合并到 `main` 和 `develop`
-4. 若某个 `test-pre-merge-*` 批次当前活跃，同步热修复结果到该临时测试分支
+3. `pr-create-guarded` 提 PR（可跳过 test-pre-merge）
+4. PR review 通过后：
+   - `pr-merge-guarded main <hotfix-branch>`
+   - `pr-merge-guarded develop <hotfix-branch>`
+5. 若某个 `test-pre-merge-*` 批次当前活跃，同步热修复结果到该临时测试分支
 
 ## Failure rule
 
