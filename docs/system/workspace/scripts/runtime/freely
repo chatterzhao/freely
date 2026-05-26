@@ -12662,8 +12662,13 @@ _ensure_acp_bridge_running() {
 
   # Determine the correct ACP binary for the current tool
   local acp_bin="claude-agent-acp"
-  local base_tool="${AI_TOOL%%-*}"  # codex-apikey-xxx → codex
+  local -a _acp_args=()
+  local base_tool="${AI_TOOL%%-*}"  # opencode-apikey-xxx → opencode, codex-apikey-xxx → codex
   case "$base_tool" in
+    opencode)
+      acp_bin="opencode"
+      _acp_args=("acp")
+      ;;
     codex)
       if [[ -n "${FREELY_CODEX_ACP_BIN:-}" ]]; then
         acp_bin="$FREELY_CODEX_ACP_BIN"
@@ -12845,9 +12850,9 @@ if added:
   # Use --foreground (no fork) + & to avoid child-process lifecycle issues
   local bridge_log; bridge_log="$(run_dir_for_project "$project")/acp-bridge.log"
   if [[ ${#_bridge_env[@]} -gt 0 ]]; then
-    env "${_bridge_env[@]}" python3 "$bridge_script" start --project "$project" --acp-bin "$acp_bin" --foreground </dev/null >>"$bridge_log" 2>&1 &
+    env "${_bridge_env[@]}" python3 "$bridge_script" start --project "$project" --acp-bin "$acp_bin" ${_acp_args:+--acp-args "${_acp_args[*]}"} --foreground </dev/null >>"$bridge_log" 2>&1 &
   else
-    python3 "$bridge_script" start --project "$project" --acp-bin "$acp_bin" --foreground </dev/null >>"$bridge_log" 2>&1 &
+    python3 "$bridge_script" start --project "$project" --acp-bin "$acp_bin" ${_acp_args:+--acp-args "${_acp_args[*]}"} --foreground </dev/null >>"$bridge_log" 2>&1 &
   fi
   disown "$!" 2>/dev/null || true
   # Note: bridge writes its own PID file during start_server, don't overwrite it

@@ -90,9 +90,10 @@ def _kill_descendants(parent_pid):
 class AcpBridge:
     """Relays JSON-RPC between Unix socket clients and claude-agent-acp stdin/stdout."""
 
-    def __init__(self, project, acp_bin="claude-agent-acp", log_file=None):
+    def __init__(self, project, acp_bin="claude-agent-acp", log_file=None, acp_args=None):
         self.project = project
         self.acp_bin = acp_bin
+        self.acp_args = acp_args or []  # tool-specific ACP server args (e.g. "acp" for opencode)
         self.log_file = log_file or _log_file(project)
         self.server_proc = None
         self.server_lock = threading.Lock()
@@ -126,7 +127,7 @@ class AcpBridge:
         # Bypass permissions in daemon mode — the ACP client handles
         # permission decisions via session/request_permission protocol.
         self.server_proc = subprocess.Popen(
-            [self.acp_bin, "--permission-mode", ACP_PERMISSION_MODE],
+            [self.acp_bin] + (self.acp_args if self.acp_args else ["--permission-mode", ACP_PERMISSION_MODE]),
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -178,7 +179,7 @@ class AcpBridge:
         # Restart
         env = os.environ.copy()
         self.server_proc = subprocess.Popen(
-            [self.acp_bin, "--permission-mode", ACP_PERMISSION_MODE],
+            [self.acp_bin] + (self.acp_args if self.acp_args else ["--permission-mode", ACP_PERMISSION_MODE]),
             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             text=True, bufsize=1, env=env,
         )
@@ -232,7 +233,7 @@ class AcpBridge:
         # Start new process (no initialize yet — lazy, done on first request)
         env = os.environ.copy()
         self.server_proc = subprocess.Popen(
-            [self.acp_bin, "--permission-mode", ACP_PERMISSION_MODE],
+            [self.acp_bin] + (self.acp_args if self.acp_args else ["--permission-mode", ACP_PERMISSION_MODE]),
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -586,7 +587,8 @@ def cmd_start(args):
             return 1
         acp_bin = resolved
 
-    bridge = AcpBridge(project, acp_bin, log_file)
+    acp_args = args.acp_args.split() if args.acp_args else None
+    bridge = AcpBridge(project, acp_bin, log_file, acp_args)
 
     # Daemonize: fork and run socket server in background.
     # start_server() writes the PID file — must happen AFTER fork so the
@@ -675,6 +677,7 @@ def main():
     p_start = sub.add_parser("start")
     p_start.add_argument("--project", required=True)
     p_start.add_argument("--acp-bin")
+    p_start.add_argument("--acp-args", help="Tool-specific ACP server arguments (space-separated, e.g. 'acp' for opencode)")
     p_start.add_argument("--log-file")
     p_start.add_argument("--foreground", action="store_true")
 
