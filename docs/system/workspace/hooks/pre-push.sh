@@ -91,10 +91,16 @@ MSG
       # Check if pr-create-gate has passed on this branch
       if [[ -z "${FREELY_SKIP_CREATE_GATE:-}" ]]; then
         if [[ ! -f ".freely/run/pr-create-gate-passed" ]]; then
-          echo "[HOOK] WARNING: pr-create-gate has not been run on this branch." >&2
-          echo "  Run pr-create-guarded before pushing:" >&2
-          echo "    ./bin/pr-create-guarded" >&2
-          echo "  To skip (not recommended): export FREELY_SKIP_CREATE_GATE=1" >&2
+          cat >&2 <<MSG
+[HOOK] Push blocked: pr-create-gate has not been run on branch '$local_branch'.
+
+  All fix/feature/hotfix branches must pass pr-create-guarded before pushing.
+  Run pr-create-guarded in your worktree:
+    ./bin/pr-create-guarded
+
+  To skip (not recommended): export FREELY_SKIP_CREATE_GATE=1
+MSG
+          exit 1
         fi
       fi
       if [[ "$remote_branch" == "$local_branch" ]]; then
