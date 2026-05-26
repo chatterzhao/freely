@@ -19361,7 +19361,7 @@ start_project_runtime() {
   # ── Sync develop working tree with remote ──
   # git update-ref alone does not update working tree files.
   # Without this, daemon can run stale code if develop was advanced by PR merges.
-  if [[ "$(current_branch || true)" == "develop" ]]; then
+  if [[ "$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)" == "develop" ]]; then
     log_info "syncing develop working tree with origin..."
     git fetch origin develop 2>/dev/null || true
     local _local_sha _remote_sha
