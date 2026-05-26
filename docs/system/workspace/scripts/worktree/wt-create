@@ -682,8 +682,8 @@ MSG
 │    3. skill:freely-doc-B1_IBM-execution → raw → candidate  │
 │    4. skill:freely-doc-B2_IBM-execution → I-* → milestone  │
 │    5. skill:freely-dev-loop-execution → code-review + pre-tests │
-│    6. merge-guarded test-pre-merge-* <fix-branch>  (test)  │
-│    7. merge-guarded develop <fix-branch>            (merge) │
+│    6. pr-create-guarded → test worktree verify      (test)  │
+│    7. pr-merge-guarded develop <fix-branch>       (merge) │
 │    8. wt-close <fix-branch>                               │
 └──────────────────────────────────────────────────────────┘
 REMINDER
@@ -703,8 +703,8 @@ REMINDER
 │    1. skill:freely-doc-B1_IBM-execution → raw → brainstorms → candidates │
 │    2. skill:freely-doc-B2_IBM-execution → materialize I-* → milestone │
 │    3. skill:freely-dev-loop-execution → implement + code-review + pre-tests │
-│    4. merge-guarded test-pre-merge-* <feature-branch>  (test) │
-│    5. merge-guarded develop <feature-branch>            (merge) │
+│    4. pr-create-guarded → test worktree verify           (test) │
+│    5. pr-merge-guarded develop <feature-branch>            (merge) │
 │    6. wt-close <feature-branch>                          │
 └──────────────────────────────────────────────────────────┘
 REMINDER
