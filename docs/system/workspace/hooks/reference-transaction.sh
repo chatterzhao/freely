@@ -111,7 +111,6 @@ while read -r old_oid new_oid refname; do
   用法: ./bin/wt-create --raw-key <key> --source <platform|chat-inbox|local> \\
     --skill <freely-fix-execution|freely-feat-execution> --slug <slug>
 
-  文档: docs/LAWS.md §2D
 MSG
         exit 1
       fi
@@ -147,7 +146,6 @@ NAME_BLOCK
 
   Usage: ./bin/wt-close <branch>
 
-  文档: docs/LAWS.md §2D
 DELETE_BLOCK
       exit 1
     fi
@@ -174,7 +172,6 @@ DELETE_BLOCK
 [HOOK] Ref update blocked: protected branch '$branch_name' cannot advance to commit '$new_oid' without a canonical protected-merge receipt.
 Direct fast-forward, reset, and other ref-only updates are not lawful protected-branch merge entrypoints.
 Create a receipt-bearing protected merge commit through ./bin/pr-merge-guarded instead.
-Policy source: docs/CONSTITUTION.md §2, docs/LAWS.md §2
 MSG
   exit 1
 done
