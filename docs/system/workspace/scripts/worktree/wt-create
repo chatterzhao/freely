@@ -326,8 +326,21 @@ conn.close()
       return 1
       ;;
     local)
-      # Issue already exists in docs/issues/, just verify
-      if [[ -f "$ROOT_DIR/docs/issues/raw-${raw_key}/issue.md" ]]; then
+      # Issue already exists in docs/issues/, verify frontmatter
+      local _issue_file="$ROOT_DIR/docs/issues/raw-${raw_key}/issue.md"
+      if [[ -f "$_issue_file" ]]; then
+        local _kind; _kind=$(python3 -c "
+import yaml
+with open('$_issue_file') as f: c = f.read()
+parts = c.split('---', 2)
+fm = yaml.safe_load(parts[1]) if len(parts) >= 3 else {}
+print(fm.get('kind', ''))
+" 2>/dev/null || true)
+        if [[ "$_kind" != "raw" ]]; then
+          echo "拒绝: raw-$raw_key 的 kind 字段为 '${_kind:-missing}'，必须为 'raw'。" >&2
+          echo "  请通过 freely feedback 创建 raw issue，不要手工创建 issue.md。" >&2
+          return 1
+        fi
         echo "pull: raw-$raw_key already exists locally" >&2
         return 0
       fi
