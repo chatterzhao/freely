@@ -20375,7 +20375,7 @@ cmd_start() {
   # Old identity has stale PID → watchdog rejects new supervisor.
   rm -f "$(supervisor_identity_dir_for_project "$project")/supervisor.env" 2>/dev/null || true
   if [[ -x "$project/bin/deploy-skills" ]]; then
-    "$project/bin/deploy-skills" || log_warn "deploy-skills exited $? (non-fatal)"
+    "$project/bin/deploy-skills" >/dev/null 2>&1 || log_warn "deploy-skills exited $? (non-fatal)"
   fi
   start_project_runtime "$project" "foreground"
 }
@@ -20573,7 +20573,7 @@ cmd_daemon_start() {
   append_runtime_event "$project" "user_daemon_start_precheck_clear" \
     "force=$force"
   if [[ -x "$project/bin/deploy-skills" ]]; then
-    "$project/bin/deploy-skills" || log_warn "deploy-skills exited $? (non-fatal)"
+    "$project/bin/deploy-skills" >/dev/null 2>&1 || log_warn "deploy-skills exited $? (non-fatal)"
   fi
   release_project_start_lock_for_runtime "$project"
   trap - EXIT

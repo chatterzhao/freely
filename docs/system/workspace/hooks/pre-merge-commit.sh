@@ -31,14 +31,12 @@ if [[ "${FREELY_SKIP_IBM_GATE:-0}" == "1" ]]; then
     cat <<MSG
 [HOOK] Merge blocked: canonical guarded merge state is missing or malformed.
 Re-run the merge through ./bin/pr-merge-guarded.
-Policy source: docs/LAWS.md §2, §2D
 MSG
     exit 1
   }
   if [[ "${FREELY_GUARDED_MERGE_COMPLETION:-0}" != "1" ]]; then
     cat <<MSG
 [HOOK] Merge blocked: guarded merge completion handshake marker missing.
-Policy source: docs/LAWS.md §2D
 MSG
     exit 1
   fi
@@ -53,7 +51,6 @@ MSG
     wt-create → skill:freely-fix-execution → dev → pr-merge-guarded
 
   本次绕过已记录。如非上述 2 种情况，请立即回退并走正常流程。
-  文档: docs/LAWS.md §2D
 GATE_WARN
 
   # Delegate to governance-merge-gate with --skip-ibm-gate for path validation.
@@ -80,7 +77,6 @@ $gate_output
 
   FREELY_SKIP_IBM_GATE=1 仅限 docs/cleanup/format 等治理型变更。
   实现变更必须走完整 raw→C→M→I 治理链。
-  文档: docs/LAWS.md §2D
 MSG
     exit "$gate_rc"
   fi
@@ -110,7 +106,6 @@ require_valid_guarded_merge_state() {
     cat <<MSG
 [HOOK] Merge blocked: canonical guarded merge state is missing or malformed.
 Raw develop merges are not an allowed entrypoint. Re-run the merge through ./bin/pr-merge-guarded so hooks can verify the canonical handshake.
-Policy source: docs/LAWS.md §2, §2D
 MSG
     exit 1
   }
@@ -119,7 +114,6 @@ MSG
     cat <<MSG
 [HOOK] Merge blocked: canonical guarded merge handshake marker is missing.
 Raw develop merges are not an allowed entrypoint. Re-run the merge through ./bin/pr-merge-guarded.
-Policy source: docs/LAWS.md §2, §2D
 MSG
     exit 1
   fi
@@ -127,7 +121,6 @@ MSG
   if ! git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1; then
     cat <<MSG
 [HOOK] Merge blocked: guarded completion requires an active MERGE_HEAD.
-Policy source: docs/LAWS.md §2D
 MSG
     exit 1
   fi
@@ -135,7 +128,6 @@ MSG
   if [[ "$guarded_state_target" != "$branch" ]]; then
     cat <<MSG
 [HOOK] Merge blocked: guarded merge completion target '$guarded_state_target' does not match current branch '$branch'.
-Policy source: docs/LAWS.md §2D
 MSG
     exit 1
   fi
@@ -145,7 +137,6 @@ MSG
   if [[ -z "$merge_head" || -z "$source_sha" || "$merge_head" != "$source_sha" ]]; then
     cat <<MSG
 [HOOK] Merge blocked: guarded merge completion source '$guarded_state_source' does not match MERGE_HEAD.
-Policy source: docs/LAWS.md §2D
 MSG
     exit 1
   fi
@@ -173,7 +164,6 @@ if [[ "$gate_rc" -ne 0 ]]; then
 $gate_output
 
 Fix the candidate -> milestone -> IBM issue chain in the source writable worktree before rerunning the guarded merge.
-Policy source: docs/LAWS.md §2C, §2D
 MSG
   exit "$gate_rc"
 fi

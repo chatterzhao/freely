@@ -87,7 +87,6 @@ if is_protected_branch "$branch"; then
   [[ -n "$merge_path" ]] || {
     cat <<MSG
 [HOOK] Commit blocked: protected branch merge requires Freely-Merge-Path trailer.
-Policy source: docs/LAWS.md §2D
 MSG
     exit 1
   }
@@ -98,7 +97,6 @@ MSG
       cat <<MSG
 [HOOK] Commit blocked: invalid Freely-Merge-Path '$merge_path'.
 Valid: pr-merge-guarded, pr-merge-guarded-complete
-Policy source: docs/LAWS.md §2D
 MSG
       exit 1
       ;;
@@ -107,7 +105,6 @@ MSG
   [[ -n "$bypass_mode" ]] || {
     cat <<MSG
 [HOOK] Commit blocked: protected branch merge requires Freely-Bypass-Mode trailer.
-Policy source: docs/LAWS.md §2D
 MSG
     exit 1
   }
@@ -118,7 +115,6 @@ MSG
       cat <<MSG
 [HOOK] Commit blocked: invalid Freely-Bypass-Mode '$bypass_mode'.
 Valid: forbidden
-Policy source: docs/LAWS.md §2D
 MSG
       exit 1
       ;;
@@ -127,7 +123,6 @@ MSG
   [[ -n "$source_branch_t" ]] || {
     cat <<MSG
 [HOOK] Commit blocked: protected branch merge requires Freely-Source-Branch trailer.
-Policy source: docs/LAWS.md §2D
 MSG
     exit 1
   }

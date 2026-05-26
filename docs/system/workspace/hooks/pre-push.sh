@@ -31,7 +31,6 @@ while read -r local_ref local_sha remote_ref remote_sha; do
 [HOOK] Push blocked: test pre-merge batch '$local_branch' is local-only.
 Create the batch from current develop, use it for temporary verification, then delete it.
 Do not publish test-pre-merge branches to remote.
-Policy source: $policy_ref
 MSG
     exit 1
   fi
@@ -68,7 +67,6 @@ MSG
 $gate_output
 
 Fix the candidate -> milestone -> IBM issue chain before pushing develop.
-Policy source: docs/LAWS.md §2C
 MSG
             exit "$gate_rc"
           fi
@@ -109,7 +107,6 @@ MSG
       cat >&2 <<MSG
 [HOOK] Push blocked: branch '$local_branch' can only push to the same branch on remote.
 Attempted remote ref: ${remote_ref:-<none>}
-Policy source: $policy_ref
 MSG
       exit 1
       ;;
@@ -120,7 +117,6 @@ MSG
       cat >&2 <<MSG
 [HOOK] Push blocked: branch '$local_branch' can only push to the same branch on remote.
 Attempted remote ref: ${remote_ref:-<none>}
-Policy source: $policy_ref
 MSG
       exit 1
       ;;
@@ -128,7 +124,6 @@ MSG
       cat >&2 <<MSG
 [HOOK] Push blocked: unsupported branch type '$local_branch'.
 Use feature/*, release/*, hotfix/* or protected integration branches.
-Policy source: $policy_ref
 MSG
       exit 1
       ;;

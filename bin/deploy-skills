@@ -185,7 +185,7 @@ for t in "${TOOL_LIST[@]}"; do
 done
 
 if [[ -n "$unknown_tools" ]]; then
-  echo "ERROR: unsupported tools:$unknown_tools" >&2
+  echo "WARNING: unsupported tools:$unknown_tools" >&2
   echo "Supported tools: claude*, codex*, oc-*, opencode, cc*" >&2
   echo "Unsupported (no mapping): iflow*, kiro-cli*" >&2
   exit 1

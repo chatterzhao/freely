@@ -162,7 +162,6 @@ require_valid_guarded_completion_state() {
     cat <<MSG
 [HOOK] Commit blocked: guarded merge completion state is missing or malformed.
 Re-run the merge through ./bin/pr-merge-guarded so hooks can verify a canonical completion handshake.
-Policy source: docs/LAWS.md §2D
 MSG
     exit 1
   }
@@ -170,7 +169,6 @@ MSG
   if [[ "$guarded_state_target" != "$branch" ]]; then
     cat <<MSG
 [HOOK] Commit blocked: guarded merge completion target '$guarded_state_target' does not match current branch '$branch'.
-Policy source: docs/LAWS.md §2D
 MSG
     exit 1
   fi
@@ -180,7 +178,6 @@ MSG
   if [[ -z "$merge_head" || -z "$source_sha" || "$merge_head" != "$source_sha" ]]; then
     cat <<MSG
 [HOOK] Commit blocked: guarded merge completion source '$guarded_state_source' does not match MERGE_HEAD.
-Policy source: docs/LAWS.md §2D
 MSG
     exit 1
   fi
@@ -204,7 +201,6 @@ Use the guarded completion path instead:
 
   ./bin/pr-merge-guarded complete "$branch" <source-branch>
 
-Policy source: docs/LAWS.md §2D
 MSG
     exit 1
   fi
@@ -215,7 +211,6 @@ Test pre-merge batches are ephemeral verification surfaces.
 - fix failures back in the source feature worktree
 - delete the batch when testing ends
 
-Policy source: docs/CONSTITUTION.md §2
 MSG
   exit 1
 fi
@@ -243,7 +238,6 @@ Use the guarded completion path instead:
   ./bin/pr-merge-guarded complete "$branch" <source-branch>
 
 Do not finish protected-branch merges with bare 'git commit' or equivalent bypass.
-Policy source: docs/LAWS.md §2D
 MSG
       exit 1
     fi
@@ -267,7 +261,6 @@ When the work is finished and merged, clean up with:
 
 If you skip this workflow, hooks will create the worktree when possible and print guidance.
 Do not keep committing in the current directory.
-Policy source: docs/CONSTITUTION.md §2
 MSG
     exit 1
     ;;
@@ -286,7 +279,6 @@ if ! freely_wt_is_primary_worktree; then
 $checkpoint_output
 
 Split this commit into issue-aligned atomic batches, or move mixed work into separate worktrees.
-Policy source: docs/LAWS.md §2D
 MSG
       exit 1
     elif [[ "$checkpoint_rc" -ne 0 ]]; then
@@ -306,7 +298,6 @@ MSG
 $pretests_output
 
 Keep the issue in a non-completed phase until its bound pre-tests acceptance items are backed by real test execution, lawful non-test waivers, and traceable evidence. Do not clear this gate by only filling metadata.
-Policy source: docs/LAWS.md §2D
 MSG
       exit "$pretests_rc"
     fi
@@ -322,7 +313,6 @@ Expected:
   feature/premerge-* from the active test-pre-merge-* batch (or develop when no test batch is active)
   release/* from develop
   hotfix/* from main
-Policy source: docs/CONSTITUTION.md §2
 MSG
   exit 1
 fi
@@ -341,7 +331,6 @@ Start work in worktree:
 Standard cleanup after merge:
   git worktree remove ${rel_target}
   git branch -d "$branch"
-Policy source: docs/CONSTITUTION.md §2
 MSG
   git worktree list
   exit 1
@@ -364,6 +353,5 @@ If you must create it manually instead:
 When the work is finished and merged:
   git worktree remove ${rel_target}
   git branch -d "$branch"
-Policy source: docs/CONSTITUTION.md §2
 MSG
 exit 1
