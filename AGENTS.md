@@ -74,7 +74,7 @@ Freely 处于研究优先的整合阶段。
   	     2. `./bin/freely-package --version test-YYYYMMDD-NNN-dev` — 从 test-pre-merge 打包 pre 版本
   	     3. 用打包后的 `freely` 启动 daemon 开发 Freely 自己（或指定一个 feature worktree）
   	     4. 验证至少完成一个 Manager cycle（patrol → 判断 → 产出），AI 不崩溃、不重启循环
-  	     5. 通过 → merge 到 develop。失败 → 丢弃 test-pre-merge，修 feature
+  	     5. 通过 → pr-merge-guarded develop <feature-branch> 合并。失败 → 丢弃 test-pre-merge，修 feature
   	     - 预置脚本：`./bin/test-pre-merge-selfhost <project>` 执行步骤 1-3
   	     - 成功标准：打包版本能开发 Freely 自己。这个测试落地了"编译器自举"——用上一个版本开发下一个版本。
   	     - 示例：`./bin/test-pre-merge-selfhost /path/to/project`

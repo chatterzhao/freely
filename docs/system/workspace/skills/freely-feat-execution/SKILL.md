@@ -1,6 +1,6 @@
 ---
 name: freely-feat-execution
-description: 新功能/大型改动的完整开发流程——B1_IBM预研→B2_IBM→dev实现→pr-create-guarded→pr-merge-guarded门禁合并→wt-close，与 freely-fix-execution 同级抽象。
+description: 新功能/大型改动的完整开发流程——B1_IBM预研→B2_IBM→dev实现→test-pre-merge验证→pr-create-guarded→pr-merge-guarded门禁合并→wt-close，与 freely-fix-execution 同级抽象。
 ---
 
 # skill:freely-feat-execution
@@ -14,7 +14,7 @@ description: 新功能/大型改动的完整开发流程——B1_IBM预研→B2_
 | | freely-fix-execution | freely-feat-execution |
 |---|---|---|
 | 适用 | bug fix、小改动 | 新功能、大型重构 |
-| 流程 | test-pre-merge 沙箱 → cp → commit | wt-create→B1_IBM→B2_IBM→dev→pr-create-guarded→pr-merge-guarded→wt-close |
+| 流程 | test-pre-merge 沙箱 → cp → commit | wt-create→B1_IBM→B2_IBM→dev→test-pre-merge→pr-create-guarded→pr-merge-guarded→wt-close |
 | 治理 | 后置 | 前置（B1_IBM 即开始） |
 
 ## 下层 skill
@@ -99,7 +99,7 @@ freely-feat-execution 在不同阶段调用下层 skill：
 1. 运行 `./bin/pr-merge-guarded develop <pr-branch>`
 2. PR gate 检查
 3. promotion gate 检查
-4. merge → git push develop
+4. pr-merge-guarded develop <pr-branch> → develop-push
 5. issue-sync close
 ```
 
@@ -121,7 +121,7 @@ freely-feat-execution 在不同阶段调用下层 skill：
 
 ## 硬性规则
 
-- 不要跳过 B1_IBM→B2_IBM→dev→pr-create-guarded→pr-merge-guarded→wt-close 任一阶段
+- 不要跳过 B1_IBM→B2_IBM→dev→test-pre-merge→pr-create-guarded→pr-merge-guarded→wt-close 任一阶段
 - 不要在 develop 上直接开发
 - 分支名必须以 `feature/` 为前缀，工位名必须包含 `feature`
 - feature worktree 必须用 ./bin/wt-create 创建

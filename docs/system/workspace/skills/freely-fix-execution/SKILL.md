@@ -79,8 +79,8 @@ hotfix/*          → main
 | 分支类型 | 默认 base | 说明 |
 |---|---|---|
 | `feature/*` | develop | 标准功能开发，走完整 获取issue→wt-create→B1→B2→dev→test-pre-merge-*验证→pr-create-guarded→pr-merge-guarded develop 链路 |
-| `fix/*` | develop | bug 修复，从 develop 派生，合并回 develop |
-| `hotfix/*` | main | 紧急修复，从 main 的标签派生，合并回 main 和 develop |
+| `fix/*` | develop | bug 修复，从 develop 派生，通过 pr-merge-guarded 合并回 develop |
+| `hotfix/*` | main | 紧急修复，从 main 的标签派生，通过 pr-merge-guarded 合并回 main 和 develop |
 
 ---
 
@@ -97,8 +97,8 @@ hotfix/*          → main
 
 | 类型 | 分支 | 合并路径 |
 |---|---|---|
-| 普通 fix | `fix/raw-{raw-key}-{slug}` | fix → develop |
-| 紧急 hotfix | `hotfix/<desc>-<YYYYMMDD>` | hotfix → develop（可跳过 test-pre-merge-*） |
+| 普通 fix | `fix/raw-{raw-key}-{slug}` | fix → test-pre-merge → pr-create-guarded → pr-merge-guarded develop |
+| 紧急 hotfix | `hotfix/<desc>-<YYYYMMDD>` | hotfix → pr-merge-guarded main + develop（可跳过 test-pre-merge） |
 
 ---
 
