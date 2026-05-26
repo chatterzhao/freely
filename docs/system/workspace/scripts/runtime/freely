@@ -19357,6 +19357,27 @@ start_project_runtime() {
   register_project_in_registry "$project"
   append_runtime_event "$project" "start_project_runtime_after_registry" \
     "entrypoint_mode=$entrypoint_mode"
+
+  # ── Sync develop working tree with remote ──
+  # git update-ref alone does not update working tree files.
+  # Without this, daemon can run stale code if develop was advanced by PR merges.
+  if [[ "$(current_branch || true)" == "develop" ]]; then
+    log_info "syncing develop working tree with origin..."
+    git fetch origin develop 2>/dev/null || true
+    local _local_sha _remote_sha
+    _local_sha="$(git rev-parse HEAD 2>/dev/null || true)"
+    _remote_sha="$(git rev-parse refs/remotes/origin/develop 2>/dev/null || true)"
+    if [[ -n "$_local_sha" && -n "$_remote_sha" && "$_local_sha" != "$_remote_sha" ]]; then
+      log_info "develop working tree is behind (local=$_local_sha remote=$_remote_sha), updating..."
+      git config core.hooksPath /dev/null
+      git reset --hard refs/remotes/origin/develop
+      git config core.hooksPath .githooks
+      log_info "develop working tree updated to $_remote_sha"
+    else
+      log_info "develop working tree is current"
+    fi
+  fi
+
   check_doc_gate_or_fail "$project" || {
     log_error "start blocked by doc gate"
     exit 1
