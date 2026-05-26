@@ -204,6 +204,20 @@ def search_raw_issue(raw_key: str) -> dict[str, dict]:
                                 "url": issue.get("url", ""),
                             }
                             break
+                # Fallback: search raw_key in body
+                if platform not in results:
+                    result = _gh("issue", "list", "--repo", repo, "--state", "open",
+                               "--search", f"raw-{raw_key} in:body", "--limit", "5",
+                               "--json", "number,title,url", check=False)
+                    if result.returncode == 0 and result.stdout.strip():
+                        issues = json.loads(result.stdout)
+                        for issue in issues:
+                            results[platform] = {
+                                "issue_number": str(issue["number"]),
+                                "title": issue.get("title", ""),
+                                "url": issue.get("url", ""),
+                            }
+                            break
             elif platform == "gitee":
                 result = subprocess.run(
                     [sys.executable, str(RUNTIME_DIR / "gitee-issue.py"),
@@ -224,6 +238,17 @@ def search_raw_issue(raw_key: str) -> dict[str, dict]:
                                 "url": issue.get("html_url", issue.get("url", "")),
                             }
                             break
+                    # Fallback: search raw_key in body
+                    if platform not in results:
+                        for issue in issues:
+                            body = issue.get("body", "") or ""
+                            if f"raw-{raw_key}" in body:
+                                results[platform] = {
+                                    "issue_number": str(issue.get("number", issue.get("id", ""))),
+                                    "title": issue.get("title", ""),
+                                    "url": issue.get("html_url", issue.get("url", "")),
+                                }
+                                break
         except Exception:
             continue
     return results
