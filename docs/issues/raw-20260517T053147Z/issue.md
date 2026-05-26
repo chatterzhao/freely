@@ -10,7 +10,7 @@ platform_ids:
     issue_id: '424'
     url: https://github.com/chatterzhao/freely/issues/424
     synced_at: '2026-05-17T05:31:55Z'
-updated_at: '2026-05-25T03:30:25Z'
+updated_at: '2026-05-26T12:27:28Z'
 primary_platform: github
 phase_state: absorbed
 absorbed_into: I-20260413-0420-A
