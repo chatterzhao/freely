@@ -106,7 +106,10 @@ while read -r old_oid new_oid refname; do
 [HOOK] Branch creation blocked: '$branch_name'
 
   fix/feature/hotfix/test-pre-merge 分支禁止手动创建。
-  唯一入口: ./bin/wt-create --raw-key <key> --slug <slug>
+  唯一入口: wt-create
+
+  用法: ./bin/wt-create --raw-key <key> --source <platform|chat-inbox|local> \\
+    --skill <freely-fix-execution|freely-feat-execution> --slug <slug>
 
   文档: docs/LAWS.md §2D
 MSG
