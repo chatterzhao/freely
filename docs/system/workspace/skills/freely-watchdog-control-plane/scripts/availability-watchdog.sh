@@ -774,7 +774,7 @@ codex_exec_saved_slot_truth() {
         ;;
     esac
     printf '%s\t%s\t%s\t%s\t0\t%s\n' "$candidate" "$status_text" "$auth_email" "${reset_at:-0}" "$detail" >>"$results_file"
-  done < <(codex_saved_slots "$project")
+  done <<<"$(codex_saved_slots "$project")"
 
   restore_codex_probe_origin "$original_slot" "$original_active_slot" "$auth_backup" >/dev/null || true
   [[ -z "$auth_backup" ]] || rm -f "$auth_backup"
@@ -841,7 +841,8 @@ codex_oauth_probe_single_slot() {
     return 0
   fi
 
-  read -r token auth_email account_id < <(python3 - <<'PY' "$auth_file"
+  local _auth_data
+  _auth_data="$(python3 - "$auth_file" <<'PY'
 import base64
 import json
 import sys
@@ -865,7 +866,8 @@ if id_token:
         email = ""
 print(token, email, account_id)
 PY
-)
+  )"
+  IFS=' ' read -r token auth_email account_id <<<"$_auth_data"
 
   if [[ -z "$token" ]]; then
     printf '%s\tmissing_token\t%s\t0\t0\taccess token missing\n' "$slot" "$auth_email" >"$output_file"
@@ -1013,7 +1015,7 @@ codex_oauth_sweep_all_slots() {
     result_file="$tmp_dir/${candidate}.tsv"
     swept_candidates=$((swept_candidates + 1))
     codex_oauth_probe_single_slot "$project" "$candidate" "$auth_file" "$result_file" &
-  done < <(codex_saved_slots "$project")
+  done <<<"$(codex_saved_slots "$project")"
   wait || true
 
   cat "$tmp_dir"/*.tsv 2>/dev/null >"$results_file" || true
@@ -1175,7 +1177,7 @@ codex_any_saved_slot_available_now() {
     if codex_slot_is_available_now "$project" "$candidate"; then
       return 0
     fi
-  done < <(codex_saved_slots "$project")
+  done <<<"$(codex_saved_slots "$project")"
   return 1
 }
 
@@ -1196,7 +1198,7 @@ select_next_codex_slot() {
       return 0
     fi
     [[ "$candidate" == "$normalized_current" ]] && seen_current=1
-  done < <(codex_saved_slots "$project")
+  done <<<"$(codex_saved_slots "$project")"
   return 1
 }
 
@@ -1215,7 +1217,7 @@ select_next_codex_saved_slot() {
       return 0
     fi
     [[ "$candidate" == "$normalized_current" ]] && seen_current=1
-  done < <(codex_saved_slots "$project")
+  done <<<"$(codex_saved_slots "$project")"
   return 1
 }
 
@@ -1234,7 +1236,7 @@ select_earliest_reset_codex_slot() {
       best_slot="$candidate"
       best_reset="$reset_at"
     fi
-  done < <(codex_saved_slots "$project")
+  done <<<"$(codex_saved_slots "$project")"
   if [[ -n "$best_slot" ]]; then
     printf '%s|%s\n' "$best_slot" "$best_reset"
   fi
@@ -1252,7 +1254,7 @@ select_any_available_codex_slot() {
       printf '%s\n' "$candidate"
       return 0
     fi
-  done < <(codex_saved_slots "$project")
+  done <<<"$(codex_saved_slots "$project")"
 }
 
 watchdog_reset_buffer_seconds() {
@@ -1337,7 +1339,7 @@ select_earliest_reset_codex_slot_any() {
       best_slot="$candidate"
       best_reset="$reset_at"
     fi
-  done < <(codex_saved_slots "$project")
+  done <<<"$(codex_saved_slots "$project")"
   if [[ -n "$best_slot" ]]; then
     printf '%s|%s\n' "$best_slot" "$best_reset"
   fi
@@ -1635,7 +1637,7 @@ probe_any_usable_codex_slot_now() {
       return 0
       ;;
     esac
-  done < <(codex_saved_slots "$project")
+  done <<<"$(codex_saved_slots "$project")"
 
   active_slot="$(codex_current_slot "$project")"
   if [[ -n "$original_slot" && -n "$active_slot" && "$(normalize_codex_slot_name "$original_slot")" != "$(normalize_codex_slot_name "$active_slot")" ]]; then
@@ -1778,7 +1780,7 @@ probe_all_codex_slots_and_update_cooldown() {
 
     # Print status line
     printf '%s %-28s  %-15s  %s\n' "$status_icon" "$candidate$current_marker" "$status_text" "$details" >&2
-  done < <(codex_saved_slots "$project")
+  done <<<"$(codex_saved_slots "$project")"
 
   if [[ -s "$results_file" ]]; then
     codex_write_availability_cache_from_sweep_results "$project" "$results_file"
