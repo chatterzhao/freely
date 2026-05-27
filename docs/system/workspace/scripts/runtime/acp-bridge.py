@@ -124,10 +124,10 @@ class AcpBridge:
         self.log(f"starting ACP server: {self.acp_bin}")
         # Inherit environment but let explicitly-set vars (from alias settings) win
         env = os.environ.copy()
-        # Bypass permissions in daemon mode — the ACP client handles
-        # permission decisions via session/request_permission protocol.
+        # Permission mode is set via session/set_mode RPC after session creation.
+        # --permission-mode CLI flag is claude-agent-acp-specific; codex-acp, opencode lack it.
         self.server_proc = subprocess.Popen(
-            [self.acp_bin] + (self.acp_args if self.acp_args else ["--permission-mode", ACP_PERMISSION_MODE]),
+            [self.acp_bin] + (self.acp_args if self.acp_args else []),
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -179,7 +179,7 @@ class AcpBridge:
         # Restart
         env = os.environ.copy()
         self.server_proc = subprocess.Popen(
-            [self.acp_bin] + (self.acp_args if self.acp_args else ["--permission-mode", ACP_PERMISSION_MODE]),
+            [self.acp_bin] + (self.acp_args if self.acp_args else []),
             stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             text=True, bufsize=1, env=env,
         )
@@ -233,7 +233,7 @@ class AcpBridge:
         # Start new process (no initialize yet — lazy, done on first request)
         env = os.environ.copy()
         self.server_proc = subprocess.Popen(
-            [self.acp_bin] + (self.acp_args if self.acp_args else ["--permission-mode", ACP_PERMISSION_MODE]),
+            [self.acp_bin] + (self.acp_args if self.acp_args else []),
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
