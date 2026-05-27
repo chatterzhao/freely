@@ -12706,23 +12706,39 @@ _ensure_acp_bridge_running() {
   local -a _bridge_env=()
   local tool_name="${AI_TOOL:-claude}"
 
-  # ── claude / opencode: resolve alias → settings.json → env key ──
+  # ── claude / opencode: resolve slot config → env vars ──
+  # Known bare tool names still need slot config read for permission mode.
+  local _alias_path=""
   case "$tool_name" in
-    codex|claude|cc|cc-use-codex-cli|kiro-cli|iflow|opencode) ;;
+    codex|claude|cc|cc-use-codex-cli|kiro-cli|iflow|opencode)
+      # Bare tool name: try to find slot config from AI_TOOL_SLOT or ~/.ai-auth/
+      local _slot="${AI_TOOL_SLOT:-}"
+      if [[ -z "$_slot" && "$tool_name" == "opencode" ]]; then
+        _slot=$(ls -d "$HOME/.ai-auth/opencode-"* 2>/dev/null | head -1)
+        [[ -n "$_slot" ]] && _alias_path="$_slot/settings.json"
+      elif [[ -z "$_slot" && "$tool_name" == "codex" ]]; then
+        _slot=$(ls -d "$HOME/.ai-auth/codex-"* 2>/dev/null | head -1)
+      fi
+      ;;
     *)
       local _resolved; _resolved=$(${SHELL:-bash} -ic "alias '$tool_name' 2>/dev/null" 2>/dev/null | sed -n "s/^${tool_name}='\\(.*\\)'$/\\1/p")
       if [[ -n "$_resolved" ]]; then
         # Extract config path from alias (Claude: --settings, OpenCode: OPENCODE_CONFIG=)
-        local _alias_path; _alias_path=$(echo "$_resolved" | sed -n 's/.*--settings \([^ ]*\).*/\1/p')
+        _alias_path=$(echo "$_resolved" | sed -n 's/.*--settings \([^ ]*\).*/\1/p')
         if [[ -z "$_alias_path" ]]; then
           _alias_path=$(echo "$_resolved" | sed -n 's/.*OPENCODE_CONFIG="\([^"]*\)".*/\1/p')
         fi
         _alias_path="${_alias_path/#\~/$HOME}"
-        if [[ -n "$_alias_path" && -f "$_alias_path" ]]; then
-          while IFS='=' read -r key value; do
-            [[ -n "$key" ]] || continue
-            _bridge_env+=("$key=$value")
-          done < <(python3 -c "
+      fi
+      ;;
+  esac
+
+  # Read slot settings.json into bridge env (applies to all tools)
+  if [[ -n "$_alias_path" && -f "$_alias_path" ]]; then
+    while IFS='=' read -r key value; do
+      [[ -n "$key" ]] || continue
+      _bridge_env+=("$key=$value")
+    done < <(python3 -c "
 import json
 try:
     with open('$_alias_path') as f:
@@ -12738,10 +12754,7 @@ try:
         print(f'CLAUDE_CODE_PERMISSION_MODE={pm}')
 except: pass
 " 2>/dev/null)
-        fi
-      fi
-      ;;
-  esac
+  fi
 
   # ── codex: set CODEX_HOME to slot dir ──
   # Codex reads config.toml + auth.json from $CODEX_HOME.

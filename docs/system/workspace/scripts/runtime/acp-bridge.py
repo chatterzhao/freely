@@ -390,30 +390,38 @@ class AcpBridge:
             for sock in dead:
                 self.clients.remove(sock)
 
+    @property
+    def _is_claude_acp(self) -> bool:
+        """session/set_mode is claude-agent-acp specific. opencode/codex don't support it."""
+        return "claude-agent-acp" in self.acp_bin or self.acp_bin == "claude-agent-acp"
+
     def session_new(self, session_id=None, cwd=None):
-        """Create a new ACP session and set bypassPermissions mode."""
+        """Create a new ACP session."""
         params = {"cwd": cwd or self.project, "mcpServers": []}
         if session_id:
             params["sessionId"] = session_id
         result = self._send_request("session/new", params, timeout=30)
         sid = result.get("sessionId", "")
-        # Immediately set bypassPermissions to avoid interactive permission hangs
-        try:
-            self._send_request("session/set_mode", {"sessionId": sid, "modeId": ACP_PERMISSION_MODE}, timeout=10)
-            self.log(f"session {sid[:12]}... mode set to bypassPermissions")
-        except Exception as e:
-            self.log(f"session/set_mode failed (non-fatal): {e}")
+        if self._is_claude_acp:
+            try:
+                self._send_request("session/set_mode",
+                    {"sessionId": sid, "modeId": ACP_PERMISSION_MODE}, timeout=10)
+                self.log(f"session {sid[:12]}... mode set to {ACP_PERMISSION_MODE}")
+            except Exception as e:
+                self.log(f"session/set_mode failed (non-fatal): {e}")
         return sid
 
     def session_resume(self, session_id, cwd=None):
-        """Resume an existing ACP session and ensure bypassPermissions is active."""
+        """Resume an existing ACP session."""
         params = {"sessionId": session_id, "cwd": cwd or self.project, "mcpServers": []}
         result = self._send_request("session/resume", params, timeout=30)
         sid = result.get("sessionId", "")
-        try:
-            self._send_request("session/set_mode", {"sessionId": sid, "modeId": ACP_PERMISSION_MODE}, timeout=10)
-        except Exception:
-            pass
+        if self._is_claude_acp:
+            try:
+                self._send_request("session/set_mode",
+                    {"sessionId": sid, "modeId": ACP_PERMISSION_MODE}, timeout=10)
+            except Exception:
+                pass
         return sid
 
     def session_prompt(self, session_id, prompt_text, timeout=900):
