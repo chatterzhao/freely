@@ -84,7 +84,7 @@ if ! command -v gh >/dev/null 2>&1; then
 fi
 
 gh_pr_args=()
-[[ -n "$title" ]] && gh_pr_args+=(--title "$title")
-[[ -n "$body" ]] && gh_pr_args+=(--body "$body")
+[[ -n "${title:-}" ]] && gh_pr_args+=(--title "$title")
+[[ -n "${body:-}" ]] && gh_pr_args+=(--body "$body")
 
 gh pr create --head "$current_branch" --base "$base" "${gh_pr_args[@]}"
