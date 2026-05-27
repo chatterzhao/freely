@@ -51,6 +51,21 @@ source "$NETWORK_PROXY_RESOLVER_LIB"
 SESSION_CACHE_LIB="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-cache.sh"
 [[ -f "$SESSION_CACHE_LIB" ]] && source "$SESSION_CACHE_LIB"
 
+# ── Tool registry helpers ─────────────────────────────────────────────
+TOOL_REGISTRY="$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-registry.json5"
+TOOL_REGISTRY_QUERY="$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-registry-query.py"
+
+_tool_registry_get() {
+  local tool="$1" field="$2"
+  [[ -f "$TOOL_REGISTRY" && -f "$TOOL_REGISTRY_QUERY" ]] || return 1
+  python3 "$TOOL_REGISTRY_QUERY" "$TOOL_REGISTRY" "$tool" "$field" 2>/dev/null
+}
+
+_tool_is_registered() {
+  local tool="$1"
+  _tool_registry_get "$tool" "acp.binary" >/dev/null 2>&1
+}
+
 RUNTIME_ACP_PROMPT_CLIENT="$SELF_ROOT/docs/system/workspace/scripts/runtime/run-acp-prompt.py"
 
 codex_slot_switch_lock_dir_for_launch() {
@@ -315,8 +330,9 @@ _resolve_tool_family() {
     *-account-*) tool="${tool%%-account-*}" ;;
   esac
   case "$tool" in
-    codex|claude|cc|cc-use-codex-cli|kiro-cli|iflow|opencode) printf '%s\n' "$tool"; return 0 ;;
+    *) ;;
   esac
+  if _tool_is_registered "$tool"; then printf '%s\n' "$tool"; return 0; fi
   local expansion binary
   expansion=$(_resolve_type_expansion "$tool")
   if [[ -z "${expansion:-}" ]]; then
@@ -358,8 +374,9 @@ _apply_tool_alias_settings() {
   local tool="$1"
   local resolved alias_path
   case "$tool" in
-    codex|claude|cc|cc-use-codex-cli|kiro-cli|iflow|opencode) return 0 ;;
+    *) ;;
   esac
+  if _tool_is_registered "$tool"; then return 0; fi
   resolved=$(_resolve_type_expansion "$tool")
   [[ -n "$resolved" ]] || return 0
   local first_binary="${resolved%% *}"
