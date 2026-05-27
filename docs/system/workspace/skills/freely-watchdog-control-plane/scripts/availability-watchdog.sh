@@ -657,7 +657,10 @@ codex_cached_inventory_truth() {
   file="$(codex_availability_cache_file "$project")"
   [[ -f "$file" ]] || { printf 'none\n'; return 1; }
 
+  # Read CSV skipping header line; avoid process substitution for portability
+  local _first=1
   while IFS=$'\t' read -r slot status auth_email reset_at http_code detail refreshed_at; do
+    [[ -n "$_first" ]] && { _first=; continue; }
     [[ -n "$slot" ]] || continue
     if [[ "$status" == "usable" && -z "$usable_slot" ]]; then
       usable_slot="$slot"
@@ -668,7 +671,7 @@ codex_cached_inventory_truth() {
         earliest_reset="$reset_at"
       fi
     fi
-  done < <(tail -n +2 "$file")
+  done < "$file"
 
   if [[ -n "$usable_slot" ]]; then
     printf 'usable:%s\n' "$usable_slot"
