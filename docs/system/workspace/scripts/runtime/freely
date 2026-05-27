@@ -1,5 +1,5 @@
-# file-size: skip (legacy 20K line monolith, split pending)
 #!/usr/bin/env bash
+# file-size: skip (legacy 20K line monolith, split pending)
 # freely: AI-native project runtime — daemon, supervisor, and lifecycle orchestrator.
 #
 # Responsibilities:
