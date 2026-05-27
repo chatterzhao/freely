@@ -1,0 +1,1369 @@
+#!/usr/bin/env python3
+"""freely_db_manager.py — Unified SQLite access daemon for Freely.
+
+Single long-running process, single SQLite connection. All 40+ operations
+across chats, sessions, handoffs, and task_mode_gate tables go through
+this daemon via Unix-domain-socket JSON-RPC.
+
+Lifecycle:
+  python3 freely_db_manager.py start --project <path> [--foreground]
+  python3 freely_db_manager.py stop --project <path>
+  python3 freely_db_manager.py status --project <path>
+"""
+
+import argparse
+import hashlib
+import json
+import os
+import re
+import signal
+import socket
+import sqlite3
+import sys
+import time
+import uuid
+from datetime import datetime, timezone
+
+# Import handoff parser for parse/extract (lazy-loaded at first use)
+_handoff_parser = None
+
+def _get_handoff_parser():
+    global _handoff_parser
+    if _handoff_parser is None:
+        from handoff_parser import (
+            extract_handoff_block, validate_handoff_json, normalize_fields, normalize_exit_kind
+        )
+        _handoff_parser = (extract_handoff_block, validate_handoff_json, normalize_fields, normalize_exit_kind)
+    return _handoff_parser
+
+
+# ── Path helpers ──────────────────────────────────────────────────────────
+
+def _short_hash(project: str) -> str:
+    return hashlib.sha256(os.path.abspath(project).encode()).hexdigest()[:16]
+
+
+def _socket_path(project: str) -> str:
+    return f"/tmp/freely-db-{_short_hash(project)}.sock"
+
+
+def _pid_file(project: str) -> str:
+    return f"/tmp/freely-db-{_short_hash(project)}.pid"
+
+
+def _log_file(project: str) -> str:
+    return os.path.join(project, ".freely", "run", "db-daemon.log")
+
+
+# ── Timestamp helpers ─────────────────────────────────────────────────────
+
+def _now_utc() -> str:
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _utc_timestamp() -> int:
+    """Second-precision UTC timestamp: YYYYMMDDHHMMSS (14 digits).
+    Fits in SQLite INTEGER (max 9.2e18). Single-writer daemon eliminates collisions.
+    """
+    return int(datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S"))
+
+
+def _bare_to_iso(raw: str) -> str:
+    raw = raw.strip()
+    if len(raw) >= 14 and raw[8] == "T":
+        return raw
+    if len(raw) == 14 and raw.isdigit():
+        return f"{raw[:8]}T{raw[8:]}Z"
+    return raw
+
+
+def _iso_to_bare(val: str) -> str:
+    val = val.strip()
+    if len(val) >= 14 and val[8] == "T":
+        core = val[:8] + val[9:].replace("Z", "")
+        return core
+    return val
+
+
+# ── Daemon ────────────────────────────────────────────────────────────────
+
+class DbDaemon:
+    def __init__(self, project: str):
+        self.project = os.path.abspath(project)
+        self.db_path = os.path.join(self.project, ".freely", "freely.db")
+        self.socket_path = _socket_path(self.project)
+        self.pid_file = _pid_file(self.project)
+        self.log_path = _log_file(self.project)
+        self.conn: sqlite3.Connection | None = None
+        self.running = False
+        self.requests_served = 0
+        self.errors = 0
+        self.uptime = 0.0
+
+        # Per-second sequence counter for unique chat IDs
+        self._chat_seq = 0
+        self._chat_last_ts = 0
+
+    def log(self, msg: str) -> None:
+        ts = _now_utc()
+        try:
+            os.makedirs(os.path.dirname(self.log_path), exist_ok=True)
+            with open(self.log_path, "a") as f:
+                f.write(f"[{ts}] {msg}\n")
+        except OSError:
+            pass
+
+    def _open_db(self) -> None:
+        os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
+        self.conn = sqlite3.connect(self.db_path)
+        self.conn.execute("PRAGMA journal_mode=WAL")
+        self.conn.execute("PRAGMA foreign_keys=OFF")
+        self.conn.execute("PRAGMA busy_timeout=5000")
+        self.conn.row_factory = sqlite3.Row
+
+    def _ensure_tables(self) -> None:
+        c = self.conn
+
+        # chats
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS chats (
+                id INTEGER PRIMARY KEY,
+                chat_type TEXT NOT NULL,
+                issue_id TEXT NOT NULL,
+                author TEXT NOT NULL DEFAULT 'human',
+                channel TEXT NOT NULL DEFAULT 'chat',
+                message TEXT NOT NULL,
+                consumed INTEGER NOT NULL DEFAULT 0,
+                session_refs TEXT DEFAULT '[]',
+                intake_id TEXT DEFAULT '',
+                materialized_as TEXT DEFAULT '',
+                created_at TEXT NOT NULL DEFAULT '',
+                conversation_id INTEGER DEFAULT 0
+            )
+        """)
+        c.execute("CREATE INDEX IF NOT EXISTS idx_consumed ON chats(consumed)")
+        c.execute("CREATE INDEX IF NOT EXISTS idx_issue_id ON chats(issue_id)")
+        try:
+            c.execute("ALTER TABLE chats ADD COLUMN conversation_id INTEGER DEFAULT 0")
+        except sqlite3.OperationalError:
+            pass
+
+        # sessions
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS sessions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                session_id TEXT NOT NULL UNIQUE,
+                project TEXT NOT NULL,
+                tool TEXT NOT NULL,
+                role TEXT NOT NULL DEFAULT 'manager',
+                parent_session_id TEXT DEFAULT '',
+                launch_kind TEXT NOT NULL DEFAULT 'fresh',
+                tool_adapter TEXT NOT NULL DEFAULT 'direct',
+                resume_mode TEXT DEFAULT '',
+                status TEXT NOT NULL DEFAULT 'active',
+                error_reason TEXT DEFAULT '',
+                metadata_json TEXT DEFAULT '{}',
+                created_at TEXT NOT NULL DEFAULT '',
+                updated_at TEXT NOT NULL DEFAULT ''
+            )
+        """)
+        c.execute("CREATE INDEX IF NOT EXISTS idx_session_id ON sessions(session_id)")
+        c.execute("CREATE INDEX IF NOT EXISTS idx_project_status ON sessions(project, status)")
+        c.execute("CREATE INDEX IF NOT EXISTS idx_project_role_status ON sessions(project, role, status)")
+        c.execute("CREATE INDEX IF NOT EXISTS idx_parent ON sessions(parent_session_id)")
+
+        # tool_switch_events
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS tool_switch_events (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                trigger_error TEXT NOT NULL DEFAULT 'startup',
+                old_tool TEXT NOT NULL DEFAULT '',
+                old_session_id TEXT NOT NULL DEFAULT '',
+                old_jsonl_path TEXT NOT NULL DEFAULT '',
+                old_cycle_log TEXT NOT NULL DEFAULT '',
+                new_tool TEXT NOT NULL DEFAULT '',
+                new_session_id TEXT NOT NULL DEFAULT '',
+                cross_tool INTEGER NOT NULL DEFAULT 0,
+                status TEXT NOT NULL DEFAULT 'succeeded'
+            )
+        """)
+        c.execute("CREATE INDEX IF NOT EXISTS idx_switch_status ON tool_switch_events(status)")
+
+        # handoffs
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS handoffs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                handoff_id TEXT NOT NULL UNIQUE,
+                role TEXT NOT NULL CHECK(role IN ('manager','worker')),
+                raw_key TEXT NOT NULL,
+                worktree TEXT DEFAULT '',
+                branch TEXT DEFAULT '',
+                prompt_file TEXT NOT NULL,
+                parent_handoff_id TEXT DEFAULT '',
+                previous_worker_handoff_id TEXT DEFAULT '',
+                intent_kind TEXT DEFAULT '',
+                status TEXT NOT NULL DEFAULT 'pending'
+                    CHECK(status IN ('pending','launched','completed','rejected','blocked','consumed')),
+                exit_kind TEXT DEFAULT '',
+                reason TEXT DEFAULT '',
+                restart_point TEXT DEFAULT '',
+                next_action TEXT DEFAULT '',
+                completion_summary TEXT DEFAULT '',
+                evidence_paths TEXT DEFAULT '',
+                worker_prompts_csv TEXT DEFAULT '',
+                repair_target_role TEXT DEFAULT '',
+                repair_target_handoff_id TEXT DEFAULT '',
+                validation_errors_json TEXT DEFAULT '[]',
+                session_id TEXT DEFAULT '',
+                created_by TEXT DEFAULT '',
+                consumed_by TEXT DEFAULT '',
+                send_to_ai TEXT NOT NULL DEFAULT 'pending'
+                    CHECK(send_to_ai IN ('pending','success','fail')),
+                launched_at TEXT DEFAULT '',
+                last_activity_at TEXT DEFAULT '',
+                completed_at TEXT DEFAULT '',
+                created_at TEXT NOT NULL DEFAULT '',
+                updated_at TEXT NOT NULL DEFAULT ''
+            )
+        """)
+        c.execute("CREATE INDEX IF NOT EXISTS idx_handoffs_role_status ON handoffs(role, status)")
+        c.execute("CREATE INDEX IF NOT EXISTS idx_handoffs_raw_key ON handoffs(raw_key)")
+        c.execute("CREATE INDEX IF NOT EXISTS idx_handoffs_worktree ON handoffs(worktree)")
+        c.execute("CREATE INDEX IF NOT EXISTS idx_handoffs_parent ON handoffs(parent_handoff_id)")
+        c.execute("CREATE INDEX IF NOT EXISTS idx_handoffs_prev_worker ON handoffs(previous_worker_handoff_id)")
+        c.execute("CREATE INDEX IF NOT EXISTS idx_handoffs_worktree_status ON handoffs(worktree, status)")
+        c.execute("CREATE INDEX IF NOT EXISTS idx_handoffs_send_to_ai ON handoffs(send_to_ai)")
+
+        # Schema migrations for handoffs
+        existing = {row[1] for row in c.execute("PRAGMA table_info(handoffs)")}
+        for col_name, col_def in [
+            ("previous_worker_handoff_id", "TEXT DEFAULT ''"),
+            ("last_activity_at", "TEXT DEFAULT ''"),
+            ("repair_target_role", "TEXT DEFAULT ''"),
+            ("repair_target_handoff_id", "TEXT DEFAULT ''"),
+            ("validation_errors_json", "TEXT DEFAULT '[]'"),
+            ("reason", "TEXT DEFAULT ''"),
+            ("send_to_ai", "TEXT NOT NULL DEFAULT 'pending'"),
+            ("worker_pid", "TEXT DEFAULT ''"),
+        ]:
+            if col_name not in existing:
+                try:
+                    c.execute(f"ALTER TABLE handoffs ADD COLUMN {col_name} {col_def}")
+                except Exception:
+                    pass
+
+        # task_mode_gate
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS task_mode_gate (
+                id INTEGER PRIMARY KEY CHECK (id = 1),
+                mode TEXT NOT NULL DEFAULT 'wait',
+                task_scan_id TEXT DEFAULT '',
+                mode_just_switched INTEGER NOT NULL DEFAULT 0,
+                updated_at TEXT NOT NULL DEFAULT ''
+            )
+        """)
+
+        self.conn.commit()
+        self.log("all tables ensured")
+
+    # ── Request dispatcher ────────────────────────────────────────────
+
+    def dispatch(self, method: str, params: dict) -> dict:
+        handler = HANDLERS.get(method)
+        if handler is None:
+            self.errors += 1
+            raise ValueError(f"unknown method: {method}")
+        try:
+            return handler(self, params)
+        except Exception:
+            self.errors += 1
+            raise
+
+    # ── chat helpers ──────────────────────────────────────────────────
+
+    def _generate_chat_id(self) -> int:
+        """Generate chat PK with second precision + per-second sequence.
+        Single-writer daemon: serial writes eliminate race-condition collisions.
+        Sequence handles sub-second consecutive calls."""
+        ts = _utc_timestamp()
+        if ts == self._chat_last_ts:
+            self._chat_seq += 1
+            return ts + self._chat_seq
+        self._chat_last_ts = ts
+        self._chat_seq = 0
+        return ts
+
+    def _run_socket_server(self) -> None:
+        if os.path.exists(self.socket_path):
+            os.unlink(self.socket_path)
+        sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        sock.bind(self.socket_path)
+        sock.listen(8)
+        os.chmod(self.socket_path, 0o700)
+        sock.settimeout(1.0)
+        self.log(f"listening on {self.socket_path}")
+
+        try:
+            while self.running:
+                try:
+                    conn, _ = sock.accept()
+                    self._handle_client(conn)
+                except socket.timeout:
+                    continue
+                except OSError as e:
+                    self.log(f"socket accept error: {e}")
+                    break
+        finally:
+            sock.close()
+            if os.path.exists(self.socket_path):
+                os.unlink(self.socket_path)
+
+    def _handle_client(self, conn: socket.socket) -> None:
+        try:
+            conn.settimeout(30)
+            data = b""
+            while True:
+                try:
+                    chunk = conn.recv(4096)
+                    if not chunk:
+                        break
+                    data += chunk
+                    if b"\n" in data:
+                        break
+                except socket.timeout:
+                    break
+            if not data:
+                return
+
+            request = json.loads(data.decode().strip())
+            method = request.get("method", "")
+            params = request.get("params", {})
+            req_id = request.get("id", 0)
+
+            result = self.dispatch(method, params)
+            self.requests_served += 1
+
+            response = {"jsonrpc": "2.0", "id": req_id, "result": result}
+            conn.sendall((json.dumps(response, default=str) + "\n").encode())
+        except Exception as e:
+            self.errors += 1
+            error_resp = {
+                "jsonrpc": "2.0",
+                "id": request.get("id", 0) if "request" in dir() else 0,
+                "error": {"code": -32000, "message": str(e)},
+            }
+            try:
+                conn.sendall((json.dumps(error_resp) + "\n").encode())
+            except OSError:
+                pass
+        finally:
+            try:
+                conn.close()
+            except OSError:
+                pass
+
+    # ── Lifecycle ─────────────────────────────────────────────────────
+
+    def start(self) -> None:
+        self._open_db()
+        self._ensure_tables()
+        self.running = True
+        self.uptime = time.time()
+        self._run_socket_server()
+
+    def stop(self) -> None:
+        self.running = False
+        if self.conn:
+            try:
+                self.conn.close()
+            except Exception:
+                pass
+        self.log("daemon stopped")
+
+
+# ── Method handlers ───────────────────────────────────────────────────────
+
+HANDLERS = {}
+
+def _h(method: str):
+    """Decorator to register a handler."""
+    def dec(fn):
+        HANDLERS[method] = fn
+        return fn
+    return dec
+
+
+# ── db.* ──────────────────────────────────────────────────────────────────
+
+@_h("db.ping")
+def h_db_ping(daemon: DbDaemon, params: dict) -> dict:
+    return {"pong": True}
+
+
+@_h("db.stats")
+def h_db_stats(daemon: DbDaemon, params: dict) -> dict:
+    return {
+        "uptime": int(time.time() - daemon.uptime),
+        "requests_served": daemon.requests_served,
+        "errors": daemon.errors,
+    }
+
+
+# ── chat.* ────────────────────────────────────────────────────────────────
+
+@_h("chat.add")
+def h_chat_add(daemon: DbDaemon, params: dict) -> dict:
+    chat_type = params["chat_type"]
+    issue_id = params.get("issue_id", "pending")
+    message = params["message"]
+    author = params.get("author", "human")
+    channel = params.get("channel", "chat")
+    session_refs = params.get("session_refs", "[]")
+    intake_id = params.get("intake_id", "")
+    conversation_id = int(params.get("conversation_id", 0))
+
+    for attempt in range(5):
+        chat_id = daemon._generate_chat_id()
+        try:
+            daemon.conn.execute(
+                "INSERT INTO chats (id, chat_type, issue_id, author, channel, "
+                "message, consumed, session_refs, intake_id, created_at, conversation_id) "
+                "VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?)",
+                (chat_id, chat_type, issue_id, author, channel,
+                 message, session_refs, intake_id, _now_utc(), conversation_id),
+            )
+            if chat_type == "chat-message" and conversation_id == 0:
+                daemon.conn.execute(
+                    "UPDATE chats SET conversation_id = ? WHERE id = ?",
+                    (chat_id, chat_id),
+                )
+            daemon.conn.commit()
+            return {"chat_id": _bare_to_iso(str(chat_id))}
+        except sqlite3.IntegrityError:
+            if attempt < 4:
+                continue
+            raise
+
+
+@_h("chat.list")
+def h_chat_list(daemon: DbDaemon, params: dict) -> dict:
+    limit = int(params.get("limit", 50))
+    rows = daemon.conn.execute(
+        "SELECT * FROM chats WHERE consumed = 0 AND (conversation_id = 0 OR conversation_id IS NULL) "
+        "ORDER BY id ASC LIMIT ?", (limit,)
+    ).fetchall()
+    return {"rows": [dict(r) for r in rows]}
+
+
+@_h("chat.list-conversations")
+def h_chat_list_conversations(daemon: DbDaemon, params: dict) -> dict:
+    rows = daemon.conn.execute(
+        "SELECT conversation_id, COUNT(*) as cnt, MIN(created_at) as first_at, MIN(id) as first_id "
+        "FROM chats WHERE consumed = 0 AND conversation_id > 0 "
+        "GROUP BY conversation_id ORDER BY MIN(id)"
+    ).fetchall()
+    return {"rows": [dict(r) for r in rows]}
+
+
+@_h("chat.query-by-issue")
+def h_chat_query_by_issue(daemon: DbDaemon, params: dict) -> dict:
+    issue_id = params["issue_id"]
+    consumed = params.get("consumed")
+    if consumed is not None:
+        rows = daemon.conn.execute(
+            "SELECT * FROM chats WHERE issue_id = ? AND consumed = ? ORDER BY id ASC",
+            (issue_id, int(consumed)),
+        ).fetchall()
+    else:
+        rows = daemon.conn.execute(
+            "SELECT * FROM chats WHERE issue_id = ? ORDER BY id ASC",
+            (issue_id,),
+        ).fetchall()
+    return {"rows": [dict(r) for r in rows]}
+
+
+@_h("chat.show")
+def h_chat_show(daemon: DbDaemon, params: dict) -> dict:
+    chat_id = params["chat_id"]
+    chat_id_bare = int(_iso_to_bare(str(chat_id))) if not str(chat_id).isdigit() else int(chat_id)
+    row = daemon.conn.execute(
+        "SELECT * FROM chats WHERE id = ?", (chat_id_bare,)
+    ).fetchone()
+    if not row:
+        alt = _bare_to_iso(str(chat_id)) if str(chat_id).isdigit() else _iso_to_bare(str(chat_id))
+        try:
+            row = daemon.conn.execute(
+                "SELECT * FROM chats WHERE id = ?", (int(alt),)
+            ).fetchone()
+        except (ValueError, TypeError):
+            pass
+    if row:
+        return {"found": True, "chat": dict(row)}
+    return {"found": False}
+
+
+@_h("chat.consume")
+def h_chat_consume(daemon: DbDaemon, params: dict) -> dict:
+    chat_id = params["chat_id"]
+    materialized_as = params.get("materialized_as", "")
+    bare = _iso_to_bare(str(chat_id))
+    daemon.conn.execute(
+        "UPDATE chats SET consumed = 1, materialized_as = ? WHERE id = ?",
+        (materialized_as, int(bare) if bare.isdigit() else bare),
+    )
+    changed = daemon.conn.total_changes > 0
+    daemon.conn.commit()
+    return {"changed": changed}
+
+
+@_h("chat.discard")
+def h_chat_discard(daemon: DbDaemon, params: dict) -> dict:
+    chat_id = params["chat_id"]
+    bare = _iso_to_bare(str(chat_id))
+    daemon.conn.execute(
+        "UPDATE chats SET consumed = -1 WHERE id = ?",
+        (int(bare) if bare.isdigit() else bare,),
+    )
+    changed = daemon.conn.total_changes > 0
+    daemon.conn.commit()
+    return {"changed": changed}
+
+
+@_h("chat.reset")
+def h_chat_reset(daemon: DbDaemon, params: dict) -> dict:
+    chat_id = params["chat_id"]
+    bare = _iso_to_bare(str(chat_id))
+    daemon.conn.execute(
+        "UPDATE chats SET consumed = 0 WHERE id = ?",
+        (int(bare) if bare.isdigit() else bare,),
+    )
+    changed = daemon.conn.total_changes > 0
+    daemon.conn.commit()
+    return {"changed": changed}
+
+
+@_h("chat.update-issue-id")
+def h_chat_update_issue_id(daemon: DbDaemon, params: dict) -> dict:
+    chat_id = params["chat_id"]
+    new_issue_id = params["issue_id"]
+    bare = _iso_to_bare(str(chat_id))
+    daemon.conn.execute(
+        "UPDATE chats SET issue_id = ? WHERE id = ?",
+        (new_issue_id, int(bare) if bare.isdigit() else bare),
+    )
+    changed = daemon.conn.total_changes > 0
+    daemon.conn.commit()
+    return {"changed": changed}
+
+
+@_h("chat.update-conversation-id")
+def h_chat_update_conversation_id(daemon: DbDaemon, params: dict) -> dict:
+    chat_id = params["chat_id"]
+    conv_id = int(params["conversation_id"])
+    bare = _iso_to_bare(str(chat_id))
+    daemon.conn.execute(
+        "UPDATE chats SET conversation_id = ? WHERE id = ?",
+        (conv_id, int(bare) if bare.isdigit() else bare),
+    )
+    changed = daemon.conn.total_changes > 0
+    daemon.conn.commit()
+    return {"changed": changed}
+
+
+@_h("chat.query-active-conversation")
+def h_chat_query_active_conversation(daemon: DbDaemon, params: dict) -> dict:
+    row = daemon.conn.execute(
+        "SELECT conversation_id FROM chats WHERE chat_type = 'chat-message' "
+        "AND consumed = 0 AND conversation_id > 0 ORDER BY id DESC LIMIT 1"
+    ).fetchone()
+    return {"conversation_id": row[0] if row else None}
+
+
+@_h("chat.conversation-messages")
+def h_chat_conversation_messages(daemon: DbDaemon, params: dict) -> dict:
+    conv_id = int(params["conversation_id"])
+    rows = daemon.conn.execute(
+        "SELECT * FROM chats WHERE conversation_id = ? AND consumed = 0 ORDER BY id ASC",
+        (conv_id,),
+    ).fetchall()
+    return {"rows": [dict(r) for r in rows]}
+
+
+@_h("chat.consume-conversation")
+def h_chat_consume_conversation(daemon: DbDaemon, params: dict) -> dict:
+    conv_id = int(params["conversation_id"])
+    action = params["action"]
+    target_dir = params.get("target", "")
+    rows = daemon.conn.execute(
+        "SELECT * FROM chats WHERE conversation_id = ? AND consumed = 0 ORDER BY id ASC",
+        (conv_id,),
+    ).fetchall()
+    if not rows:
+        return {"count": 0}
+
+    messages = [dict(r) for r in rows]
+    count = 0
+    now = _now_utc()
+
+    if action == "materialize" and target_dir:
+        combined = "\n---\n".join(m.get("message", "") for m in messages)
+        issue_id = f"raw-{messages[0]['id']}"
+        first = messages[0]
+        author = first.get("author", "human")
+        channel = first.get("channel", "chat")
+        created_at = first.get("created_at", now)
+        session_refs = first.get("session_refs", "[]")
+        intake_id = first.get("intake_id", "")
+
+        os.makedirs(target_dir, exist_ok=True)
+        issue_file = os.path.join(target_dir, "issue.md")
+        with open(issue_file, "w", encoding="utf-8") as f:
+            f.write(
+                f"---\nlocal_id: {issue_id}\nkind: raw\nphase_state: proposed\n"
+                f"platform_ids: {{}}\nprimary_platform: \"\"\ncanonical_issue_path: \"\"\n"
+                f"last_synced_comment_at: {{}}\nhash: \"\"\n"
+                f"created_at: {created_at}\nupdated_at: {created_at}\n"
+                f"intake_id: {intake_id}\nauthor: {author}\nchannel: {channel}\n"
+                f"session_refs: {session_refs}\n---\n\n{combined}\n"
+            )
+        for m in messages:
+            daemon.conn.execute("UPDATE chats SET consumed = 1, materialized_as = ? WHERE id = ?",
+                                (issue_id, m["id"]))
+            count += 1
+
+    elif action == "materialize-all-as-comment" and target_dir:
+        for m in messages:
+            author = m.get("author", "human")
+            channel = m.get("channel", "chat")
+            created_at = m.get("created_at", now)
+            msg = m.get("message", "")
+            comment_id = f"comment-{created_at.replace(':', '').replace('-', '')}"
+            os.makedirs(os.path.dirname(target_dir), exist_ok=True)
+            with open(target_dir, "a", encoding="utf-8") as f:
+                f.write(f"\n### {comment_id}\n{{source: chat, author: {author}, channel: {channel}}}\n\n{msg}\n")
+            daemon.conn.execute("UPDATE chats SET consumed = 1 WHERE id = ?", (m["id"],))
+            count += 1
+
+    daemon.conn.commit()
+    return {"count": count}
+
+
+@_h("chat.count-comments-for-key")
+def h_chat_count_comments(daemon: DbDaemon, params: dict) -> dict:
+    key = params["key"]
+    row = daemon.conn.execute(
+        "SELECT COUNT(*) FROM chats WHERE consumed = 0 AND chat_type = 'comment' "
+        "AND (issue_id = ? OR issue_id LIKE ?)", (key, f"{key}%")
+    ).fetchone()
+    return {"count": row[0]}
+
+
+@_h("chat.base-keys")
+def h_chat_base_keys(daemon: DbDaemon, params: dict) -> dict:
+    rows = daemon.conn.execute(
+        "SELECT DISTINCT issue_id FROM chats WHERE consumed = 0 AND chat_type = 'new-issue'"
+    ).fetchall()
+    return {"keys": [r[0] for r in rows]}
+
+
+# ── session.* ─────────────────────────────────────────────────────────────
+
+@_h("session.upsert")
+def h_session_upsert(daemon: DbDaemon, params: dict) -> dict:
+    session_id = params["session_id"]
+    project = params.get("project", daemon.project)
+    tool = params["tool"]
+    role = params.get("role", "manager")
+    parent_session_id = params.get("parent_session_id", "")
+    launch_kind = params.get("launch_kind", "fresh")
+    tool_adapter = params.get("tool_adapter", "direct")
+    resume_mode = params.get("resume_mode", "")
+    error_reason = params.get("error_reason", "")
+    metadata_json = params.get("metadata_json", "{}")
+    now = _now_utc()
+
+    existing = daemon.conn.execute(
+        "SELECT session_id FROM sessions WHERE session_id = ?", (session_id,)
+    ).fetchone()
+
+    if existing:
+        daemon.conn.execute(
+            "UPDATE sessions SET project=?, tool=?, role=?, parent_session_id=?, "
+            "launch_kind=?, tool_adapter=?, resume_mode=?, status='active', "
+            "error_reason=?, metadata_json=?, updated_at=? WHERE session_id=?",
+            (project, tool, role, parent_session_id, launch_kind, tool_adapter,
+             resume_mode, error_reason, metadata_json, now, session_id),
+        )
+    else:
+        daemon.conn.execute(
+            "INSERT INTO sessions (session_id, project, tool, role, parent_session_id, "
+            "launch_kind, tool_adapter, resume_mode, status, error_reason, metadata_json, "
+            "created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,'active',?,?,?,?)",
+            (session_id, project, tool, role, parent_session_id, launch_kind,
+             tool_adapter, resume_mode, error_reason, metadata_json, now, now),
+        )
+    daemon.conn.commit()
+    return {"session_id": session_id}
+
+
+@_h("session.get-active")
+def h_session_get_active(daemon: DbDaemon, params: dict) -> dict:
+    project = params.get("project", daemon.project)
+    role = params.get("role", "manager")
+    row = daemon.conn.execute(
+        "SELECT session_id FROM sessions WHERE project=? AND role=? AND status='active' "
+        "ORDER BY updated_at DESC LIMIT 1", (project, role)
+    ).fetchone()
+    return {"session_id": row[0] if row else None}
+
+
+@_h("session.get-parent")
+def h_session_get_parent(daemon: DbDaemon, params: dict) -> dict:
+    row = daemon.conn.execute(
+        "SELECT parent_session_id FROM sessions WHERE session_id=?",
+        (params["session_id"],)
+    ).fetchone()
+    return {"parent_session_id": row[0] if row and row[0] else None}
+
+
+@_h("session.show")
+def h_session_show(daemon: DbDaemon, params: dict) -> dict:
+    row = daemon.conn.execute(
+        "SELECT * FROM sessions WHERE session_id=?", (params["session_id"],)
+    ).fetchone()
+    if row:
+        return {"found": True, "session": dict(row)}
+    return {"found": False}
+
+
+@_h("session.complete")
+def h_session_complete(daemon: DbDaemon, params: dict) -> dict:
+    status = params.get("status", "completed")
+    error_reason = params.get("error_reason", "")
+    daemon.conn.execute(
+        "UPDATE sessions SET status=?, error_reason=?, updated_at=? WHERE session_id=?",
+        (status, error_reason, _now_utc(), params["session_id"]),
+    )
+    changed = daemon.conn.total_changes > 0
+    daemon.conn.commit()
+    return {"changed": changed}
+
+
+@_h("session.list")
+def h_session_list(daemon: DbDaemon, params: dict) -> dict:
+    project = params.get("project", daemon.project)
+    status = params.get("status")
+    role = params.get("role")
+    if status and role:
+        rows = daemon.conn.execute(
+            "SELECT * FROM sessions WHERE project=? AND status=? AND role=? ORDER BY updated_at DESC",
+            (project, status, role),
+        ).fetchall()
+    elif status:
+        rows = daemon.conn.execute(
+            "SELECT * FROM sessions WHERE project=? AND status=? ORDER BY updated_at DESC",
+            (project, status),
+        ).fetchall()
+    elif role:
+        rows = daemon.conn.execute(
+            "SELECT * FROM sessions WHERE project=? AND role=? ORDER BY updated_at DESC",
+            (project, role),
+        ).fetchall()
+    else:
+        rows = daemon.conn.execute(
+            "SELECT * FROM sessions WHERE project=? ORDER BY updated_at DESC",
+            (project,),
+        ).fetchall()
+    return {"rows": [dict(r) for r in rows]}
+
+
+@_h("session.list-children")
+def h_session_list_children(daemon: DbDaemon, params: dict) -> dict:
+    rows = daemon.conn.execute(
+        "SELECT * FROM sessions WHERE parent_session_id=? ORDER BY updated_at DESC",
+        (params["parent_session_id"],),
+    ).fetchall()
+    return {"rows": [dict(r) for r in rows]}
+
+
+@_h("session.count-active")
+def h_session_count_active(daemon: DbDaemon, params: dict) -> dict:
+    project = params.get("project", daemon.project)
+    row = daemon.conn.execute(
+        "SELECT COUNT(*) FROM sessions WHERE project=? AND status='active'",
+        (project,),
+    ).fetchone()
+    return {"count": row[0]}
+
+
+@_h("session.tool-switch-read")
+def h_session_tool_switch_read(daemon: DbDaemon, params: dict) -> dict:
+    row = daemon.conn.execute(
+        "SELECT * FROM tool_switch_events WHERE status='succeeded' ORDER BY id DESC LIMIT 1"
+    ).fetchone()
+    if row is None:
+        return {"found": False}
+    return {"found": True, "record": dict(row)}
+
+
+@_h("session.tool-switch-write")
+def h_session_tool_switch_write(daemon: DbDaemon, params: dict) -> dict:
+    trigger_error = params.get("trigger_error", "startup")
+    old_tool = params.get("old_tool", "")
+    old_session_id = params.get("old_session_id", "")
+    old_jsonl_path = params.get("old_jsonl_path", "")
+    old_cycle_log = params.get("old_cycle_log", "")
+    new_tool = params.get("new_tool", "")
+    new_session_id = params.get("new_session_id", "")
+
+    cross_tool = 0
+    if old_tool and new_tool:
+        base_old = old_tool.split("-")[0] if "-" in old_tool else old_tool
+        base_new = new_tool.split("-")[0] if "-" in new_tool else new_tool
+        cross_tool = 1 if base_old != base_new else 0
+
+    daemon.conn.execute("UPDATE tool_switch_events SET status='stale' WHERE status!='stale'")
+    daemon.conn.execute(
+        "INSERT INTO tool_switch_events (trigger_error, old_tool, old_session_id, "
+        "old_jsonl_path, old_cycle_log, new_tool, new_session_id, cross_tool, status) "
+        "VALUES (?,?,?,?,?,?,?,?,'succeeded')",
+        (trigger_error, old_tool, old_session_id, old_jsonl_path, old_cycle_log,
+         new_tool, new_session_id, cross_tool),
+    )
+    daemon.conn.commit()
+    return {"ok": True}
+
+
+@_h("session.tool-switch-update-sid")
+def h_session_tool_switch_update_sid(daemon: DbDaemon, params: dict) -> dict:
+    daemon.conn.execute(
+        "UPDATE tool_switch_events SET new_session_id=? "
+        "WHERE status='succeeded' AND id=(SELECT MAX(id) FROM tool_switch_events WHERE status='succeeded')",
+        (params["new_session_id"],),
+    )
+    changed = daemon.conn.total_changes > 0
+    daemon.conn.commit()
+    return {"changed": changed}
+
+
+# ── handoff.* ─────────────────────────────────────────────────────────────
+
+@_h("handoff.insert")
+def h_handoff_insert(daemon: DbDaemon, params: dict) -> dict:
+    now = _now_utc()
+    hid = (now.replace("T", "").replace("Z", "").replace("-", "").replace(":", "")
+           + "-" + uuid.uuid4().hex[:6])
+    daemon.conn.execute(
+        """INSERT INTO handoffs (handoff_id, role, raw_key, worktree, branch,
+           prompt_file, parent_handoff_id, previous_worker_handoff_id,
+           intent_kind, status, exit_kind, reason, restart_point, next_action,
+           completion_summary, evidence_paths, worker_prompts_csv,
+           session_id, created_by, consumed_by, created_at, updated_at)
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+        (hid, params.get("role", "manager"), params.get("raw_key", ""),
+         params.get("worktree", ""), params.get("branch", ""),
+         params.get("prompt_file", ""), params.get("parent", ""),
+         params.get("prev_worker", ""), params.get("intent_kind", ""),
+         params.get("status", "pending"), params.get("exit_kind", ""),
+         params.get("reason", ""), params.get("restart_point", ""),
+         params.get("next_action", ""), params.get("completion_summary", ""),
+         params.get("evidence_paths", ""), params.get("worker_prompts_csv", ""),
+         params.get("session_id", ""), params.get("created_by", ""),
+         params.get("consumed_by", ""), now, now),
+    )
+    daemon.conn.commit()
+    return {"handoff_id": hid}
+
+
+@_h("handoff.update")
+def h_handoff_update(daemon: DbDaemon, params: dict) -> dict:
+    now = _now_utc()
+    fields = []
+    values = []
+    for f in ("status", "exit_kind", "session_id", "reason", "restart_point",
+              "next_action", "completion_summary", "evidence_paths", "worker_prompts_csv"):
+        if f in params:
+            fields.append(f"{f}=?")
+            values.append(params[f])
+    if not fields:
+        return {"affected": 0}
+    fields.append("updated_at=?")
+    values.append(now)
+    values.append(params["handoff_id"])
+    daemon.conn.execute(
+        f"UPDATE handoffs SET {', '.join(fields)} WHERE handoff_id=?",
+        values,
+    )
+    affected = daemon.conn.total_changes
+    daemon.conn.commit()
+    return {"affected": affected}
+
+
+@_h("handoff.get")
+def h_handoff_get(daemon: DbDaemon, params: dict) -> dict:
+    row = daemon.conn.execute(
+        "SELECT * FROM handoffs WHERE handoff_id=?", (params["handoff_id"],)
+    ).fetchone()
+    return {"record": dict(row) if row else None}
+
+
+@_h("handoff.list")
+def h_handoff_list(daemon: DbDaemon, params: dict) -> dict:
+    role = params.get("role", "worker")
+    status = params.get("status")
+    if status:
+        rows = daemon.conn.execute(
+            "SELECT * FROM handoffs WHERE role=? AND status=? ORDER BY created_at DESC",
+            (role, status),
+        ).fetchall()
+    else:
+        rows = daemon.conn.execute(
+            "SELECT * FROM handoffs WHERE role=? ORDER BY created_at DESC",
+            (role,),
+        ).fetchall()
+    return {"rows": [dict(r) for r in rows]}
+
+
+@_h("handoff.list-by-key")
+def h_handoff_list_by_key(daemon: DbDaemon, params: dict) -> dict:
+    rows = daemon.conn.execute(
+        "SELECT * FROM handoffs WHERE raw_key=? ORDER BY created_at DESC",
+        (params["raw_key"],),
+    ).fetchall()
+    return {"rows": [dict(r) for r in rows]}
+
+
+@_h("handoff.active-workers")
+def h_handoff_active_workers(daemon: DbDaemon, params: dict) -> dict:
+    worktree = params.get("worktree", "")
+    rows = daemon.conn.execute(
+        "SELECT * FROM handoffs WHERE role='worker' AND status='launched' AND worktree=?",
+        (worktree,),
+    ).fetchall()
+    return {"rows": [dict(r) for r in rows]}
+
+
+@_h("handoff.has-active-worker")
+def h_handoff_has_active_worker(daemon: DbDaemon, params: dict) -> dict:
+    row = daemon.conn.execute(
+        "SELECT COUNT(*) FROM handoffs WHERE role='worker' AND status='launched' AND worktree=?",
+        (params.get("worktree", ""),),
+    ).fetchone()
+    return {"has_active": row[0] > 0}
+
+
+@_h("handoff.latest-manager")
+def h_handoff_latest_manager(daemon: DbDaemon, params: dict) -> dict:
+    row = daemon.conn.execute(
+        "SELECT * FROM handoffs WHERE role='manager' ORDER BY created_at DESC LIMIT 1"
+    ).fetchone()
+    return {"record": dict(row) if row else None}
+
+
+@_h("handoff.latest-completed-worker")
+def h_handoff_latest_completed_worker(daemon: DbDaemon, params: dict) -> dict:
+    raw_key = params.get("raw_key", "")
+    if raw_key:
+        row = daemon.conn.execute(
+            "SELECT * FROM handoffs WHERE role='worker' AND status='completed' AND raw_key=? "
+            "ORDER BY completed_at DESC LIMIT 1", (raw_key,)
+        ).fetchone()
+    else:
+        row = daemon.conn.execute(
+            "SELECT * FROM handoffs WHERE role='worker' AND status='completed' "
+            "ORDER BY completed_at DESC LIMIT 1"
+        ).fetchone()
+    return {"record": dict(row) if row else None}
+
+
+@_h("handoff.mark-stale")
+def h_handoff_mark_stale(daemon: DbDaemon, params: dict) -> dict:
+    timeout = int(params.get("inactivity_minutes", 15))
+    daemon.conn.execute(
+        "UPDATE handoffs SET status='blocked', updated_at=? "
+        "WHERE status IN ('pending','launched') AND role='worker' "
+        "AND datetime(last_activity_at) < datetime('now', ? || ' minutes')",
+        (_now_utc(), f"-{timeout}"),
+    )
+    affected = daemon.conn.total_changes
+    daemon.conn.commit()
+    return {"affected": affected}
+
+
+@_h("handoff.auto-consume")
+def h_handoff_auto_consume(daemon: DbDaemon, params: dict) -> dict:
+    raw_key = params.get("raw_key", "")
+    consumed_by = params.get("consumed_by", "manager")
+    daemon.conn.execute(
+        "UPDATE handoffs SET status='consumed', consumed_by=?, updated_at=? "
+        "WHERE raw_key=? AND role='worker' AND status IN ('completed','rejected')",
+        (consumed_by, _now_utc(), raw_key),
+    )
+    affected = daemon.conn.total_changes
+    daemon.conn.commit()
+    return {"affected": affected}
+
+
+@_h("handoff.update-last-activity")
+def h_handoff_update_last_activity(daemon: DbDaemon, params: dict) -> dict:
+    daemon.conn.execute(
+        "UPDATE handoffs SET last_activity_at=? WHERE handoff_id=?",
+        (_now_utc(), params["handoff_id"]),
+    )
+    daemon.conn.commit()
+    return {"ok": True}
+
+
+@_h("handoff.update-send-to-ai")
+def h_handoff_update_send_to_ai(daemon: DbDaemon, params: dict) -> dict:
+    daemon.conn.execute(
+        "UPDATE handoffs SET send_to_ai=? WHERE handoff_id=?",
+        (params["send_to_ai"], params["handoff_id"]),
+    )
+    affected = daemon.conn.total_changes
+    daemon.conn.commit()
+    return {"affected": affected}
+
+
+@_h("handoff.update-worker-pid")
+def h_handoff_update_worker_pid(daemon: DbDaemon, params: dict) -> dict:
+    daemon.conn.execute(
+        "UPDATE handoffs SET worker_pid=? WHERE handoff_id=?",
+        (params["worker_pid"], params["handoff_id"]),
+    )
+    affected = daemon.conn.total_changes
+    daemon.conn.commit()
+    return {"affected": affected}
+
+
+@_h("handoff.list-pending-delivery")
+def h_handoff_list_pending_delivery(daemon: DbDaemon, params: dict) -> dict:
+    consumed_by = params.get("consumed_by", "")
+    if consumed_by:
+        rows = daemon.conn.execute(
+            "SELECT * FROM handoffs WHERE send_to_ai='pending' AND consumed_by=? "
+            "ORDER BY created_at ASC", (consumed_by,)
+        ).fetchall()
+    else:
+        rows = daemon.conn.execute(
+            "SELECT * FROM handoffs WHERE send_to_ai='pending' ORDER BY created_at ASC"
+        ).fetchall()
+    return {"rows": [dict(r) for r in rows]}
+
+
+@_h("handoff.get-launched-pids")
+def h_handoff_get_launched_pids(daemon: DbDaemon, params: dict) -> dict:
+    raw_key = params.get("raw_key", "")
+    if raw_key:
+        rows = daemon.conn.execute(
+            "SELECT handoff_id, worker_pid, worktree FROM handoffs "
+            "WHERE role='worker' AND status='launched' AND raw_key=? AND worker_pid!=''",
+            (raw_key,),
+        ).fetchall()
+    else:
+        rows = daemon.conn.execute(
+            "SELECT handoff_id, worker_pid, worktree FROM handoffs "
+            "WHERE role='worker' AND status='launched' AND worker_pid!=''"
+        ).fetchall()
+    return {"rows": [dict(r) for r in rows]}
+
+
+@_h("handoff.parse")
+def h_handoff_parse(daemon: DbDaemon, params: dict) -> dict:
+    """Parse handoff JSON from AI reply, validate, insert into DB.
+    Uses handoff_parser for pure logic, DB for the insert."""
+    extract, validate, norm_fields, norm_exit = _get_handoff_parser()
+    reply_text = params["reply_text"]
+    context = params.get("context", {})
+
+    block = extract(reply_text)
+    if not block:
+        return {"ok": False, "errors": [{"field": "handoff_block", "error": "no ```handoff block found"}]}
+
+    try:
+        ai_fields = json.loads(block)
+    except json.JSONDecodeError as e:
+        return {"ok": False, "errors": [{"field": "parse", "error": str(e)}]}
+
+    norm_fields(ai_fields)
+    ok, errors = validate(ai_fields)
+    if not ok:
+        return {"ok": False, "errors": errors}
+
+    # Build record: Runtime fields + AI fields
+    now = _now_utc()
+    hid = (now.replace("T", "").replace("Z", "").replace("-", "").replace(":", "")
+           + "-" + uuid.uuid4().hex[:6])
+
+    record = {
+        "handoff_id": hid,
+        "role": context.get("role", "manager"),
+        "raw_key": context.get("raw_key", ""),
+        "worktree": context.get("worktree", ""),
+        "branch": context.get("branch", ""),
+        "prompt_file": context.get("prompt_file", ""),
+        "parent_handoff_id": context.get("parent_handoff_id", ""),
+        "previous_worker_handoff_id": context.get("previous_worker_handoff_id", ""),
+        "intent_kind": context.get("intent_kind", ""),
+        "status": "pending",
+        "session_id": context.get("session_id", ""),
+        "created_by": "runtime",
+        "consumed_by": ai_fields.get("consumed_by") or context.get("role", "manager"),
+        "launched_at": "", "last_activity_at": "", "completed_at": "",
+        "created_at": now, "updated_at": now,
+        **{k: v for k, v in ai_fields.items() if v != ''},
+    }
+    for f in ('exit_kind', 'reason', 'restart_point', 'next_action',
+              'completion_summary', 'evidence_paths', 'worker_prompts_csv'):
+        if f not in record:
+            record[f] = ''
+
+    daemon.conn.execute(
+        """INSERT INTO handoffs (handoff_id, role, raw_key, worktree, branch,
+           prompt_file, parent_handoff_id, previous_worker_handoff_id,
+           intent_kind, status, exit_kind, reason, restart_point, next_action,
+           completion_summary, evidence_paths, worker_prompts_csv,
+           session_id, created_by, consumed_by,
+           launched_at, last_activity_at, completed_at, created_at, updated_at)
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+        (record["handoff_id"], record["role"], record["raw_key"],
+         record["worktree"], record["branch"], record["prompt_file"],
+         record["parent_handoff_id"], record["previous_worker_handoff_id"],
+         record["intent_kind"], record["status"],
+         record["exit_kind"], record["reason"],
+         record["restart_point"], record["next_action"],
+         record["completion_summary"], record["evidence_paths"],
+         record["worker_prompts_csv"],
+         record["session_id"], record["created_by"], record["consumed_by"],
+         record["launched_at"], record["last_activity_at"],
+         record["completed_at"], record["created_at"], record["updated_at"]))
+    # Manager records auto-complete
+    if record["role"] == "manager":
+        daemon.conn.execute(
+            "UPDATE handoffs SET status='completed', completed_at=?, updated_at=? WHERE handoff_id=?",
+            (now, now, record["handoff_id"]))
+        record["status"] = "completed"
+    daemon.conn.commit()
+
+    return {"ok": True, "handoff_id": record["handoff_id"], "exit_kind": record["exit_kind"]}
+
+
+@_h("handoff.extract")
+def h_handoff_extract(daemon: DbDaemon, params: dict) -> dict:
+    """Extract and validate handoff JSON without any DB side effects."""
+    from handoff_parser import extract_handoff_json
+    return extract_handoff_json(params.get("reply_text", ""))
+
+
+# ── task-mode.* ───────────────────────────────────────────────────────────
+
+@_h("task-mode.init")
+def h_task_mode_init(daemon: DbDaemon, params: dict) -> dict:
+    default = params.get("default", "wait")
+    row = daemon.conn.execute("SELECT COUNT(*) FROM task_mode_gate").fetchone()
+    if row[0] == 0:
+        daemon.conn.execute(
+            "INSERT INTO task_mode_gate (id, mode, task_scan_id, updated_at) "
+            "VALUES (1, ?, '', datetime('now'))", (default,)
+        )
+        daemon.conn.commit()
+    return {"ok": True}
+
+
+@_h("task-mode.read")
+def h_task_mode_read(daemon: DbDaemon, params: dict) -> dict:
+    row = daemon.conn.execute(
+        "SELECT mode FROM task_mode_gate WHERE id=1"
+    ).fetchone()
+    mode = row[0] if row else "wait"
+    return {"mode": mode}
+
+
+@_h("task-mode.read-with-scan")
+def h_task_mode_read_with_scan(daemon: DbDaemon, params: dict) -> dict:
+    row = daemon.conn.execute(
+        "SELECT mode, task_scan_id FROM task_mode_gate WHERE id=1"
+    ).fetchone()
+    if row:
+        return {"mode": row[0], "task_scan_id": row[1] or ""}
+    return {"mode": "wait", "task_scan_id": ""}
+
+
+@_h("task-mode.write")
+def h_task_mode_write(daemon: DbDaemon, params: dict) -> dict:
+    mode = params["mode"]
+    scan_id = params.get("scan_id", "")
+    now = _now_utc()
+    daemon.conn.execute(
+        "INSERT OR REPLACE INTO task_mode_gate (id, mode, task_scan_id, mode_just_switched, updated_at) "
+        "VALUES (1, ?, ?, 1, ?)", (mode, scan_id, now)
+    )
+    daemon.conn.commit()
+    return {"ok": True}
+
+
+@_h("task-mode.read-just-switched")
+def h_task_mode_read_just_switched(daemon: DbDaemon, params: dict) -> dict:
+    row = daemon.conn.execute(
+        "SELECT mode_just_switched FROM task_mode_gate WHERE id=1"
+    ).fetchone()
+    val = row[0] if row else 0
+    daemon.conn.execute(
+        "UPDATE task_mode_gate SET mode_just_switched=0 WHERE id=1 AND mode_just_switched=1"
+    )
+    daemon.conn.commit()
+    return {"just_switched": val}
+
+
+# ── CLI ───────────────────────────────────────────────────────────────────
+
+def cmd_start(args) -> int:
+    project = args.project
+    pid_file = _pid_file(project)
+    socket_path = _socket_path(project)
+
+    # Check already running
+    if os.path.exists(pid_file):
+        try:
+            with open(pid_file) as f:
+                old_pid = int(f.read().strip())
+            os.kill(old_pid, 0)
+            print(f"freely-db daemon already running (PID {old_pid})")
+            return 0
+        except (OSError, ValueError):
+            os.unlink(pid_file)
+
+    daemon = DbDaemon(project)
+
+    if not args.foreground:
+        pid = os.fork()
+        if pid > 0:
+            time.sleep(0.3)
+            if os.path.exists(_pid_file(daemon.project)):
+                print(f"freely-db daemon started (PID {pid})")
+                return 0
+            else:
+                print("[ERROR] db daemon failed to start", file=sys.stderr)
+                return 1
+
+    # Child or foreground
+    os.makedirs(os.path.dirname(pid_file), exist_ok=True)
+    with open(pid_file, "w") as f:
+        f.write(str(os.getpid()))
+
+    def _cleanup(*_):
+        daemon.stop()
+        if os.path.exists(pid_file):
+            os.unlink(pid_file)
+        if os.path.exists(socket_path):
+            os.unlink(socket_path)
+        sys.exit(0)
+
+    signal.signal(signal.SIGTERM, _cleanup)
+    signal.signal(signal.SIGINT, _cleanup)
+
+    try:
+        daemon.start()
+    except Exception as e:
+        print(f"[ERROR] daemon start failed: {e}", file=sys.stderr)
+        return 1
+    return 0
+
+
+def cmd_stop(args) -> int:
+    project = args.project
+    pid_file = _pid_file(project)
+    socket_path = _socket_path(project)
+
+    if not os.path.exists(pid_file):
+        print("freely-db daemon not running")
+        if os.path.exists(socket_path):
+            os.unlink(socket_path)
+        return 0
+
+    try:
+        with open(pid_file) as f:
+            pid = int(f.read().strip())
+        os.kill(pid, signal.SIGTERM)
+        print(f"freely-db daemon stopped (PID {pid})")
+    except (OSError, ValueError) as e:
+        print(f"failed to stop: {e}")
+
+    if os.path.exists(pid_file):
+        os.unlink(pid_file)
+    if os.path.exists(socket_path):
+        os.unlink(socket_path)
+    return 0
+
+
+def cmd_status(args) -> int:
+    project = args.project
+    pid_file = _pid_file(project)
+    socket_path = _socket_path(project)
+
+    if not os.path.exists(pid_file):
+        print("stopped")
+        return 1
+
+    try:
+        with open(pid_file) as f:
+            pid = int(f.read().strip())
+        os.kill(pid, 0)
+    except (OSError, ValueError):
+        print("stopped (stale pid)")
+        if os.path.exists(socket_path):
+            os.unlink(socket_path)
+        return 1
+
+    # Health check via socket
+    if os.path.exists(socket_path):
+        try:
+            sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            sock.settimeout(3)
+            sock.connect(socket_path)
+            req = json.dumps({"jsonrpc": "2.0", "id": 9999, "method": "db.ping", "params": {}}) + "\n"
+            sock.sendall(req.encode())
+            data = sock.recv(4096)
+            sock.close()
+            resp = json.loads(data.decode())
+            if "result" in resp:
+                print(f"running (PID {pid})")
+                return 0
+        except Exception:
+            pass
+
+    print(f"unhealthy (PID {pid})")
+    return 1
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Freely unified DB daemon")
+    sub = parser.add_subparsers(dest="command")
+
+    p = sub.add_parser("start")
+    p.add_argument("--project", required=True)
+    p.add_argument("--foreground", action="store_true")
+
+    p = sub.add_parser("stop")
+    p.add_argument("--project", required=True)
+
+    p = sub.add_parser("status")
+    p.add_argument("--project", required=True)
+
+    args = parser.parse_args()
+    if not args.command:
+        parser.print_help()
+        return 1
+
+    if args.command == "start":
+        return cmd_start(args)
+    elif args.command == "stop":
+        return cmd_stop(args)
+    elif args.command == "status":
+        return cmd_status(args)
+    return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

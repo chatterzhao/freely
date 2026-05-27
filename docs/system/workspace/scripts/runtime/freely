@@ -3566,18 +3566,14 @@ ensure_runtime_tool_session_anchor() {
     # Non-ACP mode: scan the tool's session dir for JSONL files.
     if [[ -z "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
       if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
-        local _acp_db=""$project/.freely/freely.db""
-        local _session_store_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-store.py"
-        if [[ -f "$_session_store_py" && -f "$_acp_db" ]]; then
-          local _acp_sid
-          _acp_sid=$(python3 "$_session_store_py" get-active \
-            --db "$_acp_db" \
-            --project "$project" \
-            --role "${FREELY_ROLE_HINT:-manager}" 2>/dev/null || true)
-          if [[ -n "$_acp_sid" ]] && is_valid_uuid "$_acp_sid"; then
-            CLAUDE_SESSION_ID_CURRENT="$_acp_sid"
-            log_info "session id recovered from session-store: $_acp_sid"
-          fi
+        local _acp_sid
+        _acp_sid=$(python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli" \
+          --project "$project" session.get-active \
+          --project "$project" \
+          --role "${FREELY_ROLE_HINT:-manager}" 2>/dev/null || true)
+        if [[ -n "$_acp_sid" ]] && is_valid_uuid "$_acp_sid"; then
+          CLAUDE_SESSION_ID_CURRENT="$_acp_sid"
+          log_info "session id recovered from session-store: $_acp_sid"
         fi
       else
         local fallback_id
@@ -3590,17 +3586,13 @@ ensure_runtime_tool_session_anchor() {
     fi
     # Resume evidence: ACP mode checks session-store (SQLite); non-ACP checks JSONL.
     if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
-      local _acp_evidence_db=""$project/.freely/freely.db""
-      local _acp_evidence_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-store.py"
-      if [[ -f "$_acp_evidence_py" && -f "$_acp_evidence_db" ]]; then
-        local _acp_evidence_sid
-        _acp_evidence_sid=$(python3 "$_acp_evidence_py" get-active \
-          --db "$_acp_evidence_db" \
-          --project "$project" \
-          --role "${FREELY_ROLE_HINT:-manager}" 2>/dev/null || true)
-        if [[ -n "$_acp_evidence_sid" ]] && is_valid_uuid "$_acp_evidence_sid"; then
-          current_verified="1"
-        fi
+      local _acp_evidence_sid
+      _acp_evidence_sid=$(python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli" \
+        --project "$project" session.get-active \
+        --project "$project" \
+        --role "${FREELY_ROLE_HINT:-manager}" 2>/dev/null || true)
+      if [[ -n "$_acp_evidence_sid" ]] && is_valid_uuid "$_acp_evidence_sid"; then
+        current_verified="1"
       fi
     elif claude_has_verified_resume_evidence "$project" "${CLAUDE_SESSION_ID_CURRENT:-}"; then
       current_verified="1"
@@ -4772,33 +4764,20 @@ manager_bootstrap_runtime_expected() {
 #   trigger_error|old_tool|old_session_id|old_jsonl|old_cycle_log|new_tool|new_session_id|cross_tool
 # Returns empty if no record exists.
 _tool_switch_read_latest() {
-  local db_path="$1"
-  local session_store_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-store.py"
-  [[ -f "$db_path" && -f "$session_store_py" ]] || return 1
-  python3 -c "
-from importlib.machinery import SourceFileLoader
-m = SourceFileLoader('session_store', '$session_store_py').load_module()
-r = m.tool_switch_read_latest('$db_path')
-if r:
-    print('|'.join(str(r.get(k,'')) for k in [
-        'trigger_error','old_tool','old_session_id','old_jsonl_path','old_cycle_log',
-        'new_tool','new_session_id','cross_tool'
-    ]))
-" 2>/dev/null || true
+  local project="$1"
+  local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
+  python3 "$cli" --project "$project" session.tool-switch-read 2>/dev/null || true
 }
 
 # Atomic write: stale all previous + insert new succeeded.
 _tool_switch_atomic_write() {
-  local db_path="$1" trigger_error="$2" old_tool="$3" old_session_id="$4"
+  local project="$1" trigger_error="$2" old_tool="$3" old_session_id="$4"
   local old_jsonl="$5" old_cycle_log="$6" new_tool="$7" new_session_id="$8"
-  local session_store_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-store.py"
-  [[ -f "$db_path" && -f "$session_store_py" ]] || return 1
-  python3 -c "
-from importlib.machinery import SourceFileLoader
-m = SourceFileLoader('session_store', '$session_store_py').load_module()
-m.tool_switch_atomic_write('$db_path', '$trigger_error', '$old_tool', '$old_session_id',
-    '$old_jsonl', '$old_cycle_log', '$new_tool', '$new_session_id')
-" 2>/dev/null || true
+  local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
+  python3 "$cli" --project "$project" session.tool-switch-write \
+    --trigger_error "$trigger_error" --old_tool "$old_tool" --old_session_id "$old_session_id" \
+    --old_jsonl_path "$old_jsonl" --old_cycle_log "$old_cycle_log" \
+    --new_tool "$new_tool" --new_session_id "$new_session_id" 2>/dev/null || true
 }
 
 # Determine launch kind from latest switch record.
@@ -4807,7 +4786,7 @@ _tool_switch_launch_kind() {
   local project="$1"
   local db_path; db_path="$project/.freely/freely.db"
   local record
-  record="$(_tool_switch_read_latest "$db_path")" || { printf 'fresh\n'; return 0; }
+  record="$(_tool_switch_read_latest "$project")" || { printf 'fresh\n'; return 0; }
   [[ -n "$record" ]] || { printf 'fresh\n'; return 0; }
 
   IFS='|' read -r _trig _old_tool _old_sid _old_jsonl _old_clog _new_tool _new_sid _cross_tool <<<"$record"
@@ -4920,12 +4899,11 @@ prepare_manager_cross_tool_fallback_if_needed() {
     runtime_clear_session_state_for_fresh_launch "$project"
     record_tool_auto_switch_event "$project" "$current_tool" "$fallback_tool" "${fallback_slot:-}" "$last_exit_reason"
     # Record switch in tool_switch_events table for session/bridge handling
-    local _db; _db="$project/.freely/freely.db"
     local _old_sid _old_jsonl _old_clog
     _old_sid="${LAST_TOOL_SESSION_ID:-}"
     _old_jsonl="${LAST_TOOL_JSONL_PATH:-}"
     _old_clog="${LAST_CYCLE_LOG:-}"
-    _tool_switch_atomic_write "$_db" "$last_exit_reason" "$current_tool" "$_old_sid" "$_old_jsonl" "$_old_clog" "$fallback_tool" ""
+    _tool_switch_atomic_write "$project" "$last_exit_reason" "$current_tool" "$_old_sid" "$_old_jsonl" "$_old_clog" "$fallback_tool" ""
     load_config "$project"
     TOOL_AUTO_RECOVERY_DECISION="selected"
     return 0
@@ -5768,11 +5746,11 @@ _write_chat_to_issue() {
     chat_type="chat-message"
     issue_id=""
     if [[ "$new_conversation" == "true" ]]; then
-      conversation_id=0  # first message — auto-updated to own id by chat-inbox.py
+      conversation_id=0  # first message
     else
       # Check for active (unconsumed) conversation
-      conversation_id=$(python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/chat-inbox.py" \
-        query-active-conversation --db "$db_path" 2>/dev/null || true)
+      conversation_id=$(python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli" \
+        --project "$project" chat.query-active-conversation 2>/dev/null || true)
       conversation_id="${conversation_id:-0}"
     fi
   elif [[ -n "$target_issue" ]]; then
@@ -5786,9 +5764,9 @@ _write_chat_to_issue() {
     conversation_id=0
   fi
 
-  # Step 1: INSERT into freely.db chats table
-  chat_id=$(python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/chat-inbox.py" add \
-    --db "$db_path" \
+  # Step 1: INSERT into freely.db chats table via daemon
+  local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
+  chat_id=$(python3 "$cli" --project "$project" chat.add \
     --type "$chat_type" \
     --issue-id "${issue_id:-pending}" \
     --message "$message" \
@@ -5797,15 +5775,15 @@ _write_chat_to_issue() {
     --session-refs "$session_refs" \
     --intake-id "$intake_id" \
     --conversation-id "$conversation_id" 2>/dev/null) || {
-      log_error "failed to write chat to freely.db"
+      log_error "failed to write chat to freely.db (daemon may be down, check db-daemon.log)"
       return 1
     }
 
   # For new-issue: update issue_id now that we have the chat id
   if [[ "$chat_type" == "new-issue" ]]; then
     issue_id="raw-$chat_id"
-    python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/chat-inbox.py" _update_issue_id \
-      --db "$db_path" --id "$chat_id" --issue-id "$issue_id" >/dev/null 2>&1 || true
+    python3 "$cli" --project "$project" chat.update-issue-id \
+      --id "$chat_id" --issue_id "$issue_id" >/dev/null 2>&1 || true
   fi
 
   # For chat-message: if conversation_id was 0 (first message), the Python add_chat
@@ -5835,17 +5813,14 @@ _write_chat_to_issue() {
     worktree_found=$(find "$worktrees_root" -maxdepth 1 -type d -name "*${issue_id}*" 2>/dev/null | head -1)
     if [[ -n "$worktree_found" && -d "$worktree_found/docs/issues/$issue_id" ]]; then
       if [[ "$chat_type" == "new-issue" ]]; then
-        python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/chat-inbox.py" materialize \
-          --db "$db_path" --id "$chat_id" --target "$worktree_found/docs/issues/$issue_id" >/dev/null 2>&1 \
-          && python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/chat-inbox.py" consume \
-          --db "$db_path" --id "$chat_id" --materialized-as "$issue_id" >/dev/null 2>&1 \
+        local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
+        python3 "$cli" --project "$project" chat.consume \
+          --id "$chat_id" --materialized_as "$issue_id" >/dev/null 2>&1 \
           && log_info "chat materialized directly to worktree: $worktree_found"
       else
-        python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/chat-inbox.py" materialize-comment \
-          --db "$db_path" --id "$chat_id" \
-          --issue-file "$worktree_found/docs/issues/$issue_id/issue.md" >/dev/null 2>&1 \
-          && python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/chat-inbox.py" consume \
-          --db "$db_path" --id "$chat_id" >/dev/null 2>&1 \
+        local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
+        python3 "$cli" --project "$project" chat.consume \
+          --id "$chat_id" >/dev/null 2>&1 \
           && log_info "chat comment synced directly to worktree: $worktree_found"
       fi
       # Signal the daemon even for direct sync (worktree AI needs to notice)
@@ -7719,78 +7694,70 @@ ensure_install_lifecycle_allowlist_file() {
 EOF
 }
 
-# Lazy-init freely.db on startup so existing projects don't need manual re-init.
+# Ensure freely-db daemon is running for this project.
+# The daemon owns the single SQLite connection; all DB ops go through it.
 ensure_freely_db() {
   local project="$1"
+  local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
+  local daemon_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely_db_manager.py"
   local freely_db=""$project/.freely/freely.db""
-  local chat_inbox_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/chat-inbox.py"
-  local session_store_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-store.py"
-  if [[ -f "$chat_inbox_py" && ! -f "$freely_db" ]]; then
-    python3 "$chat_inbox_py" init --db "$freely_db" >/dev/null 2>&1 || true
+
+  # Quick health check
+  if python3 "$cli" --project "$project" db.ping >/dev/null 2>&1; then
+    return 0
   fi
-  if [[ -f "$session_store_py" ]]; then
-    python3 "$session_store_py" init --db "$freely_db" >/dev/null 2>&1 || true
-  fi
+
+  # Start daemon in foreground mode, background it
+  log_info "starting freely-db daemon for $project"
+  python3 "$daemon_py" start --project "$project" --foreground </dev/null >>"$project/.freely/run/db-daemon.log" 2>&1 &
+  local daemon_pid=$!
+  disown "$daemon_pid"
+
+  # Wait for socket to appear
+  local waited=0
+  while [[ $waited -lt 50 ]]; do
+    if python3 "$cli" --project "$project" db.ping >/dev/null 2>&1; then
+      log_info "freely-db daemon ready (PID $daemon_pid)"
+      return 0
+    fi
+    sleep 0.1
+    ((waited++))
+  done
+  log_error "freely-db daemon failed to start"
+  return 1
 }
 
 # ── task-mode gate (SQLite) ──────────────────────────────
 
 ensure_task_mode_gate() {
   local project="$1" config_default="${2:-wait}"
-  local freely_db=""$project/.freely/freely.db""
-  local init_mode init_scan_id
+  local init_mode
   case "$config_default" in
-    auto) init_mode="auto"; init_scan_id="" ;;
-    wait) init_mode="wait"; init_scan_id="" ;;
-    id:*) init_mode="id"; init_scan_id="${config_default#id:}" ;;
-    *) init_mode="wait"; init_scan_id="" ;;
+    auto) init_mode="auto" ;;
+    wait) init_mode="wait" ;;
+    id:*) init_mode="id" ;;
+    *) init_mode="wait" ;;
   esac
-  python3 -c "
-import sqlite3
-conn = sqlite3.connect('$freely_db')
-conn.execute('''CREATE TABLE IF NOT EXISTS task_mode_gate (
-    id INTEGER PRIMARY KEY CHECK (id = 1),
-    mode TEXT NOT NULL DEFAULT 'wait',
-    task_scan_id TEXT DEFAULT '',
-    mode_just_switched INTEGER NOT NULL DEFAULT 0,
-    updated_at TEXT NOT NULL DEFAULT ''
-)''')
-cur = conn.execute('SELECT COUNT(*) FROM task_mode_gate')
-if cur.fetchone()[0] == 0:
-    conn.execute('''INSERT INTO task_mode_gate (id, mode, task_scan_id, updated_at)
-                    VALUES (1, '$init_mode', '$init_scan_id', datetime('now'))''')
-try:
-    conn.execute('ALTER TABLE task_mode_gate ADD COLUMN mode_just_switched INTEGER NOT NULL DEFAULT 0')
-except:
-    pass
-conn.commit()
-conn.close()
-" 2>/dev/null || true
+  local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
+  python3 "$cli" --project "$project" task-mode.init --default "$init_mode" >/dev/null 2>&1 || true
 }
 
 read_task_mode() {
   local project="$1"
-  local freely_db=""$project/.freely/freely.db""
-  python3 -c "
-import sqlite3
-conn = sqlite3.connect('$freely_db')
-cur = conn.execute('SELECT mode, task_scan_id FROM task_mode_gate WHERE id = 1')
-row = cur.fetchone()
-if row:
-    mode, scan_id = row
-    if mode == 'id' and scan_id:
-        print(f'id:{scan_id}')
-    else:
-        print(mode)
-else:
-    print('wait')
-conn.close()
-" 2>/dev/null || echo 'wait'
+  local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
+  local result
+  result=$(python3 "$cli" --project "$project" task-mode.read-with-scan 2>/dev/null) || { echo 'wait'; return 0; }
+  local mode="${result%%|*}"
+  local scan_id="${result#*|}"
+  if [[ "$mode" == "id" && -n "$scan_id" ]]; then
+    echo "id:${scan_id}"
+  else
+    echo "$mode"
+  fi
 }
 
 write_task_mode() {
   local project="$1" mode="$2" scan_id="${3:-}"
-  local freely_db=""$project/.freely/freely.db""
   local task_mode task_scan_id
   case "$mode" in
     auto) task_mode="auto"; task_scan_id="" ;;
@@ -7799,17 +7766,8 @@ write_task_mode() {
     id:*) task_mode="id"; task_scan_id="${mode#id:}" ;;
     *) log_error "invalid task-mode: $mode (expected auto|wait|listen|id:<scan-id>)"; return 1 ;;
   esac
-  python3 <<PY
-import sqlite3
-conn = sqlite3.connect('$freely_db')
-cur = conn.execute("SELECT mode FROM task_mode_gate WHERE id = 1")
-old = cur.fetchone()
-old_mode = old[0] if old else ''
-changed = 1 if old_mode and old_mode != '$task_mode' else 0
-conn.execute("INSERT OR REPLACE INTO task_mode_gate (id, mode, task_scan_id, mode_just_switched, updated_at) VALUES (1, '$task_mode', '$task_scan_id', ?, datetime('now'))", (changed,))
-conn.commit()
-conn.close()
-PY
+  local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
+  python3 "$cli" --project "$project" task-mode.write --mode "$task_mode" --scan_id "$task_scan_id" >/dev/null 2>&1 || true
   append_runtime_event "$project" "task_mode_written" \
     "mode=$task_mode" \
     "task_scan_id=${task_scan_id:-none}"
@@ -11814,20 +11772,21 @@ manager_record_worker_pid_for_launch() {
   local freely_db handoff_id
   freely_db="$target_project/.freely/freely.db"
   [[ -f "$freely_db" ]] || return 0
-  handoff_id="$(python3 -c "
-import sqlite3
-conn = sqlite3.connect('$freely_db')
-row = conn.execute(
-  \"SELECT handoff_id FROM handoffs WHERE prompt_file=? AND role='worker' AND status IN ('pending','launched') ORDER BY created_at DESC LIMIT 1\",
-  ('$prompt_file',)).fetchone()
-conn.close()
-print(row[0] if row else '')
+  local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
+  handoff_id="$(python3 "$cli" --project "$target_project" handoff.list \
+    --role worker --status launched 2>/dev/null | python3 -c "
+import json, sys
+rows = json.load(sys.stdin)
+for r in rows:
+  if r.get('prompt_file') == '$prompt_file':
+    print(r['handoff_id'])
+    sys.exit(0)
+print('')
 " 2>/dev/null || true)"
   [[ -n "$handoff_id" ]] || return 0
-  python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py" \
-    --db "$freely_db" update-worker-pid \
-    --handoff-id "$handoff_id" \
-    --worker-pid "$worker_pid" >/dev/null 2>&1 || true
+  python3 "$cli" --project "$target_project" handoff.update-worker-pid \
+    --handoff_id "$handoff_id" \
+    --worker_pid "$worker_pid" >/dev/null 2>&1 || true
 }
 
 launch_worker_from_manager_prompt_if_needed() {
@@ -11904,13 +11863,11 @@ launch_worker_from_manager_prompt_if_needed() {
     # Write a chat-inbox entry so the AI learns what fields are needed
     local _db_path _chat_py
     _db_path=""$manager_project/.freely/freely.db""
-    _chat_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/chat-inbox.py"
-    if [[ -f "$_chat_py" ]]; then
-      python3 "$_chat_py" add --db "$_db_path" --type "comment" \
-        --issue-id "raw-guidance" \
-        --message "Worker prompt $(basename "$prompt_file") has incomplete verification metadata. Missing fields: $missing_fields_csv. Please add these fields or remove the verification metadata section." \
-        --author "runtime" --channel "worker-guard" >/dev/null 2>&1 || true
-    fi
+    local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
+    python3 "$cli" --project "$manager_project" chat.add --type "comment" \
+      --issue-id "raw-guidance" \
+      --message "Worker prompt $(basename "$prompt_file") has incomplete verification metadata. Missing fields: $missing_fields_csv. Please add these fields or remove the verification metadata section." \
+      --author "runtime" --channel "worker-guard" >/dev/null 2>&1 || true
     # Continue with launch — don't block on incomplete metadata
   fi
   intake_id="$(write_manager_worker_launch_intake "$target_project" "$prompt_file")"
@@ -12869,15 +12826,12 @@ if added:
 
   append_runtime_event "$project" "acp_bridge_started" "bridge_pid=$(cat "$pid_file" 2>/dev/null || echo unknown)"
   # Record startup in tool_switch_events for session continuity tracking
-  local _ts_db; _ts_db="$project/.freely/freely.db"
   local _ts_old_tool=""
-  if [[ -f "$_ts_db" ]]; then
-    local _ts_record; _ts_record="$(_tool_switch_read_latest "$_ts_db")"
-    if [[ -n "$_ts_record" ]]; then
-      _ts_old_tool="$(echo "$_ts_record" | cut -d'|' -f6)"  # new_tool from last record
-    fi
+  local _ts_record; _ts_record="$(_tool_switch_read_latest "$project")"
+  if [[ -n "$_ts_record" ]]; then
+    _ts_old_tool="$(echo "$_ts_record" | cut -d'|' -f6)"  # new_tool from last record
   fi
-  _tool_switch_atomic_write "$_ts_db" "startup" "$_ts_old_tool" "" "" "" "${AI_TOOL:-}" ""
+  _tool_switch_atomic_write "$project" "startup" "$_ts_old_tool" "" "" "" "${AI_TOOL:-}" ""
 }
 
 _stop_acp_bridge() {
@@ -13368,7 +13322,7 @@ write_session_handoff() {
 
   # Cross-tool context: when tool changed, pass previous session evidence
   local CROSS_TOOL_CONTEXT="none" CROSS_TOOL_EVIDENCE_PATH="none" CROSS_TOOL_HINT="none"
-  local _ctx_record; _ctx_record="$(_tool_switch_read_latest "$project/.freely/freely.db")"
+  local _ctx_record; _ctx_record="$(_tool_switch_read_latest "$project")"
   if [[ -n "$_ctx_record" ]]; then
     local _ctx_cross; _ctx_cross=$(echo "$_ctx_record" | cut -d'|' -f8)
     if [[ "$_ctx_cross" == "1" ]]; then
@@ -15995,16 +15949,13 @@ select_launch_kind() {
       return 0
     fi
     # Query session-store for active session (authoritative source).
-    local session_store_py sid
-    session_store_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-store.py"
-    local _acp_db=""$PROJECT_ROOT/.freely/freely.db""
-    if [[ -f "$session_store_py" && -f "$_acp_db" ]]; then
-      sid=$(python3 "$session_store_py" get-active \
-        --db "$_acp_db" \
-        --project "$PROJECT_ROOT" \
-        --role "${FREELY_ROLE_HINT:-manager}" 2>/dev/null || true)
-      if [[ -n "$sid" ]] && is_valid_uuid "$sid"; then
-        CLAUDE_SESSION_ID_CURRENT="$sid"
+    local sid
+    local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
+    sid=$(python3 "$cli" --project "$PROJECT_ROOT" session.get-active \
+      --project "$PROJECT_ROOT" \
+      --role "${FREELY_ROLE_HINT:-manager}" 2>/dev/null || true)
+    if [[ -n "$sid" ]] && is_valid_uuid "$sid"; then
+      CLAUDE_SESSION_ID_CURRENT="$sid"
         LAST_TOOL_SESSION_ID="$sid"
         # ACP multi-turn: session/new once, then session/prompt each cycle
         if [[ "${FREELY_ACP_FIRST_LAUNCH_DONE:-0}" == "1" ]]; then
@@ -16016,7 +15967,6 @@ select_launch_kind() {
         fi
         return 0
       fi
-    fi
     # No active session in session-store → fresh launch.
     LAUNCH_KIND_SELECTED="fresh"
     LAUNCH_ROTATION_REASON="acp_first_launch"
@@ -16667,39 +16617,30 @@ manager_scan_stale_worker_pids() {
   [[ -n "$raw_key" ]] || return 0
 
   local result
+  local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
   result="$(python3 -c "
-import sqlite3, os
-from datetime import datetime, timezone
-conn = sqlite3.connect('$freely_db')
-rows = conn.execute(
-  \"SELECT handoff_id, worker_pid FROM handoffs \"
-  \"WHERE role='worker' AND status='launched' AND worker_pid != '' AND worker_pid IS NOT NULL \"
-  \"AND raw_key=? ORDER BY created_at ASC\",
-  ('$raw_key',)
-).fetchall()
+import json, os, subprocess, sys
+raw_key = '''$raw_key'''
+r = subprocess.run([sys.executable, '$cli', '--project', '$project', 'handoff.get-launched-pids', '--raw_key', raw_key],
+                   capture_output=True, text=True, timeout=10)
+rows = json.loads(r.stdout) if r.returncode == 0 else []
 marked = []
 scanned = len(rows)
-for hid, pid_str in rows:
+for row in rows:
+  pid_str = row.get('worker_pid', '')
   if not pid_str or not pid_str.strip().isdigit():
     continue
   pid = int(pid_str.strip())
   try:
     os.kill(pid, 0)
   except OSError:
-    marked.append(hid)
+    marked.append(row['handoff_id'])
 if marked:
-  now = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
   for hid in marked:
-    conn.execute(
-      \"UPDATE handoffs SET status='blocked', exit_kind='stale_pid', \"
-      \"reason='Worker PID kill -0 failed, marking stale_pid', \"
-      \"next_action='Manager: check worker worktree and re-dispatch', \"
-      \"completed_at=?, updated_at=? \"
-      \"WHERE handoff_id=? AND status='launched'\",
-      (now, now, hid)
-    )
-conn.commit()
-conn.close()
+    subprocess.run([sys.executable, '$cli', '--project', '$project', 'handoff.update',
+                    '--handoff_id', hid, '--status', 'blocked', '--exit_kind', 'stale_pid',
+                    '--reason', 'Worker PID kill -0 failed, marking stale_pid'],
+                   capture_output=True, timeout=10)
 print(f'{scanned},{len(marked)}')
 " 2>/dev/null || echo "0,0")"
 
@@ -17043,7 +16984,7 @@ ensure_manager_once() {
   elif [[ "$same_tool_blocked" != "1" && -n "$current_pid" ]] && [[ -z "$current_ai_pid" ]] \
     && [[ "$(read_task_mode "$project")" != "wait" ]]; then
     local _just_switched
-    _just_switched=$(python3 -c "import sqlite3; conn = sqlite3.connect('$freely_db'); cur = conn.execute('SELECT mode_just_switched FROM task_mode_gate WHERE id = 1'); row = cur.fetchone(); print(row[0] if row else 0); conn.execute('UPDATE task_mode_gate SET mode_just_switched = 0 WHERE id = 1 AND mode_just_switched = 1'); conn.commit(); conn.close()" 2>/dev/null || echo 0)
+    _just_switched=$(python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli" --project "$project" task-mode.read-just-switched 2>/dev/null || echo 0)
     if [[ "$_just_switched" == "1" ]]; then
       log_info "task_mode just switched; keeping supervisor pid=$current_pid alive for one cycle"
       append_lifecycle_trace "$project" "L224" "manager_keepalive" \
@@ -18318,17 +18259,23 @@ EOF
     done
   fi
 
-  # Initialize freely.db (chats + sessions tables)
+  # Initialize freely.db via daemon (handles all tables)
   local freely_db=""$project/.freely/freely.db""
-  local chat_inbox_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/chat-inbox.py"
-  local session_store_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-store.py"
   local handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
-  if [[ -f "$chat_inbox_py" ]]; then
-    python3 "$chat_inbox_py" init --db "$freely_db" >/dev/null 2>&1 || true
+  local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
+  local daemon_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely_db_manager.py"
+
+  # Start daemon (auto-creates all tables on first start)
+  if ! python3 "$cli" --project "$project" db.ping >/dev/null 2>&1; then
+    python3 "$daemon_py" start --project "$project" --foreground </dev/null >>"$project/.freely/run/db-daemon.log" 2>&1 &
+    local _pid=$!
+    disown "$_pid"
+    for _ in $(seq 1 50); do
+      python3 "$cli" --project "$project" db.ping >/dev/null 2>&1 && break
+      sleep 0.1
+    done
   fi
-  if [[ -f "$session_store_py" ]]; then
-    python3 "$session_store_py" init --db "$freely_db" >/dev/null 2>&1 || true
-  fi
+
   if [[ -f "$handoff_py" ]]; then
     python3 "$handoff_py" init --db "$freely_db" >/dev/null 2>&1 || true
   fi
@@ -20173,7 +20120,7 @@ print(ready)
     # Cache metrics for token cost optimization observability
     local _cache_acp_count _cache_active_sessions
     _cache_acp_count=$(pgrep -c "claude-agent-acp" 2>/dev/null || echo "0")
-    _cache_active_sessions=$(python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/session-store.py" count-active --db ""$project/.freely/freely.db"" --project "$project" 2>/dev/null || echo "0")
+    _cache_active_sessions=$(python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli" --project "$project" session.count-active --project "$project" 2>/dev/null || echo "0")
     append_runtime_event "$project" "cache_metrics" \
       "supervisor_pid=$$" \
       "role=${LAST_ROLE_HINT:-unknown}" \

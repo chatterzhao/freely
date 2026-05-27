@@ -1,0 +1,287 @@
+#!/usr/bin/env bash
+# test-freely-db-daemon-unified
+# Verify: freely_db_manager daemon + CLI + handoff.py → daemon integration.
+set -uo pipefail  # no -e: we handle exit codes explicitly
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+RUNTIME_DIR="$SCRIPT_DIR/../runtime"
+DAEMON="$RUNTIME_DIR/freely_db_manager.py"
+CLI="$RUNTIME_DIR/freely-db-cli"
+HANDOFF="$RUNTIME_DIR/handoff.py"
+PROJECT="$(cd "$RUNTIME_DIR/../../../.." && pwd)"
+DB_PATH="$PROJECT/.freely/freely.db"
+PASS=0
+FAIL=0
+
+assert_eq() {
+  local label="$1" expected="$2" actual="$3"
+  if [[ "$expected" == "$actual" ]]; then
+    ((PASS++))
+    echo "  PASS $label"
+  else
+    ((FAIL++))
+    echo "  FAIL $label: expected '$expected', got '$actual'"
+  fi
+}
+
+assert_contains() {
+  local label="$1" needle="$2" haystack="$3"
+  if echo "$haystack" | grep -qF "$needle"; then
+    ((PASS++))
+    echo "  PASS $label"
+  else
+    ((FAIL++))
+    echo "  FAIL $label: expected to contain '$needle'"
+  fi
+}
+
+assert_exit() {
+  local label="$1" expected_code="$2" actual_code="$3"
+  if [[ "$actual_code" == "$expected_code" ]]; then
+    ((PASS++))
+    echo "  PASS $label"
+  else
+    ((FAIL++))
+    echo "  FAIL $label: expected exit $expected_code, got $actual_code"
+  fi
+}
+
+cleanup() {
+  python3 "$DAEMON" stop --project "$PROJECT" 2>/dev/null || true
+}
+trap cleanup EXIT
+
+# Clean slate: remove old DB so tests are idempotent
+rm -f "$DB_PATH" "$DB_PATH"-wal "$DB_PATH"-shm
+
+echo "=== Test: freely_db_manager daemon + CLI + handoff.py ==="
+echo ""
+
+# ── 1. Daemon Lifecycle ─────────────────────────────────────────────
+echo "[1] Daemon lifecycle"
+
+# 1a. Stop any stale instance
+python3 "$DAEMON" stop --project "$PROJECT" 2>/dev/null || true
+sleep 0.3
+echo "  1a. status (stopped)"
+python3 "$DAEMON" status --project "$PROJECT" 2>&1; _rc=$?
+assert_exit "1a. status returns non-zero when stopped" 1 "$_rc"
+
+# 1b. Start daemon
+echo "  1b. start"
+python3 "$DAEMON" start --project "$PROJECT" --foreground &
+DAEMON_PID=$!
+for _ in $(seq 1 50); do
+  python3 "$CLI" --project "$PROJECT" db.ping >/dev/null 2>&1 && break
+  sleep 0.1
+done
+
+# 1c. Status running
+echo "  1c. status (running)"
+python3 "$DAEMON" status --project "$PROJECT"; _rc=$?
+assert_exit "1c. status returns zero when running" 0 "$_rc"
+
+# 1d. Ping
+PING=$(python3 "$CLI" --project "$PROJECT" db.ping 2>&1)
+assert_eq "1d. db.ping" "pong" "$PING"
+
+echo ""
+
+# ── 2. Chat Operations ──────────────────────────────────────────────
+echo "[2] Chat operations"
+
+# 2a. Add new-issue
+CHAT_ID=$(python3 "$CLI" --project "$PROJECT" chat.add \
+  --type new-issue --issue-id pending --message "test chat add" --author test 2>&1)
+assert_contains "2a. chat.add returns ISO timestamp" "T" "$CHAT_ID"
+assert_contains "2a. chat.add ends with Z" "Z" "$CHAT_ID"
+
+# 2b. Add chat-message
+MSG_ID=$(python3 "$CLI" --project "$PROJECT" chat.add \
+  --type chat-message --issue-id "conv-test" --message "hello" --author test \
+  --conversation-id 0 2>&1)
+assert_contains "2b. chat-message add" "T" "$MSG_ID"
+
+# 2c. List chats
+LIST=$(python3 "$CLI" --project "$PROJECT" chat.list --limit 10 2>&1)
+assert_contains "2c. chat.list" "test chat add" "$LIST"
+
+# 2d. Show chat
+SHOW=$(python3 "$CLI" --project "$PROJECT" chat.show --id "$CHAT_ID" 2>&1)
+assert_contains "2d. chat.show" "chat_type: new-issue" "$SHOW"
+assert_contains "2d. chat.show message" "test chat add" "$SHOW"
+
+# 2e. Query active conversation
+CONV=$(python3 "$CLI" --project "$PROJECT" chat.query-active-conversation 2>&1)
+assert_contains "2e. query-active-conversation" "0" "$CONV"  # second msg had conv_id=0
+
+# 2f. Consume
+CONSUME=$(python3 "$CLI" --project "$PROJECT" chat.consume --id "$CHAT_ID" 2>&1)
+assert_eq "2f. chat.consume" "OK" "$CONSUME"
+
+# 2g. Consumed item NOT in list, unconsumed message with non-zero conv_id also filtered
+LIST2=$(python3 "$CLI" --project "$PROJECT" chat.list --limit 50 2>&1)
+if ! echo "$LIST2" | grep -q "$CHAT_ID"; then
+  ((PASS++)); echo "  PASS 2g. consumed $CHAT_ID not in list"
+else
+  ((FAIL++)); echo "  FAIL 2g. consumed item still in list"
+fi
+
+echo ""
+
+# ── 3. Session Operations ───────────────────────────────────────────
+echo "[3] Session operations"
+
+# 3a. Upsert
+SID=$(python3 "$CLI" --project "$PROJECT" session.upsert \
+  --session-id "test-uuid-1234-5678-abcd" --project "$PROJECT" \
+  --tool claude --role manager --launch-kind fresh --tool_adapter acp 2>&1)
+assert_eq "3a. session.upsert" "test-uuid-1234-5678-abcd" "$SID"
+
+# 3b. Get active
+ACTIVE=$(python3 "$CLI" --project "$PROJECT" session.get-active \
+  --project "$PROJECT" --role manager 2>&1)
+assert_eq "3b. session.get-active" "test-uuid-1234-5678-abcd" "$ACTIVE"
+
+# 3c. Count active
+COUNT=$(python3 "$CLI" --project "$PROJECT" session.count-active --project "$PROJECT" 2>&1)
+assert_eq "3c. session.count-active" "1" "$COUNT"
+
+# 3d. Complete
+COMPLETE=$(python3 "$CLI" --project "$PROJECT" session.complete \
+  --session-id "test-uuid-1234-5678-abcd" --status completed 2>&1)
+assert_eq "3d. session.complete" "OK" "$COMPLETE"
+
+# 3e. Count after complete
+COUNT2=$(python3 "$CLI" --project "$PROJECT" session.count-active --project "$PROJECT" 2>&1)
+assert_eq "3e. count after complete" "0" "$COUNT2"
+
+echo ""
+
+# ── 4. Task-mode Operations ─────────────────────────────────────────
+echo "[4] Task-mode operations"
+
+python3 "$CLI" --project "$PROJECT" task-mode.init --default wait >/dev/null 2>&1
+
+MODE=$(python3 "$CLI" --project "$PROJECT" task-mode.read 2>&1)
+assert_eq "4a. task-mode.read default" "wait" "$MODE"
+
+python3 "$CLI" --project "$PROJECT" task-mode.write --mode auto --scan_id scan-001 >/dev/null 2>&1
+
+MODE2=$(python3 "$CLI" --project "$PROJECT" task-mode.read 2>&1)
+assert_eq "4b. task-mode.read after write" "auto" "$MODE2"
+
+SCAN=$(python3 "$CLI" --project "$PROJECT" task-mode.read-with-scan 2>&1)
+assert_contains "4c. task-mode.read-with-scan" "auto" "$SCAN"
+assert_contains "4c. scan_id" "scan-001" "$SCAN"
+
+JSW=$(python3 "$CLI" --project "$PROJECT" task-mode.read-just-switched 2>&1)
+assert_eq "4d. read-just-switched (write set it to 1)" "1" "$JSW"
+JSW2=$(python3 "$CLI" --project "$PROJECT" task-mode.read-just-switched 2>&1)
+assert_eq "4e. read-just-switched again (reset to 0)" "0" "$JSW2"
+
+echo ""
+
+# ── 5. Tool-switch Operations ───────────────────────────────────────
+echo "[5] Tool-switch operations"
+
+python3 "$CLI" --project "$PROJECT" session.tool-switch-write \
+  --trigger_error test --old_tool claude --new_tool opencode >/dev/null 2>&1
+
+TS_RECORD=$(python3 "$CLI" --project "$PROJECT" session.tool-switch-read 2>&1)
+assert_contains "5a. tool-switch-read has old_tool" "claude" "$TS_RECORD"
+assert_contains "5b. tool-switch-read has new_tool" "opencode" "$TS_RECORD"
+
+echo ""
+
+# ── 6. Handoff via handoff.py → daemon ──────────────────────────────
+echo "[6] Handoff operations (handoff.py → daemon)"
+
+# 6a. Init
+python3 "$HANDOFF" init --db "$DB_PATH" >/dev/null 2>&1
+((PASS++)); echo "  PASS 6a. handoff.init"
+
+# 6b. Insert
+HID=$(python3 "$HANDOFF" insert --db "$DB_PATH" --role manager \
+  --raw-key test-key --prompt-file /tmp/test-prompt.txt 2>&1)
+assert_contains "6b. handoff.insert" "-" "$HID"  # UUID-suffix format
+
+# 6c. Get
+HGET=$(python3 "$HANDOFF" get --db "$DB_PATH" --handoff-id "$HID" 2>&1)
+assert_contains "6c. handoff.get" "test-key" "$HGET"
+
+# 6d. Update
+HUP=$(python3 "$HANDOFF" update --db "$DB_PATH" --handoff-id "$HID" \
+  --status launched --exit-kind manager_working 2>&1)
+assert_contains "6d. handoff.update" "affected=1" "$HUP"
+
+# 6e. List
+HLIST=$(python3 "$HANDOFF" list --db "$DB_PATH" --role manager 2>&1)
+assert_contains "6e. handoff.list" "$HID" "$HLIST"
+
+# 6f. Latest manager
+HLM=$(python3 "$HANDOFF" latest-manager --db "$DB_PATH" 2>&1)
+assert_contains "6f. handoff.latest-manager" "$HID" "$HLM"
+
+echo ""
+
+# ── 7. Concurrent Access Safety ─────────────────────────────────────
+echo "[7] Concurrent access"
+
+# Launch 20 simultaneous chat.add calls
+pids=()
+for i in $(seq 1 20); do
+  python3 "$CLI" --project "$PROJECT" chat.add \
+    --type new-issue --issue-id "concurrent-test" --message "concurrent $i" --author test \
+    >/dev/null 2>&1 &
+  pids+=($!)
+done
+
+failed_concurrent=0
+for pid in "${pids[@]}"; do
+  wait "$pid" || ((failed_concurrent++))
+done
+
+if [[ "$failed_concurrent" -eq 0 ]]; then
+  ((PASS++)); echo "  PASS 7a. 20 concurrent chat.add all succeeded"
+else
+  ((FAIL++)); echo "  FAIL 7a. $failed_concurrent concurrent chat.add failed"
+fi
+
+# Verify all 20 are in the DB
+CONCURRENT_COUNT=$(python3 "$CLI" --project "$PROJECT" chat.list --limit 50 2>&1 | grep -c 'concurrent-test' || true)
+if [[ "$CONCURRENT_COUNT" -eq 20 ]]; then
+  ((PASS++)); echo "  PASS 7b. all 20 concurrent messages in DB"
+else
+  ((FAIL++)); echo "  FAIL 7b. expected 20, found $CONCURRENT_COUNT"
+fi
+
+echo ""
+
+# ── 8. Old Modules Removed ──────────────────────────────────────────
+echo "[8] Old modules removed"
+
+for mod in chat-inbox.py session-store.py worker-store.py; do
+  if [[ ! -f "$RUNTIME_DIR/$mod" ]]; then
+    ((PASS++)); echo "  PASS 8. $mod removed"
+  else
+    ((FAIL++)); echo "  FAIL 8. $mod still exists"
+  fi
+done
+
+echo ""
+
+# ── 9. Stats ────────────────────────────────────────────────────────
+echo "[9] Daemon stats"
+STATS=$(python3 "$CLI" --project "$PROJECT" db.stats 2>&1)
+assert_contains "9a. stats has requests_served" "requests_served" "$STATS"
+assert_contains "9b. stats has errors" "errors" "$STATS"
+echo "  INFO $STATS"
+
+echo ""
+echo "=== Results: $PASS passed, $FAIL failed ==="
+
+if [[ "$FAIL" -gt 0 ]]; then
+  exit 1
+fi
+exit 0

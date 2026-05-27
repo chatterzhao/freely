@@ -298,7 +298,11 @@ do_initial_merge() {
   echo "[MERGE-GUARD] fetching latest $target from origin..."
   git fetch origin "$target" 2>/dev/null || echo "[MERGE-GUARD] warning: fetch failed, proceeding with local state" >&2
 
-  check_branch_context "$target"
+  # Dry-run skips branch context check — pr-create-guarded runs this
+  # from the feature branch, not the target branch.
+  if [[ "$dry_run" != "1" ]]; then
+    check_branch_context "$target"
+  fi
   validate_merge_direction "$target" "$source_branch"
   blocked_merge_branch "$target" && fail "blocked_merge: target '$target' is blocked from merge operations"
   blocked_merge_branch "$source_branch" && fail "blocked_merge: source '$source_branch' is blocked from merge operations"
