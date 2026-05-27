@@ -83,8 +83,13 @@ if ! command -v gh >/dev/null 2>&1; then
   exit 1
 fi
 
-gh_pr_args=()
-[[ -n "${title:-}" ]] && gh_pr_args+=(--title "$title")
-[[ -n "${body:-}" ]] && gh_pr_args+=(--body "$body")
-
-gh pr create --head "$current_branch" --base "$base" "${gh_pr_args[@]}"
+# Build PR args; provide defaults if not specified
+if [[ -z "${title:-}" ]]; then
+  title="$(echo "$current_branch" | sed 's/.*raw-[0-9]*T[0-9]*Z-//; s/-/ /g')"
+fi
+if [[ -z "${body:-}" ]]; then
+  body="See commits for details."
+fi
+gh pr create --head "$current_branch" --base "$base" \
+  --title "$title" \
+  --body "$body"
