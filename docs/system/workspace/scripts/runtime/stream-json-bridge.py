@@ -48,16 +48,15 @@ def _log(msg: str) -> None:
 
 
 def _persist_session(session_id: str, project: str, tool: str, launch_kind: str) -> None:
-    """Persist session ID via session-store.py."""
-    session_store_py = os.path.join(os.path.dirname(__file__), "session-store.py")
-    if not os.path.exists(session_store_py):
+    """Persist session ID via freely-db daemon."""
+    cli = os.path.join(os.path.dirname(__file__), "freely-db-cli")
+    if not os.path.exists(cli):
         return
-    db_path = os.path.join(project, ".freely", "freely.db")
     subprocess.run(
-        [sys.executable, session_store_py, "upsert",
-         "--db", db_path, "--session-id", session_id, "--project", project,
+        [sys.executable, cli, "--project", project, "session.upsert",
+         "--session-id", session_id, "--project", project,
          "--tool", tool, "--role", os.environ.get("FREELY_ROLE_HINT", "manager"),
-         "--launch-kind", launch_kind, "--tool-adapter", "stream-json"],
+         "--launch-kind", launch_kind, "--tool_adapter", "stream-json"],
         capture_output=True, text=True,
     )
 

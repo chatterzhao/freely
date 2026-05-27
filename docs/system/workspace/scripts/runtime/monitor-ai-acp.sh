@@ -154,59 +154,40 @@ _grep_new_only() {
   fi
 }
 
-# ── Session state (via session-store.py SQLite) ─────────────────────
+# ── Session state (via freely-db daemon) ────────────────────────────
 
 _persist_session_to_store() {
   local project="$1" clean_session_id="$2" tool="$3" launch_kind="$4" resume_mode="$5"
-  local db_path="$project/.freely/freely.db"
-  local session_store_py
-  session_store_py="$(dirname "$0")/session-store.py"
-  if [[ ! -f "$session_store_py" ]]; then
-    echo "[WARN] session-store.py not found, cannot persist session" >&2
-    return 1
-  fi
   local role="${FREELY_ROLE_HINT:-manager}"
-  python3 "$session_store_py" upsert \
-    --db "$db_path" \
+  local cli; cli="$(dirname "$0")/freely-db-cli"
+  python3 "$cli" --project "$project" session.upsert \
     --session-id "$clean_session_id" \
     --project "$project" \
     --tool "$tool" \
     --role "$role" \
     --launch-kind "$launch_kind" \
-    --tool-adapter acp \
-    --resume-mode "${resume_mode:-}" \
+    --tool_adapter acp \
+    --resume_mode "${resume_mode:-}" \
     >/dev/null 2>&1 || {
-      echo "[WARN] session-store.py upsert failed for $clean_session_id" >&2
+      echo "[WARN] session upsert failed for $clean_session_id" >&2
       return 1
     }
 }
 
 _mark_session_failed() {
   local project="$1" session_id="$2" error_reason="$3"
-  local db_path="$project/.freely/freely.db"
-  local session_store_py
-  session_store_py="$(dirname "$0")/session-store.py"
-  if [[ ! -f "$session_store_py" ]]; then
-    return 1
-  fi
-  python3 "$session_store_py" complete \
-    --db "$db_path" \
+  local cli; cli="$(dirname "$0")/freely-db-cli"
+  python3 "$cli" --project "$project" session.complete \
     --session-id "$session_id" \
     --status failed \
-    --error-reason "$error_reason" \
+    --error_reason "$error_reason" \
     >/dev/null 2>&1 || true
 }
 
 _mark_session_completed() {
   local project="$1" session_id="$2"
-  local db_path="$project/.freely/freely.db"
-  local session_store_py
-  session_store_py="$(dirname "$0")/session-store.py"
-  if [[ ! -f "$session_store_py" ]]; then
-    return 1
-  fi
-  python3 "$session_store_py" complete \
-    --db "$db_path" \
+  local cli; cli="$(dirname "$0")/freely-db-cli"
+  python3 "$cli" --project "$project" session.complete \
     --session-id "$session_id" \
     --status completed \
     >/dev/null 2>&1 || true
@@ -214,18 +195,10 @@ _mark_session_completed() {
 
 _tool_switch_writeback_session_id() {
   local project="$1" new_session_id="$2"
-  local db_path="$project/.freely/freely.db"
-  local session_store_py
-  session_store_py="$(dirname "$0")/session-store.py"
-  if [[ ! -f "$session_store_py" ]]; then
-    return 1
-  fi
-  if [[ -z "$new_session_id" ]]; then
-    return 1
-  fi
-  python3 "$session_store_py" tool-switch-update-sid \
-    --db "$db_path" \
-    --new-session-id "$new_session_id" \
+  [[ -n "$new_session_id" ]] || return 1
+  local cli; cli="$(dirname "$0")/freely-db-cli"
+  python3 "$cli" --project "$project" session.tool-switch-update-sid \
+    --new_session_id "$new_session_id" \
     >/dev/null 2>&1 || true
 }
 

@@ -1496,15 +1496,10 @@ cmd_switch() {
             grep -q "^AI_TOOL=" "$_cfg" 2>/dev/null && sed -i '' "s/^AI_TOOL=.*/AI_TOOL=\"$_ai_tool_val\"/" "$_cfg" || echo "AI_TOOL=\"$_ai_tool_val\"" >> "$_cfg"
             log_info "Updated AI_TOOL in config.env: $_ai_tool_val"
             # Record switch in tool_switch_events table
-            local _db; _db="${SWITCH_PROJECT}/.freely/freely.db"
-            local _ss_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-store.py"
-            if [[ -f "$_db" && -f "$_ss_py" ]]; then
-              python3 -c "
-from importlib.machinery import SourceFileLoader
-m = SourceFileLoader('session_store', '$_ss_py').load_module()
-m.tool_switch_atomic_write('$_db', 'switch_command', '$_old_tool', '', '', '', '$_ai_tool_val', '')
-" 2>/dev/null || true
-            fi
+            local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
+            python3 "$cli" --project "${SWITCH_PROJECT}" session.tool-switch-write \
+              --trigger_error switch_command --old_tool "$_old_tool" \
+              --new_tool "$_ai_tool_val" 2>/dev/null || true
           fi
         fi
       fi
@@ -1518,15 +1513,10 @@ m.tool_switch_atomic_write('$_db', 'switch_command', '$_old_tool', '', '', '', '
           local _old_tool; _old_tool=$(grep "^AI_TOOL=" "$cfg" 2>/dev/null | head -1 | sed 's/^AI_TOOL="//; s/"$//; s/".*$//')
           grep -q "^AI_TOOL=" "$cfg" 2>/dev/null             && sed -i '' "s/^AI_TOOL=.*/AI_TOOL="$slot"/" "$cfg"             || echo "AI_TOOL="$slot"" >> "$cfg"
           log_info "Updated AI_TOOL in config.env: $slot"
-          local _db; _db="${SWITCH_PROJECT}/.freely/freely.db"
-          local _ss_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-store.py"
-          if [[ -f "$_db" && -f "$_ss_py" ]]; then
-            python3 -c "
-from importlib.machinery import SourceFileLoader
-m = SourceFileLoader('session_store', '$_ss_py').load_module()
-m.tool_switch_atomic_write('$_db', 'switch_command', '$_old_tool', '', '', '', '$slot', '')
-" 2>/dev/null || true
-          fi
+          local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
+          python3 "$cli" --project "${SWITCH_PROJECT}" session.tool-switch-write \
+            --trigger_error switch_command --old_tool "$_old_tool" \
+            --new_tool "$slot" 2>/dev/null || true
         fi
       fi
       ;;
