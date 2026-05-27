@@ -19664,6 +19664,11 @@ ${_msg}" >/dev/null 2>&1 || true
     # Re-load session state each cycle so resume/fork decisions see latest values
     load_session_state_or_defaults "$project"
 
+    # Ensure ACP bridge binary matches current tool (tool may have been switched by auto-recovery)
+    if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
+      _ensure_acp_bridge_running "$project" || log_warn "ACP bridge check failed, continuing with existing bridge"
+    fi
+
     # Scan for stale worker PIDs before keepalive decisions
     if [[ "$(effective_runtime_role_for_project "$project")" == "manager" ]]; then
       manager_scan_stale_worker_pids "$project" || true
