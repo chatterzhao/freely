@@ -1,0 +1,378 @@
+#!/usr/bin/env python3
+"""freely-db-cli — Thin socket client for freely_db_manager daemon.
+
+Replaces direct calls to chat-inbox.py, session-store.py, and inline sqlite3.
+Sends JSON-RPC over Unix socket, formats responses for bash consumption.
+
+Usage:
+  freely-db-cli --project <path> <table>.<action> [--flag value ...]
+
+Examples:
+  freely-db-cli --project /path chat add --type new-issue --message "hello"
+  freely-db-cli --project /path session get-active --role manager
+  freely-db-cli --project /path db ping
+"""
+
+import argparse
+import hashlib
+import json
+import os
+import socket
+import sys
+
+
+def _short_hash(project: str) -> str:
+    return hashlib.sha256(os.path.abspath(project).encode()).hexdigest()[:16]
+
+
+def _socket_path(project: str) -> str:
+    return f"/tmp/freely-db-{_short_hash(project)}.sock"
+
+
+# ── Socket transport ──────────────────────────────────────────────────────
+
+def _call(project: str, method: str, params: dict, timeout: float = 30.0) -> dict:
+    socket_path = _socket_path(project)
+    if not os.path.exists(socket_path):
+        print(f"ERROR: freely-db daemon not running (socket {socket_path} not found)", file=sys.stderr)
+        sys.exit(1)
+
+    request = {"jsonrpc": "2.0", "id": 1, "method": method, "params": params}
+    sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    sock.settimeout(timeout)
+    try:
+        sock.connect(socket_path)
+        sock.sendall((json.dumps(request, default=str) + "\n").encode())
+        sock.shutdown(socket.SHUT_WR)
+        data = b""
+        while True:
+            chunk = sock.recv(4096)
+            if not chunk:
+                break
+            data += chunk
+    finally:
+        sock.close()
+
+    response = json.loads(data.decode())
+    if "error" in response:
+        err = response["error"]
+        print(f"ERROR: {err.get('message', str(err))}", file=sys.stderr)
+        sys.exit(1)
+    return response.get("result", {})
+
+
+# ── Output formatters ─────────────────────────────────────────────────────
+
+def _out_raw(val):        print(val)
+def _out_ok(val):         print("OK" if val else "NOT_FOUND")
+def _out_changed(d):      print("OK" if d.get("changed") else "NOT_FOUND")
+def _out_bool(d, key):    print("true" if d.get(key) else "false")
+def _out_count(d):        print(d.get("count", 0))
+def _out_json(d):         print(json.dumps(d))
+def _out_json_rows(d):    print(json.dumps(d.get("rows", [])))
+def _out_dict(d, key):    print(d.get(key, "") or "")
+def _out_record_json(d):  print(json.dumps(d.get("record") or {}))
+def _out_rows_tab(d, *cols):
+    for r in d.get("rows", []):
+        print("\t".join(str(r.get(c, "")) for c in cols))
+def _out_rows_tab_msg(d):
+    for r in d.get("rows", []):
+        print(f"{r.get('id','')}\t{r.get('chat_type','')}\t{r.get('issue_id','')}\t{r.get('message','')[:80]}")
+def _out_rows_tab_sessions(d):
+    for r in d.get("rows", []):
+        print(f"{r.get('session_id','')}\t{r.get('role','')}\t{r.get('launch_kind','')}\t{r.get('status','')}\t{r.get('updated_at','')}")
+
+
+def _chat_show_output(result):
+    if result.get("found"):
+        for k, v in result["chat"].items():
+            print(f"{k}: {v}")
+    else:
+        print("NOT_FOUND")
+        sys.exit(1)
+
+
+def _session_get_active_output(result):
+    sid = result.get("session_id")
+    if sid:
+        print(sid)
+    else:
+        print("")
+        sys.exit(1)
+
+
+def _session_get_parent_output(result):
+    pid = result.get("parent_session_id")
+    if pid:
+        print(pid)
+    else:
+        print("")
+        sys.exit(1)
+
+
+def _session_show_output(result):
+    if result.get("found"):
+        for k, v in result["session"].items():
+            print(f"{k}: {v}")
+    else:
+        print("NOT_FOUND")
+        sys.exit(1)
+
+
+def _tool_switch_read_output(result):
+    if result.get("found") and result.get("record"):
+        rec = result["record"]
+        print("|".join(str(rec.get(k, '')) for k in [
+            'trigger_error', 'old_tool', 'old_session_id', 'old_jsonl_path',
+            'old_cycle_log', 'new_tool', 'new_session_id', 'cross_tool'
+        ]))
+
+
+def _handoff_parse_output(result):
+    if not result.get("ok"):
+        print(json.dumps({"action": "repair", "errors": result.get("errors", [])}))
+        sys.exit(1)
+    print(json.dumps({"action": result.get("exit_kind", ""),
+                      "handoff_id": result.get("handoff_id", "")}))
+
+
+def _task_mode_read_scan_output(result):
+    print(f'{result.get("mode", "wait")}|{result.get("task_scan_id", "")}')
+
+
+# ── Parameter builders ────────────────────────────────────────────────────
+
+def _chat_add_params(args):
+    return {
+        "chat_type": args.get("type", "new-issue"),
+        "issue_id": args.get("issue_id", "pending"),
+        "message": args["message"],
+        "author": args.get("author", "human"),
+        "channel": args.get("channel", "chat"),
+        "session_refs": args.get("session_refs", "[]"),
+        "intake_id": args.get("intake_id", ""),
+        "conversation_id": int(args.get("conversation_id", 0)),
+    }
+
+def _chat_qbi_params(args):
+    p = {"issue_id": args["issue_id"]}
+    if args.get("consumed") is not None:
+        p["consumed"] = int(args["consumed"])
+    return p
+
+def _chat_show_params(args):
+    return {"chat_id": args["id"]}
+
+def _chat_consume_conv_params(args):
+    return {
+        "conversation_id": int(args.get("conversation_id", 0)),
+        "action": args.get("action", "materialize"),
+        "target": args.get("target", ""),
+    }
+
+def _session_upsert_params(args):
+    return {
+        "session_id": args["session_id"],
+        "project": args.get("project", ""),
+        "tool": args["tool"],
+        "role": args.get("role", "manager"),
+        "parent_session_id": args.get("parent_session_id", ""),
+        "launch_kind": args.get("launch_kind", "fresh"),
+        "tool_adapter": args.get("tool_adapter", "direct"),
+        "resume_mode": args.get("resume_mode", ""),
+        "error_reason": args.get("error_reason", ""),
+        "metadata_json": args.get("metadata_json", "{}"),
+    }
+
+def _session_get_active_params(args):
+    return {"project": args.get("project", ""), "role": args.get("role", "manager")}
+
+def _session_complete_params(args):
+    return {
+        "session_id": args["session_id"],
+        "status": args.get("status", "completed"),
+        "error_reason": args.get("error_reason", ""),
+    }
+
+def _session_list_params(args):
+    p = {"project": args.get("project", "")}
+    if args.get("status"): p["status"] = args["status"]
+    if args.get("role"): p["role"] = args["role"]
+    return p
+
+def _tool_switch_write_params(args):
+    return {
+        "trigger_error": args.get("trigger_error", "startup"),
+        "old_tool": args.get("old_tool", ""),
+        "old_session_id": args.get("old_session_id", ""),
+        "old_jsonl_path": args.get("old_jsonl_path", ""),
+        "old_cycle_log": args.get("old_cycle_log", ""),
+        "new_tool": args.get("new_tool", ""),
+        "new_session_id": args.get("new_session_id", ""),
+    }
+
+def _handoff_insert_params(args):
+    return {
+        "role": args.get("role", "manager"), "raw_key": args.get("raw_key", ""),
+        "worktree": args.get("worktree", ""), "branch": args.get("branch", ""),
+        "prompt_file": args.get("prompt_file", ""), "parent": args.get("parent", ""),
+        "prev_worker": args.get("prev_worker", ""), "intent_kind": args.get("intent_kind", ""),
+        "status": args.get("status", "pending"), "exit_kind": args.get("exit_kind", ""),
+        "reason": args.get("reason", ""), "restart_point": args.get("restart_point", ""),
+        "next_action": args.get("next_action", ""), "completion_summary": args.get("completion_summary", ""),
+        "evidence_paths": args.get("evidence_paths", ""), "worker_prompts_csv": args.get("worker_prompts_csv", ""),
+        "session_id": args.get("session_id", ""), "created_by": args.get("created_by", ""),
+        "consumed_by": args.get("consumed_by", ""),
+    }
+
+def _handoff_update_params(args):
+    p = {"handoff_id": args["handoff_id"]}
+    for f in ("status", "exit_kind", "session_id", "reason", "restart_point",
+              "next_action", "completion_summary", "evidence_paths", "worker_prompts_csv"):
+        if args.get(f): p[f] = args[f]
+    return p
+
+def _handoff_list_params(args):
+    p = {"role": args.get("role", "worker")}
+    if args.get("status"): p["status"] = args["status"]
+    return p
+
+def _handoff_parse_params(args):
+    return {
+        "reply_text": args.get("reply_text", ""),
+        "context": {
+            "role": args.get("role", "manager"), "raw_key": args.get("raw_key", ""),
+            "worktree": args.get("worktree", ""), "branch": args.get("branch", ""),
+            "prompt_file": args.get("prompt_file", ""),
+            "parent_handoff_id": args.get("parent_handoff_id", ""),
+            "previous_worker_handoff_id": args.get("previous_worker_handoff_id", ""),
+            "intent_kind": args.get("intent_kind", ""),
+            "session_id": args.get("session_id", ""),
+        },
+    }
+
+def _handoff_extract_local(args):
+    """handoff.extract is pure local parsing — no daemon call needed."""
+    from handoff_parser import extract_handoff_json
+    reply_text = args.get("reply_text", "")
+    if not reply_text:
+        reply_text = sys.stdin.read()
+    result = extract_handoff_json(reply_text)
+    if result["ok"]:
+        print(json.dumps({"action": result["exit_kind"], "fields": result["fields"]}))
+    else:
+        print(json.dumps({"action": "repair", "errors": result["errors"]}))
+        sys.exit(1)
+
+
+# ── Method dispatch table ─────────────────────────────────────────────────
+# Each entry: (rpc_method_name, output_formatter_fn, param_builder_fn)
+# Must be defined AFTER all referenced functions.
+
+METHODS = {
+    "db.ping":                ("db.ping",                 lambda r: print("pong" if r.get("pong") else "fail"), lambda a: {}),
+    "db.stats":               ("db.stats",                lambda r: print(json.dumps(r)), lambda a: {}),
+
+    # chat.*
+    "chat.add":               ("chat.add",                lambda r: print(r.get("chat_id", "")), _chat_add_params),
+    "chat.list":              ("chat.list",               _out_rows_tab_msg, lambda a: {"limit": a.get("limit", 50)}),
+    "chat.query-by-issue":    ("chat.query-by-issue",     _out_rows_tab_msg, _chat_qbi_params),
+    "chat.show":              ("chat.show",               _chat_show_output, _chat_show_params),
+    "chat.consume":           ("chat.consume",            _out_changed, lambda a: {"chat_id": a["id"], "materialized_as": a.get("materialized_as", "")}),
+    "chat.discard":           ("chat.discard",            _out_changed, lambda a: {"chat_id": a["id"]}),
+    "chat.reset":             ("chat.reset",              _out_changed, lambda a: {"chat_id": a["id"]}),
+    "chat.update-issue-id":   ("chat.update-issue-id",    lambda r: print("OK" if r.get("changed") else "NOT_FOUND"), lambda a: {"chat_id": a["id"], "issue_id": a["issue_id"]}),
+    "chat.update-conversation-id": ("chat.update-conversation-id", lambda r: print("OK" if r.get("changed") else "NOT_FOUND"), lambda a: {"chat_id": a["id"], "conversation_id": a["conversation_id"]}),
+    "chat.query-active-conversation": ("chat.query-active-conversation", lambda r: print(r.get("conversation_id", "") or ""), lambda a: {}),
+    "chat.conversation-messages": ("chat.conversation-messages", _out_json_rows, lambda a: {"conversation_id": a["conversation_id"]}),
+    "chat.consume-conversation": ("chat.consume-conversation", _out_count, _chat_consume_conv_params),
+    "chat.count-comments-for-key": ("chat.count-comments-for-key", _out_count, lambda a: {"key": a["key"]}),
+    "chat.base-keys":         ("chat.base-keys",           lambda r: print("\n".join(r.get("keys", []))), lambda a: {}),
+
+    # session.*
+    "session.upsert":         ("session.upsert",          lambda r: print(r.get("session_id", "")), _session_upsert_params),
+    "session.get-active":     ("session.get-active",      _session_get_active_output, _session_get_active_params),
+    "session.get-parent":     ("session.get-parent",      _session_get_parent_output, lambda a: {"session_id": a["session_id"]}),
+    "session.show":           ("session.show",            _session_show_output, lambda a: {"session_id": a["session_id"]}),
+    "session.complete":       ("session.complete",        _out_changed, _session_complete_params),
+    "session.list":           ("session.list",            _out_rows_tab_sessions, _session_list_params),
+    "session.list-children":  ("session.list-children",   _out_rows_tab_sessions, lambda a: {"parent_session_id": a["parent_session_id"]}),
+    "session.count-active":   ("session.count-active",    _out_count, lambda a: {"project": a.get("project", "")}),
+    "session.tool-switch-read": ("session.tool-switch-read", _tool_switch_read_output, lambda a: {}),
+    "session.tool-switch-write": ("session.tool-switch-write", lambda r: print("OK"), _tool_switch_write_params),
+    "session.tool-switch-update-sid": ("session.tool-switch-update-sid", _out_changed, lambda a: {"new_session_id": a["new_session_id"]}),
+
+    # handoff.*
+    "handoff.insert":         ("handoff.insert",          lambda r: print(r.get("handoff_id", "")), _handoff_insert_params),
+    "handoff.update":         ("handoff.update",          lambda r: print(f'ok affected={r.get("affected", 0)}'), _handoff_update_params),
+    "handoff.get":            ("handoff.get",             _out_record_json, lambda a: {"handoff_id": a["handoff_id"]}),
+    "handoff.list":           ("handoff.list",            _out_json_rows, _handoff_list_params),
+    "handoff.list-by-key":    ("handoff.list-by-key",     _out_json_rows, lambda a: {"raw_key": a["raw_key"]}),
+    "handoff.active-workers": ("handoff.active-workers",  _out_json_rows, lambda a: {"worktree": a.get("worktree", "")}),
+    "handoff.has-active-worker": ("handoff.has-active-worker", lambda r: _out_bool(r, "has_active"), lambda a: {"worktree": a.get("worktree", "")}),
+    "handoff.latest-manager": ("handoff.latest-manager",  _out_record_json, lambda a: {}),
+    "handoff.latest-completed-worker": ("handoff.latest-completed-worker", _out_record_json, lambda a: {"raw_key": a.get("raw_key", "")}),
+    "handoff.mark-stale":     ("handoff.mark-stale",      lambda r: print(f'ok affected={r.get("affected", 0)}'), lambda a: {"inactivity_minutes": a.get("timeout_minutes", 15)}),
+    "handoff.auto-consume":   ("handoff.auto-consume",    lambda r: print(f'{r.get("affected", 0)}'), lambda a: {"raw_key": a.get("raw_key", ""), "consumed_by": a.get("consumed_by", "manager")}),
+    "handoff.update-last-activity": ("handoff.update-last-activity", lambda r: print("ok"), lambda a: {"handoff_id": a["handoff_id"]}),
+    "handoff.update-send-to-ai": ("handoff.update-send-to-ai", lambda r: print(f'ok affected={r.get("affected", 0)}'), lambda a: {"handoff_id": a["handoff_id"], "send_to_ai": a["send_to_ai"]}),
+    "handoff.update-worker-pid": ("handoff.update-worker-pid", lambda r: print(f'ok affected={r.get("affected", 0)}'), lambda a: {"handoff_id": a["handoff_id"], "worker_pid": a["worker_pid"]}),
+    "handoff.list-pending-delivery": ("handoff.list-pending-delivery", _out_json_rows, lambda a: {"consumed_by": a.get("consumed_by", "")}),
+    "handoff.get-launched-pids": ("handoff.get-launched-pids", _out_json_rows, lambda a: {"raw_key": a.get("raw_key", "")}),
+    "handoff.parse":          ("handoff.parse",           _handoff_parse_output, _handoff_parse_params),
+    "handoff.extract":        None,  # handled locally, not via daemon
+
+    # task-mode.*
+    "task-mode.init":         ("task-mode.init",          lambda r: None, lambda a: {"default": a.get("default", "wait")}),
+    "task-mode.read":         ("task-mode.read",          lambda r: print(r.get("mode", "wait")), lambda a: {}),
+    "task-mode.read-with-scan": ("task-mode.read-with-scan", _task_mode_read_scan_output, lambda a: {}),
+    "task-mode.write":        ("task-mode.write",         lambda r: None, lambda a: {"mode": a["mode"], "scan_id": a.get("scan_id", "")}),
+    "task-mode.read-just-switched": ("task-mode.read-just-switched", lambda r: print(r.get("just_switched", 0)), lambda a: {}),
+}
+
+
+# ── CLI ───────────────────────────────────────────────────────────────────
+
+def main():
+    parser = argparse.ArgumentParser(description="freely-db-cli: thin socket client for freely_db_manager")
+    parser.add_argument("--project", required=True, help="Project root path")
+    parser.add_argument("--timeout", type=float, default=30.0, help="Socket timeout seconds")
+
+    known, unknown = parser.parse_known_args()
+    if not unknown:
+        parser.print_help()
+        sys.exit(1)
+
+    method = unknown[0]
+    args = {}
+    i = 1
+    while i < len(unknown):
+        if unknown[i].startswith("--"):
+            key = unknown[i][2:].replace("-", "_")
+            if i + 1 < len(unknown) and not unknown[i + 1].startswith("--"):
+                args[key] = unknown[i + 1]
+                i += 2
+            else:
+                args[key] = "true"
+                i += 1
+        else:
+            i += 1
+
+    # handoff.extract is handled locally (no daemon needed)
+    if method == "handoff.extract":
+        _handoff_extract_local(args)
+        return
+
+    entry = METHODS.get(method)
+    if entry is None:
+        print(f"ERROR: unknown method '{method}'", file=sys.stderr)
+        sys.exit(1)
+
+    rpc_method, formatter, param_builder = entry
+    params = param_builder(args)
+    result = _call(known.project, rpc_method, params, known.timeout)
+    formatter(result)
+
+
+if __name__ == "__main__":
+    main()
