@@ -305,6 +305,28 @@ def is_governance_only_path(rel_path: str) -> bool:
     return False
 
 
+_CODE_EXTS = {".sh", ".py", ".rs", ".ts", ".js", ".tsx", ".jsx", ".go", ".java", ".c", ".cpp", ".h", ".toml"}
+_CODE_INTERPRETERS = ("python", "bash", "sh", "node", "deno", "bun")
+
+
+def _is_code_file(rel_path: str) -> bool:
+    """Check if a file is implementation code by extension or shebang."""
+    if os.path.splitext(rel_path)[1] in _CODE_EXTS:
+        return True
+    # No extension: check shebang for script interpreter
+    if os.path.splitext(rel_path)[1] == "":
+        try:
+            with open(rel_path, "rb") as f:
+                head = f.read(128).decode("utf-8", errors="ignore")
+            if head.startswith("#!"):
+                for interp in _CODE_INTERPRETERS:
+                    if interp in head[:128]:
+                        return True
+        except (OSError, UnicodeDecodeError):
+            pass
+    return False
+
+
 def is_implementation_bearing_path(rel_path: str) -> bool:
     if rel_path in IMPLEMENTATION_PATH_FILES:
         return True
@@ -770,9 +792,8 @@ def main() -> int:
             for p in non_governance_paths:
                 print(f"  - {p}")
             return 1
-        # Even within governance paths, code files MUST go through full lifecycle
-        code_exts = {".sh", ".py", ".rs", ".ts", ".js", ".tsx", ".jsx", ".go", ".java", ".c", ".cpp", ".h", ".toml"}
-        code_paths = [p for p in changed_paths if os.path.splitext(p)[1] in code_exts]
+        # Code files (by extension or shebang) MUST go through full lifecycle
+        code_paths = [p for p in changed_paths if _is_code_file(p)]
         if code_paths:
             print("[FAIL] FREELY_SKIP_IBM_GATE=1 but code files cannot skip IBM gate.")
             print("Code files require full raw/C/M/I lifecycle regardless of path:")
