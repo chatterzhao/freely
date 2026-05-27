@@ -405,7 +405,7 @@ _apply_tool_alias_settings() {
   while IFS='=' read -r key value; do
     [[ -n "$key" ]] || continue
     export "$key"="$value"
-  done < <(python3 -c "
+  done <<<"$(python3 -c "
 import json, sys
 try:
     with open('$alias_path') as f:
@@ -420,7 +420,7 @@ try:
     settings_file = '${alias_path}'
     print(f'CLAUDE_CODE_SETTINGS_FILE={settings_file}')
 except: pass
-" 2>/dev/null)
+" 2>/dev/null)"
 }
 
 tool_has_capability() {
@@ -678,7 +678,7 @@ tool_run_direct_from_prompt_file() {
       # Session strategy: use the session-cache module if available.
       if [[ "$launch_kind" == "fork" ]]; then
         if [[ -n "$tool_resume_target" && -n "$claude_session_id" ]] && declare -f session_fork_args >/dev/null 2>&1; then
-          while IFS= read -r arg; do [[ -n "$arg" ]] && args+=("$arg"); done < <(session_fork_args "$tool" "$tool_resume_target" "$claude_session_id")
+          while IFS= read -r arg; do [[ -n "$arg" ]] && args+=("$arg"); done <<<"$(session_fork_args "$tool" "$tool_resume_target" "$claude_session_id")"
         elif [[ -n "$tool_resume_target" && -n "$claude_session_id" ]]; then
           args+=(--resume "$tool_resume_target" --fork-session --session-id "$claude_session_id")
         elif [[ -n "$tool_resume_target" ]]; then
@@ -688,7 +688,7 @@ tool_run_direct_from_prompt_file() {
         fi
       elif [[ "$launch_kind" == "resume" ]]; then
         if [[ -n "$tool_resume_target" ]] && declare -f session_resume_args >/dev/null 2>&1; then
-          while IFS= read -r arg; do [[ -n "$arg" ]] && args+=("$arg"); done < <(session_resume_args "$tool" "$tool_resume_target")
+          while IFS= read -r arg; do [[ -n "$arg" ]] && args+=("$arg"); done <<<"$(session_resume_args "$tool" "$tool_resume_target")"
         elif [[ -n "$tool_resume_target" ]]; then
           args+=(--resume "$tool_resume_target")
         elif [[ -n "$claude_session_id" ]]; then
@@ -696,7 +696,7 @@ tool_run_direct_from_prompt_file() {
         fi
       elif [[ -n "$claude_session_id" ]]; then
         if declare -f session_fresh_args >/dev/null 2>&1; then
-          while IFS= read -r arg; do [[ -n "$arg" ]] && args+=("$arg"); done < <(session_fresh_args "$tool" "$claude_session_id")
+          while IFS= read -r arg; do [[ -n "$arg" ]] && args+=("$arg"); done <<<"$(session_fresh_args "$tool" "$claude_session_id")"
         else
           args+=(--session-id "$claude_session_id")
         fi
