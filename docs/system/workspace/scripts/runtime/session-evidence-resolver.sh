@@ -34,7 +34,7 @@ find_claude_jsonl_path_for_session() {
       printf '%s\n' "$candidate"
       return 0
     fi
-  done < <(project_root_variants "$project_root")
+  done <<<"$(project_root_variants "$project_root")"
 
   while IFS= read -r fallback_candidate; do
     [[ -n "$fallback_candidate" ]] || continue
@@ -42,7 +42,7 @@ find_claude_jsonl_path_for_session() {
       printf '%s\n' "$fallback_candidate"
       return 0
     fi
-  done < <(find "$projects_root" -type f -name "${claude_session_id}.jsonl" 2>/dev/null | sort)
+  done <<<"$(find "$projects_root" -type f -name "${claude_session_id}.jsonl" 2>/dev/null | sort)"
 }
 
 claude_jsonl_matches_project_root() {
