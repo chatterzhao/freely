@@ -12639,14 +12639,34 @@ _ensure_acp_bridge_running() {
           Linux:x86_64) _triplet="x86_64-unknown-linux-gnu" ;;
           *) _triplet="" ;;
         esac
+        local _cache_root="${FREELY_ACP_CACHE_DIR:-$HOME/.cache/freely/acp}"
         if [[ -n "$_triplet" ]]; then
-          acp_bin="$HOME/.cache/freely/acp/codex-acp/$_ver/$_triplet/codex-acp"
+          acp_bin="$_cache_root/codex-acp/$_ver/$_triplet/codex-acp"
         fi
       fi
-      [[ -n "$acp_bin" && -x "$acp_bin" ]] || {
-        log_warn "codex-acp binary not found at $acp_bin, falling back to claude-agent-acp"
+      # Auto-download if missing (reuse tool-launchers.sh logic inline)
+      if [[ -n "$acp_bin" && ! -x "$acp_bin" ]]; then
+        local _install_dir; _install_dir="$(dirname "$acp_bin")"
+        local _archive_url="https://github.com/zed-industries/codex-acp/releases/download/v${_ver}/codex-acp-${_ver}-${_triplet}.tar.gz"
+        log_info "downloading codex-acp ${_ver} for ${_triplet}..."
+        mkdir -p "$_install_dir"
+        local _tmp_archive; _tmp_archive="$(mktemp "$_install_dir/codex-acp.XXXXXX")"
+        if curl -fsSL "$_archive_url" -o "$_tmp_archive" 2>/dev/null; then
+          if tar -xzf "$_tmp_archive" -C "$_install_dir" 2>/dev/null && [[ -x "$acp_bin" ]]; then
+            log_info "codex-acp ${_ver} installed to $acp_bin"
+          else
+            log_warn "codex-acp extraction failed, falling back to claude-agent-acp"
+            acp_bin="claude-agent-acp"
+          fi
+        else
+          log_warn "codex-acp download failed (${_archive_url}), falling back to claude-agent-acp"
+          acp_bin="claude-agent-acp"
+        fi
+        rm -f "$_tmp_archive"
+      elif [[ -z "$acp_bin" ]]; then
+        log_warn "codex-acp: unsupported platform, falling back to claude-agent-acp"
         acp_bin="claude-agent-acp"
-      }
+      fi
       ;;
     *) acp_bin="${FREELY_CLAUDE_ACP_BIN:-claude-agent-acp}" ;;
   esac
