@@ -42,6 +42,27 @@ SESSION_EVIDENCE_RESOLVER_LIB="$SELF_ROOT/docs/system/workspace/scripts/runtime/
 }
 source "$SESSION_EVIDENCE_RESOLVER_LIB"
 
+# ── Tool registry (JSON5, single source of truth for per-tool capabilities) ──
+TOOL_REGISTRY="$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-registry.json5"
+TOOL_REGISTRY_QUERY="$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-registry-query.py"
+
+_tool_registry_get() {
+  # Usage: _tool_registry_get <tool> <dot.path> → prints value, exit 1 if not found
+  local tool="$1" field="$2"
+  [[ -f "$TOOL_REGISTRY" && -f "$TOOL_REGISTRY_QUERY" ]] || return 1
+  python3 "$TOOL_REGISTRY_QUERY" "$TOOL_REGISTRY" "$tool" "$field" 2>/dev/null
+}
+
+_tool_registry_tools() {
+  # List all registered tool names
+  python3 "$TOOL_REGISTRY_QUERY" "$TOOL_REGISTRY" --list 2>/dev/null
+}
+
+_tool_is_registered() {
+  local tool="$1"
+  _tool_registry_get "$tool" "acp.binary" >/dev/null 2>&1
+}
+
 SESSION_CACHE_LIB="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-cache.sh"
 [[ -f "$SESSION_CACHE_LIB" ]] && source "$SESSION_CACHE_LIB"
 
@@ -3285,9 +3306,7 @@ _strip_env_prefix() {
 # Supports recursive aliases (alias → another alias → binary).
 _resolve_tool_family() {
   local tool="$1"
-  case "$tool" in
-    codex|claude|cc|cc-use-codex-cli|kiro-cli|iflow|opencode) printf '%s\n' "$tool"; return 0 ;;
-  esac
+  if _tool_is_registered "$tool"; then printf '%s\n' "$tool"; return 0; fi
   local expansion binary
   expansion=$(_resolve_type_expansion "$tool")
   if [[ -z "${expansion:-}" ]]; then
@@ -12617,59 +12636,52 @@ _ensure_acp_bridge_running() {
   pid_file="$(_acp_bridge_pid_file "$project")"
   socket="$(_acp_bridge_socket "$project")"
 
-  # Determine the correct ACP binary for the current tool
+  # Determine the correct ACP binary for the current tool via registry
   local acp_bin="claude-agent-acp"
   local -a _acp_args=()
   local base_tool="${AI_TOOL%%-*}"  # opencode-apikey-xxx → opencode, codex-apikey-xxx → codex
-  case "$base_tool" in
-    opencode)
-      acp_bin="opencode"
-      _acp_args=("acp")
-      ;;
-    codex)
-      if [[ -n "${FREELY_CODEX_ACP_BIN:-}" ]]; then
-        acp_bin="$FREELY_CODEX_ACP_BIN"
+
+  # Read ACP binary and args from tool registry (single source of truth)
+  local _reg_bin; _reg_bin="$(_tool_registry_get "$base_tool" "acp.binary" 2>/dev/null || true)"
+  if [[ -n "$_reg_bin" ]]; then
+    acp_bin="$_reg_bin"
+    # Parse args from registry (space-separated)
+    local _reg_args; _reg_args="$(_tool_registry_get "$base_tool" "acp.args" 2>/dev/null || true)"
+    [[ -n "$_reg_args" ]] && read -ra _acp_args <<<"$_reg_args"
+
+    # Handle codex auto-download (driven by registry flag, not hardcoded)
+    local _auto_dl; _auto_dl="$(_tool_registry_get "$base_tool" "acp.auto_download" 2>/dev/null || echo "false")"
+    if [[ "$_auto_dl" == "true" && ! -x "$acp_bin" ]]; then
+      local _reg_ver; _reg_ver="$(_tool_registry_get "$base_tool" "acp.download_version" 2>/dev/null || echo "0.15.0")"
+      local _reg_repo; _reg_repo="$(_tool_registry_get "$base_tool" "acp.download_repo" 2>/dev/null || echo "zed-industries/codex-acp")"
+      local _triplet; _triplet="$(uname -s):$(uname -m)"
+      case "$_triplet" in
+        Darwin:arm64) _triplet="aarch64-apple-darwin" ;;
+        Darwin:x86_64) _triplet="x86_64-apple-darwin" ;;
+        Linux:aarch64|Linux:arm64) _triplet="aarch64-unknown-linux-gnu" ;;
+        Linux:x86_64) _triplet="x86_64-unknown-linux-gnu" ;;
+        *) _triplet="" ;;
+      esac
+      local _cache_root="${FREELY_ACP_CACHE_DIR:-$HOME/.cache/freely/acp}"
+      acp_bin="$_cache_root/codex-acp/$_reg_ver/$_triplet/codex-acp"
+      local _archive_url="https://github.com/${_reg_repo}/releases/download/v${_reg_ver}/codex-acp-${_reg_ver}-${_triplet}.tar.gz"
+      log_info "downloading $_reg_bin ${_reg_ver} for ${_triplet}..."
+      local _install_dir; _install_dir="$(dirname "$acp_bin")"
+      mkdir -p "$_install_dir"
+      local _tmp_archive; _tmp_archive="$(mktemp "$_install_dir/codex-acp.XXXXXX")"
+      if curl -fsSL "$_archive_url" -o "$_tmp_archive" 2>/dev/null && \
+         tar -xzf "$_tmp_archive" -C "$_install_dir" 2>/dev/null && [[ -x "$acp_bin" ]]; then
+        log_info "$_reg_bin ${_reg_ver} installed to $acp_bin"
       else
-        local _ver="${FREELY_CODEX_ACP_VERSION:-0.15.0}"
-        local _triplet; _triplet="$(uname -s):$(uname -m)"
-        case "$_triplet" in
-          Darwin:arm64) _triplet="aarch64-apple-darwin" ;;
-          Darwin:x86_64) _triplet="x86_64-apple-darwin" ;;
-          Linux:aarch64|Linux:arm64) _triplet="aarch64-unknown-linux-gnu" ;;
-          Linux:x86_64) _triplet="x86_64-unknown-linux-gnu" ;;
-          *) _triplet="" ;;
-        esac
-        local _cache_root="${FREELY_ACP_CACHE_DIR:-$HOME/.cache/freely/acp}"
-        if [[ -n "$_triplet" ]]; then
-          acp_bin="$_cache_root/codex-acp/$_ver/$_triplet/codex-acp"
-        fi
-      fi
-      # Auto-download if missing (reuse tool-launchers.sh logic inline)
-      if [[ -n "$acp_bin" && ! -x "$acp_bin" ]]; then
-        local _install_dir; _install_dir="$(dirname "$acp_bin")"
-        local _archive_url="https://github.com/zed-industries/codex-acp/releases/download/v${_ver}/codex-acp-${_ver}-${_triplet}.tar.gz"
-        log_info "downloading codex-acp ${_ver} for ${_triplet}..."
-        mkdir -p "$_install_dir"
-        local _tmp_archive; _tmp_archive="$(mktemp "$_install_dir/codex-acp.XXXXXX")"
-        if curl -fsSL "$_archive_url" -o "$_tmp_archive" 2>/dev/null; then
-          if tar -xzf "$_tmp_archive" -C "$_install_dir" 2>/dev/null && [[ -x "$acp_bin" ]]; then
-            log_info "codex-acp ${_ver} installed to $acp_bin"
-          else
-            log_warn "codex-acp extraction failed, falling back to claude-agent-acp"
-            acp_bin="claude-agent-acp"
-          fi
-        else
-          log_warn "codex-acp download failed (${_archive_url}), falling back to claude-agent-acp"
-          acp_bin="claude-agent-acp"
-        fi
-        rm -f "$_tmp_archive"
-      elif [[ -z "$acp_bin" ]]; then
-        log_warn "codex-acp: unsupported platform, falling back to claude-agent-acp"
+        log_warn "$_reg_bin download failed, using default"
         acp_bin="claude-agent-acp"
       fi
-      ;;
-    *) acp_bin="${FREELY_CLAUDE_ACP_BIN:-claude-agent-acp}" ;;
-  esac
+      rm -f "$_tmp_archive"
+    fi
+  else
+    # Not in registry: use claude-agent-acp as default
+    acp_bin="${FREELY_CLAUDE_ACP_BIN:-claude-agent-acp}"
+  fi
 
   # Store the binary path so we can detect tool changes across cycles
   local acp_bin_file="${pid_file}.bin"
@@ -12709,18 +12721,14 @@ _ensure_acp_bridge_running() {
   # ── claude / opencode: resolve slot config → env vars ──
   # Known bare tool names still need slot config read for permission mode.
   local _alias_path=""
-  case "$tool_name" in
-    codex|claude|cc|cc-use-codex-cli|kiro-cli|iflow|opencode)
-      # Bare tool name: try to find slot config from AI_TOOL_SLOT or ~/.ai-auth/
+  if _tool_is_registered "$tool_name"; then
+      # Registered tool: find slot config from AI_TOOL_SLOT or ~/.ai-auth/
       local _slot="${AI_TOOL_SLOT:-}"
-      if [[ -z "$_slot" && "$tool_name" == "opencode" ]]; then
-        _slot=$(ls -d "$HOME/.ai-auth/opencode-"* 2>/dev/null | head -1)
-        [[ -n "$_slot" ]] && _alias_path="$_slot/settings.json"
-      elif [[ -z "$_slot" && "$tool_name" == "codex" ]]; then
-        _slot=$(ls -d "$HOME/.ai-auth/codex-"* 2>/dev/null | head -1)
+      if [[ -z "$_slot" ]]; then
+        _slot=$(ls -d "$HOME/.ai-auth/${tool_name}-"* 2>/dev/null | head -1)
+        [[ -n "$_slot" && "$tool_name" != "codex" ]] && _alias_path="$_slot/settings.json"
       fi
-      ;;
-    *)
+  else
       local _resolved; _resolved=$(${SHELL:-bash} -ic "alias '$tool_name' 2>/dev/null" 2>/dev/null | sed -n "s/^${tool_name}='\\(.*\\)'$/\\1/p")
       if [[ -n "$_resolved" ]]; then
         # Extract config path from alias (Claude: --settings, OpenCode: OPENCODE_CONFIG=)
@@ -12730,8 +12738,7 @@ _ensure_acp_bridge_running() {
         fi
         _alias_path="${_alias_path/#\~/$HOME}"
       fi
-      ;;
-  esac
+  fi
 
   # Read slot settings.json into bridge env (applies to all tools)
   if [[ -n "$_alias_path" && -f "$_alias_path" ]]; then
