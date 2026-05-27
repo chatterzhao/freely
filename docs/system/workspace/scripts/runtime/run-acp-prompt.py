@@ -394,21 +394,21 @@ def main():
         t_session = time.time()
 
         # Ensure bypassPermissions is active for this session.
-        # Ensure permission mode matches tool-native config (JSON settings file).
-        # The bridge sets this after session/new and session/resume, but
-        # this call is defense-in-depth for direct (subprocess) mode.
-        _perm_mode = os.environ.get("CLAUDE_CODE_PERMISSION_MODE", "")
-        if not _perm_mode:
-            print("[run-acp-prompt] WARNING: CLAUDE_CODE_PERMISSION_MODE not set. Check ~/.ai-auth/<tool>/settings.json", file=sys.stderr)
-            _perm_mode = "default"
-        try:
-            client.request(
-                "session/set_mode",
-                {"sessionId": session_id, "modeId": _perm_mode},
-                timeout=10,
-            )
-        except Exception:
-            pass
+        # In bridge mode, the bridge already handles this after session/new
+        # and session/resume. Only needed for subprocess (--agent) mode.
+        if not args.bridge_socket:
+            _perm_mode = os.environ.get("CLAUDE_CODE_PERMISSION_MODE", "")
+            if not _perm_mode:
+                print("[run-acp-prompt] WARNING: CLAUDE_CODE_PERMISSION_MODE not set", file=sys.stderr)
+                _perm_mode = "default"
+            try:
+                client.request(
+                    "session/set_mode",
+                    {"sessionId": session_id, "modeId": _perm_mode},
+                    timeout=10,
+                )
+            except Exception:
+                pass
 
         # Model selection
         if args.reasoning_effort:
