@@ -12836,9 +12836,9 @@ if added:
   # Record the binary path so we can detect tool changes across cycles
   printf '%s\n' "$acp_bin" > "$acp_bin_file" 2>/dev/null || true
 
-  # Wait for readiness
+  # Wait for readiness (codex-acp cold start ~8s, use 15s margin)
   local waited=0
-  while [[ ! -S "$socket" ]] && (( waited < 50 )); do
+  while [[ ! -S "$socket" ]] && (( waited < 150 )); do
     sleep 0.1
     waited=$((waited + 1))
   done
