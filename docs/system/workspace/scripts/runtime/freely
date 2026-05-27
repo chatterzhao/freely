@@ -15967,7 +15967,6 @@ select_launch_kind() {
         fi
         return 0
       fi
-    fi
     # No active session in session-store → fresh launch.
     LAUNCH_KIND_SELECTED="fresh"
     LAUNCH_ROTATION_REASON="acp_first_launch"
