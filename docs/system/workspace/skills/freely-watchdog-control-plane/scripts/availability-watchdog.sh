@@ -1102,7 +1102,7 @@ codex_prune_stale_slot_cooldowns() {
   file="$(codex_slot_cooldown_file "$project")"
   [[ -f "$file" ]] || return 0
   tmp="${file}.tmp"
-  awk -F '\t' '
+  codex_saved_slots "$project" | awk -F '\t' '
     NR==FNR {
       if ($0 != "") {
         saved[$0]=1
@@ -1112,7 +1112,7 @@ codex_prune_stale_slot_cooldowns() {
     NF >= 2 && ($1 in saved) {
       print $0
     }
-  ' <(codex_saved_slots "$project") "$file" >"$tmp"
+  ' - "$file" >"$tmp"
   mv "$tmp" "$file"
 }
 
