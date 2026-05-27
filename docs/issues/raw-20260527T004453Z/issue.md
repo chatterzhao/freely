@@ -2,8 +2,13 @@
 local_id: raw-20260527T004453Z
 kind: raw
 phase_state: absorbed
-platform_ids: {}
-primary_platform: ''
+absorbed_into: "PR #2243 refactor: unified DB daemon"
+platform_ids:
+  github:
+    issue_id: '2243'
+    url: https://github.com/chatterzhao/freely/pull/2243
+    synced_at: ''
+primary_platform: github
 canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
