@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# ensure-codex-acp: download (if needed) and print codex-acp binary path.
+# Single entry point used by both freely and tool-launchers.sh.
+# Configuration read from tool-registry.json5 (version, repo).
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REGISTRY="$SCRIPT_DIR/tool-registry.json5"
+REGISTRY_QUERY="$SCRIPT_DIR/tool-registry-query.py"
+
+_reg_get() {
+  local field="$1"
+  python3 "$REGISTRY_QUERY" "$REGISTRY" codex "$field" 2>/dev/null
+}
+
+# Allow env override
+if [[ -n "${FREELY_CODEX_ACP_BIN:-}" ]]; then
+  [[ -x "$FREELY_CODEX_ACP_BIN" ]] || { echo "[ERROR] FREELY_CODEX_ACP_BIN not executable: $FREELY_CODEX_ACP_BIN" >&2; exit 1; }
+  printf '%s\n' "$FREELY_CODEX_ACP_BIN"
+  exit 0
+fi
+
+# Read config from tool registry
+VERSION="$(_reg_get "acp.download_version")"
+REPO="$(_reg_get "acp.download_repo")"
+VERSION="${VERSION:-0.15.0}"
+REPO="${REPO:-zed-industries/codex-acp}"
+
+# Platform triplet
+case "$(uname -s):$(uname -m)" in
+  Darwin:arm64)  TRIPLET="aarch64-apple-darwin" ;;
+  Darwin:x86_64) TRIPLET="x86_64-apple-darwin" ;;
+  Linux:aarch64|Linux:arm64) TRIPLET="aarch64-unknown-linux-gnu" ;;
+  Linux:x86_64)  TRIPLET="x86_64-unknown-linux-gnu" ;;
+  *) echo "[ERROR] unsupported platform" >&2; exit 1 ;;
+esac
+
+CACHE_ROOT="${FREELY_ACP_CACHE_DIR:-$HOME/.cache/freely/acp}"
+INSTALL_DIR="$CACHE_ROOT/codex-acp/$VERSION/$TRIPLET"
+BINARY_PATH="$INSTALL_DIR/codex-acp"
+
+# Already cached?
+if [[ -x "$BINARY_PATH" ]]; then
+  printf '%s\n' "$BINARY_PATH"
+  exit 0
+fi
+
+# Download
+ARCHIVE_URL="https://github.com/${REPO}/releases/download/v${VERSION}/codex-acp-${VERSION}-${TRIPLET}.tar.gz"
+echo "[INFO] downloading codex-acp ${VERSION} for ${TRIPLET} from ${REPO}" >&2
+mkdir -p "$INSTALL_DIR"
+TMP_ARCHIVE="$(mktemp "$INSTALL_DIR/codex-acp.XXXXXX")"
+
+if curl -fsSL "$ARCHIVE_URL" -o "$TMP_ARCHIVE" 2>/dev/null && \
+   tar -xzf "$TMP_ARCHIVE" -C "$INSTALL_DIR" 2>/dev/null && \
+   [[ -f "$BINARY_PATH" ]]; then
+  chmod +x "$BINARY_PATH" 2>/dev/null || true
+  rm -f "$TMP_ARCHIVE"
+  echo "[INFO] codex-acp ${VERSION} installed to $BINARY_PATH" >&2
+  printf '%s\n' "$BINARY_PATH"
+  exit 0
+else
+  rm -f "$TMP_ARCHIVE"
+  echo "[ERROR] failed to download codex-acp from $ARCHIVE_URL" >&2
+  exit 1
+fi
