@@ -4520,8 +4520,12 @@ attempt_local_same_tool_slot_recovery_after_failure() {
   LOCAL_TOOL_AUTO_RECOVERY_SLOT=""
   tool_supports_auto_same_tool_slot_recovery "$tool" || return 1
   worker_runtime_should_self_recover_slot_local_failure "$project" || return 1
+  local _current_slot; _current_slot="$(runtime_read_tool_current_slot "$project" "$tool" 2>/dev/null || true)"
   tool_select_ready_slot_for_manager_auto_recovery "$project" "$tool" "after_failure" || return 1
   LOCAL_TOOL_AUTO_RECOVERY_SLOT="${TOOL_AUTO_RECOVERY_SLOT:-}"
+  # If the "new" slot is the same as current, same-tool recovery didn't actually
+  # change anything — return failure so cross-tool switching can take over.
+  [[ -n "$_current_slot" && "$LOCAL_TOOL_AUTO_RECOVERY_SLOT" != "$_current_slot" ]] || return 1
   record_tool_auto_switch_event "$project" "$tool" "$tool" "${LOCAL_TOOL_AUTO_RECOVERY_SLOT:-}" "same_tool_slot_recovery" "" "false" "selected" "" "active_runtime_supervisor"
   return 0
 }
