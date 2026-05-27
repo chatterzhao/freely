@@ -859,14 +859,32 @@ tool_run_acp_from_prompt_file() {
         echo "[ERROR] missing ACP prompt client: $RUNTIME_ACP_PROMPT_CLIENT" >&2
         return 1
       }
-      exec python3 "$RUNTIME_ACP_PROMPT_CLIENT" \
-        --agent 'opencode acp' \
-        --cwd "$project" \
-        --prompt-file "$prompt_file" \
-        --mode "$mode" \
-        --model "$model" \
-        --launch-kind "$launch_kind" \
+      freely_apply_project_network_proxy_env "$project"
+      local -a acp_args=(
+        --bridge-socket "$bridge_socket"
+        --cwd "$project"
+        --prompt-file "$prompt_file"
+        --mode "$mode"
+        --model "$model"
+        --launch-kind "$launch_kind"
         --reasoning-effort "$reasoning_effort"
+      )
+      # Session management based on launch kind
+      case "$launch_kind" in
+        resume)
+          [[ -n "$tool_resume_target" ]] && acp_args+=(--resume "$tool_resume_target")
+          ;;
+        prompt)
+          [[ -n "$claude_session_id" ]] && acp_args+=(--resume "$claude_session_id")
+          ;;
+        fork)
+          [[ -n "$tool_resume_target" ]] && acp_args+=(--resume "$tool_resume_target")
+          ;;
+        fresh|fresh_with_handoff)
+          [[ -n "$claude_session_id" ]] && acp_args+=(--session-id "$claude_session_id")
+          ;;
+      esac
+      exec python3 "$RUNTIME_ACP_PROMPT_CLIENT" "${acp_args[@]}"
       ;;
     *)
       echo "[ERROR] unsupported ACP launcher for tool: $tool" >&2
