@@ -4376,11 +4376,21 @@ append_unique_tool_to_stream() {
 }
 
 runtime_builtin_auto_recovery_tool_priority() {
-  printf 'codex\n'
-  printf 'claude\n'
-  printf 'opencode\n'
-  printf 'kiro-cli\n'
-  printf 'cc-use-codex-cli\n'
+  # Single source of truth: AI_FALLBACK_TOOLS in config.env (comma-separated)
+  local _fallback_csv="${AI_FALLBACK_TOOLS:-}"
+  if [[ -n "$_fallback_csv" ]]; then
+    local IFS=','
+    for _tool in $_fallback_csv; do
+      [[ -n "$_tool" ]] && printf '%s\n' "$_tool"
+    done
+  else
+    # Fallback if config not loaded
+    printf 'codex\n'
+    printf 'claude\n'
+    printf 'opencode\n'
+    printf 'kiro-cli\n'
+    printf 'cc-use-codex-cli\n'
+  fi
 }
 
 runtime_default_fallback_tools_for_current_tool() {
