@@ -129,80 +129,13 @@ wait_for_codex_slot_switch_idle_before_launch() {
   done
 }
 
-codex_acp_version_for_launch() {
-  printf '%s\n' "${FREELY_CODEX_ACP_VERSION:-0.15.0}"
-}
-
-codex_acp_platform_triplet_for_launch() {
-  local uname_s uname_m
-  uname_s="$(uname -s)"
-  uname_m="$(uname -m)"
-  case "$uname_s:$uname_m" in
-    Darwin:arm64) printf 'aarch64-apple-darwin\n' ;;
-    Darwin:x86_64) printf 'x86_64-apple-darwin\n' ;;
-    Linux:aarch64|Linux:arm64) printf 'aarch64-unknown-linux-gnu\n' ;;
-    Linux:x86_64) printf 'x86_64-unknown-linux-gnu\n' ;;
-    *)
-      echo "[ERROR] unsupported platform for codex-acp binary: ${uname_s}:${uname_m}" >&2
-      return 1
-      ;;
-  esac
-}
-
-codex_acp_cache_dir_for_launch() {
-  printf '%s\n' "${FREELY_ACP_CACHE_DIR:-$HOME/.cache/freely/acp}"
-}
-
-codex_acp_download_url_for_launch() {
-  local version="$1" triplet="$2"
-  printf 'https://github.com/zed-industries/codex-acp/releases/download/v%s/codex-acp-%s-%s.tar.gz\n' "$version" "$version" "$triplet"
-}
-
 ensure_codex_acp_binary_for_launch() {
-  local override="${FREELY_CODEX_ACP_BIN:-}"
-  local version triplet cache_root install_dir binary_path archive_url tmp_archive
-
-  if [[ -n "$override" ]]; then
-    [[ -x "$override" ]] || {
-      echo "[ERROR] FREELY_CODEX_ACP_BIN is not executable: $override" >&2
-      return 1
-    }
-    printf '%s\n' "$override"
-    return 0
+  local _ensure_script
+  _ensure_script="$SELF_ROOT/docs/system/workspace/scripts/runtime/ensure-codex-acp"
+  if [[ -x "$_ensure_script" ]]; then
+    "$_ensure_script" 2>/dev/null && return 0
   fi
-
-  version="$(codex_acp_version_for_launch)"
-  triplet="$(codex_acp_platform_triplet_for_launch)" || return 1
-  cache_root="$(codex_acp_cache_dir_for_launch)"
-  install_dir="$cache_root/codex-acp/$version/$triplet"
-  binary_path="$install_dir/codex-acp"
-
-  if [[ -x "$binary_path" ]]; then
-    printf '%s\n' "$binary_path"
-    return 0
-  fi
-
-  mkdir -p "$install_dir"
-  tmp_archive="$(mktemp "$install_dir/codex-acp.XXXXXX")"
-  archive_url="$(codex_acp_download_url_for_launch "$version" "$triplet")"
-  echo "[INFO] downloading codex-acp ${version} for ${triplet}" >&2
-  curl -fsSL "$archive_url" -o "$tmp_archive" || {
-    rm -f "$tmp_archive"
-    echo "[ERROR] failed to download codex-acp from $archive_url" >&2
-    return 1
-  }
-  tar -xzf "$tmp_archive" -C "$install_dir" || {
-    rm -f "$tmp_archive"
-    echo "[ERROR] failed to unpack codex-acp archive: $tmp_archive" >&2
-    return 1
-  }
-  rm -f "$tmp_archive"
-  [[ -x "$binary_path" ]] || chmod +x "$binary_path" 2>/dev/null || true
-  [[ -x "$binary_path" ]] || {
-    echo "[ERROR] codex-acp binary missing after install: $binary_path" >&2
-    return 1
-  }
-  printf '%s\n' "$binary_path"
+  return 1
 }
 
 tool_default_capabilities() {
