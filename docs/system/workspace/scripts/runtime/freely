@@ -4559,7 +4559,7 @@ attempt_runtime_auto_recovery_after_failure() {
   config_bool_enabled "${AUTO_SWITCH_TOOL:-false}" || return 1
   while IFS= read -r candidate; do
     [[ -n "$candidate" ]] || continue
-    [[ "$candidate" != "$current_tool" ]] || continue
+    [[ "$candidate" != "${current_tool%%-*}" ]] || continue
     runtime_auto_recovery_tool_was_attempted "$candidate" && continue
     if ! tool_ready_for_manager_auto_recovery "$project" "$candidate"; then
       continue
@@ -4908,7 +4908,7 @@ prepare_manager_cross_tool_fallback_if_needed() {
   earliest_slot=""
   while IFS= read -r candidate; do
     [[ -n "$candidate" ]] || continue
-    [[ "$candidate" != "$current_tool" ]] || continue
+    [[ "$candidate" != "${current_tool%%-*}" ]] || continue
     if tool_ready_for_manager_auto_recovery "$project" "$candidate"; then
       fallback_tool="$candidate"
       fallback_slot="${TOOL_AUTO_RECOVERY_SLOT:-}"
