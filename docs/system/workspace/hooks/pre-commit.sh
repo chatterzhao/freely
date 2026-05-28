@@ -1,6 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# ── Hook integrity: core.hooksPath must be .githooks ──
+_hooks_path="$(git config --local core.hooksPath 2>/dev/null || echo ".githooks")"
+if [[ "$_hooks_path" != ".githooks" ]]; then
+  cat >&2 <<MSG
+[HOOK] BLOCKED: git hooks disabled (core.hooksPath=$_hooks_path).
+  Hooks enforce the canonical workflow. Restore with:
+    git config core.hooksPath .githooks
+MSG
+  exit 1
+fi
+
+
 # ── Fleet audit: detect orphaned managed branches ──
 _fleet_audit_orphans() {
   local branch worktree_path issue_count=0
