@@ -4520,9 +4520,8 @@ record_tool_auto_switch_event() {
 }
 
 worker_runtime_should_self_recover_slot_local_failure() {
-  local project="$1" role
-  role="$(effective_runtime_role_for_project "$project")"
-  [[ "$role" == "worker" ]]
+  # Both manager and worker should try same-tool slot switching before cross-tool.
+  return 0
 }
 
 attempt_local_same_tool_slot_recovery_after_failure() {
@@ -12570,6 +12569,9 @@ _acp_bridge_has_fatal_error() {
   # Network / transport failure cascade (certificate, handshake, channel)
   rg -qi 'Transport channel closed|HandshakeFailure|received fatal alert|certificate not valid|certificate expired|worker quit with fatal' "$bridge_log" 2>/dev/null && return 0
 
+  # Upstream API unreachable (common to all ACP tools)
+  rg -qi 'stream disconnected before completion|error sending request for url|failed to refresh available models|server stdout closed' "$bridge_log" 2>/dev/null && return 0
+
   # Session lost (bridge restart, process death, or backend eviction)
   rg -qi 'Session not found|Internal error|Resource not found' "$bridge_log" 2>/dev/null && return 0
 
@@ -20087,6 +20089,12 @@ print(ready)
       if [[ -n "$slot_switch_reason" ]]; then
         LAST_SLOT_SWITCH_REASON="$slot_switch_reason"
         LAST_SLOT_SWITCH_AT="$(current_timestamp_utc_for_machine)"
+      fi
+    fi
+    # Tool-agnostic: if AI exited non-zero with no cycle output, tool is unproductive
+    if [[ -z "$slot_switch_reason" && "${rc:-0}" != "0" ]]; then
+      if [[ ! -f "$cycle_log" || $(wc -c < "$cycle_log" 2>/dev/null || echo 0) -lt 20 ]]; then
+        slot_switch_reason="tool_unproductive"
       fi
     fi
     if [[ -z "$network_failure_reason" && -z "$slot_switch_reason" && -z "$rate_limit_reason" ]]; then
