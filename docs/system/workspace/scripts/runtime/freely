@@ -17074,6 +17074,12 @@ ensure_manager_once() {
     return 0
   fi
 
+  # Clear stale "stopped" state from startup_self_heal_no_runtime.
+  # This state means the PREVIOUS supervisor detected no runtime — not that
+  # the operator requested a permanent stop. Only operator_stop should persist.
+  if [[ "$desired_state" == "stopped" && "$last_exit_reason" != "operator_stop" ]]; then
+    write_workcell_state "$project" "running" "down" "down" "watchdog_restart"
+  fi
   append_lifecycle_trace "$project" "L240" "manager_launch_requested" \
     "decision=${TOOL_AUTO_RECOVERY_DECISION:-none}" \
     "tool=${AI_TOOL:-unknown}" \
