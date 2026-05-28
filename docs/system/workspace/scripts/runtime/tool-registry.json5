@@ -1,89 +1,71 @@
-{
-  // ===========================================================================
-  // Freely Tool Capability Registry
-  // ===========================================================================
-  // Each tool entry defines:
-  //   acp        - ACP server binary, args, and resolution strategy
-  //   permission - how permissions are read from slot config and applied
-  //   session    - session lifecycle capabilities (fork, resume)
-  //   model_default - default model when slot config doesn't specify one
-  //   binary_resolution - how to find the ACP binary ("path" or "cache")
-  //
-  // To add a new tool: add one entry here, create slot config in ~/.ai-auth/.
-  // No code changes needed.
-  // ===========================================================================
-
   "claude": {
     "acp": {
-      "binary": "claude-agent-acp",
-      "args": [],
-    },
+  "binary": "claude-agent-acp",
+  "args": []
+},
     "permission": {
-      // Field in slot settings.json: top-level "permissionMode" or nested "permissions.defaultMode"
-      "config_field": "permissionMode",
-      "fallback_field": "permissions.defaultMode",
-      // How to apply: via ACP session/set_mode RPC (claude-agent-acp specific)
-      "mechanism": "session_set_mode",
-    },
+  "config_field": "permissionMode",
+  "fallback_field": "permissions.defaultMode",
+  "mechanism": "session_set_mode"
+},
     "session": {
-      "supports_fork": true,
-      "supports_resume": true,
-    },
+  "supports_fork": true,
+  "supports_resume": true
+},
     "model_default": "claude-sonnet-4-6",
-    // Binary is found via PATH (e.g. npm install -g @anthropic-ai/claude-code)
     "binary_resolution": "path",
+    // Command to verify tool health before removing from dead list
+    "test_command": "claude -p 'say hi' --output-format text --dangerously-skip-permissions",
   },
-
   "codex": {
     "acp": {
-      "binary": "codex-acp",
-      "args": [],
-      // Auto-download from GitHub releases if not cached
-      "auto_download": true,
-      "download_version": "0.15.0",
-      "download_repo": "zed-industries/codex-acp",
-    },
+  "binary": "codex-acp",
+  "args": [],
+  "auto_download": true,
+  "download_version": "0.15.0",
+  "download_repo": "zed-industries/codex-acp"
+},
     "permission": {
-      // Codex reads approval_policy + sandbox_mode from config.toml in slot dir.
-      // CODEX_HOME env var already redirects to the slot directory.
-      "mechanism": "slot_config_toml",
-      "config_fields": ["approval_policy", "sandbox_mode"],
-    },
+  "mechanism": "slot_config_toml",
+  "config_fields": [
+    "approval_policy",
+    "sandbox_mode"
+  ]
+},
     "session": {
-      "supports_fork": true,
-      "supports_resume": true,
-    },
+  "supports_fork": true,
+  "supports_resume": true
+},
     "model_default": "gpt-5.5",
-    // Binary is cached at ~/.cache/freely/acp/codex-acp/<ver>/<triplet>/
     "binary_resolution": "cache",
+    // Command to verify tool health before removing from dead list
+    "test_command": "codex exec 'say hi'",
   },
-
   "opencode": {
     "acp": {
-      "binary": "opencode",
-      "args": ["acp"],
-    },
+  "binary": "opencode",
+  "args": [
+    "acp"
+  ]
+},
     "permission": {
-      // opencode reads "permission" field from settings.json.
-      // OPENCODE_CONFIG env var points to slot settings.json.
-      "config_field": "permission",
-      "mechanism": "env_var",
-      "env_var": "OPENCODE_CONFIG",
-    },
+  "config_field": "permission",
+  "mechanism": "env_var",
+  "env_var": "OPENCODE_CONFIG"
+},
     "session": {
-      "supports_fork": true,
-      "supports_resume": true,
-    },
+  "supports_fork": true,
+  "supports_resume": true
+},
     "model_default": "deepseek-v4-flash-free",
     "binary_resolution": "path",
+    // Command to verify tool health before removing from dead list
+    "test_command": "opencode run 'say hi'",
   },
-
-  // Aliases: map alternative tool names to canonical entries above.
-  // These tools share the same ACP binary and config as "claude".
   "_aliases": {
-    "cc": "claude",
-    "cc-use-codex-cli": "claude",
-    "kiro-cli": "claude",
-    "iflow": "claude",
-  },
+  "cc": "claude",
+  "cc-use-codex-cli": "claude",
+  "kiro-cli": "claude",
+  "iflow": "claude"
+}
 }
