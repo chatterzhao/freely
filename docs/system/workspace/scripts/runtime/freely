@@ -19595,6 +19595,10 @@ start_project_runtime() {
   local restart_count=0
   local FIRST_ROUND=true
   local LAUNCH_KIND_SELECTED="" LAUNCH_ROTATION_REASON=""
+  # Ignore SIGPIPE: bridge crash propagates via pipe to monitor-ai-acp.sh,
+  # which is a child of supervisor. Without this trap, SIGPIPE kills supervisor
+  # before post-cycle analysis runs — losing the chance to detect failure and switch tools.
+  trap '' SIGPIPE
   load_session_state_or_defaults "$project"
 
   # ACP bridge lifecycle: ensure persistent claude-agent-acp is running before first cycle
