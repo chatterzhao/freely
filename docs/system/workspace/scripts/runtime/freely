@@ -20275,6 +20275,13 @@ print(f'send_to_ai=success updated={len(rows)}', flush=True)
     fi
     local auto_recovery_reason=""
     auto_recovery_reason="${slot_switch_reason:-${network_failure_reason:-}}"
+    # execution_network_transient means the tool is healthy, network blipped.
+    # Don't switch tools for transient errors — just retry after backoff.
+    if [[ "$auto_recovery_reason" == "execution_network_transient" ]]; then
+      log_info "transient network error detected; retrying same tool after backoff"
+      sleep_with_rate_limit_recheck "$PROJECT_ROOT" "$((5 + RANDOM % 10))"
+      auto_recovery_reason=""
+    fi
     if [[ -n "$auto_recovery_reason" ]]; then
       if attempt_runtime_proxy_self_heal_after_network_failure "$PROJECT_ROOT" "$AI_TOOL" "$auto_recovery_reason"; then
         sleep_with_rate_limit_recheck "$PROJECT_ROOT" 1
@@ -20285,6 +20292,15 @@ print(f'send_to_ai=success updated={len(rows)}', flush=True)
           log_warn "${auto_recovery_reason} detected for this workcell; worker runtime switched locally to slot=${RUNTIME_AUTO_RECOVERY_SLOT:-unknown} and will continue"
         else
           log_warn "${auto_recovery_reason} detected for this workcell; worker runtime switched to tool=${RUNTIME_AUTO_RECOVERY_TOOL:-unknown} slot=${RUNTIME_AUTO_RECOVERY_SLOT:-none} and will continue"
+          # Cooldown after cross-tool switch: prevent immediate switch-back ping-pong
+          CROSS_TOOL_SWITCH_AT="${CROSS_TOOL_SWITCH_AT:-0}"
+          local _now; _now="$(date +%s)"
+          local _cooldown="${CROSS_TOOL_SWITCH_COOLDOWN_SECS:-120}"
+          if (( _now - CROSS_TOOL_SWITCH_AT < _cooldown )); then
+            log_warn "cross-tool switch cooldown active; preventing switch-back for $(( _cooldown - (_now - CROSS_TOOL_SWITCH_AT) ))s"
+            sleep_with_rate_limit_recheck "$PROJECT_ROOT" "$(( _cooldown - (_now - CROSS_TOOL_SWITCH_AT) ))"
+          fi
+          CROSS_TOOL_SWITCH_AT="$_now"
         fi
         append_runtime_event "$project" "supervisor_local_slot_recovery" \
           "supervisor_pid=$$" \
