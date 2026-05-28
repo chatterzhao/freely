@@ -328,6 +328,12 @@ METHODS = {
     "task-mode.read-with-scan": ("task-mode.read-with-scan", _task_mode_read_scan_output, lambda a: {}),
     "task-mode.write":        ("task-mode.write",         lambda r: None, lambda a: {"mode": a["mode"], "scan_id": a.get("scan_id", "")}),
     "task-mode.read-just-switched": ("task-mode.read-just-switched", lambda r: print(r.get("just_switched", 0)), lambda a: {}),
+
+    # tool.failure-* — dead tool tracking for auto-switch
+    "tool.failure-add":       ("tool.failure-add",       lambda r: print("ok"), lambda a: {"tool": a["tool"], "slot": a.get("slot",""), "reason": a.get("reason","")}),
+    "tool.failure-count":     ("tool.failure-count",     lambda r: print(r.get("count", 0)), lambda a: {"tool": a["tool"], "slot": a.get("slot",""), "window_secs": int(a.get("window_secs",3600))}),
+    "tool.failure-clear":     ("tool.failure-clear",     lambda r: print("ok"), lambda a: {"tool": a["tool"], "slot": a.get("slot","")}),
+    "tool.failure-list-dead": ("tool.failure-list-dead", lambda r: print(json.dumps(r.get("tools",[]))), lambda a: {"window_secs": int(a.get("window_secs",3600)), "threshold": int(a.get("threshold",3))}),
 }
 
 

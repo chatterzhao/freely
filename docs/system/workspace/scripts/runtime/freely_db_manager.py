@@ -263,6 +263,18 @@ class DbDaemon:
                 updated_at TEXT NOT NULL DEFAULT ''
             )
         """)
+        # tool_failure_log — dead tool tracking for auto-switch
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS tool_failure_log (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                tool TEXT NOT NULL,
+                slot TEXT NOT NULL DEFAULT '',
+                reason TEXT NOT NULL DEFAULT '',
+                created_at TEXT NOT NULL DEFAULT ''
+            )
+        """)
+        c.execute("CREATE INDEX IF NOT EXISTS idx_tool_failure_tool ON tool_failure_log(tool, slot)")
+        c.execute("CREATE INDEX IF NOT EXISTS idx_tool_failure_created ON tool_failure_log(created_at)")
 
         self.conn.commit()
         self.log("all tables ensured")
@@ -1214,6 +1226,58 @@ def h_task_mode_read_just_switched(daemon: DbDaemon, params: dict) -> dict:
     )
     daemon.conn.commit()
     return {"just_switched": val}
+
+
+# ── tool.failure-log ──────────────────────────────────────────────────────
+
+@_h("tool.failure-add")
+def h_tool_failure_add(daemon: DbDaemon, params: dict) -> dict:
+    """Record a tool failure."""
+    daemon.conn.execute(
+        "INSERT INTO tool_failure_log (tool, slot, reason, created_at) VALUES (?, ?, ?, ?)",
+        (params["tool"], params.get("slot", ""), params.get("reason", ""), _now_utc()),
+    )
+    daemon.conn.commit()
+    return {"ok": True}
+
+
+@_h("tool.failure-count")
+def h_tool_failure_count(daemon: DbDaemon, params: dict) -> dict:
+    """Count failures for a tool+slot in the last N seconds."""
+    window = int(params.get("window_secs", 3600))
+    cutoff = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")  # approximate
+    row = daemon.conn.execute(
+        "SELECT COUNT(*) FROM tool_failure_log WHERE tool=? AND slot=? "
+        "AND datetime(created_at) > datetime('now', ? || ' seconds')",
+        (params["tool"], params.get("slot", ""), f"-{window}"),
+    ).fetchone()
+    return {"count": row[0]}
+
+
+@_h("tool.failure-clear")
+def h_tool_failure_clear(daemon: DbDaemon, params: dict) -> dict:
+    """Clear all failures for a tool+slot (resurrection)."""
+    daemon.conn.execute(
+        "DELETE FROM tool_failure_log WHERE tool=? AND slot=?",
+        (params["tool"], params.get("slot", "")),
+    )
+    daemon.conn.commit()
+    return {"ok": True}
+
+
+@_h("tool.failure-list-dead")
+def h_tool_failure_list_dead(daemon: DbDaemon, params: dict) -> dict:
+    """List tools that have >= threshold failures in the window."""
+    window = int(params.get("window_secs", 3600))
+    threshold = int(params.get("threshold", 3))
+    rows = daemon.conn.execute(
+        "SELECT tool, slot, COUNT(*) as cnt FROM tool_failure_log "
+        "WHERE datetime(created_at) > datetime('now', ? || ' seconds') "
+        "GROUP BY tool, slot HAVING cnt >= ?",
+        (f"-{window}", threshold),
+    ).fetchall()
+    return {"tools": [{"tool": r[0], "slot": r[1], "count": r[2]} for r in rows]}
+
 
 
 # ── CLI ───────────────────────────────────────────────────────────────────
