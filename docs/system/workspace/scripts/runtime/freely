@@ -4571,6 +4571,9 @@ attempt_runtime_auto_recovery_after_failure() {
     record_tool_auto_switch_event "$project" "$current_tool" "$candidate" "${fallback_slot:-}" "${failure_reason:-runtime_error_auto_recovery}" "" "false" "selected" "" "active_runtime_supervisor"
     RUNTIME_AUTO_RECOVERY_TOOL="$candidate"
     RUNTIME_AUTO_RECOVERY_SLOT="${fallback_slot:-}"
+    # Reset fresh-launch circuit breaker: new tool gets its own retry quota
+    FRESH_LAUNCH_COUNT_CURRENT=0
+    FRESH_LAUNCH_FIRST_AT=0
     return 0
   done < <(runtime_auto_recovery_tool_order "$current_tool")
 
@@ -16036,9 +16039,9 @@ select_launch_kind() {
     if [[ "$first_at" =~ ^[0-9]+$ ]] && (( now - first_at < window )); then
       count=$((count + 1))
       if (( count >= max_count )); then
-        log_error "fresh launch circuit breaker tripped: ${count} in ${window}s (max=${max_count}). Token waste prevention."
-        write_workcell_state "$PROJECT_ROOT" "running" "up" "down" "fresh_launch_loop_detected"
-        : >"$(stop_marker_file "$PROJECT_ROOT")"
+        log_error "fresh launch circuit breaker tripped: ${count} in ${window}s (max=${max_count}). Restarting supervisor with fresh counters."
+        write_workcell_state "$PROJECT_ROOT" "running" "down" "down" "fresh_launch_loop_detected"
+        # Exit without stop_marker so watchdog can restart supervisor with reset counters
         exit 0
       fi
     else
