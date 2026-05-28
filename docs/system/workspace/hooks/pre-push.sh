@@ -96,22 +96,19 @@ MSG
   Run pr-create-guarded in your worktree:
     ./bin/pr-create-guarded
 
-  To skip (not recommended): export FREELY_SKIP_CREATE_GATE=1
+  The ONLY valid way to push is:
+    ./bin/pr-create-guarded
 MSG
           exit 1
         fi
       else
-        # FREELY_SKIP_CREATE_GATE=1 is set: only allowed for docs/cleanup changes.
-        # Code files MUST go through pr-create-guarded regardless.
+        # FREELY_SKIP_CREATE_GATE=1: only allowed for docs-only changes.
+        # Code files MUST go through pr-create-guarded.
         local _base; _base="$(git merge-base origin/develop HEAD 2>/dev/null || echo "origin/develop")"
         if git diff --name-only "$_base..HEAD" 2>/dev/null | grep -qE '\.(sh|py|rs|ts|js|tsx|jsx|go|java|c|cpp|h|toml)$'; then
           cat >&2 <<MSG
-[HOOK] FREELY_SKIP_CREATE_GATE=1 blocked: code files detected in push.
-
-  Code files (.sh/.py/.rs/.ts/.js etc) cannot bypass pr-create-guarded.
-  Use the canonical workflow:
-    ./bin/pr-create-guarded
-
+[HOOK] FREELY_SKIP_CREATE_GATE=1 rejected: code files must use pr-create-guarded.
+  Run: ./bin/pr-create-guarded
 MSG
           exit 1
         fi
