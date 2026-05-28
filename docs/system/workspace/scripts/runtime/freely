@@ -63,6 +63,61 @@ _tool_is_registered() {
   _tool_registry_get "$tool" "acp.binary" >/dev/null 2>&1
 }
 
+# ── Dead tool tracking (SQLite via freely-db-cli) ─────────────────────
+
+_tool_failure_add() {
+  local tool="$1" slot="$2" reason="$3"
+  python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli" \
+    --project "$PROJECT_ROOT" tool.failure-add --tool "$tool" --slot "$slot" --reason "$reason" >/dev/null 2>&1 || true
+}
+
+_tool_failure_count() {
+  local tool="$1" slot="$2" window="${3:-3600}"
+  python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli" \
+    --project "$PROJECT_ROOT" tool.failure-count --tool "$tool" --slot "$slot" --window_secs "$window" 2>/dev/null || echo "0"
+}
+
+_tool_failure_clear() {
+  local tool="$1" slot="$2"
+  python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli" \
+    --project "$PROJECT_ROOT" tool.failure-clear --tool "$tool" --slot "$slot" >/dev/null 2>&1 || true
+}
+
+_tool_is_dead() {
+  local tool="$1" slot="$2"
+  local count; count="$(_tool_failure_count "$tool" "${slot:-}" 3600)"
+  [[ "$count" -ge 3 ]]
+}
+
+_tool_test_resurrect() {
+  local tool="$1"
+  local test_cmd; test_cmd="$(_tool_registry_get "$tool" "test_command" 2>/dev/null || true)"
+  [[ -n "$test_cmd" ]] || return 1
+  # Run test command, 15s timeout
+  if timeout 15 bash -c "$test_cmd" >/dev/null 2>&1; then
+    _tool_failure_clear "$tool" ""
+    return 0
+  fi
+  return 1
+}
+
+# ── Cooldown cycle state ─────────────────────────────────────────────
+_read_cooldown_state() {
+  local state_file; state_file="$(run_dir_for_project "$PROJECT_ROOT")/cooldown-state.env"
+  if [[ -f "$state_file" ]]; then
+    unset COOLDOWN_SWITCH_AT COOLDOWN_SWITCH_INDEX
+    source "$state_file"
+  fi
+  CROSS_TOOL_SWITCH_AT="${COOLDOWN_SWITCH_AT:-0}"
+  CROSS_TOOL_SWITCH_INDEX="${COOLDOWN_SWITCH_INDEX:-0}"
+}
+
+_write_cooldown_state() {
+  local at="$1" idx="$2"
+  local state_file; state_file="$(run_dir_for_project "$PROJECT_ROOT")/cooldown-state.env"
+  printf 'COOLDOWN_SWITCH_AT=%s\nCOOLDOWN_SWITCH_INDEX=%s\n' "$at" "$idx" >"$state_file"
+}
+
 SESSION_CACHE_LIB="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-cache.sh"
 [[ -f "$SESSION_CACHE_LIB" ]] && source "$SESSION_CACHE_LIB"
 
@@ -4556,10 +4611,45 @@ attempt_runtime_auto_recovery_after_failure() {
   fi
 
   config_bool_enabled "${AUTO_SWITCH_TOOL:-false}" || return 1
-  while IFS= read -r candidate; do
+
+  # Record current tool failure for dead-tool tracking
+  local _base_cur; _base_cur="${current_tool%%-*}"
+  local _cur_slot; _cur_slot="$(runtime_read_tool_current_slot "$project" "$_base_cur" 2>/dev/null || true)"
+  _tool_failure_add "$_base_cur" "${_cur_slot:-}" "${failure_reason:-unknown}"
+
+  # Cooldown: advance within AI_FALLBACK_TOOLS order, skip dead tools
+  _read_cooldown_state
+  local _now; _now="$(date +%s)"
+  local _cooldown="${CROSS_TOOL_COOLDOWN_SECS:-600}"
+  if (( _now - CROSS_TOOL_SWITCH_AT < _cooldown )); then
+    CROSS_TOOL_SWITCH_INDEX=$((CROSS_TOOL_SWITCH_INDEX + 1))
+    log_info "cross-tool cooldown active: advancing to position $CROSS_TOOL_SWITCH_INDEX"
+  else
+    CROSS_TOOL_SWITCH_INDEX=0
+    CROSS_TOOL_SWITCH_AT="$_now"
+    log_info "cross-tool cooldown expired: resetting to start of fallback order"
+  fi
+
+  local _fallback_list; _fallback_list="$(printf '%s,' $(runtime_builtin_auto_recovery_tool_priority))"
+  IFS=',' read -ra _fallback_arr <<<"$_fallback_list"
+  local _start_idx="$CROSS_TOOL_SWITCH_INDEX"
+  local _found=0
+
+  for ((_i=0; _i<${#_fallback_arr[@]}; _i++)); do
+    local _idx=$(( (_start_idx + _i) % ${#_fallback_arr[@]} ))
+    local candidate="${_fallback_arr[$_idx]}"
     [[ -n "$candidate" ]] || continue
-    [[ "$candidate" != "${current_tool%%-*}" ]] || continue
+    [[ "$candidate" != "$_base_cur" ]] || continue
     runtime_auto_recovery_tool_was_attempted "$candidate" && continue
+    # Skip dead tools (3 failures in 1 hour); try resurrection via test_command
+    local _cand_slot; _cand_slot="$(runtime_read_tool_current_slot "$project" "$candidate" 2>/dev/null || true)"
+    if _tool_is_dead "$candidate" "${_cand_slot:-}"; then
+      if _tool_test_resurrect "$candidate"; then
+        log_info "dead tool $candidate resurrected via test_command"
+      else
+        continue
+      fi
+    fi
     if ! tool_ready_for_manager_auto_recovery "$project" "$candidate"; then
       continue
     fi
@@ -4570,11 +4660,17 @@ attempt_runtime_auto_recovery_after_failure() {
     record_tool_auto_switch_event "$project" "$current_tool" "$candidate" "${fallback_slot:-}" "${failure_reason:-runtime_error_auto_recovery}" "" "false" "selected" "" "active_runtime_supervisor"
     RUNTIME_AUTO_RECOVERY_TOOL="$candidate"
     RUNTIME_AUTO_RECOVERY_SLOT="${fallback_slot:-}"
-    # Reset fresh-launch circuit breaker: new tool gets its own retry quota
+    CROSS_TOOL_SWITCH_INDEX="$_idx"
+    _write_cooldown_state "$_now" "$_idx"
     FRESH_LAUNCH_COUNT_CURRENT=0
     FRESH_LAUNCH_FIRST_AT=0
+    _found=1
     return 0
-  done < <(runtime_auto_recovery_tool_order "$current_tool")
+  done
+
+  # All tools exhausted: keep cooldown state, let watchdog wait
+  _write_cooldown_state "$_now" "$CROSS_TOOL_SWITCH_INDEX"
+  log_warn "all fallback tools exhausted or dead; will retry after cooldown"
 
   if [[ -n "$origin_tool" && "$origin_tool" != "$current_tool" ]]; then
     persist_project_tool_selection "$project" "$origin_tool"
