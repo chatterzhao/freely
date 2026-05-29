@@ -91,49 +91,77 @@ _bridge_ensure_running() {
   [[ -S "$socket" ]] || { echo "[ERROR] bridge socket did not appear" >&2; return 1; }
 }
 
+# ── Helpers ─────────────────────────────────────────────────────────
+
+_file_mtime_epoch() {
+  local f="$1"
+  [[ -f "$f" ]] || { echo "0"; return 0; }
+  stat -f %m "$f" 2>/dev/null || echo 0
+}
+
 # ── Error detection ────────────────────────────────────────────────
 
 _detect_acp_failure() {
   local log_file="$1" failure_marker="$2" network_failure_marker="$3" bridge_lost_marker="$4" bridge_log_offset="${5:-}"
   [[ -f "$log_file" ]] || return 0
 
-  local _matched
+  local _matched _bridge_log _net_err
+  _bridge_log="$(dirname "$log_file")/../run/acp-bridge.log"
+
+  # ── Layer 1: Network / transport failure (from cycle log) ──
   if _matched=$(grep -m1 -E '\b(Connection refused|Connection reset by peer|connection refused|connection reset|ECONNREFUSED|ENOTFOUND|ETIMEDOUT|socket hang up|timed out|connection timeout|Connection timed out|dial timeout|i/o timeout|read timeout|deadline exceeded|TLS handshake|TLS alert|TLS error|proxy error|proxy refused|proxy timeout|proxy auth|Could not connect to proxy|DNS error|DNS failure|DNS timeout|DNS resolution|Could not resolve host|name resolution failed|NXDOMAIN)\b' "$log_file" 2>/dev/null); then
     echo "[ACP-detect] network_failure matched: ${_matched:0:200}" >&2
     [[ -n "$network_failure_marker" ]] && echo "network_failure" > "$network_failure_marker"
   fi
 
+  # ── Layer 2: Auth / rate limit failure (from cycle log) ──
   if _matched=$(grep -m1 -E '(HTTP 40[123]|HTTP 429|40[123] Unauthorized|40[123] Forbidden|429 Too Many Requests|status: 40[123]|status: 429|Unauthorized|Payment Required|insufficient_quota|rate_limit|quota exceeded|InsufficientBalance)' "$log_file" 2>/dev/null); then
     echo "[ACP-detect] auth_or_rate_limit matched: ${_matched:0:200}" >&2
     [[ -n "$failure_marker" ]] && echo "auth_or_rate_limit" > "$failure_marker"
   fi
 
-  # Bridge unrecoverable failure: bridge process died or became unresponsive.
-  # Session loss (Session not found) is NOT a kill trigger — run-acp-prompt.py
-  # handles it internally by falling back to session/new. Killing during the
-  # fallback creates a death loop where the next cycle repeats the same pattern.
+  # ── Layer 3: Bridge log fatal error detection ──
+  # MUST mirror _acp_bridge_has_fatal_error() in freely so the same error
+  # patterns that drive post-cycle tool switching also trigger live detection.
+  # Without this, the monitor loop hangs when run-acp-prompt.py blocks on a
+  # dead bridge socket while the error is only visible in acp-bridge.log.
   #
-  # Scan only NEW content (since cycle start) to avoid matching stale errors
-  # from previous cycles. Uses byte offset recorded at launch time.
-  local bridge_log
-  bridge_log="$(dirname "$log_file")/../run/acp-bridge.log"
-  if _matched=$(_grep_new_only "$bridge_log" "$bridge_log_offset" -m1 -E '(exited unexpectedly|ProcessTransport.*not ready|idle timeout)' 2>/dev/null) && [[ -n "$_matched" ]]; then
-    echo "[ACP-detect] bridge_session_lost matched: ${_matched:0:200}" >&2
+  # Scan only NEW content (since cycle start) to avoid matching stale errors.
+  _net_err='(Transport channel closed|stream disconnected before completion|error sending request for url|HandshakeFailure|received fatal alert|certificate not valid|certificate expired)'
+  local _bridge_fatal
+  _bridge_fatal='(exited unexpectedly|ProcessTransport.*not ready|idle timeout|worker quit with fatal|server stdout closed|Transport channel closed|stream disconnected before completion|error sending request for url|failed to refresh available models|HandshakeFailure|received fatal alert|certificate not valid|certificate expired)'
+
+  if _matched=$(_grep_new_only "$_bridge_log" "$bridge_log_offset" -m1 -E "$_bridge_fatal" 2>/dev/null) && [[ -n "$_matched" ]]; then
+    echo "[ACP-detect] bridge_fatal matched: ${_matched:0:200}" >&2
     [[ -n "$bridge_lost_marker" ]] && echo "bridge_session_lost" > "$bridge_lost_marker"
-  elif _matched=$(grep -m1 -E '(exited unexpectedly|ProcessTransport.*not ready|idle timeout)' "$log_file" 2>/dev/null) && [[ -n "$_matched" ]]; then
-    echo "[ACP-detect] bridge_session_lost matched: ${_matched:0:200}" >&2
+    if echo "$_matched" | grep -qE "$_net_err" 2>/dev/null; then
+      [[ -n "$network_failure_marker" ]] && echo "network_failure" > "$network_failure_marker"
+    fi
+  elif _matched=$(grep -m1 -E "$_bridge_fatal" "$log_file" 2>/dev/null) && [[ -n "$_matched" ]]; then
+    echo "[ACP-detect] bridge_fatal matched (cycle log): ${_matched:0:200}" >&2
     [[ -n "$bridge_lost_marker" ]] && echo "bridge_session_lost" > "$bridge_lost_marker"
+    if echo "$_matched" | grep -qE "$_net_err" 2>/dev/null; then
+      [[ -n "$network_failure_marker" ]] && echo "network_failure" > "$network_failure_marker"
+    fi
   fi
 
-  # Session-not-found is recoverable (run-acp-prompt.py falls back to session/new).
-  # Log it for observability but do NOT kill the process.
+  # Also scan cycle log for network-class transport errors.
+  if [[ ! -f "$network_failure_marker" ]]; then
+    if _matched=$(grep -m1 -E "$_net_err" "$log_file" 2>/dev/null); then
+      echo "[ACP-detect] network_fatal matched (cycle): ${_matched:0:200}" >&2
+      [[ -n "$network_failure_marker" ]] && echo "network_failure" > "$network_failure_marker"
+    fi
+  fi
+
+  # ── Layer 4: Session-not-found (recoverable) ──
   local _session_lost_warn
-  if _session_lost_warn=$(_grep_new_only "$bridge_log" "$bridge_log_offset" -m1 -E '(session.*not found|unknown session|no such session|Session not found)' 2>/dev/null) && [[ -n "$_session_lost_warn" ]]; then
+  if _session_lost_warn=$(_grep_new_only "$_bridge_log" "$bridge_log_offset" -m1 -E '(session.*not found|unknown session|no such session|Session not found)' 2>/dev/null) && [[ -n "$_session_lost_warn" ]]; then
     echo "[ACP-detect] session_lost (recoverable, fallback expected): ${_session_lost_warn:0:200}" >&2
   elif _session_lost_warn=$(grep -m1 -E '(session.*not found|unknown session|no such session|Session not found)' "$log_file" 2>/dev/null) && [[ -n "$_session_lost_warn" ]]; then
     echo "[ACP-detect] session_lost (recoverable, fallback expected): ${_session_lost_warn:0:200}" >&2
   fi
 }
+
 
 # _grep_new_only: grep only new content added after a byte offset.
 # Used to scan the persistent bridge log without matching stale errors.
@@ -294,9 +322,14 @@ main() {
 
   echo "$child_pid"
 
-  # ── Monitor loop (transport monitoring, not AI completion detection) ──
+  # ── Monitor loop (transport monitoring + stall watchdog) ──
+  local _stall_timeout _last_debug_mtime _stall_start
+  _stall_timeout="${FREELY_ACP_STALL_TIMEOUT_SECS:-120}"
+  _last_debug_mtime="$(_file_mtime_epoch "$debug_log_file")"
+  _stall_start=""
+
   while kill -0 "$child_pid" 2>/dev/null; do
-    # Live failure detection
+    # Live failure detection (log-based patterns)
     if [[ -n "$failure_marker_file" || -n "$network_failure_marker_file" || -n "$bridge_lost_marker_file" ]]; then
       _detect_acp_failure "$log_file" "$failure_marker_file" "$network_failure_marker_file" "$bridge_lost_marker_file" "$bridge_log_offset" "$bridge_log_offset"
       if [[ -f "$failure_marker_file" || -f "$network_failure_marker_file" || -f "$bridge_lost_marker_file" ]]; then
@@ -304,6 +337,30 @@ main() {
         break
       fi
     fi
+
+    # Watchdog timeout: if debug log stalls and bridge is dead, don't hang.
+    # Catches run-acp-prompt.py blocking on a dead socket without writing errors.
+    local _cur_debug_mtime
+    _cur_debug_mtime="$(_file_mtime_epoch "$debug_log_file")"
+    if [[ -n "$_cur_debug_mtime" && "$_cur_debug_mtime" -gt 0 ]]; then
+      if [[ "$_cur_debug_mtime" -gt "$_last_debug_mtime" ]]; then
+        _last_debug_mtime="$_cur_debug_mtime"
+        _stall_start=""
+      elif [[ -z "$_stall_start" ]]; then
+        _stall_start="$(date +%s)"
+      elif (( $(date +%s) - _stall_start >= _stall_timeout )); then
+        local _bridge_pid
+        _bridge_pid=$(cat "$(_bridge_pid_file "$project")" 2>/dev/null || true)
+        if [[ -z "$_bridge_pid" ]] || ! kill -0 "$_bridge_pid" 2>/dev/null; then
+          echo "[ACP-detect] stall_timeout: debug log stalled ${_stall_timeout}s, bridge dead" >&2
+          [[ -n "$bridge_lost_marker" ]] && echo "bridge_session_lost" > "$bridge_lost_marker"
+          [[ -n "$network_failure_marker" ]] && echo "network_failure" > "$network_failure_marker"
+          kill "$child_pid" 2>/dev/null || true
+          break
+        fi
+      fi
+    fi
+
     sleep 1
   done
 
@@ -360,6 +417,8 @@ main() {
     _detect_acp_failure "$log_file" "$failure_marker_file" "$network_failure_marker_file" "$bridge_lost_marker_file" "$bridge_log_offset"
     if [[ -f "$failure_marker_file" ]]; then
       failure_detected="auth_or_rate_limit"
+    elif [[ -f "$network_failure_marker_file" ]]; then
+      failure_detected="network_failure"
     elif [[ -f "$bridge_lost_marker_file" ]]; then
       failure_detected="bridge_session_lost"
     fi
