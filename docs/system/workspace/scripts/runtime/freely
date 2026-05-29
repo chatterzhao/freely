@@ -7251,6 +7251,37 @@ clear_execution_network_state() {
   rm -f "$(execution_network_state_file "$project")"
 }
 
+# _cleanup_orphaned_monitors: kill orphaned monitor-ai-acp.sh processes
+# that survived a bridge crash and are blocking supervisor restart.
+_cleanup_orphaned_monitors() {
+  local project="$1"
+  local run_dir pid_file pattern
+  run_dir="$(run_dir_for_project "$project")"
+  # Find monitor-ai-acp.sh processes whose parent is init (orphaned)
+  # or whose bridge process is dead.
+  while IFS= read -r pid; do
+    [[ -n "$pid" ]] || continue
+    # Only kill if parent is launchd (PID 1, orphaned) or parent is dead
+    local ppid
+    ppid=$(ps -o ppid= -p "$pid" 2>/dev/null | tr -d ' ' || true)
+    if [[ "$ppid" == "1" ]] || ! kill -0 "$ppid" 2>/dev/null; then
+      log_warn "killing orphaned monitor-ai-acp.sh pid=$pid (ppid=${ppid:-dead})"
+      kill "$pid" 2>/dev/null || true
+    fi
+  done < <(pgrep -f "monitor-ai-acp.sh.*$project" 2>/dev/null || true)
+  # Clean up stale pid files
+  pid_file="$run_dir/ai.pid"
+  if [[ -f "$pid_file" ]]; then
+    local stale_pid
+    stale_pid=$(cat "$pid_file" 2>/dev/null || true)
+    if [[ -n "$stale_pid" ]] && ! kill -0 "$stale_pid" 2>/dev/null; then
+      rm -f "$pid_file"
+    fi
+  fi
+}
+
+
+
 runtime_network_failure_reason_from_log() {
   local project="$1" log_file="$2"
   local state_file now_epoch last_epoch last_count next_retry_epoch reason failure_count window_secs budget base_delay max_delay backoff cooldown
@@ -16502,6 +16533,9 @@ launch_manager_supervisor() {
   if [[ "$launch_mode" == "daemon" ]]; then
     launch_mode_command="daemon-run"
   fi
+  # Kill orphaned monitor-ai-acp.sh processes that survived a bridge crash.
+  # These zombies block supervisor restart by holding PID files and resources.
+  _cleanup_orphaned_monitors "$project"
   clear_execution_network_state "$project"
   if [[ -n "${FREELY_ENSURE_MANAGER_LAUNCH_BIN:-}" ]]; then
     # Test launch shims are synchronous evidence points; avoid background races in focused regressions.
@@ -20510,19 +20544,14 @@ print(f'send_to_ai=success updated={len(rows)}', flush=True)
         continue
       fi
       if attempt_runtime_auto_recovery_after_failure "$PROJECT_ROOT" "$AI_TOOL" "$auto_recovery_reason"; then
+        # attempt_runtime_auto_recovery_after_failure already handles cooldown
+        # state (CROSS_TOOL_SWITCH_AT, CROSS_TOOL_SWITCH_INDEX).  Do NOT apply a
+        # second cooldown here — the double sleep of 120s causes the ensure-manager
+        # to kill the supervisor as stalled before it can restart the bridge.
         if [[ "${RUNTIME_AUTO_RECOVERY_TOOL:-$AI_TOOL}" == "$AI_TOOL" ]]; then
           log_warn "${auto_recovery_reason} detected for this workcell; worker runtime switched locally to slot=${RUNTIME_AUTO_RECOVERY_SLOT:-unknown} and will continue"
         else
           log_warn "${auto_recovery_reason} detected for this workcell; worker runtime switched to tool=${RUNTIME_AUTO_RECOVERY_TOOL:-unknown} slot=${RUNTIME_AUTO_RECOVERY_SLOT:-none} and will continue"
-          # Cooldown after cross-tool switch: prevent immediate switch-back ping-pong
-          CROSS_TOOL_SWITCH_AT="${CROSS_TOOL_SWITCH_AT:-0}"
-          local _now; _now="$(date +%s)"
-          local _cooldown="${CROSS_TOOL_SWITCH_COOLDOWN_SECS:-120}"
-          if (( _now - CROSS_TOOL_SWITCH_AT < _cooldown )); then
-            log_warn "cross-tool switch cooldown active; preventing switch-back for $(( _cooldown - (_now - CROSS_TOOL_SWITCH_AT) ))s"
-            sleep_with_rate_limit_recheck "$PROJECT_ROOT" "$(( _cooldown - (_now - CROSS_TOOL_SWITCH_AT) ))"
-          fi
-          CROSS_TOOL_SWITCH_AT="$_now"
         fi
         append_runtime_event "$project" "supervisor_local_slot_recovery" \
           "supervisor_pid=$$" \
