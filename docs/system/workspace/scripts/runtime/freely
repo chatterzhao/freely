@@ -3356,6 +3356,15 @@ _strip_env_prefix() {
   printf '%s\n' "$val"
 }
 
+# _resolve_shell_alias: resolve a shell alias to its expansion text.
+# Uses `alias` builtin (via login shell for cross-shell compat).
+# Prints the full alias expansion (everything after the '='), or empty if undefined.
+_resolve_shell_alias() {
+  local name="$1"
+  ${SHELL:-bash} -ic "alias '$name' 2>/dev/null" 2>/dev/null \
+    | sed -n "s/^${name}='\\(.*\\)'$/\\1/p"
+}
+
 # _resolve_tool_family: resolve any alias/function/binary to known tool family.
 # Uses `type` for unified cross-shell resolution. No hardcoded prefix lists needed.
 # Supports recursive aliases (alias → another alias → binary).
@@ -12745,6 +12754,220 @@ finally:
 " 2>/dev/null
 }
 
+# ─────────────────────────────────────────────────────────────────
+# Registry-driven bridge env helper — reads ALL behavior from
+# tool-registry.json5 slot section.  Adding a new tool requires
+# only a registry entry + slot config; no code changes here.
+#
+# Signature: _bridge_env_for_registered_tool <tool_name> <project> <base_tool>
+#   tool_name — full name with slot suffix (e.g. opencode-apikey-ds-flash-auto)
+#   project   — project root path (used for codex writable_roots, logging context)
+#   base_tool — canonical tool name for registry lookup (e.g. opencode, codex)
+#
+# Emits "KEY=VALUE" lines to stdout for the caller to accumulate via while-read.
+# stderr (log_info/log_warn) passes through to the daemon log.
+# Three-phase config path resolution: registered dir → alias parse → ~/.ai-auth/ fallback.
+# ─────────────────────────────────────────────────────────────────
+_bridge_env_for_registered_tool() {
+  local tool_name="$1" project="$2" base_tool="$3"
+  local _slot_path="" _slot_type="" _cfg_file="" _is_dir=""
+
+  # ════════════════════════════════════════════════════════════════
+  # Phase 1: Resolve slot config path (3 strategies)
+  # ════════════════════════════════════════════════════════════════
+
+  # Read static slot fields from registry once
+  local _discovery _alias_key _bridge_env_var _post_init
+  _discovery="$(_tool_registry_get "$base_tool" "slot.discovery" 2>/dev/null || true)"
+  _alias_key="$(_tool_registry_get "$base_tool" "slot.alias_key" 2>/dev/null || true)"
+  _cfg_file="$(_tool_registry_get "$base_tool" "slot.config_file" 2>/dev/null || true)"
+  _is_dir="$(_tool_registry_get "$base_tool" "slot.is_dir" 2>/dev/null || echo "false")"
+  _bridge_env_var="$(_tool_registry_get "$base_tool" "slot.bridge_config_env" 2>/dev/null || true)"
+  _post_init="$(_tool_registry_get "$base_tool" "slot.post_init" 2>/dev/null || true)"
+
+  # ── Strategy A: registered tool → AI_TOOL_SLOT or ~/.ai-auth/<tool>-*/ ──
+  if _tool_is_registered "$tool_name"; then
+    local _slot_dir="${AI_TOOL_SLOT:-}"
+    [[ -z "$_slot_dir" ]] && _slot_dir=$(ls -d "$HOME/.ai-auth/${tool_name}-"* 2>/dev/null | head -1)
+    [[ -z "$_slot_dir" ]] && _slot_dir="$HOME/.ai-auth/$tool_name"
+    if [[ -n "$_slot_dir" && -d "$_slot_dir" ]]; then
+      if [[ "$_is_dir" == "true" ]]; then
+        _slot_path="$_slot_dir"; _slot_type="dir"
+      elif [[ -f "$_slot_dir/$_cfg_file" ]]; then
+        _slot_path="$_slot_dir/$_cfg_file"; _slot_type="file"
+      fi
+    fi
+  fi
+
+  # ── Strategy B: alias resolution (if A yielded nothing) ──
+  if [[ -z "$_slot_path" && -n "$_discovery" && -n "$_alias_key" ]]; then
+    local _resolved; _resolved=$(_resolve_shell_alias "$tool_name")
+    if [[ -n "$_resolved" ]]; then
+      if [[ "$_discovery" == "alias_cli_arg" ]]; then
+        # --settings <path>
+        _slot_path=$(echo "$_resolved" | sed -n "s/.*$_alias_key \([^ ]*\).*/\1/p")
+        _slot_path="${_slot_path/#\~/$HOME}"
+        _slot_type="file"
+      elif [[ "$_discovery" == "alias_env_var" ]]; then
+        # ENV="<path>"
+        _slot_path=$(echo "$_resolved" | sed -n "s/.*$_alias_key=\"\([^\"]*\)\".*/\1/p")
+        _slot_path="${_slot_path/#\~/$HOME}"
+        _slot_type="$([[ "$_is_dir" == "true" ]] && echo "dir" || echo "file")"
+      fi
+    fi
+  fi
+
+  # ── Strategy C: fallback to ~/.ai-auth/<tool_name>/ ──
+  if [[ -z "$_slot_path" ]]; then
+    local _fb_dir="$HOME/.ai-auth/$tool_name"
+    if [[ -d "$_fb_dir" ]]; then
+      if [[ "$_is_dir" == "true" ]]; then
+        _slot_path="$_fb_dir"; _slot_type="dir"
+      elif [[ -f "$_fb_dir/$_cfg_file" ]]; then
+        _slot_path="$_fb_dir/$_cfg_file"; _slot_type="file"
+      fi
+    fi
+  fi
+
+  # ── Validate resolved path ──
+  if [[ -z "$_slot_path" ]]; then return 0; fi
+  if [[ "$_slot_type" == "dir" ]]; then
+    [[ -d "$_slot_path" ]] || return 0
+  else
+    [[ -f "$_slot_path" ]] || return 0
+  fi
+
+  # ════════════════════════════════════════════════════════════════
+  # Phase 2: Emit bridge env vars, read config, run post_init hook
+  # ════════════════════════════════════════════════════════════════
+
+  # ── 2a. Emit bridge_config_env (e.g. OPENCODE_CONFIG, CODEX_HOME) ──
+  if [[ -n "$_bridge_env_var" ]]; then
+    echo "${_bridge_env_var}=$_slot_path"
+    log_info "ACP bridge: ${_bridge_env_var}=$_slot_path"
+  fi
+
+  # ── 2b. Read config_file (settings.json) for inline env vars + permission ──
+  local _full_path=""
+  if [[ "$_slot_type" == "dir" && -n "$_cfg_file" ]]; then
+    _full_path="$_slot_path/$_cfg_file"
+  elif [[ "$_slot_type" == "file" ]]; then
+    _full_path="$_slot_path"
+  fi
+
+  if [[ -n "$_full_path" && -f "$_full_path" ]]; then
+    local _perm_field _perm_fallback
+    _perm_field="$(_tool_registry_get "$base_tool" "permission.config_field" 2>/dev/null || true)"
+    _perm_fallback="$(_tool_registry_get "$base_tool" "permission.fallback_field" 2>/dev/null || true)"
+
+    python3 -c "
+import json
+try:
+    with open('$_full_path') as f:
+        d = json.load(f)
+    for k, v in d.get('env', {}).items():
+        print(f'{k}={v}')
+    pm = ''
+    pf = '$_perm_field'
+    fb = '$_perm_fallback'
+    if pf:
+        if pf in d:
+            pm = d[pf]
+        elif fb:
+            # Handle dot-path fallback (e.g. 'permissions.defaultMode')
+            parts = fb.split('.')
+            cur = d
+            for p in parts:
+                if isinstance(cur, dict) and p in cur:
+                    cur = cur[p]
+                else:
+                    cur = None
+                    break
+            if cur is not None:
+                pm = str(cur)
+    if pm:
+        print(f'CLAUDE_CODE_PERMISSION_MODE={pm}')
+except: pass
+" 2>/dev/null || true
+  fi
+
+  # ── 2c. post_init hook (e.g. codex writable_roots) ──
+  case "$_post_init" in
+    ensure_writable_roots)
+      if [[ "$_slot_type" == "dir" ]]; then
+        _bridge_env_ensure_writable_roots "$_slot_path" "$project"
+      else
+        local _hook_dir; _hook_dir="$(dirname "$_slot_path" 2>/dev/null || true)"
+        [[ -n "$_hook_dir" ]] && _bridge_env_ensure_writable_roots "$_hook_dir" "$project"
+      fi
+      ;;
+  esac
+}
+
+# ── codex writable_roots helper ──────────────────────────────────
+# Patch config.toml sandbox.writable_roots to include project +
+# worktrees directories (required for codex sandbox to create files).
+# Called via slot.post_init hook from _bridge_env_for_registered_tool.
+# Side effect: MAY modify config.toml on disk.
+_bridge_env_ensure_writable_roots() {
+  local _slot_dir="$1" project="$2"
+  local _project_name _project_parent _wt_dir _slot_cfg
+
+  _project_name=$(basename "$project")
+  _project_parent=$(dirname "$project")
+  _wt_dir="${_project_parent}/${_project_name}-worktrees"
+  _slot_cfg="$_slot_dir/config.toml"
+
+  [[ -f "$_slot_cfg" ]] || return 0
+
+  local _need_append=0
+  grep -qF "\"$project\"" "$_slot_cfg" 2>/dev/null || _need_append=1
+  grep -qF "\"$_wt_dir\"" "$_slot_cfg" 2>/dev/null || _need_append=1
+  [[ "$_need_append" -eq 1 ]] || return 0
+
+  local _added; _added=$(python3 -c "
+import re
+cfg_path = '$_slot_cfg'
+project = '$project'
+wt_dir = '$_wt_dir'
+
+with open(cfg_path) as f:
+    content = f.read()
+
+roots_match = re.search(r'^\[sandbox\]\s*\n(.*?)(?=\n\[|\Z)', content, re.DOTALL | re.MULTILINE)
+writable_match = re.search(r'^writable_roots\s*=\s*\[(.*?)\]', content, re.MULTILINE)
+
+existing = []
+if writable_match:
+    raw = writable_match.group(1)
+    existing = [x.strip().strip('\"') for x in raw.split(',') if x.strip()]
+
+added = []
+for need in [project, wt_dir]:
+    if need not in existing:
+        existing.append(need)
+        added.append(need)
+
+if added:
+    new_roots = '[' + ', '.join(f'\"{r}\"' for r in existing) + ']'
+    if writable_match:
+        content = content[:writable_match.start()] + 'writable_roots = ' + new_roots + content[writable_match.end():]
+    elif roots_match:
+        insert_pos = roots_match.end()
+        content = content[:insert_pos] + f'writable_roots = {new_roots}\n' + content[insert_pos:]
+    else:
+        content += f'\n[sandbox]\nwritable_roots = {new_roots}\n'
+    with open(cfg_path, 'w') as f:
+        f.write(content)
+    for a in added:
+        print(a)
+" 2>/dev/null) || true
+
+  if [[ -n "$_added" ]]; then
+    log_info "ACP bridge: appended to writable_roots: $(echo "$_added" | tr '\n' ', ' | sed 's/, $//')"
+  fi
+}
+
 _ensure_acp_bridge_running() {
   local project="$1"
   local pid_file socket
@@ -12813,130 +13036,17 @@ _ensure_acp_bridge_running() {
   local -a _bridge_env=()
   local tool_name="${AI_TOOL:-claude}"
 
-  # ── claude / opencode: resolve slot config → env vars ──
-  # Known bare tool names still need slot config read for permission mode.
-  local _alias_path=""
-  if _tool_is_registered "$tool_name"; then
-      # Registered tool: find slot config from AI_TOOL_SLOT or ~/.ai-auth/
-      local _slot="${AI_TOOL_SLOT:-}"
-      if [[ -z "$_slot" ]]; then
-        _slot=$(ls -d "$HOME/.ai-auth/${tool_name}-"* 2>/dev/null | head -1)
-        [[ -n "$_slot" && "$tool_name" != "codex" ]] && _alias_path="$_slot/settings.json"
-      fi
+  # ── Registry-driven bridge env dispatch ────────────────────────
+  # _bridge_env_for_registered_tool reads ALL behavior from the
+  # tool-registry.json5 slot section.  Any tool with a slot entry
+  # is handled automatically — no per-tool case arm needed.
+  local _bridge_line
+  if _tool_registry_get "$base_tool" "slot.discovery" >/dev/null 2>&1; then
+    while IFS= read -r _bridge_line; do
+      [[ -n "$_bridge_line" ]] && _bridge_env+=("$_bridge_line")
+    done < <(_bridge_env_for_registered_tool "$tool_name" "$project" "$base_tool")
   else
-      local _resolved; _resolved=$(${SHELL:-bash} -ic "alias '$tool_name' 2>/dev/null" 2>/dev/null | sed -n "s/^${tool_name}='\\(.*\\)'$/\\1/p")
-      if [[ -n "$_resolved" ]]; then
-        # Extract config path from alias (Claude: --settings, OpenCode: OPENCODE_CONFIG=)
-        _alias_path=$(echo "$_resolved" | sed -n 's/.*--settings \([^ ]*\).*/\1/p')
-        if [[ -z "$_alias_path" ]]; then
-          _alias_path=$(echo "$_resolved" | sed -n 's/.*OPENCODE_CONFIG="\([^"]*\)".*/\1/p')
-        fi
-        _alias_path="${_alias_path/#\~/$HOME}"
-      fi
-  fi
-
-  # Read slot settings.json into bridge env (applies to all tools)
-  if [[ -n "$_alias_path" && -f "$_alias_path" ]]; then
-    while IFS='=' read -r key value; do
-      [[ -n "$key" ]] || continue
-      _bridge_env+=("$key=$value")
-    done < <(python3 -c "
-import json
-try:
-    with open('$_alias_path') as f:
-        d = json.load(f)
-    for k, v in d.get('env', {}).items():
-        print(f'{k}={v}')
-    # Claude: permissionMode / permissions.defaultMode
-    pm = d.get('permissionMode', '') or d.get('permissions', {}).get('defaultMode', '')
-    # OpenCode: permission field
-    if not pm:
-        pm = d.get('permission', '')
-    if pm:
-        print(f'CLAUDE_CODE_PERMISSION_MODE={pm}')
-except: pass
-" 2>/dev/null)
-  fi
-
-  # ── codex: set CODEX_HOME to slot dir ──
-  # Codex reads config.toml + auth.json from $CODEX_HOME.
-  # No file copying to ~/.codex/ needed.
-  if [[ "$base_tool" == "codex" ]]; then
-    local _codex_resolved; _codex_resolved=$(${SHELL:-bash} -ic "alias '$tool_name' 2>/dev/null" 2>/dev/null | sed -n "s/^${tool_name}='\\(.*\\)'$/\\1/p")
-    local _slot_dir
-    _slot_dir=$(echo "$_codex_resolved" | sed -n 's/.*CODEX_HOME="\([^"]*\)".*/\1/p')
-    _slot_dir="${_slot_dir/#\~/$HOME}"
-    if [[ -z "$_slot_dir" || ! -d "$_slot_dir" ]]; then
-      _slot_dir="$HOME/.ai-auth/$tool_name"
-    fi
-    if [[ -d "$_slot_dir" ]]; then
-      _bridge_env+=("CODEX_HOME=$_slot_dir")
-      log_info "ACP bridge: CODEX_HOME=$_slot_dir"
-
-      # Ensure sandbox writable_roots includes project dir + worktrees dir.
-      # Both are required for codex to create/edit worktrees outside the project root.
-      local _project_name _project_parent _wt_dir _slot_cfg _need_append _roots_content
-      _project_name=$(basename "$project")
-      _project_parent=$(dirname "$project")
-      _wt_dir="${_project_parent}/${_project_name}-worktrees"
-      _slot_cfg="$_slot_dir/config.toml"
-
-      if [[ -f "$_slot_cfg" ]]; then
-        _need_append=0
-        # Check if project dir is in writable_roots
-        if ! grep -qF "\"$project\"" "$_slot_cfg" 2>/dev/null; then
-          _need_append=1
-        fi
-        # Check if worktrees dir is in writable_roots
-        if ! grep -qF "\"$_wt_dir\"" "$_slot_cfg" 2>/dev/null; then
-          _need_append=1
-        fi
-
-        if [[ "$_need_append" -eq 1 ]]; then
-          # Parse existing writable_roots, append missing paths
-          python3 -c "
-import re, sys
-cfg_path = '$_slot_cfg'
-project = '$project'
-wt_dir = '$_wt_dir'
-
-with open(cfg_path) as f:
-    content = f.read()
-
-# Find or create [sandbox] section with writable_roots
-roots_match = re.search(r'^\[sandbox\]\s*\n(.*?)(?=\n\[|\Z)', content, re.DOTALL | re.MULTILINE)
-writable_match = re.search(r'^writable_roots\s*=\s*\[(.*?)\]', content, re.MULTILINE)
-
-existing = []
-if writable_match:
-    raw = writable_match.group(1)
-    existing = [x.strip().strip('\"') for x in raw.split(',') if x.strip()]
-
-added = []
-for need in [project, wt_dir]:
-    if need not in existing:
-        existing.append(need)
-        added.append(need)
-
-if added:
-    new_roots = '[' + ', '.join(f'\"{r}\"' for r in existing) + ']'
-    if writable_match:
-        content = content[:writable_match.start()] + 'writable_roots = ' + new_roots + content[writable_match.end():]
-    else:
-        # No writable_roots yet, add under [sandbox] or create section
-        if roots_match:
-            insert_pos = roots_match.end()
-            content = content[:insert_pos] + f'writable_roots = {new_roots}\n' + content[insert_pos:]
-        else:
-            content += f'\n[sandbox]\nwritable_roots = {new_roots}\n'
-
-    with open(cfg_path, 'w') as f:
-        f.write(content)
-    log_info 'ACP bridge: appended to writable_roots: ' + ', '.join(added)
-" 2>/dev/null
-        fi
-      fi
-    fi
+    log_warn "no slot.discovery in registry for base_tool='$base_tool', no bridge env vars set"
   fi
 
   # Use --foreground (no fork) + & to avoid child-process lifecycle issues
