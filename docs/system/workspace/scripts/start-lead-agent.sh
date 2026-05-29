@@ -211,7 +211,15 @@ parse_ai_spec_or_fail() {
     exit 1
   }
 
-  case "$tool" in
+  # Normalize slot-suffixed tool names (opencode-apikey-xxx → opencode, codex-account-xxx → codex)
+  local _case_tool="$tool"
+  case "$_case_tool" in
+    opencode-*|codex-*|claude-*)
+      _case_tool="${_case_tool%%-*}"  # strip first -suffix to get base name
+      ;;
+  esac
+
+  case "$_case_tool" in
     codex|kiro-cli|iflow|cc|claude|cc-use-codex-cli|opencode|test-sleep|test-compact|test-once|test-session|test-route-only) ;;
     *)
       # Unknown tool may be an alias resolved by tool-launchers.sh

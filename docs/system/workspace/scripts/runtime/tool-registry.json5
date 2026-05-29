@@ -25,6 +25,17 @@
       // How to apply: via ACP session/set_mode RPC (claude-agent-acp specific)
       "mechanism": "session_set_mode",
     },
+    // How bridge env vars are discovered and passed for this tool
+    "slot": {
+      // alias_cli_arg: config path is a CLI flag (--settings <path>) in the alias
+      "discovery": "alias_cli_arg",
+      "alias_key": "--settings",
+      "config_file": "settings.json",
+      "is_dir": false,
+      // claude-agent-acp receives config via --settings CLI arg; no extra env var needed
+      "bridge_config_env": "",
+      "post_init": "",
+    },
     "session": {
       "supports_fork": true,
       "supports_resume": true,
@@ -51,6 +62,18 @@
       "mechanism": "slot_config_toml",
       "config_fields": ["approval_policy", "sandbox_mode"],
     },
+    "slot": {
+      // alias_env_var: config dir is an env var (CODEX_HOME="<dir>") in the alias
+      "discovery": "alias_env_var",
+      "alias_key": "CODEX_HOME",
+      // No JSON config file to read for inline env vars (uses config.toml for sandbox)
+      "config_file": "",
+      "is_dir": true,
+      // Bridge must export CODEX_HOME so the ACP subprocess finds its config dir
+      "bridge_config_env": "CODEX_HOME",
+      // Post-init: patch sandbox writable_roots in config.toml
+      "post_init": "ensure_writable_roots",
+    },
     "session": {
       "supports_fork": true,
       "supports_resume": true,
@@ -73,6 +96,16 @@
       "config_field": "permission",
       "mechanism": "env_var",
       "env_var": "OPENCODE_CONFIG",
+    },
+    "slot": {
+      // alias_env_var: config path is an env var (OPENCODE_CONFIG="<path>") in the alias
+      "discovery": "alias_env_var",
+      "alias_key": "OPENCODE_CONFIG",
+      "config_file": "settings.json",
+      "is_dir": false,
+      // Bridge MUST export OPENCODE_CONFIG so opencode acp finds its slot config at runtime
+      "bridge_config_env": "OPENCODE_CONFIG",
+      "post_init": "",
     },
     "session": {
       "supports_fork": true,
