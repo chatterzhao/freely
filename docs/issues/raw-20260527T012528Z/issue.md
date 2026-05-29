@@ -2,17 +2,22 @@
 local_id: raw-20260527T012528Z
 kind: raw
 phase_state: proposed
-platform_ids: {}
-primary_platform: ""
-canonical_issue_path: ""
+platform_ids:
+  github:
+    issue_id: '2319'
+    url: https://github.com/chatterzhao/freely/issues/2319
+    synced_at: '2026-05-29T21:48:26Z'
+primary_platform: github
+canonical_issue_path: ''
 last_synced_comment_at: {}
-hash: ""
-created_at: 2026-05-27T01:25:28Z
-updated_at: 2026-05-27T01:25:28Z
-intake_id: ""
+hash: ''
+created_at: 2026-05-27 01:25:28+00:00
+updated_at: '2026-05-29T21:48:26Z'
+intake_id: ''
 author: zhaoquan
 channel: local
 session_refs: []
+platform_state: open
 ---
 
 ## 背景

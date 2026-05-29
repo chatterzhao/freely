@@ -2,7 +2,7 @@
 local_id: raw-20260527T004453Z
 kind: raw
 phase_state: absorbed
-absorbed_into: "PR #2243 refactor: unified DB daemon"
+absorbed_into: 'PR #2243 refactor: unified DB daemon'
 platform_ids:
   github:
     issue_id: '2243'
@@ -13,11 +13,12 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: 2026-05-27 00:44:53+00:00
-updated_at: 2026-05-27 00:44:53+00:00
+updated_at: '2026-05-29T21:50:46Z'
 intake_id: ''
 author: zhaoquan
 channel: local
 session_refs: []
+platform_state: closed
 ---
 ## Problem
 
