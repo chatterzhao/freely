@@ -11990,6 +11990,11 @@ launch_worker_from_manager_prompt_if_needed() {
   #   The new approach shares the manager's runtime. If the worker AI crashes,
   #   the manager's watchdog should detect and recover it.
   local manager_project="$1" prompt_file="$2"
+  # Worker prompt paths in the exit contract are relative to the manager
+  # project (e.g. .freely/run/worker-prompts/...).  The worker process cd's
+  # to the target worktree before reading the prompt — and each worktree has
+  # its own .freely directory.  Resolve to absolute so the worker can find it.
+  [[ "$prompt_file" != /* ]] && prompt_file="$manager_project/$prompt_file"
   local target_project runtime_probe_project prompt_target_worktree
   local intake_id supervisor_pid ai_pid runtime_contract_file missing_fields_csv has_any_verification_metadata="0"
   local selected_tool
