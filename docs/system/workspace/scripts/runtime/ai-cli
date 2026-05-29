@@ -1147,6 +1147,47 @@ tool_save_generic() {
 cmd_login() {
   local tool="$1" auth_mode="${2:-}"
 
+  # ── Registry check: warn if base tool not registered ──────────
+  # Strip slot suffix to get base tool (opencode-apikey-ds → opencode)
+  local _base_tool="$tool"
+  case "$_base_tool" in
+    *-apikey-*) _base_tool="${_base_tool%%-apikey-*}" ;;
+    *-account-*) _base_tool="${_base_tool%%-account-*}" ;;
+  esac
+  if ! _tool_registry_get "$_base_tool" "slot.discovery" >/dev/null 2>&1; then
+    log_warn "Tool '$_base_tool' is not registered in tool-registry.json5."
+    log_warn "Login will create the slot + alias, but the ACP bridge won't know"
+    log_warn "how to discover its config.  You MUST add a registry entry first:"
+    log_warn ""
+    log_warn "  File: docs/system/workspace/scripts/runtime/tool-registry.json5"
+    log_warn ""
+    log_warn "  Add a block like this (adjust fields for your tool):"
+    log_warn '  "{                                                "'
+    log_warn '  "  \"$_base_tool\": {                                   "'
+    log_warn '  "    \"acp\":        { \"binary\": \"...\", \"args\": [] }, "'
+    log_warn '  "    \"permission\": { \"mechanism\": \"...\", ... },     "'
+    log_warn '  "    \"slot\": {                                       "'
+    log_warn '  "      \"discovery\":  \"alias_env_var\",              "'
+    log_warn '  "      \"alias_key\":  \"NEWTOOL_CONFIG\",             "'
+    log_warn '  "      \"config_file\": \"settings.json\",             "'
+    log_warn '  "      \"is_dir\":       false,                        "'
+    log_warn '  "      \"bridge_config_env\": \"NEWTOOL_CONFIG\",     "'
+    log_warn '  "      \"post_init\":    \"\"                          "'
+    log_warn '  "    },                                               "'
+    log_warn '  "    \"session\":     { ... },                         "'
+    log_warn '  "    \"model_default\": \"...\",                       "'
+    log_warn '  "    \"test_command\": \"...\"                         "'
+    log_warn '  "  }                                                 "'
+    log_warn ""
+    log_warn "  See existing entries (claude, opencode, codex) for reference."
+    log_warn "  Then re-run: freely ai login $tool $auth_mode"
+    log_warn ""
+    if [[ "${FREELY_STRICT_NEW_TOOL:-}" == "true" ]]; then
+      log_error "Aborting: FREELY_STRICT_NEW_TOOL=true (set to false to proceed anyway)"
+      exit 3
+    fi
+  fi
+
   # ── apikey: unified across ALL tools ──
   if [[ "$auth_mode" == "apikey" ]]; then
     _require_acp_binary "$tool" || exit 1
