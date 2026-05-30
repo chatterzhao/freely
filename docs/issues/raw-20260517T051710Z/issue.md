@@ -10,7 +10,7 @@ platform_ids:
     issue_id: '420'
     url: https://github.com/chatterzhao/freely/issues/420
     synced_at: '2026-05-17T05:17:17Z'
-updated_at: '2026-05-30T05:39:36Z'
+updated_at: '2026-05-30T05:53:52Z'
 primary_platform: github
 phase_state: absorbed
 absorbed_into: I-20260413-0420-A
