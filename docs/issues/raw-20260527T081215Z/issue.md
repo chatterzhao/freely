@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260527T081215Z
 kind: raw
-phase_state: completed
+phase_state: proposed
 platform_ids: {}
 primary_platform: ''
 canonical_issue_path: ''
