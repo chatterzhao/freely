@@ -20347,8 +20347,18 @@ print(ready)
         LAST_SLOT_SWITCH_AT="$(current_timestamp_utc_for_machine)"
       fi
     fi
-    # Tool-agnostic: if AI exited non-zero with no cycle output, tool is unproductive
-    if [[ -z "$slot_switch_reason" && "${rc:-0}" != "0" ]]; then
+    # Tool-agnostic: if AI exited non-zero with little cycle output, the tool
+    # MAY be unproductive.  But first check the debug log: if the AI was making
+    # tool calls, it WAS working — it just didn't finish (e.g. ACP timeout).
+    # A small cycle log with active tool calls means the tool is healthy.
+    local _tool_was_active=""
+    cycle_debug_log="${cycle_log%.log}.debug.log"
+    if [[ -f "$cycle_debug_log" ]]; then
+      if grep -qE '\[ACP tool_call\]' "$cycle_debug_log" 2>/dev/null; then
+        _tool_was_active="1"
+      fi
+    fi
+    if [[ -z "$slot_switch_reason" && "${rc:-0}" != "0" && "$_tool_was_active" != "1" ]]; then
       local _cycle_size; _cycle_size=$(wc -c < "$cycle_log" 2>/dev/null || echo 0)
       if [[ ! -f "$cycle_log" || "$_cycle_size" -lt 200 ]]; then
         slot_switch_reason="tool_unproductive"
