@@ -2,7 +2,7 @@
 local_id: raw-20260516T095920Z
 kind: raw
 phase_state: dropped
-updated_at: '2026-05-27T00:09:10Z'
+updated_at: '2026-05-30T04:10:29Z'
 closeout_note: fix directly merged to develop via fix/raw-20260512T0915Z-worker-blocked-reason
   without I-* lifecycle chain
 platform_ids:

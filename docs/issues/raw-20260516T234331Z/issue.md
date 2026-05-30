@@ -10,7 +10,7 @@ platform_ids:
     issue_id: '380'
     url: https://github.com/chatterzhao/freely/issues/380
     synced_at: '2026-05-16T23:43:36Z'
-updated_at: '2026-05-27T00:08:39Z'
+updated_at: '2026-05-30T04:09:49Z'
 primary_platform: github
 phase_state: absorbed
 absorbed_into: I-20260413-0420-A
