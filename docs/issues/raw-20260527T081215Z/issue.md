@@ -8,11 +8,12 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: 2026-05-27 08:12:15+00:00
-updated_at: 2026-05-27 08:12:15+00:00
+updated_at: '2026-05-30T04:10:06Z'
 intake_id: ''
 author: zhaoquan
 channel: local
 session_refs: []
+platform_state: closed
 ---
 
 ## Problem
