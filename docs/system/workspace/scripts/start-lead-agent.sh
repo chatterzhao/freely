@@ -461,6 +461,4 @@ ${manager_artifact_rule_escaped}
 - 若 runtime 已注入 \`上下文容量预警\` 或 \`会话轮换交接\`，优先按该治理提示收口；不要把它当作可忽略的背景信息。
 - 这不是强制停止开发；你需要结合 issue 边界、验证状态和当前改动范围自主决定是否先收口，再继续委派/实现。
 
-补充要求：
-${additional_requirements_escaped}
 EOF
