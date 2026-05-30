@@ -2,18 +2,22 @@
 local_id: raw-20260527T080702Z
 kind: raw
 phase_state: proposed
-platform_ids: {}
-primary_platform: ''
+platform_ids:
+  github:
+    issue_id: '2335'
+    url: https://github.com/chatterzhao/freely/issues/2335
+    synced_at: '2026-05-30T05:41:32Z'
+primary_platform: github
 canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: 2026-05-27 08:07:02+00:00
-updated_at: '2026-05-30T05:22:10Z'
+updated_at: '2026-05-30T05:41:32Z'
 intake_id: ''
 author: zhaoquan
 channel: local
 session_refs: []
-platform_state: closed
+platform_state: open
 ---
 
 ## Problem
