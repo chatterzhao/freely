@@ -1,8 +1,7 @@
 ---
 local_id: raw-20260527T004453Z
 kind: raw
-phase_state: absorbed
-absorbed_into: 'PR #2243 refactor: unified DB daemon'
+phase_state: completed
 platform_ids:
   github:
     issue_id: '2243'
