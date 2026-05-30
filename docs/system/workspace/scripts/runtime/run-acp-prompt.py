@@ -435,10 +435,11 @@ def main():
         # ── Prompt loop (one-shot or loop mode) ────────────────────
         def send_prompt(prompt_text, t_start, t_session, launch_kind):
             t_before = time.time()
+            prompt_timeout = int(os.environ.get("ACP_PROMPT_TIMEOUT", "3600"))
             prompt_result = client.request(
                 "session/prompt",
                 {"sessionId": session_id, "prompt": [{"type": "text", "text": prompt_text}]},
-                timeout=900,
+                timeout=prompt_timeout,
             )
             t_done = time.time()
             stop_reason = prompt_result.get("stopReason", "unknown")

@@ -11990,6 +11990,11 @@ launch_worker_from_manager_prompt_if_needed() {
   #   The new approach shares the manager's runtime. If the worker AI crashes,
   #   the manager's watchdog should detect and recover it.
   local manager_project="$1" prompt_file="$2"
+  # Worker prompt paths in the exit contract are relative to the manager
+  # project (e.g. .freely/run/worker-prompts/...).  The worker process cd's
+  # to the target worktree before reading the prompt — and each worktree has
+  # its own .freely directory.  Resolve to absolute so the worker can find it.
+  [[ "$prompt_file" != /* ]] && prompt_file="$manager_project/$prompt_file"
   local target_project runtime_probe_project prompt_target_worktree
   local intake_id supervisor_pid ai_pid runtime_contract_file missing_fields_csv has_any_verification_metadata="0"
   local selected_tool
@@ -20342,8 +20347,18 @@ print(ready)
         LAST_SLOT_SWITCH_AT="$(current_timestamp_utc_for_machine)"
       fi
     fi
-    # Tool-agnostic: if AI exited non-zero with no cycle output, tool is unproductive
-    if [[ -z "$slot_switch_reason" && "${rc:-0}" != "0" ]]; then
+    # Tool-agnostic: if AI exited non-zero with little cycle output, the tool
+    # MAY be unproductive.  But first check the debug log: if the AI was making
+    # tool calls, it WAS working — it just didn't finish (e.g. ACP timeout).
+    # A small cycle log with active tool calls means the tool is healthy.
+    local _tool_was_active=""
+    cycle_debug_log="${cycle_log%.log}.debug.log"
+    if [[ -f "$cycle_debug_log" ]]; then
+      if grep -qE '\[ACP tool_call\]' "$cycle_debug_log" 2>/dev/null; then
+        _tool_was_active="1"
+      fi
+    fi
+    if [[ -z "$slot_switch_reason" && "${rc:-0}" != "0" && "$_tool_was_active" != "1" ]]; then
       local _cycle_size; _cycle_size=$(wc -c < "$cycle_log" 2>/dev/null || echo 0)
       if [[ ! -f "$cycle_log" || "$_cycle_size" -lt 200 ]]; then
         slot_switch_reason="tool_unproductive"
