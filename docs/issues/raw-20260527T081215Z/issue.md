@@ -1,18 +1,19 @@
 ---
 local_id: raw-20260527T081215Z
 kind: raw
-phase_state: absorbed
+phase_state: proposed
 platform_ids: {}
 primary_platform: ''
 canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: 2026-05-27 08:12:15+00:00
-updated_at: 2026-05-27 08:12:15+00:00
+updated_at: '2026-05-30T05:19:52Z'
 intake_id: ''
 author: zhaoquan
 channel: local
 session_refs: []
+platform_state: closed
 ---
 
 ## Problem

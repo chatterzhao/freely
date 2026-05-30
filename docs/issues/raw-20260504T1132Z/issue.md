@@ -10,7 +10,7 @@ platform_ids:
     url: https://github.com/chatterzhao/freely/issues/203
 primary_platform: github
 created_at: '2026-05-04T11:32:00Z'
-updated_at: '2026-05-27T00:10:04Z'
+updated_at: '2026-05-30T05:21:12Z'
 intake_id: 20260504T1132Z-raw-key-format
 author: human
 channel: github

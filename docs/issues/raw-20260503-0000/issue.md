@@ -14,7 +14,7 @@ canonical_issue_path: docs/epics/workspace-routing-foundation/acp-bridge-crash-r
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-03T00:00:00Z'
-updated_at: '2026-05-27T00:08:33Z'
+updated_at: '2026-05-30T05:19:27Z'
 intake_id: 20260503-0000-acp-bridge-crash
 author: human
 channel: chat
