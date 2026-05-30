@@ -14,7 +14,7 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-04-30T00:10:00Z'
-updated_at: '2026-05-30T05:21:09Z'
+updated_at: '2026-05-30T05:40:26Z'
 intake_id: 20260430-0010-doc-sync
 author: human
 channel: chat
