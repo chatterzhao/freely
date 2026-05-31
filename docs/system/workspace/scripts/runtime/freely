@@ -94,7 +94,7 @@ _tool_test_resurrect() {
   local test_cmd; test_cmd="$(_tool_registry_get "$tool" "test_command" 2>/dev/null || true)"
   [[ -n "$test_cmd" ]] || return 1
   # Run test command, 15s timeout
-  if timeout 15 bash -c "$test_cmd" >/dev/null 2>&1; then
+  if perl -e 'alarm 30; exec @ARGV' -- bash -c "$test_cmd" >/dev/null 2>&1; then
     _tool_failure_clear "$tool" ""
     return 0
   fi
@@ -4626,18 +4626,15 @@ attempt_runtime_auto_recovery_after_failure() {
   local _cur_slot; _cur_slot="$(runtime_read_tool_current_slot "$project" "$_base_cur" 2>/dev/null || true)"
   _tool_failure_add "$_base_cur" "${_cur_slot:-}" "${failure_reason:-unknown}"
 
-  # Cooldown: advance within AI_FALLBACK_TOOLS order, skip dead tools
+  # Always advance to the next tool in the fallback list; never reset.
+  # The dead mechanism (3 failures/hour + test_command resurrection) is the
+  # sole gate — a time-based cooldown that resets the index is harmful when
+  # AI cycles outlast the cooldown window (e.g. opencode 900s idle timeout >
+  # 600s cooldown).  Without resets, the index advances monotonically and
+  # wraps naturally via modulo below.
   _read_cooldown_state
   local _now; _now="$(date +%s)"
-  local _cooldown="${CROSS_TOOL_COOLDOWN_SECS:-600}"
-  if (( _now - CROSS_TOOL_SWITCH_AT < _cooldown )); then
-    CROSS_TOOL_SWITCH_INDEX=$((CROSS_TOOL_SWITCH_INDEX + 1))
-    log_info "cross-tool cooldown active: advancing to position $CROSS_TOOL_SWITCH_INDEX"
-  else
-    CROSS_TOOL_SWITCH_INDEX=0
-    CROSS_TOOL_SWITCH_AT="$_now"
-    log_info "cross-tool cooldown expired: resetting to start of fallback order"
-  fi
+  CROSS_TOOL_SWITCH_INDEX=$((CROSS_TOOL_SWITCH_INDEX + 1))
 
   local _fallback_list; _fallback_list="$(printf '%s,' $(runtime_builtin_auto_recovery_tool_priority))"
   IFS=',' read -ra _fallback_arr <<<"$_fallback_list"
