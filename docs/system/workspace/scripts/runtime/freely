@@ -101,6 +101,91 @@ _tool_test_resurrect() {
   return 1
 }
 
+# _assemble_slot_test_command: build the test command for a specific (tool, slot)
+# using ~/.ai-auth/{slot}/ credentials.  Returns the command via stdout.
+_assemble_slot_test_command() {
+  local tool="$1" slot="$2"
+  local _discovery _alias_key _cfg_file _is_dir _bridge_env _test_base
+  local _slot_dir _slot_path
+  _slot_dir="$HOME/.ai-auth/$slot"
+  [[ -d "$_slot_dir" ]] || return 1
+
+  _discovery="$(_tool_registry_get "$tool" "slot.discovery" 2>/dev/null || true)"
+  _alias_key="$(_tool_registry_get "$tool" "slot.alias_key" 2>/dev/null || true)"
+  _cfg_file="$(_tool_registry_get "$tool" "slot.config_file" 2>/dev/null || true)"
+  _is_dir="$(_tool_registry_get "$tool" "slot.is_dir" 2>/dev/null || echo "false")"
+  _bridge_env="$(_tool_registry_get "$tool" "slot.bridge_config_env" 2>/dev/null || true)"
+  _test_base="$(_tool_registry_get "$tool" "test_command" 2>/dev/null || true)"
+  [[ -n "$_test_base" ]] || return 1
+
+  # Resolve slot config path
+  if [[ "$_is_dir" == "true" ]]; then
+    _slot_path="$_slot_dir"
+  elif [[ -n "$_cfg_file" ]]; then
+    _slot_path="$_slot_dir/$_cfg_file"
+  else
+    _slot_path="$_slot_dir"
+  fi
+  [[ -e "$_slot_path" ]] || return 1
+
+  # Assemble
+  case "$_discovery" in
+    alias_cli_arg)
+      # claude: --settings <path>
+      if echo "$_test_base" | grep -q "$_alias_key "; then
+        echo "${_test_base/$_alias_key /$_alias_key $_slot_path }"
+      else
+        echo "$_test_base $_alias_key $_slot_path"
+      fi
+      ;;
+    alias_env_var)
+      if [[ -n "$_bridge_env" ]]; then
+        echo "$_bridge_env=$_slot_path $_test_base"
+      else
+        echo "$_test_base"
+      fi
+      ;;
+    *) echo "$_test_base" ;;
+  esac
+}
+
+# _resurrect_dead_tools_batch: run once before fallback switching.  Queries the
+# db for dead (tool, slot) pairs, assembles slot-specific test commands with
+# ~/.ai-auth/{slot}/ credentials, runs each with 30s hard timeout.
+# Pass → _tool_failure_clear that slot.  Fail/timeout → slot stays dead.
+_resurrect_dead_tools_batch() {
+  local project="$1"
+  local _dead_json _count _tool _slot _test_cmd _rc
+  local _db_cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
+  _dead_json=$(python3 "$_db_cli" --project "$project" tool.failure-list-dead \
+    --window_secs 3600 --threshold 3 2>/dev/null || true)
+  [[ -n "$_dead_json" ]] || return 0
+  _count=$(echo "$_dead_json" | python3 -c "import json,sys; print(len(json.load(sys.stdin).get('tools',[])))" 2>/dev/null || echo 0)
+  [[ "$_count" -gt 0 ]] || return 0
+
+  log_info "batch resurrection: $_count dead slot(s) to test"
+  echo "$_dead_json" | python3 -c "
+import json, sys
+for t in json.load(sys.stdin).get('tools', []):
+    print(f'{t[\"tool\"]}|{t[\"slot\"]}')
+" | while IFS='|' read -r _tool _slot; do
+    [[ -n "$_tool" && -n "$_slot" ]] || continue
+    _test_cmd="$(_assemble_slot_test_command "$_tool" "$_slot")"
+    if [[ -z "$_test_cmd" ]]; then
+      log_warn "dead slot $_tool/$_slot: could not assemble test command (skip)"
+      continue
+    fi
+    log_info "testing dead slot $_tool/$_slot: $_test_cmd"
+    if perl -e 'alarm 30; exec @ARGV' -- bash -c "$_test_cmd" >/dev/null 2>&1; then
+      _tool_failure_clear "$_tool" "$_slot"
+      log_info "dead slot $_tool/$_slot resurrected"
+    else
+      _rc=$?
+      log_warn "dead slot $_tool/$_slot remains dead (test_command failed, rc=$_rc)"
+    fi
+  done
+}
+
 # ── Cooldown cycle state ─────────────────────────────────────────────
 _read_cooldown_state() {
   local state_file; state_file="$(run_dir_for_project "$PROJECT_ROOT")/cooldown-state.env"
@@ -4641,20 +4726,20 @@ attempt_runtime_auto_recovery_after_failure() {
   local _start_idx="$CROSS_TOOL_SWITCH_INDEX"
   local _found=0
 
+  # Batch-test all dead tools once before iterating — saves tokens vs per-candidate testing.
+  _resurrect_dead_tools_batch "$project"
+
   for ((_i=0; _i<${#_fallback_arr[@]}; _i++)); do
     local _idx=$(( (_start_idx + _i) % ${#_fallback_arr[@]} ))
     local candidate="${_fallback_arr[$_idx]}"
     [[ -n "$candidate" ]] || continue
     [[ "$candidate" != "$_base_cur" ]] || continue
     runtime_auto_recovery_tool_was_attempted "$candidate" && continue
-    # Skip dead tools (3 failures in 1 hour); try resurrection via test_command
+    # Skip dead tools (3 failures in 1 hour).  Resurrection was already attempted
+    # in the batch scan above — if still dead, the tool is genuinely unavailable.
     local _cand_slot; _cand_slot="$(runtime_read_tool_current_slot "$project" "$candidate" 2>/dev/null || true)"
     if _tool_is_dead "$candidate" "${_cand_slot:-}"; then
-      if _tool_test_resurrect "$candidate"; then
-        log_info "dead tool $candidate resurrected via test_command"
-      else
-        continue
-      fi
+      continue
     fi
     if ! tool_ready_for_manager_auto_recovery "$project" "$candidate"; then
       continue
