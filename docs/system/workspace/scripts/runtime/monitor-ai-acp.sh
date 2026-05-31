@@ -322,12 +322,7 @@ main() {
 
   echo "$child_pid"
 
-  # ── Monitor loop (transport monitoring + stall watchdog) ──
-  local _stall_timeout _last_debug_mtime _stall_start
-  _stall_timeout="${FREELY_ACP_STALL_TIMEOUT_SECS:-120}"
-  _last_debug_mtime="$(_file_mtime_epoch "$debug_log_file")"
-  _stall_start=""
-
+  # ── Monitor loop (transport monitoring) ──
   while kill -0 "$child_pid" 2>/dev/null; do
     # Live failure detection (log-based patterns)
     if [[ -n "$failure_marker_file" || -n "$network_failure_marker_file" || -n "$bridge_lost_marker_file" ]]; then
@@ -338,25 +333,18 @@ main() {
       fi
     fi
 
-    # Watchdog timeout: if debug log stalls and bridge is dead, don't hang.
-    # Catches run-acp-prompt.py blocking on a dead socket without writing errors.
-    local _cur_debug_mtime
-    _cur_debug_mtime="$(_file_mtime_epoch "$debug_log_file")"
-    if [[ -n "$_cur_debug_mtime" && "$_cur_debug_mtime" -gt 0 ]]; then
-      if [[ "$_cur_debug_mtime" -gt "$_last_debug_mtime" ]]; then
-        _last_debug_mtime="$_cur_debug_mtime"
-        _stall_start=""
-      elif [[ -z "$_stall_start" ]]; then
-        _stall_start="$(date +%s)"
-      elif (( $(date +%s) - _stall_start >= _stall_timeout )); then
-        # AI completely idle for _stall_timeout — no tool calls, no output.
-        # Catches opencode retrying 429 internally, hung LLM connections, etc.
-        echo "[ACP-detect] stall_timeout: debug log stalled ${_stall_timeout}s, AI unresponsive" >&2
-        [[ -n "$bridge_lost_marker" ]] && echo "bridge_session_lost" > "$bridge_lost_marker"
-        [[ -n "$network_failure_marker" ]] && echo "network_failure" > "$network_failure_marker"
-        kill "$child_pid" 2>/dev/null || true
-        break
-      fi
+    # Bridge-dead check: if the ACP bridge process died, kill the child.
+    # The bridge has its own idle timeout (900s) for unresponsive AI.
+    # Debug log mtime is NOT a liveness signal — AI thinking, reading
+    # governance docs, and processing prompts all produce zero debug output.
+    local _bridge_pid
+    _bridge_pid=$(cat "$(_bridge_pid_file "$project")" 2>/dev/null || true)
+    if [[ -n "$_bridge_pid" ]] && ! kill -0 "$_bridge_pid" 2>/dev/null; then
+      echo "[ACP-detect] bridge died (pid=$_bridge_pid), killing child" >&2
+      [[ -n "$bridge_lost_marker" ]] && echo "bridge_session_lost" > "$bridge_lost_marker"
+      [[ -n "$network_failure_marker" ]] && echo "network_failure" > "$network_failure_marker"
+      kill "$child_pid" 2>/dev/null || true
+      break
     fi
 
     sleep 1
