@@ -393,7 +393,7 @@ main() {
     stop_reason="unknown"
   fi
 
-  # Persist clean session ID to session-store (authoritative source)
+# Persist clean session ID to session-store (authoritative source)
   if [[ -n "$session_id_clean" ]]; then
     local resume_mode_detected=""
     if [[ "$launch_kind" == "resume" ]]; then
