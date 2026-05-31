@@ -1,36 +1,40 @@
-# Freely project-level Codex config
+# Freely 项目级 Codex 配置
 # Reference: https://developers.openai.com/codex/config-reference/
 #
-# This file is versioned on purpose so every worktree inherits the same project
-# defaults. `freely init` should create or update this file as a managed
-# bootstrap artifact instead of mutating user-global `~/.codex/config.toml`.
-#
-# Why these keys exist:
-# - `model_context_window`: keep the effective budget below the cost step-up zone
-#   observed during dogfooding so Codex compacts earlier instead of drifting
-#   into an expensive context shape.
-# - `model_auto_compact_token_limit`: trigger compaction before the window cap so
-#   long-running sessions compress predictably.
-# - `project_doc_max_bytes`: bound auto-loaded project docs so startup context is
-#   stable and large governance files do not dominate the prompt budget.
-# - `approval_policy`: follow the Freely runtime posture for this project so
-#   auto mode stays non-interactive by default.
-# - `sandbox_mode`: keep the recommended workspace-write safeguard as a
-#   project-local Codex baseline without making it a Freely hard prerequisite.
-# - `sandbox_workspace_write.writable_roots`: allow direct access to the sibling
-#   `{project}-worktrees` root, which is outside the project root by design.
+# 实际完整配置在 slot 目录: /Users/zhaoyu/.ai-auth/cc-use-codex-cli/config.toml
+# 本文件仅放项目级覆盖字段，方便用户快速修改。
+# 其余字段（openai_base_url / auth / provider）在 slot 配置中。
+# 修改后生效于下次 codex session，无需重启 freely。
 
-# Context window governance
-model_context_window = 200000
-model_auto_compact_token_limit = 150000
+# ── 默认模型 ── (方便快速修改，会覆盖 slot 的 model)
+model = "gpt-5.5"
 
-# Project doc budget
-project_doc_max_bytes = 32768
-
-# Approval and sandbox defaults
+# ── 批准策略 ──────────────────────────────────────────
+# "never"        — 自动批准所有操作（Freely auto 模式默认）
+# "on-failure"   — 仅命令失败时请求批准
+# "on-request"   — 命令请求批准时询问（step 模式默认）
+# "always"       — 始终需要手动批准
 approval_policy = "never"
+
+# ── 沙箱模式 ──────────────────────────────────────────
+# "read-only"         — 只读，禁止修改文件系统
+# "workspace-write"   — 项目目录可写（推荐）
+# "danger-full-access" — 完全访问，无限制
 sandbox_mode = "workspace-write"
 
+# ── 沙箱网络 ──────────────────────────────────────────
+# true = 允许命令访问网络, false = 禁止
+# 注意: 此字段在 [sandbox_workspace_write] 段下，
+# 自由模式或 danger 模式需另设全局 network_access。
 [sandbox_workspace_write]
 network_access = false
+
+# ── 额外可写路径 ──────────────────────────────────────
+# 项目 worktrees 目录在项目根外，需显式放行
 writable_roots = ["/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees"]
+
+# ── 上下文管理 ────────────────────────────────────────
+# 控制 session 上下文预算，超限触发 compaction
+model_context_window = 200000
+model_auto_compact_token_limit = 150000
+project_doc_max_bytes = 32768
