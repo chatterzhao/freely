@@ -14,7 +14,7 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-04-29T17:45:00Z'
-updated_at: '2026-05-30T06:11:41Z'
+updated_at: '2026-05-31T00:28:21Z'
 intake_id: 20260429-1745-bash32-daemon-compat-fix
 author: human
 channel: chat
