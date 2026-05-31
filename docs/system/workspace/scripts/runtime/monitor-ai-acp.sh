@@ -349,15 +349,13 @@ main() {
       elif [[ -z "$_stall_start" ]]; then
         _stall_start="$(date +%s)"
       elif (( $(date +%s) - _stall_start >= _stall_timeout )); then
-        local _bridge_pid
-        _bridge_pid=$(cat "$(_bridge_pid_file "$project")" 2>/dev/null || true)
-        if [[ -z "$_bridge_pid" ]] || ! kill -0 "$_bridge_pid" 2>/dev/null; then
-          echo "[ACP-detect] stall_timeout: debug log stalled ${_stall_timeout}s, bridge dead" >&2
-          [[ -n "$bridge_lost_marker" ]] && echo "bridge_session_lost" > "$bridge_lost_marker"
-          [[ -n "$network_failure_marker" ]] && echo "network_failure" > "$network_failure_marker"
-          kill "$child_pid" 2>/dev/null || true
-          break
-        fi
+        # AI completely idle for _stall_timeout — no tool calls, no output.
+        # Catches opencode retrying 429 internally, hung LLM connections, etc.
+        echo "[ACP-detect] stall_timeout: debug log stalled ${_stall_timeout}s, AI unresponsive" >&2
+        [[ -n "$bridge_lost_marker" ]] && echo "bridge_session_lost" > "$bridge_lost_marker"
+        [[ -n "$network_failure_marker" ]] && echo "network_failure" > "$network_failure_marker"
+        kill "$child_pid" 2>/dev/null || true
+        break
       fi
     fi
 
