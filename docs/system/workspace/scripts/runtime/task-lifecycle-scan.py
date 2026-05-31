@@ -1502,7 +1502,7 @@ def add_platform_sync_batch(items: list[dict], ts: str) -> list[dict]:
     Removes individual items and creates a single batch item as the
     first (highest priority) result.
     """
-    sync_stages = {"platform_open", "platform_only", "state_mismatch", "local_only"}
+    sync_stages = {"platform_open", "platform_only", "state_mismatch", "local_only", "platform_close", "branch_deleted"}
     sync_items = [it for it in items if it.get("stage") in sync_stages]
     remaining = [it for it in items if it.get("stage") not in sync_stages]
 
@@ -1512,7 +1512,9 @@ def add_platform_sync_batch(items: list[dict], ts: str) -> list[dict]:
     pull_count = sum(1 for it in sync_items if it.get("stage") in ("platform_open", "platform_only"))
     push_count = sum(1 for it in sync_items if it.get("stage") == "local_only")
     reconcile_count = sum(1 for it in sync_items if it.get("stage") == "state_mismatch")
+    close_count = sum(1 for it in sync_items if it.get("stage") in ("platform_close", "branch_deleted"))
     comment_count = sum(1 for it in sync_items if it.get("stage") == "pending_comments")
+    total_sync = pull_count + push_count + reconcile_count + close_count
 
     batch_item = {
         "key": f"platform-sync-batch-{ts}",
@@ -1521,12 +1523,13 @@ def add_platform_sync_batch(items: list[dict], ts: str) -> list[dict]:
         "ready": True,
         "priority": "P0_highest",
         "incomplete": [],
-        "next_action": f"[manager] freely feedback --repo chatterzhao/freely --title \"Platform sync batch: sync {pull_count + push_count + reconcile_count} items\" --body \"Batch sync task discovered by scan.\\npull={pull_count} push={push_count} reconcile={reconcile_count}\\nplatforms: github, gitee\"\n  → 拿到 raw-{{real_key}} → wt-create --raw-key {{real_key}} --source platform --skill freely-fix-execution --slug platform-sync\n[worker] issue-sync batch → git commit → wt-close",
+        "next_action": f"[manager] freely feedback --repo chatterzhao/freely --title \"Platform sync batch: sync {total_sync} items\" --body \"Batch sync task discovered by scan.\\npull={pull_count} push={push_count} reconcile={reconcile_count} close={close_count}\\nplatforms: github, gitee\"\n  → 拿到 raw-{{real_key}} → wt-create --raw-key {{real_key}} --source platform --skill freely-fix-execution --slug platform-sync\n[worker] issue-sync batch → git commit → wt-close",
         "sync_summary": {
-            "total": pull_count + push_count + reconcile_count,
+            "total": total_sync,
             "pull": pull_count,
             "push": push_count,
             "reconcile_state": reconcile_count,
+            "close": close_count,
             "pending_comments": comment_count,
             "platforms": ["github", "gitee"],
         },
