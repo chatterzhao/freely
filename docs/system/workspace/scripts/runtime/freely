@@ -3470,8 +3470,8 @@ _resolve_tool_family() {
     binary="${binary%% *}"
     binary=$(basename "$binary" 2>/dev/null || echo "$binary")
     case "$binary" in
-      claude)  printf 'claude\n'; return 0 ;;
-      codex|kiro-cli|iflow|opencode) printf '%s\n' "$binary"; return 0 ;;
+      claude)  printf 'claude\n' || true; return 0 ;;
+      codex|kiro-cli|iflow|opencode) printf '%s\n' "$binary" || true; return 0 ;;
       *)
         local rec_expansion rec_binary
         rec_expansion=$(_resolve_type_expansion "$binary")
@@ -3480,7 +3480,7 @@ _resolve_tool_family() {
           rec_binary="${rec_binary%% *}"
           rec_binary=$(basename "$rec_binary" 2>/dev/null || echo "$rec_binary")
           case "$rec_binary" in
-            claude)  printf 'claude\n'; return 0 ;;
+            claude)  printf 'claude\n' || true; return 0 ;;
             codex|kiro-cli|iflow|opencode) printf '%s\n' "$rec_binary"; return 0 ;;
           esac
         fi
@@ -5024,8 +5024,18 @@ _tool_switch_launch_kind() {
     printf 'fresh\n'; return 0  # cross-tool → force fresh
   fi
 
-  # Same tool: try resume if old session ID exists
+  # Same tool: try resume if old session ID exists in the record,
+  # OR if there's an active session in the session-store.
   if [[ -n "$_new_sid" ]]; then
+    printf 'resume\n'; return 0
+  fi
+  # No session ID in the record (e.g. bridge restart created a fresh one).
+  # Fall back to session-store — if an active session exists for this tool,
+  # resume it instead of forcing yet another fresh_with_handoff cycle.
+  local _active_sid
+  _active_sid=$(python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli" \
+    --project "$project" session.get-active --project "$project" --role manager 2>/dev/null || true)
+  if [[ -n "$_active_sid" ]] && is_valid_uuid "$_active_sid"; then
     printf 'resume\n'; return 0
   fi
   printf 'fresh\n'
@@ -7361,6 +7371,14 @@ _cleanup_orphaned_monitors() {
     fi
   fi
 }
+# _update_heartbeat: touch the supervisor heartbeat file so the ensure-manager
+# watchdog knows the supervisor is alive and working.  Called every ~2s by the
+# background heartbeat process and at key points in the main loop.
+_update_heartbeat() {
+  local project="$1"
+  touch "$(run_dir_for_project "$project")/supervisor-heartbeat" 2>/dev/null || true
+}
+
 
 
 
@@ -17304,68 +17322,38 @@ ensure_manager_once() {
       fi
     fi
   fi
-  current_ai_pid="$(manager_ai_pid_for_project "$project")"
-  if project_bootstrap_launch_in_flight "$project" "$current_pid" "$current_ai_pid"; then
-    log_info "manager bootstrap is still within ai launch grace; keeping supervisor pid=$current_pid alive"
-    append_lifecycle_trace "$project" "L220" "manager_keepalive" \
-      "trigger=bootstrap_ai_grace" \
-      "supervisor_pid=${current_pid:-unknown}" \
-      "next=keep_current_supervisor"
-  elif project_runtime_auto_recovery_launch_in_flight "$project" "$current_pid" "$current_ai_pid"; then
-    log_info "manager runtime auto-recovery is still within ai launch grace; keeping supervisor pid=$current_pid alive"
-    append_lifecycle_trace "$project" "L221" "manager_keepalive" \
-      "trigger=auto_recovery_ai_grace" \
-      "supervisor_pid=${current_pid:-unknown}" \
-      "next=keep_current_supervisor"
-  elif manager_supervisor_between_rounds_relaunch_in_flight "$project" "$current_pid" "$current_ai_pid"; then
-    log_info "manager supervisor is between rounds within relaunch grace; keeping supervisor pid=$current_pid alive"
-    append_lifecycle_trace "$project" "L221" "manager_keepalive" \
-      "trigger=between_rounds_relaunch_grace" \
-      "supervisor_pid=${current_pid:-unknown}" \
-      "next=keep_current_supervisor"
-  elif supervisor_startup_lifecycle_in_flight "$project" "$current_pid"; then
-    log_info "manager supervisor is still advancing the next startup lifecycle; keeping supervisor pid=$current_pid alive"
-    append_lifecycle_trace "$project" "L221" "manager_keepalive" \
-      "trigger=startup_lifecycle_grace" \
-      "supervisor_pid=${current_pid:-unknown}" \
-      "next=keep_current_supervisor"
-  elif manager_supervisor_post_ai_cycle_finalize_in_flight "$project" "$current_pid" "$current_ai_pid"; then
-    log_info "manager supervisor is finalizing the previous ai cycle; keeping supervisor pid=$current_pid alive"
-    append_lifecycle_trace "$project" "L221" "manager_keepalive" \
-      "trigger=post_ai_cycle_finalize_grace" \
-      "supervisor_pid=${current_pid:-unknown}" \
-      "next=keep_current_supervisor"
-  elif manager_supervisor_waiting_on_active_workers "$project" "$current_pid" "$current_ai_pid"; then
-    log_info "manager supervisor is waiting on active worker progress; keeping supervisor pid=$current_pid alive"
-    append_lifecycle_trace "$project" "L221" "manager_keepalive" \
-      "trigger=active_worker_wait" \
-      "supervisor_pid=${current_pid:-unknown}" \
-      "next=keep_current_supervisor"
-  elif project_bootstrap_launch_in_flight_from_unverified_supervisor_hint "$project"; then
-    log_info "manager bootstrap is still within ai launch grace under degraded process inspection; keeping hinted supervisor pid=${supervisor_hint:-unknown} alive"
-    append_lifecycle_trace "$project" "L222" "manager_keepalive" \
-      "trigger=bootstrap_ai_grace_unverified_supervisor_hint" \
-      "supervisor_pid=${supervisor_hint:-unknown}" \
-      "next=keep_current_supervisor"
-  elif [[ "$same_tool_blocked" != "1" && -n "$current_pid" ]] && [[ -z "$current_ai_pid" ]] \
-    && [[ "$(read_task_mode "$project")" != "wait" ]]; then
-    local _just_switched
-    _just_switched=$(python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli" --project "$project" task-mode.read-just-switched 2>/dev/null || echo 0)
-    if [[ "$_just_switched" == "1" ]]; then
-      log_info "task_mode just switched; keeping supervisor pid=$current_pid alive for one cycle"
-      append_lifecycle_trace "$project" "L224" "manager_keepalive" \
-        "trigger=mode_just_switched_grace" \
-        "supervisor_pid=${current_pid:-unknown}" \
-        "next=keep_current_supervisor"
+  # ── Heartbeat-based liveness (replaces L220-L240 grace chain) ──
+  # The supervisor touches supervisor-heartbeat every ~2s via a background
+  # subprocess.  If the heartbeat is stale, the supervisor is dead/stuck.
+  # No ai.pid dependency, no file-IPC state inference, no grace layers.
+  local _hb_file _hb_timeout _hb_now _hb_epoch _hb_stale
+  _hb_file="$run_dir/supervisor-heartbeat"
+  _hb_timeout="${SUPERVISOR_HEARTBEAT_TIMEOUT_SECS:-120}"
+  if [[ -n "$current_pid" ]] && kill -0 "$current_pid" 2>/dev/null; then
+    _hb_stale=0
+    if [[ -f "$_hb_file" ]]; then
+      _hb_epoch=$(stat -f %m "$_hb_file" 2>/dev/null || echo 0)
+      _hb_now=$(date +%s)
+      if (( _hb_now - _hb_epoch > _hb_timeout )); then
+        _hb_stale=1
+      fi
     else
-      log_warn "manager supervisor is idle after recovery gate passed; restarting manager with the latest handoff"
-      append_lifecycle_trace "$project" "L223" "manager_idle_supervisor_restart" \
-        "trigger=supervisor_alive_ai_missing_after_grace" \
-        "supervisor_pid=${current_pid:-unknown}" \
-        "next=restart_manager_supervisor"
-      restart_manager_supervisor_preserving_handoff "$project"
-      current_pid=""
+      # No heartbeat file yet — supervisor may be starting.  Give it a
+      # short grace (15s) for the first heartbeat to appear.
+      local _sup_start_epoch
+      _sup_start_epoch=$(stat -f %m "$sup_pid_file" 2>/dev/null || echo 0)
+      _hb_now=$(date +%s)
+      if (( _hb_now - _sup_start_epoch > 15 )); then
+        _hb_stale=1
+      fi
     fi
+    if [[ "$_hb_stale" == "0" ]]; then
+      return 0
+    fi
+    log_warn "supervisor heartbeat stale (>${_hb_timeout}s or missing), restarting (pid=$current_pid)"
+    kill "$current_pid" 2>/dev/null || true
+    sleep 1
+    current_pid=""
   fi
 
   prepare_manager_cross_tool_fallback_if_needed "$project" "$same_tool_blocked" >/dev/null || true
@@ -19984,7 +19972,22 @@ ${_msg}" >/dev/null 2>&1 || true
     fi
   }
   trap '_on_supervisor_err $LINENO' ERR
+  # ── Heartbeat subprocess: keeps supervisor-heartbeat fresh while we wait ──
+  # The ensure-manager watchdog only checks this file.  A background process
+  # updates it every 2s, covering the "waiting for AI" period where the main
+  # loop blocks on monitor-ai-acp.sh.
+  (
+    while true; do
+      _update_heartbeat "$PROJECT_ROOT"
+      sleep 2
+    done
+  ) &
+  _heartbeat_bg_pid=$!
+  # Kill the heartbeat subprocess when the supervisor exits
+  trap 'kill $_heartbeat_bg_pid 2>/dev/null || true' EXIT
+
   while true; do
+    _update_heartbeat "$PROJECT_ROOT"
     # Re-load session state each cycle so resume/fork decisions see latest values
     load_session_state_or_defaults "$project"
 
@@ -20090,6 +20093,7 @@ print(ready)
       "expected_from_previous=L020" \
       "expected_next=L021"
     local prompt_utf8_invalid_count="0"
+    _update_heartbeat "$PROJECT_ROOT"
     if ! build_prompt >"$prompt_file"; then
       LAST_WORKCELL_EXIT_REASON="prompt_build_failed"
       write_workcell_state "$project" "running" "up" "down" "$LAST_WORKCELL_EXIT_REASON"
