@@ -12,7 +12,7 @@ platform_ids:
 primary_platform: github
 source_candidate: docs/pre-brainstorms/20260506-wt-create-dual/candidates.md
 created_at: 2026-05-06 12:30:00+00:00
-updated_at: '2026-06-01T11:50:22Z'
+updated_at: '2026-06-01T12:12:23Z'
 author: zhaoquan
 channel: github
 session_refs: []
