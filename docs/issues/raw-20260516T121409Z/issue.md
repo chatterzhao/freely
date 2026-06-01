@@ -2,7 +2,7 @@
 local_id: raw-20260516T121409Z
 kind: raw
 priority: P2
-phase_state: dropped
+phase_state: absorbed
 source: chat-inbox
 created_at: '2026-05-16T12:14:09Z'
 title: manager-agent.md 缺少巡逻模式行为规范，导致 Manager 面对 scan 数据只输出 stop_ai
@@ -11,11 +11,12 @@ platform_ids:
     issue_id: '368'
     url: https://github.com/chatterzhao/freely/issues/368
     synced_at: '2026-05-16T12:14:17Z'
-updated_at: '2026-05-31T00:29:48Z'
+updated_at: '2026-06-01T12:11:49Z'
 primary_platform: github
 platform_state: closed
 force_closed_at: '2026-05-16T12:59:11Z'
 force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
+absorbed_into: infra-githooks
 ---
 
 ## 根因

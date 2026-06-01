@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260519T175836Z
 kind: raw
-phase_state: dropped
+phase_state: absorbed
 platform_ids:
   github:
     issue_id: '661'
@@ -12,7 +12,7 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-19T17:58:50Z'
-updated_at: '2026-05-31T00:37:36Z'
+updated_at: '2026-06-01T12:11:09Z'
 intake_id: ''
 author: platform
 channel: github
@@ -22,6 +22,7 @@ dropped_reason: Implementation merged to develop. send_to_ai field + ACP prompt 
 platform_state: closed
 force_closed_at: '2026-05-19T22:49:06Z'
 force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
+absorbed_into: infra-githooks
 ---
 
 ## raw-20260519T175836Z
