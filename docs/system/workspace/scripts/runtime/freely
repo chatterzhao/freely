@@ -5170,6 +5170,7 @@ prepare_manager_cross_tool_fallback_if_needed() {
     persist_project_tool_selection "$project" "$fallback_tool"
     # Kill old ACP bridge immediately so next cycle starts with new tool's binary
     _stop_acp_bridge "$project"
+    FREELY_ACP_FIRST_LAUNCH_DONE=0
     runtime_clear_session_state_for_fresh_launch "$project"
     record_tool_auto_switch_event "$project" "$current_tool" "$fallback_tool" "${fallback_slot:-}" "$last_exit_reason"
     # Record switch in tool_switch_events table for session/bridge handling
