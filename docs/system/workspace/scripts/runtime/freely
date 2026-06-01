@@ -4729,10 +4729,17 @@ attempt_runtime_auto_recovery_after_failure() {
   # Batch-test all dead tools once before iterating — saves tokens vs per-candidate testing.
   _resurrect_dead_tools_batch "$project"
 
+  # Track resolved canonical names to deduplicate aliases (kiro-cli→claude etc.)
+  local _seen_canonical=""
   for ((_i=0; _i<${#_fallback_arr[@]}; _i++)); do
     local _idx=$(( (_start_idx + _i) % ${#_fallback_arr[@]} ))
     local candidate="${_fallback_arr[$_idx]}"
     [[ -n "$candidate" ]] || continue
+    # Resolve alias to canonical: cc-use-codex-cli → claude
+    candidate="$(_resolve_tool_alias "$candidate")"
+    # Deduplicate: skip if canonical already seen in this pass
+    [[ "$_seen_canonical" == *"|$candidate|"* ]] && continue
+    _seen_canonical="$_seen_canonical|$candidate|"
     [[ "$candidate" != "$_base_cur" ]] || continue
     runtime_auto_recovery_tool_was_attempted "$candidate" && continue
     # Skip dead tools (3 failures in 1 hour).  Resurrection was already attempted
@@ -5002,6 +5009,28 @@ _tool_switch_atomic_write() {
     --new_tool "$new_tool" --new_session_id "$new_session_id" 2>/dev/null || true
 }
 
+# _resolve_tool_alias: resolve a tool name to its canonical form using the
+# registry aliases field (comma-separated).  Returns the canonical name if
+# the given name is an alias, otherwise returns the name unchanged.
+_resolve_tool_alias() {
+  local tool="$1"
+  # Check all registered tools for a matching alias
+  local _reg_tools _t _aliases
+  _reg_tools="$(_tool_registry_tools 2>/dev/null || true)"
+  for _t in $_reg_tools; do
+    _aliases="$(_tool_registry_get "$_t" "aliases" 2>/dev/null || true)"
+    [[ -n "$_aliases" ]] || continue
+    if echo "$_aliases" | tr ',' '
+' | grep -qFx "$tool"; then
+      printf '%s
+' "$_t"
+      return 0
+    fi
+  done
+  printf '%s
+' "$tool"
+}
+
 # Determine launch kind from latest switch record.
 # Returns: fresh|resume  (fresh means session/new needed)
 _tool_switch_launch_kind() {
@@ -5017,9 +5046,14 @@ _tool_switch_launch_kind() {
     printf 'fresh\n'; return 0
   fi
 
-  # Compare base tool names to detect cross-tool change since last record
-  local base_current="${current_tool%%-*}"
-  local base_recorded="${_new_tool%%-*}"
+  # Resolve aliases at the full tool name level before extracting base.
+  # cc-use-codex-cli → claude, then base=claude; cc-apikey-xxx → cc (no alias)
+  # → resolve → claude → base=claude.  Without this, cc != claude → cross_tool.
+  local _canonical_current _canonical_recorded
+  _canonical_current="$(_resolve_tool_alias "$current_tool")"
+  _canonical_recorded="$(_resolve_tool_alias "$_new_tool")"
+  local base_current="${_canonical_current%%-*}"
+  local base_recorded="${_canonical_recorded%%-*}"
   if [[ "$base_current" != "$base_recorded" ]]; then
     printf 'fresh\n'; return 0  # cross-tool → force fresh
   fi
@@ -19984,17 +20018,17 @@ ${_msg}" >/dev/null 2>&1 || true
   }
   trap '_on_supervisor_err $LINENO' ERR
   # ── Heartbeat subprocess: keeps supervisor-heartbeat fresh while we wait ──
-  # The ensure-manager watchdog only checks this file.  A background process
-  # updates it every 2s, covering the "waiting for AI" period where the main
-  # loop blocks on monitor-ai-acp.sh.
+  # Checks parent liveness so an orphaned heartbeat can't fool the watchdog.
+  # Pass supervisor PID explicitly — $$ inside () is the subshell's PID.
+  local _supervisor_pid=$$
   (
-    while true; do
+    while kill -0 $_supervisor_pid 2>/dev/null; do
       _update_heartbeat "$PROJECT_ROOT"
       sleep 2
     done
   ) &
   _heartbeat_bg_pid=$!
-  # Kill the heartbeat subprocess when the supervisor exits
+  # Kill the heartbeat subprocess when the supervisor exits (belt and suspenders)
   trap 'kill $_heartbeat_bg_pid 2>/dev/null || true' EXIT
 
   while true; do
