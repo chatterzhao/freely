@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260519T033529Z
 kind: raw
-phase_state: dropped
+phase_state: absorbed
 platform_ids:
   github:
     issue_id: '612'
@@ -18,6 +18,7 @@ author: platform
 channel: github
 session_refs: []
 platform_state: closed
+absorbed_into: infra/.githooks (gitignore for reference-transaction.debug)
 ---
 
 ## raw-20260519T033529Z

@@ -2,7 +2,7 @@
 issue_id: raw-20260518T020302Z
 kind: raw
 priority: P1
-phase_state: dropped
+phase_state: absorbed
 decision_reason: Platform issue
 source: feedback
 created_at: '2026-05-18T02:03:02Z'
@@ -15,6 +15,7 @@ platform_ids:
 updated_at: '2026-06-01T03:11:23Z'
 primary_platform: github
 platform_state: closed
+absorbed_into: infra/.githooks (gitignore for reference-transaction.debug)
 ---
 
 ## 依赖
