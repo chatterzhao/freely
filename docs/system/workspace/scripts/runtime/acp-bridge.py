@@ -108,6 +108,8 @@ class AcpBridge:
         self.last_activity_ts = time.time()
         self.activity_lock = threading.Lock()
         self.stdin_write_lock = threading.Lock()
+        self._stdout_master_fd = None
+        self._stdout_reader = None
 
     def log(self, msg):
         ts = time.strftime("%Y-%m-%dT%H:%M:%S")
@@ -118,6 +120,45 @@ class AcpBridge:
         except OSError:
             pass
 
+    def _popen_with_pty(self, env):
+        """Start ACP server process with PTY stdout to prevent block buffering.
+
+        Uses os.openpty() so the child process sees a terminal-like stdout,
+        which forces line-buffered output instead of the 4KB-16KB block
+        buffering that pipes cause.  Every \\n triggers an immediate flush.
+        """
+        # Close previous PTY master fd if any (from a prior process)
+        if self._stdout_master_fd is not None:
+            try:
+                if self._stdout_reader is not None:
+                    self._stdout_reader.close()
+                else:
+                    os.close(self._stdout_master_fd)
+            except OSError:
+                pass
+            self._stdout_master_fd = None
+            self._stdout_reader = None
+
+        master_fd, slave_fd = os.openpty()
+        try:
+            proc = subprocess.Popen(
+                [self.acp_bin] + (self.acp_args if self.acp_args else []),
+                stdin=subprocess.PIPE,
+                stdout=slave_fd,
+                stderr=subprocess.PIPE,
+                text=True,
+                bufsize=1,
+                env=env,
+            )
+        except BaseException:
+            os.close(master_fd)
+            os.close(slave_fd)
+            raise
+        os.close(slave_fd)  # child owns slave; close parent's copy
+        self._stdout_master_fd = master_fd
+        self._stdout_reader = os.fdopen(master_fd, 'r')
+        return proc
+
     def start_server(self):
         """Launch claude-agent-acp and initialize handshake."""
         _truncate_log(self.log_file)
@@ -126,15 +167,7 @@ class AcpBridge:
         env = os.environ.copy()
         # Permission mode is set via session/set_mode RPC after session creation.
         # --permission-mode CLI flag is claude-agent-acp-specific; codex-acp, opencode lack it.
-        self.server_proc = subprocess.Popen(
-            [self.acp_bin] + (self.acp_args if self.acp_args else []),
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            bufsize=1,
-            env=env,
-        )
+        self.server_proc = self._popen_with_pty(env)
 
         # Start reader threads
         self.running = True
@@ -178,11 +211,7 @@ class AcpBridge:
                 event.set(); del self.pending[req_id]
         # Restart
         env = os.environ.copy()
-        self.server_proc = subprocess.Popen(
-            [self.acp_bin] + (self.acp_args if self.acp_args else []),
-            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-            text=True, bufsize=1, env=env,
-        )
+        self.server_proc = self._popen_with_pty(env)
         # Start new reader threads for new process
         self.stdout_thread = threading.Thread(target=self._read_stdout, daemon=True)
         self.stderr_thread = threading.Thread(target=self._read_stderr, daemon=True)
@@ -232,22 +261,14 @@ class AcpBridge:
                 del self.pending[req_id]
         # Start new process (no initialize yet — lazy, done on first request)
         env = os.environ.copy()
-        self.server_proc = subprocess.Popen(
-            [self.acp_bin] + (self.acp_args if self.acp_args else []),
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            bufsize=1,
-            env=env,
-        )
+        self.server_proc = self._popen_with_pty(env)
         self.log("server process restarted (initialize deferred to first request)")
 
     def _read_stdout(self):
-        """Read newline-delimited JSON from server stdout."""
-        while self.running and self.server_proc and self.server_proc.stdout:
+        """Read newline-delimited JSON from server stdout (via PTY master fd)."""
+        while self.running and self.server_proc and self._stdout_reader:
             try:
-                line = self.server_proc.stdout.readline()
+                line = self._stdout_reader.readline()
                 if not line:
                     self.log("server stdout closed")
                     break
@@ -454,6 +475,17 @@ class AcpBridge:
                 pass
             # Kill entire process group to clean up orphaned Claude SDK children
             _kill_descendants(self.server_proc.pid)
+        # Clean up PTY master fd
+        if self._stdout_master_fd is not None:
+            try:
+                self._stdout_reader.close()
+            except (OSError, AttributeError):
+                try:
+                    os.close(self._stdout_master_fd)
+                except OSError:
+                    pass
+            self._stdout_master_fd = None
+            self._stdout_reader = None
         if os.path.exists(self.socket_path):
             os.unlink(self.socket_path)
         pid_file = _pid_file(self.project)
