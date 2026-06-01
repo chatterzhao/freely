@@ -43,6 +43,8 @@
     "model_default": "claude-sonnet-4-6",
     // Binary is found via PATH (e.g. npm install -g @anthropic-ai/claude-code)
     "binary_resolution": "path",
+    // Comma-separated aliases resolved to this canonical tool
+    "aliases": "cc,cc-use-codex-cli,kiro-cli,iflow,claude-code",
     // CLI command to verify tool health for dead list resurrection
     "test_command": "claude -p 'say hi' --output-format text --dangerously-skip-permissions --bare --system-prompt '' --max-tokens 50",
   },
@@ -81,6 +83,7 @@
     "model_default": "gpt-5.5",
     // Binary is cached at ~/.cache/freely/acp/codex-acp/<ver>/<triplet>/
     "binary_resolution": "cache",
+    "aliases": "",
     // CLI command to verify tool health for dead list resurrection
     "test_command": "codex exec 'say hi' --max-tokens 50",
   },
@@ -113,17 +116,10 @@
     },
     "model_default": "deepseek-v4-flash-free",
     "binary_resolution": "path",
+    "aliases": "",
     // CLI command to verify tool health for dead list resurrection
     "test_command": "opencode run 'say hi' --pure",
   },
 
-  // Aliases: map alternative tool names to canonical entries above.
-  // These tools share the same ACP binary and config as "claude".
-  "_aliases": {
-    "cc": "claude",
-    "cc-use-codex-cli": "claude",
-    "kiro-cli": "claude",
-    "iflow": "claude",
-  },
 }
 
