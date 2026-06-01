@@ -16,7 +16,7 @@ primary_platform: github
 platform_state: closed
 force_closed_at: '2026-05-16T12:59:11Z'
 force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
-absorbed_into: infra/.githooks (gitignore for reference-transaction.debug)
+absorbed_into: infra-githooks
 ---
 
 ## 根因

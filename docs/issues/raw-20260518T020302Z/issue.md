@@ -15,7 +15,7 @@ platform_ids:
 updated_at: '2026-06-01T03:11:23Z'
 primary_platform: github
 platform_state: closed
-absorbed_into: infra/.githooks (gitignore for reference-transaction.debug)
+absorbed_into: infra-githooks
 ---
 
 ## 依赖

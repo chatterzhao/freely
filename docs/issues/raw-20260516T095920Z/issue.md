@@ -20,7 +20,7 @@ author: platform
 channel: github
 session_refs: []
 platform_state: closed
-absorbed_into: infra/.githooks (gitignore for reference-transaction.debug)
+absorbed_into: infra-githooks
 ---
 
 ## raw-20260516T095920Z
