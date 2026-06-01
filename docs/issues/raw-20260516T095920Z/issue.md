@@ -1,8 +1,8 @@
 ---
 local_id: raw-20260516T095920Z
 kind: raw
+updated_at: '2026-06-01T12:11:59Z'
 phase_state: absorbed
-updated_at: '2026-06-01T03:10:50Z'
 closeout_note: fix directly merged to develop via fix/raw-20260512T0915Z-worker-blocked-reason
   without I-* lifecycle chain
 platform_ids:
