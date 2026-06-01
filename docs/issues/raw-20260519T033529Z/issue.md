@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260519T033529Z
 kind: raw
-phase_state: dropped
+phase_state: absorbed
 platform_ids:
   github:
     issue_id: '612'
@@ -12,12 +12,13 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-19T03:35:43Z'
-updated_at: '2026-05-31T00:37:14Z'
+updated_at: '2026-06-01T03:09:30Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
 platform_state: closed
+absorbed_into: infra-githooks
 ---
 
 ## raw-20260519T033529Z
