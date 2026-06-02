@@ -278,6 +278,87 @@ class ACPClient:
         self.transport.close()
 
 
+
+
+# ── Delta extraction ------------------------------------------------------------------
+
+
+# Section headers whose content is STATIC (agent def, governance, delegation
+# workflow, fleet inventory, etc.) and should NOT be re-sent on subsequent
+# turns in an existing ACP session -- the model already has them in context.
+_STATIC_SECTION_PREFIXES = (
+    "=== Agent 角色定义 ===",
+    "## Worker Delegation",
+    "## Fleet Inventory",
+    "## Fleet Snapshot",
+    "## Continuity Guard",
+    "## Managed Surfaces",
+    "## Current Worktree Inventory",
+    "## Stale Runtime Refs",
+    "## Summary Target Hint",
+    "## Use",
+    "## Repair Contract",
+    "## Manager Bootstrap Recovery",
+    "## 工位可写性",
+)
+
+# Section headers whose content is DYNAMIC (changes between turns).
+# These are the sections we MUST include in the delta.
+_DYNAMIC_SECTION_PREFIXES = (
+    "=== 本轮 delta",
+    "## Handoff 上下文",
+    "### Worker 汇报",
+    "### Worker 异常",
+    "### 近期 Worker",
+)
+
+
+def extract_delta(text):
+    '''Strip static sections from a prompt file.
+
+    The ACP server already has the full system prompt, agent definition,
+    governance rules and delegation workflow in its session context from
+    the first turn.  On subsequent turns we MUST only send content that
+    changes between turns - worker reports, scan data, turn instructions.
+
+    Uses a simple line-oriented state machine keyed off ``## `` / ``=== ``
+    section headers.  Unknown sections are PRESERVED (safe default).
+    '''
+    if "## " not in text and "=== " not in text:
+        return text  # no section markers - assume already a delta
+
+    out_lines = []
+    in_static = False
+
+    for line in text.split("\n"):
+        stripped = line.strip()
+
+        # Section header detection
+        if stripped.startswith("## ") or stripped.startswith("=== "):
+            is_static = any(stripped.startswith(p) for p in _STATIC_SECTION_PREFIXES)
+            is_dynamic = any(stripped.startswith(p) for p in _DYNAMIC_SECTION_PREFIXES)
+
+            if is_dynamic:
+                in_static = False
+            elif is_static:
+                in_static = True
+            else:
+                in_static = False
+
+        if not in_static:
+            out_lines.append(line)
+
+    result = "\n".join(out_lines)
+
+    while result.endswith("\n\n"):
+        result = result[:-1]
+
+    if result.strip():
+        return result
+    return text
+
+
+
 # ── CLI ─────────────────────────────────────────────────────────────
 
 def parse_args():
@@ -297,6 +378,10 @@ def parse_args():
                         help="Loop mode: after prompt completes, check --next-prompt-file for the next prompt. Delete after reading. 'EXIT' in file stops the loop.")
     parser.add_argument("--next-prompt-file", default="",
                         help="Path to file that contains the next prompt file path (loop mode)")
+    parser.add_argument("--delta", action="store_true",
+                        help="Delta mode: strip static sections (agent def, governance) from prompt text. "
+                             "Use on subsequent prompts in an existing ACP session to avoid re-sending "
+                             "content the server already has in context.")
     return parser.parse_args()
 
 
@@ -448,7 +533,13 @@ def main():
                 )
 
         # ── Prompt loop (one-shot or loop mode) ────────────────────
-        def send_prompt(prompt_text, t_start, t_session, launch_kind):
+        def send_prompt(prompt_text, t_start, t_session, launch_kind, use_delta=False):
+            if use_delta:
+                orig_len = len(prompt_text)
+                prompt_text = extract_delta(prompt_text)
+                if len(prompt_text) != orig_len:
+                    print(f"[DELTA] stripped {orig_len - len(prompt_text)} bytes of static sections "
+                          f"(original={orig_len}b -> delta={len(prompt_text)}b)", flush=True)
             t_before = time.time()
             prompt_timeout = int(os.environ.get("ACP_PROMPT_TIMEOUT", "3600"))
             prompt_result = client.request(
@@ -504,7 +595,8 @@ def main():
             return stop_reason
 
         try:
-            stop_reason = send_prompt(prompt_text, t_start, t_session, launch_kind)
+            stop_reason = send_prompt(prompt_text, t_start, t_session, launch_kind,
+                                      use_delta=(launch_kind == "prompt" or args.delta))
         except Exception as prompt_exc:
             # session/prompt failed — session may have been lost (bridge restart).
             # Fall back to session/new and retry once.
@@ -518,7 +610,8 @@ def main():
             print(f"session id: {session_id} (fresh after prompt failure)", flush=True)         # line 2: human log
             t_session = time.time()
             launch_kind = "fresh"
-            stop_reason = send_prompt(prompt_text, t_start, t_session, launch_kind)
+            stop_reason = send_prompt(prompt_text, t_start, t_session, launch_kind,
+                                      use_delta=False)
 
         # Loop mode: keep session alive, wait for next prompt via control file
         if args.loop and args.next_prompt_file:
@@ -541,7 +634,8 @@ def main():
                     except Exception as e:
                         print(f"[WARN] cannot read next prompt file: {line} ({e})", flush=True)
                         continue
-                    stop_reason = send_prompt(next_text, t_start, t_session, launch_kind)
+                    stop_reason = send_prompt(next_text, t_start, t_session, launch_kind,
+                                              use_delta=True)
                     t_start = time.time()
                 else:
                     time.sleep(0.5)  # poll interval
