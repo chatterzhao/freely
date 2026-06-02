@@ -359,12 +359,27 @@ def main():
                 print(f"session id: {session_id} (fresh after resume failure)", flush=True) # line 2: human log
 
         elif launch_kind == "prompt" and resume_target:
-            # Multi-turn within same session: session already exists from fresh/resume.
-            # If session was lost (bridge restart), send_prompt() will fall back to session/new.
-            session_id = resume_target
-            print(f"session id: {session_id} (prompt)", flush=True)         # line 2: human log
-            # session_result for prompt-mode multi-turn
-            session_result = {"sessionId": session_id}
+            # Multi-turn within same session: verify session is still reachable.
+            # After bridge restart, the ACP server loses all in-memory sessions.
+            # session/prompt with an unknown session ID hangs until idle timeout (900s).
+            # Fast-fail with session/resume (10s timeout) to detect dead sessions.
+            try:
+                session_result = client.request(
+                    "session/resume",
+                    {"sessionId": resume_target, "cwd": cwd, "mcpServers": []},
+                    timeout=10,
+                )
+                session_id = session_result["sessionId"]
+                print(f"session id: {session_id} (prompt)", flush=True)
+            except Exception:
+                print(f"[WARN] session {resume_target} lost (bridge restart?), falling back to session/new", flush=True)
+                new_params = {"cwd": cwd, "mcpServers": []}
+                if args.session_id:
+                    new_params["sessionId"] = args.session_id
+                session_result = client.request("session/new", new_params, timeout=30)
+                session_id = session_result["sessionId"]
+                print(session_id, flush=True)
+                print(f"session id: {session_id} (fresh after prompt resume failure)", flush=True)
 
         elif launch_kind == "fork":
             # Worker forks from parent: gets own session, inherits context via prompt.
