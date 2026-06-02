@@ -93,8 +93,17 @@ _tool_test_resurrect() {
   local tool="$1"
   local test_cmd; test_cmd="$(_tool_registry_get "$tool" "test_command" 2>/dev/null || true)"
   [[ -n "$test_cmd" ]] || return 1
-  # Run test command, 15s timeout
-  if perl -e 'alarm 30; exec @ARGV' -- bash -c "$test_cmd" >/dev/null 2>&1; then
+  # Run test command with 30s timeout.  Cross-platform:
+  # - Linux: timeout(1) from coreutils
+  # - macOS: perl alarm (timeout not available by default)
+  # - Windows Git Bash: timeout(1) usually available
+  local _timeout_ok=0
+  if timeout 30 bash -c "$test_cmd" >/dev/null 2>&1; then
+    _timeout_ok=1
+  elif perl -e 'alarm 30; exec @ARGV' -- bash -c "$test_cmd" >/dev/null 2>&1; then
+    _timeout_ok=1
+  fi
+  if [[ "$_timeout_ok" == "1" ]]; then
     _tool_failure_clear "$tool" ""
     return 0
   fi
@@ -8775,7 +8784,7 @@ latest_cycle_log_for_project() {
 file_mtime_epoch() {
   local path="$1"
   [[ -f "$path" ]] || return 1
-  stat -f '%m' "$path" 2>/dev/null || return 1
+  stat -f '%m' "$path" 2>/dev/null || stat -c '%Y' "$path" 2>/dev/null || return 1
 }
 
 timestamp_epoch_or_zero() {
@@ -15341,12 +15350,208 @@ $fleet_snapshot
 EOF
   fi
 
+  # ── Worker fleet status (active workers + scan dedup) ──
+  _append_worker_fleet_status_if_needed
+
   cat <<EOF
 主管模式要求：
 - 若当前轮次承担项目级监督职责，先基于工位快照安排继续开发、冻结、验证、合并和清理顺序。
 - 可并行且互不阻塞的任务，使用 subagent 提高效率。
 - 若工位视图缺少准确 issue/phase，不要伪造；先把该工位视为需要进一步核对的监督对象。
 EOF
+}
+
+_append_worker_fleet_status_if_needed() {
+  local scan_json_path wt_paths
+  scan_json_path="$(task_source_scan_json_path_for_project "$PROJECT_ROOT")"
+  # Collect active worker worktree paths (exclude develop/main/test-pre-merge)
+  wt_paths="$(worker_worktree_paths_for_manager_project "$PROJECT_ROOT" 2>/dev/null || true)"
+  [[ -n "$wt_paths" ]] || return 0
+
+  python3 - "$PROJECT_ROOT" "$scan_json_path" <<'PYEOF'
+import json, os, sys
+from pathlib import Path
+
+project = sys.argv[1]
+scan_path = sys.argv[2]
+
+# Read scan data
+scan_items = []
+scan_families = set()
+if os.path.exists(scan_path):
+    try:
+        with open(scan_path) as f:
+            scan_data = json.load(f)
+        for it in scan_data.get("items", []):
+            sf = it.get("source_family", "")
+            stage = it.get("stage", "")
+            scan_items.append(it)
+            scan_families.add(f"{sf}:{stage}")
+    except Exception:
+        pass
+
+# Find worker worktrees
+run_dir = os.path.join(project, ".freely", "run")
+wt_list = []
+seen = set()
+for entry in os.scandir(os.path.join(project, "..")):
+    if not entry.is_dir():
+        continue
+    wt_path = entry.path
+    if "-worktrees/" not in wt_path and f"{os.path.basename(project)}-worktrees" not in os.path.dirname(wt_path):
+        continue
+    branch_file = os.path.join(wt_path, ".git")
+    if not os.path.exists(branch_file):
+        continue
+    # Skip main project and test-pre-merge
+    wt_name = os.path.basename(wt_path)
+    if "test-pre-merge" in wt_name:
+        continue
+    if wt_path == project:
+        continue
+    seen.add(wt_path)
+
+# Also try git worktree list
+import subprocess
+try:
+    r = subprocess.run(["git", "-C", project, "worktree", "list", "--porcelain"],
+                       capture_output=True, text=True, timeout=5)
+    cur_wt = ""; cur_br = ""
+    for line in r.stdout.splitlines():
+        if line.startswith("worktree "):
+            cur_wt = line[9:]
+            cur_br = ""
+        elif line.startswith("branch "):
+            cur_br = line.split("refs/heads/", 1)[-1] if "refs/heads/" in line else line[7:]
+        elif line == "":
+            if cur_wt and cur_wt != project and "test-pre-merge" not in os.path.basename(cur_wt):
+                seen.add(cur_wt)
+            cur_wt = ""; cur_br = ""
+    if cur_wt and cur_wt != project and "test-pre-merge" not in os.path.basename(cur_wt):
+        seen.add(cur_wt)
+except Exception:
+    pass
+
+# Analyze each worktree
+rows = []
+for wt_path in sorted(seen):
+    if not os.path.isdir(wt_path):
+        continue
+    wt_name = os.path.basename(wt_path)
+    # Read branch
+    branch = "unknown"
+    try:
+        r = subprocess.run(["git", "-C", wt_path, "branch", "--show-current"],
+                           capture_output=True, text=True, timeout=5)
+        branch = r.stdout.strip()
+    except Exception:
+        pass
+
+    # Read workcell state
+    status = "unknown"
+    exit_reason = ""
+    state_file = os.path.join(wt_path, ".freely", "run", "workcell-state.env")
+    if os.path.exists(state_file):
+        try:
+            with open(state_file) as f:
+                for line in f:
+                    if line.startswith("DESIRED_RUNTIME_STATE="):
+                        status = line.split("=", 1)[1].strip().strip('"')
+                    elif line.startswith("LAST_EXIT_REASON="):
+                        exit_reason = line.split("=", 1)[1].strip().strip('"')
+        except Exception:
+            pass
+    if status == "unknown":
+        # Check if daemon appears to be running
+        ai_pid_file = os.path.join(wt_path, ".freely", "run", "ai.pid")
+        if os.path.exists(ai_pid_file):
+            status = "waiting"
+
+    # Read worker prompt (find the latest one)
+    intent_kind = ""
+    rationale = ""
+    intent_target = ""
+    prompt_dir = os.path.join(wt_path, ".freely", "run", "worker-prompts")
+    if not os.path.isdir(prompt_dir):
+        prompt_dir = os.path.join(project, ".freely", "run", "worker-prompts")
+    if os.path.isdir(prompt_dir):
+        # Find prompt files associated with this worktree
+        for pf in sorted(os.listdir(prompt_dir), reverse=True):
+            pf_path = os.path.join(prompt_dir, pf)
+            if not os.path.isfile(pf_path):
+                continue
+            try:
+                with open(pf_path) as f:
+                    content = f.read(4096)
+                if wt_path in content or wt_name.replace("fix-raw-", "").replace("feature-raw-", "")[:15] in pf:
+                    for line in content.splitlines():
+                        line = line.strip()
+                        if line.startswith("intent_kind:"):
+                            intent_kind = line.split(":", 1)[1].strip()
+                        elif line.startswith("rationale:"):
+                            rationale = line.split(":", 1)[1].strip().strip('"')
+                        elif line.startswith("intent_target:"):
+                            intent_target = line.split(":", 1)[1].strip().strip('"')
+                    break
+            except Exception:
+                pass
+
+    # Match against scan items by source_family
+    matched_scan = ""
+    for it in scan_items:
+        sf = it.get("source_family", "")
+        stage = it.get("stage", "")
+        if intent_kind == "sync" and sf == "platform_sync":
+            matched_scan = f"platform_sync_batch (scan key={it.get('key','')[:30]})"
+            break
+        if intent_kind == "cleanup" and sf == "remote_branch_governance":
+            matched_scan = f"fleet_cleanup ({sf})"
+            break
+
+    rows.append({
+        "worktree": wt_name,
+        "branch": branch,
+        "status": status,
+        "exit_reason": exit_reason[:60] if exit_reason else "",
+        "intent": intent_kind or "unknown",
+        "target": intent_target[:40] if intent_target else (rationale[:40] if rationale else ""),
+        "scan_match": matched_scan,
+    })
+
+if not rows:
+    sys.exit(0)
+
+# Output structured table
+print()
+print("## Worker Fleet Status (Active Workers)")
+print()
+print("| Worktree | Branch | Intent | Status | Task / Scan Match |")
+print("|----------|--------|--------|--------|-------------------|")
+for r in rows:
+    status_icon = {"running": "▶", "waiting": "⏳", "stopped": "✓", "unknown": "?"}.get(r["status"], "?")
+    print(f"| {r['worktree'][:40]} | {r['branch'][:25]} | {r['intent']} | {status_icon} {r['status']} | {r['scan_match'] or r['target'] or '-'} |")
+
+# Summarize stale/zombie workers
+stale = [r for r in rows if r["status"] in ("stopped", "waiting")]
+completed = [r for r in rows if r["status"] == "stopped"]
+if completed:
+    print()
+    print("### Completed / Zombie Workers (needs cleanup)")
+    for r in completed:
+        print(f"- `{r['worktree']}`: exit={r['exit_reason'] or 'unknown'} → consider \\`wt-close --force {r['branch']}\\`")
+
+# Scan dedup hint
+scan_covered = set()
+for r in rows:
+    if r["scan_match"]:
+        scan_covered.add("platform_sync_batch" if "platform_sync" in r["scan_match"] else r["intent"])
+if scan_covered:
+    print()
+    print("### Scan Dedup: Active Workers vs Current Scan")
+    for sc in sorted(scan_covered):
+        active_count = sum(1 for r in rows if sc in r.get("scan_match", "") or r["intent"] == sc)
+        print(f"- `{sc}`: {active_count} active/pending worker(s) → check if new scan item is the same task before delegating")
+PYEOF
 }
 
 append_human_chat_intake_if_needed() {
@@ -17496,7 +17701,7 @@ ensure_manager_once() {
   if [[ -n "$current_pid" ]] && kill -0 "$current_pid" 2>/dev/null; then
     _hb_stale=0
     if [[ -f "$_hb_file" ]]; then
-      _hb_epoch=$(stat -f %m "$_hb_file" 2>/dev/null || echo 0)
+      _hb_epoch=$(file_mtime_epoch "$_hb_file" 2>/dev/null || echo 0)
       _hb_now=$(date +%s)
       if (( _hb_now - _hb_epoch > _hb_timeout )); then
         _hb_stale=1
@@ -17505,7 +17710,7 @@ ensure_manager_once() {
       # No heartbeat file yet — supervisor may be starting.  Give it a
       # short grace (15s) for the first heartbeat to appear.
       local _sup_start_epoch
-      _sup_start_epoch=$(stat -f %m "$sup_pid_file" 2>/dev/null || echo 0)
+      _sup_start_epoch=$(file_mtime_epoch "$sup_pid_file" 2>/dev/null || echo 0)
       _hb_now=$(date +%s)
       if (( _hb_now - _sup_start_epoch > 15 )); then
         _hb_stale=1

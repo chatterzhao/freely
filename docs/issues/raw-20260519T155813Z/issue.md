@@ -1,7 +1,8 @@
 ---
 local_id: raw-20260519T155813Z
 kind: raw
-phase_state: dropped
+phase_state: absorbed
+absorbed_into: I-governance-cleanup-20260601
 platform_ids:
   github:
     issue_id: '659'

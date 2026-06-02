@@ -2,7 +2,8 @@
 kind: raw
 local_id: raw-20260516T094405Z
 priority: P2
-phase_state: dropped
+phase_state: absorbed
+absorbed_into: I-governance-cleanup-20260601
 source: chat-inbox
 created_at: '2026-05-16T09:44:05Z'
 title: delegate_workers 被 exclusive_fields_conflict 拒绝：reason 字段被误当作 stop_reason
