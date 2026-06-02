@@ -360,9 +360,11 @@ main() {
   local session_id_clean session_id_out stop_reason
   session_id_clean=$(grep -oE '[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}' "$log_file" 2>/dev/null | head -1 || true)
   session_id_out=$(sed -n 's/^session id: //p' "$log_file" | head -n 1 || true)
-  # Fallback: if UUID pattern did not match (e.g. opencode ses_ format), use session_id_out
+  # Fallback: if UUID pattern did not match (e.g. opencode ses_ format), use session_id_out.
+  # Strip trailing annotations like " (prompt)", " (resumed)", " (fresh after...)"
+  # that are log decoration from run-acp-prompt.py, not part of the real session ID.
   if [[ -z "$session_id_clean" && -n "$session_id_out" ]]; then
-    session_id_clean="$session_id_out"
+    session_id_clean="${session_id_out%% *}"
   fi
 
   # If session/prompt fell back to session/new, the first bare UUID in the log
