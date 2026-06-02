@@ -460,6 +460,30 @@ def main():
             print(cache_msg, flush=True)
             print(cache_msg, flush=True)  # also to stdout (cycle log) for easy inspection
 
+            # Track context fill ratio from session/prompt response usage data.
+            context_window = usage.get("model_context_window") or 0
+            if context_window <= 0:
+                models_state = prompt_result.get("models") or {}
+                available = models_state.get("availableModels") or []
+                if available and isinstance(available, list) and len(available) > 0:
+                    context_window = (available[0].get("contextWindow")
+                                      or available[0].get("model_context_window")
+                                      or 0)
+            ratio_str = ""
+            if total_tokens > 0 and context_window > 0:
+                ratio = total_tokens / context_window
+                ratio_str = f"{ratio:.4f}"
+                cwd_path = cwd if cwd and os.path.isdir(cwd) else None
+                if cwd_path:
+                    ratio_file = os.path.join(cwd_path, ".freely", "run", "bridge-context-ratio.txt")
+                    try:
+                        os.makedirs(os.path.dirname(ratio_file), exist_ok=True)
+                        with open(ratio_file, "w") as f:
+                            f.write(ratio_str + "\n")
+                    except OSError:
+                        pass
+                print(f"[CONTEXT] session_id={session_id} context_ratio={ratio_str} total_tokens={total_tokens} context_window={context_window}", flush=True)
+
             if stop_reason != "end_turn":
                 print(f"[WARN] ACP prompt finished with stopReason={stop_reason}", flush=True)
             return stop_reason

@@ -52,6 +52,11 @@ def _log_file(project):
     return os.path.join(_runtime_dir(project), "acp-bridge.log")
 
 
+def _context_ratio_file(project):
+    """Path to file where bridge writes the latest context fill ratio."""
+    return os.path.join(_runtime_dir(project), "bridge-context-ratio.txt")
+
+
 def _truncate_log(log_file):
     """Truncate bridge log so stale errors from prior runs don't pollute detection."""
     try:
@@ -97,7 +102,7 @@ class AcpBridge:
         self.log_file = log_file or _log_file(project)
         self.server_proc = None
         self.server_lock = threading.Lock()
-        self.pending = {}  # request_id -> threading.Event + response
+        self.pending = {}  # request_id -> {"event": Event, "response": dict, "method": str}
         self.request_counter = 0
         self.running = False
         self.socket_path = _socket_path(project)
@@ -207,8 +212,8 @@ class AcpBridge:
         self.server_ready.clear()
         # Clear stale pending requests
         with self.server_lock:
-            for req_id, (event, _container) in list(self.pending.items()):
-                event.set(); del self.pending[req_id]
+            for req_id, slot in list(self.pending.items()):
+                slot["event"].set(); del self.pending[req_id]
         # Restart
         env = os.environ.copy()
         self.server_proc = self._popen_with_pty(env)
@@ -256,8 +261,8 @@ class AcpBridge:
         _truncate_log(self.log_file)
         # Clear pending requests — their callers will get TimeoutError
         with self.server_lock:
-            for req_id, (event, _container) in list(self.pending.items()):
-                event.set()
+            for req_id, slot in list(self.pending.items()):
+                slot["event"].set()
                 del self.pending[req_id]
         # Start new process (no initialize yet — lazy, done on first request)
         env = os.environ.copy()
@@ -313,9 +318,15 @@ class AcpBridge:
     def _dispatch(self, msg):
         msg_id = msg.get("id")
         if msg_id is not None and msg_id in self.pending:
-            event, container = self.pending[msg_id]
-            container["response"] = msg
-            event.set()
+            slot = self.pending[msg_id]
+            slot["response"] = msg
+            slot["event"].set()
+            # Track context fill ratio from session/prompt responses.
+            # The response contains usage data with total_tokens and
+            # context window info. Write ratio to a marker file for
+            # the freely supervisor to consume.
+            if slot.get("method") == "session/prompt":
+                self._track_context_ratio(msg.get("result", {}))
         elif "method" in msg:
             # Server→client request/notification (e.g. session/request_permission).
             # Broadcast to ALL connected clients so they can respond.
@@ -323,6 +334,35 @@ class AcpBridge:
         elif msg_id is not None:
             # Response for unknown request — log for debugging
             self.log(f"response for unknown id: {msg_id}, result={str(msg.get('result',''))[:100]}")
+
+    def _track_context_ratio(self, result):
+        """Extract usage stats from session/prompt result and write to marker file."""
+        usage = result.get("usage") or {}
+        # Supports both Anthropic and DeepSeek cache field names
+        total_tokens = usage.get("total_tokens") or 0
+        if total_tokens <= 0:
+            return
+        # Context window: try model_context_window from usage, fall back to estimate
+        context_window = usage.get("model_context_window") or 0
+        if context_window <= 0:
+            # If the result includes models info, try to locate it
+            models = result.get("models") or {}
+            available = models.get("availableModels") or []
+            if available and isinstance(available, list) and len(available) > 0:
+                context_window = (available[0].get("contextWindow")
+                                  or available[0].get("model_context_window")
+                                  or 0)
+        if context_window <= 0:
+            return
+        ratio = total_tokens / context_window
+        try:
+            ratio_path = _context_ratio_file(self.project)
+            os.makedirs(os.path.dirname(ratio_path), exist_ok=True)
+            with open(ratio_path, "w") as f:
+                f.write(f"{ratio:.4f}\n")
+            self.log(f"context_ratio={ratio:.4f} ({total_tokens}/{context_window})")
+        except OSError as e:
+            self.log(f"failed to write context ratio: {e}")
 
     def _send_request(self, method, params, timeout=BRIDGE_TIMEOUT):
         """Send JSON-RPC request to server and wait for response.
@@ -337,7 +377,7 @@ class AcpBridge:
             req_id = self.request_counter
             event = threading.Event()
             container = {}
-            self.pending[req_id] = (event, container)
+            self.pending[req_id] = {"event": event, "response": container, "method": method}
 
             request = {
                 "jsonrpc": "2.0",
@@ -387,9 +427,9 @@ class AcpBridge:
                     self.pending.pop(req_id, None)
                 raise TimeoutError(f"timeout waiting for {method}")
 
-        response = container.get("response", {})
         with self.server_lock:
-            self.pending.pop(req_id, None)
+            slot = self.pending.pop(req_id, {"response": {}})
+        response = slot.get("response", {})
 
         if "error" in response:
             err = response["error"]

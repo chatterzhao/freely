@@ -3873,8 +3873,8 @@ MAX_RESUME_STREAK=24
 MAX_ROUTE_ONLY_STREAK=1
 ROTATE_ON_CONTEXT_COMPACTED=1
 SESSION_HANDOFF_TAIL_LINES=80
-CONTEXT_WARN_RATIO=0.50
-CONTEXT_ROTATE_RATIO=0.70
+CONTEXT_WARN_RATIO=0.70
+CONTEXT_ROTATE_RATIO=0.85
 CHECKPOINT_WARN_DIRTY_ENTRIES=40
 CHECKPOINT_BLOCK_DIRTY_ENTRIES=120
 CHECKPOINT_DRIFT_STREAK_THRESHOLD=2
@@ -15163,18 +15163,100 @@ append_context_warning_if_needed() {
   if [[ "${LAUNCH_KIND_SELECTED:-}" != "resume" ]]; then
     return 0
   fi
-  if ! ratio_meets_threshold "${LAST_CONTEXT_RATIO:-}" "${CONTEXT_WARN_RATIO:-0.50}"; then
+  if ! ratio_meets_threshold "${LAST_CONTEXT_RATIO:-}" "${CONTEXT_WARN_RATIO:-0.70}"; then
     return 0
   fi
+  local _pct
+  _pct="$(awk -v r="${LAST_CONTEXT_RATIO:-0}" 'BEGIN { printf "%.0f", r * 100 }' 2>/dev/null || echo "unknown")"
   cat <<EOF
 
-上下文容量预警：
-- 上一轮 Codex context ratio: ${LAST_CONTEXT_RATIO}
-- 本地 warn 阈值: ${CONTEXT_WARN_RATIO:-0.50}
-- 在继续当前 issue 前，先更新当前阶段对应的 continuity artifact，再继续推进。
+Context Capacity Warning:
+- Codex context ratio: ${LAST_CONTEXT_RATIO} (${_pct}%)
+- Warn threshold: ${CONTEXT_WARN_RATIO:-0.70}
+- Rotate threshold: ${CONTEXT_ROTATE_RATIO:-0.85}
+
+Your session context is approaching the rotation limit. Before the next rotation,
+prepare a structured handoff summary. The handoff MUST include these sections:
+
+## Goal
+What was the objective of this session?
+
+## Current State
+What has been accomplished so far? What is the state of each active work item?
+
+## Open Blockers
+What is blocking progress? Include error messages, stalled tool calls, or missing dependencies.
+
+## Recent Decisions
+What architectural, governance, or sequencing decisions were made?
+
+## Files-of-Interest
+Which files were modified or are relevant for continued work?
+
+## Recovery Hints
+What should the next session do first? Include exact commands, file paths, or queries.
+
+Output this as a \`\`\`handoff JSON block at the end of your reply.
 
 $(context_summary_target_hint "$PROJECT_ROOT")
 EOF
+}
+
+# Guard against recursive build_prompt → build_handoff_only_prompt → build_prompt loop
+_BUILD_HANDOFF_ONLY_GUARD=0
+
+build_handoff_only_prompt() {
+	local project="$1"
+	local handoff_path
+	handoff_path="$(handoff_file "$project")"
+	if [[ ! -f "$handoff_path" ]]; then
+		if [[ "$_BUILD_HANDOFF_ONLY_GUARD" -eq 1 ]]; then
+			log_warn "handoff-only prompt: no handoff file found AND recursive guard active; building minimal delta prompt"
+			cat <<PROMPT_FALLBACK
+# Context Rotation (No Handoff File)
+
+The previous session reached high context capacity but no structured handoff
+file was found. Continue based on your training knowledge and the workspace
+state visible to you.
+
+$(context_summary_target_hint "$project")
+PROMPT_FALLBACK
+			return 0
+		fi
+		log_warn "handoff-only prompt requested but no handoff file found at $handoff_path; falling back to full prompt"
+		_BUILD_HANDOFF_ONLY_GUARD=1
+		build_prompt
+		return 0
+	fi
+	local _pct
+	_pct="$(awk -v r="${LAST_CONTEXT_RATIO:-0}" 'BEGIN { printf "%.0f", r * 100 }' 2>/dev/null || echo "unknown")"
+	cat <<PROMPT_HANDOFF_ONLY
+# Context Rotation Handover
+
+This is a CLEAN session created after a context-rotation trigger.
+The OLD session reached ${_pct}% context capacity.
+
+The ONLY context available is the handoff below. DO NOT assume any prior
+session state, tool output, or conversation history exists.
+
+Read the handoff carefully and continue from where it left off.
+
+PROMPT_HANDOFF_ONLY
+
+	cat "$handoff_path"
+
+	cat <<PROMPT_HANDOFF_ONLY_TAIL
+
+## Continuation Instructions
+
+1. First verify the current state of the workspace (git status, worktree state).
+2. Pick up from the Recovery Hints in the handoff above.
+3. If the handoff mentions continuation artifacts, read them for additional context.
+4. Output a \`\`\`handoff JSON block at the end of your reply so runtime can
+   persist your continuation state for the next rotation.
+
+$(context_summary_target_hint "$project")
+PROMPT_HANDOFF_ONLY_TAIL
 }
 
 append_checkpoint_governance_if_needed() {
@@ -18353,6 +18435,14 @@ PROMPT_DELTA
     append_worker_exit_contract_directive_if_needed "$PROJECT_ROOT"
     return 0
   fi
+  # Handoff-only mode: context exceeded rotation threshold.
+  # Build a minimal prompt with ONLY the handoff content (few KB) instead of
+  # the full 68KB system prompt. The new session starts clean with just enough
+  # context to continue.
+  if [[ "${LAUNCH_KIND_SELECTED:-}" == "fresh_with_handoff" && "${LAUNCH_ROTATION_REASON:-}" == "context_usage_threshold" ]]; then
+    build_handoff_only_prompt "$PROJECT_ROOT"
+    return 0
+  fi
   workspace_root="$(workspace_root_for_project "$PROJECT_ROOT")"
   # Inject agent role definition at prompt start.
   # Fresh/fork: full definition. Prompt (multi-turn): session remembers, skip.
@@ -20325,6 +20415,15 @@ print(ready)
       primary_rate_limit_resets_at="$(runtime_capture_or_empty extract_latest_codex_primary_rate_limit_reset_at_from_jsonl "$tool_jsonl_path")"
       secondary_rate_limit_used_percent="$(runtime_capture_or_empty extract_latest_codex_secondary_rate_limit_used_percent_from_jsonl "$tool_jsonl_path")"
       secondary_rate_limit_resets_at="$(runtime_capture_or_empty extract_latest_codex_secondary_rate_limit_reset_at_from_jsonl "$tool_jsonl_path")"
+    fi
+    # Fallback: for non-Codex ACP tools (e.g. claude-agent-acp), read
+    # context ratio from the bridge's marker file. The bridge writes this
+    # after each session/prompt response that contains usage data.
+    if [[ -z "${context_ratio:-}" ]]; then
+      local _bridge_ratio_file="$PROJECT_ROOT/.freely/run/bridge-context-ratio.txt"
+      if [[ -f "$_bridge_ratio_file" ]]; then
+        context_ratio="$(cat "$_bridge_ratio_file" 2>/dev/null || true)"
+      fi
     fi
     active_slot="$(runtime_capture_or_empty runtime_read_tool_current_slot "$PROJECT_ROOT" "$AI_TOOL")"
     if [[ "$AI_TOOL" == "codex" || "$AI_TOOL" == codex-* ]]; then
