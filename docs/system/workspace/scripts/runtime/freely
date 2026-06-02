@@ -15670,6 +15670,7 @@ task_source_scan_regeneration_reason_for_project() {
   local project="$1"
   local scan_mtime latest_intake_mtime latest_continuity_mtime
   local continuity_file active_running_workers state_path current_head anchored_head
+  local prev_active_workers stale_minutes scan_age_minutes
 
   scan_mtime="$(latest_task_source_scan_json_mtime_for_project "$project" 2>/dev/null || true)"
   if [[ -z "$scan_mtime" ]]; then
@@ -15679,18 +15680,34 @@ task_source_scan_regeneration_reason_for_project() {
 
   active_running_workers="$(manager_semantic_loop_active_worker_count_for_project "$project" 2>/dev/null || true)"
   [[ "$active_running_workers" =~ ^[0-9]+$ ]] || active_running_workers="0"
-  if (( active_running_workers > 0 )); then
-    return 1
-  fi
 
   state_path="$(task_source_scan_state_file_for_project "$project")"
-  current_head="$(task_source_scan_current_project_head_for_project "$project")"
-  anchored_head=""
+  prev_active_workers="0"
   if [[ -f "$state_path" ]]; then
     # shellcheck disable=SC1090
     source "$state_path"
+    prev_active_workers="${LAST_TASK_SOURCE_SCAN_ACTIVE_WORKERS:-0}"
     anchored_head="${LAST_TASK_SOURCE_SCAN_PROJECT_HEAD:-}"
+    [[ "$prev_active_workers" =~ ^[0-9]+$ ]] || prev_active_workers="0"
   fi
+
+  # If workers are still running, block regeneration (avoid mid-flight churn).
+  # But persist the current count so we can detect completion next cycle.
+  if (( active_running_workers > 0 )); then
+    if (( active_running_workers != prev_active_workers )); then
+      _update_task_source_scan_state_active_workers "$project" "$active_running_workers"
+    fi
+    return 1
+  fi
+
+  # Worker-completion trigger: workers just finished (was >0, now 0).
+  if (( prev_active_workers > 0 && active_running_workers == 0 )); then
+    _update_task_source_scan_state_active_workers "$project" "0"
+    printf 'workers_completed_since_last_scan\n'
+    return 0
+  fi
+
+  current_head="$(task_source_scan_current_project_head_for_project "$project")"
   if [[ -n "$current_head" && -n "$anchored_head" && "$current_head" != "$anchored_head" ]]; then
     printf 'project_head_changed_since_last_scan\n'
     return 0
@@ -15711,7 +15728,26 @@ task_source_scan_regeneration_reason_for_project() {
     fi
   fi
 
+  # Time-based staleness: if scan is older than SCAN_MAX_STALE_MINUTES, force refresh.
+  # This catches cases where no external trigger fired but the scan data is stale.
+  stale_minutes="${SCAN_MAX_STALE_MINUTES:-15}"
+  scan_age_minutes=$(( ($(date +%s) - scan_mtime) / 60 ))
+  if (( scan_age_minutes >= stale_minutes )); then
+    printf 'scan_stale_age_%d_minutes\n' "$scan_age_minutes"
+    return 0
+  fi
+
   return 1
+}
+
+_update_task_source_scan_state_active_workers() {
+  local project="$1" count="$2"
+  local state_path
+  state_path="$(task_source_scan_state_file_for_project "$project")"
+  if [[ -f "$state_path" ]]; then
+    sed -i '' -E '/^LAST_TASK_SOURCE_SCAN_ACTIVE_WORKERS=/d' "$state_path" 2>/dev/null || true
+  fi
+  printf 'LAST_TASK_SOURCE_SCAN_ACTIVE_WORKERS=%s\n' "$count" >>"$state_path"
 }
 
 # ── PR scanning via configured repo platforms ─────────────────────
