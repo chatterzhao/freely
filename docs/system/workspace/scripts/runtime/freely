@@ -93,8 +93,17 @@ _tool_test_resurrect() {
   local tool="$1"
   local test_cmd; test_cmd="$(_tool_registry_get "$tool" "test_command" 2>/dev/null || true)"
   [[ -n "$test_cmd" ]] || return 1
-  # Run test command, 15s timeout
-  if perl -e 'alarm 30; exec @ARGV' -- bash -c "$test_cmd" >/dev/null 2>&1; then
+  # Run test command with 30s timeout.  Cross-platform:
+  # - Linux: timeout(1) from coreutils
+  # - macOS: perl alarm (timeout not available by default)
+  # - Windows Git Bash: timeout(1) usually available
+  local _timeout_ok=0
+  if timeout 30 bash -c "$test_cmd" >/dev/null 2>&1; then
+    _timeout_ok=1
+  elif perl -e 'alarm 30; exec @ARGV' -- bash -c "$test_cmd" >/dev/null 2>&1; then
+    _timeout_ok=1
+  fi
+  if [[ "$_timeout_ok" == "1" ]]; then
     _tool_failure_clear "$tool" ""
     return 0
   fi
@@ -8775,7 +8784,7 @@ latest_cycle_log_for_project() {
 file_mtime_epoch() {
   local path="$1"
   [[ -f "$path" ]] || return 1
-  stat -f '%m' "$path" 2>/dev/null || return 1
+  stat -f '%m' "$path" 2>/dev/null || stat -c '%Y' "$path" 2>/dev/null || return 1
 }
 
 timestamp_epoch_or_zero() {
@@ -17692,7 +17701,7 @@ ensure_manager_once() {
   if [[ -n "$current_pid" ]] && kill -0 "$current_pid" 2>/dev/null; then
     _hb_stale=0
     if [[ -f "$_hb_file" ]]; then
-      _hb_epoch=$(stat -f %m "$_hb_file" 2>/dev/null || echo 0)
+      _hb_epoch=$(file_mtime_epoch "$_hb_file" 2>/dev/null || echo 0)
       _hb_now=$(date +%s)
       if (( _hb_now - _hb_epoch > _hb_timeout )); then
         _hb_stale=1
@@ -17701,7 +17710,7 @@ ensure_manager_once() {
       # No heartbeat file yet — supervisor may be starting.  Give it a
       # short grace (15s) for the first heartbeat to appear.
       local _sup_start_epoch
-      _sup_start_epoch=$(stat -f %m "$sup_pid_file" 2>/dev/null || echo 0)
+      _sup_start_epoch=$(file_mtime_epoch "$sup_pid_file" 2>/dev/null || echo 0)
       _hb_now=$(date +%s)
       if (( _hb_now - _sup_start_epoch > 15 )); then
         _hb_stale=1
