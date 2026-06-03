@@ -13,12 +13,12 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-17T04:47:59Z'
-updated_at: '2026-06-03T05:25:29Z'
+updated_at: '2026-06-03T08:29:00Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
+platform_state: closed
 ---
 
 ## I-20260508T111130Z-A: reference-transaction hook delete fix
