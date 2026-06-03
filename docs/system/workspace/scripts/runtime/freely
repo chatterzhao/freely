@@ -12237,7 +12237,7 @@ SESSIONEOF
 
   local _manager_bridge_socket _worker_pid
   _manager_bridge_socket="$(_acp_bridge_socket "$manager_project")"
-  if [[ ! -S "$_manager_bridge_socket" || -n "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
+  if [[ ! -S "$_manager_bridge_socket" ]]; then
     log_warn "manager bridge socket not found; falling back to --agent mode (opencode)"
     local _worker_next_file
     _worker_next_file="$(run_dir_for_project "$target_project")/worker-next-prompt.txt"
@@ -18670,7 +18670,14 @@ build_prompt() {
 PROMPT_DELTA
     append_manager_handoff_context_if_needed "$PROJECT_ROOT"
     append_fleet_supervision_if_needed
-    append_task_source_patrol_seed_if_needed skip_if_active
+    # Only inject scan data when it was regenerated. The session
+    # stays alive across prompt cycles (session/close is skipped
+    # in prompt mode), so it remembers the scan from the fresh cycle.
+    local _delta_scan_reason
+    _delta_scan_reason="$(task_source_scan_regeneration_reason_for_project "$PROJECT_ROOT" 2>/dev/null || true)"
+    if [[ -n "$_delta_scan_reason" && "$_delta_scan_reason" != "reuse_existing_scan" ]]; then
+      append_task_source_patrol_seed_if_needed skip_if_active
+    fi
     append_manager_exit_contract_directive_if_needed "$PROJECT_ROOT"
     append_worker_exit_contract_directive_if_needed "$PROJECT_ROOT"
     return 0
