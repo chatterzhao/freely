@@ -548,11 +548,13 @@ def main():
     finally:
         if stop_reason == "end_turn" and not args.loop:
             time.sleep(2)  # grace period for bridge to finish sending notifications
-        if args.loop:
-            try:
-                client.request("session/close", {"sessionId": session_id}, timeout=10)
-            except Exception:
-                pass
+        # Close session to release Claude SDK subprocess. Without this,
+        # each cycle leaves an orphaned claude CLI process (~100-300MB)
+        # that accumulates and degrades all subsequent requests.
+        try:
+            client.request("session/close", {"sessionId": session_id}, timeout=10)
+        except Exception:
+            pass
         client.close()
 
 
