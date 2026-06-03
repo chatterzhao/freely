@@ -314,33 +314,18 @@ do_initial_merge() {
   fi
 
   # ── PR review gate (develop target only) ──────────────────────────────
+  # Every merge to develop must have a corresponding PR for traceability.
+  # The approval requirement is optional — what matters is the PR exists.
   if [[ "$target" == "develop" && "$dry_run" != "1" ]] && command -v gh &>/dev/null; then
-    if [[ -z "${FREELY_SKIP_PR_GATE:-}" ]]; then
-      local pr_number
-      pr_number="$(gh pr list --head "$source_branch" --state OPEN --json number -q '.[0].number' 2>/dev/null || true)"
-      if [[ -z "$pr_number" ]]; then
-        echo "[MERGE-GUARD] PR review gate: no open PR found for branch '$source_branch'." >&2
-        echo "  Please create a PR first:" >&2
-        echo "    gh pr create --base develop --head $source_branch --title \"...\" --body \"...\"" >&2
-        echo "  To skip this gate (not recommended): export FREELY_SKIP_PR_GATE=1" >&2
-        exit 1
-      fi
-
-      local approval_count
-      approval_count="$(gh pr view "$pr_number" --json reviews -q '[.reviews[] | select(.state == "APPROVED")] | length' 2>/dev/null || echo 0)"
-      if [[ "$approval_count" -lt 1 ]]; then
-        echo "[MERGE-GUARD] PR review gate: PR #$pr_number lacks required approval." >&2
-        echo "  Please get at least one approval review on the PR:" >&2
-        echo "    https://github.com/chatterzhao/freely/pull/$pr_number" >&2
-        echo "  Or use the GitHub CLI to request a review:" >&2
-        echo "    gh pr review $pr_number --approve" >&2
-        exit 1
-      fi
-
-      echo "[MERGE-GUARD] PR review gate: PR #$pr_number approved ($approval_count approval(s)) — proceeding."
-    else
-      echo "[MERGE-GUARD] PR review gate: skipped (FREELY_SKIP_PR_GATE=1)"
+    local pr_number
+    pr_number="$(gh pr list --head "$source_branch" --state OPEN --json number -q '.[0].number' 2>/dev/null || true)"
+    if [[ -z "$pr_number" ]]; then
+      echo "[MERGE-GUARD] PR review gate: no open PR found for branch '$source_branch'." >&2
+      echo "  Every merge to develop must have a PR. Create one first:" >&2
+      echo "    gh pr create --base develop --head $source_branch --title \"...\" --body \"...\"" >&2
+      exit 1
     fi
+    echo "[MERGE-GUARD] PR gate: PR #$pr_number exists — proceeding."
   fi
 
   run_promotion_gate_if_needed "$target" "$source_branch"

@@ -14919,18 +14919,26 @@ print(ready)
           if [[ "$_override_count" -eq 1 ]]; then
             cat > "$_hint_file" <<HINTEOF
 [AUTO-MODE RETRY] Previous cycle returned stop_ai but scan has ${_ready_count} actionable items.
-Review each item's next_action field carefully:
-- Items with [manager] prefix require you to run wt-create
-- Items with [worker] prefix require you to delegate a worker
-- Do not stop_ai while actionable items exist in the scan.
+
+Your job is to delegate workers for these items. How to decide:
+- Each item's next_action tells you what to do ([manager]=wt-create, [worker]=delegate)
+- Worktree isolation means items on different branches/worktrees CAN run in parallel
+- Assess dependencies: items touching the same files/branches should be sequential
+- Delegate a reasonable batch (3-5 workers if independent, fewer if dependent)
+- After delegating, exit with manager_working (not stop_ai) while workers run
+- Only stop_ai when zero ready items remain AND no workers are running
 HINTEOF
           else
             cat > "$_hint_file" <<HINTEOF
-[AUTO-MODE RETRY #2 - FINAL WARNING] Two consecutive cycles returned stop_ai with actionable scan items.
-You MUST either: (a) delegate_workers for items with [worker] next_action,
-(b) resume_manager if you need more analysis,
-(c) report a specific blocker if you genuinely cannot proceed.
-Returning stop_ai again will switch to wait mode requiring human intervention.
+[AUTO-MODE RETRY #2 - FINAL WARNING] Second stop_ai with ${_ready_count} ready items.
+
+You have work to do. Pick at least ONE ready item right now:
+- If next_action starts with [manager]: run wt-create, then delegate the worker
+- If next_action starts with [worker]: create the worker prompt and delegate it
+- Do NOT try to process everything at once. Start with ONE. Then exit with manager_working.
+- scan items are isolated by worktree — you can run multiple workers concurrently on different branches.
+
+Returning stop_ai again degrades to wait mode (human intervention required).
 HINTEOF
           fi
           append_runtime_event "$project" "task_mode_gate_override_stop_ai" \

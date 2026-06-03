@@ -92,6 +92,13 @@ Freely 是一个自主循环运行器：
 - Git 钩子应在本地工作流中强制分支保护。
 - 钩子拒绝消息必须指向本宪法章节作为策略来源。
 - 受保护分支上的 hook/gate bypass（包括但不限于 `--no-verify`）永久禁止。无例外。
+- **明确禁止的绕过手段（非穷举）**：
+  - `git -c core.hooksPath=/dev/null`（禁用所有 hook）
+  - `git push --force` 到 `main`/`develop`（force push 到受保护分支）
+  - `FREELY_SKIP_PR_GATE=1`（已从代码中移除）
+  - `--no-verify` / `--no-gpg-sign`（跳过 hook）
+  - 直接 `git commit` 在 `main`/`develop` 上（应通过 worktree + PR 流程）
+  - 任何修改 `.githooks/` 目录内容以削弱检查的行为
 - break-glass 不能仅凭个人口头判断成立；必须留下可审计证据，并且后续 canonical 治理检查必须能识别该次豁免。
 - 执行步骤以 `docs/system/workspace/skills/` 为执行事实源（How）；技能路由与验收门以 `docs/LAWS.md` 为准。
 - **分支规则表**：
