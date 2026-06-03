@@ -23,11 +23,12 @@ import threading
 
 BRIDGE_TIMEOUT = int(os.environ.get("ACP_BRIDGE_SESSION_TIMEOUT", "1800"))
 ACP_IDLE_TIMEOUT = int(os.environ.get("ACP_BRIDGE_IDLE_TIMEOUT", "900"))
-_perm = os.environ.get("CLAUDE_CODE_PERMISSION_MODE", "")
-if not _perm:
-    import sys
-    print("[acp-bridge] WARNING: CLAUDE_CODE_PERMISSION_MODE not set. Permission mode defaults to empty. Check ~/.ai-auth/<tool>/settings.json", file=sys.stderr)
-ACP_PERMISSION_MODE = _perm or "default"
+ACP_PERMISSION_MODE = os.environ.get("CLAUDE_CODE_PERMISSION_MODE") or "bypassPermissions"
+if not os.environ.get("CLAUDE_CODE_PERMISSION_MODE"):
+    import sys as _sys
+    _sys.stderr.write("[acp-bridge] CLAUDE_CODE_PERMISSION_MODE not set — defaulting to bypassPermissions. "
+                       "Set via monitor-ai-acp.sh _bridge_ensure_running or export manually.\n")
+    _sys.stderr.flush()
 
 
 def _short_hash(project: str) -> str:
@@ -330,6 +331,9 @@ class AcpBridge:
         elif "method" in msg:
             # Server→client request/notification (e.g. session/request_permission).
             # Broadcast to ALL connected clients so they can respond.
+            method = msg.get("method", "")
+            if method == "session/request_permission":
+                self.log(f"permission requested (mode={ACP_PERMISSION_MODE}): {json.dumps(msg.get('params',{}))[:200]}")
             self._broadcast_notification(msg)
         elif msg_id is not None:
             # Response for unknown request — log for debugging
@@ -468,8 +472,16 @@ class AcpBridge:
                 self._send_request("session/set_mode",
                     {"sessionId": sid, "modeId": ACP_PERMISSION_MODE}, timeout=10)
                 self.log(f"session {sid[:12]}... mode set to {ACP_PERMISSION_MODE}")
+                if ACP_PERMISSION_MODE != "bypassPermissions":
+                    sys.stderr.write(f"[acp-bridge] WARNING: session {sid[:12]}... "
+                                     f"permission mode is '{ACP_PERMISSION_MODE}', not 'bypassPermissions'. "
+                                     f"Tool calls may require approval and could hang.\n")
+                    sys.stderr.flush()
             except Exception as e:
-                self.log(f"session/set_mode failed (non-fatal): {e}")
+                self.log(f"session/set_mode FAILED: {e}")
+                sys.stderr.write(f"[acp-bridge] ERROR: session/set_mode failed for {sid[:12]}...: {e}. "
+                                 f"Claude SDK will use default permission mode.\n")
+                sys.stderr.flush()
         return sid
 
     def session_resume(self, session_id, cwd=None):
@@ -588,9 +600,23 @@ def handle_client(conn, bridge):
                 try:
                     # Ensure server is alive before forwarding (lazy restart).
                     bridge._ensure_server_alive()
-                    # Forward request to server via bridge's send/recv pipeline
-                    result = bridge._send_request(method, params,
-                        timeout=params.get("timeout", BRIDGE_TIMEOUT))
+                    # Route session/new and session/resume through bridge methods
+                    # so session/set_mode is called for claude-agent-acp.
+                    if method == "session/new":
+                        sid = bridge.session_new(
+                            session_id=params.get("sessionId"),
+                            cwd=params.get("cwd"),
+                        )
+                        result = {"sessionId": sid}
+                    elif method == "session/resume":
+                        sid = bridge.session_resume(
+                            session_id=params.get("sessionId"),
+                            cwd=params.get("cwd"),
+                        )
+                        result = {"sessionId": sid}
+                    else:
+                        result = bridge._send_request(method, params,
+                            timeout=params.get("timeout", BRIDGE_TIMEOUT))
                     response = {"jsonrpc": "2.0", "id": req_id, "result": result}
                 except TimeoutError as e:
                     response = {"jsonrpc": "2.0", "id": req_id, "error": {"code": -32000, "message": str(e)}}

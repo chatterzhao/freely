@@ -359,27 +359,15 @@ def main():
                 print(f"session id: {session_id} (fresh after resume failure)", flush=True) # line 2: human log
 
         elif launch_kind == "prompt" and resume_target:
-            # Multi-turn within same session: verify session is still reachable.
-            # After bridge restart, the ACP server loses all in-memory sessions.
-            # session/prompt with an unknown session ID hangs until idle timeout (900s).
-            # Fast-fail with session/resume (10s timeout) to detect dead sessions.
-            try:
-                session_result = client.request(
-                    "session/resume",
-                    {"sessionId": resume_target, "cwd": cwd, "mcpServers": []},
-                    timeout=10,
-                )
-                session_id = session_result["sessionId"]
-                print(f"session id: {session_id} (prompt)", flush=True)
-            except Exception:
-                print(f"[WARN] session {resume_target} lost (bridge restart?), falling back to session/new", flush=True)
-                new_params = {"cwd": cwd, "mcpServers": []}
-                if args.session_id:
-                    new_params["sessionId"] = args.session_id
-                session_result = client.request("session/new", new_params, timeout=30)
-                session_id = session_result["sessionId"]
-                print(session_id, flush=True)
-                print(f"session id: {session_id} (fresh after prompt resume failure)", flush=True)
+            # Multi-turn within same session. The session was created by
+            # the fresh cycle on this bridge and is still alive — no need
+            # for session/resume which triggers --replay-user-messages.
+            # session/prompt appends the new message like a chat message.
+            # If the session was lost (bridge restart), select_launch_kind
+            # would have returned fresh, not prompt.
+            session_id = resume_target
+            print(f"session id: {session_id} (prompt)", flush=True)
+            session_result = {"sessionId": session_id}
 
         elif launch_kind == "fork":
             # Worker forks from parent: gets own session, inherits context via prompt.
@@ -548,11 +536,13 @@ def main():
     finally:
         if stop_reason == "end_turn" and not args.loop:
             time.sleep(2)  # grace period for bridge to finish sending notifications
-        if args.loop:
-            try:
-                client.request("session/close", {"sessionId": session_id}, timeout=10)
-            except Exception:
-                pass
+        # Close session to release Claude SDK subprocess. Without this,
+        # each cycle leaves an orphaned claude CLI process (~100-300MB)
+        # that accumulates and degrades all subsequent requests.
+        try:
+            client.request("session/close", {"sessionId": session_id}, timeout=10)
+        except Exception:
+            pass
         client.close()
 
 

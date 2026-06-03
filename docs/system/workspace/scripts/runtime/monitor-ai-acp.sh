@@ -55,19 +55,28 @@ _bridge_log_file() {
 }
 
 _bridge_ensure_running() {
-  local project="$1"
-  local pid_file socket bridge_script
+  local project="$1" tool="${2:-}"
+  local pid_file socket bridge_script tool_file last_tool
   pid_file="$(_bridge_pid_file "$project")"
   socket="$(_bridge_socket "$project")"
+  tool_file="$(_bridge_pid_file "$project").tool"
 
   # Already running?
   if [[ -f "$pid_file" ]]; then
     local pid
     pid=$(cat "$pid_file" 2>/dev/null || true)
     if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null && [[ -S "$socket" ]]; then
-      return 0
+      # Same tool/slot? Keep bridge alive.
+      last_tool=$(cat "$tool_file" 2>/dev/null || true)
+      if [[ -z "$tool" || "$last_tool" == "$tool" ]]; then
+        return 0
+      fi
+      # Tool/slot changed — kill old bridge, restart with new env.
+      echo "[bridge] tool changed ($last_tool → $tool), restarting bridge"
+      kill "$pid" 2>/dev/null || true
+      sleep 1
     fi
-    rm -f "$pid_file" "$socket"
+    rm -f "$pid_file" "$socket" "$tool_file"
   fi
 
   bridge_script="$SCRIPT_DIR/acp-bridge.py"
@@ -76,6 +85,60 @@ _bridge_ensure_running() {
     echo "[ERROR] acp-bridge.py not found" >&2
     return 1
   }
+
+  # Export permission mode from slot config for claude-agent-acp.
+  # _apply_tool_alias_settings returns early for registered tools, so
+  # CLAUDE_CODE_PERMISSION_MODE may not be set. Read it from the slot
+  # config here. Only claude uses session/set_mode; codex/opencode
+  # handle permissions internally via their own config mechanisms.
+  if [[ -n "$tool" && -z "${CLAUDE_CODE_PERMISSION_MODE:-}" ]]; then
+    local _slot_dir _settings_file _base_tool
+    _base_tool="${tool%%-*}"  # claude-apikey-ds-flash-auto → claude
+    _slot_dir=$(ls -d "$HOME/.ai-auth/${tool}" 2>/dev/null | head -1 || true)
+    if [[ -z "$_slot_dir" ]]; then
+      _slot_dir=$(ls -d "$HOME/.ai-auth/${tool}-"* 2>/dev/null | head -1 || true)
+    fi
+    if [[ -n "$_slot_dir" && -d "$_slot_dir" ]]; then
+      case "$_base_tool" in
+        claude)
+          _settings_file="$_slot_dir/settings.json"
+          if [[ -f "$_settings_file" ]]; then
+            export CLAUDE_CODE_PERMISSION_MODE="$(python3 -c "
+import json
+with open('$_settings_file') as f:
+    d = json.load(f)
+pm = d.get('permissionMode', '') or d.get('permissions', {}).get('defaultMode', '')
+if pm: print(pm)
+" 2>/dev/null || echo 'bypassPermissions')"
+          fi
+          ;;
+        codex)
+          # codex uses config.toml with approval_policy; bridge doesn't call
+          # session/set_mode for codex, but export env for completeness.
+          _settings_file="$_slot_dir/config.toml"
+          if [[ -f "$_settings_file" ]]; then
+            local _approval
+            _approval=$(python3 -c "
+try:
+    import tomllib
+except ImportError:
+    import tomli as tomllib
+with open('$_settings_file','rb') as f:
+    d = tomllib.load(f)
+print(d.get('approval_policy',''))
+" 2>/dev/null)
+            if [[ -n "$_approval" ]]; then
+              export CLAUDE_CODE_PERMISSION_MODE="$_approval"
+            fi
+          fi
+          ;;
+        opencode)
+          # opencode uses settings.json with 'permission' field.
+          # Permission is already handled by OPENCODE_CONFIG env var.
+          ;;
+      esac
+    fi
+  fi
 
   python3 "$bridge_script" start --project "$project" >/dev/null 2>&1 || {
     echo "[ERROR] failed to start ACP bridge" >&2
@@ -89,6 +152,12 @@ _bridge_ensure_running() {
     waited=$((waited + 1))
   done
   [[ -S "$socket" ]] || { echo "[ERROR] bridge socket did not appear" >&2; return 1; }
+
+  # Persist the tool/slot that started this bridge so we can detect
+  # changes on the next call (same base tool, different slot → restart).
+  if [[ -n "$tool" ]]; then
+    printf '%s\n' "$tool" > "$tool_file"
+  fi
 }
 
 # ── Helpers ─────────────────────────────────────────────────────────
@@ -283,7 +352,7 @@ main() {
   _apply_tool_alias_settings "$tool"
 
   # Ensure persistent ACP server is running (inherits env from alias settings)
-  _bridge_ensure_running "$project" || exit 1
+  _bridge_ensure_running "$project" "$tool" || exit 1
 
   # Record bridge log byte offset at cycle start so failure detection only
   # scans NEW content — avoids matching stale errors from previous cycles.
