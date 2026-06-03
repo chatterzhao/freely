@@ -12,11 +12,15 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-03T00:54:37Z'
-updated_at: '2026-06-03T00:54:37Z'
+updated_at: '2026-06-03T01:03:14Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
+force_closed_at: '2026-06-03T01:03:14Z'
+force_closed_reason: 'platform sync completed, 66 issues closed on GitHub, 1 created,
+  sync state recorded in issue #2456'
 ---
 
 Batch sync task discovered by scan.
