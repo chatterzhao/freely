@@ -8,6 +8,19 @@
 
 如果本文件中的任何陈述与上述三个核心文档冲突，以核心文档为准。
 
+## 禁止操作
+
+以下操作违反 `CONSTITUTION.md` §5（执行），**任何情况下不得使用**：
+
+- `git -c core.hooksPath=/dev/null <command>` — 禁用 hook
+- `git push --force` 到 `main` 或 `develop`
+- `--no-verify` / `--no-gpg-sign` — 跳过 hook
+- 直接在 `main`/`develop` 上 `git commit`
+- 修改 `.githooks/` 目录内容以削弱检查
+
+**没有例外。** 即使为了调试或加速迭代也不允许。
+正确的做法是走 `wt-create → worktree → commit → pr-create-guarded → pr-merge-guarded` 流程。
+
 ## 当前项目阶段
 Freely 处于研究优先的整合阶段。
 当前活跃文档范围：
