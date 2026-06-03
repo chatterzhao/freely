@@ -1,7 +1,8 @@
 ---
 local_id: raw-20260519T155813Z
 kind: raw
-phase_state: dropped
+phase_state: absorbed
+absorbed_into: "direct-merge:hotfix/cleanup-worker-launchable (commit 1834197b)"
 platform_ids:
   github:
     issue_id: '659'
@@ -12,13 +13,11 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-19T15:58:28Z'
-updated_at: '2026-06-03T11:46:23Z'
+updated_at: '2026-06-03T12:32:19Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-dropped_reason: Fix merged to develop via fix/raw-20260519T155813Z-launchable-reason.
-  Runtime bug fix.
 platform_state: closed
 ---
 
@@ -34,14 +33,6 @@ platform_state: closed
 | updated | unknown |
 
 ---
-
-> **Freely 治理**：这是 raw issue `raw-20260519T155813Z`。实现前请用 `wt-create --raw-key 20260519T155813Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
-kind: raw
-priority: P2
-phase_state: proposed
-source: feedback
-created_at: "2026-05-19T15:58:13Z"
-title: "launchable check failed reason too vague — need actionable rejection messages"
 
 ## 问题
 
