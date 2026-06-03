@@ -13,7 +13,7 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-08T13:34:23Z'
-updated_at: '2026-06-03T11:44:20Z'
+updated_at: '2026-06-03T13:01:26Z'
 intake_id: ''
 author: zhaoquan
 channel: local
