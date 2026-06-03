@@ -1,32 +1,52 @@
 ---
 local_id: raw-20260508T111130Z
 kind: raw
-phase_state: completed
-closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
-updated_at: 2026-05-17T04:47:25Z
+phase_state: absorbed
+absorbed_into: I-20260508T111130Z-A
 platform_ids:
   github:
-    issue_id: '256'
-    url: https://github.com/chatterzhao/freely/issues/256
+    issue_id: '397'
+    url: https://github.com/chatterzhao/freely/issues/397
+    synced_at: '2026-06-03T05:25:29Z'
 primary_platform: github
-pre_tests_path: docs/epics/reference-transaction-delete-fix/verification/pre-tests.md
-verification_artifact_dir: docs/epics/reference-transaction-delete-fix/code-reviews
-platform_state: closed
+canonical_issue_path: ''
+last_synced_comment_at: {}
+hash: ''
+created_at: '2026-05-17T04:47:59Z'
+updated_at: '2026-06-03T05:25:29Z'
+intake_id: ''
+author: platform
+channel: github
+session_refs: []
+platform_state: open
 ---
 
-# raw-20260508T111130Z: reference-transaction hook 误拦截 branch delete
+## I-20260508T111130Z-A: reference-transaction hook delete fix
+
+| Field | Value |
+|-------|-------|
+| local_id | `I-20260508T111130Z-A` |
+| kind | `linked` |
+| status | `unknown` |
+| phase | `absorbed` |
+| canonical | `none` |
+| created | unknown |
+| updated | unknown |
+
+---
+
+
+local_id: I-20260508T111130Z-A
+kind: linked
+phase_state: absorbed
+promoted_from: raw-20260508T111130Z
+source_candidate: docs/pre-brainstorms/20260508T111130Z--reference-transaction-delete-fix/candidates.md#C-20260508T111130Z-A
+verification_artifact_dir: docs/epics/reference-transaction-delete-fix/code-reviews
+pre_tests_path: docs/epics/reference-transaction-delete-fix/verification/pre-tests.md
+platform_ids: {}
+platform_state: open
+
+# I-20260508T111130Z-A: reference-transaction hook delete fix
 
 - pre_tests_path: docs/epics/reference-transaction-delete-fix/verification/pre-tests.md
 - verification_artifact_dir: docs/epics/reference-transaction-delete-fix/code-reviews
-
-## 问题
-
-`git branch -d` 删除已合并的 `test-pre-merge-*` 分支时被 reference-transaction hook 拦截。
-
-## 根因
-
-Hook 收到 aborted 事务时 `old_oid=000... new_oid=000...`，触发了 creation guard。
-
-## 修复
-
-在 creation guard 前加 aborted/no-op 事务跳过检查。
