@@ -2,6 +2,7 @@
 local_id: raw-20260508T121541Z
 kind: raw
 phase_state: absorbed
+absorbed_into: I-20260508T121541Z-A
 platform_ids:
   github:
     issue_id: '398'
@@ -12,7 +13,7 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-17T04:48:04Z'
-updated_at: '2026-06-03T10:02:40Z'
+updated_at: '2026-06-03T08:27:41Z'
 intake_id: ''
 author: platform
 channel: github

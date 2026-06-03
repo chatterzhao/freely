@@ -16,6 +16,7 @@ import socket
 import sys
 import uuid
 from datetime import datetime, timezone
+from typing import Optional, List
 
 # ── Daemon socket RPC ────────────────────────────────────────────────────
 
@@ -150,19 +151,19 @@ def update_worker_pid(handoff_id: str, worker_pid: str) -> int:
     return result.get("affected", 0)
 
 
-def get_handoff(handoff_id: str) -> dict | None:
+def get_handoff(handoff_id: str) -> Optional[dict]:
     result = _db_rpc("handoff.get", {"handoff_id": handoff_id})
     return result.get("record")
 
 
-def list_by_role(role: str = "worker", status: str | None = None) -> list[dict]:
+def list_by_role(role: str = "worker", status: Optional[str] = None) -> List[dict]:
     params = {"role": role}
     if status: params["status"] = status
     result = _db_rpc("handoff.list", params)
     return result.get("rows", [])
 
 
-def list_by_key(raw_key: str, statuses: list[str] | None = None) -> list[dict]:
+def list_by_key(raw_key: str, statuses: Optional[List[str]] = None) -> List[dict]:
     result = _db_rpc("handoff.list-by-key", {"raw_key": raw_key})
     rows = result.get("rows", [])
     if statuses:
@@ -170,7 +171,7 @@ def list_by_key(raw_key: str, statuses: list[str] | None = None) -> list[dict]:
     return rows
 
 
-def query_active_workers(worktree: str) -> list[dict]:
+def query_active_workers(worktree: str) -> List[dict]:
     result = _db_rpc("handoff.active-workers", {"worktree": worktree})
     return result.get("rows", [])
 
@@ -180,12 +181,12 @@ def has_active_worker(worktree: str) -> bool:
     return result.get("has_active", False)
 
 
-def latest_manager() -> dict | None:
+def latest_manager() -> Optional[dict]:
     result = _db_rpc("handoff.latest-manager", {})
     return result.get("record")
 
 
-def latest_completed_worker(raw_key: str = "") -> dict | None:
+def latest_completed_worker(raw_key: str = "") -> Optional[dict]:
     result = _db_rpc("handoff.latest-completed-worker", {"raw_key": raw_key})
     return result.get("record")
 
@@ -275,7 +276,7 @@ def insert_repair_handoff(repair_target_role: str, repair_target_handoff_id: str
     return result.get("handoff_id", "")
 
 
-def query_by_issue(issue_id: str, consumed: int | None = None) -> list[dict]:
+def query_by_issue(issue_id: str, consumed: Optional[int] = None) -> List[dict]:
     """Legacy compat: handoffs are queried by raw_key, not issue_id."""
     return list_by_key(issue_id)
 
