@@ -15,7 +15,7 @@ description: 快速修复 bug 的特殊高效策略——用 test-pre-merge-* �
 
 **不违背本质**：
 - `test-pre-merge-*` 的保护约束是禁止 add/commit/push（防止未经审查的代码进入共享历史）。fix skill 在上面只产生 dirty state，不 add、不 commit、不 push。这与约束的精神完全一致——保护的是共享历史，不是阻止本地文件修改。
-- 正式提交发生在可写工位（feature/hotfix），合并走 pr-merge-guarded 合规路径。与常规开发的区别仅在于"快速测试在哪做"，提交和合并的合规性完全相同。
+- 正式提交发生在可写工位（fix/hotfix），合并走 pr-merge-guarded 合规路径。与常规开发的区别仅在于"快速测试在哪做"，提交和合并的合规性完全相同。
 
 ## 核心原则
 
@@ -42,7 +42,7 @@ test-pre-merge-* 上的操作:
   清理 dirty state → ✅ git checkout -- . / git clean -fd
 ```
 
-**关键**：修改只在 test-pre-merge-* 上以 dirty state 存在，验证通过后 cp 到可写工位（feature/hotfix）正式 add+commit。test-pre-merge-* 上的 dirty 修改最终被丢弃。正式提交全在可写工位，合并也走可写工位 → develop 的合规路径。
+**关键**：修改只在 test-pre-merge-* 上以 dirty state 存在，验证通过后 cp 到可写工位（fix/hotfix）正式 add+commit。test-pre-merge-* 上的 dirty 修改最终被丢弃。正式提交全在可写工位，合并也走可写工位 → develop 的合规路径。
 
 ### test-pre-merge-* 作为丢弃式测试沙箱
 
@@ -63,13 +63,13 @@ test-pre-merge-* 上的操作:
 | `test-pre-merge-*` | ❌ | ❌ | 预集成验证批次 / 私有测试沙箱 |
 | `fix/*` | ✅ | ✅ | bug 修复专用 |
 | `feature/*` | ✅ | ✅ | 功能开发 |
-| `feature/premerge-*` | ✅ | ✅ | 冲突收敛（格式: `feature/premerge-YYYYMMDDTHHMM[SS]Z--<topic>`） |
+| `fix/premerge-*` | ✅ | ✅ | 冲突收敛（格式: `fix/premerge-YYYYMMDDTHHMM[SS]Z--<topic>`） |
 | `hotfix/*` | ✅ | ✅ | 紧急 fix，可直达 develop |
 
 合并路径（来自 pr-merge-guarded）:
 ```
 fix/*             → test-pre-merge → pr-create-guarded → pr-merge-guarded
-feature/*         → test-pre-merge → pr-create-guarded → pr-merge-guarded
+fix/*             → test-pre-merge → pr-create-guarded → pr-merge-guarded
 hotfix/*          → main + develop (pr-merge-guarded)
 hotfix/*          → main
 ```
@@ -78,7 +78,6 @@ hotfix/*          → main
 
 | 分支类型 | 默认 base | 说明 |
 |---|---|---|
-| `feature/*` | develop | 标准功能开发，走完整 获取issue→wt-create→B1→B2→dev→test-pre-merge-*验证→pr-create-guarded→pr-merge-guarded develop 链路 |
 | `fix/*` | develop | bug 修复，从 develop 派生，通过 pr-merge-guarded 合并回 develop |
 | `hotfix/*` | main | 紧急修复，从 main 的标签派生，通过 pr-merge-guarded 合并回 main 和 develop |
 
