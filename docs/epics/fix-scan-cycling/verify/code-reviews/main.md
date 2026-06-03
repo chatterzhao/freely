@@ -1,3 +1,8 @@
+---
+issue_id: I-raw-20260603T142127Z-A
+issue_path: docs/issues/I-raw-20260603T142127Z-A/issue.md
+---
+
 ## Implementation Decision Note
 
 - decision: "Two-part fix: (1) issue-sync batch creates linked I-* items on platform, (2) task-lifecycle-scan.py deduplicates platform_sync_batch across scans"

@@ -1,9 +1,9 @@
 # Candidates
 
-## C-raw-20260603T142127Z-A: fix scan cycling — issue-sync batch create + cross-batch dedup
+## C-20260603T142127Z-A: fix scan cycling — issue-sync batch create + cross-batch dedup
 
 - candidate_format_version: v2
-- candidate_id: `C-raw-20260603T142127Z-A`
+- candidate_id: `C-20260603T142127Z-A`
 - title: fix scan cycling — issue-sync batch create linked I-* items + cross-batch dedup
 - status: `promoted`
 - milestone: M-20260603T142127Z-A
