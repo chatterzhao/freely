@@ -11,4 +11,6 @@ implemented_in:
   commits:
   - 8357a8b4
   - 83067702
----
+  - 2f960d67
+source_candidate: docs/pre-brainstorms/c-raw-20260603T142127Z-fix-scan-cycling/candidates.md#C-raw-20260603T142127Z-A
+verification_artifact_dir: docs/epics/fix-scan-cycling/verify/
