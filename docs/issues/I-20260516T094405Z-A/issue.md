@@ -9,7 +9,8 @@ primary_platform: github
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-16T09:44:05Z'
-updated_at: '2026-06-03T12:20:00Z'
+updated_at: '2026-06-03T12:38:07Z'
+source_candidate: docs/pre-brainstorms/20260516T094405Z--delegate-workers-exclusive-conflict/candidates.md
 intake_id: ''
 author: manager
 channel: direct-absorption

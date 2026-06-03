@@ -9,7 +9,8 @@ primary_platform: github
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-19T15:58:13Z'
-updated_at: '2026-06-03T12:20:00Z'
+updated_at: '2026-06-03T12:38:07Z'
+source_candidate: docs/pre-brainstorms/20260519T155813Z--launchable-check-reason/candidates.md
 intake_id: ''
 author: manager
 channel: direct-absorption
