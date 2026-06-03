@@ -1243,6 +1243,20 @@ def main() -> int:
         if status in pre_ibm_statuses:
             continue
 
+        candidate_queue_entries = milestone_candidate_entries.get(candidate.candidate_id, [])
+
+        # M GATE: promoted candidates must have candidate_issues in milestones.md.
+        # This check runs before the relevance filter below so that promoted
+        # candidates without candidate_issues are caught even when their specific
+        # lines in the candidates.md file are not directly "touched" by the diff.
+        if status == "promoted" and not candidate_queue_entries:
+            errors.append(
+                f"{candidate.candidate_id} in {candidate.path} is promoted but has no candidate_issues entry in docs/milestones.md. "
+                f"Promoted candidates must flow through milestone candidate_issues -> committed_issues. "
+                f"Add C-{key} as M-{key} to the active milestone's candidate_issues queue."
+            )
+            continue
+
         if (
             not candidate_is_relevant
             and not unresolved_metadata_fix_is_absorbed_by_governance_owner
@@ -1269,7 +1283,6 @@ def main() -> int:
             )
             continue
 
-        candidate_queue_entries = milestone_candidate_entries.get(candidate.candidate_id, [])
         if status in active_statuses:
             declared_milestone_status = milestone_status_by_id.get(milestone, "missing")
             if declared_milestone_status != "active":
