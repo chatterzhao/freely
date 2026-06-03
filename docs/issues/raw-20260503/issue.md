@@ -15,7 +15,7 @@ platform_ids:
 primary_platform: github
 hash: ''
 created_at: '2026-05-03T01:15:00Z'
-updated_at: '2026-06-01T12:12:06Z'
+updated_at: '2026-06-03T03:08:41Z'
 session_refs:
 - tool: ccds
   session_id: 20260503-acp-bridge-path-sync
