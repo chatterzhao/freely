@@ -586,11 +586,22 @@ def handle_client(conn, bridge):
                     continue
 
                 try:
-                    # Ensure server is alive before forwarding (lazy restart).
                     bridge._ensure_server_alive()
-                    # Forward request to server via bridge's send/recv pipeline
-                    result = bridge._send_request(method, params,
-                        timeout=params.get("timeout", BRIDGE_TIMEOUT))
+                    if method == "session/new":
+                        sid = bridge.session_new(
+                            session_id=params.get("sessionId"),
+                            cwd=params.get("cwd"),
+                        )
+                        result = {"sessionId": sid}
+                    elif method == "session/resume":
+                        sid = bridge.session_resume(
+                            session_id=params.get("sessionId"),
+                            cwd=params.get("cwd"),
+                        )
+                        result = {"sessionId": sid}
+                    else:
+                        result = bridge._send_request(method, params,
+                            timeout=params.get("timeout", BRIDGE_TIMEOUT))
                     response = {"jsonrpc": "2.0", "id": req_id, "result": result}
                 except TimeoutError as e:
                     response = {"jsonrpc": "2.0", "id": req_id, "error": {"code": -32000, "message": str(e)}}
