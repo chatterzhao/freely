@@ -7809,6 +7809,7 @@ load_session_state_or_defaults() {
   CHECKPOINT_DRIFT_STREAK_CURRENT="0"
   ROUTE_ONLY_STREAK_CURRENT="0"
   RESUME_STREAK_CURRENT="0"
+  FREELY_ACP_FIRST_LAUNCH_DONE="0"
 
   if [[ -f "$state_file" ]]; then
     # shellcheck disable=SC1090
@@ -13638,6 +13639,7 @@ CHECKPOINT_DRIFT_STREAK_CURRENT="$checkpoint_drift_streak"
 ROUTE_ONLY_STREAK_CURRENT="$route_only_streak"
 RESUME_STREAK_CURRENT="$resume_streak"
 SESSION_PARENT_ID="$session_parent_id"
+FREELY_ACP_FIRST_LAUNCH_DONE="${FREELY_ACP_FIRST_LAUNCH_DONE:-0}"
 EOF
   mv "$tmp_state_file" "$state_file"
 }
@@ -20874,6 +20876,10 @@ print(ready)
       record_restart_storm_signal "$PROJECT_ROOT" "$restart_signal_reason" "${restart_window_count:-0}" "${restart_window_peak:-0}"
     fi
 
+    # Mark first ACP launch done → subsequent cycles use prompt mode for multi-turn delta.
+    # Persisted via write_session_state below so it survives across loop iterations.
+    FREELY_ACP_FIRST_LAUNCH_DONE=1
+
     write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$prompt_file" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$(runtime_capture_or_empty runtime_read_tool_current_slot "$project" "$AI_TOOL")" "$LAST_SLOT_SWITCH_REASON" "$LAST_SLOT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}" "${AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV:-}" "${AUTO_RECOVERY_ORIGIN_TOOL:-}" "${SESSION_PARENT_ID:-}"
     # Normalize rc=1 to 0 when the debug log shows a clean SessionEnd completion.
     # Claude Code -p mode may exit 1 even when the session ended gracefully (SessionEnd:other).
@@ -21009,9 +21015,6 @@ print(f'send_to_ai=success updated={len(rows)}', flush=True)
       LAST_WORKCELL_EXIT_REASON="manager_worker_launch_after_ai_cycle"
       write_workcell_state "$PROJECT_ROOT" "running" "up" "down" "$LAST_WORKCELL_EXIT_REASON"
     fi
-
-    # Mark first ACP launch done → subsequent cycles use prompt mode for multi-turn delta
-    FREELY_ACP_FIRST_LAUNCH_DONE=1
 
     restart_count=$((restart_count + 1))
     if [[ "${MAX_RESTARTS:-0}" -gt 0 && "$restart_count" -gt "${MAX_RESTARTS:-0}" ]]; then

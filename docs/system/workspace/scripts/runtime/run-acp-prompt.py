@@ -536,12 +536,9 @@ def main():
     finally:
         if stop_reason == "end_turn" and not args.loop:
             time.sleep(2)  # grace period for bridge to finish sending notifications
-        # Close session to release Claude SDK subprocess.
-        # EXCEPT in prompt mode: the session stays alive across multi-turn
-        # cycles. Closing it would force the next cycle to create a new
-        # session (session/new) which has no conversation history. Like a
-        # chat box, prompt mode appends to the existing session.
-        if launch_kind != "prompt":
+        # Close session for fork (worker) mode — workers are one-shot, session won't be reused.
+        # Manager cycles (fresh, prompt, resume) keep the session alive for multi-turn continuity.
+        if launch_kind == "fork":
             try:
                 client.request("session/close", {"sessionId": session_id}, timeout=10)
             except Exception:
