@@ -1,53 +1,49 @@
 ---
 local_id: raw-20260508T121541Z
 kind: raw
-phase_state: completed
-closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
-updated_at: 2026-05-17T04:47:25Z
+phase_state: absorbed
 platform_ids:
   github:
-    issue_id: '257'
-    url: https://github.com/chatterzhao/freely/issues/257
+    issue_id: '398'
+    url: https://github.com/chatterzhao/freely/issues/398
     synced_at: ''
 primary_platform: github
 canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
-created_at: '2026-05-08T12:15:50Z'
+created_at: '2026-05-17T04:48:04Z'
+updated_at: '2026-05-17T04:48:04Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: closed
+platform_state: open
 ---
 
-## Bug
+## I-20260508T121541Z-A: platform-adapter title key fix
 
-`platform-adapter.py` `pull_raw_issue` 第 326 行只比较了 `standard_key != raw_key`，**没有先检查标题是否已包含 canonical key**：
+| Field | Value |
+|-------|-------|
+| local_id | `I-20260508T121541Z-A` |
+| kind | `linked` |
+| status | `unknown` |
+| phase | `absorbed` |
+| canonical | `none` |
+| created | unknown |
+| updated | unknown |
 
-```python
-standard_key = _created_at_to_key(created_at)
-if standard_key and standard_key != raw_key:  # ← 缺了标题检查！
-    raw_key = standard_key  # 覆盖
-```
+---
 
-## 设计意图
 
-只有当标题里**没有** `raw-{key}` 时，才用 `created_at` 派生 key。标题已有 key 时不应覆盖。
+local_id: I-20260508T121541Z-A
+kind: linked
+phase_state: absorbed
+promoted_from: raw-20260508T121541Z
+source_candidate: docs/pre-brainstorms/20260508T121541Z--platform-adapter-title-key/candidates.md#C-20260508T121541Z-A
+verification_artifact_dir: docs/epics/platform-adapter-title-key/code-reviews
+pre_tests_path: docs/epics/platform-adapter-title-key/verification/pre-tests.md
+platform_state: open
 
-## 本次案例
-
-- 标题: `raw-20260508T111130Z: reference-transaction hook ...` ← 已有 key
-- created_at: `2026-05-08T11:11:39Z` ← 晚了 9 秒
-- 应跳过标准化，但当前代码仍覆盖 → key 变成 `111139Z`
-
-## 修复
-
-```python
-title = info.get("title", "")
-if f"raw-{raw_key}" not in title and standard_key and standard_key != raw_key:
-    # 只有标题缺失 raw key 时才标准化
-    ...
-```
+# I-20260508T121541Z-A: platform-adapter title key fix
 - pre_tests_path: docs/epics/platform-adapter-title-key/verification/pre-tests.md
 - verification_artifact_dir: docs/epics/platform-adapter-title-key/code-reviews
