@@ -2,7 +2,8 @@
 kind: raw
 local_id: raw-20260516T094405Z
 priority: P2
-phase_state: dropped
+phase_state: absorbed
+absorbed_into: I-20260516T094405Z-A
 source: chat-inbox
 created_at: '2026-05-16T09:44:05Z'
 title: delegate_workers 被 exclusive_fields_conflict 拒绝：reason 字段被误当作 stop_reason
@@ -11,7 +12,7 @@ platform_ids:
     issue_id: '363'
     url: https://github.com/chatterzhao/freely/issues/363
     synced_at: '2026-05-16T09:44:11Z'
-updated_at: '2026-06-03T11:45:49Z'
+updated_at: '2026-06-03T12:30:00Z'
 primary_platform: github
 platform_state: closed
 force_closed_at: '2026-05-16T09:48:58Z'
