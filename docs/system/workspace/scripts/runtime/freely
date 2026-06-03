@@ -3826,6 +3826,24 @@ load_config() {
   [[ -f "$cfg" ]] || { log_error "missing config: $cfg"; exit 1; }
   # shellcheck disable=SC1090
   source "$cfg"
+
+  # Validate PROJECT_ROOT — must be non-empty, absolute, and an existing directory.
+  if [[ -z "${PROJECT_ROOT:-}" ]]; then
+    log_error "PROJECT_ROOT is not set in $cfg"
+    log_error "Add: PROJECT_ROOT=\"<absolute-path-to-this-project>\""
+    exit 1
+  fi
+  if [[ "${PROJECT_ROOT:0:1}" != "/" ]]; then
+    log_error "PROJECT_ROOT must be an absolute path in $cfg"
+    log_error "Current value: PROJECT_ROOT=\"${PROJECT_ROOT}\""
+    exit 1
+  fi
+  if [[ ! -d "$PROJECT_ROOT" ]]; then
+    log_error "PROJECT_ROOT directory does not exist: ${PROJECT_ROOT}"
+    log_error "Fix PROJECT_ROOT in $cfg to point to the actual project directory"
+    exit 1
+  fi
+
   migrate_project_auto_recovery_defaults_if_needed "$project"
 }
 
