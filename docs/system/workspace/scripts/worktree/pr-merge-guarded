@@ -10,6 +10,7 @@ Usage:
 Behavior:
   - non-interactive policy gate before merge
   - blocks invalid merge direction immediately
+  - supports fix/*, feature/*, feat/*, hotfix/*, release/* source branches
   - writes protected-branch merge receipts into merge commit messages
   - supports a controlled conflict completion path
   - --dry-run: run all gates but skip git merge/issue-sync/develop-push
@@ -116,11 +117,10 @@ BRANCH_BLOCK
   source: $source_branch
 
 Allowed:
-  feature/raw-{key}-{slug} <-> develop
-  feat/raw-{key}-{slug} <-> develop
-  feature/raw-{key}-{slug} <-> develop
-  hotfeature/raw-{key}-{slug} <-> develop
-  feat/raw-{key}-{slug} <-> develop
+  fix/* <-> develop
+  feature/* <-> develop
+  feat/* <-> develop
+  hotfix/* <-> develop
   release/* -> main
   hotfix/* -> main
 MSG
