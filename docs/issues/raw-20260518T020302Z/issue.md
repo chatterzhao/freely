@@ -12,7 +12,7 @@ platform_ids:
     issue_id: '536'
     url: https://github.com/chatterzhao/freely/issues/536
     synced_at: '2026-05-18T02:03:09Z'
-updated_at: '2026-06-03T08:29:55Z'
+updated_at: '2026-06-03T10:50:45Z'
 primary_platform: github
 platform_state: closed
 absorbed_into: infra-githooks
