@@ -12,12 +12,12 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-17T04:48:04Z'
-updated_at: '2026-05-17T04:48:04Z'
+updated_at: '2026-06-03T10:02:40Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
+platform_state: closed
 ---
 
 ## I-20260508T121541Z-A: platform-adapter title key fix
