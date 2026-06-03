@@ -1,8 +1,8 @@
 ---
-local_id: I-raw-20260603T142127Z-A
-issue_id: I-raw-20260603T142127Z-A
-issue_path: docs/issues/I-raw-20260603T142127Z-A/issue.md
 ---
+
+- issue_id: I-20260603T142127Z-A
+- issue_path: docs/issues/I-20260603T142127Z-A/issue.md
 
 ## Implementation
 
@@ -14,4 +14,4 @@ issue_path: docs/issues/I-raw-20260603T142127Z-A/issue.md
 ## Verification
 
 - PR #2546 created
-- All gates pass except final governance materialization (this commit)
+- ready for merge to develop

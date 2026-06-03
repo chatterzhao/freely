@@ -1,5 +1,5 @@
 ---
-local_id: I-raw-20260603T142127Z-A
+local_id: I-20260603T142127Z-A
 kind: linked
 phase_state: completed
 title: fix: scan cycling — issue-sync batch create linked I-* items + cross-batch dedup

@@ -2,7 +2,7 @@
 local_id: raw-20260603T142127Z
 kind: raw
 phase_state: absorbed
-absorbed_into: I-raw-20260603T142127Z-A
+absorbed_into: I-20260603T142127Z-A
 title: fix-scan-cycling — issue-sync batch cannot push I-* linked items, causing platform_sync_batch
   to cycle infinitely
 created_at: 2026-06-03 14:21:27+00:00
