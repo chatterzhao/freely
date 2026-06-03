@@ -732,6 +732,11 @@ cmd_batch() {
         fi
         ;;
       linked)
+        # Create on platform if missing (e.g. I-* items with no github.issue_id)
+        if ! _already_on_platform "$issue_file" "github" 2>/dev/null; then
+          echo "[issue-sync] batch: create $local_id (linked, not on platform)"
+          cmd_create "$local_id" || true
+        fi
         if _changed_since_last_sync "$local_id" "$issue_file"; then
           local phase; phase=$(_fm_get "$issue_file" "phase_state")
           echo "[issue-sync] batch: update $local_id (phase=$phase)"

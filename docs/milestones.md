@@ -6067,3 +6067,20 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260524T230541Z-A/issue.md`
 - source_candidate: `docs/candidates/C-20260524T230541Z-dev-flow-docs.md`
+
+## M-20260603T142127Z-A
+- title: fix scan cycling — issue-sync batch create + cross-batch dedup
+- status: active
+### candidate_issues
+1. `C-20260603T142127Z-A`
+- milestone: M-20260603T142127Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260603T142127Z-A/issue.md`
+### committed_issues
+1. `I-20260603T142127Z-A`
+- title: fix scan cycling — issue-sync batch create linked I-* items + cross-batch dedup
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260603T142127Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/c-raw-20260603T142127Z-fix-scan-cycling/candidates.md#C-20260603T142127Z-A`
+- verification_artifact_dir: `docs/epics/fix-scan-cycling/verify/code-reviews/main.md`
