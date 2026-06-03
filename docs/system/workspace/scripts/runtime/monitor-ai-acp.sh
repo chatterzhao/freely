@@ -56,18 +56,27 @@ _bridge_log_file() {
 
 _bridge_ensure_running() {
   local project="$1" tool="${2:-}"
-  local pid_file socket bridge_script
+  local pid_file socket bridge_script tool_file last_tool
   pid_file="$(_bridge_pid_file "$project")"
   socket="$(_bridge_socket "$project")"
+  tool_file="$(_bridge_pid_file "$project").tool"
 
   # Already running?
   if [[ -f "$pid_file" ]]; then
     local pid
     pid=$(cat "$pid_file" 2>/dev/null || true)
     if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null && [[ -S "$socket" ]]; then
-      return 0
+      # Same tool/slot? Keep bridge alive.
+      last_tool=$(cat "$tool_file" 2>/dev/null || true)
+      if [[ -z "$tool" || "$last_tool" == "$tool" ]]; then
+        return 0
+      fi
+      # Tool/slot changed — kill old bridge, restart with new env.
+      echo "[bridge] tool changed ($last_tool → $tool), restarting bridge"
+      kill "$pid" 2>/dev/null || true
+      sleep 1
     fi
-    rm -f "$pid_file" "$socket"
+    rm -f "$pid_file" "$socket" "$tool_file"
   fi
 
   bridge_script="$SCRIPT_DIR/acp-bridge.py"
@@ -143,6 +152,12 @@ print(d.get('approval_policy',''))
     waited=$((waited + 1))
   done
   [[ -S "$socket" ]] || { echo "[ERROR] bridge socket did not appear" >&2; return 1; }
+
+  # Persist the tool/slot that started this bridge so we can detect
+  # changes on the next call (same base tool, different slot → restart).
+  if [[ -n "$tool" ]]; then
+    printf '%s\n' "$tool" > "$tool_file"
+  fi
 }
 
 # ── Helpers ─────────────────────────────────────────────────────────
