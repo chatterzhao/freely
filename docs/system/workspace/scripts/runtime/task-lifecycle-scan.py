@@ -600,7 +600,7 @@ def build_payload(project: Path, raw_key: str = "") -> dict:
 
     # Platform sync batch grouping — combine all sync-related items into one batch
     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    output = add_platform_sync_batch(output, ts)
+    output = add_platform_sync_batch(output, ts, project)
 
     # When raw_key is specified, filter output to only items matching this key.
     # This ensures the prompt builder gets only the targeted raw→I chain.
@@ -1490,7 +1490,7 @@ CHAIN_ACTIONS = {
 }
 
 
-def add_platform_sync_batch(items: list[dict], ts: str) -> list[dict]:
+def add_platform_sync_batch(items: list[dict], ts: str, project: Path) -> list[dict]:
     """Collect platform sync items into one batch entry.
 
     Stages that belong to platform_sync_batch:
@@ -1500,7 +1500,9 @@ def add_platform_sync_batch(items: list[dict], ts: str) -> list[dict]:
       - local_only: local issue not yet on platform
 
     Removes individual items and creates a single batch item as the
-    first (highest priority) result.
+    first (highest priority) result. Uses cross-scan dedup: if the
+    same set of sync items was already batched, produces a noop entry
+    instead of a new actionable batch.
     """
     sync_stages = {"platform_open", "platform_only", "state_mismatch", "local_only", "platform_close", "branch_deleted"}
     sync_items = [it for it in items if it.get("stage") in sync_stages]
@@ -1516,14 +1518,33 @@ def add_platform_sync_batch(items: list[dict], ts: str) -> list[dict]:
     comment_count = sum(1 for it in sync_items if it.get("stage") == "pending_comments")
     total_sync = pull_count + push_count + reconcile_count + close_count
 
+    # Cross-scan dedup: compare fingerprint of this batch vs previous
+    sync_keys = sorted([it.get("key", "") for it in sync_items])
+    fingerprint = json.dumps({"keys": sync_keys, "total": total_sync}, sort_keys=True)
+    state_dir = project / ".freely" / "run"
+    state_file = state_dir / "platform-sync-batch-state.json"
+
+    noop = False
+    if state_file.exists():
+        try:
+            prev = json.loads(state_file.read_text())
+            if prev.get("fingerprint") == fingerprint:
+                noop = True
+        except (json.JSONDecodeError, KeyError):
+            pass
+
+    if not noop:
+        state_dir.mkdir(parents=True, exist_ok=True)
+        state_file.write_text(json.dumps({"fingerprint": fingerprint, "last_ts": ts}, indent=2))
+
     batch_item = {
         "key": f"platform-sync-batch-{ts}",
         "stage": "platform_sync_batch",
         "source_family": "platform_sync",
-        "ready": True,
+        "ready": not noop,
         "priority": "P0_highest",
-        "incomplete": [],
-        "next_action": f"[manager] freely feedback --repo chatterzhao/freely --title \"Platform sync batch: sync {total_sync} items\" --body \"Batch sync task discovered by scan.\\npull={pull_count} push={push_count} reconcile={reconcile_count} close={close_count}\\nplatforms: github, gitee\"\n  → 拿到 raw-{{real_key}} → wt-create --raw-key {{real_key}} --source platform --skill freely-fix-execution --slug platform-sync\n[worker] issue-sync batch → git commit → wt-close",
+        "incomplete": [] if not noop else ["noop"],
+        "noop": noop,
         "sync_summary": {
             "total": total_sync,
             "pull": pull_count,
@@ -1534,6 +1555,13 @@ def add_platform_sync_batch(items: list[dict], ts: str) -> list[dict]:
             "platforms": ["github", "gitee"],
         },
     }
+
+    if not noop:
+        batch_item["next_action"] = (
+            f"[manager] freely feedback --repo chatterzhao/freely --title \"Platform sync batch: sync {total_sync} items\" --body \"Batch sync task discovered by scan.\\npull={pull_count} push={push_count} reconcile={reconcile_count} close={close_count}\\nplatforms: github, gitee\"\n"
+            "  → 拿到 raw-{{real_key}} → wt-create --raw-key {{real_key}} --source platform --skill freely-fix-execution --slug platform-sync\n"
+            "[worker] issue-sync batch → git commit → wt-close"
+        )
 
     return [batch_item] + remaining
 
