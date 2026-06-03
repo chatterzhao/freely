@@ -13183,6 +13183,8 @@ _ensure_acp_bridge_running() {
 
   # Store the binary path so we can detect tool changes across cycles
   local acp_bin_file="${pid_file}.bin"
+  # Also store the tool name to detect same-base-tool slot switches
+  local acp_tool_file="${pid_file}.tool"
 
   # Already running?
   if [[ -f "$pid_file" ]]; then
@@ -13192,8 +13194,17 @@ _ensure_acp_bridge_running() {
       # Check if the running bridge uses the right binary
       local running_bin=""
       [[ -f "$acp_bin_file" ]] && running_bin=$(cat "$acp_bin_file" 2>/dev/null || true)
+      # Check if the tool (including slot) changed — same base-tool but
+      # different slot means different API key; bridge must restart.
+      local running_tool=""
+      [[ -f "$acp_tool_file" ]] && running_tool=$(cat "$acp_tool_file" 2>/dev/null || true)
       if [[ -n "$running_bin" && "$running_bin" != "$acp_bin" ]]; then
-        log_info "ACP bridge binary changed ($running_bin → $acp_bin), restarting"
+        log_info "ACP bridge binary changed ($running_bin → $acp_bin), gracefully closing session before restart"
+        _acp_session_close "$project" "${CLAUDE_SESSION_ID_CURRENT:-}"
+        _stop_acp_bridge "$project"
+      elif [[ -n "$running_tool" && "$running_tool" != "${AI_TOOL:-}" ]]; then
+        log_info "ACP bridge tool changed ($running_tool → ${AI_TOOL:-}), gracefully closing session before restart"
+        _acp_session_close "$project" "${CLAUDE_SESSION_ID_CURRENT:-}"
         _stop_acp_bridge "$project"
       elif _acp_bridge_health_check "$project" 5; then
         return 0
@@ -13201,7 +13212,7 @@ _ensure_acp_bridge_running() {
         log_warn "existing ACP bridge (pid=$pid) is alive but failed health check; restarting"
       fi
     fi
-    rm -f "$pid_file" "$socket" "$acp_bin_file"
+    rm -f "$pid_file" "$socket" "$acp_bin_file" "$acp_tool_file"
   fi
 
   local bridge_script="$SELF_ROOT/docs/system/workspace/scripts/runtime/acp-bridge.py"
@@ -13238,8 +13249,9 @@ _ensure_acp_bridge_running() {
   fi
   disown "$!" 2>/dev/null || true
   # Note: bridge writes its own PID file during start_server, don't overwrite it
-  # Record the binary path so we can detect tool changes across cycles
+  # Record the binary path and tool name so we can detect changes across cycles
   printf '%s\n' "$acp_bin" > "$acp_bin_file" 2>/dev/null || true
+  printf '%s\n' "${AI_TOOL:-}" > "$acp_tool_file" 2>/dev/null || true
 
   # Wait for readiness (codex-acp cold start ~8s, use 15s margin)
   local waited=0
@@ -13257,6 +13269,41 @@ _ensure_acp_bridge_running() {
     _ts_old_tool="$(echo "$_ts_record" | cut -d'|' -f6)"  # new_tool from last record
   fi
   _tool_switch_atomic_write "$project" "startup" "$_ts_old_tool" "" "" "" "${AI_TOOL:-}" ""
+}
+
+# _acp_session_close: gracefully close an ACP session via bridge socket.
+# This lets the SDK finalize JSONL, flush buffers, and write session metadata
+# before the bridge is killed.  Works for all ACP implementations (claude/codex/opencode)
+# since the bridge forwards session/close to the SDK via _send_request.
+# Falls back silently if bridge is dead or SDK does not support the method.
+_acp_session_close() {
+  local project="$1" session_id="$2"
+  local socket; socket="$(_acp_bridge_socket "$project")"
+  [[ -S "$socket" ]] || return 0
+  [[ -n "$session_id" ]] || return 0
+
+  python3 -c "
+import socket, json, sys
+try:
+    sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    sock.settimeout(15)
+    sock.connect('$socket')
+    req = json.dumps({'jsonrpc':'2.0','id':1,'method':'session/close','params':{'sessionId':'$session_id'}})
+    sock.sendall((req + '\
+').encode())
+    sock.settimeout(15)
+    resp = sock.recv(4096)
+    sock.close()
+    result = json.loads(resp)
+    if 'error' in result:
+        print(f'[acp-session-close] error: ' + str(result.get('error','unknown')), flush=True)
+        sys.exit(1)
+    print(f'[acp-session-close] closed session $session_id', flush=True)
+except FileNotFoundError:
+    pass
+except Exception as e:
+    print(f'[acp-session-close] failed: {e}', flush=True)
+" 2>/dev/null || true
 }
 
 _stop_acp_bridge() {
