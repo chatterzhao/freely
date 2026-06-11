@@ -31,35 +31,70 @@ REQUIRED_FIELDS = {
 
 # AI natural-language → canonical exit_kind normalization
 EXIT_KIND_ALIASES = {
-    'completed':                 'worker_done',
-    'success':                   'worker_done',
-    'partial':                   'worker_done',
-    'normal':                    'worker_done',
-    'completed_no_op':           'worker_done',
-    'clean_success':             'worker_done',
-    'completed_with_findings':   'worker_done',
-    'partial_success':           'worker_done',
-    'completed_s_hint':          'worker_done',
-    'completed_with_evidence':   'worker_done',
-    'done':                      'worker_done',
-    'completed_idle':            'worker_done',
-    'completed_independent':     'worker_done',
-    'complete':                  'worker_done',
-    'task_already_done':         'worker_done',
-    'noop':                      'worker_done',
-    'ok':                        'worker_done',
-    'good':                      'worker_done',
-    'all_done':                  'worker_done',
-    'blocked':                   'worker_blocked',
-    'stuck':                     'worker_blocked',
-    'cannot_proceed':            'worker_blocked',
-    'awaiting_review':           'worker_handoff_needed',
-    'needs_research':            'worker_handoff_needed',
-    'transition':                'worker_handoff_needed',
-    'needs_input':               'worker_handoff_needed',
-    'requires_manager':          'worker_handoff_needed',
-    'idle':                      'stop_ai',
-    'dispatch':                  'delegate_workers',
+    # ── Manager exit_kind 别名 ──
+    # delegate_workers
+    'delegate':              'delegate_workers',
+    'delegated':             'delegate_workers',
+    'dispatch':               'delegate_workers',  # 原有
+    # manager_working
+    'working':               'manager_working',
+    'active':                 'manager_working',
+    # resume_manager
+    'continue':              'resume_manager',
+    'resume':                 'resume_manager',
+    'analyzing':              'resume_manager',
+    'researching':            'resume_manager',
+    # stop_ai
+    'stopped':               'stop_ai',
+    'paused':                'stop_ai',
+    'exit':                  'stop_ai',
+    'finished':              'stop_ai',
+    'nothing':               'stop_ai',
+    'no_work':               'stop_ai',
+    'done':                  'stop_ai',
+    'idle':                   'stop_ai',  # 原有
+
+    # ── Worker exit_kind 别名 ──
+    # worker_done
+    'completed':              'worker_done',
+    'success':                'worker_done',
+    'partial':                'worker_done',
+    'normal':                 'worker_done',
+    'completed_no_op':        'worker_done',
+    'clean_success':           'worker_done',
+    'completed_with_findings': 'worker_done',
+    'partial_success':        'worker_done',
+    'completed_s_hint':        'worker_done',
+    'completed_with_evidence': 'worker_done',
+    'done':                    'worker_done',
+    'completed_idle':          'worker_done',
+    'completed_independent':  'worker_done',
+    'complete':                'worker_done',
+    'task_already_done':       'worker_done',
+    'noop':                   'worker_done',
+    'ok':                     'worker_done',
+    'good':                   'worker_done',
+    'all_done':               'worker_done',
+    'finished':               'worker_done',
+    'finished_no_op':         'worker_done',
+    'completed_no_changes':    'worker_done',
+    'no_changes_needed':      'worker_done',
+    'skip':                   'worker_done',
+    'skipped':                'worker_done',
+    # worker_blocked
+    'blocked':                'worker_blocked',
+    'stuck':                  'worker_blocked',
+    'cannot_proceed':         'worker_blocked',
+    'waiting':                'worker_blocked',
+    'waiting_on':             'worker_blocked',
+    # worker_handoff_needed
+    'awaiting_review':       'worker_handoff_needed',
+    'needs_research':         'worker_handoff_needed',
+    'transition':             'worker_handoff_needed',
+    'needs_input':            'worker_handoff_needed',
+    'requires_manager':       'worker_handoff_needed',
+    'waiting_input':          'worker_handoff_needed',
+    'needs_approval':         'worker_handoff_needed',
 }
 
 # AI field name aliases → canonical names
@@ -155,22 +190,41 @@ def normalize_fields(ai_fields: dict) -> dict:
     return ai_fields
 
 
-def normalize_exit_kind(ai_fields: dict) -> dict:
-    """Normalize natural-language exit_kind to canonical values. Mutates and returns."""
+def normalize_exit_kind(ai_fields: dict, role: str = "") -> dict:
+    """Normalize natural-language exit_kind to canonical values. Mutates and returns.
+
+    Args:
+        ai_fields: The handoff fields dict (will be modified in place)
+        role: The agent role ("manager" or "worker"), used to resolve ambiguous aliases.
+              If empty, defaults to manager semantics for ambiguous aliases.
+    """
     exit_kind = ai_fields.get('exit_kind', '')
+
+    # ── Handle ambiguous aliases with context awareness ──────────────────────
+    AMBIGUOUS_ALIASES = {'finished', 'done', 'no_changes_needed'}
+    if exit_kind in AMBIGUOUS_ALIASES:
+        if role == 'worker':
+            # Workers use 'finished'/'done' to indicate completion
+            ai_fields['exit_kind'] = 'worker_done'
+        else:
+            # Managers use 'finished'/'done' to indicate stop/idle
+            ai_fields['exit_kind'] = 'stop_ai'
+        return ai_fields
+
+    # ── Handle unambiguous aliases ─────────────────────────────────────────
     if exit_kind in EXIT_KIND_ALIASES:
         ai_fields['exit_kind'] = EXIT_KIND_ALIASES[exit_kind]
     return ai_fields
 
 
-def validate_handoff_json(ai_fields: dict) -> tuple[bool, list[dict]]:
+def validate_handoff_json(ai_fields: dict, role: str = "") -> tuple[bool, list[dict]]:
     """Validate AI-produced handoff JSON. Returns (ok, errors).
 
     Normalizes natural-language exit_kind to canonical values first.
     """
     errors = []
     exit_kind = ai_fields.get('exit_kind', '')
-    normalize_exit_kind(ai_fields)
+    normalize_exit_kind(ai_fields, role=role)
     exit_kind = ai_fields.get('exit_kind', '')
 
     if exit_kind not in VALID_EXIT_KINDS:

@@ -227,7 +227,8 @@ def parse_handoff_json(reply_text: str, context: dict):
         return None, "repair", [{"field": "parse", "error": str(e)}]
 
     normalize_fields(ai_fields)
-    ok, errors = validate_handoff_json(ai_fields)
+    role = context.get("role", "manager")
+    ok, errors = validate_handoff_json(ai_fields, role=role)
     if not ok:
         return None, "repair", errors
 
