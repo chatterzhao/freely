@@ -398,8 +398,6 @@ def main():
                 print(f"Worker does not support skill: {args.check_capability}")
         else:
             print(f"Worker does not support skill: {args.check_capability}")
-        else:
-            print(f"Worker does not support skill: {args.check_capability}")
 
     else:
         parser.print_help()

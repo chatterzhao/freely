@@ -28,7 +28,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 RUNTIME_DIR = os.path.dirname(SCRIPT_DIR)
 sys.path.insert(0, RUNTIME_DIR)
 
-from a2a.a2a_client import A2AClient, A2AHandoffAdapter, TaskState
+from a2a.a2a_client import A2AClient, TaskState
 from a2a.a2a_server import EXIT_KIND_TO_TASK_STATE
 
 
@@ -213,7 +213,12 @@ def test_capability_check(project: str) -> TestResult:
     result.start()
 
     try:
-        adapter = A2AHandoffAdapter(project)
+        client = A2AClient(project)
+        card = client.discover_agent()
+
+        if not card:
+            result.end(False, "No Agent Card found")
+            return result
 
         # 检查支持的 skill
         supported_skills = [
@@ -224,11 +229,10 @@ def test_capability_check(project: str) -> TestResult:
         ]
 
         for skill in supported_skills:
-            has_capability = adapter.discover_and_check_capability(skill)
-            if has_capability:
+            if card.freely and skill in card.freely.get("supportedSkills", []):
                 print(f"  ✓ Worker supports: {skill}")
             else:
-                print(f"  - Worker does not support: {skill} (may be fallback)")
+                print(f"  - Worker does not support: {skill}")
 
         result.end(True)
         return result
@@ -277,28 +281,15 @@ def test_task_wait_for_completion(project: str) -> TestResult:
 
 
 def test_handoff_fallback(project: str) -> TestResult:
-    """T6: Handoff Fallback"""
-    result = TestResult("T6: Handoff Fallback")
+    """T6: Handoff Fallback (已废弃 - A2A 为主协议)"""
+    result = TestResult("T6: Handoff Fallback (deprecated)")
     result.start()
 
     try:
-        adapter = A2AHandoffAdapter(project)
-
-        # 尝试创建 Task (可能 fallback)
-        task = adapter.create_task_with_fallback(
-            skill="freely-fix-execution",
-            prompt_file="docs/issues/test/issue.md",
-            worktree="/path/to/worktree",
-            branch="feature/test",
-            reason="Test A2A with Handoff fallback",
-        )
-
-        if task:
-            print(f"  ✓ Task created (A2A or Handoff): {task.get('id') or task.get('handoff_id')}")
-            if task.get("fallback"):
-                print(f"  ✓ Fallback to Handoff was used")
-        else:
-            print(f"  - No A2A server, Handoff fallback would be used in production")
+        # T6 已废弃 - A2A 现在是主协议，不再需要 fallback
+        # 保留此测试以记录架构决策
+        print(f"  - T6 deprecated: A2A is now primary protocol")
+        print(f"  - Handoff preserved for backward compatibility only")
 
         result.end(True)
         return result
