@@ -338,93 +338,6 @@ class A2AClient:
                 break
 
 
-# ── Handoff 兼容层 ───────────────────────────────────────────────────────────
-
-class A2AHandoffAdapter:
-    """A2A 与 Handoff 的兼容层
-
-    将 A2A Task 操作转换为 Freely Handoff 操作，
-    保持向后兼容。
-    """
-
-    def __init__(self, project: str):
-        self.project = project
-        self._a2a_client = A2AClient(project)
-
-    def discover_and_check_capability(self, skill: str) -> bool:
-        """发现 Worker 并检查是否支持指定 skill"""
-        agent_card = self._a2a_client.discover_agent()
-        if not agent_card:
-            return False
-
-        # 检查 freely 扩展
-        if not agent_card.freely:
-            return False
-
-        supported_skills = agent_card.freely.get("supportedSkills", [])
-        return skill in supported_skills
-
-    def create_task_with_fallback(
-        self,
-        skill: str,
-        prompt_file: str = "",
-        worktree: str = "",
-        branch: str = "",
-        reason: str = "",
-        session_id: str = "",
-    ) -> Optional[Dict]:
-        """创建 Task，失败时 fallback 到 Handoff"""
-        try:
-            # 尝试 A2A
-            task = self._a2a_client.create_task(
-                skill=skill,
-                prompt_file=prompt_file,
-                worktree=worktree,
-                branch=branch,
-                reason=reason,
-                session_id=session_id,
-            )
-            if task:
-                return task.to_dict()
-        except Exception as e:
-            print(f"[A2A Handoff Adapter] A2A failed, falling back to Handoff: {e}")
-
-        # Fallback 到 Handoff
-        print("[A2A Handoff Adapter] Falling back to Handoff")
-        return self._fallback_to_handoff(skill, prompt_file, worktree, branch, reason, session_id)
-
-    def _fallback_to_handoff(
-        self,
-        skill: str,
-        prompt_file: str,
-        worktree: str,
-        branch: str,
-        reason: str,
-        session_id: str,
-    ) -> Optional[Dict]:
-        """Fallback 到 Handoff"""
-        # 导入 handoff 模块
-        import sys
-        sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-        try:
-            import handoff
-            handoff_id = handoff.insert_handoff(
-                role="worker",
-                raw_key=f"a2a-fallback-{skill}",
-                prompt_file=prompt_file,
-                worktree=worktree,
-                branch=branch,
-                intent_kind=skill,
-                status="pending",
-                reason=reason,
-                session_id=session_id,
-            )
-            return {"handoff_id": handoff_id, "fallback": True}
-        except Exception as e:
-            print(f"[A2A Handoff Adapter] Handoff fallback failed: {e}")
-            return None
-
-
 # ── Main ───────────────────────────────────────────────────────────────────────
 
 def main():
@@ -476,9 +389,15 @@ def main():
             print("Task wait timeout or error")
 
     elif args.check_capability:
-        adapter = A2AHandoffAdapter(args.project)
-        if adapter.discover_and_check_capability(args.check_capability):
-            print(f"Worker supports skill: {args.check_capability}")
+        card = client.discover_agent()
+        if card and card.freely:
+            supported_skills = card.freely.get("supportedSkills", [])
+            if args.check_capability in supported_skills:
+                print(f"Worker supports skill: {args.check_capability}")
+            else:
+                print(f"Worker does not support skill: {args.check_capability}")
+        else:
+            print(f"Worker does not support skill: {args.check_capability}")
         else:
             print(f"Worker does not support skill: {args.check_capability}")
 
