@@ -2163,7 +2163,7 @@ handoff_file() {
 
 _db_exit_contract_field() {
   local project="$1" role="$2" field="$3" _handoff_py _db_path
-  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db_path=""$project/.freely/freely.db""
   [[ -f "$_handoff_py" && -f "$_db_path" ]] || return 1
   if [[ "$role" == "manager" ]]; then
@@ -12562,7 +12562,7 @@ worktree_has_active_worker() {
   local project="$1" worktree="$2"
   [[ -n "$worktree" && -d "$worktree" ]] || return 1
   local _handoff_py _db_path
-  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db_path="$project/.freely/freely.db"
   [[ -f "$_handoff_py" && -f "$_db_path" ]] || return 1
   # Only check launched — pending is transient (created and launched atomically in consume_delegate_workers)
@@ -12680,7 +12680,7 @@ manager_runtime_launch_workers_after_ai_cycle_if_needed() {
 
   local _worker_csv _prompt_file _launched_count _handoff_py _db_path _handoff_id
   local _prev_worker_id _prev_worker_summary _raw_key _parent_handoff_id _is_followthrough
-  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db_path=""$project/.freely/freely.db""
   _worker_csv="$(_db_exit_contract_field "$project" manager worker_prompts_csv)"
   # Get parent handoff_id (latest manager record)
@@ -14300,8 +14300,8 @@ append_manager_exit_contract_directive_if_needed() {
 
 委派前查 blocked/completed：
 ```
-python3 docs/system/workspace/scripts/runtime/handoff.py list --db .freely/freely.db --role worker --status blocked
-python3 docs/system/workspace/scripts/runtime/handoff.py list --db .freely/freely.db --role worker --status completed
+python3 docs/system/workspace/scripts/runtime/a2a_task.py list --db .freely/freely.db --role worker --status blocked
+python3 docs/system/workspace/scripts/runtime/a2a_task.py list --db .freely/freely.db --role worker --status completed
 ```
 
 在回复末尾输出 ```json5 代码块，格式见 docs/system/workspace/agents/manager-agent.md §交接 JSON：
@@ -14346,7 +14346,7 @@ sync_exit_contract_to_handoffs() {
 parse_handoff_json_reply() {
   local project="$1" cycle_log="$2" role="$3" raw_key="$4" prompt_file="$5"
   local _handoff_py _db_path _reply_text _result _action _exit_kind
-  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db_path="$project/.freely/freely.db"
   [[ -f "$_handoff_py" && -f "$_db_path" ]] || { printf 'repair:["handoff_py_or_db_missing"]\n'; return 1; }
   # Extract tail of cycle log (handoff JSON is at end of AI reply)
@@ -14375,7 +14375,7 @@ parse_handoff_json_reply() {
 
 manager_exit_contract_kind() {
   local project="$1" _handoff_py _db_path
-  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db_path=""$project/.freely/freely.db""
   if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
     local pending_workers
@@ -14410,7 +14410,7 @@ validate_manager_exit_contract_for_project() {
   local project="$1" kind="" missing_csv=""
   local stop_reason restart_point next_action why_not_stop why_not_delegate worker_prompts_csv
   local _handoff_py _db_path
-  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db_path=""$project/.freely/freely.db""
   if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
     local pending_workers worker_prompts_list
@@ -14499,7 +14499,7 @@ autofill_manager_exit_contract_for_cleanup_delegate_workers_if_possible() {
   manager_exit_contract_has_launchable_worker_prompt "$project" "$worker_prompts_csv" || return 1
 
   local _handoff_py _db_path _raw_key _hid
-  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db_path=""$project/.freely/freely.db""
   if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
     _raw_key=$(echo "$continuity_file" | grep -oE '[0-9]{8}T[0-9]{4,6}Z' | head -1 || echo "autofill")
@@ -14546,7 +14546,7 @@ autofill_manager_exit_contract_for_continuity_resume_if_possible() {
   [[ -n "$next_action" ]] || next_action="continue the current manager-owned lane from $(basename "$continuity_file") before widening patrol"
 
   local _handoff_py _db_path _raw_key
-  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db_path=""$project/.freely/freely.db""
   if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
     _raw_key=$(echo "$continuity_file" | grep -oE '[0-9]{8}T[0-9]{4,6}Z' | head -1 || echo "autofill")
@@ -14564,7 +14564,7 @@ autofill_manager_exit_contract_for_continuity_resume_if_possible() {
 
 worker_exit_contract_kind() {
   local project="$1" _handoff_py _db_path
-  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db_path=""$project/.freely/freely.db""
   [[ -f "$_handoff_py" && -f "$_db_path" ]] || return 1
   python3 "$_handoff_py" list --db "$_db_path" --role worker --status completed 2>/dev/null | python3 -c "
@@ -14825,7 +14825,7 @@ _manager_auto_consume_workers() {
   local project="$1"
   local _worker_csv _hp _db _prompt_file _rk _consumed
   _worker_csv="$(_db_exit_contract_field "$project" manager worker_prompts_csv 2>/dev/null || echo "")"
-  _hp="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  _hp="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db="$project/.freely/freely.db"
   [[ -f "$_hp" && -f "$_db" ]] || return 0
   _consumed=0
@@ -16134,7 +16134,7 @@ PRPY
       rm -f "$_scan_pr_tmp"
       # Post-process: filter scan items that have active workers
       local _handoff_py _db_path
-      _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+      _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
       _db_path="$project/.freely/freely.db"
       if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
         python3 - "$output_path" "$_handoff_py" "$_db_path" <<'SCANFILTER'
@@ -18861,7 +18861,7 @@ append_manager_handoff_context_if_needed() {
   local project="$1"
   [[ "$(effective_runtime_role_for_project "$project")" == "manager" ]] || return 0
   local _handoff_py _db_path
-  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db_path="$project/.freely/freely.db"
   [[ -f "$_handoff_py" && -f "$_db_path" ]] || return 0
 
@@ -19085,7 +19085,7 @@ EOF
 
   # Initialize freely.db via daemon (handles all tables)
   local freely_db=""$project/.freely/freely.db""
-  local handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  local handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
   local daemon_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely_db_manager.py"
 
@@ -20170,7 +20170,7 @@ start_project_runtime() {
 
   # Initialize SQLite worker delegation store + migrate old exit contracts
   local _handoff_py _worker_db_path
-  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db_path=""$project/.freely/freely.db""
   if [[ -f "$_handoff_py" ]]; then
     python3 "$_handoff_py" init --db "$_db_path" >/dev/null 2>&1 || true
@@ -21070,7 +21070,7 @@ print(ready)
     # The AI just saw all send_to_ai=pending/fail messages in its prompt.
     # Update them to success so they won't be re-delivered next cycle.
     if [[ "$exit_contract_action" != "resume_invalid" && "$exit_contract_action" != "" ]]; then
-      _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+      _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
       _handoff_db="$PROJECT_ROOT/.freely/freely.db"
       if [[ -f "$_handoff_py" && -f "$_handoff_db" ]]; then
         python3 -c "

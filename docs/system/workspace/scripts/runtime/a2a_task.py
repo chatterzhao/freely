@@ -208,55 +208,125 @@ def insert_handoff(role: str = "manager", raw_key: str = "", **kwargs) -> str:
 
 def _main() -> int:
     parser = argparse.ArgumentParser(description="A2A Task DB API")
+    parser.add_argument("--db", default=None, help="ignored (compat)")  # legacy compat
     sub = parser.add_subparsers(dest="cmd")
 
+    # create
     p_create = sub.add_parser("create")
     p_create.add_argument("--skill", default="")
     p_create.add_argument("--worktree", default="")
     p_create.add_argument("--branch", default="")
-    p_create.add_argument("--raw-key", default="")
+    p_create.add_argument("--raw-key", default=None)
     p_create.add_argument("--prompt-file", default="")
     p_create.add_argument("--message", default="")
 
+    # get
     p_get = sub.add_parser("get")
-    p_get.add_argument("task_id")
+    p_get.add_argument("--handoff-id", dest="task_id", default="")
 
+    # list
     p_list = sub.add_parser("list")
-    p_list.add_argument("--state", default=None)
-    p_list.add_argument("--agent-id", default=None)
+    p_list.add_argument("--role", default="worker")  # legacy compat
+    p_list.add_argument("--status", default=None)
     p_list.add_argument("--raw-key", default=None)
     p_list.add_argument("--worktree", default=None)
 
+    # update
     p_update = sub.add_parser("update")
-    p_update.add_argument("task_id")
+    p_update.add_argument("--handoff-id", dest="task_id", default="")
     p_update.add_argument("--state", default=None)
     p_update.add_argument("--exit-kind", default=None)
+    p_update.add_argument("--status", default=None)  # legacy compat
+
+    # latest-manager
+    p_lm = sub.add_parser("latest-manager")
+
+    # latest-completed-worker
+    p_lcw = sub.add_parser("latest-completed-worker")
+    p_lcw.add_argument("--raw-key", default=None)
+
+    # update-last-activity
+    p_ula = sub.add_parser("update-last-activity")
+    p_ula.add_argument("--handoff-id", dest="task_id", default="")
+
+    # auto-consume
+    p_ac = sub.add_parser("auto-consume")
+    p_ac.add_argument("--raw-key", default="")
+
+    # insert (legacy compat)
+    p_insert = sub.add_parser("insert")
+    p_insert.add_argument("--role", default="manager")
+    p_insert.add_argument("--raw-key", default="")
+    p_insert.add_argument("--worktree", default="")
+    p_insert.add_argument("--branch", default="")
+    p_insert.add_argument("--prompt-file", default="")
+    p_insert.add_argument("--intent-kind", default="")
 
     args = parser.parse_args()
 
     if args.cmd == "create":
-        tid = create_task(skill=args.skill, worktree=args.worktree,
-                          branch=args.branch, raw_key=getattr(args, 'raw_key', ''),
-                          prompt_file=getattr(args, 'prompt_file', ''),
-                          message=getattr(args, 'message', ''))
+        tid = create_task(
+            skill=args.skill or "", worktree=args.worktree or "",
+            branch=args.branch or "", raw_key=getattr(args, 'raw_key', None) or "",
+            prompt_file=getattr(args, 'prompt_file', "") or "",
+            message=getattr(args, 'message', "") or "")
         print(json.dumps({"task_id": tid}))
     elif args.cmd == "get":
         t = get_task(args.task_id)
         print(json.dumps(t or {}))
     elif args.cmd == "list":
+        agent_id = None
+        if hasattr(args, 'role') and args.role == 'worker':
+            agent_id = 'worker'
+        elif hasattr(args, 'role') and args.role == 'manager':
+            agent_id = 'manager'
+        state_map = {
+            'launched': 'working', 'pending': 'submitted',
+            'completed': 'completed', 'blocked': 'input-required',
+            'rejected': 'failed', 'consumed': 'completed',
+        }
+        state = None
+        if getattr(args, 'status', None):
+            state = state_map.get(args.status, args.status)
         if hasattr(args, 'raw_key') and args.raw_key:
             rows = list_by_raw_key(args.raw_key)
         elif hasattr(args, 'worktree') and args.worktree:
-            rows = list_by_worktree(args.worktree, args.state)
+            rows = list_by_worktree(args.worktree, state)
         else:
-            rows = list_tasks(state=args.state, agent_id=getattr(args, 'agent_id', None))
+            rows = list_tasks(state=state, agent_id=agent_id)
         print(json.dumps({"rows": rows}))
     elif args.cmd == "update":
         kwargs = {}
-        if args.state: kwargs["state"] = args.state
-        if getattr(args, 'exit_kind', None): kwargs["exit_kind"] = args.exit_kind
+        if getattr(args, 'status', None):
+            sm = {'launched': 'working', 'pending': 'submitted',
+                  'completed': 'completed', 'blocked': 'input-required'}
+            kwargs['state'] = sm.get(args.status, args.status)
+        if getattr(args, 'state', None): kwargs['state'] = args.state
+        if getattr(args, 'exit_kind', None): kwargs['exit_kind'] = args.exit_kind
         print(json.dumps({"affected": update_task(args.task_id, **kwargs)}))
+    elif args.cmd == "latest-manager":
+        t = latest_manager()
+        print(json.dumps(t or {}))
+    elif args.cmd == "latest-completed-worker":
+        rows = list_by_raw_key(getattr(args, 'raw_key', None) or "")
+        completed = [r for r in rows if r.get('state') == 'completed' and r.get('agent_id') == 'worker']
+        print(json.dumps(completed[0] if completed else {}))
+    elif args.cmd == "update-last-activity":
+        print(json.dumps({"affected": update_task(args.task_id)}))
+    elif args.cmd == "auto-consume":
+        rk = getattr(args, 'raw_key', '') or ""
+        rows = list_by_raw_key(rk)
+        affected = 0
+        for r in rows:
+            if r.get('state') in ('completed', 'failed') and r.get('agent_id') == 'worker':
+                affected += update_task(r.get('task_id', ''), state='completed')
+        print(json.dumps({"affected": affected}))
+    elif args.cmd == "insert":
+        tid = insert_handoff(
+            role=getattr(args, 'role', 'manager'), raw_key=getattr(args, 'raw_key', '') or '',
+            worktree=getattr(args, 'worktree', '') or '',
+            branch=getattr(args, 'branch', '') or '',
+            prompt_file=getattr(args, 'prompt_file', '') or '',
+            intent_kind=getattr(args, 'intent_kind', '') or '')
+        print(json.dumps({"handoff_id": tid}))
     return 0
-
-if __name__ == "__main__":
-    raise SystemExit(_main())
