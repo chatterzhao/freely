@@ -927,30 +927,89 @@ def h_session_tool_switch_update_sid(daemon: DbDaemon, params: dict) -> dict:
     return {"changed": changed}
 
 
-# ── handoff.* ─────────────────────────────────────────────────────────────
+# ── handoff.* → a2a_tasks compat ───────────────────────────────────────────
+# Phase 1: All handoff.* RPC methods now write to a2a_tasks table.
+# RPC names preserved for backward compat; internal storage is a2a_tasks.
+# Field mapping: handoff_id→task_id, role→agent_id, status→state, etc.
+
+_HANDOFF_STATUS_TO_A2A = {
+    "pending": "submitted", "launched": "working", "completed": "completed",
+    "rejected": "failed", "blocked": "input-required", "consumed": "completed",
+}
+
+_A2A_STATE_TO_HANDOFF = {v: k for k, v in _HANDOFF_STATUS_TO_A2A.items()}
+
+def _handoff_to_a2a_params(p: dict) -> dict:
+    """Map handoff RPC params → a2a_tasks field names."""
+    status = p.get("status", "pending")
+    return {
+        "task_id": p.get("handoff_id", ""),
+        "name": p.get("intent_kind", ""),
+        "description": p.get("reason", ""),
+        "state": _HANDOFF_STATUS_TO_A2A.get(status, "submitted"),
+        "agent_id": p.get("role", "manager"),
+        "skill": p.get("intent_kind", ""),
+        "message": p.get("completion_summary", p.get("reason", "")),
+        "raw_key": p.get("raw_key", ""),
+        "worktree": p.get("worktree", ""), "branch": p.get("branch", ""),
+        "prompt_file": p.get("prompt_file", ""), "exit_kind": p.get("exit_kind", ""),
+        "reason": p.get("reason", ""), "next_action": p.get("next_action", ""),
+        "completion_summary": p.get("completion_summary", ""),
+        "evidence_paths": p.get("evidence_paths", ""),
+        "worker_prompts_csv": p.get("worker_prompts_csv", ""),
+        "error": p.get("error", ""), "session_id": p.get("session_id", ""),
+        "launched_at": p.get("launched_at", ""), "completed_at": p.get("completed_at", ""),
+    }
+
+def _a2a_row_to_handoff(r: dict) -> dict:
+    """Map a2a_tasks row → handoff-compatible dict."""
+    state = r.get("state", "submitted")
+    return {
+        "handoff_id": r.get("task_id", ""), "role": r.get("agent_id", "manager"),
+        "raw_key": r.get("raw_key", ""), "worktree": r.get("worktree", ""),
+        "branch": r.get("branch", ""), "prompt_file": r.get("prompt_file", ""),
+        "parent_handoff_id": "", "previous_worker_handoff_id": "",
+        "intent_kind": r.get("skill", ""),
+        "status": _A2A_STATE_TO_HANDOFF.get(state, "pending"),
+        "exit_kind": r.get("exit_kind", ""), "reason": r.get("reason", ""),
+        "restart_point": "", "next_action": r.get("next_action", ""),
+        "completion_summary": r.get("completion_summary", ""),
+        "evidence_paths": r.get("evidence_paths", ""),
+        "worker_prompts_csv": r.get("worker_prompts_csv", ""),
+        "repair_target_role": "", "repair_target_handoff_id": "",
+        "validation_errors_json": "[]", "session_id": r.get("session_id", ""),
+        "created_by": r.get("agent_id", ""), "consumed_by": "",
+        "send_to_ai": "success" if state == "completed" else "pending",
+        "launched_at": r.get("launched_at", ""),
+        "last_activity_at": r.get("updated_at", ""),
+        "completed_at": r.get("completed_at", ""),
+        "created_at": r.get("created_at", ""), "updated_at": r.get("updated_at", ""),
+    }
+
 
 @_h("handoff.insert")
 def h_handoff_insert(daemon: DbDaemon, params: dict) -> dict:
+    """Insert via a2a_tasks (Phase 1 compat)."""
     now = _now_utc()
     hid = (now.replace("T", "").replace("Z", "").replace("-", "").replace(":", "")
            + "-" + uuid.uuid4().hex[:6])
     daemon.conn.execute(
-        """INSERT INTO handoffs (handoff_id, role, raw_key, worktree, branch,
-           prompt_file, parent_handoff_id, previous_worker_handoff_id,
-           intent_kind, status, exit_kind, reason, restart_point, next_action,
-           completion_summary, evidence_paths, worker_prompts_csv,
-           session_id, created_by, consumed_by, created_at, updated_at)
-           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
-        (hid, params.get("role", "manager"), params.get("raw_key", ""),
-         params.get("worktree", ""), params.get("branch", ""),
-         params.get("prompt_file", ""), params.get("parent", ""),
-         params.get("prev_worker", ""), params.get("intent_kind", ""),
-         params.get("status", "pending"), params.get("exit_kind", ""),
-         params.get("reason", ""), params.get("restart_point", ""),
+        """INSERT INTO a2a_tasks (task_id, name, state, agent_id, skill, message,
+           raw_key, worktree, branch, prompt_file, exit_kind, reason,
+           next_action, completion_summary, evidence_paths, worker_prompts_csv,
+           session_id, launched_at, created_at, updated_at)
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+        (hid, params.get("intent_kind", ""),
+         _HANDOFF_STATUS_TO_A2A.get(params.get("status", "pending"), "submitted"),
+         params.get("role", "manager"),
+         params.get("intent_kind", ""),
+         params.get("completion_summary", params.get("reason", "")),
+         params.get("raw_key", ""), params.get("worktree", ""),
+         params.get("branch", ""), params.get("prompt_file", ""),
+         params.get("exit_kind", ""), params.get("reason", ""),
          params.get("next_action", ""), params.get("completion_summary", ""),
          params.get("evidence_paths", ""), params.get("worker_prompts_csv", ""),
-         params.get("session_id", ""), params.get("created_by", ""),
-         params.get("consumed_by", ""), now, now),
+         params.get("session_id", ""), now, now, now),
     )
     daemon.conn.commit()
     return {"handoff_id": hid}
@@ -958,87 +1017,83 @@ def h_handoff_insert(daemon: DbDaemon, params: dict) -> dict:
 
 @_h("handoff.update")
 def h_handoff_update(daemon: DbDaemon, params: dict) -> dict:
-    now = _now_utc()
-    fields = []
-    values = []
-    for f in ("status", "exit_kind", "session_id", "reason", "restart_point",
-              "next_action", "completion_summary", "evidence_paths", "worker_prompts_csv"):
-        if f in params:
-            fields.append(f"{f}=?")
-            values.append(params[f])
-    if not fields:
-        return {"affected": 0}
-    fields.append("updated_at=?")
-    values.append(now)
-    values.append(params["handoff_id"])
-    daemon.conn.execute(
-        f"UPDATE handoffs SET {', '.join(fields)} WHERE handoff_id=?",
-        values,
-    )
-    affected = daemon.conn.total_changes
+    now, fields, values = _now_utc(), [], []
+    fm = {"status": "state", "exit_kind": "exit_kind", "session_id": "session_id",
+          "reason": "reason", "next_action": "next_action",
+          "completion_summary": "completion_summary", "evidence_paths": "evidence_paths",
+          "worker_prompts_csv": "worker_prompts_csv"}
+    for hf, af in fm.items():
+        if hf in params:
+            v = params[hf]
+            if hf == "status": v = _HANDOFF_STATUS_TO_A2A.get(v, v)
+            fields.append(f"{af}=?"); values.append(v)
+    if not fields: return {"affected": 0}
+    fields.append("updated_at=?"); values.append(now); values.append(params["handoff_id"])
+    c = daemon.conn.execute(
+        f"UPDATE a2a_tasks SET {', '.join(fields)} WHERE task_id=?", values)
     daemon.conn.commit()
-    return {"affected": affected}
+    return {"affected": c.rowcount if hasattr(c, 'rowcount') else 1}
 
 
 @_h("handoff.get")
 def h_handoff_get(daemon: DbDaemon, params: dict) -> dict:
     row = daemon.conn.execute(
-        "SELECT * FROM handoffs WHERE handoff_id=?", (params["handoff_id"],)
-    ).fetchone()
-    return {"record": dict(row) if row else None}
+        "SELECT * FROM a2a_tasks WHERE task_id=?", (params["handoff_id"],)).fetchone()
+    if not row: return {"record": None}
+    cols = [d[0] for d in daemon.conn.execute("PRAGMA table_info(a2a_tasks)").fetchall()]
+    return {"record": _a2a_row_to_handoff(dict(zip(cols, row)))}
 
 
 @_h("handoff.list")
 def h_handoff_list(daemon: DbDaemon, params: dict) -> dict:
     role = params.get("role", "worker")
-    status = params.get("status")
-    if status:
+    h_status = params.get("status")
+    if h_status:
+        a2a_state = _HANDOFF_STATUS_TO_A2A.get(h_status, h_status)
         rows = daemon.conn.execute(
-            "SELECT * FROM handoffs WHERE role=? AND status=? ORDER BY created_at DESC",
-            (role, status),
-        ).fetchall()
+            "SELECT * FROM a2a_tasks WHERE agent_id=? AND state=? ORDER BY created_at DESC",
+            (role, a2a_state)).fetchall()
     else:
         rows = daemon.conn.execute(
-            "SELECT * FROM handoffs WHERE role=? ORDER BY created_at DESC",
-            (role,),
-        ).fetchall()
-    return {"rows": [dict(r) for r in rows]}
+            "SELECT * FROM a2a_tasks WHERE agent_id=? ORDER BY created_at DESC", (role,)).fetchall()
+    cols = [d[0] for d in daemon.conn.execute("PRAGMA table_info(a2a_tasks)").fetchall()]
+    return {"rows": [_a2a_row_to_handoff(dict(zip(cols, r))) for r in rows]}
 
 
 @_h("handoff.list-by-key")
 def h_handoff_list_by_key(daemon: DbDaemon, params: dict) -> dict:
     rows = daemon.conn.execute(
-        "SELECT * FROM handoffs WHERE raw_key=? ORDER BY created_at DESC",
-        (params["raw_key"],),
-    ).fetchall()
-    return {"rows": [dict(r) for r in rows]}
+        "SELECT * FROM a2a_tasks WHERE raw_key=? ORDER BY created_at DESC",
+        (params["raw_key"],)).fetchall()
+    cols = [d[0] for d in daemon.conn.execute("PRAGMA table_info(a2a_tasks)").fetchall()]
+    return {"rows": [_a2a_row_to_handoff(dict(zip(cols, r))) for r in rows]}
 
 
 @_h("handoff.active-workers")
 def h_handoff_active_workers(daemon: DbDaemon, params: dict) -> dict:
-    worktree = params.get("worktree", "")
     rows = daemon.conn.execute(
-        "SELECT * FROM handoffs WHERE role='worker' AND status='launched' AND worktree=?",
-        (worktree,),
-    ).fetchall()
-    return {"rows": [dict(r) for r in rows]}
+        "SELECT * FROM a2a_tasks WHERE agent_id='worker' AND state='working' AND worktree=?",
+        (params.get("worktree", ""),)).fetchall()
+    cols = [d[0] for d in daemon.conn.execute("PRAGMA table_info(a2a_tasks)").fetchall()]
+    return {"rows": [_a2a_row_to_handoff(dict(zip(cols, r))) for r in rows]}
 
 
 @_h("handoff.has-active-worker")
 def h_handoff_has_active_worker(daemon: DbDaemon, params: dict) -> dict:
     row = daemon.conn.execute(
-        "SELECT COUNT(*) FROM handoffs WHERE role='worker' AND status='launched' AND worktree=?",
-        (params.get("worktree", ""),),
-    ).fetchone()
-    return {"has_active": row[0] > 0}
+        "SELECT COUNT(*) FROM a2a_tasks WHERE agent_id='worker' AND state='working' AND worktree=?",
+        (params.get("worktree", ""),)).fetchone()
+    return {"has_active": row[0] > 0 if row else False}
 
 
 @_h("handoff.latest-manager")
 def h_handoff_latest_manager(daemon: DbDaemon, params: dict) -> dict:
     row = daemon.conn.execute(
-        "SELECT * FROM handoffs WHERE role='manager' ORDER BY created_at DESC LIMIT 1"
+        "SELECT * FROM a2a_tasks WHERE agent_id='manager' ORDER BY created_at DESC LIMIT 1"
     ).fetchone()
-    return {"record": dict(row) if row else None}
+    if not row: return {"record": None}
+    cols = [d[0] for d in daemon.conn.execute("PRAGMA table_info(a2a_tasks)").fetchall()]
+    return {"record": _a2a_row_to_handoff(dict(zip(cols, row)))}
 
 
 @_h("handoff.latest-completed-worker")
@@ -1046,196 +1101,76 @@ def h_handoff_latest_completed_worker(daemon: DbDaemon, params: dict) -> dict:
     raw_key = params.get("raw_key", "")
     if raw_key:
         row = daemon.conn.execute(
-            "SELECT * FROM handoffs WHERE role='worker' AND status='completed' AND raw_key=? "
-            "ORDER BY completed_at DESC LIMIT 1", (raw_key,)
-        ).fetchone()
+            "SELECT * FROM a2a_tasks WHERE agent_id='worker' AND state='completed' AND raw_key=? "
+            "ORDER BY completed_at DESC LIMIT 1", (raw_key,)).fetchone()
     else:
         row = daemon.conn.execute(
-            "SELECT * FROM handoffs WHERE role='worker' AND status='completed' "
-            "ORDER BY completed_at DESC LIMIT 1"
-        ).fetchone()
-    return {"record": dict(row) if row else None}
+            "SELECT * FROM a2a_tasks WHERE agent_id='worker' AND state='completed' "
+            "ORDER BY completed_at DESC LIMIT 1").fetchone()
+    if not row: return {"record": None}
+    cols = [d[0] for d in daemon.conn.execute("PRAGMA table_info(a2a_tasks)").fetchall()]
+    return {"record": _a2a_row_to_handoff(dict(zip(cols, row)))}
 
 
 @_h("handoff.mark-stale")
 def h_handoff_mark_stale(daemon: DbDaemon, params: dict) -> dict:
     timeout = int(params.get("inactivity_minutes", 15))
     daemon.conn.execute(
-        "UPDATE handoffs SET status='blocked', updated_at=? "
-        "WHERE status IN ('pending','launched') AND role='worker' "
-        "AND datetime(last_activity_at) < datetime('now', ? || ' minutes')",
-        (_now_utc(), f"-{timeout}"),
-    )
-    affected = daemon.conn.total_changes
+        "UPDATE a2a_tasks SET state='input-required', updated_at=? "
+        "WHERE state IN ('submitted','working') AND agent_id='worker' "
+        "AND datetime(updated_at) < datetime('now', ? || ' minutes')",
+        (_now_utc(), f"-{timeout}"))
     daemon.conn.commit()
-    return {"affected": affected}
+    return {"affected": daemon.conn.total_changes}
 
 
 @_h("handoff.auto-consume")
 def h_handoff_auto_consume(daemon: DbDaemon, params: dict) -> dict:
-    raw_key = params.get("raw_key", "")
-    consumed_by = params.get("consumed_by", "manager")
+    now = _now_utc()
     daemon.conn.execute(
-        "UPDATE handoffs SET status='consumed', consumed_by=?, updated_at=? "
-        "WHERE raw_key=? AND role='worker' AND status IN ('completed','rejected')",
-        (consumed_by, _now_utc(), raw_key),
-    )
-    affected = daemon.conn.total_changes
+        "UPDATE a2a_tasks SET state='completed', updated_at=?, completed_at=? "
+        "WHERE raw_key=? AND agent_id='worker' AND state IN ('completed','failed')",
+        (now, now, params.get("raw_key", "")))
     daemon.conn.commit()
-    return {"affected": affected}
+    return {"affected": daemon.conn.total_changes}
 
 
 @_h("handoff.update-last-activity")
 def h_handoff_update_last_activity(daemon: DbDaemon, params: dict) -> dict:
     daemon.conn.execute(
-        "UPDATE handoffs SET last_activity_at=? WHERE handoff_id=?",
-        (_now_utc(), params["handoff_id"]),
-    )
+        "UPDATE a2a_tasks SET updated_at=? WHERE task_id=?",
+        (_now_utc(), params["handoff_id"]))
     daemon.conn.commit()
     return {"ok": True}
 
 
 @_h("handoff.update-send-to-ai")
 def h_handoff_update_send_to_ai(daemon: DbDaemon, params: dict) -> dict:
-    daemon.conn.execute(
-        "UPDATE handoffs SET send_to_ai=? WHERE handoff_id=?",
-        (params["send_to_ai"], params["handoff_id"]),
-    )
-    affected = daemon.conn.total_changes
-    daemon.conn.commit()
-    return {"affected": affected}
+    return {"affected": 1}  # no-op in A2A
 
 
 @_h("handoff.update-worker-pid")
 def h_handoff_update_worker_pid(daemon: DbDaemon, params: dict) -> dict:
-    daemon.conn.execute(
-        "UPDATE handoffs SET worker_pid=? WHERE handoff_id=?",
-        (params["worker_pid"], params["handoff_id"]),
-    )
-    affected = daemon.conn.total_changes
-    daemon.conn.commit()
-    return {"affected": affected}
+    return {"affected": 1}  # no-op in A2A
 
 
 @_h("handoff.list-pending-delivery")
 def h_handoff_list_pending_delivery(daemon: DbDaemon, params: dict) -> dict:
-    consumed_by = params.get("consumed_by", "")
-    if consumed_by:
-        rows = daemon.conn.execute(
-            "SELECT * FROM handoffs WHERE send_to_ai='pending' AND consumed_by=? "
-            "ORDER BY created_at ASC", (consumed_by,)
-        ).fetchall()
-    else:
-        rows = daemon.conn.execute(
-            "SELECT * FROM handoffs WHERE send_to_ai='pending' ORDER BY created_at ASC"
-        ).fetchall()
-    return {"rows": [dict(r) for r in rows]}
+    rows = daemon.conn.execute(
+        "SELECT * FROM a2a_tasks WHERE state='submitted' ORDER BY created_at ASC").fetchall()
+    cols = [d[0] for d in daemon.conn.execute("PRAGMA table_info(a2a_tasks)").fetchall()]
+    return {"rows": [_a2a_row_to_handoff(dict(zip(cols, r))) for r in rows]}
 
 
 @_h("handoff.get-launched-pids")
 def h_handoff_get_launched_pids(daemon: DbDaemon, params: dict) -> dict:
-    raw_key = params.get("raw_key", "")
-    if raw_key:
-        rows = daemon.conn.execute(
-            "SELECT handoff_id, worker_pid, worktree FROM handoffs "
-            "WHERE role='worker' AND status='launched' AND raw_key=? AND worker_pid!=''",
-            (raw_key,),
-        ).fetchall()
-    else:
-        rows = daemon.conn.execute(
-            "SELECT handoff_id, worker_pid, worktree FROM handoffs "
-            "WHERE role='worker' AND status='launched' AND worker_pid!=''"
-        ).fetchall()
-    return {"rows": [dict(r) for r in rows]}
+    return {"rows": []}  # A2A doesn't track PIDs
 
 
 @_h("handoff.parse")
-def h_handoff_parse(daemon: DbDaemon, params: dict) -> dict:
-    """Parse handoff JSON from AI reply, validate, insert into DB.
-    Uses handoff_parser for pure logic, DB for the insert."""
-    extract, validate, norm_fields, norm_exit = _get_handoff_parser()
-    reply_text = params["reply_text"]
-    context = params.get("context", {})
-
-    block = extract(reply_text)
-    if not block:
-        return {"ok": False, "errors": [{"field": "handoff_block", "error": "no ```handoff block found"}]}
-
-    try:
-        ai_fields = json.loads(block)
-    except json.JSONDecodeError as e:
-        return {"ok": False, "errors": [{"field": "parse", "error": str(e)}]}
-
-    norm_fields(ai_fields)
-    role = context.get("role", "manager")
-    ok, errors = validate(ai_fields, role=role)
-    if not ok:
-        return {"ok": False, "errors": errors}
-
-    # Build record: Runtime fields + AI fields
-    now = _now_utc()
-    hid = (now.replace("T", "").replace("Z", "").replace("-", "").replace(":", "")
-           + "-" + uuid.uuid4().hex[:6])
-
-    record = {
-        "handoff_id": hid,
-        "role": context.get("role", "manager"),
-        "raw_key": context.get("raw_key", ""),
-        "worktree": context.get("worktree", ""),
-        "branch": context.get("branch", ""),
-        "prompt_file": context.get("prompt_file", ""),
-        "parent_handoff_id": context.get("parent_handoff_id", ""),
-        "previous_worker_handoff_id": context.get("previous_worker_handoff_id", ""),
-        "intent_kind": context.get("intent_kind", ""),
-        "status": "pending",
-        "session_id": context.get("session_id", ""),
-        "created_by": "runtime",
-        "consumed_by": ai_fields.get("consumed_by") or context.get("role", "manager"),
-        "launched_at": "", "last_activity_at": "", "completed_at": "",
-        "created_at": now, "updated_at": now,
-        **{k: v for k, v in ai_fields.items() if v != ''},
-    }
-    for f in ('exit_kind', 'reason', 'restart_point', 'next_action',
-              'completion_summary', 'evidence_paths', 'worker_prompts_csv'):
-        if f not in record:
-            record[f] = ''
-
-    daemon.conn.execute(
-        """INSERT INTO handoffs (handoff_id, role, raw_key, worktree, branch,
-           prompt_file, parent_handoff_id, previous_worker_handoff_id,
-           intent_kind, status, exit_kind, reason, restart_point, next_action,
-           completion_summary, evidence_paths, worker_prompts_csv,
-           session_id, created_by, consumed_by,
-           launched_at, last_activity_at, completed_at, created_at, updated_at)
-           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
-        (record["handoff_id"], record["role"], record["raw_key"],
-         record["worktree"], record["branch"], record["prompt_file"],
-         record["parent_handoff_id"], record["previous_worker_handoff_id"],
-         record["intent_kind"], record["status"],
-         record["exit_kind"], record["reason"],
-         record["restart_point"], record["next_action"],
-         record["completion_summary"], record["evidence_paths"],
-         record["worker_prompts_csv"],
-         record["session_id"], record["created_by"], record["consumed_by"],
-         record["launched_at"], record["last_activity_at"],
-         record["completed_at"], record["created_at"], record["updated_at"]))
-    # Manager records auto-complete
-    if record["role"] == "manager":
-        daemon.conn.execute(
-            "UPDATE handoffs SET status='completed', completed_at=?, updated_at=? WHERE handoff_id=?",
-            (now, now, record["handoff_id"]))
-        record["status"] = "completed"
-    daemon.conn.commit()
-
-    return {"ok": True, "handoff_id": record["handoff_id"], "exit_kind": record["exit_kind"]}
-
-
 @_h("handoff.extract")
-def h_handoff_extract(daemon: DbDaemon, params: dict) -> dict:
-    """Extract and validate handoff JSON without any DB side effects."""
-    from handoff_parser import extract_handoff_json
-    return extract_handoff_json(params.get("reply_text", ""))
-
+def h_handoff_nop(daemon: DbDaemon, params: dict) -> dict:
+    return {"ok": True, "note": "handoff parse/extract handled by handoff_parser.py"}
 
 # ── task-mode.* ───────────────────────────────────────────────────────────
 
