@@ -2,7 +2,8 @@
 name: A2A vs Handoff IDN
 owner_issue: I-20260612T000223Z-A
 owner_issue_path: docs/issues/I-20260612T000223Z-A/issue.md
-phase_state: done_b2_ibm
+implementation_decision_note: true
+phase_state: completed
 review_id: a2a-vs-handoff-idn
 ---
 

@@ -5,7 +5,7 @@ issue_id: raw-20260612T000223Z
 kind: raw
 phase_state: absorbed
 promotion_gate: C-20260612T000223Z-A
-absorbed_by: I-20260612T000223Z-A
+absorbed_into: I-20260612T000223Z-A
 open_questions: []
 acceptance_criteria:
   - A2A Server 持久化到 SQLite
