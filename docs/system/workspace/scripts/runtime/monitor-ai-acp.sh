@@ -165,7 +165,7 @@ print(d.get('approval_policy',''))
 _file_mtime_epoch() {
   local f="$1"
   [[ -f "$f" ]] || { echo "0"; return 0; }
-  stat -f %m "$f" 2>/dev/null || echo 0
+  stat -f %m "$f" 2>/dev/null || stat -c %Y "$f" 2>/dev/null || echo 0
 }
 
 # ── Error detection ────────────────────────────────────────────────
