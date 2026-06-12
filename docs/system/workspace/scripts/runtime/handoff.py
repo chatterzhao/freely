@@ -1,6 +1,10 @@
-#!/usr/bin/env python3
-"""handoff.py: Manager-worker handoff state — DB ops via freely-db daemon.
+"""DEPRECATED — replaced by a2a_task.py (2026-06-12).
 
+handoff.py — original handoff implementation.
+All new code should use a2a_task.py instead.
+The handoffs SQLite table has been dropped; use a2a_tasks table.
+This file remains for reference only. Phase 4 will rename to .py.bak.
+"""
 One table (handoffs), role field (manager|worker).
 AI outputs ```handoff JSON → Runtime parses → writes DB via daemon → dispatches.
 
