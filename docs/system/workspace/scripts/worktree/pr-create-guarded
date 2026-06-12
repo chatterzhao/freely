@@ -71,15 +71,19 @@ mkdir -p .freely/run
 echo "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > .freely/run/pr-create-gate-passed
 echo ""
 
-# ── Step 3: Push current branch ──
-echo "Step 3/4: pushing $current_branch..."
-git push origin "$current_branch" 2>&1
+# ── Step 3: Push current branch to github (primary platform for PR) ──
+echo "Step 3/4: pushing $current_branch to github..."
+if ! git push github "$current_branch" 2>&1; then
+  echo "Warning: push to github failed, trying origin..." >&2
+  git push origin "$current_branch" 2>&1
+fi
 echo ""
 
-# ── Step 4: Create PR ──
-echo "Step 4/4: creating pull request..."
+# ── Step 4: Create PR via GitHub (unified platform) ──
+echo "Step 4/4: creating pull request via GitHub..."
 if ! command -v gh >/dev/null 2>&1; then
   echo "ERROR: gh (GitHub CLI) not found. Please install gh and create the PR manually." >&2
+  echo "  Visit: https://cli.github.com/" >&2
   exit 1
 fi
 
@@ -90,6 +94,14 @@ fi
 if [[ -z "${body:-}" ]]; then
   body="See commits for details."
 fi
+
+# Use GitHub as unified platform for PR creation
+# Push branch to github first if not already there
+if ! git ls-remote --exit-code github "$current_branch" >/dev/null 2>&1; then
+  echo "Pushing branch to github first..."
+  git push github "$current_branch" 2>&1
+fi
+
 gh pr create --head "$current_branch" --base "$base" \
   --title "$title" \
   --body "$body"
