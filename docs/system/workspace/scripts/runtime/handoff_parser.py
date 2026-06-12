@@ -1,6 +1,9 @@
-#!/usr/bin/env python3
-"""handoff_parser.py — Pure parsing/validation logic extracted from handoff.py.
+"""DEPRECATED — replaced by a2a_task_parser.py (2026-06-12).
 
+handoff_parser.py — original handoff JSON parser.
+All parsing logic moved to a2a_task_parser.py.
+This file remains for reference only. Phase 4 will rename to .py.bak.
+"""
 No DB dependencies. Used by freely_db_manager.py (for handoff.parse),
 and by freely bash (for handoff.extract via CLI).
 """
