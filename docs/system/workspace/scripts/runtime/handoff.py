@@ -277,6 +277,70 @@ def insert_repair_handoff(repair_target_role: str, repair_target_handoff_id: str
     return result.get("handoff_id", "")
 
 
+# ── A2A Task convenience (maps handoff ↔ A2A Task) ────────────────────────
+
+def a2a_create_task(skill: str, worktree: str, branch: str,
+                     session_id: str = "", message: str = "",
+                     prompt_file: str = "", reason: str = "") -> str:
+    """Create an A2A Task from handoff context."""
+    result = _db_rpc("a2a_task.insert", {
+        "name": skill,
+        "description": reason,
+        "skill": skill,
+        "session_id": session_id,
+        "message": message,
+        "worktree": worktree,
+        "branch": branch,
+        "prompt_file": prompt_file,
+        "state": "submitted",
+    })
+    return result.get("task_id", "")
+
+
+def a2a_update_from_handoff(task_id: str, exit_kind: str,
+                            reason: str = "", progress: str = "",
+                            next_action: str = "", completion_summary: str = "",
+                            evidence_paths: str = "", error: str = "") -> int:
+    """Update A2A Task state from handoff exit_kind."""
+    result = _db_rpc("a2a_task.update-from-exit-kind", {
+        "task_id": task_id,
+        "exit_kind": exit_kind,
+        "reason": reason,
+        "progress": progress,
+        "next_action": next_action,
+        "completion_summary": completion_summary,
+        "evidence_paths": evidence_paths,
+        "error": error,
+    })
+    return result.get("affected", 0)
+
+
+def a2a_get_task(task_id: str) -> Optional[dict]:
+    """Get A2A Task by ID."""
+    result = _db_rpc("a2a_task.get", {"task_id": task_id})
+    return result.get("record")
+
+
+def a2a_list_tasks(state: Optional[str] = None,
+                   agent_id: Optional[str] = None,
+                   skill: Optional[str] = None) -> List[dict]:
+    """List A2A Tasks with optional filters."""
+    params = {}
+    if state: params["state"] = state
+    if agent_id: params["agent_id"] = agent_id
+    if skill: params["skill"] = skill
+    result = _db_rpc("a2a_task.list", params)
+    return result.get("rows", [])
+
+
+def a2a_list_by_worktree(worktree: str, state: Optional[str] = None) -> List[dict]:
+    """List A2A Tasks by worktree."""
+    params = {"worktree": worktree}
+    if state: params["state"] = state
+    result = _db_rpc("a2a_task.list-by-worktree", params)
+    return result.get("rows", [])
+
+
 def query_by_issue(issue_id: str, consumed: Optional[int] = None) -> List[dict]:
     """Legacy compat: handoffs are queried by raw_key, not issue_id."""
     return list_by_key(issue_id)

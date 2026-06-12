@@ -1,8 +1,8 @@
 ---
 local_id: I-20260524T053214Z-A
 kind: linked
-status: in_dev
-phase_state: in_dev
+status: completed
+phase_state: completed
 promoted_from: raw-20260524T053214Z
 source_candidate: docs/pre-brainstorms/20260524T053214Z--acp-tool-switch-integration/candidates.md
 canonical_issue_path: ""
