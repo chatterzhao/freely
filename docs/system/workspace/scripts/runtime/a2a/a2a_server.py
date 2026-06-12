@@ -302,7 +302,7 @@ def _create_agent_card(project: str, skill: str = "") -> AgentCard:
         "worktreeIsolation": True,
         "worktreeRoot": f"{os.path.dirname(os.path.dirname(project))}/worktrees",
         "supportedExitKinds": list(EXIT_KIND_TO_TASK_STATE.keys()),
-        "handoffJsonSchema": "https://freely.dev/schemas/handoff-v1",
+        "a2aSchema": "https://a2a-specification.github.io/A2A/schema",
         "supportedSkills": [s["id"] for s in skills],
         "transport": "unix-domain-socket",
         "socketPath": _socket_path(project),
