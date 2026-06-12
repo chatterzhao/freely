@@ -1,3 +1,11 @@
+---
+name: A2A vs Handoff IDN
+owner_issue: I-20260612T000223Z-A
+owner_issue_path: docs/issues/I-20260612T000223Z-A/issue.md
+phase_state: done_b2_ibm
+review_id: a2a-vs-handoff-idn
+---
+
 # Implementation Decision Note: A2A 协议替换 Freely Handoff
 
 ## Decision

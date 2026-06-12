@@ -1,6 +1,7 @@
 ---
 name: A2A 协议替换 Handoff 架构重构
 description: 用 Google A2A 协议替换 Freely 私有 Handoff 机制，实现标准化的 Agent 间通信
+issue_id: raw-20260612T000223Z
 kind: raw
 phase_state: absorbed
 promotion_gate: C-20260612T000223Z-A

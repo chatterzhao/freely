@@ -1,4 +1,11 @@
-# Implementation Decision Note: A2A 协议替换 Freely Handoff
+---
+name: A2A 协议替换 Handoff 实现决策
+owner_issue: I-20260612T000223Z-A
+owner_issue_path: docs/issues/I-20260612T000223Z-A/issue.md
+phase_state: in_dev
+---
+
+# Implementation Decision Note: A2A 协议替换 Handoff
 
 - **issue_id**: I-20260612T000223Z-A
 - **phase**: dev-loop
