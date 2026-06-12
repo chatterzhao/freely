@@ -4,7 +4,7 @@
 
 - candidate_format_version: v2
 - title: ACP session 生命周期接入 tool_switch_events 统一真相源
-- status: promoted
+- status: absorbed
 - decision_reason: Freely 运行时死锁——tool_switch_events 已实现但 ACP 路径未接入，导致 session 切换和 bridge 重启后无限循环。4 个集成断点 + 2 个兜底已实现。
 - next_action: B2_IBM → I-* → dev-loop → pr-merge-guarded develop
 - revisit_trigger: N/A（已 promote）
