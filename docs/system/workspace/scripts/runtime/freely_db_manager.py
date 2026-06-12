@@ -276,6 +276,62 @@ class DbDaemon:
         c.execute("CREATE INDEX IF NOT EXISTS idx_tool_failure_tool ON tool_failure_log(tool, slot)")
         c.execute("CREATE INDEX IF NOT EXISTS idx_tool_failure_created ON tool_failure_log(created_at)")
 
+        # a2a_tasks — A2A protocol Task storage (aligns with Google A2A spec + Freely extensions)
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS a2a_tasks (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                task_id TEXT NOT NULL UNIQUE,
+                name TEXT NOT NULL DEFAULT '',
+                description TEXT NOT NULL DEFAULT '',
+                state TEXT NOT NULL DEFAULT 'submitted'
+                    CHECK(state IN ('submitted','working','input-required','completed','failed','canceled')),
+                agent_id TEXT NOT NULL DEFAULT '',
+                skill TEXT NOT NULL DEFAULT '',
+                session_id TEXT NOT NULL DEFAULT '',
+                message TEXT NOT NULL DEFAULT '',
+                created_at TEXT NOT NULL DEFAULT '',
+                updated_at TEXT NOT NULL DEFAULT '',
+                -- Freely extension fields (aligned with handoffs table)
+                prompt_file TEXT NOT NULL DEFAULT '',
+                worktree TEXT NOT NULL DEFAULT '',
+                branch TEXT NOT NULL DEFAULT '',
+                exit_kind TEXT NOT NULL DEFAULT '',
+                reason TEXT NOT NULL DEFAULT '',
+                progress TEXT NOT NULL DEFAULT '',
+                next_action TEXT NOT NULL DEFAULT '',
+                completion_summary TEXT NOT NULL DEFAULT '',
+                evidence_paths TEXT NOT NULL DEFAULT '',
+                worker_prompts_csv TEXT NOT NULL DEFAULT '',
+                error TEXT NOT NULL DEFAULT ''
+            )
+        """)
+        c.execute("CREATE INDEX IF NOT EXISTS idx_a2a_tasks_state ON a2a_tasks(state)")
+        c.execute("CREATE INDEX IF NOT EXISTS idx_a2a_tasks_agent ON a2a_tasks(agent_id)")
+        c.execute("CREATE INDEX IF NOT EXISTS idx_a2a_tasks_skill ON a2a_tasks(skill)")
+        c.execute("CREATE INDEX IF NOT EXISTS idx_a2a_tasks_worktree ON a2a_tasks(worktree)")
+        c.execute("CREATE INDEX IF NOT EXISTS idx_a2a_tasks_session ON a2a_tasks(session_id)")
+
+        # Schema migrations for a2a_tasks (Freely extensions)
+        existing_cols = {row[1] for row in c.execute("PRAGMA table_info(a2a_tasks)")}
+        for col_name, col_def in [
+            ("prompt_file", "TEXT NOT NULL DEFAULT ''"),
+            ("worktree", "TEXT NOT NULL DEFAULT ''"),
+            ("branch", "TEXT NOT NULL DEFAULT ''"),
+            ("exit_kind", "TEXT NOT NULL DEFAULT ''"),
+            ("reason", "TEXT NOT NULL DEFAULT ''"),
+            ("progress", "TEXT NOT NULL DEFAULT ''"),
+            ("next_action", "TEXT NOT NULL DEFAULT ''"),
+            ("completion_summary", "TEXT NOT NULL DEFAULT ''"),
+            ("evidence_paths", "TEXT NOT NULL DEFAULT ''"),
+            ("worker_prompts_csv", "TEXT NOT NULL DEFAULT ''"),
+            ("error", "TEXT NOT NULL DEFAULT ''"),
+        ]:
+            if col_name not in existing_cols:
+                try:
+                    c.execute(f"ALTER TABLE a2a_tasks ADD COLUMN {col_name} {col_def}")
+                except Exception:
+                    pass
+
         self.conn.commit()
         self.log("all tables ensured")
 
@@ -1099,7 +1155,8 @@ def h_handoff_parse(daemon: DbDaemon, params: dict) -> dict:
         return {"ok": False, "errors": [{"field": "parse", "error": str(e)}]}
 
     norm_fields(ai_fields)
-    ok, errors = validate(ai_fields)
+    role = context.get("role", "manager")
+    ok, errors = validate(ai_fields, role=role)
     if not ok:
         return {"ok": False, "errors": errors}
 
@@ -1278,6 +1335,182 @@ def h_tool_failure_list_dead(daemon: DbDaemon, params: dict) -> dict:
     ).fetchall()
     return {"tools": [{"tool": r[0], "slot": r[1], "count": r[2]} for r in rows]}
 
+
+
+# ── a2a_task.* ──────────────────────────────────────────────────────────────
+
+@_h("a2a_task.insert")
+def h_a2a_task_insert(daemon: DbDaemon, params: dict) -> dict:
+    """Insert a new A2A Task (with Freely extension fields)."""
+    now = _now_utc()
+    task_id = params.get("task_id", str(uuid.uuid4()))
+    c = daemon.conn.execute(
+        """INSERT INTO a2a_tasks
+           (task_id, name, description, state, agent_id, skill, session_id, message,
+            created_at, updated_at, prompt_file, worktree, branch, exit_kind, reason,
+            progress, next_action, completion_summary, evidence_paths, worker_prompts_csv, error)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        (
+            task_id,
+            params.get("name", ""),
+            params.get("description", ""),
+            params.get("state", "submitted"),
+            params.get("agent_id", ""),
+            params.get("skill", ""),
+            params.get("session_id", ""),
+            params.get("message", ""),
+            now,
+            now,
+            params.get("prompt_file", ""),
+            params.get("worktree", ""),
+            params.get("branch", ""),
+            params.get("exit_kind", ""),
+            params.get("reason", ""),
+            params.get("progress", ""),
+            params.get("next_action", ""),
+            params.get("completion_summary", ""),
+            params.get("evidence_paths", ""),
+            params.get("worker_prompts_csv", ""),
+            params.get("error", ""),
+        ),
+    )
+    daemon.conn.commit()
+    return {"task_id": task_id, "affected": 1}
+
+
+@_h("a2a_task.get")
+def h_a2a_task_get(daemon: DbDaemon, params: dict) -> dict:
+    """Get a single A2A Task by task_id."""
+    row = daemon.conn.execute(
+        "SELECT * FROM a2a_tasks WHERE task_id = ?", (params["task_id"],)
+    ).fetchone()
+    if not row:
+        return {"record": None}
+    cols = [desc[0] for desc in daemon.conn.execute("PRAGMA table_info(a2a_tasks)").fetchall()]
+    return {"record": dict(zip(cols, row))}
+
+
+@_h("a2a_task.update")
+def h_a2a_task_update(daemon: DbDaemon, params: dict) -> dict:
+    """Update A2A Task fields (excluding id/created_at)."""
+    task_id = params.pop("task_id")
+    params.pop("updated_at", None)  # Handled by caller or use _now_utc()
+    if not params:
+        return {"affected": 0}
+    now = _now_utc()
+    set_cols = ", ".join(f"{k} = ?" for k in params.keys())
+    c = daemon.conn.execute(
+        f"UPDATE a2a_tasks SET {set_cols}, updated_at = ? WHERE task_id = ?",
+        list(params.values()) + [now, task_id],
+    )
+    daemon.conn.commit()
+    return {"affected": c.rowcount}
+
+
+@_h("a2a_task.delete")
+def h_a2a_task_delete(daemon: DbDaemon, params: dict) -> dict:
+    """Delete an A2A Task."""
+    c = daemon.conn.execute(
+        "DELETE FROM a2a_tasks WHERE task_id = ?", (params["task_id"],)
+    )
+    daemon.conn.commit()
+    return {"affected": c.rowcount}
+
+
+@_h("a2a_task.list")
+def h_a2a_task_list(daemon: DbDaemon, params: dict) -> dict:
+    """List all A2A Tasks, optionally filtered by state/agent_id/skill."""
+    sql = "SELECT * FROM a2a_tasks"
+    filters = []
+    vals = []
+    if "state" in params and params["state"]:
+        filters.append("state = ?")
+        vals.append(params["state"])
+    if "agent_id" in params and params["agent_id"]:
+        filters.append("agent_id = ?")
+        vals.append(params["agent_id"])
+    if "skill" in params and params["skill"]:
+        filters.append("skill = ?")
+        vals.append(params["skill"])
+    if filters:
+        sql += " WHERE " + " AND ".join(filters)
+    sql += " ORDER BY created_at DESC"
+    rows = daemon.conn.execute(sql, vals).fetchall()
+    cols = [desc[0] for desc in daemon.conn.execute("PRAGMA table_info(a2a_tasks)").fetchall()]
+    return {"rows": [dict(zip(cols, r)) for r in rows]}
+
+
+@_h("a2a_task.list-by-worktree")
+def h_a2a_task_list_by_worktree(daemon: DbDaemon, params: dict) -> dict:
+    """List A2A Tasks by worktree, optionally filtered by state."""
+    sql = "SELECT * FROM a2a_tasks WHERE worktree = ?"
+    vals = [params["worktree"]]
+    if "state" in params and params["state"]:
+        sql += " AND state = ?"
+        vals.append(params["state"])
+    sql += " ORDER BY created_at DESC"
+    rows = daemon.conn.execute(sql, vals).fetchall()
+    cols = [desc[0] for desc in daemon.conn.execute("PRAGMA table_info(a2a_tasks)").fetchall()]
+    return {"rows": [dict(zip(cols, r)) for r in rows]}
+
+
+@_h("a2a_task.update-from-exit-kind")
+def h_a2a_task_update_from_exit_kind(daemon: DbDaemon, params: dict) -> dict:
+    """Update A2A Task from handoff exit_kind.
+
+    Maps Freely exit_kind to A2A task state and extracts fields.
+    """
+    task_id = params.get("task_id", "")
+    exit_kind = params.get("exit_kind", "")
+    reason = params.get("reason", "")
+    progress = params.get("progress", "")
+    next_action = params.get("next_action", "")
+    completion_summary = params.get("completion_summary", "")
+    evidence_paths = params.get("evidence_paths", "")
+    error = params.get("error", "")
+
+    # Map exit_kind → A2A state
+    EXIT_KIND_TO_A2A = {
+        'manager_working': 'submitted',
+        'worker_working': 'working',
+        'worker_done': 'completed',
+        'worker_blocked': 'input-required',
+        'worker_handoff_needed': 'input-required',
+        'delegate_workers': 'submitted',
+        'resume_manager': 'completed',
+        'stop_ai': 'failed',
+    }
+    state = EXIT_KIND_TO_A2A.get(exit_kind, 'working')
+
+    now = _now_utc()
+    updates = {
+        "exit_kind": exit_kind,
+        "state": state,
+        "updated_at": now,
+    }
+    if reason:
+        updates["reason"] = reason
+    if progress:
+        updates["progress"] = progress
+    if next_action:
+        updates["next_action"] = next_action
+    if completion_summary:
+        updates["completion_summary"] = completion_summary
+    if evidence_paths:
+        updates["evidence_paths"] = evidence_paths
+    if error:
+        updates["error"] = error
+
+    if not updates:
+        return {"affected": 0}
+
+    set_cols = ", ".join(f"{k} = ?" for k in updates.keys())
+    c = daemon.conn.execute(
+        f"UPDATE a2a_tasks SET {set_cols} WHERE task_id = ?",
+        list(updates.values()) + [task_id],
+    )
+    daemon.conn.commit()
+    return {"affected": c.rowcount}
 
 
 # ── CLI ───────────────────────────────────────────────────────────────────
