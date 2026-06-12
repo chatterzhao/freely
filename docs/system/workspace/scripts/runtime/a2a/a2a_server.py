@@ -57,12 +57,24 @@ EXIT_KIND_TO_TASK_STATE = {
 
 @dataclass
 class Task:
-    id: str
+    """A2A Task Model (符合 Google A2A 协议规范)
+
+    核心字段: id, state, agent_id, skill, session_id, message
+    Freely 扩展: prompt_file, worktree, branch, exit_kind, reason, progress, next_action,
+                completion_summary, evidence_paths, worker_prompts_csv, error
+    """
+    id: str = ""
     state: str = TaskState.SUBMITTED.value
     created_at: str = ""
     updated_at: str = ""
     session_id: str = ""
     skill: str = ""
+    # A2A 标准字段
+    name: str = ""
+    description: str = ""
+    agent_id: str = ""
+    message: str = ""
+    # Freely 扩展字段
     prompt_file: str = ""
     worktree: str = ""
     branch: str = ""
@@ -77,11 +89,20 @@ class Task:
     messages: List[Dict] = field(default_factory=list)
 
     def to_dict(self) -> Dict:
-        return asdict(self)
+        """转换为 dict，过滤 None 值"""
+        d = {}
+        for k, v in asdict(self).items():
+            if v is not None:
+                d[k] = v
+        return d
 
     @classmethod
     def from_dict(cls, data: Dict) -> 'Task':
-        return cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})
+        """从 dict 创建 Task"""
+        # 兼容处理：跳过不存在于 dataclass 的字段
+        valid = {f for f in cls.__dataclass_fields__}
+        filtered = {k: v for k, v in data.items() if k in valid}
+        return cls(**filtered)
 
 
 @dataclass
@@ -106,56 +127,97 @@ class AgentCard:
 # ── In-Memory Task Store (临时，正式实现使用 DB) ────────────────────────────────
 
 class TaskStore:
-    """Task 存储，使用内存存储（正式实现应使用 DB）"""
+    """Task 存储，使用 SQLite 持久化（通过 freely_db_manager daemon）
 
-    def __init__(self):
-        self._tasks: Dict[str, Task] = {}
+    所有数据库操作通过 _db_rpc 进行，确保：
+    - 进程重启后状态不丢失
+    - 与 Freely Runtime 共享同一数据库
+    """
+
+    def __init__(self, project: str):
+        self.project = project
         self._lock = threading.RLock()
 
+    def _db_rpc(self, method: str, params: dict, timeout: float = 30.0) -> dict:
+        """Send JSON-RPC to freely_db_manager daemon."""
+        import socket as sock_module
+        import hashlib
+        import json as json_mod
+
+        def _short_hash(p: str) -> str:
+            return hashlib.sha256(os.path.abspath(p).encode()).hexdigest()[:16]
+
+        socket_path = f"/tmp/freely-db-{_short_hash(self.project)}.sock"
+
+        request = {"jsonrpc": "2.0", "id": 1, "method": method, "params": params}
+        sock = sock_module.socket(sock_module.AF_UNIX, sock_module.SOCK_STREAM)
+        sock.settimeout(timeout)
+        try:
+            sock.connect(socket_path)
+            sock.sendall((json_mod.dumps(request, default=str) + "\n").encode())
+            sock.shutdown(sock_module.SHUT_WR)
+            data = b""
+            while True:
+                chunk = sock.recv(4096)
+                if not chunk:
+                    break
+                data += chunk
+        finally:
+            sock.close()
+
+        response = json_mod.loads(data.decode())
+        if "error" in response:
+            raise RuntimeError(response["error"].get("message", str(response["error"])))
+        return response.get("result", {})
+
     def create(self, task: Task) -> Task:
-        with self._lock:
-            task.id = str(uuid.uuid4())
-            task.created_at = _now_utc()
-            task.updated_at = _now_utc()
-            task.state = TaskState.SUBMITTED.value
-            self._tasks[task.id] = task
+        """创建新 Task，持久化到 SQLite"""
+        task.id = str(uuid.uuid4())
+        task.created_at = _now_utc()
+        task.updated_at = _now_utc()
+        task.state = TaskState.SUBMITTED.value
+
+        result = self._db_rpc("a2a_task.insert", task.to_dict())
+        task.id = result.get("task_id", task.id)
         return task
 
     def get(self, task_id: str) -> Optional[Task]:
-        with self._lock:
-            return self._tasks.get(task_id)
+        """从 SQLite 加载 Task"""
+        result = self._db_rpc("a2a_task.get", {"task_id": task_id})
+        record = result.get("record")
+        if record:
+            return Task.from_dict(record)
+        return None
 
     def update(self, task_id: str, **kwargs) -> Optional[Task]:
-        with self._lock:
-            task = self._tasks.get(task_id)
-            if task:
-                for key, value in kwargs.items():
-                    if hasattr(task, key):
-                        setattr(task, key, value)
-                task.updated_at = _now_utc()
-        return task
+        """更新 Task 字段"""
+        kwargs["task_id"] = task_id
+        kwargs["updated_at"] = _now_utc()
+        result = self._db_rpc("a2a_task.update", kwargs)
+        if result.get("affected", 0) > 0:
+            return self.get(task_id)
+        return None
 
     def update_state(self, task_id: str, state: str, **kwargs) -> Optional[Task]:
-        with self._lock:
-            task = self._tasks.get(task_id)
-            if task:
-                task.state = state
-                task.updated_at = _now_utc()
-                for key, value in kwargs.items():
-                    if hasattr(task, key):
-                        setattr(task, key, value)
-        return task
+        """更新 Task 状态"""
+        kwargs["task_id"] = task_id
+        kwargs["state"] = state
+        kwargs["updated_at"] = _now_utc()
+        result = self._db_rpc("a2a_task.update", kwargs)
+        if result.get("affected", 0) > 0:
+            return self.get(task_id)
+        return None
 
     def list_all(self) -> List[Task]:
-        with self._lock:
-            return list(self._tasks.values())
+        """列出所有 Task"""
+        result = self._db_rpc("a2a_task.list", {})
+        rows = result.get("rows", [])
+        return [Task.from_dict(r) for r in rows]
 
     def delete(self, task_id: str) -> bool:
-        with self._lock:
-            if task_id in self._tasks:
-                del self._tasks[task_id]
-                return True
-        return False
+        """删除 Task"""
+        result = self._db_rpc("a2a_task.delete", {"task_id": task_id})
+        return result.get("affected", 0) > 0
 
 
 # ── SSE Streaming ─────────────────────────────────────────────────────────────
@@ -187,7 +249,8 @@ class SSELock:
 
 # ── Global State ──────────────────────────────────────────────────────────────
 
-_task_store = TaskStore()
+# 注意：TaskStore 现在是实例变量，在 A2AServer.__init__ 中创建
+# _task_store = TaskStore()  # 已废弃，使用 self._task_store
 _sse_manager = SSELock()
 
 
@@ -271,6 +334,7 @@ class A2AServer:
         self.project = project
         self._running = False
         self._agent_card = _create_agent_card(project)
+        self._task_store = TaskStore(project)
 
     def start(self):
         """启动 A2A Server"""
@@ -400,7 +464,7 @@ class A2AServer:
                 next_action=data.get("next_action", ""),
             )
 
-            task = _task_store.create(task)
+            task = self._task_store.create(task)
 
             response = {
                 "id": task.id,
@@ -415,12 +479,12 @@ class A2AServer:
 
     def _handle_list_tasks(self, client: socket.socket):
         """列出所有 Task"""
-        tasks = _task_store.list_all()
+        tasks = self._task_store.list_all()
         self._send_json_response(client, 200, {"tasks": [t.to_dict() for t in tasks]})
 
     def _handle_get_task(self, client: socket.socket, task_id: str):
         """获取 Task"""
-        task = _task_store.get(task_id)
+        task = self._task_store.get(task_id)
         if task:
             self._send_json_response(client, 200, task.to_dict())
         else:
@@ -429,7 +493,7 @@ class A2AServer:
     def _handle_update_task(self, client: socket.socket, task_id: str, request_text: str):
         """更新 Task"""
         try:
-            task = _task_store.get(task_id)
+            task = self._task_store.get(task_id)
             if not task:
                 self._send_json_response(client, 404, {"error": "Task not found"})
                 return
@@ -446,18 +510,18 @@ class A2AServer:
 
             # 更新字段
             update_fields = {}
-            for field in ["exit_kind", "reason", "progress", "next_action",
+            for field in ["state", "exit_kind", "reason", "progress", "next_action",
                           "completion_summary", "evidence_paths", "worker_prompts_csv",
                           "error", "session_id"]:
                 if field in data:
                     update_fields[field] = data[field]
 
             # 转换 exit_kind 到 task state
-            if "exit_kind" in data:
+            if "exit_kind" in data and "state" not in data:
                 state = EXIT_KIND_TO_TASK_STATE.get(data["exit_kind"], TaskState.WORKING.value)
                 update_fields["state"] = state.value
 
-            task = _task_store.update(task_id, **update_fields)
+            task = self._task_store.update(task_id, **update_fields)
 
             self._send_json_response(client, 200, task.to_dict())
 
@@ -510,7 +574,7 @@ class A2AServer:
         # 模拟 SSE 推送（实际应使用 asyncio）
         def send_updates():
             while self._running:
-                task = _task_store.get(task_id)
+                task = self._task_store.get(task_id)
                 if task:
                     event = json.dumps({"taskId": task.id, "state": task.state, "updatedAt": task.updated_at})
                     try:

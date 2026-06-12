@@ -97,17 +97,18 @@ verification_artifact_dir: docs/epics/a2a-replace-handoff/architecture-refactor/
 1. **A2A Server (Worker 端)**
    - 实现 Agent Card endpoint
    - 实现 Task CRUD endpoints
+   - 实现 SQLite 持久化（修复内存丢失问题）
    - 实现 SSE streaming
 
 2. **A2A Client (Manager 端)**
    - 实现能力发现
    - 实现 Task 创建和状态监控
-   - 保留 Handoff 作为 fallback
+   - 与 Freely Runtime 集成
 
 ### Phase 3: 状态迁移
 
-1. 将 handoff table 迁移到 A2A Task
-2. 迁移完成后删除旧 handoff 逻辑
+1. 将 handoff 表迁移到 A2A Task 表
+2. 迁移完成后**删除**旧 handoff 逻辑（exit_kind 别名等）
 3. 性能基准测试
 
 ### Phase 4: 增强功能
@@ -119,9 +120,10 @@ verification_artifact_dir: docs/epics/a2a-replace-handoff/architecture-refactor/
 ## 验收标准
 
 - Manager 能通过 Agent Card 发现 Worker 能力
-- exit_kind 能正确映射到 A2A Task 状态
+- A2A Task State 替代 exit_kind（无别名映射）
 - SSE 能实时推送 Worker 状态变化
-- 现有 handoff 场景全部兼容
+- A2A Task 持久化到 SQLite（进程重启不丢失）
+- 旧 handoff exit_kind 别名逻辑已删除
 - 与外部 Agent 系统能互通
 
 ## 相关文档
