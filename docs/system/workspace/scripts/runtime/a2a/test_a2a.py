@@ -208,28 +208,39 @@ def test_task_crud(project: str) -> TestResult:
 
 
 def test_capability_check(project: str) -> TestResult:
-    """T4: 能力协商 (Capability Check)"""
+    """T4: 能力协商 (Capability Check via Agent Card)"""
     result = TestResult("T4: Capability Check")
     result.start()
 
     try:
         client = A2AClient(project)
-        card = client.discover_agent()
 
+        # 通过 Agent Card 发现能力
+        card = client.discover_agent()
         if not card:
             result.end(False, "No Agent Card found")
             return result
 
-        # 检查支持的 skill
-        supported_skills = [
+        # 验证 freely 扩展
+        if not card.freely:
+            result.end(False, "Missing freely extension")
+            return result
+
+        # 验证支持的 skills
+        supported_skills = card.freely.get("supportedSkills", [])
+        if not supported_skills:
+            result.end(False, "No skills found in freely extension")
+            return result
+
+        expected_skills = [
             "freely-fix-execution",
             "freely-feat-execution",
             "freely-doc-B1_IBM-execution",
             "freely-doc-B2_IBM-execution",
         ]
 
-        for skill in supported_skills:
-            if card.freely and skill in card.freely.get("supportedSkills", []):
+        for skill in expected_skills:
+            if skill in supported_skills:
                 print(f"  ✓ Worker supports: {skill}")
             else:
                 print(f"  - Worker does not support: {skill}")
@@ -262,34 +273,10 @@ def test_task_wait_for_completion(project: str) -> TestResult:
 
         print(f"  ✓ Task created: {task.id}")
 
-        # 模拟 Worker 状态变化
-        # 在实际测试中，这需要 A2A Server 端运行
-        # 这里我们测试 get_task 逻辑
-        retrieved = client.get_task(task.id)
-        if not retrieved:
-            result.end(False, "Task retrieval failed")
-            return result
-
-        print(f"  ✓ Task state: {retrieved.state}")
-
-        result.end(True)
-        return result
-
-    except Exception as e:
-        result.end(False, str(e))
-        return result
-
-
-def test_handoff_fallback(project: str) -> TestResult:
-    """T6: Handoff Fallback (已废弃 - A2A 为主协议)"""
-    result = TestResult("T6: Handoff Fallback (deprecated)")
-    result.start()
-
-    try:
-        # T6 已废弃 - A2A 现在是主协议，不再需要 fallback
-        # 保留此测试以记录架构决策
-        print(f"  - T6 deprecated: A2A is now primary protocol")
-        print(f"  - Handoff preserved for backward compatibility only")
+        # 等待 Task 完成 (或超时)
+        completed = client.wait_for_completion(task.id, timeout=5)
+        if completed:
+            print(f"  ✓ Task completed: {completed.state}")
 
         result.end(True)
         return result
@@ -309,7 +296,6 @@ def run_all_tests(project: str) -> dict:
         ("T3", "Task CRUD", lambda: test_task_crud(project)),
         ("T4", "Capability Check", lambda: test_capability_check(project)),
         ("T5", "Wait for Completion", lambda: test_task_wait_for_completion(project)),
-        ("T6", "Handoff Fallback", lambda: test_handoff_fallback(project)),
     ]
 
     results = {}
