@@ -289,9 +289,8 @@ class DbDaemon:
                 skill TEXT NOT NULL DEFAULT '',
                 session_id TEXT NOT NULL DEFAULT '',
                 message TEXT NOT NULL DEFAULT '',
-                created_at TEXT NOT NULL DEFAULT '',
-                updated_at TEXT NOT NULL DEFAULT '',
                 -- Freely extension fields (aligned with handoffs table)
+                raw_key TEXT NOT NULL DEFAULT '',
                 prompt_file TEXT NOT NULL DEFAULT '',
                 worktree TEXT NOT NULL DEFAULT '',
                 branch TEXT NOT NULL DEFAULT '',
@@ -302,7 +301,15 @@ class DbDaemon:
                 completion_summary TEXT NOT NULL DEFAULT '',
                 evidence_paths TEXT NOT NULL DEFAULT '',
                 worker_prompts_csv TEXT NOT NULL DEFAULT '',
-                error TEXT NOT NULL DEFAULT ''
+                error TEXT NOT NULL DEFAULT '',
+                -- Message history (A2A standard: array of {role,type,content})
+                messages_json TEXT NOT NULL DEFAULT '[]',
+                -- Lifecycle timestamps
+                launched_at TEXT NOT NULL DEFAULT '',
+                completed_at TEXT NOT NULL DEFAULT '',
+                -- Standard timestamps
+                created_at TEXT NOT NULL DEFAULT '',
+                updated_at TEXT NOT NULL DEFAULT ''
             )
         """)
         c.execute("CREATE INDEX IF NOT EXISTS idx_a2a_tasks_state ON a2a_tasks(state)")
@@ -310,10 +317,12 @@ class DbDaemon:
         c.execute("CREATE INDEX IF NOT EXISTS idx_a2a_tasks_skill ON a2a_tasks(skill)")
         c.execute("CREATE INDEX IF NOT EXISTS idx_a2a_tasks_worktree ON a2a_tasks(worktree)")
         c.execute("CREATE INDEX IF NOT EXISTS idx_a2a_tasks_session ON a2a_tasks(session_id)")
+        c.execute("CREATE INDEX IF NOT EXISTS idx_a2a_tasks_raw_key ON a2a_tasks(raw_key)")
 
         # Schema migrations for a2a_tasks (Freely extensions)
         existing_cols = {row[1] for row in c.execute("PRAGMA table_info(a2a_tasks)")}
         for col_name, col_def in [
+            ("raw_key", "TEXT NOT NULL DEFAULT ''"),
             ("prompt_file", "TEXT NOT NULL DEFAULT ''"),
             ("worktree", "TEXT NOT NULL DEFAULT ''"),
             ("branch", "TEXT NOT NULL DEFAULT ''"),
@@ -325,6 +334,9 @@ class DbDaemon:
             ("evidence_paths", "TEXT NOT NULL DEFAULT ''"),
             ("worker_prompts_csv", "TEXT NOT NULL DEFAULT ''"),
             ("error", "TEXT NOT NULL DEFAULT ''"),
+            ("messages_json", "TEXT NOT NULL DEFAULT '[]'"),
+            ("launched_at", "TEXT NOT NULL DEFAULT ''"),
+            ("completed_at", "TEXT NOT NULL DEFAULT ''"),
         ]:
             if col_name not in existing_cols:
                 try:
@@ -1511,6 +1523,69 @@ def h_a2a_task_update_from_exit_kind(daemon: DbDaemon, params: dict) -> dict:
     )
     daemon.conn.commit()
     return {"affected": c.rowcount}
+
+
+@_h("a2a_task.list-by-raw-key")
+def h_a2a_task_list_by_raw_key(daemon: DbDaemon, params: dict) -> dict:
+    """List A2A Tasks by raw_key, ordered by created_at DESC."""
+    rows = daemon.conn.execute(
+        "SELECT * FROM a2a_tasks WHERE raw_key = ? ORDER BY created_at DESC",
+        (params["raw_key"],),
+    ).fetchall()
+    cols = [desc[0] for desc in daemon.conn.execute("PRAGMA table_info(a2a_tasks)").fetchall()]
+    return {"rows": [dict(zip(cols, r)) for r in rows]}
+
+
+@_h("a2a_task.list-active")
+def h_a2a_task_list_active(daemon: DbDaemon, params: dict) -> dict:
+    """List A2A Tasks in active states (submitted, working, input-required)."""
+    rows = daemon.conn.execute(
+        "SELECT * FROM a2a_tasks WHERE state IN ('submitted','working','input-required') ORDER BY updated_at DESC"
+    ).fetchall()
+    cols = [desc[0] for desc in daemon.conn.execute("PRAGMA table_info(a2a_tasks)").fetchall()]
+    return {"rows": [dict(zip(cols, r)) for r in rows]}
+
+
+@_h("a2a_task.latest-manager")
+def h_a2a_task_latest_manager(daemon: DbDaemon, params: dict) -> dict:
+    """Get latest manager task (agent_id starts with 'manager')."""
+    rows = daemon.conn.execute(
+        "SELECT * FROM a2a_tasks WHERE agent_id LIKE 'manager%' ORDER BY created_at DESC LIMIT 1"
+    ).fetchall()
+    cols = [desc[0] for desc in daemon.conn.execute("PRAGMA table_info(a2a_tasks)").fetchall()]
+    return {"rows": [dict(zip(cols, r)) for r in rows]}
+
+
+@_h("a2a_task.update-message")
+def h_a2a_task_update_message(daemon: DbDaemon, params: dict) -> dict:
+    """Append a message to messages_json and update state + message fields."""
+    task_id = params["task_id"]
+    msg_role = params.get("role", "worker")
+    msg_type = params.get("type", "text")
+    msg_content = params.get("content", "")
+
+    row = daemon.conn.execute(
+        "SELECT messages_json FROM a2a_tasks WHERE task_id = ?", (task_id,)
+    ).fetchone()
+    if not row:
+        return {"affected": 0, "error": "task not found"}
+
+    import json as _json
+    messages = _json.loads(row[0] or "[]")
+    messages.append({
+        "role": msg_role,
+        "type": msg_type,
+        "content": msg_content,
+        "timestamp": _now_utc(),
+    })
+
+    now = _now_utc()
+    daemon.conn.execute(
+        "UPDATE a2a_tasks SET message = ?, messages_json = ?, updated_at = ? WHERE task_id = ?",
+        (msg_content, _json.dumps(messages, ensure_ascii=False), now, task_id),
+    )
+    daemon.conn.commit()
+    return {"affected": 1}
 
 
 # ── CLI ───────────────────────────────────────────────────────────────────
