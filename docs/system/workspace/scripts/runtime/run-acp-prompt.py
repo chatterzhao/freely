@@ -278,6 +278,87 @@ class ACPClient:
         self.transport.close()
 
 
+
+
+# ── Delta extraction ------------------------------------------------------------------
+
+
+# Section headers whose content is STATIC (agent def, governance, delegation
+# workflow, fleet inventory, etc.) and should NOT be re-sent on subsequent
+# turns in an existing ACP session -- the model already has them in context.
+_STATIC_SECTION_PREFIXES = (
+    "=== Agent 角色定义 ===",
+    "## Worker Delegation",
+    "## Fleet Inventory",
+    "## Fleet Snapshot",
+    "## Continuity Guard",
+    "## Managed Surfaces",
+    "## Current Worktree Inventory",
+    "## Stale Runtime Refs",
+    "## Summary Target Hint",
+    "## Use",
+    "## Repair Contract",
+    "## Manager Bootstrap Recovery",
+    "## 工位可写性",
+)
+
+# Section headers whose content is DYNAMIC (changes between turns).
+# These are the sections we MUST include in the delta.
+_DYNAMIC_SECTION_PREFIXES = (
+    "=== 本轮 delta",
+    "## Handoff 上下文",
+    "### Worker 汇报",
+    "### Worker 异常",
+    "### 近期 Worker",
+)
+
+
+def extract_delta(text):
+    '''Strip static sections from a prompt file.
+
+    The ACP server already has the full system prompt, agent definition,
+    governance rules and delegation workflow in its session context from
+    the first turn.  On subsequent turns we MUST only send content that
+    changes between turns - worker reports, scan data, turn instructions.
+
+    Uses a simple line-oriented state machine keyed off ``## `` / ``=== ``
+    section headers.  Unknown sections are PRESERVED (safe default).
+    '''
+    if "## " not in text and "=== " not in text:
+        return text  # no section markers - assume already a delta
+
+    out_lines = []
+    in_static = False
+
+    for line in text.split("\n"):
+        stripped = line.strip()
+
+        # Section header detection
+        if stripped.startswith("## ") or stripped.startswith("=== "):
+            is_static = any(stripped.startswith(p) for p in _STATIC_SECTION_PREFIXES)
+            is_dynamic = any(stripped.startswith(p) for p in _DYNAMIC_SECTION_PREFIXES)
+
+            if is_dynamic:
+                in_static = False
+            elif is_static:
+                in_static = True
+            else:
+                in_static = False
+
+        if not in_static:
+            out_lines.append(line)
+
+    result = "\n".join(out_lines)
+
+    while result.endswith("\n\n"):
+        result = result[:-1]
+
+    if result.strip():
+        return result
+    return text
+
+
+
 # ── CLI ─────────────────────────────────────────────────────────────
 
 def parse_args():
@@ -297,6 +378,10 @@ def parse_args():
                         help="Loop mode: after prompt completes, check --next-prompt-file for the next prompt. Delete after reading. 'EXIT' in file stops the loop.")
     parser.add_argument("--next-prompt-file", default="",
                         help="Path to file that contains the next prompt file path (loop mode)")
+    parser.add_argument("--delta", action="store_true",
+                        help="Delta mode: strip static sections (agent def, governance) from prompt text. "
+                             "Use on subsequent prompts in an existing ACP session to avoid re-sending "
+                             "content the server already has in context.")
     return parser.parse_args()
 
 
@@ -359,14 +444,11 @@ def main():
                 print(f"session id: {session_id} (fresh after resume failure)", flush=True) # line 2: human log
 
         elif launch_kind == "prompt" and resume_target:
-            # Multi-turn within same session. The session was created by
-            # the fresh cycle on this bridge and is still alive — no need
-            # for session/resume which triggers --replay-user-messages.
-            # session/prompt appends the new message like a chat message.
-            # If the session was lost (bridge restart), select_launch_kind
-            # would have returned fresh, not prompt.
+            # Multi-turn within same session: session already exists from fresh/resume.
+            # If session was lost (bridge restart), send_prompt() will fall back to session/new.
             session_id = resume_target
-            print(f"session id: {session_id} (prompt)", flush=True)
+            print(f"session id: {session_id} (prompt)", flush=True)         # line 2: human log
+            # session_result for prompt-mode multi-turn
             session_result = {"sessionId": session_id}
 
         elif launch_kind == "fork":
@@ -436,7 +518,13 @@ def main():
                 )
 
         # ── Prompt loop (one-shot or loop mode) ────────────────────
-        def send_prompt(prompt_text, t_start, t_session, launch_kind):
+        def send_prompt(prompt_text, t_start, t_session, launch_kind, use_delta=False):
+            if use_delta:
+                orig_len = len(prompt_text)
+                prompt_text = extract_delta(prompt_text)
+                if len(prompt_text) != orig_len:
+                    print(f"[DELTA] stripped {orig_len - len(prompt_text)} bytes of static sections "
+                          f"(original={orig_len}b -> delta={len(prompt_text)}b)", flush=True)
             t_before = time.time()
             prompt_timeout = int(os.environ.get("ACP_PROMPT_TIMEOUT", "3600"))
             prompt_result = client.request(
@@ -463,36 +551,13 @@ def main():
             print(cache_msg, flush=True)
             print(cache_msg, flush=True)  # also to stdout (cycle log) for easy inspection
 
-            # Track context fill ratio from session/prompt response usage data.
-            context_window = usage.get("model_context_window") or 0
-            if context_window <= 0:
-                models_state = prompt_result.get("models") or {}
-                available = models_state.get("availableModels") or []
-                if available and isinstance(available, list) and len(available) > 0:
-                    context_window = (available[0].get("contextWindow")
-                                      or available[0].get("model_context_window")
-                                      or 0)
-            ratio_str = ""
-            if total_tokens > 0 and context_window > 0:
-                ratio = total_tokens / context_window
-                ratio_str = f"{ratio:.4f}"
-                cwd_path = cwd if cwd and os.path.isdir(cwd) else None
-                if cwd_path:
-                    ratio_file = os.path.join(cwd_path, ".freely", "run", "bridge-context-ratio.txt")
-                    try:
-                        os.makedirs(os.path.dirname(ratio_file), exist_ok=True)
-                        with open(ratio_file, "w") as f:
-                            f.write(ratio_str + "\n")
-                    except OSError:
-                        pass
-                print(f"[CONTEXT] session_id={session_id} context_ratio={ratio_str} total_tokens={total_tokens} context_window={context_window}", flush=True)
-
             if stop_reason != "end_turn":
                 print(f"[WARN] ACP prompt finished with stopReason={stop_reason}", flush=True)
             return stop_reason
 
         try:
-            stop_reason = send_prompt(prompt_text, t_start, t_session, launch_kind)
+            stop_reason = send_prompt(prompt_text, t_start, t_session, launch_kind,
+                                      use_delta=(launch_kind == "prompt" or args.delta))
         except Exception as prompt_exc:
             # session/prompt failed — session may have been lost (bridge restart).
             # Fall back to session/new and retry once.
@@ -506,7 +571,8 @@ def main():
             print(f"session id: {session_id} (fresh after prompt failure)", flush=True)         # line 2: human log
             t_session = time.time()
             launch_kind = "fresh"
-            stop_reason = send_prompt(prompt_text, t_start, t_session, launch_kind)
+            stop_reason = send_prompt(prompt_text, t_start, t_session, launch_kind,
+                                      use_delta=False)
 
         # Loop mode: keep session alive, wait for next prompt via control file
         if args.loop and args.next_prompt_file:
@@ -529,16 +595,15 @@ def main():
                     except Exception as e:
                         print(f"[WARN] cannot read next prompt file: {line} ({e})", flush=True)
                         continue
-                    stop_reason = send_prompt(next_text, t_start, t_session, launch_kind)
+                    stop_reason = send_prompt(next_text, t_start, t_session, launch_kind,
+                                              use_delta=True)
                     t_start = time.time()
                 else:
                     time.sleep(0.5)  # poll interval
     finally:
         if stop_reason == "end_turn" and not args.loop:
             time.sleep(2)  # grace period for bridge to finish sending notifications
-        # Close session for fork (worker) mode — workers are one-shot, session won't be reused.
-        # Manager cycles (fresh, prompt, resume) keep the session alive for multi-turn continuity.
-        if launch_kind == "fork":
+        if args.loop:
             try:
                 client.request("session/close", {"sessionId": session_id}, timeout=10)
             except Exception:
