@@ -5,7 +5,7 @@
 
 ## M-20260524T053214Z-A
 - title: ACP session 生命周期接入 tool_switch_events
-- status: active
+- status: completed
 ### candidate_issues
 1. `C-20260524T053214Z-A`
 - milestone: M-20260524T053214Z-A
@@ -15,7 +15,7 @@
 1. `I-20260524T053214Z-A`
 - title: ACP session 生命周期接入 tool_switch_events
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260524T053214Z-A/issue.md`
 
 ## M-20260430-0010-A
