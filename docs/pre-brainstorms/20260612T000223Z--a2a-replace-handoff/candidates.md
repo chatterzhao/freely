@@ -4,7 +4,7 @@
 
 - candidate_format_version: v2
 - title: A2A 协议替换 Freely Handoff 架构重构
-- status: proposed
+- status: promoted
 - decision_reason: |
   Freely 自举开发中暴露 Handoff 机制缺陷：
   - 大量 launch_failed, launchable check failed
@@ -12,7 +12,7 @@
   - scan 列表做完就停摆
   A2A 协议提供标准化能力声明、完整状态机、实时推送，可从根本上解决这些问题。
 - next_action: 进入 B2_IBM，产出 I-* issue，包含 PRD/pre-tests/tasks/code-review
-- revisit_trigger: N/A（已决定推进）
+- revisit_trigger: N/A（已 promote）
 - acceptance_criteria:
   - A2A 协议设计文档完成
   - Agent Card 扩展设计覆盖 Freely 特有概念

@@ -6091,7 +6091,14 @@ routing_policy:
 ### candidate_issues
 1. `C-20260612T000223Z-A`
 - milestone: M-20260612T000223Z-A
-- status: proposed
+- status: promoted
 - decision_reason: Freely 自举开发中暴露 Handoff 机制缺陷导致 launchable check 失败
-- next_action: 进入 B2_IBM，产出 I-* issue
+- next_action: 进入 dev-loop 实现
 - promoted_issue_path: `docs/issues/I-20260612T000223Z-A/issue.md`
+### committed_issues
+1. `I-20260612T000223Z-A`
+- title: A2A 协议替换 Freely Handoff 架构重构
+- milestone_state: committed
+- phase_state: `in_b2_ibm`
+- issue_path: `docs/issues/I-20260612T000223Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260612T000223Z--a2a-replace-handoff/candidates.md#C-20260612T000223Z-A`

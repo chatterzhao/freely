@@ -1,0 +1,132 @@
+---
+local_id: I-20260612T000223Z-A
+kind: linked
+status: in_dev
+phase_state: done_b2_ibm
+promoted_from: raw-20260612T000223Z
+source_candidate: docs/pre-brainstorms/20260612T000223Z--a2a-replace-handoff/candidates.md
+canonical_issue_path: ""
+platform_ids: {}
+primary_platform: ""
+last_synced_comment_at: {}
+hash: ""
+created_at: 2026-06-12T00:02:38Z
+updated_at: 2026-06-12T00:10:00Z
+intake_id: ""
+author: platform
+channel: freely-feat-execution
+session_refs: []
+pre_tests_path: docs/epics/a2a-replace-handoff/architecture-refactor/verification/pre-tests.md
+verification_artifact_dir: docs/epics/a2a-replace-handoff/architecture-refactor/code-reviews
+---
+
+# I-20260612T000223Z-A: A2A 协议替换 Freely Handoff 架构重构
+
+- source_candidate: `docs/pre-brainstorms/20260612T000223Z--a2a-replace-handoff/candidates.md`
+- pre_tests_path: `docs/epics/a2a-replace-handoff/architecture-refactor/verification/pre-tests.md`
+- verification_artifact_dir: `docs/epics/a2a-replace-handoff/architecture-refactor/code-reviews`
+
+## 问题描述
+
+当前 Freely 使用私有 Handoff 机制实现 Manager-Worker 交接，存在以下问题：
+
+### 1. 能力发现缺失
+- Manager 和 Worker 之间没有标准化的能力声明机制
+- 每个 Worker 需要什么能力、输出什么格式，Manager 不知道
+- 导致盲目委派 → launchable check 失败
+
+### 2. 状态机不完整
+- Handoff 只有简单的 pending/launched/completed 状态
+- 没有增量状态（如 working、blocked、needs_input）
+- 无法实时推送状态变化
+
+### 3. 实时通信缺失
+- 当前靠轮询 DB 获取状态
+- 没有 SSE/Streaming 机制
+- Manager 无法感知 Worker 实时状态
+
+### 4. 维护成本
+- 私有 Handoff 协议需要持续维护
+- 无法与外部 Agent 生态互操作
+
+## 解决方案
+
+### 方案概述：A2A 彻底替换 Handoff
+
+采用 Linux 基金会 AI Agents 工作组发布的 A2A (Agent-to-Agent) 协议替换现有的私有 Handoff 机制。
+
+### A2A vs Freely Handoff 能力对比
+
+| 能力 | A2A | Freely Handoff |
+|------|-----|----------------|
+| Agent 能力发现 | ✅ Agent Card 标准 | ❌ 无 |
+| 完整状态机 | ✅ 8 种状态 | ❌ 3 种状态 |
+| 实时推送 | ✅ SSE/Streaming | ❌ 无 |
+| 能力协商 | ✅ Capability negotiation | ❌ 无 |
+| 开放互操作 | ✅ Linux 基金会标准 | ❌ 私有 |
+
+## 实现
+
+### Phase 1: 协议设计
+
+1. **Freely Agent Card 扩展设计**
+   - 声明 Freely 特有能力（worktree 隔离、skill、exit_kind）
+   - 能力协商机制
+
+2. **exit_kind → A2A Task 状态映射**
+   ```
+   Freely exit_kind     → A2A Task state
+   ─────────────────────────────────────
+   manager_working      → submitted
+   worker_working       → working
+   worker_done          → completed
+   worker_blocked       → input-required
+   worker_handoff_needed → pending-input
+   delegate_workers    → submitted
+   resume_manager       → completed
+   stop_ai              → failed
+   ```
+
+3. **Freely 特有 artifact 类型**
+   - handoff_json → 自定义 artifact
+   - completion_summary → text artifact
+   - evidence_paths → artifact references
+
+### Phase 2: 原型实现
+
+1. **A2A Server (Worker 端)**
+   - 实现 Agent Card endpoint
+   - 实现 Task CRUD endpoints
+   - 实现 SSE streaming
+
+2. **A2A Client (Manager 端)**
+   - 实现能力发现
+   - 实现 Task 创建和状态监控
+   - 保留 Handoff 作为 fallback
+
+### Phase 3: 状态迁移
+
+1. 将 handoff table 迁移到 A2A Task
+2. 迁移完成后删除旧 handoff 逻辑
+3. 性能基准测试
+
+### Phase 4: 增强功能
+
+1. SSE 实时推送
+2. 外部 Agent 互操作
+3. 能力协商自动化
+
+## 验收标准
+
+- Manager 能通过 Agent Card 发现 Worker 能力
+- exit_kind 能正确映射到 A2A Task 状态
+- SSE 能实时推送 Worker 状态变化
+- 现有 handoff 场景全部兼容
+- 与外部 Agent 系统能互通
+
+## 相关文档
+
+- PRD: `prd.md`
+- Pre-tests: `verification/pre-tests.md`
+- Tasks: `tasks.md`
+- Code Reviews: `code-reviews/`
