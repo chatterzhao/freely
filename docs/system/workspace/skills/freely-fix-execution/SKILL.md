@@ -159,17 +159,18 @@ hotfix/*          → main
   │
   ├─ 运行 ./bin/governance-merge-gate --range "develop..HEAD" 只检查本分支
   ├─ gate 失败：用对应 skill 修复分支自己的错误，预存错误不阻塞
-  ├─ gate 通过：./bin/pr-merge-guarded develop fix/<name>
-  ├─ 紧急: ./bin/pr-merge-guarded develop hotfix/<name>
-  └─ 可选: git checkout main && ./bin/pr-merge-guarded main hotfix/<name>
+  ├─ gate 通过：freely pr-merge-guarded develop fix/<name>
+  ├─ 紧急: freely pr-merge-guarded develop hotfix/<name>
+  └─ 可选: git checkout main && freely pr-merge-guarded main hotfix/<name>
 
 阶段 5 — 收尾
   │
   ├─ 丢弃 test-pre-merge-* 上的 dirty 修改（已经 cp 到可写工位）
   │     cd <test-pre-merge-wt> && git checkout -- . && git clean -fd
-  ├─ 删除 test-pre-merge-* 工位
-  │     git worktree remove <test-pre-merge-wt>
-  └─ git branch -D test-pre-merge-<name>
+  ├─ 关闭 test-pre-merge-* 工位和分支
+  │     freely wt-close test-pre-merge-<name>
+  └─ 关闭 fix 工位和分支（PR 已合并到 develop）
+        freely wt-close fix/<name>
 ```
 
 ---
