@@ -24,13 +24,13 @@ import time
 import uuid
 from datetime import datetime, timezone
 
-# Import handoff parser for parse/extract (lazy-loaded at first use)
+# Import a2a_task parser for parse/extract (lazy-loaded at first use)
 _handoff_parser = None
 
 def _get_handoff_parser():
     global _handoff_parser
     if _handoff_parser is None:
-        from handoff_parser import (
+        from a2a_task_parser import (
             extract_handoff_block, validate_handoff_json, normalize_fields, normalize_exit_kind
         )
         _handoff_parser = (extract_handoff_block, validate_handoff_json, normalize_fields, normalize_exit_kind)
