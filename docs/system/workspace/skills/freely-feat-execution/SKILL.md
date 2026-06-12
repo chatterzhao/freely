@@ -84,19 +84,13 @@ freely-feat-execution 在不同阶段调用下层 skill：
 ### 阶段 5：提 PR
 ```
 1. 在 feature worktree 运行 dry-run 门禁检查
-2. 运行 `./bin/pr-create-guarded`：
-   - git pull develop --rebase
-   - 冲突处理
-   - 运行 pre-tests
-   - dry-run gate 检查
-   - git push
-   - gh pr create
+2. 运行 `freely pr-create-guarded`
 3. PR 审查通过后进入门禁合并
 ```
 
 ### 阶段 6：门禁合并
 ```
-1. 运行 `./bin/pr-merge-guarded develop <pr-branch>`
+1. 运行 `freely pr-merge-guarded develop <pr-branch>`
 2. PR gate 检查
 3. promotion gate 检查
 4. pr-merge-guarded develop <pr-branch> → develop-push
@@ -108,7 +102,7 @@ freely-feat-execution 在不同阶段调用下层 skill：
 1. 更新 issue phase_state → completed
 2. 更新 milestones.md
 3. raw issue → absorbed/dropped
-4. wt-close
+4. freely wt-close <branch>
 ```
 
 ## Gate 处理

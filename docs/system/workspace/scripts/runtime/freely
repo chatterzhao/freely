@@ -732,6 +732,11 @@ Usage:
   freely develop-push attempt [--project <abs_path>]
   freely develop-push defer [--project <abs_path>] --reason <post_merge_acceptance|cleanup_followthrough|remote_delivery_hold> [--note <text>]
   freely develop-push clear [--project <abs_path>]
+  freely wt-create [--raw-key <key>] [--source <platform|chat-inbox>] [--skill <skill>] [--slug <slug>] [--base <branch>]
+  freely pr-create-guarded [--title <title>] [--body <body>] [--base <branch>]
+  freely pr-merge-guarded <target-branch> <source-branch> [--dry-run]
+  freely pr-merge-guarded complete <target-branch> <source-branch>
+  freely wt-close <branch> [--force] [--skip-platform] [--dry-run]
   freely stop [--project <abs_path>]
 
 AI mode:
@@ -23331,6 +23336,24 @@ cmd_stop() {
   log_info "stopped (if running)"
 }
 
+# ── Worktree lifecycle commands (dispatch to bin/) ──
+
+cmd_wt_create() {
+  exec bash "$SELF_ROOT/bin/wt-create" "$@"
+}
+
+cmd_pr_create_guarded() {
+  exec bash "$SELF_ROOT/bin/pr-create-guarded" "$@"
+}
+
+cmd_pr_merge_guarded() {
+  exec bash "$SELF_ROOT/bin/pr-merge-guarded" "$@"
+}
+
+cmd_wt_close() {
+  exec bash "$SELF_ROOT/bin/wt-close" "$@"
+}
+
 main() {
   local cmd="${1:-}"
   if [[ "$cmd" == "--help" || "$cmd" == "-h" ]]; then
@@ -23388,6 +23411,10 @@ main() {
     live-status) cmd_live_status "$@" ;;
     fleet-status) cmd_fleet_status "$@" ;;
     develop-push) cmd_develop_push "$@" ;;
+    wt-create) cmd_wt_create "$@" ;;
+    pr-create-guarded) cmd_pr_create_guarded "$@" ;;
+    pr-merge-guarded) cmd_pr_merge_guarded "$@" ;;
+    wt-close) cmd_wt_close "$@" ;;
     stop) cmd_stop "$@" ;;
     *) log_error "unknown command: $cmd"; usage; exit 1 ;;
   esac
