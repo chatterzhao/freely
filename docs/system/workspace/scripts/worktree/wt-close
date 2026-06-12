@@ -430,4 +430,52 @@ else
   fi
 fi
 
+# ── Phase 7: Sync develop across platforms ──
+
+# Only sync when closing a test-pre-merge-* branch (PR was merged to develop)
+if [[ "$branch" == test-pre-merge-* ]]; then
+  echo "wt-close: syncing develop across platforms..."
+
+  if [[ "$DRY_RUN" == true ]]; then
+    _dry "git fetch github origin"
+    _dry "git update-ref refs/heads/develop <sha>"
+    _dry "git push origin develop:develop"
+  else
+    # 1. Fetch all remotes
+    for remote in $(git remote); do
+      git fetch "$remote" develop 2>/dev/null || true
+    done
+
+    # 2. Find authoritative SHA (github as primary platform)
+    authoritative_sha=$(git rev-parse github/develop 2>/dev/null || echo "")
+
+    if [[ -n "$authoritative_sha" ]]; then
+      # 3. Sync local develop if needed
+      local_sha=$(git rev-parse develop 2>/dev/null || echo "")
+
+      if [[ "$local_sha" != "$authoritative_sha" ]]; then
+        if git diff --quiet HEAD 2>/dev/null; then
+          echo "wt-close: updating local develop to $(git rev-parse --short "$authoritative_sha")..."
+          git update-ref refs/heads/develop "$authoritative_sha"
+          echo "wt-close: local develop synced ✓"
+        else
+          echo "wt-close: warning - local develop is dirty, skipping local sync" >&2
+        fi
+      fi
+
+      # 4. Sync to other platforms (origin/gitee)
+      origin_sha=$(git rev-parse origin/develop 2>/dev/null || echo "")
+
+      if [[ -n "$origin_sha" && "$origin_sha" != "$authoritative_sha" ]]; then
+        echo "wt-close: syncing develop to gitee (origin)..."
+        if git push origin "develop:develop" 2>/dev/null; then
+          echo "wt-close: gitee develop synced ✓"
+        else
+          echo "wt-close: warning - failed to sync gitee (may need manual sync)" >&2
+        fi
+      fi
+    fi
+  fi
+fi
+
 echo "wt-close: done ✓"
