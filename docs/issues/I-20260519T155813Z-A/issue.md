@@ -5,19 +5,23 @@ phase_state: completed
 promoted_from: raw-20260519T155813Z
 source_candidate: docs/pre-brainstorms/20260519T155813Z--launchable-check-reason/candidates.md
 canonical_issue_path: ''
-platform_ids: {}
+platform_ids:
+  github:
+    issue_id: '2600'
+    url: https://github.com/chatterzhao/freely/issues/2600
+    synced_at: '2026-06-13T10:45:17Z'
 primary_platform: github
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-19T15:58:13Z'
-updated_at: '2026-06-03T12:30:00Z'
+updated_at: '2026-06-13T10:45:17Z'
 intake_id: ''
 author: manager
 channel: direct-absorption
 session_refs: []
 pre_tests_path: ''
 verification_artifact_dir: ''
-platform_state: closed
+platform_state: open
 ---
 
 # I-20260519T155813Z-A: launchable check failed reason too vague

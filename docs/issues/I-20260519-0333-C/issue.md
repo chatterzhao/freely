@@ -1,22 +1,28 @@
 ---
 local_id: I-20260519-0333-C
-issue_title: 'Testing evidence ladder and gate mapping'
+issue_title: Testing evidence ladder and gate mapping
 kind: linked
 phase_state: completed
-promoted_from: 'pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates'
-source_candidate: 'docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/candidates.md#C-20260325-0333-A'
+promoted_from: pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates
+source_candidate: docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/candidates.md#C-20260325-0333-A
 milestone: M-20260306-workspace-routing-foundation
 canonical_issue_path: docs/epics/testing-evidence-ladder/testing-evidence-ladder-and-gate-mapping/issues/testing-evidence-ladder-and-gate-mapping.md
 pre_tests_path: docs/epics/testing-evidence-ladder/testing-evidence-ladder-and-gate-mapping/pre-tests.md
 tasks_path: docs/epics/testing-evidence-ladder/testing-evidence-ladder-and-gate-mapping/tasks.md
 verification_artifact_dir: docs/epics/testing-evidence-ladder/testing-evidence-ladder-and-gate-mapping/code-reviews
-platform_ids: {}
-platform_state: closed
-updated_at: '2026-05-19T22:35:00Z'
+platform_ids:
+  github:
+    issue_id: '2601'
+    url: https://github.com/chatterzhao/freely/issues/2601
+    synced_at: '2026-06-13T10:45:32Z'
+platform_state: open
+updated_at: '2026-06-13T10:45:32Z'
 session_refs:
-  - tool: cc
-    session_id: 20260519-testing-evidence-ladder-slice2-b2
-    role: author
+- tool: cc
+  session_id: 20260519-testing-evidence-ladder-slice2-b2
+  role: author
+primary_platform: github
+created_at: '2026-06-13T10:45:32Z'
 ---
 
 # I-20260519-0333-C: Testing Evidence Ladder and Gate Mapping

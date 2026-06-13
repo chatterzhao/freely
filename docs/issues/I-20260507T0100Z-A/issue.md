@@ -6,8 +6,15 @@ source_candidate: docs/pre-brainstorms/20260507-fix-branch-naming/candidates.md
 milestone: M-20260507T0100Z-A
 verification_artifact_dir: docs/epics/fix-branch-naming/code-reviews
 pre_tests_path: docs/epics/fix-branch-naming/verification/pre-tests.md
-platform_ids: {}
-platform_state: ''
+platform_ids:
+  github:
+    issue_id: '2606'
+    url: https://github.com/chatterzhao/freely/issues/2606
+    synced_at: '2026-06-13T10:51:03Z'
+platform_state: open
+updated_at: '2026-06-13T10:51:03Z'
+primary_platform: github
+created_at: '2026-06-13T10:51:03Z'
 ---
 
 # I-20260507T0100Z-A: fix-execution branch naming
