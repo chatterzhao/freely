@@ -480,6 +480,9 @@ class A2AServer:
 
 # ── CLI ──────────────────────────────────────────────────────────────────
 
+def _pid_file(project: str) -> str:
+    return f"/tmp/freely-a2a-{_short_hash(project)}.pid"
+
 def main():
     parser = argparse.ArgumentParser(description="Freely A2A Gateway (local + network)")
     parser.add_argument("--project", required=True)
@@ -490,16 +493,47 @@ def main():
     parser.add_argument("--listen-mode", default="")  # unix|tcp|both
     args = parser.parse_args()
     sp = _socket_path(args.project)
+    pf = _pid_file(args.project)
+
     if args.stop:
-        if os.path.exists(sp): os.remove(sp)
-        print("[A2A Gateway] Stopped")
+        # Graceful stop via PID file (aligns with JiuwenSwarm signal pattern)
+        if os.path.exists(pf):
+            try:
+                with open(pf) as f:
+                    pid = int(f.read().strip())
+                os.kill(pid, 15)  # SIGTERM → triggers A2AServer.stop()
+                import time
+                for _ in range(50):
+                    try: os.kill(pid, 0); time.sleep(0.1)
+                    except OSError: break
+                try: os.kill(pid, 0); os.kill(pid, 9)
+                except OSError: pass
+                print(f"[A2A Gateway] Stopped (PID {pid})")
+            except (ValueError, OSError) as e:
+                print(f"[A2A Gateway] Warning: {e}")
+            if os.path.exists(pf): os.remove(pf)
+        if os.path.exists(sp):
+            os.remove(sp)
     elif args.start:
+        with open(pf, 'w') as f:
+            f.write(str(os.getpid()))
+        import signal
         if args.listen_mode:
             os.environ["A2A_LISTEN_MODE"] = args.listen_mode
         srv = A2AServer(project=args.project, socket_path=sp,
                         tcp_host=args.tcp_host, tcp_port=args.tcp_port)
+
+        def _on_term(signum, frame):
+            srv.stop()
+            if os.path.exists(pf): os.remove(pf)
+            os._exit(0)
+        signal.signal(signal.SIGTERM, _on_term)
+        signal.signal(signal.SIGINT, _on_term)
+
         try: srv.start()
         except KeyboardInterrupt: srv.stop()
+        finally:
+            if os.path.exists(pf): os.remove(pf)
 
 
 if __name__ == "__main__":
