@@ -1,9 +1,9 @@
 ---
 local_id: raw-20260613T110000Z
 kind: raw
-phase_state: absorbed
-absorbed_into: a2a-client-fix
-absorbed_at: '2026-06-13T11:08:00Z'
+phase_state: dropped
+absorbed_into: ''
+absorbed_at: ''
 platform_ids: {}
 primary_platform: local
 canonical_issue_path: ''
@@ -17,3 +17,5 @@ Manager AI 输出正确的 JSON state block 后 parse_a2a_task_json_reply 始终
 
 根因: 模块级变量 _client = None 被同名函数 def _client() 覆盖，
 global _client 永远指向函数自身，process_ai_reply 调用 c.create() 时报 AttributeError。
+
+dropped_reason: Fix was applied directly in a2a-client-fix branch. No canonical issue was created to track the fix independently. The fix has been merged and is no longer a separate work item.
