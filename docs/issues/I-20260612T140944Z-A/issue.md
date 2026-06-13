@@ -13,6 +13,7 @@ updated_at: '2026-06-13T01:20:00Z'
 platform_state: open
 linked_raw: raw-20260612T140944Z
 linked_candidate: C-20260612T140944Z-A
+source_candidate: docs/candidates/C-20260612T140944Z-A.md
 worktree: fix/raw-20260612T140944Z-a2a-handoff-compat
 ---
 

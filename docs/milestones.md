@@ -11,7 +11,7 @@
 - milestone: M-20260612T140944Z-A
 - status: promoted
 - promoted_issue_path: `docs/issues/I-20260612T140944Z-A/issue.md`
-### committed_issues
+### completed_issues
 1. `I-20260612T140944Z-A`
 - title: 彻底 A2A 重构 — 官方 SDK + 双传输 + Agent 注册中心
 - milestone_state: committed
