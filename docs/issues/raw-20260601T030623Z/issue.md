@@ -2,7 +2,9 @@
 local_id: raw-20260601T030623Z
 kind: raw
 phase_state: dropped
-dropped_reason: Fix applied via fix/raw-20260601T030623Z-cross-platform-fixes commit b33dff5a. Cross-platform compatibility for timeout (Linux) and stat (Linux -c %Y fallback). No B1/B2 needed — direct fix-execution path.
+dropped_reason: Fix applied via fix/raw-20260601T030623Z-cross-platform-fixes commit
+  b33dff5a. Cross-platform compatibility for timeout (Linux) and stat (Linux -c %Y
+  fallback). No B1/B2 needed — direct fix-execution path.
 platform_state: closed
 platform_ids:
   github:
@@ -14,7 +16,7 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-01T03:06:39Z'
-updated_at: '2026-06-01T03:06:39Z'
+updated_at: '2026-06-13T10:48:41Z'
 intake_id: ''
 author: platform
 channel: github

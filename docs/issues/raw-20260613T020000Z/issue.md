@@ -4,11 +4,13 @@ kind: raw
 phase_state: absorbed
 platform_ids:
   github:
-    issue_id: "2578"
+    issue_id: '2578'
     url: https://github.com/chatterzhao/freely/pull/2578
 primary_platform: github
 canonical_issue_path: ''
 created_at: '2026-06-13T02:00:00Z'
+platform_state: closed
+updated_at: '2026-06-13T10:48:27Z'
 ---
 
 pr-create-guarded 和 pr-merge-guarded 硬编码 GitHub，不支持多平台配置。
