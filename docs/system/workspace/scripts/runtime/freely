@@ -12785,7 +12785,7 @@ print(sum(1 for r in rows if r.get('worktree','')=='$_target_worktree'))
 
 回复末尾输出 A2A Task 状态 JSON（格式见 worker-agent.md）：
 
-```json5
+```json
 {
   "state": "completed",
   "summary": "...",
@@ -14345,7 +14345,7 @@ python3 docs/system/workspace/scripts/runtime/a2a_task.py list --db .freely/free
 
 回复末尾输出 A2A Task 状态 JSON（格式见 manager-agent.md）：
 
-```json5
+```json
 {
   "state": "submitted",
   "summary": "...",
@@ -14363,7 +14363,7 @@ append_worker_exit_contract_directive_if_needed() {
 
 回复末尾输出 A2A Task 状态 JSON（格式见 worker-agent.md）：
 
-```json5
+```json
 {
   "state": "completed",
   "summary": "...",

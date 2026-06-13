@@ -104,7 +104,7 @@ scan 是任务来源。以下情况必须手动 `freely task-source-scan`：
 Manager 的完整回复是 A2A Message。回复末尾的结构化 JSON 提供 Task 状态转换，
 Runtime 通过 A2A Server `PATCH /tasks/{id}` 更新。
 
-```json5
+```json
 {
   // state — A2A Task 状态。Manager 只允许这三个值：
   //   "submitted"  — 委派 Worker 或进行中

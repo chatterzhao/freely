@@ -34,7 +34,7 @@
 Worker 的完整回复是 A2A Message。回复末尾的 JSON 提供 Task 状态转换，
 Runtime 通过 A2A Server `PATCH /tasks/{id}` 更新。
 
-```json5
+```json
 {
   // state — A2A Task 状态。Worker 只允许这四个值：
   //   "working"         — 正在执行
