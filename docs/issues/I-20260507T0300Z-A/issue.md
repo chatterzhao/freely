@@ -6,8 +6,15 @@ source_candidate: docs/pre-brainstorms/20260507-gate1-timestamp/candidates.md
 milestone: M-20260507T0300Z-A
 verification_artifact_dir: docs/epics/gate1-timestamp/code-reviews
 pre_tests_path: docs/epics/gate1-timestamp/verification/pre-tests.md
-platform_ids: {}
-platform_state: ''
+platform_ids:
+  github:
+    issue_id: '2599'
+    url: https://github.com/chatterzhao/freely/issues/2599
+    synced_at: '2026-06-13T10:45:11Z'
+platform_state: open
+updated_at: '2026-06-13T10:45:11Z'
+primary_platform: github
+created_at: '2026-06-13T10:45:11Z'
 ---
 # I-20260507T0300Z-A: GATE 1 timestamp check
 - pre_tests_path: `docs/epics/gate1-timestamp/verification/pre-tests.md`
