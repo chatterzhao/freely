@@ -3,6 +3,25 @@
 
 本文件是 Freely 自举开发时的主动扫描入口，用来承接已进入活跃范围的 candidate / issue。
 
+## M-20260612T140944Z-A
+- title: 彻底 A2A 重构 — 官方 SDK + 双传输 + Agent 注册中心
+- status: completed
+### candidate_issues
+1. `C-20260612T140944Z-A`
+- milestone: M-20260612T140944Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260612T140944Z-A/issue.md`
+### committed_issues
+1. `I-20260612T140944Z-A`
+- title: 彻底 A2A 重构 — 官方 SDK + 双传输 + Agent 注册中心
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260612T140944Z-A/issue.md`
+- linked_raw: `docs/issues/raw-20260612T140944Z/issue.md`
+- linked_candidate: `docs/candidates/C-20260612T140944Z-A.md`
+- worktree: `fix/raw-20260612T140944Z-a2a-handoff-compat`
+- pr: `https://github.com/chatterzhao/freely/pull/2577`
+
 ## M-20260524T053214Z-A
 - title: ACP session 生命周期接入 tool_switch_events
 - status: completed
