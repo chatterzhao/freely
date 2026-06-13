@@ -6,15 +6,17 @@ local_id: raw-20260503T1235Z
 priority: P1
 absorbed_into: I-20260503T1235Z-A
 source: platform
-updated_at: 2026-05-17T04:47:25Z
+updated_at: '2026-06-13T11:23:09Z'
 platform_ids:
   github:
-    issue_id: "186"
+    issue_id: '186'
     owner: chatterzhao
     repo: freely
-created_at: "2026-05-03T12:39:03Z"
-title: "fix: defer worker auto-recovery to after first AI patrol"
+created_at: '2026-05-03T12:39:03Z'
+title: 'fix: defer worker auto-recovery to after first AI patrol'
 platform_state: closed
+force_closed_at: '2026-06-13T11:23:09Z'
+force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
 ---
 
 ## Root Cause
