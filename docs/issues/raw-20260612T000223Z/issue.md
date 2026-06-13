@@ -9,7 +9,7 @@ created_at: '2026-06-12T00:02:23Z'
 title: A2A 协议替换 Freely Handoff 架构重构
 platform_ids: {}
 primary_platform: github
-updated_at: '2026-06-13T10:50:30Z'
+updated_at: '2026-06-13T12:34:43Z'
 platform_state: closed
 ---
 
