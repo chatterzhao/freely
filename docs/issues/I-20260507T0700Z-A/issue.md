@@ -6,8 +6,15 @@ source_candidate: docs/pre-brainstorms/20260507-unified-platform/candidates.md
 milestone: M-20260507T0700Z-A
 verification_artifact_dir: docs/epics/unified-platform/code-reviews
 pre_tests_path: docs/epics/unified-platform/verification/pre-tests.md
-platform_ids: {}
-platform_state: ''
+platform_ids:
+  github:
+    issue_id: '2608'
+    url: https://github.com/chatterzhao/freely/issues/2608
+    synced_at: '2026-06-13T10:51:42Z'
+platform_state: open
+updated_at: '2026-06-13T10:51:42Z'
+primary_platform: github
+created_at: '2026-06-13T10:51:42Z'
 ---
 # I-20260507T0700Z-A: unified platform layer
 - pre_tests_path: `docs/epics/unified-platform/verification/pre-tests.md`

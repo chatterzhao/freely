@@ -6,7 +6,15 @@ promoted_from: raw-20260508T050922Z
 source_candidate: docs/pre-brainstorms/20260508T050922Z--closeout-chain/candidates.md#C-20260508T050922Z-A
 verification_artifact_dir: docs/epics/closeout-chain/code-reviews
 pre_tests_path: docs/epics/closeout-chain/verification/pre-tests.md
-platform_state: ''
+platform_state: open
+platform_ids:
+  github:
+    issue_id: '2616'
+    url: https://github.com/chatterzhao/freely/issues/2616
+    synced_at: '2026-06-13T10:53:11Z'
+updated_at: '2026-06-13T10:53:11Z'
+primary_platform: github
+created_at: '2026-06-13T10:53:11Z'
 ---
 # I-20260508T050922Z-A: 门禁收口链路修复
 - pre_tests_path: docs/epics/closeout-chain/verification/pre-tests.md
