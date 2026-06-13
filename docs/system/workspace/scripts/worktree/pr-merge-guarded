@@ -203,13 +203,83 @@ attempt_develop_push_followthrough_if_needed() {
   [[ "$target" == "develop" ]] || return 0
   [[ -x "./bin/freely" ]] || return 0
 
-  echo "[MERGE-GUARD] develop merge completed; attempting single push followthrough"
-  if ! ./bin/freely develop-push attempt --project "$PWD"; then
-    echo "[MERGE-GUARD] develop push followthrough blocked; merge already committed and explicit push_blocked truth should be available" >&2
+  echo "[MERGE-GUARD] develop merge completed; pushing to all remotes"
+
+  # Push to all configured remotes, not just @{upstream}.
+  # After merge to develop, every remote must be synced.
+  local push_ok=1
+  local remotes
+  remotes=$(git remote 2>/dev/null || true)
+  [[ -n "$remotes" ]] || remotes="origin"
+
+  for remote in $remotes; do
+    # Skip internal "all" remote if present
+    [[ "$remote" == "all" ]] && continue
+    echo "[MERGE-GUARD] pushing develop to $remote..."
+    if git push "$remote" develop 2>&1; then
+      echo "[MERGE-GUARD] $remote: pushed ✓"
+    else
+      echo "[MERGE-GUARD] $remote: push FAILED — will retry via develop-push followthrough" >&2
+      push_ok=0
+    fi
+  done
+
+  if [[ "$push_ok" == "1" ]]; then
+    echo "[MERGE-GUARD] all remotes synced ✓"
+  else
+    echo "[MERGE-GUARD] some remotes failed; using develop-push attempt for retry tracking" >&2
+    ./bin/freely develop-push attempt --project "$PWD" || true
+    echo "[MERGE-GUARD] merge committed; push_blocked state available for retry" >&2
   fi
 
   # Sync changed issues to platforms after merge to develop.
   _sync_issues_changed_in_merge
+
+  # ── Sync PRs across platforms: close merged PRs, delete source branch ──
+  # After local merge + push develop to all remotes, each platform still
+  # has an open PR. Close/merge them so they reflect the actual state.
+  _sync_prs_across_platforms "$source_branch"
+}
+
+# _sync_prs_across_platforms: after local merge + push develop, close the
+# PRs on all platforms so they don't remain open. Also delete the source
+# branch from each platform.
+_sync_prs_across_platforms() {
+  local source_branch="$1"
+  [[ -n "$source_branch" ]] || return 0
+
+  for platform in github gitee; do
+    local cli=""
+    case "$platform" in
+      github) command -v gh >/dev/null 2>&1 && cli="gh" ;;
+      gitee)  command -v gitee >/dev/null 2>&1 && cli="gitee" ;;
+    esac
+    [[ -n "$cli" ]] || continue
+
+    # Find open PR for this branch
+    local pr_number
+    pr_number="$("$cli" pr list --head "$source_branch" --state OPEN --json number -q '.[0].number' 2>/dev/null || true)"
+    if [[ -z "$pr_number" ]]; then
+      continue
+    fi
+
+    echo "[MERGE-GUARD] closing PR #$pr_number on $platform..."
+    # Close the PR (already merged locally, develop already pushed)
+    "$cli" pr close "$pr_number" --comment "Merged via pr-merge-guarded; develop synced." 2>/dev/null || \
+      echo "[MERGE-GUARD] warning: failed to close $platform PR #$pr_number" >&2
+
+    # Delete the source branch from this platform
+    local remote=""
+    case "$platform" in
+      github) remote="github" ;;
+      gitee)  git remote | grep -q '^gitee$' && remote="gitee" || remote="origin" ;;
+    esac
+    if [[ -n "$remote" ]]; then
+      echo "[MERGE-GUARD] deleting $source_branch from $platform ($remote)..."
+      git push "$remote" --delete "$source_branch" 2>/dev/null || \
+        echo "[MERGE-GUARD] warning: failed to delete $source_branch from $remote" >&2
+    fi
+  done
 }
 
 # _sync_issues_changed_in_merge: after merge to develop, update local
@@ -313,19 +383,32 @@ do_initial_merge() {
     echo "[MERGE-GUARD] allowed: $source_branch -> $target"
   fi
 
-  # ── PR review gate (develop target only) ──────────────────────────────
-  # Every merge to develop must have a corresponding PR for traceability.
-  # The approval requirement is optional — what matters is the PR exists.
-  if [[ "$target" == "develop" && "$dry_run" != "1" ]] && command -v gh &>/dev/null; then
-    local pr_number
-    pr_number="$(gh pr list --head "$source_branch" --state OPEN --json number -q '.[0].number' 2>/dev/null || true)"
-    if [[ -z "$pr_number" ]]; then
-      echo "[MERGE-GUARD] PR review gate: no open PR found for branch '$source_branch'." >&2
-      echo "  Every merge to develop must have a PR. Create one first:" >&2
-      echo "    gh pr create --base develop --head $source_branch --title \"...\" --body \"...\"" >&2
+  # ── PR review gate (develop target only, multi-platform) ───────────
+  # Every merge to develop must have a PR for traceability.
+  # Checks ALL configured platforms — at least one must have an open PR.
+  if [[ "$target" == "develop" && "$dry_run" != "1" ]]; then
+    local pr_found=0
+    if command -v gh &>/dev/null; then
+      local gh_pr
+      gh_pr="$(gh pr list --head "$source_branch" --state OPEN --json number -q '.[0].number' 2>/dev/null || true)"
+      if [[ -n "$gh_pr" ]]; then
+        echo "[MERGE-GUARD] PR gate: GitHub PR #$gh_pr exists"
+        pr_found=1
+      fi
+    fi
+    if [[ "$pr_found" == "0" ]] && command -v gitee &>/dev/null; then
+      local gitee_pr
+      gitee_pr="$(gitee pr list --head "$source_branch" --state OPEN --json number -q '.[0].number' 2>/dev/null || true)"
+      if [[ -n "$gitee_pr" ]]; then
+        echo "[MERGE-GUARD] PR gate: Gitee PR #$gitee_pr exists"
+        pr_found=1
+      fi
+    fi
+    if [[ "$pr_found" == "0" ]]; then
+      echo "[MERGE-GUARD] PR review gate: no open PR found for '$source_branch' on any platform." >&2
+      echo "  Run ./bin/pr-create-guarded to create a PR first." >&2
       exit 1
     fi
-    echo "[MERGE-GUARD] PR gate: PR #$pr_number exists — proceeding."
   fi
 
   run_promotion_gate_if_needed "$target" "$source_branch"

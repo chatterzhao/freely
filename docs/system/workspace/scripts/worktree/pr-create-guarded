@@ -71,23 +71,14 @@ mkdir -p .freely/run
 echo "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > .freely/run/pr-create-gate-passed
 echo ""
 
-# ── Step 3: Push current branch to github (primary platform for PR) ──
-echo "Step 3/4: pushing $current_branch to github..."
-if ! git push github "$current_branch" 2>&1; then
-  echo "Warning: push to github failed, trying origin..." >&2
-  git push origin "$current_branch" 2>&1
-fi
-echo ""
+# ── Step 3+4: Push branch + Create PR on each configured platform ──
+# Principle: push branch to platform X, create PR on platform X.
+# Never push to A then PR on B (cross-platform = empty PR).
+# Reads FREELY_REPO_PLATFORMS (comma-separated, e.g. "github,gitee").
+# Each platform maps to: remote name, optional CLI for PR creation.
+echo "Step 3/4: pushing + PR on all platforms..."
 
-# ── Step 4: Create PR via GitHub (unified platform) ──
-echo "Step 4/4: creating pull request via GitHub..."
-if ! command -v gh >/dev/null 2>&1; then
-  echo "ERROR: gh (GitHub CLI) not found. Please install gh and create the PR manually." >&2
-  echo "  Visit: https://cli.github.com/" >&2
-  exit 1
-fi
-
-# Build PR args; provide defaults if not specified
+# Build PR defaults
 if [[ -z "${title:-}" ]]; then
   title="$(echo "$current_branch" | sed 's/.*raw-[0-9]*T[0-9]*Z-//; s/-/ /g')"
 fi
@@ -95,13 +86,90 @@ if [[ -z "${body:-}" ]]; then
   body="See commits for details."
 fi
 
-# Use GitHub as unified platform for PR creation
-# Push branch to github first if not already there
-if ! git ls-remote --exit-code github "$current_branch" >/dev/null 2>&1; then
-  echo "Pushing branch to github first..."
-  git push github "$current_branch" 2>&1
-fi
+_platform_configs() {
+  local configured="${FREELY_REPO_PLATFORMS:-}"
+  if [[ -n "$configured" ]]; then
+    printf '%s\n' "$configured" | tr ',' '\n'
+  else
+    # Auto-detect: check for github/gitee remotes
+    git remote | grep -q '^github$' && echo "github"
+    git remote | grep -q '^gitee$' && echo "gitee"
+    # If nothing detected, use origin
+    local count
+    count=$(git remote | grep -c -v '^all$' || true)
+    if [[ "${count:-0}" == "1" ]]; then
+      git remote | grep -v '^all$' | while read -r r; do echo "$r"; done
+    fi
+  fi | sort -u
+}
 
-gh pr create --head "$current_branch" --base "$base" \
-  --title "$title" \
-  --body "$body"
+_platform_cli() {
+  case "$1" in
+    github) echo "gh" ;;
+    gitee)  echo "gitee" ;;
+    *)      echo "" ;;
+  esac
+}
+
+_platform_remote_name() {
+  case "$1" in
+    gitee) git remote | grep -q '^gitee$' && echo "gitee" || echo "origin" ;;
+    *)     echo "$1" ;;
+  esac
+}
+
+platforms=$(_platform_configs)
+if [[ -z "$platforms" ]]; then
+  echo "ERROR: no platforms. Set FREELY_REPO_PLATFORMS or add remotes." >&2
+  exit 1
+fi
+echo "Platforms: $(echo "$platforms" | tr '\n' ' ')"
+
+pushed_any=0
+pr_created_any=0
+for platform in $platforms; do
+  remote=$(_platform_remote_name "$platform")
+
+  # Step A: Push branch to this platform (always)
+  echo "  [$platform] pushing branch..."
+  if git push "$remote" "$current_branch" 2>&1; then
+    pushed_any=1
+    echo "  [$platform] push ✓"
+  else
+    echo "  [$platform] push FAILED — skipping PR" >&2
+    continue
+  fi
+
+  # Step B: Create PR on this platform (if CLI available)
+  cli=$(_platform_cli "$platform")
+  if [[ -z "$cli" ]] || ! command -v "$cli" >/dev/null 2>&1; then
+    echo "  [$platform] no CLI ($cli), skipping PR"
+    continue
+  fi
+
+  echo "  [$platform] creating PR via $cli..."
+  if [[ "$cli" == "gh" ]]; then
+    if gh pr create --head "$current_branch" --base "$base" \
+         --title "$title" --body "$body" 2>&1; then
+      pr_created_any=1; echo "  [$platform] PR created ✓"
+    else
+      echo "  [$platform] PR creation FAILED" >&2
+    fi
+  elif [[ "$cli" == "gitee" ]]; then
+    if gitee pr create --head "$current_branch" --base "$base" \
+         --title "$title" --body "$body" 2>&1; then
+      pr_created_any=1; echo "  [$platform] PR created ✓"
+    else
+      echo "  [$platform] PR creation FAILED" >&2
+    fi
+  fi
+done
+echo ""
+
+if [[ "$pushed_any" == "0" ]]; then
+  echo "ERROR: failed to push to any platform" >&2
+  exit 1
+fi
+if [[ "$pr_created_any" == "0" ]]; then
+  echo "WARNING: PR not created on any platform (manual PR may be needed)" >&2
+fi
