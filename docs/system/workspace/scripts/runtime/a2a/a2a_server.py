@@ -121,25 +121,33 @@ class SQLiteTaskStore(BaseTaskStore):
             sock.close()
         return json.loads(data.decode()).get("result", {})
 
+    @staticmethod
+    def _db_state_to_pb(db_state: str) -> int:
+        m = {'submitted': TaskState.TASK_STATE_SUBMITTED, 'working': TaskState.TASK_STATE_WORKING,
+             'completed': TaskState.TASK_STATE_COMPLETED, 'failed': TaskState.TASK_STATE_FAILED,
+             'input-required': TaskState.TASK_STATE_INPUT_REQUIRED,
+             'pending-input': TaskState.TASK_STATE_INPUT_REQUIRED,
+             'canceled': TaskState.TASK_STATE_CANCELED}
+        return m.get(db_state, TaskState.TASK_STATE_SUBMITTED)
+
+    @staticmethod
+    def _pb_state_to_db(ts: int) -> str:
+        m = {TaskState.TASK_STATE_SUBMITTED: 'submitted', TaskState.TASK_STATE_WORKING: 'working',
+             TaskState.TASK_STATE_COMPLETED: 'completed', TaskState.TASK_STATE_FAILED: 'failed',
+             TaskState.TASK_STATE_INPUT_REQUIRED: 'input-required',
+             TaskState.TASK_STATE_CANCELED: 'canceled'}
+        return m.get(ts, 'submitted')
+
     def _row_to_task(self, row: dict) -> Task:
-        state_map = {
-            'submitted': TaskState.TASK_STATE_SUBMITTED,
-            'working': TaskState.TASK_STATE_WORKING,
-            'completed': TaskState.TASK_STATE_COMPLETED,
-            'failed': TaskState.TASK_STATE_FAILED,
-            'input-required': TaskState.TASK_STATE_INPUT_REQUIRED,
-            'pending-input': TaskState.TASK_STATE_INPUT_REQUIRED,
-            'canceled': TaskState.TASK_STATE_CANCELED,
-        }
+        """Convert DB row → SDK Task protobuf (id + status.state)."""
+        st = self._db_state_to_pb(row.get('state', ''))
         return Task(id=row.get('task_id', ''),
-                    state=state_map.get(row.get('state', ''), TaskState.TASK_STATE_SUBMITTED))
+                    status=TaskStatus(state=st),
+                    context_id=row.get('session_id', ''))
 
     def save(self, task: Task) -> Task:
-        state_str = {
-            TaskState.TASK_STATE_SUBMITTED: 'submitted', TaskState.TASK_STATE_WORKING: 'working',
-            TaskState.TASK_STATE_COMPLETED: 'completed', TaskState.TASK_STATE_FAILED: 'failed',
-            TaskState.TASK_STATE_INPUT_REQUIRED: 'input-required', TaskState.TASK_STATE_CANCELED: 'canceled',
-        }.get(task.state, 'submitted')
+        """Save task to SQLite. SDK Task.status.state → DB state."""
+        state_str = self._pb_state_to_db(task.status.state if hasattr(task, 'status') and task.status else TaskState.TASK_STATE_SUBMITTED)
         existing = self._db_rpc("a2a_task.get", {"task_id": task.id}).get("record") if task.id else None
         if existing:
             self._db_rpc("a2a_task.update", {"task_id": task.id, "state": state_str, "updated_at": _now_utc()})
@@ -228,7 +236,7 @@ class FreelyAgentExecutor(BaseAgentExecutor):
                 status=TaskStatus(state=TaskState.TASK_STATE_WORKING), final=False))
 
             # 3. Create task in SQLite for Worker runtime
-            internal_task = Task(id=str(uuid.uuid4()), state=TaskState.TASK_STATE_SUBMITTED)
+            internal_task = Task(id=str(uuid.uuid4()), status=TaskStatus(state=TaskState.TASK_STATE_SUBMITTED))
             self._server.task_store.save(internal_task)
 
             # Store task metadata via raw RPC
@@ -333,7 +341,7 @@ class A2AServer:
         if request.method == "POST":
             try:
                 body = await request.json()
-                task = Task(id=str(uuid.uuid4()), state=TaskState.TASK_STATE_SUBMITTED)
+                task = Task(id=str(uuid.uuid4()), status=TaskStatus(state=TaskState.TASK_STATE_SUBMITTED))
                 task = self.task_store.save(task)
                 fields = {"task_id": task.id, "state": "submitted",
                     "agent_id": body.get("agent_id", body.get("agentId", "worker")),
