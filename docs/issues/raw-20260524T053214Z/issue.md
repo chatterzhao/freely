@@ -9,7 +9,8 @@ created_at: '2026-05-24T05:32:14Z'
 title: ACP session 生命周期接入 tool_switch_events
 platform_ids: {}
 primary_platform: github
-updated_at: '2026-05-24T05:32:14Z'
+updated_at: '2026-06-13T10:51:37Z'
+platform_state: closed
 ---
 
 ## 摘要

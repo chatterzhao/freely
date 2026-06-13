@@ -5,19 +5,24 @@ status: in_dev
 phase_state: completed
 promoted_from: raw-20260612T000223Z
 source_candidate: docs/pre-brainstorms/20260612T000223Z--a2a-replace-handoff/candidates.md
-canonical_issue_path: ""
-platform_ids: {}
-primary_platform: ""
+canonical_issue_path: ''
+platform_ids:
+  github:
+    issue_id: '2614'
+    url: https://github.com/chatterzhao/freely/issues/2614
+    synced_at: '2026-06-13T10:52:46Z'
+primary_platform: github
 last_synced_comment_at: {}
-hash: ""
-created_at: 2026-06-12T00:02:38Z
-updated_at: 2026-06-12T00:10:00Z
-intake_id: ""
+hash: ''
+created_at: 2026-06-12 00:02:38+00:00
+updated_at: '2026-06-13T10:52:46Z'
+intake_id: ''
 author: platform
 channel: freely-feat-execution
 session_refs: []
 pre_tests_path: docs/epics/a2a-replace-handoff/architecture-refactor/verification/pre-tests.md
 verification_artifact_dir: docs/epics/a2a-replace-handoff/architecture-refactor/code-reviews
+platform_state: open
 ---
 
 # I-20260612T000223Z-A: A2A 协议替换 Freely Handoff 架构重构

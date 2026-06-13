@@ -8,6 +8,8 @@ title: fix-scan-cycling — issue-sync batch cannot push I-* linked items, causi
 created_at: 2026-06-03 14:21:27+00:00
 author: manager
 session_refs: []
+platform_state: closed
+updated_at: '2026-06-13T10:53:07Z'
 ---
 
 ## Problem
