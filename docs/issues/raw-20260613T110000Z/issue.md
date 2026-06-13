@@ -2,6 +2,8 @@
 local_id: raw-20260613T110000Z
 kind: raw
 phase_state: absorbed
+absorbed_into: fix/raw-20260613T112526Z-a2a-client-fix
+absorbed_at: '2026-06-13T11:08:00Z'
 platform_ids: {}
 primary_platform: local
 canonical_issue_path: ''
