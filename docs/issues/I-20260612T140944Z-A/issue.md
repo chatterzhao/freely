@@ -3,13 +3,17 @@ local_id: I-20260612T140944Z-A
 kind: linked
 phase_state: completed
 completed_at: '2026-06-13'
-platform_ids: {}
+platform_ids:
+  github:
+    issue_id: '2590'
+    url: https://github.com/chatterzhao/freely/issues/2590
+    synced_at: '2026-06-13T10:42:58Z'
 primary_platform: github
 canonical_issue_path: docs/epics/a2a-replace-handoff/architecture-refactor/
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-13T01:20:00Z'
-updated_at: '2026-06-13T01:20:00Z'
+updated_at: '2026-06-13T10:42:58Z'
 platform_state: open
 linked_raw: raw-20260612T140944Z
 linked_candidate: C-20260612T140944Z-A
