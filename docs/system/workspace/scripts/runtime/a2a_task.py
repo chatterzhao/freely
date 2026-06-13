@@ -323,27 +323,38 @@ def process_ai_reply(reply_text: str, role: str = "manager", raw_key: str = "",
         return {"ok": False, "errors": errors}
 
     state = fields["state"]
-    c = _client()
 
-    # Create task via A2A protocol
-    r = c.create(
-        skill=fields.get("skill", ""),
-        agent_id=role, name=role,
-        raw_key=raw_key, worktree=worktree, branch=branch,
-        prompt_file=prompt_file, session_id=session_id,
-        message=fields.get("summary", ""),
-        state=state,
-        summary=fields.get("summary", ""),
-        next=fields.get("next", ""),
-        evidence=fields.get("evidence", ""),
-        worker_prompts_csv=fields.get("workers", ""),
-    )
-    task_id = r.get("id", "")
+    # Communicate with A2A Server. If unreachable, return parsed state still.
+    try:
+        c = _client()
+        r = c.create(
+            skill=fields.get("skill", ""),
+            agent_id=role, name=role,
+            raw_key=raw_key, worktree=worktree, branch=branch,
+            prompt_file=prompt_file, session_id=session_id,
+            message=fields.get("summary", ""),
+            state=state,
+            summary=fields.get("summary", ""),
+            next=fields.get("next", ""),
+            evidence=fields.get("evidence", ""),
+            worker_prompts_csv=fields.get("workers", ""),
+        )
+        task_id = r.get("id", "")
+        c.add_message(task_id, role=role, msg_type="text", content=reply_text[:32768])
+    except Exception as e:
+        return {"ok": True, "state": state, "exit_kind": state,
+                "task_id": "a2a_unreachable",
+                "workers": fields.get("workers", ""),
+                "summary": fields.get("summary", ""),
+                "next": fields.get("next", ""),
+                "evidence": fields.get("evidence", ""),
+                "a2a_error": str(e)}
 
-    # Add the AI reply as an A2A Message
-    c.add_message(task_id, role=role, msg_type="text", content=reply_text[:32768])
-
-    return {"ok": True, "task_id": task_id, "state": state}
+    return {"ok": True, "task_id": task_id, "state": state, "exit_kind": state,
+            "workers": fields.get("workers", ""),
+            "summary": fields.get("summary", ""),
+            "next": fields.get("next", ""),
+            "evidence": fields.get("evidence", "")}
 
 
 def read_state_only(reply_text: str) -> dict:
@@ -526,7 +537,11 @@ def _main() -> int:
                 branch=getattr(args, 'branch', '') or "",
                 session_id=getattr(args, 'session_id', '') or "")
             if result.get("ok"):
-                print(json.dumps({"action": result.get("state", ""), "task_id": result.get("task_id", "")}))
+                print(json.dumps({"action": result.get("state", ""), "task_id": result.get("task_id", ""),
+                                  "workers": result.get("workers", ""),
+                                  "summary": result.get("summary", ""),
+                                  "next": result.get("next", ""),
+                                  "evidence": result.get("evidence", "")}))
             else:
                 print(json.dumps({"action": "repair", "errors": result.get("errors", [])}))
         elif args.cmd == "extract":
