@@ -2,7 +2,10 @@
 local_id: raw-20260613T020000Z
 kind: raw
 phase_state: absorbed
-platform_ids: {}
+platform_ids:
+  github:
+    issue_id: "2578"
+    url: https://github.com/chatterzhao/freely/pull/2578
 primary_platform: github
 canonical_issue_path: ''
 created_at: '2026-06-13T02:00:00Z'
