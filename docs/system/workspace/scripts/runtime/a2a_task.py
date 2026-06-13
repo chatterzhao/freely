@@ -217,13 +217,13 @@ class A2AClient:
         return affected
 
 
-_client = None
+_client_instance = None
 
 def _client() -> A2AClient:
-    global _client
-    if _client is None:
-        _client = A2AClient(_resolve_project())
-    return _client
+    global _client_instance
+    if _client_instance is None:
+        _client_instance = A2AClient(_resolve_project())
+    return _client_instance
 
 
 # ── A2A Task States ───────────────────────────────────────────────────────
@@ -437,7 +437,7 @@ def _main() -> int:
     p_ms = sub.add_parser("mark-stale")
     p_ms.add_argument("--timeout-minutes", default="30")
 
-    args = parser.parse_args()
+    args, _ = parser.parse_known_args()
 
     global PROJECT
     if getattr(args, 'project', None):
