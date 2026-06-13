@@ -8,8 +8,8 @@ platform_ids: {}
 primary_platform: local
 canonical_issue_path: ''
 created_at: '2026-06-13T11:00:00Z'
-platform_state: local_only
-updated_at: '2026-06-13T11:00:00Z'
+platform_state: closed
+updated_at: '2026-06-13T12:35:14Z'
 ---
 
 a2a_task.py _client 变量/函数命名冲突导致 process_ai_reply 永远失败。

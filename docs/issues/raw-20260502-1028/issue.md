@@ -14,7 +14,7 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-02T10:28:00Z'
-updated_at: '2026-06-13T10:51:32Z'
+updated_at: '2026-06-13T12:35:32Z'
 intake_id: 20260502-1028-stale-lock
 author: human
 channel: chat
