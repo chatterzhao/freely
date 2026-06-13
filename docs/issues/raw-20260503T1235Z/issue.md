@@ -1,6 +1,6 @@
 ---
 kind: raw
-phase_state: completed
+phase_state: absorbed
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 local_id: raw-20260503T1235Z
 priority: P1
