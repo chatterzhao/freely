@@ -64,7 +64,7 @@ def extract_state_block(reply_text: str) -> str:
     The AI reply IS an A2A Message. The structured state block at the end
     provides the Task state transition data for the A2A Server.
     """
-    m = re.search(r'```(?:json)?\s*\n?(.*?)\n?```', reply_text, re.DOTALL)
+    m = re.search(r'```(\S*)\s*\n(.*?)```', reply_text, re.DOTALL)
     return m.group(1).strip() if m else ""
 
 
