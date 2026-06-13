@@ -19824,12 +19824,26 @@ stop_project_runtime() {
     rm -f "$_bridge_pid_file"
   fi
   rm -f "$(_acp_bridge_socket "$project")"
-  # Stop A2A Server (Agent-to-Agent protocol)
+  # Stop A2A Server — uses PID file for graceful shutdown (aligns JiuwenSwarm)
   local _a2a_socket
   _a2a_socket="$(_a2a_socket_path "$project")"
   if [[ -S "$_a2a_socket" ]]; then
     python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a/a2a_server.py" \
       --project "$project" --stop >/dev/null 2>&1 || rm -f "$_a2a_socket"
+  fi
+  # Stop DB daemon via PID file
+  local _db_pid_file _db_pid
+  _db_pid_file="$(python3 -c "
+import hashlib,os
+h=hashlib.sha256(os.path.abspath('$project').encode()).hexdigest()[:16]
+print(f'/tmp/freely-db-{h}.pid')
+" 2>/dev/null || true)"
+  if [[ -n "$_db_pid_file" && -f "$_db_pid_file" ]]; then
+    _db_pid="$(cat "$_db_pid_file" 2>/dev/null || true)"
+    if [[ -n "$_db_pid" ]] && kill -0 "$_db_pid" 2>/dev/null; then
+      terminate_pid_with_graceful_wait "$_db_pid" "freely-db daemon during stop"
+    fi
+    rm -f "$_db_pid_file"
   fi
   if [[ "$(role_hint_for_project "$project")" == "manager" ]]; then
     materialize_missing_required_manager_continuity_fallback "$project" "$stop_reason" || true
