@@ -23,37 +23,32 @@
 
 - `rationale` 格式必须是 `"因为 {X}，所以做 {Y}"`。不成立 → `worker_handoff_needed`
 - Task 提到了 raw-xxx → 读 `docs/issues/raw-{key}/issue.md` 获取背景
-- 不要为此跑 scan、读 LAWS.md、查 handoff DB——Manager 做过了
+- 不要为此跑 scan、读 LAWS.md、查 a2a_tasks——Manager 做过了
 
 ### 3. 执行 Task
 
 读 `## Task` 部分，直接执行。不重新 patrol，不委派其他 Worker。
 
-### 4. 完成后交接
+### 4. A2A Task State（完成后输出）
 
-在回复末尾输出 ```json5 代码块：
+Worker 的完整回复是 A2A Message。回复末尾的 JSON 提供 Task 状态转换，
+Runtime 通过 A2A Server `PATCH /tasks/{id}` 更新。
 
 ```json5
 {
-  // exit_kind 只允许三个值，禁止用 completed blocked success partial done complete ok normal noop
-  //   "worker_done"              — 任务已完成
-  //   "worker_blocked"           — 被阻塞，需主管介入
-  //   "worker_handoff_needed"    — 需主管审核或决策
-  "exit_kind": "worker_done",
+  // state — A2A Task 状态。Worker 只允许这四个值：
+  //   "working"         — 正在执行
+  //   "completed"       — 任务完成
+  //   "input-required"  — 被阻塞，需 Manager 输入
+  //   "pending-input"   — 需 Manager 决策
+  "state": "completed",
 
-  // worker_done 时填下面两个，不要填 reason/next_action
-  "completion_summary": "...",   // 具体完成了什么
-  "evidence_paths": "...",       // 证据文件绝对路径
+  // state=completed 时：
+  "summary": "...",    // 完成了什么
+  "evidence": "...",   // 证据文件路径
 
-  // worker_blocked / worker_handoff_needed 时填下面两个，不要填 completion_summary/evidence_paths
-  "reason": "...",               // 阻塞原因或背景
-  "next_action": "...",          // 建议主管做什么决策
-
-  // 谁应该消费这份 handoff：
-  //   "manager"  — Manager 在下一次 patrol 消费
-  //   "worker"   — Worker 领取执行
-  //   "runtime"  — Runtime supervisor 处理
-  "consumed_by": "worker"
+  // state=input-required/pending-input 时：
+  "next": "..."        // 建议 Manager 做什么
 }
 ```
 

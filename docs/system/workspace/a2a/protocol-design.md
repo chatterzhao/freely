@@ -103,7 +103,7 @@ Freely Agent Card 扩展 A2A 标准，声明 Freely 特有能力：
       "resume_manager",
       "stop_ai"
     ],
-    "handoffJsonSchema": "https://freely.dev/schemas/handoff-v1",
+    "a2aSchema": "https://freely.dev/schemas/a2a-task-v1",
     "supportedSkills": [
       "freely-fix-execution",
       "freely-feat-execution",
@@ -135,9 +135,9 @@ Freely Agent Card 扩展 A2A 标准，声明 Freely 特有能力：
 
 ```json
 {
-  "type": "freely_handoff",
-  "name": "Freely Handoff JSON",
-  "description": "Freely Manager-Worker handoff document",
+  "type": "a2a_task",
+  "name": "Freely A2A Task JSON",
+  "description": "Freely Manager-Worker A2A task document",
   "parts": [
     {
       "type": "data",

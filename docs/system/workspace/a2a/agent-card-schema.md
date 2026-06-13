@@ -123,10 +123,10 @@
           "items": { "type": "string" },
           "description": "支持的所有 exit_kind 类型"
         },
-        "handoffJsonSchema": {
+        "a2aSchema": {
           "type": "string",
           "format": "uri",
-          "description": "Handoff JSON Schema URL"
+          "description": "A2A Task JSON Schema URL"
         },
         "supportedSkills": {
           "type": "array",
@@ -267,7 +267,7 @@
       "resume_manager",
       "stop_ai"
     ],
-    "handoffJsonSchema": "https://freely.dev/schemas/handoff-v1",
+    "a2aSchema": "https://freely.dev/schemas/a2a-task-v1",
     "supportedSkills": [
       "freely-fix-execution",
       "freely-feat-execution",

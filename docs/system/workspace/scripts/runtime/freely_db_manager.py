@@ -2,8 +2,8 @@
 """freely_db_manager.py — Unified SQLite access daemon for Freely.
 
 Single long-running process, single SQLite connection. All 40+ operations
-across chats, sessions, handoffs, and task_mode_gate tables go through
-this daemon via Unix-domain-socket JSON-RPC.
+across chats, sessions, a2a_tasks, task_mode_gate, and tool_failure_log
+tables go through this daemon via Unix-domain-socket JSON-RPC.
 
 Lifecycle:
   python3 freely_db_manager.py start --project <path> [--foreground]
@@ -25,16 +25,16 @@ import uuid
 from datetime import datetime, timezone
 
 # Import a2a_task parser for parse/extract (lazy-loaded at first use)
-_handoff_parser = None
+_task_parser = None
 
-def _get_handoff_parser():
-    global _handoff_parser
-    if _handoff_parser is None:
+def _get_task_parser():
+    global _task_parser
+    if _task_parser is None:
         from a2a_task_parser import (
-            extract_handoff_block, validate_handoff_json, normalize_fields, normalize_exit_kind
+            extract_task_block, validate_task_json, normalize_fields, normalize_exit_kind
         )
-        _handoff_parser = (extract_handoff_block, validate_handoff_json, normalize_fields, normalize_exit_kind)
-    return _handoff_parser
+        _task_parser = (extract_task_block, validate_task_json, normalize_fields, normalize_exit_kind)
+    return _task_parser
 
 
 # ── Path helpers ──────────────────────────────────────────────────────────
@@ -190,7 +190,28 @@ class DbDaemon:
         """)
         c.execute("CREATE INDEX IF NOT EXISTS idx_switch_status ON tool_switch_events(status)")
 
-
+        # task_mode_gate
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS task_mode_gate (
+                id INTEGER PRIMARY KEY CHECK (id = 1),
+                mode TEXT NOT NULL DEFAULT 'wait',
+                task_scan_id TEXT DEFAULT '',
+                mode_just_switched INTEGER NOT NULL DEFAULT 0,
+                updated_at TEXT NOT NULL DEFAULT ''
+            )
+        """)
+        # tool_failure_log — dead tool tracking for auto-switch
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS tool_failure_log (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                tool TEXT NOT NULL,
+                slot TEXT NOT NULL DEFAULT '',
+                reason TEXT NOT NULL DEFAULT '',
+                created_at TEXT NOT NULL DEFAULT ''
+            )
+        """)
+        c.execute("CREATE INDEX IF NOT EXISTS idx_tool_failure_tool ON tool_failure_log(tool, slot)")
+        c.execute("CREATE INDEX IF NOT EXISTS idx_tool_failure_created ON tool_failure_log(created_at)")
 
         # a2a_tasks — A2A protocol Task storage (aligns with Google A2A spec + Freely extensions)
         c.execute("""
@@ -205,7 +226,7 @@ class DbDaemon:
                 skill TEXT NOT NULL DEFAULT '',
                 session_id TEXT NOT NULL DEFAULT '',
                 message TEXT NOT NULL DEFAULT '',
-                -- Freely extension fields (aligned with handoffs table)
+                -- Freely extension fields
                 raw_key TEXT NOT NULL DEFAULT '',
                 prompt_file TEXT NOT NULL DEFAULT '',
                 worktree TEXT NOT NULL DEFAULT '',
@@ -218,6 +239,10 @@ class DbDaemon:
                 evidence_paths TEXT NOT NULL DEFAULT '',
                 worker_prompts_csv TEXT NOT NULL DEFAULT '',
                 error TEXT NOT NULL DEFAULT '',
+                -- Runtime tracking
+                worker_pid TEXT NOT NULL DEFAULT '',
+                delivery_status TEXT NOT NULL DEFAULT 'pending'
+                    CHECK(delivery_status IN ('pending','delivered','failed')),
                 -- Message history (A2A standard: array of {role,type,content})
                 messages_json TEXT NOT NULL DEFAULT '[]',
                 -- Lifecycle timestamps
@@ -250,6 +275,8 @@ class DbDaemon:
             ("evidence_paths", "TEXT NOT NULL DEFAULT ''"),
             ("worker_prompts_csv", "TEXT NOT NULL DEFAULT ''"),
             ("error", "TEXT NOT NULL DEFAULT ''"),
+            ("worker_pid", "TEXT NOT NULL DEFAULT ''"),
+            ("delivery_status", "TEXT NOT NULL DEFAULT 'pending'"),
             ("messages_json", "TEXT NOT NULL DEFAULT '[]'"),
             ("launched_at", "TEXT NOT NULL DEFAULT ''"),
             ("completed_at", "TEXT NOT NULL DEFAULT ''"),
@@ -1074,7 +1101,7 @@ def h_a2a_task_list_by_worktree(daemon: DbDaemon, params: dict) -> dict:
 
 @_h("a2a_task.update-from-exit-kind")
 def h_a2a_task_update_from_exit_kind(daemon: DbDaemon, params: dict) -> dict:
-    """Update A2A Task from handoff exit_kind.
+    """Update A2A Task from exit_kind.
 
     Maps Freely exit_kind to A2A task state and extracts fields.
     """
@@ -1192,6 +1219,58 @@ def h_a2a_task_update_message(daemon: DbDaemon, params: dict) -> dict:
     )
     daemon.conn.commit()
     return {"affected": 1}
+
+
+@_h("a2a_task.update-worker-pid")
+def h_a2a_task_update_worker_pid(daemon: DbDaemon, params: dict) -> dict:
+    """Record worker PID for process health checks."""
+    daemon.conn.execute(
+        "UPDATE a2a_tasks SET worker_pid = ?, updated_at = ? WHERE task_id = ?",
+        (params["worker_pid"], _now_utc(), params["task_id"]),
+    )
+    daemon.conn.commit()
+    return {"affected": daemon.conn.total_changes}
+
+
+@_h("a2a_task.get-launched-pids")
+def h_a2a_task_get_launched_pids(daemon: DbDaemon, params: dict) -> dict:
+    """Get task_id + worker_pid for launched workers, optionally filtered by raw_key."""
+    raw_key = params.get("raw_key", "")
+    if raw_key:
+        rows = daemon.conn.execute(
+            "SELECT task_id, worker_pid, worktree FROM a2a_tasks "
+            "WHERE agent_id = 'worker' AND state = 'working' AND raw_key = ? AND worker_pid != ''",
+            (raw_key,),
+        ).fetchall()
+    else:
+        rows = daemon.conn.execute(
+            "SELECT task_id, worker_pid, worktree FROM a2a_tasks "
+            "WHERE agent_id = 'worker' AND state = 'working' AND worker_pid != ''"
+        ).fetchall()
+    cols = ["task_id", "worker_pid", "worktree"]
+    return {"rows": [dict(zip(cols, r)) for r in rows]}
+
+
+@_h("a2a_task.list-pending-delivery")
+def h_a2a_task_list_pending_delivery(daemon: DbDaemon, params: dict) -> dict:
+    """List tasks with delivery_status='pending' for AI context injection."""
+    rows = daemon.conn.execute(
+        "SELECT * FROM a2a_tasks WHERE delivery_status = 'pending' AND agent_id = 'worker' "
+        "ORDER BY created_at ASC"
+    ).fetchall()
+    cols = [desc[0] for desc in daemon.conn.execute("PRAGMA table_info(a2a_tasks)").fetchall()]
+    return {"rows": [dict(zip(cols, r)) for r in rows]}
+
+
+@_h("a2a_task.update-delivery-status")
+def h_a2a_task_update_delivery_status(daemon: DbDaemon, params: dict) -> dict:
+    """Mark task delivery_status (e.g. 'delivered' after AI consumption)."""
+    daemon.conn.execute(
+        "UPDATE a2a_tasks SET delivery_status = ?, updated_at = ? WHERE task_id = ?",
+        (params["delivery_status"], _now_utc(), params["task_id"]),
+    )
+    daemon.conn.commit()
+    return {"affected": daemon.conn.total_changes}
 
 
 # ── CLI ───────────────────────────────────────────────────────────────────

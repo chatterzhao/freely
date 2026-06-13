@@ -53,7 +53,7 @@ intent_target: <简短描述>
 
 1. **开工位**：目标 worktree 不存在 → `./bin/wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>`
 2. **写 prompt**：`.freely/run/worker-prompts/<ts>-worker-<slug>.txt`，header + Task
-3. **输出 handoff**：`exit_kind: "delegate_workers"`，`worker_prompts_csv` 指向 prompt 路径
+3. **输出 A2A Task JSON**：`exit_kind: "delegate_workers"`，`worker_prompts_csv` 指向 prompt 路径
 
 ## 收口判断
 
@@ -99,31 +99,22 @@ scan 是任务来源。以下情况必须手动 `freely task-source-scan`：
 | `freely-chat-issue-routing` | chat 消息路由 |
 | `freely-human-interruption-manager-triage` | 插话路由 |
 
-## 交接 JSON
+## A2A Task State（回复末尾输出）
 
-在回复末尾输出 ```json5 代码块：
+Manager 的完整回复是 A2A Message。回复末尾的结构化 JSON 提供 Task 状态转换，
+Runtime 通过 A2A Server `PATCH /tasks/{id}` 更新。
 
 ```json5
 {
-  // exit_kind 只允许四个值，禁止用 completed done success partial normal idle continue wait
-  //   "delegate_workers"    — 委派 Worker（已创建 prompt 文件）
-  //   "resume_manager"      — 需继续分析（复杂决策、B1 评估）
-  //   "manager_working"     — 进行中（Worker 已派/后台任务在跑/等外部结果），保持 session
-  //   "stop_ai"             — 无事可做（禁止连续）
-  "exit_kind": "delegate_workers",
+  // state — A2A Task 状态。Manager 只允许这三个值：
+  //   "submitted"  — 委派 Worker 或进行中
+  //   "completed"  — 本轮分析完成
+  //   "failed"     — 无事可做或停止
+  "state": "submitted",
 
-  // 下面按 exit_kind 选填：
-  "reason": "...",               // delegate/resume/stop 都要
-  "worker_prompts_csv": "...",   // 仅 delegate_workers
-  "restart_point": "...",        // 仅 resume_manager：pre_brainstorm | IBM | dev | verification | recovery | cleanup
-  "next_action": "...",          // 仅 resume_manager / manager_working
-  "progress": "...",             // 仅 manager_working：当前进度
-
-  // 谁应该消费这份 handoff：
-  //   "manager"  — Manager 在下一次 patrol 消费
-  //   "worker"   — Worker 领取执行
-  //   "runtime"  — Runtime supervisor 处理
-  "consumed_by": "manager"
+  "summary": "...",              // 本轮总结
+  "workers": "...",              // state=submitted 且委派时：worker prompt CSV 路径
+  "next": "..."                  // 下一步
 }
 ```
 
