@@ -6,7 +6,7 @@
 
 构建一个 Jarvis 式自主循环运行器：
 - 启动后 AI 担任项目所有者角色。
-- AI 从项目意图、story-scoped code-reviews、test、chat 输入与会话证据（人类或自治）、github-issue、治理漂移、运行时异常中发现新问题，并先收敛为 candidate；从 scan 结果获取待委派任务，从 handoffs 表查询进行中任务；里程碑作为规划层追踪已纳入任务，从进度/恢复文档续接已有 issue；而非固定从单一任务列表
+- AI 从项目意图、story-scoped code-reviews、test、chat 输入与会话证据（人类或自治）、github-issue、治理漂移、运行时异常中发现新问题，并先收敛为 candidate；从 scan 结果获取待委派任务，从 a2a_tasks 表查询进行中任务；里程碑作为规划层追踪已纳入任务，从进度/恢复文档续接已有 issue；而非固定从单一任务列表
 - AI 自主管理：获取 Issue → 文档 → 开发 → 验收 → 获取 Issue 的闭环
 - AI 持续运行（自己监控ai工具崩溃/阻塞自动触发续接），除非明确停止。或找不到需求，或者出现重大事故 AI 自己已经无力自己解决。
 - Freely 开发 Freely 时暴露的可复现共性问题，默认先判断是否应成为 Freely 能力发现；若可泛化到用户项目，应进入三个 loop 的 canonical lifecycle materialize 为可复用能力，而不是停留成一次性项目经验。

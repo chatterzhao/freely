@@ -1783,7 +1783,7 @@ reclaim_delegated_worker_starting_stuck_runtime_if_needed() {
     "$(interruption_dispatcher_pid_file "$project")" \
     "$(ensure_manager_watchdog_pid_file "$project")" \
     "$(session_state_file "$project")" \
-    "$(handoff_file "$project")" \
+    "$(exit_contract_file "$project")" \
     "$(stop_marker_file "$project")"
   write_workcell_state "$project" "stopped" "down" "down" "starting_stuck_reclaimed"
   append_runtime_event "$project" "delegated_worker_starting_stuck_reclaimed" \
@@ -2156,18 +2156,18 @@ worker_verification_contract_state_file() {
   echo "$(run_dir_for_project "$project")/worker-verification-contract.env"
 }
 
-handoff_file() {
+exit_contract_file() {
   local project="$1"
-  echo "$(run_dir_for_project "$project")/session-handoff.txt"
+  echo "$(run_dir_for_project "$project")/session-contract.txt"
 }
 
 _db_exit_contract_field() {
-  local project="$1" role="$2" field="$3" _handoff_py _db_path
-  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  local project="$1" role="$2" field="$3" _a2a_task_py _db_path
+  _a2a_task_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db_path=""$project/.freely/freely.db""
-  [[ -f "$_handoff_py" && -f "$_db_path" ]] || return 1
+  [[ -f "$_a2a_task_py" && -f "$_db_path" ]] || return 1
   if [[ "$role" == "manager" ]]; then
-    python3 "$_handoff_py" latest-manager --db "$_db_path" 2>/dev/null | python3 -c "
+    python3 "$_a2a_task_py" latest-manager --db "$_db_path" 2>/dev/null | python3 -c "
 import json,sys
 try:
     r=json.load(sys.stdin)
@@ -2175,7 +2175,7 @@ try:
 except: pass
 " 2>/dev/null
   else
-    python3 "$_handoff_py" list --db "$_db_path" --role worker --status completed 2>/dev/null | python3 -c "
+    python3 "$_a2a_task_py" list --db "$_db_path" --role worker --status completed 2>/dev/null | python3 -c "
 import json,sys
 try:
     rows=json.load(sys.stdin)
@@ -2186,9 +2186,9 @@ except: pass
   fi
 }
 
-manager_bootstrap_handoff_file() {
+manager_bootstrap_exit_contract_file() {
   local project="$1"
-  echo "$(run_dir_for_project "$project")/manager-bootstrap-handoff.txt"
+  echo "$(run_dir_for_project "$project")/manager-bootstrap-contract.txt"
 }
 
 manager_exit_contract_file() {
@@ -2708,8 +2708,8 @@ materialize_required_manager_continuity_startup_stub() {
 - manager_mode: \`true\`
 - previous_manager_continuity: \`${previous_manager_continuity}\`
 - continuity_written_by: \`freely-runtime-startup-stub\`
-- startup_handoff_state: \`seeded_by_runtime\`
-- startup_handoff_launch_kind: \`${launch_kind:-unknown}\`
+- startup_contract_state: \`seeded_by_runtime\`
+- startup_launch_kind: \`${launch_kind:-unknown}\`
 
 ## Runtime Startup Stub
 
@@ -2739,7 +2739,7 @@ EOF
     "previous_continuity=${previous_manager_continuity}"
 }
 
-manager_handoff_snapshot_for_project() {
+manager_session_snapshot_for_project() {
   local project="$1"
   local prompt_file expected_continuity latest_generated written_by
   prompt_file="$(find_latest_prompt_file_for_project "$project")"
@@ -7769,10 +7769,10 @@ tool_has_resume_evidence() {
 }
 
 session_handoff_rotation_reason() {
-  local project="$1" handoff_path
-  handoff_path="$(handoff_file "$project")"
-  [[ -f "$handoff_path" ]] || return 1
-  awk -F': ' '/^- rotation_reason:/ { print $2; exit }' "$handoff_path"
+  local project="$1" contract_path
+  contract_path="$(exit_contract_file "$project")"
+  [[ -f "$contract_path" ]] || return 1
+  awk -F': ' '/^- rotation_reason:/ { print $2; exit }' "$contract_path"
 }
 
 log_has_same_tool_route_only_handoff() {
@@ -8065,6 +8065,7 @@ ensure_freely_db() {
   while [[ $waited -lt 50 ]]; do
     if python3 "$cli" --project "$project" db.ping >/dev/null 2>&1; then
       log_info "freely-db daemon ready (PID $daemon_pid)"
+      ensure_a2a_server_running "$project"
       return 0
     fi
     sleep 0.1
@@ -8072,6 +8073,48 @@ ensure_freely_db() {
   done
   log_error "freely-db daemon failed to start"
   return 1
+}
+
+# ── A2A Server (Agent-to-Agent protocol) ──────────────────
+
+ensure_a2a_server_running() {
+  local project="$1"
+  local a2a_server_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a/a2a_server.py"
+  local a2a_socket a2a_pid
+  a2a_socket="$(_a2a_socket_path "$project")"
+  [[ -f "$a2a_server_py" ]] || return 0
+  # Already running?
+  if [[ -S "$a2a_socket" ]]; then
+    return 0
+  fi
+  # Clean stale socket from previous crash
+  [[ -S "$a2a_socket" ]] || rm -f "$a2a_socket" 2>/dev/null || true
+  # Start A2A Server — supports local (Unix socket) and remote (TCP)
+  # Config: A2A_LISTEN_MODE=unix|tcp|both  A2A_TCP_HOST=0.0.0.0  A2A_TCP_PORT=19100
+  log_info "starting A2A server for $project (mode=${A2A_LISTEN_MODE:-unix})"
+  python3 "$a2a_server_py" --project "$project" --start \
+    --listen-mode "${A2A_LISTEN_MODE:-unix}" \
+    --tcp-host "${A2A_TCP_HOST:-}" --tcp-port "${A2A_TCP_PORT:-0}" \
+    </dev/null >>"$project/.freely/run/a2a-server.log" 2>&1 &
+  a2a_pid=$!
+  disown "$a2a_pid"
+  local waited=0
+  while [[ $waited -lt 30 ]]; do
+    if [[ -S "$a2a_socket" ]]; then
+      log_info "A2A server ready (PID $a2a_pid) on $a2a_socket"
+      return 0
+    fi
+    sleep 0.1
+    ((waited++))
+  done
+  log_warn "A2A server start timed out (may be TCP-only)"
+  return 0
+}
+
+_a2a_socket_path() {
+  local project="$1" hash
+  hash="$(python3 -c "import hashlib,os; print(hashlib.sha256(os.path.abspath('$project').encode()).hexdigest()[:16])" 2>/dev/null || true)"
+  echo "/tmp/freely-a2a-${hash}"
 }
 
 # ── task-mode gate (SQLite) ──────────────────────────────
@@ -8689,7 +8732,7 @@ request_local_runtime_handoff_stop() {
   fi
 
   if [[ -z "$(manager_supervisor_pid_for_project "$project")" && -z "$(runtime_ai_pid_hint_for_project "$project")" ]]; then
-    rm -f "$run_dir/supervisor.pid" "$run_dir/ai.pid" "$(session_state_file "$project")" "$(handoff_file "$project")" "$stop_file"
+    rm -f "$run_dir/supervisor.pid" "$run_dir/ai.pid" "$(session_state_file "$project")" "$(exit_contract_file "$project")" "$stop_file"
     write_workcell_state "$project" "stopped" "down" "down" "delegated_runtime_handoff"
     state_settled="1"
   fi
@@ -8741,7 +8784,7 @@ reconcile_delegated_runtime_handoff_state_if_needed() {
   [[ -z "$delegated_real" || "$delegated_real" == "$project_real" ]] || return 1
 
   run_dir="$(run_dir_for_project "$project")"
-  rm -f "$run_dir/supervisor.pid" "$run_dir/ai.pid" "$(interruption_dispatcher_pid_file "$project")" "$(ensure_manager_watchdog_pid_file "$project")" "$(session_state_file "$project")" "$(handoff_file "$project")" "$(stop_marker_file "$project")"
+  rm -f "$run_dir/supervisor.pid" "$run_dir/ai.pid" "$(interruption_dispatcher_pid_file "$project")" "$(ensure_manager_watchdog_pid_file "$project")" "$(session_state_file "$project")" "$(exit_contract_file "$project")" "$(stop_marker_file "$project")"
   write_workcell_state "$project" "stopped" "down" "down" "delegated_runtime_handoff"
   append_runtime_event "$project" "delegated_runtime_handoff_state_reconciled" \
     "resolution_file=$resolution_file" \
@@ -10504,7 +10547,7 @@ rebind_active_worker_runtime_control_plane_if_needed() {
   fi
   intake_id="$(write_manager_worker_launch_intake "$target_project" "$prompt_file")"
   write_worker_verification_contract_file "$runtime_contract_file" "$prompt_file" "$intake_id" "$target_project"
-  rm -f "$(handoff_file "$target_project")"
+  rm -f "$(exit_contract_file "$target_project")"
   refresh_workcell_state_projection "$target_project"
   append_runtime_event "$manager_project" "manager_worker_runtime_control_plane_rebind" \
     "worktree=$target_project" \
@@ -11361,7 +11404,7 @@ EOF
   write_interruption_resolution_artifact \
     "$project" \
     "$intake_id" \
-    "manager_runtime_launch_workers_from_latest_handoff" \
+    "manager_runtime_launch_workers_from_latest_task" \
     "blocked" \
     "launch_blocked" \
     "handoff://worker-launch" \
@@ -12116,24 +12159,21 @@ ensure_runtime_workcell_initialized_for_launch() {
 
 manager_record_worker_pid_for_launch() {
   local target_project="$1" worker_pid="$2" prompt_file="$3"
-  local freely_db handoff_id
-  freely_db="$target_project/.freely/freely.db"
-  [[ -f "$freely_db" ]] || return 0
-  local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
-  handoff_id="$(python3 "$cli" --project "$target_project" handoff.list \
-    --role worker --status launched 2>/dev/null | python3 -c "
+  local _a2a_task_py _db_path task_id
+  _a2a_task_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
+  _db_path="$target_project/.freely/freely.db"
+  [[ -f "$_a2a_task_py" && -f "$_db_path" ]] || return 0
+  task_id="$(python3 "$_a2a_task_py" list --db "$_db_path" --role worker --status launched 2>/dev/null | python3 -c "
 import json, sys
 rows = json.load(sys.stdin)
 for r in rows:
   if r.get('prompt_file') == '$prompt_file':
-    print(r['handoff_id'])
+    print(r.get('task_id',''))
     sys.exit(0)
 print('')
 " 2>/dev/null || true)"
-  [[ -n "$handoff_id" ]] || return 0
-  python3 "$cli" --project "$target_project" handoff.update-worker-pid \
-    --handoff_id "$handoff_id" \
-    --worker_pid "$worker_pid" >/dev/null 2>&1 || true
+  [[ -n "$task_id" ]] || return 0
+  python3 "$_a2a_task_py" update-worker-pid --db "$_db_path" --task-id "$task_id" --worker-pid "$worker_pid" >/dev/null 2>&1 || true
 }
 
 launch_worker_from_manager_prompt_if_needed() {
@@ -12224,7 +12264,7 @@ launch_worker_from_manager_prompt_if_needed() {
   fi
   intake_id="$(write_manager_worker_launch_intake "$target_project" "$prompt_file")"
   write_worker_verification_contract_file "$runtime_contract_file" "$prompt_file" "$intake_id" "$target_project"
-  rm -f "$(handoff_file "$target_project")"
+  rm -f "$(exit_contract_file "$target_project")"
   refresh_workcell_state_projection "$target_project"
   if [[ -n "$supervisor_pid" && -n "$ai_pid" ]]; then
     if rebind_active_worker_runtime_control_plane_if_needed "$manager_project" "$target_project" "$prompt_file"; then
@@ -12330,7 +12370,7 @@ SESSIONEOF
   return 0
 }
 
-manager_runtime_launch_workers_from_latest_handoff() {
+manager_runtime_launch_workers_from_latest_task() {
   local project="$1"
   local continuity_file continuity_generated prompt_generated_csv launched_csv queued_csv
   local launched_count prompt_file prompt_rank prompt_index target_project write_scope
@@ -12561,19 +12601,19 @@ manager_runtime_launch_workers_from_latest_handoff() {
 worktree_has_active_worker() {
   local project="$1" worktree="$2"
   [[ -n "$worktree" && -d "$worktree" ]] || return 1
-  local _handoff_py _db_path
-  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  local _a2a_task_py _db_path
+  _a2a_task_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db_path="$project/.freely/freely.db"
-  [[ -f "$_handoff_py" && -f "$_db_path" ]] || return 1
+  [[ -f "$_a2a_task_py" && -f "$_db_path" ]] || return 1
   # Only check launched — pending is transient (created and launched atomically in consume_delegate_workers)
   local active_records sup_pid
-  active_records=$(python3 "$_handoff_py" list --db "$_db_path" --role worker --status launched 2>/dev/null)
+  active_records=$(python3 "$_a2a_task_py" list --db "$_db_path" --role worker --status launched 2>/dev/null)
   local matching
   matching=$(echo "$active_records" | python3 -c "
 import json,sys
 for r in json.load(sys.stdin):
     if r.get('worktree','') == '$worktree':
-        print(r.get('handoff_id',''))
+        print(r.get('task_id',''))
 " 2>/dev/null)
   [[ -z "$matching" ]] && return 1
   sup_pid=$(cat "$worktree/.freely/run/supervisor.pid" 2>/dev/null || true)
@@ -12582,7 +12622,7 @@ for r in json.load(sys.stdin):
     local hid
     for hid in $matching; do
       [[ -n "$hid" ]] || continue
-      python3 "$_handoff_py" update-last-activity --db "$_db_path" --handoff-id "$hid" >/dev/null 2>&1 || true
+      python3 "$_a2a_task_py" update-last-activity --db "$_db_path" --task-id "$hid" >/dev/null 2>&1 || true
     done
     return 0
   fi
@@ -12590,7 +12630,7 @@ for r in json.load(sys.stdin):
   for hid in $matching; do
     [[ -n "$hid" ]] || continue
     # Extract raw_key from the DB record for this handoff
-    raw_key_for_worker=$(python3 "$_handoff_py" get --db "$_db_path" --handoff-id "$hid" 2>/dev/null | \
+    raw_key_for_worker=$(python3 "$_a2a_task_py" get --db "$_db_path" --task-id "$hid" 2>/dev/null | \
       python3 -c "import json,sys; r=json.load(sys.stdin); print(r.get('raw_key',''))" 2>/dev/null || echo "")
     # Try to parse worker handoff from cycle log before marking stale.
     # Find the cycle log whose session_id prefix appears in this worker's handoff record.
@@ -12603,11 +12643,11 @@ for r in json.load(sys.stdin):
     [[ -z "$_w_cycle_log" || ! -f "$_w_cycle_log" ]] && \
       _w_cycle_log="$(ls -t "$(logs_dir_for_project "$project")"/cycle-worker-*.log 2>/dev/null | head -1)"
     if [[ -n "$_w_cycle_log" && -f "$_w_cycle_log" ]]; then
-      _w_extract_result="$(python3 "$_handoff_py" extract --reply-text "$(tail -c 32768 "$_w_cycle_log" 2>/dev/null)" 2>/dev/null || true)"
+      _w_extract_result="$(python3 "$_a2a_task_py" extract --reply-text "$(tail -c 32768 "$_w_cycle_log" 2>/dev/null)" 2>/dev/null || true)"
       _w_action=$(echo "$_w_extract_result" | python3 -c "import json,sys; print(json.load(sys.stdin).get('action','error'))" 2>/dev/null || echo "error")
       if [[ "$_w_action" == "worker_done" ]]; then
         _w_cs=$(echo "$_w_extract_result" | python3 -c "import json,sys; print(json.load(sys.stdin).get('fields',{}).get('completion_summary',''))" 2>/dev/null || echo "")
-        python3 "$_handoff_py" update --db "$_db_path" --handoff-id "$hid" \
+        python3 "$_a2a_task_py" update --db "$_db_path" --task-id "$hid" \
           --status completed --expected-status launched --exit-kind worker_done \
           --completion-summary "${_w_cs:0:2000}" \
           --reason "worker completed, handoff parsed from cycle log" >/dev/null 2>&1 || true
@@ -12615,20 +12655,20 @@ for r in json.load(sys.stdin):
       elif [[ "$_w_action" == "worker_blocked" ]]; then
         _w_reason=$(echo "$_w_extract_result" | python3 -c "import json,sys; print(json.load(sys.stdin).get('fields',{}).get('reason',''))" 2>/dev/null || echo "")
         _w_next=$(echo "$_w_extract_result" | python3 -c "import json,sys; print(json.load(sys.stdin).get('fields',{}).get('next_action',''))" 2>/dev/null || echo "")
-        python3 "$_handoff_py" update --db "$_db_path" --handoff-id "$hid" \
+        python3 "$_a2a_task_py" update --db "$_db_path" --task-id "$hid" \
           --status blocked --expected-status launched --exit-kind worker_blocked \
           --reason "${_w_reason:0:2000}" --next-action "${_w_next:0:2000}" >/dev/null 2>&1 || true
         continue
       elif [[ "$_w_action" == "worker_handoff_needed" ]]; then
         _w_reason=$(echo "$_w_extract_result" | python3 -c "import json,sys; print(json.load(sys.stdin).get('fields',{}).get('reason',''))" 2>/dev/null || echo "")
         _w_next=$(echo "$_w_extract_result" | python3 -c "import json,sys; print(json.load(sys.stdin).get('fields',{}).get('next_action',''))" 2>/dev/null || echo "")
-        python3 "$_handoff_py" update --db "$_db_path" --handoff-id "$hid" \
+        python3 "$_a2a_task_py" update --db "$_db_path" --task-id "$hid" \
           --status completed --expected-status launched --exit-kind worker_handoff_needed \
           --reason "${_w_reason:0:2000}" --next-action "${_w_next:0:2000}" >/dev/null 2>&1 || true
         continue
       fi
     fi
-    python3 "$_handoff_py" update --db "$_db_path" --handoff-id "$hid" \
+    python3 "$_a2a_task_py" update --db "$_db_path" --task-id "$hid" \
       --status blocked --expected-status launched --exit-kind stale_pid \
       --reason "worker process no longer alive" >/dev/null 2>&1 || true
   done
@@ -12644,7 +12684,7 @@ manager_runtime_launch_workers_after_ai_cycle_if_needed() {
   #   directly via the manager's ACP bridge — no separate freely daemon.
   #
   # PREVIOUS APPROACH (abandoned):
-  #   manager_runtime_launch_workers_from_latest_handoff parsed worker
+  #   manager_runtime_launch_workers_from_latest_task parsed worker
   #   prompts from continuity markdown (awk regex). This was fragile:
   #   - AI output format variations broke the regex parser
   #   - Multi-layer gate checks (stale refs, launchable, etc.) filtered
@@ -12678,14 +12718,14 @@ manager_runtime_launch_workers_after_ai_cycle_if_needed() {
     return 0
   fi
 
-  local _worker_csv _prompt_file _launched_count _handoff_py _db_path _handoff_id
-  local _prev_worker_id _prev_worker_summary _raw_key _parent_handoff_id _is_followthrough
-  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  local _worker_csv _prompt_file _launched_count _a2a_task_py _db_path _task_id
+  local _prev_worker_id _prev_worker_summary _raw_key _parent_task_id _is_followthrough
+  _a2a_task_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db_path=""$project/.freely/freely.db""
   _worker_csv="$(_db_exit_contract_field "$project" manager worker_prompts_csv)"
   # Get parent handoff_id (latest manager record)
-  _parent_handoff_id=$(python3 "$_handoff_py" latest-manager --db "$_db_path" 2>/dev/null | \
-    python3 -c "import json,sys; print(json.load(sys.stdin).get('handoff_id',''))" 2>/dev/null || echo "")
+  _parent_task_id=$(python3 "$_a2a_task_py" latest-manager --db "$_db_path" 2>/dev/null | \
+    python3 -c "import json,sys; print(json.load(sys.stdin).get('task_id',''))" 2>/dev/null || echo "")
   _launched_count=0
   if [[ -n "$_worker_csv" ]]; then
     local IFS=","
@@ -12700,26 +12740,26 @@ manager_runtime_launch_workers_after_ai_cycle_if_needed() {
       fi
       # Extract raw_key from prompt filename
       _raw_key="$(echo "$_prompt_file" | grep -oE '[0-9]{8}T[0-9]{4,6}Z' | head -1)"
-      # Compute previous_worker_handoff_id: latest completed worker for same raw_key
+      # Compute previous_worker_task_id: latest completed worker for same raw_key
       _prev_worker_id=""
       _prev_worker_summary=""
       if [[ -n "$_raw_key" ]]; then
         local _prev_json
-        _prev_json=$(python3 "$_handoff_py" latest-completed-worker --db "$_db_path" --raw-key "$_raw_key" 2>/dev/null || true)
-        _prev_worker_id=$(echo "$_prev_json" | python3 -c "import json,sys; print(json.load(sys.stdin).get('handoff_id',''))" 2>/dev/null || echo "")
+        _prev_json=$(python3 "$_a2a_task_py" latest-completed-worker --db "$_db_path" --raw-key "$_raw_key" 2>/dev/null || true)
+        _prev_worker_id=$(echo "$_prev_json" | python3 -c "import json,sys; print(json.load(sys.stdin).get('task_id',''))" 2>/dev/null || echo "")
         _prev_worker_summary=$(echo "$_prev_json" | python3 -c "import json,sys; print(json.load(sys.stdin).get('completion_summary',''))" 2>/dev/null || echo "")
       fi
       # Determine if followthrough (worktree had prior completed worker) or fresh fork
       _is_followthrough="false"
       if [[ -n "$_target_worktree" ]]; then
         local _existing_completed
-        _existing_completed=$(python3 "$_handoff_py" active-workers --db "$_db_path" --worktree "$_target_worktree" 2>/dev/null | \
+        _existing_completed=$(python3 "$_a2a_task_py" active-workers --db "$_db_path" --worktree "$_target_worktree" 2>/dev/null | \
           python3 -c "import json,sys; rows=json.load(sys.stdin); print(len(rows))" 2>/dev/null || echo "0")
         # Check if worktree has completed workers (not launched)
         local _completed_count
         _completed_count=$(python3 -c "
 import json,subprocess,sys
-r=subprocess.run([sys.executable,'$_handoff_py','list','--db','$_db_path','--role','worker','--status','completed'],
+r=subprocess.run([sys.executable,'$_a2a_task_py','list','--db','$_db_path','--role','worker','--status','completed'],
                  capture_output=True,text=True,timeout=5)
 rows=json.loads(r.stdout) if r.returncode==0 else []
 print(sum(1 for r in rows if r.get('worktree','')=='$_target_worktree'))
@@ -12727,38 +12767,37 @@ print(sum(1 for r in rows if r.get('worktree','')=='$_target_worktree'))
         [[ "${_completed_count:-0}" -gt 0 ]] && _is_followthrough="true"
       fi
       # INSERT pending handoff record with computed prev_worker
-      _handoff_id=""
-      if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
-        _handoff_id=$(python3 "$_handoff_py" insert --db "$_db_path" \
+      _task_id=""
+      if [[ -f "$_a2a_task_py" && -f "$_db_path" ]]; then
+        _task_id=$(python3 "$_a2a_task_py" insert --db "$_db_path" \
           --role worker --raw-key "$_raw_key" \
           --prompt-file "$_prompt_file" --worktree "$_target_worktree" \
           --created-by manager --consumed-by manager \
-          --parent "$_parent_handoff_id" --prev-worker "$_prev_worker_id" 2>/dev/null || true)
+          --parent "$_parent_task_id" --prev-worker "$_prev_worker_id" 2>/dev/null || true)
       fi
       # WORKER_HANDOFF_INJECT: JSON5 template (quoted to protect backticks) + vars
-      if [[ -n "$_handoff_id" && -f "$_prompt_file" ]]; then
+      if [[ -n "$_task_id" && -f "$_prompt_file" ]]; then
         local _prev_summary_truncated
         _prev_summary_truncated="${_prev_worker_summary:0:80}"
-        cat >> "$_prompt_file" <<'WORKER_HANDOFF_INJECT'
+        cat >> "$_prompt_file" <<'WORKER_STATE_INJECT'
 
 ---
 
-在回复末尾输出 ```json5 代码块，格式见 docs/system/workspace/agents/worker-agent.md §交接 JSON：
+回复末尾输出 A2A Task 状态 JSON（格式见 worker-agent.md）：
 
 ```json5
 {
-  "exit_kind": "worker_done",
-  "completion_summary": "...",
-  "evidence_paths": "...",
-  "consumed_by": "worker"
+  "state": "completed",
+  "summary": "...",
+  "evidence": "..."
 }
 ```
 
-WORKER_HANDOFF_INJECT
+WORKER_STATE_INJECT
         cat >> "$_prompt_file" <<EOF
 
-- handoff_id: ${_handoff_id}
-- parent_handoff_id: ${_parent_handoff_id}
+- task_id: ${_task_id}
+- parent_task_id: ${_parent_task_id}
 - 上轮产出: ${_prev_summary_truncated:-无}
 
 EOF
@@ -12766,15 +12805,15 @@ EOF
       if launch_worker_from_manager_prompt_if_needed "$project" "$_prompt_file"; then
         _launched_count=$((_launched_count + 1))
         log_info "worker launched: $(basename "$_prompt_file")"
-        if [[ -n "$_handoff_id" && -f "$_handoff_py" && -f "$_db_path" ]]; then
-          python3 "$_handoff_py" update --db "$_db_path" \
-            --handoff-id "$_handoff_id" --status "launched" --expected-status "pending" >/dev/null 2>&1 || true
+        if [[ -n "$_task_id" && -f "$_a2a_task_py" && -f "$_db_path" ]]; then
+          python3 "$_a2a_task_py" update --db "$_db_path" \
+            --task-id "$_task_id" --status "launched" --expected-status "pending" >/dev/null 2>&1 || true
         fi
       else
         log_warn "worker launch failed: $(basename "$_prompt_file") — ${LAUNCH_REJECT_REASON:-launchable check failed}"
-        if [[ -n "$_handoff_id" && -f "$_handoff_py" && -f "$_db_path" ]]; then
-          python3 "$_handoff_py" update --db "$_db_path" \
-            --handoff-id "$_handoff_id" --status "rejected" --expected-status "pending" --exit-kind "launch_failed" \
+        if [[ -n "$_task_id" && -f "$_a2a_task_py" && -f "$_db_path" ]]; then
+          python3 "$_a2a_task_py" update --db "$_db_path" \
+            --task-id "$_task_id" --status "rejected" --expected-status "pending" --exit-kind "launch_failed" \
             --reason "${LAUNCH_REJECT_REASON:-launchable check failed}" >/dev/null 2>&1 || true
         fi
       fi
@@ -13821,7 +13860,7 @@ record_restart_storm_signal() {
 write_session_handoff() {
   local project="$1" rotation_reason="$2"
   local out_file branch tail_lines
-  out_file="$(handoff_file "$project")"
+  out_file="$(exit_contract_file "$project")"
   branch="$(git -C "$project" branch --show-current 2>/dev/null || true)"
   tail_lines="${SESSION_HANDOFF_TAIL_LINES:-80}"
 
@@ -13954,9 +13993,9 @@ session_handoff_recent_output_excerpt() {
 
 append_handoff_prompt_if_present() {
   local project="$1"
-  local handoff_path
-  handoff_path="$(handoff_file "$project")"
-  [[ -f "$handoff_path" ]] || return 0
+  local contract_path
+  contract_path="$(exit_contract_file "$project")"
+  [[ -f "$contract_path" ]] || return 0
   cat <<EOF
 
 会话轮换交接：
@@ -13965,14 +14004,14 @@ append_handoff_prompt_if_present() {
 - 若交接中的旧结论与仓库现状冲突，以当前仓库事实为准。
 
 EOF
-  cat "$handoff_path"
+  cat "$contract_path"
 }
 
 prepend_exit_contract_repair_focus_if_needed() {
   local project="$1"
-  local rotation_reason handoff_path
+  local rotation_reason contract_path
   rotation_reason="$(session_handoff_rotation_reason "$project" || true)"
-  handoff_path="$(handoff_file "$project")"
+  contract_path="$(exit_contract_file "$project")"
   case "$rotation_reason" in
     worker_exit_contract_repair)
       cat <<EOF
@@ -13980,7 +14019,7 @@ Repair-first override:
 - 当前轮次是 worker exit contract repair。先补齐缺失或无效的 worker exit contract，再做任何其它扩展阅读、实现或 broad patrol。
 - 继续沿用当前 worker issue 边界，不要重开 manager patrol，也不要把自己提升成主管。
 - 必须在本轮结束前在回复末尾输出有效的 ```json (handoff 内容) JSON 块；否则 runtime 会继续按同一 resume target 拉回修复。
-- handoff_evidence: \`${handoff_path}\`
+- handoff_evidence: \`${contract_path}\`
 
 EOF
       ;;
@@ -13990,7 +14029,7 @@ Repair-first override:
 - 当前轮次是 manager exit contract repair。先补齐缺失或无效的 manager exit contract，再做新的 delegation、cleanup judgement 或 broad patrol。
 - 继续沿用当前 manager 上下文，不要忽略 repair contract 去重跑首轮排班。
 - 必须在本轮结束前在回复末尾输出有效的 ```json (handoff 内容) JSON 块；否则 runtime 会继续按同一 resume target 拉回修复。
-- handoff_evidence: \`${handoff_path}\`
+- handoff_evidence: \`${contract_path}\`
 
 EOF
       ;;
@@ -14013,10 +14052,10 @@ manager_exit_contract_repair_prompt_expected_continuity_file() {
 }
 
 build_manager_exit_contract_repair_fresh_with_handoff_prompt() {
-  local project=”$1” expected_continuity handoff_path live_status_cmd scan_json_path latest_continuity
+  local project=”$1” expected_continuity contract_path live_status_cmd scan_json_path latest_continuity
   expected_continuity=”$(manager_exit_contract_repair_prompt_expected_continuity_file “$project”)”
   manager_agent_def="$(cat "$(workspace_root_for_project "$project")/agents/manager-agent.md" 2>/dev/null || true)"
-  handoff_path=”$(handoff_file “$project”)”
+  contract_path=”$(exit_contract_file “$project”)”
   live_status_cmd=”./bin/freely live-status --project $project”
   scan_json_path=”$(task_source_scan_json_path_for_project “$project”)”
   latest_continuity=”$(latest_generated_manager_continuity_file_for_project “$project”)”
@@ -14035,7 +14074,7 @@ ${manager_agent_def}
 
 本轮只允许先读这些最小现场：
 - 项目治理入口：\`$project/AGENTS.md\`
-- 当前修复交接：\`$handoff_path\`
+- 当前修复交接：\`$contract_path\`
 - 当前 runtime 状态入口：\`$live_status_cmd\`
 - 当前结构化 scan：\`$scan_json_path\`
 - 当前最新 manager continuity：\`$latest_continuity\`
@@ -14199,7 +14238,7 @@ append_manager_consumed_continuity_resume_focus_if_needed() {
   latest_generated="$(latest_generated_manager_continuity_file_for_project "$project")"
   case "${LAUNCH_KIND_SELECTED:-}" in
     resume)
-      [[ ! -f "$(handoff_file "$project")" ]] || return 0
+      [[ ! -f "$(exit_contract_file "$project")" ]] || return 0
       state_file="$(manager_worker_launch_state_file "$project")"
       continuity_file="${LAST_MANAGER_CONTINUITY_CONSUMED:-}"
       if [[ -z "$continuity_file" && -f "$state_file" ]]; then
@@ -14212,7 +14251,7 @@ append_manager_consumed_continuity_resume_focus_if_needed() {
       focus_label="已消费 manager continuity 续接"
       ;;
     fresh_with_handoff)
-      [[ -f "$(handoff_file "$project")" ]] || return 0
+      [[ -f "$(exit_contract_file "$project")" ]] || return 0
       continuity_file="$latest_generated"
       [[ -n "$continuity_file" && -f "$continuity_file" ]] || return 0
       focus_label="manager continuity handoff 续接"
@@ -14298,20 +14337,19 @@ append_manager_exit_contract_directive_if_needed() {
   [[ "${unresolved_workers:-0}" =~ ^[0-9]+$ ]] || unresolved_workers="0"
   cat <<'EOF'
 
-委派前查 blocked/completed：
+委派前查 worker 状态：
 ```
-python3 docs/system/workspace/scripts/runtime/handoff.py list --db .freely/freely.db --role worker --status blocked
-python3 docs/system/workspace/scripts/runtime/handoff.py list --db .freely/freely.db --role worker --status completed
+python3 docs/system/workspace/scripts/runtime/a2a_task.py list --db .freely/freely.db --role worker --status blocked
+python3 docs/system/workspace/scripts/runtime/a2a_task.py list --db .freely/freely.db --role worker --status completed
 ```
 
-在回复末尾输出 ```json5 代码块，格式见 docs/system/workspace/agents/manager-agent.md §交接 JSON：
+回复末尾输出 A2A Task 状态 JSON（格式见 manager-agent.md）：
 
 ```json5
 {
-  "exit_kind": "delegate_workers",
-  "reason": "...",
-  "worker_prompts_csv": "...",
-  "consumed_by": "manager"
+  "state": "submitted",
+  "summary": "...",
+  "workers": "..."
 }
 ```
 EOF
@@ -14323,32 +14361,31 @@ append_worker_exit_contract_directive_if_needed() {
 
   cat <<'EOF'
 
-在回复末尾输出 ```json5 代码块，格式见 docs/system/workspace/agents/worker-agent.md §交接 JSON：
+回复末尾输出 A2A Task 状态 JSON（格式见 worker-agent.md）：
 
 ```json5
 {
-  "exit_kind": "worker_done",
-  "completion_summary": "...",
-  "evidence_paths": "...",
-  "consumed_by": "worker"
+  "state": "completed",
+  "summary": "...",
+  "evidence": "..."
 }
 ```
 EOF
 }
 
-sync_exit_contract_to_handoffs() {
+sync_exit_contract_to_a2a_tasks() {
   return 0
 }
 
-# parse_handoff_json_reply: extract ```json (handoff 内容) JSON from AI cycle log, parse via handoff.py, dispatch consume_*.
+# parse_a2a_task_json_reply: extract ```json (handoff 内容) JSON from AI cycle log, parse via a2a_task.py, dispatch consume_*.
 # Returns: "ok:<exit_kind>" on success, "repair:<errors_json>" on failure.
-# Side effects: INSERTs handoff record + dispatches consume_* (all inside handoff.py parse).
-parse_handoff_json_reply() {
+# Side effects: INSERTs handoff record + dispatches consume_* (all inside a2a_task.py parse).
+parse_a2a_task_json_reply() {
   local project="$1" cycle_log="$2" role="$3" raw_key="$4" prompt_file="$5"
-  local _handoff_py _db_path _reply_text _result _action _exit_kind
-  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  local _a2a_task_py _db_path _reply_text _result _action _exit_kind
+  _a2a_task_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db_path="$project/.freely/freely.db"
-  [[ -f "$_handoff_py" && -f "$_db_path" ]] || { printf 'repair:["handoff_py_or_db_missing"]\n'; return 1; }
+  [[ -f "$_a2a_task_py" && -f "$_db_path" ]] || { printf 'repair:["a2a_task_py_or_db_missing"]\n'; return 1; }
   # Extract tail of cycle log (handoff JSON is at end of AI reply)
   if [[ -n "$cycle_log" && -f "$cycle_log" ]]; then
     _reply_text="$(tail -c 32768 "$cycle_log" 2>/dev/null || true)"
@@ -14359,7 +14396,7 @@ parse_handoff_json_reply() {
     printf 'repair:["empty_reply"]\n'
     return 1
   fi
-  _result=$(python3 "$_handoff_py" parse --db "$_db_path" --reply-text "$_reply_text" \
+  _result=$(python3 "$_a2a_task_py" parse --db "$_db_path" --reply-text "$_reply_text" \
     --role "$role" --raw-key "$raw_key" --prompt-file "$prompt_file" 2>/dev/null || true)
   _action=$(echo "$_result" | python3 -c "import json,sys; print(json.load(sys.stdin).get('action','error'))" 2>/dev/null || echo "error")
   if [[ "$_action" == "repair" ]]; then
@@ -14374,18 +14411,18 @@ parse_handoff_json_reply() {
 }
 
 manager_exit_contract_kind() {
-  local project="$1" _handoff_py _db_path
-  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  local project="$1" _a2a_task_py _db_path
+  _a2a_task_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db_path=""$project/.freely/freely.db""
-  if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
+  if [[ -f "$_a2a_task_py" && -f "$_db_path" ]]; then
     local pending_workers
-    pending_workers=$(python3 "$_handoff_py" list --db "$_db_path" --role worker --status pending 2>/dev/null | python3 -c "import json,sys; rows=json.load(sys.stdin); print(len(rows))" 2>/dev/null || echo "0")
+    pending_workers=$(python3 "$_a2a_task_py" list --db "$_db_path" --role worker --status pending 2>/dev/null | python3 -c "import json,sys; rows=json.load(sys.stdin); print(len(rows))" 2>/dev/null || echo "0")
     if [[ "${pending_workers:-0}" -gt 0 ]]; then
       echo "delegate_workers"
       return 0
     fi
     local latest_mgr
-    latest_mgr=$(python3 "$_handoff_py" latest-manager --db "$_db_path" 2>/dev/null | python3 -c "import json,sys; r=json.load(sys.stdin); print(r.get('exit_kind',''))" 2>/dev/null || true)
+    latest_mgr=$(python3 "$_a2a_task_py" latest-manager --db "$_db_path" 2>/dev/null | python3 -c "import json,sys; r=json.load(sys.stdin); print(r.get('exit_kind',''))" 2>/dev/null || true)
     if [[ -n "$latest_mgr" ]]; then
       echo "$latest_mgr"
       return 0
@@ -14409,12 +14446,12 @@ manager_exit_contract_has_launchable_worker_prompt() {
 validate_manager_exit_contract_for_project() {
   local project="$1" kind="" missing_csv=""
   local stop_reason restart_point next_action why_not_stop why_not_delegate worker_prompts_csv
-  local _handoff_py _db_path
-  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  local _a2a_task_py _db_path
+  _a2a_task_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db_path=""$project/.freely/freely.db""
-  if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
+  if [[ -f "$_a2a_task_py" && -f "$_db_path" ]]; then
     local pending_workers worker_prompts_list
-    pending_workers=$(python3 "$_handoff_py" list --db "$_db_path" --role worker --status pending 2>/dev/null | python3 -c "
+    pending_workers=$(python3 "$_a2a_task_py" list --db "$_db_path" --role worker --status pending 2>/dev/null | python3 -c "
 import json,sys
 try:
     rows=json.load(sys.stdin)
@@ -14498,15 +14535,15 @@ autofill_manager_exit_contract_for_cleanup_delegate_workers_if_possible() {
   [[ -n "$worker_prompts_csv" ]] || return 1
   manager_exit_contract_has_launchable_worker_prompt "$project" "$worker_prompts_csv" || return 1
 
-  local _handoff_py _db_path _raw_key _hid
-  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  local _a2a_task_py _db_path _raw_key _hid
+  _a2a_task_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db_path=""$project/.freely/freely.db""
-  if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
+  if [[ -f "$_a2a_task_py" && -f "$_db_path" ]]; then
     _raw_key=$(echo "$continuity_file" | grep -oE '[0-9]{8}T[0-9]{4,6}Z' | head -1 || echo "autofill")
     local IFS=","
     for _prompt_file in $worker_prompts_csv; do
       [[ -n "$_prompt_file" && -f "$_prompt_file" ]] || continue
-      python3 "$_handoff_py" insert --db "$_db_path" \
+      python3 "$_a2a_task_py" insert --db "$_db_path" \
         --role worker --raw-key "$_raw_key" \
         --prompt-file "$_prompt_file" --created-by manager --consumed-by manager \
         --intent-kind cleanup 2>/dev/null || true
@@ -14545,12 +14582,12 @@ autofill_manager_exit_contract_for_continuity_resume_if_possible() {
   [[ -n "$restart_point" ]] || restart_point="resume from authoritative manager continuity $(basename "$continuity_file")"
   [[ -n "$next_action" ]] || next_action="continue the current manager-owned lane from $(basename "$continuity_file") before widening patrol"
 
-  local _handoff_py _db_path _raw_key
-  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  local _a2a_task_py _db_path _raw_key
+  _a2a_task_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db_path=""$project/.freely/freely.db""
-  if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
+  if [[ -f "$_a2a_task_py" && -f "$_db_path" ]]; then
     _raw_key=$(echo "$continuity_file" | grep -oE '[0-9]{8}T[0-9]{4,6}Z' | head -1 || echo "autofill")
-    python3 "$_handoff_py" insert --db "$_db_path" \
+    python3 "$_a2a_task_py" insert --db "$_db_path" \
       --role manager --raw-key "$_raw_key" \
       --prompt-file "$continuity_file" --created-by manager --consumed-by manager \
       --intent-kind resume 2>/dev/null || true
@@ -14563,11 +14600,11 @@ autofill_manager_exit_contract_for_continuity_resume_if_possible() {
 }
 
 worker_exit_contract_kind() {
-  local project="$1" _handoff_py _db_path
-  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  local project="$1" _a2a_task_py _db_path
+  _a2a_task_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db_path=""$project/.freely/freely.db""
-  [[ -f "$_handoff_py" && -f "$_db_path" ]] || return 1
-  python3 "$_handoff_py" list --db "$_db_path" --role worker --status completed 2>/dev/null | python3 -c "
+  [[ -f "$_a2a_task_py" && -f "$_db_path" ]] || return 1
+  python3 "$_a2a_task_py" list --db "$_db_path" --role worker --status completed 2>/dev/null | python3 -c "
 import json,sys
 try:
     rows=json.load(sys.stdin)
@@ -14639,7 +14676,7 @@ write_manager_exit_contract_repair_handoff() {
   if [[ -z "$resume_target" && -f "$session_file" ]]; then
     resume_target="$(meta_env_value "$session_file" "LAST_TOOL_RESUME_TARGET")"
   fi
-  cat >"$(handoff_file "$project")" <<EOF
+  cat >"$(exit_contract_file "$project")" <<EOF
 # Session Handoff
 
 - rotation_reason: manager_exit_contract_repair
@@ -14675,7 +14712,7 @@ write_manager_resume_handoff() {
   restart_point="$(_db_exit_contract_field "$project" manager restart_point)"
   next_action="$(_db_exit_contract_field "$project" manager next_action)"
   resume_reason="$(_db_exit_contract_field "$project" manager reason)"
-  cat >"$(handoff_file "$project")" <<EOF
+  cat >"$(exit_contract_file "$project")" <<EOF
 # Session Handoff
 
 - rotation_reason: manager_exit_contract_resume
@@ -14720,7 +14757,7 @@ write_worker_exit_contract_repair_handoff() {
     closeout_requires_adequacy="$(worker_prompt_closeout_requires_adequacy "$prompt_file")"
     closeout_review_artifact_policy="$(worker_prompt_closeout_review_artifact_policy "$prompt_file")"
   fi
-  cat >"$(handoff_file "$project")" <<EOF
+  cat >"$(exit_contract_file "$project")" <<EOF
 # Session Handoff
 
 - rotation_reason: worker_exit_contract_repair
@@ -14739,7 +14776,7 @@ write_worker_exit_contract_repair_handoff() {
 - The missing/invalid contract is the blocking defect from the previous round.
 EOF
   if [[ -n "$prompt_file" && -f "$prompt_file" ]]; then
-    cat >>"$(handoff_file "$project")" <<EOF
+    cat >>"$(exit_contract_file "$project")" <<EOF
 
 ## Original Worker Boundary
 - source_prompt_file: ${prompt_file}
@@ -14754,7 +14791,7 @@ EOF
 - closeout_review_artifact_policy: ${closeout_review_artifact_policy:-unknown}
 EOF
     if [[ "${intent_kind:-unknown}" == "cleanup" ]] && worker_prompt_has_verification_metadata "$prompt_file"; then
-      cat >>"$(handoff_file "$project")" <<'EOF'
+      cat >>"$(exit_contract_file "$project")" <<'EOF'
 
 ## Cleanup Reentry Requirement
 - Repairing the missing worker exit contract is necessary, but it is not by itself a valid cleanup completion.
@@ -14781,10 +14818,10 @@ worker_exit_contract_summary_is_repair_only() {
 }
 
 worker_exit_contract_evidence_is_internal_repair_only() {
-  local project="$1" evidence_paths_csv="${2:-}" contract_file handoff_path item
+  local project="$1" evidence_paths_csv="${2:-}" contract_file contract_path item
   [[ -n "$evidence_paths_csv" ]] || return 1
   contract_file="$(worker_exit_contract_file "$project")"
-  handoff_path="$(handoff_file "$project")"
+  contract_path="$(exit_contract_file "$project")"
   IFS=',' read -r -a __freely_repair_evidence_items <<<"$evidence_paths_csv"
   ((${#__freely_repair_evidence_items[@]} > 0)) || return 1
   for item in "${__freely_repair_evidence_items[@]}"; do
@@ -14792,7 +14829,7 @@ worker_exit_contract_evidence_is_internal_repair_only() {
     item="${item%"${item##*[![:space:]]}"}"
     [[ -n "$item" ]] || continue
     case "$item" in
-      "$contract_file"|"$handoff_path") ;;
+      "$contract_file"|"$contract_path") ;;
       *) return 1 ;;
     esac
   done
@@ -14825,7 +14862,7 @@ _manager_auto_consume_workers() {
   local project="$1"
   local _worker_csv _hp _db _prompt_file _rk _consumed
   _worker_csv="$(_db_exit_contract_field "$project" manager worker_prompts_csv 2>/dev/null || echo "")"
-  _hp="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  _hp="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db="$project/.freely/freely.db"
   [[ -f "$_hp" && -f "$_db" ]] || return 0
   _consumed=0
@@ -14865,7 +14902,7 @@ manager_runtime_handle_exit_contract_after_ai_cycle() {
       # ── New path: parse ```json (handoff 内容) JSON from AI reply ──
       cycle_log="${LAST_CYCLE_LOG:-}"
       raw_key="manager-patrol"
-      parse_result="$(parse_handoff_json_reply "$project" "$cycle_log" "manager" "$raw_key" "" 2>/dev/null || true)"
+      parse_result="$(parse_a2a_task_json_reply "$project" "$cycle_log" "manager" "$raw_key" "" 2>/dev/null || true)"
       parse_ok="${parse_result%%:*}"
       if [[ "$parse_ok" == "ok" ]]; then
         kind="${parse_result#ok:}"
@@ -15112,7 +15149,7 @@ worker_runtime_handle_exit_contract_after_ai_cycle() {
       local _w_cycle_log _w_raw_key _w_parse_result _w_parse_ok
       _w_cycle_log="${LAST_CYCLE_LOG:-}"
       _w_raw_key="$(_db_exit_contract_field "$project" worker raw_key 2>/dev/null || echo "")"
-      _w_parse_result="$(parse_handoff_json_reply "$project" "$_w_cycle_log" "worker" "$_w_raw_key" "" 2>/dev/null || true)"
+      _w_parse_result="$(parse_a2a_task_json_reply "$project" "$_w_cycle_log" "worker" "$_w_raw_key" "" 2>/dev/null || true)"
       _w_parse_ok="${_w_parse_result%%:*}"
       if [[ "$_w_parse_ok" == "ok" ]]; then
         kind="${_w_parse_result#ok:}"
@@ -15199,12 +15236,12 @@ project_runtime_handle_exit_contract_after_ai_cycle() {
 
 write_manager_bootstrap_handoff() {
   local project="$1" trigger="$2" previous_slot="$3" active_slot="$4" reason="$5" next_action="$6"
-  local handoff_path branch fleet_snapshot
-  handoff_path="$(handoff_file "$project")"
+  local contract_path branch fleet_snapshot
+  contract_path="$(exit_contract_file "$project")"
   branch="$(git -C "$project" branch --show-current 2>/dev/null || true)"
   fleet_snapshot="$(fleet_status_text_for_project "$project")"
 
-  cat >"$handoff_path" <<EOF
+  cat >"$contract_path" <<EOF
 # Session Handoff
 
 - rotation_reason: manager_bootstrap_watchdog
@@ -15238,7 +15275,7 @@ $(context_summary_target_hint "$project")
 EOF
 
   if [[ -n "$fleet_snapshot" ]]; then
-    cat >>"$handoff_path" <<EOF
+    cat >>"$contract_path" <<EOF
 
 ## Fleet Snapshot
 \`\`\`
@@ -15296,9 +15333,9 @@ _BUILD_HANDOFF_ONLY_GUARD=0
 
 build_handoff_only_prompt() {
 	local project="$1"
-	local handoff_path
-	handoff_path="$(handoff_file "$project")"
-	if [[ ! -f "$handoff_path" ]]; then
+	local contract_path
+	contract_path="$(exit_contract_file "$project")"
+	if [[ ! -f "$contract_path" ]]; then
 		if [[ "$_BUILD_HANDOFF_ONLY_GUARD" -eq 1 ]]; then
 			log_warn "handoff-only prompt: no handoff file found AND recursive guard active; building minimal delta prompt"
 			cat <<PROMPT_FALLBACK
@@ -15312,7 +15349,7 @@ $(context_summary_target_hint "$project")
 PROMPT_FALLBACK
 			return 0
 		fi
-		log_warn "handoff-only prompt requested but no handoff file found at $handoff_path; falling back to full prompt"
+		log_warn "handoff-only prompt requested but no handoff file found at $contract_path; falling back to full prompt"
 		_BUILD_HANDOFF_ONLY_GUARD=1
 		build_prompt
 		return 0
@@ -15332,7 +15369,7 @@ Read the handoff carefully and continue from where it left off.
 
 PROMPT_HANDOFF_ONLY
 
-	cat "$handoff_path"
+	cat "$contract_path"
 
 	cat <<PROMPT_HANDOFF_ONLY_TAIL
 
@@ -16133,11 +16170,11 @@ with open(output_path, "w") as f:
 PRPY
       rm -f "$_scan_pr_tmp"
       # Post-process: filter scan items that have active workers
-      local _handoff_py _db_path
-      _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+      local _a2a_task_py _db_path
+      _a2a_task_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
       _db_path="$project/.freely/freely.db"
-      if [[ -f "$_handoff_py" && -f "$_db_path" ]]; then
-        python3 - "$output_path" "$_handoff_py" "$_db_path" <<'SCANFILTER'
+      if [[ -f "$_a2a_task_py" && -f "$_db_path" ]]; then
+        python3 - "$output_path" "$_a2a_task_py" "$_db_path" <<'SCANFILTER'
 import json, sys, subprocess
 output_path = sys.argv[1]
 hp = sys.argv[2]
@@ -16161,7 +16198,7 @@ for it in items:
                           capture_output=True, text=True, timeout=5)
         try:
             records = json.loads(r.stdout)
-            has_active = any(rec.get('status') == 'launched' for rec in records)
+            has_active = any(rec.get('state') == 'working' for rec in records)
         except: pass
     if not has_active:
         filtered.append(it)
@@ -16480,7 +16517,7 @@ settle_retire_ready_merged_worker_runtime_state() {
     "$(interruption_dispatcher_pid_file "$target_project")" \
     "$(ensure_manager_watchdog_pid_file "$target_project")" \
     "$(session_state_file "$target_project")" \
-    "$(handoff_file "$target_project")"
+    "$(exit_contract_file "$target_project")"
   write_workcell_state "$target_project" "stopped" "down" "down" "retire_ready_merged_worker"
   append_runtime_event "$manager_project" "retire_ready_merged_worker_settled" \
     "worktree=$target_project" \
@@ -16541,7 +16578,7 @@ manager_runtime_recover_workers_if_needed() {
   if [[ "$skip_continuity_recovery" != "true" ]]; then
     reset_project_runtime_discovery_cache "$project"
     latest_continuity_file="$(latest_generated_manager_continuity_file_for_project "$project")"
-    recovered="$(manager_runtime_launch_workers_from_latest_handoff "$project")"
+    recovered="$(manager_runtime_launch_workers_from_latest_task "$project")"
     [[ "$recovered" =~ ^[0-9]+$ ]] || recovered=0
   fi
   normalized_project="$(normalize_runtime_worktree_path "$project")"
@@ -16613,7 +16650,7 @@ manager_runtime_recover_workers_if_needed() {
           "intake_id=$terminal_intake_id"
       fi
       write_workcell_state "$wt_path" "stopped" "down" "down" "$terminal_exit_reason"
-      log_info "manager runtime skips expected-running recovery for terminal worker exit contract: branch=${branch:-unknown} exit_kind=${terminal_kind:-unknown} path=$wt_path"
+      log_info "manager runtime skips expected-running recovery for terminal worker exit contract: branch=${branch:-unknown} state=${terminal_kind:-unknown} path=$wt_path"
       continue
     fi
 
@@ -16872,7 +16909,7 @@ select_launch_kind() {
   fi
 
   if [[ "${FIRST_ROUND:-true}" == true ]] \
-    && [[ ! -f "$(handoff_file "$PROJECT_ROOT")" ]] \
+    && [[ ! -f "$(exit_contract_file "$PROJECT_ROOT")" ]] \
     && [[ -z "${LAST_TOOL_RESUME_TARGET:-}" ]] \
     && [[ -z "${LAST_TOOL_SESSION_ID:-}" ]] \
     && [[ -z "${LAST_LAUNCH_KIND:-}" ]] \
@@ -17443,20 +17480,21 @@ manager_supervisor_waiting_on_active_workers() {
 }
 
 manager_scan_stale_worker_pids() {
-  local project="$1" freely_db raw_key scanned_count=0 marked_count=0
-  freely_db="$project/.freely/freely.db"
-  [[ -f "$freely_db" ]] || return 0
+  local project="$1" _a2a_task_py _db_path raw_key scanned_count=0 marked_count=0
+  _a2a_task_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
+  _db_path="$project/.freely/freely.db"
+  [[ -f "$_a2a_task_py" && -f "$_db_path" ]] || return 0
   raw_key="$(echo "$(git -C "$project" rev-parse --abbrev-ref HEAD 2>/dev/null)" | grep -oE '[0-9]{8}T[0-9]{4,6}Z' | head -1)"
   [[ -n "$raw_key" ]] || return 0
 
   local result
-  local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
   result="$(python3 -c "
 import json, os, subprocess, sys
 raw_key = '''$raw_key'''
-r = subprocess.run([sys.executable, '$cli', '--project', '$project', 'handoff.get-launched-pids', '--raw_key', raw_key],
+r = subprocess.run([sys.executable, '$_a2a_task_py', 'get-launched-pids', '--db', '$_db_path', '--raw-key', raw_key],
                    capture_output=True, text=True, timeout=10)
-rows = json.loads(r.stdout) if r.returncode == 0 else []
+data = json.loads(r.stdout) if r.returncode == 0 else {}
+rows = data.get('rows', [])
 marked = []
 scanned = len(rows)
 for row in rows:
@@ -17467,11 +17505,11 @@ for row in rows:
   try:
     os.kill(pid, 0)
   except OSError:
-    marked.append(row['handoff_id'])
+    marked.append(row.get('task_id', ''))
 if marked:
-  for hid in marked:
-    subprocess.run([sys.executable, '$cli', '--project', '$project', 'handoff.update',
-                    '--handoff_id', hid, '--status', 'blocked', '--exit_kind', 'stale_pid',
+  for tid in marked:
+    subprocess.run([sys.executable, '$_a2a_task_py', 'update', '--db', '$_db_path',
+                    '--task-id', tid, '--status', 'blocked', '--exit-kind', 'stale_pid',
                     '--reason', 'Worker PID kill -0 failed, marking stale_pid'],
                    capture_output=True, timeout=10)
 print(f'{scanned},{len(marked)}')
@@ -18745,11 +18783,11 @@ build_prompt() {
   if [[ "${LAUNCH_KIND_SELECTED:-}" == "prompt" ]]; then
     cat <<'PROMPT_DELTA'
 === 本轮 delta（会话已记住你的角色和历史） ===
-上一轮 exit_kind: ${LAST_WORKCELL_EXIT_REASON:-unknown}
-请基于 session 历史继续工作。先读 handoffs 更新，再决定下一步。
-写 ```json (handoff 内容) JSON 到回复末尾。
+上一轮 state: ${LAST_WORKCELL_EXIT_REASON:-unknown}
+请基于 session 历史继续工作。先读 a2a_tasks 更新，再决定下一步。
+回复末尾输出 A2A Task 状态 JSON。
 PROMPT_DELTA
-    append_manager_handoff_context_if_needed "$PROJECT_ROOT"
+    append_manager_task_context_if_needed "$PROJECT_ROOT"
     append_fleet_supervision_if_needed
     # Only inject scan data when it was regenerated. The session
     # stays alive across prompt cycles (session/close is skipped
@@ -18826,10 +18864,10 @@ PROMPT_AGENT
     fi
     # ── DYNAMIC: scan, intakes, alerts (changes each cycle) ──
     # Warn when pending delivery backlog but always include scan data
-    if [[ "${MANAGER_HANDOFF_BACKLOG_COUNT:-0}" -ge 5 ]] && [[ "$(read_task_mode "$PROJECT_ROOT")" != id:* ]]; then
+    if [[ "${MANAGER_TASK_BACKLOG_COUNT:-0}" -ge 5 ]] && [[ "$(read_task_mode "$PROJECT_ROOT")" != id:* ]]; then
       cat <<BACKLOG_NOTE
 
-⚠️ 待送达消息 ${MANAGER_HANDOFF_BACKLOG_COUNT} 条（≥5）。先处理上面的 Worker 汇报，再看 scan 决定是否委派新任务。
+⚠️ 待送达消息 ${MANAGER_TASK_BACKLOG_COUNT} 条（≥5）。先处理上面的 Worker 汇报，再看 scan 决定是否委派新任务。
 BACKLOG_NOTE
     fi
     append_task_source_patrol_seed_if_needed
@@ -18848,48 +18886,48 @@ BACKLOG_NOTE
     rm -f "$PROJECT_ROOT/.freely/run/auto-retry-hint.txt"
   fi
   # ── MANAGER-ONLY: handoff context (thread history + unconsumed workers) ──
-  append_manager_handoff_context_if_needed "$PROJECT_ROOT"
+  append_manager_task_context_if_needed "$PROJECT_ROOT"
   # ── DYNAMIC: session handoff & continuity (changes each cycle, appended last) ──
   append_handoff_prompt_if_present "$PROJECT_ROOT"
   append_manager_consumed_continuity_resume_focus_if_needed "$PROJECT_ROOT"
   append_cleanup_governance_retirement_worker_directive_if_needed "$PROJECT_ROOT"
 }
 
-# append_manager_handoff_context_if_needed: inject thread history + unconsumed worker list for Manager patrol.
+# append_manager_task_context_if_needed: inject thread history + unconsumed worker list for Manager patrol.
 # Worker does NOT receive this — it only gets Task + agent doc + HANDOFF_INJECT.
-append_manager_handoff_context_if_needed() {
+append_manager_task_context_if_needed() {
   local project="$1"
   [[ "$(effective_runtime_role_for_project "$project")" == "manager" ]] || return 0
-  local _handoff_py _db_path
-  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  local _a2a_task_py _db_path
+  _a2a_task_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db_path="$project/.freely/freely.db"
-  [[ -f "$_handoff_py" && -f "$_db_path" ]] || return 0
+  [[ -f "$_a2a_task_py" && -f "$_db_path" ]] || return 0
 
-  # Pending delivery: send_to_ai IN ('pending','fail'), consumed_by=manager
+  # Pending delivery: tasks in input-required/pending-input states (worker→manager)
   # These are worker messages not yet delivered to the Manager AI.
   local pending_delivery pending_delivery_count
   pending_delivery=$(python3 -c "
 import json,subprocess,sys
-hp='$_handoff_py'; db='$_db_path'
+hp='$_a2a_task_py'; db='$_db_path'
 r=subprocess.run([sys.executable,hp,'list-pending-delivery','--db',db,'--consumed-by','manager'],
                  capture_output=True,text=True,timeout=5)
 rows=json.loads(r.stdout) if r.returncode==0 else []
 for r in rows[:10]:
-    print(f\"- {r.get('handoff_id','?')[:20]} exit={r.get('exit_kind','?')} status={r.get('status','?')} summary={r.get('completion_summary','')[:60]} reason={r.get('reason','')[:60]} next_action={r.get('next_action','')[:60]}\")
+    print(f\"- {r.get('task_id','?')[:20]} exit={r.get('exit_kind','?')} state={r.get('state','?')} summary={r.get('completion_summary','')[:60]} reason={r.get('reason','')[:60]} next_action={r.get('next_action','')[:60]}\")
 if not rows:
     print('(无待送达的 Worker 汇报)')
 print(f'PENDING_DELIVERY_COUNT={len(rows)}', flush=True)
 " 2>/dev/null || echo "PENDING_DELIVERY_COUNT=0")
 
   # Extract pending delivery count for backlog gating
-  MANAGER_HANDOFF_BACKLOG_COUNT=$(echo "$pending_delivery" | grep -o 'PENDING_DELIVERY_COUNT=[0-9]*' | cut -d= -f2)
-  [[ "${MANAGER_HANDOFF_BACKLOG_COUNT:-0}" =~ ^[0-9]+$ ]] || MANAGER_HANDOFF_BACKLOG_COUNT=0
+  MANAGER_TASK_BACKLOG_COUNT=$(echo "$pending_delivery" | grep -o 'PENDING_DELIVERY_COUNT=[0-9]*' | cut -d= -f2)
+  [[ "${MANAGER_TASK_BACKLOG_COUNT:-0}" =~ ^[0-9]+$ ]] || MANAGER_TASK_BACKLOG_COUNT=0
 
   # Thread history: recent handoff records (all roles, grouped by raw_key)
   local thread_summary
   thread_summary=$(python3 -c "
 import json,subprocess,sys
-hp='$_handoff_py'; db='$_db_path'
+hp='$_a2a_task_py'; db='$_db_path'
 rows=[]
 for role in ['manager','worker']:
     for st in ['completed','consumed']:
@@ -18899,7 +18937,7 @@ for role in ['manager','worker']:
             rows.extend(json.loads(r.stdout))
 rows.sort(key=lambda r: r.get('created_at',''), reverse=True)
 for r in rows[:10]:
-    print(f\"- {r.get('handoff_id','?')[:20]} role={r.get('role','?')} exit={r.get('exit_kind','?')} status={r.get('status','?')} raw_key={r.get('raw_key','?')[:20]} reason={r.get('reason','')[:50]} created={r.get('created_at','')[:19]}\")
+    print(f\"- {r.get('task_id','?')[:20]} role={r.get('agent_id','?')} exit={r.get('exit_kind','?')} status={r.get('state','?')} raw_key={r.get('raw_key','?')[:20]} reason={r.get('reason','')[:50]} created={r.get('created_at','')[:19]}\")
 if not rows:
     print('(无线程历史)')
 " 2>/dev/null || echo "(查询失败)")
@@ -18908,7 +18946,7 @@ if not rows:
   local worker_errors
   worker_errors=$(python3 -c "
 import json,subprocess,sys
-hp='$_handoff_py'; db='$_db_path'
+hp='$_a2a_task_py'; db='$_db_path'
 rows=[]
 for st in ['blocked','rejected']:
     r=subprocess.run([sys.executable,hp,'list','--db',db,'--role','worker','--status',st],
@@ -18918,20 +18956,20 @@ for st in ['blocked','rejected']:
 # Only recent (last 60 min) and not yet consumed by manager
 recent=[r for r in rows if r.get('created_at','') >= '$(date -u -v-60M +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -d \"60 minutes ago\" +%Y-%m-%dT%H:%M:%SZ)' and r.get('consumed_by','') != 'manager']
 for r in recent[:8]:
-    hid=r.get('handoff_id','?')[:25]
-    st=r.get('status','?')
+    tid=r.get('task_id','')[:25]
+    st=r.get('state','?')
     ek=r.get('exit_kind','?')
     reason=r.get('reason','')[:80]
     ts=r.get('created_at','')[:16]
-    print(f'- \`{hid}\` → {ek}: {reason} ({ts})')
-    print(f'  查询: handoff.py show --db .freely/freely.db --handoff-id {hid}')
+    print(f'- \`{tid}\` → {ek}: {reason} ({ts})')
+    print(f'  查询: a2a_task.py get --task-id {tid}')
 if not recent:
     print('(无异常)')
 " 2>/dev/null || echo "(查询失败)")
 
   cat <<EOF
 
-## Handoff 上下文（仅 Manager 可见）
+## A2A Task 上下文（仅 Manager 可见）
 
 ### Worker 汇报（待你处理）
 ${pending_delivery}
@@ -19054,7 +19092,7 @@ cmd_init() {
   write_project_tool_wrapper_scripts "$project"
   write_project_tool_boundary_bootstrap_file "$project"
   register_project_in_registry "$project"
-  rm -f "$(session_state_file "$project")" "$(handoff_file "$project")"
+  rm -f "$(session_state_file "$project")" "$(exit_contract_file "$project")"
   write_workcell_state "$project" "stopped" "down" "down" "initialized"
   # ── Write project .gitignore with template ignore rule ──
   local gitignore="$project/.gitignore"
@@ -19083,9 +19121,8 @@ EOF
     done
   fi
 
-  # Initialize freely.db via daemon (handles all tables)
+  # Initialize freely.db via daemon (handles all tables including a2a_tasks)
   local freely_db=""$project/.freely/freely.db""
-  local handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
   local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
   local daemon_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely_db_manager.py"
 
@@ -19099,10 +19136,7 @@ EOF
       sleep 0.1
     done
   fi
-
-  if [[ -f "$handoff_py" ]]; then
-    python3 "$handoff_py" init --db "$freely_db" >/dev/null 2>&1 || true
-  fi
+  ensure_a2a_server_running "$project"
   ensure_task_mode_gate "$project" "wait"
   log_info "initialized: $(config_file "$project")"
   load_config "$project"
@@ -19493,7 +19527,7 @@ with open(rows_file, "r", encoding="utf-8") as rows:
             path
             for path in (
                 os.path.join(project_root, ".freely", "run", "session-state.env"),
-                os.path.join(project_root, ".freely", "run", "session-handoff.txt"),
+                os.path.join(project_root, ".freely", "run", "session-contract.txt"),
                 os.path.join(project_root, ".freely", "run", "ai.pid"),
                 os.path.join(project_root, ".freely", "run", "supervisor.pid"),
                 os.path.join(project_root, ".freely", "run", "stop.requested"),
@@ -19790,6 +19824,13 @@ stop_project_runtime() {
     rm -f "$_bridge_pid_file"
   fi
   rm -f "$(_acp_bridge_socket "$project")"
+  # Stop A2A Server (Agent-to-Agent protocol)
+  local _a2a_socket
+  _a2a_socket="$(_a2a_socket_path "$project")"
+  if [[ -S "$_a2a_socket" ]]; then
+    python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a/a2a_server.py" \
+      --project "$project" --stop >/dev/null 2>&1 || rm -f "$_a2a_socket"
+  fi
   if [[ "$(role_hint_for_project "$project")" == "manager" ]]; then
     materialize_missing_required_manager_continuity_fallback "$project" "$stop_reason" || true
     if stop_reason_records_manager_operator_boundary "$stop_reason"; then
@@ -19804,7 +19845,7 @@ stop_project_runtime() {
       # Keep session state and bridge alive for resume
       ;;
     *)
-      rm -f "$(session_state_file "$project")" "$(handoff_file "$project")"
+      rm -f "$(session_state_file "$project")" "$(exit_contract_file "$project")"
       if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
         _stop_acp_bridge "$project"
       fi
@@ -20169,12 +20210,12 @@ start_project_runtime() {
     "entrypoint_mode=$entrypoint_mode"
 
   # Initialize SQLite worker delegation store + migrate old exit contracts
-  local _handoff_py _worker_db_path
-  _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
+  local _a2a_task_py _worker_db_path
+  _a2a_task_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db_path=""$project/.freely/freely.db""
-  if [[ -f "$_handoff_py" ]]; then
-    python3 "$_handoff_py" init --db "$_db_path" >/dev/null 2>&1 || true
-    python3 "$_handoff_py" mark-stale --db "$_db_path" --timeout-minutes 30 >/dev/null 2>&1 || true
+  if [[ -f "$_a2a_task_py" ]]; then
+    python3 "$_a2a_task_py" init --db "$_db_path" >/dev/null 2>&1 || true
+    python3 "$_a2a_task_py" mark-stale --db "$_db_path" --timeout-minutes 30 >/dev/null 2>&1 || true
   fi
 
   local sdir run_dir logs_dir sup_pid_file child_pid_file loop_log
@@ -20251,7 +20292,7 @@ start_project_runtime() {
       fi
       LAST_WORKCELL_EXIT_REASON="$(runtime_stop_exit_reason "${LAST_WORKCELL_EXIT_REASON:-}")"
       DESIRED_RUNTIME_STATE_VALUE="stopped"
-      rm -f "$child_pid_file" "$(session_state_file "$project")" "$(handoff_file "$project")"
+      rm -f "$child_pid_file" "$(session_state_file "$project")" "$(exit_contract_file "$project")"
       log_info "received stop signal, exiting supervisor before next ai launch"
       exit 0
     fi
@@ -20485,7 +20526,7 @@ ${_msg}" >/dev/null 2>&1 || true
       continue
     fi
     # FIRST_ROUND guard: continuity-based worker recovery
-    # (manager_runtime_launch_workers_from_latest_handoff) is skipped on the
+    # (manager_runtime_launch_workers_from_latest_task) is skipped on the
     # first cycle because the fleet cache isn't populated until build_prompt
     # runs. Startup recovery created 3+ simultaneous ACP sessions
     # (manager + workers) collapsing the bridge in <60s.
@@ -20615,7 +20656,7 @@ print(ready)
     LAST_DELEGATED_CONTINUATION_CONSUMED_AT="$delegated_consumed_at"
     write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$prompt_file" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$(runtime_read_tool_current_slot "$project" "$AI_TOOL")" "$LAST_SLOT_SWITCH_REASON" "$LAST_SLOT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}" "${AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV:-}" "${AUTO_RECOVERY_ORIGIN_TOOL:-}" "${SESSION_PARENT_ID:-}"
     if [[ "$mode_name" == "fresh" || "$mode_name" == "fresh_with_handoff" ]]; then
-      rm -f "$(handoff_file "$PROJECT_ROOT")"
+      rm -f "$(exit_contract_file "$PROJECT_ROOT")"
     fi
 
     local tool_adapter failure_marker_file="" network_failure_marker_file="" bridge_lost_marker_file=""
@@ -20839,7 +20880,7 @@ print(ready)
     if [[ "$stop_requested" -eq 1 || -f "$(stop_marker_file "$PROJECT_ROOT")" ]]; then
       LAST_WORKCELL_EXIT_REASON="$(runtime_stop_exit_reason "${LAST_WORKCELL_EXIT_REASON:-}")"
       DESIRED_RUNTIME_STATE_VALUE="stopped"
-      rm -f "$child_pid_file" "$(session_state_file "$PROJECT_ROOT")" "$(handoff_file "$PROJECT_ROOT")"
+      rm -f "$child_pid_file" "$(session_state_file "$PROJECT_ROOT")" "$(exit_contract_file "$PROJECT_ROOT")"
       log_info "received stop signal, exiting supervisor"
       exit 0
     fi
@@ -21070,21 +21111,21 @@ print(ready)
     # The AI just saw all send_to_ai=pending/fail messages in its prompt.
     # Update them to success so they won't be re-delivered next cycle.
     if [[ "$exit_contract_action" != "resume_invalid" && "$exit_contract_action" != "" ]]; then
-      _handoff_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/handoff.py"
-      _handoff_db="$PROJECT_ROOT/.freely/freely.db"
-      if [[ -f "$_handoff_py" && -f "$_handoff_db" ]]; then
+      _a2a_task_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
+      _db_path="$PROJECT_ROOT/.freely/freely.db"
+      if [[ -f "$_a2a_task_py" && -f "$_db_path" ]]; then
         python3 -c "
 import json,subprocess,sys
-hp='$_handoff_py'; db='$_handoff_db'
-r=subprocess.run([sys.executable,hp,'list-pending-delivery','--db',db,'--consumed-by','manager'],
+hp='$_a2a_task_py'; db='$_db_path'
+r=subprocess.run([sys.executable,hp,'list-pending-delivery','--db',db],
                  capture_output=True,text=True,timeout=5)
 rows=json.loads(r.stdout) if r.returncode==0 else []
 for row in rows:
-    hid=row.get('handoff_id','')
-    if hid:
-        subprocess.run([sys.executable,hp,'update-send-to-ai','--db',db,'--handoff-id',hid,'--send-to-ai','success'],
+    tid=row.get('task_id','')
+    if tid:
+        subprocess.run([sys.executable,hp,'update-send-to-ai','--db',db,'--task-id',tid,'--send-to-ai','success'],
                        capture_output=True,timeout=5)
-print(f'send_to_ai=success updated={len(rows)}', flush=True)
+print(f'delivery_status=delivered updated={len(rows)}', flush=True)
 " >/dev/null 2>&1 || true
       fi
     fi
@@ -21237,7 +21278,7 @@ cmd_new_session() {
     log_info "session state cleared: $state_file"
   fi
   # Also clear handoff and continuity files
-  rm -f "$(handoff_file "$project")" 2>/dev/null || true
+  rm -f "$(exit_contract_file "$project")" 2>/dev/null || true
   # contract cleanup deprecated
   # Write force-fresh marker so select_launch_kind skips JSONL fallback
   mkdir -p "$(dirname "$state_file")"
@@ -21603,7 +21644,7 @@ Mandatory restore anchors:
 $anchor_lines
 Auxiliary artifacts intentionally not required:
 - $(session_state_file "$project")
-- $(handoff_file "$project")
+- $(exit_contract_file "$project")
 - $(run_dir_for_project "$project")/ai.pid
 - $(run_dir_for_project "$project")/supervisor.pid
 EOF
@@ -22731,7 +22772,7 @@ cmd_live_status() {
   scan_summary_top_refs="none"
   IFS='|' read -r scan_summary_state scan_summary_generated_at scan_summary_reason scan_summary_surface_counts scan_summary_top_refs <<<"$(task_source_scan_status_summary_for_project "$project" || true)"
   IFS='|' read -r blocked_supervision_state blocked_supervision_reason blocked_supervision_summary blocked_supervision_artifact <<<"$(blocked_supervision_snapshot_for_project "$project" || true)"
-  IFS='|' read -r manager_handoff_state manager_handoff_reason manager_handoff_expected manager_handoff_latest_generated manager_handoff_prompt_file manager_handoff_writer manager_handoff_summary <<<"$(manager_handoff_snapshot_for_project "$project" || true)"
+  IFS='|' read -r manager_handoff_state manager_handoff_reason manager_handoff_expected manager_handoff_latest_generated manager_handoff_prompt_file manager_handoff_writer manager_handoff_summary <<<"$(manager_session_snapshot_for_project "$project" || true)"
   IFS='|' read -r manager_continuity_gap_state manager_continuity_gap_reason manager_continuity_gap_expected manager_continuity_gap_latest_generated manager_continuity_gap_prompt_file manager_continuity_gap_age_secs manager_continuity_gap_age_state manager_continuity_gap_summary <<<"$(manager_continuity_gap_snapshot_for_project "$project" || true)"
   manager_continuity_gap_writer_state="none"
   if [[ "$manager_continuity_gap_state" == "active" ]]; then
@@ -23119,7 +23160,7 @@ cmd_fleet_status() {
       fi
       IFS='|' read -r blocked_supervision_state blocked_supervision_reason blocked_supervision_summary blocked_supervision_artifact <<<"$(blocked_supervision_snapshot_for_project "$wt_path")"
       local manager_handoff_state manager_handoff_reason manager_handoff_expected manager_handoff_latest_generated manager_handoff_prompt_file manager_handoff_writer manager_handoff_summary
-      IFS='|' read -r manager_handoff_state manager_handoff_reason manager_handoff_expected manager_handoff_latest_generated manager_handoff_prompt_file manager_handoff_writer manager_handoff_summary <<<"$(manager_handoff_snapshot_for_project "$wt_path")"
+      IFS='|' read -r manager_handoff_state manager_handoff_reason manager_handoff_expected manager_handoff_latest_generated manager_handoff_prompt_file manager_handoff_writer manager_handoff_summary <<<"$(manager_session_snapshot_for_project "$wt_path")"
       IFS='|' read -r manager_continuity_gap_state manager_continuity_gap_reason manager_continuity_gap_expected manager_continuity_gap_latest_generated manager_continuity_gap_prompt_file manager_continuity_gap_age_secs manager_continuity_gap_age_state manager_continuity_gap_summary <<<"$(manager_continuity_gap_snapshot_for_project "$wt_path")"
       develop_push_snapshot="$(develop_push_followthrough_snapshot_for_project "$wt_path")"
       IFS='|' read -r develop_push_state develop_push_summary _ _ _ _ _ _ _ _ _ develop_push_urgency develop_push_resync_required <<<"$develop_push_snapshot"

@@ -225,4 +225,4 @@ http_status: 500 Internal Server Error
 ## 参考
 
 - [A2A Task State Machine](https://github.com/A2A-Specification/A2A)
-- [Freely Handoff 机制](./handoff.md)
+- [A2A Task 机制](./protocol-design.md)

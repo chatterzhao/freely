@@ -1,14 +1,10 @@
 #!/usr/bin/env python3
-"""a2a_client.py - A2A Client (Manager 端)
+"""a2a_client.py — A2A Protocol Client
 
-实现 A2A 协议的客户端，用于 Freely Manager Agent。
+A2A client for Manager-to-Worker communication. Uses standard A2A types.
+Aligns with JiuwenSwarm's A2A Client pattern.
 
-功能：
-- 能力发现 (discoverAgent)
-- Task 创建和状态监控
-- 与 Freely Handoff 机制集成
-
-A2A 协议规范: https://github.com/A2A-Specification/A2A
+A2A Spec: https://github.com/A2A-Specification/A2A
 """
 
 import argparse

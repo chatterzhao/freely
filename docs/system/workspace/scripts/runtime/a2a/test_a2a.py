@@ -1,384 +1,283 @@
 #!/usr/bin/env python3
-"""test_a2a.py - A2A 协议测试脚本
+"""test_a2a.py — A2A protocol unit tests
 
-测试 A2A Server/Client 实现的功能：
-- T1: Agent Card 发现
-- T2: exit_kind 状态映射
-- T3: Task CRUD 操作
-- T4: Handoff fallback
-- T5: SSE 实时推送
-- T6: 能力协商
+Tests cover:
+  T1: Parser (state-based, alias handling)
+  T2: Registry (register/discover/heartbeat)
+  T3: Types (official SDK + custom)
+  T4: Client (transport selection, discovery)
+  T5: Server setup (routes, executor)
 
-运行方式:
-  # 启动 A2A Server (Worker 端)
-  python3 docs/system/workspace/scripts/runtime/a2a/a2a_server.py --project /path/to/project --start
-
-  # 运行测试 (Manager 端)
-  python3 docs/system/workspace/scripts/runtime/a2a/test_a2a.py --project /path/to/project
+Usage:
+  python3 docs/system/workspace/scripts/runtime/a2a/test_a2a.py
 """
 
-import argparse
 import os
 import sys
-import time
 import json
+import time
+import threading
+from dataclasses import asdict
 
-# 添加 runtime 目录到 path
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 RUNTIME_DIR = os.path.dirname(SCRIPT_DIR)
 sys.path.insert(0, RUNTIME_DIR)
+sys.path.insert(0, SCRIPT_DIR)
 
-from a2a.a2a_client import A2AClient, TaskState
-from a2a.a2a_server import EXIT_KIND_TO_TASK_STATE
-
-
-# ── 测试结果收集 ───────────────────────────────────────────────────────────
+# ── Test runner ──────────────────────────────────────────────────────────
 
 class TestResult:
     def __init__(self, name: str):
         self.name = name
         self.passed = False
         self.error = ""
-        self.start_time = 0
-        self.end_time = 0
-
-    def start(self):
-        self.start_time = time.time()
-
-    def end(self, passed: bool, error: str = ""):
-        self.end_time = time.time()
-        self.passed = passed
-        self.error = error
-
-    def duration(self) -> float:
-        return self.end_time - self.start_time
-
-
-# ── 测试用例 ───────────────────────────────────────────────────────────────
-
-def test_agent_card_discovery(project: str) -> TestResult:
-    """T1: Agent Card 发现"""
-    result = TestResult("T1: Agent Card Discovery")
-    result.start()
-
-    try:
-        client = A2AClient(project)
-        card = client.discover_agent()
-
-        if not card:
-            result.end(False, "No Agent Card found")
-            return result
-
-        # 验证 Agent Card 字段
-        required_fields = ["name", "description", "url", "version", "capabilities", "skills"]
-        for field in required_fields:
-            if not hasattr(card, field) or not getattr(card, field):
-                result.end(False, f"Missing or empty field: {field}")
-                return result
-
-        # 验证 freely 扩展
-        if not card.freely:
-            result.end(False, "Missing freely extension")
-            return result
-
-        if "agentType" not in card.freely:
-            result.end(False, "Missing freely.agentType")
-            return result
-
-        if card.freely["agentType"] != "worker":
-            result.end(False, f"Expected agentType=worker, got {card.freely['agentType']}")
-            return result
-
-        # 验证 skills
-        if not card.skills:
-            result.end(False, "No skills found")
-            return result
-
-        print(f"  ✓ Agent Card: {card.name} v{card.version}")
-        print(f"  ✓ Skills: {[s['id'] for s in card.skills]}")
-        print(f"  ✓ Freely extension: {card.freely.get('agentType')}")
-
-        result.end(True)
-        return result
-
-    except Exception as e:
-        result.end(False, str(e))
-        return result
-
-
-def test_exit_kind_mapping() -> TestResult:
-    """T2: exit_kind → Task State 映射"""
-    result = TestResult("T2: exit_kind Mapping")
-    result.start()
-
-    try:
-        # 验证映射表
-        expected_mappings = {
-            'manager_working': TaskState.SUBMITTED,
-            'worker_working': TaskState.WORKING,
-            'worker_done': TaskState.COMPLETED,
-            'worker_blocked': TaskState.INPUT_REQUIRED,
-            'worker_handoff_needed': TaskState.PENDING_INPUT,
-            'delegate_workers': TaskState.SUBMITTED,
-            'resume_manager': TaskState.COMPLETED,
-            'stop_ai': TaskState.FAILED,
-        }
-
-        for exit_kind, expected_state in expected_mappings.items():
-            actual_state = EXIT_KIND_TO_TASK_STATE.get(exit_kind)
-            if actual_state != expected_state:
-                result.end(False, f"Mismatch: {exit_kind} -> {actual_state} (expected {expected_state})")
-                return result
-
-        print(f"  ✓ All {len(expected_mappings)} exit_kind mappings verified")
-
-        result.end(True)
-        return result
-
-    except Exception as e:
-        result.end(False, str(e))
-        return result
-
-
-def test_task_crud(project: str) -> TestResult:
-    """T3: Task CRUD 操作"""
-    result = TestResult("T3: Task CRUD")
-    result.start()
-
-    try:
-        client = A2AClient(project)
-
-        # Create
-        task = client.create_task(
-            skill="freely-fix-execution",
-            prompt_file="docs/issues/test/issue.md",
-            worktree="/path/to/worktree",
-            branch="feature/test",
-            reason="Test task creation",
-            session_id="test-session-001",
-        )
-
-        if not task:
-            result.end(False, "Task creation failed")
-            return result
-
-        task_id = task.id
-        print(f"  ✓ Task created: {task_id}")
-
-        # Read
-        retrieved = client.get_task(task_id)
-        if not retrieved or retrieved.id != task_id:
-            result.end(False, "Task retrieval failed")
-            return result
-        print(f"  ✓ Task retrieved: {retrieved.state}")
-
-        # Update
-        updated = client.update_task(
-            task_id=task_id,
-            exit_kind="worker_working",
-            progress="Processing test task...",
-            next_action="Continue execution",
-        )
-
-        if not updated or updated.state != TaskState.WORKING.value:
-            result.end(False, f"Task update failed, state: {updated.state if updated else 'None'}")
-            return result
-        print(f"  ✓ Task updated: {updated.state}")
-
-        # Complete
-        completed = client.update_task(
-            task_id=task_id,
-            exit_kind="worker_done",
-            completion_summary="Test task completed successfully",
-            evidence_paths="docs/progress/test/evidence.md",
-            next_action="Ready for next task",
-        )
-
-        if not completed or completed.state != TaskState.COMPLETED.value:
-            result.end(False, f"Task completion failed, state: {completed.state if completed else 'None'}")
-            return result
-        print(f"  ✓ Task completed: {completed.state}")
-
-        result.end(True)
-        return result
-
-    except Exception as e:
-        result.end(False, str(e))
-        return result
-
-
-def test_capability_check(project: str) -> TestResult:
-    """T4: 能力协商 (Capability Check via Agent Card)"""
-    result = TestResult("T4: Capability Check")
-    result.start()
-
-    try:
-        client = A2AClient(project)
-
-        # 通过 Agent Card 发现能力
-        card = client.discover_agent()
-        if not card:
-            result.end(False, "No Agent Card found")
-            return result
-
-        # 验证 freely 扩展
-        if not card.freely:
-            result.end(False, "Missing freely extension")
-            return result
-
-        # 验证支持的 skills
-        supported_skills = card.freely.get("supportedSkills", [])
-        if not supported_skills:
-            result.end(False, "No skills found in freely extension")
-            return result
-
-        expected_skills = [
-            "freely-fix-execution",
-            "freely-feat-execution",
-            "freely-doc-B1_IBM-execution",
-            "freely-doc-B2_IBM-execution",
-        ]
-
-        for skill in expected_skills:
-            if skill in supported_skills:
-                print(f"  ✓ Worker supports: {skill}")
-            else:
-                print(f"  - Worker does not support: {skill}")
-
-        result.end(True)
-        return result
-
-    except Exception as e:
-        result.end(False, str(e))
-        return result
-
-
-def test_task_wait_for_completion(project: str) -> TestResult:
-    """T5: 等待 Task 完成"""
-    result = TestResult("T5: Wait for Completion")
-    result.start()
-
-    try:
-        client = A2AClient(project)
-
-        # 创建 Task
-        task = client.create_task(
-            skill="freely-fix-execution",
-            reason="Test wait for completion",
-        )
-
-        if not task:
-            result.end(False, "Task creation failed")
-            return result
-
-        print(f"  ✓ Task created: {task.id}")
-
-        # 等待 Task 完成 (或超时)
-        completed = client.wait_for_completion(task.id, timeout=5)
-        if completed:
-            print(f"  ✓ Task completed: {completed.state}")
-
-        result.end(True)
-        return result
-
-    except Exception as e:
-        result.end(False, str(e))
-        return result
-
-
-# ── 主测试运行器 ───────────────────────────────────────────────────────────
-
-def run_all_tests(project: str) -> dict:
-    """运行所有测试"""
-    tests = [
-        ("T1", "Agent Card Discovery", lambda: test_agent_card_discovery(project)),
-        ("T2", "exit_kind Mapping", test_exit_kind_mapping),
-        ("T3", "Task CRUD", lambda: test_task_crud(project)),
-        ("T4", "Capability Check", lambda: test_capability_check(project)),
-        ("T5", "Wait for Completion", lambda: test_task_wait_for_completion(project)),
-    ]
-
-    results = {}
-    passed = 0
-    failed = 0
-
-    print("\n" + "=" * 60)
-    print("A2A Protocol Test Suite")
-    print("=" * 60)
-    print(f"Project: {project}")
-    print(f"Time: {time.strftime('%Y-%m-%d %H:%M:%S')}")
-    print("=" * 60 + "\n")
-
-    for test_id, test_name, test_func in tests:
-        print(f"[{test_id}] {test_name}")
-        print("-" * 40)
-        result = test_func()
-        results[test_id] = result
-
-        if result.passed:
-            print(f"  PASSED ({result.duration():.3f}s)")
-            passed += 1
-        else:
-            print(f"  FAILED: {result.error} ({result.duration():.3f}s)")
-            failed += 1
-
-        print()
-
-    # 汇总
-    print("=" * 60)
-    print(f"Results: {passed} passed, {failed} failed, {len(tests)} total")
-    print("=" * 60)
-
-    return {
-        "passed": passed,
-        "failed": failed,
-        "total": len(tests),
-        "results": {k: {"passed": v.passed, "error": v.error} for k, v in results.items()},
-    }
 
+passed = 0
+failed = 0
+
+def test(name):
+    def decorator(fn):
+        def wrapper():
+            global passed, failed
+            try:
+                fn()
+                print(f"  ✅ {name}")
+                passed += 1
+            except Exception as e:
+                print(f"  ❌ {name}: {e}")
+                global failed_count
+                failed += 1
+        return wrapper
+    return decorator
+
+
+# ── T1: Parser ───────────────────────────────────────────────────────────
+
+@test("Parser: validates all 6 A2A states")
+def test_parser_states():
+    from a2a_task_parser import VALID_STATES, extract_task_state
+    assert 'submitted' in VALID_STATES
+    assert 'working' in VALID_STATES
+    assert 'completed' in VALID_STATES
+    assert 'failed' in VALID_STATES
+    assert 'input-required' in VALID_STATES
+    assert 'pending-input' in VALID_STATES
+    r = extract_task_state('```json\n{"state":"completed","summary":"done"}\n```')
+    assert r['ok'] and r['state'] == 'completed'
+
+@test("Parser: validates required summary field")
+def test_parser_required():
+    from a2a_task_parser import extract_task_state
+    r = extract_task_state('```json\n{"state":"completed"}\n```')
+    assert not r['ok']
+
+@test("Parser: rejects invalid state")
+def test_parser_invalid():
+    from a2a_task_parser import extract_task_state
+    r = extract_task_state('```json\n{"state":"invalid"}\n```')
+    assert not r['ok']
+
+@test("Parser: natural language aliases")
+def test_parser_aliases():
+    from a2a_task_parser import normalize_state
+    assert normalize_state('done') == 'completed'
+    assert normalize_state('delegate') == 'submitted'
+    assert normalize_state('blocked') == 'input-required'
+    assert normalize_state('stopped') == 'failed'
+    assert normalize_state('handoff') == 'pending-input'
+    # Valid states pass through
+    assert normalize_state('working') == 'working'
+    assert normalize_state('completed') == 'completed'
+
+@test("Parser: no exit_kind legacy")
+def test_parser_no_exit_kind():
+    import a2a_task_parser
+    assert not hasattr(a2a_task_parser, 'VALID_EXIT_KINDS')
+    assert not hasattr(a2a_task_parser, 'EXIT_KIND_ALIASES')
+
+
+# ── T2: Registry ─────────────────────────────────────────────────────────
+
+@test("Registry: register and discover")
+def test_registry_basic():
+    from a2a_registry import AgentRegistry
+    reg = AgentRegistry()
+    reg.register("http://host1:19100", "worker", worktree="/tmp/wt1")
+    reg.register("http://host2:19100", "manager")
+    workers = reg.discover(role="worker")
+    assert len(workers) == 1
+    assert workers[0].endpoint == "http://host1:19100"
+    assert workers[0].worktree == "/tmp/wt1"
+
+@test("Registry: heartbeat and cleanup")
+def test_registry_heartbeat():
+    from a2a_registry import AgentRegistry
+    reg = AgentRegistry()
+    reg.register("http://host1:19100", "worker", ttl=1)
+    time.sleep(0.1)
+    assert reg.heartbeat("http://host1:19100")
+    n = reg.cleanup_expired()
+    assert n == 0  # heartbeat refreshed
+
+@test("Registry: deregister")
+def test_registry_deregister():
+    from a2a_registry import AgentRegistry
+    reg = AgentRegistry()
+    reg.register("http://host1:19100", "worker")
+    assert reg.deregister("http://host1:19100")
+    assert len(reg.discover()) == 0
+
+@test("Registry: discover by skill")
+def test_registry_skill():
+    from a2a_registry import AgentRegistry
+    reg = AgentRegistry()
+    reg.register("http://a:19100", "worker", skills=["freely-fix-execution"])
+    reg.register("http://b:19100", "worker", skills=["freely-feat-execution"])
+    results = reg.discover(skill="freely-fix-execution")
+    assert len(results) == 1
+    assert results[0].endpoint == "http://a:19100"
+
+
+# ── T3: Types ────────────────────────────────────────────────────────────
+
+@test("Types: official SDK types available")
+def test_official_types():
+    from a2a.types import (
+        Task, TaskState, Message, Part, Artifact,
+        AgentCard, AgentSkill, AgentCapabilities, AgentInterface,
+        TaskStatusUpdateEvent, TaskArtifactUpdateEvent,
+    )
+    card = AgentCard(
+        name="Test", description="Test agent",
+        capabilities=AgentCapabilities(streaming=True),
+        skills=[AgentSkill(id="test", name="Test")],
+    )
+    assert hasattr(card, 'name')
+    assert hasattr(card, 'capabilities')
+
+@test("Types: custom types compatible")
+def test_custom_types():
+    import a2a_types
+    assert len(a2a_types.FREELY_SKILLS) == 7
+    assert a2a_types.TaskState.SUBMITTED == 'submitted'
+    event = a2a_types.TaskStatusUpdateEvent(
+        task_id="t1",
+        status=a2a_types.TaskStatus(state="completed"),
+    )
+    assert hasattr(event, 'task_id')
+
+
+# ── T4: Client ───────────────────────────────────────────────────────────
+
+@test("Client: local unix transport")
+def test_client_local():
+    from a2a_task import A2AClient
+    c = A2AClient(project="/tmp/test")
+    assert c._endpoint.startswith("unix://")
+
+@test("Client: remote http transport")
+def test_client_remote():
+    from a2a_task import A2AClient
+    c = A2AClient(url="http://192.168.1.100:19100")
+    assert c._endpoint == "http://192.168.1.100:19100"
+
+@test("Client: agent discovery")
+def test_client_discovery():
+    from a2a_task import A2AClient
+    c = A2AClient(project="/tmp/test")
+    endpoints = c.discover_agents()
+    assert isinstance(endpoints, list)
+
+@test("Client: connect to agents")
+def test_client_connect():
+    from a2a_task import A2AClient
+    c = A2AClient(project="/tmp/test")
+    remote = c.connect("http://other:19100")
+    assert remote._url == "http://other:19100"
+    local = c.connect("unix:///tmp/test.sock")
+    assert local._socket_path == "/tmp/test.sock"
+
+@test("Client: all 21 public API functions")
+def test_client_api():
+    import a2a_task
+    for fn in ['create_task','get_task','update_task','delete_task','list_tasks',
+        'list_by_raw_key','list_by_worktree','list_active','list_active_workers',
+        'latest_manager','update_message','process_ai_reply','read_state_only',
+        'pending_delivery','mark_delivered','set_worker_pid','launched_pids',
+        'mark_stale','update_delivery_status','update_worker_pid','get_launched_pids']:
+        assert hasattr(a2a_task, fn), f'Missing: {fn}'
+        assert callable(getattr(a2a_task, fn)), f'Not callable: {fn}'
+
+
+# ── T5: Server ───────────────────────────────────────────────────────────
+
+@test("Server: routes are complete")
+def test_server_routes():
+    import os
+    os.environ['A2A_LISTEN_MODE'] = 'unix'
+    from a2a_server import A2AServer
+    srv = A2AServer(project="/tmp/test", socket_path="/tmp/test.sock")
+    app = srv._build_app()
+    paths = []
+    for route in app.routes:
+        if hasattr(route, 'path'):
+            paths.append(route.path)
+    required = ['/', '/.well-known/agent.json', '/tasks', '/tasks/{task_id:path}',
+                '/tasks/latest-manager', '/tasks/pending-delivery', '/tasks/launched-pids']
+    for p in required:
+        assert p in paths, f'Missing: {p}'
+
+@test("Server: AgentCard has skills")
+def test_server_agentcard():
+    import os
+    os.environ['A2A_LISTEN_MODE'] = 'unix'
+    from a2a_server import _build_agent_card
+    card = _build_agent_card("/tmp/test")
+    assert len(card.skills) == 7
+    skill_ids = [s.id for s in card.skills]
+    assert 'freely-fix-execution' in skill_ids
+    assert card.capabilities.streaming == True
+
+@test("Server: dual transport config")
+def test_server_dual():
+    import os
+    os.environ['A2A_LISTEN_MODE'] = 'both'
+    from a2a_server import A2AServer
+    srv = A2AServer(project="/tmp/test", socket_path="/tmp/test.sock",
+                    tcp_host="127.0.0.1", tcp_port=19101)
+    assert srv.listen_mode == 'both'
+    assert srv.tcp_host == '127.0.0.1'
+    assert srv.tcp_port == 19101
+
+@test("Server: async executor")
+def test_server_executor():
+    import inspect
+    from a2a_server import FreelyAgentExecutor
+    assert inspect.iscoroutinefunction(FreelyAgentExecutor.execute)
+    assert inspect.iscoroutinefunction(FreelyAgentExecutor.cancel)
+
+@test("Server: SQLiteTaskStore inherits SDK")
+def test_server_store():
+    from a2a.server.tasks import TaskStore as SDKStore
+    from a2a_server import SQLiteTaskStore
+    assert issubclass(SQLiteTaskStore, SDKStore)
+
+
+# ── Main ─────────────────────────────────────────────────────────────────
 
 def main():
-    parser = argparse.ArgumentParser(description="A2A Protocol Test Suite")
-    parser.add_argument("--project", required=True, help="Freely 项目路径")
-    parser.add_argument("--test", help="运行单个测试 (T1-T6)")
-    parser.add_argument("--output", help="输出 JSON 结果到文件")
-    args = parser.parse_args()
+    global passed, failed
+    print("=== A2A Protocol Tests ===\n")
 
-    project = args.project
+    # Run all tests
+    for name, fn in sorted(globals().items()):
+        if name.startswith('test_') and callable(fn):
+            fn()
 
-    if args.test:
-        # 运行单个测试
-        test_map = {
-            "T1": lambda: test_agent_card_discovery(project),
-            "T2": test_exit_kind_mapping,
-            "T3": lambda: test_task_crud(project),
-            "T4": lambda: test_capability_check(project),
-            "T5": lambda: test_task_wait_for_completion(project),
-            "T6": lambda: test_handoff_fallback(project),
-        }
-
-        if args.test in test_map:
-            result = test_map[args.test]()
-            print(f"{args.test}: {'PASSED' if result.passed else 'FAILED'}")
-            if not result.passed:
-                print(f"  Error: {result.error}")
-                sys.exit(1)
-        else:
-            print(f"Unknown test: {args.test}")
-            print(f"Available: {list(test_map.keys())}")
-            sys.exit(1)
-    else:
-        # 运行所有测试
-        results = run_all_tests(project)
-
-        if args.output:
-            with open(args.output, "w") as f:
-                json.dump(results, f, indent=2)
-            print(f"\nResults saved to: {args.output}")
-
-        # 返回退出码
-        sys.exit(0 if results["failed"] == 0 else 1)
+    total = passed + failed
+    print(f"\n=== Results: {passed}/{total} passed ===")
+    return 0 if failed == 0 else 1
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

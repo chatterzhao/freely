@@ -384,17 +384,17 @@ if [[ ${#remotes[@]} -gt 0 ]]; then
   done
 fi
 
-# ── Phase 5: Consume handoffs then remove worktree ──
+# ── Phase 5: Consume A2A tasks then remove worktree ──
 
-# Extract raw_key from branch and auto-consume all terminal worker handoffs.
-# Worker handoffs should remain visible (completed/blocked) until wt-close,
+# Extract raw_key from branch and auto-consume all terminal worker tasks.
+# Worker tasks should remain visible (completed/blocked) until wt-close,
 # so the manager can read and process them before the worktree is retired.
-_handoff_py="$ROOT_DIR/docs/system/workspace/scripts/runtime/handoff.py"
-_handoff_db="$ROOT_DIR/.freely/freely.db"
+_a2a_task_py="$ROOT_DIR/docs/system/workspace/scripts/runtime/a2a_task.py"
+_db_path="$ROOT_DIR/.freely/freely.db"
 _raw_key="$(echo "$branch" | grep -oE '[0-9]{8}T[0-9]{4,6}Z' | head -1 || true)"
-if [[ -n "$_raw_key" && -f "$_handoff_py" && -f "$_handoff_db" ]]; then
-  _consumed=$(python3 "$_handoff_py" auto-consume --db "$_handoff_db" --raw-key "$_raw_key" 2>/dev/null || true)
-  echo "wt-close: consumed ${_consumed:-0} handoffs for $_raw_key"
+if [[ -n "$_raw_key" && -f "$_a2a_task_py" && -f "$_db_path" ]]; then
+  _consumed=$(python3 "$_a2a_task_py" auto-consume --db "$_db_path" --raw-key "$_raw_key" 2>/dev/null || true)
+  echo "wt-close: consumed ${_consumed:-0} tasks for $_raw_key"
 fi
 
 if [[ -n "$wt_path" ]]; then
