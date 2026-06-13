@@ -106,10 +106,11 @@ while read -r old_oid new_oid refname; do
 [HOOK] Branch creation blocked: '$branch_name'
 
   fix/feature/hotfix/test-pre-merge 分支禁止手动创建。
-  唯一入口: wt-create
+  完整开发流程（详见 AGENTS.md §核心开发流程）：
 
-  用法: ./bin/wt-create --raw-key <key> --source <platform|chat-inbox|local> \\
-    --skill <freely-fix-execution|freely-feat-execution> --slug <slug>
+  阶段2: 创建 raw issue → ./bin/freely feedback --repo <user/repo> --title '...' --body '...'
+  阶段3: 创建工位   → ./bin/wt-create --raw-key <key> --source <platform|chat-inbox|local> \\
+                          --skill <freely-fix-execution|freely-feat-execution> --slug <slug>
 
 MSG
         exit 1
