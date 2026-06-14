@@ -14343,15 +14343,20 @@ python3 docs/system/workspace/scripts/runtime/a2a_task.py list --db .freely/free
 python3 docs/system/workspace/scripts/runtime/a2a_task.py list --db .freely/freely.db --role worker --status completed
 ```
 
-回复末尾输出 A2A Task 状态 JSON（格式见 manager-agent.md）：
-
-```json
-{
-  "state": "submitted",
-  "summary": "...",
-  "workers": "..."
-}
+**本轮结束时必须调用 a2a-exit 工具声明状态（不再通过文本 JSON block）：**
 ```
+python3 docs/system/workspace/scripts/runtime/a2a_task.py a2a-exit \
+  --state submitted|completed|failed \
+  --summary "本轮做了什么" \
+  --workers "worker-prompt.csv路径（委派时填写）" \
+  --next "下一步建议"
+```
+
+示例 — 委派 Worker:
+  a2a-exit --state submitted --summary "created 3 workers" --workers ".freely/run/worker-prompts/w1.txt,..."
+
+示例 — 分析完成无事可做:
+  a2a-exit --state completed --summary "no actionable items, scan stale"
 EOF
 }
 
@@ -14361,14 +14366,13 @@ append_worker_exit_contract_directive_if_needed() {
 
   cat <<'EOF'
 
-回复末尾输出 A2A Task 状态 JSON（格式见 worker-agent.md）：
-
-```json
-{
-  "state": "completed",
-  "summary": "...",
-  "evidence": "..."
-}
+**本轮结束时必须调用 a2a-exit 工具声明状态：**
+```
+python3 docs/system/workspace/scripts/runtime/a2a_task.py a2a-exit \
+  --state completed|working|input-required|pending-input \
+  --summary "完成了什么" \
+  --evidence "证据路径" \
+  --next "下一步建议"
 ```
 EOF
 }
@@ -14377,16 +14381,52 @@ sync_exit_contract_to_a2a_tasks() {
   return 0
 }
 
-# parse_a2a_task_json_reply: extract ```json (handoff 内容) JSON from AI cycle log, parse via a2a_task.py, dispatch consume_*.
+# parse_a2a_task_json_reply: extract A2A Task state from AI cycle.
+# Primary path (post-A2A refactoring): read state from A2A Task created by a2a-exit tool.
+# Fallback: parse ```json block from AI reply text.
 # Returns: "ok:<exit_kind>" on success, "repair:<errors_json>" on failure.
-# Side effects: INSERTs handoff record + dispatches consume_* (all inside a2a_task.py parse).
 parse_a2a_task_json_reply() {
   local project="$1" cycle_log="$2" role="$3" raw_key="$4" prompt_file="$5"
   local _a2a_task_py _db_path _reply_text _result _action _exit_kind
   _a2a_task_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db_path="$project/.freely/freely.db"
   [[ -f "$_a2a_task_py" && -f "$_db_path" ]] || { printf 'repair:["a2a_task_py_or_db_missing"]\n'; return 1; }
-  # Extract tail of cycle log (handoff JSON is at end of AI reply)
+
+  # ── Primary path: read A2A state from latest task (created by a2a-exit tool) ──
+  if [[ "$role" == "manager" ]]; then
+    _result=$(python3 "$_a2a_task_py" latest-manager --db "$_db_path" 2>/dev/null || true)
+  else
+    _result=$(python3 "$_a2a_task_py" list --db "$_db_path" --role worker --status completed 2>/dev/null | python3 -c "import json,sys; rows=json.load(sys.stdin); print(json.dumps(rows[0]) if rows else '{}')" 2>/dev/null || echo "{}")
+  fi
+  _action=$(echo "$_result" | python3 -c "import json,sys; r=json.load(sys.stdin); print(r.get('state',''))" 2>/dev/null || echo "")
+  if [[ -n "$_action" && "$_action" != "null" ]]; then
+    # Found A2A state from tool call — translate to exit_kind and return
+    _workers_field=$(echo "$_result" | python3 -c "import json,sys; r=json.load(sys.stdin); print(r.get('worker_prompts_csv',''))" 2>/dev/null || echo "")
+    case "$_action" in
+      submitted)
+        if [[ -n "$_workers_field" && "$_workers_field" != "null" ]]; then
+          _exit_kind="delegate_workers"
+        else
+          _exit_kind="resume_manager"
+        fi ;;
+      completed)
+        if [[ "$role" == "worker" ]]; then _exit_kind="worker_done"
+        else _exit_kind="resume_manager"; fi ;;
+      failed)   _exit_kind="stop_ai" ;;
+      working)
+        if [[ "$role" == "worker" ]]; then _exit_kind="worker_working"
+        else _exit_kind="manager_working"; fi ;;
+      input-required|pending-input)
+        if [[ "$role" == "worker" ]]; then _exit_kind="worker_blocked"
+        else _exit_kind="resume_manager"; fi ;;
+      *)        _exit_kind="resume_manager" ;;
+    esac
+    append_runtime_event "$project" "a2a_exit_tool_state_read" "state=$_action" "exit_kind=$_exit_kind"
+    printf 'ok:%s\n' "$_exit_kind"
+    return 0
+  fi
+
+  # ── Fallback: extract JSON block from AI reply text ──
   if [[ -n "$cycle_log" && -f "$cycle_log" ]]; then
     _reply_text="$(tail -c 32768 "$cycle_log" 2>/dev/null || true)"
   else
