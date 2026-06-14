@@ -1,15 +1,23 @@
 #!/usr/bin/env python3
-"""acp-bridge.py: Persistent relay between claude-agent-acp and monitor clients.
+"""acp-bridge.py — ACP Bridge entry point.
 
-Keeps claude-agent-acp alive across AI cycles. Each monitor invocation
-connects via Unix socket, sends JSON-RPC, receives response, disconnects.
-The bridge keeps the server process alive for session persistence.
-
-Usage:
-  acp-bridge.py start --project <path> [--acp-bin <path>] [--log-file <path>]
-  acp-bridge.py stop --project <path>
-  acp-bridge.py status --project <path>
+Routes to acp_bridge_v2.py (SDK-based) by default.
+Set FREELY_ACP_USE_SDK=0 to use the legacy hand-rolled JSON-RPC implementation.
+Set FREELY_ACP_LEGACY_FALLBACK=1 to force legacy mode (same as USE_SDK=0).
 """
+
+import os, sys
+
+_use_legacy = os.environ.get("FREELY_ACP_LEGACY_FALLBACK", "0") == "1" or               os.environ.get("FREELY_ACP_USE_SDK", "1") == "0"
+
+if not _use_legacy:
+    try:
+        from acp import Agent  # noqa: check SDK availability
+        _v2_path = os.path.join(os.path.dirname(__file__), "acp_bridge_v2.py")
+        if os.path.exists(_v2_path):
+            os.execv(sys.executable, [sys.executable, _v2_path] + sys.argv[1:])
+    except ImportError:
+        print("[acp-bridge] agent-client-protocol SDK not available, falling back to legacy", file=sys.stderr)
 
 import argparse
 import json
