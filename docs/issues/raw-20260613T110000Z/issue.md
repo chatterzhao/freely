@@ -1,9 +1,9 @@
 ---
 local_id: raw-20260613T110000Z
 kind: raw
-phase_state: dropped
-absorbed_into: ''
-absorbed_at: ''
+phase_state: absorbed
+absorbed_into: raw-20260614T103101Z
+absorbed_at: '2026-06-14T00:00:00Z'
 platform_ids: {}
 primary_platform: local
 canonical_issue_path: ''
