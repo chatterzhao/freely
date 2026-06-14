@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260613T110000Z
 kind: raw
-phase_state: dropped
+phase_state: absorbed
 absorbed_into: ''
 absorbed_at: ''
 platform_ids: {}
