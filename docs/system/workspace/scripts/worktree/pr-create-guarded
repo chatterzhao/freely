@@ -91,13 +91,31 @@ _platform_configs() {
   if [[ -n "$configured" ]]; then
     printf '%s\n' "$configured" | tr ',' '\n'
   else
-    # Auto-detect: check for github/gitee remotes
-    git remote | grep -q '^github$' && echo "github"
-    git remote | grep -q '^gitee$' && echo "gitee"
-    # If nothing detected, use origin
-    local count
-    count=$(git remote | grep -c -v '^all$' || true)
-    if [[ "${count:-0}" == "1" ]]; then
+    # Auto-detect: check remote URLs to identify platforms.
+    # Uses URL matching so any remote name (origin, upstream, etc.) works.
+    # Also keeps name-based detection for backward compatibility.
+    local found_github=0 found_gitee=0 found_gitlab=0
+    while IFS= read -r remote; do
+      [[ -z "$remote" || "$remote" == "all" ]] && continue
+      local url
+      url=$(git remote get-url "$remote" 2>/dev/null || true)
+      case "$url" in
+        *github.com*|*github-*|*github*)  found_github=1 ;;
+        *gitee.com*|*gitee-*|*gitee*)      found_gitee=1 ;;
+        *gitlab.com*|*gitlab-*|*gitlab*)    found_gitlab=1 ;;
+      esac
+      # Also check remote name as fallback
+      case "$remote" in
+        github) found_github=1 ;;
+        gitee)  found_gitee=1 ;;
+        gitlab) found_gitlab=1 ;;
+      esac
+    done < <(git remote)
+    [[ "$found_github" == "1" ]] && echo "github"
+    [[ "$found_gitee" == "1" ]] && echo "gitee"
+    [[ "$found_gitlab" == "1" ]] && echo "gitlab"
+    # If nothing detected, fall back to origin only
+    if [[ "$found_github" == "0" && "$found_gitee" == "0" && "$found_gitlab" == "0" ]]; then
       git remote | grep -v '^all$' | while read -r r; do echo "$r"; done
     fi
   fi | sort -u
