@@ -14393,6 +14393,32 @@ parse_a2a_task_json_reply() {
   [[ -f "$_a2a_task_py" && -f "$_db_path" ]] || { printf 'repair:["a2a_task_py_or_db_missing"]\n'; return 1; }
 
   # ── Primary path: read A2A state from latest task (created by a2a-exit tool) ──
+  # Check signal file first for immediate detection (no polling delay)
+  local _signal_file="$project/.freely/run/last-exit-task.env"
+  if [[ -f "$_signal_file" ]]; then
+    local _sig_state
+    _sig_state=$(grep -o 'STATE=[a-z-]*' "$_signal_file" 2>/dev/null | cut -d= -f2 || echo "")
+    if [[ -n "$_sig_state" ]]; then
+      case "$_sig_state" in
+        submitted)
+          local _sig_workers; _sig_workers=$(grep -o 'WORKERS=.*' "$_signal_file" 2>/dev/null | cut -d= -f2 || echo "")
+          if [[ -n "$_sig_workers" ]]; then _exit_kind="delegate_workers"
+          else _exit_kind="resume_manager"; fi ;;
+        completed) if [[ "$role" == "worker" ]]; then _exit_kind="worker_done"
+          else _exit_kind="resume_manager"; fi ;;
+        failed)   _exit_kind="stop_ai" ;;
+        working)  if [[ "$role" == "worker" ]]; then _exit_kind="worker_working"
+          else _exit_kind="manager_working"; fi ;;
+        input-required|pending-input)
+          if [[ "$role" == "worker" ]]; then _exit_kind="worker_blocked"
+          else _exit_kind="resume_manager"; fi ;;
+        *)        _exit_kind="resume_manager" ;;
+      esac
+      append_runtime_event "$project" "a2a_exit_signal_file_read" "state=$_sig_state" "exit_kind=$_exit_kind"
+      printf 'ok:%s\n' "$_exit_kind"
+      return 0
+    fi
+  fi
   if [[ "$role" == "manager" ]]; then
     _result=$(python3 "$_a2a_task_py" latest-manager --db "$_db_path" 2>/dev/null || true)
   else
