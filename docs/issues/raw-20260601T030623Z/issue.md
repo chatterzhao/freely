@@ -1,7 +1,9 @@
 ---
 local_id: raw-20260601T030623Z
 kind: raw
-phase_state: dropped
+phase_state: absorbed
+absorbed_into: raw-20260601T030623Z
+absorbed_at: "2026-06-01T03:06:39Z"
 dropped_reason: Fix applied via fix/raw-20260601T030623Z-cross-platform-fixes commit
   b33dff5a. Cross-platform compatibility for timeout (Linux) and stat (Linux -c %Y
   fallback). No B1/B2 needed — direct fix-execution path.
