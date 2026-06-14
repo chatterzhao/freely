@@ -19123,6 +19123,32 @@ cmd_init() {
         fi
         ;;
     esac
+
+    # ACP SDK pre-flight check: agent-client-protocol must be installed.
+    # The ACP adapter uses the official SDK to communicate with AI CLI tools
+    # (claude-agent-acp, codex-acp, opencode). Without it, daemon start will fail.
+    if ! python3 -c "from acp import Agent" 2>/dev/null; then
+      cat <<SDK_HELP >&2
+[$(date -u +"%Y-%m-%dT%H:%M:%SZ")] [ERROR] agent-client-protocol SDK not installed
+
+  Freely 使用 Agent Client Protocol (ACP) 与 AI 工具通信。
+  ACP adapter 需要官方 Python SDK 才能启动 AI 会话。
+
+  安装命令:
+    pip3 install agent-client-protocol
+
+  如果系统使用 externally-managed Python (PEP 668):
+    pip3 install --break-system-packages agent-client-protocol
+
+  验证安装:
+    python3 -c "from acp import Agent; print('OK')"
+
+  当前工具: $tool
+  当前适配器: $tool_adapter
+
+SDK_HELP
+      exit 1
+    fi
   fi
 
   tool_capabilities="$(tool_default_capabilities_for_runtime "$tool")"
