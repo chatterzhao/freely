@@ -6,7 +6,6 @@ block at the end provides the A2A Task state transition data.
 
 A2A states: submitted, working, completed, failed, input-required, pending-input
 """
-#!/usr/bin/env python3
 """DEPRECATED: a2a_task_parser.py — text JSON extraction is now FALLBACK ONLY.
 
 Primary exit path: a2a-exit tool (AI directly sets A2A Task state).
@@ -16,8 +15,7 @@ Deprecation schedule:
   Phase 4a (current): Fallback only, log deprecation warning on each use
   Phase 4b (2026-07-01): Prune STATE_ALIASES to minimal set
   Phase 4c (2026-07-14): Remove entirely (require >90% a2a-exit adoption)
-
-
+"""
 
 import json
 import re
