@@ -14475,6 +14475,25 @@ parse_a2a_task_json_reply() {
     return 1
   fi
   _exit_kind="${_action:-unknown}"
+  case "$_exit_kind" in
+    submitted)
+      local _workers_field
+      _workers_field=$(echo "$_result" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('workers',''))" 2>/dev/null || echo "")
+      if [[ -n "$_workers_field" && "$_workers_field" != "null" ]]; then
+        _exit_kind="delegate_workers"
+        printf '%s\n' "$_workers_field" > "$project/.freely/run/last-workers-csv.txt" 2>/dev/null || true
+      else
+        _exit_kind="resume_manager"
+      fi ;;
+    completed) if [[ "$role" == "worker" ]]; then _exit_kind="worker_done"
+      else _exit_kind="resume_manager"; fi ;;
+    failed)   _exit_kind="stop_ai" ;;
+    working)  if [[ "$role" == "worker" ]]; then _exit_kind="worker_working"
+      else _exit_kind="manager_working"; fi ;;
+    input-required|pending-input)
+      if [[ "$role" == "worker" ]]; then _exit_kind="worker_blocked"
+      else _exit_kind="resume_manager"; fi ;;
+  esac
   printf 'ok:%s\n' "$_exit_kind"
   return 0
 }
@@ -15193,6 +15212,12 @@ HINTEOF
       ;;
     delegate_workers)
       worker_prompts_csv="$(_db_exit_contract_field "$project" manager worker_prompts_csv)"
+      if [[ -z "$worker_prompts_csv" || "$worker_prompts_csv" == "null" ]]; then
+        local _persisted_csv="$project/.freely/run/last-workers-csv.txt"
+        if [[ -f "$_persisted_csv" ]]; then
+          worker_prompts_csv="$(cat "$_persisted_csv" 2>/dev/null || true)"
+        fi
+      fi
       append_runtime_event "$project" "manager_exit_contract_delegate_workers" \
         "worker_prompts_csv=${worker_prompts_csv:-none}"
       printf 'delegate_workers\n'
