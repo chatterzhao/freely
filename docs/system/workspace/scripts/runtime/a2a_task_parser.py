@@ -75,7 +75,7 @@ def extract_state_block(reply_text: str) -> str:
     provides the Task state transition data for the A2A Server.
     """
     m = re.search(r'```(\S*)\s*\n(.*?)```', reply_text, re.DOTALL)
-    return m.group(1).strip() if m else ""
+    return m.group(2).strip() if m else ""
 
 
 def validate_state_json(fields: dict) -> tuple:
