@@ -1120,7 +1120,7 @@ def h_a2a_task_update_from_exit_kind(daemon: DbDaemon, params: dict) -> dict:
         'worker_working': 'working',
         'worker_done': 'completed',
         'worker_blocked': 'input-required',
-        'worker_handoff_needed': 'input-required',
+        'worker_handoff_needed': 'pending-input',
         'delegate_workers': 'submitted',
         'resume_manager': 'completed',
         'stop_ai': 'failed',
