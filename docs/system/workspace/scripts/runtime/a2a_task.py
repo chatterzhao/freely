@@ -448,6 +448,20 @@ def _main() -> int:
     p_ms = sub.add_parser("mark-stale")
     p_ms.add_argument("--timeout-minutes", default="30")
 
+    # ── a2a-exit: AI explicitly sets A2A Task state (standard A2A pattern) ──
+    p_exit = sub.add_parser("a2a-exit")
+    p_exit.add_argument("--state", required=True, help="A2A state: submitted|working|completed|failed|input-required|pending-input")
+    p_exit.add_argument("--summary", default="", help="Completion summary")
+    p_exit.add_argument("--workers", default="", help="Worker prompts CSV (for delegate)")
+    p_exit.add_argument("--next", default="", help="Next action")
+    p_exit.add_argument("--evidence", default="", help="Evidence paths")
+    p_exit.add_argument("--role", default="manager", help="Role: manager|worker")
+    p_exit.add_argument("--raw-key", default="", help="Raw issue key")
+    p_exit.add_argument("--worktree", default="", help="Worktree path")
+    p_exit.add_argument("--branch", default="", help="Branch name")
+    p_exit.add_argument("--prompt-file", default="", help="Prompt file path")
+    p_exit.add_argument("--session-id", default="", help="Session ID")
+
     args, _ = parser.parse_known_args()
 
     global PROJECT
@@ -577,6 +591,39 @@ def _main() -> int:
             timeout = int(getattr(args, 'timeout_minutes', '30') or '30')
             affected = mark_stale(timeout)
             print(json.dumps({"affected": affected}))
+        elif args.cmd == "a2a-exit":
+            # ── AI explicitly sets A2A Task state via tool call ──
+            # Standard A2A pattern: Agent declares state transition directly,
+            # no text parsing needed. This is the primary exit path.
+            from a2a_task_parser import normalize_state, VALID_STATES
+            raw_state = getattr(args, 'state', '') or ''
+            state = normalize_state(raw_state)
+            if state not in VALID_STATES:
+                print(json.dumps({"ok": False, "error": f"invalid state: {raw_state}"}))
+            else:
+                c = _client()
+                r = c.create(
+                    agent_id=getattr(args, 'role', 'manager') or "manager",
+                    name=getattr(args, 'role', 'manager') or "manager",
+                    raw_key=getattr(args, 'raw_key', '') or "",
+                    worktree=getattr(args, 'worktree', '') or "",
+                    branch=getattr(args, 'branch', '') or "",
+                    prompt_file=getattr(args, 'prompt_file', '') or "",
+                    session_id=getattr(args, 'session_id', '') or "",
+                    message=getattr(args, 'summary', '') or "",
+                    state=state,
+                    summary=getattr(args, 'summary', '') or "",
+                    next=getattr(args, 'next', '') or "",
+                    evidence=getattr(args, 'evidence', '') or "",
+                    worker_prompts_csv=getattr(args, 'workers', '') or "",
+                )
+                task_id = r.get("id", "")
+                print(json.dumps({"ok": True, "task_id": task_id, "state": state,
+                                  "exit_kind": state,
+                                  "workers": getattr(args, 'workers', '') or "",
+                                  "summary": getattr(args, 'summary', '') or "",
+                                  "next": getattr(args, 'next', '') or "",
+                                  "evidence": getattr(args, 'evidence', '') or ""}))
     except RuntimeError as e:
         print(json.dumps({"error": str(e)}))
     return 0
