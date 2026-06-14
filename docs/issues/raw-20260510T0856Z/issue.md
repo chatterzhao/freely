@@ -1,17 +1,44 @@
 ---
 local_id: raw-20260510T0856Z
 kind: raw
-phase_state: completed
+phase_state: absorbed
+absorbed_into: I-20260510T0856Z-A
 platform_ids:
   github:
-    issue_id: '272'
-    url: https://github.com/chatterzhao/freely/issues/272
+    issue_id: '2595'
+    url: https://github.com/chatterzhao/freely/issues/2595
+    synced_at: ''
 primary_platform: github
-platform_state: closed
+canonical_issue_path: ''
+last_synced_comment_at: {}
+hash: ''
+created_at: '2026-06-13T10:44:41Z'
+updated_at: '2026-06-13T10:44:41Z'
+intake_id: ''
+author: platform
+channel: github
+session_refs: []
 ---
-## 问题
 
-wait→auto 切换后看门狗误杀 supervisor（竞态）。
-## 修复
+## I-20260510T0856Z-A
 
-task_mode_gate 加 mode_just_switched 列，一次切换一次豁免。
+| Field | Value |
+|-------|-------|
+| local_id | `I-20260510T0856Z-A` |
+| kind | `linked` |
+| phase_state | `completed` |
+| canonical | `none` |
+| created | unknown |
+| updated | unknown |
+
+---
+
+
+local_id: I-20260510T0856Z-A
+kind: linked
+phase_state: completed
+promoted_from: raw-20260510T0856Z
+source_candidate: docs/pre-brainstorms/20260510T0856Z--mode-switch-guard/candidates.md
+verification_artifact_dir: docs/epics/mode-switch-guard/code-reviews
+pre_tests_path: docs/epics/mode-switch-guard/verification/pre-tests.md
+platform_state: ''
