@@ -441,6 +441,19 @@ def _main() -> int:
     p_glp = sub.add_parser("get-launched-pids")
     p_glp.add_argument("--raw-key", default="")
 
+
+
+    # ── session.* commands ──────────────────────────────────────────────
+    p_sx = sub.add_parser("session-export")
+    p_sx.add_argument("--session-id", default="", help="Session ID to export")
+    p_sx.add_argument("--output", default="", help="Output JSONL path")
+
+    p_si = sub.add_parser("session-import")
+    p_si.add_argument("--path", required=True, help="JSONL file to import")
+
+    p_slk = sub.add_parser("session-last-exit-kind")
+    p_slk.add_argument("--session-id", required=True, help="Session ID")
+
     # init: no-op (daemon creates tables); kept for backward compat
     sub.add_parser("init")
 
@@ -587,6 +600,56 @@ def _main() -> int:
             print(json.dumps({"rows": rows}))
         elif args.cmd == "init":
             print(json.dumps({"ok": True}))
+
+        elif args.cmd == "session-export":
+            sid = getattr(args, 'session_id', '') or ''
+            output = getattr(args, 'output', '') or ''
+            if not output:
+                output = f"/tmp/freely-session-{sid}.jsonl"
+            # Export session rounds as JSONL
+            try:
+                c = _client()
+                tasks = c.list(raw_key=sid) if sid else []
+                with open(output, 'w') as f:
+                    for t in tasks:
+                        f.write(json.dumps(t, default=str) + "\n")
+                print(json.dumps({"ok": True, "output": output, "count": len(tasks)}))
+            except Exception as e:
+                print(json.dumps({"ok": False, "error": str(e)}))
+        elif args.cmd == "session-import":
+            path = getattr(args, 'path', '') or ''
+            count = 0
+            try:
+                with open(path) as f:
+                    for line in f:
+                        line = line.strip()
+                        if line:
+                            try:
+                                data = json.loads(line)
+                                c = _client()
+                                c.create(**{k: v for k, v in data.items() if v})
+                                count += 1
+                            except Exception:
+                                pass
+                print(json.dumps({"ok": True, "imported": count}))
+            except Exception as e:
+                print(json.dumps({"ok": False, "error": str(e)}))
+        elif args.cmd == "session-last-exit-kind":
+            sid = getattr(args, 'session_id', '') or ''
+            try:
+                c = _client()
+                tasks = c.list(raw_key=sid) if sid else []
+                # Find last task with a state set by a2a-exit
+                for t in reversed(tasks):
+                    state = t.get('state', '')
+                    if state in ('submitted', 'completed', 'failed', 'working', 'input-required', 'pending-input'):
+                        print(state)
+                        break
+                else:
+                    print("")
+            except Exception:
+                print("")
+
         elif args.cmd == "mark-stale":
             timeout = int(getattr(args, 'timeout_minutes', '30') or '30')
             affected = mark_stale(timeout)
