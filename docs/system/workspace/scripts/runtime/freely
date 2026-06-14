@@ -14462,7 +14462,10 @@ parse_a2a_task_json_reply() {
     printf 'repair:["empty_reply"]\n'
     return 1
   fi
-  _result=$(python3 "$_a2a_task_py" parse --db "$_db_path" --reply-text "$_reply_text" \
+  local _reply_tmp="$project/.freely/run/.parse-reply-tmp.txt"
+  printf "%s
+" "$_reply_text" > "$_reply_tmp" 2>/dev/null || true
+  _result=$(python3 "$_a2a_task_py" parse --db "$_db_path" --reply-file "$_reply_tmp" \
     --role "$role" --raw-key "$raw_key" --prompt-file "$prompt_file" 2>/dev/null || true)
   _action=$(echo "$_result" | python3 -c "import json,sys; print(json.load(sys.stdin).get('action','error'))" 2>/dev/null || echo "error")
   if [[ "$_action" == "repair" ]]; then

@@ -565,8 +565,13 @@ def _main() -> int:
                     affected += update_task(r.get('id', r.get('task_id', '')), state='completed')
             print(json.dumps({"affected": affected}))
         elif args.cmd == "parse":
+            reply_file = getattr(args, 'reply_file', '') or ''
+            reply_text = getattr(args, 'reply_text', '') or ""
+            if reply_file and os.path.isfile(reply_file):
+                with open(reply_file) as f:
+                    reply_text = f.read()
             result = process_ai_reply(
-                reply_text=getattr(args, 'reply_text', '') or "",
+                reply_text=reply_text,
                 role=getattr(args, 'role', 'manager') or "manager",
                 raw_key=getattr(args, 'raw_key', '') or "",
                 prompt_file=getattr(args, 'prompt_file', '') or "",
