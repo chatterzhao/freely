@@ -477,7 +477,7 @@ do_completion() {
   require_merge_in_progress
   require_matching_merge_head "$source_branch"
 
-  local merge_path="merge-guarded-complete"
+  local merge_path="pr-merge-guarded-complete"
   local merge_message
   merge_message="$(render_merge_message "$merge_path" "$source_branch")"
   write_merge_message_file "$merge_message"
