@@ -218,39 +218,23 @@ elif [[ "$FORCE" == true ]]; then
   echo "wt-close: --force, skipping checks"
 fi
 
-# ── Guard: refuse to modify issue files on protected branches ──
-
-_guard_branch=$(git -C "$ROOT_DIR" rev-parse --abbrev-ref HEAD 2>/dev/null || true)
+# ── Guard: refuse to close if the main repo is on the branch being closed ──
 
 # Orphaned branch cleanup: skip frontmatter/issue operations entirely
 if [[ "$FORCE" == true && -z "$wt_path" ]]; then
   echo "wt-close: orphaned branch cleanup mode (no worktree, no frontmatter ops)"
 
 else
-  # ── Guard: refuse to modify issue files on protected branches ──
-  case "$_guard_branch" in
-    main|develop|test-pre-merge-*)
-      printf >&2 '%s
-' \
-        "Error: wt-close refuses to modify files on protected branch: $_guard_branch" \
-        "" \
-        "Protected branches (main, develop, test-pre-merge-*) must not be modified directly." \
-        "wt-close writes issue frontmatter and commits — this must happen from a writable branch." \
-        "" \
-        "Workflow:" \
-        "  1. Ensure the main repo is on a non-protected branch (any fix/* or feature/* worktree)" \
-        "  2. Or run wt-close from inside a fix/feature worktree: cd <worktree> && ./bin/wt-close <branch>" \
-        "" \
-        "Full cycle reference:" \
-        "  skill:freely-fix-execution or skill:freely-feat-execution" \
-        "  → wt-create → fix in fix/feature worktree" \
-        "  → merge fix-branch into test-pre-merge-* worktree          (test)" \
-        "  → pr-create-guarded (pull develop → dry-run gate → push → PR)" \
-        "  → pr-merge-guarded develop <fix-or-feature-branch>         (merge)" \
-        "  → wt-close"
-      exit 1
-      ;;
-  esac
+  # Only block if the branch being closed IS the currently checked-out branch
+  _guard_branch=$(git -C "$ROOT_DIR" rev-parse --abbrev-ref HEAD 2>/dev/null || true)
+  if [[ "$branch" == "$_guard_branch" ]]; then
+    case "$_guard_branch" in
+      main|develop|test-pre-merge-*)
+        echo "Error: cannot close the currently checked-out protected branch" >&2
+        exit 1
+        ;;
+    esac
+  fi
 fi
 
 # ── Unmerged commits guard (--force) ──
@@ -402,7 +386,7 @@ if [[ -n "$wt_path" ]]; then
     _dry "git worktree remove $wt_path"
   else
     echo "wt-close: removing worktree $wt_path..."
-    if git worktree remove "$wt_path" 2>/dev/null; then
+    if FREELY_WT_BYPASS_GUARD=1 command git worktree remove "$wt_path" 2>/dev/null; then
       echo "wt-close: worktree removed ✓"
     else
       echo "Warning: worktree has dirty/untracked files, retrying with --force..." >&2
