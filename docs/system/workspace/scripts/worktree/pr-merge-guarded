@@ -270,7 +270,8 @@ GATE_BLOCKED
 
 # _sync_prs_across_platforms: after merge + push develop, close remaining
 # open PRs on platforms that weren't handled by `gh pr merge`.
-# GitHub PRs are already closed+deleted by `gh pr merge --delete-branch`.
+# GitHub PRs are already closed by `gh pr merge --merge`.
+# Source branch deletion is handled by wt-close.
 _sync_prs_across_platforms() {
   local source_branch="$1"
   [[ -n "$source_branch" ]] || return 0
@@ -449,9 +450,16 @@ do_initial_merge() {
     if [[ -n "$gh_pr" ]]; then
       echo "[MERGE-GUARD] merging via GitHub PR #$gh_pr..."
       # Use --admin to skip required-checks (governance gate already passed)
-      # Use --merge strategy to create a proper merge commit
-      if gh pr merge "$gh_pr" --merge --admin --delete-branch \
-           --subject "$merge_message" 2>&1; then
+      # Use --merge strategy to create a proper merge commit.
+      # Do NOT use --delete-branch: branch lifecycle is managed by wt-close,
+      # not by pr-merge-guarded. Premature deletion of a branch with an
+      # active worktree causes gh to return non-zero even when the merge
+      # succeeds, triggering a false fallback to local merge that produces
+      # a duplicate merge commit and cross-platform develop divergence.
+      local gh_rc=0
+      gh pr merge "$gh_pr" --merge --admin \
+           --subject "$merge_message" 2>&1 || gh_rc=$?
+      if [[ "$gh_rc" -eq 0 ]]; then
         echo "[MERGE-GUARD] GitHub PR #$gh_pr merged ✓"
         # Pull the merge commit that GitHub created
         git fetch origin "$target" 2>/dev/null || true
@@ -461,7 +469,19 @@ do_initial_merge() {
         attempt_develop_push_followthrough_if_needed "$target"
         return 0
       fi
-      echo "[MERGE-GUARD] GitHub merge failed, falling back to local merge..." >&2
+      # gh returned non-zero — check if the PR was actually merged despite
+      # the error (e.g. post-merge branch deletion failed but merge succeeded).
+      local pr_state
+      pr_state="$(gh pr view "$gh_pr" --json state -q '.state' 2>/dev/null || true)"
+      if [[ "$pr_state" == "MERGED" ]]; then
+        echo "[MERGE-GUARD] GitHub PR #$gh_pr merged (gh reported error but PR state is MERGED)" >&2
+        echo "[MERGE-GUARD] gh error was non-fatal; pulling the merge commit..." >&2
+        git fetch origin "$target" 2>/dev/null || true
+        git pull origin "$target" --ff-only 2>/dev/null || true
+        attempt_develop_push_followthrough_if_needed "$target"
+        return 0
+      fi
+      echo "[MERGE-GUARD] GitHub merge failed (PR state=$pr_state), falling back to local merge..." >&2
     fi
   fi
 
