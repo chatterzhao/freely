@@ -158,7 +158,7 @@ class A2AClient:
     # ── Task API ───────────────────────────────────────────────────────
 
     def create(self, **kwargs) -> dict:
-        return self._request("POST", "/tasks", {k: v for k, v in kwargs.items() if v})
+        return self._request("POST", "/tasks", dict(kwargs))
 
     def get(self, task_id: str) -> Optional[dict]:
         r = self._request("GET", f"/tasks/{task_id}")
@@ -166,7 +166,7 @@ class A2AClient:
 
     def update(self, task_id: str, **fields) -> dict:
         return self._request("PATCH", f"/tasks/{task_id}",
-                            {k: v for k, v in fields.items() if v})
+                            dict(fields))
 
     def list(self, **filters) -> List[dict]:
         params = [f"{k}={v}" for k, v in filters.items() if v]
@@ -671,7 +671,7 @@ def _main() -> int:
                             try:
                                 data = json.loads(line)
                                 c = _client()
-                                c.create(**{k: v for k, v in data.items() if v})
+                                c.create(**data)
                                 count += 1
                             except Exception:
                                 pass
