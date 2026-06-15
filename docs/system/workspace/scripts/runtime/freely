@@ -8017,8 +8017,8 @@ EOF
 - `pretests-gate` — pre-tests 证据
 
 ### 交接（Manager ↔ Worker）
-- Manager 在回复末尾输出 ` ```json ` 交接块（delegate_workers/resume_manager/stop_ai）
-- Worker 在回复末尾输出 ` ```json ` 交接块（worker_done/worker_blocked/worker_handoff_needed）
+- Manager 调用 a2a-exit 工具声明状态（见 manager-agent.md），不在回复末尾输出 JSON
+- Worker 调用 a2a-exit 工具声明状态（见 worker-agent.md），不在回复末尾输出 JSON
 - Runtime 自动解析 JSON 并写入中心 DB: `.freely/freely.db`
 
 ### 禁止
@@ -14018,7 +14018,7 @@ prepend_exit_contract_repair_focus_if_needed() {
 Repair-first override:
 - 当前轮次是 worker exit contract repair。先补齐缺失或无效的 worker exit contract，再做任何其它扩展阅读、实现或 broad patrol。
 - 继续沿用当前 worker issue 边界，不要重开 manager patrol，也不要把自己提升成主管。
-- 必须在本轮结束前在回复末尾输出有效的 ```json (handoff 内容) JSON 块；否则 runtime 会继续按同一 resume target 拉回修复。
+- 必须在本轮结束前调用 a2a-exit 工具声明状态；否则 runtime 会继续按同一 resume target 拉回修复。
 - handoff_evidence: \`${contract_path}\`
 
 EOF
@@ -14028,7 +14028,7 @@ EOF
 Repair-first override:
 - 当前轮次是 manager exit contract repair。先补齐缺失或无效的 manager exit contract，再做新的 delegation、cleanup judgement 或 broad patrol。
 - 继续沿用当前 manager 上下文，不要忽略 repair contract 去重跑首轮排班。
-- 必须在本轮结束前在回复末尾输出有效的 ```json (handoff 内容) JSON 块；否则 runtime 会继续按同一 resume target 拉回修复。
+- 必须在本轮结束前调用 a2a-exit 工具声明状态；否则 runtime 会继续按同一 resume target 拉回修复。
 - handoff_evidence: \`${contract_path}\`
 
 EOF
