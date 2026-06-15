@@ -1031,7 +1031,7 @@ def h_a2a_task_get(daemon: DbDaemon, params: dict) -> dict:
     ).fetchone()
     if not row:
         return {"record": None}
-    cols = [desc[0] for desc in daemon.conn.execute("PRAGMA table_info(a2a_tasks)").fetchall()]
+    cols = [desc[1] for desc in daemon.conn.execute("PRAGMA table_info(a2a_tasks)").fetchall()]
     return {"record": dict(zip(cols, row))}
 
 
@@ -1081,7 +1081,7 @@ def h_a2a_task_list(daemon: DbDaemon, params: dict) -> dict:
         sql += " WHERE " + " AND ".join(filters)
     sql += " ORDER BY created_at DESC"
     rows = daemon.conn.execute(sql, vals).fetchall()
-    cols = [desc[0] for desc in daemon.conn.execute("PRAGMA table_info(a2a_tasks)").fetchall()]
+    cols = [desc[1] for desc in daemon.conn.execute("PRAGMA table_info(a2a_tasks)").fetchall()]
     return {"rows": [dict(zip(cols, r)) for r in rows]}
 
 
@@ -1095,7 +1095,7 @@ def h_a2a_task_list_by_worktree(daemon: DbDaemon, params: dict) -> dict:
         vals.append(params["state"])
     sql += " ORDER BY created_at DESC"
     rows = daemon.conn.execute(sql, vals).fetchall()
-    cols = [desc[0] for desc in daemon.conn.execute("PRAGMA table_info(a2a_tasks)").fetchall()]
+    cols = [desc[1] for desc in daemon.conn.execute("PRAGMA table_info(a2a_tasks)").fetchall()]
     return {"rows": [dict(zip(cols, r)) for r in rows]}
 
 
@@ -1165,7 +1165,7 @@ def h_a2a_task_list_by_raw_key(daemon: DbDaemon, params: dict) -> dict:
         "SELECT * FROM a2a_tasks WHERE raw_key = ? ORDER BY created_at DESC",
         (params["raw_key"],),
     ).fetchall()
-    cols = [desc[0] for desc in daemon.conn.execute("PRAGMA table_info(a2a_tasks)").fetchall()]
+    cols = [desc[1] for desc in daemon.conn.execute("PRAGMA table_info(a2a_tasks)").fetchall()]
     return {"rows": [dict(zip(cols, r)) for r in rows]}
 
 
@@ -1175,7 +1175,7 @@ def h_a2a_task_list_active(daemon: DbDaemon, params: dict) -> dict:
     rows = daemon.conn.execute(
         "SELECT * FROM a2a_tasks WHERE state IN ('submitted','working','input-required') ORDER BY updated_at DESC"
     ).fetchall()
-    cols = [desc[0] for desc in daemon.conn.execute("PRAGMA table_info(a2a_tasks)").fetchall()]
+    cols = [desc[1] for desc in daemon.conn.execute("PRAGMA table_info(a2a_tasks)").fetchall()]
     return {"rows": [dict(zip(cols, r)) for r in rows]}
 
 
@@ -1185,7 +1185,7 @@ def h_a2a_task_latest_manager(daemon: DbDaemon, params: dict) -> dict:
     rows = daemon.conn.execute(
         "SELECT * FROM a2a_tasks WHERE agent_id LIKE 'manager%' ORDER BY created_at DESC LIMIT 1"
     ).fetchall()
-    cols = [desc[0] for desc in daemon.conn.execute("PRAGMA table_info(a2a_tasks)").fetchall()]
+    cols = [desc[1] for desc in daemon.conn.execute("PRAGMA table_info(a2a_tasks)").fetchall()]
     return {"rows": [dict(zip(cols, r)) for r in rows]}
 
 
@@ -1258,7 +1258,7 @@ def h_a2a_task_list_pending_delivery(daemon: DbDaemon, params: dict) -> dict:
         "SELECT * FROM a2a_tasks WHERE delivery_status = 'pending' AND agent_id = 'worker' "
         "ORDER BY created_at ASC"
     ).fetchall()
-    cols = [desc[0] for desc in daemon.conn.execute("PRAGMA table_info(a2a_tasks)").fetchall()]
+    cols = [desc[1] for desc in daemon.conn.execute("PRAGMA table_info(a2a_tasks)").fetchall()]
     return {"rows": [dict(zip(cols, r)) for r in rows]}
 
 

@@ -14392,33 +14392,7 @@ parse_a2a_task_json_reply() {
   _db_path="$project/.freely/freely.db"
   [[ -f "$_a2a_task_py" && -f "$_db_path" ]] || { printf 'repair:["a2a_task_py_or_db_missing"]\n'; return 1; }
 
-  # ── Primary path: read A2A state from latest task (created by a2a-exit tool) ──
-  # Check signal file first for immediate detection (no polling delay)
-  local _signal_file="$project/.freely/run/last-exit-task.env"
-  if [[ -f "$_signal_file" ]]; then
-    local _sig_state
-    _sig_state=$(grep -o 'STATE=[a-z-]*' "$_signal_file" 2>/dev/null | cut -d= -f2 || echo "")
-    if [[ -n "$_sig_state" ]]; then
-      case "$_sig_state" in
-        submitted)
-          local _sig_workers; _sig_workers=$(grep -o 'WORKERS=.*' "$_signal_file" 2>/dev/null | cut -d= -f2 || echo "")
-          if [[ -n "$_sig_workers" ]]; then _exit_kind="delegate_workers"
-          else _exit_kind="resume_manager"; fi ;;
-        completed) if [[ "$role" == "worker" ]]; then _exit_kind="worker_done"
-          else _exit_kind="resume_manager"; fi ;;
-        failed)   _exit_kind="stop_ai" ;;
-        working)  if [[ "$role" == "worker" ]]; then _exit_kind="worker_working"
-          else _exit_kind="manager_working"; fi ;;
-        input-required|pending-input)
-          if [[ "$role" == "worker" ]]; then _exit_kind="worker_blocked"
-          else _exit_kind="resume_manager"; fi ;;
-        *)        _exit_kind="resume_manager" ;;
-      esac
-      append_runtime_event "$project" "a2a_exit_signal_file_read" "state=$_sig_state" "exit_kind=$_exit_kind"
-      printf 'ok:%s\n' "$_exit_kind"
-      return 0
-    fi
-  fi
+  # ── Primary path: read A2A state from DB (single source of truth) ──
   if [[ "$role" == "manager" ]]; then
     _result=$(python3 "$_a2a_task_py" latest-manager --db "$_db_path" 2>/dev/null || true)
   else
@@ -14452,50 +14426,9 @@ parse_a2a_task_json_reply() {
     return 0
   fi
 
-  # ── Fallback: extract JSON block from AI reply text ──
-  if [[ -n "$cycle_log" && -f "$cycle_log" ]]; then
-    _reply_text="$(tail -c 32768 "$cycle_log" 2>/dev/null || true)"
-  else
-    _reply_text=""
-  fi
-  if [[ -z "$_reply_text" ]]; then
-    printf 'repair:["empty_reply"]\n'
-    return 1
-  fi
-  local _reply_tmp="$project/.freely/run/.parse-reply-tmp.txt"
-  printf "%s
-" "$_reply_text" > "$_reply_tmp" 2>/dev/null || true
-  _result=$(python3 "$_a2a_task_py" parse --db "$_db_path" --reply-file "$_reply_tmp" \
-    --role "$role" --raw-key "$raw_key" --prompt-file "$prompt_file" 2>/dev/null || true)
-  _action=$(echo "$_result" | python3 -c "import json,sys; print(json.load(sys.stdin).get('action','error'))" 2>/dev/null || echo "error")
-  if [[ "$_action" == "repair" ]]; then
-    local _errors
-    _errors=$(echo "$_result" | python3 -c "import json,sys; print(json.dumps(json.load(sys.stdin).get('errors',[])))" 2>/dev/null || echo "[]")
-    printf 'repair:%s\n' "$_errors"
-    return 1
-  fi
-  _exit_kind="${_action:-unknown}"
-  case "$_exit_kind" in
-    submitted)
-      local _workers_field
-      _workers_field=$(echo "$_result" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('workers',''))" 2>/dev/null || echo "")
-      if [[ -n "$_workers_field" && "$_workers_field" != "null" ]]; then
-        _exit_kind="delegate_workers"
-        printf '%s\n' "$_workers_field" > "$project/.freely/run/last-workers-csv.txt" 2>/dev/null || true
-      else
-        _exit_kind="resume_manager"
-      fi ;;
-    completed) if [[ "$role" == "worker" ]]; then _exit_kind="worker_done"
-      else _exit_kind="resume_manager"; fi ;;
-    failed)   _exit_kind="stop_ai" ;;
-    working)  if [[ "$role" == "worker" ]]; then _exit_kind="worker_working"
-      else _exit_kind="manager_working"; fi ;;
-    input-required|pending-input)
-      if [[ "$role" == "worker" ]]; then _exit_kind="worker_blocked"
-      else _exit_kind="resume_manager"; fi ;;
-  esac
-  printf 'ok:%s\n' "$_exit_kind"
-  return 0
+  # ── Text parsing fallback REMOVED (Phase 3) — a2a-exit is the only path ──
+  printf 'repair:["no_a2a_exit_called"]\n'
+  return 1
 }
 
 manager_exit_contract_kind() {
@@ -15212,12 +15145,7 @@ HINTEOF
       ;;
     delegate_workers)
       worker_prompts_csv="$(_db_exit_contract_field "$project" manager worker_prompts_csv)"
-      if [[ -z "$worker_prompts_csv" || "$worker_prompts_csv" == "null" ]]; then
-        local _persisted_csv="$project/.freely/run/last-workers-csv.txt"
-        if [[ -f "$_persisted_csv" ]]; then
-          worker_prompts_csv="$(cat "$_persisted_csv" 2>/dev/null || true)"
-        fi
-      fi
+
       append_runtime_event "$project" "manager_exit_contract_delegate_workers" \
         "worker_prompts_csv=${worker_prompts_csv:-none}"
       printf 'delegate_workers\n'
@@ -20316,23 +20244,75 @@ start_project_runtime() {
   append_runtime_event "$project" "start_project_runtime_after_registry" \
     "entrypoint_mode=$entrypoint_mode"
 
-  # ── Sync develop working tree with remote ──
-  # git update-ref alone does not update working tree files.
-  # Without this, daemon can run stale code if develop was advanced by PR merges.
+  # ── Sync develop working tree: verify all platforms are consistent ──
+  # Multi-platform governance: every configured remote must agree on develop HEAD.
+  # If platforms are out of sync, refuse to start — the operator must resolve.
+  # Stashes dirty files instead of discarding. Uses git pull (respects hooks).
   if [[ "$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)" == "develop" ]]; then
-    log_info "syncing develop working tree with origin..."
-    git fetch origin develop 2>/dev/null || true
-    local _local_sha _remote_sha
+    local _local_sha _first_sha="" _first_remote="" _consistent=1 _divergence_report=""
     _local_sha="$(git rev-parse HEAD 2>/dev/null || true)"
-    _remote_sha="$(git rev-parse refs/remotes/origin/develop 2>/dev/null || true)"
-    if [[ -n "$_local_sha" && -n "$_remote_sha" && "$_local_sha" != "$_remote_sha" ]]; then
-      log_info "develop working tree is behind (local=$_local_sha remote=$_remote_sha), updating..."
-      git config core.hooksPath /dev/null
-      git reset --hard refs/remotes/origin/develop
-      git config core.hooksPath .githooks
-      log_info "develop working tree updated to $_remote_sha"
+
+    # Detect dirty working tree — refuse to start, let user decide
+    if ! git diff --quiet 2>/dev/null || ! git diff --cached --quiet 2>/dev/null; then
+      log_error "develop working tree is dirty — cannot start daemon."
+      log_error ""
+      log_error "Modified files:"
+      git diff --name-only 2>/dev/null | while read -r _f; do echo "  (unstaged) $_f"; done
+      git diff --cached --name-only 2>/dev/null | while read -r _f; do echo "  (staged)   $_f"; done
+      log_error ""
+      log_error "The daemon must start from a clean working tree to avoid"
+      log_error "overwriting uncommitted work during platform sync."
+      log_error ""
+      log_error "Resolve by:"
+      log_error "  git stash       — save changes and restore later"
+      log_error "  git commit ...  — commit changes to a feature branch"
+      log_error "  git checkout -- <file> — discard changes (caution!)"
+      log_error ""
+      log_error "Then retry: freely daemon start --project $project"
+      exit 1
+    fi
+
+    # Fetch all remotes and verify consistency
+    for _remote in $(git remote 2>/dev/null | grep -v '^all$'); do
+      git fetch "$_remote" develop 2>/dev/null || true
+      local _remote_sha
+      _remote_sha="$(git rev-parse "refs/remotes/$_remote/develop" 2>/dev/null || true)"
+      if [[ -n "$_remote_sha" ]]; then
+        if [[ -z "$_first_sha" ]]; then
+          _first_sha="$_remote_sha"
+          _first_remote="$_remote"
+        elif [[ "$_remote_sha" != "$_first_sha" ]]; then
+          _consistent=0
+          _divergence_report+="  $_first_remote: $_first_sha"$'\n'
+          _divergence_report+="  $_remote: $_remote_sha"$'\n'
+        fi
+      fi
+    done
+
+    if [[ "$_consistent" == "0" ]]; then
+      # Platforms are out of sync — refuse to start
+      log_error "develop branch is inconsistent across platforms!"
+      log_error "The following remotes have different HEAD commits:"
+      printf '%s' "$_divergence_report" >&2
+      log_error ""
+      log_error "This means pr-merge-guarded did not push to all platforms."
+      log_error "Resolve by running:"
+      log_error "  ./bin/freely develop-push status --project $project"
+      log_error "  ./bin/freely develop-push attempt --project $project"
+      log_error ""
+      log_error "If a platform is permanently unavailable, remove it from git remote:"
+      log_error "  git remote remove <name>"
+      exit 1
+    fi
+
+    if [[ -n "$_first_sha" && "$_local_sha" != "$_first_sha" ]]; then
+      log_info "develop working tree updating to $_first_sha"
+      git pull "$_first_remote" develop --ff-only 2>/dev/null || {
+        log_warn "fast-forward sync failed, trying merge..."
+        git pull "$_first_remote" develop --no-edit 2>/dev/null || log_warn "sync merge failed, continuing with local state"
+      }
     else
-      log_info "develop working tree is current"
+      log_info "develop working tree is current (all platforms consistent)"
     fi
   fi
 

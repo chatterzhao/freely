@@ -1,9 +1,10 @@
 ---
 local_id: raw-20260514T022352Z
 kind: raw
-phase_state: completed
+phase_state: absorbed
+absorbed_into: I-20260514T022352Z-A
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
-updated_at: 2026-05-17T04:47:25Z
+updated_at: 2026-05-17 04:47:25+00:00
 platform_ids:
   github:
     issue_id: '341'
