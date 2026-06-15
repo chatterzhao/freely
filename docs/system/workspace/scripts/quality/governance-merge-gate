@@ -346,9 +346,17 @@ def changed_paths_from_args(args: argparse.Namespace) -> List[str]:
                 head = range_parts[1].strip()
                 try:
                     merge_base = git("merge-base", base, head).strip()
+                    if not merge_base:
+                        raise subprocess.CalledProcessError(1, ["git", "merge-base"])
                     output = git("diff", "--name-only", "--diff-filter=ACMR", f"{merge_base}..{head}")
                 except subprocess.CalledProcessError:
-                    output = git("diff", "--name-only", "--diff-filter=ACMR", "4b825dc642cb6eb9a060e54bf899d153c1c0c5b8", head)
+                    # No common ancestor found (e.g. after history rewrite).
+                    # Diff against HEAD alone to get all files in the push.
+                    try:
+                        output = git("diff", "--name-only", "--diff-filter=ACMR", "4b825dc642cb6eb9a060e54bf899d153c1c0c5b8", head)
+                    except subprocess.CalledProcessError:
+                        # Empty tree fallback also failed — use head commit files directly
+                        output = git("diff-tree", "--no-commit-id", "--name-only", "-r", "--diff-filter=ACMR", head)
             else:
                 raise
     else:
