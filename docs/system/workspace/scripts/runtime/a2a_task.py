@@ -725,7 +725,8 @@ def _main() -> int:
                 try:
                     os.makedirs(run_dir, exist_ok=True)
                     with open(os.path.join(run_dir, "last-exit-task.env"), "w") as f:
-                        f.write(f"TASK_ID={task_id}\nSTATE={state}\n")
+                        workers_val = getattr(args, 'workers', '') or ''
+                        f.write(f"TASK_ID={task_id}\nSTATE={state}\nWORKERS={workers_val}\n")
                 except Exception:
                     pass
                 print(json.dumps({"ok": True, "task_id": task_id, "state": state,
