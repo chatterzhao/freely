@@ -2,18 +2,42 @@
 local_id: raw-20260510T1840Z
 kind: raw
 phase_state: completed
-closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 platform_ids:
   github:
-    issue_id: '371'
-    url: https://github.com/chatterzhao/freely/issues/371
-    synced_at: '2026-05-16T13:21:00Z'
+    issue_id: '2610'
+    url: https://github.com/chatterzhao/freely/issues/2610
+    synced_at: ''
 primary_platform: github
-platform_state: open
-updated_at: 2026-05-17T04:47:25Z
-created_at: '2026-05-16T13:21:00Z'
+canonical_issue_path: ''
+last_synced_comment_at: {}
+hash: ''
+created_at: '2026-06-13T10:52:13Z'
+updated_at: '2026-06-13T10:52:13Z'
+intake_id: ''
+author: platform
+channel: github
+session_refs: []
 ---
-## 问题
-init --skip-branch-check 可绕过分支校验，daemon start 不检查。
-## 修复
-移除 skip，init 和 daemon start 都强制检查，不绕过。
+
+## I-20260510T1840Z-A
+
+| Field | Value |
+|-------|-------|
+| local_id | `I-20260510T1840Z-A` |
+| kind | `linked` |
+| phase_state | `completed` |
+| canonical | `none` |
+| created | unknown |
+| updated | unknown |
+
+---
+
+
+local_id: I-20260510T1840Z-A
+kind: linked
+phase_state: completed
+promoted_from: raw-20260510T1840Z
+source_candidate: docs/pre-brainstorms/20260510T1840Z--branch-check-no-bypass/candidates.md
+verification_artifact_dir: docs/epics/branch-check-no-bypass/code-reviews
+pre_tests_path: docs/epics/branch-check-no-bypass/verification/pre-tests.md
+platform_state: ''
