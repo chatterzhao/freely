@@ -5374,6 +5374,18 @@ materialize_project_tooling_for_loaded_config() {
   fi
   write_project_tool_wrapper_scripts "$project"
   write_project_tool_boundary_bootstrap_file "$project"
+  install_git_worktree_guard_for_project "$project"
+}
+
+install_git_worktree_guard_for_project() {
+  local project="$1"
+  local guard_src="$SELF_ROOT/bin/git-worktree-guard"
+  local guard_dst="$project/.freely/bin/git-worktree-guard"
+  if [[ -f "$guard_src" ]]; then
+    mkdir -p "$(dirname "$guard_dst")"
+    cp "$guard_src" "$guard_dst"
+    chmod +x "$guard_dst"
+  fi
 }
 
 retarget_project_path_from_source() {

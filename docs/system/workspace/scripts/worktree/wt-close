@@ -390,7 +390,7 @@ if [[ -n "$wt_path" ]]; then
       echo "wt-close: worktree removed ✓"
     else
       echo "Warning: worktree has dirty/untracked files, retrying with --force..." >&2
-      git worktree remove --force "$wt_path" 2>/dev/null || {
+      FREELY_WT_BYPASS_GUARD=1 command git worktree remove --force "$wt_path" 2>/dev/null || {
         echo "Error: could not remove worktree $wt_path, remove manually" >&2
         exit 1
       }

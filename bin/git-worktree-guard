@@ -1,11 +1,19 @@
 #!/usr/bin/env bash
 # git-worktree-guard: intercept git worktree remove for managed worktrees.
-# Source this in your shell or symlink as a git wrapper.
+# Source this in your shell or install as a git PATH wrapper.
 #
-# Usage: source bin/git-worktree-guard  (installs git() function)
-#        or: export PATH="bin:$PATH"     (uses this script as git wrapper)
+# Usage:
+#   source bin/git-worktree-guard          (installs git() function)
+#   cp bin/git-worktree-guard .freely/bin/git  (PATH wrapper)
+#   FREELY_WT_BYPASS_GUARD=1 git worktree remove ...  (bypass)
 
 set -euo pipefail
+
+# ── Bypass env check ──
+# When FREELY_WT_BYPASS_GUARD=1, delegate directly to real git worktree remove.
+_bypass_guard() {
+  [[ "${FREELY_WT_BYPASS_GUARD:-0}" == "1" ]]
+}
 
 _is_managed_worktree() {
   local path="$1"
@@ -24,7 +32,10 @@ _worktree_remove_guard() {
   local args=("$@")
   local target=""
   local i
-  
+
+  # Bypass: if FREELY_WT_BYPASS_GUARD=1, delegate directly to real git
+  _bypass_guard && { command git worktree remove "$@"; return $?; }
+
   # Find the target worktree path in arguments
   for ((i=0; i<${#args[@]}; i++)); do
     case "${args[$i]}" in
@@ -33,46 +44,45 @@ _worktree_remove_guard() {
       *) target="${args[$i]}"; break ;;
     esac
   done
-  
+
   if [[ -z "$target" ]]; then
     # No target found, delegate to real git
     command git worktree remove "$@"
     return $?
   fi
-  
+
   # Resolve to absolute path if needed
   if [[ ! -d "$target" ]]; then
-    # Might be a relative path; try to resolve
     local abs_target
     abs_target="$(cd "$target" 2>/dev/null && pwd -P || echo "$target")"
     if [[ -d "$abs_target" ]]; then
       target="$abs_target"
     fi
   fi
-  
+
   if _is_managed_worktree "$target"; then
     cat >&2 <<'BLOCK'
 [freely] git worktree remove BLOCKED for managed worktree.
 
   Managed worktrees must be closed through wt-close:
     ./bin/wt-close <branch>
-  
+
   For emergency cleanup (corrupted/abandoned worktree):
     ./bin/wt-close --force <branch> --reason "why force close"
 
   If you absolutely must use raw git:
-    \command git worktree remove "$@"
+    FREELY_WT_BYPASS_GUARD=1 git worktree remove "$@"
 BLOCK
     return 1
   fi
-  
+
   # Not managed, delegate to real git
   command git worktree remove "$@"
 }
 
-# If sourced, install git() function wrapper
+# ── Dual-mode: sourced function or PATH wrapper ──
 if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
-  # Being sourced — install git() wrapper
+  # Being sourced — install git() function wrapper
   if ! declare -f _original_git >/dev/null 2>&1; then
     eval '_original_git() { command git "$@"; }'
   fi
@@ -83,9 +93,17 @@ if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
     fi
     _original_git "$@"
   }
+elif [[ "$(basename "$0")" == "git" ]]; then
+  # PATH wrapper mode: invoked as `git` from .freely/bin/
+  if [[ "$1" == "worktree" && "$2" == "remove" ]]; then
+    _worktree_remove_guard "${@:2}"
+  else
+    command git "$@"
+  fi
 else
-  # Being executed directly — not supported (must be sourced)
-  echo "git-worktree-guard: must be sourced, not executed" >&2
+  # Direct execution — not supported
+  echo "git-worktree-guard: must be sourced, not executed directly" >&2
   echo "  source bin/git-worktree-guard" >&2
+  echo "  or install as .freely/bin/git (PATH wrapper)" >&2
   exit 1
 fi
