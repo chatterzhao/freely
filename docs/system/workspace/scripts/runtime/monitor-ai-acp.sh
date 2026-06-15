@@ -265,8 +265,8 @@ _persist_session_to_store() {
     --launch-kind "$launch_kind" \
     --tool_adapter acp \
     --resume_mode "${resume_mode:-}" \
-    >/dev/null 2>&1 || {
-      echo "[WARN] session upsert failed for $clean_session_id" >&2
+    2>>"$project/.freely/run/db-daemon.log" || {
+      echo "[WARN] session upsert failed for $clean_session_id (see db-daemon.log)" >&2
       return 1
     }
 }
@@ -278,7 +278,7 @@ _mark_session_failed() {
     --session-id "$session_id" \
     --status failed \
     --error_reason "$error_reason" \
-    >/dev/null 2>&1 || true
+    2>>"$project/.freely/run/db-daemon.log" || true
 }
 
 _mark_session_completed() {
@@ -287,7 +287,7 @@ _mark_session_completed() {
   python3 "$cli" --project "$project" session.complete \
     --session-id "$session_id" \
     --status completed \
-    >/dev/null 2>&1 || true
+    2>>"$project/.freely/run/db-daemon.log" || true
 }
 
 _tool_switch_writeback_session_id() {
@@ -296,7 +296,7 @@ _tool_switch_writeback_session_id() {
   local cli; cli="$(dirname "$0")/freely-db-cli"
   python3 "$cli" --project "$project" session.tool-switch-update-sid \
     --new_session_id "$new_session_id" \
-    >/dev/null 2>&1 || true
+    2>>"$project/.freely/run/db-daemon.log" || true
 }
 
 # ── Main ───────────────────────────────────────────────────────────

@@ -68,19 +68,19 @@ _tool_is_registered() {
 _tool_failure_add() {
   local tool="$1" slot="$2" reason="$3"
   python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli" \
-    --project "$PROJECT_ROOT" tool.failure-add --tool "$tool" --slot "$slot" --reason "$reason" >/dev/null 2>&1 || true
+    --project "$PROJECT_ROOT" tool.failure-add --tool "$tool" --slot "$slot" --reason "$reason" 2>>"$PROJECT_ROOT/.freely/run/db-daemon.log" || true
 }
 
 _tool_failure_count() {
   local tool="$1" slot="$2" window="${3:-3600}"
   python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli" \
-    --project "$PROJECT_ROOT" tool.failure-count --tool "$tool" --slot "$slot" --window_secs "$window" 2>/dev/null || echo "0"
+    --project "$PROJECT_ROOT" tool.failure-count --tool "$tool" --slot "$slot" --window_secs "$window" 2>>"$PROJECT_ROOT/.freely/run/db-daemon.log" || echo "0"
 }
 
 _tool_failure_clear() {
   local tool="$1" slot="$2"
   python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli" \
-    --project "$PROJECT_ROOT" tool.failure-clear --tool "$tool" --slot "$slot" >/dev/null 2>&1 || true
+    --project "$PROJECT_ROOT" tool.failure-clear --tool "$tool" --slot "$slot" 2>>"$PROJECT_ROOT/.freely/run/db-daemon.log" || true
 }
 
 _tool_is_dead() {
@@ -3752,7 +3752,7 @@ ensure_runtime_tool_session_anchor() {
         _acp_sid=$(python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli" \
           --project "$project" session.get-active \
           --project "$project" \
-          --role "${FREELY_ROLE_HINT:-manager}" 2>/dev/null || true)
+          --role "${FREELY_ROLE_HINT:-manager}" 2>>"$project/.freely/run/db-daemon.log" || log_warn "session-store query failed")
         if [[ -n "$_acp_sid" ]] && is_valid_uuid "$_acp_sid"; then
           CLAUDE_SESSION_ID_CURRENT="$_acp_sid"
           log_info "session id recovered from session-store: $_acp_sid"
@@ -3772,7 +3772,7 @@ ensure_runtime_tool_session_anchor() {
       _acp_evidence_sid=$(python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli" \
         --project "$project" session.get-active \
         --project "$project" \
-        --role "${FREELY_ROLE_HINT:-manager}" 2>/dev/null || true)
+        --role "${FREELY_ROLE_HINT:-manager}" 2>>"$project/.freely/run/db-daemon.log" || log_warn "session-store query failed")
       if [[ -n "$_acp_evidence_sid" ]] && is_valid_uuid "$_acp_evidence_sid"; then
         current_verified="1"
       fi
@@ -5027,7 +5027,7 @@ manager_bootstrap_runtime_expected() {
 _tool_switch_read_latest() {
   local project="$1"
   local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
-  python3 "$cli" --project "$project" session.tool-switch-read 2>/dev/null || true
+  python3 "$cli" --project "$project" session.tool-switch-read 2>>"$project/.freely/run/db-daemon.log" || true
 }
 
 # Atomic write: stale all previous + insert new succeeded.
@@ -5038,7 +5038,7 @@ _tool_switch_atomic_write() {
   python3 "$cli" --project "$project" session.tool-switch-write \
     --trigger_error "$trigger_error" --old_tool "$old_tool" --old_session_id "$old_session_id" \
     --old_jsonl_path "$old_jsonl" --old_cycle_log "$old_cycle_log" \
-    --new_tool "$new_tool" --new_session_id "$new_session_id" 2>/dev/null || true
+    --new_tool "$new_tool" --new_session_id "$new_session_id" 2>>"$project/.freely/run/db-daemon.log" || true
 }
 
 # _resolve_tool_alias: resolve a tool name to its canonical form using the
