@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260612T140944Z
 kind: raw
-phase_state: proposed
+phase_state: absorbed
 platform_ids:
   github:
     issue_id: '2569'
@@ -17,7 +17,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs:
-  - fix/raw-20260612T140944Z-a2a-handoff-compat
+- fix/raw-20260612T140944Z-a2a-handoff-compat
 ---
 
 原始 scope: a2a_tasks 表 raw_key 列 INSERT 遗漏。
