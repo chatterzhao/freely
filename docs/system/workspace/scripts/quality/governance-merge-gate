@@ -333,6 +333,25 @@ def is_implementation_bearing_path(rel_path: str) -> bool:
     return rel_path.startswith(IMPLEMENTATION_PATH_PREFIXES)
 
 
+def _fail_no_common_ancestor(base: str, head: str) -> None:
+    """Block the push — git merge-base found no common ancestor (history rewritten)."""
+    print(f"""
+╔══════════════════════════════════════════════════════════════╗
+║  [GOVERNANCE-GATE] 无法验证 — 找不到共同祖先                 ║
+╠══════════════════════════════════════════════════════════════╣
+║  git merge-base 返回空 → 提交历史被重写过。                  ║
+║  门禁无法验证中间 commit 的治理合规性，必须阻塞。             ║
+║                                                              ║
+║  常见原因: git filter-branch / rebase 重写了 develop 历史     ║
+║                                                              ║
+║  修复: 确认重写后的 phase_state 正确 → 一次性对齐:            ║
+║    git push <remote> develop --force-with-lease               ║
+║  之后恢复使用 pr-merge-guarded（不再 force push）             ║
+╚══════════════════════════════════════════════════════════════╝
+""", file=sys.stderr)
+    sys.exit(1)
+
+
 def changed_paths_from_args(args: argparse.Namespace) -> List[str]:
     if args.staged:
         output = git("diff", "--cached", "--name-only", "--diff-filter=ACMR")
@@ -346,9 +365,11 @@ def changed_paths_from_args(args: argparse.Namespace) -> List[str]:
                 head = range_parts[1].strip()
                 try:
                     merge_base = git("merge-base", base, head).strip()
+                    if not merge_base:
+                        _fail_no_common_ancestor(base, head)
                     output = git("diff", "--name-only", "--diff-filter=ACMR", f"{merge_base}..{head}")
                 except subprocess.CalledProcessError:
-                    output = git("diff", "--name-only", "--diff-filter=ACMR", "4b825dc642cb6eb9a060e54bf899d153c1c0c5b8", head)
+                    _fail_no_common_ancestor(base, head)
             else:
                 raise
     else:
