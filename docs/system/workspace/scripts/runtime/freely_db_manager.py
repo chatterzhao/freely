@@ -336,7 +336,7 @@ class DbDaemon:
                     continue
                 except OSError as e:
                     self.log(f"socket accept error: {e}")
-                    break
+                    continue
         finally:
             sock.close()
             if os.path.exists(self.socket_path):
