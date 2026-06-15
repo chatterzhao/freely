@@ -559,20 +559,41 @@ def main():
             stop_reason = send_prompt(prompt_text, t_start, t_session, launch_kind,
                                       use_delta=(launch_kind == "prompt" or args.delta))
         except Exception as prompt_exc:
-            # session/prompt failed — session may have been lost (bridge restart).
-            # Fall back to session/new and retry once.
-            print(f"[WARN] session/prompt failed ({prompt_exc}), falling back to session/new", flush=True)
-            new_params = {"cwd": cwd, "mcpServers": []}
-            if args.session_id:
-                new_params["sessionId"] = args.session_id
-            session_result = client.request("session/new", new_params, timeout=30)
-            session_id = session_result["sessionId"]
-            print(session_id, flush=True)                                                      # line 1: clean UUID
-            print(f"session id: {session_id} (fresh after prompt failure)", flush=True)         # line 2: human log
-            t_session = time.time()
-            launch_kind = "fresh"
-            stop_reason = send_prompt(prompt_text, t_start, t_session, launch_kind,
-                                      use_delta=False)
+            # session/prompt failed — session may have been closed by the AI
+            # (e.g. opencode closes sessions after stop_reason=end_turn).
+            # Try session/resume first to re-activate the closed session
+            # before falling all the way back to session/new.
+            # session/resume preserves context history and enables cache hits.
+            print(f"[WARN] session/prompt failed ({prompt_exc}), trying session/resume", flush=True)
+            try:
+                resume_result = client.request(
+                    "session/resume",
+                    {"sessionId": session_id, "cwd": cwd, "mcpServers": []},
+                    timeout=30,
+                )
+                resumed_id = resume_result["sessionId"]
+                print(resumed_id, flush=True)
+                print(f"session id: {resumed_id} (resumed after prompt failure)", flush=True)
+                session_id = resumed_id
+                t_session = time.time()
+                launch_kind = "resume"
+                stop_reason = send_prompt(prompt_text, t_start, t_session, launch_kind,
+                                          use_delta=True)
+            except Exception as resume_exc:
+                # session/resume also failed — bridge may have restarted.
+                # Fall back to session/new as last resort.
+                print(f"[WARN] session/resume also failed ({resume_exc}), falling back to session/new", flush=True)
+                new_params = {"cwd": cwd, "mcpServers": []}
+                if args.session_id:
+                    new_params["sessionId"] = args.session_id
+                session_result = client.request("session/new", new_params, timeout=30)
+                session_id = session_result["sessionId"]
+                print(session_id, flush=True)
+                print(f"session id: {session_id} (fresh after prompt failure)", flush=True)
+                t_session = time.time()
+                launch_kind = "fresh"
+                stop_reason = send_prompt(prompt_text, t_start, t_session, launch_kind,
+                                          use_delta=False)
 
         # Loop mode: keep session alive, wait for next prompt via control file
         if args.loop and args.next_prompt_file:
