@@ -14452,50 +14452,9 @@ parse_a2a_task_json_reply() {
     return 0
   fi
 
-  # ── Fallback: extract JSON block from AI reply text ──
-  if [[ -n "$cycle_log" && -f "$cycle_log" ]]; then
-    _reply_text="$(tail -c 32768 "$cycle_log" 2>/dev/null || true)"
-  else
-    _reply_text=""
-  fi
-  if [[ -z "$_reply_text" ]]; then
-    printf 'repair:["empty_reply"]\n'
-    return 1
-  fi
-  local _reply_tmp="$project/.freely/run/.parse-reply-tmp.txt"
-  printf "%s
-" "$_reply_text" > "$_reply_tmp" 2>/dev/null || true
-  _result=$(python3 "$_a2a_task_py" parse --db "$_db_path" --reply-file "$_reply_tmp" \
-    --role "$role" --raw-key "$raw_key" --prompt-file "$prompt_file" 2>/dev/null || true)
-  _action=$(echo "$_result" | python3 -c "import json,sys; print(json.load(sys.stdin).get('action','error'))" 2>/dev/null || echo "error")
-  if [[ "$_action" == "repair" ]]; then
-    local _errors
-    _errors=$(echo "$_result" | python3 -c "import json,sys; print(json.dumps(json.load(sys.stdin).get('errors',[])))" 2>/dev/null || echo "[]")
-    printf 'repair:%s\n' "$_errors"
-    return 1
-  fi
-  _exit_kind="${_action:-unknown}"
-  case "$_exit_kind" in
-    submitted)
-      local _workers_field
-      _workers_field=$(echo "$_result" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('workers',''))" 2>/dev/null || echo "")
-      if [[ -n "$_workers_field" && "$_workers_field" != "null" ]]; then
-        _exit_kind="delegate_workers"
-        printf '%s\n' "$_workers_field" > "$project/.freely/run/last-workers-csv.txt" 2>/dev/null || true
-      else
-        _exit_kind="resume_manager"
-      fi ;;
-    completed) if [[ "$role" == "worker" ]]; then _exit_kind="worker_done"
-      else _exit_kind="resume_manager"; fi ;;
-    failed)   _exit_kind="stop_ai" ;;
-    working)  if [[ "$role" == "worker" ]]; then _exit_kind="worker_working"
-      else _exit_kind="manager_working"; fi ;;
-    input-required|pending-input)
-      if [[ "$role" == "worker" ]]; then _exit_kind="worker_blocked"
-      else _exit_kind="resume_manager"; fi ;;
-  esac
-  printf 'ok:%s\n' "$_exit_kind"
-  return 0
+  # ── Text parsing fallback REMOVED (Phase 3) — a2a-exit is the only path ──
+  printf 'repair:["no_a2a_exit_called"]\n'
+  return 1
 }
 
 manager_exit_contract_kind() {
@@ -15212,12 +15171,7 @@ HINTEOF
       ;;
     delegate_workers)
       worker_prompts_csv="$(_db_exit_contract_field "$project" manager worker_prompts_csv)"
-      if [[ -z "$worker_prompts_csv" || "$worker_prompts_csv" == "null" ]]; then
-        local _persisted_csv="$project/.freely/run/last-workers-csv.txt"
-        if [[ -f "$_persisted_csv" ]]; then
-          worker_prompts_csv="$(cat "$_persisted_csv" 2>/dev/null || true)"
-        fi
-      fi
+
       append_runtime_event "$project" "manager_exit_contract_delegate_workers" \
         "worker_prompts_csv=${worker_prompts_csv:-none}"
       printf 'delegate_workers\n'
