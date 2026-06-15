@@ -6121,3 +6121,21 @@ routing_policy:
 - phase_state: `in_b2_ibm`
 - issue_path: `docs/issues/I-20260612T000223Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260612T000223Z--a2a-replace-handoff/candidates.md#C-20260612T000223Z-A`
+
+## M-20260615T001626Z-A
+- title: 移除 A2A 文本 JSON 解析 Fallback (Phase 1+2)
+- status: active
+### candidate_issues
+1. `C-20260615T001626Z-A`
+- milestone: M-20260615T001626Z-A
+- status: promoted
+- decision_reason: 父 Epic a2a-replace-handoff 已完成核心实现。当前代码存在双路径（a2a-exit + 文本 JSON 解析 fallback），Phase 1+2 修复信号文件 WORKERS 字段并统一所有 Prompt 为 a2a-exit 指令，是消除双路径的第一步。
+- next_action: 进入 B2_IBM 实现设计
+- promoted_issue_path: `docs/issues/I-20260615T001626Z-A/issue.md`
+### committed_issues
+1. `I-20260615T001626Z-A`
+- title: 移除 A2A 文本 JSON 解析 Fallback (Phase 1+2)
+- milestone_state: committed
+- phase_state: `in_b2_ibm`
+- issue_path: `docs/issues/I-20260615T001626Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260615T001626Z--a2a-no-fallback/candidates.md#C-20260615T001626Z-A`

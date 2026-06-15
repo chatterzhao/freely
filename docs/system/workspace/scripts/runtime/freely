@@ -12783,7 +12783,7 @@ print(sum(1 for r in rows if r.get('worktree','')=='$_target_worktree'))
 
 ---
 
-回复末尾输出 A2A Task 状态 JSON（格式见 worker-agent.md）：
+本轮结束时必须调用 a2a-exit 工具（见 worker-agent.md）。不要输出 JSON block：
 
 ```json
 {
@@ -14081,7 +14081,7 @@ ${manager_agent_def}
 
 硬性收口要求：
 - 先写 manager continuity 文件：\`$expected_continuity\`
-- 再在回复末尾输出 \`\`\`json (handoff 内容) JSON 块（resume_manager 或 stop_ai）
+- 再在回复末尾输出 \`\`\`json (handoff 内容) JSON 块（completed 或 failed 或 submitted）
 - 如果 scan 显示 backlog 非空，而你没有形成新的 manager continuity 或合法 worker delegation，这一轮视为失败。
 - 如果当前没有 launchable worker prompt，就必须用 continuity 把当前 manager-owned restart point / next_action 写清，再输出 resume_manager JSON。
 - 只有当前 manager lane 已经明确闭合且 scan/source 也证明可以安全停下时，才允许输出 stop_ai JSON。
@@ -18807,7 +18807,7 @@ build_prompt() {
 === 本轮 delta（会话已记住你的角色和历史） ===
 上一轮 state: ${LAST_WORKCELL_EXIT_REASON:-unknown}
 请基于 session 历史继续工作。先读 a2a_tasks 更新，再决定下一步。
-回复末尾输出 A2A Task 状态 JSON。
+调用 a2a-exit 工具声明本轮状态
 PROMPT_DELTA
     append_manager_task_context_if_needed "$PROJECT_ROOT"
     append_fleet_supervision_if_needed

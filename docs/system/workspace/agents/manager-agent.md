@@ -53,7 +53,7 @@ intent_target: <简短描述>
 
 1. **开工位**：目标 worktree 不存在 → `./bin/wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>`
 2. **写 prompt**：`.freely/run/worker-prompts/<ts>-worker-<slug>.txt`，header + Task
-3. **输出 A2A Task JSON**：`exit_kind: "delegate_workers"`，`worker_prompts_csv` 指向 prompt 路径
+3. **调用 a2a-exit**：`a2a-exit --state submitted --workers "prompt路径"`（见文末 A2A Task State 节）
 
 ## 收口判断
 
