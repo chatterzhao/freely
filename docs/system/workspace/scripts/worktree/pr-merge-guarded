@@ -212,24 +212,51 @@ attempt_develop_push_followthrough_if_needed() {
   remotes=$(git remote 2>/dev/null || true)
   [[ -n "$remotes" ]] || remotes="origin"
 
+  local failed_remotes=""
   for remote in $remotes; do
-    # Skip internal "all" remote if present
     [[ "$remote" == "all" ]] && continue
     echo "[MERGE-GUARD] pushing develop to $remote..."
     if git push "$remote" develop 2>&1; then
       echo "[MERGE-GUARD] $remote: pushed ✓"
     else
-      echo "[MERGE-GUARD] $remote: push FAILED — will retry via develop-push followthrough" >&2
-      push_ok=0
+      echo "[MERGE-GUARD] $remote: push FAILED" >&2
+      failed_remotes="$failed_remotes $remote"
     fi
   done
 
-  if [[ "$push_ok" == "1" ]]; then
+  if [[ -z "$failed_remotes" ]]; then
     echo "[MERGE-GUARD] all remotes synced ✓"
   else
-    echo "[MERGE-GUARD] some remotes failed; using develop-push attempt for retry tracking" >&2
+    # ── BLOCKING: push failed on some platforms. Do not continue. ──
+    cat >&2 <<GATE_BLOCKED
+
+╔══════════════════════════════════════════════════════════════╗
+║  [MERGE-GUARD] 多平台推送失败 — 合并已阻塞                    ║
+╠══════════════════════════════════════════════════════════════╣
+║  失败平台: ${failed_remotes}
+║                                                              ║
+║  原因: governance gate 拦截了推送。                           ║
+║  上面 git push 的完整报错说明了具体哪些 raw issue 的          ║
+║  phase_state 不符合门禁要求。                                 ║
+║                                                              ║
+║  修复步骤:                                                    ║
+║  1. 根据报错找到 phase_state 不正确的 raw issue               ║
+║  2. 如果代码已实现但未走 B1→candidate→I-* 链:                ║
+║     skill:freely-doc-B1_IBM-execution → brainstorm → candidate║
+║     skill:freely-doc-B2_IBM-execution → I-* → milestone       ║
+║  3. 如果只是 metadata 未更新 (fix-execution 路径):            ║
+║     更新 phase_state 为 absorbed，指向吸收它的 canonical issue║
+║  4. 修复完成后重新执行:                                       ║
+║     ./bin/pr-merge-guarded develop <source-branch>            ║
+║                                                              ║
+║  查询当前阻塞状态:                                            ║
+║     ./bin/freely develop-push status --project <path>         ║
+╚══════════════════════════════════════════════════════════════╝
+
+GATE_BLOCKED
+    # Record state for develop-push attempt tracking
     ./bin/freely develop-push attempt --project "$PWD" || true
-    echo "[MERGE-GUARD] merge committed; push_blocked state available for retry" >&2
+    exit 1
   fi
 
   # Sync changed issues to platforms after merge to develop.
