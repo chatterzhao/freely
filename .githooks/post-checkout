@@ -69,8 +69,7 @@ MSG
   echo "[HOOK] To continue in that worktree:"
   echo "  cd \"$existing_for_branch\""
   echo "[HOOK] Standard cleanup after merge:"
-  echo "  git worktree remove ${rel_target}"
-  echo "  git branch -d \"$branch\""
+  echo "  ./bin/wt-close \"$branch\""
   exit 0
 fi
 
@@ -95,6 +94,5 @@ Primary worktree switched back to '$parking_branch'.
 [HOOK] Worktree mode is required for this branch. Continue there with:
   cd "$target_path"
 [HOOK] Standard cleanup after merge:
-  git worktree remove $(freely_wt_relative_target_for_branch "$branch")
-  git branch -d "$branch"
+  ./bin/wt-close "$branch"
 MSG
