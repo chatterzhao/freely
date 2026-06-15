@@ -14459,6 +14459,41 @@ manager_exit_contract_kind() {
       return 0
     fi
   fi
+  # ── Step 4: Filesystem fallback (after_run safety net) ──────────
+  # If A2A has no record (AI forgot a2a-exit, crashed, or timed out),
+  # scan worker-prompts/ for files created during this AI cycle.
+  # The filesystem IS the event bus: prompt file creation = delegation.
+  # This guarantees the runtime always detects new worker prompts
+  # regardless of AI behavior — equivalent to Routa's after_run hook.
+  local _prompts_dir="$project/.freely/run/worker-prompts"
+  local _prompt_file_ref _new_prompts_csv=""
+  _prompt_file_ref="$(latest_prompt_file_for_project "$project" 2>/dev/null || true)"
+  if [[ -d "$_prompts_dir" && -n "$_prompt_file_ref" && -f "$_prompt_file_ref" ]]; then
+    local _cycle_start _new_count=0
+    _cycle_start=$(stat -f %m "$_prompt_file_ref" 2>/dev/null || stat -c %Y "$_prompt_file_ref" 2>/dev/null || echo "0")
+    if [[ "$_cycle_start" =~ ^[0-9]+$ && "$_cycle_start" -gt 0 ]]; then
+      while IFS= read -r _pf; do
+        [[ -n "$_pf" && -f "$_pf" ]] || continue
+        local _pf_mtime
+        _pf_mtime=$(stat -f %m "$_pf" 2>/dev/null || stat -c %Y "$_pf" 2>/dev/null || echo "0")
+        if [[ "$_pf_mtime" =~ ^[0-9]+$ && "$_pf_mtime" -ge "$_cycle_start" ]]; then
+          if [[ -z "$_new_prompts_csv" ]]; then
+            _new_prompts_csv="$_pf"
+          else
+            _new_prompts_csv="$_new_prompts_csv,$_pf"
+          fi
+          ((_new_count++))
+        fi
+      done < <(find "$_prompts_dir" -maxdepth 1 -type f -name '*.txt' 2>/dev/null | sort)
+    fi
+    if [[ -n "$_new_prompts_csv" ]]; then
+      append_runtime_event "$project" "manager_exit_contract_filesystem_fallback" \
+        "worker_prompts_csv=${_new_prompts_csv}" \
+        "new_count=${_new_count}"
+      echo "delegate_workers"
+      return 0
+    fi
+  fi
   return 1
 }
 
