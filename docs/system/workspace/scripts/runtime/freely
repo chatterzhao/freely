@@ -20244,23 +20244,75 @@ start_project_runtime() {
   append_runtime_event "$project" "start_project_runtime_after_registry" \
     "entrypoint_mode=$entrypoint_mode"
 
-  # ── Sync develop working tree with remote ──
-  # git update-ref alone does not update working tree files.
-  # Without this, daemon can run stale code if develop was advanced by PR merges.
+  # ── Sync develop working tree: verify all platforms are consistent ──
+  # Multi-platform governance: every configured remote must agree on develop HEAD.
+  # If platforms are out of sync, refuse to start — the operator must resolve.
+  # Stashes dirty files instead of discarding. Uses git pull (respects hooks).
   if [[ "$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)" == "develop" ]]; then
-    log_info "syncing develop working tree with origin..."
-    git fetch origin develop 2>/dev/null || true
-    local _local_sha _remote_sha
+    local _local_sha _first_sha="" _first_remote="" _consistent=1 _divergence_report=""
     _local_sha="$(git rev-parse HEAD 2>/dev/null || true)"
-    _remote_sha="$(git rev-parse refs/remotes/origin/develop 2>/dev/null || true)"
-    if [[ -n "$_local_sha" && -n "$_remote_sha" && "$_local_sha" != "$_remote_sha" ]]; then
-      log_info "develop working tree is behind (local=$_local_sha remote=$_remote_sha), updating..."
-      git config core.hooksPath /dev/null
-      git reset --hard refs/remotes/origin/develop
-      git config core.hooksPath .githooks
-      log_info "develop working tree updated to $_remote_sha"
+
+    # Detect dirty working tree — refuse to start, let user decide
+    if ! git diff --quiet 2>/dev/null || ! git diff --cached --quiet 2>/dev/null; then
+      log_error "develop working tree is dirty — cannot start daemon."
+      log_error ""
+      log_error "Modified files:"
+      git diff --name-only 2>/dev/null | while read -r _f; do echo "  (unstaged) $_f"; done
+      git diff --cached --name-only 2>/dev/null | while read -r _f; do echo "  (staged)   $_f"; done
+      log_error ""
+      log_error "The daemon must start from a clean working tree to avoid"
+      log_error "overwriting uncommitted work during platform sync."
+      log_error ""
+      log_error "Resolve by:"
+      log_error "  git stash       — save changes and restore later"
+      log_error "  git commit ...  — commit changes to a feature branch"
+      log_error "  git checkout -- <file> — discard changes (caution!)"
+      log_error ""
+      log_error "Then retry: freely daemon start --project $project"
+      exit 1
+    fi
+
+    # Fetch all remotes and verify consistency
+    for _remote in $(git remote 2>/dev/null | grep -v '^all$'); do
+      git fetch "$_remote" develop 2>/dev/null || true
+      local _remote_sha
+      _remote_sha="$(git rev-parse "refs/remotes/$_remote/develop" 2>/dev/null || true)"
+      if [[ -n "$_remote_sha" ]]; then
+        if [[ -z "$_first_sha" ]]; then
+          _first_sha="$_remote_sha"
+          _first_remote="$_remote"
+        elif [[ "$_remote_sha" != "$_first_sha" ]]; then
+          _consistent=0
+          _divergence_report+="  $_first_remote: $_first_sha"$'\n'
+          _divergence_report+="  $_remote: $_remote_sha"$'\n'
+        fi
+      fi
+    done
+
+    if [[ "$_consistent" == "0" ]]; then
+      # Platforms are out of sync — refuse to start
+      log_error "develop branch is inconsistent across platforms!"
+      log_error "The following remotes have different HEAD commits:"
+      printf '%s' "$_divergence_report" >&2
+      log_error ""
+      log_error "This means pr-merge-guarded did not push to all platforms."
+      log_error "Resolve by running:"
+      log_error "  ./bin/freely develop-push status --project $project"
+      log_error "  ./bin/freely develop-push attempt --project $project"
+      log_error ""
+      log_error "If a platform is permanently unavailable, remove it from git remote:"
+      log_error "  git remote remove <name>"
+      exit 1
+    fi
+
+    if [[ -n "$_first_sha" && "$_local_sha" != "$_first_sha" ]]; then
+      log_info "develop working tree updating to $_first_sha"
+      git pull "$_first_remote" develop --ff-only 2>/dev/null || {
+        log_warn "fast-forward sync failed, trying merge..."
+        git pull "$_first_remote" develop --no-edit 2>/dev/null || log_warn "sync merge failed, continuing with local state"
+      }
     else
-      log_info "develop working tree is current"
+      log_info "develop working tree is current (all platforms consistent)"
     fi
   fi
 
