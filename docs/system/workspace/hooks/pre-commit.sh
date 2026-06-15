@@ -268,8 +268,7 @@ If you must use raw 'git worktree add', immediately follow it with:
   ./bin/freely sync-tooling --source-project <your-project-name-path> --project ../<your-project-name>-worktrees/<derived-branch-dir>
 
 When the work is finished and merged, clean up with:
-  git worktree remove ../<your-project-name>-worktrees/feature-<task-name>
-  git branch -d feature/<task-name>
+  ./bin/wt-close feature/<task-name>
 
 If you skip this workflow, hooks will create the worktree when possible and print guidance.
 Do not keep committing in the current directory.
@@ -341,8 +340,7 @@ Start work in worktree:
   cd "$existing_for_branch"
 
 Standard cleanup after merge:
-  git worktree remove ${rel_target}
-  git branch -d "$branch"
+  ./bin/wt-close "$branch"
 MSG
   git worktree list
   exit 1
@@ -363,7 +361,6 @@ If you must create it manually instead:
   ./bin/freely sync-tooling --source-project <your-project-name-path> --project ${rel_target}
 
 When the work is finished and merged:
-  git worktree remove ${rel_target}
-  git branch -d "$branch"
+  ./bin/wt-close "$branch"
 MSG
 exit 1
