@@ -686,7 +686,41 @@ def _main() -> int:
             # ── AI explicitly sets A2A Task state via tool call ──
             # If --task-id given: PATCH existing task (standard A2A lifecycle).
             # If no --task-id: POST create new task (first submission only).
-            from a2a_task_parser import normalize_state, VALID_STATES
+            # Inlined from a2a_task_parser (Phase 5a)
+VALID_STATES = {
+    'submitted', 'working', 'completed', 'failed',
+    'input-required', 'pending-input',
+}
+
+STATE_ALIASES = {
+    # submitted
+    'delegate': 'submitted', 'delegated': 'submitted', 'dispatch': 'submitted',
+    'working': 'submitted', 'active': 'submitted', 'in_progress': 'working',
+    # working (worker)
+    'in-progress': 'working', 'progress': 'working',
+    # completed
+    'done': 'completed', 'success': 'completed', 'finished': 'completed',
+    'complete': 'completed', 'ok': 'completed', 'good': 'completed',
+    'completed_no_op': 'completed', 'clean_success': 'completed',
+    'completed_with_findings': 'completed', 'partial_success': 'completed',
+    'completed_s_hint': 'completed', 'completed_with_evidence': 'completed',
+    'completed_idle': 'completed', 'completed_independent': 'completed',
+    'task_already_done': 'completed', 'noop': 'completed',
+    'all_done': 'completed', 'finished_no_op': 'completed',
+    'completed_no_changes': 'completed', 'normal': 'completed',
+    # failed
+    'stopped': 'failed', 'paused': 'failed', 'exit': 'failed',
+    'nothing': 'failed', 'no_work': 'failed', 'idle': 'failed',
+    'stop': 'failed', 'error': 'failed',
+    # input-required
+    'blocked': 'input-required', 'block': 'input-required',
+    # pending-input
+    'needs_manager': 'pending-input', 'needs_input': 'pending-input',
+    'handoff': 'pending-input',
+}
+
+def normalize_state_fields(fields: dict) -> None:
+    """Normalize AI natural language → A2A state in place.
             raw_state = getattr(args, 'state', '') or ''
             state = normalize_state(raw_state)
             if state not in VALID_STATES:
