@@ -353,7 +353,7 @@ class A2AServer:
                     "worker_prompts_csv": body.get("workers", ""),
                     "message": body.get("message", ""),
                 }
-                self.task_store.raw_rpc("a2a_task.update", {k: v for k, v in fields.items() if v})
+                self.task_store.raw_rpc("a2a_task.update", dict(fields))
                 return JSONResponse({"id": task.id, "state": "submitted"}, status_code=202)
             except Exception as e:
                 return JSONResponse({"error": str(e)}, status_code=400)

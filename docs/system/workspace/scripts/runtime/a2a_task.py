@@ -158,7 +158,7 @@ class A2AClient:
     # ── Task API ───────────────────────────────────────────────────────
 
     def create(self, **kwargs) -> dict:
-        return self._request("POST", "/tasks", {k: v for k, v in kwargs.items() if v})
+        return self._request("POST", "/tasks", dict(kwargs))
 
     def get(self, task_id: str) -> Optional[dict]:
         r = self._request("GET", f"/tasks/{task_id}")
@@ -166,7 +166,7 @@ class A2AClient:
 
     def update(self, task_id: str, **fields) -> dict:
         return self._request("PATCH", f"/tasks/{task_id}",
-                            {k: v for k, v in fields.items() if v})
+                            dict(fields))
 
     def list(self, **filters) -> List[dict]:
         params = [f"{k}={v}" for k, v in filters.items() if v]
@@ -363,6 +363,36 @@ def read_state_only(reply_text: str) -> dict:
     return extract_task_state(reply_text)
 
 
+VALID_STATES = {
+    'submitted', 'working', 'completed', 'failed',
+    'input-required', 'pending-input',
+}
+
+STATE_ALIASES = {
+    'delegate': 'submitted', 'delegated': 'submitted', 'dispatch': 'submitted',
+    'working': 'submitted', 'active': 'submitted', 'in_progress': 'working',
+    'in-progress': 'working', 'progress': 'working',
+    'done': 'completed', 'success': 'completed', 'finished': 'completed',
+    'complete': 'completed', 'ok': 'completed', 'good': 'completed',
+    'completed_no_op': 'completed', 'clean_success': 'completed',
+    'completed_with_findings': 'completed', 'partial_success': 'completed',
+    'completed_s_hint': 'completed', 'completed_with_evidence': 'completed',
+    'completed_idle': 'completed', 'completed_independent': 'completed',
+    'task_already_done': 'completed', 'noop': 'completed',
+    'all_done': 'completed', 'finished_no_op': 'completed',
+    'completed_no_changes': 'completed', 'normal': 'completed',
+    'stopped': 'failed', 'paused': 'failed', 'exit': 'failed',
+    'nothing': 'failed', 'no_work': 'failed', 'idle': 'failed',
+    'stop': 'failed', 'error': 'failed',
+    'blocked': 'input-required', 'block': 'input-required',
+    'needs_manager': 'pending-input', 'needs_input': 'pending-input',
+    'handoff': 'pending-input',
+}
+
+def normalize_state(raw: str) -> str:
+    s = raw.strip().lower().replace('-', '_').replace(' ', '_')
+    return STATE_ALIASES.get(s, s)
+
 # ── CLI ───────────────────────────────────────────────────────────────────
 
 def _main() -> int:
@@ -507,7 +537,6 @@ def _main() -> int:
             args.state = sm.get(args.status, args.status)
         # Map legacy --exit-kind to state
         if getattr(args, 'exit_kind', None) and not getattr(args, 'state', None):
-            from a2a_task_parser import normalize_state
             args.state = normalize_state(args.exit_kind)
 
     try:
@@ -642,7 +671,7 @@ def _main() -> int:
                             try:
                                 data = json.loads(line)
                                 c = _client()
-                                c.create(**{k: v for k, v in data.items() if v})
+                                c.create(**data)
                                 count += 1
                             except Exception:
                                 pass
@@ -683,44 +712,6 @@ def _main() -> int:
                 r = c.update(task_id, **fields)
                 print(json.dumps({"ok": True, "task_id": task_id, "state": fields["state"]}))
         elif args.cmd == "a2a-exit":
-            # ── AI explicitly sets A2A Task state via tool call ──
-            # If --task-id given: PATCH existing task (standard A2A lifecycle).
-            # If no --task-id: POST create new task (first submission only).
-            # Inlined from a2a_task_parser (Phase 5a)
-VALID_STATES = {
-    'submitted', 'working', 'completed', 'failed',
-    'input-required', 'pending-input',
-}
-
-STATE_ALIASES = {
-    # submitted
-    'delegate': 'submitted', 'delegated': 'submitted', 'dispatch': 'submitted',
-    'working': 'submitted', 'active': 'submitted', 'in_progress': 'working',
-    # working (worker)
-    'in-progress': 'working', 'progress': 'working',
-    # completed
-    'done': 'completed', 'success': 'completed', 'finished': 'completed',
-    'complete': 'completed', 'ok': 'completed', 'good': 'completed',
-    'completed_no_op': 'completed', 'clean_success': 'completed',
-    'completed_with_findings': 'completed', 'partial_success': 'completed',
-    'completed_s_hint': 'completed', 'completed_with_evidence': 'completed',
-    'completed_idle': 'completed', 'completed_independent': 'completed',
-    'task_already_done': 'completed', 'noop': 'completed',
-    'all_done': 'completed', 'finished_no_op': 'completed',
-    'completed_no_changes': 'completed', 'normal': 'completed',
-    # failed
-    'stopped': 'failed', 'paused': 'failed', 'exit': 'failed',
-    'nothing': 'failed', 'no_work': 'failed', 'idle': 'failed',
-    'stop': 'failed', 'error': 'failed',
-    # input-required
-    'blocked': 'input-required', 'block': 'input-required',
-    # pending-input
-    'needs_manager': 'pending-input', 'needs_input': 'pending-input',
-    'handoff': 'pending-input',
-}
-
-def normalize_state_fields(fields: dict) -> None:
-    """Normalize AI natural language → A2A state in place.
             raw_state = getattr(args, 'state', '') or ''
             state = normalize_state(raw_state)
             if state not in VALID_STATES:
@@ -729,7 +720,6 @@ def normalize_state_fields(fields: dict) -> None:
                 c = _client()
                 existing_task_id = getattr(args, 'task_id', '') or ''
                 if existing_task_id:
-                    # Update existing task (standard A2A lifecycle)
                     r = c.update(existing_task_id, state=state,
                                  summary=getattr(args, 'summary', '') or "",
                                  next=getattr(args, 'next', '') or "",
@@ -737,7 +727,6 @@ def normalize_state_fields(fields: dict) -> None:
                                  worker_prompts_csv=getattr(args, 'workers', '') or "")
                     task_id = existing_task_id
                 else:
-                    # Create new task (first submission)
                     r = c.create(
                         agent_id=getattr(args, 'role', 'manager') or "manager",
                         name=getattr(args, 'role', 'manager') or "manager",
@@ -754,7 +743,6 @@ def normalize_state_fields(fields: dict) -> None:
                         worker_prompts_csv=getattr(args, 'workers', '') or "",
                     )
                     task_id = r.get("id", "")
-                # Write signal file for immediate supervisor detection
                 run_dir = os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "..", ".freely", "run")
                 try:
                     os.makedirs(run_dir, exist_ok=True)
