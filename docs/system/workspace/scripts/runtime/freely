@@ -14442,6 +14442,16 @@ manager_exit_contract_kind() {
       echo "delegate_workers"
       return 0
     fi
+    # Check worker_prompts_csv from latest manager A2A task.
+    # a2a-exit --workers writes worker_prompts_csv, not exit_kind.
+    # Without this check, the runtime never detects delegate_workers
+    # and Worker AIs are never launched (175 prompts accumulated).
+    local mgr_workers
+    mgr_workers=$(python3 "$_a2a_task_py" latest-manager --db "$_db_path" 2>/dev/null | python3 -c "import json,sys; r=json.load(sys.stdin); print(r.get('worker_prompts_csv',''))" 2>/dev/null || true)
+    if [[ -n "$mgr_workers" && "$mgr_workers" != "null" ]]; then
+      echo "delegate_workers"
+      return 0
+    fi
     local latest_mgr
     latest_mgr=$(python3 "$_a2a_task_py" latest-manager --db "$_db_path" 2>/dev/null | python3 -c "import json,sys; r=json.load(sys.stdin); print(r.get('exit_kind',''))" 2>/dev/null || true)
     if [[ -n "$latest_mgr" ]]; then
@@ -14483,6 +14493,16 @@ except: pass
     if [[ -n "$pending_workers" ]]; then
       worker_prompts_csv="$pending_workers"
       kind="delegate_workers"
+    fi
+    # Check worker_prompts_csv from latest manager A2A task.
+    # a2a-exit --workers writes this field, not exit_kind.
+    if [[ -z "$kind" ]]; then
+      local _mgr_workers
+      _mgr_workers=$(python3 "$_a2a_task_py" latest-manager --db "$_db_path" 2>/dev/null | python3 -c "import json,sys; r=json.load(sys.stdin); print(r.get('worker_prompts_csv',''))" 2>/dev/null || true)
+      if [[ -n "$_mgr_workers" && "$_mgr_workers" != "null" ]]; then
+        worker_prompts_csv="$_mgr_workers"
+        kind="delegate_workers"
+      fi
     fi
     if [[ -z "$kind" ]]; then
       kind="$(_db_exit_contract_field "$project" manager exit_kind)"
