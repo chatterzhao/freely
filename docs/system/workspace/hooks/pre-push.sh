@@ -37,6 +37,26 @@ MSG
 
   case "$local_branch" in
     main|develop)
+      # ── Force-push detection: block history rewrite on protected branches ──
+      if [[ -n "${remote_sha:-}" && "$remote_sha" != "0000000000000000000000000000000000000000" ]]; then
+        if ! git merge-base --is-ancestor "$remote_sha" "$local_sha" 2>/dev/null; then
+          cat >&2 <<MSG
+[HOOK] Push blocked: force push to protected branch '$local_branch' is forbidden.
+
+  git push --force / --force-with-lease 会重写受保护分支的提交历史，
+  导致不同平台 commit SHA 不一致，破坏多平台同步。
+
+  正确流程:
+    - 所有改动通过 pr-merge-guarded 合并
+    - pr-merge-guarded 会同时推送到所有平台，保证一致性
+    - 如果遇到 governance gate 阻塞，按报错修复后重新执行 pr-merge-guarded
+
+  永远不要对 main/develop 使用 --force 或 --force-with-lease。
+
+MSG
+          exit 1
+        fi
+      fi
       if [[ "$local_branch" == "develop" && -x "./bin/governance-merge-gate" ]]; then
         if [[ "${FREELY_SKIP_IBM_GATE:-0}" == "1" ]]; then
           echo "[HOOK] FREELY_SKIP_IBM_GATE=1 — validating governance-only paths via governance-merge-gate --skip-ibm-gate"
