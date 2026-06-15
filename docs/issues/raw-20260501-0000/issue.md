@@ -15,7 +15,7 @@ platform_ids:
 primary_platform: github
 hash: ''
 created_at: '2026-05-01T00:00:00Z'
-updated_at: '2026-06-14T12:59:55Z'
+updated_at: '2026-06-15T06:11:34Z'
 session_refs:
 - tool: ccds
   session_id: 20260501-scan-pr-platform
