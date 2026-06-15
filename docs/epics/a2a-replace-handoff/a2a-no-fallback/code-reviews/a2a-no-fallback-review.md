@@ -1,10 +1,29 @@
 ---
 name: A2A No-Fallback Implementation Decision Note
 owner_issue: I-20260615T001626Z-A
-owner_issue_path: docs/epics/a2a-replace-handoff/a2a-no-fallback/issues/I-20260615T001626Z-A.md
+owner_issue_path: docs/issues/I-20260615T001626Z-A/issue.md
 implementation_decision_note: true
 phase_state: completed
 review_id: a2a-no-fallback-review
+decision: Execute Phase 1+2 — fix signal file WORKERS field + unify all prompts to a2a-exit instruction
+why_this: |
+  Dual-path architecture (a2a-exit + text JSON parsing) creates confusion and
+  maintenance burden. The A2A protocol is now the standard; text fallback is
+  redundant legacy. Phase 1+2 fixes the most urgent signal file bug and removes
+  the root cause (JSON block instructions in prompts).
+alternatives_considered:
+  - "Phase 1-6 all at once: larger scope, harder rollback, higher risk"
+  - "Phase 1 only without Phase 2: doesn't fix root cause (prompt inconsistency)"
+  - "No change: accumulates tech debt from dual-path maintenance"
+boundary_non_goals:
+  - "Does not change A2A Task state machine behavior"
+  - "Does not modify Manager-Worker responsibility boundaries"
+  - "Does not delete parse_a2a_task_json_reply (Phase 3-6)"
+  - "Does not remove persistence files (Phase 3-6)"
+residual_risk: |
+  FREELY_A2A_TEXT_PARSING_FALLBACK=1 env var provides break-glass rollback.
+  If a2a_task.py has bugs, fallback path can be re-enabled during transition.
+  Phase 3-6 follow-up worktrees will complete the cleanup.
 ---
 
 # Implementation Decision Note: 移除 A2A 文本 JSON 解析 Fallback (Phase 1+2)
