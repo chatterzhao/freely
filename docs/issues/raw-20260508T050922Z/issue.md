@@ -1,31 +1,46 @@
 ---
 local_id: raw-20260508T050922Z
 kind: raw
-phase_state: completed
-closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
-updated_at: 2026-05-17T04:47:25Z
+phase_state: absorbed
 platform_ids:
   github:
-    issue_id: '255'
-    url: https://github.com/chatterzhao/freely/issues/255
+    issue_id: '2616'
+    url: https://github.com/chatterzhao/freely/issues/2616
     synced_at: ''
 primary_platform: github
 canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
-created_at: '2026-05-08T05:09:22Z'
+created_at: '2026-06-13T10:53:23Z'
+updated_at: '2026-06-13T10:53:23Z'
 intake_id: ''
-author: zhaoquan
+author: platform
 channel: github
 session_refs: []
-platform_state: closed
 ---
 
-## 问题
+## I-20260508T050922Z-A: 门禁收口链路修复
 
-I-* issue 创建后 platform_ids 为空，导致 issue-sync close 无法自动关闭平台 issue。
+| Field | Value |
+|-------|-------|
+| local_id | `I-20260508T050922Z-A` |
+| kind | `linked` |
+| phase_state | `completed` |
+| canonical | `none` |
+| created | unknown |
+| updated | unknown |
 
-## 修复
+---
 
-1. cmd_close: I-* 无 platform_ids 时向上追溯 raw-* parent
-2. cmd_promote: 确保 platform_ids 写入 I-* issue
+
+local_id: I-20260508T050922Z-A
+kind: linked
+phase_state: completed
+promoted_from: raw-20260508T050922Z
+source_candidate: docs/pre-brainstorms/20260508T050922Z--closeout-chain/candidates.md#C-20260508T050922Z-A
+verification_artifact_dir: docs/epics/closeout-chain/code-reviews
+pre_tests_path: docs/epics/closeout-chain/verification/pre-tests.md
+platform_state: ''
+# I-20260508T050922Z-A: 门禁收口链路修复
+- pre_tests_path: docs/epics/closeout-chain/verification/pre-tests.md
+- verification_artifact_dir: docs/epics/closeout-chain/code-reviews
