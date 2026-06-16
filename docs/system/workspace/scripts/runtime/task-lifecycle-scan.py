@@ -473,16 +473,41 @@ def scan_classification(project: Path, platform_data: dict) -> list[dict]:
             plat_state = platform_all.get(gh_id, "").upper()
             if plat_state:
                 if local_platform_state and local_platform_state != plat_state:
-                    # Phase 1: State mismatch
-                    items.append({
-                        "source_family": "classification", "key": name,
-                        "stage": "state_mismatch",
-                        "detail": f"本地状态={local_platform_state}, 平台状态={plat_state}",
-                        "platform_issue": gh_id,
-                        "incomplete": ["platform_state_mismatch"],
-                        "ready": False,
-                        "next_action": "同步本地平台状态或关闭平台 issue",
-                    })
+                    # Check if either side is terminal → resolve instead of sync
+                    local_terminal = (phase in TERMINAL_RAW) or (phase in ("absorbed", "dropped"))
+                    platform_closed = (plat_state == "CLOSED" or plat_state == "MERGED")
+
+                    if local_terminal and not platform_closed:
+                        items.append({
+                            "source_family": "classification", "key": name,
+                            "stage": "close_platform",
+                            "detail": f"本地已 terminal ({phase}), 平台仍 {plat_state}",
+                            "platform_issue": gh_id,
+                            "incomplete": ["platform_not_closed"],
+                            "ready": True,
+                            "next_action": f"关闭平台 issue #{gh_id}（本地已 terminal: {phase}）",
+                        })
+                    elif platform_closed and not local_terminal:
+                        items.append({
+                            "source_family": "classification", "key": name,
+                            "stage": "close_local",
+                            "detail": f"平台已 {plat_state}, 本地仍 {local_platform_state}",
+                            "platform_issue": gh_id,
+                            "incomplete": ["local_not_closed"],
+                            "ready": True,
+                            "next_action": f"标记本地为 dropped（平台 issue #{gh_id} 已 {plat_state}）",
+                        })
+                    else:
+                        # Both non-terminal → real mismatch
+                        items.append({
+                            "source_family": "classification", "key": name,
+                            "stage": "state_mismatch",
+                            "detail": f"本地状态={local_platform_state}, 平台状态={plat_state}",
+                            "platform_issue": gh_id,
+                            "incomplete": ["platform_state_mismatch"],
+                            "ready": False,
+                            "next_action": "同步本地平台状态或关闭平台 issue",
+                        })
                 # Consistent state → no action
             else:
                 # gh_id not in platform_all → local_only
@@ -659,6 +684,11 @@ def _derive_action(stage: str, incomplete: list[str]) -> str:
     # Priority: doc updates first (cheapest), then platform close, then investigation
     inc_str = " ".join(incomplete)
 
+    # Terminal resolution actions
+    if stage == "close_platform":
+        return "关闭平台侧 issue（本地已 terminal）"
+    if stage == "close_local":
+        return "标记本地 issue 为 dropped（平台已关闭）"
     if "not_promoted_to_I" in inc_str:
         return "完成 B1 预研 → 产出 candidate → 决策 promote"
     if stage == "B1_proposed":
