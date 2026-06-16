@@ -21,10 +21,6 @@ def config_toml_path(project: str) -> Path:
     return state_dir(project) / "config.toml"
 
 
-def config_env_path(project: str) -> Path:
-    return state_dir(project) / "config.env"
-
-
 def global_state_dir() -> Path:
     raw = os.environ.get("FREELY_HOME") or os.environ.get("HOME")
     return Path(raw or "~").expanduser() / ".freely"
@@ -34,30 +30,7 @@ def global_config_toml_path() -> Path:
     return global_state_dir() / "config.toml"
 
 
-def global_config_env_path() -> Path:
-    return global_state_dir() / "config.env"
-
-
 # ── Readers ────────────────────────────────────────────────────────
-
-
-def parse_env_file(path: Path) -> dict[str, str]:
-    values: dict[str, str] = {}
-    if not path.is_file():
-        return values
-    for line in path.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if not line or line.startswith("#"):
-            continue
-        if "=" not in line:
-            continue
-        key, raw = line.split("=", 1)
-        key = key.strip()
-        raw = raw.strip()
-        if len(raw) >= 2 and raw[0] == raw[-1] and raw[0] in {"'", '"'}:
-            raw = raw[1:-1]
-        values[key] = raw
-    return values
 
 
 def read_config_toml(project: str) -> dict[str, Any]:
@@ -70,22 +43,14 @@ def read_config_toml(project: str) -> dict[str, Any]:
 
 def read_config_from_path(path: str) -> dict[str, Any]:
     p = Path(path)
-    if p.suffix == ".toml":
-        if not p.is_file():
-            return {}
-        with p.open("rb") as f:
-            return tomllib.load(f)
-    return parse_env_file(p)
+    if not p.is_file():
+        return {}
+    with p.open("rb") as f:
+        return tomllib.load(f)
 
 
 def read_config(project: str) -> dict[str, Any]:
-    toml = read_config_toml(project)
-    if toml:
-        return toml
-    env = parse_env_file(config_env_path(project))
-    if env:
-        return env
-    return {}
+    return read_config_toml(project)
 
 
 # ── Shell export output ────────────────────────────────────────────
@@ -157,23 +122,6 @@ def upsert_config_toml(project: str, key: str, value: str) -> None:
     write_config_toml(project, data)
 
 
-# ── Write config.env for backward compat ───────────────────────────
-
-
-def write_config_env(project: str, data: dict[str, str]) -> None:
-    path = config_env_path(project)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    lines: list[str] = []
-    for key, value in data.items():
-        if isinstance(value, dict):
-            for sub_key, sub_value in value.items():
-                lines.append(f'{key}_{sub_key}="{sub_value}"')
-        else:
-            lines.append(f'{key}="{value}"')
-    lines.append("")
-    path.write_text("\n".join(lines), encoding="utf-8")
-
-
 # ── CLI ────────────────────────────────────────────────────────────
 
 
@@ -203,16 +151,6 @@ def cmd_init_toml(args: argparse.Namespace) -> None:
 
 def cmd_upsert(args: argparse.Namespace) -> None:
     upsert_config_toml(args.project, args.key, args.value)
-    data = read_config_toml(args.project)
-    flat: dict[str, str] = {}
-    for k, v in data.items():
-        if isinstance(v, dict):
-            for sk, sv in v.items():
-                flat[f"{k}_{sk}"] = str(sv)
-        else:
-            flat[k] = str(v)
-    if flat:
-        write_config_env(args.project, flat)
 
 
 def cmd_print(args: argparse.Namespace) -> None:
