@@ -8204,7 +8204,7 @@ read_task_mode() {
     result=$(python3 "$cli" --project "$project" task-mode.read-with-scan 2>/dev/null) && break
   done
   if [[ -z "$result" ]]; then
-    log_error "task_mode degraded to WAIT: DB query failed after 3 retries (freely-db daemon not ready or crashed). AI will not work until task-mode is set to auto."
+    log_error "task_mode degraded to WAIT: DB query failed after 3 retries (freely-db daemon not ready or crashed). AI will not work in wait mode. After fixing the root cause, restart with --task-mode auto, or run: freely task-mode set --project <project> --task-mode auto"
     echo 'wait'; return 0
   fi
   local mode="${result%%|*}"
