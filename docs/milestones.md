@@ -2716,17 +2716,23 @@ routing_policy:
 - verification_artifact_dir: `docs/epics/governance-enforce/code-reviews`
 
 ## M-20260616T044030Z-A
-- title: Complete config.toml migration
-- status: active
+- title: Complete config.toml migration — clean break, TOML-only, zero config.env
+- status: completed
 ### candidate_issues
 1. `C-20260616T044030Z-A`
 - candidate_id: C-20260616T044030Z-A
 - milestone: M-20260616T044030Z-A
-- title: Complete config.toml migration with auto-migration and backward compatibility
+- title: Complete config.toml migration — clean break, TOML-only, zero config.env
 - status: promoted
 - promoted_issue_path: docs/issues/I-20260616T044030Z-A/issue.md
-- decision_reason: Auto-migration enables self-healing daemon startup
+- decision_reason: 彻底 TOML-only 方案 — 单一配置路径、零兼容负担、用户必须手工阅读注释配置
 - next_action: 进入 B2_IBM 物化
+### committed_issues
+1. `I-20260616T044030Z-A`
+- title: config.toml complete migration — clean break, TOML-only
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260616T044030Z-A/issue.md`
 
 ## M-20260616T110714Z-parse-env-removal
 - title: config.toml clean break — parse_env_file removal + quality fixes
