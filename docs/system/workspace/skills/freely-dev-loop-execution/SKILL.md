@@ -5,6 +5,9 @@ description: 执行 scan-selected 或 handoff-continued ready issue 的实现、
 
 # skill:freely-dev-loop-execution
 
+> 全链路: feedback → wt-create → B1_IBM → B2_IBM → dev → pr-create-guarded → pr-merge-guarded → wt-close
+>                                                          ↑ you are here（实现 + code-review + pre-tests）
+
 ## 职责
 
 - 只处理 docs 已足够的 ready issue。

@@ -55,8 +55,8 @@ Worker 被分配后自行按 skill 执行，完成后通过 handoff 汇报结果
 scan 没有发现任务时，写 `stop_ai` 并说明原因。不要循环重启。
 
 如果需要创建新任务：
-- `freely chat --new-issue "描述"` — 插话创建 raw issue
-- 在 GitHub/Gitee 创建 raw issue → 下次 patrol scan 会扫到
+- `freely feedback --repo <user/repo> --title "..." --body "..."` — 创建 raw issue 到 GitHub 平台
+- raw issue 创建后，scan 下次 patrol 会扫到并创建工位
 
 ## 命名约定
 
@@ -65,6 +65,54 @@ scan 没有发现任务时，写 `stop_ai` 并说明原因。不要循环重启�
 例如 `raw-key=20260511T1029Z` → raw issue id = `raw-20260511T1029Z`。
 
 分支名和工位名中的 `raw-{raw-key}` 都遵循这个规则。
+
+## 规范流程
+
+一个 raw issue 从创建到合并的完整生命周期。所有改动（除"可跳过 IBM"场景外）走此链路。
+
+### Feat（新功能/大型改动，推荐）
+
+```
+feedback → wt-create → B1_IBM → B2_IBM → dev实现 → pr-create-guarded → pr-merge-guarded → wt-close
+```
+
+| 步骤 | 命令 / Skill | Loop |
+|------|-------------|------|
+| 1. 创建 raw issue | `freely feedback --repo ... --title ... --body ...` | 人类操作 |
+| 2. 创建工位 | `wt-create --raw-key <key> --source platform --skill freely-feat-execution --slug <slug>` | auto |
+| 3. 预研（Brainstorm → Candidate） | `skill:freely-doc-B1_IBM-execution` | doc |
+| 4. 实现设计（Map: prd/pre-tests/tasks） | `skill:freely-doc-B2_IBM-execution` | doc |
+| 5. 代码实现 + code-review + pre-tests | `skill:freely-dev-loop-execution` | dev |
+| 6. 提 PR（含 dry-run gate） | `pr-create-guarded [title] [body] [base]` | auto |
+| 7. 门禁合并 | `pr-merge-guarded develop <feature-branch>` | auto |
+| 8. 收口清理 | `wt-close <branch>` | auto |
+
+### Fix（快速修复，治理后置）
+
+```
+wt-create → dev → test → B1 → B2 → pr-create → pr-merge → wt-close
+```
+
+与 Feat 区别：B1/B2 后置于 test 之后，用 `test-pre-merge-*` 沙箱快测。详见 `skill:freely-fix-execution`。
+
+### Doc-only（纯文档/模板/config）
+
+```
+dev → pr-create → pr-merge → wt-close
+```
+
+跳过 test-pre-merge、B1_IBM、B2_IBM。适用于仅修改 docs/、templates/ 的改动。
+
+### 你的位置
+
+每个 skill SKILL.md 头部标注了当前 skill 在完整链路中的位置，格式如下：
+
+```
+全链路: feedback → wt-create → B1_IBM → B2_IBM → dev → pr-create-guarded → pr-merge-guarded → wt-close
+                                                            ↑ you are here
+```
+
+> 三 loop（auto / doc / dev）的完整流转图见 `docs/system/workspace/three-loop-capability-lifecycle.md`。
 
 ## IBM 生命周期
 

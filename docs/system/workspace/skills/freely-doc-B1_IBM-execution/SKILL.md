@@ -5,6 +5,9 @@ description: B1_IBM：I→B→M 第一阶段。消费 scan 结果中 wt-create �
 
 # skill:freely-doc-B1_IBM-execution
 
+> 全链路: feedback → wt-create → B1_IBM → B2_IBM → dev → pr-create-guarded → pr-merge-guarded → wt-close
+>                                    ↑ you are here（B: Brainstorm → M: Milestone）
+
 ## I→B→M 骨架
 
 B1_IBM 是 IBM Framework 第一阶段。I（Input）由 wt-create 准备，B1_IBM 做 B（Brainstorm）和 M（Milestone）。
