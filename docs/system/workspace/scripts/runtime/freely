@@ -8088,16 +8088,41 @@ ensure_freely_db() {
 ensure_a2a_server_running() {
   local project="$1"
   local a2a_server_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a/a2a_server.py"
-  local a2a_socket a2a_pid
+  local a2a_socket a2a_pid a2a_cached_pid_file a2a_pid_file
   a2a_socket="$(_a2a_socket_path "$project")"
+  a2a_cached_pid_file="$(run_dir_for_project "$project")/a2a-server.pid"
+  # Temp PID file path (same hashing as a2a_server.py)
+  a2a_pid_file="/tmp/freely-a2a-$(python3 -c "
+import hashlib,os
+h=hashlib.sha256(os.path.abspath('$project').encode()).hexdigest()[:16]
+print(h)" 2>/dev/null || true).pid"
   [[ -f "$a2a_server_py" ]] || return 0
-  # Already running?
-  if [[ -S "$a2a_socket" ]]; then
-    return 0
+
+  # ── Kill any existing A2A server processes for this project ──────────
+  # Prevents zombie accumulation from daemon restarts without clean stop.
+  local _a2a_old_pid
+  # Read from temp PID file (written by a2a_server.py itself)
+  if [[ -f "$a2a_pid_file" ]]; then
+    _a2a_old_pid="$(cat "$a2a_pid_file" 2>/dev/null || true)"
+    if [[ -n "$_a2a_old_pid" ]]; then
+      terminate_pid_with_graceful_wait "$_a2a_old_pid" "stale a2a server ($a2a_pid_file)"
+    fi
   fi
-  # Clean stale socket from previous crash
-  [[ -S "$a2a_socket" ]] || rm -f "$a2a_socket" 2>/dev/null || true
-  # Start A2A Server — supports local (Unix socket) and remote (TCP)
+  # Also check cached PID file from previous start
+  if [[ -f "$a2a_cached_pid_file" ]]; then
+    _a2a_old_pid="$(cat "$a2a_cached_pid_file" 2>/dev/null || true)"
+    if [[ -n "$_a2a_old_pid" ]]; then
+      terminate_pid_with_graceful_wait "$_a2a_old_pid" "stale a2a server ($a2a_cached_pid_file)"
+    fi
+    rm -f "$a2a_cached_pid_file"
+  fi
+  # Belt-and-suspenders: kill any remaining a2a_server.py processes for this project
+  pkill -f "python3.*a2a_server\.py.*--project.*${project}.*--start" 2>/dev/null || true
+  # Clean stale socket
+  rm -f "$a2a_socket" 2>/dev/null || true
+
+  # ── Start A2A Server ────────────────────────────────────────────────
+  # Supports local (Unix socket) and remote (TCP)
   # Config: A2A_LISTEN_MODE=unix|tcp|both  A2A_TCP_HOST=0.0.0.0  A2A_TCP_PORT=19100
   log_info "starting A2A server for $project (mode=${A2A_LISTEN_MODE:-unix})"
   python3 "$a2a_server_py" --project "$project" --start \
@@ -8106,16 +8131,43 @@ ensure_a2a_server_running() {
     </dev/null >>"$project/.freely/run/a2a-server.log" 2>&1 &
   a2a_pid=$!
   disown "$a2a_pid"
-  local waited=0
-  while [[ $waited -lt 30 ]]; do
+  # Write PID to cached file for robust stop detection
+  mkdir -p "$(run_dir_for_project "$project")"
+  printf '%s\n' "$a2a_pid" > "$a2a_cached_pid_file"
+
+  # ── Wait for A2A Server with HTTP health check (up to 10s) ──────────
+  # Connects to the Unix socket and sends GET /tasks to verify the server
+  # is fully initialized and responding to HTTP requests.
+  local _health_waited=0 _health_ok=0
+  while [[ $_health_waited -lt 20 ]]; do
     if [[ -S "$a2a_socket" ]]; then
-      log_info "A2A server ready (PID $a2a_pid) on $a2a_socket"
-      return 0
+      if python3 -c "
+import socket, sys
+try:
+    s = socket.socket(socket.AF_UNIX)
+    s.settimeout(2)
+    s.connect('$a2a_socket')
+    s.sendall(b'GET /tasks HTTP/1.1\r\nHost: localhost\r\n\r\n')
+    resp = s.recv(128)
+    s.close()
+    if resp.startswith(b'HTTP'):
+        sys.exit(0)
+except Exception:
+    pass
+sys.exit(1)
+" 2>/dev/null; then
+        _health_ok=1
+        break
+      fi
     fi
-    sleep 0.1
-    ((waited++))
+    sleep 0.5
+    _health_waited=$((_health_waited + 1))
   done
-  log_warn "A2A server start timed out (may be TCP-only)"
+  if [[ "$_health_ok" == "1" ]]; then
+    log_info "A2A server ready (PID $a2a_pid) on $a2a_socket (http healthcheck ok)"
+  else
+    log_warn "A2A server start timed out after 10s (may be TCP-only)"
+  fi
   return 0
 }
 
@@ -8143,8 +8195,14 @@ ensure_task_mode_gate() {
 read_task_mode() {
   local project="$1"
   local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
-  local result
-  result=$(python3 "$cli" --project "$project" task-mode.read-with-scan 2>/dev/null) || { echo 'wait'; return 0; }
+  local result _retry
+  for _retry in 1 2 3; do
+    result=$(python3 "$cli" --project "$project" task-mode.read-with-scan 2>/dev/null) && break
+  done
+  if [[ -z "$result" ]]; then
+    log_error "task_mode degraded to WAIT: DB query failed after 3 retries (freely-db daemon not ready or crashed). AI will not work until task-mode is set to auto."
+    echo 'wait'; return 0
+  fi
   local mode="${result%%|*}"
   local scan_id="${result#*|}"
   if [[ "$mode" == "id" && -n "$scan_id" ]]; then
@@ -19934,13 +19992,24 @@ stop_project_runtime() {
     rm -f "$_bridge_pid_file"
   fi
   rm -f "$(_acp_bridge_socket "$project")"
-  # Stop A2A Server — uses PID file for graceful shutdown (aligns JiuwenSwarm)
-  local _a2a_socket
+  # Stop A2A Server — multi-layer cleanup for zombie prevention
+  local _a2a_socket _a2a_cached_pid _a2a_cached_pid_file
   _a2a_socket="$(_a2a_socket_path "$project")"
-  if [[ -S "$_a2a_socket" ]]; then
-    python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a/a2a_server.py" \
-      --project "$project" --stop >/dev/null 2>&1 || rm -f "$_a2a_socket"
+  _a2a_cached_pid_file="$(run_dir_for_project "$project")/a2a-server.pid"
+  # Layer 1: graceful shutdown via a2a_server.py --stop (reads its own temp PID file)
+  python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a/a2a_server.py" \
+    --project "$project" --stop >/dev/null 2>&1 || true
+  # Layer 2: direct PID kill from cached file written by ensure_a2a_server_running
+  if [[ -f "$_a2a_cached_pid_file" ]]; then
+    _a2a_cached_pid="$(cat "$_a2a_cached_pid_file" 2>/dev/null || true)"
+    if [[ -n "$_a2a_cached_pid" ]]; then
+      terminate_pid_with_graceful_wait "$_a2a_cached_pid" "a2a server (cached pid)"
+    fi
+    rm -f "$_a2a_cached_pid_file"
   fi
+  # Layer 3: pkill fallback for any remaining zombie processes
+  pkill -f "python3.*a2a_server\.py.*--project.*${project}.*--start" 2>/dev/null || true
+  rm -f "$_a2a_socket"
   # Stop DB daemon via PID file
   local _db_pid_file _db_pid
   _db_pid_file="$(python3 -c "
@@ -21186,9 +21255,11 @@ print(ready)
       fi
     fi
     # Normalize rc=1→0: end_turn received before disconnect (Broken pipe tolerance)
+    local _end_turn_detected=0
     if [[ "${rc:-0}" != "0" && -f "$cycle_log" ]]; then
       if grep -q 'stop_reason=end_turn' "$cycle_log" 2>/dev/null; then
         rc=0
+        _end_turn_detected=1
         log_info "normalized rc=1→0: end_turn received before disconnect"
       fi
     fi
@@ -21282,6 +21353,50 @@ print(ready)
       delegate_workers|continue|"")
         ;;
     esac
+
+    # ── After-run worker detection for prompt mode (end_turn without a2a-exit) ──
+    # When Manager exits with end_turn in prompt mode, no a2a-exit is called to
+    # write the exit contract. The filesystem scan in manager_exit_contract_kind()
+    # Step 4 may not be reached. This block runs BEFORE the next cycle starts,
+    # detecting new worker prompts written during the cycle and triggering
+    # delegate_workers so Workers are launched instead of restarting Manager.
+    if [[ "$_end_turn_detected" == "1" \
+          && "$exit_contract_action" != "delegate_workers" \
+          && "$exit_contract_action" != "stop_ai" \
+          && "$(effective_runtime_role_for_project "$PROJECT_ROOT")" == "manager" ]]; then
+      local _ar_prompts_dir="$PROJECT_ROOT/.freely/run/worker-prompts"
+      local _ar_prompt_ref _ar_new_csv="" _ar_new_count=0 _ar_pf_mtime
+      _ar_prompt_ref="$(latest_prompt_file_for_project "$PROJECT_ROOT" 2>/dev/null || true)"
+      if [[ -d "$_ar_prompts_dir" && -n "$_ar_prompt_ref" && -f "$_ar_prompt_ref" ]]; then
+        local _ar_cycle_start
+        _ar_cycle_start=$(stat -f %m "$_ar_prompt_ref" 2>/dev/null || stat -c %Y "$_ar_prompt_ref" 2>/dev/null || echo "0")
+        if [[ "$_ar_cycle_start" =~ ^[0-9]+$ && "$_ar_cycle_start" -gt 0 ]]; then
+          while IFS= read -r _ar_pf; do
+            [[ -n "$_ar_pf" && -f "$_ar_pf" ]] || continue
+            _ar_pf_mtime=$(stat -f %m "$_ar_pf" 2>/dev/null || stat -c %Y "$_ar_pf" 2>/dev/null || echo "0")
+            if [[ "$_ar_pf_mtime" =~ ^[0-9]+$ && "$_ar_pf_mtime" -ge "$_ar_cycle_start" ]]; then
+              if [[ -z "$_ar_new_csv" ]]; then
+                _ar_new_csv="$_ar_pf"
+              else
+                _ar_new_csv="$_ar_new_csv,$_ar_pf"
+              fi
+              ((_ar_new_count++))
+            fi
+          done < <(find "$_ar_prompts_dir" -maxdepth 1 -type f -name '*.txt' 2>/dev/null | sort)
+        fi
+        if [[ -n "$_ar_new_csv" ]]; then
+          append_runtime_event "$project" "after_run_worker_detected" \
+            "worker_prompts_csv=${_ar_new_csv}" \
+            "new_count=${_ar_new_count}" \
+            "origin=end_turn_prompt_mode"
+          log_info "after_run: detected ${_ar_new_count} new worker prompt(s) after end_turn (prompt mode)"
+          exit_contract_action="delegate_workers"
+          # Write worker CSV to exit contract so manager_runtime_launch_workers
+          # can find the prompt files. Without this, _worker_csv stays empty.
+          echo "WORKER_PROMPTS_CSV=$_ar_new_csv" >> "$(manager_exit_contract_file "$PROJECT_ROOT")"
+        fi
+      fi
+    fi
 
     # ── Mark pending-delivery messages as delivered after successful AI cycle ──
     # The AI just saw all send_to_ai=pending/fail messages in its prompt.

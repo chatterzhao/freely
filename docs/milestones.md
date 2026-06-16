@@ -6201,6 +6201,7 @@ routing_policy:
 - issue_path: `docs/issues/I-20260616T044825Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260616T044825Z--remove-absolute-timeout/candidates.md#C-20260616T044825Z-A`
 - verification_artifact_dir: `docs/epics/remove-absolute-timeout/remove-bridge-absolute-cap/code-reviews`
+
 ## M-20260615T235818Z-config-toml-migration
 - title: config.toml migration
 - status: active
@@ -6217,3 +6218,25 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260615T235818Z-config-toml/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260615T235818Z--config-toml-migration/candidates.md`
+
+## M-20260616T055035Z-A
+- title: A2A server hygiene + after-run worker detection for prompt mode
+- status: active
+### candidate_issues
+1. `C-20260616T055035Z-A`
+- candidate_id: C-20260616T055035Z-A
+- milestone: M-20260616T055035Z-A
+- title: A2A server hygiene + after-run worker detection for prompt mode
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260616T055035Z-A/issue.md`
+- decision_reason: Zombie A2A processes (5 observed); startup healthcheck false timeout; after-run worker detection missing for end_turn prompt mode
+- next_action: 已实现并合并
+### completed_issues
+1. `I-20260616T055035Z-A`
+- issue_id: I-20260616T055035Z-A
+- title: A2A server hygiene + after-run worker detection for prompt mode
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260616T055035Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260616T055035Z--a2a-hygiene-after-run/candidates.md#C-20260616T055035Z-A`
+- verification_artifact_dir: `docs/epics/a2a-hygiene-after-run/code-reviews`
