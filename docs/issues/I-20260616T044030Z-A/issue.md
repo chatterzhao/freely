@@ -1,7 +1,7 @@
 ---
 local_id: I-20260616T044030Z-A
 kind: linked
-phase_state: done_b2_ibm
+phase_state: completed
 promoted_from: raw-20260616T044030Z
 source_candidate: docs/pre-brainstorms/20260616T044030Z--config-toml-complete/candidates.md
 canonical_issue_path: docs/issues/I-20260616T044030Z-A/issue.md
