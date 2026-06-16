@@ -44,50 +44,80 @@
 
 ## Research
 
-### 方案 A：完全回退 config.env
-- daemon 立即工作
-- 丢失 TOML 优势
-- 已合入代码大量回退→风险
-
-### 方案 B：启动时自动迁移（选定）
-- `load_config()`: 先试 config.toml → 不存在则读 config.env → 自动创建 config.toml → 记录迁移日志
-- 全局配置同样处理
+### 方案 A：自动迁移（渐进式）
+- load_config: toml missing → try config.env → auto-migrate → use toml
 - 迁移后保留 config.env 不改名（向后兼容 1 周期）
-- `freely init` 直接生成 config.toml（已实现 ✓）
-- `interruption-manager-handler` 和 `signal-intent-handler` 改为 fallback
+- 所有 handler 保留 env fallback
+- 缺点：代码中有两条配置读取路径（toml + env），增加维护负担
+- 缺点：迁移代码（parse_env_file）是运行时死代码，迁移完成后永不再用
 
-### 方案 C：只创建 config.toml 文件
-- 手动 python3 脚本从 config.env 生成
-- daemon 不自治，需人工干预
-- 放弃
+### 方案 B：彻底 TOML-only（选定）
+- config.toml 是唯一配置格式，不存在 config.env 读取/迁移/回退
+- `freely init` 释放 `config.toml.example` 到 `.freely/`，**不自动生成 config.toml**
+- 启动时 config.toml 不存在 → 阻塞，提示用户 `cp config.toml.example config.toml` 并手工编辑
+- 所有 handler/脚本 TOML-only，无 env 回退
+- 优点：单一配置路径，零兼容负担，用户必须阅读注释理解每个配置项
+- 优点：无需 parse_env_file、迁移代码、env fallback 代码
+
+### 方案 C：手动迁移脚本
+- 提供独立 Python 脚本从 config.env 生成 config.toml
+- daemon 不参与迁移，需人工执行
+- 放弃：daemon 不能自治，老用户迁移体验差
 
 ## Decision
 
-**方案 B — 自动迁移**
+**方案 B — 彻底 TOML-only，零 config.env**
+
+### 正确流程
+
+```
+freely init:
+  ├── 释放 config.toml.example → .freely/config.toml.example
+  ├── 释放模板 → docs/
+  ├── 初始化 freely.db
+  └── 提示: cp config.toml.example config.toml + 编辑 + freely start
+       （不自动生成 config.toml，确保用户手工阅读注释配置）
+
+freely start (load_config):
+  ├── config.toml 存在 → source_config → 校验 PROJECT_ROOT → 启动
+  └── config.toml 不存在 → 阻塞:
+        "config.toml not found"
+        "cp .freely/config.toml.example .freely/config.toml"
+        "然后按注释编辑"
+```
 
 ### 实现清单
-1. `load_config()`: toml missing → try env → auto-migrate → use toml
-2. `interruption-manager-handler`: `[[ -f config.toml ]] || exit 1` → try env fallback
-3. `signal-intent-handler`: 同上
-4. `ai-cli`: 4 处检查改为 try toml → fallback env
-5. `bin/pre-init-runtime`: 复制 config.toml 而非 config.env
-6. `bin/check-file-size`: 更新注释
-7. `freely_config.py`: 添加 `migrate-from-env` 命令
-8. `config.toml.example`: 创建模板（不含敏感值）
-9. 迁移后保留 config.env（不删除）
-10. 全局配置 `~/.freely/config.toml` 同样 fallback
+1. `freely_config.py`: 移除 parse_env_file、--from-env，不保留任何 config.env 代码
+2. `freely_config.py`: 修复 dict_to_toml 表头排序、_shell_quote $/反引号、cmd_print 嵌套 dict
+3. `load_config()`: config.toml 不存在时阻塞 + 明确提示（不迁移、不回退）
+4. `freely init`: 移除 write_config 调用，只释放 config.toml.example
+5. `freely init`: 移除 autonomy_contract、codex_config 等依赖 config.toml 的步骤
+6. `network-proxy-resolver.sh`: 移除 source config.env 回退分支
+7. `interruption-manager-handler`: `source_config`（TOML-only）
+8. `signal-intent-handler`: `eval toml2env`（TOML-only，shell 转义已修复）
+9. `bin/pre-init-runtime`: 复制 config.toml 并 sed 修正路径（已实现 ✓）
+10. `bin/check-file-size`: 更新注释中的 config.env→config.toml
+11. `config.toml.example`: 56 字段全量中文注释，ACP 默认值
+12. `templates/config.toml.example`: init 时释放到 .freely/ 目录
+13. AGENTS.md + freely-fix-execution/SKILL.md: config.env→config.toml
 
 ### 不做的
-- 删除 config.env（保留兼容 1 周期）
-- 修改 `write_config()`（已是 TOML ✓）
+- **任何 config.env 读取/迁移/回退** — 彻底断点
+- **freely init 自动生成 config.toml** — 用户必须手工配置
 - 修改 `.gitignore`（`.freely/` 已忽略 ✓）
+- 全局配置 fallback（全局配置同为 TOML-only，无 config.toml 则同样阻塞）
 
 ### 验收
-- [ ] daemon 能从 config.env 自动迁移启动
-- [ ] daemon 能从 config.toml 直接启动
-- [ ] freely init 生成 config.toml
-- [ ] 所有 handler 不会因缺 toml 退出
-- [ ] 全局配置同样 fallback
+- [x] freely init 释放 config.toml.example 到 .freely/
+- [x] freely init 不生成 config.toml
+- [x] load_config: config.toml 存在→正常启动
+- [x] load_config: config.toml 不存在→阻塞+提示 cp example
+- [x] 零 config.env 代码：无 parse_env_file、无 --from-env、无 source config.env
+- [x] config.toml.example: 56 字段中文注释，ACP 默认值
+- [x] 所有 shell 脚本 TOML-only（无 env source 回退）
+- [x] dict_to_toml: flat keys 先于 sections（修复 upsert 数据错位）
+- [x] _shell_quote: $ 和反引号已转义
+- [x] 文档 AGENTS.md + SKILL.md: config.env→config.toml
 
 ## Additional gaps found
 
@@ -95,7 +125,8 @@
 8 个 runtime posture 设置不在 template 中，已补充。
 
 ### freely init 不释放 template
-`init` 只生成 `.freely/config.toml`（通过 write_config），但不复制 `templates/config.toml.example` 到 `.freely/config.toml.example`。需要添加。
+`init` 之前只生成 `.freely/config.toml`（通过 write_config），不释放 `.freely/config.toml.example`。
+修正后 init 不再生成 config.toml，只释放 example。
 
 ### freely package 不复制配置
 `bin/freely-package` 没有 config 复制逻辑。打包时需要复制 `.freely/config.toml`（或让用户自行提供）。
