@@ -69,9 +69,9 @@ SRC="$ROOT_DIR/docs/system/workspace/skills"
 # Resolve default tools: --tools flag > AI_TOOL from project config > FREELY_TOOLS env > global config > claude
 if [[ -z "$tools" ]]; then
   # Try project-local config first
-  project_cfg="$ROOT_DIR/.freely/config.env"
+  project_cfg="$ROOT_DIR/.freely/config.toml"
   if [[ -f "$project_cfg" ]]; then
-    local_ai_tool=$(grep "^AI_TOOL=" "$project_cfg" 2>/dev/null | head -1 | cut -d= -f2 | tr -d '"' | tr -d "'" | xargs || true)
+    local_ai_tool=$(grep '^AI_TOOL = ' "$project_cfg" 2>/dev/null | head -1 | cut -d= -f2 | tr -d '"' | tr -d "'" | xargs || true)
     if [[ -n "$local_ai_tool" ]]; then
       tools="$local_ai_tool"
     fi
@@ -81,9 +81,9 @@ if [[ -z "$tools" ]]; then
   tools="${FREELY_TOOLS:-}"
 fi
 if [[ -z "$tools" ]]; then
-  for config in "${HOME}/.freely/config.env" "${HOME}/.config/freely/config.env"; do
+  for config in "${HOME}/.freely/config.toml" "${HOME}/.config/freely/config.toml"; do
     if [[ -f "$config" ]]; then
-      tools=$(grep "^FREELY_TOOLS=" "$config" 2>/dev/null | cut -d= -f2 | tr -d '"' | tr -d "'" || true)
+      tools=$(grep "^FREELY_TOOLS = " "$config" 2>/dev/null | cut -d= -f2 | tr -d '"' | tr -d "'" || true)
       [[ -n "$tools" ]] && break
     fi
   done

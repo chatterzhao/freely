@@ -6202,6 +6202,23 @@ routing_policy:
 - source_candidate: `docs/pre-brainstorms/20260616T044825Z--remove-absolute-timeout/candidates.md#C-20260616T044825Z-A`
 - verification_artifact_dir: `docs/epics/remove-absolute-timeout/remove-bridge-absolute-cap/code-reviews`
 
+## M-20260615T235818Z-config-toml-migration
+- title: config.toml migration
+- status: active
+### candidate_issues
+1. `C-20260615T235818Z-config-toml`
+- milestone: M-20260615T235818Z-config-toml-migration
+- status: promoted
+- decision_reason: raw-20260615T235818Z (GitHub #2780) — migrate from config.env to config.toml
+- next_action: completed, merge to develop
+### completed_issues
+1. `I-20260615T235818Z-config-toml`
+- title: config.toml migration
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260615T235818Z-config-toml/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260615T235818Z--config-toml-migration/candidates.md`
+
 ## M-20260616T055035Z-A
 - title: A2A server hygiene + after-run worker detection for prompt mode
 - status: active

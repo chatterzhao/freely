@@ -2,12 +2,12 @@
 
 freely_network_proxy_project_config_file() {
   local project="$1"
-  printf '%s\n' "$project/.freely/config.env"
+  printf '%s\n' "$project/.freely/config.toml"
 }
 
 freely_network_proxy_global_config_file() {
   local freely_home="${FREELY_HOME:-$HOME/.freely}"
-  printf '%s\n' "$freely_home/config.env"
+  printf '%s\n' "$freely_home/config.toml"
 }
 
 freely_network_proxy_read_config_values() {
@@ -15,8 +15,14 @@ freely_network_proxy_read_config_values() {
   (
     unset FREELY_NETWORK_PROXY_MODE FREELY_NETWORK_PROXY_URL FREELY_ALL_PROXY FREELY_HTTP_PROXY FREELY_HTTPS_PROXY FREELY_NO_PROXY
     [[ -f "$cfg" ]] || exit 0
-    # shellcheck disable=SC1090
-    source "$cfg"
+    if [[ "$cfg" == *.toml ]]; then
+      local freely_root
+      freely_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../.." && pwd -P)"
+      eval "$("$freely_root/bin/toml2env" --file "$cfg" 2>/dev/null)" || exit 0
+    else
+      # shellcheck disable=SC1090
+      source "$cfg"
+    fi
     printf '%s\x1f%s\x1f%s\x1f%s\x1f%s\x1f%s\n' \
       "${FREELY_NETWORK_PROXY_MODE:-}" \
       "${FREELY_NETWORK_PROXY_URL:-}" \
@@ -131,7 +137,7 @@ freely_apply_project_network_proxy_env() {
       no_proxy="${FREELY_NO_PROXY:-}"
 
       [[ -n "$all_proxy" || -n "$http_proxy" || -n "$https_proxy" || -n "$no_proxy" ]] || {
-        echo "[ERROR] FREELY_NETWORK_PROXY_MODE=explicit but no proxy values are set in $(freely_network_proxy_project_config_file "$project") or $(freely_network_proxy_global_config_file)" >&2
+        echo "[ERROR] FREELY_NETWORK_PROXY_MODE=explicit but no proxy values are set in $(freely_network_proxy_project_config_file "$project")" >&2
         return 1
       }
 

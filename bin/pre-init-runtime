@@ -44,16 +44,16 @@ echo "[pre-init] target: $PRE_PROJECT"
 # 1. 创建目录
 mkdir -p "$PRE_PROJECT/.freely/run" "$PRE_PROJECT/.freely/logs" "$PRE_PROJECT/.freely/intake"
 
-# 2. 复制 config.env，修正 PROJECT_ROOT 和相关路径
-if [[ -f "$SOURCE_PROJECT/.freely/config.env" ]]; then
+# 2. 复制 config.toml，修正 PROJECT_ROOT 和相关路径
+if [[ -f "$SOURCE_PROJECT/.freely/config.toml" ]]; then
   sed \
-    -e "s|PROJECT_ROOT=.*|PROJECT_ROOT=\"$PRE_PROJECT\"|" \
-    -e "s|INTENT_FILE=.*|INTENT_FILE=\"$PRE_PROJECT/docs/PROJECT_INTENT.md\"|" \
-    -e "s|CONSTITUTION_FILE=.*|CONSTITUTION_FILE=\"$PRE_PROJECT/docs/CONSTITUTION.md\"|" \
-    "$SOURCE_PROJECT/.freely/config.env" > "$PRE_PROJECT/.freely/config.env"
-  echo "  config.env (paths fixed)"
+    -e 's|^PROJECT_ROOT = ".*"|PROJECT_ROOT = "'"$PRE_PROJECT"'"|' \
+    -e 's|^INTENT_FILE = ".*"|INTENT_FILE = "'"$PRE_PROJECT"'/docs/PROJECT_INTENT.md"|' \
+    -e 's|^CONSTITUTION_FILE = ".*"|CONSTITUTION_FILE = "'"$PRE_PROJECT"'/docs/CONSTITUTION.md"|' \
+    "$SOURCE_PROJECT/.freely/config.toml" > "$PRE_PROJECT/.freely/config.toml"
+  echo "  config.toml (paths fixed)"
 else
-  echo "  [WARN] no config.env in source"
+  echo "  [WARN] no config.toml in source"
 fi
 
 # 3. 复制 freely.db（session-store、chat-inbox）
