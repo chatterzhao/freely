@@ -1235,17 +1235,14 @@ cmd_login() {
           log_info "Alias already exists: $_alias_name"
         fi
 
-        # Auto-detect project from PWD and update AI_TOOL in config.env
+        # Auto-detect project from PWD and update AI_TOOL in config
         local _project_dir="$PWD"
         while [[ "$_project_dir" != "/" ]]; do
-          if [[ -f "$_project_dir/.freely/config.env" ]]; then
-            local _cfg="$_project_dir/.freely/config.env"
+          if [[ -f "$_project_dir/.freely/config.toml" || -f "$_project_dir/.freely/config.env" ]]; then
             local _ai_tool_val="$slot"
-            # (removed: account slots now use full slot name via CODEX_HOME)
-            if [[ -f "$_cfg" ]]; then
-              grep -q "^AI_TOOL=" "$_cfg" 2>/dev/null && sed -i '' "s/^AI_TOOL=.*/AI_TOOL=\"$_ai_tool_val\"/" "$_cfg" || echo "AI_TOOL=\"$_ai_tool_val\"" >> "$_cfg"
-              log_info "Updated AI_TOOL in config.env: $_ai_tool_val"
-            fi
+            "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely_config.py" upsert \
+              --project "$_project_dir" --key "AI_TOOL" --value "$_ai_tool_val"
+            log_info "Updated AI_TOOL in config: $_ai_tool_val"
             break
           fi
           _project_dir="$(dirname "$_project_dir")"
@@ -1509,7 +1506,7 @@ cmd_switch() {
   if [[ -z "${SWITCH_PROJECT:-}" ]]; then
     local _pwd="$PWD"
     while [[ "$_pwd" != "/" ]]; do
-      if [[ -f "$_pwd/.freely/config.env" ]]; then
+      if [[ -f "$_pwd/.freely/config.toml" || -f "$_pwd/.freely/config.env" ]]; then
         SWITCH_PROJECT="$_pwd"
         break
       fi
@@ -1529,13 +1526,14 @@ cmd_switch() {
       if [[ "$rc" -eq 0 ]]; then
         notify_freely_auth_change "codex" "$slot" "switch_success"
         if [[ -n "${SWITCH_PROJECT:-}" ]]; then
-          local _cfg="${SWITCH_PROJECT}/.freely/config.env"
+          local _cfg="${SWITCH_PROJECT}/.freely/config.toml"
           local _ai_tool_val="$slot"
-          # (removed: account slots now use full slot name via CODEX_HOME)
-          if [[ -f "$_cfg" ]]; then
-            local _old_tool; _old_tool=$(grep "^AI_TOOL=" "$_cfg" 2>/dev/null | head -1 | sed 's/^AI_TOOL="//; s/"$//; s/".*$//')
-            grep -q "^AI_TOOL=" "$_cfg" 2>/dev/null && sed -i '' "s/^AI_TOOL=.*/AI_TOOL=\"$_ai_tool_val\"/" "$_cfg" || echo "AI_TOOL=\"$_ai_tool_val\"" >> "$_cfg"
-            log_info "Updated AI_TOOL in config.env: $_ai_tool_val"
+          if [[ -f "$_cfg" || -f "${SWITCH_PROJECT}/.freely/config.env" ]]; then
+            local _old_tool
+            _old_tool=$("$SELF_ROOT/bin/toml2env" --project "${SWITCH_PROJECT}" 2>/dev/null | grep "^export AI_TOOL=" | sed 's/^export AI_TOOL=//; s/^"//; s/"$//') || true
+            "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely_config.py" upsert \
+              --project "${SWITCH_PROJECT}" --key "AI_TOOL" --value "$_ai_tool_val"
+            log_info "Updated AI_TOOL in config: $_ai_tool_val"
             # Record switch in tool_switch_events table
             local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
             python3 "$cli" --project "${SWITCH_PROJECT}" session.tool-switch-write \
@@ -1549,11 +1547,13 @@ cmd_switch() {
     claude|cc|cc-use-codex-cli|opencode|iflow|kiro-cli)
       tool_switch_direct_generic "$tool" "$slot"
       if [[ "$slot" == *-apikey-* && -n "${SWITCH_PROJECT:-}" ]]; then
-        local cfg="${SWITCH_PROJECT}/.freely/config.env"
-        if [[ -f "$cfg" ]]; then
-          local _old_tool; _old_tool=$(grep "^AI_TOOL=" "$cfg" 2>/dev/null | head -1 | sed 's/^AI_TOOL="//; s/"$//; s/".*$//')
-          grep -q "^AI_TOOL=" "$cfg" 2>/dev/null             && sed -i '' "s/^AI_TOOL=.*/AI_TOOL="$slot"/" "$cfg"             || echo "AI_TOOL="$slot"" >> "$cfg"
-          log_info "Updated AI_TOOL in config.env: $slot"
+        local cfg="${SWITCH_PROJECT}/.freely/config.toml"
+        if [[ -f "$cfg" || -f "${SWITCH_PROJECT}/.freely/config.env" ]]; then
+          local _old_tool
+          _old_tool=$("$SELF_ROOT/bin/toml2env" --project "${SWITCH_PROJECT}" 2>/dev/null | grep "^export AI_TOOL=" | sed 's/^export AI_TOOL=//; s/^"//; s/"$//') || true
+          "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely_config.py" upsert \
+            --project "${SWITCH_PROJECT}" --key "AI_TOOL" --value "$slot"
+          log_info "Updated AI_TOOL in config: $slot"
           local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
           python3 "$cli" --project "${SWITCH_PROJECT}" session.tool-switch-write \
             --trigger_error switch_command --old_tool "$_old_tool" \

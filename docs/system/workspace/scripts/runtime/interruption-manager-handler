@@ -232,10 +232,16 @@ if emit_execution_continuation_fast_path_if_applicable "$message" "$role_hint"; 
   exit 0
 fi
 
-config_file="$project/.freely/config.env"
-[[ -f "$config_file" ]] || exit 1
-# shellcheck disable=SC1090
-source "$config_file"
+config_toml="$project/.freely/config.toml"
+config_env="$project/.freely/config.env"
+if [[ -f "$config_toml" ]]; then
+  source_config "$project" || exit 1
+elif [[ -f "$config_env" ]]; then
+  # shellcheck disable=SC1090
+  source "$config_env"
+else
+  exit 1
+fi
 
 tool="${AI_TOOL:-codex}"
 model="${AI_MODEL:-gpt-5.4}"
