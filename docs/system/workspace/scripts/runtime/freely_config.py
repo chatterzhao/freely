@@ -137,7 +137,15 @@ def cmd_toml2env(args: argparse.Namespace) -> None:
 
 def cmd_init_toml(args: argparse.Namespace) -> None:
     data: dict[str, Any] = {}
-    if args.values:
+    if args.from_env:
+        env_path = Path(args.project) / ".freely" / "config.env"
+        if env_path.is_file():
+            data = parse_env_file(env_path)
+            print(f"migrated {len(data)} keys from {env_path}")
+        else:
+            print(f"config.env not found at {env_path}", file=sys.stderr)
+            sys.exit(1)
+    elif args.values:
         for item in args.values:
             if "=" not in item:
                 continue
@@ -177,6 +185,9 @@ def main() -> None:
     p_init.add_argument("--project", default=".", help="Project root path")
     p_init.add_argument(
         "--value", dest="values", action="append", help="KEY=VALUE pairs"
+    )
+    p_init.add_argument(
+        "--from-env", action="store_true", help="Migrate from config.env"
     )
 
     p_upsert = sub.add_parser("upsert", help="Upsert a config key")

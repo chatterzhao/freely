@@ -2699,3 +2699,23 @@ routing_policy:
 - issue_path: `docs/issues/I-20260616T083810Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260616T083810Z--governance-enforce/candidates.md#C-20260616T083810Z-A`
 - verification_artifact_dir: `docs/epics/governance-enforce/code-reviews`
+
+## M-20260616T044030Z-A
+- title: Complete config.toml migration
+- status: active
+### candidate_issues
+1. `C-20260616T044030Z-A`
+- candidate_id: C-20260616T044030Z-A
+- milestone: M-20260616T044030Z-A
+- title: Complete config.toml migration with auto-migration and backward compatibility
+- status: promoted
+- promoted_issue_path: docs/issues/I-20260616T044030Z-A/issue.md
+- decision_reason: Auto-migration enables self-healing daemon startup
+- next_action: 进入 B2_IBM 物化
+### committed_issues
+1. `I-20260616T044030Z-A`
+- issue_id: I-20260616T044030Z-A
+- phase_state: `done_b2_ibm`
+- issue_path: `docs/issues/I-20260616T044030Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260616T044030Z--config-toml-complete/candidates.md#C-20260616T044030Z-A`
+- verification_artifact_dir: `docs/epics/config-toml-complete/code-reviews`
