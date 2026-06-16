@@ -6215,5 +6215,5 @@ routing_policy:
 - title: config.toml migration
 - milestone_state: committed
 - phase_state: `completed`
-- issue_path: `docs/issues/raw-20260615T235818Z/issue.md`
+- issue_path: `docs/issues/I-20260615T235818Z-config-toml/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260615T235818Z--config-toml-migration/candidates.md`
