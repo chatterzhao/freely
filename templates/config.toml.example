@@ -1,0 +1,81 @@
+# Freely 项目配置文件
+# 由 `freely init` 自动生成，也可手动编辑。
+# 文件路径: .freely/config.toml
+
+# ── 项目基础 ──────────────────────────────────────────
+PROJECT_ROOT = "/path/to/your-project"
+INTENT_FILE = "/path/to/your-project/docs/PROJECT_INTENT.md"
+CONSTITUTION_FILE = "/path/to/your-project/docs/CONSTITUTION.md"
+FREELY_HOME = "/path/to/freely/installation"
+
+# ── AI 工具配置 ──────────────────────────────────────
+AI_TOOL = "codex"
+AI_MODEL = "gpt-5.4"
+AI_MODE = "auto"
+AI_REASONING_EFFORT = "medium"
+
+# ── AI 工具适配器 ─────────────────────────────────
+AI_TOOL_ADAPTER = "acp"
+AI_TOOL_ADAPTER_POLICY = "direct"
+# AI_TOOL_CAPABILITIES = "one,two,three"
+# AI_TOOL_POLICY = "default"
+
+# ── Codex 特定能力 ────────────────────────────────
+AI_CAPABILITY_CODEX_MODEL = "gpt-5.4"
+AI_CAPABILITY_CODEX_SANDBOX = "workspace-write"
+AI_CAPABILITY_CODEX_APPROVAL_POLICY = "never"
+AI_CAPABILITY_CODEX_CWD_MODE = "project"
+
+# ── 自动切换 ─────────────────────────────────────
+AUTO_SWITCH_SLOT = true
+AUTO_SWITCH_TOOL = true
+AUTO_SETUP_FREELY_PROXY = true
+
+# ── 回退工具 ─────────────────────────────────────
+AI_FALLBACK_TOOLS = "codex,opencode"
+
+# ── 循环控制 ─────────────────────────────────────
+CHECK_INTERVAL = 10
+RESTART_DELAY = 2
+MAX_RESTARTS = 0
+
+# ── 流控 ─────────────────────────────────────────
+IFLOW_MAX_TURNS = 100
+MAX_RESUME_STREAK = 24
+MAX_ROUTE_ONLY_STREAK = 1
+ROTATE_ON_CONTEXT_COMPACTED = 1
+SESSION_HANDOFF_TAIL_LINES = 80
+
+# ── 上下文管理 ───────────────────────────────────
+CONTEXT_WARN_RATIO = 0.70
+CONTEXT_ROTATE_RATIO = 0.85
+
+# ── Checkpoint ───────────────────────────────────
+CHECKPOINT_WARN_DIRTY_ENTRIES = 40
+CHECKPOINT_BLOCK_DIRTY_ENTRIES = 120
+CHECKPOINT_DRIFT_STREAK_THRESHOLD = 2
+
+# ── 风暴保护 ────────────────────────────────────
+RESTART_STORM_WINDOW_SECS = 30
+RESTART_STORM_COUNT = 10
+PROCESS_CHURN_PEAK = 10
+RESTART_STORM_OBSERVE_DELAY_SECS = 30
+
+# ── 网络代理 ─────────────────────────────────────
+#   inherit  保持环境变量中的代理设置
+#   disabled  清除代理环境变量
+#   explicit  使用下面指定的代理值
+FREELY_NETWORK_PROXY_MODE = "inherit"
+FREELY_NETWORK_PROXY_URL = ""
+FREELY_ALL_PROXY = ""
+FREELY_HTTP_PROXY = ""
+FREELY_HTTPS_PROXY = ""
+FREELY_NO_PROXY = ""
+
+# ── 仓库平台 ─────────────────────────────────────
+# 逗号分隔，例如 "github,gitee"
+FREELY_REPO_PLATFORMS = ""
+
+# ── 安全审查 ─────────────────────────────────────
+FREELY_SECURITY_REVIEW_POLICY = "advisory-on-high-risk-or-uncertainty"
+FREELY_SECURITY_REVIEW_SCOPE = "execution-boundary-and-reviewer-support"
