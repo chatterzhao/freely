@@ -2712,15 +2712,6 @@ routing_policy:
 - promoted_issue_path: docs/issues/I-20260616T044030Z-A/issue.md
 - decision_reason: Auto-migration enables self-healing daemon startup
 - next_action: 进入 B2_IBM 物化
-2. `I-20260616T110714Z-parse-env-removal`
-- issue_id: I-20260616T110714Z-parse-env-removal
-- phase_state: `in_progress`
-- issue_path: `docs/issues/I-20260616T110714Z-parse-env-removal/issue.md`
-
-## M-20260616T110714Z-parse-env-removal
-- title: config.toml clean break — parse_env_file removal + quality fixes
-- status: active
-### candidate_issues
 
 ## M-20260616T110714Z-parse-env-removal
 - title: config.toml clean break — parse_env_file removal + quality fixes
