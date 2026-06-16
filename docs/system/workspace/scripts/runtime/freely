@@ -3852,27 +3852,20 @@ load_config() {
       exit 1
     }
   else
-    # Auto-migrate from config.env if config.toml doesn't exist yet
-    local _env_cfg="$project/.freely/config.env"
-    if [[ -f "$_env_cfg" ]]; then
-      log_info "config.toml not found, auto-migrating from config.env → config.toml"
-      python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely_config.py" init-toml --project "$project" --from-env 2>/dev/null && \
-        log_info "config.toml created from config.env" || \
-        log_warn "auto-migration failed, falling back to direct config.env source"
-      # Reload from the now-created config.toml, or fall back to env
-      if [[ -f "$cfg" ]]; then
-        source_config "$project" || {
-          log_error "failed to load migrated config.toml: $cfg"
-          exit 1
-        }
-      else
-        # Migration failed — source env directly as last resort
-        source "$_env_cfg"
-      fi
+    log_error "config.toml not found in $(state_dir "$project")"
+    log_error ""
+    log_error "Freely requires config.toml to start. Create it:"
+    log_error ""
+    if [[ -f "$project/.freely/config.toml.example" ]]; then
+      log_error "  cp $project/.freely/config.toml.example $cfg"
     else
-      log_error "missing config: no config.toml and no config.env in $(state_dir "$project")"
-      exit 1
+      log_error "  cp templates/config.toml.example $cfg"
     fi
+    log_error "  Then edit $cfg with your project settings"
+    log_error ""
+    log_error "Or generate a default config:"
+    log_error "  freely init --project $project"
+    exit 1
   fi
 
   # Validate PROJECT_ROOT — must be non-empty, absolute, and an existing directory.
@@ -19271,17 +19264,17 @@ SDK_HELP
   ensure_install_lifecycle_allowlist_file "$project"
   ensure_repo_hooks_enabled_or_fail "$project"
   sync_repo_hook_assets_from_source "$SELF_ROOT" "$project"
-  write_config "$project" "$intent" "$constitution" "$tool" "$model" "$mode" "$reasoning_effort" "$tool_adapter" "$tool_adapter_policy" "$tool_capabilities" "$tool_policy" "$codex_capability_model" "$codex_capability_sandbox" "$codex_capability_approval_policy" "$codex_capability_cwd_mode" "$force"
-  record_default_autonomy_contract "$project" "$mode" "$FREELY_INIT_CONSENT_STATUS" "$FREELY_INIT_CONSENT_RECORDED_AT" "$FREELY_INIT_CONSENT_RECORDED_VIA"
-  if tool_requires_project_codex_config "$tool" "$tool_capabilities"; then
-    write_project_codex_config "$project" "$force" "$mode"
+
+  # Release config.toml.example — user must copy and configure manually.
+  # We do NOT auto-generate config.toml because users must read the
+  # comments to understand what each value means.
+  local _example_src="$SELF_ROOT/templates/config.toml.example"
+  local _example_dst="$project/.freely/config.toml.example"
+  if [[ -f "$_example_src" ]]; then
+    cp "$_example_src" "$_example_dst"
+    log_info "config.toml.example released to .freely/"
   fi
-  load_config "$project"
-  write_project_tool_wrapper_scripts "$project"
-  write_project_tool_boundary_bootstrap_file "$project"
-  register_project_in_registry "$project"
-  rm -f "$(session_state_file "$project")" "$(exit_contract_file "$project")"
-  write_workcell_state "$project" "stopped" "down" "down" "initialized"
+
   # ── Write project .gitignore with template ignore rule ──
   local gitignore="$project/.gitignore"
   if [[ ! -f "$gitignore" || "$force" == "true" ]]; then
@@ -19326,17 +19319,18 @@ EOF
   fi
   ensure_a2a_server_running "$project"
   ensure_task_mode_gate "$project" "wait"
-  log_info "initialized: $(config_file "$project")"
-  load_config "$project"
-  echo "activation_consent_status: $(freely_activation_consent_status_for_loaded_config)"
-  echo "activation_consent_recorded_at: $(format_timestamp_local_for_display "$(freely_activation_consent_recorded_at_for_loaded_config)")"
-  echo "activation_consent_recorded_via: $(freely_activation_consent_recorded_via_for_loaded_config)"
-  echo "autonomy_profile: ${FREELY_AUTONOMY_PROFILE:-$(freely_autonomy_profile_for_mode "${AI_MODE:-}")}"
-  echo "interaction_posture: ${FREELY_INTERACTION_POSTURE:-$(freely_interaction_posture_for_mode "${AI_MODE:-}")}"
-  echo "approval_posture: ${FREELY_APPROVAL_POSTURE:-$(freely_approval_posture_for_mode "${AI_MODE:-}")}"
-  echo "safeguard_guidance_posture: $(freely_safeguard_guidance_posture_for_loaded_config)"
-  echo "runtime_decision_posture: $(freely_runtime_decision_posture_for_loaded_config)"
-  echo "minimal_risk_posture: $(freely_minimal_risk_posture_for_loaded_config)"
+  log_info "init complete — config.toml.example released to .freely/"
+  echo ""
+  echo "┌─ 下一步 ──────────────────────────────────────────────┐"
+  echo "│  config.toml.example 已释放到 .freely/ 目录              │"
+  echo "│                                                        │"
+  echo "│  1. 复制并编辑配置:                                     │"
+  echo "│    cp .freely/config.toml.example .freely/config.toml"
+  echo "│    vim .freely/config.toml  (按注释修改 PROJECT_ROOT 等)"
+  echo "│                                                        │"
+  echo "│  2. 启动 freely:                                        │"
+  echo "│    freely start --project $project"
+  echo "└────────────────────────────────────────────────────────┘"
 }
 
 cmd_set_tool() {

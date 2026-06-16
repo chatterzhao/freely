@@ -2712,10 +2712,23 @@ routing_policy:
 - promoted_issue_path: docs/issues/I-20260616T044030Z-A/issue.md
 - decision_reason: Auto-migration enables self-healing daemon startup
 - next_action: 进入 B2_IBM 物化
+
+## M-20260616T110714Z-parse-env-removal
+- title: config.toml clean break — parse_env_file removal + quality fixes
+- status: active
+### candidate_issues
+1. `C-20260616T110714Z-parse-env-removal`
+- candidate_id: C-20260616T110714Z-parse-env-removal
+- milestone: M-20260616T110714Z-parse-env-removal
+- title: parse_env_file removal + quality fixes for clean break
+- status: promoted
+- promoted_issue_path: docs/issues/I-20260616T110714Z-parse-env-removal/issue.md
+- decision_reason: parse_env_file 被有意删除而非恢复，彻底 TOML-only
+- next_action: 合并到 develop
 ### committed_issues
-1. `I-20260616T044030Z-A`
-- issue_id: I-20260616T044030Z-A
-- phase_state: `done_b2_ibm`
-- issue_path: `docs/issues/I-20260616T044030Z-A/issue.md`
-- source_candidate: `docs/pre-brainstorms/20260616T044030Z--config-toml-complete/candidates.md#C-20260616T044030Z-A`
+1. `I-20260616T110714Z-parse-env-removal`
+- issue_id: I-20260616T110714Z-parse-env-removal
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260616T110714Z-parse-env-removal/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260616T110714Z--parse-env-file-removal/candidates.md#C-20260616T110714Z-parse-env-removal`
 - verification_artifact_dir: `docs/epics/config-toml-complete/code-reviews`
