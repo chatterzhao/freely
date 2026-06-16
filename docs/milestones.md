@@ -15,7 +15,7 @@
 1. `I-20260616T224707Z-A`
 - title: ACP Session ID 格式污染修复 — 兼容三种 AI CLI 的 Session ID 提取
 - milestone_state: committed
-- phase_state: `done_b2_ibm`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260616T224707Z-A/issue.md`
 
 ## M-20260616T143914Z-A

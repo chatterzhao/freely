@@ -1,8 +1,8 @@
 ---
 local_id: I-20260616T224707Z-A
 kind: linked
-status: in_dev
-phase_state: done_b2_ibm
+status: completed
+phase_state: completed
 promoted_from: raw-20260616T224707Z
 source_candidate: docs/pre-brainstorms/20260616T224707Z--acp-session-id-format-fix/candidates.md
 canonical_issue_path: ""
@@ -16,8 +16,8 @@ intake_id: ""
 author: zhaoquan
 channel: freely-fix-execution
 session_refs: []
-pre_tests_path: docs/pre-brainstorms/20260616T224707Z--acp-session-id-format-fix/pre-tests.md
-verification_artifact_dir: docs/pre-brainstorms/20260616T224707Z--acp-session-id-format-fix/code-reviews
+pre_tests_path: docs/epics/acp-session-id-format-fix/pre-tests.md
+verification_artifact_dir: docs/epics/acp-session-id-format-fix/code-reviews
 ---
 
 # I-20260616T224707Z-A: ACP Session ID 格式污染修复
