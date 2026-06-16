@@ -2,6 +2,7 @@
 
 ## C-20260615T235818Z-config-toml
 
+- milestone: M-20260615T235818Z-config-toml-migration
 - status: `promoted`
 - acceptance_criteria:
   - config.toml as primary format
