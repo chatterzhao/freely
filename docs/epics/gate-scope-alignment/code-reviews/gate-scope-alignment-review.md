@@ -11,6 +11,7 @@ review_id: gate-scope-alignment-review
 
 - issue_id: I-20260616T030213Z-A
 - issue_path: docs/issues/I-20260616T030213Z-A/issue.md
+- source_candidate: docs/pre-brainstorms/20260616T030213Z--gate-scope-alignment/candidates.md
 
 ## Implementation Decision Note
 
