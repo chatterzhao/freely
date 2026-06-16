@@ -1,7 +1,8 @@
 ---
-issue_id: I-20260616T143914Z-A
-issue_path: docs/issues/I-20260616T143914Z-A/issue.md
 ---
+
+- issue_id: I-20260616T143914Z-A
+- issue_path: docs/issues/I-20260616T143914Z-A/issue.md
 
 ## Implementation
 
