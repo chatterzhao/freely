@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+"""Freely project configuration manager — TOML-only, no config.env."""
+
 from __future__ import annotations
 
 import argparse
@@ -9,8 +11,6 @@ from pathlib import Path
 from typing import Any
 
 # ── Config file paths ──────────────────────────────────────────────
-
-SELF_ROOT = Path(__file__).resolve().parent.parent.parent.parent
 
 
 def state_dir(project: str) -> Path:
@@ -57,12 +57,18 @@ def read_config(project: str) -> dict[str, Any]:
 
 
 def _shell_quote(value: Any) -> str:
+    """Return a shell-safe double-quoted representation.
+
+    Escapes ``\\``, ``"``, ``$``, and backtick so the result is safe
+    to ``eval`` in bash inside double quotes.
+    """
     if isinstance(value, bool):
         return "true" if value else "false"
     if isinstance(value, (int, float)):
         return str(value)
     s = str(value)
     s = s.replace("\\", "\\\\").replace('"', '\\"')
+    s = s.replace("$", "\\$").replace("`", "\\`")
     return f'"{s}"'
 
 
@@ -91,17 +97,31 @@ def _toml_quote(value: Any) -> str:
 
 
 def dict_to_toml(data: dict[str, Any], comments: dict[str, str] | None = None) -> str:
+    """Serialize a dict to TOML text.
+
+    Flat keys are emitted first, then each ``[section]`` block, so
+    flat keys appended after a section (e.g. by upsert) are not
+    absorbed into the preceding table.
+    """
     lines: list[str] = []
-    for key, value in data.items():
+    flat_keys = [(k, v) for k, v in data.items() if not isinstance(v, dict)]
+    sections = [(k, v) for k, v in data.items() if isinstance(v, dict)]
+
+    for key, value in flat_keys:
         if comments and key in comments:
             for cl in comments[key].split("\n"):
                 lines.append(f"# {cl}")
-        if isinstance(value, dict):
-            lines.append(f"\n[{key}]")
-            for sub_key, sub_value in value.items():
-                lines.append(f'{sub_key} = {_toml_quote(sub_value)}')
-        else:
-            lines.append(f'{key} = {_toml_quote(value)}')
+        lines.append(f'{key} = {_toml_quote(value)}')
+
+    for key, value in sections:
+        if comments and key in comments:
+            for cl in comments[key].split("\n"):
+                lines.append(f"# {cl}")
+        lines.append("")
+        lines.append(f"[{key}]")
+        for sub_key, sub_value in value.items():
+            lines.append(f'{sub_key} = {_toml_quote(sub_value)}')
+
     lines.append("")
     return "\n".join(lines)
 
@@ -137,14 +157,13 @@ def cmd_toml2env(args: argparse.Namespace) -> None:
 
 def cmd_init_toml(args: argparse.Namespace) -> None:
     data: dict[str, Any] = {}
-    if args.from_env:
-        env_path = Path(args.project) / ".freely" / "config.env"
-        if env_path.is_file():
-            data = parse_env_file(env_path)
-            print(f"migrated {len(data)} keys from {env_path}")
-        else:
-            print(f"config.env not found at {env_path}", file=sys.stderr)
-            sys.exit(1)
+    if args.from_stdin:
+        for line in sys.stdin.read().splitlines():
+            line = line.strip()
+            if not line or "=" not in line:
+                continue
+            key, val = line.split("=", 1)
+            data[key.strip()] = val.strip()
     elif args.values:
         for item in args.values:
             if "=" not in item:
@@ -166,7 +185,11 @@ def cmd_print(args: argparse.Namespace) -> None:
     if not data:
         sys.exit(1)
     for key, value in data.items():
-        print(f'{key} = "{value}"')
+        if isinstance(value, dict):
+            for sub_key, sub_value in value.items():
+                print(f'{key}.{sub_key} = {_toml_quote(sub_value)}')
+        else:
+            print(f'{key} = {_toml_quote(value)}')
 
 
 def main() -> None:
@@ -187,7 +210,7 @@ def main() -> None:
         "--value", dest="values", action="append", help="KEY=VALUE pairs"
     )
     p_init.add_argument(
-        "--from-env", action="store_true", help="Migrate from config.env"
+        "--from-stdin", action="store_true", help="Read KEY=VALUE lines from stdin"
     )
 
     p_upsert = sub.add_parser("upsert", help="Upsert a config key")

@@ -15,14 +15,9 @@ freely_network_proxy_read_config_values() {
   (
     unset FREELY_NETWORK_PROXY_MODE FREELY_NETWORK_PROXY_URL FREELY_ALL_PROXY FREELY_HTTP_PROXY FREELY_HTTPS_PROXY FREELY_NO_PROXY
     [[ -f "$cfg" ]] || exit 0
-    if [[ "$cfg" == *.toml ]]; then
-      local freely_root
-      freely_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../.." && pwd -P)"
-      eval "$("$freely_root/bin/toml2env" --file "$cfg" 2>/dev/null)" || exit 0
-    else
-      # shellcheck disable=SC1090
-      source "$cfg"
-    fi
+    local freely_root
+    freely_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../.." && pwd -P)"
+    eval "$("$freely_root/bin/toml2env" --file "$cfg" 2>/dev/null)" || exit 0
     printf '%s\x1f%s\x1f%s\x1f%s\x1f%s\x1f%s\n' \
       "${FREELY_NETWORK_PROXY_MODE:-}" \
       "${FREELY_NETWORK_PROXY_URL:-}" \
