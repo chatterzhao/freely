@@ -282,6 +282,19 @@ def normalized_phase(value: Optional[str]) -> str:
 
 
 def is_governance_only_path(rel_path: str) -> bool:
+    """Paths where FREELY_SKIP_IBM_GATE=1 is allowed.
+
+    Per LAWS.md §3: only docs/cleanup/format changes that structurally
+    do not require IBM lifecycle evidence. This means governance process
+    artifacts (pre-brainstorms, epics, progress, issues, milestones,
+    agent/skill definitions) and meta-governance quality scripts.
+
+    Deliberately EXCLUDED (require full IBM lifecycle):
+      - docs/system/workspace/hooks/          (runtime enforcement code)
+      - docs/system/workspace/scripts/runtime/ (daemon, bridge, launchers)
+      - docs/system/workspace/scripts/worktree/ (wt-close, pr-merge, etc.)
+      - docs/system/workspace/scripts/tests/    (test code)
+    """
     if rel_path in {
         "AGENTS.md",
         "docs/CONSTITUTION.md",
@@ -295,12 +308,10 @@ def is_governance_only_path(rel_path: str) -> bool:
         return True
     if rel_path.startswith(("docs/pre-brainstorms/", "docs/epics/", "docs/progress/", "docs/issues/")):
         return True
-    if rel_path.startswith(("docs/system/workspace/agents/", "docs/system/workspace/skills/", "docs/system/workspace/hooks/")):
+    if rel_path.startswith(("docs/system/workspace/agents/", "docs/system/workspace/skills/")):
         return True
-    if rel_path.startswith(("docs/system/workspace/scripts/quality/", "docs/system/workspace/scripts/worktree/", "docs/system/workspace/scripts/runtime/", "docs/system/workspace/scripts/tests/")):
-        return True
-    # Legacy catch: test-governance-* at the top of tests/ (backward compat)
-    if re.match(r"docs/system/workspace/scripts/tests/test-governance-[^/]+$", rel_path):
+    # Meta-governance quality scripts (governance-merge-gate itself)
+    if rel_path.startswith("docs/system/workspace/scripts/quality/"):
         return True
     return False
 
