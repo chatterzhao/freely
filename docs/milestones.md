@@ -6224,6 +6224,7 @@ routing_policy:
 - source_candidate: `docs/pre-brainstorms/20260616T055035Z--a2a-hygiene-after-run/candidates.md#C-20260616T055035Z-A`
 - verification_artifact_dir: `docs/epics/a2a-hygiene-after-run/code-reviews`
 
+
 ## M-20260616T083810Z-A
 - title: Governance enforcement
 - status: active
@@ -6231,14 +6232,15 @@ routing_policy:
 1. `C-20260616T083810Z-A`
 - candidate_id: C-20260616T083810Z-A
 - milestone: M-20260616T083810Z-A
+- title: Governance enforcement improvements
 - status: promoted
 - promoted_issue_path: docs/issues/I-20260616T083810Z-A/issue.md
+- decision_reason: SKIP_IBM_GATE abused; fix-execution ambiguous; error messages lack skill refs
+- next_action: 进入 B2_IBM 物化
 ### committed_issues
 1. `I-20260616T083810Z-A`
 - issue_id: I-20260616T083810Z-A
-- phase_state: completed
-- source_candidate: docs/pre-brainstorms/20260616T083810Z--governance-enforce/candidates.md#C-20260616T083810Z-A
-- verification_artifact_dir: docs/epics/governance-enforce/code-reviews
-
-### completed_issues
-1. `I-20260616T083810Z-A` — governance enforcement improvements merged to develop
+- phase_state: `done_b2_ibm`
+- issue_path: `docs/issues/I-20260616T083810Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260616T083810Z--governance-enforce/candidates.md#C-20260616T083810Z-A`
+- verification_artifact_dir: `docs/epics/governance-enforce/code-reviews`
