@@ -6211,7 +6211,7 @@ routing_policy:
 - decision_reason: raw-20260615T235818Z (GitHub #2780) — migrate from config.env to config.toml
 - next_action: completed, merge to develop
 ### completed_issues
-1. `raw-20260615T235818Z`
+1. `I-20260615T235818Z-config-toml`
 - title: config.toml migration
 - milestone_state: committed
 - phase_state: `completed`

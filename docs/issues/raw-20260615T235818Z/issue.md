@@ -1,7 +1,7 @@
 ---
-local_id: raw-20260615T235818Z
-kind: raw
-phase_state: proposed
+local_id: I-20260615T235818Z-config-toml
+kind: I-
+phase_state: completed
 platform_ids:
   github:
     issue_id: '2780'
