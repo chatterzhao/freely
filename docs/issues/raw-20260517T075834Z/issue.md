@@ -2,7 +2,8 @@
 local_id: raw-20260517T075834Z
 kind: raw
 priority: P2
-phase_state: open
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 source: chat-inbox
 created_at: '2026-05-17T07:58:34Z'
 title: 'supervisor crash: bash rc=0'
@@ -11,9 +12,9 @@ platform_ids:
     issue_id: '450'
     url: https://github.com/chatterzhao/freely/issues/450
     synced_at: '2026-05-17T07:58:43Z'
-updated_at: '2026-05-17T07:58:43Z'
+updated_at: '2026-06-16T04:29:07Z'
 primary_platform: github
-platform_state: open
+platform_state: closed
 ---
 
 supervisor crash: bash at freely:18777 (rc=0)

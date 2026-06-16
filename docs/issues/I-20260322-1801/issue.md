@@ -1,8 +1,8 @@
 ---
 local_id: I-20260322-1801
 kind: linked
-phase_state: completed
-completed_at: '2026-04-29'
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 platform_ids:
   github:
     issue_id: '50'
@@ -19,7 +19,7 @@ last_synced_comment_at:
 hash: ''
 created_at: '2026-04-27T11:16:52Z'
 updated_at: '2026-04-27T11:16:52Z'
-platform_state: open
+platform_state: closed
 ---
 
 Freely 这次不是遇到一次性 merge 事故，而是暴露出 `pre-test-merge` 作为治理对象的定义不完整：

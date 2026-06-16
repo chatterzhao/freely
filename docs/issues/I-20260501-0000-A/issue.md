@@ -2,7 +2,8 @@
 local_id: I-20260501-0000-A
 issue_title: PR scan surface + FREELY_REPO_PLATFORMS config
 kind: linked
-phase_state: completed
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 promoted_from: raw-20260501-0000
 platform_ids:
   github:
@@ -21,5 +22,5 @@ session_refs:
 - tool: ccds
   session_id: 20260501-scan-pr-platform
   role: author
-platform_state: open
+platform_state: closed
 ---

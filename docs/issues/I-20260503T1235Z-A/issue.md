@@ -2,7 +2,8 @@
 local_id: I-20260503T1235Z-A
 issue_title: "fix: defer worker auto-recovery to after first AI patrol"
 kind: linked
-phase_state: completed
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 promoted_from: raw-20260503T1235Z
 source_candidate: docs/pre-brainstorms/20260503-1235--auto-recovery-race/candidates.md#C-20260503T1235Z-A
 platform_ids:
@@ -19,7 +20,7 @@ created_at: "2026-05-03T12:39:03Z"
 updated_at: "2026-05-14T07:30:00Z"
 session_refs:
   - {tool: ccds, session_id: "20260503-auto-recovery-race", role: "author"}
-platform_state: completed
+platform_state: closed
 ---
 
 ## Implementation

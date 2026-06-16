@@ -1,12 +1,13 @@
 ---
 local_id: I-20260510T1840Z-A
 kind: linked
-phase_state: completed
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 promoted_from: raw-20260510T1840Z
 source_candidate: docs/pre-brainstorms/20260510T1840Z--branch-check-no-bypass/candidates.md
 verification_artifact_dir: docs/epics/branch-check-no-bypass/code-reviews
 pre_tests_path: docs/epics/branch-check-no-bypass/verification/pre-tests.md
-platform_state: open
+platform_state: closed
 platform_ids:
   github:
     issue_id: '2610'

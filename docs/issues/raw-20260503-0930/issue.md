@@ -2,7 +2,8 @@
 local_id: raw-20260503-0930
 kind: raw
 priority: medium
-phase_state: completed
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 phase_state: completed
 source: platform
@@ -13,7 +14,7 @@ platform_ids:
     repo: freely
 created_at: "2026-05-03T09:30:00Z"
 title: "feat: webhook receiver for realtime platform issue sync"
-platform_state: open
+platform_state: closed
 ---
 ## 问题
 平台 issue 变化 → webhook POST → freely receiver → issue-sync → docs/issues/raw-*

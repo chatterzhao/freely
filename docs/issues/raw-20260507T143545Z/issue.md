@@ -1,7 +1,8 @@
 ---
 local_id: raw-20260507T143545Z
 kind: raw
-phase_state: completed
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 updated_at: 2026-05-17T04:47:25Z
 platform_ids:
@@ -20,7 +21,7 @@ channel: github
 session_refs: []
 pre_tests_path: docs/epics/timestamp-seconds-upgrade/verification/pre-tests.md
 verification_artifact_dir: docs/epics/timestamp-seconds-upgrade/code-reviews
-platform_state: open
+platform_state: closed
 ---
 
 - pre_tests_path: docs/epics/timestamp-seconds-upgrade/verification/pre-tests.md

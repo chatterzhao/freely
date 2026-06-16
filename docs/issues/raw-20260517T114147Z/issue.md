@@ -13,7 +13,7 @@ platform_ids:
     synced_at: '2026-05-17T12:23:48Z'
 updated_at: '2026-05-17T12:23:48Z'
 primary_platform: github
-platform_state: open
+platform_state: closed
 ---
 
 supervisor crash: bash at freely:18777 (rc=0)

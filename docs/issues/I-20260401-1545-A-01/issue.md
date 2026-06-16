@@ -1,8 +1,8 @@
 ---
 local_id: I-20260401-1545-A-01
 kind: linked
-phase_state: completed
-completed_at: '2026-04-29'
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 platform_ids:
   github:
     issue_id: '82'
@@ -19,7 +19,7 @@ last_synced_comment_at:
 hash: ''
 created_at: '2026-04-27T11:22:02Z'
 updated_at: '2026-05-17T08:01:41Z'
-platform_state: open
+platform_state: closed
 ---
 
 ACP 边界已经冻结，runtime `adapter axis` 也已经 materialize 到 config / dispatch / status truth。下一步如果继续停在抽象层，只会重复“ACP 可不可以”而不产生真实判断。

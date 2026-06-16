@@ -2,7 +2,8 @@
 local_id: raw-20260517T093315Z
 kind: raw
 priority: P2
-phase_state: open
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 source: chat-inbox
 created_at: '2026-05-17T09:33:15Z'
 title: session UUID 提取用 head -1 读到空行，导致 session 永不被持久化，cache 命中率为零
@@ -13,7 +14,7 @@ platform_ids:
     synced_at: '2026-05-17T09:33:21Z'
 updated_at: '2026-05-17T09:33:21Z'
 primary_platform: github
-platform_state: open
+platform_state: closed
 ---
 
 ## 根因

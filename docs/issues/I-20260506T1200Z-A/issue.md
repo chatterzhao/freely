@@ -1,7 +1,8 @@
 ---
 local_id: I-20260506T1200Z-A
 kind: linked
-phase_state: completed
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 source_candidate: docs/pre-brainstorms/20260506-ibm-skill-rename/candidates.md
 milestone: M-20260506T1200Z-A
 verification_artifact_dir: docs/epics/ibm-skill-rename/code-reviews
@@ -11,7 +12,7 @@ platform_ids:
     issue_id: '2587'
     url: https://github.com/chatterzhao/freely/issues/2587
     synced_at: '2026-06-13T10:42:20Z'
-platform_state: open
+platform_state: closed
 updated_at: '2026-06-13T10:42:20Z'
 primary_platform: github
 created_at: '2026-06-13T10:42:20Z'

@@ -1,8 +1,8 @@
 ---
 local_id: I-20260319-2315
 kind: linked
-phase_state: completed
-completed_at: '2026-04-29'
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 platform_ids:
   github:
     issue_id: '24'
@@ -19,7 +19,7 @@ last_synced_comment_at:
 hash: ''
 created_at: '2026-04-27T11:14:12Z'
 updated_at: '2026-04-27T11:14:12Z'
-platform_state: open
+platform_state: closed
 ---
 
 Freely 需要一个真正可用的 CLI 前台插话入口，但这个入口必须继续服从既有 human interruption 架构：

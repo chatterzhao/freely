@@ -1,7 +1,8 @@
 ---
 local_id: raw-20260514T103532Z
 kind: raw
-phase_state: completed
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 platform_ids:
   github:
     issue_id: '344'
@@ -17,7 +18,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
+platform_state: closed
 ---
 
 ## raw-20260514T103532Z

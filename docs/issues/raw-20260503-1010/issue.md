@@ -2,12 +2,13 @@
 local_id: raw-20260503-1010
 kind: raw
 priority: high
-phase_state: completed
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 source: chat-inbox
 created_at: '2026-05-03T10:10:00Z'
 title: 'fix: SQLite busy_timeout=0 causes concurrent write failures'
-platform_state: open
+platform_state: closed
 platform_ids:
   github:
     issue_id: '373'

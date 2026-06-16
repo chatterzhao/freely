@@ -2,12 +2,13 @@
 local_id: raw-20260511T1343Z
 kind: raw
 priority: medium
-phase_state: completed
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 source: chat-inbox
 created_at: '2026-05-11T13:43:00Z'
 title: 'fix: empty scan should trigger stop_ai, not restart loop'
-platform_state: open
+platform_state: closed
 platform_ids:
   github:
     issue_id: '370'
