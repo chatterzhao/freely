@@ -3,7 +3,6 @@ local_id: raw-20260507T0730Z
 kind: raw
 phase_state: completed
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
-phase_state: completed
 platform_ids:
   github:
     issue_id: '244'
@@ -22,7 +21,7 @@ session_refs: []
 pre_tests_path: docs/epics/source-param/verification/pre-tests.md
 verification_artifact_dir: docs/epics/source-param/code-reviews
 source_candidate: docs/pre-brainstorms/20260507-source-param/candidates.md
-platform_state: open
+platform_state: closed
 ---
 
 ## 背景

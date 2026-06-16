@@ -3,7 +3,6 @@ local_id: raw-20260507T0100Z
 kind: raw
 phase_state: completed
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
-phase_state: completed
 platform_ids:
   github:
     issue_id: '278'
@@ -18,7 +17,7 @@ pre_tests_path: docs/epics/fix-branch-naming/verification/pre-tests.md
 verification_artifact_dir: docs/epics/fix-branch-naming/code-reviews
 source_candidate: docs/pre-brainstorms/20260507-fix-branch-naming/candidates.md
 updated_at: 2026-05-17T04:47:25Z
-platform_state: open
+platform_state: closed
 ---
 
 ## 问题

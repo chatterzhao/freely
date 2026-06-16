@@ -16,7 +16,7 @@ pre_tests_path: docs/epics/promoted-gate-fix/verification/pre-tests.md
 verification_artifact_dir: docs/epics/promoted-gate-fix/code-reviews
 source_candidate: docs/pre-brainstorms/20260507-promoted-gate-fix/candidates.md
 updated_at: 2026-05-17T04:47:25Z
-platform_state: open
+platform_state: closed
 ---
 ## 问题
 promoted candidate M 检查绕过

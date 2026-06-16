@@ -8,7 +8,7 @@ platform_ids:
     issue_id: '376'
     url: https://github.com/chatterzhao/freely/issues/376
     synced_at: '2026-05-16T13:22:28Z'
-platform_state: open
+platform_state: closed
 updated_at: 2026-05-17T04:47:25Z
 primary_platform: github
 created_at: '2026-05-16T13:22:28Z'
