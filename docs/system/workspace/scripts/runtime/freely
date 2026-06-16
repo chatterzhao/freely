@@ -3852,8 +3852,27 @@ load_config() {
       exit 1
     }
   else
-    log_error "missing config: no config.toml in $(state_dir "$project")"
-    exit 1
+    # Auto-migrate from config.env if config.toml doesn't exist yet
+    local _env_cfg="$project/.freely/config.env"
+    if [[ -f "$_env_cfg" ]]; then
+      log_info "config.toml not found, auto-migrating from config.env → config.toml"
+      python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely_config.py" init-toml --project "$project" --from-env 2>/dev/null && \
+        log_info "config.toml created from config.env" || \
+        log_warn "auto-migration failed, falling back to direct config.env source"
+      # Reload from the now-created config.toml, or fall back to env
+      if [[ -f "$cfg" ]]; then
+        source_config "$project" || {
+          log_error "failed to load migrated config.toml: $cfg"
+          exit 1
+        }
+      else
+        # Migration failed — source env directly as last resort
+        source "$_env_cfg"
+      fi
+    else
+      log_error "missing config: no config.toml and no config.env in $(state_dir "$project")"
+      exit 1
+    fi
   fi
 
   # Validate PROJECT_ROOT — must be non-empty, absolute, and an existing directory.
