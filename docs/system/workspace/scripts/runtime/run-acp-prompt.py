@@ -9,7 +9,8 @@ Two transport modes:
 
 Session states (--launch-kind):
   fresh   → session/new
-  resume  → session/resume <resume_target>
+  resume  → session/resume <resume_target>  (correct; not session/load)
+  prompt  → session/prompt (multi-turn, session already alive)
   fork    → session/new (worker gets own session, context from prompt)
 """
 

@@ -567,11 +567,11 @@ tool_run_direct_from_prompt_file() {
       local -a args=(exec --skip-git-repo-check -C "$project")
       [[ -n "$worktrees_root" ]] && args+=(--add-dir "$worktrees_root")
       if [[ "$launch_kind" == "resume" ]]; then
-        [[ -n "$tool_resume_target" ]] || {
+        [[ -n "$claude_session_id" ]] || {
           echo "[ERROR] codex resume requires an explicit session target" >&2
           return 1
         }
-        args=(exec resume "$tool_resume_target" --skip-git-repo-check)
+        args=(exec resume "$claude_session_id" --skip-git-repo-check)
       fi
       [[ -n "$model" ]] && args+=(-m "$model")
       [[ -n "$reasoning_effort" ]] && args+=(-c "model_reasoning_effort=\"$reasoning_effort\"")
@@ -639,10 +639,8 @@ tool_run_direct_from_prompt_file() {
       elif [[ "$launch_kind" == "resume" ]]; then
         if [[ -n "$tool_resume_target" ]] && declare -f session_resume_args >/dev/null 2>&1; then
           while IFS= read -r arg; do [[ -n "$arg" ]] && args+=("$arg"); done <<<"$(session_resume_args "$tool" "$tool_resume_target")"
-        elif [[ -n "$tool_resume_target" ]]; then
-          args+=(--resume "$tool_resume_target")
         elif [[ -n "$claude_session_id" ]]; then
-          args+=(--session-id "$claude_session_id")
+          args+=(--resume "$claude_session_id")
         fi
       elif [[ -n "$claude_session_id" ]]; then
         if declare -f session_fresh_args >/dev/null 2>&1; then
@@ -666,8 +664,8 @@ tool_run_direct_from_prompt_file() {
     opencode)
       local -a args=(run --print-logs)
       [[ -n "$project" ]] && args+=("--dir" "$project")
-      if [[ "$launch_kind" == "resume" ]] && [[ -n "$tool_resume_target" ]]; then
-        args+=("-s" "$tool_resume_target")
+      if [[ "$launch_kind" == "resume" ]] && [[ -n "$claude_session_id" ]]; then
+        args+=("-s" "$claude_session_id")
       fi
       exec opencode "${tool_extra_args[@]:-}" "${args[@]}" "$(cat "$prompt_file")"
       ;;
@@ -766,7 +764,7 @@ tool_run_acp_from_prompt_file() {
         --model "$model" \
         --launch-kind "$launch_kind" \
         --session-id "${claude_session_id:-}" \
-        ${tool_resume_target:+--resume "$tool_resume_target"} \
+        ${claude_session_id:+--resume "$claude_session_id"} \
         --reasoning-effort "$reasoning_effort"
       ;;
     claude|cc|cc-use-codex-cli)
@@ -787,7 +785,7 @@ tool_run_acp_from_prompt_file() {
       # Session management based on launch kind
       case "$launch_kind" in
         resume)
-          [[ -n "$tool_resume_target" ]] && acp_args+=(--resume "$tool_resume_target")
+          [[ -n "$claude_session_id" ]] && acp_args+=(--resume "$claude_session_id")
           ;;
         prompt)
           # Multi-turn delta: session alive, just send prompt.
@@ -796,7 +794,7 @@ tool_run_acp_from_prompt_file() {
           [[ -n "$claude_session_id" ]] && acp_args+=(--resume "$claude_session_id")
           ;;
         fork)
-          [[ -n "$tool_resume_target" ]] && acp_args+=(--resume "$tool_resume_target")
+          [[ -n "$claude_session_id" ]] && acp_args+=(--resume "$claude_session_id")
           ;;
         fresh|fresh_with_handoff)
           [[ -n "$claude_session_id" ]] && acp_args+=(--session-id "$claude_session_id")
@@ -822,13 +820,13 @@ tool_run_acp_from_prompt_file() {
       # Session management based on launch kind
       case "$launch_kind" in
         resume)
-          [[ -n "$tool_resume_target" ]] && acp_args+=(--resume "$tool_resume_target")
+          [[ -n "$claude_session_id" ]] && acp_args+=(--resume "$claude_session_id")
           ;;
         prompt)
           [[ -n "$claude_session_id" ]] && acp_args+=(--resume "$claude_session_id")
           ;;
         fork)
-          [[ -n "$tool_resume_target" ]] && acp_args+=(--resume "$tool_resume_target")
+          [[ -n "$claude_session_id" ]] && acp_args+=(--resume "$claude_session_id")
           ;;
         fresh|fresh_with_handoff)
           [[ -n "$claude_session_id" ]] && acp_args+=(--session-id "$claude_session_id")
