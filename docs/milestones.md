@@ -15,7 +15,7 @@
 1. `I-20260616T224707Z-A`
 - title: ACP Session ID 格式污染修复 — 兼容三种 AI CLI 的 Session ID 提取
 - milestone_state: committed
-- phase_state: `in_b2_ibm`
+- phase_state: `done_b2_ibm`
 - issue_path: `docs/issues/I-20260616T224707Z-A/issue.md`
 
 ## M-20260616T143914Z-A
@@ -1937,7 +1937,7 @@ routing_policy:
 1. `I-20260509T024559Z-A`
 - title: multi-project isolation architecture
 - milestone_state: committed
-- phase_state: `in_b2_ibm`
+- phase_state: `done_b2_ibm`
 - issue_path: `docs/issues/I-20260509T024559Z-A/issue.md`
 
 ## M-20260517T082422Z-A
@@ -2623,7 +2623,7 @@ routing_policy:
 1. `I-20260612T000223Z-A`
 - title: A2A 协议替换 Freely Handoff 架构重构
 - milestone_state: committed
-- phase_state: `in_b2_ibm`
+- phase_state: `done_b2_ibm`
 - issue_path: `docs/issues/I-20260612T000223Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260612T000223Z--a2a-replace-handoff/candidates.md#C-20260612T000223Z-A`
 
@@ -2641,7 +2641,7 @@ routing_policy:
 1. `I-20260615T001626Z-A`
 - title: 移除 A2A 文本 JSON 解析 Fallback (Phase 1+2)
 - milestone_state: committed
-- phase_state: `in_b2_ibm`
+- phase_state: `done_b2_ibm`
 - issue_path: `docs/issues/I-20260615T001626Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260615T001626Z--a2a-no-fallback/candidates.md#C-20260615T001626Z-A`
 

@@ -2,7 +2,7 @@
 local_id: I-20260616T224707Z-A
 kind: linked
 status: in_dev
-phase_state: in_b2_ibm
+phase_state: done_b2_ibm
 promoted_from: raw-20260616T224707Z
 source_candidate: docs/pre-brainstorms/20260616T224707Z--acp-session-id-format-fix/candidates.md
 canonical_issue_path: ""
