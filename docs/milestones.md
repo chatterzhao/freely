@@ -6192,7 +6192,12 @@ routing_policy:
 - promoted_issue_path: `docs/issues/I-20260616T044825Z-A/issue.md`
 - decision_reason: Industry standard (6 ACP projects checked) uses only idle timeouts, no absolute caps. The absolute 30-minute timeout kills legitimate long-running AI sessions even when actively producing output.
 - next_action: 进入 B2_IBM 物化
-### committed_issues
+### completed_issues
 1. `I-20260616T044825Z-A`
 - issue_id: I-20260616T044825Z-A
+- title: Remove BRIDGE_TIMEOUT absolute cap for session/prompt in acp-bridge.py
+- milestone_state: committed
 - phase_state: `completed`
+- issue_path: `docs/issues/I-20260616T044825Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260616T044825Z--remove-absolute-timeout/candidates.md#C-20260616T044825Z-A`
+- verification_artifact_dir: `docs/epics/remove-absolute-timeout/remove-bridge-absolute-cap/code-reviews`
