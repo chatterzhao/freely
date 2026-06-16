@@ -4,7 +4,9 @@
 
 - raw_issue: raw-20260616T110714Z
 - status: `absorbed`
-- absorbed_by: I-20260616T044030Z-A (config.toml clean break — 彻底 TOML-only)
+- absorbed_by: I-20260616T044030Z-A
+- promoted_issue_path: docs/issues/I-20260616T044030Z-A/issue.md
+- decision_reason: parse_env_file 被有意删除（而非修复/恢复）。彻底 TOML-only 方案不需要任何 config.env 迁移代码。本修复是 I-20260616T044030Z-A config.toml clean break 的子任务，不独立开 issue。
 - absorb_reason: parse_env_file 删除是 config-toml-complete clean-break 的子任务。不恢复该函数，而是彻底移除所有 config.env 迁移代码。
 - acceptance_criteria:
   - parse_env_file 不恢复（删除调用方和 --from-env flag）
