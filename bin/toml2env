@@ -5,7 +5,7 @@ SELF_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 
 if [[ $# -eq 0 ]]; then
   echo "Usage: toml2env --project <project> [--file <path>]" >&2
-  echo "       toml2env --file <config.toml|config.env>" >&2
+  echo "       toml2env --file <config.toml>" >&2
   exit 1
 fi
 
