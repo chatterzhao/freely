@@ -3,6 +3,7 @@
 ## C-20260616T110714Z-parse-env-removal
 
 - raw_issue: raw-20260616T110714Z
+- milestone: M-20260616T110714Z-parse-env-removal
 - status: `promoted`
 - promoted_issue_id: I-20260616T110714Z-parse-env-removal
 - promoted_issue_path: docs/issues/I-20260616T110714Z-parse-env-removal/issue.md
