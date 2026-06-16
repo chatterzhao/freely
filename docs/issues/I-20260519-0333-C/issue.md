@@ -2,7 +2,8 @@
 local_id: I-20260519-0333-C
 issue_title: Testing evidence ladder and gate mapping
 kind: linked
-phase_state: completed
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 promoted_from: pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates
 source_candidate: docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/candidates.md#C-20260325-0333-A
 milestone: M-20260306-workspace-routing-foundation
@@ -15,7 +16,7 @@ platform_ids:
     issue_id: '2601'
     url: https://github.com/chatterzhao/freely/issues/2601
     synced_at: '2026-06-13T10:45:32Z'
-platform_state: open
+platform_state: closed
 updated_at: '2026-06-13T10:45:32Z'
 session_refs:
 - tool: cc

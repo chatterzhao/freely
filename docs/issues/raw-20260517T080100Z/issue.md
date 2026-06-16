@@ -2,7 +2,8 @@
 local_id: raw-20260517T080100Z
 kind: raw
 priority: P2
-phase_state: open
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 source: chat-inbox
 created_at: '2026-05-17T08:01:00Z'
 title: 'supervisor crash: bash rc=0'
@@ -13,7 +14,7 @@ platform_ids:
     synced_at: '2026-05-17T08:01:06Z'
 updated_at: '2026-05-17T08:01:06Z'
 primary_platform: github
-platform_state: open
+platform_state: closed
 ---
 
 supervisor crash: bash at freely:18777 (rc=0)

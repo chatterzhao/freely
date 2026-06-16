@@ -1,7 +1,8 @@
 ---
 local_id: I-20260513T040512Z-A
 kind: i_issue
-phase_state: completed
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 promoted_from: raw-20260513T040512Z
 source_candidate: docs/pre-brainstorms/20260513T040512Z--task-lifecycle-scan-batch/candidates.md
 milestone: M-20260513T040512Z-A
@@ -22,7 +23,7 @@ channel: freely-feat-execution
 session_refs: []
 pre_tests_path: docs/issues/I-20260513T040512Z-A/pre-tests.md
 verification_artifact_dir: 'docs/epics/task-lifecycle-scan-batch/code-reviews/'
-platform_state: open
+platform_state: closed
 ---
 
 # I-20260513T040512Z-A: task-lifecycle-scan 批量化 — 1+3 阶段扫描替代 O(n) API 逐项查询

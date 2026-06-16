@@ -1,8 +1,8 @@
 ---
 local_id: I-20260320-2105
 kind: linked
-phase_state: completed
-completed_at: '2026-04-29'
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 platform_ids:
   github:
     issue_id: '30'
@@ -19,7 +19,7 @@ last_synced_comment_at:
 hash: ''
 created_at: '2026-04-27T11:14:43Z'
 updated_at: '2026-04-27T11:14:43Z'
-platform_state: open
+platform_state: closed
 ---
 
 Freely 已经形成三块状态面：

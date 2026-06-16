@@ -1,6 +1,7 @@
 ---
 local_id: raw-20260506T0200Z
-phase_state: completed
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 kind: raw
 source_family: chat_inbox
@@ -13,7 +14,7 @@ platform_ids:
 updated_at: 2026-05-17T04:47:25Z
 primary_platform: github
 created_at: '2026-05-10T09:30:21Z'
-platform_state: open
+platform_state: closed
 ---
 
 # raw-20260506T0200Z: 评论消费链路——DB → issue.md → 平台 三段状态追踪

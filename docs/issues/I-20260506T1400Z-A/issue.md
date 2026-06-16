@@ -1,7 +1,8 @@
 ---
 local_id: I-20260506T1400Z-A
 kind: linked
-phase_state: in_dev
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 source_candidate: docs/pre-brainstorms/20260506-merge-guarded-fix/candidates.md
 milestone: M-20260506T1400Z-A
 verification_artifact_dir: docs/epics/merge-guarded-fix-whitelist/code-reviews
@@ -11,7 +12,7 @@ platform_ids:
     issue_id: '2598'
     url: https://github.com/chatterzhao/freely/issues/2598
     synced_at: '2026-06-13T10:44:57Z'
-platform_state: open
+platform_state: closed
 updated_at: '2026-06-13T10:44:57Z'
 primary_platform: github
 created_at: '2026-06-13T10:44:57Z'

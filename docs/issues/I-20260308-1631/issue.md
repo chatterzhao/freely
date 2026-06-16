@@ -1,8 +1,8 @@
 ---
 local_id: I-20260308-1631
 kind: linked
-phase_state: completed
-completed_at: '2026-04-29'
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 platform_ids:
   github:
     issue_id: '6'
@@ -19,7 +19,7 @@ last_synced_comment_at:
 hash: ''
 created_at: '2026-04-27T11:12:15Z'
 updated_at: '2026-04-27T11:12:15Z'
-platform_state: open
+platform_state: closed
 ---
 
 # Issue: stage-prefixed-progress-identifier

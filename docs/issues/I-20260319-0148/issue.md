@@ -1,8 +1,8 @@
 ---
 local_id: I-20260319-0148
 kind: linked
-phase_state: completed
-completed_at: '2026-04-29'
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 platform_ids:
   github:
     issue_id: '22'
@@ -19,7 +19,7 @@ last_synced_comment_at:
 hash: ''
 created_at: '2026-04-27T11:14:03Z'
 updated_at: '2026-04-27T11:14:03Z'
-platform_state: open
+platform_state: closed
 ---
 
 旧 `context-compaction` 分支不再适合作为继续开发主线，但其独有的 continuity guard 能力仍值得保留。

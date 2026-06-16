@@ -1,8 +1,8 @@
 ---
 local_id: I-20260321-2010
 kind: linked
-phase_state: completed
-completed_at: '2026-04-29'
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 platform_ids:
   github:
     issue_id: '42'
@@ -19,7 +19,7 @@ last_synced_comment_at:
 hash: ''
 created_at: '2026-04-27T11:16:07Z'
 updated_at: '2026-04-27T11:16:07Z'
-platform_state: open
+platform_state: closed
 ---
 
 Freely 现在对不同工具的会话续接模型不一致：

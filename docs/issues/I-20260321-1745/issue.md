@@ -1,8 +1,8 @@
 ---
 local_id: I-20260321-1745
 kind: linked
-phase_state: completed
-completed_at: '2026-04-29'
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 platform_ids:
   github:
     issue_id: '39'
@@ -19,7 +19,7 @@ last_synced_comment_at:
 hash: ''
 created_at: '2026-04-27T11:15:49Z'
 updated_at: '2026-04-27T11:15:49Z'
-platform_state: open
+platform_state: closed
 ---
 
 Freely 当前仍缺少一条稳定的生命周期边界语义，导致团队会反复争论：

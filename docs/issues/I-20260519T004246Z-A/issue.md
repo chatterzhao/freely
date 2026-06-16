@@ -1,7 +1,8 @@
 ---
 local_id: I-20260519T004246Z-A
 kind: i_issue
-phase_state: in_dev
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 promoted_from: raw-20260519T004246Z
 source_candidate: docs/pre-brainstorms/20260519T004246Z--agent-docs-fix/candidates.md
 canonical_issue_path: ''
@@ -20,7 +21,7 @@ channel: manager-promotion
 session_refs: []
 pre_tests_path: docs/issues/I-20260519T004246Z-A/pre-tests.md
 verification_artifact_dir: ''
-platform_state: open
+platform_state: closed
 ---
 
 # I-20260519T004246Z-A: handoff.py 增加 evidence_paths 为 worker_done 必填字段

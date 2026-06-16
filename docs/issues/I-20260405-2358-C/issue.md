@@ -1,8 +1,8 @@
 ---
 local_id: I-20260405-2358-C
 kind: linked
-phase_state: completed
-completed_at: '2026-04-29'
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 platform_ids:
   github:
     issue_id: '116'
@@ -19,7 +19,7 @@ last_synced_comment_at:
 hash: ''
 created_at: '2026-04-27T11:25:22Z'
 updated_at: '2026-05-17T08:01:52Z'
-platform_state: open
+platform_state: closed
 ---
 
 本轮 `bin/` 全量命令审计已经证明，Freely 现在的 CLI 能力不只是 runtime 语义问题，还存在一层更前置的包装层回归：

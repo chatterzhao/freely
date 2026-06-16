@@ -2,7 +2,8 @@
 local_id: I-20260524T053214Z-A
 kind: linked
 status: completed
-phase_state: completed
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 promoted_from: raw-20260524T053214Z
 source_candidate: docs/pre-brainstorms/20260524T053214Z--acp-tool-switch-integration/candidates.md
 canonical_issue_path: ''
@@ -24,7 +25,7 @@ pre_tests_path: docs/issues/raw-20260524T053214Z/pre-tests.md
 verification_artifact_dir: docs/epics/acp-tool-switch-integration/code-reviews
 milestone: M-20260524T053214Z-A
 milestone_state: committed
-platform_state: open
+platform_state: closed
 ---
 
 # I-20260524T053214Z-A: ACP session 生命周期接入 tool_switch_events

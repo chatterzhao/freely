@@ -2,7 +2,8 @@
 local_id: raw-20260503-0915
 kind: raw
 priority: high
-phase_state: completed
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 phase_state: completed
 source: platform
@@ -13,7 +14,7 @@ platform_ids:
     repo: freely
 created_at: "2026-05-03T09:15:00Z"
 title: "feat: enforce test-pre-merge before develop merge"
-platform_state: open
+platform_state: closed
 ---
 ## 问题
 hotfix→develop 跳过 test-pre-merge，pretests-gate 不触发。

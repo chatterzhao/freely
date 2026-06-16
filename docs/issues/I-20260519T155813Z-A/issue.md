@@ -1,7 +1,8 @@
 ---
 local_id: I-20260519T155813Z-A
 kind: linked
-phase_state: completed
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 promoted_from: raw-20260519T155813Z
 source_candidate: docs/pre-brainstorms/20260519T155813Z--launchable-check-reason/candidates.md
 canonical_issue_path: ''
@@ -21,7 +22,7 @@ channel: direct-absorption
 session_refs: []
 pre_tests_path: ''
 verification_artifact_dir: ''
-platform_state: open
+platform_state: closed
 ---
 
 # I-20260519T155813Z-A: launchable check failed reason too vague

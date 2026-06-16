@@ -1,7 +1,8 @@
 ---
 local_id: I-20260516T094405Z-A
 kind: linked
-phase_state: completed
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 promoted_from: raw-20260516T094405Z
 source_candidate: docs/pre-brainstorms/20260516T094405Z--delegate-workers-exclusive-conflict/candidates.md
 canonical_issue_path: ''
@@ -21,7 +22,7 @@ channel: direct-absorption
 session_refs: []
 pre_tests_path: ''
 verification_artifact_dir: ''
-platform_state: open
+platform_state: closed
 ---
 
 # I-20260516T094405Z-A: delegate_workers 被 exclusive_fields_conflict 拒绝

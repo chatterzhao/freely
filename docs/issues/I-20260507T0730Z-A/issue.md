@@ -1,7 +1,8 @@
 ---
 local_id: I-20260507T0730Z-A
 kind: linked
-phase_state: in_dev
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 source_candidate: docs/pre-brainstorms/20260507-source-param/candidates.md
 milestone: M-20260507T0730Z-A
 verification_artifact_dir: docs/epics/source-param/code-reviews
@@ -11,7 +12,7 @@ platform_ids:
     issue_id: '2613'
     url: https://github.com/chatterzhao/freely/issues/2613
     synced_at: '2026-06-13T10:52:17Z'
-platform_state: open
+platform_state: closed
 updated_at: '2026-06-13T10:52:17Z'
 primary_platform: github
 created_at: '2026-06-13T10:52:17Z'

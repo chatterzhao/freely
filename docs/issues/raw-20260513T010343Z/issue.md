@@ -1,7 +1,8 @@
 ---
 local_id: raw-20260513T010343Z
 kind: raw
-phase_state: completed
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 updated_at: 2026-05-17T04:47:25Z
 platform_ids:
@@ -18,7 +19,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
+platform_state: closed
 ---
 
 ## 根因

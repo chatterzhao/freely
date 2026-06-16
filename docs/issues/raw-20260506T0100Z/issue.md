@@ -1,6 +1,7 @@
 ---
 local_id: raw-20260506T0100Z
-phase_state: completed
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 kind: raw
 source_family: chat_inbox
@@ -13,7 +14,7 @@ platform_ids:
 updated_at: 2026-05-17T04:47:25Z
 primary_platform: github
 created_at: '2026-05-10T09:29:04Z'
-platform_state: open
+platform_state: closed
 ---
 
 # raw-20260506T0100Z: scan 盲区——文档链解析错误和断链导致漏扫
