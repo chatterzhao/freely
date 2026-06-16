@@ -9,6 +9,7 @@ platform_ids:
     synced_at: ''
 primary_platform: github
 canonical_issue_path: ''
+source_candidate: docs/pre-brainstorms/20260615T235818Z--config-toml-migration/candidates.md
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-15T23:58:34Z'
