@@ -22,7 +22,25 @@
   - 旧 handoff.py update/insert 指令从 agent docs 删除
 - promotion_gate: #343 四个 bug 在新的 protocol 实现后全部消除
 - open_questions: []
-- acceptance_reviews: []
+- acceptance_reviews:
+  - reviewer: "ai-agent"
+    date: "2026-06-16"
+    decision: promote
+    rationale: >
+      预研质量高（558 行 brainstorms.md），12 项 acceptance_criteria 全部明确定义，
+      状态机、乐观锁、JSON 协议、上下文分层等核心设计细节完整。
+      #343 的四个 bug 在新协议下结构上不再存在（promotion_gate 结构满足）。
+      open_questions 为空，B2_IBM 已完全 materialize：
+      PRD、pre-tests、tasks、code-reviews 均已完成（at docs/epics/agent-handoff-protocol/）。
+      Issue I-20260514T103532Z-A phase_state=completed、platform_state=closed。
+      无阻拦项，建议正式 promote。
+    findings:
+      - acceptance_criteria: 12 项全部定义清晰，brainstorms.md 有对应的详细设计说明
+      - promotion_gate: "#343 四个 bug 在新协议下结构上不存在" — 设计确认，code-review 确认
+      - open_questions: 空 — 所有问题在预研中已收敛
+      - B2_IBM_materialization: 完整 — PRD/pre-tests/tasks/code-reviews 均存在
+      - issue_state: I-20260514T103532Z-A phase_state=completed, platform_state=closed
+      - milestone: M-20260514T103532Z-A status=completed, candidate 已标记为 promoted
 - promoted_issue_path: docs/issues/I-20260514T103532Z-A/issue.md
 - milestone: M-20260514T103532Z-A
 - session_refs: []
