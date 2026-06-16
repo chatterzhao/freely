@@ -18,6 +18,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+verification_artifact_dir: docs/progress/
 ---
 
 ## Problem
@@ -51,9 +52,10 @@ session_refs: []
 8. All Python scripts use tomllib directly
 
 ## Acceptance
-- [ ] config.toml as primary format
-- [ ] Old config.env still readable (backward compat)
-- [ ] Python scripts use tomllib
-- [ ] Shell scripts use toml2env helper
-- [ ] freely init generates config.toml
-- [ ] Auto-migration from config.env on startup
+- [x] config.toml as primary format
+- [x] Old config.env still readable (backward compat, Phase 1)
+- [x] Python scripts use tomllib
+- [x] Shell scripts use toml2env helper
+- [x] freely init generates config.toml
+- [x] Auto-migration from config.env on startup (Phase 1)
+- [x] Complete migration — no config.env fallback (Phase 2, this merge)
