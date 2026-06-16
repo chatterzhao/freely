@@ -2,57 +2,89 @@
 
 ## Discovery
 
-### Current state (post-Phase 1+2 partial merge)
-- `config_file()` returns `.freely/config.toml` (changed)
-- `load_config()` reads config.toml only — exits if missing
-- `interruption-manager-handler` exits if config.toml missing
-- `signal-intent-handler` exits if config.toml missing
-- `.freely/config.toml` does NOT exist → daemon can't start
-- Phase 1 backward-compatible code was removed in Phase 2
-- `freely_config.py` has full TOML read/write support
+### 当前状态（Phase 1+2 部分合并后）
 
-### What config.env contains (56 keys)
-PROJECT_ROOT, INTENT_FILE, CONSTITUTION_FILE, FREELY_HOME,
-AI_TOOL, AI_MODEL, AI_MODE, AI_REASONING_EFFORT,
-AI_TOOL_ADAPTER, AI_TOOL_ADAPTER_POLICY, AI_TOOL_CAPABILITIES,
-AI_TOOL_POLICY, + codex capability settings
+**已改但有问题：**
+| 文件 | 状态 | 问题 |
+|------|------|------|
+| `config_file()` | 返回 `.toml` | 文件不存在→daemon 起不来 |
+| `global_config_file()` | 返回 `.toml` | 同上 |
+| `load_config()` | 只读 toml | 无 fallback，直接 exit |
+| `source_config()` | toml2env 转换 | 需要 toml 文件存在 |
+| `write_config()` | 写 TOML 格式 | 格式正确 ✓ |
+| `interruption-manager-handler:235` | 检查 toml | 不存在则 exit 1 |
+| `signal-intent-handler:44` | 检查 toml | 不存在则 exit 1 |
+| `ai-cli:1241,1509,1529,1550` | 检查 toml | 使用 toml |
 
-### Files that reference config
-See analysis comment on #2815: freely, ai-cli, monitor-ai-acp.sh,
-tool-launchers.sh, signal-intent-handler, interruption-manager-handler,
-freely_config.py, bin/freely
+**已做对：**
+| 文件 | 状态 |
+|------|------|
+| `freely_config.py` | 完整 TOML 读写 ✓ |
+| `toml2env` | TOML→shell env 转换 ✓ |
+| `write_config()` | 生成 TOML 格式 ✓ |
+| `.gitignore` | `.freely/` 已忽略，toml 不跟踪 ✓ |
+
+### 涉及文件（12 个）
+1. `freely` — load_config, config_file, write_config, source_config
+2. `freely_config.py` — read/write/upsert/init-toml
+3. `ai-cli` — 4 处 config.toml 检查
+4. `interruption-manager-handler` — line 235-236
+5. `signal-intent-handler` — line 44-45
+6. `monitor-ai-acp.sh` — bridge_config_env
+7. `manager-watchdog.sh`
+8. `network-proxy-resolver.sh`
+9. `bin/toml2env` — 转换器
+10. `bin/pre-init-runtime` — 复制配置
+11. `bin/check-file-size` — 旧 config.env 引用
+12. `bin/deploy-skills`
+
+### 全局配置
+`~/.freely/config.env` → `~/.freely/config.toml`
+`global_config_file()` 已改为 `.toml`，同样缺文件问题
 
 ## Research
 
-### Approach A: Full revert to config.env
-- Pro: daemon works immediately
-- Con: loses TOML benefits, regression
+### 方案 A：完全回退 config.env
+- daemon 立即工作
+- 丢失 TOML 优势
+- 已合入代码大量回退→风险
 
-### Approach B: Auto-migration on startup (chosen)
-- load_config() tries config.toml first
-- If missing: reads config.env, creates config.toml, logs migration
-- If config.toml exists: uses it directly
-- config.env kept as fallback for 1 release cycle
-- freely_config.py `init-toml` command for explicit migration
+### 方案 B：启动时自动迁移（选定）
+- `load_config()`: 先试 config.toml → 不存在则读 config.env → 自动创建 config.toml → 记录迁移日志
+- 全局配置同样处理
+- 迁移后保留 config.env 不改名（向后兼容 1 周期）
+- `freely init` 直接生成 config.toml（已实现 ✓）
+- `interruption-manager-handler` 和 `signal-intent-handler` 改为 fallback
 
-### Approach C: Manual migration script
-- Pro: explicit control
-- Con: daemon can't self-heal, requires human intervention
+### 方案 C：只创建 config.toml 文件
+- 手动 python3 脚本从 config.env 生成
+- daemon 不自治，需人工干预
+- 放弃
 
 ## Decision
 
-**Approach B** — auto-migration in load_config().
+**方案 B — 自动迁移**
 
-load_config already has `source_config()` that reads TOML via toml2env.
-Add fallback: if config.toml missing but config.env exists → auto-migrate.
-Then freely init generates config.toml directly.
+### 实现清单
+1. `load_config()`: toml missing → try env → auto-migrate → use toml
+2. `interruption-manager-handler`: `[[ -f config.toml ]] || exit 1` → try env fallback
+3. `signal-intent-handler`: 同上
+4. `ai-cli`: 4 处检查改为 try toml → fallback env
+5. `bin/pre-init-runtime`: 复制 config.toml 而非 config.env
+6. `bin/check-file-size`: 更新注释
+7. `freely_config.py`: 添加 `migrate-from-env` 命令
+8. `config.toml.example`: 创建模板（不含敏感值）
+9. 迁移后保留 config.env（不删除）
+10. 全局配置 `~/.freely/config.toml` 同样 fallback
 
-### Backward compatibility
-- If both exist: use config.toml (newer format)
-- If only config.env: auto-migrate to config.toml, then use it
-- If only config.toml: use directly
-- If neither: error (project not initialized)
+### 不做的
+- 删除 config.env（保留兼容 1 周期）
+- 修改 `write_config()`（已是 TOML ✓）
+- 修改 `.gitignore`（`.freely/` 已忽略 ✓）
 
-### .gitignore
-- `.freely/` already gitignored — config.toml is NOT tracked
-- config.toml.example should be tracked in repo root
+### 验收
+- [ ] daemon 能从 config.env 自动迁移启动
+- [ ] daemon 能从 config.toml 直接启动
+- [ ] freely init 生成 config.toml
+- [ ] 所有 handler 不会因缺 toml 退出
+- [ ] 全局配置同样 fallback
