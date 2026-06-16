@@ -6,5 +6,8 @@ source_candidate: docs/pre-brainstorms/20260615T235818Z--config-toml-migration/c
 absorbed_into: I-20260615T235818Z-config-toml
 canonical_issue_path: docs/issues/I-20260615T235818Z-config-toml/issue.md
 created_at: '2026-06-15T23:58:00Z'
+force_closed_at: '2026-06-16T09:05:07Z'
+force_closed_reason: 'merged to develop via PR #2836'
+updated_at: '2026-06-16T09:05:07Z'
 ---
 config.toml migration — absorbed into I-20260615T235818Z-config-toml
