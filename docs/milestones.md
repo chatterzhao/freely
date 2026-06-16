@@ -6146,6 +6146,7 @@ routing_policy:
 ### candidate_issues
 1. `C-20260616T030213Z-A`
 - candidate_id: C-20260616T030213Z-A
+- milestone: M-20260616T030213Z-A
 - title: Align governance-merge-gate scope with LAWS.md
 - status: promoted
 - promoted_issue_path: `docs/issues/I-20260616T030213Z-A/issue.md`
