@@ -36,7 +36,7 @@
 - milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260524T053214Z-A/issue.md`
-
+##
 ## M-20260430-0010-A
 - title: Sync docs + fix governance-only paths for architecture docs
 - status: completed
@@ -247,7 +247,7 @@
 - milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260511T0731Z-A/issue.md`
-
+##
 ## M-20260511T0407Z-A
 - title: handoff 表加 worker 汇报字段
 - status: active
@@ -262,7 +262,7 @@
 - milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260511T0407Z-A/issue.md`
-
+##
 ## M-20260511T0245Z-A
 - title: DB 路径统一
 - status: active
@@ -277,7 +277,7 @@
 - milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260511T0245Z-A/issue.md`
-
+##
 ## M-20260511T0229Z-A
 - title: worker prompt 注入 handoff 汇报指令
 - status: active
@@ -292,7 +292,7 @@
 - milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260511T0229Z-A/issue.md`
-
+##
 ## M-20260511T0019Z-A
 - title: sync 管道改直接 SQLite 查询
 - status: active
@@ -307,7 +307,7 @@
 - milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260511T0019Z-A/issue.md`
-
+##
 ## M-20260510T1853Z-A
 - title: 分支+工位完整性检查
 - status: active
@@ -322,7 +322,7 @@
 - milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260510T1853Z-A/issue.md`
-
+##
 ## M-20260510T1840Z-A
 - title: 分支校验不可绕过
 - status: active
@@ -337,7 +337,7 @@
 - milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260510T1840Z-A/issue.md`
-
+##
 ## M-20260510T1339Z-A
 - title: wt-create 创建顺序重构
 - status: active
@@ -352,7 +352,7 @@
 - milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260510T1339Z-A/issue.md`
-
+##
 ## M-20260510T1326Z-A
 - title: init 分支名校验
 - status: active
@@ -367,7 +367,7 @@
 - milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260510T1326Z-A/issue.md`
-
+##
 ## M-20260510T1318Z-A
 - title: handoff.py insert 支持 exit_kind
 - status: active
@@ -382,7 +382,7 @@
 - milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260510T1318Z-A/issue.md`
-
+##
 ## M-20260510T0856Z-A
 - title: mode_just_switched 豁免
 - status: active
@@ -397,7 +397,7 @@
 - milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260510T0856Z-A/issue.md`
-
+##
 ## M-20260510T0112Z-A
 - title: L223 task_mode wait 判断修复
 - status: active
@@ -412,7 +412,7 @@
 - milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260510T0112Z-A/issue.md`
-
+##
 ## M-20260508T045527Z-A
 - title: 删除废弃扫描脚本
 - status: active
@@ -427,7 +427,7 @@
 - milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T045527Z-A/issue.md`
-
+##
 ## M-20260508T050922Z-A
 - title: 门禁收口链路修复
 - status: active
@@ -442,7 +442,7 @@
 - milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T050922Z-A/issue.md`
-
+##
 ## Milestone Policy
 
 milestone_status_policy_version: v2
@@ -499,8 +499,8 @@ routing_policy:
 - issue_path: `docs/issues/I-20260508T120000Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260508T120000Z--wt-create-fix/candidates.md`
 - verification_artifact_dir: `docs/epics/wt-create-fix/code-reviews`
-
-
+##
+##
 ## M-20260507T143546Z-A
 - title: platform pull title standardization
 - status: active
@@ -517,7 +517,7 @@ routing_policy:
 - issue_path: `docs/issues/I-20260507T143546Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507T143546Z--platform-pull-standardize/candidates.md`
 - verification_artifact_dir: `docs/epics/platform-pull-standardize/code-reviews`
-
+##
 ## M-20260508T005431Z-A
 - title: skill standardization
 - status: active
@@ -551,7 +551,7 @@ routing_policy:
 - issue_path: `docs/issues/I-20260507T143545Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507T143545Z--timestamp-seconds-upgrade/candidates.md`
 - verification_artifact_dir: `docs/epics/timestamp-seconds-upgrade/code-reviews`
-
+##
 ## M-20260508T004541Z-A
 - title: skill ref cleanup
 - status: active
@@ -568,8 +568,8 @@ routing_policy:
 - issue_path: `docs/issues/I-20260508T004541Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260508T004541Z--skill-ref-cleanup/candidates.md`
 - verification_artifact_dir: `docs/epics/skill-ref-cleanup/code-reviews`
-
-
+##
+##
 ## M-20260508T011858Z-A
 - title: skill gate alignment
 - status: active
@@ -586,7 +586,7 @@ routing_policy:
 - issue_path: `docs/issues/I-20260508T011858Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260508T011858Z--skill-gate-alignment/candidates.md`
 - verification_artifact_dir: `docs/epics/skill-gate-alignment/code-reviews`
-
+##
 ## M-20260507T143544Z-A
 - title: raw-issue-pull interception guard
 - status: active
@@ -603,7 +603,7 @@ routing_policy:
 - issue_path: `docs/issues/I-20260507T143544Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507T143544Z--intercept-guard/candidates.md`
 - verification_artifact_dir: `docs/epics/raw-issue-pull-intercept/code-reviews`
-
+##
 ## M-20260507T0700Z-A
 - title: unified platform layer
 - status: active
@@ -719,7 +719,7 @@ routing_policy:
 - issue_path: `docs/issues/I-20260506T1400Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260506-pr-merge-guarded-fix/candidates.md`
 - verification_artifact_dir: `docs/epics/pr-merge-guarded-fix-whitelist/code-reviews`
-
+##
 ## M-20260506T1200Z-A
 
 - title: Skill rename to B1_IBM/B2_IBM + I→B→M skeleton
@@ -746,7 +746,7 @@ routing_policy:
 - issue_path: `docs/issues/I-20260506T1200Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260506-ibm-skill-rename/candidates.md`
 - verification_artifact_dir: `docs/epics/ibm-skill-rename/code-reviews`
-
+##
 ## M-20260506T1230Z-A
 
 - title: wt-create dual worktree creation
@@ -774,7 +774,7 @@ routing_policy:
 - issue_path: `docs/issues/I-20260506T1230Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260506-wt-create-dual/candidates.md`
 - verification_artifact_dir: `docs/epics/wt-create-dual/code-reviews`
-
+##
 ## M-20260306-workspace-routing-foundation
 
 - title: Workspace routing foundation for Freely dogfooding
@@ -800,7 +800,7 @@ routing_policy:
 - progress_path: `docs/progress/workspace-routing-foundation/p-scan-lifecycle-migration.md`
 - source_candidate: `docs/pre-brainstorms/20260503-0200--scan-lifecycle-migration/candidates.md#C-20260503-0200-A`
 - next_action: `Merge to develop.`
-
+##
 30. `I-20260513T010343Z-A`
 - title: raw key seconds format cleanup — 4 regex fixes + 10+ doc updates
 - milestone_state: committed
@@ -815,7 +815,7 @@ routing_policy:
   - `docs/issues/raw-20260513T010343Z/issue.md`
   - `docs/progress/workspace-routing-foundation/p-raw-key-seconds-cleanup-followthrough.md`
 - next_action: `Merge to test-pre-merge, selfhost verify, then promote to develop.`
-
+##
 8. `I-20260502-0500-C`
 - title: Token 花费优化
 - milestone_state: committed
@@ -828,7 +828,7 @@ routing_policy:
 - evidence:
   - docs/epics/token-cost-optimization/code-reviews/20260502-phase-0-4-implementation.md
 - next_action: test-pre-merge 验证后 merge develop
-
+##
 9. `I-20260502-1028-A`
 - title: fix: clean stale start lock before daemon stop
 - milestone_state: committed
@@ -843,7 +843,7 @@ routing_policy:
   - `docs/progress/workspace-routing-foundation/p-stale-start-lock-cleanup.md`
   - `docs/epics/workspace-routing-foundation/stale-start-lock-cleanup/code-reviews/20260502-stale-start-lock-cleanup-verification.md`
 - next_action: `Merge to develop, then release to main.`
-
+##
 10. `I-20260503-0000-A`
 - title: fix: ACP bridge crash resilience with self-healing
 - milestone_state: committed
@@ -858,7 +858,7 @@ routing_policy:
   - `docs/progress/workspace-routing-foundation/p-acp-bridge-crash-resilience.md`
   - `docs/epics/workspace-routing-foundation/acp-bridge-crash-resilience/code-reviews/review.md`
 - next_action: `Merge to develop, then release to main.`
-
+##
 11. `I-20260503-0000-B`
 - title: feat: add fix-execution skill for rapid bug fix workflow
 - milestone_state: committed
@@ -873,7 +873,7 @@ routing_policy:
   - `docs/progress/workspace-routing-foundation/p-fix-execution-skill.md`
   - `docs/epics/workspace-routing-foundation/fix-execution-skill/code-reviews/review.md`
 - next_action: `Merge to develop.`
-
+##
 12. `I-20260503-0115-A`
 - title: fix: sync acp-bridge hash-based socket paths across bash and Python
 - milestone_state: committed
@@ -887,7 +887,7 @@ routing_policy:
   - `docs/progress/workspace-routing-foundation/p-acp-bridge-path-sync.md`
   - `docs/epics/workspace-routing-foundation/acp-bridge-path-sync/code-reviews/review.md`
 - next_action: `Merge to develop, then release to main.`
-
+##
 8. `I-20260421-1530-A`
 - title: Live-status scan summary and prompt anchor governance
 - milestone_state: committed
@@ -918,9 +918,9 @@ routing_policy:
   - `bash -n docs/system/workspace/scripts/runtime/freely`
   - `./bin/governance-check`
 - next_action: Preserve this owner as the smallest implementation slice: complete guarded develop merge and run develop-side daemon/status replay before considering any broader status-family or scan-schema follow-on.
-
-
-
+##
+##
+##
 25. `I-20260429-2000-A`
 - title: Gate dev experience: --range pre-flight + secret detection FP fix
 - milestone_state: committed
@@ -938,7 +938,7 @@ routing_policy:
   - `docs/progress/workspace-routing-foundation/p-gate-dev-experience-preflight.md`
   - `docs/epics/workspace-routing-foundation/gate-dev-experience-preflight/code-reviews/20260429-gate-dev-experience-preflight-verification.md`
 - next_action: `Merge into develop.`
-
+##
 26. `I-20260503T0915Z-enforce-test-pre-merge`
 - title: Enforce test-pre-merge gate for ALL develop-bound merges
 - milestone_state: committed
@@ -952,7 +952,7 @@ routing_policy:
   - `docs/epics/test-pre-merge-enforcement/issues/I-20260503T0915Z-enforce-test-pre-merge.md`
   - `docs/epics/test-pre-merge-enforcement/code-reviews/rev-20260503-enforce-test-pre-merge.md`
 - next_action: `Merge to test-pre-merge, selfhost verify, then promote to develop.`
-
+##
 29. `I-20260505T1210Z-A-C`
 - title: governance gate state consistency + schema validation
 - milestone_state: committed
@@ -966,7 +966,7 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/issue-state-refactor/issues/I-20260505T1210Z-A-C.md`
   - `docs/epics/workspace-routing-foundation/issue-state-refactor/code-reviews/review-C.md`
 - next_action: `Merge to develop.`
-
+##
 28. `I-20260505T1210Z-A-B`
 - title: issue-sync 只写 platform_state
 - milestone_state: committed
@@ -980,7 +980,7 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/issue-state-refactor/issues/I-20260505T1210Z-A-B.md`
   - `docs/epics/workspace-routing-foundation/issue-state-refactor/code-reviews/review-B.md`
 - next_action: `Merge to develop.`
-
+##
 27. `I-20260505T1210Z-A`
 - title: scan 常量对齐 IBM Framework §89 + 迁移现有 issue
 - milestone_state: committed
@@ -995,9 +995,9 @@ routing_policy:
   - `docs/epics/workspace-routing-foundation/issue-state-refactor/pre-tests.md`
   - `docs/epics/workspace-routing-foundation/issue-state-refactor/code-reviews/review.md`
 - next_action: `Merge to develop.`
-
-
-
+##
+##
+##
 ### committed_issues
 
 7. `I-20260502-0500-A`
@@ -3979,7 +3979,7 @@ routing_policy:
 - revisit_trigger: 当再次复现 active worker 已收到 delegated continuation 但 cycle log / closeout 长时间不推进，或当前 runtime 补丁验证稳定后需要冻结独立 issue contract 时，重新进入 materialization 判断
 
 ### committed_issues
-
+##
 ### candidate_issues
 
 8. `C-20260319-0018-B`
@@ -4102,7 +4102,7 @@ routing_policy:
 - revisit_trigger: Revisit immediately if protected-root local `develop` can still advance through non-receipted ref-only updates, or if the new ref gate blocks canonical receipt-bearing protected merge commits.
 
 ### committed_issues
-
+##
 1. `I-20260419-0210-A`
 - title: Protected-branch ref-only entrypoint enforcement governance
 - milestone_state: committed
@@ -4117,7 +4117,7 @@ routing_policy:
   - `docs/system/workspace/hooks/reference-transaction.sh`
   - `docs/system/workspace/scripts/tests/test-reference-transaction-hook`
   - `docs/epics/workspace-routing-foundation/protected-branch-ref-only-entrypoint-enforcement-governance/code-reviews/20260419-protected-branch-ref-only-entrypoint-enforcement-verification.md`
-
+##
 ### completed_issues
 
 2. `I-20260405-0425-A`
@@ -4487,7 +4487,7 @@ routing_policy:
 - why_now: Freely 正在吃自己的狗粮开发自己；如果架构、控制面、standalone/OpenClaw、human intervention 等候选持续分散在多个分支和 pre-brainstorm 中，auto-loop 与人工协作都会缺少统一编排入口，同时也会与现有 frontend-probe milestone 的边界复评形成重复编排。
 
 ### committed_issues
-
+##
 ### candidate_issues
 
 1. `C-20260312-0011-E`
@@ -4697,7 +4697,7 @@ routing_policy:
 - why_now: `PROJECT_INTENT / CONSTITUTION / LAWS / AGENTS.md` 的高层分工已经通过独立 issue 写回，需要 milestone 保留同一条 canonical traceability
 
 ### committed_issues
-
+##
 1. `I-20260416-0448-A`
 - title: MemArk protected-root bootstrap followthrough governance
 - milestone_state: committed
@@ -4709,7 +4709,7 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260416-0448--memark-protected-root-bootstrap-followthrough/candidates.md`
 - next_action: Keep this owner narrow: carry the root `.gitignore` prerequisite for `.memark/` and `corpus/`, verify linked worktree MemArk health remains intact, then replay through `test-pre-merge-memark-init` into guarded `develop`.
 - revisit_trigger: Re-open only if canonical Freely root again loses the MemArk ignore prerequisite or the protected-root/worktree boundary for MemArk bootstrap drifts.
-
+##
 ### completed_issues
 
 1. `I-20260405-1235-A`
@@ -4992,9 +4992,9 @@ routing_policy:
 - why_now: Freely 的目标本身就是防止 AI 跑偏；如果自举开发中每个后端增量都不能立刻被前端观察、打断和回放，狗粮链路仍然不完整
 
 ### committed_issues
-
+##
 - none currently
-
+##
 ### candidate_issues
 
 - none currently
@@ -5092,9 +5092,9 @@ routing_policy:
 - why_now: 研究已经证明本地浏览器 UA 抓取可行；如果不把脚本放进 skill，分享 skill 时能力仍然是不完整的
 
 ### committed_issues
-
+##
 - none currently
-
+##
 ### candidate_issues
 
 - none currently
@@ -5128,9 +5128,9 @@ routing_policy:
 - why_now: Freely 自己的 `prd.md` 还偏向人类摘要，而用户已经明确提出要在 Freely 流程里回答“AI 生成 PRD 应该长什么样”；如果不先给出 canonical 结构，后续 doc-loop 仍会沿用旧范式
 
 ### committed_issues
-
+##
 - none currently
-
+##
 ### candidate_issues
 
 - none currently
@@ -5157,7 +5157,7 @@ routing_policy:
 - milestone_state: committed
 - phase_state: `in_dev`
 - issue_path: `docs/issues/I-20260508T111130Z-A/issue.md`
-
+##
 ## M-20260508T124041Z-A
 - title: wt-create pull defer
 - status: active
@@ -5172,7 +5172,7 @@ routing_policy:
 - milestone_state: committed
 - phase_state: `in_dev`
 - issue_path: `docs/issues/I-20260508T124041Z-A/issue.md`
-
+##
 ## M-20260508T133423Z-A
 - title: raw-issue-pull fix
 - status: active
@@ -5187,7 +5187,7 @@ routing_policy:
 - milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T133423Z-A/issue.md`
-
+##
 ## M-20260508T121541Z-A
 - title: platform-adapter title key fix
 - status: active
@@ -5202,7 +5202,7 @@ routing_policy:
 - milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T121541Z-A/issue.md`
-
+##
 ## M-20260508T154706Z-A
 - title: wt-create skill name + reminder
 - status: active
@@ -5217,7 +5217,7 @@ routing_policy:
 - milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T154706Z-A/issue.md`
-
+##
 ## M-20260508T232413Z-A
 - title: merge error IBM guidance
 - status: active
@@ -5232,13 +5232,13 @@ routing_policy:
 - milestone_state: committed
 - phase_state: `in_dev`
 - issue_path: `docs/issues/I-20260508T232413Z-A/issue.md`
-
+##
 1. `I-20260508T154706Z-A`
 - title: wt-create skill name + post-creation reminder
 - milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T154706Z-A/issue.md`
-
+##
 ## M-20260508T225041Z-A
 - title: ACP bridge restart storm
 - status: active
@@ -5287,7 +5287,7 @@ routing_policy:
 - milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260510T0112Z-A/issue.md`
-
+##
 ## M-20260509T090210Z-A
 - title: handoff SQLite refactor
 - status: completed
@@ -5302,7 +5302,7 @@ routing_policy:
 - milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260509T090210Z-A/issue.md`
-
+##
 ## M-20260509T024559Z-A
 - title: multi-project isolation
 - status: active
@@ -5317,7 +5317,7 @@ routing_policy:
 - milestone_state: committed
 - phase_state: `in_b2_ibm`
 - issue_path: `docs/issues/I-20260509T024559Z-A/issue.md`
-
+##
 ## M-20260517T082422Z-A
 - title: supervisor bash rc=0 crash (absorbed)
 - status: active
@@ -5409,7 +5409,7 @@ routing_policy:
 - milestone_state: committed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260518T020406Z-A/issue.md`
-
+##
 ## M-20260519T004246Z-A
 - title: agent 文档修复 — handoff 必填/互斥字段对齐 + 路径修正
 - status: active
@@ -5553,7 +5553,7 @@ routing_policy:
 - milestone_state: b2_ibm
 - phase_state: `b2_ibm`
 - issue_path: `docs/issues/I-20260513T040512Z-A/issue.md`
-
+##
 ## M-20260506T1000Z-A
 - title: supervisor 主循环前置 task_mode wait 门禁
 - status: active
@@ -5574,7 +5574,7 @@ routing_policy:
 - title: supervisor 主循环 select_launch_kind 前添加 task_mode=wait 门禁
 - milestone_state: committed
 - issue_path: `docs/issues/I-20260506T1000Z-A/issue.md`
-
+##
 ## M-20260521T012042Z-A
 - title: Manager keepalive stale-pid 扫描 + Worker ACP 初始化超时自愈
 - status: active
@@ -5633,7 +5633,7 @@ routing_policy:
 - milestone: M-20260521T032154Z-A
 - phase_state: done_b2_ibm
 - issue_path: `docs/issues/I-20260521T032154Z-A/issue.md`
-
+##
 ## M-20260521T095313Z-A
 - title: AI_TOOL alias type-based resolution
 - status: active
@@ -5924,7 +5924,7 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260522T053702Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260522T053702Z--cmd-login-apikey-unified-top/candidates.md#C-20260522T053702Z-A`
-
+##
 ## M-20260522T071901Z-A
 - title: slot full-name final fixes
 - status: active
@@ -6069,7 +6069,7 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260522T095721Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260522T095721Z--codex-acp-full-lifecycle/candidates.md#C-20260522T095721Z-A`
-
+##
 ## M-20260524T230541Z-A
 - title: 开发流程描述修正（skip-ibm docs governance）
 - status: completed
@@ -6086,7 +6086,7 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260524T230541Z-A/issue.md`
 - source_candidate: `docs/candidates/C-20260524T230541Z-dev-flow-docs.md`
-
+##
 ## M-20260603T142127Z-A
 - title: fix scan cycling — issue-sync batch create + cross-batch dedup
 - status: active
@@ -6103,7 +6103,7 @@ routing_policy:
 - issue_path: `docs/issues/I-20260603T142127Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/c-raw-20260603T142127Z-fix-scan-cycling/candidates.md#C-20260603T142127Z-A`
 - verification_artifact_dir: `docs/epics/fix-scan-cycling/verify/code-reviews/main.md`
-
+##
 ## M-20260612T000223Z-A
 - title: A2A 协议替换 Freely Handoff 架构重构
 - status: active
@@ -6121,7 +6121,7 @@ routing_policy:
 - phase_state: `in_b2_ibm`
 - issue_path: `docs/issues/I-20260612T000223Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260612T000223Z--a2a-replace-handoff/candidates.md#C-20260612T000223Z-A`
-
+##
 ## M-20260615T001626Z-A
 - title: 移除 A2A 文本 JSON 解析 Fallback (Phase 1+2)
 - status: active
@@ -6139,7 +6139,7 @@ routing_policy:
 - phase_state: `in_b2_ibm`
 - issue_path: `docs/issues/I-20260615T001626Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260615T001626Z--a2a-no-fallback/candidates.md#C-20260615T001626Z-A`
-
+##
 ## M-20260616T030213Z-A
 - title: Align governance-merge-gate scope with LAWS.md
 - status: active
@@ -6159,7 +6159,7 @@ routing_policy:
 - issue_path: `docs/issues/I-20260616T030213Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260616T030213Z--gate-scope-alignment/candidates.md#C-20260616T030213Z-A`
 - verification_artifact_dir: `docs/epics/gate-scope-alignment/code-reviews`
-
+##
 ## M-20260616T033325Z-A
 - title: Pre-merge governance gate check
 - status: active
@@ -6179,7 +6179,7 @@ routing_policy:
 - issue_path: `docs/issues/I-20260616T033325Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260616T033325Z--premerge-gate-check/candidates.md#C-20260616T033325Z-A`
 - verification_artifact_dir: `docs/epics/premerge-gate-check/code-reviews`
-
+##
 ## M-20260616T044825Z-A
 - title: Remove BRIDGE_TIMEOUT absolute cap for session/prompt
 - status: active
@@ -6239,3 +6239,6 @@ routing_policy:
 - phase_state: completed
 - source_candidate: docs/pre-brainstorms/20260616T083810Z--governance-enforce/candidates.md#C-20260616T083810Z-A
 - verification_artifact_dir: docs/epics/governance-enforce/code-reviews
+
+### completed_issues
+1. `I-20260616T083810Z-A` — governance enforcement improvements merged to develop
