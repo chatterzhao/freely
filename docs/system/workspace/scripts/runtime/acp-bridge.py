@@ -414,8 +414,7 @@ class AcpBridge:
 
         if method == "session/prompt":
             poll_interval = min(ACP_IDLE_TIMEOUT // 2, 30)
-            deadline = time.time() + timeout
-            while time.time() < deadline:
+            while True:
                 if event.wait(timeout=poll_interval):
                     break
                 with self.activity_lock:
@@ -427,12 +426,6 @@ class AcpBridge:
                         f"idle timeout: no AI activity for {idle_secs:.0f}s "
                         f"(limit={ACP_IDLE_TIMEOUT}s) waiting for {method}"
                     )
-            if not event.is_set():
-                with self.server_lock:
-                    self.pending.pop(req_id, None)
-                raise TimeoutError(
-                    f"absolute timeout ({timeout}s) waiting for {method}"
-                )
         else:
             if not event.wait(timeout=timeout):
                 with self.server_lock:
