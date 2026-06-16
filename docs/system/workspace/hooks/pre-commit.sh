@@ -232,7 +232,20 @@ case "$branch" in
     # Allow governance-automated commits (wt-close frontmatter, issue-sync,
     # lifecycle closeout, etc.) via FREELY_SKIP_IBM_GATE=1.
     if [[ "${FREELY_SKIP_IBM_GATE:-0}" == "1" ]]; then
-      echo "[HOOK] IBM governance gate skipped (FREELY_SKIP_IBM_GATE=1)"
+      echo "[HOOK] FREELY_SKIP_IBM_GATE=1 — validating governance-only paths"
+      if [[ -x "./bin/governance-merge-gate" ]]; then
+        set +e
+        gate_output="$(./bin/governance-merge-gate --staged --target-branch "$branch" --skip-ibm-gate 2>&1)"
+        gate_rc=$?
+        set -e
+        if [[ "$gate_rc" -ne 0 ]]; then
+          echo "[HOOK] FREELY_SKIP_IBM_GATE=1 blocked: non-governance changes detected." >&2
+          echo "$gate_output" >&2
+          exit "$gate_rc"
+        fi
+        echo "$gate_output"
+      fi
+      echo "[HOOK] IBM governance gate skipped (governance-only changes confirmed)"
       exit 0
     fi
     if git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1; then
