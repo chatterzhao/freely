@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SELF_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+
+if [[ $# -eq 0 ]]; then
+  echo "Usage: toml2env --project <project> [--file <path>]" >&2
+  echo "       toml2env --file <config.toml>" >&2
+  exit 1
+fi
+
+exec python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely_config.py" toml2env "$@"

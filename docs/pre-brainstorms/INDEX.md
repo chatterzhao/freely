@@ -1,4 +1,7 @@
 # Pre-brainstorm 索引（IBM Framework B1）
+- 20260615T235818Z--config-toml-migration
+  - brainstorms: docs/pre-brainstorms/20260615T235818Z--config-toml-migration/brainstorms.md
+  - candidates: docs/pre-brainstorms/20260615T235818Z--config-toml-migration/candidates.md
 - 20260506T1000Z--wt-create-raw-key-refactor
   - brainstorms: docs/pre-brainstorms/20260506T1000Z--wt-create-raw-key-refactor/brainstorms.md
   - candidates: docs/pre-brainstorms/20260506T1000Z--wt-create-raw-key-refactor/candidates.md
