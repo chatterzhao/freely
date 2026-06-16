@@ -5,6 +5,9 @@ description: 快速修复 bug 的特殊高效策略——用 test-pre-merge-* �
 
 # skill:freely-fix-execution
 
+> 全链路(Fix变体): wt-create → dev → test → B1 → B2 → pr-create → pr-merge → wt-close
+>                                    ↑ 本 skill 自此开始（快测沙箱策略，治理后置）
+
 ## 定位
 
 **fix skill 是特殊场景的高效策略，不是通用开发流程。**

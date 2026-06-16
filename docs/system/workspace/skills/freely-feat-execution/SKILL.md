@@ -1,9 +1,12 @@
 ---
 name: freely-feat-execution
-description: 新功能/大型改动的完整开发流程——B1_IBM预研→B2_IBM→dev实现→test-pre-merge验证→pr-create-guarded→pr-merge-guarded门禁合并→wt-close，与 freely-fix-execution 同级抽象。
+description: 新功能/大型改动的完整开发流程——feedback→wt-create→B1_IBM预研→B2_IBM→dev实现→test-pre-merge验证→pr-create-guarded→pr-merge-guarded门禁合并→wt-close，与 freely-fix-execution 同级抽象。
 ---
 
 # skill:freely-feat-execution
+
+> 全链路: feedback → wt-create → B1_IBM → B2_IBM → dev → pr-create-guarded → pr-merge-guarded → wt-close
+>                                                              ↑ 本 skill 自此开始（提供 B1→B2→dev→pr→merge→close 完整抽象）
 
 ## 定位
 

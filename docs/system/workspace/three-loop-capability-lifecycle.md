@@ -2,6 +2,8 @@
 
 本文件是 Freely 能力生命周期路由的唯一细节真源。SVG 图为视觉总览，本文为文字规范。
 
+> **AI 入口指引**：`AGENTS.md` §规范流程 提供了面向 AI agent 和用户的标准操作链路（feat/fix/doc-only 三种变体）。本文为底层真源，AGENTS.md 为上层入口。
+
 ![Three-Loop Lifecycle](three-loop-lifecycle.svg)
 
 凡是会改变 three-loop routing、loop placement、completion / verification / cleanup / recovery judgment 的实现、prompt、agent、skill 或高层文档，在修改前都必须先阅读并理解本文件；若语义变化，必须同步更新本文件及 SVG 图。
