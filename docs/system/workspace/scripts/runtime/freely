@@ -19275,6 +19275,19 @@ SDK_HELP
     log_info "config.toml.example released to .freely/"
   fi
 
+  # Release ai-auth slot templates to .freely/ai-auth/ for user reference.
+  # Users should read README.md and use the .example files as templates
+  # when creating their own ~/.ai-auth/ slots.
+  local _ai_auth_src="$SELF_ROOT/templates/ai-auth"
+  local _ai_auth_dst="$project/.freely/ai-auth"
+  if [[ -d "$_ai_auth_src" ]]; then
+    rm -rf "$_ai_auth_dst"
+    cp -r "$_ai_auth_src" "$_ai_auth_dst"
+    log_info "ai-auth slot templates released to .freely/ai-auth/"
+    log_info "→ read .freely/ai-auth/README.md to configure AI CLI slots"
+    log_info "→ then set AI_TOOL in .freely/config.toml to match your alias name"
+  fi
+
   # ── Write project .gitignore with template ignore rule ──
   local gitignore="$project/.gitignore"
   if [[ ! -f "$gitignore" || "$force" == "true" ]]; then

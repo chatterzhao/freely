@@ -2,6 +2,14 @@
 
 本文档记录各 AI CLI 工具的多账号支持方式和配置切换方法。
 
+> **用户配置模板**：`templates/ai-auth/` 提供了 Claude Code、Codex、OpenCode
+> 三种工具的 slot 配置 `.example` 模板，含完整注释。新用户按
+> `templates/ai-auth/README.md` 操作即可在 10 分钟内建好第一个可用 slot。
+>
+> ★ **命名约定**：slot 目录名 = `.zshrc` alias 名 = `config.toml` `AI_TOOL` 值，
+> 三者必须一致。格式：`{tool}-{type}-{name}`，Freely 靠 `-apikey-` / `-account-`
+> 前缀识别工具族。
+
 ## 支持情况汇总
 
 | 工具 | 配置目录切换 | 环境变量 | 推荐方案 |
