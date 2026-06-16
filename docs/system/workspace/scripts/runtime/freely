@@ -21254,9 +21254,11 @@ print(ready)
       fi
     fi
     # Normalize rc=1→0: end_turn received before disconnect (Broken pipe tolerance)
+    local _end_turn_detected=0
     if [[ "${rc:-0}" != "0" && -f "$cycle_log" ]]; then
       if grep -q 'stop_reason=end_turn' "$cycle_log" 2>/dev/null; then
         rc=0
+        _end_turn_detected=1
         log_info "normalized rc=1→0: end_turn received before disconnect"
       fi
     fi
@@ -21350,6 +21352,47 @@ print(ready)
       delegate_workers|continue|"")
         ;;
     esac
+
+    # ── After-run worker detection for prompt mode (end_turn without a2a-exit) ──
+    # When Manager exits with end_turn in prompt mode, no a2a-exit is called to
+    # write the exit contract. The filesystem scan in manager_exit_contract_kind()
+    # Step 4 may not be reached. This block runs BEFORE the next cycle starts,
+    # detecting new worker prompts written during the cycle and triggering
+    # delegate_workers so Workers are launched instead of restarting Manager.
+    if [[ "$_end_turn_detected" == "1" \
+          && "$exit_contract_action" != "delegate_workers" \
+          && "$exit_contract_action" != "stop_ai" \
+          && "$(effective_runtime_role_for_project "$PROJECT_ROOT")" == "manager" ]]; then
+      local _ar_prompts_dir="$PROJECT_ROOT/.freely/run/worker-prompts"
+      local _ar_prompt_ref _ar_new_csv="" _ar_new_count=0 _ar_pf_mtime
+      _ar_prompt_ref="$(latest_prompt_file_for_project "$PROJECT_ROOT" 2>/dev/null || true)"
+      if [[ -d "$_ar_prompts_dir" && -n "$_ar_prompt_ref" && -f "$_ar_prompt_ref" ]]; then
+        local _ar_cycle_start
+        _ar_cycle_start=$(stat -f %m "$_ar_prompt_ref" 2>/dev/null || stat -c %Y "$_ar_prompt_ref" 2>/dev/null || echo "0")
+        if [[ "$_ar_cycle_start" =~ ^[0-9]+$ && "$_ar_cycle_start" -gt 0 ]]; then
+          while IFS= read -r _ar_pf; do
+            [[ -n "$_ar_pf" && -f "$_ar_pf" ]] || continue
+            _ar_pf_mtime=$(stat -f %m "$_ar_pf" 2>/dev/null || stat -c %Y "$_ar_pf" 2>/dev/null || echo "0")
+            if [[ "$_ar_pf_mtime" =~ ^[0-9]+$ && "$_ar_pf_mtime" -ge "$_ar_cycle_start" ]]; then
+              if [[ -z "$_ar_new_csv" ]]; then
+                _ar_new_csv="$_ar_pf"
+              else
+                _ar_new_csv="$_ar_new_csv,$_ar_pf"
+              fi
+              ((_ar_new_count++))
+            fi
+          done < <(find "$_ar_prompts_dir" -maxdepth 1 -type f -name '*.txt' 2>/dev/null | sort)
+        fi
+        if [[ -n "$_ar_new_csv" ]]; then
+          append_runtime_event "$project" "after_run_worker_detected" \
+            "worker_prompts_csv=${_ar_new_csv}" \
+            "new_count=${_ar_new_count}" \
+            "origin=end_turn_prompt_mode"
+          log_info "after_run: detected ${_ar_new_count} new worker prompt(s) after end_turn (prompt mode)"
+          exit_contract_action="delegate_workers"
+        fi
+      fi
+    fi
 
     # ── Mark pending-delivery messages as delivered after successful AI cycle ──
     # The AI just saw all send_to_ai=pending/fail messages in its prompt.
