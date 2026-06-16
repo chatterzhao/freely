@@ -2,6 +2,7 @@
 
 ## C-20260615T235818Z-config-toml
 
+- raw_issue: raw-20260615T235818Z
 - milestone: M-20260615T235818Z-config-toml-migration
 - status: `promoted`
 - acceptance_criteria:
