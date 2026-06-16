@@ -58,11 +58,52 @@ if [[ -x "$ROOT_DIR/bin/pr-merge-guarded" ]]; then
     exit 1
   fi
 else
-  # Fallback: run governance-merge-gate directly
-  echo "[WARN] pr-merge-guarded not found, running governance-merge-gate directly..."
-  if [[ -x "$ROOT_DIR/bin/governance-merge-gate" ]]; then
-    "$ROOT_DIR/bin/governance-merge-gate" --range "$base..HEAD"
+  echo "[WARN] pr-merge-guarded not found, skipping dry-run"
+fi
+
+# ── Step 2b: IBM governance gate (early check before PR creation) ──
+# Runs governance-merge-gate on the diff between base and current branch.
+# Catches missing IBM lifecycle artifacts (candidate, I-*, milestone)
+# BEFORE pushing and creating PR — gives developer clear fix instructions.
+echo ""
+echo "Step 2b/4: IBM governance gate..."
+if [[ -x "$ROOT_DIR/bin/governance-merge-gate" ]]; then
+  set +e
+  gate_output="$("$ROOT_DIR/bin/governance-merge-gate" --range "$base..HEAD" 2>&1)"
+  gate_rc=$?
+  set -e
+  if [[ "$gate_rc" -ne 0 ]]; then
+    cat >&2 <<GATE_BLOCKED
+
+╔══════════════════════════════════════════════════════════════╗
+║  [GOVERNANCE-GATE] IBM 治理门禁未通过                        ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  你的分支缺少完整的 IBM 生命周期治理文档。                     ║
+║  在创建 PR 之前，请先完成以下步骤:                             ║
+║                                                              ║
+║  skill:freely-doc-B1_IBM-execution                           ║
+║    → raw issue → brainstorm → candidate → milestones.md       ║
+║                                                              ║
+║  skill:freely-doc-B2_IBM-execution                           ║
+║    → I-* issue → prd.md → tasks.md → pre-tests → code-review  ║
+║    → milestones.md committed_issues                           ║
+║                                                              ║
+║  详见 docs/system/workspace/ibm-framework.md                  ║
+║                                                              ║
+║  详细错误:                                                    ║
+║  $gate_output
+║                                                              ║
+║  修复后重新运行 ./bin/pr-create-guarded                       ║
+╚══════════════════════════════════════════════════════════════╝
+
+GATE_BLOCKED
+    exit 1
   fi
+  echo "$gate_output"
+  echo "[GOVERNANCE-GATE] IBM governance artifacts: OK"
+else
+  echo "[WARN] governance-merge-gate not found, skipping IBM gate check"
 fi
 echo ""
 

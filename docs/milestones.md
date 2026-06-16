@@ -6159,3 +6159,23 @@ routing_policy:
 - issue_path: `docs/issues/I-20260616T030213Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260616T030213Z--gate-scope-alignment/candidates.md#C-20260616T030213Z-A`
 - verification_artifact_dir: `docs/epics/gate-scope-alignment/code-reviews`
+
+## M-20260616T033325Z-A
+- title: Pre-merge governance gate check
+- status: active
+### candidate_issues
+1. `C-20260616T033325Z-A`
+- candidate_id: C-20260616T033325Z-A
+- milestone: M-20260616T033325Z-A
+- title: Pre-merge governance gate check
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260616T033325Z-A/issue.md`
+- decision_reason: Early gate detection with clear IBM skill guidance
+- next_action: 进入 B2_IBM 物化
+### committed_issues
+1. `I-20260616T033325Z-A`
+- issue_id: I-20260616T033325Z-A
+- phase_state: `done_b2_ibm`
+- issue_path: `docs/issues/I-20260616T033325Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260616T033325Z--premerge-gate-check/candidates.md#C-20260616T033325Z-A`
+- verification_artifact_dir: `docs/epics/premerge-gate-check/code-reviews`
