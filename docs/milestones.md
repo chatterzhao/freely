@@ -2717,7 +2717,7 @@ routing_policy:
 
 ## M-20260616T044030Z-A
 - title: Complete config.toml migration — clean break, TOML-only, zero config.env
-- status: completed
+- status: active
 ### candidate_issues
 1. `C-20260616T044030Z-A`
 - candidate_id: C-20260616T044030Z-A

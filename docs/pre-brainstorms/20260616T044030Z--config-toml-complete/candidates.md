@@ -1,6 +1,7 @@
 - candidate_id: C-20260616T044030Z-A
 - title: Complete config.toml migration — clean break, TOML-only, zero config.env
-- status: promoted
+- status: absorbed
+- absorbed_into: I-20260616T044030Z-A
 - milestone: M-20260616T044030Z-A
 - promoted_issue_path: docs/issues/I-20260616T044030Z-A/issue.md
 - decision_reason: 彻底 TOML-only 方案 — 单一配置路径、零兼容负担、用户必须手工阅读注释配置
