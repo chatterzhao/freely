@@ -49,7 +49,7 @@
   - 必须与 git-dir scoped guarded completion state 一起出现；单独设置环境变量不构成合法握手
 - `FREELY_SKIP_IBM_GATE=1`
   - 唯一合法 bypass 机制：仅跳过 IBM governance 文档门禁，保留安全/分支保护门禁
-  - 仅限 docs/cleanup/format 等结构上无需 IBM lifecycle 证据的变更
+  - 仅限 document|cleanup|format 等结构上无需 IBM lifecycle 证据的变更
 
 运行时语义：
 - `pr-merge-guarded` 负责写入 `MERGE_MSG` receipt 和 git-dir scoped guarded completion state
