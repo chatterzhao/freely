@@ -1,0 +1,16 @@
+---
+local_id: I-20260616T033325Z-A
+kind: linked
+phase_state: done_b2_ibm
+promoted_from: raw-20260616T033325Z
+source_candidate: docs/pre-brainstorms/20260616T033325Z--premerge-gate-check/candidates.md
+canonical_issue_path: docs/epics/premerge-gate-check/issues/I-20260616T033325Z-A.md
+pre_tests_path: docs/epics/premerge-gate-check/verification/pre-tests.md
+verification_artifact_dir: docs/epics/premerge-gate-check/code-reviews
+platform_ids:
+  github:
+    issue_id: "2807"
+    url: https://github.com/chatterzhao/freely/issues/2807
+primary_platform: github
+created_at: 2026-06-16T03:33:25Z
+---
