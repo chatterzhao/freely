@@ -11,6 +11,12 @@
 - milestone: M-20260616T224707Z-A
 - status: promoted
 - promoted_issue_path: `docs/issues/I-20260616T224707Z-A/issue.md`
+### committed_issues
+1. `I-20260616T224707Z-A`
+- title: ACP Session ID 格式污染修复 — 兼容三种 AI CLI 的 Session ID 提取
+- milestone_state: committed
+- phase_state: `in_b2_ibm`
+- issue_path: `docs/issues/I-20260616T224707Z-A/issue.md`
 
 ## M-20260616T143914Z-A
 - title: 规范流程文档治理 — 在 AGENTS.md/CONSTITUTION/skills 中补齐完整规范流程
