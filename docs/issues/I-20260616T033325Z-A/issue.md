@@ -1,7 +1,7 @@
 ---
 local_id: I-20260616T033325Z-A
 kind: linked
-phase_state: done_b2_ibm
+phase_state: completed
 promoted_from: raw-20260616T033325Z
 source_candidate: docs/pre-brainstorms/20260616T033325Z--premerge-gate-check/candidates.md
 canonical_issue_path: docs/epics/premerge-gate-check/issues/I-20260616T033325Z-A.md
