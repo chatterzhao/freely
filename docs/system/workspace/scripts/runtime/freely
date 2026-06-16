@@ -968,10 +968,6 @@ global_config_file() {
   echo "$(global_state_dir)/config.toml"
 }
 
-global_env_config_file() {
-  echo "$(global_state_dir)/config.env"
-}
-
 projects_registry_file() {
   echo "$(global_state_dir)/projects.tsv"
 }
@@ -1410,11 +1406,6 @@ append_lifecycle_trace() {
 config_file() {
   local project="$1"
   echo "$(state_dir "$project")/config.toml"
-}
-
-env_config_file() {
-  local project="$1"
-  echo "$(state_dir "$project")/config.env"
 }
 
 project_codex_config_file() {
@@ -1972,17 +1963,6 @@ resolve_ai_spec_for_project_or_global() {
       compose_ai_spec "$tool" "$model" "$mode"
       return 0
     fi
-  elif [[ -f "$(env_config_file "$project")" ]]; then
-    unset AI_TOOL AI_MODEL AI_MODE
-    # shellcheck disable=SC1090
-    source "$(env_config_file "$project")"
-    tool="${AI_TOOL:-}"
-    model="${AI_MODEL:-}"
-    mode="${AI_MODE:-auto}"
-    if [[ -n "$tool" ]]; then
-      compose_ai_spec "$tool" "$model" "$mode"
-      return 0
-    fi
   fi
 
   if source_global_config; then
@@ -2023,7 +2003,7 @@ resolve_tool_adapter_policy_for_project_or_global() {
     return 0
   fi
 
-  if [[ -f "$(global_config_file)" || -f "$(global_env_config_file)" ]]; then
+  if [[ -f "$(global_config_file)" ]]; then
     current_tool="$(
       (
         unset AI_TOOL AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
@@ -2075,7 +2055,7 @@ resolve_tool_adapter_for_project_or_global() {
     return 0
   fi
 
-  if [[ -f "$(global_config_file)" || -f "$(global_env_config_file)" ]]; then
+  if [[ -f "$(global_config_file)" ]]; then
     current_tool="$(
       (
         unset AI_TOOL AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
@@ -3392,11 +3372,10 @@ interruption_dispatcher_pid_hint_for_project() {
 
 valid_ai_pid_for_project() {
   local project="$1" pid="$2"
-  local cfg env_cfg tool cmd fragment
+  local cfg tool cmd fragment
   cfg="$(config_file "$project")"
-  env_cfg="$(env_config_file "$project")"
   tool="codex"
-  if [[ -f "$cfg" || -f "$env_cfg" ]]; then
+  if [[ -f "$cfg" ]]; then
     source_config "$project"
     tool="${AI_TOOL:-codex}"
   fi
@@ -3843,53 +3822,37 @@ interruption_handler_bin_for_project() {
 
 source_config() {
   local project="$1"
-  local cfg env_cfg
+  local cfg
   cfg="$(config_file "$project")"
-  env_cfg="$(env_config_file "$project")"
   if [[ -f "$cfg" ]]; then
     eval "$("$SELF_ROOT/bin/toml2env" --project "$project" 2>/dev/null)"
     return $?
-  fi
-  if [[ -f "$env_cfg" ]]; then
-    # shellcheck disable=SC1090
-    source "$env_cfg"
-    return 0
   fi
   return 1
 }
 
 source_global_config() {
-  local cfg env_cfg
+  local cfg
   cfg="$(global_config_file)"
-  env_cfg="$(global_env_config_file)"
   if [[ -f "$cfg" ]]; then
     eval "$("$SELF_ROOT/bin/toml2env" --file "$cfg" 2>/dev/null)"
     return $?
-  fi
-  if [[ -f "$env_cfg" ]]; then
-    # shellcheck disable=SC1090
-    source "$env_cfg"
-    return 0
   fi
   return 1
 }
 
 load_config() {
   local project="$1"
-  local cfg env_cfg
+  local cfg
   cfg="$(config_file "$project")"
-  env_cfg="$(env_config_file "$project")"
 
   if [[ -f "$cfg" ]]; then
     source_config "$project" || {
       log_error "failed to load config: $cfg"
       exit 1
     }
-  elif [[ -f "$env_cfg" ]]; then
-    # shellcheck disable=SC1090
-    source "$env_cfg"
   else
-    log_error "missing config: no config.toml or config.env in $(state_dir "$project")"
+    log_error "missing config: no config.toml in $(state_dir "$project")"
     exit 1
   fi
 
@@ -3983,17 +3946,6 @@ FREELY_REPO_PLATFORMS = ""
 FREELY_SECURITY_REVIEW_POLICY = "advisory-on-high-risk-or-uncertainty"
 FREELY_SECURITY_REVIEW_SCOPE = "execution-boundary-and-reviewer-support"
 EOF
-
-  local env_cfg
-  env_cfg="$(env_config_file "$project")"
-  local toml_key
-  while IFS='=' read -r toml_key _; do
-    toml_key="$(printf '%s' "$toml_key" | xargs)"
-    [[ -n "$toml_key" && "$toml_key" != \#* ]] || continue
-    local env_val
-    env_val="$(printf '%s' "${!toml_key:-}")"
-    printf '%s="%s"\n' "$toml_key" "$env_val"
-  done < "$cfg" > "$env_cfg"
 }
 
 config_bool_enabled() {
@@ -4014,36 +3966,13 @@ config_env_escaped_value() {
 
 upsert_config_key() {
   local project="$1" key="$2" value="${3:-}"
-  local cfg env_cfg
+  local cfg
   cfg="$(config_file "$project")"
-  env_cfg="$(env_config_file "$project")"
 
   # Update config.toml via Python module
   if [[ -f "$cfg" ]]; then
     "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely_config.py" upsert \
       --project "$project" --key "$key" --value "$value"
-  fi
-
-  # Update config.env for backward compat (in-place editing)
-  if [[ -f "$env_cfg" ]]; then
-    local tmp escaped
-    tmp="$(mktemp "${env_cfg}.XXXXXX")"
-    escaped="$(config_env_escaped_value "$value")"
-    awk -v key="$key" -v value="$escaped" '
-      BEGIN { written=0 }
-      index($0, key "=") == 1 {
-        print key "=\"" value "\""
-        written=1
-        next
-      }
-      { print }
-      END {
-        if (!written) {
-          print key "=\"" value "\""
-        }
-      }
-    ' "$env_cfg" >"$tmp"
-    mv "$tmp" "$env_cfg"
   fi
 }
 
@@ -4632,7 +4561,7 @@ append_unique_tool_to_stream() {
 }
 
 runtime_builtin_auto_recovery_tool_priority() {
-  # Single source of truth: AI_FALLBACK_TOOLS in config.env (comma-separated)
+  # Single source of truth: AI_FALLBACK_TOOLS in config.toml (comma-separated)
   local _fallback_csv="${AI_FALLBACK_TOOLS:-}"
   if [[ -n "$_fallback_csv" ]]; then
     local IFS=','
@@ -4924,7 +4853,7 @@ persist_project_tool_selection() {
 
 project_tool_selection_truth() {
   local project="$1" current_tool current_adapter current_adapter_policy
-  if [[ -f "$(config_file "$project")" ]] || [[ -f "$(env_config_file "$project")" ]]; then
+  if [[ -f "$(config_file "$project")" ]]; then
     :
   else
     printf '||\n'
@@ -5002,7 +4931,7 @@ resolve_project_tool_adapter_selection() {
 project_tool_runtime_selection_truth() {
   local project="$1"
   local current_tool current_model current_reasoning current_adapter current_adapter_policy
-  if [[ -f "$(config_file "$project")" ]] || [[ -f "$(env_config_file "$project")" ]]; then
+  if [[ -f "$(config_file "$project")" ]]; then
     :
   else
     printf '||||\n'
@@ -5534,11 +5463,6 @@ sync_project_tooling_from_source() {
     log_error "target project not found: $target_project"
     return 1
   }
-  if [[ ! -f "$source_cfg" ]]; then
-    local source_env_cfg
-    source_env_cfg="$(env_config_file "$source_project")"
-    source_cfg="$source_env_cfg"
-  fi
   [[ -f "$source_cfg" ]] || {
     log_warn "skip tooling sync: source config missing at $(config_file "$source_project")"
     return 0
@@ -19590,7 +19514,7 @@ collect_global_restart_snapshot_rows() {
   local restore_candidate restore_ready restore_blocker
   while IFS= read -r wt_path; do
     [[ -n "$wt_path" ]] || continue
-    [[ -f "$(config_file "$wt_path")" || -f "$(env_config_file "$wt_path")" ]] || continue
+    [[ -f "$(config_file "$wt_path")" ]] || continue
     declared_project_root="$wt_path"
     unset PROJECT_ROOT
     source_config "$wt_path"
@@ -22141,10 +22065,6 @@ HELP
     resolved_repo="$FREELY_REPO_URL"
   elif [[ -f "$SELF_ROOT/.freely/config.toml" ]]; then
     resolved_repo="$("$SELF_ROOT/bin/toml2env" --project "$SELF_ROOT" 2>/dev/null | grep '^export FREELY_REPO_URL=' | sed 's/^export FREELY_REPO_URL=//; s/^"//; s/"$//')"
-  elif [[ -f "$SELF_ROOT/.freely/config.env" ]]; then
-    # shellcheck disable=SC1090
-    source "$SELF_ROOT/.freely/config.env"
-    resolved_repo="${FREELY_REPO_URL:-}"
   fi
 
   [[ -n "$resolved_repo" ]] || { log_error "no repo specified: use --repo or set FREELY_REPO_URL in .freely/config.toml"; return 1; }
