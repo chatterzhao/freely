@@ -1,5 +1,6 @@
 ---
 kind: raw
+issue_id: raw-20260616T044825Z
 title: Remove BRIDGE_TIMEOUT absolute cap for session/prompt in acp-bridge.py
 key: raw-20260616T044825Z
 description: BRIDGE_TIMEOUT=1800s imposes an absolute 30-minute wall-clock limit that

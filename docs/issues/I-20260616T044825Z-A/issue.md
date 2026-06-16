@@ -1,8 +1,8 @@
 ---
 local_id: I-20260616T044825Z-A
 kind: linked
-status: done_b2_ibm
-phase_state: done_b2_ibm
+status: completed
+phase_state: completed
 promoted_from: raw-20260616T044825Z
 source_candidate: docs/pre-brainstorms/20260616T044825Z--remove-absolute-timeout/candidates.md
 canonical_issue_path: ""

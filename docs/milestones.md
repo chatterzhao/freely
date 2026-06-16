@@ -6195,7 +6195,4 @@ routing_policy:
 ### committed_issues
 1. `I-20260616T044825Z-A`
 - issue_id: I-20260616T044825Z-A
-- phase_state: `done_b2_ibm`
-- issue_path: `docs/issues/I-20260616T044825Z-A/issue.md`
-- source_candidate: `docs/pre-brainstorms/20260616T044825Z--remove-absolute-timeout/candidates.md#C-20260616T044825Z-A`
-- verification_artifact_dir: `docs/epics/remove-absolute-timeout/remove-bridge-absolute-cap/code-reviews`
+- phase_state: `completed`
