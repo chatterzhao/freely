@@ -6139,3 +6139,22 @@ routing_policy:
 - phase_state: `in_b2_ibm`
 - issue_path: `docs/issues/I-20260615T001626Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260615T001626Z--a2a-no-fallback/candidates.md#C-20260615T001626Z-A`
+
+## M-20260616T030213Z-A
+- title: Align governance-merge-gate scope with LAWS.md
+- status: active
+### candidate_issues
+1. `C-20260616T030213Z-A`
+- candidate_id: C-20260616T030213Z-A
+- title: Align governance-merge-gate scope with LAWS.md
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260616T030213Z-A/issue.md`
+- decision_reason: LAWS.md limits FREELY_SKIP_IBM_GATE to docs/cleanup/format but gate allowed runtime scripts
+- next_action: 进入 B2_IBM 物化
+### committed_issues
+1. `I-20260616T030213Z-A`
+- issue_id: I-20260616T030213Z-A
+- phase_state: `done_b2_ibm`
+- issue_path: `docs/issues/I-20260616T030213Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260616T030213Z--gate-scope-alignment/candidates.md#C-20260616T030213Z-A`
+- verification_artifact_dir: `docs/epics/gate-scope-alignment/code-reviews`
