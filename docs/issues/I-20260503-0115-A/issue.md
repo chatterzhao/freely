@@ -2,7 +2,8 @@
 local_id: I-20260503-0115-A
 issue_title: 'fix: sync acp-bridge hash-based socket paths across bash and Python'
 kind: linked
-phase_state: in_dev
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 promoted_from: hotfix/acp-bridge-path-mismatch-20260503
 platform_ids:
   github:
@@ -20,5 +21,5 @@ session_refs:
 - tool: ccds
   session_id: 20260503-acp-bridge-path-sync
   role: author
-platform_state: open
+platform_state: closed
 ---

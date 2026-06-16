@@ -1,8 +1,8 @@
 ---
 local_id: I-20260321-0217
 kind: linked
-phase_state: completed
-completed_at: '2026-04-29'
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 platform_ids:
   github:
     issue_id: '31'
@@ -19,7 +19,7 @@ last_synced_comment_at:
 hash: ''
 created_at: '2026-04-27T11:14:48Z'
 updated_at: '2026-04-27T11:14:48Z'
-platform_state: open
+platform_state: closed
 ---
 
 Freely 已经支持多个顶层 AI tool，但 `Claude Code` 仍缺两类关键治理能力：

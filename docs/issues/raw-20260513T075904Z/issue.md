@@ -1,7 +1,8 @@
 ---
 local_id: raw-20260513T075904Z
 kind: raw
-phase_state: completed
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 priority: P1
 source: chat-inbox
@@ -15,7 +16,7 @@ platform_ids:
     url: https://github.com/chatterzhao/freely/issues/329
     synced_at: '2026-05-13T07:59:10Z'
 primary_platform: github
-platform_state: open
+platform_state: closed
 ---
 
 ## Bug

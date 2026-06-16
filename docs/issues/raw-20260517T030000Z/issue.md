@@ -3,7 +3,8 @@ local_id: raw-20260517T030000Z
 id: raw-20260517T030000Z
 kind: raw
 title: 'batch closeout round 4: remaining lifecycle items'
-phase_state: completed
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 source: manager
 created_at: '2026-05-17T03:00:00Z'
@@ -12,7 +13,7 @@ platform_ids:
     issue_id: '385'
     url: https://github.com/chatterzhao/freely/issues/385
     synced_at: '2026-05-17T03:22:18Z'
-platform_state: open
+platform_state: closed
 ---
 
 # batch closeout round 4

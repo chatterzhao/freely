@@ -1,8 +1,8 @@
 ---
 local_id: I-20260326-1835
 kind: linked
-phase_state: completed
-completed_at: '2026-04-29'
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 platform_ids:
   github:
     issue_id: '58'
@@ -19,7 +19,7 @@ last_synced_comment_at:
 hash: ''
 created_at: '2026-04-27T11:17:40Z'
 updated_at: '2026-04-27T11:17:40Z'
-platform_state: open
+platform_state: closed
 ---
 
 Freely 在自举开发中已经形成了两层真源：

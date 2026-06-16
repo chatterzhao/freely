@@ -1,8 +1,8 @@
 ---
 local_id: I-20260327-0701
 kind: linked
-phase_state: completed
-completed_at: '2026-04-29'
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 platform_ids:
   github:
     issue_id: '61'
@@ -19,7 +19,7 @@ last_synced_comment_at:
 hash: ''
 created_at: '2026-04-27T11:17:58Z'
 updated_at: '2026-04-27T11:17:58Z'
-platform_state: open
+platform_state: closed
 ---
 
 The observed miss was not that Freely lacked tests in the abstract. High-level truth already required `Unit / Integration / End-to-End / Real-Environment`, and the gates already checked that those sections existed. The gap was narrower and more serious:

@@ -1,7 +1,8 @@
 ---
 local_id: raw-20260507T143544Z
 kind: raw
-phase_state: completed
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 updated_at: 2026-05-17T04:47:25Z
 platform_ids:
@@ -21,7 +22,7 @@ session_refs: []
 pre_tests_path: docs/epics/raw-issue-pull-intercept/verification/pre-tests.md
 verification_artifact_dir: docs/epics/raw-issue-pull-intercept/code-reviews
 source_candidate: docs/pre-brainstorms/20260507T143544Z--intercept-guard/candidates.md
-platform_state: open
+platform_state: closed
 ---
 
 - pre_tests_path: `docs/epics/raw-issue-pull-intercept/verification/pre-tests.md`

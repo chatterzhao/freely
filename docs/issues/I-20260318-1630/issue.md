@@ -1,8 +1,8 @@
 ---
 local_id: I-20260318-1630
 kind: linked
-phase_state: completed
-completed_at: '2026-04-29'
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 platform_ids:
   github:
     issue_id: '19'
@@ -19,7 +19,7 @@ last_synced_comment_at:
 hash: ''
 created_at: '2026-04-27T11:13:47Z'
 updated_at: '2026-04-27T11:13:47Z'
-platform_state: open
+platform_state: closed
 ---
 
 一旦 future global `restart` 成为显式 all-project control-plane action，Freely 不能只做 blind kill + blind relaunch。它必须记住 restart 前哪些 projects 处于 running，保留恢复所需的 durable evidence，并显式排除 operator 已停下的 projects。

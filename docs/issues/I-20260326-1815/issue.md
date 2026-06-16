@@ -1,8 +1,8 @@
 ---
 local_id: I-20260326-1815
 kind: linked
-phase_state: completed
-completed_at: '2026-04-29'
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 platform_ids:
   github:
     issue_id: '57'
@@ -19,7 +19,7 @@ last_synced_comment_at:
 hash: ''
 created_at: '2026-04-27T11:17:35Z'
 updated_at: '2026-04-27T11:17:35Z'
-platform_state: open
+platform_state: closed
 ---
 
 Freely 已经把 `pre-tests.md` 定义成 issue-level acceptance 控制面，也把 verification 收敛成 integration / acceptance-first。但当前 enforcement 仍然不够强：

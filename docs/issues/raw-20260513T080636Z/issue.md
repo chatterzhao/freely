@@ -1,7 +1,8 @@
 ---
 local_id: raw-20260513T080636Z
 kind: raw
-phase_state: completed
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 source_candidate: docs/pre-brainstorms/20260513T080636Z--acp-phase-state-cleanup/candidates.md#C-20260513T080636Z-A
 priority: P2
@@ -15,7 +16,7 @@ platform_ids:
     url: https://github.com/chatterzhao/freely/issues/330
     synced_at: '2026-05-13T09:49:13Z'
 primary_platform: github
-platform_state: open
+platform_state: closed
 ---
 
 ## raw-20260513T080636Z

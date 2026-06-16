@@ -1,8 +1,8 @@
 ---
 local_id: I-20260321-1530
 kind: linked
-phase_state: completed
-completed_at: '2026-04-29'
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 platform_ids:
   github:
     issue_id: '36'
@@ -19,7 +19,7 @@ last_synced_comment_at:
 hash: ''
 created_at: '2026-04-27T11:15:26Z'
 updated_at: '2026-04-27T11:15:26Z'
-platform_state: open
+platform_state: closed
 ---
 
 Freely 现有的 `prd.md` 普遍偏短，能表达“这轮要做什么”，但还不足以让 AI 在 doc-loop 和 dev-loop 中稳定继续工作。外部研究显示，AI 时代的 PRD 不应只是说明文，而应成为能驱动 prototype、eval、task slicing 和模型升级重判的执行控制面。

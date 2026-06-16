@@ -1,8 +1,8 @@
 ---
 local_id: I-20260322-0412
 kind: linked
-phase_state: completed
-completed_at: '2026-04-29'
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 platform_ids:
   github:
     issue_id: '48'
@@ -19,7 +19,7 @@ last_synced_comment_at:
 hash: ''
 created_at: '2026-04-27T11:16:42Z'
 updated_at: '2026-04-27T11:16:42Z'
-platform_state: open
+platform_state: closed
 ---
 
 manager runtime 已经能把 stable worker prompt 转成目标 worker worktree 的 delegated continuation intake，并拉起 worker runtime。但当目标 worker 已经有 active AI 时，这条 delegated continuation 不会被及时消费，导致“worker 已活着，但 handoff 没真正进入下一轮”。

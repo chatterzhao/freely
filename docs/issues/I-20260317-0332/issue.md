@@ -1,8 +1,8 @@
 ---
 local_id: I-20260317-0332
 kind: linked
-phase_state: completed
-completed_at: '2026-04-29'
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 platform_ids:
   github:
     issue_id: '10'
@@ -19,7 +19,7 @@ last_synced_comment_at:
 hash: ''
 created_at: '2026-04-27T11:12:32Z'
 updated_at: '2026-04-27T11:12:32Z'
-platform_state: open
+platform_state: closed
 ---
 
 # Issue: frontend-runtime-baseline-for-probe

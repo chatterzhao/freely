@@ -1,8 +1,8 @@
 ---
 local_id: I-20260326-1915
 kind: linked
-phase_state: completed
-completed_at: '2026-04-29'
+phase_state: dropped
+completed_at: '2026-06-16T04:14:56Z'
 platform_ids:
   github:
     issue_id: '59'
@@ -19,7 +19,7 @@ last_synced_comment_at:
 hash: ''
 created_at: '2026-04-27T11:17:45Z'
 updated_at: '2026-04-27T11:17:45Z'
-platform_state: open
+platform_state: closed
 ---
 
 Freely 在准备 broad/deep refactor 时，真实 fleet 一度同时存在：
