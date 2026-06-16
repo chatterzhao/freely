@@ -1238,7 +1238,7 @@ cmd_login() {
         # Auto-detect project from PWD and update AI_TOOL in config
         local _project_dir="$PWD"
         while [[ "$_project_dir" != "/" ]]; do
-          if [[ -f "$_project_dir/.freely/config.toml" || -f "$_project_dir/.freely/config.env" ]]; then
+          if [[ -f "$_project_dir/.freely/config.toml" ]]; then
             local _ai_tool_val="$slot"
             "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely_config.py" upsert \
               --project "$_project_dir" --key "AI_TOOL" --value "$_ai_tool_val"
@@ -1506,7 +1506,7 @@ cmd_switch() {
   if [[ -z "${SWITCH_PROJECT:-}" ]]; then
     local _pwd="$PWD"
     while [[ "$_pwd" != "/" ]]; do
-      if [[ -f "$_pwd/.freely/config.toml" || -f "$_pwd/.freely/config.env" ]]; then
+      if [[ -f "$_pwd/.freely/config.toml" ]]; then
         SWITCH_PROJECT="$_pwd"
         break
       fi
@@ -1528,7 +1528,7 @@ cmd_switch() {
         if [[ -n "${SWITCH_PROJECT:-}" ]]; then
           local _cfg="${SWITCH_PROJECT}/.freely/config.toml"
           local _ai_tool_val="$slot"
-          if [[ -f "$_cfg" || -f "${SWITCH_PROJECT}/.freely/config.env" ]]; then
+          if [[ -f "$_cfg" ]]; then
             local _old_tool
             _old_tool=$("$SELF_ROOT/bin/toml2env" --project "${SWITCH_PROJECT}" 2>/dev/null | grep "^export AI_TOOL=" | sed 's/^export AI_TOOL=//; s/^"//; s/"$//') || true
             "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely_config.py" upsert \
@@ -1548,7 +1548,7 @@ cmd_switch() {
       tool_switch_direct_generic "$tool" "$slot"
       if [[ "$slot" == *-apikey-* && -n "${SWITCH_PROJECT:-}" ]]; then
         local cfg="${SWITCH_PROJECT}/.freely/config.toml"
-        if [[ -f "$cfg" || -f "${SWITCH_PROJECT}/.freely/config.env" ]]; then
+        if [[ -f "$cfg" ]]; then
           local _old_tool
           _old_tool=$("$SELF_ROOT/bin/toml2env" --project "${SWITCH_PROJECT}" 2>/dev/null | grep "^export AI_TOOL=" | sed 's/^export AI_TOOL=//; s/^"//; s/"$//') || true
           "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely_config.py" upsert \

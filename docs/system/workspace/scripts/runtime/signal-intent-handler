@@ -42,15 +42,8 @@ message_file="$project/.freely/intake/$intake_id/message.txt"
 message="$(cat "$message_file")"
 
 config_toml="$project/.freely/config.toml"
-config_env="$project/.freely/config.env"
-if [[ -f "$config_toml" ]]; then
-  eval "$("$SELF_ROOT/bin/toml2env" --project "$project" 2>/dev/null)" || exit 1
-elif [[ -f "$config_env" ]]; then
-  # shellcheck disable=SC1090
-  source "$config_env"
-else
-  exit 1
-fi
+[[ -f "$config_toml" ]] || exit 1
+eval "$("$SELF_ROOT/bin/toml2env" --project "$project" 2>/dev/null)" || exit 1
 
 tool="${AI_TOOL:-codex}"
 model="${AI_MODEL:-gpt-5.4}"

@@ -5,19 +5,9 @@ freely_network_proxy_project_config_file() {
   printf '%s\n' "$project/.freely/config.toml"
 }
 
-freely_network_proxy_project_env_config_file() {
-  local project="$1"
-  printf '%s\n' "$project/.freely/config.env"
-}
-
 freely_network_proxy_global_config_file() {
   local freely_home="${FREELY_HOME:-$HOME/.freely}"
   printf '%s\n' "$freely_home/config.toml"
-}
-
-freely_network_proxy_global_env_config_file() {
-  local freely_home="${FREELY_HOME:-$HOME/.freely}"
-  printf '%s\n' "$freely_home/config.env"
 }
 
 freely_network_proxy_read_config_values() {
@@ -51,13 +41,7 @@ freely_network_proxy_resolve_config() {
   local global_mode="" global_url="" global_all="" global_http="" global_https="" global_no=""
 
   project_cfg="$(freely_network_proxy_project_config_file "$project")"
-  if [[ ! -f "$project_cfg" ]]; then
-    project_cfg="$(freely_network_proxy_project_env_config_file "$project")"
-  fi
   global_cfg="$(freely_network_proxy_global_config_file)"
-  if [[ ! -f "$global_cfg" ]]; then
-    global_cfg="$(freely_network_proxy_global_env_config_file)"
-  fi
 
   project_values="$(freely_network_proxy_read_config_values "$project_cfg" || true)"
   if [[ -n "$project_values" ]]; then
@@ -153,7 +137,7 @@ freely_apply_project_network_proxy_env() {
       no_proxy="${FREELY_NO_PROXY:-}"
 
       [[ -n "$all_proxy" || -n "$http_proxy" || -n "$https_proxy" || -n "$no_proxy" ]] || {
-        echo "[ERROR] FREELY_NETWORK_PROXY_MODE=explicit but no proxy values are set in $(freely_network_proxy_project_config_file "$project") or $(freely_network_proxy_global_config_file)" >&2
+        echo "[ERROR] FREELY_NETWORK_PROXY_MODE=explicit but no proxy values are set in $(freely_network_proxy_project_config_file "$project")" >&2
         return 1
       }
 
