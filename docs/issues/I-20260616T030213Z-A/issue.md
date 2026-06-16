@@ -5,6 +5,8 @@ phase_state: done_b2_ibm
 promoted_from: raw-20260616T030213Z
 source_candidate: docs/pre-brainstorms/20260616T030213Z--gate-scope-alignment/candidates.md
 canonical_issue_path: docs/issues/I-20260616T030213Z-A/issue.md
+pre_tests_path: docs/epics/gate-scope-alignment/verification/pre-tests.md
+verification_artifact_dir: docs/epics/gate-scope-alignment/code-reviews
 platform_ids:
   github:
     issue_id: "2795"
