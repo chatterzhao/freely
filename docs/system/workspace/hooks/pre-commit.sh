@@ -239,7 +239,17 @@ case "$branch" in
         gate_rc=$?
         set -e
         if [[ "$gate_rc" -ne 0 ]]; then
-          echo "[HOOK] FREELY_SKIP_IBM_GATE=1 blocked: non-governance changes detected." >&2
+          cat >&2 <<'GUIDE'
+[HOOK] FREELY_SKIP_IBM_GATE=1 blocked: non-governance changes detected.
+
+  FREELY_SKIP_IBM_GATE=1 only allows docs/cleanup/format changes.
+  For implementation changes, complete IBM lifecycle FIRST:
+
+    skill:freely-doc-B1_IBM-execution  → raw → brainstorm → candidate → milestones.md
+    skill:freely-doc-B2_IBM-execution  → I-* issue → PRD → tasks → code-review → milestones.md
+
+  Then commit via proper worktree flow (not directly on develop).
+GUIDE
           echo "$gate_output" >&2
           exit "$gate_rc"
         fi

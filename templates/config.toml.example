@@ -1,0 +1,203 @@
+# ───────────────────────────────────────────────────────────────────
+# Freely 项目配置文件模板 (config.toml.example)
+# ───────────────────────────────────────────────────────────────────
+#
+# 使用方法:
+#   1. cp config.toml.example .freely/config.toml
+#   2. 编辑 .freely/config.toml，按注释逐项配置
+#   3. 运行: freely start --project /path/to/project
+#
+# 格式: TOML (Python 3.11+ tomllib 标准库)
+#   - 字符串: key = "value"
+#   - 布尔:   key = true / false（不加引号）
+#   - 整数:   key = 10（不加引号）
+#   - 浮点:   key = 0.70（不加引号）
+#   - 表:     [section_name]
+#
+# 注意: freely init 只释放此模板，不会自动生成 config.toml。
+#       必须手工配置以确保理解每个值的含义。
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 一、项目基础 — 必须配置
+# ══════════════════════════════════════════════════════════════════════
+
+# 项目根目录的绝对路径（必须修改）
+PROJECT_ROOT = "/path/to/your-project"
+
+# 项目意图文件，描述项目目标和核心需求，freely 用它约束 AI 行为
+INTENT_FILE = "/path/to/your-project/docs/PROJECT_INTENT.md"
+
+# 项目宪法文件，定义不可违背的架构和开发约束
+CONSTITUTION_FILE = "/path/to/your-project/docs/CONSTITUTION.md"
+
+# Freely 安装根目录（固定值，init 时自动填入实际路径，一般不需修改）
+FREELY_HOME = "/path/to/freely/installation"
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 二、AI 工具配置
+# ══════════════════════════════════════════════════════════════════════
+
+# AI 工具: codex | claude | opencode | iflow | kiro-cli | cc
+AI_TOOL = "codex"
+
+# 模型名称: codex→gpt-5.4/gpt-5.5, claude→claude-sonnet-4-6/claude-opus-4-8
+AI_MODEL = "gpt-5.4"
+
+# 运行模式: auto(全自主) | step(交互) | wait(监听)
+AI_MODE = "auto"
+
+# 推理深度: low | medium | high
+AI_REASONING_EFFORT = "medium"
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 三、AI 工具适配器（推荐保持默认 ACP 模式）
+# ══════════════════════════════════════════════════════════════════════
+
+# 适配器: acp(ACP协议,推荐) | direct(命令行,已废弃)
+AI_TOOL_ADAPTER = "acp"
+
+# 适配器策略: direct(透传) | managed(Freely管理)
+AI_TOOL_ADAPTER_POLICY = "direct"
+
+# 自定义能力列表（逗号分隔），留空=默认
+# AI_TOOL_CAPABILITIES = ""
+# 全局策略，留空=默认
+# AI_TOOL_POLICY = ""
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 四、Codex 特定（仅 AI_TOOL=codex 或 codex-* 别名时生效）
+# ══════════════════════════════════════════════════════════════════════
+
+AI_CAPABILITY_CODEX_MODEL = "gpt-5.4"
+# 沙箱: read-only | workspace-write(推荐) | danger-full-access
+AI_CAPABILITY_CODEX_SANDBOX = "workspace-write"
+# 批准策略: never(auto) | on-failure | on-request(step) | always
+AI_CAPABILITY_CODEX_APPROVAL_POLICY = "never"
+# 工作目录: project(推荐) | auto
+AI_CAPABILITY_CODEX_CWD_MODE = "project"
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 五、自动切换
+# ══════════════════════════════════════════════════════════════════════
+
+# slot 自动切换: 当前 slot 限流时自动换备用
+AUTO_SWITCH_SLOT = true
+# 跨工具自动回退: 当前工具不可用时依次尝试 AI_FALLBACK_TOOLS
+AUTO_SWITCH_TOOL = true
+# init 时自动配置网络代理
+AUTO_SETUP_FREELY_PROXY = true
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 六、回退工具 — 逗号分隔，按顺序尝试
+# ══════════════════════════════════════════════════════════════════════
+
+AI_FALLBACK_TOOLS = "codex,opencode"
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 七、循环控制（固定默认值，一般无需修改）
+# ══════════════════════════════════════════════════════════════════════
+
+CHECK_INTERVAL = 10          # 主循环检查间隔(秒)
+RESTART_DELAY = 2            # 异常重启延迟(秒)
+MAX_RESTARTS = 0             # 最大连续重启次数(0=不限制)
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 八、流控（固定默认值，一般无需修改）
+# ══════════════════════════════════════════════════════════════════════
+
+IFLOW_MAX_TURNS = 100        # session 最大对话轮数
+MAX_RESUME_STREAK = 24       # 最大连续恢复次数
+MAX_ROUTE_ONLY_STREAK = 1    # 最大仅路由次数
+ROTATE_ON_CONTEXT_COMPACTED = 1  # 上下文压缩后轮转(1=是,0=否)
+SESSION_HANDOFF_TAIL_LINES = 80  # handoff 传递尾部行数
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 九、上下文管理（固定默认值，一般无需修改）
+# ══════════════════════════════════════════════════════════════════════
+
+CONTEXT_WARN_RATIO = 0.70    # 上下文使用警告阈值(70%)
+CONTEXT_ROTATE_RATIO = 0.85  # 上下文强制轮转阈值(85%，须>WARN_RATIO)
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 十、Checkpoint（固定默认值，一般无需修改）
+# ══════════════════════════════════════════════════════════════════════
+
+CHECKPOINT_WARN_DIRTY_ENTRIES = 40   # 脏文件警告阈值
+CHECKPOINT_BLOCK_DIRTY_ENTRIES = 120 # 脏文件阻塞阈值
+CHECKPOINT_DRIFT_STREAK_THRESHOLD = 2  # 漂移检测阈值
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 十一、风暴保护（固定默认值，一般无需修改）
+# ══════════════════════════════════════════════════════════════════════
+
+RESTART_STORM_WINDOW_SECS = 30     # 检测窗口(秒)
+RESTART_STORM_COUNT = 10           # 风暴阈值(次)
+PROCESS_CHURN_PEAK = 10            # 进程抖动峰值
+RESTART_STORM_OBSERVE_DELAY_SECS = 30  # 观察延迟(秒)
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 十二、网络代理
+# ══════════════════════════════════════════════════════════════════════
+
+# 代理模式: inherit(继承环境) | disabled(直连) | explicit(自定义)
+FREELY_NETWORK_PROXY_MODE = "inherit"
+# 以下仅在 mode=explicit 时需要填写
+FREELY_NETWORK_PROXY_URL = ""   # 通用代理(http://host:port 或 socks5://)
+FREELY_HTTP_PROXY = ""          # HTTP 代理
+FREELY_HTTPS_PROXY = ""         # HTTPS 代理
+FREELY_ALL_PROXY = ""           # 全局代理(覆盖上述)
+FREELY_NO_PROXY = ""            # 不走代理的地址(逗号分隔)
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 十三、仓库平台 — PR/Issue 扫描（需对应 CLI: github→gh, gitee→gitee）
+# ══════════════════════════════════════════════════════════════════════
+
+FREELY_REPO_PLATFORMS = ""  # 例如 "github,gitee"，留空=不扫描
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 十四、安全审查（推荐保持默认）
+# ══════════════════════════════════════════════════════════════════════
+
+# 策略: advisory-on-high-risk-or-uncertainty(推荐) | always | never
+FREELY_SECURITY_REVIEW_POLICY = "advisory-on-high-risk-or-uncertainty"
+# 范围: execution-boundary-and-reviewer-support(推荐) | full-boundary-audit
+FREELY_SECURITY_REVIEW_SCOPE = "execution-boundary-and-reviewer-support"
+
+
+# ══════════════════════════════════════════════════════════════════════
+# 十五、自治与安全姿态（推荐保持默认）
+# ══════════════════════════════════════════════════════════════════════
+
+# 自治级别: autonomous-default(推荐) | supervised | manual
+FREELY_AUTONOMY_PROFILE = "autonomous-default"
+# 交互姿态: non-interactive(auto推荐) | interactive
+FREELY_INTERACTION_POSTURE = "non-interactive"
+# 批准姿态: automatic-where-supported(auto推荐) | explicit
+FREELY_APPROVAL_POSTURE = "automatic-where-supported"
+# 防护引导: recommended-nonblocking(推荐) | strict-blocking
+FREELY_SAFEGUARD_GUIDANCE_POSTURE = "recommended-nonblocking"
+# 运行时决策: internal-ai-escalation-before-stop(推荐) | operator-decide
+FREELY_RUNTIME_DECISION_POSTURE = "internal-ai-escalation-before-stop"
+# 最小风险: last-resort-safe-stop（固定值，不可修改）
+FREELY_MINIMAL_RISK_POSTURE = "last-resort-safe-stop"
+
+# ── 激活同意（以下为 auto 模式标配，init 时自动设置）──
+
+FREELY_ACTIVATION_CONSENT_REQUIRED = "true"       # auto 模式需要
+FREELY_ACTIVATION_CONSENT_STATUS = "accepted"     # accepted | pending | not-required
+FREELY_ACTIVATION_CONSENT_RECORDED_AT = ""        # ISO 8601 UTC, init时自动填入
+FREELY_ACTIVATION_CONSENT_RECORDED_VIA = ""       # init时自动填入来源

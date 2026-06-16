@@ -965,7 +965,7 @@ global_state_dir() {
 }
 
 global_config_file() {
-  echo "$(global_state_dir)/config.env"
+  echo "$(global_state_dir)/config.toml"
 }
 
 projects_registry_file() {
@@ -1405,7 +1405,7 @@ append_lifecycle_trace() {
 
 config_file() {
   local project="$1"
-  echo "$(state_dir "$project")/config.env"
+  echo "$(state_dir "$project")/config.toml"
 }
 
 project_codex_config_file() {
@@ -1955,8 +1955,7 @@ resolve_ai_spec_for_project_or_global() {
   cfg="$(config_file "$project")"
   if [[ -f "$cfg" ]]; then
     unset AI_TOOL AI_MODEL AI_MODE
-    # shellcheck disable=SC1090
-    source "$cfg"
+    source_config "$project"
     tool="${AI_TOOL:-}"
     model="${AI_MODEL:-}"
     mode="${AI_MODE:-auto}"
@@ -1966,11 +1965,7 @@ resolve_ai_spec_for_project_or_global() {
     fi
   fi
 
-  cfg="$(global_config_file)"
-  if [[ -f "$cfg" ]]; then
-    unset AI_TOOL AI_MODEL AI_MODE
-    # shellcheck disable=SC1090
-    source "$cfg"
+  if source_global_config; then
     tool="${AI_TOOL:-}"
     model="${AI_MODEL:-}"
     mode="${AI_MODE:-auto}"
@@ -2008,29 +2003,25 @@ resolve_tool_adapter_policy_for_project_or_global() {
     return 0
   fi
 
-  cfg="$(global_config_file)"
-  if [[ -f "$cfg" ]]; then
+  if [[ -f "$(global_config_file)" ]]; then
     current_tool="$(
       (
         unset AI_TOOL AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
-        # shellcheck disable=SC1090
-        source "$cfg"
+        source_global_config
         printf '%s' "${AI_TOOL:-}"
       )
     )"
     current_policy="$(
       (
         unset AI_TOOL AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
-        # shellcheck disable=SC1090
-        source "$cfg"
+        source_global_config
         printf '%s' "${AI_TOOL_ADAPTER_POLICY:-}"
       )
     )"
     current_adapter="$(
       (
         unset AI_TOOL AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
-        # shellcheck disable=SC1090
-        source "$cfg"
+        source_global_config
         printf '%s' "${AI_TOOL_ADAPTER:-}"
       )
     )"
@@ -2064,21 +2055,18 @@ resolve_tool_adapter_for_project_or_global() {
     return 0
   fi
 
-  cfg="$(global_config_file)"
-  if [[ -f "$cfg" ]]; then
+  if [[ -f "$(global_config_file)" ]]; then
     current_tool="$(
       (
         unset AI_TOOL AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
-        # shellcheck disable=SC1090
-        source "$cfg"
+        source_global_config
         printf '%s' "${AI_TOOL:-}"
       )
     )"
     current_adapter="$(
       (
         unset AI_TOOL AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
-        # shellcheck disable=SC1090
-        source "$cfg"
+        source_global_config
         printf '%s' "${AI_TOOL_ADAPTER:-}"
       )
     )"
@@ -3388,8 +3376,7 @@ valid_ai_pid_for_project() {
   cfg="$(config_file "$project")"
   tool="codex"
   if [[ -f "$cfg" ]]; then
-    # shellcheck disable=SC1090
-    source "$cfg"
+    source_config "$project"
     tool="${AI_TOOL:-codex}"
   fi
 
@@ -3833,28 +3820,68 @@ interruption_handler_bin_for_project() {
   fi
 }
 
+source_config() {
+  local project="$1"
+  local cfg
+  cfg="$(config_file "$project")"
+  if [[ -f "$cfg" ]]; then
+    eval "$("$SELF_ROOT/bin/toml2env" --project "$project" 2>/dev/null)"
+    return $?
+  fi
+  return 1
+}
+
+source_global_config() {
+  local cfg
+  cfg="$(global_config_file)"
+  if [[ -f "$cfg" ]]; then
+    eval "$("$SELF_ROOT/bin/toml2env" --file "$cfg" 2>/dev/null)"
+    return $?
+  fi
+  return 1
+}
+
 load_config() {
   local project="$1"
   local cfg
   cfg="$(config_file "$project")"
-  [[ -f "$cfg" ]] || { log_error "missing config: $cfg"; exit 1; }
-  # shellcheck disable=SC1090
-  source "$cfg"
+
+  if [[ -f "$cfg" ]]; then
+    source_config "$project" || {
+      log_error "failed to load config: $cfg"
+      exit 1
+    }
+  else
+    log_error "config.toml not found in $(state_dir "$project")"
+    log_error ""
+    log_error "Freely requires config.toml to start. Create it:"
+    log_error ""
+    if [[ -f "$project/.freely/config.toml.example" ]]; then
+      log_error "  cp $project/.freely/config.toml.example $cfg"
+    else
+      log_error "  cp templates/config.toml.example $cfg"
+    fi
+    log_error "  Then edit $cfg with your project settings"
+    log_error ""
+    log_error "Or generate a default config:"
+    log_error "  freely init --project $project"
+    exit 1
+  fi
 
   # Validate PROJECT_ROOT — must be non-empty, absolute, and an existing directory.
   if [[ -z "${PROJECT_ROOT:-}" ]]; then
-    log_error "PROJECT_ROOT is not set in $cfg"
+    log_error "PROJECT_ROOT is not set in config"
     log_error "Add: PROJECT_ROOT=\"<absolute-path-to-this-project>\""
     exit 1
   fi
   if [[ "${PROJECT_ROOT:0:1}" != "/" ]]; then
-    log_error "PROJECT_ROOT must be an absolute path in $cfg"
+    log_error "PROJECT_ROOT must be an absolute path in config"
     log_error "Current value: PROJECT_ROOT=\"${PROJECT_ROOT}\""
     exit 1
   fi
   if [[ ! -d "$PROJECT_ROOT" ]]; then
     log_error "PROJECT_ROOT directory does not exist: ${PROJECT_ROOT}"
-    log_error "Fix PROJECT_ROOT in $cfg to point to the actual project directory"
+    log_error "Fix PROJECT_ROOT in config to point to the actual project directory"
     exit 1
   fi
 
@@ -3877,59 +3904,59 @@ write_config() {
   default_fallback_tools="$(runtime_default_fallback_tools_for_current_tool "$tool" | paste -sd, -)"
 
   cat >"$cfg" <<EOF
-PROJECT_ROOT="$project"
-INTENT_FILE="$intent"
-CONSTITUTION_FILE="$constitution"
-FREELY_HOME="$SELF_ROOT"
-AI_TOOL="$tool"
-AI_MODEL="$model"
-AI_MODE="$mode"
-AI_REASONING_EFFORT="$reasoning_effort"
-AI_TOOL_ADAPTER="$tool_adapter"
-AI_TOOL_ADAPTER_POLICY="$tool_adapter_policy"
-AI_TOOL_CAPABILITIES="$tool_capabilities"
-AI_TOOL_POLICY="$tool_policy"
-AI_CAPABILITY_CODEX_MODEL="$codex_capability_model"
-AI_CAPABILITY_CODEX_SANDBOX="$codex_capability_sandbox"
-AI_CAPABILITY_CODEX_APPROVAL_POLICY="$codex_capability_approval_policy"
-AI_CAPABILITY_CODEX_CWD_MODE="$codex_capability_cwd_mode"
-AUTO_SWITCH_SLOT="true"
-AUTO_SWITCH_TOOL="true"
-AUTO_SETUP_FREELY_PROXY="true"
-AI_FALLBACK_TOOLS="$default_fallback_tools"
-CHECK_INTERVAL=10
-RESTART_DELAY=2
-MAX_RESTARTS=0
-IFLOW_MAX_TURNS=100
-MAX_RESUME_STREAK=24
-MAX_ROUTE_ONLY_STREAK=1
-ROTATE_ON_CONTEXT_COMPACTED=1
-SESSION_HANDOFF_TAIL_LINES=80
-CONTEXT_WARN_RATIO=0.70
-CONTEXT_ROTATE_RATIO=0.85
-CHECKPOINT_WARN_DIRTY_ENTRIES=40
-CHECKPOINT_BLOCK_DIRTY_ENTRIES=120
-CHECKPOINT_DRIFT_STREAK_THRESHOLD=2
-RESTART_STORM_WINDOW_SECS=30
-RESTART_STORM_COUNT=10
-PROCESS_CHURN_PEAK=10
-RESTART_STORM_OBSERVE_DELAY_SECS=30
-# Proxy mode:
-# - inherit: keep ambient shell proxy env for tool launches
-# - disabled: clear ALL_PROXY/HTTP_PROXY/HTTPS_PROXY/NO_PROXY before tool launches
-# - explicit: force the FREELY_* proxy values below for tool launches
-FREELY_NETWORK_PROXY_MODE="inherit"
-FREELY_NETWORK_PROXY_URL=""
-FREELY_ALL_PROXY=""
-FREELY_HTTP_PROXY=""
-FREELY_HTTPS_PROXY=""
-FREELY_NO_PROXY=""
+PROJECT_ROOT = "$project"
+INTENT_FILE = "$intent"
+CONSTITUTION_FILE = "$constitution"
+FREELY_HOME = "$SELF_ROOT"
+AI_TOOL = "$tool"
+AI_MODEL = "$model"
+AI_MODE = "$mode"
+AI_REASONING_EFFORT = "$reasoning_effort"
+AI_TOOL_ADAPTER = "$tool_adapter"
+AI_TOOL_ADAPTER_POLICY = "$tool_adapter_policy"
+AI_TOOL_CAPABILITIES = "$tool_capabilities"
+AI_TOOL_POLICY = "$tool_policy"
+AI_CAPABILITY_CODEX_MODEL = "$codex_capability_model"
+AI_CAPABILITY_CODEX_SANDBOX = "$codex_capability_sandbox"
+AI_CAPABILITY_CODEX_APPROVAL_POLICY = "$codex_capability_approval_policy"
+AI_CAPABILITY_CODEX_CWD_MODE = "$codex_capability_cwd_mode"
+AUTO_SWITCH_SLOT = true
+AUTO_SWITCH_TOOL = true
+AUTO_SETUP_FREELY_PROXY = true
+AI_FALLBACK_TOOLS = "$default_fallback_tools"
+CHECK_INTERVAL = 10
+RESTART_DELAY = 2
+MAX_RESTARTS = 0
+IFLOW_MAX_TURNS = 100
+MAX_RESUME_STREAK = 24
+MAX_ROUTE_ONLY_STREAK = 1
+ROTATE_ON_CONTEXT_COMPACTED = 1
+SESSION_HANDOFF_TAIL_LINES = 80
+CONTEXT_WARN_RATIO = 0.70
+CONTEXT_ROTATE_RATIO = 0.85
+CHECKPOINT_WARN_DIRTY_ENTRIES = 40
+CHECKPOINT_BLOCK_DIRTY_ENTRIES = 120
+CHECKPOINT_DRIFT_STREAK_THRESHOLD = 2
+RESTART_STORM_WINDOW_SECS = 30
+RESTART_STORM_COUNT = 10
+PROCESS_CHURN_PEAK = 10
+RESTART_STORM_OBSERVE_DELAY_SECS = 30
+# Proxy mode
+#   inherit  keep ambient shell proxy env for tool launches
+#   disabled clear ALL_PROXY/HTTP_PROXY/HTTPS_PROXY/NO_PROXY before tool launches
+#   explicit force the FREELY_* proxy values below for tool launches
+FREELY_NETWORK_PROXY_MODE = "inherit"
+FREELY_NETWORK_PROXY_URL = ""
+FREELY_ALL_PROXY = ""
+FREELY_HTTP_PROXY = ""
+FREELY_HTTPS_PROXY = ""
+FREELY_NO_PROXY = ""
 # Repo platforms for PR/issue scanning. Comma-separated, e.g. "github,gitee".
-# Each platform name maps to its CLI: github→gh, gitee→gitee.
+# Each platform name maps to its CLI: github->gh, gitee->gitee.
 # Empty = no platform scanning.
-FREELY_REPO_PLATFORMS=""
-FREELY_SECURITY_REVIEW_POLICY="advisory-on-high-risk-or-uncertainty"
-FREELY_SECURITY_REVIEW_SCOPE="execution-boundary-and-reviewer-support"
+FREELY_REPO_PLATFORMS = ""
+FREELY_SECURITY_REVIEW_POLICY = "advisory-on-high-risk-or-uncertainty"
+FREELY_SECURITY_REVIEW_SCOPE = "execution-boundary-and-reviewer-support"
 EOF
 }
 
@@ -3951,25 +3978,14 @@ config_env_escaped_value() {
 
 upsert_config_key() {
   local project="$1" key="$2" value="${3:-}"
-  local cfg tmp escaped
+  local cfg
   cfg="$(config_file "$project")"
-  tmp="$(mktemp "${cfg}.XXXXXX")"
-  escaped="$(config_env_escaped_value "$value")"
-  awk -v key="$key" -v value="$escaped" '
-    BEGIN { written=0 }
-    index($0, key "=") == 1 {
-      print key "=\"" value "\""
-      written=1
-      next
-    }
-    { print }
-    END {
-      if (!written) {
-        print key "=\"" value "\""
-      }
-    }
-  ' "$cfg" >"$tmp"
-  mv "$tmp" "$cfg"
+
+  # Update config.toml via Python module
+  if [[ -f "$cfg" ]]; then
+    "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely_config.py" upsert \
+      --project "$project" --key "$key" --value "$value"
+  fi
 }
 
 migrate_project_auto_recovery_defaults_if_needed() {
@@ -4557,7 +4573,7 @@ append_unique_tool_to_stream() {
 }
 
 runtime_builtin_auto_recovery_tool_priority() {
-  # Single source of truth: AI_FALLBACK_TOOLS in config.env (comma-separated)
+  # Single source of truth: AI_FALLBACK_TOOLS in config.toml (comma-separated)
   local _fallback_csv="${AI_FALLBACK_TOOLS:-}"
   if [[ -n "$_fallback_csv" ]]; then
     local IFS=','
@@ -4848,33 +4864,31 @@ persist_project_tool_selection() {
 }
 
 project_tool_selection_truth() {
-  local project="$1" cfg current_tool current_adapter current_adapter_policy
-  cfg="$(config_file "$project")"
-  [[ -f "$cfg" ]] || {
+  local project="$1" current_tool current_adapter current_adapter_policy
+  if [[ -f "$(config_file "$project")" ]]; then
+    :
+  else
     printf '||\n'
     return 0
-  }
+  fi
   current_tool="$(
     (
       unset AI_TOOL AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
-      # shellcheck disable=SC1090
-      source "$cfg"
+      source_config "$project"
       printf '%s' "${AI_TOOL:-}"
     )
   )"
   current_adapter="$(
     (
       unset AI_TOOL AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
-      # shellcheck disable=SC1090
-      source "$cfg"
+      source_config "$project"
       printf '%s' "${AI_TOOL_ADAPTER:-}"
     )
   )"
   current_adapter_policy="$(
     (
       unset AI_TOOL AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
-      # shellcheck disable=SC1090
-      source "$cfg"
+      source_config "$project"
       printf '%s' "${AI_TOOL_ADAPTER_POLICY:-}"
     )
   )"
@@ -4927,50 +4941,46 @@ resolve_project_tool_adapter_selection() {
 }
 
 project_tool_runtime_selection_truth() {
-  local project="$1" cfg
+  local project="$1"
   local current_tool current_model current_reasoning current_adapter current_adapter_policy
-  cfg="$(config_file "$project")"
-  [[ -f "$cfg" ]] || {
+  if [[ -f "$(config_file "$project")" ]]; then
+    :
+  else
     printf '||||\n'
     return 0
-  }
+  fi
   current_tool="$(
     (
       unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
-      # shellcheck disable=SC1090
-      source "$cfg"
+      source_config "$project"
       printf '%s' "${AI_TOOL:-}"
     )
   )"
   current_model="$(
     (
       unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
-      # shellcheck disable=SC1090
-      source "$cfg"
+      source_config "$project"
       printf '%s' "${AI_MODEL:-}"
     )
   )"
   current_reasoning="$(
     (
       unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
-      # shellcheck disable=SC1090
-      source "$cfg"
+      source_config "$project"
       printf '%s' "${AI_REASONING_EFFORT:-}"
     )
   )"
   current_adapter="$(
     (
       unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
-      # shellcheck disable=SC1090
-      source "$cfg"
+      source_config "$project"
       printf '%s' "${AI_TOOL_ADAPTER:-}"
     )
   )"
   current_adapter_policy="$(
     (
       unset AI_TOOL AI_MODEL AI_REASONING_EFFORT AI_TOOL_ADAPTER AI_TOOL_ADAPTER_POLICY
-      # shellcheck disable=SC1090
-      source "$cfg"
+      source_config "$project"
       printf '%s' "${AI_TOOL_ADAPTER_POLICY:-}"
     )
   )"
@@ -5268,9 +5278,9 @@ tool_boundary_launch_boundary_note() {
 tool_boundary_sync_policy_note() {
   local tool="$1"
   case "$tool" in
-    codex) printf 'copy `.freely/config.env`, then rematerialize `.codex/config.toml` and wrapper in each new worktree\n' ;;
-    claude|iflow) printf 'copy `.freely/config.env`, then rematerialize wrapper in each new worktree\n' ;;
-    kiro-cli) printf 'copy `.freely/config.env`, then rematerialize wrapper/bootstrap only\n' ;;
+    codex) printf 'copy `.freely/config.toml`, then rematerialize `.codex/config.toml` and wrapper in each new worktree\n' ;;
+    claude|iflow) printf 'copy `.freely/config.toml`, then rematerialize wrapper in each new worktree\n' ;;
+    kiro-cli) printf 'copy `.freely/config.toml`, then rematerialize wrapper/bootstrap only\n' ;;
     *) printf 'unknown\n' ;;
   esac
 }
@@ -5411,16 +5421,14 @@ rewrite_synced_project_config_for_target() {
   raw_intent="$(
     (
       unset PROJECT_ROOT INTENT_FILE CONSTITUTION_FILE
-      # shellcheck disable=SC1090
-      source "$target_cfg"
+      source_config "$target_project"
       printf '%s' "${INTENT_FILE:-}"
     )
   )"
   raw_constitution="$(
     (
       unset PROJECT_ROOT INTENT_FILE CONSTITUTION_FILE
-      # shellcheck disable=SC1090
-      source "$target_cfg"
+      source_config "$target_project"
       printf '%s' "${CONSTITUTION_FILE:-}"
     )
   )"
@@ -5468,7 +5476,7 @@ sync_project_tooling_from_source() {
     return 1
   }
   [[ -f "$source_cfg" ]] || {
-    log_warn "skip tooling sync: source config missing at $source_cfg"
+    log_warn "skip tooling sync: source config missing at $(config_file "$source_project")"
     return 0
   }
   if [[ "$target_project" != "$source_project" ]] && project_path_is_under_worktrees_root "$source_project" "$target_project"; then
@@ -7525,8 +7533,8 @@ runtime_network_failure_reason_from_log() {
 
 runtime_proxy_mode_summary_for_logs() {
   local project="$1" project_cfg global_cfg mode
-  project_cfg="$project/.freely/config.env"
-  global_cfg="${FREELY_HOME:-$HOME/.freely}/config.env"
+  project_cfg="$project/.freely/config.toml"
+  global_cfg="${FREELY_HOME:-$HOME/.freely}/config.toml"
 
   if declare -F freely_network_proxy_project_config_file >/dev/null 2>&1; then
     project_cfg="$(freely_network_proxy_project_config_file "$project")"
@@ -8204,7 +8212,7 @@ read_task_mode() {
     result=$(python3 "$cli" --project "$project" task-mode.read-with-scan 2>/dev/null) && break
   done
   if [[ -z "$result" ]]; then
-    log_error "task_mode degraded to WAIT: DB query failed after 3 retries (freely-db daemon not ready or crashed). AI will not work until task-mode is set to auto."
+    log_error "task_mode degraded to WAIT: DB query failed after 3 retries (freely-db daemon not ready or crashed). AI will not work in wait mode. After fixing the root cause, restart with --task-mode auto, or run: freely task-mode set --project <project> --task-mode auto"
     echo 'wait'; return 0
   fi
   local mode="${result%%|*}"
@@ -19256,17 +19264,17 @@ SDK_HELP
   ensure_install_lifecycle_allowlist_file "$project"
   ensure_repo_hooks_enabled_or_fail "$project"
   sync_repo_hook_assets_from_source "$SELF_ROOT" "$project"
-  write_config "$project" "$intent" "$constitution" "$tool" "$model" "$mode" "$reasoning_effort" "$tool_adapter" "$tool_adapter_policy" "$tool_capabilities" "$tool_policy" "$codex_capability_model" "$codex_capability_sandbox" "$codex_capability_approval_policy" "$codex_capability_cwd_mode" "$force"
-  record_default_autonomy_contract "$project" "$mode" "$FREELY_INIT_CONSENT_STATUS" "$FREELY_INIT_CONSENT_RECORDED_AT" "$FREELY_INIT_CONSENT_RECORDED_VIA"
-  if tool_requires_project_codex_config "$tool" "$tool_capabilities"; then
-    write_project_codex_config "$project" "$force" "$mode"
+
+  # Release config.toml.example — user must copy and configure manually.
+  # We do NOT auto-generate config.toml because users must read the
+  # comments to understand what each value means.
+  local _example_src="$SELF_ROOT/templates/config.toml.example"
+  local _example_dst="$project/.freely/config.toml.example"
+  if [[ -f "$_example_src" ]]; then
+    cp "$_example_src" "$_example_dst"
+    log_info "config.toml.example released to .freely/"
   fi
-  load_config "$project"
-  write_project_tool_wrapper_scripts "$project"
-  write_project_tool_boundary_bootstrap_file "$project"
-  register_project_in_registry "$project"
-  rm -f "$(session_state_file "$project")" "$(exit_contract_file "$project")"
-  write_workcell_state "$project" "stopped" "down" "down" "initialized"
+
   # ── Write project .gitignore with template ignore rule ──
   local gitignore="$project/.gitignore"
   if [[ ! -f "$gitignore" || "$force" == "true" ]]; then
@@ -19311,17 +19319,18 @@ EOF
   fi
   ensure_a2a_server_running "$project"
   ensure_task_mode_gate "$project" "wait"
-  log_info "initialized: $(config_file "$project")"
-  load_config "$project"
-  echo "activation_consent_status: $(freely_activation_consent_status_for_loaded_config)"
-  echo "activation_consent_recorded_at: $(format_timestamp_local_for_display "$(freely_activation_consent_recorded_at_for_loaded_config)")"
-  echo "activation_consent_recorded_via: $(freely_activation_consent_recorded_via_for_loaded_config)"
-  echo "autonomy_profile: ${FREELY_AUTONOMY_PROFILE:-$(freely_autonomy_profile_for_mode "${AI_MODE:-}")}"
-  echo "interaction_posture: ${FREELY_INTERACTION_POSTURE:-$(freely_interaction_posture_for_mode "${AI_MODE:-}")}"
-  echo "approval_posture: ${FREELY_APPROVAL_POSTURE:-$(freely_approval_posture_for_mode "${AI_MODE:-}")}"
-  echo "safeguard_guidance_posture: $(freely_safeguard_guidance_posture_for_loaded_config)"
-  echo "runtime_decision_posture: $(freely_runtime_decision_posture_for_loaded_config)"
-  echo "minimal_risk_posture: $(freely_minimal_risk_posture_for_loaded_config)"
+  log_info "init complete — config.toml.example released to .freely/"
+  echo ""
+  echo "┌─ 下一步 ──────────────────────────────────────────────┐"
+  echo "│  config.toml.example 已释放到 .freely/ 目录              │"
+  echo "│                                                        │"
+  echo "│  1. 复制并编辑配置:                                     │"
+  echo "│    cp .freely/config.toml.example .freely/config.toml"
+  echo "│    vim .freely/config.toml  (按注释修改 PROJECT_ROOT 等)"
+  echo "│                                                        │"
+  echo "│  2. 启动 freely:                                        │"
+  echo "│    freely start --project $project"
+  echo "└────────────────────────────────────────────────────────┘"
 }
 
 cmd_set_tool() {
@@ -19579,8 +19588,7 @@ collect_global_restart_snapshot_rows() {
     [[ -f "$(config_file "$wt_path")" ]] || continue
     declared_project_root="$wt_path"
     unset PROJECT_ROOT
-    # shellcheck disable=SC1090
-    source "$(config_file "$wt_path")"
+    source_config "$wt_path"
     declared_project_root="${PROJECT_ROOT:-$wt_path}"
     branch="$(git -C "$wt_path" branch --show-current 2>/dev/null || true)"
     role_hint="$(role_hint_for_project "$wt_path")"
@@ -22183,13 +22191,11 @@ HELP
     resolved_repo="$(_resolve_gh_repo "$repo")" || { log_error "invalid --repo format: $repo"; return 1; }
   elif [[ -n "${FREELY_REPO_URL:-}" ]]; then
     resolved_repo="$FREELY_REPO_URL"
-  elif [[ -f "$SELF_ROOT/.freely/config.env" ]]; then
-    # shellcheck disable=SC1090
-    source "$SELF_ROOT/.freely/config.env"
-    resolved_repo="${FREELY_REPO_URL:-}"
+  elif [[ -f "$SELF_ROOT/.freely/config.toml" ]]; then
+    resolved_repo="$("$SELF_ROOT/bin/toml2env" --project "$SELF_ROOT" 2>/dev/null | grep '^export FREELY_REPO_URL=' | sed 's/^export FREELY_REPO_URL=//; s/^"//; s/"$//')"
   fi
 
-  [[ -n "$resolved_repo" ]] || { log_error "no repo specified: use --repo or set FREELY_REPO_URL in .freely/config.env"; return 1; }
+  [[ -n "$resolved_repo" ]] || { log_error "no repo specified: use --repo or set FREELY_REPO_URL in .freely/config.toml"; return 1; }
 
   stamp=$(date -u +%Y%m%dT%H%M%SZ)
   raw_key="$stamp"

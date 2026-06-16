@@ -6,7 +6,7 @@ HOOK_NAME="$(basename "$0")"
 if [[ -x "$ROOT_DIR/docs/system/workspace/hooks/${HOOK_NAME}.sh" ]]; then
   exec bash "$ROOT_DIR/docs/system/workspace/hooks/${HOOK_NAME}.sh" "$@"
 fi
-FREELY_HOME="$(source "$ROOT_DIR/.freely/config.env" 2>/dev/null && printf '%s' "${FREELY_HOME:-}")"
+FREELY_HOME="$(sed -n 's/^FREELY_HOME = "\(.*\)"$/\1/p' "$ROOT_DIR/.freely/config.toml" 2>/dev/null || true)"
 if [[ -n "${FREELY_HOME:-}" && -x "$FREELY_HOME/docs/system/workspace/hooks/${HOOK_NAME}.sh" ]]; then
   exec bash "$FREELY_HOME/docs/system/workspace/hooks/${HOOK_NAME}.sh" "$@"
 fi

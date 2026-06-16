@@ -75,7 +75,7 @@ MSG
 
 $gate_output
 
-  FREELY_SKIP_IBM_GATE=1 仅限 docs/cleanup/format 等治理型变更。
+  FREELY_SKIP_IBM_GATE=1 仅限 document|cleanup|format 等治理型变更。
   实现变更必须走完整 raw→C→M→I 治理链。
 MSG
     exit "$gate_rc"

@@ -50,7 +50,7 @@ test-pre-merge-* 上的操作:
 
 | 职能 | 说明 |
 |---|---|
-| **私有测试沙箱** | 仅在本地用于快速迭代验证，不参与任何合并链。hook 复制 config.env、freely.db、tool-boundary，与 develop/main 等效。可以 stop/start daemon 做端到端验证，验证后丢弃。 |
+| **私有测试沙箱** | 仅在本地用于快速迭代验证，不参与任何合并链。hook 复制 config.toml、freely.db、tool-boundary，与 develop/main 等效。可以 stop/start daemon 做端到端验证，验证后丢弃。 |
 
 ---
 

@@ -80,7 +80,7 @@ Freely 处于研究优先的整合阶段。
   	   - **test-pre-merge 运行环境初始化**：
   	     - pre 工位从 develop 创建后是裸分支，无 config、无 session-store、无 continuity
   	     - 必须运行 `./bin/pre-init-runtime --pre-project <pre-worktree>` 从 develop 复制运行时状态
-  	     - 这会复制 config.env（修正路径）、freely.db（session-store）、tool-boundary-bootstrap
+  	     - 这会复制 config.toml（修正路径）、freely.db（session-store）、tool-boundary-bootstrap
   	     - 初始化后 pre 工位具备完整的 Manager 运行能力
   	   - **test-pre-merge 的真实环境测试（端到端门禁）**：feature 合并到 test-pre-merge 后必须通过自举验证才能合并到 develop：
   	     1. `./bin/pre-init-runtime --pre-project <pre-worktree>` — 初始化运行时环境
