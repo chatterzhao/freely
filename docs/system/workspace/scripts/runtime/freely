@@ -8199,8 +8199,14 @@ ensure_task_mode_gate() {
 read_task_mode() {
   local project="$1"
   local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
-  local result
-  result=$(python3 "$cli" --project "$project" task-mode.read-with-scan 2>/dev/null) || { echo 'wait'; return 0; }
+  local result _retry
+  for _retry in 1 2 3; do
+    result=$(python3 "$cli" --project "$project" task-mode.read-with-scan 2>/dev/null) && break
+  done
+  if [[ -z "$result" ]]; then
+    log_error "task_mode degraded to WAIT: DB query failed after 3 retries (freely-db daemon not ready or crashed). AI will not work until task-mode is set to auto."
+    echo 'wait'; return 0
+  fi
   local mode="${result%%|*}"
   local scan_id="${result#*|}"
   if [[ "$mode" == "id" && -n "$scan_id" ]]; then
