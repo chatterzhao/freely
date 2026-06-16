@@ -4,7 +4,7 @@ kind: raw
 <<<<<<< HEAD
 phase_state: dropped
 =======
-phase_state: proposed
+phase_state: absorbed
 >>>>>>> fix/raw-20260519T145435Z-consumed-by-auto-consume
 platform_ids:
   github:
@@ -44,7 +44,7 @@ dropped_reason: Fix merged directly to develop via pr-merge-guarded. Runtime bug
 > **Freely 治理**：这是 raw issue `raw-20260519T145435Z`。实现前请用 `wt-create --raw-key 20260519T145435Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
 kind: raw
 priority: P2
-phase_state: proposed
+phase_state: absorbed
 source: feedback
 created_at: "2026-05-19T14:54:35Z"
 title: "consumed_by routing field + auto_consume premature consumption design fix"

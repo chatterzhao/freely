@@ -1,7 +1,7 @@
 ---
 kind: raw
 priority: P3
-phase_state: proposed
+phase_state: absorbed
 title: raw issue metadata stub (empty body)
 platform_state: open
 platform_ids:

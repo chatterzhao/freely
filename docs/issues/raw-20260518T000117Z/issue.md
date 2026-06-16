@@ -45,9 +45,9 @@ ibm-framework.md 设计的目标模型是 issue.md 只有两个状态字段：
 
 | 文件 | 行 | 当前 | 改为 |
 |------|-----|------|------|
-| `chat-inbox.py` | 202 | `status: proposed` | `phase_state: proposed` |
+| `chat-inbox.py` | 202 | `status: proposed` | `phase_state: absorbed` |
 | `platform-adapter.py` | 361 | `"status": "proposed"` | 删除（362已有 phase_state） |
-| `freely` cmd_feedback | 20076 | `status: open` | `phase_state: proposed` |
+| `freely` cmd_feedback | 20076 | `status: open` | `phase_state: absorbed` |
 
 ### 读取方（5处，均在 issue-sync）
 

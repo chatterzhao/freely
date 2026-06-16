@@ -5,7 +5,7 @@ priority: P2
 source: chat-inbox
 created_at: '2026-05-17T07:34:34Z'
 title: 时间戳生成处缺少 Z 时区标识，应统一使用 UTC+Z 格式
-phase_state: proposed
+phase_state: absorbed
 platform_ids:
   github:
     issue_id: '448'

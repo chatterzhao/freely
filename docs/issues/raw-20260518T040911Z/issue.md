@@ -1,7 +1,7 @@
 ---
 kind: raw
 priority: P1
-phase_state: proposed
+phase_state: absorbed
 source: feedback
 created_at: '2026-05-18T04:09:11Z'
 title: 'auto_consume 调用处传入硬编码 raw_key，application 永远消费不到 worker handoff'

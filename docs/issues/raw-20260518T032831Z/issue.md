@@ -1,7 +1,7 @@
 ---
 kind: raw
 priority: P2
-phase_state: proposed
+phase_state: absorbed
 source: feedback
 created_at: '2026-05-18T03:28:31Z'
 title: freely ai config 命令：统一管理各 AI Tool 配置 + 向下生成 + alias 生成

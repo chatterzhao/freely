@@ -37,7 +37,7 @@ absorbed_into: infra-githooks
 > **Freely 治理**：这是 raw issue `raw-20260519T033529Z`。实现前请用 `wt-create --raw-key 20260519T033529Z` 创建专属工位，确保代码修改在包含此 raw-key 的分支上进行。
 kind: raw
 priority: P0
-phase_state: proposed
+phase_state: absorbed
 source: feedback
 created_at: "2026-05-19T03:35:29Z"
 title: "Worker handoff JSON 损坏：ACP stream 混入乱码 + 部分 worker 不写 handoff"
