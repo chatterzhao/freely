@@ -1,6 +1,10 @@
+# 使用方法:
+#   cp config.toml.example .freely/config.toml
+#   然后编辑 .freely/config.toml 填入你的实际值。
+#   或者运行: freely init --project <path> --intent ... --ai <tool>
+#   freely init 会自动生成 .freely/config.toml。
+#
 # Freely 项目配置文件
-# 由 `freely init` 自动生成，也可手动编辑。
-# 文件路径: .freely/config.toml
 
 # ── 项目基础 ──────────────────────────────────────────
 PROJECT_ROOT = "/path/to/your-project"
@@ -79,3 +83,20 @@ FREELY_REPO_PLATFORMS = ""
 # ── 安全审查 ─────────────────────────────────────
 FREELY_SECURITY_REVIEW_POLICY = "advisory-on-high-risk-or-uncertainty"
 FREELY_SECURITY_REVIEW_SCOPE = "execution-boundary-and-reviewer-support"
+
+# ── 自治与安全姿态 ─────────────────────────────
+# autonomy_profile: autonomous-default | supervised | manual
+FREELY_AUTONOMY_PROFILE = "autonomous-default"
+# interaction_posture: interactive | non-interactive
+FREELY_INTERACTION_POSTURE = "non-interactive"
+# approval_posture: explicit | automatic-where-supported
+FREELY_APPROVAL_POSTURE = "automatic-where-supported"
+# safeguard_guidance_posture: strict-blocking | recommended-nonblocking
+FREELY_SAFEGUARD_GUIDANCE_POSTURE = "recommended-nonblocking"
+# runtime_decision_posture: operator-decide | internal-ai-escalation-before-stop
+FREELY_RUNTIME_DECISION_POSTURE = "internal-ai-escalation-before-stop"
+# minimal_risk_posture: last-resort-safe-stop
+FREELY_MINIMAL_RISK_POSTURE = "last-resort-safe-stop"
+# activation_consent: required=true|false, status=accepted|pending, recorded_at/via=timestamp
+FREELY_ACTIVATION_CONSENT_REQUIRED = "true"
+FREELY_ACTIVATION_CONSENT_STATUS = "accepted"

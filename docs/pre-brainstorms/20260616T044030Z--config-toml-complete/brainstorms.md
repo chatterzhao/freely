@@ -88,3 +88,17 @@
 - [ ] freely init 生成 config.toml
 - [ ] 所有 handler 不会因缺 toml 退出
 - [ ] 全局配置同样 fallback
+
+## Additional gaps found
+
+### config.toml.example 缺失字段
+8 个 runtime posture 设置不在 template 中，已补充。
+
+### freely init 不释放 template
+`init` 只生成 `.freely/config.toml`（通过 write_config），但不复制 `templates/config.toml.example` 到 `.freely/config.toml.example`。需要添加。
+
+### freely package 不复制配置
+`bin/freely-package` 没有 config 复制逻辑。打包时需要复制 `.freely/config.toml`（或让用户自行提供）。
+
+### pre-init-runtime 已正确处理
+`bin/pre-init-runtime` line 47-54 已处理 config.toml 复制和路径修正 ✓
