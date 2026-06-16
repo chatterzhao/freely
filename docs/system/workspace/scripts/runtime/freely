@@ -21390,6 +21390,9 @@ print(ready)
             "origin=end_turn_prompt_mode"
           log_info "after_run: detected ${_ar_new_count} new worker prompt(s) after end_turn (prompt mode)"
           exit_contract_action="delegate_workers"
+          # Write worker CSV to exit contract so manager_runtime_launch_workers
+          # can find the prompt files. Without this, _worker_csv stays empty.
+          echo "WORKER_PROMPTS_CSV=$_ar_new_csv" >> "$(manager_exit_contract_file "$PROJECT_ROOT")"
         fi
       fi
     fi
