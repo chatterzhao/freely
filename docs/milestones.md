@@ -3,6 +3,21 @@
 
 本文件是 Freely 自举开发时的主动扫描入口，用来承接已进入活跃范围的 candidate / issue。
 
+## M-20260616T143914Z-A
+- title: 规范流程文档治理 — 在 AGENTS.md/CONSTITUTION/skills 中补齐完整规范流程
+- status: active
+### candidate_issues
+1. `C-20260616T143914Z-A`
+- milestone: M-20260616T143914Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260616T143914Z-A/issue.md`
+### committed_issues
+1. `I-20260616T143914Z-A`
+- title: 规范流程文档治理 — AGENTS.md/CONSTITUTION/skills 完整化
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260616T143914Z-A/issue.md`
+
 ## M-20260612T140944Z-A
 - title: 彻底 A2A 重构 — 官方 SDK + 双传输 + Agent 注册中心
 - status: completed

@@ -1,7 +1,8 @@
 ---
 local_id: I-20260616T143914Z-A
 kind: linked
-phase_state: in_dev
+phase_state: completed
+source_candidate: docs/pre-brainstorms/20260616T143914Z--workflow-docs-governance/candidates.md#C-20260616T143914Z-A
 platform_ids: {}
 primary_platform: github
 canonical_issue_path: docs/pre-brainstorms/20260616T143914Z--workflow-docs-governance/candidates.md
