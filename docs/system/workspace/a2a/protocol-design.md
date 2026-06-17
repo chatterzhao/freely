@@ -146,7 +146,6 @@ Freely Agent Card 扩展 A2A 标准，声明 Freely 特有能力：
         "completion_summary": "...",
         "evidence_paths": ["..."],
         "next_action": "...",
-        "worker_prompts_csv": "...",
         "session_id": "...",
         "consumed_by": "manager"
       }

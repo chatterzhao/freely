@@ -272,7 +272,6 @@ class DbDaemon:
             ("next_action", "TEXT NOT NULL DEFAULT ''"),
             ("completion_summary", "TEXT NOT NULL DEFAULT ''"),
             ("evidence_paths", "TEXT NOT NULL DEFAULT ''"),
-            ("worker_prompts_csv", "TEXT NOT NULL DEFAULT ''"),
             ("error", "TEXT NOT NULL DEFAULT ''"),
             ("worker_pid", "TEXT NOT NULL DEFAULT ''"),
             ("delivery_status", "TEXT NOT NULL DEFAULT 'pending'"),
@@ -992,7 +991,7 @@ def h_a2a_task_insert(daemon: DbDaemon, params: dict) -> dict:
         """INSERT INTO a2a_tasks
            (task_id, name, description, state, agent_id, skill, session_id, message,
             created_at, updated_at, prompt_file, worktree, branch, exit_kind, reason,
-            progress, next_action, completion_summary, evidence_paths, worker_prompts_csv, error)
+            progress, next_action, completion_summary, evidence_paths, error)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (
             task_id,
@@ -1013,7 +1012,6 @@ def h_a2a_task_insert(daemon: DbDaemon, params: dict) -> dict:
             params.get("next_action", ""),
             params.get("completion_summary", ""),
             params.get("evidence_paths", ""),
-            params.get("worker_prompts_csv", ""),
             params.get("error", ""),
         ),
     )

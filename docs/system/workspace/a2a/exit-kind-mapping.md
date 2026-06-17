@@ -121,7 +121,6 @@ http_status: 202 Accepted
 语义: Manager 委派新 Worker 创建子任务
 示例: |
   Manager 委派多个 Worker 并行执行子任务
-  - worker_prompts_csv: "worker1.csv,worker2.csv"
   - next_action: "等待子任务完成"
 ```
 

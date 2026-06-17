@@ -111,7 +111,7 @@ class A2AClient:
         """Send standard HTTP request to A2A Server REST endpoints (bypass JSON-RPC).
 
         Used for Freely-specific operations (create, update) that carry
-        extended fields (worker_prompts_csv, delivery_status, worker_pid)
+        extended fields (delivery_status, worker_pid)
         not preserved by the JSON-RPC tasks/send → execute() path.
         """
         self._ensure()
@@ -415,7 +415,6 @@ def process_ai_reply(reply_text: str, role: str = "manager", raw_key: str = "",
             summary=fields.get("summary", ""),
             next=fields.get("next", ""),
             evidence=fields.get("evidence", ""),
-            worker_prompts_csv=fields.get("workers", ""),
         )
         task_id = r.get("id", "")
         c.add_message(task_id, role=role, msg_type="text", content=reply_text[:32768])

@@ -1,3 +1,19 @@
+## M-20260617T121221Z-A
+- title: Remove worker_prompts_csv leftovers
+- status: active
+### candidate_issues
+1. `C-20260617T121221Z-A`
+- milestone: M-20260617T121221Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260617T121221Z-A/issue.md`
+### committed_issues
+1. `I-20260617T121221Z-A`
+- title: Remove worker_prompts_csv leftovers
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260617T121221Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/remove-worker-csv/code-reviews`
+
 ## M-20260617T110109Z-A
 - title: Remove prompt_file from A2A layer
 - status: active
