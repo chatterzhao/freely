@@ -2,7 +2,7 @@
 local_id: I-20260617T103956Z-A
 kind: linked
 status: in_dev
-phase_state: in_b2_ibm
+phase_state: completed
 promoted_from: raw-20260617T103956Z
 source_candidate: docs/pre-brainstorms/20260617T103956Z--eliminate-csv/candidates.md
 verification_artifact_dir: docs/epics/eliminate-csv/code-reviews
