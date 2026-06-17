@@ -14,7 +14,7 @@ platform_ids:
     url: https://github.com/chatterzhao/freely/issues/385
     synced_at: '2026-05-17T03:22:18Z'
 platform_state: closed
-updated_at: '2026-06-17T17:07:28Z'
+updated_at: '2026-06-17T17:15:20Z'
 ---
 
 # batch closeout round 4
