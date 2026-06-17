@@ -279,7 +279,7 @@ def _task_upsert_params(args):
 
 def _task_update_params(args):
     p = {"task_id": args["task_id"]}
-              "worktree", "branch", "exit_kind", "reason", "completion_summary",
+    for k in ("worktree", "branch", "exit_kind", "reason", "completion_summary",
               "worker_prompts_csv", "error", "worker_pid", "delivery_status"):
         if k in args and args[k]:
             p[k] = args[k]
