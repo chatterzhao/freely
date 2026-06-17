@@ -9,7 +9,9 @@ created_at: 2026-06-03 14:21:27+00:00
 author: manager
 session_refs: []
 platform_state: closed
-updated_at: '2026-06-15T06:13:37Z'
+updated_at: '2026-06-17T14:11:48Z'
+force_closed_at: '2026-06-17T14:11:48Z'
+force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
 ---
 
 ## Problem

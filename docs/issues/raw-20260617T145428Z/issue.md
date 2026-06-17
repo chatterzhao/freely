@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260617T145428Z
 kind: raw
-phase_state: proposed
+phase_state: absorbed
 platform_ids:
   github:
     issue_id: '2932'
@@ -17,6 +17,9 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+force_closed_at: '2026-06-17T15:08:43Z'
+force_closed_reason: 'pr-merge-guarded: absorbed by merge'
+absorbed_into: ''
 ---
 
 ## Bug 1: freely-db-cli IndentationError

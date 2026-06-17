@@ -12,12 +12,14 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-22T07:19:16Z'
-updated_at: '2026-06-17T00:24:00Z'
+updated_at: '2026-06-17T14:11:27Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
 platform_state: closed
+force_closed_at: '2026-06-17T14:11:27Z'
+force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
 ---
 
 1. codex_infer_slot_kind_from_slot: account-*/apikey-* → *-account-*/ *-apikey-*，兼容全名

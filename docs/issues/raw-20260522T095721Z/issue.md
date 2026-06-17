@@ -8,5 +8,7 @@ platform_ids:
     issue_id: '2125'
 primary_platform: github
 platform_state: closed
-updated_at: '2026-06-17T00:25:53Z'
+updated_at: '2026-06-17T14:11:37Z'
+force_closed_at: '2026-06-17T14:11:37Z'
+force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
 ---
