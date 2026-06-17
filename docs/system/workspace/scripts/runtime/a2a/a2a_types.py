@@ -312,7 +312,6 @@ class Task:
     branch: str = ""
     completion_summary: str = ""
     evidence_paths: str = ""
-    worker_prompts_csv: str = ""
     worker_pid: str = ""
     delivery_status: str = "pending"
     error: str = ""
@@ -340,8 +339,6 @@ class Task:
         if self.branch: d["branch"] = self.branch
         if self.completion_summary: d["completionSummary"] = self.completion_summary
         if self.evidence_paths: d["evidencePaths"] = self.evidence_paths
-        if self.worker_prompts_csv: d["workerPromptsCsv"] = self.worker_prompts_csv
-        if self.worker_pid: d["workerPid"] = self.worker_pid
         if self.delivery_status: d["deliveryStatus"] = self.delivery_status
         if self.error: d["error"] = self.error
         if self.freely: d["freely"] = self.freely
@@ -367,7 +364,6 @@ class Task:
             branch=data.get("branch", ""),
             completion_summary=data.get("completionSummary", data.get("completion_summary", "")),
             evidence_paths=data.get("evidencePaths", data.get("evidence_paths", "")),
-            worker_prompts_csv=data.get("workerPromptsCsv", data.get("worker_prompts_csv", "")),
             worker_pid=data.get("workerPid", data.get("worker_pid", "")),
             delivery_status=data.get("deliveryStatus", data.get("delivery_status", "pending")),
             error=data.get("error", ""),

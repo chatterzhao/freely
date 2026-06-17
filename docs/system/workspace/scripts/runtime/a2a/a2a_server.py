@@ -249,7 +249,6 @@ class FreelyAgentExecutor(BaseAgentExecutor):
                 "branch": metadata.get("branch", ""),
                 "raw_key": metadata.get("raw_key", ""),
                 "message": query,
-                "worker_prompts_csv": metadata.get("worker_prompts_csv", ""),
                 "completion_summary": metadata.get("completion_summary", metadata.get("summary", "")),
                 "next_action": metadata.get("next_action", metadata.get("next", "")),
                 "evidence_paths": metadata.get("evidence_paths", metadata.get("evidence", "")),
@@ -431,7 +430,6 @@ class A2AServer:
                     "worktree": body.get("worktree", ""), "branch": body.get("branch", ""),
                     "raw_key": body.get("raw_key", body.get("rawKey", "")),
                     "completion_summary": body.get("summary", ""),
-                    "worker_prompts_csv": body.get("worker_prompts_csv", body.get("workers", "")),
                     "message": body.get("message", ""),
                 }
                 self.task_store.raw_rpc("a2a_task.update", dict(fields))
@@ -475,7 +473,7 @@ class A2AServer:
                   'failed':'failed','input-required':'input-required','canceled':'canceled'}
             fields = {}
             if "state" in body: fields["state"] = sm.get(body["state"], body["state"])
-            for k in ["completion_summary","evidence_paths","worker_prompts_csv","error",
+            for k in ["completion_summary","evidence_paths","error",
                        "reason","next_action","progress","summary","next","evidence"]:
                 if k in body: fields[k] = body[k]
             if "summary" in fields: fields.setdefault("completion_summary", fields.pop("summary"))
