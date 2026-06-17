@@ -30,22 +30,33 @@ echo ""
 
 # ── Step 1: Pull latest develop into current branch ──
 echo "Step 1/4: pulling latest $base into $current_branch..."
-if ! git pull origin "$base" 2>&1; then
+_pull_output=$(git pull origin "$base" 2>&1) || {
+  _conflicted_files=$(git diff --name-only --diff-filter=U 2>/dev/null || true)
   cat >&2 <<CONFLICT
-========================================
-冲突: $base 合并到 $current_branch 时出现冲突
 
-请在当前工位中手动解决冲突:
-  git mergetool 或手动编辑冲突文件
-  git add <resolved-files>
-  git commit
-
-然后重新运行:
-  ./bin/pr-create-guarded
-========================================
+╔══════════════════════════════════════════════════════════════╗
+║  [PR-CREATE-GUARD] 合并冲突 — $base → $current_branch         ║
+╠══════════════════════════════════════════════════════════════╣
+║  git pull 输出:                                               ║
+$(echo "$_pull_output" | tail -5 | sed 's/^/║  /')
+╠══════════════════════════════════════════════════════════════╣
+║  冲突文件:                                                    ║
+$([[ -n "$_conflicted_files" ]] && echo "$_conflicted_files" | sed 's/^/║    /' || echo '║    (无法列出冲突文件)')
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  解决冲突后继续:                                              ║
+║    1. 编辑冲突文件，解决冲突标记 (<<<<<<< / ======= / >>>>>>>)║
+║    2. git add <resolved-files>                               ║
+║    3. git commit                                             ║
+║    4. ./bin/pr-create-guarded                                ║
+║                                                              ║
+║  放弃合并，回到合并前状态:                                    ║
+║    git merge --abort                                         ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
 CONFLICT
   exit 1
-fi
+}
 echo ""
 
 # ── Step 2: dry-run merge gate ──
