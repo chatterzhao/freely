@@ -291,23 +291,34 @@ fi
 
 # ── Phase 3: Force-close trace (--force only) ──
 
-if [[ "$FORCE" == true && -z "$wt_path" ]]; then
-    :  # skip force-close trace for orphaned branches
-  elif [[ "$FORCE" == true && -n "$issue_id" && -f "${issue_file:-}" ]]; then
-  ts="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-  if [[ "$DRY_RUN" == true ]]; then
-    _dry "write force_closed trace to $issue_file"
-  else
-    _fm_set_str "$issue_file" "force_closed_at" "$ts"
-    _fm_set_str "$issue_file" "force_closed_reason" "${FORCE_REASON:-wt-close --force: worktree retired without completed phase_state}"
-    _fm_set_str "$issue_file" "updated_at" "$ts"
-    echo "wt-close: force-closed $issue_id (force_closed trace written to frontmatter)"
-  fi
-fi
+# pr-merge-guarded already writes phase_state=absorbed + force_closed trace
+# into the merge commit. Only write a force-close trace here if the frontmatter
+# was NOT already absorbed by a merge. Otherwise the merge commit's version wins.
+
+	if [[ "$FORCE" == true && -z "$wt_path" ]]; then
+	    :  # skip force-close trace for orphaned branches
+	  elif [[ "$FORCE" == true && -n "$issue_id" && -f "${issue_file:-}" ]]; then
+	  local _current_phase
+	  _current_phase="$(_fm_get "$issue_file" "phase_state")"
+	  if [[ "$_current_phase" == "absorbed" ]]; then
+	    echo "wt-close: frontmatter already absorbed by pr-merge-guarded, skipping force-close trace"
+	  else
+	    ts="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+	    if [[ "$DRY_RUN" == true ]]; then
+	      _dry "write force_closed trace to $issue_file"
+	    else
+	      _fm_set_str "$issue_file" "force_closed_at" "$ts"
+	      _fm_set_str "$issue_file" "force_closed_reason" "${FORCE_REASON:-wt-close --force: worktree retired without completed phase_state}"
+	      _fm_set_str "$issue_file" "updated_at" "$ts"
+	      echo "wt-close: force-closed $issue_id (force_closed trace written to frontmatter)"
+	    fi
+	  fi
+	fi
 
 # ── Phase 3.5: Frontmatter already absorbed by pr-merge-guarded ──
-# No local develop commit needed. The merge commit carries phase_state=absorbed,
-# force_closed_at, and absorbed_into. wt-close only removes the worktree + branch.
+# The merge commit carries phase_state=absorbed, force_closed_at, and
+# absorbed_into. wt-close only removes the worktree + branch.
+# Phase 3 above guards against overwriting this with --force.
 
 # ── Phase 4: Remote branch delete ──
 
