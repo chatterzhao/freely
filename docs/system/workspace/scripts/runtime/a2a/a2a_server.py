@@ -250,6 +250,11 @@ class FreelyAgentExecutor(BaseAgentExecutor):
                 "branch": metadata.get("branch", ""),
                 "raw_key": metadata.get("raw_key", ""),
                 "message": query,
+                "worker_prompts_csv": metadata.get("worker_prompts_csv", ""),
+                "completion_summary": metadata.get("completion_summary", metadata.get("summary", "")),
+                "next_action": metadata.get("next_action", metadata.get("next", "")),
+                "evidence_paths": metadata.get("evidence_paths", metadata.get("evidence", "")),
+                "session_id": metadata.get("session_id", ""),
             })
 
             # 4. Emit artifact with internal task reference
