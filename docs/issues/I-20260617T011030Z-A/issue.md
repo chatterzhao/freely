@@ -1,8 +1,8 @@
 ---
 local_id: I-20260617T011030Z-A
 kind: linked
-status: in_dev
-phase_state: done_b2_ibm
+status: completed
+phase_state: completed
 promoted_from: raw-20260617T011030Z
 source_candidate: docs/pre-brainstorms/20260617T011030Z--acp-a2a-refactor/candidates.md
 canonical_issue_path: ""
