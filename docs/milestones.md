@@ -3,6 +3,21 @@
 
 本文件是 Freely 自举开发时的主动扫描入口，用来承接已进入活跃范围的 candidate / issue。
 
+## M-20260616T224707Z-A
+- title: ACP Session ID 格式污染修复 — 兼容三种 AI CLI 的 Session ID 提取
+- status: active
+### candidate_issues
+1. `C-20260616T224707Z-A`
+- milestone: M-20260616T224707Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260616T224707Z-A/issue.md`
+### committed_issues
+1. `I-20260616T224707Z-A`
+- title: ACP Session ID 格式污染修复 — 兼容三种 AI CLI 的 Session ID 提取
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260616T224707Z-A/issue.md`
+
 ## M-20260616T143914Z-A
 - title: 规范流程文档治理 — 在 AGENTS.md/CONSTITUTION/skills 中补齐完整规范流程
 - status: active
@@ -1922,7 +1937,7 @@ routing_policy:
 1. `I-20260509T024559Z-A`
 - title: multi-project isolation architecture
 - milestone_state: committed
-- phase_state: `in_b2_ibm`
+- phase_state: `done_b2_ibm`
 - issue_path: `docs/issues/I-20260509T024559Z-A/issue.md`
 
 ## M-20260517T082422Z-A
@@ -2608,7 +2623,7 @@ routing_policy:
 1. `I-20260612T000223Z-A`
 - title: A2A 协议替换 Freely Handoff 架构重构
 - milestone_state: committed
-- phase_state: `in_b2_ibm`
+- phase_state: `done_b2_ibm`
 - issue_path: `docs/issues/I-20260612T000223Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260612T000223Z--a2a-replace-handoff/candidates.md#C-20260612T000223Z-A`
 
@@ -2626,7 +2641,7 @@ routing_policy:
 1. `I-20260615T001626Z-A`
 - title: 移除 A2A 文本 JSON 解析 Fallback (Phase 1+2)
 - milestone_state: committed
-- phase_state: `in_b2_ibm`
+- phase_state: `done_b2_ibm`
 - issue_path: `docs/issues/I-20260615T001626Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260615T001626Z--a2a-no-fallback/candidates.md#C-20260615T001626Z-A`
 
@@ -2716,17 +2731,23 @@ routing_policy:
 - verification_artifact_dir: `docs/epics/governance-enforce/code-reviews`
 
 ## M-20260616T044030Z-A
-- title: Complete config.toml migration
+- title: Complete config.toml migration — clean break, TOML-only, zero config.env
 - status: active
 ### candidate_issues
 1. `C-20260616T044030Z-A`
 - candidate_id: C-20260616T044030Z-A
 - milestone: M-20260616T044030Z-A
-- title: Complete config.toml migration with auto-migration and backward compatibility
+- title: Complete config.toml migration — clean break, TOML-only, zero config.env
 - status: promoted
 - promoted_issue_path: docs/issues/I-20260616T044030Z-A/issue.md
-- decision_reason: Auto-migration enables self-healing daemon startup
+- decision_reason: 彻底 TOML-only 方案 — 单一配置路径、零兼容负担、用户必须手工阅读注释配置
 - next_action: 进入 B2_IBM 物化
+### committed_issues
+1. `I-20260616T044030Z-A`
+- title: config.toml complete migration — clean break, TOML-only
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260616T044030Z-A/issue.md`
 
 ## M-20260616T110714Z-parse-env-removal
 - title: config.toml clean break — parse_env_file removal + quality fixes
