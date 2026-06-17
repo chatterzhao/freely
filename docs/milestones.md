@@ -1,4 +1,13 @@
 <!-- file_size_check: skip (auto-populated milestone index) -->
+## M-20260617T055840Z-A
+- title: Merge Guard + Rebase Integrity — branch protection 拦截直接 merge + post-rewrite hook
+- status: active
+### candidate_issues
+1. `C-20260617T055840Z-A`
+- milestone: M-20260617T055840Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260617T055840Z-A/issue.md`
+
 ## M-20260617T031719Z-A
 - title: ACP/A2A Final Review Fixes
 - status: active
