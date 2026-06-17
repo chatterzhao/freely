@@ -1,3 +1,12 @@
+## M-20260617T145428Z-A
+- title: Fix freely-db-cli syntax + AGENTS.md flow + hook skill routing
+- status: active
+### candidate_issues
+1. `C-20260617T145428Z-A`
+- milestone: M-20260617T145428Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260617T145428Z-A/issue.md`
+
 ## M-20260617T133709Z-A
 - title: Fix gh pr merge receipt
 - status: active
