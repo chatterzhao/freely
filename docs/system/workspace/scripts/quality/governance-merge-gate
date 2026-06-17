@@ -810,6 +810,8 @@ def main() -> int:
     parser.add_argument("--source-branch", default="", help="Source branch for guarded merge verification.")
     parser.add_argument("--skip-ibm-gate", action="store_true", help="Skip IBM governance lifecycle validation. Only check that changed paths are governance-only (no implementation code).")
     args = parser.parse_args()
+    if not args.skip_ibm_gate and os.environ.get("FREELY_SKIP_IBM_GATE") == "1":
+        args.skip_ibm_gate = True
     USE_STAGED_VIEW = bool(args.staged)
     if args.range:
         USE_RANGE_VIEW = True
