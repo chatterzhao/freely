@@ -12,5 +12,5 @@ platform_ids:
     url: https://github.com/chatterzhao/freely/issues/2815
 primary_platform: github
 post_hoc_corrections:
-  - 2026-06-16: aligned brainstorms.md/candidates.md/milestones.md solution description from "auto-migration" to "clean break TOML-only" to match actual implementation
+  - raw-20260616T153145Z: aligned brainstorms.md/candidates.md/milestones.md solution description from "auto-migration" to "clean break TOML-only" to match actual implementation
 ---
