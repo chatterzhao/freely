@@ -322,7 +322,9 @@ class AcpBridge:
                 line = self.server_proc.stderr.readline()
                 if not line:
                     break
-                self.log(f"server stderr: {line.rstrip()[:500]}")
+                self.log(f"server stderr: {line_str}")
+                if any(p in line_str.lower() for p in ("fatal", "panic", "internal error", "segfault", "out of memory", "cannot allocate", "unreachable")):
+                    self._fatal_detected = True
             except (ValueError, OSError):
                 break
 
@@ -338,6 +340,12 @@ class AcpBridge:
             # the freely supervisor to consume.
             if slot.get("method") == "session/prompt":
                 self._track_context_ratio(msg.get("result", {}))
+                result = msg.get("result", {})
+                sr = result.get("stopReason", "")
+                if sr == "end_turn" and self._fatal_detected:
+                    result["stopReason"] = "error"
+                elif sr == "end_turn" and self._idle_timeout_detected:
+                    result["stopReason"] = "idle_timeout"
         elif "method" in msg:
             # Server→client request/notification (e.g. session/request_permission).
             # Broadcast to ALL connected clients so they can respond.
