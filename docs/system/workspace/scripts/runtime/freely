@@ -12818,14 +12818,21 @@ manager_runtime_launch_workers_after_ai_cycle_if_needed() {
   local _prev_worker_id _prev_worker_summary _raw_key _parent_task_id _is_followthrough
   _a2a_task_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db_path=""$project/.freely/freely.db""
-  # A2A-native: query submitted worker tasks instead of CSV
+  # A2A-native: query submitted worker tasks with structured data.
+  # Output: task_id<TAB>message<TAB>worktree<TAB>branch<TAB>raw_key<TAB>skill (one per task)
   _worker_tasks=$(python3 "$_a2a_task_py" list --role worker --status submitted 2>/dev/null | python3 -c "
 import json,sys
 try:
     rows=json.load(sys.stdin)
     for r in rows:
-        pf=r.get('prompt_file','')
-        if pf: print(pf)
+        tid=r.get('task_id','')
+        msg=r.get('message','') or r.get('summary','')
+        wt=r.get('worktree','')
+        br=r.get('branch','')
+        rk=r.get('raw_key','')
+        sk=r.get('skill','')
+        if tid and msg:
+            print(f'{tid}\t{msg}\t{wt}\t{br}\t{rk}\t{sk}')
 except: pass
 " 2>/dev/null || true)
   # Get parent handoff_id (latest manager record)
@@ -12833,35 +12840,19 @@ except: pass
     python3 -c "import json,sys; print(json.load(sys.stdin).get('task_id',''))" 2>/dev/null || echo "")
   _launched_count=0
   if [[ -n "$_worker_tasks" ]]; then
-    while IFS= read -r _prompt_file; do
-      [[ -n "$_prompt_file" ]] || continue
-      # A2A-native: generate prompt file from Task.message if file doesn't exist
-      if [[ ! -f "$_prompt_file" ]]; then
-        local _task_msg
-        _task_msg=$(python3 "$_a2a_task_py" get --task-id "$_task_id" 2>/dev/null | python3 -c "
-import json,sys
-try:
-    r=json.load(sys.stdin)
-    print(r.get('message','') or r.get('summary','') or '')
-except: pass
-" 2>/dev/null || true)
-        if [[ -n "$_task_msg" ]]; then
-          mkdir -p "$(dirname "$_prompt_file")" 2>/dev/null || true
-          printf '%s\n' "$_task_msg" > "$_prompt_file"
-        else
-          continue
-        fi
-      fi
-      [[ -f "$_prompt_file" ]] || continue
+    while IFS=$'\t' read -r _task_id _task_msg _target_worktree _task_branch _raw_key _task_skill; do
+      [[ -n "$_task_id" && -n "$_task_msg" ]] || continue
+      # Derive prompt file path from task_id (ACR layer concern, not A2A)
+      local _prompts_dir="${_target_worktree:-$project}/.freely/run/a2a-prompts"
+      mkdir -p "$_prompts_dir" 2>/dev/null || true
+      _prompt_file="$_prompts_dir/task-${_task_id}.txt"
+      printf '%s\n' "$_task_msg" > "$_prompt_file"
       # Guard: skip if worktree already has an active worker
       local _target_worktree
-      _target_worktree="$(worker_prompt_target_worktree "$_prompt_file" 2>/dev/null || true)"
       if [[ -n "$_target_worktree" ]] && worktree_has_active_worker "$project" "$_target_worktree"; then
         log_warn "worker skipped: worktree busy — $_target_worktree"
         continue
       fi
-      # Extract raw_key from prompt filename
-      _raw_key="$(echo "$_prompt_file" | grep -oE '[0-9]{8}T[0-9]{4,6}Z' | head -1)"
       # Compute previous_worker_task_id: latest completed worker for same raw_key
       _prev_worker_id=""
       _prev_worker_summary=""
@@ -14520,7 +14511,7 @@ sync_exit_contract_to_a2a_tasks() {
 # Fallback: parse ```json block from AI reply text.
 # Returns: "ok:<exit_kind>" on success, "repair:<errors_json>" on failure.
 parse_a2a_task_json_reply() {
-  local project="$1" cycle_log="$2" role="$3" raw_key="$4" prompt_file="$5"
+  local project="$1" cycle_log="$2" role="$3" raw_key="$4"
   local _a2a_task_py _db_path _reply_text _result _action _exit_kind
   _a2a_task_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db_path="$project/.freely/freely.db"

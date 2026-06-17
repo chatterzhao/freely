@@ -264,7 +264,6 @@ class DbDaemon:
         existing_cols = {row[1] for row in c.execute("PRAGMA table_info(a2a_tasks)")}
         for col_name, col_def in [
             ("raw_key", "TEXT NOT NULL DEFAULT ''"),
-            ("prompt_file", "TEXT NOT NULL DEFAULT ''"),
             ("worktree", "TEXT NOT NULL DEFAULT ''"),
             ("branch", "TEXT NOT NULL DEFAULT ''"),
             ("exit_kind", "TEXT NOT NULL DEFAULT ''"),
@@ -1006,7 +1005,6 @@ def h_a2a_task_insert(daemon: DbDaemon, params: dict) -> dict:
             params.get("message", ""),
             now,
             now,
-            params.get("prompt_file", ""),
             params.get("worktree", ""),
             params.get("branch", ""),
             params.get("exit_kind", ""),

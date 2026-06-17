@@ -215,7 +215,6 @@ def _handoff_insert_params(args):
     return {
         "role": args.get("role", "manager"), "raw_key": args.get("raw_key", ""),
         "worktree": args.get("worktree", ""), "branch": args.get("branch", ""),
-        "prompt_file": args.get("prompt_file", ""), "parent": args.get("parent", ""),
         "prev_worker": args.get("prev_worker", ""), "intent_kind": args.get("intent_kind", ""),
         "status": args.get("status", "pending"), "exit_kind": args.get("exit_kind", ""),
         "reason": args.get("reason", ""), "restart_point": args.get("restart_point", ""),
@@ -243,7 +242,6 @@ def _handoff_parse_params(args):
         "context": {
             "role": args.get("role", "manager"), "raw_key": args.get("raw_key", ""),
             "worktree": args.get("worktree", ""), "branch": args.get("branch", ""),
-            "prompt_file": args.get("prompt_file", ""),
             "parent_handoff_id": args.get("parent_handoff_id", ""),
             "previous_worker_handoff_id": args.get("previous_worker_handoff_id", ""),
             "intent_kind": args.get("intent_kind", ""),
@@ -272,7 +270,6 @@ def _task_upsert_params(args):
         "task_id": args.get("task_id", ""), "name": args.get("name", ""),
         "state": args.get("state", "submitted"), "agent_id": args.get("agent_id", ""),
         "skill": args.get("skill", ""), "session_id": args.get("session_id", ""),
-        "prompt_file": args.get("prompt_file", ""), "worktree": args.get("worktree", ""),
         "branch": args.get("branch", ""), "exit_kind": args.get("exit_kind", ""),
         "reason": args.get("reason", ""),
         "completion_summary": args.get("completion_summary", ""),
@@ -282,7 +279,6 @@ def _task_upsert_params(args):
 
 def _task_update_params(args):
     p = {"task_id": args["task_id"]}
-    for k in ("state", "agent_id", "skill", "session_id", "prompt_file",
               "worktree", "branch", "exit_kind", "reason", "completion_summary",
               "worker_prompts_csv", "error", "worker_pid", "delivery_status"):
         if k in args and args[k]:

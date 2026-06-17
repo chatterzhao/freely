@@ -308,7 +308,6 @@ class Task:
     metadata: Optional[Dict] = None
     # Freely extension fields
     raw_key: str = ""
-    prompt_file: str = ""
     worktree: str = ""
     branch: str = ""
     completion_summary: str = ""
@@ -338,8 +337,6 @@ class Task:
         if self.metadata: d["metadata"] = self.metadata
         # Freely fields
         if self.raw_key: d["rawKey"] = self.raw_key
-        if self.prompt_file: d["promptFile"] = self.prompt_file
-        if self.worktree: d["worktree"] = self.worktree
         if self.branch: d["branch"] = self.branch
         if self.completion_summary: d["completionSummary"] = self.completion_summary
         if self.evidence_paths: d["evidencePaths"] = self.evidence_paths
@@ -366,7 +363,6 @@ class Task:
             updated_at=data.get("updatedAt", data.get("updated_at", "")),
             metadata=data.get("metadata"),
             raw_key=data.get("rawKey", data.get("raw_key", "")),
-            prompt_file=data.get("promptFile", data.get("prompt_file", "")),
             worktree=data.get("worktree", ""),
             branch=data.get("branch", ""),
             completion_summary=data.get("completionSummary", data.get("completion_summary", "")),
