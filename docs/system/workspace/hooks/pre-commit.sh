@@ -278,23 +278,21 @@ MSG
     fi
     cat <<MSG
 [HOOK] Commit blocked: direct development on '$branch' is forbidden.
-This repo enforces worktree mode for feature development.
-Use the standard git worktree flow from the project root:
 
-Run:
-  cd <your-project-name-path>
-  ./bin/wt-create feature/<task-name> --base develop
-  cd ../<your-project-name>-worktrees/<derived-branch-dir>
+Read AGENTS.md §核心开发流程, then invoke the correct skill:
 
-`wt-create` derives the correct sibling worktree path and initializes managed tool boundaries there.
-If you must use raw 'git worktree add', immediately follow it with:
-  ./bin/freely sync-tooling --source-project <your-project-name-path> --project ../<your-project-name>-worktrees/<derived-branch-dir>
+  Bug fix  → skill:freely-fix-execution   (Fix first, govern later)
+  Feature  → skill:freely-feat-execution  (Govern first, then code)
 
-When the work is finished and merged, clean up with:
-  ./bin/wt-close feature/<task-name>
+Quick start:
+  cd <project-root>
+  ./bin/wt-create --raw-key <key> --source <platform|chat-inbox> --skill <skill> --slug <slug>
+  cd ../<project>-worktrees/<branch-dir>
 
-If you skip this workflow, hooks will create the worktree when possible and print guidance.
-Do not keep committing in the current directory.
+Do NOT work around this hook. Bypass attempts (skip-worktree, --no-verify,
+removing remotes, etc.) violate CONSTITUTION.md §5.
+The skills enforce the full IBM lifecycle:
+  feedback → wt-create → B1_IBM → B2_IBM → dev → pr-create → pr-merge → wt-close
 MSG
     exit 1
     ;;
