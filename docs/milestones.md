@@ -1,3 +1,19 @@
+## M-20260617T095105Z-A
+- title: A2A-Native Delegation — eliminate CSV, Task.message delegation
+- status: active
+### candidate_issues
+1. `C-20260617T095105Z-A`
+- milestone: M-20260617T095105Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260617T095105Z-A/issue.md`
+### committed_issues
+1. `I-20260617T095105Z-A`
+- title: A2A-Native Delegation
+- milestone_state: committed
+- phase_state: `in_b2_ibm`
+- issue_path: `docs/issues/I-20260617T095105Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/a2a-native-delegation/code-reviews`
+
 ## M-20260617T090413Z-A
 - title: REST routing for a2a-exit worker_prompts_csv
 - status: active
