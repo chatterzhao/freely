@@ -51,9 +51,16 @@ intent_target: <简短描述>
 
 ### 委派步骤
 
+**关键**：你运行在 ACP session 中（opencode/claude/codex 等 AI CLI tool）。
+Worker 是独立的 ACP fork session，由 Runtime 通过 A2A Server 管理。
+**禁止**使用本地 `task` 工具做 Worker 委派——那是 session-local 的，不会触发 Runtime 启动 Worker。
+
 1. **开工位**：目标 worktree 不存在 → `./bin/wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>`
-2. **写 prompt**：`.freely/run/worker-prompts/<ts>-worker-<slug>.txt`，header + Task
+2. **写 prompt**：用 `write` 工具写 `.freely/run/worker-prompts/<ts>-worker-<slug>.txt`，header + Task
 3. **调用 a2a-exit**：`a2a-exit --state submitted --workers "prompt路径"`（见文末 A2A Task State 节）
+
+Runtime 检测到新的 worker prompt 文件后，通过 A2A Server TaskStore 创建 task，
+然后以 ACP fork session 启动 Worker。Worker 完成后通过 A2A `tasks/push` 汇报状态。
 
 ## 收口判断
 

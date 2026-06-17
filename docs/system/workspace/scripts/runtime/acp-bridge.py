@@ -502,7 +502,11 @@ class AcpBridge:
         return sid
 
     def session_ping(self, session_id, timeout=10):
-        """Send session/ping to test AI liveness. Returns True if pong received."""
+        """Send session/ping to test AI liveness AND reset activity timer.
+        If A2A workers are alive, call this periodically to prevent idle timeout.
+        Returns True if pong received."""
+        with self.activity_lock:
+            self.last_activity_ts = time.time()  # reset idle timer
         try:
             result = self._send_request("session/ping", {"sessionId": session_id}, timeout=timeout)
             return result.get("status") == "ok" or "pong" in str(result).lower()
