@@ -2,7 +2,7 @@
 local_id: raw-20260617T160807Z
 kind: raw
 phase_state: absorbed
-absorbed_into: 'I-20260617T160807Z-A'
+absorbed_into: I-20260617T160807Z-A
 platform_ids:
   github:
     issue_id: '2936'
@@ -18,6 +18,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+force_closed_at: '2026-06-17T16:11:12Z'
+force_closed_reason: 'pr-merge-guarded: absorbed by merge'
 ---
 
 ## Bug
