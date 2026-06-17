@@ -19,7 +19,7 @@ channel: github
 session_refs: []
 force_closed_at: '2026-06-17T15:11:12Z'
 force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
-absorbed_into: ''
+absorbed_into: 'I-20260617T145428Z-A'
 ---
 
 ## Bug 1: freely-db-cli IndentationError

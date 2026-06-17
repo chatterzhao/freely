@@ -20,6 +20,7 @@ session_refs: []
 platform_state: closed
 force_closed_at: '2026-06-17T14:11:27Z'
 force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
+absorbed_into: 'I-20260522T071901Z-A'
 ---
 
 1. codex_infer_slot_kind_from_slot: account-*/apikey-* → *-account-*/ *-apikey-*，兼容全名
