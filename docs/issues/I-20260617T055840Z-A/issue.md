@@ -2,7 +2,7 @@
 local_id: I-20260617T055840Z-A
 kind: linked
 status: in_dev
-phase_state: done_b2_ibm
+phase_state: completed
 promoted_from: raw-20260617T055840Z
 source_candidate: docs/pre-brainstorms/20260617T055840Z--merge-guard-rebase-integrity/candidates.md
 canonical_issue_path: ""
