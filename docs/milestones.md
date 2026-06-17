@@ -1,4 +1,19 @@
 <!-- file_size_check: skip (auto-populated milestone index) -->
+## M-20260617T031719Z-A
+- title: ACP/A2A Final Review Fixes
+- status: active
+### candidate_issues
+1. `C-20260617T031719Z-A`
+- milestone: M-20260617T031719Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260617T031719Z-A/issue.md`
+### committed_issues
+1. `I-20260617T031719Z-A`
+- title: ACP/A2A Final Review Fixes
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260617T031719Z-A/issue.md`
+
 
 ## M-20260616T111514Z-A
 - title: write_config heredoc → Python 序列化 + 补齐 posture 字段
@@ -453,7 +468,7 @@ routing_policy:
 1. `I-20260508T120000Z-A`
 - title: wt-create fix
 - milestone_state: committed
-- phase_state: `in_verification`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T120000Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260508T120000Z--wt-create-fix/candidates.md`
 - verification_artifact_dir: `docs/epics/wt-create-fix/code-reviews`
@@ -471,7 +486,7 @@ routing_policy:
 1. `I-20260507T143546Z-A`
 - title: platform pull title standardization
 - milestone_state: committed
-- phase_state: `in_verification`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260507T143546Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507T143546Z--platform-pull-standardize/candidates.md`
 - verification_artifact_dir: `docs/epics/platform-pull-standardize/code-reviews`
@@ -488,7 +503,7 @@ routing_policy:
 1. `I-20260508T005431Z-A`
 - title: skill standardization
 - milestone_state: committed
-- phase_state: `in_verification`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T005431Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260508T005431Z--skill-standardize/candidates.md`
 - verification_artifact_dir: `docs/epics/skill-standardize/code-reviews`
@@ -505,7 +520,7 @@ routing_policy:
 1. `I-20260507T143545Z-A`
 - title: timestamp seconds upgrade
 - milestone_state: committed
-- phase_state: `in_verification`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260507T143545Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507T143545Z--timestamp-seconds-upgrade/candidates.md`
 - verification_artifact_dir: `docs/epics/timestamp-seconds-upgrade/code-reviews`
@@ -522,7 +537,7 @@ routing_policy:
 1. `I-20260508T004541Z-A`
 - title: skill ref cleanup
 - milestone_state: committed
-- phase_state: `in_verification`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T004541Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260508T004541Z--skill-ref-cleanup/candidates.md`
 - verification_artifact_dir: `docs/epics/skill-ref-cleanup/code-reviews`
@@ -540,7 +555,7 @@ routing_policy:
 1. `I-20260508T011858Z-A`
 - title: skill gate alignment
 - milestone_state: committed
-- phase_state: `in_verification`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T011858Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260508T011858Z--skill-gate-alignment/candidates.md`
 - verification_artifact_dir: `docs/epics/skill-gate-alignment/code-reviews`
@@ -557,7 +572,7 @@ routing_policy:
 1. `I-20260507T143544Z-A`
 - title: raw-issue-pull interception guard + CLI dispatch
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260507T143544Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507T143544Z--intercept-guard/candidates.md`
 - verification_artifact_dir: `docs/epics/raw-issue-pull-intercept/code-reviews`
@@ -574,7 +589,7 @@ routing_policy:
 1. `I-20260507T0700Z-A`
 - title: unified platform layer
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260507T0700Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507-unified-platform/candidates.md`
 - verification_artifact_dir: `docs/epics/unified-platform/code-reviews`
@@ -590,7 +605,7 @@ routing_policy:
 1. `I-20260507T0730Z-A`
 - title: wt-create --source parameter
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260507T0730Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507-source-param/candidates.md`
 - verification_artifact_dir: `docs/epics/source-param/code-reviews`
@@ -606,7 +621,7 @@ routing_policy:
 1. `I-20260507T0600Z-A`
 - title: raw-issue-pull
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260507T0600Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507-raw-issue-pull/candidates.md`
 - verification_artifact_dir: `docs/epics/raw-issue-pull/code-reviews`
@@ -622,7 +637,7 @@ routing_policy:
 1. `I-20260507T0300Z-A`
 - title: GATE 1 timestamp check
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260507T0300Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507-gate1-timestamp/candidates.md`
 - verification_artifact_dir: `docs/epics/gate1-timestamp/code-reviews`
@@ -638,7 +653,7 @@ routing_policy:
 1. `I-20260507T0200Z-A`
 - title: promoted gate fix
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260507T0200Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507-promoted-gate-fix/candidates.md`
 - verification_artifact_dir: `docs/epics/promoted-gate-fix/code-reviews`
@@ -654,7 +669,7 @@ routing_policy:
 1. `I-20260507T0100Z-A`
 - title: fix-execution branch naming
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260507T0100Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507-fix-branch-naming/candidates.md`
 - verification_artifact_dir: `docs/epics/fix-branch-naming/code-reviews`
@@ -673,7 +688,7 @@ routing_policy:
 1. `I-20260506T1400Z-A`
 - title: pr-merge-guarded fix/* whitelist
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260506T1400Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260506-pr-merge-guarded-fix/candidates.md`
 - verification_artifact_dir: `docs/epics/pr-merge-guarded-fix-whitelist/code-reviews`
@@ -700,7 +715,7 @@ routing_policy:
 1. `I-20260506T1200Z-A`
 - title: Skill rename to B1_IBM/B2_IBM + I→B→M skeleton
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260506T1200Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260506-ibm-skill-rename/candidates.md`
 - verification_artifact_dir: `docs/epics/ibm-skill-rename/code-reviews`
@@ -849,7 +864,7 @@ routing_policy:
 8. `I-20260421-1530-A`
 - title: Live-status scan summary and prompt anchor governance
 - milestone_state: committed
-- phase_state: `in_verification`
+- phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/issues/live-status-scan-summary-and-prompt-anchor-governance.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-live-status-scan-summary-and-prompt-anchor-governance.md`
@@ -914,7 +929,7 @@ routing_policy:
 29. `I-20260505T1210Z-A-C`
 - title: governance gate state consistency + schema validation
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/issue-state-refactor/issues/I-20260505T1210Z-A-C.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-issue-state-refactor.md`
@@ -928,7 +943,7 @@ routing_policy:
 28. `I-20260505T1210Z-A-B`
 - title: issue-sync 只写 platform_state
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/issue-state-refactor/issues/I-20260505T1210Z-A-B.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-issue-state-refactor.md`
@@ -942,7 +957,7 @@ routing_policy:
 27. `I-20260505T1210Z-A`
 - title: scan 常量对齐 IBM Framework §89 + 迁移现有 issue
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/issue-state-refactor/issues/I-20260505T1210Z-A.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-issue-state-refactor.md`
@@ -982,7 +997,7 @@ routing_policy:
 8. `I-20260501-0000-A`
 - title: PR scan surface + FREELY_REPO_PLATFORMS config
 - milestone_state: committed
-- phase_state: `in_verification`
+- phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/scan-pr-platform-config/issues/I-20260501-0000-A.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-scan-pr-platform-config.md`
@@ -1826,7 +1841,7 @@ routing_policy:
 1. `I-20260508T111130Z-A`
 - title: reference-transaction hook delete fix
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T111130Z-A/issue.md`
 
 ## M-20260508T124041Z-A
@@ -1841,7 +1856,7 @@ routing_policy:
 1. `I-20260508T124041Z-A`
 - title: wt-create pull deferred to after worktree creation
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T124041Z-A/issue.md`
 
 ## M-20260508T133423Z-A
@@ -1901,7 +1916,7 @@ routing_policy:
 1. `I-20260508T232413Z-A`
 - title: pr-merge-guarded IBM phase guidance
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T232413Z-A/issue.md`
 
 1. `I-20260508T154706Z-A`
