@@ -1,3 +1,19 @@
+## M-20260617T110109Z-A
+- title: Remove prompt_file from A2A layer
+- status: active
+### candidate_issues
+1. `C-20260617T110109Z-A`
+- milestone: M-20260617T110109Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260617T110109Z-A/issue.md`
+### committed_issues
+1. `I-20260617T110109Z-A`
+- title: Remove prompt_file from A2A
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260617T110109Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/remove-prompt-file/code-reviews`
+
 ## M-20260617T103956Z-A
 - title: Complete CSV elimination + A2A SendMessage delegation
 - status: active
