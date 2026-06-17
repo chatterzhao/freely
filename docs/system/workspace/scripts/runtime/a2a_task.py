@@ -382,7 +382,6 @@ get_launched_pids = launched_pids
 # ── AI Reply Processing ──────────────────────────────────────────────────
 
 def process_ai_reply(reply_text: str, role: str = "manager", raw_key: str = "",
-                     prompt_file: str = "", worktree: str = "",
                      branch: str = "", session_id: str = "") -> dict:
     """Process AI reply: extract A2A state, create/update Task via A2A Server.
 
@@ -411,7 +410,6 @@ def process_ai_reply(reply_text: str, role: str = "manager", raw_key: str = "",
             skill=fields.get("skill", ""),
             agent_id=role, name=role,
             raw_key=raw_key, worktree=worktree, branch=branch,
-            prompt_file=prompt_file, session_id=session_id,
             message=fields.get("summary", ""),
             state=state,
             summary=fields.get("summary", ""),
@@ -485,7 +483,6 @@ def _main() -> int:
     p_create.add_argument("--worktree", default="")
     p_create.add_argument("--branch", default="")
     p_create.add_argument("--raw-key", default=None)
-    p_create.add_argument("--prompt-file", default="")
     p_create.add_argument("--message", default="")
     p_create.add_argument("--agent-id", default="manager")
 
@@ -494,7 +491,6 @@ def _main() -> int:
     p_insert.add_argument("--raw-key", default="")
     p_insert.add_argument("--worktree", default="")
     p_insert.add_argument("--branch", default="")
-    p_insert.add_argument("--prompt-file", default="")
     p_insert.add_argument("--intent-kind", default="")
 
     p_get = sub.add_parser("get")
@@ -526,7 +522,6 @@ def _main() -> int:
     p_parse.add_argument("--reply-text", default="")
     p_parse.add_argument("--role", default="manager")
     p_parse.add_argument("--raw-key", default="")
-    p_parse.add_argument("--prompt-file", default="")
     p_parse.add_argument("--worktree", default="")
     p_parse.add_argument("--branch", default="")
     p_parse.add_argument("--session-id", default="")
@@ -589,7 +584,6 @@ def _main() -> int:
     p_exit.add_argument("--raw-key", default="", help="Raw issue key")
     p_exit.add_argument("--worktree", default="", help="Worktree path")
     p_exit.add_argument("--branch", default="", help="Branch name")
-    p_exit.add_argument("--prompt-file", default="", help="Prompt file path")
     p_exit.add_argument("--task-id", default="", help="Existing task ID (updates instead of creating)")
     p_exit.add_argument("--session-id", default="", help="Session ID")
 
@@ -624,7 +618,6 @@ def _main() -> int:
                 worktree=getattr(args, 'worktree', '') or "",
                 branch=getattr(args, 'branch', '') or "",
                 raw_key=getattr(args, 'raw_key', None) or "",
-                prompt_file=getattr(args, 'prompt_file', '') or "",
                 message=getattr(args, 'message', '') or "",
                 agent_id=getattr(args, 'agent_id', 'manager') or "manager")
             print(json.dumps({"task_id": tid}))
@@ -634,7 +627,6 @@ def _main() -> int:
                 raw_key=getattr(args, 'raw_key', '') or "",
                 worktree=getattr(args, 'worktree', '') or "",
                 branch=getattr(args, 'branch', '') or "",
-                prompt_file=getattr(args, 'prompt_file', '') or "",
                 skill=getattr(args, 'intent_kind', '') or "")
             print(json.dumps({"task_id": tid}))
         elif args.cmd == "get":
@@ -681,7 +673,6 @@ def _main() -> int:
                 reply_text=reply_text,
                 role=getattr(args, 'role', 'manager') or "manager",
                 raw_key=getattr(args, 'raw_key', '') or "",
-                prompt_file=getattr(args, 'prompt_file', '') or "",
                 worktree=getattr(args, 'worktree', '') or "",
                 branch=getattr(args, 'branch', '') or "",
                 session_id=getattr(args, 'session_id', '') or "")
@@ -810,7 +801,6 @@ def _main() -> int:
                         raw_key=getattr(args, 'raw_key', '') or "",
                         worktree=getattr(args, 'worktree', '') or "",
                         branch=getattr(args, 'branch', '') or "",
-                        prompt_file=getattr(args, 'prompt_file', '') or "",
                         session_id=getattr(args, 'session_id', '') or "",
                         message=getattr(args, 'summary', '') or "",
                         state=state,
