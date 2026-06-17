@@ -392,6 +392,7 @@ main() {
   echo "$child_pid"
 
   # ── Monitor loop (transport monitoring) ──
+  local _ping_counter=0
   while kill -0 "$child_pid" 2>/dev/null; do
     # Live failure detection (log-based patterns)
     if [[ -n "$failure_marker_file" || -n "$network_failure_marker_file" || -n "$bridge_lost_marker_file" ]]; then
@@ -416,6 +417,27 @@ main() {
       break
     fi
 
+    # Periodic session/ping to reset bridge idle timer when A2A workers may be active.
+    # Runs every ~60s; prevents 900s idle timeout from killing bridge during long worker runs.
+    if (( _ping_counter % 60 == 0 )); then
+      local _session_id
+      _session_id=$(grep -oE 'ses_[A-Za-z0-9]+' "$log_file" 2>/dev/null | head -1 || true)
+      if [[ -n "$_session_id" ]]; then
+        python3 -c "
+import json, socket, time
+try:
+    sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    sock.settimeout(10)
+    sock.connect('$(_bridge_socket "$project")')
+    req = json.dumps({'jsonrpc':'2.0','id':1,'method':'session/ping','params':{'sessionId':'$_session_id'}})
+    sock.sendall(f'POST / HTTP/1.1\r\nContent-Type: application/json\r\nContent-Length: {len(req)}\r\n\r\n{req}'.encode())
+    sock.recv(4096)
+    sock.close()
+except: pass
+" 2>/dev/null || true
+      fi
+    fi
+    _ping_counter=$((_ping_counter + 1))
     sleep 1
   done
 
