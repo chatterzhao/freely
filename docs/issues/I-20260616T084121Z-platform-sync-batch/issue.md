@@ -11,9 +11,9 @@ platform_ids:
     issue_id: '2867'
     url: https://github.com/chatterzhao/freely/issues/2867
     synced_at: '2026-06-17T00:21:34Z'
-updated_at: '2026-06-17T00:21:34Z'
+updated_at: '2026-06-17T16:38:28Z'
 created_at: '2026-06-17T00:21:34Z'
-platform_state: open
+platform_state: closed
 ---
 
 # Issue: Platform Sync Batch — raw-20260616T084121Z
