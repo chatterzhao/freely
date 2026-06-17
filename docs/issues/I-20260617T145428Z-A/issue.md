@@ -5,19 +5,24 @@ status: in_dev
 phase_state: completed
 promoted_from: raw-20260617T145428Z
 source_candidate: docs/pre-brainstorms/20260617T145428Z--freely-db-cli-agents-fix/candidates.md
-canonical_issue_path: ""
-platform_ids: {}
-primary_platform: ""
+canonical_issue_path: ''
+platform_ids:
+  github:
+    issue_id: '2945'
+    url: https://github.com/chatterzhao/freely/issues/2945
+    synced_at: '2026-06-17T17:08:52Z'
+primary_platform: github
 last_synced_comment_at: {}
-hash: ""
-created_at: 2026-06-17T14:54:28Z
-updated_at: 2026-06-17T14:54:28Z
-intake_id: ""
+hash: ''
+created_at: 2026-06-17 14:54:28+00:00
+updated_at: '2026-06-17T17:08:52Z'
+intake_id: ''
 author: zhaoquan
 channel: freely-fix-execution
 session_refs: []
 pre_tests_path: docs/epics/freely-db-cli-agents-fix/verification/pre-tests.md
 verification_artifact_dir: docs/epics/freely-db-cli-agents-fix/code-reviews
+platform_state: open
 ---
 
 # I-20260617T145428Z-A: Fix freely-db-cli syntax + AGENTS.md flow + hook skill routing
