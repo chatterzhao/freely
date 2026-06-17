@@ -1,20 +1,36 @@
 # CI guard: block GitHub Merge button and enforce the correct merge workflow.
 #
-# How this works:
-#   1. This workflow creates a check named "governance/pr-merge-guard" in "in_progress" state.
-#   2. GitHub branch protection on develop requires this check to pass.
-#   3. Only pr-merge-guarded (running locally) can set this check to "success" via GitHub API.
-#   4. Result: GitHub UI "Merge pull request" button is greyed out until pr-merge-guarded runs.
+# ── How this works ──────────────────────────────────────────────
+#   1. This workflow creates a check "governance/pr-merge-guard" (in_progress).
+#   2. Branch protection on develop REQUIRES this check to pass.
+#   3. Only pr-merge-guarded sets it to "success" via GitHub API.
+#   4. Result: GitHub UI merge button is greyed out.
 #
-# Branch protection setup (repo admin, one-time):
-#   Settings → Branches → Add rule for "develop":
-#     ☑ Require status checks to pass before merging
-#       Search: "governance/pr-merge-guard"
-#     ☑ Do not allow bypassing the above settings
+# ── One-time setup (after `freely init`) ────────────────────────
+#   Run this ONCE to enable branch protection on develop:
 #
-# Correct merge workflow:
+#     gh api repos/{owner}/{repo}/branches/develop/protection \
+#       --method PUT --input - <<'JSON'
+#     {
+#       "required_status_checks": {
+#         "strict": true,
+#         "contexts": ["governance/pr-merge-guard"]
+#       },
+#       "enforce_admins": false,
+#       "required_pull_request_reviews": null,
+#       "restrictions": null,
+#       "allow_force_pushes": false,
+#       "allow_deletions": false
+#     }
+#     JSON
+#
+#   Or via UI: Settings → Branches → Add rule → "develop"
+#     ☑ Require status checks → search "governance/pr-merge-guard"
+#     ☑ Require branches to be up to date before merging
+#
+# ── Correct merge workflow ──────────────────────────────────────
 #   ./bin/pr-merge-guarded develop <source-branch>
-#   (NOT the GitHub Merge button)
+#   (NEVER the GitHub Merge button)
 
 name: PR Merge Guard
 
