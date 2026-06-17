@@ -1,6 +1,6 @@
 ---
 name: freely-fix-execution
-description: 快速修复 bug 的特殊高效策略——用 test-pre-merge-* 私有工位隔离快测，cp 到可写工位正式提交，不违背保护分支的本质约束。
+description: 快速修复 bug 的特殊高效策略——wt-create→实现→B1_IBM→B2_IBM→pr-create-guarded→pr-merge-guarded→wt-close。Fix first, govern later。用 test-pre-merge-* 私有工位隔离快测，cp 到可写工位正式提交，不违背保护分支的本质约束。
 ---
 
 # skill:freely-fix-execution
@@ -158,7 +158,7 @@ hotfix/*          → main
   ├─ skill:freely-dev-loop-execution → code-review（必须 ## Implementation Decision Note）+ pre-tests
   └─ milestones.md
 
-阶段 4a — 提 PR
+阶段 4 — 提 PR（`freely pr-create-guarded` 命令）
   │
   ├─ 在 fix worktree 中执行 `freely pr-create-guarded` 命令
   ├─ 自动完成：pull develop → 冲突处理 → dry-run gate → push → gh pr create
@@ -167,7 +167,7 @@ hotfix/*          → main
 阶段 4b — 门禁合并
   │
   ├─ 切换到 develop 分支：git checkout develop
-  ├─ 在 develop 分支执行 `freely pr-merge-guarded develop fix/<name>` 命令
+  ├─ 在 develop 分支执行 `freely pr-merge-guarded develop fix/<name>` 命令 命令
   ├─ 自动完成：PR gate → promotion gate → gh pr merge → 本地同步 → 推送全部 remote → issue 同步
   ├─ 禁止用 gh pr merge --admin 命令替代
   ├─ 紧急: freely pr-merge-guarded develop hotfix/<name>
@@ -191,6 +191,8 @@ hotfix/*          → main
 - **原 feature 还在就直接在上面修**，不新建工位。
 - **治理后置**，验证通过再写。
 - **根因深挖**，不修表面症状。
+- `freely pr-create-guarded` 命令和 `freely pr-merge-guarded` 命令是提 PR 和合并的唯一合法入口。**禁止用 gh pr create、gh pr merge --admin、git push --force、git merge 等原子命令替代。**
+- `freely pr-merge-guarded` 命令必须在 develop 分支执行，不在 worktree 分支执行。
 - **不跳过门禁**，`freely pr-create-guarded` 命令和 `freely pr-merge-guarded` 命令是提 PR 和合并的唯一合法入口。
 - **禁止用原子命令绕过**：gh pr create、gh pr merge --admin、git push --force、git merge 等原子命令不得替代 pr-create-guarded / pr-merge-guarded 命令。
 
