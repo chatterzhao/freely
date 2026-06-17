@@ -15,7 +15,7 @@
 1. `I-20260617T011030Z-A`
 - title: ACP/A2A 架构重构 — 统一协议层 + 事件溯源 WAL + 跨 tool 委托 + 全状态暴露
 - milestone_state: committed
-- phase_state: `in_b2_ibm`
+- phase_state: `done_b2_ibm`
 - issue_path: `docs/issues/I-20260617T011030Z-A/issue.md`
 
 ## M-20260616T224707Z-A
