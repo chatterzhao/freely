@@ -1,3 +1,19 @@
+## M-20260617T160807Z-A
+- title: Fix wt-close --force local crash
+- status: active
+### candidate_issues
+1. `C-20260617T160807Z-A`
+- milestone: M-20260617T160807Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260617T160807Z-A/issue.md`
+### committed_issues
+1. `I-20260617T160807Z-A`
+- title: Fix wt-close --force local crash
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260617T160807Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/wt-close-local-fix/code-reviews`
+
 ## M-20260617T160003Z-A
 - title: Fix wt-close --force overwriting pr-merge-guarded frontmatter
 - status: active
