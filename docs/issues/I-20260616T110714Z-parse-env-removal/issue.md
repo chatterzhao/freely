@@ -7,6 +7,14 @@ source_candidate: docs/pre-brainstorms/20260616T110714Z--parse-env-file-removal/
 canonical_issue_path: docs/issues/I-20260616T110714Z-parse-env-removal/issue.md
 verification_artifact_dir: docs/epics/config-toml-complete/code-reviews
 primary_platform: github
+platform_ids:
+  github:
+    issue_id: '2869'
+    url: https://github.com/chatterzhao/freely/issues/2869
+    synced_at: '2026-06-17T00:25:04Z'
+updated_at: '2026-06-17T00:25:04Z'
+created_at: '2026-06-17T00:25:04Z'
+platform_state: open
 ---
 
 # Issue: config.toml clean break — parse_env_file removal + quality fixes

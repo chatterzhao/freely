@@ -13,12 +13,13 @@ canonical_issue_path: docs/issues/I-20260612T140944Z-A/issue.md
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-12T14:10:01Z'
-updated_at: '2026-06-13T01:10:00Z'
+updated_at: '2026-06-17T00:26:25Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs:
 - fix/raw-20260612T140944Z-a2a-handoff-compat
+platform_state: closed
 ---
 
 原始 scope: a2a_tasks 表 raw_key 列 INSERT 遗漏。

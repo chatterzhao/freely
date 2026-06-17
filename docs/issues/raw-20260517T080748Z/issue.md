@@ -12,7 +12,7 @@ platform_ids:
     issue_id: '468'
     url: https://github.com/chatterzhao/freely/issues/468
     synced_at: '2026-05-17T08:07:57Z'
-updated_at: '2026-05-17T08:07:57Z'
+updated_at: '2026-06-17T00:22:52Z'
 primary_platform: github
 platform_state: closed
 ---

@@ -9,7 +9,7 @@ source: chat-inbox
 created_at: '2026-05-13T07:59:04Z'
 title: 'pr-merge-guarded: _sync_issues_changed_in_merge reads fm.get(''status'') but
   I-* issues use phase_state'
-updated_at: 2026-05-17T04:47:25Z
+updated_at: '2026-06-17T00:25:55Z'
 platform_ids:
   github:
     issue_id: '329'

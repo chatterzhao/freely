@@ -12,12 +12,12 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: 2026-05-27 08:12:15+00:00
-updated_at: '2026-05-30T05:39:10Z'
+updated_at: '2026-06-17T00:20:42Z'
 intake_id: ''
 author: zhaoquan
 channel: local
 session_refs: []
-platform_state: open
+platform_state: closed
 ---
 
 ## Problem

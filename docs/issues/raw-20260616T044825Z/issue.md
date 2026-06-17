@@ -8,6 +8,8 @@ description: BRIDGE_TIMEOUT=1800s imposes an absolute 30-minute wall-clock limit
   idle timeout.
 phase_state: absorbed
 absorbed_into: I-20260616T044825Z-A
+platform_state: closed
+updated_at: '2026-06-17T00:18:59Z'
 ---
 
 BRIDGE_TIMEOUT=1800s imposes an absolute 30-minute wall-clock limit on session/prompt in acp-bridge.py. This kills legitimate long-running AI sessions even when the AI is actively producing output. Industry standard (6 ACP projects checked): none use absolute caps, only idle timeouts.
