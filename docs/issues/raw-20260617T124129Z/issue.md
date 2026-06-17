@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260617T124129Z
 kind: raw
-phase_state: proposed
+phase_state: absorbed
 platform_ids:
   github:
     issue_id: '2922'
@@ -17,6 +17,9 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+force_closed_at: '2026-06-17T12:52:54Z'
+force_closed_reason: 'pr-create-guarded: absorbed by merge'
+absorbed_into: ''
 ---
 
 ## 问题
