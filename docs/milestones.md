@@ -14,20 +14,24 @@
 - issue_path: `docs/issues/I-20260617T145428Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/freely-db-cli-agents-fix/code-reviews`
 
-
 ## M-20260617T133709Z-A
 - title: Fix gh pr merge receipt
+
+## M-20260617T131746Z-A
+- title: Fix pull || true
 - status: active
 ### candidate_issues
-1. `C-20260617T133709Z-A`
+1. `C-20260617T131746Z-A`
+- milestone: M-20260617T131746Z-A
 - status: promoted
-- promoted_issue_path: `docs/issues/I-20260617T133709Z-A/issue.md`
+- promoted_issue_path: `docs/issues/I-20260617T131746Z-A/issue.md`
 ### committed_issues
-1. `I-20260617T133709Z-A`
+1. `I-20260617T131746Z-A`
+- title: Fix pull || true
 - milestone_state: committed
 - phase_state: `completed`
-- issue_path: `docs/issues/I-20260617T133709Z-A/issue.md`
-- verification_artifact_dir: `docs/epics/gh-merge-receipt/code-reviews`
+- issue_path: `docs/issues/I-20260617T131746Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/fix-pull-true/code-reviews`
 
 ## M-20260617T124129Z-A
 - title: pr-merge-guarded absorbs wt-close frontmatter
