@@ -9,6 +9,7 @@ platform_ids:
     url: https://github.com/chatterzhao/freely/issues/289
 primary_platform: github
 platform_state: closed
+updated_at: '2026-06-17T00:21:05Z'
 ---
 ## 问题
 init 不检查分支名，导致不合规分支进入，AI 后续无法处理。

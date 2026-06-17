@@ -12,13 +12,14 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-21T12:27:41Z'
-updated_at: '2026-05-21T15:26:59Z'
+updated_at: '2026-06-17T00:28:40Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
 force_closed_at: '2026-05-21T15:26:59Z'
 force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
+platform_state: closed
 ---
 
 ## 问题

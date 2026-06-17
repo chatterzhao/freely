@@ -10,9 +10,9 @@ platform_ids:
     issue_id: '548'
     url: https://github.com/chatterzhao/freely/issues/548
     synced_at: '2026-05-18T03:00:01Z'
-updated_at: '2026-05-18T03:00:01Z'
+updated_at: '2026-06-17T00:20:21Z'
 primary_platform: github
-platform_state: open
+platform_state: closed
 ---
 
 supervisor crash: bash at freely:18777 (rc=0)

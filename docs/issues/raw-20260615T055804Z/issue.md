@@ -12,11 +12,12 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-15T05:58:21Z'
-updated_at: '2026-06-15T05:58:21Z'
+updated_at: '2026-06-17T00:18:38Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 Batch sync task discovered by scan.\npull=676 push=9 reconcile=194 close=61\nplatforms: github, gitee

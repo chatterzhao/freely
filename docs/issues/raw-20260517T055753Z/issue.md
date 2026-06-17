@@ -13,7 +13,7 @@ platform_ids:
     issue_id: '431'
     url: https://github.com/chatterzhao/freely/issues/431
     synced_at: '2026-05-17T05:58:02Z'
-updated_at: '2026-06-15T06:10:32Z'
+updated_at: '2026-06-17T00:21:20Z'
 primary_platform: github
 platform_state: closed
 ---
