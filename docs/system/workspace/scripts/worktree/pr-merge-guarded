@@ -574,9 +574,12 @@ do_initial_merge() {
            --subject "$merge_message" 2>&1 || gh_rc=$?
       if [[ "$gh_rc" -eq 0 ]]; then
         echo "[MERGE-GUARD] GitHub PR #$gh_pr merged ✓"
-        # Pull the merge commit that GitHub created
-        git fetch "$merge_remote" "$target" 2>/dev/null || true
-        git pull "$merge_remote" "$target" --ff-only 2>/dev/null || true
+        # Pull the merge commit that GitHub created.
+        # If pull fails (dirty tree, non-ff), fetch + reset to remote commit.
+        if ! git pull "$merge_remote" "$target" --ff-only 2>/dev/null; then
+          git fetch "$merge_remote" "$target" 2>/dev/null || true
+          git reset --hard "$merge_remote/$target" 2>/dev/null || true
+        fi
 
         # Sync develop to all other platforms
         attempt_develop_push_followthrough_if_needed "$target" "$source_branch"
@@ -589,8 +592,10 @@ do_initial_merge() {
       if [[ "$pr_state" == "MERGED" ]]; then
         echo "[MERGE-GUARD] GitHub PR #$gh_pr merged (gh reported error but PR state is MERGED)" >&2
         echo "[MERGE-GUARD] gh error was non-fatal; pulling the merge commit..." >&2
-        git fetch "$merge_remote" "$target" 2>/dev/null || true
-        git pull "$merge_remote" "$target" --ff-only 2>/dev/null || true
+        if ! git pull "$merge_remote" "$target" --ff-only 2>/dev/null; then
+          git fetch "$merge_remote" "$target" 2>/dev/null || true
+          git reset --hard "$merge_remote/$target" 2>/dev/null || true
+        fi
         attempt_develop_push_followthrough_if_needed "$target" "$source_branch"
         return 0
       fi
