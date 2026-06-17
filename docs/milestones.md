@@ -1,3 +1,19 @@
+## M-20260617T103956Z-A
+- title: Complete CSV elimination + A2A SendMessage delegation
+- status: active
+### candidate_issues
+1. `C-20260617T103956Z-A`
+- milestone: M-20260617T103956Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260617T103956Z-A/issue.md`
+### committed_issues
+1. `I-20260617T103956Z-A`
+- title: Complete CSV elimination
+- milestone_state: committed
+- phase_state: `in_b2_ibm`
+- issue_path: `docs/issues/I-20260617T103956Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/eliminate-csv/code-reviews`
+
 ## M-20260617T095105Z-A
 - title: A2A-Native Delegation — eliminate CSV, Task.message delegation
 - status: active

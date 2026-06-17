@@ -12834,7 +12834,25 @@ except: pass
   _launched_count=0
   if [[ -n "$_worker_tasks" ]]; then
     while IFS= read -r _prompt_file; do
-      [[ -n "$_prompt_file" && -f "$_prompt_file" ]] || continue
+      [[ -n "$_prompt_file" ]] || continue
+      # A2A-native: generate prompt file from Task.message if file doesn't exist
+      if [[ ! -f "$_prompt_file" ]]; then
+        local _task_msg
+        _task_msg=$(python3 "$_a2a_task_py" get --task-id "$_task_id" 2>/dev/null | python3 -c "
+import json,sys
+try:
+    r=json.load(sys.stdin)
+    print(r.get('message','') or r.get('summary','') or '')
+except: pass
+" 2>/dev/null || true)
+        if [[ -n "$_task_msg" ]]; then
+          mkdir -p "$(dirname "$_prompt_file")" 2>/dev/null || true
+          printf '%s\n' "$_task_msg" > "$_prompt_file"
+        else
+          continue
+        fi
+      fi
+      [[ -f "$_prompt_file" ]] || continue
       # Guard: skip if worktree already has an active worker
       local _target_worktree
       _target_worktree="$(worker_prompt_target_worktree "$_prompt_file" 2>/dev/null || true)"

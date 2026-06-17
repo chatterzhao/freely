@@ -18,49 +18,31 @@
 | `manager_working` | 进行中（Worker 已派、等后台任务），保持 session 继续 |
 | `stop_ai` | 真的无事（无汇报、无 scan、无 dirty worktree）。**严禁连续** |
 
-## 委派 Worker
+## 委派 Worker（A2A SendMessage 标准模式）
 
-Worker prompt header 必须包含以下字段：
+对标 A2A 官方协议：`SendMessage → Task(state=submitted) → Worker 处理 → TaskStatusUpdate`
 
-```
-Worktree:
-- /absolute/path/to/worktree
-Branch:
-- fix/raw-YYYYMMDDTHHMM[SS]Z-<slug>
-intent_kind: <edit|merge|closeout|sync|cleanup|promotion>
-skill: <对应 skill 名>
-rationale: "因为 {X}，所以做 {Y}"
-dispatch_priority: P2
-parallel_safe: true
-write_scope: worktree
-intent_target: <简短描述>
-```
+Worker 是独立 ACP session，由 Runtime 通过 A2A Server 管理。
+你通过 a2a-exit 创建 submitted Worker task，Runtime 自动启动 Worker。
 
-### intent_kind 语义
+1. **开工位**（如不存在）：`./bin/wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>`
+2. **创建 Worker task**（无需先写 prompt 文件）：
+   ```
+   a2a-exit --state submitted --agent-id worker \
+     --skill <freely-fix-execution|freely-dev-loop-execution|...> \
+     --worktree /absolute/path/to/worktree \
+     --branch fix/raw-YYYYMMDDTHHMMSSZ-<slug> \
+     --raw-key <key> \
+     --summary "完整的 Worker 指令内容"
+   ```
+   - `--summary` 是 Worker 的完整 prompt 内容（= A2A 协议 SendMessage.message）
+   - `--skill` 必填（定义 Worker 的 task scope）
+   - Runtime 会自动从 task 生成 prompt file 然后启动 Worker ACP session
 
-| intent_kind | 含义 | 对应 skill | write_scope |
-|-------------|------|-----------|-------------|
-| `edit` | 代码/文档修改 | `freely-dev-loop-execution` | worktree |
-| `merge` | 合并到 develop | `freely-branch-management` | project |
-| `closeout` | 批量收口关闭 | `freely-worktree-maintenance-governance` | project |
-| `sync` | 平台同步 | `./bin/issue-sync` | project |
-| `cleanup` | 清理过期资源 | `freely-worktree-hygiene-supervision` | worktree |
-| `promotion` | 发布/升级 | `freely-candidate-acceptance-review` | project |
+3. **多 Worker**：重复步骤 2。每次 `a2a-exit --state submitted --agent-id worker` 创建一个独立 Worker task。
 
-**`skill:` 是必填字段。** 不指定 skill 的 Worker prompt 是无效委派。
-
-### 委派步骤
-
-**关键**：你运行在 ACP session 中（opencode/claude/codex 等 AI CLI tool）。
-Worker 是独立的 ACP fork session，由 Runtime 通过 A2A Server 管理。
-**禁止**使用本地 `task` 工具做 Worker 委派——那是 session-local 的，不会触发 Runtime 启动 Worker。
-
-1. **开工位**：目标 worktree 不存在 → `./bin/wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>`
-2. **写 prompt**：用 `write` 工具写 `.freely/run/worker-prompts/<ts>-worker-<slug>.txt`，header + Task
-3. **调用 a2a-exit**：`a2a-exit --state submitted --workers "prompt路径"`（见文末 A2A Task State 节）
-
-Runtime 检测到新的 worker prompt 文件后，通过 A2A Server TaskStore 创建 task，
-然后以 ACP fork session 启动 Worker。Worker 完成后通过 A2A `tasks/push` 汇报状态。
+4. **状态汇报**：Worker 完成后通过 A2A SSE `TaskStatusUpdateEvent` 通知状态变更。
+   你用 `tasks/list` 查询 Worker 完成状态。
 
 ## 收口判断
 
@@ -106,24 +88,25 @@ scan 是任务来源。以下情况必须手动 `freely task-source-scan`：
 | `freely-chat-issue-routing` | chat 消息路由 |
 | `freely-human-interruption-manager-triage` | 插话路由 |
 
-## A2A Task State（回复末尾输出）
+## A2A Task State（a2a-exit 调用）
 
-Manager 的完整回复是 A2A Message。回复末尾的结构化 JSON 提供 Task 状态转换，
-Runtime 通过 A2A Server `PATCH /tasks/{id}` 更新。
+Manager 通过 a2a-exit 声明本轮状态。对标 A2A 协议 SendMessage。
 
-```json
-{
-  // state — A2A Task 状态。Manager 只允许这三个值：
-  //   "submitted"  — 委派 Worker 或进行中
-  //   "completed"  — 本轮分析完成
-  //   "failed"     — 无事可做或停止
-  "state": "submitted",
+```bash
+# 委派 Worker: state=submitted, agent-id=worker
+a2a-exit --state submitted --agent-id worker \
+  --skill freely-fix-execution --worktree /path --branch fix/xxx \
+  --raw-key 20260617T...Z --summary "Worker 的完整 prompt 指令"
 
-  "summary": "...",              // 本轮总结
-  "workers": "...",              // state=submitted 且委派时：worker prompt CSV 路径
-  "next": "..."                  // 下一步
-}
+# 完成本轮: state=completed
+a2a-exit --state completed --summary "本轮 summary"
+
+# 停止: state=failed
+a2a-exit --state failed --summary "stop reason"
 ```
+
+**禁止使用 `--workers` 参数**（已废弃）。Worker 的完整指令写在 `--summary` 中。
+Runtime 从 A2A Task.message 生成 prompt file 后启动 Worker ACP session。
 
 ## scan next_action 行为契约
 
