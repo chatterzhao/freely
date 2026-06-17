@@ -265,6 +265,43 @@ def _handoff_extract_local(args):
         sys.exit(1)
 
 
+# ── Task param builders ──────────────────────────────────────────────────────
+
+def _task_upsert_params(args):
+    return {
+        "task_id": args.get("task_id", ""), "name": args.get("name", ""),
+        "state": args.get("state", "submitted"), "agent_id": args.get("agent_id", ""),
+        "skill": args.get("skill", ""), "session_id": args.get("session_id", ""),
+        "prompt_file": args.get("prompt_file", ""), "worktree": args.get("worktree", ""),
+        "branch": args.get("branch", ""), "exit_kind": args.get("exit_kind", ""),
+        "reason": args.get("reason", ""),
+        "completion_summary": args.get("completion_summary", ""),
+        "worker_prompts_csv": args.get("worker_prompts_csv", ""),
+        "error": args.get("error", ""),
+    }
+
+def _task_update_params(args):
+    p = {"task_id": args["task_id"]}
+    for k in ("state", "agent_id", "skill", "session_id", "prompt_file",
+              "worktree", "branch", "exit_kind", "reason", "completion_summary",
+              "worker_prompts_csv", "error", "worker_pid", "delivery_status"):
+        if k in args and args[k]:
+            p[k] = args[k]
+    return p
+
+def _task_list_params(args):
+    p = {}
+    if args.get("state"): p["state"] = args["state"]
+    if args.get("agent_id"): p["agent_id"] = args["agent_id"]
+    if args.get("skill"): p["skill"] = args["skill"]
+    return p
+
+def _task_list_by_worktree_params(args):
+    p = {"worktree": args["worktree"]}
+    if args.get("state"): p["state"] = args["state"]
+    return p
+
+
 # ── Method dispatch table ─────────────────────────────────────────────────
 # Each entry: (rpc_method_name, output_formatter_fn, param_builder_fn)
 # Must be defined AFTER all referenced functions.
@@ -334,6 +371,15 @@ METHODS = {
     "tool.failure-count":     ("tool.failure-count",     lambda r: print(r.get("count", 0)), lambda a: {"tool": a["tool"], "slot": a.get("slot",""), "window_secs": int(a.get("window_secs",3600))}),
     "tool.failure-clear":     ("tool.failure-clear",     lambda r: print("ok"), lambda a: {"tool": a["tool"], "slot": a.get("slot","")}),
     "tool.failure-list-dead": ("tool.failure-list-dead", lambda r: print(json.dumps(r.get("tools",[]))), lambda a: {"window_secs": int(a.get("window_secs",3600)), "threshold": int(a.get("threshold",3))}),
+
+    # task.* — A2A Task persistence (WAL layer for A2A Server TaskStore)
+    "task.upsert":            ("a2a_task.insert",        lambda r: print(r.get("task_id", "")), _task_upsert_params),
+    "task.get":               ("a2a_task.get",           _out_record_json, lambda a: {"task_id": a["task_id"]}),
+    "task.update":            ("a2a_task.update",        _out_changed, _task_update_params),
+    "task.list":              ("a2a_task.list",          _out_json_rows, _task_list_params),
+    "task.restore":           ("a2a_task.list",          _out_json_rows, lambda a: {}),  # all tasks for WAL replay
+    "task.list-by-worktree":  ("a2a_task.list-by-worktree", _out_json_rows, _task_list_by_worktree_params),
+    "task.delete":            ("a2a_task.delete",        lambda r: print(f'ok affected={r.get("affected", 0)}'), lambda a: {"task_id": a["task_id"]}),
 }
 
 

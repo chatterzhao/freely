@@ -107,18 +107,37 @@ class A2AClient:
             return self._unix_request(method, path, body, timeout)
 
     def _unix_request(self, method: str, path: str, body=None, timeout=30.0) -> dict:
+        # Map REST-style paths to A2A JSON-RPC 2.0 methods.
+        # The A2A Server uses official SDK create_jsonrpc_routes at POST /.
+        _base = path.split("?")[0]
+        _rpc_map = {
+            ("POST", "/tasks"):            "tasks/send",
+            ("GET",  "/tasks"):            "tasks/list",
+            ("PATCH","/tasks"):            "tasks/push",
+            ("GET",  "/tasks/latest-manager"):    "tasks/get",
+            ("GET",  "/tasks/pending-delivery"):  "tasks/list",
+        }
+        # Build key: (method, base_path_stripped_of_task_id)
+        import re
+        _stripped = re.sub(r'/tasks/[^/]+', '/tasks', _base)
+        rpc_method = _rpc_map.get((method, _stripped), f"tasks/{method.lower()}")
+        params = body if body is not None else {}
+        # If the path had a task_id segment, inject it
+        _m = re.match(r'/tasks/([^/]+)', _base)
+        if _m and "task_id" not in params:
+            params = dict(params, taskId=_m.group(1))
+
+        jsonrpc_req = {"jsonrpc": "2.0", "id": 1, "method": rpc_method, "params": params}
+        http_body = json.dumps(jsonrpc_req, default=str)
+        request = (f"POST / HTTP/1.1\r\n"
+                   f"Content-Type: application/json\r\n"
+                   f"Content-Length: {len(http_body)}\r\n"
+                   f"Connection: close\r\n\r\n{http_body}")
+
         sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         sock.settimeout(timeout)
         try:
             sock.connect(self._socket_path)
-            if body is not None:
-                body_json = json.dumps(body, default=str)
-                request = (f"{method} {path} HTTP/1.1\r\n"
-                          f"Content-Type: application/json\r\n"
-                          f"Content-Length: {len(body_json)}\r\n"
-                          f"Connection: close\r\n\r\n{body_json}")
-            else:
-                request = f"{method} {path} HTTP/1.1\r\nConnection: close\r\n\r\n"
             sock.sendall(request.encode())
             data = b""
             while True:
@@ -127,7 +146,7 @@ class A2AClient:
                 data += chunk
         finally:
             sock.close()
-        return self._parse_response(data.decode("utf-8", errors="replace"))
+        return self._parse_jsonrpc_response(data.decode("utf-8", errors="replace"))
 
     def _http_request(self, method: str, path: str, body=None, timeout=30.0) -> dict:
         """HTTP request via TCP (uses urllib for zero extra deps)."""
@@ -150,10 +169,30 @@ class A2AClient:
 
     @staticmethod
     def _parse_response(text: str) -> dict:
+        """Parse HTTP response body (legacy REST path — kept for _http_request)."""
         body_start = text.find("\r\n\r\n")
         if body_start == -1: body_start = text.find("\n\n")
         if body_start != -1: return json.loads(text[body_start + 4:])
         return {"error": "empty response"}
+
+    @staticmethod
+    def _parse_jsonrpc_response(text: str) -> dict:
+        """Parse JSON-RPC 2.0 response from A2A Server."""
+        body_start = text.find("\r\n\r\n")
+        if body_start == -1: body_start = text.find("\n\n")
+        body = text[body_start + 4:] if body_start != -1 else text
+        try:
+            rpc = json.loads(body)
+        except json.JSONDecodeError:
+            return {"error": "invalid JSON-RPC response", "raw": body[:200]}
+        if "error" in rpc:
+            err = rpc["error"]
+            return {"error": err.get("message", str(err)), "code": err.get("code", -1)}
+        result = rpc.get("result", {})
+        # A2A SDK wraps results in Task objects; extract the data
+        if isinstance(result, dict):
+            return result
+        return {"result": result}
 
     # ── Task API ───────────────────────────────────────────────────────
 
@@ -396,8 +435,7 @@ def normalize_state(raw: str) -> str:
 # ── CLI ───────────────────────────────────────────────────────────────────
 
 def _main() -> int:
-    parser = argparse.ArgumentParser(description="A2A Protocol Client")
-    parser.add_argument("--db", default=None, help=argparse.SUPPRESS)
+    parser = argparse.ArgumentParser(description="A2A Protocol Client (JSON-RPC 2.0)")
     parser.add_argument("--project", default=None, help="Project path")
     sub = parser.add_subparsers(dest="cmd")
 

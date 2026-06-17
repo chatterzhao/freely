@@ -313,6 +313,30 @@ class A2AServer:
         self.agent_card = _build_agent_card(project)
         self.task_store = SQLiteTaskStore(project)
         self.executor = FreelyAgentExecutor(self)
+        # Restore non-terminal tasks from WAL on startup (crash recovery)
+        self._restore_tasks()
+
+    def _restore_tasks(self):
+        """Replay WAL: restore all non-terminal tasks into memory on startup.
+        Terminal states (completed/failed/canceled) are skipped — they're done.
+        """
+        try:
+            rows = self.task_store.get_all_dicts()
+            restored = 0
+            for row in rows:
+                state = row.get("state", "")
+                if state in ("completed", "failed", "canceled"):
+                    continue
+                # Non-terminal: restore to TaskStore (already in SQLite, just ensure
+                # in-memory SDK cache is populated by loading via get())
+                if row.get("task_id"):
+                    self.task_store.get(row["task_id"])
+                    restored += 1
+            if restored > 0:
+                import sys
+                print(f"[A2A Gateway] Restored {restored} non-terminal tasks from WAL", file=sys.stderr)
+        except Exception:
+            pass  # DB not available → start with empty TaskStore (降级运行)
 
     def _build_app(self) -> Starlette:
         request_handler = DefaultRequestHandler(

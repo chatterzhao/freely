@@ -124,6 +124,8 @@ class AcpBridge:
         self.stdin_write_lock = threading.Lock()
         self._stdout_master_fd = None
         self._stdout_reader = None
+        self._fatal_detected = False       # set when bridge detects fatal error
+        self._idle_timeout_detected = False  # set when idle timeout triggers
 
     def log(self, msg):
         ts = time.strftime("%Y-%m-%dT%H:%M:%S")
@@ -420,6 +422,7 @@ class AcpBridge:
                 with self.activity_lock:
                     idle_secs = time.time() - self.last_activity_ts
                 if idle_secs > ACP_IDLE_TIMEOUT:
+                    self._idle_timeout_detected = True
                     with self.server_lock:
                         self.pending.pop(req_id, None)
                     raise TimeoutError(
@@ -498,6 +501,18 @@ class AcpBridge:
                 pass
         return sid
 
+    def session_ping(self, session_id, timeout=10):
+        """Send session/ping to test AI liveness AND reset activity timer.
+        If A2A workers are alive, call this periodically to prevent idle timeout.
+        Returns True if pong received."""
+        with self.activity_lock:
+            self.last_activity_ts = time.time()  # reset idle timer
+        try:
+            result = self._send_request("session/ping", {"sessionId": session_id}, timeout=timeout)
+            return result.get("status") == "ok" or "pong" in str(result).lower()
+        except Exception:
+            return False
+
     def session_prompt(self, session_id, prompt_text, timeout=900):
         """Send a prompt and wait for response. Returns (stop_reason, response_text)."""
         params = {
@@ -506,6 +521,11 @@ class AcpBridge:
         }
         result = self._send_request("session/prompt", params, timeout=timeout)
         stop_reason = result.get("stopReason", "unknown")
+        # Normalize stopReason: detect fatal errors that AI tools mask as end_turn
+        if stop_reason == "end_turn" and self._fatal_detected:
+            stop_reason = "error"
+        elif stop_reason == "end_turn" and self._idle_timeout_detected:
+            stop_reason = "idle_timeout"
         # Collect text from response
         text = ""
         for item in result.get("message", []):
