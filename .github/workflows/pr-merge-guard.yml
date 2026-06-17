@@ -1,16 +1,20 @@
 # CI guard: block GitHub Merge button and enforce the correct merge workflow.
-# This workflow ensures PRs targeting develop are merged only through
-# the pr-merge-guarded script, not via the GitHub web UI or API directly.
 #
-# How to merge correctly:
-#   1. Get at least one approval review on this PR.
-#   2. Run pr-merge-guarded locally or via the CI runner:
-#       cd /path/to/repo
-#       docs/system/workspace/scripts/worktree/pr-merge-guarded develop <source-branch>
+# How this works:
+#   1. This workflow creates a check named "governance/pr-merge-guard" in "in_progress" state.
+#   2. GitHub branch protection on develop requires this check to pass.
+#   3. Only pr-merge-guarded (running locally) can set this check to "success" via GitHub API.
+#   4. Result: GitHub UI "Merge pull request" button is greyed out until pr-merge-guarded runs.
 #
-# For raw/fix branches:
-#   The fix/dev workflow must go through test-pre-merge first, then
-#   pr-merge-guarded to develop. See docs/milestones.md for detail.
+# Branch protection setup (repo admin, one-time):
+#   Settings → Branches → Add rule for "develop":
+#     ☑ Require status checks to pass before merging
+#       Search: "governance/pr-merge-guard"
+#     ☑ Do not allow bypassing the above settings
+#
+# Correct merge workflow:
+#   ./bin/pr-merge-guarded develop <source-branch>
+#   (NOT the GitHub Merge button)
 
 name: PR Merge Guard
 
@@ -22,51 +26,21 @@ jobs:
   guard:
     runs-on: ubuntu-latest
     steps:
-      - name: Check branch name contains raw-key
-        id: check_raw_key
-        run: |
-          BRANCH="${{ github.head_ref }}"
-          if echo "$BRANCH" | grep -qE 'raw-[0-9]{8}T[0-9]{6}Z'; then
-            echo "raw_key_found=true" >> "$GITHUB_OUTPUT"
-            echo "[GUARD] raw-key detected in branch name: $BRANCH"
-          else
-            echo "raw_key_found=false" >> "$GITHUB_OUTPUT"
-            echo "[GUARD] branch name '$BRANCH' does not contain a raw-key pattern"
-          fi
-
-      - name: Validate merge direction
-        id: check_direction
-        run: |
-          HEAD="${{ github.head_ref }}"
-          BASE="${{ github.base_ref }}"
-          if echo "$HEAD" | grep -qE '^fix/' && [ "$BASE" = "develop" ]; then
-            echo "direction_valid=true" >> "$GITHUB_OUTPUT"
-            echo "[GUARD] merge direction valid: $HEAD -> $BASE"
-          else
-            echo "direction_valid=false" >> "$GITHUB_OUTPUT"
-            echo "[GUARD] merge direction: $HEAD -> $BASE (expected fix/* -> develop)"
-          fi
-
-      - name: Block merge and show instructions
-        run: |
-          echo ""
-          echo "================================================================"
-          echo "  CI GUARD: This PR cannot be merged via GitHub UI"
-          echo "================================================================"
-          echo ""
-          echo "To merge this PR correctly, use the pr-merge-guarded script:"
-          echo ""
-          echo "  1. Ensure the PR has at least one approval review."
-          echo "  2. Clone/checkout the target repository."
-          echo "  3. Run:"
-          echo ""
-          echo "     docs/system/workspace/scripts/worktree/pr-merge-guarded \\"
-          echo "       develop ${{ github.head_ref }}"
-          echo ""
-          echo "This guard only blocks the GitHub merge button; the correct"
-          echo "workflow is always available through pr-merge-guarded."
-          echo ""
-          echo "For questions, see docs/milestones.md or docs/system/workspace/"
-          echo "================================================================"
-          echo ""
-          exit 1
+      - name: Create blocking governance check
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: checkRun } = await github.rest.checks.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'governance/pr-merge-guard',
+              head_sha: context.payload.pull_request.head.sha,
+              status: 'in_progress',
+              output: {
+                title: 'Governance gates pending',
+                summary: 'This PR must be merged via pr-merge-guarded, not the GitHub UI.\n\n' +
+                         'Run: ./bin/pr-merge-guarded develop ' + context.payload.pull_request.head.ref + '\n\n' +
+                         'The pr-merge-guarded script will run all governance gates and set this check to success.'
+              }
+            });
+            console.log(`Created check run ${checkRun.id} — merge blocked until pr-merge-guarded sets it to success`);
