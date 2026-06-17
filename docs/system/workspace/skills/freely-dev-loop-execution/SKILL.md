@@ -154,6 +154,6 @@ pre-tests.md 是验证计划，不是门禁表单。写真正会执行的测试�
 ## 完成判定
 
 - 当前 dev-loop 产物、测试、issue、milestone、progress 已一致，并已把 evidence 交回外层判断。
-- 开发完成后通过 pr-create-guarded 提 PR，进入门禁合并流程。
+- 开发完成后：在 worktree 中执行 `freely pr-create-guarded` 命令提 PR → 切换到 develop 分支执行 `freely pr-merge-guarded develop <branch>` 命令合并。禁止绕过。
 - 若有依赖父分支，已明确后续 restack / promote 要求。
 - terminal completion / cleanup / retirement 仍由 `auto-loop` 判定。
