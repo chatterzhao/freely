@@ -180,7 +180,7 @@ _detect_acp_failure() {
   # ── Layer 1: Network / transport failure (from cycle log) ──
   if _matched=$(grep -m1 -E '\b(Connection refused|Connection reset by peer|connection refused|connection reset|ECONNREFUSED|ENOTFOUND|ETIMEDOUT|socket hang up|timed out|connection timeout|Connection timed out|dial timeout|i/o timeout|read timeout|deadline exceeded|TLS handshake|TLS alert|TLS error|proxy error|proxy refused|proxy timeout|proxy auth|Could not connect to proxy|DNS error|DNS failure|DNS timeout|DNS resolution|Could not resolve host|name resolution failed|NXDOMAIN)\b' "$log_file" 2>/dev/null); then
     echo "[ACP-detect] network_failure matched: ${_matched:0:200}" >&2
-    [[ -n "$network_failure_marker" ]] && echo "network_failure" > "$network_failure_marker"
+    [[ -n "$network_failure_marker_file" ]] && echo "network_failure" > "$network_failure_marker_file"
   fi
 
   # ── Layer 2: Auth / rate limit failure (from cycle log) ──
@@ -202,15 +202,15 @@ _detect_acp_failure() {
 
   if _matched=$(_grep_new_only "$_bridge_log" "$bridge_log_offset" -m1 -E "$_bridge_fatal" 2>/dev/null) && [[ -n "$_matched" ]]; then
     echo "[ACP-detect] bridge_fatal matched: ${_matched:0:200}" >&2
-    [[ -n "$bridge_lost_marker" ]] && echo "bridge_session_lost" > "$bridge_lost_marker"
+    [[ -n "$bridge_lost_marker_file" ]] && echo "bridge_session_lost" > "$bridge_lost_marker_file"
     if echo "$_matched" | grep -qE "$_net_err" 2>/dev/null; then
-      [[ -n "$network_failure_marker" ]] && echo "network_failure" > "$network_failure_marker"
+      [[ -n "$network_failure_marker_file" ]] && echo "network_failure" > "$network_failure_marker_file"
     fi
   elif _matched=$(grep -m1 -E "$_bridge_fatal" "$log_file" 2>/dev/null) && [[ -n "$_matched" ]]; then
     echo "[ACP-detect] bridge_fatal matched (cycle log): ${_matched:0:200}" >&2
-    [[ -n "$bridge_lost_marker" ]] && echo "bridge_session_lost" > "$bridge_lost_marker"
+    [[ -n "$bridge_lost_marker_file" ]] && echo "bridge_session_lost" > "$bridge_lost_marker_file"
     if echo "$_matched" | grep -qE "$_net_err" 2>/dev/null; then
-      [[ -n "$network_failure_marker" ]] && echo "network_failure" > "$network_failure_marker"
+      [[ -n "$network_failure_marker_file" ]] && echo "network_failure" > "$network_failure_marker_file"
     fi
   fi
 
@@ -218,7 +218,7 @@ _detect_acp_failure() {
   if [[ ! -f "$network_failure_marker" ]]; then
     if _matched=$(grep -m1 -E "$_net_err" "$log_file" 2>/dev/null); then
       echo "[ACP-detect] network_fatal matched (cycle): ${_matched:0:200}" >&2
-      [[ -n "$network_failure_marker" ]] && echo "network_failure" > "$network_failure_marker"
+      [[ -n "$network_failure_marker_file" ]] && echo "network_failure" > "$network_failure_marker_file"
     fi
   fi
 
@@ -410,8 +410,8 @@ main() {
     _bridge_pid=$(cat "$(_bridge_pid_file "$project")" 2>/dev/null || true)
     if [[ -n "$_bridge_pid" ]] && ! kill -0 "$_bridge_pid" 2>/dev/null; then
       echo "[ACP-detect] bridge died (pid=$_bridge_pid), killing child" >&2
-      [[ -n "$bridge_lost_marker" ]] && echo "bridge_session_lost" > "$bridge_lost_marker"
-      [[ -n "$network_failure_marker" ]] && echo "network_failure" > "$network_failure_marker"
+      [[ -n "$bridge_lost_marker_file" ]] && echo "bridge_session_lost" > "$bridge_lost_marker_file"
+      [[ -n "$network_failure_marker_file" ]] && echo "network_failure" > "$network_failure_marker_file"
       kill "$child_pid" 2>/dev/null || true
       break
     fi

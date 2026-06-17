@@ -112,8 +112,8 @@ class A2AClient:
         _base = path.split("?")[0]
         _rpc_map = {
             ("POST", "/tasks"):            "tasks/send",
-            ("GET",  "/tasks"):            "tasks/list",
-            ("PATCH","/tasks"):            "tasks/push",
+            ("GET",  "/tasks/{id}"):        "tasks/get",
+            ("PATCH","/tasks/{id}"):        "tasks/push",
             ("GET",  "/tasks/latest-manager"):    "tasks/get",
             ("GET",  "/tasks/pending-delivery"):  "tasks/list",
         }
