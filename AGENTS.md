@@ -19,7 +19,7 @@
 - 修改 `.githooks/` 目录内容以削弱检查
 
 **没有例外。** 即使为了调试或加速迭代也不允许。
-正确的做法是走 `wt-create → worktree → commit → pr-create-guarded → pr-merge-guarded` 流程。
+正确的做法是走 `wt-create → B1_IBM → B2_IBM → commit → pr-create-guarded → pr-merge-guarded` 流程。
 
 ## 当前项目阶段
 Freely 处于研究优先的整合阶段。
@@ -163,10 +163,10 @@ Freely 开发 Freely 时，默认先问四件事：
 
 当发现运行时 bug，使用 `skill:freely-fix-execution` 快速修复。先判场景：
 
-- **原 feature worktree 还在** → 直接在 feature 上改、提交。走 feature → test-pre-merge-* → pr-create-guarded → pr-merge-guarded → develop。
+- **原 feature worktree 还在** → 直接在 feature 上改、提交。走 feature → test-pre-merge-* → B1_IBM → B2_IBM → pr-create-guarded → pr-merge-guarded → develop。
 - **原 feature 已退役（已合并/已删）** → 建 `test-pre-merge-<desc>-<YYYYMMDD>` 私有工位快测（不改不提交不推送，不违背保护约束）。验证通过后 cp 修改到新建的 `feature/*` 或 `hotfix/*` 可写工位，增量提交。
 - **普通 fix** 用 `feature/*` → test-pre-merge-* → pr-create-guarded → pr-merge-guarded → develop；**紧急 hotfix** 用 `hotfix/*` → develop（hotfix 从 main 创建，可跳过 test-pre-merge）。
-- **补齐治理**：raw issue → candidate → canonical issue → progress → code-review（`## Implementation Decision Note`）→ milestones.md。
+- **补齐治理**：B1_IBM（`freely-doc-B1_IBM-execution`：brainstorms.md → candidates.md → milestone）→ B2_IBM（`freely-doc-B2_IBM-execution`：I-* issue → prd → pre-tests → tasks → code-review → progress）→ milestones.md。
 - **原则**：Fix first, govern later。test-pre-merge-* 私有测试不违背保护约束。fix 工位早期创建、增量提交。
 
 详见 `skill:freely-fix-execution`

@@ -17,8 +17,8 @@ description: 新功能/大型改动的完整开发流程——feedback→wt-crea
 | | freely-fix-execution | freely-feat-execution |
 |---|---|---|
 | 适用 | bug fix、小改动 | 新功能、大型重构 |
-| 流程 | test-pre-merge 沙箱 → cp → commit | wt-create→B1_IBM→B2_IBM→dev→test-pre-merge→pr-create-guarded→pr-merge-guarded→wt-close |
-| 治理 | 后置 | 前置（B1_IBM 即开始） |
+| 流程 | wt-create → 实现 → B1_IBM → B2_IBM → pr-create-guarded → pr-merge-guarded → wt-close | wt-create → B1_IBM → B2_IBM → dev → pr-create-guarded → pr-merge-guarded → wt-close |
+| IBM 顺序 | 实现后治理（Fix first, govern later） | 治理后实现（Govern first, code later） |
 
 ## 下层 skill
 
