@@ -1,4 +1,20 @@
 <!-- file_size_check: skip (auto-populated milestone index) -->
+
+## M-20260616T111514Z-A
+- title: write_config heredoc → Python 序列化 + 补齐 posture 字段
+- status: active
+### candidate_issues
+1. `C-20260616T111514Z-A`
+- milestone: M-20260616T111514Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260616T111514Z-A/issue.md`
+### committed_issues
+1. `I-20260616T111514Z-A`
+- title: write_config heredoc → Python 序列化 + 补齐 posture 字段
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260616T111514Z-A/issue.md`
+
 # Milestones
 
 本文件是 Freely 自举开发时的主动扫描入口，用来承接已进入活跃范围的 candidate / issue。
