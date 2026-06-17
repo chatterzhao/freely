@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260507T0300Z
 kind: raw
-phase_state: completed
+phase_state: dropped
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 source_candidate: docs/pre-brainstorms/20260507-gate1-timestamp/candidates.md
 platform_ids:
