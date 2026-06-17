@@ -1,3 +1,22 @@
+## M-20260617T145428Z-A
+- title: Fix freely-db-cli syntax + AGENTS.md flow + hook skill routing
+- status: active
+### candidate_issues
+1. `C-20260617T145428Z-A`
+- milestone: M-20260617T145428Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260617T145428Z-A/issue.md`
+### committed_issues
+1. `I-20260617T145428Z-A`
+- title: Fix freely-db-cli syntax + AGENTS.md flow + hook skill routing
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260617T145428Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/freely-db-cli-agents-fix/code-reviews`
+
+## M-20260617T133709Z-A
+- title: Fix gh pr merge receipt
+
 ## M-20260617T131746Z-A
 - title: Fix pull || true
 - status: active
@@ -212,7 +231,7 @@
 1. `I-20260617T011030Z-A`
 - title: ACP/A2A 架构重构 — 统一协议层 + 事件溯源 WAL + 跨 tool 委托 + 全状态暴露
 - milestone_state: committed
-- phase_state: `done_b2_ibm`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260617T011030Z-A/issue.md`
 
 ## M-20260616T224707Z-A
@@ -2149,7 +2168,7 @@ routing_policy:
 1. `I-20260509T024559Z-A`
 - title: multi-project isolation architecture
 - milestone_state: committed
-- phase_state: `done_b2_ibm`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260509T024559Z-A/issue.md`
 
 ## M-20260517T082422Z-A
@@ -2835,7 +2854,7 @@ routing_policy:
 1. `I-20260612T000223Z-A`
 - title: A2A 协议替换 Freely Handoff 架构重构
 - milestone_state: committed
-- phase_state: `done_b2_ibm`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260612T000223Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260612T000223Z--a2a-replace-handoff/candidates.md#C-20260612T000223Z-A`
 
@@ -2853,7 +2872,7 @@ routing_policy:
 1. `I-20260615T001626Z-A`
 - title: 移除 A2A 文本 JSON 解析 Fallback (Phase 1+2)
 - milestone_state: committed
-- phase_state: `done_b2_ibm`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260615T001626Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260615T001626Z--a2a-no-fallback/candidates.md#C-20260615T001626Z-A`
 
@@ -2872,7 +2891,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260616T030213Z-A`
 - issue_id: I-20260616T030213Z-A
-- phase_state: `done_b2_ibm`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260616T030213Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260616T030213Z--gate-scope-alignment/candidates.md#C-20260616T030213Z-A`
 - verification_artifact_dir: `docs/epics/gate-scope-alignment/code-reviews`
@@ -2892,7 +2911,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260616T033325Z-A`
 - issue_id: I-20260616T033325Z-A
-- phase_state: `done_b2_ibm`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260616T033325Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260616T033325Z--premerge-gate-check/candidates.md#C-20260616T033325Z-A`
 - verification_artifact_dir: `docs/epics/premerge-gate-check/code-reviews`
@@ -2937,7 +2956,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260616T083810Z-A`
 - issue_id: I-20260616T083810Z-A
-- phase_state: `done_b2_ibm`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260616T083810Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260616T083810Z--governance-enforce/candidates.md#C-20260616T083810Z-A`
 - verification_artifact_dir: `docs/epics/governance-enforce/code-reviews`
