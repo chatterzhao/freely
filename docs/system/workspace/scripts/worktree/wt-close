@@ -298,7 +298,7 @@ fi
 	if [[ "$FORCE" == true && -z "$wt_path" ]]; then
 	    :  # skip force-close trace for orphaned branches
 	  elif [[ "$FORCE" == true && -n "$issue_id" && -f "${issue_file:-}" ]]; then
-	  local _current_phase
+	  _current_phase=
 	  _current_phase="$(_fm_get "$issue_file" "phase_state")"
 	  if [[ "$_current_phase" == "absorbed" ]]; then
 	    echo "wt-close: frontmatter already absorbed by pr-merge-guarded, skipping force-close trace"
