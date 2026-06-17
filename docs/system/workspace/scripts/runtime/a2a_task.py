@@ -106,6 +106,39 @@ class A2AClient:
         else:
             return self._unix_request(method, path, body, timeout)
 
+    def _rest_request(self, method: str, path: str, body: Optional[Dict] = None,
+                      timeout: float = 30.0) -> dict:
+        """Send standard HTTP request to A2A Server REST endpoints (bypass JSON-RPC).
+
+        Used for Freely-specific operations (create, update) that carry
+        extended fields (worker_prompts_csv, delivery_status, worker_pid)
+        not preserved by the JSON-RPC tasks/send → execute() path.
+        """
+        self._ensure()
+        if self._url:
+            return self._http_request(method, path, body, timeout)
+        # Unix socket: send standard HTTP request to REST endpoint
+        data_bytes = json.dumps(body, default=str).encode() if body else b""
+        request = (f"{method} {path} HTTP/1.1\r\n"
+                   f"Host: localhost\r\n"
+                   f"Content-Type: application/json\r\n"
+                   f"Content-Length: {len(data_bytes)}\r\n"
+                   f"Connection: close\r\n\r\n")
+
+        sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        sock.settimeout(timeout)
+        try:
+            sock.connect(self._socket_path)
+            sock.sendall(request.encode() + data_bytes)
+            data = b""
+            while True:
+                chunk = sock.recv(4096)
+                if not chunk: break
+                data += chunk
+        finally:
+            sock.close()
+        return self._parse_response(data.decode("utf-8", errors="replace"))
+
     def _unix_request(self, method: str, path: str, body=None, timeout=30.0) -> dict:
         # Map REST-style paths to A2A JSON-RPC 2.0 methods.
         # The A2A Server uses official SDK create_jsonrpc_routes at POST /.
@@ -197,15 +230,17 @@ class A2AClient:
     # ── Task API ───────────────────────────────────────────────────────
 
     def create(self, **kwargs) -> dict:
-        return self._request("POST", "/tasks", dict(kwargs))
+        """Create task via REST endpoint (preserves Freely-specific fields)."""
+        return self._rest_request("POST", "/tasks", dict(kwargs))
 
     def get(self, task_id: str) -> Optional[dict]:
         r = self._request("GET", f"/tasks/{task_id}")
         return r if "id" in r else None
 
     def update(self, task_id: str, **fields) -> dict:
-        return self._request("PATCH", f"/tasks/{task_id}",
-                            dict(fields))
+        """Update task via REST endpoint (preserves Freely-specific fields)."""
+        return self._rest_request("PATCH", f"/tasks/{task_id}",
+                                  dict(fields))
 
     def list(self, **filters) -> List[dict]:
         params = [f"{k}={v}" for k, v in filters.items() if v]

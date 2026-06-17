@@ -433,7 +433,7 @@ class A2AServer:
                     "worktree": body.get("worktree", ""), "branch": body.get("branch", ""),
                     "raw_key": body.get("raw_key", body.get("rawKey", "")),
                     "completion_summary": body.get("summary", ""),
-                    "worker_prompts_csv": body.get("workers", ""),
+                    "worker_prompts_csv": body.get("worker_prompts_csv", body.get("workers", "")),
                     "message": body.get("message", ""),
                 }
                 self.task_store.raw_rpc("a2a_task.update", dict(fields))
