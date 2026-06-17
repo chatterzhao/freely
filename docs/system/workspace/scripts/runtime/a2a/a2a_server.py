@@ -79,7 +79,7 @@ def _build_agent_card(project: str) -> AgentCard:
         name="Freely Worker",
         description="Freely Worker Agent — worktree-isolated, skill-based A2A execution",
         version="1.0.0",
-        capabilities=AgentCapabilities(streaming=False, push_notifications=False),
+        capabilities=AgentCapabilities(streaming=True, push_notifications=True),
         skills=FREELY_SKILLS,
         supported_interfaces=[
             AgentInterface(
@@ -353,8 +353,62 @@ class A2AServer:
             Route("/tasks/pending-delivery", self._pending_delivery, methods=["GET"]),
             Route("/tasks/launched-pids", self._launched_pids, methods=["GET"]),
             Route("/tasks/{task_id:path}", self._task_endpoint, methods=["GET", "PATCH"]),
+            Route("/tasks/{task_id}/stream", self._task_stream_endpoint, methods=["GET"]),
         ])
         return Starlette(routes=routes)
+
+    # ── SSE Streaming ──────────────────────────────────────────────────────
+
+    def __init_sse(self):
+        """Lazy-init SSE subscriber registry."""
+        if not hasattr(self, '_sse_subscribers'):
+            self._sse_subscribers: dict[str, list] = {}
+
+    async def _task_stream_endpoint(self, request: Request):
+        """SSE endpoint: stream task state changes as Server-Sent Events.
+        GET /tasks/{task_id}/stream
+        """
+        task_id = request.path_params.get("task_id", "")
+        if not task_id or task_id == "stream":
+            return JSONResponse({"error": "task_id required"}, status_code=400)
+
+        self.__init_sse()
+        queue: asyncio.Queue = asyncio.Queue()
+
+        # Send initial state
+        task = self.task_store.get(task_id)
+        initial_state = task.status.state if task and hasattr(task, 'status') and task.status else "unknown"
+        await queue.put({"event": "initial", "data": {"task_id": task_id, "state": str(initial_state)}})
+
+        # Register subscriber
+        if task_id not in self._sse_subscribers:
+            self._sse_subscribers[task_id] = []
+        self._sse_subscribers[task_id].append(queue)
+
+        async def event_generator():
+            try:
+                while True:
+                    event = await queue.get()
+                    event_type = event.get("event", "message")
+                    data = json.dumps(event.get("data", {}), default=str)
+                    yield f"event: {event_type}\ndata: {data}\n\n"
+            except asyncio.CancelledError:
+                pass
+            finally:
+                if task_id in self._sse_subscribers and queue in self._sse_subscribers[task_id]:
+                    self._sse_subscribers[task_id].remove(queue)
+
+        return Response(
+            event_generator(),
+            media_type="text/event-stream",
+            headers={"Cache-Control": "no-cache", "Connection": "keep-alive", "X-Accel-Buffering": "no"},
+        )
+
+    async def _notify_sse(self, task_id: str, event_type: str, data: dict):
+        """Notify all SSE subscribers for a task of a state change."""
+        self.__init_sse()
+        for q in self._sse_subscribers.get(task_id, []):
+            await q.put({"event": event_type, "data": data})
 
     # ── Endpoints ──────────────────────────────────────────────────────
 
@@ -425,6 +479,13 @@ class A2AServer:
             if "next" in fields: fields.setdefault("next_action", fields.pop("next"))
             if "evidence" in fields: fields.setdefault("evidence_paths", fields.pop("evidence"))
             self.task_store.update_fields(task_id, **{k:v for k,v in fields.items() if v})
+            # Notify SSE subscribers of state change
+            if "state" in fields:
+                import asyncio as _asyncio
+                _asyncio.ensure_future(self._notify_sse(task_id, "state_update", {
+                    "task_id": task_id, "state": fields["state"],
+                    **{k: v for k, v in fields.items() if k != "state"}
+                }))
             row = self.task_store.raw_rpc("a2a_task.get", {"task_id": task_id}).get("record")
             return JSONResponse(row or {})
         return JSONResponse({"error": "Method Not Allowed"}, status_code=405)
