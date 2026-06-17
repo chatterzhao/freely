@@ -305,23 +305,9 @@ if [[ "$FORCE" == true && -z "$wt_path" ]]; then
   fi
 fi
 
-# ── Phase 3.5: Commit frontmatter changes ──
-
-if [[ "$FORCE" == true && -z "$wt_path" ]]; then
-    echo "wt-close: skipping frontmatter commit (orphaned branch)"
-  elif [[ "$DRY_RUN" == false && -n "$issue_id" && -f "${issue_file:-}" ]]; then
-  if ! git -C "$ROOT_DIR" diff --quiet -- "$issue_file" 2>/dev/null; then
-    echo "wt-close: committing frontmatter updates for $issue_id..."
-    git -C "$ROOT_DIR" add "$issue_file" 2>/dev/null || true
-    if FREELY_SKIP_IBM_GATE=1 git -C "$ROOT_DIR" commit -m "governance: wt-close frontmatter update for $issue_id" 2>/dev/null; then
-      echo "wt-close: frontmatter committed ✓"
-    else
-      echo "wt-close: frontmatter commit skipped (no changes or commit blocked)"
-    fi
-  fi
-elif [[ "$DRY_RUN" == true && -n "$issue_id" && -f "${issue_file:-}" ]]; then
-  _dry "git -C $ROOT_DIR add $issue_file && git -C $ROOT_DIR commit -m 'governance: wt-close frontmatter update for $issue_id'"
-fi
+# ── Phase 3.5: Frontmatter already absorbed by pr-merge-guarded ──
+# No local develop commit needed. The merge commit carries phase_state=absorbed,
+# force_closed_at, and absorbed_into. wt-close only removes the worktree + branch.
 
 # ── Phase 4: Remote branch delete ──
 

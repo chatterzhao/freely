@@ -264,10 +264,50 @@ cleanup_guarded_state() {
   rm -f "$state_file"
 }
 
+_absorb_close_frontmatter() {
+  # After merge, update raw issue frontmatter so wt-close doesn't need to.
+  # This keeps develop clean — no dirty files, no FREELY_SKIP_IBM_GATE commits.
+  local source_branch="$1"
+  local raw_key
+  raw_key=$(echo "$source_branch" | grep -oE 'raw-[0-9]{8}T[0-9]{6}Z' | head -1 || true)
+  [[ -n "$raw_key" ]] || return 0
+  local issue_file="docs/issues/${raw_key}/issue.md"
+  [[ -f "$issue_file" ]] || return 0
+
+  local now
+  now=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+  # update frontmatter: phase_state=absorbed, add force_closed timestamps
+  python3 -c "
+import yaml, sys
+with open('$issue_file') as f:
+    parts = f.read().split('---', 2)
+fm = yaml.safe_load(parts[1]) if len(parts) >= 3 else {}
+fm['phase_state'] = 'absorbed'
+fm['force_closed_at'] = '$now'
+fm['force_closed_reason'] = 'pr-merge-guarded: absorbed by merge'
+if 'absorbed_into' not in fm:
+    fm['absorbed_into'] = ''
+new_fm = yaml.dump(fm, default_flow_style=False, allow_unicode=True, sort_keys=False).strip()
+body = parts[2] if len(parts) >= 3 else ''
+with open('$issue_file', 'w') as f:
+    f.write('---\n' + new_fm + '\n---' + body)
+" 2>/dev/null || true
+
+  if ! git diff --quiet -- "$issue_file" 2>/dev/null; then
+    git add "$issue_file" 2>/dev/null || true
+    git commit --amend --no-edit 2>/dev/null || true
+    echo "[MERGE-GUARD] frontmatter absorbed for $raw_key ✓"
+  fi
+}
+
 attempt_develop_push_followthrough_if_needed() {
   local target="$1"
   [[ "$target" == "develop" ]] || return 0
   [[ -x "./bin/freely" ]] || return 0
+
+  # Absorb close frontmatter into merge commit (replaces wt-close develop commit)
+  _absorb_close_frontmatter "${2:-}"
 
   echo "[MERGE-GUARD] develop merge completed; pushing to all remotes"
 
@@ -539,7 +579,7 @@ do_initial_merge() {
         git pull "$merge_remote" "$target" --ff-only 2>/dev/null || true
 
         # Sync develop to all other platforms
-        attempt_develop_push_followthrough_if_needed "$target"
+        attempt_develop_push_followthrough_if_needed "$target" "$source_branch"
         return 0
       fi
       # gh returned non-zero — check if the PR was actually merged despite
@@ -551,7 +591,7 @@ do_initial_merge() {
         echo "[MERGE-GUARD] gh error was non-fatal; pulling the merge commit..." >&2
         git fetch "$merge_remote" "$target" 2>/dev/null || true
         git pull "$merge_remote" "$target" --ff-only 2>/dev/null || true
-        attempt_develop_push_followthrough_if_needed "$target"
+        attempt_develop_push_followthrough_if_needed "$target" "$source_branch"
         return 0
       fi
       echo "[MERGE-GUARD] GitHub merge failed (PR state=$pr_state), falling back to local merge..." >&2
@@ -577,7 +617,7 @@ do_initial_merge() {
   set -e
   if ! git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1; then
     cleanup_guarded_state
-    attempt_develop_push_followthrough_if_needed "$target"
+    attempt_develop_push_followthrough_if_needed "$target" "$source_branch"
     if [[ "$continue_rc" -ne 0 ]]; then
       echo "[MERGE-GUARD] warning: merge commit created but git merge --continue returned $continue_rc (non-critical)" >&2
     fi
@@ -609,7 +649,7 @@ do_completion() {
   set -e
   if ! git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1; then
     cleanup_guarded_state
-    attempt_develop_push_followthrough_if_needed "$target"
+    attempt_develop_push_followthrough_if_needed "$target" "$source_branch"
     if [[ "$continue_rc" -ne 0 ]]; then
       echo "[MERGE-GUARD] warning: merge commit created but git merge --continue returned $continue_rc (non-critical)" >&2
     fi

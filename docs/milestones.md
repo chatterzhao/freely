@@ -1,3 +1,19 @@
+## M-20260617T124129Z-A
+- title: pr-merge-guarded absorbs wt-close frontmatter
+- status: active
+### candidate_issues
+1. `C-20260617T124129Z-A`
+- milestone: M-20260617T124129Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260617T124129Z-A/issue.md`
+### committed_issues
+1. `I-20260617T124129Z-A`
+- title: pr-merge-guarded absorbs wt-close
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260617T124129Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/merge-absorbs-close/code-reviews`
+
 ## M-20260617T121221Z-A
 - title: Remove worker_prompts_csv leftovers
 - status: active
