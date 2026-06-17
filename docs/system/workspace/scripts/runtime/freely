@@ -3909,64 +3909,70 @@ write_config() {
 
   default_fallback_tools="$(runtime_default_fallback_tools_for_current_tool "$tool" | paste -sd, -)"
 
-  cat >"$cfg" <<EOF
-PROJECT_ROOT = "$project"
-INTENT_FILE = "$intent"
-CONSTITUTION_FILE = "$constitution"
-FREELY_HOME = "$SELF_ROOT"
-AI_TOOL = "$tool"
-AI_MODEL = "$model"
-AI_MODE = "$mode"
-AI_REASONING_EFFORT = "$reasoning_effort"
-AI_TOOL_ADAPTER = "$tool_adapter"
-AI_TOOL_ADAPTER_POLICY = "$tool_adapter_policy"
-AI_TOOL_CAPABILITIES = "$tool_capabilities"
-AI_TOOL_POLICY = "$tool_policy"
-AI_CAPABILITY_CODEX_MODEL = "$codex_capability_model"
-AI_CAPABILITY_CODEX_SANDBOX = "$codex_capability_sandbox"
-AI_CAPABILITY_CODEX_APPROVAL_POLICY = "$codex_capability_approval_policy"
-AI_CAPABILITY_CODEX_CWD_MODE = "$codex_capability_cwd_mode"
-AUTO_SWITCH_SLOT = true
-AUTO_SWITCH_TOOL = true
-AUTO_SETUP_FREELY_PROXY = true
-AI_FALLBACK_TOOLS = "$default_fallback_tools"
-CHECK_INTERVAL = 10
-RESTART_DELAY = 2
-MAX_RESTARTS = 0
-IFLOW_MAX_TURNS = 100
-MAX_RESUME_STREAK = 24
-MAX_ROUTE_ONLY_STREAK = 1
-ROTATE_ON_CONTEXT_COMPACTED = 1
-SESSION_HANDOFF_TAIL_LINES = 80
-CONTEXT_WARN_RATIO = 0.70
-CONTEXT_ROTATE_RATIO = 0.85
-CHECKPOINT_WARN_DIRTY_ENTRIES = 40
-CHECKPOINT_BLOCK_DIRTY_ENTRIES = 120
-CHECKPOINT_DRIFT_STREAK_THRESHOLD = 2
-RESTART_STORM_WINDOW_SECS = 30
-RESTART_STORM_COUNT = 10
-PROCESS_CHURN_PEAK = 10
-RESTART_STORM_OBSERVE_DELAY_SECS = 30
-# Proxy mode
-#   inherit  keep ambient shell proxy env for tool launches
-#   disabled clear ALL_PROXY/HTTP_PROXY/HTTPS_PROXY/NO_PROXY before tool launches
-#   explicit force the FREELY_* proxy values below for tool launches
-FREELY_NETWORK_PROXY_MODE = "inherit"
-FREELY_NETWORK_PROXY_URL = ""
-FREELY_ALL_PROXY = ""
-FREELY_HTTP_PROXY = ""
-FREELY_HTTPS_PROXY = ""
-FREELY_NO_PROXY = ""
-# Repo platforms for PR/issue scanning. Comma-separated, e.g. "github,gitee".
-# Each platform name maps to its CLI: github->gh, gitee->gitee.
-# Empty = no platform scanning.
-FREELY_REPO_PLATFORMS = ""
-FREELY_SECURITY_REVIEW_POLICY = "advisory-on-high-risk-or-uncertainty"
-FREELY_SECURITY_REVIEW_SCOPE = "execution-boundary-and-reviewer-support"
-EOF
+  # Use freely_config.py for proper TOML serialization (escaping, type inference)
+  # instead of bash heredoc which bypasses Python's _toml_quote and _shell_quote.
+  python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely_config.py" init-toml \
+    --project "$project" \
+    --value "PROJECT_ROOT=$project" \
+    --value "INTENT_FILE=$intent" \
+    --value "CONSTITUTION_FILE=$constitution" \
+    --value "FREELY_HOME=$SELF_ROOT" \
+    --value "AI_TOOL=$tool" \
+    --value "AI_MODEL=$model" \
+    --value "AI_MODE=$mode" \
+    --value "AI_REASONING_EFFORT=$reasoning_effort" \
+    --value "AI_TOOL_ADAPTER=$tool_adapter" \
+    --value "AI_TOOL_ADAPTER_POLICY=$tool_adapter_policy" \
+    --value "AI_TOOL_CAPABILITIES=$tool_capabilities" \
+    --value "AI_TOOL_POLICY=$tool_policy" \
+    --value "AI_CAPABILITY_CODEX_MODEL=$codex_capability_model" \
+    --value "AI_CAPABILITY_CODEX_SANDBOX=$codex_capability_sandbox" \
+    --value "AI_CAPABILITY_CODEX_APPROVAL_POLICY=$codex_capability_approval_policy" \
+    --value "AI_CAPABILITY_CODEX_CWD_MODE=$codex_capability_cwd_mode" \
+    --value "AUTO_SWITCH_SLOT=true" \
+    --value "AUTO_SWITCH_TOOL=true" \
+    --value "AUTO_SETUP_FREELY_PROXY=true" \
+    --value "AI_FALLBACK_TOOLS=$default_fallback_tools" \
+    --value "CHECK_INTERVAL=10" \
+    --value "RESTART_DELAY=2" \
+    --value "MAX_RESTARTS=0" \
+    --value "IFLOW_MAX_TURNS=100" \
+    --value "MAX_RESUME_STREAK=24" \
+    --value "MAX_ROUTE_ONLY_STREAK=1" \
+    --value "ROTATE_ON_CONTEXT_COMPACTED=1" \
+    --value "SESSION_HANDOFF_TAIL_LINES=80" \
+    --value "CONTEXT_WARN_RATIO=0.70" \
+    --value "CONTEXT_ROTATE_RATIO=0.85" \
+    --value "CHECKPOINT_WARN_DIRTY_ENTRIES=40" \
+    --value "CHECKPOINT_BLOCK_DIRTY_ENTRIES=120" \
+    --value "CHECKPOINT_DRIFT_STREAK_THRESHOLD=2" \
+    --value "RESTART_STORM_WINDOW_SECS=30" \
+    --value "RESTART_STORM_COUNT=10" \
+    --value "PROCESS_CHURN_PEAK=10" \
+    --value "RESTART_STORM_OBSERVE_DELAY_SECS=30" \
+    --value "FREELY_NETWORK_PROXY_MODE=inherit" \
+    --value "FREELY_NETWORK_PROXY_URL=" \
+    --value "FREELY_ALL_PROXY=" \
+    --value "FREELY_HTTP_PROXY=" \
+    --value "FREELY_HTTPS_PROXY=" \
+    --value "FREELY_NO_PROXY=" \
+    --value "FREELY_REPO_PLATFORMS=" \
+    --value "FREELY_SECURITY_REVIEW_POLICY=advisory-on-high-risk-or-uncertainty" \
+    --value "FREELY_SECURITY_REVIEW_SCOPE=execution-boundary-and-reviewer-support" \
+    --value "FREELY_AUTONOMY_PROFILE=autonomous-default" \
+    --value "FREELY_INTERACTION_POSTURE=non-interactive" \
+    --value "FREELY_APPROVAL_POSTURE=automatic-where-supported" \
+    --value "FREELY_SAFEGUARD_GUIDANCE_POSTURE=recommended-nonblocking" \
+    --value "FREELY_RUNTIME_DECISION_POSTURE=internal-ai-escalation-before-stop" \
+    --value "FREELY_MINIMAL_RISK_POSTURE=last-resort-safe-stop" \
+    --value "FREELY_ACTIVATION_CONSENT_REQUIRED=true" \
+    --value "FREELY_ACTIVATION_CONSENT_STATUS=accepted" \
+    --value "FREELY_ACTIVATION_CONSENT_RECORDED_AT=auto" \
+    --value "FREELY_ACTIVATION_CONSENT_RECORDED_VIA=freely-init"
+
 }
 
-config_bool_enabled() {
+config_bool_enabledconfig_bool_enabled() {
   local value="${1:-}"
   value="$(printf '%s' "$value" | tr '[:upper:]' '[:lower:]')"
   case "$value" in
