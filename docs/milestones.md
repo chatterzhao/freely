@@ -1,3 +1,19 @@
+## M-20260617T063755Z-A
+- title: A2A Unified Data Flow — eliminate _db_rpc bypass + SSE
+- status: active
+### candidate_issues
+1. `C-20260617T063755Z-A`
+- milestone: M-20260617T063755Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260617T063755Z-A/issue.md`
+### committed_issues
+1. `I-20260617T063755Z-A`
+- title: A2A Unified Data Flow
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260617T063755Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/a2a-unified-data-flow/code-reviews`
+
 <!-- file_size_check: skip (auto-populated milestone index) -->
 ## M-20260617T055840Z-A
 - title: Merge Guard + Rebase Integrity — branch protection 拦截直接 merge + post-rewrite hook
