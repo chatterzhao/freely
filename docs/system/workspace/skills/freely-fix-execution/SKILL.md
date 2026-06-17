@@ -93,7 +93,7 @@ hotfix/*          → main
 | 原 feature 工位 | 做法 |
 |---|---|
 | **还在** | 直接在 feature 上改 → 测 → 提交。走 feature → test-pre-merge → pr-create-guarded → pr-merge-guarded develop |
-| **已退役（已合并/已删）** | 建 `test-pre-merge-*` 私有工位快测 → cp 到新建的 `fix/*` 或 `hotfix/*` |
+| **已退役（已合并/已删）** | 建 `test-pre-merge-*` 私有工位快测 → cp 到新建的 `fix/*` 或 `hotfix/*` → `freely pr-create-guarded` 命令 → `freely pr-merge-guarded develop <branch>` 命令 → `freely wt-close` 命令 |
 
 ### 再判严重程度
 
@@ -158,11 +158,18 @@ hotfix/*          → main
   ├─ skill:freely-dev-loop-execution → code-review（必须 ## Implementation Decision Note）+ pre-tests
   └─ milestones.md
 
-阶段 4 — 门禁合并
+阶段 4a — 提 PR
   │
-  ├─ 运行 ./bin/governance-merge-gate --range "develop..HEAD" 只检查本分支
-  ├─ gate 失败：用对应 skill 修复分支自己的错误，预存错误不阻塞
-  ├─ gate 通过：freely pr-merge-guarded develop fix/<name>
+  ├─ 在 fix worktree 中执行 `freely pr-create-guarded` 命令
+  ├─ 自动完成：pull develop → 冲突处理 → dry-run gate → push → gh pr create
+  ├─ 禁止用 gh pr create 命令替代
+  │
+阶段 4b — 门禁合并
+  │
+  ├─ 切换到 develop 分支：git checkout develop
+  ├─ 在 develop 分支执行 `freely pr-merge-guarded develop fix/<name>` 命令
+  ├─ 自动完成：PR gate → promotion gate → gh pr merge → 本地同步 → 推送全部 remote → issue 同步
+  ├─ 禁止用 gh pr merge --admin 命令替代
   ├─ 紧急: freely pr-merge-guarded develop hotfix/<name>
   └─ 可选: git checkout main && freely pr-merge-guarded main hotfix/<name>
 
@@ -170,10 +177,8 @@ hotfix/*          → main
   │
   ├─ 丢弃 test-pre-merge-* 上的 dirty 修改（已经 cp 到可写工位）
   │     cd <test-pre-merge-wt> && git checkout -- . && git clean -fd
-  ├─ 关闭 test-pre-merge-* 工位和分支
-  │     freely wt-close test-pre-merge-<name>
-  └─ 关闭 fix 工位和分支（PR 已合并到 develop）
-        freely wt-close fix/<name>
+  ├─ 执行 `freely wt-close test-pre-merge-<name>` 命令关闭测试工位
+  └─ 执行 `freely wt-close fix/<name>` 命令关闭 fix 工位和分支（PR 已合并到 develop）
 ```
 
 ---
@@ -186,7 +191,8 @@ hotfix/*          → main
 - **原 feature 还在就直接在上面修**，不新建工位。
 - **治理后置**，验证通过再写。
 - **根因深挖**，不修表面症状。
-- **不跳过门禁**，用 pr-create-guarded / pr-merge-guarded。
+- **不跳过门禁**，`freely pr-create-guarded` 命令和 `freely pr-merge-guarded` 命令是提 PR 和合并的唯一合法入口。
+- **禁止用原子命令绕过**：gh pr create、gh pr merge --admin、git push --force、git merge 等原子命令不得替代 pr-create-guarded / pr-merge-guarded 命令。
 
 ## 门禁常见坑速查
 

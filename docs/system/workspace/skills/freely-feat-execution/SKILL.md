@@ -84,23 +84,23 @@ freely-feat-execution 在不同阶段调用下层 skill：
 3. phase_state → in_verification
 ```
 
-### 阶段 5：提 PR
+### 阶段 5：`freely pr-create-guarded` 命令提 PR
 ```
 1. 在 feature worktree 运行 dry-run 门禁检查
-2. 运行 `freely pr-create-guarded`
+2. 运行 `freely pr-create-guarded` 命令
 3. PR 审查通过后进入门禁合并
 ```
 
-### 阶段 6：门禁合并
+### 阶段 6：`freely pr-merge-guarded` 命令门禁合并
 ```
-1. 运行 `freely pr-merge-guarded develop <pr-branch>`
+1. 切换到 develop 分支，运行 `freely pr-merge-guarded develop <pr-branch>` 命令（必须在 develop 分支执行）
 2. PR gate 检查
 3. promotion gate 检查
 4. pr-merge-guarded develop <pr-branch> → develop-push
 5. issue-sync close
 ```
 
-### 阶段 7：收口
+### 阶段 7：`freely wt-close` 命令收口
 ```
 1. 更新 issue phase_state → completed
 2. 更新 milestones.md
@@ -123,3 +123,4 @@ freely-feat-execution 在不同阶段调用下层 skill：
 - 分支名必须以 `feature/` 为前缀，工位名必须包含 `feature`
 - feature worktree 必须用 ./bin/wt-create 创建
 - 门禁必须过，不过就修，不绕过
+- `freely pr-create-guarded` 命令和 `freely pr-merge-guarded` 命令是提 PR 和合并的唯一合法入口。禁止用 gh pr create、gh pr merge --admin、git push --force、git merge 等原子命令替代
