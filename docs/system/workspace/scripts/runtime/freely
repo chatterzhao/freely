@@ -3619,9 +3619,15 @@ current_workcell_session_refs() {
   printf '[tool=%s,resume_target=%s,scope=workcell-current]\n' "$tool" "$resume_target"
 }
 
-is_valid_uuid() {
+# is_valid_session_id: accepts UUID v4 (Claude Code/Codex CLI) and ses_ format (OpenCode)
+is_valid_session_id() {
   local value="$1"
-  [[ "$value" =~ ^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$ ]]
+  [[ "$value" =~ ^(ses_[A-Za-z0-9]+|[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$ ]]
+}
+
+# backward compat: existing callers
+is_valid_uuid() {
+  is_valid_session_id "$@"
 }
 
 # _persist_session_anchor_early: write session ID to disk immediately

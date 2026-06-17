@@ -425,20 +425,24 @@ main() {
   set -e
 
   # ── Completion detection: stopReason from ACP protocol output ──
-  # Search entire file for clean UUID — cycle log line 1 may be blank.
-  local session_id_clean session_id_out stop_reason
-  session_id_clean=$(grep -oE '[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}' "$log_file" 2>/dev/null | head -1 || true)
-  session_id_out=$(sed -n 's/^session id: //p' "$log_file" | tail -n 1 || true)
-  # Fallback: if UUID pattern did not match (e.g. opencode ses_ format), use session_id_out
+  # Match both UUID v4 (Claude Code/Codex) and ses_ format (OpenCode).
+  # Session IDs never contain spaces; human-readable labels like "(prompt)"
+  # and "(fresh after prompt failure)" always follow a space.
+  local session_id_clean session_id_out_raw session_id_out stop_reason
+  session_id_clean=$(grep -oE '(ses_[A-Za-z0-9]+|[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})' "$log_file" 2>/dev/null | head -1 || true)
+  session_id_out_raw=$(sed -n 's/^session id: //p' "$log_file" | tail -n 1 || true)
+  # Strip label suffix: valid session IDs (UUID v4 and ses_) contain no spaces
+  session_id_out="${session_id_out_raw%% *}"
+  # Fallback: if pattern did not match, use stripped session_id_out
   if [[ -z "$session_id_clean" && -n "$session_id_out" ]]; then
     session_id_clean="$session_id_out"
   fi
 
-  # If session/prompt fell back to session/new, the first bare UUID in the log
+  # If session/prompt fell back to session/new, the first matched ID in the log
   # is the stale resume target. Use the NEW session ID from the fallback instead.
-  if echo "$session_id_out" | grep -qE '\(fresh after (prompt|resume) failure\)'; then
+  if echo "$session_id_out_raw" | grep -qE '\(fresh after (prompt|resume) failure\)'; then
     local _fallback_sid
-    _fallback_sid=$(echo "$session_id_out" | grep -oE '[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}' | head -1 || true)
+    _fallback_sid=$(echo "$session_id_out_raw" | grep -oE '(ses_[A-Za-z0-9]+|[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})' | head -1 || true)
     if [[ -n "$_fallback_sid" ]]; then
       session_id_clean="$_fallback_sid"
     fi
@@ -454,7 +458,7 @@ main() {
   if [[ -n "$session_id_clean" ]]; then
     local resume_mode_detected=""
     if [[ "$launch_kind" == "resume" ]]; then
-      if echo "$session_id_out" | grep -q "(fresh after resume failure)"; then
+      if echo "$session_id_out_raw" | grep -q "(fresh after resume failure)"; then
         resume_mode_detected="recreated"
       else
         resume_mode_detected="native"
