@@ -12814,18 +12814,26 @@ manager_runtime_launch_workers_after_ai_cycle_if_needed() {
     return 0
   fi
 
-  local _worker_csv _prompt_file _launched_count _a2a_task_py _db_path _task_id
+  local _worker_tasks _prompt_file _launched_count _a2a_task_py _db_path _task_id
   local _prev_worker_id _prev_worker_summary _raw_key _parent_task_id _is_followthrough
   _a2a_task_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db_path=""$project/.freely/freely.db""
-  _worker_csv="$(_db_exit_contract_field "$project" manager worker_prompts_csv)"
+  # A2A-native: query submitted worker tasks instead of CSV
+  _worker_tasks=$(python3 "$_a2a_task_py" list --role worker --status submitted 2>/dev/null | python3 -c "
+import json,sys
+try:
+    rows=json.load(sys.stdin)
+    for r in rows:
+        pf=r.get('prompt_file','')
+        if pf: print(pf)
+except: pass
+" 2>/dev/null || true)
   # Get parent handoff_id (latest manager record)
   _parent_task_id=$(python3 "$_a2a_task_py" latest-manager 2>/dev/null | \
     python3 -c "import json,sys; print(json.load(sys.stdin).get('task_id',''))" 2>/dev/null || echo "")
   _launched_count=0
-  if [[ -n "$_worker_csv" ]]; then
-    local IFS=","
-    for _prompt_file in $_worker_csv; do
+  if [[ -n "$_worker_tasks" ]]; then
+    while IFS= read -r _prompt_file; do
       [[ -n "$_prompt_file" && -f "$_prompt_file" ]] || continue
       # Guard: skip if worktree already has an active worker
       local _target_worktree
@@ -12913,7 +12921,7 @@ EOF
             --reason "${LAUNCH_REJECT_REASON:-launchable check failed}" >/dev/null 2>&1 || true
         fi
       fi
-    done
+    done <<< "$_worker_tasks"
   fi
   launched_count="$_launched_count"
   [[ "$launched_count" =~ ^[0-9]+$ ]] || launched_count="0"
@@ -14619,33 +14627,22 @@ manager_exit_contract_has_launchable_worker_prompt() {
 
 validate_manager_exit_contract_for_project() {
   local project="$1" kind="" missing_csv=""
-  local stop_reason restart_point next_action why_not_stop why_not_delegate worker_prompts_csv
+  local stop_reason restart_point next_action why_not_stop why_not_delegate
   local _a2a_task_py _db_path
   _a2a_task_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db_path=""$project/.freely/freely.db""
   if [[ -f "$_a2a_task_py" && -f "$_db_path" ]]; then
-    local pending_workers worker_prompts_list
-    pending_workers=$(python3 "$_a2a_task_py" list --role worker --status pending 2>/dev/null | python3 -c "
+    # A2A-native: query submitted worker tasks instead of CSV
+    local pending_workers
+    pending_workers=$(python3 "$_a2a_task_py" list --role worker --status submitted 2>/dev/null | python3 -c "
 import json,sys
 try:
     rows=json.load(sys.stdin)
-    files=[r.get('prompt_file','') for r in rows if r.get('prompt_file')]
-    print(','.join(files))
-except: pass
-" 2>/dev/null || true)
-    if [[ -n "$pending_workers" ]]; then
-      worker_prompts_csv="$pending_workers"
+    print(len(rows))
+except: print('0')
+" 2>/dev/null || echo "0")
+    if [[ "${pending_workers:-0}" -gt 0 ]]; then
       kind="delegate_workers"
-    fi
-    # Check worker_prompts_csv from latest manager A2A task.
-    # a2a-exit --workers writes this field, not exit_kind.
-    if [[ -z "$kind" ]]; then
-      local _mgr_workers
-      _mgr_workers=$(python3 "$_a2a_task_py" latest-manager 2>/dev/null | python3 -c "import json,sys; r=json.load(sys.stdin); print(r.get('worker_prompts_csv',''))" 2>/dev/null || true)
-      if [[ -n "$_mgr_workers" && "$_mgr_workers" != "null" ]]; then
-        worker_prompts_csv="$_mgr_workers"
-        kind="delegate_workers"
-      fi
     fi
     if [[ -z "$kind" ]]; then
       kind="$(_db_exit_contract_field "$project" manager exit_kind)"
@@ -14670,25 +14667,20 @@ except: pass
   stop_reason="$(_db_exit_contract_field "$project" manager reason)"
   restart_point="$(_db_exit_contract_field "$project" manager restart_point)"
   next_action="$(_db_exit_contract_field "$project" manager next_action)"
-  why_not_stop=""  # unified reason field, old why_not_stop column removed
-  why_not_delegate=""  # unified reason field, old why_not_delegate column removed
-  worker_prompts_csv="$(_db_exit_contract_field "$project" manager worker_prompts_csv)"
+  why_not_stop=""
+  why_not_delegate=""
   case "$kind" in
     stop_ai)
       [[ -n "$stop_reason" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "STOP_REASON")"
-      [[ -z "$restart_point$next_action$worker_prompts_csv" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "exclusive_fields_conflict")"
+      [[ -z "$restart_point$next_action" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "exclusive_fields_conflict")"
       ;;
     resume_manager)
       [[ -n "$restart_point" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "RESTART_POINT")"
       [[ -n "$next_action" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "NEXT_ACTION")"
-      # why_not_stop/why_not_delegate removed in reason-unify (#344), skip
-      [[ -z "$worker_prompts_csv" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "exclusive_fields_conflict")"
+      [[ -z "$why_not_stop$why_not_delegate" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "exclusive_fields_conflict")"
       ;;
     delegate_workers)
-      [[ -n "$worker_prompts_csv" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "WORKER_PROMPTS_CSV")"
-      if [[ -n "$worker_prompts_csv" ]] && ! manager_exit_contract_has_launchable_worker_prompt "$project" "$worker_prompts_csv"; then
-        missing_csv="$(csv_append_unique_item "$missing_csv" "WORKER_PROMPTS_NOT_LAUNCHABLE")"
-      fi
+      # A2A-native: worker existence validated via tasks/list query above
       [[ -z "$restart_point$next_action$why_not_stop$why_not_delegate" ]] || missing_csv="$(csv_append_unique_item "$missing_csv" "exclusive_fields_conflict")"
       ;;
   esac
