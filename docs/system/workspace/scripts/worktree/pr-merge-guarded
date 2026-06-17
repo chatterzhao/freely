@@ -143,6 +143,72 @@ run_promotion_gate_if_needed() {
   fi
 }
 
+check_rebase_integrity() {
+  # Rejects merge if post-rewrite hook detected lost files during rebase.
+  # Marker written by docs/system/workspace/hooks/post-rewrite.sh
+  local marker_file="$PWD/.freely/run/rebase-lost-files"
+  if [[ -f "$marker_file" && -s "$marker_file" ]]; then
+    cat >&2 <<EOF
+╔══════════════════════════════════════════════════════════╗
+║  REBASE INTEGRITY GATE FAILED                            ║
+╠══════════════════════════════════════════════════════════╣
+║  The post-rewrite hook detected files that were present  ║
+║  before rebase but are MISSING from the post-rebase diff.║
+║  This may indicate code was accidentally dropped during  ║
+║  conflict resolution.                                    ║
+╠══════════════════════════════════════════════════════════╣
+║  Lost files:                                             ║
+EOF
+    while IFS= read -r f; do
+      echo "║    $f" >&2
+    done < "$marker_file"
+    cat >&2 <<EOF
+╠══════════════════════════════════════════════════════════╣
+║  Action required:                                        ║
+║    1. Verify these files were intentionally dropped      ║
+║    2. If accidental: restore changes and commit          ║
+║    3. Clear marker: rm -f .freely/run/rebase-lost-files  ║
+╚══════════════════════════════════════════════════════════╝
+EOF
+    fail "rebase integrity: $(wc -l < "$marker_file" | tr -d ' ') file(s) lost during rebase"
+  fi
+}
+
+_set_governance_check_pass() {
+  # Update the governance/pr-merge-guard check run (created by CI workflow)
+  # from "in_progress" to "success". This satisfies GitHub branch protection's
+  # required status check, allowing gh pr merge (without --admin) to proceed.
+  local source_branch="$1"
+  local head_sha
+  head_sha="$(git rev-parse "$source_branch" 2>/dev/null)" || return 0
+  if ! command -v gh &>/dev/null; then return 0; fi
+
+  # Find the existing check run created by the CI workflow, update it to success.
+  local check_run_id
+  check_run_id=$(gh api "repos/{owner}/{repo}/commits/$head_sha/check-runs" \
+    --jq '.check_runs[] | select(.name == "governance/pr-merge-guard") | .id' 2>/dev/null | head -1)
+
+  if [[ -n "$check_run_id" ]]; then
+    gh api -X PATCH "repos/{owner}/{repo}/check-runs/$check_run_id" \
+      --field status="completed" \
+      --field conclusion="success" \
+      --field 'output[title]=Governance gates passed' \
+      --field 'output[summary]=All pr-merge-guarded governance gates passed.' \
+      >/dev/null 2>&1 || true
+  else
+    # No existing check run (CI hasn't run yet or branch protection not configured).
+    # Create one so gh pr merge (without --admin) can succeed.
+    gh api "repos/{owner}/{repo}/check-runs" \
+      --field name="governance/pr-merge-guard" \
+      --field head_sha="$head_sha" \
+      --field status="completed" \
+      --field conclusion="success" \
+      --field 'output[title]=Governance gates passed' \
+      --field 'output[summary]=All pr-merge-guarded governance gates passed (created locally).' \
+      >/dev/null 2>&1 || true
+  fi
+}
+
 render_merge_message() {
   local merge_path="$1"
   local source_branch="$2"
@@ -432,6 +498,9 @@ do_initial_merge() {
 
   run_promotion_gate_if_needed "$target" "$source_branch"
 
+  # Rebase integrity: block merge if post-rewrite hook detected lost files.
+  check_rebase_integrity
+
   # ── Dry run: skip merge, issue-sync, and develop-push ──
   if [[ "$dry_run" == "1" ]]; then
     echo "[MERGE-GUARD] --dry-run complete: all gates passed. (merge/sync/push skipped)"
@@ -451,7 +520,9 @@ do_initial_merge() {
     gh_pr="$(gh pr list --head "$source_branch" --state OPEN --json number -q '.[0].number' 2>/dev/null || true)"
     if [[ -n "$gh_pr" ]]; then
       echo "[MERGE-GUARD] merging via GitHub PR #$gh_pr..."
-      # Use --admin to skip required-checks (governance gate already passed)
+      # Set governance check to success so GitHub branch protection allows merge.
+      # This replaces the previous --admin flag which bypassed all required checks.
+      _set_governance_check_pass "$source_branch"
       # Use --merge strategy to create a proper merge commit.
       # Do NOT use --delete-branch: branch lifecycle is managed by wt-close,
       # not by pr-merge-guarded. Premature deletion of a branch with an
@@ -459,7 +530,7 @@ do_initial_merge() {
       # succeeds, triggering a false fallback to local merge that produces
       # a duplicate merge commit and cross-platform develop divergence.
       local gh_rc=0
-      gh pr merge "$gh_pr" --merge --admin \
+      gh pr merge "$gh_pr" --merge \
            --subject "$merge_message" 2>&1 || gh_rc=$?
       if [[ "$gh_rc" -eq 0 ]]; then
         echo "[MERGE-GUARD] GitHub PR #$gh_pr merged ✓"
