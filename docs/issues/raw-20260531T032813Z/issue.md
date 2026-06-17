@@ -12,11 +12,12 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-31T03:28:28Z'
-updated_at: '2026-05-31T03:28:28Z'
+updated_at: '2026-06-17T00:19:43Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 ## 修复

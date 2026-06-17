@@ -1,4 +1,19 @@
 {
   "last_scan_at": "2026-06-16T00:16:45Z",
-  "version": "1.0"
+  "version": "1.0",
+  "last_sync_at": "2026-06-17T00:25:04Z",
+  "synced_issues": {
+    "I-20260616T084121Z-platform-sync-batch": {
+      "mtime": 1781655694,
+      "synced_at": "2026-06-17T00:21:34Z"
+    },
+    "I-20260616T044825Z-A": {
+      "mtime": 1781655859,
+      "synced_at": "2026-06-17T00:24:19Z"
+    },
+    "I-20260616T110714Z-parse-env-removal": {
+      "mtime": 1781655904,
+      "synced_at": "2026-06-17T00:25:04Z"
+    }
+  }
 }

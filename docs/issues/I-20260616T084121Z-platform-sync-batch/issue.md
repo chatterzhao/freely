@@ -6,6 +6,14 @@ promoted_from: raw-20260616T084121Z
 source_candidate: docs/pre-brainstorms/20260616T084121Z--platform-sync-batch/candidates.md
 canonical_issue_path: docs/issues/I-20260616T084121Z-platform-sync-batch/issue.md
 primary_platform: github
+platform_ids:
+  github:
+    issue_id: '2867'
+    url: https://github.com/chatterzhao/freely/issues/2867
+    synced_at: '2026-06-17T00:21:34Z'
+updated_at: '2026-06-17T00:21:34Z'
+created_at: '2026-06-17T00:21:34Z'
+platform_state: open
 ---
 
 # Issue: Platform Sync Batch — raw-20260616T084121Z

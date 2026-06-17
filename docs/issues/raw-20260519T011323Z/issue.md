@@ -5,13 +5,13 @@ phase_state: absorbed
 source: feedback
 created_at: '2026-05-19T01:13:23Z'
 title: 'supervisor crash: bash rc=0'
-platform_state: open
+platform_state: closed
 platform_ids:
   github:
     issue_id: '598'
     url: https://github.com/chatterzhao/freely/issues/598
     synced_at: '2026-05-19T01:46:54Z'
-updated_at: '2026-05-19T01:46:54Z'
+updated_at: '2026-06-17T00:19:04Z'
 primary_platform: github
 ---
 
