@@ -12,11 +12,13 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-17T05:58:56Z'
-updated_at: '2026-06-17T05:58:56Z'
+updated_at: '2026-06-17T06:27:15Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
+force_closed_at: '2026-06-17T06:27:15Z'
+force_closed_reason: phase_state field fix only, code already merged to develop
 ---
 
 ## 问题
