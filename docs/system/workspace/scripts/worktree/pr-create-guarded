@@ -112,6 +112,40 @@ mkdir -p .freely/run
 echo "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > .freely/run/pr-create-gate-passed
 echo ""
 
+# ── Step 2c: Absorb close frontmatter into feature branch ──
+# Update raw issue frontmatter so wt-close doesn't need to touch develop.
+# This is a normal commit on the feature branch — no bypass needed.
+_raw_key=$(echo "$current_branch" | grep -oE 'raw-[0-9]{8}T[0-9]{6}Z' | head -1 || true)
+if [[ -n "$_raw_key" ]]; then
+  _issue_file="docs/issues/${_raw_key}/issue.md"
+  if [[ -f "$_issue_file" ]]; then
+    _now=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+    python3 -c "
+import yaml
+with open('$_issue_file') as f:
+    parts = f.read().split('---', 2)
+fm = yaml.safe_load(parts[1]) if len(parts) >= 3 else {}
+fm['phase_state'] = 'absorbed'
+fm['force_closed_at'] = '$_now'
+fm['force_closed_reason'] = 'pr-create-guarded: absorbed by merge'
+if 'absorbed_into' not in fm:
+    fm['absorbed_into'] = ''
+new_fm = yaml.dump(fm, default_flow_style=False, allow_unicode=True, sort_keys=False).strip()
+body = parts[2] if len(parts) >= 3 else ''
+with open('$_issue_file', 'w') as f:
+    f.write('---\n' + new_fm + '\n---' + body)
+" 2>/dev/null
+    if ! git diff --quiet -- "$_issue_file" 2>/dev/null; then
+      git add "$_issue_file" 2>/dev/null || true
+      git commit -m "governance: pr-create-guarded close frontmatter for $_raw_key
+
+Co-Authored-By: Claude <noreply@anthropic.com>" 2>/dev/null || true
+      echo "frontmatter absorbed for $_raw_key ✓"
+    fi
+  fi
+fi
+echo ""
+
 # ── Step 3+4: Push branch + Create PR on each configured platform ──
 # Principle: push branch to platform X, create PR on platform X.
 # Never push to A then PR on B (cross-platform = empty PR).
