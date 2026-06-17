@@ -15,14 +15,14 @@ primary_platform: github
 last_synced_comment_at: {}
 hash: ''
 created_at: 2026-06-16 04:48:25+00:00
-updated_at: '2026-06-17T00:24:19Z'
+updated_at: '2026-06-17T16:38:16Z'
 intake_id: ''
 author: claude
 channel: freely-fix-execution
 session_refs: []
 pre_tests_path: docs/epics/remove-absolute-timeout/remove-bridge-absolute-cap/pre-tests.md
 verification_artifact_dir: docs/epics/remove-absolute-timeout/remove-bridge-absolute-cap/code-reviews
-platform_state: open
+platform_state: closed
 ---
 
 # I-20260616T044825Z-A: Remove BRIDGE_TIMEOUT absolute cap for session/prompt in acp-bridge.py

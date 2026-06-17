@@ -12,9 +12,9 @@ platform_ids:
     issue_id: '2869'
     url: https://github.com/chatterzhao/freely/issues/2869
     synced_at: '2026-06-17T00:25:04Z'
-updated_at: '2026-06-17T00:25:04Z'
+updated_at: '2026-06-17T16:38:34Z'
 created_at: '2026-06-17T00:25:04Z'
-platform_state: open
+platform_state: closed
 ---
 
 # Issue: config.toml clean break — parse_env_file removal + quality fixes
