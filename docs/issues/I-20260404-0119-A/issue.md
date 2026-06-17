@@ -20,7 +20,7 @@ last_synced_comment_at:
 hash: ''
 created_at: '2026-04-27T11:23:27Z'
 updated_at: '2026-05-17T12:22:20Z'
-platform_state: closed
+platform_state: open
 ---
 
 The active milestone still keeps several completed owners in `committed_issues`. That conflicts with milestone policy and leaves the main orchestration surface with stale sequencing truth.
