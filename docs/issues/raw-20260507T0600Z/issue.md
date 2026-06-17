@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260507T0600Z
 kind: raw
-phase_state: completed
+phase_state: dropped
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
 platform_ids:
   github:
@@ -16,7 +16,7 @@ pre_tests_path: docs/epics/raw-issue-pull/verification/pre-tests.md
 verification_artifact_dir: docs/epics/raw-issue-pull/code-reviews
 source_candidate: docs/pre-brainstorms/20260507-raw-issue-pull/candidates.md
 updated_at: 2026-05-17T04:47:25Z
-platform_state: open
+platform_state: closed
 ---
 ## raw-issue-pull
 从平台拉取 raw issue 到本地 docs/issues/
