@@ -12719,6 +12719,12 @@ for r in json.load(sys.stdin):
   local hid raw_key_for_worker _w_cycle_log _w_extract_result _w_action _w_cs _w_reason _w_next
   for hid in $matching; do
     [[ -n "$hid" ]] || continue
+    # Query A2A state first (authoritative) — skip if already terminal
+    local _a2a_state
+    _a2a_state=$(python3 "$_a2a_task_py" get --task-id "$hid" 2>/dev/null |       python3 -c "import json,sys; r=json.load(sys.stdin); print(r.get('state',''))" 2>/dev/null || echo "")
+    if [[ "$_a2a_state" == "completed" || "$_a2a_state" == "failed" || "$_a2a_state" == "canceled" ]]; then
+      continue  # Already terminal via a2a-exit
+    fi
     # Extract raw_key from the DB record for this handoff
     raw_key_for_worker=$(python3 "$_a2a_task_py" get --task-id "$hid" 2>/dev/null | \
       python3 -c "import json,sys; r=json.load(sys.stdin); print(r.get('raw_key',''))" 2>/dev/null || echo "")
