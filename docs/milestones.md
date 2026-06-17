@@ -7,6 +7,13 @@
 - milestone: M-20260617T055840Z-A
 - status: promoted
 - promoted_issue_path: `docs/issues/I-20260617T055840Z-A/issue.md`
+### committed_issues
+1. `I-20260617T055840Z-A`
+- title: Merge Guard + Rebase Integrity
+- milestone_state: committed
+- phase_state: `done_b2_ibm`
+- issue_path: `docs/issues/I-20260617T055840Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/merge-guard-rebase-integrity/code-reviews`
 
 ## M-20260617T031719Z-A
 - title: ACP/A2A Final Review Fixes
