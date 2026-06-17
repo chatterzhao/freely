@@ -583,7 +583,6 @@ def _main() -> int:
     p_exit = sub.add_parser("a2a-exit")
     p_exit.add_argument("--state", required=True, help="A2A state: submitted|working|completed|failed|input-required|pending-input")
     p_exit.add_argument("--summary", default="", help="Completion summary")
-    p_exit.add_argument("--workers", default="", help="Worker prompts CSV (for delegate)")
     p_exit.add_argument("--next", default="", help="Next action")
     p_exit.add_argument("--evidence", default="", help="Evidence paths")
     p_exit.add_argument("--role", default="manager", help="Role: manager|worker")
@@ -802,8 +801,7 @@ def _main() -> int:
                     r = c.update(existing_task_id, state=state,
                                  summary=getattr(args, 'summary', '') or "",
                                  next=getattr(args, 'next', '') or "",
-                                 evidence=getattr(args, 'evidence', '') or "",
-                                 worker_prompts_csv=getattr(args, 'workers', '') or "")
+                                 evidence=getattr(args, 'evidence', '') or "")
                     task_id = existing_task_id
                 else:
                     r = c.create(
@@ -819,7 +817,6 @@ def _main() -> int:
                         summary=getattr(args, 'summary', '') or "",
                         next=getattr(args, 'next', '') or "",
                         evidence=getattr(args, 'evidence', '') or "",
-                        worker_prompts_csv=getattr(args, 'workers', '') or "",
                     )
                     task_id = r.get("id", "")
                 run_dir = os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "..", ".freely", "run")
@@ -827,7 +824,7 @@ def _main() -> int:
                     os.makedirs(run_dir, exist_ok=True)
                     with open(os.path.join(run_dir, "last-exit-task.env"), "w") as f:
                         workers_val = getattr(args, 'workers', '') or ''
-                        f.write(f"TASK_ID={task_id}\nSTATE={state}\nWORKERS={workers_val}\n")
+                        f.write(f"TASK_ID={task_id}\nSTATE={state}\n")
                 except Exception:
                     pass
                 print(json.dumps({"ok": True, "task_id": task_id, "state": state,
