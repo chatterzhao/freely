@@ -6,6 +6,14 @@
 - milestone: M-20260617T145428Z-A
 - status: promoted
 - promoted_issue_path: `docs/issues/I-20260617T145428Z-A/issue.md`
+### committed_issues
+1. `I-20260617T145428Z-A`
+- title: Fix freely-db-cli syntax + AGENTS.md flow + hook skill routing
+- milestone_state: committed
+- phase_state: `done_b2_ibm`
+- issue_path: `docs/issues/I-20260617T145428Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/freely-db-cli-agents-fix/code-reviews`
+
 
 ## M-20260617T133709Z-A
 - title: Fix gh pr merge receipt
