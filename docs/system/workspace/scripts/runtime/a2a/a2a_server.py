@@ -79,7 +79,7 @@ def _build_agent_card(project: str) -> AgentCard:
         name="Freely Worker",
         description="Freely Worker Agent — worktree-isolated, skill-based A2A execution",
         version="1.0.0",
-        capabilities=AgentCapabilities(streaming=False, push_notifications=False),
+        capabilities=AgentCapabilities(streaming=True, push_notifications=False),
         skills=FREELY_SKILLS,
         supported_interfaces=[
             AgentInterface(

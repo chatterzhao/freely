@@ -12719,15 +12719,6 @@ for r in json.load(sys.stdin):
   local hid raw_key_for_worker _w_cycle_log _w_extract_result _w_action _w_cs _w_reason _w_next
   for hid in $matching; do
     [[ -n "$hid" ]] || continue
-    # Query A2A Server TaskStore first (authoritative) — before log parsing fallback
-    local _a2a_state
-    _a2a_state=$(python3 "$_a2a_task_py" get --task-id "$hid" 2>/dev/null | \
-      python3 -c "import json,sys; r=json.load(sys.stdin); print(r.get('state',''))" 2>/dev/null || echo "")
-    if [[ "$_a2a_state" == "completed" ]]; then
-      continue  # Already done via a2a-exit
-    elif [[ "$_a2a_state" == "failed" || "$_a2a_state" == "canceled" ]]; then
-      continue  # Terminal
-    fi
     # Extract raw_key from the DB record for this handoff
     raw_key_for_worker=$(python3 "$_a2a_task_py" get --task-id "$hid" 2>/dev/null | \
       python3 -c "import json,sys; r=json.load(sys.stdin); print(r.get('raw_key',''))" 2>/dev/null || echo "")
@@ -13002,16 +12993,15 @@ except Exception:
     return 1
   fi
 
-  # Signal 5: A2A worker liveness — if workers are alive, Manager may be
-  # waiting (not dead). Query A2A Server TaskStore for active worker count.
-  local _a2a_task_py _a2a_db _active_workers
+  # Signal 5: A2A worker liveness — if workers are alive, the AI may
+  # be waiting (not dead). Query A2A task state before declaring dead.
+  local _a2a_task_py _a2a_db _active
   _a2a_task_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _a2a_db="$project/.freely/freely.db"
   if [[ -f "$_a2a_task_py" && -f "$_a2a_db" ]]; then
-    _active_workers=$(python3 "$_a2a_task_py" list --role worker --status working 2>/dev/null | \
-      python3 -c "import json,sys; rows=json.load(sys.stdin); print(len(rows))" 2>/dev/null || echo "0")
-    if [[ "${_active_workers:-0}" -gt 0 ]]; then
-      return 0  # Workers alive → Manager is waiting, not dead
+    _active=$(python3 "$_a2a_task_py" list --state working 2>/dev/null |       python3 -c "import json,sys; print(len(json.load(sys.stdin).get('rows',[])))" 2>/dev/null || echo "0")
+    if [[ "${_active:-0}" -gt 0 ]]; then
+      return 0  # Workers alive → Manager waiting, not dead
     fi
   fi
 

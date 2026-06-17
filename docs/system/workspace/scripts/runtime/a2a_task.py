@@ -112,8 +112,8 @@ class A2AClient:
         _base = path.split("?")[0]
         _rpc_map = {
             ("POST", "/tasks"):            "tasks/send",
-            ("GET",  "/tasks/{id}"):        "tasks/get",
-            ("PATCH","/tasks/{id}"):        "tasks/push",
+            ("GET",  "/tasks"):            "tasks/list",
+            ("PATCH","/tasks"):            "tasks/push",
             ("GET",  "/tasks/latest-manager"):    "tasks/get",
             ("GET",  "/tasks/pending-delivery"):  "tasks/list",
         }
@@ -175,6 +175,30 @@ class A2AClient:
         if body_start != -1: return json.loads(text[body_start + 4:])
         return {"error": "empty response"}
 
+    def _db_rpc(self, method: str, params: dict, timeout: float = 30.0) -> dict:
+        """Direct db_manager RPC for extended Freely operations.
+        These bypass A2A Server because they use Freely-specific DB fields
+        not in the A2A standard Task protobuf (worker_pid, delivery_status, etc.).
+        The A2A Server uses this same path internally via SQLiteTaskStore._db_rpc."""
+        import hashlib
+        h = hashlib.sha256(os.path.abspath(self.project).encode()).hexdigest()[:16]
+        sp = f"/tmp/freely-db-{h}.sock"
+        req = json.dumps({"jsonrpc": "2.0", "id": 1, "method": method, "params": params}, default=str) + "\n"
+        sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        sock.settimeout(timeout)
+        try:
+            sock.connect(sp)
+            sock.sendall(req.encode())
+            sock.shutdown(socket.SHUT_WR)
+            data = b""
+            while True:
+                chunk = sock.recv(4096)
+                if not chunk: break
+                data += chunk
+        finally:
+            sock.close()
+        return json.loads(data.decode()).get("result", {})
+
     @staticmethod
     def _parse_jsonrpc_response(text: str) -> dict:
         """Parse JSON-RPC 2.0 response from A2A Server."""
@@ -213,28 +237,33 @@ class A2AClient:
         return self._request("GET", path).get("tasks", [])
 
     def latest_manager(self) -> Optional[dict]:
-        r = self._request("GET", "/tasks/latest-manager")
-        return r if "id" in r else None
+        """Get latest manager task via db_manager (authoritative)."""
+        r = self._db_rpc("a2a_task.latest-manager", {})
+        return r if "task_id" in r else None
 
     def pending_delivery(self) -> List[dict]:
-        return self._request("GET", "/tasks/pending-delivery").get("tasks", [])
+        """Get pending deliveries via db_manager (authoritative)."""
+        return self._db_rpc("a2a_task.list-pending-delivery", {}).get("rows", [])
 
     def launched_pids(self, raw_key: str = "") -> List[dict]:
-        path = f"/tasks/launched-pids?raw_key={raw_key}" if raw_key else "/tasks/launched-pids"
-        return self._request("GET", path).get("rows", [])
+        """Get launched worker PIDs via db_manager."""
+        return self._db_rpc("a2a_task.get-launched-pids", {"raw_key": raw_key}).get("rows", [])
 
     def add_message(self, task_id: str, role: str = "worker",
                     msg_type: str = "text", content: str = "") -> dict:
-        return self._request("POST", f"/tasks/{task_id}/messages",
-                            {"role": role, "type": msg_type, "content": content})
+        """Add message via db_manager (Freely extension, not in A2A Task protobuf)."""
+        return self._db_rpc("a2a_task.update-message",
+                           {"task_id": task_id, "role": role, "type": msg_type, "content": content})
 
     def mark_delivered(self, task_id: str) -> dict:
-        return self._request("PATCH", f"/tasks/{task_id}/delivery",
-                            {"delivery_status": "delivered"})
+        """Mark delivered via db_manager."""
+        return self._db_rpc("a2a_task.update-delivery-status",
+                           {"task_id": task_id, "delivery_status": "delivered"})
 
     def set_worker_pid(self, task_id: str, worker_pid: str) -> dict:
-        return self._request("PATCH", f"/tasks/{task_id}/worker-pid",
-                            {"worker_pid": worker_pid})
+        """Set worker PID via db_manager."""
+        return self._db_rpc("a2a_task.update-worker-pid",
+                           {"task_id": task_id, "worker_pid": worker_pid})
 
     def delete(self, task_id: str) -> dict:
         return self.update(task_id, state="canceled")

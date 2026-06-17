@@ -180,7 +180,7 @@ _detect_acp_failure() {
   # ── Layer 1: Network / transport failure (from cycle log) ──
   if _matched=$(grep -m1 -E '\b(Connection refused|Connection reset by peer|connection refused|connection reset|ECONNREFUSED|ENOTFOUND|ETIMEDOUT|socket hang up|timed out|connection timeout|Connection timed out|dial timeout|i/o timeout|read timeout|deadline exceeded|TLS handshake|TLS alert|TLS error|proxy error|proxy refused|proxy timeout|proxy auth|Could not connect to proxy|DNS error|DNS failure|DNS timeout|DNS resolution|Could not resolve host|name resolution failed|NXDOMAIN)\b' "$log_file" 2>/dev/null); then
     echo "[ACP-detect] network_failure matched: ${_matched:0:200}" >&2
-    [[ -n "$network_failure_marker_file" ]] && echo "network_failure" > "$network_failure_marker_file"
+    [[ -n "$network_failure_marker" ]] && echo "network_failure" > "$network_failure_marker"
   fi
 
   # ── Layer 2: Auth / rate limit failure (from cycle log) ──
@@ -202,15 +202,15 @@ _detect_acp_failure() {
 
   if _matched=$(_grep_new_only "$_bridge_log" "$bridge_log_offset" -m1 -E "$_bridge_fatal" 2>/dev/null) && [[ -n "$_matched" ]]; then
     echo "[ACP-detect] bridge_fatal matched: ${_matched:0:200}" >&2
-    [[ -n "$bridge_lost_marker_file" ]] && echo "bridge_session_lost" > "$bridge_lost_marker_file"
+    [[ -n "$bridge_lost_marker" ]] && echo "bridge_session_lost" > "$bridge_lost_marker"
     if echo "$_matched" | grep -qE "$_net_err" 2>/dev/null; then
-      [[ -n "$network_failure_marker_file" ]] && echo "network_failure" > "$network_failure_marker_file"
+      [[ -n "$network_failure_marker" ]] && echo "network_failure" > "$network_failure_marker"
     fi
   elif _matched=$(grep -m1 -E "$_bridge_fatal" "$log_file" 2>/dev/null) && [[ -n "$_matched" ]]; then
     echo "[ACP-detect] bridge_fatal matched (cycle log): ${_matched:0:200}" >&2
-    [[ -n "$bridge_lost_marker_file" ]] && echo "bridge_session_lost" > "$bridge_lost_marker_file"
+    [[ -n "$bridge_lost_marker" ]] && echo "bridge_session_lost" > "$bridge_lost_marker"
     if echo "$_matched" | grep -qE "$_net_err" 2>/dev/null; then
-      [[ -n "$network_failure_marker_file" ]] && echo "network_failure" > "$network_failure_marker_file"
+      [[ -n "$network_failure_marker" ]] && echo "network_failure" > "$network_failure_marker"
     fi
   fi
 
@@ -218,7 +218,7 @@ _detect_acp_failure() {
   if [[ ! -f "$network_failure_marker" ]]; then
     if _matched=$(grep -m1 -E "$_net_err" "$log_file" 2>/dev/null); then
       echo "[ACP-detect] network_fatal matched (cycle): ${_matched:0:200}" >&2
-      [[ -n "$network_failure_marker_file" ]] && echo "network_failure" > "$network_failure_marker_file"
+      [[ -n "$network_failure_marker" ]] && echo "network_failure" > "$network_failure_marker"
     fi
   fi
 
@@ -411,28 +411,30 @@ main() {
     _bridge_pid=$(cat "$(_bridge_pid_file "$project")" 2>/dev/null || true)
     if [[ -n "$_bridge_pid" ]] && ! kill -0 "$_bridge_pid" 2>/dev/null; then
       echo "[ACP-detect] bridge died (pid=$_bridge_pid), killing child" >&2
-      [[ -n "$bridge_lost_marker_file" ]] && echo "bridge_session_lost" > "$bridge_lost_marker_file"
-      [[ -n "$network_failure_marker_file" ]] && echo "network_failure" > "$network_failure_marker_file"
+      [[ -n "$bridge_lost_marker" ]] && echo "bridge_session_lost" > "$bridge_lost_marker"
+      [[ -n "$network_failure_marker" ]] && echo "network_failure" > "$network_failure_marker"
       kill "$child_pid" 2>/dev/null || true
       break
     fi
 
-    # Periodic session/ping to reset bridge idle timer when A2A workers may be active.
-    # Runs every ~60s; prevents 900s idle timeout from killing bridge during long worker runs.
-    if (( _ping_counter % 60 == 0 )); then
-      local _session_id
-      _session_id=$(grep -oE 'ses_[A-Za-z0-9]+' "$log_file" 2>/dev/null | head -1 || true)
-      if [[ -n "$_session_id" ]]; then
+    # Periodic session/ping (~every 60s) to reset bridge idle timer.
+    # Prevents 900s idle timeout from killing bridge during long worker runs.
+    if (( _ping_counter > 0 && _ping_counter % 60 == 0 )); then
+      local _sid _bridge_sock
+      _sid=$(grep -oE 'ses_[A-Za-z0-9]+|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{12}' "$log_file" 2>/dev/null | head -1 || true)
+      _bridge_sock=$(_bridge_socket "$project" 2>/dev/null || true)
+      if [[ -n "$_sid" && -n "$_bridge_sock" && -S "$_bridge_sock" ]]; then
         python3 -c "
-import json, socket, time
+import json, socket
 try:
-    sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-    sock.settimeout(10)
-    sock.connect('$(_bridge_socket "$project")')
-    req = json.dumps({'jsonrpc':'2.0','id':1,'method':'session/ping','params':{'sessionId':'$_session_id'}})
-    sock.sendall(f'POST / HTTP/1.1\r\nContent-Type: application/json\r\nContent-Length: {len(req)}\r\n\r\n{req}'.encode())
-    sock.recv(4096)
-    sock.close()
+    s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    s.settimeout(5)
+    s.connect('$_bridge_sock')
+    req = json.dumps({'jsonrpc':'2.0','id':1,'method':'session/ping','params':{'sessionId':'$_sid'}})
+    body = json.dumps(req)
+    s.sendall(f'POST / HTTP/1.1\r\nContent-Type: application/json\r\nContent-Length: {len(body)}\r\n\r\n{body}'.encode())
+    s.recv(1024)
+    s.close()
 except: pass
 " 2>/dev/null || true
       fi
