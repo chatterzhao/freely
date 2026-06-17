@@ -9,9 +9,10 @@
 |------|------|------|
 | `config_file()` | 返回 `.toml` | 文件不存在→daemon 起不来 |
 | `global_config_file()` | 返回 `.toml` | 同上 |
-| `load_config()` | 只读 toml | 无 fallback，直接 exit |
+| `load_config()` | 只读 toml | 无 config.toml 时直接 exit，无提示 |
 | `source_config()` | toml2env 转换 | 需要 toml 文件存在 |
 | `write_config()` | 写 TOML 格式 | 格式正确 ✓ |
+| `freely init` | 生成 config.toml | 自动生成导致用户不看注释不理解配置 |
 | `interruption-manager-handler:235` | 检查 toml | 不存在则 exit 1 |
 | `signal-intent-handler:44` | 检查 toml | 不存在则 exit 1 |
 | `ai-cli:1241,1509,1529,1550` | 检查 toml | 使用 toml |
@@ -25,7 +26,7 @@
 | `.gitignore` | `.freely/` 已忽略，toml 不跟踪 ✓ |
 
 ### 涉及文件（12 个）
-1. `freely` — load_config, config_file, write_config, source_config
+1. `freely` — load_config, config_file, write_config, source_config, init flow
 2. `freely_config.py` — read/write/upsert/init-toml
 3. `ai-cli` — 4 处 config.toml 检查
 4. `interruption-manager-handler` — line 235-236

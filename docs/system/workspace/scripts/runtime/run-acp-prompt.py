@@ -448,7 +448,8 @@ def main():
             # Multi-turn within same session: session already exists from fresh/resume.
             # If session was lost (bridge restart), send_prompt() will fall back to session/new.
             session_id = resume_target
-            print(f"session id: {session_id} (prompt)", flush=True)         # line 2: human log
+            print(session_id, flush=True)                                    # line 1: clean ID for machine parsing
+            print(f"session id: {session_id} (prompt)", flush=True)          # line 2: human log
             # session_result for prompt-mode multi-turn
             session_result = {"sessionId": session_id}
 
