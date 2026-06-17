@@ -1,6 +1,6 @@
 # Implementation Decision Note: Merge Guard + Rebase Integrity
 
-- owner_issue: I-20260617T055840Z-A
+- issue_id: I-20260617T055840Z-A
 - reviewer: claude-sonnet-4-6
 - review_date: 2026-06-17
 - decision: 采用 GitHub branch protection (required status check) + git post-rewrite/pre-rebase hooks + pr-merge-guarded gate 三层防护
