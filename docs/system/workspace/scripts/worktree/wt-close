@@ -396,6 +396,12 @@ if [[ ${#remotes[@]} -gt 0 ]]; then
   done
 fi
 
+
+  # Prune stale local tracking refs for deleted remote branches
+  for _r in "${remotes[@]}"; do
+    git remote prune "$_r" 2>/dev/null || true
+  done
+
 # ── Phase 5: Consume A2A tasks then remove worktree ──
 
 # Extract raw_key from branch and auto-consume all terminal worker tasks.
