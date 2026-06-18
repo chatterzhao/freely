@@ -5,14 +5,14 @@ description: 快速修复 bug 的特殊高效策略——wt-create→实现→B1
 
 # skill:freely-fix-execution
 
-> 全链路(Fix变体): wt-create → dev → test → B1 → B2 → pr-create → pr-merge → wt-close
+> 全链路(Fix变体): wt-create → dev → test → B1 → B2 → pr-create → pr-review → pr-merge → wt-close
 >                                    ↑ 本 skill 自此开始（快测沙箱策略，治理后置）
 
 ## 定位
 
 **fix skill 是特殊场景的高效策略，不是通用开发流程。**
 
-常规开发走 `feature → test-pre-merge → pr-create-guarded → pr-merge-guarded develop` 完整链路，每个门禁都过。但 bug 修复有特殊性：需要快速迭代验证（改了测、测了改），如果每次改一行代码都走一遍完整门禁链路，效率极低。
+常规开发走 `feature → test-pre-merge → pr-create-guarded → pr-review-guarded → pr-merge-guarded develop` 完整链路，每个门禁都过。但 bug 修复有特殊性：需要快速迭代验证（改了测、测了改），如果每次改一行代码都走一遍完整门禁链路，效率极低。
 
 本 skill 在不违背保护分支本质约束的前提下，用 `test-pre-merge-*` 作为私有快速测试沙箱，验证通过后将修改转移到可写工位，正式提交和门禁合并仍在合规分支上完成。
 
@@ -71,8 +71,8 @@ test-pre-merge-* 上的操作:
 
 合并路径（来自 pr-merge-guarded）:
 ```
-fix/*             → test-pre-merge → pr-create-guarded → pr-merge-guarded
-fix/*             → test-pre-merge → pr-create-guarded → pr-merge-guarded
+fix/*             → test-pre-merge → pr-create-guarded → pr-review-guarded → pr-merge-guarded
+fix/*             → test-pre-merge → pr-create-guarded → pr-review-guarded → pr-merge-guarded
 hotfix/*          → main + develop (pr-merge-guarded)
 hotfix/*          → main
 ```
@@ -92,14 +92,14 @@ hotfix/*          → main
 
 | 原 feature 工位 | 做法 |
 |---|---|
-| **还在** | 直接在 feature 上改 → 测 → 提交。走 feature → test-pre-merge → pr-create-guarded → pr-merge-guarded develop |
+| **还在** | 直接在 feature 上改 → 测 → 提交。走 feature → test-pre-merge → pr-create-guarded → pr-review-guarded → pr-merge-guarded develop |
 | **已退役（已合并/已删）** | 建 `test-pre-merge-*` 私有工位快测 → cp 到新建的 `fix/*` 或 `hotfix/*` → `freely pr-create-guarded` 命令 → `freely pr-merge-guarded develop <branch>` 命令 → `freely wt-close` 命令 |
 
 ### 再判严重程度
 
 | 类型 | 分支 | 合并路径 |
 |---|---|---|
-| 普通 fix | `fix/raw-{raw-key}-{slug}` | fix → test-pre-merge → pr-create-guarded → pr-merge-guarded develop |
+| 普通 fix | `fix/raw-{raw-key}-{slug}` | fix → test-pre-merge → pr-create-guarded → pr-review-guarded → pr-merge-guarded develop |
 | 紧急 hotfix | `hotfix/<desc>-<YYYYMMDD>` | hotfix → pr-merge-guarded main + develop（可跳过 test-pre-merge） |
 
 ---
@@ -120,7 +120,7 @@ hotfix/*          → main
   ├─ stop → start daemon → 验证
   ├─ 迭代到修复稳定
   ├─ git commit（增量提交，不等全部完成）
-  └─ 走 feature → test-pre-merge → pr-create-guarded → pr-merge-guarded develop 完整路径
+  └─ 走 feature → test-pre-merge → pr-create-guarded → pr-review-guarded → pr-merge-guarded develop 完整路径
 ```
 
 ### 场景 B：原 feature 已退役

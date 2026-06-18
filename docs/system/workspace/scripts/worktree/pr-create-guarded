@@ -265,14 +265,18 @@ for platform in $platforms; do
   if [[ "$cli" == "gh" ]]; then
     if gh pr create --head "$current_branch" --base "$base" \
          --title "$title" --body "$body" 2>&1; then
-      pr_created_any=1; echo "  [$platform] PR created ✓"
+      pr_created_any=1; echo "  [$platform] PR created ✓
+  echo ""
+  echo "Next: ./bin/pr-review-guarded $current_branch""
     else
       echo "  [$platform] PR creation FAILED" >&2
     fi
   elif [[ "$cli" == "gitee" ]]; then
     if gitee pr create --head "$current_branch" --base "$base" \
          --title "$title" --body "$body" 2>&1; then
-      pr_created_any=1; echo "  [$platform] PR created ✓"
+      pr_created_any=1; echo "  [$platform] PR created ✓
+  echo ""
+  echo "Next: ./bin/pr-review-guarded $current_branch""
     else
       echo "  [$platform] PR creation FAILED" >&2
     fi

@@ -19,7 +19,7 @@
 - 修改 `.githooks/` 目录内容以削弱检查
 
 **没有例外。** 即使为了调试或加速迭代也不允许。
-正确的做法是走 `wt-create → B1_IBM → B2_IBM → commit → pr-create-guarded → pr-merge-guarded` 流程。
+正确的做法是走 `wt-create → B1_IBM → B2_IBM → commit → pr-create-guarded → pr-review-guarded → pr-merge-guarded` 流程。
 
 ## 当前项目阶段
 Freely 处于研究优先的整合阶段。
@@ -141,8 +141,9 @@ Freely 开发 Freely 时，默认先问四件事：
 阶段4: Dev 实现（dev-loop-execution → 写代码 → feature-local 测试 → commit）
 阶段5: test-pre-merge 验证（merge fix-branch → test-pre-merge worktree → 端到端测试 → 迭代通过）
 阶段6: 提 PR（pr-create-guarded → pull develop → 冲突处理 → dry-run gate → push → gh pr create）
-阶段7: PR review + CI（CI check → Approval）
-阶段8: 门禁合并（pr-merge-guarded → PR gate → promotion gate → merge → develop-push）
+阶段7: PR review（pr-review-guarded → 6 维 review → verdict 文档）
+阶段8: CI check（CI check → Approval）
+阶段9: 门禁合并（pr-merge-guarded → PR gate → promotion gate → merge → develop-push）
 阶段9: 收口（wt-close）
 ```
 
@@ -167,9 +168,9 @@ Freely 开发 Freely 时，默认先问四件事：
 
 当发现运行时 bug，使用 `skill:freely-fix-execution` 快速修复。先判场景：
 
-- **原 feature worktree 还在** → 直接在 feature 上改、提交。走 feature → test-pre-merge-* → B1_IBM → B2_IBM → pr-create-guarded → pr-merge-guarded → develop。
+- **原 feature worktree 还在** → 直接在 feature 上改、提交。走 feature → test-pre-merge-* → B1_IBM → B2_IBM → pr-create-guarded → pr-review-guarded → pr-merge-guarded → develop。
 - **原 feature 已退役（已合并/已删）** → 建 `test-pre-merge-<desc>-<YYYYMMDD>` 私有工位快测（不改不提交不推送，不违背保护约束）。验证通过后 cp 修改到新建的 `feature/*` 或 `hotfix/*` 可写工位，增量提交。
-- **普通 fix** 用 `feature/*` → test-pre-merge-* → pr-create-guarded → pr-merge-guarded → develop；**紧急 hotfix** 用 `hotfix/*` → develop（hotfix 从 main 创建，可跳过 test-pre-merge）。
+- **普通 fix** 用 `feature/*` → test-pre-merge-* → pr-create-guarded → pr-review-guarded → pr-merge-guarded → develop；**紧急 hotfix** 用 `hotfix/*` → develop（hotfix 从 main 创建，可跳过 test-pre-merge）。
 - **补齐治理**：B1_IBM（`freely-doc-B1_IBM-execution`：brainstorms.md → candidates.md → milestone）→ B2_IBM（`freely-doc-B2_IBM-execution`：I-* issue → prd → pre-tests → tasks → code-review → progress）→ milestones.md。
 - **原则**：Fix first, govern later。test-pre-merge-* 私有测试不违背保护约束。fix 工位早期创建、增量提交。
 

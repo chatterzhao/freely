@@ -697,6 +697,7 @@ MSG
 │    4. skill:freely-doc-B2_IBM-execution → I-* → milestone  │
 │    5. skill:freely-dev-loop-execution → code-review + pre-tests │
 │    6. pr-create-guarded → test worktree verify      (test)  │
+│    6.5. pr-review-guarded → independent review gate            │
 │    7. pr-merge-guarded develop <fix-branch>       (merge) │
 │    8. wt-close <fix-branch>                               │
 └──────────────────────────────────────────────────────────┘
@@ -718,6 +719,7 @@ REMINDER
 │    2. skill:freely-doc-B2_IBM-execution → materialize I-* → milestone │
 │    3. skill:freely-dev-loop-execution → implement + code-review + pre-tests │
 │    4. pr-create-guarded → test worktree verify           (test) │
+│    6.5. pr-review-guarded → independent review gate            │
 │    5. pr-merge-guarded develop <feature-branch>            (merge) │
 │    6. wt-close <feature-branch>                          │
 └──────────────────────────────────────────────────────────┘

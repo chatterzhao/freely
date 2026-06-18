@@ -5,7 +5,7 @@ description: B1_IBM：I→B→M 第一阶段。消费 scan 结果中 wt-create �
 
 # skill:freely-doc-B1_IBM-execution
 
-> 全链路: feedback → wt-create → B1_IBM → B2_IBM → dev → pr-create-guarded → pr-merge-guarded → wt-close
+> 全链路: feedback → wt-create → B1_IBM → B2_IBM → dev → pr-create-guarded → pr-review-guarded → pr-merge-guarded → wt-close
 >                                    ↑ you are here（B: Brainstorm → M: Milestone）
 
 ## I→B→M 骨架
