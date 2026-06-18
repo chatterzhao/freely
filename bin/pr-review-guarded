@@ -204,7 +204,21 @@ REVIEWDOC
 
 echo ""
 echo "Review document: $review_file"
+
+# Auto-commit review document so it travels with the PR branch
+if [[ "$final_verdict" == "pass" ]]; then
+  git add "$review_file" 2>/dev/null || true
+  if ! git diff --cached --quiet 2>/dev/null; then
+    git commit -m "review: pr-review-guarded verdict=$final_verdict for PR #$pr_number
+
+Co-Authored-By: Claude <noreply@anthropic.com>" 2>/dev/null || true
+    echo "Review document committed to branch."
+  fi
+fi
+
 echo ""
-echo "Next: ./bin/pr-merge-guarded $base $review_branch"
+echo "Next steps:"
+echo "  git push  # if review document was committed"
+echo "  cd $(dirname "$(git rev-parse --show-toplevel 2>/dev/null || pwd)")/.. && ./bin/pr-merge-guarded $base $review_branch"
 
 [[ "$final_verdict" == "pass" ]] && exit 0 || exit 1

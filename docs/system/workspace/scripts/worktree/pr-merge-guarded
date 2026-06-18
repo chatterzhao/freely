@@ -512,6 +512,12 @@ do_initial_merge() {
     _pr_number="$(gh pr list --repo chatterzhao/freely --head "$source_branch" --state OPEN --json number -q '.[0].number' 2>/dev/null || true)"
     if [[ -n "$_pr_number" ]]; then
       _review_file="$(find docs/epics -name "pr-review-${_pr_number}.md" 2>/dev/null | head -1 || true)"
+      # If not found locally (PR not yet merged), search PR branch via git ls-tree
+      if [[ -z "$_review_file" ]]; then
+        git fetch github "$source_branch" 2>/dev/null || true
+        _review_file="$(git ls-tree -r --name-only "refs/remotes/github/$source_branch" 2>/dev/null | grep "pr-review-${_pr_number}.md" | head -1 || true)"
+        [[ -n "$_review_file" ]] && _review_file="refs/remotes/github/$source_branch:$_review_file"
+      fi
       if [[ -z "$_review_file" ]]; then
         cat >&2 <<REVIEW_GATE_MISSING
 ╔══════════════════════════════════════════════════════════════╗
