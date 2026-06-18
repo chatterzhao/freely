@@ -1,3 +1,20 @@
+### committed_issues
+1. `I-20260618T040226Z-A`
+- title: pr-review-guarded command + workflow integration
+- milestone_state: committed
+- phase_state: `in_b2_ibm`
+- issue_path: `docs/issues/I-20260618T040226Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/pr-review-guarded/code-reviews`
+
+## M-20260618T040226Z-A
+- title: pr-review-guarded — independent PR review gate
+- status: active
+### candidate_issues
+1. `C-20260618T040226Z-A`
+- milestone: M-20260618T040226Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260618T040226Z-A/issue.md`
+
 ## M-20260618T031437Z-A
 - title: Fix wt-close remote branch deletion
 - status: active
