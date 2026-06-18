@@ -1,3 +1,20 @@
+## M-20260618T015503Z-A
+- title: Fix worktree path architecture — docs/issues/ in worktree, not develop
+- status: active
+### candidate_issues
+1. `C-20260618T015503Z-A`
+- milestone: M-20260618T015503Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260618T015503Z-A/issue.md`
+
+### committed_issues
+1. `I-20260618T015503Z-A`
+- title: Fix worktree path architecture
+- milestone_state: committed
+- phase_state: `in_b2_ibm`
+- issue_path: `docs/issues/I-20260618T015503Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/worktree-path-architecture/code-reviews`
+
 ## M-20260617T160807Z-A
 - title: Fix wt-close --force local crash
 - status: active
