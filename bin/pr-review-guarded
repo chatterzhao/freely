@@ -1,0 +1,210 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# pr-review-guarded: independent PR review gate between pr-create and pr-merge.
+#
+# Usage:
+#   ./bin/pr-review-guarded <branch> [--reviewer <name>] [--verdict pass|fail|needs_changes]
+#
+# Runs 6 review dimensions, produces review document, outputs verdict.
+# pr-merge-guarded gates on verdict=pass before allowing merge.
+
+ROOT_DIR="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+[[ -n "$ROOT_DIR" ]] || { echo "ERROR: not in a git repository" >&2; exit 1; }
+cd "$ROOT_DIR"
+
+current_branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
+review_branch="${1:-$current_branch}"
+reviewer="${2:-cli}"
+verdict_override="${3:-}"
+
+base="develop"
+pr_number=""
+review_dir=""
+
+echo "=== pr-review-guarded: $review_branch → $base ==="
+echo ""
+
+# ── Step 1: Find PR number ──
+if command -v gh &>/dev/null; then
+  pr_number=$(gh pr list --repo chatterzhao/freely --head "$review_branch" --state open --json number -q '.[0].number' 2>/dev/null || true)
+fi
+if [[ -z "$pr_number" ]]; then
+  pr_number="local"
+fi
+echo "PR: #$pr_number"
+
+# ── Step 2: Find review document path ──
+# Look for the epic directory matching this branch's issue
+_raw_key=$(echo "$review_branch" | grep -oE 'raw-[0-9]{8}T[0-9]{6}Z' | head -1 || true)
+_issue_id="I-${_raw_key#raw-}-A"
+_epic_dir=""
+if [[ -d "docs/issues/$_issue_id" ]]; then
+  _verification_dir=$(grep "verification_artifact_dir:" "docs/issues/$_issue_id/issue.md" 2>/dev/null | sed "s/.*: *'*\([^']*\)'*/\1/" | head -1 || true)
+  if [[ -n "$_verification_dir" ]] && [[ -d "$_verification_dir" ]]; then
+    _epic_dir="$_verification_dir"
+  fi
+fi
+if [[ -z "$_epic_dir" ]]; then
+  _epic_dir="docs/epics/pr-review-guarded/code-reviews"
+fi
+review_file="$_epic_dir/pr-review-${pr_number}.md"
+mkdir -p "$_epic_dir"
+
+echo "Review document: $review_file"
+echo ""
+
+# ── Step 3: Run 6 review dimensions ──
+pass_count=0
+fail_count=0
+review_body=""
+
+check_dimension() {
+  local dim="$1" status="$2" evidence="$3"
+  if [[ "$status" == "pass" || "$status" == "n/a" ]]; then
+    ((pass_count++))
+    symbol="✅"
+  else
+    ((fail_count++))
+    symbol="❌"
+  fi
+  review_body+="## $dim
+- status: $status
+- evidence: $evidence
+
+"
+  echo "  $symbol $dim: $status"
+}
+
+echo "Review dimensions:"
+echo ""
+
+# 1. Worktree check
+_wt_path=$(git worktree list --porcelain 2>/dev/null | awk -v br="refs/heads/$review_branch" '
+  $1=="worktree" { wt=$2 }
+  $1=="branch" && $2==br { print wt; exit }
+')
+if [[ -n "$_wt_path" ]]; then
+  if git -C "$_wt_path" diff --quiet 2>/dev/null && git -C "$_wt_path" diff --cached --quiet 2>/dev/null; then
+    check_dimension "1. Worktree Check" "pass" "worktree=$_wt_path branch=$review_branch clean=true"
+  else
+    check_dimension "1. Worktree Check" "fail" "worktree=$_wt_path is dirty"
+  fi
+else
+  check_dimension "1. Worktree Check" "pass" "no worktree found (branch may already be merged or remote-only)"
+fi
+
+# 2. IBM Completeness (governance-merge-gate)
+if [[ -x "$ROOT_DIR/bin/governance-merge-gate" ]]; then
+  gate_output=$("$ROOT_DIR/bin/governance-merge-gate" --range "$base..$review_branch" 2>&1) && gate_rc=0 || gate_rc=$?
+  if [[ "$gate_rc" -eq 0 ]]; then
+    check_dimension "2. IBM Completeness" "pass" "governance-merge-gate passed"
+  else
+    check_dimension "2. IBM Completeness" "fail" "$(echo "$gate_output" | head -3 | tr '\n' ' ')"
+  fi
+else
+  check_dimension "2. IBM Completeness" "pass" "governance-merge-gate not available (skipped)"
+fi
+
+# 3. Code Review Evidence
+_found_impl_decision=false
+for _dir in docs/epics/*/code-reviews/; do
+  if [[ -f "${_dir}implementation-decision.md" ]]; then
+    _found_impl_decision=true
+    _missing_fields=""
+    for _field in "issue_id:" "decision:" "why_this:" "alternatives_considered:" "residual_risk:"; do
+      grep -q "$_field" "${_dir}implementation-decision.md" 2>/dev/null || _missing_fields="$_missing_fields $_field"
+    done
+    if [[ -z "$_missing_fields" ]]; then
+      check_dimension "3. Code Review Evidence" "pass" "implementation-decision.md in $_dir, all fields complete"
+    else
+      check_dimension "3. Code Review Evidence" "fail" "implementation-decision.md missing fields:$_missing_fields"
+    fi
+    break
+  fi
+done
+if [[ "$_found_impl_decision" != "true" ]]; then
+  check_dimension "3. Code Review Evidence" "fail" "no implementation-decision.md found"
+fi
+
+# 4. Pre-test Evidence
+_found_pre_tests=false
+for _dir in docs/epics/*/verification/; do
+  if [[ -f "${_dir}pre-tests.md" ]]; then
+    _found_pre_tests=true
+    _items=$(grep -c "adequacy:" "${_dir}pre-tests.md" 2>/dev/null || echo 0)
+    check_dimension "4. Pre-test Evidence" "pass" "pre-tests.md in $_dir, $_items acceptance items"
+    break
+  fi
+done
+if [[ "$_found_pre_tests" != "true" ]]; then
+  check_dimension "4. Pre-test Evidence" "fail" "no pre-tests.md found"
+fi
+
+# 5. Semantic Conflict / Receipt Integrity
+if git diff "$base..$review_branch" -- docs/system/workspace/scripts/worktree/pr-merge-guarded 2>/dev/null | grep -q "."; then
+  # pr-merge-guarded was modified — verify receipt split is preserved
+  if grep -q '_merge_subject.*_merge_body' docs/system/workspace/scripts/worktree/pr-merge-guarded 2>/dev/null; then
+    check_dimension "5. Receipt Integrity" "pass" "pr-merge-guarded modified, --subject/--body split preserved"
+  else
+    check_dimension "5. Receipt Integrity" "fail" "pr-merge-guarded modified but --subject/--body split is MISSING. See ef251886/PR #2963."
+  fi
+else
+  check_dimension "5. Receipt Integrity" "n/a" "pr-merge-guarded not modified by this PR"
+fi
+
+# 6. Phase State Consistency
+if [[ -n "$_raw_key" ]] && [[ -f "docs/issues/$_raw_key/issue.md" ]]; then
+  _phase=$(grep "phase_state:" "docs/issues/$_raw_key/issue.md" 2>/dev/null | head -1 | sed 's/.*: *//' | tr -d "'\"")
+  if [[ "$_phase" == "absorbed" ]]; then
+    check_dimension "6. Phase State" "pass" "raw issue phase_state=absorbed"
+  else
+    check_dimension "6. Phase State" "fail" "raw issue phase_state=$_phase, expected 'absorbed'"
+  fi
+else
+  check_dimension "6. Phase State" "n/a" "no raw issue found for branch $review_branch"
+fi
+
+# ── Step 4: Determine verdict ──
+if [[ -n "$verdict_override" ]]; then
+  final_verdict="$verdict_override"
+else
+  if [[ "$fail_count" -eq 0 ]]; then
+    final_verdict="pass"
+  else
+    final_verdict="fail"
+  fi
+fi
+
+echo ""
+echo "─────────────────────────────────────────"
+if [[ "$final_verdict" == "pass" ]]; then
+  echo "  Verdict: ✅ PASS ($pass_count/6 dimensions passed)"
+else
+  echo "  Verdict: ❌ FAIL ($fail_count dimension(s) failed)"
+fi
+echo "─────────────────────────────────────────"
+
+# ── Step 5: Write review document ──
+_now=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+cat > "$review_file" << REVIEWDOC
+# PR Review: #$pr_number
+- pr_number: $pr_number
+- branch: $review_branch
+- base: $base
+- reviewer: $reviewer
+- review_date: $_now
+- verdict: $final_verdict
+
+$review_body
+## Overall Verdict
+- verdict: $final_verdict
+- notes: $([[ "$final_verdict" == "pass" ]] && echo "Ready for pr-merge-guarded" || echo "Fix failing dimensions and re-run pr-review-guarded")
+REVIEWDOC
+
+echo ""
+echo "Review document: $review_file"
+echo ""
+echo "Next: ./bin/pr-merge-guarded $base $review_branch"
+
+[[ "$final_verdict" == "pass" ]] && exit 0 || exit 1

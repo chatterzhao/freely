@@ -5,7 +5,7 @@ description: 新功能/大型改动的完整开发流程——feedback→wt-crea
 
 # skill:freely-feat-execution
 
-> 全链路: feedback → wt-create → B1_IBM → B2_IBM → dev → pr-create-guarded → pr-merge-guarded → wt-close
+> 全链路: feedback → wt-create → B1_IBM → B2_IBM → dev → pr-create-guarded → pr-review-guarded → pr-merge-guarded → wt-close
 >                                                              ↑ 本 skill 自此开始（提供 B1→B2→dev→pr→merge→close 完整抽象）
 
 ## 定位
@@ -17,7 +17,7 @@ description: 新功能/大型改动的完整开发流程——feedback→wt-crea
 | | freely-fix-execution | freely-feat-execution |
 |---|---|---|
 | 适用 | bug fix、小改动 | 新功能、大型重构 |
-| 流程 | wt-create → 实现 → B1_IBM → B2_IBM → pr-create-guarded → pr-merge-guarded → wt-close | wt-create → B1_IBM → B2_IBM → dev → pr-create-guarded → pr-merge-guarded → wt-close |
+| 流程 | wt-create → 实现 → B1_IBM → B2_IBM → pr-create-guarded → pr-review-guarded → pr-merge-guarded → wt-close | wt-create → B1_IBM → B2_IBM → dev → pr-create-guarded → pr-review-guarded → pr-merge-guarded → wt-close |
 | IBM 顺序 | 实现后治理（Fix first, govern later） | 治理后实现（Govern first, code later） |
 
 ## 下层 skill
@@ -33,7 +33,7 @@ freely-feat-execution 在不同阶段调用下层 skill：
 - B1_IBM 预研阶段就写治理文档（brainstorms.md + candidates.md）
 - B2_IBM materialize 后才能开始写代码
 - dev-loop 产出 pre-tests + code-review 证据
-- 合并走 feature → test-pre-merge → pr-create-guarded → pr-merge-guarded develop 完整链路
+- 合并走 feature → test-pre-merge → pr-create-guarded → pr-review-guarded → pr-merge-guarded develop 完整链路
 - 不跳过门禁
 
 ## 工作流
@@ -84,7 +84,8 @@ freely-feat-execution 在不同阶段调用下层 skill：
 3. phase_state → in_verification
 ```
 
-### 阶段 5：`freely pr-create-guarded` 命令提 PR
+### 阶段 5：pr-create-guarded 提 PR
+阶段 5.5：pr-review-guarded 独立 review
 ```
 1. 在 feature worktree 运行 dry-run 门禁检查
 2. 运行 `freely pr-create-guarded` 命令
