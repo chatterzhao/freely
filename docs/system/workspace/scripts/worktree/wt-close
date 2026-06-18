@@ -1,10 +1,22 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd -P)"
 source "$(dirname "${BASH_SOURCE[0]}")/worktree-common.sh"
 
-ISSUES_DIR="$ROOT_DIR/docs/issues"
+# Paths from config.toml (single source of truth)
+PROJECT_ROOT="${PROJECT_ROOT:-}"
+PROJECT_WORKTREES_ROOT="${PROJECT_WORKTREES_ROOT:-}"
+PROJECT_WORKTREE_PATH="${PROJECT_WORKTREE_PATH:-}"
+
+# Derive from config.toml if not already set
+if [[ -z "$PROJECT_ROOT" ]] && [[ -f ".freely/config.toml" ]]; then
+  PROJECT_ROOT="$(dirname "${BASH_SOURCE[0]}")/../../../../.."
+  PROJECT_ROOT="$(cd "$PROJECT_ROOT" && pwd -P)"
+fi
+if [[ -z "$PROJECT_WORKTREES_ROOT" ]]; then
+  PROJECT_WORKTREES_ROOT="${PROJECT_ROOT}-worktrees"
+fi
+
 FORCE=false
 DISCARD_UNMERGED=false
 FORCE_REASON=""
@@ -158,6 +170,13 @@ if [[ -z "$branch" ]]; then
 fi
 echo "wt-close: branch = $branch"
 
+# Derive PROJECT_WORKTREE_PATH from branch name
+if [[ -z "$PROJECT_WORKTREE_PATH" ]] && [[ -n "$branch" ]]; then
+  _wt_dir="$(freely_wt_dir_name_for_branch "$branch")"
+  PROJECT_WORKTREE_PATH="${PROJECT_WORKTREES_ROOT}/${_wt_dir}"
+fi
+ISSUES_DIR="$PROJECT_WORKTREE_PATH/docs/issues"
+
 # ── Guard: protected branch (test-pre-merge is disposable, skip checks) ──
 if [[ "$branch" == test-pre-merge-* ]]; then
   echo "wt-close: test-pre-merge branch (disposable), skipping checks and platform close"
@@ -205,8 +224,8 @@ if [[ "$FORCE" == false && -n "$issue_id" && -f "${issue_file:-}" ]]; then
   echo "wt-close: phase_state=completed ✓"
 
   # pretests-retirement-gate check
-  if [[ -x "$ROOT_DIR/bin/pretests-retirement-gate" ]]; then
-    if "$ROOT_DIR/bin/pretests-retirement-gate" "$wt_path" 2>/dev/null; then
+  if [[ -x "$PROJECT_ROOT/bin/pretests-retirement-gate" ]]; then
+    if "$PROJECT_ROOT/bin/pretests-retirement-gate" "$wt_path" 2>/dev/null; then
       echo "wt-close: pretests-retirement-gate passed ✓"
     else
       echo "Error: pretests-retirement-gate failed for $wt_path" >&2
@@ -226,7 +245,7 @@ if [[ "$FORCE" == true && -z "$wt_path" ]]; then
 
 else
   # Only block if the branch being closed IS the currently checked-out branch
-  _guard_branch=$(git -C "$ROOT_DIR" rev-parse --abbrev-ref HEAD 2>/dev/null || true)
+  _guard_branch=$(git -C "$PROJECT_ROOT" rev-parse --abbrev-ref HEAD 2>/dev/null || true)
   if [[ "$branch" == "$_guard_branch" ]]; then
     case "$_guard_branch" in
       main|develop|test-pre-merge-*)
@@ -239,10 +258,10 @@ fi
 
 # ── Unmerged commits guard (--force) ──
 if [[ "$FORCE" == true ]]; then
-  _ahead=$(git -C "$ROOT_DIR" rev-list --count develop.."$branch" 2>/dev/null || echo 0)
+  _ahead=$(git -C "$PROJECT_ROOT" rev-list --count develop.."$branch" 2>/dev/null || echo 0)
   if [[ "$_ahead" -gt 0 ]]; then
     echo "wt-close: WARNING — $branch has $_ahead unmerged commit(s) ahead of develop:"
-    git -C "$ROOT_DIR" log --oneline --no-decorate "develop..$branch" 2>/dev/null | while read -r line; do
+    git -C "$PROJECT_ROOT" log --oneline --no-decorate "develop..$branch" 2>/dev/null | while read -r line; do
       echo "          $line"
     done
     echo ""
@@ -275,7 +294,7 @@ if [[ "$FORCE" == true && -z "$wt_path" ]]; then
     _dry "./bin/issue-sync close $issue_id completed"
   else
     echo "wt-close: closing platform issue for $issue_id..."
-    if "$ROOT_DIR/bin/issue-sync" close "$issue_id" completed 2>&1; then
+    if "$PROJECT_ROOT/bin/issue-sync" close "$issue_id" completed 2>&1; then
       echo "wt-close: platform issue closed ✓"
 
       _fm_set_str "$issue_file" "platform_state" "closed"
@@ -370,8 +389,8 @@ fi
 # Extract raw_key from branch and auto-consume all terminal worker tasks.
 # Worker tasks should remain visible (completed/blocked) until wt-close,
 # so the manager can read and process them before the worktree is retired.
-_a2a_task_py="$ROOT_DIR/docs/system/workspace/scripts/runtime/a2a_task.py"
-_db_path="$ROOT_DIR/.freely/freely.db"
+_a2a_task_py="$PROJECT_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
+_db_path="$PROJECT_ROOT/.freely/freely.db"
 _raw_key="$(echo "$branch" | grep -oE '[0-9]{8}T[0-9]{4,6}Z' | head -1 || true)"
 if [[ -n "$_raw_key" && -f "$_a2a_task_py" && -f "$_db_path" ]]; then
   _consumed=$(python3 "$_a2a_task_py" auto-consume --db "$_db_path" --raw-key "$_raw_key" 2>/dev/null || true)

@@ -33,7 +33,7 @@ done
 
 [[ -n "$raw_key" ]] || { echo "Missing --raw-key" >&2; usage; exit 1; }
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+ROOT_DIR="${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)}"
 [[ -z "$target" ]] && target="$(pwd)/docs/issues/raw-${raw_key}"
 
 # ── Worktree / branch interception ─────────────────────────

@@ -28,6 +28,61 @@ base="${3:-develop}"
 echo "=== pr-create-guarded: $current_branch → $base ==="
 echo ""
 
+# ── Step 0a: Worktree cleanliness check ──
+if ! git diff --quiet 2>/dev/null || ! git diff --cached --quiet 2>/dev/null; then
+  cat >&2 <<DIRTY
+[PR-CREATE] Worktree is dirty — cannot create PR.
+Uncommitted changes prevent accurate governance-gate evaluation.
+Modified files:
+$(git diff --name-only 2>/dev/null | sed 's/^/  /')
+$(git diff --cached --name-only 2>/dev/null | sed 's/^/  (staged) /')
+
+Resolve:
+  git add <files> && git commit -m "..."   — commit changes
+  git stash                                — save and restore later
+  git checkout -- <file>                   — discard (caution!)
+DIRTY
+  exit 1
+fi
+echo "Step 0a/4: worktree clean ✓"
+
+# ── Step 0b: Worktree phase_state check ──
+_raw_key=$(echo "$current_branch" | grep -oE 'raw-[0-9]{8}T[0-9]{6}Z' | head -1 || true)
+if [[ -n "$_raw_key" ]]; then
+  _issue_file="$ROOT_DIR/docs/issues/${_raw_key}/issue.md"
+  if [[ -f "$_issue_file" ]]; then
+    _phase="$(python3 -c "
+import yaml
+with open('$_issue_file') as f: c=f.read()
+p=c.split('---',2)
+fm=yaml.safe_load(p[1]) if len(p)>=3 else {}
+print(fm.get('phase_state',''))
+" 2>/dev/null || true)"
+    if [[ "$_phase" != "absorbed" ]]; then
+      cat >&2 <<PHASE
+[PR-CREATE] raw issue phase_state is '${_phase:-<empty>}', not 'absorbed'.
+The raw issue must be absorbed before creating a PR.
+This means the IBM lifecycle is complete and the issue is ready for merge.
+
+  Current state: phase_state=${_phase:-<empty>}
+  Required:      phase_state=absorbed
+
+  If work is done but phase_state not updated:
+    1. Edit $ROOT_DIR/docs/issues/${_raw_key}/issue.md
+    2. Set phase_state: absorbed
+    3. Set absorbed_into: 'I-{key}-A' (the I-* issue that absorbs this)
+    4. git add + git commit
+
+  If governance (B1_IBM/B2_IBM) is incomplete:
+    skill:freely-doc-B1_IBM-execution → brainstorm → candidate
+    skill:freely-doc-B2_IBM-execution → I-* → pre-tests → code-review
+PHASE
+      exit 1
+    fi
+    echo "Step 0b/4: phase_state=absorbed ✓"
+  fi
+fi
+
 # ── Step 1: Pull latest develop into current branch ──
 echo "Step 1/4: pulling latest $base into $current_branch..."
 if ! git pull origin "$base" 2>&1; then
