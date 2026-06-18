@@ -1,6 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# pr-merge-guarded must run from the main repo (develop), not a worktree.
+# Resolve project root via .freely/config.toml or git worktree list.
+if [[ -z "${PROJECT_ROOT:-}" ]]; then
+  _primary=$(git worktree list --porcelain 2>/dev/null | awk '
+    $1=="worktree" { wt=$2 }
+    $1=="HEAD" && $2 ~ /^[0-9a-f]{40}$/ { print wt; exit }
+  ')
+  PROJECT_ROOT="${_primary:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+fi
+cd "$PROJECT_ROOT" || { echo "ERROR: cannot cd to PROJECT_ROOT=$PROJECT_ROOT" >&2; exit 1; }
+
 usage() {
   cat <<'USAGE'
 Usage:
