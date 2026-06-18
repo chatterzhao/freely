@@ -1,3 +1,19 @@
+## M-20260618T043121Z-A
+- title: Fix pr-create dirty check + pr-merge develop check
+- status: active
+### candidate_issues
+1. `C-20260618T043121Z-A`
+- milestone: M-20260618T043121Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260618T043121Z-A/issue.md`
+### committed_issues
+1. `I-20260618T043121Z-A`
+- title: Fix pr-create dirty check + pr-merge develop check
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260618T043121Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/pr-create-dirty-check-fix/code-reviews`
+
 ### committed_issues
 1. `I-20260618T040226Z-A`
 - title: pr-review-guarded command + workflow integration
