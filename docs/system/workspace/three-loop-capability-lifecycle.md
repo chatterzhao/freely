@@ -18,15 +18,15 @@ SVG 图展示的五层实体，从上到下、从内到外：
 | **Layer 2** | auto-loop / doc-loop / dev-loop | 实线泳道 | 三个 Loop 的 gate 序列和逻辑流程 |
 | **Layer 3** | Manager Agent / Worker Agent | 虚线框 | 逻辑角色（非独立进程），由 prompt 注入定义 |
 | **Layer 3a** | M-Skills / W-Skills | 点线框 | Skill 集合，按 Manager / Worker / 通用能力被 Agent 消费 |
-| **Layer 4** | ACP Bridge / A2A Server / DB daemon + SQLite/WAL | 实线框 | 真实进程通过 Unix socket 通信；SQLite/WAL 是持久化文件，不是进程 |
+| **Layer 4** | ACP Bridge / A2A Server / freely-db daemon + SQLite/WAL | 实线框 | `freely_db_manager.py` 是 SQLite 单写入访问进程，通过 Unix socket 提供 JSON-RPC；SQLite/WAL 是持久化文件 |
 | **Layer 5** | AI CLI Tool (Claude Code/codex/opencode/...) | 实线框 | 外部独立进程，在 Runtime 之外，通过 ACP JSON-RPC 连接 |
 
 ### 实体框型约定
 
-- **实线框** = 真实进程或守护进程（有 PID，可启停）：Freely Runtime, ACP Bridge, A2A Server, DB daemon, AI CLI Tool
+- **实线框** = 真实进程或守护进程（有 PID，可启停）：Freely Runtime, ACP Bridge, A2A Server, freely-db daemon, AI CLI Tool
 - **虚线框** = 逻辑角色（AI Agent，由 prompt 注入定义）：Manager Agent, Worker Agent
 - **点线框** = Skill 集合：M-Skills, W-Skills
-- **DB 文件** = SQLite/WAL 持久化，不单独拥有 PID；由 `freely_db_manager.py` 通过 Unix socket 对外提供 JSON-RPC。
+- **SQLite/WAL 文件** = 持久化文件，不单独拥有 PID；由 `freely_db_manager.py` 持有单 SQLite connection 并通过 Unix socket 对外提供 JSON-RPC。
 
 ### 协议通道
 

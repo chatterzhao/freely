@@ -17,7 +17,8 @@
 │  └──────┬───────┘                       └─────────────────────────────┘│
 │         │ JSON-RPC over Unix socket + WAL-backed tables                  │
 │  ┌──────▼───────┐                                                        │
-│  │ db_manager   │──► SQLite/WAL (runtime state tables)                  │
+│  │ freely-db    │──► SQLite/WAL (runtime state tables)                  │
+│  │ daemon       │    single writer: freely_db_manager.py                │
 │  └──────────────┘                                                        │
 └─────────────────────────────────────────────────────────────────────────┘
          │                                              │
@@ -97,7 +98,7 @@
 | **Agent 间协调** | A2A | Task 生命周期、Message 内容、SSE 通知 | ❌ 零文件 |
 | **AI 执行** | ACP | session/prompt、stopReason、session/ping | ✅ 临时文件（协议需要） |
 | **编排** | Freely Runtime | scan→prompt→delegate→launch→monitor | 生成临时文件 |
-| **持久化** | DB daemon + SQLite/WAL | `a2a_tasks` 委派、`chats` 插话摄入、`sessions` ACP 会话、`tool_*` 恢复证据、`task_mode_gate` 模式状态 | DB 文件 |
+| **持久化** | freely-db daemon + SQLite/WAL | `freely_db_manager.py` 持有单 SQLite connection，通过 Unix socket JSON-RPC 读写 `a2a_tasks`、`chats`、`sessions`、`tool_*`、`task_mode_gate` | DB 文件 |
 
 ## 关键数据流
 

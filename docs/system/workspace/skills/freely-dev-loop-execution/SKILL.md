@@ -31,7 +31,7 @@ description: 执行 scan-selected 或 handoff-continued ready issue 的实现、
 这样做：
 1. 读取 issue、`prd.md`、`pre-tests.md`、`tasks.md`、milestone。
 2. 确认当前 issue 已是 ready issue，而不是候选或仅 docs 收敛中的 issue。
-3. 确认 issue / milestone 的 `phase_state=done_ibm` 或 `in_dev`。
+3. 确认 issue / milestone 的 `phase_state=done_b2_ibm` 或 `in_dev`。
 4. 确认当前 worktree 正确：
    - 独立 issue -> 通常基于 `develop`
    - 依赖父分支 -> 基于 `execution_base`

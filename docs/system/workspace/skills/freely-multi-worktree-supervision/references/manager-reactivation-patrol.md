@@ -20,7 +20,7 @@
 - 但没有新的 worker 在继续 pre-brainstorm / IBM materialization
 
 2. `phase orphaned`
-- `phase_state=in_ibm|in_dev|in_verification`
+- `phase_state=in_b2_ibm|done_b2_ibm|in_dev|in_verification`
 - 但对应 worktree 没有活跃 supervisor / ai
 - 且没有 recovery / handoff 正在接管
 
@@ -35,7 +35,7 @@
 
 5. `worker dispatch-only with delegated local handoff`
 - worker 工位 `live-status` 停在 `dispatch_only`
-- intake 已存在本工位 delegated `handoff://continuation` / `handoff://verification`
+- intake 已存在本工位 delegated continuation / verification target
 - 但没有新的 worker 主循环接棒
 
 6. `external drift / out-of-band reconcile`

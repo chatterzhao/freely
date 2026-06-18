@@ -60,7 +60,7 @@ session_refs: []
 - Supervisor 主循环：while true { scan → build_prompt → select_launch_kind → monitor → exit_contract → delegate → sleep }
 - Task mode gate：auto / wait / listen 三种模式的循环行为
 - scan 机制：task-lifecycle-scan.py → CHAIN_ACTIONS 字典 → next_action 字段
-- AI CLI Tool 层：opencode / cc / codex / iflow / kiro，各自的 adapter（direct / acp）
+- AI CLI Tool 层：opencode / cc / codex / iflow / kiro，经 registry 进入 ACP family
 - 提示组装：build_prompt → start-lead-agent.sh → agent 角色 + 治理 + 上下文源 + 执行规则
 
 ## 新 SVG 设计方案
@@ -87,7 +87,7 @@ session_refs: []
 ├──────────────────────────────────────────────────────────────┤
 │  Layer 5: AI CLI Tools                                       │
 │  opencode / cc / codex / iflow / kiro                        │
-│  adapter: direct | acp | prefer_acp_fallback_direct          │
+│  adapter: acp (current product working mode)                 │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -98,7 +98,7 @@ session_refs: []
 3. **Agent 角色框**：Manager（develop, M-skills）和 Worker（feature/*, W-skills），标注技能集
 4. **Skill 路由**：context-source-skill 的分支（discovery→doc-B1, milestone→doc-B2, continuation→dev-loop）
 5. **Runtime 循环**：Supervisor while-true 循环 + task-mode gate
-6. **AI CLI Tool 层**：底部工具矩阵，标注 adapter 类型
+6. **AI CLI Tool 层**：底部工具矩阵，标注 canonical ACP 接入
 7. **出口合同**：三个出口（stop_ai→停止, delegate_workers→启动Worker, resume_manager→继续巡逻）
 8. **图例**：协议颜色约定（ACP=蓝, A2A=绿, Runtime=灰, Skill=紫）
 

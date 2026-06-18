@@ -12,6 +12,12 @@
     <marker id="arrow-scan" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
       <path d="M0,0 L8,3 L0,6 Z" fill="#94a3b8"/>
     </marker>
+    <marker id="arrow-db" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#eab308"/>
+    </marker>
+    <marker id="arrow-skill" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+      <path d="M0,0 L7,2.5 L0,5 Z" fill="#a855f7"/>
+    </marker>
     <marker id="loop-arrow" markerWidth="6" markerHeight="5" refX="6" refY="2.5" orient="auto">
       <path d="M0,0 L6,2.5 L0,5 Z" fill="#888"/>
     </marker>
@@ -139,6 +145,7 @@
   <text x="930" y="282" font-size="10" font-weight="bold" fill="#7c3aed" font-family="system-ui, sans-serif">M-Skills (Manager-owned Skill 集合)</text>
   <text x="930" y="297" font-size="8" fill="#6b21a8" font-family="system-ui, sans-serif">constitution-guard, laws-enforcer, context-source-skill, auto-loop-orchestrator</text>
   <text x="930" y="311" font-size="8" fill="#6b21a8" font-family="system-ui, sans-serif">feat-execution, chat-issue-routing, worktree-*, watchdog-*, milestone-planning, ...</text>
+  <line x1="908" y1="296" x2="918" y2="296" stroke="#a855f7" stroke-width="1.2" marker-end="url(#arrow-skill)"/>
 
   <!-- ===== DOC-LOOP SWIMLANE ===== -->
   <rect x="30" y="345" width="660" height="210" rx="8" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
@@ -166,6 +173,7 @@
   <text x="55" y="529" font-size="8" font-weight="bold" fill="#7c3aed" font-family="system-ui, sans-serif">W-Skills:</text>
   <text x="125" y="529" font-size="8" fill="#6b21a8" font-family="system-ui, sans-serif">doc-B1_IBM-execution, doc-B2_IBM-execution, constitution-guard, laws-enforcer</text>
   <text x="55" y="541" font-size="8" fill="#6b21a8" font-family="system-ui, sans-serif">入口: Task.message → prompt file → worker-agent.md (intent_kind → skill mapping)</text>
+  <line x1="360" y1="509" x2="360" y2="513" stroke="#a855f7" stroke-width="1" marker-end="url(#arrow-skill)"/>
 
   <text x="360" y="338" text-anchor="middle" font-size="9" fill="#16a34a" font-family="system-ui, sans-serif">↑ return to auto-loop dispatch</text>
 
@@ -195,6 +203,7 @@
   <text x="735" y="529" font-size="8" font-weight="bold" fill="#7c3aed" font-family="system-ui, sans-serif">W-Skills:</text>
   <text x="805" y="529" font-size="8" fill="#6b21a8" font-family="system-ui, sans-serif">dev-loop-execution, fix-execution, feat-execution, branch-management, worktree-*, constitution-guard</text>
   <text x="735" y="541" font-size="8" fill="#6b21a8" font-family="system-ui, sans-serif">入口: Task.message → prompt file → worker-agent.md (intent_kind: edit→dev-loop, merge→branch-mgmt, ...)</text>
+  <line x1="1040" y1="509" x2="1040" y2="513" stroke="#a855f7" stroke-width="1" marker-end="url(#arrow-skill)"/>
 
   <text x="1040" y="338" text-anchor="middle" font-size="9" fill="#b91c1c" font-family="system-ui, sans-serif">↑ return to auto-loop test gate</text>
 
@@ -205,7 +214,7 @@
   <rect x="45" y="595" width="640" height="130" rx="6" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
   <rect x="45" y="595" width="200" height="20" rx="3" fill="#6366f1"/>
   <text x="145" y="609" text-anchor="middle" font-size="10" font-weight="bold" fill="white" font-family="system-ui, sans-serif">ACP Bridge (acp-bridge.py)</text>
-  <text x="55" y="632" font-size="9" fill="#4338ca" font-family="system-ui, sans-serif">JSON-RPC over Unix socket — default adapter: acp；Runtime 与 AI CLI Tool 之间的会话代理</text>
+  <text x="55" y="632" font-size="9" fill="#4338ca" font-family="system-ui, sans-serif">JSON-RPC over Unix socket — adapter: acp；Runtime 与 AI CLI Tool 之间的会话代理</text>
   <text x="55" y="648" font-size="9" fill="#475569" font-family="system-ui, sans-serif">session/new → session/resume → session/prompt → stopReason → session/ping → session/close</text>
   <text x="55" y="664" font-size="9" fill="#475569" font-family="system-ui, sans-serif">三级缓存: L1 resume (0 token) | L2 fork (增量, 同 system prompt) | L3 fresh (全量, 新 prompt)</text>
   <text x="55" y="680" font-size="9" fill="#475569" font-family="system-ui, sans-serif">select_launch_kind: fresh | resume | fork | prompt — ensure_runtime_tool_session_anchor</text>
@@ -217,7 +226,7 @@
   <rect x="710" y="595" width="250" height="20" rx="3" fill="#10b981"/>
   <text x="835" y="609" text-anchor="middle" font-size="10" font-weight="bold" fill="white" font-family="system-ui, sans-serif">A2A Server (a2a_server.py + a2a_task.py)</text>
   <text x="720" y="632" font-size="9" fill="#065f46" font-family="system-ui, sans-serif">REST + SSE over Unix socket — Agent 间通信 (Manager ↔ Worker), 零文件交接</text>
-  <text x="720" y="648" font-size="9" fill="#475569" font-family="system-ui, sans-serif">Task 状态机: submitted → working → completed | failed | input-required</text>
+  <text x="720" y="648" font-size="9" fill="#475569" font-family="system-ui, sans-serif">Task 状态机: submitted → working → completed | failed | input-required | pending-input</text>
   <text x="720" y="664" font-size="9" fill="#475569" font-family="system-ui, sans-serif">Manager 委派: a2a-exit --state submitted --agent-id worker --skill ... --message "完整 prompt"</text>
   <text x="720" y="680" font-size="9" fill="#475569" font-family="system-ui, sans-serif">Runtime 发现: tasks/list --state submitted → Task.message → prompt file → 启动 Worker</text>
   <text x="720" y="696" font-size="9" fill="#475569" font-family="system-ui, sans-serif">SSE 通知: TaskStatusUpdateEvent → Manager 下一轮 patrol 感知 Worker 完成</text>
@@ -225,8 +234,8 @@
 
   <!-- SQLite -->
   <rect x="45" y="740" width="640" height="45" rx="5" fill="#fefce8" stroke="#eab308" stroke-width="1.5"/>
-  <text x="55" y="758" font-size="10" font-weight="bold" fill="#a16207" font-family="system-ui, sans-serif">DB daemon + SQLite/WAL (freely_db_manager.py)</text>
-  <text x="55" y="774" font-size="9" fill="#854d0e" font-family="system-ui, sans-serif">a2a_tasks=delegation, chats=intake, sessions=ACP, tool_*=recovery, task_mode_gate=mode</text>
+  <text x="55" y="758" font-size="10" font-weight="bold" fill="#a16207" font-family="system-ui, sans-serif">freely-db daemon (freely_db_manager.py) + SQLite/WAL</text>
+  <text x="55" y="774" font-size="9" fill="#854d0e" font-family="system-ui, sans-serif">single-writer JSON-RPC: a2a_tasks, chats, sessions, tool_*, task_mode_gate</text>
 
   <!-- ACP ↔ A2A coordination note -->
   <rect x="710" y="740" width="660" height="45" rx="5" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
@@ -235,28 +244,34 @@
 
   <!-- ===== PROTOCOL DATA FLOW ARROWS ===== -->
   <!-- ACP: Manager → ACP Bridge -->
-  <line x1="290" y1="327" x2="290" y2="593" stroke="#6366f1" stroke-width="1.8" marker-end="url(#arrow-acp)"/>
-  <text x="302" y="470" font-size="8" fill="#6366f1" font-family="system-ui, sans-serif" transform="rotate(90,302,470)">ACP session/prompt</text>
+  <path d="M290,327 L25,327 L25,580 L290,580 L290,593" fill="none" stroke="#6366f1" stroke-width="1.8" marker-end="url(#arrow-acp)"/>
+  <text x="37" y="470" font-size="8" fill="#6366f1" font-family="system-ui, sans-serif" transform="rotate(90,37,470)">ACP session/prompt</text>
 
   <!-- A2A: Manager → A2A Server (delegation) -->
-  <path d="M925,327 L925,420 Q925,435 910,435 L640,435 Q620,435 620,450 L620,593" fill="none" stroke="#10b981" stroke-width="1.8" marker-end="url(#arrow-a2a)"/>
-  <text x="790" y="428" font-size="8" fill="#10b981" font-family="system-ui, sans-serif">a2a-exit --state submitted (Manager 委派 Worker)</text>
+  <path d="M880,327 L880,337 L700,337 L700,570 L1040,570 L1040,593" fill="none" stroke="#10b981" stroke-width="1.8" marker-end="url(#arrow-a2a)"/>
+  <text x="790" y="566" font-size="8" fill="#10b981" font-family="system-ui, sans-serif">a2a-exit --state submitted → A2A Server</text>
 
   <!-- A2A SSE: A2A Server → Manager (notification) -->
-  <path d="M730,660 L730,340" fill="none" stroke="#10b981" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrow-a2a)"/>
-  <text x="740" y="510" font-size="8" fill="#10b981" font-family="system-ui, sans-serif" transform="rotate(90,740,510)">SSE TaskStatusUpdateEvent (通知 Manager)</text>
+  <path d="M1370,660 L1380,660 L1380,340 L760,340 L760,327" fill="none" stroke="#10b981" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrow-a2a)"/>
+  <text x="1366" y="510" font-size="8" fill="#10b981" font-family="system-ui, sans-serif" transform="rotate(90,1366,510)">SSE TaskStatusUpdateEvent (通知 Manager)</text>
 
   <!-- A2A: A2A Server → doc-loop Worker -->
-  <path d="M740,660 L740,500 Q740,490 725,490 L695,490" fill="none" stroke="#10b981" stroke-width="1.5" marker-end="url(#arrow-a2a)"/>
-  <text x="705" y="580" font-size="7" fill="#10b981" font-family="system-ui, sans-serif">tasks/list → Worker prompt</text>
+  <path d="M740,660 L700,660 Q690,660 690,640 L690,505 Q690,492 677,492" fill="none" stroke="#10b981" stroke-width="1.5" marker-end="url(#arrow-a2a)"/>
+  <text x="585" y="572" font-size="7" fill="#10b981" font-family="system-ui, sans-serif">tasks/list → doc Worker prompt</text>
 
   <!-- A2A: A2A Server → dev-loop Worker -->
-  <line x1="1050" y1="660" x2="1050" y2="550" stroke="#10b981" stroke-width="1.5" marker-end="url(#arrow-a2a)"/>
-  <text x="1058" y="610" font-size="7" fill="#10b981" font-family="system-ui, sans-serif">fork Worker ACP session</text>
+  <line x1="1050" y1="660" x2="1050" y2="509" stroke="#10b981" stroke-width="1.5" marker-end="url(#arrow-a2a)"/>
+  <text x="1058" y="610" font-size="7" fill="#10b981" font-family="system-ui, sans-serif">tasks/list → dev Worker prompt</text>
 
   <!-- A2A: Worker → A2A Server (completion) -->
-  <line x1="1120" y1="550" x2="1120" y2="660" stroke="#10b981" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrow-a2a)"/>
+  <line x1="1120" y1="509" x2="1120" y2="660" stroke="#10b981" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrow-a2a)"/>
   <text x="1128" y="610" font-size="7" fill="#10b981" font-family="system-ui, sans-serif">a2a-exit completed</text>
+
+  <!-- DB persistence: ACP/A2A → freely-db daemon -->
+  <line x1="255" y1="725" x2="255" y2="740" stroke="#eab308" stroke-width="1.2" marker-end="url(#arrow-db)"/>
+  <text x="265" y="737" font-size="7" fill="#a16207" font-family="system-ui, sans-serif">sessions/tool_*</text>
+  <line x1="900" y1="725" x2="650" y2="740" stroke="#eab308" stroke-width="1.2" marker-end="url(#arrow-db)"/>
+  <text x="730" y="735" font-size="7" fill="#a16207" font-family="system-ui, sans-serif">a2a_tasks/chats/task_mode_gate</text>
 
   <!-- Scan: filesystem → intake -->
   <path d="M20,164 L41,164" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-scan)"/>
@@ -270,7 +285,7 @@
   <rect x="30" y="922" width="220" height="20" rx="3" fill="#6b7280"/>
   <text x="140" y="936" text-anchor="middle" font-size="10" font-weight="bold" fill="white" font-family="system-ui, sans-serif">AI CLI Tool — Manager Session</text>
   <text x="40" y="958" font-size="9" fill="#374151" font-family="system-ui, sans-serif">Claude ACP family / codex-acp / opencode acp</text>
-  <text x="40" y="974" font-size="9" fill="#374151" font-family="system-ui, sans-serif">adapter: acp (current default) — tool registry → monitor-ai-acp.sh → run-acp-prompt.py</text>
+  <text x="40" y="974" font-size="9" fill="#374151" font-family="system-ui, sans-serif">adapter: acp (product working mode) — tool registry → monitor-ai-acp.sh → run-acp-prompt.py</text>
 
   <!-- Worker-side AI CLI Tool -->
   <rect x="720" y="922" width="650" height="65" rx="6" fill="#f3f4f6" stroke="#6b7280" stroke-width="2"/>
@@ -279,12 +294,12 @@
   <text x="730" y="958" font-size="9" fill="#374151" font-family="system-ui, sans-serif">cc / kiro-cli / iflow aliases enter Claude ACP family by registry</text>
   <text x="730" y="974" font-size="9" fill="#374151" font-family="system-ui, sans-serif">ACP fork: SESSION_PARENT_ID → 独立 session, 不污染父 session JSONL</text>
 
-  <!-- ACP arrows: Runtime ↔ AI CLI Tools -->
-  <line x1="355" y1="785" x2="355" y2="920" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow-acp)"/>
-  <text x="367" y="860" font-size="8" fill="#6366f1" font-family="system-ui, sans-serif">ACP JSON-RPC: session/new, /resume, /prompt, stopReason</text>
+  <!-- ACP arrows: ACP Bridge ↔ AI CLI Tools -->
+  <path d="M355,725 L355,735 L35,735 L35,920" fill="none" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow-acp)"/>
+  <text x="47" y="860" font-size="8" fill="#6366f1" font-family="system-ui, sans-serif" transform="rotate(90,47,860)">ACP JSON-RPC: session/new, /resume, /prompt, stopReason</text>
 
-  <line x1="1045" y1="785" x2="1045" y2="920" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow-acp)"/>
-  <text x="1057" y="860" font-size="8" fill="#6366f1" font-family="system-ui, sans-serif">ACP JSON-RPC: fork session → /prompt → stopReason</text>
+  <path d="M685,690 L700,690 L700,825 L1045,825 L1045,920" fill="none" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow-acp)"/>
+  <text x="760" y="845" font-size="8" fill="#6366f1" font-family="system-ui, sans-serif">ACP JSON-RPC: fork session → /prompt → stopReason</text>
 
   <!-- ===== LEGEND ===== -->
   <rect x="30" y="1005" width="1340" height="80" rx="6" fill="white" stroke="#e2e8f0" stroke-width="1"/>
@@ -318,5 +333,5 @@
   <rect x="610" y="1047" width="14" height="11" rx="2" fill="#f3f4f6" stroke="#6b7280"/>
   <text x="628" y="1056" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">AI CLI Tool (外部进程)</text>
 
-  <text x="780" y="1056" font-size="9" fill="#94a3b8" font-family="system-ui, sans-serif">━━ 实线箭头 = 同步调用 — — 虚线箭头 = 异步通知/回环 ··· 点线箭头 = scan 读取</text>
+  <text x="780" y="1056" font-size="9" fill="#94a3b8" font-family="system-ui, sans-serif">━━ 实线箭头 = 同步调用 — — 虚线箭头 = 异步通知/回环 ··· 点线箭头 = scan 读取；黄线 = DB persistence，紫线 = Skill lookup</text>
 </svg>
