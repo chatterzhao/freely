@@ -3,7 +3,7 @@
 - branch: fix/raw-20260618T071502Z-pr-merge-local-merge
 - base: develop
 - reviewer: cli
-- review_date: 2026-06-18T07:27:49Z
+- review_date: 2026-06-18T07:29:38Z
 - verdict: fail
 
 ## 1. Worktree Check
@@ -12,7 +12,7 @@
 
 ## 2. IBM Completeness
 - status: fail
-- evidence: [FAIL] develop merge governance gate blocked. The following raw/C/M/I lifecycle links are incomplete or inconsistent: - This develop-bound merge has no raw/C/M/I lifecycle evidence. Every worktree must start from a raw-* issue (chat or platform), proceed through B1 pre-brainstorm research, and hit a traceable C-* candidate in the merge diff. Continue existing research by updating its raw/candidate/issue/progress/review artifacts, or if this is a completed-family reopen, create a new raw issue and new candidate that records reopen_of_issue and reopen_reason before replaying the merge. 
+- evidence: [FAIL] develop merge governance gate blocked. The following raw/C/M/I lifecycle links are incomplete or inconsistent: - docs/epics/pr-review-guarded/code-reviews/pr-review-local.md points to owner issue 'missing', but that issue cannot be resolved. Every develop-bound merge must stay on a candidate-driven lifecycle. Link the review to a real issue that traces back to a pre-brainstorm candidate. 
 
 ## 3. Code Review Evidence
 - status: pass
