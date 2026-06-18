@@ -85,9 +85,6 @@
   <text x="514" y="180" text-anchor="middle" font-size="8.5" fill="#475569" font-family="system-ui, sans-serif">端到端验证</text>
   <text x="514" y="194" text-anchor="middle" font-size="7.5" fill="#94a3b8" font-family="system-ui, sans-serif">阶段7</text>
 
-  <path d="M460,205 C460,228 568,228 568,205" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#loop-arrow)"/>
-  <text x="514" y="224" text-anchor="middle" font-size="7.5" fill="#888" font-family="system-ui, sans-serif">↻ fail → back to dev-loop</text>
-
   <line x1="573" y1="164" x2="589" y2="164" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <!-- pr-create (阶段8) -->
@@ -106,9 +103,6 @@
   <text x="802" y="180" text-anchor="middle" font-size="8.5" fill="#475569" font-family="system-ui, sans-serif">6-dim review→verdict</text>
   <text x="802" y="194" text-anchor="middle" font-size="7.5" fill="#94a3b8" font-family="system-ui, sans-serif">阶段9</text>
 
-  <path d="M745,205 C745,228 862,228 862,205" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#loop-arrow)"/>
-  <text x="802" y="224" text-anchor="middle" font-size="7.5" fill="#888" font-family="system-ui, sans-serif">↻ fail → back to dev-loop</text>
-
   <line x1="865" y1="164" x2="881" y2="164" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <!-- CI check (阶段10): external -->
@@ -117,9 +111,6 @@
   <text x="938" y="166" text-anchor="middle" font-size="8.5" fill="#475569" font-family="system-ui, sans-serif">CI + Approval</text>
   <text x="938" y="180" text-anchor="middle" font-size="8.5" fill="#475569" font-family="system-ui, sans-serif">(外部/GitHub)</text>
   <text x="938" y="194" text-anchor="middle" font-size="7.5" fill="#94a3b8" font-family="system-ui, sans-serif">阶段10</text>
-
-  <path d="M891,205 C891,228 986,228 986,205" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#loop-arrow)"/>
-  <text x="938" y="224" text-anchor="middle" font-size="7.5" fill="#888" font-family="system-ui, sans-serif">↻ fail → back to dev-loop</text>
 
   <line x1="991" y1="164" x2="1007" y2="164" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
 
@@ -130,8 +121,10 @@
   <text x="1074" y="180" text-anchor="middle" font-size="8.5" fill="#475569" font-family="system-ui, sans-serif">gate→merge→push</text>
   <text x="1074" y="194" text-anchor="middle" font-size="7.5" fill="#94a3b8" font-family="system-ui, sans-serif">阶段11</text>
 
-  <path d="M1017,205 C1017,228 1132,228 1132,205" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#loop-arrow)"/>
-  <text x="1074" y="224" text-anchor="middle" font-size="7.5" fill="#888" font-family="system-ui, sans-serif">↻ fail → back to dev-loop</text>
+  <!-- gate failures return to dev-loop repair, then re-enter test/pr gates -->
+  <path d="M514,200 L514,238 M802,200 L802,238 M938,200 L938,238 M1074,200 L1074,238 M514,238 L1074,238" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="4,2"/>
+  <path d="M870,238 L914,238 L914,373 L870,373 L870,382" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#loop-arrow)"/>
+  <text x="870" y="232" text-anchor="middle" font-size="7.5" fill="#888" font-family="system-ui, sans-serif">fail → repair in dev-loop → re-enter gates</text>
 
   <line x1="1137" y1="164" x2="1153" y2="164" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
 
@@ -264,10 +257,10 @@
   <line x1="345" y1="762" x2="370" y2="762" stroke="#eab308" stroke-width="1.2" marker-end="url(#arrow-db)"/>
   <text x="348" y="755" font-size="7" fill="#a16207" font-family="system-ui, sans-serif">WAL</text>
 
-  <!-- ACP ↔ A2A coordination note -->
+  <!-- Freely Runtime bridge (task launcher) -->
   <rect x="710" y="740" width="660" height="45" rx="5" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
-  <text x="720" y="758" font-size="10" font-weight="bold" fill="#475569" font-family="system-ui, sans-serif">Runtime bridge: A2A task → ACP worker session</text>
-  <text x="720" y="774" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">a2a-exit → a2a_tasks → delegate_workers → tasks/list → Task.message → Worker ACP session</text>
+  <text x="720" y="758" font-size="10" font-weight="bold" fill="#475569" font-family="system-ui, sans-serif">Freely Runtime bridge (task launcher): A2A task → Worker ACP session</text>
+  <text x="720" y="774" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">reads a2a_tasks via tasks/list → Task.message → prompt file → ACP Bridge starts Worker session</text>
 
   <!-- ===== PROTOCOL DATA FLOW ARROWS ===== -->
   <!-- ACP: Manager → ACP Bridge -->
@@ -282,13 +275,17 @@
   <path d="M1370,660 L1380,660 L1380,340 L760,340 L760,327" fill="none" stroke="#10b981" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrow-a2a)"/>
   <text x="1366" y="510" font-size="8" fill="#10b981" font-family="system-ui, sans-serif" transform="rotate(90,1366,510)">SSE TaskStatusUpdateEvent (通知 Manager)</text>
 
-  <!-- A2A: A2A Server → doc-loop Worker -->
-  <path d="M740,660 L700,660 Q690,660 690,640 L690,505 Q690,492 677,492" fill="none" stroke="#10b981" stroke-width="1.5" marker-end="url(#arrow-a2a)"/>
-  <text x="585" y="572" font-size="7" fill="#10b981" font-family="system-ui, sans-serif">Runtime: tasks/list → doc Worker prompt</text>
+  <!-- A2A: A2A Server → Runtime bridge (task discovery) -->
+  <line x1="1040" y1="725" x2="1040" y2="740" stroke="#10b981" stroke-width="1.5" marker-end="url(#arrow-a2a)"/>
+  <text x="1050" y="737" font-size="7" fill="#10b981" font-family="system-ui, sans-serif">tasks/list discovery</text>
 
-  <!-- A2A: A2A Server → dev-loop Worker -->
-  <line x1="1050" y1="660" x2="1050" y2="509" stroke="#10b981" stroke-width="1.5" marker-end="url(#arrow-a2a)"/>
-  <text x="1058" y="610" font-size="7" fill="#10b981" font-family="system-ui, sans-serif">Runtime: tasks/list → dev Worker prompt</text>
+  <!-- ACP launch: Runtime bridge → doc-loop Worker -->
+  <path d="M720,740 L695,740 L695,572 L690,572 L690,505 Q690,492 677,492" fill="none" stroke="#6366f1" stroke-width="1.5" marker-end="url(#arrow-acp)"/>
+  <text x="510" y="572" font-size="7" fill="#6366f1" font-family="system-ui, sans-serif">prompt file → doc Worker ACP session</text>
+
+  <!-- ACP launch: Runtime bridge → dev-loop Worker -->
+  <path d="M1280,740 L1378,740 L1378,492 L1357,492" fill="none" stroke="#6366f1" stroke-width="1.5" marker-end="url(#arrow-acp)"/>
+  <text x="1162" y="572" font-size="7" fill="#6366f1" font-family="system-ui, sans-serif">prompt file → dev Worker ACP session</text>
 
   <!-- A2A: doc-loop Worker → A2A Server (completion) -->
   <path d="M360,509 L360,570 L740,570 L740,660" fill="none" stroke="#10b981" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrow-a2a)"/>
