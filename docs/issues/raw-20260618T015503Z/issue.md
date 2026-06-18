@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260618T015503Z
 kind: raw
-phase_state: proposed
+phase_state: absorbed
 platform_ids:
   github:
     issue_id: '2956'
@@ -17,6 +17,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+absorbed_into: I-20260618T015503Z-A
 ---
 
 ## 问题概述
