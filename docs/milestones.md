@@ -1,9 +1,17 @@
+## M-20260618T071502Z-A
+- title: pr-merge local merge replaces gh pr merge
+- status: active
+### candidate_issues
+1. `C-20260618T071502Z-A`
+- milestone: M-20260618T071502Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260618T071502Z-A/issue.md`
 ### committed_issues
-1. `I-20260618T065221Z-A`
-- title: pr-merge local merge + wt-create consistency
+1. `I-20260618T071502Z-A`
+- title: pr-merge local merge replaces gh pr merge
 - milestone_state: committed
 - phase_state: `completed`
-- issue_path: `docs/issues/I-20260618T065221Z-A/issue.md`
+- issue_path: `docs/issues/I-20260618T071502Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/pr-merge-local-merge/code-reviews`
 
 ## M-20260618T065221Z-A

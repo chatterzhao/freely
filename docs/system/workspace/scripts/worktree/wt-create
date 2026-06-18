@@ -637,9 +637,11 @@ if [[ -n "$_github_head" ]] && [[ -n "$_origin_head" ]] && [[ "$_github_head" !=
 fi
 _sync_head="${_github_head:-$_origin_head}"
 if [[ -n "$_sync_head" ]]; then
-  git update-ref refs/heads/develop "$_sync_head" 2>/dev/null 
-    && echo "  develop updated to $(git rev-parse --short develop)" 
-    || echo "  warning: sync failed, proceeding with local develop"
+  if git update-ref refs/heads/develop "$_sync_head" 2>/dev/null; then
+    echo "  develop updated to $(git rev-parse --short develop)"
+  else
+    echo "  warning: sync failed, proceeding with local develop"
+  fi
 else
   echo "  warning: no remote develop found, proceeding with local develop"
 fi

@@ -144,10 +144,10 @@ fi
 # 5. Semantic Conflict / Receipt Integrity
 if git diff "$base..$review_branch" -- docs/system/workspace/scripts/worktree/pr-merge-guarded 2>/dev/null | grep -q "."; then
   # pr-merge-guarded was modified — verify receipt split is preserved
-  if grep -q '_merge_subject.*_merge_body' docs/system/workspace/scripts/worktree/pr-merge-guarded 2>/dev/null; then
-    check_dimension "5. Receipt Integrity" "pass" "pr-merge-guarded modified, --subject/--body split preserved"
+  if grep -Eq '_merge_subject.*_merge_body|render_merge_message|local merge with receipt' docs/system/workspace/scripts/worktree/pr-merge-guarded 2>/dev/null; then
+    check_dimension "5. Receipt Integrity" "pass" "pr-merge-guarded modified, receipt mechanism preserved (local merge or --subject/--body)"
   else
-    check_dimension "5. Receipt Integrity" "fail" "pr-merge-guarded modified but --subject/--body split is MISSING. See ef251886/PR #2963."
+    check_dimension "5. Receipt Integrity" "fail" "pr-merge-guarded modified but receipt mechanism MISSING. See ef251886/PR #2963."
   fi
 else
   check_dimension "5. Receipt Integrity" "n/a" "pr-merge-guarded not modified by this PR"
