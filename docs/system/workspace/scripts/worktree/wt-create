@@ -306,11 +306,11 @@ conn.close()
 
       local issue_dir="$PWD/docs/issues/raw-${raw_key}"
       mkdir -p "$issue_dir"
-      if ! python3 "$chat_inbox_py" materialize --db "$db_path" --id "$ts" --target "$issue_dir" >/dev/null 2>&1; then
+      if ! python3 "$chat_inbox_py" materialize --db "$db_path" --id "$ts_bare" --target "$issue_dir" >/dev/null 2>&1; then
         echo "chat-inbox: materialize failed for id=$ts" >&2
         return 1
       fi
-      python3 "$chat_inbox_py" consume --db "$db_path" --id "$ts" --materialized-as "raw-${raw_key}" >/dev/null 2>&1
+      python3 "$chat_inbox_py" consume --db "$db_path" --id "$ts_bare" --materialized-as "raw-${raw_key}" >/dev/null 2>&1
       echo "pull: materialized raw-$raw_key from chat-inbox → $issue_dir/issue.md" >&2
       return 0
       ;;
@@ -409,6 +409,7 @@ _require_issue_exists() {
   case "$key" in
     raw-*)
       ts="${key#raw-}"
+      ts_bare=$(echo "$ts" | tr -d 'TZ')
 
       # ── Scan matching (new: validate --source against scan, fallback to dir/DB) ──
       local scan_found=0
@@ -448,7 +449,7 @@ _require_issue_exists() {
             fi
             ;;
           chat-inbox)
-            if [[ -f "$db_path" ]] && python3 "$chat_inbox_py" show --db "$db_path" --id "$ts" >/dev/null 2>&1; then
+            if [[ -f "$db_path" ]] && python3 "$chat_inbox_py" show --db "$db_path" --id "$ts_bare" >/dev/null 2>&1; then
               : # chat exists in inbox, proceed
             else
               echo "拒绝创建工位: raw-$raw_key not found in chat-inbox" >&2
@@ -488,9 +489,8 @@ _require_issue_exists() {
       fi
 
       # Source 1: chat-inbox (already handled by pull in new mode)
-      if [[ -f "$db_path" ]] && python3 "$chat_inbox_py" show --db "$db_path" --id "$ts" >/dev/null 2>&1; then
-        local consumed ts_bare
-        ts_bare=$(echo "$ts" | tr -d 'TZ')
+      if [[ -f "$db_path" ]] && python3 "$chat_inbox_py" show --db "$db_path" --id "$ts_bare" >/dev/null 2>&1; then
+        local consumed
         consumed=$(python3 -c "
 import sqlite3
 conn=sqlite3.connect('$db_path')
@@ -561,7 +561,7 @@ conn.close()
   local issue_dir="$target_path/docs/issues/$key"
   mkdir -p "$issue_dir"
 
-  if ! python3 "$chat_inbox_py" materialize --db "$db_path" --id "$ts" --target "$issue_dir" >/dev/null 2>&1; then
+  if ! python3 "$chat_inbox_py" materialize --db "$db_path" --id "$ts_bare" --target "$issue_dir" >/dev/null 2>&1; then
     echo "materialize failed, rolling back worktree" >&2
     git -C "$ROOT_DIR" worktree remove "$target_path" --force 2>/dev/null || true
     git -C "$ROOT_DIR" branch -D "$branch" 2>/dev/null || true
