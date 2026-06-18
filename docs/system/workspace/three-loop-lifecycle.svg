@@ -30,11 +30,11 @@
   <text x="20" y="52" font-size="11" fill="#64748b" font-family="system-ui, sans-serif">feedback → wt-create → B1→B2→dev → test-pre-merge → pr-create-guarded → pr-review-guarded → CI → pr-merge-guarded → wt-close</text>
 
   <!-- =================================================================== -->
-  <!-- FREELY RUNTIME CONTAINER (solid)                                     -->
+  <!-- FREELY RUNTIME MANAGED BOUNDARY                                      -->
   <!-- =================================================================== -->
-  <rect x="15" y="70" width="1370" height="820" rx="10" fill="#f8fafc" stroke="#64748b" stroke-width="2.5"/>
-  <rect x="25" y="58" width="280" height="18" rx="3" fill="#64748b"/>
-  <text x="165" y="71" text-anchor="middle" font-size="10" font-weight="bold" fill="white" font-family="system-ui, sans-serif">Freely Runtime (bash supervisor, while-true loop)</text>
+  <rect x="15" y="70" width="1370" height="820" rx="10" fill="#f8fafc" stroke="#64748b" stroke-width="2.5" stroke-dasharray="8,4"/>
+  <rect x="25" y="58" width="330" height="18" rx="3" fill="#64748b"/>
+  <text x="190" y="71" text-anchor="middle" font-size="10" font-weight="bold" fill="white" font-family="system-ui, sans-serif">Freely Runtime-managed boundary (supervisor + daemons)</text>
 
   <!-- =================================================================== -->
   <!-- AUTO-LOOP SWIMLANE                                                   -->
@@ -136,13 +136,13 @@
 
   <!-- ===== MANAGER AGENT (dashed box) ===== -->
   <rect x="38" y="265" width="870" height="62" rx="6" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.5" stroke-dasharray="6,3"/>
-  <text x="48" y="282" font-size="10" font-weight="bold" fill="#2563eb" font-family="system-ui, sans-serif">Manager Agent (逻辑角色 — ACP session, develop worktree)</text>
+  <text x="48" y="282" font-size="10" font-weight="bold" fill="#2563eb" font-family="system-ui, sans-serif">Manager Agent (逻辑角色 — prompt-defined, executed by AI CLI ACP session)</text>
   <text x="48" y="297" font-size="9" fill="#475569" font-family="system-ui, sans-serif">patrol → task-source-scan → 读取 scan.json (CHAIN_ACTIONS/next_action) → judge</text>
   <text x="48" y="312" font-size="9" fill="#475569" font-family="system-ui, sans-serif">→ a2a-exit --state submitted|completed|failed → delegate_workers | resume_manager | stop_ai</text>
 
   <!-- M-Skills (dotted box) -->
   <rect x="920" y="265" width="440" height="62" rx="6" fill="#faf5ff" stroke="#a855f7" stroke-width="1.2" stroke-dasharray="3,3"/>
-  <text x="930" y="282" font-size="10" font-weight="bold" fill="#7c3aed" font-family="system-ui, sans-serif">M-Skills (Manager-owned Skill 集合)</text>
+  <text x="930" y="282" font-size="10" font-weight="bold" fill="#7c3aed" font-family="system-ui, sans-serif">M-Skills (instruction/capability modules for Manager)</text>
   <text x="930" y="297" font-size="8" fill="#6b21a8" font-family="system-ui, sans-serif">constitution-guard, laws-enforcer, context-source-skill, auto-loop-orchestrator</text>
   <text x="930" y="311" font-size="8" fill="#6b21a8" font-family="system-ui, sans-serif">feat-execution, chat-issue-routing, worktree-*, watchdog-*, milestone-planning, ...</text>
   <line x1="908" y1="296" x2="918" y2="296" stroke="#a855f7" stroke-width="1.2" marker-end="url(#arrow-skill)"/>
@@ -167,7 +167,7 @@
   <text x="517" y="434" text-anchor="middle" font-size="9" fill="#475569" font-family="system-ui, sans-serif">code-reviews/ → phase_state: done_b2_ibm</text>
 
   <rect x="45" y="475" width="632" height="34" rx="5" fill="#fef2f2" stroke="#f87171" stroke-width="1.2" stroke-dasharray="6,3"/>
-  <text x="55" y="490" font-size="9" font-weight="bold" fill="#b91c1c" font-family="system-ui, sans-serif">Worker Agent (逻辑角色 — ACP session, feature worktree)</text>
+  <text x="55" y="490" font-size="9" font-weight="bold" fill="#b91c1c" font-family="system-ui, sans-serif">Worker Agent (逻辑角色 — prompt-defined, executed by AI CLI ACP session)</text>
 
   <rect x="45" y="514" width="632" height="32" rx="5" fill="#faf5ff" stroke="#a855f7" stroke-width="1" stroke-dasharray="3,3"/>
   <text x="55" y="529" font-size="8" font-weight="bold" fill="#7c3aed" font-family="system-ui, sans-serif">W-Skills:</text>
@@ -197,7 +197,7 @@
   <text x="1197" y="434" text-anchor="middle" font-size="9" fill="#475569" font-family="system-ui, sans-serif">implementation evidence → in_verification</text>
 
   <rect x="725" y="475" width="632" height="34" rx="5" fill="#fef2f2" stroke="#f87171" stroke-width="1.2" stroke-dasharray="6,3"/>
-  <text x="735" y="490" font-size="9" font-weight="bold" fill="#b91c1c" font-family="system-ui, sans-serif">Worker Agent (逻辑角色 — ACP session, feature/hotfix worktree)</text>
+  <text x="735" y="490" font-size="9" font-weight="bold" fill="#b91c1c" font-family="system-ui, sans-serif">Worker Agent (逻辑角色 — prompt-defined, executed by AI CLI ACP session)</text>
 
   <rect x="725" y="514" width="632" height="32" rx="5" fill="#faf5ff" stroke="#a855f7" stroke-width="1" stroke-dasharray="3,3"/>
   <text x="735" y="529" font-size="8" font-weight="bold" fill="#7c3aed" font-family="system-ui, sans-serif">W-Skills:</text>
@@ -208,13 +208,13 @@
   <text x="1040" y="338" text-anchor="middle" font-size="9" fill="#b91c1c" font-family="system-ui, sans-serif">↑ return to auto-loop test gate</text>
 
   <!-- ===== PROTOCOL LAYER ===== -->
-  <text x="42" y="582" font-size="12" font-weight="bold" fill="#334155" font-family="system-ui, sans-serif">Protocol Layer (实线框 = 进程/守护进程, 通过 Unix socket 通信；DB 文件单独标注)</text>
+  <text x="42" y="582" font-size="12" font-weight="bold" fill="#334155" font-family="system-ui, sans-serif">Protocol / Service / Datastore Layer (protocols connect actors; daemons operate state; files store state)</text>
 
   <!-- ACP Bridge -->
   <rect x="45" y="595" width="640" height="130" rx="6" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
   <rect x="45" y="595" width="200" height="20" rx="3" fill="#6366f1"/>
   <text x="145" y="609" text-anchor="middle" font-size="10" font-weight="bold" fill="white" font-family="system-ui, sans-serif">ACP Bridge (acp-bridge.py)</text>
-  <text x="55" y="632" font-size="9" fill="#4338ca" font-family="system-ui, sans-serif">JSON-RPC over Unix socket — adapter: acp；Runtime 与 AI CLI Tool 之间的会话代理</text>
+  <text x="55" y="632" font-size="9" fill="#4338ca" font-family="system-ui, sans-serif">ACP session/control channel: Freely Runtime ↔ AI CLI Tool (prompt/resume/fork/stopReason)</text>
   <text x="55" y="648" font-size="9" fill="#475569" font-family="system-ui, sans-serif">session/new → session/resume → session/prompt → stopReason → session/ping → session/close</text>
   <text x="55" y="664" font-size="9" fill="#475569" font-family="system-ui, sans-serif">三级缓存: L1 resume (0 token) | L2 fork (增量, 同 system prompt) | L3 fresh (全量, 新 prompt)</text>
   <text x="55" y="680" font-size="9" fill="#475569" font-family="system-ui, sans-serif">select_launch_kind: fresh | resume | fork | prompt — ensure_runtime_tool_session_anchor</text>
@@ -224,22 +224,31 @@
   <!-- A2A Server -->
   <rect x="710" y="595" width="660" height="130" rx="6" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
   <rect x="710" y="595" width="250" height="20" rx="3" fill="#10b981"/>
-  <text x="835" y="609" text-anchor="middle" font-size="10" font-weight="bold" fill="white" font-family="system-ui, sans-serif">A2A Server (a2a_server.py + a2a_task.py)</text>
-  <text x="720" y="632" font-size="9" fill="#065f46" font-family="system-ui, sans-serif">REST + SSE over Unix socket — Agent 间通信 (Manager ↔ Worker), 零文件交接</text>
+  <text x="835" y="609" text-anchor="middle" font-size="10" font-weight="bold" fill="white" font-family="system-ui, sans-serif">A2A Server (a2a_server.py)</text>
+  <text x="720" y="632" font-size="9" fill="#065f46" font-family="system-ui, sans-serif">Coordination service: Manager/Worker task agreement, state, SSE notification</text>
   <text x="720" y="648" font-size="9" fill="#475569" font-family="system-ui, sans-serif">Task 状态机: submitted → working → completed | failed | input-required | pending-input</text>
   <text x="720" y="664" font-size="9" fill="#475569" font-family="system-ui, sans-serif">Manager 委派: a2a-exit --state submitted --agent-id worker --skill ... --message "完整 prompt"</text>
   <text x="720" y="680" font-size="9" fill="#475569" font-family="system-ui, sans-serif">Runtime 发现: tasks/list --state submitted → Task.message → prompt file → 启动 Worker</text>
   <text x="720" y="696" font-size="9" fill="#475569" font-family="system-ui, sans-serif">SSE 通知: TaskStatusUpdateEvent → Manager 下一轮 patrol 感知 Worker 完成</text>
   <text x="720" y="712" font-size="9" fill="#475569" font-family="system-ui, sans-serif">exit_kind 映射: stop_ai→failed, delegate_workers→submitted, resume_manager→completed, worker_done→completed</text>
 
-  <!-- SQLite -->
-  <rect x="45" y="740" width="640" height="45" rx="5" fill="#fefce8" stroke="#eab308" stroke-width="1.5"/>
-  <text x="55" y="758" font-size="10" font-weight="bold" fill="#a16207" font-family="system-ui, sans-serif">freely-db daemon (freely_db_manager.py) + SQLite/WAL</text>
-  <text x="55" y="774" font-size="9" fill="#854d0e" font-family="system-ui, sans-serif">single-writer JSON-RPC: a2a_tasks, chats, sessions, tool_*, task_mode_gate</text>
+  <!-- freely-db daemon + SQLite/WAL file -->
+  <rect x="45" y="740" width="300" height="45" rx="5" fill="#fefce8" stroke="#eab308" stroke-width="1.5"/>
+  <rect x="45" y="740" width="155" height="18" rx="3" fill="#eab308"/>
+  <text x="122" y="753" text-anchor="middle" font-size="10" font-weight="bold" fill="white" font-family="system-ui, sans-serif">freely-db daemon</text>
+  <text x="55" y="768" font-size="8.5" fill="#854d0e" font-family="system-ui, sans-serif">freely_db_manager.py</text>
+  <text x="55" y="780" font-size="8" fill="#854d0e" font-family="system-ui, sans-serif">single SQLite connection; Unix socket JSON-RPC</text>
+
+  <rect x="370" y="740" width="315" height="45" rx="5" fill="#fffbeb" stroke="#eab308" stroke-width="1.2" stroke-dasharray="5,3"/>
+  <text x="380" y="758" font-size="10" font-weight="bold" fill="#a16207" font-family="system-ui, sans-serif">SQLite/WAL file (.freely/freely.db)</text>
+  <text x="380" y="774" font-size="8.5" fill="#854d0e" font-family="system-ui, sans-serif">a2a_tasks, chats, sessions, tool_*, task_mode_gate</text>
+
+  <line x1="345" y1="762" x2="370" y2="762" stroke="#eab308" stroke-width="1.2" marker-end="url(#arrow-db)"/>
+  <text x="348" y="755" font-size="7" fill="#a16207" font-family="system-ui, sans-serif">WAL</text>
 
   <!-- ACP ↔ A2A coordination note -->
   <rect x="710" y="740" width="660" height="45" rx="5" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
-  <text x="720" y="758" font-size="10" font-weight="bold" fill="#475569" font-family="system-ui, sans-serif">ACP ↔ A2A 协作</text>
+  <text x="720" y="758" font-size="10" font-weight="bold" fill="#475569" font-family="system-ui, sans-serif">Runtime bridge: A2A task → ACP worker session</text>
   <text x="720" y="774" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">a2a-exit → a2a_tasks → delegate_workers → tasks/list → Task.message → Worker ACP session</text>
 
   <!-- ===== PROTOCOL DATA FLOW ARROWS ===== -->
@@ -257,40 +266,44 @@
 
   <!-- A2A: A2A Server → doc-loop Worker -->
   <path d="M740,660 L700,660 Q690,660 690,640 L690,505 Q690,492 677,492" fill="none" stroke="#10b981" stroke-width="1.5" marker-end="url(#arrow-a2a)"/>
-  <text x="585" y="572" font-size="7" fill="#10b981" font-family="system-ui, sans-serif">tasks/list → doc Worker prompt</text>
+  <text x="585" y="572" font-size="7" fill="#10b981" font-family="system-ui, sans-serif">Runtime: tasks/list → doc Worker prompt</text>
 
   <!-- A2A: A2A Server → dev-loop Worker -->
   <line x1="1050" y1="660" x2="1050" y2="509" stroke="#10b981" stroke-width="1.5" marker-end="url(#arrow-a2a)"/>
-  <text x="1058" y="610" font-size="7" fill="#10b981" font-family="system-ui, sans-serif">tasks/list → dev Worker prompt</text>
+  <text x="1058" y="610" font-size="7" fill="#10b981" font-family="system-ui, sans-serif">Runtime: tasks/list → dev Worker prompt</text>
 
-  <!-- A2A: Worker → A2A Server (completion) -->
+  <!-- A2A: doc-loop Worker → A2A Server (completion) -->
+  <path d="M360,509 L360,570 L740,570 L740,660" fill="none" stroke="#10b981" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrow-a2a)"/>
+  <text x="480" y="565" font-size="7" fill="#10b981" font-family="system-ui, sans-serif">a2a-exit completed</text>
+
+  <!-- A2A: dev-loop Worker → A2A Server (completion) -->
   <line x1="1120" y1="509" x2="1120" y2="660" stroke="#10b981" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrow-a2a)"/>
   <text x="1128" y="610" font-size="7" fill="#10b981" font-family="system-ui, sans-serif">a2a-exit completed</text>
 
   <!-- DB persistence: ACP/A2A → freely-db daemon -->
   <line x1="255" y1="725" x2="255" y2="740" stroke="#eab308" stroke-width="1.2" marker-end="url(#arrow-db)"/>
   <text x="265" y="737" font-size="7" fill="#a16207" font-family="system-ui, sans-serif">sessions/tool_*</text>
-  <line x1="900" y1="725" x2="650" y2="740" stroke="#eab308" stroke-width="1.2" marker-end="url(#arrow-db)"/>
-  <text x="730" y="735" font-size="7" fill="#a16207" font-family="system-ui, sans-serif">a2a_tasks/chats/task_mode_gate</text>
+  <line x1="900" y1="725" x2="330" y2="740" stroke="#eab308" stroke-width="1.2" marker-end="url(#arrow-db)"/>
+  <text x="520" y="735" font-size="7" fill="#a16207" font-family="system-ui, sans-serif">a2a_tasks/chats/task_mode_gate</text>
 
   <!-- Scan: filesystem → intake -->
   <path d="M20,164 L41,164" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow-scan)"/>
   <text x="8" y="158" font-size="8" fill="#94a3b8" font-family="system-ui, sans-serif">scan</text>
 
   <!-- ===== AI CLI TOOLS (OUTSIDE Runtime — external processes) ===== -->
-  <text x="25" y="910" font-size="12" font-weight="bold" fill="#334155" font-family="system-ui, sans-serif">AI CLI Tool Layer (实线框 = 外部独立进程, 与 Runtime 通过 ACP JSON-RPC 通信)</text>
+  <text x="25" y="910" font-size="12" font-weight="bold" fill="#334155" font-family="system-ui, sans-serif">AI Execution Provider Layer (external AI CLI processes; Claude/Codex/opencode reached through ACP)</text>
 
   <!-- Manager-side AI CLI Tool -->
   <rect x="30" y="922" width="650" height="65" rx="6" fill="#f3f4f6" stroke="#6b7280" stroke-width="2"/>
   <rect x="30" y="922" width="220" height="20" rx="3" fill="#6b7280"/>
-  <text x="140" y="936" text-anchor="middle" font-size="10" font-weight="bold" fill="white" font-family="system-ui, sans-serif">AI CLI Tool — Manager Session</text>
+  <text x="140" y="936" text-anchor="middle" font-size="10" font-weight="bold" fill="white" font-family="system-ui, sans-serif">AI Provider — Manager Session</text>
   <text x="40" y="958" font-size="9" fill="#374151" font-family="system-ui, sans-serif">Claude ACP family / codex-acp / opencode acp</text>
   <text x="40" y="974" font-size="9" fill="#374151" font-family="system-ui, sans-serif">adapter: acp (product working mode) — tool registry → monitor-ai-acp.sh → run-acp-prompt.py</text>
 
   <!-- Worker-side AI CLI Tool -->
   <rect x="720" y="922" width="650" height="65" rx="6" fill="#f3f4f6" stroke="#6b7280" stroke-width="2"/>
   <rect x="720" y="922" width="220" height="20" rx="3" fill="#6b7280"/>
-  <text x="830" y="936" text-anchor="middle" font-size="10" font-weight="bold" fill="white" font-family="system-ui, sans-serif">AI CLI Tool — Worker Session</text>
+  <text x="830" y="936" text-anchor="middle" font-size="10" font-weight="bold" fill="white" font-family="system-ui, sans-serif">AI Provider — Worker Session</text>
   <text x="730" y="958" font-size="9" fill="#374151" font-family="system-ui, sans-serif">cc / kiro-cli / iflow aliases enter Claude ACP family by registry</text>
   <text x="730" y="974" font-size="9" fill="#374151" font-family="system-ui, sans-serif">ACP fork: SESSION_PARENT_ID → 独立 session, 不污染父 session JSONL</text>
 
@@ -301,37 +314,11 @@
   <path d="M685,690 L700,690 L700,825 L1045,825 L1045,920" fill="none" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow-acp)"/>
   <text x="760" y="845" font-size="8" fill="#6366f1" font-family="system-ui, sans-serif">ACP JSON-RPC: fork session → /prompt → stopReason</text>
 
-  <!-- ===== LEGEND ===== -->
-  <rect x="30" y="1005" width="1340" height="80" rx="6" fill="white" stroke="#e2e8f0" stroke-width="1"/>
-
-  <text x="50" y="1026" font-size="11" font-weight="bold" fill="#334155" font-family="system-ui, sans-serif">图例:</text>
-
-  <rect x="100" y="1015" width="55" height="16" rx="3" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
-  <text x="163" y="1028" font-size="9" fill="#475569" font-family="system-ui, sans-serif">实线框 = 真实进程 (有 PID, 可启停)</text>
-
-  <rect x="370" y="1015" width="55" height="16" rx="3" fill="#eff6ff" stroke="#60a5fa" stroke-width="1.5" stroke-dasharray="6,3"/>
-  <text x="433" y="1028" font-size="9" fill="#475569" font-family="system-ui, sans-serif">虚线框 = 逻辑角色 (AI Agent, prompt 注入定义)</text>
-
-  <rect x="720" y="1015" width="55" height="16" rx="3" fill="#faf5ff" stroke="#a855f7" stroke-width="1.2" stroke-dasharray="3,3"/>
-  <text x="783" y="1028" font-size="9" fill="#475569" font-family="system-ui, sans-serif">点线框 = Skill 集合 (Manager / Worker / shared)</text>
-
-  <line x1="1050" y1="1023" x2="1078" y2="1023" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow-acp)"/>
-  <text x="1086" y="1028" font-size="9" fill="#475569" font-family="system-ui, sans-serif">ACP (session 管理)</text>
-
-  <line x1="1220" y1="1023" x2="1248" y2="1023" stroke="#10b981" stroke-width="2" marker-end="url(#arrow-a2a)"/>
-  <text x="1256" y="1028" font-size="9" fill="#475569" font-family="system-ui, sans-serif">A2A (Agent 间委派)</text>
-
-  <text x="50" y="1056" font-size="10" font-weight="bold" fill="#334155" font-family="system-ui, sans-serif">颜色:</text>
-  <rect x="100" y="1047" width="14" height="11" rx="2" fill="#eff6ff" stroke="#93c5fd"/>
-  <text x="118" y="1056" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">auto-loop / Manager / ACP</text>
-  <rect x="280" y="1047" width="14" height="11" rx="2" fill="#f0fdf4" stroke="#86efac"/>
-  <text x="298" y="1056" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">doc-loop / A2A</text>
-  <rect x="398" y="1047" width="14" height="11" rx="2" fill="#fef2f2" stroke="#fca5a5"/>
-  <text x="416" y="1056" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">dev-loop / Worker</text>
-  <rect x="535" y="1047" width="14" height="11" rx="2" fill="#faf5ff" stroke="#a855f7"/>
-  <text x="553" y="1056" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">Skill</text>
-  <rect x="610" y="1047" width="14" height="11" rx="2" fill="#f3f4f6" stroke="#6b7280"/>
-  <text x="628" y="1056" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">AI CLI Tool (外部进程)</text>
-
-  <text x="780" y="1056" font-size="9" fill="#94a3b8" font-family="system-ui, sans-serif">━━ 实线箭头 = 同步调用 — — 虚线箭头 = 异步通知/回环 ··· 点线箭头 = scan 读取；黄线 = DB persistence，紫线 = Skill lookup</text>
+  <!-- ===== PARTICIPANT TAXONOMY ===== -->
+  <rect x="30" y="1000" width="1340" height="90" rx="6" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="50" y="1019" font-size="11" font-weight="bold" fill="#334155" font-family="system-ui, sans-serif">Participant taxonomy (industry-style: actor/role, service, protocol, datastore, instruction module are separate kinds)</text>
+  <text x="50" y="1038" font-size="8.5" fill="#475569" font-family="system-ui, sans-serif">Boundary: Freely runtime-managed system; Workflow surfaces: auto/doc/dev loops and gates; Agent roles: Manager/Worker are prompt-defined roles executed inside AI provider sessions.</text>
+  <text x="50" y="1055" font-size="8.5" fill="#475569" font-family="system-ui, sans-serif">AI provider: Claude/Codex/opencode CLI process; Skills: instruction/capability modules selected by role; ACP: Freely↔AI session/prompt/control protocol.</text>
+  <text x="50" y="1072" font-size="8.5" fill="#475569" font-family="system-ui, sans-serif">A2A: Manager/Worker task coordination, state, and SSE notification; freely-db daemon: single-writer DB operation service; SQLite/WAL: durable datastore.</text>
+  <text x="50" y="1087" font-size="8" fill="#94a3b8" font-family="system-ui, sans-serif">Line meanings: gray=workflow, blue=ACP session control, green=A2A coordination, yellow=DB persistence, purple=skill lookup, dashed=async/return/notification.</text>
 </svg>
