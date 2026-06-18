@@ -8,6 +8,56 @@
 
 凡是会改变 three-loop routing、loop placement、completion / verification / cleanup / recovery judgment 的实现、prompt、agent、skill 或高层文档，在修改前都必须先阅读并理解本文件；若语义变化，必须同步更新本文件及 SVG 图。
 
+## 五层架构
+
+SVG 图展示的五层实体，从上到下、从内到外：
+
+| 层 | 实体 | 框型 | 说明 |
+|----|------|------|------|
+| **Layer 1** | Freely Runtime | 实线大框 | bash supervisor, while-true loop, 最外层容器 |
+| **Layer 2** | auto-loop / doc-loop / dev-loop | 实线泳道 | 三个 Loop 的 gate 序列和逻辑流程 |
+| **Layer 3** | Manager Agent / Worker Agent | 虚线框 | 逻辑角色（非独立进程），由 prompt 注入定义 |
+| **Layer 3a** | M-Skills / W-Skills | 点线框 | 33 个 Skill，分 A/M/W 三层，附属于 Agent |
+| **Layer 4** | ACP Bridge / A2A Server / SQLite | 实线框 | 真实进程（有 PID），通过 Unix socket 通信 |
+| **Layer 5** | AI CLI Tool (opencode/Claude Code/codex/...) | 实线框 | 外部独立进程，在 Runtime 之外，通过 ACP JSON-RPC 连接 |
+
+### 实体框型约定
+
+- **实线框** = 真实进程（有 PID，可启停）：Freely Runtime, ACP Bridge, A2A Server, SQLite, AI CLI Tool
+- **虚线框** = 逻辑角色（AI Agent，由 prompt 注入定义）：Manager Agent, Worker Agent
+- **点线框** = Skill 集合（33 个，分 A/M/W 三层）：M-Skills, W-Skills
+
+### 协议通道
+
+- **ACP (AI Communication Protocol)**：JSON-RPC over Unix socket。Freely Runtime ↔ AI CLI Tool 之间的会话代理。session/new → session/resume → session/prompt → stopReason。三级缓存：L1 resume (0 token) | L2 fork (增量) | L3 fresh (全量)
+- **A2A (Agent-to-Agent Protocol)**：REST + SSE over Unix socket。Manager ↔ Worker 之间的零文件委派。a2a-exit → Task.message → tasks/list → Worker prompt → SSE TaskStatusUpdateEvent
+
+### 关键数据流
+
+```
+scan (文件系统读取) ──→ intake gate ──→ routing ──→ dispatch
+                                                      │
+                              ┌────────────────────────┘
+                              ▼
+              Manager ACP session → AI 决策 → a2a-exit --state submitted
+                                                      │
+                              ┌────────────────────────┘
+                              ▼
+              A2A Server: Task 存储 → SSE 通知
+                              │
+              ┌───────────────┴───────────────┐
+              ▼                               ▼
+        doc-loop Worker                  dev-loop Worker
+        (B1_IBM→B2_IBM)                 (implement→evidence)
+              │                               │
+              └───────────┬───────────────────┘
+                          ▼
+              a2a-exit --state completed
+                          │
+                          ▼
+              SSE → Manager 下一轮 patrol → test gate → ... → closeout
+```
+
 ## 三 Loop 架构
 
 | Loop | 驱动源 | 角色 | 核心职责 |
@@ -23,8 +73,8 @@ auto-loop 是唯一的调度中枢。doc-loop 和 dev-loop 不自行启动，始
 ### Gate 序列
 
 ```
-intake → routing → dispatch → test → pr-create → PR review → pr-merge → closeout
-  ↻                       ↻        ↻          ↻                       ↻
+intake → routing → dispatch → test → pr-create → pr-review → CI check → pr-merge → closeout
+  ↻                       ↻        ↻          ↻           ↻          ↻            ↻
 ```
 
 每个 gate 内部都有小循环（↻）：失败 → 回修 → 重试。
@@ -61,18 +111,24 @@ intake → routing → dispatch → test → pr-create → PR review → pr-merg
 - 命令封装: `pr-create-guarded` 内部执行 `git pull origin develop` + `pr-merge-guarded --dry-run` + `git push` + `gh pr create`
 - 内部小循环: conflict → 解决 → re-pull; gate fail → back to dev-loop fix
 
-#### PR review gate（阶段9）
+#### pr-review gate（阶段9）
 - 触发: PR 已创建
+- 执行: `pr-review-guarded` → 6 维独立 review → verdict 文档 (pass/fail)
+- 命令封装: `pr-review-guarded` 内部从 correctness / security / performance / reuse / governance / testing 六个维度审查 diff，产出 verdict 文档
+- 内部小循环: verdict=fail → back to dev-loop fix; 不通过 review 不得进入 CI
+
+#### CI check gate（阶段10）
+- 触发: pr-review gate 通过 (verdict=pass)
 - 执行: CI (`pr-merge-guard.yml`) + 人 review → Approval
 - 位置: 外部（GitHub），不在 Freely runtime 内
 
-#### pr-merge gate（阶段10）
+#### pr-merge gate（阶段11）
 - 触发: PR 获得 Approval
 - 执行: `pr-merge-guarded develop <pr-branch>`
 - 命令封装: `pr-merge-guarded` 内部执行 `git fetch origin develop` + PR gate (check PR + approval) + promotion gate + `git merge --no-ff` + issue-sync + `develop-push`
 - 内部小循环: gate fail → back to dev-loop fix
 
-#### closeout gate（阶段11）
+#### closeout gate（阶段12）
 - 触发: merge 完成
 - 执行: `wt-close <branch>`
 - 命令封装: `wt-close` 内部执行 issue-sync close + milestone update + `git branch -d` + `git push --delete` + worktree remove
@@ -117,15 +173,15 @@ auto-loop dispatch gate 触发
 ## 完整管线（feedback → wt-close）在三 loop 中的流转
 
 ```
-阶段:  |  1-3   |   4-5   |    6    |    7    |    8    |   9   |   10   |  11
-loop:  | auto   |  doc    |   dev   |  auto   |  auto   | external | auto  | auto
-gate:  |intake  | B1→B2   |implem→  |  test   |pr-create|PR review|pr-merge|closeout
-       |routing |         |evidence |         |         |         |        |
+阶段:  |  1-3   |   4-5   |    6    |    7    |    8    |     9     |   10    |   11   |  12
+loop:  | auto   |  doc    |   dev   |  auto   |  auto   |   auto    | external| auto   | auto
+gate:  |intake  | B1→B2   |implem→  |  test   |pr-create| pr-review | CI check|pr-merge|closeout
+       |routing |         |evidence |         |         |           |         |        |
 
-auto:  intake → routing → dispatch ──→ test → pr-create → [PR review] → pr-merge → closeout
-                 │           │           ↑                                  │
-doc:             │    B1→B2  │           │                                  │
-dev:             │           └── implement→evidence ────────────────────────┘
+auto:  intake → routing → dispatch ──→ test → pr-create → pr-review → [CI check] → pr-merge → closeout
+                 │           │           │                              ↑
+doc:             │    B1→B2  │           │                              │
+dev:             │           └── implement→evidence ────────────────────┘
 ```
 
 ## 命令封装一览
@@ -136,6 +192,7 @@ dev:             │           └── implement→evidence ──────
 |------|---------|
 | `wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>` | `git fetch origin develop` → `git update-ref` → `git worktree add` → test-pre-merge worktree → raw-issue-pull → platform_ids fill |
 | `pr-create-guarded` | `git pull origin develop` → `pr-merge-guarded --dry-run` → `git push origin HEAD` → `gh pr create --head HEAD` |
+| `pr-review-guarded` | 6 维独立 review (correctness / security / performance / reuse / governance / testing) → verdict 文档 (pass/fail) |
 | `pr-merge-guarded develop <pr-branch>` | `git fetch origin develop` → validate direction → PR gate (check PR + approval) → promotion gate → `git merge --no-ff` → issue-sync → `develop-push` |
 | `wt-close <branch>` | issue-sync close → milestone update → `git branch -d` → `git push --delete` → worktree remove |
 
@@ -143,18 +200,18 @@ dev:             │           └── implement→evidence ──────
 
 ### Fix 修复（治理后置）
 ```
-wt-create → dev(implement) → test → B1 → B2 → pr-create → pr-merge → wt-close
+wt-create → dev(implement) → test → B1 → B2 → pr-create → pr-review → pr-merge → wt-close
                                    ↑ B1/B2 后置于 test 之后，PR 门禁不后置
 ```
 
 ### Hotfix 紧急修复
 ```
-从 main 创建 hotfix/* → dev → pr-create → pr-merge main → pr-merge develop → wt-close
+从 main 创建 hotfix/* → dev → pr-create → pr-review → pr-merge main → pr-merge develop → wt-close
 （可跳过 test-pre-merge，双合并 main+develop）
 ```
 
 ### Doc-only 纯文档
 ```
-dev → pr-create → pr-merge → wt-close
+dev → pr-create → pr-review → pr-merge → wt-close
 （跳过 test-pre-merge、B1、B2）
 ```
