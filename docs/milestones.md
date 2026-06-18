@@ -1,3 +1,19 @@
+## M-20260618T054147Z-A
+- title: wt-close prune stale tracking refs
+- status: active
+### candidate_issues
+1. `C-20260618T054147Z-A`
+- milestone: M-20260618T054147Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260618T054147Z-A/issue.md`
+### committed_issues
+1. `I-20260618T054147Z-A`
+- title: wt-close prune stale tracking refs
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260618T054147Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/wt-close-prune-stale-refs/code-reviews`
+
 ## M-20260618T051709Z-A
 - title: pr-merge review gate
 - status: active
