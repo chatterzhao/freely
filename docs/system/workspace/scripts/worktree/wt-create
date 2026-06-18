@@ -304,7 +304,7 @@ conn.close()
         return 1
       fi
 
-      local issue_dir="$ROOT_DIR/docs/issues/raw-${raw_key}"
+      local issue_dir="$PWD/docs/issues/raw-${raw_key}"
       mkdir -p "$issue_dir"
       if ! python3 "$chat_inbox_py" materialize --db "$db_path" --id "$ts" --target "$issue_dir" >/dev/null 2>&1; then
         echo "chat-inbox: materialize failed for id=$ts" >&2
@@ -327,7 +327,7 @@ conn.close()
       ;;
     local)
       # Issue already exists in docs/issues/, verify frontmatter
-      local _issue_file="$ROOT_DIR/docs/issues/raw-${raw_key}/issue.md"
+      local _issue_file="$PWD/docs/issues/raw-${raw_key}/issue.md"
       if [[ -f "$_issue_file" ]]; then
         local _kind; _kind=$(python3 -c "
 import yaml
@@ -354,7 +354,7 @@ print(fm.get('kind', ''))
 
 _fill_platform_ids() {
   local raw_key="$1"
-  local issue_file="$ROOT_DIR/docs/issues/raw-${raw_key}/issue.md"
+  local issue_file="$PWD/docs/issues/raw-${raw_key}/issue.md"
   [[ -f "$issue_file" ]] || return 0
 
   # Check if any configured platform is missing
@@ -586,7 +586,8 @@ conn.close()
 # raw issue as absorbed so scan stops showing it and comment routing works.
 _mark_raw_issue_absorbed() {
   local raw_key="$1"
-  local issue_file="$ROOT_DIR/docs/issues/raw-${raw_key}/issue.md"
+  local target_path="${2:-$ROOT_DIR}"
+  local issue_file="$target_path/docs/issues/raw-${raw_key}/issue.md"
   [[ -f "$issue_file" ]] || { echo "warning: issue file not found: $issue_file" >&2; return 0; }
   python3 -c "
 import yaml
@@ -646,7 +647,7 @@ git fetch origin develop 2>/dev/null && git update-ref refs/heads/develop refs/r
       return 1
     fi
     _fill_platform_ids "$raw_key"
-    _mark_raw_issue_absorbed "$raw_key"
+    _mark_raw_issue_absorbed "$raw_key" "$fix_target"
   fi
 
   tp_target="$(freely_wt_resolve_target_path "$test_pre_merge_branch")"
