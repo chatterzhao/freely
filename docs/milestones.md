@@ -1,3 +1,19 @@
+## M-20260618T051709Z-A
+- title: pr-merge review gate
+- status: active
+### candidate_issues
+1. `C-20260618T051709Z-A`
+- milestone: M-20260618T051709Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260618T051709Z-A/issue.md`
+### committed_issues
+1. `I-20260618T051709Z-A`
+- title: pr-merge review gate
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260618T051709Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/pr-merge-review-gate/code-reviews`
+
 ## M-20260618T050413Z-A
 - title: Scope pr-create untracked check to governance dirs
 - status: active
