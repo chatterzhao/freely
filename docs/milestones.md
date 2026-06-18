@@ -3245,3 +3245,19 @@ routing_policy:
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260616T084121Z-platform-sync-batch/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260616T084121Z--platform-sync-batch/candidates.md#C-20260616T084121Z-platform-sync-batch`
+
+## M-20260618T100000Z-A
+- title: wt-create chat-inbox ID normalization fix
+- status: active
+### candidate_issues
+1. `C-20260618T100000Z-A`
+- milestone: M-20260618T100000Z-A
+- status: absorbed
+- absorbed_into: `I-20260618T100000Z-A`
+### committed_issues
+1. `I-20260618T100000Z-A`
+- title: wt-create chat-inbox ID normalization
+- milestone_state: committed
+- phase_state: `done_b2_ibm`
+- issue_path: `docs/issues/I-20260618T100000Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/wt-create-chat-inbox-id-bug/code-reviews`

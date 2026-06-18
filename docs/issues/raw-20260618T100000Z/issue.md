@@ -2,6 +2,7 @@
 local_id: raw-20260618T100000Z
 kind: raw
 phase_state: absorbed
+absorbed_into: I-20260618T100000Z-A
 platform_ids: {}
 primary_platform: ''
 platform_state: open
