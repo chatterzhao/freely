@@ -1,26 +1,14 @@
+---
+issue_id: I-20260618T100000Z-A
+issue_path: docs/issues/I-20260618T100000Z-A/issue.md
+---
+
 # Implementation Decision Note
 
-## Decision
+## Implementation Decision Note
 
-Normalize chat-inbox ID by stripping TZ characters with `tr -d 'TZ'` before passing to `chat-inbox.py` commands.
-
-## Why This
-
-- Minimal change: 4 lines modified, all following the same pattern already used by SQL queries in the same functions
-- Consistent: the existing SQL queries already compute `ts_bare` correctly; the bug was that `chat-inbox.py` calls didn't use it
-- Chat-inbox.py expects bare IDs (its help text says `YYYYMMDDHHMMSS`)
-
-## Alternatives Considered
-
-1. **chat-inbox.py handles both formats**: Would require changing the Python script to accept either format, increasing complexity and testing surface
-2. **Store IDs with TZ in DB**: Would break existing data and require migration
-
-## Boundary / Non-Goals
-
-- Does not change chat-inbox.py interface
-- Does not modify DB schema
-- Does not affect `--source platform` or `--source local` paths
-
-## Residual Risk
-
-- If future code adds new `chat-inbox.py` call sites, they may also forget to normalize. Mitigation: grep for `--id.*\$ts` patterns in reviews.
+- decision: Normalize chat-inbox ID by stripping TZ characters before passing to chat-inbox.py commands
+- why_this: Minimal change (4 lines), follows existing pattern already used for SQL queries in same functions; chat-inbox.py explicitly expects bare IDs per its help text
+- alternatives_considered: 1) chat-inbox.py handles both formats — increases complexity and testing surface; 2) Store IDs with TZ in DB — breaks existing data and requires migration
+- boundary_non_goals: Does not change chat-inbox.py interface, DB schema, or affect --source platform/--source local paths
+- residual_risk: Future new call sites may also forget normalization — mitigate by grep for --id.*$ts in reviews

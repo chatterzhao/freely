@@ -2,7 +2,7 @@
 local_id: I-20260618T100000Z-A
 kind: linked
 status: in_dev
-phase_state: done_b2_ibm
+phase_state: completed
 promoted_from: raw-20260618T100000Z
 source_candidate: docs/pre-brainstorms/20260618T100000Z--wt-create-chat-inbox-id-bug/candidates.md
 canonical_issue_path: ""

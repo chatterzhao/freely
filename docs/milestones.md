@@ -3258,6 +3258,6 @@ routing_policy:
 1. `I-20260618T100000Z-A`
 - title: wt-create chat-inbox ID normalization
 - milestone_state: committed
-- phase_state: `done_b2_ibm`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260618T100000Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/wt-create-chat-inbox-id-bug/code-reviews`
