@@ -1,5 +1,12 @@
+---
+issue_id: I-20260618T100000Z-A
+issue_path: docs/issues/I-20260618T100000Z-A/issue.md
+---
+
 # PR Review: #2989
 - pr_number: 2989
+- issue_id: I-20260618T100000Z-A
+- issue_path: docs/issues/I-20260618T100000Z-A/issue.md
 - branch: fix/raw-20260618T100000Z-wt-create-chat-inbox-id-bug
 - base: develop
 - reviewer: cli
