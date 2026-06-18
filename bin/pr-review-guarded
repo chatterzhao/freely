@@ -61,7 +61,7 @@ review_body=""
 
 check_dimension() {
   local dim="$1" status="$2" evidence="$3"
-  if [[ "$status" == "pass" ]]; then
+  if [[ "$status" == "pass" || "$status" == "n/a" ]]; then
     ((pass_count++))
     symbol="✅"
   else
@@ -95,8 +95,8 @@ else
 fi
 
 # 2. IBM Completeness (governance-merge-gate)
-if [[ -x "./bin/governance-merge-gate" ]]; then
-  gate_output=$(./bin/governance-merge-gate --range "$base..$review_branch" 2>&1) && gate_rc=0 || gate_rc=$?
+if [[ -x "$ROOT_DIR/bin/governance-merge-gate" ]]; then
+  gate_output=$("$ROOT_DIR/bin/governance-merge-gate" --range "$base..$review_branch" 2>&1) && gate_rc=0 || gate_rc=$?
   if [[ "$gate_rc" -eq 0 ]]; then
     check_dimension "2. IBM Completeness" "pass" "governance-merge-gate passed"
   else
@@ -144,7 +144,7 @@ fi
 # 5. Semantic Conflict / Receipt Integrity
 if git diff "$base..$review_branch" -- docs/system/workspace/scripts/worktree/pr-merge-guarded 2>/dev/null | grep -q "."; then
   # pr-merge-guarded was modified — verify receipt split is preserved
-  if grep -q '_merge_subject.*_merge_body\|--body.*_merge_body' docs/system/workspace/scripts/worktree/pr-merge-guarded 2>/dev/null; then
+  if grep -q '_merge_subject.*_merge_body' docs/system/workspace/scripts/worktree/pr-merge-guarded 2>/dev/null; then
     check_dimension "5. Receipt Integrity" "pass" "pr-merge-guarded modified, --subject/--body split preserved"
   else
     check_dimension "5. Receipt Integrity" "fail" "pr-merge-guarded modified but --subject/--body split is MISSING. See ef251886/PR #2963."

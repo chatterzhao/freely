@@ -14,6 +14,13 @@
 - milestone: M-20260618T040226Z-A
 - status: promoted
 - promoted_issue_path: `docs/issues/I-20260618T040226Z-A/issue.md`
+### committed_issues
+1. `I-20260618T040226Z-A`
+- title: pr-review-guarded command + workflow integration
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260618T040226Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/pr-review-guarded/code-reviews`
 
 ## M-20260618T031437Z-A
 - title: Fix wt-close remote branch deletion

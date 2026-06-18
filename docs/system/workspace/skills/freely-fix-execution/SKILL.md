@@ -5,7 +5,7 @@ description: 快速修复 bug 的特殊高效策略——wt-create→实现→B1
 
 # skill:freely-fix-execution
 
-> 全链路(Fix变体): wt-create → dev → test → B1 → B2 → pr-create → pr-review → pr-merge → wt-close
+> 全链路(Fix变体): wt-create → dev → test → B1_IBM → B2_IBM → pr-create-guarded → pr-review-guarded → pr-merge-guarded → wt-close
 >                                    ↑ 本 skill 自此开始（快测沙箱策略，治理后置）
 
 ## 定位
