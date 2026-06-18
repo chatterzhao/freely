@@ -1,5 +1,6 @@
 # PR Review: #2977
 - pr_number: 2977
+- issue_id: I-20260618T054147Z-A
 - branch: fix/raw-20260618T054147Z-wt-close-prune-stale-refs
 - base: develop
 - reviewer: cli
