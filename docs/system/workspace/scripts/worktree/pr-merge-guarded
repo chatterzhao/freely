@@ -506,6 +506,41 @@ do_initial_merge() {
     fi
   fi
 
+
+  # ── PR review gate: check pr-review-guarded verdict ──
+  if [[ "$dry_run" != "1" ]]; then
+    _pr_number="$(gh pr list --repo chatterzhao/freely --head "$source_branch" --state OPEN --json number -q '.[0].number' 2>/dev/null || true)"
+    if [[ -n "$_pr_number" ]]; then
+      _review_file="$(find docs/epics -name "pr-review-${_pr_number}.md" 2>/dev/null | head -1 || true)"
+      if [[ -z "$_review_file" ]]; then
+        cat >&2 <<REVIEW_GATE_MISSING
+╔══════════════════════════════════════════════════════════════╗
+║  [MERGE-GUARD] PR review missing                            ║
+╠══════════════════════════════════════════════════════════════╣
+║  No review document found for PR #$_pr_number.               ║
+║  Run pr-review-guarded before merging:                       ║
+║    cd <worktree> && ./bin/pr-review-guarded $source_branch   ║
+╚══════════════════════════════════════════════════════════════╝
+REVIEW_GATE_MISSING
+        exit 1
+      fi
+      _verdict="$(grep '^- verdict:' "$_review_file" 2>/dev/null | head -1 | sed 's/.*: *//')"
+      if [[ "$_verdict" != "pass" ]]; then
+        cat >&2 <<REVIEW_GATE_FAIL
+╔══════════════════════════════════════════════════════════════╗
+║  [MERGE-GUARD] PR review not passed                         ║
+╠══════════════════════════════════════════════════════════════╣
+║  Review: $_review_file                                       ║
+║  Verdict: $_verdict                                          ║
+║  Fix failing dimensions and re-run pr-review-guarded.        ║
+╚══════════════════════════════════════════════════════════════╝
+REVIEW_GATE_FAIL
+        exit 1
+      fi
+      echo "[MERGE-GUARD] PR review: pass ✓"
+    fi
+  fi
+
   run_promotion_gate_if_needed "$target" "$source_branch"
 
   # Rebase integrity: block merge if post-rewrite hook detected lost files.
