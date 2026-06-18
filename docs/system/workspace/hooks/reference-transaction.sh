@@ -169,10 +169,25 @@ DELETE_BLOCK
   fi
 
   branch_name="$(protected_branch_name "$refname")"
+  # Check WHY the receipt is missing — give actionable guidance
+  local _commit_subject=""
+  _commit_subject="$(git show --no-patch --format=%s "$new_oid" 2>/dev/null || true)"
   cat <<MSG >&2
 [HOOK] Ref update blocked: protected branch '$branch_name' cannot advance to commit '$new_oid' without a canonical protected-merge receipt.
-Direct fast-forward, reset, and other ref-only updates are not lawful protected-branch merge entrypoints.
-Create a receipt-bearing protected merge commit through ./bin/pr-merge-guarded instead.
+
+The target commit message does not contain 'Freely-Merge-Path: pr-merge-guarded'.
+
+Commit subject: $_commit_subject
+
+Possible causes:
+  1. gh pr merge was used without --body (receipt lost — see PR #2963)
+  2. A prior merge silently overwrote the receipt fix (ef251886)
+  3. Merge was done outside pr-merge-guarded (e.g. manual gh pr merge)
+
+Fix:
+  - Re-run the merge through ./bin/pr-merge-guarded
+  - If PR is already merged, use: ./bin/pr-merge-guarded complete develop <branch>
+  - Or add receipt manually with FREELY_GUARDED_MERGE_COMPLETION=1 git merge
 MSG
   exit 1
 done

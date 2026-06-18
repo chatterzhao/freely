@@ -541,9 +541,39 @@ do_initial_merge() {
         echo "[MERGE-GUARD] GitHub PR #$gh_pr merged ✓"
         # Pull the merge commit that GitHub created (carries receipt in body).
         # If pull fails (dirty tree, non-ff), fetch + reset to remote commit.
+        # Verify the merge commit carries canonical receipt — if not, the merge
+        # silently overwrote a prior receipt fix (e.g. --subject/--body split).
         if ! git pull "$merge_remote" "$target" --ff-only 2>/dev/null; then
           git fetch "$merge_remote" "$target" 2>/dev/null || true
           FREELY_SKIP_IBM_GATE=1 git reset --hard "$merge_remote/$target" 2>/dev/null || true
+        fi
+
+        # Verify merge commit carries canonical receipt
+        local _merge_head
+        _merge_head="$(git rev-parse HEAD 2>/dev/null || true)"
+        if [[ -n "$_merge_head" ]]; then
+          if ! (git show --no-patch --format=%B "$_merge_head" 2>/dev/null | grep -Eq '^Freely-Merge-Path: (pr-merge-guarded|pr-merge-guarded-complete)'); then
+            cat >&2 <<RECEIPT_LOST
+╔══════════════════════════════════════════════════════════════╗
+║  [MERGE-GUARD] MERGE RECEIPT LOST — POSSIBLE SEMANTIC CONFLICT ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  Merge commit $_merge_head does not contain                  ║
+║  Freely-Merge-Path receipt.                                  ║
+║                                                              ║
+║  Likely cause: another branch modified the same area of      ║
+║  pr-merge-guarded. Git auto-merged without conflict, but     ║
+║  the receipt split (--subject/--body) was overwritten.       ║
+║                                                              ║
+║  Fix: restore the --subject/--body split from ef251886.      ║
+║  Reference: PR #2963                                         ║
+║                                                              ║
+║  Aborting merge to prevent receipt loss.                     ║
+╚══════════════════════════════════════════════════════════════╝
+RECEIPT_LOST
+            git reset --hard HEAD~1 2>/dev/null || true
+            exit 1
+          fi
         fi
 
         # Sync develop to all other platforms
