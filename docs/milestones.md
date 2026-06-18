@@ -1,3 +1,19 @@
+## M-20260618T050413Z-A
+- title: Scope pr-create untracked check to governance dirs
+- status: active
+### candidate_issues
+1. `C-20260618T050413Z-A`
+- milestone: M-20260618T050413Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260618T050413Z-A/issue.md`
+### committed_issues
+1. `I-20260618T050413Z-A`
+- title: Scope pr-create untracked check to governance dirs
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260618T050413Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/pr-create-untracked-refine/code-reviews`
+
 ## M-20260618T044047Z-A
 - title: pr-merge explicit cd to develop + cleanliness check
 - status: active
