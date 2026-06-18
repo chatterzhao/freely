@@ -623,10 +623,26 @@ _create_worktree() {
 _require_issue_exists "$fix_branch" || exit 1
 
 # ── Sync local develop with remote ───────────────────────
-echo "=== Syncing local develop with origin ==="
-git fetch origin develop 2>/dev/null && git update-ref refs/heads/develop refs/remotes/origin/develop 2>/dev/null \
-  && echo "  develop updated to $(git rev-parse --short develop)" \
-  || echo "  warning: sync failed, proceeding with local develop"
+echo "=== Syncing local develop ==="
+_github_head=""
+_origin_head=""
+git fetch github develop 2>/dev/null && _github_head="$(git rev-parse refs/remotes/github/develop 2>/dev/null || true)" || true
+git fetch origin develop 2>/dev/null && _origin_head="$(git rev-parse refs/remotes/origin/develop 2>/dev/null || true)" || true
+if [[ -n "$_github_head" ]] && [[ -n "$_origin_head" ]] && [[ "$_github_head" != "$_origin_head" ]]; then
+  echo "ERROR: Platform divergence detected" >&2
+  echo "  github: $_github_head" >&2
+  echo "  origin: $_origin_head" >&2
+  echo "  Cannot create worktree. Run: ./bin/freely develop-push attempt" >&2
+  exit 1
+fi
+_sync_head="${_github_head:-$_origin_head}"
+if [[ -n "$_sync_head" ]]; then
+  git update-ref refs/heads/develop "$_sync_head" 2>/dev/null 
+    && echo "  develop updated to $(git rev-parse --short develop)" 
+    || echo "  warning: sync failed, proceeding with local develop"
+else
+  echo "  warning: no remote develop found, proceeding with local develop"
+fi
 
 # ── Create worktree(s) ───────────────────────────────────
 
