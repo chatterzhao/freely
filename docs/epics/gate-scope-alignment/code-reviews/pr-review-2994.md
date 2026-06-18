@@ -4,6 +4,8 @@
 - base: develop
 - reviewer: cli
 - review_date: 2026-06-18T12:05:44Z
+- issue_id: I-20260616T030213Z-A
+- issue_path: docs/issues/I-20260616T030213Z-A/issue.md
 - verdict: pass
 
 ## 1. Worktree Check
