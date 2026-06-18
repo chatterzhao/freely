@@ -1,0 +1,19 @@
+---
+local_id: I-20260618T024841Z-A
+kind: linked
+status: in_dev
+phase_state: completed
+promoted_from: raw-20260618T024841Z
+source_candidate: docs/pre-brainstorms/20260618T024841Z--raw-issue-review-fixes/candidates.md
+canonical_issue_path: ""
+pre_tests_path: docs/epics/raw-issue-review-fixes/verification/pre-tests.md
+verification_artifact_dir: docs/epics/raw-issue-review-fixes/code-reviews
+platform_ids: {}
+primary_platform: ""
+created_at: 2026-06-18T02:48:41Z
+author: zhaoquan
+channel: freely-fix-execution
+session_refs: []
+---
+
+# I-20260618T024841Z-A: Fix raw issue completeness
