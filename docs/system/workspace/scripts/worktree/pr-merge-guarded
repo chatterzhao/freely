@@ -529,15 +529,21 @@ do_initial_merge() {
       # succeeds, triggering a false fallback to local merge that produces
       # a duplicate merge commit and cross-platform develop divergence.
       local gh_rc=0
+      # GitHub only uses first line of --subject. Pass receipt metadata as --body
+      # so commit_has_canonical_receipt() passes in reference-transaction hook.
+      local _merge_subject _merge_body
+      _merge_subject="$(echo "$merge_message" | head -1)"
+      _merge_body="$(echo "$merge_message" | tail -n +3)"
       gh pr merge "$gh_pr" --merge \
-           --subject "$merge_message" 2>&1 || gh_rc=$?
+           --subject "$_merge_subject" \
+           --body "$_merge_body" 2>&1 || gh_rc=$?
       if [[ "$gh_rc" -eq 0 ]]; then
         echo "[MERGE-GUARD] GitHub PR #$gh_pr merged ✓"
-        # Pull the merge commit that GitHub created.
+        # Pull the merge commit that GitHub created (carries receipt in body).
         # If pull fails (dirty tree, non-ff), fetch + reset to remote commit.
         if ! git pull "$merge_remote" "$target" --ff-only 2>/dev/null; then
           git fetch "$merge_remote" "$target" 2>/dev/null || true
-          git reset --hard "$merge_remote/$target" 2>/dev/null || true
+          FREELY_SKIP_IBM_GATE=1 git reset --hard "$merge_remote/$target" 2>/dev/null || true
         fi
 
         # Sync develop to all other platforms
@@ -553,7 +559,7 @@ do_initial_merge() {
         echo "[MERGE-GUARD] gh error was non-fatal; pulling the merge commit..." >&2
         if ! git pull "$merge_remote" "$target" --ff-only 2>/dev/null; then
           git fetch "$merge_remote" "$target" 2>/dev/null || true
-          git reset --hard "$merge_remote/$target" 2>/dev/null || true
+          FREELY_SKIP_IBM_GATE=1 git reset --hard "$merge_remote/$target" 2>/dev/null || true
         fi
         attempt_develop_push_followthrough_if_needed "$target" "$source_branch"
         return 0

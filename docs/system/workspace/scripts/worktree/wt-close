@@ -386,10 +386,10 @@ if [[ ${#remotes[@]} -gt 0 ]]; then
             echo "wt-close: gitee branch deleted via API ✓"
           else
             echo "wt-close: gitee API delete failed, trying git push --delete..."
-            git push "$remote" --delete "$branch" 2>/dev/null || true
+            git push "$remote" --delete "$branch" 2>&1 || echo "wt-close: warning: failed to delete $branch on $remote" >&2
           fi
         else
-          git push "$remote" --delete "$branch" 2>/dev/null || true
+          git push "$remote" --delete "$branch" 2>&1 || echo "wt-close: warning: failed to delete $branch on $remote" >&2
         fi
       fi
     fi
