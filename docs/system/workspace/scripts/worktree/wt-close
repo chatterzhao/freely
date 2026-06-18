@@ -339,6 +339,18 @@ fi
 # absorbed_into. wt-close only removes the worktree + branch.
 # Phase 3 above guards against overwriting this with --force.
 
+# ── Phase 3.6: Guard — ensure raw issue exists in develop ──
+# After merge, the raw issue should exist in develop's docs/issues/.
+# If it's only in the worktree (merge was skipped), copy it before deleting.
+if [[ -n "$issue_id" ]] && [[ -f "${PROJECT_WORKTREE_PATH}/docs/issues/${issue_id}/issue.md" ]]; then
+  _dev_issue="$PROJECT_ROOT/docs/issues/${issue_id}/issue.md"
+  if [[ ! -f "$_dev_issue" ]]; then
+    echo "wt-close: raw issue not in develop, copying from worktree"
+    mkdir -p "$(dirname "$_dev_issue")"
+    cp "${PROJECT_WORKTREE_PATH}/docs/issues/${issue_id}/issue.md" "$_dev_issue"
+  fi
+fi
+
 # ── Phase 4: Remote branch delete ──
 
 remotes=()
