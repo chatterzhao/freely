@@ -2,7 +2,7 @@
 local_id: I-20260618T015503Z-A
 kind: linked
 status: in_dev
-phase_state: in_b2_ibm
+phase_state: completed
 promoted_from: raw-20260618T015503Z
 source_candidate: docs/pre-brainstorms/20260618T015503Z--worktree-path-architecture/candidates.md
 canonical_issue_path: ""
