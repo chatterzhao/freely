@@ -1,3 +1,19 @@
+## M-20260618T060624Z-A
+- title: pr-review auto-push review commit
+- status: active
+### candidate_issues
+1. `C-20260618T060624Z-A`
+- milestone: M-20260618T060624Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260618T060624Z-A/issue.md`
+### committed_issues
+1. `I-20260618T060624Z-A`
+- title: pr-review auto-push review commit
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260618T060624Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/pr-review-auto-push/code-reviews`
+
 ## M-20260618T051709Z-A
 - title: pr-merge review gate
 - status: active
