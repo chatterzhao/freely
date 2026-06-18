@@ -365,14 +365,14 @@ _gitee_remote() {
 
 _gitee_branch_delete() {
   local branch="$1"
-  local gitee_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/gitee-issue.py"
+  local gitee_py="$PROJECT_ROOT/docs/system/workspace/scripts/runtime/gitee-issue.py"
   [[ -f "$gitee_py" ]] || return 1
   python3 "$gitee_py" delete-branch "$branch" 2>/dev/null
 }
 
 if [[ ${#remotes[@]} -gt 0 ]]; then
   for remote in "${remotes[@]}"; do
-    if git fetch "$remote" "$branch" 2>/dev/null; then
+    if git fetch "$remote" "$branch" 2>/dev/null; then  # fetch may fail for already-deleted branches; try delete anyway
       if [[ "$DRY_RUN" == true ]]; then
         if _gitee_remote "$remote"; then
           _dry "gitee-issue.py delete-branch $branch"
