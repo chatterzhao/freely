@@ -29,18 +29,23 @@ echo "=== pr-create-guarded: $current_branch → $base ==="
 echo ""
 
 # ── Step 0a: Worktree cleanliness check ──
-if ! git diff --quiet 2>/dev/null || ! git diff --cached --quiet 2>/dev/null; then
+_dirty_files=$(git status --porcelain 2>/dev/null | grep -v '^?' | head -20 || true)
+_untracked=$(git ls-files --others --exclude-standard 2>/dev/null | head -20 || true)
+if [[ -n "$_dirty_files" ]] || [[ -n "$_untracked" ]]; then
   cat >&2 <<DIRTY
 [PR-CREATE] Worktree is dirty — cannot create PR.
 Uncommitted changes prevent accurate governance-gate evaluation.
-Modified files:
-$(git diff --name-only 2>/dev/null | sed 's/^/  /')
-$(git diff --cached --name-only 2>/dev/null | sed 's/^/  (staged) /')
+
+Tracked modifications:
+${_dirty_files:-  (none)}
+
+Untracked files (should be committed or .gitignored):
+${_untracked:-  (none)}
 
 Resolve:
   git add <files> && git commit -m "..."   — commit changes
   git stash                                — save and restore later
-  git checkout -- <file>                   — discard (caution!)
+  echo <pattern> >> .gitignore             — intentionally ignore
 DIRTY
   exit 1
 fi
