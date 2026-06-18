@@ -70,6 +70,12 @@
   <text x="369" y="180" text-anchor="middle" font-size="8.5" fill="#475569" font-family="system-ui, sans-serif">delegate_workers</text>
   <text x="369" y="194" text-anchor="middle" font-size="7.5" fill="#94a3b8" font-family="system-ui, sans-serif">阶段4-6入口</text>
 
+  <!-- dispatch → doc-loop / dev-loop delegation (logical flow, protocol detail in A2A arrows below) -->
+  <path d="M320,200 L320,335 L170,335 L170,343" fill="none" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="5,4"/>
+  <text x="175" y="332" font-size="7.5" fill="#94a3b8" font-family="system-ui, sans-serif">delegate → B1_IBM</text>
+  <path d="M420,200 L420,330 L900,330 L900,343" fill="none" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="5,4"/>
+  <text x="910" y="327" font-size="7.5" fill="#94a3b8" font-family="system-ui, sans-serif">delegate → implement</text>
+
   <line x1="434" y1="164" x2="450" y2="164" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <!-- test gate (阶段7) -->
@@ -112,6 +118,9 @@
   <text x="938" y="180" text-anchor="middle" font-size="8.5" fill="#475569" font-family="system-ui, sans-serif">(外部/GitHub)</text>
   <text x="938" y="194" text-anchor="middle" font-size="7.5" fill="#94a3b8" font-family="system-ui, sans-serif">阶段10</text>
 
+  <path d="M891,205 C891,228 986,228 986,205" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#loop-arrow)"/>
+  <text x="938" y="224" text-anchor="middle" font-size="7.5" fill="#888" font-family="system-ui, sans-serif">↻ fail → back to dev-loop</text>
+
   <line x1="991" y1="164" x2="1007" y2="164" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
 
   <!-- pr-merge (阶段11) -->
@@ -120,6 +129,9 @@
   <text x="1074" y="166" text-anchor="middle" font-size="8.5" fill="#475569" font-family="system-ui, sans-serif">pr-merge-guarded</text>
   <text x="1074" y="180" text-anchor="middle" font-size="8.5" fill="#475569" font-family="system-ui, sans-serif">gate→merge→push</text>
   <text x="1074" y="194" text-anchor="middle" font-size="7.5" fill="#94a3b8" font-family="system-ui, sans-serif">阶段11</text>
+
+  <path d="M1017,205 C1017,228 1132,228 1132,205" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#loop-arrow)"/>
+  <text x="1074" y="224" text-anchor="middle" font-size="7.5" fill="#888" font-family="system-ui, sans-serif">↻ fail → back to dev-loop</text>
 
   <line x1="1137" y1="164" x2="1153" y2="164" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
 
@@ -166,6 +178,9 @@
   <text x="517" y="418" text-anchor="middle" font-size="9" fill="#475569" font-family="system-ui, sans-serif">I-* → prd.md → pre-tests.md → tasks.md</text>
   <text x="517" y="434" text-anchor="middle" font-size="9" fill="#475569" font-family="system-ui, sans-serif">code-reviews/ → phase_state: done_b2_ibm</text>
 
+  <path d="M362,457 C362,468 672,468 672,457" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#loop-arrow)"/>
+  <text x="517" y="464" text-anchor="middle" font-size="7.5" fill="#888" font-family="system-ui, sans-serif">↻ 设计未 ready → 继续设计</text>
+
   <rect x="45" y="475" width="632" height="34" rx="5" fill="#fef2f2" stroke="#f87171" stroke-width="1.2" stroke-dasharray="6,3"/>
   <text x="55" y="490" font-size="9" font-weight="bold" fill="#b91c1c" font-family="system-ui, sans-serif">Worker Agent (逻辑角色 — prompt-defined, executed by AI CLI ACP session)</text>
 
@@ -195,6 +210,9 @@
   <text x="1197" y="402" text-anchor="middle" font-size="11" font-weight="bold" fill="#991b1b" font-family="system-ui, sans-serif">evidence (阶段6)</text>
   <text x="1197" y="418" text-anchor="middle" font-size="9" fill="#475569" font-family="system-ui, sans-serif">progress → code-review</text>
   <text x="1197" y="434" text-anchor="middle" font-size="9" fill="#475569" font-family="system-ui, sans-serif">implementation evidence → in_verification</text>
+
+  <path d="M1042,457 C1042,468 1352,468 1352,457" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#loop-arrow)"/>
+  <text x="1197" y="464" text-anchor="middle" font-size="7.5" fill="#888" font-family="system-ui, sans-serif">↻ 证据不足 → 补充</text>
 
   <rect x="725" y="475" width="632" height="34" rx="5" fill="#fef2f2" stroke="#f87171" stroke-width="1.2" stroke-dasharray="6,3"/>
   <text x="735" y="490" font-size="9" font-weight="bold" fill="#b91c1c" font-family="system-ui, sans-serif">Worker Agent (逻辑角色 — prompt-defined, executed by AI CLI ACP session)</text>

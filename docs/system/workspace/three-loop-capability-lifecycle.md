@@ -14,24 +14,26 @@ SVG 图展示的五层实体，从上到下、从内到外：
 
 | 层 | 实体 | 框型 | 说明 |
 |----|------|------|------|
-| **Layer 1** | Freely Runtime | 实线大框 | bash supervisor, while-true loop, 最外层容器 |
-| **Layer 2** | auto-loop / doc-loop / dev-loop | 实线泳道 | 三个 Loop 的 gate 序列和逻辑流程 |
-| **Layer 3** | Manager Agent / Worker Agent | 虚线框 | 逻辑角色（非独立进程），由 prompt 注入定义 |
-| **Layer 3a** | M-Skills / W-Skills | 点线框 | Skill 集合，按 Manager / Worker / 通用能力被 Agent 消费 |
-| **Layer 4** | ACP Bridge / A2A Server / freely-db daemon + SQLite/WAL | 实线框 | `freely_db_manager.py` 是 SQLite 单写入访问进程，通过 Unix socket 提供 JSON-RPC；SQLite/WAL 是持久化文件 |
-| **Layer 5** | AI CLI Tool (Claude Code/codex/opencode/...) | 实线框 | 外部独立进程，在 Runtime 之外，通过 ACP JSON-RPC 连接 |
+| **Layer 1** | Freely Runtime-managed boundary | 虚线大框 | supervisor + managed daemons 的系统边界，不等于单一进程 |
+| **Layer 2** | auto-loop / doc-loop / dev-loop | 实线泳道 / gate | lifecycle workflow surface，表达阶段、gate 和回环，不是进程 |
+| **Layer 3** | Manager Agent / Worker Agent | 虚线框 | prompt-defined AI role，由下方 AI provider 的 ACP session 执行；不是独立进程 |
+| **Layer 3a** | M-Skills / W-Skills | 点线框 | instruction / capability modules，被 Manager / Worker role 选择和消费；不是 Actor |
+| **Layer 4** | ACP Bridge / A2A Server / freely-db daemon / SQLite-WAL | 服务框 + 存储框 | ACP Bridge/A2A Server/freely-db daemon 是服务/守护进程；SQLite/WAL 是 durable datastore 文件 |
+| **Layer 5** | AI provider / AI CLI tool (Claude Code/codex/opencode/...) | 外部进程框 | 外部 AI 执行提供层；Freely 通过 ACP 对其发 prompt、resume/fork session 并接收 stopReason |
 
 ### 实体框型约定
 
-- **实线框** = 真实进程或守护进程（有 PID，可启停）：Freely Runtime, ACP Bridge, A2A Server, freely-db daemon, AI CLI Tool
-- **虚线框** = 逻辑角色（AI Agent，由 prompt 注入定义）：Manager Agent, Worker Agent
-- **点线框** = Skill 集合：M-Skills, W-Skills
-- **SQLite/WAL 文件** = 持久化文件，不单独拥有 PID；由 `freely_db_manager.py` 持有单 SQLite connection 并通过 Unix socket 对外提供 JSON-RPC。
+- **外层虚线大框** = runtime-managed boundary：Freely supervisor 管理的系统边界。
+- **带标题条实线框** = 真实进程或守护进程（有 PID，可启停）：ACP Bridge, A2A Server, freely-db daemon, AI provider / AI CLI Tool。
+- **泳道 / gate 实线框** = workflow surface：auto/doc/dev loop 的阶段与判断点，不表示进程。
+- **虚线角色框** = AI role：Manager Agent / Worker Agent，由 prompt、上下文和 skill 约束定义，在 AI provider session 中执行。
+- **点线框** = instruction/capability module set：M-Skills, W-Skills。
+- **SQLite/WAL 存储框** = durable datastore 文件，不单独拥有 PID；由 `freely_db_manager.py` 持有单 SQLite connection 并通过 Unix socket JSON-RPC 读写。
 
 ### 协议通道
 
-- **ACP (AI Communication Protocol)**：当前默认工作模式。Freely Runtime 通过 `monitor-ai-acp.sh` → `run-acp-prompt.py` → `acp-bridge.py` 连接外部 AI CLI 的 ACP server。canonical ACP family 当前是 `claude-agent-acp`、`codex-acp`、`opencode acp`；`cc` / `kiro-cli` / `iflow` 等 legacy 名称按 registry alias 进入 Claude ACP family。session/new → session/resume → session/prompt → stopReason。三级缓存：L1 resume (0 token) | L2 fork (增量) | L3 fresh (全量)
-- **A2A (Agent-to-Agent Protocol)**：REST + SSE over Unix socket。Manager ↔ Worker 之间的零文件委派。a2a-exit → Task.message → tasks/list → Worker prompt → SSE TaskStatusUpdateEvent。旧 `handoffs` 文件/表语义已被 `a2a_tasks` 取代。
+- **ACP (AI Communication Protocol)**：Freely runtime/ACP bridge 与外部 AI provider 之间的 session/prompt/control protocol，不是 Agent 间协商协议。它负责 session/new、session/resume、fork/prompt、stopReason、session/ping 等；当前产品工作模式是 ACP。Freely 通过 `monitor-ai-acp.sh` → `run-acp-prompt.py` → `acp-bridge.py` 连接外部 AI CLI 的 ACP server。canonical ACP family 当前是 `claude-agent-acp`、`codex-acp`、`opencode acp`；`cc` / `kiro-cli` / `iflow` 等 legacy 名称按 registry alias 进入 Claude ACP family。
+- **A2A (Agent-to-Agent Protocol)**：Manager role 与 Worker role 之间的 task coordination / state / notification protocol。A2A Server 是 coordination service；`a2a_task.py` / `a2a-exit` 是 CLI client/tool。Manager 用 `a2a-exit` 创建 `submitted` Task，Runtime 通过 `tasks/list` 生成 Worker prompt 并启动 Worker ACP session，Worker 完成后通过 A2A task state 和 SSE 通知 Manager。旧 `handoffs` 文件/表语义已被 `a2a_tasks` 取代。
 
 ### SQLite 表职责
 
