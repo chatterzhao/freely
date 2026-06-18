@@ -17,20 +17,33 @@ SVG 图展示的五层实体，从上到下、从内到外：
 | **Layer 1** | Freely Runtime | 实线大框 | bash supervisor, while-true loop, 最外层容器 |
 | **Layer 2** | auto-loop / doc-loop / dev-loop | 实线泳道 | 三个 Loop 的 gate 序列和逻辑流程 |
 | **Layer 3** | Manager Agent / Worker Agent | 虚线框 | 逻辑角色（非独立进程），由 prompt 注入定义 |
-| **Layer 3a** | M-Skills / W-Skills | 点线框 | 33 个 Skill，分 A/M/W 三层，附属于 Agent |
-| **Layer 4** | ACP Bridge / A2A Server / SQLite | 实线框 | 真实进程（有 PID），通过 Unix socket 通信 |
-| **Layer 5** | AI CLI Tool (opencode/Claude Code/codex/...) | 实线框 | 外部独立进程，在 Runtime 之外，通过 ACP JSON-RPC 连接 |
+| **Layer 3a** | M-Skills / W-Skills | 点线框 | Skill 集合，按 Manager / Worker / 通用能力被 Agent 消费 |
+| **Layer 4** | ACP Bridge / A2A Server / DB daemon + SQLite/WAL | 实线框 | 真实进程通过 Unix socket 通信；SQLite/WAL 是持久化文件，不是进程 |
+| **Layer 5** | AI CLI Tool (Claude Code/codex/opencode/...) | 实线框 | 外部独立进程，在 Runtime 之外，通过 ACP JSON-RPC 连接 |
 
 ### 实体框型约定
 
-- **实线框** = 真实进程（有 PID，可启停）：Freely Runtime, ACP Bridge, A2A Server, SQLite, AI CLI Tool
+- **实线框** = 真实进程或守护进程（有 PID，可启停）：Freely Runtime, ACP Bridge, A2A Server, DB daemon, AI CLI Tool
 - **虚线框** = 逻辑角色（AI Agent，由 prompt 注入定义）：Manager Agent, Worker Agent
-- **点线框** = Skill 集合（33 个，分 A/M/W 三层）：M-Skills, W-Skills
+- **点线框** = Skill 集合：M-Skills, W-Skills
+- **DB 文件** = SQLite/WAL 持久化，不单独拥有 PID；由 `freely_db_manager.py` 通过 Unix socket 对外提供 JSON-RPC。
 
 ### 协议通道
 
-- **ACP (AI Communication Protocol)**：JSON-RPC over Unix socket。Freely Runtime ↔ AI CLI Tool 之间的会话代理。session/new → session/resume → session/prompt → stopReason。三级缓存：L1 resume (0 token) | L2 fork (增量) | L3 fresh (全量)
-- **A2A (Agent-to-Agent Protocol)**：REST + SSE over Unix socket。Manager ↔ Worker 之间的零文件委派。a2a-exit → Task.message → tasks/list → Worker prompt → SSE TaskStatusUpdateEvent
+- **ACP (AI Communication Protocol)**：当前默认工作模式。Freely Runtime 通过 `monitor-ai-acp.sh` → `run-acp-prompt.py` → `acp-bridge.py` 连接外部 AI CLI 的 ACP server。canonical ACP family 当前是 `claude-agent-acp`、`codex-acp`、`opencode acp`；`cc` / `kiro-cli` / `iflow` 等 legacy 名称按 registry alias 进入 Claude ACP family。session/new → session/resume → session/prompt → stopReason。三级缓存：L1 resume (0 token) | L2 fork (增量) | L3 fresh (全量)
+- **A2A (Agent-to-Agent Protocol)**：REST + SSE over Unix socket。Manager ↔ Worker 之间的零文件委派。a2a-exit → Task.message → tasks/list → Worker prompt → SSE TaskStatusUpdateEvent。旧 `handoffs` 文件/表语义已被 `a2a_tasks` 取代。
+
+### SQLite 表职责
+
+SQLite 不是单一职责的 crash-recovery 文件；不同表在 Freely runtime 中承担不同职责：
+
+| 表 | 职责 |
+|----|------|
+| `a2a_tasks` | Manager/Worker 委派、状态机、Task.message、worker delivery/consumption |
+| `chats` | human interruption / chat intake 暂存与消费状态 |
+| `sessions` | ACP session、tool adapter、launch_kind、父子 session 关系 |
+| `tool_failure_log` / `tool_switch_events` | tool availability、slot-first recovery、跨工具切换证据 |
+| `task_mode_gate` | `auto` / `wait` / `listen` 模式门控 |
 
 ### 关键数据流
 
@@ -43,7 +56,7 @@ scan (文件系统读取) ──→ intake gate ──→ routing ──→ disp
                                                       │
                               ┌────────────────────────┘
                               ▼
-              A2A Server: Task 存储 → SSE 通知
+              A2A Server: a2a_tasks 存储 → SSE 通知
                               │
               ┌───────────────┴───────────────┐
               ▼                               ▼
@@ -62,7 +75,7 @@ scan (文件系统读取) ──→ intake gate ──→ routing ──→ disp
 
 | Loop | 驱动源 | 角色 | 核心职责 |
 |------|--------|------|---------|
-| **auto-loop** | task-mode (auto/wait/listen) → scan + handoff | 主管 (Manager) | 信号接收 → 路由分发 → gate 序列 → 收口 |
+| **auto-loop** | task-mode (auto/wait/listen) → scan + A2A/continuity evidence | 主管 (Manager) | 信号接收 → 路由分发 → gate 序列 → 收口 |
 | **doc-loop** | auto-loop dispatch gate → 委派 Worker | Worker | B1_IBM (预研) → B2_IBM (设计) |
 | **dev-loop** | auto-loop dispatch gate → 委派 Worker | Worker | 实现 → 测试 → 证据 |
 
@@ -101,9 +114,9 @@ intake → routing → dispatch → test → pr-create → pr-review → CI chec
 
 #### test gate（阶段7）
 - 触发: dev-loop 返回 evidence 就绪
-- 执行: merge fix-branch → test-pre-merge-{key}-{slug} worktree → 端到端验证
-- 内部小循环: fail → back to dev-loop fix → re-merge → re-test → pass
-- 注意: test-pre-merge 是每个 issue 独立的丢弃式沙箱，不是共享批次
+- 执行: 将来源 `feature/*` / `fix/*` 临时装配到 `test-pre-merge-{key}-{slug}` worktree → 端到端验证
+- 内部小循环: fail → back to source branch dev-loop fix → 重新装配测试工位 → re-test → pass
+- 注意: `test-pre-merge-*` 是一次性测试沙箱，只用于临时验证；验证后丢弃，不作为合并来源。验证通过后仍由来源分支走 `pr-create-guarded` / `pr-review-guarded` / `pr-merge-guarded develop <source-branch>`。
 
 #### pr-create gate（阶段8）
 - 触发: test gate 通过
