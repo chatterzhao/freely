@@ -1,3 +1,19 @@
+## M-20260618T035220Z-A
+- title: Merge semantic conflict detection
+- status: active
+### candidate_issues
+1. `C-20260618T035220Z-A`
+- milestone: M-20260618T035220Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260618T035220Z-A/issue.md`
+### committed_issues
+1. `I-20260618T035220Z-A`
+- title: Merge semantic conflict detection
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260618T035220Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/merge-semantic-conflict/code-reviews`
+
 ## M-20260618T031437Z-A
 - title: Fix wt-close remote branch deletion
 - status: active
