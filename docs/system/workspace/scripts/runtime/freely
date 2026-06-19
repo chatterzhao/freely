@@ -12824,7 +12824,7 @@ manager_runtime_launch_workers_after_ai_cycle_if_needed() {
 import json,sys
 try:
     rows=json.load(sys.stdin)
-    for r in rows:
+    for r in rows.get("rows", []):
         tid=r.get('task_id','')
         msg=r.get('message','') or r.get('summary','')
         wt=r.get('worktree','')
