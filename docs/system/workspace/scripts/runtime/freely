@@ -12814,13 +12814,17 @@ manager_runtime_launch_workers_after_ai_cycle_if_needed() {
   #   - Parallel workers mutating the same files
   #   Future iterations should add these guards back at the exit_contract level.
   local project="$1" exit_reason="${2:-}" launched_count="0"
+  log_info "worker_launch: enter (project=$project exit_reason=$exit_reason)"
   [[ "$(effective_runtime_role_for_project "$project")" == "manager" ]] || {
+    log_info "worker_launch: skip — role is not manager"
     printf '0\n'
     return 0
   }
   local _contract_kind
   _contract_kind="$(manager_exit_contract_kind "$project" 2>/dev/null || true)"
+  log_info "worker_launch: contract_kind=$_contract_kind"
   if [[ "$_contract_kind" != "delegate_workers" ]]; then
+    log_info "worker_launch: skip — contract kind is not delegate_workers"
     printf '0\n'
     return 0
   fi
@@ -12851,6 +12855,7 @@ except: pass
   _parent_task_id=$(python3 "$_a2a_task_py" latest-manager 2>/dev/null | \
     python3 -c "import json,sys; print(json.load(sys.stdin).get('task_id',''))" 2>/dev/null || echo "")
   _launched_count=0
+  log_info "worker_launch: _worker_tasks has $(echo "$_worker_tasks" | wc -l | tr -d ' ') lines"
   if [[ -n "$_worker_tasks" ]]; then
     while IFS=$'\t' read -r _task_id _task_msg _target_worktree _task_branch _raw_key _task_skill; do
       [[ -n "$_task_id" && -n "$_task_msg" ]] || continue
