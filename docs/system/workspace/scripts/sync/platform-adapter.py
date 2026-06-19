@@ -398,6 +398,7 @@ def pull_raw_issue(raw_key: str, target_dir: Path) -> Optional[dict]:
     }
 
     import yaml
+    yaml.SafeLoader.yaml_implicit_resolvers.pop('tag:yaml.org,2002:timestamp', None)
     fm_str = yaml.dump(frontmatter, default_flow_style=False, allow_unicode=True, sort_keys=False).strip()
     body = details.get("body", "")
     # Remove frontmatter from body if present (GH issue body may contain old frontmatter)
