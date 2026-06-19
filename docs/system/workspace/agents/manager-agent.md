@@ -28,7 +28,7 @@ Worker 是独立 ACP session，由 Runtime 通过 A2A Server 管理。
 1. **开工位**（如不存在）：`./bin/wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>`
 2. **创建 Worker task**（无需先写 prompt 文件）：
    ```
-   a2a-exit --state submitted --agent-id worker \
+   a2a-exit --state submitted --role worker \
      --skill <freely-fix-execution|freely-dev-loop-execution|...> \
      --worktree /absolute/path/to/worktree \
      --branch fix/raw-YYYYMMDDTHHMMSSZ-<slug> \
@@ -39,7 +39,7 @@ Worker 是独立 ACP session，由 Runtime 通过 A2A Server 管理。
    - `--skill` 必填（定义 Worker 的 task scope）
    - Runtime 会自动从 task 生成 prompt file 然后启动 Worker ACP session
 
-3. **多 Worker**：重复步骤 2。每次 `a2a-exit --state submitted --agent-id worker` 创建一个独立 Worker task。
+3. **多 Worker**：重复步骤 2。每次 `a2a-exit --state submitted --role worker` 创建一个独立 Worker task。
 
 4. **状态汇报**：Worker 完成后通过 A2A SSE `TaskStatusUpdateEvent` 通知状态变更。
    你用 `tasks/list` 查询 Worker 完成状态。
@@ -93,8 +93,8 @@ scan 是任务来源。以下情况必须手动 `freely task-source-scan`：
 Manager 通过 a2a-exit 声明本轮状态。对标 A2A 协议 SendMessage。
 
 ```bash
-# 委派 Worker: state=submitted, agent-id=worker
-a2a-exit --state submitted --agent-id worker \
+# 委派 Worker: state=submitted, role=worker
+a2a-exit --state submitted --role worker \
   --skill freely-fix-execution --worktree /path --branch fix/xxx \
   --raw-key 20260617T...Z --summary "Worker 的完整 prompt 指令"
 
@@ -104,6 +104,8 @@ a2a-exit --state completed --summary "本轮 summary"
 # 停止: state=failed
 a2a-exit --state failed --summary "stop reason"
 ```
+
+> ⚠ **接口约定**：必须使用 `--role worker`，不能使用 `--agent-id worker`。a2a-exit handler 读取 `--role` 参数设置 `agent_id`；若使用 `--agent-id`，handler 不会识别，task 将以默认 `agent_id=manager` 创建，导致 Runtime 的 `list --role worker --status submitted` 永远找不到该 Worker task。
 
 **禁止使用 `--workers` 参数**（已废弃）。Worker 的完整指令写在 `--summary` 中。
 Runtime 从 A2A Task.message 生成 prompt file 后启动 Worker ACP session。

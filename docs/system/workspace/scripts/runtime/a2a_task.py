@@ -580,6 +580,7 @@ def _main() -> int:
     p_exit.add_argument("--next", default="", help="Next action")
     p_exit.add_argument("--evidence", default="", help="Evidence paths")
     p_exit.add_argument("--role", default="manager", help="Role: manager|worker")
+    p_exit.add_argument("--agent-id", default=None, help=argparse.SUPPRESS)  # deprecated, use --role
     p_exit.add_argument("--raw-key", default="", help="Raw issue key")
     p_exit.add_argument("--worktree", default="", help="Worktree path")
     p_exit.add_argument("--branch", default="", help="Branch name")
@@ -780,6 +781,9 @@ def _main() -> int:
                 r = c.update(task_id, **fields)
                 print(json.dumps({"ok": True, "task_id": task_id, "state": fields["state"]}))
         elif args.cmd == "a2a-exit":
+            # Backward compat: --agent-id maps to --role (deprecated, use --role)
+            if getattr(args, 'agent_id', None) and getattr(args, 'role', 'manager') == 'manager':
+                args.role = args.agent_id
             raw_state = getattr(args, 'state', '') or ''
             state = normalize_state(raw_state)
             if state not in VALID_STATES:

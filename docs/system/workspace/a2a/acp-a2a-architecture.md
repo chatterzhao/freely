@@ -51,7 +51,7 @@
       │                    │                      │                    │
       │ 4. a2a-exit ───────│─────────────────────►│                    │
       │   --state=submitted│  5. POST /tasks       │                    │
-      │   --agent-id=worker│     TaskStore.save()  │                    │
+      │   --role=worker│     TaskStore.save()  │                    │
       │   --message="..."  │     → a2a_tasks table │                    │
       │                    │                      │                    │
       │ 6. end_turn        │                      │                    │
@@ -62,7 +62,7 @@
       │                    │                      │                    │
       │                    │ 8. tasks/list ──────►│                    │
       │                    │   --state=submitted  │                    │
-      │                    │   --agent-id=worker  │                    │
+      │                    │   --role=worker  │                    │
       │                    │◄─────────────────────│                    │
       │                    │   [{task_id,         │                    │
       │                    │     message,         │                    │
