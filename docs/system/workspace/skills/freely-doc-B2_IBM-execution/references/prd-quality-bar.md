@@ -4,7 +4,7 @@
 
 ## Minimum structure
 
-达到 `done_ibm` 前，`prd.md` 至少应覆盖：
+达到 `done_b2_ibm` 前，`prd.md` 至少应覆盖：
 
 1. `Goal`
 - 这轮真正想让产品或治理发生什么变化
@@ -54,11 +54,11 @@
 12. `Dev-Loop Handoff`
 - 后续实现环如何消费这份 PRD，需要哪些最小引用和下一跳上下文
 
-## Bar for `done_ibm`
+## Bar for `done_b2_ibm`
 
 仅有 `Goal`、`Product Surface` 或一般性背景描述，不算达标。
 
-进入 `done_ibm` 前，至少还要满足：
+进入 `done_b2_ibm` 前，至少还要满足：
 
 - `pre-tests.md` 能从 `prd.md` 自然派生，而不是另起一套口头标准
 - `pre-tests.md` 能直接表达 issue-level acceptance，且默认以 smoke / integration / regression / non-goals 这类行为视角组织

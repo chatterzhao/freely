@@ -61,7 +61,7 @@ Freely doc-loop 的治理框架。每个工作项经历两个 IBM 阶段——B1
 
 ## B2_IBM：Input → Brainstorm → Map
 
-从 scan/handoffs 选出并提交到 milestone 的 issue 到 map 产物完整交付。
+从 scan、A2A task 与 continuity evidence 选出并提交到 milestone 的 issue 到 map 产物完整交付。
 
 | 字母 | 含义 | 说明 |
 |------|------|------|
@@ -108,7 +108,7 @@ Freely doc-loop 的治理框架。每个工作项经历两个 IBM 阶段——B1
 milestone 是 B1_IBM 和 B2_IBM 之间的排序与承接层。
 
 - `candidate_issues`：B1_IBM 产出的 candidate 队列。未收口的 candidate 继续留在此处，写清 `next_action` 和 `revisit_trigger`
-- `committed_issues`：B2_IBM 管道内部的 I 来源（任务选择来自 scan/handoffs）。candidate 被 promoted 后，正式 issue 进入此队列
+- `committed_issues`：B2_IBM 管道内部的 I 来源（任务选择来自 scan、A2A task 与 continuation evidence）。candidate 被 promoted 后，正式 issue 进入此队列
 - milestone 的 `M-{key}` 是 candidate 身份，不等于执行编排身份。IBM materialization 产出 `I-{key}` 后，编排切到 I-*
 
 ## 与 Three-Loop 的关系

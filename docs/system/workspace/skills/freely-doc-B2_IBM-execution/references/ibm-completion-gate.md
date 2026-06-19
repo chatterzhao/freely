@@ -30,14 +30,14 @@
 
 并保持：
 
-- `phase_state=in_ibm`
+- `phase_state=in_b2_ibm`
 - 不为纯 IBM 工作伪造 `progress`
 - 若依赖未合并父分支，保留 `execution_base`、`integration_target`、`depends_on`
 - candidate-level acceptance 已在 issue-bound artifacts 中被继续深化
 
 ## Ready for dev
 
-满足以下条件时进入 `done_ibm`：
+满足以下条件时进入 `done_b2_ibm`：
 
 - 文档已足够驱动实现
 - issue scope 与 acceptance 稳定
@@ -54,7 +54,7 @@
   - 若其中某类不适用，已显式写明理由与替代证据
 - `post-merge acceptance` 已写明目标环境是 `develop` 还是某个 `test-pre-merge-*` 批次
 - `post-merge acceptance` 已写明：在 protected branch worktree 中只做验证，不直接修实现
-- 若目标环境是 `test-pre-merge-*`，语义已写明这是主线前临时验证批次，完成后由当前权威批次进入 `develop` 并 retire 该批次，而不是绕回来源 `feature/*` 保留第二条正常路径
+- 若目标环境是 `test-pre-merge-*`，语义已写明这是主线前临时验证批次，完成后回到来源 `feature/*` / `fix/*` 走 guarded PR/merge 进入 `develop`，并 retire 该批次
 - 若目标环境是 `develop`，语义已写明这是主线后的 completion verification，而不是在 `develop` 上先预测试
 - issue-bound brainstorm 的未决问题已不再阻断 dev
 - implementation 所需文档引用齐备

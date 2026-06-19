@@ -48,7 +48,7 @@
 | M | `freely-module-interface-governance` | 模块接口版本治理 |
 | W | `freely-dev-loop-execution` | scan-selected / handoff-continued issue 的实现与测试 |
 | W | `freely-doc-B1_IBM-execution` | raw issue → brainstorm → candidate |
-| W | `freely-doc-B2_IBM-execution` | scan/handoffs 选出的 issue → prd/tasks/code-review |
+| W | `freely-doc-B2_IBM-execution` | scan/A2A/continuity 选出的 issue → prd/tasks/code-review |
 | W | `freely-fix-execution` | bug 快速修复流程 |
 | W | `freely-url-content-intake` | URL 内容抓取与结构化 |
 | W | `freely-rust-tauri-toolchain-bootstrap` | Rust/Tauri toolchain 引导 |

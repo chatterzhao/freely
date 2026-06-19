@@ -8,7 +8,7 @@
 ## Committed issues
 
 - 缺 `b-issue/prd/pre-tests/tasks`：`freely-doc-B2_IBM-execution`
-- docs 足够且 `phase_state` 为 `done_ibm` 或 `in_dev`：`freely-dev-loop-execution`
+- docs 足够且 `phase_state` 为 `done_b2_ibm` 或 `in_dev`：`freely-dev-loop-execution`
 - 若处于 `in_verification`：只做校验和回写，不重开实现
 
 ## Completed issues

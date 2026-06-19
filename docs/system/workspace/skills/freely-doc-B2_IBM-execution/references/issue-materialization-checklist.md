@@ -45,7 +45,7 @@ Issue front matter 还应显式绑定：
 - 若后续会进入 develop-bound implementation materialization，默认约定该目录下的 review / verification artifact 还要承载 `## Implementation Decision Note`
   - 最小字段：`decision`、`why_this`、`alternatives_considered`、`boundary_non_goals`、`residual_risk`
 
-写完后仍需按 [prd-quality-bar.md](prd-quality-bar.md) 检查 `prd.md` 是否达到 AI-ready 最小结构；未达标时不得宣称 `done_ibm`。
+写完后仍需按 [prd-quality-bar.md](prd-quality-bar.md) 检查 `prd.md` 是否达到 AI-ready 最小结构；未达标时不得宣称 `done_b2_ibm`。
 
 ## Required write-back
 
@@ -53,7 +53,7 @@ Issue front matter 还应显式绑定：
 - `docs/milestones.md.issue_path`
 - 若从一个 `M-{issue-id}` 拆出多个 `I-{issue-id}*`，则 milestone 的正式编排区必须写回这些 `I-*` 的顺序与阶段归属
 - 原始 `M-{issue-id}` 只保留来源/追溯语义，不继续代替正式执行编排
-- `phase_state=in_ibm`
+- `phase_state=in_b2_ibm`
 - 继承有效 `session_refs`
 - 在 issue / `prd.md` / `pre-tests.md` / `tasks.md` / issue-bound brainstorm 中继续深化 acceptance 边界
 - 在 `pre-tests.md` 中默认先写 executable acceptance 行为，而不是 wording review / truth-source reading checklist

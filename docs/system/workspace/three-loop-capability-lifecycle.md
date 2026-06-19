@@ -8,11 +8,76 @@
 
 凡是会改变 three-loop routing、loop placement、completion / verification / cleanup / recovery judgment 的实现、prompt、agent、skill 或高层文档，在修改前都必须先阅读并理解本文件；若语义变化，必须同步更新本文件及 SVG 图。
 
+## 五层架构
+
+SVG 图展示的五层实体，从上到下、从内到外：
+
+| 层 | 实体 | 框型 | 说明 |
+|----|------|------|------|
+| **Layer 1** | Freely Runtime-managed boundary | 虚线大框 | supervisor + managed daemons 的系统边界，不等于单一进程 |
+| **Layer 2** | auto-loop / doc-loop / dev-loop | 实线泳道 / gate | lifecycle workflow surface，表达阶段、gate 和回环，不是进程 |
+| **Layer 3** | Manager Agent / Worker Agent | 虚线框 | prompt-defined AI role，由下方 AI provider 的 ACP session 执行；不是独立进程 |
+| **Layer 3a** | M-Skills / W-Skills | 点线框 | instruction / capability modules，被 Manager / Worker role 选择和消费；不是 Actor |
+| **Layer 4** | ACP Bridge / A2A Server / freely-db daemon / SQLite-WAL | 服务框 + 存储框 | ACP Bridge/A2A Server/freely-db daemon 是服务/守护进程；SQLite/WAL 是 durable datastore 文件 |
+| **Layer 5** | AI provider / AI CLI tool (Claude Code/codex/opencode/...) | 外部进程框 | 外部 AI 执行提供层；Freely 通过 ACP 对其发 prompt、resume/fork session 并接收 stopReason |
+
+### 实体框型约定
+
+- **外层虚线大框** = runtime-managed boundary：Freely supervisor 管理的系统边界。
+- **带标题条实线框** = 真实进程或守护进程（有 PID，可启停）：ACP Bridge, A2A Server, freely-db daemon, AI provider / AI CLI Tool。
+- **泳道 / gate 实线框** = workflow surface：auto/doc/dev loop 的阶段与判断点，不表示进程。
+- **虚线角色框** = AI role：Manager Agent / Worker Agent，由 prompt、上下文和 skill 约束定义，在 AI provider session 中执行。
+- **点线框** = instruction/capability module set：M-Skills, W-Skills。
+- **SQLite/WAL 存储框** = durable datastore 文件，不单独拥有 PID；由 `freely_db_manager.py` 持有单 SQLite connection 并通过 Unix socket JSON-RPC 读写。
+
+### 协议通道
+
+- **ACP (AI Communication Protocol)**：Freely runtime/ACP bridge 与外部 AI provider 之间的 session/prompt/control protocol，不是 Agent 间协商协议。它负责 session/new、session/resume、fork/prompt、stopReason、session/ping 等；当前产品工作模式是 ACP。Freely 通过 `monitor-ai-acp.sh` → `run-acp-prompt.py` → `acp-bridge.py` 连接外部 AI CLI 的 ACP server。canonical ACP family 当前是 `claude-agent-acp`、`codex-acp`、`opencode acp`；`cc` / `kiro-cli` / `iflow` 等 legacy 名称按 registry alias 进入 Claude ACP family。
+- **A2A (Agent-to-Agent Protocol)**：Manager role 与 Worker role 之间的 task coordination / state / notification protocol。A2A Server 是 coordination service；`a2a_task.py` / `a2a-exit` 是 CLI client/tool。Manager 用 `a2a-exit` 创建 `submitted` Task，Runtime 通过 `tasks/list` 生成 Worker prompt 并启动 Worker ACP session，Worker 完成后通过 A2A task state 和 SSE 通知 Manager。旧 `handoffs` 文件/表语义已被 `a2a_tasks` 取代。
+
+### SQLite 表职责
+
+SQLite 不是单一职责的 crash-recovery 文件；不同表在 Freely runtime 中承担不同职责：
+
+| 表 | 职责 |
+|----|------|
+| `a2a_tasks` | Manager/Worker 委派、状态机、Task.message、worker delivery/consumption |
+| `chats` | human interruption / chat intake 暂存与消费状态 |
+| `sessions` | ACP session、tool adapter、launch_kind、父子 session 关系 |
+| `tool_failure_log` / `tool_switch_events` | tool availability、slot-first recovery、跨工具切换证据 |
+| `task_mode_gate` | `auto` / `wait` / `listen` 模式门控 |
+
+### 关键数据流
+
+```
+scan (文件系统读取) ──→ intake gate ──→ routing ──→ dispatch
+                                                      │
+                              ┌────────────────────────┘
+                              ▼
+              Manager ACP session → AI 决策 → a2a-exit --state submitted
+                                                      │
+                              ┌────────────────────────┘
+                              ▼
+              A2A Server: a2a_tasks 存储 → SSE 通知
+                              │
+              ┌───────────────┴───────────────┐
+              ▼                               ▼
+        doc-loop Worker                  dev-loop Worker
+        (B1_IBM→B2_IBM)                 (implement→evidence)
+              │                               │
+              └───────────┬───────────────────┘
+                          ▼
+              a2a-exit --state completed
+                          │
+                          ▼
+              SSE → Manager 下一轮 patrol → test gate → ... → closeout
+```
+
 ## 三 Loop 架构
 
 | Loop | 驱动源 | 角色 | 核心职责 |
 |------|--------|------|---------|
-| **auto-loop** | task-mode (auto/wait/listen) → scan + handoff | 主管 (Manager) | 信号接收 → 路由分发 → gate 序列 → 收口 |
+| **auto-loop** | task-mode (auto/wait/listen) → scan + A2A/continuity evidence | 主管 (Manager) | 信号接收 → 路由分发 → gate 序列 → 收口 |
 | **doc-loop** | auto-loop dispatch gate → 委派 Worker | Worker | B1_IBM (预研) → B2_IBM (设计) |
 | **dev-loop** | auto-loop dispatch gate → 委派 Worker | Worker | 实现 → 测试 → 证据 |
 
@@ -23,8 +88,8 @@ auto-loop 是唯一的调度中枢。doc-loop 和 dev-loop 不自行启动，始
 ### Gate 序列
 
 ```
-intake → routing → dispatch → test → pr-create → PR review → pr-merge → closeout
-  ↻                       ↻        ↻          ↻                       ↻
+intake → routing → dispatch → test → pr-create → pr-review → CI check → pr-merge → closeout
+  ↻                       ↻        ↻          ↻           ↻          ↻            ↻
 ```
 
 每个 gate 内部都有小循环（↻）：失败 → 回修 → 重试。
@@ -51,9 +116,9 @@ intake → routing → dispatch → test → pr-create → PR review → pr-merg
 
 #### test gate（阶段7）
 - 触发: dev-loop 返回 evidence 就绪
-- 执行: merge fix-branch → test-pre-merge-{key}-{slug} worktree → 端到端验证
-- 内部小循环: fail → back to dev-loop fix → re-merge → re-test → pass
-- 注意: test-pre-merge 是每个 issue 独立的丢弃式沙箱，不是共享批次
+- 执行: 将来源 `feature/*` / `fix/*` 临时装配到 `test-pre-merge-{key}-{slug}` worktree → 端到端验证
+- 内部小循环: fail → back to source branch dev-loop fix → 重新装配测试工位 → re-test → pass
+- 注意: `test-pre-merge-*` 是一次性测试沙箱，只用于临时验证；验证后丢弃，不作为合并来源。验证通过后仍由来源分支走 `pr-create-guarded` / `pr-review-guarded` / `pr-merge-guarded develop <source-branch>`。
 
 #### pr-create gate（阶段8）
 - 触发: test gate 通过
@@ -61,18 +126,24 @@ intake → routing → dispatch → test → pr-create → PR review → pr-merg
 - 命令封装: `pr-create-guarded` 内部执行 `git pull origin develop` + `pr-merge-guarded --dry-run` + `git push` + `gh pr create`
 - 内部小循环: conflict → 解决 → re-pull; gate fail → back to dev-loop fix
 
-#### PR review gate（阶段9）
+#### pr-review gate（阶段9）
 - 触发: PR 已创建
+- 执行: `pr-review-guarded` → 6 维独立 review → verdict 文档 (pass/fail)
+- 命令封装: `pr-review-guarded` 内部从 correctness / security / performance / reuse / governance / testing 六个维度审查 diff，产出 verdict 文档
+- 内部小循环: verdict=fail → back to dev-loop fix; 不通过 review 不得进入 CI
+
+#### CI check gate（阶段10）
+- 触发: pr-review gate 通过 (verdict=pass)
 - 执行: CI (`pr-merge-guard.yml`) + 人 review → Approval
 - 位置: 外部（GitHub），不在 Freely runtime 内
 
-#### pr-merge gate（阶段10）
+#### pr-merge gate（阶段11）
 - 触发: PR 获得 Approval
 - 执行: `pr-merge-guarded develop <pr-branch>`
 - 命令封装: `pr-merge-guarded` 内部执行 `git fetch origin develop` + PR gate (check PR + approval) + promotion gate + `git merge --no-ff` + issue-sync + `develop-push`
 - 内部小循环: gate fail → back to dev-loop fix
 
-#### closeout gate（阶段11）
+#### closeout gate（阶段12）
 - 触发: merge 完成
 - 执行: `wt-close <branch>`
 - 命令封装: `wt-close` 内部执行 issue-sync close + milestone update + `git branch -d` + `git push --delete` + worktree remove
@@ -117,15 +188,15 @@ auto-loop dispatch gate 触发
 ## 完整管线（feedback → wt-close）在三 loop 中的流转
 
 ```
-阶段:  |  1-3   |   4-5   |    6    |    7    |    8    |   9   |   10   |  11
-loop:  | auto   |  doc    |   dev   |  auto   |  auto   | external | auto  | auto
-gate:  |intake  | B1→B2   |implem→  |  test   |pr-create|PR review|pr-merge|closeout
-       |routing |         |evidence |         |         |         |        |
+阶段:  |  1-3   |   4-5   |    6    |    7    |    8    |     9     |   10    |   11   |  12
+loop:  | auto   |  doc    |   dev   |  auto   |  auto   |   auto    | external| auto   | auto
+gate:  |intake  | B1→B2   |implem→  |  test   |pr-create| pr-review | CI check|pr-merge|closeout
+       |routing |         |evidence |         |         |           |         |        |
 
-auto:  intake → routing → dispatch ──→ test → pr-create → [PR review] → pr-merge → closeout
-                 │           │           ↑                                  │
-doc:             │    B1→B2  │           │                                  │
-dev:             │           └── implement→evidence ────────────────────────┘
+auto:  intake → routing → dispatch ──→ test → pr-create → pr-review → [CI check] → pr-merge → closeout
+                 │           │           │                              ↑
+doc:             │    B1→B2  │           │                              │
+dev:             │           └── implement→evidence ────────────────────┘
 ```
 
 ## 命令封装一览
@@ -136,6 +207,7 @@ dev:             │           └── implement→evidence ──────
 |------|---------|
 | `wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>` | `git fetch origin develop` → `git update-ref` → `git worktree add` → test-pre-merge worktree → raw-issue-pull → platform_ids fill |
 | `pr-create-guarded` | `git pull origin develop` → `pr-merge-guarded --dry-run` → `git push origin HEAD` → `gh pr create --head HEAD` |
+| `pr-review-guarded` | 6 维独立 review (correctness / security / performance / reuse / governance / testing) → verdict 文档 (pass/fail) |
 | `pr-merge-guarded develop <pr-branch>` | `git fetch origin develop` → validate direction → PR gate (check PR + approval) → promotion gate → `git merge --no-ff` → issue-sync → `develop-push` |
 | `wt-close <branch>` | issue-sync close → milestone update → `git branch -d` → `git push --delete` → worktree remove |
 
@@ -143,18 +215,18 @@ dev:             │           └── implement→evidence ──────
 
 ### Fix 修复（治理后置）
 ```
-wt-create → dev(implement) → test → B1 → B2 → pr-create → pr-merge → wt-close
+wt-create → dev(implement) → test → B1 → B2 → pr-create → pr-review → pr-merge → wt-close
                                    ↑ B1/B2 后置于 test 之后，PR 门禁不后置
 ```
 
 ### Hotfix 紧急修复
 ```
-从 main 创建 hotfix/* → dev → pr-create → pr-merge main → pr-merge develop → wt-close
+从 main 创建 hotfix/* → dev → pr-create → pr-review → pr-merge main → pr-merge develop → wt-close
 （可跳过 test-pre-merge，双合并 main+develop）
 ```
 
 ### Doc-only 纯文档
 ```
-dev → pr-create → pr-merge → wt-close
+dev → pr-create → pr-review → pr-merge → wt-close
 （跳过 test-pre-merge、B1、B2）
 ```
