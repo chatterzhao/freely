@@ -98,6 +98,101 @@ phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
 - 不实现代码或运行测试（dev-loop 负责）
 - 不直接写 progress（dev-loop 负责）
 
+## 门禁常见坑速查
+
+> 若 gate 报错，先在此表查找匹配项。更多细节见下方规范模板。
+
+| gate 报错关键词 | 原因 | 正确格式 |
+|-----------|------|---------|
+| verification_artifact_dir too broad or non-canonical | 需以 /code-reviews 结尾，至少4段路径 | `docs/epics/{epic-name}/{story-name}/code-reviews` |
+| implementation decision note is incomplete | 需 5 个字段 | `decision` / `why_this` / `alternatives_considered` / `boundary_non_goals` / `residual_risk` |
+| owner issue 'missing' / that issue cannot be resolved | review/code-review 文件需 bullet 格式的 issue_id | `- issue_id: I-20260508T011858Z-A` |
+| phase_state cannot own capability/implementation changes | 实现变更的 I-* 需 completed | `phase_state: completed` |
+| pre_tests_path 验证失败 | I-* issue 需声明 pre_tests_path | `pre_tests_path: docs/epics/{epic}/verification/pre-tests.md` |
+
+## 规范文档示例(copy-paste可用)
+
+### I-* issue.md（完整模板）
+
+```markdown
+---
+local_id: I-20260508T011858Z-A
+kind: linked
+phase_state: done_b2_ibm
+source_raw: raw-20260508T011858Z
+source_candidate: docs/pre-brainstorms/20260508T011858Z--skill-gate-alignment/candidates.md#C-20260508T011858Z-A
+verification_artifact_dir: docs/epics/skill-gate-alignment/code-reviews
+pre_tests_path: docs/epics/skill-gate-alignment/verification/pre-tests.md
+platform_ids: {}
+primary_platform: github
+canonical_issue_path: I-20260508T011858Z-A
+last_synced_comment_at: {}
+created_at: 2026-05-08
+session_refs: []
+---
+
+# I-20260508T011858Z-A: 标题
+
+- source_candidate: docs/pre-brainstorms/20260508T011858Z--skill-gate-alignment/candidates.md#C-20260508T011858Z-A
+- verification_artifact_dir: docs/epics/skill-gate-alignment/code-reviews
+- pre_tests_path: docs/epics/skill-gate-alignment/verification/pre-tests.md
+```
+
+### Implementation Decision Note（完整模板）
+
+```markdown
+---
+issue_id: I-20260508T011858Z-A
+issue_path: docs/issues/I-20260508T011858Z-A/issue.md
+phase_state: done_b2_ibm
+---
+
+- issue_id: I-20260508T011858Z-A
+- issue_path: docs/issues/I-20260508T011858Z-A/issue.md
+
+## Implementation Decision Note
+
+- decision: 做了什么
+- why_this: 为什么选这个方案
+- alternatives_considered: 考虑过哪些替代方案
+- boundary_non_goals: 明确不做的事
+- residual_risk: 残余风险
+```
+
+### pr-review 文件（code-review 模板）
+
+```markdown
+# PR Review: #1234
+- pr_number: 1234
+- branch: feature/raw-xxx-slug
+- base: develop
+- reviewer: cli
+- verdict: pass
+- issue_id: I-20260508T011858Z-A
+- issue_path: docs/issues/I-20260508T011858Z-A/issue.md
+
+## 1. Worktree Check
+- status: pass
+
+## 2. IBM Completeness
+- status: pass
+
+## 3. Code Review Evidence
+- status: pass
+
+## 4. Pre-test Evidence
+- status: pass
+
+## 5. Receipt Integrity
+- status: n/a
+
+## 6. Phase State
+- status: pass
+
+## Overall Verdict
+- verdict: pass
+```
+
 ## 工作流
 
 1. 确认 Input：milestone committed_issues 中的 I-{key} 存在
