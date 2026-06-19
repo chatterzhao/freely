@@ -2,6 +2,7 @@
 local_id: raw-20260513T040512Z
 kind: raw
 phase_state: absorbed
+absorbed_into: I-20260513T040512Z-A
 platform_ids:
   github:
     issue_id: '327'
@@ -17,7 +18,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: closed
+platform_state: open
 force_closed_at: '2026-05-19T19:21:36Z'
 force_closed_reason: 'wt-close --force: worktree retired without completed phase_state'
 ---
