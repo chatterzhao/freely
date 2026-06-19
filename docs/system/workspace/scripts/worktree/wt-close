@@ -294,7 +294,7 @@ if [[ "$FORCE" == true && -z "$wt_path" ]]; then
     _dry "./bin/issue-sync close $issue_id completed"
   else
     echo "wt-close: closing platform issue for $issue_id..."
-    if "$PROJECT_ROOT/bin/issue-sync" close "$issue_id" completed 2>&1; then
+    if "$PROJECT_ROOT/bin/issue-sync" --project "$wt_path" close "$issue_id" completed 2>&1; then
       echo "wt-close: platform issue closed ✓"
 
       _fm_set_str "$issue_file" "platform_state" "closed"
