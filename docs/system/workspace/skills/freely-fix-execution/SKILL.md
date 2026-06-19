@@ -198,6 +198,10 @@ hotfix/*          → main
 
 ## 门禁常见坑速查
 
+> 本表为 fix-execution 特有的快速修复场景。完整 IBM 治理坑速查见:
+> - `skill:freely-doc-B1_IBM-execution` §门禁常见坑速查 (candidate/source_candidate/milestone)
+> - `skill:freely-doc-B2_IBM-execution` §门禁常见坑速查 (I-* issue/verification/code-review)
+
 | 失败 | 修复 |
 |---|---|
 | `decision` missing | 用 `## Implementation Decision Note` section |
