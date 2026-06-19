@@ -39,6 +39,7 @@ _fm_get() {
   local file="$1" key="$2"
   python3 -c "
 import yaml, sys
+yaml.SafeLoader.yaml_implicit_resolvers.pop('tag:yaml.org,2002:timestamp', None)
 with open('$file') as f: content = f.read()
 if not content.startswith('---'): sys.exit(0)
 parts = content.split('---', 2)
@@ -58,6 +59,8 @@ _fm_set() {
   local file="$1" key="$2" value="$3"
   python3 -c "
 import yaml
+# Disable timestamp auto-parsing to preserve original datetime string format.
+yaml.SafeLoader.yaml_implicit_resolvers.pop('tag:yaml.org,2002:timestamp', None)
 with open('$file') as f: content = f.read()
 parts = content.split('---', 2)
 fm = yaml.safe_load(parts[1]) if len(parts) >= 3 else {}
@@ -121,6 +124,7 @@ _already_on_platform() {
   local pid
   pid=$(python3 -c "
 import yaml
+yaml.SafeLoader.yaml_implicit_resolvers.pop('tag:yaml.org,2002:timestamp', None)
 with open('$file') as f: content = f.read()
 parts = content.split('---', 2)
 if len(parts) >= 3:
@@ -168,6 +172,7 @@ _has_unsynced_comments() {
   local last_sync
   last_sync=$(python3 -c "
 import yaml
+yaml.SafeLoader.yaml_implicit_resolvers.pop('tag:yaml.org,2002:timestamp', None)
 with open('$file') as f: content = f.read()
 parts = content.split('---', 2)
 if len(parts) >= 3:
@@ -344,6 +349,7 @@ _gitee_issue_id() {
   local file="$1"
   python3 -c "
 import yaml
+yaml.SafeLoader.yaml_implicit_resolvers.pop('tag:yaml.org,2002:timestamp', None)
 with open('$file') as f: content = f.read()
 parts = content.split('---', 2)
 if len(parts) >= 3:
@@ -358,15 +364,36 @@ _update_platform_ids() {
   local file="$1" platform="$2" issue_id="$3" url="$4"
   local ts; ts=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
   python3 -c "
-import yaml
+import yaml, re
+# Disable timestamp auto-parsing to preserve datetime string format.
+yaml.SafeLoader.yaml_implicit_resolvers.pop('tag:yaml.org,2002:timestamp', None)
 with open('$file') as f: content = f.read()
 parts = content.split('---', 2)
 fm = yaml.safe_load(parts[1]) if len(parts) >= 3 else {}
 fm.setdefault('platform_ids', {})
+
+# Only update platform_ids if the issue_id actually changed.
+existing = fm.get('platform_ids', {}).get('$platform', {}).get('issue_id', '')
+platform_changed = (str(existing) != '$issue_id')
+
 fm['platform_ids']['$platform'] = {'issue_id': '$issue_id', 'url': '$url', 'synced_at': '$ts'}
-fm['updated_at'] = '$ts'
+
+# Only set updated_at when platform data materially changed.
+if platform_changed:
+    fm['updated_at'] = '$ts'
+
 if not fm.get('primary_platform'): fm['primary_platform'] = '$platform'
-if not fm.get('created_at'): fm['created_at'] = '$ts'
+
+# Infer created_at from raw key timestamp when missing.
+# raw-20260619T030248Z → 2026-06-19T03:02:48Z
+if not fm.get('created_at'):
+    local_id = fm.get('local_id', '')
+    m = re.match(r'(?:raw-)?(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z', local_id or '')
+    if m:
+        fm['created_at'] = f\"{m[1]}-{m[2]}-{m[3]}T{m[4]}:{m[5]}:{m[6]}Z\"
+    else:
+        fm['created_at'] = '$ts'  # fallback
+
 new_fm = yaml.dump(fm, default_flow_style=False, allow_unicode=True, sort_keys=False).strip()
 body_text = parts[2] if len(parts) >= 3 else ''
 with open('$file', 'w') as f: f.write('---\n' + new_fm + '\n---' + body_text)
@@ -548,6 +575,7 @@ if matches:
   # Update last_synced_comment_at
   python3 -c "
 import yaml
+yaml.SafeLoader.yaml_implicit_resolvers.pop('tag:yaml.org,2002:timestamp', None)
 with open('$file') as f: content = f.read()
 parts = content.split('---', 2)
 fm = yaml.safe_load(parts[1]) if len(parts) >= 3 else {}
@@ -821,6 +849,7 @@ cmd_status() {
   echo "platform_ids:"
   python3 -c "
 import yaml
+yaml.SafeLoader.yaml_implicit_resolvers.pop('tag:yaml.org,2002:timestamp', None)
 with open('$file') as f: content = f.read()
 parts = content.split('---', 2)
 if len(parts) >= 3:
