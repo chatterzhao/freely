@@ -32,3 +32,10 @@
 | Date | Decision | Reason |
 |------|----------|--------|
 | 2026-06-18 | proposed | Initial brainstorm complete, awaiting acceptance review |
+| 2026-06-18 | promoted | Acceptance review complete. Clear scope, low risk, addresses real user need. Acceptance criteria well-defined. Proceed to B2_IBM. |
+
+## Promotion Evidence
+
+**promoted_issue_path**: I-20260616T140126Z-A
+**verdict**: promote
+**review_summary**: This feature addresses a clear user pain point (new users don't know how to configure ~/.ai-auth/ slots). The 7 acceptance criteria are well-defined and testable. Template files follow existing conventions. No architectural risk. Proceed to B2_IBM for detailed design. |
