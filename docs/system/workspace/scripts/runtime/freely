@@ -12831,6 +12831,7 @@ try:
         br=r.get('branch','')
         rk=r.get('raw_key','')
         sk=r.get('skill','')
+        msg = msg.replace("\n", " ").replace("\r", "")
         if tid and msg:
             print(f'{tid}\t{msg}\t{wt}\t{br}\t{rk}\t{sk}')
 except: pass
