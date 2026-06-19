@@ -1,7 +1,8 @@
 ---
 local_id: raw-20260619T111454Z
 kind: raw
-phase_state: absorbed
+phase_state: dropped
+dropped_reason: Batch sync operational record (pull=0 push=163 close=63) — scan completed, no actionable issue to absorb
 platform_ids:
   github:
     issue_id: '3057'
