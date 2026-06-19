@@ -1,10 +1,10 @@
 ---
 local_id: raw-20260509T024559Z
 kind: raw
-phase_state: dropped
+phase_state: absorbed
+absorbed_into: I-20260509T024559Z-A
 completed_at: '2026-06-16T04:14:56Z'
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
-phase_state: completed
 platform_ids:
   github:
     issue_id: '265'
@@ -15,12 +15,12 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-09T03:28:23Z'
-updated_at: 2026-05-17T04:47:25Z
+updated_at: 2026-05-17 04:47:25+00:00
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: closed
+platform_state: open
 ---
 
 ## 目标
