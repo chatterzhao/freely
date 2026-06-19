@@ -1,4 +1,5 @@
 ---
+issue_id: I-20260616T140126Z-A
 name: ai-auth Template Config Files
 kind: linked
 milestone: M-2026-Q2
