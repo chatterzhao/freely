@@ -9738,6 +9738,7 @@ worker_prompt_target_branch() {
       print value
       exit
     }
+	    /^Branch: / { sub(/^Branch: /, ""); print; exit }
     /^Branch:$/ { capture=1; next }
     capture && /^- / {
       value=$0
@@ -9810,7 +9811,7 @@ worktree_path_for_branch() {
 
 worker_prompt_resolved_worktree() {
   local manager_project="$1" prompt_file="$2"
-  local target_worktree target_branch
+  local target_worktree target_branch derived_worktree
   target_worktree="$(worker_prompt_target_worktree "$prompt_file")"
   if [[ -n "$target_worktree" && -d "$target_worktree" ]]; then
     normalize_runtime_worktree_path "$target_worktree"
@@ -9819,6 +9820,15 @@ worker_prompt_resolved_worktree() {
   target_branch="$(worker_prompt_target_branch "$prompt_file")"
   if [[ -n "$target_branch" ]]; then
     worktree_path_for_branch "$manager_project" "$target_branch"
+    return 0
+  fi
+  # Fallback: prompt files are always stored at
+  # <worktree>/.freely/run/a2a-prompts/task-<id>.txt.
+  # Derive the worktree path from the file location.
+  derived_worktree="$(dirname "$(dirname "$(dirname "$(dirname "$prompt_file")")")")"
+  if [[ -d "$derived_worktree/.freely" ]]; then
+    normalize_runtime_worktree_path "$derived_worktree"
+    return 0
   fi
 }
 
@@ -10903,6 +10913,7 @@ worker_prompt_target_worktree() {
       exit
     }
     /^你的 worktree：$/ { capture=1; next }
+	    /^Worktree: \// { sub(/^Worktree: /, ""); print; exit }
     /^Worktree:$/ { capture=1; next }
     capture && /^- / {
       sub(/^- /, "", $0)
