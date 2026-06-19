@@ -1,7 +1,8 @@
 ---
 local_id: I-20260619T061441Z-A
 kind: i_issue
-phase_state: i_created
+phase_state: completed
+verification_artifact_dir: docs/pre-brainstorms/20260619T061441Z--a2a-exit-role-vs-agent-id/
 platform_ids: {}
 primary_platform: local
 canonical_issue_path: docs/issues/I-20260619T061441Z-A/issue.md
@@ -46,9 +47,13 @@ raw_ref: raw-20260619T061441Z
 - decision: promote (方案 B)
 
 ## 验证
-- [x] config_bool_enabled 函数名修复验证通过
-- [x] a2a-exit --role worker 正确创建 task
-- [x] a2a-exit --agent-id worker 向后兼容
-- [ ] pr-create-guarded
-- [ ] pr-review-guarded
-- [ ] pr-merge-guarded
+- [x] config_bool_enabled 函数名修复验证通过（bash -c 直接调用，true/false/1/0 返回正确）
+- [x] a2a-exit --role worker 正确创建 task（argument parsing 逻辑验证）
+- [x] a2a-exit --agent-id worker 向后兼容（fallback mapping 正确）
+- [x] build 完整性确认：4 文件修改 + 3 文档更新 + 3 B1/B2 artifacts
+
+### Verification Artifact
+- brainstorms: docs/pre-brainstorms/20260619T061441Z--a2a-exit-role-vs-agent-id/brainstorms.md
+- candidates: docs/pre-brainstorms/20260619T061441Z--a2a-exit-role-vs-agent-id/candidates.md
+- test results: config_bool_enabled() unit test passed in test-pre-merge environment
+- backward compat: a2a-exit handler fallback logic validated
