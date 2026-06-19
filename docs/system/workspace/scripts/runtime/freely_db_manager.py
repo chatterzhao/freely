@@ -992,7 +992,7 @@ def h_a2a_task_insert(daemon: DbDaemon, params: dict) -> dict:
            (task_id, name, description, state, agent_id, skill, session_id, message,
             created_at, updated_at, prompt_file, worktree, branch, exit_kind, reason,
             progress, next_action, completion_summary, evidence_paths, error)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (
             task_id,
             params.get("name", ""),
@@ -1004,6 +1004,7 @@ def h_a2a_task_insert(daemon: DbDaemon, params: dict) -> dict:
             params.get("message", ""),
             now,
             now,
+            params.get("prompt_file", ""),
             params.get("worktree", ""),
             params.get("branch", ""),
             params.get("exit_kind", ""),

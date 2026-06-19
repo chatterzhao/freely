@@ -9738,6 +9738,7 @@ worker_prompt_target_branch() {
       print value
       exit
     }
+	    /^Branch: / { sub(/^Branch: /, ""); print; exit }
     /^Branch:$/ { capture=1; next }
     capture && /^- / {
       value=$0
@@ -9810,7 +9811,7 @@ worktree_path_for_branch() {
 
 worker_prompt_resolved_worktree() {
   local manager_project="$1" prompt_file="$2"
-  local target_worktree target_branch
+  local target_worktree target_branch derived_worktree
   target_worktree="$(worker_prompt_target_worktree "$prompt_file")"
   if [[ -n "$target_worktree" && -d "$target_worktree" ]]; then
     normalize_runtime_worktree_path "$target_worktree"
@@ -9819,6 +9820,15 @@ worker_prompt_resolved_worktree() {
   target_branch="$(worker_prompt_target_branch "$prompt_file")"
   if [[ -n "$target_branch" ]]; then
     worktree_path_for_branch "$manager_project" "$target_branch"
+    return 0
+  fi
+  # Fallback: prompt files are always stored at
+  # <worktree>/.freely/run/a2a-prompts/task-<id>.txt.
+  # Derive the worktree path from the file location.
+  derived_worktree="$(dirname "$(dirname "$(dirname "$(dirname "$prompt_file")")")")"
+  if [[ -d "$derived_worktree/.freely" ]]; then
+    normalize_runtime_worktree_path "$derived_worktree"
+    return 0
   fi
 }
 
@@ -10903,6 +10913,7 @@ worker_prompt_target_worktree() {
       exit
     }
     /^你的 worktree：$/ { capture=1; next }
+	    /^Worktree: \// { sub(/^Worktree: /, ""); print; exit }
     /^Worktree:$/ { capture=1; next }
     capture && /^- / {
       sub(/^- /, "", $0)
@@ -12476,7 +12487,7 @@ manager_runtime_launch_workers_from_latest_task() {
   }
   continuity_generated="$continuity_file"
   if ! manager_continuity_has_worker_prompts "$continuity_file"; then
-    materialize_cleanup_worker_prompt_from_manager_continuity_if_needed "$project" "$continuity_file" >/dev/null || true
+    materialize_cleanup_worker_prompt_from_manager_continuity_if_needed "$project" "$continuity_file" || true
   fi
   prompt_generated_csv="$(latest_manager_worker_prompt_csv_from_continuity "$continuity_file")"
 
@@ -12803,13 +12814,17 @@ manager_runtime_launch_workers_after_ai_cycle_if_needed() {
   #   - Parallel workers mutating the same files
   #   Future iterations should add these guards back at the exit_contract level.
   local project="$1" exit_reason="${2:-}" launched_count="0"
+  log_info "worker_launch: enter (project=$project exit_reason=$exit_reason)"
   [[ "$(effective_runtime_role_for_project "$project")" == "manager" ]] || {
+    log_info "worker_launch: skip — role is not manager"
     printf '0\n'
     return 0
   }
   local _contract_kind
   _contract_kind="$(manager_exit_contract_kind "$project" 2>/dev/null || true)"
+  log_info "worker_launch: contract_kind=$_contract_kind"
   if [[ "$_contract_kind" != "delegate_workers" ]]; then
+    log_info "worker_launch: skip — contract kind is not delegate_workers"
     printf '0\n'
     return 0
   fi
@@ -12824,13 +12839,14 @@ manager_runtime_launch_workers_after_ai_cycle_if_needed() {
 import json,sys
 try:
     rows=json.load(sys.stdin)
-    for r in rows:
+    for r in rows.get("rows", []):
         tid=r.get('task_id','')
         msg=r.get('message','') or r.get('summary','')
         wt=r.get('worktree','')
         br=r.get('branch','')
         rk=r.get('raw_key','')
         sk=r.get('skill','')
+        msg = msg.replace("\n", " ").replace("\r", "")
         if tid and msg:
             print(f'{tid}\t{msg}\t{wt}\t{br}\t{rk}\t{sk}')
 except: pass
@@ -12839,6 +12855,7 @@ except: pass
   _parent_task_id=$(python3 "$_a2a_task_py" latest-manager 2>/dev/null | \
     python3 -c "import json,sys; print(json.load(sys.stdin).get('task_id',''))" 2>/dev/null || echo "")
   _launched_count=0
+  log_info "worker_launch: _worker_tasks has $(echo "$_worker_tasks" | wc -l | tr -d ' ') lines"
   if [[ -n "$_worker_tasks" ]]; then
     while IFS=$'\t' read -r _task_id _task_msg _target_worktree _task_branch _raw_key _task_skill; do
       [[ -n "$_task_id" && -n "$_task_msg" ]] || continue
@@ -18029,7 +18046,7 @@ ensure_manager_once() {
     current_pid=""
   fi
 
-  prepare_manager_cross_tool_fallback_if_needed "$project" "$same_tool_blocked" >/dev/null || true
+  prepare_manager_cross_tool_fallback_if_needed "$project" "$same_tool_blocked" || true
 
   if [[ "${TOOL_AUTO_RECOVERY_DECISION:-none}" == "waiting" ]]; then
     log_warn "manager bootstrap remains blocked while every configured recovery path is unavailable"
@@ -20874,7 +20891,7 @@ print(ready)
     # Process terminated workers once per cycle (not every watchdog tick)
     # On first cycle, skip continuity-based recovery — fleet cache not populated yet.
     # Workers are launched via post-AI-cycle handler (delegate_workers exit contract).
-    manager_runtime_recover_workers_if_needed "$PROJECT_ROOT" "$FIRST_ROUND" >/dev/null || true
+    manager_runtime_recover_workers_if_needed "$PROJECT_ROOT" "$FIRST_ROUND" || true
     ensure_runtime_tool_session_anchor "$AI_TOOL" "$mode_name" "$PROJECT_ROOT"
     # Persist session anchor immediately so SIGTERM-killed sessions can resume
     _persist_session_anchor_early "$PROJECT_ROOT" "$AI_TOOL"
@@ -21479,7 +21496,7 @@ print(f'delivery_status=delivered updated={len(rows)}', flush=True)
     fi
 
     if [[ "$exit_contract_action" == "delegate_workers" ]]; then
-      manager_runtime_launch_workers_after_ai_cycle_if_needed "$PROJECT_ROOT" "$LAST_WORKCELL_EXIT_REASON" >/dev/null
+      manager_runtime_launch_workers_after_ai_cycle_if_needed "$PROJECT_ROOT" "$LAST_WORKCELL_EXIT_REASON"
       LAST_WORKCELL_EXIT_REASON="manager_worker_launch_after_ai_cycle"
       write_workcell_state "$PROJECT_ROOT" "running" "up" "down" "$LAST_WORKCELL_EXIT_REASON"
     fi
