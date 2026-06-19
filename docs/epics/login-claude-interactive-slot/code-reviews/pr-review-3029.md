@@ -1,5 +1,7 @@
 # PR Review: #3029
 - pr_number: 3029
+- issue_id: I-20260619T033758Z-A
+- issue_path: docs/issues/I-20260619T033758Z-A/issue.md
 - branch: fix/raw-20260619T033758Z-login-claude-interactive-slot
 - base: develop
 - reviewer: cli
