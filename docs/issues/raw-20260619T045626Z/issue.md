@@ -3,7 +3,6 @@ local_id: raw-20260619T045626Z
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260619T045626Z-A
-source_candidate: docs/pre-brainstorms/20260619T045626Z--pr-merge-flock/candidates.md#C-20260619T045626Z-A
 platform_ids:
   github:
     issue_id: '3031'
