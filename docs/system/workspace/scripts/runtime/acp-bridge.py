@@ -584,10 +584,13 @@ def handle_client(conn, bridge):
         bridge.clients.append(conn)
     try:
         while True:
-            data = conn.recv(4096)
+            try:
+                data = conn.recv(4096)
+            except (ConnectionResetError, OSError):
+                break
             if not data:
                 break
-            buf += data.decode("utf-8")
+            buf += data.decode("utf-8", errors="replace")
             while "\n" in buf:
                 line, buf = buf.split("\n", 1)
                 line = line.strip()
@@ -596,7 +599,10 @@ def handle_client(conn, bridge):
                 try:
                     request = json.loads(line)
                 except json.JSONDecodeError:
-                    conn.send((json.dumps({"jsonrpc": "2.0", "id": 0, "error": {"code": -32700, "message": "parse error"}}) + "\n").encode())
+                    try:
+                        conn.send((json.dumps({"jsonrpc": "2.0", "id": 0, "error": {"code": -32700, "message": "parse error"}}) + "\n").encode())
+                    except (BrokenPipeError, ConnectionResetError, OSError):
+                        break
                     continue
 
                 method = request.get("method", "")
@@ -658,14 +664,21 @@ def handle_client(conn, bridge):
 
                 try:
                     conn.send((json.dumps(response, separators=(",", ":")) + "\n").encode())
+                except (BrokenPipeError, ConnectionResetError, OSError):
+                    break
                 except Exception as e:
                     bridge.log(f"send response error: {e}")
                     break
+    except Exception as e:
+        bridge.log(f"handle_client unhandled error: {e}")
     finally:
         with bridge.clients_lock:
             if conn in bridge.clients:
                 bridge.clients.remove(conn)
-        conn.close()
+        try:
+            conn.close()
+        except Exception:
+            pass
 
 
 def run_socket_server(bridge):
