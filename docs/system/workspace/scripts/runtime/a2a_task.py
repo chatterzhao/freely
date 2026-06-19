@@ -248,7 +248,7 @@ class A2AClient:
     def list(self, **filters) -> List[dict]:
         params = [f"{k}={v}" for k, v in filters.items() if v]
         path = "/tasks?" + "&".join(params) if params else "/tasks"
-        return self._request("GET", path).get("tasks", [])
+        return self._rest_request("GET", path).get("tasks", [])
 
     def latest_manager(self) -> Optional[dict]:
         """Get latest manager task via A2A Server (authoritative)."""
