@@ -4,7 +4,8 @@ description:
 ## 核心约定
 slot 目录名 = .zshrc alias 名 = config.toml AI_TOOL 值，三者必须一致。目录命名规范: {tool}-{type}-{name}，其中 {t
 kind: raw
-phase_state: b1_brainstorm
+phase_state: absorbed
+absorbed_into: I-20260616T140126Z-A
 open_questions:
   - Overwrite vs. skip on re-init for .freely/ai-auth/?
   - Include kiro-cli templates?
