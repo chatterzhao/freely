@@ -1,6 +1,7 @@
 # PR Review: #3087
 - pr_number: 3087
-- owner_issue: I-20260619T111454Z-A
+- issue_id: I-20260619T111454Z-A
+- issue_path: docs/issues/I-20260619T111454Z-A/issue.md
 - branch: fix/raw-20260619T111454Z-platform-sync
 - base: develop
 - reviewer: cli
