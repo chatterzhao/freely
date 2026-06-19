@@ -161,17 +161,20 @@ class A2AClient:
             params = dict(params, taskId=_m.group(1))
 
         jsonrpc_req = {"jsonrpc": "2.0", "id": 1, "method": rpc_method, "params": params}
-        http_body = json.dumps(jsonrpc_req, default=str)
+        http_body = json.dumps(jsonrpc_req, default=str, ensure_ascii=False)
+        http_body_bytes = http_body.encode('utf-8')
+        # Content-Length MUST be byte count (RFC 7230). len(str) causes
+        # Content-Length mismatch for non-ASCII → h11 "Invalid HTTP request".
         request = (f"POST / HTTP/1.1\r\n"
-                   f"Content-Type: application/json\r\n"
-                   f"Content-Length: {len(http_body)}\r\n"
-                   f"Connection: close\r\n\r\n{http_body}")
+                   f"Content-Type: application/json; charset=utf-8\r\n"
+                   f"Content-Length: {len(http_body_bytes)}\r\n"
+                   f"Connection: close\r\n\r\n")
 
         sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         sock.settimeout(timeout)
         try:
             sock.connect(self._socket_path)
-            sock.sendall(request.encode())
+            sock.sendall(request.encode('ascii') + http_body_bytes)
             data = b""
             while True:
                 chunk = sock.recv(4096)
