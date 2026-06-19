@@ -12476,7 +12476,7 @@ manager_runtime_launch_workers_from_latest_task() {
   }
   continuity_generated="$continuity_file"
   if ! manager_continuity_has_worker_prompts "$continuity_file"; then
-    materialize_cleanup_worker_prompt_from_manager_continuity_if_needed "$project" "$continuity_file" >/dev/null || true
+    materialize_cleanup_worker_prompt_from_manager_continuity_if_needed "$project" "$continuity_file" || true
   fi
   prompt_generated_csv="$(latest_manager_worker_prompt_csv_from_continuity "$continuity_file")"
 
@@ -18030,7 +18030,7 @@ ensure_manager_once() {
     current_pid=""
   fi
 
-  prepare_manager_cross_tool_fallback_if_needed "$project" "$same_tool_blocked" >/dev/null || true
+  prepare_manager_cross_tool_fallback_if_needed "$project" "$same_tool_blocked" || true
 
   if [[ "${TOOL_AUTO_RECOVERY_DECISION:-none}" == "waiting" ]]; then
     log_warn "manager bootstrap remains blocked while every configured recovery path is unavailable"
@@ -20875,7 +20875,7 @@ print(ready)
     # Process terminated workers once per cycle (not every watchdog tick)
     # On first cycle, skip continuity-based recovery — fleet cache not populated yet.
     # Workers are launched via post-AI-cycle handler (delegate_workers exit contract).
-    manager_runtime_recover_workers_if_needed "$PROJECT_ROOT" "$FIRST_ROUND" >/dev/null || true
+    manager_runtime_recover_workers_if_needed "$PROJECT_ROOT" "$FIRST_ROUND" || true
     ensure_runtime_tool_session_anchor "$AI_TOOL" "$mode_name" "$PROJECT_ROOT"
     # Persist session anchor immediately so SIGTERM-killed sessions can resume
     _persist_session_anchor_early "$PROJECT_ROOT" "$AI_TOOL"
@@ -21480,7 +21480,7 @@ print(f'delivery_status=delivered updated={len(rows)}', flush=True)
     fi
 
     if [[ "$exit_contract_action" == "delegate_workers" ]]; then
-      manager_runtime_launch_workers_after_ai_cycle_if_needed "$PROJECT_ROOT" "$LAST_WORKCELL_EXIT_REASON" >/dev/null
+      manager_runtime_launch_workers_after_ai_cycle_if_needed "$PROJECT_ROOT" "$LAST_WORKCELL_EXIT_REASON"
       LAST_WORKCELL_EXIT_REASON="manager_worker_launch_after_ai_cycle"
       write_workcell_state "$PROJECT_ROOT" "running" "up" "down" "$LAST_WORKCELL_EXIT_REASON"
     fi
