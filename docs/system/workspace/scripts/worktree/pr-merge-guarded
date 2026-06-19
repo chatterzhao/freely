@@ -35,7 +35,9 @@ fail() {
 }
 
 merge_lock_dir() {
-  printf '%s/freely-merge-lock\n' "$(git rev-parse --git-dir 2>/dev/null || echo "/tmp")"
+  # Use --git-common-dir so the lock is in the main repo, not a worktree subdir.
+  # Multiple worktrees share the main repo; the lock must protect the shared develop branch.
+  printf '%s/freely-merge-lock\n' "$(git rev-parse --git-common-dir 2>/dev/null || git rev-parse --git-dir 2>/dev/null || echo "/tmp")"
 }
 acquire_merge_lock() {
   local lock_dir; lock_dir="$(merge_lock_dir)"
