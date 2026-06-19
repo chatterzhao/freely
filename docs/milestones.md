@@ -3282,7 +3282,13 @@ routing_policy:
 - title: pr-merge-guarded flock concurrency guard
 - status: active
 ### candidate_issues
-- C-20260619T045626Z-A
+1. `C-20260619T045626Z-A`
+- milestone: M-20260619T045626Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260619T045626Z-A/issue.md`
 ### committed_issues
-- issue: I-20260619T045626Z-A
-  commit_sha: pending
+1. `I-20260619T045626Z-A`
+- title: pr-merge-guarded flock concurrency
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260619T045626Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/pr-merge-flock/code-reviews`
