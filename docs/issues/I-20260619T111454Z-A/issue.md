@@ -2,6 +2,7 @@
 local_id: I-20260619T111454Z-A
 kind: i_issue
 phase_state: completed
+source_candidate: docs/pre-brainstorms/20260619T111454Z--platform-sync-batch/candidates.md
 canonical_issue_path: docs/issues/I-20260619T111454Z-A/issue.md
 platform_ids: {}
 primary_platform: local
