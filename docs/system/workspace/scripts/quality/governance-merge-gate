@@ -414,7 +414,7 @@ def parse_candidate_file(rel_path: str) -> List[CandidateRecord]:
 
     starts = []
     for idx, line in enumerate(lines):
-        heading = re.match(r"^##{1,3}\s+(C-[A-Za-z0-9-]+)", line.strip())
+        heading = re.match(r"^#{1,3}\s+(C-[A-Za-z0-9-]+)", line.strip())
         if heading:
             starts.append((idx, heading.group(1)))
             continue
@@ -1192,8 +1192,12 @@ def main() -> int:
         owner_issue_records[owner_issue.path] = owner_issue
         source_candidate = resolve_source_candidate_record(owner_issue, candidate_records_by_path)
         if not source_candidate:
+            sc_path = anchorless_source_candidate(owner_issue.source_candidate) if owner_issue and owner_issue.source_candidate else ""
+            detail = ""
+            if sc_path and path_exists(sc_path):
+                detail = f" File '{sc_path}' exists but contains no recognizable candidate heading (expecting ## C-xxx or ### C-xxx)."
             errors.append(
-                f"{progress.path} points to owner issue {owner_issue.issue_id or owner_issue.path}, but that issue has no valid source_candidate. "
+                f"{progress.path} points to owner issue {owner_issue.issue_id or owner_issue.path}, but that issue has no valid source_candidate.{detail} "
                 f"Restore the originating C-* candidate before merging develop-bound work."
             )
             continue
@@ -1216,8 +1220,12 @@ def main() -> int:
         owner_issue_records[owner_issue.path] = owner_issue
         source_candidate = resolve_source_candidate_record(owner_issue, candidate_records_by_path)
         if not source_candidate:
+            sc_path = anchorless_source_candidate(owner_issue.source_candidate) if owner_issue and owner_issue.source_candidate else ""
+            detail = ""
+            if sc_path and path_exists(sc_path):
+                detail = f" File '{sc_path}' exists but contains no recognizable candidate heading (expecting ## C-xxx or ### C-xxx)."
             errors.append(
-                f"{review.path} points to owner issue {owner_issue.issue_id or owner_issue.path}, but that issue has no valid source_candidate. "
+                f"{review.path} points to owner issue {owner_issue.issue_id or owner_issue.path}, but that issue has no valid source_candidate.{detail} "
                 f"Restore the originating C-* candidate before merging develop-bound work."
             )
             continue
