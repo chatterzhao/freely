@@ -38,10 +38,10 @@
   <text x="350" y="82" font-size="10" fill="#334155" font-family="system-ui, sans-serif">while true; do</text>
   <text x="350" y="98" font-size="10" fill="#475569" font-family="system-ui, sans-serif">  scan pulse → 发现任务 → 启动 Agent Role   |   AI 死 → restart → 继续 scan</text>
   <text x="350" y="112" font-size="8" fill="#94a3b8" font-family="system-ui, sans-serif">🔵 代码级循环 — Runtime 硬编码的 while-true + scan 脉冲</text>
-  <rect x="875" y="78" width="495" height="31" rx="5" fill="#fff7ed" stroke="#fb923c" stroke-width="1.2" stroke-dasharray="4,3"/>
-  <text x="890" y="91" font-size="8.5" font-weight="bold" fill="#c2410c" font-family="system-ui, sans-serif">Human side-channel（旁路，不阻塞 loop）</text>
-  <text x="890" y="104" font-size="7.5" fill="#9a3412" font-family="system-ui, sans-serif">freely feedback→platform raw issue | freely chat→DB→issue/comment；下一轮 scan 暴露</text>
-  <path d="M875,106 L785,106" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow-scan)"/>
+  <rect x="895" y="35" width="475" height="31" rx="5" fill="#fff7ed" stroke="#fb923c" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <text x="910" y="48" font-size="8.5" font-weight="bold" fill="#c2410c" font-family="system-ui, sans-serif">Human side-channel（旁路，不阻塞 loop）</text>
+  <text x="910" y="61" font-size="7.5" fill="#9a3412" font-family="system-ui, sans-serif">freely feedback→platform raw issue | freely chat→DB→issue/comment；scan 暴露</text>
+  <path d="M1130,66 L1130,86 L785,86" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow-scan)"/>
 
   <!-- =================================================================== -->
   <!-- MANAGER AGENT ROLE                                                    -->
@@ -205,10 +205,10 @@
   <text x="260" y="1004" font-size="8" fill="#94a3b8" font-family="system-ui, sans-serif">ACP Bridge → AI CLI（new/resume → session/prompt full|delta）→ stopReason → Runtime 读 exit_kind → 继续</text>
 
   <!-- ACP arrows: Runtime/ACP Bridge sends session/prompt/control to AI CLI Tool -->
-  <path d="M355,855 L355,865 L35,865 L35,950" fill="none" stroke="#6366f1" stroke-width="1.8" marker-end="url(#arrow-acp)"/>
-  <text x="48" y="915" font-size="7" fill="#6366f1" font-family="system-ui, sans-serif">ACP prompt/control → AI CLI</text>
-  <path d="M1040,855 L1040,865 L1040,950" fill="none" stroke="#6366f1" stroke-width="1.8" marker-end="url(#arrow-acp)"/>
-  <text x="1048" y="915" font-size="7" fill="#6366f1" font-family="system-ui, sans-serif">ACP worker prompt → AI CLI</text>
+  <path d="M600,855 L600,865 L700,865 L700,950" fill="none" stroke="#6366f1" stroke-width="1.8" marker-end="url(#arrow-acp)"/>
+  <text x="510" y="943" font-size="7" fill="#6366f1" font-family="system-ui, sans-serif">ACP manager prompt/control → AI CLI</text>
+  <path d="M1040,925 L1040,950" fill="none" stroke="#6366f1" stroke-width="1.8" marker-end="url(#arrow-acp)"/>
+  <text x="1048" y="943" font-size="7" fill="#6366f1" font-family="system-ui, sans-serif">ACP worker prompt → AI CLI</text>
 
   <!-- =================================================================== -->
   <!-- LEGEND / TAXONOMY                                                     -->
