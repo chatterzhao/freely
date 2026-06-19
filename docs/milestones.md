@@ -1,3 +1,12 @@
+## M-20260619T033758Z-A
+- title: login claude interactive slot naming + alias creation
+- status: active
+### candidate_issues
+1. `C-20260619T033758Z-A`
+- milestone: M-20260619T033758Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260619T033758Z-A/issue.md`
+
 ## M-20260618T071502Z-A
 - title: pr-merge local merge replaces gh pr merge
 - status: active
