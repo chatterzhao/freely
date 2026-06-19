@@ -1,5 +1,8 @@
 # Implementation Decision Note
 
+- owner_issue: `docs/issues/I-20260619T033758Z-A/issue.md`
+- source_candidate: `docs/pre-brainstorms/20260619T033758Z--login-claude-interactive-slot/candidates.md`
+
 ## decision
 
 修改 `docs/system/workspace/scripts/runtime/ai-cli`：新增 `_prompt_generic_login_mode` 和 `_login_account_slot` 两个函数，修改 `cmd_login` 的 claude/opencode/cc/kiro-cli 分支和 `_login_apikey_alias` 的 slot 命名逻辑，替换 settings.json 骨架。

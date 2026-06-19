@@ -1,8 +1,9 @@
 ---
 local_id: I-20260619T033758Z-A
 kind: linked
-status: in_dev
-phase_state: in_dev
+status: completed
+phase_state: completed
+completion_evidence: docs/epics/login-claude-interactive-slot/code-reviews/test-log.md
 promoted_from: raw-20260619T033758Z
 source_candidate: docs/pre-brainstorms/20260619T033758Z--login-claude-interactive-slot/candidates.md
 canonical_issue_path: ""

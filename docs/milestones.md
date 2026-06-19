@@ -10,7 +10,7 @@
 1. `I-20260619T033758Z-A`
 - title: login claude interactive slot naming + alias creation
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260619T033758Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/login-claude-interactive-slot/code-reviews`
 
