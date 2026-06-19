@@ -885,35 +885,33 @@ main() {
   [[ -d "$ISSUES_DIR" ]] || { echo "[ERROR] $ISSUES_DIR not found" >&2; exit 1; }
 
   # Guard: refuse to modify files on protected branches.
-  # Exception: 'close' is the final post-merge cleanup step — it runs on develop
-  # after pr-merge-guarded has already merged. It only writes platform_state: closed.
+  # All issue modifications must happen in worktrees (fix/* or feature/*).
+  # Callers on develop must use: issue-sync --project /path/to/worktree <action> <local_id>
   _guard_branch=$(git -C "$ROOT_DIR" rev-parse --abbrev-ref HEAD 2>/dev/null || true)
-  if [[ "$action" != "close" ]]; then
-    case "$_guard_branch" in
-      main|develop|test-pre-merge-*)
-        printf >&2 '%s\n' \
-          "[ERROR] issue-sync refuses to run on protected branch: $_guard_branch" \
-          "" \
-          "Protected branches (main, develop, test-pre-merge-*) must not be modified directly." \
-          "All code and issue changes go through worktrees:" \
-          "" \
-          "  Bug fix:   skill:freely-fix-execution" \
-          "  Feature:   skill:freely-feat-execution" \
-          "" \
-          "Workflow:" \
-          "  1. feedback → create raw issue in docs/issues/" \
-          "  2. wt-create --raw-key <key> --skill <freely-fix-execution|freely-feat-execution> --slug <slug>" \
-          "  3. Fix/develop in fix/* or feature/* worktree → git commit" \
-          "  4. pr-create-guarded → pull develop → 冲突处理 → dry-run gate → push → gh pr create" \
-          "  5. pr-merge-guarded develop <branch> → PR gate → promotion gate → merge" \
-          "  6. wt-close <branch>" \
-          "" \
-          "Or to invoke from a worktree directly:" \
-          "  issue-sync --project /path/to/worktree <action> <local_id>"
-        exit 1
-        ;;
-    esac
-  fi
+  case "$_guard_branch" in
+    main|develop|test-pre-merge-*)
+      printf >&2 '%s\n' \
+        "[ERROR] issue-sync refuses to run on protected branch: $_guard_branch" \
+        "" \
+        "Protected branches (main, develop, test-pre-merge-*) must not be modified directly." \
+        "All code and issue changes go through worktrees:" \
+        "" \
+        "  Bug fix:   skill:freely-fix-execution" \
+        "  Feature:   skill:freely-feat-execution" \
+        "" \
+        "Workflow:" \
+        "  1. feedback → create raw issue in docs/issues/" \
+        "  2. wt-create --raw-key <key> --skill <freely-fix-execution|freely-feat-execution> --slug <slug>" \
+        "  3. Fix/develop in fix/* or feature/* worktree → git commit" \
+        "  4. pr-create-guarded → pull develop → 冲突处理 → dry-run gate → push → gh pr create" \
+        "  5. pr-merge-guarded develop <branch> → PR gate → promotion gate → merge" \
+        "  6. wt-close <branch>" \
+        "" \
+        "Or to invoke from a worktree directly:" \
+        "  issue-sync --project /path/to/worktree <action> <local_id>"
+      exit 1
+      ;;
+  esac
 
   GH_REPO="${GH_REPO:-$(_gh_repo)}"
   GITEE_REPO="${GITEE_REPO:-$(_gitee_repo)}"
