@@ -5,6 +5,7 @@ phase_state: i_created
 platform_ids: {}
 primary_platform: local
 canonical_issue_path: docs/issues/I-20260619T061441Z-A/issue.md
+source_candidate: docs/pre-brainstorms/20260619T061441Z--a2a-exit-role-vs-agent-id/candidates.md
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-19T06:20:00Z'
