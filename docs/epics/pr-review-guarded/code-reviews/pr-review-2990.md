@@ -5,6 +5,8 @@
 - reviewer: cli
 - review_date: 2026-06-19T03:27:03Z
 - verdict: pass
+- issue_id: raw-20260618T094846Z
+- issue_path: docs/issues/raw-20260618T094846Z/issue.md
 
 ## 1. Worktree Check
 - status: pass
