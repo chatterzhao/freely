@@ -1,8 +1,11 @@
 ---
 issue_id: I-20260619T035704Z-A
 issue_path: docs/issues/I-20260619T035704Z-A/issue.md
-phase_state: in_verification
+phase_state: done_b2_ibm
 ---
+
+- issue_id: I-20260619T035704Z-A
+- issue_path: docs/issues/I-20260619T035704Z-A/issue.md
 
 ## Implementation Decision
 

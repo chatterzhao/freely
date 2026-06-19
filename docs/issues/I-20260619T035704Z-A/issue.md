@@ -1,10 +1,10 @@
 ---
 local_id: I-20260619T035704Z-A
 kind: linked
-phase_state: in_verification
+phase_state: done_b2_ibm
 source_raw: raw-20260619T035704Z
 source_candidate: docs/pre-brainstorms/20260619T035704Z--parse-candidate-heading-regex/candidates.md#C-20260619T035704Z-A
-verification_artifact_dir: docs/epics/parse-candidate-heading-regex
+verification_artifact_dir: docs/epics/parse-candidate-heading-regex/code-reviews
 platform_ids: {}
 primary_platform: github
 canonical_issue_path: I-20260619T035704Z-A
