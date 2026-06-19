@@ -15,9 +15,10 @@
 │  │ SSE /stream  │                       │ tasks/list --state submitted ││
 │  │ AgentCard    │                       │ tasks/get, tasks/update     ││
 │  └──────┬───────┘                       └─────────────────────────────┘│
-│         │ async WAL                                                      │
+│         │ JSON-RPC over Unix socket + WAL-backed tables                  │
 │  ┌──────▼───────┐                                                        │
-│  │ db_manager   │──► SQLite (crash recovery only)                       │
+│  │ freely-db    │──► SQLite/WAL (runtime state tables)                  │
+│  │ daemon       │    single writer: freely_db_manager.py                │
 │  └──────────────┘                                                        │
 └─────────────────────────────────────────────────────────────────────────┘
          │                                              │
@@ -51,7 +52,7 @@
       │ 4. a2a-exit ───────│─────────────────────►│                    │
       │   --state=submitted│  5. POST /tasks       │                    │
       │   --agent-id=worker│     TaskStore.save()  │                    │
-      │   --message="..."  │     → SQLite (async)  │                    │
+      │   --message="..."  │     → a2a_tasks table │                    │
       │                    │                      │                    │
       │ 6. end_turn        │                      │                    │
       │◄───────────────────│                      │                    │
@@ -97,7 +98,7 @@
 | **Agent 间协调** | A2A | Task 生命周期、Message 内容、SSE 通知 | ❌ 零文件 |
 | **AI 执行** | ACP | session/prompt、stopReason、session/ping | ✅ 临时文件（协议需要） |
 | **编排** | Freely Runtime | scan→prompt→delegate→launch→monitor | 生成临时文件 |
-| **持久化** | SQLite WAL | 崩溃恢复（异步，非协调通道） | DB 文件 |
+| **持久化** | freely-db daemon + SQLite/WAL | `freely_db_manager.py` 持有单 SQLite connection，通过 Unix socket JSON-RPC 读写 `a2a_tasks`、`chats`、`sessions`、`tool_*`、`task_mode_gate` | DB 文件 |
 
 ## 关键数据流
 

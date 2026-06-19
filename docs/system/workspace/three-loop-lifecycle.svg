@@ -1,192 +1,244 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 900" width="1400" height="900">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1200" width="1400" height="1200">
   <defs>
     <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-      <path d="M0,0 L8,3 L0,6 Z" fill="#555"/>
+      <path d="M0,0 L8,3 L0,6 Z" fill="#64748b"/>
     </marker>
-    <marker id="arrow-blue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-      <path d="M0,0 L8,3 L0,6 Z" fill="#2563eb"/>
+    <marker id="arrow-acp" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#6366f1"/>
     </marker>
-    <marker id="arrow-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-      <path d="M0,0 L8,3 L0,6 Z" fill="#16a34a"/>
+    <marker id="arrow-a2a" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#10b981"/>
+    </marker>
+    <marker id="arrow-scan" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#94a3b8"/>
+    </marker>
+    <marker id="arrow-db" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#eab308"/>
+    </marker>
+    <marker id="arrow-skill" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+      <path d="M0,0 L7,2.5 L0,5 Z" fill="#c084fc"/>
     </marker>
     <marker id="loop-arrow" markerWidth="6" markerHeight="5" refX="6" refY="2.5" orient="auto">
       <path d="M0,0 L6,2.5 L0,5 Z" fill="#888"/>
     </marker>
   </defs>
 
-  <!-- Background -->
-  <rect width="1400" height="900" fill="#fafbfc"/>
+  <rect width="1400" height="1200" fill="#fafbfc"/>
 
-  <!-- 三 loop 标签 -->
-  <text x="20" y="30" font-size="16" font-weight="bold" fill="#1e293b">Freely Three-Loop Capability Lifecycle</text>
-  <text x="20" y="52" font-size="12" fill="#64748b">feedback → wt-create → B1→B2→dev → test-pre-merge → pr-create-guarded → pr-merge-guarded → wt-close</text>
+  <!-- ===== TITLE ===== -->
+  <text x="20" y="30" font-size="16" font-weight="bold" fill="#1e293b" font-family="system-ui, sans-serif">Freely — Agent Role 驱动的能力生命周期</text>
+  <text x="20" y="50" font-size="10" fill="#64748b" font-family="system-ui, sans-serif">Runtime → ACP Bridge → AI CLI ACP Session（执行 Manager/Worker Role，装载 Skill）→ 调用 Commands / A2A / DB</text>
 
-  <!-- ===== AUTO-LOOP 泳道 ===== -->
-  <rect x="10" y="70" width="1380" height="340" rx="8" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
-  <text x="22" y="94" font-size="14" font-weight="bold" fill="#1d4ed8">auto-loop (主管调度)</text>
-  <text x="160" y="94" font-size="11" fill="#64748b">task-mode: auto / wait / listen — driven by scan + handoff</text>
+  <!-- =================================================================== -->
+  <!-- RUNTIME — 系统心跳层                                                  -->
+  <!-- =================================================================== -->
+  <rect x="15" y="70" width="1370" height="45" rx="6" fill="#f1f5f9" stroke="#64748b" stroke-width="1.5"/>
+  <rect x="25" y="58" width="300" height="20" rx="3" fill="#64748b"/>
+  <text x="175" y="71" text-anchor="middle" font-size="10" font-weight="bold" fill="white" font-family="system-ui, sans-serif">Freely Runtime — 系统心跳 (while-true)</text>
+  <text x="350" y="82" font-size="10" fill="#334155" font-family="system-ui, sans-serif">while true; do</text>
+  <text x="350" y="98" font-size="10" fill="#475569" font-family="system-ui, sans-serif">  scan pulse → 发现任务 → 启动 Agent Role   |   AI 死 → restart → 继续 scan</text>
+  <text x="350" y="112" font-size="8" fill="#94a3b8" font-family="system-ui, sans-serif">🔵 代码级循环 — Runtime 硬编码的 while-true + scan 脉冲</text>
+  <rect x="895" y="35" width="475" height="31" rx="5" fill="#fff7ed" stroke="#fb923c" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <text x="910" y="48" font-size="8.5" font-weight="bold" fill="#c2410c" font-family="system-ui, sans-serif">Human side-channel（旁路，不阻塞 loop）</text>
+  <text x="910" y="61" font-size="7.5" fill="#9a3412" font-family="system-ui, sans-serif">freely feedback→platform raw issue | freely chat→DB→issue/comment；scan 暴露</text>
+  <path d="M1130,66 L1130,86 L785,86" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow-scan)"/>
 
-  <!-- === Gate 1: Intake === -->
-  <rect x="30" y="110" width="130" height="80" rx="6" fill="white" stroke="#60a5fa" stroke-width="2"/>
-  <text x="95" y="135" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e40af">intake</text>
-  <text x="95" y="152" text-anchor="middle" font-size="10" fill="#475569">scan items</text>
-  <text x="95" y="166" text-anchor="middle" font-size="10" fill="#475569">chat / platform</text>
-  <text x="95" y="180" text-anchor="middle" font-size="9" fill="#94a3b8">阶段1</text>
+  <!-- =================================================================== -->
+  <!-- MANAGER AGENT ROLE                                                    -->
+  <!-- =================================================================== -->
+  <rect x="30" y="135" width="1340" height="265" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="2.5"/>
+  <rect x="40" y="120" width="300" height="24" rx="4" fill="#2563eb"/>
+  <text x="190" y="136" text-anchor="middle" font-size="11" font-weight="bold" fill="white" font-family="system-ui, sans-serif">Manager Agent Role（executed inside AI CLI ACP session）</text>
 
-  <line x1="160" y1="150" x2="195" y2="150" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <!-- Manager: loaded Skills -->
+  <rect x="50" y="155" width="1300" height="48" rx="6" fill="#faf5ff" stroke="#c084fc" stroke-width="1.5"/>
+  <text x="65" y="172" font-size="10" font-weight="bold" fill="#7c3aed" font-family="system-ui, sans-serif">装载的 Skill（指令程序）：</text>
+  <text x="65" y="190" font-size="9" fill="#6b21a8" font-family="system-ui, sans-serif">auto-loop-orchestrator（编排决策）| constitution-guard（硬约束检查）| laws-enforcer | context-source-skill | chat-issue-routing | milestone-planning | worktree-* | watchdog-*</text>
 
-  <!-- === Gate 2: Routing === -->
-  <rect x="200" y="110" width="130" height="80" rx="6" fill="white" stroke="#60a5fa" stroke-width="2"/>
-  <text x="265" y="135" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e40af">routing</text>
-  <text x="265" y="152" text-anchor="middle" font-size="10" fill="#475569">freely feedback</text>
-  <text x="265" y="166" text-anchor="middle" font-size="10" fill="#475569">wt-create</text>
-  <text x="265" y="180" text-anchor="middle" font-size="9" fill="#94a3b8">阶段2-3</text>
+  <!-- Manager: decision cycle (left) -->
+  <rect x="50" y="215" width="600" height="95" rx="6" fill="white" stroke="#60a5fa" stroke-width="1.5"/>
+  <text x="65" y="235" font-size="10" font-weight="bold" fill="#1d4ed8" font-family="system-ui, sans-serif">Skill 定义的行为循环：</text>
+  <text x="65" y="255" font-size="9" fill="#475569" font-family="system-ui, sans-serif">scan pulse → 读取 scan artifact（platform raw / chat DB interruption / A2A state）</text>
+  <text x="65" y="272" font-size="9" fill="#475569" font-family="system-ui, sans-serif">├─ platform raw 或 chat new-issue → wt-create → A2A dispatch 给 Worker</text>
+  <text x="65" y="289" font-size="9" fill="#475569" font-family="system-ui, sans-serif">├─ chat comment → issue comment / re-activate；Worker done → closeout / merge</text>
+  <text x="65" y="306" font-size="9" fill="#475569" font-family="system-ui, sans-serif">└─ 无事可做 → stop_ai → 等下一轮 scan</text>
+  <text x="480" y="295" font-size="8" fill="#a855f7" font-family="system-ui, sans-serif">🟣 Skill 行为模式 — auto-loop-orchestrator 注入 prompt 指导 Agent 决策</text>
 
-  <line x1="330" y1="150" x2="365" y2="150" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <!-- Manager: gate chain (right) -->
+  <rect x="670" y="215" width="680" height="95" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="685" y="235" font-size="10" font-weight="bold" fill="#475569" font-family="system-ui, sans-serif">收口门禁链（Manager Role 按 Skill 指令依次调用）：</text>
+  <rect x="685" y="248" width="75" height="26" rx="4" fill="white" stroke="#94a3b8" stroke-width="1"/>
+  <text x="722" y="265" text-anchor="middle" font-size="8" font-weight="bold" fill="#475569" font-family="system-ui, sans-serif">test gate</text>
+  <line x1="760" y1="261" x2="775" y2="261" stroke="#94a3b8" stroke-width="1"/>
+  <rect x="778" y="248" width="70" height="26" rx="4" fill="white" stroke="#94a3b8" stroke-width="1"/>
+  <text x="813" y="265" text-anchor="middle" font-size="8" font-weight="bold" fill="#475569" font-family="system-ui, sans-serif">pr-create</text>
+  <line x1="848" y1="261" x2="863" y2="261" stroke="#94a3b8" stroke-width="1"/>
+  <rect x="866" y="248" width="70" height="26" rx="4" fill="white" stroke="#94a3b8" stroke-width="1"/>
+  <text x="901" y="265" text-anchor="middle" font-size="8" font-weight="bold" fill="#475569" font-family="system-ui, sans-serif">pr-review</text>
+  <line x1="936" y1="261" x2="951" y2="261" stroke="#94a3b8" stroke-width="1"/>
+  <rect x="954" y="248" width="55" height="26" rx="4" fill="white" stroke="#94a3b8" stroke-width="1"/>
+  <text x="981" y="265" text-anchor="middle" font-size="8" font-weight="bold" fill="#475569" font-family="system-ui, sans-serif">CI</text>
+  <line x1="1009" y1="261" x2="1024" y2="261" stroke="#94a3b8" stroke-width="1"/>
+  <rect x="1027" y="248" width="65" height="26" rx="4" fill="white" stroke="#94a3b8" stroke-width="1"/>
+  <text x="1059" y="265" text-anchor="middle" font-size="8" font-weight="bold" fill="#475569" font-family="system-ui, sans-serif">pr-merge</text>
+  <line x1="1092" y1="261" x2="1107" y2="261" stroke="#94a3b8" stroke-width="1"/>
+  <rect x="1110" y="248" width="65" height="26" rx="4" fill="white" stroke="#94a3b8" stroke-width="1"/>
+  <text x="1142" y="265" text-anchor="middle" font-size="8" font-weight="bold" fill="#475569" font-family="system-ui, sans-serif">closeout</text>
+  <text x="685" y="295" font-size="8" fill="#f59e0b" font-family="system-ui, sans-serif">🟠 门禁报错循环 — gate fail → exit 1 + 报错信息指导 Agent 调哪个 Skill/命令 → 修复 → 重试</text>
 
-  <!-- === Gate 3: Dispatch === -->
-  <rect x="370" y="110" width="150" height="80" rx="6" fill="white" stroke="#60a5fa" stroke-width="2"/>
-  <text x="445" y="135" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e40af">dispatch</text>
-  <text x="445" y="152" text-anchor="middle" font-size="10" fill="#475569">scan next_action</text>
-  <text x="445" y="166" text-anchor="middle" font-size="10" fill="#475569">delegate_workers</text>
-  <text x="445" y="180" text-anchor="middle" font-size="9" fill="#94a3b8">阶段4-6入口</text>
+  <!-- Manager: exit/continuation -->
+  <rect x="50" y="325" width="1300" height="60" rx="5" fill="#f0fdf4" stroke="#86efac" stroke-width="1"/>
+  <text x="65" y="345" font-size="9" fill="#065f46" font-family="system-ui, sans-serif">产出：scan artifact 供下一轮消费 → 通过 A2A 委派 Worker → 收口 closeout 后 wt-close 清理工位 → 下一轮 scan 继续</text>
+  <text x="65" y="363" font-size="9" fill="#065f46" font-family="system-ui, sans-serif">重启点：Manager Role 会话中断 → Runtime restart → scan 从 scan artifact / A2A 任务状态恢复 → 继续判断，无缝衔接</text>
 
-  <!-- Dispatch 分叉 -->
-  <line x1="520" y1="150" x2="560" y2="150" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <!-- =================================================================== -->
+  <!-- WORKER AGENT ROLE                                                     -->
+  <!-- =================================================================== -->
+  <rect x="30" y="420" width="1340" height="215" rx="10" fill="#fef2f2" stroke="#dc2626" stroke-width="2.5"/>
+  <rect x="40" y="405" width="380" height="24" rx="4" fill="#dc2626"/>
+  <text x="230" y="421" text-anchor="middle" font-size="11" font-weight="bold" fill="white" font-family="system-ui, sans-serif">Worker Agent Role（executed inside AI CLI ACP session，可多实例并行）</text>
 
-  <!-- === Gate 4: Test Gate === -->
-  <rect x="565" y="110" width="140" height="80" rx="6" fill="white" stroke="#16a34a" stroke-width="2"/>
-  <text x="635" y="135" text-anchor="middle" font-size="12" font-weight="bold" fill="#166534">test gate</text>
-  <text x="635" y="152" text-anchor="middle" font-size="10" fill="#475569">merge→test-</text>
-  <text x="635" y="166" text-anchor="middle" font-size="10" fill="#475569">pre-merge→e2e</text>
-  <text x="635" y="180" text-anchor="middle" font-size="9" fill="#94a3b8">阶段7</text>
+  <!-- Worker: loaded Skills -->
+  <rect x="50" y="440" width="1300" height="40" rx="6" fill="#faf5ff" stroke="#c084fc" stroke-width="1"/>
+  <text x="65" y="457" font-size="10" font-weight="bold" fill="#7c3aed" font-family="system-ui, sans-serif">装载的 Skill：</text>
+  <text x="65" y="473" font-size="9" fill="#6b21a8" font-family="system-ui, sans-serif">doc-B1_IBM-execution（预研）| doc-B2_IBM-execution（设计）| dev-loop-execution（实现+测试）| fix-execution（修复）| branch-management（工位管理）</text>
 
-  <!-- Test gate inner loop -->
-  <path d="M570,195 C570,225 700,225 700,195" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#loop-arrow)"/>
-  <text x="635" y="218" text-anchor="middle" font-size="9" fill="#888">↻ fail → back to dev-loop</text>
+  <!-- Worker: doc-loop (left) -->
+  <rect x="50" y="492" width="600" height="132" rx="6" fill="white" stroke="#4ade80" stroke-width="1.5"/>
+  <text x="65" y="512" font-size="10" font-weight="bold" fill="#166534" font-family="system-ui, sans-serif">doc-loop（scan 发现需维护 doc 的节点时触发）</text>
+  <rect x="65" y="522" width="270" height="48" rx="4" fill="#f0fdf4" stroke="#86efac" stroke-width="1"/>
+  <text x="200" y="540" text-anchor="middle" font-size="9" font-weight="bold" fill="#15803d" font-family="system-ui, sans-serif">B1_IBM（阶段4）</text>
+  <text x="200" y="558" text-anchor="middle" font-size="8" fill="#475569" font-family="system-ui, sans-serif">brainstorm → converge → candidate</text>
+  <line x1="335" y1="546" x2="355" y2="546" stroke="#64748b" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <rect x="360" y="522" width="270" height="48" rx="4" fill="#f0fdf4" stroke="#86efac" stroke-width="1"/>
+  <text x="495" y="540" text-anchor="middle" font-size="9" font-weight="bold" fill="#15803d" font-family="system-ui, sans-serif">B2_IBM（阶段5）</text>
+  <text x="495" y="558" text-anchor="middle" font-size="8" fill="#475569" font-family="system-ui, sans-serif">prd → pre-tests → tasks → done_b2_ibm</text>
+  <!-- doc-loop internal retry -->
+  <path d="M80,575 C80,586 345,586 345,575" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#loop-arrow)"/>
+  <text x="212" y="583" text-anchor="middle" font-size="7.5" fill="#888" font-family="system-ui, sans-serif">↻ B1边界未稳继续 | B2设计未ready继续</text>
+  <rect x="65" y="592" width="570" height="22" rx="4" fill="#fefce8" stroke="#eab308" stroke-width="0.8"/>
+  <text x="75" y="607" font-size="8" fill="#a16207" font-family="system-ui, sans-serif">🟠 门禁报错循环：gate fail → 报错信息指定调用哪个命令/调哪个 Skill → Agent 修复 → 重试 gate</text>
 
-  <line x1="705" y1="150" x2="740" y2="150" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <!-- Worker: dev-loop (right) -->
+  <rect x="670" y="492" width="680" height="132" rx="6" fill="white" stroke="#f87171" stroke-width="1.5"/>
+  <text x="685" y="512" font-size="10" font-weight="bold" fill="#991b1b" font-family="system-ui, sans-serif">dev-loop（doc 完成后，Manager Role dispatch 触发）</text>
+  <rect x="685" y="522" width="300" height="48" rx="4" fill="#fef2f2" stroke="#fca5a5" stroke-width="1"/>
+  <text x="835" y="540" text-anchor="middle" font-size="9" font-weight="bold" fill="#b91c1c" font-family="system-ui, sans-serif">implement（阶段6）</text>
+  <text x="835" y="558" text-anchor="middle" font-size="8" fill="#475569" font-family="system-ui, sans-serif">写代码 → feature-local 测试</text>
+  <line x1="985" y1="546" x2="1005" y2="546" stroke="#64748b" stroke-width="1.2" marker-end="url(#arrow)"/>
+  <rect x="1010" y="522" width="320" height="48" rx="4" fill="#fef2f2" stroke="#fca5a5" stroke-width="1"/>
+  <text x="1170" y="540" text-anchor="middle" font-size="9" font-weight="bold" fill="#b91c1c" font-family="system-ui, sans-serif">evidence（阶段6）</text>
+  <text x="1170" y="558" text-anchor="middle" font-size="8" fill="#475569" font-family="system-ui, sans-serif">progress → code-review → in_verification</text>
+  <!-- dev-loop internal retry -->
+  <path d="M700,575 C700,586 970,586 970,575" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#loop-arrow)"/>
+  <text x="835" y="583" text-anchor="middle" font-size="7.5" fill="#888" font-family="system-ui, sans-serif">↻ test 不通过 → fix → re-test</text>
+  <rect x="685" y="592" width="650" height="22" rx="4" fill="#fefce8" stroke="#eab308" stroke-width="0.8"/>
+  <text x="695" y="607" font-size="8" fill="#a16207" font-family="system-ui, sans-serif">🟠 门禁报错循环：pr-create / pr-merge fail → 报错信息指导调用 skill:doc-B1/B2 或更新 metadata → 修复 → 重试</text>
 
-  <!-- === Gate 5: PR-Create === -->
-  <rect x="745" y="110" width="140" height="80" rx="6" fill="white" stroke="#2563eb" stroke-width="2"/>
-  <text x="815" y="135" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e40af">pr-create</text>
-  <text x="815" y="152" text-anchor="middle" font-size="10" fill="#475569">pr-create-guarded</text>
-  <text x="815" y="166" text-anchor="middle" font-size="10" fill="#475569">pull→dry-run→push→PR</text>
-  <text x="815" y="180" text-anchor="middle" font-size="9" fill="#94a3b8">阶段8</text>
+  <!-- =================================================================== -->
+  <!-- COMMANDS / TOOLS — 工具层                                             -->
+  <!-- =================================================================== -->
+  <rect x="30" y="660" width="1340" height="55" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <rect x="40" y="648" width="240" height="20" rx="3" fill="#94a3b8"/>
+  <text x="160" y="661" text-anchor="middle" font-size="10" font-weight="bold" fill="white" font-family="system-ui, sans-serif">Commands — Skill 调用的封装工具</text>
+  <text x="310" y="678" font-size="9" fill="#475569" font-family="system-ui, sans-serif">wt-create</text>
+  <text x="410" y="678" font-size="9" fill="#475569" font-family="system-ui, sans-serif">pr-create-guarded</text>
+  <text x="560" y="678" font-size="9" fill="#475569" font-family="system-ui, sans-serif">pr-review-guarded</text>
+  <text x="720" y="678" font-size="9" fill="#475569" font-family="system-ui, sans-serif">pr-merge-guarded</text>
+  <text x="880" y="678" font-size="9" fill="#475569" font-family="system-ui, sans-serif">wt-close</text>
+  <text x="980" y="678" font-size="9" fill="#475569" font-family="system-ui, sans-serif">a2a-exit</text>
+  <text x="1080" y="678" font-size="9" fill="#475569" font-family="system-ui, sans-serif">task-source-scan</text>
+  <text x="300" y="700" font-size="8" fill="#f59e0b" font-family="system-ui, sans-serif">🟠 所有 gate 脚本统一的循环机制：fail → exit 1 + stderr 报错信息明确指定下一步执行什么命令/调哪个 Skill → Agent 执行 → 重试 gate</text>
 
-  <!-- PR-create inner loop -->
-  <path d="M750,195 C750,225 880,225 880,195" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#loop-arrow)"/>
-  <text x="815" y="218" text-anchor="middle" font-size="9" fill="#888">↻ conflict/gate fail → resolve</text>
+  <!-- =================================================================== -->
+  <!-- ACP / A2A — 通信基础设施                                              -->
+  <!-- =================================================================== -->
+  <rect x="30" y="735" width="660" height="120" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.8"/>
+  <rect x="40" y="723" width="280" height="20" rx="3" fill="#6366f1"/>
+  <text x="180" y="736" text-anchor="middle" font-size="10" font-weight="bold" fill="white" font-family="system-ui, sans-serif">ACP — 会话通道（Freely ↔ AI CLI Tool）</text>
+  <text x="45" y="760" font-size="9" fill="#4338ca" font-family="system-ui, sans-serif">session/new|session/resume 只建/恢复 session；payload 总是通过 session/prompt 发送</text>
+  <text x="45" y="778" font-size="9" fill="#475569" font-family="system-ui, sans-serif">fresh/fork: session/new + full session/prompt（role+skills 在 prompt 文本里）；fork 不是 ACP 方法</text>
+  <text x="45" y="796" font-size="9" fill="#475569" font-family="system-ui, sans-serif">resume/prompt: existing/resumed session + delta session/prompt（scan/A2A/turn updates）</text>
+  <text x="45" y="814" font-size="9" fill="#475569" font-family="system-ui, sans-serif">空闲超时: 900s — 崩溃恢复: _ensure_server_alive + _restart_server</text>
+  <text x="45" y="835" font-size="8" fill="#94a3b8" font-family="system-ui, sans-serif">ACP 是 Freely Runtime 与 AI CLI Tool 之间的 session/prompt/control 通道，不是 Agent 间通信</text>
 
-  <line x1="885" y1="150" x2="920" y2="150" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="710" y="735" width="660" height="120" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="1.8"/>
+  <rect x="720" y="723" width="300" height="20" rx="3" fill="#10b981"/>
+  <text x="870" y="736" text-anchor="middle" font-size="10" font-weight="bold" fill="white" font-family="system-ui, sans-serif">A2A — Agent 间任务协调（Manager ↔ Worker）</text>
+  <text x="725" y="760" font-size="9" fill="#065f46" font-family="system-ui, sans-serif">Task 状态机: submitted → working → completed | failed | input-required | pending-input</text>
+  <text x="725" y="778" font-size="9" fill="#475569" font-family="system-ui, sans-serif">Manager 委派: a2a-exit --state submitted → A2A Server 存 task（含 message/prompt_file/worktree 等载荷）</text>
+  <text x="725" y="796" font-size="9" fill="#475569" font-family="system-ui, sans-serif">Runtime tasks/list 发现 → 读取 Task.message/prompt_file → ACP Bridge 启 Worker ACP session</text>
+  <text x="725" y="814" font-size="9" fill="#475569" font-family="system-ui, sans-serif">Worker 完成: a2a-exit completed → SSE 通知 Manager → Manager 下一轮 patrol 感知并收口</text>
+  <text x="725" y="835" font-size="8" fill="#94a3b8" font-family="system-ui, sans-serif">A2A 存任务状态与任务载荷/提示入口，Runtime 负责将其转化为 Worker 启动，A2A 不直接执行 Worker</text>
 
-  <!-- === Gate 6: PR Review === -->
-  <rect x="925" y="110" width="120" height="80" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
-  <text x="985" y="135" text-anchor="middle" font-size="12" font-weight="bold" fill="#92400e">PR review</text>
-  <text x="985" y="152" text-anchor="middle" font-size="10" fill="#475569">CI check</text>
-  <text x="985" y="166" text-anchor="middle" font-size="10" fill="#475569">approval</text>
-  <text x="985" y="180" text-anchor="middle" font-size="9" fill="#94a3b8">阶段9 · 外部</text>
+  <!-- A2A flow between Manager Agent Role and Worker Agent Role -->
+  <path d="M1115,385 L1115,420" fill="none" stroke="#10b981" stroke-width="1.7" stroke-dasharray="6,3" marker-end="url(#arrow-a2a)"/>
+  <text x="1125" y="410" font-size="7" fill="#10b981" font-family="system-ui, sans-serif">A2A task coordination</text>
 
-  <line x1="1045" y1="150" x2="1080" y2="150" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <!-- =================================================================== -->
+  <!-- DB + RUNTIME BRIDGE — 持久化与启动                                     -->
+  <!-- =================================================================== -->
+  <rect x="30" y="875" width="660" height="50" rx="6" fill="#fefce8" stroke="#eab308" stroke-width="1.5"/>
+  <rect x="40" y="863" width="180" height="20" rx="3" fill="#eab308"/>
+  <text x="130" y="876" text-anchor="middle" font-size="10" font-weight="bold" fill="white" font-family="system-ui, sans-serif">freely-db + SQLite/WAL</text>
+  <text x="240" y="890" font-size="9" fill="#475569" font-family="system-ui, sans-serif">DB 守护进程 (freely_db_manager.py) — single-writer, Unix socket JSON-RPC</text>
+  <text x="240" y="910" font-size="9" fill="#854d0e" font-family="system-ui, sans-serif">a2a_tasks（委派状态+载荷）| chats（freely chat 插话/评论）| sessions（ACP session）| tool_*（工具切换）| task_mode_gate（模式）</text>
 
-  <!-- === Gate 7: PR-Merge === -->
-  <rect x="1085" y="110" width="140" height="80" rx="6" fill="white" stroke="#2563eb" stroke-width="2"/>
-  <text x="1155" y="135" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e40af">pr-merge</text>
-  <text x="1155" y="152" text-anchor="middle" font-size="10" fill="#475569">pr-merge-guarded</text>
-  <text x="1155" y="166" text-anchor="middle" font-size="10" fill="#475569">PR→promo→merge→push</text>
-  <text x="1155" y="180" text-anchor="middle" font-size="9" fill="#94a3b8">阶段10</text>
+  <rect x="710" y="875" width="660" height="50" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="725" y="895" font-size="9" fill="#475569" font-family="system-ui, sans-serif">Runtime bridge（task launcher）: reads a2a_tasks → builds prompt file → ACP Bridge starts Worker ACP session</text>
+  <text x="725" y="912" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">scan artifact 汇入 platform raw、chat DB interruption、A2A task state，被下一轮 scan pulse 消费</text>
 
-  <!-- PR-merge inner loop -->
-  <path d="M1090,195 C1090,225 1220,225 1220,195" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#loop-arrow)"/>
-  <text x="1155" y="218" text-anchor="middle" font-size="9" fill="#888">↻ gate fail → back to dev-loop</text>
+  <!-- DB arrows -->
+  <line x1="255" y1="855" x2="255" y2="875" stroke="#eab308" stroke-width="1.2" marker-end="url(#arrow-db)"/>
+  <text x="265" y="870" font-size="7" fill="#a16207" font-family="system-ui, sans-serif">sessions/tool_*</text>
+  <line x1="900" y1="855" x2="330" y2="875" stroke="#eab308" stroke-width="1.2" marker-end="url(#arrow-db)"/>
+  <text x="550" y="870" font-size="7" fill="#a16207" font-family="system-ui, sans-serif">a2a_tasks/chats</text>
 
-  <line x1="1225" y1="150" x2="1260" y2="150" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <!-- =================================================================== -->
+  <!-- AI CLI TOOL — 外部执行环境                                            -->
+  <!-- =================================================================== -->
+  <rect x="30" y="950" width="1340" height="65" rx="8" fill="#f3f4f6" stroke="#6b7280" stroke-width="2" stroke-dasharray="6,3"/>
+  <rect x="40" y="938" width="200" height="20" rx="3" fill="#6b7280"/>
+  <text x="140" y="951" text-anchor="middle" font-size="10" font-weight="bold" fill="white" font-family="system-ui, sans-serif">AI CLI Tool — 外部执行环境</text>
+  <text x="260" y="968" font-size="9" fill="#374151" font-family="system-ui, sans-serif">Claude ACP family / codex-acp / opencode acp — Manager ACP Session（接收 prompt，执行 Manager Role，返回 stopReason）</text>
+  <text x="260" y="986" font-size="9" fill="#374151" font-family="system-ui, sans-serif">cc / kiro-cli / iflow → Claude ACP family by registry — Worker ACP Session（launch_kind=fork 仍用 session/new 独立会话）</text>
+  <text x="260" y="1004" font-size="8" fill="#94a3b8" font-family="system-ui, sans-serif">ACP Bridge → AI CLI（new/resume → session/prompt full|delta）→ stopReason → Runtime 读 exit_kind → 继续</text>
 
-  <!-- === Gate 8: Closeout === -->
-  <rect x="1265" y="110" width="110" height="80" rx="6" fill="#dbeafe" stroke="#93c5fd" stroke-width="2"/>
-  <text x="1320" y="135" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e40af">closeout</text>
-  <text x="1320" y="152" text-anchor="middle" font-size="10" fill="#475569">wt-close</text>
-  <text x="1320" y="166" text-anchor="middle" font-size="10" fill="#475569">issue-sync close</text>
-  <text x="1320" y="180" text-anchor="middle" font-size="9" fill="#94a3b8">阶段11</text>
+  <!-- ACP arrows: Runtime/ACP Bridge sends session/prompt/control to AI CLI Tool -->
+  <path d="M600,855 L600,865 L700,865 L700,950" fill="none" stroke="#6366f1" stroke-width="1.8" marker-end="url(#arrow-acp)"/>
+  <text x="510" y="943" font-size="7" fill="#6366f1" font-family="system-ui, sans-serif">ACP manager prompt/control → AI CLI</text>
+  <path d="M1040,925 L1040,950" fill="none" stroke="#6366f1" stroke-width="1.8" marker-end="url(#arrow-acp)"/>
+  <text x="1048" y="943" font-size="7" fill="#6366f1" font-family="system-ui, sans-serif">ACP worker prompt → AI CLI</text>
 
-  <!-- Closeout 回到 intake -->
-  <path d="M1320,190 L1320,340 Q1320,360 1300,360 L95,360 Q75,360 75,340 L75,195" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrow)"/>
-  <text x="700" y="378" text-anchor="middle" font-size="10" fill="#94a3b8">下一轮 scan</text>
+  <!-- =================================================================== -->
+  <!-- LEGEND / TAXONOMY                                                     -->
+  <!-- =================================================================== -->
+  <rect x="30" y="1040" width="1340" height="145" rx="6" fill="white" stroke="#e2e8f0" stroke-width="1"/>
 
-  <!-- ===== DOC-LOOP 泳道 ===== -->
-  <rect x="30" y="440" width="430" height="240" rx="8" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
-  <text x="42" y="464" font-size="14" font-weight="bold" fill="#15803d">doc-loop (文档设计)</text>
-  <text x="220" y="464" font-size="11" fill="#64748b">触发: auto-loop dispatch → worker → B1/B2</text>
+  <text x="50" y="1062" font-size="11" font-weight="bold" fill="#334155" font-family="system-ui, sans-serif">执行链路</text>
+  <text x="50" y="1080" font-size="9" fill="#475569" font-family="system-ui, sans-serif">Runtime → ACP Bridge → AI CLI ACP Session（执行 Manager/Worker Role，装载 Skill）→ 调用 Commands / A2A / DB</text>
 
-  <!-- B1 -->
-  <rect x="50" y="485" width="180" height="100" rx="6" fill="white" stroke="#4ade80" stroke-width="2"/>
-  <text x="140" y="508" text-anchor="middle" font-size="12" font-weight="bold" fill="#166534">B1_IBM</text>
-  <text x="140" y="525" text-anchor="middle" font-size="10" fill="#475569">brainstorm → converge</text>
-  <text x="140" y="540" text-anchor="middle" font-size="10" fill="#475569">candidate → promote</text>
-  <text x="140" y="557" text-anchor="middle" font-size="9" fill="#94a3b8">阶段4</text>
-  <path d="M55,590 C55,615 225,615 225,590" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#loop-arrow)"/>
-  <text x="140" y="608" text-anchor="middle" font-size="9" fill="#888">↻ 边界未稳 → 继续</text>
+  <text x="50" y="1108" font-size="11" font-weight="bold" fill="#334155" font-family="system-ui, sans-serif">三种循环机制</text>
+  <rect x="50" y="1118" width="14" height="11" rx="2" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="70" y="1127" font-size="9" fill="#475569" font-family="system-ui, sans-serif">🔵 代码级循环 — Runtime while-true + scan 脉冲（硬编码，不依赖 Skill）</text>
+  <rect x="550" y="1118" width="14" height="11" rx="2" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="570" y="1127" font-size="9" fill="#475569" font-family="system-ui, sans-serif">🟠 门禁报错循环 — gate fail → exit 1 + 报错给出具体命令/Skill 名 → Agent 修复 → 重试 gate</text>
+  <rect x="1020" y="1118" width="14" height="11" rx="2" fill="#faf5ff" stroke="#a855f7"/>
+  <text x="1040" y="1127" font-size="9" fill="#475569" font-family="system-ui, sans-serif">🟣 Skill 行为循环 — Skill 注入 prompt 指导 Agent "当 X 发生就做 Y"</text>
 
-  <line x1="230" y1="535" x2="260" y2="535" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
-
-  <!-- B2 -->
-  <rect x="265" y="485" width="180" height="100" rx="6" fill="white" stroke="#4ade80" stroke-width="2"/>
-  <text x="355" y="508" text-anchor="middle" font-size="12" font-weight="bold" fill="#166534">B2_IBM</text>
-  <text x="355" y="525" text-anchor="middle" font-size="10" fill="#475569">design → pre-tests</text>
-  <text x="355" y="540" text-anchor="middle" font-size="10" fill="#475569">prd / tasks / reviews</text>
-  <text x="355" y="557" text-anchor="middle" font-size="9" fill="#94a3b8">阶段5</text>
-  <path d="M270,590 C270,615 440,615 440,590" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#loop-arrow)"/>
-  <text x="355" y="608" text-anchor="middle" font-size="9" fill="#888">↻ 未 ready → 继续设计</text>
-
-  <!-- doc-loop → dispatch → dev-loop 顺序路由 -->
-  <text x="245" y="650" text-anchor="middle" font-size="10" fill="#16a34a">↓ return to auto-loop dispatch</text>
-  <text x="245" y="668" text-anchor="middle" font-size="9" fill="#64748b">dispatch 顺序路由: doc-loop → dev-loop (串行)</text>
-
-  <!-- ===== DEV-LOOP 泳道 ===== -->
-  <rect x="490" y="440" width="430" height="240" rx="8" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.5"/>
-  <text x="502" y="464" font-size="14" font-weight="bold" fill="#b91c1c">dev-loop (开发实现)</text>
-  <text x="680" y="464" font-size="11" fill="#64748b">触发: auto-loop dispatch → worker → dev-loop-execution</text>
-
-  <!-- Implement -->
-  <rect x="510" y="485" width="180" height="90" rx="6" fill="white" stroke="#f87171" stroke-width="2"/>
-  <text x="600" y="508" text-anchor="middle" font-size="12" font-weight="bold" fill="#991b1b">implement</text>
-  <text x="600" y="525" text-anchor="middle" font-size="10" fill="#475569">写代码 → test-lane</text>
-  <text x="600" y="540" text-anchor="middle" font-size="10" fill="#475569">feature-local</text>
-  <text x="600" y="555" text-anchor="middle" font-size="9" fill="#94a3b8">阶段6</text>
-  <path d="M515,580 C515,600 685,600 685,580" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#loop-arrow)"/>
-  <text x="600" y="596" text-anchor="middle" font-size="9" fill="#888">↻ fail → fix → re-test</text>
-
-  <line x1="690" y1="530" x2="720" y2="530" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
-
-  <!-- Evidence -->
-  <rect x="725" y="485" width="180" height="90" rx="6" fill="white" stroke="#f87171" stroke-width="2"/>
-  <text x="815" y="508" text-anchor="middle" font-size="12" font-weight="bold" fill="#991b1b">evidence</text>
-  <text x="815" y="525" text-anchor="middle" font-size="10" fill="#475569">progress → code-review</text>
-  <text x="815" y="540" text-anchor="middle" font-size="10" fill="#475569">implementation note</text>
-  <text x="815" y="555" text-anchor="middle" font-size="9" fill="#94a3b8">阶段6</text>
-
-  <!-- dev-loop 返回 auto -->
-  <text x="705" y="660" text-anchor="middle" font-size="10" fill="#b91c1c">↓ return to auto-loop test gate</text>
-
-  <!-- ===== 命令封装说明 ===== -->
-  <rect x="30" y="710" width="1340" height="80" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
-  <text x="50" y="735" font-size="12" font-weight="bold" fill="#475569">命令封装（gate 命令名 → 内部调用）:</text>
-  <text x="50" y="758" font-size="10" fill="#64748b">wt-create → git fetch + update-ref + worktree add + test-pre-merge worktree</text>
-  <text x="50" y="775" font-size="10" fill="#64748b">pr-create-guarded → git pull develop + pr-merge-guarded --dry-run + git push + gh pr create</text>
-  <text x="800" y="758" font-size="10" fill="#64748b">pr-merge-guarded → fetch + validate direction + PR gate + promotion gate + git merge --no-ff + issue-sync + develop-push</text>
-  <text x="800" y="775" font-size="10" fill="#64748b">wt-close → issue-sync close + milestone update + git branch -d + git push --delete + worktree remove</text>
-
-  <!-- 图例 -->
-  <rect x="30" y="805" width="1340" height="55" rx="6" fill="white" stroke="#e2e8f0" stroke-width="1"/>
-  <text x="50" y="828" font-size="11" font-weight="bold" fill="#475569">inner loops:</text>
-  <path d="M140,823 C140,845 240,845 240,823" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#loop-arrow)"/>
-  <text x="250" y="828" font-size="10" fill="#888">↻ 内部小循环（fail → fix → retry）</text>
-  <text x="500" y="828" font-size="11" font-weight="bold" fill="#475569">colors:</text>
-  <rect x="550" y="818" width="16" height="12" rx="2" fill="#eff6ff" stroke="#93c5fd" stroke-width="1"/>
-  <text x="572" y="828" font-size="10" fill="#64748b">auto</text>
-  <rect x="610" y="818" width="16" height="12" rx="2" fill="#f0fdf4" stroke="#86efac" stroke-width="1"/>
-  <text x="632" y="828" font-size="10" fill="#64748b">doc</text>
-  <rect x="670" y="818" width="16" height="12" rx="2" fill="#fef2f2" stroke="#fca5a5" stroke-width="1"/>
-  <text x="692" y="828" font-size="10" fill="#64748b">dev</text>
-  <text x="780" y="828" font-size="10" fill="#94a3b8">━━ dash = 流程主线&nbsp;&nbsp;--- dash = 回环</text>
+  <text x="50" y="1155" font-size="10" font-weight="bold" fill="#334155" font-family="system-ui, sans-serif">颜色</text>
+  <rect x="90" y="1147" width="14" height="11" rx="2" fill="#eff6ff" stroke="#2563eb"/>
+  <text x="108" y="1156" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">Manager Role</text>
+  <rect x="205" y="1147" width="14" height="11" rx="2" fill="#fef2f2" stroke="#dc2626"/>
+  <text x="223" y="1156" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">Worker Role</text>
+  <rect x="315" y="1147" width="14" height="11" rx="2" fill="#faf5ff" stroke="#c084fc"/>
+  <text x="333" y="1156" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">Skill（指令程序）</text>
+  <rect x="438" y="1147" width="14" height="11" rx="2" fill="#eef2ff" stroke="#6366f1"/>
+  <text x="456" y="1156" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">ACP（会话通道）</text>
+  <rect x="567" y="1147" width="14" height="11" rx="2" fill="#ecfdf5" stroke="#10b981"/>
+  <text x="585" y="1156" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">A2A（任务协调）</text>
+  <rect x="690" y="1147" width="14" height="11" rx="2" fill="#f3f4f6" stroke="#6b7280"/>
+  <text x="708" y="1156" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">AI CLI Tool（外部）</text>
+  <rect x="835" y="1147" width="14" height="11" rx="2" fill="#fff7ed" stroke="#fb923c"/>
+  <text x="853" y="1156" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">Human side-channel</text>
 </svg>

@@ -50,7 +50,7 @@
 1. 分支来源、merge 方向、保护分支策略符合宪法分支表。
 2. `feature/*` 默认从 `develop` 创建并在 worktree 内开发；若 issue 明确依赖未合并父分支改动，可从父 `feature/*` 派生 dedicated worktree，但必须记录依赖关系与最终集成目标。
 3. `main/develop/test-pre-merge-*` 保持 add/commit 禁止；`test-pre-merge-*` 还必须禁止 push。
-4. `develop` 合并前，`TEST`（含集成验收）通过；`develop` 的正常合法来源是 `test-pre-merge-*` family 与 `hotfix/*`。若走 `test-pre-merge-*` 路径，当前批次必须可追溯到 single-feature lane 或 explicit multi-bundle 的来源 feature、source shas、merge order 与 base develop sha。
+4. `develop` 合并前，`TEST`（含集成验收）通过；`develop` 的正常合法来源是已通过 guarded PR/merge 的来源 `feature/*` / `fix/*` 与符合热修复规则的 `hotfix/*`。若经过 `test-pre-merge-*` 验证，当前批次必须可追溯到 single-feature lane 或 explicit multi-bundle 的来源 feature、source shas、merge order 与 base develop sha，但 `test-pre-merge-*` 本身不得作为 develop merge source。
 4b. `test-pre-merge-*` 只承担主线前的临时验证职责，不承担“在 `develop` 上先预测试”的替代语义；需要主线前验证时，应进入新的 `test-pre-merge-*` 批次，需要主线后真实环境验收时，才进入 `develop` 的 completion verification。
 4d. `develop` 在本地 merge 后允许存在短暂的 post-merge acceptance / cleanup followthrough 窗口；但若本地 `develop` 已领先其 tracked remote，这段窗口必须以显式的 status / patrol truth 暴露，不得静默假装已经完成远端 canonical followthrough。
 4a. 当 issue 已有 `pre-tests.md` 时，develop 合并 gate 默认优先看其中定义的 integration / acceptance evidence；代码评审完成度不得替代这层验收。
@@ -77,11 +77,11 @@
 12. runtime/status 必须暴露当前 project dirty entries 与项目级 worktree dirty summary，供多 worktree 监督与 promotion 决策使用。
 13. 若当前工位已通过最小验证门，但仍持续扩写实现而不形成 checkpoint commit / checkpoint note，视为自治治理退化，不得宣称“工作正常”。
 14. `test-pre-merge-*` 作为临时预集成批次时，若 `develop` 已前进到使其不再权威、或批次出现 protected-env 独有差异、或 promotion/cleanup 证据断裂，则该批次应被判定为 stale 并立即删除；若仍需继续验证，必须从当前 `develop` 重建新批次。
-15. `test-pre-merge-*` 的 promotion 默认回到来源 feature 的已验证结果；保留旧批次快照不是默认真相面，只有在当前批次仍然权威时才可继续消费。
+15. `test-pre-merge-*` 的验证结论默认回到来源 feature/fix 的已验证结果；保留旧批次快照不是默认真相面，只有在当前批次仍然权威时才可继续消费。
 16. `test-pre-merge-*` 不得承载 owner truth、issue continuation、milestone truth 或长期 cleanup 决策；若因为这些内容导致测试批次不能删除，默认判定为 misuse。
 
 最小验收证据：
-- 分支来源与合并路径记录（若经过 `test-pre-merge-*`，需包含进入 `develop` 的批次标识、来源 feature 顺序或 explicit multi-bundle 组装证据，以及该批次的删除 / 重建结论）
+- 分支来源与合并路径记录（若经过 `test-pre-merge-*`，需包含测试批次标识、来源 feature/fix 顺序或 explicit multi-bundle 组装证据、回到来源分支的 guarded PR/merge 证据，以及该批次的删除 / 重建结论）
 - `execution_base` / `integration_target` / `depends_on` 记录（如存在派生 worktree）
 - `wt-status-all` 输出记录
 - project dirty budget / worktree dirty summary 记录（如进入 checkpoint 治理）
@@ -189,8 +189,10 @@
 判定规则：
 1. 以下流程标识的规范语义以本章为唯一事实源：
    - `source_class`: `discovery | milestone | continuation`
-   - `route_kind: `b2` | dev_loop | completion_verification | recovery`
-   - `phase_state`: `todo_pre_brainstorm | in_pre_brainstorm | done_pre_brainstorm | todo_b2 | in_b2 | done_b2 | in_dev | blocked_dev | in_verification | in_recovery | completed`
+   - `route_kind`: `b2 | dev_loop | completion_verification | recovery`
+   - raw issue `phase_state`: `proposed | absorbed | dropped`
+   - linked issue `phase_state`: `in_b2_ibm | done_b2_ibm | in_dev | blocked_dev | in_verification | completed`
+   - `recovery` 是 route/runtime 状态，不写入 linked issue `phase_state`
    - `runtime_state`: `attachable | resumable | restart_required | unavailable`
 2. `candidate.status` 只用于 pre-brainstorm 阶段，建议值保持为 `proposed | needs_research | blocked | promoted | absorbed | dropped`；不得拿它替代 issue 或 dev-loop 状态。
 2a. merge 到 `develop` 前，candidate 是否允许“没有下一环”只能由当前 `candidate.status` 判定：
@@ -205,12 +207,12 @@
    - 后移只允许发生在“已知更早会消费它的后续 active milestone”上；不得为了保持表面可见而把 candidate 长期停放到模糊远期 milestone
 3. `milestone_state` 只表达 milestone 队列归属，建议值保持为 `candidate | committed | completed`；不得再拿它表达 B2 / dev / verification 阶段。
 4. 任何跨环迁移都必须同步更新对应产物，最少遵循：
-   - `discovery -> pre_brainstorm`：更新 `brainstorms.md`、`candidates.md`、`milestones.md.candidate_issues`，并使用 `phase_state=todo_pre_brainstorm | in_pre_brainstorm`
-   - `candidate -> milestone-owned issue`：先把 `C-{issue-id}` 接入 milestone 的 `M-{issue-id}`；进入 B2 时，`B` 必须把该 `M-{issue-id}` materialize 成一个或多个 `I-{issue-id}*`，并同步更新 `candidates.md.promoted_issue_path`、`docs/milestones.md.issue_path`、正式 `issue` 路径，以及这些 `I-*` 在 milestone 中的阶段与顺序，然后进入 `phase_state=in_b2`
-   - `in_b2 -> done_b2`：更新 `issue`、`docs/milestones.md`，不得强制创建 `progress`
-   - `done_b2 -> in_dev`：更新 `issue`、`docs/milestones.md`、`progress`
+   - `discovery -> pre_brainstorm`：更新 `brainstorms.md`、`candidates.md`、`milestones.md.candidate_issues`，并使用 `candidate.status=proposed | needs_research | blocked`
+   - `candidate -> milestone-owned issue`：先把 `C-{issue-id}` 接入 milestone 的 `M-{issue-id}`；进入 B2 时，`B` 必须把该 `M-{issue-id}` materialize 成一个或多个 `I-{issue-id}*`，并同步更新 `candidates.md.promoted_issue_path`、`docs/milestones.md.issue_path`、正式 `issue` 路径，以及这些 `I-*` 在 milestone 中的阶段与顺序，然后进入 `phase_state=in_b2_ibm`
+   - `in_b2_ibm -> done_b2_ibm`：更新 `issue`、`docs/milestones.md`，不得强制创建 `progress`
+   - `done_b2_ibm -> in_dev`：更新 `issue`、`docs/milestones.md`、`progress`
    - `in_dev -> blocked_dev`：更新 `issue`、`progress`、`docs/milestones.md`，并记录 blocker
-   - `recovery`：更新 `progress` 或 `recovery`，并带回当前 `runtime_state` 与 `phase_state=in_recovery`
+   - `recovery`：更新 `progress` 或 `recovery`，并带回当前 `runtime_state` 与原 linked issue `phase_state`；不得把恢复路线写成 linked issue `phase_state=in_recovery`
    - `in_verification -> completed`：更新 `issue`、`docs/milestones.md`、必要的 `progress/recovery` 完结记录，以及后续清理证据
 4a. 对 `pre-brainstorm -> candidate -> milestone -> issue -> progress/recovery -> completed/cleanup` 这条链，应按“治理事务”理解：只有相关 canonical artifacts 都同步后，当前迁移才算完成；不得只改其中一个文档就声称已完成收口。
 4b. `M-{issue-id}` 是 milestone candidate 身份，不等于最终执行编排身份；一旦 B2 materialization 产出一个或多个 `I-{issue-id}*`，milestone 的正式编排必须切到这些 `I-*`，原始 `M-*` 只保留来源与追溯语义。
@@ -258,27 +260,26 @@
 21a. `needs_research` 保持可见不等于可以永久挂起；若当前 milestone 已确认本轮不会消费，必须在当前轮明确做出“留当前 milestone / 后移到更合适的 active milestone / dropped”三选一决策，并把原因写回 canonical artifacts。
 
 状态词图例：
-- `todo_*`：下一阶段已确定，但尚未开始
-- `in_*`：当前阶段执行中
+- `proposed | needs_research | blocked | promoted | absorbed | dropped`：candidate / raw issue 收敛状态，按产物类型解释
+- `in_b2_ibm | done_b2_ibm | in_dev | blocked_dev | in_verification | completed`：linked issue 生命周期状态
+- `in_*`：当前阶段已进入；是否仍有活跃进程必须结合 `runtime_state` 与 evidence 判断
 - `done_*`：当前阶段完成，可流转到下一阶段
 - `blocked_*`：当前阶段被阻塞，需先解阻或恢复
-- `completed`：整个 issue 生命周期结束
+- `completed`：整个 linked issue 生命周期结束
 
 状态流转图：
 
 ```mermaid
 flowchart LR
-    A[todo_pre_brainstorm] --> B[in_pre_brainstorm]
-    B --> C[done_pre_brainstorm]
-    C --> D[todo_b2]
-    D --> E[in_b2]
-    E --> F[done_b2]
+    A[candidate proposed/needs_research/blocked] --> C[promoted]
+    C --> E[in_b2_ibm]
+    E --> F[done_b2_ibm]
     F --> G[in_dev]
     G --> H[in_verification]
     H --> J[completed]
 
     G --> K[blocked_dev]
-    K --> L[in_recovery]
+    K --> L[recovery route]
     L --> G
 ```
 
@@ -286,7 +287,7 @@ flowchart LR
 - 阶段交接统一通过 `done_* -> 下一个 in_*`
 - `blocked_dev` 不是终态；恢复后回到 `in_dev` 继续
 - 下次重新进入一个未完成 issue 时，若执行上下文仍可续接，应优先回到对应 `in_*`，而不是重新生成新的 `todo_*`
-- 若 `in_*` 已陈旧且会话不可续接，先进入 `in_recovery` 做恢复判定；恢复成功再回原 `in_*`，恢复失败再落 `blocked_*`
+- 若 `in_*` 已陈旧且会话不可续接，先进入 recovery route 做恢复判定；恢复成功再回原 `in_*`，恢复失败再落 `blocked_*`
 - 系统监控发现 PID 消失时，先做恢复定位，不直接改 `phase_state`
 
 最小验收证据：

@@ -1,6 +1,6 @@
 ---
 name: freely-doc-B2_IBM-execution
-description: B2_IBM：I→B→M 第二阶段。从 scan/handoffs 选出的 milestone committed_issues 取 I-{key}，经 Brainstorm 实现设计，产出 Map（prd/pre-tests/tasks/code-review）交付 dev-loop。
+description: B2_IBM：I→B→M 第二阶段。从 scan、A2A task 与 continuity evidence 选出的 milestone committed_issues 取 I-{key}，经 Brainstorm 实现设计，产出 Map（prd/pre-tests/tasks/code-review）交付 dev-loop。
 ---
 
 # skill:freely-doc-B2_IBM-execution
@@ -10,7 +10,7 @@ description: B2_IBM：I→B→M 第二阶段。从 scan/handoffs 选出的 miles
 
 ## I→B→M 骨架
 
-B2_IBM 是 IBM Framework 第二阶段。I（Input）从 scan/handoffs 选出的里程碑已提交 issue 来，B2_IBM 做 B（Brainstorm）和 M（Map）。
+B2_IBM 是 IBM Framework 第二阶段。I（Input）从 scan、A2A task 与 continuity evidence 选出的里程碑已提交 issue 来，B2_IBM 做 B（Brainstorm）和 M（Map）。
 
 | 阶段 | 含义 | 谁准备 | 产物 |
 |------|------|--------|------|

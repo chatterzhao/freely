@@ -29,13 +29,17 @@
 
 ## Runtime Adapter Note
 
-- Freely runtime 正在把“工具选择”和“adapter 选择”拆成两个独立轴。
+- Freely runtime 已把“工具选择”和“adapter 选择”拆成两个独立轴，当前工作模式以 ACP 为准。
 - 当前 canonical truth 是：
   - `AI_TOOL` 继续表示选中的外部工具
-  - `AI_TOOL_ADAPTER_POLICY` 表示该工具期望采用哪条接入策略，例如 `direct`、`acp`、`prefer_acp_fallback_direct`
+  - `AI_TOOL_ADAPTER_POLICY` 表示该工具期望采用哪条接入策略；当前正常运行值为 `acp`
   - `AI_TOOL_ADAPTER` 表示 runtime 依据 policy 和当前支持面解析出的实际 adapter
   - status / introspection 还会暴露当前工具的 `tool_supported_adapters`，作为当前 runtime 支持矩阵
-- 本阶段所有现有工具的默认 adapter 仍然是 `direct`。
+- 当前 runtime 默认 adapter 是 `acp`；`direct` 属于遗留兼容/历史测试路径，不再作为 Freely 的产品工作模式描述。
+- 当前 canonical ACP family 来自 `tool-registry.json5`：
+  - `claude` 通过 `claude-agent-acp` 接入；`cc`、`cc-use-codex-cli`、`kiro-cli`、`iflow`、`claude-code` 是该 family 的 registry alias
+  - `codex` 通过 `codex-acp` 接入
+  - `opencode` 通过 `opencode acp` 接入
 - 当前 runtime 已冻结一条选择语义：
   - 同工具重选时，继续保留当前 `AI_TOOL_ADAPTER_POLICY` 和 `AI_TOOL_ADAPTER` truth，不因重写 config 或恢复写回而静默回到默认值
   - 同工具 mutation 时，继续保留该工具当前 `AI_MODEL` / `AI_REASONING_EFFORT` truth，不因只换 adapter 或重写选择而回到工具默认值
@@ -43,12 +47,8 @@
 - 当前显式配置入口包括：
   - `freely init --tool-adapter <adapter> [--tool-adapter-policy <policy>]`
   - `freely set-tool --tool <tool> [--tool-adapter <adapter>] [--tool-adapter-policy <policy>]`
-- 当前 runtime 对 policy 的解析语义是：
-  - `direct` -> `AI_TOOL_ADAPTER=direct`
-  - `acp` -> `AI_TOOL_ADAPTER=acp`
-  - `prefer_acp_fallback_direct` -> 若该工具存在受支持 ACP path 则取 `acp`，否则解析为 `direct`
-- `acp` 目前只处于 boundary/materialization 阶段，不是已实现 runtime adapter；若配置到未实现 adapter，runtime 应显式 fail fast，而不是静默回退。
-- 后续若新增工具原生支持 ACP，或现有工具出现高质量 ACP bridge，Freely 可以按工具逐个启用 `acp`，但 `direct` 继续是一等路径。
+- 当前 runtime 主路径是：`monitor-ai-acp.sh` → `run-acp-prompt.py` → `acp-bridge.py` → 外部工具 ACP adapter。
+- `direct` / `prefer_acp_fallback_direct` 只属于 legacy compatibility 术语；新能力设计、SVG 和运行时语义以 ACP 主路径为准。
 
 ## Runtime Security Review Note
 
@@ -75,9 +75,9 @@
   - project root 是 integration / merge / runtime bootstrap surface
   - sibling `{project}-worktrees` root 是 owner development surface
 - 项目级工具配置按工具解耦：
-  - `codex` 走 tool-native `.codex/config.toml`，并由 Freely 额外提供 `.freely/bin/codex` wrapper
-  - `claude`、`iflow` 当前没有 verified 的 project-local writable-root config surface，因此走 Freely wrapper + launch-time flag
-  - `kiro-cli` 当前只有 passthrough wrapper，不伪造 project-local writable-root truth
+  - `codex` 走 `codex-acp`，并继续使用 project-local `.codex/config.toml` / `.freely/bin/codex` 边界材料
+  - `claude` family 走 `claude-agent-acp`；`cc`、`kiro-cli`、`iflow` 等 registry alias 复用 Claude ACP family 的接入面
+  - `opencode` 走 `opencode acp`，并通过 `OPENCODE_CONFIG` 等 slot/materialization truth 注入项目边界
 - 新 worktree 不依赖 Git 复制 ignored / untracked local files：
   - 标准入口 `wt-create` 和 protected-branch auto-worktree hook 会调用 `freely sync-tooling --source-project <root> --project <worktree>`
   - `sync-tooling` 先复制最小 `.freely/config.env`，再在目标 worktree 重新 materialize 各工具本地边界
@@ -93,19 +93,19 @@
   - 非交互 `-p -y` 提示执行
   - 适合首跳自治和研究/文档型收敛
 - recommended_when:
+  - 需要沿用 `iflow` 这个历史工具名/profile 触发 Claude ACP family
   - 任务仍在理解、收敛、路由、文档编排阶段
-  - 需要较长 prompt 驱动下一跳工作
-- example:
+- tool-native reference:
   - fresh/auto: `iflow -p "<assembled prompt>" -y --max-turns 100`
   - resume/auto with explicit session file: `iflow -r <session-file> -p "<assembled prompt>" -y --max-turns 100`
   - resume/auto without explicit target: `iflow -c -p "<assembled prompt>" -y --max-turns 100`
   - fresh/step: `iflow -p "<assembled prompt>" --default --max-turns 100`
 - runtime_notes:
-  - `iflow --continue` only means recent conversation, not workcell-scoped explicit session addressing.
-  - `iflow --resume <session-file>` can target a specific session file, but Freely does not yet materialize it as a canonical per-workcell resume target.
+  - Freely runtime currently routes `iflow` as a registry alias of the `claude` ACP family, so runtime session/fork/resume behavior comes from `claude-agent-acp`, not from `iflow` tool-native CLI resume semantics.
+  - Tool-native `iflow --continue` only means recent conversation, not workcell-scoped explicit session addressing.
+  - Tool-native `iflow --resume <session-file>` can target a specific session file, but Freely does not use that path as the canonical runtime session mechanism.
   - Freely now treats sibling worktree reachability as a boundary bootstrap concern for `iflow`: runtime launch adds `--add-dir <project-worktrees-root>`, and `freely init` writes a project-local `.freely/bin/iflow` wrapper with the same boundary. This extends the reachable workspace beyond the project root; it does not replace normal project-root access.
   - When a new worktree is created, Freely can rematerialize these local boundaries with `freely sync-tooling --source-project <project-root> --project <worktree>`, so ignored or untracked tool-local files do not get stranded in the primary root.
-  - Until that materialization exists, `iflow` remains a weaker continuity contract than `codex` / `cc`.
 
 ### codex
 
@@ -118,17 +118,16 @@
 - recommended_when:
   - 任务已命中 usable issue
   - 需要直接在仓库中进行实现、验证、修文档
-- example:
+- tool-native reference:
   - fresh/auto: `codex exec --skip-git-repo-check -C <project-root> --dangerously-bypass-approvals-and-sandbox - < <prompt-file>`
   - fresh/step: `codex exec --skip-git-repo-check -C <project-root> - < <prompt-file>`
   - resume/auto: `codex exec resume <SESSION_ID> --skip-git-repo-check --dangerously-bypass-approvals-and-sandbox - < <prompt-file>`
   - fresh_with_handoff/auto: `codex exec --skip-git-repo-check -C <project-root> --dangerously-bypass-approvals-and-sandbox - < <prompt-file>`
 - runtime_notes:
-  - current adapter matrix is `direct,acp`; first ACP prototype is intentionally scoped to fresh-path validation, not resume parity.
-  - `adapter=acp` now launches through Freely's one-shot ACP client plus the external `codex-acp` adapter binary; first launch will download the pinned release into the Freely ACP cache unless `FREELY_CODEX_ACP_BIN` overrides it.
-  - current ACP fresh path supports `fresh` / `fresh_with_handoff`; `resume` remains explicitly blocked so ACP does not pretend direct-equivalent session-addressed continuity.
-  - current ACP bridge can auto-answer ACP permission requests in `mode=auto`; `AI_REASONING_EFFORT` does not yet have an ACP-side mapping.
-  - Freely treats `codex` as an explicit session-addressed resume tool: canonical continuity target is the concrete `SESSION_ID`, not `resume --last`.
+  - Freely runtime launches `codex` through `codex-acp`; first launch downloads the pinned adapter into the Freely ACP cache unless `FREELY_CODEX_ACP_BIN` overrides it.
+  - Current ACP path supports `fresh` / `fresh_with_handoff` / `resume` / `fork`; `fresh_with_handoff` is a launch-kind for continuity repair, not the deprecated worker handoffs storage.
+  - Current ACP bridge can auto-answer ACP permission requests in `mode=auto`; `AI_REASONING_EFFORT` mapping remains tool/adapter-specific.
+  - Freely treats `codex` as an explicit session-addressed resume tool: canonical continuity target is the concrete ACP `sessionId`, not `resume --last`.
   - Codex posture is now split into two layers on purpose:
     - project-local baseline: `freely init` materializes a project-scoped `.codex/config.toml`; in `auto` mode this baseline now writes `approval_policy = "never"` while keeping `sandbox_mode = "workspace-write"` and `network_access = false` as the recommended local defaults
     - launch-time injection: runtime still adds `--dangerously-bypass-approvals-and-sandbox` for current non-interactive auto execution, and now also injects `--add-dir <project-worktrees-root>` so sibling worktrees remain reachable without falling back to editing `develop`; this extends Codex reach beyond the project root, not away from it
@@ -148,16 +147,16 @@
   - 能承接单目录下的连续对话
   - 具备交互式恢复入口
 - recommended_when:
-  - 当前任务不要求并发安全的 explicit session-addressed resume
-  - 可以接受“当前目录最近会话”语义
-- example:
+  - 需要沿用 `kiro-cli` 这个历史工具名/profile 触发 Claude ACP family
+  - 任务可接受该 alias 当前由 Freely registry 映射到 `claude-agent-acp`
+- tool-native reference:
   - fresh/auto: `kiro-cli chat --no-interactive --trust-all-tools --model <model> < <prompt-file>`
   - resume/auto: `kiro-cli chat --resume --no-interactive --trust-all-tools --model <model> "继续上次未完成工作，按项目意图和宪法持续推进。"`
   - interactive fallback: `kiro-cli chat --resume-picker`
 - runtime_notes:
-  - `kiro-cli --resume` 当前只恢复当前目录最近会话，不是 canonical 的 explicit session-addressed resume。
+  - Freely runtime currently routes `kiro-cli` as a registry alias of the `claude` ACP family, so runtime session/fork/resume behavior comes from `claude-agent-acp`, not from `kiro-cli` tool-native CLI resume semantics.
+  - Tool-native `kiro-cli --resume` 当前只恢复当前目录最近会话，不是 canonical 的 explicit session-addressed resume。
   - `--resume-picker` 只是人工交互 fallback，不能作为 supervisor/runtime 默认重入路径。
-  - 因此 `kiro-cli` 当前不应被标记为并发安全的 canonical continuity tool。
   - 当 cycle log 出现 `Monthly request limit reached` 或 `Unable to verify subscription status: service error` 时，Freely 当前会把它们视为 Kiro availability failure，写入 canonical reason 并停止本地盲目 relaunch，后续 recovery 交回 watchdog / manager control plane。
 
 ### cc
@@ -169,11 +168,12 @@
   - 适合作为普通 Claude Code tool，在 Freely 中承接上下文管理、并行 worktree、subagent 和非交互会话
 - recommended_when:
   - 需要 `Claude Code` 的 agent/context 管理
-- example:
+- tool-native reference:
   - fresh/auto: `claude -p --permission-mode bypassPermissions --session-id <uuid> "<assembled prompt>"`
   - resume/auto: `claude -p --permission-mode bypassPermissions --resume <session-id> "<assembled prompt>"`
 - runtime_notes:
-  - `cc` 不默认启用 `codex-cli` MCP；它是纯 Claude Code 顶层工具。
+  - `cc` 不默认启用 `codex-cli` MCP；它是 Claude ACP family 的普通 Claude Code profile。
+  - Freely runtime launches this family through `claude-agent-acp`; tool-native commands above are manual reference, not runtime launch truth.
   - `cc` 当前没有单独的 project-local tool config materialization；Freely 主要通过 launch-time flags 注入 non-interactive posture，例如 `--permission-mode bypassPermissions`、`--session-id`、以及可选 debug/model/effort parameters。
   - Freely runtime 现在会额外注入 `--add-dir <project-worktrees-root>`，并由 `freely init` 写出对应的 `.freely/bin/claude` wrapper，避免 Claude 在 repo root 会话里因为 sibling worktree 不可达而退回 protected branch 上写；项目根目录本身仍是合法的集成/merge 工作面。
   - 如果新 worktree 是通过标准 Freely 入口创建的，Claude 对应的受管 wrapper 也会在目标 worktree 被重新 materialize，而不依赖 Git 复制 ignored local files。
@@ -190,12 +190,12 @@
 - recommended_when:
   - 需要 `Claude Code` 的会话和上下文能力
   - 同时希望 repo 实现、review、verification 默认走 Codex MCP
-- example:
+- tool-native reference:
   - fresh/auto: `claude -p --permission-mode bypassPermissions --session-id <uuid> --append-system-prompt "<fixed codex-cli MCP policy>" "<assembled prompt>"`
   - resume/auto: `claude -p --permission-mode bypassPermissions --resume <session-id> --append-system-prompt "<fixed codex-cli MCP policy>" "<assembled prompt>"`
 - runtime_notes:
   - `cc-use-codex-cli` 是固定 profile，不要求用户再单独配置 capability 参数。
-  - `cc-use-codex-cli` 当前也主要通过 launch-time materialization 工作，而不是写独立 project-local Claude config。
+  - `cc-use-codex-cli` 是 `claude` ACP family 的 registry alias，主要通过 launch-time materialization 工作，而不是写独立 project-local Claude config。
   - Freely 会固定注入：`model=gpt-5.4`、`sandbox=workspace-write`、`approval-policy=never`；当当前 branch 是 protected branch 时，system prompt 会明确区分 project root 的 read/merge/integration 用途，与 owner development 的 dedicated worktree 用途，并同步为 Claude 注入 `--add-dir <project-worktrees-root>`。
   - 每个 running workcell 使用独立 `Claude session-id`，降低多 worker / 多 worktree 并发时的会话串线风险。
   - 证据模型分两层：

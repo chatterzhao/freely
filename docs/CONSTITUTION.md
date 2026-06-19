@@ -18,7 +18,7 @@ Freely 是一个自主循环运行器：
 - `main` 仅用于发布，必须保持稳定。
 - `develop` 是长期开发集成分支，也是 `feature/*` 的默认父分支。
 - `test-pre-merge-*` 是临时预集成验证批次分支前缀；仅在组合验证、短周期集成验收、复杂冲突收敛或发布前预演时启用。每次启用前必须先从当前 `develop` 新建全新批次；旧批次若存在，先删除。
-- `feature/*` 分支从 `develop` 创建。测试时 merge 到 `test-pre-merge-*`（临时测试面），测试通过后通过 `pr-create-guarded` 提 PR，经 review 后由 `pr-merge-guarded` 合并到 `develop`。`test-pre-merge-*` 不参与最终合并链。
+- `feature/*` 分支从 `develop` 创建。测试时可临时装配到 `test-pre-merge-*`（一次性测试面），测试通过后通过 `pr-create-guarded` 提 PR，经 review 后由 `pr-merge-guarded` 合并来源分支到 `develop`。`test-pre-merge-*` 不参与最终合并链。
 - `release/*` 分支从 `develop` 创建用于发布冻结，然后合并到 `main` 并回合并到 `develop`。
 - `hotfix/*` 分支从 `main` 创建，然后合并到 `main` 和 `develop`。
 
@@ -37,14 +37,14 @@ Freely 是一个自主循环运行器：
 - 不稳定的变更不得合并到 `main`。
 - `main` 只接受来自 `release/*` 或 `hotfix/*` 的合并。
 - `develop` 是功能交付的默认目标分支；进入 `develop` 前必须满足要求的 `TEST`、评审与进度/恢复证据。
-- `develop` 的正常 promote source 只接受 `test-pre-merge-*` family 与 `hotfix/*`；`feature/* -> develop` 作为正常路径被阻止；`feature/*` 必须通过 `pr-merge-guarded` 经 PR review 和门禁检查后合并到 `develop`。
-- `test-pre-merge-*` 仍是临时验证路径，但它同时是进入 `develop` 的 canonical promote family；其 merge receipt 必须能追溯到来源 feature 或 explicit multi-bundle 的组装证据。
+- `develop` 的正常合并来源是经过 `pr-create-guarded` / `pr-review-guarded` / `pr-merge-guarded` 的来源 `feature/*`，以及符合热修复规则的 `hotfix/*`；`test-pre-merge-*` 不得作为 develop merge source。
+- `test-pre-merge-*` 只是临时验证路径；其测试记录必须能追溯到来源 feature 或 explicit multi-bundle 的组装证据，但验证通过后仍回到来源分支执行 guarded PR/merge。
 - `develop` 不得承担“尚未进入主线前的预测试环境”职责；需要主线前集成验证时，应使用 `test-pre-merge-*`，而不是在 `develop` 上先做预检。
 - `feature/*` 的实现自测与局部回归默认留在其 dedicated worktree；只有需要受保护分支真实集成面的测试，才切换到 `test-pre-merge-*` 或目标 protected branch 的 canonical worktree。
-- `test-pre-merge-*` 的 promotion 以当前权威批次为准；single-feature lane 与 explicit multi-bundle lane 共享同一 canonical family 前缀，不再引入第二个 `test-pre-*` 前缀。若当前批次已 stale，先 retire / rebuild，再决定是否继续 promote。
+- `test-pre-merge-*` 的验证结论只在当前权威批次内有效；single-feature lane 与 explicit multi-bundle lane 共享同一 family 前缀，不再引入第二个 `test-pre-*` 前缀。若当前批次已 stale，先 retire / rebuild，再决定是否重新验证来源分支。
 - 提升前的具体验收门与证据口径由 `docs/LAWS.md` 第 2 章定义。
 - `PRE_TEST` 与 `TEST` 的职责边界由 `docs/LAWS.md` 第 2 章与第 11 章定义。
-- develop-bound 能力若先进入 `test-pre-merge-*`，验证通过后应由当前权威 `test-pre-merge-*` 批次并入 `develop`，并保留来源 feature / bundle 追溯证据；不得绕回 `feature/* -> develop` 继续保留第二条正常路径。
+- develop-bound 能力若先进入 `test-pre-merge-*`，验证通过后应回到来源 `feature/*` / `fix/*` 走 guarded PR/merge 进入 `develop`，并保留测试批次与来源 feature / bundle 追溯证据；不得把 `test-pre-merge-*` 当作合并来源。
 - `test-pre-merge-*` 的退出形态固定为：验证结束后立即删除；若同一能力仍要继续验证，只能从当前 `develop` 重新创建新批次。
 - `main` / `develop` / `test-pre-merge-*` 上，hook/gate bypass 永久禁止。`FREELY_SKIP_IBM_GATE=1` 是唯一合法豁免。
 “这次应该没问题”不能构成 protected-branch bypass 的依据。
@@ -106,8 +106,8 @@ Freely 是一个自主循环运行器：
 | 分支 | push | add/commit | merge 来源 | merge 到 | 备注 |
 |------|------|------------|-----------|----------|------|
 | main | ✅ | ❌ | release/*, hotfix/* | - | 发布/热修复入口 |
-| develop | ✅ | ❌ | test-pre-merge-*, hotfix/* | - | 默认开发集成入口；正常 promote 只接受 `test-pre-merge-*` family 或 `hotfix/*` |
-| test-pre-merge-* | ❌ | ❌ | feature/*, hotfix/*, feature/premerge-* | - | 临时预集成验证批次；必须从当前 develop 新建，用完立即删除 |
+| develop | ✅ | ❌ | guarded feature/fix PR, hotfix/* | - | 默认开发集成入口；`test-pre-merge-*` 只提供测试证据，不作为 merge source |
+| test-pre-merge-* | ❌ | ❌ | feature/*, fix/*, hotfix/*, feature/premerge-* | - | 临时预集成验证批次；必须从当前 develop 新建，用完立即删除，不参与最终合并链 |
 | feature/* | ✅ 同名 | ✅ worktree | - | test-pre-merge-* (测试) → pr-create-guarded (PR) → pr-merge-guarded (合并) | 从 develop 创建；完整链路: `feedback → wt-create → B1_IBM → B2_IBM → dev → pr-create-guarded → pr-merge-guarded → wt-close`（详见 AGENTS.md §规范流程） |
 | release/* | ✅ 同名 | ✅ worktree | - | main, develop | 从 develop 创建 |
 | hotfix/* | ✅ 同名 | ✅ worktree | - | main, develop | 从 main 创建 |
