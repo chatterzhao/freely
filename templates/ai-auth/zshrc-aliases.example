@@ -1,46 +1,18 @@
-# ═══════════════════════════════════════════════════════════════════════════
-# AI CLI Slot Aliases — 追加到 ~/.zshrc 尾部
-# ═══════════════════════════════════════════════════════════════════════════
+# ===================================================
+# Freely ai-auth slot zshrc aliases example
+# Naming convention: {tool}-{type}-{name}
+# ===================================================
+# Add these lines to your ~/.zshrc to create
+# convenient aliases for your auth slots.
 #
-# ★ 命名约定（非常重要）：
-#   alias 名 = slot 目录名 = config.toml 的 AI_TOOL 值（三者完全一致）
-#
-#   格式：{tool}-{type}-{your-name}
-#   - {tool}: claude | codex | opencode（必须，Freely 据此识别工具族）
-#   - {type}: apikey（API key 模式）| account（OAuth 账号模式）
-#   - {your-name}: 自定义，通常描述 provider/账号/用途
-#
-# ★ 如果你改了 alias 名，必须同时改两处：
-#   1. ~/.ai-auth/{alias-name}/          — slot 目录名
-#   2. .freely/config.toml → AI_TOOL     — 指向同一个 alias 名
-#
-# ★ 验证：source ~/.zshrc 后直接敲 alias 名，应进入对应 AI CLI 的交互界面
-#
-# 安全：chmod 700 ~/.ai-auth
-# ═══════════════════════════════════════════════════════════════════════════
+# The alias name MUST match the slot directory name.
+# ===================================================
 
-# --- Claude Code (API key 模式) ---
-# 格式：claude-apikey-{your-name}
-# --settings 指向 slot 目录下的 settings.json
-# --dangerously-skip-permissions 配合 settings.json 中的 bypassPermissions
-#
-# alias claude-apikey-my-provider="claude --settings $HOME/.ai-auth/claude-apikey-my-provider/settings.json --dangerously-skip-permissions"
+# Claude API key mode
+alias claude-apikey-personal="claude"
 
+# Codex account mode
+alias codex-account-work="codex"
 
-# --- OpenCode (API key 模式) ---
-# 格式：opencode-apikey-{your-name}
-# OPENCODE_CONFIG 环境变量指向 slot 目录下的 settings.json
-#
-# ★ OpenCode 的 API key 不在 settings.json 内，需要单独通过环境变量设置
-#   在 alias 之前 export（或放在 ~/.zshrc 更前面的位置）：
-#     export DEEPSEEK_API_KEY="your-apikey"
-#
-# alias opencode-apikey-my-provider='OPENCODE_CONFIG="$HOME/.ai-auth/opencode-apikey-my-provider/settings.json" opencode'
-
-
-# --- Codex (OAuth 账号模式) ---
-# 格式：codex-account-{your-name}
-# CODEX_HOME 环境变量指向 slot 目录（该目录即完整 CODEX_HOME，
-#   包含 config.toml + auth.json + sessions 等）
-#
-# alias codex-account-my-openai='CODEX_HOME="$HOME/.ai-auth/codex-account-my-openai" codex'
+# OpenCode API key mode (API key from env)
+alias opencode-apikey-default="opencode"

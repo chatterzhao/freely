@@ -1,75 +1,28 @@
-// ═══════════════════════════════════════════════════════════════════════════
-// OpenCode Slot 配置模板
-// ═══════════════════════════════════════════════════════════════════════════
-//
-// ★ 命名约定（必须遵守）：
-//   本文件所在目录名 = .zshrc alias 名 = config.toml 的 AI_TOOL 值（三者完全一致）
-//
-//   格式：opencode-apikey-{your-name}
-//   Freely 靠 -apikey- 前缀识别为 opencode 工具族，不可修改此格式。
-//
-//   示例：如果你的 slot 名为 opencode-apikey-my-provider
-//     → 目录：   ~/.ai-auth/opencode-apikey-my-provider/
-//     → alias：   alias opencode-apikey-my-provider='OPENCODE_CONFIG="..." opencode'
-//     → config：  AI_TOOL = "opencode-apikey-my-provider"
-//
-// ★ 如果你改了 slot 名，必须同时改三处：目录名、alias 名、AI_TOOL 值。
-//
-// ★ 注意：OpenCode 的 API key 不在本文件内！
-//   通过以下方式之一注入：
-//   1. 环境变量（推荐）：在 ~/.zshrc 中 alias 之前设置
-//        export DEEPSEEK_API_KEY="your-apikey"
-//   2. OpenCode 自身全局 settings：~/.opencode/config.json
-//   本 slot 的 settings.json 仅定义 model + provider 配置。
-//
-// 使用方法：
-//   1. mkdir -p ~/.ai-auth/opencode-apikey-{your-name}
-//   2. cp 本文件 → ~/.ai-auth/opencode-apikey-{your-name}/settings.json
-//   3. 编辑下方 model、provider 配置
-//   4. 在 ~/.zshrc 中设置 API key 环境变量 + 添加 alias（见
-//      templates/ai-auth/zshrc-aliases.example）
-//   5. 在 .freely/config.toml 中设置 AI_TOOL = "opencode-apikey-{your-name}"
-//   6. 验证：source ~/.zshrc && opencode-apikey-{your-name} run "say hi"
-//
-// 安全：chmod 700 ~/.ai-auth && chmod 600 ~/.ai-auth/*/settings.json
-// ═══════════════════════════════════════════════════════════════════════════
-
 {
-  // ── 权限 ───────────────────────────────────────────────────────────────
-  // "allow" = 自动模式（Freely auto 模式推荐）
-  "permission": "allow",
-
-  // ── Model ───────────────────────────────────────────────────────────────
-  // OpenCode 使用的模型标识。格式：opencode/{model-name}
-  // 常用值：opencode/deepseek-v4-flash-free、opencode/deepseek-v3-free
-  "model": "opencode/your-model-here",
-
-  // ── Provider 配置 ──────────────────────────────────────────────────────
-  "provider": {
-    "opencode": {
-      "models": {
-        // ★ 将 "your-model-here" 替换为实际模型名（与顶层 model 去掉 opencode/ 前缀一致）
-        "your-model-here": {
-          // ── Reasoning variants（可选）────────────────────────────────
-          // 如果你的 provider 模型支持 reasoning/thinking 模式，在此配置
-          "variants": {
-            "think-max": {
-              "reasoningEffort": "max",
-              "interleaved": {
-                "field": "reasoning_content"
-              }
-            }
-          },
-
-          // ── 上下文和输出限制 ─────────────────────────────────────────
-          "limit": {
-            // 最大上下文窗口（tokens）
-            "context": 1000000,
-            // 最大输出长度（tokens）
-            "output": 393216
-          }
-        }
-      }
+  "model": "deepseek-v4-flash-free",
+  "providerConfig": {
+    "type": "opencode",
+    "apiKeyEnvVar": "OPENCODE_API_KEY",
+    "apiKeyHelper": {
+      "enabled": true,
+      "storage": "keychain"
     }
-  }
+  },
+  "env": {
+    "OPENCODE_DEFAULT_MODEL": "deepseek-v4-flash-free"
+  },
+  "permissionMode": "bypassPermissions",
+  "permissions": {
+    "defaultMode": "bypassPermissions",
+    "allow": [
+      "Bash(git *)",
+      "Read(*)"
+    ],
+    "deny": [
+      "Bash(rm -rf /)",
+      "Bash(rm -rf ~/*)"
+    ]
+  },
+  "theme": "dark",
+  "editor": "vim"
 }
