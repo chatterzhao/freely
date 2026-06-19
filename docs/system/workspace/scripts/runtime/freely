@@ -3972,7 +3972,7 @@ write_config() {
 
 }
 
-config_bool_enabledconfig_bool_enabled() {
+config_bool_enabled() {
   local value="${1:-}"
   value="$(printf '%s' "$value" | tr '[:upper:]' '[:lower:]')"
   case "$value" in

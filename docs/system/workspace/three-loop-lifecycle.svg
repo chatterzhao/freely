@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1200" width="1400" height="1200">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1350" width="1400" height="1350">
   <defs>
     <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
       <path d="M0,0 L8,3 L0,6 Z" fill="#64748b"/>
@@ -23,7 +23,7 @@
     </marker>
   </defs>
 
-  <rect width="1400" height="1200" fill="#fafbfc"/>
+  <rect width="1400" height="1350" fill="#fafbfc"/>
 
   <!-- ===== TITLE ===== -->
   <text x="20" y="30" font-size="16" font-weight="bold" fill="#1e293b" font-family="system-ui, sans-serif">Freely — Agent Role 驱动的能力生命周期</text>
@@ -164,12 +164,20 @@
 
   <rect x="710" y="735" width="660" height="120" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="1.8"/>
   <rect x="720" y="723" width="300" height="20" rx="3" fill="#10b981"/>
-  <text x="870" y="736" text-anchor="middle" font-size="10" font-weight="bold" fill="white" font-family="system-ui, sans-serif">A2A — Agent 间任务协调（Manager ↔ Worker）</text>
+  <text x="870" y="736" text-anchor="middle" font-size="10" font-weight="bold" fill="white" font-family="system-ui, sans-serif">A2A — Agent 间任务协调 (Manager ↔ Worker)</text>
   <text x="725" y="760" font-size="9" fill="#065f46" font-family="system-ui, sans-serif">Task 状态机: submitted → working → completed | failed | input-required | pending-input</text>
-  <text x="725" y="778" font-size="9" fill="#475569" font-family="system-ui, sans-serif">Manager 委派: a2a-exit --state submitted → A2A Server 存 task（含 message/prompt_file/worktree 等载荷）</text>
-  <text x="725" y="796" font-size="9" fill="#475569" font-family="system-ui, sans-serif">Runtime tasks/list 发现 → 读取 Task.message/prompt_file → ACP Bridge 启 Worker ACP session</text>
-  <text x="725" y="814" font-size="9" fill="#475569" font-family="system-ui, sans-serif">Worker 完成: a2a-exit completed → SSE 通知 Manager → Manager 下一轮 patrol 感知并收口</text>
-  <text x="725" y="835" font-size="8" fill="#94a3b8" font-family="system-ui, sans-serif">A2A 存任务状态与任务载荷/提示入口，Runtime 负责将其转化为 Worker 启动，A2A 不直接执行 Worker</text>
+  <text x="725" y="778" font-size="9" fill="#475569" font-family="system-ui, sans-serif">Manager 委派: a2a-exit --state submitted --role worker --summary "..." (⚠ 不可用 --agent-id)</text>
+  <text x="725" y="796" font-size="9" fill="#475569" font-family="system-ui, sans-serif">Worker 完成: a2a-exit --state completed → A2A task state 更新 → SSE 通知 Manager</text>
+  <text x="725" y="814" font-size="9" fill="#475569" font-family="system-ui, sans-serif">Manager 查询: a2a_task.py list --role worker --status blocked|completed</text>
+  <text x="725" y="835" font-size="8" fill="#94a3b8" font-family="system-ui, sans-serif">A2A 存任务状态与载荷；Runtime Task Launcher 负责读取 → 生成 prompt → 启动 Worker</text>
+
+  <!-- Runtime Task Launcher box -->
+  <rect x="1015" y="752" width="340" height="90" rx="6" fill="#d1fae5" stroke="#059669" stroke-width="1.8"/>
+  <text x="1185" y="770" text-anchor="middle" font-size="9" font-weight="bold" fill="#065f46" font-family="system-ui, sans-serif">Runtime Task Launcher</text>
+  <text x="1025" y="788" font-size="8" fill="#047857" font-family="system-ui, sans-serif">1. list --role worker --status submitted</text>
+  <text x="1025" y="802" font-size="8" fill="#047857" font-family="system-ui, sans-serif">2. 生成 Worker prompt file</text>
+  <text x="1025" y="816" font-size="8" fill="#047857" font-family="system-ui, sans-serif">3. ACP Bridge → session/new → Worker 启动</text>
+  <text x="1025" y="830" font-size="8" fill="#047857" font-family="system-ui, sans-serif">4. 更新 task state: submitted → working</text>
 
   <!-- A2A flow between Manager Agent Role and Worker Agent Role -->
   <path d="M1115,385 L1115,420" fill="none" stroke="#10b981" stroke-width="1.7" stroke-dasharray="6,3" marker-end="url(#arrow-a2a)"/>
@@ -184,9 +192,10 @@
   <text x="240" y="890" font-size="9" fill="#475569" font-family="system-ui, sans-serif">DB 守护进程 (freely_db_manager.py) — single-writer, Unix socket JSON-RPC</text>
   <text x="240" y="910" font-size="9" fill="#854d0e" font-family="system-ui, sans-serif">a2a_tasks（委派状态+载荷）| chats（freely chat 插话/评论）| sessions（ACP session）| tool_*（工具切换）| task_mode_gate（模式）</text>
 
-  <rect x="710" y="875" width="660" height="50" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
-  <text x="725" y="895" font-size="9" fill="#475569" font-family="system-ui, sans-serif">Runtime bridge（task launcher）: reads a2a_tasks → builds prompt file → ACP Bridge starts Worker ACP session</text>
-  <text x="725" y="912" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">scan artifact 汇入 platform raw、chat DB interruption、A2A task state，被下一轮 scan pulse 消费</text>
+  <rect x="710" y="875" width="660" height="60" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="725" y="895" font-size="9" fill="#475569" font-family="system-ui, sans-serif">Runtime bridge: consume_delegate_workers → list --role worker --status submitted → prompt → launch</text>
+  <text x="725" y="912" font-size="9" fill="#475569" font-family="system-ui, sans-serif">→ ACP Bridge Worker session/new → launch_kind=fork → monitor-ai-acp.sh → Worker ACP session started</text>
+  <text x="725" y="928" font-size="8" fill="#ef4444" font-family="system-ui, sans-serif">⚠ 已知陷阱: --agent-id worker 无效，必须用 --role worker；否则 task 以 agent_id=manager 创建，Runtime 无法发现</text>
 
   <!-- DB arrows -->
   <line x1="255" y1="855" x2="255" y2="875" stroke="#eab308" stroke-width="1.2" marker-end="url(#arrow-db)"/>
@@ -213,7 +222,8 @@
   <!-- =================================================================== -->
   <!-- LEGEND / TAXONOMY                                                     -->
   <!-- =================================================================== -->
-  <rect x="30" y="1040" width="1340" height="145" rx="6" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="30" y="1040" width="1340" height="160" rx="6" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="50" y="1180" font-size="8" fill="#ef4444" font-family="system-ui, sans-serif">⚠ A2A 关键接口约定: Manager 委派 Worker 必须用 a2a-exit --state submitted --role worker (非 --agent-id)，否则 Worker 永不启动</text>
 
   <text x="50" y="1062" font-size="11" font-weight="bold" fill="#334155" font-family="system-ui, sans-serif">执行链路</text>
   <text x="50" y="1080" font-size="9" fill="#475569" font-family="system-ui, sans-serif">Runtime → ACP Bridge → AI CLI ACP Session（执行 Manager/Worker Role，装载 Skill）→ 调用 Commands / A2A / DB</text>
