@@ -1,8 +1,5 @@
 ---
-name: 创建 templates/ai-auth/ slot 配置示例模板，解决新用户安装后不知道如何配置 
-description: 
-## 核心约定
-slot 目录名 = .zshrc alias 名 = config.toml AI_TOOL 值，三者必须一致。目录命名规范: {tool}-{type}-{name}，其中 {t
+name: ai-auth Template Config Files
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260616T140126Z-A
