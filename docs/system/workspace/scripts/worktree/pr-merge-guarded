@@ -530,11 +530,12 @@ do_initial_merge() {
   # ── Local git merge with receipt ──
   # gh pr merge --merge --body does NOT work. Use local merge.
   local merge_message; merge_message="$(render_merge_message "pr-merge-guarded" "$source_branch")"
-  git fetch github "$target" 2>/dev/null || true; git fetch origin "$target" 2>/dev/null || true
+  # ── Save PR number before merge so we can close it after success ──
+  local _pr_number=""
   if command -v gh &>/dev/null; then
-    local _pr; _pr="$(gh pr list --head "$source_branch" --state OPEN --json number -q '.[0].number' 2>/dev/null || true)"
-    [[ -n "$_pr" ]] && { echo "[MERGE-GUARD] closing GitHub PR #$_pr (using local merge)..."; gh pr close "$_pr" 2>/dev/null || true; }
+    _pr_number="$(gh pr list --head "$source_branch" --state OPEN --json number -q '.[0].number' 2>/dev/null || true)"
   fi
+  git fetch github "$target" 2>/dev/null || true; git fetch origin "$target" 2>/dev/null || true
   echo "[MERGE-GUARD] performing local merge: $source_branch → $target"
   set +e; git merge --no-commit --no-ff "$source_branch"; local merge_rc=$?; set -e
   [[ "$merge_rc" -ne 0 ]] && return "$merge_rc"
@@ -543,11 +544,18 @@ do_initial_merge() {
   write_guarded_state "$target" "$source_branch" "forbidden"
   set +e; FREELY_GUARDED_MERGE_COMPLETION=1 GIT_EDITOR=: git merge --continue; local continue_rc=$?; set -e
   if ! git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1; then
+    # ── Merge succeeded: close PR ──
+    if [[ -n "$_pr_number" ]]; then
+      echo "[MERGE-GUARD] merge committed. Closing GitHub PR #$_pr_number..."
+      gh pr close "$_pr_number" --comment "Merged via pr-merge-guarded; develop synced from GitHub." 2>/dev/null || true
+    fi
     cleanup_guarded_state
     attempt_develop_push_followthrough_if_needed "$target" "$source_branch"
     [[ "$continue_rc" -ne 0 ]] && echo "[MERGE-GUARD] warning: merge continue returned $continue_rc" >&2
     return 0
   fi
+  # ── Merge did NOT complete (hook failed, etc.): PR stays open ──
+  [[ -n "$_pr_number" ]] && echo "[MERGE-GUARD] merge blocked. PR #$_pr_number left open for retry." >&2
   return "$continue_rc"
 }
 
