@@ -37,7 +37,11 @@
   <text x="175" y="71" text-anchor="middle" font-size="10" font-weight="bold" fill="white" font-family="system-ui, sans-serif">Freely Runtime — 系统心跳 (while-true)</text>
   <text x="350" y="82" font-size="10" fill="#334155" font-family="system-ui, sans-serif">while true; do</text>
   <text x="350" y="98" font-size="10" fill="#475569" font-family="system-ui, sans-serif">  scan pulse → 发现任务 → 启动 Agent Role   |   AI 死 → restart → 继续 scan</text>
-  <text x="1050" y="90" font-size="9" fill="#94a3b8" font-family="system-ui, sans-serif">🔵 代码级循环 — Runtime 硬编码的 while-true + scan 脉冲</text>
+  <text x="350" y="112" font-size="8" fill="#94a3b8" font-family="system-ui, sans-serif">🔵 代码级循环 — Runtime 硬编码的 while-true + scan 脉冲</text>
+  <rect x="875" y="78" width="495" height="31" rx="5" fill="#fff7ed" stroke="#fb923c" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <text x="890" y="91" font-size="8.5" font-weight="bold" fill="#c2410c" font-family="system-ui, sans-serif">Human side-channel（旁路，不阻塞 loop）</text>
+  <text x="890" y="104" font-size="7.5" fill="#9a3412" font-family="system-ui, sans-serif">freely feedback→platform raw issue | freely chat→DB→issue/comment；下一轮 scan 暴露</text>
+  <path d="M875,106 L785,106" fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow-scan)"/>
 
   <!-- =================================================================== -->
   <!-- MANAGER AGENT ROLE                                                    -->
@@ -54,9 +58,9 @@
   <!-- Manager: decision cycle (left) -->
   <rect x="50" y="215" width="600" height="95" rx="6" fill="white" stroke="#60a5fa" stroke-width="1.5"/>
   <text x="65" y="235" font-size="10" font-weight="bold" fill="#1d4ed8" font-family="system-ui, sans-serif">Skill 定义的行为循环：</text>
-  <text x="65" y="255" font-size="9" fill="#475569" font-family="system-ui, sans-serif">scan pulse 到达 → 读取 scan artifact (manager-task-source-scan-latest.json) → 判断 next_action</text>
-  <text x="65" y="272" font-size="9" fill="#475569" font-family="system-ui, sans-serif">├─ 有新 raw issue（open）→ wt-create 创建工位 → A2A dispatch 给 Worker</text>
-  <text x="65" y="289" font-size="9" fill="#475569" font-family="system-ui, sans-serif">├─ Worker done → 判断 closeout / merge / re-dispatch</text>
+  <text x="65" y="255" font-size="9" fill="#475569" font-family="system-ui, sans-serif">scan pulse → 读取 scan artifact（platform raw / chat DB interruption / A2A state）</text>
+  <text x="65" y="272" font-size="9" fill="#475569" font-family="system-ui, sans-serif">├─ platform raw 或 chat new-issue → wt-create → A2A dispatch 给 Worker</text>
+  <text x="65" y="289" font-size="9" fill="#475569" font-family="system-ui, sans-serif">├─ chat comment → issue comment / re-activate；Worker done → closeout / merge</text>
   <text x="65" y="306" font-size="9" fill="#475569" font-family="system-ui, sans-serif">└─ 无事可做 → stop_ai → 等下一轮 scan</text>
   <text x="480" y="295" font-size="8" fill="#a855f7" font-family="system-ui, sans-serif">🟣 Skill 行为模式 — auto-loop-orchestrator 注入 prompt 指导 Agent 决策</text>
 
@@ -167,9 +171,9 @@
   <text x="725" y="814" font-size="9" fill="#475569" font-family="system-ui, sans-serif">Worker 完成: a2a-exit completed → SSE 通知 Manager → Manager 下一轮 patrol 感知并收口</text>
   <text x="725" y="835" font-size="8" fill="#94a3b8" font-family="system-ui, sans-serif">A2A 存任务状态与任务载荷/提示入口，Runtime 负责将其转化为 Worker 启动，A2A 不直接执行 Worker</text>
 
-  <!-- A2A flow arrows between agent roles and A2A Server -->
-  <path d="M880,400 L880,660" fill="none" stroke="#10b981" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrow-a2a)"/>
-  <text x="888" y="540" font-size="7" fill="#10b981" font-family="system-ui, sans-serif">A2A 委派/完成</text>
+  <!-- A2A flow between Manager Agent Role and Worker Agent Role -->
+  <path d="M1115,385 L1115,420" fill="none" stroke="#10b981" stroke-width="1.7" stroke-dasharray="6,3" marker-end="url(#arrow-a2a)"/>
+  <text x="1125" y="410" font-size="7" fill="#10b981" font-family="system-ui, sans-serif">A2A task coordination</text>
 
   <!-- =================================================================== -->
   <!-- DB + RUNTIME BRIDGE — 持久化与启动                                     -->
@@ -178,11 +182,11 @@
   <rect x="40" y="863" width="180" height="20" rx="3" fill="#eab308"/>
   <text x="130" y="876" text-anchor="middle" font-size="10" font-weight="bold" fill="white" font-family="system-ui, sans-serif">freely-db + SQLite/WAL</text>
   <text x="240" y="890" font-size="9" fill="#475569" font-family="system-ui, sans-serif">DB 守护进程 (freely_db_manager.py) — single-writer, Unix socket JSON-RPC</text>
-  <text x="240" y="910" font-size="9" fill="#854d0e" font-family="system-ui, sans-serif">a2a_tasks（委派状态+载荷）| chats（对话）| sessions（ACP session）| tool_*（工具切换）| task_mode_gate（模式）</text>
+  <text x="240" y="910" font-size="9" fill="#854d0e" font-family="system-ui, sans-serif">a2a_tasks（委派状态+载荷）| chats（freely chat 插话/评论）| sessions（ACP session）| tool_*（工具切换）| task_mode_gate（模式）</text>
 
   <rect x="710" y="875" width="660" height="50" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
   <text x="725" y="895" font-size="9" fill="#475569" font-family="system-ui, sans-serif">Runtime bridge（task launcher）: reads a2a_tasks → builds prompt file → ACP Bridge starts Worker ACP session</text>
-  <text x="725" y="912" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">scan artifact（manager-task-source-scan-latest.json）由 task-source-scan 写入，被下一轮 scan pulse 消费</text>
+  <text x="725" y="912" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">scan artifact 汇入 platform raw、chat DB interruption、A2A task state，被下一轮 scan pulse 消费</text>
 
   <!-- DB arrows -->
   <line x1="255" y1="855" x2="255" y2="875" stroke="#eab308" stroke-width="1.2" marker-end="url(#arrow-db)"/>
@@ -200,11 +204,11 @@
   <text x="260" y="986" font-size="9" fill="#374151" font-family="system-ui, sans-serif">cc / kiro-cli / iflow → Claude ACP family by registry — Worker ACP Session（launch_kind=fork 仍用 session/new 独立会话）</text>
   <text x="260" y="1004" font-size="8" fill="#94a3b8" font-family="system-ui, sans-serif">ACP Bridge → AI CLI（new/resume → session/prompt full|delta）→ stopReason → Runtime 读 exit_kind → 继续</text>
 
-  <!-- ACP arrows: ACP Bridge ↔ AI CLI Tool (correct direction) -->
+  <!-- ACP arrows: Runtime/ACP Bridge sends session/prompt/control to AI CLI Tool -->
   <path d="M355,855 L355,865 L35,865 L35,950" fill="none" stroke="#6366f1" stroke-width="1.8" marker-end="url(#arrow-acp)"/>
-  <text x="48" y="915" font-size="7" fill="#6366f1" font-family="system-ui, sans-serif">ACP session</text>
+  <text x="48" y="915" font-size="7" fill="#6366f1" font-family="system-ui, sans-serif">ACP prompt/control → AI CLI</text>
   <path d="M1040,855 L1040,865 L1040,950" fill="none" stroke="#6366f1" stroke-width="1.8" marker-end="url(#arrow-acp)"/>
-  <text x="1048" y="915" font-size="7" fill="#6366f1" font-family="system-ui, sans-serif">ACP worker session</text>
+  <text x="1048" y="915" font-size="7" fill="#6366f1" font-family="system-ui, sans-serif">ACP worker prompt → AI CLI</text>
 
   <!-- =================================================================== -->
   <!-- LEGEND / TAXONOMY                                                     -->
@@ -235,4 +239,6 @@
   <text x="585" y="1156" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">A2A（任务协调）</text>
   <rect x="690" y="1147" width="14" height="11" rx="2" fill="#f3f4f6" stroke="#6b7280"/>
   <text x="708" y="1156" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">AI CLI Tool（外部）</text>
+  <rect x="835" y="1147" width="14" height="11" rx="2" fill="#fff7ed" stroke="#fb923c"/>
+  <text x="853" y="1156" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">Human side-channel</text>
 </svg>
