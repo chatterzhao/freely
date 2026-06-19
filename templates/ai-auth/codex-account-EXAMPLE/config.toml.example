@@ -1,83 +1,20 @@
-# ═══════════════════════════════════════════════════════════════════════════
-# Codex Slot 配置模板
-# ═══════════════════════════════════════════════════════════════════════════
+# =============================================
+# Freely ~/.ai-auth/ slot config template
+# Naming convention: {tool}-{type}-{name}
+#   tool = codex  type = account  name = EXAMPLE
+# =============================================
+# codex account mode uses API key-based auth
+# via CODEX_API_KEY env var or --api-key flag.
 #
-# ★ 命名约定（必须遵守）：
-#   本文件所在目录名 = .zshrc alias 名 = config.toml 的 AI_TOOL 值（三者完全一致）
-#
-#   Codex slot 的特殊性：整个 slot 目录就是 CODEX_HOME，不仅包含 config.toml
-#   还包含 auth.json、sqlite 数据库、sessions 等运行时状态。
-#   Freely 靠 -account- 前缀识别为 codex 工具族，不可修改此格式。
-#
-#   格式：codex-account-{your-name}
-#
-#   示例：如果你的 slot 名为 codex-account-my-openai
-#     → 目录：   ~/.ai-auth/codex-account-my-openai/
-#     → alias：   alias codex-account-my-openai='CODEX_HOME="..." codex'
-#     → config：  AI_TOOL = "codex-account-my-openai"
-#
-# ★ 如果你改了 slot 名，必须同时改三处：目录名、alias 名、AI_TOOL 值。
-#
-# 使用方法：
-#   1. mkdir -p ~/.ai-auth/codex-account-{your-name}
-#   2. cp 本文件 → ~/.ai-auth/codex-account-{your-name}/config.toml
-#   3. 编辑下方 model、sandbox 等为你需要的值
-#   4. codex login（在 CODEX_HOME 指向该目录的环境下）→ 生成 auth.json
-#   5. 添加 alias 到 ~/.zshrc（见 templates/ai-auth/zshrc-aliases.example）
-#   6. 在 .freely/config.toml 中设置 AI_TOOL = "codex-account-{your-name}"
-#
-# 安全：chmod 700 ~/.ai-auth && chmod 600 ~/.ai-auth/*/auth.json
-# ═══════════════════════════════════════════════════════════════════════════
+# Replace "your-apikey" with your actual key.
+# Do NOT commit this file with real keys.
+# =============================================
 
-# ── Model ─────────────────────────────────────────────────────────────────
-# Codex 使用的模型名。常用值：gpt-5.4、gpt-5.5、gpt-5.5-codex 等
-model = "gpt-5.5"
+model = "claude-sonnet-4-20250514"
+sandbox = false
+approval_policy = "auto"
+auto_approve = true
+api_key = "your-apikey"
 
-# ── Provider ──────────────────────────────────────────────────────────────
-model_provider = "OpenAI"
-
-# ── Reasoning Effort（可选）───────────────────────────────────────────────
-# low | medium | high
-model_reasoning_effort = "medium"
-
-# ── 批准策略 ──────────────────────────────────────────────────────────────
-# never       = 全自动（Freely auto 模式推荐）
-# on-failure  = 仅在失败时询问
-# on-request  = 交互模式
-approval_policy = "never"
-
-# ── 沙箱模式 ──────────────────────────────────────────────────────────────
-# workspace-write  = 可写工作区（推荐）
-# read-only        = 只读
-# danger-full-access = 完全访问（高风险）
-sandbox_mode = "workspace-write"
-
-# ── 网络 ──────────────────────────────────────────────────────────────────
-network_access = "enabled"
-
-# ── Personality ───────────────────────────────────────────────────────────
-personality = "pragmatic"
-
-# ═══════════════════════════════════════════════════════════════════════════
-# ★ cli_auth_credentials_store = "file" 是关键设置
-# 确保 auth.json 以文件存储（而非系统 keyring），slot 迁移依赖此设置。
-# ═══════════════════════════════════════════════════════════════════════════
-
-# ── Provider 配置 ─────────────────────────────────────────────────────────
-[model_providers.OpenAI]
-name = "OpenAI"
-wire_api = "responses"
-requires_openai_auth = true
-
-# ── 项目信任级别 ──────────────────────────────────────────────────────────
-# 将 /path/to/your-project 替换为实际项目路径
-[projects."/path/to/your-project"]
-trust_level = "trusted"
-
-# ── 沙箱可写路径 ──────────────────────────────────────────────────────────
-# 将路径替换为你的实际项目路径和 worktrees 路径
-[sandbox]
-writable_roots = [
-    "/path/to/your-project",
-    "/path/to/your-project-worktrees"
-]
+[writable_roots]
+  "." = true

@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# release-ai-auth-templates: copy templates/ai-auth/ to project .freely/ai-auth/
+set -euo pipefail
+
+PROJECT="${1:-$PWD}"
+SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)/templates/ai-auth"
+DST="$PROJECT/.freely/ai-auth"
+
+[[ -d "$SRC" ]] || { echo "ERROR: templates/ai-auth/ not found at $SRC"; exit 1; }
+
+mkdir -p "$(dirname "$DST")"
+cp -r "$SRC" "$DST"
+echo "ai-auth templates released to $DST"
+echo ""
+echo "Next steps:"
+echo "  1. cd $DST"
+echo "  2. cp -r claude-apikey-EXAMPLE ~/.ai-auth/claude-apikey-<your-name>"
+echo "  3. Edit settings.json, replace 'your-apikey'"

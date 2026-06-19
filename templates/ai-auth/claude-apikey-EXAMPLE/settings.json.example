@@ -1,86 +1,54 @@
-// ═══════════════════════════════════════════════════════════════════════════
-// Claude Code Slot 配置模板
-// ═══════════════════════════════════════════════════════════════════════════
-//
-// ★ 命名约定（必须遵守）：
-//   本文件所在目录名 = .zshrc alias 名 = config.toml 的 AI_TOOL 值（三者完全一致）
-//
-//   格式：claude-apikey-{your-name}
-//   Freely 靠 -apikey- 前缀识别为 claude 工具族，不可修改此格式。
-//
-//   示例：如果你的 slot 名为 claude-apikey-my-provider
-//     → 目录：  ~/.ai-auth/claude-apikey-my-provider/
-//     → alias：  alias claude-apikey-my-provider="claude --settings ..."
-//     → config： AI_TOOL = "claude-apikey-my-provider"
-//
-// ★ 如果你改了 slot 名，必须同时改三处：目录名、alias 名、AI_TOOL 值。
-//
-// 使用方法：
-//   1. mkdir -p ~/.ai-auth/claude-apikey-{your-name}
-//   2. cp 本文件 → ~/.ai-auth/claude-apikey-{your-name}/settings.json
-//   3. 编辑下方 your-apikey、base URL、model 为你的实际值
-//   4. 添加 alias 到 ~/.zshrc（见 templates/ai-auth/zshrc-aliases.example）
-//   5. 在 .freely/config.toml 中设置 AI_TOOL = "claude-apikey-{your-name}"
-//   6. 验证：source ~/.zshrc && claude-apikey-{your-name} -p "say hi"
-//
-// 安全：chmod 700 ~/.ai-auth && chmod 600 ~/.ai-auth/*/settings.json
-// ═══════════════════════════════════════════════════════════════════════════
-
 {
-  // ── Model ─────────────────────────────────────────────────────────────
-  // Claude Code 使用的模型名。格式：{model-name}[{context-window}]
-  // 常用值（取决于你的 provider 支持什么）：
-  //   - deepseek-v4-flash[1m]
-  //   - claude-sonnet-4-6[1m]
-  //   - claude-opus-4-8[1m]
-  //   - claude-fable-5[1m]
-  "model": "your-model-here[1m]",
-
-  // ── 环境变量（API key + endpoint） ─────────────────────────────────────
+  "model": "claude-opus-4-8",
   "env": {
-    // ★ 你的 API key（占位符 your-apikey，替换为实际 key）
     "ANTHROPIC_AUTH_TOKEN": "your-apikey",
-
-    // ★ API endpoint base URL
-    // DeepSeek:   https://api.deepseek.com/anthropic
-    // 官方:        https://api.anthropic.com
-    // 自建 proxy: https://your-proxy.example.com
-    "ANTHROPIC_BASE_URL": "https://api.deepseek.com/anthropic",
-
-    // ★ 传给 provider 的模型名，通常与顶层 "model" 相同
-    "ANTHROPIC_MODEL": "your-model-here[1m]",
-
-    // ── 各档位默认模型（可选） ──────────────────────────────────────────
-    // 以下四个字段均可选。不设则 Claude Code 使用自身默认值。
-    // 如果你的 provider 只有一个模型，全部设为同一个即可。
-
-    // Opus 档位默认模型（高能力）
-    "ANTHROPIC_DEFAULT_OPUS_MODEL": "your-model-here[1m]",
-
-    // Sonnet 档位默认模型（均衡）
-    "ANTHROPIC_DEFAULT_SONNET_MODEL": "your-model-here[1m]",
-
-    // Haiku 档位默认模型（轻量快速）
-    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "your-model-here[1m]",
-
-    // 子 agent 使用的模型
-    "CLAUDE_CODE_SUBAGENT_MODEL": "your-model-here[1m]"
+    "ANTHROPIC_BASE_URL": "https://api.anthropic.com",
+    "ANTHROPIC_MODEL": "claude-opus-4-8",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-8",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-6",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4-5",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "claude-sonnet-4-6"
   },
-
-  // ── 权限配置 ───────────────────────────────────────────────────────────
-  // "bypassPermissions" = 自动模式（Freely auto 模式推荐）
-  // "default"            = 标准模式（每次操作需确认）
   "permissionMode": "bypassPermissions",
-
   "permissions": {
-    // deny 列表：即使 bypassPermissions 也禁止的操作
+    "defaultMode": "bypassPermissions",
+    "allow": [
+      "Bash(git log *)",
+      "Bash(git diff *)",
+      "Bash(git status *)",
+      "Bash(git branch *)",
+      "Read(*)"
+    ],
     "deny": [
       "Bash(git push --force origin main:*)",
       "Bash(git push --force origin develop:*)",
       "Bash(git push --delete origin main:*)",
-      "Bash(git push --delete origin develop:*)"
-    ],
-    // 默认模式：与顶层 permissionMode 一致
-    "defaultMode": "bypassPermissions"
-  }
+      "Bash(git push --delete origin develop:*)",
+      "Bash(rm -rf /)",
+      "Bash(rm -rf ~/*)",
+      "Bash(> /dev/sd*)"
+    ]
+  },
+  "apiKeyHelper": {
+    "enabled": true,
+    "storage": "keychain"
+  },
+  "hooks": {
+    "pre": {},
+    "post": {},
+    "onFailure": {}
+  },
+  "statusLine": {
+    "enabled": true,
+    "position": "bottom",
+    "showKeyBindings": true,
+    "showModel": true,
+    "showTokens": false,
+    "showActivity": true,
+    "style": "default"
+  },
+  "autoUpdatesChannel": "latest",
+  "skipDangerousModePermissionPrompt": true,
+  "theme": "dark",
+  "editor": "vim"
 }
