@@ -1,7 +1,7 @@
 # Test Log: login claude 交互式 slot
 
-- owner_issue: `docs/issues/I-20260619T033758Z-A/issue.md`
-- source_candidate: `docs/pre-brainstorms/20260619T033758Z--login-claude-interactive-slot/candidates.md`
+- issue_id: I-20260619T033758Z-A
+- issue_path: docs/issues/I-20260619T033758Z-A/issue.md
 
 Test date: 2026-06-19
 Test worktree: test-pre-merge-20260619T033758Z-login-claude-interactive-slot
