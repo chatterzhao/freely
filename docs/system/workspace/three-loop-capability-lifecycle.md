@@ -33,7 +33,7 @@ SVG 图展示的五层实体，从上到下、从内到外：
 ### 协议通道
 
 - **ACP (AI Communication Protocol)**：Freely runtime/ACP bridge 与外部 AI provider 之间的 session/prompt/control protocol，不是 Agent 间协商协议。它负责 session/new、session/resume、fork/prompt、stopReason、session/ping 等；当前产品工作模式是 ACP。Freely 通过 `monitor-ai-acp.sh` → `run-acp-prompt.py` → `acp-bridge.py` 连接外部 AI CLI 的 ACP server。canonical ACP family 当前是 `claude-agent-acp`、`codex-acp`、`opencode acp`；`cc` / `kiro-cli` / `iflow` 等 legacy 名称按 registry alias 进入 Claude ACP family。
-- **A2A (Agent-to-Agent Protocol)**：Manager role 与 Worker role 之间的 task coordination / state / notification protocol。A2A Server 是 coordination service；`a2a_task.py` / `a2a-exit` 是 CLI client/tool。Manager 用 `a2a-exit` 创建 `submitted` Task，Runtime 通过 `tasks/list` 生成 Worker prompt 并启动 Worker ACP session，Worker 完成后通过 A2A task state 和 SSE 通知 Manager。旧 `handoffs` 文件/表语义已被 `a2a_tasks` 取代。
+- **A2A (Agent-to-Agent Protocol)**：Manager role 与 Worker role 之间的 task coordination / state / notification protocol。A2A Server 是 coordination service；`a2a_task.py` / `a2a-exit` 是 CLI client/tool。Manager 用 `a2a-exit --state submitted --role worker` 创建 Worker Task（**必须用 `--role worker`，不能使用已废弃的 `--agent-id worker`**，否则 Task 会以默认 `agent_id=manager` 创建，Runtime 无法发现）。Runtime 通过 `list --role worker --status submitted` 发现 pending Task → 生成 Worker prompt file → ACP Bridge 启动独立 Worker ACP session。Worker 完成后调用 `a2a-exit --state completed` → A2A task state 更新 + SSE 通知 Manager。旧 `handoffs` 文件/表语义已被 `a2a_tasks` 取代。
 
 ### SQLite 表职责
 
@@ -54,11 +54,18 @@ scan (文件系统读取) ──→ intake gate ──→ routing ──→ disp
                                                       │
                               ┌────────────────────────┘
                               ▼
-              Manager ACP session → AI 决策 → a2a-exit --state submitted
+              Manager ACP session → AI 决策 → a2a-exit --state submitted --role worker
                                                       │
                               ┌────────────────────────┘
                               ▼
-              A2A Server: a2a_tasks 存储 → SSE 通知
+              A2A Server: a2a_tasks 存储 (agent_id=worker, state=submitted)
+                              │
+                              ▼
+              Runtime Task Launcher: list --role worker --status submitted
+                              │
+                              ├── 生成 Worker prompt file (task-{id}.txt)
+                              ├── ACP Bridge → session/new → 启动 Worker ACP session
+                              └── 更新 task state: submitted → working (launched)
                               │
               ┌───────────────┴───────────────┐
               ▼                               ▼
@@ -71,6 +78,12 @@ scan (文件系统读取) ──→ intake gate ──→ routing ──→ disp
                           │
                           ▼
               SSE → Manager 下一轮 patrol → test gate → ... → closeout
+
+Manager exit contract 种类（manager_exit_contract_kind）:
+  - delegate_workers: 有 Worker Task 已提交到 A2A Server，Runtime 负责启动 Worker
+  - stop_ai:        无事可做，结束 AI session，等下一轮 scan 唤醒
+  - resume_manager:  Manager 需要继续分析（B1 评估、复杂决策）
+  - manager_working: Worker 已派出，保持 session 继续等待 Worker 完成
 ```
 
 ## 三 Loop 架构
@@ -113,6 +126,28 @@ intake → routing → dispatch → test → pr-create → pr-review → CI chec
 - 执行: Manager 读取 next_action → 判断 [manager] wt-create 或 [worker] delegate
 - 路由: 向 doc-loop 或 dev-loop 委派 Worker
 - 顺序: B1→B2→dev 是串行的（先 doc-loop 后 dev-loop）
+
+**Worker 委派协议（a2a-exit 接口约定）**：
+- Manager 必须使用 `a2a-exit --state submitted --role worker --worktree <path> --branch <name> --raw-key <key> --summary "完整指令"`
+- **禁止使用 `--agent-id` 参数**（该参数已被 `--role` 取代，使用 `--agent-id worker` 会导致 task 以默认 `agent_id=manager` 创建，Runtime 无法发现，`worker_prompts_csv=none`）
+- Runtime Task Launcher 通过 `list --role worker --status submitted` 发现 pending Worker task
+- 发现后：生成 prompt file → 更新 task state 为 working → ACP Bridge 启动独立 Worker ACP session
+- Worker 完成后：`a2a-exit --state completed` → A2A task state 更新 → SSE 通知 Manager
+
+**Worker A2A Task 状态机**：
+```
+submitted ──→ working (launched) ──→ completed
+     │              │                    │
+     └──────────────┴────────────────────┘
+                    ↓
+              failed / input-required / pending-input
+```
+- `submitted`: Manager 已委派，等待 Runtime Task Launcher 启动
+- `working`: Worker ACP session 已启动
+- `completed`: Worker 正常完成
+- `failed`: Worker 异常退出
+- `input-required`: Worker 需要 Manager 提供额外输入
+- `pending-input`: Worker 等待外部输入
 
 #### test gate（阶段7）
 - 触发: dev-loop 返回 evidence 就绪

@@ -155,4 +155,55 @@ Freely 的主链 trace 不是普通 debug 文本，而是三 loop 执行链的 m
 - 先改逻辑，再同步改 trace 编号和 handoff
 - 不允许新增匿名跳转
 - 不允许只打进入不打出去
-- 不允许只写自然语言“下一步做什么”，而不写 `to=<checkpoint>`
+- 不允许只写自然语言”下一步做什么”，而不写 `to=<checkpoint>`
+
+## 11. 已注册的 auto-loop 检查点
+
+以下是当前 Freely Runtime 中已实现的 auto-loop 检查点（基于生命周期 trace 实际观测验证）：
+
+### Daemon 启动链
+| 检查点 | Stage | 说明 |
+|--------|-------|------|
+| `A-L001` | `start_requested` | 用户发出 daemon start 命令 |
+| `A-L010` | `supervisor_started` | Supervisor 进程已启动，进入 daemon-run 主循环 |
+| `A-L240` | `manager_launch_requested` | Supervisor 请求启动 Manager AI session |
+
+### Prompt 构建链
+| 检查点 | Stage | 说明 |
+|--------|-------|------|
+| `A-L020` | `prompt_build_begin` | 开始构建 AI prompt（含 scan、handoff、continuity 注入） |
+| `A-L021` | `prompt_build_complete` | Prompt 构建完成 |
+| `A-L022` | `manager_startup_continuity_stub_checked` | Manager 启动连续性检查完成 |
+
+### AI 执行链
+| 检查点 | Stage | 说明 |
+|--------|-------|------|
+| `A-L040` | `ai_launch_begin` | AI 进程已启动（ACP Bridge → AI CLI Tool） |
+| `A-L041` | `ai_launch_observed` | AI 进程存活确认 |
+| `A-L042` | `ai_cycle_finished` | AI 周期结束（exit_reason=ai_exit_rc_0 / ...） |
+
+### L042 出口路由
+
+```
+A-L042 to=A-L020    → prompt 模式继续下一轮 (acp_multi_turn)
+A-L042 to=A-L090    → Worker 委派消费
+A-L042 to=A-L201    → 连续性 handoff
+A-L042 to=A-L210    → closeout gate
+A-L042 to=A-L230    → recovery 恢复
+A-L042 to=TERM      → 终止（stop_ai）
+```
+
+### A2A Worker Launch 事件
+
+当 Manager exit contract = delegate_workers 时：
+
+```text
+event=manager_exit_contract_delegate_workers worker_prompts_csv=<路径或none>
+event=worker_task_launched task_id=<id> worktree=<path>
+event=worker_launch_failed task_id=<id> reason=<reason>
+```
+
+`worker_prompts_csv=none` 表示 Runtime 未发现任何 submitted worker task。常见原因：
+1. Manager 使用了 `--agent-id worker` 而非 `--role worker`（task 创建为 agent_id=manager）
+2. a2a-exit 命令未被实际执行（AI 仅在文本中讨论了它）
+3. a2a_tasks 表不可用（freely-db 未运行或 crash）
