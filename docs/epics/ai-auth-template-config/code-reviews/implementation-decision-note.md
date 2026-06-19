@@ -1,9 +1,6 @@
----
-issue_id: I-20260616T140126Z-A
-kind: decision-note
----
-
 # Implementation Decision Note: ai-auth Template Configs
+- issue_id: I-20260616T140126Z-A
+- kind: decision-note
 
 ## Decision
 Create template config files under `templates/ai-auth/` with `.example` suffix, covering three tool families (claude-apikey, codex-account, opencode-apikey). Integrate with `freely init` for automated deployment.
