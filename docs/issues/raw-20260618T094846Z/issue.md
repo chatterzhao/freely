@@ -2,7 +2,7 @@
 local_id: raw-20260618T094846Z
 kind: raw
 phase_state: absorbed
-source_candidate: C-20260618T094846Z-A
+source_candidate: docs/pre-brainstorms/20260618T094846Z--update-three-loop-svg/candidates.md#C-20260618T094846Z-A
 platform_ids:
   github:
     issue_id: '2988'
