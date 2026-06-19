@@ -3261,6 +3261,12 @@ routing_policy:
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260616T084121Z-platform-sync-batch/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260616T084121Z--platform-sync-batch/candidates.md#C-20260616T084121Z-platform-sync-batch`
+### completed_issues
+1. `I-20260619T111454Z-A`
+- title: Platform Sync Batch — raw-20260619T111454Z
+- milestone_state: committed
+- phase_state: `completed`
+- verification_artifact_dir: `docs/pre-brainstorms/20260619T111454Z--platform-sync-batch/`
 
 ## M-20260618T100000Z-A
 - title: wt-create chat-inbox ID normalization fix
