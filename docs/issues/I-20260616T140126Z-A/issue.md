@@ -19,7 +19,7 @@ promotion_gate:
   - Cross-references validated
 source: raw-20260616T140126Z
 raw_key: 20260616T140126Z
-source_candidate: C-20260616T140126Z-1
+source_candidate: docs/pre-brainstorms/20260616T140126Z--ai-auth-template/candidates.md
 created: 2026-06-18T08:05:54Z
 updated: 2026-06-19T06:20:00Z
 ---
