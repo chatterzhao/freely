@@ -1,3 +1,19 @@
+## M-20260619T033758Z-A
+- title: login claude interactive slot naming + alias creation
+- status: active
+### candidate_issues
+1. `C-20260619T033758Z-A`
+- milestone: M-20260619T033758Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260619T033758Z-A/issue.md`
+### committed_issues
+1. `I-20260619T033758Z-A`
+- title: login claude interactive slot naming + alias creation
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260619T033758Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/login-claude-interactive-slot/code-reviews`
+
 ## M-20260618T071502Z-A
 - title: pr-merge local merge replaces gh pr merge
 - status: active
