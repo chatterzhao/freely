@@ -34,6 +34,38 @@ fail() {
   exit 1
 }
 
+merge_lock_dir() {
+  # Use --git-common-dir so the lock is in the main repo, not a worktree subdir.
+  # Multiple worktrees share the main repo; the lock must protect the shared develop branch.
+  printf '%s/freely-merge-lock\n' "$(git rev-parse --git-common-dir 2>/dev/null || git rev-parse --git-dir 2>/dev/null || echo "/tmp")"
+}
+acquire_merge_lock() {
+  local lock_dir; lock_dir="$(merge_lock_dir)"
+  local timeout="${MERGE_LOCK_TIMEOUT:-300}" waited=0 interval=2
+  while ! mkdir "$lock_dir" 2>/dev/null; do
+    if [[ "$waited" -ge "$timeout" ]]; then
+      echo "[MERGE-GUARD] merge lock timeout after ${timeout}s (another merge in progress?)" >&2
+      return 1
+    fi
+    sleep "$interval"
+    waited=$((waited + interval))
+  done
+  echo "[MERGE-GUARD] merge lock acquired (waited ${waited}s)."
+  trap 'release_merge_lock' EXIT
+}
+release_merge_lock() {
+  local lock_dir; lock_dir="$(merge_lock_dir)"
+  rmdir "$lock_dir" 2>/dev/null || true
+}
+cleanup_merge_residue() {
+  # Belt-and-suspenders: ensure no MERGE_HEAD leaks past a failed merge attempt.
+  if git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1; then
+    echo "[MERGE-GUARD] cleaning up stale MERGE_HEAD from interrupted merge" >&2
+    git merge --abort 2>/dev/null || git reset --merge 2>/dev/null || true
+    find "$(git rev-parse --git-dir)" -name "MERGE_*" -delete 2>/dev/null || true
+  fi
+}
+
 current_branch() {
   git rev-parse --abbrev-ref HEAD 2>/dev/null || true
 }
@@ -456,6 +488,12 @@ if len(p) >= 3:
 
 do_initial_merge() {
   local target="$1"; local source_branch="$2"; local dry_run="${3:-0}"
+  # ── Concurrency guard: prevent stale MERGE_HEAD from blocking other merges ──
+  if [[ "$dry_run" != "1" ]]; then
+    cleanup_merge_residue
+    acquire_merge_lock || return 1
+    trap 'release_merge_lock; cleanup_merge_residue' EXIT
+  fi
   echo "[MERGE-GUARD] fetching latest $target from origin..."
   git fetch origin "$target" 2>/dev/null || echo "[MERGE-GUARD] warning: fetch failed" >&2
   if [[ "$dry_run" != "1" ]]; then check_branch_context "$target"; fi
