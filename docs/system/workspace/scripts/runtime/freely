@@ -14543,14 +14543,12 @@ parse_a2a_task_json_reply() {
   _action=$(echo "$_result" | python3 -c "import json,sys; r=json.load(sys.stdin); print(r.get('state',''))" 2>/dev/null || echo "")
   if [[ -n "$_action" && "$_action" != "null" ]]; then
     # Found A2A state from tool call — translate to exit_kind and return
-    _workers_field=$(echo "$_result" | python3 -c "import json,sys; r=json.load(sys.stdin); print(r.get('worker_prompts_csv',''))" 2>/dev/null || echo "")
     case "$_action" in
       submitted)
-        if [[ -n "$_workers_field" && "$_workers_field" != "null" ]]; then
-          _exit_kind="delegate_workers"
-        else
-          _exit_kind="resume_manager"
-        fi ;;
+        # A2A-native: Manager creates individual worker tasks via a2a-exit --role worker.
+        # worker_prompts_csv is a CSV-era relic, always empty in the A2A flow.
+        # submitted state IS the signal that workers were delegated.
+        _exit_kind="delegate_workers" ;;
       completed)
         if [[ "$role" == "worker" ]]; then _exit_kind="worker_done"
         else _exit_kind="resume_manager"; fi ;;
