@@ -1,5 +1,6 @@
 ---
 issue_id: I-20260619T035704Z-A
+issue_path: docs/issues/I-20260619T035704Z-A/issue.md
 phase_state: in_verification
 ---
 
