@@ -2,6 +2,8 @@
 local_id: raw-20260619T045410Z
 kind: raw
 phase_state: absorbed
+absorbed_into: I-20260619T045410Z-A
+source_candidate: docs/pre-brainstorms/20260619T045410Z--pr-close-after-merge/candidates.md#C-20260619T045410Z-A
 platform_ids:
   github:
     issue_id: '3030'

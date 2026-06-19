@@ -3292,3 +3292,18 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260619T045626Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/pr-merge-flock/code-reviews`
+
+## M-20260619T045410Z-A
+- title: pr-merge-guarded PR close timing fix
+- status: active
+### candidate_issues
+1. `C-20260619T045410Z-A`
+- milestone: M-20260619T045410Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260619T045410Z-A/issue.md`
+### committed_issues
+1. `I-20260619T045410Z-A`
+- title: PR close after merge success
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260619T045410Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/pr-close-after-merge/code-reviews`
