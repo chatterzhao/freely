@@ -4,7 +4,8 @@ name: ai-auth Template Config Files
 kind: linked
 milestone: M-2026-Q2
 epic: ai-auth-template-config
-phase_state: in_b2_ibm
+phase_state: completed
+verification_artifact_dir: docs/epics/ai-auth-template-config/code-reviews/
 acceptance_criteria:
   - templates/ai-auth/claude-apikey-EXAMPLE/settings.json.example exists
   - templates/ai-auth/codex-account-EXAMPLE/config.toml.example exists
