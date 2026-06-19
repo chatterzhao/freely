@@ -3277,3 +3277,12 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260618T100000Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/wt-create-chat-inbox-id-bug/code-reviews`
+
+## M-20260619T045626Z-A
+- title: pr-merge-guarded flock concurrency guard
+- status: active
+### candidate_issues
+- C-20260619T045626Z-A
+### committed_issues
+- issue: I-20260619T045626Z-A
+  commit_sha: pending

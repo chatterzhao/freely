@@ -1,7 +1,7 @@
 ---
 local_id: I-20260619T045626Z-A
 kind: linked
-phase_state: done_b2_ibm
+phase_state: completed
 source_raw: raw-20260619T045626Z
 source_candidate: docs/pre-brainstorms/20260619T045626Z--pr-merge-flock/candidates.md#C-20260619T045626Z-A
 verification_artifact_dir: docs/epics/pr-merge-flock/code-reviews
