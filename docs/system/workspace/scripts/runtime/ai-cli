@@ -77,6 +77,22 @@ codex_prompt_login_mode() {
   esac
 }
 
+# Prompt auth mode for claude/opencode/cc/kiro-cli (non-codex tools).
+# Same shape as codex_prompt_login_mode but with tool-specific prompt.
+_prompt_generic_login_mode() {
+  local tool="$1" selected
+  selected="$(prompt_value "$tool auth mode (account/apikey)" "account")"
+  case "$selected" in
+    account|apikey)
+      printf '%s\n' "$selected"
+      ;;
+    *)
+      log_error "Unsupported auth mode for $tool: $selected (use: account, apikey)"
+      exit 2
+      ;;
+  esac
+}
+
 # 确认操作
 confirm() {
   local msg="$1"
@@ -1258,7 +1274,20 @@ cmd_login() {
       log_info "iflow auth material still comes from environment/config; slot container created for scheduler compatibility."
       ;;
     kiro-cli|cc|cc-use-codex-cli|opencode|claude)
-      tool_login_generic "$tool"
+      # If no auth_mode given → prompt interactively (like codex)
+      if [[ -z "$auth_mode" ]]; then
+        auth_mode="$(_prompt_generic_login_mode "$tool")"
+      fi
+      # Route to the right handler
+      if [[ "$auth_mode" == "apikey" ]]; then
+        _require_acp_binary "$tool" || exit 1
+        _login_apikey_alias "$tool"
+      elif [[ "$auth_mode" == "account" ]]; then
+        _login_account_slot "$tool"
+      else
+        log_error "Unsupported auth mode for $tool: $auth_mode (use: account, apikey)"
+        exit 2
+      fi
       ;;
     *)
       log_error "Unknown tool: $tool"
@@ -1273,7 +1302,19 @@ cmd_login() {
 _login_apikey_alias() {
   local tool="$1" slot_name slot_dir alias_name rc_file config_file
   # Full slot name = directory name: {tool}-apikey-{name}
-  slot_name="${tool}-apikey-${LOGIN_PROVIDER_NAME:-default}"
+  # --name flag takes priority; otherwise prompt interactively (empty → exit)
+  if [[ -n "${LOGIN_PROVIDER_NAME:-}" ]]; then
+    slot_name="${tool}-apikey-${LOGIN_PROVIDER_NAME}"
+  else
+    if [[ "$YES_MODE" == "true" ]]; then
+      log_error "--name is required in non-interactive (--yes) mode for $tool apikey login"
+      exit 2
+    fi
+    local custom_name
+    custom_name="$(prompt_value "Enter slot name for $tool apikey")"
+    [[ -z "$custom_name" ]] && { log_error "Slot name is required — cannot be empty"; exit 2; }
+    slot_name="${tool}-apikey-${custom_name}"
+  fi
   slot_dir="$AUTH_DIR/$slot_name"
   alias_name="$slot_name"
 
@@ -1291,8 +1332,58 @@ _login_apikey_alias() {
       config_file="$slot_dir/settings.json"
       cat > "$config_file" <<'JSON'
 {
-  "env": {},
-  "permissions": {"defaultMode": "bypassPermissions"}
+  "model": "claude-opus-4-8",
+  "env": {
+    "ANTHROPIC_AUTH_TOKEN": "",
+    "ANTHROPIC_BASE_URL": "https://api.anthropic.com",
+    "ANTHROPIC_MODEL": "claude-opus-4-8",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-8",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-6",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-haiku-4-5",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "claude-sonnet-4-6"
+  },
+  "permissionMode": "bypassPermissions",
+  "permissions": {
+    "defaultMode": "bypassPermissions",
+    "allow": [
+      "Bash(git log *)",
+      "Bash(git diff *)",
+      "Bash(git status *)",
+      "Bash(git branch *)",
+      "Read(*)"
+    ],
+    "deny": [
+      "Bash(git push --force origin main:*)",
+      "Bash(git push --force origin develop:*)",
+      "Bash(git push --delete origin main:*)",
+      "Bash(git push --delete origin develop:*)",
+      "Bash(rm -rf /)",
+      "Bash(rm -rf ~/*)",
+      "Bash(> /dev/sd*)"
+    ]
+  },
+  "apiKeyHelper": {
+    "enabled": true,
+    "storage": "keychain"
+  },
+  "hooks": {
+    "pre": {},
+    "post": {},
+    "onFailure": {}
+  },
+  "statusLine": {
+    "enabled": true,
+    "position": "bottom",
+    "showKeyBindings": true,
+    "showModel": true,
+    "showTokens": false,
+    "showActivity": true,
+    "style": "default"
+  },
+  "autoUpdatesChannel": "latest",
+  "skipDangerousModePermissionPrompt": true,
+  "theme": "dark",
+  "editor": "vim"
 }
 JSON
       ;;
@@ -1375,6 +1466,63 @@ TOML
   log_info ""
   log_info ">>> Please edit the config file above to add"
   log_info "    your API key, base URL, model, etc."
+  log_info "============================================"
+  echo ""
+}
+
+# _login_account_slot: create account-mode slot with interactive slot name prompt.
+# Slot dir: ~/.ai-auth/{tool}-account-{name}/
+# Alias:    {tool}-account-{name}="{tool}"
+# For claude/opencode/cc/kiro-cli — account mode uses default tool auth (OAuth/keychain),
+# so the slot is a named reference without a custom settings override.
+_login_account_slot() {
+  local tool="$1" slot_name slot_dir alias_name rc_file
+
+  # Resolve slot name: --name flag or interactive prompt
+  if [[ -n "${LOGIN_PROVIDER_NAME:-}" ]]; then
+    slot_name="${tool}-account-${LOGIN_PROVIDER_NAME}"
+  else
+    if [[ "$YES_MODE" == "true" ]]; then
+      log_error "--name is required in non-interactive (--yes) mode for $tool account login"
+      exit 2
+    fi
+    local custom_name
+    custom_name="$(prompt_value "Enter slot name for $tool account")"
+    [[ -z "$custom_name" ]] && { log_error "Slot name is required — cannot be empty"; exit 2; }
+    slot_name="${tool}-account-${custom_name}"
+  fi
+
+  slot_dir="$AUTH_DIR/$slot_name"
+  alias_name="$slot_name"
+
+  [[ "$DRY_RUN" == "true" ]] && {
+    log_info "[DRY-RUN] Would create account slot: $slot_dir"
+    log_info "[DRY-RUN] Would add alias: $alias_name"
+    return 0
+  }
+
+  mkdir -p "$slot_dir"
+  write_tool_active_slot "$tool" "$slot_name"
+
+  # Add alias to shell rc — account mode points directly to the tool binary
+  rc_file="${FREELY_SHELL_RC_FILE:-$HOME/.zshrc}"
+  if ! grep -qF "alias $alias_name=" "$rc_file" 2>/dev/null; then
+    echo "alias $alias_name=\"$tool\"" >> "$rc_file"
+    log_info "Alias added: $alias_name"
+  else
+    log_info "Alias already exists: $alias_name"
+  fi
+
+  notify_freely_auth_change "$tool" "$slot_name" "login_success"
+
+  echo ""
+  log_info "============================================"
+  log_info "Account slot created successfully!"
+  log_info "  Tool:   $tool (account)"
+  log_info "  Alias:  $alias_name"
+  log_info "  Dir:    $slot_dir"
+  log_info ""
+  log_info "  Run '$alias_name' to use $tool with default auth."
   log_info "============================================"
   echo ""
 }
