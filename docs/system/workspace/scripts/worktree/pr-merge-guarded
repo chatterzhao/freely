@@ -34,21 +34,26 @@ fail() {
   exit 1
 }
 
-merge_lock_file() {
-  printf '%s/freely-merge.lock\n' "$(git rev-parse --git-dir 2>/dev/null || echo "/tmp")"
+merge_lock_dir() {
+  printf '%s/freely-merge-lock\n' "$(git rev-parse --git-dir 2>/dev/null || echo "/tmp")"
 }
 acquire_merge_lock() {
-  local lock; lock="$(merge_lock_file)"
-  exec 200>"$lock"
-  if ! flock -x -w "${MERGE_LOCK_TIMEOUT:-300}" 200 2>/dev/null; then
-    echo "[MERGE-GUARD] merge lock timeout after ${MERGE_LOCK_TIMEOUT:-300}s (another merge in progress?)" >&2
-    return 1
-  fi
-  echo "[MERGE-GUARD] merge lock acquired."
+  local lock_dir; lock_dir="$(merge_lock_dir)"
+  local timeout="${MERGE_LOCK_TIMEOUT:-300}" waited=0 interval=2
+  while ! mkdir "$lock_dir" 2>/dev/null; do
+    if [[ "$waited" -ge "$timeout" ]]; then
+      echo "[MERGE-GUARD] merge lock timeout after ${timeout}s (another merge in progress?)" >&2
+      return 1
+    fi
+    sleep "$interval"
+    waited=$((waited + interval))
+  done
+  echo "[MERGE-GUARD] merge lock acquired (waited ${waited}s)."
+  trap 'release_merge_lock' EXIT
 }
 release_merge_lock() {
-  flock -u 200 2>/dev/null || true
-  exec 200>&- 2>/dev/null || true
+  local lock_dir; lock_dir="$(merge_lock_dir)"
+  rmdir "$lock_dir" 2>/dev/null || true
 }
 cleanup_merge_residue() {
   # Belt-and-suspenders: ensure no MERGE_HEAD leaks past a failed merge attempt.
