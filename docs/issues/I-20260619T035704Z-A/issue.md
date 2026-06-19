@@ -3,7 +3,7 @@ local_id: I-20260619T035704Z-A
 kind: linked
 phase_state: in_dev
 source_raw: raw-20260619T035704Z
-source_candidate: C-20260619T035704Z-A
+source_candidate: docs/pre-brainstorms/20260619T035704Z--parse-candidate-heading-regex/candidates.md#C-20260619T035704Z-A
 platform_ids: {}
 primary_platform: github
 canonical_issue_path: I-20260619T035704Z-A
