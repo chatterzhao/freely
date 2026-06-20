@@ -12859,14 +12859,27 @@ except: pass
   if [[ -n "$_worker_tasks" ]]; then
     while IFS=$'\t' read -r _task_id _task_msg _target_worktree _task_branch _raw_key _task_skill; do
       [[ -n "$_task_id" && -n "$_task_msg" ]] || continue
+      # Check worktree existence BEFORE creating prompt file or launching.
+      # If the worktree doesn't exist, mark the task as input-required so
+      # the Manager can create it on the next patrol (self-healing loop).
+      if [[ ! -d "$_target_worktree" ]]; then
+        log_warn "worker deferred: worktree missing — $_target_worktree"
+        log_warn "  raw_key=$_raw_key branch=$_task_branch"
+        if [[ -n "$_task_id" && -f "$_a2a_task_py" && -f "$_db_path" ]]; then
+          python3 "$_a2a_task_py" update \
+            --task-id "$_task_id" --status "input-required" \
+            --reason "worktree_missing: raw_key=$_raw_key branch=$_task_branch worktree=$_target_worktree" \
+            >/dev/null 2>&1 || true
+        fi
+        continue
+      fi
       # Derive prompt file path from task_id (ACR layer concern, not A2A)
       local _prompts_dir="${_target_worktree:-$project}/.freely/run/a2a-prompts"
       mkdir -p "$_prompts_dir" 2>/dev/null || true
       _prompt_file="$_prompts_dir/task-${_task_id}.txt"
       printf '%s\n' "$_task_msg" > "$_prompt_file"
       # Guard: skip if worktree already has an active worker
-      local _target_worktree
-      if [[ -n "$_target_worktree" ]] && worktree_has_active_worker "$project" "$_target_worktree"; then
+      if worktree_has_active_worker "$project" "$_target_worktree"; then
         log_warn "worker skipped: worktree busy — $_target_worktree"
         continue
       fi
