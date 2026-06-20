@@ -14,7 +14,7 @@ platform_ids:
 updated_at: '2026-06-17T16:53:37Z'
 primary_platform: github
 created_at: '2026-06-17T16:53:37Z'
-platform_state: open
+platform_state: closed
 ---
 # I-20260617T110109Z-A: Remove prompt_file from A2A
 A2A needs Message, not files. prompt_file path now derived from task_id at Runtime.

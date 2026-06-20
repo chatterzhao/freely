@@ -5,19 +5,20 @@ status: in_dev
 phase_state: completed
 promoted_from: raw-20260617T063755Z
 source_candidate: docs/pre-brainstorms/20260617T063755Z--a2a-unified-data-flow/candidates.md
-canonical_issue_path: ""
+canonical_issue_path: ''
 platform_ids: {}
-primary_platform: ""
+primary_platform: ''
 last_synced_comment_at: {}
-hash: ""
-created_at: 2026-06-17T06:37:55Z
-updated_at: 2026-06-17T06:40:00Z
-intake_id: ""
+hash: ''
+created_at: 2026-06-17 06:37:55+00:00
+updated_at: 2026-06-17 06:40:00+00:00
+intake_id: ''
 author: zhaoquan
 channel: freely-fix-execution
 session_refs: []
 pre_tests_path: docs/epics/a2a-unified-data-flow/pre-tests.md
 verification_artifact_dir: docs/epics/a2a-unified-data-flow/code-reviews
+platform_state: closed
 ---
 
 # I-20260617T063755Z-A: A2A Unified Data Flow

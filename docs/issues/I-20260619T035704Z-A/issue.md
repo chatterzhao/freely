@@ -11,6 +11,7 @@ canonical_issue_path: I-20260619T035704Z-A
 last_synced_comment_at: {}
 created_at: 2026-06-19
 session_refs: []
+platform_state: closed
 ---
 
 ## Fix: parse_candidate_file heading regex #{1,3} + diagnostic
