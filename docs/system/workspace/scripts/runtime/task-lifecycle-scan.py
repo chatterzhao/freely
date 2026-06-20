@@ -32,7 +32,11 @@ def parse_frontmatter(text: str) -> dict:
     if not text.startswith("---"):
         return _parse_legacy_frontmatter(text)
     parts = text.split("---", 2)
-    if len(parts) < 3:
+    # Accept 2 parts (opening --- without closing ---) or 3 parts (both delimiters)
+    if len(parts) < 2:
+        return {}
+    yaml_text = parts[1] if len(parts) >= 2 else ""
+    if not yaml_text.strip():
         return {}
     fields = {}
     in_platform_ids = False
@@ -1215,7 +1219,7 @@ def _trace_chain(project: Path, key: str, platform_data: dict) -> dict:
     if has_worktree:
         merged_reached = any_merged
     else:
-        merged_reached = phase in DONE_STATES.union(ACTIVE_B2)
+        merged_reached = phase in DONE_STATES or phase in ACTIVE_B2 or phase in TERMINAL_CHILD
     _st("merged_develop", merged_reached, True,
         branches=branch_statuses if branch_statuses else None,
         reason=("at least one branch merged" if any_merged else
