@@ -21654,6 +21654,9 @@ cmd_start() {
     esac
   done
   project="$(resolve_project_or_fail "$project")"
+  # Ensure DB daemon is running before write_task_mode writes to SQLite.
+  # write_task_mode calls freely-db-cli which needs the DB daemon's Unix socket.
+  ensure_freely_db "$project"
   # Write task mode: explicit flag or reset to default wait
   if [[ -n "$task_mode" ]]; then
     write_task_mode "$project" "$task_mode"
@@ -21834,6 +21837,9 @@ cmd_daemon_start() {
     esac
   done
   project="$(resolve_project_or_fail "$project")"
+  # Ensure DB daemon is running before write_task_mode writes to SQLite.
+  # write_task_mode calls freely-db-cli which needs the DB daemon's Unix socket.
+  ensure_freely_db "$project"
   if [[ -n "$task_mode" ]]; then
     write_task_mode "$project" "$task_mode"
   else
