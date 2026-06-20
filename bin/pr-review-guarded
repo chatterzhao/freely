@@ -213,12 +213,41 @@ if [[ "$final_verdict" == "pass" ]]; then
 
 Co-Authored-By: Claude <noreply@anthropic.com>" 2>/dev/null || true
     echo "Review document committed to branch."
+
+    # Push to all platforms (same as pr-create-guarded).
+    # Without this, pr-merge-guarded can't find the review file on github.
+    _platform_configs() {
+      if [[ -n "${FREELY_REPO_PLATFORMS:-}" ]]; then
+        echo "${FREELY_REPO_PLATFORMS//,/ }"
+        return
+      fi
+      local found_github=0 found_gitee=0
+      while IFS= read -r remote; do
+        [[ -z "$remote" || "$remote" == "all" ]] && continue
+        case "$(git remote get-url "$remote" 2>/dev/null || true)" in
+          *github.com*|*github-*|*github*) found_github=1 ;;
+          *gitee.com*|*gitee-*|*gitee*)   found_gitee=1 ;;
+        esac
+      done < <(git remote)
+      [[ "$found_github" == "1" ]] && echo "github"
+      [[ "$found_gitee" == "1" ]] && echo "gitee"
+    }
+    _platform_remote_name() {
+      case "$1" in
+        gitee) git remote | grep -q '^gitee$' && echo "gitee" || echo "origin" ;;
+        *)     echo "$1" ;;
+      esac
+    }
+    for platform in $(_platform_configs); do
+      remote=$(_platform_remote_name "$platform")
+      echo "  [$platform] pushing review commit..."
+      git push "$remote" "$review_branch" 2>&1 || echo "  [$platform] push FAILED (non-fatal)" >&2
+    done
   fi
 fi
 
 echo ""
 echo "Next steps:"
-echo "  git push  # if review document was committed"
-echo "  cd $(dirname "$(git rev-parse --show-toplevel 2>/dev/null || pwd)")/.. && ./bin/pr-merge-guarded $base $review_branch"
+echo "  ./bin/pr-merge-guarded $base $review_branch"
 
 [[ "$final_verdict" == "pass" ]] && exit 0 || exit 1
