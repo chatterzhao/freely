@@ -3339,3 +3339,8 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260620T083454Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/lifecycle-scan-phase-state/verify`
+### completed_issues
+1. `I-20260620T083454Z-A`
+- title: fix lifecycle scan phase_state filtering
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260620T083454Z-A/issue.md`
