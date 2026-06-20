@@ -91,17 +91,27 @@ fi
 # ── Step 1: Pull latest develop into current branch ──
 echo "Step 1/4: pulling latest $base into $current_branch..."
 if ! git pull origin "$base" 2>&1; then
+  conflicted_files=$(git diff --name-only --diff-filter=U 2>/dev/null || true)
   cat >&2 <<CONFLICT
 ========================================
 冲突: $base 合并到 $current_branch 时出现冲突
 
-请在当前工位中手动解决冲突:
-  git mergetool 或手动编辑冲突文件
-  git add <resolved-files>
-  git commit
+冲突文件:
+$(if [[ -n "$conflicted_files" ]]; then echo "$conflicted_files" | sed 's/^/  /'; else echo "  (无法列出冲突文件，请执行 git status 查看)"; fi)
 
-然后重新运行:
-  ./bin/pr-create-guarded
+解决方案（二选一）:
+
+  方案A: 手动解决冲突
+    git mergetool          # 或用编辑器手动编辑冲突文件
+    git add <resolved-files>
+    git commit
+    ./bin/pr-create-guarded  # 重新运行
+
+  方案B: 放弃本次合并
+    git merge --abort      # 回到合并前状态
+    # 修复冲突根源后重新运行
+    ./bin/pr-create-guarded
+
 ========================================
 CONFLICT
   exit 1
