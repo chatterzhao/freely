@@ -385,7 +385,7 @@ get_launched_pids = launched_pids
 # ── AI Reply Processing ──────────────────────────────────────────────────
 
 def process_ai_reply(reply_text: str, role: str = "manager", raw_key: str = "",
-                     branch: str = "", session_id: str = "") -> dict:
+                     worktree: str = "", branch: str = "", session_id: str = "") -> dict:
     """Process AI reply: extract A2A state, create/update Task via A2A Server.
 
     The AI reply IS an A2A Message. The state block provides the task transition.
@@ -413,6 +413,7 @@ def process_ai_reply(reply_text: str, role: str = "manager", raw_key: str = "",
             skill=fields.get("skill", ""),
             agent_id=role, name=role,
             raw_key=raw_key, worktree=worktree, branch=branch,
+            session_id=session_id,
             message=fields.get("summary", ""),
             state=state,
             summary=fields.get("summary", ""),
@@ -509,6 +510,7 @@ def _main() -> int:
     p_update = sub.add_parser("update")
     p_update.add_argument("--task-id", default="")
     p_update.add_argument("--state", default=None)
+    p_update.add_argument("--session-id", default=None, help="Worker ACP session ID")
     p_update.add_argument("--exit-kind", default=None, help=argparse.SUPPRESS)
     p_update.add_argument("--status", default=None, help=argparse.SUPPRESS)
 
@@ -546,6 +548,11 @@ def _main() -> int:
     p_uwp.add_argument("--worker-pid", default="")
     p_glp = sub.add_parser("get-launched-pids")
     p_glp.add_argument("--raw-key", default="")
+
+    # ── prompt: send a message to a worker via A2A session/prompt ──
+    p_prompt = sub.add_parser("prompt")
+    p_prompt.add_argument("--task-id", required=True, help="Target A2A task ID")
+    p_prompt.add_argument("--message", required=True, help="Message to send to worker")
 
 
 
@@ -648,6 +655,7 @@ def _main() -> int:
         elif args.cmd == "update":
             kwargs = {}
             if getattr(args, 'state', None): kwargs['state'] = args.state
+            if getattr(args, 'session_id', None): kwargs['session_id'] = args.session_id
             print(json.dumps({"affected": update_task(_task_id, **kwargs)}))
         elif args.cmd == "latest-manager":
             t = latest_manager()
@@ -714,6 +722,19 @@ def _main() -> int:
         elif args.cmd == "get-launched-pids":
             rows = launched_pids(getattr(args, 'raw_key', '') or "")
             print(json.dumps({"rows": rows}))
+        elif args.cmd == "prompt":
+            # Send a message to a worker's ACP session via A2A Server.
+            # This stores the message on the task and, if the A2A Server has an
+            # active SSE connection to the worker, it will be delivered in real-time.
+            task_id = getattr(args, 'task_id', '') or ''
+            message = getattr(args, 'message', '') or ''
+            try:
+                c = _client()
+                r = c.add_message(task_id, role="manager", msg_type="text", content=message[:32768])
+                print(json.dumps({"ok": True, "task_id": task_id, "sent": len(message)}))
+            except Exception as e:
+                print(json.dumps({"ok": False, "error": str(e)}))
+
         elif args.cmd == "init":
             print(json.dumps({"ok": True}))
 

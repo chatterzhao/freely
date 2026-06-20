@@ -12292,6 +12292,39 @@ print('')
   python3 "$_a2a_task_py" update-worker-pid --task-id "$task_id" --worker-pid "$worker_pid" >/dev/null 2>&1 || true
 }
 
+# Capture worker's ACP session ID from the cycle log and store it in the A2A task.
+# This enables Manager to use session/prompt for intervention and SSE for streaming.
+capture_worker_session_id_and_store() {
+  local manager_project="$1" worker_cycle_log="$2" task_id="$3"
+  [[ -n "$task_id" ]] || return 0
+  (
+    # Wait for session ID to appear in the log (first line = clean UUID)
+    local _session_id="" _timeout=30 _elapsed=0
+    while [[ $_elapsed -lt $_timeout ]]; do
+      if [[ -f "$worker_cycle_log" && -s "$worker_cycle_log" ]]; then
+        _session_id="$(head -n 1 "$worker_cycle_log" 2>/dev/null | tr -d '[:space:]' || true)"
+        # Validate UUID format (with or without dashes)
+        if [[ "$_session_id" =~ ^[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{12}$ ]]; then
+          break
+        fi
+        _session_id=""
+      fi
+      sleep 1
+      _elapsed=$((_elapsed + 1))
+    done
+    if [[ -n "$_session_id" ]]; then
+      local _a2a_task_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
+      local _db_path="$manager_project/.freely/freely.db"
+      if [[ -f "$_a2a_task_py" && -f "$_db_path" ]]; then
+        python3 "$_a2a_task_py" update --task-id "$task_id" --session-id "$_session_id" >/dev/null 2>&1 || true
+        log_info "worker session-id stored: task=$task_id session=$_session_id"
+      fi
+    else
+      log_warn "worker session-id capture timed out after ${_timeout}s: task=$task_id"
+    fi
+  ) &
+}
+
 launch_worker_from_manager_prompt_if_needed() {
   # ── Worker AI launch ──────────────────────────────────────────────
   #
@@ -12321,7 +12354,7 @@ launch_worker_from_manager_prompt_if_needed() {
   #   - Worker state isolation (separate .freely/run/ per worktree)
   #   The new approach shares the manager's runtime. If the worker AI crashes,
   #   the manager's watchdog should detect and recover it.
-  local manager_project="$1" prompt_file="$2" known_worktree="${3:-}"
+  local manager_project="$1" prompt_file="$2" known_worktree="${3:-}" task_id="${4:-}"
   # Worker prompt paths in the exit contract are relative to the manager
   # project (e.g. .freely/run/worker-prompts/...).  The worker process cd's
   # to the target worktree before reading the prompt — and each worktree has
@@ -12457,6 +12490,7 @@ SESSIONEOF
       "worker_pid=$_worker_pid" \
       "target_project=$target_project" \
       "prompt_file=$prompt_file"
+    capture_worker_session_id_and_store "$manager_project" "$worker_cycle_log" "$task_id"
     return 0
   fi
 
@@ -12488,6 +12522,7 @@ SESSIONEOF
     "worker_pid=$_worker_pid" \
     "target_project=$target_project" \
     "prompt_file=$prompt_file"
+  capture_worker_session_id_and_store "$manager_project" "$worker_cycle_log" "$task_id"
   return 0
 }
 
@@ -12867,6 +12902,9 @@ manager_runtime_launch_workers_after_ai_cycle_if_needed() {
   if [[ -n "$_worker_tasks" ]]; then
     while IFS=$'\t' read -r _task_id _task_msg _target_worktree _task_branch _raw_key _task_skill; do
       [[ -n "$_task_id" && -n "$_task_msg" ]] || continue
+      # Save original A2A task_id before it gets overwritten by insert handoff record.
+      # This is the A2A Server task that Manager monitors via SSE/polling.
+      local _a2a_task_id="$_task_id"
       # Check worktree existence BEFORE creating prompt file or launching.
       # If the worktree doesn't exist, mark the task as input-required so
       # the Manager can create it on the next patrol (self-healing loop).
@@ -12963,12 +13001,17 @@ WORKER_STATE_INJECT
 
 EOF
       fi
-      if launch_worker_from_manager_prompt_if_needed "$project" "$_prompt_file" "$_target_worktree"; then
+      if launch_worker_from_manager_prompt_if_needed "$project" "$_prompt_file" "$_target_worktree" "$_a2a_task_id"; then
         _launched_count=$((_launched_count + 1))
         log_info "worker launched: $(basename "$_prompt_file")"
         if [[ -n "$_task_id" && -f "$_a2a_task_py" && -f "$_db_path" ]]; then
           python3 "$_a2a_task_py" update \
             --task-id "$_task_id" --status "launched" --expected-status "pending" >/dev/null 2>&1 || true
+          # Also update A2A task with session_id if we didn't capture it in launch
+          if [[ -n "$_a2a_task_id" && "$_a2a_task_id" != "$_task_id" ]]; then
+            python3 "$_a2a_task_py" update \
+              --task-id "$_a2a_task_id" --status "working" >/dev/null 2>&1 || true
+          fi
         fi
       else
         log_warn "worker launch failed: $(basename "$_prompt_file") — ${LAUNCH_REJECT_REASON:-launchable check failed}"
