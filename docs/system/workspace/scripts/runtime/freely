@@ -8744,18 +8744,17 @@ manager_worker_launch_state_refresh_for_status() {
     needs_writeback="1"
   fi
   max_parallel_workers="$(manager_max_parallel_workers || true)"
+  # Parse max:warn format (e.g., "10:7")
+  local _mw_max="${max_parallel_workers%%:*}"
+  [[ "$_mw_max" =~ ^[0-9]+$ ]] || _mw_max="10"
   active_running_workers="$(manager_semantic_loop_active_worker_count_for_project "$project" || true)"
-  if [[ "$max_parallel_workers" == "unbounded" ]]; then
-    available_new_slots="unbounded"
+  if ! [[ "$active_running_workers" =~ ^[0-9]+$ ]]; then
+    active_running_workers="0"
+  fi
+  if (( active_running_workers >= _mw_max )); then
+    available_new_slots="0"
   else
-    if ! [[ "$active_running_workers" =~ ^[0-9]+$ ]]; then
-      active_running_workers="0"
-    fi
-    if (( active_running_workers >= max_parallel_workers )); then
-      available_new_slots="0"
-    else
-      available_new_slots="$((max_parallel_workers - active_running_workers))"
-    fi
+    available_new_slots="$((_mw_max - active_running_workers))"
   fi
 
   if [[ "$needs_writeback" == "1" \
@@ -10847,10 +10846,10 @@ manager_semantic_loop_repeat_state_for_project() {
     (( available_new_slots > 0 )) || return 1
   fi
   max_parallel_workers="$(manager_max_parallel_workers)"
-  if [[ "$max_parallel_workers" != "unbounded" ]]; then
-    [[ "$max_parallel_workers" =~ ^[0-9]+$ ]] || return 1
-    (( max_parallel_workers > active_running_workers )) || return 1
-  fi
+  # Parse max:warn format (e.g., "10:7")
+  local _mw2_max="${max_parallel_workers%%:*}"
+  [[ "$_mw2_max" =~ ^[0-9]+$ ]] || _mw2_max="10"
+  (( _mw2_max > active_running_workers )) || return 1
   latest_consumed="unavailable"
   if [[ -f "$(manager_worker_launch_state_file "$project")" ]]; then
     # shellcheck disable=SC1090
