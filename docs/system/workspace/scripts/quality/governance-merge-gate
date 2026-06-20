@@ -484,7 +484,12 @@ def parse_issue_file(rel_path: str) -> IssueRecord:
             try:
                 canonical_text = read_repo_text(canonical)
                 def cgrab(name: str) -> Optional[str]:
+                    # bullet format: "- key: value" (canonical I-* issues)
                     m = re.search(rf"^\s*-\s*{re.escape(name)}:\s*(.+?)\s*$", canonical_text, re.MULTILINE)
+                    if m:
+                        return normalize_scalar(m.group(1))
+                    # YAML format: "key: value" at line start (raw-* and linked I-*)
+                    m = re.search(rf"^{re.escape(name)}:\s*(.+?)\s*$", canonical_text, re.MULTILINE)
                     return normalize_scalar(m.group(1)) if m else None
                 # Canonical fields override linked fields (which may be absent or stale)
                 phase_state = cgrab("phase_state") or phase_state
