@@ -1842,23 +1842,25 @@ manager_worker_launch_state_reconcile_prompt_liveness() {
   queued_csv="${QUEUED_WORKER_PROMPTS:-}"
   queued_prompt_blockers="${QUEUED_WORKER_PROMPT_BLOCKERS:-}"
   max_parallel_workers="$(manager_max_parallel_workers || true)"
+  # Parse max:warn format (e.g., "10:7")
+  local _max_workers="${max_parallel_workers%%:*}"
+  local _warn_workers="${max_parallel_workers##*:}"
+  [[ "$_max_workers" =~ ^[0-9]+$ ]] || _max_workers="10"
+  [[ "$_warn_workers" =~ ^[0-9]+$ ]] || _warn_workers="7"
+  max_parallel_workers="$_max_workers"
   discovered_active_running_workers="$(count_active_running_workers_for_manager_project "$project" 2>/dev/null || true)"
   [[ "$discovered_active_running_workers" =~ ^[0-9]+$ ]] || discovered_active_running_workers="0"
   active_running_workers="$(manager_semantic_loop_active_worker_count_for_project "$project" || true)"
   if [[ -n "$normalized_launched_csv" && -z "$updated_launched_csv" ]]; then
     active_running_workers="$discovered_active_running_workers"
   fi
-  if [[ "$max_parallel_workers" == "unbounded" ]]; then
-    available_new_slots="unbounded"
+  if ! [[ "$active_running_workers" =~ ^[0-9]+$ ]]; then
+    active_running_workers="0"
+  fi
+  if (( active_running_workers >= _max_workers )); then
+    available_new_slots="0"
   else
-    if ! [[ "$active_running_workers" =~ ^[0-9]+$ ]]; then
-      active_running_workers="0"
-    fi
-    if (( active_running_workers >= max_parallel_workers )); then
-      available_new_slots="0"
-    else
-      available_new_slots="$((max_parallel_workers - active_running_workers))"
-    fi
+    available_new_slots="$((_max_workers - active_running_workers))"
   fi
 
   if [[ "$needs_writeback" == "1" || "$updated_launched_csv" != "$normalized_launched_csv" ]]; then
@@ -12090,7 +12092,9 @@ manager_pending_ownership_conflicts_summary() {
 }
 
 manager_max_parallel_workers() {
-  printf 'unbounded\n'
+  # Two-tier concurrency: soft cap (7) warns, hard cap (10) blocks.
+  # Future: overridable via config.toml [runtime] max_parallel_workers / worker_warn_threshold
+  printf '10:7\n'
 }
 
 all_repo_worktrees_for_project() {

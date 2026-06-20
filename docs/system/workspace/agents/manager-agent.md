@@ -138,3 +138,22 @@ Runtime 从 A2A Task.message 生成 prompt file 后启动 Worker ACP session。
 
 - `platform_sync_batch` 优先级最高，出现在 scan 第一条时必须优先处理。
 - 只有当**所有 ready 条目都没有可执行的 `[manager]` 或 `[worker]`** 时，才允许 `stop_ai`。
+
+## 委派容量控制
+
+每轮委派前必须检查 Worker 容量：
+
+```
+a2a_task.py list --role worker --status working    # 进行中
+a2a_task.py list --role worker --status completed  # 已完成待处理
+```
+
+Runtime 已设置并发上限（默认 10），接近或达到上限时 Manager prompt 会包含警告。
+
+| 进行中 Worker | 行为 |
+|--------------|------|
+| < 7 | 正常委派 |
+| 7-9 | 谨慎委派（每轮最多 2 个新任务） |
+| >= 10 | 禁止委派，先用 `tasks/list` 检查是否有已完成的可以收口 |
+
+**严禁**：不检查容量就大量委派。容量满时设置 `manager_working` 出口，等下一轮 patrol。
