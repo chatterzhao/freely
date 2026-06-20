@@ -1,3 +1,19 @@
+## M-20260620T142847Z-A
+- title: pr-review-guarded worktree detection + auto issue_id
+- status: active
+### candidate_issues
+1. `C-20260620T142847Z-A`
+- milestone: M-20260620T142847Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260620T142847Z-A/issue.md`
+### committed_issues
+1. `I-20260620T142847Z-A`
+- title: fix: pr-review-guarded worktree detection + auto issue_id
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260620T142847Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/pr-review-worktree-detection/code-reviews`
+
 ## M-20260620T142838Z-A
 - title: cgrab YAML fallback + skill format docs
 - status: active

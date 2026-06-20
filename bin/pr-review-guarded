@@ -11,10 +11,13 @@ set -euo pipefail
 
 ROOT_DIR="$(git rev-parse --show-toplevel 2>/dev/null || true)"
 [[ -n "$ROOT_DIR" ]] || { echo "ERROR: not in a git repository" >&2; exit 1; }
-cd "$ROOT_DIR"
 
-current_branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
-review_branch="${1:-$current_branch}"
+review_branch="${1:-}"
+if [[ -z "$review_branch" ]]; then
+  echo "ERROR: branch argument required." >&2
+  echo "Usage: ./bin/pr-review-guarded <branch>" >&2
+  exit 1
+fi
 reviewer="${2:-cli}"
 verdict_override="${3:-}"
 
@@ -95,6 +98,11 @@ else
 fi
 
 # 2. IBM Completeness (governance-merge-gate)
+# Run gate from worktree context so that docs/issues/, docs/epics/, and
+# milestones.md are read from the fix branch, not from the current checkout.
+if [[ -n "$_wt_path" ]]; then
+  cd "$_wt_path"
+fi
 if [[ -x "$ROOT_DIR/bin/governance-merge-gate" ]]; then
   gate_output=$("$ROOT_DIR/bin/governance-merge-gate" --range "$base..$review_branch" 2>&1) && gate_rc=0 || gate_rc=$?
   if [[ "$gate_rc" -eq 0 ]]; then
@@ -195,6 +203,7 @@ cat > "$review_file" << REVIEWDOC
 - reviewer: $reviewer
 - review_date: $_now
 - verdict: $final_verdict
+- issue_id: $_issue_id
 
 $review_body
 ## Overall Verdict
