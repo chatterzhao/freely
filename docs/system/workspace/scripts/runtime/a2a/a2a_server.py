@@ -291,6 +291,24 @@ class FreelyAgentExecutor(BaseAgentExecutor):
 
 # ── A2A Server ───────────────────────────────────────────────────────────
 
+
+# ── Uvicorn log config: suppress h11 "Invalid HTTP request" noise ──
+# h11 library emits WARNING for every non-HTTP byte received on the socket.
+# With Content-Length fixed (a2a_task.py L170 uses len(http_body_bytes)),
+# remaining noise is from external probes or stray connections.
+# Configure h11 logger at ERROR level to suppress diagnostic noise.
+
+def _a2a_uvicorn_log_config():
+    return {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "loggers": {
+            "h11": {"level": "ERROR"},
+            "uvicorn": {"level": "INFO"},
+        },
+    }
+
+
 class A2AServer:
     """A2A Protocol Server — async, official SDK + Starlette + Uvicorn.
 
@@ -525,7 +543,8 @@ class A2AServer:
             if os.path.exists(self.socket_path):
                 os.remove(self.socket_path)
             uds_config = uvicorn.Config(app=app, uds=self.socket_path,
-                                        log_level="info", access_log=False)
+                                        log_level="info", access_log=False,
+                                        log_config=_a2a_uvicorn_log_config())
             uds_server = uvicorn.Server(uds_config)
             self._servers.append(uds_server)
             import threading
@@ -535,7 +554,8 @@ class A2AServer:
 
         if self.listen_mode in ("tcp", "both"):
             tcp_config = uvicorn.Config(app=app, host=self.tcp_host, port=self.tcp_port,
-                                        log_level="info", access_log=False)
+                                        log_level="info", access_log=False,
+                                        log_config=_a2a_uvicorn_log_config())
             tcp_server = uvicorn.Server(tcp_config)
             self._servers.append(tcp_server)
             import threading
