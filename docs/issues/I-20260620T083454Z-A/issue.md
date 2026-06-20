@@ -3,7 +3,7 @@ local_id: I-20260620T083454Z-A
 kind: fix
 phase_state: dev_done
 milestone: ""
-source_candidate: ""
+source_candidate: docs/pre-brainstorms/20260620T083454Z--lifecycle-scan-phase-state/candidates.md#C-20260620T083454Z-A
 canonical_issue_path: docs/issues/I-20260620T083454Z-A/issue.md
 title: "fix: task-source-scan check phase_state before reporting incomplete"
 created_at: "2026-06-20T09:50:00Z"
