@@ -14,15 +14,6 @@
 - issue_path: `docs/issues/I-20260620T104526Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/worker-sse-supervision/verify`
 
-## M-20260620T104526Z-B
-- title: Worker SSE Supervision — Real-time session/prompt Delivery (Future)
-- status: pending
-### candidate_issues
-1. `C-20260620T104526Z-B`
-- milestone: M-20260620T104526Z-B
-- status: promoted (future)
-- promoted_issue_path: `docs/issues/I-20260620T104526Z-B/issue.md`
-
 ## M-20260619T033758Z-A
 - title: login claude interactive slot naming + alias creation
 - status: active
