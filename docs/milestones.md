@@ -1,3 +1,19 @@
+## M-20260618T091116Z-A
+- title: Fix write_task_mode ordering — ensure DB daemon running first
+- status: active
+### candidate_issues
+1. `C-20260618T091116Z-A`
+- milestone: M-20260618T091116Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260618T091116Z-A/issue.md`
+### committed_issues
+1. `I-20260618T091116Z-A`
+- title: fix: ensure DB daemon running before write_task_mode
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260618T091116Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/write-task-mode-ordering/code-reviews`
+
 ## M-20260620T120020Z-A
 - title: Hotfix — remove 'local' from wt-close top-level code (PR #3165 regression)
 - status: active
