@@ -300,6 +300,33 @@ if [[ "$FORCE" == true && -z "$wt_path" ]]; then
       _fm_set_str "$issue_file" "platform_state" "closed"
       _fm_set_str "$issue_file" "updated_at" "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
       echo "wt-close: frontmatter updated (platform_state=closed)"
+
+      # Also close the absorbed I-* issue if it has its own platform_ids.
+      # When a raw issue is absorbed (absorbed_into: I-XXXXX-A), the I-* issue
+      # may have been pushed to GitHub as a separate issue.  wt-close must close
+      # it too — otherwise completed I-* issues accumulate as open on GitHub.
+      local _absorbed_i
+      _absorbed_i="$(_fm_get "$issue_file" "absorbed_into")"
+      if [[ -n "$_absorbed_i" ]]; then
+        local _i_file="$PROJECT_ROOT/docs/issues/$_absorbed_i/issue.md"
+        if [[ -f "$_i_file" ]]; then
+          local _i_phase _i_platform_state
+          _i_phase="$(_fm_get "$_i_file" "phase_state")"
+          _i_platform_state="$(_fm_get "$_i_file" "platform_state")"
+          if [[ "$_i_phase" == "completed" || "$_i_phase" == "done_b2_ibm" ]]; then
+            if [[ "$_i_platform_state" != "closed" ]]; then
+              echo "wt-close: also closing absorbed I-* issue: $_absorbed_i"
+              if "$PROJECT_ROOT/bin/issue-sync" --project "$wt_path" close "$_absorbed_i" completed 2>&1; then
+                _fm_set_str "$_i_file" "platform_state" "closed"
+                _fm_set_str "$_i_file" "updated_at" "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+                echo "wt-close: absorbed I-* closed ✓"
+              else
+                echo "Warning: issue-sync close failed for $_absorbed_i, continuing..." >&2
+              fi
+            fi
+          fi
+        fi
+      fi
     else
       echo "Warning: issue-sync close failed for $issue_id, continuing..." >&2
     fi

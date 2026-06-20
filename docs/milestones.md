@@ -1,3 +1,19 @@
+## M-20260620T115242Z-A
+- title: wt-close closes absorbed I-* issue; issue-sync parent_raw fallback
+- status: active
+### candidate_issues
+1. `C-20260620T115242Z-A`
+- milestone: M-20260620T115242Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260620T115242Z-A/issue.md`
+### committed_issues
+1. `I-20260620T115242Z-A`
+- title: fix: wt-close closes absorbed I-* issue; issue-sync parent_raw fallback
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260620T115242Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/i-star-wt-close-fix/verify`
+
 ## M-20260620T113909Z-A
 - title: pr-review-guarded — auto-push review to all platforms
 - status: active
