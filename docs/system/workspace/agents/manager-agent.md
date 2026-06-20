@@ -44,6 +44,23 @@ Worker 是独立 ACP session，由 Runtime 通过 A2A Server 管理。
 4. **状态汇报**：Worker 完成后通过 A2A SSE `TaskStatusUpdateEvent` 通知状态变更。
    你用 `tasks/list` 查询 Worker 完成状态。
 
+## 自愈：Worker 启动失败的修复
+
+Runtime 启动 Worker 时如果工位不存在，会把 task 标记为 `input-required`，
+reason 包含 `raw_key`、`branch`、`worktree`。必须在每轮 patrol 中检查并处理：
+
+```
+python3 docs/system/workspace/scripts/runtime/a2a_task.py list --role worker --status input-required
+```
+
+**worktree_missing** — 工位不存在：
+- 先用 `wt-create --help` 了解用法
+- 再用完整参数创建：`wt-create --raw-key <key> --source platform --skill <skill> --slug <slug>`
+- 如果 raw issue 也不存在 → 先用 `freely feedback --help` → `freely feedback --repo <repo> --title "..." --body "..."`
+- 工位建好后：`a2a_task.py update --task-id <id> --state submitted`，Runtime 下轮自动启动 Worker
+
+**严禁**：不检查 `input-required` 就 `stop_ai`。只要存在 input-required task，必须处理或至少 report 处理进度。
+
 ## 收口判断
 
 - feature 分支已 merge 到 develop → retire worktree（`wt-close`）
