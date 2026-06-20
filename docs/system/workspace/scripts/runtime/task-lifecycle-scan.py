@@ -19,6 +19,7 @@ TERMINAL_CANDIDATE = {"absorbed", "dropped", "promoted"}
 ACTIVE_B2 = {"in_b2_ibm", "done_b2_ibm", "in_dev", "blocked_dev"}
 COMPLETED = "completed"
 DONE_STATES = {"done_b2_ibm", "completed"}  # implementation finished (B2 done or fully complete)
+TERMINAL_CHILD = {"absorbed", "dropped", "completed"}
 
 
 def now_iso() -> str:
@@ -29,9 +30,13 @@ def now_iso() -> str:
 
 def parse_frontmatter(text: str) -> dict:
     if not text.startswith("---"):
-        return {}
+        return _parse_legacy_frontmatter(text)
     parts = text.split("---", 2)
-    if len(parts) < 3:
+    # Accept 2 parts (opening --- without closing ---) or 3 parts (both delimiters)
+    if len(parts) < 2:
+        return {}
+    yaml_text = parts[1] if len(parts) >= 2 else ""
+    if not yaml_text.strip():
         return {}
     fields = {}
     in_platform_ids = False
@@ -61,6 +66,22 @@ def parse_frontmatter(text: str) -> dict:
         if in_platform_ids and current_platform:
             key = f"platform_ids.{current_platform}.{key}"
         fields[key] = val
+    return fields
+
+
+def _parse_legacy_frontmatter(text: str) -> dict:
+    """Parse old-format frontmatter without YAML --- delimiters.
+    Lines start with "- key: value".
+    """
+    fields = {}
+    for line in text.splitlines():
+        m = re.match(r"^\s*- ([a-zA-Z_][a-zA-Z0-9_]*):\s*(.*)", line)
+        if m:
+            key = m.group(1).strip()
+            val = m.group(2).strip().strip("`").strip('"').strip("'")
+            fields[key] = val
+        elif fields:
+            break
     return fields
 
 
@@ -1008,15 +1029,26 @@ def _trace_chain(project: Path, key: str, platform_data: dict) -> dict:
         if i_dirs or b1_dirs:
             raw_status = "inferred"
             absorbed_into = ""
-            stations["raw_created"] = {"reached": True, "status": "inferred", "note": "raw file missing, inferred from I-* or B1 children"}
+            # Check if any I-* child has terminal phase_state
+            for i_dir in i_dirs:
+                i_file = i_dir / "issue.md"
+                if i_file.is_file():
+                    cfm = parse_frontmatter(i_file.read_text(encoding="utf-8"))
+                    cp = cfm.get("phase_state", "")
+                    if cp in TERMINAL_CHILD:
+                        raw_status = cp
+                        absorbed_into = cfm.get("absorbed_into", "")
+                        break
+            note = "raw file missing" if raw_status == "inferred" else f"inferred from I-* child ({raw_status})"
+            stations["raw_created"] = {"reached": True, "status": raw_status, "note": note}
         else:
             stations["raw_created"] = {"reached": False}
             blockers.append("raw_not_created")
             return _finalize_chain(key, stations, blockers, "raw_created", "raw_created")
 
     # Station 1: B1 pre-brainstorm directory
-    # If raw is absorbed, B1 phase is complete regardless of directory existence
-    raw_is_absorbed = raw_status in ("absorbed",)
+    # If raw is absorbed or dropped, B1 phase is complete regardless of directory existence
+    raw_is_absorbed = raw_status in TERMINAL_RAW or raw_status in TERMINAL_CHILD
     pb_dirs = sorted((project / "docs" / "pre-brainstorms").glob(f"{key}--*")) if (project / "docs" / "pre-brainstorms").is_dir() else []
     b1_dir = pb_dirs[0] if pb_dirs else None
 
@@ -1094,6 +1126,10 @@ def _trace_chain(project: Path, key: str, platform_data: dict) -> dict:
                 "platform_ids": _extract_platform_ids(fm),
             })
 
+    # Dropped/completed raw: terminal, no further action needed
+    if raw_status in ("dropped", "completed"):
+        return _finalize_chain(key, stations, blockers, "dropped_complete", None)
+
     # Absorbed raw: chain may be complete, but cross-validate with children.
     # Don't let a single absorbed flag suppress active children or missing targets.
     if raw_is_absorbed:
@@ -1102,7 +1138,7 @@ def _trace_chain(project: Path, key: str, platform_data: dict) -> dict:
             if (target_dir / "issue.md").is_file():
                 target_fm = parse_frontmatter((target_dir / "issue.md").read_text(encoding="utf-8"))
                 target_phase = target_fm.get("phase_state", "")
-                if target_phase in DONE_STATES or target_phase == COMPLETED:
+                if target_phase in DONE_STATES or target_phase == COMPLETED or target_phase in TERMINAL_CHILD:
                     # Target is done — absorption is fully resolved.
                     stations["i_created"] = {"reached": True, "note": f"absorbed into {absorbed_into} (done)"}
                     if i_children:
@@ -1161,12 +1197,12 @@ def _trace_chain(project: Path, key: str, platform_data: dict) -> dict:
     _st = lambda name, reached, required, **kw: stations.update({name: {"reached": reached, "required": required, **kw}})
 
     # dev_worktree reached if: worktree exists now, OR was merged OR phase_state proves implementation happened
-    dev_wt_reached = has_worktree or any_merged or (not has_worktree and phase in DONE_STATES.union(ACTIVE_B2))
+    dev_wt_reached = has_worktree or any_merged or (not has_worktree and (phase in DONE_STATES or phase in ACTIVE_B2 or phase in TERMINAL_CHILD))
     _st("dev_worktree", dev_wt_reached, True,
         branches=branch_statuses if branch_statuses else None,
         branch_hint="已退役" if not has_worktree else None)
 
-    _st("dev_phase_done", phase in DONE_STATES or phase == COMPLETED, True, phase=phase or "empty")
+    _st("dev_phase_done", phase in DONE_STATES or phase in TERMINAL_CHILD, True, phase=phase or "empty")
 
     # Optional: code review evidence (not all issues need formal review)
     has_cr = False
@@ -1183,7 +1219,7 @@ def _trace_chain(project: Path, key: str, platform_data: dict) -> dict:
     if has_worktree:
         merged_reached = any_merged
     else:
-        merged_reached = phase in DONE_STATES.union(ACTIVE_B2)
+        merged_reached = phase in DONE_STATES or phase in ACTIVE_B2 or phase in TERMINAL_CHILD
     _st("merged_develop", merged_reached, True,
         branches=branch_statuses if branch_statuses else None,
         reason=("at least one branch merged" if any_merged else
@@ -1352,7 +1388,7 @@ def _finalize_chain(key: str, stations: dict, blockers: list[str], current: str,
         "stations": stations,
         "blockers": blockers,
         "advisory": advisory,
-        "complete": len(blockers) == 0 and current in ("branch_deleted", "absorbed_complete"),
+        "complete": len(blockers) == 0 and current in ("branch_deleted", "absorbed_complete", "dropped_complete"),
     }
 
 
