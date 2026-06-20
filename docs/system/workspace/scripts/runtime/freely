@@ -12835,22 +12835,10 @@ manager_runtime_launch_workers_after_ai_cycle_if_needed() {
   _db_path=""$project/.freely/freely.db""
   # A2A-native: query submitted worker tasks with structured data.
   # Output: task_id<TAB>message<TAB>worktree<TAB>branch<TAB>raw_key<TAB>skill (one per task)
-  _worker_tasks=$(python3 "$_a2a_task_py" list --role worker --status submitted 2>/dev/null | python3 -c "
-import json,sys
-try:
-    rows=json.load(sys.stdin)
-    for r in rows.get("rows", []):
-        tid=r.get('task_id','')
-        msg=r.get('message','') or r.get('summary','')
-        wt=r.get('worktree','')
-        br=r.get('branch','')
-        rk=r.get('raw_key','')
-        sk=r.get('skill','')
-        msg = msg.replace("\n", " ").replace("\r", "")
-        if tid and msg:
-            print(f'{tid}\t{msg}\t{wt}\t{br}\t{rk}\t{sk}')
-except: pass
-" 2>/dev/null || true)
+  # A2A-native: query submitted worker tasks with structured data.
+  # Uses external Python script to avoid heredoc quoting issues in daemon context.
+  local _consume_filter_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/consume_worker_tasks.py"
+  _worker_tasks=$(python3 "$_a2a_task_py" list --role worker --status submitted 2>/dev/null | python3 "$_consume_filter_py" 2>/dev/null || true)
   # Get parent handoff_id (latest manager record)
   _parent_task_id=$(python3 "$_a2a_task_py" latest-manager 2>/dev/null | \
     python3 -c "import json,sys; print(json.load(sys.stdin).get('task_id',''))" 2>/dev/null || echo "")
