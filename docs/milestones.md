@@ -3323,3 +3323,19 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260619T045410Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/pr-close-after-merge/code-reviews`
+
+## M-20260620T083454Z-A
+- title: lifecycle scan phase_state filtering
+- status: active
+### candidate_issues
+1. `C-20260620T083454Z-A`
+- milestone: M-20260620T083454Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260620T083454Z-A/issue.md`
+### committed_issues
+1. `I-20260620T083454Z-A`
+- title: fix lifecycle scan phase_state filtering
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260620T083454Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/lifecycle-scan-phase-state/verify`

@@ -1,7 +1,8 @@
 ---
 local_id: I-20260620T083454Z-A
 kind: fix
-phase_state: dev_done
+phase_state: completed
+verification_artifact_dir: docs/epics/lifecycle-scan-phase-state/verify
 milestone: ""
 source_candidate: docs/pre-brainstorms/20260620T083454Z--lifecycle-scan-phase-state/candidates.md#C-20260620T083454Z-A
 canonical_issue_path: docs/issues/I-20260620T083454Z-A/issue.md
