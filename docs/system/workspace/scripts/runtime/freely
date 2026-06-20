@@ -12306,7 +12306,7 @@ launch_worker_from_manager_prompt_if_needed() {
   #   - Worker state isolation (separate .freely/run/ per worktree)
   #   The new approach shares the manager's runtime. If the worker AI crashes,
   #   the manager's watchdog should detect and recover it.
-  local manager_project="$1" prompt_file="$2"
+  local manager_project="$1" prompt_file="$2" known_worktree="${3:-}"
   # Worker prompt paths in the exit contract are relative to the manager
   # project (e.g. .freely/run/worker-prompts/...).  The worker process cd's
   # to the target worktree before reading the prompt — and each worktree has
@@ -12315,7 +12315,12 @@ launch_worker_from_manager_prompt_if_needed() {
   local target_project runtime_probe_project prompt_target_worktree
   local intake_id supervisor_pid ai_pid runtime_contract_file missing_fields_csv has_any_verification_metadata="0"
   local selected_tool
-  target_project="$(materialize_worker_prompt_worktree_if_needed "$manager_project" "$prompt_file")"
+  # Prefer known_worktree from A2A DB (structured, reliable) over prompt text parsing.
+  if [[ -n "$known_worktree" && -d "$known_worktree" ]]; then
+    target_project="$known_worktree"
+  else
+    target_project="$(materialize_worker_prompt_worktree_if_needed "$manager_project" "$prompt_file")"
+  fi
   if [[ -z "$target_project" || ! -d "$target_project" ]]; then
     log_warn "worker launch BLOCKED: worktree does not exist (target=$target_project)"
     log_warn "  Manager must create the worktree before delegating workers."
@@ -12933,7 +12938,7 @@ WORKER_STATE_INJECT
 
 EOF
       fi
-      if launch_worker_from_manager_prompt_if_needed "$project" "$_prompt_file"; then
+      if launch_worker_from_manager_prompt_if_needed "$project" "$_prompt_file" "$_target_worktree"; then
         _launched_count=$((_launched_count + 1))
         log_info "worker launched: $(basename "$_prompt_file")"
         if [[ -n "$_task_id" && -f "$_a2a_task_py" && -f "$_db_path" ]]; then
