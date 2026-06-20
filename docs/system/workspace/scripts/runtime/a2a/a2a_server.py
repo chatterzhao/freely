@@ -431,6 +431,7 @@ class A2AServer:
                     "raw_key": body.get("raw_key", body.get("rawKey", "")),
                     "completion_summary": body.get("summary", ""),
                     "message": body.get("message", ""),
+                    "session_id": body.get("session_id", ""),
                 }
                 self.task_store.raw_rpc("a2a_task.update", dict(fields))
                 return JSONResponse({"id": task.id, "state": "submitted"}, status_code=202)
@@ -474,7 +475,8 @@ class A2AServer:
             fields = {}
             if "state" in body: fields["state"] = sm.get(body["state"], body["state"])
             for k in ["completion_summary","evidence_paths","error",
-                       "reason","next_action","progress","summary","next","evidence"]:
+                       "reason","next_action","progress","summary","next","evidence",
+                       "session_id"]:
                 if k in body: fields[k] = body[k]
             if "summary" in fields: fields.setdefault("completion_summary", fields.pop("summary"))
             if "next" in fields: fields.setdefault("next_action", fields.pop("next"))

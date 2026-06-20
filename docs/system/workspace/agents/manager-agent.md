@@ -21,7 +21,7 @@ python3 docs/system/workspace/scripts/runtime/a2a_task.py list --role worker --s
 - B1/B2 完成 → 判断是否需要 dev-loop 或 PR
 - 有遗留 → 创建新的 raw issue 继续
 
-### 步骤 3：检查 Worker 容量
+### 步骤 3：检查 Worker 容量与 SSE 监督
 
 ```
 python3 docs/system/workspace/scripts/runtime/a2a_task.py list --role worker --status working
@@ -34,6 +34,46 @@ Runtime 并发上限默认 10（软上限 7 警告）。
 | 0-6 | 正常委派新任务 |
 | 7-9 | **谨慎委派**，每轮最多 2 个新任务。优先处理已完成 Worker 的收口 |
 | >= 10 | **禁止委派**。必须用 `a2a-exit --state completed --summary "at capacity"` 退出，等下一轮 |
+
+#### Worker 实时监督（SSE 流式订阅）
+
+对每个 `status=working` 的 Worker，检查其 `session_id` 字段：
+
+```
+python3 docs/system/workspace/scripts/runtime/a2a_task.py get --task-id <task_id>
+```
+
+**有 session_id 的活跃 Worker**：
+- 可用 `curl -N http://localhost:18911/tasks/{task_id}/stream` 订阅 SSE 实时状态流
+- SSE 事件类型：`initial`（当前状态）、`state_update`（状态变更）
+- SSE 不阻塞 patrol：启动 curl 后台进程，下一轮读取收集到的更新
+
+**无 session_id 的 Worker**：
+- Worker 刚启动（session_id 尚未捕获），normal——本轮先跳过，下轮再检查
+- 若连续 2 轮仍然无 session_id → Worker 可能启动失败，标记 `failed`
+
+**卡顿检测（stall timeout）**：
+- Worker 在 `working` 状态超过 N 分钟无更新 → 用 `session/prompt` 主动问询
+- `a2a_task.py prompt --task-id <id> --message "Status check: what are you working on?"`
+- 若 `session/prompt` 回复正常 → 等待；无响应 → 标记 `input-required`
+
+#### session/prompt 干预机制
+
+Runtime 已将 Worker 的 ACP session_id 存入 A2A task。当需要主动干预时：
+
+```bash
+# 发送干预消息到 Worker 的 ACP session
+python3 docs/system/workspace/scripts/runtime/a2a_task.py prompt \
+  --task-id <task_id> \
+  --message "你的干预指令"
+```
+
+适用场景：
+- Worker 卡住、超时无更新
+- 发现更高优先级任务，需要 Worker 切换
+- Worker 产出需要即时纠正方向
+
+`session/prompt` 通过 A2A Server 的 ACP bridge 转发到 Worker 的 session。Worker 收到后作为 chat 消息处理。
 
 ### 步骤 4：处理 input-required
 
@@ -132,6 +172,10 @@ Freely 运行时环境中 PATH 已包含 `freely` 及项目脚本目录：
 | `pr-create-guarded` | 创建 PR（pull develop→冲突处理→dry-run gate→push→gh pr create） | dev 完成后 |
 | `pr-merge-guarded develop <pr-branch>` | 门禁合并（PR gate→promotion gate→merge→develop-push） | 合并准备就绪时 |
 | `freely daemon stop --project <path>` | 停止运行时 | 操作前需要停 daemon 时 |
+| `a2a_task.py get --task-id <id>` | 查询单个 A2A task（含 session_id） | 检查 Worker session 状态 |
+| `a2a_task.py update --task-id <id> --status <state>` | 更新 A2A task 状态 | Worker 卡住需手动标记 |
+| `a2a_task.py prompt --task-id <id> --message "..."` | 通过 ACP session/prompt 干预 Worker | Worker 卡住、需即时纠偏 |
+| `curl -N http://localhost:18911/tasks/{task_id}/stream` | SSE 实时订阅 Worker 状态变更 | 长时间运行的 Worker 实时监督 |
 
 ### scan 刷新规则
 
