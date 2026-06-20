@@ -1,5 +1,5 @@
 # Code Review: write_task_mode ordering fix
-- owner_issue: docs/issues/I-20260618T091116Z-A/issue.md
+- issue_path: docs/issues/I-20260618T091116Z-A/issue.md
 
 ## Review Summary
 - Change: 2 lines added (ensure_freely_db calls) in two functions
