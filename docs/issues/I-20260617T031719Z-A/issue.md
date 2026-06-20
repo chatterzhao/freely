@@ -18,7 +18,7 @@ platform_ids:
     url: https://github.com/chatterzhao/freely/issues/2944
     synced_at: '2026-06-17T17:08:23Z'
 primary_platform: github
-platform_state: open
+platform_state: closed
 ---
 
 # I-20260617T031719Z-A: ACP/A2A Final Review Fixes

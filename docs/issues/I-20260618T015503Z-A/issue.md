@@ -5,15 +5,16 @@ status: in_dev
 phase_state: completed
 promoted_from: raw-20260618T015503Z
 source_candidate: docs/pre-brainstorms/20260618T015503Z--worktree-path-architecture/candidates.md
-canonical_issue_path: ""
+canonical_issue_path: ''
 platform_ids: {}
-primary_platform: ""
-created_at: 2026-06-18T01:55:03Z
+primary_platform: ''
+created_at: 2026-06-18 01:55:03+00:00
 author: zhaoquan
 channel: freely-feat-execution
 session_refs: []
 pre_tests_path: docs/epics/worktree-path-architecture/verification/pre-tests.md
 verification_artifact_dir: docs/epics/worktree-path-architecture/code-reviews
+platform_state: closed
 ---
 
 # I-20260618T015503Z-A: Fix worktree path architecture

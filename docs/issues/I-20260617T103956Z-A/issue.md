@@ -14,7 +14,7 @@ platform_ids:
 updated_at: '2026-06-17T17:02:12Z'
 primary_platform: github
 created_at: '2026-06-17T17:02:12Z'
-platform_state: open
+platform_state: closed
 ---
 # I-20260617T103956Z-A: Complete CSV Elimination
 Eliminate all remaining worker_prompts_csv references (~28). Manager prompt: A2A SendMessage pattern.

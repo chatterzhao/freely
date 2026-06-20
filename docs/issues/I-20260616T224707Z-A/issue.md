@@ -5,19 +5,20 @@ status: completed
 phase_state: completed
 promoted_from: raw-20260616T224707Z
 source_candidate: docs/pre-brainstorms/20260616T224707Z--acp-session-id-format-fix/candidates.md
-canonical_issue_path: ""
+canonical_issue_path: ''
 platform_ids: {}
-primary_platform: ""
+primary_platform: ''
 last_synced_comment_at: {}
-hash: ""
-created_at: 2026-06-16T22:47:07Z
-updated_at: 2026-06-16T22:47:07Z
-intake_id: ""
+hash: ''
+created_at: 2026-06-16 22:47:07+00:00
+updated_at: 2026-06-16 22:47:07+00:00
+intake_id: ''
 author: zhaoquan
 channel: freely-fix-execution
 session_refs: []
 pre_tests_path: docs/epics/acp-session-id-format-fix/pre-tests.md
 verification_artifact_dir: docs/epics/acp-session-id-format-fix/code-reviews
+platform_state: closed
 ---
 
 # I-20260616T224707Z-A: ACP Session ID 格式污染修复

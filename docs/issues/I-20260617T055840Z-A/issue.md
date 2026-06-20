@@ -22,7 +22,7 @@ channel: freely-fix-execution
 session_refs: []
 pre_tests_path: docs/epics/merge-guard-rebase-integrity/pre-tests.md
 verification_artifact_dir: docs/epics/merge-guard-rebase-integrity/code-reviews
-platform_state: open
+platform_state: closed
 ---
 
 # I-20260617T055840Z-A: Merge Guard + Rebase Integrity
