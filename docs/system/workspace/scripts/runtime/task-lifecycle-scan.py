@@ -30,7 +30,7 @@ def now_iso() -> str:
 
 def parse_frontmatter(text: str) -> dict:
     if not text.startswith("---"):
-        return {}
+        return _parse_legacy_frontmatter(text)
     parts = text.split("---", 2)
     if len(parts) < 3:
         return {}
@@ -62,6 +62,22 @@ def parse_frontmatter(text: str) -> dict:
         if in_platform_ids and current_platform:
             key = f"platform_ids.{current_platform}.{key}"
         fields[key] = val
+    return fields
+
+
+def _parse_legacy_frontmatter(text: str) -> dict:
+    """Parse old-format frontmatter without YAML --- delimiters.
+    Lines start with "- key: value".
+    """
+    fields = {}
+    for line in text.splitlines():
+        m = re.match(r"^\s*- ([a-zA-Z_][a-zA-Z0-9_]*):\s*(.*)", line)
+        if m:
+            key = m.group(1).strip()
+            val = m.group(2).strip().strip("`").strip('"').strip("'")
+            fields[key] = val
+        elif fields:
+            break
     return fields
 
 
@@ -1182,7 +1198,7 @@ def _trace_chain(project: Path, key: str, platform_data: dict) -> dict:
         branches=branch_statuses if branch_statuses else None,
         branch_hint="已退役" if not has_worktree else None)
 
-    _st("dev_phase_done", phase in DONE_STATES or phase == COMPLETED, True, phase=phase or "empty")
+    _st("dev_phase_done", phase in DONE_STATES or phase in TERMINAL_CHILD, True, phase=phase or "empty")
 
     # Optional: code review evidence (not all issues need formal review)
     has_cr = False
