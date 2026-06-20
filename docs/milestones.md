@@ -1,3 +1,19 @@
+## M-20260620T113909Z-A
+- title: pr-review-guarded — auto-push review to all platforms
+- status: active
+### candidate_issues
+1. `C-20260620T113909Z-A`
+- milestone: M-20260620T113909Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260620T113909Z-A/issue.md`
+### committed_issues
+1. `I-20260620T113909Z-A`
+- title: fix: pr-review-guarded auto-push review document to all platforms
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260620T113909Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/pr-review-push-fix/verify`
+
 ## M-20260620T104526Z-A
 - title: Worker SSE Supervision — Session ID Pass-Through + Manager SSE Awareness
 - status: active
