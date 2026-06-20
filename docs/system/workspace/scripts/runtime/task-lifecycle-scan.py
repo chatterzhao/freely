@@ -1368,7 +1368,7 @@ def _finalize_chain(key: str, stations: dict, blockers: list[str], current: str,
         "stations": stations,
         "blockers": blockers,
         "advisory": advisory,
-        "complete": len(blockers) == 0 and current in ("branch_deleted", "absorbed_complete"),
+        "complete": len(blockers) == 0 and current in ("branch_deleted", "absorbed_complete", "dropped_complete"),
     }
 
 
