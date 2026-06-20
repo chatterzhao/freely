@@ -31,7 +31,17 @@ export class TauriProbeAdapter implements ProbeAdapter {
     });
   }
 
-  requestSnapshot(projectId: string): Promise<ProbeSnapshot> {
+  async listProjects(): Promise<string[]> {
+    try {
+      // Backend-driven project discovery (Tauri command).
+      return await this.invoke<string[]>("list_projects", {});
+    } catch {
+      // Fallback for backends without the list_projects command yet.
+      return ["freely", "freely-sandbox", "frontend-probe-demo"];
+    }
+  }
+
+  async requestSnapshot(projectId: string): Promise<ProbeSnapshot> {
     return this.invoke<ProbeSnapshot>(this.bindings.requestSnapshotCommand, {
       payload: {
         projectId,
