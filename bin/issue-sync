@@ -599,10 +599,12 @@ cmd_close() {
   gh_id=$(_gh_issue_number "$file")
   gitee_id=$(_gitee_resolve_issue_number "$file" "$local_id")
 
-  # Fallback: if I-* has no platform_ids, trace up to raw-* parent
+  # Fallback: if I-* has no platform_ids, trace up to raw-* parent.
+  # Supports both promoted_from (legacy) and parent_raw (post-2026-06-20).
   local kind="$(_fm_get "$file" "kind")"
   if [[ -z "$gh_id" && -z "$gitee_id" && "$kind" == "linked" ]]; then
-    local parent_id="$(_fm_get "$file" "promoted_from")"
+    local parent_id="$(_fm_get "$file" "parent_raw")"
+    [[ -z "$parent_id" ]] && parent_id="$(_fm_get "$file" "promoted_from")"
     if [[ -n "$parent_id" ]]; then
       local parent_file="$ISSUES_DIR/$parent_id/issue.md"
       if [[ -f "$parent_file" ]]; then
