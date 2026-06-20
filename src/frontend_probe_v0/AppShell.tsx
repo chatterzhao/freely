@@ -1,7 +1,7 @@
 import type { ProbeAdapter } from "./adapter";
 import type { ServerEvent } from "./contracts";
 import { buildPanelModels } from "./panels";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { useProbeChatIntervention } from "./useProbeChatIntervention";
 import { useProbeEvents } from "./useProbeEvents";
@@ -104,6 +104,17 @@ export function AppShell({
   bridgeBindings,
 }: AppShellProps) {
   const [selectedProjectId, setSelectedProjectId] = useState(projectId);
+  const [projectList, setProjectList] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!adapter) return;
+    let cancelled = false;
+    adapter.listProjects().then((ids) => {
+      if (!cancelled) setProjectList(ids);
+    });
+    return () => { cancelled = true; };
+  }, [adapter]);
+
   const { adapter: resolvedAdapter, error: runtimeError, snapshot, loading } = useProbeRuntime(
     selectedProjectId,
     adapter,
@@ -205,7 +216,7 @@ export function AppShell({
             }}
             value={selectedProjectId}
           >
-            {["freely", "freely-sandbox", "frontend-probe-demo"].map((candidateProjectId) => (
+            {(projectList.length > 0 ? projectList : [projectId]).map((candidateProjectId) => (
               <option key={candidateProjectId} value={candidateProjectId}>
                 {candidateProjectId}
               </option>

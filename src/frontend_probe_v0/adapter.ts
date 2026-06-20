@@ -3,6 +3,8 @@ import type { EventListener } from "./events";
 import { mockSnapshot } from "./mockSnapshot";
 
 export interface ProbeAdapter {
+  /** List known project IDs — driven by runtime config, not hardcoded. */
+  listProjects(): Promise<string[]>;
   requestSnapshot(projectId: string): Promise<ProbeSnapshot>;
   sendCommand(command: ClientCommand): Promise<void>;
 }
@@ -10,6 +12,15 @@ export interface ProbeAdapter {
 export class MockProbeAdapter implements ProbeAdapter {
   private readonly listeners = new Set<EventListener>();
   private readonly snapshots = new Map<string, ProbeSnapshot>();
+
+  async listProjects(): Promise<string[]> {
+    const known = new Set(this.snapshots.keys());
+    // Default projects always available even before any snapshot is loaded.
+    for (const id of ["freely", "freely-sandbox", "frontend-probe-demo"]) {
+      known.add(id);
+    }
+    return Array.from(known).sort();
+  }
 
   async requestSnapshot(projectId: string): Promise<ProbeSnapshot> {
     return structuredClone(this.getSnapshot(projectId));

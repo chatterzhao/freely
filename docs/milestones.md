@@ -1,3 +1,19 @@
+## M-20260617T051631Z-A
+- title: Frontend dynamic project list via adapter
+- status: active
+### candidate_issues
+1. `C-20260617T051631Z-A`
+- milestone: M-20260617T051631Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260617T051631Z-A/issue.md`
+### committed_issues
+1. `I-20260617T051631Z-A`
+- title: fix: dynamic project list via adapter
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260617T051631Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/frontend-dynamic-project-list/code-reviews`
+
 ## M-20260619T061448Z-A
 - title: A2A server h11 non-HTTP noise suppression
 - status: active
