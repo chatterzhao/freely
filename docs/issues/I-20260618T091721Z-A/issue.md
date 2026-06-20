@@ -1,0 +1,32 @@
+---
+issue_id: I-20260618T091721Z-A
+kind: fix
+phase_state: completed
+milestone: M-20260618T091721Z-A
+source_candidate: docs/pre-brainstorms/raw-20260618T091721Z-add-claude-md/candidates.md#C-20260618T091721Z-A
+canonical_issue_path: docs/issues/I-20260618T091721Z-A/issue.md
+title: Add CLAUDE.md — automatic AI governance rule loading
+---
+
+# I-20260618T091721Z-A: CLAUDE.md project governance auto-loading
+
+- title: Add CLAUDE.md — automatic AI governance rule loading
+- source: `raw-20260618T091721Z` (GitHub #2986)
+- milestone: M-20260618T091721Z-A
+- source_candidate: `docs/pre-brainstorms/raw-20260618T091721Z-add-claude-md/candidates.md#C-20260618T091721Z-A`
+- issue_id: I-20260618T091721Z-A
+- phase_state: completed
+- component: governance
+
+## Branch
+
+- feature branch: `fix/raw-20260618T091721Z-add-claude-md-governance`
+
+## Deliverables
+
+### B2_IBM
+- PRD: `docs/epics/add-claude-md-governance/prd.md`
+- Tasks: `docs/epics/add-claude-md-governance/tasks.md`
+
+### Implementation
+- `CLAUDE.md` — Created at project root, auto-loaded by Claude Code

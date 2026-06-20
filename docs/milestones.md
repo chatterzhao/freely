@@ -1,3 +1,19 @@
+## M-20260618T091721Z-A
+- title: Add CLAUDE.md — automatic AI governance rule loading
+- status: active
+### candidate_issues
+1. `C-20260618T091721Z-A`
+- milestone: M-20260618T091721Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260618T091721Z-A/issue.md`
+### committed_issues
+1. `I-20260618T091721Z-A`
+- title: fix: add CLAUDE.md for automatic AI governance rule loading
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260618T091721Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/add-claude-md-governance/code-reviews`
+
 ## M-20260618T091116Z-A
 - title: Fix write_task_mode ordering — ensure DB daemon running first
 - status: active
