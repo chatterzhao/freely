@@ -1015,8 +1015,8 @@ def _trace_chain(project: Path, key: str, platform_data: dict) -> dict:
             return _finalize_chain(key, stations, blockers, "raw_created", "raw_created")
 
     # Station 1: B1 pre-brainstorm directory
-    # If raw is absorbed, B1 phase is complete regardless of directory existence
-    raw_is_absorbed = raw_status in ("absorbed",)
+    # If raw is absorbed or dropped, B1 phase is complete regardless of directory existence
+    raw_is_absorbed = raw_status in TERMINAL_RAW
     pb_dirs = sorted((project / "docs" / "pre-brainstorms").glob(f"{key}--*")) if (project / "docs" / "pre-brainstorms").is_dir() else []
     b1_dir = pb_dirs[0] if pb_dirs else None
 
@@ -1093,6 +1093,10 @@ def _trace_chain(project: Path, key: str, platform_data: dict) -> dict:
                 "canonical": fm.get("canonical_issue_path", ""),
                 "platform_ids": _extract_platform_ids(fm),
             })
+
+    # Dropped raw: terminal, no further action needed
+    if raw_status in ("dropped",):
+        return _finalize_chain(key, stations, blockers, "dropped_complete", None)
 
     # Absorbed raw: chain may be complete, but cross-validate with children.
     # Don't let a single absorbed flag suppress active children or missing targets.
