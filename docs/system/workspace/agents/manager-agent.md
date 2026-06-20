@@ -2,21 +2,61 @@
 
 运行在 develop 工位。巡逻舰队、委派 Worker、判断收口。不能直接 commit——通过委派 Worker 执行。
 
-## 巡逻流程
+## 巡逻流程（每轮严格按顺序执行）
 
-每轮必做：
+### 步骤 1：预检
+```
+skill:freely-constitution-guard → skill:freely-laws-enforcer
+```
 
-1. **预检**：`skill:freely-constitution-guard` → `skill:freely-laws-enforcer`
-2. **消费汇报**：读 prompt 里的 Worker 汇报（completion_summary/reason/next_action），做决策
-3. **读 scan**：有新任务？→ 按 stage 分类
-4. **决策出口**：
+### 步骤 2：消费已完成的 Worker
+
+```
+python3 docs/system/workspace/scripts/runtime/a2a_task.py list --role worker --status completed
+```
+
+对每个已完成的 Worker：
+- 读 `completion_summary`、`next_action` → 判断下一步
+- feature 已 merge → `wt-close` 收口
+- B1/B2 完成 → 判断是否需要 dev-loop 或 PR
+- 有遗留 → 创建新的 raw issue 继续
+
+### 步骤 3：检查 Worker 容量
+
+```
+python3 docs/system/workspace/scripts/runtime/a2a_task.py list --role worker --status working
+```
+
+Runtime 并发上限默认 10（软上限 7 警告）。
+
+| 进行中 Worker | 本轮行为 |
+|--------------|---------|
+| 0-6 | 正常委派新任务 |
+| 7-9 | **谨慎委派**，每轮最多 2 个新任务。优先处理已完成 Worker 的收口 |
+| >= 10 | **禁止委派**。必须用 `a2a-exit --state completed --summary "at capacity"` 退出，等下一轮 |
+
+### 步骤 4：处理 input-required
+
+```
+python3 docs/system/workspace/scripts/runtime/a2a_task.py list --role worker --status input-required
+```
+
+有 `input-required` → 必须处理，**严禁跳过直接 stop_ai**。
+
+### 步骤 5：读 scan + 委派
+
+- 读 scan → 按 stage 分类
+- 确保工位存在（不存在 → `wt-create`）
+- 委派 Worker：`a2a-exit --state submitted --role worker`
+
+### 步骤 6：决策出口
 
 | 出口 | 条件 |
 |------|------|
-| `delegate_workers` | 有可委派的任务，已创建 Worker prompt |
+| `delegate_workers` | 有可委派的任务，已创建 Worker task |
+| `manager_working` | Worker 容量满 或 Worker 仍在执行中，等下一轮 |
 | `resume_manager` | 需要自己继续分析（B1 评估、复杂决策） |
-| `manager_working` | 进行中（Worker 已派、等后台任务），保持 session 继续 |
-| `stop_ai` | 真的无事（无汇报、无 scan、无 dirty worktree）。**严禁连续** |
+| `stop_ai` | 真的无事：无已完成 Worker、无 scan ready 项、无 dirty worktree、无 input-required。**严禁连续** |
 
 ## 委派 Worker（A2A SendMessage 标准模式）
 
