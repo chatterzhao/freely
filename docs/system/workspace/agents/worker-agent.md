@@ -15,6 +15,8 @@
 | `closeout` | 批量收口关闭 | `skill:freely-worktree-maintenance-governance`（含 wt-close） |
 | `sync` | 平台同步 | `./bin/issue-sync`（直接用工具） |
 | `cleanup` | 清理过期资源 | `skill:freely-worktree-hygiene-supervision` |
+| `doc` | B1/B2 文档预研/设计 | `skill:freely-doc-B1_IBM-execution`（brainstorm→candidate）或 `skill:freely-doc-B2_IBM-execution`（prd→tasks→code-review） |
+| `dev` | 代码实现 | `skill:freely-dev-loop-execution`（implement→test→evidence） |
 | `promotion` | 发布/升级 | `skill:freely-candidate-acceptance-review` |
 
 如果 prompt header 没有 `skill:` 字段，按 intent_kind 从上表选择对应 skill。

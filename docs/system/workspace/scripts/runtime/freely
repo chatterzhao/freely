@@ -12926,10 +12926,20 @@ print(sum(1 for r in rows if r.get('worktree','')=='$_target_worktree'))
           --created-by manager --consumed-by manager \
           --parent "$_parent_task_id" --prev-worker "$_prev_worker_id" 2>/dev/null || true)
       fi
-      # WORKER_HANDOFF_INJECT: JSON5 template (quoted to protect backticks) + vars
+      # WORKER_HANDOFF_INJECT: prepend worker-agent.md role + skill context,
+      # then append a2a-exit contract.
       if [[ -n "$_task_id" && -f "$_prompt_file" ]]; then
-        local _prev_summary_truncated
+        local _prev_summary_truncated _worker_agent_md
         _prev_summary_truncated="${_prev_worker_summary:0:80}"
+        # Inject worker-agent.md as role definition so the Worker knows its
+        # capabilities, intent_kind→skill mapping, and completion contract.
+        _worker_agent_md="$SELF_ROOT/docs/system/workspace/agents/worker-agent.md"
+        if [[ -f "$_worker_agent_md" ]]; then
+          local _tmp_prompt
+          _tmp_prompt="$(mktemp "$_prompts_dir/tmp.XXXXXX")"
+          cat "$_worker_agent_md" "$_prompt_file" > "$_tmp_prompt"
+          mv "$_tmp_prompt" "$_prompt_file"
+        fi
         cat >> "$_prompt_file" <<'WORKER_STATE_INJECT'
 
 ---
