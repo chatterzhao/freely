@@ -3,7 +3,10 @@ set -euo pipefail
 
 # Scripts live in the main repo (primary git worktree), not in worktrees.
 # Use git worktree list to find the primary worktree path.
-_primary="$(git worktree list --porcelain 2>/dev/null | awk '
+# Buffer git output into a variable to avoid SIGPIPE from awk exit
+# closing the pipe while git is still writing (triggers set -o pipefail).
+_wt_raw="$(git worktree list --porcelain 2>/dev/null || true)"
+_primary="$(printf '%s\n' "$_wt_raw" | awk '
   $1=="worktree" { wt=$2 }
   $1=="HEAD" && $2 ~ /^[0-9a-f]{40}$/ { print wt; exit }
 ')"

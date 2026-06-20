@@ -15,7 +15,9 @@ freely_wt_first_test_pre_merge_branch() {
 }
 
 freely_wt_primary_worktree() {
-  git worktree list --porcelain | awk '/^worktree / {print $2; exit}'
+  local _wt_raw
+  _wt_raw="$(git worktree list --porcelain 2>/dev/null || true)"
+  printf '%s\n' "$_wt_raw" | awk '/^worktree / {print $2; exit}'
 }
 
 freely_wt_current_path() {
@@ -122,8 +124,9 @@ freely_wt_relative_target_for_branch() {
 }
 
 freely_wt_existing_for_branch() {
-  local branch="$1"
-  git worktree list --porcelain | awk -v b="refs/heads/$branch" '
+  local branch="$1" _wt_raw
+  _wt_raw="$(git worktree list --porcelain 2>/dev/null || true)"
+  printf '%s\n' "$_wt_raw" | awk -v b="refs/heads/$branch" '
     $1=="worktree" {wt=$2}
     $1=="branch" && $2==b {print wt; exit}
   '
