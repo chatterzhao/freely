@@ -15,6 +15,8 @@ implemented_in:
   - d7f3433e4
   - 2adaf04e5
   - c72a42683
+  - ba2d7cf52
+  - 22cfa89d6
 verified_in:
   test_branch: test-pre-merge-20260620T083454Z-scan-fix
 ---
