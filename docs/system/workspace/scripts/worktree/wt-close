@@ -305,23 +305,22 @@ if [[ "$FORCE" == true && -z "$wt_path" ]]; then
       # When a raw issue is absorbed (absorbed_into: I-XXXXX-A), the I-* issue
       # may have been pushed to GitHub as a separate issue.  wt-close must close
       # it too — otherwise completed I-* issues accumulate as open on GitHub.
-      local _absorbed_i
-      _absorbed_i="$(_fm_get "$issue_file" "absorbed_into")"
-      if [[ -n "$_absorbed_i" ]]; then
-        local _i_file="$PROJECT_ROOT/docs/issues/$_absorbed_i/issue.md"
-        if [[ -f "$_i_file" ]]; then
-          local _i_phase _i_platform_state
-          _i_phase="$(_fm_get "$_i_file" "phase_state")"
-          _i_platform_state="$(_fm_get "$_i_file" "platform_state")"
-          if [[ "$_i_phase" == "completed" || "$_i_phase" == "done_b2_ibm" ]]; then
-            if [[ "$_i_platform_state" != "closed" ]]; then
-              echo "wt-close: also closing absorbed I-* issue: $_absorbed_i"
-              if "$PROJECT_ROOT/bin/issue-sync" --project "$wt_path" close "$_absorbed_i" completed 2>&1; then
-                _fm_set_str "$_i_file" "platform_state" "closed"
-                _fm_set_str "$_i_file" "updated_at" "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+      # Note: no "local" here — this is script top-level, not a function.
+      _wt_i_absorbed_i="$(_fm_get "$issue_file" "absorbed_into")"
+      if [[ -n "$_wt_i_absorbed_i" ]]; then
+        _wt_i_file="$PROJECT_ROOT/docs/issues/$_wt_i_absorbed_i/issue.md"
+        if [[ -f "$_wt_i_file" ]]; then
+          _wt_i_phase="$(_fm_get "$_wt_i_file" "phase_state")"
+          _wt_i_platform_state="$(_fm_get "$_wt_i_file" "platform_state")"
+          if [[ "$_wt_i_phase" == "completed" || "$_wt_i_phase" == "done_b2_ibm" ]]; then
+            if [[ "$_wt_i_platform_state" != "closed" ]]; then
+              echo "wt-close: also closing absorbed I-* issue: $_wt_i_absorbed_i"
+              if "$PROJECT_ROOT/bin/issue-sync" --project "$wt_path" close "$_wt_i_absorbed_i" completed 2>&1; then
+                _fm_set_str "$_wt_i_file" "platform_state" "closed"
+                _fm_set_str "$_wt_i_file" "updated_at" "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
                 echo "wt-close: absorbed I-* closed ✓"
               else
-                echo "Warning: issue-sync close failed for $_absorbed_i, continuing..." >&2
+                echo "Warning: issue-sync close failed for $_wt_i_absorbed_i, continuing..." >&2
               fi
             fi
           fi
