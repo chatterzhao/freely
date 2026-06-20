@@ -1,3 +1,19 @@
+## M-20260619T061448Z-A
+- title: A2A server h11 non-HTTP noise suppression
+- status: active
+### candidate_issues
+1. `C-20260619T061448Z-A`
+- milestone: M-20260619T061448Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260619T061448Z-A/issue.md`
+### committed_issues
+1. `I-20260619T061448Z-A`
+- title: fix: suppress A2A server h11 non-HTTP noise
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260619T061448Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/a2a-h11-noise/code-reviews`
+
 ## M-20260620T142847Z-A
 - title: pr-review-guarded worktree detection + auto issue_id
 - status: active
