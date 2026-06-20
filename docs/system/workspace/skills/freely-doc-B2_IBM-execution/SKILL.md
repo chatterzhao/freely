@@ -107,6 +107,7 @@ phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
 | verification_artifact_dir too broad or non-canonical | 需以 /code-reviews 结尾，至少4段路径 | `docs/epics/{epic-name}/{story-name}/code-reviews` |
 | implementation decision note is incomplete | 需 5 个字段 | `decision` / `why_this` / `alternatives_considered` / `boundary_non_goals` / `residual_risk` |
 | owner issue 'missing' / that issue cannot be resolved | review/code-review 文件需 bullet 格式的 issue_id | `- issue_id: I-20260508T011858Z-A` |
+| I-* canonical fields (phase_state/milestone/source_candidate) silently cleared | I-* frontmatter 用了 `---` YAML 包裹格式；canonical reader 只解析 bullet | 去掉 `---` 包裹，用 bullet 格式：`- phase_state: completed` |
 | phase_state cannot own capability/implementation changes | 实现变更的 I-* 需 completed | `phase_state: completed` |
 | pre_tests_path 验证失败 | I-* issue 需声明 pre_tests_path | `pre_tests_path: docs/epics/{epic}/verification/pre-tests.md` |
 
@@ -115,27 +116,21 @@ phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
 ### I-* issue.md（完整模板）
 
 ```markdown
----
-local_id: I-20260508T011858Z-A
-kind: linked
-phase_state: done_b2_ibm
-source_raw: raw-20260508T011858Z
-source_candidate: docs/pre-brainstorms/20260508T011858Z--skill-gate-alignment/candidates.md#C-20260508T011858Z-A
-verification_artifact_dir: docs/epics/skill-gate-alignment/code-reviews
-pre_tests_path: docs/epics/skill-gate-alignment/verification/pre-tests.md
-platform_ids: {}
-primary_platform: github
-canonical_issue_path: I-20260508T011858Z-A
-last_synced_comment_at: {}
-created_at: 2026-05-08
-session_refs: []
----
+<!-- I-* frontmatter 使用 bullet 格式（- key: value），不用 YAML --- 包裹。
+     canonical reader (cgrab) 解析 bullet 和 YAML 均可，但 bullet 是推荐格式。 -->
+- issue_id: I-20260508T011858Z-A
+- kind: fix
+- phase_state: completed
+- milestone: M-20260508T011858Z-A
+- source_candidate: docs/pre-brainstorms/20260508T011858Z--skill-gate-alignment/candidates.md#C-20260508T011858Z-A
+- verification_artifact_dir: docs/epics/skill-gate-alignment/code-reviews
+- canonical_issue_path: docs/issues/I-20260508T011858Z-A/issue.md
+- title: 简短描述
 
 # I-20260508T011858Z-A: 标题
 
 - source_candidate: docs/pre-brainstorms/20260508T011858Z--skill-gate-alignment/candidates.md#C-20260508T011858Z-A
 - verification_artifact_dir: docs/epics/skill-gate-alignment/code-reviews
-- pre_tests_path: docs/epics/skill-gate-alignment/verification/pre-tests.md
 ```
 
 ### Implementation Decision Note（完整模板）

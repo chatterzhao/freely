@@ -1,3 +1,19 @@
+## M-20260620T142838Z-A
+- title: cgrab YAML fallback + skill format docs
+- status: active
+### candidate_issues
+1. `C-20260620T142838Z-A`
+- milestone: M-20260620T142838Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260620T142838Z-A/issue.md`
+### committed_issues
+1. `I-20260620T142838Z-A`
+- title: fix: cgrab YAML fallback + skill format docs
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260620T142838Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/cgrab-yaml-fallback/code-reviews`
+
 ## M-20260617T130029Z-A
 - title: pr-create-guarded conflict handling — show conflicted files + abort
 - status: active
