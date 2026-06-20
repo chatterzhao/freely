@@ -8001,7 +8001,19 @@ EOF
 ensure_project_agents_md() {
   local project="$1"
   local agents_file="$project/AGENTS.md"
+  local claude_file="$project/CLAUDE.md"
   local template="$SELF_ROOT/docs/system/workspace/AGENTS.md.example"
+
+  # Generate CLAUDE.md for Claude Code compatibility.
+  # Claude Code reads CLAUDE.md from project root; codex and opencode read AGENTS.md.
+  # CLAUDE.md is a minimal pointer file — the single source of truth is AGENTS.md.
+  if [[ ! -f "$claude_file" ]]; then
+    cat >"$claude_file" <<'CEOF'
+# CLAUDE.md
+Read `AGENTS.md` for project governance, coding conventions, branch/worktree rules, and Freely AI runtime workflow. This file is the authoritative entry point for all AI agents working on this project.
+CEOF
+    log_info "created: CLAUDE.md (Claude Code pointer to AGENTS.md)"
+  fi
 
   if [[ ! -f "$agents_file" ]]; then
     if [[ -f "$template" ]]; then
