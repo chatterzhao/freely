@@ -16,7 +16,7 @@ channel: github
 session_refs: []
 pre_tests_path: docs/epics/merge-guarded-fix-whitelist/verification/pre-tests.md
 verification_artifact_dir: docs/epics/merge-guarded-fix-whitelist/code-reviews
-updated_at: '2026-06-21T18:26:02Z'
+updated_at: '2026-06-21T20:04:45Z'
 platform_state: closed
 ---
 
