@@ -170,9 +170,26 @@ DELETE_BLOCK
 
   branch_name="$(protected_branch_name "$refname")"
   cat <<MSG >&2
-[HOOK] Ref update blocked: protected branch '$branch_name' cannot advance to commit '$new_oid' without a canonical protected-merge receipt.
-Direct fast-forward, reset, and other ref-only updates are not lawful protected-branch merge entrypoints.
-Create a receipt-bearing protected merge commit through ./bin/pr-merge-guarded instead.
+[HOOK] Ref update blocked: protected branch '$branch_name' cannot advance.
+
+  Target commit:  $new_oid
+  Receipt check:  FAILED (Freely-Merge-Path missing or not canonical)
+
+  This block prevents semantic conflicts — merges that git's text-based
+  auto-merge accepts but that silently regress prior fixes.
+
+  Diagnostic steps:
+    1. Check if the merge overwrote a prior fix:
+         git show $new_oid
+         git log --oneline $new_oid --not $old_oid | head -5
+    2. If the commit IS a protected merge, re-run with pr-merge-guarded:
+         ./bin/pr-merge-guarded $branch_name <source-branch>
+       This ensures the merge receipt is properly injected.
+    3. If this is an emergency bypass, use FREELY_SKIP_IBM_GATE=1
+       (governance-only changes only — code changes will be rejected).
+
+  Direct fast-forward, reset, and ref-only updates are not lawful
+  protected-branch merge entrypoints.
 MSG
   exit 1
 done
