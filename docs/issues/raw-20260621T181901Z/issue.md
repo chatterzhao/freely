@@ -1,7 +1,8 @@
 ---
 local_id: raw-20260621T181901Z
 kind: raw
-phase_state: proposed
+phase_state: absorbed
+absorbed_into: batch-sync-20260621
 platform_ids:
   github:
     issue_id: '3270'
@@ -12,12 +13,12 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-21T18:19:00Z'
-updated_at: '2026-06-21T18:19:00Z'
+updated_at: '2026-06-21T18:29:00Z'
 intake_id: ''
 author: platform
 channel: platform-sync-scan
 session_refs: []
-platform_state: open
+platform_state: closed
 ---
 
 # Platform sync batch: sync 54 items
