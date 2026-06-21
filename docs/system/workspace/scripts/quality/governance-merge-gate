@@ -646,17 +646,37 @@ def build_issue_index() -> Dict[str, IssueRecord]:
         paths = [line.strip() for line in output.splitlines() if line.strip()]
     except Exception:
         paths = []
-    # Also scan docs/issues/ for raw-* and I-* linked issue files.
-    # These are the lifecycle entry points created by chat-inbox and wt-create.
-    issues_dir = os.path.join(ROOT_DIR, "docs", "issues")
-    if os.path.isdir(issues_dir):
-        for d in sorted(os.listdir(issues_dir)):
-            if d.startswith("raw-") or d.startswith("I-"):
-                mf = os.path.join(issues_dir, d, "issue.md")
-                if os.path.isfile(mf):
-                    rel = os.path.relpath(mf, ROOT_DIR)
-                    if rel not in paths:
-                        paths.append(rel)
+    # Scan docs/issues/ for raw-* and I-* linked issue files.
+    # When validating a range (pr-review-guarded from outside the worktree),
+    # discover files from the source ref via git ls-tree so we find new
+    # I-* and raw-* that only exist in the fix branch.
+    if USE_RANGE_VIEW and RANGE_SOURCE_REF:
+        try:
+            # ls-tree from docs/issues/ subtree returns paths relative to that dir
+            # (e.g. "raw-20260620T142838Z/issue.md"). Prepend docs/issues/ prefix.
+            output = git("ls-tree", "--name-only", "-r", f"{RANGE_SOURCE_REF}:docs/issues/")
+            for line in output.splitlines():
+                line = line.strip()
+                if not line:
+                    continue
+                if line.endswith("/issue.md") and not line.startswith(".scan"):
+                    full_path = f"docs/issues/{line}"
+                    if full_path not in paths:
+                        paths.append(full_path)
+        except Exception:
+            pass
+    # Fallback: filesystem scan at ROOT_DIR (works when running from the
+    # worktree that actually has the files on disk).
+    if not USE_RANGE_VIEW or not RANGE_SOURCE_REF:
+        issues_dir = os.path.join(ROOT_DIR, "docs", "issues")
+        if os.path.isdir(issues_dir):
+            for d in sorted(os.listdir(issues_dir)):
+                if d.startswith("raw-") or d.startswith("I-"):
+                    mf = os.path.join(issues_dir, d, "issue.md")
+                    if os.path.isfile(mf):
+                        rel = os.path.relpath(mf, ROOT_DIR)
+                        if rel not in paths:
+                            paths.append(rel)
     result: Dict[str, IssueRecord] = {}
     for path in paths:
         result[path] = parse_issue_file(path)
