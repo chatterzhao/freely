@@ -652,16 +652,17 @@ def build_issue_index() -> Dict[str, IssueRecord]:
     # I-* and raw-* that only exist in the fix branch.
     if USE_RANGE_VIEW and RANGE_SOURCE_REF:
         try:
+            # ls-tree from docs/issues/ subtree returns paths relative to that dir
+            # (e.g. "raw-20260620T142838Z/issue.md"). Prepend docs/issues/ prefix.
             output = git("ls-tree", "--name-only", "-r", f"{RANGE_SOURCE_REF}:docs/issues/")
             for line in output.splitlines():
                 line = line.strip()
                 if not line:
                     continue
-                # ls-tree returns paths relative to the tree root.
-                # We want issue.md files under docs/issues/raw-*/ or docs/issues/I-*/
-                if line.endswith("/issue.md") and line.startswith("docs/issues/"):
-                    if line not in paths:
-                        paths.append(line)
+                if line.endswith("/issue.md") and not line.startswith(".scan"):
+                    full_path = f"docs/issues/{line}"
+                    if full_path not in paths:
+                        paths.append(full_path)
         except Exception:
             pass
     # Fallback: filesystem scan at ROOT_DIR (works when running from the
