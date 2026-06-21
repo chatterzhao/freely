@@ -16,13 +16,13 @@ primary_platform: github
 last_synced_comment_at: {}
 hash: ''
 created_at: 2026-05-19 16:29:00+00:00
-updated_at: '2026-05-19T16:36:00Z'
+updated_at: '2026-06-21T15:21:54Z'
 intake_id: ''
 author: zhaoquan
 channel: freely-feat-execution
 session_refs: []
 pre_tests_path: docs/issues/I-20260513T040512Z-A/pre-tests.md
-verification_artifact_dir: 'docs/epics/task-lifecycle-scan-batch/code-reviews/'
+verification_artifact_dir: docs/epics/task-lifecycle-scan-batch/code-reviews/
 platform_state: closed
 ---
 
