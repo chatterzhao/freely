@@ -3718,3 +3718,22 @@ routing_policy:
 - title: complete intake migration + stale cleanup
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260621T081426Z-A/issue.md`
+## M-20260621T081814Z-A
+- title: Manager review gate + proactive steer prompt
+- status: active
+### candidate_issues
+1. C-20260621T081814Z-A
+- milestone: M-20260621T081814Z-A
+- status: promoted
+- promoted_issue_path: docs/issues/I-20260621T081814Z-A/issue.md
+### committed_issues
+1. I-20260621T081814Z-A
+- title: Manager review gate + proactive steer prompt
+- milestone_state: committed
+- phase_state: completed
+- issue_path: docs/issues/I-20260621T081814Z-A/issue.md
+### completed_issues
+1. I-20260621T081814Z-A
+- title: Manager review gate + proactive steer prompt
+- phase_state: completed
+- issue_path: docs/issues/I-20260621T081814Z-A/issue.md
