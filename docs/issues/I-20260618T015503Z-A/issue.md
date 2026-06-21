@@ -18,7 +18,7 @@ channel: freely-feat-execution
 session_refs: []
 pre_tests_path: docs/epics/worktree-path-architecture/verification/pre-tests.md
 verification_artifact_dir: docs/epics/worktree-path-architecture/code-reviews
-platform_state: open
+platform_state: closed
 updated_at: '2026-06-21T18:24:53Z'
 ---
 
