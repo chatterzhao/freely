@@ -22345,6 +22345,14 @@ Options:
   --severity <level>      Priority: P0 (critical), P1 (high), P2 (default).
 
 Examples:
+
+Before creating a new issue, search for existing open issues on the same topic:
+  gh issue list --repo <repo> --search "keyword" --state open
+
+If a similar open issue exists, reuse it instead of creating a duplicate:
+  - Comment on the existing issue with additional context
+  - Use the existing raw_key to create/resume a worktree
+
   freely feedback --repo chatterzhao/freely --title "bug" --body "..."
   freely feedback --repo https://github.com/user/project.git --title "bug" --body "..."
 HELP
