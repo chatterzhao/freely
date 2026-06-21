@@ -474,6 +474,24 @@ else
   fi
 fi
 
+# ── Phase 6b: Cleanup companion test-pre-merge via raw-key ──
+# fix/raw-{raw_key}-{slug} and test-pre-merge-{raw_key}-{slug} share the same raw-key.
+# Derive the test-pre-merge branch from the fix branch name — no stored relationship needed.
+if [[ "$branch" == fix/raw-* || "$branch" == feature/raw-* ]]; then
+  _tp_raw_key=$(echo "$branch" | sed -n 's|.*/raw-\([0-9]\{8\}T[0-9]\{6\}Z\)-.*|\1|p')
+  _tp_slug=$(echo "$branch" | sed -n 's|.*/raw-[0-9]\{8\}T[0-9]\{6\}Z-\(.*\)|\1|p')
+  if [[ -n "$_tp_raw_key" ]]; then
+    _tp_branch="test-pre-merge-${_tp_raw_key}-${_tp_slug}"
+    _tp_wt="$PROJECT_WORKTREES_ROOT/test-pre-merge-${_tp_raw_key}-${_tp_slug}"
+    if git show-ref --verify --quiet "refs/heads/$_tp_branch" 2>/dev/null; then
+      echo "wt-close: cleaning up companion test-pre-merge: $_tp_branch"
+      [[ -d "$_tp_wt" ]] && git worktree remove --force "$_tp_wt" 2>/dev/null || true
+      git branch -D "$_tp_branch" 2>/dev/null || true
+      echo "wt-close: test-pre-merge cleaned ✓"
+    fi
+  fi
+fi
+
 # ── Phase 7: Sync develop across platforms ──
 
 # Only sync when closing a test-pre-merge-* branch (PR was merged to develop)

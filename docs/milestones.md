@@ -3637,3 +3637,24 @@ routing_policy:
 - title: fix worker fork A2A socket + systemic JSON parse + scan filter
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260621T043842Z-A/issue.md`
+
+## M-20260621T063130Z-A
+- title: raw-key-driven wt-close + issue-sync close fallback
+- status: active
+### candidate_issues
+1. `C-20260621T063130Z-A`
+- milestone: M-20260621T063130Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260621T063130Z-A/issue.md`
+### committed_issues
+1. `I-20260621T063130Z-A`
+- title: raw-key-driven wt-close + issue-sync close fallback
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260621T063130Z-A/issue.md`
+- verification_artifact_dir: `docs/pre-brainstorms/20260621T063130Z--wt-close-test-premerge-cleanup`
+### completed_issues
+1. `I-20260621T063130Z-A`
+- title: raw-key-driven wt-close + issue-sync close fallback
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260621T063130Z-A/issue.md`
