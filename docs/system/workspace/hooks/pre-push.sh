@@ -6,10 +6,41 @@ policy_ref='docs/CONSTITUTION.md §2'
 while read -r local_ref local_sha remote_ref remote_sha; do
   [[ -z "${local_ref:-}" ]] && continue
 
-  # Allow remote branch deletion (git push --delete). git sends
-  # all-zero local_sha for delete operations; local_ref may be "(delete)".
+  # Remote branch deletion (git push --delete): only allowed via wt-close.
+  # git sends all-zero local_sha for delete operations.
   if [[ "$local_sha" == "0000000000000000000000000000000000000000" ]]; then
-    continue
+    # Walk process ancestry to check if wt-close is in the parent chain
+    local _pid _ppid _cmd _is_wt_close=0
+    _pid=$PPID
+    while [[ "$_pid" -gt 1 ]]; do
+      _cmd=$(ps -o comm= -p "$_pid" 2>/dev/null || true)
+      case "$_cmd" in
+        wt-close|bash*)
+          local _full_cmd
+          _full_cmd=$(ps -o args= -p "$_pid" 2>/dev/null || true)
+          case "$_full_cmd" in
+            *wt-close*) _is_wt_close=1; break ;;
+          esac
+          ;;
+      esac
+      _ppid=$(ps -o ppid= -p "$_pid" 2>/dev/null | tr -d ' ' || true)
+      [[ -n "$_ppid" && "$_ppid" -gt 0 ]] || break
+      _pid=$_ppid
+    done
+    if [[ "$_is_wt_close" -eq 1 ]]; then
+      continue
+    fi
+    cat >&2 <<'DELETE_BLOCK'
+[HOOK] 远程分支删除被拦截。
+
+  删除远程分支必须通过 wt-close 收口。
+  直接执行 git push --delete 是违规操作。
+
+  Usage: ./bin/wt-close <branch>
+
+  这是硬性门禁，无法绕过。
+DELETE_BLOCK
+    exit 1
   fi
 
   # Allow tag pushes (git push <remote> <tagname>)
