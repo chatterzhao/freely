@@ -5124,6 +5124,10 @@ _tool_switch_launch_kind() {
   # resume it instead of forcing yet another fresh_with_handoff cycle.
   local _active_sid _base_tool
   _base_tool="${current_tool%%-*}"
+  # TODO(#2897): migrate to freely-db-cli session query (avoid direct sqlite3).
+  # The freely-db-cli session.get-active doesn't yet support tool-pattern
+  # filtering; once extended, replace this inline sqlite3 with:
+  #   python3 "$cli" --project "$project" session.get-active --tool-like "$_base_tool%"
   _active_sid=$(python3 -c "
 import sqlite3
 conn = sqlite3.connect('$project/.freely/freely.db')
@@ -15130,6 +15134,10 @@ worker_exit_contract_done_is_repair_only_cleanup_escape() {
   worker_exit_contract_evidence_is_internal_repair_only "$project" "$evidence_paths_csv"
 }
 
+# TODO(#2913): migrate to A2A Task.message delegation.
+# worker_prompts_csv is deprecated; PR #2914 removed --workers from a2a-exit.
+# Remaining 24 CSV references in this file should be replaced with
+# tasks/list --state=submitted queries per docs/epics/a2a-native-delegation/prd.md.
 # _manager_auto_consume_workers: extract raw_keys from worker_prompts_csv,
 # call auto_consume for each unique raw_key so consumed_by becomes 'manager'.
 _manager_auto_consume_workers() {
