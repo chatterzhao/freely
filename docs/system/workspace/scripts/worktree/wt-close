@@ -428,6 +428,29 @@ fi
     git remote prune "$_r" 2>/dev/null || true
   done
 
+# _update_scan_state: mark scan item as closed after wt-close. Mirrors wt-create.
+_update_scan_state() {
+  local _rk="$1" _ts
+  local _scan_file="$PROJECT_ROOT/.freely/run/manager-task-source-scan-latest.json"
+  _ts=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  [[ -f "$_scan_file" ]] || return 0
+  python3 -c "
+import json, os
+try:
+    with open('$_scan_file') as f: scan = json.load(f)
+    for item in scan.get('items', []):
+        key = item.get('key', '')
+        na = item.get('next_action', '')
+        if '$_rk' in key or '$_rk' in na:
+            item['scan_state'] = 'closed'
+            item['scan_state_updated_at'] = '$_ts'
+    tmp = '$_scan_file' + '.tmp'
+    with open(tmp, 'w') as f: json.dump(scan, f, indent=2)
+    os.rename(tmp, '$_scan_file')
+except: pass
+" 2>/dev/null || true
+}
+
 # ── Phase 4.5: Safe worker shutdown ─────────────────────
 
 # Stop any active workers on this raw_key before deleting the worktree.
@@ -502,6 +525,7 @@ fi
 if [[ -n "$_raw_key" && -f "$_a2a_task_py" && -f "$_db_path" ]]; then
   _consumed=$(python3 "$_a2a_task_py" auto-consume --db "$_db_path" --raw-key "$_raw_key" 2>/dev/null || true)
   echo "wt-close: consumed ${_consumed:-0} tasks for $_raw_key"
+  _update_scan_state "$_raw_key" "closed"
 fi
 
 if [[ -n "$wt_path" ]]; then
