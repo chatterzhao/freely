@@ -732,10 +732,18 @@ def h_session_upsert(daemon: DbDaemon, params: dict) -> dict:
 def h_session_get_active(daemon: DbDaemon, params: dict) -> dict:
     project = params.get("project", daemon.project)
     role = params.get("role", "manager")
-    row = daemon.conn.execute(
-        "SELECT session_id FROM sessions WHERE project=? AND role=? AND status='active' "
-        "ORDER BY updated_at DESC LIMIT 1", (project, role)
-    ).fetchone()
+    tool_like = params.get("tool_like", "")
+    if tool_like:
+        row = daemon.conn.execute(
+            "SELECT session_id FROM sessions WHERE project=? AND role=? AND status='active' "
+            "AND tool LIKE ? ORDER BY updated_at DESC LIMIT 1",
+            (project, role, tool_like)
+        ).fetchone()
+    else:
+        row = daemon.conn.execute(
+            "SELECT session_id FROM sessions WHERE project=? AND role=? AND status='active' "
+            "ORDER BY updated_at DESC LIMIT 1", (project, role)
+        ).fetchone()
     return {"session_id": row[0] if row else None}
 
 

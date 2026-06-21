@@ -185,7 +185,10 @@ def _session_upsert_params(args):
     }
 
 def _session_get_active_params(args):
-    return {"project": args.get("project", ""), "role": args.get("role", "manager")}
+    p = {"project": args.get("project", ""), "role": args.get("role", "manager")}
+    if args.get("tool_like"):
+        p["tool_like"] = args["tool_like"]
+    return p
 
 def _session_complete_params(args):
     return {
