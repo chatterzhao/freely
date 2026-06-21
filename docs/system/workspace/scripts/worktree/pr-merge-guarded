@@ -552,7 +552,21 @@ do_initial_merge() {
   write_guarded_state "$target" "$source_branch" "forbidden"
   set +e; FREELY_GUARDED_MERGE_COMPLETION=1 GIT_EDITOR=: git merge --continue; local continue_rc=$?; set -e
   if ! git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1; then
-    # ── Merge succeeded: close PR ──
+    # ── Merge succeeded: verify receipt integrity ──
+    local merge_head
+    merge_head="$(git rev-parse HEAD)"
+    if ! git log -1 --format=%B "$merge_head" | grep -q "Freely-Merge-Path:"; then
+      echo "[MERGE-GUARD] ERROR: merge commit $merge_head missing Freely-Merge-Path receipt." >&2
+      echo "  This indicates a semantic conflict or receipt injection failure." >&2
+      echo "  The merge commit was created but the receipt is absent — possible regression." >&2
+      echo "  Aborting push. Inspect the merge commit and re-run pr-merge-guarded." >&2
+      echo "  If this persists, check write_merge_message_file and render_merge_message." >&2
+      # Don't push without receipt — ref update hooks will also block
+    else
+      echo "[MERGE-GUARD] receipt integrity verified ✓"
+    fi
+
+    # ── Close PR ──
     if [[ -n "$_pr_number" ]]; then
       echo "[MERGE-GUARD] merge committed. Closing GitHub PR #$_pr_number..."
       gh pr close "$_pr_number" --comment "Merged via pr-merge-guarded; develop synced from GitHub." 2>/dev/null || true
