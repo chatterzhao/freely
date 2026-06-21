@@ -3156,7 +3156,7 @@ routing_policy:
 1. `I-20260522T051507Z-A`
 - title: slot full name compat
 - milestone_state: committed
-- phase_state: `in_verification`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260522T051507Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260522T051507Z--slot-full-name-compat/candidates.md#C-20260522T051507Z-A`
 ## M-20260522T053702Z-A
