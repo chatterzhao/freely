@@ -7387,6 +7387,13 @@ log_has_execution_network_failure() {
   runtime_error_signal_excerpt "$log_file" | rg -qi 'ERROR:\s*Reconnecting|worker quit with fatal: Transport channel closed|invalid peer certificate|certificate was not trusted|certificate expired|received fatal alert|websocket: failed to connect|connection closed via error|curl: \((7|28|35|52|56)\)|timed out|timeout|connection reset|connection refused|connection aborted|network is unreachable|temporary failure in name resolution|eai_again|enotfound|tls handshake|proxyconnect tcp|proxy error|bad gateway|service unavailable|gateway timeout|upstream connect error|502|503|504|Failed to refresh token: error sending request for url \("https://auth\.openai\.com/oauth/token"\)'
 }
 
+# Detect AI quota/usage-limit errors from any provider (free tier exhausted, etc.)
+log_has_ai_quota_exhausted() {
+  local log_file="$1"
+  [[ -f "$log_file" ]] || return 1
+  rg -qi 'free usage exceeded|quota exceeded|rate limit reached|too many requests|billing quota|insufficient_quota|usage limit exceeded|429.*too many|exceeded your current quota|credit balance.*too low|monthly usage limit|daily usage limit|try again later.*rate' "$log_file"
+}
+
 log_has_kiro_monthly_request_limit() {
   local log_file="$1"
   [[ -f "$log_file" ]] || return 1
@@ -21345,6 +21352,22 @@ print(ready)
       slot_switch_reason="$live_failure_reason"
     fi
     # bridge_session_lost is handled at session-store level (mark failed → fresh next launch).
+	    # ── Layer 1: Universal failure detection (all tools) ──
+	    # Network failures, idle timeouts, and quota exhaustion affect ALL tools.
+	    # This runs BEFORE tool-specific checks so new tools get protection by default.
+	    if [[ -z "$slot_switch_reason" ]]; then
+	      if log_has_ai_quota_exhausted "$cycle_log"; then
+	        slot_switch_reason="ai_quota_exhausted"
+	      elif _acp_bridge_has_fatal_error "$PROJECT_ROOT" || log_has_execution_network_failure "$cycle_log"; then
+	        slot_switch_reason="network_failure"
+	      fi
+	      if [[ -n "$slot_switch_reason" ]]; then
+	        LAST_SLOT_SWITCH_REASON="$slot_switch_reason"
+	        LAST_SLOT_SWITCH_AT="$(current_timestamp_utc_for_machine)"
+	      fi
+	    fi
+	    # ── Layer 2: Tool-specific failure detection ──
+
     # No slot switch needed — the tool itself is healthy, just the session is gone.
     if [[ "$AI_TOOL" == "codex" || "$AI_TOOL" == codex-* ]]; then
       rate_limit_reason="$(runtime_capture_or_empty codex_rate_limit_reason_from_usage "${primary_rate_limit_used_percent:-}" "${secondary_rate_limit_used_percent:-}")"
@@ -21360,8 +21383,6 @@ print(ready)
         codex_record_slot_cooldown "$PROJECT_ROOT" "$active_cooldown_identity" "${rate_limit_reset_at:-}"
       elif log_has_auth_failure "$cycle_log"; then
         slot_switch_reason="auth_failure"
-      elif _acp_bridge_has_fatal_error "$PROJECT_ROOT" || log_has_execution_network_failure "$cycle_log"; then
-        slot_switch_reason="network_failure"
       fi
       if [[ -n "$slot_switch_reason" ]]; then
         LAST_SLOT_SWITCH_REASON="$slot_switch_reason"

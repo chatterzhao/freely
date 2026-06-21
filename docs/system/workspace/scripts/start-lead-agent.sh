@@ -211,21 +211,29 @@ parse_ai_spec_or_fail() {
     exit 1
   }
 
-  # Normalize slot-suffixed tool names (opencode-apikey-xxx → opencode, codex-account-xxx → codex)
+  # Normalize slot-suffixed tool names: strip -suffix to get base name.
+  # Registry is the authority — any registered tool with slots gets normalized.
   local _case_tool="$tool"
-  case "$_case_tool" in
-    opencode-*|codex-*|claude-*)
-      _case_tool="${_case_tool%%-*}"  # strip first -suffix to get base name
-      ;;
-  esac
+  local _reg_tools _t
+  _reg_tools="$(_tool_registry_tools 2>/dev/null || true)"
+  for _t in $_reg_tools; do
+    [[ -n "$_t" ]] || continue
+    if [[ "$_case_tool" == "$_t"-* || "$_case_tool" == "$_t" ]]; then
+      _case_tool="$_t"
+      break
+    fi
+  done
 
-  case "$_case_tool" in
-    codex|kiro-cli|iflow|cc|claude|cc-use-codex-cli|opencode|test-sleep|test-compact|test-once|test-session|test-route-only) ;;
-    *)
-      # Unknown tool may be an alias resolved by tool-launchers.sh
-      echo "[WARN] tool '$tool' not in known list, passing through for alias resolution" >&2
-      ;;
-  esac
+  # Validation: check if tool is registered
+  local _is_known=0
+  for _t in $_reg_tools test-; do
+    if [[ "$_case_tool" == "$_t" || "$_case_tool" == "$_t"* ]]; then
+      _is_known=1; break
+    fi
+  done
+  if [[ "$_is_known" == "0" ]]; then
+    echo "[WARN] tool '$tool' not in registry, passing through for alias resolution" >&2
+  fi
 
   printf '%s|%s|%s\n' "$tool" "${model:-}" "$mode"
 }
