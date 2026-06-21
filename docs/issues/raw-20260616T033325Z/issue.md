@@ -10,5 +10,5 @@ primary_platform: github
 created_at: 2026-06-16 03:33:25+00:00
 absorbed_into: I-20260616T033325Z-A
 platform_state: closed
-updated_at: '2026-06-21T18:30:00Z'
+updated_at: '2026-06-21T20:12:23Z'
 ---
