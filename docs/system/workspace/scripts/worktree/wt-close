@@ -428,14 +428,77 @@ fi
     git remote prune "$_r" 2>/dev/null || true
   done
 
-# ── Phase 5: Consume A2A tasks then remove worktree ──
+# ── Phase 4.5: Safe worker shutdown ─────────────────────
 
-# Extract raw_key from branch and auto-consume all terminal worker tasks.
-# Worker tasks should remain visible (completed/blocked) until wt-close,
-# so the manager can read and process them before the worktree is retired.
+# Stop any active workers on this raw_key before deleting the worktree.
+# Prevents zombie worker processes (run-acp-prompt.py with cwd to deleted dir).
 _a2a_task_py="$PROJECT_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
 _db_path="$PROJECT_ROOT/.freely/freely.db"
 _raw_key="$(echo "$branch" | grep -oE '[0-9]{8}T[0-9]{4,6}Z' | head -1 || true)"
+if [[ -n "$_raw_key" && -f "$_a2a_task_py" && -f "$_db_path" ]]; then
+  _active_workers=$(python3 "$_a2a_task_py" list --raw-key "$_raw_key" --status working,submitted,launched 2>/dev/null | python3 -c "
+import json,sys
+try:
+    data=json.load(sys.stdin)
+    rows=data.get('rows',[])
+    for r in rows:
+        print(f\"{r.get('task_id','')}\t{r.get('worker_pid','')}\t{r.get('session_id','')}\t{r.get('state','')}\")
+except: pass
+" 2>/dev/null || true)
+
+  if [[ -n "$_active_workers" ]]; then
+    echo "wt-close: checking active workers for raw_key=$_raw_key..."
+    while IFS=$'\t' read -r _wtask_id _wpid _wsession _wstate; do
+      [[ -n "$_wtask_id" ]] || continue
+      echo "wt-close: worker task=$_wtask_id pid=$_wpid state=$_wstate"
+
+      # Check if process exists
+      if [[ -n "$_wpid" ]] && kill -0 "$_wpid" 2>/dev/null; then
+        # Try graceful shutdown via A2A session/prompt
+        if [[ -n "$_wsession" ]]; then
+          echo "wt-close: sending shutdown request to worker $_wtask_id (session=$_wsession)..."
+          python3 "$_a2a_task_py" prompt --task-id "$_wtask_id" \
+            --message "wt-close: worktree closing, please complete and a2a-exit." >/dev/null 2>&1 || true
+          # Wait for worker to exit gracefully (max 10s)
+          for _i in 1 2 3 4 5; do
+            sleep 2
+            kill -0 "$_wpid" 2>/dev/null || break
+          done
+        fi
+        # Force kill if still alive
+        if kill -0 "$_wpid" 2>/dev/null; then
+          echo "wt-close: force-killing worker pid=$_wpid..."
+          kill -TERM "$_wpid" 2>/dev/null || true
+          sleep 2
+          kill -0 "$_wpid" 2>/dev/null && kill -9 "$_wpid" 2>/dev/null || true
+        fi
+        echo "wt-close: worker $_wtask_id shutdown complete"
+      else
+        echo "wt-close: worker $_wtask_id already exited (pid=$_wpid not found)"
+      fi
+
+      # Mark task as consumed
+      python3 "$_a2a_task_py" update --task-id "$_wtask_id" --state consumed >/dev/null 2>&1 || true
+    done <<<"$_active_workers"
+  fi
+
+  # Safety net: scan for any residual run-acp-prompt processes in this worktree
+  if [[ -n "$wt_path" && -d "$wt_path" ]]; then
+    _residual_pids=$(ps aux | grep "run-acp-prompt.*$wt_path" | grep -v grep | awk '{print $2}' || true)
+    if [[ -n "$_residual_pids" ]]; then
+      echo "wt-close: cleaning up residual worker processes in $wt_path..."
+      for _rpid in $_residual_pids; do
+        kill -9 "$_rpid" 2>/dev/null || true
+      done
+    fi
+  fi
+fi
+
+# ── Phase 5: Consume A2A tasks then remove worktree ──
+
+# auto-consume all terminal worker tasks (variables set in Phase 4.5).
+# Worker tasks should remain visible (completed/blocked) until wt-close,
+# so the manager can read and process them before the worktree is retired.
 if [[ -n "$_raw_key" && -f "$_a2a_task_py" && -f "$_db_path" ]]; then
   _consumed=$(python3 "$_a2a_task_py" auto-consume --db "$_db_path" --raw-key "$_raw_key" 2>/dev/null || true)
   echo "wt-close: consumed ${_consumed:-0} tasks for $_raw_key"
