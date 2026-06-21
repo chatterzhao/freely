@@ -6426,6 +6426,29 @@ worker_terminal_continuation_materialization_is_current() {
   return 0
 }
 
+# Query friedly.db chats table for unconsumed human messages (docs/issues/ migration).
+# Complements intake_snapshot_for_project which reads legacy .freely/intake/.
+chat_intake_snapshot_for_project() {
+  local project="$1" limit="${2:-8}"
+  local _db_path _rows
+  _db_path="$project/.freely/freely.db"
+  [[ -f "$_db_path" ]] || return 0
+  _rows=$(python3 -c "
+import sqlite3, sys
+try:
+    db = sqlite3.connect('$_db_path')
+    rows = db.execute('SELECT id, chat_type, issue_id, author, message, created_at FROM chats WHERE consumed = 0 ORDER BY id DESC LIMIT $limit').fetchall()
+    for r in rows:
+        cid, ctype, issue, author, msg, created = r
+        msg_preview = (msg or '')[:120].replace(chr(10),' ')
+        print(f'- id=chat-{cid} status=pending type={ctype} author={author} issue={issue} created_at={created} message={msg_preview}')
+    db.close()
+except: pass
+" 2>/dev/null || true)
+  [[ -n "$_rows" ]] || return 0
+  printf 'chat messages (freely.db):\n%s\n' "$_rows"
+}
+
 intake_snapshot_for_project() {
   local project="$1" limit="${2:-8}"
   local intake_root item_dir meta_file message_file status intake_id created_at channel author classification linked_artifact first_line count reaction claimed_by absorption_target
@@ -15926,9 +15949,10 @@ append_human_chat_intake_if_needed() {
   if [[ "$(role_hint_for_project "$PROJECT_ROOT")" != "manager" ]]; then
     return 0
   fi
-  local intake_snapshot
+  local intake_snapshot chat_snapshot
   intake_snapshot="$(intake_snapshot_for_project "$PROJECT_ROOT" 8)"
-  [[ -n "$intake_snapshot" ]] || return 0
+  chat_snapshot="$(chat_intake_snapshot_for_project "$PROJECT_ROOT" 8)"
+  [[ -n "$intake_snapshot$chat_snapshot" ]] || return 0
   cat <<EOF
 
 Human chat intake queue:
@@ -15939,6 +15963,7 @@ Human chat intake queue:
 - intake item 只有在被吸收进 recovery / issue / pre-brainstorm / milestone 后，才算处理完成。
 
 $intake_snapshot
+$chat_snapshot
 EOF
 }
 
@@ -18933,6 +18958,23 @@ ensure_interruption_dispatch_once() {
 
   if [[ "$handled_any" == "1" ]]; then
     log_info "interruption dispatcher handled intake(s)"
+  fi
+
+  # Periodically mark old consumed chats as stale (consumed=-1).
+  # Preserves audit trail but removes from active view.
+  local _db_path
+  _db_path="$project/.freely/freely.db"
+  if [[ -f "$_db_path" ]]; then
+    python3 -c "
+import sqlite3, time
+try:
+    db = sqlite3.connect('$_db_path')
+    cutoff = int(time.time()) - 7*86400  # 7 days
+    db.execute(\"UPDATE chats SET consumed = -1 WHERE consumed = 1 AND CAST(created_at AS INTEGER) < ?\", (cutoff,))
+    db.commit()
+    db.close()
+except: pass
+" 2>/dev/null || true
   fi
 }
 

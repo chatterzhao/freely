@@ -3698,3 +3698,23 @@ routing_policy:
 - title: stop-side worker state preservation
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260621T092609Z-A/issue.md`
+
+## M-20260621T081426Z-A
+- title: complete intake migration + stale cleanup
+- status: active
+### candidate_issues
+1. `C-20260621T081426Z-A`
+- milestone: M-20260621T081426Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260621T081426Z-A/issue.md`
+### committed_issues
+1. `I-20260621T081426Z-A`
+- title: complete intake migration + stale cleanup
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260621T081426Z-A/issue.md`
+### completed_issues
+1. `I-20260621T081426Z-A`
+- title: complete intake migration + stale cleanup
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260621T081426Z-A/issue.md`
