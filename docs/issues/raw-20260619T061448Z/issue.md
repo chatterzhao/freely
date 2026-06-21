@@ -13,11 +13,12 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-19T06:15:05Z'
-updated_at: '2026-06-20T12:57:57Z'
+updated_at: '2026-06-21T18:25:49Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 A2A server log shows 40+ 'Invalid HTTP request received' warnings since startup. Something sends non-HTTP data to the A2A unix socket. Fix: identify probe source and configure correct protocol, or add protocol detection in A2A server to suppress noise.
