@@ -5124,19 +5124,10 @@ _tool_switch_launch_kind() {
   # resume it instead of forcing yet another fresh_with_handoff cycle.
   local _active_sid _base_tool
   _base_tool="${current_tool%%-*}"
-  # TODO(#2897): migrate to freely-db-cli session query (avoid direct sqlite3).
-  # The freely-db-cli session.get-active doesn't yet support tool-pattern
-  # filtering; once extended, replace this inline sqlite3 with:
-  #   python3 "$cli" --project "$project" session.get-active --tool-like "$_base_tool%"
-  _active_sid=$(python3 -c "
-import sqlite3
-conn = sqlite3.connect('$project/.freely/freely.db')
-row = conn.execute(
-    'SELECT session_id FROM sessions WHERE project=? AND role=? AND status=? AND tool LIKE ? ORDER BY updated_at DESC LIMIT 1',
-    ('$project', 'manager', 'active', '$_base_tool%')
-).fetchone()
-print(row[0] if row else '')
-" 2>/dev/null || true)
+  local _cli
+  _cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
+  _active_sid=$(python3 "$_cli" --project "$project" session.get-active \
+    --role manager --tool-like "${_base_tool}%" 2>/dev/null || true)
   if [[ -n "$_active_sid" ]]; then
     printf 'resume\n'; return 0
   fi
