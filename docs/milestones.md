@@ -1,3 +1,19 @@
+## M-20260618T035220Z-B
+- title: Semantic overlap detection in pr-merge-guarded
+- status: active
+### candidate_issues
+1. `C-20260618T035220Z-B`
+- milestone: M-20260618T035220Z-B
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260618T035220Z-B/issue.md`
+### committed_issues
+1. `I-20260618T035220Z-B`
+- title: fix: semantic overlap detection
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260618T035220Z-B/issue.md`
+- verification_artifact_dir: `docs/epics/semantic-overlap/code-reviews`
+
 ## M-20260617T095105Z-B
 - title: Remove dead CSV code paths
 - status: active

@@ -549,6 +549,30 @@ do_initial_merge() {
   [[ "$merge_rc" -ne 0 ]] && return "$merge_rc"
   require_merge_in_progress; require_matching_merge_head "$source_branch"
   write_merge_message_file "$merge_message"
+
+  # ── Semantic conflict detection ──────────────────────────────
+  # Detect when concurrent develop commits modify the same files as
+  # the source branch — git auto-merges text but may regress behavior.
+  local _merge_base _source_files _target_files _overlap
+  _merge_base=$(git merge-base "$target" "$source_branch" 2>/dev/null || true)
+  if [[ -n "$_merge_base" ]]; then
+    _source_files=$(git diff --name-only "$_merge_base..$source_branch" 2>/dev/null | sort -u || true)
+    _target_files=$(git diff --name-only "$_merge_base..$target" 2>/dev/null | sort -u || true)
+    _overlap=$(comm -12 <(echo "$_source_files") <(echo "$_target_files") 2>/dev/null || true)
+    if [[ -n "$_overlap" ]]; then
+      echo "[MERGE-GUARD] semantic overlap: $(echo "$_overlap" | wc -l | tr -d ' ') file(s) modified in both branches:" >&2
+      echo "$_overlap" | while read -r _f; do
+        local _dev_commits
+        _dev_commits=$(git log --oneline --no-decorate "$_merge_base..$target" -- "$_f" 2>/dev/null | head -3 || true)
+        echo "  $_f" >&2
+        [[ -n "$_dev_commits" ]] && echo "$_dev_commits" | sed 's/^/    ↳ /' >&2 || true
+      done
+      echo "[MERGE-GUARD] review the overlap above — concurrent changes may interact." >&2
+    else
+      echo "[MERGE-GUARD] semantic check: no overlapping files ✓"
+    fi
+  fi
+
   write_guarded_state "$target" "$source_branch" "forbidden"
   set +e; FREELY_GUARDED_MERGE_COMPLETION=1 GIT_EDITOR=: git merge --continue; local continue_rc=$?; set -e
   if ! git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1; then
