@@ -735,6 +735,21 @@ fi
   _create_worktree "$test_pre_merge_branch" "$tp_target" "$fix_branch"
   echo "  test-pre-merge: $tp_target (base: $fix_branch)"
 
+  # Clone .freely runtime state from develop so test worktree can run daemon
+  _src_freely="$ROOT_DIR/.freely"
+  _dst_freely="$tp_target/.freely"
+  if [[ -d "$_src_freely" && -d "$tp_target" ]]; then
+    mkdir -p "$_dst_freely"
+    # Copy freely.db (runtime database with A2A tasks, sessions, scan data)
+    [[ -f "$_src_freely/freely.db" ]] && cp "$_src_freely/freely.db" "$_dst_freely/freely.db" 2>/dev/null || true
+    # Copy a2a_task.db (if separate from freely.db)
+    [[ -f "$_src_freely/a2a_task.db" ]] && cp "$_src_freely/a2a_task.db" "$_dst_freely/a2a_task.db" 2>/dev/null || true
+    # Do NOT copy: run/ (PIDs, sockets — daemon start recreates them)
+    # Do NOT copy: logs/ (test worktree should have own logs)
+    # config.toml is already synced by sync-tooling
+    echo "  test-pre-merge: cloned .freely state from develop"
+  fi
+
   cat <<MSG
 
 ╔══════════════════════════════════════════════════════════╗
