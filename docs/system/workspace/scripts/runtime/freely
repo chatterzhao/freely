@@ -20114,6 +20114,24 @@ stop_project_runtime() {
     rm -f "$_bridge_pid_file"
   fi
   rm -f "$(_acp_bridge_socket "$project")"
+  # Before stopping A2A server: transition all working workers to input-required
+  # so they can be resumed on next start instead of being discarded as zombies.
+  # A2A spec: input-required = "task paused, awaiting external input to proceed".
+  # Daemon stop is the external pause; daemon start is the external resume signal.
+  local _a2a_task_py _db_path _working_workers _wid
+  _a2a_task_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
+  _db_path="$project/.freely/freely.db"
+  if [[ -f "$_a2a_task_py" && -f "$_db_path" ]]; then
+    _working_workers=$(python3 "$_a2a_task_py" list --role worker --status working 2>/dev/null | \
+      python3 -c "import json,sys; data=json.load(sys.stdin); [print(r.get('task_id','')) for r in data.get('rows',[])]" 2>/dev/null || true)
+    for _wid in $_working_workers; do
+      [[ -n "$_wid" ]] || continue
+      python3 "$_a2a_task_py" update --task-id "$_wid" --state input-required >/dev/null 2>&1 || true
+    done
+    if [[ -n "$_working_workers" ]]; then
+      log_info "marked $(echo "$_working_workers" | wc -l | tr -d ' ') working worker(s) as input-required for resume on restart"
+    fi
+  fi
   # Stop A2A Server — multi-layer cleanup for zombie prevention
   local _a2a_socket _a2a_cached_pid _a2a_cached_pid_file
   _a2a_socket="$(_a2a_socket_path "$project")"

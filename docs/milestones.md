@@ -3678,3 +3678,23 @@ routing_policy:
 - title: align verification gate rebind path
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260621T090002Z-A/issue.md`
+
+## M-20260621T092609Z-A
+- title: stop-side worker state preservation for restart resume
+- status: active
+### candidate_issues
+1. `C-20260621T092609Z-A`
+- milestone: M-20260621T092609Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260621T092609Z-A/issue.md`
+### committed_issues
+1. `I-20260621T092609Z-A`
+- title: stop-side worker state preservation
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260621T092609Z-A/issue.md`
+### completed_issues
+1. `I-20260621T092609Z-A`
+- title: stop-side worker state preservation
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260621T092609Z-A/issue.md`
