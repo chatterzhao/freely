@@ -9,16 +9,17 @@ platform_ids:
     url: https://github.com/chatterzhao/freely/issues/2988
     synced_at: ''
 primary_platform: github
-canonical_issue_path: 'raw-20260618T094846Z'
-absorbed_into: 'raw-20260618T094846Z'
+canonical_issue_path: raw-20260618T094846Z
+absorbed_into: raw-20260618T094846Z
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-18T09:49:02Z'
-updated_at: '2026-06-18T09:49:02Z'
+updated_at: '2026-06-21T18:26:30Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 ## 目标

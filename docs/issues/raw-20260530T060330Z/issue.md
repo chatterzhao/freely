@@ -12,7 +12,7 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-30T06:03:45Z'
-updated_at: '2026-06-17T00:18:19Z'
+updated_at: '2026-06-21T18:27:35Z'
 intake_id: ''
 author: platform
 channel: github

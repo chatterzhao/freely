@@ -13,11 +13,12 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-19T06:14:58Z'
-updated_at: '2026-06-19T06:14:58Z'
+updated_at: '2026-06-21T18:26:24Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 Root cause found: Manager prompt template uses --agent-id worker but a2a-exit handler reads --role instead. Result: tasks created with agent_id=manager (default), never found by list --role worker --status submitted. Manager continuity confirms 'Workers created via a2a-exit are never executed'. Fix: update prompt template line ~30-38 to use --role worker.

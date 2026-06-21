@@ -13,11 +13,12 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-17T13:00:45Z'
-updated_at: '2026-06-17T13:00:45Z'
+updated_at: '2026-06-21T18:30:06Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 当前 git pull 冲突时只输出模糊信息，不列出冲突文件，不提供 abort 路径。
