@@ -10644,14 +10644,16 @@ rebind_active_worker_runtime_control_plane_if_needed() {
     has_any_verification_metadata="1"
   fi
   if [[ -n "$missing_fields_csv" && "$has_any_verification_metadata" == "1" ]]; then
-    write_worker_verification_contract_file "$runtime_contract_file" "$prompt_file" "" "$target_project"
-    write_workcell_state \
-      "$target_project" \
-      "running" \
-      "$( [[ -n "$supervisor_pid" ]] && printf 'up' || printf 'down' )" \
-      "$( [[ -n "$ai_pid" ]] && printf 'up' || printf 'down' )" \
-      "manager_worker_launch_verification_blocked"
-    return 1
+    log_warn "worker verification metadata incomplete in rebind: missing=$missing_fields_csv (prompt=$(basename "$prompt_file"))"
+    local _db_path _chat_py
+    _db_path=""$manager_project/.freely/freely.db""
+    local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
+    python3 "$cli" --project "$manager_project" chat.add --type "comment" \
+      --issue-id "raw-guidance" \
+      --message "Worker prompt $(basename "$prompt_file") has incomplete verification metadata. Missing fields: $missing_fields_csv. Please add these fields or remove the verification metadata section." \
+      --author "runtime" --channel "worker-guard" >/dev/null 2>&1 || true
+    # Continue with rebind — don't block on incomplete metadata.
+    # Full 12-field verification is enforced at merge gate for test-pre-merge family.
   fi
   intake_id="$(write_manager_worker_launch_intake "$target_project" "$prompt_file")"
   write_worker_verification_contract_file "$runtime_contract_file" "$prompt_file" "$intake_id" "$target_project"

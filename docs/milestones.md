@@ -3658,3 +3658,23 @@ routing_policy:
 - title: raw-key-driven wt-close + issue-sync close fallback
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260621T063130Z-A/issue.md`
+
+## M-20260621T090002Z-A
+- title: align verification gate rebind path
+- status: active
+### candidate_issues
+1. `C-20260621T090002Z-A`
+- milestone: M-20260621T090002Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260621T090002Z-A/issue.md`
+### committed_issues
+1. `I-20260621T090002Z-A`
+- title: align verification gate rebind path
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260621T090002Z-A/issue.md`
+### completed_issues
+1. `I-20260621T090002Z-A`
+- title: align verification gate rebind path
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260621T090002Z-A/issue.md`
