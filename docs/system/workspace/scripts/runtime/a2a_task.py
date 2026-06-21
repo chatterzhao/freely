@@ -252,17 +252,17 @@ class A2AClient:
 
     def latest_manager(self) -> Optional[dict]:
         """Get latest manager task via A2A Server (authoritative)."""
-        r = self._request("GET", "/tasks/latest-manager")
+        r = self._rest_request("GET", "/tasks/latest-manager")
         return r if "task_id" in r else None
 
     def pending_delivery(self) -> List[dict]:
         """Get pending deliveries via A2A Server (authoritative)."""
-        return self._request("GET", "/tasks/pending-delivery").get("tasks", [])
+        return self._rest_request("GET", "/tasks/pending-delivery").get("tasks", [])
 
     def launched_pids(self, raw_key: str = "") -> List[dict]:
         """Get launched worker PIDs via A2A Server."""
         path = f"/tasks/launched-pids?raw_key={raw_key}" if raw_key else "/tasks/launched-pids"
-        return self._request("GET", path).get("rows", [])
+        return self._rest_request("GET", path).get("rows", [])
 
     def add_message(self, task_id: str, role: str = "worker",
                     msg_type: str = "text", content: str = "") -> dict:
