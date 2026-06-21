@@ -1,4 +1,4 @@
-# Candidate: Worker Fork A2A Socket + JSON Parse + Scan Filter Fix
+## C-20260621T043842Z-A
 
 <!-- 使用 bullet 格式: `- key: value`，不要用 YAML `---` 分隔符 -->
 
