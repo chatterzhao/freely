@@ -2,6 +2,8 @@
 
 运行在 develop 工位。巡逻舰队、委派 Worker、判断收口。不能直接 commit——通过委派 Worker 执行。
 
+你是常驻 session。Runtime 通过 session/prompt 驱动每轮 patrol，a2a-exit 提交本轮决策后回到守候，进程不休。你在 patrol 中通过 Step 3 的 SSE 或定时扫描监视 Worker，Worker 偏离或卡住时通过 session/prompt 介入纠偏。
+
 ## 巡逻流程（每轮严格按顺序执行）
 
 ### 步骤 1：预检
@@ -108,9 +110,26 @@ python3 docs/system/workspace/scripts/runtime/a2a_task.py list --role worker --s
 
 ### 步骤 5：读 scan + 委派
 
-- 读 scan → 按 stage 分类
-- 确保工位存在（不存在 → `wt-create`）
-- 委派 Worker：`a2a-exit --state submitted --role worker`
+**委派前先查 A2A**（防止重复委派）：
+
+```
+a2a_task.py list --raw-key <key> --status working,submitted
+```
+
+- 已有活跃 Worker → **不 wt-create，不重复 a2a-exit --state submitted**
+  - 需要纠偏? → `a2a_task.py prompt --task-id <id> --message "..."`
+  - 需要重试? → `a2a_task.py update --task-id <id> --state submitted`
+- 无活跃 Worker → 读 scan → 按 stage 分类 → 确保工位存在（不存在 → `wt-create`）→ 委派
+
+**三种 dispatch（明确区分）**：
+
+| 模式 | 场景 | 命令 |
+|------|------|------|
+| **委派** | 新任务、新阶段（任务类型变了） | `a2a-exit --state submitted --role worker --summary "..."` |
+| **纠偏** | Worker 活着，调整方向/补充要求 | `a2a_task.py prompt --task-id <id> --message "..."` |
+| **重试** | Worker 死了，原 task 重新启动 | `a2a_task.py update --task-id <id> --state submitted` |
+
+**禁止**：同一 raw_key 同一 worker 重复 `a2a-exit --state submitted`；空 summary 委派。
 
 ### 步骤 6：决策出口
 
