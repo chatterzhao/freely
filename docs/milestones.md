@@ -1,3 +1,19 @@
+## M-20260617T095105Z-B
+- title: Remove dead CSV code paths
+- status: active
+### candidate_issues
+1. `C-20260617T095105Z-B`
+- milestone: M-20260617T095105Z-B
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260617T095105Z-B/issue.md`
+### committed_issues
+1. `I-20260617T095105Z-B`
+- title: fix: remove dead CSV code paths
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260617T095105Z-B/issue.md`
+- verification_artifact_dir: `docs/epics/csv-dead-code-removal/code-reviews`
+
 ## M-20260617T063755Z-B
 - title: Replace inline sqlite3 session query with freely-db-cli
 - status: active
