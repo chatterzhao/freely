@@ -6,15 +6,20 @@ phase_state: completed
 promoted_from: raw-20260618T015503Z
 source_candidate: docs/pre-brainstorms/20260618T015503Z--worktree-path-architecture/candidates.md
 canonical_issue_path: ''
-platform_ids: {}
-primary_platform: ''
+platform_ids:
+  github:
+    issue_id: '3271'
+    url: https://github.com/chatterzhao/freely/issues/3271
+    synced_at: '2026-06-21T18:24:53Z'
+primary_platform: github
 created_at: 2026-06-18 01:55:03+00:00
 author: zhaoquan
 channel: freely-feat-execution
 session_refs: []
 pre_tests_path: docs/epics/worktree-path-architecture/verification/pre-tests.md
 verification_artifact_dir: docs/epics/worktree-path-architecture/code-reviews
-platform_state: closed
+platform_state: open
+updated_at: '2026-06-21T18:24:53Z'
 ---
 
 # I-20260618T015503Z-A: Fix worktree path architecture
