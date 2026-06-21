@@ -1,3 +1,19 @@
+## M-20260617T063755Z-B
+- title: Replace inline sqlite3 session query with freely-db-cli
+- status: active
+### candidate_issues
+1. `C-20260617T063755Z-B`
+- milestone: M-20260617T063755Z-B
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260617T063755Z-B/issue.md`
+### committed_issues
+1. `I-20260617T063755Z-B`
+- title: fix: replace inline sqlite3 with freely-db-cli
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260617T063755Z-B/issue.md`
+- verification_artifact_dir: `docs/epics/sqlite3-migration/code-reviews`
+
 ## M-20260621T005656Z-A
 - title: build_issue_index git ls-tree range discovery
 - status: active
