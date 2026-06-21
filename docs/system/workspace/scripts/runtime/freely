@@ -14651,16 +14651,9 @@ manager_exit_contract_kind() {
       echo "delegate_workers"
       return 0
     fi
-    # Check worker_prompts_csv from latest manager A2A task.
-    # a2a-exit --workers writes worker_prompts_csv, not exit_kind.
-    # Without this check, the runtime never detects delegate_workers
-    # and Worker AIs are never launched (175 prompts accumulated).
-    local mgr_workers
-    mgr_workers=$(python3 "$_a2a_task_py" latest-manager 2>/dev/null | python3 -c "import json,sys; r=json.load(sys.stdin); print(r.get('worker_prompts_csv',''))" 2>/dev/null || true)
-    if [[ -n "$mgr_workers" && "$mgr_workers" != "null" ]]; then
-      echo "delegate_workers"
-      return 0
-    fi
+    # PR #2914 removed --workers from a2a-exit; worker_prompts_csv is
+    # always empty. Worker delegation is now detected via tasks/list
+    # --status pending above. Fall through to exit_kind.
     local latest_mgr
     latest_mgr=$(python3 "$_a2a_task_py" latest-manager 2>/dev/null | python3 -c "import json,sys; r=json.load(sys.stdin); print(r.get('exit_kind',''))" 2>/dev/null || true)
     if [[ -n "$latest_mgr" ]]; then
@@ -15125,42 +15118,19 @@ worker_exit_contract_done_is_repair_only_cleanup_escape() {
   worker_exit_contract_evidence_is_internal_repair_only "$project" "$evidence_paths_csv"
 }
 
-# TODO(#2913): migrate to A2A Task.message delegation.
-# worker_prompts_csv is deprecated; PR #2914 removed --workers from a2a-exit.
-# Remaining 24 CSV references in this file should be replaced with
-# tasks/list --state=submitted queries per docs/epics/a2a-native-delegation/prd.md.
-# _manager_auto_consume_workers: extract raw_keys from worker_prompts_csv,
-# call auto_consume for each unique raw_key so consumed_by becomes 'manager'.
+# _manager_auto_consume_workers: mark workers as consumed for the current
+# task-mode raw_key. The CSV-era worker_prompts_csv pipeline was removed
+# (PR #2914); workers are now tracked via A2A tasks/list queries.
 _manager_auto_consume_workers() {
   local project="$1"
-  local _worker_csv _hp _db _prompt_file _rk _consumed
-  _worker_csv="$(_db_exit_contract_field "$project" manager worker_prompts_csv 2>/dev/null || echo "")"
+  local _hp _db _tm_mode _rk
   _hp="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db="$project/.freely/freely.db"
   [[ -f "$_hp" && -f "$_db" ]] || return 0
-  _consumed=0
-  if [[ -n "$_worker_csv" ]]; then
-    local _seen_rk=""
-    for _prompt_file in $(printf '%s\n' "$_worker_csv" | tr ',' '\n'); do
-      [[ -n "$_prompt_file" ]] || continue
-      _rk=$(echo "$_prompt_file" | grep -oE '[0-9]{8}T[0-9]{4,6}Z' | head -1)
-      [[ -n "$_rk" ]] || continue
-      # Dedup: same raw_key may appear across multiple prompt files
-      [[ "$_seen_rk" == *"|$_rk|"* ]] && continue
-      _seen_rk="$_seen_rk|$_rk|"
-      python3 "$_hp" auto-consume --db "$_db" --raw-key "$_rk" >/dev/null 2>&1 || true
-      _consumed=$((_consumed + 1))
-    done
-  fi
-  # If no worker_prompts_csv (stop_ai / resume without delegation),
-  # still consume any pending workers for the current task-mode raw_key
-  if [[ "$_consumed" -eq 0 ]]; then
-    local _tm_mode _rk
-    _tm_mode="$(read_task_mode "$project")"
-    case "$_tm_mode" in
-      id:*) _rk="${_tm_mode#id:}"; python3 "$_hp" auto-consume --db "$_db" --raw-key "$_rk" >/dev/null 2>&1 || true ;;
-    esac
-  fi
+  _tm_mode="$(read_task_mode "$project")"
+  case "$_tm_mode" in
+    id:*) _rk="${_tm_mode#id:}"; python3 "$_hp" auto-consume --db "$_db" --raw-key "$_rk" >/dev/null 2>&1 || true ;;
+  esac
 }
 
 manager_runtime_handle_exit_contract_after_ai_cycle() {
