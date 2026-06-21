@@ -1678,7 +1678,7 @@ routing_policy:
 - milestone_state: committed
 - phase_state: `in_verification`
 - priority: P0
-- issue_path: docs/issues/I-20260502-0500-A/issue.md
+- issue_path: `docs/issues/I-20260502-0500-A/issue.md
 - progress_path: docs/progress/freely-packaging-selfhost/p-freely-packaging-selfhost.md
 - pretests_path: docs/epics/freely-packaging-selfhost/pre-tests.md
 - tasks_path: docs/epics/freely-packaging-selfhost/tasks.md
@@ -3485,7 +3485,7 @@ routing_policy:
 - milestone: M-20260616T044030Z-A
 - title: Complete config.toml migration — clean break, TOML-only, zero config.env
 - status: promoted
-- promoted_issue_path: docs/issues/I-20260616T044030Z-A/issue.md
+- promoted_issue_path: `docs/issues/I-20260616T044030Z-A/issue.md
 - decision_reason: 彻底 TOML-only 方案 — 单一配置路径、零兼容负担、用户必须手工阅读注释配置
 - next_action: 进入 B2_IBM 物化
 ### committed_issues
@@ -3504,7 +3504,7 @@ routing_policy:
 - milestone: M-20260616T110714Z-parse-env-removal
 - title: parse_env_file removal + quality fixes for clean break
 - status: promoted
-- promoted_issue_path: docs/issues/I-20260616T110714Z-parse-env-removal/issue.md
+- promoted_issue_path: `docs/issues/I-20260616T110714Z-parse-env-removal/issue.md
 - decision_reason: parse_env_file 被有意删除而非恢复，彻底 TOML-only
 - next_action: 合并到 develop
 ### committed_issues
@@ -3524,7 +3524,7 @@ routing_policy:
 - milestone: M-20260616T084121Z-platform-sync-batch
 - title: Platform sync batch closeout operation
 - status: promoted
-- promoted_issue_path: docs/issues/I-20260616T084121Z-platform-sync-batch/issue.md
+- promoted_issue_path: `docs/issues/I-20260616T084121Z-platform-sync-batch/issue.md
 - decision_reason: 批量同步操作，platform-sync 架构执行实例
 - next_action: 合并到 develop
 2. `C-20260619T111454Z-platform-sync-batch`
@@ -3532,7 +3532,7 @@ routing_policy:
 - milestone: M-20260616T084121Z-platform-sync-batch
 - title: Platform sync batch closeout operation
 - status: promoted
-- promoted_issue_path: docs/issues/I-20260619T111454Z-A/issue.md
+- promoted_issue_path: `docs/issues/I-20260619T111454Z-A/issue.md
 - decision_reason: 批量同步操作，platform-sync 架构执行实例
 - next_action: 合并到 develop
 ### committed_issues
@@ -3718,3 +3718,22 @@ routing_policy:
 - title: complete intake migration + stale cleanup
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260621T081426Z-A/issue.md`
+## M-20260621T081814Z-A
+- title: Manager review gate + proactive steer prompt
+- status: active
+### candidate_issues
+1. `C-20260621T081814Z-A`
+- milestone: M-20260621T081814Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260621T081814Z-A/issue.md
+### committed_issues
+1. `I-20260621T081814Z-A`
+- title: Manager review gate + proactive steer prompt
+- milestone_state: committed
+- phase_state: completed
+- issue_path: `docs/issues/I-20260621T081814Z-A/issue.md
+### completed_issues
+1. `I-20260621T081814Z-A`
+- title: Manager review gate + proactive steer prompt
+- phase_state: completed
+- issue_path: `docs/issues/I-20260621T081814Z-A/issue.md

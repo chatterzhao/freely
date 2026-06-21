@@ -16,10 +16,28 @@ python3 docs/system/workspace/scripts/runtime/a2a_task.py list --role worker --s
 ```
 
 对每个已完成的 Worker：
-- 读 `completion_summary`、`next_action` → 判断下一步
+- 读 `completion_summary`、`next_action`、`evidence_paths` → 对照 raw issue 的 acceptance criteria
 - feature 已 merge → `wt-close` 收口
 - B1/B2 完成 → 判断是否需要 dev-loop 或 PR
 - 有遗留 → 创建新的 raw issue 继续
+
+#### 评审闸门 (Review Gate)
+
+**对每个已完成的 Worker，评审产出后再决定下一步。不接受自我评估，只接受证据。**
+
+1. **读产出**: `completion_summary` + `evidence_paths` 指定的文件
+2. **对照验收标准**: raw issue 中的 acceptance_criteria、I-* issue 的 pre-tests
+3. **判断**:
+   - ✅ **accept**: 产出符合预期 → 推进下一门（PR、merge、close、wt-close）
+   - ❌ **revise**: 产出有缺陷 / 方向偏离 / 证据不足 → 介入纠偏
+
+**revise 时的介入**（统一 dispatch）:
+- Worker session 还在 → `session/prompt`:
+  ```bash
+  a2a_task.py prompt --task-id <id> --message "请修改: <具体问题>"
+  ```
+- Worker session 死了，JSONL 完整 → Runtime 自动 resume 恢复上下文
+- 全丢了 → 重新委派 Worker（同步骤 5），`--summary` 包含前 worker 的 `completion_summary` + 纠偏指令
 
 ### 步骤 3：检查 Worker 容量与 SSE 监督
 
@@ -56,6 +74,11 @@ python3 docs/system/workspace/scripts/runtime/a2a_task.py get --task-id <task_id
 - Worker 在 `working` 状态超过 N 分钟无更新 → 用 `session/prompt` 主动问询
 - `a2a_task.py prompt --task-id <id> --message "Status check: what are you working on?"`
 - 若 `session/prompt` 回复正常 → 等待；无响应 → 标记 `input-required`
+
+**主动纠偏（proactive steer）**：
+- 巡检中如果发现 Worker 产出方向偏离预期（读它的 completion_summary、progress、evidence）→ 不等完成，立即介入
+- 与评审闸门的 revise 使用同一套 dispatch：session/prompt（alive）/ resume（idle+JSONL）/ 重新委派（dead）
+- `a2a_task.py prompt --task-id <id> --message "方向调整: <偏离了什么，应该怎么改>"`
 
 #### session/prompt 干预机制
 
