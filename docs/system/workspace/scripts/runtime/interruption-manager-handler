@@ -95,10 +95,20 @@ done
   exit 1
 }
 
-meta_file="$project/.freely/intake/$intake_id/meta.env"
-message_file="$project/.freely/intake/$intake_id/message.txt"
-[[ -f "$meta_file" && -f "$message_file" ]] || exit 1
-message="$(cat "$message_file")"
+# Support both legacy .freely/intake/ and new docs/issues/ (IBM Framework B1_IBM)
+if [[ "$intake_id" == raw-* || "$intake_id" == I-* ]]; then
+  issue_file="$project/docs/issues/$intake_id/issue.md"
+  [[ -f "$issue_file" ]] || exit 1
+  # Extract message from issue.md: read between first --- and the next --- (YAML frontmatter),
+  # then take everything after as the message body.
+  message="$(sed -n '/^---$/,/^---$/!p; /^---$/,/^---$/{/^---$/!p}' "$issue_file" | tail -n +2 | head -c 32768 || true)"
+  [[ -n "$message" ]] || exit 1
+else
+  meta_file="$project/.freely/intake/$intake_id/meta.env"
+  message_file="$project/.freely/intake/$intake_id/message.txt"
+  [[ -f "$meta_file" && -f "$message_file" ]] || exit 1
+  message="$(cat "$message_file")"
+fi
 
 message_has_any_phrase() {
   local haystack="$1"
