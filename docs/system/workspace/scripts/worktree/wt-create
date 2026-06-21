@@ -225,6 +225,40 @@ for b in $test_pre_merge_branch $fix_branch; do
   fi
 done
 
+# ── Fuzzy-match: block if ANY branch/worktree exists for this raw_key ──
+_existing_branch=$(git branch | grep "raw-${raw_key}" | head -1 || true)
+_existing_wt=$(git worktree list 2>/dev/null | grep "raw-${raw_key}" | head -1 || true)
+if [[ -n "$_existing_branch" || -n "$_existing_wt" ]]; then
+  cat >&2 <<FUZZY_BLOCK
+拒绝创建工位: raw-${raw_key} 已有工位/分支
+
+  已有分支: ${_existing_branch:-无}
+  已有工位: ${_existing_wt:-无}
+
+  同一 raw_key 不允许创建多个工位。请使用已有工位继续工作，
+  或先 wt-close 清理后再重建。
+FUZZY_BLOCK
+  exit 1
+fi
+
+# ── Raw issue state check ────────────────────────────────
+_issue_file="docs/issues/raw-${raw_key}/issue.md"
+if [[ -f "$_issue_file" ]]; then
+  _phase=$(grep 'phase_state:' "$_issue_file" 2>/dev/null | head -1 | sed 's/.*: *//' | tr -d "'\"")
+  case "$_phase" in
+    absorbed|completed|dropped)
+      cat >&2 <<PHASE_BLOCK
+拒绝创建工位: raw-${raw_key} 已关闭 (phase_state=${_phase})
+
+  该 raw issue 已关闭，不需要新建工位。
+  如果确实需要重新打开: 将 phase_state 改为 proposed
+  如果有替代 issue: 使用新的 raw_key
+PHASE_BLOCK
+      exit 1
+      ;;
+  esac
+fi
+
 # ── Issue pre-check helpers ──────────────────────────────
 
 _extract_issue_key() {
