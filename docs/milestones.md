@@ -1,3 +1,19 @@
+## M-20260621T005656Z-A
+- title: build_issue_index git ls-tree range discovery
+- status: active
+### candidate_issues
+1. `C-20260621T005656Z-A`
+- milestone: M-20260621T005656Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260621T005656Z-A/issue.md`
+### committed_issues
+1. `I-20260621T005656Z-A`
+- title: fix: build_issue_index git ls-tree range discovery
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260621T005656Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/gate-range-ls-tree/code-reviews`
+
 ## M-20260618T035220Z-A
 - title: Post-merge receipt check + actionable ref-transaction errors
 - status: active
