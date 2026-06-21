@@ -1,8 +1,9 @@
 ---
 local_id: I-20260621T130954Z-A
 kind: I
-phase_state: promoted
+phase_state: completed
 source_candidate: `docs/pre-brainstorms/20260621T130954Z--a2a-unix-request-route-fix/candidates.md#c-20260621T130954Z-A`
+verification_artifact_dir: docs/pre-brainstorms/20260621T130954Z--a2a-unix-request-route-fix
 raw_refs:
   - raw-20260621T130954Z
 candidate_refs:
