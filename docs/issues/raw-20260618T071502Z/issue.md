@@ -12,12 +12,13 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-18T07:15:19Z'
-updated_at: '2026-06-18T07:15:19Z'
+updated_at: '2026-06-21T18:27:48Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
 absorbed_into: I-20260618T071502Z-A
+platform_state: closed
 ---
 
 gh pr merge --merge --body is non-functional. Replace with local git merge --no-ff with Freely-Merge-Path receipt.
