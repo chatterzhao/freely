@@ -4,6 +4,7 @@
 
 - candidate_format_version: v2
 - status: promoted
+- promoted_issue_path: docs/issues/I-20260621T043842Z-A/issue.md
 - milestone: M-20260621T043842Z-A
 - decision_reason: 方案A (最小改动，直接修复 bug)
 - promoted_at: 2026-06-21T04:40:00Z
