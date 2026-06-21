@@ -3205,7 +3205,7 @@ routing_policy:
 1. `I-20260522T072450Z-A`
 - title: fix list double prefix
 - milestone_state: committed
-- phase_state: `in_verification`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260522T072450Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260522T072450Z--fix-list-double-prefix/candidates.md#C-20260522T072450Z-A`
 ## M-20260522T075012Z-A
