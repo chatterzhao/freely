@@ -615,6 +615,30 @@ cmd_close() {
     fi
   fi
 
+  # Fallback 2: search GitHub by raw-key in title (raw-key is universal identifier).
+  # All artefacts carry raw-key — worktree, branch, raw issue, I-* issue.
+  if [[ -z "$gh_id" && -n "${GH_REPO:-}" ]]; then
+    local _search_key="${local_id#raw-}"
+    [[ "$_search_key" == "$local_id" ]] && _search_key="${local_id#I-}"
+    local _found
+    _found=$(gh issue list -R "$GH_REPO" --search "raw-${_search_key} in:title" --state open --json number --jq '.[0].number' 2>/dev/null || true)
+    if [[ -z "$_found" ]]; then
+      _found=$(gh issue list -R "$GH_REPO" --search "${local_id} in:title" --state open --json number --jq '.[0].number' 2>/dev/null || true)
+    fi
+    if [[ -n "$_found" ]]; then
+      gh_id="$_found"
+      echo "[issue-sync] close fallback: found GitHub #$gh_id by raw-key search"
+    fi
+  fi
+
+  # If all fallbacks exhausted, error instead of silently skipping.
+  if [[ -z "$gh_id" && -z "$gitee_id" ]]; then
+    echo "[ERROR] issue-sync close: cannot find platform issue for $local_id" >&2
+    echo "  platform_ids empty, parent raw has no platform_ids, GitHub search found nothing." >&2
+    echo "  Please verify the issue was created on a platform, or close it manually." >&2
+    exit 1
+  fi
+
   if [[ -n "${GH_REPO:-}" && -n "$gh_id" ]]; then
     echo "[issue-sync] GitHub: closing #$gh_id"
     _gh_close "$gh_id" "$reason"
