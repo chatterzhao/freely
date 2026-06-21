@@ -2169,7 +2169,7 @@ except: pass
 import json,sys
 try:
     data=json.load(sys.stdin)
-    rows=data.get("rows",[]); latest=rows[0] if rows else {}
+    rows=data.get('rows',[]); latest=rows[0] if rows else {}
     print(latest.get('$field',''))
 except: pass
 " 2>/dev/null
@@ -12968,7 +12968,7 @@ manager_runtime_launch_workers_after_ai_cycle_if_needed() {
       if [[ -n "$_target_worktree" ]]; then
         local _existing_completed
         _existing_completed=$(python3 "$_a2a_task_py" active-workers --worktree "$_target_worktree" 2>/dev/null | \
-          python3 -c "import json,sys; data=json.load(sys.stdin); print(len(data.get("rows",[])))" 2>/dev/null || echo "0")
+          python3 -c "import json,sys; data=json.load(sys.stdin); print(len(data.get('rows',[])))" 2>/dev/null || echo "0")
         # Check if worktree has completed workers (not launched)
         local _completed_count
         _completed_count=$(python3 -c "
@@ -12976,7 +12976,7 @@ import json,subprocess,sys
 r=subprocess.run([sys.executable,'$_a2a_task_py','list','--role','worker','--status','completed'],
                  capture_output=True,text=True,timeout=5)
 data=json.loads(r.stdout) if r.returncode==0 else {}
-print(sum(1 for r in data.get("rows", []) if r.get('worktree','')=='$_target_worktree'))
+print(sum(1 for r in data.get('rows', []) if r.get('worktree','')=='$_target_worktree'))
 " 2>/dev/null || echo "0")
         [[ "${_completed_count:-0}" -gt 0 ]] && _is_followthrough="true"
       fi
@@ -14637,7 +14637,7 @@ parse_a2a_task_json_reply() {
   if [[ "$role" == "manager" ]]; then
     _result=$(python3 "$_a2a_task_py" latest-manager 2>/dev/null || true)
   else
-    _result=$(python3 "$_a2a_task_py" list --role worker --status completed 2>/dev/null | python3 -c "import json,sys; data=json.load(sys.stdin); rows=data.get("rows",[]); print(json.dumps(rows[0]) if rows else '{}')" 2>/dev/null || echo "{}")
+    _result=$(python3 "$_a2a_task_py" list --role worker --status completed 2>/dev/null | python3 -c "import json,sys; data=json.load(sys.stdin); rows=data.get('rows',[]); print(json.dumps(rows[0]) if rows else '{}')" 2>/dev/null || echo "{}")
   fi
   _action=$(echo "$_result" | python3 -c "import json,sys; r=json.load(sys.stdin); print(r.get('state',''))" 2>/dev/null || echo "")
   if [[ -n "$_action" && "$_action" != "null" ]]; then
@@ -14676,7 +14676,7 @@ manager_exit_contract_kind() {
   _db_path=""$project/.freely/freely.db""
   if [[ -f "$_a2a_task_py" && -f "$_db_path" ]]; then
     local pending_workers
-    pending_workers=$(python3 "$_a2a_task_py" list --role worker --status pending 2>/dev/null | python3 -c "import json,sys; data=json.load(sys.stdin); print(len(data.get("rows",[])))" 2>/dev/null || echo "0")
+    pending_workers=$(python3 "$_a2a_task_py" list --role worker --status pending 2>/dev/null | python3 -c "import json,sys; data=json.load(sys.stdin); print(len(data.get('rows',[])))" 2>/dev/null || echo "0")
     if [[ "${pending_workers:-0}" -gt 0 ]]; then
       echo "delegate_workers"
       return 0
@@ -14754,7 +14754,7 @@ validate_manager_exit_contract_for_project() {
 import json,sys
 try:
     data=json.load(sys.stdin)
-    print(len(data.get("rows",[])))
+    print(len(data.get('rows',[])))
 except: print('0')
 " 2>/dev/null || echo "0")
     if [[ "${pending_workers:-0}" -gt 0 ]]; then
@@ -14900,8 +14900,8 @@ worker_exit_contract_kind() {
 import json,sys
 try:
     data=json.load(sys.stdin)
-    r=data.get("rows",[])[0] if data.get("rows",[]) else {}
-    kind=r.get("exit_kind","")
+    r=data.get('rows',[])[0] if data.get('rows',[]) else {}
+    kind=r.get('exit_kind','')
     print(kind) if kind else None
 except: pass
 " 2>/dev/null || return 1
