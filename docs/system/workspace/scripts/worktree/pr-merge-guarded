@@ -404,8 +404,7 @@ _sync_prs_across_platforms() {
     local remote=""
     git remote | grep -q '^gitee$' && remote="gitee" || remote="origin"
     if [[ -n "$remote" ]]; then
-      echo "[MERGE-GUARD] deleting $source_branch from $platform..."
-      git push "$remote" --delete "$source_branch" 2>/dev/null || true
+	      echo "[MERGE-GUARD] remote branch cleanup deferred to wt-close for $source_branch on $platform"
     fi
   done
 }
