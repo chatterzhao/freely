@@ -18,7 +18,7 @@ created_at: 2026-06-17 16:08:07+00:00
 author: zhaoquan
 channel: freely-fix-execution
 session_refs: []
-platform_state: open
+platform_state: closed
 updated_at: '2026-06-21T18:27:46Z'
 ---
 
