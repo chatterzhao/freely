@@ -29,7 +29,7 @@ def _now_utc() -> str:
 PROJECT = None
 
 def _resolve_project() -> str:
-    return PROJECT or os.getcwd()
+    return PROJECT or os.environ.get("SESSION_PARENT_PROJECT") or os.getcwd()
 
 
 # ── A2A Protocol Client ───────────────────────────────────────────────────

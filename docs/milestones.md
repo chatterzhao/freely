@@ -3616,3 +3616,24 @@ routing_policy:
 - title: fix lifecycle scan phase_state filtering
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260620T083454Z-A/issue.md`
+
+## M-20260621T043842Z-A
+- title: worker fork A2A socket + JSON parse + scan filter fix
+- status: active
+### candidate_issues
+1. `C-20260621T043842Z-A`
+- milestone: M-20260621T043842Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260621T043842Z-A/issue.md`
+### committed_issues
+1. `I-20260621T043842Z-A`
+- title: fix worker fork A2A socket + systemic JSON parse + scan filter
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260621T043842Z-A/issue.md`
+- verification_artifact_dir: `docs/pre-brainstorms/20260621T043842Z--session-parent-project-export`
+### completed_issues
+1. `I-20260621T043842Z-A`
+- title: fix worker fork A2A socket + systemic JSON parse + scan filter
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260621T043842Z-A/issue.md`

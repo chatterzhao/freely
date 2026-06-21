@@ -2168,8 +2168,8 @@ except: pass
     python3 "$_a2a_task_py" list --role worker --status completed 2>/dev/null | python3 -c "
 import json,sys
 try:
-    rows=json.load(sys.stdin)
-    latest=rows[0] if rows else {}
+    data=json.load(sys.stdin)
+    rows=data.get("rows",[]); latest=rows[0] if rows else {}
     print(latest.get('$field',''))
 except: pass
 " 2>/dev/null
@@ -12276,8 +12276,8 @@ manager_record_worker_pid_for_launch() {
   [[ -f "$_a2a_task_py" && -f "$_db_path" ]] || return 0
   task_id="$(python3 "$_a2a_task_py" list --role worker --status launched 2>/dev/null | python3 -c "
 import json, sys
-rows = json.load(sys.stdin)
-for r in rows:
+data = json.load(sys.stdin)
+for r in data.get('rows', []):
   if r.get('prompt_file') == '$prompt_file':
     print(r.get('task_id',''))
     sys.exit(0)
@@ -12497,6 +12497,7 @@ SESSIONEOF
     cd "$target_project" 2>/dev/null || cd "$manager_project"
     export FREELY_ROLE_HINT=worker
     export SESSION_PARENT_ID="${CLAUDE_SESSION_ID_CURRENT:-}"
+    export SESSION_PARENT_PROJECT="$manager_project"
     python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/run-acp-prompt.py" \
       --bridge-socket "$_manager_bridge_socket" \
       --cwd "$target_project" \
@@ -12756,13 +12757,17 @@ worktree_has_active_worker() {
   _a2a_task_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db_path="$project/.freely/freely.db"
   [[ -f "$_a2a_task_py" && -f "$_db_path" ]] || return 1
-  # Only check launched — pending is transient (created and launched atomically in consume_delegate_workers)
-  local active_records sup_pid
+  # Check launched workers via has-active-worker first (fast path, no JSON parsing)
+  local result sup_pid
+  result=$(python3 "$_a2a_task_py" has-active-worker --worktree "$worktree" 2>/dev/null)
+  [[ "$result" != "true" ]] && return 1
+  # Collect matching task IDs for downstream processing
+  local active_records matching
   active_records=$(python3 "$_a2a_task_py" list --role worker --status launched 2>/dev/null)
-  local matching
   matching=$(echo "$active_records" | python3 -c "
 import json,sys
-for r in json.load(sys.stdin):
+data = json.load(sys.stdin)
+for r in data.get('rows', []):
     if r.get('worktree','') == '$worktree':
         print(r.get('task_id',''))
 " 2>/dev/null)
@@ -12938,15 +12943,15 @@ manager_runtime_launch_workers_after_ai_cycle_if_needed() {
       if [[ -n "$_target_worktree" ]]; then
         local _existing_completed
         _existing_completed=$(python3 "$_a2a_task_py" active-workers --worktree "$_target_worktree" 2>/dev/null | \
-          python3 -c "import json,sys; rows=json.load(sys.stdin); print(len(rows))" 2>/dev/null || echo "0")
+          python3 -c "import json,sys; data=json.load(sys.stdin); print(len(data.get("rows",[])))" 2>/dev/null || echo "0")
         # Check if worktree has completed workers (not launched)
         local _completed_count
         _completed_count=$(python3 -c "
 import json,subprocess,sys
 r=subprocess.run([sys.executable,'$_a2a_task_py','list','--role','worker','--status','completed'],
                  capture_output=True,text=True,timeout=5)
-rows=json.loads(r.stdout) if r.returncode==0 else []
-print(sum(1 for r in rows if r.get('worktree','')=='$_target_worktree'))
+data=json.loads(r.stdout) if r.returncode==0 else {}
+print(sum(1 for r in data.get("rows", []) if r.get('worktree','')=='$_target_worktree'))
 " 2>/dev/null || echo "0")
         [[ "${_completed_count:-0}" -gt 0 ]] && _is_followthrough="true"
       fi
@@ -14607,7 +14612,7 @@ parse_a2a_task_json_reply() {
   if [[ "$role" == "manager" ]]; then
     _result=$(python3 "$_a2a_task_py" latest-manager 2>/dev/null || true)
   else
-    _result=$(python3 "$_a2a_task_py" list --role worker --status completed 2>/dev/null | python3 -c "import json,sys; rows=json.load(sys.stdin); print(json.dumps(rows[0]) if rows else '{}')" 2>/dev/null || echo "{}")
+    _result=$(python3 "$_a2a_task_py" list --role worker --status completed 2>/dev/null | python3 -c "import json,sys; data=json.load(sys.stdin); rows=data.get("rows",[]); print(json.dumps(rows[0]) if rows else '{}')" 2>/dev/null || echo "{}")
   fi
   _action=$(echo "$_result" | python3 -c "import json,sys; r=json.load(sys.stdin); print(r.get('state',''))" 2>/dev/null || echo "")
   if [[ -n "$_action" && "$_action" != "null" ]]; then
@@ -14646,7 +14651,7 @@ manager_exit_contract_kind() {
   _db_path=""$project/.freely/freely.db""
   if [[ -f "$_a2a_task_py" && -f "$_db_path" ]]; then
     local pending_workers
-    pending_workers=$(python3 "$_a2a_task_py" list --role worker --status pending 2>/dev/null | python3 -c "import json,sys; rows=json.load(sys.stdin); print(len(rows))" 2>/dev/null || echo "0")
+    pending_workers=$(python3 "$_a2a_task_py" list --role worker --status pending 2>/dev/null | python3 -c "import json,sys; data=json.load(sys.stdin); print(len(data.get("rows",[])))" 2>/dev/null || echo "0")
     if [[ "${pending_workers:-0}" -gt 0 ]]; then
       echo "delegate_workers"
       return 0
@@ -14723,8 +14728,8 @@ validate_manager_exit_contract_for_project() {
     pending_workers=$(python3 "$_a2a_task_py" list --role worker --status submitted 2>/dev/null | python3 -c "
 import json,sys
 try:
-    rows=json.load(sys.stdin)
-    print(len(rows))
+    data=json.load(sys.stdin)
+    print(len(data.get("rows",[])))
 except: print('0')
 " 2>/dev/null || echo "0")
     if [[ "${pending_workers:-0}" -gt 0 ]]; then
@@ -14869,8 +14874,8 @@ worker_exit_contract_kind() {
   python3 "$_a2a_task_py" list --role worker --status completed 2>/dev/null | python3 -c "
 import json,sys
 try:
-    rows=json.load(sys.stdin)
-    r=rows[0] if rows else {}
+    data=json.load(sys.stdin)
+    r=data.get("rows",[])[0] if data.get("rows",[]) else {}
     kind=r.get("exit_kind","")
     print(kind) if kind else None
 except: pass
@@ -16442,7 +16447,7 @@ for it in items:
                           capture_output=True, text=True, timeout=5)
         try:
             records = json.loads(r.stdout)
-            has_active = any(rec.get('state') == 'working' for rec in records)
+            has_active = any(rec.get('state') in ('working', 'submitted', 'launched') for rec in records)
         except: pass
     if not has_active:
         filtered.append(it)
