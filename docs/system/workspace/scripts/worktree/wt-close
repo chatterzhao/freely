@@ -260,11 +260,16 @@ fi
 # ── Resolve worktree path ──
 wt_path="$(_resolve_worktree_path "$branch" || true)"
 if [[ -z "$wt_path" ]]; then
-  if [[ "$FORCE" == true ]]; then
-    echo "wt-close: --force, no worktree found for '$branch' (orphaned branch cleanup)"
+  if [[ "$FORCE" == true || "$PLATFORM_ONLY" == true ]]; then
+    if [[ "$PLATFORM_ONLY" == true ]]; then
+      echo "wt-close: --platform-only, no worktree found for '$branch' (API close only)"
+    else
+      echo "wt-close: --force, no worktree found for '$branch' (orphaned branch cleanup)"
+    fi
   else
     echo "Error: no worktree found for branch '$branch'" >&2
     echo "  Use --force to close an orphaned branch (worktree already removed)." >&2
+    echo "  Or use --platform-only to just close the platform issue via API." >&2
     exit 1
   fi
 else
