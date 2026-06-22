@@ -156,21 +156,34 @@ done
 set -- "${args[@]}"
 input="${1:-}"
 
-# ── --reason gate: bypass flags require --reason (except test-pre-merge) ──
+# ── --reason gate: bypass flags require valid reason (except test-pre-merge) ──
+# Reason must start with "违规绕过门禁中，理由充分，是：" to prevent casual abuse.
 if [[ "$input" != test-pre-merge-* ]]; then
   _require_reason() {
     local flag="$1" flag_name="$2"
-    if [[ "${!flag:-false}" == "true" && -z "${FORCE_REASON:-}" ]]; then
+    if [[ "${!flag:-false}" != "true" ]]; then
+      return 0
+    fi
+    if [[ -z "${FORCE_REASON:-}" ]] || ! echo "${FORCE_REASON}" | grep -q "^违规绕过门禁中，理由充分，是："; then
       cat >&2 <<GATE
-[GATE] 你在违规绕过门禁: wt-close ${flag_name}
+[GATE] 检测到你试图违规绕过门禁: wt-close ${flag_name}
 
-  请严格执行门禁。如果确实满足绕过条件（不是偷奸耍滑），
-  请加上绕过理由参数：
-    --reason "具体绕过原因"
+  大概率你在滥用绕过，请仔细研判。
+  如果重新研判后确认不是滥用绕过，请按以下格式加上绕过理由:
+    --reason "违规绕过门禁中，理由充分，是：<具体原因>"
 
-  示例: ./bin/wt-close ${flag_name} --reason "emergency: worktree corrupted" <branch>
+  --force 合法场景:
+    - phase_state 未达 completed 但工位需强制收口（如废弃开发、工位损坏）
+    - 孤分支清理（工位目录已删除，仅剩分支引用）
+  --discard-unmerged 合法场景:
+    - 未合并提交确认丢弃（需同时使用 --force）
+  --skip-platform 合法场景:
+    - 平台 issue 已手动关闭或无需同步
+
+  示例:
+    ./bin/wt-close --force --reason "违规绕过门禁中，理由充分，是：该功能确定放弃，不再继续实现此 raw issue" fix/raw-xxx
+    ./bin/wt-close --force --discard-unmerged --reason "违规绕过门禁中，理由充分，是：该方案已被否决，未合并提交确认丢弃" fix/raw-xxx
 GATE
-      exit 1
     fi
   }
   _require_reason FORCE "--force"
