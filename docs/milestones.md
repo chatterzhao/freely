@@ -3763,5 +3763,10 @@ routing_policy:
 1. `I-20260622T003231Z-A`
 - title: Fix pre-push.sh local keyword for macOS bash compat
 - milestone_state: committed
-- phase_state: dev_worktree
+- phase_state: completed
+- issue_path: `docs/issues/I-20260622T003231Z-A/issue.md`
+### completed_issues
+1. `I-20260622T003231Z-A`
+- title: Fix pre-push.sh local keyword for macOS bash compat
+- phase_state: completed
 - issue_path: `docs/issues/I-20260622T003231Z-A/issue.md`

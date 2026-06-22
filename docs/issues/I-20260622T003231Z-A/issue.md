@@ -1,7 +1,7 @@
 ---
 local_id: I-20260622T003231Z-A
 kind: linked
-phase_state: dev_worktree
+phase_state: completed
 milestone_state: committed
 milestone: M-20260622T003231Z-A
 platform_ids:
@@ -11,6 +11,7 @@ platform_ids:
 primary_platform: github
 canonical_issue_path: docs/epics/hook-bash-local-fix
 source_candidate: docs/pre-brainstorms/20260622T003231Z--hook-bash-local-fix/candidates.md#C-20260622T003231Z-A
+verification_artifact_dir: docs/epics/hook-bash-local-fix/code-reviews
 created_at: '2026-06-22T00:32:48Z'
 updated_at: '2026-06-22T00:32:48Z'
 author: platform
