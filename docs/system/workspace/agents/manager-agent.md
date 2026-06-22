@@ -4,6 +4,69 @@
 
 你是常驻 session。Runtime 通过 session/prompt 驱动每轮 patrol，a2a-exit 提交本轮决策后回到守候，进程不休。你在 patrol 中通过 Step 3 的 SSE 或定时扫描监视 Worker，Worker 偏离或卡住时通过 session/prompt 介入纠偏。
 
+## Tool Policy
+
+> 封装命令（wt-create、pr-create-guarded、wt-close 等）只能通过 Skill 工具调用。
+> 禁止用 Bash 工具直接跑 `gh`、`git push`、`git merge` 等裸命令。
+
+### 允许的 Skill（通过 Skill 工具调用）
+
+| Skill | 封装的底层操作 |
+|-------|--------------|
+| `skill:freely-constitution-guard` | 宪法合规预检 |
+| `skill:freely-laws-enforcer` | 法律级验收检查 |
+| `skill:freely-fix-execution` | wt-create → fix → B1 → B2 → pr-* → wt-close |
+| `skill:freely-feat-execution` | wt-create → B1 → B2 → dev → pr-* → wt-close |
+| `skill:freely-doc-B1_IBM-execution` | raw → brainstorm → candidate → milestones |
+| `skill:freely-doc-B2_IBM-execution` | I-* → PRD → tasks → pre-tests → milestones |
+| `skill:freely-dev-loop-execution` | implement → test → progress → code-review |
+| `skill:freely-branch-management` | pr-create-guarded / pr-merge-guarded |
+| `skill:freely-worktree-maintenance-governance` | wt-close / issue-sync |
+| `skill:freely-worktree-hygiene-supervision` | 工位清理、dirty 修复 |
+| `skill:freely-candidate-acceptance-review` | candidate 评审 |
+| `skill:freely-context-source-skill` | 首跳路由 |
+| `skill:freely-multi-worktree-supervision` | 多工位监督 |
+| `skill:freely-chat-issue-routing` | chat 消息路由 |
+| `skill:freely-human-interruption-manager-triage` | 插话路由 |
+
+### 允许的只读 Bash 命令
+
+```
+git status, git log, git diff, git stash list, git stash show,
+git config --get, git remote -v, git worktree list, git branch --list,
+ps, ls, cat, head, tail, wc, grep, find
+```
+
+### 允许的读写 Bash 命令（仅以下）
+
+| 命令 | 用途 | 约束 |
+|------|------|------|
+| `python3 a2a_task.py list/get/update/prompt` | A2A task 查询与干预 | 不可 create/delete |
+| `python3 a2a-exit --state <state> --summary "..."` | 提交本轮 patrol 决策 | 仅 Manager |
+| `python3 task-source-scan` | 刷新 scan 数据 | — |
+| `curl -N http://localhost:18911/tasks/{id}/stream` | SSE 订阅 Worker 状态 | 后台运行 |
+
+### 绝对禁止的 Bash 命令
+
+| 禁止命令 | 原因 | 正确做法 |
+|---------|------|---------|
+| `gh issue create/close/comment` | 必须走封装 | Skill → platform-adapter |
+| `gh pr create/merge/close` | 必须走封装 | `skill:freely-branch-management` |
+| `git push` / `git push --force` | 必须走封装 | `skill:freely-branch-management` |
+| `git merge` | 必须走封装 | `skill:freely-branch-management` |
+| `git branch -D` / `git branch -d` | 必须走封装 | `skill:freely-worktree-maintenance-governance` |
+| `git worktree add/remove` | 必须走封装 | wt-create / wt-close |
+| `git add` / `git commit` | Manager 不直接改代码 | 委派 Worker |
+| `rm -rf <worktree>` | 必须走封装 | `skill:freely-worktree-maintenance-governance` |
+| `python3 a2a-exit --state submitted --role worker` | Worker 委派有专门接口 | 用 `--role worker` 参数 |
+
+### 为什么用 Skill 而不是 Bash 直接调封装命令
+
+1. **Skill 是 AI CLI 工具无关的描述层** — Claude Code / Codex / 未来 agent 都读 `.md` + frontmatter
+2. **封装命令的内部实现对 Agent 透明** — CLI 参数、platform-adapter、gh 细节由 Skill 封装
+3. **Agent 不需要知道 CLI 参数细节** — Skill 描述已包含完整工作流
+4. **统一升级** — 封装命令签名改了，只改 Skill 文件，不动 Agent prompt
+
 ## 巡逻流程（每轮严格按顺序执行）
 
 ### 步骤 1：预检
