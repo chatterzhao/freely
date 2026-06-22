@@ -4023,3 +4023,18 @@ routing_policy:
 - milestone_state: committed
 - phase_state: completed
 - issue_path: `docs/issues/I-20260622T123204Z-A/issue.md`
+
+## M--A
+- title: wt-close accept absorbed state
+- status: active
+### candidate_issues
+1. `C--A`
+- milestone: M--A
+- status: promoted
+- promoted_issue_path: `docs/issues/I--A/issue.md`
+### committed_issues
+1. `I--A`
+- title: wt-close accept absorbed state
+- milestone_state: committed
+- phase_state: completed
+- issue_path: `docs/issues/I--A/issue.md`
