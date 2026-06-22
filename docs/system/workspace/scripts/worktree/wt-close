@@ -39,14 +39,33 @@ Options:
                       (blocks if branch unmerged; use with --discard-unmerged)
   --discard-unmerged  Confirm intentional discard of unmerged commits.
                       Must be used with --force when branch is ahead of develop.
-  --reason <text>    Reason for force-close (used with --force)
-  --skip-platform    Skip platform issue close
+  --reason <text>    Reason for force-close (REQUIRED with --force/--discard-unmerged/--skip-platform)
+                      Format: --reason "违规绕过门禁中，理由充分，是：<业务理由>"
+  --skip-platform    Skip platform issue close (requires --reason)
   --dry-run          Print what would be done, don't execute
+
+Bypass gates & --reason:
+  使用 --force、--discard-unmerged、--skip-platform 绕过门禁时，必须提供 --reason。
+  --reason 必须匹配正则: ^违规绕过门禁中，理由充分，是：
+  业务理由必须是真正的业务原因，不能是技术症状。
+
+  --force 有效理由:
+    ✅ "该功能确定放弃，不再继续实现此 raw issue"
+    ✅ "工位目录已损坏或丢失，仅剩分支引用需清理"
+  --discard-unmerged 有效理由:
+    ✅ "该方案已被否决，未合并提交确认丢弃"
+  --skip-platform 有效理由:
+    ✅ "平台 issue 已通过其他渠道手动关闭，无需同步"
+
+  无效理由（技术症状，会被拒绝）:
+    ❌ "phase_state 未 completed"
+    ❌ "连接超时"
 
 Examples:
   ./bin/wt-close feature/raw-20260513T081743Z-wt-close
-  ./bin/wt-close /path/to/worktree --force
-  ./bin/wt-close fix/raw-20260513T075904Z-merge-guarded-phase-state --skip-platform
+  ./bin/wt-close fix/raw-xxx --force --reason "违规绕过门禁中，理由充分，是：该功能确定放弃，不再继续实现此 raw issue"
+  ./bin/wt-close fix/raw-xxx --force --discard-unmerged --reason "违规绕过门禁中，理由充分，是：该方案已被否决，未合并提交确认丢弃"
+  ./bin/wt-close fix/raw-xxx --skip-platform --reason "违规绕过门禁中，理由充分，是：平台 issue 已通过其他渠道手动关闭，无需同步"
 USAGE
 }
 

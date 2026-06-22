@@ -695,7 +695,7 @@ preflight_codex_slot_recovery_before_start_or_fail() {
 usage() {
   cat <<'EOF'
 Usage:
-  freely init [--project <abs_path>] --intent <abs_file> --constitution <abs_file> [--ai <tool[:model][:mode]>] [--tool-adapter <adapter>] [--tool-adapter-policy <policy>] [--reasoning-effort <effort>] [--accept-default-autonomy] [--force]
+  freely init [--project <abs_path>] --intent <abs_file> --constitution <abs_file> [--ai <tool[:model][:mode]>] [--tool-adapter <adapter>] [--tool-adapter-policy <policy>] [--reasoning-effort <effort>] [--accept-default-autonomy] [--force] [--reason <text>]
   freely set-tool [--project <abs_path>] --tool <name> [--tool-adapter <adapter>] [--tool-adapter-policy <policy>]
   freely sync-tooling [--project <abs_path>] --source-project <abs_path>
   freely doctor [--project <abs_path>]
@@ -709,9 +709,9 @@ Usage:
   freely ensure-manager [--project <abs_path>] [--watch] [--interval <seconds>]
   freely ensure-interruption-dispatch [--project <abs_path>] [--watch] [--interval <seconds>]
   freely auth-change-wake [--tool <name>] [--slot <slot>] [--reason <reason>]
-  freely start [--project <abs_path>] [--task-mode auto|wait|listen|id:<scan-id>] [--force]
-  freely daemon start [--project <abs_path>] [--task-mode auto|wait|listen|id:<scan-id>] [--force]
-  freely task-mode set --project <abs_path> --task-mode auto|wait|listen|id:<scan-id> [--force]
+  freely start [--project <abs_path>] [--task-mode auto|wait|listen|id:<scan-id>] [--force] [--reason <text>]
+  freely daemon start [--project <abs_path>] [--task-mode auto|wait|listen|id:<scan-id>] [--force] [--reason <text>]
+  freely task-mode set --project <abs_path> --task-mode auto|wait|listen|id:<scan-id> [--force] [--reason <text>]
   freely task-mode get --project <abs_path>
   freely daemon stop [--project <abs_path>]
   freely daemon status [--project <abs_path>]
@@ -736,12 +736,30 @@ Usage:
   freely pr-create-guarded [--title <title>] [--body <body>] [--base <branch>]
   freely pr-merge-guarded <target-branch> <source-branch> [--dry-run]
   freely pr-merge-guarded complete <target-branch> <source-branch>
-  freely wt-close <branch> [--force] [--skip-platform] [--dry-run]
+  freely wt-close <branch> [--force] [--skip-platform] [--discard-unmerged] [--reason <text>] [--dry-run]
   freely stop [--project <abs_path>]
 
 AI mode:
   auto  -> non-interactive, auto-approve (where supported)
   step  -> interactive/approval mode
+
+Bypass gates (--force / --skip-platform / --discard-unmerged) require --reason:
+  这些命令的 bypass 标志（--force、--skip-platform、--discard-unmerged）必须配合 --reason 使用。
+  --reason 格式必须匹配正则: --reason "违规绕过门禁中，理由充分，是：<业务理由>"
+  业务理由必须是真正的业务原因，不能是技术症状（如 phase_state 未 completed、连接超时等）。
+
+  有效业务理由示例:
+    ✅ "该功能确定放弃，不再继续实现此 raw issue"
+    ✅ "该方案已被否决，未合并提交确认丢弃"
+    ✅ "配置文件损坏无法修复，需重建初始化"
+    ✅ "守护进程状态损坏导致无法正常调度，需强制重建运行时"
+    ✅ "当前 AI 进程陷入死循环无法响应，需强制终止后切换模式"
+    ✅ "IBM Completeness 维度不适用于本次纯文档修改"
+
+  无效理由（技术症状，会被拒绝）:
+    ❌ "phase_state 未 completed"
+    ❌ "连接超时"
+    ❌ "编译失败"
 EOF
 }
 
