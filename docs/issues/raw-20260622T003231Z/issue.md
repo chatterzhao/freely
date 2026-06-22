@@ -1,13 +1,14 @@
 ---
 local_id: raw-20260622T003231Z
 kind: raw
-phase_state: proposed
+phase_state: absorbed
+absorbed_into: I-20260622T003231Z-A
 platform_ids:
   github:
     issue_id: '3307'
     url: https://github.com/chatterzhao/freely/issues/3307
 primary_platform: github
-canonical_issue_path: ''
+canonical_issue_path: docs/issues/I-20260622T003231Z-A/issue.md
 created_at: '2026-06-22T00:32:48Z'
 updated_at: '2026-06-22T00:32:48Z'
 author: platform

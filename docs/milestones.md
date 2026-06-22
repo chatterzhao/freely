@@ -3750,3 +3750,18 @@ routing_policy:
 - title: Manager review gate + proactive steer prompt
 - phase_state: completed
 - issue_path: `docs/issues/I-20260621T081814Z-A/issue.md
+
+## M-20260622T003231Z-A
+- title: Fix pre-push.sh local keyword for macOS bash compat
+- status: active
+### candidate_issues
+1. `C-20260622T003231Z-A`
+- milestone: M-20260622T003231Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260622T003231Z-A/issue.md`
+### committed_issues
+1. `I-20260622T003231Z-A`
+- title: Fix pre-push.sh local keyword for macOS bash compat
+- milestone_state: committed
+- phase_state: dev_worktree
+- issue_path: `docs/issues/I-20260622T003231Z-A/issue.md`
