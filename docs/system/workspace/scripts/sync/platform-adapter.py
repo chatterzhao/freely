@@ -225,14 +225,15 @@ def _get_issue_state(platform: str, issue_id: str) -> Optional[str]:
             if result.returncode == 0:
                 return result.stdout.strip()
         elif platform == "gitee":
-            # Gitee: use API via gitee-issue.py
+            # Gitee: use 'get' subcommand and parse JSON state field
             result = subprocess.run(
                 [sys.executable, str(RUNTIME_DIR / "gitee-issue.py"),
-                 "--repo", _gitee_repo(), "state", issue_id],
+                 "--repo", _gitee_repo(), "get", issue_id],
                 capture_output=True, text=True
             )
             if result.returncode == 0:
-                return result.stdout.strip().lower()
+                data = json.loads(result.stdout)
+                return str(data.get("state", "")).lower()
     except Exception:
         pass
     return None

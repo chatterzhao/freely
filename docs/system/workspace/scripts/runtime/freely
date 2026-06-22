@@ -19389,10 +19389,17 @@ PLATFORM_GATE
         if ! ssh -T -o StrictHostKeyChecking=no -o ConnectTimeout=5 git@github.com 2>&1 | grep -qE "successfully authenticated|Permission denied"; then
           log_warn "github: SSH key check failed — run: ssh -T git@github.com"
         fi
+        if ! git ls-remote --heads git@github.com:$(git remote get-url origin 2>/dev/null | sed 's|.*github.com[:/]||;s|\.git$||') 2>/dev/null | grep -q "refs/heads/"; then
+          log_warn "github: repo reachability check failed — verify the repo exists and SSH access is configured"
+        fi
         ;;
       gitee)
         if ! ssh -T -o StrictHostKeyChecking=no -o ConnectTimeout=5 git@gitee.com 2>&1 | grep -qE "successfully|Welcome|Permission denied"; then
           log_warn "gitee: SSH key check failed — run: ssh -T git@gitee.com"
+        fi
+        # Gitee reachability: check via git remote
+        if ! git ls-remote --heads git@gitee.com:$(git remote get-url origin 2>/dev/null | sed 's|.*gitee.com[:/]||;s|\.git$||') 2>/dev/null | grep -q "refs/heads/"; then
+          log_warn "gitee: repo reachability check failed — verify the repo exists and SSH access is configured"
         fi
         ;;
     esac
