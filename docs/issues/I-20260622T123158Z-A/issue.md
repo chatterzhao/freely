@@ -2,6 +2,7 @@
 local_id: I-20260622T123158Z-A
 kind: I
 phase_state: completed
+source_candidate: docs/milestones.md#C-20260622T123158Z-A
 platform_ids:
   github:
     issue_id: ''

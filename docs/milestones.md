@@ -1,3 +1,19 @@
+## M-20260622T123158Z-A
+- title: Agent Tool Policy — separate Manager/Worker tool constraints
+- status: active
+### candidate_issues
+1. `C-20260622T123158Z-A`
+- milestone: M-20260622T123158Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260622T123158Z-A/issue.md`
+### committed_issues
+1. `I-20260622T123158Z-A`
+- title: feat: Agent Tool Policy in manager-agent.md and worker-agent.md
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260622T123158Z-A/issue.md`
+- verification_artifact_dir: `docs/system/workspace/agents`
+
 ## M-20260618T035220Z-B
 - title: Semantic overlap detection in pr-merge-guarded
 - status: active
