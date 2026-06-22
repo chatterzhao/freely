@@ -420,12 +420,11 @@ for p, info in fm.get('platform_ids', {}).items():
         break
 " 2>/dev/null)
   if [[ -n "$_po_raw_gh" ]]; then
-    echo "wt-close: closing raw issue #$_po_raw_gh on GitHub..."
-    if gh issue close "$_po_raw_gh" --repo "$(cd "$PROJECT_ROOT" && git remote get-url origin | grep -oE '[^:/]+/[^/]+' | head -1)" -r "completed" 2>&1; then
+    echo "wt-close: closing raw issue #$_po_raw_gh via platform-adapter..."
+    if python3 "$PROJECT_ROOT/docs/system/workspace/scripts/sync/platform-adapter.py" close github "$_po_raw_gh" 2>&1; then
       echo "wt-close: raw issue #$_po_raw_gh closed ✓ (local files unchanged)"
     else
-      echo "Warning: gh close failed for #$_po_raw_gh, trying issue-sync fallback..." >&2
-      "$PROJECT_ROOT/bin/issue-sync" --project "$PROJECT_ROOT" close "$issue_id" completed 2>&1 ||         echo "Warning: issue-sync fallback also failed for $issue_id, continuing..." >&2
+      echo "Warning: platform-adapter close failed for #$_po_raw_gh" >&2
     fi
   fi
   
@@ -451,7 +450,7 @@ for p, info in fm.get('platform_ids', {}).items():
           _po_i_title="$(_fm_get "$_po_i_file" "local_id")"
           if [[ -n "$_po_i_gh" ]]; then
             echo "wt-close: also closing absorbed I-* issue $_po_i_title (#$_po_i_gh)..."
-            gh issue close "$_po_i_gh" --repo "$(cd "$PROJECT_ROOT" && git remote get-url origin | grep -oE '[^:/]+/[^/]+' | head -1)" -r "completed" 2>&1 &&               echo "wt-close: I-* #$_po_i_gh closed ✓ (local files unchanged)" ||               echo "Warning: gh close failed for I-* #$_po_i_gh" >&2
+            python3 "$PROJECT_ROOT/docs/system/workspace/scripts/sync/platform-adapter.py" close github "$_po_i_gh" 2>&1 &&               echo "wt-close: I-* #$_po_i_gh closed ✓ (local files unchanged)" ||               echo "Warning: platform-adapter close failed for I-* #$_po_i_gh" >&2
           fi
         fi
       fi

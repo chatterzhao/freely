@@ -493,6 +493,10 @@ if __name__ == "__main__":
         platform, num = sys.argv[2], sys.argv[3]
         result = fetch_issue(platform, num)
         print(json.dumps(result, indent=2))
+    elif len(sys.argv) > 1 and sys.argv[1] == "close":
+        platform, issue_number = sys.argv[2], sys.argv[3]
+        result = close_issue("", issue_number)
+        print(json.dumps(result, indent=2))
     elif len(sys.argv) > 1 and sys.argv[1] == "pull":
         raw_key = sys.argv[2]
         target = Path(sys.argv[3]) if len(sys.argv) > 3 else Path(f"docs/issues/raw-{raw_key}")
