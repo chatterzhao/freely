@@ -26,7 +26,35 @@ while [[ $# -gt 0 ]]; do
     --verdict) verdict_override="${2:-}"; shift 2 ;;
     --reason) verdict_reason="${2:-}"; shift 2 ;;
     --help|-h)
-      echo "Usage: ./bin/pr-review-guarded <branch> [--reviewer <name>] [--verdict pass|fail|needs_changes] [--reason <text>]" >&2
+      cat >&2 <<'HELPMSG'
+Usage: ./bin/pr-review-guarded <branch> [--reviewer <name>] [--verdict pass|fail|needs_changes] [--reason <text>]
+
+Runs 6 review dimensions, produces review document, outputs verdict.
+pr-merge-guarded gates on verdict=pass before allowing merge.
+
+Options:
+  --reviewer <name>   Reviewer name (default: cli)
+  --verdict <value>   Override automated verdict (pass|fail|needs_changes)
+  --reason <text>     REQUIRED when --verdict pass overrides failing dimensions
+                      Format: --reason "违规绕过门禁中，理由充分，是：<业务理由>"
+
+--reason gate:
+  使用 --verdict pass 覆盖失败的 review 维度时，必须提供 --reason。
+  --reason 必须匹配正则: ^违规绕过门禁中，理由充分，是：
+  业务理由必须是真正的业务原因，不能是技术症状。
+
+  有效理由示例:
+    ✅ "IBM Completeness 维度不适用于本次纯文档修改，其他维度均已通过"
+    ✅ "Worktree Check 失败是因为工位已合并删除，其他维度均通过"
+  无效理由（技术症状，会被拒绝）:
+    ❌ "测试失败了但没关系"
+    ❌ "赶时间合并"
+
+Examples:
+  ./bin/pr-review-guarded fix/raw-xxx
+  ./bin/pr-review-guarded fix/raw-xxx --verdict pass
+  ./bin/pr-review-guarded fix/raw-xxx --verdict pass --reason "违规绕过门禁中，理由充分，是：IBM Completeness 维度不适用于本次纯文档修改"
+HELPMSG
       exit 1 ;;
     -*) echo "Unknown: $1" >&2; exit 1 ;;
     *) review_branch="$1"; shift ;;
