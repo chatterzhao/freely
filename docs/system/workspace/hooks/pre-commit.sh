@@ -230,9 +230,24 @@ fi
 case "$branch" in
   main|develop)
     # Allow governance-automated commits (wt-close frontmatter, issue-sync,
-    # lifecycle closeout, etc.) via FREELY_SKIP_IBM_GATE=1.
-    if [[ "${FREELY_SKIP_IBM_GATE:-0}" == "1" ]]; then
-      echo "[HOOK] FREELY_SKIP_IBM_GATE=1 — validating governance-only paths"
+    # lifecycle closeout, etc.) via FREELY_SKIP_IBM_GATE with valid reason.
+    if [[ -n "${FREELY_SKIP_IBM_GATE:-}" ]]; then
+      # --reason gate: env var bypass must carry valid business reason
+      if ! echo "${FREELY_SKIP_IBM_GATE}" | grep -q "^违规绕过门禁中，理由充分，是："; then
+        cat >&2 <<'REASON_GATE'
+[GATE] 检测到你试图通过 FREELY_SKIP_IBM_GATE 违规绕过门禁
+
+  如果是因为实现没有达到门禁要求，请按要求去完成，而不是想着违规绕过。
+
+  只有确实有合理的业务理由（仅文档/清理/格式化变更等），才允许绕过。
+  FREELY_SKIP_IBM_GATE 的值必须匹配格式:
+    FREELY_SKIP_IBM_GATE="违规绕过门禁中，理由充分，是：<业务理由>"
+
+  示例: FREELY_SKIP_IBM_GATE="违规绕过门禁中，理由充分，是：仅文档类变更不含实现代码" git commit
+REASON_GATE
+        exit 1
+      fi
+      echo "[HOOK] FREELY_SKIP_IBM_GATE — validating governance-only paths"
       if [[ -x "./bin/governance-merge-gate" ]]; then
         set +e
         gate_output="$(./bin/governance-merge-gate --staged --target-branch "$branch" --skip-ibm-gate 2>&1)"

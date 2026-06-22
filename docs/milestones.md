@@ -3909,3 +3909,20 @@ routing_policy:
 - issue_path: `docs/issues/I-20260622T100348Z-A/issue.md`
 - source_raws:
   - `raw-20260622T100348Z`
+
+## M-20260622T104129Z-A
+- title: FREELY_SKIP env var bypass requires reason regex
+- status: active
+### candidate_issues
+1. `C-20260622T104129Z-A`
+- milestone: M-20260622T104129Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260622T104129Z-A/issue.md`
+### committed_issues
+1. `I-20260622T104129Z-A`
+- title: FREELY_SKIP env var bypass requires reason regex
+- milestone_state: committed
+- phase_state: completed
+- issue_path: `docs/issues/I-20260622T104129Z-A/issue.md`
+- source_raws:
+  - `raw-20260622T104129Z`

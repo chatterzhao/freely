@@ -88,8 +88,22 @@ MSG
         fi
       fi
       if [[ "$local_branch" == "develop" && -x "./bin/governance-merge-gate" ]]; then
-        if [[ "${FREELY_SKIP_IBM_GATE:-0}" == "1" ]]; then
-          echo "[HOOK] FREELY_SKIP_IBM_GATE=1 — validating governance-only paths via governance-merge-gate --skip-ibm-gate"
+        if [[ -n "${FREELY_SKIP_IBM_GATE:-}" ]]; then
+          if ! echo "${FREELY_SKIP_IBM_GATE}" | grep -q "^违规绕过门禁中，理由充分，是："; then
+            cat >&2 <<'REASON_GATE'
+[GATE] 检测到你试图通过 FREELY_SKIP_IBM_GATE 违规绕过门禁
+
+  如果是因为实现没有达到门禁要求，请按要求去完成，而不是想着违规绕过。
+
+  只有确实有合理的业务理由（仅文档/清理/格式化变更等），才允许绕过。
+  FREELY_SKIP_IBM_GATE 的值必须匹配格式:
+    FREELY_SKIP_IBM_GATE="违规绕过门禁中，理由充分，是：<业务理由>"
+
+  示例: FREELY_SKIP_IBM_GATE="违规绕过门禁中，理由充分，是：仅文档类变更不含实现代码" git push
+REASON_GATE
+            exit 1
+          fi
+          echo "[HOOK] FREELY_SKIP_IBM_GATE — validating governance-only paths via governance-merge-gate --skip-ibm-gate"
           set +e
           gate_output="$(./bin/governance-merge-gate --range "develop..HEAD" --skip-ibm-gate 2>&1)"
           gate_rc=$?
@@ -152,12 +166,26 @@ MSG
           exit 1
         fi
       else
-        # FREELY_SKIP_CREATE_GATE=1: only allowed for docs-only changes.
+        # FREELY_SKIP_CREATE_GATE: only allowed for docs-only changes with valid reason.
+        if ! echo "${FREELY_SKIP_CREATE_GATE}" | grep -q "^违规绕过门禁中，理由充分，是："; then
+          cat >&2 <<'REASON_GATE'
+[GATE] 检测到你试图通过 FREELY_SKIP_CREATE_GATE 违规绕过门禁
+
+  如果是因为实现没有达到门禁要求，请按要求去完成，而不是想着违规绕过。
+
+  只有确实有合理的业务理由（纯文档变更、治理文档更新等），才允许绕过。
+  FREELY_SKIP_CREATE_GATE 的值必须匹配格式:
+    FREELY_SKIP_CREATE_GATE="违规绕过门禁中，理由充分，是：<业务理由>"
+
+  示例: FREELY_SKIP_CREATE_GATE="违规绕过门禁中，理由充分，是：纯治理文档更新不含代码变更" git push
+REASON_GATE
+          exit 1
+        fi
         # Code files MUST go through pr-create-guarded.
         local _base; _base="$(git merge-base origin/develop HEAD 2>/dev/null || echo "origin/develop")"
         if git diff --name-only "$_base..HEAD" 2>/dev/null | grep -qE '\.(sh|py|rs|ts|js|tsx|jsx|go|java|c|cpp|h|toml)$'; then
           cat >&2 <<MSG
-[HOOK] FREELY_SKIP_CREATE_GATE=1 rejected: code files must use pr-create-guarded.
+[HOOK] FREELY_SKIP_CREATE_GATE rejected: code files must use pr-create-guarded.
   Run: ./bin/pr-create-guarded
 MSG
           exit 1
