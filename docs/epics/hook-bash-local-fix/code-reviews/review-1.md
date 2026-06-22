@@ -1,8 +1,6 @@
----
-issue_id: I-20260622T003231Z-A
-issue_path: docs/issues/I-20260622T003231Z-A/issue.md
-phase_state: in_dev
----
+- issue_id: I-20260622T003231Z-A
+- issue_path: docs/issues/I-20260622T003231Z-A/issue.md
+- phase_state: in_dev
 
 # code-review: pre-push.sh local keyword fix
 
