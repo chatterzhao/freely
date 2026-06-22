@@ -291,14 +291,16 @@ fi
 
 if [[ "$FORCE" == false && -n "$issue_id" && -f "${issue_file:-}" ]]; then
   phase_state="$(_fm_get "$issue_file" "phase_state")"
-  if [[ -z "$phase_state" || "$phase_state" != "completed" ]]; then
+  if [[ -z "$phase_state" || ( "$phase_state" != "completed" && "$phase_state" != "absorbed" ) ]]; then
     cat >&2 <<PHASE_GATE
-[wt-close] $issue_id 的 phase_state='${phase_state:-<empty>}'，不满足 wt-close 要求的 'completed'
+[wt-close] $issue_id 的 phase_state='${phase_state:-<empty>}'，不满足 wt-close 要求的 'completed' 或 'absorbed'
+
+  'absorbed' 是正常完成状态——pr-merge-guarded 将 raw issue 吸收到 I-* issue，表示工作已完成。
 
   请判断属于以下哪种情况，然后采取对应措施:
 
-  1. 实现已完成，只是 phase_state 忘记更新为 completed
-     → 更新 $issue_file 的 phase_state 为 completed，然后重新执行 wt-close
+  1. 实现已完成，只是 phase_state 忘记更新为 completed 或 absorbed
+     → 更新 $issue_file 的 phase_state，然后重新执行 wt-close
 
   2. 实现确实还没做完
      → 请回到工位继续完成实现工作，完成后再执行 wt-close
@@ -313,7 +315,7 @@ if [[ "$FORCE" == false && -n "$issue_id" && -f "${issue_file:-}" ]]; then
 PHASE_GATE
     exit 1
   fi
-  echo "wt-close: phase_state=completed ✓"
+  echo "wt-close: phase_state=$phase_state ✓"
 
   # pretests-retirement-gate check
   if [[ -x "$PROJECT_ROOT/bin/pretests-retirement-gate" ]]; then
