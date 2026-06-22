@@ -22452,6 +22452,35 @@ cmd_chat() {
   [[ -n "$message" ]] || { usage; exit 1; }
   project="$(resolve_project_or_fail "$project" 1)"
 
+  # Gate: block new comments on closed issues (#3302)
+  if [[ -n "$target_issue" && "$new_issue" != "true" ]]; then
+    local _chat_issue_file _chat_phase
+    # Resolve target_issue to local issue file: try raw-<id> or search docs/issues
+    if [[ -f "$project/docs/issues/$target_issue/issue.md" ]]; then
+      _chat_issue_file="$project/docs/issues/$target_issue/issue.md"
+    elif [[ -f "$project/docs/issues/raw-$target_issue/issue.md" ]]; then
+      _chat_issue_file="$project/docs/issues/raw-$target_issue/issue.md"
+    fi
+    if [[ -n "${_chat_issue_file:-}" && -f "$_chat_issue_file" ]]; then
+      _chat_phase="$(sed -n '/^---$/,/^---$/p' "$_chat_issue_file" | grep "^phase_state:" | sed 's/^phase_state: *//' | tr -d '"' 2>/dev/null || true)"
+      case "$_chat_phase" in
+        absorbed|completed|dropped|closed)
+          cat >&2 <<CHAT_BLOCK
+[BLOCKED] 无法在已关闭的 issue 上创建评论。
+
+  Issue: $target_issue
+  phase_state: $_chat_phase
+
+  已关闭的 issue 不接受新评论。
+  - 如需继续讨论: 重新打开该 issue
+  - 如果是新问题: freely feedback 创建新 raw issue
+CHAT_BLOCK
+          exit 1
+          ;;
+      esac
+    fi
+  fi
+
   # --new only valid with --conversation
   if [[ "$new_conversation" == "true" && "$conversation" != "true" ]]; then
     log_error "--new is only valid with --conversation"
