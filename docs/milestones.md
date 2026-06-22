@@ -4024,17 +4024,18 @@ routing_policy:
 - phase_state: completed
 - issue_path: `docs/issues/I-20260622T123204Z-A/issue.md`
 
-## M--A
+
+## M-20260622T131109Z-A
 - title: wt-close accept absorbed state
 - status: active
 ### candidate_issues
-1. `C--A`
-- milestone: M--A
+1. `C-20260622T131109Z-A`
+- milestone: M-20260622T131109Z-A
 - status: promoted
-- promoted_issue_path: `docs/issues/I--A/issue.md`
+- promoted_issue_path: `docs/issues/I-20260622T131109Z-A/issue.md`
 ### committed_issues
-1. `I--A`
+1. `I-20260622T131109Z-A`
 - title: wt-close accept absorbed state
 - milestone_state: committed
 - phase_state: completed
-- issue_path: `docs/issues/I--A/issue.md`
+- issue_path: `docs/issues/I-20260622T131109Z-A/issue.md`
