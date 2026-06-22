@@ -69,9 +69,17 @@ description: 执行 scan-selected 或 handoff-continued ready issue 的实现、
 
 ### 情景 D：pre-tests.md 结构
 
-pre-tests.md 是验证计划，不是门禁表单。写真正会执行的测试，引用实际存在的测试产物。
+> pre-tests.md 完整模板由 `skill:freely-doc-B2_IBM-execution` 内置提供。
+> B2_IBM 阶段写好 `test_command` + `expected_output`，dev-loop 阶段先 RED 后 GREEN。
+> 正式执行验证由 `skill:freely-test-execution` 负责——逐条执行并收集 evidence。
 
-**必需章节**：
+dev-loop 阶段的职责：
+- 读取 B2 写好的 pre-tests.md
+- **先跑 RED**：实现前先执行 test_command，确认测试能失败（证明测试有效）
+- **再跑 GREEN**：实现后重新执行，全部 passed 才进入 test skill
+- 把 RED-GREEN 结果记录到 pre-tests.md 的 actual_output / evidence_file
+
+**必需章节**（详见 B2_IBM skill 模板）：
 
 | 章节 | 内容 |
 |------|------|
@@ -138,6 +146,51 @@ pre-tests.md 是验证计划，不是门禁表单。写真正会执行的测试�
 2. 在提升前先确认父分支结果。
 3. 父分支进入要求路径后，把当前分支 restack / rebase / merge 上游。
 4. 重新执行必需测试，再继续提升。
+
+### 情景 F：质量三步检查（实现前必须通过）
+
+在开始写代码之前，完成以下三步检查。不是走过场——每步必须产出可验证的记录。
+
+#### F1. Tech Stack Review（技术栈审查）
+
+确认实现方案中使用的技术/工具/库是否正确：
+
+1. 列出本次实现涉及的运行时依赖（语言、库、CLI 工具、外部服务）
+2. 对每个依赖确认：
+   - 是否已在项目中可用（检查 `config.toml`、`bin/`、现有 worktree）
+   - 是否需要新增依赖 → 记录到 issue 的 `depends_on` 字段
+   - 版本兼容性是否有已知问题
+3. 产出：在 issue 或 progress 中写 `## Tech Stack Review` 段落
+
+#### F2. Architecture Check（架构检查）
+
+确认实现不会破坏现有架构边界：
+
+1. 读取 `docs/CONSTITUTION.md` 和 `docs/PROJECT_INTENT.md` 确认边界约束
+2. 确认修改不跨越 loop 边界（doc-loop 不改 runtime、dev-loop 不改 scan 分类）
+3. 确认不引入循环依赖（如 skill 之间互相引用、runtime 依赖 sync 脚本的运行时状态）
+4. 产出：在 issue 或 progress 中写 `## Architecture Check` 段落
+
+#### F3. Acceptance Criteria Mapping（验收标准映射）
+
+确认每条 acceptance criteria 都有对应的实现和测试：
+
+1. 读取 raw issue 的 acceptance criteria（如果有）
+2. 读取 I-* issue 的 pre-tests.md
+3. 逐条核对：每条 acceptance criteria → 至少一条 pre-tests 中的 acceptance 项
+4. 发现未覆盖的 → 回 B2_IBM 补充 pre-tests
+5. 产出：映射表 `## Acceptance Mapping`（acceptance criteria → pre-tests acceptance-N）
+
+### 情景 G：进入 test skill
+
+dev-loop 完成后（代码已提交、RED-GREEN 通过、质量三步完成）：
+
+→ 进入 `skill:freely-test-execution` — 在 test-pre-merge 工位中逐条执行 pre-tests
+
+```
+dev-loop 完成 → test skill（全绿）→ pr-create-guarded
+              ↘ (有红) → 回 dev-loop 修复
+```
 
 ## 按需参考
 

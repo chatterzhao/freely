@@ -5,8 +5,8 @@ description: 新功能/大型改动的完整开发流程——feedback→wt-crea
 
 # skill:freely-feat-execution
 
-> 全链路: feedback → [命令] wt-create → [skill] skill:freely-doc-B1_IBM-execution → [skill] skill:freely-doc-B2_IBM-execution → dev → [命令] pr-create-guarded → [命令] pr-review-guarded → [命令] pr-merge-guarded → [命令] wt-close
->                                                              ↑ 本 skill 自此开始（提供 B1→B2→dev→pr→merge→close 完整抽象）
+> 全链路: feedback → [命令] wt-create → [skill] skill:freely-doc-B1_IBM-execution → [skill] skill:freely-doc-B2_IBM-execution → dev(RED-GREEN) → [skill] skill:freely-test-execution(全绿) → [命令] pr-create-guarded → [命令] pr-review-guarded → [命令] pr-merge-guarded → [命令] wt-close
+>                                                              ↑ 本 skill 自此开始（提供 B1→B2→dev→test→pr→merge→close 完整抽象）
 
 ## 定位
 
