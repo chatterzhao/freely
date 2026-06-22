@@ -110,6 +110,37 @@ def list_open_issues(platforms: list[str]) -> dict[str, str]:
     return result
 
 
+def fetch_issue_state(platform: str, issue_number: str) -> Optional[str]:
+    """Fetch issue state from a single platform. Returns 'OPEN'/'CLOSED' or None."""
+    try:
+        if platform == "github":
+            proc = subprocess.run(
+                ["gh", "issue", "view", str(issue_number), "--json", "state"],
+                capture_output=True, text=True, timeout=10)
+            if proc.returncode == 0:
+                return json.loads(proc.stdout).get("state", "")
+        elif platform == "gitee":
+            proc = subprocess.run(
+                [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
+                 "--repo", _gitee_repo(), "get", str(issue_number)],
+                capture_output=True, text=True, timeout=10)
+            if proc.returncode == 0:
+                data = json.loads(proc.stdout)
+                return data.get("state", "").upper()
+    except Exception:
+        pass
+    return None
+
+
+def configured_platforms() -> list[str]:
+    """Read FREELY_REPO_PLATFORMS from config/env. Falls back to auto-detection."""
+    csv = os.environ.get("FREELY_REPO_PLATFORMS", "")
+    platforms = [p.strip() for p in csv.split(",") if p.strip()]
+    if not platforms:
+        platforms = available_platforms()
+    return platforms
+
+
 # ---- Unified public API ----
 
 def create_issue(local_id: str, title: str, body: str) -> dict[str, dict]:

@@ -435,11 +435,7 @@ def fetch_open_platform_issues(project: Path) -> dict:
         "issues": [],
     }
     try:
-        platforms_csv = os.environ.get('FREELY_REPO_PLATFORMS', '')
-        platforms = [p.strip() for p in platforms_csv.split(',') if p.strip()]
-        if not platforms:
-            from platform_adapter import available_platforms
-            platforms = available_platforms()
+        from platform_adapter import configured_platforms; platforms = configured_platforms()
         open_issues = _platform_list_open(platforms)
         for num, state in open_issues.items():
             result["all"][num] = state
@@ -471,17 +467,14 @@ def _is_github_closed_lookup(issue_number: str, platform_data: dict) -> bool | N
     state = platform_all.get(str(issue_number))
     if state is not None:
         return state != "OPEN"
-    # Not in open list — query individually (cheap, ~0.5s per issue)
+    # Not in open list — query via platform-adapter
     if not issue_number:
         return None
     try:
-        proc = subprocess.run(
-            ["gh", "issue", "view", str(issue_number), "--json", "state"],
-            capture_output=True, text=True, timeout=10
-        )
-        if proc.returncode == 0:
-            data = json.loads(proc.stdout)
-            return data.get("state", "") != "OPEN"
+        from platform_adapter import fetch_issue_state
+        state = fetch_issue_state("github", str(issue_number))
+        if state:
+            return state != "OPEN"
     except Exception:
         pass
     return None
