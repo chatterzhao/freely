@@ -3926,3 +3926,20 @@ routing_policy:
 - issue_path: `docs/issues/I-20260622T104129Z-A/issue.md`
 - source_raws:
   - `raw-20260622T104129Z`
+
+## M-20260622T110050Z-A
+- title: wt-close error messages guide user instead of pushing --force
+- status: active
+### candidate_issues
+1. `C-20260622T110050Z-A`
+- milestone: M-20260622T110050Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260622T110050Z-A/issue.md`
+### committed_issues
+1. `I-20260622T110050Z-A`
+- title: wt-close error messages guide user instead of pushing --force
+- milestone_state: committed
+- phase_state: completed
+- issue_path: `docs/issues/I-20260622T110050Z-A/issue.md`
+- source_raws:
+  - `raw-20260622T110050Z`
