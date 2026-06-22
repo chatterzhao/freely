@@ -3770,3 +3770,18 @@ routing_policy:
 - title: Fix pre-push.sh local keyword for macOS bash compat
 - phase_state: completed
 - issue_path: `docs/issues/I-20260622T003231Z-A/issue.md`
+
+## M-20260622T021126Z-A
+- title: Platform sync batch
+- status: active
+### candidate_issues
+1. `C-20260622T021126Z-A`
+- milestone: M-20260622T021126Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260622T021126Z-A/issue.md`
+### committed_issues
+1. `I-20260622T021126Z-A`
+- title: Platform sync batch
+- milestone_state: committed
+- phase_state: completed
+- issue_path: `docs/issues/I-20260622T021126Z-A/issue.md`
