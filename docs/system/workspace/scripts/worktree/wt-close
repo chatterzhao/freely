@@ -273,8 +273,25 @@ fi
 if [[ "$FORCE" == false && -n "$issue_id" && -f "${issue_file:-}" ]]; then
   phase_state="$(_fm_get "$issue_file" "phase_state")"
   if [[ -z "$phase_state" || "$phase_state" != "completed" ]]; then
-    echo "Error: $issue_id phase_state='${phase_state:-<empty>}', not 'completed'" >&2
-    echo "  Use --force to skip this check." >&2
+    cat >&2 <<PHASE_GATE
+[wt-close] $issue_id 的 phase_state='${phase_state:-<empty>}'，不满足 wt-close 要求的 'completed'
+
+  请判断属于以下哪种情况，然后采取对应措施:
+
+  1. 实现已完成，只是 phase_state 忘记更新为 completed
+     → 更新 $issue_file 的 phase_state 为 completed，然后重新执行 wt-close
+
+  2. 实现确实还没做完
+     → 请回到工位继续完成实现工作，完成后再执行 wt-close
+
+  3. 该功能已确定放弃，工位需要强制收口
+     → 使用 --force 并给出准确的业务理由:
+       ./bin/wt-close $branch --force --reason "违规绕过门禁中，理由充分，是：<业务理由>"
+
+     有效业务理由示例:
+       ✅ "该功能确定放弃，不再继续实现此 raw issue"
+       ✅ "该方案已被否决，工位需强制收口销毁"
+PHASE_GATE
     exit 1
   fi
   echo "wt-close: phase_state=completed ✓"
@@ -284,8 +301,25 @@ if [[ "$FORCE" == false && -n "$issue_id" && -f "${issue_file:-}" ]]; then
     if "$PROJECT_ROOT/bin/pretests-retirement-gate" "$wt_path" 2>/dev/null; then
       echo "wt-close: pretests-retirement-gate passed ✓"
     else
-      echo "Error: pretests-retirement-gate failed for $wt_path" >&2
-      echo "  Use --force to skip this check." >&2
+      cat >&2 <<PRETEST_GATE
+[wt-close] pretests-retirement-gate 检查未通过: $wt_path
+
+  请判断属于以下哪种情况，然后采取对应措施:
+
+  1. 测试还没跑完
+     → 请完成测试验证，通过后重新执行 wt-close
+
+  2. 测试确实不适用于本工位（如纯文档变更、配置修改等）
+     → 使用 --force 并给出准确的业务理由:
+       ./bin/wt-close $branch --force --reason "违规绕过门禁中，理由充分，是：<业务理由>"
+
+     有效业务理由示例:
+       ✅ "本次变更仅为文档修改，不涉及需要 pretests 验证的代码"
+       ✅ "该功能已通过手动验证，pretests gate 属于误报"
+
+  3. 该功能已确定放弃
+     → 同上使用 --force + --reason
+PRETEST_GATE
       exit 1
     fi
   fi
