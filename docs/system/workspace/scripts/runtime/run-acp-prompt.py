@@ -567,6 +567,10 @@ def main():
             # before falling all the way back to session/new.
             # session/resume preserves context history and enables cache hits.
             print(f"[WARN] session/prompt failed ({prompt_exc}), trying session/resume", flush=True)
+            _exc_msg = str(prompt_exc)
+            if "idle timeout" in _exc_msg:
+                print(f"[FATAL] idle timeout: AI unresponsive, not retrying. Let runtime recover.", flush=True)
+                sys.exit(1)
             try:
                 resume_result = client.request(
                     "session/resume",
