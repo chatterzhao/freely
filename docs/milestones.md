@@ -4008,3 +4008,18 @@ routing_policy:
 - issue_path: `docs/issues/I-20260622T120046Z-A/issue.md`
 - source_raws:
   - `raw-20260622T120046Z`
+
+## M-20260622T123204Z-A
+- title: platform-adapter close CLI
+- status: active
+### candidate_issues
+1. `C-20260622T123204Z-A`
+- milestone: M-20260622T123204Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260622T123204Z-A/issue.md`
+### committed_issues
+1. `I-20260622T123204Z-A`
+- title: platform-adapter close CLI
+- milestone_state: committed
+- phase_state: completed
+- issue_path: `docs/issues/I-20260622T123204Z-A/issue.md`
