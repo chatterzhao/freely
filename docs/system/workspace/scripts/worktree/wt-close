@@ -156,6 +156,28 @@ done
 set -- "${args[@]}"
 input="${1:-}"
 
+# ── --reason gate: bypass flags require --reason (except test-pre-merge) ──
+if [[ "$input" != test-pre-merge-* ]]; then
+  _require_reason() {
+    local flag="$1" flag_name="$2"
+    if [[ "${!flag:-false}" == "true" && -z "${FORCE_REASON:-}" ]]; then
+      cat >&2 <<GATE
+[GATE] 你在违规绕过门禁: wt-close ${flag_name}
+
+  请严格执行门禁。如果确实满足绕过条件（不是偷奸耍滑），
+  请加上绕过理由参数：
+    --reason "具体绕过原因"
+
+  示例: ./bin/wt-close ${flag_name} --reason "emergency: worktree corrupted" <branch>
+GATE
+      exit 1
+    fi
+  }
+  _require_reason FORCE "--force"
+  _require_reason SKIP_PLATFORM "--skip-platform"
+  _require_reason DISCARD_UNMERGED "--discard-unmerged"
+fi
+
 if [[ -z "$input" ]]; then
   echo "Error: missing <branch> or <worktree-path>" >&2
   usage
