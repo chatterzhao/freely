@@ -594,6 +594,51 @@ def scan_classification(project: Path, platform_data: dict) -> list[dict]:
 
 # ── Main ─────────────────────────────────────────────────
 
+def _set_scan_states(items: list[dict], project: Path) -> None:
+    """Set scan_state on each item based on worktree existence.
+
+    pending  — default, no worktree found for this item's raw_key
+    working  — a worktree exists for this raw_key (via wt-create)
+    closed   — preserved from previous scan if raw issue still closed
+    """
+    import subprocess
+    import re
+
+    # Collect all existing worktree paths
+    try:
+        wt_list = subprocess.run(
+            ["git", "worktree", "list", "--porcelain"],
+            capture_output=True, text=True, cwd=project, timeout=5
+        ).stdout
+        wt_paths = re.findall(r"^worktree (.+)$", wt_list, re.MULTILINE)
+    except Exception:
+        wt_paths = []
+
+    for item in items:
+        key = item.get("key", "")
+        na = item.get("next_action", "")
+
+        # Extract raw_key from key or next_action
+        rk = ""
+        for src in (key, na):
+            m = re.search(r"(?:raw-)?(\d{8}T\d{6}Z)", src)
+            if m:
+                rk = m.group(1)
+                break
+
+        # Default: pending
+        state = "pending"
+
+        # Check worktree existence
+        if rk:
+            for wt in wt_paths:
+                if rk in wt:
+                    state = "working"
+                    item["scan_state_worktree"] = wt
+                    break
+
+        item["scan_state"] = state
+
 def build_payload(project: Path, raw_key: str = "") -> dict:
     output = []
 
@@ -647,6 +692,9 @@ def build_payload(project: Path, raw_key: str = "") -> dict:
     # Platform sync batch grouping — combine all sync-related items into one batch
     ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     output = add_platform_sync_batch(output, ts, project)
+
+    # ── scan_state: set per-item lifecycle state from worktree existence ──
+    _set_scan_states(output, project)
 
     # When raw_key is specified, filter output to only items matching this key.
     # This ensures the prompt builder gets only the targeted raw→I chain.
