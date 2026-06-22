@@ -259,42 +259,14 @@ pr_created_any=0
 for platform in $platforms; do
   remote=$(_platform_remote_name "$platform")
 
-  # Step A: Push branch to this platform (always)
+  # Push branch to this platform
   echo "  [$platform] pushing branch..."
   if git push "$remote" "$current_branch" 2>&1; then
     pushed_any=1
     echo "  [$platform] push ✓"
   else
-    echo "  [$platform] push FAILED — skipping PR" >&2
+    echo "  [$platform] push FAILED" >&2
     continue
-  fi
-
-  # Step B: Create PR on this platform (if CLI available)
-  cli=$(_platform_cli "$platform")
-  if [[ -z "$cli" ]] || ! command -v "$cli" >/dev/null 2>&1; then
-    echo "  [$platform] no CLI ($cli), skipping PR"
-    continue
-  fi
-
-  echo "  [$platform] creating PR via $cli..."
-  if [[ "$cli" == "gh" ]]; then
-    if gh pr create --head "$current_branch" --base "$base" \
-         --title "$title" --body "$body" 2>&1; then
-      pr_created_any=1; echo "  [$platform] PR created ✓
-  echo ""
-  echo "Next: ./bin/pr-review-guarded $current_branch""
-    else
-      echo "  [$platform] PR creation FAILED" >&2
-    fi
-  elif [[ "$cli" == "gitee" ]]; then
-    if gitee pr create --head "$current_branch" --base "$base" \
-         --title "$title" --body "$body" 2>&1; then
-      pr_created_any=1; echo "  [$platform] PR created ✓
-  echo ""
-  echo "Next: ./bin/pr-review-guarded $current_branch""
-    else
-      echo "  [$platform] PR creation FAILED" >&2
-    fi
   fi
 done
 echo ""
@@ -303,6 +275,22 @@ if [[ "$pushed_any" == "0" ]]; then
   echo "ERROR: failed to push to any platform" >&2
   exit 1
 fi
-if [[ "$pr_created_any" == "0" ]]; then
+
+# Create PR on all platforms via platform-adapter (#3340)
+echo "  Creating PR via platform-adapter..."
+_adapter="$ROOT_DIR/docs/system/workspace/scripts/sync/platform-adapter.py"
+_pr_result="$(python3 "$_adapter" create-pr "$current_branch" "$base" "$title" "$body" 2>&1)" || true
+echo "$_pr_result"
+
+# Check if at least one platform succeeded
+if echo "$_pr_result" | grep -q '"status": "created"'; then
+  pr_created_any=1
+fi
+
+if [[ "$pr_created_any" == "1" ]]; then
+  echo ""
+  echo "Next: ./bin/pr-review-guarded $current_branch"
+  echo ""
+else
   echo "WARNING: PR not created on any platform (manual PR may be needed)" >&2
 fi

@@ -589,10 +589,11 @@ do_initial_merge() {
       echo "[MERGE-GUARD] receipt integrity verified ✓"
     fi
 
-    # ── Close PR ──
+    # ── Close PR via platform-adapter (#3340) ──
     if [[ -n "$_pr_number" ]]; then
-      echo "[MERGE-GUARD] merge committed. Closing GitHub PR #$_pr_number..."
-      gh pr close "$_pr_number" --comment "Merged via pr-merge-guarded; develop synced from GitHub." 2>/dev/null || true
+      echo "[MERGE-GUARD] merge committed. Closing PR #$_pr_number via platform-adapter..."
+      _adapter="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}/docs/system/workspace/scripts/sync/platform-adapter.py"
+      python3 "$_adapter" close-pr github "$_pr_number" 2>/dev/null || true
     fi
     cleanup_guarded_state
     attempt_develop_push_followthrough_if_needed "$target" "$source_branch"

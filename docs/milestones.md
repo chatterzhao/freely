@@ -1,3 +1,19 @@
+## M-20260622T234854Z-A
+- title: Post-review quality — adapter integration + chat gate + cleanup
+- status: active
+### candidate_issues
+1. `C-20260622T234854Z-A`
+- milestone: M-20260622T234854Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260622T234854Z-A/issue.md`
+### committed_issues
+1. `I-20260622T234854Z-A`
+- title: feat: post-review quality improvements
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260622T234854Z-A/issue.md`
+- verification_artifact_dir: `bin/`
+
 ## M-20260622T021827Z-A
 - title: test-execution skill + pre-tests template + dev-loop quality steps
 - status: active
