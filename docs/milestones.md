@@ -3845,3 +3845,13 @@ routing_policy:
 - milestone_state: committed
 - phase_state: completed
 - issue_path: `docs/issues/I-20260622T025736Z-A/issue.md`
+
+## M-20260622T030420Z-A
+- title: Platform sync batch
+- status: active
+### committed_issues
+1. `I-20260622T030420Z-A`
+- title: Platform sync batch
+- milestone_state: committed
+- phase_state: completed
+- issue_path: `docs/issues/I-20260622T030420Z-A/issue.md`
