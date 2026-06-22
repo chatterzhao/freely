@@ -364,7 +364,7 @@ def check_completion(item: dict, platform_data: dict) -> list[str]:
         if raw.get("raw_status") not in TERMINAL_RAW:
             raw_pids = raw.get("platform_ids", {})
             if raw_pids.get("github"):
-                raw_gh = _is_github_closed_lookup(raw_pids["github"], platform_data)
+                raw_gh = _is_github_closed_lookup(_platform_issue_id(raw_pids, "github"), platform_data)
                 if raw_gh is True:
                     pass  # closed = done, skip all checks
                 elif raw_gh is False:
@@ -389,12 +389,12 @@ def check_completion(item: dict, platform_data: dict) -> list[str]:
         has_any_platform = False
         if pids.get("github"):
             has_any_platform = True
-            gh_closed = _is_github_closed_lookup(pids["github"], platform_data)
+            gh_closed = _is_github_closed_lookup(_platform_issue_id(pids, "github"), platform_data)
             if gh_closed is not True:  # False or None
                 all_confirmed_closed = False
                 if gh_closed is False:
                     incomplete.append(f"{pfx}github_not_closed")
-        if pids.get("gitee"):
+        if _platform_issue_id(pids, "gitee"):
             has_any_platform = True
             # Gitee check requires API; skip for now
             all_confirmed_closed = False
@@ -446,6 +446,17 @@ def fetch_open_platform_issues(project: Path) -> dict:
     except Exception:
         pass  # fallback: empty platform_data, downstream checks will return None
     return result
+
+
+def _platform_issue_id(pids: dict, platform: str) -> str:
+    """Extract issue ID string from either flat or nested platform_ids format.
+    Flat:   {"github": "97"}           → "97"
+    Nested: {"github": {"issue_id": "97"}} → "97"
+    """
+    val = pids.get(platform, "")
+    if isinstance(val, dict):
+        return str(val.get("issue_id", ""))
+    return str(val) if val else ""
 
 
 def _is_github_closed_lookup(issue_number: str, platform_data: dict) -> bool | None:
