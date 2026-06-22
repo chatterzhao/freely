@@ -430,8 +430,8 @@ def fetch_open_platform_issues(project: Path) -> dict:
     }
     try:
         proc = subprocess.run(
-            ["gh", "issue", "list", "--state", "all", "--limit", "5000",
-             "--json", "number,title,body,state"],
+            ["gh", "issue", "list", "--state", "open", "--limit", "200",
+             "--json", "number,state"],
             capture_output=True, text=True, timeout=30
         )
         if proc.returncode == 0:
@@ -460,12 +460,26 @@ def _platform_issue_id(pids: dict, platform: str) -> str:
 
 
 def _is_github_closed_lookup(issue_number: str, platform_data: dict) -> bool | None:
-    """Check issue state from platform_all dict — zero API calls.
+    """Check issue state. Uses platform_all (OPEN issues) first,
+    then gh issue view for per-issue lookup if not in open list.
     Returns True if CLOSED/MERGED, False if OPEN, None if unknown."""
     platform_all: dict = platform_data.get("all", {})
     state = platform_all.get(str(issue_number))
     if state is not None:
         return state != "OPEN"
+    # Not in open list — query individually (cheap, ~0.5s per issue)
+    if not issue_number:
+        return None
+    try:
+        proc = subprocess.run(
+            ["gh", "issue", "view", str(issue_number), "--json", "state"],
+            capture_output=True, text=True, timeout=10
+        )
+        if proc.returncode == 0:
+            data = json.loads(proc.stdout)
+            return data.get("state", "") != "OPEN"
+    except Exception:
+        pass
     return None
 
 
