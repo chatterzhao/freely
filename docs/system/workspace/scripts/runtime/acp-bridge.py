@@ -30,7 +30,7 @@ import time
 import threading
 
 BRIDGE_TIMEOUT = int(os.environ.get("ACP_BRIDGE_SESSION_TIMEOUT", "1800"))
-ACP_IDLE_TIMEOUT = int(os.environ.get("ACP_BRIDGE_IDLE_TIMEOUT", "900"))
+ACP_IDLE_TIMEOUT = int(os.environ.get("ACP_BRIDGE_IDLE_TIMEOUT", "180"))
 ACP_PERMISSION_MODE = os.environ.get("CLAUDE_CODE_PERMISSION_MODE") or "bypassPermissions"
 if not os.environ.get("CLAUDE_CODE_PERMISSION_MODE"):
     import sys as _sys
