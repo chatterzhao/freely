@@ -19297,9 +19297,26 @@ cmd_init() {
       --reasoning-effort) reasoning_effort="${2:-}"; shift 2 ;;
       --accept-default-autonomy) accept_default_autonomy="true"; shift ;;
       --force) force="true"; shift ;;
+      --reason) reason="${2:-}"; shift 2 ;;
       *) log_error "unknown arg: $1"; usage; exit 1 ;;
     esac
   done
+
+  # --reason gate
+  if [[ "$force" == "true" && -z "${reason:-}" ]]; then
+    cat >&2 <<'REASON_GATE'
+[GATE] 检测到你试图违规绕过门禁: freely init --force
+
+  如果是因为实现没有达到门禁要求，请按要求去完成，而不是想着违规绕过。
+
+  只有确实有合理的业务理由（配置损坏需重建等），才允许绕过。
+  请按以下格式加上绕过理由:
+    --reason "违规绕过门禁中，理由充分，是：<业务理由>"
+
+  示例: freely init --force --reason "违规绕过门禁中，理由充分，是：配置文件损坏无法修复，需重建初始化" ...
+REASON_GATE
+    exit 1
+  fi
 
   [[ -n "$intent" && -n "$constitution" ]] || {
     usage
@@ -21707,9 +21724,27 @@ cmd_start() {
       --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
       --task-mode) task_mode="${2:-}"; shift 2 ;;
       --force) force="1"; shift ;;
+      --reason) reason="${2:-}"; shift 2 ;;
       *) log_error "unknown arg: $1"; usage; exit 1 ;;
     esac
   done
+
+  # --reason gate: --force bypass requires business justification
+  if [[ "$force" == "1" && -z "${reason:-}" ]]; then
+    cat >&2 <<'REASON_GATE'
+[GATE] 检测到你试图违规绕过门禁: freely start --force
+
+  如果是因为实现没有达到门禁要求，请按要求去完成，而不是想着违规绕过。
+
+  只有确实有合理的业务理由（运行时损坏无法正常恢复等），才允许绕过。
+  请按以下格式加上绕过理由:
+    --reason "违规绕过门禁中，理由充分，是：<业务理由>"
+
+  示例: freely start --force --reason "违规绕过门禁中，理由充分，是：运行时状态损坏导致无法正常启动，需强制重建" --project /path/to/project
+REASON_GATE
+    exit 1
+  fi
+
   project="$(resolve_project_or_fail "$project")"
   # Ensure DB daemon is running before write_task_mode writes to SQLite.
   # write_task_mode calls freely-db-cli which needs the DB daemon's Unix socket.
@@ -21890,9 +21925,28 @@ cmd_daemon_start() {
       --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
       --task-mode) task_mode="${2:-}"; shift 2 ;;
       --force) force="1"; shift ;;
+      --reason) reason="${2:-}"; shift 2 ;;
       *) log_error "unknown arg: $1"; usage; exit 1 ;;
     esac
   done
+
+  # --reason gate: --force bypass requires business justification
+  # Placed BEFORE auto storm recovery so system auto-healing is not blocked
+  if [[ "$force" == "1" && -z "${reason:-}" ]]; then
+    cat >&2 <<'REASON_GATE'
+[GATE] 检测到你试图违规绕过门禁: freely daemon start --force
+
+  如果是因为实现没有达到门禁要求，请按要求去完成，而不是想着违规绕过。
+
+  只有确实有合理的业务理由（守护进程状态损坏需强制重建等），才允许绕过。
+  请按以下格式加上绕过理由:
+    --reason "违规绕过门禁中，理由充分，是：<业务理由>"
+
+  示例: freely daemon start --force --reason "违规绕过门禁中，理由充分，是：守护进程状态损坏导致无法正常调度，需强制重建运行时" --project /path/to/project
+REASON_GATE
+    exit 1
+  fi
+
   project="$(resolve_project_or_fail "$project")"
   # Ensure DB daemon is running before write_task_mode writes to SQLite.
   # write_task_mode calls freely-db-cli which needs the DB daemon's Unix socket.
@@ -22038,9 +22092,27 @@ cmd_task_mode() {
       --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
       --task-mode) mode="${2:-}"; shift 2 ;;
       --force) force="1"; shift ;;
+      --reason) reason="${2:-}"; shift 2 ;;
       *) log_error "unknown arg: $1"; usage; exit 1 ;;
     esac
   done
+
+  # --reason gate: --force bypass requires business justification
+  if [[ "$force" == "1" && -z "${reason:-}" ]]; then
+    cat >&2 <<'REASON_GATE'
+[GATE] 检测到你试图违规绕过门禁: freely task-mode set --force
+
+  如果是因为实现没有达到门禁要求，请按要求去完成，而不是想着违规绕过。
+
+  只有确实有合理的业务理由（当前 AI 进程卡死无法正常切换模式等），才允许绕过。
+  请按以下格式加上绕过理由:
+    --reason "违规绕过门禁中，理由充分，是：<业务理由>"
+
+  示例: freely task-mode set --force --reason "违规绕过门禁中，理由充分，是：当前 AI 进程陷入死循环无法响应，需强制终止后切换模式" --task-mode auto --project /path/to/project
+REASON_GATE
+    exit 1
+  fi
+
   project="$(resolve_project_or_fail "$project")"
 
   case "$action" in
