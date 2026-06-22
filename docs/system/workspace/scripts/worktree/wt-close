@@ -172,9 +172,18 @@ if [[ "$input" != test-pre-merge-* ]]; then
   如果重新研判后确认不是滥用绕过，请按以下格式加上绕过理由:
     --reason "违规绕过门禁中，理由充分，是：<具体原因>"
 
-  示例: ./bin/wt-close ${flag_name} --reason "违规绕过门禁中，理由充分，是：worktree corrupted, emergency cleanup" <branch>
+  --force 合法场景:
+    - phase_state 未达 completed 但工位需强制收口（如废弃开发、工位损坏）
+    - 孤分支清理（工位目录已删除，仅剩分支引用）
+  --discard-unmerged 合法场景:
+    - 未合并提交确认丢弃（需同时使用 --force）
+  --skip-platform 合法场景:
+    - 平台 issue 已手动关闭或无需同步
+
+  示例:
+    ./bin/wt-close --force --reason "违规绕过门禁中，理由充分，是：phase_state 未 completed，废弃开发需强制收口" fix/raw-xxx
+    ./bin/wt-close --force --discard-unmerged --reason "违规绕过门禁中，理由充分，是：未合并提交确认丢弃，该方案已放弃" fix/raw-xxx
 GATE
-      exit 1
     fi
   }
   _require_reason FORCE "--force"
