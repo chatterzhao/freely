@@ -12,6 +12,12 @@ import argparse, json, os, re, sys, subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 
+# Import platform-adapter for list_open_issues
+_SYNC_DIR = Path(__file__).resolve().parent.parent / "sync"
+if str(_SYNC_DIR) not in sys.path:
+    sys.path.insert(0, str(_SYNC_DIR))
+from platform_adapter import list_open_issues as _platform_list_open
+
 # IBM Framework §89: raw.phase_state ∈ {proposed, absorbed, dropped}
 # IBM Framework §89: I-*.phase_state ∈ {in_b2_ibm → done_b2_ibm → in_dev → blocked_dev → in_verification → completed}
 TERMINAL_RAW = {"absorbed", "dropped"}
@@ -429,20 +435,18 @@ def fetch_open_platform_issues(project: Path) -> dict:
         "issues": [],
     }
     try:
-        proc = subprocess.run(
-            ["gh", "issue", "list", "--state", "open", "--limit", "200",
-             "--json", "number,state"],
-            capture_output=True, text=True, timeout=30
-        )
-        if proc.returncode == 0:
-            for issue in json.loads(proc.stdout):
-                num = str(issue.get("number", ""))
-                state = issue.get("state", "")
-                result["all"][num] = state
-                result["issues"].append(issue)
-                if state == "OPEN":
-                    result["open_set"].add(num)
-                    result["open_issues"].append(issue)
+        platforms_csv = os.environ.get('FREELY_REPO_PLATFORMS', '')
+        platforms = [p.strip() for p in platforms_csv.split(',') if p.strip()]
+        if not platforms:
+            from platform_adapter import available_platforms
+            platforms = available_platforms()
+        open_issues = _platform_list_open(platforms)
+        for num, state in open_issues.items():
+            result["all"][num] = state
+            if state == "OPEN":
+                result["open_set"].add(num)
+                result["open_issues"].append({"number": num, "state": state})
+            result["issues"].append({"number": num, "state": state})
     except Exception:
         pass  # fallback: empty platform_data, downstream checks will return None
     return result

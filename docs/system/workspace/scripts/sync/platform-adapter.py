@@ -75,6 +75,41 @@ def available_platforms() -> list[str]:
     return platforms
 
 
+def list_open_issues(platforms: list[str]) -> dict[str, str]:
+    """List OPEN issues across all configured platforms. Returns union {number: state}.
+    Used by scan's fetch_open_platform_issues to avoid hardcoding gh CLI.
+    """
+    result: dict[str, str] = {}
+    for p in platforms:
+        try:
+            if p == "github":
+                repo = _gh_repo()
+                if not repo:
+                    continue
+                proc = subprocess.run(
+                    ["gh", "issue", "list", "--repo", repo,
+                     "--state", "open", "--limit", "200",
+                     "--json", "number,state"],
+                    capture_output=True, text=True, timeout=30)
+                if proc.returncode == 0:
+                    for issue in json.loads(proc.stdout):
+                        result[str(issue["number"])] = issue.get("state", "OPEN")
+            elif p == "gitee":
+                proc = subprocess.run(
+                    [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
+                     "--repo", _gitee_repo(), "list",
+                     "--state", "open", "--per-page", "50"],
+                    capture_output=True, text=True, timeout=30)
+                if proc.returncode == 0:
+                    for issue in json.loads(proc.stdout):
+                        num = str(issue.get("number", issue.get("id", "")))
+                        if num:
+                            result[num] = issue.get("state", "OPEN")
+        except Exception:
+            continue
+    return result
+
+
 # ---- Unified public API ----
 
 def create_issue(local_id: str, title: str, body: str) -> dict[str, dict]:
