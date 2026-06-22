@@ -1,3 +1,19 @@
+## M-20260621T202057Z-A
+- title: Batch infrastructure fixes — raw validation, comment blocking, PR ops, platform gate, docs
+- status: active
+### candidate_issues
+1. `C-20260621T202057Z-A`
+- milestone: M-20260621T202057Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260621T202057Z-A/issue.md`
+### committed_issues
+1. `I-20260621T202057Z-A`
+- title: feat: batch implementation of 11 remaining issues
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260621T202057Z-A/issue.md`
+- verification_artifact_dir: `docs/system/workspace/scripts`
+
 ## M-20260622T123158Z-A
 - title: Agent Tool Policy — separate Manager/Worker tool constraints
 - status: active
