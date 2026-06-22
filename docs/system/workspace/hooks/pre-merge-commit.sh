@@ -11,8 +11,23 @@ if [[ -n "$guarded_state_path" ]]; then
   guarded_state_path="$guarded_state_path/freely-guarded-merge-state"
 fi
 
-# FREELY_SKIP_IBM_GATE: skip IBM governance gate, keep merge state check
-if [[ "${FREELY_SKIP_IBM_GATE:-0}" == "1" ]]; then
+# FREELY_SKIP_IBM_GATE: skip IBM governance gate with valid reason, keep merge state check
+if [[ -n "${FREELY_SKIP_IBM_GATE:-}" ]]; then
+  # --reason gate: env var bypass must carry valid business reason
+  if ! echo "${FREELY_SKIP_IBM_GATE}" | grep -q "^违规绕过门禁中，理由充分，是："; then
+    cat >&2 <<'REASON_GATE'
+[GATE] 检测到你试图通过 FREELY_SKIP_IBM_GATE 违规绕过门禁
+
+  如果是因为实现没有达到门禁要求，请按要求去完成，而不是想着违规绕过。
+
+  只有确实有合理的业务理由（仅文档/清理/格式化变更等），才允许绕过。
+  FREELY_SKIP_IBM_GATE 的值必须匹配格式:
+    FREELY_SKIP_IBM_GATE="违规绕过门禁中，理由充分，是：<业务理由>"
+
+  示例: FREELY_SKIP_IBM_GATE="违规绕过门禁中，理由充分，是：仅文档类变更不含实现代码" git merge
+REASON_GATE
+    exit 1
+  fi
   load_guarded_state() {
     [[ -n "$guarded_state_path" && -f "$guarded_state_path" ]] || return 1
     guarded_state_target=""
@@ -82,7 +97,7 @@ MSG
   fi
 
   echo "$gate_output"
-  echo "[HOOK] IBM governance gate skipped (FREELY_SKIP_IBM_GATE=1)"
+  echo "[HOOK] IBM governance gate skipped (FREELY_SKIP_IBM_GATE)"
   exit 0
 fi
 

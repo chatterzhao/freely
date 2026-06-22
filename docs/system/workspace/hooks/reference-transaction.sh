@@ -160,7 +160,22 @@ DELETE_BLOCK
     continue
   fi
 
-  if [[ "${FREELY_SKIP_IBM_GATE:-0}" == "1" ]]; then
+  if [[ -n "${FREELY_SKIP_IBM_GATE:-}" ]]; then
+    # --reason gate: env var bypass must carry valid business reason
+    if ! echo "${FREELY_SKIP_IBM_GATE}" | grep -q "^违规绕过门禁中，理由充分，是："; then
+      cat >&2 <<'REASON_GATE'
+[GATE] 检测到你试图通过 FREELY_SKIP_IBM_GATE 违规绕过门禁
+
+  如果是因为实现没有达到门禁要求，请按要求去完成，而不是想着违规绕过。
+
+  只有确实有合理的业务理由，才允许绕过。
+  FREELY_SKIP_IBM_GATE 的值必须匹配格式:
+    FREELY_SKIP_IBM_GATE="违规绕过门禁中，理由充分，是：<业务理由>"
+
+  示例: FREELY_SKIP_IBM_GATE="违规绕过门禁中，理由充分，是：紧急修复已通过完整治理流程的合并冲突" git ...
+REASON_GATE
+      exit 1
+    fi
     continue
   fi
 
@@ -185,7 +200,7 @@ DELETE_BLOCK
     2. If the commit IS a protected merge, re-run with pr-merge-guarded:
          ./bin/pr-merge-guarded $branch_name <source-branch>
        This ensures the merge receipt is properly injected.
-    3. If this is an emergency bypass, use FREELY_SKIP_IBM_GATE=1
+    3. If this is an emergency bypass, use FREELY_SKIP_IBM_GATE="违规绕过门禁中，理由充分，是：<业务理由>"
        (governance-only changes only — code changes will be rejected).
 
   Direct fast-forward, reset, and ref-only updates are not lawful
