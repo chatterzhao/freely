@@ -1,3 +1,19 @@
+## M-20260622T021832Z-A
+- title: Post-review quality fixes — gitee state, repo reachability, skill markers
+- status: active
+### candidate_issues
+1. `C-20260622T021832Z-A`
+- milestone: M-20260622T021832Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260622T021832Z-A/issue.md`
+### committed_issues
+1. `I-20260622T021832Z-A`
+- title: fix: post-review quality fixes
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260622T021832Z-A/issue.md`
+- verification_artifact_dir: `docs/system/workspace/scripts`
+
 ## M-20260621T202057Z-A
 - title: Batch infrastructure fixes — raw validation, comment blocking, PR ops, platform gate, docs
 - status: active
