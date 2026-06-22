@@ -181,8 +181,8 @@ if [[ "$input" != test-pre-merge-* ]]; then
     - 平台 issue 已手动关闭或无需同步
 
   示例:
-    ./bin/wt-close --force --reason "违规绕过门禁中，理由充分，是：phase_state 未 completed，废弃开发需强制收口" fix/raw-xxx
-    ./bin/wt-close --force --discard-unmerged --reason "违规绕过门禁中，理由充分，是：未合并提交确认丢弃，该方案已放弃" fix/raw-xxx
+    ./bin/wt-close --force --reason "违规绕过门禁中，理由充分，是：该功能确定放弃，不再继续实现此 raw issue" fix/raw-xxx
+    ./bin/wt-close --force --discard-unmerged --reason "违规绕过门禁中，理由充分，是：该方案已被否决，未合并提交确认丢弃" fix/raw-xxx
 GATE
     fi
   }
