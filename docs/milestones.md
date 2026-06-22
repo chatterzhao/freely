@@ -3960,3 +3960,20 @@ routing_policy:
 - issue_path: `docs/issues/I-20260622T113847Z-A/issue.md`
 - source_raws:
   - `raw-20260622T113847Z`
+
+## M-20260622T114625Z-A
+- title: --platform-only bypass worktree guard
+- status: active
+### candidate_issues
+1. `C-20260622T114625Z-A`
+- milestone: M-20260622T114625Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260622T114625Z-A/issue.md`
+### committed_issues
+1. `I-20260622T114625Z-A`
+- title: --platform-only bypass worktree guard
+- milestone_state: committed
+- phase_state: completed
+- issue_path: `docs/issues/I-20260622T114625Z-A/issue.md`
+- source_raws:
+  - `raw-20260622T114625Z`
