@@ -4,22 +4,40 @@ set -euo pipefail
 # pr-review-guarded: independent PR review gate between pr-create and pr-merge.
 #
 # Usage:
-#   ./bin/pr-review-guarded <branch> [--reviewer <name>] [--verdict pass|fail|needs_changes]
+#   ./bin/pr-review-guarded <branch> [--reviewer <name>] [--verdict pass|fail|needs_changes] [--reason <text>]
 #
 # Runs 6 review dimensions, produces review document, outputs verdict.
 # pr-merge-guarded gates on verdict=pass before allowing merge.
+#
+# --reason gate: when --verdict pass overrides failing dimensions, --reason is required.
+# This prevents casual bypass of automated quality checks.
 
 ROOT_DIR="$(git rev-parse --show-toplevel 2>/dev/null || true)"
 [[ -n "$ROOT_DIR" ]] || { echo "ERROR: not in a git repository" >&2; exit 1; }
 
-review_branch="${1:-}"
+# Parse arguments
+review_branch=""
+reviewer="cli"
+verdict_override=""
+verdict_reason=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --reviewer) reviewer="${2:-cli}"; shift 2 ;;
+    --verdict) verdict_override="${2:-}"; shift 2 ;;
+    --reason) verdict_reason="${2:-}"; shift 2 ;;
+    --help|-h)
+      echo "Usage: ./bin/pr-review-guarded <branch> [--reviewer <name>] [--verdict pass|fail|needs_changes] [--reason <text>]" >&2
+      exit 1 ;;
+    -*) echo "Unknown: $1" >&2; exit 1 ;;
+    *) review_branch="$1"; shift ;;
+  esac
+done
+
 if [[ -z "$review_branch" ]]; then
   echo "ERROR: branch argument required." >&2
   echo "Usage: ./bin/pr-review-guarded <branch>" >&2
   exit 1
 fi
-reviewer="${2:-cli}"
-verdict_override="${3:-}"
 
 base="develop"
 pr_number=""
@@ -174,6 +192,23 @@ else
 fi
 
 # ── Step 4: Determine verdict ──
+# --reason gate: overriding failing dimensions with --verdict pass requires business justification
+if [[ "$verdict_override" == "pass" && "$fail_count" -gt 0 && -z "${verdict_reason:-}" ]]; then
+  cat >&2 <<'REASON_GATE'
+[GATE] 检测到你试图违规绕过门禁: pr-review-guarded --verdict pass (override failing dimensions)
+
+  如果是因为实现没有达到门禁要求，请按要求去完成，而不是想着违规绕过。
+
+  使用 --verdict pass 覆盖失败的 review 维度属于绕过门禁行为。
+  只有确实有合理的业务理由（如：失败维度不适用于本次变更、已知问题已有单独 issue 跟踪等），才允许绕过。
+  请按以下格式加上绕过理由:
+    --reason "违规绕过门禁中，理由充分，是：<业务理由>"
+
+  示例: ./bin/pr-review-guarded fix/raw-xxx --verdict pass --reason "违规绕过门禁中，理由充分，是：IBM Completeness 维度不适用于本次纯文档修改，其他维度均已通过"
+REASON_GATE
+  exit 1
+fi
+
 if [[ -n "$verdict_override" ]]; then
   final_verdict="$verdict_override"
 else
@@ -204,10 +239,12 @@ cat > "$review_file" << REVIEWDOC
 - review_date: $_now
 - verdict: $final_verdict
 - issue_id: $_issue_id
+$([[ -n "${verdict_reason:-}" ]] && echo "- reason: $verdict_reason")
 
 $review_body
 ## Overall Verdict
 - verdict: $final_verdict
+$([[ -n "${verdict_reason:-}" ]] && echo "- reason: $verdict_reason")
 - notes: $([[ "$final_verdict" == "pass" ]] && echo "Ready for pr-merge-guarded" || echo "Fix failing dimensions and re-run pr-review-guarded")
 REVIEWDOC
 
