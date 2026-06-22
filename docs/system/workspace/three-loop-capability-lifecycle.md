@@ -33,6 +33,9 @@ SVG 图展示的五层实体，从上到下、从内到外：
 ### 协议通道
 
 - **ACP (AI Communication Protocol)**：Freely runtime/ACP bridge 与外部 AI provider 之间的 session/prompt/control protocol，不是 Agent 间协商协议。它负责 session/new、session/resume、fork/prompt、stopReason、session/ping 等；当前产品工作模式是 ACP。Freely 通过 `monitor-ai-acp.sh` → `run-acp-prompt.py` → `acp-bridge.py` 连接外部 AI CLI 的 ACP server。canonical ACP family 当前是 `claude-agent-acp`、`codex-acp`、`opencode acp`；`cc` / `kiro-cli` / `iflow` 等 legacy 名称按 registry alias 进入 Claude ACP family。
+    **故障检测分层** (#3301/#3303):
+    - **Layer 1 (通用)**: idle timeout / network failure / quota exhausted — 所有工具生效。idle timeout 默认 180s，超时后不重试，直接触发 auto-recovery。
+    - **Layer 2 (工具专属)**: codex rate-limit / kiro monthly-limit — 按工具注册的故障模式。
 - **A2A (Agent-to-Agent Protocol)**：Manager role 与 Worker role 之间的 task coordination / state / notification protocol。A2A Server 是 coordination service；`a2a_task.py` / `a2a-exit` 是 CLI client/tool。Manager 用 `a2a-exit --state submitted --role worker` 创建 Worker Task（**必须用 `--role worker`，不能使用已废弃的 `--agent-id worker`**，否则 Task 会以默认 `agent_id=manager` 创建，Runtime 无法发现）。Runtime 通过 `list --role worker --status submitted` 发现 pending Task → 生成 Worker prompt file → ACP Bridge 启动独立 Worker ACP session。Worker 完成后调用 `a2a-exit --state completed` → A2A task state 更新 + SSE 通知 Manager。旧 `handoffs` 文件/表语义已被 `a2a_tasks` 取代。
 
 ### SQLite 表职责
@@ -79,11 +82,14 @@ scan (文件系统读取) ──→ intake gate ──→ routing ──→ disp
                           ▼
               SSE → Manager 下一轮 patrol → test gate → ... → closeout
 
-Manager exit contract 种类（manager_exit_contract_kind）:
-  - delegate_workers: 有 Worker Task 已提交到 A2A Server，Runtime 负责启动 Worker
-  - stop_ai:        无事可做，结束 AI session，等下一轮 scan 唤醒
-  - resume_manager:  Manager 需要继续分析（B1 评估、复杂决策）
-  - manager_working: Worker 已派出，保持 session 继续等待 Worker 完成
+Manager 是常驻 session，Runtime 通过 session/prompt 驱动每轮 patrol。
+a2a-exit 提交本轮决策后回到守候，进程不休。
+
+Manager 决策出口（manager_exit_contract_kind）:
+  - delegate_workers: Worker 已委派到 A2A Server，Runtime 负责启动 Worker
+  - manager_working:  Worker 已派出/容量满，保持 session 继续等待
+  - resume_manager:   Manager 需要继续分析（B1 评估、复杂决策）
+  - stop_ai:          无事可做，暂停 patrol，等下一轮唤醒。**严禁连续 stop_ai**
 ```
 
 ## 三 Loop 架构
@@ -126,6 +132,11 @@ intake → routing → dispatch → test → pr-create → pr-review → CI chec
 - 执行: Manager 读取 next_action → 判断 [manager] wt-create 或 [worker] delegate
 - 路由: 向 doc-loop 或 dev-loop 委派 Worker
 - 顺序: B1→B2→dev 是串行的（先 doc-loop 后 dev-loop）
+- **委派前检查**: `a2a_task.py list --raw-key <key> --status working,submitted` 防重复委派 (#3285)
+- **三种 dispatch 模式** (#3286):
+  - **委派**: `a2a-exit --state submitted --role worker --summary "..."` (新任务)
+  - **纠偏**: `a2a_task.py prompt --task-id <id> --message "..."` (Worker 活着，调整方向)
+  - **重试**: `a2a_task.py update --task-id <id> --state submitted` (Worker 死了，重新启动)
 
 **Worker 委派协议（a2a-exit 接口约定）**：
 - Manager 必须使用 `a2a-exit --state submitted --role worker --worktree <path> --branch <name> --raw-key <key> --summary "完整指令"`
@@ -181,7 +192,8 @@ submitted ──→ working (launched) ──→ completed
 #### closeout gate（阶段12）
 - 触发: merge 完成
 - 执行: `wt-close <branch>`
-- 命令封装: `wt-close` 内部执行 issue-sync close + milestone update + `git branch -d` + `git push --delete` + worktree remove
+- 命令封装: `wt-close` 内部执行 Phase 1-3 (phase_state check + platform close + force-close trace) → Phase 4 (delete remote branch) → Phase 4.5 (Worker 安全下线: 查询活跃 Worker → session/prompt 通知 → kill) → Phase 5 (auto-consume A2A → worktree remove → branch -d)
+- 注意: `pr-merge-guarded` 不再删除远程分支 (#3280)。远程分支删除统一由 `wt-close` 负责。
 - 完成后: 回到 intake gate，开始下一轮 scan
 
 ## doc-loop（文档设计层）
