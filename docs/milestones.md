@@ -3849,6 +3849,11 @@ routing_policy:
 ## M-20260622T030420Z-A
 - title: Platform sync batch
 - status: active
+### candidate_issues
+1. `C-20260622T030420Z-A`
+- milestone: M-20260622T030420Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260622T030420Z-A/issue.md`
 ### committed_issues
 1. `I-20260622T030420Z-A`
 - title: Platform sync batch
