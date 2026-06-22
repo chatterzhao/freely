@@ -409,7 +409,16 @@ if [[ "$PLATFORM_ONLY" == true ]]; then
   fi
   
   # Get raw issue's GitHub number and close via API
-  _po_raw_gh="$(_fm_get "$_po_issue_file" "issue_id")"
+  _po_raw_gh=$(python3 -c "
+import yaml
+with open('$_po_issue_file') as f:
+    parts = f.read().split('---', 2)
+fm = yaml.safe_load(parts[1]) if len(parts) >= 3 else {}
+for p, info in fm.get('platform_ids', {}).items():
+    if isinstance(info, dict) and info.get('issue_id'):
+        print(info['issue_id'])
+        break
+" 2>/dev/null)
   if [[ -n "$_po_raw_gh" ]]; then
     echo "wt-close: closing raw issue #$_po_raw_gh on GitHub..."
     if gh issue close "$_po_raw_gh" --repo "$(cd "$PROJECT_ROOT" && git remote get-url origin | grep -oE '[^:/]+/[^/]+' | head -1)" -r "completed" 2>&1; then
@@ -429,7 +438,16 @@ if [[ "$PLATFORM_ONLY" == true ]]; then
       _po_i_ps="$(_fm_get "$_po_i_file" "platform_state")"
       if [[ "$_po_i_phase" == "completed" || "$_po_i_phase" == "done_b2_ibm" ]]; then
         if [[ "$_po_i_ps" != "closed" ]]; then
-          _po_i_gh="$(_fm_get "$_po_i_file" "issue_id")"
+          _po_i_gh=$(python3 -c "
+import yaml
+with open('$_po_i_file') as f:
+    parts = f.read().split('---', 2)
+fm = yaml.safe_load(parts[1]) if len(parts) >= 3 else {}
+for p, info in fm.get('platform_ids', {}).items():
+    if isinstance(info, dict) and info.get('issue_id'):
+        print(info['issue_id'])
+        break
+" 2>/dev/null)
           _po_i_title="$(_fm_get "$_po_i_file" "local_id")"
           if [[ -n "$_po_i_gh" ]]; then
             echo "wt-close: also closing absorbed I-* issue $_po_i_title (#$_po_i_gh)..."
