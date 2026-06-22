@@ -10,13 +10,12 @@ while read -r local_ref local_sha remote_ref remote_sha; do
   # git sends all-zero local_sha for delete operations.
   if [[ "$local_sha" == "0000000000000000000000000000000000000000" ]]; then
     # Walk process ancestry to check if wt-close is in the parent chain
-    local _pid _ppid _cmd _is_wt_close=0
     _pid=$PPID
+    _is_wt_close=0
     while [[ "$_pid" -gt 1 ]]; do
       _cmd=$(ps -o comm= -p "$_pid" 2>/dev/null || true)
       case "$_cmd" in
         wt-close|bash*)
-          local _full_cmd
           _full_cmd=$(ps -o args= -p "$_pid" 2>/dev/null || true)
           case "$_full_cmd" in
             *wt-close*) _is_wt_close=1; break ;;
