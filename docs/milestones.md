@@ -3979,7 +3979,15 @@ routing_policy:
   - `raw-20260622T114625Z`
 ## M-20260622T115249Z-A
 - title: Fix --platform-only nested platform_ids reading
+- status: active
 ### candidate_issues
-1. `C-20260622T115249Z-A` - status: promoted - promoted_issue_path: `docs/issues/I-20260622T115249Z-A/issue.md`
+1. `C-20260622T115249Z-A`
+- milestone: M-20260622T115249Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260622T115249Z-A/issue.md`
 ### committed_issues
-1. `I-20260622T115249Z-A` - milestone_state: committed - phase_state: completed - issue_path: `docs/issues/I-20260622T115249Z-A/issue.md`
+1. `I-20260622T115249Z-A`
+- title: Fix --platform-only nested platform_ids reading
+- milestone_state: committed
+- phase_state: completed
+- issue_path: `docs/issues/I-20260622T115249Z-A/issue.md`
