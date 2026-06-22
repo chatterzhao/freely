@@ -21,12 +21,13 @@ FORCE=false
 DISCARD_UNMERGED=false
 FORCE_REASON=""
 SKIP_PLATFORM=false
+PLATFORM_ONLY=false
 DRY_RUN=false
 
 usage() {
   cat <<USAGE
 Usage:
-  ./bin/wt-close <branch> [--force] [--skip-platform] [--dry-run]
+  ./bin/wt-close <branch> [--force] [--skip-platform] [--platform-only] [--dry-run]
 
 Close a worktree: validate phase_state, close platform issue, remove worktree+branch.
 
@@ -42,6 +43,9 @@ Options:
   --reason <text>    Reason for force-close (REQUIRED with --force/--discard-unmerged/--skip-platform)
                       Format: --reason "违规绕过门禁中，理由充分，是：<业务理由>"
   --skip-platform    Skip platform issue close (requires --reason)
+                      Only valid scenario: platform issue was already closed manually
+  --platform-only    Close platform issue via API only, no local file changes (requires --reason)
+                      For orphan issues where worktree is gone but platform issue remains open
   --dry-run          Print what would be done, don't execute
 
 Bypass gates & --reason:
@@ -54,8 +58,11 @@ Bypass gates & --reason:
     ✅ "工位目录已损坏或丢失，仅剩分支引用需清理"
   --discard-unmerged 有效理由:
     ✅ "该方案已被否决，未合并提交确认丢弃"
-  --skip-platform 有效理由:
+  --skip-platform 合法业务理由（仅一种）:
     ✅ "平台 issue 已通过其他渠道手动关闭，无需同步"
+  --platform-only 合法业务理由:
+    ✅ "工位已删除但平台 issue 仍 OPEN，需关闭平台 issue 收口"
+    ✅ "孤儿 raw issue——工位和分支已清理，仅剩平台 issue 未同步关闭"
 
   无效理由（技术症状，会被拒绝）:
     ❌ "phase_state 未 completed"
@@ -66,6 +73,7 @@ Examples:
   ./bin/wt-close fix/raw-xxx --force --reason "违规绕过门禁中，理由充分，是：该功能确定放弃，不再继续实现此 raw issue"
   ./bin/wt-close fix/raw-xxx --force --discard-unmerged --reason "违规绕过门禁中，理由充分，是：该方案已被否决，未合并提交确认丢弃"
   ./bin/wt-close fix/raw-xxx --skip-platform --reason "违规绕过门禁中，理由充分，是：平台 issue 已通过其他渠道手动关闭，无需同步"
+  ./bin/wt-close fix/raw-xxx --platform-only --reason "违规绕过门禁中，理由充分，是：工位已删除但平台 issue 仍 OPEN，需关闭平台 issue 收口"
 USAGE
 }
 
@@ -165,6 +173,7 @@ while [[ $# -gt 0 ]]; do
     --discard-unmerged) DISCARD_UNMERGED=true; shift ;;
     --reason) FORCE_REASON="$2"; shift 2 ;;
     --skip-platform) SKIP_PLATFORM=true; shift ;;
+    --platform-only) PLATFORM_ONLY=true; shift ;;
     --dry-run) DRY_RUN=true; shift ;;
     --help|-h) usage; exit 0 ;;
     -*) echo "Unknown: $1" >&2; usage; exit 1 ;;
@@ -198,6 +207,10 @@ if [[ "$input" != test-pre-merge-* ]]; then
     - 工位目录已损坏或丢失，仅剩分支引用需清理
   --discard-unmerged 合法业务理由:
     - 该方案已被否决，未合并的提交确认不再需要（需同时使用 --force）
+  --platform-only 合法业务理由:
+    - 工位已删除但平台 issue 仍 OPEN，需关闭平台 issue 收口
+    - 孤儿 raw issue——工位和分支已清理，仅剩平台 issue 未同步关闭
+
   --skip-platform 合法业务理由:
     - 平台 issue 已通过其他渠道手动关闭，无需同步
 
@@ -209,6 +222,7 @@ GATE
   }
   _require_reason FORCE "--force"
   _require_reason SKIP_PLATFORM "--skip-platform"
+  _require_reason PLATFORM_ONLY "--platform-only"
   _require_reason DISCARD_UNMERGED "--discard-unmerged"
 fi
 
@@ -374,8 +388,59 @@ UNMERGED_BLOCK
   fi
 fi
 
-# ── Phase 2: Platform close ── (skipped for orphaned branches)
 # ── Phase 2: Platform close ──
+
+# --platform-only: close platform issue via API only, NO local file modifications.
+# For orphan issues where worktree is gone but platform issue remains open.
+# Uses gh API directly (not issue-sync) to avoid writing to develop.
+if [[ "$PLATFORM_ONLY" == true ]]; then
+  echo "wt-close: --platform-only mode (API close only, no local file changes)"
+  
+  # Read issue.md from main repo (read-only)
+  _po_issue_file="$PROJECT_ROOT/docs/issues/$issue_id/issue.md"
+  if [[ ! -f "$_po_issue_file" ]]; then
+    echo "Error: --platform-only cannot find issue file: $_po_issue_file" >&2
+    exit 1
+  fi
+  
+  # Get raw issue's GitHub number and close via API
+  _po_raw_gh="$(_fm_get "$_po_issue_file" "issue_id")"
+  if [[ -n "$_po_raw_gh" ]]; then
+    echo "wt-close: closing raw issue #$_po_raw_gh on GitHub..."
+    if gh issue close "$_po_raw_gh" --repo "$(cd "$PROJECT_ROOT" && git remote get-url origin | grep -oE '[^:/]+/[^/]+' | head -1)" -r "completed" 2>&1; then
+      echo "wt-close: raw issue #$_po_raw_gh closed ✓ (local files unchanged)"
+    else
+      echo "Warning: gh close failed for #$_po_raw_gh, trying issue-sync fallback..." >&2
+      "$PROJECT_ROOT/bin/issue-sync" --project "$PROJECT_ROOT" close "$issue_id" completed 2>&1 ||         echo "Warning: issue-sync fallback also failed for $issue_id, continuing..." >&2
+    fi
+  fi
+  
+  # Also close absorbed I-* issue via API
+  _po_absorbed_i="$(_fm_get "$_po_issue_file" "absorbed_into")"
+  if [[ -n "$_po_absorbed_i" ]]; then
+    _po_i_file="$PROJECT_ROOT/docs/issues/$_po_absorbed_i/issue.md"
+    if [[ -f "$_po_i_file" ]]; then
+      _po_i_phase="$(_fm_get "$_po_i_file" "phase_state")"
+      _po_i_ps="$(_fm_get "$_po_i_file" "platform_state")"
+      if [[ "$_po_i_phase" == "completed" || "$_po_i_phase" == "done_b2_ibm" ]]; then
+        if [[ "$_po_i_ps" != "closed" ]]; then
+          _po_i_gh="$(_fm_get "$_po_i_file" "issue_id")"
+          _po_i_title="$(_fm_get "$_po_i_file" "local_id")"
+          if [[ -n "$_po_i_gh" ]]; then
+            echo "wt-close: also closing absorbed I-* issue $_po_i_title (#$_po_i_gh)..."
+            gh issue close "$_po_i_gh" --repo "$(cd "$PROJECT_ROOT" && git remote get-url origin | grep -oE '[^:/]+/[^/]+' | head -1)" -r "completed" 2>&1 &&               echo "wt-close: I-* #$_po_i_gh closed ✓ (local files unchanged)" ||               echo "Warning: gh close failed for I-* #$_po_i_gh" >&2
+          fi
+        fi
+      fi
+    fi
+  fi
+  
+  echo "wt-close: --platform-only complete (platform closed, local files unchanged)"
+  echo "  Note: local platform_state still shows 'open'. Next scan will detect inconsistency."
+  exit 0
+fi
+
+# ── Phase 2: Platform close ── (skipped for orphaned branches)
 
 if [[ "$FORCE" == true && -z "$wt_path" ]]; then
     :  # skip platform close for orphaned branches
