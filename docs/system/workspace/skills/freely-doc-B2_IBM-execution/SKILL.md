@@ -40,7 +40,7 @@ B2_IBM 不创建 I-{key}。
 |------|------|
 | `issues/{name}.md` | I-* issue 文档，完整格式见下方示例 |
 | `prd.md` | Goal → Dev-Loop Handoff |
-| `pre-tests.md` | 结构见 `skill:freely-dev-loop-execution` 情景 D |
+| `pre-tests.md` | 结构化测试计划（含 test_command + expected_output），模板见下方 |
 | `tasks.md` | 任务分解，关联 owner issue |
 | `code-reviews/` | Implementation Decision Note（decision/why_this/alternatives_considered/boundary_non_goals/residual_risk） |
 
@@ -80,6 +80,70 @@ verification_artifact_dir: docs/epics/skill-gate-alignment/code-reviews
 ```
 
 注意 `canonical_issue_path` 为空避免自引用；YAML frontmatter 和正文 bullet 字段都需要写关键字段。
+
+### pre-tests.md 完整模板
+
+B2_IBM 阶段直接写入以下格式。AI 按模板填写，无需查看任何其他文件。模板已满足 LAWS.md §4c 全部要求。
+
+```markdown
+# Pre-Tests: <功能名>
+- issue_id: I-{key}-A
+
+## Acceptance Items
+
+### acceptance-1
+- acceptance_target: <raw issue 验收标准>
+- testing_layer: unit | integration | end-to-end
+- target_environment: test-pre-merge-{key}-{slug}
+- required_evidence: <测试通过的证据要求>
+- test_command: <实际执行的 shell 命令，如：./bin/test-lane integration -- pytest tests/test_xxx.py>
+- expected_output: <命令的预期输出，如：所有测试 PASSED，无 FAIL>
+- actual_output: (由 skill:freely-test-execution 执行后填写)
+- evidence_file: (执行后填写，指向 .freely/run/test-evidence/acceptance-1.log)
+- blocker: (失败时填写) definition_missing | commands_only | evidence_plan_missing | execution_pending_or_failed
+- status: pending | passed | failed
+
+### acceptance-2
+- acceptance_target: <验收标准2>
+- testing_layer: end-to-end
+- target_environment: test-pre-merge-{key}-{slug}
+- required_evidence: <证据要求>
+- test_command: <shell 命令>
+- expected_output: <预期输出>
+- actual_output: (执行后填写)
+- evidence_file: (执行后填写)
+- blocker: (失败时填写)
+- status: pending
+
+## Unit
+- acceptance_target: <单元测试覆盖目标>
+- testing_layer: unit
+- target_environment: <feature worktree>
+- required_evidence: <判定标准>
+- not_applicable_reason: (如不适用填写) no_executable_boundary_at_this_layer
+- not_applicable_explanation: (如不适用填写) <原因和替代验证>
+- replacement_evidence: (如不适用填写) <替代验证方式>
+
+## Integration
+- acceptance_target: <集成测试覆盖目标>
+- testing_layer: integration
+- target_environment: test-pre-merge-{key}-{slug}
+- required_evidence: <判定标准>
+
+## End-to-End
+- acceptance_target: <端到端验证目标>
+- testing_layer: end-to-end
+- target_environment: test-pre-merge-{key}-{slug} → develop merge chain
+- required_evidence: guarded merge receipts
+
+## Real-Environment
+- real_environment_status: pass | fail | not_tested
+- real_environment_reason: <真实环境验证结果>
+```
+
+**status 取值**: `pending`（未执行）、`passed`（通过）、`failed`（失败）。
+
+**blocker 取值**: `definition_missing`（验收标准缺失）、`commands_only`（只有命令无预期输出）、`evidence_plan_missing`（无证据计划）、`execution_pending_or_failed`（未执行或失败）。
 
 ### 完成自检
 
