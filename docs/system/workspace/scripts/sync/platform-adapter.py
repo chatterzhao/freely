@@ -176,13 +176,30 @@ def create_issue(local_id: str, title: str, body: str) -> dict[str, dict]:
 
 
 def add_comment(local_id: str, platform_issue_id: str, comment_body: str) -> dict[str, dict]:
-    """Add a comment to an issue on all configured platforms."""
+    """Add a comment to an issue on all configured platforms.
+
+    Blocks new comments on closed issues (#3302). Comment sync (issue-sync)
+    is exempt — it pushes locally-recorded comments made while the issue was open.
+    """
     results = {}
     for platform in available_platforms():
         try:
+            # Check if platform issue is closed before commenting (#3302)
+            issue_state = _get_issue_state(platform, platform_issue_id)
+            if issue_state and issue_state.lower() == "closed":
+                results[platform] = {
+                    "status": "blocked",
+                    "error": (
+                        f"Issue #{platform_issue_id} is CLOSED on {platform}. "
+                        "Cannot create new comments on closed issues. "
+                        "Re-open the issue first, or create a new raw issue via 'freely feedback'."
+                    ),
+                }
+                continue
+
             if platform == "github":
-                result = _gh("issue", "comment", "--repo", _gh_repo(),
-                            platform_issue_id, "--body", comment_body)
+                _gh("issue", "comment", "--repo", _gh_repo(),
+                    platform_issue_id, "--body", comment_body)
                 results[platform] = {"status": "created"}
             elif platform == "gitee":
                 result = subprocess.run(
@@ -194,6 +211,31 @@ def add_comment(local_id: str, platform_issue_id: str, comment_body: str) -> dic
         except Exception as e:
             results[platform] = {"status": "error", "error": str(e)[:200]}
     return results
+
+
+def _get_issue_state(platform: str, issue_id: str) -> Optional[str]:
+    """Get the state (open/closed) of a platform issue. Returns None if unknown."""
+    try:
+        if platform == "github":
+            result = subprocess.run(
+                ["gh", "issue", "view", issue_id, "--repo", _gh_repo(),
+                 "--json", "state", "--jq", ".state"],
+                capture_output=True, text=True
+            )
+            if result.returncode == 0:
+                return result.stdout.strip()
+        elif platform == "gitee":
+            # Gitee: use API via gitee-issue.py
+            result = subprocess.run(
+                [sys.executable, str(RUNTIME_DIR / "gitee-issue.py"),
+                 "--repo", _gitee_repo(), "state", issue_id],
+                capture_output=True, text=True
+            )
+            if result.returncode == 0:
+                return result.stdout.strip().lower()
+    except Exception:
+        pass
+    return None
 
 
 def close_issue(local_id: str, platform_issue_id: str) -> dict[str, dict]:
@@ -483,6 +525,71 @@ def pull_raw_issue(raw_key: str, target_dir: Path) -> Optional[dict]:
     }
 
 
+# ── PR Operations (#3340) ────────────────────────────────────────────
+
+def create_pr(branch: str, base: str = "develop", title: str = "", body: str = "") -> dict:
+    """Create a PR on all configured platforms. Returns {platform: {url, number}}."""
+    results = {}
+    for platform in available_platforms():
+        try:
+            if platform == "github":
+                cmd = ["gh", "pr", "create", "--repo", _gh_repo(),
+                       "--head", branch, "--base", base]
+                if title:
+                    cmd.extend(["--title", title])
+                if body:
+                    cmd.extend(["--body", body])
+                result = subprocess.run(cmd, capture_output=True, text=True)
+                if result.returncode == 0:
+                    # Extract PR URL from stdout
+                    url = result.stdout.strip()
+                    number = url.split("/")[-1] if url else ""
+                    results[platform] = {"url": url, "number": number, "status": "created"}
+                else:
+                    results[platform] = {"status": "error", "error": result.stderr[:200]}
+            elif platform == "gitee":
+                # Gitee: push branch first, then API create PR
+                results[platform] = {"status": "skipped", "error": "gitee PR creation via API not yet implemented"}
+        except Exception as e:
+            results[platform] = {"status": "error", "error": str(e)[:200]}
+    return results
+
+
+def merge_pr(platform: str, pr_number: str) -> dict:
+    """Merge a PR on the specified platform."""
+    try:
+        if platform == "github":
+            result = subprocess.run(
+                ["gh", "pr", "merge", pr_number, "--repo", _gh_repo(),
+                 "--squash", "--delete-branch"],
+                capture_output=True, text=True
+            )
+            if result.returncode == 0:
+                return {"status": "merged", "platform": platform, "number": pr_number}
+            return {"status": "error", "error": result.stderr[:200]}
+        elif platform == "gitee":
+            return {"status": "skipped", "error": "gitee PR merge via API not yet implemented"}
+    except Exception as e:
+        return {"status": "error", "error": str(e)[:200]}
+
+
+def close_pr(platform: str, pr_number: str) -> dict:
+    """Close a PR without merging on the specified platform."""
+    try:
+        if platform == "github":
+            result = subprocess.run(
+                ["gh", "pr", "close", pr_number, "--repo", _gh_repo()],
+                capture_output=True, text=True
+            )
+            if result.returncode == 0:
+                return {"status": "closed", "platform": platform, "number": pr_number}
+            return {"status": "error", "error": result.stderr[:200]}
+        elif platform == "gitee":
+            return {"status": "skipped", "error": "gitee PR close via API not yet implemented"}
+    except Exception as e:
+        return {"status": "error", "error": str(e)[:200]}
+
+
 # CLI entry point for testing
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "search":
@@ -502,6 +609,20 @@ if __name__ == "__main__":
         target = Path(sys.argv[3]) if len(sys.argv) > 3 else Path(f"docs/issues/raw-{raw_key}")
         result = pull_raw_issue(raw_key, target)
         print(json.dumps(result, indent=2, default=str))
+    elif len(sys.argv) > 1 and sys.argv[1] == "create-pr":
+        branch, base = sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else "develop"
+        title = sys.argv[4] if len(sys.argv) > 4 else ""
+        body = sys.argv[5] if len(sys.argv) > 5 else ""
+        result = create_pr(branch, base, title, body)
+        print(json.dumps(result, indent=2))
+    elif len(sys.argv) > 1 and sys.argv[1] == "merge-pr":
+        platform, pr_number = sys.argv[2], sys.argv[3]
+        result = merge_pr(platform, pr_number)
+        print(json.dumps(result, indent=2))
+    elif len(sys.argv) > 1 and sys.argv[1] == "close-pr":
+        platform, pr_number = sys.argv[2], sys.argv[3]
+        result = close_pr(platform, pr_number)
+        print(json.dumps(result, indent=2))
     else:
         print(f"Available platforms: {available_platforms()}")
         print(f"GitHub repo: {_gh_repo()}")

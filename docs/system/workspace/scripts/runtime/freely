@@ -10576,6 +10576,24 @@ worker_prompt_launchable_for_manager_project() {
     log_warn "worker_prompt_launchable: $LAUNCH_REJECT_REASON"
     return 1
   fi
+  # Gate: validate raw issue exists and is open before launching worker (#3290)
+  if [[ -n "$raw_key_hint" ]]; then
+    local _raw_issue_file="$manager_project/docs/issues/raw-${raw_key_hint}/issue.md"
+    if [[ ! -f "$_raw_issue_file" ]]; then
+      LAUNCH_REJECT_REASON="raw-${raw_key_hint} has no corresponding raw issue at docs/issues/raw-${raw_key_hint}/issue.md — check raw_key is correct. If the issue was renamed/moved, update the task's raw_key."
+      log_warn "worker_prompt_launchable: $LAUNCH_REJECT_REASON"
+      return 1
+    fi
+    local _raw_phase
+    _raw_phase="$(sed -n '/^---$/,/^---$/p' "$_raw_issue_file" | grep "^phase_state:" | sed 's/^phase_state: *//' | tr -d '"' 2>/dev/null || true)"
+    case "$_raw_phase" in
+      absorbed|completed|dropped)
+        LAUNCH_REJECT_REASON="raw-${raw_key_hint} is closed (phase_state=${_raw_phase}) — re-open the raw issue if still active, or use a new raw_key for new work"
+        log_warn "worker_prompt_launchable: $LAUNCH_REJECT_REASON"
+        return 1
+        ;;
+    esac
+  fi
   handoff_prompt_file="$(worker_handoff_followthrough_prompt_file_for_project "$resolved_worktree" || true)"
   if [[ -n "$handoff_prompt_file" && -f "$handoff_prompt_file" && "$handoff_prompt_file" != "$prompt_file" ]]; then
     LAUNCH_REJECT_REASON="worktree busy: '$resolved_worktree' has followthrough prompt, worker already assigned"
@@ -19345,6 +19363,41 @@ REASON_GATE
   [[ -f "$intent" ]] || { log_error "intent file not found: $intent"; exit 1; }
   [[ -f "$constitution" ]] || { log_error "constitution file not found: $constitution"; exit 1; }
   validate_project_branch_names "$project"
+
+  # Platform configuration gate (#3336)
+  local _platforms _platforms_config
+  _platforms="$(get_config FREELY_REPO_PLATFORMS "")"
+  if [[ -z "$_platforms" ]]; then
+    cat >&2 <<'PLATFORM_GATE'
+[BLOCKED] 未配置仓库平台 (FREELY_REPO_PLATFORMS)。
+
+  Freely 支持 GitHub 和 Gitee，至少需要配置一个。
+  请在项目的 config.toml 中设置:
+
+    FREELY_REPO_PLATFORMS = "github,gitee"  (两个都配置)
+    FREELY_REPO_PLATFORMS = "github"         (仅 GitHub)
+    FREELY_REPO_PLATFORMS = "gitee"          (仅 Gitee)
+
+  然后重新运行 freely init。
+PLATFORM_GATE
+    exit 1
+  fi
+  IFS=',' read -ra _platform_arr <<< "$_platforms"
+  for _p in "${_platform_arr[@]}"; do
+    case "$_p" in
+      github)
+        if ! ssh -T -o StrictHostKeyChecking=no -o ConnectTimeout=5 git@github.com 2>&1 | grep -qE "successfully authenticated|Permission denied"; then
+          log_warn "github: SSH key check failed — run: ssh -T git@github.com"
+        fi
+        ;;
+      gitee)
+        if ! ssh -T -o StrictHostKeyChecking=no -o ConnectTimeout=5 git@gitee.com 2>&1 | grep -qE "successfully|Welcome|Permission denied"; then
+          log_warn "gitee: SSH key check failed — run: ssh -T git@gitee.com"
+        fi
+        ;;
+    esac
+  done
+
   ai_spec="$(resolve_ai_spec_for_project_or_global "$project" "$ai_spec")" || {
     log_error "missing --ai and no project/global default AI configured"
     log_error "set --ai explicitly, or define AI_TOOL/AI_MODEL/AI_MODE in $(global_config_file)"
