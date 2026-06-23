@@ -221,7 +221,7 @@ class DbDaemon:
                 name TEXT NOT NULL DEFAULT '',
                 description TEXT NOT NULL DEFAULT '',
                 state TEXT NOT NULL DEFAULT 'submitted'
-                    CHECK(state IN ('submitted','working','input-required','completed','failed','canceled')),
+                    CHECK(state IN ('submitted','working','input-required','pending-input','completed','failed','canceled')),
                 agent_id TEXT NOT NULL DEFAULT '',
                 skill TEXT NOT NULL DEFAULT '',
                 session_id TEXT NOT NULL DEFAULT '',
@@ -1101,64 +1101,6 @@ def h_a2a_task_list_by_worktree(daemon: DbDaemon, params: dict) -> dict:
     cols = [desc[1] for desc in daemon.conn.execute("PRAGMA table_info(a2a_tasks)").fetchall()]
     return {"rows": [dict(zip(cols, r)) for r in rows]}
 
-
-@_h("a2a_task.update-from-exit-kind")
-def h_a2a_task_update_from_exit_kind(daemon: DbDaemon, params: dict) -> dict:
-    """Update A2A Task from exit_kind.
-
-    Maps Freely exit_kind to A2A task state and extracts fields.
-    """
-    task_id = params.get("task_id", "")
-    exit_kind = params.get("exit_kind", "")
-    reason = params.get("reason", "")
-    progress = params.get("progress", "")
-    next_action = params.get("next_action", "")
-    completion_summary = params.get("completion_summary", "")
-    evidence_paths = params.get("evidence_paths", "")
-    error = params.get("error", "")
-
-    # Map exit_kind → A2A state
-    EXIT_KIND_TO_A2A = {
-        'manager_working': 'submitted',
-        'worker_working': 'working',
-        'worker_done': 'completed',
-        'worker_blocked': 'input-required',
-        'worker_handoff_needed': 'pending-input',
-        'delegate_workers': 'submitted',
-        'resume_manager': 'completed',
-        'stop_ai': 'failed',
-    }
-    state = EXIT_KIND_TO_A2A.get(exit_kind, 'working')
-
-    now = _now_utc()
-    updates = {
-        "exit_kind": exit_kind,
-        "state": state,
-        "updated_at": now,
-    }
-    if reason:
-        updates["reason"] = reason
-    if progress:
-        updates["progress"] = progress
-    if next_action:
-        updates["next_action"] = next_action
-    if completion_summary:
-        updates["completion_summary"] = completion_summary
-    if evidence_paths:
-        updates["evidence_paths"] = evidence_paths
-    if error:
-        updates["error"] = error
-
-    if not updates:
-        return {"affected": 0}
-
-    set_cols = ", ".join(f"{k} = ?" for k in updates.keys())
-    c = daemon.conn.execute(
-        f"UPDATE a2a_tasks SET {set_cols} WHERE task_id = ?",
-        list(updates.values()) + [task_id],
-    )
-    daemon.conn.commit()
-    return {"affected": c.rowcount}
 
 
 @_h("a2a_task.list-by-raw-key")

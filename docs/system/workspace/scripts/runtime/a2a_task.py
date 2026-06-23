@@ -639,7 +639,7 @@ def read_state_only(reply_text: str) -> dict:
 
 VALID_STATES = {
     'submitted', 'working', 'completed', 'failed',
-    'input-required', 'pending-input',
+    'input-required', 'pending-input', 'canceled',
 }
 
 STATE_ALIASES = {
@@ -870,6 +870,10 @@ def _main() -> int:
             kwargs = {}
             if getattr(args, 'state', None): kwargs['state'] = args.state
             if getattr(args, 'session_id', None): kwargs['session_id'] = args.session_id
+            if getattr(args, 'reason', None): kwargs['reason'] = args.reason
+            if getattr(args, 'completion_summary', None): kwargs['completion_summary'] = args.completion_summary
+            if getattr(args, 'next_action', None): kwargs['next_action'] = args.next_action
+            if getattr(args, 'exit_kind', None): kwargs['exit_kind'] = args.exit_kind
             print(json.dumps({"affected": update_task(_task_id, **kwargs)}))
         elif args.cmd == "latest-manager":
             t = latest_manager()

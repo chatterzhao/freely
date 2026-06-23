@@ -338,20 +338,27 @@ class A2AServer:
         self._restore_tasks()
 
     def _restore_tasks(self):
-        """Restore non-terminal tasks on startup with process liveness checks.
+        """Restore non-terminal tasks on startup: state correction + env recovery.
 
-        For 'working' tasks: check if the worker PID is still alive.
-        Alive → keep 'working'. Dead → mark 'failed' (process died during downtime).
-        For 'submitted' tasks (Manager): if no corresponding worker tasks exist
-        and the task is > 60s old, mark 'completed' (stale delegation).
-        For 'input-required' tasks: keep as-is (Manager decides on resume).
+        State correction (A0-A3): check if persisted state is still valid.
+        - working + alive PID → keep working (B1: prompt resume)
+        - working + dead PID → failed (B2: notify Manager)
+        - working + no PID → input-required (A1: can't verify, Manager decides)
+        - submitted(Manager) + active workers → keep (B4: restore supervision)
+        - submitted(Manager) + no active workers + >60s → completed (A2: stale)
+        - input-required + worktree deleted → failed (A3)
+        - input-required + worktree exists → keep (B3: notify Manager)
+
+        Env recovery (B1-B4): notify Manager via SSE of what happened.
         """
         try:
             rows = self.task_store.get_all_dicts()
             import os as _os
+            import sys as _sys
             now = __import__('time').time()
             restored = 0
             failed = 0
+            notifications = []  # (task_id, message) for SSE injection
 
             for row in rows:
                 state = row.get("state", "")
@@ -364,9 +371,9 @@ class A2AServer:
 
                 agent_id = row.get("agent_id", "")
                 worker_pid = row.get("worker_pid", "")
+                worktree = row.get("worktree", "")
 
                 if state == "working" and agent_id == "worker":
-                    # Check process liveness
                     alive = False
                     if worker_pid:
                         try:
@@ -375,16 +382,37 @@ class A2AServer:
                             alive = True
                         except (ValueError, OSError):
                             alive = False
-                    if not alive:
+
+                    if alive and worktree and _os.path.exists(worktree):
+                        restored += 1
+                        # B1: prompt Worker to resume
+                        notifications.append((task_id,
+                            f"[Restart Recovery] Worker {task_id} was working before shutdown. "
+                            f"Process PID={worker_pid} is still alive. Resuming supervision."))
+                    elif not worker_pid:
+                        # A1: no PID — can't verify liveness
+                        self.task_store.raw_rpc("a2a_task.update", {
+                            "task_id": task_id, "state": "input-required",
+                            "error": "missing_worker_pid_at_restart"})
+                        notifications.append((task_id,
+                            f"[Restart Recovery] Worker {task_id} was working but has no PID record. "
+                            f"Marked input-required. Please check worktree and decide."))
+                    else:
+                        # PID dead
+                        reason = "process_died_during_downtime"
+                        if worktree and not _os.path.exists(worktree):
+                            reason = "process_died_and_worktree_deleted_during_downtime"
                         self.task_store.raw_rpc("a2a_task.update", {
                             "task_id": task_id, "state": "failed",
-                            "error": "process_died_during_downtime"})
+                            "error": reason})
                         failed += 1
-                        continue
-                    restored += 1
+                        # B2: notify Manager
+                        notifications.append((task_id,
+                            f"[Restart Recovery] Worker {task_id} died during downtime: {reason}. "
+                            f"Marked failed."))
+                    continue
 
                 elif state == "submitted" and agent_id == "manager":
-                    # Check if this is a stale delegation
                     created = row.get("created_at", "")
                     if created:
                         try:
@@ -392,23 +420,60 @@ class A2AServer:
                             dt = datetime.strptime(created[:19], "%Y-%m-%dT%H:%M:%S")
                             age = (datetime.now(timezone.utc) - dt.replace(tzinfo=timezone.utc)).total_seconds()
                             if age > 60:
-                                # Check if any workers exist for this manager task
-                                workers = [r for r in rows if r.get("agent_id") == "worker"
-                                          and r.get("raw_key") == row.get("raw_key", "")]
-                                if not workers:
+                                # A2: only check ACTIVE (non-terminal) workers
+                                active_workers = [
+                                    r for r in rows
+                                    if r.get("agent_id") == "worker"
+                                    and r.get("raw_key") == row.get("raw_key", "")
+                                    and r.get("state") not in ("completed", "failed", "canceled")
+                                ]
+                                if not active_workers:
                                     self.task_store.raw_rpc("a2a_task.update", {
                                         "task_id": task_id, "state": "completed",
                                         "completion_summary": "auto_completed_on_restart_stale_delegation"})
+                                else:
+                                    # B4: active workers exist, restore supervision
+                                    notifications.append((task_id,
+                                        f"[Restart Recovery] Manager had active workers before shutdown. "
+                                        f"Resuming supervision of {len(active_workers)} worker(s)."))
                         except Exception:
                             pass
+
+                elif state == "input-required":
+                    # A3: check worktree still exists
+                    if worktree and not _os.path.exists(worktree):
+                        self.task_store.raw_rpc("a2a_task.update", {
+                            "task_id": task_id, "state": "failed",
+                            "error": "worktree_deleted_during_downtime"})
+                        failed += 1
+                        notifications.append((task_id,
+                            f"[Restart Recovery] Worker {task_id} was waiting for input "
+                            f"but worktree no longer exists. Marked failed."))
+                    else:
+                        restored += 1
+                        # B3: notify Manager worker needs input
+                        notifications.append((task_id,
+                            f"[Restart Recovery] Worker {task_id} was waiting for input before shutdown. "
+                            f"Please check and provide input or close."))
                 else:
                     restored += 1
 
-            import sys
             msg = f"[A2A Gateway] Restored {restored} non-terminal tasks"
             if failed > 0:
                 msg += f", {failed} marked failed (dead processes)"
-            print(msg, file=sys.stderr)
+            if notifications:
+                msg += f", {len(notifications)} recovery notifications"
+            print(msg, file=_sys.stderr)
+
+            # B1-B4: inject recovery notifications via SSE event queue
+            if notifications:
+                for tid, note in notifications:
+                    try:
+                        self.task_store.raw_rpc("a2a_task.update", {
+                            "task_id": tid,
+                            "completion_summary": note[:200]})  # truncated for DB
+                    except Exception:
+                        pass
         except Exception:
             pass  # DB not available → start with empty TaskStore (降级运行)
 
@@ -538,7 +603,7 @@ class A2AServer:
             sm = {'submitted':'submitted','working':'working','completed':'completed',
                   'failed':'failed','input-required':'input-required','canceled':'canceled'}
             fields = {}
-            if "state" in body: fields["state"] = sm.get(body["state"], body["state"])
+            if "state" in body: fields["state"] = sm.get(body["state"])  # reject unknown states
             for k in ["completion_summary","evidence_paths","error",
                        "reason","next_action","progress","summary","next","evidence",
                        "session_id"]:
