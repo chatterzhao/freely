@@ -13,6 +13,7 @@ import os
 import socket
 import time
 import threading
+import http.client
 from datetime import datetime, timezone
 from typing import Optional, List, Dict, Callable
 
@@ -304,15 +305,13 @@ class A2AClient:
     # ── SSE Client ────────────────────────────────────────────────────────
 
     def stream_task(self, task_id: str, on_event: Callable[[dict], None] = None,
-                    timeout: float = 0) -> dict:
+                    timeout: float = 0, last_event_id: str = "") -> dict:
         """Connect to GET /tasks/{task_id}/stream and yield SSE events.
 
         Returns a dict with keys: 'status' (ok/error/timeout), 'events' (list of parsed
-        events), 'last_event_id' (str|None), 'terminal' (bool — stream closed at
-        completed/failed/canceled/rejected).
+        events), 'last_event_id' (str|None), 'terminal' (bool — stream closed AND task
+        is in a terminal state per A2A spec).
         """
-        import http.client
-
         result = {"status": "ok", "events": [], "last_event_id": None, "terminal": False}
         sp = _a2a_socket_path(self.project)
 
@@ -325,6 +324,8 @@ class A2AClient:
             conn.putrequest("GET", f"/tasks/{task_id}/stream")
             conn.putheader("Accept", "text/event-stream")
             conn.putheader("Connection", "keep-alive")
+            if last_event_id:
+                conn.putheader("Last-Event-ID", last_event_id)
             conn.endheaders()
 
             resp = conn.getresponse()
@@ -335,7 +336,7 @@ class A2AClient:
                 return result
 
             event_type = ""
-            event_data = ""
+            event_data_lines = []
             event_id = ""
 
             while True:
@@ -344,22 +345,33 @@ class A2AClient:
                     break
                 line = line.rstrip("\n").rstrip("\r")
 
-                if line.startswith("event: "):
-                    event_type = line[7:]
-                elif line.startswith("data: "):
-                    event_data = line[6:]
-                elif line.startswith("id: "):
-                    event_id = line[4:]
-                elif line == "" and event_data:
+                if line.startswith("event:"):
+                    event_type = line[6:].lstrip()
+                elif line.startswith("data:"):
+                    event_data_lines.append(line[5:].lstrip())
+                elif line.startswith("id:"):
+                    event_id = line[3:].lstrip()
+                elif line == "" and event_data_lines:
+                    event_data = "\n".join(event_data_lines)
                     event = self._parse_sse_event(event_type, event_data, event_id)
                     result["events"].append(event)
                     result["last_event_id"] = event_id or result["last_event_id"]
                     if on_event:
                         on_event(event)
-                    event_type, event_data, event_id = "", "", ""
+                    event_type, event_data_lines, event_id = "", [], ""
 
             conn.close()
-            result["terminal"] = True
+
+            # Determine if terminal: check task state after stream close
+            try:
+                task = self.get(task_id)
+                state = task.get("state", task.get("status", ""))
+                if state in ("completed", "failed", "canceled", "rejected"):
+                    result["terminal"] = True
+                else:
+                    result["terminal"] = False
+            except Exception:
+                result["terminal"] = True  # Conservative: treat as terminal
             return result
 
         except socket.timeout:
@@ -386,19 +398,28 @@ class A2AClient:
         """Reconnect to SSE with exponential backoff after disconnect.
 
         Retry delays: base_delay → 2× → 4× → 8× → 16× → cap at 30s.
+        Uses Last-Event-ID header for server-side resume on reconnect.
         Returns the last stream_task result (after max_retries or terminal).
         """
         delay = base_delay
+        resume_id = last_event_id
         result = {"status": "error", "events": [], "last_event_id": last_event_id,
                   "terminal": False, "retries": 0}
 
         for attempt in range(max_retries):
-            result = self.stream_task(task_id, on_event=on_event, timeout=30.0)
+            result = self.stream_task(task_id, on_event=on_event, timeout=30.0,
+                                     last_event_id=resume_id)
             result["retries"] = attempt
 
+            # Propagate latest event id for next retry
+            if result.get("last_event_id"):
+                resume_id = result["last_event_id"]
+
+            # Stop if task is genuinely terminal
             if result["status"] == "ok" and result["terminal"]:
                 return result
 
+            # Retry on non-terminal disconnect or error
             if attempt < max_retries - 1:
                 time.sleep(delay)
                 delay = min(delay * 2, 30.0)
@@ -406,27 +427,43 @@ class A2AClient:
         return result
 
 
+_client_lock = threading.Lock()
 _client_instance = None
 
 def _client() -> A2AClient:
     global _client_instance
     if _client_instance is None:
-        _client_instance = A2AClient(_resolve_project())
+        with _client_lock:
+            if _client_instance is None:
+                _client_instance = A2AClient(_resolve_project())
     return _client_instance
 
+_sse_pool_lock = threading.Lock()
 _sse_pool_instance = None
 
 def _sse_pool() -> SSEPool:
     global _sse_pool_instance
     if _sse_pool_instance is None:
-        _sse_pool_instance = SSEPool(_resolve_project())
+        with _sse_pool_lock:
+            if _sse_pool_instance is None:
+                _sse_pool_instance = SSEPool(_resolve_project())
     return _sse_pool_instance
 
 
 # ── SSE Connection Pool ─────────────────────────────────────────────────
 
 class SSEPool:
-    """Manager-side SSE connection pool. Max 10 concurrent connections."""
+    """Manager-side SSE connection metadata registry (Phase 1 foundation).
+
+    Phase 1: Tracks which tasks are being streamed, max 10 entries,
+    heartbeat timestamps, stale detection. Does NOT open/manage actual
+    connections — that integration happens in Phase 2 (freely bash script
+    uses stream_task/resubscribe and calls SSEPool for bookkeeping).
+
+    Phase 2 (planned): Integration with freely script — when Manager
+    opens an SSE stream for a Worker, it registers in the pool. When
+    stale_ids() returns tasks, Manager resubscribes or marks them dead.
+    """
 
     def __init__(self, project: str, max_connections: int = 10):
         self.project = project
@@ -751,8 +788,9 @@ def _main() -> int:
     p_stream = sub.add_parser("stream")
     p_stream.add_argument("--task-id", required=True)
     p_stream.add_argument("--timeout", type=float, default=30.0)
-    p_stream.add_argument("--print-events", action="store_true",
-                          default=True, help="Print events to stdout")
+    p_stream.add_argument("--last-event-id", default="")
+    p_stream.add_argument("--no-print", action="store_true",
+                          help="Suppress event printing")
 
     p_resub = sub.add_parser("resubscribe")
     p_resub.add_argument("--task-id", required=True)
@@ -991,19 +1029,26 @@ def _main() -> int:
 
         elif args.cmd == "stream":
             c = _client()
-            def _print_event(ev):
-                print(json.dumps(ev, ensure_ascii=False), flush=True)
-            result = c.stream_task(args.task_id, on_event=_print_event,
-                                   timeout=args.timeout)
+            on_ev = None
+            if not getattr(args, 'no_print', False):
+                def _print_event(ev):
+                    print(json.dumps(ev, ensure_ascii=False), flush=True)
+                on_ev = _print_event
+            result = c.stream_task(args.task_id, on_event=on_ev,
+                                   timeout=args.timeout,
+                                   last_event_id=getattr(args, 'last_event_id', '') or '')
             if result["status"] != "ok":
                 print(json.dumps({"error": result.get("error", result["status"])}))
 
         elif args.cmd == "resubscribe":
             c = _client()
-            def _print_event_r(ev):
-                print(json.dumps(ev, ensure_ascii=False), flush=True)
+            on_ev = None
+            if not getattr(args, 'no_print', False):
+                def _print_event_r(ev):
+                    print(json.dumps(ev, ensure_ascii=False), flush=True)
+                on_ev = _print_event_r
             result = c.resubscribe(args.task_id, args.last_event_id,
-                                   on_event=_print_event_r,
+                                   on_event=on_ev,
                                    max_retries=args.max_retries,
                                    base_delay=args.base_delay)
             print(json.dumps({"status": result["status"],
