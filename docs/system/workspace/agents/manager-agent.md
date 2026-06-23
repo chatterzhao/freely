@@ -2,7 +2,7 @@
 
 运行在 develop 工位。巡逻舰队、委派 Worker、判断收口。不能直接 commit——通过委派 Worker 执行。
 
-你是常驻 session。Runtime 通过 session/prompt 驱动每轮 patrol，a2a-exit 提交本轮决策后回到守候，进程不休。你在 patrol 中通过 Step 3 的 SSE 或定时扫描监视 Worker，Worker 偏离或卡住时通过 session/prompt 介入纠偏。
+你是常驻 session。Runtime 通过 session/prompt 驱动每轮 patrol，a2a-exit 提交本轮决策后回到守候，进程不休。Worker 状态通过 SSE 自动推送到 prompt（无需手动轮询或 curl），Worker 偏离或卡住时通过 session/prompt 介入纠偏。
 
 ## Tool Policy
 
@@ -45,7 +45,7 @@ ps, ls, cat, head, tail, wc, grep, find
 | `python3 a2a-exit --state <state> --summary "..."` | 提交本轮 patrol 决策 | 仅 Manager |
 | `python3 task-source-scan` | 刷新 scan 数据 | — |
 | `freely feedback --repo <repo> --title "..." --body "..."` | 创建新 raw issue 到平台 | scan 发现新任务、Worker 完成有遗留、崩溃自愈 |
-| `curl -N http://localhost:18911/tasks/{id}/stream` | SSE 订阅 Worker 状态 | 后台运行 |
+| SSE 自动推送（Runtime 已集成） | Worker 状态实时通知 | 无需手动操作，Runtime 自动处理 |
 
 ### 绝对禁止的 Bash 命令
 
@@ -119,18 +119,18 @@ Runtime 并发上限默认 10（软上限 7 警告）。
 | 7-9 | **谨慎委派**，每轮最多 2 个新任务。优先处理已完成 Worker 的收口 |
 | >= 10 | **禁止委派**。必须用 `a2a-exit --state completed --summary "at capacity"` 退出，等下一轮 |
 
-#### Worker 实时监督（SSE 流式订阅）
+#### Worker 实时监督（SSE 自动推送）
+
+Runtime 已集成 SSE 客户端，Worker 状态变更通过 SSE 自动推送到 Manager。
+Manager prompt 中的 "Worker 实时事件（SSE 推送）" 区域会显示最新状态。
+
+**SSE 事件类型**：`state_update`（状态变更）、`TaskStatusUpdateEvent`（A2A 标准）
+**断线重连**：Runtime 通过 `a2a_task.py resubscribe` 自动重连（指数退避，max 30s）
 
 对每个 `status=working` 的 Worker，检查其 `session_id` 字段：
-
 ```
 python3 docs/system/workspace/scripts/runtime/a2a_task.py get --task-id <task_id>
 ```
-
-**有 session_id 的活跃 Worker**：
-- 可用 `curl -N http://localhost:18911/tasks/{task_id}/stream` 订阅 SSE 实时状态流
-- SSE 事件类型：`initial`（当前状态）、`state_update`（状态变更）
-- SSE 不阻塞 patrol：启动 curl 后台进程，下一轮读取收集到的更新
 
 **无 session_id 的 Worker**：
 - Worker 刚启动（session_id 尚未捕获），normal——本轮先跳过，下轮再检查
@@ -227,8 +227,13 @@ Worker 是独立 ACP session，由 Runtime 通过 A2A Server 管理。
 
 3. **多 Worker**：重复步骤 2。每次 `a2a-exit --state submitted --role worker` 创建一个独立 Worker task。
 
-4. **状态汇报**：Worker 完成后通过 A2A SSE `TaskStatusUpdateEvent` 通知状态变更。
-   你用 `tasks/list` 查询 Worker 完成状态。
+4. **状态汇报与 Decision Loop**：Worker 完成后通过 A2A SSE `TaskStatusUpdateEvent` 自动通知。
+   SSE 事件已在 prompt 的 "Worker 实时事件" 区域展示，无需手动查询。
+   
+   **Manager Decision Loop**（收到 Worker 完成后）：
+   - 委派 review subagent 评审 Worker 产出 → 达标/不达标
+   - 达标 → Manager a2a-exit state=completed，释放 Worker 槽位，看 scan 有无新任务
+   - 不达标 → wt-create 建新工位 → 重新委派 Worker
 
 ## 自愈：Worker 启动失败的修复
 
@@ -281,7 +286,7 @@ Freely 运行时环境中 PATH 已包含 `freely` 及项目脚本目录：
 | `a2a_task.py get --task-id <id>` | 查询单个 A2A task（含 session_id） | 检查 Worker session 状态 |
 | `a2a_task.py update --task-id <id> --status <state>` | 更新 A2A task 状态 | Worker 卡住需手动标记 |
 | `a2a_task.py prompt --task-id <id> --message "..."` | 通过 ACP session/prompt 干预 Worker | Worker 卡住、需即时纠偏 |
-| `curl -N http://localhost:18911/tasks/{task_id}/stream` | SSE 实时订阅 Worker 状态变更 | 长时间运行的 Worker 实时监督 |
+| SSE 自动推送（Runtime 已集成 stream_task/resubscribe） | Worker 状态变更实时通知 | 无需手动操作 |
 
 ### scan 刷新规则
 
