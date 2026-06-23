@@ -6,6 +6,12 @@
   废弃 delivery_status 列 + _restore_tasks() 修复 + filesystem_fallback deprecated。
   #3381 完整分析的最终结论——SSE 缺失是当前 5/6 问题的中枢。
   5 阶段递进：客户端基础→双写过渡→废弃轮询→服务端修复→文档验证。
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260623T100903Z-A`
 - title: 彻底实现 SSE — SSE 客户端 + 替代轮询 + 废弃 delivery_status
@@ -17,6 +23,12 @@
 ## M-20260623T005123Z-A
 - title: Flow documentation overhaul
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260623T005123Z-A`
 - title: docs: unify flow representation
@@ -28,6 +40,12 @@
 ## M-20260623T005139Z-A
 - title: wt-create --source platform-only + Manager feedback capability
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260623T005139Z-A`
 - title: feat: wt-create --source platform-only
@@ -39,6 +57,12 @@
 ## M-20260622T234854Z-A
 - title: Post-review quality — adapter integration + chat gate + cleanup
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260622T234854Z-A`
 - title: feat: post-review quality improvements
@@ -50,6 +74,12 @@
 ## M-20260622T021827Z-A
 - title: test-execution skill + pre-tests template + dev-loop quality steps
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260622T021827Z-A`
 - title: feat: test-execution skill + pre-tests + dev-loop quality
@@ -61,6 +91,12 @@
 ## M-20260622T021832Z-A
 - title: Post-review quality fixes — gitee state, repo reachability, skill markers
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260622T021832Z-A`
 - title: fix: post-review quality fixes
@@ -72,6 +108,12 @@
 ## M-20260621T202057Z-A
 - title: Batch infrastructure fixes — raw validation, comment blocking, PR ops, platform gate, docs
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260621T202057Z-A`
 - title: feat: batch implementation of 11 remaining issues
@@ -83,6 +125,12 @@
 ## M-20260622T123158Z-A
 - title: Agent Tool Policy — separate Manager/Worker tool constraints
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260622T123158Z-A`
 - title: feat: Agent Tool Policy in manager-agent.md and worker-agent.md
@@ -94,6 +142,12 @@
 ## M-20260618T035220Z-B
 - title: Semantic overlap detection in pr-merge-guarded
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260618T035220Z-B`
 - title: fix: semantic overlap detection
@@ -105,6 +159,12 @@
 ## M-20260617T095105Z-B
 - title: Remove dead CSV code paths
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260617T095105Z-B`
 - title: fix: remove dead CSV code paths
@@ -116,6 +176,12 @@
 ## M-20260617T063755Z-B
 - title: Replace inline sqlite3 session query with freely-db-cli
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260617T063755Z-B`
 - title: fix: replace inline sqlite3 with freely-db-cli
@@ -127,6 +193,12 @@
 ## M-20260621T005656Z-A
 - title: build_issue_index git ls-tree range discovery
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260621T005656Z-A`
 - title: fix: build_issue_index git ls-tree range discovery
@@ -138,6 +210,12 @@
 ## M-20260618T035220Z-A
 - title: Post-merge receipt check + actionable ref-transaction errors
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260618T035220Z-A`
 - title: fix: post-merge receipt check + actionable ref-transaction errors
@@ -149,6 +227,12 @@
 ## M-20260617T063755Z-A
 - title: A2A Phase 2 residual docs + CSV deprecation markers
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260617T063755Z-A`
 - title: fix: A2A Phase 2 docs + CSV deprecation
@@ -160,6 +244,12 @@
 ## M-20260617T051631Z-A
 - title: Frontend dynamic project list via adapter
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260617T051631Z-A`
 - title: fix: dynamic project list via adapter
@@ -171,6 +261,12 @@
 ## M-20260619T061448Z-A
 - title: A2A server h11 non-HTTP noise suppression
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260619T061448Z-A`
 - title: fix: suppress A2A server h11 non-HTTP noise
@@ -182,6 +278,12 @@
 ## M-20260620T142847Z-A
 - title: pr-review-guarded worktree detection + auto issue_id
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260620T142847Z-A`
 - title: fix: pr-review-guarded worktree detection + auto issue_id
@@ -193,6 +295,12 @@
 ## M-20260620T142838Z-A
 - title: cgrab YAML fallback + skill format docs
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260620T142838Z-A`
 - title: fix: cgrab YAML fallback + skill format docs
@@ -204,6 +312,12 @@
 ## M-20260617T130029Z-A
 - title: pr-create-guarded conflict handling — show conflicted files + abort
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260617T130029Z-A`
 - title: fix: pr-create-guarded conflict handling — show conflicted files + abort
@@ -215,6 +329,12 @@
 ## M-20260618T091721Z-A
 - title: Add CLAUDE.md — automatic AI governance rule loading
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260618T091721Z-A`
 - title: fix: add CLAUDE.md for automatic AI governance rule loading
@@ -226,6 +346,12 @@
 ## M-20260618T091116Z-A
 - title: Fix write_task_mode ordering — ensure DB daemon running first
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260618T091116Z-A`
 - title: fix: ensure DB daemon running before write_task_mode
@@ -237,6 +363,12 @@
 ## M-20260620T120020Z-A
 - title: Hotfix — remove 'local' from wt-close top-level code (PR #3165 regression)
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260620T120020Z-A`
 - title: hotfix: remove local from wt-close top-level code
@@ -248,6 +380,12 @@
 ## M-20260620T115242Z-A
 - title: wt-close closes absorbed I-* issue; issue-sync parent_raw fallback
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260620T115242Z-A`
 - title: fix: wt-close closes absorbed I-* issue; issue-sync parent_raw fallback
@@ -259,6 +397,12 @@
 ## M-20260620T113909Z-A
 - title: pr-review-guarded — auto-push review to all platforms
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260620T113909Z-A`
 - title: fix: pr-review-guarded auto-push review document to all platforms
@@ -270,6 +414,12 @@
 ## M-20260620T104526Z-A
 - title: Worker SSE Supervision — Session ID Pass-Through + Manager SSE Awareness
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260620T104526Z-A`
 - title: fix: A2A SSE supervision — store worker session_id, enable session/prompt intervention
@@ -281,6 +431,12 @@
 ## M-20260619T033758Z-A
 - title: login claude interactive slot naming + alias creation
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260619T033758Z-A`
 - title: login claude interactive slot naming + alias creation
@@ -292,6 +448,12 @@
 ## M-20260618T071502Z-A
 - title: pr-merge local merge replaces gh pr merge
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260618T071502Z-A`
 - title: pr-merge local merge replaces gh pr merge
@@ -303,6 +465,12 @@
 ## M-20260618T065221Z-A
 - title: pr-merge local merge + wt-create consistency check
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260618T065221Z-A`
 - title: pr-merge local merge + wt-create consistency
@@ -314,6 +482,12 @@
 ## M-20260618T054147Z-A
 - title: wt-close prune stale tracking refs
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260618T054147Z-A`
 - title: wt-close prune stale tracking refs
@@ -325,6 +499,12 @@
 ## M-20260618T051709Z-A
 - title: pr-merge review gate
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260618T051709Z-A`
 - title: pr-merge review gate
@@ -336,6 +516,12 @@
 ## M-20260618T050413Z-A
 - title: Scope pr-create untracked check to governance dirs
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260618T050413Z-A`
 - title: Scope pr-create untracked check to governance dirs
@@ -347,6 +533,12 @@
 ## M-20260618T044047Z-A
 - title: pr-merge explicit cd to develop + cleanliness check
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260618T044047Z-A`
 - title: pr-merge explicit cd to develop + cleanliness check
@@ -358,6 +550,12 @@
 ## M-20260618T043121Z-A
 - title: Fix pr-create dirty check + pr-merge develop check
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260618T043121Z-A`
 - title: Fix pr-create dirty check + pr-merge develop check
@@ -365,6 +563,12 @@
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260618T043121Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/pr-create-dirty-check-fix/code-reviews`
+
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
 
 ### committed_issues
 1. `I-20260618T040226Z-A`
@@ -377,6 +581,12 @@
 ## M-20260618T040226Z-A
 - title: pr-review-guarded — independent PR review gate
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260618T040226Z-A`
 - title: pr-review-guarded command + workflow integration
@@ -388,6 +598,12 @@
 ## M-20260618T031437Z-A
 - title: Fix wt-close remote branch deletion
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260618T031437Z-A`
 - title: Fix wt-close remote branch deletion
@@ -395,6 +611,12 @@
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260618T031437Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/wt-close-remote-delete-fix/code-reviews`
+
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
 
 ### committed_issues
 1. `I-20260618T024841Z-A`
@@ -407,6 +629,12 @@
 ## M-20260618T024841Z-A
 - title: Fix raw issue completeness — candidate sync + wt-close guard
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260618T024841Z-A`
 - title: Fix raw issue completeness
@@ -418,6 +646,12 @@
 ## M-20260618T015503Z-A
 - title: Fix worktree path architecture — docs/issues/ in worktree, not develop
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260618T015503Z-A`
 - title: Fix worktree path architecture
@@ -429,6 +663,12 @@
 ## M-20260617T160807Z-A
 - title: Fix wt-close --force local crash
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260617T160807Z-A`
 - title: Fix wt-close --force local crash
@@ -440,6 +680,12 @@
 ## M-20260617T160003Z-A
 - title: Fix wt-close --force overwriting pr-merge-guarded frontmatter
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260617T160003Z-A`
 - title: Fix wt-close --force overwriting pr-merge-guarded frontmatter
@@ -451,6 +697,12 @@
 ## M-20260617T145428Z-A
 - title: Fix freely-db-cli syntax + AGENTS.md flow + hook skill routing
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260617T145428Z-A`
 - title: Fix freely-db-cli syntax + AGENTS.md flow + hook skill routing
@@ -462,6 +714,12 @@
 ## M-20260617T133709Z-A
 - title: Fix gh pr merge receipt
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260617T133709Z-A`
 - title: Fix gh pr merge receipt
@@ -473,6 +731,12 @@
 ## M-20260617T131746Z-A
 - title: Fix pull || true
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260617T131746Z-A`
 - title: Fix pull || true
@@ -484,6 +748,12 @@
 ## M-20260617T124129Z-A
 - title: pr-merge-guarded absorbs wt-close frontmatter
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260617T124129Z-A`
 - title: pr-merge-guarded absorbs wt-close
@@ -495,6 +765,12 @@
 ## M-20260617T121221Z-A
 - title: Remove worker_prompts_csv leftovers
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260617T121221Z-A`
 - title: Remove worker_prompts_csv leftovers
@@ -506,6 +782,12 @@
 ## M-20260617T110109Z-A
 - title: Remove prompt_file from A2A layer
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260617T110109Z-A`
 - title: Remove prompt_file from A2A
@@ -517,6 +799,12 @@
 ## M-20260617T103956Z-A
 - title: Complete CSV elimination + A2A SendMessage delegation
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260617T103956Z-A`
 - title: Complete CSV elimination
@@ -528,6 +816,12 @@
 ## M-20260617T095105Z-A
 - title: A2A-Native Delegation — eliminate CSV, Task.message delegation
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260617T095105Z-A`
 - title: A2A-Native Delegation
@@ -539,6 +833,12 @@
 ## M-20260617T090413Z-A
 - title: REST routing for a2a-exit worker_prompts_csv
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260617T090413Z-A`
 - title: REST routing for a2a-exit
@@ -550,6 +850,12 @@
 ## M-20260617T090408Z-A
 - title: Fix worker_prompts_csv dead loop
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260617T090408Z-A`
 - title: Fix worker_prompts_csv dead loop
@@ -561,6 +867,12 @@
 ## M-20260617T063755Z-A
 - title: A2A Unified Data Flow — eliminate _db_rpc bypass + SSE
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260617T063755Z-A`
 - title: A2A Unified Data Flow
@@ -573,6 +885,12 @@
 ## M-20260617T055840Z-A
 - title: Merge Guard + Rebase Integrity — branch protection 拦截直接 merge + post-rewrite hook
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260617T055840Z-A`
 - title: Merge Guard + Rebase Integrity
@@ -590,6 +908,12 @@
 ## M-20260617T031719Z-A
 - title: ACP/A2A Final Review Fixes
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260617T031719Z-A`
 - title: ACP/A2A Final Review Fixes
@@ -601,6 +925,12 @@
 ## M-20260616T111514Z-A
 - title: write_config heredoc → Python 序列化 + 补齐 posture 字段
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260616T111514Z-A`
 - title: write_config heredoc → Python 序列化 + 补齐 posture 字段
@@ -615,6 +945,12 @@
 ## M-20260617T011030Z-A
 - title: ACP/A2A 架构重构 — 统一协议层 + 事件溯源 WAL + 跨 tool 委托 + 全状态暴露
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260617T011030Z-A`
 - title: ACP/A2A 架构重构 — 统一协议层 + 事件溯源 WAL + 跨 tool 委托 + 全状态暴露
@@ -625,6 +961,12 @@
 ## M-20260616T224707Z-A
 - title: ACP Session ID 格式污染修复 — 兼容三种 AI CLI 的 Session ID 提取
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260616T224707Z-A`
 - title: ACP Session ID 格式污染修复 — 兼容三种 AI CLI 的 Session ID 提取
@@ -635,6 +977,12 @@
 ## M-20260616T143914Z-A
 - title: 规范流程文档治理 — 在 AGENTS.md/CONSTITUTION/skills 中补齐完整规范流程
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260616T143914Z-A`
 - title: 规范流程文档治理 — AGENTS.md/CONSTITUTION/skills 完整化
@@ -645,6 +993,12 @@
 ## M-20260612T140944Z-A
 - title: 彻底 A2A 重构 — 官方 SDK + 双传输 + Agent 注册中心
 - status: completed
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260524T053214Z-A`
 - title: ACP session 生命周期接入 tool_switch_events
@@ -655,6 +1009,12 @@
 ## M-20260430-0010-A
 - title: Sync docs + fix governance-only paths for architecture docs
 - status: completed
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260511T0731Z-A`
 - title: 同工位并发防护
@@ -665,6 +1025,12 @@
 ## M-20260511T0407Z-A
 - title: handoff 表加 worker 汇报字段
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260511T0407Z-A`
 - title: handoff 表加 worker 汇报字段
@@ -675,6 +1041,12 @@
 ## M-20260511T0245Z-A
 - title: DB 路径统一
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260511T0245Z-A`
 - title: DB 路径统一
@@ -685,6 +1057,12 @@
 ## M-20260511T0229Z-A
 - title: worker prompt 注入 handoff 汇报指令
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260511T0229Z-A`
 - title: worker prompt 注入 handoff 汇报指令
@@ -695,6 +1073,12 @@
 ## M-20260511T0019Z-A
 - title: sync 管道改直接 SQLite 查询
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260511T0019Z-A`
 - title: sync 管道改直接 SQLite 查询
@@ -705,6 +1089,12 @@
 ## M-20260510T1853Z-A
 - title: 分支+工位完整性检查
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260510T1853Z-A`
 - title: 分支+工位完整性检查
@@ -715,6 +1105,12 @@
 ## M-20260510T1840Z-A
 - title: 分支校验不可绕过
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260510T1840Z-A`
 - title: 分支校验不可绕过
@@ -725,6 +1121,12 @@
 ## M-20260510T1339Z-A
 - title: wt-create 创建顺序重构
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260510T1339Z-A`
 - title: wt-create 创建顺序重构
@@ -735,6 +1137,12 @@
 ## M-20260510T1326Z-A
 - title: init 分支名校验
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260510T1326Z-A`
 - title: init 分支名校验
@@ -745,6 +1153,12 @@
 ## M-20260510T1318Z-A
 - title: handoff.py insert 支持 exit_kind
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260510T1318Z-A`
 - title: handoff.py insert 支持 exit_kind
@@ -755,6 +1169,12 @@
 ## M-20260510T0856Z-A
 - title: mode_just_switched 豁免
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260510T0856Z-A`
 - title: mode_just_switched 豁免
@@ -765,6 +1185,12 @@
 ## M-20260510T0112Z-A
 - title: L223 task_mode wait 判断修复
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260510T0112Z-A`
 - title: L223 task_mode wait 判断修复
@@ -775,6 +1201,12 @@
 ## M-20260508T045527Z-A
 - title: 删除废弃扫描脚本
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260508T045527Z-A`
 - title: 删除废弃扫描脚本
@@ -785,6 +1217,12 @@
 ## M-20260508T050922Z-A
 - title: 门禁收口链路修复
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260508T050922Z-A`
 - title: 门禁收口链路修复
@@ -835,6 +1273,12 @@ routing_policy:
 ## M-20260508T120000Z-A
 - title: wt-create fix
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260508T120000Z-A`
 - title: wt-create fix
@@ -848,6 +1292,12 @@ routing_policy:
 ## M-20260507T143546Z-A
 - title: platform pull title standardization
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260507T143546Z-A`
 - title: platform pull title standardization
@@ -860,6 +1310,12 @@ routing_policy:
 ## M-20260508T005431Z-A
 - title: skill standardization
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260508T005431Z-A`
 - title: skill standardization
@@ -871,6 +1327,12 @@ routing_policy:
 ## M-20260507T143545Z-A
 - title: timestamp seconds upgrade
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260507T143545Z-A`
 - title: timestamp seconds upgrade
@@ -883,6 +1345,12 @@ routing_policy:
 ## M-20260508T004541Z-A
 - title: skill ref cleanup
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260508T004541Z-A`
 - title: skill ref cleanup
@@ -896,6 +1364,12 @@ routing_policy:
 ## M-20260508T011858Z-A
 - title: skill gate alignment
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260508T011858Z-A`
 - title: skill gate alignment
@@ -908,6 +1382,12 @@ routing_policy:
 ## M-20260507T143544Z-A
 - title: raw-issue-pull interception guard
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260507T143544Z-A`
 - title: raw-issue-pull interception guard + CLI dispatch
@@ -920,6 +1400,12 @@ routing_policy:
 ## M-20260507T0700Z-A
 - title: unified platform layer
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260507T0700Z-A`
 - title: unified platform layer
@@ -931,6 +1417,12 @@ routing_policy:
 ## M-20260507T0730Z-A
 - title: wt-create --source parameter
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260507T0730Z-A`
 - title: wt-create --source parameter
@@ -942,6 +1434,12 @@ routing_policy:
 ## M-20260507T0600Z-A
 - title: raw-issue-pull
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260507T0600Z-A`
 - title: raw-issue-pull
@@ -953,6 +1451,12 @@ routing_policy:
 ## M-20260507T0300Z-A
 - title: GATE 1 timestamp check
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260507T0300Z-A`
 - title: GATE 1 timestamp check
@@ -964,6 +1468,12 @@ routing_policy:
 ## M-20260507T0200Z-A
 - title: promoted gate fix
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260507T0200Z-A`
 - title: promoted gate fix
@@ -975,6 +1485,12 @@ routing_policy:
 ## M-20260507T0100Z-A
 - title: fix-execution branch naming
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260507T0100Z-A`
 - title: fix-execution branch naming
@@ -987,6 +1503,12 @@ routing_policy:
 
 - title: pr-merge-guarded fix/* whitelist
 - status: active
+
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
 
 ### committed_issues
 1. `I-20260506T1400Z-A`
@@ -1002,6 +1524,12 @@ routing_policy:
 - title: Skill rename to B1_IBM/B2_IBM + I→B→M skeleton
 - status: active
 
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260506T1200Z-A`
 - title: Skill rename to B1_IBM/B2_IBM + I→B→M skeleton
@@ -1015,6 +1543,12 @@ routing_policy:
 
 - title: wt-create dual worktree creation
 - status: active
+
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
 
 ### committed_issues
 1. `I-20260506T1230Z-A`
@@ -1033,6 +1567,12 @@ routing_policy:
 - source_candidates: `docs/pre-brainstorms/20260306-0248--issue-brainstorm-routing-guard/candidates.md`
 - intent: 把首跳路由治理候选正式纳入 milestone，避免 Freely 自己继续依赖悬空 candidate 工作
 - why_now: 这批项定义 Freely 如何发现上下文、读取 milestone、并路由到下一跳 skill；如果 milestone 自身不先落盘，Freely 的狗粮链路就是断的
+
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
 
 ### committed_issues
 1. `I-20260503-0200-A`
@@ -1242,6 +1782,12 @@ routing_policy:
 
 
 
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 
 7. `I-20260502-0500-A`
@@ -1291,7 +1837,19 @@ routing_policy:
   - `docs/pre-brainstorms/20260503-1235--auto-recovery-b1/candidates.md` (B1 materialization)
 - next_action: `Merge to develop.`
 
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
+
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
 
 ### committed_issues
 
@@ -1316,17 +1874,41 @@ routing_policy:
 - intent: 把“backend-core-first + frontend-probe-from-day-1”收敛为 Freely 自举开发自己的正式候选批次，避免继续只有后端结论、没有产品面验证闭环
 - why_now: Freely 的目标本身就是防止 AI 跑偏；如果自举开发中每个后端增量都不能立刻被前端观察、打断和回放，狗粮链路仍然不完整
 
-### committed_issues
-
-- none currently
-
-### committed_issues
-
-- none currently
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
 
 ### committed_issues
 
 - none currently
+
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
+### committed_issues
+
+- none currently
+
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
+### committed_issues
+
+- none currently
+
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
 
 ### committed_issues
 1. `I-20260508T111130Z-A`
@@ -1338,6 +1920,12 @@ routing_policy:
 ## M-20260508T124041Z-A
 - title: wt-create pull defer
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260508T124041Z-A`
 - title: wt-create pull deferred to after worktree creation
@@ -1348,6 +1936,12 @@ routing_policy:
 ## M-20260508T133423Z-A
 - title: raw-issue-pull fix
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260508T133423Z-A`
 - title: raw-issue-pull target to pwd + fix/feature guard
@@ -1358,6 +1952,12 @@ routing_policy:
 ## M-20260508T121541Z-A
 - title: platform-adapter title key fix
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260508T121541Z-A`
 - title: platform-adapter title key fix
@@ -1368,6 +1968,12 @@ routing_policy:
 ## M-20260508T154706Z-A
 - title: wt-create skill name + reminder
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260508T154706Z-A`
 - title: wt-create skill name + post-creation reminder
@@ -1378,6 +1984,12 @@ routing_policy:
 ## M-20260508T232413Z-A
 - title: merge error IBM guidance
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260508T232413Z-A`
 - title: pr-merge-guarded IBM phase guidance
@@ -1394,6 +2006,12 @@ routing_policy:
 ## M-20260508T225041Z-A
 - title: ACP bridge restart storm
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260510T0112Z-A`
 - title: raw issue 正文注入治理提醒
@@ -1404,6 +2022,12 @@ routing_policy:
 ## M-20260509T090210Z-A
 - title: handoff SQLite refactor
 - status: completed
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260509T090210Z-A`
 - title: handoff SQLite refactor
@@ -1414,6 +2038,12 @@ routing_policy:
 ## M-20260509T024559Z-A
 - title: multi-project isolation
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260509T024559Z-A`
 - title: multi-project isolation architecture
@@ -1424,6 +2054,12 @@ routing_policy:
 ## M-20260517T082422Z-A
 - title: supervisor bash rc=0 crash (absorbed)
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260518T020406Z-A`
 - title: chats 表扩展 conversation_id + chat-message 类型 + scan 对齐
@@ -1434,6 +2070,12 @@ routing_policy:
 ## M-20260519T004246Z-A
 - title: agent 文档修复 — handoff 必填/互斥字段对齐 + 路径修正
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260513T040512Z-A`
 - title: task-lifecycle-scan 批量化 — 1+3 阶段扫描替代 O(n) API 逐项查询
@@ -1444,6 +2086,12 @@ routing_policy:
 ## M-20260506T1000Z-A
 - title: supervisor 主循环前置 task_mode wait 门禁
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260506T1000Z-A`
 - title: supervisor 主循环 select_launch_kind 前添加 task_mode=wait 门禁
@@ -1453,6 +2101,12 @@ routing_policy:
 ## M-20260521T012042Z-A
 - title: Manager keepalive stale-pid 扫描 + Worker ACP 初始化超时自愈
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260521T032154Z-A`
 - milestone: M-20260521T032154Z-A
@@ -1462,6 +2116,12 @@ routing_policy:
 ## M-20260521T095313Z-A
 - title: AI_TOOL alias type-based resolution
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260522T045227Z-A`
 - title: probe say hi
@@ -1471,6 +2131,12 @@ routing_policy:
 ## M-20260522T051507Z-A
 - title: slot full name compat
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260522T051507Z-A`
 - title: slot full name compat
@@ -1481,6 +2147,12 @@ routing_policy:
 ## M-20260522T053702Z-A
 - title: cmd_login apikey unified
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260522T053702Z-A`
 - title: cmd_login apikey unified
@@ -1492,6 +2164,12 @@ routing_policy:
 ## M-20260522T071901Z-A
 - title: slot full-name final fixes
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260522T071901Z-A`
 - title: slot full-name final fixes
@@ -1502,6 +2180,12 @@ routing_policy:
 ## M-20260522T072450Z-A
 - title: fix list double prefix
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260522T072450Z-A`
 - title: fix list double prefix
@@ -1512,6 +2196,12 @@ routing_policy:
 ## M-20260522T075012Z-A
 - title: fix help text
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260522T075012Z-A`
 - title: fix help text
@@ -1522,6 +2212,12 @@ routing_policy:
 ## M-20260522T075839Z-A
 - title: switch auto-extract tool
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260522T075839Z-A`
 - title: switch auto-extract tool
@@ -1532,6 +2228,12 @@ routing_policy:
 ## M-20260522T081853Z-A
 - title: update fallback priority
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260522T081853Z-A`
 - title: update fallback priority
@@ -1542,6 +2244,12 @@ routing_policy:
 ## M-20260522T083133Z-A
 - title: switch auto all tools
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260522T083133Z-A`
 - title: switch auto all tools
@@ -1552,6 +2260,12 @@ routing_policy:
 ## M-20260522T085354Z-A
 - title: codex account config update
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260522T085354Z-A`
 - title: codex account config update
@@ -1562,6 +2276,12 @@ routing_policy:
 ## M-20260522T091606Z-A
 - title: default adapter acp
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260522T091606Z-A`
 - title: default adapter acp
@@ -1572,6 +2292,12 @@ routing_policy:
 ## M-20260522T095721Z-A
 - title: codex acp full lifecycle
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260522T095721Z-A`
 - title: codex acp full lifecycle
@@ -1583,6 +2309,12 @@ routing_policy:
 ## M-20260524T230541Z-A
 - title: 开发流程描述修正（skip-ibm docs governance）
 - status: completed
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260524T230541Z-A`
 - title: 开发流程描述修正（5个文件）
@@ -1594,6 +2326,12 @@ routing_policy:
 ## M-20260603T142127Z-A
 - title: fix scan cycling — issue-sync batch create + cross-batch dedup
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260603T142127Z-A`
 - title: fix scan cycling — issue-sync batch create linked I-* items + cross-batch dedup
@@ -1606,6 +2344,12 @@ routing_policy:
 ## M-20260612T000223Z-A
 - title: A2A 协议替换 Freely Handoff 架构重构
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260612T000223Z-A`
 - title: A2A 协议替换 Freely Handoff 架构重构
@@ -1617,6 +2361,12 @@ routing_policy:
 ## M-20260615T001626Z-A
 - title: 移除 A2A 文本 JSON 解析 Fallback (Phase 1+2)
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260615T001626Z-A`
 - title: 移除 A2A 文本 JSON 解析 Fallback (Phase 1+2)
@@ -1628,6 +2378,12 @@ routing_policy:
 ## M-20260616T030213Z-A
 - title: Align governance-merge-gate scope with LAWS.md
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260616T030213Z-A`
 - issue_id: I-20260616T030213Z-A
@@ -1639,6 +2395,12 @@ routing_policy:
 ## M-20260616T033325Z-A
 - title: Pre-merge governance gate check
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260616T033325Z-A`
 - issue_id: I-20260616T033325Z-A
@@ -1650,6 +2412,12 @@ routing_policy:
 ## M-20260616T044825Z-A
 - title: Remove BRIDGE_TIMEOUT absolute cap for session/prompt
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260616T083810Z-A`
 - issue_id: I-20260616T083810Z-A
@@ -1661,6 +2429,12 @@ routing_policy:
 ## M-20260616T044030Z-A
 - title: Complete config.toml migration — clean break, TOML-only, zero config.env
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260616T044030Z-A`
 - title: config.toml complete migration — clean break, TOML-only
@@ -1671,6 +2445,12 @@ routing_policy:
 ## M-20260616T110714Z-parse-env-removal
 - title: config.toml clean break — parse_env_file removal + quality fixes
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260616T110714Z-parse-env-removal`
 - issue_id: I-20260616T110714Z-parse-env-removal
@@ -1682,6 +2462,12 @@ routing_policy:
 ## M-20260616T084121Z-platform-sync-batch
 - title: Platform Sync Batch — raw-20260616T084121Z
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260616T084121Z-platform-sync-batch`
 - issue_id: I-20260616T084121Z-platform-sync-batch
@@ -1700,6 +2486,12 @@ routing_policy:
 ## M-20260618T100000Z-A
 - title: wt-create chat-inbox ID normalization fix
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260618T100000Z-A`
 - title: wt-create chat-inbox ID normalization
@@ -1711,6 +2503,12 @@ routing_policy:
 ## M-20260619T045626Z-A
 - title: pr-merge-guarded flock concurrency guard
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260619T045626Z-A`
 - title: pr-merge-guarded flock concurrency
@@ -1721,6 +2519,12 @@ routing_policy:
 ## M-20260619T045410Z-A
 - title: pr-merge-guarded PR close timing fix
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260619T045410Z-A`
 - title: PR close after merge success
@@ -1731,6 +2535,12 @@ routing_policy:
 ## M-20260620T083454Z-A
 - title: lifecycle scan phase_state filtering
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260620T083454Z-A`
 - title: fix lifecycle scan phase_state filtering
@@ -1747,6 +2557,12 @@ routing_policy:
 ## M-20260621T043842Z-A
 - title: worker fork A2A socket + JSON parse + scan filter fix
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260621T043842Z-A`
 - title: fix worker fork A2A socket + systemic JSON parse + scan filter
@@ -1763,6 +2579,12 @@ routing_policy:
 ## M-20260621T063130Z-A
 - title: raw-key-driven wt-close + issue-sync close fallback
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260621T063130Z-A`
 - title: raw-key-driven wt-close + issue-sync close fallback
@@ -1779,6 +2601,12 @@ routing_policy:
 ## M-20260621T090002Z-A
 - title: align verification gate rebind path
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260621T090002Z-A`
 - title: align verification gate rebind path
@@ -1794,6 +2622,12 @@ routing_policy:
 ## M-20260621T092609Z-A
 - title: stop-side worker state preservation for restart resume
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260621T092609Z-A`
 - title: stop-side worker state preservation
@@ -1809,6 +2643,12 @@ routing_policy:
 ## M-20260621T081426Z-A
 - title: complete intake migration + stale cleanup
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260621T081426Z-A`
 - title: complete intake migration + stale cleanup
@@ -1823,6 +2663,12 @@ routing_policy:
 ## M-20260621T081814Z-A
 - title: Manager review gate + proactive steer prompt
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260621T081814Z-A`
 - title: Manager review gate + proactive steer prompt
@@ -1838,6 +2684,12 @@ routing_policy:
 ## M-20260622T003231Z-A
 - title: Fix pre-push.sh local keyword for macOS bash compat
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260622T003231Z-A`
 - title: Fix pre-push.sh local keyword for macOS bash compat
@@ -1853,6 +2705,12 @@ routing_policy:
 ## M-20260622T021126Z-A
 - title: Platform sync batch
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260622T021126Z-A`
 - title: Platform sync batch
@@ -1863,6 +2721,12 @@ routing_policy:
 ## M-20260622T023441Z-A
 - title: Platform sync batch
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260622T023441Z-A`
 - title: Platform sync batch
@@ -1873,6 +2737,12 @@ routing_policy:
 ## M-20260622T024321Z-A
 - title: Platform sync batch
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260622T024321Z-A`
 - title: Platform sync batch
@@ -1883,6 +2753,12 @@ routing_policy:
 ## M-20260622T025044Z-A
 - title: Platform sync batch
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260622T025044Z-A`
 - title: Platform sync batch
@@ -1893,6 +2769,12 @@ routing_policy:
 ## M-20260622T025736Z-A
 - title: Platform sync batch
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260622T025736Z-A`
 - title: Platform sync batch
@@ -1903,6 +2785,12 @@ routing_policy:
 ## M-20260622T030420Z-A
 - title: Platform sync batch
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260622T030420Z-A`
 - title: Platform sync batch
@@ -1913,6 +2801,12 @@ routing_policy:
 ## M-20260622T031557Z-A
 - title: Platform sync batch
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260622T031557Z-A`
 - title: Platform sync batch
@@ -1923,6 +2817,12 @@ routing_policy:
 ## M-20260622T000649Z-A
 - title: --reason gate for all CLI bypass mechanisms
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260622T000649Z-A`
 - title: --reason gate for all CLI bypass mechanisms
@@ -1935,6 +2835,12 @@ routing_policy:
 ## M-20260622T100348Z-A
 - title: --reason documentation in all command --help outputs
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260622T100348Z-A`
 - title: --reason documentation in all command --help outputs
@@ -1947,6 +2853,12 @@ routing_policy:
 ## M-20260622T104129Z-A
 - title: FREELY_SKIP env var bypass requires reason regex
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260622T104129Z-A`
 - title: FREELY_SKIP env var bypass requires reason regex
@@ -1959,6 +2871,12 @@ routing_policy:
 ## M-20260622T110050Z-A
 - title: wt-close error messages guide user instead of pushing --force
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260622T110050Z-A`
 - title: wt-close error messages guide user instead of pushing --force
@@ -1971,6 +2889,12 @@ routing_policy:
 ## M-20260622T113847Z-A
 - title: wt-close --platform-only for orphan issue platform close
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260622T113847Z-A`
 - title: wt-close --platform-only for orphan issue platform close
@@ -1983,6 +2907,12 @@ routing_policy:
 ## M-20260622T114625Z-A
 - title: --platform-only bypass worktree guard
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260622T114625Z-A`
 - title: --platform-only bypass worktree guard
@@ -1994,6 +2924,12 @@ routing_policy:
 ## M-20260622T115249Z-A
 - title: Fix --platform-only nested platform_ids reading
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260622T115249Z-A`
 - title: Fix --platform-only nested platform_ids reading
@@ -2004,6 +2940,12 @@ routing_policy:
 ## M-20260622T120046Z-A
 - title: Fix --platform-only nested platform_ids YAML reading
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260622T120046Z-A`
 - title: Fix --platform-only nested platform_ids YAML reading
@@ -2016,6 +2958,12 @@ routing_policy:
 ## M-20260622T123204Z-A
 - title: platform-adapter close CLI
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260622T123204Z-A`
 - title: platform-adapter close CLI
@@ -2027,6 +2975,12 @@ routing_policy:
 ## M-20260622T131109Z-A
 - title: wt-close accept absorbed state
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260622T131109Z-A`
 - title: wt-close accept absorbed state
@@ -2037,6 +2991,12 @@ routing_policy:
 ## M-20260623T022909Z-A
 - title: fix task-lifecycle-scan.py platform_adapter import (hyphenated filename)
 - status: active
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+
 ### committed_issues
 1. `I-20260623T022909Z-A`
 - title: fix task-lifecycle-scan.py platform_adapter import (hyphenated filename)

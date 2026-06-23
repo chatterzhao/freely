@@ -86,3 +86,11 @@
 - [ ] delivery_status 依赖为零（grep 确认）
 - [ ] 79 条 stale pending 不再出现
 - [ ] _restore_tasks 在重启后正确恢复 SSE 订阅
+
+### T5.3 — SSE 后重新评估清单（来自 B1 brainstorms）
+- [ ] Manager task 腐烂是否不再复现
+- [ ] 79 条 stale pending 是否不再出现
+- [ ] filesystem_fallback 是否可以安全删除（后续 issue）
+- [ ] parse_a2a_task_json_reply 的兜底修复是否仍需要（如果需要，优先级降低）
+- [ ] L0-L3 兜底的优先级是否需要调整
+- [ ] CSV 清理（#3387）是否可以安全执行
