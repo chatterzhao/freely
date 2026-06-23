@@ -14,7 +14,7 @@
 ### committed_issues
 1. `I-20260623T100903Z-A`
 - title: 彻底实现 SSE — SSE 客户端 + 替代轮询 + 废弃 delivery_status
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/sse-full-implementation/code-reviews`
@@ -32,7 +32,7 @@
 ### committed_issues
 1. `I-20260623T005123Z-A`
 - title: docs: unify flow representation
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260623T005123Z-A/issue.md`
 - verification_artifact_dir: `docs/system/workspace/skills`
@@ -43,7 +43,7 @@
 ### committed_issues
 1. `I-20260623T005139Z-A`
 - title: feat: wt-create --source platform-only
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260623T005139Z-A/issue.md`
 - verification_artifact_dir: `docs/system/workspace/scripts`
@@ -54,7 +54,7 @@
 ### committed_issues
 1. `I-20260622T234854Z-A`
 - title: feat: post-review quality improvements
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260622T234854Z-A/issue.md`
 - verification_artifact_dir: `bin/`
@@ -65,7 +65,7 @@
 ### committed_issues
 1. `I-20260622T021827Z-A`
 - title: feat: test-execution skill + pre-tests + dev-loop quality
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260622T021827Z-A/issue.md`
 - verification_artifact_dir: `docs/system/workspace/skills`
@@ -76,7 +76,7 @@
 ### committed_issues
 1. `I-20260622T021832Z-A`
 - title: fix: post-review quality fixes
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260622T021832Z-A/issue.md`
 - verification_artifact_dir: `docs/system/workspace/scripts`
@@ -87,7 +87,7 @@
 ### committed_issues
 1. `I-20260621T202057Z-A`
 - title: feat: batch implementation of 11 remaining issues
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260621T202057Z-A/issue.md`
 - verification_artifact_dir: `docs/system/workspace/scripts`
@@ -98,7 +98,7 @@
 ### committed_issues
 1. `I-20260622T123158Z-A`
 - title: feat: Agent Tool Policy in manager-agent.md and worker-agent.md
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260622T123158Z-A/issue.md`
 - verification_artifact_dir: `docs/system/workspace/agents`
@@ -109,7 +109,7 @@
 ### committed_issues
 1. `I-20260618T035220Z-B`
 - title: fix: semantic overlap detection
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260618T035220Z-B/issue.md`
 - verification_artifact_dir: `docs/epics/semantic-overlap/code-reviews`
@@ -120,7 +120,7 @@
 ### committed_issues
 1. `I-20260617T095105Z-B`
 - title: fix: remove dead CSV code paths
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260617T095105Z-B/issue.md`
 - verification_artifact_dir: `docs/epics/csv-dead-code-removal/code-reviews`
@@ -131,7 +131,7 @@
 ### committed_issues
 1. `I-20260617T063755Z-B`
 - title: fix: replace inline sqlite3 with freely-db-cli
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260617T063755Z-B/issue.md`
 - verification_artifact_dir: `docs/epics/sqlite3-migration/code-reviews`
@@ -142,7 +142,7 @@
 ### committed_issues
 1. `I-20260621T005656Z-A`
 - title: fix: build_issue_index git ls-tree range discovery
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260621T005656Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/gate-range-ls-tree/code-reviews`
@@ -153,7 +153,7 @@
 ### committed_issues
 1. `I-20260618T035220Z-A`
 - title: fix: post-merge receipt check + actionable ref-transaction errors
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260618T035220Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/semantic-conflict-receipt/code-reviews`
@@ -164,7 +164,7 @@
 ### committed_issues
 1. `I-20260617T063755Z-A`
 - title: fix: A2A Phase 2 docs + CSV deprecation
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260617T063755Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/a2a-phase2-csv-docs/code-reviews`
@@ -175,7 +175,7 @@
 ### committed_issues
 1. `I-20260617T051631Z-A`
 - title: fix: dynamic project list via adapter
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260617T051631Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/frontend-dynamic-project-list/code-reviews`
@@ -186,7 +186,7 @@
 ### committed_issues
 1. `I-20260619T061448Z-A`
 - title: fix: suppress A2A server h11 non-HTTP noise
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260619T061448Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/a2a-h11-noise/code-reviews`
@@ -197,7 +197,7 @@
 ### committed_issues
 1. `I-20260620T142847Z-A`
 - title: fix: pr-review-guarded worktree detection + auto issue_id
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260620T142847Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/pr-review-worktree-detection/code-reviews`
@@ -208,7 +208,7 @@
 ### committed_issues
 1. `I-20260620T142838Z-A`
 - title: fix: cgrab YAML fallback + skill format docs
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260620T142838Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/cgrab-yaml-fallback/code-reviews`
@@ -219,7 +219,7 @@
 ### committed_issues
 1. `I-20260617T130029Z-A`
 - title: fix: pr-create-guarded conflict handling — show conflicted files + abort
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260617T130029Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/pr-create-conflict-abort/code-reviews`
@@ -230,7 +230,7 @@
 ### committed_issues
 1. `I-20260618T091721Z-A`
 - title: fix: add CLAUDE.md for automatic AI governance rule loading
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260618T091721Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/add-claude-md-governance/code-reviews`
@@ -241,7 +241,7 @@
 ### committed_issues
 1. `I-20260618T091116Z-A`
 - title: fix: ensure DB daemon running before write_task_mode
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260618T091116Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/write-task-mode-ordering/code-reviews`
@@ -252,7 +252,7 @@
 ### committed_issues
 1. `I-20260620T120020Z-A`
 - title: hotfix: remove local from wt-close top-level code
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260620T120020Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/wt-close-local-fix/verify`
@@ -263,7 +263,7 @@
 ### committed_issues
 1. `I-20260620T115242Z-A`
 - title: fix: wt-close closes absorbed I-* issue; issue-sync parent_raw fallback
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260620T115242Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/i-star-wt-close-fix/verify`
@@ -274,7 +274,7 @@
 ### committed_issues
 1. `I-20260620T113909Z-A`
 - title: fix: pr-review-guarded auto-push review document to all platforms
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260620T113909Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/pr-review-push-fix/verify`
@@ -285,7 +285,7 @@
 ### committed_issues
 1. `I-20260620T104526Z-A`
 - title: fix: A2A SSE supervision — store worker session_id, enable session/prompt intervention
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260620T104526Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/worker-sse-supervision/verify`
@@ -296,7 +296,7 @@
 ### committed_issues
 1. `I-20260619T033758Z-A`
 - title: login claude interactive slot naming + alias creation
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260619T033758Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/login-claude-interactive-slot/code-reviews`
@@ -307,7 +307,7 @@
 ### committed_issues
 1. `I-20260618T071502Z-A`
 - title: pr-merge local merge replaces gh pr merge
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260618T071502Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/pr-merge-local-merge/code-reviews`
@@ -318,7 +318,7 @@
 ### committed_issues
 1. `I-20260618T065221Z-A`
 - title: pr-merge local merge + wt-create consistency
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260618T065221Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/pr-merge-local-merge/code-reviews`
@@ -329,7 +329,7 @@
 ### committed_issues
 1. `I-20260618T054147Z-A`
 - title: wt-close prune stale tracking refs
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260618T054147Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/wt-close-prune-stale-refs/code-reviews`
@@ -340,7 +340,7 @@
 ### committed_issues
 1. `I-20260618T051709Z-A`
 - title: pr-merge review gate
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260618T051709Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/pr-merge-review-gate/code-reviews`
@@ -351,7 +351,7 @@
 ### committed_issues
 1. `I-20260618T050413Z-A`
 - title: Scope pr-create untracked check to governance dirs
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260618T050413Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/pr-create-untracked-refine/code-reviews`
@@ -362,7 +362,7 @@
 ### committed_issues
 1. `I-20260618T044047Z-A`
 - title: pr-merge explicit cd to develop + cleanliness check
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260618T044047Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/pr-merge-develop-check/code-reviews`
@@ -373,7 +373,7 @@
 ### committed_issues
 1. `I-20260618T043121Z-A`
 - title: Fix pr-create dirty check + pr-merge develop check
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260618T043121Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/pr-create-dirty-check-fix/code-reviews`
@@ -381,7 +381,7 @@
 ### committed_issues
 1. `I-20260618T040226Z-A`
 - title: pr-review-guarded command + workflow integration
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260618T040226Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/pr-review-guarded/code-reviews`
@@ -392,7 +392,7 @@
 ### committed_issues
 1. `I-20260618T040226Z-A`
 - title: pr-review-guarded command + workflow integration
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260618T040226Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/pr-review-guarded/code-reviews`
@@ -403,7 +403,7 @@
 ### committed_issues
 1. `I-20260618T031437Z-A`
 - title: Fix wt-close remote branch deletion
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260618T031437Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/wt-close-remote-delete-fix/code-reviews`
@@ -411,7 +411,7 @@
 ### committed_issues
 1. `I-20260618T024841Z-A`
 - title: Fix raw issue completeness
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260618T024841Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/raw-issue-review-fixes/code-reviews`
@@ -422,7 +422,7 @@
 ### committed_issues
 1. `I-20260618T024841Z-A`
 - title: Fix raw issue completeness
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260618T024841Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/raw-issue-review-fixes/code-reviews`
@@ -433,7 +433,7 @@
 ### committed_issues
 1. `I-20260618T015503Z-A`
 - title: Fix worktree path architecture
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260618T015503Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/worktree-path-architecture/code-reviews`
@@ -444,7 +444,7 @@
 ### committed_issues
 1. `I-20260617T160807Z-A`
 - title: Fix wt-close --force local crash
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260617T160807Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/wt-close-local-fix/code-reviews`
@@ -455,7 +455,7 @@
 ### committed_issues
 1. `I-20260617T160003Z-A`
 - title: Fix wt-close --force overwriting pr-merge-guarded frontmatter
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260617T160003Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/wt-close-force-overwrite-fix/code-reviews`
@@ -466,7 +466,7 @@
 ### committed_issues
 1. `I-20260617T145428Z-A`
 - title: Fix freely-db-cli syntax + AGENTS.md flow + hook skill routing
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260617T145428Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/freely-db-cli-agents-fix/code-reviews`
@@ -477,7 +477,7 @@
 ### committed_issues
 1. `I-20260617T133709Z-A`
 - title: Fix gh pr merge receipt
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260617T133709Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/gh-merge-receipt/code-reviews`
@@ -488,7 +488,7 @@
 ### committed_issues
 1. `I-20260617T131746Z-A`
 - title: Fix pull || true
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260617T131746Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/fix-pull-true/code-reviews`
@@ -499,7 +499,7 @@
 ### committed_issues
 1. `I-20260617T124129Z-A`
 - title: pr-merge-guarded absorbs wt-close
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260617T124129Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/merge-absorbs-close/code-reviews`
@@ -510,7 +510,7 @@
 ### committed_issues
 1. `I-20260617T121221Z-A`
 - title: Remove worker_prompts_csv leftovers
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260617T121221Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/remove-worker-csv/code-reviews`
@@ -521,7 +521,7 @@
 ### committed_issues
 1. `I-20260617T110109Z-A`
 - title: Remove prompt_file from A2A
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260617T110109Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/remove-prompt-file/code-reviews`
@@ -532,7 +532,7 @@
 ### committed_issues
 1. `I-20260617T103956Z-A`
 - title: Complete CSV elimination
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260617T103956Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/eliminate-csv/code-reviews`
@@ -543,7 +543,7 @@
 ### committed_issues
 1. `I-20260617T095105Z-A`
 - title: A2A-Native Delegation
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260617T095105Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/a2a-native-delegation/code-reviews`
@@ -554,7 +554,7 @@
 ### committed_issues
 1. `I-20260617T090413Z-A`
 - title: REST routing for a2a-exit
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260617T090413Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/fix-rest-routing/code-reviews`
@@ -565,7 +565,7 @@
 ### committed_issues
 1. `I-20260617T090408Z-A`
 - title: Fix worker_prompts_csv dead loop
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260617T090408Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/fix-worker-prompts-csv/code-reviews`
@@ -576,7 +576,7 @@
 ### committed_issues
 1. `I-20260617T063755Z-A`
 - title: A2A Unified Data Flow
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260617T063755Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/a2a-unified-data-flow/code-reviews`
@@ -588,7 +588,7 @@
 ### committed_issues
 1. `I-20260617T055840Z-A`
 - title: Merge Guard + Rebase Integrity
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260617T055840Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/merge-guard-rebase-integrity/code-reviews`
@@ -605,7 +605,7 @@
 ### committed_issues
 1. `I-20260617T031719Z-A`
 - title: ACP/A2A Final Review Fixes
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260617T031719Z-A/issue.md`
 
@@ -616,7 +616,7 @@
 ### committed_issues
 1. `I-20260616T111514Z-A`
 - title: write_config heredoc → Python 序列化 + 补齐 posture 字段
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260616T111514Z-A/issue.md`
 
@@ -630,7 +630,7 @@
 ### committed_issues
 1. `I-20260617T011030Z-A`
 - title: ACP/A2A 架构重构 — 统一协议层 + 事件溯源 WAL + 跨 tool 委托 + 全状态暴露
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260617T011030Z-A/issue.md`
 
@@ -640,7 +640,7 @@
 ### committed_issues
 1. `I-20260616T224707Z-A`
 - title: ACP Session ID 格式污染修复 — 兼容三种 AI CLI 的 Session ID 提取
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260616T224707Z-A/issue.md`
 
@@ -650,7 +650,7 @@
 ### committed_issues
 1. `I-20260616T143914Z-A`
 - title: 规范流程文档治理 — AGENTS.md/CONSTITUTION/skills 完整化
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260616T143914Z-A/issue.md`
 
@@ -660,7 +660,7 @@
 ### committed_issues
 1. `I-20260524T053214Z-A`
 - title: ACP session 生命周期接入 tool_switch_events
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260524T053214Z-A/issue.md`
 
@@ -670,7 +670,7 @@
 ### committed_issues
 1. `I-20260511T0731Z-A`
 - title: 同工位并发防护
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260511T0731Z-A/issue.md`
 
@@ -680,7 +680,7 @@
 ### committed_issues
 1. `I-20260511T0407Z-A`
 - title: handoff 表加 worker 汇报字段
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260511T0407Z-A/issue.md`
 
@@ -690,7 +690,7 @@
 ### committed_issues
 1. `I-20260511T0245Z-A`
 - title: DB 路径统一
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260511T0245Z-A/issue.md`
 
@@ -700,7 +700,7 @@
 ### committed_issues
 1. `I-20260511T0229Z-A`
 - title: worker prompt 注入 handoff 汇报指令
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260511T0229Z-A/issue.md`
 
@@ -710,7 +710,7 @@
 ### committed_issues
 1. `I-20260511T0019Z-A`
 - title: sync 管道改直接 SQLite 查询
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260511T0019Z-A/issue.md`
 
@@ -720,7 +720,7 @@
 ### committed_issues
 1. `I-20260510T1853Z-A`
 - title: 分支+工位完整性检查
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260510T1853Z-A/issue.md`
 
@@ -730,7 +730,7 @@
 ### committed_issues
 1. `I-20260510T1840Z-A`
 - title: 分支校验不可绕过
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260510T1840Z-A/issue.md`
 
@@ -740,7 +740,7 @@
 ### committed_issues
 1. `I-20260510T1339Z-A`
 - title: wt-create 创建顺序重构
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260510T1339Z-A/issue.md`
 
@@ -750,7 +750,7 @@
 ### committed_issues
 1. `I-20260510T1326Z-A`
 - title: init 分支名校验
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260510T1326Z-A/issue.md`
 
@@ -760,7 +760,7 @@
 ### committed_issues
 1. `I-20260510T1318Z-A`
 - title: handoff.py insert 支持 exit_kind
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260510T1318Z-A/issue.md`
 
@@ -770,7 +770,7 @@
 ### committed_issues
 1. `I-20260510T0856Z-A`
 - title: mode_just_switched 豁免
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260510T0856Z-A/issue.md`
 
@@ -780,7 +780,7 @@
 ### committed_issues
 1. `I-20260510T0112Z-A`
 - title: L223 task_mode wait 判断修复
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260510T0112Z-A/issue.md`
 
@@ -790,7 +790,7 @@
 ### committed_issues
 1. `I-20260508T045527Z-A`
 - title: 删除废弃扫描脚本
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260508T045527Z-A/issue.md`
 
@@ -800,7 +800,7 @@
 ### committed_issues
 1. `I-20260508T050922Z-A`
 - title: 门禁收口链路修复
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260508T050922Z-A/issue.md`
 
@@ -850,7 +850,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260508T120000Z-A`
 - title: wt-create fix
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T120000Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260508T120000Z--wt-create-fix/candidates.md`
@@ -863,7 +863,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260507T143546Z-A`
 - title: platform pull title standardization
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260507T143546Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507T143546Z--platform-pull-standardize/candidates.md`
@@ -875,7 +875,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260508T005431Z-A`
 - title: skill standardization
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T005431Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260508T005431Z--skill-standardize/candidates.md`
@@ -886,7 +886,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260507T143545Z-A`
 - title: timestamp seconds upgrade
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260507T143545Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507T143545Z--timestamp-seconds-upgrade/candidates.md`
@@ -898,7 +898,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260508T004541Z-A`
 - title: skill ref cleanup
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T004541Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260508T004541Z--skill-ref-cleanup/candidates.md`
@@ -911,7 +911,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260508T011858Z-A`
 - title: skill gate alignment
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T011858Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260508T011858Z--skill-gate-alignment/candidates.md`
@@ -923,7 +923,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260507T143544Z-A`
 - title: raw-issue-pull interception guard + CLI dispatch
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260507T143544Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507T143544Z--intercept-guard/candidates.md`
@@ -935,7 +935,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260507T0700Z-A`
 - title: unified platform layer
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260507T0700Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507-unified-platform/candidates.md`
@@ -946,7 +946,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260507T0730Z-A`
 - title: wt-create --source parameter
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260507T0730Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507-source-param/candidates.md`
@@ -957,7 +957,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260507T0600Z-A`
 - title: raw-issue-pull
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260507T0600Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507-raw-issue-pull/candidates.md`
@@ -968,7 +968,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260507T0300Z-A`
 - title: GATE 1 timestamp check
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260507T0300Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507-gate1-timestamp/candidates.md`
@@ -979,7 +979,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260507T0200Z-A`
 - title: promoted gate fix
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260507T0200Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507-promoted-gate-fix/candidates.md`
@@ -990,7 +990,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260507T0100Z-A`
 - title: fix-execution branch naming
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260507T0100Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507-fix-branch-naming/candidates.md`
@@ -1003,7 +1003,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260506T1400Z-A`
 - title: pr-merge-guarded fix/* whitelist
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260506T1400Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260506-pr-merge-guarded-fix/candidates.md`
@@ -1017,7 +1017,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260506T1200Z-A`
 - title: Skill rename to B1_IBM/B2_IBM + I→B→M skeleton
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260506T1200Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260506-ibm-skill-rename/candidates.md`
@@ -1031,7 +1031,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260506T1230Z-A`
 - title: wt-create dual worktree creation
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `absorbed`
 - issue_path: `docs/issues/I-20260506T1230Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260506-wt-create-dual/candidates.md`
@@ -1049,7 +1049,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260503-0200-A`
 - title: scan: switch to task-lifecycle-scan v2 with full lifecycle chain trace
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/scan-lifecycle-migration/issues/I-20260503-0200-A.md`
@@ -1059,7 +1059,7 @@ routing_policy:
 
 30. `I-20260513T010343Z-A`
 - title: raw key seconds format cleanup — 4 regex fixes + 10+ doc updates
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - priority: P1
 - issue_path: `docs/issues/I-20260513T010343Z-A/issue.md`
@@ -1074,7 +1074,7 @@ routing_policy:
 
 8. `I-20260502-0500-C`
 - title: Token 花费优化
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - priority: P0
 - issue_path: docs/epics/token-cost-optimization/issues/token-cost-optimization.md
@@ -1087,7 +1087,7 @@ routing_policy:
 
 9. `I-20260502-1028-A`
 - title: fix: clean stale start lock before daemon stop
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `done`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/stale-start-lock-cleanup/issues/I-20260502-1028-A.md`
@@ -1102,7 +1102,7 @@ routing_policy:
 
 10. `I-20260503-0000-A`
 - title: fix: ACP bridge crash resilience with self-healing
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `done_ibm`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/acp-bridge-crash-resilience/issues/I-20260503-0000-A.md`
@@ -1117,7 +1117,7 @@ routing_policy:
 
 11. `I-20260503-0000-B`
 - title: feat: add fix-execution skill for rapid bug fix workflow
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/fix-execution-skill/issues/I-20260503-0000-B.md`
@@ -1132,7 +1132,7 @@ routing_policy:
 
 12. `I-20260503-0115-A`
 - title: fix: sync acp-bridge hash-based socket paths across bash and Python
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/acp-bridge-path-sync/issues/I-20260503-0115-A.md`
@@ -1146,7 +1146,7 @@ routing_policy:
 
 8. `I-20260421-1530-A`
 - title: Live-status scan summary and prompt anchor governance
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/issues/live-status-scan-summary-and-prompt-anchor-governance.md`
@@ -1179,7 +1179,7 @@ routing_policy:
 
 25. `I-20260429-2000-A`
 - title: Gate dev experience: --range pre-flight + secret detection FP fix
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/gate-dev-experience-preflight/issues/I-20260429-2000-A.md`
@@ -1197,7 +1197,7 @@ routing_policy:
 
 26. `I-20260503T0915Z-enforce-test-pre-merge`
 - title: Enforce test-pre-merge gate for ALL develop-bound merges
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - priority: P0
 - issue_path: `docs/epics/test-pre-merge-enforcement/issues/I-20260503T0915Z-enforce-test-pre-merge.md`
@@ -1211,7 +1211,7 @@ routing_policy:
 
 29. `I-20260505T1210Z-A-C`
 - title: governance gate state consistency + schema validation
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - priority: P1
 - issue_path: `docs/epics/workspace-routing-foundation/issue-state-refactor/issues/I-20260505T1210Z-A-C.md`
@@ -1225,7 +1225,7 @@ routing_policy:
 
 28. `I-20260505T1210Z-A-B`
 - title: issue-sync 只写 platform_state
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/issue-state-refactor/issues/I-20260505T1210Z-A-B.md`
@@ -1239,7 +1239,7 @@ routing_policy:
 
 27. `I-20260505T1210Z-A`
 - title: scan 常量对齐 IBM Framework §89 + 迁移现有 issue
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/issue-state-refactor/issues/I-20260505T1210Z-A.md`
@@ -1258,7 +1258,7 @@ routing_policy:
 
 7. `I-20260502-0500-A`
 - title: Freely 打包与自举验证
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - priority: P0
 - issue_path: `docs/issues/I-20260502-0500-A/issue.md
@@ -1279,7 +1279,7 @@ routing_policy:
 
 8. `I-20260501-0000-A`
 - title: PR scan surface + FREELY_REPO_PLATFORMS config
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - priority: P0
 - issue_path: `docs/epics/workspace-routing-foundation/scan-pr-platform-config/issues/I-20260501-0000-A.md`
@@ -1290,7 +1290,7 @@ routing_policy:
 
 9. `I-20260503T1235Z-A`
 - title: feat: add skip_continuity_recovery guard for first-round worker startup
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - priority: P0
 - issue_path: `docs/issues/I-20260503T1235Z-A/issue.md`
@@ -1309,7 +1309,7 @@ routing_policy:
 
 1. `I-20260416-0448-A`
 - title: MemArk protected-root bootstrap followthrough governance
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - priority: P1
 - issue_path: `docs/epics/freely-product-architecture/memark-protected-root-bootstrap-followthrough-governance/issues/memark-protected-root-bootstrap-followthrough-governance.md`
@@ -1343,7 +1343,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260508T111130Z-A`
 - title: reference-transaction hook delete fix
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T111130Z-A/issue.md`
 
@@ -1353,7 +1353,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260508T124041Z-A`
 - title: wt-create pull deferred to after worktree creation
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T124041Z-A/issue.md`
 
@@ -1363,7 +1363,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260508T133423Z-A`
 - title: raw-issue-pull target to pwd + fix/feature guard
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260508T133423Z-A/issue.md`
 
@@ -1373,7 +1373,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260508T121541Z-A`
 - title: platform-adapter title key fix
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260508T121541Z-A/issue.md`
 
@@ -1383,7 +1383,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260508T154706Z-A`
 - title: wt-create skill name + post-creation reminder
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260508T154706Z-A/issue.md`
 
@@ -1393,13 +1393,13 @@ routing_policy:
 ### committed_issues
 1. `I-20260508T232413Z-A`
 - title: pr-merge-guarded IBM phase guidance
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260508T232413Z-A/issue.md`
 
 1. `I-20260508T154706Z-A`
 - title: wt-create skill name + post-creation reminder
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260508T154706Z-A/issue.md`
 
@@ -1409,7 +1409,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260510T0112Z-A`
 - title: raw issue 正文注入治理提醒
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260510T0112Z-A/issue.md`
 
@@ -1419,7 +1419,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260509T090210Z-A`
 - title: handoff SQLite refactor
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260509T090210Z-A/issue.md`
 
@@ -1429,7 +1429,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260509T024559Z-A`
 - title: multi-project isolation architecture
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260509T024559Z-A/issue.md`
 
@@ -1439,7 +1439,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260518T020406Z-A`
 - title: chats 表扩展 conversation_id + chat-message 类型 + scan 对齐
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260518T020406Z-A/issue.md`
 
@@ -1459,7 +1459,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260506T1000Z-A`
 - title: supervisor 主循环 select_launch_kind 前添加 task_mode=wait 门禁
-- milestone_state: committed
+- milestone_state: completed
 - issue_path: `docs/issues/I-20260506T1000Z-A/issue.md`
 
 ## M-20260521T012042Z-A
@@ -1477,7 +1477,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260522T045227Z-A`
 - title: probe say hi
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260522T045227Z-A/issue.md`
 ## M-20260522T051507Z-A
@@ -1486,7 +1486,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260522T051507Z-A`
 - title: slot full name compat
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260522T051507Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260522T051507Z--slot-full-name-compat/candidates.md#C-20260522T051507Z-A`
@@ -1496,7 +1496,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260522T053702Z-A`
 - title: cmd_login apikey unified
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260522T053702Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260522T053702Z--cmd-login-apikey-unified-top/candidates.md#C-20260522T053702Z-A`
@@ -1507,7 +1507,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260522T071901Z-A`
 - title: slot full-name final fixes
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260522T071901Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260522T071901Z--slot-full-name-final-fixes/candidates.md#C-20260522T071901Z-A`
@@ -1517,7 +1517,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260522T072450Z-A`
 - title: fix list double prefix
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260522T072450Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260522T072450Z--fix-list-double-prefix/candidates.md#C-20260522T072450Z-A`
@@ -1527,7 +1527,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260522T075012Z-A`
 - title: fix help text
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260522T075012Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260522T075012Z--fix-help-text/candidates.md#C-20260522T075012Z-A`
@@ -1537,7 +1537,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260522T075839Z-A`
 - title: switch auto-extract tool
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260522T075839Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260522T075839Z--switch-auto-extract-tool/candidates.md#C-20260522T075839Z-A`
@@ -1547,7 +1547,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260522T081853Z-A`
 - title: update fallback priority
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260522T081853Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260522T081853Z--update-fallback-tools/candidates.md#C-20260522T081853Z-A`
@@ -1557,7 +1557,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260522T083133Z-A`
 - title: switch auto all tools
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260522T083133Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260522T083133Z--switch-auto-all-tools/candidates.md#C-20260522T083133Z-A`
@@ -1567,7 +1567,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260522T085354Z-A`
 - title: codex account config update
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260522T085354Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260522T085354Z--fix-codex-account-config/candidates.md#C-20260522T085354Z-A`
@@ -1577,7 +1577,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260522T091606Z-A`
 - title: default adapter acp
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260522T091606Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260522T091606Z--default-adapter-acp/candidates.md#C-20260522T091606Z-A`
@@ -1587,7 +1587,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260522T095721Z-A`
 - title: codex acp full lifecycle
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260522T095721Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260522T095721Z--codex-acp-full-lifecycle/candidates.md#C-20260522T095721Z-A`
@@ -1598,7 +1598,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260524T230541Z-A`
 - title: 开发流程描述修正（5个文件）
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260524T230541Z-A/issue.md`
 - source_candidate: `docs/candidates/C-20260524T230541Z-dev-flow-docs.md`
@@ -1609,7 +1609,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260603T142127Z-A`
 - title: fix scan cycling — issue-sync batch create linked I-* items + cross-batch dedup
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260603T142127Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/c-raw-20260603T142127Z-fix-scan-cycling/candidates.md#C-20260603T142127Z-A`
@@ -1621,7 +1621,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260612T000223Z-A`
 - title: A2A 协议替换 Freely Handoff 架构重构
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260612T000223Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260612T000223Z--a2a-replace-handoff/candidates.md#C-20260612T000223Z-A`
@@ -1632,7 +1632,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260615T001626Z-A`
 - title: 移除 A2A 文本 JSON 解析 Fallback (Phase 1+2)
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260615T001626Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260615T001626Z--a2a-no-fallback/candidates.md#C-20260615T001626Z-A`
@@ -1676,7 +1676,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260616T044030Z-A`
 - title: config.toml complete migration — clean break, TOML-only
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `in_verification`
 - issue_path: `docs/issues/I-20260616T044030Z-A/issue.md`
 
@@ -1715,7 +1715,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260618T100000Z-A`
 - title: wt-create chat-inbox ID normalization
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260618T100000Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/wt-create-chat-inbox-id-bug/code-reviews`
@@ -1746,7 +1746,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260620T083454Z-A`
 - title: fix lifecycle scan phase_state filtering
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260620T083454Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/lifecycle-scan-phase-state/verify`
@@ -1762,7 +1762,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260621T043842Z-A`
 - title: fix worker fork A2A socket + systemic JSON parse + scan filter
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260621T043842Z-A/issue.md`
 - verification_artifact_dir: `docs/pre-brainstorms/20260621T043842Z--session-parent-project-export`
@@ -1778,7 +1778,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260621T063130Z-A`
 - title: raw-key-driven wt-close + issue-sync close fallback
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260621T063130Z-A/issue.md`
 - verification_artifact_dir: `docs/pre-brainstorms/20260621T063130Z--wt-close-test-premerge-cleanup`
@@ -1794,7 +1794,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260621T090002Z-A`
 - title: align verification gate rebind path
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260621T090002Z-A/issue.md`
 ### completed_issues
@@ -1809,7 +1809,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260621T092609Z-A`
 - title: stop-side worker state preservation
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260621T092609Z-A/issue.md`
 ### completed_issues
@@ -1824,7 +1824,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260621T081426Z-A`
 - title: complete intake migration + stale cleanup
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260621T081426Z-A/issue.md`
 ### completed_issues
@@ -1838,7 +1838,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260621T081814Z-A`
 - title: Manager review gate + proactive steer prompt
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: completed
 - issue_path: `docs/issues/I-20260621T081814Z-A/issue.md
 ### completed_issues
@@ -1853,7 +1853,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260622T003231Z-A`
 - title: Fix pre-push.sh local keyword for macOS bash compat
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: completed
 - issue_path: `docs/issues/I-20260622T003231Z-A/issue.md`
 ### completed_issues
@@ -1868,7 +1868,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260622T021126Z-A`
 - title: Platform sync batch
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: completed
 - issue_path: `docs/issues/I-20260622T021126Z-A/issue.md`
 
@@ -1878,7 +1878,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260622T023441Z-A`
 - title: Platform sync batch
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: completed
 - issue_path: `docs/issues/I-20260622T023441Z-A/issue.md`
 
@@ -1888,7 +1888,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260622T024321Z-A`
 - title: Platform sync batch
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: completed
 - issue_path: `docs/issues/I-20260622T024321Z-A/issue.md`
 
@@ -1898,7 +1898,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260622T025044Z-A`
 - title: Platform sync batch
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: completed
 - issue_path: `docs/issues/I-20260622T025044Z-A/issue.md`
 
@@ -1908,7 +1908,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260622T025736Z-A`
 - title: Platform sync batch
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: completed
 - issue_path: `docs/issues/I-20260622T025736Z-A/issue.md`
 
@@ -1918,7 +1918,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260622T030420Z-A`
 - title: Platform sync batch
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: completed
 - issue_path: `docs/issues/I-20260622T030420Z-A/issue.md`
 
@@ -1928,7 +1928,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260622T031557Z-A`
 - title: Platform sync batch
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: completed
 - issue_path: `docs/issues/I-20260622T031557Z-A/issue.md`
 
@@ -1938,7 +1938,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260622T000649Z-A`
 - title: --reason gate for all CLI bypass mechanisms
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: completed
 - issue_path: `docs/issues/I-20260622T000649Z-A/issue.md`
 - source_raws:
@@ -1950,7 +1950,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260622T100348Z-A`
 - title: --reason documentation in all command --help outputs
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: completed
 - issue_path: `docs/issues/I-20260622T100348Z-A/issue.md`
 - source_raws:
@@ -1962,7 +1962,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260622T104129Z-A`
 - title: FREELY_SKIP env var bypass requires reason regex
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: completed
 - issue_path: `docs/issues/I-20260622T104129Z-A/issue.md`
 - source_raws:
@@ -1974,7 +1974,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260622T110050Z-A`
 - title: wt-close error messages guide user instead of pushing --force
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: completed
 - issue_path: `docs/issues/I-20260622T110050Z-A/issue.md`
 - source_raws:
@@ -1986,7 +1986,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260622T113847Z-A`
 - title: wt-close --platform-only for orphan issue platform close
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: completed
 - issue_path: `docs/issues/I-20260622T113847Z-A/issue.md`
 - source_raws:
@@ -1998,7 +1998,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260622T114625Z-A`
 - title: --platform-only bypass worktree guard
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: completed
 - issue_path: `docs/issues/I-20260622T114625Z-A/issue.md`
 - source_raws:
@@ -2009,7 +2009,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260622T115249Z-A`
 - title: Fix --platform-only nested platform_ids reading
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: completed
 - issue_path: `docs/issues/I-20260622T115249Z-A/issue.md`
 
@@ -2019,7 +2019,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260622T120046Z-A`
 - title: Fix --platform-only nested platform_ids YAML reading
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: completed
 - issue_path: `docs/issues/I-20260622T120046Z-A/issue.md`
 - source_raws:
@@ -2031,7 +2031,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260622T123204Z-A`
 - title: platform-adapter close CLI
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: completed
 - issue_path: `docs/issues/I-20260622T123204Z-A/issue.md`
 
@@ -2042,7 +2042,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260622T131109Z-A`
 - title: wt-close accept absorbed state
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: completed
 - issue_path: `docs/issues/I-20260622T131109Z-A/issue.md`
 
@@ -2052,7 +2052,7 @@ routing_policy:
 ### committed_issues
 1. `I-20260623T022909Z-A`
 - title: fix task-lifecycle-scan.py platform_adapter import (hyphenated filename)
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: completed
 - issue_path: `docs/issues/I-20260623T022909Z-A/issue.md`
 - source_raws:
