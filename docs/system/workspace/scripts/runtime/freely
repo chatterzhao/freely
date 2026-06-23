@@ -19500,50 +19500,6 @@ if consumed_ids:
 " 2>/dev/null || echo "0"
 }
 
-# SSE event ingestion: poll active worker SSE streams and write events to queue.
-# Called once per patrol cycle before building Manager prompt.
-# Uses short timeouts so it doesn't block the patrol loop.
-_sse_ingest_worker_events() {
-  local project="$1"
-  local _a2a_task_py queue_file timeout
-  _a2a_task_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
-  [[ -f "$_a2a_task_py" ]] || return 0
-  queue_file="$(_sse_event_queue_path "$project")"
-  timeout="${SSE_INGEST_TIMEOUT:-3}"  # short timeout, don't block patrol
-
-  # Get active worker tasks
-  python3 "$_a2a_task_py" list --role worker --status working 2>/dev/null | \
-    python3 -c "
-import json, sys, subprocess
-rows = json.load(sys.stdin).get('rows', []) if hasattr(json.load(sys.stdin), 'get') else json.loads(sys.stdin.read()).get('rows', [])
-for r in rows[:10]:  # max 10 concurrent workers
-    tid = r.get('task_id', '')
-    if tid:
-        # Quick SSE poll: short timeout, just get buffered events
-        try:
-            result = subprocess.run(
-                [sys.executable, '$_a2a_task_py', 'stream', '--task-id', tid,
-                 '--timeout', str($timeout), '--no-print'],
-                capture_output=True, text=True, timeout=$((timeout + 5)))
-        except subprocess.TimeoutExpired:
-            continue
-        # Write events to queue
-        if result and result.returncode == 0:
-            try:
-                data = json.loads(result.stdout)
-            except:
-                continue
-            events = data if isinstance(data, list) else data.get('events', [])
-            for ev in events:
-                state = ev.get('state', 'unknown')
-                ts = ev.get('timestamp', '')
-                with open('$queue_file', 'a') as f:
-                    f.write(json.dumps({'task_id': tid, 'state': state,
-                          'timestamp': ts, 'event_type': ev.get('event_type',''),
-                          'consumed': False}, ensure_ascii=False) + '\n')
-" 2>/dev/null || true
-}
-
 append_manager_task_context_if_needed() {
   local project="$1"
   [[ "$(effective_runtime_role_for_project "$project")" == "manager" ]] || return 0
@@ -19552,8 +19508,8 @@ append_manager_task_context_if_needed() {
   _db_path="$project/.freely/freely.db"
   [[ -f "$_a2a_task_py" && -f "$_db_path" ]] || return 0
 
-  # Ingest SSE events from active workers before reading queue
-  _sse_ingest_worker_events "$project"
+  # SSE Watchdog handles event ingestion (persistent connections + ACP injection).
+  # Manager just reads the JSONL queue that the watchdog continuously populates.
 
   # ── SSE events: primary Worker status source (replaces list-pending-delivery) ──
   local sse_output sse_count
