@@ -1,3 +1,12 @@
+## M-20260623T140410Z-A
+- title: Fix _restore_tasks edge cases — missing PID, stale detection, deleted worktree
+- status: active
+### candidate_issues
+1. `C-20260623T140410Z-A`
+- milestone: M-20260623T140410Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260623T140410Z-A/issue.md`
+
 ## M-20260623T100903Z-A
 - title: Complete SSE implementation — client, replace polling, remove delivery_status
 - status: active
