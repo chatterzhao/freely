@@ -1,18 +1,24 @@
 # Candidates
 
-## C-20260623T140410Z-A: _restore_tasks 边界修复
+## C-20260623T140410Z-A: _restore_tasks 重启恢复——状态修正 + 环境恢复
 
 - candidate_format_version: v2
-- title: 修复 _restore_tasks 3 个边界——working 无 PID / submitted 活跃 Worker 误判 / input-required 工位已删
+- title: _restore_tasks 重启恢复：状态修正（A1-A3）+ 环境恢复（B1-B4）+ TTL 清理评估
 - status: promoted
 - decision_reason: #3388 SSE 实现中修复了 _restore_tasks 基础逻辑，但遗漏 3 个边界。A1（无 PID → input-required 而非 restored）、A2（只检查活跃 Worker 而非全部 Worker）、A3（工位删除 → failed）。约 20 行改动，低风险。内存优先 gap 评估后不纳入本次交付。
 - next_action: 进入 B2_IBM → I-* issue → dev-loop 实现
 - revisit_trigger: N/A（已 promote）
 - acceptance_criteria:
+  状态修正（A1-A3）：
   - A1: working + worker_pid 为空 → 标记 input-required（reason: missing_worker_pid_at_restart）
   - A2: submitted(Manager) + 只检查非终态活跃 Worker → 全部终态才 auto-complete
   - A3: input-required + worktree 路径不存在 → 标记 failed（reason: worktree_deleted_during_downtime）
-  - Part B: 内存优先 gap 在 milestones.md 中保留跟踪条目，不作为交付物
+  环境恢复（B1-B4）：
+  - B1: working+PID存活+worktree在 → prompt Worker resume
+  - B2: 任何→failed → SSE 注入 "Worker X died: {reason}"
+  - B3: input-required+worktree在 → SSE 注入 "Worker X needs input: {reason}"
+  - B4: submitted(Mgr)+活跃Worker → SSE 注入 "Restored: Worker X still running"
+  Part C（不交付）：TTL 清理作为后续 issue
 - promotion_gate:
   - brainstorms.md 完成 ✅
   - 3 个修复的代码路径分析准确 ✅

@@ -9,6 +9,37 @@
 ### 时效性判断
 - **高度相关**。3 个边界直接影响重启后状态正确性。内存优先 gap 已存在 10 天（`raw-20260617T011030Z`），但当前磁盘方案在 patrol 周期粒度下可接受。
 
+### SSE 通知模型（讨论中澄清）
+
+Watchdog 只管 `working`→终态 的正向流转，这是正确的：
+
+```
+submitted → working           ❌ 不需要（正常启动）
+working → completed           ✅ 注入 Manager（需要 review）
+working → failed              ✅ 注入 Manager（需要处理）
+working → input-required      ✅ 注入 Manager（需要提供输入）
+input-required → working      ❌ 不需要（Manager 自己给的输入）
+```
+
+非 working 状态的问题（submitted 腐烂、input-required 卡住）是 Manager patrol 的职责，不是 watchdog 的。
+
+### 重启恢复的核心问题
+
+重启时不是"值变了"——状态没变，还是同一个值。但**环境变了**（进程死了、工位没了）。`_restore_tasks` 要做两件事：
+
+1. **状态修正**：根据环境判断该状态是否还成立。不成立→修正到正确状态。
+2. **环境恢复**：修正后，通知 Manager 该做什么。
+
+| 重启时状态 | 环境检查 | 状态修正 | 环境恢复（通知 Manager） |
+|-----------|---------|---------|---------------------|
+| `working` + PID 存活 + worktree 在 | 进程在 | keep `working` | 发 prompt 给 Worker resume |
+| `working` + PID 死 | 进程死 | → `failed` | SSE 注入 "Worker X died" |
+| `working` + 无 PID | 无法判断 | → `input-required` | SSE 注入 "Worker X 状态未知" |
+| `submitted`(Manager) + 活跃 Worker | Worker 还在跑 | keep `submitted` | Manager patrol 继续监督 |
+| `submitted`(Manager) + 全终态 Worker | Worker 都完了 | → `completed` | 无需通知（正常收口） |
+| `input-required` + worktree 删了 | 工位没了 | → `failed` | SSE 注入 "Worker X 工位已删除" |
+| `input-required` + worktree 在 | 可以恢复 | keep `input-required` | SSE 注入 "Worker X 等待输入" |
+
 ### 问题边界
 
 本 issue 分两个独立部分：
@@ -109,15 +140,24 @@ else:
 
 ## Decision
 
-### 方案：修复 A1-A3，评估 Part B 后置
+### 方案：状态修正（A1-A3）+ 环境恢复（B1-B3）+ TTL（Part C）
 
-**Fix A1**：`working` + 无 `worker_pid` → `input-required`（reason: `missing_worker_pid_at_restart`）
+**Fix A1-A3**（状态修正——判断状态是否还成立）：
 
-**Fix A2**：`submitted` + 只检查活跃 Worker（非终态），全部终态才 auto-complete
+- A1: `working` + 无 `worker_pid` → `input-required`
+- A2: `submitted`(Manager) + 只检查活跃 Worker（过滤终态）
+- A3: `input-required` + worktree 不存在 → `failed`
 
-**Fix A3**：`input-required` + worktree 不存在 → `failed`（reason: `worktree_deleted_during_downtime`）
+**Fix B1-B3**（环境恢复——修正后通知 Manager 该做什么）：
 
-**Part B**：记录在 milestones.md 中作为跟踪项，不交付。
+_restore_tasks 结束后，对每个被修正/保持的 task，通过 SSE watchdog 的事件注入机制，向 Manager 发送一条恢复通知：
+
+- B1: `working`+PID存活+worktree在 → `a2a_task.py prompt --task-id X --message "resume: continue from where you left off"`
+- B2: 任何状态→`failed` → SSE 注入 "Worker X died during downtime: {reason}"  
+- B3: `input-required`+worktree在 → SSE 注入 "Worker X needs your input: {reason}"
+- B4: `submitted`(Manager)+活跃Worker → SSE 注入 "Restored: Worker X is still running, continue supervision"
+
+**Part C（TTL 清理，本次不交付）**：终端状态 task 的自动过期机制。记录为后续 issue。
 
 ### 拒绝的方案
 
