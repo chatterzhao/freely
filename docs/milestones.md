@@ -10,7 +10,14 @@
 1. `I-20260623T162226Z-A`
 - title: L0-L3 loop guard
 - milestone_state: committed
-- phase_state: `in_b2_ibm`
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260623T162226Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/loop-guard-l0-l3/code-reviews`
+### completed_issues
+1. `I-20260623T162226Z-A`
+- title: L0-L3 loop guard
+- milestone_state: completed
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260623T162226Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/loop-guard-l0-l3/code-reviews`
 
