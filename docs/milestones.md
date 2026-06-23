@@ -4151,3 +4151,16 @@ routing_policy:
 - milestone_state: committed
 - phase_state: completed
 - issue_path: `docs/issues/I-20260622T131109Z-A/issue.md`
+
+## M-20260623T022909Z-A
+- title: fix task-lifecycle-scan.py platform_adapter import (hyphenated filename)
+- status: active
+### candidate_issues
+### committed_issues
+1. `I-20260623T022909Z-A`
+- title: fix task-lifecycle-scan.py platform_adapter import (hyphenated filename)
+- milestone_state: committed
+- phase_state: in_verification
+- issue_path: `docs/issues/I-20260623T022909Z-A/issue.md`
+- source_raws:
+  - `raw-20260623T022909Z`
