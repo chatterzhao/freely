@@ -32,14 +32,14 @@
 ## Acceptance Items
 | id | requirement | evidence_level | status | artifact_ref |
 |----|------------|---------------|--------|-------------|
-| AT1 | C1: wt-close state=completed | integration | pending | a2a_task.py get verification |
-| AT2 | C2: CLI 元数据传递 | script regression | pending | grep a2a_task.py update kwargs |
-| AT3 | C3-C4: 状态集合一致 | script regression | pending | grep VALID_STATES + CHECK |
+| AT1 | C1: wt-close state=completed | integration | pass | a2a_task.py get verification |
+| AT2 | C2: CLI metadata passthrough | script regression | pass | grep a2a_task.py update kwargs |
+| AT3 | C3-C4: state consistency | script regression | pass | grep VALID_STATES + CHECK |
 | AT4 | C5: PATCH 拒绝 unknown | integration | pending | curl PATCH invalid state |
-| AT5 | C6: 死代码删除 | script regression | pending | grep h_a2a_task_update_from_exit_kind |
-| AT6 | A0: stop 不动 state | integration | pending | SQLite query after stop |
-| AT7 | A1-A3: _restore_tasks 边界 | integration | pending | restart cycle log |
-| AT8 | B1-B4: 环境恢复通知 | integration | pending | SSE event in Manager session |
+| AT5 | C6: dead code removed | script regression | pass | grep h_a2a_task_update_from_exit_kind |
+| AT6 | A0: stop no touch state | integration | pass | SQLite query after stop |
+| AT7 | A1-A3: _restore_tasks edges | integration | pass | restart cycle log |
+| AT8 | B1-B4: recovery notifications | integration | pass | SSE event in Manager session |
 | AT9 | premerge-integration gate | premerge-integration | pending | test-pre-merge verification |
 
 - surface_kind: bugfix
