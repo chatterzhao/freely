@@ -16,7 +16,7 @@
 1. `I-20260623T100903Z-A`
 - title: 彻底实现 SSE — SSE 客户端 + 替代轮询 + 废弃 delivery_status
 - milestone_state: committed
-- phase_state: `in_b2_ibm`
+- phase_state: `in_dev`
 - issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
 - verification_artifact_dir: `docs/epics/sse-full-implementation`
 
@@ -574,7 +574,7 @@
 1. `I-20260618T040226Z-A`
 - title: pr-review-guarded command + workflow integration
 - milestone_state: committed
-- phase_state: `in_b2_ibm`
+- phase_state: `in_dev`
 - issue_path: `docs/issues/I-20260618T040226Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/pr-review-guarded/code-reviews`
 
@@ -656,7 +656,7 @@
 1. `I-20260618T015503Z-A`
 - title: Fix worktree path architecture
 - milestone_state: committed
-- phase_state: `in_b2_ibm`
+- phase_state: `in_dev`
 - issue_path: `docs/issues/I-20260618T015503Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/worktree-path-architecture/code-reviews`
 
@@ -809,7 +809,7 @@
 1. `I-20260617T103956Z-A`
 - title: Complete CSV elimination
 - milestone_state: committed
-- phase_state: `in_b2_ibm`
+- phase_state: `in_dev`
 - issue_path: `docs/issues/I-20260617T103956Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/eliminate-csv/code-reviews`
 
@@ -826,7 +826,7 @@
 1. `I-20260617T095105Z-A`
 - title: A2A-Native Delegation
 - milestone_state: committed
-- phase_state: `in_b2_ibm`
+- phase_state: `in_dev`
 - issue_path: `docs/issues/I-20260617T095105Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/a2a-native-delegation/code-reviews`
 
