@@ -1,3 +1,19 @@
+## M-20260623T005139Z-A
+- title: wt-create --source platform-only + Manager feedback capability
+- status: active
+### candidate_issues
+1. `C-20260623T005139Z-A`
+- milestone: M-20260623T005139Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260623T005139Z-A/issue.md`
+### committed_issues
+1. `I-20260623T005139Z-A`
+- title: feat: wt-create --source platform-only
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260623T005139Z-A/issue.md`
+- verification_artifact_dir: `docs/system/workspace/scripts`
+
 ## M-20260622T234854Z-A
 - title: Post-review quality — adapter integration + chat gate + cleanup
 - status: active
