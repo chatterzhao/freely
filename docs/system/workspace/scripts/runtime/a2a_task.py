@@ -11,8 +11,11 @@ import argparse
 import json
 import os
 import socket
+import time
+import threading
+import http.client
 from datetime import datetime, timezone
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Callable
 
 # ── Path helpers ─────────────────────────────────────────────────────────
 
@@ -111,7 +114,7 @@ class A2AClient:
         """Send standard HTTP request to A2A Server REST endpoints (bypass JSON-RPC).
 
         Used for Freely-specific operations (create, update) that carry
-        extended fields (delivery_status, worker_pid)
+        extended fields (e.g., worker_pid, session_id)
         not preserved by the JSON-RPC tasks/send → execute() path.
         """
         self._ensure()
@@ -148,7 +151,6 @@ class A2AClient:
             ("GET",  "/tasks"):            "tasks/list",
             ("PATCH","/tasks"):            "tasks/push",
             ("GET",  "/tasks/latest-manager"):    "tasks/get",
-            ("GET",  "/tasks/pending-delivery"):  "tasks/list",
         }
         # Build key: (method, base_path_stripped_of_task_id)
         import re
@@ -255,10 +257,6 @@ class A2AClient:
         r = self._rest_request("GET", "/tasks/latest-manager")
         return r if "task_id" in r else None
 
-    def pending_delivery(self) -> List[dict]:
-        """Get pending deliveries via A2A Server (authoritative)."""
-        return self._rest_request("GET", "/tasks/pending-delivery").get("tasks", [])
-
     def launched_pids(self, raw_key: str = "") -> List[dict]:
         """Get launched worker PIDs via A2A Server."""
         path = f"/tasks/launched-pids?raw_key={raw_key}" if raw_key else "/tasks/launched-pids"
@@ -269,11 +267,6 @@ class A2AClient:
         """Add message via A2A Server endpoint."""
         return self._request("POST", f"/tasks/{task_id}/messages",
                             {"role": role, "type": msg_type, "content": content})
-
-    def mark_delivered(self, task_id: str) -> dict:
-        """Mark delivered via A2A Server endpoint."""
-        return self._request("PATCH", f"/tasks/{task_id}/delivery",
-                            {"delivery_status": "delivered"})
 
     def set_worker_pid(self, task_id: str, worker_pid: str) -> dict:
         """Set worker PID via A2A Server endpoint."""
@@ -299,14 +292,221 @@ class A2AClient:
                     pass
         return affected
 
+    # ── SSE Client ────────────────────────────────────────────────────────
 
+    def stream_task(self, task_id: str, on_event: Callable[[dict], None] = None,
+                    timeout: float = 0, last_event_id: str = "") -> dict:
+        """Connect to GET /tasks/{task_id}/stream and yield SSE events.
+
+        Returns a dict with keys: 'status' (ok/error/timeout), 'events' (list of parsed
+        events), 'last_event_id' (str|None), 'terminal' (bool — stream closed AND task
+        is in a terminal state per A2A spec).
+        """
+        result = {"status": "ok", "events": [], "last_event_id": None, "terminal": False}
+        sp = _a2a_socket_path(self.project)
+
+        try:
+            conn = http.client.HTTPConnection("localhost")
+            conn.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            conn.sock.settimeout(timeout if timeout > 0 else 30.0)
+            conn.sock.connect(sp)
+
+            conn.putrequest("GET", f"/tasks/{task_id}/stream")
+            conn.putheader("Accept", "text/event-stream")
+            conn.putheader("Connection", "keep-alive")
+            if last_event_id:
+                conn.putheader("Last-Event-ID", last_event_id)
+            conn.endheaders()
+
+            resp = conn.getresponse()
+            if resp.status != 200:
+                result["status"] = "error"
+                result["error"] = f"HTTP {resp.status}: {resp.read().decode()[:200]}"
+                conn.close()
+                return result
+
+            event_type = ""
+            event_data_lines = []
+            event_id = ""
+
+            while True:
+                line = resp.readline().decode("utf-8", errors="replace")
+                if line == "":
+                    break
+                line = line.rstrip("\n").rstrip("\r")
+
+                if line.startswith("event:"):
+                    event_type = line[6:].lstrip()
+                elif line.startswith("data:"):
+                    event_data_lines.append(line[5:].lstrip())
+                elif line.startswith("id:"):
+                    event_id = line[3:].lstrip()
+                elif line == "" and event_data_lines:
+                    event_data = "\n".join(event_data_lines)
+                    event = self._parse_sse_event(event_type, event_data, event_id)
+                    result["events"].append(event)
+                    result["last_event_id"] = event_id or result["last_event_id"]
+                    if on_event:
+                        on_event(event)
+                    event_type, event_data_lines, event_id = "", [], ""
+
+            conn.close()
+
+            # Determine if terminal: check task state after stream close
+            try:
+                task = self.get(task_id)
+                state = task.get("state", task.get("status", ""))
+                if state in ("completed", "failed", "canceled", "rejected"):
+                    result["terminal"] = True
+                else:
+                    result["terminal"] = False
+            except Exception:
+                result["terminal"] = True  # Conservative: treat as terminal
+            return result
+
+        except socket.timeout:
+            result["status"] = "timeout"
+            return result
+        except Exception as e:
+            result["status"] = "error"
+            result["error"] = str(e)
+            return result
+
+    def _parse_sse_event(self, event_type: str, data: str, event_id: str) -> dict:
+        """Parse an SSE event data payload into a dict."""
+        event = {"event_type": event_type, "id": event_id}
+        try:
+            payload = json.loads(data)
+            event.update(payload)
+        except json.JSONDecodeError:
+            event["raw_data"] = data
+        return event
+
+    def resubscribe(self, task_id: str, last_event_id: str = "",
+                    on_event: Callable[[dict], None] = None,
+                    max_retries: int = 6, base_delay: float = 1.0) -> dict:
+        """Reconnect to SSE with exponential backoff after disconnect.
+
+        Retry delays: base_delay → 2× → 4× → 8× → 16× → cap at 30s.
+        Uses Last-Event-ID header for server-side resume on reconnect.
+        Returns the last stream_task result (after max_retries or terminal).
+        """
+        delay = base_delay
+        resume_id = last_event_id
+        result = {"status": "error", "events": [], "last_event_id": last_event_id,
+                  "terminal": False, "retries": 0}
+
+        for attempt in range(max_retries):
+            result = self.stream_task(task_id, on_event=on_event, timeout=30.0,
+                                     last_event_id=resume_id)
+            result["retries"] = attempt
+
+            # Propagate latest event id for next retry
+            if result.get("last_event_id"):
+                resume_id = result["last_event_id"]
+
+            # Stop if task is genuinely terminal
+            if result["status"] == "ok" and result["terminal"]:
+                return result
+
+            # Retry on non-terminal disconnect or error
+            if attempt < max_retries - 1:
+                time.sleep(delay)
+                delay = min(delay * 2, 30.0)
+
+        return result
+
+
+_client_lock = threading.Lock()
 _client_instance = None
 
 def _client() -> A2AClient:
     global _client_instance
     if _client_instance is None:
-        _client_instance = A2AClient(_resolve_project())
+        with _client_lock:
+            if _client_instance is None:
+                _client_instance = A2AClient(_resolve_project())
     return _client_instance
+
+_sse_pool_lock = threading.Lock()
+_sse_pool_instance = None
+
+def _sse_pool() -> SSEPool:
+    global _sse_pool_instance
+    if _sse_pool_instance is None:
+        with _sse_pool_lock:
+            if _sse_pool_instance is None:
+                _sse_pool_instance = SSEPool(_resolve_project())
+    return _sse_pool_instance
+
+
+# ── SSE Connection Pool ─────────────────────────────────────────────────
+
+class SSEPool:
+    """Manager-side SSE connection metadata registry (Phase 1 foundation).
+
+    Phase 1: Tracks which tasks are being streamed, max 10 entries,
+    heartbeat timestamps, stale detection. Does NOT open/manage actual
+    connections — that integration happens in Phase 2 (freely bash script
+    uses stream_task/resubscribe and calls SSEPool for bookkeeping).
+
+    Phase 2 (planned): Integration with freely script — when Manager
+    opens an SSE stream for a Worker, it registers in the pool. When
+    stale_ids() returns tasks, Manager resubscribes or marks them dead.
+    """
+
+    def __init__(self, project: str, max_connections: int = 10):
+        self.project = project
+        self.max_connections = max_connections
+        self._pool: Dict[str, Dict] = {}
+        self._lock = threading.Lock()
+
+    def active_count(self) -> int:
+        with self._lock:
+            return len(self._pool)
+
+    def add(self, task_id: str, on_event: Callable[[dict], None] = None) -> bool:
+        with self._lock:
+            if task_id in self._pool:
+                return True
+            if len(self._pool) >= self.max_connections:
+                return False
+            self._pool[task_id] = {
+                "task_id": task_id, "added_at": _now_utc(),
+                "on_event": on_event, "last_event_at": None,
+            }
+            return True
+
+    def remove(self, task_id: str):
+        with self._lock:
+            self._pool.pop(task_id, None)
+
+    def heartbeat(self, task_id: str):
+        with self._lock:
+            if task_id in self._pool:
+                self._pool[task_id]["last_event_at"] = _now_utc()
+
+    def stale_ids(self, timeout_seconds: int = 120) -> List[str]:
+        cutoff = datetime.now(timezone.utc)
+        stale = []
+        with self._lock:
+            for tid, info in self._pool.items():
+                last = info.get("last_event_at")
+                if not last:
+                    stale.append(tid)  # No heartbeat ever → stale
+                else:
+                    dt = datetime.strptime(last[:19], "%Y-%m-%dT%H:%M:%S")
+                    if (cutoff - dt.replace(tzinfo=timezone.utc)).total_seconds() > timeout_seconds:
+                        stale.append(tid)
+        return stale
+
+    def close_all(self):
+        with self._lock:
+            self._pool.clear()
+
+    def list_active(self) -> List[str]:
+        with self._lock:
+            return list(self._pool.keys())
 
 
 # ── A2A Task States ───────────────────────────────────────────────────────
@@ -361,12 +561,6 @@ def update_message(task_id: str, content: str, role: str = "worker",
                    msg_type: str = "text") -> int:
     return 1 if _client().add_message(task_id, role, msg_type, content).get("ok") else 0
 
-def pending_delivery() -> List[dict]:
-    return _client().pending_delivery()
-
-def mark_delivered(task_id: str) -> int:
-    return 1 if _client().mark_delivered(task_id).get("ok") else 0
-
 def set_worker_pid(task_id: str, worker_pid: str) -> int:
     return 1 if _client().set_worker_pid(task_id, worker_pid).get("ok") else 0
 
@@ -377,7 +571,6 @@ def mark_stale(timeout_minutes: int = 30) -> int:
     return _client().mark_stale(timeout_minutes)
 
 # Legacy aliases (for backward compat with freely bash)
-update_delivery_status = mark_delivered
 update_worker_pid = set_worker_pid
 get_launched_pids = launched_pids
 
@@ -539,10 +732,6 @@ def _main() -> int:
     p_lk = sub.add_parser("list-key")
     p_lk.add_argument("--raw-key", default="")
 
-    p_lpd = sub.add_parser("list-pending-delivery")
-    p_usa = sub.add_parser("update-send-to-ai")
-    p_usa.add_argument("--task-id", default="")
-
     p_uwp = sub.add_parser("update-worker-pid")
     p_uwp.add_argument("--task-id", default="")
     p_uwp.add_argument("--worker-pid", default="")
@@ -573,6 +762,31 @@ def _main() -> int:
     # mark-stale: mark timed-out working tasks as input-required
     p_ms = sub.add_parser("mark-stale")
     p_ms.add_argument("--timeout-minutes", default="30")
+
+    # ── SSE: stream task events ─────────────────────────────────────────
+    p_stream = sub.add_parser("stream")
+    p_stream.add_argument("--task-id", required=True)
+    p_stream.add_argument("--timeout", type=float, default=30.0)
+    p_stream.add_argument("--last-event-id", default="")
+    p_stream.add_argument("--no-print", action="store_true",
+                          help="Suppress event printing")
+
+    p_resub = sub.add_parser("resubscribe")
+    p_resub.add_argument("--task-id", required=True)
+    p_resub.add_argument("--last-event-id", default="")
+    p_resub.add_argument("--max-retries", type=int, default=6)
+    p_resub.add_argument("--base-delay", type=float, default=1.0)
+
+    # ── SSE Pool management ─────────────────────────────────────────────
+    p_spool = sub.add_parser("sse-pool")
+    p_spool_sub = p_spool.add_subparsers(dest="pool_cmd")
+    p_spool_add = p_spool_sub.add_parser("add")
+    p_spool_add.add_argument("--task-id", required=True)
+    p_spool_rm = p_spool_sub.add_parser("remove")
+    p_spool_rm.add_argument("--task-id", required=True)
+    p_spool_sub.add_parser("count")
+    p_spool_sub.add_parser("list")
+    p_spool_close = p_spool_sub.add_parser("close")
 
     # ── a2a-task-update: Worker mid-execution progress reporting ──
     p_tu = sub.add_parser("a2a-task-update")
@@ -710,12 +924,6 @@ def _main() -> int:
         elif args.cmd == "list-key":
             rows = list_by_raw_key(getattr(args, 'raw_key', '') or "")
             print(json.dumps(rows))
-        elif args.cmd == "list-pending-delivery":
-            rows = pending_delivery()
-            print(json.dumps(rows))
-        elif args.cmd == "update-send-to-ai":
-            r = mark_delivered(_task_id)
-            print(json.dumps({"affected": 1 if r else 0}))
         elif args.cmd == "update-worker-pid":
             r = set_worker_pid(_task_id, getattr(args, 'worker_pid', '') or "")
             print(json.dumps({"affected": 1 if r else 0}))
@@ -791,6 +999,50 @@ def _main() -> int:
             timeout = int(getattr(args, 'timeout_minutes', '30') or '30')
             affected = mark_stale(timeout)
             print(json.dumps({"affected": affected}))
+
+        elif args.cmd == "stream":
+            c = _client()
+            on_ev = None
+            if not getattr(args, 'no_print', False):
+                def _print_event(ev):
+                    print(json.dumps(ev, ensure_ascii=False), flush=True)
+                on_ev = _print_event
+            result = c.stream_task(args.task_id, on_event=on_ev,
+                                   timeout=args.timeout,
+                                   last_event_id=getattr(args, 'last_event_id', '') or '')
+            if result["status"] != "ok":
+                print(json.dumps({"error": result.get("error", result["status"])}))
+
+        elif args.cmd == "resubscribe":
+            c = _client()
+            on_ev = None
+            if not getattr(args, 'no_print', False):
+                def _print_event_r(ev):
+                    print(json.dumps(ev, ensure_ascii=False), flush=True)
+                on_ev = _print_event_r
+            result = c.resubscribe(args.task_id, args.last_event_id,
+                                   on_event=on_ev,
+                                   max_retries=args.max_retries,
+                                   base_delay=args.base_delay)
+            print(json.dumps({"status": result["status"],
+                              "terminal": result["terminal"],
+                              "retries": result.get("retries", 0)}))
+
+        elif args.cmd == "sse-pool":
+            pool = _sse_pool()
+            if args.pool_cmd == "add":
+                ok = pool.add(args.task_id)
+                print(json.dumps({"ok": ok, "active_count": pool.active_count()}))
+            elif args.pool_cmd == "remove":
+                pool.remove(args.task_id)
+                print(json.dumps({"ok": True, "active_count": pool.active_count()}))
+            elif args.pool_cmd == "count":
+                print(json.dumps({"count": pool.active_count()}))
+            elif args.pool_cmd == "list":
+                print(json.dumps({"tasks": pool.list_active()}))
+            elif args.pool_cmd == "close":
+                pool.close_all()
+                print(json.dumps({"ok": True, "message": "pool closed"}))
         elif args.cmd == "a2a-task-update":
             task_id = getattr(args, 'task_id', '') or ''
             if not task_id:

@@ -203,8 +203,6 @@ def test_client_api():
     for fn in ['create_task','get_task','update_task','delete_task','list_tasks',
         'list_by_raw_key','list_by_worktree','list_active','list_active_workers',
         'latest_manager','update_message','process_ai_reply','read_state_only',
-        'pending_delivery','mark_delivered','set_worker_pid','launched_pids',
-        'mark_stale','update_delivery_status','update_worker_pid','get_launched_pids']:
         assert hasattr(a2a_task, fn), f'Missing: {fn}'
         assert callable(getattr(a2a_task, fn)), f'Not callable: {fn}'
 

@@ -241,8 +241,7 @@ class DbDaemon:
                 error TEXT NOT NULL DEFAULT '',
                 -- Runtime tracking
                 worker_pid TEXT NOT NULL DEFAULT '',
-                delivery_status TEXT NOT NULL DEFAULT 'pending'
-                    CHECK(delivery_status IN ('pending','delivered','failed')),
+                -- delivery_status removed (SSE replaces polling-based delivery)
                 -- Message history (A2A standard: array of {role,type,content})
                 messages_json TEXT NOT NULL DEFAULT '[]',
                 -- Lifecycle timestamps
@@ -274,7 +273,6 @@ class DbDaemon:
             ("evidence_paths", "TEXT NOT NULL DEFAULT ''"),
             ("error", "TEXT NOT NULL DEFAULT ''"),
             ("worker_pid", "TEXT NOT NULL DEFAULT ''"),
-            ("delivery_status", "TEXT NOT NULL DEFAULT 'pending'"),
             ("messages_json", "TEXT NOT NULL DEFAULT '[]'"),
             ("launched_at", "TEXT NOT NULL DEFAULT ''"),
             ("completed_at", "TEXT NOT NULL DEFAULT ''"),
@@ -1256,27 +1254,7 @@ def h_a2a_task_get_launched_pids(daemon: DbDaemon, params: dict) -> dict:
     return {"rows": [dict(zip(cols, r)) for r in rows]}
 
 
-@_h("a2a_task.list-pending-delivery")
-def h_a2a_task_list_pending_delivery(daemon: DbDaemon, params: dict) -> dict:
-    """List tasks with delivery_status='pending' for AI context injection."""
-    rows = daemon.conn.execute(
-        "SELECT * FROM a2a_tasks WHERE delivery_status = 'pending' AND agent_id = 'worker' "
-        "ORDER BY created_at ASC"
-    ).fetchall()
-    cols = [desc[1] for desc in daemon.conn.execute("PRAGMA table_info(a2a_tasks)").fetchall()]
-    return {"rows": [dict(zip(cols, r)) for r in rows]}
-
-
-@_h("a2a_task.update-delivery-status")
-def h_a2a_task_update_delivery_status(daemon: DbDaemon, params: dict) -> dict:
-    """Mark task delivery_status (e.g. 'delivered' after AI consumption)."""
-    daemon.conn.execute(
-        "UPDATE a2a_tasks SET delivery_status = ?, updated_at = ? WHERE task_id = ?",
-        (params["delivery_status"], _now_utc(), params["task_id"]),
-    )
-    daemon.conn.commit()
-    return {"affected": daemon.conn.total_changes}
-
+# delivery_status RPC handlers removed — SSE replaces polling-based delivery
 
 # ── CLI ───────────────────────────────────────────────────────────────────
 

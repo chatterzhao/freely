@@ -338,24 +338,77 @@ class A2AServer:
         self._restore_tasks()
 
     def _restore_tasks(self):
-        """Replay WAL: restore all non-terminal tasks into memory on startup.
-        Terminal states (completed/failed/canceled) are skipped — they're done.
+        """Restore non-terminal tasks on startup with process liveness checks.
+
+        For 'working' tasks: check if the worker PID is still alive.
+        Alive → keep 'working'. Dead → mark 'failed' (process died during downtime).
+        For 'submitted' tasks (Manager): if no corresponding worker tasks exist
+        and the task is > 60s old, mark 'completed' (stale delegation).
+        For 'input-required' tasks: keep as-is (Manager decides on resume).
         """
         try:
             rows = self.task_store.get_all_dicts()
+            import os as _os
+            now = __import__('time').time()
             restored = 0
+            failed = 0
+
             for row in rows:
                 state = row.get("state", "")
                 if state in ("completed", "failed", "canceled"):
                     continue
-                # Non-terminal: restore to TaskStore (already in SQLite, just ensure
-                # in-memory SDK cache is populated by loading via get())
-                if row.get("task_id"):
-                    self.task_store.get(row["task_id"])
+
+                task_id = row.get("task_id", "")
+                if not task_id:
+                    continue
+
+                agent_id = row.get("agent_id", "")
+                worker_pid = row.get("worker_pid", "")
+
+                if state == "working" and agent_id == "worker":
+                    # Check process liveness
+                    alive = False
+                    if worker_pid:
+                        try:
+                            pid = int(worker_pid)
+                            _os.kill(pid, 0)
+                            alive = True
+                        except (ValueError, OSError):
+                            alive = False
+                    if not alive:
+                        self.task_store.raw_rpc("a2a_task.update", {
+                            "task_id": task_id, "state": "failed",
+                            "error": "process_died_during_downtime"})
+                        failed += 1
+                        continue
                     restored += 1
-            if restored > 0:
-                import sys
-                print(f"[A2A Gateway] Restored {restored} non-terminal tasks from WAL", file=sys.stderr)
+
+                elif state == "submitted" and agent_id == "manager":
+                    # Check if this is a stale delegation
+                    created = row.get("created_at", "")
+                    if created:
+                        try:
+                            from datetime import datetime, timezone, timedelta
+                            dt = datetime.strptime(created[:19], "%Y-%m-%dT%H:%M:%S")
+                            age = (datetime.now(timezone.utc) - dt.replace(tzinfo=timezone.utc)).total_seconds()
+                            if age > 60:
+                                # Check if any workers exist for this manager task
+                                workers = [r for r in rows if r.get("agent_id") == "worker"
+                                          and r.get("raw_key") == row.get("raw_key", "")]
+                                if not workers:
+                                    self.task_store.raw_rpc("a2a_task.update", {
+                                        "task_id": task_id, "state": "completed",
+                                        "completion_summary": "auto_completed_on_restart_stale_delegation"})
+                        except Exception:
+                            pass
+                else:
+                    restored += 1
+
+            import sys
+            msg = f"[A2A Gateway] Restored {restored} non-terminal tasks"
+            if failed > 0:
+                msg += f", {failed} marked failed (dead processes)"
+            print(msg, file=sys.stderr)
         except Exception:
             pass  # DB not available → start with empty TaskStore (降级运行)
 
@@ -371,7 +424,6 @@ class A2AServer:
             Route("/.well-known/agent-card.json", self._agent_card_endpoint, methods=["GET"]),
             Route("/tasks", self._tasks_endpoint, methods=["GET", "POST"]),
             Route("/tasks/latest-manager", self._latest_manager, methods=["GET"]),
-            Route("/tasks/pending-delivery", self._pending_delivery, methods=["GET"]),
             Route("/tasks/launched-pids", self._launched_pids, methods=["GET"]),
             Route("/tasks/{task_id:path}", self._task_endpoint, methods=["GET", "PATCH"]),
             Route("/tasks/{task_id}/stream", self._task_stream_endpoint, methods=["GET"]),
@@ -458,7 +510,7 @@ class A2AServer:
         else:
             qs = dict(request.query_params)
             rows = self.task_store.get_all_dicts()
-            for key in ("state", "agent_id", "skill", "worktree", "raw_key", "delivery_status"):
+            for key in ("state", "agent_id", "skill", "worktree", "raw_key"):
                 if key in qs: rows = [r for r in rows if r.get(key) == qs[key]]
             rows.sort(key=lambda r: r.get("created_at", ""), reverse=True)
             return JSONResponse({"tasks": rows})
@@ -470,11 +522,6 @@ class A2AServer:
             self.task_store.raw_rpc("a2a_task.update-message", {
                 "task_id": tid, "role": body.get("role", "worker"),
                 "type": body.get("type", "text"), "content": body.get("content", "")})
-            return JSONResponse({"ok": True})
-        if task_id.endswith("/delivery") and request.method == "PATCH":
-            tid = task_id[:-10]; body = await request.json()
-            self.task_store.raw_rpc("a2a_task.update-delivery-status",
-                {"task_id": tid, "delivery_status": body.get("delivery_status", "delivered")})
             return JSONResponse({"ok": True})
         if task_id.endswith("/worker-pid") and request.method == "PATCH":
             tid = task_id[:-12]; body = await request.json()
@@ -516,12 +563,6 @@ class A2AServer:
         mgr = [r for r in rows if r.get("agent_id", "").startswith("manager")]
         mgr.sort(key=lambda r: r.get("created_at", ""), reverse=True)
         return JSONResponse(mgr[0] if mgr else {})
-
-    async def _pending_delivery(self, request: Request):
-        rows = self.task_store.get_all_dicts()
-        pending = [r for r in rows if r.get("delivery_status") == "pending" and r.get("agent_id") == "worker"]
-        pending.sort(key=lambda r: r.get("created_at", ""))
-        return JSONResponse({"tasks": pending})
 
     async def _launched_pids(self, request: Request):
         raw_key = request.query_params.get("raw_key", "")
