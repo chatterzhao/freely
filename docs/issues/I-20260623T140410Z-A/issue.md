@@ -2,7 +2,7 @@
 local_id: I-20260623T140410Z-A
 kind: linked
 status: in_b2_ibm
-phase_state: in_b2_ibm
+phase_state: in_dev
 promoted_from: raw-20260623T140410Z
 source_candidate: docs/pre-brainstorms/20260623T140410Z--restore-tasks-edge-cases/candidates.md
 canonical_issue_path: ""
