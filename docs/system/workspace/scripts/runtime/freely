@@ -732,7 +732,7 @@ Usage:
   freely develop-push attempt [--project <abs_path>]
   freely develop-push defer [--project <abs_path>] --reason <post_merge_acceptance|cleanup_followthrough|remote_delivery_hold> [--note <text>]
   freely develop-push clear [--project <abs_path>]
-  freely wt-create [--raw-key <key>] [--source <platform|chat-inbox>] [--skill <skill>] [--slug <slug>] [--base <branch>]
+  freely wt-create [--raw-key <key>] [--source platform] [--skill <skill>] [--slug <slug>] [--base <branch>]
   freely pr-create-guarded [--title <title>] [--body <body>] [--base <branch>]
   freely pr-merge-guarded <target-branch> <source-branch> [--dry-run]
   freely pr-merge-guarded complete <target-branch> <source-branch>
@@ -6154,9 +6154,9 @@ _write_chat_to_issue() {
 
   if [[ "$chat_type" == "new-issue" ]]; then
     log_info "[chat] raw issue created: $issue_id"
-    log_info "[chat] Next: create a worktree to fix or implement:"
-    log_info "[chat]   Bug fix:  wt-create --raw-key ${chat_id} --source chat-inbox --skill freely-fix-execution --slug <slug>"
-    log_info "[chat]   Feature:  wt-create --raw-key ${chat_id} --source chat-inbox --skill freely-feat-execution --slug <slug>"
+    log_info "[chat] Next: create raw issue on GitHub, then worktree:"
+    log_info "[chat]   1. freely feedback --repo <repo> --title \"...\" --body \"...\""
+    log_info "[chat]   2. wt-create --raw-key <returned-key> --source platform --skill freely-fix-execution --slug <slug>"
     log_info "[chat] Then follow the skill: skill:freely-fix-execution (Fix first) or skill:freely-feat-execution (Govern first)"
   fi
 
@@ -22725,10 +22725,9 @@ cmd_intake_chat() {
   [[ "$conversation" == "true" ]] && echo "conversation: true"
   if [[ "$new_issue" == "true" ]]; then
     echo ""
-    echo "[chat] The daemon will create a raw issue from this intake."
-    echo "[chat] After the raw issue appears (check docs/issues/ or daemon log), run:"
-    echo "[chat]   Bug fix:  wt-create --raw-key <raw-key> --source chat-inbox --skill freely-fix-execution --slug <slug>"
-    echo "[chat]   Feature:  wt-create --raw-key <raw-key> --source chat-inbox --skill freely-feat-execution --slug <slug>"
+    echo "[chat] To create a raw issue from this intake:"
+    echo "[chat]   1. freely feedback --repo <repo> --title \"...\" --body \"...\""
+    echo "[chat]   2. wt-create --raw-key <returned-key> --source platform --skill freely-fix-execution --slug <slug>"
     echo "[chat]"
     echo "[chat] Then follow the skill to complete the work:"
     echo "[chat]   skill:freely-fix-execution  — Fix first, govern later"

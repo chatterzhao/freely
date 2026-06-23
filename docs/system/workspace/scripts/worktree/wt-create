@@ -4,14 +4,12 @@ set -euo pipefail
 usage() {
   cat <<USAGE
 Usage:
-  ./bin/wt-create --raw-key <key> --source <platform|chat-inbox> --skill <freely-fix-execution|freely-feat-execution> --slug <slug> [--base <branch>]
+  ./bin/wt-create --raw-key <key> --source platform --skill <freely-fix-execution|freely-feat-execution> --slug <slug> [--base <branch>]
   ./bin/wt-create <branch> [--base <base-branch>]    (legacy: 补建 test-pre-merge-*、纯文档、init develop、release 分支)
 
 Required:
   --raw-key <key>     Raw issue key (YYYYMMDDTHHMM[SS]Z format, e.g. 20260513T010343Z)
-  --source  <platform|chat-inbox>
-                        platform    — GitHub/Gitee OPEN issue
-                        chat-inbox  — freely.db chats 表
+  --source  platform    Raw issue must exist on GitHub (created via 'freely feedback')
   --skill   <freely-fix-execution|freely-feat-execution>
                         freely-fix-execution  — 快速修复 bug
                         freely-feat-execution — 新功能/大型改动
@@ -27,12 +25,13 @@ What it creates:
        freely-feat-execution  → feature/raw-{raw-key}-{slug}
   2. test-pre-merge-{raw-key}-{slug}  ← based on ①, discardable testing sandbox
 
-Examples:
-  ./bin/wt-create --raw-key 20260506T100035Z --source platform \
-    --skill freely-fix-execution --slug task-mode-wait-prelaunch-gate
+Before wt-create, create the raw issue on GitHub first:
+  freely feedback --repo <repo> --title "..." --body "..."
 
-  ./bin/wt-create --raw-key 20260506T100035Z --source chat-inbox \
-    --skill freely-feat-execution --slug new-auth-module
+Example:
+  freely feedback --repo chatterzhao/freely --title "描述" --body "..."
+  ./bin/wt-create --raw-key <returned-key> --source platform \
+    --skill freely-fix-execution --slug task-mode-wait-prelaunch-gate
 
 Legacy:
   ./bin/wt-create feature/my-task-20260307 --base develop
@@ -117,16 +116,15 @@ if [[ -n "$raw_key" || -n "$source_val" || -n "$skill_path" || -n "$slug" ]]; th
     cat <<MSG >&2
 Missing required: --source
 
-  --source tells wt-create where the raw issue comes from:
-    chat-inbox  — freely.db chats 表 (chat_type=new-issue, consumed=0)
-    platform    — GitHub/Gitee OPEN issue
+  --source must be 'platform'. All raw issues must exist on GitHub.
+  Create one first: freely feedback --repo <repo> --title "..." --body "..."
 
   AI: search for this raw-key in the scan file to find its source_family:
     .freely/run/manager-task-source-scan-latest.json
 
   If the scan file doesn't have this key, wt-create will auto-run scan once.
 
-Usage: ./bin/wt-create --raw-key <key> --source <source> --skill <path> --slug <slug>
+Usage: ./bin/wt-create --raw-key <key> --source platform --skill <path> --slug <slug>
 MSG
     exit 1
   fi
@@ -148,12 +146,16 @@ fi
 
 if [[ "$using_new" -eq 1 ]]; then
   case "$source_val" in
-    chat-inbox|platform|local) ;;
+    platform) ;;
+    chat-inbox|local)
+      echo "Invalid --source '$source_val'. Only 'platform' is allowed." >&2
+      echo "  All raw issues must be created on GitHub via 'freely feedback' first." >&2
+      echo "  Then use: wt-create --raw-key <key> --source platform --skill <skill> --slug <slug>" >&2
+      exit 1
+      ;;
     *)
-      echo "Invalid --source '$source_val'. Must be 'chat-inbox', 'platform', or 'local'." >&2
-      echo "  chat-inbox — raw issue comes from freely.db chats table" >&2
-      echo "  platform   — raw issue comes from GitHub/Gitee OPEN issue" >&2
-      echo "  local      — raw issue exists in docs/issues/raw-<key>/" >&2
+      echo "Invalid --source '$source_val'. Must be 'platform'." >&2
+      echo "  platform — raw issue exists on GitHub (created via 'freely feedback')" >&2
       exit 1
       ;;
   esac
@@ -316,38 +318,6 @@ _run_scan_once() {
 _pull_raw_issue() {
   local raw_key="$1" source="$2"
   case "$source" in
-    chat-inbox)
-      local ts db_path chat_inbox_py
-      ts="${raw_key}"
-      db_path="$ROOT_DIR/.freely/freely.db"
-      chat_inbox_py="$ROOT_DIR/docs/system/workspace/scripts/runtime/chat-inbox.py"
-      [[ -f "$db_path" ]] || { echo "chat-inbox DB not found: $db_path" >&2; return 1; }
-
-      # Check if chat with this id exists and is unconsumed (normalize ISO->bare for DB)
-      local consumed ts_bare
-      ts_bare=$(echo "$ts" | tr -d 'TZ')
-      consumed=$(python3 -c "
-import sqlite3
-conn=sqlite3.connect('$db_path')
-r=conn.execute('SELECT consumed FROM chats WHERE id=? AND chat_type=\"new-issue\"', ('$ts_bare',)).fetchone()
-print(r[0] if r else '')
-conn.close()
-" 2>/dev/null || echo "")
-      if [[ "$consumed" != "0" ]]; then
-        echo "chat-inbox: no unconsumed new-issue chat found for id=$ts" >&2
-        return 1
-      fi
-
-      local issue_dir="$PWD/docs/issues/raw-${raw_key}"
-      mkdir -p "$issue_dir"
-      if ! python3 "$chat_inbox_py" materialize --db "$db_path" --id "$ts_bare" --target "$issue_dir" >/dev/null 2>&1; then
-        echo "chat-inbox: materialize failed for id=$ts" >&2
-        return 1
-      fi
-      python3 "$chat_inbox_py" consume --db "$db_path" --id "$ts_bare" --materialized-as "raw-${raw_key}" >/dev/null 2>&1
-      echo "pull: materialized raw-$raw_key from chat-inbox → $issue_dir/issue.md" >&2
-      return 0
-      ;;
     platform)
       if [[ -x "$ROOT_DIR/bin/raw-issue-pull" ]]; then
         local result
@@ -357,28 +327,6 @@ conn.close()
           return 0
         fi
       fi
-      return 1
-      ;;
-    local)
-      # Issue already exists in docs/issues/, verify frontmatter
-      local _issue_file="$PWD/docs/issues/raw-${raw_key}/issue.md"
-      if [[ -f "$_issue_file" ]]; then
-        local _kind; _kind=$(python3 -c "
-import yaml
-with open('$_issue_file') as f: c = f.read()
-parts = c.split('---', 2)
-fm = yaml.safe_load(parts[1]) if len(parts) >= 3 else {}
-print(fm.get('kind', ''))
-" 2>/dev/null || true)
-        if [[ "$_kind" != "raw" ]]; then
-          echo "拒绝: raw-$raw_key 的 kind 字段为 '${_kind:-missing}'，必须为 'raw'。" >&2
-          echo "  请通过 freely feedback 创建 raw issue，不要手工创建 issue.md。" >&2
-          return 1
-        fi
-        echo "pull: raw-$raw_key already exists locally" >&2
-        return 0
-      fi
-      echo "pull: raw-$raw_key not found in docs/issues/" >&2
       return 1
       ;;
   esac
@@ -482,42 +430,18 @@ _require_issue_exists() {
               return 1
             fi
             ;;
-          chat-inbox)
-            if [[ -f "$db_path" ]] && python3 "$chat_inbox_py" show --db "$db_path" --id "$ts_bare" >/dev/null 2>&1; then
-              : # chat exists in inbox, proceed
+          chat-inbox|local|*)
+            # All sources other than platform: redirect to feedback → platform flow
+            if [[ -d "$ROOT_DIR/docs/issues/raw-$raw_key" ]] || [[ -d "$ROOT_DIR/docs/issues/$key" ]]; then
+              echo "  发现本地 issue 文件，请使用 --source platform:" >&2
+              echo "    wt-create --raw-key $raw_key --source platform --skill <skill> --slug <slug>" >&2
             else
-              echo "拒绝创建工位: raw-$raw_key not found in chat-inbox" >&2
-              if [[ -d "$ROOT_DIR/docs/issues/raw-$raw_key" ]]; then
-                echo "  但发现 issue 文件存在于 docs/issues/raw-$raw_key/" >&2
-                echo "  请使用 --source platform（本地 issue 文件作为 platform 创建工位）:" >&2
-                echo "    wt-create --raw-key $raw_key --source platform --skill <skill> --slug <slug>" >&2
-              else
-                echo "  先通过 freely chat 提交消息创建 chat-inbox raw issue" >&2
-                echo "  创建后重试: wt-create --raw-key $raw_key --source chat-inbox --skill <skill> --slug <slug>" >&2
-              fi
-              return 1
+              echo "拒绝创建工位: raw-$raw_key 不存在" >&2
+              echo "  所有 raw issue 必须通过 freely feedback 在 GitHub 上创建:" >&2
+              echo "    freely feedback --repo <repo> --title '...' --body '...'" >&2
+              echo "  创建后重试: wt-create --raw-key $raw_key --source platform --skill <skill> --slug <slug>" >&2
             fi
-            ;;
-          local)
-            if [[ -d "$ROOT_DIR/docs/issues/$key" ]]; then
-              : # exists locally
-            else
-              echo "拒绝创建工位: raw-$raw_key not found in docs/issues/" >&2
-              echo "  先在 docs/issues/raw-$raw_key/ 创建 issue.md" >&2
-              echo "  或: freely feedback --repo <user/repo> --title '...' --body '...'" >&2
-              echo "  创建后重试: wt-create --raw-key $raw_key --source local --skill <skill> --slug <slug>" >&2
-              return 1
-            fi
-            ;;
-          *)
-            # Legacy / unspecified source: check local dir
-            if [[ -d "$ROOT_DIR/docs/issues/$key" ]]; then
-              : # exists locally
-            else
-              echo "拒绝创建工位: raw-$raw_key not found" >&2
-              echo "  --source 必须为 'platform' 或 'chat-inbox'，且 raw issue 必须存在" >&2
-              return 1
-            fi
+            return 1
             ;;
         esac
       fi
@@ -844,7 +768,7 @@ Branch:
 Execution base:
   $base
 
-  wt-create 标准模式: --raw-key <key> --source <platform|chat-inbox> --skill <freely-fix-execution|freely-feat-execution> --slug <slug>
+  wt-create 标准模式: --raw-key <key> --source platform --skill <freely-fix-execution|freely-feat-execution> --slug <slug>
     使用场景：从 raw issue 创建 fix|hotfix|feature + test-pre-merge 工位对，走完整 IBM 治理链路
   wt-create legacy 模式: <branch>
     使用场景：已有 fix|hotfix|feature 开发工位但缺 test-pre-merge-<raw-key>-<slug> 时补建测试工位、

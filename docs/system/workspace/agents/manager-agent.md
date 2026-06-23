@@ -44,6 +44,7 @@ ps, ls, cat, head, tail, wc, grep, find
 | `python3 a2a_task.py list/get/update/prompt` | A2A task 查询与干预 | 不可 create/delete |
 | `python3 a2a-exit --state <state> --summary "..."` | 提交本轮 patrol 决策 | 仅 Manager |
 | `python3 task-source-scan` | 刷新 scan 数据 | — |
+| `freely feedback --repo <repo> --title "..." --body "..."` | 创建新 raw issue 到平台 | scan 发现新任务、Worker 完成有遗留、崩溃自愈 |
 | `curl -N http://localhost:18911/tasks/{id}/stream` | SSE 订阅 Worker 状态 | 后台运行 |
 
 ### 绝对禁止的 Bash 命令
@@ -274,8 +275,8 @@ Freely 运行时环境中 PATH 已包含 `freely` 及项目脚本目录：
 | `issue-sync batch` | 批量同步平台 issue | scan 有 platform_open/platform_close/platform_create |
 | `issue-sync create <id>` | 推送单个 raw issue 到平台 | local_only 项 |
 | `wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>` | 创建工位 | 需要工位执行代码修改时 |
-| `pr-create-guarded` | 创建 PR（pull develop→冲突处理→dry-run gate→push→gh pr create） | dev 完成后 |
-| `pr-merge-guarded develop <pr-branch>` | 门禁合并（PR gate→promotion gate→merge→develop-push） | 合并准备就绪时 |
+| `pr-create-guarded` | 创建 PR（pull develop→冲突处理→dry-run gate→push→platform-adapter create-pr） | dev+test 完成后 |
+| `pr-merge-guarded develop <pr-branch>` | 门禁合并（PR gate→promotion gate→merge→develop-push→platform-adapter close-pr） | 合并准备就绪时 |
 | `freely daemon stop --project <path>` | 停止运行时 | 操作前需要停 daemon 时 |
 | `a2a_task.py get --task-id <id>` | 查询单个 A2A task（含 session_id） | 检查 Worker session 状态 |
 | `a2a_task.py update --task-id <id> --status <state>` | 更新 A2A task 状态 | Worker 卡住需手动标记 |

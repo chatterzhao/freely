@@ -15,6 +15,7 @@
 | `skill:freely-doc-B1_IBM-execution` | raw issue → brainstorm → candidate |
 | `skill:freely-doc-B2_IBM-execution` | I-issue → prd/pre-tests/tasks/code-review |
 | `skill:freely-dev-loop-execution` | 实现 → 测试 → 证据 → code-review |
+| `skill:freely-test-execution` | 在 test-pre-merge 工位逐条执行 pre-tests，全绿后进入 PR |
 | `skill:freely-branch-management` | pr-create-guarded / pr-merge-guarded |
 | `skill:freely-worktree-maintenance-governance` | wt-close、issue-sync |
 | `skill:freely-constitution-guard` | 提交/合并前宪法预检 |
