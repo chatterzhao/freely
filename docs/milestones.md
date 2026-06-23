@@ -1,3 +1,17 @@
+## M-20260623T100903Z-A
+- title: Complete SSE implementation — client, replace polling, remove delivery_status
+- status: active
+- description: |
+  彻底实现 SSE：a2a_task.py SSE 客户端 + freely 脚本替代 list-pending-delivery 轮询 +
+  废弃 delivery_status 列 + _restore_tasks() 修复 + filesystem_fallback deprecated。
+  #3381 完整分析的最终结论——SSE 缺失是当前 5/6 问题的中枢。
+  5 阶段递进：客户端基础→双写过渡→废弃轮询→服务端修复→文档验证。
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
+
 ## M-20260623T022909Z-A
 - title: Fix scan import for platform-adapter
 - status: active
