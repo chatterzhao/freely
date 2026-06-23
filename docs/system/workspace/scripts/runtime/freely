@@ -11092,6 +11092,184 @@ manager_semantic_loop_signal_snapshot_for_project() {
   printf 'manager_continuity_rewrite_without_state_advance|%s|%s|%s|%s|%s\n' \
     "$repeat_count" \
     "$latest_continuity" \
+
+# ── L0-L3 Loop Guard ───────────────────────────────────────────────────
+
+LOOP_GUARD_L0_WINDOW_SECS="${LOOP_GUARD_L0_WINDOW_SECS:-300}"
+LOOP_GUARD_L0_FRESH_THRESHOLD="${LOOP_GUARD_L0_FRESH_THRESHOLD:-3}"
+LOOP_GUARD_L1_MAX_STRIKES="${LOOP_GUARD_L1_MAX_STRIKES:-3}"
+LOOP_GUARD_L2_TOKEN_THRESHOLD="${LOOP_GUARD_L2_TOKEN_THRESHOLD:-20000}"
+LOOP_GUARD_L2_WINDOW_SECS="${LOOP_GUARD_L2_WINDOW_SECS:-600}"
+LOOP_GUARD_L3_TOKEN_CAP="${LOOP_GUARD_L3_TOKEN_CAP:-500000}"
+
+_loop_guard_L0_window_file() { echo "$(run_dir_for_project "$1")/loop-guard-L0-window.tsv"; }
+_loop_guard_L1_state_file() { echo "$(run_dir_for_project "$1")/loop-guard-L1-state.env"; }
+_loop_guard_L2_state_file() { echo "$(run_dir_for_project "$1")/loop-guard-L2-state.env"; }
+_loop_guard_L3_state_file() { echo "$(run_dir_for_project "$1")/loop-guard-L3-state.env"; }
+
+# L0: Fresh launch storm detection
+_loop_guard_L0_check() {
+  local project="$1" launch_kind="${2:-}" worker_launched="${3:-0}"
+  local window_file now_epoch fresh_count
+  window_file="$(_loop_guard_L0_window_file "$project")"
+  now_epoch="$(date +%s)"
+  [[ "$worker_launched" =~ ^[0-9]+$ ]] || worker_launched=0
+
+  # Append current entry
+  mkdir -p "$(dirname "$window_file")"
+  printf '%s\t%s\t%s\n' "$now_epoch" "$launch_kind" "$worker_launched" >> "$window_file"
+
+  # Count fresh launches with zero output in window
+  fresh_count=$(awk -F '\t' -v now="$now_epoch" -v window="$LOOP_GUARD_L0_WINDOW_SECS" '
+    NF >= 3 && $1 ~ /^[0-9]+$/ {
+      if ((now - $1) <= window && $2 == "fresh" && $3 == "0") fresh++
+    }
+    END { print fresh+0 }
+  ' "$window_file")
+
+  if (( fresh_count > LOOP_GUARD_L0_FRESH_THRESHOLD )); then
+    append_runtime_event "$project" "loop_guard_L0_storm" \
+      "fresh_count=$fresh_count" \
+      "window_secs=$LOOP_GUARD_L0_WINDOW_SECS" \
+      "action=task_mode_wait"
+    write_task_mode "$project" "wait"
+    return 1
+  fi
+  return 0
+}
+
+# L1: Action fingerprint stagnation
+_loop_guard_L1_check() {
+  local project="$1" exit_kind="${2:-}" worker_launched="${3:-0}"
+  local state_file prev_exit_kind prev_worker_launched strike_count
+  state_file="$(_loop_guard_L1_state_file "$project")"
+  [[ "$worker_launched" =~ ^[0-9]+$ ]] || worker_launched=0
+
+  # Load previous state
+  prev_exit_kind=""; prev_worker_launched=""; strike_count=0
+  if [[ -f "$state_file" ]]; then
+    source "$state_file" 2>/dev/null || true
+    strike_count="${LOOP_GUARD_L1_STRIKES:-0}"
+  fi
+
+  # Check if same fingerprint
+  if [[ "$exit_kind" == "$prev_exit_kind" && "$worker_launched" == "$prev_worker_launched" && "$worker_launched" == "0" ]]; then
+    strike_count=$((strike_count + 1))
+  else
+    strike_count=0
+  fi
+
+  # Save state
+  mkdir -p "$(dirname "$state_file")"
+  cat > "$state_file" <<< "prev_exit_kind=$exit_kind
+prev_worker_launched=$worker_launched
+LOOP_GUARD_L1_STRIKES=$strike_count"
+
+  if (( strike_count >= LOOP_GUARD_L1_MAX_STRIKES )); then
+    append_runtime_event "$project" "loop_guard_L1_stagnation" \
+      "exit_kind=$exit_kind" \
+      "strikes=$strike_count" \
+      "action=task_mode_listen"
+    write_task_mode "$project" "listen"
+    # Reset strikes after action
+    rm -f "$state_file"
+    return 1
+  elif (( strike_count == LOOP_GUARD_L1_MAX_STRIKES - 2 )); then
+    append_runtime_event "$project" "loop_guard_L1_hint" \
+      "exit_kind=$exit_kind" \
+      "strikes=$strike_count"
+  elif (( strike_count == LOOP_GUARD_L1_MAX_STRIKES - 1 )); then
+    append_runtime_event "$project" "loop_guard_L1_intervention" \
+      "exit_kind=$exit_kind" \
+      "strikes=$strike_count" \
+      "hint=Please call a2a-exit --state failed if no actionable work"
+  fi
+  return 0
+}
+
+# L2: Token waste detection
+_loop_guard_L2_check() {
+  local project="$1" prompt_bytes="${2:-0}" worker_launched="${3:-0}"
+  local state_file window_start_bytes window_start_time now_epoch
+  state_file="$(_loop_guard_L2_state_file "$project")"
+  [[ "$prompt_bytes" =~ ^[0-9]+$ ]] || prompt_bytes=0
+  [[ "$worker_launched" =~ ^[0-9]+$ ]] || worker_launched=0
+  now_epoch="$(date +%s)"
+
+  # Initialize or load window
+  if [[ -f "$state_file" ]]; then
+    source "$state_file" 2>/dev/null || true
+  fi
+  window_start_bytes="${LOOP_GUARD_L2_START_BYTES:-$prompt_bytes}"
+  window_start_time="${LOOP_GUARD_L2_START_TIME:-$now_epoch}"
+
+  # Reset window if it expired
+  if (( now_epoch - window_start_time > LOOP_GUARD_L2_WINDOW_SECS )); then
+    window_start_bytes=$prompt_bytes
+    window_start_time=$now_epoch
+  fi
+
+  local window_tokens=$(( (prompt_bytes - window_start_bytes) / 4 ))  # bytes→tokens estimate
+
+  mkdir -p "$(dirname "$state_file")"
+  cat > "$state_file" <<< "LOOP_GUARD_L2_START_BYTES=$window_start_bytes
+LOOP_GUARD_L2_START_TIME=$window_start_time"
+
+  if (( window_tokens > LOOP_GUARD_L2_TOKEN_THRESHOLD && worker_launched == 0 )); then
+    append_runtime_event "$project" "loop_guard_L2_token_waste" \
+      "estimated_tokens=$window_tokens" \
+      "window_secs=$LOOP_GUARD_L2_WINDOW_SECS" \
+      "action=task_mode_listen"
+    write_task_mode "$project" "listen"
+    rm -f "$state_file"
+    return 1
+  fi
+  return 0
+}
+
+# L3: Hard budget cap
+_loop_guard_L3_check() {
+  local project="$1" total_tokens="${2:-0}"
+  local state_file accumulated
+  state_file="$(_loop_guard_L3_state_file "$project")"
+  [[ "$total_tokens" =~ ^[0-9]+$ ]] || total_tokens=0
+
+  accumulated=0
+  if [[ -f "$state_file" ]]; then
+    source "$state_file" 2>/dev/null || true
+    accumulated="${LOOP_GUARD_L3_ACCUMULATED:-0}"
+  fi
+  accumulated=$((accumulated + total_tokens))
+
+  mkdir -p "$(dirname "$state_file")"
+  echo "LOOP_GUARD_L3_ACCUMULATED=$accumulated" > "$state_file"
+
+  if (( accumulated > LOOP_GUARD_L3_TOKEN_CAP )); then
+    append_runtime_event "$project" "loop_guard_L3_budget_exhausted" \
+      "accumulated_tokens=$accumulated" \
+      "cap=$LOOP_GUARD_L3_TOKEN_CAP" \
+      "action=task_mode_wait"
+    write_task_mode "$project" "wait"
+    : > "$(stop_marker_file "$project")"
+    return 1
+  fi
+  return 0
+}
+
+# Main L0-L3 check — called once per patrol cycle before sleep
+loop_guard_check_all() {
+  local project="$1" launch_kind="${2:-}" exit_kind="${3:-}" \
+        worker_launched="${4:-0}" prompt_bytes="${5:-0}"
+  # L0: fresh launch storm
+  _loop_guard_L0_check "$project" "$launch_kind" "$worker_launched" || return 1
+  # L1: action fingerprint
+  _loop_guard_L1_check "$project" "$exit_kind" "$worker_launched" || return 1
+  # L2: token waste (estimate — full fix needs #3386)
+  _loop_guard_L2_check "$project" "$prompt_bytes" "$worker_launched" || return 1
+  # L3: hard budget (estimate)
+  _loop_guard_L3_check "$project" "$((prompt_bytes / 4))" || return 1
+  return 0
+}
     "$latest_consumed" \
     "$latest_prompt_csv" \
     "$oldest_repeat"
@@ -22031,6 +22209,13 @@ print(ready)
       sleep_with_rate_limit_recheck "$PROJECT_ROOT" "$observe_delay"
       continue
     fi
+    # ── L0-L3 Loop Guard: detect dead loops before next cycle ──
+    loop_guard_check_all "$PROJECT_ROOT" \
+      "${LAST_LAUNCH_KIND:-}" \
+      "${LAST_EXIT_REASON:-}" \
+      "${worker_launched_directly:-0}" \
+      "${LAST_PROMPT_BYTES:-0}" || true  # never block supervisor on guard error
+
     sleep_with_rate_limit_recheck "$PROJECT_ROOT" "$next_restart_delay"
   done
 }
