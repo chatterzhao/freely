@@ -1,3 +1,26 @@
+## M-20260623T140410Z-A
+- title: Fix _restore_tasks edge cases — missing PID, stale detection, deleted worktree
+- status: active
+### candidate_issues
+1. `C-20260623T140410Z-A`
+- milestone: M-20260623T140410Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260623T140410Z-A/issue.md`
+### committed_issues
+1. `I-20260623T140410Z-A`
+- title: A2A 状态管理全量修复 — stop 不动状态 + 重启恢复 + 审计 bug
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260623T140410Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/a2a-state-management/code-reviews`
+### completed_issues
+1. `I-20260623T140410Z-A`
+- title: A2A 状态管理全量修复
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260623T140410Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/a2a-state-management/code-reviews`
+
 ## M-20260623T100903Z-A
 - title: Complete SSE implementation — client, replace polling, remove delivery_status
 - status: active

@@ -679,8 +679,8 @@ except: pass
         echo "wt-close: worker $_wtask_id already exited (pid=$_wpid not found)"
       fi
 
-      # Mark task as consumed
-      python3 "$_a2a_task_py" update --task-id "$_wtask_id" --state consumed >/dev/null 2>&1 || true
+      # Mark task as completed (was 'consumed' — invalid A2A state, silently rejected by SQLite CHECK)
+      python3 "$_a2a_task_py" update --task-id "$_wtask_id" --state completed >/dev/null 2>&1 || true
     done <<<"$_active_workers"
   fi
 
