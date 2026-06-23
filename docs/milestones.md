@@ -1,3 +1,19 @@
+## M-20260623T022909Z-A
+- title: Fix scan import for platform-adapter
+- status: active
+### candidate_issues
+1. `C-20260623T022909Z-A`
+- milestone: M-20260623T022909Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260623T022909Z-A/issue.md`
+### committed_issues
+1. `I-20260623T022909Z-A`
+- title: fix: replace platform_adapter direct imports with importlib loading
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260623T022909Z-A/issue.md`
+- verification_artifact_dir: `docs/system/workspace/scripts/runtime`
+
 ## M-20260623T005123Z-A
 - title: Flow documentation overhaul
 - status: active
@@ -4151,3 +4167,20 @@ routing_policy:
 - milestone_state: committed
 - phase_state: completed
 - issue_path: `docs/issues/I-20260622T131109Z-A/issue.md`
+
+## M-20260623T022909Z-A
+- title: fix task-lifecycle-scan.py platform_adapter import (hyphenated filename)
+- status: active
+### candidate_issues
+1. `C-20260623T022909Z-A`
+- milestone: M-20260623T022909Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260623T022909Z-A/issue.md`
+### committed_issues
+1. `I-20260623T022909Z-A`
+- title: fix task-lifecycle-scan.py platform_adapter import (hyphenated filename)
+- milestone_state: committed
+- phase_state: completed
+- issue_path: `docs/issues/I-20260623T022909Z-A/issue.md`
+- source_raws:
+  - `raw-20260623T022909Z`

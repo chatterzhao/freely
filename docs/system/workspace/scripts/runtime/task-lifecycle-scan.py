@@ -12,11 +12,20 @@ import argparse, json, os, re, sys, subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 
-# Import platform-adapter for list_open_issues
+# Import platform-adapter via importlib (file has hyphen, breaks direct import)
+import importlib.util
 _SYNC_DIR = Path(__file__).resolve().parent.parent / "sync"
-if str(_SYNC_DIR) not in sys.path:
-    sys.path.insert(0, str(_SYNC_DIR))
-from platform_adapter import list_open_issues as _platform_list_open
+_PA_MODULE = None
+
+def _get_pa():
+    global _PA_MODULE
+    if _PA_MODULE is None:
+        spec = importlib.util.spec_from_file_location(
+            "platform_adapter", str(_SYNC_DIR / "platform-adapter.py")
+        )
+        _PA_MODULE = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(_PA_MODULE)
+    return _PA_MODULE
 
 # IBM Framework §89: raw.phase_state ∈ {proposed, absorbed, dropped}
 # IBM Framework §89: I-*.phase_state ∈ {in_b2_ibm → done_b2_ibm → in_dev → blocked_dev → in_verification → completed}
@@ -435,8 +444,8 @@ def fetch_open_platform_issues(project: Path) -> dict:
         "issues": [],
     }
     try:
-        from platform_adapter import configured_platforms; platforms = configured_platforms()
-        open_issues = _platform_list_open(platforms)
+        platforms = _get_pa().configured_platforms()
+        open_issues = _get_pa().list_open_issues(platforms)
         for num, state in open_issues.items():
             result["all"][num] = state
             if state == "OPEN":
@@ -471,8 +480,7 @@ def _is_github_closed_lookup(issue_number: str, platform_data: dict) -> bool | N
     if not issue_number:
         return None
     try:
-        from platform_adapter import fetch_issue_state
-        state = fetch_issue_state("github", str(issue_number))
+        state = _get_pa().fetch_issue_state("github", str(issue_number))
         if state:
             return state != "OPEN"
     except Exception:
