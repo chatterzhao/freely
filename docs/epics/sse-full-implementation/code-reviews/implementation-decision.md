@@ -1,6 +1,9 @@
-# Implementation Decision Note: SSE 彻底实现
+---
+owner_issue: I-20260623T100903Z-A
+owner_issue_path: docs/issues/I-20260623T100903Z-A/issue.md
+---
 
-owner_issue: docs/issues/I-20260623T100903Z-A/issue.md
+# Implementation Decision Note: SSE 彻底实现
 
 ## decision
 采用 5 阶段递进方案，从轮询迁移到 SSE 推送。Phase 2 双写过渡（SSE + 轮询并行）确保安全切换，Phase 3 在 SSE 稳定后删除 delivery_status。
