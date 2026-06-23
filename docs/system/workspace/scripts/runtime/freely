@@ -22029,12 +22029,16 @@ print(ready)
     local _cache_acp_count _cache_active_sessions
     _cache_acp_count=$(pgrep -c "claude-agent-acp" 2>/dev/null || echo "0")
     _cache_active_sessions=$(python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli" --project "$project" session.count-active --project "$project" 2>/dev/null || echo "0")
+    local _pb _estimated_tokens
+    _pb=$(wc -c < "$prompt_file" 2>/dev/null | tr -d ' ' || echo '0')
+    _estimated_tokens=$(( _pb / 4 ))  # bytes → tokens estimate (CN/EN mix)
     append_runtime_event "$project" "cache_metrics" \
       "supervisor_pid=$$" \
       "role=${LAST_ROLE_HINT:-unknown}" \
       "launch_kind=$mode_name" \
       "prompt_file=$prompt_file" \
-      "prompt_bytes=$(wc -c < "$prompt_file" 2>/dev/null | tr -d ' ' || echo '0')" \
+      "prompt_bytes=$_pb" \
+      "estimated_input_tokens=$_estimated_tokens" \
       "resume_streak=${RESUME_STREAK_CURRENT:-0}" \
       "context_ratio=${context_ratio:-0}" \
       "acp_process_count=${_cache_acp_count}" \

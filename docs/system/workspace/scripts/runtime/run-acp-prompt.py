@@ -543,13 +543,18 @@ def main():
             print(f"[TIMING] transport_connect={(t_session - t_start):.1f}s session_new={0:.1f}s prompt_wait={(t_done - t_before):.1f}s total={(t_done - t_start):.1f}s prompt_size={prompt_kb:.1f}kb", flush=True)
 
             usage = prompt_result.get("usage") or {}
+            prompt_bytes = len(prompt_text.encode('utf-8'))
             # Supports both Anthropic and DeepSeek cache field names
             cache_hit = usage.get("cache_read_input_tokens") or usage.get("prompt_cache_hit_tokens") or 0
             cache_miss = usage.get("cache_creation_input_tokens") or usage.get("prompt_cache_miss_tokens") or 0
             input_tokens = usage.get("input_tokens") or usage.get("prompt_tokens") or 0
             output_tokens = usage.get("output_tokens") or usage.get("completion_tokens") or 0
             total_tokens = usage.get("total_tokens", 0)
-            cache_msg = f"[CACHE] session_id={session_id} launch_kind={launch_kind} prompt_bytes={len(prompt_text.encode('utf-8'))} input={input_tokens} cache_hit={cache_hit} cache_miss={cache_miss} output={output_tokens} total={total_tokens}"
+            # Workaround: if no usage data, estimate from bytes (4 bytes ≈ 1 token for mixed CN/EN)
+            if total_tokens == 0 and input_tokens == 0:
+                input_tokens = prompt_bytes // 4
+                total_tokens = input_tokens  # lower bound estimate
+            cache_msg = f"[CACHE] session_id={session_id} launch_kind={launch_kind} prompt_bytes={prompt_bytes} input={input_tokens} cache_hit={cache_hit} cache_miss={cache_miss} output={output_tokens} total={total_tokens}"
             print(cache_msg, flush=True)
             print(cache_msg, flush=True)  # also to stdout (cycle log) for easy inspection
 
