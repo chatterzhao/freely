@@ -6,6 +6,13 @@
 - milestone: M-20260623T162226Z-A
 - status: promoted
 - promoted_issue_path: `docs/issues/I-20260623T162226Z-A/issue.md`
+### committed_issues
+1. `I-20260623T162226Z-A`
+- title: L0-L3 loop guard
+- milestone_state: committed
+- phase_state: `in_b2_ibm`
+- issue_path: `docs/issues/I-20260623T162226Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/loop-guard-l0-l3/code-reviews`
 
 ## M-20260623T162243Z-A
 - title: scan_state output to Manager prompt

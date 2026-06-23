@@ -1,0 +1,12 @@
+---
+local_id: I-20260623T162226Z-A
+kind: linked
+status: in_b2_ibm
+phase_state: in_b2_ibm
+promoted_from: raw-20260623T162226Z
+source_candidate: docs/pre-brainstorms/20260623T162226Z--loop-guard-l0-l3/candidates.md
+pre_tests_path: ""
+verification_artifact_dir: docs/epics/loop-guard-l0-l3/code-reviews
+---
+# I-20260623T162226Z-A: L0-L3 兜底死循环检测
+4 层递进，~150 行 bash，全在 freely 脚本。
