@@ -114,7 +114,7 @@ class A2AClient:
         """Send standard HTTP request to A2A Server REST endpoints (bypass JSON-RPC).
 
         Used for Freely-specific operations (create, update) that carry
-        extended fields (delivery_status, worker_pid)
+        extended fields (e.g., worker_pid, session_id)
         not preserved by the JSON-RPC tasks/send → execute() path.
         """
         self._ensure()

@@ -56,8 +56,6 @@ class TestA2ATaskInsert(unittest.TestCase):
                 worker_prompts_csv TEXT NOT NULL DEFAULT '',
                 error TEXT NOT NULL DEFAULT '',
                 worker_pid TEXT NOT NULL DEFAULT '',
-                delivery_status TEXT NOT NULL DEFAULT 'pending'
-                    CHECK(delivery_status IN ('pending','delivered','failed')),
                 messages_json TEXT NOT NULL DEFAULT '[]',
                 launched_at TEXT NOT NULL DEFAULT '',
                 completed_at TEXT NOT NULL DEFAULT '',
