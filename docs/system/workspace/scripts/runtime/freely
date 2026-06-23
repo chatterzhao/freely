@@ -14734,7 +14734,11 @@ manager_exit_contract_kind() {
       return 0
     fi
   fi
-  # ── Step 4: Filesystem fallback (after_run safety net) ──────────
+  # ── Step 4: Filesystem fallback (after_run safety net) — [DEPRECATED] ──
+  # Deprecated after SSE full implementation. SSE provides real-time Worker
+  # status notification via stream_task/resubscribe. This filesystem fallback
+  # remains as a safety net for the transition period. Will be removed in a
+  # future cleanup issue after SSE has been stable in production.
   # If A2A has no record (AI forgot a2a-exit, crashed, or timed out),
   # scan worker-prompts/ for files created during this AI cycle.
   # The filesystem IS the event bus: prompt file creation = delegation.
@@ -14762,9 +14766,11 @@ manager_exit_contract_kind() {
       done < <(find "$_prompts_dir" -maxdepth 1 -type f -name '*.txt' 2>/dev/null | sort)
     fi
     if [[ -n "$_new_prompts_csv" ]]; then
+      log_info "[DEPRECATED] filesystem_fallback triggered for project $project (new_count=${_new_count}) — SSE should handle this"
       append_runtime_event "$project" "manager_exit_contract_filesystem_fallback" \
         "worker_prompts_csv=${_new_prompts_csv}" \
-        "new_count=${_new_count}"
+        "new_count=${_new_count}" \
+        "deprecated=true"
       echo "delegate_workers"
       return 0
     fi
@@ -21750,7 +21756,9 @@ print(ready)
           done < <(find "$_ar_prompts_dir" -maxdepth 1 -type f -name '*.txt' 2>/dev/null | sort)
         fi
         if [[ -n "$_ar_new_csv" ]]; then
+          log_info "[DEPRECATED] after_run_worker_detected for project $project — SSE should handle this"
           append_runtime_event "$project" "after_run_worker_detected" \
+            "deprecated=true" \
             "worker_prompts_csv=${_ar_new_csv}" \
             "new_count=${_ar_new_count}" \
             "origin=end_turn_prompt_mode"
