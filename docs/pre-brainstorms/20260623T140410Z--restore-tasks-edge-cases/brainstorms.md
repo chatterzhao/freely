@@ -142,9 +142,14 @@ else:
 
 ### 方案：状态修正（A1-A3）+ 环境恢复（B1-B3）+ TTL（Part C）
 
+**Fix A0**（stop 不改 A2A 状态——最关键）：
+
+- A0: 删除 `freely` 第 20273 行的 `working→input-required` 转换。Stop 只杀进程，不动状态。状态由 `_restore_tasks` 在重启时统一判断。
+- 影响：A0 之后，重启时最常见的路径是 `working + PID 死 → failed → B2 通知 Manager` ——这是主要路径，不是边界。
+
 **Fix A1-A3**（状态修正——判断状态是否还成立）：
 
-- A1: `working` + 无 `worker_pid` → `input-required`
+- A1: `working` + 无 `worker_pid` → `input-required`（罕见：PID 未记录）
 - A2: `submitted`(Manager) + 只检查活跃 Worker（过滤终态）
 - A3: `input-required` + worktree 不存在 → `failed`
 

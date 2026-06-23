@@ -3,12 +3,14 @@
 ## C-20260623T140410Z-A: _restore_tasks 重启恢复——状态修正 + 环境恢复
 
 - candidate_format_version: v2
-- title: _restore_tasks 重启恢复：状态修正（A1-A3）+ 环境恢复（B1-B4）+ TTL 清理评估
+- title: _restore_tasks 重启恢复：stop 不动 A2A 状态（A0）+ 状态修正（A1-A3）+ 环境恢复（B1-B4）
 - status: promoted
-- decision_reason: #3388 SSE 实现中修复了 _restore_tasks 基础逻辑，但遗漏 3 个边界。A1（无 PID → input-required 而非 restored）、A2（只检查活跃 Worker 而非全部 Worker）、A3（工位删除 → failed）。约 20 行改动，低风险。内存优先 gap 评估后不纳入本次交付。
+- decision_reason: 当前 stop 把 working→input-required（freely:20273），丢失"Worker 工作中断"信息，重启后 Manager 误以为 Worker 在等输入。正确的做法：stop 只杀进程不动状态，_restore_tasks 在重启时统一判断。A0 是最关键的修正，加上 A1-A3 边界补全和 B1-B4 环境恢复，形成完整的重启恢复闭环。
 - next_action: 进入 B2_IBM → I-* issue → dev-loop 实现
 - revisit_trigger: N/A（已 promote）
 - acceptance_criteria:
+  A0（stop 不动状态）：
+  - A0: 删除 freely:20273 的 `working→input-required` 转换，stop 只杀进程不动 A2A state
   状态修正（A1-A3）：
   - A1: working + worker_pid 为空 → 标记 input-required（reason: missing_worker_pid_at_restart）
   - A2: submitted(Manager) + 只检查非终态活跃 Worker → 全部终态才 auto-complete
