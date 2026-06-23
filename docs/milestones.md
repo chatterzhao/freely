@@ -1,3 +1,19 @@
+## M-20260623T005123Z-A
+- title: Flow documentation overhaul
+- status: active
+### candidate_issues
+1. `C-20260623T005123Z-A`
+- milestone: M-20260623T005123Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260623T005123Z-A/issue.md`
+### committed_issues
+1. `I-20260623T005123Z-A`
+- title: docs: unify flow representation
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260623T005123Z-A/issue.md`
+- verification_artifact_dir: `docs/system/workspace/skills`
+
 ## M-20260623T005139Z-A
 - title: wt-create --source platform-only + Manager feedback capability
 - status: active
