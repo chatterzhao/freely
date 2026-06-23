@@ -163,22 +163,26 @@ SSE: Worker state=failed / stream 断开
 
 ## Decision
 
-### 方案：5 阶段递进实施
+### 方案：5 阶段递进实施（含 SSE Watchdog）
 
 SSE 实现按依赖关系分 5 阶段，每阶段可独立验证：
 
 **阶段 1：SSE 客户端基础（无行为变更）**
-- a2a_task.py：`stream_task()` + `resubscribe()` + SSE 事件解析
+- a2a_task.py：`stream_task()` + `resubscribe()` + SSE 事件解析 + SSEPool
 - 独立测试：连接 SSE 端点，接收事件，验证 stream close
 - 此时 Manager 仍用轮询，SSE 客户端只是"可用了"
 
-**阶段 2：freely 脚本双写过渡**
-- Manager 同时走 SSE 和轮询两条路径
-- 优先消费 SSE 事件，轮询作为 fallback
-- 写 runtime event 对比两条路径的结果
-- SSE 事件到达率 > 99% 且持续稳定 → 进入阶段 3
+**阶段 2：SSE Watchdog（持久 SSE 连接 + ACP 实时注入）** ← 新增
+- 新建 SSE Watchdog 进程（与 manager_watchdog、interruption_dispatcher 同级）
+- 持久连接活跃 Worker 的 SSE 流（`stream_task` 保持连接）
+- 收到 `state_update` 事件：
+  - 写入 JSONL 队列（`.freely/run/sse-events.jsonl`）
+  - 通过 ACP `session/prompt` 注入 Manager session（实时通知）
+- stream close → 终态检测 → 关闭连接
+- 断线 → `resubscribe`（Last-Event-ID）重连
+- Manager prompt 通过 JSONL 队列消费事件（已有 `_sse_event_queue_read_unconsumed`）
 
-**阶段 3：废弃轮询 + delivery_status**
+**阶段 3：废弃 delivery_status**
 - 移除 list-pending-delivery 调用
 - 删除 delivery_status 列和相关代码
 - 执行 79 条旧记录迁移

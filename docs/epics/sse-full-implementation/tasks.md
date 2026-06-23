@@ -27,10 +27,18 @@
 - [ ] 重连退避测试
 - [ ] 连接池并发测试
 
-## Phase 2: Dual-Write Transition
+## Phase 2: SSE Watchdog + Event Queue
 
-### T2.1 — SSE 事件队列
-- [ ] `.freely/run/sse-events.jsonl` 写入逻辑
+### T2.1 — SSE Watchdog 脚本
+- [x] 新建 `docs/system/workspace/scripts/runtime/sse-watchdog.sh`
+- [x] 持久 SSE 连接活跃 Worker（`a2a_task.py stream --task-id X`）
+- [x] `state_update` 事件 → JSONL 队列 + ACP session/prompt 注入
+- [x] stream close → 终态检测 → 关闭连接
+- [x] 断线 → resubscribe（指数退避）
+- [x] daemon start/stop 时随 supervisor 启停
+
+### T2.2 — SSE 事件队列
+- [x] `.freely/run/sse-events.jsonl` 写入逻辑
 - [ ] 事件格式: `{"task_id":"...","state":"...","timestamp":"...","event_type":"..."}`
 - [ ] 消费后标记 consumed（追加 `.consumed` 字段）
 

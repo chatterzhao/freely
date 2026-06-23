@@ -44,15 +44,25 @@
 - `stream_pool.add(task_id)` / `stream_pool.remove(task_id)` / `stream_pool.active_count()`
 - 心跳: 每 30s 检查连接存活，死连接自动重连
 
-## Phase 2: Dual-Write Transition
+## Phase 2: SSE Watchdog（持久 SSE 连接 + ACP 实时注入）
 
-### freely 脚本: 双写模式
+### SSE Watchdog 进程（新增）
 
-- `append_manager_task_context_if_needed`:
-  - 优先消费 SSE 事件队列（`.freely/run/sse-events.jsonl`）
-  - 同时保留 list-pending-delivery 轮询（fallback）
-  - 对比两条路径结果 → runtime event `sse_vs_poll_consistency`
-- 过渡期: SSE 事件到达率 > 99% 持续 24h → 进入 Phase 3
+- 与 manager_watchdog、interruption_dispatcher 同级的新 runtime 进程
+- 持久连接活跃 Worker 的 SSE 流（`a2a_task.py stream --task-id X`，保持连接）
+- 收到 `state_update` 事件：
+  - 写入 JSONL 队列（`.freely/run/sse-events.jsonl`）
+  - 通过 ACP `session/prompt` 注入 Manager session（实时通知，突破 patrol 周期延迟）
+- stream close → 终态检测（task state=completed/failed/canceled）→ 关闭连接
+- 断线 → `resubscribe`（Last-Event-ID，指数退避重连）
+- 启动时机：daemon start 时随 supervisor 一起启动
+- 停止时机：daemon stop 时随 supervisor 一起停止
+
+### A2A 协作模型
+
+Manager → Worker：Task 创建 + Messages（`a2a-exit --role worker` / `a2a_task.py prompt`）
+Worker → Manager：SSE 推送 state 变更（working/input-required/failed/completed）
+SSE Watchdog：维护 Worker SSE 连接，事件到达时 JSONL + ACP 注入
 
 ### SSE 事件队列
 

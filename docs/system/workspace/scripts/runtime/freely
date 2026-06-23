@@ -46,6 +46,8 @@ source "$SESSION_EVIDENCE_RESOLVER_LIB"
 TOOL_REGISTRY="$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-registry.json5"
 TOOL_REGISTRY_QUERY="$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-registry-query.py"
 
+_sse_watchdog_sh="$SELF_ROOT/docs/system/workspace/scripts/runtime/sse-watchdog.sh"
+
 _tool_registry_get() {
   # Usage: _tool_registry_get <tool> <dot.path> → prints value, exit 1 if not found
   local tool="$1" field="$2"
@@ -708,6 +710,7 @@ Usage:
   freely intake status [--project <abs_path>]
   freely ensure-manager [--project <abs_path>] [--watch] [--interval <seconds>]
   freely ensure-interruption-dispatch [--project <abs_path>] [--watch] [--interval <seconds>]
+  freely ensure-sse-watchdog [--project <abs_path>] [--watch] [--interval <seconds>]
   freely auth-change-wake [--tool <name>] [--slot <slot>] [--reason <reason>]
   freely start [--project <abs_path>] [--task-mode auto|wait|listen|id:<scan-id>] [--force] [--reason <text>]
   freely daemon start [--project <abs_path>] [--task-mode auto|wait|listen|id:<scan-id>] [--force] [--reason <text>]
@@ -1578,6 +1581,7 @@ runtime_pid_file_for_role() {
     ai) printf '%s\n' "$(run_dir_for_project "$project")/ai.pid" ;;
     manager_watchdog) printf '%s\n' "$(ensure_manager_watchdog_pid_file "$project")" ;;
     interruption_dispatcher) printf '%s\n' "$(interruption_dispatcher_pid_file "$project")" ;;
+    sse_watchdog) printf '%s\n' "$(sse_watchdog_pid_file "$project")" ;;
     acp_bridge) printf '%s\n' "/tmp/freely-acp-$(_acp_bridge_short_hash "$project").pid" ;;
     *) return 1 ;;
   esac
@@ -1590,6 +1594,7 @@ runtime_pid_valid_for_role() {
     ai) valid_ai_pid_for_project "$project" "$pid" ;;
     manager_watchdog) valid_ensure_manager_watchdog_pid_for_project "$project" "$pid" ;;
     interruption_dispatcher) valid_interruption_dispatcher_pid_for_project "$project" "$pid" ;;
+    sse_watchdog) valid_sse_watchdog_pid_for_project "$project" "$pid" ;;
     acp_bridge) kill -0 "$pid" 2>/dev/null ;;  # alive = valid
     *) return 1 ;;
   esac
@@ -1625,7 +1630,7 @@ clear_stale_runtime_pid_file_if_invalid() {
 
 startup_self_heal_clear_stale_pid_files_if_needed() {
   local project="$1" trigger="${2:-runtime_read}" role cleared_any=1
-  for role in supervisor ai acp_bridge manager_watchdog interruption_dispatcher; do
+  for role in supervisor ai acp_bridge manager_watchdog interruption_dispatcher sse_watchdog; do
     if clear_stale_runtime_pid_file_if_invalid "$project" "$role" "$trigger"; then
       cleared_any=0
     fi
@@ -1659,7 +1664,8 @@ startup_self_heal_should_mark_runtime_down() {
   ai_pid="$(runtime_ai_pid_hint_for_project "$project")"
   dispatcher_pid="$(interruption_dispatcher_pid_for_project "$project")"
   watchdog_pid="$(manager_watchdog_pid_for_project "$project")"
-  [[ -z "$supervisor_pid" && -z "$ai_pid" && -z "$dispatcher_pid" && -z "$watchdog_pid" ]] || return 1
+  sse_watchdog_pid="$(sse_watchdog_pid_for_project "$project")"
+  [[ -z "$supervisor_pid" && -z "$ai_pid" && -z "$dispatcher_pid" && -z "$watchdog_pid" && -z "$sse_watchdog_pid" ]] || return 1
   [[ -z "$(runtime_unverified_pid_roles_for_project "$project")" ]] || return 1
 
   state_epoch="$(timestamp_epoch_or_zero "$last_state_updated_at")"
@@ -1794,12 +1800,15 @@ reclaim_delegated_worker_starting_stuck_runtime_if_needed() {
   [[ -n "$dispatcher_pid" ]] && terminate_pid_with_graceful_wait "$dispatcher_pid" "delegated worker starting-stuck interruption dispatcher reclaim"
   watchdog_pid="$(manager_watchdog_pid_for_project "$project")"
   [[ -n "$watchdog_pid" ]] && terminate_pid_with_graceful_wait "$watchdog_pid" "delegated worker starting-stuck manager watchdog reclaim"
+  sse_watchdog_pid="$(sse_watchdog_pid_for_project "$project")"
+  [[ -n "$sse_watchdog_pid" ]] && terminate_pid_with_graceful_wait "$sse_watchdog_pid" "delegated worker starting-stuck SSE watchdog reclaim"
 
   rm -f \
     "$run_dir/supervisor.pid" \
     "$run_dir/ai.pid" \
     "$(interruption_dispatcher_pid_file "$project")" \
     "$(ensure_manager_watchdog_pid_file "$project")" \
+    "$(sse_watchdog_pid_file "$project")" \
     "$(session_state_file "$project")" \
     "$(exit_contract_file "$project")" \
     "$(stop_marker_file "$project")"
@@ -2301,6 +2310,11 @@ ensure_manager_watchdog_pid_file() {
 interruption_dispatcher_pid_file() {
   local project="$1"
   echo "$(run_dir_for_project "$project")/interruption-dispatch.pid"
+}
+
+sse_watchdog_pid_file() {
+  local project="$1"
+  echo "$(run_dir_for_project "$project")/sse-watchdog.pid"
 }
 
 interruption_triage_lock_dir_for_intake() {
@@ -2849,11 +2863,12 @@ trimmed_file_excerpt() {
 }
 
 live_status_activity_state_for_project() {
-  local project="$1" supervisor_pid ai_pid dispatcher_pid watchdog_pid intake_active
+  local project="$1" supervisor_pid ai_pid dispatcher_pid watchdog_pid sse_watchdog_pid intake_active
   supervisor_pid="$(manager_supervisor_pid_for_project "$project")"
   ai_pid="$(runtime_ai_pid_hint_for_project "$project")"
   dispatcher_pid="$(interruption_dispatcher_pid_for_project "$project")"
   watchdog_pid="$(manager_watchdog_pid_for_project "$project")"
+  sse_watchdog_pid="$(sse_watchdog_pid_for_project "$project")"
   if [[ -n "$ai_pid" ]]; then
     printf 'ai_active\n'
     return 0
@@ -2869,6 +2884,8 @@ live_status_activity_state_for_project() {
     printf 'supervising\n'
   elif [[ -n "$dispatcher_pid" ]]; then
     printf 'dispatch_only\n'
+  elif [[ -n "$sse_watchdog_pid" ]]; then
+    printf 'supervising\n'
   elif [[ -n "$(runtime_unverified_pid_roles_for_project "$project")" ]]; then
     printf 'degraded_unverified_pid_hints\n'
   elif [[ "${intake_active:-0}" -gt 0 ]]; then
@@ -3049,6 +3066,66 @@ discover_interruption_dispatcher_pids() {
       }
     }
     index($0, "runtime/freely ensure-interruption-dispatch") && index($0, "--watch") {
+      if (skip[$1]) {
+        next
+      }
+      for (i = 1; i <= NF; i++) {
+        if ($i == "--project" && (i + 1) <= NF && $(i + 1) == p) {
+          print $1
+          next
+        }
+        if (index($i, "--project=") == 1 && substr($i, 11) == p) {
+          print $1
+          next
+        }
+      }
+    }
+  '
+}
+
+discover_sse_watchdog_pids() {
+  local project="$1" excluded_pids="${2:-}"
+  local project_regex
+  process_inspection_available || return 0
+  project_regex="$(printf '%s\n' "$project" | sed 's/[][(){}.^$+*?|\\]/\\&/g')"
+  if command -v pgrep >/dev/null 2>&1; then
+    pgrep -fal "runtime/sse-watchdog.sh.*${project_regex}" 2>/dev/null | awk -v p="$project" -v excluded="$excluded_pids" '
+      BEGIN {
+        split(excluded, raw, ",")
+        for (i in raw) {
+          if (raw[i] != "") {
+            skip[raw[i]] = 1
+          }
+        }
+      }
+      index($0, "--watch") {
+        if (skip[$1]) {
+          next
+        }
+        for (i = 1; i <= NF; i++) {
+          if ($i == "--project" && (i + 1) <= NF && $(i + 1) == p) {
+            print $1
+            next
+          }
+          if (index($i, "--project=") == 1 && substr($i, 11) == p) {
+            print $1
+            next
+          }
+        }
+      }
+    '
+    return 0
+  fi
+  ps -axo pid=,command= 2>/dev/null | awk -v p="$project" -v excluded="$excluded_pids" '
+    BEGIN {
+      split(excluded, raw, ",")
+      for (i in raw) {
+        if (raw[i] != "") {
+          skip[raw[i]] = 1
+        }
+      }
+    }
+    index($0, "runtime/sse-watchdog.sh") && index($0, "--watch") {
       if (skip[$1]) {
         next
       }
@@ -3269,6 +3346,14 @@ valid_interruption_dispatcher_pid_for_project() {
   control_plane_pid_matches_authoritative_runtime_source "$project" "$pid"
 }
 
+valid_sse_watchdog_pid_for_project() {
+  local pid="$1" project="$2"
+  pid_matches_project "$pid" "$project" "runtime/sse-watchdog.sh --project" || return 1
+  [[ "$pid" =~ ^[0-9]+$ ]] || return 1
+  kill -0 "$pid" 2>/dev/null || return 1
+  return 0
+}
+
 project_owned_manager_watchdog_pid_for_project() {
   local project="$1" pid="$2"
   pid_matches_project "$pid" "$project" "runtime/freely ensure-manager --project"
@@ -3277,6 +3362,11 @@ project_owned_manager_watchdog_pid_for_project() {
 project_owned_interruption_dispatcher_pid_for_project() {
   local project="$1" pid="$2"
   pid_matches_project "$pid" "$project" "runtime/freely ensure-interruption-dispatch --project"
+}
+
+project_owned_sse_watchdog_pid_for_project() {
+  local project="$1" pid="$2"
+  pid_matches_project "$pid" "$project" "runtime/sse-watchdog.sh --project"
 }
 
 reconcile_control_plane_processes_for_active_runtime() {
@@ -3314,6 +3404,20 @@ reconcile_control_plane_processes_for_active_runtime() {
     fi
     terminate_pid_with_graceful_wait "$pid" "project manager watchdog runtime-source reconcile"
   done < <(discover_manager_watchdog_pids "$project")
+
+  pid_file="$(sse_watchdog_pid_file "$project")"
+  if [[ -f "$pid_file" ]]; then
+    pid="$(cat "$pid_file" 2>/dev/null || true)"
+    if [[ -n "$pid" ]] && project_owned_sse_watchdog_pid_for_project "$project" "$pid" && ! valid_sse_watchdog_pid_for_project "$project" "$pid"; then
+      terminate_pid_with_graceful_wait "$pid" "project SSE watchdog runtime-source reconcile"
+      rm -f "$pid_file"
+    fi
+  fi
+  while IFS= read -r pid; do
+    [[ -n "$pid" ]] || continue
+    valid_sse_watchdog_pid_for_project "$project" "$pid" && continue
+    terminate_pid_with_graceful_wait "$pid" "project SSE watchdog runtime-source reconcile"
+  done < <(discover_sse_watchdog_pids "$project")
 }
 
 interruption_dispatcher_pid_for_project() {
@@ -3354,6 +3458,25 @@ manager_watchdog_pid_for_project() {
   return 0
 }
 
+sse_watchdog_pid_for_project() {
+  local project="$1" pid_file pid
+  pid_file="$(sse_watchdog_pid_file "$project")"
+  if [[ -f "$pid_file" ]]; then
+    pid="$(cat "$pid_file" 2>/dev/null || true)"
+    if valid_sse_watchdog_pid_for_project "$project" "$pid"; then
+      printf '%s\n' "$pid"
+      return 0
+    fi
+  fi
+  pid="$(discover_sse_watchdog_pids "$project" | head -n 1)"
+  if [[ -n "$pid" ]]; then
+    printf '%s\n' "$pid" >"$pid_file"
+    printf '%s\n' "$pid"
+    return 0
+  fi
+  return 0
+}
+
 manager_supervisor_pid_hint_for_project() {
   local project="$1" run_dir sp
   run_dir="$(run_dir_for_project "$project")"
@@ -3384,6 +3507,18 @@ interruption_dispatcher_pid_hint_for_project() {
   [[ -f "$pid_file" ]] || return 0
   pid="$(cat "$pid_file" 2>/dev/null || true)"
   if valid_interruption_dispatcher_pid_for_project "$project" "$pid"; then
+    printf '%s\n' "$pid"
+    return 0
+  fi
+  pid_hint_from_file_without_process_inspection "$pid" || true
+}
+
+sse_watchdog_pid_hint_for_project() {
+  local project="$1" pid_file pid
+  pid_file="$(sse_watchdog_pid_file "$project")"
+  [[ -f "$pid_file" ]] || return 0
+  pid="$(cat "$pid_file" 2>/dev/null || true)"
+  if valid_sse_watchdog_pid_for_project "$project" "$pid"; then
     printf '%s\n' "$pid"
     return 0
   fi
@@ -8911,7 +9046,8 @@ reconcile_delegated_runtime_handoff_state_if_needed() {
   ai_pid="$(runtime_ai_pid_hint_for_project "$project")"
   dispatcher_pid="$(interruption_dispatcher_pid_for_project "$project")"
   watchdog_pid="$(manager_watchdog_pid_for_project "$project")"
-  [[ -z "$supervisor_pid" && -z "$ai_pid" && -z "$dispatcher_pid" && -z "$watchdog_pid" ]] || return 1
+  sse_watchdog_pid="$(sse_watchdog_pid_for_project "$project")"
+  [[ -z "$supervisor_pid" && -z "$ai_pid" && -z "$dispatcher_pid" && -z "$watchdog_pid" && -z "$sse_watchdog_pid" ]] || return 1
   unverified_roles="$(runtime_unverified_pid_roles_for_project "$project")"
   [[ -z "$unverified_roles" ]] || return 1
 
@@ -17473,6 +17609,14 @@ launch_interruption_dispatcher() {
   disown "$!" 2>/dev/null || true
 }
 
+launch_sse_watchdog() {
+  local project="$1"
+  local argv0
+  argv0="runtime/sse-watchdog.sh --project $project --watch"
+  nohup bash -lc "cd '$project' && exec -a '$argv0' bash '$_sse_watchdog_sh' --project '$project' --watch --interval 10" </dev/null >/dev/null 2>&1 &
+  disown "$!" 2>/dev/null || true
+}
+
 launch_manager_watchdog() {
   local project="$1"
   local launch_bin watch_interval argv0
@@ -17957,6 +18101,9 @@ runtime_unverified_pid_roles_for_project() {
   if [[ -n "$(interruption_dispatcher_pid_hint_for_project "$project")" ]] && [[ -z "$(interruption_dispatcher_pid_for_project "$project")" ]]; then
     roles+=("interruption_dispatcher")
   fi
+  if [[ -n "$(sse_watchdog_pid_hint_for_project "$project")" ]] && [[ -z "$(sse_watchdog_pid_for_project "$project")" ]]; then
+    roles+=("sse_watchdog")
+  fi
   if [[ -n "$(manager_ai_pid_hint_for_project "$project")" ]] && [[ -z "$(manager_ai_pid_for_project "$project")" ]]; then
     roles+=("ai")
   fi
@@ -18009,6 +18156,21 @@ ensure_manager_watchdog_ready_or_fail() {
   for attempts in $(seq 1 "$wait_attempts"); do
     watchdog_pid="$(runtime_capture_or_empty manager_watchdog_pid_for_project "$project")"
     if [[ -n "$watchdog_pid" ]]; then
+      return 0
+    fi
+    sleep "$wait_sleep"
+  done
+  return 1
+}
+
+ensure_sse_watchdog_ready_or_fail() {
+  local project="$1" sse_watchdog_pid attempts wait_attempts wait_sleep
+  wait_attempts="${FREELY_SSE_WATCHDOG_READY_ATTEMPTS:-300}"
+  wait_sleep="${FREELY_SSE_WATCHDOG_READY_SLEEP_SECS:-0.1}"
+  [[ "$wait_attempts" =~ ^[0-9]+$ ]] || wait_attempts=300
+  for attempts in $(seq 1 "$wait_attempts"); do
+    sse_watchdog_pid="$(runtime_capture_or_empty sse_watchdog_pid_for_project "$project")"
+    if [[ -n "$sse_watchdog_pid" ]]; then
       return 0
     fi
     sleep "$wait_sleep"
@@ -19049,6 +19211,35 @@ cmd_ensure_interruption_dispatch_watch() {
     fi
     if [[ -f "$(intake_pending_signal_file "$project")" ]]; then
       ensure_interruption_dispatch_once "$project"
+    fi
+    sleep "$interval"
+  done
+}
+
+cmd_ensure_sse_watchdog_watch() {
+  local project="$1" interval="$2" pid_file existing_pid
+  pid_file="$(sse_watchdog_pid_file "$project")"
+  mkdir -p "$(dirname "$pid_file")"
+
+  if [[ -f "$pid_file" ]]; then
+    existing_pid="$(cat "$pid_file" 2>/dev/null || true)"
+    if [[ "$existing_pid" != "$$" ]] && valid_sse_watchdog_pid_for_project "$project" "$existing_pid"; then
+      log_info "SSE watchdog already running (pid=$existing_pid)"
+      return 0
+    fi
+    rm -f "$pid_file"
+  fi
+
+  echo "$$" >"$pid_file"
+  trap "rm -f '$pid_file'; exit 0" INT TERM HUP
+  trap "rm -f '$pid_file'" EXIT
+
+  while true; do
+    if [[ -f "$(stop_marker_file "$project")" ]]; then
+      exit 0
+    fi
+    if ! bash "$_sse_watchdog_sh" --project "$project" --watch --interval 10; then
+      log_warn "SSE watchdog iteration failed, retrying"
     fi
     sleep "$interval"
   done
@@ -20733,6 +20924,11 @@ ensure_no_active_supervisor_conflict() {
       terminate_pid_with_graceful_wait "$stale_watchdog_pid" "stale watchdog during supervisor repair" 2>/dev/null || true
       rm -f "$(ensure_manager_watchdog_pid_file "$project")"
     fi
+    stale_sse_watchdog_pid="$(cat "$(sse_watchdog_pid_file "$project")" 2>/dev/null || true)"
+    if [[ -n "$stale_sse_watchdog_pid" ]]; then
+      terminate_pid_with_graceful_wait "$stale_sse_watchdog_pid" "stale SSE watchdog during supervisor repair" 2>/dev/null || true
+      rm -f "$(sse_watchdog_pid_file "$project")"
+    fi
   fi
   if [[ -f "$child_pid_file" ]]; then
     local active_ai_pid
@@ -20984,6 +21180,10 @@ start_project_runtime() {
     watchdog_pid="$(manager_watchdog_pid_for_project "$PROJECT_ROOT")"
     if [[ -n "$watchdog_pid" ]]; then
       terminate_pid_with_graceful_wait "$watchdog_pid" "project manager watchdog during supervisor cleanup"
+    fi
+    sse_watchdog_pid="$(sse_watchdog_pid_for_project "$PROJECT_ROOT")"
+    if [[ -n "$sse_watchdog_pid" ]]; then
+      terminate_pid_with_graceful_wait "$sse_watchdog_pid" "project SSE watchdog during supervisor cleanup"
     fi
     if [[ "$(role_hint_for_project "$PROJECT_ROOT")" == "manager" ]] && { [[ "${effective_desired_state:-stopped}" == "stopped" ]] || [[ "${effective_exit_reason:-}" == "operator_stop" ]]; }; then
       materialize_missing_required_manager_continuity_fallback "$PROJECT_ROOT" "${effective_exit_reason:-supervisor_cleanup}" || true
@@ -22485,6 +22685,30 @@ cmd_ensure_interruption_dispatch() {
   ensure_interruption_dispatch_once "$project"
 }
 
+cmd_ensure_sse_watchdog() {
+  local project="" watch_mode="0" watch_interval="10"
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      --watch) watch_mode="1"; shift ;;
+      --interval) watch_interval="${2:-}"; shift 2 ;;
+      *) log_error "unknown arg: $1"; usage; exit 1 ;;
+    esac
+  done
+  project="$(resolve_project_or_fail "$project")"
+  [[ "$watch_interval" =~ ^[0-9]+$ ]] || { log_error "ensure-sse-watchdog --interval must be a positive integer"; exit 1; }
+  load_config "$project"
+  check_doc_gate_or_fail "$project" || {
+    log_error "ensure-sse-watchdog blocked by doc gate"
+    exit 1
+  }
+  if [[ "$watch_mode" == "1" ]]; then
+    cmd_ensure_sse_watchdog_watch "$project" "$watch_interval"
+    return 0
+  fi
+  bash "$_sse_watchdog_sh" --project "$project" --watch --interval 10
+}
+
 cmd_doctor() {
   local project=""
   local cfg=""
@@ -23391,6 +23615,8 @@ cmd_live_status() {
   ai_cmd="$(ps_command_for_pid "$ai_pid")"
   dispatcher_cmd="$(ps_command_for_pid "$dispatcher_pid")"
   watchdog_cmd="$(ps_command_for_pid "$watchdog_pid")"
+  sse_watchdog_pid="$(sse_watchdog_pid_for_project "$project")"
+  sse_watchdog_cmd="$(ps_command_for_pid "$sse_watchdog_pid")"
   prompt_file="$(find_latest_prompt_file_for_project "$project" || true)"
   continuity_file="$(find_latest_manager_continuity_file_for_project "$project" || true)"
   prompt_excerpt="$(trimmed_file_excerpt "$prompt_file" tail 12 || true)"
@@ -24211,6 +24437,7 @@ main() {
     ensure-manager) cmd_ensure_manager "$@" ;;
     auth-change-wake) cmd_auth_change_wake "$@" ;;
     ensure-interruption-dispatch) cmd_ensure_interruption_dispatch "$@" ;;
+    ensure-sse-watchdog) cmd_ensure_sse_watchdog "$@" ;;
     start) cmd_start "$@" ;;
     daemon)
       local subcmd="${1:-}"
