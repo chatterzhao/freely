@@ -6,6 +6,11 @@
   废弃 delivery_status 列 + _restore_tasks() 修复 + filesystem_fallback deprecated。
   #3381 完整分析的最终结论——SSE 缺失是当前 5/6 问题的中枢。
   5 阶段递进：客户端基础→双写过渡→废弃轮询→服务端修复→文档验证。
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 ### committed_issues
 1. `I-20260623T100903Z-A`
 - title: 彻底实现 SSE — SSE 客户端 + 替代轮询 + 废弃 delivery_status
