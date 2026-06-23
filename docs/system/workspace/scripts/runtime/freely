@@ -16841,8 +16841,15 @@ for stage in stage_order:
             print(f"  issue_id={it.get('issue_id', '?')}")
             print(f"  worktree_exists={it.get('worktree_exists', '?')}")
             print(f"  message_preview={it.get('message_preview', '')[:100]}")
-        print(f"- key={it['key']} stage={stage} ready={is_ready}")
+        scan_state = it.get("scan_state", "?")
+        scan_wt = it.get("scan_state_worktree", "")
+        print(f"- key={it['key']} stage={stage} ready={is_ready} scan_state={scan_state}")
         print(f"  title={title}")
+        if scan_wt:
+            print(f"  worktree={scan_wt}")
+        # Dead worker detection: worktree exists but no active A2A worker
+        if scan_state == "working" and not scan_wt:
+            print(f"  ⚠️ 工位存在但 Worker 无响应（查 A2A task 状态，prompt 唤醒或 wt-close）")
         if source_family == "worktree_governance":
             print(f"  branch={it.get('branch', '?')}")
             print(f"  worktree_path={it.get('worktree_path', '?')}")
