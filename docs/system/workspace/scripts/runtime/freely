@@ -19311,50 +19311,20 @@ append_manager_task_context_if_needed() {
   _db_path="$project/.freely/freely.db"
   [[ -f "$_a2a_task_py" && -f "$_db_path" ]] || return 0
 
-  # ── Phase 2 Dual-Write: SSE events first, polling as fallback ──
-  local sse_output sse_count poll_output poll_count
+  # ── SSE events: primary Worker status source (replaces list-pending-delivery) ──
+  local sse_output sse_count
   sse_output="$(_sse_event_queue_read_unconsumed "$project")"
   sse_count=$(echo "$sse_output" | grep -o 'SSE_EVENT_COUNT=[0-9]*' | cut -d= -f2)
   [[ "${sse_count:-0}" =~ ^[0-9]+$ ]] || sse_count=0
 
-  # Pending delivery: tasks in input-required/pending-input states (worker→manager)
-  # These are worker messages not yet delivered to the Manager AI.
-  local pending_delivery pending_delivery_count
-  pending_delivery=$(python3 -c "
-import json,subprocess,sys
-hp='$_a2a_task_py'; db='$_db_path'
-r=subprocess.run([sys.executable,hp,'list-pending-delivery','--db',db,'--consumed-by','manager'],
-                 capture_output=True,text=True,timeout=5)
-rows=json.loads(r.stdout) if r.returncode==0 else []
-for r in rows[:10]:
-    print(f\"- {r.get('task_id','?')[:20]} exit={r.get('exit_kind','?')} state={r.get('state','?')} summary={r.get('completion_summary','')[:60]} reason={r.get('reason','')[:60]} next_action={r.get('next_action','')[:60]}\")
-if not rows:
-    print('(无待送达的 Worker 汇报)')
-print(f'PENDING_DELIVERY_COUNT={len(rows)}', flush=True)
-" 2>/dev/null || echo "PENDING_DELIVERY_COUNT=0")
+  # Polling path removed — SSE is the sole Worker status source.
+  # delivery_status column and list-pending-delivery are deleted in Phase 3.
+  local pending_delivery="(SSE 实时推送中，无轮询 fallback)"
+  local poll_count=0
 
-  poll_count=$(echo "$pending_delivery" | grep -o 'PENDING_DELIVERY_COUNT=[0-9]*' | cut -d= -f2)
-  [[ "${poll_count:-0}" =~ ^[0-9]+$ ]] || poll_count=0
-
-  # ── Phase 2 consistency check ──
-  if (( sse_count > 0 || poll_count > 0 )); then
-    local consistency="match"
-    if (( sse_count > 0 && poll_count == 0 )); then
-      consistency="sse_only"
-    elif (( sse_count == 0 && poll_count > 0 )); then
-      consistency="poll_only"
-    elif (( sse_count != poll_count )); then
-      consistency="mismatch($sse_count vs $poll_count)"
-    fi
-    append_runtime_event "$project" "sse_vs_poll_consistency" \
-      "sse_count=$sse_count" \
-      "poll_count=$poll_count" \
-      "consistency=$consistency"
-  fi
-
-  # Extract pending delivery count for backlog gating (prefer SSE count)
-  MANAGER_TASK_BACKLOG_COUNT="${sse_count:-$poll_count}"
-  [[ "${MANAGER_TASK_BACKLOG_COUNT:-0}" =~ ^[0-9]+$ ]] || MANAGER_TASK_BACKLOG_COUNT="${poll_count:-0}"
+  # Backlog gating uses SSE count
+  MANAGER_TASK_BACKLOG_COUNT="${sse_count:-0}"
+  [[ "${MANAGER_TASK_BACKLOG_COUNT:-0}" =~ ^[0-9]+$ ]] || MANAGER_TASK_BACKLOG_COUNT=0
 
   # Thread history: recent handoff records (all roles, grouped by raw_key)
   local thread_summary
@@ -19404,11 +19374,8 @@ if not recent:
 
 ## A2A Task 上下文（仅 Manager 可见）
 
-### SSE 实时事件（Phase 2 双写过渡）
+### Worker 实时事件（SSE 推送）
 ${sse_output}
-
-### Worker 汇报（待你处理 — 轮询 fallback）
-${pending_delivery}
 
 ### Worker 异常（需处理）
 ${worker_errors}
@@ -19416,7 +19383,7 @@ ${worker_errors}
 ### 近期 Worker 线程历史
 ${thread_summary}
 
-处理原则：SSE 实时事件优先于轮询汇报。先读上面的 SSE 事件和 Worker 汇报（Runtime 投递给你的消息），读 completion_summary/reason/next_action 做决策。异常 Worker 要及时清理（stale_pid → 退休工位释放资源）。消息看完后如果无事可做再看 scan 找新任务。
+处理原则：Worker 状态通过 SSE 实时推送，无需轮询。先读上面的 Worker 事件，读 completion_summary/reason/next_action 做决策。异常 Worker 要及时清理（stale_pid → 退休工位释放资源）。消息看完后如果无事可做再看 scan 找新任务。
 EOF
 }
 
