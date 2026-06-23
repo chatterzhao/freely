@@ -1,12 +1,12 @@
 ---
 name: freely-feat-execution
-description: 新功能/大型改动的完整开发流程——feedback→wt-create→B1_IBM预研→B2_IBM→dev实现→test-pre-merge验证→pr-create-guarded→pr-merge-guarded门禁合并→wt-close，与 freely-fix-execution 同级抽象。
+description: 新功能/大型改动的完整开发流程——feedback→wt-create→B1→B2→dev→test→pr-create→pr-merge→wt-close，与 freely-fix-execution 同级抽象。
 ---
 
 # skill:freely-feat-execution
 
 > 全链路: feedback → [命令] wt-create → [skill] skill:freely-doc-B1_IBM-execution → [skill] skill:freely-doc-B2_IBM-execution → dev(RED-GREEN) → [skill] skill:freely-test-execution(全绿) → [命令] pr-create-guarded → [命令] pr-review-guarded → [命令] pr-merge-guarded → [命令] wt-close
->                                                              ↑ 本 skill 自此开始（提供 B1→B2→dev→test→pr→merge→close 完整抽象）
+>                                                              [本 skill 自此开始 — B1→B2→dev→test→pr→merge→close 完整抽象]
 
 ## 定位
 
@@ -17,7 +17,7 @@ description: 新功能/大型改动的完整开发流程——feedback→wt-crea
 | | freely-fix-execution | freely-feat-execution |
 |---|---|---|
 | 适用 | bug fix、小改动 | 新功能、大型重构 |
-| 流程 | wt-create → 实现 → B1_IBM → B2_IBM → pr-create-guarded → pr-review-guarded → pr-merge-guarded → wt-close | wt-create → B1_IBM → B2_IBM → dev → pr-create-guarded → pr-review-guarded → pr-merge-guarded → wt-close |
+| 流程 | feedback → wt-create → dev → test → B1 → B2 → pr-create → pr-review → pr-merge → wt-close | feedback → wt-create → B1 → B2 → dev → test → pr-create → pr-review → pr-merge → wt-close |
 | IBM 顺序 | 实现后治理（Fix first, govern later） | 治理后实现（Govern first, code later） |
 
 ## 下层 skill
@@ -33,7 +33,7 @@ freely-feat-execution 在不同阶段调用下层 skill：
 - B1_IBM 预研阶段就写治理文档（brainstorms.md + candidates.md）
 - B2_IBM materialize 后才能开始写代码
 - dev-loop 产出 pre-tests + code-review 证据
-- 合并走 feature → test-pre-merge → pr-create-guarded → pr-review-guarded → pr-merge-guarded develop 完整链路
+- 合并走 feature → [skill] test-execution → [命令] pr-create → [命令] pr-review → [命令] pr-merge develop 完整链路
 - 不跳过门禁
 
 ## 工作流
@@ -119,7 +119,7 @@ freely-feat-execution 在不同阶段调用下层 skill：
 
 ## 硬性规则
 
-- 不要跳过 B1_IBM→B2_IBM→dev→test-pre-merge→pr-create-guarded→pr-merge-guarded→wt-close 任一阶段
+- 不要跳过 feedback→wt-create→B1→B2→dev→test→pr-create→pr-review→pr-merge→wt-close 任一阶段
 - 不要在 develop 上直接开发
 - 分支名必须以 `feature/` 为前缀，工位名必须包含 `feature`
 - feature worktree 必须用 ./bin/wt-create 创建

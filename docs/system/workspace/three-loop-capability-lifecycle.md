@@ -252,18 +252,19 @@ dev:             │           └── implement→evidence ──────
 
 | 命令 | 内部步骤 |
 |------|---------|
-| `wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>` | `git fetch origin develop` → `git update-ref` → `git worktree add` → test-pre-merge worktree → raw-issue-pull → platform_ids fill |
-| `pr-create-guarded` | `git pull origin develop` → `pr-merge-guarded --dry-run` → `git push origin HEAD` → `gh pr create --head HEAD` |
+| `freely feedback --repo <repo> --title "..." --body "..."` | 在 GitHub 创建 raw issue（raw issue 不存在时需要） |
+| `wt-create --raw-key <key> --source platform --skill <skill> --slug <slug>` | `git fetch origin develop` → `git update-ref` → `git worktree add` → test-pre-merge worktree → raw-issue-pull → platform_ids fill |
+| `pr-create-guarded` | `git pull origin develop` → `pr-merge-guarded --dry-run` → `git push origin HEAD` → `platform-adapter create-pr` |
 | `pr-review-guarded` | 6 维独立 review (correctness / security / performance / reuse / governance / testing) → verdict 文档 (pass/fail) |
-| `pr-merge-guarded develop <pr-branch>` | `git fetch origin develop` → validate direction → PR gate (check PR + approval) → promotion gate → `git merge --no-ff` → issue-sync → `develop-push` |
-| `wt-close <branch>` | issue-sync close → milestone update → `git branch -d` → `git push --delete` → worktree remove |
+| `pr-merge-guarded develop <pr-branch>` | `git fetch origin develop` → validate direction → PR gate (check PR + approval) → promotion gate → `git merge --no-ff` → issue-sync → `develop-push` → `platform-adapter close-pr` |
+| `wt-close <branch>` | Phase 1-3 (phase_state check + platform close) → Phase 4 (delete remote branch) → Phase 4.5 (Worker shutdown) → Phase 5 (auto-consume A2A → worktree remove → branch -d) |
 
 ## 变体路径
 
 ### Fix 修复（治理后置）
 ```
-wt-create → dev(implement) → test → B1 → B2 → pr-create → pr-review → pr-merge → wt-close
-                                   ↑ B1/B2 后置于 test 之后，PR 门禁不后置
+([命令] feedback) → [命令] wt-create → [skill] dev → [skill] test → [skill] B1 → [skill] B2 → [命令] pr-create → [命令] pr-review → [命令] pr-merge → [命令] wt-close
+                                                                   ↑ B1/B2 后置于 test 之后，PR 门禁不后置
 ```
 
 ### Hotfix 紧急修复

@@ -1,18 +1,18 @@
 ---
 name: freely-fix-execution
-description: 快速修复 bug 的特殊高效策略——wt-create→实现→B1_IBM→B2_IBM→pr-create-guarded→pr-merge-guarded→wt-close。Fix first, govern later。用 test-pre-merge-* 私有工位隔离快测，cp 到可写工位正式提交，不违背保护分支的本质约束。
+description: 快速修复 bug 的特殊高效策略——feedback→wt-create→dev→test→B1_IBM→B2_IBM→pr-create-guarded→pr-merge-guarded→wt-close。Fix first, govern later。用 test-pre-merge-* 私有工位隔离快测，cp 到可写工位正式提交，不违背保护分支的本质约束。
 ---
 
 # skill:freely-fix-execution
 
 > 全链路(Fix变体): [命令] wt-create → dev(RED-GREEN) → [skill] skill:freely-test-execution(全绿) → [skill] skill:freely-doc-B1_IBM-execution → [skill] skill:freely-doc-B2_IBM-execution → [命令] pr-create-guarded → [命令] pr-review-guarded → [命令] pr-merge-guarded → [命令] wt-close
->                                    ↑ 本 skill 自此开始（快测沙箱策略，治理后置）
+>                                    [本 skill 自此开始 — 快测沙箱策略，治理后置]
 
 ## 定位
 
 **fix skill 是特殊场景的高效策略，不是通用开发流程。**
 
-常规开发走 `feature → test-pre-merge → pr-create-guarded → pr-review-guarded → pr-merge-guarded develop` 完整链路，每个门禁都过。但 bug 修复有特殊性：需要快速迭代验证（改了测、测了改），如果每次改一行代码都走一遍完整门禁链路，效率极低。
+常规开发走 `feature → [skill] test-execution → pr-create-guarded → pr-review-guarded → pr-merge-guarded develop` 完整链路，每个门禁都过。但 bug 修复有特殊性：需要快速迭代验证（改了测、测了改），如果每次改一行代码都走一遍完整门禁链路，效率极低。
 
 本 skill 在不违背保护分支本质约束的前提下，用 `test-pre-merge-*` 作为私有快速测试沙箱，验证通过后将修改转移到可写工位，正式提交和门禁合并仍在合规分支上完成。
 
@@ -71,8 +71,7 @@ test-pre-merge-* 上的操作:
 
 合并路径（来自 pr-merge-guarded）:
 ```
-fix/*             → test-pre-merge → pr-create-guarded → pr-review-guarded → pr-merge-guarded
-fix/*             → test-pre-merge → pr-create-guarded → pr-review-guarded → pr-merge-guarded
+fix/*             → [skill] test-execution → [skill] B1 → [skill] B2 → [命令] pr-create → [命令] pr-review → [命令] pr-merge
 hotfix/*          → main + develop (pr-merge-guarded)
 hotfix/*          → main
 ```
@@ -92,14 +91,14 @@ hotfix/*          → main
 
 | 原 feature 工位 | 做法 |
 |---|---|
-| **还在** | 直接在 feature 上改 → 测 → 提交。走 feature → test-pre-merge → pr-create-guarded → pr-review-guarded → pr-merge-guarded develop |
-| **已退役（已合并/已删）** | 建 `test-pre-merge-*` 私有工位快测 → cp 到新建的 `fix/*` 或 `hotfix/*` → `freely pr-create-guarded` 命令 → `freely pr-merge-guarded develop <branch>` 命令 → `freely wt-close` 命令 |
+| **还在** | 直接在 feature 上改 → 测 → 提交。走 feature → [skill] test-execution → [skill] B1 → [skill] B2 → [命令] pr-create → [命令] pr-review → [命令] pr-merge develop |
+| **已退役（已合并/已删）** | 建 `test-pre-merge-*` 私有工位快测 → cp 到新建的 `fix/*` 或 `hotfix/*` → [skill] test-execution → [skill] B1 → [skill] B2 → [命令] pr-create → [命令] pr-merge → [命令] wt-close |
 
 ### 再判严重程度
 
 | 类型 | 分支 | 合并路径 |
 |---|---|---|
-| 普通 fix | `fix/raw-{raw-key}-{slug}` | fix → test-pre-merge → pr-create-guarded → pr-review-guarded → pr-merge-guarded develop |
+| 普通 fix | `fix/raw-{raw-key}-{slug}` | fix → [skill] test-execution → [skill] B1 → [skill] B2 → [命令] pr-create → [命令] pr-review → [命令] pr-merge develop |
 | 紧急 hotfix | `hotfix/<desc>-<YYYYMMDD>` | hotfix → pr-merge-guarded main + develop（可跳过 test-pre-merge） |
 
 ---
@@ -120,7 +119,7 @@ hotfix/*          → main
   ├─ stop → start daemon → 验证
   ├─ 迭代到修复稳定
   ├─ git commit（增量提交，不等全部完成）
-  └─ 走 feature → test-pre-merge → pr-create-guarded → pr-review-guarded → pr-merge-guarded develop 完整路径
+  └─ 走 feature → [skill] test-execution → [skill] B1 → [skill] B2 → [命令] pr-create → [命令] pr-review → [命令] pr-merge develop 完整路径
 ```
 
 ### 场景 B：原 feature 已退役
@@ -161,8 +160,8 @@ hotfix/*          → main
 阶段 4 — 提 PR（`freely pr-create-guarded` 命令）
   │
   ├─ 在 fix worktree 中执行 `freely pr-create-guarded` 命令
-  ├─ 自动完成：pull develop → 冲突处理 → dry-run gate → push → gh pr create
-  ├─ 禁止用 gh pr create 命令替代
+  ├─ 自动完成：pull develop → 冲突处理 → dry-run gate → push → platform-adapter create-pr
+  ├─ 禁止用 gh pr create 命令替代（必须走 pr-create-guarded → platform-adapter）
   │
 阶段 4b — 门禁合并
   │

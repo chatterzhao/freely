@@ -22,13 +22,22 @@
 正确的做法是走标准开发流程:
 
 ```
-[命令] ./bin/wt-create → [skill] skill:freely-doc-B1_IBM-execution → [skill] skill:freely-doc-B2_IBM-execution
-→ git add/commit → [命令] ./bin/pr-create-guarded → [命令] ./bin/pr-review-guarded
-→ [命令] ./bin/pr-merge-guarded → [命令] ./bin/wt-close
+feat: ([命令] feedback) → [命令] wt-create → [skill] B1 → [skill] B2 → [skill] dev → [skill] test → [命令] pr-create → [命令] pr-review → [命令] pr-merge → [命令] wt-close
+fix:  ([命令] feedback) → [命令] wt-create → [skill] dev → [skill] test → [skill] B1 → [skill] B2 → [命令] pr-create → [命令] pr-review → [命令] pr-merge → [命令] wt-close
+
+     反馈: freely feedback --repo <repo> --title "..." --body "..."         (raw issue 不存在时需要)
+     工位: wt-create --raw-key <key> --source platform --skill <skill> --slug <slug>
+     B1:   skill:freely-doc-B1_IBM-execution
+     B2:   skill:freely-doc-B2_IBM-execution
+     dev:  skill:freely-dev-loop-execution
+     test: skill:freely-test-execution
+     pr:   pr-create-guarded → pr-review-guarded → pr-merge-guarded
+     收口: wt-close <branch>
 ```
 
-> **标记规则**: `[命令]` = bin 脚本，在 shell 中直接执行。`[skill]` = skill:xxx，由 AI agent 通过 Skill 工具加载执行。
-> Skill 是流程的权威来源——具体步骤见各 skill 的 SKILL.md，而非在此重复。
+> **`[命令]`** = bin 脚本，在 shell 中直接执行。**`[skill]`** = skill:xxx，由 AI agent 通过 Skill 工具加载。
+> Skill 是流程的权威来源——具体步骤见各 skill 的 SKILL.md。
+> `()` = 可选步骤（raw issue 已存在则跳过）。
 
 ## 当前项目阶段
 Freely 处于研究优先的整合阶段。
@@ -144,31 +153,33 @@ Freely 开发 Freely 时，默认先问四件事：
       scan ──→ 已有 raw issue ─┤
       scan ──→ 已有工位 ──→ 直接进入继续
                                 ↓
-阶段1: [命令] wt-create --raw-key ... --source ... --skill ... --slug ...
+阶段0: (可选) [命令] freely feedback --repo <repo> --title "..." --body "..."  — 无 raw issue 时创建
+阶段1: [命令] wt-create --raw-key <key> --source platform --skill <skill> --slug <slug>
 阶段2: [skill] skill:freely-doc-B1_IBM-execution（brainstorm → candidate → promote/absorb/drop）
 阶段3: [skill] skill:freely-doc-B2_IBM-execution（I-* → prd/pre-tests/tasks/code-reviews）
-阶段4: [skill] skill:freely-dev-loop-execution（写代码 → feature-local 测试 → commit）
-阶段5: test-pre-merge 验证（merge fix-branch → test-pre-merge worktree → 端到端测试 → 迭代通过）
-阶段6: [命令] ./bin/pr-create-guarded → pull develop → 冲突处理 → dry-run gate → push → gh pr create
+阶段4: [skill] skill:freely-dev-loop-execution（写代码 → RED-GREEN 验证 → commit）
+阶段5: [skill] skill:freely-test-execution（test-pre-merge 工位逐条执行 pre-tests → 全绿）
+阶段6: [命令] ./bin/pr-create-guarded → pull develop → 冲突处理 → dry-run gate → push → platform-adapter
 阶段7: [命令] ./bin/pr-review-guarded → 6 维 review → verdict 文档
 阶段8: CI check → Approval
-阶段9: [命令] ./bin/pr-merge-guarded → PR gate → promotion gate → merge → develop-push
+阶段9: [命令] ./bin/pr-merge-guarded → PR gate → promotion gate → merge → develop-push → platform-adapter
 阶段10: [命令] ./bin/wt-close
 ```
 
 | 步骤 | 操作 | 类型 | 谁执行 |
 |------|------|------|--------|
-| 1. 开工位 | `./bin/wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>` | [命令] | Manager/开发者 |
+| 0. 反馈 | `freely feedback --repo <repo> --title "..." --body "..."` (raw issue 不存在时) | [命令] | Manager/开发者 |
+| 1. 开工位 | `./bin/wt-create --raw-key <key> --source platform --skill <skill> --slug <slug>` | [命令] | Manager/开发者 |
 | 2. B1_IBM 预研 | B1:IBM（brainstorm→candidate→milestone） | [skill] skill:freely-doc-B1_IBM-execution | Worker |
 | 3. B2_IBM 设计 | B2:IBM（I-*→prd/pre-tests/tasks/code-reviews） | [skill] skill:freely-doc-B2_IBM-execution | Worker |
-| 4. Dev 实现 | dev-loop-execution → 写代码 → feature-local 测试 → commit | [skill] skill:freely-dev-loop-execution | Worker |
-| 5. test-pre-merge 验证 | merge fix-branch → test-pre-merge worktree → 端到端测试 → 迭代通过 | [命令] | Worker |
-| 6. 提 PR | `./bin/pr-create-guarded` → pull develop → 冲突处理 → dry-run gate → push → gh pr create | [命令] | Worker/Manager |
+| 4. Dev 实现 | dev-loop-execution → 写代码 → RED-GREEN → commit | [skill] skill:freely-dev-loop-execution | Worker |
+| 5. Test 验证 | test-pre-merge 工位逐条执行 pre-tests → 全绿 | [skill] skill:freely-test-execution | Worker |
+| 6. 提 PR | `./bin/pr-create-guarded` → pull develop → 冲突处理 → dry-run gate → push → platform-adapter | [命令] | Worker/Manager |
 | 7. PR review + CI | CI check → Approval | [命令] ./bin/pr-review-guarded | Manager |
-| 8. 门禁合并 | `./bin/pr-merge-guarded develop <pr-branch>` → PR gate → promotion gate → merge | [命令] | Worker/Manager |
+| 8. 门禁合并 | `./bin/pr-merge-guarded develop <pr-branch>` → PR gate → promotion gate → merge → platform-adapter | [命令] | Worker/Manager |
 | 9. 关工位 | `./bin/wt-close <branch>` 清理工位+分支 | [命令] | Worker/Manager |
 
-- Manager 负责入口路由（feedback/scan 判定）和步骤 1，Worker 负责步骤 2-9 执行
+- Manager 负责入口路由（feedback/scan 判定）和步骤 0-1，Worker 负责步骤 2-9 执行
 - 步骤 2-9 由 Worker 在 skill 约束下完成，完成后写 handoff JSON 汇报
 - wt-close 会自动消费该工位的所有 worker handoff
 - **禁止在 develop 上直接修改、提交**——那是受保护主管工位
@@ -177,10 +188,10 @@ Freely 开发 Freely 时，默认先问四件事：
 
 当发现运行时 bug，使用 `skill:freely-fix-execution` 快速修复。先判场景：
 
-- **原 feature worktree 还在** → 直接在 feature 上改、提交。走 feature → test-pre-merge-* → B1_IBM → B2_IBM → pr-create-guarded → pr-review-guarded → pr-merge-guarded → develop。
-- **原 feature 已退役（已合并/已删）** → 建 `test-pre-merge-<desc>-<YYYYMMDD>` 私有工位快测（不改不提交不推送，不违背保护约束）。验证通过后 cp 修改到新建的 `feature/*` 或 `hotfix/*` 可写工位，增量提交。
-- **普通 fix** 用 `feature/*` → test-pre-merge-* → pr-create-guarded → pr-review-guarded → pr-merge-guarded → develop；**紧急 hotfix** 用 `hotfix/*` → develop（hotfix 从 main 创建，可跳过 test-pre-merge）。
-- **补齐治理**：B1_IBM（`freely-doc-B1_IBM-execution`：brainstorms.md → candidates.md → milestone）→ B2_IBM（`freely-doc-B2_IBM-execution`：I-* issue → prd → pre-tests → tasks → code-review → progress）→ milestones.md。
+- **原 feature worktree 还在** → 直接在 feature 上改、提交。走 feature → [skill] test-execution → [skill] B1_IBM → [skill] B2_IBM → [命令] pr-create-guarded → [命令] pr-review-guarded → [命令] pr-merge-guarded → develop。
+- **原 feature 已退役（已合并/已删）** → 建 `test-pre-merge-*` 私有工位快测（不改不提交不推送，不违背保护约束）。验证通过后 cp 修改到新建的 `fix/*` 或 `hotfix/*` 可写工位，增量提交。
+- **普通 fix** 走 `fix → [skill] test-execution → [skill] B1 → [skill] B2 → [命令] pr-create → [命令] pr-review → [命令] pr-merge → develop`；**紧急 hotfix** 用 `hotfix/*` → develop（hotfix 从 main 创建，可跳过 test-pre-merge）。
+- **补齐治理**：B1_IBM（`skill:freely-doc-B1_IBM-execution`：brainstorm → candidate → milestone）→ B2_IBM（`skill:freely-doc-B2_IBM-execution`：I-* → prd → pre-tests → tasks → code-review）→ milestones.md。
 - **原则**：Fix first, govern later。test-pre-merge-* 私有测试不违背保护约束。fix 工位早期创建、增量提交。
 
 详见 `skill:freely-fix-execution`

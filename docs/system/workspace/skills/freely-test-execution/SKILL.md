@@ -6,7 +6,7 @@ description: 独立测试执行 skill——在 test-pre-merge 工位中逐条执
 # skill:freely-test-execution
 
 > 全链路: dev → test → pr-create-guarded → pr-review-guarded → pr-merge-guarded → wt-close
->                ↑ you are here（执行 pre-tests → 全绿才放行）
+>                [本 skill 自此开始 — 执行 pre-tests → 全绿才放行]
 
 ## 在流程中的位置
 
