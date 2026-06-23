@@ -313,7 +313,6 @@ class Task:
     completion_summary: str = ""
     evidence_paths: str = ""
     worker_pid: str = ""
-    delivery_status: str = "pending"
     error: str = ""
     freely: Optional[Dict] = None
 
@@ -339,7 +338,6 @@ class Task:
         if self.branch: d["branch"] = self.branch
         if self.completion_summary: d["completionSummary"] = self.completion_summary
         if self.evidence_paths: d["evidencePaths"] = self.evidence_paths
-        if self.delivery_status: d["deliveryStatus"] = self.delivery_status
         if self.error: d["error"] = self.error
         if self.freely: d["freely"] = self.freely
         return d
@@ -365,7 +363,6 @@ class Task:
             completion_summary=data.get("completionSummary", data.get("completion_summary", "")),
             evidence_paths=data.get("evidencePaths", data.get("evidence_paths", "")),
             worker_pid=data.get("workerPid", data.get("worker_pid", "")),
-            delivery_status=data.get("deliveryStatus", data.get("delivery_status", "pending")),
             error=data.get("error", ""),
             freely=data.get("freely"),
         )

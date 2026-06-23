@@ -151,7 +151,6 @@ class A2AClient:
             ("GET",  "/tasks"):            "tasks/list",
             ("PATCH","/tasks"):            "tasks/push",
             ("GET",  "/tasks/latest-manager"):    "tasks/get",
-            ("GET",  "/tasks/pending-delivery"):  "tasks/list",
         }
         # Build key: (method, base_path_stripped_of_task_id)
         import re

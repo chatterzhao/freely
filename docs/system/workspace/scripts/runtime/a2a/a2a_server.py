@@ -457,7 +457,7 @@ class A2AServer:
         else:
             qs = dict(request.query_params)
             rows = self.task_store.get_all_dicts()
-            for key in ("state", "agent_id", "skill", "worktree", "raw_key", "delivery_status"):
+            for key in ("state", "agent_id", "skill", "worktree", "raw_key"):
                 if key in qs: rows = [r for r in rows if r.get(key) == qs[key]]
             rows.sort(key=lambda r: r.get("created_at", ""), reverse=True)
             return JSONResponse({"tasks": rows})
