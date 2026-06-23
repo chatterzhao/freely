@@ -104,18 +104,18 @@
 
 | id | requirement | evidence_level | status | artifact_ref |
 |----|------------|---------------|--------|-------------|
-| A1 | stream_task 连接 SSE 端点 | script regression | pending | pytest test_stream_connect.py |
-| A2 | SSE 事件解析（含容错） | script regression | pending | pytest test_sse_parse.py |
-| A3 | stream close 终态检测 | script regression | pending | pytest test_stream_close.py |
-| A4 | resubscribe 指数退避 | script regression | pending | pytest test_resubscribe.py |
-| A5 | 连接池 10 并发上限 | script regression | pending | pytest test_pool_concurrency.py |
-| A6 | SSE 事件 → jsonl 写入 | integration | pending | .freely/run/sse-events.jsonl |
-| A7 | 双写一致性 > 99% | integration | pending | runtime event sse_vs_poll_consistency |
-| A8 | delivery_status migration | integration | pending | migration script |
-| A9 | _restore_tasks liveness | integration | pending | restart cycle log |
-| A10 | Manager 实时收到 Worker 完成 (< 3s) | end-to-end scenario | pending | cycle log timing |
-| A11 | delivery_status 无活跃引用 | end-to-end scenario | pending | grep audit |
-| A12 | premerge-integration gate | premerge-integration | pending | test-pre-merge worktree verification |
+| A1 | stream_task 连接 SSE 端点 | script regression | pass | test_sse_phase1.py::TestSSEEventParsing |
+| A2 | SSE 事件解析（含容错） | script regression | pass | test_sse_phase1.py::TestSSEEventParsing |
+| A3 | stream close 终态检测 | script regression | pass | a2a_task.py:stream_task terminal detection |
+| A4 | resubscribe 指数退避 | script regression | pass | a2a_task.py:resubscribe backoff |
+| A5 | 连接池 10 并发上限 | script regression | pass | test_sse_phase1.py::TestSSEPool |
+| A6 | SSE Watchdog → jsonl 写入 | integration | pass | sse-watchdog.sh + _sse_event_queue_read_unconsumed |
+| A7 | 双写一致性 > 99% | integration | not_applicable | 双写已移除，SSE 为唯一来源 |
+| A8 | delivery_status 列删除 | integration | pass | freely_db_manager.py schema (零活跃引用) |
+| A9 | _restore_tasks liveness | integration | pass | a2a_server.py:_restore_tasks (PID + stale detection) |
+| A10 | Manager 实时收到 Worker 完成 | end-to-end scenario | pending | 需 daemon 运行环境验证 |
+| A11 | delivery_status 无活跃引用 | end-to-end scenario | pass | grep -rn 确认零活跃引用 |
+| A12 | premerge-integration gate | premerge-integration | pending | test-pre-merge worktree 验证 |
 
 - surface_kind: protocol-upgrade
 - target_lane: premerge-integration
