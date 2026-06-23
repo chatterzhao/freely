@@ -19231,6 +19231,78 @@ BACKLOG_NOTE
 
 # append_manager_task_context_if_needed: inject thread history + unconsumed worker list for Manager patrol.
 # Worker does NOT receive this — it only gets Task + agent doc + HANDOFF_INJECT.
+# ── SSE Event Queue (Phase 2: Dual-Write Transition) ──────────────────
+
+_sse_event_queue_path() {
+  local project="$1"
+  echo "$(run_dir_for_project "$project")/sse-events.jsonl"
+}
+
+# Append an SSE event to the queue (called when SSE events arrive)
+sse_event_queue_append() {
+  local project="$1" task_id="$2" state="$3" event_type="${4:-TaskStatusUpdateEvent}"
+  local queue_file timestamp
+  queue_file="$(_sse_event_queue_path "$project")"
+  timestamp="$(current_timestamp_utc_for_machine)"
+  mkdir -p "$(dirname "$queue_file")"
+  printf '{"task_id":"%s","state":"%s","timestamp":"%s","event_type":"%s","consumed":false}\n' \
+    "$task_id" "$state" "$timestamp" "$event_type" >> "$queue_file"
+}
+
+# Read unconsumed SSE events, return count of new events read
+_sse_event_queue_read_unconsumed() {
+  local project="$1" queue_file
+  queue_file="$(_sse_event_queue_path "$project")"
+  if [[ ! -f "$queue_file" || ! -s "$queue_file" ]]; then
+    echo "0"
+    return 0
+  fi
+  python3 -c "
+import json, sys
+queue_file = '$queue_file'
+events = []
+try:
+    with open(queue_file) as f:
+        for line in f:
+            line = line.strip()
+            if not line: continue
+            try: ev = json.loads(line)
+            except: continue
+            if not ev.get('consumed'): events.append(ev)
+except: pass
+# Print unconsumed events (max 10) in prompt format
+for ev in events[:10]:
+    tid = ev.get('task_id','?')[:20]
+    st = ev.get('state','?')
+    ts = ev.get('timestamp','')[:19]
+    print(f'- [SSE] {tid} state={st} at={ts}')
+if events:
+    print(f'SSE_EVENT_COUNT={len(events)}')
+else:
+    print(f'SSE_EVENT_COUNT=0')
+# Mark as consumed
+consumed_ids = [ev.get('task_id') for ev in events[:10]]
+if consumed_ids:
+    new_lines = []
+    with open(queue_file) as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                new_lines.append('')
+                continue
+            try: ev = json.loads(line)
+            except:
+                new_lines.append(line)
+                continue
+            if ev.get('task_id') in consumed_ids and not ev.get('consumed'):
+                ev['consumed'] = True
+            new_lines.append(json.dumps(ev, ensure_ascii=False))
+    with open(queue_file, 'w') as f:
+        for l in new_lines:
+            f.write(l + '\n')
+" 2>/dev/null || echo "0"
+}
+
 append_manager_task_context_if_needed() {
   local project="$1"
   [[ "$(effective_runtime_role_for_project "$project")" == "manager" ]] || return 0
@@ -19238,6 +19310,12 @@ append_manager_task_context_if_needed() {
   _a2a_task_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
   _db_path="$project/.freely/freely.db"
   [[ -f "$_a2a_task_py" && -f "$_db_path" ]] || return 0
+
+  # ── Phase 2 Dual-Write: SSE events first, polling as fallback ──
+  local sse_output sse_count poll_output poll_count
+  sse_output="$(_sse_event_queue_read_unconsumed "$project")"
+  sse_count=$(echo "$sse_output" | grep -o 'SSE_EVENT_COUNT=[0-9]*' | cut -d= -f2)
+  [[ "${sse_count:-0}" =~ ^[0-9]+$ ]] || sse_count=0
 
   # Pending delivery: tasks in input-required/pending-input states (worker→manager)
   # These are worker messages not yet delivered to the Manager AI.
@@ -19255,9 +19333,28 @@ if not rows:
 print(f'PENDING_DELIVERY_COUNT={len(rows)}', flush=True)
 " 2>/dev/null || echo "PENDING_DELIVERY_COUNT=0")
 
-  # Extract pending delivery count for backlog gating
-  MANAGER_TASK_BACKLOG_COUNT=$(echo "$pending_delivery" | grep -o 'PENDING_DELIVERY_COUNT=[0-9]*' | cut -d= -f2)
-  [[ "${MANAGER_TASK_BACKLOG_COUNT:-0}" =~ ^[0-9]+$ ]] || MANAGER_TASK_BACKLOG_COUNT=0
+  poll_count=$(echo "$pending_delivery" | grep -o 'PENDING_DELIVERY_COUNT=[0-9]*' | cut -d= -f2)
+  [[ "${poll_count:-0}" =~ ^[0-9]+$ ]] || poll_count=0
+
+  # ── Phase 2 consistency check ──
+  if (( sse_count > 0 || poll_count > 0 )); then
+    local consistency="match"
+    if (( sse_count > 0 && poll_count == 0 )); then
+      consistency="sse_only"
+    elif (( sse_count == 0 && poll_count > 0 )); then
+      consistency="poll_only"
+    elif (( sse_count != poll_count )); then
+      consistency="mismatch($sse_count vs $poll_count)"
+    fi
+    append_runtime_event "$project" "sse_vs_poll_consistency" \
+      "sse_count=$sse_count" \
+      "poll_count=$poll_count" \
+      "consistency=$consistency"
+  fi
+
+  # Extract pending delivery count for backlog gating (prefer SSE count)
+  MANAGER_TASK_BACKLOG_COUNT="${sse_count:-$poll_count}"
+  [[ "${MANAGER_TASK_BACKLOG_COUNT:-0}" =~ ^[0-9]+$ ]] || MANAGER_TASK_BACKLOG_COUNT="${poll_count:-0}"
 
   # Thread history: recent handoff records (all roles, grouped by raw_key)
   local thread_summary
@@ -19307,7 +19404,10 @@ if not recent:
 
 ## A2A Task 上下文（仅 Manager 可见）
 
-### Worker 汇报（待你处理）
+### SSE 实时事件（Phase 2 双写过渡）
+${sse_output}
+
+### Worker 汇报（待你处理 — 轮询 fallback）
 ${pending_delivery}
 
 ### Worker 异常（需处理）
@@ -19316,7 +19416,7 @@ ${worker_errors}
 ### 近期 Worker 线程历史
 ${thread_summary}
 
-处理原则：先读上面的 Worker 汇报（Runtime 投递给你的消息），读 completion_summary/reason/next_action 做决策。异常 Worker 要及时清理（stale_pid → 退休工位释放资源）。消息看完后如果无事可做再看 scan 找新任务。
+处理原则：SSE 实时事件优先于轮询汇报。先读上面的 SSE 事件和 Worker 汇报（Runtime 投递给你的消息），读 completion_summary/reason/next_action 做决策。异常 Worker 要及时清理（stale_pid → 退休工位释放资源）。消息看完后如果无事可做再看 scan 找新任务。
 EOF
 }
 
