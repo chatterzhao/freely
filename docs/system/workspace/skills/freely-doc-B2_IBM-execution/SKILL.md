@@ -6,7 +6,7 @@ description: B2_IBM：I→B→M 第二阶段。从 scan、A2A task 与 continuit
 # skill:freely-doc-B2_IBM-execution
 
 > 全链路: feedback → wt-create → B1_IBM → B2_IBM → dev → pr-create-guarded → pr-review-guarded → pr-merge-guarded → wt-close
->                                               ↑ you are here（B: 实现设计 → M: Map 交付 dev-loop）
+>                                               [本 skill 自此开始 — 实现设计 → Map 交付 dev-loop]
 
 ## I→B→M 骨架
 

@@ -108,7 +108,7 @@ Freely 是一个自主循环运行器：
 | main | ✅ | ❌ | release/*, hotfix/* | - | 发布/热修复入口 |
 | develop | ✅ | ❌ | guarded feature/fix PR, hotfix/* | - | 默认开发集成入口；`test-pre-merge-*` 只提供测试证据，不作为 merge source |
 | test-pre-merge-* | ❌ | ❌ | feature/*, fix/*, hotfix/*, feature/premerge-* | - | 临时预集成验证批次；必须从当前 develop 新建，用完立即删除，不参与最终合并链 |
-| feature/* | ✅ 同名 | ✅ worktree | - | test-pre-merge-* (测试) → pr-create-guarded (PR) → pr-merge-guarded (合并) | 从 develop 创建；完整链路: `feedback → wt-create → B1_IBM → B2_IBM → dev → pr-create-guarded → pr-merge-guarded → wt-close`（详见 AGENTS.md §规范流程） |
+| feature/* | ✅ 同名 | ✅ worktree | - | test-pre-merge-* (测试) → pr-create-guarded (PR) → pr-merge-guarded (合并) | 从 develop 创建；完整链路: `feedback → wt-create → B1 → B2 → dev → test → pr-create → pr-merge → wt-close`（详见 AGENTS.md §规范流程） |
 | release/* | ✅ 同名 | ✅ worktree | - | main, develop | 从 develop 创建 |
 | hotfix/* | ✅ 同名 | ✅ worktree | - | main, develop | 从 main 创建 |
 

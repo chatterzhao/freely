@@ -5,8 +5,8 @@ description: B1_IBM：I→B→M 第一阶段。消费 scan 结果中 wt-create �
 
 # skill:freely-doc-B1_IBM-execution
 
-> 全链路: feedback → wt-create → B1_IBM → B2_IBM → dev → pr-create-guarded → pr-review-guarded → pr-merge-guarded → wt-close
->                                    ↑ you are here（B: Brainstorm → M: Milestone）
+> 全链路: ([命令] feedback) → [命令] wt-create → [skill] B1 → [skill] B2 → [skill] dev → [skill] test → [命令] pr-create → [命令] pr-review → [命令] pr-merge → [命令] wt-close
+>                                                                  [本 skill 自此开始 — Brainstorm → Milestone]
 
 ## I→B→M 骨架
 
