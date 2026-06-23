@@ -1,3 +1,26 @@
+## M-20260623T162243Z-A
+- title: scan_state output to Manager prompt
+- status: active
+### candidate_issues
+1. `C-20260623T162243Z-A`
+- milestone: M-20260623T162243Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260623T162243Z-A/issue.md`
+### committed_issues
+1. `I-20260623T162243Z-A`
+- title: scan_state output to Manager prompt
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260623T162243Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/scan-state-prompt-output/code-reviews`
+### completed_issues
+1. `I-20260623T162243Z-A`
+- title: scan_state output to Manager prompt
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260623T162243Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/scan-state-prompt-output/code-reviews`
+
 ## M-20260623T140410Z-A
 - title: Fix _restore_tasks edge cases — missing PID, stale detection, deleted worktree
 - status: active
