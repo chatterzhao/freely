@@ -2,7 +2,7 @@
 - title: Fix scan import for platform-adapter
 - status: active
 ### candidate_issues
-1. `C-20260623T022909Z-key: scan-import-fix`
+1. `C-20260623T022909Z-A`
 - milestone: M-20260623T022909Z-A
 - status: promoted
 - promoted_issue_path: `docs/issues/I-20260623T022909Z-A/issue.md`
@@ -10,7 +10,7 @@
 1. `I-20260623T022909Z-A`
 - title: fix: replace platform_adapter direct imports with importlib loading
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260623T022909Z-A/issue.md`
 - verification_artifact_dir: `docs/system/workspace/scripts/runtime`
 
