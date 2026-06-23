@@ -29,7 +29,7 @@
   - mode: subagent
   - summary: 审查 #3381 全部 14 条评论，确认 SSE 缺失是所有问题中枢的结论正确。验证 5 阶段方案覆盖所有 SSE 直接关联点（客户端、轮询替代、delivery_status 废弃、_restore_tasks 修复、filesystem_fallback deprecated）。确认 A2A 协议标准对齐。双写过渡方案提供安全网，风险可控。
   - verdict: pass
-- promoted_issue_path: docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md
+- promoted_issue_path: docs/issues/I-20260623T100903Z-A/issue.md
 - milestone: M-20260623T100903Z-A
 - session_refs:
   - tool: claude-code
