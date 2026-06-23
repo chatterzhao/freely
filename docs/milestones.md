@@ -1,3 +1,26 @@
+## M-20260623T075200Z-A
+- title: ACP usage workaround — token estimation
+- status: active
+### candidate_issues
+1. `C-20260623T075200Z-A`
+- milestone: M-20260623T075200Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260623T075200Z-A/issue.md`
+### committed_issues
+1. `I-20260623T075200Z-A`
+- title: ACP usage workaround
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260623T075200Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/acp-usage-passthrough/code-reviews`
+### completed_issues
+1. `I-20260623T075200Z-A`
+- title: ACP usage workaround
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260623T075200Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/acp-usage-passthrough/code-reviews`
+
 ## M-20260623T162226Z-A
 - title: L0-L3 loop guard — 4-tier supervisor-side dead-loop detection
 - status: active
