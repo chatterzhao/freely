@@ -371,7 +371,6 @@ class A2AServer:
             Route("/.well-known/agent-card.json", self._agent_card_endpoint, methods=["GET"]),
             Route("/tasks", self._tasks_endpoint, methods=["GET", "POST"]),
             Route("/tasks/latest-manager", self._latest_manager, methods=["GET"]),
-            Route("/tasks/pending-delivery", self._pending_delivery, methods=["GET"]),
             Route("/tasks/launched-pids", self._launched_pids, methods=["GET"]),
             Route("/tasks/{task_id:path}", self._task_endpoint, methods=["GET", "PATCH"]),
             Route("/tasks/{task_id}/stream", self._task_stream_endpoint, methods=["GET"]),
@@ -471,11 +470,6 @@ class A2AServer:
                 "task_id": tid, "role": body.get("role", "worker"),
                 "type": body.get("type", "text"), "content": body.get("content", "")})
             return JSONResponse({"ok": True})
-        if task_id.endswith("/delivery") and request.method == "PATCH":
-            tid = task_id[:-10]; body = await request.json()
-            self.task_store.raw_rpc("a2a_task.update-delivery-status",
-                {"task_id": tid, "delivery_status": body.get("delivery_status", "delivered")})
-            return JSONResponse({"ok": True})
         if task_id.endswith("/worker-pid") and request.method == "PATCH":
             tid = task_id[:-12]; body = await request.json()
             self.task_store.raw_rpc("a2a_task.update-worker-pid",
@@ -516,12 +510,6 @@ class A2AServer:
         mgr = [r for r in rows if r.get("agent_id", "").startswith("manager")]
         mgr.sort(key=lambda r: r.get("created_at", ""), reverse=True)
         return JSONResponse(mgr[0] if mgr else {})
-
-    async def _pending_delivery(self, request: Request):
-        rows = self.task_store.get_all_dicts()
-        pending = [r for r in rows if r.get("delivery_status") == "pending" and r.get("agent_id") == "worker"]
-        pending.sort(key=lambda r: r.get("created_at", ""))
-        return JSONResponse({"tasks": pending})
 
     async def _launched_pids(self, request: Request):
         raw_key = request.query_params.get("raw_key", "")

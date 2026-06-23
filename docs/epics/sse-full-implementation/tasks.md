@@ -51,9 +51,9 @@
 - [ ] 删除 delivery_status 列 + CHECK 约束
 
 ### T3.2 — Code Removal
-- [ ] a2a_task.py: 删除 mark_delivered()、pending_delivery()
-- [ ] a2a_server.py: 删除 /tasks/{id}/delivery PATCH 端点
-- [ ] freely: 删除 after_run delivery 标记代码 (L21699-21720)
+- [x] a2a_task.py: 删除 mark_delivered (Phase 3 done)()、pending_delivery()
+- [x] a2a_server.py: 删除 /tasks/{id}/delivery (Phase 3 done) PATCH 端点
+- [x] freely: 删除 after_run delivery (Phase 3 done) 标记代码 (L21699-21720)
 - [ ] freely: 删除 prompt 中 PENDING_DELIVERY_COUNT
 
 ### T3.3 — SSE-Only Mode

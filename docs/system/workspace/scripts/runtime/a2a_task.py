@@ -258,10 +258,6 @@ class A2AClient:
         r = self._rest_request("GET", "/tasks/latest-manager")
         return r if "task_id" in r else None
 
-    def pending_delivery(self) -> List[dict]:
-        """Get pending deliveries via A2A Server (authoritative)."""
-        return self._rest_request("GET", "/tasks/pending-delivery").get("tasks", [])
-
     def launched_pids(self, raw_key: str = "") -> List[dict]:
         """Get launched worker PIDs via A2A Server."""
         path = f"/tasks/launched-pids?raw_key={raw_key}" if raw_key else "/tasks/launched-pids"
@@ -272,11 +268,6 @@ class A2AClient:
         """Add message via A2A Server endpoint."""
         return self._request("POST", f"/tasks/{task_id}/messages",
                             {"role": role, "type": msg_type, "content": content})
-
-    def mark_delivered(self, task_id: str) -> dict:
-        """Mark delivered via A2A Server endpoint."""
-        return self._request("PATCH", f"/tasks/{task_id}/delivery",
-                            {"delivery_status": "delivered"})
 
     def set_worker_pid(self, task_id: str, worker_pid: str) -> dict:
         """Set worker PID via A2A Server endpoint."""
@@ -571,12 +562,6 @@ def update_message(task_id: str, content: str, role: str = "worker",
                    msg_type: str = "text") -> int:
     return 1 if _client().add_message(task_id, role, msg_type, content).get("ok") else 0
 
-def pending_delivery() -> List[dict]:
-    return _client().pending_delivery()
-
-def mark_delivered(task_id: str) -> int:
-    return 1 if _client().mark_delivered(task_id).get("ok") else 0
-
 def set_worker_pid(task_id: str, worker_pid: str) -> int:
     return 1 if _client().set_worker_pid(task_id, worker_pid).get("ok") else 0
 
@@ -587,7 +572,6 @@ def mark_stale(timeout_minutes: int = 30) -> int:
     return _client().mark_stale(timeout_minutes)
 
 # Legacy aliases (for backward compat with freely bash)
-update_delivery_status = mark_delivered
 update_worker_pid = set_worker_pid
 get_launched_pids = launched_pids
 
@@ -748,10 +732,6 @@ def _main() -> int:
     p_haw.add_argument("--worktree", default="")
     p_lk = sub.add_parser("list-key")
     p_lk.add_argument("--raw-key", default="")
-
-    p_lpd = sub.add_parser("list-pending-delivery")
-    p_usa = sub.add_parser("update-send-to-ai")
-    p_usa.add_argument("--task-id", default="")
 
     p_uwp = sub.add_parser("update-worker-pid")
     p_uwp.add_argument("--task-id", default="")
@@ -945,12 +925,6 @@ def _main() -> int:
         elif args.cmd == "list-key":
             rows = list_by_raw_key(getattr(args, 'raw_key', '') or "")
             print(json.dumps(rows))
-        elif args.cmd == "list-pending-delivery":
-            rows = pending_delivery()
-            print(json.dumps(rows))
-        elif args.cmd == "update-send-to-ai":
-            r = mark_delivered(_task_id)
-            print(json.dumps({"affected": 1 if r else 0}))
         elif args.cmd == "update-worker-pid":
             r = set_worker_pid(_task_id, getattr(args, 'worker_pid', '') or "")
             print(json.dumps({"affected": 1 if r else 0}))

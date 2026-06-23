@@ -21763,28 +21763,7 @@ print(ready)
       fi
     fi
 
-    # ── Mark pending-delivery messages as delivered after successful AI cycle ──
-    # The AI just saw all send_to_ai=pending/fail messages in its prompt.
-    # Update them to success so they won't be re-delivered next cycle.
-    if [[ "$exit_contract_action" != "resume_invalid" && "$exit_contract_action" != "" ]]; then
-      _a2a_task_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
-      _db_path="$PROJECT_ROOT/.freely/freely.db"
-      if [[ -f "$_a2a_task_py" && -f "$_db_path" ]]; then
-        python3 -c "
-import json,subprocess,sys
-hp='$_a2a_task_py'; db='$_db_path'
-r=subprocess.run([sys.executable,hp,'list-pending-delivery','--db',db],
-                 capture_output=True,text=True,timeout=5)
-rows=json.loads(r.stdout) if r.returncode==0 else []
-for row in rows:
-    tid=row.get('task_id','')
-    if tid:
-        subprocess.run([sys.executable,hp,'update-send-to-ai','--db',db,'--task-id',tid,'--send-to-ai','success'],
-                       capture_output=True,timeout=5)
-print(f'delivery_status=delivered updated={len(rows)}', flush=True)
-" >/dev/null 2>&1 || true
-      fi
-    fi
+    # SSE 替代了 delivery_status — after_run delivery marking 已废弃
 
     if [[ "$exit_contract_action" == "delegate_workers" ]]; then
       manager_runtime_launch_workers_after_ai_cycle_if_needed "$PROJECT_ROOT" "$LAST_WORKCELL_EXIT_REASON"
