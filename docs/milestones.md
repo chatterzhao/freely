@@ -10,14 +10,14 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260623T100903Z-A`
 - title: 彻底实现 SSE — SSE 客户端 + 替代轮询 + 废弃 delivery_status
 - milestone_state: committed
 - phase_state: `in_dev`
-- issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/sse-full-implementation`
 
 ## M-20260623T005123Z-A
@@ -27,7 +27,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260623T005123Z-A`
@@ -44,7 +44,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260623T005139Z-A`
@@ -61,7 +61,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260622T234854Z-A`
@@ -78,7 +78,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260622T021827Z-A`
@@ -95,7 +95,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260622T021832Z-A`
@@ -112,7 +112,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260621T202057Z-A`
@@ -129,7 +129,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260622T123158Z-A`
@@ -146,7 +146,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260618T035220Z-B`
@@ -163,7 +163,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260617T095105Z-B`
@@ -180,7 +180,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260617T063755Z-B`
@@ -197,7 +197,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260621T005656Z-A`
@@ -214,7 +214,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260618T035220Z-A`
@@ -231,7 +231,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260617T063755Z-A`
@@ -248,7 +248,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260617T051631Z-A`
@@ -265,7 +265,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260619T061448Z-A`
@@ -282,7 +282,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260620T142847Z-A`
@@ -299,7 +299,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260620T142838Z-A`
@@ -316,7 +316,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260617T130029Z-A`
@@ -333,7 +333,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260618T091721Z-A`
@@ -350,7 +350,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260618T091116Z-A`
@@ -367,7 +367,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260620T120020Z-A`
@@ -384,7 +384,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260620T115242Z-A`
@@ -401,7 +401,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260620T113909Z-A`
@@ -418,7 +418,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260620T104526Z-A`
@@ -435,7 +435,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260619T033758Z-A`
@@ -452,7 +452,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260618T071502Z-A`
@@ -469,7 +469,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260618T065221Z-A`
@@ -486,7 +486,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260618T054147Z-A`
@@ -503,7 +503,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260618T051709Z-A`
@@ -520,7 +520,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260618T050413Z-A`
@@ -537,7 +537,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260618T044047Z-A`
@@ -554,7 +554,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260618T043121Z-A`
@@ -568,7 +568,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260618T040226Z-A`
@@ -585,7 +585,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260618T040226Z-A`
@@ -602,7 +602,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260618T031437Z-A`
@@ -616,7 +616,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260618T024841Z-A`
@@ -633,7 +633,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260618T024841Z-A`
@@ -650,7 +650,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260618T015503Z-A`
@@ -667,7 +667,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260617T160807Z-A`
@@ -684,7 +684,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260617T160003Z-A`
@@ -701,7 +701,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260617T145428Z-A`
@@ -718,7 +718,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260617T133709Z-A`
@@ -735,7 +735,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260617T131746Z-A`
@@ -752,7 +752,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260617T124129Z-A`
@@ -769,7 +769,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260617T121221Z-A`
@@ -786,7 +786,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260617T110109Z-A`
@@ -803,7 +803,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260617T103956Z-A`
@@ -820,7 +820,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260617T095105Z-A`
@@ -837,7 +837,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260617T090413Z-A`
@@ -854,7 +854,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260617T090408Z-A`
@@ -871,7 +871,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260617T063755Z-A`
@@ -889,7 +889,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260617T055840Z-A`
@@ -912,7 +912,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260617T031719Z-A`
@@ -929,7 +929,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260616T111514Z-A`
@@ -949,7 +949,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260617T011030Z-A`
@@ -965,7 +965,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260616T224707Z-A`
@@ -981,7 +981,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260616T143914Z-A`
@@ -997,7 +997,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260524T053214Z-A`
@@ -1013,7 +1013,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260511T0731Z-A`
@@ -1029,7 +1029,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260511T0407Z-A`
@@ -1045,7 +1045,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260511T0245Z-A`
@@ -1061,7 +1061,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260511T0229Z-A`
@@ -1077,7 +1077,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260511T0019Z-A`
@@ -1093,7 +1093,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260510T1853Z-A`
@@ -1109,7 +1109,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260510T1840Z-A`
@@ -1125,7 +1125,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260510T1339Z-A`
@@ -1141,7 +1141,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260510T1326Z-A`
@@ -1157,7 +1157,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260510T1318Z-A`
@@ -1173,7 +1173,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260510T0856Z-A`
@@ -1189,7 +1189,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260510T0112Z-A`
@@ -1205,7 +1205,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260508T045527Z-A`
@@ -1221,7 +1221,7 @@
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260508T050922Z-A`
@@ -1277,7 +1277,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260508T120000Z-A`
@@ -1296,7 +1296,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260507T143546Z-A`
@@ -1314,7 +1314,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260508T005431Z-A`
@@ -1331,7 +1331,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260507T143545Z-A`
@@ -1349,7 +1349,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260508T004541Z-A`
@@ -1368,7 +1368,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260508T011858Z-A`
@@ -1386,7 +1386,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260507T143544Z-A`
@@ -1404,7 +1404,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260507T0700Z-A`
@@ -1421,7 +1421,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260507T0730Z-A`
@@ -1438,7 +1438,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260507T0600Z-A`
@@ -1455,7 +1455,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260507T0300Z-A`
@@ -1472,7 +1472,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260507T0200Z-A`
@@ -1489,7 +1489,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260507T0100Z-A`
@@ -1508,7 +1508,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260506T1400Z-A`
@@ -1528,7 +1528,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260506T1200Z-A`
@@ -1548,7 +1548,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260506T1230Z-A`
@@ -1572,7 +1572,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260503-0200-A`
@@ -1786,7 +1786,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 
@@ -1841,7 +1841,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 
@@ -1849,7 +1849,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 
@@ -1878,7 +1878,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 
@@ -1888,7 +1888,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 
@@ -1898,7 +1898,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 
@@ -1908,7 +1908,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260508T111130Z-A`
@@ -1924,7 +1924,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260508T124041Z-A`
@@ -1940,7 +1940,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260508T133423Z-A`
@@ -1956,7 +1956,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260508T121541Z-A`
@@ -1972,7 +1972,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260508T154706Z-A`
@@ -1988,7 +1988,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260508T232413Z-A`
@@ -2010,7 +2010,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260510T0112Z-A`
@@ -2026,7 +2026,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260509T090210Z-A`
@@ -2042,7 +2042,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260509T024559Z-A`
@@ -2058,7 +2058,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260518T020406Z-A`
@@ -2074,7 +2074,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260513T040512Z-A`
@@ -2090,7 +2090,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260506T1000Z-A`
@@ -2105,7 +2105,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260521T032154Z-A`
@@ -2120,7 +2120,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260522T045227Z-A`
@@ -2135,7 +2135,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260522T051507Z-A`
@@ -2151,7 +2151,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260522T053702Z-A`
@@ -2168,7 +2168,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260522T071901Z-A`
@@ -2184,7 +2184,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260522T072450Z-A`
@@ -2200,7 +2200,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260522T075012Z-A`
@@ -2216,7 +2216,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260522T075839Z-A`
@@ -2232,7 +2232,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260522T081853Z-A`
@@ -2248,7 +2248,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260522T083133Z-A`
@@ -2264,7 +2264,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260522T085354Z-A`
@@ -2280,7 +2280,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260522T091606Z-A`
@@ -2296,7 +2296,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260522T095721Z-A`
@@ -2313,7 +2313,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260524T230541Z-A`
@@ -2330,7 +2330,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260603T142127Z-A`
@@ -2348,7 +2348,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260612T000223Z-A`
@@ -2365,7 +2365,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260615T001626Z-A`
@@ -2382,7 +2382,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260616T030213Z-A`
@@ -2399,7 +2399,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260616T033325Z-A`
@@ -2416,7 +2416,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260616T083810Z-A`
@@ -2433,7 +2433,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260616T044030Z-A`
@@ -2449,7 +2449,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260616T110714Z-parse-env-removal`
@@ -2466,7 +2466,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260616T084121Z-platform-sync-batch`
@@ -2490,7 +2490,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260618T100000Z-A`
@@ -2507,7 +2507,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260619T045626Z-A`
@@ -2523,7 +2523,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260619T045410Z-A`
@@ -2539,7 +2539,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260620T083454Z-A`
@@ -2561,7 +2561,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260621T043842Z-A`
@@ -2583,7 +2583,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260621T063130Z-A`
@@ -2605,7 +2605,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260621T090002Z-A`
@@ -2626,7 +2626,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260621T092609Z-A`
@@ -2647,7 +2647,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260621T081426Z-A`
@@ -2667,7 +2667,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260621T081814Z-A`
@@ -2688,7 +2688,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260622T003231Z-A`
@@ -2709,7 +2709,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260622T021126Z-A`
@@ -2725,7 +2725,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260622T023441Z-A`
@@ -2741,7 +2741,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260622T024321Z-A`
@@ -2757,7 +2757,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260622T025044Z-A`
@@ -2773,7 +2773,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260622T025736Z-A`
@@ -2789,7 +2789,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260622T030420Z-A`
@@ -2805,7 +2805,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260622T031557Z-A`
@@ -2821,7 +2821,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260622T000649Z-A`
@@ -2839,7 +2839,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260622T100348Z-A`
@@ -2857,7 +2857,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260622T104129Z-A`
@@ -2875,7 +2875,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260622T110050Z-A`
@@ -2893,7 +2893,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260622T113847Z-A`
@@ -2911,7 +2911,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260622T114625Z-A`
@@ -2928,7 +2928,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260622T115249Z-A`
@@ -2944,7 +2944,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260622T120046Z-A`
@@ -2962,7 +2962,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260622T123204Z-A`
@@ -2979,7 +2979,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260622T131109Z-A`
@@ -2995,7 +2995,7 @@ routing_policy:
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/sse-full-implementation/issues/I-20260623T100903Z-A.md`
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
 
 ### committed_issues
 1. `I-20260623T022909Z-A`
