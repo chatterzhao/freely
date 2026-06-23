@@ -1,3 +1,12 @@
+## M-20260623T162226Z-A
+- title: L0-L3 loop guard — 4-tier supervisor-side dead-loop detection
+- status: active
+### candidate_issues
+1. `C-20260623T162226Z-A`
+- milestone: M-20260623T162226Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260623T162226Z-A/issue.md`
+
 ## M-20260623T162243Z-A
 - title: scan_state output to Manager prompt
 - status: active
