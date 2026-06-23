@@ -174,5 +174,25 @@ _restore_tasks 结束后，对每个被修正/保持的 task，通过 SSE watchd
 - 约 20 行改动
 - 不影响其他模块
 
+### A2A 状态转换全量审计（新增）
+
+对项目中所有修改 A2A state 的代码进行全量审计，发现以下额外问题：
+
+| # | 严重度 | 位置 | 问题 |
+|---|--------|------|------|
+| C1 | 🔴 | `wt-close:683` | 写入无效状态 `"consumed"`——不在 VALID_STATES/CHECK 中，SQLite 拒绝，`\|\| true` 吞掉错误。Worker task 从未被 wt-close 更新成功过。 |
+| C2 | 🟡 | `a2a_task.py:869` | `update` CLI 的 argparse 接收 `--reason/--completion-summary/--next-action` 但未传给服务器，3 条 handoff 路径的元数据静默丢失 |
+| C3 | 🟢 | `a2a_task.py:640` | `VALID_STATES` 缺 `canceled`——`a2a-exit --state canceled` 被拒绝 |
+| C4 | 🟢 | `freely_db_manager.py:224` | CHECK 约束缺 `pending-input`（SDK 映射掩盖了，但直接写入会失败） |
+| C5 | 🟡 | `a2a_server.py:538` | PATCH 端点 `sm` dict 对未知状态原样放行 |
+| C6 | 🟢 | `freely_db_manager.py:1105` | `h_a2a_task_update_from_exit_kind` 死代码，从未被调用 |
+
+### 完整任务清单
+
+**A0**（stop 不动状态）：删除 freely:20273 working→input-required
+**A1-A3**（状态修正边界）：working 无PID / submitted 活跃Worker 过滤 / input-required 工位检查
+**B1-B4**（环境恢复通知）：SSE 注入 Manager 该做什么
+**C1-C6**（审计修复）：wt-close consumed→completed / CLI 元数据传递 / VALID_STATES 补齐 / CHECK 补齐 / PATCH 验证 / 死代码清理
+
 ### 下一跳
 - 进入 B2_IBM → I-* issue → dev-loop 实现

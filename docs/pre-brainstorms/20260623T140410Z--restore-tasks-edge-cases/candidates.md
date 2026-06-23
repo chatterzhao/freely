@@ -3,9 +3,9 @@
 ## C-20260623T140410Z-A: _restore_tasks 重启恢复——状态修正 + 环境恢复
 
 - candidate_format_version: v2
-- title: _restore_tasks 重启恢复：stop 不动 A2A 状态（A0）+ 状态修正（A1-A3）+ 环境恢复（B1-B4）
+- title: A2A 状态管理全量修复：stop 不动状态 + 重启恢复 + 审计 bug 修复（14 项）
 - status: promoted
-- decision_reason: 当前 stop 把 working→input-required（freely:20273），丢失"Worker 工作中断"信息，重启后 Manager 误以为 Worker 在等输入。正确的做法：stop 只杀进程不动状态，_restore_tasks 在重启时统一判断。A0 是最关键的修正，加上 A1-A3 边界补全和 B1-B4 环境恢复，形成完整的重启恢复闭环。
+- decision_reason: 全量审计发现 14 项问题。A0（stop 改 working→input-required 是错误的）是最关键的架构修正。C1（wt-close consumed 从未生效）是最隐蔽的运行时 bug。加上 A1-A3 边界补全、B1-B4 环境恢复、C2-C6 审计修复，形成 A2A 状态管理的完整闭环。
 - next_action: 进入 B2_IBM → I-* issue → dev-loop 实现
 - revisit_trigger: N/A（已 promote）
 - acceptance_criteria:
@@ -20,7 +20,14 @@
   - B2: 任何→failed → SSE 注入 "Worker X died: {reason}"
   - B3: input-required+worktree在 → SSE 注入 "Worker X needs input: {reason}"
   - B4: submitted(Mgr)+活跃Worker → SSE 注入 "Restored: Worker X still running"
-  Part C（不交付）：TTL 清理作为后续 issue
+  审计修复（C1-C6）：
+  - C1: wt-close `--state consumed` → `--state completed`（consumed 不是有效 A2A 状态）
+  - C2: a2a_task.py `update` CLI 补传 `--reason/--completion-summary/--next-action`
+  - C3: a2a_task.py VALID_STATES 加 `canceled`
+  - C4: freely_db_manager.py CHECK 约束加 `pending-input`
+  - C5: a2a_server.py PATCH 端点 sm dict 排除未知状态（原样放行 → 拒绝）
+  - C6: freely_db_manager.py 删除死代码 `h_a2a_task_update_from_exit_kind`
+  Part D（不交付）：TTL 清理作为后续 issue
 - promotion_gate:
   - brainstorms.md 完成 ✅
   - 3 个修复的代码路径分析准确 ✅
