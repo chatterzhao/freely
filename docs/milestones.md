@@ -5,13 +5,13 @@
 1. `C-20260624T152500Z-A`
 - milestone: M-20260624T152500Z-A
 - status: promoted
-- promoted_issue_path: `docs/issues/I-20260624T152500Z-A/issue.md`
+- promoted_issue_path: `docs/epics/pr-create-pretests-check/issues/I-20260624T152500Z-A.md`
 ### committed_issues
 1. `I-20260624T152500Z-A`
 - title: Add pretests evidence check to pr-create-guarded
 - milestone_state: committed
 - phase_state: `completed`
-- issue_path: `docs/issues/I-20260624T152500Z-A/issue.md`
+- issue_path: `docs/epics/pr-create-pretests-check/issues/I-20260624T152500Z-A.md`
 - pre_tests_path: `docs/epics/pr-create-pretests-check/pre-tests.md`
 - verification_artifact_dir: `docs/epics/pr-create-pretests-check/code-reviews`
 - tasks_path: `docs/epics/pr-create-pretests-check/tasks.md`
