@@ -2183,3 +2183,20 @@ routing_policy:
 - issue_path: `docs/issues/I-20260624T004524Z-A/issue.md`
 - source_raws:
   - `raw-20260624T004524Z`
+
+## M-20260624T013737Z-A
+- title: tool-registry.json5 → TOML 配置驱动注册表（Phase 1+2）
+- status: active
+### candidate_issues
+1. `C-20260624T013737Z-A`
+- milestone: M-20260624T013737Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T013737Z-A/issue.md`
+### committed_issues
+1. `I-20260624T013737Z-A`
+- title: tool-registry.json5 → TOML 配置驱动注册表（Phase 1+2）
+- milestone_state: completed
+- phase_state: completed
+- issue_path: `docs/issues/I-20260624T013737Z-A/issue.md`
+- source_raws:
+  - `raw-20260624T013737Z`

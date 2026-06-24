@@ -1,27 +1,30 @@
 #!/usr/bin/env python3
-"""Tool registry query helper. Reads tool-registry.json5 and outputs values for bash.
+"""Tool registry query helper. Reads tool-registry.toml (or .json5) and outputs values for bash.
 
 Usage:
   python3 tool-registry-query.py <registry-path> <tool> dot.path.to.field
   python3 tool-registry-query.py <registry-path> <tool> --keys  (list top-level keys)
   python3 tool-registry-query.py <registry-path> --list          (list all tool names)
 
+File priority:
+  If <registry-path> is a .toml file, also checks ~/.freely/tool-registry.toml.
+  User keys override system keys (shallow merge per tool section).
+
 Examples:
-  python3 tool-registry-query.py tool-registry.json5 codex acp.binary
+  python3 tool-registry-query.py tool-registry.toml codex acp.binary
   # → codex-acp
 
-  python3 tool-registry-query.py tool-registry.json5 opencode permission.mechanism
+  python3 tool-registry-query.py tool-registry.toml opencode permission.mechanism
   # → env_var
 """
 
+import os
 import re
 import sys
 
 
 def _strip_json5(text: str) -> str:
-    """Strip // line comments and /* block comments */ from JSON5 text.
-    Also strip trailing commas before ] and }."""
-    # Remove // line comments (not inside strings)
+    """Strip // line comments and /* block comments */ from JSON5 text."""
     result = []
     in_string = False
     in_block = False
@@ -63,10 +66,57 @@ def _strip_json5(text: str) -> str:
         result.append(ch)
         i += 1
 
-    # Strip trailing commas before ] and }
     text = ''.join(result)
     text = re.sub(r',\s*([}\]])', r'\1', text)
     return text
+
+
+def _load_toml(path: str) -> dict:
+    """Load a TOML file, returning dict of tool sections."""
+    import tomllib
+    with open(path, 'rb') as f:
+        return tomllib.load(f)
+
+
+def _load_json5(path: str) -> dict:
+    """Load a JSON5 file, returning dict of tool sections."""
+    import json
+    with open(path) as f:
+        return json.loads(_strip_json5(f.read()))
+
+
+def _load_registry(path: str) -> dict:
+    """Load registry from path, auto-detecting format (.toml vs .json5)."""
+    if path.endswith('.toml'):
+        return _load_toml(path)
+    else:
+        return _load_json5(path)
+
+
+def _merge_registries(system: dict, user: dict) -> dict:
+    """Merge user registry over system registry. User tool keys override system."""
+    merged = dict(system)
+    for key, value in user.items():
+        if key.startswith('_'):
+            continue
+        merged[key] = value  # user overrides entire tool section
+    return merged
+
+
+def _resolve_registry(registry_path: str) -> dict:
+    """Load registry with file priority: ~/.freely/tool-registry.toml > system."""
+    data = _load_registry(registry_path)
+
+    # Check for user override: ~/.freely/tool-registry.toml
+    user_path = os.path.expanduser("~/.freely/tool-registry.toml")
+    if os.path.isfile(user_path) and registry_path.endswith('.toml'):
+        try:
+            user_data = _load_toml(user_path)
+            data = _merge_registries(data, user_data)
+        except Exception:
+            pass  # user file corrupt → use system only
+
+    return data
 
 
 def _get(obj, path: str):
@@ -85,16 +135,14 @@ def main():
         print("Usage: tool-registry-query.py <registry> <tool> [field] | --list | <tool> --keys", file=sys.stderr)
         sys.exit(1)
 
-    import json
     registry_path = sys.argv[1]
+    if not os.path.isfile(registry_path):
+        print(f"ERROR: registry file not found: {registry_path}", file=sys.stderr)
+        sys.exit(1)
 
-    with open(registry_path) as f:
-        text = f.read()
-
-    data = json.loads(_strip_json5(text))
+    data = _resolve_registry(registry_path)
 
     if len(sys.argv) == 3 and sys.argv[2] == "--list":
-        # List all tool names (excluding _aliases)
         for name in sorted(data):
             if not name.startswith("_"):
                 print(name)
@@ -131,6 +179,7 @@ def main():
         else:
             print(value)
     else:
+        import json
         print(json.dumps(tool_data, indent=2))
 
 
