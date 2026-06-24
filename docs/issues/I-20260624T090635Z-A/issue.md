@@ -1,8 +1,8 @@
 ---
 local_id: I-20260624T090635Z-A
 kind: linked
-status: in_dev
-phase_state: done_b2_ibm
+status: in_verification
+phase_state: in_verification
 promoted_from: raw-20260624T090635Z
 source_candidate: docs/pre-brainstorms/20260624T090635Z--registry-adapter-acp-dispatch/candidates.md#C-20260624T090635Z-A
 canonical_issue_path: docs/issues/I-20260624T090635Z-A/issue.md

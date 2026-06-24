@@ -105,12 +105,8 @@ _bridge_ensure_running() {
       _perm_fallback="$(_tool_config_field_fallback "$_base_tool" "permission_bypass" 2>/dev/null || true)"
       _cfg_format="$(_tool_config_format "$_base_tool" 2>/dev/null || true)"
       if [[ -z "$_perm_field" ]]; then
-        # Fallback: hardcoded defaults for tools not yet in registry
-        case "$_base_tool" in
-          claude) _perm_field="permissionMode"; _perm_fallback="permissions.defaultMode"; _cfg_format="json" ;;
-          codex)  _perm_field="approval_policy"; _cfg_format="toml" ;;
-          opencode) _perm_field="permission"; _cfg_format="json" ;;
-        esac
+        # Registry has no permission_bypass — tool handles permissions via ACP native flow
+        echo "[bridge] permission_bypass not declared for tool $_base_tool, using ACP default" >&2
       fi
 
       if [[ -n "$_perm_field" && -f "$_settings_file" ]]; then
