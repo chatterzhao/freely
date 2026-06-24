@@ -1,3 +1,12 @@
+## M-20260624T155212Z-A
+- title: pretests-retirement-gate fallback for missing workcell-state.env
+- status: active
+### candidate_issues
+1. `C-20260624T155212Z-A`
+- milestone: M-20260624T155212Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T155212Z-A/issue.md`
+
 ## M-20260624T154500Z-A
 - title: runtime py chmod +x
 - status: active
