@@ -1,3 +1,21 @@
+## M-20260624T155212Z-A
+- title: pretests-retirement-gate fallback for missing workcell-state.env
+- status: active
+### candidate_issues
+1. `C-20260624T155212Z-A`
+- milestone: M-20260624T155212Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T155212Z-A/issue.md`
+### committed_issues
+1. `I-20260624T155212Z-A`
+- title: pretests-retirement-gate fallback for missing workcell-state.env
+- milestone_state: committed
+- phase_state: `done_b2_ibm`
+- issue_path: `docs/issues/I-20260624T155212Z-A/issue.md`
+- pre_tests_path: `docs/epics/pretests-retirement-gate-fallback/pre-tests.md`
+- verification_artifact_dir: `docs/epics/pretests-retirement-gate-fallback/code-reviews`
+- source_candidate: `docs/pre-brainstorms/20260624T155212Z--pretests-retirement-gate-fallback/candidates.md#C-20260624T155212Z-A`
+
 ## M-20260624T154500Z-A
 - title: runtime py chmod +x
 - status: active
