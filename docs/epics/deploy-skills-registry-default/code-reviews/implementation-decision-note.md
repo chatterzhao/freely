@@ -1,6 +1,7 @@
 # Implementation Decision Note: deploy-skills registry-driven default
 
-- owner_issue: I-20260624T004510Z-A
+- issue_id: I-20260624T004510Z-A
+- issue_path: docs/issues/I-20260624T004510Z-A/issue.md
 - milestone: M-20260624T004510Z-A
 
 ## Implementation Decision Note
