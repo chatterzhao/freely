@@ -177,6 +177,48 @@ else
 fi
 echo ""
 
+# ── Step 2c: Pretests execution evidence check ──
+# Checks that pretests execution evidence exists before allowing PR creation.
+# Mirrors the check in wt-close to catch untested code before PR creation.
+echo "Step 2c/4: pretests execution evidence check..."
+# Use the current worktree as both project (for issue/doc lookup) and worktree path
+# (for runtime evidence). During development, governance files live in the worktree
+# alongside the code changes, so the worktree root is the correct project root here.
+if [[ -x "$ROOT_DIR/bin/pretests-retirement-gate" ]]; then
+  set +e
+  _gate_output="$("$ROOT_DIR/bin/pretests-retirement-gate" --project "$ROOT_DIR" --worktree-path "$ROOT_DIR" 2>&1)"
+  _gate_rc=$?
+  set -e
+  if [[ "$_gate_rc" -ne 0 ]]; then
+    cat >&2 <<PRETEST_GATE_BLOCKED
+
+╔══════════════════════════════════════════════════════════════╗
+║  [PRETESTS-GATE] Pretests 执行证据检查未通过                   ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  当前分支缺少 pretests 执行证据。                               ║
+║  在创建 PR 之前，请先完成测试验证。                               ║
+║                                                              ║
+║  skill:freely-test-execution                                  ║
+║    → 在 test-pre-merge 工位中逐条执行 pre-tests.md 的          ║
+║      test_command                                             ║
+║    → 收集 actual_output 和 evidence                            ║
+║    → 全绿后重新运行 ./bin/pr-create-guarded                   ║
+║                                                              ║
+║  详细错误:                                                    ║
+║  $_gate_output
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+
+PRETEST_GATE_BLOCKED
+    exit 1
+  fi
+  echo "[PRETESTS-GATE] pretests execution evidence: OK ✓"
+else
+  echo "[WARN] pretests-retirement-gate not found, skipping pretests evidence check"
+fi
+echo ""
+
 # ── Step 2b: Write gate-passed marker ──
 mkdir -p .freely/run
 echo "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > .freely/run/pr-create-gate-passed
