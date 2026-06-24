@@ -726,7 +726,7 @@ Usage:
   freely task-source-scan [--project <abs_path>] [--json]
   freely task-scan [--project <abs_path>] [--json]
   freely raw-issue-pull --raw-key <key> [--project <abs_path>] [--target <dir>]
-  freely feedback --repo <user/repo|url> --title <text> --body <text> [--severity P0|P1|P2]   (create raw issue on configured platform)
+  freely feedback --title <text> --body <text> [--severity P0|P1|P2]   (create raw issue on all configured repo platforms)
   freely issue-sync <args>...                   (delegate to bin/issue-sync)
   freely status [--project <abs_path>] [--view baseline|live|fleet|all]
   freely live-status [--project <abs_path>]
@@ -21462,7 +21462,7 @@ launch_kind: ${mode_name:-unknown}"
 ${_msg}" >/dev/null 2>&1 || true
         else
           # No existing issue — create new one
-          "$SELF_ROOT/bin/freely" feedback --repo "$FREELY_REPO_URL" --title "$_crash_title" --body "$_msg" >/dev/null 2>&1 || true
+          "$SELF_ROOT/bin/freely" feedback --title "$_crash_title" --body "$_msg" >/dev/null 2>&1 || true
         fi
       fi
     fi
@@ -22992,35 +22992,24 @@ submit_human_frontdoor_message() {
 
 # Resolve user/repo or GitHub URL to canonical user/repo form.
 # Accepted: user/repo, https://github.com/user/repo.git, git@github.com:user/repo.git
-_resolve_gh_repo() {
-  local input="$1"
-  # user/repo → user/repo
-  if [[ "$input" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then echo "$input"; return 0; fi
-  # https://github.com/user/repo.git → user/repo
-  if [[ "$input" =~ github\.com/([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+) ]]; then echo "${BASH_REMATCH[1]%.git}"; return 0; fi
-  # git@github.com:user/repo.git → user/repo
-  if [[ "$input" =~ github\.com:([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+) ]]; then echo "${BASH_REMATCH[1]%.git}"; return 0; fi
-  return 1
-}
-
 cmd_feedback() {
-  local title="" body="" severity="P2" repo="" raw_key="" stamp="" resolved_repo="" gh_result gh_url
+  local title="" body="" severity="P2" raw_key="" stamp="" local_id="" issue_dir="" issue_file="" issue_sync_bin="" sync_result
+
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      --repo) repo="${2:-}"; shift 2 ;;
       --title) title="${2:-}"; shift 2 ;;
       --body) body="${2:-}"; shift 2 ;;
       --severity) severity="${2:-}"; shift 2 ;;
       --help|-h) cat <<HELP; return 0
-Usage: freely feedback --repo <user/repo|url> --title <text> --body <text> [--severity P0|P1|P2]
+Usage: freely feedback --title <text> --body <text> [--severity P0|P1|P2]
 
-Create a raw issue on the configured platform.
+Create a raw issue on all configured repo platforms (GitHub, Gitee, ...).
+Repo is auto-detected from git remotes — no need to pass it manually.
 
 Options:
-  --repo <user/repo|url>  Required. Platform repo (user/repo, https://..., or git@...).
-  --title <text>          Required. Issue title.
-  --body <text>           Required. Issue body/description.
-  --severity <level>      Priority: P0 (critical), P1 (high), P2 (default).
+  --title <text>     Required. Issue title.
+  --body <text>      Required. Issue body/description.
+  --severity <level> Priority: P0 (critical), P1 (high), P2 (default).
 
 Examples:
 
@@ -23029,9 +23018,13 @@ If a similar open issue exists, reuse it instead of creating a duplicate:
   - Comment on the existing issue with additional context
   - Use the existing raw_key to create/resume a worktree
 
-  freely feedback --repo chatterzhao/freely --title "bug" --body "..."
-  freely feedback --repo https://git.example.com/user/project.git --title "bug" --body "..."
+  freely feedback --title "bug: something broken" --body "details..."
+  freely feedback --title "feat: new capability" --body "details..." --severity P1
 HELP
+        ;;
+      --repo|--repo=*)
+        log_error "--repo is no longer needed: repo is auto-detected from git remotes. Remove --repo and retry."
+        return 1
         ;;
       --*) log_error "unknown option: $1"; return 1 ;;
       *) break ;;
@@ -23045,44 +23038,60 @@ HELP
     *) log_error "--severity must be P0, P1, or P2"; return 1 ;;
   esac
 
-  # Resolve repo: --repo flag takes priority, then FREELY_REPO_URL env/config
-  if [[ -n "$repo" ]]; then
-    resolved_repo="$(_resolve_gh_repo "$repo")" || { log_error "invalid --repo format: $repo"; return 1; }
-  elif [[ -n "${FREELY_REPO_URL:-}" ]]; then
-    resolved_repo="$FREELY_REPO_URL"
-  elif [[ -f "$SELF_ROOT/.freely/config.toml" ]]; then
-    resolved_repo="$("$SELF_ROOT/bin/toml2env" --project "$SELF_ROOT" 2>/dev/null | grep '^export FREELY_REPO_URL=' | sed 's/^export FREELY_REPO_URL=//; s/^"//; s/"$//')"
-  fi
-
-  [[ -n "$resolved_repo" ]] || { log_error "no repo specified: use --repo or set FREELY_REPO_URL in .freely/config.toml"; return 1; }
-
   stamp=$(date -u +%Y%m%dT%H%M%SZ)
   raw_key="$stamp"
+  local_id="raw-${raw_key}"
 
-  if ! command -v gh &>/dev/null; then
-    log_error "gh (GitHub CLI) not found — cannot create issue"
+  # Create local issue file under docs/issues/
+  issue_dir="$SELF_ROOT/docs/issues/$local_id"
+  issue_file="$issue_dir/issue.md"
+  local created_at_iso; created_at_iso=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+  mkdir -p "$issue_dir"
+  cat > "$issue_file" <<MDFILE
+---
+local_id: $local_id
+id: $local_id
+kind: raw
+title: '$title'
+phase_state: proposed
+severity: $severity
+source: feedback
+created_at: '$created_at_iso'
+platform_ids: {}
+---
+
+$body
+MDFILE
+
+  echo "[feedback] local issue file created: $issue_file"
+
+  # Delegate to issue-sync for platform creation (handles GitHub + Gitee + future platforms)
+  issue_sync_bin="$SELF_ROOT/bin/issue-sync"
+  if [[ ! -x "$issue_sync_bin" ]]; then
+    log_error "issue-sync not found or not executable: $issue_sync_bin"
+    log_error "local issue file exists at $issue_file — create platform issue manually or fix issue-sync"
     return 1
   fi
 
-  gh_result=$(gh issue create --repo "$resolved_repo" \
-    --title "[RAW-${stamp}] ${title}" \
-    --body "${body}" \
-    --label "kind/raw,phase/proposed" 2>&1)
-  gh_url=$(printf '%s\n' "$gh_result" | grep -o 'https://github.com/[^ ]*' | head -1)
-  if [[ -n "$gh_url" ]]; then
-    echo "[feedback] raw issue created: raw-${raw_key}"
-    echo "[feedback] url: ${gh_url}"
-    echo "[feedback]"
-    echo "[feedback] Next: create a worktree to fix or implement:"
-    echo "[feedback]   Bug fix:  wt-create --raw-key ${raw_key} --source platform --skill freely-fix-execution --slug <slug>"
-    echo "[feedback]   Feature:  wt-create --raw-key ${raw_key} --source platform --skill freely-feat-execution --slug <slug>"
-    echo "[feedback]"
-    echo "[feedback] After wt-create, follow the skill to complete the work:"
-    echo "[feedback]   skill:freely-fix-execution  — Fix first, govern later"
-    echo "[feedback]   skill:freely-feat-execution — Govern first, then code"
-  else
-    echo "[feedback] WARNING: gh issue create output: $gh_result" >&2
-  fi
+  sync_result=$(bash "$issue_sync_bin" create "$local_id" 2>&1) || {
+    log_error "issue-sync create failed — local issue file saved at $issue_file"
+    echo "[feedback] issue-sync output: $sync_result" >&2
+    printf 'raw-%s\n' "$raw_key"
+    return 1
+  }
+
+  echo "$sync_result"
+  echo "[feedback]"
+  echo "[feedback] raw issue created: $local_id"
+  echo "[feedback]"
+  echo "[feedback] Next: create a worktree to fix or implement:"
+  echo "[feedback]   Bug fix:  wt-create --raw-key ${raw_key} --source platform --skill freely-fix-execution --slug <slug>"
+  echo "[feedback]   Feature:  wt-create --raw-key ${raw_key} --source platform --skill freely-feat-execution --slug <slug>"
+  echo "[feedback]"
+  echo "[feedback] After wt-create, follow the skill to complete the work:"
+  echo "[feedback]   skill:freely-fix-execution  — Fix first, govern later"
+  echo "[feedback]   skill:freely-feat-execution — Govern first, then code"
 
   printf 'raw-%s\n' "$raw_key"
 }

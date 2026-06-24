@@ -1,3 +1,19 @@
+## M-20260624T141559Z-A
+- title: cmd_feedback 对齐 issue-sync 多平台架构
+- status: active
+### candidate_issues
+1. `C-20260624T141559Z-A`
+- milestone: M-20260624T141559Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/raw-20260624T141559Z/issue.md`
+### committed_issues
+1. `I-20260624T141559Z-A`
+- title: cmd_feedback 对齐 issue-sync 多平台架构
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260624T141559Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/feedback-issue-sync/code-reviews`
+
 ## M-20260624T092822Z-A
 - title: Cline registry 配置
 - status: active
