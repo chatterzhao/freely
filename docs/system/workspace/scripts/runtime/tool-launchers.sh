@@ -53,13 +53,7 @@ SESSION_CACHE_LIB="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-cach
 
 # ── Tool registry helpers ─────────────────────────────────────────────
 # Prefer TOML format; fall back to JSON5 for backward compatibility
-TOOL_REGISTRY_TOML="$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-registry.toml"
-TOOL_REGISTRY_JSON5="$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-registry.json5"
-if [[ -f "$TOOL_REGISTRY_TOML" ]]; then
-  TOOL_REGISTRY="$TOOL_REGISTRY_TOML"
-else
-  TOOL_REGISTRY="$TOOL_REGISTRY_JSON5"
-fi
+TOOL_REGISTRY="$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-registry.toml"
 TOOL_REGISTRY_QUERY="$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-registry-query.py"
 
 _tool_registry_get() {

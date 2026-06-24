@@ -11,11 +11,11 @@ so tools can invoke them via skill:<name>.
 
 Options:
   --tools <tools>  Comma-separated tool names (default: all installed tools from
-                    tool-registry.json5, auto-detected via command availability)
+                    tool-registry.toml, auto-detected via command availability)
   --force          Force overwrite even if content is identical
   --dry-run        Show what would be deployed without writing.
 
-Supported tools (from tool-registry.json5):
+Supported tools (from tool-registry.toml):
   claude*     → ~/.claude/skills/
   codex*      → ~/.codex/skills/
   oc-*        → ~/.config/opencode/skills/  (if project .opencode/ not found)
@@ -66,42 +66,23 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 SRC="$ROOT_DIR/docs/system/workspace/skills"
 [[ -d "$SRC" ]] || { echo "Skill source directory not found: $SRC" >&2; exit 1; }
 
-# Resolve default tools: --tools flag > tool-registry.json5 (all installed)
+# Resolve default tools: --tools flag > tool-registry.toml (all installed)
+# 
 if [[ -z "$tools" ]]; then
-  _reg_file="$ROOT_DIR/docs/system/workspace/scripts/runtime/tool-registry.json5"
-  if [[ -f "$_reg_file" ]]; then
+  _reg_file="$ROOT_DIR/docs/system/workspace/scripts/runtime/tool-registry.toml"
+  _reg_query="$ROOT_DIR/docs/system/workspace/scripts/runtime/tool-registry-query.py"
+
+  if [[ -f "$_reg_file" && -f "$_reg_query" ]]; then
     _installed_tools=""
     while IFS= read -r _tool_key; do
       [[ -z "$_tool_key" ]] && continue
-      # Determine binary to check: use first word of test_command, or canonical tool name
-      _test_bin=$(python3 -c "
-import json, re, sys
-with open('$_reg_file') as f:
-    content = f.read()
-content = re.sub(r'//.*', '', content)
-content = re.sub(r'/\*.*?\*/', '', content, flags=re.DOTALL)
-reg = json.loads(content)
-tc = reg.get('$_tool_key', {}).get('test_command', '')
-if tc:
-    print(tc.split()[0])
-else:
-    print('$_tool_key')
-" 2>/dev/null)
+      # Determine binary to check: use first word of test_command via registry query
+      _test_bin=$(python3 "$_reg_query" "$_reg_file" "$_tool_key" "test_command" 2>/dev/null | awk '{print $1}')
       if [[ -n "$_test_bin" ]] && command -v "$_test_bin" >/dev/null 2>&1; then
         [[ -n "$_installed_tools" ]] && _installed_tools="$_installed_tools,"
         _installed_tools="$_installed_tools$_tool_key"
       fi
-    done < <(python3 -c "
-import json, re
-with open('$_reg_file') as f:
-    content = f.read()
-content = re.sub(r'//.*', '', content)
-content = re.sub(r'/\*.*?\*/', '', content, flags=re.DOTALL)
-reg = json.loads(content)
-for name in reg:
-    if name.startswith('_'): continue
-    print(name)
-" 2>/dev/null)
+    done < <(python3 "$_reg_query" "$_reg_file" --list 2>/dev/null)
     tools="$_installed_tools"
   fi
 fi

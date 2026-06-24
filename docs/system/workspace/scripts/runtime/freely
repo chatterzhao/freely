@@ -42,8 +42,8 @@ SESSION_EVIDENCE_RESOLVER_LIB="$SELF_ROOT/docs/system/workspace/scripts/runtime/
 }
 source "$SESSION_EVIDENCE_RESOLVER_LIB"
 
-# ── Tool registry (JSON5, single source of truth for per-tool capabilities) ──
-TOOL_REGISTRY="$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-registry.json5"
+# ── Tool registry  ──
+TOOL_REGISTRY="$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-registry.toml"
 TOOL_REGISTRY_QUERY="$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-registry-query.py"
 
 _sse_watchdog_sh="$SELF_ROOT/docs/system/workspace/scripts/runtime/sse-watchdog.sh"
@@ -13605,7 +13605,7 @@ finally:
 
 # ─────────────────────────────────────────────────────────────────
 # Registry-driven bridge env helper — reads ALL behavior from
-# tool-registry.json5 slot section.  Adding a new tool requires
+# tool-registry.toml slot section.  Adding a new tool requires
 # only a registry entry + slot config; no code changes here.
 #
 # Signature: _bridge_env_for_registered_tool <tool_name> <project> <base_tool>
@@ -13898,7 +13898,7 @@ _ensure_acp_bridge_running() {
 
   # ── Registry-driven bridge env dispatch ────────────────────────
   # _bridge_env_for_registered_tool reads ALL behavior from the
-  # tool-registry.json5 slot section.  Any tool with a slot entry
+  # tool-registry.toml slot section.  Any tool with a slot entry
   # is handled automatically — no per-tool case arm needed.
   local _bridge_line
   if _tool_registry_get "$base_tool" "slot.discovery" >/dev/null 2>&1; then
