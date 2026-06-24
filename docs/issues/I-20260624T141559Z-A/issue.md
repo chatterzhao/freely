@@ -1,6 +1,6 @@
 - issue_id: I-20260624T141559Z-A
 - kind: fix
-- phase_state: done_dev
+- phase_state: completed
 - milestone: M-20260624T141559Z-A
 - source_candidate: docs/pre-brainstorms/20260624T141559Z--feedback-issue-sync/candidates.md#C-20260624T141559Z-A
 - source_raw: raw-20260624T141559Z

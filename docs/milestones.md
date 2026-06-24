@@ -10,7 +10,7 @@
 1. `I-20260624T141559Z-A`
 - title: cmd_feedback 对齐 issue-sync 多平台架构
 - milestone_state: committed
-- phase_state: `done_dev`
+- phase_state: `completed`
 - issue_path: `docs/issues/I-20260624T141559Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/feedback-issue-sync/code-reviews`
 
