@@ -1,6 +1,6 @@
 ---
 name: freely-fix-execution
-description: 快速修复 bug 的特殊高效策略——feedback→wt-create→dev→test→B1_IBM→B2_IBM→pr-create-guarded→pr-merge-guarded→wt-close。Fix first, govern later。用 test-pre-merge-* 私有工位隔离快测，stash 到可写工位正式提交，不违背保护分支的本质约束。
+description: 快速修复 bug 的特殊高效策略——feedback→wt-create→dev→test→B1_IBM→B2_IBM→pr-create-guarded→pr-merge-guarded→wt-close。Fix first, govern later（完整工作流见本 skill 文档）。用 test-pre-merge-* 私有工位隔离快测，stash 到可写工位正式提交，不违背保护分支的本质约束。
 ---
 
 # skill:freely-fix-execution
@@ -23,6 +23,7 @@ description: 快速修复 bug 的特殊高效策略——feedback→wt-create→
 ## 核心原则
 
 > **Fix first, govern later. Test in isolation, commit to writable.**
+> 完整工作流见本 skill 文档（§工作流、§场景 A、§场景 B）。
 
 - 不在 `main`/`develop` 上直接改代码（阻塞其他 AI 并发）
 - 用 `test-pre-merge-*` 私有工位快速测试（不改不提交不推送，不违背保护约束）
