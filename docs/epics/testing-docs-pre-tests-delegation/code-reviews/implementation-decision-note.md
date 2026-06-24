@@ -1,5 +1,7 @@
 ## Implementation Decision Note
 
+- issue_id: I-20260624T081358Z-A
+- issue_path: docs/issues/I-20260624T081358Z-A/issue.md
 - decision: skills 和 AGENTS.md 的测试描述从硬编码 daemon 改为委托 pre-tests.md
 - why_this: 测试方式由改动类型和 pre-tests.md 决定，不应由 skill 文档硬编码
 - alternatives_considered: 

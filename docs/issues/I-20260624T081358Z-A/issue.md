@@ -1,8 +1,8 @@
 ---
 local_id: I-20260624T081358Z-A
 kind: linked
-status: in_dev
-phase_state: done_b2_ibm
+status: completed
+phase_state: completed
 promoted_from: raw-20260624T081358Z
 source_candidate: docs/pre-brainstorms/20260624T081358Z--testing-docs-pre-tests-delegation/candidates.md#C-20260624T081358Z-A
 canonical_issue_path: docs/issues/I-20260624T081358Z-A/issue.md
