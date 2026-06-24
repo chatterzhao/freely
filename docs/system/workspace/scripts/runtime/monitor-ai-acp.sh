@@ -99,44 +99,57 @@ _bridge_ensure_running() {
       _slot_dir=$(ls -d "$HOME/.ai-auth/${tool}-"* 2>/dev/null | head -1 || true)
     fi
     if [[ -n "$_slot_dir" && -d "$_slot_dir" ]]; then
-      case "$_base_tool" in
-        claude)
-          _settings_file="$_slot_dir/settings.json"
-          if [[ -f "$_settings_file" ]]; then
-            export CLAUDE_CODE_PERMISSION_MODE="$(python3 -c "
-import json
-with open('$_settings_file') as f:
-    d = json.load(f)
-pm = d.get('permissionMode', '') or d.get('permissions', {}).get('defaultMode', '')
-if pm: print(pm)
-" 2>/dev/null || echo 'bypassPermissions')"
-          fi
-          ;;
-        codex)
-          # codex uses config.toml with approval_policy; bridge doesn't call
-          # session/set_mode for codex, but export env for completeness.
-          _settings_file="$_slot_dir/config.toml"
-          if [[ -f "$_settings_file" ]]; then
-            local _approval
-            _approval=$(python3 -c "
-try:
-    import tomllib
-except ImportError:
-    import tomli as tomllib
-with open('$_settings_file','rb') as f:
-    d = tomllib.load(f)
-print(d.get('approval_policy',''))
-" 2>/dev/null)
-            if [[ -n "$_approval" ]]; then
-              export CLAUDE_CODE_PERMISSION_MODE="$_approval"
-            fi
-          fi
-          ;;
-        opencode)
-          # opencode uses settings.json with 'permission' field.
-          # Permission is already handled by OPENCODE_CONFIG env var.
-          ;;
-      esac
+      # Permission bypass field: registry-driven (no hardcoded case)
+      local _perm_field _perm_fallback _cfg_format
+      _perm_field="$(_tool_config_field "$_base_tool" "permission_bypass" 2>/dev/null || true)"
+      _perm_fallback="$(_tool_config_field_fallback "$_base_tool" "permission_bypass" 2>/dev/null || true)"
+      _cfg_format="$(_tool_config_format "$_base_tool" 2>/dev/null || true)"
+      if [[ -z "$_perm_field" ]]; then
+        # Fallback: hardcoded defaults for tools not yet in registry
+        case "$_base_tool" in
+          claude) _perm_field="permissionMode"; _perm_fallback="permissions.defaultMode"; _cfg_format="json" ;;
+          codex)  _perm_field="approval_policy"; _cfg_format="toml" ;;
+          opencode) _perm_field="permission"; _cfg_format="json" ;;
+        esac
+      fi
+
+      if [[ -n "$_perm_field" && -f "$_settings_file" ]]; then
+        if [[ "$_cfg_format" == "toml" ]]; then
+          export CLAUDE_CODE_PERMISSION_MODE="$(python3 -c "
+      import tomllib, sys
+      try:
+          with open('$_settings_file','rb') as f:
+              d = tomllib.load(f)
+          print(d.get('$_perm_field','') or '')
+      except: pass
+      " 2>/dev/null)"
+        else
+          export CLAUDE_CODE_PERMISSION_MODE="$(python3 -c "
+      import json
+      try:
+          with open('$_settings_file') as f:
+              d = json.load(f)
+          pm = ''
+          pf = '$_perm_field'
+          fb = '$_perm_fallback'
+          if pf and pf in d:
+              pm = d[pf]
+          elif fb:
+              parts = fb.split('.')
+              cur = d
+              for p in parts:
+                  if isinstance(cur, dict) and p in cur:
+                      cur = cur[p]
+                  else:
+                      cur = None
+                      break
+              if cur is not None:
+                  pm = str(cur)
+          if pm: print(pm)
+      except: pass
+      " 2>/dev/null)"
+        fi
+      fi
     fi
   fi
 

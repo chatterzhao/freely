@@ -52,7 +52,14 @@ SESSION_CACHE_LIB="$SELF_ROOT/docs/system/workspace/scripts/runtime/session-cach
 [[ -f "$SESSION_CACHE_LIB" ]] && source "$SESSION_CACHE_LIB"
 
 # ── Tool registry helpers ─────────────────────────────────────────────
-TOOL_REGISTRY="$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-registry.json5"
+# Prefer TOML format; fall back to JSON5 for backward compatibility
+TOOL_REGISTRY_TOML="$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-registry.toml"
+TOOL_REGISTRY_JSON5="$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-registry.json5"
+if [[ -f "$TOOL_REGISTRY_TOML" ]]; then
+  TOOL_REGISTRY="$TOOL_REGISTRY_TOML"
+else
+  TOOL_REGISTRY="$TOOL_REGISTRY_JSON5"
+fi
 TOOL_REGISTRY_QUERY="$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-registry-query.py"
 
 _tool_registry_get() {
@@ -64,6 +71,29 @@ _tool_registry_get() {
 _tool_is_registered() {
   local tool="$1"
   _tool_registry_get "$tool" "acp.binary" >/dev/null 2>&1
+}
+
+# ── config_schema field abstraction ────────────────────────────────────────
+# Reads a tool-specific config field name from the registry's config_schema.
+# Usage: _tool_config_field <tool> <concept>
+#   _tool_config_field claude permission_bypass → "permissionMode"
+#   _tool_config_field codex  permission_bypass → "approval_policy"
+#   _tool_config_field gemini permission_bypass → "" (not declared → use default)
+_tool_config_field() {
+  local tool="$1" concept="$2"
+  _tool_registry_get "$tool" "config_schema.fields.${concept}.path" 2>/dev/null
+}
+
+# Read a config field's fallback path from the registry.
+_tool_config_field_fallback() {
+  local tool="$1" concept="$2"
+  _tool_registry_get "$tool" "config_schema.fields.${concept}.fallback_path" 2>/dev/null
+}
+
+# Read config file format for a tool (json or toml).
+_tool_config_format() {
+  local tool="$1"
+  _tool_registry_get "$tool" "config_schema.file_format" 2>/dev/null
 }
 
 RUNTIME_ACP_PROMPT_CLIENT="$SELF_ROOT/docs/system/workspace/scripts/runtime/run-acp-prompt.py"
@@ -352,6 +382,24 @@ _apply_tool_alias_settings() {
   [[ -n "$alias_path" ]] || return 0
   alias_path="${alias_path/#\~/$HOME}"
   [[ -f "$alias_path" ]] || return 0
+  # Resolve base tool for registry-driven permission field names
+  local _base_tool _perm_field _perm_fallback
+  _base_tool="${tool%%-*}"
+  _perm_field="$(_tool_config_field "$_base_tool" "permission_bypass" 2>/dev/null || true)"
+  _perm_fallback="$(_tool_config_field_fallback "$_base_tool" "permission_bypass" 2>/dev/null || true)"
+  # Fallback to hardcoded defaults if registry not available
+  [[ -n "$_perm_field" ]] || _perm_field="permissionMode"
+  [[ -n "$_perm_fallback" ]] || _perm_fallback="permissions.defaultMode"
+
+  # Resolve base tool for registry-driven permission field names
+  local _base_tool _perm_field _perm_fallback
+  _base_tool="${tool%%-*}"
+  _perm_field="$(_tool_config_field "$_base_tool" "permission_bypass" 2>/dev/null || true)"
+  _perm_fallback="$(_tool_config_field_fallback "$_base_tool" "permission_bypass" 2>/dev/null || true)"
+  # Fallback to hardcoded defaults if registry unavailable
+  [[ -n "$_perm_field" ]] || _perm_field="permissionMode"
+  [[ -n "$_perm_fallback" ]] || _perm_fallback="permissions.defaultMode"
+
   while IFS='=' read -r key value; do
     [[ -n "$key" ]] || continue
     export "$key"="$value"
@@ -364,7 +412,22 @@ try:
     for k, v in env.items():
         print(f'{k}={v}')
     # Read permission mode: top-level 'permissionMode' or nested 'permissions.defaultMode'
-    pm = d.get('permissionMode', '') or d.get('permissions', {}).get('defaultMode', '')
+    pf = '$_perm_field'
+    fb = '$_perm_fallback'
+    pm = ''
+    if pf and pf in d:
+        pm = d[pf]
+    elif fb:
+        parts = fb.split('.')
+        cur = d
+        for p in parts:
+            if isinstance(cur, dict) and p in cur:
+                cur = cur[p]
+            else:
+                cur = None
+                break
+        if cur is not None:
+            pm = str(cur)
     if pm:
         print(f'CLAUDE_CODE_PERMISSION_MODE={pm}')
     settings_file = '${alias_path}'
