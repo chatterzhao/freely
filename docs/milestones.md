@@ -2149,3 +2149,12 @@ routing_policy:
 - issue_path: `docs/issues/I-20260623T022909Z-A/issue.md`
 - source_raws:
   - `raw-20260623T022909Z`
+
+## M-20260624T004510Z-A
+- title: deploy-skills opencode wildcard fix + registry-driven default tool detection
+- status: active
+### candidate_issues
+1. `C-20260624T004510Z-A`
+- milestone: M-20260624T004510Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T004510Z-A/issue.md`
