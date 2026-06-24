@@ -17,7 +17,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-absorbed_into: fix/raw-20260624T154500Z-runtime-py-chmod
+absorbed_into: I-20260624T154500Z-A
+source_candidate: docs/pre-brainstorms/20260624T154500Z--runtime-py-chmod/candidates.md#C-20260624T154500Z-A
 ---
 
 ## 根因

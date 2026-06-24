@@ -1,3 +1,19 @@
+## M-20260624T154500Z-A
+- title: runtime py chmod +x
+- status: active
+### candidate_issues
+1. `C-20260624T154500Z-A`
+- milestone: M-20260624T154500Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T154500Z-A/issue.md`
+### committed_issues
+1. `I-20260624T154500Z-A`
+- title: runtime py chmod +x
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260624T154500Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/runtime-py-chmod/code-reviews`
+
 ## M-20260624T151020Z-A
 - title: wt-close gate 传参修复
 - status: active
