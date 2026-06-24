@@ -67,6 +67,30 @@ _tool_is_registered() {
   _tool_registry_get "$tool" "acp.binary" >/dev/null 2>&1
 }
 
+# _resolve_tool_by_binary: scan registry aliases for reverse matching (binary → tool family).
+# Used by _resolve_tool_family fallback when the tool name isn't directly registered.
+_resolve_tool_by_binary() {
+  local binary="$1"
+  [[ -n "$binary" ]] || return 1
+  local _tools _t _aliases _a
+  _tools=$(python3 "$TOOL_REGISTRY_QUERY" "$TOOL_REGISTRY" --list 2>/dev/null || true)
+  for _t in $_tools; do
+    [[ -n "$_t" ]] || continue
+    # Direct match: tool name == binary name (e.g., codex → codex)
+    if [[ "$_t" == "$binary" ]]; then
+      printf '%s\n' "$_t"; return 0
+    fi
+    # Alias match: check tool's aliases (e.g., cc → claude, kiro-cli → claude)
+    _aliases=$(_tool_registry_get "$_t" "aliases" 2>/dev/null || true)
+    for _a in $_aliases; do
+      if [[ "$_a" == "$binary" ]]; then
+        printf '%s\n' "$_t"; return 0
+      fi
+    done
+  done
+  return 1
+}
+
 # ── config_schema field abstraction ────────────────────────────────────────
 # Reads a tool-specific config field name from the registry's config_schema.
 # Usage: _tool_config_field <tool> <concept>
@@ -190,17 +214,15 @@ tool_default_adapter() {
 tool_supported_adapters() {
   local tool="$1"
   tool="$(_resolve_tool_family "$tool")"
-  case "$tool" in
-    codex)
-      printf 'direct\nacp\n'
-      ;;
-    kiro-cli|iflow|cc|cc-use-codex-cli|claude|opencode|test-sleep|test-compact|test-once|test-session|test-route-only|test-scripted)
-      printf 'direct\nacp\n'
-      ;;
-    *)
-      printf 'direct\n'
-      ;;
-  esac
+  # Registry-driven: read adapters.supported field
+  local _supported
+  _supported=$(_tool_registry_get "$tool" "adapters.supported" 2>/dev/null || true)
+  if [[ -n "$_supported" ]]; then
+    printf '%s\n' "$_supported" | tr ',' '\n' | sed 's/^ *//; s/ *$//'
+  else
+    # Conservative default for unregistered tools
+    printf 'direct\n'
+  fi
 }
 
 tool_adapter_is_supported() {
@@ -212,20 +234,18 @@ tool_adapter_is_supported() {
 tool_supported_launch_kinds_for_adapter() {
   local tool="$1" adapter="$2"
   tool="$(_resolve_tool_family "$tool")"
-  case "$tool:$adapter" in
-    codex:acp)
-      # codex-acp supports full ACP session lifecycle (Zed codex-acp)
-      printf 'fresh\nresume\nfork\nfresh_with_handoff\nprompt\n'
-      ;;
-    *:acp)
-      # ACP native: session states + prompt (multi-turn delta)
-      printf 'fresh\nresume\nfork\nfresh_with_handoff\nprompt\n'
-      ;;
-    *)
-      # direct mode (DEPRECATED: will be removed when ACP is stable)
-      printf 'fresh\nresume\nfresh_with_handoff\n'
-      ;;
-  esac
+  # Registry-driven: read adapters.launch_kinds.<adapter>
+  local _launch_kinds
+  _launch_kinds=$(_tool_registry_get "$tool" "adapters.launch_kinds.${adapter}" 2>/dev/null || true)
+  if [[ -n "$_launch_kinds" ]]; then
+    printf '%s\n' "$_launch_kinds" | tr ',' '\n' | sed 's/^ *//; s/ *$//'
+  else
+    # Conservative default: ACP gets full lifecycle, direct gets limited
+    case "$adapter" in
+      acp) printf 'fresh\nresume\nfork\nfresh_with_handoff\nprompt\n' ;;
+      *)   printf 'fresh\nresume\nfresh_with_handoff\n' ;;
+    esac
+  fi
 }
 
 tool_adapter_supports_launch_kind() {
@@ -304,23 +324,24 @@ _resolve_tool_family() {
     binary="$(_strip_env_prefix "$expansion")"
     binary="${binary%% *}"
     binary=$(basename "$binary" 2>/dev/null || echo "$binary")
-    case "$binary" in
-      claude)  printf 'claude\n'; return 0 ;;
-      codex|kiro-cli|iflow|opencode) printf '%s\n' "$binary"; return 0 ;;
-      *)
-        local rec_expansion rec_binary
-        rec_expansion=$(_resolve_type_expansion "$binary")
-        if [[ -n "${rec_expansion:-}" ]]; then
-          rec_binary="$(_strip_env_prefix "$rec_expansion")"
-          rec_binary="${rec_binary%% *}"
-          rec_binary=$(basename "$rec_binary" 2>/dev/null || echo "$rec_binary")
-          case "$rec_binary" in
-            claude)  printf 'claude\n'; return 0 ;;
-            codex|kiro-cli|iflow|opencode) printf '%s\n' "$rec_binary"; return 0 ;;
-          esac
-        fi
-        ;;
-    esac
+    # Scan registry aliases for reverse match (binary → tool family)
+    local _reg_tool
+    _reg_tool=$(_resolve_tool_by_binary "$binary")
+    if [[ -n "$_reg_tool" ]]; then
+      printf '%s\n' "$_reg_tool"; return 0
+    fi
+    # Recursive: try resolving the binary itself as an alias
+    local rec_expansion rec_binary
+    rec_expansion=$(_resolve_type_expansion "$binary")
+    if [[ -n "${rec_expansion:-}" ]]; then
+      rec_binary="$(_strip_env_prefix "$rec_expansion")"
+      rec_binary="${rec_binary%% *}"
+      rec_binary=$(basename "$rec_binary" 2>/dev/null || echo "$rec_binary")
+      _reg_tool=$(_resolve_tool_by_binary "$rec_binary")
+      if [[ -n "$_reg_tool" ]]; then
+        printf '%s\n' "$_reg_tool"; return 0
+      fi
+    fi
   fi
   printf '%s\n' "$tool"
 }
@@ -469,10 +490,13 @@ ensure_claude_runtime_home_for_launch() {
 
 tool_supports_add_dir_boundary() {
   local tool="$1"
-  case "$tool" in
-    codex|iflow|claude|claude|cc|cc-use-codex-cli) return 0 ;;
-    *) return 1 ;;
-  esac
+  # Registry-driven: read launch.direct.add_dir_boundary (boolean)
+  local _add_dir
+  _add_dir=$(_tool_registry_get "$tool" "launch.direct.add_dir_boundary" 2>/dev/null || true)
+  if [[ "$_add_dir" == "true" ]]; then
+    return 0
+  fi
+  return 1
 }
 
 tool_boundary_add_dir() {
@@ -782,13 +806,13 @@ tool_run_acp_from_prompt_file() {
 
   case "$tool" in
     codex)
+      # codex uses its own ACP bridge socket (independent from claude-agent-acp)
       [[ -f "$RUNTIME_ACP_PROMPT_CLIENT" ]] || {
         echo "[ERROR] missing ACP prompt client: $RUNTIME_ACP_PROMPT_CLIENT" >&2
         return 1
       }
       local codex_acp_bin
       codex_acp_bin="$(ensure_codex_acp_binary_for_launch)" || return 1
-      # codex-acp bridge socket (separate from claude bridge)
       local _hash; _hash=$(printf "%s" "$project" | shasum -a 256 | cut -c1-16)
       local codex_bridge_socket="/tmp/freely-acp-$_hash.sock"
       freely_apply_project_network_proxy_env "$project"
@@ -803,76 +827,40 @@ tool_run_acp_from_prompt_file() {
         ${claude_session_id:+--resume "$claude_session_id"} \
         --reasoning-effort "$reasoning_effort"
       ;;
-    claude|cc|cc-use-codex-cli)
-      [[ -f "$RUNTIME_ACP_PROMPT_CLIENT" ]] || {
-        echo "[ERROR] missing ACP prompt client: $RUNTIME_ACP_PROMPT_CLIENT" >&2
-        return 1
-      }
-      freely_apply_project_network_proxy_env "$project"
-      local -a acp_args=(
-        --bridge-socket "$bridge_socket"
-        --cwd "$project"
-        --prompt-file "$prompt_file"
-        --mode "$mode"
-        --model "$model"
-        --launch-kind "$launch_kind"
-        --reasoning-effort "$reasoning_effort"
-      )
-      # Session management based on launch kind
-      case "$launch_kind" in
-        resume)
-          [[ -n "$claude_session_id" ]] && acp_args+=(--resume "$claude_session_id")
-          ;;
-        prompt)
-          # Multi-turn delta: session alive, just send prompt.
-          # Pass session_id as --resume; run-acp-prompt --launch-kind prompt
-          # sets session_id from it and calls send_prompt() directly.
-          [[ -n "$claude_session_id" ]] && acp_args+=(--resume "$claude_session_id")
-          ;;
-        fork)
-          [[ -n "$claude_session_id" ]] && acp_args+=(--resume "$claude_session_id")
-          ;;
-        fresh|fresh_with_handoff)
-          [[ -n "$claude_session_id" ]] && acp_args+=(--session-id "$claude_session_id")
-          ;;
-      esac
-      exec python3 "$RUNTIME_ACP_PROMPT_CLIENT" "${acp_args[@]}"
-      ;;
-    opencode)
-      [[ -f "$RUNTIME_ACP_PROMPT_CLIENT" ]] || {
-        echo "[ERROR] missing ACP prompt client: $RUNTIME_ACP_PROMPT_CLIENT" >&2
-        return 1
-      }
-      freely_apply_project_network_proxy_env "$project"
-      local -a acp_args=(
-        --bridge-socket "$bridge_socket"
-        --cwd "$project"
-        --prompt-file "$prompt_file"
-        --mode "$mode"
-        --model "$model"
-        --launch-kind "$launch_kind"
-        --reasoning-effort "$reasoning_effort"
-      )
-      # Session management based on launch kind
-      case "$launch_kind" in
-        resume)
-          [[ -n "$claude_session_id" ]] && acp_args+=(--resume "$claude_session_id")
-          ;;
-        prompt)
-          [[ -n "$claude_session_id" ]] && acp_args+=(--resume "$claude_session_id")
-          ;;
-        fork)
-          [[ -n "$claude_session_id" ]] && acp_args+=(--resume "$claude_session_id")
-          ;;
-        fresh|fresh_with_handoff)
-          [[ -n "$claude_session_id" ]] && acp_args+=(--session-id "$claude_session_id")
-          ;;
-      esac
-      exec python3 "$RUNTIME_ACP_PROMPT_CLIENT" "${acp_args[@]}"
-      ;;
     *)
-      echo "[ERROR] unsupported ACP launcher for tool: $tool" >&2
-      return 1
+      # Generic ACP path: works for claude, opencode, and any new tool
+      # registered in tool-registry.toml with an acp section
+      [[ -f "$RUNTIME_ACP_PROMPT_CLIENT" ]] || {
+        echo "[ERROR] missing ACP prompt client: $RUNTIME_ACP_PROMPT_CLIENT" >&2
+        return 1
+      }
+      freely_apply_project_network_proxy_env "$project"
+      local -a acp_args=(
+        --bridge-socket "$bridge_socket"
+        --cwd "$project"
+        --prompt-file "$prompt_file"
+        --mode "$mode"
+        --model "$model"
+        --launch-kind "$launch_kind"
+        --reasoning-effort "$reasoning_effort"
+      )
+      # Session management based on launch kind
+      case "$launch_kind" in
+        resume)
+          [[ -n "$claude_session_id" ]] && acp_args+=(--resume "$claude_session_id")
+          ;;
+        prompt)
+          # Multi-turn delta: session alive, just send prompt
+          [[ -n "$claude_session_id" ]] && acp_args+=(--resume "$claude_session_id")
+          ;;
+        fork)
+          [[ -n "$claude_session_id" ]] && acp_args+=(--resume "$claude_session_id")
+          ;;
+        fresh|fresh_with_handoff)
+          [[ -n "$claude_session_id" ]] && acp_args+=(--session-id "$claude_session_id")
+          ;;
+      esac
+      exec python3 "$RUNTIME_ACP_PROMPT_CLIENT" "${acp_args[@]}"
       ;;
   esac
 }
