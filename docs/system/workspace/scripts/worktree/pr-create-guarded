@@ -181,12 +181,12 @@ echo ""
 # Checks that pretests execution evidence exists before allowing PR creation.
 # Mirrors the check in wt-close to catch untested code before PR creation.
 echo "Step 2c/4: pretests execution evidence check..."
-# Get main project root (primary worktree)
-_PROJECT_ROOT="$(git worktree list --porcelain | awk '/^worktree / {print $2; exit}')"
-if [[ -x "$_PROJECT_ROOT/bin/pretests-retirement-gate" ]]; then
-  _WORKTREE_PATH="$ROOT_DIR"
+# Use the current worktree as both project (for issue/doc lookup) and worktree path
+# (for runtime evidence). During development, governance files live in the worktree
+# alongside the code changes, so the worktree root is the correct project root here.
+if [[ -x "$ROOT_DIR/bin/pretests-retirement-gate" ]]; then
   set +e
-  _gate_output="$("$_PROJECT_ROOT/bin/pretests-retirement-gate" --project "$_PROJECT_ROOT" --worktree-path "$_WORKTREE_PATH" 2>&1)"
+  _gate_output="$("$ROOT_DIR/bin/pretests-retirement-gate" --project "$ROOT_DIR" --worktree-path "$ROOT_DIR" 2>&1)"
   _gate_rc=$?
   set -e
   if [[ "$_gate_rc" -ne 0 ]]; then
