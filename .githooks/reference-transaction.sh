@@ -108,7 +108,7 @@ while read -r old_oid new_oid refname; do
   fix/feature/hotfix/test-pre-merge 分支禁止手动创建。
   完整开发流程（详见 AGENTS.md §核心开发流程）：
 
-  阶段2: 创建 raw issue → ./bin/freely feedback --repo <user/repo> --title '...' --body '...'
+  阶段2: 创建 raw issue → ./bin/freely feedback（使用 --help 了解用法）
   阶段3: 创建工位   → ./bin/wt-create --raw-key <key> --source <platform|chat-inbox|local> \\
                           --skill <freely-fix-execution|freely-feat-execution> --slug <slug>
 

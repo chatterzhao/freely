@@ -726,7 +726,7 @@ Usage:
   freely task-source-scan [--project <abs_path>] [--json]
   freely task-scan [--project <abs_path>] [--json]
   freely raw-issue-pull --raw-key <key> [--project <abs_path>] [--target <dir>]
-  freely feedback --repo <user/repo|url> --title <text> --body <text> [--severity P0|P1|P2]   (create raw issue on GitHub)
+  freely feedback --repo <user/repo|url> --title <text> --body <text> [--severity P0|P1|P2]   (create raw issue on configured platform)
   freely issue-sync <args>...                   (delegate to bin/issue-sync)
   freely status [--project <abs_path>] [--view baseline|live|fleet|all]
   freely live-status [--project <abs_path>]
@@ -6289,8 +6289,8 @@ _write_chat_to_issue() {
 
   if [[ "$chat_type" == "new-issue" ]]; then
     log_info "[chat] raw issue created: $issue_id"
-    log_info "[chat] Next: create raw issue on GitHub, then worktree:"
-    log_info "[chat]   1. freely feedback --repo <repo> --title \"...\" --body \"...\""
+    log_info "[chat] Next: create raw issue on configured platform, then worktree:"
+    log_info "[chat]   1. ./bin/freely feedback --help   (review usage, then create the raw issue)"
     log_info "[chat]   2. wt-create --raw-key <returned-key> --source platform --skill freely-fix-execution --slug <slug>"
     log_info "[chat] Then follow the skill: skill:freely-fix-execution (Fix first) or skill:freely-feat-execution (Govern first)"
   fi
@@ -22995,25 +22995,23 @@ cmd_feedback() {
       --help|-h) cat <<HELP; return 0
 Usage: freely feedback --repo <user/repo|url> --title <text> --body <text> [--severity P0|P1|P2]
 
-Create a raw issue on the specified GitHub repository.
+Create a raw issue on the configured platform.
 
 Options:
-  --repo <user/repo|url>  Required. GitHub repo (user/repo, https://..., or git@...).
+  --repo <user/repo|url>  Required. Platform repo (user/repo, https://..., or git@...).
   --title <text>          Required. Issue title.
   --body <text>           Required. Issue body/description.
   --severity <level>      Priority: P0 (critical), P1 (high), P2 (default).
 
 Examples:
 
-Before creating a new issue, search for existing open issues on the same topic:
-  gh issue list --repo <repo> --search "keyword" --state open
-
+Before creating a new issue, search for existing open issues on the same topic first.
 If a similar open issue exists, reuse it instead of creating a duplicate:
   - Comment on the existing issue with additional context
   - Use the existing raw_key to create/resume a worktree
 
   freely feedback --repo chatterzhao/freely --title "bug" --body "..."
-  freely feedback --repo https://github.com/user/project.git --title "bug" --body "..."
+  freely feedback --repo https://git.example.com/user/project.git --title "bug" --body "..."
 HELP
         ;;
       --*) log_error "unknown option: $1"; return 1 ;;
@@ -23185,7 +23183,7 @@ cmd_intake_chat() {
   if [[ "$new_issue" == "true" ]]; then
     echo ""
     echo "[chat] To create a raw issue from this intake:"
-    echo "[chat]   1. freely feedback --repo <repo> --title \"...\" --body \"...\""
+    echo "[chat]   1. ./bin/freely feedback --help   (review usage, then create the raw issue)"
     echo "[chat]   2. wt-create --raw-key <returned-key> --source platform --skill freely-fix-execution --slug <slug>"
     echo "[chat]"
     echo "[chat] Then follow the skill to complete the work:"

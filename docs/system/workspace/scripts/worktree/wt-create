@@ -9,7 +9,7 @@ Usage:
 
 Required:
   --raw-key <key>     Raw issue key (YYYYMMDDTHHMM[SS]Z format, e.g. 20260513T010343Z)
-  --source  platform    Raw issue must exist on GitHub (created via 'freely feedback')
+  --source  platform    Raw issue must exist on a configured platform (created via 'freely feedback')
   --skill   <freely-fix-execution|freely-feat-execution>
                         freely-fix-execution  — 快速修复 bug
                         freely-feat-execution — 新功能/大型改动
@@ -25,8 +25,8 @@ What it creates:
        freely-feat-execution  → feature/raw-{raw-key}-{slug}
   2. test-pre-merge-{raw-key}-{slug}  ← based on ①, discardable testing sandbox
 
-Before wt-create, create the raw issue on GitHub first:
-  freely feedback --repo <repo> --title "..." --body "..."
+Before wt-create, create the raw issue on a configured platform first:
+  ./bin/freely feedback --help    (review usage, then create the raw issue)
 
 Example:
   freely feedback --repo chatterzhao/freely --title "描述" --body "..."
@@ -116,8 +116,8 @@ if [[ -n "$raw_key" || -n "$source_val" || -n "$skill_path" || -n "$slug" ]]; th
     cat <<MSG >&2
 Missing required: --source
 
-  --source must be 'platform'. All raw issues must exist on GitHub.
-  Create one first: freely feedback --repo <repo> --title "..." --body "..."
+  --source must be 'platform'. Raw issues must exist on a configured platform.
+  Create one first: ./bin/freely feedback --help
 
   AI: search for this raw-key in the scan file to find its source_family:
     .freely/run/manager-task-source-scan-latest.json
@@ -149,13 +149,13 @@ if [[ "$using_new" -eq 1 ]]; then
     platform) ;;
     chat-inbox|local)
       echo "Invalid --source '$source_val'. Only 'platform' is allowed." >&2
-      echo "  All raw issues must be created on GitHub via 'freely feedback' first." >&2
+      echo "  Raw issues must be created on a configured platform via 'freely feedback' first." >&2
       echo "  Then use: wt-create --raw-key <key> --source platform --skill <skill> --slug <slug>" >&2
       exit 1
       ;;
     *)
       echo "Invalid --source '$source_val'. Must be 'platform'." >&2
-      echo "  platform — raw issue exists on GitHub (created via 'freely feedback')" >&2
+      echo "  platform — raw issue exists on a configured platform (created via 'freely feedback')" >&2
       exit 1
       ;;
   esac
@@ -423,9 +423,9 @@ _require_issue_exists() {
               : # exists locally (local_only — will be pushed to platform by worker)
             else
               echo "拒绝创建工位: raw-$raw_key not found on platform or local" >&2
-              echo "  先在平台创建 raw issue:" >&2
-              echo "    freely feedback --repo <user/repo> --title '...' --body '...'" >&2
-              echo "  或: gh issue create --repo <user/repo> --title '[RAW-$raw_key] ...' --body '...'" >&2
+              echo "  如果出错是因为还没有创建 raw issue：" >&2
+              echo "    请使用 ./bin/freely feedback 命令创建 raw issue" >&2
+              echo "    如果不清楚用法，请运行 ./bin/freely feedback --help" >&2
               echo "  创建后重试: wt-create --raw-key $raw_key --source platform --skill <skill> --slug <slug>" >&2
               return 1
             fi
@@ -437,8 +437,9 @@ _require_issue_exists() {
               echo "    wt-create --raw-key $raw_key --source platform --skill <skill> --slug <slug>" >&2
             else
               echo "拒绝创建工位: raw-$raw_key 不存在" >&2
-              echo "  所有 raw issue 必须通过 freely feedback 在 GitHub 上创建:" >&2
-              echo "    freely feedback --repo <repo> --title '...' --body '...'" >&2
+              echo "  如果出错是因为还没有创建 raw issue：" >&2
+              echo "    请使用 ./bin/freely feedback 命令创建 raw issue" >&2
+              echo "    如果不清楚用法，请运行 ./bin/freely feedback --help" >&2
               echo "  创建后重试: wt-create --raw-key $raw_key --source platform --skill <skill> --slug <slug>" >&2
             fi
             return 1

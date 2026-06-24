@@ -1,3 +1,26 @@
+## M-20260624T072546Z-A
+- title: 平台硬编码报错修复
+- status: active
+### candidate_issues
+1. `C-20260624T072546Z-A`
+- milestone: M-20260624T072546Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T072546Z-A/issue.md`
+### committed_issues
+1. `I-20260624T072546Z-A`
+- title: 平台硬编码报错修复
+- milestone_state: committed
+- phase_state: `done_b2_ibm`
+- issue_path: `docs/issues/I-20260624T072546Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/platform-agnostic-error-msgs/code-reviews`
+### completed_issues
+1. `I-20260624T072546Z-A`
+- title: 平台硬编码报错修复
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260624T072546Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/platform-agnostic-error-msgs/code-reviews`
+
 ## M-20260624T081419Z-A
 - title: fix-execution cp→git stash 工作流优化
 - status: active
