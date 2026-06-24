@@ -2200,3 +2200,19 @@ routing_policy:
 - issue_path: `docs/issues/I-20260624T013737Z-A/issue.md`
 - source_raws:
   - `raw-20260624T013737Z`
+
+## M-20260624T055231Z-A
+- title: remove JSON5 fallback — TOML-only migration
+- status: active
+### candidate_issues
+1. `C-20260624T055231Z-A`
+- milestone: M-20260624T055231Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T055231Z-A/issue.md`
+### committed_issues
+1. `I-20260624T055231Z-A`
+- milestone_state: completed
+- phase_state: completed
+- issue_path: `docs/issues/I-20260624T055231Z-A/issue.md`
+- source_raws:
+  - `raw-20260624T055231Z`
