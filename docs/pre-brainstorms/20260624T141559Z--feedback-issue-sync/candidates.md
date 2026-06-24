@@ -4,6 +4,8 @@ status: promoted
 source_raw: raw-20260624T141559Z
 created_at: 2026-06-24
 milestone: M-20260624T141559Z-A
+promoted_issue_path: docs/issues/I-20260624T141559Z-A/issue.md
+updated_at: '2026-06-24T14:45:00Z'
 ---
 
 ## C-20260624T141559Z-A: cmd_feedback 对齐 issue-sync 多平台架构
@@ -27,6 +29,6 @@ milestone: M-20260624T141559Z-A
   - mode: manual-review
   - summary: 审查 cmd_feedback 重写是否完整对齐 issue-sync，无遗留 --repo 引用
   - verdict: pass
-- promoted_issue_path: docs/issues/raw-20260624T141559Z/issue.md
+- promoted_issue_path: docs/issues/I-20260624T141559Z-A/issue.md
 - milestone: M-20260624T141559Z-A
 - session_refs: []

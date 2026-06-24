@@ -1,10 +1,10 @@
 ---
-issue_id: raw-20260624T141559Z
+issue_id: I-20260624T141559Z-A
 phase_state: done_b2_ibm
 ---
 
-- issue_id: raw-20260624T141559Z
-- issue_path: docs/issues/raw-20260624T141559Z/issue.md
+- issue_id: I-20260624T141559Z-A
+- issue_path: docs/issues/I-20260624T141559Z-A/issue.md
 
 ## Implementation Decision Note
 

@@ -12,13 +12,14 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-24T14:16:17Z'
-updated_at: '2026-06-24T14:35:00Z'
+updated_at: '2026-06-24T14:45:00Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
 platform_state: open
-absorbed_into: fix/raw-20260624T141559Z-feedback-issue-sync
+absorbed_into: I-20260624T141559Z-A
+source_candidate: docs/pre-brainstorms/20260624T141559Z--feedback-issue-sync/candidates.md#C-20260624T141559Z-A
 ---
 
 ## 问题
