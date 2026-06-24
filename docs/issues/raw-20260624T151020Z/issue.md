@@ -17,7 +17,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-absorbed_into: fix/raw-20260624T151020Z-wt-close-gate-args
+absorbed_into: I-20260624T151020Z-A
 ---
 
 ## 根因
