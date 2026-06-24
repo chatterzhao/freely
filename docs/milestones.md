@@ -1,3 +1,12 @@
+## M-20260624T081358Z-A
+- title: 测试文档 daemon 假设修复
+- status: active
+### candidate_issues
+1. `C-20260624T081358Z-A`
+- milestone: M-20260624T081358Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T081358Z-A/issue.md`
+
 ## M-20260623T075200Z-A
 - title: ACP usage workaround — token estimation
 - status: active
