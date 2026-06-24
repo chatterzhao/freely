@@ -392,7 +392,7 @@ _apply_tool_alias_settings() {
   [[ -n "$_perm_fallback" ]] || _perm_fallback="permissions.defaultMode"
 
   # Resolve base tool for registry-driven permission field names
-  local _base_tool _perm_field _perm_fallback
+  while IFS='=' read -r key value; do
   _base_tool="${tool%%-*}"
   _perm_field="$(_tool_config_field "$_base_tool" "permission_bypass" 2>/dev/null || true)"
   _perm_fallback="$(_tool_config_field_fallback "$_base_tool" "permission_bypass" 2>/dev/null || true)"
