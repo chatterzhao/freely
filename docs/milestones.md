@@ -1,4 +1,3 @@
-## M-20260624T090635Z-A
 - title: adapter/ACP dispatch 注册表驱动化
 - status: active
 ### candidate_issues
