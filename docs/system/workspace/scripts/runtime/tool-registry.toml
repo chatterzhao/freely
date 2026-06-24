@@ -306,3 +306,102 @@ requires_project_owned_fallback = false
 
 [opencode.skill]
 dir = "${HOME}/.config/opencode/skills"
+
+# ── Cline ────────────────────────────────────────────────────────────────────
+
+[cline]
+display_name = "Cline"
+binary_resolution = "path"          # npm install -g cline → in PATH
+aliases = []
+fallback_priority = 60              # after opencode, before hypothetical new tools
+test_command = "cline --yolo 'say hi'"
+
+[cline.acp]
+binary = "cline"
+args = ["--acp"]                    # native ACP via @agentclientprotocol/sdk over stdio/ndjson
+bridge_socket_suffix = "cline"
+
+[cline.permission]
+mechanism = "cli_flag"              # --yolo bypasses confirmations in non-interactive mode
+config_field = "yolo"
+
+[cline.slot]
+discovery = "alias_env_var"         # CLINE_CONFIG_FILE=.../providers.json
+alias_key = "CLINE_CONFIG_FILE"
+config_file = "providers.json"
+is_dir = false
+bridge_config_env = "CLINE_CONFIG_FILE"
+post_init = ""
+
+[cline.config_schema]
+file_format = "json"
+file_name = "providers.json"
+
+[cline.config_schema.fields]
+permission_bypass = { path = "yolo" }
+model = { path = "model" }
+api_base_url = { path = "baseURL" }
+reasoning_effort = { path = "thinking" }
+
+[cline.session]
+supports_fork = true
+supports_resume = true
+id_format = "timestamp_nanoid_cli"               # e.g. 1719234567890_abc12_cli
+directory_template = "${HOME}/.cline/data/sessions"
+extract_regex = 'session[._]id[=:]\s*(\d{13}_[A-Za-z0-9]{5,10}_cli)'
+
+[cline.session.cli]
+fresh = []
+resume = ["--id", "{target}"]
+fork = ["--id", "{parent}"]
+
+[cline.adapters]
+supported = ["direct", "acp"]
+default = "acp"
+
+[cline.adapters.launch_kinds]
+acp = "fresh,resume,fork,fresh_with_handoff,prompt"
+direct = "fresh,resume,fresh_with_handoff"
+
+[cline.launch.direct]
+binary = "cline"
+args = ["--yolo", "--cwd", "{project}"]
+resume_flag = "--id"
+session_flag = "--id"
+model_flag = "--model"
+reasoning_flag = "--thinking"
+add_dir_boundary = false            # Cline uses --cwd; no separate --add-dir concept
+
+[cline.launch.acp]
+model_flag = "--model"
+session_flag = "--session-id"
+resume_flag = "--resume"
+
+[cline.error_patterns]
+auth_failure = ["401|402|403", "unauthorized", "invalid.?token|token.?expired", "authentication.?failed", "not authenticated", "login required"]
+quota_exhausted = ["insufficient_quota|quota exceeded", "insufficient balance|insufficient credit", "payment required", "billing.*required"]
+rate_limited = ["429 too many requests", "rate limit", "try again later"]
+
+[cline.auto_recovery]
+command_name = "cline"
+supports_same_tool_slot = true
+supports_proxy_self_heal = false
+requires_project_config = false
+
+[cline.auto_recovery.failure_scope]
+primary_rate_limit_exhausted = "slot_local"
+auth_failure = "slot_local"
+network_failure = "slot_local"
+
+[cline.boundary]
+project_config_surface = "none materialized by Freely yet"
+launch_note = "adds --cwd {project}"
+sync_note = "copy `.freely/config.toml`, then rematerialize wrapper in each new worktree"
+
+[cline.process_match]
+fragments = ["cline"]
+fallback_token = "cline"
+requires_project_owned_fallback = false
+
+[cline.skill]
+dir = "${HOME}/.cline/skills"
