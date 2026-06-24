@@ -1,3 +1,12 @@
+## M-20260624T141559Z-A
+- title: cmd_feedback 对齐 issue-sync 多平台架构
+- status: active
+### candidate_issues
+1. `C-20260624T141559Z-A`
+- milestone: M-20260624T141559Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/raw-20260624T141559Z/issue.md`
+
 ## M-20260624T092822Z-A
 - title: Cline registry 配置
 - status: active
