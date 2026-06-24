@@ -100,7 +100,7 @@ Freely 处于研究优先的整合阶段。
   	     - 必须运行 `./bin/pre-init-runtime --pre-project <pre-worktree>` 从 develop 复制运行时状态
   	     - 这会复制 config.toml（修正路径）、freely.db（session-store）、tool-boundary-bootstrap
   	     - 初始化后 pre 工位具备完整的 Manager 运行能力
-  	   - **test-pre-merge 的真实环境测试（端到端门禁）**：feature 合并到 test-pre-merge 后必须通过自举验证才能合并到 develop：
+  	   - **test-pre-merge 的验证**：验证方式由 pre-tests.md 中的测试用例决定（pre-tests.md 由 B2_IBM 编写，test-execution 执行）。以下是 Freely 自举开发的端到端门禁示例（daemon 型项目参考）。feature 合并到 test-pre-merge 后必须通过验证才能合并到 develop：
   	     1. `./bin/pre-init-runtime --pre-project <pre-worktree>` — 初始化运行时环境
   	     2. `./bin/freely-package --version test-YYYYMMDD-NNN-dev` — 从 test-pre-merge 打包 pre 版本
   	     3. 用打包后的 `freely` 启动 daemon 开发 Freely 自己（或指定一个 feature worktree）

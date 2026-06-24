@@ -79,7 +79,7 @@ freely-feat-execution 在不同阶段调用下层 skill：
 
 ### 阶段 4：test-pre-merge 验证
 ```
-1. dev 合并到 test-pre-merge-{raw-key}-* → 在 test 工位启动项目测试
+1. dev 合并到 test-pre-merge-{raw-key}-* → 在 test 工位按 pre-tests.md 执行验证
 2. 有问题 → dev(fix|hotfix|feature) 修改 → 合并到 test → 重启测试（反复至达标）
 3. phase_state → in_verification
 ```

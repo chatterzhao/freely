@@ -53,7 +53,7 @@ test-pre-merge-* 上的操作:
 
 | 职能 | 说明 |
 |---|---|
-| **私有测试沙箱** | 仅在本地用于快速迭代验证，不参与任何合并链。hook 复制 config.toml、freely.db、tool-boundary，与 develop/main 等效。可以 stop/start daemon 做端到端验证，验证后丢弃。 |
+| **私有测试沙箱** | 仅在本地用于快速迭代验证，不参与任何合并链。hook 复制 config.toml、freely.db、tool-boundary，与 develop/main 等效。按 pre-tests.md 中的 test_command 执行验证（pre-tests.md 由 skill:freely-doc-B2_IBM-execution 指导编写，skill:freely-test-execution 负责执行）。验证后丢弃。 |
 
 ---
 
@@ -116,7 +116,7 @@ hotfix/*          → main
   │
   ├─ 前置检查通过（issue 仍有价值）
   ├─ 直接在上面改源码
-  ├─ stop → start daemon → 验证
+  ├─ 按 pre-tests.md 执行验证（由 B2_IBM 编写，test-execution 执行）
   ├─ 迭代到修复稳定
   ├─ git commit（增量提交，不等全部完成）
   └─ 走 feature → [skill] test-execution → [skill] B1 → [skill] B2 → [命令] pr-create → [命令] pr-review → [命令] pr-merge develop 完整路径
@@ -138,7 +138,7 @@ hotfix/*          → main
   │   └─ test-pre-merge-{raw-key}-{slug}  (基于 fix，临时测试工位)
   │
   │
-  ├─ 在 test-pre-merge 工位中改源码 → stop/start daemon → 验证
+  ├─ 在 test-pre-merge 工位中改源码 → 按 pre-tests.md 执行验证（由 B2_IBM 编写，test-execution 执行）
   ├─ 深挖根因链，反复迭代
   └─ 此阶段不 commit、不 push、不写治理文档
 

@@ -1,3 +1,26 @@
+## M-20260624T081358Z-A
+- title: 测试文档 daemon 假设修复
+- status: active
+### candidate_issues
+1. `C-20260624T081358Z-A`
+- milestone: M-20260624T081358Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T081358Z-A/issue.md`
+### committed_issues
+1. `I-20260624T081358Z-A`
+- title: 测试文档 daemon 假设修复
+- milestone_state: committed
+- phase_state: `done_b2_ibm`
+- issue_path: `docs/issues/I-20260624T081358Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/testing-docs-pre-tests-delegation/code-reviews`
+### completed_issues
+1. `I-20260624T081358Z-A`
+- title: 测试文档 daemon 假设修复
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260624T081358Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/testing-docs-pre-tests-delegation/code-reviews`
+
 ## M-20260623T075200Z-A
 - title: ACP usage workaround — token estimation
 - status: active
