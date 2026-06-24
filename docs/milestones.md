@@ -1,3 +1,12 @@
+## M-20260624T090635Z-A
+- title: adapter/ACP dispatch 注册表驱动化
+- status: active
+### candidate_issues
+1. `C-20260624T090635Z-A`
+- milestone: M-20260624T090635Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T090635Z-A/issue.md`
+
 ## M-20260624T072546Z-A
 - title: 平台硬编码报错修复
 - status: active
