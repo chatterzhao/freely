@@ -188,18 +188,18 @@ ensure_codex_acp_binary_for_launch() {
 
 tool_default_capabilities() {
   local tool="$1"
-  case "$tool" in
-    cc-use-codex-cli) printf 'codex-cli\n' ;;
-    *) printf '\n' ;;
-  esac
+  # Registry-driven: read optional capabilities field
+  local _caps
+  _caps=$(_tool_registry_get "$tool" "capabilities" 2>/dev/null || true)
+  printf '%s\n' "$_caps"
 }
 
 tool_default_policy() {
   local tool="$1"
-  case "$tool" in
-    cc-use-codex-cli) printf 'prefer-codex-for-repo-work\n' ;;
-    *) printf '\n' ;;
-  esac
+  # Registry-driven: read optional default_policy field
+  local _policy
+  _policy=$(_tool_registry_get "$tool" "default_policy" 2>/dev/null || true)
+  printf '%s\n' "$_policy"
 }
 
 tool_default_adapter() {
@@ -439,19 +439,26 @@ tool_has_capability() {
 tool_accepts_explicit_resume_target() {
   local tool="$1"
   tool="$(_resolve_tool_family "$tool")"
-  case "$tool" in
-    codex|iflow|opencode) return 0 ;;
-    *) return 1 ;;
-  esac
+  # Registry-driven: accepts if session.cli.resume contains {target}
+  local _resume_cli
+  _resume_cli=$(_tool_registry_get "$tool" "session.cli.resume" 2>/dev/null || true)
+  if [[ "$_resume_cli" == *"{target}"* ]]; then
+    return 0
+  fi
+  return 1
 }
 
 tool_requires_explicit_resume_target() {
   local tool="$1"
   tool="$(_resolve_tool_family "$tool")"
-  case "$tool" in
-    codex) return 0 ;;
-    *) return 1 ;;
-  esac
+  # Registry-driven: requires if resume needs explicit session ID (like codex 'exec resume')
+  local _resume_cli
+  _resume_cli=$(_tool_registry_get "$tool" "session.cli.resume" 2>/dev/null || true)
+  # If resume command has more than just a session flag (e.g. 'exec resume'), it requires explicit target
+  if [[ "$_resume_cli" == *"resume"* && "$_resume_cli" != "{target}"* && "$_resume_cli" != "--"*"{target}"* ]]; then
+    return 0
+  fi
+  return 1
 }
 
 project_worktrees_root_for_launch() {

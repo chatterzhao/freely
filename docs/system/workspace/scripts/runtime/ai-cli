@@ -1760,6 +1760,14 @@ _cmd_switch_auto() {
           perl -e '"'"'alarm 10; exec @ARGV'"'"' bash -c "OPENCODE_CONFIG='"'"'$slot_dir/settings.json'"'"' opencode run '"'"'say hi'"'"'" >"$_out" 2>&1 && probe_ok=1 ;;
         codex)
           perl -e '"'"'alarm 10; exec @ARGV'"'"' bash -c "CODEX_HOME='"'"'"'"'"\$slot_dir'"'"'"'"'" codex exec '"'"'"'"say hi'"'"'"'" --skip-git-repo-check" >"\$_out" 2>&1 && probe_ok=1 ;;
+        *)
+          # Registry-driven: use test_command for unknown tools
+          local _test_cmd
+          _test_cmd=$(_tool_registry_get "$tool" "test_command" 2>/dev/null || true)
+          if [[ -n "$_test_cmd" ]]; then
+            perl -e '"'"'alarm 10; exec @ARGV'"'"' bash -c "$_test_cmd" >"$_out" 2>&1 && probe_ok=1
+          fi
+          ;;
       esac
       rm -f "$_out"
       if [[ "$probe_ok" == "1" ]]; then
