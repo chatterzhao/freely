@@ -2166,3 +2166,20 @@ routing_policy:
 - issue_path: `docs/issues/I-20260624T004510Z-A/issue.md`
 - source_raws:
   - `raw-20260624T004510Z`
+
+## M-20260624T004524Z-A
+- title: A2A server _restore_tasks 异步化，消除启动超时
+- status: active
+### candidate_issues
+1. `C-20260624T004524Z-A`
+- milestone: M-20260624T004524Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T004524Z-A/issue.md`
+### committed_issues
+1. `I-20260624T004524Z-A`
+- title: A2A server _restore_tasks 异步化，消除启动超时
+- milestone_state: completed
+- phase_state: completed
+- issue_path: `docs/issues/I-20260624T004524Z-A/issue.md`
+- source_raws:
+  - `raw-20260624T004524Z`
