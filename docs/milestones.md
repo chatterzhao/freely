@@ -6,6 +6,13 @@
 - milestone: M-20260624T141559Z-A
 - status: promoted
 - promoted_issue_path: `docs/issues/raw-20260624T141559Z/issue.md`
+### committed_issues
+1. `raw-20260624T141559Z`
+- title: cmd_feedback 对齐 issue-sync 多平台架构
+- milestone_state: committed
+- phase_state: `done_dev`
+- issue_path: `docs/issues/raw-20260624T141559Z/issue.md`
+- verification_artifact_dir: `docs/epics/feedback-issue-sync/code-reviews`
 
 ## M-20260624T092822Z-A
 - title: Cline registry 配置
