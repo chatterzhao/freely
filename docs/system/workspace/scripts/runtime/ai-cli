@@ -1589,8 +1589,14 @@ cmd_save() {
       tool_save_generic "$tool" "$slot"
       ;;
     *)
-      log_error "Unknown tool: $tool"
-      exit 2
+      local _bt2="${tool%%-*}"
+      case "$_bt2" in *-apikey-*) _bt2="${_bt2%%-apikey-*}" ;; *-account-*) _bt2="${_bt2%%-account-*}" ;; esac
+      if _tool_is_registered "$_bt2" 2>/dev/null; then
+        tool_save_generic "$tool" "$slot"
+      else
+        log_error "Unknown tool: $tool"
+        exit 2
+      fi
       ;;
   esac
 }
@@ -1710,8 +1716,12 @@ cmd_switch() {
       fi
       ;;
     *)
-      log_error "Unknown tool '"'"'$tool'"'"' extracted from slot '"'"'$slot'"'"'"
-      exit 2
+      if _tool_is_registered "$tool" 2>/dev/null; then
+        tool_switch_direct_generic "$tool" "$slot"
+      else
+        log_error "Unknown tool '"'"'$tool'"'"' extracted from slot '"'"'$slot'"'"'"
+        exit 2
+      fi
       ;;
   esac
 }
