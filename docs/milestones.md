@@ -2216,3 +2216,19 @@ routing_policy:
 - issue_path: `docs/issues/I-20260624T055231Z-A/issue.md`
 - source_raws:
   - `raw-20260624T055231Z`
+
+## M-20260624T061532Z-A
+- title: clean query tool JSON5 dead code
+- status: active
+### candidate_issues
+1. `C-20260624T061532Z-A`
+- milestone: M-20260624T061532Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T061532Z-A/issue.md`
+### committed_issues
+1. `I-20260624T061532Z-A`
+- milestone_state: completed
+- phase_state: completed
+- issue_path: `docs/issues/I-20260624T061532Z-A/issue.md`
+- source_raws:
+  - `raw-20260624T061532Z`
