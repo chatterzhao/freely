@@ -2379,3 +2379,26 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260624T090651Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/registry-probe-boundary-resume/code-reviews`
+
+## M-20260624T090654Z-A
+- title: ai-cli generic commands
+- status: active
+### candidate_issues
+1. `C-20260624T090654Z-A`
+- milestone: M-20260624T090654Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T090654Z-A/issue.md`
+### committed_issues
+1. `I-20260624T090654Z-A`
+- title: ai-cli generic commands
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260624T090654Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/ai-cli-generic-tool-commands/code-reviews`
+### completed_issues
+1. `I-20260624T090654Z-A`
+- title: ai-cli generic commands
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260624T090654Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/ai-cli-generic-tool-commands/code-reviews`
