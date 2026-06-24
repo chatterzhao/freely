@@ -319,7 +319,7 @@ PHASE_GATE
 
   # pretests-retirement-gate check
   if [[ -x "$PROJECT_ROOT/bin/pretests-retirement-gate" ]]; then
-    if "$PROJECT_ROOT/bin/pretests-retirement-gate" "$wt_path" 2>/dev/null; then
+    if "$PROJECT_ROOT/bin/pretests-retirement-gate" --project "$PROJECT_ROOT" --worktree-path "$wt_path" 2>/dev/null; then
       echo "wt-close: pretests-retirement-gate passed ✓"
     else
       cat >&2 <<PRETEST_GATE
