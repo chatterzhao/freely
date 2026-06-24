@@ -1,6 +1,6 @@
 ---
 name: freely-fix-execution
-description: 快速修复 bug 的特殊高效策略——feedback→wt-create→dev→test→B1_IBM→B2_IBM→pr-create-guarded→pr-merge-guarded→wt-close。Fix first, govern later。用 test-pre-merge-* 私有工位隔离快测，cp 到可写工位正式提交，不违背保护分支的本质约束。
+description: 快速修复 bug 的特殊高效策略——feedback→wt-create→dev→test→B1_IBM→B2_IBM→pr-create-guarded→pr-merge-guarded→wt-close。Fix first, govern later。用 test-pre-merge-* 私有工位隔离快测，stash 到可写工位正式提交，不违背保护分支的本质约束。
 ---
 
 # skill:freely-fix-execution
@@ -26,7 +26,7 @@ description: 快速修复 bug 的特殊高效策略——feedback→wt-create→
 
 - 不在 `main`/`develop` 上直接改代码（阻塞其他 AI 并发）
 - 用 `test-pre-merge-*` 私有工位快速测试（不改不提交不推送，不违背保护约束）
-- 测完 cp 修改到可写工位（原 feature 还在就 cp 回去，已退役就 cp 到新 fix 工位）
+- 测完在 test 工位 git stash push，再到可写工位 git stash apply（原 feature 还在就 apply 回去，已退役就 apply 到新 fix 工位）
 - 治理文档在修复验证后才写
 
 ---
@@ -36,16 +36,23 @@ description: 快速修复 bug 的特殊高效策略——feedback→wt-create→
 `test-pre-merge-*` 的保护约束是禁止写入（add/commit）和推送（CONSTITUTION.md §2, LAWS.md §2）。fix skill 用它做的是：
 
 ```
-test-pre-merge-* 上的操作:
-  改源码 → ✅ 产生 dirty state（私有工位，仅自己可见）
-  git add → ❌ 不做
+在 test-pre-merge-* 工位上（只改不提交）:
+  改源码     → ✅ 产生 dirty state（私有工位，仅自己可见）
+  git add    → ❌ 不做
   git commit → ❌ 不做
-  git push → ❌ 不做（pre-push hook 也阻止）
-  cp 修改到可写工位 → ✅ 转移修改
-  清理 dirty state → ✅ git checkout -- . / git clean -fd
+  git push   → ❌ 不做（pre-push hook 也阻止）
+  验证通过后 → git stash push --include-untracked -m "fix: <描述>"
+              （stash 跨 worktree 共享，因为同属一个 git 仓库）
+
+在可写工位（fix/hotfix）上（正式提交）:
+  git stash apply  → 应用改动（先用 apply 不用 pop，留 stash 备份）
+  git status       → 检查转移过来的文件列表是否符合预期
+  git stash drop   → 确认无误后清理 stash
+  git add <文件>   → 逐个（或用 git add -u 只加已跟踪文件）
+  git commit       → 正式提交
 ```
 
-**关键**：修改只在 test-pre-merge-* 上以 dirty state 存在，验证通过后 cp 到可写工位（fix/hotfix）正式 add+commit。test-pre-merge-* 上的 dirty 修改最终被丢弃。正式提交全在可写工位，合并也走可写工位 → develop 的合规路径。
+**关键**：修改在 test-pre-merge-* 上只以 dirty state 存在。验证通过后 `git stash push` 暂存所有改动（stash 对同一仓库的所有 worktree 可见），再到可写工位 `git stash apply` 取出，最后正式 add+commit。test-pre-merge-* 上的 dirty state 被 stash 清空后无需额外清理（如有未跟踪文件残留，`git clean -fd` 即可）。正式提交全在可写工位，合并也走可写工位 → develop 的合规路径。
 
 ### test-pre-merge-* 作为丢弃式测试沙箱
 
@@ -92,7 +99,7 @@ hotfix/*          → main
 | 原 feature 工位 | 做法 |
 |---|---|
 | **还在** | 直接在 feature 上改 → 测 → 提交。走 feature → [skill] test-execution → [skill] B1 → [skill] B2 → [命令] pr-create → [命令] pr-review → [命令] pr-merge develop |
-| **已退役（已合并/已删）** | 建 `test-pre-merge-*` 私有工位快测 → cp 到新建的 `fix/*` 或 `hotfix/*` → [skill] test-execution → [skill] B1 → [skill] B2 → [命令] pr-create → [命令] pr-merge → [命令] wt-close |
+| **已退役（已合并/已删）** | 建 `test-pre-merge-*` 私有工位快测 → stash 到新建的 `fix/*` 或 `hotfix/*` → [skill] test-execution → [skill] B1 → [skill] B2 → [命令] pr-create → [命令] pr-merge → [命令] wt-close |
 
 ### 再判严重程度
 
@@ -142,11 +149,23 @@ hotfix/*          → main
   ├─ 深挖根因链，反复迭代
   └─ 此阶段不 commit、不 push、不写治理文档
 
-阶段 2 — 增量 cp 到可写工位，commit
+阶段 2 — 从 test 工位转移修改到 fix 工位，commit
   │
-  ├─ 每个阶段性修复验证通过后 cp + commit:
-  │     cp <test-pre-merge-wt>/path/to/file <fix-wt>/path/to/file
-  │     cd <fix-wt> && git commit -m "fix: <阶段性描述>"
+  ├─ 每个阶段性修复验证通过后：
+  │     1. 在 test 工位暂存全部改动:
+  │        cd <test-pre-merge-wt>
+  │        git stash push --include-untracked -m "fix: <阶段性描述>"
+  │        # stash push 后 test 工位自动恢复干净（dirty state 进入 stash）
+  │
+  │     2. 在 fix 工位取出改动:
+  │        cd <fix-wt>
+  │        git stash apply        # 用 apply 不用 pop，保留 stash 备份
+  │        git status             # 检查转移的文件列表是否符合预期
+  │        git stash drop         # 确认无误后清理 stash
+  │
+  │     3. 在 fix 工位提交:
+  │        git add <changed-files>   # 或 git add -u（只加已跟踪文件）
+  │        git commit -m "fix: <阶段性描述>"
   │
   └─ 增量提交，不堆到最后
 
@@ -174,8 +193,9 @@ hotfix/*          → main
 
 阶段 5 — 收尾
   │
-  ├─ 丢弃 test-pre-merge-* 上的 dirty 修改（已经 cp 到可写工位）
-  │     cd <test-pre-merge-wt> && git checkout -- . && git clean -fd
+  ├─ 确认 test 工位已干净（stash push 后应无残留）:
+  │     cd <test-pre-merge-wt> && git status
+  │     如有残留 → git checkout -- . && git clean -fd
   ├─ 执行 `freely wt-close test-pre-merge-<name>` 命令关闭测试工位
   └─ 执行 `freely wt-close fix/<name>` 命令关闭 fix 工位和分支（PR 已合并到 develop）
 ```
@@ -185,8 +205,8 @@ hotfix/*          → main
 ## 硬性规则
 
 - **不发明新分支名**。只用 `fix/*`、`feature/*`、`feature/premerge-*`、`hotfix/*`、`test-pre-merge-*`。
-- **test-pre-merge-* 上不 commit、不 push**。只改源码快速测试，修改全部 cp 到可写工位。
-- **fix 工位早期创建**，增量 cp + commit，不堆到最后。
+- **test-pre-merge-* 上不 commit、不 push**。只改源码快速测试，修改全部 git stash push，再到 fix 工位 git stash apply。
+- **fix 工位早期创建**，增量 apply + commit，不堆到最后。
 - **原 feature 还在就直接在上面修**，不新建工位。
 - **治理后置**，验证通过再写。
 - **根因深挖**，不修表面症状。
