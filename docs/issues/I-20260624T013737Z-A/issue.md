@@ -1,8 +1,8 @@
 ---
 local_id: I-20260624T013737Z-A
 kind: linked
-status: in_dev
-phase_state: in_dev
+status: completed
+phase_state: completed
 promoted_from: raw-20260624T013737Z
 source_candidate: docs/pre-brainstorms/20260624T013737Z--tool-registry-toml/candidates.md#C-20260624T013737Z-A
 canonical_issue_path: docs/issues/I-20260624T013737Z-A/issue.md
