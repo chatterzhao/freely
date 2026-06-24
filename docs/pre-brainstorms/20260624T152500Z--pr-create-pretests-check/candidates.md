@@ -2,7 +2,7 @@
 source: raw-20260624T152500Z
 ---
 
-# Candidate: C-20260624T152500Z-A
+## C-20260624T152500Z-A
 
 - status: promoted
 - promoted_issue_path: docs/epics/pr-create-pretests-check/issues/I-20260624T152500Z-A.md
