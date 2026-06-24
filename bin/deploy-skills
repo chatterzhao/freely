@@ -10,16 +10,16 @@ Deploy all skills from docs/system/workspace/skills/ to AI tool skill directorie
 so tools can invoke them via skill:<name>.
 
 Options:
-  --tools <tools>  Comma-separated tool names (default: AI_TOOL from project config,
-                    or FREELY_TOOLS env, or global config, or "claude")
+  --tools <tools>  Comma-separated tool names (default: all installed tools from
+                    tool-registry.json5, auto-detected via command availability)
   --force          Force overwrite even if content is identical
   --dry-run        Show what would be deployed without writing.
 
-Supported tools:
+Supported tools (from tool-registry.json5):
   claude*     → ~/.claude/skills/
   codex*      → ~/.codex/skills/
   oc-*        → ~/.config/opencode/skills/  (if project .opencode/ not found)
-  opencode    → ~/.config/opencode/skills/  (if project .opencode/ not found)
+  opencode*   → ~/.config/opencode/skills/  (if project .opencode/ not found)
   cc*         → ~/.claude/skills/
   iflow*      → (not yet supported)
   kiro-cli*   → (not yet supported)
@@ -29,7 +29,7 @@ skills are deployed there instead of global config.
 
 Examples:
   ./bin/deploy-skills --tools claude,codex
-  ./bin/deploy-skills --tools oc-acp-ds-flash-auto --force
+  ./bin/deploy-skills --tools opencode-apikey-ds-flash-auto --force
   ./bin/deploy-skills --dry-run
 USAGE
 }
@@ -66,28 +66,46 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 SRC="$ROOT_DIR/docs/system/workspace/skills"
 [[ -d "$SRC" ]] || { echo "Skill source directory not found: $SRC" >&2; exit 1; }
 
-# Resolve default tools: --tools flag > AI_TOOL from project config > FREELY_TOOLS env > global config > claude
+# Resolve default tools: --tools flag > tool-registry.json5 (all installed)
 if [[ -z "$tools" ]]; then
-  # Try project-local config first
-  project_cfg="$ROOT_DIR/.freely/config.toml"
-  if [[ -f "$project_cfg" ]]; then
-    local_ai_tool=$(grep '^AI_TOOL = ' "$project_cfg" 2>/dev/null | head -1 | cut -d= -f2 | tr -d '"' | tr -d "'" | xargs || true)
-    if [[ -n "$local_ai_tool" ]]; then
-      tools="$local_ai_tool"
-    fi
+  _reg_file="$ROOT_DIR/docs/system/workspace/scripts/runtime/tool-registry.json5"
+  if [[ -f "$_reg_file" ]]; then
+    _installed_tools=""
+    while IFS= read -r _tool_key; do
+      [[ -z "$_tool_key" ]] && continue
+      # Determine binary to check: use first word of test_command, or canonical tool name
+      _test_bin=$(python3 -c "
+import json, re, sys
+with open('$_reg_file') as f:
+    content = f.read()
+content = re.sub(r'//.*', '', content)
+content = re.sub(r'/\*.*?\*/', '', content, flags=re.DOTALL)
+reg = json.loads(content)
+tc = reg.get('$_tool_key', {}).get('test_command', '')
+if tc:
+    print(tc.split()[0])
+else:
+    print('$_tool_key')
+" 2>/dev/null)
+      if [[ -n "$_test_bin" ]] && command -v "$_test_bin" >/dev/null 2>&1; then
+        [[ -n "$_installed_tools" ]] && _installed_tools="$_installed_tools,"
+        _installed_tools="$_installed_tools$_tool_key"
+      fi
+    done < <(python3 -c "
+import json, re
+with open('$_reg_file') as f:
+    content = f.read()
+content = re.sub(r'//.*', '', content)
+content = re.sub(r'/\*.*?\*/', '', content, flags=re.DOTALL)
+reg = json.loads(content)
+for name in reg:
+    if name.startswith('_'): continue
+    print(name)
+" 2>/dev/null)
+    tools="$_installed_tools"
   fi
 fi
-if [[ -z "$tools" ]]; then
-  tools="${FREELY_TOOLS:-}"
-fi
-if [[ -z "$tools" ]]; then
-  for config in "${HOME}/.freely/config.toml" "${HOME}/.config/freely/config.toml"; do
-    if [[ -f "$config" ]]; then
-      tools=$(grep "^FREELY_TOOLS = " "$config" 2>/dev/null | cut -d= -f2 | tr -d '"' | tr -d "'" || true)
-      [[ -n "$tools" ]] && break
-    fi
-  done
-fi
+# Fallback: if registry lookup produced nothing, default to claude
 [[ -z "$tools" ]] && tools="claude"
 
 # Map tool name to skill directory
@@ -96,7 +114,7 @@ tool_dir() {
   case "$tool" in
     claude*) echo "${HOME}/.claude/skills" ;;
     codex*)  echo "${HOME}/.codex/skills" ;;
-    oc-*|opencode)
+    oc-*|opencode*)
       # Prefer project-local .opencode/skills/ over global
       if [[ -d "$ROOT_DIR/.opencode/skills" ]]; then
         echo "$ROOT_DIR/.opencode/skills"
@@ -186,7 +204,7 @@ done
 
 if [[ -n "$unknown_tools" ]]; then
   echo "WARNING: unsupported tools:$unknown_tools" >&2
-  echo "Supported tools: claude*, codex*, oc-*, opencode, cc*" >&2
+  echo "Supported tools: claude*, codex*, oc-*, opencode*, cc*" >&2
   echo "Unsupported (no mapping): iflow*, kiro-cli*" >&2
   exit 1
 fi
