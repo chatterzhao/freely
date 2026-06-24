@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260624T151020Z
 kind: raw
-phase_state: proposed
+phase_state: absorbed
 platform_ids:
   github:
     issue_id: '3440'
@@ -12,11 +12,12 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-24T15:10:43Z'
-updated_at: '2026-06-24T15:10:43Z'
+updated_at: '2026-06-24T15:20:00Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
+absorbed_into: fix/raw-20260624T151020Z-wt-close-gate-args
 ---
 
 ## 根因
