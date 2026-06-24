@@ -14953,8 +14953,13 @@ python3 docs/system/workspace/scripts/runtime/a2a_task.py a2a-exit \
 示例 — 委派 Worker:
   a2a-exit --state submitted --summary "created 3 workers" --workers ".freely/run/worker-prompts/w1.txt,..."
 
-示例 — 分析完成无事可做:
-  a2a-exit --state completed --summary "no actionable items, scan stale"
+示例 — 分析完成无事可做（用 failed 让 Manager 走 stop_ai → listen 降级）:
+  a2a-exit --state failed --summary "no actionable items, scan stale"
+
+三态语义：
+  submitted — 已委派 Worker，等待 Worker 完成
+  completed — 任务完成，Manager 继续巡逻（resume_manager）
+  failed    — 无事可做/任务失败，Manager 走 stop_ai → listen 降级
 EOF
 }
 
@@ -15002,9 +15007,23 @@ parse_a2a_task_json_reply() {
     case "$_action" in
       submitted)
         # A2A-native: Manager creates individual worker tasks via a2a-exit --role worker.
-        # worker_prompts_csv is a CSV-era relic, always empty in the A2A flow.
-        # submitted state IS the signal that workers were delegated.
-        _exit_kind="delegate_workers" ;;
+        # Check for rotting: submitted + no workers + 30s grace period → resume_manager.
+        local _w_count _task_ts _now _age
+        _w_count=$(python3 "$_a2a_task_py" list --role worker --status pending 2>/dev/null | python3 -c "import json,sys; data=json.load(sys.stdin); print(len(data.get('rows',[])))" 2>/dev/null || echo "0")
+        _task_ts=$(echo "$_result" | python3 -c "import json,sys; r=json.load(sys.stdin); print(r.get('updated_at',''))" 2>/dev/null || echo "")
+        _now=$(date +%s)
+        if [[ -n "$_task_ts" ]]; then
+          _age=$(( _now - _task_ts ))
+        else
+          _age=0
+        fi
+        if [[ "${_w_count:-0}" -eq 0 && ${_age:-0} -gt 30 ]]; then
+          # Rotting: submitted with no workers after 30s grace — resume manager
+          _exit_kind="resume_manager"
+        else
+          # Normal: workers delegated or still within grace period
+          _exit_kind="delegate_workers"
+        fi ;;
       completed)
         if [[ "$role" == "worker" ]]; then _exit_kind="worker_done"
         else _exit_kind="resume_manager"; fi ;;
