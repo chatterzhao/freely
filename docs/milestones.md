@@ -2232,3 +2232,19 @@ routing_policy:
 - issue_path: `docs/issues/I-20260624T061532Z-A/issue.md`
 - source_raws:
   - `raw-20260624T061532Z`
+
+## M-20260624T062756Z-A
+- title: tools.md json5 → toml
+- status: active
+### candidate_issues
+1. `C-20260624T062756Z-A`
+- milestone: M-20260624T062756Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T062756Z-A/issue.md`
+### committed_issues
+1. `I-20260624T062756Z-A`
+- milestone_state: completed
+- phase_state: completed
+- issue_path: `docs/issues/I-20260624T062756Z-A/issue.md`
+- source_raws:
+  - `raw-20260624T062756Z`
