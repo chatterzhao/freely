@@ -1,3 +1,4 @@
+## M-20260624T090635Z-A
 - title: adapter/ACP dispatch 注册表驱动化
 - status: active
 ### candidate_issues
@@ -5,6 +6,13 @@
 - milestone: M-20260624T090635Z-A
 - status: promoted
 - promoted_issue_path: `docs/issues/I-20260624T090635Z-A/issue.md`
+### committed_issues
+1. `I-20260624T090635Z-A`
+- title: adapter/ACP dispatch
+- milestone_state: committed
+- phase_state: `in_verification`
+- issue_path: `docs/issues/I-20260624T090635Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/registry-adapter-acp-dispatch/code-reviews`
 
 ## M-20260624T072546Z-A
 - title: 平台硬编码报错修复
