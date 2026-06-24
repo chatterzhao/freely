@@ -334,43 +334,28 @@ _resolve_tool_family() {
 # _apply_tool_alias_settings: resolve alias, extract --settings path, export env vars.
 # For ACP mode, this is how per-alias settings (e.g. cc-ds-flash-auto) are applied.
 _apply_tool_alias_settings() {
-  local tool="$1"
-  local resolved alias_path
-  case "$tool" in
-    *) ;;
-  esac
-  if _tool_is_registered "$tool"; then return 0; fi
-  resolved=$(_resolve_type_expansion "$tool")
-  [[ -n "$resolved" ]] || return 0
-  local first_binary="${resolved%% *}"
-  if [[ ! "$first_binary" =~ ^(claude|codex|kiro-cli|iflow|opencode)$ ]]; then
-    local rec_resolved
-    rec_resolved=$(_resolve_type_expansion "$first_binary")
-    [[ -n "$rec_resolved" ]] && resolved="$rec_resolved"
-  fi
-  # Export env var assignments from alias prefix (e.g. OPENCODE_CONFIG=... opencode)
-  local remainder="$resolved"
-  while true; do
-    local _trimmed="${remainder#"${remainder%%[![:space:]]*}"}"
-    case "$_trimmed" in
-      [a-zA-Z_]*=*) ;;
-      *) break ;;
-    esac
+  local tool="${1:-}"
+  [[ -n "$tool" ]] || return 0
+
+  local _shell _alias_value _alias_line
+  _shell="${FREELY_AI_ALIAS_SHELL_NAME:-$(ps -p $$ -o comm= 2>/dev/null || basename "${SHELL:-zsh}")}"
+  _alias_line=$(whence -v "$tool" 2>/dev/null || type "$tool" 2>/dev/null || true)
+  [[ -n "$_alias_line" ]] || return 0
+  _alias_value=$(echo "$_alias_line" | sed -n "s/.*${tool} is an alias for //p" || true)
+  [[ -n "$_alias_value" ]] || return 0
+
+  # Parse env var exports from alias (e.g., CODEX_HOME=... OPENCODE_CONFIG=...)
+  local remainder="${_alias_value}"
+  local alias_path=""
+  while [[ "$remainder" =~ ^[A-Z_][A-Z0-9_]*= ]]; do
     local var_name="${remainder%%=*}"
-    var_name="${var_name##* }"  # strip leading spaces
     remainder="${remainder#*=}"
-    if [[ "$remainder" == \"* ]]; then
-      remainder="${remainder#\"}"
-      local var_val="${remainder%%\"*}"
+    if [[ "$remainder" == '*'[[:space:]]* || "$remainder" == "*"[[:space:]]* ]]; then
+      local q="${remainder:0:1}"
+      remainder="${remainder#?}"
+      local var_val="${remainder%%${q}*}"
+      remainder="${remainder#*${q}}"
       export "$var_name"="$var_val"
-      remainder="${remainder#*\"}"
-      remainder="${remainder# }"
-    elif [[ "$remainder" == \'* ]]; then
-      remainder="${remainder#\'}"
-      local var_val="${remainder%%\'*}"
-      export "$var_name"="$var_val"
-      remainder="${remainder#*\'}"
-      remainder="${remainder# }"
     else
       local var_val="${remainder%%[[:space:]]*}"
       export "$var_name"="$var_val"
@@ -378,22 +363,14 @@ _apply_tool_alias_settings() {
     fi
   done
   # Extract --settings <path> from the remainder
-  alias_path=$(echo "$remainder" | sed -n 's/.*--settings \([^ ]*\).*/\1/p')
+  alias_path=$(echo "$remainder" | sed -n 's/.*--settings \([^ ]*\).*//p')
   [[ -n "$alias_path" ]] || return 0
   alias_path="${alias_path/#\~/$HOME}"
   [[ -f "$alias_path" ]] || return 0
-  # Resolve base tool for registry-driven permission field names
-  local _base_tool _perm_field _perm_fallback
-  _base_tool="${tool%%-*}"
-  _perm_field="$(_tool_config_field "$_base_tool" "permission_bypass" 2>/dev/null || true)"
-  _perm_fallback="$(_tool_config_field_fallback "$_base_tool" "permission_bypass" 2>/dev/null || true)"
-  # Fallback to hardcoded defaults if registry not available
-  [[ -n "$_perm_field" ]] || _perm_field="permissionMode"
-  [[ -n "$_perm_fallback" ]] || _perm_fallback="permissions.defaultMode"
 
-  # Resolve base tool for registry-driven permission field names
-  while IFS='=' read -r key value; do
-  _base_tool="${tool%%-*}"
+  # ── Resolve base tool for registry-driven permission field names ──
+  local _base_tool _perm_field _perm_fallback
+  _base_tool="${tool%%-*}"  # opencode-apikey-xxx → opencode
   _perm_field="$(_tool_config_field "$_base_tool" "permission_bypass" 2>/dev/null || true)"
   _perm_fallback="$(_tool_config_field_fallback "$_base_tool" "permission_bypass" 2>/dev/null || true)"
   # Fallback to hardcoded defaults if registry unavailable
@@ -411,9 +388,9 @@ try:
     env = d.get('env', {})
     for k, v in env.items():
         print(f'{k}={v}')
-    # Read permission mode: top-level 'permissionMode' or nested 'permissions.defaultMode'
-    pf = '$_perm_field'
-    fb = '$_perm_fallback'
+    # Read permission bypass using registry-driven field names
+    pf = '${_perm_field}'
+    fb = '${_perm_fallback}'
     pm = ''
     if pf and pf in d:
         pm = d[pf]
@@ -435,6 +412,8 @@ try:
 except: pass
 " 2>/dev/null)"
 }
+
+
 
 tool_has_capability() {
   local capabilities="$1" capability="$2"
