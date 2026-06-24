@@ -28,13 +28,13 @@ test skill 位于 dev-loop 和 pr-create 之间。它是最后一道自动化验
 ```
 1. cd 到 test-pre-merge 工位（不在则硬拦截）
 2. 合并 fix/feature 分支到 test-pre-merge
-3. 启动 daemon（如需端到端验证）
+3. 按 pre-tests.md 各条 acceptance 的 target_environment 准备运行环境
 4. 逐条执行 pre-tests.md 中的 test_command
 5. 填写 actual_output + evidence_file
 6. 对比 expected_output → passed | failed
 7. 全部 passed（全绿）→ 达标，继续 pr-create
 8. 有任何 failed（红色）→ 回 dev-loop 修复
-9. stop daemon（如已启动）
+9. 清理测试运行环境
 ```
 
 ### 步骤详细说明
@@ -62,13 +62,9 @@ git merge fix/raw-XXX-<slug> --no-edit
 # 有冲突 → 记录 blocker，回 dev-loop
 ```
 
-#### 步骤 3：启动 daemon（可选）
+#### 步骤 3：准备测试运行环境（按需）
 
-仅端到端测试需要 daemon：
-
-```bash
-./bin/freely daemon start --project . --task-mode wait
-```
+按 pre-tests.md 各条 acceptance 的 `target_environment` 准备运行环境。pre-tests.md 由 `skill:freely-doc-B2_IBM-execution` 指导编写，其中 `test_command` 和 `target_environment` 已声明测试所需的命令和环境。
 
 #### 步骤 4-5：逐条执行测试
 
