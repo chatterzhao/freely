@@ -1,3 +1,26 @@
+## M-20260624T092822Z-A
+- title: Cline registry 配置
+- status: active
+### candidate_issues
+1. `C-20260624T092822Z-A`
+- milestone: M-20260624T092822Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T092822Z-A/issue.md`
+### committed_issues
+1. `I-20260624T092822Z-A`
+- title: Cline registry
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260624T092822Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/cline-registry-config/code-reviews`
+### completed_issues
+1. `I-20260624T092822Z-A`
+- title: Cline registry
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260624T092822Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/cline-registry-config/code-reviews`
+
 ## M-20260624T090635Z-A
 - title: adapter/ACP dispatch 注册表驱动化
 - status: active
