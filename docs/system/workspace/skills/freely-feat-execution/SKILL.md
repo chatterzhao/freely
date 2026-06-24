@@ -20,6 +20,8 @@ description: 新功能/大型改动的完整开发流程——feedback→wt-crea
 | 流程 | feedback → wt-create → dev → test → B1 → B2 → pr-create → pr-review → pr-merge → wt-close | feedback → wt-create → B1 → B2 → dev → test → pr-create → pr-review → pr-merge → wt-close |
 | IBM 顺序 | 实现后治理（Fix first, govern later） | 治理后实现（Govern first, code later） |
 
+> **"Fix first" / "Govern first" 指的是 IBM 框架中治理文档（B1_IBM/B2_IBM）与 Dev 实现之间的先后顺序，不是跳过流程步骤的借口。具体流程请仔细阅读对应 skill 的完整内容，严格按规范步骤执行。**
+
 ## 下层 skill
 
 freely-feat-execution 在不同阶段调用下层 skill：

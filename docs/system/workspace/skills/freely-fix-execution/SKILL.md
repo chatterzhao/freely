@@ -23,6 +23,8 @@ description: 快速修复 bug 的特殊高效策略——feedback→wt-create→
 ## 核心原则
 
 > **Fix first, govern later. Test in isolation, commit to writable.**
+> 
+> 这是指 IBM 框架中治理文档（B1_IBM/B2_IBM）与 Dev 实现之间的先后顺序——先改代码验证，再补治理文档。具体流程请仔细阅读本 skill 的完整内容，严格按规范步骤执行。不要只记口号跳过关键步骤。
 
 - 不在 `main`/`develop` 上直接改代码（阻塞其他 AI 并发）
 - 用 `test-pre-merge-*` 私有工位快速测试（不改不提交不推送，不违背保护约束）
