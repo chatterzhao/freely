@@ -36,7 +36,7 @@
   - `AI_TOOL_ADAPTER` 表示 runtime 依据 policy 和当前支持面解析出的实际 adapter
   - status / introspection 还会暴露当前工具的 `tool_supported_adapters`，作为当前 runtime 支持矩阵
 - 当前 runtime 默认 adapter 是 `acp`；`direct` 属于遗留兼容/历史测试路径，不再作为 Freely 的产品工作模式描述。
-- 当前 canonical ACP family 来自 `tool-registry.json5`：
+- 当前 canonical ACP family 来自 `tool-registry.toml`：
   - `claude` 通过 `claude-agent-acp` 接入；`cc`、`cc-use-codex-cli`、`kiro-cli`、`iflow`、`claude-code` 是该 family 的 registry alias
   - `codex` 通过 `codex-acp` 接入
   - `opencode` 通过 `opencode acp` 接入
