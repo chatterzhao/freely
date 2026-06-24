@@ -334,8 +334,8 @@ class A2AServer:
         self.agent_card = _build_agent_card(project)
         self.task_store = SQLiteTaskStore(project)
         self.executor = FreelyAgentExecutor(self)
-        # Restore non-terminal tasks from WAL on startup (crash recovery)
-        self._restore_tasks()
+        # Note: _restore_tasks() is deferred to start() to avoid blocking
+        # server startup (health check timeout). Runs in a background thread.
 
     def _restore_tasks(self):
         """Restore non-terminal tasks on startup: state correction + env recovery.
@@ -673,6 +673,15 @@ class A2AServer:
             raise RuntimeError(f"Invalid A2A_LISTEN_MODE={self.listen_mode}")
 
         self._running = True
+
+        # Defer crash recovery to background thread: __init__ no longer blocks
+        # on _restore_tasks(), so the Unix socket is bound and accepting
+        # connections before recovery begins.  This prevents health-check
+        # timeouts on startup when the DB has many stale tasks.
+        import threading
+        threading.Thread(target=self._restore_tasks, daemon=True,
+                         name="a2a-restore").start()
+
         # Keep main thread alive
         try:
             while self._running:

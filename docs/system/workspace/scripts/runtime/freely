@@ -8382,7 +8382,7 @@ sys.exit(1)
   if [[ "$_health_ok" == "1" ]]; then
     log_info "A2A server ready (PID $a2a_pid) on $a2a_socket (http healthcheck ok)"
   else
-    log_warn "A2A server start timed out after 10s (may be TCP-only)"
+    log_warn "A2A server start timed out after 10s (check DB size, zombie PIDs, or disk I/O)"
   fi
   return 0
 }
