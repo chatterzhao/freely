@@ -1,8 +1,8 @@
 ---
 local_id: I-20260624T104236Z-A
 kind: linked
-status: in_dev
-phase_state: in_dev
+status: completed
+phase_state: completed
 promoted_from: raw-20260624T104236Z
 source_candidate: docs/pre-brainstorms/20260624T104236Z--fix-govern-first-skill-pointer/candidates.md#C-20260624T104236Z-A
 canonical_issue_path: docs/issues/I-20260624T104236Z-A/issue.md
@@ -14,7 +14,7 @@ platform_ids:
     url: https://github.com/chatterzhao/freely/issues/3428
 primary_platform: github
 pre_tests_path: ''
-verification_artifact_dir: docs/reviews
+verification_artifact_dir: docs/epics/fix-govern-first-skill-pointer/code-reviews
 platform_state: open
 ---
 # I-20260624T104236Z-A: Add skill doc pointer after Fix/Govern first
