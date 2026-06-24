@@ -2519,3 +2519,19 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260624T104229Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/wt-create-skill-prompt/code-reviews`
+
+## M-20260624T104233Z-A
+- title: AGENTS.md daemon test refs → pre-tests.md
+- status: active
+### candidate_issues
+1. `C-20260624T104233Z-A`
+- milestone: M-20260624T104233Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T104233Z-A/issue.md`
+### committed_issues
+1. `I-20260624T104233Z-A`
+- title: AGENTS.md daemon test refs → pre-tests.md
+- milestone_state: committed
+- phase_state: `done_b2_ibm`
+- issue_path: `docs/issues/I-20260624T104233Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/agents-daemon-to-pre-tests/code-reviews`
