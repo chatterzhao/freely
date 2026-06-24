@@ -2153,6 +2153,11 @@ routing_policy:
 ## M-20260624T004510Z-A
 - title: deploy-skills opencode wildcard fix + registry-driven default tool detection
 - status: active
+### candidate_issues
+1. `C-20260624T004510Z-A`
+- milestone: M-20260624T004510Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T004510Z-A/issue.md`
 ### committed_issues
 1. `I-20260624T004510Z-A`
 - title: deploy-skills opencode wildcard fix + registry-driven default tool detection

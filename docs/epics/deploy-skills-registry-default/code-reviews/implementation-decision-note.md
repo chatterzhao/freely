@@ -1,5 +1,8 @@
 # Implementation Decision Note: deploy-skills registry-driven default
 
+- owner_issue: I-20260624T004510Z-A
+- milestone: M-20260624T004510Z-A
+
 ## Implementation Decision Note
 
 - decision: 修复 `opencode` 通配符（`opencode)` → `opencode*)`）并从 `tool-registry.json5` 驱动默认 tool 检测
