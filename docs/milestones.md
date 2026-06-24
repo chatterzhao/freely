@@ -2356,3 +2356,26 @@ routing_policy:
 - issue_path: `docs/issues/I-20260624T062756Z-A/issue.md`
 - source_raws:
   - `raw-20260624T062756Z`
+
+## M-20260624T090651Z-A
+- title: probe/resume registry
+- status: active
+### candidate_issues
+1. `C-20260624T090651Z-A`
+- milestone: M-20260624T090651Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T090651Z-A/issue.md`
+### committed_issues
+1. `I-20260624T090651Z-A`
+- title: probe/resume registry
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260624T090651Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/registry-probe-boundary-resume/code-reviews`
+### completed_issues
+1. `I-20260624T090651Z-A`
+- title: probe/resume registry
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260624T090651Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/registry-probe-boundary-resume/code-reviews`
