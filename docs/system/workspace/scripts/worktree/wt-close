@@ -732,10 +732,11 @@ if [[ "$DRY_RUN" == true ]]; then
   _dry "git branch -d $branch"
 else
   echo "wt-close: deleting branch $branch..."
-  if git branch -d "$branch" 2>/dev/null; then
+  # Explicitly check against develop (not HEAD/upstream).
+  if git branch -d "$branch" develop 2>/dev/null; then
     echo "wt-close: branch deleted ✓"
   else
-    echo "Warning: branch '$branch' not fully merged, using -D..." >&2
+    echo "Warning: branch '$branch' not fully merged into develop, using -D..." >&2
     git branch -D "$branch" 2>/dev/null || true
   fi
 fi
