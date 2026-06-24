@@ -1,5 +1,7 @@
 # Code Review: I-20260624T152500Z-A
 
+- issue_id: I-20260624T152500Z-A
+
 ## Implementation Decision Note
 
 **Decision**: Add Step 2c to pr-create-guarded that calls pretests-retirement-gate before allowing PR creation. The check mirrors the exact pattern from wt-close (lines 320-346) using `--project` and `--worktree-path` flags.
