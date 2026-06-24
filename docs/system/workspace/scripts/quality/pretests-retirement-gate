@@ -101,8 +101,41 @@ if not pretests_gate.exists():
     print(f"[pretests_retirement_missing] missing gate: {pretests_gate}", file=sys.stderr)
     sys.exit(1)
 if not state_file.exists():
-    print(f"[pretests_retirement_state_missing] missing worker state: {state_file}", file=sys.stderr)
-    sys.exit(1)
+    print(f"[pretests_retirement_state_missing] missing worker state: {state_file}, falling back to worktree pre-tests scan", file=sys.stderr)
+    # Fallback: no worker metadata — scan worktree for pre-tests.md files and validate via pretests-gate
+    fallback_entries: list[tuple[str, str]] = []
+    worktree_epics = worktree / "docs" / "epics"
+    if worktree_epics.exists():
+        for pt_file in sorted(worktree_epics.glob("**/pre-tests.md")):
+            pt_rel = str(pt_file.relative_to(worktree))
+            esc_pt_rel = re.escape(pt_rel)
+            pt_pattern = re.compile(rf"^- pre_tests_path:\s*`?{esc_pt_rel}`?\s*$", re.MULTILINE)
+            for issue_file in worktree.glob("docs/epics/**/issues/*.md"):
+                try:
+                    text = issue_file.read_text()
+                except OSError:
+                    continue
+                if pt_pattern.search(text):
+                    fallback_entries.append((str(issue_file.relative_to(worktree)), pt_rel))
+                    break
+    if not fallback_entries:
+        print("[pretests_retirement_fallback_empty] no pre-tests.md with matching owner issue found in worktree docs/epics/", file=sys.stderr)
+        sys.exit(1)
+    fallback_failures = 0
+    for issue_path, pt_rel in fallback_entries:
+        cmd = [str(pretests_gate), "--project", str(worktree), "--issue", issue_path]
+        result = subprocess.run(cmd, text=True, capture_output=True)
+        combined_output = f"{result.stdout}\n{result.stderr}"
+        for line in combined_output.splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            if line.startswith("[pretests-gate]"):
+                continue
+            print(line, file=sys.stderr)
+        if result.returncode != 0:
+            fallback_failures += 1
+    sys.exit(1 if fallback_failures > 0 else 0)
 if not owner_issue and not recorded_pre_tests and not closeout_gate and not closeout_gate_command:
     print("[pretests_retirement_binding_missing] worker state does not record owner issue, pre-tests path, or closeout context", file=sys.stderr)
     sys.exit(1)
