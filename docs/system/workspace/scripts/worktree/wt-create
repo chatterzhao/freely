@@ -709,16 +709,9 @@ MSG
 │  测试时进入 test-pre-merge 工位:                          │
 │    cd $tp_target                                         │
 │                                                          │
-│  Fix first, govern later (代码先行, 治理后置):             │
-│    1. 在 test-pre-merge-* 改源码, stop/start daemon 验证    │
-│    2. cp 修改到 fix 工位, git commit                       │
-│    3. skill:freely-doc-B1_IBM-execution → raw → candidate  │
-│    4. skill:freely-doc-B2_IBM-execution → I-* → milestone  │
-│    5. skill:freely-dev-loop-execution → code-review + pre-tests │
-│    6. pr-create-guarded → test worktree verify      (test)  │
-│    6.5. pr-review-guarded → independent review gate            │
-│    7. pr-merge-guarded develop <fix-branch>       (merge) │
-│    8. wt-close <fix-branch>                               │
+│  请阅读 skill:${skill_name}                                 │
+│  按其规范流程的完整步骤执行。                                 │
+│  Skill 是流程的唯一权威来源——不依赖本提示的摘要。              │
 └──────────────────────────────────────────────────────────┘
 REMINDER
       ;;
@@ -733,14 +726,9 @@ REMINDER
 │  测试时进入 test-pre-merge 工位:                          │
 │    cd $tp_target                                         │
 │                                                          │
-│  Govern first, then code (治理先行, 代码后置):            │
-│    1. skill:freely-doc-B1_IBM-execution → raw → brainstorms → candidates │
-│    2. skill:freely-doc-B2_IBM-execution → materialize I-* → milestone │
-│    3. skill:freely-dev-loop-execution → implement + code-review + pre-tests │
-│    4. pr-create-guarded → test worktree verify           (test) │
-│    6.5. pr-review-guarded → independent review gate            │
-│    5. pr-merge-guarded develop <feature-branch>            (merge) │
-│    6. wt-close <feature-branch>                          │
+│  请阅读 skill:${skill_name}                                 │
+│  按其规范流程的完整步骤执行。                                 │
+│  Skill 是流程的唯一权威来源——不依赖本提示的摘要。              │
 └──────────────────────────────────────────────────────────┘
 REMINDER
       ;;
