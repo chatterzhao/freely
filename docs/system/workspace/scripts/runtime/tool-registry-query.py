@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Tool registry query helper. Reads tool-registry.toml (or .json5) and outputs values for bash.
+"""Tool registry query helper. Reads tool-registry.toml and outputs values for bash.
 
 Usage:
   python3 tool-registry-query.py <registry-path> <tool> dot.path.to.field
@@ -19,56 +19,7 @@ Examples:
 """
 
 import os
-import re
 import sys
-
-
-def _strip_json5(text: str) -> str:
-    """Strip // line comments and /* block comments */ from JSON5 text."""
-    result = []
-    in_string = False
-    in_block = False
-    escape = False
-    i = 0
-    while i < len(text):
-        ch = text[i]
-        if escape:
-            result.append(ch)
-            escape = False
-            i += 1
-            continue
-        if ch == '\\' and in_string:
-            result.append(ch)
-            escape = True
-            i += 1
-            continue
-        if ch == '"' and not in_block:
-            in_string = not in_string
-            result.append(ch)
-            i += 1
-            continue
-        if not in_string and not in_block and ch == '/' and i + 1 < len(text) and text[i + 1] == '/':
-            i += 2
-            while i < len(text) and text[i] != '\n':
-                i += 1
-            continue
-        if not in_string and not in_block and ch == '/' and i + 1 < len(text) and text[i + 1] == '*':
-            in_block = True
-            i += 2
-            continue
-        if in_block and ch == '*' and i + 1 < len(text) and text[i + 1] == '/':
-            in_block = False
-            i += 2
-            continue
-        if in_block:
-            i += 1
-            continue
-        result.append(ch)
-        i += 1
-
-    text = ''.join(result)
-    text = re.sub(r',\s*([}\]])', r'\1', text)
-    return text
 
 
 def _load_toml(path: str) -> dict:
@@ -76,21 +27,6 @@ def _load_toml(path: str) -> dict:
     import tomllib
     with open(path, 'rb') as f:
         return tomllib.load(f)
-
-
-def _load_json5(path: str) -> dict:
-    """Load a JSON5 file, returning dict of tool sections."""
-    import json
-    with open(path) as f:
-        return json.loads(_strip_json5(f.read()))
-
-
-def _load_registry(path: str) -> dict:
-    """Load registry from path, auto-detecting format (.toml vs .json5)."""
-    if path.endswith('.toml'):
-        return _load_toml(path)
-    else:
-        return _load_json5(path)
 
 
 def _merge_registries(system: dict, user: dict) -> dict:
@@ -105,7 +41,7 @@ def _merge_registries(system: dict, user: dict) -> dict:
 
 def _resolve_registry(registry_path: str) -> dict:
     """Load registry with file priority: ~/.freely/tool-registry.toml > system."""
-    data = _load_registry(registry_path)
+    data = _load_toml(registry_path)
 
     # Check for user override: ~/.freely/tool-registry.toml
     user_path = os.path.expanduser("~/.freely/tool-registry.toml")
