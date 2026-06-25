@@ -1,3 +1,19 @@
+## M-20260625T031400Z-A
+- title: feedback adapter fix
+- status: active
+### candidate_issues
+1. `C-20260625T031400Z-A`
+- milestone: M-20260625T031400Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260625T031400Z-A/issue.md`
+### committed_issues
+1. `I-20260625T031400Z-A`
+- title: feedback adapter fix
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260625T031400Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/feedback-adapter-fix/code-reviews`
+
 ## M-20260625T003331Z-A
 - title: feedback platform-only
 - status: active

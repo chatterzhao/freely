@@ -1,0 +1,8 @@
+- issue_id: I-20260625T031400Z-A
+- kind: fix
+- phase_state: completed
+- milestone: M-20260625T031400Z-A
+- source_candidate: docs/pre-brainstorms/20260625T031400Z--feedback-adapter-fix/candidates.md#C-20260625T031400Z-A
+- verification_artifact_dir: docs/epics/feedback-adapter-fix/code-reviews
+- canonical_issue_path: docs/issues/I-20260625T031400Z-A/issue.md
+- title: feedback adapter fix

@@ -23063,21 +23063,39 @@ HELP
 
   [[ -n "$_platforms" ]] || { log_error "no platforms detected. Set FREELY_REPO_PLATFORMS or add git remotes."; return 1; }
 
-  local _adapter="$SELF_ROOT/docs/system/workspace/scripts/sync/platform-adapter.py"
   local _created=0
 
   echo "[feedback] raw issue created: raw-${raw_key}"
   echo "[feedback] platforms: $_platforms"
 
   for _platform in ${_platforms//,/ }; do
-    local _result
-    _result=$(python3 "$_adapter" create-issue "$_platform" "[RAW-${stamp}] ${title}" "${body}" "kind/raw,phase/proposed" 2>&1) || true
-    local _url; _url=$(printf '%s\n' "$_result" | grep -o 'https://[^ ]*' | head -1 || true)
+    local _result _url
+    case "$_platform" in
+      github)
+        if command -v gh &>/dev/null; then
+          local _gh_repo; _gh_repo=$(gh repo view --json nameWithOwner -q '.nameWithOwner' 2>/dev/null || echo "")
+          if [[ -n "$_gh_repo" ]]; then
+            _result=$(gh issue create --repo "$_gh_repo" \
+              --title "[RAW-${stamp}] ${title}" --body "${body}" --label "kind/raw,phase/proposed" 2>&1) || true
+            _url=$(printf '%s\n' "$_result" | grep -o 'https://github.com/[^ ]*' | head -1 || true)
+          fi
+        fi
+        ;;
+      gitee)
+        local _gitee_repo; _gitee_repo=$(git remote -v 2>/dev/null | awk '/gitee.*\(push\)/ {n=split($2,a,"/"); sub(/\.git$/, "", a[n]); printf "%s/%s", a[n-1], a[n]; exit}')
+        if [[ -n "$_gitee_repo" ]] && [[ -x "$SELF_ROOT/docs/system/workspace/scripts/runtime/gitee-issue.py" ]]; then
+          _result=$(python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/gitee-issue.py" \
+            --repo "$_gitee_repo" create --title "[RAW-${stamp}] ${title}" --body "${body}" 2>&1) || true
+          _url=$(printf '%s\n' "$_result" | grep -o 'https://gitee.com/[^ ]*' | head -1 || true)
+        fi
+        ;;
+    esac
     if [[ -n "$_url" ]]; then
       echo "[feedback] $_platform: $_url"
       _created=1
     else
-      echo "[feedback] $_platform: FAILED -- $_result" >&2
+      echo "[feedback] $_platform: FAILED" >&2
+      [[ -n "$_result" ]] && echo "[feedback]   detail: $_result" >&2
     fi
   done
 
