@@ -1,8 +1,8 @@
 ---
 local_id: I-20260625T050000Z-A
 kind: linked
-status: in_dev
-phase_state: in_dev
+status: completed
+phase_state: completed
 promoted_from: raw-20260625T050000Z
 source_candidate: docs/issues/raw-20260625T050000Z/issue.md
 canonical_issue_path: docs/epics/pr-create-pull-after-gates/issues/I-20260625T050000Z-A.md

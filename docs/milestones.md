@@ -10,7 +10,7 @@
 1. `I-20260625T050000Z-A`
 - title: Move git pull in pr-create-guarded after all gates pass
 - milestone_state: committed
-- phase_state: `in_dev`
+- phase_state: `completed`
 - issue_path: `docs/epics/pr-create-pull-after-gates/issues/I-20260625T050000Z-A.md`
 - pre_tests_path: `docs/epics/pr-create-pull-after-gates/pre-tests.md`
 - verification_artifact_dir: `docs/epics/pr-create-pull-after-gates/code-reviews`
