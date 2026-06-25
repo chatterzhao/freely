@@ -13,7 +13,7 @@
 - actual_output: PASS
 - evidence_file: .freely/run/test-evidence/acceptance-1.log
 - blocker: (失败时填写)
-- status: passed
+- status: pass
 
 ### acceptance-2
 - acceptance_target: pretests-retirement-gate 包含 E2E/集成测试层级检查
@@ -25,7 +25,7 @@
 - actual_output: PASS
 - evidence_file: .freely/run/test-evidence/acceptance-2.log
 - blocker: (失败时填写)
-- status: passed
+- status: pass
 
 ## Unit
 - acceptance_target: 文本内容验证
