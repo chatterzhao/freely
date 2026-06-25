@@ -17,7 +17,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-absorbed_into: fix/raw-20260625T020000Z-gate-error-skill-pointers
+absorbed_into: I-20260625T020000Z-A
+source_candidate: docs/pre-brainstorms/20260625T020000Z--gate-error-skill-pointers/candidates.md#C-20260625T020000Z-A
 ---
 
 ## 问题
