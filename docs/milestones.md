@@ -1,3 +1,19 @@
+## M-20260625T222357Z-A
+- title: review in test-pre-merge + three-layer
+- status: active
+### candidate_issues
+1. `C-20260625T222357Z-A`
+- milestone: M-20260625T222357Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260625T222357Z-A/issue.md`
+### committed_issues
+1. `I-20260625T222357Z-A`
+- title: review in test-pre-merge
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260625T222357Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/review-test-worktree/code-reviews`
+
 ## M-20260625T061044Z-A
 - title: issue-sync batch before scan
 - status: active
