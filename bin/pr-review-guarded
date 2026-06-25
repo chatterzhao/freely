@@ -351,6 +351,15 @@ _platform_configs() {
   [[ "$fgt" == "1" ]] && echo "gitee"
 }
 
+
+_platform_remote_name() {
+  case "$1" in
+    gitee) git remote | grep -q '^gitee$' && echo "gitee" || echo "origin" ;;
+    *)     echo "$1" ;;
+  esac
+}
+
+
       remote=$(_platform_remote_name "$platform")
       echo "  [$platform] pushing review commit..."
       git -C "$ROOT_DIR" push "$remote" "$review_branch" 2>&1 || true
@@ -372,9 +381,3 @@ fi
 # ── Helpers ──────────────────────────────────────────────────
 
 
-_platform_remote_name() {
-  case "$1" in
-    gitee) git remote | grep -q '^gitee$' && echo "gitee" || echo "origin" ;;
-    *)     echo "$1" ;;
-  esac
-}
