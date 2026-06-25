@@ -1,5 +1,6 @@
 ## M-20260625T031400Z-A
 - title: feedback adapter fix
+- status: active
 ### candidate_issues
 1. `C-20260625T031400Z-A`
 - milestone: M-20260625T031400Z-A
