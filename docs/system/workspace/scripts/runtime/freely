@@ -22278,6 +22278,26 @@ REASON_GATE
   fi
 
   project="$(resolve_project_or_fail "$project")"
+
+  # Auto-detect platforms from git remotes and update FREELY_REPO_PLATFORMS in config.toml.
+  # This field is auto-maintained by freely start / daemon start — do not edit manually.
+  local _detected_platforms="" _found_gh=0 _found_gt=0
+  while IFS= read -r _remote; do
+    [[ -z "$_remote" || "$_remote" == "all" ]] && continue
+    local _url; _url=$(git -C "$project" remote get-url "$_remote" 2>/dev/null || true)
+    case "$_url" in
+      *github.com*|*github-*|*github*) _found_gh=1 ;;
+      *gitee.com*|*gitee-*|*gitee*)     _found_gt=1 ;;
+    esac
+  done < <(git -C "$project" remote 2>/dev/null)
+  [[ "$_found_gh" == "1" ]] && _detected_platforms="$_detected_platforms,github"
+  [[ "$_found_gt" == "1" ]] && _detected_platforms="$_detected_platforms,gitee"
+  _detected_platforms="${_detected_platforms#,}"
+  if [[ -n "$_detected_platforms" ]] && [[ "$_detected_platforms" != "${FREELY_REPO_PLATFORMS:-}" ]]; then
+    upsert_config_key "$project" "FREELY_REPO_PLATFORMS" "$_detected_platforms"
+    FREELY_REPO_PLATFORMS="$_detected_platforms"
+  fi
+
   # Ensure DB daemon is running before write_task_mode writes to SQLite.
   # write_task_mode calls freely-db-cli which needs the DB daemon's Unix socket.
   ensure_freely_db "$project"
@@ -22480,6 +22500,26 @@ REASON_GATE
   fi
 
   project="$(resolve_project_or_fail "$project")"
+
+  # Auto-detect platforms from git remotes and update FREELY_REPO_PLATFORMS in config.toml.
+  # This field is auto-maintained by freely start / daemon start — do not edit manually.
+  local _detected_platforms="" _found_gh=0 _found_gt=0
+  while IFS= read -r _remote; do
+    [[ -z "$_remote" || "$_remote" == "all" ]] && continue
+    local _url; _url=$(git -C "$project" remote get-url "$_remote" 2>/dev/null || true)
+    case "$_url" in
+      *github.com*|*github-*|*github*) _found_gh=1 ;;
+      *gitee.com*|*gitee-*|*gitee*)     _found_gt=1 ;;
+    esac
+  done < <(git -C "$project" remote 2>/dev/null)
+  [[ "$_found_gh" == "1" ]] && _detected_platforms="$_detected_platforms,github"
+  [[ "$_found_gt" == "1" ]] && _detected_platforms="$_detected_platforms,gitee"
+  _detected_platforms="${_detected_platforms#,}"
+  if [[ -n "$_detected_platforms" ]] && [[ "$_detected_platforms" != "${FREELY_REPO_PLATFORMS:-}" ]]; then
+    upsert_config_key "$project" "FREELY_REPO_PLATFORMS" "$_detected_platforms"
+    FREELY_REPO_PLATFORMS="$_detected_platforms"
+  fi
+
   # Ensure DB daemon is running before write_task_mode writes to SQLite.
   # write_task_mode calls freely-db-cli which needs the DB daemon's Unix socket.
   ensure_freely_db "$project"
@@ -23042,26 +23082,9 @@ HELP
   raw_key="$stamp"
   local_id="raw-${raw_key}"
 
-  # Detect platforms: config takes priority, fallback to git remote auto-detection
-  local _platforms=""
-  if [[ -n "${FREELY_REPO_PLATFORMS:-}" ]]; then
-    _platforms="${FREELY_REPO_PLATFORMS}"
-  else
-    local _found_github=0 _found_gitee=0
-    while IFS= read -r _remote; do
-      [[ -z "$_remote" || "$_remote" == "all" ]] && continue
-      local _url; _url=$(git remote get-url "$_remote" 2>/dev/null || true)
-      case "$_url" in
-        *github.com*|*github-*|*github*) _found_github=1 ;;
-        *gitee.com*|*gitee-*|*gitee*)     _found_gitee=1 ;;
-      esac
-    done < <(git remote)
-    [[ "$_found_github" == "1" ]] && _platforms="$_platforms,github"
-    [[ "$_found_gitee" == "1" ]] && _platforms="$_platforms,gitee"
-    _platforms="${_platforms#,}"
-  fi
-
-  [[ -n "$_platforms" ]] || { log_error "no platforms detected. Set FREELY_REPO_PLATFORMS or add git remotes."; return 1; }
+  # Platforms are auto-detected by freely start / daemon start and written to FREELY_REPO_PLATFORMS.
+  local _platforms="${FREELY_REPO_PLATFORMS:-}"
+  [[ -n "$_platforms" ]] || { log_error "no platforms configured. Run 'freely start' to auto-detect from git remotes."; return 1; }
 
   # Delegate to platform-adapter — handles all platforms based on FREELY_REPO_PLATFORMS
   local _adapter="$SELF_ROOT/docs/system/workspace/scripts/sync/platform-adapter.py"
