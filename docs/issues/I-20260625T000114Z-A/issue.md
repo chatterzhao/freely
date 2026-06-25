@@ -1,0 +1,8 @@
+- issue_id: I-20260625T000114Z-A
+- kind: fix
+- phase_state: completed
+- milestone: M-20260625T000114Z-A
+- source_candidate: docs/pre-brainstorms/20260625T000114Z--path-var-unify/candidates.md#C-20260625T000114Z-A
+- verification_artifact_dir: docs/epics/path-var-unify/code-reviews
+- canonical_issue_path: docs/issues/I-20260625T000114Z-A/issue.md
+- title: wt-close -D fix
