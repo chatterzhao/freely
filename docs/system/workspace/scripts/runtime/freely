@@ -22313,6 +22313,17 @@ REASON_GATE
     upsert_config_key "$project" "FREELY_REPO_PLATFORMS" "$_detected_platforms"
     FREELY_REPO_PLATFORMS="$_detected_platforms"
   fi
+	  # ── Issue-sync batch: clear deterministic sync tasks before scan ──
+	  # Handles close/update/pull without AI, leaving only novel cases for Manager.
+	  local _sync_bin="$project/bin/issue-sync"
+	  if [[ -x "$_sync_bin" ]]; then
+	    log_info "running issue-sync batch before daemon scan"
+	    bash "$_sync_bin" batch 2>&1 | while IFS= read -r _line; do
+	      log_info "issue-sync: $_line"
+	    done || log_warn "issue-sync batch completed with warnings"
+	  fi
+	  # ── End issue-sync batch ─────────────────────────────────────────
+
 
   # Ensure DB daemon is running before write_task_mode writes to SQLite.
   # write_task_mode calls freely-db-cli which needs the DB daemon's Unix socket.
