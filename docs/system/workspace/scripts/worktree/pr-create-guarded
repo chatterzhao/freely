@@ -144,6 +144,8 @@ if [[ -x "$ROOT_DIR/bin/governance-merge-gate" ]]; then
 ║    3. 还没有 → 按语义理解修正，不要凑字段                       ║
 ║    4. 理解全部错误再开始改，不要改一条验一条                     ║
 ║                                                              ║
+║  离开「对着错误凑」的习惯——门禁说缺什么，skill 说怎么做。         ║
+║                                                              ║
 ║  你的分支: $_flow_hint
 ║  应读 skill: $_skill_order
 ║                                                              ║
