@@ -113,28 +113,43 @@ if [[ -x "$ROOT_DIR/bin/governance-merge-gate" ]]; then
   gate_rc=$?
   set -e
   if [[ "$gate_rc" -ne 0 ]]; then
+	    # Detect fix vs feature branch to show correct skill flow
+	    local _flow_hint _skill_order
+	    case "$current_branch" in
+	      fix/*)
+	        _flow_hint="Fix first, govern later → 代码已实现，补 IBM 治理文档即可"
+	        _skill_order="先看 skill:freely-fix-execution（核心原则、工作流），再看 skill:freely-doc-B1_IBM-execution → skill:freely-doc-B2_IBM-execution"
+	        ;;
+	      feature/*)
+	        _flow_hint="Govern first, code later → 先完成 IBM 治理，再实现代码"
+	        _skill_order="先看 skill:freely-feat-execution（核心原则、工作流），再看 skill:freely-doc-B1_IBM-execution → skill:freely-doc-B2_IBM-execution"
+	        ;;
+	      *)
+	        _flow_hint="不确定 fix 或 feature，请查看工位分支名"
+	        _skill_order="参考 skill:freely-doc-B1_IBM-execution 和 skill:freely-doc-B2_IBM-execution"
+	        ;;
+	    esac
     cat >&2 <<GATE_BLOCKED
 
 ╔══════════════════════════════════════════════════════════════╗
 ║  [GOVERNANCE-GATE] IBM 治理门禁未通过                        ║
 ╠══════════════════════════════════════════════════════════════╣
 ║                                                              ║
-║  你的分支缺少完整的 IBM 生命周期治理文档。                     ║
-║  在创建 PR 之前，请先完成以下步骤:                             ║
+║  根因：未按 skill 规范流程完成治理，或格式不符合 skill 要求。     ║
 ║                                                              ║
-║  skill:freely-doc-B1_IBM-execution                           ║
-║    → raw issue → brainstorm → candidate → milestones.md       ║
+║  不要直接对着下方错误逐条改！                                   ║
+║  正确做法：                                                   ║
+║    1. 完整阅读 skill 的「门禁常见坑速查」→ 找匹配项             ║
+║    2. 坑速查没有 → 看 skill 中的模板/示例                     ║
+║    3. 还没有 → 按语义理解修正，不要凑字段                       ║
+║    4. 理解全部错误再开始改，不要改一条验一条                     ║
 ║                                                              ║
-║  skill:freely-doc-B2_IBM-execution                           ║
-║    → I-* issue → prd.md → tasks.md → pre-tests → code-review  ║
-║    → milestones.md committed_issues                           ║
-║                                                              ║
-║  详见 docs/system/workspace/ibm-framework.md                  ║
+║  你的分支: $_flow_hint
+║  应读 skill: $_skill_order
 ║                                                              ║
 ║  详细错误:                                                    ║
 ║  $gate_output
 ║                                                              ║
-║  修复后重新运行 ./bin/pr-create-guarded                       ║
 ╚══════════════════════════════════════════════════════════════╝
 
 GATE_BLOCKED
