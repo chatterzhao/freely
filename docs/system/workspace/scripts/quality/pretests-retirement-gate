@@ -176,14 +176,14 @@ if not state_file.exists():
             item_status = fields.get("status", "")
             item_output = fields.get("actual_output", "")
 
-            # Check GREEN: status must be pass or not_applicable
-            if item_status not in ("pass", "not_applicable"):
+            # Check GREEN: status must be pass/passed or not_applicable
+            if item_status not in ("pass", "passed", "not_applicable"):
                 print(f"[GATE] GREEN 未完成：{pt_rel} 中的 {item_id} 状态为 {item_status}。\n请阅读 skill:freely-test-execution，根据 pre-tests.md 设计的测试方案实际执行测试。\n不要改 status 字段假装通过——去跑测试，把真实结果写回 actual_output。", file=sys.stderr)
                 fallback_failures += 1
                 continue
 
             # Check GREEN: actual_output must be filled, not placeholder
-            if item_status == "pass" and (not item_output or item_output in ("(执行后填写)",)):
+            if item_status in ("pass", "passed") and (not item_output or item_output in ("(执行后填写)",)):
                 print(f"[GATE] GREEN 未完成：{pt_rel} 中的 {item_id} 未填写 actual_output。\n请阅读 skill:freely-test-execution，根据 pre-tests.md 设计的测试方案实际执行测试，把真实结果写回 actual_output 和 evidence_file。", file=sys.stderr)
                 fallback_failures += 1
 
