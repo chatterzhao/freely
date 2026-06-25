@@ -276,6 +276,7 @@ else
   _acp_used=0
   _review_verdict="pass"
   _review_summary="Legacy fallback — ACP bridge not running"
+  _review_json="{}"
 fi
 
 # Parse verdict
