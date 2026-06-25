@@ -101,8 +101,10 @@ if not pretests_gate.exists():
     print(f"[pretests_retirement_missing] missing gate: {pretests_gate}", file=sys.stderr)
     sys.exit(1)
 if not state_file.exists():
-    print(f"[pretests_retirement_state_missing] missing worker state: {state_file}, falling back to worktree pre-tests scan", file=sys.stderr)
-    # Fallback: no worker metadata — scan worktree for pre-tests.md files and validate via pretests-gate
+    print(f"[pretests_retirement_state_missing] missing worker state: {state_file}, falling back to manual GREEN check", file=sys.stderr)
+    # Fallback: no Worker metadata — scan worktree for pre-tests.md and check GREEN evidence directly.
+    # GREEN = actual_output is filled (not placeholder) AND status is "pass".
+    # This is separate from RED (document structure checked by IBM governance gate).
     fallback_entries: list[tuple[str, str]] = []
     worktree_epics = worktree / "docs" / "epics"
     if worktree_epics.exists():
@@ -119,22 +121,47 @@ if not state_file.exists():
                     fallback_entries.append((str(issue_file.relative_to(worktree)), pt_rel))
                     break
     if not fallback_entries:
-        print("[pretests_retirement_fallback_empty] no pre-tests.md with matching owner issue found in worktree docs/epics/", file=sys.stderr)
+        print("[pretests_retirement_fallback_empty] no pre-tests.md with matching owner issue found", file=sys.stderr)
         sys.exit(1)
+
+    # GREEN-only check: verify actual_output is filled for each acceptance item
     fallback_failures = 0
     for issue_path, pt_rel in fallback_entries:
-        cmd = [str(pretests_gate), "--project", str(worktree), "--issue", issue_path]
-        result = subprocess.run(cmd, text=True, capture_output=True)
-        combined_output = f"{result.stdout}\n{result.stderr}"
-        for line in combined_output.splitlines():
-            line = line.strip()
-            if not line:
-                continue
-            if line.startswith("[pretests-gate]"):
-                continue
-            print(line, file=sys.stderr)
-        if result.returncode != 0:
+        pt_full = worktree / pt_rel
+        try:
+            pt_text = pt_full.read_text()
+        except OSError:
+            print(f"[pretests_retirement_fallback_read_error] cannot read {pt_rel}", file=sys.stderr)
             fallback_failures += 1
+            continue
+
+        # Parse acceptance items
+        items = re.split(r"^###\s+", pt_text, flags=re.MULTILINE)[1:]
+        for item in items:
+            header = item.split("\n")[0].strip()
+            fields = {}
+            for key in ("id", "status", "actual_output"):
+                m = re.search(rf"^- {key}:\s*(.+?)\s*$", item, re.MULTILINE)
+                if m:
+                    fields[key] = m.group(1).strip()
+
+            item_id = fields.get("id", header)
+            item_status = fields.get("status", "")
+            item_output = fields.get("actual_output", "")
+
+            # Check GREEN: status must be pass or not_applicable
+            if item_status not in ("pass", "not_applicable"):
+                print(f"[pretests_retirement_green_missing] {pt_rel}: {item_id}: status='{item_status}', must be 'pass' or 'not_applicable'", file=sys.stderr)
+                fallback_failures += 1
+                continue
+
+            # Check GREEN: actual_output must be filled, not placeholder
+            if item_status == "pass" and (not item_output or item_output in ("(执行后填写)",)):
+                print(f"[pretests_retirement_green_missing] {pt_rel}: {item_id}: actual_output not filled — GREEN evidence missing. Execute skill:freely-test-execution or manually fill test results.", file=sys.stderr)
+                fallback_failures += 1
+
+    if fallback_failures > 0:
+        print(f"[pretests_retirement_green_missing] {fallback_failures} GREEN evidence gap(s) found. Fix before retrying.", file=sys.stderr)
     sys.exit(1 if fallback_failures > 0 else 0)
 if not owner_issue and not recorded_pre_tests and not closeout_gate and not closeout_gate_command:
     print("[pretests_retirement_binding_missing] worker state does not record owner issue, pre-tests path, or closeout context", file=sys.stderr)
