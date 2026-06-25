@@ -1,11 +1,6 @@
 ## M-20260625T050000Z-A
 - title: Move git pull in pr-create-guarded after all gates pass
 - status: active
-### candidate_issues
-1. `C-20260625T050000Z-A`
-- milestone: M-20260625T050000Z-A
-- status: promoted
-- promoted_issue_path: `docs/epics/pr-create-pull-after-gates/issues/I-20260625T050000Z-A.md`
 ### committed_issues
 1. `I-20260625T050000Z-A`
 - title: Move git pull in pr-create-guarded after all gates pass
