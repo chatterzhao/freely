@@ -371,6 +371,118 @@ else
   fi
 fi
 
+# ── Phase 1.5: Consistency check — dev and test worktrees must be synced ──
+# Only for fix|feature branches (skip orphaned, test-pre-merge, main, develop).
+# Prevent closing when test results would be lost.
+
+_consistency_check() {
+  local _dev_branch="$1" _dev_wt="$2"
+
+  # Skip if not a fix|feature branch
+  [[ "$_dev_branch" == fix/raw-* || "$_dev_branch" == feature/raw-* ]] || return 0
+
+  # Extract raw key
+  local _raw_key
+  _raw_key=$(echo "$_dev_branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)
+  [[ -n "$_raw_key" ]] || return 0
+
+  # Find test-pre-merge worktree
+  local _test_wt
+  _test_wt=$(git -C "$PROJECT_ROOT" worktree list --porcelain 2>/dev/null | awk -v k="test-pre-merge-$_raw_key" '
+    $1=="worktree" { wt=$2 }
+    $1=="branch" && $2 ~ k { print wt; exit }
+  ')
+  [[ -z "$_test_wt" || ! -d "$_test_wt" ]] && return 0  # no test worktree, skip
+
+  echo "wt-close: checking consistency between dev and test worktrees..."
+
+  # Check 1: dev worktree clean
+  if git -C "$_dev_wt" status --short 2>/dev/null | grep -q .; then
+    cat >&2 <<DIRTY_DEV
+╔══════════════════════════════════════════════════════════════╗
+║  ⚠️  wt-close blocked: 开发工位有未提交的修改                ║
+╠══════════════════════════════════════════════════════════════╣
+║  开发工位: $_dev_wt ($_dev_branch)
+║                                                              ║
+║  git 跟踪的文件必须提交。请处理后再 wt-close:                  ║
+║    cd $_dev_wt && git add -A && git commit
+║    git push && pr-review && wt-close
+╚══════════════════════════════════════════════════════════════╝
+DIRTY_DEV
+    exit 1
+  fi
+
+  # Check 2: test worktree clean
+  if git -C "$_test_wt" status --short 2>/dev/null | grep -q .; then
+    cat >&2 <<DIRTY_TEST
+╔══════════════════════════════════════════════════════════════╗
+║  ⚠️  wt-close blocked: 测试工位有未提交的测试结果            ║
+╠══════════════════════════════════════════════════════════════╣
+║  测试工位: $_test_wt (test-pre-merge-$_raw_key-*)
+║                                                              ║
+║  git 跟踪的文件必须提交。请处理后再 wt-close:                  ║
+║    cd $_test_wt && git add -A && git commit -m "test: results"
+║                                                              ║
+║  ⚠️  然后必须同步到开发工位，否则测试通过的代码会丢失:         ║
+║    cd $_dev_wt
+║    git cherry-pick \$(git -C $_test_wt log --format=%H --no-merges $_dev_branch..HEAD)
+║    git push && pr-review && wt-close
+╚══════════════════════════════════════════════════════════════╝
+DIRTY_TEST
+    exit 1
+  fi
+
+  # Check 3: test has commits not in dev (test results need cherry-pick)
+  local _missing
+  _missing=$(git -C "$_test_wt" log --oneline --no-merges "$_dev_branch..HEAD" 2>/dev/null || true)
+  if [[ -n "$_missing" ]]; then
+    cat >&2 <<NEED_CP
+╔══════════════════════════════════════════════════════════════╗
+║  ⚠️  wt-close blocked: 测试工位有提交未同步到开发工位        ║
+╠══════════════════════════════════════════════════════════════╣
+║  开发和对应测试工位不一致，会导致最后测试通过的开发里没有，白干。
+║                                                              ║
+║  开发工位: $_dev_wt ($_dev_branch)
+║  测试工位: $_test_wt (test-pre-merge-$_raw_key-*)
+║                                                              ║
+║  以下提交在测试工位但不在开发工位:                              ║
+║  $_missing
+║                                                              ║
+║  请用 cherry-pick 同步到开发工位:                              ║
+║    cd $_dev_wt
+║    git cherry-pick \$(git -C $_test_wt log --format=%H --no-merges $_dev_branch..HEAD)
+║    git push && pr-review && wt-close
+╚══════════════════════════════════════════════════════════════╝
+NEED_CP
+    exit 1
+  fi
+
+  # Check 4: dev has commits not in test (out of sync)
+  _missing=$(git -C "$_test_wt" log --oneline --no-merges "HEAD..$_dev_branch" 2>/dev/null || true)
+  if [[ -n "$_missing" ]]; then
+    cat >&2 <<NEED_MERGE
+╔══════════════════════════════════════════════════════════════╗
+║  ⚠️  wt-close blocked: 开发工位有提交未同步到测试工位        ║
+╠══════════════════════════════════════════════════════════════╣
+║  开发工位: $_dev_wt ($_dev_branch)
+║  测试工位: $_test_wt (test-pre-merge-$_raw_key-*)
+║                                                              ║
+║  以下提交在开发工位但不在测试工位:                              ║
+║  $_missing
+║                                                              ║
+║  请合并: cd $_test_wt && git merge $_dev_branch --no-edit
+║    git push && pr-review && wt-close
+╚══════════════════════════════════════════════════════════════╝
+NEED_MERGE
+    exit 1
+  fi
+
+  echo "wt-close: consistency check passed ✓"
+}
+
+cd "$PROJECT_ROOT" || { echo "Error: cannot cd to $PROJECT_ROOT" >&2; exit 1; }
+_consistency_check "$branch" "$wt_path"
+
 # ── Unmerged commits guard (--force) ──
 if [[ "$FORCE" == true ]]; then
   _ahead=$(git -C "$PROJECT_ROOT" rev-list --count develop.."$branch" 2>/dev/null || echo 0)
@@ -781,8 +893,8 @@ UNMERGED
 fi
 
 # ── Phase 6b: Cleanup companion test-pre-merge via raw-key ──
-# fix/raw-{raw_key}-{slug} and test-pre-merge-{raw_key}-{slug} share the same raw-key.
-# Derive the test-pre-merge branch from the fix branch name — no stored relationship needed.
+# fix|feature/raw-{raw_key}-{slug} and test-pre-merge-{raw_key}-{slug} share the same raw-key.
+# Derive the test-pre-merge branch from the fix|feature branch name — no stored relationship needed.
 if [[ "$branch" == fix/raw-* || "$branch" == feature/raw-* ]]; then
   _tp_raw_key=$(echo "$branch" | sed -n 's|.*/raw-\([0-9]\{8\}T[0-9]\{6\}Z\)-.*|\1|p')
   _tp_slug=$(echo "$branch" | sed -n 's|.*/raw-[0-9]\{8\}T[0-9]\{6\}Z-\(.*\)|\1|p')
