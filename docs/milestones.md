@@ -1,3 +1,18 @@
+## M-20260625T003331Z-A
+- title: feedback platform-only
+- status: active
+### candidate_issues
+1. `C-20260625T003331Z-A`
+- milestone: M-20260625T003331Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260625T003331Z-A/issue.md`
+### committed_issues
+1. `I-20260625T003331Z-A`
+- title: feedback platform-only
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260625T003331Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/feedback-platform-only/code-reviews`
 ## M-20260625T012435Z-A
 - title: test-pre-merge allow merges
 - status: active
