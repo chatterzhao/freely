@@ -12,15 +12,11 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-25T22:24:16Z'
-updated_at: '2026-06-25T22:24:16Z'
+updated_at: '2026-06-25T22:37:34Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-absorbed_into: I-20260625T222357Z-A
-source_candidate: docs/pre-brainstorms/20260625T222357Z--review-test-worktree/candidates.md#C-20260625T222357Z-A
-promoted_issue_path: docs/issues/I-20260625T222357Z-A/issue.md
-pre_tests_path: docs/epics/review-test-worktree/verification/pre-tests.md
 ---
 
 ## 设计

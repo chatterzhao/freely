@@ -4,7 +4,7 @@ set -euo pipefail
 # pr-review-guarded: TDD review gate between pr-create and pr-merge.
 #
 # Reviews in test-pre-merge worktree (the live test sandbox), not in the
-# fix/feature worktree.  This ensures the Reviewer sees actual evidence:
+# fix|feature worktree.  This ensures the Reviewer sees actual evidence:
 # committed pre-tests.md with actual_output, plus .freely/run/ evidence files.
 #
 # Pre-review checks (bash layer):
@@ -131,7 +131,7 @@ if ! git -C "$_test_wt" merge-base --is-ancestor "$review_branch" HEAD 2>/dev/nu
 ╔══════════════════════════════════════════════════════════════╗
 ║  ⚠️  Review blocked: test-pre-merge not synced with fix     ║
 ╠══════════════════════════════════════════════════════════════╣
-║  test-pre-merge does not contain fix/feature branch commits.         ║
+║  test-pre-merge does not contain fix|feature branch commits.         ║
 ║  Please merge fix/feature into test-pre-merge:                       ║
 ║    cd $_test_wt && git merge $review_branch --no-edit      ║
 ╚══════════════════════════════════════════════════════════════╝
