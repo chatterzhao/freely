@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# pr-create-guarded: pull latest develop → handle conflicts → dry-run gate → push → create PR
+# pr-create-guarded: rebase onto latest develop → handle conflicts → dry-run gate → push → create PR
 #
 # Usage:
 #   ./bin/pr-create-guarded [--title <title>] [--body <body>] [--base <branch>]
@@ -219,29 +219,31 @@ mkdir -p .freely/run
 echo "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > .freely/run/pr-create-gate-passed
 echo ""
 
-# ── Step 3: Pull latest develop (all gates passed, now sync before push) ──
-# Pull only executes when all local gates have passed.
-# Gate failures exit before reaching here — no wasted network round-trips during fix-retry cycles.
-echo "Step 3/4: pulling latest $base into $current_branch..."
-if ! git pull origin "$base" 2>&1; then
+# ── Step 3: Rebase onto latest develop (all gates passed, now sync before push) ──
+# Rebase replays each commit individually onto the latest base, preventing a single
+# merge commit from crossing checkpoint-guard scope budgets when develop has files
+# from other merged PRs. Conflicts surface per-commit instead of all at once.
+echo "Step 3/4: rebasing $current_branch onto latest $base..."
+if ! git pull --rebase origin "$base" 2>&1; then
   conflicted_files=$(git diff --name-only --diff-filter=U 2>/dev/null || true)
   cat >&2 <<CONFLICT
 ========================================
-冲突: $base 合并到 $current_branch 时出现冲突
+冲突: $current_branch rebase 到 $base 时出现冲突
 
 冲突文件:
 $(if [[ -n "$conflicted_files" ]]; then echo "$conflicted_files" | sed 's/^/  /'; else echo "  (无法列出冲突文件，请执行 git status 查看)"; fi)
 
 解决方案（二选一）:
 
-  方案A: 手动解决冲突
-    git mergetool          # 或用编辑器手动编辑冲突文件
+  方案A: 手动解决冲突后继续 rebase
+    # 编辑冲突文件，解决冲突
     git add <resolved-files>
-    git commit
+    git rebase --continue     # 继续 rebase
+    # 如果还有冲突，重复上述步骤直到 rebase 完成
     ./bin/pr-create-guarded  # 重新运行
 
-  方案B: 放弃本次合并
-    git merge --abort      # 回到合并前状态
+  方案B: 放弃本次 rebase
+    git rebase --abort       # 回到 rebase 前状态
     # 修复冲突根源后重新运行
     ./bin/pr-create-guarded
 
@@ -330,7 +332,7 @@ for platform in $platforms; do
 
   # Push branch to this platform
   echo "  [$platform] pushing branch..."
-  if git push "$remote" "$current_branch" 2>&1; then
+  if git push --force-with-lease "$remote" "$current_branch" 2>&1; then
     pushed_any=1
     echo "  [$platform] push ✓"
   else
