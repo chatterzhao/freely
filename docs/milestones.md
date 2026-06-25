@@ -1,3 +1,19 @@
+## M-20260624T235907Z-A
+- title: anti-cheating gate
+- status: active
+### candidate_issues
+1. `C-20260624T235907Z-A`
+- milestone: M-20260624T235907Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T235907Z-A/issue.md`
+### committed_issues
+1. `I-20260624T235907Z-A`
+- title: anti-cheating gate
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260624T235907Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/anti-cheating-gate/code-reviews`
+
 ## M-20260625T081835Z-A
 - title: config read fix
 - status: active
