@@ -355,6 +355,8 @@ _platform_configs() {
 _platform_remote_name() {
   case "$1" in
     gitee) git remote | grep -q '^gitee$' && echo "gitee" || echo "origin" ;;
+
+
     *)     echo "$1" ;;
   esac
 }
