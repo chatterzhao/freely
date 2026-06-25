@@ -5648,13 +5648,29 @@ sync_project_tooling_from_source() {
     fi
   fi
 
-  mkdir -p "$(dirname "$target_cfg")"
-  cp "$source_cfg" "$target_cfg"
-  rewrite_synced_project_config_for_target "$source_project" "$target_project"
-  sync_repo_hook_assets_from_source "$source_project" "$target_project"
-  load_config "$target_project"
-  materialize_project_tooling_for_loaded_config "$target_project" "true"
-  log_info "synced project-local tooling: $source_project -> $target_project"
+	  mkdir -p "$(dirname "$target_cfg")"
+	  cp "$source_cfg" "$target_cfg"
+	  rewrite_synced_project_config_for_target "$source_project" "$target_project"
+	  # ── Agent-table slot assignment ──────────────────────────
+	  _agent_table="$source_project/.freely/agent-table.toml"
+	  _agent_query="$source_project/bin/agent-table-query"
+	  if [[ -f "$_agent_table" && -x "$_agent_query" ]]; then
+	    _next_worker="$("$_agent_query" --project "$source_project" --list worker 2>/dev/null | head -1 || true)"
+	    if [[ -n "$_next_worker" ]]; then
+	      _worker_slot="$("$_agent_query" --project "$source_project" --get-slot "$_next_worker" 2>/dev/null || true)"
+	      if [[ -n "$_worker_slot" ]]; then
+	        _tmp_cfg="$(mktemp "${target_cfg}.agent.XXXXXX")"
+	        sed "s/^AI_TOOL = .*$/AI_TOOL = \"$_worker_slot\"/" "$target_cfg" > "$_tmp_cfg"
+	        mv "$_tmp_cfg" "$target_cfg"
+	        log_info "agent-table: assigned $_next_worker slot=$_worker_slot to $target_project"
+	      fi
+	    fi
+	  fi
+	  # ── End agent-table slot assignment ──────────────────────
+	  sync_repo_hook_assets_from_source "$source_project" "$target_project"
+	  load_config "$target_project"
+	  materialize_project_tooling_for_loaded_config "$target_project" "true"
+	  log_info "synced project-local tooling: $source_project -> $target_project"
 }
 
 write_project_codex_config() {

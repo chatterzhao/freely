@@ -1,0 +1,219 @@
+#!/usr/bin/env python3
+"""agent-table-query — query .freely/agent-table.toml for agent instances.
+
+Usage:
+  agent-table-query --list <role>                        list all IDs for a role
+  agent-table-query --get <id>                           get full agent entry
+  agent-table-query --get-slot <id>                      get slot for an agent
+  agent-table-query --get-reviewer <worker_id>           get reviewer_id+slot for worker
+  agent-table-query --next-available <role>              get next free agent ID
+  agent-table-query --mark-busy <id>                     mark agent as busy
+  agent-table-query --mark-free <id>                     mark agent as free
+  agent-table-query --expand-pools                       print expanded agent list
+
+Agent Table Format (.freely/agent-table.toml):
+
+  [[agents]]
+  manager_id = "manager_01"
+  manager_slot = "claude-apikey-ds-pro-auto"
+  worktree = "develop"
+
+  [[agent_pools]]
+  role = "worker"
+  count = 3
+  worker_slot = "claude-apikey-ds-pro-auto"
+  reviewer_slot = "claude-apikey-ds-pro-auto"
+
+Pool expands to: worker_01, worker_02, worker_03 paired with
+reviewer_01, reviewer_02, reviewer_03 respectively.
+"""
+
+import argparse
+import json
+import os
+import re
+import sys
+from pathlib import Path
+from typing import Optional
+
+# Python 3.11+ has tomllib; fall back to tomli for older versions
+try:
+    import tomllib
+except ImportError:
+    try:
+        import tomli as tomllib
+    except ImportError:
+        print("ERROR: requires Python 3.11+ or 'pip install tomli'", file=sys.stderr)
+        sys.exit(1)
+
+
+def _find_table(project: str = "") -> Path:
+    """Find agent-table.toml in project .freely/ directory."""
+    roots = []
+    if project:
+        roots.append(Path(project))
+    # Also try git root
+    try:
+        import subprocess
+        r = subprocess.check_output(
+            ["git", "rev-parse", "--show-toplevel"],
+            text=True, stderr=subprocess.DEVNULL
+        ).strip()
+        if r:
+            roots.append(Path(r))
+    except Exception:
+        pass
+    roots.append(Path.cwd())
+
+    for root in roots:
+        path = root / ".freely" / "agent-table.toml"
+        if path.exists():
+            return path
+    raise FileNotFoundError("agent-table.toml not found in .freely/")
+
+
+def parse_table(project: str = "") -> dict:
+    """Parse agent-table.toml into expanded agent dict + raw data."""
+    path = _find_table(project)
+    with open(path, "rb") as f:
+        raw = tomllib.load(f)
+
+    result = {
+        "path": str(path),
+        "agents": {},      # id -> {id, role, slot, ...}
+        "pools": [],       # raw pool entries
+        "expanded": {},    # expanded agent instances
+    }
+
+    # Parse [[agents]] — singleton entries
+    for entry in raw.get("agents", []):
+        agent = dict(entry)
+        # Detect role from field name: {role}_id
+        for key in list(agent.keys()):
+            if key.endswith("_id"):
+                role = key[:-3]  # e.g. "manager_id" -> "manager"
+                agent["role"] = role
+                agent["id"] = agent[key]
+                agent["slot"] = agent.get(f"{role}_slot", "")
+                result["agents"][agent["id"]] = agent
+                result["expanded"][agent["id"]] = agent
+                break
+
+    # Parse [[agent_pools]] — expand into individual agents
+    for pool in raw.get("agent_pools", []):
+        result["pools"].append(dict(pool))
+        role = pool.get("role", "worker")
+        count = int(pool.get("count", 1))
+        worker_slot = pool.get(f"{role}_slot", "")
+        reviewer_slot = pool.get("reviewer_slot", "")
+        has_reviewer = "reviewer_slot" in pool
+
+        for i in range(1, count + 1):
+            worker_id = f"{role}_{i:02d}"
+            worker_agent = {
+                "id": worker_id,
+                "role": role,
+                "slot": worker_slot,
+            }
+            result["expanded"][worker_id] = worker_agent
+
+            if has_reviewer:
+                reviewer_id = f"reviewer_{i:02d}"
+                reviewer_agent = {
+                    "id": reviewer_id,
+                    "role": "reviewer",
+                    "slot": reviewer_slot,
+                    "parent_worker": worker_id,
+                }
+                result["expanded"][reviewer_id] = reviewer_agent
+                worker_agent["reviewer_id"] = reviewer_id
+
+    return result
+
+
+def list_agents(data: dict, role: str) -> list:
+    """List all agent IDs for a given role."""
+    return [
+        a["id"] for a in data["expanded"].values()
+        if a.get("role") == role
+    ]
+
+
+def get_agent(data: dict, agent_id: str) -> Optional[dict]:
+    """Get full agent entry by ID."""
+    return data["expanded"].get(agent_id)
+
+
+def get_slot(data: dict, agent_id: str) -> str:
+    """Get slot for an agent."""
+    agent = data["expanded"].get(agent_id)
+    return agent.get("slot", "") if agent else ""
+
+
+def get_reviewer(data: dict, worker_id: str) -> Optional[dict]:
+    """Get reviewer info for a worker."""
+    worker = data["expanded"].get(worker_id)
+    if not worker or "reviewer_id" not in worker:
+        return None
+    reviewer_id = worker["reviewer_id"]
+    reviewer = data["expanded"].get(reviewer_id)
+    return reviewer
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Query Freely Agent Table")
+    parser.add_argument("--project", default="", help="Project root path")
+    parser.add_argument("--list", metavar="ROLE", help="List all agent IDs for a role")
+    parser.add_argument("--get", metavar="ID", help="Get full agent entry by ID")
+    parser.add_argument("--get-slot", metavar="ID", help="Get slot for an agent ID")
+    parser.add_argument("--get-reviewer", metavar="WORKER_ID", help="Get reviewer for a worker")
+    parser.add_argument("--expand-pools", action="store_true", help="Print expanded agent table")
+    parser.add_argument("--json", action="store_true", help="Output as JSON")
+
+    args = parser.parse_args()
+    try:
+        data = parse_table(args.project)
+    except FileNotFoundError as e:
+        print(f"ERROR: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    if args.list:
+        ids = list_agents(data, args.list)
+        if args.json:
+            print(json.dumps(ids))
+        else:
+            for i in ids:
+                print(i)
+    elif args.get:
+        agent = get_agent(data, args.get)
+        if agent:
+            print(json.dumps(agent, indent=2) if args.json else json.dumps(agent))
+        else:
+            print(f"ERROR: agent '{args.get}' not found", file=sys.stderr)
+            sys.exit(1)
+    elif args.get_slot:
+        slot = get_slot(data, args.get_slot)
+        if slot:
+            print(slot)
+        else:
+            sys.exit(1)
+    elif args.get_reviewer:
+        rev = get_reviewer(data, args.get_reviewer)
+        if rev:
+            print(json.dumps(rev, indent=2) if args.json else json.dumps(rev))
+        else:
+            print(f"ERROR: no reviewer for worker '{args.get_reviewer}'", file=sys.stderr)
+            sys.exit(1)
+    elif args.expand_pools:
+        if args.json:
+            print(json.dumps(data["expanded"], indent=2))
+        else:
+            for aid, a in sorted(data["expanded"].items()):
+                extra = f" reviewer={a['reviewer_id']}" if "reviewer_id" in a else ""
+                print(f"  {aid:20s} role={a['role']:10s} slot={a['slot']}{extra}")
+    else:
+        parser.print_help()
+
+
+if __name__ == "__main__":
+    main()
