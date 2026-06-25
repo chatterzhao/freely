@@ -183,17 +183,22 @@ if [[ -x "$ROOT_DIR/bin/pretests-retirement-gate" ]]; then
     cat >&2 <<PRETEST_GATE_BLOCKED
 
 ╔══════════════════════════════════════════════════════════════╗
-║  [PRETESTS-GATE] Pretests 执行证据检查未通过                   ║
+║  [PRETESTS-GATE] 测试门禁未通过                               ║
 ╠══════════════════════════════════════════════════════════════╣
 ║                                                              ║
-║  当前分支缺少 pretests 执行证据。                               ║
-║  在创建 PR 之前，请先完成测试验证。                               ║
+║  测试分为两个阶段，缺一不可：                                    ║
 ║                                                              ║
-║  skill:freely-test-execution                                  ║
-║    → 在 test-pre-merge 工位中逐条执行 pre-tests.md 的          ║
-║      test_command                                             ║
-║    → 收集 actual_output 和 evidence                            ║
-║    → 全绿后重新运行 ./bin/pr-create-guarded                   ║
+║  RED — 测试方案设计（B2_IBM 产物）:                              ║
+║    阅读 skill:freely-doc-B2_IBM-execution                      ║
+║    根据本次修改目标，在 pre-tests.md 中设计合理的测试方案            ║
+║    方案应根据改动类型选择：AI 相关 md、测试脚本、端到端测试             ║
+║                                                              ║
+║  GREEN — 测试执行证据（test-execution 产物）:                     ║
+║    阅读 skill:freely-test-execution                             ║
+║    根据 pre-tests.md 设计的方案实际执行测试                         ║
+║    不要改 status 字段假装通过——去跑测试，写回真实结果                 ║
+║                                                              ║
+║  离开「对着错误凑字段」的习惯——门禁说缺什么，skill 说怎么做。         ║
 ║                                                              ║
 ║  详细错误:                                                    ║
 ║  $_gate_output
