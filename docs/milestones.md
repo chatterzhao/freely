@@ -1,3 +1,19 @@
+## M-20260625T020000Z-A
+- title: gate error skill guidance
+- status: active
+### candidate_issues
+1. `C-20260625T020000Z-A`
+- milestone: M-20260625T020000Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260625T020000Z-A/issue.md`
+### committed_issues
+1. `I-20260625T020000Z-A`
+- title: gate error skill guidance
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260625T020000Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/gate-error-skill-pointers/code-reviews`
+
 ## M-20260625T050000Z-A
 - title: Move git pull in pr-create-guarded after all gates pass
 - status: active
