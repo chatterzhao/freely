@@ -1,3 +1,19 @@
+## M-20260625T061044Z-A
+- title: issue-sync batch before scan
+- status: active
+### candidate_issues
+1. `C-20260625T061044Z-A`
+- milestone: M-20260625T061044Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260625T061044Z-A/issue.md`
+### committed_issues
+1. `I-20260625T061044Z-A`
+- title: issue-sync batch before scan
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260625T061044Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/issue-sync-batch/code-reviews`
+
 ## M-20260625T044836Z-A
 - title: issue-sync filter skip closed
 - status: active
