@@ -133,7 +133,7 @@ if ! git -C "$_test_wt" merge-base --is-ancestor "$review_branch" HEAD 2>/dev/nu
 ╠══════════════════════════════════════════════════════════════╣
 ║  test-pre-merge does not contain fix branch commits.         ║
 ║  Please merge fix into test-pre-merge:                       ║
-║    cd $_test_wt && git merge $_review_branch --no-edit      ║
+║    cd $_test_wt && git merge $review_branch --no-edit      ║
 ╚══════════════════════════════════════════════════════════════╝
 SYNC
   exit 1
