@@ -1,3 +1,19 @@
+## M-20260625T044836Z-A
+- title: issue-sync filter skip closed
+- status: active
+### candidate_issues
+1. `C-20260625T044836Z-A`
+- milestone: M-20260625T044836Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260625T044836Z-A/issue.md`
+### committed_issues
+1. `I-20260625T044836Z-A`
+- title: issue-sync filter skip closed
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260625T044836Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/issue-sync-filter/code-reviews`
+
 ## M-20260625T152446Z-A
 - title: pr-review-guarded ACP TDD Reviewer
 - status: active

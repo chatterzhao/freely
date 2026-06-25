@@ -744,27 +744,36 @@ cmd_batch() {
   last_scan=$(_scan_state_get "last_sync_at")
   echo "[issue-sync] batch: last sync = ${last_scan:-never}"
 
-  # Collect all issue files into an array first (use temp file to preserve null bytes)
-  local _tmp
-  _tmp=$(mktemp /tmp/issue-sync-batch.XXXXXX)
-  find "$ISSUES_DIR" -name "issue.md" -print0 2>/dev/null > "$_tmp"
-  while IFS= read -r -d '' issue_file; do
-    [[ -n "$issue_file" ]] || continue
-    local dir local_id
-    dir=$(dirname "$issue_file")
-    local_id=$(basename "$dir")
-    [[ "$local_id" == raw-* || "$local_id" == I-* ]] || continue
-    issue_files+=("$issue_file")
-    total=$((total + 1))
-  done < "$_tmp"
-  rm -f "$_tmp"
+	  # Collect all issue files into an array first (use temp file to preserve null bytes)
+	  # Filter: skip issues where local platform_state is already closed
+	  # (fully synced — no action needed). This reduces scan volume from ~200
+	  # to ~10-20 inconsistent issues.
+	  local _tmp _skipped=0
+	  _tmp=$(mktemp /tmp/issue-sync-batch.XXXXXX)
+	  find "$ISSUES_DIR" -name "issue.md" -print0 2>/dev/null > "$_tmp"
+	  while IFS= read -r -d '' issue_file; do
+	    [[ -n "$issue_file" ]] || continue
+	    local dir local_id
+	    dir=$(dirname "$issue_file")
+	    local_id=$(basename "$dir")
+	    [[ "$local_id" == raw-* || "$local_id" == I-* ]] || continue
+	    # Skip fully-synced: platform_state=closed means both sides agree
+	    local _pstate; _pstate=$(_fm_get "$issue_file" "platform_state")
+	    if [[ "$_pstate" == "closed" ]]; then
+	      _skipped=$((_skipped + 1))
+	      continue
+	    fi
+	    issue_files+=("$issue_file")
+	    total=$((total + 1))
+	  done < "$_tmp"
+	  rm -f "$_tmp"
 
-  if [[ "$total" -eq 0 ]]; then
-    echo "[issue-sync] batch: no issues found"
-    return 0
-  fi
+	  if [[ "$total" -eq 0 ]]; then
+	    echo "[issue-sync] batch: no issues to sync (skipped $_skipped already closed)"
+	    return 0
+	  fi
 
-  echo "[issue-sync] batch: $total issue(s) to process, batch_size=$batch_size"
+	  echo "[issue-sync] batch: $total issue(s) to process ($_skipped skipped as closed), batch_size=$batch_size"
 
   for issue_file in "${issue_files[@]}"; do
     local dir local_id

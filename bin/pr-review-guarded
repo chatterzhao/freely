@@ -418,6 +418,14 @@ _platform_configs() {
   [[ "$found_gitee" == "1" ]] && echo "gitee"
 }
 
+_platform_remote_name() {
+  case "$1" in
+    gitee) git remote | grep -q '^gitee$' && echo "gitee" || echo "origin" ;;
+    *)     echo "$1" ;;
+  esac
+}
+
+
     for platform in $(_platform_configs); do
       remote=$(_platform_remote_name "$platform")
       echo "  [$platform] pushing review commit..."
@@ -464,9 +472,3 @@ fi
 # ── Helper functions ────────────────────────────────────────
 
 
-_platform_remote_name() {
-  case "$1" in
-    gitee) git remote | grep -q '^gitee$' && echo "gitee" || echo "origin" ;;
-    *)     echo "$1" ;;
-  esac
-}
