@@ -1,0 +1,15 @@
+Script flow verification for pr-create-guarded pull reorder
+
+Check: git pull origin develop still appears in the script
+Result: PASS — pull command found
+
+Check: git pull is NOT at Step 1 (before any gate)
+Result: PASS — Step 1 no longer contains pull
+
+Check: git pull appears after gate-passed marker (Step 3 area)
+Result: PASS — pull is between gate-passed and push
+
+Check: All gate paths exit 1 before pull
+Result: PASS — each gate (clean, phase_state, dry-run, IBM, pretests) exits 1
+
+Date: 2026-06-25

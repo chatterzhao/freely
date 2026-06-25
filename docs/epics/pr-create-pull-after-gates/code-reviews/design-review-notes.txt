@@ -1,0 +1,25 @@
+Design Review Notes — I-20260625T050000Z-A
+
+Change: Move git pull from Step 1 to Step 3 in pr-create-guarded
+
+Rationale:
+- Gates are all local checks (clean, phase_state, dry-run, IBM, pretests)
+- Pull at Step 1 wastes network round-trips on every gate failure retry
+- Only push needs up-to-date remote state
+- Pull + push adjacent at Step 3 forms a tight fetch-and-push sequence
+
+Risk:
+- Low. Pure reorder of existing logic. No new gates, no new external calls.
+- If remote diverged significantly between Step 1 and Step 3 (possible only in
+  manual or concurrent scenarios), pull could introduce merge conflicts. Same
+  risk as pull-at-Step-1, just later.
+
+Gate exit verification:
+- clean check: git status --porcelain must be empty → exit 1 if dirty
+- phase_state check: must be in_dev/completed → exit 1 if not
+- dry-run: --dry-run or gate-skip flags → exit 1 if block
+- IBM governance gate: governance-check script → exit 1 if fails
+- pretests gate: pretests-retirement-gate → exit 1 if fails
+- All precede the pull at Step 3
+
+Conclusion: APPROVED. No semantic change, only efficiency improvement.

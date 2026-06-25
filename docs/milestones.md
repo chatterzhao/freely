@@ -1,3 +1,22 @@
+## M-20260625T050000Z-A
+- title: Move git pull in pr-create-guarded after all gates pass
+- status: active
+### candidate_issues
+1. `I-20260625T050000Z-A`
+- milestone: M-20260625T050000Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/pr-create-pull-after-gates/issues/I-20260625T050000Z-A.md`
+### committed_issues
+1. `I-20260625T050000Z-A`
+- title: Move git pull in pr-create-guarded after all gates pass
+- milestone_state: committed
+- phase_state: `in_dev`
+- issue_path: `docs/epics/pr-create-pull-after-gates/issues/I-20260625T050000Z-A.md`
+- pre_tests_path: `docs/epics/pr-create-pull-after-gates/pre-tests.md`
+- verification_artifact_dir: `docs/epics/pr-create-pull-after-gates/code-reviews`
+- tasks_path: `docs/epics/pr-create-pull-after-gates/tasks.md`
+- source_candidate: `docs/issues/raw-20260625T050000Z/issue.md`
+
 ## M-20260624T152500Z-A
 - title: Add pretests evidence check to pr-create-guarded
 - status: active
