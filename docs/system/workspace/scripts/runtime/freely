@@ -23042,56 +23042,51 @@ HELP
   raw_key="$stamp"
   local_id="raw-${raw_key}"
 
-  # Create local issue file under docs/issues/
-  issue_dir="$SELF_ROOT/docs/issues/$local_id"
-  issue_file="$issue_dir/issue.md"
-  local created_at_iso; created_at_iso=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-
-  mkdir -p "$issue_dir"
-  cat > "$issue_file" <<MDFILE
----
-local_id: $local_id
-id: $local_id
-kind: raw
-title: '$title'
-phase_state: proposed
-severity: $severity
-source: feedback
-created_at: '$created_at_iso'
-platform_ids: {}
----
-
-$body
-MDFILE
-
-  echo "[feedback] local issue file created: $issue_file"
-
-  # Delegate to issue-sync for platform creation (handles GitHub + Gitee + future platforms)
-  issue_sync_bin="$SELF_ROOT/bin/issue-sync"
-  if [[ ! -x "$issue_sync_bin" ]]; then
-    log_error "issue-sync not found or not executable: $issue_sync_bin"
-    log_error "local issue file exists at $issue_file — create platform issue manually or fix issue-sync"
-    return 1
+  # Detect platforms: config takes priority, fallback to git remote auto-detection
+  local _platforms=""
+  if [[ -n "${FREELY_REPO_PLATFORMS:-}" ]]; then
+    _platforms="${FREELY_REPO_PLATFORMS}"
+  else
+    local _found_github=0 _found_gitee=0
+    while IFS= read -r _remote; do
+      [[ -z "$_remote" || "$_remote" == "all" ]] && continue
+      local _url; _url=$(git remote get-url "$_remote" 2>/dev/null || true)
+      case "$_url" in
+        *github.com*|*github-*|*github*) _found_github=1 ;;
+        *gitee.com*|*gitee-*|*gitee*)     _found_gitee=1 ;;
+      esac
+    done < <(git remote)
+    [[ "$_found_github" == "1" ]] && _platforms="$_platforms,github"
+    [[ "$_found_gitee" == "1" ]] && _platforms="$_platforms,gitee"
+    _platforms="${_platforms#,}"
   fi
 
-  sync_result=$(bash "$issue_sync_bin" create "$local_id" 2>&1) || {
-    log_error "issue-sync create failed — local issue file saved at $issue_file"
-    echo "[feedback] issue-sync output: $sync_result" >&2
-    printf 'raw-%s\n' "$raw_key"
-    return 1
-  }
+  [[ -n "$_platforms" ]] || { log_error "no platforms detected. Set FREELY_REPO_PLATFORMS or add git remotes."; return 1; }
 
-  echo "$sync_result"
-  echo "[feedback]"
-  echo "[feedback] raw issue created: $local_id"
+  local _adapter="$SELF_ROOT/docs/system/workspace/scripts/sync/platform-adapter.py"
+  local _created=0
+
+  echo "[feedback] raw issue created: raw-${raw_key}"
+  echo "[feedback] platforms: $_platforms"
+
+  for _platform in ${_platforms//,/ }; do
+    local _result
+    _result=$(python3 "$_adapter" create-issue "$_platform" "[RAW-${stamp}] ${title}" "${body}" "kind/raw,phase/proposed" 2>&1) || true
+    local _url; _url=$(printf '%s\n' "$_result" | grep -o 'https://[^ ]*' | head -1 || true)
+    if [[ -n "$_url" ]]; then
+      echo "[feedback] $_platform: $_url"
+      _created=1
+    else
+      echo "[feedback] $_platform: FAILED -- $_result" >&2
+    fi
+  done
+
+  [[ "$_created" == "1" ]] || { echo "[feedback] WARNING: no platform issue created" >&2; }
+
   echo "[feedback]"
   echo "[feedback] Next: create a worktree to fix or implement:"
-  echo "[feedback]   Bug fix:  wt-create --raw-key ${raw_key} --source platform --skill freely-fix-execution --slug <slug>"
-  echo "[feedback]   Feature:  wt-create --raw-key ${raw_key} --source platform --skill freely-feat-execution --slug <slug>"
-  echo "[feedback]"
-  echo "[feedback] After wt-create, follow the skill to complete the work:"
-  echo "[feedback]   skill:freely-fix-execution  — Fix first, govern later"
-  echo "[feedback]   skill:freely-feat-execution — Govern first, then code"
+  echo "[feedback]   wt-create --raw-key ${raw_key} --source platform --skill freely-fix-execution --slug <slug>"
+  echo "[feedback]   wt-create --raw-key ${raw_key} --source platform --skill freely-feat-execution --slug <slug>"
 
   printf 'raw-%s\n' "$raw_key"
 }
