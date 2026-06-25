@@ -12,13 +12,11 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-24T23:59:07Z'
-updated_at: '2026-06-25T08:00:00Z'
+updated_at: '2026-06-25T08:56:37Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
-absorbed_into: I-20260624T235907Z-A
-source_candidate: docs/pre-brainstorms/20260624T235907Z--red-green-separation/candidates.md#C-20260624T235907Z-A
 ---
 
 ## 问题

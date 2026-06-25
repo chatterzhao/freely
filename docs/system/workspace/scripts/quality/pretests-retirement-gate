@@ -187,6 +187,19 @@ if not state_file.exists():
                 print(f"[GATE] GREEN 未完成：{pt_rel} 中的 {item_id} 未填写 actual_output。\n请阅读 skill:freely-test-execution，根据 pre-tests.md 设计的测试方案实际执行测试，把真实结果写回 actual_output 和 evidence_file。", file=sys.stderr)
                 fallback_failures += 1
 
+    # Anti-cheating: if all items are mock/not_applicable with no real evidence, hard-reject
+    _cheat_total = len(items)
+    _cheat_mock = sum(1 for it in items if re.search(r"^- evidence_level:\s*mock\s*$", it, re.MULTILINE))
+    _cheat_na = sum(1 for it in items if re.search(r"^- status:\s*not_applicable\s*$", it, re.MULTILINE))
+    _cheat_real = sum(1 for it in items
+                      if re.search(r"^- status:\s*pass\s*$", it, re.MULTILINE)
+                      and re.search(r"^- actual_output:\s*(?!(\s*$|\([^)]*\)))(.+?)\s*$", it, re.MULTILINE))
+    if _cheat_total > 0 and _cheat_real == 0 and (_cheat_mock + _cheat_na) == _cheat_total:
+        print(f"\n[GATE] pre-tests.md 疑似糊弄: {_cheat_total} 个测试项，{_cheat_mock} mock + {_cheat_na} not_applicable，0 个真实通过的测试。", file=sys.stderr)
+        print("测试方案必须根据改动范围设计真实测试——改了哪里、可能坏哪里、怎么证明没坏。", file=sys.stderr)
+        print("如果不知道该测什么，重新阅读 raw issue 理解改动，然后阅读 skill:freely-doc-B2_IBM-execution 重新设计测试方案。", file=sys.stderr)
+        fallback_failures += 1
+
     if fallback_failures > 0:
         print(f"\n[GATE] 共 {fallback_failures} 项 GREEN 测试未执行。\n请阅读 skill:freely-test-execution 完成上述测试，不要逐条改状态绕过。\n如需豁免某项测试，在 acceptance item 中设置 status=not_applicable 并填写 not_applicable_reason。", file=sys.stderr)
     sys.exit(1 if fallback_failures > 0 else 0)
