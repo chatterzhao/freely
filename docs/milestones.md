@@ -13,6 +13,23 @@
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260625T084506Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/b2-ibm-anti-cheating/code-reviews`
+=======
+## M-20260625T084522Z-A
+- title: test-execution skill anti-ghost-pass
+- status: active
+### candidate_issues
+1. `C-20260625T084522Z-A`
+- milestone: M-20260625T084522Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260625T084522Z-A/issue.md`
+### committed_issues
+1. `I-20260625T084522Z-A`
+- title: test-execution skill anti-ghost-pass
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260625T084522Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/test-exec-anti-ghost-pass/code-reviews`
+>>>>>>> c71a36b30 (chore: milestone M-20260625T084522Z-A for test-exec anti-ghost-pass (#3495))
 
 ## M-20260625T000114Z-A
 - title: wt-close -D fix
@@ -141,6 +158,7 @@
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260625T003331Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/feedback-platform-only/code-reviews`
+
 ## M-20260625T012435Z-A
 - title: test-pre-merge allow merges
 - status: active
@@ -156,6 +174,7 @@
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260625T012435Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/test-pre-merge-allow/code-reviews`
+
 ## M-20260625T020333Z-A
 - title: --force = abandon only
 - status: active
@@ -1381,6 +1400,7 @@ routing_policy:
 - issue_path: `docs/issues/I-20260508T005431Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260508T005431Z--skill-standardize/candidates.md`
 - verification_artifact_dir: `docs/epics/skill-standardize/code-reviews`
+
 ## M-20260507T143545Z-A
 - title: timestamp seconds upgrade
 - status: active
@@ -1441,6 +1461,7 @@ routing_policy:
 - issue_path: `docs/issues/I-20260507T0700Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507-unified-platform/candidates.md`
 - verification_artifact_dir: `docs/epics/unified-platform/code-reviews`
+
 ## M-20260507T0730Z-A
 - title: wt-create --source parameter
 - status: active
@@ -1452,6 +1473,7 @@ routing_policy:
 - issue_path: `docs/issues/I-20260507T0730Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507-source-param/candidates.md`
 - verification_artifact_dir: `docs/epics/source-param/code-reviews`
+
 ## M-20260507T0600Z-A
 - title: raw-issue-pull
 - status: active
@@ -1463,6 +1485,7 @@ routing_policy:
 - issue_path: `docs/issues/I-20260507T0600Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507-raw-issue-pull/candidates.md`
 - verification_artifact_dir: `docs/epics/raw-issue-pull/code-reviews`
+
 ## M-20260507T0300Z-A
 - title: GATE 1 timestamp check
 - status: active
@@ -1474,6 +1497,7 @@ routing_policy:
 - issue_path: `docs/issues/I-20260507T0300Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507-gate1-timestamp/candidates.md`
 - verification_artifact_dir: `docs/epics/gate1-timestamp/code-reviews`
+
 ## M-20260507T0200Z-A
 - title: promoted gate fix
 - status: active
@@ -1485,6 +1509,7 @@ routing_policy:
 - issue_path: `docs/issues/I-20260507T0200Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507-promoted-gate-fix/candidates.md`
 - verification_artifact_dir: `docs/epics/promoted-gate-fix/code-reviews`
+
 ## M-20260507T0100Z-A
 - title: fix-execution branch naming
 - status: active
@@ -1496,6 +1521,7 @@ routing_policy:
 - issue_path: `docs/issues/I-20260507T0100Z-A/issue.md`
 - source_candidate: `docs/pre-brainstorms/20260507-fix-branch-naming/candidates.md`
 - verification_artifact_dir: `docs/epics/fix-branch-naming/code-reviews`
+
 ## M-20260506T1400Z-A
 
 - title: pr-merge-guarded fix/* whitelist
