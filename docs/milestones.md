@@ -1,3 +1,19 @@
+## M-20260624T235907Z-A
+- title: RED/GREEN separation
+- status: active
+### candidate_issues
+1. `C-20260624T235907Z-A`
+- milestone: M-20260624T235907Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T235907Z-A/issue.md`
+### committed_issues
+1. `I-20260624T235907Z-A`
+- title: RED/GREEN separation
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260624T235907Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/red-green-separation/code-reviews`
+
 ## M-20260625T030147Z-A
 - title: auto-detect platforms
 - status: active
