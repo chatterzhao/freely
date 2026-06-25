@@ -239,11 +239,95 @@ if [[ -n "$_acp_bridge_socket" ]] && [[ -x "$ACP_PROMPT_CLIENT" ]]; then
     _review_session_id="$_new_session_id"
   fi
 else
-  echo "[WARN] ACP bridge not available — falling back to local review"
-  # Fallback: use the 6-dimension checks (legacy)
-  echo "Running legacy 6-dimension review..."
-  # ... (kept as fallback, exits early)
-fi
+  echo "[WARN] ACP bridge not available — running legacy 6-dimension review"
+
+  # Legacy fallback: run the original 6-dimension checks
+  pass_count=0
+  fail_count=0
+  review_body=""
+
+  check_dimension() {
+    local dim="$1" status="$2" evidence="$3"
+    if [[ "$status" == "pass" || "$status" == "n/a" ]]; then
+      ((pass_count++))
+      echo "  ✅ $dim: $status"
+    else
+      ((fail_count++))
+      echo "  ❌ $dim: $status"
+    fi
+    review_body+="## $dim
+- status: $status
+- evidence: $evidence
+
+"
+  }
+
+  echo ""
+  echo "Review dimensions:"
+  echo ""
+
+  # 1. Worktree check
+  if [[ -n "$_wt_path" ]]; then
+    if git -C "$_wt_path" diff --quiet 2>/dev/null && git -C "$_wt_path" diff --cached --quiet 2>/dev/null; then
+      check_dimension "1. Worktree Check" "pass" "clean"
+    else
+      check_dimension "1. Worktree Check" "fail" "dirty"
+    fi
+  else
+    check_dimension "1. Worktree Check" "pass" "no worktree"
+  fi
+
+  # 2. IBM Completeness
+  if [[ -x "$ROOT_DIR/bin/governance-merge-gate" ]]; then
+    if "$ROOT_DIR/bin/governance-merge-gate" --range "$base..$review_branch" >/dev/null 2>&1; then
+      check_dimension "2. IBM Completeness" "pass" "passed"
+    else
+      check_dimension "2. IBM Completeness" "fail" "see governance-merge-gate"
+    fi
+  else
+    check_dimension "2. IBM Completeness" "n/a" "gate not available"
+  fi
+
+  # 3. Code Review Evidence
+  _found_impl=false
+  for _d in docs/epics/*/code-reviews/; do
+    if [[ -f "${_d}implementation-decision-note.md" ]] || [[ -f "${_d}implementation-decision.md" ]]; then
+      _found_impl=true
+      check_dimension "3. Code Review Evidence" "pass" "found"
+      break
+    fi
+  done
+  [[ "$_found_impl" != "true" ]] && check_dimension "3. Code Review Evidence" "fail" "not found"
+
+  # 4. Pre-test Evidence
+  if [[ -n "$_pre_tests_file" ]]; then
+    check_dimension "4. Pre-test Evidence" "pass" "$_pre_tests_file"
+  else
+    check_dimension "4. Pre-test Evidence" "fail" "no pre-tests.md"
+  fi
+
+  # 5. Receipt Integrity
+  check_dimension "5. Receipt Integrity" "n/a" "not checked in fallback"
+
+  # 6. Phase State
+  if [[ -n "$_raw_key" ]] && [[ -f "docs/issues/$_raw_key/issue.md" ]]; then
+    _phase=$(grep "phase_state:" "docs/issues/$_raw_key/issue.md" 2>/dev/null | head -1 | sed 's/.*: *//' | tr -d "'\"")
+    if [[ "$_phase" == "absorbed" ]]; then
+      check_dimension "6. Phase State" "pass" "absorbed"
+    else
+      check_dimension "6. Phase State" "fail" "$_phase"
+    fi
+  else
+    check_dimension "6. Phase State" "n/a" "no raw issue"
+  fi
+
+  if [[ "$fail_count" -eq 0 ]]; then
+    _review_verdict="pass"
+    _review_summary="Legacy 6-dimension review: $pass_count/$((pass_count+fail_count)) passed"
+  else
+    _review_verdict="fail"
+    _review_summary="Legacy review: $fail_count dimension(s) failed"
+  fi
 
 # Parse verdict from Reviewer output
 _review_verdict="fail"
