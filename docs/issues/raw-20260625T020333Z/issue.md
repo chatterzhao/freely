@@ -14,6 +14,7 @@ intake_id: ''
 author: ai-manager
 channel: internal
 session_refs: []
+source_candidate: docs/pre-brainstorms/20260625T020333Z--force-abandon-only/candidates.md#C-20260625T020333Z-A
 ---
 
 ## 问题

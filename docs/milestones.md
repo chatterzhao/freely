@@ -1,3 +1,19 @@
+## M-20260625T020333Z-A
+- title: --force = abandon only
+- status: active
+### candidate_issues
+1. `C-20260625T020333Z-A`
+- milestone: M-20260625T020333Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260625T020333Z-A/issue.md`
+### committed_issues
+1. `I-20260625T020333Z-A`
+- title: --force = abandon only
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260625T020333Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/force-abandon-only/code-reviews`
+
 ## M-20260625T020000Z-A
 - title: gate error skill guidance
 - status: active
