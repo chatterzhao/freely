@@ -200,6 +200,65 @@ if not state_file.exists():
         print("如果不知道该测什么，重新阅读 raw issue 理解改动，然后阅读 skill:freely-doc-B2_IBM-execution 重新设计测试方案。", file=sys.stderr)
         fallback_failures += 1
 
+    # E2E and Integration test adequacy — the most critical safeguard in AI programming
+    # Check that pre-tests.md has real E2E and integration test coverage, not just unit tests
+    _e2e_has_real = False
+    _integration_has_real = False
+    for item in items:
+        _layer = ""
+        _m = re.search(r"^- testing_layer:\s*(.+?)\s*$", item, re.MULTILINE)
+        if _m:
+            _layer = _m.group(1).strip()
+        _cmd = ""
+        _m = re.search(r"^- test_command:\s*(.+?)\s*$", item, re.MULTILINE)
+        if _m:
+            _cmd = _m.group(1).strip()
+        # A real test: has a non-empty, non-placeholder test_command
+        _is_real = bool(_cmd and _cmd not in ("(执行后填写)", "") and "echo pass" not in _cmd.lower() and _cmd not in ("true", ":"))
+        if _layer == "end-to-end" and _is_real:
+            _e2e_has_real = True
+        if _layer == "integration" and _is_real:
+            _integration_has_real = True
+
+    # Also check ## End-to-End and ## Integration layer sections
+    _e2e_section = re.search(r"^##\s+End-to-End\s*$(.+?)(?=^##\s|\Z)", pt_text, re.MULTILINE | re.DOTALL)
+    _integration_section = re.search(r"^##\s+Integration\s*$(.+?)(?=^##\s|\Z)", pt_text, re.MULTILINE | re.DOTALL)
+
+    for _section, _label, _has_real in [
+        (_e2e_section, "端到端测试 (End-to-End)", _e2e_has_real),
+        (_integration_section, "集成测试 (Integration)", _integration_has_real),
+    ]:
+        if _has_real:
+            continue
+        _na_reason = ""
+        if _section:
+            _m = re.search(r"^- not_applicable_reason:\s*(.+?)\s*$", _section.group(1), re.MULTILINE)
+            if _m:
+                _na_reason = _m.group(1).strip()
+        # Valid skip: has a real, specific not_applicable reason (not placeholder)
+        if _na_reason and _na_reason not in ("(如不适用填写)", "", "no_executable_boundary_at_this_layer"):
+            continue
+
+        print(f"\n[GATE] 测试层级不充分：{_label} 缺失或无效。", file=sys.stderr)
+        print("", file=sys.stderr)
+        print("端到端测试和集成测试是 AI 编程中防止项目失败的最重要保证。", file=sys.stderr)
+        print("AI 生成的代码最容易在模块边界和端到端流程中出错，只跑单元测试不够。", file=sys.stderr)
+        print("", file=sys.stderr)
+        print("请重新阅读以下 skill，重新审查当前修改需求：", file=sys.stderr)
+        print("  - skill:freely-doc-B2_IBM-execution（反糊弄铁律、测试方案设计）", file=sys.stderr)
+        print("  - skill:freely-test-execution（可执行性检查、反 ghost pass）", file=sys.stderr)
+        print("", file=sys.stderr)
+        if _label.startswith("端到端"):
+            print("如果该改动影响用户可见行为、UI 交互、完整业务流程 → 必须设计端到端测试。", file=sys.stderr)
+            print("端到端测试可以是：Playwright/Selenium UI 自动化、实际运行应用并操作、模拟用户点击流程。", file=sys.stderr)
+        if _label.startswith("集成"):
+            print("如果该改动涉及多模块协作、数据流、状态变更 → 必须设计集成测试。", file=sys.stderr)
+            print("集成测试可以是：pytest 集成套件、API 端到端调用链验证、编译+启动+数据流验证。", file=sys.stderr)
+        print("", file=sys.stderr)
+        print("绝对不允许需要端到端测试或集成测试的改动糊弄过去。", file=sys.stderr)
+        print("只有确实不适用时才写 not_applicable_reason，且必须写明具体理由（不能敷衍成\"不适用\"三个字）。", file=sys.stderr)
+        fallback_failures += 1
+
     if fallback_failures > 0:
         print(f"\n[GATE] 共 {fallback_failures} 项 GREEN 测试未执行。\n请阅读 skill:freely-test-execution 完成上述测试，不要逐条改状态绕过。\n如需豁免某项测试，在 acceptance item 中设置 status=not_applicable 并填写 not_applicable_reason。", file=sys.stderr)
     sys.exit(1 if fallback_failures > 0 else 0)

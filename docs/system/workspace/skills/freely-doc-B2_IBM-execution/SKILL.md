@@ -85,6 +85,26 @@ verification_artifact_dir: docs/epics/skill-gate-alignment/code-reviews
 
 B2_IBM 阶段直接写入以下格式。AI 按模板填写，无需查看任何其他文件。模板已满足 LAWS.md §4c 全部要求。
 
+> ⚠️ **反糊弄铁律**
+>
+> pre-tests.md 不是给门禁看的，是给测试执行者看的。
+> 每条 acceptance item 必须是**真实的测试用例**，能切实验证改动是否正确。
+>
+> - 如果不知道该测什么：重新读 raw issue 理解改动范围，从改动面推导测试面
+> - 如果改动不影响某层：写 `not_applicable` 且 **必须写明具体理由**（不是"不适用"三个字敷衍）
+> - 禁止：无理由全部 not_applicable + mock
+> - 禁止：status 写 pass 但 actual_output 为空（那是 ghost pass，会被 pretests-retirement-gate 硬拦截）
+> - 每一条 test_command 必须是真正可执行的测试用例（单元测试、集成测试、端到端测试、API 调用、编译验证、shell 脚本等均可），expected_output 必须具体可验证
+>
+> **端到端测试和集成测试是 AI 编程中防止项目失败的最重要保证。**
+>
+> - 如果改动涉及多模块协作、数据流、状态变更 → 必须设计集成测试
+> - 如果改动影响用户可见行为、UI 交互、完整业务流程 → 必须设计端到端测试
+> - 不要只写单元测试了事——AI 生成的代码最容易在模块边界和端到端流程中出错
+> - 选择测试层级的原则：能用端到端兜底就用端到端，需要集成测试兜底就必须用集成测试
+>
+> **糊弄 pre-tests.md 是导致项目失败的严重失职行为。绝对不允许糊弄测试相关的任何环节。**
+
 ```markdown
 # Pre-Tests: <功能名>
 - issue_id: I-{key}-A
