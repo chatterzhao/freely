@@ -622,6 +622,14 @@ if __name__ == "__main__":
         print(json.dumps(result, indent=2))
     elif len(sys.argv) > 1 and sys.argv[1] == "close-pr":
         platform, pr_number = sys.argv[2], sys.argv[3]
+    elif len(sys.argv) > 1 and sys.argv[1] == "create-issue":
+        local_id, title, body = sys.argv[2], sys.argv[3], sys.argv[4] if len(sys.argv) > 4 else ""
+        result = create_issue(local_id, title, body)
+        print(json.dumps(result, indent=2))
+    elif len(sys.argv) > 1 and sys.argv[1] == "comment":
+        local_id, comment_body = sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else ""
+        result = sync_comment(local_id, comment_body)
+        print(json.dumps(result, indent=2))
         result = close_pr(platform, pr_number)
         print(json.dumps(result, indent=2))
     else:
