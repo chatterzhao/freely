@@ -17,6 +17,10 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+absorbed_into: I-20260625T084522Z-A
+source_candidate: docs/pre-brainstorms/20260625T084522Z--test-exec-anti-ghost-pass/candidates.md#C-20260625T084522Z-A
+promoted_issue_path: docs/issues/I-20260625T084522Z-A/issue.md
+pre_tests_path: docs/epics/test-exec-anti-ghost-pass/verification/pre-tests.md
 ---
 
 ## 问题
