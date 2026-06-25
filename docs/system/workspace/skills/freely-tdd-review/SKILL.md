@@ -1,6 +1,6 @@
 ---
 name: freely-tdd-review
-description: TDD 评审 agent——在 test-pre-merge 工位独立审查三层。代码质量→完成度→代码安全。脏 worktree 直接 fail。
+description: TDD 评审 agent——在 test-pre-merge 工位独立审查四层。Clean&Sync→代码质量→完成度→代码安全。脏 worktree 直接 fail。
 ---
 
 # skill:freely-tdd-review
@@ -25,21 +25,32 @@ description: TDD 评审 agent——在 test-pre-merge 工位独立审查三层�
 2. `pre-tests.md`（已 committed，含 actual_output + evidence_file）
 3. `git diff $review_branch..HEAD` — fix/feature 和 test-pre-merge 的差异（应只有测试结果）
 
-## 三层审查
+## 四层审查
 
 一层不过就是 fail。全过才 pass。
 
-### 第一层：代码质量
+### 第一层：Clean & Sync — 代码干净且一致
+
+> 这是 Review 的第一道防线。脏的或不同步的代码直接 fail，不审其他。
 
 | 检查项 | 标准 | 怎么审 |
 |--------|------|--------|
+| 双工位 clean | fix 和 test-pre-merge 都不脏 | `git -C` status --short 为空 |
+| 代码相等 | fix 和 test-pre-merge 代码一致 | `git -C test merge-base --is-ancestor fix HEAD` |
 | diff 纯净 | git diff fix..HEAD 只有 pre-tests.md + evidence | 看 diff 文件列表，不应有源码文件 |
+
+**判定**：任一工位 dirty → fail。代码不同步 → fail。diff 有源码文件 → fail（代码没同步回 fix 工位，test-pre-merge 销毁后代码丢失）。
+
+### 第二层：代码质量
+
+| 检查项 | 标准 | 怎么审 |
+|--------|------|--------|
 | test_command 未弱化 | 不是 echo pass / true / : / 空 | 读 pre-tests.md 逐条检查 |
-| worktree clean | git diff --stat 为空 | git status |
+| 无意外文件 | 没有 .orig / .rej / .tmp / 无关变更 | 看 diff |
 
-**判定**：有源码改动在 diff 里 → fail。test_command 是占位符 → fail。
+**判定**：test_command 是占位符 → fail。
 
-### 第二层：完成度
+### 第三层：完成度
 
 | 检查项 | 标准 | 怎么审 |
 |--------|------|--------|
@@ -69,6 +80,7 @@ description: TDD 评审 agent——在 test-pre-merge 工位独立审查三层�
 {
   "verdict": "pass" | "fail",
   "round": 1,
+  "code_clean": {"status": "pass"|"fail", "note": "..."},
   "code_quality": {"status": "pass"|"fail", "note": "..."},
   "completeness": {"status": "pass"|"fail", "note": "..."},
   "code_safety": {"status": "pass"|"fail", "note": "..."},
@@ -77,7 +89,7 @@ description: TDD 评审 agent——在 test-pre-merge 工位独立审查三层�
 }
 ```
 
-三层全 pass → verdict=pass。任一层 fail → verdict=fail。
+四层全 pass → verdict=pass。任一层 fail → verdict=fail。
 
 ## 多轮评审
 
