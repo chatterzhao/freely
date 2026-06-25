@@ -17,6 +17,9 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+source_candidate: docs/pre-brainstorms/20260625T084506Z--b2-ibm-anti-cheating/candidates.md#C-20260625T084506Z-A
+promoted_issue_path: docs/issues/I-20260625T084506Z-A/issue.md
+pre_tests_path: docs/epics/b2-ibm-anti-cheating/verification/pre-tests.md
 ---
 
 ## 问题
