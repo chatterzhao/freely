@@ -141,13 +141,14 @@ fi
 
 # 3c. Reverse sync: fix must have test-pre-merge commits
 # Cherry-pick missing commits (e.g. pre-tests.md filled by test run)
-_missing_commits=$(git -C "$_test_wt" log --oneline "$review_branch..HEAD" 2>/dev/null || true)
+# Exclude merge commits — those are scaffolding, not code.
+_missing_commits=$(git -C "$_test_wt" log --oneline --no-merges "$review_branch..HEAD" 2>/dev/null || true)
 if [[ -n "$_missing_commits" ]]; then
-  echo "⚠️  test-pre-merge has commits not in fix branch:"
+  echo "⚠️  test-pre-merge has commits (non-merge) not in fix branch:"
   echo "$_missing_commits"
   echo ""
   echo "Cherry-pick these to fix branch before review:"
-  echo "  cd $_fix_wt && git cherry-pick \$(git -C $_test_wt log --format=%H $review_branch..HEAD)"
+  echo "  cd $_fix_wt && git cherry-pick \$(git -C $_test_wt log --format=%H --no-merges $review_branch..HEAD)"
   echo ""
   echo "(or re-run pr-review-guarded --verdict pass --reason \"...\" if this is intentional)"
   exit 1
