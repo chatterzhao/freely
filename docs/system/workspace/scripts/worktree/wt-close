@@ -36,7 +36,8 @@ Arguments:
                       or worktree path (e.g. /path/to/worktree)
 
 Options:
-  --force            Skip phase_state and pretests-retirement checks
+  --force            确定要丢弃此 raw issue，跳过所有检查直接关闭。
+                      保留此 raw issue 继续推进则不应使用 --force，应修复门禁报错。
                       (blocks if branch unmerged; use with --discard-unmerged)
   --discard-unmerged  Confirm intentional discard of unmerged commits.
                       Must be used with --force when branch is ahead of develop.
@@ -48,19 +49,28 @@ Options:
                       For orphan issues where worktree is gone but platform issue remains open
   --dry-run          Print what would be done, don't execute
 
-Bypass gates & --reason:
-  使用 --force、--discard-unmerged、--skip-platform 绕过门禁时，必须提供 --reason。
-  --reason 必须匹配正则: ^违规绕过门禁中，理由充分，是：
-  业务理由必须是真正的业务原因，不能是技术症状。
+Z --force 不是用来绕过错误的 ═══════════════════════════════════════
+  --force 的唯一语义：确定丢弃此 raw issue，不再继续推进。
+  只要是保留 issue 继续工作，遇到任何报错都应去解决根因，而不是 --force。
 
-  --force 有效理由:
+  --force 合法场景（确定丢弃 issue）:
     ✅ "该功能确定放弃，不再继续实现此 raw issue"
     ✅ "工位目录已损坏或丢失，仅剩分支引用需清理"
-  --discard-unmerged 有效理由:
+
+  以下场景不应使用 --force（应修复对应的报错）:
+    ❌ gate 检查未通过 → 解决 gate 报出的具体问题
+    ❌ pretests 未执行 → 执行 skill:freely-test-execution
+    ❌ workcell-state.env 缺失 → 手工补写（手工执行场景）或执行 test skill
+    ❌ IBM 治理文档缺失 → 完成 B1_IBM / B2_IBM
+    ❌ 测试失败 → 回到 dev-loop 修复
+
+  --discard-unmerged 合法场景:
     ✅ "该方案已被否决，未合并提交确认丢弃"
-  --skip-platform 合法业务理由（仅一种）:
+
+  --skip-platform 合法场景（仅一种）:
     ✅ "平台 issue 已通过其他渠道手动关闭，无需同步"
-  --platform-only 合法业务理由:
+
+  --platform-only 合法场景:
     ✅ "工位已删除但平台 issue 仍 OPEN，需关闭平台 issue 收口"
     ✅ "孤儿 raw issue——工位和分支已清理，仅剩平台 issue 未同步关闭"
 
@@ -71,9 +81,6 @@ Bypass gates & --reason:
 Examples:
   ./bin/wt-close feature/raw-20260513T081743Z-wt-close
   ./bin/wt-close fix/raw-xxx --force --reason "违规绕过门禁中，理由充分，是：该功能确定放弃，不再继续实现此 raw issue"
-  ./bin/wt-close fix/raw-xxx --force --discard-unmerged --reason "违规绕过门禁中，理由充分，是：该方案已被否决，未合并提交确认丢弃"
-  ./bin/wt-close fix/raw-xxx --skip-platform --reason "违规绕过门禁中，理由充分，是：平台 issue 已通过其他渠道手动关闭，无需同步"
-  ./bin/wt-close fix/raw-xxx --platform-only --reason "违规绕过门禁中，理由充分，是：工位已删除但平台 issue 仍 OPEN，需关闭平台 issue 收口"
 USAGE
 }
 
@@ -325,21 +332,18 @@ PHASE_GATE
       cat >&2 <<PRETEST_GATE
 [wt-close] pretests-retirement-gate 检查未通过: $wt_path
 
-  请判断属于以下哪种情况，然后采取对应措施:
+  ── 保留此 issue 继续推进 ────────────────────────────────────
+  请完成测试验证，通过后重新执行 wt-close:
 
-  1. 测试还没跑完
-     → 请完成测试验证，通过后重新执行 wt-close
+  1. 测试还没跑完 → 执行 skill:freely-test-execution
+  2. workcell-state.env 缺失（手工执行） → 在 .freely/run/ 下创建
+  3. pre-tests.md 的 actual_output 未填写 → 填回测试结果
 
-  2. 测试确实不适用于本工位（如纯文档变更、配置修改等）
-     → 使用 --force 并给出准确的业务理由:
-       ./bin/wt-close $branch --force --reason "违规绕过门禁中，理由充分，是：<业务理由>"
+  解决上述问题后，wt-close 无需 --force 即可通过。
 
-     有效业务理由示例:
-       ✅ "本次变更仅为文档修改，不涉及需要 pretests 验证的代码"
-       ✅ "该功能已通过手动验证，pretests gate 属于误报"
-
-  3. 该功能已确定放弃
-     → 同上使用 --force + --reason
+  ── 确定丢弃此 issue ────────────────────────────────────────
+  --force 仅用于此场景: 确定不再继续实现此 raw issue。
+    wt-close $branch --force --reason "违规绕过门禁中，理由充分，是：该功能确定放弃"
 PRETEST_GATE
       exit 1
     fi

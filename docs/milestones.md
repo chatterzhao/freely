@@ -1,3 +1,19 @@
+## M-20260625T020333Z-A
+- title: --force = abandon only
+- status: active
+### candidate_issues
+1. `C-20260625T020333Z-A`
+- milestone: M-20260625T020333Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260625T020333Z-A/issue.md`
+### committed_issues
+1. `I-20260625T020333Z-A`
+- title: --force = abandon only
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260625T020333Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/force-abandon-only/code-reviews`
+
 ## M-20260625T020000Z-A
 - title: gate error skill guidance
 - status: active
@@ -2614,3 +2630,28 @@ routing_policy:
 - phase_state: `done_b2_ibm`
 - issue_path: `docs/issues/I-20260624T104233Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/agents-daemon-to-pre-tests/code-reviews`
+
+## M-20260625T020333Z-A
+- title: wt-close --force semantics = abandon-only
+- status: active
+### candidate_issues
+1. `C-20260625T020333Z-A`
+- milestone: M-20260625T020333Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260625T020333Z-A/issue.md`
+### committed_issues
+1. `I-20260625T020333Z-A`
+- title: wt-close --force semantics = abandon-only
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260625T020333Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/force-abandon-only/code-reviews`
+- source_candidate: `docs/pre-brainstorms/20260625T020333Z--force-abandon-only/candidates.md#C-20260625T020333Z-A`
+### completed_issues
+1. `I-20260625T020333Z-A`
+- title: wt-close --force semantics = abandon-only
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260625T020333Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/force-abandon-only/code-reviews`
+- source_candidate: `docs/pre-brainstorms/20260625T020333Z--force-abandon-only/candidates.md#C-20260625T020333Z-A`
