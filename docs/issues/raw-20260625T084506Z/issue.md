@@ -1,7 +1,8 @@
 ---
 local_id: raw-20260625T084506Z
 kind: raw
-phase_state: promoted
+phase_state: absorbed
+absorbed_into: I-20260625T084506Z-A
 platform_ids:
   github:
     issue_id: '3494'
