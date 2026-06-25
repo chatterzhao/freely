@@ -113,41 +113,44 @@ if [[ -x "$ROOT_DIR/bin/governance-merge-gate" ]]; then
   gate_rc=$?
   set -e
   if [[ "$gate_rc" -ne 0 ]]; then
-	    # Detect fix vs feature branch to show correct skill flow
-	    local _flow_hint _skill_order
+	    # Determine the authoritative skill from branch prefix.
+	    # wt-create derives prefix from --skill: freely-fix-execution → fix/raw-*, freely-feat-execution → feature/raw-*
+	    local _primary_skill _flow_desc
 	    case "$current_branch" in
 	      fix/*)
-	        _flow_hint="Fix first, govern later → 代码已实现，补 IBM 治理文档即可"
-	        _skill_order="先看 skill:freely-fix-execution（核心原则、工作流），再看 skill:freely-doc-B1_IBM-execution → skill:freely-doc-B2_IBM-execution"
+	        _primary_skill="freely-fix-execution"
+	        _flow_desc="Fix first, govern later → 代码已实现，补 IBM 治理文档"
 	        ;;
 	      feature/*)
-	        _flow_hint="Govern first, code later → 先完成 IBM 治理，再实现代码"
-	        _skill_order="先看 skill:freely-feat-execution（核心原则、工作流），再看 skill:freely-doc-B1_IBM-execution → skill:freely-doc-B2_IBM-execution"
+	        _primary_skill="freely-feat-execution"
+	        _flow_desc="Govern first, code later → 先完成 IBM 治理，再实现代码"
 	        ;;
 	      *)
-	        _flow_hint="不确定 fix 或 feature，请查看工位分支名"
-	        _skill_order="参考 skill:freely-doc-B1_IBM-execution 和 skill:freely-doc-B2_IBM-execution"
+	        _primary_skill="freely-fix-execution（无法从分支名判断，假定 fix）"
+	        _flow_desc="无法从分支名判断 fix/feature，请检查工位"
 	        ;;
 	    esac
-    cat >&2 <<GATE_BLOCKED
+	    cat >&2 <<GATE_BLOCKED
 
 ╔══════════════════════════════════════════════════════════════╗
 ║  [GOVERNANCE-GATE] IBM 治理门禁未通过                        ║
 ╠══════════════════════════════════════════════════════════════╣
 ║                                                              ║
-║  根因：未按 skill 规范流程完成治理，或格式不符合 skill 要求。     ║
+║  本工位对应 skill: ${_primary_skill}                                ║
+║  ${_flow_desc}
+║                                                              ║
+║  根因：未按上述 skill 的规范流程完成治理。                       ║
 ║                                                              ║
 ║  不要直接对着下方错误逐条改！                                   ║
 ║  正确做法：                                                   ║
-║    1. 完整阅读 skill 的「门禁常见坑速查」→ 找匹配项             ║
-║    2. 坑速查没有 → 看 skill 中的模板/示例                     ║
-║    3. 还没有 → 按语义理解修正，不要凑字段                       ║
-║    4. 理解全部错误再开始改，不要改一条验一条                     ║
+║    1. 完整阅读 skill:${_primary_skill}（核心原则、工作流、场景）     ║
+║    2. 看 skill:freely-doc-B1_IBM-execution §门禁常见坑速查       ║
+║    3. 看 skill:freely-doc-B2_IBM-execution §门禁常见坑速查       ║
+║    4. 坑速查找不到 → 看两个 skill 中的模板/示例                 ║
+║    5. 还是找不到 → 按语义理解，对照 skill 模板交叉验证后修正       ║
+║    6. 理解全部错误再开始改，不要改一条验一条                     ║
 ║                                                              ║
 ║  离开「对着错误凑」的习惯——门禁说缺什么，skill 说怎么做。         ║
-║                                                              ║
-║  你的分支: $_flow_hint
-║  应读 skill: $_skill_order
 ║                                                              ║
 ║  详细错误:                                                    ║
 ║  $gate_output
@@ -155,8 +158,8 @@ if [[ -x "$ROOT_DIR/bin/governance-merge-gate" ]]; then
 ╚══════════════════════════════════════════════════════════════╝
 
 GATE_BLOCKED
-    exit 1
-  fi
+	    exit 1
+	  fi
   echo "$gate_output"
   echo "[GOVERNANCE-GATE] IBM governance artifacts: OK"
 else
