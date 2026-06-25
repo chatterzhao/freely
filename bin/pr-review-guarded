@@ -328,21 +328,26 @@ else
     _review_verdict="fail"
     _review_summary="Legacy review: $fail_count dimension(s) failed"
   fi
+  _acp_used=0  # fallback: skip ACP output parsing below
+  _review_json="{}"  # placeholder for fallback path
+  fi  # End ACP bridge available check
 
-# Parse verdict from Reviewer output
-_review_verdict="fail"
-_review_json=""
-if echo "$_review_output" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('verdict','fail'))" 2>/dev/null; then
-  _review_verdict=$(echo "$_review_output" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('verdict','fail'))" 2>/dev/null || echo "fail")
-  _review_json=$(echo "$_review_output" | python3 -c "import json,sys; print(json.dumps(json.load(sys.stdin),indent=2))" 2>/dev/null || echo "")
-else
-  # Try to find JSON block in output
-  _json_block=$(echo "$_review_output" | grep -A100 '{' | grep -B100 '}' | head -50 || true)
-  if [[ -n "$_json_block" ]]; then
-    _review_verdict=$(echo "$_json_block" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('verdict','fail'))" 2>/dev/null || echo "fail")
-    _review_json="$_json_block"
+# Parse verdict from Reviewer output (only when ACP was actually used)
+if [[ "${_acp_used:-1}" != "0" ]]; then
+  _review_verdict="fail"
+  _review_json=""
+  if echo "$_review_output" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('verdict','fail'))" 2>/dev/null; then
+    _review_verdict=$(echo "$_review_output" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('verdict','fail'))" 2>/dev/null || echo "fail")
+    _review_json=$(echo "$_review_output" | python3 -c "import json,sys; print(json.dumps(json.load(sys.stdin),indent=2))" 2>/dev/null || echo "")
+  else
+    # Try to find JSON block in output
+    _json_block=$(echo "$_review_output" | grep -A100 '{' | grep -B100 '}' | head -50 || true)
+    if [[ -n "$_json_block" ]]; then
+      _review_verdict=$(echo "$_json_block" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('verdict','fail'))" 2>/dev/null || echo "fail")
+      _review_json="$_json_block"
+    fi
   fi
-fi
+fi  # End _acp_used guard
 
 echo ""
 echo "Reviewer verdict: $_review_verdict"
