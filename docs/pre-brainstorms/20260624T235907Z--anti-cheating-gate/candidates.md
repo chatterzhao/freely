@@ -9,3 +9,4 @@ promoted_issue_path: docs/issues/I-20260624T235907Z-A/issue.md
 - title: gate hard-rejects mock-only test plans
 - status: promoted
 - milestone: M-20260624T235907Z-A
+- promoted_issue_path: docs/issues/I-20260624T235907Z-A/issue.md
