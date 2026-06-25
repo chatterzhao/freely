@@ -1,3 +1,19 @@
+## M-20260625T045412Z-A
+- title: migrate to adapter
+- status: active
+### candidate_issues
+1. `C-20260625T045412Z-A`
+- milestone: M-20260625T045412Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260625T045412Z-A/issue.md`
+### committed_issues
+1. `I-20260625T045412Z-A`
+- title: migrate to adapter
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260625T045412Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/migrate-to-adapter/code-reviews`
+
 ## M-20260625T045400Z-A
 - title: adapter CLI
 - status: active
