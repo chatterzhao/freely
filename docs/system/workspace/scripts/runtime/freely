@@ -23082,8 +23082,10 @@ HELP
   raw_key="$stamp"
   local_id="raw-${raw_key}"
 
-  # Platforms are auto-detected by freely start / daemon start and written to FREELY_REPO_PLATFORMS.
-  local _platforms="${FREELY_REPO_PLATFORMS:-}"
+  # Platforms are auto-detected by freely start / daemon start and written to config.toml.
+  # Read directly from config.toml via freely_config.py, not from env (config.env is long deprecated).
+  local _platforms
+  _platforms="$("$SELF_ROOT/docs/system/workspace/scripts/runtime/freely_config.py" print --project "$SELF_ROOT" 2>/dev/null | grep '^FREELY_REPO_PLATFORMS' | sed 's/^FREELY_REPO_PLATFORMS *= *//; s/"//g' || true)"
   [[ -n "$_platforms" ]] || { log_error "no platforms configured. Run 'freely start' to auto-detect from git remotes."; return 1; }
 
   # Delegate to platform-adapter — handles all platforms based on FREELY_REPO_PLATFORMS
