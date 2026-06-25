@@ -1,3 +1,19 @@
+## M-20260625T131154Z-A
+- title: pr-create-guarded rebase
+- status: active
+### candidate_issues
+1. `C-20260625T131154Z-A`
+- milestone: M-20260625T131154Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260625T131154Z-A/issue.md`
+### committed_issues
+1. `I-20260625T131154Z-A`
+- title: pr-create-guarded rebase
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260625T131154Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/pr-create-rebase/code-reviews`
+
 ## M-20260625T084506Z-A
 - title: B2_IBM skill anti-cheating guidance
 - status: active
