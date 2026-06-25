@@ -1,3 +1,19 @@
+## M-20260625T153111Z-A
+- title: agent-table multi-agent registry
+- status: active
+### candidate_issues
+1. `C-20260625T153111Z-A`
+- milestone: M-20260625T153111Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260625T153111Z-A/issue.md`
+### committed_issues
+1. `I-20260625T153111Z-A`
+- title: agent-table multi-agent registry
+- milestone_state: committed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260625T153111Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/agent-table/code-reviews`
+
 ## M-20260625T131154Z-A
 - title: pr-create-guarded rebase
 - status: active
