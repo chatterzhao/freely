@@ -735,14 +735,49 @@ fi
 if [[ "$DRY_RUN" == true ]]; then
   _dry "git branch -d $branch"
 else
-  echo "wt-close: deleting branch $branch..."
-  # Explicitly check against develop (not HEAD/upstream).
-  if git branch -d "$branch" develop 2>/dev/null; then
-    echo "wt-close: branch deleted ✓"
-  else
-    echo "Warning: branch '$branch' not fully merged into develop, using -D..." >&2
-    git branch -D "$branch" 2>/dev/null || true
-  fi
+	echo "wt-close: deleting branch $branch..."
+	if git branch --merged develop | grep -q "$branch"; then
+	  git branch -d "$branch" 2>/dev/null && echo "wt-close: branch deleted ✓"
+	elif [[ "$DISCARD_UNMERGED" == true ]]; then
+	  echo "wt-close: --discard-unmerged, using -D..." >&2
+	  git branch -D "$branch" 2>/dev/null || true
+	else
+	  local _wt_skill _wt_skill_name
+	  case "$branch" in
+	    fix/*)
+	      _wt_skill="freely-fix-execution"
+	      _wt_skill_name="Fix first, govern later"
+	      ;;
+	    feature/*)
+	      _wt_skill="freely-feat-execution"
+	      _wt_skill_name="Govern first, code later"
+	      ;;
+	    *)
+	      _wt_skill="freely-fix-execution"
+	      _wt_skill_name="无法从分支名判断"
+	      ;;
+	  esac
+	  cat >&2 <<UNMERGED
+
+╔══════════════════════════════════════════════════════════════╗
+║  ⚠️  严重警告：分支未合并到 develop，无法安全删除                ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  分支 $branch 的提交尚未合并到 develop。                        ║
+║                                                              ║
+║  大概率是 pr-merge-guarded 还没执行成功。                       ║
+║  请仔细阅读 skill:${_wt_skill}（${_wt_skill_name}），               ║
+║  按 skill 工作流完成 merge 后再关闭工位。                        ║
+║                                                              ║
+║  如果确定要丢弃未合并的提交（不可恢复）：                         ║
+║    wt-close $branch --force --discard-unmerged \\
+║      --reason "违规绕过门禁中，理由充分，是：<业务理由>"           ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+
+UNMERGED
+	  exit 1
+	fi
 fi
 
 # ── Phase 6b: Cleanup companion test-pre-merge via raw-key ──
