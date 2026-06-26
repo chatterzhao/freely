@@ -1,3 +1,19 @@
+## M-20260625T211802Z-A
+- title: agent-table slot chain
+- status: active
+### candidate_issues
+1. `C-20260625T211802Z-A`
+- milestone: M-20260625T211802Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260625T211802Z-A/issue.md`
+### committed_issues
+1. `I-20260625T211802Z-A`
+- title: agent-table slot chain
+- milestone_state: committed
+- phase_state: `in_dev`
+- issue_path: `docs/issues/I-20260625T211802Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/agent-table-slot-chain/code-reviews`
+
 ## M-20260625T235017Z-A
 - title: feat→feature rename
 - status: active

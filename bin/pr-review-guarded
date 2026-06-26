@@ -26,6 +26,18 @@ REVIEWER_SKILL="freely-tdd-review"
 # Slot for Reviewer agent — uses same slot as main AI_TOOL for now.
 # When agent-table is fully deployed, this reads from reviewer_slot.
 REVIEWER_SLOT="${REVIEWER_AGENT_SLOT:-}"
+# Try agent-table for reviewer_slot if available
+_agent_query="$ROOT_DIR/bin/agent-table-query"
+if [[ -z "$REVIEWER_SLOT" && -x "$_agent_query" ]]; then
+  _worker_env="$ROOT_DIR/.freely/worker-id.env"
+  if [[ -f "$_worker_env" ]]; then
+    _my_worker_id=$(grep "worker_id=" "$_worker_env" 2>/dev/null | cut -d= -f2 || true)
+    if [[ -n "$_my_worker_id" ]]; then
+      _rev_slot=$("$_agent_query" --get-slot "$_my_worker_id" 2>/dev/null || true)
+      [[ -n "$_rev_slot" ]] && REVIEWER_SLOT="$_rev_slot"
+    fi
+  fi
+fi
 
 # Parse arguments
 review_branch=""
