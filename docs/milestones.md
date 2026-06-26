@@ -3104,3 +3104,19 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260626T150328Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/toml-array-comma-join/code-reviews`
+
+## M-20260626T155612Z-A
+- title: pr-merge-guarded issue-sync before merge
+- status: active
+### candidate_issues
+1. `C-20260626T155612Z-A`
+- milestone: M-20260626T155612Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260626T155612Z-A/issue.md`
+### completed_issues
+1. `I-20260626T155612Z-A`
+- title: pr-merge-guarded issue-sync before merge + auto-commit
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260626T155612Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/issue-sync-before-merge/code-reviews`

@@ -368,9 +368,6 @@ GATE_BLOCKED
     exit 1
   fi
 
-  # Sync changed issues to platforms after merge to develop.
-  _sync_issues_changed_in_merge "$source_branch"
-
   # ── Sync PRs across platforms: close merged PRs, delete source branch ──
   # After local merge + push develop to all remotes, each platform still
   # has an open PR. Close/merge them so they reflect the actual state.
@@ -409,10 +406,11 @@ _sync_prs_across_platforms() {
   done
 }
 
-# _sync_issues_changed_in_merge: after merge to develop, update local
-# phase_state and push platform state changes.
+# _sync_issues_changed_in_merge: BEFORE merge, update issue phase_state
+# in the fix|feature worktree, then commit + push so the worktree stays clean.
+# Mirrors pr-review-guarded: review → commit → push → merge.
 _sync_issues_changed_in_merge() {
-  local _src_branch="${1:-}"
+  local _src_branch="${1:-}" _target="${2:-develop}"
   local _wt_path
   # Resolve worktree path from source branch so issue-sync --project points
   # to a writable fix|feature/* worktree, not the protected develop branch.
@@ -423,12 +421,9 @@ _sync_issues_changed_in_merge() {
   [[ -d "$issues_dir" ]] || return 0
   [[ -x "$PWD/bin/issue-sync" ]] || return 0
 
-  local parent_sha
-  parent_sha=$(git rev-parse HEAD^ 2>/dev/null || true)
-  [[ -n "$parent_sha" ]] || return 0
-
+  # Compare source branch against target (pre-merge), not HEAD vs HEAD^ (post-merge)
   local changed_issues synced=0
-  changed_issues=$(git diff --name-only "$parent_sha" HEAD -- "$issues_dir" | grep 'issue\.md$' | sed 's|docs/issues/||' | sed 's|/issue\.md$||' | sort -u)
+  changed_issues=$(git diff --name-only "$_target" "$_src_branch" -- "$issues_dir" 2>/dev/null | grep 'issue\.md$' | sed 's|docs/issues/||' | sed 's|/issue\.md$||' | sort -u || true)
   [[ -n "$changed_issues" ]] || return 0
 
   for local_id in $changed_issues; do
@@ -473,6 +468,20 @@ _sync_issues_changed_in_merge() {
 
   if [[ "$synced" -gt 0 ]]; then
     echo "[MERGE-GUARD] synced $synced issue(s) to platforms"
+    # Auto-commit + push in source worktree so it stays clean for wt-close.
+    # Mirrors pr-review-guarded: review → commit → push → merge.
+    if [[ -d "$_wt_path" ]]; then
+      git -C "$_wt_path" add docs/issues/ 2>/dev/null || true
+      if ! git -C "$_wt_path" diff --cached --quiet 2>/dev/null; then
+        git -C "$_wt_path" commit -m "chore: issue-sync before merge
+
+Co-Authored-By: Claude <noreply@anthropic.com>" 2>/dev/null || true
+        git -C "$_wt_path" push origin "$_src_branch" 2>/dev/null || true
+        echo "[MERGE-GUARD] issue-sync committed + pushed to $_src_branch"
+        # Refresh source branch ref after push
+        git fetch origin "$_src_branch" 2>/dev/null || true
+      fi
+    fi
   fi
 }
 
@@ -543,6 +552,12 @@ do_initial_merge() {
     _pr_number="$(gh pr list --head "$source_branch" --state OPEN --json number -q '.[0].number' 2>/dev/null || true)"
   fi
   git fetch github "$target" 2>/dev/null || true; git fetch origin "$target" 2>/dev/null || true
+  # ── Issue-sync before merge: update phase_state in fix worktree,
+  # commit + push so the worktree stays clean for wt-close.
+  # Mirrors pr-review-guarded: review → commit → push → merge.
+  echo "[MERGE-GUARD] issue-sync before merge..."
+  _sync_issues_changed_in_merge "$source_branch" "$target" || true
+
   echo "[MERGE-GUARD] performing local merge: $source_branch → $target"
   set +e; git merge --no-commit --no-ff "$source_branch"; local merge_rc=$?; set -e
   [[ "$merge_rc" -ne 0 ]] && return "$merge_rc"
