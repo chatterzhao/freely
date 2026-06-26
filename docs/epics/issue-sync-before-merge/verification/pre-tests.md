@@ -52,10 +52,10 @@
 - required_evidence: --dry-run 执行成功，exit 0
 - test_command: ./bin/pr-merge-guarded develop fix/raw-20260626T155612Z-issue-sync-before-merge --dry-run
 - expected_output: --dry-run complete, exit 0
-- actual_output: (执行后填写)
-- evidence_file: (执行后填写)
-- blocker: (失败时填写)
-- status: pending
+- actual_output: --dry-run complete, exit 0
+- evidence_file: .freely/run/test-evidence/acceptance-4.log
+- blocker: none
+- status: pass
 
 ## End-to-End
 - acceptance_target: 完整 merge 后 source worktree 干净，wt-close 不阻塞
