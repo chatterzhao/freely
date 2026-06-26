@@ -116,7 +116,7 @@ if [[ -f "$ROOT_DIR/.freely/agent-id.env" ]]; then
 fi
 [[ -z "$_my_worker_id" ]] && _my_worker_id="worker_01"
   if [[ -x "$ROOT_DIR/bin/freely-review" ]]; then
-  "$ROOT_DIR/bin/freely-review" --caller worker --worker-id "$_my_worker_id" --raw-key "$_raw_key" || { echo "Review FAILED"; exit 1; }
+  "$ROOT_DIR/bin/freely-review" --caller worker --agent-id "$_my_worker_id" --raw-key "$_raw_key" || { echo "Review FAILED"; exit 1; }
   _review_round=1
   _review_verdict="pass"
   _review_summary="freely-review passed (ACP fallback)"
