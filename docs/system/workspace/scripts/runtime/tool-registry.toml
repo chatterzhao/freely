@@ -4,6 +4,27 @@
 # Each [tool] section defines an AI CLI tool's complete capability description.
 # Users can add new tools in ~/.freely/tool-registry.toml (takes priority).
 # After adding a tool, set AI_TOOL = "toolname-apikey-slotname" in config.toml.
+#
+# ── [tool.slot] 字段说明 ──────────────────────────────────────────────────
+#
+# discovery      如何从 shell alias 提取 slot 路径:
+#                  "alias_cli_arg"  → alias 用 CLI flag 如 --config /path
+#                  "alias_env_var"  → alias 用 env var 如 OPENCODE_CONFIG=/path
+# alias_key      alias 中的 flag/env-var 名 (如 "--config", "OPENCODE_CONFIG")
+# config_file    凭证文件在 slot 目录下的相对路径 (如 "settings.json",
+#                  "data/settings/providers.json")
+# is_dir         slot 路径是目录(true)还是文件(false)
+#
+# bridge_config_env — 传给 ACP binary 的配置路径，按值前缀区分模式:
+#   ""                  → 不传路径，直接从 config_file 提取 env vars 注入
+#                         (适用于 claude: ACP binary 直接读 ANTHROPIC_* 等 env)
+#   "--<flag>"          → CLI flag 模式，追加 [flag, slot_path] 到 acp.args
+#                         (适用于 cline: cline --acp --config <path>)
+#   "<ENV_VAR_NAME>"    → env var 模式，set ENV_VAR_NAME=<slot_path>
+#                         (适用于 opencode: OPENCODE_CONFIG=<path>
+#                           适用于 codex:   CODEX_HOME=<path>)
+#
+# post_init      启动后的钩子 ("" 或 "ensure_writable_roots" for codex)
 # =============================================================================
 
 # ── Claude Code ────────────────────────────────────────────────────────────
@@ -26,11 +47,13 @@ config_field = "permissionMode"     # field name in slot config
 fallback_field = "permissions.defaultMode"
 
 [claude.slot]
-discovery = "alias_cli_arg"         # config path passed via shell alias CLI flag
+# claude 凭证通过 settings.json 的 env 字段直接注入 (ANTHROPIC_AUTH_TOKEN 等)
+# ACP binary (claude-agent-acp) 不需要知道 slot 路径，只需 env vars
+discovery = "alias_cli_arg"
 alias_key = "--settings"
 config_file = "settings.json"
 is_dir = false
-bridge_config_env = ""
+bridge_config_env = ""              # 空：直接提取 env vars 注入，不传路径
 post_init = ""
 
 [claude.config_schema]
@@ -130,11 +153,13 @@ mechanism = "slot_config_toml"
 config_fields = ["approval_policy", "sandbox_mode"]
 
 [codex.slot]
+# codex 通过 CODEX_HOME 环境变量接收 slot 目录路径
+# ACP binary (codex-acp) 读取 CODEX_HOME 找到 config.toml
 discovery = "alias_env_var"
 alias_key = "CODEX_HOME"
 config_file = ""
 is_dir = true
-bridge_config_env = "CODEX_HOME"
+bridge_config_env = "CODEX_HOME"    # env var 模式：set CODEX_HOME=<slot_dir>
 post_init = "ensure_writable_roots"
 
 [codex.config_schema]
@@ -230,11 +255,13 @@ config_field = "permission"
 env_var = "OPENCODE_CONFIG"
 
 [opencode.slot]
+# opencode 通过 OPENCODE_CONFIG 环境变量接收 settings.json 路径
+# ACP binary (opencode acp) 读取 OPENCODE_CONFIG 找到 settings.json
 discovery = "alias_env_var"
 alias_key = "OPENCODE_CONFIG"
 config_file = "settings.json"
 is_dir = false
-bridge_config_env = "OPENCODE_CONFIG"
+bridge_config_env = "OPENCODE_CONFIG" # env var 模式：set OPENCODE_CONFIG=<path>
 post_init = ""
 
 [opencode.config_schema]
@@ -326,11 +353,18 @@ mechanism = "cli_flag"              # --yolo bypasses confirmations in non-inter
 config_field = "yolo"
 
 [cline.slot]
-discovery = "alias_env_var"         # CLINE_CONFIG_FILE=.../providers.json
-alias_key = "CLINE_CONFIG_FILE"
-config_file = "providers.json"
-is_dir = false
-bridge_config_env = "CLINE_CONFIG_FILE"
+# cline 不读任何 env var，只认 --config CLI flag（已验证：CLINE_CONFIG_DIR/
+# CLINE_HOME/CLINE_CONFIG 等全部不生效，仅 --config <path> 有效）
+# 因此 bridge_config_env 以 "--" 前缀触发 CLI flag 模式：
+#   cline --acp --config <slot_dir>
+#
+# --config 指向 slot 目录根，providers.json 在 data/settings/ 子目录下
+# session/db 等运行时数据也落在 --config 目录的 data/ 中（与 codex 类似）
+discovery = "alias_cli_arg"
+alias_key = "--config"
+config_file = "data/settings/providers.json"
+is_dir = true
+bridge_config_env = "--config"      # CLI flag 模式：acp.args += ["--config", "<slot_dir>"]
 post_init = ""
 
 [cline.config_schema]
@@ -346,9 +380,9 @@ reasoning_effort = { path = "thinking" }
 [cline.session]
 supports_fork = true
 supports_resume = true
-id_format = "timestamp_nanoid_cli"               # e.g. 1719234567890_abc12_cli
+id_format = "timestamp_nanoid"                   # e.g. 1782208464405_m02bu (13位时间戳_5字符nanoid)
 directory_template = "${HOME}/.cline/data/sessions"
-extract_regex = 'session[._]id[=:]\s*(\d{13}_[A-Za-z0-9]{5,10}_cli)'
+extract_regex = 'session[._]id[=:]\s*(\d{13}_[A-Za-z0-9]{5,10})'
 
 [cline.session.cli]
 fresh = []

@@ -3028,3 +3028,12 @@ routing_policy:
 - issue_path: `docs/issues/I-20260625T020333Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/force-abandon-only/code-reviews`
 - source_candidate: `docs/pre-brainstorms/20260625T020333Z--force-abandon-only/candidates.md#C-20260625T020333Z-A`
+
+## M-20260626T075106Z-A
+- title: tool family de-hardcode + AGENT_AI_TOOL + agent-id.env + reviewer
+- status: completed
+### completed_issues
+1. `I-20260626T075106Z-A`
+- milestone: M-20260626T075106Z-A
+- status: completed
+- promoted_from: C-20260626T075106Z-A
