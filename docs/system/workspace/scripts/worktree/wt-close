@@ -844,6 +844,8 @@ fi
 
 # ── Phase 6: Local branch delete ──
 
+cd "$PROJECT_ROOT" || { echo "Error: cannot cd to $PROJECT_ROOT" >&2; exit 1; }
+
 if [[ "$DRY_RUN" == true ]]; then
   _dry "git branch -d $branch"
 else
