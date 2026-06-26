@@ -4123,7 +4123,6 @@ write_config() {
     --value "INTENT_FILE=$intent" \
     --value "CONSTITUTION_FILE=$constitution" \
     --value "FREELY_HOME=$SELF_ROOT" \
-    --value "AI_TOOL=$tool" \
     --value "AI_MODEL=$model" \
     --value "AI_MODE=$mode" \
     --value "AI_REASONING_EFFORT=$reasoning_effort" \
@@ -5072,7 +5071,6 @@ persist_project_tool_selection() {
   tool_adapter="$(resolve_project_tool_adapter_selection "$project" "$tool" "$requested_adapter" "$tool_adapter_policy")"
   tool_capabilities="$(tool_default_capabilities_for_runtime "$tool")"
   tool_policy="$(tool_default_policy_for_runtime "$tool")"
-  upsert_config_key "$project" "AI_TOOL" "$effective_tool"
   upsert_config_key "$project" "AI_MODEL" "$model"
   upsert_config_key "$project" "AI_REASONING_EFFORT" "$reasoning_effort"
   upsert_config_key "$project" "AI_TOOL_ADAPTER" "$tool_adapter"
@@ -20086,7 +20084,6 @@ SDK_HELP
     [[ -n "$reasoning_effort" ]] || reasoning_effort="medium"
   fi
 
-  AI_TOOL="$tool"
   AI_MODE="$mode"
   AI_CAPABILITY_CODEX_SANDBOX="$codex_capability_sandbox"
   AI_CAPABILITY_CODEX_APPROVAL_POLICY="$codex_capability_approval_policy"
