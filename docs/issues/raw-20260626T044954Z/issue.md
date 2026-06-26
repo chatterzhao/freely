@@ -18,6 +18,8 @@ author: platform
 channel: github
 session_refs: []
 pre_tests_path: docs/epics/agent-table-slot-chain/verification/pre-tests.md
+absorbed_into: I-20260626T044954Z-A
+pre_tests_path: docs/epics/agent-table-slot-chain/verification/pre-tests.md
 absorbed_into: I-20260626T033913Z-A
 ---
 - pre_tests_path: docs/epics/agent-table-slot-chain/verification/pre-tests.md
