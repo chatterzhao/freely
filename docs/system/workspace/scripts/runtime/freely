@@ -4046,6 +4046,58 @@ load_config() {
   fi
 
   migrate_project_auto_recovery_defaults_if_needed "$project"
+
+  # ── Agent-table: resolve AGENT_AI_TOOL for ALL agents ──────
+  # AI_TOOL is deprecated.  AGENT_AI_TOOL is resolved from
+  # .freely/agent-table.toml at startup.  No config writes needed.
+  #
+  # Resolution order:
+  #   1. agent-id.env → which agent (manager_01 / worker_03 / …) owns this worktree
+  #   2. agent-table → get slot for that agent_id
+  #   3. Validate slot is a registered tool
+  if [[ -z "${AGENT_AI_TOOL:-}" ]]; then
+    local _at="${PROJECT_ROOT}/.freely/agent-table.toml"
+    local _aq="${PROJECT_ROOT}/bin/agent-table-query"
+    local _agent_env="${PROJECT_ROOT}/.freely/agent-id.env"
+    local _my_id=""
+
+    # Resolve agent identity: agent-id.env maps worktree_path → agent_id
+    if [[ -f "$_agent_env" ]]; then
+      _my_id=$(grep -F "$(pwd)" "$_agent_env" 2>/dev/null | grep -oE '(manager_[0-9]+|worker_[0-9]+)' | head -1 || true)
+    fi
+    # Manager runs on develop worktree — not in agent-id.env
+    [[ -z "$_my_id" ]] && _my_id="manager_01"
+
+    if [[ -f "$_at" && -x "$_aq" ]]; then
+      local _slot; _slot=$("$_aq" --get-slot "$_my_id" 2>/dev/null || true)
+      if [[ -n "$_slot" ]]; then
+        local _tool="${_slot%%-*}"
+        if _tool_is_registered "$_tool" 2>/dev/null; then
+          export AGENT_AI_TOOL="$_slot"
+          log_info "agent-table: $_my_id AGENT_AI_TOOL=$AGENT_AI_TOOL (pool=$(grep -c "worker_" "$_agent_env" 2>/dev/null || echo 0) workers)"
+        else
+          log_error "agent-table: $_my_id slot='$_slot' → tool='$_tool' not in registry"
+          exit 1
+        fi
+      fi
+    fi
+    if [[ -z "${AGENT_AI_TOOL:-}" ]]; then
+      log_error "AGENT_AI_TOOL not set. Configure .freely/agent-table.toml:"
+      log_error "  [[agents]]"
+      log_error "  manager_slot = \"<tool>-apikey-<slot>\""
+      log_error "  worker_slot  = \"<tool>-apikey-<slot>\""
+      log_error "  pool = N"
+      exit 1
+    fi
+  fi
+
+  # ── Derive AI_TOOL from AGENT_AI_TOOL ────────────────────
+  # AI_TOOL is no longer a config value — it is always derived
+  # from the agent-table slot.  "claude-apikey-ds-pro-auto" → "claude".
+  # This ensures tool-family checks (codex, opencode, etc.) use the
+  # correct tool, not a stale alias from old config.
+  AI_TOOL="${AGENT_AI_TOOL%%-*}"
+  export AI_TOOL
 }
 
 write_config() {
@@ -4071,7 +4123,6 @@ write_config() {
     --value "INTENT_FILE=$intent" \
     --value "CONSTITUTION_FILE=$constitution" \
     --value "FREELY_HOME=$SELF_ROOT" \
-    --value "AI_TOOL=$tool" \
     --value "AI_MODEL=$model" \
     --value "AI_MODE=$mode" \
     --value "AI_REASONING_EFFORT=$reasoning_effort" \
@@ -5020,7 +5071,6 @@ persist_project_tool_selection() {
   tool_adapter="$(resolve_project_tool_adapter_selection "$project" "$tool" "$requested_adapter" "$tool_adapter_policy")"
   tool_capabilities="$(tool_default_capabilities_for_runtime "$tool")"
   tool_policy="$(tool_default_policy_for_runtime "$tool")"
-  upsert_config_key "$project" "AI_TOOL" "$effective_tool"
   upsert_config_key "$project" "AI_MODEL" "$model"
   upsert_config_key "$project" "AI_REASONING_EFFORT" "$reasoning_effort"
   upsert_config_key "$project" "AI_TOOL_ADAPTER" "$tool_adapter"
@@ -5650,32 +5700,20 @@ sync_project_tooling_from_source() {
 	  mkdir -p "$(dirname "$target_cfg")"
 	  cp "$source_cfg" "$target_cfg"
 	  rewrite_synced_project_config_for_target "$source_project" "$target_project"
-	  # ── Agent-table slot assignment ──────────────────────────
+	  # ── Agent-table: write agent-id.env only (NOT config) ──
+	  # AGENT_AI_TOOL resolved by load_config from agent-table at startup.
+	  # No config writes needed — agent-table IS the single source of truth.
 	  _agent_table="$source_project/.freely/agent-table.toml"
 	  _agent_query="$source_project/bin/agent-table-query"
 	  if [[ -f "$_agent_table" && -x "$_agent_query" ]]; then
 	    _next_worker="$("$_agent_query" --project "$source_project" --list worker 2>/dev/null | head -1 || true)"
 	    if [[ -n "$_next_worker" ]]; then
-	      _worker_slot="$("$_agent_query" --project "$source_project" --get-slot "$_next_worker" 2>/dev/null || true)"
-	      if [[ -n "$_worker_slot" ]]; then
-	        _tmp_cfg="$(mktemp "${target_cfg}.agent.XXXXXX")"
-	        if grep -q '^AGENT_AI_TOOL =' "$target_cfg" 2>/dev/null; then
-		          sed "s/^AGENT_AI_TOOL = .*$/AGENT_AI_TOOL = \"$_worker_slot\"/" "$target_cfg" > "$_tmp_cfg"
-		else
-		          cp "$target_cfg" "$_tmp_cfg"
-		          printf 'AGENT_AI_TOOL = "%s"\n' "$_worker_slot" >> "$_tmp_cfg"
-		        fi
-	        mv "$_tmp_cfg" "$target_cfg"
-	        # Write agent-id.env at project root for cross-worktree visibility
-	        _agent_env="$source_project/.freely/agent-id.env"
-	        mkdir -p "$(dirname "$_agent_env")"
-	        echo "$target_project=worker=$_next_worker" >> "$_agent_env"
-	        log_info "agent-table: assigned $_next_worker to $target_project (agent-id.env)"
-	        log_info "agent-table: assigned $_next_worker slot=$_worker_slot to $target_project"
-	      fi
+	      _agent_env="$source_project/.freely/agent-id.env"
+	      mkdir -p "$(dirname "$_agent_env")"
+	      echo "$target_project=worker=$_next_worker" >> "$_agent_env"
+	      log_info "agent-table: assigned $_next_worker to $target_project (agent-id.env)"
 	    fi
 	  fi
-	  # ── End agent-table slot assignment ──────────────────────
 	  sync_repo_hook_assets_from_source "$source_project" "$target_project"
 	  load_config "$target_project"
 	  materialize_project_tooling_for_loaded_config "$target_project" "true"
@@ -13884,7 +13922,7 @@ _ensure_acp_bridge_running() {
   # Determine the correct ACP binary for the current tool via registry
   local acp_bin="claude-agent-acp"
   local -a _acp_args=()
-  local base_tool="${AGENT_AI_TOOL:-${AI_TOOL}}"  # opencode-apikey-xxx → opencode, codex-apikey-xxx → codex
+  local base_tool="${AGENT_AI_TOOL:-claude}"  # opencode-apikey-xxx → opencode, codex-apikey-xxx → codex
   base_tool="${base_tool%%-*}"
 
   # Read ACP binary and args from tool registry (single source of truth)
@@ -13930,8 +13968,8 @@ _ensure_acp_bridge_running() {
         log_info "ACP bridge binary changed ($running_bin → $acp_bin), gracefully closing session before restart"
         _acp_session_close "$project" "${CLAUDE_SESSION_ID_CURRENT:-}"
         _stop_acp_bridge "$project"
-      elif [[ -n "$running_tool" && "$running_tool" != "${AGENT_AI_TOOL:-${AI_TOOL:-}}" ]]; then
-        log_info "ACP bridge tool changed ($running_tool → ${AGENT_AI_TOOL:-${AI_TOOL:-}}), gracefully closing session before restart"
+      elif [[ -n "$running_tool" && "$running_tool" != "${AGENT_AI_TOOL:-claude}" ]]; then
+        log_info "ACP bridge tool changed ($running_tool → ${AGENT_AI_TOOL:-claude}), gracefully closing session before restart"
         _acp_session_close "$project" "${CLAUDE_SESSION_ID_CURRENT:-}"
         _stop_acp_bridge "$project"
       elif _acp_bridge_health_check "$project" 5; then
@@ -13953,7 +13991,7 @@ _ensure_acp_bridge_running() {
   # Collect per-slot env vars to pass to the bridge process only (not global export).
   # This isolates concurrent projects using different slots.
   local -a _bridge_env=()
-  local tool_name="${AGENT_AI_TOOL:-${AI_TOOL:-claude}}"
+  local tool_name="${AGENT_AI_TOOL:-claude}"
 
   # ── Registry-driven bridge env dispatch ────────────────────────
   # _bridge_env_for_registered_tool reads ALL behavior from the
@@ -13984,7 +14022,12 @@ _ensure_acp_bridge_running() {
       fi
     done
   fi
-  _bridge_env=("${_filtered_env[@]}")
+	# bash 3.2 + set -u: array copy from empty array errors
+	if [[ ${#_filtered_env[@]} -gt 0 ]]; then
+	  _bridge_env=("${_filtered_env[@]}")
+	else
+	  _bridge_env=()
+	fi
 
   # Use --foreground (no fork) + & to avoid child-process lifecycle issues
   local bridge_log; bridge_log="$(run_dir_for_project "$project")/acp-bridge.log"
@@ -13997,7 +14040,7 @@ _ensure_acp_bridge_running() {
   # Note: bridge writes its own PID file during start_server, don't overwrite it
   # Record the binary path and tool name so we can detect changes across cycles
   printf '%s\n' "$acp_bin" > "$acp_bin_file" 2>/dev/null || true
-  printf '%s\n' "${AGENT_AI_TOOL:-${AI_TOOL:-}}" > "$acp_tool_file" 2>/dev/null || true
+  printf '%s\n' "${AGENT_AI_TOOL:-claude}" > "$acp_tool_file" 2>/dev/null || true
 
   # Wait for readiness (codex-acp cold start ~8s, use 15s margin)
   local waited=0
@@ -20041,7 +20084,6 @@ SDK_HELP
     [[ -n "$reasoning_effort" ]] || reasoning_effort="medium"
   fi
 
-  AI_TOOL="$tool"
   AI_MODE="$mode"
   AI_CAPABILITY_CODEX_SANDBOX="$codex_capability_sandbox"
   AI_CAPABILITY_CODEX_APPROVAL_POLICY="$codex_capability_approval_policy"
@@ -20061,6 +20103,21 @@ SDK_HELP
   if [[ -f "$_example_src" ]]; then
     cp "$_example_src" "$_example_dst"
     log_info "config.toml.example released to .freely/"
+  fi
+
+  # ── Agent table template ──────────────────────────────────
+  # Always release agent-table.toml (not .example) — it is the
+  # active config file.  Slots use placeholder values pointing
+  # users to create matching ~/.ai-auth/ subfolders.
+  local _at_src="$SELF_ROOT/templates/agent-table.toml.example"
+  local _at_dst="$project/.freely/agent-table.toml"
+  if [[ -f "$_at_src" ]]; then
+    if [[ -f "$_at_dst" ]]; then
+      log_info "agent-table.toml already exists, skipping"
+    else
+      cp "$_at_src" "$_at_dst"
+      log_info "agent-table.toml created — edit slot values to match ~/.ai-auth/ subfolders"
+    fi
   fi
 
   # Release ai-auth slot templates to .freely/ai-auth/ for user reference.

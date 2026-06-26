@@ -13,7 +13,7 @@
 - `tools.md` 继续只定义任务路由与工具选择参考，不直接充当 runtime availability fallback 顺序真源。
 - 当前 runtime-owned availability manager 使用 project config 中的 `AI_FALLBACK_TOOLS` 作为 ordered recovery list，而不是复用本文件的 routing priority。
 - canonical recovery order 是：
-  - `AI_TOOL` 是 current tool 真相；runtime `current_slot` 是 current slot 真相，并继续镜像到 legacy `LAST_ACTIVE_SLOT`
+  - `AGENT_AI_TOOL`（来自 `.freely/agent-table.toml`）是 current tool+slot 真相；`AI_TOOL` 已废弃，由 load_config 自动从 AGENT_AI_TOOL 派生
   - 同工具 slot / profile recovery first
   - same-tool exhausted 后再从 `AI_FALLBACK_TOOLS` 最左侧开始重新扫描其他工具，而不是把 current tool 隐式插到最前
   - 每进入一个 fallback tool，先继续扫该工具自己的 slot family，再决定是否进入下一个工具
@@ -31,7 +31,7 @@
 
 - Freely runtime 已把“工具选择”和“adapter 选择”拆成两个独立轴，当前工作模式以 ACP 为准。
 - 当前 canonical truth 是：
-  - `AI_TOOL` 继续表示选中的外部工具
+  - `AGENT_AI_TOOL`（agent-table.toml）表示选中的外部工具+slot；`AI_TOOL` 已废弃，由 load_config 自动派生工具族名
   - `AI_TOOL_ADAPTER_POLICY` 表示该工具期望采用哪条接入策略；当前正常运行值为 `acp`
   - `AI_TOOL_ADAPTER` 表示 runtime 依据 policy 和当前支持面解析出的实际 adapter
   - status / introspection 还会暴露当前工具的 `tool_supported_adapters`，作为当前 runtime 支持矩阵

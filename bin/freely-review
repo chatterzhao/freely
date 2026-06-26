@@ -52,7 +52,10 @@ if [[ -x "$AGENT_QUERY" ]]; then
     echo "freely-review: caller=$caller worker=$agent_id reviewer=$_rev_id slot=$reviewer_slot"
   fi
 fi
-[[ -z "$reviewer_slot" ]] && reviewer_slot="${AI_TOOL:-claude-apikey-ds-pro-auto}"
+# agent-table is the source of truth for reviewer_slot.
+# AGENT_AI_TOOL is resolved from agent-table at load_config time.
+# AI_TOOL fallback is deprecated — fail clearly if unresolved.
+[[ -z "$reviewer_slot" ]] && reviewer_slot="${AGENT_AI_TOOL:-claude}"
 
 # ── Pre-checks ──
 cd "$ROOT_DIR" || { echo "Error: cannot cd to $ROOT_DIR" >&2; exit 1; }

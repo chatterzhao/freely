@@ -26,15 +26,20 @@ REVIEWER_SKILL="freely-tdd-review"
 # Slot for Reviewer agent — uses same slot as main AI_TOOL for now.
 # When agent-table is fully deployed, this reads from reviewer_slot.
 REVIEWER_SLOT="${REVIEWER_AGENT_SLOT:-}"
-# Try agent-table for reviewer_slot if available
+# Try agent-table for reviewer_slot if available.
+# Uses agent-id.env (current format), not worker-id.env (deprecated).
 _agent_query="$ROOT_DIR/bin/agent-table-query"
 if [[ -z "$REVIEWER_SLOT" && -x "$_agent_query" ]]; then
-  _worker_env="$ROOT_DIR/.freely/worker-id.env"
-  if [[ -f "$_worker_env" ]]; then
-    _my_worker_id=$(grep "worker_id=" "$_worker_env" 2>/dev/null | cut -d= -f2 || true)
+  _agent_env="$ROOT_DIR/.freely/agent-id.env"
+  if [[ -f "$_agent_env" ]]; then
+    _my_worker_id=$(grep -F "$(pwd)" "$_agent_env" 2>/dev/null | grep -oE 'worker_[0-9]+' | head -1 || true)
     if [[ -n "$_my_worker_id" ]]; then
-      _rev_slot=$("$_agent_query" --get-slot "$_my_worker_id" 2>/dev/null || true)
-      [[ -n "$_rev_slot" ]] && REVIEWER_SLOT="$_rev_slot"
+      # --get-reviewer returns the paired reviewer_id + slot from agent-table
+      _rev_info=$("$_agent_query" --get-reviewer "$_my_worker_id" 2>/dev/null || true)
+      if [[ -n "$_rev_info" ]]; then
+        _rev_slot=$(echo "$_rev_info" | python3 -c "import json,sys; print(json.load(sys.stdin).get('slot',''))" 2>/dev/null || true)
+        [[ -n "$_rev_slot" ]] && REVIEWER_SLOT="$_rev_slot"
+      fi
     fi
   fi
 fi
