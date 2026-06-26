@@ -17,6 +17,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+absorbed_into: I-20260625T211802Z-A
 source_candidate: docs/pre-brainstorms/20260625T211802Z--agent-table-slot-chain/candidates.md#C-20260625T211802Z-A
 promoted_issue_path: docs/issues/I-20260625T211802Z-A/issue.md
 pre_tests_path: docs/epics/agent-table-slot-chain/verification/pre-tests.md
