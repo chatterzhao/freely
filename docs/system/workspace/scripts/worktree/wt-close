@@ -904,10 +904,21 @@ if [[ "$branch" == fix/raw-* || "$branch" == feature/raw-* ]]; then
     _tp_branch="test-pre-merge-${_tp_raw_key}-${_tp_slug}"
     _tp_wt="$PROJECT_WORKTREES_ROOT/test-pre-merge-${_tp_raw_key}-${_tp_slug}"
     if git show-ref --verify --quiet "refs/heads/$_tp_branch" 2>/dev/null; then
-      echo "wt-close: cleaning up companion test-pre-merge: $_tp_branch"
-      [[ -d "$_tp_wt" ]] && git worktree remove --force "$_tp_wt" 2>/dev/null || true
-      git branch -D "$_tp_branch" 2>/dev/null || true
-      echo "wt-close: test-pre-merge cleaned ✓"
+      if [[ "$FORCE" == true ]]; then
+        echo "wt-close: 严重警告 —— 已经用 --force 参数彻底丢弃了所有修改"
+        [[ -d "$_tp_wt" ]] && git worktree remove --force "$_tp_wt" 2>/dev/null || true
+        git branch -D "$_tp_branch" 2>/dev/null || echo "wt-close: warning - test-pre-merge branch deletion failed" >&2
+        echo "wt-close: test-pre-merge 已强制删除 ✓"
+      else
+        echo "wt-close: cleaning up companion test-pre-merge: $_tp_branch"
+        if [[ -d "$_tp_wt" ]]; then
+          git worktree remove "$_tp_wt" || { echo "wt-close: 删除 test 工位失败" >&2; exit 1; }
+        fi
+        if git show-ref --verify --quiet "refs/heads/$_tp_branch" 2>/dev/null; then
+          git branch -d "$_tp_branch" || { echo "wt-close: 删除 test 分支失败" >&2; exit 1; }
+        fi
+        echo "wt-close: test-pre-merge cleaned ✓"
+      fi
     fi
     # Clean up agent-id.env entries for this raw-key.
     # agent-id.env lives in the main develop project root — NOT in the worktree
