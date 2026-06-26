@@ -13741,10 +13741,17 @@ _bridge_env_for_registered_tool() {
   # Phase 2: Emit bridge env vars, read config, run post_init hook
   # ════════════════════════════════════════════════════════════════
 
-  # ── 2a. Emit bridge_config_env (e.g. OPENCODE_CONFIG, CODEX_HOME) ──
+  # ── 2a. Emit bridge_config_env — dual mode by value prefix ──
+  #   "--*"  → CLI flag mode:  emit ACP_CLI:<flag>=<path> for bridge to append to args
+  #   else   → env var mode:   emit <ENV_VAR>=<path> (e.g. OPENCODE_CONFIG=/path)
   if [[ -n "$_bridge_env_var" ]]; then
-    echo "${_bridge_env_var}=$_slot_path"
-    log_info "ACP bridge: ${_bridge_env_var}=$_slot_path"
+    if [[ "$_bridge_env_var" == --* ]]; then
+      echo "ACP_CLI:${_bridge_env_var}=$_slot_path"
+      log_info "ACP bridge: CLI flag ${_bridge_env_var} $_slot_path"
+    else
+      echo "${_bridge_env_var}=$_slot_path"
+      log_info "ACP bridge: ${_bridge_env_var}=$_slot_path"
+    fi
   fi
 
   # ── 2b. Read config_file (settings.json) for inline env vars + permission ──
@@ -13960,6 +13967,21 @@ _ensure_acp_bridge_running() {
   else
     log_warn "no slot.discovery in registry for base_tool='$base_tool', no bridge env vars set"
   fi
+
+  # Extract ACP CLI flags (ACP_CLI: prefix) from bridge env and append to _acp_args.
+  # bridge_config_env values starting with "--" (e.g. "--config") emit
+  # "ACP_CLI:--config=<slot_path>" which we unpack into separate args here.
+  local -a _filtered_env=()
+  local _item
+  for _item in "${_bridge_env[@]}"; do
+    if [[ "$_item" == ACP_CLI:* ]]; then
+      local _cli_spec="${_item#ACP_CLI:}"
+      _acp_args+=("${_cli_spec%%=*}" "${_cli_spec#*=}")
+    else
+      _filtered_env+=("$_item")
+    fi
+  done
+  _bridge_env=("${_filtered_env[@]}")
 
   # Use --foreground (no fork) + & to avoid child-process lifecycle issues
   local bridge_log; bridge_log="$(run_dir_for_project "$project")/acp-bridge.log"

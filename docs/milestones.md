@@ -202,7 +202,7 @@
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260625T084506Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/b2-ibm-anti-cheating/code-reviews`
-=======
+
 ## M-20260625T084522Z-A
 - title: test-execution skill anti-ghost-pass
 - status: active
@@ -218,7 +218,6 @@
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260625T084522Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/test-exec-anti-ghost-pass/code-reviews`
->>>>>>> c71a36b30 (chore: milestone M-20260625T084522Z-A for test-exec anti-ghost-pass (#3495))
 
 ## M-20260625T000114Z-A
 - title: wt-close -D fix
@@ -3037,3 +3036,12 @@ routing_policy:
 - milestone: M-20260626T075340Z-A
 - status: completed
 - promoted_from: C-20260626T075340Z-A
+
+## M-20260626T075106Z-A
+- title: tool family de-hardcode + AGENT_AI_TOOL + agent-id.env + reviewer
+- status: completed
+### completed_issues
+1. `I-20260626T075106Z-A`
+- milestone: M-20260626T075106Z-A
+- status: completed
+- promoted_from: C-20260626T075106Z-A
