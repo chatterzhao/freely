@@ -27,7 +27,8 @@
 - blocker: none
 - status: pass
 
-### acceptance-3
+### testing_layer: integration
+- acceptance_target: pr-merge-guarded --dry-run gate passes
 - acceptance_target: diff 比较使用 source vs target（非 HEAD vs HEAD^）
 - testing_layer: unit
 - target_environment: test-pre-merge-20260626T155612Z-issue-sync-before-merge
@@ -35,7 +36,7 @@
 - test_command: grep "git diff.*_target.*_src_branch" docs/system/workspace/scripts/worktree/pr-merge-guarded
 - expected_output: git diff --name-only "$_target" "$_src_branch"
 - actual_output: git diff --name-only "$_target" "$_src_branch" -- "$issues_dir" 2>/dev/null | ...
-- evidence_file: .freely/run/test-evidence/acceptance-3.log
+- evidence_file: .freely/run/test-evidence/testing_layer: integration.log
 - blocker: none
 - status: pass
 
@@ -43,11 +44,12 @@
 - acceptance_target: 代码级验证 — issue-sync 顺序、auto-commit、diff 比较
 - testing_layer: unit
 - target_environment: fix worktree
-- required_evidence: acceptance-1 ~ acceptance-3 均 pass
+- required_evidence: acceptance-1 ~ testing_layer: integration 均 pass
 
 ## Integration
 - acceptance_target: pr-merge-guarded dry-run 通过，不报错
 - testing_layer: integration
+- acceptance_target: pr-merge-guarded --dry-run gate passes
 - target_environment: test-pre-merge-20260626T155612Z-issue-sync-before-merge
 - required_evidence: --dry-run 执行成功，exit 0
 - test_command: ./bin/pr-merge-guarded develop fix/raw-20260626T155612Z-issue-sync-before-merge --dry-run
