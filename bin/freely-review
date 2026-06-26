@@ -11,7 +11,11 @@ set -euo pipefail
 #   bin/freely-review --caller manager --worker-id worker_03 --raw-key <key>
 #   Pre-check: test worktree MUST NOT exist (wt-close complete)
 
-ROOT_DIR="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+ROOT_DIR=""
+if _dev_wt=$(git worktree list --porcelain 2>/dev/null | awk '$1=="worktree"{wt=$2} $1=="branch"&&$2=="refs/heads/develop"{print wt;exit}'); then
+  ROOT_DIR="$_dev_wt"
+fi
+[[ -z "$ROOT_DIR" ]] && ROOT_DIR="$(git rev-parse --show-toplevel 2>/dev/null || true)"
 [[ -n "$ROOT_DIR" ]] || { echo "ERROR: not in a git repository" >&2; exit 1; }
 
 AGENT_TABLE="$ROOT_DIR/.freely/agent-table.toml"
