@@ -17,6 +17,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+pre_tests_path: docs/epics/a2a-review-states/verification/pre-tests.md
 absorbed_into: I-20260626T025748Z-A
 ---
 
