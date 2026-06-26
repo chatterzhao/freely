@@ -23179,7 +23179,10 @@ HELP
 
   echo "[feedback] raw issue created: raw-${raw_key}"
 
-  _adapter_result=$(python3 "$_adapter" create-issue "$local_id" "[RAW-${stamp}] ${title}" "${body}" 2>&1) || true
+  _adapter_result=$(python3 "$_adapter" create-issue "$local_id" "[RAW-${stamp}] ${title}" "${body}" 2>&1) || {
+    echo "[feedback] ERROR: platform adapter failed (rc=$?)" >&2
+    exit 1
+  }
   echo "[feedback] adapter output:"
   echo "$_adapter_result"
 
@@ -23188,7 +23191,21 @@ HELP
     _created=1
   fi
 
-  [[ "$_created" == "1" ]] || { echo "[feedback] WARNING: no platform issue created" >&2; }
+  if [[ "$_created" != "1" ]]; then
+    echo "[feedback] ERROR: no platform issue created" >&2
+    exit 1
+  fi
+
+  # Check every configured platform individually: any error → exit
+  for _pf in $(echo "$_platforms" | tr ',' ' '); do
+    [[ -n "$_pf" ]] || continue
+    if echo "$_adapter_result" | grep -q "\"$_pf\""; then
+      if echo "$_adapter_result" | grep -A2 "\"$_pf\"" | grep -q '"status": "error"'; then
+        echo "[feedback] ERROR: $_pf platform creation failed" >&2
+        exit 1
+      fi
+    fi
+  done
 
   echo "[feedback]"
   echo "[feedback] Next: create a worktree to fix or implement:"
