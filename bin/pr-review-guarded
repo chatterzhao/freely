@@ -115,8 +115,8 @@ if [[ -f "$ROOT_DIR/.freely/agent-id.env" ]]; then
   _my_worker_id=$(grep "$(pwd)" "$ROOT_DIR/.freely/agent-id.env" 2>/dev/null | tail -1 | grep -o 'worker_[0-9]*' || true)
 fi
 [[ -z "$_my_worker_id" ]] && _my_worker_id="worker_01"
-if [[ -x "$ROOT_DIR/bin/freely-review" ]]; then
-  "$ROOT_DIR/bin/freely-review" --caller worker --worker-id "$_my_worker_id" --raw-key "$_raw_key" || { echo "Review FAILED"; exit 1; }
+if [[ -x "/bin/freely-review"  # ROOT_DIR is now real project root ]]; then
+  "/bin/freely-review"  # ROOT_DIR is now real project root --caller worker --worker-id "$_my_worker_id" --raw-key "$_raw_key" || { echo "Review FAILED"; exit 1; }
   _review_verdict="pass"
   exit 0
 fi
