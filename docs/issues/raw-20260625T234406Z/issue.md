@@ -17,6 +17,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+pre_tests_path: docs/epics/fix-feature-consistency/verification/pre-tests.md
+absorbed_into: I-20260625T234406Z-A
 absorbed_into: I-20260625T235348Z-A
 source_candidate: docs/pre-brainstorms/20260625T235348Z--wt-close-consistency/candidates.md#C-20260625T235348Z-A
 ---
