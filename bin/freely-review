@@ -1,0 +1,130 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# freely-review — unified Reviewer entry point for both Worker and Manager.
+#
+# Worker caller (ACP sync):
+#   bin/freely-review --caller worker --worker-id worker_03 --raw-key <key>
+#   Pre-check: test worktree EXISTS + clean + sync
+#
+# Manager caller (A2A async):
+#   bin/freely-review --caller manager --worker-id worker_03 --raw-key <key>
+#   Pre-check: test worktree MUST NOT exist (wt-close complete)
+
+ROOT_DIR="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+[[ -n "$ROOT_DIR" ]] || { echo "ERROR: not in a git repository" >&2; exit 1; }
+
+AGENT_TABLE="$ROOT_DIR/.freely/agent-table.toml"
+AGENT_QUERY="$ROOT_DIR/bin/agent-table-query"
+AGENT_ENV="$ROOT_DIR/.freely/agent-id.env"
+ACP_CLIENT="$ROOT_DIR/docs/system/workspace/scripts/runtime/run-acp-prompt.py"
+MAX_ROUNDS=3
+
+caller=""
+worker_id=""
+raw_key=""
+reviewer_slot="${REVIEWER_AGENT_SLOT:-}"
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --caller) caller="${2:-}"; shift 2 ;;
+    --worker-id) worker_id="${2:-}"; shift 2 ;;
+    --raw-key) raw_key="${2:-}"; shift 2 ;;
+    --slot) reviewer_slot="${2:-}"; shift 2 ;;
+    *) echo "Unknown: $1" >&2; exit 1 ;;
+  esac
+done
+
+[[ -n "$caller" && -n "$worker_id" && -n "$raw_key" ]] || {
+  echo "Usage: freely-review --caller worker|manager --worker-id <id> --raw-key <key>" >&2
+  exit 1
+}
+
+# ── Resolve reviewer from agent-table ──
+if [[ -x "$AGENT_QUERY" ]]; then
+  _rev_info=$("$AGENT_QUERY" --get-reviewer "$worker_id" 2>/dev/null || true)
+  if [[ -n "$_rev_info" ]]; then
+    _rev_id=$(echo "$_rev_info" | python3 -c "import json,sys; print(json.load(sys.stdin).get('id',''))" 2>/dev/null || true)
+    [[ -z "$reviewer_slot" ]] && reviewer_slot=$(echo "$_rev_info" | python3 -c "import json,sys; print(json.load(sys.stdin).get('slot',''))" 2>/dev/null || true)
+    echo "freely-review: caller=$caller worker=$worker_id reviewer=$_rev_id slot=$reviewer_slot"
+  fi
+fi
+[[ -z "$reviewer_slot" ]] && reviewer_slot="${AI_TOOL:-claude-apikey-ds-pro-auto}"
+
+# ── Pre-checks ──
+cd "$ROOT_DIR" || { echo "Error: cannot cd to $ROOT_DIR" >&2; exit 1; }
+
+_test_wt=$(git worktree list --porcelain 2>/dev/null | awk -v k="test-pre-merge-$raw_key" '
+  $1=="worktree" { wt=$2 }
+  $1=="branch" && $2 ~ k { print wt; exit }
+')
+
+if [[ "$caller" == "worker" ]]; then
+  # Worker caller: test worktree MUST exist
+  if [[ -z "$_test_wt" || ! -d "$_test_wt" ]]; then
+    echo "ERROR: test-pre-merge worktree not found for $raw_key" >&2
+    exit 1
+  fi
+  # Check clean
+  if git -C "$_test_wt" status --short 2>/dev/null | grep -q .; then
+    echo "ERROR: test worktree is dirty, commit first" >&2
+    exit 1
+  fi
+  echo "freely-review: worker pre-check passed (test worktree exists + clean)"
+
+elif [[ "$caller" == "manager" ]]; then
+  # Manager caller: test worktree MUST NOT exist (wt-close should have removed it)
+  if [[ -n "$_test_wt" && -d "$_test_wt" ]]; then
+    echo "ERROR: test worktree $_test_wt still exists! wt-close may have failed." >&2
+    exit 1
+  fi
+  _dev_wt=$(git worktree list --porcelain 2>/dev/null | awk -v k="raw-$raw_key" '
+    $1=="worktree" { wt=$2 }
+    $1=="branch" && $2 ~ k { print wt; exit }
+  ')
+  if [[ -n "$_dev_wt" && -d "$_dev_wt" ]]; then
+    echo "ERROR: dev worktree $_dev_wt still exists! wt-close may have failed." >&2
+    exit 1
+  fi
+  echo "freely-review: manager pre-check passed (worktrees properly removed)"
+else
+  echo "ERROR: invalid caller '$caller'" >&2
+  exit 1
+fi
+
+# ── Launch Reviewer ──
+if [[ "$caller" == "worker" ]]; then
+  # ACP sync: launch in test worktree
+  _acp_sock=""
+  for _s in /tmp/freely-acp-*.sock; do
+    [[ -S "$_s" ]] && { _acp_sock="$_s"; break; }
+  done
+
+  if [[ -n "$_acp_sock" && -x "$ACP_CLIENT" ]]; then
+    _pf="$ROOT_DIR/.freely/run/review-prompt.txt"
+    cat > "$_pf" << PROMPT
+You are the Freely TDD Reviewer (skill:freely-tdd-review).
+Work in $_test_wt. Review pre-tests.md and evidence files.
+Follow the four-layer review: Clean&Sync → Code Quality → Completeness → Code Safety.
+Output JSON: { "verdict": "pass"|"fail", "dimensions": {...}, "required_fixes": [...] }
+PROMPT
+    _output=$(python3 "$ACP_CLIENT" --bridge-socket "$_acp_sock" --prompt-file "$_pf" \
+      --launch-kind fresh --session-id "review-$raw_key" --model "$reviewer_slot" 2>&1) || true
+    _verdict=$(echo "$_output" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('verdict','fail'))" 2>/dev/null || echo "fail")
+    echo "freely-review: ACP verdict=$_verdict"
+    [[ "$_verdict" == "pass" ]] && exit 0 || exit 1
+  else
+    echo "[WARN] ACP bridge not available — skip review (not blocking)"
+    exit 0
+  fi
+
+elif [[ "$caller" == "manager" ]]; then
+  # A2A async: create review task for Manager's reviewer
+  _a2a="$ROOT_DIR/docs/system/workspace/scripts/runtime/a2a_task.py"
+  if [[ -f "$_a2a" ]]; then
+    python3 "$_a2a" insert --role reviewer --raw-key "$raw_key" \
+      --message "Review completed work for worker=$worker_id raw_key=$raw_key. Verify merged code on develop." \
+      --agent-id "reviewer_manager_01" 2>/dev/null || true
+    echo "freely-review: A2A review task created for reviewer_manager_01"
+  fi
+  exit 0
+fi
