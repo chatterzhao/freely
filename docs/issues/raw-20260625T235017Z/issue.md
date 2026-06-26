@@ -18,6 +18,8 @@ author: platform
 channel: github
 session_refs: []
 absorbed_into: I-20260625T235017Z-A
+pre_tests_path: docs/epics/feat-to-feature/verification/pre-tests.md
+absorbed_into: I-20260625T235017Z-A
 source_candidate: docs/pre-brainstorms/20260625T235017Z--feat-to-feature/candidates.md#C-20260625T235017Z-A
 ---
 
