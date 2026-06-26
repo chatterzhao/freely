@@ -3136,3 +3136,19 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260626T161720Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/kill-ai-tool-fallback/code-reviews`
+
+## M-20260626T171144Z-A
+- title: agent-table slot pinning at startup
+- status: active
+### candidate_issues
+1. `C-20260626T171144Z-A`
+- milestone: M-20260626T171144Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260626T171144Z-A/issue.md`
+### completed_issues
+1. `I-20260626T171144Z-A`
+- title: agent-table slot pinning at startup
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260626T171144Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/agent-table-slot-pin/code-reviews`
