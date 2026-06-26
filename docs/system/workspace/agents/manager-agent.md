@@ -39,6 +39,12 @@ ps, ls, cat, head, tail, wc, grep, find
 
 ### 允许的读写 Bash 命令（仅以下）
 
+> **委派前检查**：委派新 Worker 前，先查 agent-table 确认有空闲 worker：
+> \`agent-table-query --next-free worker\`（返回第一个空闲 worker_id）
+> 当前容量：\`agent-table-query --list worker | wc -l\`（pool 总数）
+
+### 允许的读写 Bash 命令（仅以下）
+
 | 命令 | 用途 | 约束 |
 |------|------|------|
 | `python3 a2a_task.py list/get/update/prompt` | A2A task 查询与干预 | 不可 create/delete |
@@ -90,6 +96,14 @@ python3 docs/system/workspace/scripts/runtime/a2a_task.py list --role worker --s
 #### 评审闸门 (Review Gate)
 
 **对每个已完成的 Worker，评审产出后再决定下一步。不接受自我评估，只接受证据。**
+
+实施步骤：
+1. 确认 worker 已完成：\`a2a_task.py latest --role worker --status completed\`
+2. 确认工位已 wt-close：工位目录不存在（否则阻塞，需排查）
+3. 调用 Reviewer：\`bin/freely-review --caller manager --worker-id <worker_id> --raw-key <raw_key>\`
+   - agent-table 自动匹配 reviewer_manager_01
+   - Reviewer 独立评审已合并的 develop 代码
+4. pass → 收工；fail → 创建 follow-up issue
 
 当 Worker a2a-exit worker_done 后:
 1. 确认对应工位已 wt-close（工位不存在）
