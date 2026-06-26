@@ -20105,6 +20105,21 @@ SDK_HELP
     log_info "config.toml.example released to .freely/"
   fi
 
+  # ── Agent table template ──────────────────────────────────
+  # Always release agent-table.toml (not .example) — it is the
+  # active config file.  Slots use placeholder values pointing
+  # users to create matching ~/.ai-auth/ subfolders.
+  local _at_src="$SELF_ROOT/templates/agent-table.toml.example"
+  local _at_dst="$project/.freely/agent-table.toml"
+  if [[ -f "$_at_src" ]]; then
+    if [[ -f "$_at_dst" ]]; then
+      log_info "agent-table.toml already exists, skipping"
+    else
+      cp "$_at_src" "$_at_dst"
+      log_info "agent-table.toml created — edit slot values to match ~/.ai-auth/ subfolders"
+    fi
+  fi
+
   # Release ai-auth slot templates to .freely/ai-auth/ for user reference.
   # Users should read README.md and use the .example files as templates
   # when creating their own ~/.ai-auth/ slots.

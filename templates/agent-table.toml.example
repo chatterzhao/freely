@@ -1,0 +1,31 @@
+# Freely Agent Table — multi-agent instance registry
+# =============================================================================
+# This file is THE single source of truth for all agent slots.
+# AI_TOOL is deprecated — agent-table replaces it entirely.
+#
+# Setup:
+#   1. Create a slot folder under ~/.ai-auth/<tool>-apikey-<name>/
+#      (e.g. ~/.ai-auth/claude-apikey-ds-pro-auto/)
+#   2. Configure credentials in that folder (settings.json, config.toml, etc.)
+#   3. Fill in the slot fields below with your folder names
+#   4. Test: bin/agent-table-query --get-slot manager_01
+#
+# [[agents]] — agent declarations with paired reviewers
+# pool=N auto-generates N instances with reviewer_{parent}_{num} naming.
+#
+# Role slots map to ~/.ai-auth/ subfolders.
+# =============================================================================
+
+[[agents]]
+manager_id = "manager_01"
+manager_slot = "your-claude-apikey-slotname"
+reviewer_id = "reviewer_manager_01"
+reviewer_slot = "your-claude-apikey-slotname"
+pool = 1
+
+[[agents]]
+worker_id = "worker_01"
+worker_slot = "your-claude-apikey-slotname"
+reviewer_id = "reviewer_worker_01"
+reviewer_slot = "your-claude-apikey-slotname"
+pool = 10
