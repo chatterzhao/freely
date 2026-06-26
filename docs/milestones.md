@@ -3064,3 +3064,12 @@ routing_policy:
 - milestone: M-20260626T130431Z-A
 - status: completed
 - promoted_from: C-20260626T130431Z-A
+
+## M-20260626T133842Z-A
+- title: feedback exit on platform error
+- status: completed
+### completed_issues
+1. `I-20260626T133842Z-A`
+- milestone: M-20260626T133842Z-A
+- status: completed
+- promoted_from: C-20260626T133842Z-A
