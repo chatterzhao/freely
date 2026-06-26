@@ -101,7 +101,39 @@ def parse_table(project: str = "") -> dict:
                 result["expanded"][agent["id"]] = agent
                 break
 
-    # Parse [[agent_pools]] — expand into individual agents
+    # Parse [[agents]] with pool — expand into individual agents
+    for agent in raw.get("agents", []):
+        agent_dict = dict(agent)
+        # Detect agent type from field name
+        for key in list(agent_dict.keys()):
+            if key.endswith("_id") and key not in ("reviewer_id",):
+                role = key[:-3]  # e.g. "manager_id" -> "manager", "worker_id" -> "worker"
+                base_id = agent_dict[key]  # e.g. "manager_01", "worker_01"
+                agent_slot = agent_dict.get(f"{role}_slot", "")
+                reviewer_id_template = agent_dict.get("reviewer_id", "")
+                reviewer_slot = agent_dict.get("reviewer_slot", "")
+                pool_count = int(agent_dict.get("pool", 1))
+                
+                for i in range(1, pool_count + 1):
+                    num = f"{i:02d}"
+                    agent_id = f"{role}_{num}"
+                    
+                    # Build agent entry
+                    entry = {"id": agent_id, "role": role, "slot": agent_slot}
+                    
+                    # Pair with reviewer
+                    if reviewer_id_template:
+                        # reviewer_id_template like "reviewer_manager_01" or "reviewer_worker_01"
+                        rev_id = reviewer_id_template.replace("_01", f"_{num}")
+                        rev_entry = {"id": rev_id, "role": "reviewer", "slot": reviewer_slot, "parent_agent": agent_id, "parent_role": role}
+                        result["expanded"][rev_id] = rev_entry
+                        entry["reviewer_id"] = rev_id
+                    
+                    result["expanded"][agent_id] = entry
+                break
+        result["agents"][agent_dict.get("manager_id") or agent_dict.get("worker_id") or "unknown"] = agent_dict
+
+    # Legacy support: [[agent_pools]] format
     for pool in raw.get("agent_pools", []):
         result["pools"].append(dict(pool))
         role = pool.get("role", "worker")
@@ -211,15 +243,15 @@ def main():
     elif args.next_free:
         role = args.next_free
         busy = set()
-        wt_root = os.path.join(os.path.dirname(data['path']), '..', '..', 'worktrees')
-        if os.path.isdir(wt_root):
-            for wt in os.listdir(wt_root):
-                env_file = os.path.join(wt_root, wt, '.freely', 'worker-id.env')
-                if os.path.exists(env_file):
-                    wid = open(env_file).read().strip()
-                    if '=' in wid:
-                        wid = wid.split('=', 1)[1]
-                    busy.add(wid)
+        # Read agent-id.env at project root
+        env_file = os.path.join(os.path.dirname(data['path']), 'agent-id.env')
+        if os.path.exists(env_file):
+            for line in open(env_file):
+                line = line.strip()
+                if '=' in line:
+                    parts = line.split('=', 2)  # worktree_path=agent_type=agent_id
+                    if len(parts) >= 2:
+                        busy.add(parts[-1])  # agent_id is the last part
         all_ids = list_agents(data, role)
         free = [aid for aid in all_ids if aid not in busy]
         if free:
@@ -248,16 +280,15 @@ def main():
             sys.exit(1)
     elif args.reconcile:
         import subprocess as _sp
-        wt_root = os.path.join(os.path.dirname(data['path']), '..', '..', 'worktrees')
+        env_file = os.path.join(os.path.dirname(data['path']), 'agent-id.env')
         active_workers = {}
-        if os.path.isdir(wt_root):
-            for wt in os.listdir(wt_root):
-                env_file = os.path.join(wt_root, wt, '.freely', 'worker-id.env')
-                if os.path.exists(env_file):
-                    wid = open(env_file).read().strip()
-                    if '=' in wid:
-                        wid = wid.split('=', 1)[1]
-                    active_workers[wid] = wt
+        if os.path.exists(env_file):
+            for line in open(env_file):
+                line = line.strip()
+                if '=' in line:
+                    parts = line.split('=', 2)
+                    if len(parts) >= 3:
+                        active_workers[parts[2]] = parts[0]  # agent_id -> worktree_path
         pool_workers = set(list_agents(data, 'worker'))
         orphans = [w for w in active_workers if w not in pool_workers]
         stale = [w for w in pool_workers if w not in active_workers]

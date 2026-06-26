@@ -1,20 +1,20 @@
 # Freely Agent Table — multi-agent instance registry
 #
-# [[agents]]      — singleton agent instances (Manager)
-# [[agent_pools]] — pooled agent instances (Worker+Reviewer pairs)
+# [[agents]] — agent declarations with paired reviewers
+# pool=N auto-generates N instances with reviewer_{parent}_{num} naming.
 #
-# Role slots ({role}_slot) map to terminal aliases configured via ~/.ai-auth/
-# Each alias bundles: provider + model + api_key + CLI tool preferences.
-#
-# See docs/system/workspace/a2a/agent-card-schema.md for full agent type spec.
+# Role slots map to terminal aliases configured via ~/.ai-auth/
 
 [[agents]]
 manager_id = "manager_01"
 manager_slot = "claude-apikey-ds-pro-auto"
-worktree = "develop"
-
-[[agent_pools]]
-role = "worker"
-count = 3
-worker_slot = "claude-apikey-ds-pro-auto"
+reviewer_id = "reviewer_manager_01"
 reviewer_slot = "claude-apikey-ds-pro-auto"
+pool = 1
+
+[[agents]]
+worker_id = "worker_01"
+worker_slot = "claude-apikey-ds-pro-auto"
+reviewer_id = "reviewer_worker_01"
+reviewer_slot = "claude-apikey-ds-pro-auto"
+pool = 10
