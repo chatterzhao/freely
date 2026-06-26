@@ -32,7 +32,7 @@ def _gh(*args: str, check: bool = True) -> subprocess.CompletedProcess:
 def _gitee_api(method: str, path: str, data: Optional[dict] = None) -> dict:
     """Call Gitee API via the project's gitee-issue module."""
     result = subprocess.run(
-        [sys.executable, str(RUNTIME_DIR / "gitee-issue.py"),
+        [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
          "--repo", _gitee_repo(),
          method, *([json.dumps(data)] if data else [])],
         capture_output=True, text=True
@@ -157,7 +157,7 @@ def create_issue(local_id: str, title: str, body: str) -> dict[str, dict]:
             elif platform == "gitee":
                 # Use gitee-issue.py CLI
                 result = subprocess.run(
-                    [sys.executable, str(RUNTIME_DIR / "gitee-issue.py"),
+                    [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
                      "--repo", _gitee_repo(), "create",
                      "--title", title, "--body", body],
                     capture_output=True, text=True
@@ -203,7 +203,7 @@ def add_comment(local_id: str, platform_issue_id: str, comment_body: str) -> dic
                 results[platform] = {"status": "created"}
             elif platform == "gitee":
                 result = subprocess.run(
-                    [sys.executable, str(RUNTIME_DIR / "gitee-issue.py"),
+                    [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
                      "--repo", _gitee_repo(), "comment", platform_issue_id, comment_body],
                     capture_output=True, text=True
                 )
@@ -227,7 +227,7 @@ def _get_issue_state(platform: str, issue_id: str) -> Optional[str]:
         elif platform == "gitee":
             # Gitee: use 'get' subcommand and parse JSON state field
             result = subprocess.run(
-                [sys.executable, str(RUNTIME_DIR / "gitee-issue.py"),
+                [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
                  "--repo", _gitee_repo(), "get", issue_id],
                 capture_output=True, text=True
             )
@@ -249,7 +249,7 @@ def close_issue(local_id: str, platform_issue_id: str) -> dict[str, dict]:
                 results[platform] = {"status": "closed"}
             elif platform == "gitee":
                 result = subprocess.run(
-                    [sys.executable, str(RUNTIME_DIR / "gitee-issue.py"),
+                    [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
                      "--repo", _gitee_repo(), "close", platform_issue_id],
                     capture_output=True, text=True
                 )
@@ -274,7 +274,7 @@ def update_issue(local_id: str, platform_issue_id: str, title: str = "", body: s
                 results[platform] = {"status": "updated"}
             elif platform == "gitee":
                 result = subprocess.run(
-                    [sys.executable, str(RUNTIME_DIR / "gitee-issue.py"),
+                    [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
                      "--repo", _gitee_repo(), "update", platform_issue_id,
                      *(["--title", title] if title else []),
                      *(["--body", body] if body else [])],
@@ -329,7 +329,7 @@ def search_raw_issue(raw_key: str) -> dict[str, dict]:
                             break
             elif platform == "gitee":
                 result = subprocess.run(
-                    [sys.executable, str(RUNTIME_DIR / "gitee-issue.py"),
+                    [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
                      "--repo", _gitee_repo(), "list", "--state", "open", "--limit", "50"],
                     capture_output=True, text=True
                 )
@@ -385,7 +385,7 @@ def fetch_issue(platform: str, issue_number: str) -> dict:
                 }
         elif platform == "gitee":
             result = subprocess.run(
-                [sys.executable, str(RUNTIME_DIR / "gitee-issue.py"),
+                [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
                  "--repo", _gitee_repo(), "get", issue_number],
                 capture_output=True, text=True
             )
