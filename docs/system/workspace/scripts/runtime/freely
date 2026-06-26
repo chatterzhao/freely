@@ -4047,32 +4047,46 @@ load_config() {
 
   migrate_project_auto_recovery_defaults_if_needed "$project"
 
-  # ── Agent-table: resolve manager AGENT_AI_TOOL ──────────────
-  # AI_TOOL is deprecated.  AGENT_AI_TOOL is now the single source of truth,
-  # resolved from .freely/agent-table.toml at startup.  No fallback to AI_TOOL.
+  # ── Agent-table: resolve AGENT_AI_TOOL for ALL agents ──────
+  # AI_TOOL is deprecated.  AGENT_AI_TOOL is resolved from
+  # .freely/agent-table.toml at startup.  No config writes needed.
+  #
+  # Resolution order:
+  #   1. agent-id.env → which agent (manager_01 / worker_03 / …) owns this worktree
+  #   2. agent-table → get slot for that agent_id
+  #   3. Validate slot is a registered tool
   if [[ -z "${AGENT_AI_TOOL:-}" ]]; then
-    local _at="$project/.freely/agent-table.toml"
-    local _aq="$project/bin/agent-table-query"
+    local _at="${PROJECT_ROOT}/.freely/agent-table.toml"
+    local _aq="${PROJECT_ROOT}/bin/agent-table-query"
+    local _agent_env="${PROJECT_ROOT}/.freely/agent-id.env"
+    local _my_id=""
+
+    # Resolve agent identity: agent-id.env maps worktree_path → agent_id
+    if [[ -f "$_agent_env" ]]; then
+      _my_id=$(grep -F "$(pwd)" "$_agent_env" 2>/dev/null | grep -oE '(manager_[0-9]+|worker_[0-9]+)' | head -1 || true)
+    fi
+    # Manager runs on develop worktree — not in agent-id.env
+    [[ -z "$_my_id" ]] && _my_id="manager_01"
+
     if [[ -f "$_at" && -x "$_aq" ]]; then
-      local _mgr_slot; _mgr_slot=$("$_aq" --get-slot manager_01 2>/dev/null || true)
-      if [[ -n "$_mgr_slot" ]]; then
-        # Validate the slot exists and its tool is registered
-        local _mgr_tool="${_mgr_slot%%-*}"
-        if _tool_is_registered "$_mgr_tool" 2>/dev/null; then
-          export AGENT_AI_TOOL="$_mgr_slot"
-          log_info "agent-table: manager AGENT_AI_TOOL=$AGENT_AI_TOOL"
+      local _slot; _slot=$("$_aq" --get-slot "$_my_id" 2>/dev/null || true)
+      if [[ -n "$_slot" ]]; then
+        local _tool="${_slot%%-*}"
+        if _tool_is_registered "$_tool" 2>/dev/null; then
+          export AGENT_AI_TOOL="$_slot"
+          log_info "agent-table: $_my_id AGENT_AI_TOOL=$AGENT_AI_TOOL (pool=$(grep -c "worker_" "$_agent_env" 2>/dev/null || echo 0) workers)"
         else
-          log_error "agent-table: manager slot '$_mgr_slot' resolves to unregistered tool '$_mgr_tool'"
-          log_error "Check tool-registry.toml or fix your agent-table.toml manager_slot"
+          log_error "agent-table: $_my_id slot='$_slot' → tool='$_tool' not in registry"
           exit 1
         fi
       fi
     fi
     if [[ -z "${AGENT_AI_TOOL:-}" ]]; then
-      log_error "AGENT_AI_TOOL is not set and cannot be resolved from agent-table.toml"
-      log_error "AI_TOOL fallback has been removed. Configure agent-table.toml:"
+      log_error "AGENT_AI_TOOL not set. Configure .freely/agent-table.toml:"
       log_error "  [[agents]]"
       log_error "  manager_slot = \"<tool>-apikey-<slot>\""
+      log_error "  worker_slot  = \"<tool>-apikey-<slot>\""
+      log_error "  pool = N"
       exit 1
     fi
   fi
@@ -5680,32 +5694,20 @@ sync_project_tooling_from_source() {
 	  mkdir -p "$(dirname "$target_cfg")"
 	  cp "$source_cfg" "$target_cfg"
 	  rewrite_synced_project_config_for_target "$source_project" "$target_project"
-	  # ── Agent-table slot assignment ──────────────────────────
+	  # ── Agent-table: write agent-id.env only (NOT config) ──
+	  # AGENT_AI_TOOL resolved by load_config from agent-table at startup.
+	  # No config writes needed — agent-table IS the single source of truth.
 	  _agent_table="$source_project/.freely/agent-table.toml"
 	  _agent_query="$source_project/bin/agent-table-query"
 	  if [[ -f "$_agent_table" && -x "$_agent_query" ]]; then
 	    _next_worker="$("$_agent_query" --project "$source_project" --list worker 2>/dev/null | head -1 || true)"
 	    if [[ -n "$_next_worker" ]]; then
-	      _worker_slot="$("$_agent_query" --project "$source_project" --get-slot "$_next_worker" 2>/dev/null || true)"
-	      if [[ -n "$_worker_slot" ]]; then
-	        _tmp_cfg="$(mktemp "${target_cfg}.agent.XXXXXX")"
-	        if grep -q '^AGENT_AI_TOOL =' "$target_cfg" 2>/dev/null; then
-		          sed "s/^AGENT_AI_TOOL = .*$/AGENT_AI_TOOL = \"$_worker_slot\"/" "$target_cfg" > "$_tmp_cfg"
-		else
-		          cp "$target_cfg" "$_tmp_cfg"
-		          printf 'AGENT_AI_TOOL = "%s"\n' "$_worker_slot" >> "$_tmp_cfg"
-		        fi
-	        mv "$_tmp_cfg" "$target_cfg"
-	        # Write agent-id.env at project root for cross-worktree visibility
-	        _agent_env="$source_project/.freely/agent-id.env"
-	        mkdir -p "$(dirname "$_agent_env")"
-	        echo "$target_project=worker=$_next_worker" >> "$_agent_env"
-	        log_info "agent-table: assigned $_next_worker to $target_project (agent-id.env)"
-	        log_info "agent-table: assigned $_next_worker slot=$_worker_slot to $target_project"
-	      fi
+	      _agent_env="$source_project/.freely/agent-id.env"
+	      mkdir -p "$(dirname "$_agent_env")"
+	      echo "$target_project=worker=$_next_worker" >> "$_agent_env"
+	      log_info "agent-table: assigned $_next_worker to $target_project (agent-id.env)"
 	    fi
 	  fi
-	  # ── End agent-table slot assignment ──────────────────────
 	  sync_repo_hook_assets_from_source "$source_project" "$target_project"
 	  load_config "$target_project"
 	  materialize_project_tooling_for_loaded_config "$target_project" "true"
