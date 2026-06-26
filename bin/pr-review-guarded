@@ -337,7 +337,6 @@ Co-Authored-By: Claude <noreply@anthropic.com>" 2>/dev/null || true
     echo "Review document committed."
     for platform in $(_platform_configs); do
 
-_platform_configs() {
   if [[ -n "${FREELY_REPO_PLATFORMS:-}" ]]; then echo "${FREELY_REPO_PLATFORMS//,/ }"; return; fi
   local fg=0 fgt=0
   while IFS= read -r r; do
@@ -356,6 +355,9 @@ _platform_remote_name() {
   case "$1" in
     gitee) git remote | grep -q '^gitee$' && echo "gitee" || echo "origin" ;;
 
+
+
+_platform_configs() {
 
     *)     echo "$1" ;;
   esac
