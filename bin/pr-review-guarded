@@ -62,10 +62,10 @@ pr_number=""
 echo "=== pr-review-guarded: $review_branch → $base ==="
 
 # ── Step 0: Find test-pre-merge worktree ──
-_fix_wt=$(git worktree list --porcelain 2>/dev/null | awk -v br="refs/heads/$review_branch" '
+_dev_wt=$(git worktree list --porcelain 2>/dev/null | awk -v br="refs/heads/$review_branch" '
   $1=="worktree" { wt=$2 } $1=="branch" && $2==br { print wt; exit }
 ')
-[[ -z "$_fix_wt" ]] && _fix_wt="$ROOT_DIR"
+[[ -z "$_dev_wt" ]] && _dev_wt="$ROOT_DIR"
 
 # Derive test-pre-merge from fix branch: fix/raw-xxx → test-pre-merge-xxx
 _raw_key=$(echo "$review_branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)
@@ -79,7 +79,7 @@ if [[ -z "$_test_wt" || ! -d "$_test_wt" ]]; then
   echo "ERROR: test-pre-merge worktree not found for $review_branch" >&2
   exit 1
 fi
-echo "Fix worktree: $_fix_wt"
+echo "Dev worktree: $_dev_wt"
 echo "Test worktree: $_test_wt"
 
 # ── Step 1: PR number ──
@@ -105,7 +105,7 @@ echo ""
 # ── Step 3: Pre-review checks (code sync) ──
 # 3a. Both worktrees must be clean
 _fix_dirty=0
-git -C "$_fix_wt" diff --quiet 2>/dev/null && git -C "$_fix_wt" diff --cached --quiet 2>/dev/null || _fix_dirty=1
+git -C "$_dev_wt" diff --quiet 2>/dev/null && git -C "$_dev_wt" diff --cached --quiet 2>/dev/null || _fix_dirty=1
 _test_dirty=0
 git -C "$_test_wt" diff --quiet 2>/dev/null && git -C "$_test_wt" diff --cached --quiet 2>/dev/null || _test_dirty=1
 
@@ -114,7 +114,7 @@ if [[ "$_fix_dirty" -eq 1 || "$_test_dirty" -eq 1 ]]; then
 ╔══════════════════════════════════════════════════════════════╗
 ║  ⚠️  Review blocked: worktree(s) dirty                       ║
 ╠══════════════════════════════════════════════════════════════╣
-$([[ "$_fix_dirty" -eq 1 ]] && echo "║  $_fix_wt: DIRTY")
+$([[ "$_fix_dirty" -eq 1 ]] && echo "║  $_dev_wt: DIRTY")
 $([[ "$_test_dirty" -eq 1 ]] && echo "║  $_test_wt: DIRTY")
 ║                                                              ║
 ║  Please commit your changes before requesting review:         ║
@@ -148,12 +148,12 @@ if [[ -n "$_missing_commits" ]]; then
   echo "$_missing_commits"
   echo ""
   echo "Cherry-pick these to fix branch before review:"
-  echo "  cd $_fix_wt && git cherry-pick \$(git -C $_test_wt log --format=%H --no-merges $review_branch..HEAD)"
+  echo "  cd $_dev_wt && git cherry-pick \$(git -C $_test_wt log --format=%H --no-merges $review_branch..HEAD)"
   echo ""
   echo "(or re-run pr-review-guarded --verdict pass --reason \"...\" if this is intentional)"
   exit 1
 fi
-echo "✅ Code sync: fix ↔ test-pre-merge identical"
+echo "✅ Code sync: fix|feature ↔ test-pre-merge identical"
 
 # ── Step 4: TDD Review in test-pre-merge ──
 if [[ -z "$REVIEWER_SLOT" ]]; then
