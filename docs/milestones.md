@@ -3028,3 +3028,12 @@ routing_policy:
 - issue_path: `docs/issues/I-20260625T020333Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/force-abandon-only/code-reviews`
 - source_candidate: `docs/pre-brainstorms/20260625T020333Z--force-abandon-only/candidates.md#C-20260625T020333Z-A`
+
+## M-20260626T075340Z-A
+- title: cline registry fix + bridge_config_env dual mode
+- status: completed
+### completed_issues
+1. `I-20260626T075340Z-A`
+- milestone: M-20260626T075340Z-A
+- status: completed
+- promoted_from: C-20260626T075340Z-A

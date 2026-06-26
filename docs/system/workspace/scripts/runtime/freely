@@ -950,12 +950,10 @@ parse_ai_spec() {
 
   local resolved_family
   resolved_family="$(_resolve_tool_family "$tool")"
-  case "$resolved_family" in
-    codex|kiro-cli|iflow|claude|cc|cc-use-codex-cli|opencode) ;;
-    *)
-      log_warn "tool '$tool' resolved to unknown family '$resolved_family', continuing anyway"
-      ;;
-  esac
+  # Registry-driven: warn only if tool is not in registry at all
+  if ! _tool_is_registered "$resolved_family"; then
+    log_warn "tool '$tool' resolved to unknown family '$resolved_family', continuing anyway"
+  fi
 
   echo "$tool|$model|$mode"
 }
@@ -1875,6 +1873,8 @@ manager_worker_launch_state_reconcile_prompt_liveness() {
   [[ "$_max_workers" =~ ^[0-9]+$ ]] || _max_workers="10"
   [[ "$_warn_workers" =~ ^[0-9]+$ ]] || _warn_workers="7"
   max_parallel_workers="$_max_workers"
+  # Reconcile zombie agent-id.env entries before counting (worktree gone but entry remains)
+  manager_reconcile_agent_id_env 2>/dev/null || true
   discovered_active_running_workers="$(count_active_running_workers_for_manager_project "$project" 2>/dev/null || true)"
   [[ "$discovered_active_running_workers" =~ ^[0-9]+$ ]] || discovered_active_running_workers="0"
   active_running_workers="$(manager_semantic_loop_active_worker_count_for_project "$project" || true)"
@@ -3607,7 +3607,8 @@ _resolve_shell_alias() {
 }
 
 # _resolve_tool_family: resolve any alias/function/binary to known tool family.
-# Uses `type` for unified cross-shell resolution. No hardcoded prefix lists needed.
+# Registry-driven: iterates [tool] sections from tool-registry.toml and matches
+# by acp.binary / launch.direct.binary. No hardcoded tool names.
 # Supports recursive aliases (alias → another alias → binary).
 _resolve_tool_family() {
   local tool="$1"
@@ -3625,44 +3626,50 @@ _resolve_tool_family() {
     binary="$(_strip_env_prefix "$expansion")"
     binary="${binary%% *}"
     binary=$(basename "$binary" 2>/dev/null || echo "$binary")
-    case "$binary" in
-      claude)  printf 'claude\n' || true; return 0 ;;
-      codex|kiro-cli|iflow|opencode) printf '%s\n' "$binary" || true; return 0 ;;
-      *)
-        local rec_expansion rec_binary
-        rec_expansion=$(_resolve_type_expansion "$binary")
-        if [[ -n "${rec_expansion:-}" ]]; then
-          rec_binary="$(_strip_env_prefix "$rec_expansion")"
-          rec_binary="${rec_binary%% *}"
-          rec_binary=$(basename "$rec_binary" 2>/dev/null || echo "$rec_binary")
-          case "$rec_binary" in
-            claude)  printf 'claude\n' || true; return 0 ;;
-            codex|kiro-cli|iflow|opencode) printf '%s\n' "$rec_binary"; return 0 ;;
-          esac
+    # Registry-driven: match binary name against every registered tool
+    local _reg_tool
+    for _reg_tool in $(_tool_registry_tools); do
+      local _acp_bin _dir_bin
+      _acp_bin="$(_tool_registry_get "$_reg_tool" "acp.binary" 2>/dev/null || true)"
+      _dir_bin="$(_tool_registry_get "$_reg_tool" "launch.direct.binary" 2>/dev/null || true)"
+      if [[ "$_acp_bin" == "$binary" || "$_dir_bin" == "$binary" ]]; then
+        printf '%s\n' "$_reg_tool"; return 0
+      fi
+    done
+    # Recursive: resolve binary itself through type, try again
+    local rec_expansion rec_binary
+    rec_expansion=$(_resolve_type_expansion "$binary")
+    if [[ -n "${rec_expansion:-}" ]]; then
+      rec_binary="$(_strip_env_prefix "$rec_expansion")"
+      rec_binary="${rec_binary%% *}"
+      rec_binary=$(basename "$rec_binary" 2>/dev/null || echo "$rec_binary")
+      for _reg_tool in $(_tool_registry_tools); do
+        local _acp_bin2 _dir_bin2
+        _acp_bin2="$(_tool_registry_get "$_reg_tool" "acp.binary" 2>/dev/null || true)"
+        _dir_bin2="$(_tool_registry_get "$_reg_tool" "launch.direct.binary" 2>/dev/null || true)"
+        if [[ "$_acp_bin2" == "$rec_binary" || "$_dir_bin2" == "$rec_binary" ]]; then
+          printf '%s\n' "$_reg_tool"; return 0
         fi
-        ;;
-    esac
+      done
+    fi
   fi
   printf '%s\n' "$tool"
 }
 
 tool_uses_claude_session_id() {
   local tool="$1"
-  # Auto-detect: resolve alias -> binary, then check family
-  tool="$(_resolve_tool_family "$tool")"
-  case "$tool" in
-    claude|cc|cc-use-codex-cli) return 0 ;;
-    *) return 1 ;;
-  esac
+  local resolved; resolved="$(_resolve_tool_family "$tool")"
+  # Registry-driven: tools with uuid-format session IDs use Claude's session model
+  local _id_fmt; _id_fmt="$(_tool_registry_get "$resolved" "session.id_format" 2>/dev/null || true)"
+  [[ "$_id_fmt" == "uuid" ]]
 }
 
 tool_prefers_explicit_resume_target() {
   local tool="$1"
-  tool="$(_resolve_tool_family "$tool")"
-  case "$tool" in
-    codex|claude|cc|cc-use-codex-cli|opencode) return 0 ;;
-    *) return 1 ;;
-  esac
+  local resolved; resolved="$(_resolve_tool_family "$tool")"
+  # Registry-driven: tools with supports_resume=true prefer explicit resume targets
+  local _supports; _supports="$(_tool_registry_get "$resolved" "session.supports_resume" 2>/dev/null || echo "false")"
+  [[ "$_supports" == "true" ]]
 }
 
 claude_has_verified_resume_evidence() {
@@ -3837,28 +3844,20 @@ STATEEOF
 }
 
 # _tool_session_dir: return the session directory for a given tool family.
-# Each tool stores sessions in its own location. This is the single abstraction
-# point for tool→directory mapping; _find_recent_session uses it.
+# Registry-driven: reads [tool].session.directory_template and expands
+# {slug}, {project}, and shell variables like ${HOME}.
 _tool_session_dir() {
   local resolved_tool="$1" project="$2"
-  case "$resolved_tool" in
-    claude|cc|cc-use-codex-cli)
-      # Slug is absolute path with '/' → '-'. Leading '/' becomes leading '-'.
-      # e.g. /Users/x/project → -Users-x-project
-      local project_slug
-      project_slug=$(printf '%s' "$project" | sed 's|/|-|g')
-      printf '%s\n' "${HOME}/.claude/projects/${project_slug}"
-      ;;
-    codex)
-      printf '%s\n' "${CODEX_HOME:-$HOME/.codex}/sessions"
-      ;;
-    opencode)
-      printf '%s\n' "${HOME}/.opencode/sessions"
-      ;;
-    *)
-      return 1
-      ;;
-  esac
+  local _template
+  _template="$(_tool_registry_get "$resolved_tool" "session.directory_template" 2>/dev/null || true)"
+  [[ -n "$_template" ]] || return 1
+  # Expand {slug}: absolute path with '/' → '-'
+  local _slug; _slug=$(printf '%s' "$project" | sed 's|/|-|g')
+  _template="${_template//\{slug\}/$_slug}"
+  _template="${_template//\{project\}/$project}"
+  # Expand shell variables: ${HOME}, ${CODEX_HOME:-$HOME/.codex}, etc.
+  _template=$(eval echo "$_template" 2>/dev/null || true)
+  printf '%s\n' "$_template"
 }
 
 # _find_recent_session_from_tool_dir: fallback when session-state.env has no valid ID.
@@ -5660,7 +5659,12 @@ sync_project_tooling_from_source() {
 	      _worker_slot="$("$_agent_query" --project "$source_project" --get-slot "$_next_worker" 2>/dev/null || true)"
 	      if [[ -n "$_worker_slot" ]]; then
 	        _tmp_cfg="$(mktemp "${target_cfg}.agent.XXXXXX")"
-	        sed "s/^AI_TOOL = .*$/AI_TOOL = \"$_worker_slot\"/" "$target_cfg" > "$_tmp_cfg"
+	        if grep -q '^AGENT_AI_TOOL =' "$target_cfg" 2>/dev/null; then
+		          sed "s/^AGENT_AI_TOOL = .*$/AGENT_AI_TOOL = \"$_worker_slot\"/" "$target_cfg" > "$_tmp_cfg"
+		else
+		          cp "$target_cfg" "$_tmp_cfg"
+		          printf 'AGENT_AI_TOOL = "%s"\n' "$_worker_slot" >> "$_tmp_cfg"
+		        fi
 	        mv "$_tmp_cfg" "$target_cfg"
 	        # Write agent-id.env at project root for cross-worktree visibility
 	        _agent_env="$source_project/.freely/agent-id.env"
@@ -12547,6 +12551,32 @@ worker_project_is_actively_running() {
   worker_project_is_actively_running_for_status "$project"
 }
 
+# manager_reconcile_agent_id_env — remove zombie entries (worktree gone, agent-id still present).
+# Called before delegation when approaching pool limit, and by agent-table-query --reconcile.
+manager_reconcile_agent_id_env() {
+  local _agent_env="${1:-}"
+  if [[ -z "$_agent_env" ]]; then
+    # Find develop worktree — agent-id.env is project-global, not worktree-local
+    local _dev_wt
+    _dev_wt=$(git worktree list --porcelain 2>/dev/null | awk '$1=="worktree"{wt=$2} $1=="branch"&&$2=="refs/heads/develop"{print wt;exit}')
+    _agent_env="${_dev_wt:-$PROJECT_ROOT}/.freely/agent-id.env"
+  fi
+  [[ -f "$_agent_env" ]] || return 0
+  local _cleaned=0 _line _wt_path
+  while IFS= read -r _line; do
+    [[ -n "$_line" ]] || continue
+    _wt_path="${_line%%=*}"
+    if [[ ! -d "$_wt_path" ]]; then
+      sed -i.bak "|^$_line$|d" "$_agent_env" 2>/dev/null || true
+      log_info "agent-id.env: removed zombie $_wt_path (worktree gone)"
+      _cleaned=$((_cleaned + 1))
+    fi
+  done < "$_agent_env"
+  [[ "$_cleaned" -gt 0 ]] && log_info "agent-id.env: cleaned $_cleaned zombie entries"
+  return 0
+}
+
+
 count_active_running_workers_for_manager_project() {
   local project="$1" wt_path count=0
   while IFS= read -r wt_path; do
@@ -13677,7 +13707,7 @@ _bridge_env_for_registered_tool() {
         # --settings <path>
         _slot_path=$(echo "$_resolved" | sed -n "s/.*$_alias_key \([^ ]*\).*/\1/p")
         _slot_path="${_slot_path/#\~/$HOME}"
-        _slot_type="file"
+        _slot_type="$([[ "$_is_dir" == "true" ]] && echo "dir" || echo "file")"
       elif [[ "$_discovery" == "alias_env_var" ]]; then
         # ENV="<path>"
         _slot_path=$(echo "$_resolved" | sed -n "s/.*$_alias_key=\"\([^\"]*\)\".*/\1/p")
@@ -13847,7 +13877,8 @@ _ensure_acp_bridge_running() {
   # Determine the correct ACP binary for the current tool via registry
   local acp_bin="claude-agent-acp"
   local -a _acp_args=()
-  local base_tool="${AI_TOOL%%-*}"  # opencode-apikey-xxx → opencode, codex-apikey-xxx → codex
+  local base_tool="${AGENT_AI_TOOL:-${AI_TOOL}}"  # opencode-apikey-xxx → opencode, codex-apikey-xxx → codex
+  base_tool="${base_tool%%-*}"
 
   # Read ACP binary and args from tool registry (single source of truth)
   local _reg_bin; _reg_bin="$(_tool_registry_get "$base_tool" "acp.binary" 2>/dev/null || true)"
@@ -13892,8 +13923,8 @@ _ensure_acp_bridge_running() {
         log_info "ACP bridge binary changed ($running_bin → $acp_bin), gracefully closing session before restart"
         _acp_session_close "$project" "${CLAUDE_SESSION_ID_CURRENT:-}"
         _stop_acp_bridge "$project"
-      elif [[ -n "$running_tool" && "$running_tool" != "${AI_TOOL:-}" ]]; then
-        log_info "ACP bridge tool changed ($running_tool → ${AI_TOOL:-}), gracefully closing session before restart"
+      elif [[ -n "$running_tool" && "$running_tool" != "${AGENT_AI_TOOL:-${AI_TOOL:-}}" ]]; then
+        log_info "ACP bridge tool changed ($running_tool → ${AGENT_AI_TOOL:-${AI_TOOL:-}}), gracefully closing session before restart"
         _acp_session_close "$project" "${CLAUDE_SESSION_ID_CURRENT:-}"
         _stop_acp_bridge "$project"
       elif _acp_bridge_health_check "$project" 5; then
@@ -13915,7 +13946,7 @@ _ensure_acp_bridge_running() {
   # Collect per-slot env vars to pass to the bridge process only (not global export).
   # This isolates concurrent projects using different slots.
   local -a _bridge_env=()
-  local tool_name="${AI_TOOL:-claude}"
+  local tool_name="${AGENT_AI_TOOL:-${AI_TOOL:-claude}}"
 
   # ── Registry-driven bridge env dispatch ────────────────────────
   # _bridge_env_for_registered_tool reads ALL behavior from the
@@ -13941,7 +13972,7 @@ _ensure_acp_bridge_running() {
   # Note: bridge writes its own PID file during start_server, don't overwrite it
   # Record the binary path and tool name so we can detect changes across cycles
   printf '%s\n' "$acp_bin" > "$acp_bin_file" 2>/dev/null || true
-  printf '%s\n' "${AI_TOOL:-}" > "$acp_tool_file" 2>/dev/null || true
+  printf '%s\n' "${AGENT_AI_TOOL:-${AI_TOOL:-}}" > "$acp_tool_file" 2>/dev/null || true
 
   # Wait for readiness (codex-acp cold start ~8s, use 15s margin)
   local waited=0
