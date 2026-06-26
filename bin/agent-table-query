@@ -29,7 +29,9 @@ reviewer_01, reviewer_02, reviewer_03 respectively.
 """
 
 import argparse
+import glob as _g
 import json
+import glob as _g
 import os
 import re
 import sys
@@ -167,6 +169,7 @@ def main():
     parser.add_argument("--get", metavar="ID", help="Get full agent entry by ID")
     parser.add_argument("--get-slot", metavar="ID", help="Get slot for an agent ID")
     parser.add_argument("--get-reviewer", metavar="WORKER_ID", help="Get reviewer for a worker")
+    parser.add_argument("--next-free", metavar="ROLE", help="Get next free agent ID for role")
     parser.add_argument("--expand-pools", action="store_true", help="Print expanded agent table")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
 
@@ -203,6 +206,44 @@ def main():
             print(json.dumps(rev, indent=2) if args.json else json.dumps(rev))
         else:
             print(f"ERROR: no reviewer for worker '{args.get_reviewer}'", file=sys.stderr)
+            sys.exit(1)
+    elif args.next_free:
+        role = args.next_free
+        busy = set()
+        wt_root = os.path.join(os.path.dirname(data['path']), '..', '..', 'worktrees')
+        if os.path.isdir(wt_root):
+            for wt in os.listdir(wt_root):
+                env_file = os.path.join(wt_root, wt, '.freely', 'worker-id.env')
+                if os.path.exists(env_file):
+                    wid = open(env_file).read().strip()
+                    if '=' in wid:
+                        wid = wid.split('=', 1)[1]
+                    busy.add(wid)
+        all_ids = list_agents(data, role)
+        free = [aid for aid in all_ids if aid not in busy]
+        if free:
+            print(free[0] if not args.json else json.dumps({'free': free, 'busy': list(busy)}))
+        else:
+            print(f'ERROR: no free {role} agent', file=sys.stderr)
+            sys.exit(1)
+    elif args.next_free:
+        role = args.next_free
+        busy = set()
+        wt_root = os.path.join(os.path.dirname(data["path"]), "..", "..", "worktrees")
+        if os.path.isdir(wt_root):
+            for wt in os.listdir(wt_root):
+                env_file = os.path.join(wt_root, wt, ".freely", "worker-id.env")
+                if os.path.exists(env_file):
+                    wid = open(env_file).read().strip()
+                    if "=" in wid:
+                        wid = wid.split("=", 1)[1]
+                    busy.add(wid)
+        all_ids = list_agents(data, role)
+        free = [aid for aid in all_ids if aid not in busy]
+        if free:
+            print(free[0] if not args.json else json.dumps({"free": free, "busy": list(busy)}))
+        else:
+            print(f"ERROR: no free {{role}} agent", file=sys.stderr)
             sys.exit(1)
     elif args.expand_pools:
         if args.json:
