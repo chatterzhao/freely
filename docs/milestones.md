@@ -3097,10 +3097,10 @@ routing_policy:
 - milestone: M-20260626T150328Z-A
 - status: promoted
 - promoted_issue_path: `docs/issues/I-20260626T150328Z-A/issue.md`
-### committed_issues
+### completed_issues
 1. `I-20260626T150328Z-A`
 - title: toml array comma-join + feedback validation + bash 3.2 guard
-- milestone_state: committed
+- milestone_state: completed
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260626T150328Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/toml-array-comma-join/code-reviews`
