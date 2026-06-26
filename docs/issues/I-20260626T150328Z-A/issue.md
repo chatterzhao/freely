@@ -2,6 +2,7 @@
 - kind: fix
 - phase_state: completed
 - milestone: M-20260626T150328Z-A
+- source_raw: raw-20260626T150328Z
 - source_candidate: docs/pre-brainstorms/20260626T150328Z--toml-array-comma-join/candidates.md#C-20260626T150328Z-A
 - verification_artifact_dir: docs/epics/toml-array-comma-join/code-reviews
 - canonical_issue_path: docs/issues/I-20260626T150328Z-A/issue.md
