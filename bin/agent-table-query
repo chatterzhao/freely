@@ -16,16 +16,20 @@ Agent Table Format (.freely/agent-table.toml):
   [[agents]]
   manager_id = "manager_01"
   manager_slot = "claude-apikey-ds-pro-auto"
-  worktree = "develop"
-
-  [[agent_pools]]
-  role = "worker"
-  count = 3
-  worker_slot = "claude-apikey-ds-pro-auto"
+  reviewer_id = "reviewer_manager_01"
   reviewer_slot = "claude-apikey-ds-pro-auto"
+  pool = 1
 
-Pool expands to: worker_01, worker_02, worker_03 paired with
-reviewer_01, reviewer_02, reviewer_03 respectively.
+  [[agents]]
+  worker_id = "worker_01"
+  worker_slot = "claude-apikey-ds-pro-auto"
+  reviewer_id = "reviewer_worker_01"
+  reviewer_slot = "claude-apikey-ds-pro-auto"
+  pool = 10
+
+Each [[agents]] entry declares an agent type with its slot (terminal alias name
+configured via ~/.ai-auth/) and a paired reviewer. pool=N auto-generates N
+instances with numbered IDs (worker_01..worker_N, reviewer_worker_01..N).
 """
 
 import argparse
