@@ -5662,6 +5662,11 @@ sync_project_tooling_from_source() {
 	        _tmp_cfg="$(mktemp "${target_cfg}.agent.XXXXXX")"
 	        sed "s/^AI_TOOL = .*$/AI_TOOL = \"$_worker_slot\"/" "$target_cfg" > "$_tmp_cfg"
 	        mv "$_tmp_cfg" "$target_cfg"
+	        # Write worker-id.env so other tools can find this assignment
+	        _worker_env="$target_project/.freely/worker-id.env"
+	        mkdir -p "$(dirname "$_worker_env")"
+	        echo "worker_id=$_next_worker" > "$_worker_env"
+	        log_info "agent-table: wrote worker_id=$_next_worker to $_worker_env"
 	        log_info "agent-table: assigned $_next_worker slot=$_worker_slot to $target_project"
 	      fi
 	    fi
