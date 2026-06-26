@@ -118,6 +118,37 @@ fi
   if [[ -x "$ROOT_DIR/bin/freely-review" ]]; then
   "$ROOT_DIR/bin/freely-review" --caller worker --worker-id "$_my_worker_id" --raw-key "$_raw_key" || { echo "Review FAILED"; exit 1; }
   _review_verdict="pass"
+  _review_summary="freely-review passed (ACP fallback)"
+  
+  # Write review document
+  _now=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  mkdir -p "$(dirname "$ROOT_DIR/$review_file")"
+  cat > "$ROOT_DIR/$review_file" << REVIEWDOC
+# PR Review: #$pr_number
+- pr_number: $pr_number
+- branch: $review_branch
+- base: $base
+- reviewer: tdd-agent (freely-review)
+- review_date: $_now
+- verdict: pass
+- rounds: $_review_round
+- issue_id: $_issue_id
+## Overall Verdict
+- verdict: pass
+- notes: Ready for pr-merge-guarded
+REVIEWDOC
+  echo "Review document: $review_file"
+  git -C "$ROOT_DIR" add "$review_file" 2>/dev/null || true
+  if ! git -C "$ROOT_DIR" diff --cached --quiet 2>/dev/null; then
+    git -C "$ROOT_DIR" commit -m "review: pr-review-guarded verdict=pass for PR #$pr_number (TDD rounds=$_review_round)
+Co-Authored-By: Claude <noreply@anthropic.com>" 2>/dev/null || true
+    echo "Review document committed."
+    for platform in $(_platform_configs); do
+      remote=$(_platform_remote_name "$platform")
+      echo "  [$platform] pushing review commit..."
+      git -C "$ROOT_DIR" push "$remote" "$review_branch" 2>&1 || true
+    done
+  fi
   exit 0
 fi
 # Fallback
