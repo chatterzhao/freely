@@ -3088,3 +3088,12 @@ routing_policy:
 1. `I-20260626T142357Z-A`
 - milestone: M-20260626T142357Z-A
 - status: completed
+
+## M-20260626T150328Z-A
+- title: toml array comma-join + feedback validation + bash 3.2 guard
+- status: active
+### candidate_issues
+1. `C-20260626T150328Z-A`
+- milestone: M-20260626T150328Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260626T150328Z-A/issue.md`
