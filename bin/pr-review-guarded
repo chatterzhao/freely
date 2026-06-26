@@ -109,6 +109,18 @@ echo ""
 
 # ── Step 3: TDD Review via ACP Reviewer ──
 # Resolve slot
+# Use freely-review if available
+_my_worker_id=""
+if [[ -f "$ROOT_DIR/.freely/agent-id.env" ]]; then
+  _my_worker_id=$(grep "$(pwd)" "$ROOT_DIR/.freely/agent-id.env" 2>/dev/null | tail -1 | grep -o 'worker_[0-9]*' || true)
+fi
+[[ -z "$_my_worker_id" ]] && _my_worker_id="worker_01"
+if [[ -x "$ROOT_DIR/bin/freely-review" ]]; then
+  "$ROOT_DIR/bin/freely-review" --caller worker --worker-id "$_my_worker_id" --raw-key "$_raw_key" || { echo "Review FAILED"; exit 1; }
+  _review_verdict="pass"
+  exit 0
+fi
+# Fallback
 if [[ -z "$REVIEWER_SLOT" ]]; then
   REVIEWER_SLOT="${AI_TOOL:-claude-apikey-ds-pro-auto}"
 fi
