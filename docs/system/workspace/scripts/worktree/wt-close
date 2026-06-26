@@ -80,7 +80,7 @@ Z --force 不是用来绕过错误的 ══════════════
 
 Examples:
   ./bin/wt-close feature/raw-20260513T081743Z-wt-close
-  ./bin/wt-close fix/raw-xxx --force --reason "违规绕过门禁中，理由充分，是：该功能确定放弃，不再继续实现此 raw issue"
+  ./bin/wt-close fix|feature/raw-xxx --force --reason "违规绕过门禁中，理由充分，是：该功能确定放弃，不再继续实现此 raw issue"
 USAGE
 }
 

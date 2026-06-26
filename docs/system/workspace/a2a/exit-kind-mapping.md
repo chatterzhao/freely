@@ -14,6 +14,7 @@
 | `delegate_workers` | `submitted` | 202 | Manager 委派新 Worker，子任务已提交 |
 | `resume_manager` | `completed` | 200 | Worker 完成任务，返回 Manager |
 | `stop_ai` | `failed` | 500 | AI 停止/失败 |
+| `worker_in_review` | `working` | 200 | Worker 进入 pr-review 阶段，ACP Reviewer 活跃 |
 
 ## A2A Task 状态机
 

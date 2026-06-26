@@ -91,6 +91,14 @@ python3 docs/system/workspace/scripts/runtime/a2a_task.py list --role worker --s
 
 **对每个已完成的 Worker，评审产出后再决定下一步。不接受自我评估，只接受证据。**
 
+当 Worker a2a-exit worker_done 后:
+1. 确认对应工位已 wt-close（工位不存在）
+2. 调用 \`freely-review --caller manager --worker-id <id> --raw-key <key>\`
+   - agent-table 自动匹配 reviewer_manager_01
+   - Reviewer 独立评审已合并的代码和测试
+3. pass → 确认收工
+4. fail → 创建 follow-up issue 或 reopen raw issue
+
 1. **读产出**: `completion_summary` + `evidence_paths` 指定的文件
 2. **对照验收标准**: raw issue 中的 acceptance_criteria、I-* issue 的 pre-tests
 3. **判断**:
