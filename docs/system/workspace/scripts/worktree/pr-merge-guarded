@@ -415,7 +415,7 @@ _sync_issues_changed_in_merge() {
   local _src_branch="${1:-}"
   local _wt_path
   # Resolve worktree path from source branch so issue-sync --project points
-  # to a writable fix/* worktree, not the protected develop branch.
+  # to a writable fix|feature/* worktree, not the protected develop branch.
   _wt_path=$(git worktree list --porcelain 2>/dev/null | awk -v br="$_src_branch" '$1=="worktree"{wt=$2} $1=="branch" && index($2,br){print wt}' | head -1)
   [[ -z "$_wt_path" ]] && _wt_path="$PWD"
 
