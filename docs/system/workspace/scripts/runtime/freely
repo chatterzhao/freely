@@ -13973,14 +13973,17 @@ _ensure_acp_bridge_running() {
   # "ACP_CLI:--config=<slot_path>" which we unpack into separate args here.
   local -a _filtered_env=()
   local _item
-  for _item in "${_bridge_env[@]}"; do
-    if [[ "$_item" == ACP_CLI:* ]]; then
-      local _cli_spec="${_item#ACP_CLI:}"
-      _acp_args+=("${_cli_spec%%=*}" "${_cli_spec#*=}")
-    else
-      _filtered_env+=("$_item")
-    fi
-  done
+  # bash 3.2 + set -u: iterating empty array directly errors ("unbound variable")
+  if [[ ${#_bridge_env[@]} -gt 0 ]]; then
+    for _item in "${_bridge_env[@]}"; do
+      if [[ "$_item" == ACP_CLI:* ]]; then
+        local _cli_spec="${_item#ACP_CLI:}"
+        _acp_args+=("${_cli_spec%%=*}" "${_cli_spec#*=}")
+      else
+        _filtered_env+=("$_item")
+      fi
+    done
+  fi
   _bridge_env=("${_filtered_env[@]}")
 
   # Use --foreground (no fork) + & to avoid child-process lifecycle issues
@@ -23162,6 +23165,44 @@ HELP
     P0|P1|P2) ;;
     *) log_error "--severity must be P0, P1, or P2"; return 1 ;;
   esac
+
+  # ── Title format validation ─────────────────────────────────
+  # 1. Type prefix: must use conventional commit type prefix
+  #    fix: / feat: / docs: / refactor: / chore: / test: / build: / ci: / perf: / style:
+  local _title_types="fix|feat|docs|refactor|chore|test|build|ci|perf|style"
+  if ! echo "$title" | grep -qE "^(${_title_types}): "; then
+    log_error "title must start with a type prefix: ${_title_types//|/, }"
+    echo >&2 "  Example: 'fix: something broken'  'feat: new capability'  'docs: update guide'"
+    echo >&2 "  Got: '$title'"
+    return 1
+  fi
+
+  # 2. Title length: user portion ≤ 72 chars, total (with [RAW-{key}] prefix) ≤ 100 chars
+  local _prefix_len=28  # "[RAW-YYYYMMDDTHHMMSSZ] " ≈ 27+1 chars
+  local _user_title_len="${#title}"
+  local _total_len=$(( _prefix_len + _user_title_len ))
+  if [[ "$_total_len" -gt 100 ]]; then
+    log_error "title too long: $_total_len chars (max 100 including [RAW-{key}] prefix)"
+    echo >&2 "  User title: $_user_title_len chars. Keep it ≤ 72 chars."
+    echo >&2 "  Got: '$title'"
+    return 1
+  fi
+
+  # ── Body format validation ──────────────────────────────────
+  # 1. Minimum content: at least 50 non-whitespace characters
+  local _body_trimmed; _body_trimmed=$(echo "$body" | tr -d '[:space:]')
+  if [[ "${#_body_trimmed}" -lt 50 ]]; then
+    log_error "body too short (${#_body_trimmed} non-ws chars, need ≥ 50)"
+    echo >&2 "  Provide enough detail: root cause, impact, fix plan."
+    return 1
+  fi
+
+  # 2. Must have at least one ## section heading (Freely raw issue convention)
+  if ! echo "$body" | grep -q '^## '; then
+    log_error "body must contain at least one ## section heading"
+    echo >&2 "  Freely raw issues use structured sections: ## 根因 / ## 影响 / ## 修复方案"
+    return 1
+  fi
 
   stamp=$(date -u +%Y%m%dT%H%M%SZ)
   raw_key="$stamp"
