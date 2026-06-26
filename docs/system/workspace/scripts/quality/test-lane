@@ -29,7 +29,7 @@ protected_branch() {
 
 feature_local_branch() {
   local branch="${1:-}"
-  [[ "$branch" == feature/* || "$branch" == release/* || "$branch" == hotfix/* ]]
+  [[ "$branch" == fix/* || "$branch" == feature/* || "$branch" == release/* || "$branch" == hotfix/* ]]
 }
 
 require_git_worktree() {
@@ -63,10 +63,10 @@ branch="$(branch_name)"
 case "$lane" in
   feature-local)
     if protected_branch "$branch"; then
-      fail "[test-lane] blocked: lane=feature-local requires a writable dedicated feature/release/hotfix/premerge worktree; current branch '$branch' is protected. Use premerge-integration on test-pre-merge-* or post-merge-followthrough on the target protected branch."
+      fail "[test-lane] blocked: lane=feature-local requires a writable dedicated fix/feature/release/hotfix/premerge worktree; current branch '$branch' is protected. Use premerge-integration on test-pre-merge-* or post-merge-followthrough on the target protected branch."
     fi
     if [[ "$branch" != feature/premerge-* ]] && ! feature_local_branch "$branch"; then
-      fail "[test-lane] blocked: lane=feature-local only runs on dedicated feature/release/hotfix/premerge branches; current branch is '$branch'."
+      fail "[test-lane] blocked: lane=feature-local only runs on dedicated fix/feature/release/hotfix/premerge branches; current branch is '$branch'."
     fi
     ;;
   premerge-integration)

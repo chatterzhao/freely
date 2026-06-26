@@ -89,7 +89,7 @@ Freely 处于研究优先的整合阶段。
 ## 会话启动检查
 
 每次会话开始：
-1. **分支/Worktree检查**：如在 `main`/`develop`/`test-pre-merge-*` 分支则禁止写入、提交，它们只接受 merge。若是启动 Freely runtime，应在项目根目录启动，但这不放宽 protected root 的 owner-development 禁令；实际写入必须由 Freely 委派到 dedicated worktree。先执行 `cd <your-project-path>`，再优先使用标准入口 `./bin/wt-create <branch> [--base <base>]` 创建 feature worktree，并 `cd` 到该 worktree 中工作。只有在基础设施受限、必须手工执行 `git worktree add -b <branch> ../<your-project-worktrees>/<branch-dir> <base>` 时，才允许裸建树，并且随后必须立刻执行 `./bin/freely sync-tooling --source-project <your-project-path> --project ../<your-project-worktrees>/<branch-dir>`。默认 `<base>` 为 `develop`；若当前 issue 依赖未合并父分支改动，可用父 `feature/*` 作为 `<base>`，但必须在 pre-brainstorm / milestone / issue 中记录依赖关系。`<your-project-worktrees>` 指当前项目同级的 worktree 根目录，格式为 `<your-project-name>-worktrees`。`<branch-dir>` 必须与当前 worktree 派生规则一致：无日期分支使用 `<branch>` 的安全化名称；若分支名包含 `YYYYMMDD` 或 `YYYYMMDDTHHMMZ`/`YYYYMMDDTHHMMSSZ`（旧格式 `YYYYMMDD-HHMM` 仍兼容），目录名改为日期前置，例：`feature/foo-20260307T1015Z` -> `20260307T1015Z-feature-foo`
+1. **分支/Worktree检查**：如在 `main`/`develop`/`test-pre-merge-*` 分支则禁止写入、提交，它们只接受 merge。若是启动 Freely runtime，应在项目根目录启动，但这不放宽 protected root 的 owner-development 禁令；实际写入必须由 Freely 委派到 dedicated worktree。先执行 `cd <your-project-path>`，再优先使用标准入口 `./bin/wt-create <branch> [--base <base>]` 创建 fix|feature worktree，并 `cd` 到该 worktree 中工作。只有在基础设施受限、必须手工执行 `git worktree add -b <branch> ../<your-project-worktrees>/<branch-dir> <base>` 时，才允许裸建树，并且随后必须立刻执行 `./bin/freely sync-tooling --source-project <your-project-path> --project ../<your-project-worktrees>/<branch-dir>`。默认 `<base>` 为 `develop`；若当前 issue 依赖未合并父分支改动，可用父 `feature/*` 作为 `<base>`，但必须在 pre-brainstorm / milestone / issue 中记录依赖关系。`<your-project-worktrees>` 指当前项目同级的 worktree 根目录，格式为 `<your-project-name>-worktrees`。`<branch-dir>` 必须与当前 worktree 派生规则一致：无日期分支使用 `<branch>` 的安全化名称；若分支名包含 `YYYYMMDD` 或 `YYYYMMDDTHHMMZ`/`YYYYMMDDTHHMMSSZ`（旧格式 `YYYYMMDD-HHMM` 仍兼容），目录名改为日期前置，例：`feature/foo-20260307T1015Z` -> `20260307T1015Z-feature-foo`
    - 先确认 `git config --get core.hooksPath` 返回 `.githooks`。仓库中“存在 hook 脚本”不代表 Git 已启用它们；只有 `core.hooksPath=.githooks` 时，根目录 `.githooks/` 包装层才会实际转发到 `docs/system/workspace/hooks/*.sh` 执行门禁。
    - `test-pre-merge-*` 是一次性本地测试批次：必须从当前 `develop` 新建，只允许 merge 装配验证，不允许普通写入/提交/push，不允许承载 owner / milestone / continuation 真相，测试结束后立即删除。
   	   - **test-pre-merge 的职责**：验证 feature 能否在真实环境中正常工作，保证 develop 只接受已验证的代码。
@@ -182,7 +182,7 @@ Freely 开发 Freely 时，默认先问四件事：
 
 当发现运行时 bug，使用 `skill:freely-fix-execution` 快速修复。先判场景：
 
-- **原 feature worktree 还在** → 直接在 feature 上改、提交。走 feature → [skill] test-execution → [skill] B1_IBM → [skill] B2_IBM → [命令] pr-create-guarded → [命令] pr-review-guarded → [命令] pr-merge-guarded → develop。
+- **原 fix|feature worktree 还在** → 直接在 fix|feature 上改、提交。走 feature → [skill] test-execution → [skill] B1_IBM → [skill] B2_IBM → [命令] pr-create-guarded → [命令] pr-review-guarded → [命令] pr-merge-guarded → develop。
 - **原 feature 已退役（已合并/已删）** → 建 `test-pre-merge-*` 私有工位快测（不改不提交不推送，不违背保护约束）。验证通过后 cp 修改到新建的 `fix/*` 或 `hotfix/*` 可写工位，增量提交。
 - **普通 fix** 走 `fix → [skill] test-execution → [skill] B1 → [skill] B2 → [命令] pr-create → [命令] pr-review → [命令] pr-merge → develop`；**紧急 hotfix** 用 `hotfix/*` → develop（hotfix 从 main 创建，可跳过 test-pre-merge）。
 - **补齐治理**：B1_IBM（`skill:freely-doc-B1_IBM-execution`：brainstorm → candidate → milestone）→ B2_IBM（`skill:freely-doc-B2_IBM-execution`：I-* → prd → pre-tests → tasks → code-review）→ milestones.md。
@@ -263,7 +263,7 @@ Freely 必须在 Freely 治理规则下开发，不得有项目特定的例外�
 - `./bin/issue-sync` — 平台 issue 同步（create/close/comment/batch）
 - `./bin/pr-merge-guarded` — 门禁合并
 - `./bin/governance-check` — 治理门禁检查
-- `./bin/wt-create` — 创建 feature worktree
+- `./bin/wt-create` — 创建 fix|feature worktree
 - `./bin/freely-package` — 打包版本
 - `./bin/issue-index` — Issue 索引管理
 - 这些是独立脚本，直接 `./bin/<name>` 调用，**不是** `./bin/freely <name>` 子命令

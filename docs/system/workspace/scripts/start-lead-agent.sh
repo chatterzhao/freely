@@ -323,7 +323,7 @@ EOF
 Worktree:
 - /abs/path/to/worktree
 Branch:
-- fix/raw-{key}-{slug}
+- fix|feature/raw-{key}-{slug}
 dispatch_priority: P2
 parallel_safe: true
 write_scope: worktree

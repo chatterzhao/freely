@@ -74,7 +74,7 @@ fi
 
 case "$branch" in
   main|develop)
-    echo "Add blocked: '$branch' is protected. Use feature/release/hotfix worktree." >&2
+    echo "Add blocked: '$branch' is protected. Use fix/feature/release/hotfix worktree." >&2
     return 1
     ;;
 esac

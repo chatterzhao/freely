@@ -194,13 +194,13 @@ fi
 
 if [[ "$using_new" -eq 1 ]]; then
   test_pre_merge_branch="test-pre-merge-${raw_key}-${slug}"
-  fix_branch="${prefix}/raw-${raw_key}-${slug}"
+  dev_branch="${prefix}/raw-${raw_key}-${slug}"
 else
   test_pre_merge_branch=""
-  fix_branch="$legacy_branch"
+  dev_branch="$legacy_branch"
 fi
 
-[[ -n "$fix_branch" ]] || { usage; exit 1; }
+[[ -n "$dev_branch" ]] || { usage; exit 1; }
 
 # ── Root dir + common ────────────────────────────────────
 
@@ -219,7 +219,7 @@ fi
 
 # ── Validate branches don't already exist ────────────────
 
-for b in $test_pre_merge_branch $fix_branch; do
+for b in $test_pre_merge_branch $dev_branch; do
   [[ -z "$b" ]] && continue
   if git show-ref --verify --quiet "refs/heads/$b"; then
     echo "Branch already exists: $b" >&2
@@ -605,7 +605,7 @@ _create_worktree() {
 
 # ── Pre-check: issue must exist ──────────────────────────
 
-_require_issue_exists "$fix_branch" || exit 1
+_require_issue_exists "$dev_branch" || exit 1
 
 # ── Sync local develop with remote ───────────────────────
 echo "=== Syncing local develop ==="
@@ -634,9 +634,9 @@ fi
 # ── Create worktree(s) ───────────────────────────────────
 
   if [[ "$using_new" -eq 1 ]]; then
-  fix_target="$(freely_wt_resolve_target_path "$fix_branch")"
+  fix_target="$(freely_wt_resolve_target_path "$dev_branch")"
   echo "=== Step 1/2: Creating ${prefix} worktree ==="
-  _create_worktree "$fix_branch" "$fix_target" "$base"
+  _create_worktree "$dev_branch" "$fix_target" "$base"
   echo "  ${prefix}: $fix_target (base: $base)"
 
   # Pull raw issue from inside the fix/feature worktree
@@ -646,7 +646,7 @@ fi
     if ! ( cd "$fix_target" && _pull_raw_issue "$raw_key" "$source_val" ); then
       echo "拒绝创建工位: raw-issue-pull failed" >&2
       git -C "$ROOT_DIR" worktree remove "$fix_target" --force 2>/dev/null || true
-      git -C "$ROOT_DIR" branch -D "$fix_branch" 2>/dev/null || true
+      git -C "$ROOT_DIR" branch -D "$dev_branch" 2>/dev/null || true
       return 1
     fi
     _fill_platform_ids "$raw_key"
@@ -657,8 +657,8 @@ fi
   tp_target="$(freely_wt_resolve_target_path "$test_pre_merge_branch")"
   echo ""
   echo "=== Step 2/2: Creating test-pre-merge worktree (for testing) ==="
-  _create_worktree "$test_pre_merge_branch" "$tp_target" "$fix_branch"
-  echo "  test-pre-merge: $tp_target (base: $fix_branch)"
+  _create_worktree "$test_pre_merge_branch" "$tp_target" "$dev_branch"
+  echo "  test-pre-merge: $tp_target (base: $dev_branch)"
 
   # Clone .freely runtime state from develop so test worktree can run daemon
   _src_freely="$ROOT_DIR/.freely"
@@ -681,17 +681,17 @@ fi
 ║  Worktrees created                                      ║
 ╠══════════════════════════════════════════════════════════╣
 ║  ${prefix} worktree:     $fix_target
-║  branch:          $fix_branch
+║  branch:          $dev_branch
 ║  base:            $base
 ║  skill:           ${skill_path}
 ║  source:          ${source_val}
 ║                                                        ║
 ║  test-pre-merge (testing): $tp_target
 ║  branch:          $test_pre_merge_branch
-║  base:            $fix_branch
+║  base:            $dev_branch
 ╠══════════════════════════════════════════════════════════╣
 ║  Merge chain:                                           ║
-║    $fix_branch → develop
+║    $dev_branch → develop
 ║                                                        ║
 ║  test-pre-merge 是丢弃的测试沙箱，不参与合并链             ║
 ╚══════════════════════════════════════════════════════════╝
@@ -746,14 +746,14 @@ REMINDER
       ;;
   esac
 else
-  tp_target="$(freely_wt_resolve_target_path "$fix_branch")"
-  _create_worktree "$fix_branch" "$tp_target" "$base"
+  tp_target="$(freely_wt_resolve_target_path "$dev_branch")"
+  _create_worktree "$dev_branch" "$tp_target" "$base"
 
   cat <<MSG
 Created worktree:
   $tp_target
 Branch:
-  $fix_branch
+  $dev_branch
 Execution base:
   $base
 

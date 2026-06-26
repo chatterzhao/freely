@@ -55,7 +55,7 @@
 4d. `develop` 在本地 merge 后允许存在短暂的 post-merge acceptance / cleanup followthrough 窗口；但若本地 `develop` 已领先其 tracked remote，这段窗口必须以显式的 status / patrol truth 暴露，不得静默假装已经完成远端 canonical followthrough。
 4a. 当 issue 已有 `pre-tests.md` 时，develop 合并 gate 默认优先看其中定义的 integration / acceptance evidence；代码评审完成度不得替代这层验收。
 4e. 测试 lane 必须与分支职责一致，至少区分三类：
-   - `feature-local`：在 dedicated feature/release/hotfix/premerge worktree 中运行实现自测、局部回归、issue-bound 验证；不得在 `main/develop/test-pre-merge-*` 上冒充此 lane。
+   - `feature-local`：在 dedicated fix/feature/release/hotfix/premerge worktree 中运行实现自测、局部回归、issue-bound 验证；不得在 `main/develop/test-pre-merge-*` 上冒充此 lane。
    - `premerge-integration`：仅在 `test-pre-merge-*` 批次中运行主线前集成 smoke/regression/acceptance；不得在 `develop` 上提前执行来替代测试批次。
    - `post-merge-followthrough`：仅在目标 protected branch 的 canonical worktree 中运行 merge 后真实环境 followthrough；它观察集成结果，不授予继续在 protected branch 上开发实现的权限。
 4f. 若使用统一测试入口，命令语义必须显式暴露 lane 与当前 branch 的匹配关系；lane 误用应直接失败，而不是静默降级到“能跑就算对”。

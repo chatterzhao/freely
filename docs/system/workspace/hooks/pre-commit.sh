@@ -219,7 +219,7 @@ MSG
   cat <<MSG
 [HOOK] Commit blocked: direct development on '$branch' is forbidden.
 Test pre-merge batches are ephemeral verification surfaces.
-- merge feature branches into this batch for testing
+- merge fix|feature branches into this batch for testing
 - fix failures back in the source feature worktree
 - delete the batch when testing ends
 
@@ -297,7 +297,7 @@ MSG
 Read AGENTS.md §核心开发流程, then invoke the correct skill:
 
   Bug fix  → skill:freely-fix-execution   (Fix first, govern later)
-  Feature  → skill:freely-feat-execution  (Govern first, then code)
+  Fix|Feature  → skill:freely-fix-execution|freely-feat-execution  (Govern first, then code)
 
 Quick start:
   cd <project-root>

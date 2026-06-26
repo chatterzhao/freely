@@ -1,31 +1,30 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# pr-review-guarded: TDD review gate between pr-create and pr-merge.
+# pr-review-guarded: ACP-based TDD review gate between pr-create and pr-merge.
 #
-# Reviews in test-pre-merge worktree (the live test sandbox), not in the
-# fix|feature worktree.  This ensures the Reviewer sees actual evidence:
-# committed pre-tests.md with actual_output, plus .freely/run/ evidence files.
+# Launches an independent Reviewer agent (separate ACP session, same worktree)
+# that performs TDD four-question review: RED → GREEN → ADEQUACY → REFACTOR.
+# Loop until pass, or escalate to Manager after 3 rounds.
 #
-# Pre-review checks (bash layer):
-#   Step 0: find test-pre-merge path
-#   Step 1: both worktrees clean
-#   Step 2: code synced (test-pre-merge has all fix commits + vice versa)
+# Usage:
+#   ./bin/pr-review-guarded <branch> [--reviewer <name>] [--verdict pass|fail|needs_changes] [--reason <text>]
 #
-# Then launches Reviewer via ACP (or falls back to legacy 6-dimension checks).
-# Review standard: three layers — code quality / completeness / code safety.
-# Loop until pass, or escalate to Manager after MAX_ROUNDS.
+# --reason gate: when --verdict pass overrides failing review, --reason is required.
 
 ROOT_DIR="$(git rev-parse --show-toplevel 2>/dev/null || true)"
 [[ -n "$ROOT_DIR" ]] || { echo "ERROR: not in a git repository" >&2; exit 1; }
 
-# ── Config ──────────────────────────────────────────────────
+# ── Config ────────────────────────────────────────────────
+
 ACP_PROMPT_CLIENT="$ROOT_DIR/docs/system/workspace/scripts/runtime/run-acp-prompt.py"
 REVIEW_STATE_DIR="$ROOT_DIR/.freely/run"
 REVIEW_SESSION_FILE="$REVIEW_STATE_DIR/review-session.env"
 REVIEW_PROMPT_FILE="$REVIEW_STATE_DIR/review-prompt.txt"
 MAX_ROUNDS=3
 REVIEWER_SKILL="freely-tdd-review"
+# Slot for Reviewer agent — uses same slot as main AI_TOOL for now.
+# When agent-table is fully deployed, this reads from reviewer_slot.
 REVIEWER_SLOT="${REVIEWER_AGENT_SLOT:-}"
 
 # Parse arguments
@@ -39,12 +38,17 @@ while [[ $# -gt 0 ]]; do
     --verdict) verdict_override="${2:-}"; shift 2 ;;
     --reason) verdict_reason="${2:-}"; shift 2 ;;
     --slot) REVIEWER_SLOT="${2:-}"; shift 2 ;;
-    --help|-h) cat >&2 <<'HELPMSG'
-Usage: ./bin/pr-review-guarded <branch> [--slot <slot>] [--verdict pass|fail] [--reason <text>]
+    --help|-h)
+      cat >&2 <<'HELPMSG'
+Usage: ./bin/pr-review-guarded <branch> [--reviewer <name>] [--slot <slot>] [--verdict pass|fail] [--reason <text>]
 
-Reviews in the matching test-pre-merge worktree.  Checks code sync, then
-launches TDD Reviewer (ACP) for three-layer review.
-Loops until pass, or escalates after 3 rounds.
+Launches TDD Reviewer via ACP for independent four-question review.
+Loops until pass (with Worker fixes between rounds) or escalates after 3 rounds.
+
+Options:
+  --slot <name>     Reviewer AI slot (default: same as AI_TOOL)
+  --verdict <value> Override verdict (pass|fail)
+  --reason <text>   REQUIRED when overriding
 HELPMSG
       exit 0 ;;
     -*) echo "Unknown: $1" >&2; exit 1 ;;
@@ -54,113 +58,74 @@ done
 
 if [[ -z "$review_branch" ]]; then
   echo "ERROR: branch argument required." >&2
+  echo "Usage: ./bin/pr-review-guarded <branch>" >&2
   exit 1
 fi
 
 base="develop"
 pr_number=""
 echo "=== pr-review-guarded: $review_branch → $base ==="
+echo ""
 
-# ── Step 0: Find test-pre-merge worktree ──
-_fix_wt=$(git worktree list --porcelain 2>/dev/null | awk -v br="refs/heads/$review_branch" '
-  $1=="worktree" { wt=$2 } $1=="branch" && $2==br { print wt; exit }
-')
-[[ -z "$_fix_wt" ]] && _fix_wt="$ROOT_DIR"
-
-# Derive test-pre-merge from fix branch: fix/raw-xxx → test-pre-merge-xxx
-_raw_key=$(echo "$review_branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)
-[[ -z "$_raw_key" ]] && { echo "ERROR: cannot extract raw key from $review_branch" >&2; exit 1; }
-
-_test_wt=$(git worktree list --porcelain 2>/dev/null | awk -v k="$_raw_key" '
-  $1=="worktree" { wt=$2 }
-  $1=="branch" && $0 ~ "test-pre-merge-"k { if (!found) { print wt; found=1 } }
-')
-if [[ -z "$_test_wt" || ! -d "$_test_wt" ]]; then
-  echo "ERROR: test-pre-merge worktree not found for $review_branch" >&2
-  exit 1
-fi
-echo "Fix worktree: $_fix_wt"
-echo "Test worktree: $_test_wt"
-
-# ── Step 1: PR number ──
+# ── Step 1: Find PR number ──
 if command -v gh &>/dev/null; then
   pr_number=$(gh pr list --repo chatterzhao/freely --head "$review_branch" --state open --json number -q '.[0].number' 2>/dev/null || true)
 fi
-[[ -z "$pr_number" ]] && pr_number="local"
+if [[ -z "$pr_number" ]]; then
+  pr_number="local"
+fi
 echo "PR: #$pr_number"
 
-# ── Step 2: Review paths ──
-_issue_id="I-${_raw_key}-A"
+# ── Step 2: Find review paths ──
+_raw_key=$(echo "$review_branch" | grep -oE 'raw-[0-9]{8}T[0-9]{6}Z' | head -1 || true)
+_issue_id="I-${_raw_key#raw-}-A"
 _epic_dir=""
-if [[ -d "$ROOT_DIR/docs/issues/$_issue_id" ]]; then
-  _verification_dir=$(grep "verification_artifact_dir:" "$ROOT_DIR/docs/issues/$_issue_id/issue.md" 2>/dev/null | sed "s/.*: *'*\([^']*\)'*/\1/" | head -1 || true)
-  [[ -n "$_verification_dir" && -d "$ROOT_DIR/$_verification_dir" ]] && _epic_dir="$_verification_dir"
+if [[ -d "docs/issues/$_issue_id" ]]; then
+  _verification_dir=$(grep "verification_artifact_dir:" "docs/issues/$_issue_id/issue.md" 2>/dev/null | sed "s/.*: *'*\([^']*\)'*/\1/" | head -1 || true)
+  if [[ -n "$_verification_dir" ]] && [[ -d "$_verification_dir" ]]; then
+    _epic_dir="$_verification_dir"
+  fi
 fi
-[[ -z "$_epic_dir" ]] && _epic_dir="docs/epics/pr-review-guarded/code-reviews"
+if [[ -z "$_epic_dir" ]]; then
+  _epic_dir="docs/epics/pr-review-guarded/code-reviews"
+fi
 review_file="$_epic_dir/pr-review-${pr_number}.md"
-mkdir -p "$ROOT_DIR/$_epic_dir" "$REVIEW_STATE_DIR"
+mkdir -p "$_epic_dir"
+mkdir -p "$REVIEW_STATE_DIR"
 echo "Review document: $review_file"
 echo ""
 
-# ── Step 3: Pre-review checks (code sync) ──
-# 3a. Both worktrees must be clean
-_fix_dirty=0
-git -C "$_fix_wt" diff --quiet 2>/dev/null && git -C "$_fix_wt" diff --cached --quiet 2>/dev/null || _fix_dirty=1
-_test_dirty=0
-git -C "$_test_wt" diff --quiet 2>/dev/null && git -C "$_test_wt" diff --cached --quiet 2>/dev/null || _test_dirty=1
-
-if [[ "$_fix_dirty" -eq 1 || "$_test_dirty" -eq 1 ]]; then
-  cat >&2 <<DIRTY
-╔══════════════════════════════════════════════════════════════╗
-║  ⚠️  Review blocked: worktree(s) dirty                       ║
-╠══════════════════════════════════════════════════════════════╣
-$([[ "$_fix_dirty" -eq 1 ]] && echo "║  $_fix_wt: DIRTY")
-$([[ "$_test_dirty" -eq 1 ]] && echo "║  $_test_wt: DIRTY")
-║                                                              ║
-║  Please commit your changes before requesting review:         ║
-║    cd $_test_wt && git add -A && git commit                  ║
-╚══════════════════════════════════════════════════════════════╝
-DIRTY
-  exit 1
-fi
-echo "✅ Both worktrees clean"
-
-# 3b. Code sync check: test-pre-merge must contain fix branch
-if ! git -C "$_test_wt" merge-base --is-ancestor "$review_branch" HEAD 2>/dev/null; then
-  cat >&2 <<SYNC
-╔══════════════════════════════════════════════════════════════╗
-║  ⚠️  Review blocked: test-pre-merge not synced with fix     ║
-╠══════════════════════════════════════════════════════════════╣
-║  test-pre-merge does not contain fix|feature branch commits.         ║
-║  Please merge fix/feature into test-pre-merge:                       ║
-║    cd $_test_wt && git merge $review_branch --no-edit      ║
-╚══════════════════════════════════════════════════════════════╝
-SYNC
-  exit 1
-fi
-
-# 3c. Reverse sync: fix must have test-pre-merge commits
-# Cherry-pick missing commits (e.g. pre-tests.md filled by test run)
-# Exclude merge commits — those are scaffolding, not code.
-_missing_commits=$(git -C "$_test_wt" log --oneline --no-merges "$review_branch..HEAD" 2>/dev/null || true)
-if [[ -n "$_missing_commits" ]]; then
-  echo "⚠️  test-pre-merge has commits (non-merge) not in fix branch:"
-  echo "$_missing_commits"
-  echo ""
-  echo "Cherry-pick these to fix branch before review:"
-  echo "  cd $_fix_wt && git cherry-pick \$(git -C $_test_wt log --format=%H --no-merges $review_branch..HEAD)"
-  echo ""
-  echo "(or re-run pr-review-guarded --verdict pass --reason \"...\" if this is intentional)"
-  exit 1
-fi
-echo "✅ Code sync: fix ↔ test-pre-merge identical"
-
-# ── Step 4: TDD Review in test-pre-merge ──
+# ── Step 3: TDD Review via ACP Reviewer ──
+# Resolve slot
 if [[ -z "$REVIEWER_SLOT" ]]; then
   REVIEWER_SLOT="${AI_TOOL:-claude-apikey-ds-pro-auto}"
 fi
 
-# Determine round
+# Get worktree path
+_wt_path=$(git worktree list --porcelain 2>/dev/null | awk -v br="refs/heads/$review_branch" '
+  $1=="worktree" { wt=$2 }
+  $1=="branch" && $2==br { print wt; exit }
+')
+_wt_path="${_wt_path:-$ROOT_DIR}"
+
+# Collect review context
+_pre_tests_file=""
+for _d in docs/epics/*/verification/; do
+  if [[ -f "${_d}pre-tests.md" ]]; then
+    _pre_tests_file="${_d}pre-tests.md"
+    break
+  fi
+done
+
+_diff_file="$REVIEW_STATE_DIR/review-diff.txt"
+git diff "$base..$review_branch" > "$_diff_file" 2>/dev/null || true
+
+_issue_file=""
+if [[ -n "$_raw_key" ]] && [[ -f "docs/issues/$_raw_key/issue.md" ]]; then
+  _issue_file="docs/issues/$_raw_key/issue.md"
+fi
+
+# Determine session state
 _review_round=1
 _review_session_id=""
 if [[ -f "$REVIEW_SESSION_FILE" ]]; then
@@ -171,81 +136,70 @@ fi
 
 echo "Review round: $_review_round / $MAX_ROUNDS"
 echo "Reviewer slot: $REVIEWER_SLOT"
-echo "Working directory: $_test_wt"
 echo ""
 
-# Escalate if max rounds exceeded
+# Check if we've exceeded max rounds
 if [[ "$_review_round" -gt "$MAX_ROUNDS" ]]; then
+  cat >&2 <<ESCALATE
+╔══════════════════════════════════════════════════════════════╗
+║  ⚠️  TDD Review 超过 $MAX_ROUNDS 轮仍未通过                        ║
+║                                                              ║
+║  Worker 和 Reviewer 对测试方案是否充分存在分歧。                  ║
+║  需要 Manager 介入裁定。                                      ║
+║                                                              ║
+║  请将以下信息提交给 Manager:                                    ║
+║    Branch: $review_branch                                     ║
+║    PR: #$pr_number                                            ║
+║    Review rounds: $_review_round                              ║
+║                                                              ║
+║  Manager 命令:                                                ║
+║    1. 审查 review 历史记录                                     ║
+║    2. 判定: 同意 Reviewer 继续完善 / 同意 Worker 放行            ║
+║    3. 写入裁定理由                                             ║
+╚══════════════════════════════════════════════════════════════╝
+ESCALATE
+  # Mark as needs_manager input
   echo "ROUND=$_review_round" > "$REVIEW_SESSION_FILE"
   echo "SESSION_ID=$_review_session_id" >> "$REVIEW_SESSION_FILE"
-  echo "⚠️  MAX_ROUNDS exceeded, escalate to Manager"
-  exit 2
+  exit 2  # Exit code 2 = escalate to manager
 fi
 
-# Collect context (from test-pre-merge!)
-_pre_tests_file=""
-for _d in "$_test_wt"/docs/epics/*/verification/; do
-  if [[ -f "${_d}pre-tests.md" ]]; then
-    _pre_tests_file="${_d}pre-tests.md"
-    break
-  fi
-done
-
-_diff_file="$REVIEW_STATE_DIR/review-diff.txt"
-git -C "$_test_wt" diff "$review_branch..HEAD" > "$_diff_file" 2>/dev/null || true
-
 # Build review prompt
-cat > "$REVIEW_PROMPT_FILE" << PROMPTEND
-You are the Freely TDD Reviewer (skill:freely-tdd-review).
+cat > "$REVIEW_PROMPT_FILE" << PROMPT
+You are the Freely TDD Reviewer. Follow skill:freely-tdd-review (TDD four-question review).
 
-Work in test-pre-merge worktree: $_test_wt
-
-## Review Context
-- Fix/feature branch: $review_branch
-- Test worktree: $_test_wt
+## Context
+- Raw issue: $_issue_file
 - Pre-tests: $_pre_tests_file
-- Git diff (fix..test): $_diff_file
+- Git diff: $_diff_file (already generated at $_diff_file)
 - Review round: $_review_round of $MAX_ROUNDS
 
-$(if [[ "$_review_round" -gt 1 ]]; then echo "This is round $_review_round. Focus on whether issues from your previous round have been fixed."; fi)
+$(if [[ "$_review_round" -gt 1 ]]; then echo "## Previous Review
+You reviewed this PR in round $((_review_round - 1)) and found issues.
+Focus on whether the issues from YOUR previous review have been fixed."; fi)
 
-## Three-Layer Review
+## Instructions
+Read the pre-tests.md and git diff, then output a JSON verdict:
 
-### Layer 1: Code Quality
-Check: git diff $review_branch..HEAD shows ONLY pre-tests.md + evidence files.
-Check: test_command has NOT been weakened (no echo pass/true/:)
-Check: no unexpected files
-
-### Layer 2: Completeness
-Check: pre-tests.md covers all acceptance_criteria from raw issue
-Check: testing layer matches change scope (integration for cross-module, E2E for user-visible)
-Check: actual_output is ALL GREEN, no ghost pass (status=pass but actual_output empty)
-Check: evidence files exist and are non-empty
-
-### Layer 3: Code Safety
-Check: all $review_branch commits are in test-pre-merge
-Check: test-pre-merge has no extra code beyond pre-tests.md + evidence
-Check: cherry-pick path will not lose code
-
-## Output (JSON only)
 {
   "verdict": "pass" | "fail",
   "round": $_review_round,
-  "code_quality": {"status": "pass"|"fail", "note": "..."},
-  "completeness": {"status": "pass"|"fail", "note": "..."},
-  "code_safety": {"status": "pass"|"fail", "note": "..."},
+  "dimensions": {
+    "red": {"status": "pass"|"fail", "note": "..."},
+    "green": {"status": "pass"|"fail", "note": "..."},
+    "adequacy": {"status": "pass"|"fail", "note": "..."},
+    "refactor": {"status": "pass"|"fail"|"warn", "note": "..."}
+  },
   "summary": "...",
   "required_fixes": ["..."]
 }
 
-Verdict: pass only if ALL three layers pass. Any layer fail = fail.
+Review the following files for evidence:
+$([[ -n "$_pre_tests_file" ]] && echo "Pre-tests: $(cat "$_pre_tests_file" 2>/dev/null || echo 'not found')")
+$([[ -f "$_diff_file" ]] && echo "Git diff (summary): $(head -100 "$_diff_file")")
+PROMPT
 
-## Evidence to review
-$(cat "$_pre_tests_file" 2>/dev/null || echo "pre-tests.md not found")
-$(head -200 "$_diff_file" 2>/dev/null || echo "no diff")
-PROMPTEND
-
-# ── ACP or Legacy ──
+# Determine ACP launch kind
 _acp_launch_kind="fresh"
 _acp_session_arg=""
 if [[ -n "$_review_session_id" ]]; then
@@ -253,42 +207,147 @@ if [[ -n "$_review_session_id" ]]; then
   _acp_session_arg="--session-id $_review_session_id"
 fi
 
+# Call Reviewer via ACP
+echo "--- TDD Review (ACP $_acp_launch_kind) ---"
+echo ""
+
 _review_output=""
 _review_rc=0
-_acp_used=1
+
+# Check if ACP bridge is available
 _acp_bridge_socket=""
 for _sock in /tmp/freely-acp-*.sock; do
-  if [[ -S "$_sock" ]]; then _acp_bridge_socket="$_sock"; break; fi
+  if [[ -S "$_sock" ]]; then
+    _acp_bridge_socket="$_sock"
+    break
+  fi
 done
 
-if [[ -n "$_acp_bridge_socket" && -x "$ACP_PROMPT_CLIENT" ]]; then
-  echo "--- TDD Review (ACP $_acp_launch_kind) ---"
+if [[ -n "$_acp_bridge_socket" ]] && [[ -x "$ACP_PROMPT_CLIENT" ]]; then
+  echo "ACP bridge: $_acp_bridge_socket"
+
   _review_output=$(python3 "$ACP_PROMPT_CLIENT" \
     --bridge-socket "$_acp_bridge_socket" \
     --prompt-file "$REVIEW_PROMPT_FILE" \
     --launch-kind "$_acp_launch_kind" \
     --session-id "${_review_session_id:-review-$pr_number}" \
     --model "$REVIEWER_SLOT" 2>&1) || _review_rc=$?
+
+  # Extract session ID from ACP output
   _new_session_id=$(echo "$_review_output" | grep "session id:" | head -1 | sed 's/.*session id: //' | tr -d '[:space:]')
-  [[ -n "$_new_session_id" ]] && _review_session_id="$_new_session_id"
+  if [[ -n "$_new_session_id" ]]; then
+    _review_session_id="$_new_session_id"
+  fi
 else
   echo "[WARN] ACP bridge not available — running legacy 6-dimension review"
-  _acp_used=0
-  _review_verdict="pass"
-  _review_summary="Legacy fallback — ACP bridge not running"
-  _review_json="{}"
-fi
 
-# Parse verdict
-if [[ "$_acp_used" == "1" ]]; then
+  # Legacy fallback: run the original 6-dimension checks
+  pass_count=0
+  fail_count=0
+  review_body=""
+
+  check_dimension() {
+    local dim="$1" status="$2" evidence="$3"
+    if [[ "$status" == "pass" || "$status" == "n/a" ]]; then
+      ((pass_count++))
+      echo "  ✅ $dim: $status"
+    else
+      ((fail_count++))
+      echo "  ❌ $dim: $status"
+    fi
+    review_body+="## $dim
+- status: $status
+- evidence: $evidence
+
+"
+  }
+
+  echo ""
+  echo "Review dimensions:"
+  echo ""
+
+  # 1. Worktree check
+  if [[ -n "$_wt_path" ]]; then
+    if git -C "$_wt_path" diff --quiet 2>/dev/null && git -C "$_wt_path" diff --cached --quiet 2>/dev/null; then
+      check_dimension "1. Worktree Check" "pass" "clean"
+    else
+      check_dimension "1. Worktree Check" "fail" "dirty"
+    fi
+  else
+    check_dimension "1. Worktree Check" "pass" "no worktree"
+  fi
+
+  # 2. IBM Completeness
+  if [[ -x "$ROOT_DIR/bin/governance-merge-gate" ]]; then
+    if "$ROOT_DIR/bin/governance-merge-gate" --range "$base..$review_branch" >/dev/null 2>&1; then
+      check_dimension "2. IBM Completeness" "pass" "passed"
+    else
+      check_dimension "2. IBM Completeness" "fail" "see governance-merge-gate"
+    fi
+  else
+    check_dimension "2. IBM Completeness" "n/a" "gate not available"
+  fi
+
+  # 3. Code Review Evidence
+  _found_impl=false
+  for _d in docs/epics/*/code-reviews/; do
+    if [[ -f "${_d}implementation-decision-note.md" ]] || [[ -f "${_d}implementation-decision.md" ]]; then
+      _found_impl=true
+      check_dimension "3. Code Review Evidence" "pass" "found"
+      break
+    fi
+  done
+  [[ "$_found_impl" != "true" ]] && check_dimension "3. Code Review Evidence" "fail" "not found"
+
+  # 4. Pre-test Evidence
+  if [[ -n "$_pre_tests_file" ]]; then
+    check_dimension "4. Pre-test Evidence" "pass" "$_pre_tests_file"
+  else
+    check_dimension "4. Pre-test Evidence" "fail" "no pre-tests.md"
+  fi
+
+  # 5. Receipt Integrity
+  check_dimension "5. Receipt Integrity" "n/a" "not checked in fallback"
+
+  # 6. Phase State
+  if [[ -n "$_raw_key" ]] && [[ -f "docs/issues/$_raw_key/issue.md" ]]; then
+    _phase=$(grep "phase_state:" "docs/issues/$_raw_key/issue.md" 2>/dev/null | head -1 | sed 's/.*: *//' | tr -d "'\"")
+    if [[ "$_phase" == "absorbed" ]]; then
+      check_dimension "6. Phase State" "pass" "absorbed"
+    else
+      check_dimension "6. Phase State" "fail" "$_phase"
+    fi
+  else
+    check_dimension "6. Phase State" "n/a" "no raw issue"
+  fi
+
+  if [[ "$fail_count" -eq 0 ]]; then
+    _review_verdict="pass"
+    _review_summary="Legacy 6-dimension review: $pass_count/$((pass_count+fail_count)) passed"
+  else
+    _review_verdict="fail"
+    _review_summary="Legacy review: $fail_count dimension(s) failed"
+  fi
+  _acp_used=0  # fallback: skip ACP output parsing below
+  _review_json="{}"  # placeholder for fallback path
+  fi  # End ACP bridge available check
+
+# Parse verdict from Reviewer output (only when ACP was actually used)
+if [[ "${_acp_used:-1}" != "0" ]]; then
   _review_verdict="fail"
-  _review_json="{}"
+  _review_json=""
   if echo "$_review_output" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('verdict','fail'))" 2>/dev/null; then
     _review_verdict=$(echo "$_review_output" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('verdict','fail'))" 2>/dev/null || echo "fail")
-    _review_json=$(echo "$_review_output" | python3 -c "import json,sys; print(json.dumps(json.load(sys.stdin),indent=2))" 2>/dev/null || echo "{}")
+    _review_json=$(echo "$_review_output" | python3 -c "import json,sys; print(json.dumps(json.load(sys.stdin),indent=2))" 2>/dev/null || echo "")
+  else
+    # Try to find JSON block in output
+    _json_block=$(echo "$_review_output" | grep -A100 '{' | grep -B100 '}' | head -50 || true)
+    if [[ -n "$_json_block" ]]; then
+      _review_verdict=$(echo "$_json_block" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('verdict','fail'))" 2>/dev/null || echo "fail")
+      _review_json="$_json_block"
+    fi
   fi
-  _review_summary=$(echo "$_review_json" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('summary',''))" 2>/dev/null || echo "")
-fi
+fi  # End _acp_used guard
 
 echo ""
 echo "Reviewer verdict: $_review_verdict"
@@ -298,26 +357,28 @@ echo "ROUND=$_review_round" > "$REVIEW_SESSION_FILE"
 echo "SESSION_ID=$_review_session_id" >> "$REVIEW_SESSION_FILE"
 echo "LAST_VERDICT=$_review_verdict" >> "$REVIEW_SESSION_FILE"
 
-# ── Result ──
+# ── Step 4: Handle result ──
 if [[ "$_review_verdict" == "pass" ]]; then
   echo "✅ TDD Review PASSED (round $_review_round)"
 
+  # Write review document
   _now=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-  cat > "$ROOT_DIR/$review_file" << REVIEWDOC
+  _review_summary=$(echo "$_review_json" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('summary','TDD review passed'))" 2>/dev/null || echo "TDD review passed")
+
+  cat > "$review_file" << REVIEWDOC
 # PR Review: #$pr_number
 - pr_number: $pr_number
 - branch: $review_branch
 - base: $base
-- reviewer: $reviewer (ACP TDD, slot=$REVIEWER_SLOT, worktree=$_test_wt)
+- reviewer: $reviewer (ACP TDD, slot=$REVIEWER_SLOT)
 - review_date: $_now
 - verdict: pass
 - rounds: $_review_round
 - issue_id: $_issue_id
 
-## Review Results
-- code_quality: pass
-- completeness: pass
-- code_safety: pass
+## TDD Review ($_review_round rounds)
+- verdict: pass
+- summary: $_review_summary
 
 $_review_json
 
@@ -327,61 +388,87 @@ $_review_json
 REVIEWDOC
 
   echo "Review document: $review_file"
+
+  # Clean up session state on pass
   rm -f "$REVIEW_SESSION_FILE" "$REVIEW_PROMPT_FILE"
 
-  git -C "$ROOT_DIR" add "$review_file" 2>/dev/null || true
-  if ! git -C "$ROOT_DIR" diff --cached --quiet 2>/dev/null; then
-    git -C "$ROOT_DIR" commit -m "review: pr-review-guarded verdict=pass for PR #$pr_number (TDD rounds=$_review_round)
+  # Auto-commit and push
+  git add "$review_file" 2>/dev/null || true
+  if ! git diff --cached --quiet 2>/dev/null; then
+    git commit -m "review: pr-review-guarded verdict=pass for PR #$pr_number (TDD rounds=$_review_round)
 
 Co-Authored-By: Claude <noreply@anthropic.com>" 2>/dev/null || true
-    echo "Review document committed."
-    for platform in $(_platform_configs); do
+    echo "Review document committed to branch."
 
-  if [[ -n "${FREELY_REPO_PLATFORMS:-}" ]]; then echo "${FREELY_REPO_PLATFORMS//,/ }"; return; fi
-  local fg=0 fgt=0
-  while IFS= read -r r; do
-    [[ -z "$r" || "$r" == "all" ]] && continue
-    case "$(git remote get-url "$r" 2>/dev/null || true)" in
-      *github.com*|*github-*|*github*) fg=1 ;;
-      *gitee.com*|*gitee-*|*gitee*)   fgt=1 ;;
+
+_platform_configs() {
+  if [[ -n "${FREELY_REPO_PLATFORMS:-}" ]]; then
+    echo "${FREELY_REPO_PLATFORMS//,/ }"
+    return
+  fi
+  local found_github=0 found_gitee=0
+  while IFS= read -r remote; do
+    [[ -z "$remote" || "$remote" == "all" ]] && continue
+    case "$(git remote get-url "$remote" 2>/dev/null || true)" in
+      *github.com*|*github-*|*github*) found_github=1 ;;
+      *gitee.com*|*gitee-*|*gitee*)   found_gitee=1 ;;
     esac
   done < <(git remote)
-  [[ "$fg" == "1" ]] && echo "github"
-  [[ "$fgt" == "1" ]] && echo "gitee"
+  [[ "$found_github" == "1" ]] && echo "github"
+  [[ "$found_gitee" == "1" ]] && echo "gitee"
 }
-
 
 _platform_remote_name() {
   case "$1" in
     gitee) git remote | grep -q '^gitee$' && echo "gitee" || echo "origin" ;;
-
-
-
-_platform_configs() {
-
     *)     echo "$1" ;;
   esac
 }
 
 
+    for platform in $(_platform_configs); do
       remote=$(_platform_remote_name "$platform")
       echo "  [$platform] pushing review commit..."
-      git -C "$ROOT_DIR" push "$remote" "$review_branch" 2>&1 || true
+      git push "$remote" "$review_branch" 2>&1 || echo "  [$platform] push FAILED (non-fatal)" >&2
     done
   fi
 
   echo ""
-  echo "Next: ./bin/pr-merge-guarded $base $review_branch"
+  echo "Next steps:"
+  echo "  ./bin/pr-merge-guarded $base $review_branch"
   exit 0
 
 else
   echo "❌ TDD Review FAILED (round $_review_round)"
+
+  if [[ -n "$_review_json" ]]; then
+    echo ""
+    echo "Review feedback:"
+    echo "$_review_json" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+dims=d.get('dimensions',{})
+for k,v in dims.items():
+    if v.get('status')=='fail':
+        print(f'  [{k}] {v.get(\"note\",\"\")}')
+fixes=d.get('required_fixes',[])
+if fixes:
+    print()
+    print('Required fixes:')
+    for f in fixes:
+        print(f'  - {f}')
+" 2>/dev/null || echo "$_review_json"
+  fi
+
   echo ""
-  echo "Fix issues and re-run: ./bin/pr-review-guarded $review_branch"
+  echo "Fix the issues above, commit changes, and re-run:"
+  echo "  ./bin/pr-review-guarded $review_branch"
+  echo ""
   echo "Rounds remaining: $((MAX_ROUNDS - _review_round))"
+
   exit 1
 fi
 
-# ── Helpers ──────────────────────────────────────────────────
+# ── Helper functions ────────────────────────────────────────
 
 
