@@ -16,7 +16,7 @@
 | `skill:freely-constitution-guard` | 宪法合规预检 |
 | `skill:freely-laws-enforcer` | 法律级验收检查 |
 | `skill:freely-fix-execution` | wt-create → fix → B1 → B2 → pr-* → wt-close |
-| `skill:freely-feat-execution` | wt-create → B1 → B2 → dev → pr-* → wt-close |
+| `skill:freely-feature-execution` | wt-create → B1 → B2 → dev → pr-* → wt-close |
 | `skill:freely-doc-B1_IBM-execution` | raw → brainstorm → candidate → milestones |
 | `skill:freely-doc-B2_IBM-execution` | I-* → PRD → tasks → pre-tests → milestones |
 | `skill:freely-dev-loop-execution` | implement → test → progress → code-review |
@@ -296,7 +296,7 @@ scan 是任务来源。以下情况必须手动 `freely task-source-scan`：
 3. 连续多轮 `stop_ai` 但怀疑有未处理任务——重扫确认
 
 输出写入 `<project>/.freely/run/manager-task-source-scan-latest.json`，下次 patrol 读到新数据。
-| `freely-feat-execution` | 新功能编排 |
+| `freely-feature-execution` | 新功能编排 |
 | `freely-chat-issue-routing` | chat 消息路由 |
 | `freely-human-interruption-manager-triage` | 插话路由 |
 

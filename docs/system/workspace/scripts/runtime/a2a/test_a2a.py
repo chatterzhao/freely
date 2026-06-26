@@ -132,7 +132,7 @@ def test_registry_skill():
     from a2a_registry import AgentRegistry
     reg = AgentRegistry()
     reg.register("http://a:19100", "worker", skills=["freely-fix-execution"])
-    reg.register("http://b:19100", "worker", skills=["freely-feat-execution"])
+    reg.register("http://b:19100", "worker", skills=["freely-feature-execution"])
     results = reg.discover(skill="freely-fix-execution")
     assert len(results) == 1
     assert results[0].endpoint == "http://a:19100"

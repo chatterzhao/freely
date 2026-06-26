@@ -60,7 +60,7 @@
           "id": {
             "type": "string",
             "description": "Skill ID",
-            "examples": ["freely-fix-execution", "freely-feat-execution"]
+            "examples": ["freely-fix-execution", "freely-feature-execution"]
           },
           "name": {
             "type": "string",
@@ -204,7 +204,7 @@
     "supportedExitKinds": [],
     "supportedSkills": [
       "freely-fix-execution",
-      "freely-feat-execution",
+      "freely-feature-execution",
       "freely-doc-B1_IBM-execution",
       "freely-doc-B2_IBM-execution"
     ],
@@ -235,7 +235,7 @@
       "outputModes": ["text", "json"]
     },
     {
-      "id": "freely-feat-execution",
+      "id": "freely-feature-execution",
       "name": "Feature Execution",
       "description": "新功能/大型改动的完整开发流程",
       "inputModes": ["text", "json"],
@@ -270,7 +270,7 @@
     "a2aSchema": "https://freely.dev/schemas/a2a-task-v1",
     "supportedSkills": [
       "freely-fix-execution",
-      "freely-feat-execution",
+      "freely-feature-execution",
       "freely-doc-B1_IBM-execution",
       "freely-doc-B2_IBM-execution"
     ],

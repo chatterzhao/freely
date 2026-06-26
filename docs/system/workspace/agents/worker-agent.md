@@ -11,7 +11,7 @@
 | Skill | 何时调用 |
 |-------|---------|
 | `skill:freely-fix-execution` | intent_kind=edit,merge 的 bug 修复 |
-| `skill:freely-feat-execution` | intent_kind=edit 的新功能开发 |
+| `skill:freely-feature-execution` | intent_kind=edit 的新功能开发 |
 | `skill:freely-doc-B1_IBM-execution` | raw issue → brainstorm → candidate |
 | `skill:freely-doc-B2_IBM-execution` | I-issue → prd/pre-tests/tasks/code-review |
 | `skill:freely-dev-loop-execution` | 实现 → 测试 → 证据 → code-review |

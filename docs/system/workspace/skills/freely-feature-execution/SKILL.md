@@ -1,9 +1,9 @@
 ---
-name: freely-feat-execution
+name: freely-feature-execution
 description: 新功能/大型改动的完整开发流程——feedback→wt-create→B1→B2→dev→test→pr-create→pr-merge→wt-close，与 freely-fix-execution 同级抽象。
 ---
 
-# skill:freely-feat-execution
+# skill:freely-feature-execution
 
 > 全链路: feedback → [命令] wt-create → [skill] skill:freely-doc-B1_IBM-execution → [skill] skill:freely-doc-B2_IBM-execution → dev(RED-GREEN) → [skill] skill:freely-test-execution(全绿) → [命令] pr-create-guarded → [命令] pr-review-guarded → [命令] pr-merge-guarded → [命令] wt-close
 >                                                              [本 skill 自此开始 — B1→B2→dev→test→pr→merge→close 完整抽象]
@@ -14,15 +14,15 @@ description: 新功能/大型改动的完整开发流程——feedback→wt-crea
 
 ## 与 freely-fix-execution 的分工
 
-| | freely-fix-execution | freely-feat-execution |
+| | freely-fix-execution | freely-feature-execution |
 |---|---|---|
 | 适用 | bug fix、小改动 | 新功能、大型重构 |
 | 流程 | feedback → wt-create → dev → test → B1 → B2 → pr-create → pr-review → pr-merge → wt-close | feedback → wt-create → B1 → B2 → dev → test → pr-create → pr-review → pr-merge → wt-close |
-| IBM 顺序 | 实现后治理（Fix first, govern later）（完整工作流见 skill:freely-fix-execution 文档） | 治理后实现（Govern first, code later）（完整工作流见 skill:freely-feat-execution 文档） |
+| IBM 顺序 | 实现后治理（Fix first, govern later）（完整工作流见 skill:freely-fix-execution 文档） | 治理后实现（Govern first, code later）（完整工作流见 skill:freely-feature-execution 文档） |
 
 ## 下层 skill
 
-freely-feat-execution 在不同阶段调用下层 skill：
+freely-feature-execution 在不同阶段调用下层 skill：
 
 1. `skill:freely-doc-B1_IBM-execution` — B1_IBM：raw issue → brainstorms.md → candidates.md
 2. `skill:freely-doc-B2_IBM-execution` — B2_IBM：candidate → materialize I-* issue → milestone → ready for dev
@@ -42,7 +42,7 @@ freely-feat-execution 在不同阶段调用下层 skill：
 ```
 1. 创建工位:
    ./bin/wt-create --raw-key <key> --source <source> \
-     --skill docs/system/workspace/skills/freely-feat-execution/SKILL.md \
+     --skill docs/system/workspace/skills/freely-feature-execution/SKILL.md \
      --slug <slug>
 
    自动创建:

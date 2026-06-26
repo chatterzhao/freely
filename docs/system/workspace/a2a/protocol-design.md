@@ -29,7 +29,7 @@ Agent Card 是 JSON 描述的 Agent 能力声明，URL: `/.well-known/agent.json
       "description": "快速修复 bug 的特殊高效策略"
     },
     {
-      "id": "freely-feat-execution",
+      "id": "freely-feature-execution",
       "name": "Feature Execution",
       "description": "新功能/大型改动的完整开发流程"
     },
@@ -106,7 +106,7 @@ Freely Agent Card 扩展 A2A 标准，声明 Freely 特有能力：
     "a2aSchema": "https://freely.dev/schemas/a2a-task-v1",
     "supportedSkills": [
       "freely-fix-execution",
-      "freely-feat-execution",
+      "freely-feature-execution",
       "freely-doc-B1_IBM-execution",
       "freely-doc-B2_IBM-execution"
     ],

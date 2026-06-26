@@ -59,7 +59,7 @@ def _socket_path(project: str) -> str:
 FREELY_SKILLS = [
     AgentSkill(id="freely-fix-execution", name="Bug Fix Execution",
                description="快速修复 bug 的高效策略", tags=["fix", "bug"]),
-    AgentSkill(id="freely-feat-execution", name="Feature Execution",
+    AgentSkill(id="freely-feature-execution", name="Feature Execution",
                description="新功能完整开发流程", tags=["feature"]),
     AgentSkill(id="freely-doc-B1_IBM-execution", name="B1_IBM Pre-Research",
                description="I→B→M 第一阶段预研", tags=["research"]),

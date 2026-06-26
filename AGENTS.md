@@ -194,7 +194,7 @@ Freely 开发 Freely 时，默认先问四件事：
 
 - 本项目 skill 定义在 `docs/system/workspace/skills/`，已通过 `./bin/deploy-skills` 部署到 `~/.claude/skills/` 供 Claude Code Skill 工具调用。
 - **修改任何 skill 后，必须立即执行 `./bin/deploy-skills`**，否则改动不会对当前及后续会话生效。
-- 项目文件中引用 skill 时只用 skill 名（如 `skill:freely-feat-execution`），不写路径；skill 文件内部互相引用除外。
+- 项目文件中引用 skill 时只用 skill 名（如 `skill:freely-feature-execution`），不写路径；skill 文件内部互相引用除外。
 - skill 内部跨 skill 引用使用相对路径（如 `../other-skill/SKILL.md`），不使用项目绝对路径。
 
 ## 吃自己的狗粮规则（Freely 构建 Freely）
