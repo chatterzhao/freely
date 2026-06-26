@@ -65,7 +65,7 @@ a2a_task_state: working
 http_status: 200 OK
 语义: Worker 正在积极执行任务
 示例: |
-  Worker 正在执行 freely-fix-execution 或 freely-feat-execution
+  Worker 正在执行 freely-fix-execution 或 freely-feature-execution
   - progress: "已修复 XXX 问题，进入 YYY 阶段"
   - next_action: "继续执行 ZZZ"
 ```

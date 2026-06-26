@@ -34,7 +34,7 @@
 | M | `freely-premerge-reconcile` | 合并冲突高风险协调 |
 | M | `freely-milestone-planning-state-maintenance` | 里程碑状态维护与排序 |
 | M | `freely-branch-management` | 完整自主分支生命周期 |
-| M | `freely-feat-execution` | 新功能完整开发流程编排 |
+| M | `freely-feature-execution` | 新功能完整开发流程编排 |
 | M | `freely-candidate-acceptance-review` | candidate acceptance 独立评审 |
 | M | `freely-watchdog-control-plane` | 外层监督与恢复控制面 |
 | M | `freely-continuity-watchdog` | 上下文连续性监督 |
