@@ -4552,6 +4552,32 @@ runtime_default_reasoning_effort_for_tool() {
   esac
 }
 
+# _init_agent_table_slot_pin: at daemon startup, write the agent-table assigned
+# slot to ~/.ai-auth/.${tool}-current-slot.  This ensures slot switching prefers
+# the agent's assigned slot over alphabetically-first scan results.
+_init_agent_table_slot_pin() {
+  local project="$1"
+  [[ -n "${AGENT_AI_TOOL:-}" ]] || return 0
+  local _at="${PROJECT_ROOT}/.freely/agent-table.toml"
+  [[ -f "$_at" ]] || return 0
+  local _aq="${PROJECT_ROOT}/bin/agent-table-query"
+  [[ -x "$_aq" ]] || return 0
+
+  # Resolve current agent identity from agent-id.env
+  local _agent_env="${PROJECT_ROOT}/.freely/agent-id.env" _my_id=""
+  if [[ -f "$_agent_env" ]]; then
+    _my_id=$(grep -F "$(pwd)" "$_agent_env" 2>/dev/null | grep -oE '(manager_[0-9]+|worker_[0-9]+)' | head -1 || true)
+  fi
+  [[ -z "$_my_id" ]] && _my_id="manager_01"
+
+  local _slot; _slot=$("$_aq" --get-slot "$_my_id" 2>/dev/null || true)
+  [[ -n "$_slot" ]] || return 0
+
+  local _tool="${_slot%%-*}"
+  runtime_write_tool_current_slot "$_tool" "$_slot"
+  log_info "agent-table: pinned $_my_id slot=$_slot → ~/.ai-auth/.${_tool}-current-slot"
+}
+
 runtime_cross_tool_fallback_order_for_current_tool() {
   local current_tool="$1"
   if [[ -n "${AI_FALLBACK_TOOLS:-}" ]]; then
@@ -21351,6 +21377,13 @@ start_project_runtime() {
   loop_log="$logs_dir/loop.log"
   mkdir -p "$run_dir" "$logs_dir"
   ensure_codex_slot_switch_startup_ready_or_fail "$project" || exit 1
+
+  # ── Agent-table: pin current slot to assigned role slot ──
+  # Slot switching scans ~/.ai-auth/ directories; without this pin,
+  # it picks the alphabetically first slot instead of the agent-table
+  # assigned one for the current role (manager/worker/reviewer).
+  _init_agent_table_slot_pin "$project" || true
+
   append_runtime_event "$project" "start_project_runtime_after_slot_switch_ready" \
     "entrypoint_mode=$entrypoint_mode"
   preflight_codex_slot_recovery_before_start_or_fail "$project" || exit 1
