@@ -4090,6 +4090,14 @@ load_config() {
       exit 1
     fi
   fi
+
+  # ── Derive AI_TOOL from AGENT_AI_TOOL ────────────────────
+  # AI_TOOL is no longer a config value — it is always derived
+  # from the agent-table slot.  "claude-apikey-ds-pro-auto" → "claude".
+  # This ensures tool-family checks (codex, opencode, etc.) use the
+  # correct tool, not a stale alias from old config.
+  AI_TOOL="${AGENT_AI_TOOL%%-*}"
+  export AI_TOOL
 }
 
 write_config() {
