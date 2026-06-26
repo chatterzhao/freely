@@ -170,6 +170,7 @@ def main():
     parser.add_argument("--get-slot", metavar="ID", help="Get slot for an agent ID")
     parser.add_argument("--get-reviewer", metavar="WORKER_ID", help="Get reviewer for a worker")
     parser.add_argument("--next-free", metavar="ROLE", help="Get next free agent ID for role")
+    parser.add_argument("--reconcile", action="store_true", help="Reconcile worktree↔agent-table")
     parser.add_argument("--expand-pools", action="store_true", help="Print expanded agent table")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
 
@@ -245,6 +246,32 @@ def main():
         else:
             print(f"ERROR: no free {{role}} agent", file=sys.stderr)
             sys.exit(1)
+    elif args.reconcile:
+        import subprocess as _sp
+        wt_root = os.path.join(os.path.dirname(data['path']), '..', '..', 'worktrees')
+        active_workers = {}
+        if os.path.isdir(wt_root):
+            for wt in os.listdir(wt_root):
+                env_file = os.path.join(wt_root, wt, '.freely', 'worker-id.env')
+                if os.path.exists(env_file):
+                    wid = open(env_file).read().strip()
+                    if '=' in wid:
+                        wid = wid.split('=', 1)[1]
+                    active_workers[wid] = wt
+        pool_workers = set(list_agents(data, 'worker'))
+        orphans = [w for w in active_workers if w not in pool_workers]
+        stale = [w for w in pool_workers if w not in active_workers]
+        active = [w for w in pool_workers if w in active_workers]
+        result = {'active': active, 'orphan_worktrees': orphans, 'stale_pool_entries': stale}
+        if args.json:
+            print(json.dumps(result))
+        else:
+            print(f"Active: {len(active)}/{len(pool_workers)}: {', '.join(sorted(active))}")
+            if orphans:
+                print(f"Orphan worktrees (no agent-table entry): {', '.join(sorted(orphans))}")
+            if stale:
+                print(f"Stale pool entries (no worktree): {', '.join(sorted(stale))}")
+
     elif args.expand_pools:
         if args.json:
             print(json.dumps(data["expanded"], indent=2))
