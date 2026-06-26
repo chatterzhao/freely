@@ -108,7 +108,7 @@ def main():
         if isinstance(value, bool):
             print("true" if value else "false")
         elif isinstance(value, list):
-            print(" ".join(str(v) for v in value))
+            print(",".join(str(v) for v in value))
         elif value is None:
             print("")
             sys.exit(1)

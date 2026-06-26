@@ -82,7 +82,7 @@ _resolve_tool_by_binary() {
     fi
     # Alias match: check tool's aliases (e.g., cc → claude, kiro-cli → claude)
     _aliases=$(_tool_registry_get "$_t" "aliases" 2>/dev/null || true)
-    for _a in $_aliases; do
+    for _a in ${_aliases//,/ }; do
       if [[ "$_a" == "$binary" ]]; then
         printf '%s\n' "$_t"; return 0
       fi
