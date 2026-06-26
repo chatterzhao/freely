@@ -3120,3 +3120,19 @@ routing_policy:
 - phase_state: `completed`
 - issue_path: `docs/issues/I-20260626T155612Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/issue-sync-before-merge/code-reviews`
+
+## M-20260626T161720Z-A
+- title: kill AI_TOOL, agent-table sole source of truth
+- status: active
+### candidate_issues
+1. `C-20260626T161720Z-A`
+- milestone: M-20260626T161720Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260626T161720Z-A/issue.md`
+### completed_issues
+1. `I-20260626T161720Z-A`
+- title: kill AI_TOOL, agent-table sole source of truth
+- milestone_state: completed
+- phase_state: `completed`
+- issue_path: `docs/issues/I-20260626T161720Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/kill-ai-tool-fallback/code-reviews`
