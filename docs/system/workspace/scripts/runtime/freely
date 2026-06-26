@@ -10759,13 +10759,13 @@ worker_prompt_launchable_for_manager_project() {
     hotfix/*) ;;  # emergency fixes
     develop)
       if [[ "$(worker_prompt_normalized_intent_kind "$prompt_file")" != "cleanup" ]]; then
-        LAUNCH_REJECT_REASON="develop rejected: only cleanup intent allowed, got '$(worker_prompt_normalized_intent_kind "$prompt_file")' — for edit/feature work, create a fix/* worktree via wt-create --raw-key ${raw_key_hint:-<key>}"
+        LAUNCH_REJECT_REASON="develop rejected: only cleanup intent allowed, got '$(worker_prompt_normalized_intent_kind "$prompt_file")' — for edit/feature work, create a fix|feature/* worktree via wt-create --raw-key ${raw_key_hint:-<key>}"
         log_warn "worker_prompt_launchable: $LAUNCH_REJECT_REASON"
         return 1
       fi
       # develop cleanup is theoretically allowed but practically blocked:
       # develop is the protected manager worktree. Cleanups must run from a dedicated worktree.
-      LAUNCH_REJECT_REASON="develop is protected: cleanup workers cannot run on develop — create a fix/* worktree via wt-create --raw-key ${raw_key_hint:-<key>} --skill freely-fix-execution --slug <slug>"
+      LAUNCH_REJECT_REASON="develop is protected: cleanup workers cannot run on develop — create a fix|feature/* worktree via wt-create --raw-key ${raw_key_hint:-<key>} --skill freely-fix-execution --slug <slug>"
       log_warn "worker_prompt_launchable: $LAUNCH_REJECT_REASON"
       return 1
       ;;
@@ -21154,7 +21154,7 @@ start_project_runtime() {
       log_error ""
       log_error "Resolve by:"
       log_error "  git stash       — save changes and restore later"
-      log_error "  git commit ...  — commit changes to a feature branch"
+      log_error "  git commit ...  — commit changes to a fix|feature branch"
       log_error "  git checkout -- <file> — discard changes (caution!)"
       log_error ""
       log_error "Then retry: freely daemon start --project $project"

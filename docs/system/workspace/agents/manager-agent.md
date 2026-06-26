@@ -217,7 +217,7 @@ Worker 是独立 ACP session，由 Runtime 通过 A2A Server 管理。
    a2a-exit --state submitted --role worker \
      --skill <freely-fix-execution|freely-dev-loop-execution|...> \
      --worktree /absolute/path/to/worktree \
-     --branch fix/raw-YYYYMMDDTHHMMSSZ-<slug> \
+     --branch <fix|feature>/raw-YYYYMMDDTHHMMSSZ-<slug> \
      --raw-key <key> \
      --summary "完整的 Worker 指令内容"
    ```
@@ -254,7 +254,7 @@ python3 docs/system/workspace/scripts/runtime/a2a_task.py list --role worker --s
 
 ## 收口判断
 
-- feature 分支已 merge 到 develop → retire worktree（`wt-close`）
+- fix|feature 分支已 merge 到 develop → retire worktree（`wt-close`）
 - 同一 worker 完成所有委派 → 判断下一步
 
 ## 可用技能
