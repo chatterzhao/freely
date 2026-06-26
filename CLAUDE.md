@@ -24,7 +24,7 @@ feedback/scan → wt-create → B1_IBM → B2_IBM → dev → test-pre-merge →
 
 ## 会话启动检查
 1. 检查分支：禁止在 `main`/`develop`/`test-pre-merge-*` 上直接写入
-2. 使用 `./bin/wt-create` 创建 feature worktree
+2. 使用 `./bin/wt-create` 创建 fix|feature worktree
 3. 确认 `git config --get core.hooksPath` 返回 `.githooks`
 
 ## 核心原则
