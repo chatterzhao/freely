@@ -17,6 +17,8 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+absorbed_into: I-20260625T235348Z-A
+source_candidate: docs/pre-brainstorms/20260625T235348Z--wt-close-consistency/candidates.md#C-20260625T235348Z-A
 ---
 
 ## 问题
