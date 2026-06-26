@@ -3055,3 +3055,12 @@ routing_policy:
 - status: completed
 - promoted_from: C-20260626T121349Z-A
 >>>>>>> fix/raw-20260626T121349Z-consistency-cleanup
+
+## M-20260626T130431Z-A
+- title: wt-close Phase 6b force fix
+- status: completed
+### completed_issues
+1. `I-20260626T130431Z-A`
+- milestone: M-20260626T130431Z-A
+- status: completed
+- promoted_from: C-20260626T130431Z-A
