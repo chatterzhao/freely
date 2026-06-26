@@ -89,7 +89,7 @@ fi
 echo "PR: #$pr_number"
 
 # ── Step 2: Find review paths ──
-_raw_key=$(echo "$review_branch" | grep -oE 'raw-[0-9]{8}T[0-9]{6}Z' | head -1 || true)
+_raw_key=$(echo "$review_branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)
 _issue_id="I-${_raw_key#raw-}-A"
 _epic_dir=""
 if [[ -d "docs/issues/$_issue_id" ]]; then
@@ -115,7 +115,9 @@ if [[ -f "$ROOT_DIR/.freely/agent-id.env" ]]; then
   _my_worker_id=$(grep "$(pwd)" "$ROOT_DIR/.freely/agent-id.env" 2>/dev/null | tail -1 | grep -o 'worker_[0-9]*' || true)
 fi
 [[ -z "$_my_worker_id" ]] && _my_worker_id="worker_01"
-if [[ -x "$ROOT_DIR/bin/freely-review" ]]; then
+echo "DEBUG: ROOT_DIR=$ROOT_DIR raw_key=$_raw_key"
+  echo "DEBUG: test wt=$(git worktree list --porcelain | awk -v k=test-pre-merge-$_raw_key "\$1=="worktree"{wt=\} \$1=="branch"\&\&\$2~k{print wt;exit}")"
+  if [[ -x "$ROOT_DIR/bin/freely-review" ]]; then
   "$ROOT_DIR/bin/freely-review" --caller worker --worker-id "$_my_worker_id" --raw-key "$_raw_key" || { echo "Review FAILED"; exit 1; }
   _review_verdict="pass"
   exit 0
