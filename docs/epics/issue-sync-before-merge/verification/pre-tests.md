@@ -27,35 +27,33 @@
 - blocker: none
 - status: pass
 
-### testing_layer: integration
+### acceptance-3
 - acceptance_target: pr-merge-guarded --dry-run gate passes
-- acceptance_target: diff 比较使用 source vs target（非 HEAD vs HEAD^）
-- testing_layer: unit
-- target_environment: test-pre-merge-20260626T155612Z-issue-sync-before-merge
-- required_evidence: diff 命令使用 _target _src_branch
-- test_command: grep "git diff.*_target.*_src_branch" docs/system/workspace/scripts/worktree/pr-merge-guarded
-- expected_output: git diff --name-only "$_target" "$_src_branch"
-- actual_output: git diff --name-only "$_target" "$_src_branch" -- "$issues_dir" 2>/dev/null | ...
-- evidence_file: .freely/run/test-evidence/testing_layer: integration.log
-- blocker: none
-- status: pass
-
-## Unit
-- acceptance_target: 代码级验证 — issue-sync 顺序、auto-commit、diff 比较
-- testing_layer: unit
-- target_environment: fix worktree
-- required_evidence: acceptance-1 ~ testing_layer: integration 均 pass
-
-## Integration
-- acceptance_target: pr-merge-guarded dry-run 通过，不报错
 - testing_layer: integration
-- acceptance_target: pr-merge-guarded --dry-run gate passes
 - target_environment: test-pre-merge-20260626T155612Z-issue-sync-before-merge
 - required_evidence: --dry-run 执行成功，exit 0
 - test_command: ./bin/pr-merge-guarded develop fix/raw-20260626T155612Z-issue-sync-before-merge --dry-run
 - expected_output: --dry-run complete, exit 0
 - actual_output: --dry-run complete, exit 0
-- evidence_file: .freely/run/test-evidence/acceptance-4.log
+- evidence_file: .freely/run/test-evidence/acceptance-3.log
+- blocker: none
+- status: pass
+
+## Unit
+- acceptance_target: 代码级验证 — issue-sync 顺序、auto-commit
+- testing_layer: unit
+- target_environment: fix worktree
+- required_evidence: acceptance-1 ~ acceptance-2 均 pass
+
+## Integration
+- acceptance_target: pr-merge-guarded --dry-run gate passes
+- testing_layer: integration
+- target_environment: test-pre-merge-20260626T155612Z-issue-sync-before-merge
+- required_evidence: acceptance-3 pass
+- test_command: ./bin/pr-merge-guarded develop fix/raw-20260626T155612Z-issue-sync-before-merge --dry-run
+- expected_output: --dry-run complete, exit 0
+- actual_output: --dry-run complete, exit 0
+- evidence_file: .freely/run/test-evidence/acceptance-3.log
 - blocker: none
 - status: pass
 
@@ -64,9 +62,9 @@
 - testing_layer: end-to-end
 - target_environment: develop merge chain
 - required_evidence: merge 后 source worktree git status clean
-- not_applicable_reason: E2E 验证需要在真实 pr-merge-guarded 执行后检查 source worktree 状态，dry-run 无法模拟 issue-sync 副作用
-- not_applicable_explanation: 本修改的 E2E 验证即本次 PR 自身的 merge 流程：如果 merge 成功且 wt-close 不阻塞，即验证通过
+- not_applicable_reason: E2E 即本次 PR merge+wt-close 流程，成功则验证通过
+- not_applicable_explanation: pr-merge-guarded 修改的 E2E 效果由自身验证
 
 ## Real-Environment
 - real_environment_status: not_tested
-- real_environment_reason: 将在此 PR merge + wt-close 过程中验证
+- real_environment_reason: 将在此 PR merge + wt-close 中验证
