@@ -152,9 +152,9 @@ Co-Authored-By: Claude <noreply@anthropic.com>" 2>/dev/null || true
   fi
   exit 0
 fi
-# Fallback
+# Fallback: agent-table already tried above. AI_TOOL is deprecated.
 if [[ -z "$REVIEWER_SLOT" ]]; then
-  REVIEWER_SLOT="${AI_TOOL:-claude-apikey-ds-pro-auto}"
+  REVIEWER_SLOT="${AGENT_AI_TOOL:-claude}"
 fi
 
 # Get worktree path
