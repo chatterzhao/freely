@@ -3037,3 +3037,12 @@ routing_policy:
 - milestone: M-20260626T075340Z-A
 - status: completed
 - promoted_from: C-20260626T075340Z-A
+
+## M-20260626T121349Z-A
+- title: agent-table help + test docs + cherry-pick consistency
+- status: completed
+### completed_issues
+1. `I-20260626T121349Z-A`
+- milestone: M-20260626T121349Z-A
+- status: completed
+- promoted_from: C-20260626T121349Z-A
