@@ -379,7 +379,7 @@ FREELY_SKILLS = [
         examples=["Fix authentication bug in login flow"],
     ),
     AgentSkill(
-        id="freely-feat-execution",
+        id="freely-feature-execution",
         name="Feature Execution",
         description="新功能/大型改动的完整开发流程：预研→设计→实现→门禁→合并",
         tags=["feature", "development", "full-cycle"],
