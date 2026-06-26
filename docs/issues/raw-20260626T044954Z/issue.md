@@ -17,6 +17,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+absorbed_into: I-20260626T033913Z-A
 ---
 
 ## 问题
