@@ -1,6 +1,6 @@
 - issue_id: I-20260627T084545Z-A
 - kind: fix
-- phase_state: done_b2_ibm
+- phase_state: completed
 - milestone: M-20260627T084545Z-A
 - source_candidate: docs/pre-brainstorms/20260627T084545Z--a2a-tasks-agent-id/candidates.md#C-20260627T084545Z-A
 - source_raw: raw-20260627T084545Z
