@@ -32,3 +32,4 @@
 
 ## Real-Environment
 - real_environment_status: not_tested
+- real_environment_reason: pre-merge 阶段
