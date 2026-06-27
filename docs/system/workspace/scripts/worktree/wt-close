@@ -58,6 +58,8 @@ Options (按场景选择，互斥):
                       检查：搜 git worktree list，有工位则阻塞 → 用正常 wt-close。
                       适用：feedback 创建 issue 后从未开过工位，决定不要了。
                       适用：工位已手动删除，仅剩平台 issue 需关闭。
+                      为何用此命令而非 gh/gitee：wt-close 封装了多平台自动执行，
+                      一次关闭 GitHub + Gitee，无需逐个平台操作。
                       必须配合 --reason。
 
   ── 其他 ──
