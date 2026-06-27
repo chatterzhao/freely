@@ -3237,6 +3237,7 @@ routing_policy:
 ### completed_issues
 1. `I-20260627T084523Z-A`
 - title: agent-lifecycle; milestone_state: completed
-- phase_state: `completed`; issue_path: `docs/issues/I-20260627T084523Z-A/issue.md`
+- issue_path: `docs/issues/I-20260627T084523Z-A/issue.md`
+- phase_state: `completed`
 - verification_artifact_dir: `docs/epics/agent-lifecycle/code-reviews`
 
