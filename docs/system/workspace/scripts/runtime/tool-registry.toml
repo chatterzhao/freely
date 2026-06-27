@@ -34,7 +34,7 @@ display_name = "Claude Code"
 binary_resolution = "path"          # "path" = find via PATH, "cache" = download
 aliases = ["cc", "cc-use-codex-cli", "kiro-cli", "iflow", "claude-code"]
 fallback_priority = 40              # lower = tried first during recovery
-test_command = "claude -p 'say hi' --output-format text --dangerously-skip-permissions --bare --system-prompt '' --max-tokens 50"
+test_command = "claude -p 'say hi' --output-format text --dangerously-skip-permissions --bare --system-prompt ''"
 
 [claude.acp]
 binary = "claude-agent-acp"
@@ -341,7 +341,7 @@ display_name = "Cline"
 binary_resolution = "path"          # npm install -g cline → in PATH
 aliases = []
 fallback_priority = 60              # after opencode, before hypothetical new tools
-test_command = "cline --yolo 'say hi'"
+test_command = "cline 'say hi' --auto-approve true"
 
 [cline.acp]
 binary = "cline"
