@@ -3251,6 +3251,7 @@ routing_policy:
 ### completed_issues
 1. `I-20260627T084545Z-A`
 - title: a2a-tasks-agent-id; milestone_state: completed
-- phase_state: `completed`; issue_path: `docs/issues/I-20260627T084545Z-A/issue.md`
+- issue_path: `docs/issues/I-20260627T084545Z-A/issue.md`
+- phase_state: `completed`
 - verification_artifact_dir: `docs/epics/a2a-tasks-agent-id/code-reviews`
 
