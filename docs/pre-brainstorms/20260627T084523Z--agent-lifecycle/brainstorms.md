@@ -143,40 +143,56 @@ A2A prompt → wait 10s → ACP session/close RPC → kill → mark completed
 
 ## 补充设计：agent-id.env 记录 session_id + resume 逻辑
 
-### agent-id.env 文件头注释
 
-```
+### agent-id.env 文件头注释（最终版）
+
+```bash
 # agent-id.env — Agent-Worktree Binding Registry
 #
 # 格式: {worktree_abs_path}={role}={agent_id}={session_id}
+# 示例: /path/to/fix-raw-xxx=worker=worker_03=uuid-session-id
 #
-# 记录时机（只有 ACP new/fork 两个入口）:
-#   1. Manager 首次启动 → ACP session/new → 仅记录 manager session（不在此文件）
-#   2. Worker 被委派到工位 → sync_tooling 写 {wt}=worker={id}（无 session_id）
-#      → Worker 首次启动 → ACP session/fork(manager) → 补写 session_id
-#   3. Reviewer 被委派 → ACP session/fork(manager) → 记录 session_id
+# ── 三种状态，只看 agent-id.env + 工位目录 ──────────────────────────
 #
-# Resume 逻辑:
-#   1. Daemon 重启 / Worker 死亡 → scan 发现工位 + agent-id.env 有记录
-#   2. 读 session_id → ACP session/resume(session_id)
-#      → 成功: worker 继续工作（缓存命中）✅
-#      → 失败: session 已死 →
-#         a. 从 pool 选空闲 worker_NN
-#         b. ACP session/fork(manager) → 新 session_id
-#         c. 更新 agent-id.env: 新 worker_id + 新 session_id
-#         d. 发送"继续上次工作"prompt
-#   3. Worker 正常完成 → wt-close → _acp_session_close → 删条目
+# 有记录 + 工位存在   → agent 正在工作或曾经工作过
+#   → session_id 非空: ACP session/resume 尝试恢复
+#   → session_id 为空: 委派了但 worker 从未启动（sync_tooling 写了记录但 daemon 没运行）
 #
-# 并发保证:
-#   - 同一个工位同时只有一个 worker（agent-id.env 互斥）
-#   - manager reconcile 清理僵尸条目（工位目录不存在 → 删记录）
-#   - max_parallel_workers: 10:7 限流
+# 有记录 + 工位不存在 → wt-close 有 bug，或违规手工移除了工位
+#   → manager_reconcile_agent_id_env 清理僵尸记录
+#   → 同时 _acp_session_close 关闭残留 session
 #
-# 一个工位最多关联 3 个 session:
-#   - manager session（在 develop 巡逻，不记录在此）
-#   - worker session（在此文件的 {wt}=worker={id}={session_id}）
-#   - reviewer session（review PR diff，可关联到 worker 条目）
+# 无记录 + 工位存在   → 从未启动过 agent（wt-create 后未运行 daemon，或手动创建工位）
+#   → scan 标为 3a_never_bound，next_action 交给 manager 判断
+#   → 如果工位有 commit: 人工已完成，应走 pr-create 流程
+#   → 如果工位无 commit: 真没开始，委派 worker
+#
+# 无记录 + 无工位     → 正常终态（wt-close 完成），或从未创建
+#   → 不关注，不属于任何 scan 分类
+#
+# ── 记录时机（只有两个 ACP 入口）────────────────────────────────────
+#
+# sync_tooling 写:      {wt}=worker={id}              （委派时，session_id 暂空）
+# worker session/fork:  {wt}=worker={id}={session_id} （首次启动后 sed 追加）
+# reviewer session/fork: 记录在 a2a_tasks，不写此文件（reviewer 无独立工位）
+# manager session/new:   不写此文件（manager 在 develop，不绑定工位）
+# wt-close:             删除整行                       （正常退出）
+# reconcile:            删除僵尸行 + session/close     （工位已删）
+#
+# ── 并发保证 ────────────────────────────────────────────────────────
+#
+# 同一个工位同时只有一个 worker（agent-id.env 互斥 + reconcile 保证）
+# max_parallel_workers: 10:7（硬限 10，警告 7）
 ```
+
+### 三种状态对照 scan
+
+| agent-id.env | 工位 | 含义 | scan 分类 | next_action |
+|-------------|------|------|-----------|-------------|
+| 有 | 存在 | agent 工作过 | Cat 3（判 session 死活） | resume / re-delegate |
+| 有 | 不存在 | wt-close bug 或手工删 | Cat 2（僵尸） | reconcile + session/close |
+| 无 | 存在 | 从未启动 agent | Cat 3a（never_bound） | manager 判断 |
+| 无 | 不存在 | 正常终态 | 不扫 | — |
 
 ### 字段演进
 
