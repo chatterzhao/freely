@@ -11,3 +11,8 @@
 
 # I-20260627T021849Z-A: wt-close --platform-only fallback
 wt-close --platform-only: if local issue.md missing, search GitHub/Gitee by raw key.
+
+## 补充: --platform-only 工位保护 + 帮助更新
+
+- 新增 worktree 存在检查，有工位时阻塞 --platform-only
+- 帮助文本重写：按场景组织，覆盖所有参数组合

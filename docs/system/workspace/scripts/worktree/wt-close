@@ -53,9 +53,13 @@ Options (按场景选择，互斥):
                       仅用于：方案已被否决，确认丢弃。
 
   ── 仅操作平台，不管本地 ──
-  --platform-only    只关闭平台 issue (GitHub/Gitee)，不改本地文件。
-                      适用：工位已删除但平台 issue 仍 OPEN。
-                      适用：feedback 创建了 issue 但从未开过工位。
+  --platform-only    只关闭平台 issue。前提：本地没有此 raw key 的工位
+                     （无论从未用 wt-create 创建过，还是工位已被删除）。
+                      检查：搜 git worktree list，有工位则阻塞 → 用正常 wt-close。
+                      适用：feedback 创建 issue 后从未开过工位，决定不要了。
+                      适用：工位已手动删除，仅剩平台 issue 需关闭。
+                      为何用此命令而非 gh/gitee：wt-close 封装了多平台自动执行，
+                      一次关闭 GitHub + Gitee，无需逐个平台操作。
                       必须配合 --reason。
 
   ── 其他 ──
@@ -510,11 +514,40 @@ fi
 # ── Phase 2: Platform close ──
 
 # --platform-only: close platform issue via API only, NO local file modifications.
-# For orphan issues where worktree is gone but platform issue remains open.
-# Uses gh API directly (not issue-sync) to avoid writing to develop.
+# Requires: NO worktree exists for this raw key (never created, or already removed).
+# If a worktree exists → blocked, use normal wt-close or --force instead.
+# Uses gh/gitee API directly to avoid writing to develop.
 if [[ "$PLATFORM_ONLY" == true ]]; then
   echo "wt-close: --platform-only mode (API close only, no local file changes)"
-  
+
+  # ── Guard: --platform-only requires NO local worktree ──
+  # If a worktree exists for this raw key, the user should use normal
+  # wt-close (or --force if discarding).  --platform-only is only for
+  # orphan issues where the worktree is already gone.
+  _po_existing_wt=$(git -C "$PROJECT_ROOT" worktree list --porcelain 2>/dev/null | awk -v k="$raw_key" '
+    $1=="worktree" { wt=$2 }
+    $1=="branch" && $2 ~ k { print wt; exit }
+  ')
+  if [[ -n "$_po_existing_wt" && -d "$_po_existing_wt" ]]; then
+    cat >&2 <<PLATFORM_BLOCK
+╔══════════════════════════════════════════════════════════════╗
+║  ⚠️  --platform-only blocked: 本地工位仍然存在               ║
+╠══════════════════════════════════════════════════════════════╣
+║  工位: $_po_existing_wt
+║  raw key: $raw_key
+║                                                              ║
+║  --platform-only 仅用于工位已被删除，仅剩平台 issue 的场景。   ║
+║                                                              ║
+║  正确做法:                                                    ║
+║    - 如果要彻底丢弃此 raw issue 的所有修改:                    ║
+║      ./bin/wt-close $branch --force --reason "违规绕过门禁中，理由充分，是：..."    ║
+║    - 如果 PR 已 merge，正常收口:                              ║
+║      ./bin/wt-close $branch                                  ║
+╚══════════════════════════════════════════════════════════════╝
+PLATFORM_BLOCK
+    exit 1
+  fi
+
   # Read issue.md from main repo (read-only).  If the file doesn't exist
   # (e.g. feedback created the issue but no worktree was ever created),
   # fall back to searching the platform by raw key.
