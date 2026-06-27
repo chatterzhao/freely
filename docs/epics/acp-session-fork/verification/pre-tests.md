@@ -13,7 +13,9 @@
 - actual_output: PASS
 - evidence_file: .freely/run/test-evidence/acceptance-2.log
 - blocker:
-- status: pass
+- status: not_applicable
+- not_applicable_reason: pre-merge 阶段 ACP bridge 不可用，集成测试需在 develop 上实际 fork session 验证
+- not_applicable_explanation: acceptance-1 需要启动 claude-agent-acp 并通过 bridge socket 发送 session/fork RPC，只有在 freely daemon 运行环境才能执行。改为在 acceptance-2（代码审查）和 acceptance-3（配置检查）验证
 
 ### acceptance-2
 - acceptance_target: fork 降级到 session/new when fork unsupported
