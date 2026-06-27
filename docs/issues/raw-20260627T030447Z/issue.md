@@ -1,7 +1,7 @@
 ---
 local_id: raw-20260627T030447Z
 kind: raw
-phase_state: absorbed
+phase_state: in_fix
 platform_ids:
   github:
     issue_id: '3578'
@@ -14,7 +14,7 @@ hash: ''
 created_at: '2026-06-27T03:05:08Z'
 updated_at: '2026-06-27T03:05:08Z'
 intake_id: ''
-author: platform
+author: zhaoquan
 channel: github
 session_refs: []
 ---
