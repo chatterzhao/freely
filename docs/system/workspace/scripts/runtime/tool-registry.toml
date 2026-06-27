@@ -25,6 +25,27 @@
 #                           适用于 codex:   CODEX_HOME=<path>)
 #
 # post_init      启动后的钩子 ("" 或 "ensure_writable_roots" for codex)
+#
+# ── [tool.adapters] 字段说明 ──────────────────────────────────────────────────
+#
+# adapters.supported    该工具支持的适配器模式列表:
+#                         "direct" — AI CLI 免交互模式。直接调用 AI CLI tool
+#                           binary（如 claude -p、codex exec），通过 CLI flag
+#                           传入 prompt 和参数。非交互式，一次性返回结果。
+#                         "acp"    — Agent Client Protocol 模式。通过 ACP bridge
+#                           (acp-bridge.py → claude-agent-acp) 与 AI agent
+#                           通信。支持 session/resume/fork 等持久化会话能力。
+#                         配置示例: supported = ["direct", "acp"]
+#                         说明: 当前所有工具均支持 direct 和 acp 两种模式，
+#                         但 direct 已弃用 (DEPRECATED)，推荐全部使用 acp。
+#
+# adapters.default      该工具的默认适配器。当前所有工具均为 "acp"。
+#                         如果 direct CLI 启动逻辑未实现（见 tool-launchers.sh），
+#                         运行时将提示 "direct 模式未实现，请配置 acp 模式"。
+#
+# adapters.launch_kinds  按适配器声明的启动方式:
+#                         acp    = "fresh,resume,fork,fresh_with_handoff,prompt"
+#                         direct = "fresh,resume,fresh_with_handoff"
 # =============================================================================
 
 # ── Claude Code ────────────────────────────────────────────────────────────

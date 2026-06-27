@@ -215,7 +215,8 @@ tool_default_adapter() {
   if [[ -n "$_default" ]]; then
     printf '%s\n' "$_default"
   else
-    printf 'direct\n'
+    # All registered tools default to acp; direct is deprecated
+    printf 'acp\n'
   fi
 }
 
@@ -785,7 +786,9 @@ sleep 1"
         --tool-resume-target "$tool_resume_target"
       ;;
     *)
-      echo "[ERROR] unsupported tool: $tool" >&2
+      echo "[ERROR] direct 模式未实现 — 工具 '$tool' 没有 direct CLI 启动逻辑。" >&2
+      echo "[ERROR] 请配置 acp 模式。在 tool-registry.toml 中确保 adapters.supported 包含 'acp'，" >&2
+      echo "[ERROR] 并确保 adapters.default = 'acp'（当前默认）。" >&2
       return 1
       ;;
   esac

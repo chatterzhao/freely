@@ -20300,17 +20300,16 @@ tool_supported_adapters_for_runtime() {
     *-apikey-*) base_tool="${base_tool%%-apikey-*}" ;;
     *-account-*) base_tool="${base_tool%%-account-*}" ;;
   esac
-  case "$base_tool" in
-    codex|opencode|claude|cline)
-      printf 'direct\nacp\n'
-      ;;
-    kiro-cli|iflow|cc|cc-use-codex-cli|test-sleep|test-compact|test-once|test-session|test-route-only|test-scripted)
-      printf 'direct\n'
-      ;;
-    *)
-      printf 'direct\n'
-      ;;
-  esac
+  # Registry-driven: read adapters.supported from tool-registry.toml.
+  # The TOML is the single source of truth — no per-tool hardcoding here.
+  local _supported
+  _supported=$(_tool_registry_get "$base_tool" "adapters.supported" 2>/dev/null || true)
+  if [[ -n "$_supported" ]]; then
+    printf '%s\n' "$_supported" | tr ',' '\n' | sed 's/^ *//; s/ *$//'
+  else
+    # Conservative default for tools not yet in the registry
+    printf 'direct\n'
+  fi
 }
 
 tool_runtime_process_match_fragments() {
