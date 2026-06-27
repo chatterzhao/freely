@@ -1,6 +1,6 @@
 - issue_id: I-20260627T030447Z-A
 - kind: fix
-- phase_state: done_b2_ibm
+- phase_state: completed
 - milestone: M-20260627T030447Z-A
 - source_candidate: docs/pre-brainstorms/20260627T030447Z--claude-acp-adapter-fix/candidates.md#C-20260627T030447Z-A
 - verification_artifact_dir: docs/epics/claude-acp-adapter-fix/code-reviews
