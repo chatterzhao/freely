@@ -3203,9 +3203,12 @@ routing_policy:
 - title: claude ACP adapter unsupported — registry-driven fix
 - status: active
 ### candidate_issues
-1. `C-20260627T030447Z-A`
+
 ### committed_issues
+
+### completed_issues
 1. `I-20260627T030447Z-A`
 - title: claude ACP adapter unsupported — registry-driven fix
-- milestone_state: committed
-- phase_state: `in_dev`
+- milestone_state: completed
+- phase_state: `completed`
+
