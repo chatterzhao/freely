@@ -208,7 +208,15 @@ tool_default_adapter() {
     printf '\n'
     return 0
   }
-  printf 'direct\n'
+  # Registry-driven: read adapters.default field
+  local _resolved _default
+  _resolved="$(_resolve_tool_family "$tool")"
+  _default=$(_tool_registry_get "$_resolved" "adapters.default" 2>/dev/null || true)
+  if [[ -n "$_default" ]]; then
+    printf '%s\n' "$_default"
+  else
+    printf 'direct\n'
+  fi
 }
 
 tool_supported_adapters() {

@@ -20282,7 +20282,14 @@ tool_default_adapter_for_runtime() {
     printf '\n'
     return 0
   }
-  printf 'acp\n'
+  # Registry-driven: read adapters.default field, fallback to acp
+  local _default
+  _default=$(_tool_registry_get "$tool" "adapters.default" 2>/dev/null || true)
+  if [[ -n "$_default" ]]; then
+    printf '%s\n' "$_default"
+  else
+    printf 'acp\n'
+  fi
 }
 
 tool_supported_adapters_for_runtime() {
@@ -20294,7 +20301,7 @@ tool_supported_adapters_for_runtime() {
     *-account-*) base_tool="${base_tool%%-account-*}" ;;
   esac
   case "$base_tool" in
-    codex|opencode)
+    codex|opencode|claude|cline)
       printf 'direct\nacp\n'
       ;;
     kiro-cli|iflow|cc|cc-use-codex-cli|test-sleep|test-compact|test-once|test-session|test-route-only|test-scripted)
@@ -21831,6 +21838,9 @@ print(ready)
 
     local tool_adapter failure_marker_file="" network_failure_marker_file="" bridge_lost_marker_file=""
     tool_adapter="${AI_TOOL_ADAPTER:-$(tool_default_adapter_for_runtime "$AI_TOOL")}"
+    # Ensure AI_TOOL_ADAPTER is available for child processes (monitor script selection)
+    # and for subsequent cycles via session state
+    export AI_TOOL_ADAPTER="$tool_adapter"
     failure_marker_file="$(run_dir_for_project "$PROJECT_ROOT")/tool-runtime-failure.marker"
     network_failure_marker_file="$(run_dir_for_project "$PROJECT_ROOT")/network-failure.marker"
     bridge_lost_marker_file="$(run_dir_for_project "$PROJECT_ROOT")/bridge-lost.marker"
