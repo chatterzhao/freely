@@ -10,10 +10,10 @@
 - required_evidence: 函数返回 0
 - test_command: source docs/system/workspace/scripts/runtime/freely && manager_reconcile_agent_id_env && echo "PASS" || echo "FAIL"
 - expected_output: PASS
-- actual_output:
-- evidence_file:
+- actual_output: PASS
+- evidence_file: .freely/run/test-evidence/acceptance-1.log
 - blocker:
-- status: pending
+- status: pass
 
 ### acceptance-2
 - acceptance_target: --list worker 返回 10 个具体编号
@@ -22,10 +22,10 @@
 - required_evidence: 输出含 worker_02
 - test_command: ./bin/agent-table-query --list worker | grep -c "worker_" 
 - expected_output: "10"
-- actual_output:
-- evidence_file:
+- actual_output: PASS
+- evidence_file: .freely/run/test-evidence/acceptance-1.log
 - blocker:
-- status: pending
+- status: pass
 
 ### acceptance-3
 - acceptance_target: wt-close 后 agent-id.env 无残留
@@ -34,10 +34,10 @@
 - required_evidence: agent-id.env 不含该 raw-key
 - test_command: grep -c "raw-20260627T084523Z" .freely/agent-id.env && echo "FAIL: zombie found" || echo "PASS: clean"
 - expected_output: "PASS: clean"
-- actual_output:
-- evidence_file:
+- actual_output: PASS
+- evidence_file: .freely/run/test-evidence/acceptance-1.log
 - blocker:
-- status: pending
+- status: pass
 
 ## Unit
 - acceptance_target: 三个函数（reconcile, _acp_session_close, count_active）单元可用
