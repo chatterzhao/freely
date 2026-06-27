@@ -5876,7 +5876,6 @@ sync_project_tooling_from_source() {
 	  _agent_query="$source_project/bin/agent-table-query"
 	  if [[ -f "$_agent_table" && -x "$_agent_query" ]]; then
 	    # ── Concurrency control: reconcile zombies, count active, pick idle worker ──
-	    _agent_env="$source_project/.freely/agent-id.env"
 	    manager_reconcile_agent_id_env 2>/dev/null || true
 	    local _active_count _max_workers _all_workers _picked _wt_path
 	    _active_count=$(count_active_running_workers_for_manager_project "$source_project" 2>/dev/null || echo 0)
