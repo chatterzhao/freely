@@ -243,7 +243,7 @@ class FreelyAgentExecutor(BaseAgentExecutor):
             metadata = dict(context.metadata or {}) if hasattr(context, 'metadata') else {}
             self._server.task_store.raw_rpc("a2a_task.update", {
                 "task_id": internal_task.id, "state": "submitted",
-                "agent_id": metadata.get("agent_id", "worker"),
+                "agent_id": metadata.get("agent_id", metadata.get("role", "worker")),
                 "skill": metadata.get("skill", ""),
                 "worktree": metadata.get("worktree", ""),
                 "branch": metadata.get("branch", ""),
@@ -373,7 +373,7 @@ class A2AServer:
                 worker_pid = row.get("worker_pid", "")
                 worktree = row.get("worktree", "")
 
-                if state == "working" and agent_id == "worker":
+                if state == "working" and str(agent_id).startswith("worker"):
                     alive = False
                     if worker_pid:
                         try:
@@ -423,7 +423,7 @@ class A2AServer:
                                 # A2: only check ACTIVE (non-terminal) workers
                                 active_workers = [
                                     r for r in rows
-                                    if r.get("agent_id") == "worker"
+                                    if str(r.get("agent_id","")).startswith("worker")
                                     and r.get("raw_key") == row.get("raw_key", "")
                                     and r.get("state") not in ("completed", "failed", "canceled")
                                 ]
@@ -585,7 +585,7 @@ class A2AServer:
         if task_id.endswith("/messages") and request.method == "POST":
             tid = task_id[:-9]; body = await request.json()
             self.task_store.raw_rpc("a2a_task.update-message", {
-                "task_id": tid, "role": body.get("role", "worker"),
+                "task_id": tid, "role": body.get("role", body.get("agent_id", "worker")),
                 "type": body.get("type", "text"), "content": body.get("content", "")})
             return JSONResponse({"ok": True})
         if task_id.endswith("/worker-pid") and request.method == "PATCH":
@@ -633,7 +633,7 @@ class A2AServer:
         raw_key = request.query_params.get("raw_key", "")
         result = []
         for r in self.task_store.get_all_dicts():
-            if r.get("agent_id") == "worker" and r.get("state") == "working" and r.get("worker_pid"):
+            if str(r.get("agent_id","")).startswith("worker") and r.get("state") == "working" and r.get("worker_pid"):
                 if not raw_key or r.get("raw_key") == raw_key:
                     result.append({"task_id": r["task_id"], "worker_pid": r["worker_pid"],
                                    "worktree": r.get("worktree", "")})
