@@ -5,6 +5,7 @@
 - source_candidate: docs/pre-brainstorms/20260627T121248Z--a2a-worker-pid-fix/candidates.md#C-20260627T121248Z-A
 - source_raw: raw-20260627T121248Z
 - verification_artifact_dir: docs/epics/a2a-worker-pid-fix/code-reviews
+pre_tests_path: docs/epics/a2a-worker-pid-fix/verification/pre-tests.md
 - canonical_issue_path: docs/issues/I-20260627T121248Z-A/issue.md
 - title: a2a worker_pid + manager check 修复
 
