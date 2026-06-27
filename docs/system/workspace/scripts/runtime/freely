@@ -13619,7 +13619,7 @@ print(sum(1 for r in data.get('rows', []) if r.get('worktree','')=='$_target_wor
       _task_id=""
       if [[ -f "$_a2a_task_py" && -f "$_db_path" ]]; then
         _task_id=$(python3 "$_a2a_task_py" insert \
-          --role worker --agent-id "${AGENT_AI_TOOL:-worker}" --raw-key "$_raw_key" \
+          --role worker --agent-id "$(grep -F "$_target_worktree" "${PROJECT_ROOT}/.freely/agent-id.env" 2>/dev/null | grep -oE 'worker_[0-9]+' | head -1 || echo "worker")" --raw-key "$_raw_key" \
           --prompt-file "$_prompt_file" --worktree "$_target_worktree" \
           --created-by manager --consumed-by manager \
           --parent "$_parent_task_id" --prev-worker "$_prev_worker_id" 2>/dev/null || true)
@@ -15397,7 +15397,7 @@ autofill_manager_exit_contract_for_cleanup_delegate_workers_if_possible() {
     for _prompt_file in $worker_prompts_csv; do
       [[ -n "$_prompt_file" && -f "$_prompt_file" ]] || continue
       python3 "$_a2a_task_py" insert \
-        --role worker --agent-id "${AGENT_AI_TOOL:-worker}" --raw-key "$_raw_key" \
+        --role worker --agent-id "worker" --raw-key "$_raw_key" \
         --prompt-file "$_prompt_file" --created-by manager --consumed-by manager \
         --intent-kind cleanup 2>/dev/null || true
     done
