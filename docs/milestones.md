@@ -3283,3 +3283,17 @@ routing_policy:
 - phase_state: `completed`
 - verification_artifact_dir: `docs/epics/scan-agent-id-fix/code-reviews`
 
+## M-20260627T121248Z-A
+- title: a2a-worker-pid-fix
+- status: active
+### candidate_issues
+1. `C-20260627T121248Z-A`
+- milestone: M-20260627T121248Z-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260627T121248Z-A/issue.md`
+### completed_issues
+1. `I-20260627T121248Z-A`
+- title: a2a-worker-pid-fix; milestone_state: completed
+- issue_path: `docs/issues/I-20260627T121248Z-A/issue.md`
+- phase_state: `completed`
+- verification_artifact_dir: `docs/epics/a2a-worker-pid-fix/code-reviews`
+

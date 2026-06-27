@@ -412,7 +412,7 @@ class A2AServer:
                             f"Marked failed."))
                     continue
 
-                elif state == "submitted" and agent_id == "manager":
+                elif state == "submitted" and str(agent_id).startswith("manager"):
                     created = row.get("created_at", "")
                     if created:
                         try:
