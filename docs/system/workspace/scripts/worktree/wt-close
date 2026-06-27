@@ -831,6 +831,10 @@ except: pass
         echo "wt-close: worker $_wtask_id already exited (pid=$_wpid not found)"
       fi
 
+      # Gracefully close ACP session before marking task completed
+      if [[ -n "$_wsession" ]]; then
+        _acp_session_close "$PROJECT_ROOT" "$_wsession"
+      fi
       # Mark task as completed (was 'consumed' — invalid A2A state, silently rejected by SQLite CHECK)
       python3 "$_a2a_task_py" update --task-id "$_wtask_id" --state completed >/dev/null 2>&1 || true
     done <<<"$_active_workers"
