@@ -4,7 +4,7 @@
 - base: develop
 - reviewer: claude
 - verdict: pass
-- issue_id: I-$(echo "fix-raw-20260627T084523Z-agent-lifecycle" | grep -oE '[0-9]{8}T[0-9]{6}Z')-A
+- issue_id: I-20260627T084523Z-A
 
 ## 1. Worktree Check
 - status: pass
