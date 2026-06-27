@@ -330,8 +330,11 @@ class A2AChecker:
         """Check if agent has an active A2A session."""
         try:
             row = self.conn.execute(
-                "SELECT COUNT(*) FROM sessions WHERE role=? AND status='active'",
-                (agent_id,)
+                # sessions.role currently stores generic roles ('worker').
+                # agent-id.env stores specific IDs ('worker_03').
+                # Extract role prefix for query compatibility.
+                "SELECT COUNT(*) FROM sessions WHERE (role=? OR role=?) AND status='active'",
+                (agent_id, agent_id.split('_')[0] if '_' in agent_id else agent_id)
             ).fetchone()
             return row[0] > 0 if row else False
         except Exception:
