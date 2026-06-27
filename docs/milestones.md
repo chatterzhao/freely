@@ -3241,3 +3241,17 @@ routing_policy:
 - phase_state: `completed`
 - verification_artifact_dir: `docs/epics/agent-lifecycle/code-reviews`
 
+## M-20260627T084545Z-A
+- title: a2a-tasks-agent-id
+- status: active
+### candidate_issues
+1. `C-20260627T084545Z-A`
+- milestone: M-20260627T084545Z-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260627T084545Z-A/issue.md`
+### completed_issues
+1. `I-20260627T084545Z-A`
+- title: a2a-tasks-agent-id; milestone_state: completed
+- issue_path: `docs/issues/I-20260627T084545Z-A/issue.md`
+- phase_state: `completed`
+- verification_artifact_dir: `docs/epics/a2a-tasks-agent-id/code-reviews`
+

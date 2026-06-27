@@ -1184,13 +1184,13 @@ def h_a2a_task_get_launched_pids(daemon: DbDaemon, params: dict) -> dict:
     if raw_key:
         rows = daemon.conn.execute(
             "SELECT task_id, worker_pid, worktree FROM a2a_tasks "
-            "WHERE agent_id = 'worker' AND state = 'working' AND raw_key = ? AND worker_pid != ''",
+            "WHERE (agent_id LIKE 'worker_%' OR agent_id = 'worker') AND state = 'working' AND raw_key = ? AND worker_pid != ''",
             (raw_key,),
         ).fetchall()
     else:
         rows = daemon.conn.execute(
             "SELECT task_id, worker_pid, worktree FROM a2a_tasks "
-            "WHERE agent_id = 'worker' AND state = 'working' AND worker_pid != ''"
+            "WHERE (agent_id LIKE 'worker_%' OR agent_id = 'worker') AND state = 'working' AND worker_pid != ''"
         ).fetchall()
     cols = ["task_id", "worker_pid", "worktree"]
     return {"rows": [dict(zip(cols, r)) for r in rows]}

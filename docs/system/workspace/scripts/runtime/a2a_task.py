@@ -880,7 +880,7 @@ def _main() -> int:
             print(json.dumps(t or {}))
         elif args.cmd == "latest-completed-worker":
             rows = list_by_raw_key(getattr(args, 'raw_key', None) or "")
-            completed = [r for r in rows if r.get('state') == 'completed' and r.get('agent_id') == 'worker']
+            completed = [r for r in rows if r.get('state') == 'completed' and str(r.get('agent_id','')).startswith('worker')]
             print(json.dumps(completed[0] if completed else {}))
         elif args.cmd == "update-last-activity":
             print(json.dumps({"affected": update_task(_task_id)}))
@@ -889,7 +889,7 @@ def _main() -> int:
             rows = list_by_raw_key(rk)
             affected = 0
             for r in rows:
-                if r.get('state') in ('completed', 'failed') and r.get('agent_id') == 'worker':
+                if r.get('state') in ('completed', 'failed') and str(r.get('agent_id','')).startswith('worker'):
                     affected += update_task(r.get('id', r.get('task_id', '')), state='completed')
             print(json.dumps({"affected": affected}))
         elif args.cmd == "parse":
