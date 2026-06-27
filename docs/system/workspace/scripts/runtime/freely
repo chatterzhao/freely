@@ -112,52 +112,118 @@ _tool_test_resurrect() {
   return 1
 }
 
-# _assemble_slot_test_command: build the test command for a specific (tool, slot)
-# using ~/.ai-auth/{slot}/ credentials.  Returns the command via stdout.
-_assemble_slot_test_command() {
-  local tool="$1" slot="$2"
+# ai_cli_tool_with_auth_assemble: unified slot command builder.
+#
+# Usage: ai_cli_tool_with_auth_assemble <type> <slot_folder_name>
+#   type: test → emit CLI command string (say-hi test)
+#         work → emit bridge env vars (ACP bridge launch)
+#
+# Tool is extracted from slot folder name internally (e.g. claude-apikey-ds-pro-auto → claude).
+# Registry fields (discovery, config_file, bridge_config_env) control path injection format.
+# No alias dependency — slot folder name maps directly to ~/.ai-auth/{slot}/.
+ai_cli_tool_with_auth_assemble() {
+  local _type="$1" _slot_folder="$2"
+  [[ -n "$_type" && -n "$_slot_folder" ]] || return 1
+
+  # ── 1. Extract tool from slot folder name ────────────────
+  local _tool="${_slot_folder%%-*}"
+  _tool="$(_resolve_tool_family "$_tool")"
+
+  # ── 2. Read registry ────────────────────────────────────
   local _discovery _alias_key _cfg_file _is_dir _bridge_env _test_base
-  local _slot_dir _slot_path
-  _slot_dir="$HOME/.ai-auth/$slot"
+  _discovery="$(_tool_registry_get "$_tool" "slot.discovery" 2>/dev/null || true)"
+  _alias_key="$(_tool_registry_get "$_tool" "slot.alias_key" 2>/dev/null || true)"
+  _cfg_file="$(_tool_registry_get "$_tool" "slot.config_file" 2>/dev/null || true)"
+  _is_dir="$(_tool_registry_get "$_tool" "slot.is_dir" 2>/dev/null || echo "false")"
+  _bridge_env="$(_tool_registry_get "$_tool" "slot.bridge_config_env" 2>/dev/null || true)"
+  _test_base="$(_tool_registry_get "$_tool" "test_command" 2>/dev/null || true)"
+
+  # ── 3. Resolve slot config path ─────────────────────────
+  local _slot_dir="$HOME/.ai-auth/$_slot_folder"
   [[ -d "$_slot_dir" ]] || return 1
 
-  _discovery="$(_tool_registry_get "$tool" "slot.discovery" 2>/dev/null || true)"
-  _alias_key="$(_tool_registry_get "$tool" "slot.alias_key" 2>/dev/null || true)"
-  _cfg_file="$(_tool_registry_get "$tool" "slot.config_file" 2>/dev/null || true)"
-  _is_dir="$(_tool_registry_get "$tool" "slot.is_dir" 2>/dev/null || echo "false")"
-  _bridge_env="$(_tool_registry_get "$tool" "slot.bridge_config_env" 2>/dev/null || true)"
-  _test_base="$(_tool_registry_get "$tool" "test_command" 2>/dev/null || true)"
-  [[ -n "$_test_base" ]] || return 1
-
-  # Resolve slot config path
+  local _slot_path="" _slot_type=""
   if [[ "$_is_dir" == "true" ]]; then
-    _slot_path="$_slot_dir"
-  elif [[ -n "$_cfg_file" ]]; then
-    _slot_path="$_slot_dir/$_cfg_file"
+    _slot_path="$_slot_dir"; _slot_type="dir"
+  elif [[ -n "$_cfg_file" && -f "$_slot_dir/$_cfg_file" ]]; then
+    _slot_path="$_slot_dir/$_cfg_file"; _slot_type="file"
   else
-    _slot_path="$_slot_dir"
+    _slot_path="$_slot_dir"; _slot_type="file"
   fi
   [[ -e "$_slot_path" ]] || return 1
 
-  # Assemble
-  case "$_discovery" in
-    alias_cli_arg)
-      # claude: --settings <path>
-      if echo "$_test_base" | grep -q "$_alias_key "; then
-        echo "${_test_base/$_alias_key /$_alias_key $_slot_path }"
-      else
-        echo "$_test_base $_alias_key $_slot_path"
-      fi
+  # ── 4. Dispatch by type ─────────────────────────────────
+  case "$_type" in
+    test)
+      [[ -n "$_test_base" ]] || return 1
+      case "$_discovery" in
+        alias_cli_arg)
+          echo "${_test_base} ${_alias_key} ${_slot_path}" ;;
+        alias_env_var)
+          if [[ -n "$_bridge_env" ]]; then
+            echo "${_bridge_env}=${_slot_path} ${_test_base}"
+          else
+            echo "$_test_base"
+          fi
+          ;;
+        *) echo "$_test_base" ;;
+      esac
       ;;
-    alias_env_var)
+    work)
+      # Emit bridge_config_env — dual mode by value prefix
       if [[ -n "$_bridge_env" ]]; then
-        echo "$_bridge_env=$_slot_path $_test_base"
-      else
-        echo "$_test_base"
+        if [[ "$_bridge_env" == --* ]]; then
+          echo "ACP_CLI:${_bridge_env}=$_slot_path"
+        else
+          echo "${_bridge_env}=$_slot_path"
+        fi
+      fi
+      # Emit inline env vars + permission mode from config file
+      local _full_path=""
+      if [[ "$_slot_type" == "dir" && -n "$_cfg_file" ]]; then
+        _full_path="$_slot_path/$_cfg_file"
+      elif [[ "$_slot_type" == "file" ]]; then
+        _full_path="$_slot_path"
+      fi
+      if [[ -n "$_full_path" && -f "$_full_path" ]]; then
+        local _perm_field _perm_fallback
+        _perm_field="$(_tool_registry_get "$_tool" "permission.config_field" 2>/dev/null || true)"
+        _perm_fallback="$(_tool_registry_get "$_tool" "permission.fallback_field" 2>/dev/null || true)"
+        python3 -c "
+import json
+with open('$_full_path') as f:
+    d = json.load(f)
+for k, v in d.get('env', {}).items():
+    print(f'{k}={v}')
+pm = ''
+pf = '$_perm_field'
+fb = '$_perm_fallback'
+if pf:
+    if pf in d:
+        pm = d[pf]
+    elif fb:
+        parts = fb.split('.')
+        cur = d
+        for p in parts:
+            if isinstance(cur, dict) and p in cur:
+                cur = cur[p]
+            else:
+                cur = None
+                break
+        if cur is not None:
+            pm = str(cur)
+if pm:
+    print(f'CLAUDE_CODE_PERMISSION_MODE={pm}')
+" 2>/dev/null || true
       fi
       ;;
-    *) echo "$_test_base" ;;
+    *) return 1 ;;
   esac
+}
+
+# LEGACY: delegates to ai_cli_tool_with_auth_assemble. Remove once all callers updated.
+_assemble_slot_test_command() {
+  ai_cli_tool_with_auth_assemble test "${2:-}"
 }
 
 # _resurrect_dead_tools_batch: run once before fallback switching.  Queries the
@@ -181,9 +247,9 @@ for t in json.load(sys.stdin).get('tools', []):
     print(f'{t[\"tool\"]}|{t[\"slot\"]}')
 " | while IFS='|' read -r _tool _slot; do
     [[ -n "$_tool" && -n "$_slot" ]] || continue
-    _test_cmd="$(_assemble_slot_test_command "$_tool" "$_slot")"
+    _test_cmd="$(ai_cli_tool_with_auth_assemble test "$_slot")"
     if [[ -z "$_test_cmd" ]]; then
-      log_warn "dead slot $_tool/$_slot: could not assemble test command (skip)"
+      log_warn "dead slot $_slot: could not assemble test command (skip)"
       continue
     fi
     log_info "testing dead slot $_tool/$_slot: $_test_cmd"
@@ -13733,146 +13799,8 @@ finally:
 # Three-phase config path resolution: registered dir → alias parse → ~/.ai-auth/ fallback.
 # ─────────────────────────────────────────────────────────────────
 _bridge_env_for_registered_tool() {
-  local tool_name="$1" project="$2" base_tool="$3"
-  local _slot_path="" _slot_type="" _cfg_file="" _is_dir=""
-
-  # ════════════════════════════════════════════════════════════════
-  # Phase 1: Resolve slot config path (3 strategies)
-  # ════════════════════════════════════════════════════════════════
-
-  # Read static slot fields from registry once
-  local _discovery _alias_key _bridge_env_var _post_init
-  _discovery="$(_tool_registry_get "$base_tool" "slot.discovery" 2>/dev/null || true)"
-  _alias_key="$(_tool_registry_get "$base_tool" "slot.alias_key" 2>/dev/null || true)"
-  _cfg_file="$(_tool_registry_get "$base_tool" "slot.config_file" 2>/dev/null || true)"
-  _is_dir="$(_tool_registry_get "$base_tool" "slot.is_dir" 2>/dev/null || echo "false")"
-  _bridge_env_var="$(_tool_registry_get "$base_tool" "slot.bridge_config_env" 2>/dev/null || true)"
-  _post_init="$(_tool_registry_get "$base_tool" "slot.post_init" 2>/dev/null || true)"
-
-  # ── Strategy A: registered tool → AI_TOOL_SLOT or ~/.ai-auth/<tool>-*/ ──
-  if _tool_is_registered "$tool_name"; then
-    local _slot_dir="${AI_TOOL_SLOT:-}"
-    [[ -z "$_slot_dir" ]] && _slot_dir=$(ls -d "$HOME/.ai-auth/${tool_name}-"* 2>/dev/null | head -1)
-    [[ -z "$_slot_dir" ]] && _slot_dir="$HOME/.ai-auth/$tool_name"
-    if [[ -n "$_slot_dir" && -d "$_slot_dir" ]]; then
-      if [[ "$_is_dir" == "true" ]]; then
-        _slot_path="$_slot_dir"; _slot_type="dir"
-      elif [[ -f "$_slot_dir/$_cfg_file" ]]; then
-        _slot_path="$_slot_dir/$_cfg_file"; _slot_type="file"
-      fi
-    fi
-  fi
-
-  # ── Strategy B: alias resolution (if A yielded nothing) ──
-  if [[ -z "$_slot_path" && -n "$_discovery" && -n "$_alias_key" ]]; then
-    local _resolved; _resolved=$(_resolve_shell_alias "$tool_name")
-    if [[ -n "$_resolved" ]]; then
-      if [[ "$_discovery" == "alias_cli_arg" ]]; then
-        # --settings <path>
-        _slot_path=$(echo "$_resolved" | sed -n "s/.*$_alias_key \([^ ]*\).*/\1/p")
-        _slot_path="${_slot_path/#\~/$HOME}"
-        _slot_type="$([[ "$_is_dir" == "true" ]] && echo "dir" || echo "file")"
-      elif [[ "$_discovery" == "alias_env_var" ]]; then
-        # ENV="<path>"
-        _slot_path=$(echo "$_resolved" | sed -n "s/.*$_alias_key=\"\([^\"]*\)\".*/\1/p")
-        _slot_path="${_slot_path/#\~/$HOME}"
-        _slot_type="$([[ "$_is_dir" == "true" ]] && echo "dir" || echo "file")"
-      fi
-    fi
-  fi
-
-  # ── Strategy C: fallback to ~/.ai-auth/<tool_name>/ ──
-  if [[ -z "$_slot_path" ]]; then
-    local _fb_dir="$HOME/.ai-auth/$tool_name"
-    if [[ -d "$_fb_dir" ]]; then
-      if [[ "$_is_dir" == "true" ]]; then
-        _slot_path="$_fb_dir"; _slot_type="dir"
-      elif [[ -f "$_fb_dir/$_cfg_file" ]]; then
-        _slot_path="$_fb_dir/$_cfg_file"; _slot_type="file"
-      fi
-    fi
-  fi
-
-  # ── Validate resolved path ──
-  if [[ -z "$_slot_path" ]]; then return 0; fi
-  if [[ "$_slot_type" == "dir" ]]; then
-    [[ -d "$_slot_path" ]] || return 0
-  else
-    [[ -f "$_slot_path" ]] || return 0
-  fi
-
-  # ════════════════════════════════════════════════════════════════
-  # Phase 2: Emit bridge env vars, read config, run post_init hook
-  # ════════════════════════════════════════════════════════════════
-
-  # ── 2a. Emit bridge_config_env — dual mode by value prefix ──
-  #   "--*"  → CLI flag mode:  emit ACP_CLI:<flag>=<path> for bridge to append to args
-  #   else   → env var mode:   emit <ENV_VAR>=<path> (e.g. OPENCODE_CONFIG=/path)
-  if [[ -n "$_bridge_env_var" ]]; then
-    if [[ "$_bridge_env_var" == --* ]]; then
-      echo "ACP_CLI:${_bridge_env_var}=$_slot_path"
-      log_info "ACP bridge: CLI flag ${_bridge_env_var} $_slot_path"
-    else
-      echo "${_bridge_env_var}=$_slot_path"
-      log_info "ACP bridge: ${_bridge_env_var}=$_slot_path"
-    fi
-  fi
-
-  # ── 2b. Read config_file (settings.json) for inline env vars + permission ──
-  local _full_path=""
-  if [[ "$_slot_type" == "dir" && -n "$_cfg_file" ]]; then
-    _full_path="$_slot_path/$_cfg_file"
-  elif [[ "$_slot_type" == "file" ]]; then
-    _full_path="$_slot_path"
-  fi
-
-  if [[ -n "$_full_path" && -f "$_full_path" ]]; then
-    local _perm_field _perm_fallback
-    _perm_field="$(_tool_registry_get "$base_tool" "permission.config_field" 2>/dev/null || true)"
-    _perm_fallback="$(_tool_registry_get "$base_tool" "permission.fallback_field" 2>/dev/null || true)"
-
-    python3 -c "
-import json
-try:
-    with open('$_full_path') as f:
-        d = json.load(f)
-    for k, v in d.get('env', {}).items():
-        print(f'{k}={v}')
-    pm = ''
-    pf = '$_perm_field'
-    fb = '$_perm_fallback'
-    if pf:
-        if pf in d:
-            pm = d[pf]
-        elif fb:
-            # Handle dot-path fallback (e.g. 'permissions.defaultMode')
-            parts = fb.split('.')
-            cur = d
-            for p in parts:
-                if isinstance(cur, dict) and p in cur:
-                    cur = cur[p]
-                else:
-                    cur = None
-                    break
-            if cur is not None:
-                pm = str(cur)
-    if pm:
-        print(f'CLAUDE_CODE_PERMISSION_MODE={pm}')
-except: pass
-" 2>/dev/null || true
-  fi
-
-  # ── 2c. post_init hook (e.g. codex writable_roots) ──
-  case "$_post_init" in
-    ensure_writable_roots)
-      if [[ "$_slot_type" == "dir" ]]; then
-        _bridge_env_ensure_writable_roots "$_slot_path" "$project"
-      else
-        local _hook_dir; _hook_dir="$(dirname "$_slot_path" 2>/dev/null || true)"
-        [[ -n "$_hook_dir" ]] && _bridge_env_ensure_writable_roots "$_hook_dir" "$project"
-      fi
-      ;;
-  esac
+  # LEGACY: delegates to ai_cli_tool_with_auth_assemble.
+  ai_cli_tool_with_auth_assemble work "${1:-}"
 }
 
 # ── codex writable_roots helper ──────────────────────────────────
@@ -14019,18 +13947,26 @@ _ensure_acp_bridge_running() {
   local -a _bridge_env=()
   local tool_name="${AGENT_AI_TOOL:-claude}"
 
-  # ── Registry-driven bridge env dispatch ────────────────────────
-  # _bridge_env_for_registered_tool reads ALL behavior from the
-  # tool-registry.toml slot section.  Any tool with a slot entry
-  # is handled automatically — no per-tool case arm needed.
+  # ── Unified auth-driven bridge env dispatch ──────────────────
+  # ai_cli_tool_with_auth_assemble work reads ALL behavior from the
+  # tool-registry.toml slot section.  Tool extracted from slot name internally.
   local _bridge_line
-  if _tool_registry_get "$base_tool" "slot.discovery" >/dev/null 2>&1; then
-    while IFS= read -r _bridge_line; do
-      [[ -n "$_bridge_line" ]] && _bridge_env+=("$_bridge_line")
-    done < <(_bridge_env_for_registered_tool "$tool_name" "$project" "$base_tool")
-  else
-    log_warn "no slot.discovery in registry for base_tool='$base_tool', no bridge env vars set"
-  fi
+  while IFS= read -r _bridge_line; do
+    [[ -n "$_bridge_line" ]] && _bridge_env+=("$_bridge_line")
+  done < <(ai_cli_tool_with_auth_assemble work "$tool_name" 2>/dev/null || true)
+  # Post-init hook (e.g. codex writable_roots) — kept in caller
+  local _post_init; _post_init="$(_tool_registry_get "$base_tool" "slot.post_init" 2>/dev/null || true)"
+  case "$_post_init" in
+    ensure_writable_roots)
+      local _slot_dir="$HOME/.ai-auth/$tool_name"
+      local _is_dir; _is_dir="$(_tool_registry_get "$base_tool" "slot.is_dir" 2>/dev/null || echo "false")"
+      if [[ "$_is_dir" == "true" ]]; then
+        _bridge_env_ensure_writable_roots "$_slot_dir" "$project"
+      else
+        _bridge_env_ensure_writable_roots "$(dirname "$_slot_dir" 2>/dev/null || true)" "$project"
+      fi
+      ;;
+  esac
 
   # Extract ACP CLI flags (ACP_CLI: prefix) from bridge env and append to _acp_args.
   # bridge_config_env values starting with "--" (e.g. "--config") emit
