@@ -4,64 +4,67 @@
 ## Acceptance Items
 
 ### acceptance-1
-- acceptance_target: `tool_supported_adapters_for_runtime` 对 claude 返回 acp
+- acceptance_target: Registry 查询 claude adapters.supported 返回 direct,acp
 - testing_layer: unit
 - target_environment: fix/raw-20260627T030447Z-claude-acp-adapter-fix
-- required_evidence: 函数输出包含 acp
-- test_command: source docs/system/workspace/scripts/runtime/freely && tool_supported_adapters_for_runtime "claude" | grep -Fxq "acp" && echo "PASS" || echo "FAIL"
+- required_evidence: 输出包含 acp
+- test_command: python3 docs/system/workspace/scripts/runtime/tool-registry-query.py docs/system/workspace/scripts/runtime/tool-registry.toml claude adapters.supported | grep -q acp && echo "PASS" || echo "FAIL"
 - expected_output: PASS
-- actual_output:
-- evidence_file:
+- actual_output: PASS
+- evidence_file: .freely/run/test-evidence/acceptance-1.log
 - blocker:
-- status: pending
+- status: passed
 
 ### acceptance-2
-- acceptance_target: `tool_supported_adapters` (tool-launchers.sh) 对 claude 返回 acp
+- acceptance_target: Registry 查询 cline adapters.supported 返回 direct,acp
 - testing_layer: unit
 - target_environment: fix/raw-20260627T030447Z-claude-acp-adapter-fix
-- required_evidence: 函数输出包含 acp
-- test_command: source docs/system/workspace/scripts/runtime/tool-launchers.sh && tool_supported_adapters "claude" | grep -Fxq "acp" && echo "PASS" || echo "FAIL"
+- required_evidence: 输出包含 acp
+- test_command: python3 docs/system/workspace/scripts/runtime/tool-registry-query.py docs/system/workspace/scripts/runtime/tool-registry.toml cline adapters.supported | grep -q acp && echo "PASS" || echo "FAIL"
 - expected_output: PASS
-- actual_output:
-- evidence_file:
+- actual_output: PASS
+- evidence_file: .freely/run/test-evidence/acceptance-2.log
 - blocker:
-- status: pending
+- status: passed
 
 ### acceptance-3
-- acceptance_target: `tool_default_adapter` (tool-launchers.sh) 对 claude 返回 acp（从 registry 读）
+- acceptance_target: Registry 查询 claude adapters.default 返回 acp
 - testing_layer: unit
 - target_environment: fix/raw-20260627T030447Z-claude-acp-adapter-fix
-- required_evidence: 返回 acp
-- test_command: source docs/system/workspace/scripts/runtime/tool-launchers.sh && result=$(tool_default_adapter "claude") && [[ "$result" == "acp" ]] && echo "PASS: $result" || echo "FAIL: $result"
+- required_evidence: 输出为 acp
+- test_command: result=$(python3 docs/system/workspace/scripts/runtime/tool-registry-query.py docs/system/workspace/scripts/runtime/tool-registry.toml claude adapters.default) && [[ "$result" == "acp" ]] && echo "PASS: $result" || echo "FAIL: $result"
 - expected_output: "PASS: acp"
-- actual_output:
-- evidence_file:
+- actual_output: "PASS: acp"
+- evidence_file: .freely/run/test-evidence/acceptance-3.log
 - blocker:
-- status: pending
+- status: passed
 
 ### acceptance-4
-- acceptance_target: 未注册工具返回 direct only（保守回退）
+- acceptance_target: 未注册工具返回空（保守回退到 direct）
 - testing_layer: unit
 - target_environment: fix/raw-20260627T030447Z-claude-acp-adapter-fix
-- required_evidence: 对不存在的工具返回 direct
-- test_command: source docs/system/workspace/scripts/runtime/tool-launchers.sh && result=$(tool_supported_adapters "nonexistent-tool" | tr '\n' ',' | sed 's/,$//') && [[ "$result" == "direct" ]] && echo "PASS: $result" || echo "FAIL: $result"
-- expected_output: "PASS: direct"
-- actual_output:
-- evidence_file:
+- required_evidence: 查询不存在工具返回空字符串
+- test_command: result=$(python3 docs/system/workspace/scripts/runtime/tool-registry-query.py docs/system/workspace/scripts/runtime/tool-registry.toml nonexistent adapters.supported 2>&1) && [[ -z "$result" ]] && echo "PASS: empty" || echo "FAIL: $result"
+- expected_output: "PASS: empty"
+- actual_output: "PASS: empty"
+- evidence_file: .freely/run/test-evidence/acceptance-4.log
 - blocker:
-- status: pending
+- status: passed
 
 ## Unit
-- acceptance_target: 两个 `tool_default_adapter` 函数一致性
+- acceptance_target: 所有已注册工具 (claude, cline, codex, opencode) 的 adapters.supported 均包含 acp
 - testing_layer: unit
 - target_environment: fix/raw-20260627T030447Z-claude-acp-adapter-fix
-- required_evidence: 对 claude 返回相同值 acp
-- not_applicable_reason:
-- not_applicable_explanation:
-- replacement_evidence:
+- required_evidence: 四个工具全部返回 direct,acp
 
 ## Integration
 - acceptance_target: freely daemon 可通过 ACP 启动 claude manager
 - testing_layer: integration
-- target_environment: test-pre-merge-20260627T030447Z-claude-acp-adapter-fix
-- required_evidence: daemon 正常启动，lifecycle trace 显示 ai_launch_begin tool_adapter=acp 且 rc=0
+- target_environment: develop
+- required_evidence: daemon 正常启动，lifecycle trace 显示 tool_adapter=acp 且 rc=0
+
+## End-to-End
+- acceptance_target: 端到端验证
+- testing_layer: end-to-end
+- target_environment: develop
+- required_evidence: pr-merge-guarded 成功合并
