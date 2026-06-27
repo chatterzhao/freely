@@ -269,6 +269,60 @@ for t in json.load(sys.stdin).get('tools', []):
   done
 }
 
+# ── Slot testing helpers ──────────────────────────────────────────────
+
+# _resolve_current_agent_id: find which agent (manager_01 / worker_03 / …)
+# owns the current worktree, via agent-id.env.  Defaults to manager_01.
+_resolve_current_agent_id() {
+  local project="${1:-${PROJECT_ROOT:-$(pwd)}}"
+  local _agent_env="$project/.freely/agent-id.env" _my_id=""
+  if [[ -f "$_agent_env" ]]; then
+    _my_id=$(grep -F "$(pwd)" "$_agent_env" 2>/dev/null | grep -oE '(manager_[0-9]+|worker_[0-9]+)' | head -1 || true)
+  fi
+  [[ -z "$_my_id" ]] && _my_id="manager_01"
+  printf '%s\n' "$_my_id"
+}
+
+# _test_slot: verify a slot is usable by running its assembled test command.
+# Uses ai_cli_tool_with_auth_assemble test internally — no alias needed.
+# Returns 0 if slot works, 1 otherwise (30s timeout).
+_test_slot() {
+  local _slot="$1" _test_cmd
+  _test_cmd="$(ai_cli_tool_with_auth_assemble test "$_slot" 2>/dev/null || true)"
+  [[ -n "$_test_cmd" ]] || return 1
+  perl -e 'alarm 30; exec @ARGV' -- bash -c "$_test_cmd" >/dev/null 2>&1
+}
+
+# _update_agent_table_slot: update {role}_slot in agent-table.toml.
+# Usage: _update_agent_table_slot <agent_id> <new_slot>
+#   e.g. _update_agent_table_slot manager_01 claude-apikey-ds-flash-auto
+_update_agent_table_slot() {
+  local _agent_id="$1" _new_slot="$2"
+  local _at="${PROJECT_ROOT}/.freely/agent-table.toml"
+  [[ -f "$_at" ]] || return 1
+  python3 -c "
+import sys
+agent_id, new_slot = sys.argv[1], sys.argv[2]
+with open('$_at', 'r') as f:
+    lines = f.readlines()
+# Find the agent entry and update its slot line
+in_target = False
+for i, line in enumerate(lines):
+    s = line.strip()
+    if s.startswith('[[agents]]'):
+        in_target = False
+    if agent_id + ' =' in s or s.startswith(agent_id + ' ='):
+        in_target = True
+    if in_target and '_slot =' in s:
+        old = lines[i].split('=', 1)[0]
+        lines[i] = f'{old}= \"{new_slot}\"\n'
+        break
+with open('$_at', 'w') as f:
+    f.writelines(lines)
+print(f'updated {agent_id} slot → {new_slot}')
+" "$_agent_id" "$_new_slot" 2>/dev/null
+}
+
 # ── Cooldown cycle state ─────────────────────────────────────────────
 _read_cooldown_state() {
   local state_file; state_file="$(run_dir_for_project "$PROJECT_ROOT")/cooldown-state.env"
@@ -4995,14 +5049,30 @@ tool_select_ready_slot_for_manager_auto_recovery() {
       selected_slot="$(runtime_read_tool_current_slot "$project" "$tool")"
       ;;
     *)
-      if [[ "$mode" == "after_failure" ]]; then
-        selected_slot="$(runtime_next_tool_slot_after_current "$project" "$tool" || true)"
-      else
-        selected_slot="$(runtime_current_or_first_tool_slot "$project" "$tool" || true)"
+      # ── Same-tool slot recovery with live testing ──────────
+      # Scan ~/.ai-auth/{tool}-* slots, test each with ai_cli_tool_with_auth_assemble.
+      # Skip current (failed) slot.  First working slot wins.
+      # On success: update agent-table.toml {role}_slot.
+      local _auth_dir _current_slot _candidate _found=""
+      _auth_dir="$HOME/.ai-auth"
+      _current_slot="$(runtime_read_tool_current_slot "$project" "$tool" 2>/dev/null || true)"
+      if [[ -d "$_auth_dir" ]]; then
+        while IFS= read -r _candidate; do
+          [[ -n "$_candidate" ]] || continue
+          [[ "$_candidate" == "$_current_slot" && "$mode" == "after_failure" ]] && continue
+          if _test_slot "$_candidate"; then
+            _found="$_candidate"
+            break
+          fi
+        done < <(ls -1 "$_auth_dir" 2>/dev/null | grep "^${tool}-")
       fi
-      [[ -n "$selected_slot" ]] || return 1
+      [[ -n "$_found" ]] || return 1
+      selected_slot="$_found"
       tool_binary_available_for_auto_recovery "$tool" || return 1
       runtime_write_tool_current_slot "$tool" "$selected_slot"
+      # Update agent-table for current agent's role
+      local _agent_id; _agent_id=$(_resolve_current_agent_id "$project" || true)
+      [[ -n "$_agent_id" ]] && _update_agent_table_slot "$_agent_id" "$selected_slot" || true
       ;;
   esac
   TOOL_AUTO_RECOVERY_SLOT="$selected_slot"
