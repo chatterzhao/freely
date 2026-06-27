@@ -9,6 +9,8 @@ platform_ids:
     synced_at: ''
 primary_platform: github
 canonical_issue_path: ''
+absorbed_into: I-20260627T121241Z-A
+absorbed_into: I-20260627T121241Z-A
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-27T12:13:01Z'
