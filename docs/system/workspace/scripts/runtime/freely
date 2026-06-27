@@ -114,13 +114,19 @@ _tool_test_resurrect() {
 
 # ai_cli_tool_with_auth_assemble: unified slot command builder.
 #
+# "slot" 是 Freely 内部叫法，指 ~/.ai-auth/ 下的鉴权目录名。
+# 目录命名约定：{tool-name}-{apikey|account}-{custom}
+#   例：claude-apikey-ds-pro-auto  →  tool=claude, auth=apikey, 自定义=ds-pro-auto
+#       opencode-apikey-ds-flash-auto → tool=opencode
+#       codex-account-user@example-com-1 → tool=codex, auth=account
+#
 # Usage: ai_cli_tool_with_auth_assemble <type> <slot_folder_name>
 #   type: test → emit CLI command string (say-hi test)
-#         work → emit bridge env vars (ACP bridge launch)
+#         work → emit bridge env vars + inline env + permission (ACP bridge launch)
 #
-# Tool is extracted from slot folder name internally (e.g. claude-apikey-ds-pro-auto → claude).
+# Tool extracted from slot folder name internally (first segment before -apikey- or -account-).
 # Registry fields (discovery, config_file, bridge_config_env) control path injection format.
-# No alias dependency — slot folder name maps directly to ~/.ai-auth/{slot}/.
+# No alias dependency — slot folder name maps directly to ~/.ai-auth/{slot_folder_name}/.
 ai_cli_tool_with_auth_assemble() {
   local _type="$1" _slot_folder="$2"
   [[ -n "$_type" && -n "$_slot_folder" ]] || return 1
