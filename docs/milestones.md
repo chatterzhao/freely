@@ -3054,7 +3054,6 @@ routing_policy:
 - milestone: M-20260626T121349Z-A
 - status: completed
 - promoted_from: C-20260626T121349Z-A
->>>>>>> fix/raw-20260626T121349Z-consistency-cleanup
 
 ## M-20260626T130431Z-A
 - title: wt-close Phase 6b force fix
@@ -3228,3 +3227,10 @@ routing_policy:
 - phase_state: `completed`
 - verification_artifact_dir: `docs/epics/acp-session-fork/code-reviews`
 
+## M-20260627T084523Z-A
+- title: Agent 生命周期管理 — 僵尸清理、并发控制、session 关闭
+- status: active
+### candidate_issues
+1. `C-20260627T084523Z-A`
+- milestone: M-20260627T084523Z-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260627T084523Z-A/issue.md`
