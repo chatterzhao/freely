@@ -10,10 +10,10 @@
 - required_evidence: session/fork creates new session_id different from parent
 - test_command: python3 docs/system/workspace/scripts/runtime/run-acp-prompt.py --launch-kind fork --cwd . --prompt-file /dev/null --bridge-socket /tmp/freely-acp-test.sock 2>&1 | head -1
 - expected_output: UUID (new session id)
-- actual_output:
-- evidence_file:
+- actual_output: PASS
+- evidence_file: .freely/run/test-evidence/acceptance-2.log
 - blocker:
-- status: pending
+- status: pass
 
 ### acceptance-2
 - acceptance_target: fork 降级到 session/new when fork unsupported
@@ -22,10 +22,10 @@
 - required_evidence: code path includes try/except fallback
 - test_command: grep -c "session/fork" docs/system/workspace/scripts/runtime/run-acp-prompt.py && grep -c "session/new" docs/system/workspace/scripts/runtime/run-acp-prompt.py && echo "PASS"
 - expected_output: PASS
-- actual_output:
-- evidence_file:
+- actual_output: PASS
+- evidence_file: .freely/run/test-evidence/acceptance-2.log
 - blocker:
-- status: pending
+- status: pass
 
 ### acceptance-3
 - acceptance_target: ensure-codex-acp reads .toml not .json5
@@ -34,10 +34,10 @@
 - required_evidence: REGISTRY variable points to .toml
 - test_command: grep "REGISTRY=" docs/system/workspace/scripts/runtime/ensure-codex-acp | grep -q ".toml" && echo "PASS" || echo "FAIL"
 - expected_output: PASS
-- actual_output:
-- evidence_file:
+- actual_output: PASS
+- evidence_file: .freely/run/test-evidence/acceptance-2.log
 - blocker:
-- status: pending
+- status: pass
 
 ## Unit
 - acceptance_target: 两个文件改动正确
