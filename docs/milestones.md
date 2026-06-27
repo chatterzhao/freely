@@ -3204,9 +3204,11 @@ routing_policy:
 - status: active
 ### candidate_issues
 1. `C-20260627T030447Z-A`
-### committed_issues
+- milestone: M-20260627T030447Z-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260627T030447Z-A/issue.md`
+### completed_issues
 1. `I-20260627T030447Z-A`
-- title: claude ACP adapter unsupported — registry-driven fix
-- milestone_state: committed
-- phase_state: `completed`
+- title: claude ACP adapter unsupported — registry-driven fix; milestone_state: completed
+- phase_state: `completed`; issue_path: `docs/issues/I-20260627T030447Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/claude-acp-adapter-fix/code-reviews`
 
