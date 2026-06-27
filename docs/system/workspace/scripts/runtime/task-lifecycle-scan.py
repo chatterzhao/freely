@@ -330,8 +330,11 @@ class A2AChecker:
         """Check if agent has an active A2A session."""
         try:
             row = self.conn.execute(
-                "SELECT COUNT(*) FROM sessions WHERE role=? AND status='active'",
-                (agent_id,)
+                # sessions.role currently stores generic roles ('worker').
+                # agent-id.env stores specific IDs ('worker_03').
+                # Extract role prefix for query compatibility.
+                "SELECT COUNT(*) FROM sessions WHERE (role=? OR role=?) AND status='active'",
+                (agent_id, agent_id.split('_')[0] if '_' in agent_id else agent_id)
             ).fetchone()
             return row[0] > 0 if row else False
         except Exception:
@@ -542,13 +545,19 @@ def scan(project: Path) -> dict:
         # ── Category 3: worktree exists → check agent liveness ────
         if wt_exists:
             wt_path = wt["path"]
-            agent_env_file = wt_path / ".freely" / "run" / "agent-id.env"
+            # Read from project-global agent-id.env (develop/.freely/agent-id.env)
+            agent_env_file = project / ".freely" / "agent-id.env"
             agent_id = ""
             if agent_env_file.exists():
                 try:
+                    wt_path_str = str(wt_path)
                     for line in agent_env_file.read_text().split("\n"):
-                        if line.startswith("AGENT_ID="):
-                            agent_id = line.split("=", 1)[1].strip().strip("'\"")
+                        if wt_path_str in line:
+                            # Format: {path}={role}={agent_id}
+                            parts = line.strip().split("=")
+                            if len(parts) >= 3:
+                                agent_id = parts[-1]
+                            break
                 except Exception:
                     pass
 

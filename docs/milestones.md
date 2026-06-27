@@ -3268,3 +3268,18 @@ routing_policy:
 - phase_state: `completed`
 - verification_artifact_dir: `docs/epics/scan-v3-refactor/code-reviews`
 
+
+## M-20260627T121241Z-A
+- title: scan-agent-id-fix
+- status: active
+### candidate_issues
+1. `C-20260627T121241Z-A`
+- milestone: M-20260627T121241Z-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260627T121241Z-A/issue.md`
+### completed_issues
+1. `I-20260627T121241Z-A`
+- title: scan-agent-id-fix; milestone_state: completed
+- issue_path: `docs/issues/I-20260627T121241Z-A/issue.md`
+- phase_state: `completed`
+- verification_artifact_dir: `docs/epics/scan-agent-id-fix/code-reviews`
+
