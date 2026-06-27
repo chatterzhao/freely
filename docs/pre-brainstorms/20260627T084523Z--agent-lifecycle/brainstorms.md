@@ -140,3 +140,57 @@ A2A prompt → wait 10s → ACP session/close RPC → kill → mark completed
 - candidate_id: C-20260627T084523Z-A
 - status: promoted
 - milestone: M-20260627T084523Z-A
+
+## 补充设计：agent-id.env 记录 session_id + resume 逻辑
+
+### agent-id.env 文件头注释
+
+```
+# agent-id.env — Agent-Worktree Binding Registry
+#
+# 格式: {worktree_abs_path}={role}={agent_id}={session_id}
+#
+# 记录时机（只有 ACP new/fork 两个入口）:
+#   1. Manager 首次启动 → ACP session/new → 仅记录 manager session（不在此文件）
+#   2. Worker 被委派到工位 → sync_tooling 写 {wt}=worker={id}（无 session_id）
+#      → Worker 首次启动 → ACP session/fork(manager) → 补写 session_id
+#   3. Reviewer 被委派 → ACP session/fork(manager) → 记录 session_id
+#
+# Resume 逻辑:
+#   1. Daemon 重启 / Worker 死亡 → scan 发现工位 + agent-id.env 有记录
+#   2. 读 session_id → ACP session/resume(session_id)
+#      → 成功: worker 继续工作（缓存命中）✅
+#      → 失败: session 已死 →
+#         a. 从 pool 选空闲 worker_NN
+#         b. ACP session/fork(manager) → 新 session_id
+#         c. 更新 agent-id.env: 新 worker_id + 新 session_id
+#         d. 发送"继续上次工作"prompt
+#   3. Worker 正常完成 → wt-close → _acp_session_close → 删条目
+#
+# 并发保证:
+#   - 同一个工位同时只有一个 worker（agent-id.env 互斥）
+#   - manager reconcile 清理僵尸条目（工位目录不存在 → 删记录）
+#   - max_parallel_workers: 10:7 限流
+#
+# 一个工位最多关联 3 个 session:
+#   - manager session（在 develop 巡逻，不记录在此）
+#   - worker session（在此文件的 {wt}=worker={id}={session_id}）
+#   - reviewer session（review PR diff，可关联到 worker 条目）
+```
+
+### 字段演进
+
+| 阶段 | 格式 | 谁写 |
+|------|------|------|
+| wt-create 后 | `{wt}=worker={id}` | sync_tooling |
+| Worker fork 后 | `{wt}=worker={id}={session_id}` | worker launch |
+| Resume 后 | `{wt}=worker={id}={session_id}`（不变） | 无需更新 |
+| 重新委派后 | `{wt}=worker={new_id}={new_session_id}` | 新 worker launch |
+| wt-close 后 | 删除整行 | wt-close |
+
+### 实现要点
+
+1. `sync_tooling` 写 `{wt}=worker={id}`（当前行为，不变）
+2. Worker fork 成功拿到 `session_id` 后，用 sed 更新该行追加 `={session_id}`
+3. Resume 时读 `session_id`；失败时走 fork 新 session，更新条目
+4. `manager_reconcile_agent_id_env` 同时关僵尸 session（`_acp_session_close`）
