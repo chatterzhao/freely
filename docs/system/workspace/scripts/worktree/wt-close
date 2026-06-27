@@ -519,15 +519,13 @@ fi
 if [[ "$PLATFORM_ONLY" == true ]]; then
   echo "wt-close: --platform-only mode (API close only, no local file changes)"
   
-  # Read issue.md from main repo (read-only)
+  # Read issue.md from main repo (read-only).  If the file doesn't exist
+  # (e.g. feedback created the issue but no worktree was ever created),
+  # fall back to searching the platform by raw key.
   _po_issue_file="$PROJECT_ROOT/docs/issues/$issue_id/issue.md"
-  if [[ ! -f "$_po_issue_file" ]]; then
-    echo "Error: --platform-only cannot find issue file: $_po_issue_file" >&2
-    exit 1
-  fi
-  
-  # Get raw issue's GitHub number and close via API
-  _po_raw_gh=$(python3 -c "
+  if [[ -f "$_po_issue_file" ]]; then
+    # Get raw issue's GitHub number from local frontmatter
+    _po_raw_gh=$(python3 -c "
 import yaml
 with open('$_po_issue_file') as f:
     parts = f.read().split('---', 2)
@@ -537,6 +535,15 @@ for p, info in fm.get('platform_ids', {}).items():
         print(info['issue_id'])
         break
 " 2>/dev/null)
+  else
+    echo "wt-close: no local issue file, searching platform by raw key..."
+    # Search GitHub for open issue containing the raw key in title
+    _po_raw_gh=$(gh issue list --repo chatterzhao/freely --state open --search "RAW-${raw_key}" --json number -q '.[0].number' 2>/dev/null || true)
+    if [[ -z "$_po_raw_gh" ]]; then
+      # Try Gitee as fallback
+      _po_raw_gh=$(gitee issue list --repo zhaoquan/freely --state open --search "RAW-${raw_key}" --json number -q '.[0].number' 2>/dev/null || true)
+    fi
+  fi
   if [[ -n "$_po_raw_gh" ]]; then
     echo "wt-close: closing raw issue #$_po_raw_gh via platform-adapter..."
     if python3 "$PROJECT_ROOT/docs/system/workspace/scripts/sync/platform-adapter.py" close github "$_po_raw_gh" 2>&1; then
