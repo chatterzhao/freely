@@ -3254,4 +3254,17 @@ routing_policy:
 - issue_path: `docs/issues/I-20260627T084545Z-A/issue.md`
 - phase_state: `completed`
 - verification_artifact_dir: `docs/epics/a2a-tasks-agent-id/code-reviews`
+## M-20260627T062554Z-A
+- title: scan-v3-refactor
+- status: active
+### candidate_issues
+1. `C-20260627T062554Z-A`
+- milestone: M-20260627T062554Z-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260627T062554Z-A/issue.md`
+### completed_issues
+1. `I-20260627T062554Z-A`
+- title: scan-v3-refactor; milestone_state: completed
+- issue_path: `docs/issues/I-20260627T062554Z-A/issue.md`
+- phase_state: `completed`
+- verification_artifact_dir: `docs/epics/scan-v3-refactor/code-reviews`
 
