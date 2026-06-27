@@ -1,6 +1,6 @@
 - issue_id: I-20260627T084551Z-A
 - kind: fix
-- phase_state: done_b2_ibm
+- phase_state: completed
 - milestone: M-20260627T084551Z-A
 - source_candidate: docs/pre-brainstorms/20260627T084551Z--acp-session-fork/candidates.md#C-20260627T084551Z-A
 - source_raw: raw-20260627T084551Z
