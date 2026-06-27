@@ -27,60 +27,56 @@ DRY_RUN=false
 usage() {
   cat <<USAGE
 Usage:
-  ./bin/wt-close <branch> [--force] [--skip-platform] [--platform-only] [--dry-run]
+  ./bin/wt-close <branch> [options]
 
-Close a worktree: validate phase_state, close platform issue, remove worktree+branch.
+Close a fix|feature worktree and its platform issue.  The command validates
+phase_state, checks dev↔test worktree consistency, closes the platform issue,
+removes the worktree directory, and deletes the branch.
 
 Arguments:
-  <branch>           Branch name (e.g. feature/raw-20260513T081743Z-wt-close)
-                      or worktree path (e.g. /path/to/worktree)
+  <branch>           Branch name (fix/raw-YYYYMMDDTHHMMSSZ-<slug>) or worktree path
 
-Options:
-  --force            确定要丢弃此 raw issue，跳过所有检查直接关闭。
-                      保留此 raw issue 继续推进则不应使用 --force，应修复门禁报错。
-                      (blocks if branch unmerged; use with --discard-unmerged)
-  --discard-unmerged  Confirm intentional discard of unmerged commits.
-                      Must be used with --force when branch is ahead of develop.
-  --reason <text>    Reason for force-close (REQUIRED with --force/--discard-unmerged/--skip-platform)
-                      Format: --reason "违规绕过门禁中，理由充分，是：<业务理由>"
-  --skip-platform    Skip platform issue close (requires --reason)
-                      Only valid scenario: platform issue was already closed manually
-  --platform-only    Close platform issue via API only, no local file changes (requires --reason)
-                      For orphan issues where worktree is gone but platform issue remains open
-  --dry-run          Print what would be done, don't execute
+Options (按场景选择，互斥):
+  --reason <text>    REQUIRED with any bypass flag below.  Format:
+                      --reason "违规绕过门禁中，理由充分，是：<业务理由>"
 
-Z --force 不是用来绕过错误的 ═══════════════════════════════════════
-  --force 的唯一语义：确定丢弃此 raw issue，不再继续推进。
-  只要是保留 issue 继续工作，遇到任何报错都应去解决根因，而不是 --force。
+  ── 正常关闭 (PR 已 merge，无需 bypass) ──
+  (no flags)         Standard close.  Requires clean worktree, synced test worktree,
+                      passed pretests, completed phase_state.
 
-  --force 合法场景（确定丢弃 issue）:
-    ✅ "该功能确定放弃，不再继续实现此 raw issue"
-    ✅ "工位目录已损坏或丢失，仅剩分支引用需清理"
+  ── 丢弃未 merge 的修改 ──
+  --force            放弃此 raw issue，丢弃所有本地修改。
+                      ⚠️ 但凡还要继续推进此 issue，就不能用 --force。
+                      ⚠️ 遇到 gate/pretests 报错应修复根因，不是 --force 绕过。
+                      必须配合 --reason。
+  --discard-unmerged  确认丢弃未 merge 的提交（需同时 --force）。
+                      仅用于：方案已被否决，确认丢弃。
 
-  以下场景不应使用 --force（应修复对应的报错）:
-    ❌ gate 检查未通过 → 解决 gate 报出的具体问题
-    ❌ pretests 未执行 → 执行 skill:freely-test-execution
-    ❌ workcell-state.env 缺失 → 手工补写（手工执行场景）或执行 test skill
-    ❌ IBM 治理文档缺失 → 完成 B1_IBM / B2_IBM
-    ❌ 测试失败 → 回到 dev-loop 修复
+  ── 仅操作平台，不管本地 ──
+  --platform-only    只关闭平台 issue (GitHub/Gitee)，不改本地文件。
+                      适用：工位已删除但平台 issue 仍 OPEN。
+                      适用：feedback 创建了 issue 但从未开过工位。
+                      必须配合 --reason。
 
-  --discard-unmerged 合法场景:
-    ✅ "该方案已被否决，未合并提交确认丢弃"
+  ── 其他 ──
+  --skip-platform    跳过平台 issue 关闭。仅用于：平台 issue 已手动关闭。
+  --dry-run          只打印操作，不执行。
 
-  --skip-platform 合法场景（仅一种）:
-    ✅ "平台 issue 已通过其他渠道手动关闭，无需同步"
+Scenarios:
+  # PR 已 merge，正常收口
+  ./bin/wt-close fix/raw-20260627T021849Z-my-fix
 
-  --platform-only 合法场景:
-    ✅ "工位已删除但平台 issue 仍 OPEN，需关闭平台 issue 收口"
-    ✅ "孤儿 raw issue——工位和分支已清理，仅剩平台 issue 未同步关闭"
+  # 确定放弃此 issue，丢弃所有修改
+  ./bin/wt-close fix/raw-xxx --force --reason "违规绕过门禁中，理由充分，是：该功能确定放弃"
 
-  无效理由（技术症状，会被拒绝）:
-    ❌ "phase_state 未 completed"
-    ❌ "连接超时"
+  # 方案被否决，丢弃未 merge 提交
+  ./bin/wt-close fix/raw-xxx --force --discard-unmerged --reason "违规绕过门禁中，理由充分，是：该方案已被否决"
 
-Examples:
-  ./bin/wt-close feature/raw-20260513T081743Z-wt-close
-  ./bin/wt-close fix|feature/raw-xxx --force --reason "违规绕过门禁中，理由充分，是：该功能确定放弃，不再继续实现此 raw issue"
+  # 工位已手动删除，只关闭平台 issue
+  ./bin/wt-close fix/raw-xxx --platform-only --reason "违规绕过门禁中，理由充分，是：工位已清理仅剩平台 issue"
+
+  # test-pre-merge 工位 (自动 --force + --skip-platform)
+  ./bin/wt-close test-pre-merge-20260627T021849Z-my-fix
 USAGE
 }
 
