@@ -43,9 +43,13 @@
 - acceptance_target: 三个函数（reconcile, _acp_session_close, count_active）单元可用
 
 ## Integration
+- not_applicable_reason: pre-merge 阶段无法执行集成测试
+- not_applicable_explanation: 需合入 develop 后启动 freely daemon 验证
 - acceptance_target: sync_tooling 分配不同 worker_NN（不总是 worker_01）
 
 ## End-to-End
+- not_applicable_reason: pre-merge 阶段无法执行端到端测试
+- not_applicable_explanation: 需合入 develop 后在真实环境验证
 - acceptance_target: freely daemon 启动后 agent-id.env 无僵尸条目，并发控制生效
 
 ## Real-Environment
