@@ -15397,7 +15397,7 @@ autofill_manager_exit_contract_for_cleanup_delegate_workers_if_possible() {
     for _prompt_file in $worker_prompts_csv; do
       [[ -n "$_prompt_file" && -f "$_prompt_file" ]] || continue
       python3 "$_a2a_task_py" insert \
-        --role worker --agent-id "worker" --raw-key "$_raw_key" \
+        --role worker --raw-key "$_raw_key" \
         --prompt-file "$_prompt_file" --created-by manager --consumed-by manager \
         --intent-kind cleanup 2>/dev/null || true
     done
