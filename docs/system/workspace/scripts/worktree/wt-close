@@ -53,10 +53,11 @@ Options (按场景选择，互斥):
                       仅用于：方案已被否决，确认丢弃。
 
   ── 仅操作平台，不管本地 ──
-  --platform-only    只关闭平台 issue。前提：本地必须没有工位。
-                      检查：用 raw key 搜 git worktree list，有工位则阻塞。
+  --platform-only    只关闭平台 issue。前提：本地没有此 raw key 的工位
+                     （无论从未用 wt-create 创建过，还是工位已被删除）。
+                      检查：搜 git worktree list，有工位则阻塞 → 用正常 wt-close。
+                      适用：feedback 创建 issue 后从未开过工位，决定不要了。
                       适用：工位已手动删除，仅剩平台 issue 需关闭。
-                      如果本地有工位 → 用正常 wt-close 或 --force。
                       必须配合 --reason。
 
   ── 其他 ──
@@ -511,8 +512,9 @@ fi
 # ── Phase 2: Platform close ──
 
 # --platform-only: close platform issue via API only, NO local file modifications.
-# For orphan issues where worktree is gone but platform issue remains open.
-# Uses gh API directly (not issue-sync) to avoid writing to develop.
+# Requires: NO worktree exists for this raw key (never created, or already removed).
+# If a worktree exists → blocked, use normal wt-close or --force instead.
+# Uses gh/gitee API directly to avoid writing to develop.
 if [[ "$PLATFORM_ONLY" == true ]]; then
   echo "wt-close: --platform-only mode (API close only, no local file changes)"
 
