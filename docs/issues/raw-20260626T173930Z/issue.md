@@ -3,8 +3,6 @@ local_id: raw-20260626T173930Z
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260626T173930Z-A
-absorbed_into: I-20260627T020240Z-A
-absorbed_into: I-20260626T173930Z-A
 platform_ids:
   github:
     issue_id: '3571'
@@ -15,11 +13,12 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-26T17:39:50Z'
-updated_at: '2026-06-27T00:40:10Z'
+updated_at: '2026-06-27T02:15:43Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 ## 现象
