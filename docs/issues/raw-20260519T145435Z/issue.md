@@ -1,8 +1,11 @@
 ---
 local_id: raw-20260519T145435Z
 kind: raw
+<<<<<<< HEAD
 phase_state: dropped
+=======
 phase_state: absorbed
+>>>>>>> fix/raw-20260519T145435Z-consumed-by-auto-consume
 platform_ids:
   github:
     issue_id: '655'
@@ -18,8 +21,11 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+<<<<<<< HEAD
 dropped_reason: Fix merged directly to develop via pr-merge-guarded. Runtime bug fix
   does not warrant full B1→I-* chain.
+=======
+>>>>>>> fix/raw-20260519T145435Z-consumed-by-auto-consume
 ---
 
 ## raw-20260519T145435Z
