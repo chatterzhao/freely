@@ -2,6 +2,7 @@
 local_id: raw-20260626T173930Z
 kind: raw
 phase_state: absorbed
+absorbed_into: I-20260626T173930Z-A
 absorbed_into: I-20260627T020240Z-A
 absorbed_into: I-20260626T173930Z-A
 platform_ids:
