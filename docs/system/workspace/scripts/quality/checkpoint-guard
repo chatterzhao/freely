@@ -172,7 +172,11 @@ if [[ "$untracked_count" -gt "$MAX_UNTRACKED_FILES" ]]; then
   checkpoint_required=1
   reasons+=("untracked_files_threshold")
 fi
-if [[ "$scope_count" -gt "$MAX_SCOPE_COUNT" ]]; then
+# Merge commits pull in develop changes — skip scope check.
+_is_merge_commit() {
+  git rev-parse --verify MERGE_HEAD >/dev/null 2>&1
+}
+if [[ "$scope_count" -gt "$MAX_SCOPE_COUNT" ]] && ! _is_merge_commit; then
   checkpoint_required=1
   reasons+=("scope_count_threshold")
 fi
