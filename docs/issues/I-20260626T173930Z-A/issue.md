@@ -20,3 +20,9 @@
 
 ai_cli_tool_with_auth_assemble(type, slot) 统一 _assemble_slot_test_command 和 _bridge_env_for_registered_tool。
 slot recovery 通过 _test_slot 实测候选 slot（30s 超时），成功则更新 agent-table.toml。
+
+## 补充修复 (2026-06-27)
+
+tool-registry.toml:
+- cline test_command: `--yolo` → `--auto-approve true`（--yolo 已废弃）
+- claude test_command: 移除 `--max-tokens 50`（当前版本不支持）
