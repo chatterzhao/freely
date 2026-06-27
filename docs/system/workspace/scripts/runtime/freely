@@ -5876,7 +5876,8 @@ sync_project_tooling_from_source() {
 	  _agent_query="$source_project/bin/agent-table-query"
 	  if [[ -f "$_agent_table" && -x "$_agent_query" ]]; then
 	    # ── Concurrency control: reconcile zombies, count active, pick idle worker ──
-	    manager_reconcile_agent_id_env 2>/dev/null || true
+	    _agent_env="$source_project/.freely/agent-id.env"
+	    manager_reconcile_agent_id_env "$_agent_env" 2>/dev/null || true
 	    local _active_count _max_workers _all_workers _picked _wt_path
 	    _active_count=$(count_active_running_workers_for_manager_project "$source_project" 2>/dev/null || echo 0)
 	    _max_workers="$(manager_max_parallel_workers)"
@@ -5886,7 +5887,7 @@ sync_project_tooling_from_source() {
 	      log_warn "agent-table: concurrency limit reached ($_active_count/$_max_workers), deferring worker assignment"
 	      return 0
 	    fi
-	    # Pick first idle worker — skip those already in agent-id.env with an active worktree
+	    # Pick first idle worker — skip those already in agent-id.env
 	    _all_workers=$("$_agent_query" --project "$source_project" --list worker 2>/dev/null || true)
 	    _picked=""
 	    for _w in $_all_workers; do
