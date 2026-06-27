@@ -454,12 +454,19 @@ def main():
             session_result = {"sessionId": session_id}
 
         elif launch_kind == "fork":
-            # Worker forks from parent: gets own session, inherits context via prompt.
-            # Using session/new is safe — avoids sharing parent session across workers.
+            # Worker/reviewer forks from parent: creates independent session
+            # while inheriting parent conversation history for cache hits.
+            # Uses session/fork (ACP official spec) when supported — Claude and
+            # OpenCode support it; Cline and Codex fall back to session/new.
             new_params = {"cwd": cwd, "mcpServers": []}
             if args.session_id:
                 new_params["sessionId"] = args.session_id
-            session_result = client.request("session/new", new_params, timeout=30)
+            try:
+                session_result = client.request("session/fork",
+                    {"sessionId": resume_target or args.session_id, "cwd": cwd, "mcpServers": []},
+                    timeout=30)
+            except Exception:
+                session_result = client.request("session/new", new_params, timeout=30)
             session_id = session_result["sessionId"]
             if resume_target:
                 print(session_id, flush=True)
