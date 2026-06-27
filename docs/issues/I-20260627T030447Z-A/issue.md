@@ -3,6 +3,7 @@
 - phase_state: completed
 - milestone: M-20260627T030447Z-A
 - source_candidate: docs/pre-brainstorms/20260627T030447Z--claude-acp-adapter-fix/candidates.md#C-20260627T030447Z-A
+- source_raw: raw-20260627T030447Z
 - verification_artifact_dir: docs/epics/claude-acp-adapter-fix/code-reviews
 - canonical_issue_path: docs/issues/I-20260627T030447Z-A/issue.md
 - pre_tests_path: docs/epics/claude-acp-adapter-fix/verification/pre-tests.md
