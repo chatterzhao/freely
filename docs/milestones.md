@@ -3157,6 +3157,10 @@ routing_policy:
 - title: ai_cli_tool_with_auth_assemble + slot recovery
 - status: active
 ### candidate_issues
+1. `C-20260626T173930Z-A`
+- milestone: M-20260626T173930Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260626T173930Z-A/issue.md`
 ### completed_issues
 1. `I-20260626T173930Z-A`
 - title: ai_cli_tool_with_auth_assemble + slot recovery
