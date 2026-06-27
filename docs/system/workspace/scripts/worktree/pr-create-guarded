@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# pr-create-guarded: rebase onto latest develop → handle conflicts → dry-run gate → push → create PR
+# pr-create-guarded: merge onto latest develop → handle conflicts → dry-run gate → push → create PR
 #
 # Usage:
 #   ./bin/pr-create-guarded [--title <title>] [--body <body>] [--base <branch>]
@@ -224,26 +224,26 @@ echo ""
 # merge commit from crossing checkpoint-guard scope budgets when develop has files
 # from other merged PRs. Conflicts surface per-commit instead of all at once.
 echo "Step 3/4: rebasing $current_branch onto latest $base..."
-if ! git pull --rebase origin "$base" 2>&1; then
+if ! git pull --no-rebase origin "$base" 2>&1; then
   conflicted_files=$(git diff --name-only --diff-filter=U 2>/dev/null || true)
   cat >&2 <<CONFLICT
 ========================================
-冲突: $current_branch rebase 到 $base 时出现冲突
+冲突: $current_branch merge 到 $base 时出现冲突
 
 冲突文件:
 $(if [[ -n "$conflicted_files" ]]; then echo "$conflicted_files" | sed 's/^/  /'; else echo "  (无法列出冲突文件，请执行 git status 查看)"; fi)
 
 解决方案（二选一）:
 
-  方案A: 手动解决冲突后继续 rebase
+  方案A: 手动解决冲突后继续 merge 冲突
     # 编辑冲突文件，解决冲突
     git add <resolved-files>
-    git rebase --continue     # 继续 rebase
-    # 如果还有冲突，重复上述步骤直到 rebase 完成
+    git add <resolved-files> && git merge --continue  # 继续 merge
+    # 如果还有冲突，重复上述步骤直到 merge 完成
     ./bin/pr-create-guarded  # 重新运行
 
-  方案B: 放弃本次 rebase
-    git rebase --abort       # 回到 rebase 前状态
+  方案B: 放弃本次 merge
+    git merge --abort          # 回到 merge 前状态
     # 修复冲突根源后重新运行
     ./bin/pr-create-guarded
 
