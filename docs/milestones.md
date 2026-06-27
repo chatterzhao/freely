@@ -3228,9 +3228,15 @@ routing_policy:
 - verification_artifact_dir: `docs/epics/acp-session-fork/code-reviews`
 
 ## M-20260627T084523Z-A
-- title: Agent 生命周期管理 — 僵尸清理、并发控制、session 关闭
+- title: agent-lifecycle
 - status: active
 ### candidate_issues
 1. `C-20260627T084523Z-A`
 - milestone: M-20260627T084523Z-A; status: promoted
 - promoted_issue_path: `docs/issues/I-20260627T084523Z-A/issue.md`
+### completed_issues
+1. `I-20260627T084523Z-A`
+- title: agent-lifecycle; milestone_state: completed
+- phase_state: `completed`; issue_path: `docs/issues/I-20260627T084523Z-A/issue.md`
+- verification_artifact_dir: `docs/epics/agent-lifecycle/code-reviews`
+
