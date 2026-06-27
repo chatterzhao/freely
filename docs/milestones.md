@@ -3198,3 +3198,14 @@ routing_policy:
 - title: wt-close --platform-only fallback; milestone_state: completed
 - phase_state: `completed`; issue_path: `docs/issues/I-20260627T021849Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/platform-only-no-local-file/code-reviews`
+
+## M-20260627T030447Z-A
+- title: claude ACP adapter unsupported — registry-driven fix
+- status: active
+### candidate_issues
+1. `C-20260627T030447Z-A`
+### committed_issues
+1. `I-20260627T030447Z-A`
+- title: claude ACP adapter unsupported — registry-driven fix
+- milestone_state: committed
+- phase_state: `in_dev`
