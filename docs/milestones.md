@@ -3213,3 +3213,18 @@ routing_policy:
 - issue_path: `docs/issues/I-20260627T030447Z-A/issue.md`
 - verification_artifact_dir: `docs/epics/claude-acp-adapter-fix/code-reviews`
 
+
+## M-20260627T084551Z-A
+- title: acp-session-fork
+- status: active
+### candidate_issues
+1. `C-20260627T084551Z-A`
+- milestone: M-20260627T084551Z-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260627T084551Z-A/issue.md`
+### completed_issues
+1. `I-20260627T084551Z-A`
+- title: acp-session-fork; milestone_state: completed
+- issue_path: `docs/issues/I-20260627T084551Z-A/issue.md`
+- phase_state: `completed`
+- verification_artifact_dir: `docs/epics/acp-session-fork/code-reviews`
+

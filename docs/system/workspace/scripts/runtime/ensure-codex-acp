@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # ensure-codex-acp: download (if needed) and print codex-acp binary path.
 # Single entry point used by both freely and tool-launchers.sh.
-# Configuration read from tool-registry.json5 (version, repo).
+# Configuration read from tool-registry.toml (version, repo).
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REGISTRY="$SCRIPT_DIR/tool-registry.json5"
+REGISTRY="$SCRIPT_DIR/tool-registry.toml"
 REGISTRY_QUERY="$SCRIPT_DIR/tool-registry-query.py"
 
 _reg_get() {
