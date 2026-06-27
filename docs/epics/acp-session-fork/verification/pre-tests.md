@@ -45,9 +45,13 @@
 - acceptance_target: 文件改动正确，无语法错误
 
 ## Integration
+- not_applicable_reason: pre-merge 阶段无法执行集成测试
+- not_applicable_explanation: 需合入 develop 后启动 freely daemon 验证
 - acceptance_target: freely daemon worker fork 使用 session/fork
 
 ## End-to-End
+- not_applicable_reason: pre-merge 阶段无法执行端到端测试
+- not_applicable_explanation: 需合入 develop 后在真实环境验证
 - acceptance_target: worker fork 后缓存命中率提升
 
 ## Real-Environment
