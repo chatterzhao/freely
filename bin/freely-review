@@ -115,8 +115,15 @@ if [[ "$caller" == "worker" ]]; then
 	      [[ -f "$_pt" ]] && _pre_tests_text="$(cat "$_pt" 2>/dev/null || true)" && break
 	    done
 	    _diff_summary="$(git diff --stat develop..HEAD 2>/dev/null | head -30 || true)"
-		    _review_file="docs/epics/pr-review-guarded/code-reviews/pr-review-raw-${raw_key}.md"
-		    mkdir -p "$(dirname "$ROOT_DIR/$_review_file")"
+		    _issue_id="I-${raw_key}-A"
+		    _epic_dir=""
+		    if [[ -d "docs/issues/$_issue_id" ]]; then
+		      _verification_dir=$(grep "verification_artifact_dir:" "docs/issues/$_issue_id/issue.md" 2>/dev/null | sed "s/.*: *'*\([^']*\)'*/\1/" | head -1 || true)
+		      [[ -n "$_verification_dir" && -d "$_verification_dir" ]] && _epic_dir="$_verification_dir"
+		    fi
+		    [[ -z "$_epic_dir" ]] && _epic_dir="docs/epics/pr-review-guarded/code-reviews"
+		    _review_file="$_epic_dir/pr-review-raw-${raw_key}.md"
+		    mkdir -p "$(dirname "$_review_file")"
 	    cat > "$_pf" << PROMPT
 You are the Freely TDD Reviewer. Load and follow skill:freely-tdd-review.
 
