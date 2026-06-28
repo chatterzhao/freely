@@ -23419,14 +23419,14 @@ HELP
   echo "$_adapter_result"
 
   # Notify active worker via ACP session/prompt if worktree is active
-  local _wt_path _agent_env="${PROJECT_ROOT}/.freely/agent-id.env"
+  local _wt_path _agent_env="${project}/.freely/agent-id.env"
   if [[ -f "$_agent_env" ]]; then
     _wt_path=$(grep -F "raw-${_raw_key}" "$_agent_env" 2>/dev/null | head -1 | cut -d= -f1 || true)
     if [[ -n "$_wt_path" && -d "$_wt_path" ]]; then
       local _session_id
       _session_id=$(python3 -c "
 import sqlite3, json
-conn = sqlite3.connect('${PROJECT_ROOT}/.freely/freely.db')
+conn = sqlite3.connect('${project}/.freely/freely.db')
 r = conn.execute(\"SELECT session_id FROM sessions WHERE project=? AND role IN ('worker','manager') AND status='active' ORDER BY updated_at DESC LIMIT 1\", ('$_wt_path',)).fetchone()
 print(r[0] if r else '')
 conn.close()

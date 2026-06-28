@@ -253,6 +253,36 @@ def close_discussion(session_id: str, platform_ids: dict) -> dict[str, dict]:
     return results
 
 
+def _comment_via_local_issue(local_id: str, comment_body: str) -> dict[str, dict]:
+    """Add comment to all platforms by looking up platform_issue_id from local issue.md."""
+    raw_key = local_id[4:] if local_id.startswith("raw-") else local_id
+    project_root = Path(os.environ.get("FREELY_PROJECT_ROOT", os.getcwd()))
+    issue_file = project_root / "docs" / "issues" / f"raw-{raw_key}" / "issue.md"
+    platform_ids = {}
+    if issue_file.exists():
+        text = issue_file.read_text(encoding="utf-8")
+        for plat in ("github", "gitee"):
+            m = re.search(rf"{plat}:\s*\n\s*issue_id:\s*'?(\d+)'?", text)
+            if m:
+                platform_ids[plat] = m.group(1)
+    if not platform_ids:
+        results = search_raw_issue(raw_key)
+        for plat, info in results.items():
+            platform_ids[plat] = info.get("issue_number", "")
+    if not platform_ids:
+        return {"error": "no platform issue found for " + local_id}
+    all_results = {}
+    for plat, num in platform_ids.items():
+        if not num:
+            continue
+        try:
+            result = add_comment(local_id, str(num), comment_body)
+            all_results.update(result)
+        except Exception as e:
+            all_results[plat] = {"status": "error", "error": str(e)[:200]}
+    return all_results
+
+
 def _get_issue_state(platform: str, issue_id: str) -> Optional[str]:
     """Get the state (open/closed) of a platform issue. Returns None if unknown."""
     try:
@@ -702,7 +732,8 @@ if __name__ == "__main__":
         print(state)
     elif len(sys.argv) > 1 and sys.argv[1] == "comment":
         local_id, comment_body = sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else ""
-        result = sync_comment(local_id, comment_body)
+        # Look up platform_issue_id from local issue file
+        result = _comment_via_local_issue(local_id, comment_body)
         print(json.dumps(result, indent=2))
     elif len(sys.argv) > 1 and sys.argv[1] == "create-discussion":
         session_id, title = sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else ""
