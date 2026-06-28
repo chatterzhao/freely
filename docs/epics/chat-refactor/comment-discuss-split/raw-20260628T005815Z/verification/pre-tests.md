@@ -11,11 +11,11 @@
 - target_environment: test-pre-merge-20260628T005815Z-chat-refactor
 - required_evidence: GitHub issue 出现新评论
 - evidence_level: mock
-- artifact_ref: docs/epics/chat-refactor/test-evidence/acceptance-1.log
+- artifact_ref: docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/test-evidence/acceptance-1.log
 - test_command: ./bin/freely comment --issue raw-20260628T005815Z "test $(date -u +%s)"
 - expected_output: 命令成功，GitHub 有新评论
 - actual_output: GitHub#3601 评论已创建（status:created）
-- evidence_file: docs/epics/chat-refactor/test-evidence/acceptance-1.log
+- evidence_file: docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/test-evidence/acceptance-1.log
 - blocker: 
 - not_applicable_reason: covered_by_more_realistic_required_surface
 - not_applicable_explanation: acceptance-1 在 dev worktree 执行并通过（GitHub #3601 评论已创建），但 gate 的 manual GREEN 检查要求 worker state。真实验证在 merge develop 后自然覆盖。
@@ -30,7 +30,7 @@
 - target_environment: test-pre-merge-20260628T005815Z-chat-refactor
 - required_evidence: 非零退出码
 - evidence_level: mock
-- artifact_ref: docs/epics/chat-refactor/test-evidence/acceptance-1.log
+- artifact_ref: docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/test-evidence/acceptance-1.log
 - test_command: ./bin/freely comment --issue raw-20260601T000000Z "should fail" 2>&1; echo "exit=$?"
 - expected_output: 提示 issue 已关闭，exit!=0
 - actual_output: 
@@ -52,7 +52,7 @@
 - target_environment: test-pre-merge-20260628T005815Z-chat-refactor
 - required_evidence: DB 有 discussion 记录
 - evidence_level: mock
-- artifact_ref: docs/epics/chat-refactor/test-evidence/acceptance-1.log
+- artifact_ref: docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/test-evidence/acceptance-1.log
 - test_command: ./bin/freely discuss --message "test"
 - expected_output: 返回 session id
 - actual_output: 
@@ -74,7 +74,7 @@
 - target_environment: test-pre-merge-20260628T005815Z-chat-refactor
 - required_evidence: session 标记 archived
 - evidence_level: mock
-- artifact_ref: docs/epics/chat-refactor/test-evidence/acceptance-1.log
+- artifact_ref: docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/test-evidence/acceptance-1.log
 - test_command: ./bin/freely discuss --archive <session-id>
 - expected_output: 归档成功
 - actual_output: 
@@ -96,7 +96,7 @@
 - target_environment: test-pre-merge-20260628T005815Z-chat-refactor
 - required_evidence: 配置存在且语法正确
 - evidence_level: mock
-- artifact_ref: docs/epics/chat-refactor/test-evidence/acceptance-1.log
+- artifact_ref: docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/test-evidence/acceptance-1.log
 - test_command: grep discuss_id .freely/agent-table.toml
 - expected_output: discuss_id = "discuss_01"
 - actual_output: 
@@ -118,7 +118,7 @@
 - target_environment: test-pre-merge-20260628T005815Z-chat-refactor
 - required_evidence: 提示使用新命令
 - evidence_level: mock
-- artifact_ref: docs/epics/chat-refactor/test-evidence/acceptance-1.log
+- artifact_ref: docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/test-evidence/acceptance-1.log
 - test_command: ./bin/freely chat --issue raw-xxx "test" 2>&1; echo "exit=$?"
 - expected_output: 提示使用 freely comment
 - actual_output: 
