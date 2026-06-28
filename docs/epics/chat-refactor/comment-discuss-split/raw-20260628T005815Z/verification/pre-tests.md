@@ -11,7 +11,7 @@
 - target_environment: fix-raw-20260628T005815Z-gitee-fix
 - required_evidence: both platforms return status:created
 - evidence_level: real_env
-- artifact_ref: https://github.com/chatterzhao/freely/issues/3606
+- artifact_ref: docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/test-evidence/acceptance-1.log
 - test_command: ./bin/freely comment --issue raw-20260628T162235Z "test $(date -u +%s)" 2>&1 | grep -E "github|gitee"
 - expected_output: github: created, gitee: created
 - actual_output: github: created, gitee: created
