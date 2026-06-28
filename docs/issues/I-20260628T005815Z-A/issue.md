@@ -1,6 +1,6 @@
 - issue_id: I-20260628T005815Z-A
 - kind: feature
-- phase_state: done_b2_ibm
+- phase_state: in_dev
 - milestone: M-20260628T005815Z-A
 - source_candidate: docs/pre-brainstorms/20260628T005815Z--chat-refactor/candidates.md#C-20260628T005815Z-A
 - source_raw: raw-20260628T005815Z
