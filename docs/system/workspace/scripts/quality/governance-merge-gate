@@ -476,9 +476,9 @@ def parse_issue_file(rel_path: str) -> IssueRecord:
     source_candidate = grab("source_candidate")
     verification_artifact_dir = grab("verification_artifact_dir")
 
-    # Linked I-* issues in docs/issues/ point to canonical I-* in docs/epics/.
-    # Follow canonical_issue_path to read authoritative governance fields.
-    if rel_path.startswith("docs/issues/I-"):
+    # Linked I-* issues (old docs/issues/ or new docs/epics/.../raw-.../issues/) point
+    # to canonical I-*. Follow canonical_issue_path to read authoritative governance fields.
+    if rel_path.startswith("docs/issues/I-") or (rel_path.startswith("docs/epics/") and "/issues/I-" in rel_path):
         canonical = grab("canonical_issue_path")
         if canonical and path_exists(canonical):
             try:
@@ -814,7 +814,7 @@ def _validate_raw_issue(issue: IssueRecord, changed_paths: list = None) -> list[
     if phase == "dropped" and changed_paths:
         code_files_in_merge = [
             p for p in changed_paths
-            if not p.startswith("docs/issues/")
+            if not p.startswith(("docs/issues/", "docs/epics/"))
             and not p.startswith("docs/pre-brainstorms/")
             and not p.startswith("docs/milestones.md")
             and not p.startswith("AGENTS.md")
@@ -1553,7 +1553,8 @@ def main() -> int:
         expected_queue = queue_for_phase.get((issue.phase_state or "").strip("`").strip())
         entries = milestone_by_issue_path.get(issue.path, [])
         # Linked I-* issues: also try canonical path for milestone matching
-        if not entries and issue.path.startswith("docs/issues/I-"):
+        # New structure: docs/epics/{epic}/{story}/raw-{raw-key}/issues/I-*.md
+        if not entries and (issue.path.startswith("docs/issues/I-") or (issue.path.startswith("docs/epics/") and "/issues/I-" in issue.path)):
             try:
                 text = read_repo_text(issue.path)
                 m = re.search(r"^canonical_issue_path:\s*(.+?)\s*$", text, re.MULTILINE)

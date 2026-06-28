@@ -96,14 +96,35 @@ echo "PR: #$pr_number"
 # ── Step 2: Find review paths ──
 _raw_key=$(echo "$review_branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)
 # Find all I-* issues under this raw key (may be split: A, B, C...)
+# New structure: docs/epics/{epic}/{story}/raw-{raw_key}/issues/I-{raw_key}-*.md
 _all_issues=()
-for _d in docs/issues/I-${_raw_key#raw-}-*/; do
-  [[ -d "$_d" ]] && _all_issues+=("$(basename "$_d" | sed 's|/||')")
+_raw_issues_dir=""
+_raw_i_glob="docs/epics/*/*/raw-${_raw_key}/issues/I-${_raw_key#raw-}-*.md"
+for _f in $_raw_i_glob; do
+  [[ -f "$_f" ]] || continue
+  _raw_issues_dir="$(dirname "$_f")"
+  _bn=$(basename "$_f" .md)
+  _all_issues+=("$_bn")
 done
+# Fallback: broad search
+if [[ ${#_all_issues[@]} -eq 0 ]]; then
+  while IFS= read -r _f; do
+    _bn=$(basename "$_f" .md)
+    [[ "$_bn" = I-${_raw_key#raw-}-* ]] && _all_issues+=("$_bn")
+  done < <(find docs/epics -path "*/raw-*/issues/I-*.md" -print 2>/dev/null | head -5)
+fi
 _issue_id="${_all_issues[0]:-I-${_raw_key#raw-}-A}"
 _epic_dir=""
-if [[ -d "docs/issues/$_issue_id" ]]; then
-  _verification_dir=$(grep "verification_artifact_dir:" "docs/issues/$_issue_id/issue.md" 2>/dev/null | sed "s/.*: *'*\([^']*\)'*/\1/" | head -1 || true)
+# Search I-* issue under new structure
+_i_issue_file=""
+if [[ -n "$_raw_issues_dir" ]]; then
+  _i_issue_file="$_raw_issues_dir/${_issue_id}.md"
+fi
+if [[ -z "$_i_issue_file" || ! -f "$_i_issue_file" ]]; then
+  _i_issue_file=$(find docs/epics -path "*/issues/${_issue_id}.md" -print -quit 2>/dev/null || true)
+fi
+if [[ -n "$_i_issue_file" && -f "$_i_issue_file" ]]; then
+  _verification_dir=$(grep "verification_artifact_dir:" "$_i_issue_file" 2>/dev/null | sed "s/.*: *'*\([^']*\)'*/\1/" | head -1 || true)
   if [[ -n "$_verification_dir" ]] && [[ -d "$_verification_dir" ]]; then
     _epic_dir="$_verification_dir"
   fi
@@ -167,14 +188,24 @@ _wt_path=$(git worktree list --porcelain 2>/dev/null | awk -v br="refs/heads/$re
 ')
 _wt_path="${_wt_path:-$ROOT_DIR}"
 
-# Collect review context
+# Collect review context — search new structure first
 _pre_tests_file=""
-for _d in docs/epics/*/verification/; do
+# New structure: docs/epics/{epic}/{story}/raw-{raw_key}/verification/pre-tests.md
+for _d in docs/epics/*/*/raw-${_raw_key}/verification/; do
   if [[ -f "${_d}pre-tests.md" ]]; then
     _pre_tests_file="${_d}pre-tests.md"
     break
   fi
 done
+# Fallback: broad search
+if [[ -z "$_pre_tests_file" ]]; then
+  for _d in docs/epics/*/*/raw-*/verification/; do
+    if [[ -f "${_d}pre-tests.md" ]]; then
+      _pre_tests_file="${_d}pre-tests.md"
+      break
+    fi
+  done
+fi
 
 _diff_file="$REVIEW_STATE_DIR/review-diff.txt"
 git diff "$base..$review_branch" > "$_diff_file" 2>/dev/null || true
@@ -324,12 +355,12 @@ Raw Key: $_raw_key
 涉及文件: docs/issues/raw-${_raw_key}/issue.md
          docs/pre-brainstorms/${_raw_key}--*/brainstorms.md
          docs/pre-brainstorms/${_raw_key}--*/candidates.md
-         docs/issues/I-${_raw_key}-*/issue.md
-         docs/epics/*/brainstorms/b-I-${_raw_key}-*.md
-         docs/epics/*/prd.md
-         docs/epics/*/verification/pre-tests.md
-         docs/epics/*/tasks.md
-         docs/epics/*/code-reviews/
+         docs/epics/*/*/raw-${_raw_key}/issues/I-${_raw_key}-*.md
+         docs/epics/*/*/raw-${_raw_key}/brainstorms/b-I-${_raw_key}-*.md
+         docs/epics/*/*/raw-${_raw_key}/prd.md
+         docs/epics/*/*/raw-${_raw_key}/verification/pre-tests.md
+         docs/epics/*/*/raw-${_raw_key}/verification/tasks.md
+         docs/epics/*/*/raw-${_raw_key}/code-reviews/
          git diff $base..$review_branch
 
 === 审查步骤 ===

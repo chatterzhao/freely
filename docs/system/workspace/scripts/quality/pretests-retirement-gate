@@ -136,18 +136,27 @@ if not state_file.exists():
                         fallback_entries.append((str(issue_file.relative_to(worktree)), pt_rel))
                 break
     if not fallback_entries and _raw_key:
-        # Fallback: try raw issue itself
+        # Fallback: try raw issue itself — check for pre_tests_path first, then source_candidate
         raw_issue = worktree / "docs" / "issues" / _raw_key / "issue.md"
         if raw_issue.exists():
             try:
                 text = raw_issue.read_text()
             except OSError:
                 text = ""
-            m = re.search(r"^- source_candidate:\s*(.+?)\s*$", text, re.MULTILINE)
+            # Check for pre_tests_path directly in raw issue (absorbed fixes etc.)
+            m = re.search(r"^- pre_tests_path:\s*(.+?)\s*$", text, re.MULTILINE)
             if m:
-                cand_path = worktree / m.group(1).split("#")[0]
-                if cand_path.exists():
-                    fallback_entries.append((str(raw_issue.relative_to(worktree)), "manual-no-pre-tests"))
+                pt_rel = m.group(1).strip()
+                pt_full = worktree / pt_rel
+                if pt_full.exists():
+                    fallback_entries.append((str(raw_issue.relative_to(worktree)), pt_rel))
+            # Fallback: source_candidate → candidate path exists (governance confirmed)
+            if not fallback_entries:
+                m = re.search(r"^- source_candidate:\s*(.+?)\s*$", text, re.MULTILINE)
+                if m:
+                    cand_path = worktree / m.group(1).split("#")[0]
+                    if cand_path.exists():
+                        fallback_entries.append((str(raw_issue.relative_to(worktree)), "manual-no-pre-tests"))
     if not fallback_entries:
         print("[GATE] RED 未完成：未找到 pre-tests.md。\n请阅读 skill:freely-doc-B2_IBM-execution，根据本次修改目标，在 pre-tests.md 中设计合理的测试方案。\n测试方案应根据改动类型选择：AI 相关 md、测试脚本、或构建编译启动端到端测试。\n不要凑格式字段——理解修改后设计对应的测试。", file=sys.stderr)
         sys.exit(1)

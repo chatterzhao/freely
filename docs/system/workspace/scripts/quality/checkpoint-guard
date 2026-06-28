@@ -53,7 +53,8 @@ normalize_path() {
 scope_for_path() {
   local path="$1"
   case "$path" in
-    docs/epics/*/*/*)
+    docs/epics/*/*/*|docs/epics/*/*/*/*|docs/epics/*/*/*/*/*|docs/epics/*/*/*/*/*/*)
+      # Matches docs/epics/{epic}/{story}/raw-{key}/... (new) and docs/epics/{epic}/{story}/... (old)
       awk -F/ '{print $1 "/" $2 "/" $3 "/" $4}' <<<"$path"
       ;;
     docs/pre-brainstorms/*/*)
@@ -74,7 +75,7 @@ scope_for_path() {
 story_scope_for_path() {
   local path="$1"
   case "$path" in
-    docs/epics/*/*/*)
+    docs/epics/*/*/*|docs/epics/*/*/*/*|docs/epics/*/*/*/*/*|docs/epics/*/*/*/*/*/*)
       awk -F/ '{print $1 "/" $2 "/" $3 "/" $4}' <<<"$path"
       ;;
     *)
