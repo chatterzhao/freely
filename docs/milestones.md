@@ -1,6 +1,10 @@
 ## M-20260628T005815Z-A
 - title: chat refactor — comment + discuss + archive skill
 - status: active
+### candidate_issues
+1. `C-20260628T005815Z-A`
+- milestone: M-20260628T005815Z-A; status: promoted
+- promoted_issue_path: `docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/issues/I-20260628T005815Z-A.md`
 ### committed_issues
 1. `I-20260628T005815Z-A`
 - title: chat refactor — comment + discuss + archive skill; milestone_state: completed
