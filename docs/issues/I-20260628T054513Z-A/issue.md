@@ -1,6 +1,6 @@
 - issue_id: I-20260628T054513Z-A
 - kind: fix
-- phase_state: in_dev
+- phase_state: completed
 - milestone: M-20260628T054513Z-A
 - source_candidate: docs/pre-brainstorms/20260628T054513Z--scope-warning/candidates.md#C-20260628T054513Z-A
 - source_raw: raw-20260628T054513Z
