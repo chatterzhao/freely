@@ -618,12 +618,16 @@
 
 ## M-20260624T072546Z-A-A
 - title: 平台硬编码报错修复
-- status: completed
+- status: active
 ### candidate_issues
 1. `C-20260624T072546Z-A`
 - milestone: M-20260624T072546Z-A-A; status: promoted
 - promoted_issue_path: `docs/issues/I-20260624T072546Z-A/issue.md`
 ### completed_issues
+1. `I-20260624T072546Z-A`
+- title: auto-generated; milestone_state: completed
+- issue_path: `docs/issues/I-20260624T072546Z-A/issue.md`
+- phase_state: `completed`
 
 ## M-20260624T081358Z-A-A
 - title: 测试文档 daemon 假设修复
