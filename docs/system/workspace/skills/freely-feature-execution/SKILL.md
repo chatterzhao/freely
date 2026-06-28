@@ -61,7 +61,7 @@ freely-feature-execution 在不同阶段调用下层 skill：
 ```
 1. skill:freely-doc-B2_IBM-execution
    → materialize I-* issue
-   → 写 docs/epics/{epic}/issues/I-{key}.md
+   → 写 docs/epics/{epic}/{story}/raw-{raw-key}/issues/I-{raw-key}-{suffix}.md
    → 写 prd.md / tasks.md / pre-tests.md
    → 更新 progress
    → 更新 milestones.md committed_issues

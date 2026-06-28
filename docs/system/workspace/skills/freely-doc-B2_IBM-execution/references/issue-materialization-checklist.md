@@ -22,22 +22,29 @@
 ### 目录结构
 
 ```
-docs/epics/{epic-name}/                          ← epic：一个能力域
-├── {story-name}/                                ← story：epic 下的子交付批次（可选，平铺时省略）
-│   ├── issues/{issue-name}.md                   ← I-* issue
-│   ├── brainstorms/b-{issue-name}.md            ← B2 头脑风暴
-│   ├── prd.md                                   ← 本批次的需求设计
-│   ├── pre-tests.md                             ← 本批次的测试计划
-│   └── tasks.md                                 ← 本批次的任务分解
-└── code-reviews/                                ← 审查产物（epic 级共用）
+docs/epics/{epic-name}/                               ← epic：一个能力域
+└── {story-name}/                                     ← story：子交付批次
+    └── raw-{raw-key}/                                ← 一个 raw issue 的全部 B2 产物
+        ├── issues/I-{raw-key}-{suffix}.md            ← I-* issue（B2 物化）
+        ├── brainstorms/b-I-{raw-key}-{suffix}.md      ← B2 头脑风暴
+        ├── prd.md                                    ← 本 raw 的需求设计
+        ├── verification/
+        │   ├── pre-tests.md                          ← 本 raw 的测试计划
+        │   └── tasks.md                              ← 本 raw 的任务分解
+        └── code-reviews/                             ← 本 raw 的审查产物
 ```
 
+**命名约定**：
+- `raw-{raw-key}` = 完整的 raw issue local_id，如 `raw-20260628T005815Z`。`raw-` 是 raw issue 的前缀，`{raw-key}` 是时间戳 key（`YYYYMMDDTHHMMSSZ`）。**目录名必须是完整的 `raw-{raw-key}`**，不是去掉前缀的 `{raw-key}`
+- I-* 命名继承 raw key + suffix：`I-{raw-key}-{suffix}`，如 `I-20260628T005815Z-A`
+- b-I-* 命名同 I-*：`b-I-{raw-key}-{suffix}`
+
 **规则**：
-- 一个 epic 可以放多个 story
-- 一个 story 对应**一个批次的 I-* + prd + pre-tests + tasks**
-- 同批次 = 同一次 B2 执行产出的相关 I-* 集合
-- 简单 epic（只有一个批次、一个 I-*）可平铺，省略 story 层
-- code-reviews/ 放在 epic 级，不放在 story 下
+- 一个 epic 放多个 story；一个 story 放多个 `raw-{raw-key}` 目录
+- 新 raw → 看归哪个已有 story（如重构 story、修复 story），或新建 story
+- 同名 `raw-{raw-key}` → 续到已有 story 下的已有目录
+- 门禁检查：目录名 `raw-{raw-key}` 与 `docs/issues/raw-{raw-key}/` 的 raw issue 不匹配 → 拦截
+- 门禁检查：I-* 文件名中的 `{raw-key}` 与目录名不一致 → 拦截
 
 ### 如何确定 epic-name 和 story-name
 
