@@ -6,11 +6,11 @@ Scans the project for pending tasks across three categories:
 
   Category 1 — 未开始 (Not started)
     Platform OPEN issue exists but nothing local: no worktree, no raw dir on develop.
-    Sub-types: 1a fresh, 1b reopen, 1c chat signal.
+    Sub-types: 1a fresh, 1b reopen.
 
   Category 2 — 已完成但状态/清理不对齐 (Completed but misaligned)
     Raw/I-* issue exists on develop but state fields are wrong, platform state
-    doesn't match, worktree/branch cleanup missed, or chat still unconsumed.
+    doesn't match, or worktree/branch cleanup missed.
 
   Category 3 — 进行中但 agent 已死 (In progress but agent dead)
     Worktree exists but the assigned agent's A2A session is not active.
@@ -164,38 +164,6 @@ def list_all_worktrees(project: Path) -> list[dict]:
 
 # ── Platform access (via platform-adapter, no hardcoding) ───────────
 
-def _merge_chat_inbox(items: list[dict], chat_inbox: list[dict],
-                       issues_by_raw: dict, wt_by_raw: dict,
-                       raw_key_pattern: re.Pattern) -> list[dict]:
-    """Add chat inbox items (Cat 1c/2d) not already reported."""
-    already = {i.get("key", "") for i in items}
-    for chat in chat_inbox:
-        issue_id = chat.get("issue_id", "")
-        m = raw_key_pattern.search(issue_id)
-        if not m:
-            continue
-        key = m.group(1)
-        if key in already:
-            continue
-        has_wt = key in wt_by_raw
-        has_raw = key in issues_by_raw
-        if not has_wt and not has_raw:
-            items.append({
-                "category": "1_not_started", "subcategory": "1c_chat_signal",
-                "key": key, "ready": False,
-                "chat_type": chat.get("chat_type", ""),
-                "message_preview": (chat.get("message", "") or "")[:100],
-                "detail": "Chat inbox unconsumed, no worktree or raw directory",
-                "next_action": "AI 判断价值 → wt-create 或标记 consumed",
-            })
-        elif has_raw and not has_wt:
-            items.append({
-                "category": "2_document_misaligned", "subcategory": "2d_chat_unconsumed",
-                "key": key, "issue_path": issues_by_raw[key]["path"], "ready": True,
-                "detail": "Raw issue exists but chat message still unconsumed",
-                "next_action": "标记 chat 为 consumed",
-            })
-    return items
 
 def _detect_platforms(project: Path) -> list[str]:
     """Detect configured platforms from git remotes (no hardcoded API calls)."""
@@ -378,23 +346,6 @@ class A2AChecker:
         return {"reason": "no_a2a_record", "resumable": False, "session_id": ""}
 
 
-# ── Chat inbox (SQLite) ─────────────────────────────────────────────
-
-def get_chat_inbox(project: Path) -> list[dict]:
-    """Return unconsumed chat messages."""
-    db_path = project / ".freely" / "freely.db"
-    if not db_path.exists():
-        return []
-    try:
-        conn = sqlite3.connect(str(db_path))
-        rows = conn.execute(
-            "SELECT * FROM chats WHERE consumed=0 AND (conversation_id=0 OR conversation_id IS NULL)"
-        ).fetchall()
-        cols = [d[1] for d in conn.execute("PRAGMA table_info(chats)").fetchall()]
-        conn.close()
-        return [dict(zip(cols, row)) for row in rows]
-    except Exception:
-        return []
 
 
 # ── Local issue reader ──────────────────────────────────────────────
@@ -480,8 +431,6 @@ def scan(project: Path) -> dict:
     worktrees = list_all_worktrees(project)
     timer.mark("worktree_list")
 
-    chat_inbox = get_chat_inbox(project)
-    timer.mark("chat_inbox")
 
     a2a = A2AChecker(project)
     timer.mark("a2a_init")
@@ -524,12 +473,6 @@ def scan(project: Path) -> dict:
     # From worktrees
     all_keys.update(wt_by_raw.keys())
 
-    # From chat inbox
-    for chat in chat_inbox:
-        issue_id = chat.get("issue_id", "")
-        m = raw_key_pattern.search(issue_id)
-        if m:
-            all_keys.add(m.group(1))
 
     # ── Apply decision tree for each key ───────────────────────────
     for raw_key in sorted(all_keys):
@@ -648,18 +591,6 @@ def scan(project: Path) -> dict:
                         "next_action": "[manager] 创建 raw issue → 工位 → 对齐 platform_state",
                     })
 
-            # Subcategory 2d: chat still unconsumed
-            for chat in chat_inbox:
-                if raw_key in (chat.get("issue_id", "") or ""):
-                    items.append({
-                        "category": "2_document_misaligned",
-                        "subcategory": "2d_chat_unconsumed",
-                        "key": raw_key,
-                        "issue_path": raw_issue["path"],
-                        "ready": True,
-                        "detail": "raw issue exists but chat message still unconsumed",
-                        "next_action": "标记 chat 为 consumed",
-                    })
             continue  # raw on develop → done with this key
 
         # ── Category 1: not started ────────────────────────────────
@@ -674,21 +605,6 @@ def scan(project: Path) -> dict:
                 "detail": "Platform OPEN, no local worktree or raw directory",
                 "next_action": f"[manager] wt-create --raw-key {raw_key} --source platform --skill freely-fix-execution",
             })
-        else:
-            # Check chat inbox
-            for chat in chat_inbox:
-                if raw_key in (chat.get("issue_id", "") or ""):
-                    items.append({
-                        "category": "1_not_started",
-                        "subcategory": "1c_chat_signal",
-                        "key": raw_key,
-                        "ready": False,
-                        "chat_type": chat.get("chat_type", ""),
-                        "message_preview": (chat.get("message", "") or "")[:100],
-                        "detail": "Chat inbox unconsumed, no worktree or raw directory",
-                        "next_action": "AI 判断价值 → wt-create 或标记 consumed",
-                    })
-
         # ── Reopen case (1b): platform OPEN + raw on develop with terminal phase ──
         # This is handled above: if raw_on_develop and phase is terminal,
         # we check platform alignment. If actual state is OPEN, it's in 2a_state_mismatch.
@@ -747,8 +663,6 @@ def scan(project: Path) -> dict:
             })
 
     # ── Check chat inbox for unconsumed messages (1c/2d) ────────────
-    # Chat inbox: always checked (SQLite, fast). Also checked in cached path.
-    items = _merge_chat_inbox(items, chat_inbox, issues_by_raw, wt_by_raw, raw_key_pattern)
 
     # ── Summary ─────────────────────────────────────────────────────
     by_cat = {}
