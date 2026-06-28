@@ -12,7 +12,7 @@ description: IBM 链路逐级审查。从 raw issue 自身质量开始，逐级�
 ## 核心方法
 
 ```
-raw issue ──→ B1（brainstorms → candidate → I-*）──→ B2（prd/pre-tests/tasks/code-review）──→ 实现代码 ──→ 测试执行
+raw issue ──→ B1（brainstorms → candidate → milestones）──→ B2（I-* 物化 → brainstorms → prd/pre-tests/tasks/code-review）──→ 实现代码 ──→ 测试执行
 ```
 
 审查就是逐级检查：上级在下一级中是否被忠实消化、充分展开、安全实现。
@@ -45,8 +45,8 @@ raw issue ──→ B1（brainstorms → candidate → I-*）──→ B2（prd/
 
 ### 第二层：Raw → B1 —— 评审面：质量 + 完整度 + 安全
 
-> 链路：`raw issue` → `brainstorms.md` → `candidates.md` → milestones.md → `I-* issue`
-> 涉及文件：`docs/issues/raw-{key}/issue.md`、`docs/pre-brainstorms/{key}--{slug}/brainstorms.md`、`docs/pre-brainstorms/{key}--{slug}/candidates.md`、`docs/milestones.md`、`docs/issues/I-{key}-A/issue.md`
+> 链路：`raw issue` → `brainstorms.md` → `candidates.md` → `milestones.md`（B1 promote candidate，引用 I-* 但不物化）
+> 涉及文件：`docs/issues/raw-{key}/issue.md`、`docs/pre-brainstorms/{key}--{slug}/brainstorms.md`、`docs/pre-brainstorms/{key}--{slug}/candidates.md`、`docs/milestones.md`
 > 这是最关键的预研层。brainstorms 必须真正理解问题并产出最佳方案。
 
 #### 质量
@@ -79,8 +79,8 @@ raw issue ──→ B1（brainstorms → candidate → I-*）──→ B2（prd/
 
 ### 第三层：B1 → B2 —— 评审面：设计质量
 
-> 链路：`I-* issue` → `b-I-*.md` → `prd.md` / `pre-tests.md` / `tasks.md` / `code-reviews/` + milestones.md
-> 涉及文件：`docs/issues/I-{key}-A/issue.md`、`docs/epics/{epic}/brainstorms/b-I-{key}-A.md`、`docs/epics/{epic}/prd.md`、`docs/epics/{epic}/verification/pre-tests.md`、`docs/epics/{epic}/tasks.md`、`docs/epics/{epic}/code-reviews/implementation-decision-note.md`、`docs/milestones.md`
+> 链路：`candidate` → `I-* issue`（B2 物化，命名继承 C-{key}-{suffix}）→ `b-I-*.md` → `prd.md` / `pre-tests.md` / `tasks.md` / `code-reviews/` + milestones.md
+> 涉及文件：`docs/issues/I-{key}-{suffix}/issue.md`、`docs/epics/{epic}/brainstorms/b-I-{key}-{suffix}.md`、`docs/epics/{epic}/prd.md`、`docs/epics/{epic}/verification/pre-tests.md`、`docs/epics/{epic}/tasks.md`、`docs/epics/{epic}/code-reviews/implementation-decision-note.md`、`docs/milestones.md`
 > B2 将 B1 的决策展开为具体可执行的设计文档。
 
 | 检查项 | 怎么审 |
@@ -137,7 +137,7 @@ raw issue ──→ B1（brainstorms → candidate → I-*）──→ B2（prd/
 - 具体发现: ...
 - 问题与修复建议: ...
 
-## 第二层：Raw → B1（质量 + 完整度 + 安全）
+## 第二层：Raw → B1（质量 + 完整度 + 安全）— brainstorms → candidate → milestones
 - status: pass | fail
 - 质量: ...
 - 完整度: ...
@@ -145,7 +145,7 @@ raw issue ──→ B1（brainstorms → candidate → I-*）──→ B2（prd/
 - 具体发现: ...
 - 问题与修复建议: ...
 
-## 第三层：B1 → B2（设计质量）
+## 第三层：B1 → B2（设计质量）— I-* 物化 → brainstorms → prd/pre-tests/tasks/code-review
 - status: pass | fail
 - 具体发现: ...
 - 问题与修复建议: ...
