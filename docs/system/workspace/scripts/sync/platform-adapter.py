@@ -404,6 +404,36 @@ def fetch_issue(platform: str, issue_number: str) -> dict:
     return {}
 
 
+def _resolve_issue_state(local_id: str) -> str:
+    """Check if a raw issue is closed on all platforms. Returns 'closed' or 'open'."""
+    raw_key = local_id[4:] if local_id.startswith("raw-") else local_id
+    # Find platform issue IDs from local issue.md
+    project_root = Path(os.environ.get("FREELY_PROJECT_ROOT", os.getcwd()))
+    issue_file = project_root / "docs" / "issues" / f"raw-{raw_key}" / "issue.md"
+    platform_ids = {}
+    if issue_file.exists():
+        text = issue_file.read_text(encoding="utf-8")
+        for plat in ("github", "gitee"):
+            m = re.search(rf"{plat}:\s*\n\s*issue_id:\s*'?(\d+)'?", text)
+            if m:
+                platform_ids[plat] = m.group(1)
+    if not platform_ids:
+        # Try platform search
+        results = search_raw_issue(raw_key)
+        for plat, info in results.items():
+            platform_ids[plat] = info.get("issue_number", "")
+    if not platform_ids:
+        return "unknown"
+    # Check each platform: if any is "open" or "unknown", return "open"
+    for plat, num in platform_ids.items():
+        if not num:
+            continue
+        state = _get_issue_state(plat, str(num))
+        if state and state.lower() not in ("closed",):
+            return "open"
+    return "closed"
+
+
 def _created_at_to_key(created_at: str) -> Optional[str]:
     """Convert platform created_at to standard raw key.
     "2026-05-06T10:00:35Z" → "20260506T100035Z"
@@ -626,6 +656,10 @@ if __name__ == "__main__":
         local_id, title, body = sys.argv[2], sys.argv[3], sys.argv[4] if len(sys.argv) > 4 else ""
         result = create_issue(local_id, title, body)
         print(json.dumps(result, indent=2))
+    elif len(sys.argv) > 1 and sys.argv[1] == "get-issue-state":
+        local_id = sys.argv[2] if len(sys.argv) > 2 else ""
+        state = _resolve_issue_state(local_id)
+        print(state)
     elif len(sys.argv) > 1 and sys.argv[1] == "comment":
         local_id, comment_body = sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else ""
         result = sync_comment(local_id, comment_body)
