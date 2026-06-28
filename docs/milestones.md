@@ -42,7 +42,7 @@
 
 ## M-20260510T1339Z-A
 - title: wt-create 创建顺序重构
-- status: completed
+- status: active
 ### candidate_issues
 1. `C-20260510T1339Z-A`
 - milestone: M-20260510T1339Z-A; status: promoted
