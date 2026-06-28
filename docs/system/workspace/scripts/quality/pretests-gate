@@ -474,7 +474,7 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
             "This gate expects real test tasks and result writeback for the current owner; you cannot clear it by only filling schema fields."
         ]
 
-    valid_statuses = {"pass", "not_applicable"}
+    valid_statuses = {"pass", "passed", "not_applicable"}
     valid_levels = {"mock", "integration", "real_env", "post_merge_dogfood"}
     acceptance_fields: list[dict[str, str]] = []
     adequacy_v2_items: list[dict[str, str]] = []

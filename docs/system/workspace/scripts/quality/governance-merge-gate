@@ -642,7 +642,7 @@ def anchorless_source_candidate(source_candidate: Optional[str]) -> Optional[str
 def build_issue_index() -> Dict[str, IssueRecord]:
     # Canonical issue files in epics/
     try:
-        output = git("ls-files", "docs/epics/**/issues/*.md")
+        output = git("ls-files", "docs/epics/**/issues/I-*.md")
         paths = [line.strip() for line in output.splitlines() if line.strip()]
     except Exception:
         paths = []
@@ -876,7 +876,7 @@ def main() -> int:
         code_paths = [p for p in changed_paths if _is_code_file(p)]
         if code_paths:
             print("[FAIL] FREELY_SKIP_IBM_GATE=1 but code files cannot skip IBM gate.")
-            print("Code files require full raw/C/M/I lifecycle regardless of path:")
+            print("不符合绕过条件，禁止再用 FREELY_SKIP_IBM_GATE 绕过参数。以下文件是代码，必须走完整 IBM 治理流程实现门禁达标:")
             for p in code_paths:
                 print(f"  - {p}")
             return 1
