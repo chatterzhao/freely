@@ -530,12 +530,12 @@ do_initial_merge() {
     [[ "$pr_found" == "0" ]] && { echo "[MERGE-GUARD] no open PR found." >&2; exit 1; }
   fi
   if [[ "$dry_run" != "1" ]]; then
-    _pr_number="$(gh pr list --repo chatterzhao/freely --head "$source_branch" --state OPEN --json number -q '.[0].number' 2>/dev/null || true)"
-    if [[ -n "$_pr_number" ]]; then
-      _review_file="$(find docs/epics -name "pr-review-${_pr_number}.md" 2>/dev/null | head -1 || true)"
+    _raw_key=$(echo "$source_branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)
+    if [[ -n "$_raw_key" ]]; then
+      _review_file="$(find docs/epics -name "pr-review-raw-${_raw_key}.md" 2>/dev/null | head -1 || true)"
       if [[ -z "$_review_file" ]]; then
         git fetch github "$source_branch" 2>/dev/null || true
-        _review_file="$(git ls-tree -r --name-only "refs/remotes/github/$source_branch" 2>/dev/null | grep "pr-review-${_pr_number}.md" | head -1 || true)"
+        _review_file="$(git ls-tree -r --name-only "refs/remotes/github/$source_branch" 2>/dev/null | grep "pr-review-raw-${_raw_key}.md" | head -1 || true)"
       fi
       [[ -z "$_review_file" ]] && { echo "[MERGE-GUARD] PR review missing. Run pr-review-guarded first." >&2; exit 1; }
       echo "[MERGE-GUARD] PR review: pass ✓"
@@ -605,7 +605,7 @@ do_initial_merge() {
     fi
 
     # ── Close PR via platform-adapter (#3340) ──
-    if [[ -n "$_pr_number" ]]; then
+    if [[ -n "$_raw_key" ]]; then
       echo "[MERGE-GUARD] merge committed. Closing PR #$_pr_number via platform-adapter..."
       _adapter="${PROJECT_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}/docs/system/workspace/scripts/sync/platform-adapter.py"
       python3 "$_adapter" close-pr github "$_pr_number" 2>/dev/null || true
