@@ -32,7 +32,7 @@
 - id: adapter-migration
 - requirement: feedback uses adapter create-issue
 - evidence_level: mock
-- status: pass
+^- status: passed
 - artifact_ref: docs/epics/migrate-to-adapter/code-reviews/implementation-decision.md
 ## Real-Environment
 - real_environment_status: pass

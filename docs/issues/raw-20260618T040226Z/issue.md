@@ -81,23 +81,23 @@ pr-create-guarded  →  pr-review-guarded  →  pr-merge-guarded
 - verdict: pass | fail | needs_changes
 
 ## Semantic Conflict Check
-- status: pass
+^- status: passed
 - evidence: No overlap with known critical invariants
 
 ## IBM Completeness Check
-- status: pass
+^- status: passed
 - evidence: governance-merge-gate passed
 
 ## Code Review Evidence
-- status: pass
+^- status: passed
 - evidence: implementation-decision.md present, all fields complete
 
 ## Pre-test Evidence
-- status: pass
+^- status: passed
 - evidence: pre-tests.md present, 3 acceptance items verified
 
 ## Receipt Integrity Check
-- status: pass
+^- status: passed
 - evidence: pr-merge-guarded uses --subject/--body split
 
 ## Overall Verdict

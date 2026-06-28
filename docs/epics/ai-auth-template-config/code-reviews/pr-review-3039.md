@@ -8,19 +8,19 @@
 - verdict: pass
 
 ## 1. Worktree Check
-- status: pass
+^- status: passed
 - evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260616T140126Z-ai-auth-template-7b54cd43 branch=feature/raw-20260616T140126Z-ai-auth-template clean=true
 
 ## 2. IBM Completeness
-- status: pass
+^- status: passed
 - evidence: governance-merge-gate passed
 
 ## 3. Code Review Evidence
-- status: pass
+^- status: passed
 - evidence: implementation-decision.md in docs/epics/a2a-native-delegation/code-reviews/, all fields complete
 
 ## 4. Pre-test Evidence
-- status: pass
+^- status: passed
 - evidence: pre-tests.md in docs/epics/acp-a2a-refactor/verification/, 0
 0 acceptance items
 
@@ -29,7 +29,7 @@
 - evidence: pr-merge-guarded not modified by this PR
 
 ## 6. Phase State
-- status: pass
+^- status: passed
 - evidence: raw issue phase_state=absorbed
 
 

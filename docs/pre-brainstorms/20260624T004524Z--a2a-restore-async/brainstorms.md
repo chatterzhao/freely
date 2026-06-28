@@ -141,7 +141,7 @@ cat > docs/epics/a2a-restore-async/verification/pre-tests.md << 'PEOF'
 - target_lane: feature-local
 - promotion_gate: develop_merge
 - evidence_level: integration
-- status: pass
+^- status: passed
 - artifact_ref: a2a_server.py lines 335-338
 
 ### AT-002 health check 消息修正
@@ -151,7 +151,7 @@ cat > docs/epics/a2a-restore-async/verification/pre-tests.md << 'PEOF'
 - target_lane: feature-local
 - promotion_gate: develop_merge
 - evidence_level: integration
-- status: pass
+^- status: passed
 - artifact_ref: freely line 8385
 PEOF
 

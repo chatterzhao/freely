@@ -5,7 +5,7 @@
 - test_command: grep -q "freely-review" docs/system/workspace/agents/manager-agent.md && grep -q "worker_in_review" docs/system/workspace/a2a/exit-kind-mapping.md && echo "PASS" || echo "FAIL"
 - expected_output: PASS
 - actual_output: PASS
-- status: pass
+^- status: passed
 ## Unit
 - acceptance_target: docs correct
 ## Integration

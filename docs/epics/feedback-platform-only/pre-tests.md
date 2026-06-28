@@ -32,7 +32,7 @@
 - id: platform-only
 - requirement: feedback creates issues via platform-adapter, no local files
 - evidence_level: mock
-- status: pass
+^- status: passed
 - artifact_ref: docs/epics/feedback-platform-only/code-reviews/implementation-decision.md
 ## Real-Environment
 - real_environment_status: pass

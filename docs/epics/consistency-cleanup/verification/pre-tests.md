@@ -13,7 +13,7 @@
 - actual_output: PASS — 0 occurrences in help text
 - evidence_file: .freely/run/test-evidence/acceptance-1.log
 - blocker: (none)
-- status: pass
+^- status: passed
 
 ### acceptance-2
 - acceptance_target: fix-execution skill uses cherry-pick not stash
@@ -25,7 +25,7 @@
 - actual_output: 13 cherry-pick references, 1 stash (comparison note only)
 - evidence_file: .freely/run/test-evidence/acceptance-2.log
 - blocker: (none)
-- status: pass
+^- status: passed
 
 ### acceptance-3
 - acceptance_target: test-pre-merge allows add/commit, prohibits push/merge
@@ -37,7 +37,7 @@
 - actual_output: "允许 add 和 commit", "禁止 push 和 merge" present
 - evidence_file: .freely/run/test-evidence/acceptance-3.log
 - blocker: (none)
-- status: pass
+^- status: passed
 
 ### acceptance-4
 - acceptance_target: agent-table-query help runs without regression
@@ -49,7 +49,7 @@
 - actual_output: [[agents]] format displayed, legacy [[agent_pools]] removed from help
 - evidence_file: .freely/run/test-evidence/acceptance-4.log
 - blocker: (none)
-- status: pass
+^- status: passed
 
 ### acceptance-5
 - acceptance_target: No stale stash workflow in skill docs
@@ -61,14 +61,14 @@
 - actual_output: 13 cherry-pick references, stash only in comparison note
 - evidence_file: .freely/run/test-evidence/acceptance-5.log
 - blocker: (none)
-- status: pass
+^- status: passed
 
 ## Unit
 - acceptance_target: Documentation-only change, verified by grep checks
 - testing_layer: unit
 - target_environment: fix worktree
 - required_evidence: All acceptance items pass
-- status: pass
+^- status: passed
 
 ## Integration
 - acceptance_target: No bash syntax regression
@@ -80,7 +80,7 @@
 - actual_output: Usage text with [[agents]] format displayed correctly
 - evidence_file: .freely/run/test-evidence/acceptance-integration.log
 - blocker: (none)
-- status: pass
+^- status: passed
 
 ## End-to-End
 - acceptance_target: Documentation consistency across all artifacts
@@ -92,4 +92,4 @@
 - actual_output: CLEAN — no stale stash workflow references
 - evidence_file: .freely/run/test-evidence/acceptance-e2e.log
 - blocker: (none)
-- status: pass
+^- status: passed

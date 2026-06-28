@@ -274,22 +274,22 @@ phase_state: done_b2_ibm
 - issue_path: docs/epics/skill-gate-alignment/skill-gate-fix/raw-20260508T011858Z/issues/I-20260508T011858Z-A.md
 
 ## 1. Worktree Check
-- status: pass
+^- status: passed
 
 ## 2. IBM Completeness
-- status: pass
+^- status: passed
 
 ## 3. Code Review Evidence
-- status: pass
+^- status: passed
 
 ## 4. Pre-test Evidence
-- status: pass
+^- status: passed
 
 ## 5. Receipt Integrity
 - status: n/a
 
 ## 6. Phase State
-- status: pass
+^- status: passed
 
 ## Overall Verdict
 - verdict: pass

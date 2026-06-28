@@ -32,7 +32,7 @@
 - id: config-read
 - requirement: feedback reads platforms from config.toml
 - evidence_level: mock
-- status: pass
+^- status: passed
 - artifact_ref: docs/epics/config-read-fix/code-reviews/implementation-decision.md
 ## Real-Environment
 - real_environment_status: pass

@@ -9,28 +9,28 @@
 - issue_path: docs/issues/I-20260619T045626Z-A/issue.md
 
 ## 1. Worktree Check
-- status: pass
+^- status: passed
 - evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260619T045626Z-pr-merge-flock-concurrency branch=fix/raw-20260619T045626Z-pr-merge-flock-concurrency clean=true
 
 ## 2. IBM Completeness
-- status: pass
+^- status: passed
 - evidence: governance-merge-gate passed
 
 ## 3. Code Review Evidence
-- status: pass
+^- status: passed
 - evidence: implementation-decision.md in docs/epics/a2a-native-delegation/code-reviews/, all fields complete
 
 ## 4. Pre-test Evidence
-- status: pass
+^- status: passed
 - evidence: pre-tests.md in docs/epics/acp-a2a-refactor/verification/, 0
 0 acceptance items
 
 ## 5. Receipt Integrity
-- status: pass
+^- status: passed
 - evidence: pr-merge-guarded modified, receipt mechanism preserved (local merge or --subject/--body)
 
 ## 6. Phase State
-- status: pass
+^- status: passed
 - evidence: raw issue phase_state=absorbed
 
 

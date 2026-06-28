@@ -34,7 +34,7 @@
 - target_lane: feature-local
 - promotion_gate: develop_merge
 - evidence_level: integration
-- status: pass
+^- status: passed
 
 ### AT-002 health check 消息修正
 - id: AT-002
@@ -43,4 +43,4 @@
 - target_lane: feature-local
 - promotion_gate: develop_merge
 - evidence_level: integration
-- status: pass
+^- status: passed

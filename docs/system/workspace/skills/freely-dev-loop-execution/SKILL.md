@@ -131,7 +131,7 @@ dev-loop 阶段的职责：
 - target_lane: premerge-integration
 - promotion_gate: develop_merge
 - evidence_level: integration
-- status: pass
+^- status: passed
 - artifact_ref: <指向实际测试产物文件，如 test 脚本或 test 输出日志，不要指向源代码>
 ```
 

@@ -13,7 +13,7 @@
 - actual_output: 6 references found — ACP_CLI extraction in _bridge_env_for_registered_tool and _ensure_acp_bridge_running, log_info messages for CLI flag and env var modes
 - evidence_file: .freely/run/test-evidence/acceptance-1.log
 - blocker: (none)
-- status: pass
+^- status: passed
 
 ### acceptance-2
 - acceptance_target: cline.slot all fields corrected per actual alias and .zshrc config
@@ -25,7 +25,7 @@
 - actual_output: All 5 fields verified — discovery=alias_cli_arg, alias_key=--config, config_file=data/settings/providers.json, is_dir=true, bridge_config_env=--config
 - evidence_file: .freely/run/test-evidence/acceptance-2.log
 - blocker: (none)
-- status: pass
+^- status: passed
 
 ### acceptance-3
 - acceptance_target: existing tools (claude/codex/opencode) bridge_config_env unchanged
@@ -37,7 +37,7 @@
 - actual_output: codex=CODEX_HOME unchanged, opencode=OPENCODE_CONFIG unchanged, claude="" unchanged (empty bridge_config_env verified by no emission)
 - evidence_file: .freely/run/test-evidence/acceptance-3.log
 - blocker: (none)
-- status: pass
+^- status: passed
 
 ### acceptance-4
 - acceptance_target: _slot_type reads _is_dir from registry instead of hardcoded "file"
@@ -49,14 +49,14 @@
 - actual_output: 5 occurrences — both alias_cli_arg and alias_env_var branches, plus Strategy A and C, all use _is_dir condition for _slot_type
 - evidence_file: .freely/run/test-evidence/acceptance-4.log
 - blocker: (none)
-- status: pass
+^- status: passed
 
 ## Unit
 - acceptance_target: Subagent code review verifies all logic correctness
 - testing_layer: unit
 - target_environment: fix worktree
 - required_evidence: Independent reviewer PASS on all criteria
-- status: pass
+^- status: passed
 
 ## Integration
 - acceptance_target: Bridge config dual-mode works end-to-end with cline ACP binary

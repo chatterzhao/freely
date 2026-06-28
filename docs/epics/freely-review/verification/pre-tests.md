@@ -7,14 +7,14 @@
 - expected_output: PASS
 - actual_output: PASS
 - evidence_file: .freely/run/test-evidence/acceptance-1.log
-- status: pass
+^- status: passed
 ### acceptance-2
 - acceptance_target: freely-review syntax ok
 - test_command: bash -n bin/freely-review && grep -q "caller" bin/freely-review && echo "PASS" || echo "FAIL"
 - expected_output: PASS
 - actual_output: PASS
 - evidence_file: .freely/run/test-evidence/acceptance-2.log
-- status: pass
+^- status: passed
 ## Unit
 - acceptance_target: basic functionality
 ## Integration

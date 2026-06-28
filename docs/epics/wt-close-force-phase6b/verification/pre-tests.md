@@ -8,7 +8,7 @@
 - expected_output: 1
 - actual_output: 1 — warning present in force branch
 - evidence_file: .freely/run/test-evidence/acceptance-1.log
-- status: pass
+^- status: passed
 
 ### acceptance-2
 - acceptance_target: Phase 6b without --force uses safe git worktree remove (no --force)
@@ -17,7 +17,7 @@
 - expected_output: safe remove line present in else branch
 - actual_output: git worktree remove "$_tp_wt" without --force in else branch
 - evidence_file: .freely/run/test-evidence/acceptance-2.log
-- status: pass
+^- status: passed
 
 ### acceptance-3
 - acceptance_target: --force 时用 -D, 非 --force 时用 -d
@@ -26,7 +26,7 @@
 - expected_output: -D in force branch, -d in else branch
 - actual_output: git branch -D in force branch, git branch -d in else branch
 - evidence_file: .freely/run/test-evidence/acceptance-3.log
-- status: pass
+^- status: passed
 
 ### acceptance-4
 - acceptance_target: bash syntax valid
@@ -35,7 +35,7 @@
 - expected_output: OK
 - actual_output: Syntax OK
 - evidence_file: .freely/run/test-evidence/acceptance-4.log
-- status: pass
+^- status: passed
 
 ### acceptance-5
 - acceptance_target: wt-close --help still works
@@ -44,4 +44,4 @@
 - expected_output: Usage text
 - actual_output: Usage text displayed correctly
 - evidence_file: .freely/run/test-evidence/acceptance-5.log
-- status: pass
+^- status: passed

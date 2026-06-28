@@ -8,19 +8,19 @@
 - issue_id: I-20260621T130954Z-A
 
 ## 1. Worktree Check
-- status: pass
+^- status: passed
 - evidence: worktree clean, single commit on top of develop
 
 ## 2. IBM Completeness
-- status: pass
+^- status: passed
 - evidence: raw issue absorbed into I-20260621T130954Z-A, no new C/M/I needed
 
 ## 3. Code Review Evidence
-- status: pass
+^- status: passed
 - evidence: 8 lines changed at 7 sites, single-quote replacement only
 
 ## 4. Pre-test Evidence
-- status: pass
+^- status: passed
 - evidence: test in test-pre-merge worktree
 
 ## 5. Receipt Integrity
@@ -28,7 +28,7 @@
 - evidence: no pr-merge-guarded modifications
 
 ## 6. Phase State
-- status: pass
+^- status: passed
 - evidence: raw issue phase_state=absorbed
 
 ## Overall Verdict

@@ -32,7 +32,7 @@
 - id: d-fix
 - requirement: wt-close refuses -D without --discard-unmerged
 - evidence_level: mock
-- status: pass
+^- status: passed
 - artifact_ref: docs/epics/path-var-unify/code-reviews/implementation-decision.md
 ## Real-Environment
 - real_environment_status: pass

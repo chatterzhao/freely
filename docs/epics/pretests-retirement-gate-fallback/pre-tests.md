@@ -13,7 +13,7 @@
 - actual_output: (由 skill:freely-test-execution 执行后填写)
 - evidence_file: (执行后填写，指向 .freely/run/test-evidence/acceptance-1.log)
 - blocker: (失败时填写) evidence_plan_missing
-- status: pass
+^- status: passed
 
 ### acceptance-2
 - acceptance_target: pretests-retirement-gate exits 1 when workcell-state.env is missing and no pre-tests.md exist
@@ -25,7 +25,7 @@
 - actual_output: (由 skill:freely-test-execution 执行后填写)
 - evidence_file: (执行后填写)
 - blocker: (失败时填写) evidence_plan_missing
-- status: pass
+^- status: passed
 
 ### acceptance-3
 - acceptance_target: Original behavior is preserved when workcell-state.env exists
@@ -37,7 +37,7 @@
 - actual_output: (执行后填写)
 - evidence_file: (执行后填写)
 - blocker: (失败时填写) evidence_plan_missing
-- status: pass
+^- status: passed
 
 ### acceptance-4
 - acceptance_target: Python syntax is valid
@@ -49,7 +49,7 @@
 - actual_output: (执行后填写)
 - evidence_file: (执行后填写)
 - blocker: (失败时填写) evidence_plan_missing
-- status: pass
+^- status: passed
 
 ## Unit
 - acceptance_target: Fallback logic is syntactically correct and handles edge cases

@@ -38,5 +38,5 @@
 - target_lane: premerge-integration
 - promotion_gate: develop_merge
 - evidence_level: integration
-- status: pass
+^- status: passed
 - artifact_ref: docs/epics/merge-error-ibm-guide/code-reviews/review.md

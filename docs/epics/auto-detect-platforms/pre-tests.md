@@ -32,7 +32,7 @@
 - id: auto-detect
 - requirement: start auto-detects platforms and updates config
 - evidence_level: mock
-- status: pass
+^- status: passed
 - artifact_ref: docs/epics/auto-detect-platforms/code-reviews/implementation-decision.md
 ## Real-Environment
 - real_environment_status: pass

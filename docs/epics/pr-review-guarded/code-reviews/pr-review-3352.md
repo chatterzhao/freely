@@ -9,19 +9,19 @@
 - reason: 违规绕过门禁中，理由充分，是：纯wt-close错误消息改进，仅修改提示文本无逻辑变更，所有维度均合规
 
 ## 1. Worktree Check
-- status: pass
+^- status: passed
 - evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260622T110050Z-wt-close-phase-gate-msg branch=fix/raw-20260622T110050Z-wt-close-phase-gate-msg clean=true
 
 ## 2. IBM Completeness
-- status: pass
+^- status: passed
 - evidence: governance-merge-gate passed
 
 ## 3. Code Review Evidence
-- status: pass
+^- status: passed
 - evidence: implementation-decision.md in docs/epics/a2a-native-delegation/code-reviews/, all fields complete
 
 ## 4. Pre-test Evidence
-- status: pass
+^- status: passed
 - evidence: pre-tests.md in docs/epics/acp-a2a-refactor/verification/, 0
 0 acceptance items
 
@@ -30,7 +30,7 @@
 - evidence: pr-merge-guarded not modified by this PR
 
 ## 6. Phase State
-- status: pass
+^- status: passed
 - evidence: raw issue phase_state=absorbed
 
 

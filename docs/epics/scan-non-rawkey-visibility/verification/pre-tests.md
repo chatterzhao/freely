@@ -9,5 +9,5 @@
 ### AT-001 non-rawkey visibility
 - id: non-rawkey-visibility
 - requirement: scan output includes gh-{number} items for platform issues without raw-key
-- status: pass
+^- status: passed
 - artifact_ref: docs/epics/scan-non-rawkey-visibility/code-reviews/review.md
