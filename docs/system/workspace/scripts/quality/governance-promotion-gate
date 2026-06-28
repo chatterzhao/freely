@@ -69,7 +69,7 @@ staged_promotion_issue_ids() {
     | while IFS= read -r rel_path; do
         [[ -n "$rel_path" ]] || continue
         case "$rel_path" in
-          docs/epics/*/issues/*.md|docs/progress/*.md|docs/progress/*/*.md|docs/epics/*/code-reviews/*.md)
+          docs/epics/*/*/raw-*/issues/*.md|docs/progress/*.md|docs/progress/*/*.md|docs/epics/*/*/raw-*/code-reviews/*.md)
             [[ -f "$project/$rel_path" ]] || continue
             sed -n 's/^[[:space:]]*-[[:space:]]*issue_id:[[:space:]]*`\\{0,1\\}\\([^`[:space:]]*\\).*/\\1/p' "$project/$rel_path"
             ;;

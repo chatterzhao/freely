@@ -351,37 +351,58 @@ class A2AChecker:
 # ── Local issue reader ──────────────────────────────────────────────
 
 def read_issues_dir(project: Path) -> list[dict]:
-    """Read all raw-* and I-* issues from docs/issues/."""
+    """Read all raw-* and I-* issues from docs/issues/ and docs/epics/."""
     issues = []
     issues_dir = project / "docs" / "issues"
-    if not issues_dir.is_dir():
-        return issues
+    if issues_dir.is_dir():
+        for d in sorted(issues_dir.iterdir()):
+            if not d.is_dir():
+                continue
+            mf = d / "issue.md"
+            if not mf.is_file():
+                continue
+            try:
+                text = mf.read_text(encoding="utf-8")
+            except Exception:
+                continue
+            fm = parse_frontmatter(text)
+            name = d.name
+            kind = "raw" if name.startswith("raw-") else "linked" if name.startswith("I-") else "other"
+            issues.append({
+                "name": name,
+                "kind": kind,
+                "path": str(d),
+                "phase_state": fm.get("phase_state", ""),
+                "platform_state": fm.get("platform_state", ""),
+                "absorbed_into": fm.get("absorbed_into", ""),
+                "github_id": extract_github_id(fm, text),
+                "source_raw": fm.get("source_raw", ""),
+                "source_candidate": fm.get("source_candidate", ""),
+                "frontmatter": fm,
+            })
 
-    for d in sorted(issues_dir.iterdir()):
-        if not d.is_dir():
-            continue
-        mf = d / "issue.md"
-        if not mf.is_file():
-            continue
-        try:
-            text = mf.read_text(encoding="utf-8")
-        except Exception:
-            continue
-        fm = parse_frontmatter(text)
-        name = d.name
-        kind = "raw" if name.startswith("raw-") else "linked" if name.startswith("I-") else "other"
-        issues.append({
-            "name": name,
-            "kind": kind,
-            "path": str(d),
-            "phase_state": fm.get("phase_state", ""),
-            "platform_state": fm.get("platform_state", ""),
-            "absorbed_into": fm.get("absorbed_into", ""),
-            "github_id": extract_github_id(fm, text),
-            "source_raw": fm.get("source_raw", ""),
-            "source_candidate": fm.get("source_candidate", ""),
-            "frontmatter": fm,
-        })
+    # Also scan I-* issues under new structure: docs/epics/{epic}/{story}/raw-{raw-key}/issues/
+    epics_dir = project / "docs" / "epics"
+    if epics_dir.is_dir():
+        for mf in sorted(epics_dir.glob("*/*/raw-*/issues/I-*.md")):
+            try:
+                text = mf.read_text(encoding="utf-8")
+            except Exception:
+                continue
+            fm = parse_frontmatter(text)
+            name = mf.stem  # e.g. I-20260628T005815Z-A
+            issues.append({
+                "name": name,
+                "kind": "linked",
+                "path": str(mf.parent),
+                "phase_state": fm.get("phase_state", ""),
+                "platform_state": fm.get("platform_state", ""),
+                "absorbed_into": fm.get("absorbed_into", ""),
+                "github_id": extract_github_id(fm, text),
+                "source_raw": fm.get("source_raw", ""),
+                "source_candidate": fm.get("source_candidate", ""),
+                "frontmatter": fm,
+            })
     return issues
 
 
