@@ -290,6 +290,24 @@ if [[ -z "$issue_id" ]]; then
   echo "  Skipping phase_state check and platform close." >&2
 fi
 
+# ── Phase 0: Comment resolution check ──
+# Scans raw issue comments. Blocks wt-close if any human comment lacks resolution.
+if [[ -n "$issue_id" ]]; then
+  _raw_file="$ISSUES_DIR/$issue_id/issue.md"
+  if [[ -f "$_raw_file" ]]; then
+    _raw_text="$(cat "$_raw_file")"
+    _unresolved=$(echo "$_raw_text" | grep -c "^### comment-" 2>/dev/null || true)
+    _resolved=$(echo "$_raw_text" | grep -c "^#### resolution-" 2>/dev/null || true)
+    if [[ "$_unresolved" -gt "$_resolved" ]]; then
+      echo "[wt-close] $issue_id: $_unresolved comments, $_resolved resolutions — $_((_unresolved - _resolved)) unresolved"
+      echo "  每条人类评论必须有子评论标记 adopted（采纳）或 discarded（丢弃）"
+      echo "  添加 #### resolution-{ts} 后重试 wt-close"
+      exit 1
+    fi
+    echo "wt-close: comment check ($_resolved/$_unresolved resolved) ✓"
+  fi
+fi
+
 # ── Phase 1: Checks ──
 
 if [[ -n "$issue_id" ]]; then
