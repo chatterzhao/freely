@@ -120,7 +120,8 @@ if not state_file.exists():
     fallback_entries: list[tuple[str, str]] = []
     if _raw_key:
         # Find I-* issue bound to this raw key
-        for issue_file in sorted(worktree.glob("docs/issues/I-*/issue.md")):
+        issue_files = list(worktree.glob("docs/issues/I-*/issue.md")) + list(worktree.glob("docs/epics/**/issues/I-*.md"))
+        for issue_file in sorted(issue_files):
             try:
                 text = issue_file.read_text()
             except OSError:

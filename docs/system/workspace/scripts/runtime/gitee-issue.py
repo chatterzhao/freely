@@ -285,14 +285,14 @@ def build_parser() -> argparse.ArgumentParser:
     list_parser = subparsers.add_parser("list")
     list_parser.add_argument("--state", default="open")
     list_parser.add_argument("--labels")
-    list_parser.add_argument("--page", type=int, default=1)
-    list_parser.add_argument("--per-page", type=int, default=20)
+    list_parser.add_argument("--page", type=str, default=1)
+    list_parser.add_argument("--per-page", type=str, default=20)
     list_parser.add_argument("--sort")
     list_parser.add_argument("--direction")
     list_parser.set_defaults(func=cmd_list)
 
     get_parser = subparsers.add_parser("get")
-    get_parser.add_argument("number", type=int)
+    get_parser.add_argument("number", type=str)
     get_parser.set_defaults(func=cmd_get)
 
     create_parser = subparsers.add_parser("create")
@@ -307,7 +307,7 @@ def build_parser() -> argparse.ArgumentParser:
     create_parser.set_defaults(func=cmd_create)
 
     update_parser = subparsers.add_parser("update")
-    update_parser.add_argument("number", type=int)
+    update_parser.add_argument("number", type=str)
     update_parser.add_argument("--title")
     update_parser.add_argument("--body")
     update_parser.add_argument("--body-file")
@@ -319,7 +319,7 @@ def build_parser() -> argparse.ArgumentParser:
     update_parser.set_defaults(func=cmd_update)
 
     comment_parser = subparsers.add_parser("comment")
-    comment_parser.add_argument("number", type=int)
+    comment_parser.add_argument("number", type=str)
     comment_parser.add_argument("--body")
     comment_parser.add_argument("--body-file")
     comment_parser.set_defaults(func=cmd_comment)
@@ -330,7 +330,7 @@ def build_parser() -> argparse.ArgumentParser:
     close_parser.set_defaults(func=cmd_close)
 
     reopen_parser = subparsers.add_parser("reopen")
-    reopen_parser.add_argument("number", type=int)
+    reopen_parser.add_argument("number", type=str)
     reopen_parser.add_argument("--comment")
     reopen_parser.set_defaults(func=cmd_reopen)
 
