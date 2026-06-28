@@ -19,6 +19,10 @@ raw issue ──→ B1（brainstorms → candidate → milestones）──→ B2
 
 **判断标准**：能从下层归纳回上层 → 消化到位。上层在下层中找不到对应 → 遗漏。下层出现了上层没有的东西 → 偏离。
 
+## 命名约定
+
+四种 issue 共享同一 `{key}`：`raw-{key}` → `C-{key}-{suffix}` → `M-{key}-{suffix}` → `I-{key}-{suffix}`。`{key}` 从 raw issue 取，`{suffix}` 从 C-* 取。详见 `docs/system/workspace/ibm-framework.md`。
+
 ## 输入
 
 审查者从工位自行读取全部 IBM 产物。
