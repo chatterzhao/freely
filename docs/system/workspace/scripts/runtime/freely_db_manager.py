@@ -172,6 +172,19 @@ class DbDaemon:
         c.execute("CREATE INDEX IF NOT EXISTS idx_project_role_status ON sessions(project, role, status)")
         c.execute("CREATE INDEX IF NOT EXISTS idx_parent ON sessions(parent_session_id)")
 
+        # discussions
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS discussions (
+                session_id TEXT PRIMARY KEY,
+                owner TEXT NOT NULL DEFAULT '',
+                status TEXT NOT NULL DEFAULT 'active',
+                platform_ids TEXT DEFAULT '{}',
+                created_at TEXT NOT NULL DEFAULT '',
+                updated_at TEXT NOT NULL DEFAULT ''
+            )
+        """)
+        c.execute("CREATE INDEX IF NOT EXISTS idx_discussions_status ON discussions(status)")
+
         # tool_switch_events
         c.execute("""
             CREATE TABLE IF NOT EXISTS tool_switch_events (
@@ -666,6 +679,67 @@ def h_chat_consume_conversation(daemon: DbDaemon, params: dict) -> dict:
 
     daemon.conn.commit()
     return {"count": count}
+
+
+# ── discuss.* ─────────────────────────────────────────────────────────────
+
+@_h("discuss.create")
+def h_discuss_create(daemon: DbDaemon, params: dict) -> dict:
+	session_id = params["session_id"]
+	owner = params.get("owner", "")
+	now = _now_utc()
+	daemon.conn.execute(
+		"INSERT INTO discussions (session_id, owner, status, platform_ids, created_at, updated_at) "
+		"VALUES (?, ?, 'active', '{}', ?, ?)",
+		(session_id, owner, now, now),
+	)
+	daemon.conn.commit()
+	return {"session_id": session_id, "ok": True}
+
+
+@_h("discuss.update-status")
+def h_discuss_update_status(daemon: DbDaemon, params: dict) -> dict:
+	session_id = params["session_id"]
+	status = params.get("status", "closed")
+	platform_ids = params.get("platform_ids", "")
+	now = _now_utc()
+	if platform_ids:
+		daemon.conn.execute(
+			"UPDATE discussions SET status=?, platform_ids=?, updated_at=? WHERE session_id=?",
+			(status, platform_ids, now, session_id),
+		)
+	else:
+		daemon.conn.execute(
+			"UPDATE discussions SET status=?, updated_at=? WHERE session_id=?",
+			(status, now, session_id),
+		)
+	daemon.conn.commit()
+	return {"session_id": session_id, "status": status, "ok": True}
+
+
+@_h("discuss.get")
+def h_discuss_get(daemon: DbDaemon, params: dict) -> dict:
+	session_id = params["session_id"]
+	row = daemon.conn.execute(
+		"SELECT session_id, owner, status, platform_ids, created_at, updated_at "
+		"FROM discussions WHERE session_id=?",
+		(session_id,),
+	).fetchone()
+	if not row:
+		return {}
+	return {
+		"session_id": row[0], "owner": row[1], "status": row[2],
+		"platform_ids": row[3], "created_at": row[4], "updated_at": row[5],
+	}
+
+
+@_h("discuss.list-active")
+def h_discuss_list_active(daemon: DbDaemon, params: dict) -> dict:
+	rows = daemon.conn.execute(
+		"SELECT session_id, owner, status, created_at FROM discussions "
+		"WHERE status='active' ORDER BY created_at DESC"
+	).fetchall()
+	return {"sessions": [{"session_id": r[0], "owner": r[1], "status": r[2], "created_at": r[3]} for r in rows]}
 
 
 @_h("chat.count-comments-for-key")
