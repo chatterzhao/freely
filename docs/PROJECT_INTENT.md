@@ -6,7 +6,7 @@
 
 构建一个 Jarvis 式自主循环运行器：
 - 启动后 AI 担任项目所有者角色。
-- AI 从项目意图、story-scoped code-reviews、test、chat 输入与会话证据（人类或自治）、github-issue、治理漂移、运行时异常中发现新问题，并先收敛为 candidate；从 scan 结果获取待委派任务，从 a2a_tasks 表查询进行中任务；里程碑作为规划层追踪已纳入任务，从进度/恢复文档续接已有 issue；而非固定从单一任务列表
+- AI 从项目意图、story-scoped code-reviews、test、comment/discuss 输入与会话证据（人类或自治）、github-issue、治理漂移、运行时异常中发现新问题，并先收敛为 candidate；从 scan 结果获取待委派任务，从 a2a_tasks 表查询进行中任务；里程碑作为规划层追踪已纳入任务，从进度/恢复文档续接已有 issue；而非固定从单一任务列表
 - AI 自主管理：获取 Issue → 文档 → 开发 → 验收 → 获取 Issue 的闭环
 - AI 持续运行（自己监控ai工具崩溃/阻塞自动触发续接），除非明确停止。或找不到需求，或者出现重大事故 AI 自己已经无力自己解决。
 - Freely 开发 Freely 时暴露的可复现共性问题，默认先判断是否应成为 Freely 能力发现；若可泛化到用户项目，应进入三个 loop 的 canonical lifecycle materialize 为可复用能力，而不是停留成一次性项目经验。
@@ -45,7 +45,7 @@ Freely 自身首先是一个产品，不应被拆成一堆并列的 shell、命�
 1. semantic surfaces
    - `init`
    - `start`
-   - `chat`
+   - `comment / discuss`
    - `baseline-status`
    - `live-status`
    - `fleet-status`
@@ -57,7 +57,7 @@ Freely 自身首先是一个产品，不应被拆成一堆并列的 shell、命�
 
 原则：
 
-- `chat` / `status` family 是 Freely 通过 shell 暴露的语义面，不是 shell 自身。
+- `comment / discuss` / `status` family 是 Freely 通过 shell 暴露的语义面，不是 shell 自身。
 - `CLI shell`、`TUI shell`、`GUI app` 是宿主壳，不是业务语义本体。
 - 外部 AI tools 是 Freely core 编排的执行提供层，不是 Freely 自己的 product shell。
 - 若未来要沉淀“通用产品形态方法”，应另开独立 lifecycle；本节只表达 Freely 自身产品架构。
@@ -88,10 +88,10 @@ Freely 自身首先是一个产品，不应被拆成一堆并列的 shell、命�
 
 流程标识词典与状态联动矩阵的规范语义统一见 `docs/LAWS.md` 第 2C 章；其中 issue / progress 的主执行标识统一使用 `phase_state`，skills 与 milestone policy 不得再自行发明同名状态。
 
-### Chat 输入与会话证据（人类/自治）
+### Comment/Discuss 输入与会话证据（人类/自治）
 
 ```
-人类 ←──→ Chat Session ←──→ AI
+人类 ←──→ Discuss Session ←──→ AI
               │
               ├── 讨论先进入 B1_IBM：沉淀到 pre-brainstorms/*/brainstorms.md
               ├── candidate 写入 pre-brainstorms/*/candidates.md（B1_IBM 产物，进入 milestone）
@@ -201,7 +201,7 @@ Freely 自身产品/系统架构的当前高层拓扑可理解为：
   - `start`
   - `daemon start|stop|status|logs`
 - submit / intervention semantics
-  - `chat`
+  - `comment / discuss`
   - future human interruption submit paths
   - pause / retry / resume 等 control actions
 - observability semantics
@@ -212,7 +212,7 @@ Freely 自身产品/系统架构的当前高层拓扑可理解为：
 
 因此：
 
-- `chat` 不是 `CLI shell`、`TUI shell`、`GUI app` 的 peer
+- `comment / discuss` 不是 `CLI shell`、`TUI shell`、`GUI app` 的 peer
 - status family 也不是 `CLI shell`、`TUI shell`、`GUI app` 的 peer
 - foreground `start` 与 explicit `daemon` control plane 是同一 runtime/orchestration 的两种入口语义，不是两套并列产品壳
 - `CLI shell`、`TUI shell`、`GUI app` 是承载这些语义面的 host shells
