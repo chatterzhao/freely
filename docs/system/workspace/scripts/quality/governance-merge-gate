@@ -791,9 +791,17 @@ def _validate_raw_issue(issue: IssueRecord, changed_paths: list = None) -> list[
         if match:
             target_id = match.group(1).strip("`").strip('"').strip("'")
             target_dir = os.path.join(ROOT_DIR, "docs", "issues", target_id)
-            if not os.path.isdir(target_dir) or not os.path.isfile(os.path.join(target_dir, "issue.md")):
+            found = os.path.isdir(target_dir) and os.path.isfile(os.path.join(target_dir, "issue.md"))
+            if not found:
+                for root, dirs, files in os.walk(os.path.join(ROOT_DIR, "docs", "epics")):
+                    if "issues" in dirs:
+                        for f in os.listdir(os.path.join(root, "issues")):
+                            if f.startswith(target_id) and f.endswith(".md"):
+                                found = True; break
+                    if found: break
+            if not found:
                 errors.append(
-                    f"{iid} in {issue.path}: absorbed_into '{target_id}' but target issue does not exist at docs/issues/{target_id}/issue.md."
+                    f"{iid} in {issue.path}: absorbed_into '{target_id}' not found at docs/issues/ or docs/epics/**/."
                 )
         else:
             errors.append(
