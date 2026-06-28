@@ -23252,6 +23252,104 @@ submit_human_frontdoor_message() {
   printf '%s\n' "$intake_output"
 }
 
+cmd_discuss() {
+  local session_id="" action="new" project="" message=""
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --continue) action="continue"; session_id="${2:-}"; shift 2 ;;
+      --archive) action="archive"; session_id="${2:-}"; shift 2 ;;
+      --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
+      --message) message="${2:-}"; shift 2 ;;
+      --help|-h) cat <<HELP; return 0
+Usage: freely discuss                          # new discussion session
+       freely discuss --continue <session-id>   # resume existing session
+       freely discuss --archive <session-id>    # archive and close discussion
+
+AI-assisted group discussion with platform sync.
+Discussions are stored locally (SQLite + JSONL) and synced to platform Discussions
+(GitHub + GitCode; Gitee skipped — no Discussions feature).
+
+Options:
+  --continue <id>   Resume an existing discussion session.
+  --archive <id>    Archive discussion: analyze, produce outputs (comments + raw issues),
+                    record output IDs, then close discussion on all platforms.
+  --project <path>  Project root path.
+  --message <text>  Initial message for new discussion.
+
+Examples:
+  freely discuss --message "Let's review @raw-3600 and @raw-3599"
+  freely discuss --continue D-20260628T005815Z
+  freely discuss --archive D-20260628T005815Z
+HELP
+        ;;
+      --*) log_error "unknown option: $1"; return 1 ;;
+      *) shift ;;
+    esac
+  done
+
+  project="$(resolve_project_or_fail "$project" 1)"
+  local _stamp _agent_env
+
+  case "$action" in
+    new)
+      _stamp="D-$(date -u +%Y%m%dT%H%M%SZ)"
+      session_id="${session_id:-$_stamp}"
+      # Create discussion in SQLite
+      python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli" \
+        --project "$project" discuss.create \
+        --session-id "$session_id" --owner "$(git config user.name)" >/dev/null 2>&1 || true
+      # Record in agent-id.env: project_root=discuss=session_id
+      _agent_env="${PROJECT_ROOT}/.freely/agent-id.env"
+      echo "${PROJECT_ROOT}=discuss=${session_id}" >> "$_agent_env"
+      # Create platform Discussions on supported platforms
+      local _adapter="$SELF_ROOT/docs/system/workspace/scripts/sync/platform-adapter.py"
+      python3 "$_adapter" create-discussion "$session_id" "${message:-New discussion}" 2>&1 || true
+      # Initialize JSONL
+      mkdir -p "${PROJECT_ROOT}/.freely/discussions"
+      local _jsonl="${PROJECT_ROOT}/.freely/discussions/${session_id}.jsonl"
+      if [[ -n "$message" ]]; then
+        echo "{\"author\":\"$(git config user.name)\",\"body\":\"$message\",\"refs\":[],\"created_at\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"consumed\":0}" >> "$_jsonl"
+      fi
+      echo "[discuss] session created: $session_id"
+      printf '%s\n' "$session_id"
+      ;;
+
+    continue)
+      [[ -n "$session_id" ]] || { log_error "--continue requires a session-id"; return 1; }
+      echo "[discuss] resuming session: $session_id"
+      # TODO: resume ACP session for discussion
+      ;;
+
+    archive)
+      [[ -n "$session_id" ]] || { log_error "--archive requires a session-id"; return 1; }
+      echo "[discuss] archiving session: $session_id"
+      # Find discuss agent session_id from sessions table
+      local _discuss_session
+      _discuss_session=$(python3 -c "
+import sqlite3
+conn = sqlite3.connect('${PROJECT_ROOT}/.freely/freely.db')
+r = conn.execute(\"SELECT session_id FROM sessions WHERE role='discuss' AND status='active' ORDER BY updated_at DESC LIMIT 1\").fetchone()
+print(r[0] if r else '')
+conn.close()
+" 2>/dev/null || true)
+      if [[ -z "$_discuss_session" ]]; then
+        log_error "no active discuss agent session found. Start a discussion first with: freely discuss"
+        return 1
+      fi
+      # Send archive instruction via ACP session/prompt
+      python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/run-acp-prompt.py" \
+        --session-id "$_discuss_session" \
+        --prompt "根据 skill:freely-discuss-archive-execution 将 session ${session_id} 归档" \
+        --cwd "$PROJECT_ROOT" >/dev/null 2>&1 || {
+          log_error "failed to send archive instruction to discuss agent"
+          return 1
+        }
+      echo "[discuss] archive instruction sent to discuss agent for $session_id"
+      ;;
+  esac
+}
+
 # Resolve user/repo or GitHub URL to canonical user/repo form.
 # Accepted: user/repo, https://github.com/user/repo.git, git@github.com:user/repo.git
 cmd_comment() {

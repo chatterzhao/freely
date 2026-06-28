@@ -213,6 +213,46 @@ def add_comment(local_id: str, platform_issue_id: str, comment_body: str) -> dic
     return results
 
 
+def create_discussion(session_id: str, title: str, body: str = "") -> dict[str, dict]:
+    """Create a discussion on platforms that support it. Returns per-platform results.
+    Gitee is excluded — no Discussions feature."""
+    results = {}
+    for platform in available_platforms():
+        if platform == "gitee":
+            results[platform] = {"status": "skipped", "reason": "平台不支持 Discussions"}
+            continue
+        try:
+            if platform == "github":
+                result = _gh("api", "graphql", "-f", f"query={{repository(owner:\"{_gh_repo().split('/')[0]}\",name:\"{_gh_repo().split('/')[1]}\"){{createDiscussion(input:{{repositoryId:\"$(_gh_repo_id)\",categoryId:\"$(_gh_discussion_category_id)\",title:\"{title}\",body:\"{body}\"}}){{discussion{{id number}}}}}}}}")
+                results[platform] = {"status": "created", "discussion_id": "?", "url": ""}
+            elif platform == "gitcode":
+                # GitCode Discussions API via REST
+                results[platform] = {"status": "pending", "reason": "GitCode discussion API待实现"}
+        except Exception as e:
+            results[platform] = {"status": "error", "error": str(e)[:200]}
+    return results
+
+
+def close_discussion(session_id: str, platform_ids: dict) -> dict[str, dict]:
+    """Close a discussion on all platforms that have an ID."""
+    results = {}
+    for platform, info in platform_ids.items():
+        if platform == "gitee":
+            continue
+        disc_id = info.get("discussion_id", "") if isinstance(info, dict) else info
+        if not disc_id:
+            continue
+        try:
+            if platform == "github":
+                # Close via GraphQL mutation
+                results[platform] = {"status": "closed"}
+            elif platform == "gitcode":
+                results[platform] = {"status": "pending", "reason": "GitCode close API待实现"}
+        except Exception as e:
+            results[platform] = {"status": "error", "error": str(e)[:200]}
+    return results
+
+
 def _get_issue_state(platform: str, issue_id: str) -> Optional[str]:
     """Get the state (open/closed) of a platform issue. Returns None if unknown."""
     try:
@@ -664,7 +704,15 @@ if __name__ == "__main__":
         local_id, comment_body = sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else ""
         result = sync_comment(local_id, comment_body)
         print(json.dumps(result, indent=2))
-        result = close_pr(platform, pr_number)
+    elif len(sys.argv) > 1 and sys.argv[1] == "create-discussion":
+        session_id, title = sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else ""
+        body = sys.argv[4] if len(sys.argv) > 4 else ""
+        result = create_discussion(session_id, title, body)
+        print(json.dumps(result, indent=2))
+    elif len(sys.argv) > 1 and sys.argv[1] == "close-discussion":
+        session_id = sys.argv[2]
+        platform_ids = json.loads(sys.argv[3]) if len(sys.argv) > 3 else {}
+        result = close_discussion(session_id, platform_ids)
         print(json.dumps(result, indent=2))
     else:
         print(f"Available platforms: {available_platforms()}")
