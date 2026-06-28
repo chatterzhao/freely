@@ -293,32 +293,52 @@ if [[ -n "$_acp_bridge_socket" ]] && [[ -x "$ACP_PROMPT_CLIENT" ]]; then
     _review_session_id="$_new_session_id"
   fi
   else
-    echo "[INFO] ACP bridge not available — manual review required"
+    echo "[INFO] ACP bridge 不可用，需人工审查"
     echo ""
-    echo "  加载 skill:freely-tdd-review，按四层 IBM 链路逐级审查："
-    echo "  第一层 Raw→B1: brainstorms/candidate 是否忠实消化了 raw issue？"
-    echo "  第二层 B1→B2: B2 产物是否忠实消化了 candidate/I-*？"
-    echo "  第三层 B2→实现: 代码是否按 pre-tests 驱动、prd 设计实现？"
-    echo "  第四层 实现→测试: 测试全部 GREEN？tasks 全部完成？"
+    echo "  请加载 skill:freely-tdd-review，按五层 IBM 链路逐级审查："
+    echo "  第一层 Raw Issue — 问题质量：这是好 issue 吗？"
+    echo "  第二层 Raw→B1 — 质量+完整度+安全：方案最优？周边全覆盖？无隐患？"
+    echo "  第三层 B1→B2 — 设计质量：产物可追溯？设计可执行？"
+    echo "  第四层 B2→实现 — 实现 fidelity+TDD 覆盖率"
+    echo "  第五层 实现→测试 — 执行完成度：全 GREEN？evidence 真实？"
     echo ""
-    echo "  审查结论写入: $review_file"
+    echo "  审查结论按 skill 输出格式写入: $review_file"
+    echo "  上下文文件: $REVIEW_STATE_DIR/review-guide.txt"
+    echo ""
     _review_guide="$REVIEW_STATE_DIR/review-guide.txt"
     cat > "$_review_guide" << GUIDEOF
-=== Review Context ===
+=== 人工审查指南 ===
+ACP bridge 不可用，请人工执行审查。
+
+审查 Skill: skill:freely-tdd-review（五层 IBM 链路逐级审查）
+审查结论写入: $review_file
+
+=== 审查上下文 ===
 Branch: $review_branch → $base
 Raw Key: $_raw_key
-Issue: $_issue_file
-Pre-tests: $_pre_tests_file
-Diff: git diff $base..$review_branch
+涉及文件: docs/issues/raw-${_raw_key}/issue.md
+         docs/pre-brainstorms/${_raw_key}--*/brainstorms.md
+         docs/pre-brainstorms/${_raw_key}--*/candidates.md
+         docs/issues/I-${_raw_key}-*/issue.md
+         docs/epics/*/brainstorms/b-I-${_raw_key}-*.md
+         docs/epics/*/prd.md
+         docs/epics/*/verification/pre-tests.md
+         docs/epics/*/tasks.md
+         docs/epics/*/code-reviews/
+         git diff $base..$review_branch
 
-=== Instructions ===
-加载 skill:freely-tdd-review。
-从 raw issue 开始，按 IBM 链路逐级审查：raw→B1→B2→实现→测试。
-每级检查下层是否忠实消化了上层。可以从下层归纳回上层。
-失败必须给出具体理由和修复建议。
+=== 审查步骤 ===
+1. 加载 skill:freely-tdd-review
+2. 从 raw issue 开始，逐级向下审查
+3. 每级检查：下层是否忠实消化了上层？
+4. 失败必须给出具体理由和修复建议——不能说"不达标"三个字
+5. 审查结论写入 $review_file（格式见 skill 输出格式）
+
+=== 审查通过后 ===
+./bin/pr-merge-guarded $base $review_branch
 GUIDEOF
     _review_verdict="manual_required"
-    _review_summary="ACP bridge unavailable — load skill:freely-tdd-review for IBM chain review"
+    _review_summary="ACP bridge unavailable — manual review via skill:freely-tdd-review. See $_review_guide"
     _acp_used=0
     _review_json="{}"
     fi  # End ACP bridge available check
