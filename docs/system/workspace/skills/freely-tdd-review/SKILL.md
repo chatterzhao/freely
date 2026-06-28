@@ -36,9 +36,9 @@ pre-tests ──→ 测试执行（全 GREEN + 真实 evidence）
 审查者从工位自行读取：
 1. `docs/issues/raw-{key}/issue.md`
 2. `docs/pre-brainstorms/{key}--{slug}/brainstorms.md` + `candidates.md`
-3. `docs/issues/I-{key}-A/issue.md`
+3. `docs/epics/{epic}/{story}/raw-{raw-key}/issues/I-{raw-key}-A.md`
 4. `docs/epics/{epic}/{story}/raw-{raw-key}/brainstorms/b-I-{raw-key}-A.md`
-5. `docs/epics/{epic}/{story}/raw-{raw-key}/prd.md`、`pre-tests.md`、`tasks.md`、`code-reviews/`
+5. `docs/epics/{epic}/{story}/raw-{raw-key}/prd.md`、`verification/pre-tests.md`、`verification/tasks.md`、`code-reviews/`
 6. `git diff develop..HEAD`（实际代码变更）
 
 ## 四层逐级审查
@@ -126,25 +126,25 @@ pre-tests ──→ 测试执行（全 GREEN + 真实 evidence）
 - verdict: pass | fail
 
 ## 第一层：Raw → B1（问题到决策）
-- status: pass | fail
+- status: passed | fail
 - 消化评估: brainstorms/candidate 是否忠实消化了 raw issue
 - 具体发现: ...
 - 问题与修复建议: ...
 
 ## 第二层：B1 → B2（决策到设计）
-- status: pass | fail
+- status: passed | fail
 - 消化评估: B2 产物是否忠实消化了 candidate/I-*
 - 具体发现: ...
 - 问题与修复建议: ...
 
 ## 第三层：B2 → 实现（TDD 测试驱动）
-- status: pass | fail
+- status: passed | fail
 - 消化评估: 代码是否按 pre-tests 驱动、prd 设计实现
 - 具体发现: ...
 - 问题与修复建议: ...
 
 ## 第四层：实现 → 测试（执行完成度）
-- status: pass | fail
+- status: passed | fail
 - 消化评估: 测试是否全部执行、tasks 是否全部完成
 - 具体发现: ...
 - 问题与修复建议: ...
