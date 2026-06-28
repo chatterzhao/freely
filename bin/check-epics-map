@@ -1,0 +1,138 @@
+#!/usr/bin/env python3
+"""Validate docs/epics-map.svg against docs/epics/ directory tree.
+
+Exit 0: aligned. Exit 1: mismatch with diff details.
+Usage: ./bin/check-epics-map [--project <path>]
+"""
+import os, re, sys
+from pathlib import Path
+
+IGNORE_DIRS = {"code-reviews", "verification", "issues", "brainstorms", "test-evidence"}
+
+def parse_svg(svg_text: str) -> tuple[set[str], dict[str, set[str]]]:
+    """Extract epics and stories from SVG. Returns (epics_set, {epic: {stories}})."""
+    epics = set()
+    stories_by_epic: dict[str, set[str]] = {}
+
+    # Find all rect elements with id attributes and their y coordinates
+    pattern = r'<rect id="(epic|story)-([^"]+)".*?y="([^"]+)".*?height="([^"]+)"'
+    elements = []
+    for m in re.finditer(pattern, svg_text):
+        elem_type = m.group(1)
+        name = m.group(2)
+        y = float(m.group(3))
+        height = float(m.group(4))
+        elements.append((elem_type, name, y, y+height))
+
+    current_epic = None
+    for elem_type, name, y_start, y_end in elements:
+        if elem_type == "epic":
+            epics.add(name)
+            current_epic = name
+            stories_by_epic[name] = set()
+        elif elem_type == "story" and current_epic:
+            # Story belongs to current_epic if it's within the epic's y range
+            # (simple nesting — stories are drawn inside their epic)
+            pass  # Will be handled by grouping below
+
+    # Group stories by their containing epic based on y-overlap
+    for elem_type, name, y_start, y_end in elements:
+        if elem_type == "story":
+            parent = None
+            for ename in epics:
+                # Find the epic's y range
+                for et, en, ey, eh in elements:
+                    if et == "epic" and en == ename:
+                        if ey <= y_start <= eh:
+                            parent = ename
+                            break
+                if parent:
+                    break
+            if parent:
+                stories_by_epic[parent].add(name)
+
+    return epics, stories_by_epic
+
+
+def walk_epics(project: Path) -> tuple[set[str], dict[str, set[str]]]:
+    """Walk docs/epics/ and return (epics_set, {epic: {stories}})."""
+    epics_dir = project / "docs" / "epics"
+    if not epics_dir.exists():
+        return set(), {}
+
+    epics = set()
+    stories_by_epic: dict[str, set[str]] = {}
+
+    for epic_d in sorted(epics_dir.iterdir()):
+        if not epic_d.is_dir():
+            continue
+        ename = epic_d.name
+        epics.add(ename)
+        stories_by_epic[ename] = set()
+
+        for child in epic_d.iterdir():
+            if child.is_dir() and child.name not in IGNORE_DIRS:
+                stories_by_epic[ename].add(child.name)
+
+    return epics, stories_by_epic
+
+
+def main():
+    project = Path(os.environ.get("FREELY_PROJECT_ROOT", os.getcwd()))
+    for arg in sys.argv[1:]:
+        if arg == "--project" or arg == "--project=":
+            continue
+        if arg.startswith("--project="):
+            project = Path(arg.split("=", 1)[1])
+        elif not arg.startswith("--"):
+            project = Path(arg)
+
+    svg_file = project / "docs" / "epics-map.svg"
+    if not svg_file.exists():
+        print(f"[epics-map] ERROR: {svg_file} not found")
+        sys.exit(1)
+
+    svg_epics, svg_stories = parse_svg(svg_file.read_text())
+    fs_epics, fs_stories = walk_epics(project)
+
+    errors = []
+
+    # Compare epics
+    svg_only_epics = svg_epics - fs_epics
+    fs_only_epics = fs_epics - svg_epics
+
+    if svg_only_epics:
+        errors.append(f"SVG 中有但 epics/ 目录不存在的 epic: {', '.join(sorted(svg_only_epics))}")
+    if fs_only_epics:
+        errors.append(f"epics/ 目录中存在但 SVG 中没有的 epic: {', '.join(sorted(fs_only_epics))}")
+
+    # Compare stories per epic
+    for ename in sorted(svg_epics & fs_epics):
+        svg_s = svg_stories.get(ename, set())
+        fs_s = fs_stories.get(ename, set())
+
+        svg_only_stories = svg_s - fs_s
+        fs_only_stories = fs_s - svg_s
+
+        if svg_only_stories:
+            errors.append(f"SVG 中 {ename} 下有但目录不存在的 story: {', '.join(sorted(svg_only_stories))}")
+        if fs_only_stories:
+            errors.append(f"目录中 {ename} 下有但 SVG 中没有的 story: {', '.join(sorted(fs_only_stories))}")
+
+    # Compare counts
+    svg_total = len(svg_epics) + sum(len(s) for s in svg_stories.values())
+    fs_total = len(fs_epics) + sum(len(s) for s in fs_stories.values())
+
+    if errors:
+        print(f"[epics-map] FAILED: SVG 与 epics/ 目录不对齐 ({svg_total} SVG vs {fs_total} FS)")
+        for e in errors:
+            print(f"  - {e}")
+        print(f"  请更新 docs/epics-map.svg 使其与 docs/epics/ 目录树一致")
+        sys.exit(1)
+
+    print(f"[epics-map] OK: {len(svg_epics)} epics, {sum(len(s) for s in svg_stories.values())} stories aligned ({svg_total} total)")
+    sys.exit(0)
+
+
+if __name__ == "__main__":
+    main()

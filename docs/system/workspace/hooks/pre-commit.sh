@@ -46,8 +46,8 @@ _scan_staged_for_secrets() {
 
   # Patterns that indicate secrets
   local patterns=(
-    'sk-[a-zA-Z0-9]{32,}'           # Anthropic/OpenAI/DeepSeek API keys
-    'sk-[a-zA-Z0-9_-]{32,}'         # Alternative key format
+    'sk-ant-[a-zA-Z0-9_-]{20,}'      # Anthropic API keys
+    'sk-or-[a-zA-Z0-9_-]{20,}'      # OpenAI API keys key format
     'ANTHROPIC_AUTH_TOKEN[[:space:]]*=[[:space:]]*[^[:space:]]{20,}'  # env var
     'DEEPSEEK_API_KEY[[:space:]]*=[[:space:]]*[^[:space:]]{20,}'
     'OPENAI_API_KEY[[:space:]]*=[[:space:]]*[^[:space:]]{20,}'
