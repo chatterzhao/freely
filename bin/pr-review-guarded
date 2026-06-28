@@ -95,7 +95,12 @@ echo "PR: #$pr_number"
 
 # ── Step 2: Find review paths ──
 _raw_key=$(echo "$review_branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)
-_issue_id=$(ls -d docs/issues/I-${_raw_key#raw-}-*/ 2>/dev/null | head -1 | sed "s|docs/issues/||;s|/||" || echo "I-${_raw_key#raw-}-A")
+# Find all I-* issues under this raw key (may be split: A, B, C...)
+_all_issues=()
+for _d in docs/issues/I-${_raw_key#raw-}-*/; do
+  [[ -d "$_d" ]] && _all_issues+=("$(basename "$_d" | sed 's|/||')")
+done
+_issue_id="${_all_issues[0]:-I-${_raw_key#raw-}-A}"
 _epic_dir=""
 if [[ -d "docs/issues/$_issue_id" ]]; then
   _verification_dir=$(grep "verification_artifact_dir:" "docs/issues/$_issue_id/issue.md" 2>/dev/null | sed "s/.*: *'*\([^']*\)'*/\1/" | head -1 || true)
