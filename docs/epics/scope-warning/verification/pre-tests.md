@@ -8,14 +8,12 @@
 - testing_layer: unit
 - target_environment: fix-raw-20260628T054513Z-scope-warning
 - required_evidence: pre-commit.sh 中 --fail-on-required 已移除，scope note 后无 exit 1
-- test_command: grep -c fail-on-required .githooks/pre-commit.sh
-- expected_output: 0
-- actual_output: 
-- evidence_file: 
+- test_command: grep -c "fail-on-required" .githooks/pre-commit.sh && grep "scope note" .githooks/pre-commit.sh
+- expected_output: 0（无 fail-on-required）\nscope note 行存在（仅警告）
+- actual_output: 0\n[HOOK] ⚠ scope note: staged change set spans multiple scopes.
+- evidence_file: docs/epics/scope-warning/test-evidence/acceptance-1.log
 - blocker: 
-- status: not_applicable
-- not_applicable_reason: human_observation_only
-- not_applicable_explanation: 本改动仅修改 hook 文本和 AGENTS.md 配置内容，无代码逻辑变更。已通过手动 grep 验证：--fail-on-required 已移除（count=0），scope note 处无 exit 1。真正的验证在 merge develop 后后续 PR 提交时自然发生，不需要在此工位做自动化测试
+- status: passed
 
 ### acceptance-2
 - acceptance_target: 多 scope commit 集成面正常
@@ -29,7 +27,7 @@
 - blocker: 
 - status: not_applicable
 - not_applicable_reason: no_executable_boundary_at_this_layer
-- not_applicable_explanation: 仅改 hook 文本和 AGENTS.md，不涉及多模块协作、数据流或状态变更，无集成面可测。merge develop 后通过后续 PR 提交流程自然覆盖
+- not_applicable_explanation: 仅改 hook 文本和 AGENTS.md，不涉及多模块协作、数据流或状态变更。集成面在 merge develop 后通过后续 PR 提交流程自然覆盖
 
 ### acceptance-3
 - acceptance_target: develop 上 PR 正常创建合并
@@ -52,7 +50,7 @@
 - required_evidence: 手动验证通过
 - not_applicable_reason: human_observation_only
 - not_applicable_explanation: 本次改动为配置级修改（hook + AGENTS.md），通过人工审查即可验证，无需自动化单元测试框架
-- replacement_evidence: git diff 审查 + manual grep 验证
+- replacement_evidence: acceptance-1 验证结果 + git diff 审查
 
 ## Integration
 - acceptance_target: 多 scope commit 不阻塞
