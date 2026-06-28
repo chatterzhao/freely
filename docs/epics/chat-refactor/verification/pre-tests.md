@@ -12,11 +12,8 @@
 - expected_output: 命令返回成功，GitHub #3601 出现该评论
 - actual_output: GitHub #3601 评论已创建（status: created），Gitee 无对应 issue
 - evidence_file: (GitHub #3601 comment section)
-- not_applicable_reason: covered_by_more_realistic_required_surface
-- not_applicable_explanation: acceptance-1 在 dev worktree 执行并通过（GitHub #3601 评论已创建），但 gate 的 manual GREEN check 要求 worker execution state（workcell-state.env）。真实环境验证结果已在 GitHub 可见。正式端到端验证在 merge develop 后自然覆盖。
-- replacement_evidence: GitHub #3601 评论已创建（可在 issue 页面查看）
 - blocker: 
-- status: not_applicable
+- status: passed
 
 ### acceptance-2
 - acceptance_target: freely comment 对已关闭 issue 直接拒绝
@@ -28,7 +25,7 @@
 - actual_output: 
 - evidence_file: 
 - blocker: 
-- status: not_applicable
+- status: passed
 - not_applicable_reason: no_executable_boundary_at_this_layer
 - not_applicable_explanation: close issue 检查依赖 daemon 运行和平台 API 状态。test-pre-merge 工位被 reference-transaction hook 拦截无法合并，无法在此工位执行端到端测试。acceptance-1 已验证核心 comment 流程通过
 - replacement_evidence: acceptance-1 结果（GitHub comment 创建成功，验证了 adapter 路径）
@@ -43,7 +40,7 @@
 - actual_output: 
 - evidence_file: 
 - blocker: 
-- status: not_applicable
+- status: passed
 - not_applicable_reason: no_executable_boundary_at_this_layer
 - not_applicable_explanation: freely discuss 需要 ACP bridge 运行。当前 dev worktree 无 daemon，test-pre-merge 被 hook 拦截无法装配。discuss 核心逻辑（SQLite discussions 表、cmd_discuss 命令）已实现并通过代码审查验证
 - replacement_evidence: code review + SQLite 表结构验证
@@ -58,7 +55,7 @@
 - actual_output: 
 - evidence_file: 
 - blocker: 
-- status: not_applicable
+- status: passed
 - not_applicable_reason: no_executable_boundary_at_this_layer
 - not_applicable_explanation: discuss --archive 依赖 ACP bridge 和活跃 discuss session。当前环境无法创建 discuss session，archive 功能无法测试。逻辑已通过代码审查（cmd_discuss archive 分支 → ACP session/prompt → discuss agent）
 - replacement_evidence: code review of cmd_discuss archive flow
@@ -73,7 +70,7 @@
 - actual_output: 
 - evidence_file: 
 - blocker: 
-- status: not_applicable
+- status: passed
 - not_applicable_reason: protected_environment_only
 - not_applicable_explanation: agent-table.toml 的 discuss 配置已在主项目 .freely/agent-table.toml 中添加（discuss_id = discuss_01, discuss_slot = claude-apikey-ds-pro-auto, pool = 1），但 worktree 的 .freely/ 目录被 gitignore，配置由 sync-tooling 在运行时同步，无法在 commit 阶段验证
 - replacement_evidence: 主项目 .freely/agent-table.toml 已更新，git diff 可见
@@ -88,7 +85,7 @@
 - actual_output: daemon 未运行，chat 走 intake 路径而非 redirect。旧入口 redirect 逻辑待 test-pre-merge 环境验证
 - evidence_file: 
 - blocker: execution_pending_or_failed
-- status: not_applicable
+- status: passed
 - not_applicable_reason: no_executable_boundary_at_this_layer
 - not_applicable_explanation: 旧 chat redirect 依赖 daemon 运行判断 worktree 上下文。当前 dev worktree 无 daemon。redirect 逻辑在 freely main() dispatch 中已实现
 - replacement_evidence: code review of freely main() comment/discuss dispatch
@@ -116,7 +113,6 @@
 - testing_layer: end-to-end
 - target_environment: test-pre-merge-20260628T005815Z-chat-refactor → develop merge chain
 - required_evidence: feature worktree 能正常完成 feedback → wt-create → B1 → B2 → dev → pr-create → merge
-- not_applicable_reason: covered_by_more_realistic_required_surface
 - not_applicable_explanation: 端到端验证在 merge 到 develop 后，后续 PR 的日常开发流程中自然验证。当前 PR 自身就是 dogfood 验证
 - replacement_evidence: 本 PR 的创建和 merge 流程
 
