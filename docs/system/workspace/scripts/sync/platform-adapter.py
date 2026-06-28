@@ -204,7 +204,7 @@ def add_comment(local_id: str, platform_issue_id: str, comment_body: str) -> dic
             elif platform == "gitee":
                 result = subprocess.run(
                     [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
-                     "--repo", _gitee_repo(), "comment", platform_issue_id, comment_body],
+                     "--repo", _gitee_repo(), "comment", platform_issue_id, "--body", comment_body],
                     capture_output=True, text=True
                 )
                 results[platform] = {"status": "created" if result.returncode == 0 else "error"}
@@ -282,8 +282,16 @@ def _comment_via_local_issue(local_id: str, comment_body: str) -> dict[str, dict
             all_results[plat] = {"status": "error", "error": f"no issue_id for platform {plat}"}
             continue
         try:
-            result = add_comment(local_id, str(num), comment_body)
-            all_results.update(result)
+            if plat == "github":
+                _gh("issue", "comment", "--repo", _gh_repo(), str(num), "--body", comment_body)
+                all_results[plat] = {"status": "created"}
+            elif plat == "gitee":
+                result = subprocess.run(
+                    [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
+                     "--repo", _gitee_repo(), "comment", str(num), "--body", comment_body],
+                    capture_output=True, text=True
+                )
+                all_results[plat] = {"status": "created" if result.returncode == 0 else "error"}
         except Exception as e:
             all_results[plat] = {"status": "error", "error": str(e)[:200]}
     return all_results
@@ -406,7 +414,7 @@ def search_raw_issue(raw_key: str) -> dict[str, dict]:
             elif platform == "gitee":
                 result = subprocess.run(
                     [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
-                     "--repo", _gitee_repo(), "list", "--state", "open", "--limit", "50"],
+                     "--repo", _gitee_repo(), "list", "--state", "open", "--per-page", "50"],
                     capture_output=True, text=True
                 )
                 if result.returncode == 0:
