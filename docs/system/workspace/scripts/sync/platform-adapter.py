@@ -167,7 +167,7 @@ def create_issue(local_id: str, title: str, body: str) -> dict[str, dict]:
                 else:
                     # Parse issue number from response
                     output = result.stdout.strip()
-                    m = re.search(r'"number"\s*:\s*(\d+)', output)
+                    m = re.search(r'"number"\s*:\s*"?([^"\s,]+)"?', output)
                     num = m.group(1) if m else "?"
                     results[platform] = {"issue_id": num, "status": "created"}
         except Exception as e:
@@ -264,7 +264,7 @@ def _comment_via_local_issue(local_id: str, comment_body: str) -> dict[str, dict
     if issue_file.exists():
         text = issue_file.read_text(encoding="utf-8")
         for plat in ("github", "gitee"):
-            m = re.search(rf"{plat}:\s*\n\s*issue_id:\s*'?(\d+)'?", text)
+            m = re.search(rf"{plat}:\s*\n\s*issue_id:\s*'?([^'\n]+)'?", text)
             if m:
                 platform_ids[plat] = m.group(1)
     # 2. For configured platforms missing from local file, search by raw-key
@@ -490,7 +490,7 @@ def _resolve_issue_state(local_id: str) -> str:
     if issue_file.exists():
         text = issue_file.read_text(encoding="utf-8")
         for plat in ("github", "gitee"):
-            m = re.search(rf"{plat}:\s*\n\s*issue_id:\s*'?(\d+)'?", text)
+            m = re.search(rf"{plat}:\s*\n\s*issue_id:\s*'?([^'\n]+)'?", text)
             if m:
                 platform_ids[plat] = m.group(1)
     if not platform_ids:
