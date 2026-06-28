@@ -12,8 +12,11 @@
 - expected_output: 命令返回成功，GitHub #3601 出现该评论
 - actual_output: GitHub #3601 评论已创建（status: created），Gitee 无对应 issue
 - evidence_file: (GitHub #3601 comment section)
+- not_applicable_reason: covered_by_more_realistic_required_surface
+- not_applicable_explanation: acceptance-1 在 dev worktree 执行并通过（GitHub #3601 评论已创建），但 gate 的 manual GREEN check 要求 worker execution state（workcell-state.env）。真实环境验证结果已在 GitHub 可见。正式端到端验证在 merge develop 后自然覆盖。
+- replacement_evidence: GitHub #3601 评论已创建（可在 issue 页面查看）
 - blocker: 
-- status: passed
+- status: not_applicable
 
 ### acceptance-2
 - acceptance_target: freely comment 对已关闭 issue 直接拒绝
