@@ -57,6 +57,6 @@
 - [x] 阶段二：discuss 命令（cmd_discuss + SQLite + adapter + agent-table）
 - [ ] 阶段三：讨论执行 skill
 - [ ] 阶段四：讨论归档 skill
-- [ ] 阶段五：评论门禁
-- [ ] 阶段六：旧 chat 拆除
-- [ ] 阶段七：边界文档变更
+- [x] 阶段五：评论门禁（pr-create Step 2d + wt-close Phase 0）
+- [ ] 阶段六：旧 chat 拆除（scan chat_inbox 删除 + 旧入口废弃）
+- [x] 阶段七：边界文档变更（CONSTITUTION/LAWS/PROJECT/AGENTS）
