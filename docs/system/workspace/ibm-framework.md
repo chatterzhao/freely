@@ -154,7 +154,7 @@ docs/issues/
 - 整个命名链：`raw-{key}` → `C-{key}-{suffix}` → `M-{key}-{suffix}` → `I-{key}-{suffix}`
 - 代码中不能自编后缀，必须从 C-* 或 I-* 文件系统 glob 获取
 
-`YYYYMMDDTHHMM[SS]Z` 为 ISO 8601 紧凑型 UTC 时间（秒精度，也可省略秒用分钟精度）。旧格式 `YYYYMMDD-HHMM` 仍兼容。
+`YYYYMMDDTHHMMSSZ` 为 ISO 8601 紧凑型 UTC 时间，精确到秒。旧格式 `YYYYMMDD-HHMM` 仍兼容。
 
 **raw-* 和 I-* 的关系**：
 
