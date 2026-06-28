@@ -115,6 +115,8 @@ if [[ "$caller" == "worker" ]]; then
 	      [[ -f "$_pt" ]] && _pre_tests_text="$(cat "$_pt" 2>/dev/null || true)" && break
 	    done
 	    _diff_summary="$(git diff --stat develop..HEAD 2>/dev/null | head -30 || true)"
+		    _review_file="docs/epics/pr-review-guarded/code-reviews/pr-review-raw-${raw_key}.md"
+		    mkdir -p "$(dirname "$ROOT_DIR/$_review_file")"
 	    cat > "$_pf" << PROMPT
 You are the Freely TDD Reviewer. Load and follow skill:freely-tdd-review.
 
@@ -129,11 +131,12 @@ $_pre_tests_text
 ## Git Diff Summary
 $_diff_summary
 
-## Instructions — skill:freely-tdd-review four-layer review
-1. Clean & Sync — worktree clean? code synced fix↔test?
-2. Code Quality — real test_command? no accidental files? code reasonable?
-3. Completeness — tests cover change surface? actual_output real? evidence exists with content?
-4. Code Safety — code not lost? cherry-pick path complete?
+## Instructions — skill:freely-tdd-review 五层 IBM 链路审查
+1. Raw Issue 问题质量 — 是否是好issue？fix真有问题？feature有价值？
+2. Raw→B1 质量+完整度+安全 — 方案最优？周边全覆盖？无安全隐患？
+3. B1→B2 设计质量 — 产物可追溯？设计可执行？
+4. B2→实现 fidelity+TDD — 代码忠实？覆盖率达标？
+5. 实现→测试 执行完成度 — 全GREEN？evidence真实？tasks收尾？
 
 Output JSON with specific findings in each dimension.
 PROMPT
