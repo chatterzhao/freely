@@ -254,10 +254,12 @@ def close_discussion(session_id: str, platform_ids: dict) -> dict[str, dict]:
 
 
 def _comment_via_local_issue(local_id: str, comment_body: str) -> dict[str, dict]:
-    """Add comment to all platforms by looking up platform_issue_id from local issue.md."""
+    """Add comment to ALL configured platforms. Uses local issue.md platform_ids first,
+    falls back to searching platform by raw-key if a platform's issue_id is missing."""
     raw_key = local_id[4:] if local_id.startswith("raw-") else local_id
     project_root = Path(os.environ.get("FREELY_PROJECT_ROOT", os.getcwd()))
     issue_file = project_root / "docs" / "issues" / f"raw-{raw_key}" / "issue.md"
+    # 1. Read known platform_ids from local issue.md
     platform_ids = {}
     if issue_file.exists():
         text = issue_file.read_text(encoding="utf-8")
@@ -265,15 +267,19 @@ def _comment_via_local_issue(local_id: str, comment_body: str) -> dict[str, dict
             m = re.search(rf"{plat}:\s*\n\s*issue_id:\s*'?(\d+)'?", text)
             if m:
                 platform_ids[plat] = m.group(1)
-    if not platform_ids:
-        results = search_raw_issue(raw_key)
-        for plat, info in results.items():
-            platform_ids[plat] = info.get("issue_number", "")
+    # 2. For configured platforms missing from local file, search by raw-key
+    for plat in available_platforms():
+        if plat not in platform_ids or not platform_ids[plat]:
+            results = search_raw_issue(raw_key)
+            if plat in results:
+                platform_ids[plat] = results[plat].get("issue_number", "")
     if not platform_ids:
         return {"error": "no platform issue found for " + local_id}
+    # 3. Post comment to each platform with its correct issue_id
     all_results = {}
     for plat, num in platform_ids.items():
-        if not num:
+        if not num or num == "?":
+            all_results[plat] = {"status": "error", "error": f"no issue_id for platform {plat}"}
             continue
         try:
             result = add_comment(local_id, str(num), comment_body)
