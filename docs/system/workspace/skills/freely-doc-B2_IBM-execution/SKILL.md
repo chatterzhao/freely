@@ -44,7 +44,7 @@ B2_IBM 不创建 I-{key}。
 | `tasks.md` | 任务分解，关联 owner issue |
 | `code-reviews/` | Implementation Decision Note（decision/why_this/alternatives_considered/boundary_non_goals/residual_risk） |
 
-**I-* issue 完整示例**（`docs/issues/I-{key}-A/issue.md`）：
+**I-* issue 完整示例**（`docs/epics/{epic}/{story}/raw-{raw-key}/issues/I-{raw-key}-A.md`）：
 
 ```markdown
 ---
@@ -231,7 +231,7 @@ phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
 - milestone: M-20260508T011858Z-A
 - source_candidate: docs/pre-brainstorms/20260508T011858Z--skill-gate-alignment/candidates.md#C-20260508T011858Z-A
 - verification_artifact_dir: docs/epics/skill-gate-alignment/code-reviews
-- canonical_issue_path: docs/issues/I-20260508T011858Z-A/issue.md
+- canonical_issue_path: ""
 - title: 简短描述
 
 # I-20260508T011858Z-A: 标题
@@ -245,12 +245,12 @@ phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
 ```markdown
 ---
 issue_id: I-20260508T011858Z-A
-issue_path: docs/issues/I-20260508T011858Z-A/issue.md
+issue_path: docs/epics/skill-gate-alignment/skill-gate-fix/raw-20260508T011858Z/issues/I-20260508T011858Z-A.md
 phase_state: done_b2_ibm
 ---
 
 - issue_id: I-20260508T011858Z-A
-- issue_path: docs/issues/I-20260508T011858Z-A/issue.md
+- issue_path: docs/epics/skill-gate-alignment/skill-gate-fix/raw-20260508T011858Z/issues/I-20260508T011858Z-A.md
 
 ## Implementation Decision Note
 
@@ -271,7 +271,7 @@ phase_state: done_b2_ibm
 - reviewer: cli
 - verdict: pass
 - issue_id: I-20260508T011858Z-A
-- issue_path: docs/issues/I-20260508T011858Z-A/issue.md
+- issue_path: docs/epics/skill-gate-alignment/skill-gate-fix/raw-20260508T011858Z/issues/I-20260508T011858Z-A.md
 
 ## 1. Worktree Check
 - status: pass
