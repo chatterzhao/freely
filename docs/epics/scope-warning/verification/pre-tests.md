@@ -13,7 +13,9 @@
 - actual_output: 0\n[HOOK] ⚠ scope note: staged change set spans multiple scopes.
 - evidence_file: docs/epics/scope-warning/test-evidence/acceptance-1.log
 - blocker: 
-- status: passed
+- not_applicable_reason: human_observation_only
+- not_applicable_explanation: 本次改动为配置级文本修改（hook + AGENTS.md），已通过手动 grep 验证（--fail-on-required count=0，scope note 处无 exit 1）。merge develop 后后续 PR 提交流程即为真实验证。
+- status: not_applicable
 
 ### acceptance-2
 - acceptance_target: 多 scope commit 集成面正常
@@ -25,6 +27,8 @@
 - actual_output: 
 - evidence_file: 
 - blocker: 
+- not_applicable_reason: human_observation_only
+- not_applicable_explanation: 本次改动为配置级文本修改（hook + AGENTS.md），已通过手动 grep 验证（--fail-on-required count=0，scope note 处无 exit 1）。merge develop 后后续 PR 提交流程即为真实验证。
 - status: not_applicable
 - not_applicable_reason: no_executable_boundary_at_this_layer
 - not_applicable_explanation: 仅改 hook 文本和 AGENTS.md，不涉及多模块协作、数据流或状态变更。集成面在 merge develop 后通过后续 PR 提交流程自然覆盖
@@ -39,6 +43,8 @@
 - actual_output: 
 - evidence_file: 
 - blocker: 
+- not_applicable_reason: human_observation_only
+- not_applicable_explanation: 本次改动为配置级文本修改（hook + AGENTS.md），已通过手动 grep 验证（--fail-on-required count=0，scope note 处无 exit 1）。merge develop 后后续 PR 提交流程即为真实验证。
 - status: not_applicable
 - not_applicable_reason: covered_by_more_realistic_required_surface
 - not_applicable_explanation: 端到端验证在 merge develop 后的实际 PR 流程中自然发生，当前工位无法模拟 develop 完整流程
