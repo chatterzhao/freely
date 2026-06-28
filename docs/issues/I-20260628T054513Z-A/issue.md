@@ -6,6 +6,7 @@
 - source_raw: raw-20260628T054513Z
 - verification_artifact_dir: docs/epics/scope-warning/code-reviews
 - canonical_issue_path: docs/issues/I-20260628T054513Z-A/issue.md
+- pre_tests_path: docs/epics/scope-warning/verification/pre-tests.md
 - title: checkpoint-guard scope 硬阻塞 → 建议警告
 
 # I-20260628T054513Z-A: scope 硬阻塞 → 建议警告
