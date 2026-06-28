@@ -47,7 +47,11 @@
 1. `C-20260510T1339Z-A`
 - milestone: M-20260510T1339Z-A; status: promoted
 - promoted_issue_path: `docs/issues/I-20260510T1339Z-A/issue.md`
-### completed_issues
+### committed_issues
+1. `I-20260510T1339Z-A`
+- title: wt-create 创建顺序重构; milestone_state: completed
+- issue_path: `docs/issues/I-20260510T1339Z-A/issue.md`
+- phase_state: `completed`
 
 ## M-20260522T045227Z-A
 - title: C-20260522T045227Z-A
