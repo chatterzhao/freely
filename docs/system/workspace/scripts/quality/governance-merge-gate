@@ -777,7 +777,7 @@ def _validate_raw_issue(issue: IssueRecord, changed_paths: list = None) -> list[
     if phase not in VALID_RAW_PHASES:
         errors.append(
             f"{iid} in {issue.path}: raw issue phase_state '{phase}' is invalid for B1. "
-            f"Valid B1 phases: {', '.join(sorted(VALID_RAW_PHASES))}."
+            f"→ 请阅读 skill:freely-doc-B1_IBM-execution §门禁常见坑速查。Valid B1 phases: {', '.join(sorted(VALID_RAW_PHASES))}."
         )
 
     # 3. Absorbed chain
@@ -806,7 +806,7 @@ def _validate_raw_issue(issue: IssueRecord, changed_paths: list = None) -> list[
         else:
             errors.append(
                 f"{iid} in {issue.path}: phase_state is 'absorbed' but no absorbed_into field. "
-                f"Set absorbed_into to the canonical I-* issue that absorbs this raw."
+                f"→ 请阅读 skill:freely-doc-B1_IBM-execution §门禁常见坑速查。Set absorbed_into to the canonical I-* issue."
             )
 
     # 4. Dropped validation: prevent using "dropped" as a shortcut for completed code merges.
@@ -1463,7 +1463,7 @@ def main() -> int:
             formal_entries = milestone_by_issue_path.get(issue_path, [])
             if not formal_entries:
                 errors.append(
-                    f"{candidate.candidate_id} in {candidate.path} already materialized to {issue_path}, but docs/milestones.md still has no committed/completed issue entry for it. "
+                    f"{candidate.candidate_id} in {candidate.path} already materialized to {issue_path}, → 请阅读 skill:freely-doc-B2_IBM-execution §门禁常见坑速查。Milestones still has no committed/completed issue entry for it. "
                     f"Move the work from milestone candidate_issues into formal issue orchestration before merging to develop."
                 )
             else:
@@ -1482,7 +1482,7 @@ def main() -> int:
 
             if candidate_queue_entries and not formal_entries:
                 errors.append(
-                    f"{candidate.candidate_id} in {candidate.path} is still only represented in milestone candidate_issues even though {issue_path} exists. "
+                    f"{candidate.candidate_id} in {candidate.path} is → 请阅读 skill:freely-doc-B2_IBM-execution §门禁常见坑速查。Still only in milestone candidate_issues even though {issue_path} exists. "
                     f"Once IBM creates I-{key}*, the milestone must sequence those formal issues instead of leaving the candidate as the execution surface."
                 )
 
