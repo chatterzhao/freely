@@ -37,3 +37,10 @@
 ## Overall Verdict
 - verdict: pass
 - notes: Ready for pr-merge-guarded
+
+## Implementation Decision Note
+- decision: 已通过 gate 验证并合并
+- why_this: 按 IBM 流程完成实现
+- alternatives_considered: 无替代方案
+- boundary_non_goals: 无
+- residual_risk: 无

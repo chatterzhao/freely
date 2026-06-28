@@ -39,3 +39,912 @@
 - issue_path: `docs/issues/I-20260627T135126Z-A/issue.md`
 - phase_state: `completed`
 - verification_artifact_dir: `docs/epics/checkpoint-merge-fix/code-reviews`
+
+## M-20260510T1339Z-A-A
+- title: wt-create 创建顺序重构
+- status: completed
+### candidate_issues
+1. `C-20260510T1339Z-A`
+- milestone: M-20260510T1339Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260510T1339Z-A/issue.md`
+### completed_issues
+
+## M-20260522T045227Z-A-A
+- title: C-20260522T045227Z-A
+- status: completed
+### candidate_issues
+1. `C-20260522T045227Z-A`
+- milestone: M-20260522T045227Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260522T045227Z-A/issue.md`
+### completed_issues
+
+## M-20260522T051507Z-A-A
+- title: C-20260522T051507Z-A
+- status: completed
+### candidate_issues
+1. `C-20260522T051507Z-A`
+- milestone: M-20260522T051507Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260522T051507Z-A/issue.md`
+### completed_issues
+
+## M-20260522T053702Z-A-A
+- title: C-20260522T053702Z-A
+- status: completed
+### candidate_issues
+1. `C-20260522T053702Z-A`
+- milestone: M-20260522T053702Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260522T053702Z-A/issue.md`
+### completed_issues
+
+## M-20260522T072450Z-A-A
+- title: C-20260522T072450Z-A
+- status: completed
+### candidate_issues
+1. `C-20260522T072450Z-A`
+- milestone: M-20260522T072450Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260522T072450Z-A/issue.md`
+### completed_issues
+
+## M-20260522T075012Z-A-A
+- title: C-20260522T075012Z-A
+- status: completed
+### candidate_issues
+1. `C-20260522T075012Z-A`
+- milestone: M-20260522T075012Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260522T075012Z-A/issue.md`
+### completed_issues
+
+## M-20260522T075839Z-A-A
+- title: C-20260522T075839Z-A
+- status: completed
+### candidate_issues
+1. `C-20260522T075839Z-A`
+- milestone: M-20260522T075839Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260522T075839Z-A/issue.md`
+### completed_issues
+
+## M-20260522T081853Z-A-A
+- title: C-20260522T081853Z-A
+- status: completed
+### candidate_issues
+1. `C-20260522T081853Z-A`
+- milestone: M-20260522T081853Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260522T081853Z-A/issue.md`
+### completed_issues
+
+## M-20260522T083133Z-A-A
+- title: C-20260522T083133Z-A
+- status: completed
+### candidate_issues
+1. `C-20260522T083133Z-A`
+- milestone: M-20260522T083133Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260522T083133Z-A/issue.md`
+### completed_issues
+
+## M-20260616T030213Z-A-A
+- title: C-20260616T030213Z-A
+- status: completed
+### candidate_issues
+1. `C-20260616T030213Z-A`
+- milestone: M-20260616T030213Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260616T030213Z-A/issue.md`
+### completed_issues
+
+## M-20260616T083810Z-A-A
+- title: C-20260616T083810Z-A
+- status: completed
+### candidate_issues
+1. `C-20260616T083810Z-A`
+- milestone: M-20260616T083810Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260616T083810Z-A/issue.md`
+### completed_issues
+
+## M-20260616T143914Z-A-A
+- title: C-20260616T143914Z-A
+- status: completed
+### candidate_issues
+1. `C-20260616T143914Z-A`
+- milestone: M-20260616T143914Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260616T143914Z-A/issue.md`
+### completed_issues
+
+## M-20260617T051631Z-A-A
+- title: C-20260617T051631Z-A
+- status: completed
+### candidate_issues
+1. `C-20260617T051631Z-A`
+- milestone: M-20260617T051631Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260617T051631Z-A/issue.md`
+### completed_issues
+
+## M-20260617T063755Z-A-A
+- title: A2A Unified Data Flow
+- status: completed
+### candidate_issues
+1. `C-20260617T063755Z-A`
+- milestone: M-20260617T063755Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260617T063755Z-A/issue.md`
+### completed_issues
+
+## M-20260617T095105Z-A-A
+- title: A2A-Native Delegation
+- status: completed
+### candidate_issues
+1. `C-20260617T095105Z-A`
+- milestone: M-20260617T095105Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260617T095105Z-A/issue.md`
+### completed_issues
+
+## M-20260617T130029Z-A-A
+- title: C-20260617T130029Z-A
+- status: completed
+### candidate_issues
+1. `C-20260617T130029Z-A`
+- milestone: M-20260617T130029Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260617T130029Z-A/issue.md`
+### completed_issues
+
+## M-20260617T133709Z-A-A
+- title: C-20260617T133709Z-A
+- status: completed
+### candidate_issues
+1. `C-20260617T133709Z-A`
+- milestone: M-20260617T133709Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260617T133709Z-A/issue.md`
+### completed_issues
+
+## M-20260618T035220Z-A-A
+- title: C-20260618T035220Z-A
+- status: completed
+### candidate_issues
+1. `C-20260618T035220Z-A`
+- milestone: M-20260618T035220Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260618T035220Z-A/issue.md`
+### completed_issues
+
+## M-20260618T054147Z-A-A
+- title: wt-close prune stale tracking refs
+- status: completed
+### candidate_issues
+1. `C-20260618T054147Z-A`
+- milestone: M-20260618T054147Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260618T054147Z-A/issue.md`
+### completed_issues
+
+## M-20260618T065221Z-A-A
+- title: pr-merge local merge + wt-create consistency check
+- status: completed
+### candidate_issues
+1. `C-20260618T065221Z-A`
+- milestone: M-20260618T065221Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260618T065221Z-A/issue.md`
+### completed_issues
+
+## M-20260618T091116Z-A-A
+- title: C-20260618T091116Z-A
+- status: completed
+### candidate_issues
+1. `C-20260618T091116Z-A`
+- milestone: M-20260618T091116Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260618T091116Z-A/issue.md`
+### completed_issues
+
+## M-20260618T091721Z-A-A
+- title: C-20260618T091721Z-A
+- status: completed
+### candidate_issues
+1. `C-20260618T091721Z-A`
+- milestone: M-20260618T091721Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260618T091721Z-A/issue.md`
+### completed_issues
+
+## M-20260619T033758Z-A-A
+- title: login claude 交互式 slot 命名与 alias 创建
+- status: completed
+### candidate_issues
+1. `C-20260619T033758Z-A`
+- milestone: M-20260619T033758Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260619T033758Z-A/issue.md`
+### completed_issues
+
+## M-20260619T043000Z-A-A
+- title: IBM治理快速达标
+- status: completed
+### candidate_issues
+1. `C-20260619T043000Z-A`
+- milestone: M-20260619T043000Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260619T043000Z-A/issue.md`
+### completed_issues
+
+## M-20260619T045410Z-A-A
+- title: PR close timing fix
+- status: completed
+### candidate_issues
+1. `C-20260619T045410Z-A`
+- milestone: M-20260619T045410Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260619T045410Z-A/issue.md`
+### completed_issues
+
+## M-20260619T061448Z-A-A
+- title: C-20260619T061448Z-A
+- status: completed
+### candidate_issues
+1. `C-20260619T061448Z-A`
+- milestone: M-20260619T061448Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260619T061448Z-A/issue.md`
+### completed_issues
+
+## M-20260620T142838Z-A-A
+- title: C-20260620T142838Z-A
+- status: completed
+### candidate_issues
+1. `C-20260620T142838Z-A`
+- milestone: M-20260620T142838Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260620T142838Z-A/issue.md`
+### completed_issues
+
+## M-20260620T142847Z-A-A
+- title: C-20260620T142847Z-A
+- status: completed
+### candidate_issues
+1. `C-20260620T142847Z-A`
+- milestone: M-20260620T142847Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260620T142847Z-A/issue.md`
+### completed_issues
+
+## M-20260621T005656Z-A-A
+- title: C-20260621T005656Z-A
+- status: completed
+### candidate_issues
+1. `C-20260621T005656Z-A`
+- milestone: M-20260621T005656Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260621T005656Z-A/issue.md`
+### completed_issues
+
+## M-20260621T043842Z-A-A
+- title: C-20260621T043842Z-A
+- status: completed
+### candidate_issues
+1. `C-20260621T043842Z-A`
+- milestone: M-20260621T043842Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260621T043842Z-A/issue.md`
+### completed_issues
+
+## M-20260621T063130Z-A-A
+- title: C-20260621T063130Z-A
+- status: completed
+### candidate_issues
+1. `C-20260621T063130Z-A`
+- milestone: M-20260621T063130Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260621T063130Z-A/issue.md`
+### completed_issues
+
+## M-20260621T081426Z-A-A
+- title: C-20260621T081426Z-A
+- status: completed
+### candidate_issues
+1. `C-20260621T081426Z-A`
+- milestone: M-20260621T081426Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260621T081426Z-A/issue.md`
+### completed_issues
+
+## M-20260621T081814Z-A-A
+- title: C-20260621T081814Z-A
+- status: completed
+### candidate_issues
+1. `C-20260621T081814Z-A`
+- milestone: M-20260621T081814Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260621T081814Z-A/issue.md`
+### completed_issues
+
+## M-20260621T090002Z-A-A
+- title: C-20260621T090002Z-A
+- status: completed
+### candidate_issues
+1. `C-20260621T090002Z-A`
+- milestone: M-20260621T090002Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260621T090002Z-A/issue.md`
+### completed_issues
+
+## M-20260621T092609Z-A-A
+- title: C-20260621T092609Z-A
+- status: completed
+### candidate_issues
+1. `C-20260621T092609Z-A`
+- milestone: M-20260621T092609Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260621T092609Z-A/issue.md`
+### completed_issues
+
+## M-20260622T000649Z-A-A
+- title: C-20260622T000649Z-A
+- status: completed
+### candidate_issues
+1. `C-20260622T000649Z-A`
+- milestone: M-20260622T000649Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260622T000649Z-A/issue.md`
+### completed_issues
+
+## M-20260622T003231Z-A-A
+- title: C-20260622T003231Z-A
+- status: completed
+### candidate_issues
+1. `C-20260622T003231Z-A`
+- milestone: M-20260622T003231Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260622T003231Z-A/issue.md`
+### completed_issues
+
+## M-20260622T021126Z-A-A
+- title: C-20260622T021126Z-A
+- status: completed
+### candidate_issues
+1. `C-20260622T021126Z-A`
+- milestone: M-20260622T021126Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260622T021126Z-A/issue.md`
+### completed_issues
+
+## M-20260622T023441Z-A-A
+- title: C-20260622T023441Z-A
+- status: completed
+### candidate_issues
+1. `C-20260622T023441Z-A`
+- milestone: M-20260622T023441Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260622T023441Z-A/issue.md`
+### completed_issues
+
+## M-20260622T024321Z-A-A
+- title: C-20260622T024321Z-A
+- status: completed
+### candidate_issues
+1. `C-20260622T024321Z-A`
+- milestone: M-20260622T024321Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260622T024321Z-A/issue.md`
+### completed_issues
+
+## M-20260622T025044Z-A-A
+- title: C-20260622T025044Z-A
+- status: completed
+### candidate_issues
+1. `C-20260622T025044Z-A`
+- milestone: M-20260622T025044Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260622T025044Z-A/issue.md`
+### completed_issues
+
+## M-20260622T025736Z-A-A
+- title: C-20260622T025736Z-A
+- status: completed
+### candidate_issues
+1. `C-20260622T025736Z-A`
+- milestone: M-20260622T025736Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260622T025736Z-A/issue.md`
+### completed_issues
+
+## M-20260622T031557Z-A-A
+- title: C-20260622T031557Z-A
+- status: completed
+### candidate_issues
+1. `C-20260622T031557Z-A`
+- milestone: M-20260622T031557Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260622T031557Z-A/issue.md`
+### completed_issues
+
+## M-20260622T100348Z-A-A
+- title: C-20260622T100348Z-A
+- status: completed
+### candidate_issues
+1. `C-20260622T100348Z-A`
+- milestone: M-20260622T100348Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260622T100348Z-A/issue.md`
+### completed_issues
+
+## M-20260622T104129Z-A-A
+- title: C-20260622T104129Z-A
+- status: completed
+### candidate_issues
+1. `C-20260622T104129Z-A`
+- milestone: M-20260622T104129Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260622T104129Z-A/issue.md`
+### completed_issues
+
+## M-20260622T110050Z-A-A
+- title: C-20260622T110050Z-A
+- status: completed
+### candidate_issues
+1. `C-20260622T110050Z-A`
+- milestone: M-20260622T110050Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260622T110050Z-A/issue.md`
+### completed_issues
+
+## M-20260622T113847Z-A-A
+- title: C-20260622T113847Z-A
+- status: completed
+### candidate_issues
+1. `C-20260622T113847Z-A`
+- milestone: M-20260622T113847Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260622T113847Z-A/issue.md`
+### completed_issues
+
+## M-20260622T114625Z-A-A
+- title: C-20260622T114625Z-A
+- status: completed
+### candidate_issues
+1. `C-20260622T114625Z-A`
+- milestone: M-20260622T114625Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260622T114625Z-A/issue.md`
+### completed_issues
+
+## M-20260622T115249Z-A-A
+- title: C-20260622T115249Z-A
+- status: completed
+### candidate_issues
+1. `C-20260622T115249Z-A`
+- milestone: M-20260622T115249Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260622T115249Z-A/issue.md`
+### completed_issues
+
+## M-20260622T120046Z-A-A
+- title: C-20260622T120046Z-A
+- status: completed
+### candidate_issues
+1. `C-20260622T120046Z-A`
+- milestone: M-20260622T120046Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260622T120046Z-A/issue.md`
+### completed_issues
+
+## M-20260622T123204Z-A-A
+- title: C-20260622T123204Z-A
+- status: completed
+### candidate_issues
+1. `C-20260622T123204Z-A`
+- milestone: M-20260622T123204Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260622T123204Z-A/issue.md`
+### completed_issues
+
+## M-20260622T131109Z-A-A
+- title: C-20260622T131109Z-A
+- status: completed
+### candidate_issues
+1. `C-20260622T131109Z-A`
+- milestone: M-20260622T131109Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260622T131109Z-A/issue.md`
+### completed_issues
+
+## M-20260623T022909Z-A-A
+- title: C-20260623T022909Z-A
+- status: completed
+### candidate_issues
+1. `C-20260623T022909Z-A`
+- milestone: M-20260623T022909Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260623T022909Z-A/issue.md`
+### completed_issues
+
+## M-20260623T075200Z-A-A
+- title: ACP usage workaround
+- status: completed
+### candidate_issues
+1. `C-20260623T075200Z-A`
+- milestone: M-20260623T075200Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260623T075200Z-A/issue.md`
+### completed_issues
+
+## M-20260623T100903Z-A-A
+- title: 彻底实现 SSE — SSE 客户端 + 替代轮询 + 废弃 delivery_status
+- status: completed
+### candidate_issues
+1. `C-20260623T100903Z-A`
+- milestone: M-20260623T100903Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260623T100903Z-A/issue.md`
+### completed_issues
+
+## M-20260623T140410Z-A-A
+- title: _restore_tasks 重启恢复——状态修正 + 环境恢复
+- status: completed
+### candidate_issues
+1. `C-20260623T140410Z-A`
+- milestone: M-20260623T140410Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260623T140410Z-A/issue.md`
+### completed_issues
+
+## M-20260623T162226Z-A-A
+- title: L0-L3 兜底死循环检测
+- status: completed
+### candidate_issues
+1. `C-20260623T162226Z-A`
+- milestone: M-20260623T162226Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260623T162226Z-A/issue.md`
+### completed_issues
+
+## M-20260623T162243Z-A-A
+- title: scan_state 输出到 Manager prompt
+- status: completed
+### candidate_issues
+1. `C-20260623T162243Z-A`
+- milestone: M-20260623T162243Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260623T162243Z-A/issue.md`
+### completed_issues
+
+## M-20260624T004510Z-A-A
+- title: deploy-skills opencode 通配符修复 + registry 驱动默认 tool
+- status: completed
+### candidate_issues
+1. `C-20260624T004510Z-A`
+- milestone: M-20260624T004510Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T004510Z-A/issue.md`
+### completed_issues
+
+## M-20260624T004524Z-A-A
+- title: A2A server _restore_tasks 异步化
+- status: completed
+### candidate_issues
+1. `C-20260624T004524Z-A`
+- milestone: M-20260624T004524Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T004524Z-A/issue.md`
+### completed_issues
+
+## M-20260624T013737Z-A-A
+- title: tool-registry.json5 → TOML 基础层（Phase 1+2）
+- status: completed
+### candidate_issues
+1. `C-20260624T013737Z-A`
+- milestone: M-20260624T013737Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T013737Z-A/issue.md`
+### completed_issues
+
+## M-20260624T055231Z-A-A
+- title: 彻底移除 JSON5 回退
+- status: completed
+### candidate_issues
+1. `C-20260624T055231Z-A`
+- milestone: M-20260624T055231Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T055231Z-A/issue.md`
+### completed_issues
+
+## M-20260624T061532Z-A-A
+- title: tool-registry-query.py 清理 JSON5 dead code
+- status: completed
+### candidate_issues
+1. `C-20260624T061532Z-A`
+- milestone: M-20260624T061532Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T061532Z-A/issue.md`
+### completed_issues
+
+## M-20260624T062756Z-A-A
+- title: tools.md json5 → toml
+- status: completed
+### candidate_issues
+1. `C-20260624T062756Z-A`
+- milestone: M-20260624T062756Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T062756Z-A/issue.md`
+### completed_issues
+
+## M-20260624T072546Z-A-A
+- title: 平台硬编码报错修复
+- status: completed
+### candidate_issues
+1. `C-20260624T072546Z-A`
+- milestone: M-20260624T072546Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T072546Z-A/issue.md`
+### completed_issues
+
+## M-20260624T081358Z-A-A
+- title: 测试文档 daemon 假设修复
+- status: completed
+### candidate_issues
+1. `C-20260624T081358Z-A`
+- milestone: M-20260624T081358Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T081358Z-A/issue.md`
+### completed_issues
+
+## M-20260624T081419Z-A-A
+- title: fix-execution cp→git stash 工作流优化
+- status: completed
+### candidate_issues
+1. `C-20260624T081419Z-A`
+- milestone: M-20260624T081419Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T081419Z-A/issue.md`
+### completed_issues
+
+## M-20260624T085740Z-A-A
+- title: parse + prompt fix
+- status: completed
+### candidate_issues
+1. `C-20260624T085740Z-A`
+- milestone: M-20260624T085740Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T085740Z-A/issue.md`
+### completed_issues
+
+## M-20260624T090635Z-A-A
+- title: adapter/ACP dispatch/launch_kind 注册表驱动化
+- status: completed
+### candidate_issues
+1. `C-20260624T090635Z-A`
+- milestone: M-20260624T090635Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T090635Z-A/issue.md`
+### completed_issues
+
+## M-20260624T090651Z-A-A
+- title: probe/resume registry-driven
+- status: completed
+### candidate_issues
+1. `C-20260624T090651Z-A`
+- milestone: M-20260624T090651Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T090651Z-A/issue.md`
+### completed_issues
+
+## M-20260624T090654Z-A-A
+- title: ai-cli generic
+- status: completed
+### candidate_issues
+1. `C-20260624T090654Z-A`
+- milestone: M-20260624T090654Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T090654Z-A/issue.md`
+### completed_issues
+
+## M-20260624T092822Z-A-A
+- title: Cline CLI registry 配置
+- status: completed
+### candidate_issues
+1. `C-20260624T092822Z-A`
+- milestone: M-20260624T092822Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T092822Z-A/issue.md`
+### completed_issues
+
+## M-20260624T104229Z-A-A
+- title: wt-create success → read skill
+- status: completed
+### candidate_issues
+1. `C-20260624T104229Z-A`
+- milestone: M-20260624T104229Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T104229Z-A/issue.md`
+### completed_issues
+
+## M-20260624T104233Z-A-A
+- title: AGENTS.md 中测试硬编码改为 pre-tests.md 委托
+- status: completed
+### candidate_issues
+1. `C-20260624T104233Z-A`
+- milestone: M-20260624T104233Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T104233Z-A/issue.md`
+### completed_issues
+
+## M-20260624T105442Z-A-A
+- title: wt-close -d develop ref
+- status: completed
+### candidate_issues
+1. `C-20260624T105442Z-A`
+- milestone: M-20260624T105442Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T105442Z-A/issue.md`
+### completed_issues
+
+## M-20260624T141559Z-A-A
+- title: cmd_feedback 对齐 issue-sync 多平台架构
+- status: completed
+### candidate_issues
+1. `C-20260624T141559Z-A`
+- milestone: M-20260624T141559Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T141559Z-A/issue.md`
+### completed_issues
+
+## M-20260624T151020Z-A-A
+- title: wt-close gate 传参修复
+- status: completed
+### candidate_issues
+1. `C-20260624T151020Z-A`
+- milestone: M-20260624T151020Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T151020Z-A/issue.md`
+### completed_issues
+
+## M-20260624T152500Z-A-A
+- title: C-20260624T152500Z-A
+- status: completed
+### candidate_issues
+1. `C-20260624T152500Z-A`
+- milestone: M-20260624T152500Z-A-A; status: promoted
+- promoted_issue_path: `docs/epics/pr-create-pretests-check/issues/I-20260624T152500Z-A.md`
+### completed_issues
+
+## M-20260624T154500Z-A-A
+- title: runtime py chmod
+- status: completed
+### candidate_issues
+1. `C-20260624T154500Z-A`
+- milestone: M-20260624T154500Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T154500Z-A/issue.md`
+### completed_issues
+
+## M-20260624T155212Z-A-A
+- title: pretests-retirement-gate fallback for missing workcell-state.env
+- status: completed
+### candidate_issues
+1. `C-20260624T155212Z-A`
+- milestone: M-20260624T155212Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T155212Z-A/issue.md`
+### completed_issues
+
+## M-20260624T235907Z-A-A
+- title: RED/GREEN separation
+- status: completed
+### candidate_issues
+1. `C-20260624T235907Z-A`
+- milestone: M-20260624T235907Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260624T235907Z-A/issue.md`
+### completed_issues
+
+## M-20260625T000114Z-A-A
+- title: C-20260625T000114Z-A
+- status: completed
+### candidate_issues
+1. `C-20260625T000114Z-A`
+- milestone: M-20260625T000114Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260625T000114Z-A/issue.md`
+### completed_issues
+
+## M-20260625T003331Z-A-A
+- title: feedback platform-only
+- status: completed
+### candidate_issues
+1. `C-20260625T003331Z-A`
+- milestone: M-20260625T003331Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260625T003331Z-A/issue.md`
+### completed_issues
+
+## M-20260625T012435Z-A-A
+- title: test-pre-merge allow merges
+- status: completed
+### candidate_issues
+1. `C-20260625T012435Z-A`
+- milestone: M-20260625T012435Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260625T012435Z-A/issue.md`
+### completed_issues
+
+## M-20260625T020000Z-A-A
+- title: gate error skill guidance
+- status: completed
+### candidate_issues
+1. `C-20260625T020000Z-A`
+- milestone: M-20260625T020000Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260625T020000Z-A/issue.md`
+### completed_issues
+
+## M-20260625T020333Z-A-A
+- title: --force abandon-only
+- status: completed
+### candidate_issues
+1. `C-20260625T020333Z-A`
+- milestone: M-20260625T020333Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260625T020333Z-A/issue.md`
+### completed_issues
+
+## M-20260625T030147Z-A-A
+- title: auto-detect platforms
+- status: completed
+### candidate_issues
+1. `C-20260625T030147Z-A`
+- milestone: M-20260625T030147Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260625T030147Z-A/issue.md`
+### completed_issues
+
+## M-20260625T031400Z-A-A
+- title: feedback adapter fix
+- status: completed
+### candidate_issues
+1. `C-20260625T031400Z-A`
+- milestone: M-20260625T031400Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260625T031400Z-A/issue.md`
+### completed_issues
+
+## M-20260625T045400Z-A-A
+- title: adapter CLI
+- status: completed
+### candidate_issues
+1. `C-20260625T045400Z-A`
+- milestone: M-20260625T045400Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260625T045400Z-A/issue.md`
+### completed_issues
+
+## M-20260625T045412Z-A-A
+- title: migrate to adapter
+- status: completed
+### candidate_issues
+1. `C-20260625T045412Z-A`
+- milestone: M-20260625T045412Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260625T045412Z-A/issue.md`
+### completed_issues
+
+## M-20260625T050000Z-A-A
+- title: C-20260625T050000Z-A
+- status: completed
+### candidate_issues
+1. `C-20260625T050000Z-A`
+- milestone: M-20260625T050000Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260625T050000Z-A/issue.md`
+### completed_issues
+
+## M-20260625T081835Z-A-A
+- title: C-20260625T081835Z-A
+- status: completed
+### candidate_issues
+1. `C-20260625T081835Z-A`
+- milestone: M-20260625T081835Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260625T081835Z-A/issue.md`
+### completed_issues
+
+## M-20260625T084506Z-A-A
+- title: B2_IBM skill 反糊弄铁律
+- status: completed
+### candidate_issues
+1. `C-20260625T084506Z-A`
+- milestone: M-20260625T084506Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260625T084506Z-A/issue.md`
+### completed_issues
+
+## M-20260625T084522Z-A-A
+- title: test-execution skill 反 ghost pass
+- status: completed
+### candidate_issues
+1. `C-20260625T084522Z-A`
+- milestone: M-20260625T084522Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260625T084522Z-A/issue.md`
+### completed_issues
+
+## M-20260625T131154Z-A-A
+- title: pr-create-guarded rebase 替代 merge
+- status: completed
+### candidate_issues
+1. `C-20260625T131154Z-A`
+- milestone: M-20260625T131154Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260625T131154Z-A/issue.md`
+### completed_issues
+
+## M-20260625T153111Z-A-A
+- title: agent-table.toml 多 agent 分身注册
+- status: completed
+### candidate_issues
+1. `C-20260625T153111Z-A`
+- milestone: M-20260625T153111Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260625T153111Z-A/issue.md`
+### completed_issues
+
+## M-20260627T062554Z-A-A
+- title: task-lifecycle-scan v3 — 三分类重构
+- status: completed
+### candidate_issues
+1. `C-20260627T062554Z-A`
+- milestone: M-20260627T062554Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260627T062554Z-A/issue.md`
+### completed_issues
+
+## M-20260627T084523Z-A-A
+- title: Agent 生命周期管理 — 僵尸清理、并发控制、session 关闭
+- status: completed
+### candidate_issues
+1. `C-20260627T084523Z-A`
+- milestone: M-20260627T084523Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260627T084523Z-A/issue.md`
+### completed_issues
+
+## M-20260627T084545Z-A-A
+- title: a2a_tasks agent_id 改具体编号 + 字段补全
+- status: completed
+### candidate_issues
+1. `C-20260627T084545Z-A`
+- milestone: M-20260627T084545Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260627T084545Z-A/issue.md`
+### completed_issues
+
+## M-20260627T084551Z-A-A
+- title: run-acp-prompt.py fork 改用 session/fork
+- status: completed
+### candidate_issues
+1. `C-20260627T084551Z-A`
+- milestone: M-20260627T084551Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260627T084551Z-A/issue.md`
+### completed_issues
+
+## M-20260627T121248Z-A-A
+- title: a2a worker_pid + manager check fix
+- status: completed
+### candidate_issues
+1. `C-20260627T121248Z-A`
+- milestone: M-20260627T121248Z-A-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260627T121248Z-A/issue.md`
+### completed_issues
