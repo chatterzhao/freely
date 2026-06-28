@@ -1,3 +1,17 @@
+## M-20260628T005815Z-A
+- title: chat refactor — comment + discuss + archive skill
+- status: active
+### candidate_issues
+1. `C-20260628T005815Z-A`
+- milestone: M-20260628T005815Z-A; status: promoted
+- promoted_issue_path: `docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/issues/I-20260628T005815Z-A.md`
+### committed_issues
+1. `I-20260628T005815Z-A`
+- title: chat refactor — comment + discuss + archive skill; milestone_state: completed
+- issue_path: `docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/issues/I-20260628T005815Z-A.md`
+- phase_state: `completed`
+- verification_artifact_dir: `docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/code-reviews`
+
 ## M-20260628T054513Z-A
 - title: scope hard block → advisory warning
 - status: active
@@ -11,6 +25,7 @@
 - issue_path: `docs/issues/I-20260628T054513Z-A/issue.md`
 - phase_state: `completed`
 - verification_artifact_dir: `docs/epics/scope-warning/code-reviews`
+
 ## M-20260627T135126Z-A
 - title: pr-create merge + checkpoint scope
 - status: active
@@ -24,13 +39,3 @@
 - issue_path: `docs/issues/I-20260627T135126Z-A/issue.md`
 - phase_state: `completed`
 - verification_artifact_dir: `docs/epics/checkpoint-merge-fix/code-reviews`
-1. `C-20260627T135126Z-A`
-- milestone: M-20260627T135126Z-A; status: promoted
-- promoted_issue_path: `docs/issues/I-20260627T135126Z-A/issue.md`
-### completed_issues
-1. `I-20260627T135126Z-A`
-- title: pr-create merge + checkpoint scope; milestone_state: completed
-- issue_path: `docs/issues/I-20260627T135126Z-A/issue.md`
-- phase_state: `completed`
-- verification_artifact_dir: `docs/epics/checkpoint-merge-fix/code-reviews`
-

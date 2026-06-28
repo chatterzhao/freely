@@ -95,7 +95,12 @@ echo "PR: #$pr_number"
 
 # ── Step 2: Find review paths ──
 _raw_key=$(echo "$review_branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)
-_issue_id="I-${_raw_key#raw-}-A"
+# Find all I-* issues under this raw key (may be split: A, B, C...)
+_all_issues=()
+for _d in docs/issues/I-${_raw_key#raw-}-*/; do
+  [[ -d "$_d" ]] && _all_issues+=("$(basename "$_d" | sed 's|/||')")
+done
+_issue_id="${_all_issues[0]:-I-${_raw_key#raw-}-A}"
 _epic_dir=""
 if [[ -d "docs/issues/$_issue_id" ]]; then
   _verification_dir=$(grep "verification_artifact_dir:" "docs/issues/$_issue_id/issue.md" 2>/dev/null | sed "s/.*: *'*\([^']*\)'*/\1/" | head -1 || true)
@@ -121,41 +126,34 @@ if [[ -f "$ROOT_DIR/.freely/agent-id.env" ]]; then
 fi
 [[ -z "$_my_worker_id" ]] && _my_worker_id="worker_01"
   if [[ -x "$ROOT_DIR/bin/freely-review" ]]; then
-  "$ROOT_DIR/bin/freely-review" --caller worker --agent-id "$_my_worker_id" --raw-key "$_raw_key" || { echo "Review FAILED"; exit 1; }
-  _review_round=1
-  _review_verdict="pass"
-  _review_summary="freely-review passed (ACP fallback)"
-  
-  # Write review document
-  _now=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-  mkdir -p "$(dirname "$ROOT_DIR/$review_file")"
-  cat > "$ROOT_DIR/$review_file" << REVIEWDOC
-# PR Review: #$pr_number
-- pr_number: $pr_number
-- branch: $review_branch
-- base: $base
-- reviewer: tdd-agent (freely-review)
-- review_date: $_now
-- verdict: pass
-- rounds: $_review_round
-- issue_id: $_issue_id
-## Overall Verdict
-- verdict: pass
-- notes: Ready for pr-merge-guarded
-REVIEWDOC
-  echo "Review document: $review_file"
-  git -C "$ROOT_DIR" add "$review_file" 2>/dev/null || true
-  if ! git -C "$ROOT_DIR" diff --cached --quiet 2>/dev/null; then
-    git -C "$ROOT_DIR" commit -m "review: pr-review-guarded verdict=pass for PR #$pr_number (TDD rounds=$_review_round)
-Co-Authored-By: Claude <noreply@anthropic.com>" 2>/dev/null || true
-    echo "Review document committed."
-    for platform in $(_platform_configs); do
-      remote=$(_platform_remote_name "$platform")
-      echo "  [$platform] pushing review commit..."
-      git -C "$ROOT_DIR" push "$remote" "$review_branch" 2>&1 || true
-    done
+  # freely-review launches reviewer agent with full context.
+  # Review doc is written by the reviewer agent (via freely-review output), not auto-generated here.
+  _review_output=$("$ROOT_DIR/bin/freely-review" --caller worker --agent-id "$_my_worker_id" --raw-key "$_raw_key" 2>&1) || _freely_rc=$?
+  _review_verdict="fail"
+  # Parse verdict from reviewer output
+  _verdict_line=$(echo "$_review_output" | grep -i "verdict.*pass\|verdict.*fail" | head -1 || true)
+  if echo "$_verdict_line" | grep -qi "pass"; then
+    _review_verdict="pass"
   fi
-  exit 0
+  if [[ "$_review_verdict" == "pass" ]]; then
+    echo "Review PASSED"
+    # Review doc should already exist from freely-review, just commit it
+    if [[ -f "$ROOT_DIR/$review_file" ]]; then
+      git -C "$ROOT_DIR" add "$review_file" 2>/dev/null || true
+      if ! git -C "$ROOT_DIR" diff --cached --quiet 2>/dev/null; then
+        git -C "$ROOT_DIR" commit -m "review: pr-review-guarded verdict=pass for $review_branch
+Co-Authored-By: Claude <noreply@anthropic.com>" 2>/dev/null || true
+        for platform in $(_platform_configs); do
+          remote=$(_platform_remote_name "$platform")
+          git -C "$ROOT_DIR" push "$remote" "$review_branch" 2>&1 || true
+        done
+      fi
+    fi
+    exit 0
+  else
+    echo "Review FAILED — see review output above for findings and fix suggestions"
+    exit 1
+  fi
 fi
 # Fallback
 if [[ -z "$REVIEWER_SLOT" ]]; then
@@ -299,99 +297,56 @@ if [[ -n "$_acp_bridge_socket" ]] && [[ -x "$ACP_PROMPT_CLIENT" ]]; then
   if [[ -n "$_new_session_id" ]]; then
     _review_session_id="$_new_session_id"
   fi
-else
-  echo "[WARN] ACP bridge not available — running legacy 6-dimension review"
-
-  # Legacy fallback: run the original 6-dimension checks
-  pass_count=0
-  fail_count=0
-  review_body=""
-
-  check_dimension() {
-    local dim="$1" status="$2" evidence="$3"
-    if [[ "$status" == "pass" || "$status" == "n/a" ]]; then
-      ((pass_count++))
-      echo "  ✅ $dim: $status"
-    else
-      ((fail_count++))
-      echo "  ❌ $dim: $status"
-    fi
-    review_body+="## $dim
-- status: $status
-- evidence: $evidence
-
-"
-  }
-
-  echo ""
-  echo "Review dimensions:"
-  echo ""
-
-  # 1. Worktree check
-  if [[ -n "$_wt_path" ]]; then
-    if git -C "$_wt_path" diff --quiet 2>/dev/null && git -C "$_wt_path" diff --cached --quiet 2>/dev/null; then
-      check_dimension "1. Worktree Check" "pass" "clean"
-    else
-      check_dimension "1. Worktree Check" "fail" "dirty"
-    fi
   else
-    check_dimension "1. Worktree Check" "pass" "no worktree"
-  fi
+    echo "[INFO] ACP bridge 不可用，需人工审查"
+    echo ""
+    echo "  请加载 skill:freely-tdd-review，按五层 IBM 链路逐级审查："
+    echo "  第一层 Raw Issue — 问题质量：这是好 issue 吗？"
+    echo "  第二层 Raw→B1 — 质量+完整度+安全：方案最优？周边全覆盖？无隐患？"
+    echo "  第三层 B1→B2 — 设计质量：产物可追溯？设计可执行？"
+    echo "  第四层 B2→实现 — 实现 fidelity+TDD 覆盖率"
+    echo "  第五层 实现→测试 — 执行完成度：全 GREEN？evidence 真实？"
+    echo ""
+    echo "  审查结论按 skill 输出格式写入: $review_file"
+    echo "  上下文文件: $REVIEW_STATE_DIR/review-guide.txt"
+    echo ""
+    _review_guide="$REVIEW_STATE_DIR/review-guide.txt"
+    cat > "$_review_guide" << GUIDEOF
+=== 人工审查指南 ===
+ACP bridge 不可用，请人工执行审查。
 
-  # 2. IBM Completeness
-  if [[ -x "$ROOT_DIR/bin/governance-merge-gate" ]]; then
-    if "$ROOT_DIR/bin/governance-merge-gate" --range "$base..$review_branch" >/dev/null 2>&1; then
-      check_dimension "2. IBM Completeness" "pass" "passed"
-    else
-      check_dimension "2. IBM Completeness" "fail" "see governance-merge-gate"
-    fi
-  else
-    check_dimension "2. IBM Completeness" "n/a" "gate not available"
-  fi
+审查 Skill: skill:freely-tdd-review（五层 IBM 链路逐级审查）
+审查结论写入: $review_file
 
-  # 3. Code Review Evidence
-  _found_impl=false
-  for _d in docs/epics/*/code-reviews/; do
-    if [[ -f "${_d}implementation-decision-note.md" ]] || [[ -f "${_d}implementation-decision.md" ]]; then
-      _found_impl=true
-      check_dimension "3. Code Review Evidence" "pass" "found"
-      break
-    fi
-  done
-  [[ "$_found_impl" != "true" ]] && check_dimension "3. Code Review Evidence" "fail" "not found"
+=== 审查上下文 ===
+Branch: $review_branch → $base
+Raw Key: $_raw_key
+涉及文件: docs/issues/raw-${_raw_key}/issue.md
+         docs/pre-brainstorms/${_raw_key}--*/brainstorms.md
+         docs/pre-brainstorms/${_raw_key}--*/candidates.md
+         docs/issues/I-${_raw_key}-*/issue.md
+         docs/epics/*/brainstorms/b-I-${_raw_key}-*.md
+         docs/epics/*/prd.md
+         docs/epics/*/verification/pre-tests.md
+         docs/epics/*/tasks.md
+         docs/epics/*/code-reviews/
+         git diff $base..$review_branch
 
-  # 4. Pre-test Evidence
-  if [[ -n "$_pre_tests_file" ]]; then
-    check_dimension "4. Pre-test Evidence" "pass" "$_pre_tests_file"
-  else
-    check_dimension "4. Pre-test Evidence" "fail" "no pre-tests.md"
-  fi
+=== 审查步骤 ===
+1. 加载 skill:freely-tdd-review
+2. 从 raw issue 开始，逐级向下审查
+3. 每级检查：下层是否忠实消化了上层？
+4. 失败必须给出具体理由和修复建议——不能说"不达标"三个字
+5. 审查结论写入 $review_file（格式见 skill 输出格式）
 
-  # 5. Receipt Integrity
-  check_dimension "5. Receipt Integrity" "n/a" "not checked in fallback"
-
-  # 6. Phase State
-  if [[ -n "$_raw_key" ]] && [[ -f "docs/issues/$_raw_key/issue.md" ]]; then
-    _phase=$(grep "phase_state:" "docs/issues/$_raw_key/issue.md" 2>/dev/null | head -1 | sed 's/.*: *//' | tr -d "'\"")
-    if [[ "$_phase" == "absorbed" ]]; then
-      check_dimension "6. Phase State" "pass" "absorbed"
-    else
-      check_dimension "6. Phase State" "fail" "$_phase"
-    fi
-  else
-    check_dimension "6. Phase State" "n/a" "no raw issue"
-  fi
-
-  if [[ "$fail_count" -eq 0 ]]; then
-    _review_verdict="pass"
-    _review_summary="Legacy 6-dimension review: $pass_count/$((pass_count+fail_count)) passed"
-  else
-    _review_verdict="fail"
-    _review_summary="Legacy review: $fail_count dimension(s) failed"
-  fi
-  _acp_used=0  # fallback: skip ACP output parsing below
-  _review_json="{}"  # placeholder for fallback path
-  fi  # End ACP bridge available check
+=== 审查通过后 ===
+./bin/pr-merge-guarded $base $review_branch
+GUIDEOF
+    _review_verdict="manual_required"
+    _review_summary="ACP bridge unavailable — manual review via skill:freely-tdd-review. See $_review_guide"
+    _acp_used=0
+    _review_json="{}"
+    fi  # End ACP bridge available check
 
 # Parse verdict from Reviewer output (only when ACP was actually used)
 if [[ "${_acp_used:-1}" != "0" ]]; then

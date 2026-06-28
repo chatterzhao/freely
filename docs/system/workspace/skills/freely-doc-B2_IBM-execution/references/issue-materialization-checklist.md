@@ -17,11 +17,51 @@
 
 ## Stable ownership required
 
-写 IBM 正式产物前，必须先确认：
+写 IBM 正式产物前，必须先确定 `epic-name` 和 `story-name`。
 
-- `epic-name`
-- `story-name`
-- `issue-name`
+### 目录结构
+
+```
+docs/epics/{epic-name}/                               ← epic：一个能力域
+└── {story-name}/                                     ← story：子交付批次
+    └── raw-{raw-key}/                                ← 一个 raw issue 的全部 B2 产物
+        ├── issues/I-{raw-key}-{suffix}.md            ← I-* issue（B2 物化）
+        ├── brainstorms/b-I-{raw-key}-{suffix}.md      ← B2 头脑风暴
+        ├── prd.md                                    ← 本 raw 的需求设计
+        ├── verification/
+        │   ├── pre-tests.md                          ← 本 raw 的测试计划
+        │   └── tasks.md                              ← 本 raw 的任务分解
+        └── code-reviews/                             ← 本 raw 的审查产物
+```
+
+**命名约定**：
+- `raw-{raw-key}` = 完整的 raw issue local_id，如 `raw-20260628T005815Z`。`raw-` 是 raw issue 的前缀，`{raw-key}` 是时间戳 key（`YYYYMMDDTHHMMSSZ`）。**目录名必须是完整的 `raw-{raw-key}`**，不是去掉前缀的 `{raw-key}`
+- I-* 命名继承 raw key + suffix：`I-{raw-key}-{suffix}`，如 `I-20260628T005815Z-A`
+- b-I-* 命名同 I-*：`b-I-{raw-key}-{suffix}`
+
+**规则**：
+- 一个 epic 放多个 story；一个 story 放多个 `raw-{raw-key}` 目录
+- 新 raw → 看归哪个已有 story（如重构 story、修复 story），或新建 story
+- 同名 `raw-{raw-key}` → 续到已有 story 下的已有目录
+- 门禁检查：目录名 `raw-{raw-key}` 与 `docs/issues/raw-{raw-key}/` 的 raw issue 不匹配 → 拦截
+- 门禁检查：I-* 文件名中的 `{raw-key}` 与目录名不一致 → 拦截
+
+### 如何确定 epic-name 和 story-name
+
+1. **读取 `docs/epics-map.svg`**：了解现有 epic 和 story 的全貌
+2. **从 candidate 提取关键词**：取 candidate title 的核心能力名词，转为 kebab-case slug
+3. **搜索已有 epic**：
+   - 关键词匹配已有 epic 名 → 用已有 epic
+   - 已有 epic 下有 story → 判断本批次是否可归入已有 story，还是需要新建 story
+   - 无匹配 → 新建 epic（kebab-case，简短描述能力域，如 `chat-refactor`）
+4. **新建 story 的命名**：`{epic-name}` 下的子交付 slug，如 `comment-module`
+5. **更新 `docs/epics-map.svg`**：新建或变更 epic/story 后必须更新 SVG，门禁会检查对齐
+
+### 需确认的字段
+
+- `epic-name` — 本 I-* 归属的能力域
+- `story-name` — 本 I-* 归属的子交付批次（平铺时可省略）
+- `issue-name` — I-* 文件名（继承 `I-{key}-{suffix}`）
 - 当前 `M-{issue-id}` 是否需要拆成多个 `I-{issue-id}*`
 - 若拆成多个 issue，它们在 milestone 中的阶段归属与排序
 

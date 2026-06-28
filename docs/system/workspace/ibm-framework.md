@@ -137,8 +137,24 @@ docs/issues/
     └── issue.md
 ```
 
-ID 格式：`raw-YYYYMMDDTHHMM[SS]Z`（新，推荐）或 `raw-YYYYMMDD-HHMM`（旧，仍兼容）。
-`YYYYMMDDTHHMM[SS]Z` 为 ISO 8601 紧凑型 UTC 时间（秒精度，也可省略秒用分钟精度）。
+### ID 命名规范
+
+四种 issue 共享同一 `{key}`，逐级继承，从 C-* 开始带 `{suffix}`：
+
+| 类型 | 命名 | 生成阶段 | 说明 |
+|------|------|---------|------|
+| `raw-{key}` | `key` = UTC 创建时间戳，如 `20260505T101010Z` | feedback / 平台扫描 | 对外联络的平台 issue |
+| `C-{key}-{suffix}` | 继承 raw key，加后缀 A/B/C… | B1 预研 | 候选 issue。一个 raw 可拆为多个 C-* |
+| `M-{key}-{suffix}` | 与 C-* 同名 | B1 里程碑编排 | 进入里程碑的候选。未被丢弃的 C-* |
+| `I-{key}-{suffix}` | 与 M-* 同名 | B2 物化 | 当前里程碑正在开发的正式 issue。由 B2 skill 物化到 `docs/issues/` |
+
+**关键规则**：
+- `{key}` 从 raw issue 取（`raw-` 前缀之后的部分）
+- `{suffix}` 从 C-* issue 取（第一个 `-` 之后的部分），如 `C-20260505T101010Z-A` → suffix = `A`
+- 整个命名链：`raw-{key}` → `C-{key}-{suffix}` → `M-{key}-{suffix}` → `I-{key}-{suffix}`
+- 代码中不能自编后缀，必须从 C-* 或 I-* 文件系统 glob 获取
+
+`YYYYMMDDTHHMMSSZ` 为 ISO 8601 紧凑型 UTC 时间，精确到秒。旧格式 `YYYYMMDD-HHMM` 仍兼容。
 
 **raw-* 和 I-* 的关系**：
 

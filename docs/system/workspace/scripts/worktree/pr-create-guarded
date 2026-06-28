@@ -88,8 +88,21 @@ PHASE
   fi
 fi
 
+# ── Step 2a: epics-map alignment check ──
+echo "Step 2a/4: epics-map alignment..."
+if [[ -x "$ROOT_DIR/bin/check-epics-map" ]]; then
+  "$ROOT_DIR/bin/check-epics-map" --project "$ROOT_DIR" || {
+    echo ""
+    echo "epics-map 门禁未通过。请更新 docs/epics-map.svg 后重试。"
+    exit 1
+  }
+else
+  echo "[WARN] check-epics-map not found, skipping"
+fi
+echo ""
+
 # ── Step 2: dry-run merge gate ──
-echo "Step 2/4: dry-run merge gate..."
+echo "Step 2b/4: dry-run merge gate..."
 if [[ -x "$ROOT_DIR/bin/pr-merge-guarded" ]]; then
   "$ROOT_DIR/bin/pr-merge-guarded" --dry-run "$base" "$current_branch"
   if [[ $? -ne 0 ]]; then
@@ -106,7 +119,7 @@ fi
 # Catches missing IBM lifecycle artifacts (candidate, I-*, milestone)
 # BEFORE pushing and creating PR — gives developer clear fix instructions.
 echo ""
-echo "Step 2b/4: IBM governance gate..."
+echo "Step 2c/4: IBM governance gate..."
 if [[ -x "$ROOT_DIR/bin/governance-merge-gate" ]]; then
   set +e
   gate_output="$("$ROOT_DIR/bin/governance-merge-gate" --range "$base..HEAD" 2>&1)"
@@ -170,7 +183,7 @@ echo ""
 # ── Step 2c: Pretests execution evidence check ──
 # Checks that pretests execution evidence exists before allowing PR creation.
 # Mirrors the check in wt-close to catch untested code before PR creation.
-echo "Step 2c/4: pretests execution evidence check..."
+echo "Step 2d/4: pretests execution evidence check..."
 # Use the current worktree as both project (for issue/doc lookup) and worktree path
 # (for runtime evidence). During development, governance files live in the worktree
 # alongside the code changes, so the worktree root is the correct project root here.
@@ -212,6 +225,44 @@ PRETEST_GATE_BLOCKED
 else
   echo "[WARN] pretests-retirement-gate not found, skipping pretests evidence check"
 fi
+echo ""
+
+# ── Step 2d: Comment resolution check ──
+# Scans raw issue comments on all platforms. Blocks PR if any human comment
+# lacks a resolution sub-comment (adopted/discarded).
+echo "Step 2e/4: comment resolution check..."
+_comment_check_failed=0
+for _raw_file in $(find "$ROOT_DIR/docs/issues" -maxdepth 2 -name "issue.md" -path "*/raw-*" 2>/dev/null); do
+  _raw_text="$(cat "$_raw_file")"
+  # Check for human comments without resolution
+  _unresolved=$(echo "$_raw_text" | grep -c "^### comment-" 2>/dev/null || true)
+  _resolved=$(echo "$_raw_text" | grep -c "^#### resolution-" 2>/dev/null || true)
+  if [[ "$_unresolved" -gt "$_resolved" ]]; then
+    _raw_id=$(basename "$(dirname "$_raw_file")")
+    echo "  $_raw_id: $_unresolved comments, $_resolved resolutions — $_((_unresolved - _resolved)) unresolved"
+    _comment_check_failed=1
+  fi
+done
+if [[ "$_comment_check_failed" -eq 1 ]]; then
+  cat >&2 <<COMMENT_GATE_BLOCKED
+========================================
+评论 resolution 检查未通过
+
+以上 raw issue 存在未标记 resolution 的评论。
+每条人类评论必须有子评论标记 adopted（采纳）或 discarded（丢弃）。
+
+修复方式：
+  对每条未处理评论，在 issue.md 中添加：
+  #### resolution-{timestamp}
+  - status: adopted | discarded
+  - reason: <理由>
+  - resolved_by: <agent_id>
+
+========================================
+COMMENT_GATE_BLOCKED
+  exit 1
+fi
+echo "  all comments resolved"
 echo ""
 
 # ── Gate-passed marker ──

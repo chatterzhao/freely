@@ -104,7 +104,7 @@
 ## 2A. 来源与路由边界（硬性要求）
 
 判定规则：
-1. 原始发现源包括：`PROJECT_INTENT`、chat/session evidence、test、code-review、github-issue、治理漂移、运行时异常。
+1. 原始发现源包括：`PROJECT_INTENT`、comment/discuss session evidence、test、code-review、github-issue、治理漂移、运行时异常。
 2. 原始发现源必须先在合适的 dedicated worktree 中进入 `pre-brainstorm`，产出 candidate，再由 milestone 承接；不得直接伪装成 ready issue。
 3. `milestones.md` 是编排来源，不是原始发现源。
 4. `milestone.candidate_issues` 只能继续研究或进入 B2，不得默认直接进入 dev-loop。

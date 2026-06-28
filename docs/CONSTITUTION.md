@@ -6,7 +6,7 @@
 
 Freely 是一个自主循环运行器：
 - 启动后 AI 担任项目所有者角色。
-- AI 从项目意图、review、test、开发进度文档、chat 输入与会话证据（人类或自治）中产出或修改候选 Issue；AI 通过 task-source-scan 发现待委派任务，通过 a2a_tasks 表查询进行中任务；里程碑仅提供排序和追踪；而非固定从单一任务列表
+- AI 从项目意图、review、test、开发进度文档、comment/discuss 输入与会话证据（人类或自治）中产出或修改候选 Issue；AI 通过 task-source-scan 发现待委派任务，通过 a2a_tasks 表查询进行中任务；里程碑仅提供排序和追踪；而非固定从单一任务列表
 - AI 自主管理：获取 Issue → 文档 → 开发 → 验收 → 获取 Issue 的闭环
 - AI 持续运行（自己监控ai工具崩溃/阻塞自动触发续接），除非明确停止。或找不到需求，或者出现重大事故 AI 自己已经无力自己解决。
 
@@ -245,7 +245,7 @@ Freely 自身的产品形态必须满足以下硬边界：
 1. `Freely core` 是被各宿主壳复用的能力本体。
 2. `Freely CLI` 是 canonical product shell。
 3. `Freely TUI app` 与 `Freely GUI app` 若存在，只能作为复用同一 core 的 optional shells。
-4. `chat`、`init`、`start`、`baseline-status`、`live-status`、`fleet-status` 属于 command / semantic surface，不得与 `CLI shell`、`TUI shell`、`GUI app` 作为同层 product shell 并列。
+4. `comment / discuss`、`init`、`start`、`baseline-status`、`live-status`、`fleet-status` 属于 command / semantic surface，不得与 `CLI shell`、`TUI shell`、`GUI app` 作为同层 product shell 并列。
 5. 外部 AI tools（如 `codex`、`Claude Code`、MCP 组合路径）属于 external AI tooling layer，由 Freely core 编排；execution-provider abstraction 只存在于该层的路由/选择语义中；它们不是 Freely 自身的 product shell。
 6. 任一 shell 不得引入绕开 core 的私有业务语义。
 

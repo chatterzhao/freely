@@ -107,12 +107,45 @@ if [[ "$caller" == "worker" ]]; then
   done
 
   if [[ -n "$_acp_sock" && -x "$ACP_CLIENT" ]]; then
-    _pf="$ROOT_DIR/.freely/run/review-prompt.txt"
-    cat > "$_pf" << PROMPT
-You are the Freely TDD Reviewer (skill:freely-tdd-review).
-Work in $_test_wt. Review pre-tests.md and evidence files.
-Follow the four-layer review: Clean&Sync → Code Quality → Completeness → Code Safety.
-Output JSON: { "verdict": "pass"|"fail", "dimensions": {...}, "required_fixes": [...] }
+	    _raw_issue_file="docs/issues/raw-${raw_key}/issue.md"
+	    _raw_issue_text=""
+	    [[ -f "$_raw_issue_file" ]] && _raw_issue_text="$(head -80 "$_raw_issue_file" 2>/dev/null || true)"
+	    _pre_tests_text=""
+	    for _pt in docs/epics/*/verification/pre-tests.md; do
+	      [[ -f "$_pt" ]] && _pre_tests_text="$(cat "$_pt" 2>/dev/null || true)" && break
+	    done
+	    _diff_summary="$(git diff --stat develop..HEAD 2>/dev/null | head -30 || true)"
+		    _issue_id="I-${raw_key}-A"
+		    _epic_dir=""
+		    if [[ -d "docs/issues/$_issue_id" ]]; then
+		      _verification_dir=$(grep "verification_artifact_dir:" "docs/issues/$_issue_id/issue.md" 2>/dev/null | sed "s/.*: *'*\([^']*\)'*/\1/" | head -1 || true)
+		      [[ -n "$_verification_dir" && -d "$_verification_dir" ]] && _epic_dir="$_verification_dir"
+		    fi
+		    [[ -z "$_epic_dir" ]] && _epic_dir="docs/epics/pr-review-guarded/code-reviews"
+		    _review_file="$_epic_dir/pr-review-raw-${raw_key}.md"
+		    mkdir -p "$(dirname "$_review_file")"
+	    cat > "$_pf" << PROMPT
+You are the Freely TDD Reviewer. Load and follow skill:freely-tdd-review.
+
+Review is NOT a gate — examine content quality, not file existence.
+
+## Raw Issue Context
+$_raw_issue_text
+
+## Pre-tests.md (the test plan)
+$_pre_tests_text
+
+## Git Diff Summary
+$_diff_summary
+
+## Instructions — skill:freely-tdd-review 五层 IBM 链路审查
+1. Raw Issue 问题质量 — 是否是好issue？fix真有问题？feature有价值？
+2. Raw→B1 质量+完整度+安全 — 方案最优？周边全覆盖？无安全隐患？
+3. B1→B2 设计质量 — 产物可追溯？设计可执行？
+4. B2→实现 fidelity+TDD — 代码忠实？覆盖率达标？
+5. 实现→测试 执行完成度 — 全GREEN？evidence真实？tasks收尾？
+
+Output JSON with specific findings in each dimension.
 PROMPT
     _output=$(python3 "$ACP_CLIENT" --bridge-socket "$_acp_sock" --prompt-file "$_pf" \
       --launch-kind fresh --session-id "review-$raw_key" --model "$reviewer_slot" 2>&1) || true

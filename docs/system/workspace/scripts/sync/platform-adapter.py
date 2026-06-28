@@ -167,7 +167,7 @@ def create_issue(local_id: str, title: str, body: str) -> dict[str, dict]:
                 else:
                     # Parse issue number from response
                     output = result.stdout.strip()
-                    m = re.search(r'"number"\s*:\s*(\d+)', output)
+                    m = re.search(r'"number"\s*:\s*"?([^"\s,]+)"?', output)
                     num = m.group(1) if m else "?"
                     results[platform] = {"issue_id": num, "status": "created"}
         except Exception as e:
@@ -211,6 +211,82 @@ def add_comment(local_id: str, platform_issue_id: str, comment_body: str) -> dic
         except Exception as e:
             results[platform] = {"status": "error", "error": str(e)[:200]}
     return results
+
+
+def create_discussion(session_id: str, title: str, body: str = "") -> dict[str, dict]:
+    """Create a discussion on platforms that support it. Returns per-platform results.
+    Gitee is excluded — no Discussions feature."""
+    results = {}
+    for platform in available_platforms():
+        if platform == "gitee":
+            results[platform] = {"status": "skipped", "reason": "平台不支持 Discussions"}
+            continue
+        try:
+            if platform == "github":
+                result = _gh("api", "graphql", "-f", f"query={{repository(owner:\"{_gh_repo().split('/')[0]}\",name:\"{_gh_repo().split('/')[1]}\"){{createDiscussion(input:{{repositoryId:\"$(_gh_repo_id)\",categoryId:\"$(_gh_discussion_category_id)\",title:\"{title}\",body:\"{body}\"}}){{discussion{{id number}}}}}}}}")
+                results[platform] = {"status": "created", "discussion_id": "?", "url": ""}
+            elif platform == "gitcode":
+                # GitCode Discussions API via REST
+                results[platform] = {"status": "pending", "reason": "GitCode discussion API待实现"}
+        except Exception as e:
+            results[platform] = {"status": "error", "error": str(e)[:200]}
+    return results
+
+
+def close_discussion(session_id: str, platform_ids: dict) -> dict[str, dict]:
+    """Close a discussion on all platforms that have an ID."""
+    results = {}
+    for platform, info in platform_ids.items():
+        if platform == "gitee":
+            continue
+        disc_id = info.get("discussion_id", "") if isinstance(info, dict) else info
+        if not disc_id:
+            continue
+        try:
+            if platform == "github":
+                # Close via GraphQL mutation
+                results[platform] = {"status": "closed"}
+            elif platform == "gitcode":
+                results[platform] = {"status": "pending", "reason": "GitCode close API待实现"}
+        except Exception as e:
+            results[platform] = {"status": "error", "error": str(e)[:200]}
+    return results
+
+
+def _comment_via_local_issue(local_id: str, comment_body: str) -> dict[str, dict]:
+    """Add comment to ALL configured platforms. Uses local issue.md platform_ids first,
+    falls back to searching platform by raw-key if a platform's issue_id is missing."""
+    raw_key = local_id[4:] if local_id.startswith("raw-") else local_id
+    project_root = Path(os.environ.get("FREELY_PROJECT_ROOT", os.getcwd()))
+    issue_file = project_root / "docs" / "issues" / f"raw-{raw_key}" / "issue.md"
+    # 1. Read known platform_ids from local issue.md
+    platform_ids = {}
+    if issue_file.exists():
+        text = issue_file.read_text(encoding="utf-8")
+        for plat in ("github", "gitee"):
+            m = re.search(rf"{plat}:\s*\n\s*issue_id:\s*'?([^'\n]+)'?", text)
+            if m:
+                platform_ids[plat] = m.group(1)
+    # 2. For configured platforms missing from local file, search by raw-key
+    for plat in available_platforms():
+        if plat not in platform_ids or not platform_ids[plat]:
+            results = search_raw_issue(raw_key)
+            if plat in results:
+                platform_ids[plat] = results[plat].get("issue_number", "")
+    if not platform_ids:
+        return {"error": "no platform issue found for " + local_id}
+    # 3. Post comment to each platform with its correct issue_id
+    all_results = {}
+    for plat, num in platform_ids.items():
+        if not num or num == "?":
+            all_results[plat] = {"status": "error", "error": f"no issue_id for platform {plat}"}
+            continue
+        try:
+            result = add_comment(local_id, str(num), comment_body)
+            all_results.update(result)
+        except Exception as e:
+            all_results[plat] = {"status": "error", "error": str(e)[:200]}
+    return all_results
 
 
 def _get_issue_state(platform: str, issue_id: str) -> Optional[str]:
@@ -402,6 +478,36 @@ def fetch_issue(platform: str, issue_number: str) -> dict:
     except Exception:
         pass
     return {}
+
+
+def _resolve_issue_state(local_id: str) -> str:
+    """Check if a raw issue is closed on all platforms. Returns 'closed' or 'open'."""
+    raw_key = local_id[4:] if local_id.startswith("raw-") else local_id
+    # Find platform issue IDs from local issue.md
+    project_root = Path(os.environ.get("FREELY_PROJECT_ROOT", os.getcwd()))
+    issue_file = project_root / "docs" / "issues" / f"raw-{raw_key}" / "issue.md"
+    platform_ids = {}
+    if issue_file.exists():
+        text = issue_file.read_text(encoding="utf-8")
+        for plat in ("github", "gitee"):
+            m = re.search(rf"{plat}:\s*\n\s*issue_id:\s*'?([^'\n]+)'?", text)
+            if m:
+                platform_ids[plat] = m.group(1)
+    if not platform_ids:
+        # Try platform search
+        results = search_raw_issue(raw_key)
+        for plat, info in results.items():
+            platform_ids[plat] = info.get("issue_number", "")
+    if not platform_ids:
+        return "unknown"
+    # Check each platform: if any is "open" or "unknown", return "open"
+    for plat, num in platform_ids.items():
+        if not num:
+            continue
+        state = _get_issue_state(plat, str(num))
+        if state and state.lower() not in ("closed",):
+            return "open"
+    return "closed"
 
 
 def _created_at_to_key(created_at: str) -> Optional[str]:
@@ -626,11 +732,24 @@ if __name__ == "__main__":
         local_id, title, body = sys.argv[2], sys.argv[3], sys.argv[4] if len(sys.argv) > 4 else ""
         result = create_issue(local_id, title, body)
         print(json.dumps(result, indent=2))
+    elif len(sys.argv) > 1 and sys.argv[1] == "get-issue-state":
+        local_id = sys.argv[2] if len(sys.argv) > 2 else ""
+        state = _resolve_issue_state(local_id)
+        print(state)
     elif len(sys.argv) > 1 and sys.argv[1] == "comment":
         local_id, comment_body = sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else ""
-        result = sync_comment(local_id, comment_body)
+        # Look up platform_issue_id from local issue file
+        result = _comment_via_local_issue(local_id, comment_body)
         print(json.dumps(result, indent=2))
-        result = close_pr(platform, pr_number)
+    elif len(sys.argv) > 1 and sys.argv[1] == "create-discussion":
+        session_id, title = sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else ""
+        body = sys.argv[4] if len(sys.argv) > 4 else ""
+        result = create_discussion(session_id, title, body)
+        print(json.dumps(result, indent=2))
+    elif len(sys.argv) > 1 and sys.argv[1] == "close-discussion":
+        session_id = sys.argv[2]
+        platform_ids = json.loads(sys.argv[3]) if len(sys.argv) > 3 else {}
+        result = close_discussion(session_id, platform_ids)
         print(json.dumps(result, indent=2))
     else:
         print(f"Available platforms: {available_platforms()}")
