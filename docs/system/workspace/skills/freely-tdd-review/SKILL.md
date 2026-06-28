@@ -43,11 +43,12 @@ pre-tests ──→ 测试执行（全 GREEN + 真实 evidence）
 
 ## 四层逐级审查
 
-### 第一层：Raw → B1 — 问题到决策的消化
+### 第一层：Raw → B1 —— 评审面：完整度
 
-> raw issue 描述问题 → brainstorms 分析问题并做出决策 → candidate 结晶决策为可执行候选
+> 链路：raw issue（问题）→ brainstorms（分析/决策）→ candidate（结晶）
+> 评审面：**完整度**——B1 是否完整覆盖了 raw？决策有依据吗？scope 合理吗？
 
-**核心问题**：candidate 能不能忠实归纳出 brainstorms 的结论？brainstorms 有没有遗漏 raw issue 的重要方面？
+**核心问题**：brainstorms 是否逐一分析了 raw 的每个问题点？candidate 是否忠实结晶了 brainstorms 的决策？raw 没有遗漏、brainstorms 没有走过场、candidate 没有曲解。
 
 | 检查项 | 怎么审 |
 |--------|--------|
@@ -61,11 +62,12 @@ pre-tests ──→ 测试执行（全 GREEN + 真实 evidence）
 - candidate 曲解了 brainstorms 的哪个决策，正确的 acceptance_criteria 应该是什么
 - scope 为什么不合理，应该拆成几个 candidate、每个的边界是什么
 
-### 第二层：B1 → B2 — 决策到设计的消化
+### 第二层：B1 → B2 —— 评审面：设计质量
 
-> candidate → I-* issue（正式任务）→ B2 brainstorms（实现分析）→ prd/pre-tests/tasks/code-review（具体设计文档）
+> 链路：candidate → I-* issue → B2 brainstorms → prd/pre-tests/tasks/code-review
+> 评审面：**设计质量**——B2 产物的设计是否忠实、可追溯、可执行？
 
-**核心问题**：B2 的每份文档能不能追溯到 candidate 的意图？prd 的设计能不能从 b-I-*.md 的分析中推导出来？
+**核心问题**：从 prd 能否归纳出 B2 brainstorms 的设计决策？从 pre-tests 能否追溯到 prd 的模块需求？每个 B2 产物是否都有上级来源，没有凭空出现也没有遗漏？设计是否具体到可以指导实现？
 
 | 检查项 | 怎么审 |
 |--------|--------|
@@ -81,11 +83,12 @@ pre-tests ──→ 测试执行（全 GREEN + 真实 evidence）
 - b-I-*.md 和 I-* 的对应关系是否正确
 - pre-tests 遗漏了哪个改动面，应该增加什么测试，建议 test_command 示例
 
-### 第三层：B2 → 实现 — TDD 测试驱动实现
+### 第三层：B2 → 实现 —— 评审面：实现 fidelity + TDD 覆盖率
 
-> prd + pre-tests + tasks → 实际代码
+> 链路：prd + pre-tests + tasks → 实际代码
+> 评审面：**实现 fidelity**——代码是否忠实于设计？**TDD 覆盖率**——测试是否充分驱动了实现？
 
-**核心问题**：代码是否严格按照 pre-tests 的测试指导来驱动实现（TDD）？实现是否忠实于 prd 和 tasks 的设计？
+**核心问题**：diff 中的每个改动是否在 pre-tests 中有对应验证？pre-tests 的每条 acceptance 是否在代码中有对应实现？有无 scope creep（实现了设计没写的）或遗漏（设计写了但没实现）？覆盖率是否达标——不只是"有一个测试"，而是改动面被充分覆盖？
 
 | 检查项 | 怎么审 |
 |--------|--------|
@@ -99,11 +102,12 @@ pre-tests ──→ 测试执行（全 GREEN + 真实 evidence）
 - 哪些代码偏离了 prd 的设计，正确的实现方向是什么
 - 哪个 task 没有对应的代码变更，是遗漏还是不需要
 
-### 第四层：实现 → 测试 — 执行完成度
+### 第四层：实现 → 测试 —— 评审面：执行完成度
 
-> pre-tests → 实际执行 → evidence → GREEN
+> 链路：pre-tests → 实际执行 → evidence → GREEN
+> 评审面：**执行完成度**——测试是否全部执行、全部通过？证据是否真实？tasks 是否全部收尾？
 
-**核心问题**：pre-tests 是否全部执行？执行结果是否真实？tasks 是否全部完成？
+**核心问题**：pre-tests 的每条 acceptance 的 status 是 passed（或合理 not_applicable）还是 pending/failed？actual_output 是真实执行结果还是占位符？evidence_file 指向的文件存在且内容可信吗？tasks.md 的每个子任务都有对应产出吗？
 
 | 检查项 | 怎么审 |
 |--------|--------|
