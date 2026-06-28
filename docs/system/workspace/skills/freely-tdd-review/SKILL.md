@@ -29,6 +29,7 @@ raw issue ──→ B1（brainstorms → candidate → I-*）──→ B2（prd/
 
 ### 第一层：Raw Issue —— 评审面：问题质量
 
+> 涉及文件：`docs/issues/raw-{key}/issue.md`
 > 评审 raw issue 本身是否是一个好 issue。不是所有 issue 都值得做。
 
 | 检查项 | 怎么审 |
@@ -44,7 +45,8 @@ raw issue ──→ B1（brainstorms → candidate → I-*）──→ B2（prd/
 
 ### 第二层：Raw → B1 —— 评审面：质量 + 完整度 + 安全
 
-> 链路：raw issue → brainstorms → candidate → I-* issue
+> 链路：`raw issue` → `brainstorms.md` → `candidates.md` → milestones.md → `I-* issue`
+> 涉及文件：`docs/issues/raw-{key}/issue.md`、`docs/pre-brainstorms/{key}--{slug}/brainstorms.md`、`docs/pre-brainstorms/{key}--{slug}/candidates.md`、`docs/milestones.md`、`docs/issues/I-{key}-A/issue.md`
 > 这是最关键的预研层。brainstorms 必须真正理解问题并产出最佳方案。
 
 #### 质量
@@ -77,7 +79,8 @@ raw issue ──→ B1（brainstorms → candidate → I-*）──→ B2（prd/
 
 ### 第三层：B1 → B2 —— 评审面：设计质量
 
-> 链路：I-* issue → B2 brainstorms（b-I-*.md）→ prd / pre-tests / tasks / code-review
+> 链路：`I-* issue` → `b-I-*.md` → `prd.md` / `pre-tests.md` / `tasks.md` / `code-reviews/` + milestones.md
+> 涉及文件：`docs/issues/I-{key}-A/issue.md`、`docs/epics/{epic}/brainstorms/b-I-{key}-A.md`、`docs/epics/{epic}/prd.md`、`docs/epics/{epic}/verification/pre-tests.md`、`docs/epics/{epic}/tasks.md`、`docs/epics/{epic}/code-reviews/implementation-decision-note.md`、`docs/milestones.md`
 > B2 将 B1 的决策展开为具体可执行的设计文档。
 
 | 检查项 | 怎么审 |
@@ -93,7 +96,8 @@ raw issue ──→ B1（brainstorms → candidate → I-*）──→ B2（prd/
 
 ### 第四层：B2 → 实现 —— 评审面：实现 fidelity + TDD 覆盖率
 
-> 链路：prd / pre-tests / tasks → 实际代码
+> 链路：`prd.md` / `pre-tests.md` / `tasks.md` → 实际代码（`git diff develop..HEAD`） + `docs/progress/{epic}/p-{issue}.md`
+> 涉及文件：以上 B2 产物 + `git diff` + progress 文档
 
 | 检查项 | 怎么审 |
 |--------|--------|
@@ -105,7 +109,8 @@ raw issue ──→ B1（brainstorms → candidate → I-*）──→ B2（prd/
 
 ### 第五层：实现 → 测试 —— 评审面：执行完成度
 
-> 链路：pre-tests → 实际执行 → evidence → GREEN
+> 链路：`pre-tests.md` → 实际执行 → `evidence_file` → GREEN + `tasks.md` 收尾
+> 涉及文件：`docs/epics/{epic}/verification/pre-tests.md`、evidence 文件、`docs/epics/{epic}/tasks.md`
 
 | 检查项 | 怎么审 |
 |--------|--------|
