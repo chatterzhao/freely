@@ -73,6 +73,9 @@
 - target_environment: fix/raw-20260628T182243Z-code-path-structure-update worktree
 - required_evidence: 4条acceptance item的grep输出均为预期结果
 - blocker_taxonomy: execution_pending_or_failed
+- not_applicable_reason: covered_by_more_realistic_required_surface
+- not_applicable_explanation: 单元测试的具体test_command+expected_output+actual_output+evidence_file已覆盖在 ## Acceptance Items 的 AT-001 至 AT-004 中，每条均可独立验证
+- replacement_evidence: 见 ## Acceptance Items AT-001~AT-004 的 grep 证据文件
 
 ## Integration
 - acceptance_target: not applicable — 纯路径字符串更新，无模块间集成面
