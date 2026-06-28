@@ -58,6 +58,23 @@ scan 没有发现任务时，写 `stop_ai` 并说明原因。不要循环重启�
 - `freely feedback --repo <user/repo> --title "..." --body "..."` — 创建 raw issue 到 GitHub 平台
 - raw issue 创建后，scan 下次 patrol 会扫到并创建工位
 
+## 提交与 Scope
+
+### 提交规范
+
+- 一个 commit 对应一个逻辑变更，聚焦一个 issue
+- 一个逻辑修改，即使有 50 个文件，也合理，比如查找替换变量名，或者函数改名等
+- 3 个不相关逻辑功能混在一起提交，即使一个文件也是违规
+- 按逻辑完整性判，不按文件数判
+
+### Scope 警告
+
+`git commit` 时 checkpoint-guard 会输出 scope 诊断（不阻塞提交）。出现警告时，按上述提交规范评审：
+
+- 修改属于同一个逻辑变更 → 继续提交
+- 不同逻辑功能混在一起 → 拆分为多个 commit
+- 不确定 → 运行 `./bin/checkpoint-guard --staged-only` 查看详情
+
 ## 命名约定
 
 `raw-key` 是 `YYYYMMDDTHHMM[SS]Z` 格式的时间戳。`raw-{raw-key}` 即 `raw-YYYYMMDDTHHMM[SS]Z`，就是 raw issue 的 local_id。

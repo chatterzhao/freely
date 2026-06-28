@@ -154,6 +154,7 @@ Freely 开发 Freely 时，默认先问四件事：
 阶段2: [skill] skill:freely-doc-B1_IBM-execution（brainstorm → candidate → promote/absorb/drop）
 阶段3: [skill] skill:freely-doc-B2_IBM-execution（I-* → prd/pre-tests/tasks/code-reviews）
 阶段4: [skill] skill:freely-dev-loop-execution（写代码 → RED-GREEN 验证 → commit）
+> commit 时 checkpoint-guard 输出 scope 诊断（不阻塞）。一个逻辑修改即使 50 个文件也合理，不相关逻辑混在一起即使 1 个文件也违规。按逻辑完整性判，不按文件数判。
 阶段5: [skill] skill:freely-test-execution（test-pre-merge 工位逐条执行 pre-tests → 全绿）
 阶段6: [命令] ./bin/pr-create-guarded → pull develop → 冲突处理 → dry-run gate → push → platform-adapter
 阶段7: [命令] ./bin/pr-review-guarded → 6 维 review → verdict 文档

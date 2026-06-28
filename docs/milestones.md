@@ -12,6 +12,20 @@
 - phase_state: `done_b2_ibm`
 - verification_artifact_dir: `docs/epics/chat-refactor/code-reviews`
 
+## M-20260628T054513Z-A
+- title: scope hard block → advisory warning
+- status: active
+### candidate_issues
+1. `C-20260628T054513Z-A`
+- milestone: M-20260628T054513Z-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260628T054513Z-A/issue.md`
+### completed_issues
+1. `I-20260628T054513Z-A`
+- title: scope hard block → advisory warning; milestone_state: completed
+- issue_path: `docs/issues/I-20260628T054513Z-A/issue.md`
+- phase_state: `completed`
+- verification_artifact_dir: `docs/epics/scope-warning/code-reviews`
+
 ## M-20260627T135126Z-A
 - title: pr-create merge + checkpoint scope
 - status: active
@@ -25,4 +39,3 @@
 - issue_path: `docs/issues/I-20260627T135126Z-A/issue.md`
 - phase_state: `completed`
 - verification_artifact_dir: `docs/epics/checkpoint-merge-fix/code-reviews`
-
