@@ -67,10 +67,10 @@ promotion_gate = sys.argv[6]
 ISSUE_RE = re.compile(r"^docs/epics/.+/issues/[^/]+\.md$")
 REQUIRED_SECTION_NAMES = ("Unit", "Integration", "End-to-End", "Real-Environment")
 REQUIRED_SECTION_SCALARS = (
-    "acceptance target",
-    "testing layer",
-    "target environment",
-    "required evidence",
+    "acceptance_target",
+    "testing_layer",
+    "target_environment",
+    "required_evidence",
 )
 REAL_ENV_STATUS_VALUES = {"pass", "fail"}
 VALID_NOT_APPLICABLE_REASONS = {
