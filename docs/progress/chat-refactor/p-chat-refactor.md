@@ -53,8 +53,8 @@
 
 ## 实现进度
 - [x] B1 + B2 文档
-- [ ] 阶段一：comment 命令
-- [ ] 阶段二：discuss 命令
+- [x] 阶段一：comment 命令（cmd_comment + get-issue-state）
+- [x] 阶段二：discuss 命令（cmd_discuss + SQLite + adapter + agent-table）
 - [ ] 阶段三：讨论执行 skill
 - [ ] 阶段四：讨论归档 skill
 - [ ] 阶段五：评论门禁
