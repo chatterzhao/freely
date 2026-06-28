@@ -17,11 +17,44 @@
 
 ## Stable ownership required
 
-写 IBM 正式产物前，必须先确认：
+写 IBM 正式产物前，必须先确定 `epic-name` 和 `story-name`。
 
-- `epic-name`
-- `story-name`
-- `issue-name`
+### 目录结构
+
+```
+docs/epics/{epic-name}/                          ← epic：一个能力域
+├── {story-name}/                                ← story：epic 下的子交付批次（可选，平铺时省略）
+│   ├── issues/{issue-name}.md                   ← I-* issue
+│   ├── brainstorms/b-{issue-name}.md            ← B2 头脑风暴
+│   ├── prd.md                                   ← 本批次的需求设计
+│   ├── pre-tests.md                             ← 本批次的测试计划
+│   └── tasks.md                                 ← 本批次的任务分解
+└── code-reviews/                                ← 审查产物（epic 级共用）
+```
+
+**规则**：
+- 一个 epic 可以放多个 story
+- 一个 story 对应**一个批次的 I-* + prd + pre-tests + tasks**
+- 同批次 = 同一次 B2 执行产出的相关 I-* 集合
+- 简单 epic（只有一个批次、一个 I-*）可平铺，省略 story 层
+- code-reviews/ 放在 epic 级，不放在 story 下
+
+### 如何确定 epic-name 和 story-name
+
+1. **读取 `docs/epics-map.svg`**：了解现有 epic 和 story 的全貌
+2. **从 candidate 提取关键词**：取 candidate title 的核心能力名词，转为 kebab-case slug
+3. **搜索已有 epic**：
+   - 关键词匹配已有 epic 名 → 用已有 epic
+   - 已有 epic 下有 story → 判断本批次是否可归入已有 story，还是需要新建 story
+   - 无匹配 → 新建 epic（kebab-case，简短描述能力域，如 `chat-refactor`）
+4. **新建 story 的命名**：`{epic-name}` 下的子交付 slug，如 `comment-module`
+5. **更新 `docs/epics-map.svg`**：新建或变更 epic/story 后必须更新 SVG，门禁会检查对齐
+
+### 需确认的字段
+
+- `epic-name` — 本 I-* 归属的能力域
+- `story-name` — 本 I-* 归属的子交付批次（平铺时可省略）
+- `issue-name` — I-* 文件名（继承 `I-{key}-{suffix}`）
 - 当前 `M-{issue-id}` 是否需要拆成多个 `I-{issue-id}*`
 - 若拆成多个 issue，它们在 milestone 中的阶段归属与排序
 
