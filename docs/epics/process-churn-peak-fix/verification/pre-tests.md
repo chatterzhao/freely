@@ -7,5 +7,5 @@
 ### AT-001 threshold-increase
 - id: threshold-increase
 - requirement: RESTART_STORM_COUNT set to 10
-^- status: passed
+- status: pass
 - artifact_ref: docs/epics/process-churn-peak-fix/code-reviews/review.md

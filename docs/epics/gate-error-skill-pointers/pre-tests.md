@@ -32,7 +32,7 @@
 - id: error-guidance
 - requirement: gate error block shows fix/feat detection and skill guidance
 - evidence_level: mock
-^- status: passed
+- status: pass
 - artifact_ref: docs/epics/gate-error-skill-pointers/code-reviews/implementation-decision.md
 ## Real-Environment
 - real_environment_status: pass

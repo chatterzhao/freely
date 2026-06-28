@@ -9,26 +9,26 @@
 - issue_id: I-20260626T075340Z-A
 
 ## 1. Worktree Check
-^- status: passed
+- status: pass
 - note: Both fix and test-pre-merge worktrees clean, code synced
 
 ## 2. IBM Completeness
-^- status: passed
+- status: pass
 - note: I-* issue, candidates.md, milestones.md, pre-tests.md all present
 
 ## 3. Code Review Evidence
-^- status: passed
+- status: pass
 - note: 2 independent subagent reviewers. Reviewer 1: 22/23 PASS, 1 bug found (_slot_type hardcoded) and fixed. Reviewer 2: confirmed fix. All criteria: correctness, edge cases, security, code quality, backward compatibility.
 
 ## 4. Pre-test Evidence
-^- status: passed
+- status: pass
 - note: 4 acceptance items all pass (unit), 2 additional (integration/E2E). pretests gate: OK
 
 ## 5. Receipt Integrity
 - status: n/a
 
 ## 6. Phase State
-^- status: passed
+- status: pass
 - note: raw issue absorbed_into I-20260626T075340Z-A, phase_state completed
 
 ## Overall Verdict

@@ -6,12 +6,12 @@
 - verdict: pass
 - issue_id: I-20260627T121248Z-A
 ## 1. Worktree Check
-^- status: passed
+- status: pass
 ## 2. IBM Completeness
-^- status: passed
+- status: pass
 ## 3. Code Review Evidence
-^- status: passed
+- status: pass
 ## 4. Pre-test Evidence
-^- status: passed
+- status: pass
 ## Overall Verdict
 - verdict: pass

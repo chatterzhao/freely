@@ -39,7 +39,7 @@
 - target_lane: feature-local
 - promotion_gate: develop_merge
 - evidence_level: integration
-^- status: passed
+- status: pass
 - artifact_ref: (manual test output)
 
 ### AT-002 registry 驱动默认 tool
@@ -49,7 +49,7 @@
 - target_lane: feature-local
 - promotion_gate: develop_merge
 - evidence_level: integration
-^- status: passed
+- status: pass
 - artifact_ref: (manual test output: detected claude)
 
 ### AT-003 --tools 显式控制
@@ -59,5 +59,5 @@
 - target_lane: feature-local
 - promotion_gate: develop_merge
 - evidence_level: integration
-^- status: passed
+- status: pass
 - artifact_ref: (manual test output: claude,codex both deployed)

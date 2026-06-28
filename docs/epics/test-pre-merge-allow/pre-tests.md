@@ -32,7 +32,7 @@
 - id: hook-fix
 - requirement: merge into test-pre-merge not blocked by hooks
 - evidence_level: mock
-^- status: passed
+- status: pass
 - artifact_ref: docs/epics/test-pre-merge-allow/code-reviews/implementation-decision.md
 ## Real-Environment
 - real_environment_status: pass

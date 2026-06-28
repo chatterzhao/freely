@@ -38,5 +38,5 @@
 - target_lane: premerge-integration
 - promotion_gate: develop_merge
 - evidence_level: integration
-^- status: passed
+- status: pass
 - artifact_ref: docs/epics/acp-bridge-restart-storm/code-reviews/review.md

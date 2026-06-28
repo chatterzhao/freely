@@ -9,7 +9,7 @@
 - expected_output: PASS
 - actual_output: PASS
 - evidence_file: .freely/run/test-evidence/acceptance-1.log
-^- status: passed
+- status: pass
 
 ### acceptance-2
 - acceptance_target: sync_tooling writes worker-id.env
@@ -18,7 +18,7 @@
 - expected_output: PASS
 - actual_output: PASS
 - evidence_file: .freely/run/test-evidence/acceptance-2.log
-^- status: passed
+- status: pass
 
 ### acceptance-3
 - acceptance_target: pr-review-guarded reads reviewer_slot
@@ -27,7 +27,7 @@
 - expected_output: PASS
 - actual_output: PASS
 - evidence_file: .freely/run/test-evidence/acceptance-3.log
-^- status: passed
+- status: pass
 
 ## Unit
 - acceptance_target: all features implemented

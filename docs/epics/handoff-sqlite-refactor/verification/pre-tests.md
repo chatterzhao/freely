@@ -38,5 +38,5 @@
 - target_lane: premerge-integration
 - promotion_gate: develop_merge
 - evidence_level: integration
-^- status: passed
+- status: pass
 - artifact_ref: docs/epics/handoff-sqlite-refactor/code-reviews/review.md

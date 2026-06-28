@@ -13,7 +13,7 @@
 - actual_output: PASS
 - evidence_file: .freely/run/test-evidence/acceptance-1.log
 - blocker:
-^- status: passed
+- status: pass
 
 ### acceptance-2
 - acceptance_target: a2a_task.py 查询兼容 worker_ prefix
@@ -25,7 +25,7 @@
 - actual_output: PASS
 - evidence_file: .freely/run/test-evidence/acceptance-2.log
 - blocker:
-^- status: passed
+- status: pass
 
 ## Unit
 - acceptance_target: 6 文件改动正确

@@ -9,19 +9,19 @@
 - reason: 违规绕过门禁中，理由充分，是：所有6个维度均合规——代码改动仅新增GATE拦截逻辑无破坏性、IBM文档链完整、prd/tasks/pre-tests均已完成
 
 ## 1. Worktree Check
-^- status: passed
+- status: pass
 - evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260622T000649Z-reason-all-gates branch=fix/raw-20260622T000649Z-reason-all-gates clean=true
 
 ## 2. IBM Completeness
-^- status: passed
+- status: pass
 - evidence: governance-merge-gate passed
 
 ## 3. Code Review Evidence
-^- status: passed
+- status: pass
 - evidence: implementation-decision.md in docs/epics/a2a-native-delegation/code-reviews/, all fields complete
 
 ## 4. Pre-test Evidence
-^- status: passed
+- status: pass
 - evidence: pre-tests.md in docs/epics/acp-a2a-refactor/verification/, 0
 0 acceptance items
 
@@ -30,7 +30,7 @@
 - evidence: pr-merge-guarded not modified by this PR
 
 ## 6. Phase State
-^- status: passed
+- status: pass
 - evidence: raw issue phase_state=absorbed
 
 

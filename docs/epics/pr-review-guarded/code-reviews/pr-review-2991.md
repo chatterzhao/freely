@@ -8,19 +8,19 @@
 - issue_id: I-20260510T1339Z-A
 
 ## 1. Worktree Check
-^- status: passed
+- status: pass
 - evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260510T1339Z-b1 branch=fix/raw-20260510T1339Z-b1 clean=true
 
 ## 2. IBM Completeness
-^- status: passed
+- status: pass
 - evidence: governance-merge-gate passed
 
 ## 3. Code Review Evidence
-^- status: passed
+- status: pass
 - evidence: implementation-decision.md in docs/epics/a2a-native-delegation/code-reviews/, all fields complete
 
 ## 4. Pre-test Evidence
-^- status: passed
+- status: pass
 - evidence: pre-tests.md in docs/epics/acp-a2a-refactor/verification/, 0
 0 acceptance items
 

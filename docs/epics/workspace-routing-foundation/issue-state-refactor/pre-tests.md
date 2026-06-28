@@ -47,7 +47,7 @@
 - id: A1
 - requirement: TERMINAL_RAW={absorbed,dropped}, DONE_STATES={done_b2_ibm,completed}, ACTIVE_B2={in_b2_ibm,done_b2_ibm,in_dev,blocked_dev}
 - evidence_level: integration
-^- status: passed
+- status: pass
 - artifact_ref: docs/epics/workspace-routing-foundation/issue-state-refactor/code-reviews/review.md
 - surface_kind: integration
 - target_lane: premerge-integration
@@ -89,7 +89,7 @@
 - id: B1
 - requirement: issue-sync close raw-xxx 后 raw phase_state 不变（保持 absorbed）
 - evidence_level: integration
-^- status: passed
+- status: pass
 - artifact_ref: docs/epics/workspace-routing-foundation/issue-state-refactor/code-reviews/review-B.md
 - surface_kind: integration
 - target_lane: premerge-integration
@@ -100,7 +100,7 @@
 - id: B2
 - requirement: issue-sync create 后 platform_state=open
 - evidence_level: integration
-^- status: passed
+- status: pass
 - artifact_ref: docs/epics/workspace-routing-foundation/issue-state-refactor/code-reviews/review-B.md
 - surface_kind: integration
 - target_lane: premerge-integration
@@ -111,7 +111,7 @@
 - id: C1
 - requirement: phase_state=completed 且 platform_state=open → gate block
 - evidence_level: integration
-^- status: passed
+- status: pass
 - artifact_ref: docs/epics/workspace-routing-foundation/issue-state-refactor/code-reviews/review-C.md
 - surface_kind: integration
 - target_lane: premerge-integration
@@ -122,7 +122,7 @@
 - id: C2
 - requirement: phase_state 不在合法值集合中 → gate block
 - evidence_level: integration
-^- status: passed
+- status: pass
 - artifact_ref: docs/epics/workspace-routing-foundation/issue-state-refactor/code-reviews/review-C.md
 - surface_kind: integration
 - target_lane: premerge-integration

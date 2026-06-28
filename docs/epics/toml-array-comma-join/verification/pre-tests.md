@@ -13,7 +13,7 @@
 - actual_output: direct,acp
 - evidence_file: .freely/run/test-evidence/acceptance-1.log
 - blocker: none
-^- status: passed
+- status: pass
 
 ### acceptance-2
 - acceptance_target: tool-registry-query.py aliases 返回逗号分隔值
@@ -25,7 +25,7 @@
 - actual_output: cc,cc-use-codex-cli,kiro-cli,iflow,claude-code
 - evidence_file: .freely/run/test-evidence/acceptance-2.log
 - blocker: none
-^- status: passed
+- status: pass
 
 ### acceptance-3
 - acceptance_target: cmd_feedback 拒绝无类型前缀的标题
@@ -37,7 +37,7 @@
 - actual_output: "[ERROR] title must start with a type prefix: fix, feat, docs, refactor, chore, test, build, ci, perf, style" / exit:1
 - evidence_file: .freely/run/test-evidence/acceptance-3.log
 - blocker: none
-^- status: passed
+- status: pass
 
 ### acceptance-4
 - acceptance_target: cmd_feedback 拒绝过长标题
@@ -49,7 +49,7 @@
 - actual_output: "[ERROR] title too long: 113 chars (max 100 including [RAW-{key}] prefix)" / exit:1
 - evidence_file: .freely/run/test-evidence/acceptance-4.log
 - blocker: none
-^- status: passed
+- status: pass
 
 ### acceptance-5
 - acceptance_target: cmd_feedback 拒绝过短 body
@@ -61,7 +61,7 @@
 - actual_output: "[ERROR] body too short (5 non-ws chars, need ≥ 50)" / exit:1
 - evidence_file: .freely/run/test-evidence/acceptance-5.log
 - blocker: none
-^- status: passed
+- status: pass
 
 ### acceptance-6
 - acceptance_target: cmd_feedback 拒绝无 ## section 的 body
@@ -73,7 +73,7 @@
 - actual_output: "[ERROR] body must contain at least one ## section heading" / exit:1
 - evidence_file: .freely/run/test-evidence/acceptance-6.log
 - blocker: none
-^- status: passed
+- status: pass
 
 ## Unit
 - acceptance_target: Python comma-join 和 bash alias loop 的单元验证

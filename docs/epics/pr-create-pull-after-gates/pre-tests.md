@@ -46,7 +46,7 @@
 - id: AI-001
 - requirement: bash -n must pass on the modified pr-create-guarded script
 - evidence_level: mock
-^- status: passed
+- status: pass
 - artifact_ref: docs/epics/pr-create-pull-after-gates/code-reviews/syntax-check.txt
 
 ### AI-002: Pull is at Step 3, gates all precede it
@@ -54,7 +54,7 @@
 - id: AI-002
 - requirement: git pull origin develop must appear after gate-passed marker and before push, never at Step 1
 - evidence_level: mock
-^- status: passed
+- status: pass
 - artifact_ref: docs/epics/pr-create-pull-after-gates/code-reviews/flow-verification.txt
 
 ### AI-003: All gate checks still exit early before pull
@@ -62,5 +62,5 @@
 - id: AI-003
 - requirement: Every gate failure path must exit 1 before reaching the pull command
 - evidence_level: mock
-^- status: passed
+- status: pass
 - artifact_ref: docs/epics/pr-create-pull-after-gates/code-reviews/flow-verification.txt

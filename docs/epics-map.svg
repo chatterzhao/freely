@@ -820,5 +820,4 @@
 <text x="50" y="16521" font-size="13" font-weight="bold" fill="#1a73e8">wt-create-pull-after-worktree</text>
 <rect id="epic-wt-create-skill-prompt" x="35" y="16550" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="16574" font-size="13" font-weight="bold" fill="#1a73e8">wt-create-skill-prompt</text>
-  <text x="10" y="9999" font-size="12" fill="gray">ibm-gate-to-skill-quickref</text>
 </svg>

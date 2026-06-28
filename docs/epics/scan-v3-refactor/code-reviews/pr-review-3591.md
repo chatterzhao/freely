@@ -7,22 +7,22 @@
 - issue_id: I-20260627T062554Z-A
 
 ## 1. Worktree Check
-^- status: passed
+- status: pass
 
 ## 2. IBM Completeness
-^- status: passed
+- status: pass
 
 ## 3. Code Review Evidence
-^- status: passed
+- status: pass
 
 ## 4. Pre-test Evidence
-^- status: passed
+- status: pass
 
 ## 5. Receipt Integrity
 - status: n/a
 
 ## 6. Phase State
-^- status: passed
+- status: pass
 
 ## Overall Verdict
 - verdict: pass

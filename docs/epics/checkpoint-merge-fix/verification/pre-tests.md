@@ -13,7 +13,7 @@
 - actual_output: PASS
 - evidence_file: .freely/run/test-evidence/acceptance-1.log
 - blocker:
-^- status: passed
+- status: pass
 
 ### acceptance-2
 - acceptance_target: checkpoint-guard merge 时跳过 scope
@@ -25,7 +25,7 @@
 - actual_output: PASS
 - evidence_file: .freely/run/test-evidence/acceptance-2.log
 - blocker:
-^- status: passed
+- status: pass
 
 ## Unit
 - acceptance_target: 两处改动语法正确，逻辑正确

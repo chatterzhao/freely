@@ -13,7 +13,7 @@
 - actual_output: PASS
 - evidence_file: .freely/run/test-evidence/acceptance-1.log
 - blocker:
-^- status: passed
+- status: pass
 
 ### acceptance-2
 - acceptance_target: --list worker 返回 10 个具体编号
@@ -25,7 +25,7 @@
 - actual_output: PASS
 - evidence_file: .freely/run/test-evidence/acceptance-1.log
 - blocker:
-^- status: passed
+- status: pass
 
 ### acceptance-3
 - acceptance_target: wt-close 后 agent-id.env 无残留
@@ -37,7 +37,7 @@
 - actual_output: PASS
 - evidence_file: .freely/run/test-evidence/acceptance-1.log
 - blocker:
-^- status: passed
+- status: pass
 
 ## Unit
 - acceptance_target: 三个函数（reconcile, _acp_session_close, count_active）单元可用

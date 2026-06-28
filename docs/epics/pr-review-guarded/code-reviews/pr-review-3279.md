@@ -8,19 +8,19 @@
 - issue_id: batch-sync-20260621
 
 ## 1. Worktree Check
-^- status: passed
+- status: pass
 - evidence: worktree already cleaned up, all changes committed
 
 ## 2. IBM Completeness
-^- status: passed
+- status: pass
 - evidence: Platform sync batch - maintenance operation, raw issue absorbed
 
 ## 3. Code Review Evidence
-^- status: passed
+- status: pass
 - evidence: issue-sync batch output verified, all changes are platform_state/updated_at metadata updates
 
 ## 4. Pre-test Evidence
-^- status: passed
+- status: pass
 - evidence: issue-sync batch validation completed successfully
 
 ## 5. Receipt Integrity
@@ -28,7 +28,7 @@
 - evidence: pr-merge-guarded not modified
 
 ## 6. Phase State
-^- status: passed
+- status: pass
 - evidence: raw-20260621T181901Z phase_state=absorbed
 
 ## Overall Verdict

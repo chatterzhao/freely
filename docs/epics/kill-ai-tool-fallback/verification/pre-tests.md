@@ -13,7 +13,7 @@
 - actual_output: AI_TOOL=claude
 - evidence_file: .freely/run/test-evidence/acceptance-1.log
 - blocker: none
-^- status: passed
+- status: pass
 
 ### acceptance-2
 - acceptance_target: _ensure_acp_bridge_running 不再引用 AI_TOOL
@@ -25,7 +25,7 @@
 - actual_output: AI_TOOL references now all derived from AGENT_AI_TOOL via load_config
 - evidence_file: .freely/run/test-evidence/acceptance-2.log
 - blocker: none
-^- status: passed
+- status: pass
 
 ### acceptance-3
 - acceptance_target: config.toml 不含 AI_TOOL
@@ -37,7 +37,7 @@
 - actual_output: exit:1
 - evidence_file: .freely/run/test-evidence/acceptance-3.log
 - blocker: none
-^- status: passed
+- status: pass
 
 ## Unit
 - acceptance_target: 代码级验证
@@ -55,7 +55,7 @@
 - actual_output: --dry-run complete, exit 0
 - evidence_file: (执行后填写)
 - blocker: (失败时填写)
-^- status: passed
+- status: pass
 
 ## End-to-End
 - acceptance_target: daemon start 后 Manager 使用 agent-table slot 正常启动

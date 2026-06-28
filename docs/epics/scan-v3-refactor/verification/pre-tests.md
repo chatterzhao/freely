@@ -13,7 +13,7 @@
 - actual_output: PASS
 - evidence_file:
 - blocker:
-^- status: passed
+- status: pass
 
 ### acceptance-2
 - acceptance_target: Cat 2a 扫出非 terminal phase
@@ -25,7 +25,7 @@
 - actual_output: PASS
 - evidence_file:
 - blocker:
-^- status: passed
+- status: pass
 
 ### acceptance-3
 - acceptance_target: Cat 3 扫出 agent 未绑定
@@ -37,7 +37,7 @@
 - actual_output: PASS
 - evidence_file:
 - blocker:
-^- status: passed
+- status: pass
 
 ### acceptance-4
 - acceptance_target: 无 push=176 误报
@@ -49,7 +49,7 @@
 - actual_output: PASS
 - evidence_file:
 - blocker:
-^- status: passed
+- status: pass
 
 ## Unit
 - acceptance_target: 所有 8 个子类分叉正确

@@ -43,7 +43,7 @@
 - target_lane: premerge-integration
 - promotion_gate: develop_merge
 - evidence_level: integration
-^- status: passed
+- status: pass
 - artifact_ref: docs/epics/raw-issue-pull-intercept/code-reviews/review.md
 
 ### AT-002 branch mismatch
@@ -53,7 +53,7 @@
 - target_lane: premerge-integration
 - promotion_gate: develop_merge
 - evidence_level: integration
-^- status: passed
+- status: pass
 - artifact_ref: docs/epics/raw-issue-pull-intercept/code-reviews/review.md
 
 ### AT-003 cli dispatch
@@ -63,5 +63,5 @@
 - target_lane: premerge-integration
 - promotion_gate: develop_merge
 - evidence_level: integration
-^- status: passed
+- status: pass
 - artifact_ref: docs/epics/raw-issue-pull-intercept/code-reviews/review.md

@@ -34,7 +34,7 @@
 - target_lane: feature-local
 - promotion_gate: develop_merge
 - evidence_level: integration
-^- status: passed
+- status: pass
 
 ### AT-002 权限字段不再硬编码
 - id: AT-002
@@ -43,7 +43,7 @@
 - target_lane: feature-local
 - promotion_gate: develop_merge
 - evidence_level: integration
-^- status: passed
+- status: pass
 
 ### AT-003 向后兼容
 - id: AT-003
@@ -52,4 +52,4 @@
 - target_lane: feature-local
 - promotion_gate: develop_merge
 - evidence_level: integration
-^- status: passed
+- status: pass

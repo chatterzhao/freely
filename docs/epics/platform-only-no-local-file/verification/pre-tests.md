@@ -11,7 +11,7 @@
 - actual_output: --dry-run complete, exit 0
 - evidence_file: .freely/run/test-evidence/acceptance-1.log
 - blocker: none
-^- status: passed
+- status: pass
 ## Unit
 - acceptance_target: 代码逻辑正确
 - testing_layer: unit
@@ -25,7 +25,7 @@
 - test_command: ./bin/pr-merge-guarded develop fix/raw-20260627T021849Z-platform-only-no-local-file --dry-run
 - expected_output: --dry-run complete
 - actual_output: --dry-run complete
-^- status: passed
+- status: pass
 ## End-to-End
 - acceptance_target: 真实 platform-only 关闭 orphan issue
 - testing_layer: end-to-end

@@ -13,7 +13,7 @@
 - actual_output: (执行后填写)
 - evidence_file: (执行后填写)
 - blocker: (失败时填写)
-^- status: passed
+- status: pass
 
 ### acceptance-2: --repo 拒绝
 - acceptance_target: 传 `--repo` 时返回明确错误
@@ -25,7 +25,7 @@
 - actual_output: (执行后填写)
 - evidence_file: (执行后填写)
 - blocker: (失败时填写)
-^- status: passed
+- status: pass
 
 ### acceptance-3: 参数校验
 - acceptance_target: 缺少 --title/--body 或非法 --severity 时正确报错
@@ -45,7 +45,7 @@
 - actual_output: (执行后填写)
 - evidence_file: (执行后填写)
 - blocker: (失败时填写)
-^- status: passed
+- status: pass
 
 ### acceptance-4: 本地文件创建
 - acceptance_target: 调用 feedback 后生成 `docs/issues/raw-{key}/issue.md`
@@ -62,7 +62,7 @@
 - actual_output: (执行后填写)
 - evidence_file: (执行后填写)
 - blocker: (失败时填写)
-^- status: passed
+- status: pass
 
 ### acceptance-5: issue-sync 委托
 - acceptance_target: feedback 创建 issue 后 GitHub 上出现对应 issue
@@ -75,7 +75,7 @@
 - actual_output: (执行后填写)
 - evidence_file: (执行后填写)
 - blocker: (失败时填写)
-^- status: passed
+- status: pass
 
 ## Unit
 - acceptance_target: 无独立单元测试边界（纯 bash 函数重写，行为级端到端验证覆盖）

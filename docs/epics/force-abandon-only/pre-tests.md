@@ -32,7 +32,7 @@
 - id: force-semantics
 - requirement: --force described as abandon-only with counter-examples
 - evidence_level: mock
-^- status: passed
+- status: pass
 - artifact_ref: docs/epics/force-abandon-only/code-reviews/implementation-decision.md
 ## Real-Environment
 - real_environment_status: pass

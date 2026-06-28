@@ -8,7 +8,7 @@
 - expected_output: 0 (no || true on adapter call)
 - actual_output: || true removed, replaced with error handler block
 - evidence_file: .freely/run/test-evidence/acceptance-1.log
-^- status: passed
+- status: pass
 
 ### acceptance-2
 - acceptance_target: no platform created → exit 1 (not WARNING)
@@ -17,7 +17,7 @@
 - expected_output: exit 1 found
 - actual_output: exit 1 on no platform created
 - evidence_file: .freely/run/test-evidence/acceptance-2.log
-^- status: passed
+- status: pass
 
 ### acceptance-3
 - acceptance_target: per-platform error check exists
@@ -26,7 +26,7 @@
 - expected_output: 1+
 - actual_output: per-platform error check present with exit 1
 - evidence_file: .freely/run/test-evidence/acceptance-3.log
-^- status: passed
+- status: pass
 
 ### acceptance-4
 - acceptance_target: bash syntax valid
@@ -35,7 +35,7 @@
 - expected_output: OK
 - actual_output: Syntax OK
 - evidence_file: .freely/run/test-evidence/acceptance-4.log
-^- status: passed
+- status: pass
 
 ### acceptance-5
 - acceptance_target: feedback --help still works
@@ -44,4 +44,4 @@
 - expected_output: Usage text
 - actual_output: Usage text displayed correctly
 - evidence_file: .freely/run/test-evidence/acceptance-5.log
-^- status: passed
+- status: pass

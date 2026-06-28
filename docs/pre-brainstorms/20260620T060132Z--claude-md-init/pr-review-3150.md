@@ -7,19 +7,19 @@
 - verdict: pass
 
 ## 1. Worktree Check
-^- status: passed
+- status: pass
 - evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260620T060132Z-claude-md-init branch=feature/raw-20260620T060132Z-claude-md-init clean=true
 
 ## 2. IBM Completeness
-^- status: passed
+- status: pass
 - evidence: governance-merge-gate passed
 
 ## 3. Code Review Evidence
-^- status: passed
+- status: pass
 - evidence: implementation-decision.md in docs/epics/a2a-native-delegation/code-reviews/, all fields complete
 
 ## 4. Pre-test Evidence
-^- status: passed
+- status: pass
 - evidence: pre-tests.md in docs/epics/acp-a2a-refactor/verification/, 0
 0 acceptance items
 
@@ -28,7 +28,7 @@
 - evidence: pr-merge-guarded not modified by this PR
 
 ## 6. Phase State
-^- status: passed
+- status: pass
 - evidence: raw issue phase_state=absorbed
 
 

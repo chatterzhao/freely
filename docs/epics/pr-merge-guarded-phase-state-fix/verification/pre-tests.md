@@ -18,5 +18,5 @@
 ### AT-001 linked phase_state
 - id: linked-phase-state
 - requirement: linked issue with phase_state=completed triggers issue-sync close
-^- status: passed
+- status: pass
 - artifact_ref: docs/epics/pr-merge-guarded-phase-state-fix/code-reviews/review.md

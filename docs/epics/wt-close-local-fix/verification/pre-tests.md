@@ -7,7 +7,7 @@
 - expected_output: PASS (0 occurrences)
 - actual_output: PASS — local removed
 - evidence_file: .freely/run/test-evidence/acceptance-1.log
-^- status: passed
+- status: pass
 ### acceptance-2
 - acceptance_target: bash syntax valid
 - testing_layer: integration
@@ -15,7 +15,7 @@
 - expected_output: OK
 - actual_output: Syntax OK
 - evidence_file: .freely/run/test-evidence/acceptance-2.log
-^- status: passed
+- status: pass
 ### acceptance-3
 - acceptance_target: wt-close --help works
 - testing_layer: end-to-end
@@ -23,4 +23,4 @@
 - expected_output: Usage
 - actual_output: Usage text displayed
 - evidence_file: .freely/run/test-evidence/acceptance-3.log
-^- status: passed
+- status: pass

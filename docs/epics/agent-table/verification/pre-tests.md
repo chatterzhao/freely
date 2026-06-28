@@ -12,7 +12,7 @@
 - expected_output: PASS
 - actual_output: PASS
 - evidence_file: .freely/run/test-evidence/acceptance-1.log
-^- status: passed
+- status: pass
 
 ### acceptance-2
 - acceptance_target: agent-table-query 返回正确 reviewer 配对
@@ -23,7 +23,7 @@
 - expected_output: PASS
 - actual_output: PASS
 - evidence_file: .freely/run/test-evidence/acceptance-2.log
-^- status: passed
+- status: pass
 
 ### acceptance-3
 - acceptance_target: wt-create 将 worker slot 写入工位 config.toml
@@ -34,7 +34,7 @@
 - expected_output: PASS
 - actual_output: PASS
 - evidence_file: .freely/run/test-evidence/acceptance-3.log
-^- status: passed
+- status: pass
 
 ## Unit
 - acceptance_target: 解析器功能正确

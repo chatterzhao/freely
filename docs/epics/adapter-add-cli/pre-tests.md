@@ -32,7 +32,7 @@
 - id: cli-works
 - requirement: create-issue and comment CLI subcommands work
 - evidence_level: mock
-^- status: passed
+- status: pass
 - artifact_ref: docs/epics/adapter-add-cli/code-reviews/implementation-decision.md
 ## Real-Environment
 - real_environment_status: pass

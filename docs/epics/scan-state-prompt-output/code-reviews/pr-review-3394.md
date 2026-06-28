@@ -9,19 +9,19 @@
 
 
 ## 1. Worktree Check
-^- status: passed
+- status: pass
 - evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260623T162243Z-scan-state-prompt-output branch=fix/raw-20260623T162243Z-scan-state-prompt-output clean=true
 
 ## 2. IBM Completeness
-^- status: passed
+- status: pass
 - evidence: governance-merge-gate passed
 
 ## 3. Code Review Evidence
-^- status: passed
+- status: pass
 - evidence: implementation-decision.md in docs/epics/a2a-native-delegation/code-reviews/, all fields complete
 
 ## 4. Pre-test Evidence
-^- status: passed
+- status: pass
 - evidence: pre-tests.md in docs/epics/a2a-state-management/verification/, 0
 0 acceptance items
 
@@ -30,7 +30,7 @@
 - evidence: pr-merge-guarded not modified by this PR
 
 ## 6. Phase State
-^- status: passed
+- status: pass
 - evidence: raw issue phase_state=absorbed
 
 

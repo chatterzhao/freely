@@ -7,14 +7,14 @@
 - test_command: grep "_init_agent_table_slot_pin" docs/system/workspace/scripts/runtime/freely | wc -l
 - expected_output: >=2 (definition + call site)
 - actual_output: 2
-^- status: passed
+- status: pass
 ### acceptance-2
 - acceptance_target: pr-merge-guarded --dry-run gate passes
 - testing_layer: integration
 - test_command: ./bin/pr-merge-guarded develop fix/raw-20260626T171144Z-agent-table-slot-pin --dry-run
 - expected_output: --dry-run complete, exit 0
 - actual_output: --dry-run complete, exit 0
-^- status: passed
+- status: pass
 ## Unit
 - acceptance_target: function exists and is called
 - testing_layer: unit
@@ -26,7 +26,7 @@
 - test_command: ./bin/pr-merge-guarded develop fix/raw-20260626T171144Z-agent-table-slot-pin --dry-run
 - expected_output: --dry-run complete
 - actual_output: --dry-run complete
-^- status: passed
+- status: pass
 ## End-to-End
 - acceptance_target: daemon start correctly pins agent-table slot
 - testing_layer: end-to-end

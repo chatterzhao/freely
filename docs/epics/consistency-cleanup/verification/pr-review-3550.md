@@ -7,23 +7,23 @@
 - issue_id: I-20260626T121349Z-A
 
 ## 1. Worktree Check
-^- status: passed
+- status: pass
 
 ## 2. IBM Completeness
-^- status: passed
+- status: pass
 
 ## 3. Code Review Evidence
-^- status: passed
+- status: pass
 - note: Docs-only change. agent-table-query help text updated, fix-execution skill constraint language corrected
 
 ## 4. Pre-test Evidence
-^- status: passed
+- status: pass
 
 ## 5. Receipt Integrity
 - status: n/a
 
 ## 6. Phase State
-^- status: passed
+- status: pass
 
 ## Overall Verdict
 - verdict: pass
