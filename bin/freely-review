@@ -107,12 +107,35 @@ if [[ "$caller" == "worker" ]]; then
   done
 
   if [[ -n "$_acp_sock" && -x "$ACP_CLIENT" ]]; then
-    _pf="$ROOT_DIR/.freely/run/review-prompt.txt"
-    cat > "$_pf" << PROMPT
-You are the Freely TDD Reviewer (skill:freely-tdd-review).
-Work in $_test_wt. Review pre-tests.md and evidence files.
-Follow the four-layer review: Clean&Sync → Code Quality → Completeness → Code Safety.
-Output JSON: { "verdict": "pass"|"fail", "dimensions": {...}, "required_fixes": [...] }
+	    _raw_issue_file="docs/issues/raw-${raw_key}/issue.md"
+	    _raw_issue_text=""
+	    [[ -f "$_raw_issue_file" ]] && _raw_issue_text="$(head -80 "$_raw_issue_file" 2>/dev/null || true)"
+	    _pre_tests_text=""
+	    for _pt in docs/epics/*/verification/pre-tests.md; do
+	      [[ -f "$_pt" ]] && _pre_tests_text="$(cat "$_pt" 2>/dev/null || true)" && break
+	    done
+	    _diff_summary="$(git diff --stat develop..HEAD 2>/dev/null | head -30 || true)"
+	    cat > "$_pf" << PROMPT
+You are the Freely TDD Reviewer. Load and follow skill:freely-tdd-review.
+
+Review is NOT a gate — examine content quality, not file existence.
+
+## Raw Issue Context
+$_raw_issue_text
+
+## Pre-tests.md (the test plan)
+$_pre_tests_text
+
+## Git Diff Summary
+$_diff_summary
+
+## Instructions — skill:freely-tdd-review four-layer review
+1. Clean & Sync — worktree clean? code synced fix↔test?
+2. Code Quality — real test_command? no accidental files? code reasonable?
+3. Completeness — tests cover change surface? actual_output real? evidence exists with content?
+4. Code Safety — code not lost? cherry-pick path complete?
+
+Output JSON with specific findings in each dimension.
 PROMPT
     _output=$(python3 "$ACP_CLIENT" --bridge-socket "$_acp_sock" --prompt-file "$_pf" \
       --launch-kind fresh --session-id "review-$raw_key" --model "$reviewer_slot" 2>&1) || true
