@@ -106,7 +106,7 @@ fi
 if [[ -z "$_epic_dir" ]]; then
   _epic_dir="docs/epics/pr-review-guarded/code-reviews"
 fi
-review_file="$_epic_dir/pr-review-${pr_number}.md"
+review_file="$_epic_dir/pr-review-raw-${_raw_key}.md"
 mkdir -p "$_epic_dir"
 mkdir -p "$REVIEW_STATE_DIR"
 echo "Review document: $review_file"

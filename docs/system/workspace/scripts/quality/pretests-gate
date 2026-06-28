@@ -67,10 +67,10 @@ promotion_gate = sys.argv[6]
 ISSUE_RE = re.compile(r"^docs/epics/.+/issues/[^/]+\.md$")
 REQUIRED_SECTION_NAMES = ("Unit", "Integration", "End-to-End", "Real-Environment")
 REQUIRED_SECTION_SCALARS = (
-    "acceptance target",
-    "testing layer",
-    "target environment",
-    "required evidence",
+    "acceptance_target",
+    "testing_layer",
+    "target_environment",
+    "required_evidence",
 )
 REAL_ENV_STATUS_VALUES = {"pass", "fail"}
 VALID_NOT_APPLICABLE_REASONS = {
@@ -308,9 +308,9 @@ def parse_scalar(section_text: str, key: str) -> str:
 
 
 def has_blocker_taxonomy(section_text: str) -> bool:
-    if re.search(r"^- blocker taxonomy:\s*`?([^`\n]+)`?\s*$", section_text, re.MULTILINE):
+    if re.search(r"^- blocker_taxonomy:\s*`?([^`\n]+)`?\s*$", section_text, re.MULTILINE):
         return True
-    if re.search(r"^- blocker taxonomy:\s*$", section_text, re.MULTILINE):
+    if re.search(r"^- blocker_taxonomy:\s*$", section_text, re.MULTILINE):
         return True
     return False
 
@@ -438,7 +438,7 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
         if not has_blocker_taxonomy(section_text):
             add_error(
                 "pre_tests_missing",
-                f"{pre_tests_path}: section '{required_name}' missing 'blocker taxonomy'",
+                f"{pre_tests_path}: section '{required_name}' missing 'blocker_taxonomy'",
             )
         not_applicable_reason = parse_scalar(section_text, "not_applicable_reason")
         not_applicable_explanation = parse_scalar(section_text, "not_applicable_explanation")

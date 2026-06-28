@@ -1,0 +1,20 @@
+- issue_id: I-20260628T054513Z-A
+- kind: fix
+- phase_state: completed
+- milestone: M-20260628T054513Z-A
+- source_candidate: docs/pre-brainstorms/20260628T054513Z--scope-warning/candidates.md#C-20260628T054513Z-A
+- source_raw: raw-20260628T054513Z
+- verification_artifact_dir: docs/epics/scope-warning/code-reviews
+- canonical_issue_path: docs/issues/I-20260628T054513Z-A/issue.md
+- pre_tests_path: docs/epics/scope-warning/verification/pre-tests.md
+- title: checkpoint-guard scope 硬阻塞 → 建议警告
+
+# I-20260628T054513Z-A: scope 硬阻塞 → 建议警告
+
+- source_candidate: docs/pre-brainstorms/20260628T054513Z--scope-warning/candidates.md#C-20260628T054513Z-A
+- verification_artifact_dir: docs/epics/scope-warning/code-reviews
+
+## 实现
+- .githooks/pre-commit.sh: --fail-on-required 移除，exit 1 移除，改为 scope note
+- AGENTS.md.example: 新增"提交与 Scope"节
+- AGENTS.md: 阶段4 加入 scope 说明

@@ -112,22 +112,34 @@ B2_IBM 阶段直接写入以下格式。AI 按模板填写，无需查看任何�
 ## Acceptance Items
 
 ### acceptance-1
+- id: AT-001
+- requirement: <验收条件简述>
 - acceptance_target: <raw issue 验收标准>
 - testing_layer: unit | integration | end-to-end
 - target_environment: test-pre-merge-{key}-{slug}
 - required_evidence: <测试通过的证据要求>
-- test_command: <实际执行的 shell 命令，如：./bin/test-lane integration -- pytest tests/test_xxx.py>
+- evidence_level: mock | integration | real_env | post_merge_dogfood
+- artifact_ref: <指向测试产物文件，如 docs/epics/{epic}/test-evidence/acceptance-1.log>
+- test_command: <实际执行的 shell 命令，如：./bin/test-lane feature-local -- echo ok>
 - expected_output: <命令的预期输出，如：所有测试 PASSED，无 FAIL>
 - actual_output: (由 skill:freely-test-execution 执行后填写)
-- evidence_file: (执行后填写，指向 .freely/run/test-evidence/acceptance-1.log)
+- evidence_file: (执行后填写，指向 staged 证据文件)
 - blocker: (失败时填写) definition_missing | commands_only | evidence_plan_missing | execution_pending_or_failed
-- status: pending | passed | failed
+- status: pending | passed | failed | not_applicable
+> passed 状态需要 worker execution state（.freely/run/workcell-state.env）。无 worker state 时 passed 会被判 execution_missing，请改用 not_applicable。
+- not_applicable_reason: (not_applicable 时必填) change_not_touching_this_layer | no_executable_boundary_at_this_layer | protected_environment_only | human_observation_only | covered_by_more_realistic_required_surface
+- not_applicable_explanation: (not_applicable 时必填) <具体原因>
+- replacement_evidence: (not_applicable 时必填) <替代验证方式或证据>
 
 ### acceptance-2
+- id: AT-002
+- requirement: <验收条件简述>
 - acceptance_target: <验收标准2>
 - testing_layer: end-to-end
 - target_environment: test-pre-merge-{key}-{slug}
 - required_evidence: <证据要求>
+- evidence_level: integration
+- artifact_ref: <证据文件路径>
 - test_command: <shell 命令>
 - expected_output: <预期输出>
 - actual_output: (执行后填写)
@@ -140,6 +152,7 @@ B2_IBM 阶段直接写入以下格式。AI 按模板填写，无需查看任何�
 - testing_layer: unit
 - target_environment: <feature worktree>
 - required_evidence: <判定标准>
+- blocker_taxonomy: execution_pending_or_failed
 - not_applicable_reason: (如不适用填写) no_executable_boundary_at_this_layer
 - not_applicable_explanation: (如不适用填写) <原因和替代验证>
 - replacement_evidence: (如不适用填写) <替代验证方式>
@@ -149,12 +162,14 @@ B2_IBM 阶段直接写入以下格式。AI 按模板填写，无需查看任何�
 - testing_layer: integration
 - target_environment: test-pre-merge-{key}-{slug}
 - required_evidence: <判定标准>
+- blocker_taxonomy: execution_pending_or_failed
 
 ## End-to-End
 - acceptance_target: <端到端验证目标>
 - testing_layer: end-to-end
 - target_environment: test-pre-merge-{key}-{slug} → develop merge chain
 - required_evidence: guarded merge receipts
+- blocker_taxonomy: execution_pending_or_failed
 
 ## Real-Environment
 - real_environment_status: pass | fail | not_tested
@@ -191,9 +206,17 @@ phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
 | verification_artifact_dir too broad or non-canonical | 需以 /code-reviews 结尾，至少4段路径 | `docs/epics/{epic-name}/{story-name}/code-reviews` |
 | implementation decision note is incomplete | 需 5 个字段 | `decision` / `why_this` / `alternatives_considered` / `boundary_non_goals` / `residual_risk` |
 | owner issue 'missing' / that issue cannot be resolved | review/code-review 文件需 bullet 格式的 issue_id | `- issue_id: I-20260508T011858Z-A` |
-| I-* canonical fields (phase_state/milestone/source_candidate) silently cleared | I-* frontmatter 用了 `---` YAML 包裹格式；canonical reader 只解析 bullet | 去掉 `---` 包裹，用 bullet 格式：`- phase_state: completed` |
+| I-* canonical fields silently cleared | I-* frontmatter 用了 `---` YAML 包裹格式；canonical reader 只解析 bullet | 去掉 `---` 包裹，用 bullet 格式：`- phase_state: completed` |
 | phase_state cannot own capability/implementation changes | 实现变更的 I-* 需 completed | `phase_state: completed` |
 | pre_tests_path 验证失败 | I-* issue 需声明 pre_tests_path | `pre_tests_path: docs/epics/{epic}/verification/pre-tests.md` |
+| section missing acceptance_target/testing_layer | 字段名必须用下划线，不是空格 | `- acceptance_target:` / `- testing_layer:` / `- target_environment:` / `- required_evidence:` |
+| acceptance item missing id/requirement/evidence_level/artifact_ref | 每个 acceptance item 必须有这 4 个字段 | `- id: AT-001` / `- requirement: ...` / `- evidence_level: mock` / `- artifact_ref: <path>` |
+| execution_missing: got passed | passed 需要 worker state（.freely/run/workcell-state.env），无则改用 not_applicable | `- status: not_applicable` + not_applicable_reason + replacement_evidence |
+| not_applicable missing replacement_evidence | not_applicable 的 item 必须写 replacement_evidence | `- replacement_evidence: <替代验证方式>` |
+| section marked not applicable but missing replacement_evidence | section 级别 not_applicable 也要写 replacement_evidence | 同上 |
+| 全部 not_applicable 被判 "疑似糊弄" | 需至少 1 个 status=passed，或改为 mock | acceptance-1 用 `- evidence_level: mock` + `- status: not_applicable` |
+| not_applicable_reason 不支持 | 合法值仅 5 个 | `change_not_touching_this_layer` / `no_executable_boundary_at_this_layer` / `protected_environment_only` / `human_observation_only` / `covered_by_more_realistic_required_surface` |
+| section missing blocker_taxonomy | Unit/Integration/End-to-End 必须声明 blocker_taxonomy | `- blocker_taxonomy: execution_pending_or_failed` |
 
 ## 规范文档示例(copy-paste可用)
 

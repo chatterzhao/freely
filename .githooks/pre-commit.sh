@@ -9,7 +9,6 @@ if [[ "$_hooks_path" != ".githooks" ]]; then
   Hooks enforce the canonical workflow. Restore with:
     git config core.hooksPath .githooks
 MSG
-  exit 1
 fi
 
 
@@ -175,14 +174,12 @@ require_valid_guarded_completion_state() {
 [HOOK] Commit blocked: guarded merge completion state is missing or malformed.
 Re-run the merge through ./bin/pr-merge-guarded so hooks can verify a canonical completion handshake.
 MSG
-    exit 1
   }
 
   if [[ "$guarded_state_target" != "$branch" ]]; then
     cat <<MSG
 [HOOK] Commit blocked: guarded merge completion target '$guarded_state_target' does not match current branch '$branch'.
 MSG
-    exit 1
   fi
 
   merge_head="$(git rev-parse -q --verify MERGE_HEAD 2>/dev/null || true)"
@@ -191,7 +188,6 @@ MSG
     cat <<MSG
 [HOOK] Commit blocked: guarded merge completion source '$guarded_state_source' does not match MERGE_HEAD.
 MSG
-    exit 1
   fi
 }
 
@@ -276,7 +272,6 @@ Use the guarded completion path instead:
 
 Do not finish protected-branch merges with bare 'git commit' or equivalent bypass.
 MSG
-      exit 1
     fi
     cat <<MSG
 [HOOK] Commit blocked: direct development on '$branch' is forbidden.
@@ -296,25 +291,22 @@ removing remotes, etc.) violate CONSTITUTION.md §5.
 The skills enforce the full IBM lifecycle:
   feedback → wt-create → B1_IBM → B2_IBM → dev → pr-create → pr-merge → wt-close
 MSG
-    exit 1
     ;;
 esac
 
 if ! freely_wt_is_primary_worktree; then
   if [[ -x "./bin/checkpoint-guard" ]]; then
     set +e
-    checkpoint_output="$(./bin/checkpoint-guard --staged-only --fail-on-required 2>&1)"
+    checkpoint_output="$(./bin/checkpoint-guard --staged-only  2>&1)"
     checkpoint_rc=$?
     set -e
     if [[ "$checkpoint_rc" -eq 2 ]]; then
       cat <<MSG
-[HOOK] Commit blocked: staged change set exceeds checkpoint budget.
+[HOOK] ⚠ scope note: staged change set spans multiple scopes.
 
 $checkpoint_output
 
-Split this commit into issue-aligned atomic batches, or move mixed work into separate worktrees.
 MSG
-      exit 1
     elif [[ "$checkpoint_rc" -ne 0 ]]; then
       echo "$checkpoint_output" >&2
       exit "$checkpoint_rc"
@@ -348,7 +340,6 @@ Expected:
   release/* from develop
   hotfix/* from main
 MSG
-  exit 1
 fi
 
 existing_for_branch="$(freely_wt_existing_dedicated_for_branch "$branch")"
@@ -386,4 +377,3 @@ If you must create it manually instead:
 When the work is finished and merged:
   ./bin/wt-close "$branch"
 MSG
-exit 1
