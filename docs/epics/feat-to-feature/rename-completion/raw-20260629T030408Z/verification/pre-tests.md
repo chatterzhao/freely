@@ -11,11 +11,11 @@
 - target_environment: fix/raw-20260629T030408Z-feat-to-feature-complete worktree
 - required_evidence: grep 确认 wt-create 中无 freely-feat-execution 残留
 - evidence_level: mock
-- artifact_ref: docs/epics/skill-rename/fix-completion/raw-20260629T030408Z/verification/test-evidence/acceptance-1.log
+- artifact_ref: docs/epics/feat-to-feature/rename-completion/raw-20260629T030408Z/verification/test-evidence/acceptance-1.log
 - test_command: grep -c "freely-feat-execution" docs/system/workspace/scripts/worktree/wt-create && echo "FAIL: still has feat-execution" || echo "PASS: clean"
 - expected_output: PASS: clean
 - actual_output: PASS: clean — 0 occurrences of freely-feat-execution in wt-create
-- evidence_file: docs/epics/skill-rename/fix-completion/raw-20260629T030408Z/verification/test-evidence/acceptance-1.log
+- evidence_file: docs/epics/feat-to-feature/rename-completion/raw-20260629T030408Z/verification/test-evidence/acceptance-1.log
 - blocker: (失败时填写)
 - status: passed
 
@@ -27,11 +27,11 @@
 - target_environment: fix/raw-20260629T030408Z-feat-to-feature-complete worktree
 - required_evidence: grep 在 scripts/ .githooks/ AGENTS.md 中无 feat-execution 命中
 - evidence_level: mock
-- artifact_ref: docs/epics/skill-rename/fix-completion/raw-20260629T030408Z/verification/test-evidence/acceptance-2.log
+- artifact_ref: docs/epics/feat-to-feature/rename-completion/raw-20260629T030408Z/verification/test-evidence/acceptance-2.log
 - test_command: grep -rn "feat-execution\|freely-feat" docs/system/workspace/scripts/ .githooks/ AGENTS.md 2>/dev/null | grep -v "feature" | grep -v '.bak' && echo "FAIL: residual feat found" || echo "PASS: zero feat-execution residuals"
 - expected_output: PASS: zero feat-execution residuals
 - actual_output: PASS: zero feat-execution residuals — grep returned no matches
-- evidence_file: docs/epics/skill-rename/fix-completion/raw-20260629T030408Z/verification/test-evidence/acceptance-2.log
+- evidence_file: docs/epics/feat-to-feature/rename-completion/raw-20260629T030408Z/verification/test-evidence/acceptance-2.log
 - blocker: (失败时填写)
 - status: passed
 
@@ -43,11 +43,11 @@
 - target_environment: fix/raw-20260629T030408Z-feat-to-feature-complete worktree
 - required_evidence: grep 确认 AGENTS.md 中 feat: 已改为 feature:
 - evidence_level: mock
-- artifact_ref: docs/epics/skill-rename/fix-completion/raw-20260629T030408Z/verification/test-evidence/acceptance-3.log
+- artifact_ref: docs/epics/feat-to-feature/rename-completion/raw-20260629T030408Z/verification/test-evidence/acceptance-3.log
 - test_command: grep "^feature: (" AGENTS.md >/dev/null && echo "PASS: feature: found" || echo "FAIL: feature: not found"
 - expected_output: PASS: feature: found
 - actual_output: PASS: feature: found — line 25 starts with "feature: ("
-- evidence_file: docs/epics/skill-rename/fix-completion/raw-20260629T030408Z/verification/test-evidence/acceptance-3.log
+- evidence_file: docs/epics/feat-to-feature/rename-completion/raw-20260629T030408Z/verification/test-evidence/acceptance-3.log
 - blocker: (失败时填写)
 - status: passed
 
