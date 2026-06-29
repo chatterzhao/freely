@@ -12,6 +12,7 @@ if [[ -z "${PROJECT_ROOT:-}" ]]; then
   PROJECT_ROOT="${_primary:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 fi
 cd "$PROJECT_ROOT" || { echo "ERROR: cannot cd to PROJECT_ROOT=$PROJECT_ROOT" >&2; exit 1; }
+source "$PROJECT_ROOT/bin/worktree-common.sh" 2>/dev/null || true
 
 usage() {
   cat <<'USAGE'

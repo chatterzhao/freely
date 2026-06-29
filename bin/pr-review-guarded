@@ -2,6 +2,8 @@
 set -euo pipefail
 
 # pr-review-guarded: ACP-based TDD review gate between pr-create and pr-merge.
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd -P)"
+source "$ROOT_DIR/bin/worktree-common.sh" 2>/dev/null || true
 #
 # Launches an independent Reviewer agent (separate ACP session, same worktree)
 # that performs TDD four-question review: RED → GREEN → ADEQUACY → REFACTOR.
