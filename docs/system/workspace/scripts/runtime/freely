@@ -23538,14 +23538,35 @@ print(json.dumps({
       return 1
     }
 
-    # Build platform body: prepend kind frontmatter if body is being updated.
-    # NOTE: _issue_kind from local frontmatter is always "raw" (document type),
-    # not the original fix/feature workflow kind. This is a known limitation —
-    # pull_raw_issue does not preserve the platform body's kind separately.
-    # A future fix should store platform_body_kind in the local frontmatter.
+    # Build platform body: preserve the original kind from the platform body.
+    # The local frontmatter kind is always "raw" (document type), not the
+    # workflow kind (fix/feature) recorded at create time in the platform body.
+    # Editing must not change the kind unless the user explicitly asks for it.
     local _platform_body=""
     if [[ -n "$has_body" ]]; then
-      _platform_body="---\nkind: ${_issue_kind}\n---\n\n${edit_body}"
+      local _body_kind=""
+      local _gh_id
+      _gh_id=$(echo "$_platform_ids_json" | python3 -c "import sys,json; print(json.load(sys.stdin).get('github',{}).get('issue_id',''))" 2>/dev/null)
+      if [[ -n "$_gh_id" ]]; then
+        _body_kind=$(python3 - "$_gh_id" << 'PYEOF'
+import sys, re, subprocess
+gh_id = sys.argv[1]
+result = subprocess.run(
+    ["gh", "issue", "view", gh_id, "--json", "body", "--jq", ".body"],
+    capture_output=True, text=True
+)
+if result.returncode != 0:
+    print("raw")
+    sys.exit(0)
+body = result.stdout
+# Platform body stores frontmatter with literal \n: ---\nkind: fix\n---\n
+m = re.search(r'---\\nkind:\s*(\w+)\\n---', body)
+print(m.group(1) if m else "raw")
+PYEOF
+        2>/dev/null)
+      fi
+      [[ -n "$_body_kind" ]] || _body_kind="unknown"
+      _platform_body="---\nkind: ${_body_kind}\n---\n\n${edit_body}"
     fi
 
     # Call platform-adapter to update remote issues
