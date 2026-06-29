@@ -2,13 +2,13 @@
 name: freely-doc-B2_IBM-execution
 description: >-
   IBM Framework 第二阶段。消费 `freely-doc-B1_IBM-execution` skill 在
-  milestones.md candidate_issues 中 promote 的 candidate。三步产出：
-  ① 根据 `promoted_issue_id` 确定 epic-name/story-name，在 milestones.md
-  committed_issues 中生成 I-* issue 的正式条目；
+  milestones.md candidate_issues 中 promote 的 candidate（通过
+  `source_candidate` 找到候选文档，读取 acceptance_criteria 等依据）。
+  三步产出：① 根据 `promoted_issue_id` 确定 epic-name/story-name，
+  在 milestones.md committed_issues 中生成 I-* issue 正式条目（含真实路径）；
   ② 在 `docs/epics/{epic-name}/{story-name}/raw-{raw-key}/issues/` 下物化
-  完整 I-* issue 文档（含 phase_state、pre_tests_path 等全部字段）；
-  ③ 产出设计产物 prd.md + pre-tests.md + tasks.md + code-reviews/。
-  交付给 `freely-dev-loop-execution` skill。
+  完整 I-* issue 文档；③ 产出设计产物 prd.md + pre-tests.md + tasks.md +
+  code-reviews/。交付给 `freely-dev-loop-execution` skill。
 
   Use when: `freely-doc-B1_IBM-execution` skill 完成 candidate promoted
   之后。触发词："B2"、"物化 issue"、"设计"、"pre-tests"、"写测试方案"、
@@ -36,16 +36,17 @@ B2_IBM 是 IBM Framework 第二阶段。消费 `freely-doc-B1_IBM-execution` ski
 ### I：Input — B1_IBM 产生的 promoted candidate
 
 从 `docs/milestones.md` → candidate_issues 中取 status=promoted 的 candidate。
-candidate 的 `promoted_issue_id` 字段是 I-* issue 的 key（如 `I-20260508T011858Z-A`）。
-这个 candidate 由 `freely-doc-B1_IBM-execution` skill 产出，已排期、已绑 milestone。
+candidate 条目包含 `promoted_issue_id`（I-* issue 的 key）和 `source_candidate`（指向 `docs/pre-brainstorms/{key}--{slug}/candidates.md` 中对应 C-* 的完整路径）。
 
-此时 I-* issue 只有 key，还没有文档文件。本 skill 在 M 阶段根据 key 确定 epic/story，构造完整路径（`docs/epics/{epic-name}/{story-name}/raw-{raw-key}/issues/{key}.md`）并物化文件。
+根据 `source_candidate` 找到候选文档，读取其 `acceptance_criteria`、`promotion_gate`、`decision_reason` 等字段——这些是生成 I-* issue 的依据。
+
+此时 I-* issue 只有 key，还没有正式条目和文档文件。本 skill 在 M 阶段完成：确定 epic/story → 在 milestones.md committed_issues 生成正式条目（含真实路径）→ 物化完整文档。
 
 ### B：Brainstorm — 实现前置设计
 
-1. 读取 candidate（Input）的 acceptance_criteria、promotion_gate
+1. 根据 candidate_issues 中的 `source_candidate` 路径，读取候选文档（`docs/pre-brainstorms/{key}--{slug}/candidates.md`），提取 acceptance_criteria、promotion_gate
 2. 读实现面、读验收标准、评估替代方案
-3. 产出 `docs/epics/{epic-name}/{story-name}/brainstorms/b-{issue-name}.md`
+3. 产出 `docs/epics/{epic-name}/{story-name}/raw-{raw-key}/brainstorms/b-I-{raw-key}-{suffix}.md`
 
 ### M：Map — 确定 epic/story + 物化 I-* issue + 完整产物目录
 
