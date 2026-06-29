@@ -324,17 +324,36 @@ echo ""
 _review_output=""
 _review_rc=0
 
-# Check if ACP bridge is available
-_acp_bridge_socket=""
-for _sock in /tmp/freely-acp-*.sock; do
-  if [[ -S "$_sock" ]]; then
-    _acp_bridge_socket="$_sock"
-    break
-  fi
-done
+# Check if ACP bridge is available.
+# ACP needs: (1) freely daemon running, (2) ACP socket present, (3) run-acp-prompt.py executable.
+# If freely is running but task mode is "wait", ACP socket exists but won't process requests.
+_acp_available=0
+_acp_unavailable_reason=""
 
-if [[ -n "$_acp_bridge_socket" ]] && [[ -x "$ACP_PROMPT_CLIENT" ]]; then
-  echo "ACP bridge: $_acp_bridge_socket"
+# 1. Check freely daemon is running
+_freely_pid=$(pgrep -f 'freely.*daemon\|freely.*start\|freely.*ensure' 2>/dev/null | head -1 || true)
+if [[ -z "$_freely_pid" ]]; then
+  _acp_unavailable_reason="freely daemon 未运行（pgrep 无匹配进程）"
+else
+  # 2. Check ACP socket
+  _acp_bridge_socket=""
+  for _sock in /tmp/freely-acp-*.sock; do
+    if [[ -S "$_sock" ]]; then
+      _acp_bridge_socket="$_sock"
+      break
+    fi
+  done
+  if [[ -z "$_acp_bridge_socket" ]]; then
+    _acp_unavailable_reason="freely daemon 运行中（PID $_freely_pid）但 ACP socket 不存在"
+  elif [[ ! -x "$ACP_PROMPT_CLIENT" ]]; then
+    _acp_unavailable_reason="ACP socket 存在但 run-acp-prompt.py 不可执行"
+  else
+    _acp_available=1
+  fi
+fi
+
+if [[ "$_acp_available" == "1" ]]; then
+  echo "ACP bridge: $_acp_bridge_socket (freely PID $_freely_pid)"
 
   _review_output=$(python3 "$ACP_PROMPT_CLIENT" \
     --bridge-socket "$_acp_bridge_socket" \
@@ -349,7 +368,8 @@ if [[ -n "$_acp_bridge_socket" ]] && [[ -x "$ACP_PROMPT_CLIENT" ]]; then
     _review_session_id="$_new_session_id"
   fi
   else
-    echo "[INFO] ACP bridge 不可用，需人工审查"
+    echo "[INFO] ACP 不可用 — $_acp_unavailable_reason"
+    echo "[INFO] 回退到人工审查"
     echo ""
     echo "  请加载 skill:freely-tdd-review，按五层 IBM 链路逐级审查："
     echo "  第一层 Raw Issue — 问题质量：这是好 issue 吗？"
@@ -505,6 +525,20 @@ _platform_remote_name() {
   echo "  ./bin/pr-merge-guarded $base $review_branch"
   exit 0
 
+elif [[ "$_review_verdict" == "manual_required" ]]; then
+  echo "📋 人工审查 — ACP bridge 不可用，需按 skill:freely-tdd-review 手动审查"
+  echo ""
+  echo "  审查指南: $_review_guide"
+  echo "  审查结论写入: $review_file"
+  echo ""
+  echo "  审查步骤:"
+  echo "    1. 加载 skill:freely-tdd-review"
+  echo "    2. 从 raw issue 开始，逐级向下审查"
+  echo "    3. 每级检查：下层是否忠实消化了上层？"
+  echo "    4. 审查结论写入 $review_file"
+  echo "    5. git add $review_file && git commit -m 'review: manual review verdict=pass'"
+  echo "    6. 重新运行 ./bin/pr-merge-guarded $base $review_branch"
+  exit 1
 else
   echo "❌ TDD Review FAILED (round $_review_round)"
 
