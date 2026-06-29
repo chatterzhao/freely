@@ -17,8 +17,8 @@ description: 新功能/大型改动的完整开发流程——feedback→wt-crea
 | | freely-fix-execution | freely-feature-execution |
 |---|---|---|
 | 适用 | bug fix、小改动 | 新功能、大型重构 |
-| 流程 | feedback → wt-create → dev → test → B1 → B2 → pr-create → pr-review → pr-merge → wt-close | feedback → wt-create → B1 → B2 → dev → test → pr-create → pr-review → pr-merge → wt-close |
-| IBM 顺序 | 实现后治理（Fix first, govern later）（完整工作流见 skill:freely-fix-execution 文档） | 治理后实现（Govern first, code later）（完整工作流见 skill:freely-feature-execution 文档） |
+| 流程 | feedback → wt-create → B1 → B2 → dev → test → pr-create → pr-review → pr-merge → wt-close | feedback → wt-create → B1 → B2 → dev → test → pr-create → pr-review → pr-merge → wt-close |
+| IBM 顺序 | 治理后实现（Govern first, code later） | 治理后实现（Govern first, code later） |
 
 ## 下层 skill
 

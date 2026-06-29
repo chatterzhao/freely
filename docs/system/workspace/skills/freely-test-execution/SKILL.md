@@ -12,7 +12,7 @@ description: 独立测试执行 skill——在 test-pre-merge 工位中逐条执
 
 ```
 feat: B1 → B2(写pre-tests) → dev(RED-GREEN实现) → test(执行验证) → pr
-fix:  wt-create → dev(RED-GREEN实现) → test(执行验证) → B1 → B2 → pr
+fix:  wt-create → B1 → B2(写pre-tests) → dev(RED-GREEN实现) → test(执行验证) → pr
 ```
 
 test skill 位于 dev-loop 和 pr-create 之间。它是最后一道自动化验证闸门——任何一条测试不通过，都不能进入 PR。
