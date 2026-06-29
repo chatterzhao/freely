@@ -549,9 +549,51 @@ do_initial_merge() {
       echo "[MERGE-GUARD] PR review: pass ✓"
     fi
   fi
-  # TODO: add dev↔test consistency check (freely_wt_assert_dev_test_consistent)
-  # Blocked by chicken-egg: pr-merge runs from develop, function only on feature branch.
-  # After this merge: source worktree-common.sh + call freely_wt_assert_dev_test_consistent.
+  # ── Local↔Remote sync check: local branch must match what's in the PR ──
+  # Catches the case where local commits (review, fixes) weren't pushed to the PR.
+  git fetch github "$source_branch" 2>/dev/null || true
+  if git rev-parse --verify "refs/remotes/github/$source_branch" >/dev/null 2>&1; then
+    local _local_head _remote_head
+    _local_head=$(git rev-parse "$source_branch" 2>/dev/null || true)
+    _remote_head=$(git rev-parse "refs/remotes/github/$source_branch" 2>/dev/null || true)
+    if [[ -n "$_local_head" && -n "$_remote_head" && "$_local_head" != "$_remote_head" ]]; then
+      cat >&2 <<LOCAL_REMOTE_SYNC
+╔══════════════════════════════════════════════════════════════╗
+║  ⚠️  PR 分支与本地不一致 — 本地有未推送的提交                ║
+╠══════════════════════════════════════════════════════════════╣
+║  本地 $source_branch: $_local_head
+║  PR 远程: $_remote_head
+║                                                              ║
+║  PR 中的代码 ≠ 你要合并的代码。以下提交未在 PR 中:             ║
+║  \$(git log --oneline $_remote_head..$_local_head 2>/dev/null)
+║                                                              ║
+║  请推送到 PR 分支后再合并:                                     ║
+║    git push github $source_branch                            ║
+║    git push origin $source_branch                            ║
+╚══════════════════════════════════════════════════════════════╝
+LOCAL_REMOTE_SYNC
+      exit 1
+    fi
+    echo "[MERGE-GUARD] local↔remote sync: ✓ ($_local_head)"
+  fi
+  # ── Dev↔Test consistency check ──
+  # Source worktree-common.sh from the source branch's WORKTREE (not develop).
+  # This avoids the chicken-egg problem: the worktree has the latest scripts.
+  local _src_wt
+  _src_wt=$(git worktree list --porcelain 2>/dev/null | awk -v br="refs/heads/$source_branch" '
+    $1=="worktree" { wt=$2 }
+    $1=="branch" && $2==br { print wt; exit }
+  ')
+  if [[ -n "$_src_wt" && -f "$_src_wt/bin/worktree-common.sh" ]]; then
+    source "$_src_wt/bin/worktree-common.sh"
+    if [[ -n "$_raw_key" ]]; then
+      freely_wt_assert_dev_test_consistent "$_raw_key" || {
+        echo ""
+        echo "  同步后重跑 test-GREEN（skill:freely-test-execution），全部 green 后重新 pr-merge。"
+        exit 1
+      }
+    fi
+  fi
   run_promotion_gate_if_needed "$target" "$source_branch"
   [[ "$dry_run" == "1" ]] && { echo "[MERGE-GUARD] --dry-run complete."; return 0; }
   # ── Local git merge with receipt ──
