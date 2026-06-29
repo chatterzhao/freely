@@ -25,7 +25,7 @@ Optional:
   --kind fix     bug 可以稳定复现。
                  已有测试能捕获 → 直接跑，确认 FAIL。
                  没有测试 → 设计复现测试或手工端到端复现。
-                 RED 含义: 确认 bug 真的存在。
+                 RED 含义: bug 存在时按测试方法测试一定是 RED，修复正确后，用修复前一样的测试方法，结论一定是 GREEN
                  分支: fix/raw-{raw-key}-{slug}
 
   --kind feature 新功能、重构、优化、架构改进。
@@ -178,7 +178,7 @@ Missing required: --kind
   --kind 怎么选（仔细分析，选错会影响 RED 阶段行为）:
 
     fix     bug 可以稳定复现。已有测试能捕获，或可以手工端到端复现。
-            RED 阶段 = 复现 bug，确认它真的存在。
+            RED 阶段 = 复现——bug 存在时按测试方法测试一定是 RED，修复正确后，用修复前一样的测试方法，结论一定是 GREEN
             分支: fix/raw-{key}-{slug}
 
     feature 新功能、重构、优化、架构改进。

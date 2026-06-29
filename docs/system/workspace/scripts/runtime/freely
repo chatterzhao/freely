@@ -23463,7 +23463,7 @@ Options:
   --title <text>     Required. Issue title.
   --body <text>      Required. Issue body/description.
   --kind <fix|feature>   Required. Issue kind — determines workflow and RED strategy.
-                        fix:     bug 可以稳定复现。RED = 确认 bug 存在。
+                        fix:     bug 存在时按测试方法测试一定是 RED，修复正确后，用修复前一样的测试方法，结论一定是 GREEN
                         feature: 新功能、重构、优化。功能未实现时，按测试方法测试一定是 RED，实现正确后，用实现前一样的测试方法，结论一定是 GREEN
   --severity <level> Priority: P0 (critical), P1 (high), P2 (default).
 
@@ -23494,7 +23494,7 @@ HELP
     echo >&2 ""
     echo >&2 "  --kind fix"
     echo >&2 "    Bug 可以稳定复现。已有测试能捕获，或可以手工端到端复现。"
-    echo >&2 "    RED 阶段 = 复现 bug，确认它真的存在。"
+    echo >&2 "    RED 阶段 = 复现——bug 存在时按测试方法测试一定是 RED，修复正确后，用修复前一样的测试方法，结论一定是 GREEN"
     echo >&2 "    分支: fix/raw-{key}-{slug}"
     echo >&2 ""
     echo >&2 "  --kind feature"
