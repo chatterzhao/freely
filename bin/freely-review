@@ -135,6 +135,7 @@ if [[ "$caller" == "worker" ]]; then
 		    [[ -z "$_epic_dir" ]] && _epic_dir="docs/epics/pr-review-guarded/code-reviews"
 		    _review_file="$_epic_dir/pr-review-raw-${raw_key}.md"
 		    mkdir -p "$(dirname "$_review_file")"
+			_pf=$(mktemp /tmp/freely-review-prompt-XXXXXX.md)
 	    cat > "$_pf" << PROMPT
 You are the Freely TDD Reviewer. Load and follow skill:freely-tdd-review.
 
