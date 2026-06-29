@@ -313,6 +313,9 @@ def is_governance_only_path(rel_path: str) -> bool:
     # Meta-governance quality scripts (governance-merge-gate itself)
     if rel_path.startswith("docs/system/workspace/scripts/quality/"):
         return True
+    # Hook documentation (.md only, not hook scripts which are runtime code)
+    if rel_path.startswith("docs/system/workspace/hooks/") and rel_path.endswith(".md"):
+        return True
     return False
 
 
