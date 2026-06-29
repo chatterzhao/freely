@@ -1,4 +1,19 @@
 
+## M-20260629T163137Z-A
+- title: fix: pr-review-guarded path + ACP detection
+- status: active
+### candidate_issues
+1. `C-20260629T163137Z-A`
+- milestone: M-20260629T163137Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/pr-review-guarded/review-fixes/raw-20260629T163137Z/issues/I-20260629T163137Z-A.md`
+### committed_issues
+1. `I-20260629T163137Z-A`
+- title: fix: pr-review-guarded path + ACP; milestone_state: committed
+- issue_path: `docs/epics/pr-review-guarded/review-fixes/raw-20260629T163137Z/issues/I-20260629T163137Z-A.md`
+- phase_state: `completed`
+### completed_issues
+
 ## M-20260629T165403Z-A
 - title: fix: wt-close args unbound + test-pre-merge -D
 - status: active
