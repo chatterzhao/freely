@@ -49,9 +49,9 @@ B1_IBM 是 IBM Framework 第一阶段。I（Input）由 `freely wt-create` 命�
 
 ### M：Milestone — 创建 milestone 节点（M-{key}-A），candidate 入队，决定 I-* 目标路径
 
-1. 从 brainstorms.md 收敛结论产出 `candidates.md`（candidate 文档，ID：C-{key}-A），格式见下方示例
-2. 在 `docs/milestones.md` 中创建 `## M-{key}-A` milestone 节点，将 candidate 写入 `candidate_issues` 队列
-3. Candidate 的 `promoted_issue_path` 字段**决定 I-* issue 的 key 和文件路径**——这是对接 `freely-doc-B2_IBM-execution` skill 的关键字段
+1. 从 brainstorms.md 收敛结论产出 `candidates.md`（candidate 文档）。candidate 的 ID 命名规则：`C-{key}-{suffix}`，suffix 从 A 开始递增（C-{key}-A、C-{key}-B...）。**一个 raw issue 通常只有一个 candidate（C-{key}-A）；raw issue scope 过大时拆成多个 candidate。**
+2. 在 `docs/milestones.md` 中创建 `## M-{key}-A` milestone 节点，将 candidate 写入 `candidate_issues` 队列。Milestone ID 与第一个 candidate 对齐（M-{key}-A）。
+3. Candidate 的 `promoted_issue_path` 字段**决定 I-* issue 的 key 和文件路径**——I-* 的 suffix 继承 candidate 的 suffix（C-{key}-A → I-{key}-A，C-{key}-B → I-{key}-B）。这是对接 `freely-doc-B2_IBM-execution` skill 的关键字段。
 4. Candidate 路径：`proposed → needs_research → blocked → promoted / absorbed / dropped`
 5. 状态变为 promoted 后，handoff 给 `freely-doc-B2_IBM-execution` skill
 
