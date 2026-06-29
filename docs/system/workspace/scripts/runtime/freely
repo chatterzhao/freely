@@ -23445,15 +23445,16 @@ conn.close()
 }
 
 cmd_feedback() {
-  local title="" body="" severity="P2" raw_key="" stamp="" local_id="" issue_dir="" issue_file="" issue_sync_bin="" sync_result
+  local title="" body="" severity="P2" issue_kind="" raw_key="" stamp="" local_id="" issue_dir="" issue_file="" issue_sync_bin="" sync_result
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --title) title="${2:-}"; shift 2 ;;
       --body) body="${2:-}"; shift 2 ;;
+      --kind) issue_kind="${2:-}"; shift 2 ;;
       --severity) severity="${2:-}"; shift 2 ;;
       --help|-h) cat <<HELP; return 0
-Usage: freely feedback --title <text> --body <text> [--severity P0|P1|P2]
+Usage: freely feedback --title <text> --body <text> --kind <fix|feature> [--severity P0|P1|P2]
 
 Create a raw issue on all configured repo platforms (GitHub, Gitee, ...).
 Repo is auto-detected from git remotes — no need to pass it manually.
@@ -23461,6 +23462,9 @@ Repo is auto-detected from git remotes — no need to pass it manually.
 Options:
   --title <text>     Required. Issue title.
   --body <text>      Required. Issue body/description.
+  --kind <fix|feature>   Required. Issue kind — determines workflow and RED strategy.
+                        fix:     bug 存在时按测试方法测试一定是 RED，修复正确后，用修复前一样的测试方法，结论一定是 GREEN
+                        feature: 新功能、重构、优化。功能未实现时，按测试方法测试一定是 RED，实现正确后，用实现前一样的测试方法，结论一定是 GREEN
   --severity <level> Priority: P0 (critical), P1 (high), P2 (default).
 
 Examples:
@@ -23470,8 +23474,8 @@ If a similar open issue exists, reuse it instead of creating a duplicate:
   - Comment on the existing issue with additional context
   - Use the existing raw_key to create/resume a worktree
 
-  freely feedback --title "bug: something broken" --body "details..."
-  freely feedback --title "feat: new capability" --body "details..." --severity P1
+  freely feedback --title "fix: something broken" --body "details..." --kind fix
+  freely feedback --title "feat: new capability" --body "details..." --kind feature --severity P1
 HELP
         ;;
       --repo|--repo=*)
@@ -23485,6 +23489,29 @@ HELP
 
   [[ -n "$title" ]] || { log_error "--title is required"; return 1; }
   [[ -n "$body" ]] || { log_error "--body is required"; return 1; }
+  [[ -n "$issue_kind" ]] || {
+    log_error "--kind is required. Carefully analyze your issue before choosing:"
+    echo >&2 ""
+    echo >&2 "  --kind fix"
+    echo >&2 "    Bug 可以稳定复现。已有测试能捕获，或可以手工端到端复现。"
+    echo >&2 "    RED 阶段 = 复现——bug 存在时按测试方法测试一定是 RED，修复正确后，用修复前一样的测试方法，结论一定是 GREEN"
+    echo >&2 "    分支: fix/raw-{key}-{slug}"
+    echo >&2 ""
+    echo >&2 "  --kind feature"
+    echo >&2 "    新功能、重构、优化、架构改进。"
+    echo >&2 "    RED 阶段 = 设计测试——功能未实现时，按测试方法测试一定是 RED，实现正确后，用实现前一样的测试方法，结论一定是 GREEN"
+    echo >&2 "    分支: feature/raw-{key}-{slug}"
+    echo >&2 ""
+    echo >&2 "  如果 bug 修复同时需要实现紧相关的新功能 → 拆为两个 raw issue，分别 feedback。"
+    echo >&2 ""
+    echo >&2 "  --kind 影响: ① 分支前缀 ② RED 阶段策略（复现 vs 设计新测试）"
+    echo >&2 "  仔细分析，选错了 RED 阶段的行为就不对了。"
+    return 1
+  }
+  case "$issue_kind" in
+    fix|feature) ;;
+    *) log_error "--kind must be 'fix' or 'feature' (got '$issue_kind')"; return 1 ;;
+  esac
   case "$severity" in
     P0|P1|P2) ;;
     *) log_error "--severity must be P0, P1, or P2"; return 1 ;;
@@ -23531,6 +23558,9 @@ HELP
   stamp=$(date -u +%Y%m%dT%H%M%SZ)
   raw_key="$stamp"
   local_id="raw-${raw_key}"
+
+  # Prepend kind to body so wt-create can read it later
+  body="---\nkind: ${issue_kind}\n---\n\n${body}"
 
   # Platforms are auto-detected by freely start / daemon start and written to config.toml.
   # Read directly from config.toml via freely_config.py, not from env (config.env is long deprecated).

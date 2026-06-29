@@ -63,7 +63,7 @@ MSG
     2. 批量 closeout / 数据迁移 / YAML 规范化（机械操作，不改变行为）
 
   代码修改（含紧急修复）必须走完整流程:
-    wt-create → skill:freely-fix-execution → dev → pr-merge-guarded
+    wt-create → skill:freely-workflow-guarded-execution → B1 → B2 → dev → test → pr-merge-guarded
 
   本次绕过已记录。如非上述 2 种情况，请立即回退并走正常流程。
 GATE_WARN

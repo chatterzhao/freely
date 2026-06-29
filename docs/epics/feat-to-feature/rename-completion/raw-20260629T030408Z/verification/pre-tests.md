@@ -18,6 +18,7 @@
 - evidence_file: docs/epics/feat-to-feature/rename-completion/raw-20260629T030408Z/verification/test-evidence/acceptance-1.log
 - blocker: (失败时填写)
 - status: passed
+- red-green-status: green
 
 ### acceptance-2: 所有活跃脚本中零 feat-execution 残留
 - id: AT-002
@@ -34,6 +35,7 @@
 - evidence_file: docs/epics/feat-to-feature/rename-completion/raw-20260629T030408Z/verification/test-evidence/acceptance-2.log
 - blocker: (失败时填写)
 - status: passed
+- red-green-status: green
 
 ### acceptance-3: AGENTS.md 使用 feature: 而非 feat:
 - id: AT-003
@@ -50,6 +52,7 @@
 - evidence_file: docs/epics/feat-to-feature/rename-completion/raw-20260629T030408Z/verification/test-evidence/acceptance-3.log
 - blocker: (失败时填写)
 - status: passed
+- red-green-status: green
 
 ## Unit
 - acceptance_target: 8个活跃代码文件中无 feat-execution 残留

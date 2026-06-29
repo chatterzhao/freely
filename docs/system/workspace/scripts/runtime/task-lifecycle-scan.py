@@ -624,7 +624,7 @@ def scan(project: Path) -> dict:
                 "key": raw_key,
                 "ready": True,
                 "detail": "Platform OPEN, no local worktree or raw directory",
-                "next_action": f"[manager] wt-create --raw-key {raw_key} --source platform --skill freely-fix-execution",
+                "next_action": f"[manager] wt-create --raw-key {raw_key} --source platform --skill freely-workflow-guarded-execution",
             })
         # ── Reopen case (1b): platform OPEN + raw on develop with terminal phase ──
         # This is handled above: if raw_on_develop and phase is terminal,
@@ -643,7 +643,7 @@ def scan(project: Path) -> dict:
                     "phase_state": raw_issue["phase_state"],
                     "ready": True,
                     "detail": f"Previous round completed (phase={raw_issue['phase_state']}), platform issue REOPENED",
-                    "next_action": f"[manager] wt-create --raw-key {raw_key} --source platform --skill freely-fix-execution (reopen)",
+                    "next_action": f"[manager] wt-create --raw-key {raw_key} --source platform --skill freely-workflow-guarded-execution (reopen)",
                 })
 
     # ── Also check I-* issues for non-terminal state ────────────────

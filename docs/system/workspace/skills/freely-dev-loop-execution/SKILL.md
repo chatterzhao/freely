@@ -5,8 +5,7 @@ description: 执行 scan-selected 或 handoff-continued ready issue 的实现、
 
 # skill:freely-dev-loop-execution
 
-> 全链路: feedback → wt-create → B1_IBM → B2_IBM → dev → pr-create-guarded → pr-review-guarded → pr-merge-guarded → wt-close
->                                                          [本 skill 自此开始 — 实现 + code-review + pre-tests]
+> 全链路: [cmd] freely feedback → [skill] freely-workflow-guarded-execution → [cmd] freely wt-create → [skill] freely-doc-B1_IBM-execution → [skill] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill][here] freely-dev-loop-execution → [skill] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
 
 ## 职责
 

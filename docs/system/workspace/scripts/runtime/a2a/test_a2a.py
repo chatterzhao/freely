@@ -131,9 +131,9 @@ def test_registry_deregister():
 def test_registry_skill():
     from a2a_registry import AgentRegistry
     reg = AgentRegistry()
-    reg.register("http://a:19100", "worker", skills=["freely-fix-execution"])
-    reg.register("http://b:19100", "worker", skills=["freely-feature-execution"])
-    results = reg.discover(skill="freely-fix-execution")
+    reg.register("http://a:19100", "worker", skills=["freely-workflow-guarded-execution"])
+    reg.register("http://b:19100", "worker", skills=["freely-workflow-guarded-execution"])
+    results = reg.discover(skill="freely-workflow-guarded-execution")
     assert len(results) == 1
     assert results[0].endpoint == "http://a:19100"
 
@@ -233,7 +233,7 @@ def test_server_agentcard():
     card = _build_agent_card("/tmp/test")
     assert len(card.skills) == 7
     skill_ids = [s.id for s in card.skills]
-    assert 'freely-fix-execution' in skill_ids
+    assert 'freely-workflow-guarded-execution' in skill_ids
     assert card.capabilities.streaming == True
 
 @test("Server: dual transport config")
