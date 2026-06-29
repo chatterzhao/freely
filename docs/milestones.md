@@ -994,7 +994,7 @@
 ### committed_issues
 1. `I-20260629T095905Z-A`
 - title: optimize workflow skill — stage 0, cd hint, CLAUDE.md chain; milestone_state: completed
-- issue_path: `docs/epics/skill-docs-optimization/description-and-chain-unify/raw-20260629T095905Z/issues/I-20260629T095905Z-A.md`
+- issue_path: `docs/epics/skill-standardize/description-and-chain-unify/raw-20260629T095905Z/issues/I-20260629T095905Z-A.md`
 - phase_state: `completed`
 
 ### completed_issues
