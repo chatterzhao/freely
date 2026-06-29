@@ -1,6 +1,13 @@
 ---
 name: freely-doc-B1_IBM-execution
-description: B1_IBM：I→B→M 第一阶段。消费 scan 结果中 wt-create 准备的 raw issue，经 Brainstorm 发散收敛产出 candidate，进入 milestone 规划队列。
+description: >-
+  IBM Framework 第一阶段。消费 raw issue 做 Brainstorm 发散收敛，
+  产出 candidate 进入 milestone 规划队列。标准产物：brainstorms.md
+  （discovery/research/decision）+ candidates.md + milestones.md 更新。
+
+  Use when: `freely wt-create` 命令建好工位之后，需要对 raw issue
+  做根因分析、方案评估、scope 判定的预研阶段。触发词："B1"、"预研"、
+  "brainstorm"、"candidate"、"分析这个 issue"、"评估方案"。
 ---
 
 # skill:freely-doc-B1_IBM-execution
