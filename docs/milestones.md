@@ -990,11 +990,11 @@
 ### candidate_issues
 1. `C-20260629T095905Z-A`
 - milestone: M-20260629T095905Z-A; status: promoted
-- promoted_issue_path: `docs/issues/I-20260629T095905Z-A/issue.md`
+- promoted_issue_path: `docs/epics/skill-docs-optimization/description-and-chain-unify/raw-20260629T095905Z/issues/I-20260629T095905Z-A.md`
 ### committed_issues
 1. `I-20260629T095905Z-A`
 - title: optimize workflow skill — stage 0, cd hint, CLAUDE.md chain; milestone_state: completed
-- issue_path: `docs/issues/I-20260629T095905Z-A/issue.md`
+- issue_path: `docs/epics/skill-docs-optimization/description-and-chain-unify/raw-20260629T095905Z/issues/I-20260629T095905Z-A.md`
 - phase_state: `completed`
 
 ### completed_issues
