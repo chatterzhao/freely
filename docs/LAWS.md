@@ -208,7 +208,7 @@
 3. `milestone_state` 只表达 milestone 队列归属，建议值保持为 `candidate | committed | completed`；不得再拿它表达 B2 / dev / verification 阶段。
 4. 任何跨环迁移都必须同步更新对应产物，最少遵循：
    - `discovery -> pre_brainstorm`：更新 `brainstorms.md`、`candidates.md`、`milestones.md.candidate_issues`，并使用 `candidate.status=proposed | needs_research | blocked`
-   - `candidate → milestone → I-* issue`（四节点链路）：`freely-doc-B1_IBM-execution` skill 把 candidate（`C-{key}-A`）接入 milestone（`M-{key}-A`，写入 milestones.md candidate_issues）；`freely-doc-B2_IBM-execution` skill 把该 `M-{key}-A` materialize 成 I-* issue（`I-{key}-A`），物化到 `docs/epics/{epic}/{story}/raw-{raw-key}/issues/`，并同步更新 milestones.md committed_issues，然后进入 `phase_state=in_b2_ibm`
+   - `candidate → milestone → I-* issue`（四节点链路）：`freely-doc-B1_IBM-execution` skill 把 candidate（`C-{key}-A`）接入 milestone（`M-{key}-A`，写入 milestones.md candidate_issues）；`freely-doc-B2_IBM-execution` skill 把该 `M-{key}-A` materialize 成 I-* issue（`I-{key}-A`），物化到 `docs/epics/{epic-name}/{story-name}/raw-{raw-key}/issues/`，并同步更新 milestones.md committed_issues，然后进入 `phase_state=in_b2_ibm`
    - `in_b2_ibm -> done_b2_ibm`：更新 `issue`、`docs/milestones.md`，不得强制创建 `progress`
    - `done_b2_ibm -> in_dev`：更新 `issue`、`docs/milestones.md`、`progress`
    - `in_dev -> blocked_dev`：更新 `issue`、`progress`、`docs/milestones.md`，并记录 blocker

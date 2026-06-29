@@ -26,7 +26,7 @@ B1_IBM 是 IBM Framework 第一阶段。I（Input）由 `freely wt-create` 命�
 | **B** | Brainstorm | `freely-doc-B1_IBM-execution` skill | `docs/pre-brainstorms/{key}--{slug}/brainstorms.md`：发散→收敛→决策 |
 | **M** | Milestone | `freely-doc-B1_IBM-execution` skill | `docs/pre-brainstorms/{key}--{slug}/candidates.md`（candidate 文档）+ milestones.md candidate_issues（candidate 的 `promoted_issue_id` 指定 I-* issue 的身份标识） |
 
-> Candidate promote 时，`promoted_issue_id` 字段确定 I-* issue 的 key。值是 `I-{key}-{suffix}`（如 `I-20260508T011858Z-A`），suffix 继承 candidate 的 suffix。`freely-doc-B2_IBM-execution` skill 根据此 key，自行确定 epic/story 后构造完整路径（`docs/epics/{epic}/{story}/raw-{raw-key}/issues/I-{raw-key}-{suffix}.md`）并物化文件。B1_IBM 不决定文件放在哪个 epic/story——那是 B2_IBM 的架构决策。
+> Candidate promote 时，`promoted_issue_id` 字段确定 I-* issue 的 key。值是 `I-{key}-{suffix}`（如 `I-20260508T011858Z-A`），suffix 继承 candidate 的 suffix。`freely-doc-B2_IBM-execution` skill 根据此 key，自行确定 epic/story 后构造完整路径（`docs/epics/{epic-name}/{story-name}/raw-{raw-key}/issues/I-{raw-key}-{suffix}.md`）并物化文件。B1_IBM 不决定文件放在哪个 epic/story——那是 B2_IBM 的架构决策。
 
 ### I：Input — `freely wt-create` 命令准备的 raw issue
 

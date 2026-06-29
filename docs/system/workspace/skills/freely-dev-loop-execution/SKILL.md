@@ -53,7 +53,7 @@ description: >-
 ### 情景 B：回写执行进度
 
 这样做：
-1. 仅把执行态写入 `docs/progress/{epic}/p-{issue}.md`（`{epic}` 由 `freely-doc-B2_IBM-execution` skill 确定——与 I-* issue 所在的 epic 一致）：
+1. 仅把执行态写入 `docs/progress/{epic-name}/p-{issue}.md`（`{epic-name}` 由 `freely-doc-B2_IBM-execution` skill 确定——与 I-* issue 所在的 epic 一致）：
    - 当前实现进度
    - 测试结果
    - blocker
