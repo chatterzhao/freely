@@ -45,9 +45,16 @@ candidate 的 `promoted_issue_path` 字段包含了 I-* issue 文档的目标路
 2. 读实现面、读验收标准、评估替代方案
 3. 产出 `docs/epics/{epic}/{story}/brainstorms/b-{issue-name}.md`
 
-### M：Map — 物化 I-* issue + 完整产物目录
+### M：Map — 确定 epic/story + 物化 I-* issue + 完整产物目录
 
-产出 `docs/epics/{epic}/{story}/raw-{raw-key}/` 下的完整目录。其中 I-* issue 是本 skill 的核心产物——根据 candidate 的 `promoted_issue_path`，在该路径物化包含完整 frontmatter 和正文的 issue 文档。
+**步骤 0：确定 epic-name 和 story-name**（写任何产物前必须先做）。
+
+`{epic}` 是能力域（capability domain），`{story}` 是 epic 下的可交付切片。这是架构决策——基于语义理解，不是从 candidate title 机械提取关键词。详见 [issue-materialization-checklist.md](references/issue-materialization-checklist.md) §如何确定 epic-name 和 story-name。简单原则：
+- 这个 raw issue 解决的能力问题，和已有 epic 的**能力域重叠** → 复用已有 epic
+- 能力域**正交**（独立可理解、独立可验收）→ 新建 epic
+- 同一 epic 下的新子问题 → 新建 story
+
+**步骤 1：产出目录**。产出 `docs/epics/{epic}/{story}/raw-{raw-key}/` 下的完整目录。其中 I-* issue 是本 skill 的核心产物——根据 candidate 的 `promoted_issue_path`，在该路径物化包含完整 frontmatter 和正文的 issue 文档。
 
 | 产物 | 要求 |
 |------|------|

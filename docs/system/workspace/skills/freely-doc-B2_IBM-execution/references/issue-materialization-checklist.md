@@ -48,14 +48,54 @@ docs/epics/{epic-name}/                               ← epic：一个能力域
 
 ### 如何确定 epic-name 和 story-name
 
-1. **读取 `docs/epics-map.svg`**：了解现有 epic 和 story 的全貌
-2. **从 candidate 提取关键词**：取 candidate title 的核心能力名词，转为 kebab-case slug
-3. **搜索已有 epic**：
-   - 关键词匹配已有 epic 名 → 用已有 epic
-   - 已有 epic 下有 story → 判断本批次是否可归入已有 story，还是需要新建 story
-   - 无匹配 → 新建 epic（kebab-case，简短描述能力域，如 `chat-refactor`）
-4. **新建 story 的命名**：`{epic-name}` 下的子交付 slug，如 `comment-module`
-5. **更新 `docs/epics-map.svg`**：新建或变更 epic/story 后必须更新 SVG，门禁会检查对齐
+> **Epic 和 story 是架构决策，不是字符串转换。** 不要从 candidate title 机械提取关键词拼 kebab-case——那是机器思维，产出的是无法理解的目录名。正确做法：理解这个 raw issue 在解决什么能力问题，然后基于语义确定它属于哪个能力域。
+
+#### 什么是 Epic
+
+一个**能力域**（capability domain），可独立理解、独立交付、独立验收。判断标准：如果 3 个月后有人问"Freely 的 XX 是怎么做的"，XX 就是 epic 名。
+
+| ✅ 好的 epic 名 | ❌ 坏的 epic 名 |
+|----------------|----------------|
+| `worktree-lifecycle`（工位全生命周期） | `fix-wt-create-local-bug`（用 bug 标题当 epic） |
+| `ai-session-continuity`（AI 会话连续性） | `acp-session-id-format-fix`（用修复手段当 epic） |
+| `process-supervision`（进程监督） | `sup-pid-file-fix`（太窄，单个修复） |
+| `issue-sync-platform`（issue 平台同步） | `platform-adapter-title-key`（太具体） |
+
+命名规则：全小写英文，用 `-` 连接，表达一个**稳定的能力概念**，不是任务描述。不包含 `fix-`、`feat-`、`raw-` 前缀。
+
+#### 什么是 Story
+
+Epic 下的一个**可交付切片**。一个 raw issue 的完整生命周期（raw → candidate → I-* issue）通常对应一个 story。同一 epic 下，不同 story 解决 epic 的不同子问题。
+
+Epic `worktree-lifecycle` 下：
+- `creation-from-raw-issue`（wt-create 创建工位）
+- `cross-worktree-consistency`（dev↔test 一致性）
+- `cleanup-and-retirement`（wt-close 收口）
+
+Epic `ai-session-continuity` 下：
+- `session-id-extraction`（session ID 提取兼容）
+- `prompt-branch-output-fix`（prompt 分支输出修正）
+
+命名规则：全小写英文，用 `-` 连接，表达 story 解决的**具体切面**。
+
+#### 决策流程
+
+1. **读全貌**：`docs/epics-map.svg` 了解已有 epic 和 story
+2. **读 candidate**：理解这个 raw issue 到底在解决什么**能力层面**的问题
+3. **判是否已有 epic 覆盖**：
+   - 涉及的**能力域**与已有 epic 重叠 → 复用该 epic
+   - 涉及的**能力域**与所有已有 epic **正交**（独立可理解、独立可验收）→ 新建 epic
+4. **判 story**：
+   - 同一 epic 下已解决过这个子问题 → 续到已有 story 的 `raw-{raw-key}` 目录
+   - 是 epic 下的新子问题 → 新建 story
+5. **不需要脚本自动化**：epic 和 story 的名字是人读的架构索引——基于语义判断，不基于关键词匹配
+6. **更新 `docs/epics-map.svg`**：新建或变更 epic/story 后必须更新 SVG，门禁会检查对齐
+
+#### 一个 raw → 一个 story 还是多个？
+
+- 一个 raw issue 的 scope 是一个独立子问题 → 一个 story
+- raw issue scope 太大、cover 多个独立切面 → B1_IBM 阶段拆成多个 candidate，每个 candidate → 自己的 story
+- 多个 raw issue 解决同一个子问题的不同阶段 → 同一个 story 下多个 `raw-{raw-key}` 目录
 
 ### 需确认的字段
 
