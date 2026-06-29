@@ -5,7 +5,7 @@ description: 新功能/大型改动的完整开发流程——feedback→wt-crea
 
 # skill:freely-feature-execution
 
-> 全链路: feedback → [命令] wt-create → [skill] skill:freely-doc-B1_IBM-execution → [skill] skill:freely-doc-B2_IBM-execution → dev(RED-GREEN) → [skill] skill:freely-test-execution(全绿) → [命令] pr-create-guarded → [命令] pr-review-guarded → [命令] pr-merge-guarded → [命令] wt-close
+> 全链路: feedback → [命令] wt-create → [skill] skill:freely-doc-B1_IBM-execution → [skill] skill:freely-doc-B2_IBM-execution → RED(功能未实现) → dev(实现) → GREEN(功能已实现) → [skill] skill:freely-test-execution(test-pre-merge) → [命令] pr-create-guarded → [命令] pr-review-guarded → [命令] pr-merge-guarded → [命令] wt-close
 >                                                              [本 skill 自此开始 — B1→B2→dev→test→pr→merge→close 完整抽象]
 
 ## 定位
@@ -68,16 +68,43 @@ freely-feature-execution 在不同阶段调用下层 skill：
 2. issue phase_state = done_b2_ibm → 进入 dev
 ```
 
-### 阶段 3：Dev 实现
+### 阶段 3：RED — 确认功能未实现（写代码之前）
+
+**不通过 RED，绝不允许写一行实现代码。**
+
+```
+1. 在 feature 工位逐条执行 pre-tests.md 的 test_command
+2. feature 的 RED 含义: 确认功能真的还未实现
+   - 按重要度设计测试: 端到端（必须）→ 集成 → 单元
+   - 每个测试在未实现时必须 FAIL
+3. 每条 acceptance item:
+   - 真的 FAIL 了 → red-green-status = red，记录 actual_RED_output
+   - 意外 PASS 了 → 测试本身有问题（测的不是新功能/测试太弱），回 B2 修 pre-tests
+4. 全部 red（或合理 not_applicable）→ 进入 dev
+```
+
+### 阶段 4：Dev 实现
+
 ```
 1. skill:freely-dev-loop-execution
    → 在 feature worktree 实现
-   → 写 pre-tests 并运行
+   → 不碰 pre-tests.md 的测试方案（测试先行，代码后行）
    → 写 code-review（含 Implementation Decision Note）
-   → 更新 progress phase_state → in_dev → in_verification
+   → 更新 progress phase_state → in_dev
 ```
 
-### 阶段 4：test-pre-merge 验证
+### 阶段 5：GREEN — 确认功能已实现（写代码之后）
+
+```
+1. 在 feature 工位逐条重新执行 pre-tests.md 的 test_command
+2. feature 的 GREEN 含义: 确认功能已实现，验收测试通过
+3. 每条 acceptance item:
+   - PASS 了 → red-green-status = green，填写 actual_output
+   - 还是 FAIL → 回阶段 4 继续实现
+4. 全部 green（或合理 not_applicable）→ phase_state → in_verification，进入 test-pre-merge
+```
+
+### 阶段 6：test-pre-merge 验证
 
 **核心原则：测试工位永远跑完整的最终代码。开发与测试工位必须一致，测试结果才有意义。**
 
@@ -102,15 +129,15 @@ freely-feature-execution 在不同阶段调用下层 skill：
 5. 最终状态: 开发工位 ≡ 测试工位（commit 完全一致），phase_state → in_verification
 ```
 
-### 阶段 5：pr-create-guarded 提 PR
-阶段 5.5：pr-review-guarded 独立 review
+### 阶段 7：pr-create-guarded 提 PR
+阶段 7.5：pr-review-guarded 独立 review
 ```
 1. 在 feature worktree 运行 dry-run 门禁检查
 2. 运行 `freely pr-create-guarded` 命令
 3. PR 审查通过后进入门禁合并
 ```
 
-### 阶段 6：`freely pr-merge-guarded` 命令门禁合并
+### 阶段 8：`freely pr-merge-guarded` 命令门禁合并
 ```
 1. 切换到 develop 分支，运行 `freely pr-merge-guarded develop <pr-branch>` 命令（必须在 develop 分支执行）
 2. PR gate 检查
@@ -119,7 +146,7 @@ freely-feature-execution 在不同阶段调用下层 skill：
 5. issue-sync close
 ```
 
-### 阶段 7：`freely wt-close` 命令收口
+### 阶段 9：`freely wt-close` 命令收口
 ```
 1. 更新 issue phase_state → completed
 2. 更新 milestones.md

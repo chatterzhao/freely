@@ -89,21 +89,39 @@ B2_IBM 阶段直接写入以下格式。AI 按模板填写，无需查看任何�
 >
 > pre-tests.md 不是给门禁看的，是给测试执行者看的。
 > 每条 acceptance item 必须是**真实的测试用例**，能切实验证改动是否正确。
+
+> ⛑️ **TDD RED-GREEN 流程（B2→dev 之间必须执行）**
+>
+> B2 写好 pre-tests 后，先跑 RED，再写代码，再跑 GREEN。
+>
+> | 阶段 | 含义 | fix | feature |
+> |------|------|-----|---------|
+> | **RED** | 确认测试真的会失败 | 确认 bug 可复现（已有测试、新测试、手工端到端复现均可） | 确认功能还未实现（设计充分的端到端、集成、单元测试） |
+> | **GREEN** | 确认实现通过全部测试 | bug 已修复，回归测试通过 | 功能已实现，验收测试通过 |
+>
+> `red-green-status` 字段：B2 写入时 = `pending` → RED 确认后 = `red` → dev 实现 → GREEN 通过后 = `green`。
+> 全部 `green` 或合理 `not_applicable` 后才能进入 test-pre-merge 最终验证。
+
+> ⚠️ **AI 时代测试层级：端到端第一，集成第二，单元第三**
+>
+> AI 生成的代码最容易在模块边界和端到端流程中出错。
+> 端到端测试是防止 AI 代码崩坏项目的最后防线，**不可跳过**。
+>
+> 设计测试时从最重要开始：
+> 1. **端到端（E2E）**：用户可见行为、完整业务流程。AI 代码出错最多的层级。**必须有。**
+> 2. **集成**：多模块协作、数据流、状态变更。AI 改 A 模块经常无意破坏 B 模块。
+> 3. **单元**：单一函数/脚本的输入输出验证。用于快速定位，但不能替代上面两层。
+>
+> 层级选择原则：能用端到端兜底就用端到端。没有端到端的设计是不完整的。
+
+> ⚠️ **通用铁律**
 >
 > - 如果不知道该测什么：重新读 raw issue 理解改动范围，从改动面推导测试面
 > - 如果改动不影响某层：写 `not_applicable` 且 **必须写明具体理由**（不是"不适用"三个字敷衍）
 > - 禁止：无理由全部 not_applicable + mock
 > - 禁止：status 写 pass 但 actual_output 为空（那是 ghost pass，会被 pretests-retirement-gate 硬拦截）
 > - 每一条 test_command 必须是真正可执行的测试用例（单元测试、集成测试、端到端测试、API 调用、编译验证、shell 脚本等均可），expected_output 必须具体可验证
->
-> **端到端测试和集成测试是 AI 编程中防止项目失败的最重要保证。**
->
-> - 如果改动涉及多模块协作、数据流、状态变更 → 必须设计集成测试
-> - 如果改动影响用户可见行为、UI 交互、完整业务流程 → 必须设计端到端测试
-> - 不要只写单元测试了事——AI 生成的代码最容易在模块边界和端到端流程中出错
-> - 选择测试层级的原则：能用端到端兜底就用端到端，需要集成测试兜底就必须用集成测试
->
-> **糊弄 pre-tests.md 是导致项目失败的严重失职行为。绝对不允许糊弄测试相关的任何环节。**
+> - **糊弄 pre-tests.md 是导致项目失败的严重失职行为。**
 
 ```markdown
 # Pre-Tests: <功能名>
@@ -121,15 +139,20 @@ B2_IBM 阶段直接写入以下格式。AI 按模板填写，无需查看任何�
 - evidence_level: mock | integration | real_env | post_merge_dogfood
 - artifact_ref: <指向测试产物文件，如 docs/epics/{epic}/test-evidence/acceptance-1.log>
 - test_command: <实际执行的 shell 命令，如：./bin/test-lane feature-local -- echo ok>
-- expected_output: <命令的预期输出，如：所有测试 PASSED，无 FAIL>
-- actual_output: (由 skill:freely-test-execution 执行后填写)
+- expected_output: <命令的预期输出（GREEN 时的输出），如：所有测试 PASSED>
+- expected_RED_output: <RED 阶段的预期输出——fix: 证明 bug 存在；feature: 证明功能未实现>
+- actual_RED_output: (RED 阶段执行后填写)
+- actual_output: (GREEN 阶段由 skill:freely-test-execution 执行后填写)
 - evidence_file: (执行后填写，指向 staged 证据文件)
-- blocker: (失败时填写) definition_missing | commands_only | evidence_plan_missing | execution_pending_or_failed
+- red-green-status: pending | red | green
+> B2 写入 = pending。RED 确认后 = red（证明测试真的会失败）。dev 实现后跑 GREEN 通过 = green。
 - status: pending | passed | failed | not_applicable
-> passed 状态需要 worker execution state（.freely/run/workcell-state.env）。无 worker state 时 passed 会被判 execution_missing，请改用 not_applicable。
+> 必须配合 red-green-status=green + 有 worker state。无 worker state 时 passed 会被判 execution_missing，请改用 not_applicable。
+- blocker: (失败时填写) definition_missing | commands_only | evidence_plan_missing | execution_pending_or_failed
 - not_applicable_reason: (not_applicable 时必填) change_not_touching_this_layer | no_executable_boundary_at_this_layer | protected_environment_only | human_observation_only | covered_by_more_realistic_required_surface
 - not_applicable_explanation: (not_applicable 时必填) <具体原因>
 - replacement_evidence: (not_applicable 时必填) <替代验证方式或证据>
+- red_how: <RED 怎么确认的> fix: 如何复现 bug（已有测试/新测试/手工端到端步骤）。feature: 设计的测试层级和理由（端到端优先）
 
 ### acceptance-2
 - id: AT-002

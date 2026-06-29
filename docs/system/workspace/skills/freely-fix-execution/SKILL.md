@@ -5,7 +5,7 @@ description: bug 修复的完整开发流程——feedback→wt-create→B1_IBM�
 
 # skill:freely-fix-execution
 
-> 全链路: [命令] wt-create → [skill] skill:freely-doc-B1_IBM-execution → [skill] skill:freely-doc-B2_IBM-execution → dev(RED-GREEN) → [skill] skill:freely-test-execution(全绿) → [命令] pr-create-guarded → [命令] pr-review-guarded → [命令] pr-merge-guarded → [命令] wt-close
+> 全链路: [命令] wt-create → [skill] skill:freely-doc-B1_IBM-execution → [skill] skill:freely-doc-B2_IBM-execution → RED(复现) → dev(修复) → GREEN(验证) → [skill] skill:freely-test-execution(test-pre-merge) → [命令] pr-create-guarded → [命令] pr-review-guarded → [命令] pr-merge-guarded → [命令] wt-close
 >          [本 skill 自此开始 — B1→B2→dev→test→pr→merge→close]
 
 ## 定位
@@ -107,25 +107,52 @@ hotfix/*          → main + develop (pr-merge-guarded)
 ```
 1. skill:freely-doc-B2_IBM-execution
    → materialize I-* issue
-   → 写 pre-tests.md（覆盖全部改动面的测试方案）
+   → 写 pre-tests.md（覆盖全部改动面的测试方案，端到端优先）
+     · 每条 acceptance item: red-green-status = pending
+     · 写清楚 RED 阶段如何复现 bug（已有测试/新测试/手工端到端步骤）
    → 写 tasks.md
    → 写 code-reviews/implementation-decision-note.md
    → 更新 milestones.md committed_issues
-2. issue phase_state = done_b2_ibm → 进入 dev
+2. issue phase_state = done_b2_ibm → 进入 RED
 ```
 
-### 阶段 3：Dev 实现（RED-GREEN 驱动）
+### 阶段 3：RED — 确认 bug 可复现（写代码之前）
+
+**不通过 RED，绝不允许写一行实现代码。**
+
+```
+1. 在 fix 工位逐条执行 pre-tests.md 的 test_command
+2. fix 的 RED 含义: 确认 bug 真的可复现
+   - 已有测试能捕获 bug → 直接跑，确认 FAIL
+   - 需要新设计测试 → 先写好测试再跑，确认 FAIL
+   - 手工端到端复现 → 记录复现步骤和结果到 actual_RED_output
+3. 每条 acceptance item:
+   - 真的 FAIL 了 → red-green-status = red，记录 actual_RED_output
+   - 意外 PASS 了 → 测试本身有问题，回 B2 修 pre-tests
+4. 全部 red（或合理 not_applicable）→ 进入 dev
+```
+
+### 阶段 4：Dev 实现（修复 bug）
 
 ```
 1. skill:freely-dev-loop-execution
-   → 在 fix 工位中实现
-   → 先跑 RED（确认 pre-tests 能复现 bug）
-   → 再跑 GREEN（实现修复后全部通过）
-   → 写 code-review 证据
-   → 更新 phase_state → in_dev → in_verification
+   → 在 fix 工位中实现修复
+   → 不碰 pre-tests.md 的测试方案（测试先行，代码后行）
+   → 更新 phase_state → in_dev
 ```
 
-### 阶段 4：Test 验证
+### 阶段 5：GREEN — 确认 bug 已修复（写代码之后）
+
+```
+1. 在 fix 工位逐条重新执行 pre-tests.md 的 test_command
+2. fix 的 GREEN 含义: 确认 bug 已修复，没有引入回归
+3. 每条 acceptance item:
+   - PASS 了 → red-green-status = green，填写 actual_output
+   - 还是 FAIL → 回阶段 4 继续修
+4. 全部 green（或合理 not_applicable）→ 进入 test-pre-merge
+```
+
+### 阶段 6：Test 验证
 
 **核心原则：测试工位永远跑完整的最终代码。开发与测试工位必须一致，测试结果才有意义。**
 
@@ -150,7 +177,7 @@ hotfix/*          → main + develop (pr-merge-guarded)
 5. 最终状态: 开发工位 ≡ 测试工位（commit 完全一致），测试全部 passed
 ```
 
-### 阶段 5：pr-create-guarded 提 PR
+### 阶段 7：pr-create-guarded 提 PR
 
 ```
 1. 在 fix worktree 中执行 ./bin/pr-create-guarded
@@ -158,14 +185,14 @@ hotfix/*          → main + develop (pr-merge-guarded)
 3. 禁止用 gh pr create 替代
 ```
 
-### 阶段 6：pr-review-guarded 独立 review
+### 阶段 8：pr-review-guarded 独立 review
 
 ```
 1. ./bin/pr-review-guarded fix/<branch>
 2. 6 维 review → verdict 文档
 ```
 
-### 阶段 7：pr-merge-guarded 门禁合并
+### 阶段 9：pr-merge-guarded 门禁合并
 
 ```
 1. 切换到 develop 分支: git checkout develop
@@ -173,7 +200,7 @@ hotfix/*          → main + develop (pr-merge-guarded)
 3. PR gate → promotion gate → merge → develop-push → platform-adapter close
 ```
 
-### 阶段 8：wt-close 收口
+### 阶段 10：wt-close 收口
 
 ```
 1. ./bin/wt-close test-pre-merge-<key>-<slug>  # 先关测试工位
