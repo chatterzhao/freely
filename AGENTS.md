@@ -22,8 +22,7 @@
 正确的做法是走标准开发流程:
 
 ```
-feature: ([命令] feedback) → [命令] wt-create → [skill] B1 → [skill] B2 → [skill] RED → [skill] dev → [skill] test → [命令] pr-create → [命令] pr-review → [命令] pr-merge → [命令] wt-close
-fix:     ([命令] feedback) → [命令] wt-create → [skill] B1 → [skill] B2 → [skill] RED → [skill] dev → [skill] test → [命令] pr-create → [命令] pr-review → [命令] pr-merge → [命令] wt-close
+feature & fix: [cmd] freely feedback → [cmd] freely wt-create → [skill] freely-doc-B1_IBM-execution → [skill] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
 
      反馈: freely feedback --repo <repo> --title "..." --body "..."         (raw issue 不存在时需要)
      评论: freely comment --issue raw-{key} "原话"                           (向已有 raw issue 追加评论)

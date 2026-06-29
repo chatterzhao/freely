@@ -5,8 +5,7 @@ description: TDD GREEN 阶段。在与开发工位 raw key 相同的 test-* 测�
 
 # skill:freely-test-execution
 
-> 全链路: RED → dev → test-GREEN → pr
->                [本 skill 自此开始 — 测试工位 最终 GREEN 验证，全绿才放行]
+> 全链路: [cmd] freely feedback → [cmd] freely wt-create → [skill] freely-doc-B1_IBM-execution → [skill] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill][here] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
 
 ## 在流程中的位置
 

@@ -263,17 +263,17 @@ dev:             │           └── implement→evidence ──────
 
 ### Fix 修复（治理先行，与 feature 完全一致）
 ```
-([命令] feedback) → [命令] wt-create → [skill] B1 → [skill] B2 → [skill] dev → [skill] test → [命令] pr-create → [命令] pr-review → [命令] pr-merge → [命令] wt-close
+[cmd] freely feedback → [cmd] freely wt-create → [skill] freely-doc-B1_IBM-execution → [skill] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
 ```
 
 ### Hotfix 紧急修复
 ```
-从 main 创建 hotfix/* → B1 → B2 → dev → test → pr-create → pr-review → pr-merge main → pr-merge develop → wt-close
+从 main 创建 hotfix/*，走完整流程（同上），唯一区别：合并目标为 main + develop
 （与 fix 流程完全一致，唯一区别：合并目标为 main + develop）
 ```
 
 ### Doc-only 纯文档
 ```
-dev → pr-create → pr-review → pr-merge → wt-close
+[cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
 （跳过 B1、B2。test 不可跳过，即使是纯文档也必须验证）
 ```

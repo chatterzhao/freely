@@ -1,12 +1,11 @@
 ---
 name: freely-feature-execution
-description: 新功能/大型改动的完整开发流程——feedback→wt-create→B1→B2→dev→test→pr-create→pr-merge→wt-close，与 freely-fix-execution 同级抽象。
+description: 新功能/大型改动的完整开发流程——freely feedback → freely wt-create → freely-doc-B1_IBM-execution → freely-doc-B2_IBM-execution → freely-test-RED-execution → freely-dev-loop-execution → freely-test-execution → freely pr-create-guarded → freely pr-merge-guarded → freely wt-close。与 freely-fix-execution 一致。
 ---
 
 # skill:freely-feature-execution
 
-> 全链路: feedback → [命令] wt-create → [skill] skill:freely-doc-B1_IBM-execution → [skill] skill:freely-doc-B2_IBM-execution → skill:freely-test-RED-execution(确认功能未实现) → dev(实现) → GREEN(功能已实现) → [skill] skill:freely-test-execution(test-pre-merge) → [命令] pr-create-guarded → [命令] pr-review-guarded → [命令] pr-merge-guarded → [命令] wt-close
->                                                              [本 skill 自此开始 — B1→B2→dev→test→pr→merge→close 完整抽象]
+> 全链路: [cmd] freely feedback → [cmd] freely wt-create → [skill] freely-doc-B1_IBM-execution → [skill] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
 
 ## 定位
 

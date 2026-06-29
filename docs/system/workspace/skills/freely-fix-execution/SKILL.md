@@ -1,12 +1,11 @@
 ---
 name: freely-fix-execution
-description: bug 修复的完整开发流程——feedback→wt-create→B1_IBM→B2_IBM→dev→test→pr-create-guarded→pr-merge-guarded→wt-close。与 freely-feature-execution 同级抽象，流程顺序一致。
+description: bug 修复的完整开发流程——freely feedback → freely wt-create → freely-doc-B1_IBM-execution → freely-doc-B2_IBM-execution → freely-test-RED-execution → freely-dev-loop-execution → freely-test-execution → freely pr-create-guarded → freely pr-merge-guarded → freely wt-close。与 freely-feature-execution 一致。
 ---
 
 # skill:freely-fix-execution
 
-> 全链路: [命令] wt-create → [skill] skill:freely-doc-B1_IBM-execution → [skill] skill:freely-doc-B2_IBM-execution → skill:freely-test-RED-execution(确认bug可复现) → dev(修复) → GREEN(验证) → [skill] skill:freely-test-execution(test-pre-merge) → [命令] pr-create-guarded → [命令] pr-review-guarded → [命令] pr-merge-guarded → [命令] wt-close
->          [本 skill 自此开始 — B1→B2→dev→test→pr→merge→close]
+> 全链路: [cmd] freely feedback → [cmd] freely wt-create → [skill] freely-doc-B1_IBM-execution → [skill] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
 
 ## 定位
 

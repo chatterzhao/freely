@@ -5,8 +5,7 @@ description: TDD RED 阶段——B2 之后、dev 之前。执行 pre-tests.md �
 
 # skill:freely-test-RED-execution
 
-> 全链路: B2(写pre-tests) → RED(确认全红) → dev(实现) → GREEN(全绿) → test-pre-merge → pr
->                      [本 skill 自此开始 — 执行 RED，确认全部测试真的会失败]
+> 全链路: [cmd] freely feedback → [cmd] freely wt-create → [skill] freely-doc-B1_IBM-execution → [skill] freely-doc-B2_IBM-execution → [skill][here] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
 
 ## 定位
 
