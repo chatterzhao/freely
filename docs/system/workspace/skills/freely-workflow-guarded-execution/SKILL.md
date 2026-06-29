@@ -89,7 +89,20 @@ hotfix/*          → main + develop
 
 ## 工作流
 
-### 前置：审视 issue 价值与时效性
+### 阶段 0：判断 raw issue 是否存在
+
+拿到任务后第一步——判断是否已有 raw issue：
+
+**有 raw issue** → 进入「前置审视」。
+**没有 raw issue** → 先用 `./bin/freely feedback` 创建 raw issue：
+
+```
+./bin/freely feedback --title "fix|feat|docs|refactor: <描述>" --kind <fix|feature> --body "<详细描述>"
+```
+
+拿到返回的 raw-{key} 后，继续用 `./bin/wt-create` 创建工位（见阶段 1）。
+
+### 前置审视：审视 issue 价值与时效性
 
 进入任何场景前，先审视 raw issue 是否过时、是否仍有价值、是否已被其他变更覆盖。若已无价值，不执行流程，写交接回主管说明理由。
 
@@ -97,9 +110,10 @@ hotfix/*          → main + develop
 
 ```
 1. ./bin/wt-create --raw-key <key> --kind <fix|feature|hotfix> --slug <slug>
-2. skill:freely-doc-B1_IBM-execution
+2. cd 到 wt-create 输出的开发工位目录（必须，不 cd 则后续命令在 develop 上执行，直接违规）
+3. skill:freely-doc-B1_IBM-execution
    → 预研收敛 → candidate 入里程碑
-3. candidate promoted → 进入 B2
+4. candidate promoted → 进入 B2
 ```
 
 详细步骤见 `skill:freely-doc-B1_IBM-execution`。

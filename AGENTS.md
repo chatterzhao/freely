@@ -4,7 +4,7 @@
 1. `docs/CONSTITUTION.md`（硬性约束）
 2. `docs/LAWS.md`（操作规则）
 3. `docs/PROJECT_INTENT.md`（产品方向）
-4. `AGENTS.md`（仅入口指引，不得覆盖 1-3）
+4. `AGENTS.md`（本文档。仅入口指引，不得覆盖 1-3）
 
 如果本文件中的任何陈述与上述三个核心文档冲突，以核心文档为准。
 
@@ -27,7 +27,7 @@ feature & fix: [cmd] freely feedback → [skill] freely-workflow-guarded-executi
      反馈: freely feedback --repo <repo> --title "..." --body "..."         (raw issue 不存在时需要)
      评论: freely comment --issue raw-{key} "原话"                           (向已有 raw issue 追加评论)
      讨论: freely discuss [--continue <id>] [--archive <id>]                  (AI 群聊讨论)
-     工位: wt-create --raw-key <key> --source platform --skill <skill> --slug <slug>
+     工位: wt-create --raw-key <key> --source platform --kind <fix|feature|hotfix> --slug <slug>
      B1:   skill:freely-doc-B1_IBM-execution
      B2:   skill:freely-doc-B2_IBM-execution
      RED:  skill:freely-test-RED-execution
@@ -150,7 +150,7 @@ Freely 开发 Freely 时，默认先问四件事：
       scan ──→ 已有工位 ──→ 直接进入继续
                                 ↓
 阶段0: (可选) [命令] freely feedback --repo <repo> --title "..." --body "..."  — 无 raw issue 时创建
-阶段1: [命令] wt-create --raw-key <key> --source platform --skill <skill> --slug <slug>
+阶段1: [命令] wt-create --raw-key <key> --source platform --kind <fix|feature|hotfix> --slug <slug>
 阶段2: [skill] skill:freely-doc-B1_IBM-execution（brainstorm → candidate → promote/absorb/drop）
 阶段3: [skill] skill:freely-doc-B2_IBM-execution（I-* → prd/pre-tests/tasks/code-reviews）
 阶段4: [skill] skill:freely-dev-loop-execution（写代码 → RED-GREEN 验证 → commit）
@@ -166,7 +166,7 @@ Freely 开发 Freely 时，默认先问四件事：
 | 步骤 | 操作 | 类型 | 谁执行 |
 |------|------|------|--------|
 | 0. 反馈 | `freely feedback --repo <repo> --title "..." --body "..."` (raw issue 不存在时) | [命令] | Manager/开发者 |
-| 1. 开工位 | `./bin/wt-create --raw-key <key> --source platform --skill <skill> --slug <slug>` | [命令] | Manager/开发者 |
+| 1. 开工位 | `./bin/wt-create --raw-key <key> --source platform --kind <fix|feature|hotfix> --slug <slug>` | [命令] | Manager/开发者 |
 | 2. B1_IBM 预研 | B1:IBM（brainstorm→candidate→milestone） | [skill] skill:freely-doc-B1_IBM-execution | Worker |
 | 3. B2_IBM 设计 | B2:IBM（I-*→prd/pre-tests/tasks/code-reviews） | [skill] skill:freely-doc-B2_IBM-execution | Worker |
 | 4. Dev 实现 | dev-loop-execution → 写代码 → RED-GREEN → commit | [skill] skill:freely-dev-loop-execution | Worker |
