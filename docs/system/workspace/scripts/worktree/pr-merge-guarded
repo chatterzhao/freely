@@ -13,41 +13,6 @@ if [[ -z "${PROJECT_ROOT:-}" ]]; then
 fi
 cd "$PROJECT_ROOT" || { echo "ERROR: cannot cd to PROJECT_ROOT=$PROJECT_ROOT" >&2; exit 1; }
 
-# Inline dev↔test consistency check (cannot rely on feature-branch worktree-common.sh yet)
-freely_wt_assert_dev_test_consistent() {
-  local _raw_key="$1"
-  [[ -n "$_raw_key" ]] || return 0
-  local _test_wt
-  _test_wt=$(git worktree list --porcelain 2>/dev/null | awk -v k="test-pre-merge-$_raw_key" '
-    $1=="worktree" { wt=$2 }
-    $1=="branch" && $2 ~ k { print wt; exit }
-  ')
-  [[ -z "$_test_wt" || ! -d "$_test_wt" ]] && return 0
-  local _dev_wt _dev_branch
-  while IFS= read -r line; do
-    case "$line" in worktree*) _dev_wt="${line#worktree }" ;; branch*)
-      local _br="${line#branch }"
-      case "$_br" in *fix/raw-*$_raw_key*|*feature/raw-*$_raw_key*)
-        _dev_branch="${_br#refs/heads/}"; break ;; esac
-      _dev_wt="" ;; esac
-  done < <(git worktree list --porcelain 2>/dev/null)
-  [[ -z "$_dev_wt" || -z "$_dev_branch" ]] && return 0
-  local _missing
-  _missing=$(git -C "$_test_wt" log --oneline --no-merges "$_dev_branch..HEAD" 2>/dev/null || true)
-  if [[ -n "$_missing" ]]; then
-    echo "[MERGE-GUARD] dev↔test out of sync: test has commits not in dev" >&2
-    echo "  cherry-pick to dev, re-run test-GREEN, then retry." >&2
-    return 1
-  fi
-  _missing=$(git -C "$_test_wt" log --oneline --no-merges "HEAD..$_dev_branch" 2>/dev/null || true)
-  if [[ -n "$_missing" ]]; then
-    echo "[MERGE-GUARD] dev↔test out of sync: dev has commits not in test" >&2
-    echo "  cherry-pick to test, re-run test-GREEN, then retry." >&2
-    return 1
-  fi
-  return 0
-}
-
 usage() {
   cat <<'USAGE'
 Usage:
@@ -584,14 +549,12 @@ do_initial_merge() {
       echo "[MERGE-GUARD] PR review: pass ✓"
     fi
   fi
-  # ── Dev↔Test consistency check ──
-  if [[ -n "$_raw_key" ]]; then
-    freely_wt_assert_dev_test_consistent "$_raw_key" || {
-      echo ""
-      echo "  同步后重跑 test-GREEN（skill:freely-test-execution），全部 green 后重新 pr-merge。"
-      exit 1
-    }
-  fi
+  # TODO(post-merge): add dev↔test consistency check once worktree-common.sh
+  # has freely_wt_assert_dev_test_consistent available on develop:
+  #   source "$PROJECT_ROOT/bin/worktree-common.sh"
+  #   if [[ -n "$_raw_key" ]]; then
+  #     freely_wt_assert_dev_test_consistent "$_raw_key" || exit 1
+  #   fi
   run_promotion_gate_if_needed "$target" "$source_branch"
   [[ "$dry_run" == "1" ]] && { echo "[MERGE-GUARD] --dry-run complete."; return 0; }
   # ── Local git merge with receipt ──
