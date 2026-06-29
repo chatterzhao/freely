@@ -14,10 +14,10 @@
 - artifact_ref: docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/verification/test-evidence/acceptance-1.log
 - test_command: grep "B1.*B2.*dev.*test" ~/.claude/skills/freely-fix-execution/SKILL.md && echo "PASS" || echo "FAIL"
 - expected_output: PASS — fix skill 描述 B1→B2→dev→test 顺序
-- actual_output: (执行后填写)
-- evidence_file: (执行后填写)
+- actual_output: PASS — fix skill 描述 B1→B2→dev→test 顺序
+- evidence_file: docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/verification/test-evidence/acceptance-1.log
 - blocker: (失败时填写)
-- status: pending
+- status: passed
 
 ### acceptance-2: 去掉 test-pre-merge cherry-pick 机制
 - id: AT-002
@@ -30,10 +30,10 @@
 - artifact_ref: docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/verification/test-evidence/acceptance-2.log
 - test_command: grep -c "cherry-pick" ~/.claude/skills/freely-fix-execution/SKILL.md && echo "FAIL: still has cherry-pick" || echo "PASS: cherry-pick removed"
 - expected_output: PASS: cherry-pick removed
-- actual_output: (执行后填写)
-- evidence_file: (执行后填写)
+- actual_output: PASS — cherry-pick dance removed from fix skill
+- evidence_file: docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/verification/test-evidence/acceptance-2.log
 - blocker: (失败时填写)
-- status: pending
+- status: passed
 
 ### acceptance-3: three-loop 真源同步更新
 - id: AT-003
@@ -46,10 +46,10 @@
 - artifact_ref: docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/verification/test-evidence/acceptance-3.log
 - test_command: grep -A2 "Fix 修复" docs/system/workspace/three-loop-capability-lifecycle.md | grep "B1.*B2.*dev" && echo "PASS" || echo "FAIL"
 - expected_output: PASS — Fix 变体路径 B1→B2→dev
-- actual_output: (执行后填写)
-- evidence_file: (执行后填写)
+- actual_output: PASS — Fix 变体路径 B1→B2→dev
+- evidence_file: docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/verification/test-evidence/acceptance-3.log
 - blocker: (失败时填写)
-- status: pending
+- status: passed
 
 ### acceptance-4: AGENTS.md 流程序列更新
 - id: AT-004
@@ -62,10 +62,10 @@
 - artifact_ref: docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/verification/test-evidence/acceptance-4.log
 - test_command: grep "^fix:" AGENTS.md | grep "B1.*B2.*dev.*test" && echo "PASS" || echo "FAIL"
 - expected_output: PASS — fix 行 B1→B2→dev→test
-- actual_output: (执行后填写)
-- evidence_file: (执行后填写)
+- actual_output: PASS — fix 行 B1→B2→dev→test
+- evidence_file: docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/verification/test-evidence/acceptance-4.log
 - blocker: (失败时填写)
-- status: pending
+- status: passed
 
 ### acceptance-5: test-execution skill fix 流程序列更新
 - id: AT-005
@@ -78,10 +78,10 @@
 - artifact_ref: docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/verification/test-evidence/acceptance-5.log
 - test_command: grep "fix:.*B1.*B2.*dev.*test\|fix:.*wt-create.*B1.*B2" ~/.claude/skills/freely-test-execution/SKILL.md && echo "PASS" || echo "FAIL"
 - expected_output: PASS — test skill fix 行 B1→B2→dev→test
-- actual_output: (执行后填写)
-- evidence_file: (执行后填写)
+- actual_output: PASS — test skill fix 行 B1→B2→dev→test
+- evidence_file: docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/verification/test-evidence/acceptance-5.log
 - blocker: (失败时填写)
-- status: pending
+- status: passed
 
 ## Unit
 - acceptance_target: 6个文件修改完成，所有 grep 检查通过
