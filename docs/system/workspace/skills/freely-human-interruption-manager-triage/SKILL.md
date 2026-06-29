@@ -1,6 +1,10 @@
 ---
 name: freely-human-interruption-manager-triage
-description: 主管型插话处理 agent 的最小 routing 技能。基于主管职责，判断这条 signal 该由主管先回答，还是应委派到后续处理链。
+description: >- 主管型插话 triage 技能。判断 signal 该由主管直接回答，还是委派到
+  `freely-human-interruption-handling` skill 或 worker 处理链。
+
+  Use when: 收到 human interruption signal 需要做首次路由判定。
+  触发词："interruption triage"、"插话路由"、"signal routing"。
 ---
 
 # skill:freely-human-interruption-manager-triage

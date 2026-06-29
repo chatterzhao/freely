@@ -27,7 +27,7 @@ This bounded follow-on closes the remaining dogfood gap in the Codex recovery fa
 - `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-requires-expected-success-shape`
 - `bash docs/system/workspace/scripts/tests/test-freely-rate-limit-log-defers-to-watchdog`
 - `bash docs/system/workspace/scripts/tests/test-freely-active-runtime-reconnect-stays-network-local`
-- real bad-account `./bin/freely start` replay from `account-worahe1001@outlook-com-1` with observed auto-switch to `account-worahe1000@outlook-com-1`
+- real bad-account `freely start` replay from `account-worahe1001@outlook-com-1` with observed auto-switch to `account-worahe1000@outlook-com-1`
 - Git commit `8f49bef8` on the feature branch
 
 ## Next Action

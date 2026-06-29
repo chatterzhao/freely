@@ -1,6 +1,10 @@
 ---
 name: freely-human-interruption-handling
-description: 处理 human interruption intake。接收 manager 已 claim 的插话，结合当前项目上下文做深度解释，产出 resolution artifact、worker handoff 和 canonical absorption 建议。
+description: >- 处理 human interruption intake。接收 manager 已 claim 的插话，结合
+  项目上下文做深度解释，产出 resolution artifact 和 absorption 建议。
+
+  Use when: `freely-human-interruption-manager-triage` skill 委派后。
+  触发词："interruption handling"、"处理插话"、"深度解释"。
 ---
 
 # skill:freely-human-interruption-handling

@@ -66,7 +66,7 @@ This was not a stalled or idle worker. The delegated lane advanced and then ente
 
 `cycle-20260331-181154.log` starts by querying:
 
-- `./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+- `freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
 
 That is the root `develop` manager runtime, not just the worker lane.
 

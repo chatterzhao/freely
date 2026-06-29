@@ -9,14 +9,14 @@
 
 ## Scope Verdict
 
-- `PASS`: the protected replay lane accepted `feature/manager-worker-runtime-source-rebind-20260424` through `./bin/pr-merge-guarded` and preserved the same manager-owned worker runtime source-rebind implementation under receipt-bearing merge.
+- `PASS`: the protected replay lane accepted `feature/manager-worker-runtime-source-rebind-20260424` through `freely pr-merge-guarded` and preserved the same manager-owned worker runtime source-rebind implementation under receipt-bearing merge.
 - `PASS`: focused premerge regressions stayed green on the protected test lane: manager-owned worker launch still binds to source runtime, stale active worker control planes still request local runtime handoff and relaunch under the manager/source runtime, and owner governance stayed green.
 - `PASS`: this is the specific develop-promotion evidence the owner was missing. It proves the repair was not only feature-local; the same bounded behavior survived protected assembly before canonical `develop` replay.
 - `PENDING`: canonical `develop` still needs the real autonomy proof: rebind the retained cleanup worker control plane, consume its existing `worker_done` truth, retire/advance that lane lawfully, and then continue into the next scan-selected task.
 
 ## Commands
 
-1. `./bin/pr-merge-guarded test-pre-merge-20260424-manager-worker-runtime-source-rebind feature/manager-worker-runtime-source-rebind-20260424`
+1. `freely pr-merge-guarded test-pre-merge-20260424-manager-worker-runtime-source-rebind feature/manager-worker-runtime-source-rebind-20260424`
 2. `bash docs/system/workspace/scripts/tests/test-freely-start-workcell-supervisor-uses-source-runtime-bin`
 3. `bash docs/system/workspace/scripts/tests/test-freely-worker-launch-rebinds-stale-active-runtime-control-plane`
 4. `./bin/governance-check`

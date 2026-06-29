@@ -60,11 +60,11 @@
 ### 真实环境验收
 
 1. 手工把 Codex 切到真实坏号，例如 `apikey-codex-a1016-1`
-2. 执行真实 `./bin/freely start --project <project>`
+2. 执行真实 `freely start --project <project>`
 3. 首轮失败后，不需要人工执行 `freely ensure-manager`
 4. 系统会自动继续恢复，直到切到可用工具/号并重新运行
 5. 同一次恢复过程中，不允许重复重启到刚失败的同一坏号
-6. `./bin/freely stop --project <project>` 后，不允许再出现被 watchdog / recheck 抢回来的新 supervisor
+6. `freely stop --project <project>` 后，不允许再出现被 watchdog / recheck 抢回来的新 supervisor
 
 ### 不验收的内容
 

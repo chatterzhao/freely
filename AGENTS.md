@@ -1,10 +1,21 @@
 # Agent 上下文入口
 
+## 强制 
+强制使用`freely-workflow-guarded-execution`这个 skill。
+
+这个 skill 它内部要求的强制开发流程（详情请阅读其 skill）:
+```
+[cmd] freely feedback → [skill] freely-workflow-guarded-execution → [cmd] freely wt-create → [skill] freely-doc-B1_IBM-execution → [skill] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
+```
+
+> **`[cmd]`** = bin 脚本，在 shell 中直接执行，如`freely feedback ...`。**`[skill]`** = xxx skill，由 AI agent 通过 Skill 工具加载。
+> Skill 是流程的权威来源——具体步骤见各 skill。
+
 ## 权威来源（按优先级排序）
-1. `docs/CONSTITUTION.md`（硬性约束）
-2. `docs/LAWS.md`（操作规则）
-3. `docs/PROJECT_INTENT.md`（产品方向）
-4. `AGENTS.md`（仅入口指引，不得覆盖 1-3）
+1. `docs/CONSTITUTION.md`（本项目开发的硬性约束）
+2. `docs/LAWS.md`（本项目开发的操作规则）
+3. `docs/PROJECT_INTENT.md`（本项目的产品方向）
+4. `AGENTS.md`（本文档。仅入口指引，不得覆盖 1-3）
 
 如果本文件中的任何陈述与上述三个核心文档冲突，以核心文档为准。
 
@@ -19,42 +30,6 @@
 - 修改 `.githooks/` 目录内容以削弱检查
 
 **没有例外。** 即使为了调试或加速迭代也不允许。
-正确的做法是走标准开发流程:
-
-```
-feature & fix: [cmd] freely feedback → [skill] freely-workflow-guarded-execution → [cmd] freely wt-create → [skill] freely-doc-B1_IBM-execution → [skill] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
-
-     反馈: freely feedback --repo <repo> --title "..." --body "..."         (raw issue 不存在时需要)
-     评论: freely comment --issue raw-{key} "原话"                           (向已有 raw issue 追加评论)
-     讨论: freely discuss [--continue <id>] [--archive <id>]                  (AI 群聊讨论)
-     工位: wt-create --raw-key <key> --source platform --skill <skill> --slug <slug>
-     B1:   skill:freely-doc-B1_IBM-execution
-     B2:   skill:freely-doc-B2_IBM-execution
-     RED:  skill:freely-test-RED-execution
-     dev:  skill:freely-dev-loop-execution
-     test: skill:freely-test-execution
-     pr:   pr-create-guarded → pr-review-guarded → pr-merge-guarded
-     收口: wt-close <branch>
-```
-
-> **`[命令]`** = bin 脚本，在 shell 中直接执行。**`[skill]`** = skill:xxx，由 AI agent 通过 Skill 工具加载。
-> Skill 是流程的权威来源——具体步骤见各 skill 的 SKILL.md。
-> `()` = 可选步骤（raw issue 已存在则跳过）。
-
-## 当前项目阶段
-Freely 处于研究优先的整合阶段。
-当前活跃文档范围：
-- `docs/CONSTITUTION.md`
-- `docs/LAWS.md`
-- `docs/PROJECT_INTENT.md`
-- `docs/pre-brainstorms/`
-- `docs/milestones.md`
-- `docs/epics/`
-- `docs/progress/`
-- `docs/system/workspace/`
-- `docs/system/workspace/ibm-framework.md`（IBM Framework 能力真源）
-
-不要将遗留路径视为活跃工作流输入（例如：旧布局下的 `docs/brainstorms/`、`docs/planning/`、`docs/continuity/`、`docs/validation/`、`docs/reviews/`）。
 
 ## 仓库分层
 
@@ -91,7 +66,7 @@ Freely 处于研究优先的整合阶段。
 ## 会话启动检查
 
 每次会话开始：
-1. **分支/Worktree检查**：如在 `main`/`develop`/`test-pre-merge-*` 分支则禁止写入、提交，它们只接受 merge。若是启动 Freely runtime，应在项目根目录启动，但这不放宽 protected root 的 owner-development 禁令；实际写入必须由 Freely 委派到 dedicated worktree。先执行 `cd <your-project-path>`，再优先使用标准入口 `./bin/wt-create <branch> [--base <base>]` 创建 fix|feature worktree，并 `cd` 到该 worktree 中工作。只有在基础设施受限、必须手工执行 `git worktree add -b <branch> ../<your-project-worktrees>/<branch-dir> <base>` 时，才允许裸建树，并且随后必须立刻执行 `./bin/freely sync-tooling --source-project <your-project-path> --project ../<your-project-worktrees>/<branch-dir>`。默认 `<base>` 为 `develop`；若当前 issue 依赖未合并父分支改动，可用父 `feature/*` 作为 `<base>`，但必须在 pre-brainstorm / milestone / issue 中记录依赖关系。`<your-project-worktrees>` 指当前项目同级的 worktree 根目录，格式为 `<your-project-name>-worktrees`。`<branch-dir>` 必须与当前 worktree 派生规则一致：无日期分支使用 `<branch>` 的安全化名称；若分支名包含 `YYYYMMDD` 或 `YYYYMMDDTHHMMZ`/`YYYYMMDDTHHMMSSZ`（旧格式 `YYYYMMDD-HHMM` 仍兼容），目录名改为日期前置，例：`feature/foo-20260307T1015Z` -> `20260307T1015Z-feature-foo`
+1. **分支/Worktree检查**：如在 `main`/`develop`/`test-pre-merge-*` 分支则禁止写入、提交，它们只接受 merge。若是启动 Freely runtime，应在项目根目录启动，但这不放宽 protected root 的 owner-development 禁令；实际写入必须由 Freely 委派到 dedicated worktree。先执行 `cd <your-project-path>`，再优先使用标准入口 `freely wt-create <branch> [--base <base>]` 创建 fix|feature worktree，并 `cd` 到该 worktree 中工作。只有在基础设施受限、必须手工执行 `git worktree add -b <branch> ../<your-project-worktrees>/<branch-dir> <base>` 时，才允许裸建树，并且随后必须立刻执行 `freely sync-tooling --source-project <your-project-path> --project ../<your-project-worktrees>/<branch-dir>`。默认 `<base>` 为 `develop`；若当前 issue 依赖未合并父分支改动，可用父 `feature/*` 作为 `<base>`，但必须在 pre-brainstorm / milestone / issue 中记录依赖关系。`<your-project-worktrees>` 指当前项目同级的 worktree 根目录，格式为 `<your-project-name>-worktrees`。`<branch-dir>` 必须与当前 worktree 派生规则一致：无日期分支使用 `<branch>` 的安全化名称；若分支名包含 `YYYYMMDD` 或 `YYYYMMDDTHHMMZ`/`YYYYMMDDTHHMMSSZ`（旧格式 `YYYYMMDD-HHMM` 仍兼容），目录名改为日期前置，例：`feature/foo-20260307T1015Z` -> `20260307T1015Z-feature-foo`
    - 先确认 `git config --get core.hooksPath` 返回 `.githooks`。仓库中“存在 hook 脚本”不代表 Git 已启用它们；只有 `core.hooksPath=.githooks` 时，根目录 `.githooks/` 包装层才会实际转发到 `docs/system/workspace/hooks/*.sh` 执行门禁。
    - `test-pre-merge-*` 是一次性本地测试批次：必须从当前 `develop` 新建，只允许 merge 装配验证，不允许普通写入/提交/push，不允许承载 owner / milestone / continuation 真相，测试结束后立即删除。
   	   - **test-pre-merge 的职责**：验证 feature 能否在真实环境中正常工作，保证 develop 只接受已验证的代码。
@@ -108,7 +83,7 @@ Freely 处于研究优先的整合阶段。
    - 跑测试先判 lane：dedicated `feature/*`、`feature/premerge-*`、`release/*`、`hotfix/*` writable worktree 跑 `feature-local`；`test-pre-merge-*` 跑 `premerge-integration`；受保护分支 merge 后 followthrough 跑 `post-merge-followthrough`。不要把 `develop` 当成主线前预测试环境。
    - 测 worker/feature lane 示例：`/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260420-feature-startup-task-source-patrol-and-reconcile/bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260420-feature-startup-task-source-patrol-and-reconcile`
    - 测未 merge 的主管态示例：`/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260420-feature-startup-task-source-patrol-and-reconcile/bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely`
-2. **大重构先做 fleet sequencing audit**：若当前任务会同时改多层真源、跨多个现有 worktree / issue，或可能重排架构主干，先运行 `git worktree list --porcelain`、`./bin/wt-fleet-status`、`./bin/freely live-status --project <project-root>`、`./bin/freely fleet-status --project <project-root>`，并把结果与 `docs/milestones.md` / 相关 `progress` 对齐。优先收束 `dirty` 或仍在 `desired=running` 的 worktree，识别必须先合并的上游治理树，再决定是否开大重构 lane；不要在 fleet 状态模糊时直接开始深层重构。
+2. **大重构先做 fleet sequencing audit**：若当前任务会同时改多层真源、跨多个现有 worktree / issue，或可能重排架构主干，先运行 `git worktree list --porcelain`、`./bin/wt-fleet-status`、`freely live-status --project <project-root>`、`freely fleet-status --project <project-root>`，并把结果与 `docs/milestones.md` / 相关 `progress` 对齐。优先收束 `dirty` 或仍在 `desired=running` 的 worktree，识别必须先合并的上游治理树，再决定是否开大重构 lane；不要在 fleet 状态模糊时直接开始深层重构。
 3. **首跳先判 loop，不要先判 cleanup**：
    - 如果是 Freely 自举中暴露的新共性问题，先判它是否应成为 Freely 能力发现；若边界未稳定，先进入 B1_IBM（`docs/pre-brainstorms/`）
    - 如果当前变更已落在现有 issue scope 内，优先吸收到既有 `issue / milestones / progress / code-review` 生命周期，不要为了一个新 worktree 再伪造新 candidate / issue
@@ -150,31 +125,31 @@ Freely 开发 Freely 时，默认先问四件事：
       scan ──→ 已有工位 ──→ 直接进入继续
                                 ↓
 阶段0: (可选) [命令] freely feedback --repo <repo> --title "..." --body "..."  — 无 raw issue 时创建
-阶段1: [命令] wt-create --raw-key <key> --source platform --skill <skill> --slug <slug>
+阶段1: [命令] wt-create --raw-key <key> --source platform --kind <fix|feature|hotfix> --slug <slug>
 阶段2: [skill] skill:freely-doc-B1_IBM-execution（brainstorm → candidate → promote/absorb/drop）
-阶段3: [skill] skill:freely-doc-B2_IBM-execution（I-* → prd/pre-tests/tasks/code-reviews）
+阶段3: [skill] skill:freely-doc-B2_IBM-execution（物化 I-* issue + prd/pre-tests/tasks/code-reviews）
 阶段4: [skill] skill:freely-dev-loop-execution（写代码 → RED-GREEN 验证 → commit）
 > commit 时 checkpoint-guard 输出 scope 诊断（不阻塞）。一个逻辑修改即使 50 个文件也合理，不相关逻辑混在一起即使 1 个文件也违规。按逻辑完整性判，不按文件数判。
 阶段5: [skill] skill:freely-test-execution（test-pre-merge 工位逐条执行 pre-tests → 全绿）
-阶段6: [命令] ./bin/pr-create-guarded → pull develop → 冲突处理 → dry-run gate → push → platform-adapter
-阶段7: [命令] ./bin/pr-review-guarded → 6 维 review → verdict 文档
+阶段6: [命令] freely pr-create-guarded → pull develop → 冲突处理 → dry-run gate → push → platform-adapter
+阶段7: [命令] freely pr-review-guarded → 6 维 review → verdict 文档
 阶段8: CI check → Approval
-阶段9: [命令] ./bin/pr-merge-guarded → PR gate → promotion gate → merge → develop-push → platform-adapter
-阶段10: [命令] ./bin/wt-close
+阶段9: [命令] freely pr-merge-guarded → PR gate → promotion gate → merge → develop-push → platform-adapter
+阶段10: [命令] freely wt-close
 ```
 
 | 步骤 | 操作 | 类型 | 谁执行 |
 |------|------|------|--------|
 | 0. 反馈 | `freely feedback --repo <repo> --title "..." --body "..."` (raw issue 不存在时) | [命令] | Manager/开发者 |
-| 1. 开工位 | `./bin/wt-create --raw-key <key> --source platform --skill <skill> --slug <slug>` | [命令] | Manager/开发者 |
+| 1. 开工位 | `freely wt-create --raw-key <key> --source platform --kind <fix|feature|hotfix> --slug <slug>` | [命令] | Manager/开发者 |
 | 2. B1_IBM 预研 | B1:IBM（brainstorm→candidate→milestone） | [skill] skill:freely-doc-B1_IBM-execution | Worker |
-| 3. B2_IBM 设计 | B2:IBM（I-*→prd/pre-tests/tasks/code-reviews） | [skill] skill:freely-doc-B2_IBM-execution | Worker |
+| 3. B2_IBM 设计 | B2:IBM（物化 I-* issue + prd/pre-tests/tasks/code-reviews） | [skill] skill:freely-doc-B2_IBM-execution | Worker |
 | 4. Dev 实现 | dev-loop-execution → 写代码 → RED-GREEN → commit | [skill] skill:freely-dev-loop-execution | Worker |
 | 5. Test 验证 | test-pre-merge 工位逐条执行 pre-tests → 全绿 | [skill] skill:freely-test-execution | Worker |
-| 6. 提 PR | `./bin/pr-create-guarded` → pull develop → 冲突处理 → dry-run gate → push → platform-adapter | [命令] | Worker/Manager |
-| 7. PR review + CI | CI check → Approval | [命令] ./bin/pr-review-guarded | Manager |
-| 8. 门禁合并 | `./bin/pr-merge-guarded develop <pr-branch>` → PR gate → promotion gate → merge → platform-adapter | [命令] | Worker/Manager |
-| 9. 关工位 | `./bin/wt-close <branch>` 清理工位+分支 | [命令] | Worker/Manager |
+| 6. 提 PR | `freely pr-create-guarded` → pull develop → 冲突处理 → dry-run gate → push → platform-adapter | [命令] | Worker/Manager |
+| 7. PR review + CI | CI check → Approval | [命令] freely pr-review-guarded | Manager |
+| 8. 门禁合并 | `freely pr-merge-guarded develop <pr-branch>` → PR gate → promotion gate → merge → platform-adapter | [命令] | Worker/Manager |
+| 9. 关工位 | `freely wt-close <branch>` 清理工位+分支 | [命令] | Worker/Manager |
 
 - Manager 负责入口路由（feedback/scan 判定）和步骤 0-1，Worker 负责步骤 2-9 执行
 - 步骤 2-9 由 Worker 在 skill 约束下完成，完成后写 handoff JSON 汇报
@@ -188,15 +163,15 @@ Freely 开发 Freely 时，默认先问四件事：
 - **原 fix|feature worktree 还在** → 直接在 fix|feature 上做 B1→B2→dev→test。走 pr-create → pr-review → pr-merge → develop。
 - **原 feature 已退役（已合并/已删）** → wt-create 创建 fix 工位 + test-pre-merge → B1→B2→dev→test → pr。
 - **普通 fix** 走 `B1 → B2 → dev → test → pr-create → pr-review → pr-merge → develop`；**紧急 hotfix** 用 `hotfix/*`，从 main 创建，合并到 main + develop。测试不可跳过，流程与 fix 完全一致。
-- **治理先行**：B1_IBM（`skill:freely-doc-B1_IBM-execution`：根因分析 → candidate → milestone）→ B2_IBM（`skill:freely-doc-B2_IBM-execution`：I-* → pre-tests → tasks → code-review）→ milestones.md。即使简单 fix 也必须走完整流程。
+- **治理先行**：B1_IBM（`skill:freely-doc-B1_IBM-execution`：根因分析 → candidate → milestone 入队）→ B2_IBM（`skill:freely-doc-B2_IBM-execution`：物化 I-* issue + pre-tests + tasks + code-review）→ milestones.md 更新。即使简单 fix 也必须走完整流程。
 - **原则**：Govern first, code later。治理文档在开发之前，pre-tests 驱动 TDD 实现。
 
 详见 `skill:freely-workflow-guarded-execution`
 
 ## Skill 管理
 
-- 本项目 skill 定义在 `docs/system/workspace/skills/`，已通过 `./bin/deploy-skills` 部署到 `~/.claude/skills/` 供 Claude Code Skill 工具调用。
-- **修改任何 skill 后，必须立即执行 `./bin/deploy-skills`**，否则改动不会对当前及后续会话生效。
+- 本项目 skill 定义在 `docs/system/workspace/skills/`，已通过 `freely deploy-skills` 部署到 `~/.claude/skills/` 供 Claude Code Skill 工具调用。
+- **修改任何 skill 后，必须立即执行 `freely deploy-skills`**，否则改动不会对当前及后续会话生效。
 - 项目文件中引用 skill 时只用 skill 名（如 `skill:freely-workflow-guarded-execution`），不写路径；skill 文件内部互相引用除外。
 - skill 内部跨 skill 引用使用相对路径（如 `../other-skill/SKILL.md`），不使用项目绝对路径。
 
@@ -217,7 +192,7 @@ Freely 必须在 Freely 治理规则下开发，不得有项目特定的例外�
 - Worktree 根目录遵循宪法策略：项目同级目录，命名为 `{project-name}-worktrees`。
 - 架构/治理变更必须先进入 `docs/pre-brainstorms/<id>/`，然后才能进入执行循环落地。
 - Freely 自举中发现的新能力，默认优先判断是否已被现有 milestone-owned issue 吸收；仅当现有 issue 无法承接时，才新开 candidate / issue。
-- 若当前项目的 Freely runtime 已在运行，优先通过 `./bin/freely chat --project <project-root> <message>` 这类 human interruption / intake 入口指导它继续开发；不要绕过 runtime 另造一套平行调度。
+- 若当前项目的 Freely runtime 已在运行，优先通过 `freely chat --project <project-root> <message>` 这类 human interruption / intake 入口指导它继续开发；不要绕过 runtime 另造一套平行调度。
 - 若在插话驱动的开发过程中发现 bug、缺口或新的能力沉淀点，仍按同一治理规则处理：必要时让 Freely 创建/进入 dedicated worktree 修复、验证、合并到 `develop`、重启 runtime，再继续通过 interruption 推进。
 - 优先使用预检 + 可操作的修复方案，而非重复的权限提示。
 - Hook/gate bypass 永久禁止，不得自行决定 `--no-verify` 或等效绕过。`FREELY_SKIP_IBM_GATE=1` 是唯一合法豁免，仅跳过 IBM 文档门禁。gate 报文档缺失就去修文档，gate 报测试缺失就去补测试；gate 误判应修正 gate 模式，不得绕过。
@@ -250,23 +225,23 @@ Freely 必须在 Freely 治理规则下开发，不得有项目特定的例外�
 - 需要枚举时优先列表、表格或代码块；能一句说清的，不扩成多段。
 
 ## 基本命令
-- `./bin/freely init|doctor|start|status|baseline-status|live-status|fleet-status|stop`
-- `./bin/freely sync-tooling --source-project <project-root> --project <worktree>`
+- `freely init|doctor|start|status|baseline-status|live-status|fleet-status|stop`
+- `freely sync-tooling --source-project <project-root> --project <worktree>`
 - `./bin/governance-check`
 - `./bin/test-pre-push-hook`
 - `cd <your-project-path>`
-- `./bin/wt-create <branch> [--base <base-branch>]`
-- `git worktree add -b <branch> ../<your-project-worktrees>/<branch-dir> <base> && ./bin/freely sync-tooling --source-project <project-root> --project ../<your-project-worktrees>/<branch-dir>`
+- `freely wt-create <branch> [--base <base-branch>]`
+- `git worktree add -b <branch> ../<your-project-worktrees>/<branch-dir> <base> && freely sync-tooling --source-project <project-root> --project ../<your-project-worktrees>/<branch-dir>`
 - `git worktree remove ../<your-project-worktrees>/<branch-dir> && git branch -d <branch>`
 - `source ./bin/wt-enter <branch>`
 - `source ./bin/wt-add <branch> -- <git-add-args>`
 
 ## 常用工具路径
 
-- `./bin/issue-sync` — 平台 issue 同步（create/close/comment/batch）
-- `./bin/pr-merge-guarded` — 门禁合并
+- `freely issue-sync` — 平台 issue 同步（create/close/comment/batch）
+- `freely pr-merge-guarded` — 门禁合并
 - `./bin/governance-check` — 治理门禁检查
-- `./bin/wt-create` — 创建 fix|feature worktree
-- `./bin/freely-package` — 打包版本
+- `freely wt-create` — 创建 fix|feature worktree
+- `freely-package` — 打包版本
 - `./bin/issue-index` — Issue 索引管理
 - 这些是独立脚本，直接 `./bin/<name>` 调用，**不是** `./bin/freely <name>` 子命令

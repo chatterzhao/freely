@@ -176,5 +176,5 @@ hook 仍然可以补，但第一刀更应该是：
 - `docs/system/workspace/hooks/pre-push.sh`
 - `docs/system/workspace/skills/branch-management/SKILL.md`
 - `docs/system/workspace/skills/multi-worktree-supervision/`
-- `./bin/freely status`
-- `./bin/freely fleet-status`
+- `freely status`
+- `freely fleet-status`

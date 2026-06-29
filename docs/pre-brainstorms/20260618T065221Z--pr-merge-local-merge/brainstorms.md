@@ -68,7 +68,7 @@ github_head=$(git rev-parse refs/remotes/github/develop)
 origin_head=$(git rev-parse refs/remotes/origin/develop)
 if [[ "$github_head" != "$origin_head" ]]; then
   echo "ERROR: platforms out of sync. github=$github_head origin=$origin_head"
-  echo "Run: ./bin/freely develop-push attempt --project <path>"
+  echo "Run: freely develop-push attempt --project <path>"
   exit 1
 fi
 git update-ref refs/heads/develop "$github_head"

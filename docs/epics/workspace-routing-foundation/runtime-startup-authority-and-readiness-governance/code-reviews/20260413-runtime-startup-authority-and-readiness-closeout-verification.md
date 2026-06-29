@@ -13,7 +13,7 @@
 
 ## Commands
 
-1. `./bin/pr-merge-guarded test-pre-merge-20260413-runtime-startup-authority-and-readiness-governance feature/runtime-startup-authority-and-readiness-governance-20260413`
+1. `freely pr-merge-guarded test-pre-merge-20260413-runtime-startup-authority-and-readiness-governance feature/runtime-startup-authority-and-readiness-governance-20260413`
 2. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-fake-supervisor-argv-does-not-validate`
 3. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-daemon-start-ignores-fake-supervisor-argv`
 4. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-start-serializes-same-project-concurrent-starts`

@@ -5,7 +5,7 @@
 近期对 `freely` runtime 的实测暴露出一个产品语义与实现入口不一致的问题：
 
 - 产品 intent 明确要求 runtime 持续运行，除非明确停止
-- 当前 `./bin/freely start` 实际上是前台 supervisor，附着在调用会话上
+- 当前 `freely start` 实际上是前台 supervisor，附着在调用会话上
 - 在前台会话结束或被清理时，supervisor 会收到 `INT/TERM`，记录为 `operator_stop`
 - 这会让用户误以为 Freely “自己停了”，但直接原因其实是入口 ownership 与产品语义不一致
 
@@ -29,7 +29,7 @@
 
 这意味着：
 
-- 从当前终端直接执行 `./bin/freely start`
+- 从当前终端直接执行 `freely start`
 - 当前终端 / 外层命令生命周期结束时
 - supervisor 也会跟着收到信号并停掉
 

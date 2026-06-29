@@ -17,7 +17,7 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-semantic-loop-status-surface`
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status`
 - `bash docs/system/workspace/scripts/tests/test-freely-fleet-status`
-- `./bin/freely fleet-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+- `freely fleet-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
 - `./bin/governance-check`
 
 ## Residual Risk

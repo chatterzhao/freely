@@ -27,7 +27,7 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-timeout-artifact`
 - `bash docs/system/workspace/scripts/tests/test-freely-codex-probe-detects-deactivated-workspace-before-timeout`
 - `bash docs/system/workspace/scripts/tests/test-watchdog-control-plane-skills`
-- `./bin/freely status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+- `freely status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
 - `./bin/governance-check`
 
 ## Residual Risk

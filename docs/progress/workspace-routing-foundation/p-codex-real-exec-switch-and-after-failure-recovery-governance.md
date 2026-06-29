@@ -31,7 +31,7 @@ This follow-on owner tightened Codex switch and startup recovery around real `co
 - `bash docs/system/workspace/scripts/tests/test-freely-worker-runtime-slot-local-failure-self-recovers-next-slot`
 - `bash docs/system/workspace/scripts/tests/test-freely-active-runtime-reconnect-stays-network-local`
 - real `./bin/ai init|list|whoami codex|status codex|switch codex|switch codex <slot>|login codex apikey|save codex|delete codex <slot>`
-- real bad-slot `./bin/freely start` replay with log observation and restored auth confirmation
+- real bad-slot `freely start` replay with log observation and restored auth confirmation
 - Git commit `b044a461` on the feature branch
 
 ## Next Action

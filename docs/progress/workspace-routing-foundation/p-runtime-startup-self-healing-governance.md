@@ -47,5 +47,5 @@
 ## Next Action
 
 1. Re-run the guarded `test-pre-merge-20260423-guard-disable-slot-switch-probe -> develop` merge with this owner evidence in the diff.
-2. After canonical `develop` carries the patch, restart `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely` under `AUTO_SWITCH_SLOT=false` and verify `~/.codex/auth.json` no longer changes from background startup/watchdog probing.
+2. After canonical `develop` carries the patch, restart `freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely` under `AUTO_SWITCH_SLOT=false` and verify `~/.codex/auth.json` no longer changes from background startup/watchdog probing.
 3. Once canonical replay is green, retire `test-pre-merge-20260423-guard-disable-slot-switch-probe` and `feature/guard-disable-slot-switch-probe`, then continue the broader protected-root daemon replay closeout for this owner.

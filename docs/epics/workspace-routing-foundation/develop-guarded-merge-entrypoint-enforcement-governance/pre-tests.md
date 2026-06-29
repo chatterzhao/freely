@@ -4,7 +4,7 @@
 
 ### AT-001 raw develop merge is blocked before downstream gates
 
-- acceptance target: `develop` 上没有 canonical guarded handshake 的 merge commit 会被 `pre-merge-commit` 立即拒绝，并明确提示改用 `./bin/pr-merge-guarded`
+- acceptance target: `develop` 上没有 canonical guarded handshake 的 merge commit 会被 `pre-merge-commit` 立即拒绝，并明确提示改用 `freely pr-merge-guarded`
 - testing layer: focused regression
 - target environment: `docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
 - required evidence: `raw merge blocked with pr-merge-guarded guidance`
@@ -38,7 +38,7 @@
 
 ### AT-001
 - id: `AT-001`
-- requirement: `Raw develop merge commits without the canonical guarded handshake fail closed and point to ./bin/pr-merge-guarded.`
+- requirement: `Raw develop merge commits without the canonical guarded handshake fail closed and point to freely pr-merge-guarded.`
 - evidence_level: `integration`
 - status: `pass`
 - artifact_ref: `docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`

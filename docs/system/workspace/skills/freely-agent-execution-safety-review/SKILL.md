@@ -1,6 +1,9 @@
 ---
 name: freely-agent-execution-safety-review
-description: 在 Freely workspace 中执行 execution-boundary review，并在不退化成用户逐步批准的前提下输出 reviewer-backed security decision support 与 machine-readable evidence。
+description: >- 在 Freely workspace 中执行 execution-boundary review，输出 reviewer-backed security decision 与 machine-readable evidence。不退化或逐步批准。
+
+  Use when: 安全敏感变更需要 execution-boundary 独立审查。
+  触发词："安全审查"、"execution review"、"boundary check"、"execution boundary"。
 ---
 
 # skill:freely-agent-execution-safety-review
@@ -27,7 +30,7 @@ description: 在 Freely workspace 中执行 execution-boundary review，并在�
 ## 核心流程
 
 1. 先运行：
-   - `./bin/freely security-review-brief --project <project-root>`
+   - `freely security-review-brief --project <project-root>`
 2. 读取以下真相：
    - `execution_boundary_audit_status`
    - `execution_boundary_audit_detail`

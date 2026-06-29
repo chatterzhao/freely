@@ -49,18 +49,18 @@ These are CLI-first product behaviors, not operator trivia. If the first-hop com
 
 ## Acceptance
 
-1. `./bin/wt-create --help` exits `0`, prints usage, and does not attempt branch/worktree creation.
+1. `freely wt-create --help` exits `0`, prints usage, and does not attempt branch/worktree creation.
 2. `source ./bin/wt-enter --help` and `source ./bin/wt-add --help` exit `0` with explicit usage text, while direct execution still rejects them.
-3. `./bin/pr-merge-guarded --help` and `./bin/freely --help` exit `0` with deliberate usage output.
+3. `freely pr-merge-guarded --help` and `./bin/freely --help` exit `0` with deliberate usage output.
 4. `./bin/ai --quiet --format json --dry-run switch codex` returns one stable JSON object that reflects saved-slot inventory and does not require long-running probe completion.
 5. Focused regressions and governance checks pass in the dedicated feature worktree.
 
 ## Verification
 
-- `./bin/wt-create --help`
+- `freely wt-create --help`
 - `bash -lc 'source ./bin/wt-enter --help'`
 - `bash -lc 'source ./bin/wt-add --help'`
-- `./bin/pr-merge-guarded --help`
+- `freely pr-merge-guarded --help`
 - `./bin/freely --help`
 - `./bin/ai --quiet --format json --dry-run switch codex`
 - `./bin/governance-check`

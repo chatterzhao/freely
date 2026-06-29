@@ -1,6 +1,13 @@
 ---
 name: freely-dev-loop-execution
-description: 执行 scan-selected 或 handoff-continued ready issue 的实现、测试与进度回写。
+description: >-
+  执行 issue 的代码实现与 TDD RED-GREEN 验证。测试先行，代码后行。
+  产出 code-review + Implementation Decision Note。不碰 pre-tests.md
+  （测试方案由 `freely-doc-B2_IBM-execution` skill 编写）。
+
+  Use when: `freely-test-RED-execution` skill 确认全部 RED 之后，
+  需要写实现代码。触发词："写代码"、"dev"、"实现"、"开发"、
+  "开始写"、"coding"。
 ---
 
 # skill:freely-dev-loop-execution
@@ -46,7 +53,7 @@ description: 执行 scan-selected 或 handoff-continued ready issue 的实现、
 ### 情景 B：回写执行进度
 
 这样做：
-1. 仅把执行态写入 `docs/progress/{epic}/p-{issue}.md`：
+1. 仅把执行态写入 `docs/progress/{epic-name}/p-{issue}.md`（`{epic-name}` 由 `freely-doc-B2_IBM-execution` skill 确定——与 I-* issue 所在的 epic 一致）：
    - 当前实现进度
    - 测试结果
    - blocker
@@ -69,7 +76,7 @@ description: 执行 scan-selected 或 handoff-continued ready issue 的实现、
 ### 情景 D：pre-tests.md 结构
 
 > pre-tests.md 完整模板由 `skill:freely-doc-B2_IBM-execution` 内置提供。
-> B2_IBM 阶段写好 `test_command` + `expected_output`，dev-loop 阶段先 RED 后 GREEN。
+> `freely-doc-B2_IBM-execution` skill 阶段写好 `test_command` + `expected_output`，dev-loop 阶段先 RED 后 GREEN。
 > 正式执行验证由 `skill:freely-test-execution` 负责——逐条执行并收集 evidence。
 
 dev-loop 阶段的职责：
@@ -78,7 +85,7 @@ dev-loop 阶段的职责：
 - **再跑 GREEN**：实现后重新执行，全部 passed 才进入 test skill
 - 把 RED-GREEN 结果记录到 pre-tests.md 的 actual_output / evidence_file
 
-**必需章节**（详见 B2_IBM skill 模板）：
+**必需章节**（详见 `freely-doc-B2_IBM-execution` skill 模板）：
 
 | 章节 | 内容 |
 |------|------|
@@ -177,7 +184,7 @@ dev-loop 阶段的职责：
 1. 读取 raw issue 的 acceptance criteria（如果有）
 2. 读取 I-* issue 的 pre-tests.md
 3. 逐条核对：每条 acceptance criteria → 至少一条 pre-tests 中的 acceptance 项
-4. 发现未覆盖的 → 回 B2_IBM 补充 pre-tests
+4. 发现未覆盖的 → 回 `freely-doc-B2_IBM-execution` skill 补充 pre-tests
 5. 产出：映射表 `## Acceptance Mapping`（acceptance criteria → pre-tests acceptance-N）
 
 ### 情景 G：进入 test skill

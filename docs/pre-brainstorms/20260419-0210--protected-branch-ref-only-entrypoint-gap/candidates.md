@@ -9,7 +9,7 @@
 - problem: `Protected branches still allow ref-only local advances such as git merge --ff-only to bypass the canonical guarded merge entrypoint because pre-merge-commit only runs when Git actually creates a merge commit.`
 - why_now:
   - `2026-04-19` protected-root replay proved canonical `develop` could be fast-forwarded directly to a feature commit before push-time governance ran
-  - this contradicts the declared contract that `./bin/pr-merge-guarded` is the canonical protected-merge entrypoint
+  - this contradicts the declared contract that `freely pr-merge-guarded` is the canonical protected-merge entrypoint
   - leaving the gap open means protected-root local truth can diverge from the legal merge path even when later push-time governance still exists
 - acceptance_criteria:
   - protected-branch ref-only advances to non-receipted commits fail before the branch ref is updated

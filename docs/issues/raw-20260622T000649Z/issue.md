@@ -13,11 +13,12 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-22T00:07:06Z'
-updated_at: '2026-06-22T00:07:06Z'
+updated_at: '2026-06-29T13:43:32Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 ## 问题
@@ -46,7 +47,7 @@ session_refs: []
   请加上绕过理由参数：
     --reason "具体绕过原因"
 
-  示例: ./bin/wt-close --force --reason "emergency: worktree corrupted" <branch>
+  示例: freely wt-close --force --reason "emergency: worktree corrupted" <branch>
 ```
 
 ## 涉及文件

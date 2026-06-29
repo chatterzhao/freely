@@ -6,7 +6,7 @@
 
 ## Context
 
-Today the protected-root runtime was started from `/Users/zhaoyu/Downloads/code/my-freely/freely` with `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely`, then observed after roughly one minute through `live-status`, pid files, logs, and run-dir artifacts.
+Today the protected-root runtime was started from `/Users/zhaoyu/Downloads/code/my-freely/freely` with `freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely`, then observed after roughly one minute through `live-status`, pid files, logs, and run-dir artifacts.
 
 The current shape is not a normal manager-owned recovery:
 

@@ -13,11 +13,12 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-18T04:02:44Z'
-updated_at: '2026-06-18T04:02:44Z'
+updated_at: '2026-06-29T13:43:19Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 ## 问题
@@ -113,7 +114,7 @@ pr-create-guarded  →  pr-review-guarded  →  pr-merge-guarded
 
 ### 与现有设施的集成
 
-- `pr-create-guarded` 成功后提示：`Next: ./bin/pr-review-guarded <branch>`
+- `pr-create-guarded` 成功后提示：`Next: freely pr-review-guarded <branch>`
 - `pr-merge-guarded` 执行前检查 pr-review 文档是否存在且 verdict=pass
 - `governance-merge-gate` 增加 pr-review 文档检查
 - 可在 GitHub 上通过 `gh pr review --approve` 同步 verdict

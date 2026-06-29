@@ -2,7 +2,7 @@
 
 ## 背景
 
-`./bin/freely daemon start` 在 macOS 上执行时，daemon 无法正常启动。通过 `bash -x` 逐行 trace 定位到两个 bash 3.2 兼容性 bug。
+`freely daemon start` 在 macOS 上执行时，daemon 无法正常启动。通过 `bash -x` 逐行 trace 定位到两个 bash 3.2 兼容性 bug。
 
 ## 问题分析
 

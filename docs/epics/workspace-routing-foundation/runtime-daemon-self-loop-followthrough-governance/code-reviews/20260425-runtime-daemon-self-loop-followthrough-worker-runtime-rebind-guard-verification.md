@@ -18,7 +18,7 @@
   3. `bash docs/system/workspace/scripts/tests/test-freely-manager-active-worker-count-prefers-live-processes`
   4. `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery`
   5. `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-path-collapses-terminal-handoff-worker-slot`
-- `PENDING`: replay the guarded merge path, absorb into canonical `develop`, restart `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely`, and verify the same worker lane no longer loops through `manager_worker_runtime_control_plane_rebind -> delegated_runtime_handoff_stop_requested` while the daemon continues toward merge/retire/next-task followthrough.
+- `PENDING`: replay the guarded merge path, absorb into canonical `develop`, restart `freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely`, and verify the same worker lane no longer loops through `manager_worker_runtime_control_plane_rebind -> delegated_runtime_handoff_stop_requested` while the daemon continues toward merge/retire/next-task followthrough.
 
 ## Implementation Decision Note
 

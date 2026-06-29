@@ -2,7 +2,7 @@
 
 ## Context
 
-Canonical root `develop` can still generate a fresh manager prompt, but the prompt-required continuity file is not materialized and the previous continuity remains stale. Before this followthrough, `./bin/freely live-status` could also exit before its first line when PID hint validation returned non-zero under `set -e`, which made the self-host stall look like a blank status surface instead of a narrow runtime truth gap.
+Canonical root `develop` can still generate a fresh manager prompt, but the prompt-required continuity file is not materialized and the previous continuity remains stale. Before this followthrough, `freely live-status` could also exit before its first line when PID hint validation returned non-zero under `set -e`, which made the self-host stall look like a blank status surface instead of a narrow runtime truth gap.
 
 The currently active committed owner under the milestone is `cli-help-and-dry-run-contract-followthrough-governance`, but its progress explicitly keeps runtime supervision out of scope. This self-host regression therefore needs to route back through the runtime blocked-intake / continuity family rather than being absorbed into the CLI contract lane.
 

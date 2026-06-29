@@ -13,7 +13,7 @@ canonical_issue_path: docs/issues/I-20260521T115809Z-A/issue.md
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-21T11:58:21Z'
-updated_at: '2026-06-17T00:19:37Z'
+updated_at: '2026-06-29T13:43:10Z'
 intake_id: ''
 author: platform
 channel: github
@@ -25,7 +25,7 @@ platform_state: closed
 
 ## 问题
 
-执行 `./bin/pr-merge-guarded develop fix/raw-20260521T095313Z-type-based-alias-resolution` 后，合并提交信息为：
+执行 `freely pr-merge-guarded develop fix/raw-20260521T095313Z-type-based-alias-resolution` 后，合并提交信息为：
 
 ```
 Merge branch forbidden into develop

@@ -27,8 +27,8 @@ All commands passed in worktree `feature/success-standard-governance-20260420`.
 
 - patched runtime was started against canonical project `/Users/zhaoyu/Downloads/code/my-freely/freely`
 - fresh interruption sent with:
-  - `./bin/freely chat --project /Users/zhaoyu/Downloads/code/my-freely/freely "...成功标准..."`
-- after one minute, `./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely` reported:
+  - `freely chat --project /Users/zhaoyu/Downloads/code/my-freely/freely "...成功标准..."`
+- after one minute, `freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely` reported:
   - `last_consumed_delegated_continuation_ids: 20260420-020937-pre-brainstorm-owner-1-success-c`
   - `current_prompt_has_delegated_continuation: 1`
   - `intake_snapshot: none`

@@ -34,11 +34,11 @@
 ## Success Criteria
 
 1. 手工把 Codex 切到真实坏号，例如 `apikey-codex-a1016-1`
-2. 执行真实 `./bin/freely start --project <project>`
+2. 执行真实 `freely start --project <project>`
 3. 首轮失败后，不需要人工执行 `freely ensure-manager`
 4. 系统会自动继续恢复，直到切到可用工具/号并重新运行
 5. 同一次恢复过程中，不允许重复重启到刚失败的同一坏号
-6. `./bin/freely stop --project <project>` 后，不允许再出现被 watchdog / recheck 抢回来的新 supervisor
+6. `freely stop --project <project>` 后，不允许再出现被 watchdog / recheck 抢回来的新 supervisor
 
 ## New Real Evidence
 
@@ -129,9 +129,9 @@ Observed sequence from `runtime-events.log` and real cycle log:
    - same-tool slot exhaustion 后能继续进入 cross-tool fallback
 4. 真实环境再次执行：
    - 坏号 `a1016`
-   - `./bin/freely start`
+   - `freely start`
    - 观察其自动切到可用工具/号
-   - `./bin/freely stop`
+   - `freely stop`
    - 确认彻底停净
 
 ## 2026-04-14 Implementation Result

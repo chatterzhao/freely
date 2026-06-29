@@ -28,8 +28,8 @@
 - target environment: `develop-bound guarded merge chain`
 - required evidence: `guarded feature→test-pre-merge→develop merge receipts plus owner review artifact`
 - blocker taxonomy: `execution_pending_or_failed`
-1. Merge `feature/raw-20260503T0915Z-enforce-test-pre-merge` into `test-pre-merge-enforce-gate-20260503` via `./bin/pr-merge-guarded`.
-2. Merge `test-pre-merge-enforce-gate-20260503` into `develop` via `./bin/pr-merge-guarded`.
+1. Merge `feature/raw-20260503T0915Z-enforce-test-pre-merge` into `test-pre-merge-enforce-gate-20260503` via `freely pr-merge-guarded`.
+2. Merge `test-pre-merge-enforce-gate-20260503` into `develop` via `freely pr-merge-guarded`.
 3. Verify `Freely-Merge-Path`, `Freely-Bypass-Mode`, `Freely-Source-Branch` trailers in merge commit messages.
 
 ## Real-Environment

@@ -28,7 +28,7 @@
   - current `git diff --stat` on entry stayed bounded to the same scope with `2 files changed`, so the worktree entered this round as a narrow candidate-doc hygiene batch rather than a mixed implementation tree
   - this round started as `fresh_with_handoff` from Codex session `019dabfa-babb-7a22-bca4-63ce4693ea81` after `context compacted`, so continuity refresh was required before any scope expansion
   - `./bin/checkpoint-guard` reports `checkpoint_required: no`
-  - `./bin/freely baseline-status --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260420-feature-startup-task-source-patrol-and-reconcile` reports `last_project_dirty_entries: 2` and `last_worktree_summary_dirty: 1`, which matches the current worktree snapshot injected for this round
+  - `freely baseline-status --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260420-feature-startup-task-source-patrol-and-reconcile` reports `last_project_dirty_entries: 2` and `last_worktree_summary_dirty: 1`, which matches the current worktree snapshot injected for this round
   - no runtime/script/test implementation files were reopened, so the only bounded delta from this session is candidate-owned continuity/evidence writeback; this round closed it with a single doc-only checkpoint commit and returned the worktree to a clean hold
 - focused_verification:
   - `PASS: bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-includes-milestone-patrol-seed`

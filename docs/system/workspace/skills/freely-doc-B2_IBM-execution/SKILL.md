@@ -1,6 +1,18 @@
 ---
 name: freely-doc-B2_IBM-execution
-description: B2_IBM：I→B→M 第二阶段。从 scan、A2A task 与 continuity evidence 选出的 milestone committed_issues 取 I-{key}，经 Brainstorm 实现设计，产出 Map（prd/pre-tests/tasks/code-review）交付 dev-loop。
+description: >-
+  IBM Framework 第二阶段。消费 `freely-doc-B1_IBM-execution` skill 在
+  milestones.md candidate_issues 中 promote 的 candidate（通过
+  `source_candidate` 找到候选文档，读取 acceptance_criteria 等依据）。
+  三步产出：① 根据 `promoted_issue_id` 确定 epic-name/story-name，
+  在 milestones.md committed_issues 中生成 I-* issue 正式条目（含真实路径）；
+  ② 在 `docs/epics/{epic-name}/{story-name}/raw-{raw-key}/issues/` 下物化
+  完整 I-* issue 文档；③ 产出设计产物 prd.md + pre-tests.md + tasks.md +
+  code-reviews/。交付给 `freely-dev-loop-execution` skill。
+
+  Use when: `freely-doc-B1_IBM-execution` skill 完成 candidate promoted
+  之后。触发词："B2"、"物化 issue"、"设计"、"pre-tests"、"写测试方案"、
+  "PRD"、"分解任务"、"I-* 文档"。
 ---
 
 # skill:freely-doc-B2_IBM-execution
@@ -9,41 +21,53 @@ description: B2_IBM：I→B→M 第二阶段。从 scan、A2A task 与 continuit
 
 ## I→B→M 骨架
 
-B2_IBM 是 IBM Framework 第二阶段。I（Input）从 scan、A2A task 与 continuity evidence 选出的里程碑已提交 issue 来，B2_IBM 做 B（Brainstorm）和 M（Map）。
+B2_IBM 是 IBM Framework 第二阶段。消费 `freely-doc-B1_IBM-execution` skill promote 的 candidate，做 B（Brainstorm）和 M（Map），**在 milestones.md committed_issues 生成 I-* 正式条目并物化完整文档**，同时产出全部设计产物。
+
+> 四节点链路中，本 skill 负责 milestone → **I-* issue 物化**。M（milestone，M-{key}-A）和 candidate 的 `promoted_issue_id`（I-{key}-{suffix}）由 B1_IBM 提供。本 skill 据此 key：① 按 [issue-materialization-checklist.md](references/issue-materialization-checklist.md) 规范确定 epic-name/story-name；② 在 milestones.md committed_issues 中生成 I-* 正式条目并**填写 epics 下的真实路径**（`docs/epics/{epic-name}/{story-name}/raw-{raw-key}/issues/I-{raw-key}-{suffix}.md`）；③ 在该路径物化完整 I-* issue 文档。
+>
+> 关键区分：B1_IBM 产出的是 key（I-{key}-{suffix}，在 candidate_issues 中）。B2_IBM 将 key 变成 milestones.md 中的**正式条目（含真实路径）**和 epics 目录下的**完整文档**。
 
 | 阶段 | 含义 | 谁准备 | 产物 |
 |------|------|--------|------|
-| **I** | Input | milestone committed_issues | I-{key}（已排期，已有正式 issue 文档） |
-| **B** | Brainstorm | B2_IBM skill | 实现前置设计、替代方案评估、验收标准 |
-| **M** | Map | B2_IBM skill | prd.md、pre-tests.md（含 Acceptance Items v2 adequacy）、tasks.md、code-reviews/ |
+| **I** | Input | `freely-doc-B1_IBM-execution` skill | promoted candidate 在 milestones.md candidate_issues 中，其 `promoted_issue_id` 是 I-* issue 的 key（I-{key}-{suffix}） |
+| **B** | Brainstorm | `freely-doc-B2_IBM-execution` skill | b-I-{key}-{suffix}.md：实现前置设计、替代方案评估、验收标准 |
+| **M** | Map | `freely-doc-B2_IBM-execution` skill | 完整 I-* issue 文档（物化） + prd.md + pre-tests.md + tasks.md + code-reviews/ |
 
-### I：Input — milestone committed_issues
+### I：Input — B1_IBM 产生的 promoted candidate
 
-从 `docs/milestones.md` → committed_issues 获取 I-{key}。
-I-{key} 由 B1_IBM 阶段 promote 而来，已排期、已有 priority、已有正式 issue 文档。
+从 `docs/milestones.md` → candidate_issues 中取 status=promoted 的 candidate。
+candidate 条目包含 `promoted_issue_id`（I-* issue 的 key）和 `source_candidate`（指向 `docs/pre-brainstorms/{key}--{slug}/candidates.md` 中对应 C-* 的完整路径）。
 
-B2_IBM 不创建 I-{key}。
+根据 `source_candidate` 找到候选文档，读取其 `acceptance_criteria`、`promotion_gate`、`decision_reason` 等字段——这些是生成 I-* issue 的依据。
+
+此时 I-* issue 只有 key，还没有正式条目和文档文件。本 skill 在 M 阶段完成：确定 epic/story → 在 milestones.md committed_issues 生成正式条目（含真实路径）→ 物化完整文档。
 
 ### B：Brainstorm — 实现前置设计
 
-1. 读取 I-{key} issue 文档（Input）
-2. 读取 candidate 的 acceptance_criteria、promotion_gate
-3. 读实现面、读验收标准、评估替代方案
-4. 产出 `brainstorms/b-{issue-name}.md`
+1. 根据 candidate_issues 中的 `source_candidate` 路径，读取候选文档（`docs/pre-brainstorms/{key}--{slug}/candidates.md`），提取 acceptance_criteria、promotion_gate
+2. 读实现面、读验收标准、评估替代方案
+3. 产出 `docs/epics/{epic-name}/{story-name}/raw-{raw-key}/brainstorms/b-I-{raw-key}-{suffix}.md`
 
-### M：Map — 完整产物目录
+### M：Map — 确定 epic/story + 物化 I-* issue + 完整产物目录
 
-产出 `docs/epics/{epic-name}/{story-name}/` 下的完整目录：
+**步骤 0：确定 epic-name 和 story-name**（写任何产物前必须先做）。
+
+`{epic-name}` 是能力域（capability domain），`{story-name}` 是 epic 下的可交付切片。这是架构决策——基于语义理解，不是从 candidate title 机械提取关键词。详见 [issue-materialization-checklist.md](references/issue-materialization-checklist.md) §如何确定 epic-name 和 story-name。简单原则：
+- 这个 raw issue 解决的能力问题，和已有 epic 的**能力域重叠** → 复用已有 epic
+- 能力域**正交**（独立可理解、独立可验收）→ 新建 epic
+- 同一 epic 下的新子问题 → 新建 story
+
+**步骤 1：产出目录**。产出 `docs/epics/{epic-name}/{story-name}/raw-{raw-key}/` 下的完整目录。其中 I-* issue 是本 skill 的核心产物——根据 candidate 的 `promoted_issue_id`，在该路径物化包含完整 frontmatter 和正文的 issue 文档。
 
 | 产物 | 要求 |
 |------|------|
-| `issues/{name}.md` | I-* issue 文档，完整格式见下方示例 |
+| `issues/I-{raw-key}-{suffix}.md` | **I-* issue 完整文档**（物化自 candidate 的 `promoted_issue_id`）。含 phase_state、pre_tests_path、verification_artifact_dir 等全部字段 |
 | `prd.md` | Goal → Dev-Loop Handoff |
 | `pre-tests.md` | 结构化测试计划（含 test_command + expected_output），模板见下方 |
 | `tasks.md` | 任务分解，关联 owner issue |
 | `code-reviews/` | Implementation Decision Note（decision/why_this/alternatives_considered/boundary_non_goals/residual_risk） |
 
-**I-* issue 完整示例**（`docs/epics/{epic}/{story}/raw-{raw-key}/issues/I-{raw-key}-A.md`）：
+**I-* issue 完整示例**（`docs/epics/{epic-name}/{story-name}/raw-{raw-key}/issues/I-{raw-key}-{suffix}.md`，此处 suffix = A）：
 
 ```markdown
 ---
@@ -136,7 +160,7 @@ B2_IBM 阶段直接写入以下格式。AI 按模板填写，无需查看任何�
 - target_environment: test-pre-merge-{key}-{slug}
 - required_evidence: <测试通过的证据要求>
 - evidence_level: mock | integration | real_env | post_merge_dogfood
-- artifact_ref: <指向测试产物文件，如 docs/epics/{epic}/test-evidence/acceptance-1.log>
+- artifact_ref: <指向测试产物文件，如 docs/epics/{epic-name}/test-evidence/acceptance-1.log>
 - test_command: <实际执行的 shell 命令，如：./bin/test-lane feature-local -- echo ok>
 - expected_output: <命令的预期输出（GREEN 时的输出），如：所有测试 PASSED>
 - expected_RED_output: <RED 阶段的预期输出——fix: 证明 bug 存在；feature: 证明功能未实现>
@@ -215,9 +239,19 @@ phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
 
 ## 不负责
 
-- 不创建 I-{key}（B1_IBM 阶段 promote 产生）
-- 不实现代码或运行测试（dev-loop 负责）
-- 不直接写 progress（dev-loop 负责）
+- 不决定 I-* issue 的 key（key 由 `freely-doc-B1_IBM-execution` skill 的 candidate 通过 `promoted_issue_id` 指定）
+- **负责**根据 key 确定 epic-name 和 story-name（按 [issue-materialization-checklist.md](references/issue-materialization-checklist.md) 规范），构造完整路径，物化文件
+- 不实现代码或运行测试（由 `freely-dev-loop-execution` skill 负责）
+- 不直接写 progress（由 `freely-dev-loop-execution` skill 负责）
+
+## 负责
+
+- **在 milestones.md committed_issues 中生成 I-* 正式条目**：根据 `promoted_issue_id` 确定的 epic-name/story-name，填写 I-* issue 的真实路径（`docs/epics/{epic-name}/{story-name}/raw-{raw-key}/issues/I-{raw-key}-{suffix}.md`）
+- **物化 I-* issue 完整文档**：在 epics 路径下创建包含完整 frontmatter（phase_state、pre_tests_path、verification_artifact_dir 等）和正文的 issue.md 文件
+- 产出 prd.md、pre-tests.md、tasks.md
+- 产出 code-reviews/（含 Implementation Decision Note）
+- 产出 prd.md、pre-tests.md、tasks.md
+- 产出 code-reviews/（含 Implementation Decision Note）
 
 ## 门禁常见坑速查
 
@@ -230,7 +264,7 @@ phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
 | owner issue 'missing' / that issue cannot be resolved | review/code-review 文件需 bullet 格式的 issue_id | `- issue_id: I-20260508T011858Z-A` |
 | I-* canonical fields silently cleared | I-* frontmatter 用了 `---` YAML 包裹格式；canonical reader 只解析 bullet | 去掉 `---` 包裹，用 bullet 格式：`- phase_state: completed` |
 | phase_state cannot own capability/implementation changes | 实现变更的 I-* 需 completed | `phase_state: completed` |
-| pre_tests_path 验证失败 | I-* issue 需声明 pre_tests_path | `pre_tests_path: docs/epics/{epic}/verification/pre-tests.md` |
+| pre_tests_path 验证失败 | I-* issue 需声明 pre_tests_path | `pre_tests_path: docs/epics/{epic-name}/verification/pre-tests.md` |
 | section missing acceptance_target/testing_layer | 字段名必须用下划线，不是空格 | `- acceptance_target:` / `- testing_layer:` / `- target_environment:` / `- required_evidence:` |
 | acceptance item missing id/requirement/evidence_level/artifact_ref | 每个 acceptance item 必须有这 4 个字段 | `- id: AT-001` / `- requirement: ...` / `- evidence_level: mock` / `- artifact_ref: <path>` |
 | execution_missing: got passed | passed 需要 worker state（.freely/run/workcell-state.env），无则改用 not_applicable | `- status: not_applicable` + not_applicable_reason + replacement_evidence |
@@ -319,11 +353,12 @@ phase_state: done_b2_ibm
 
 ## 工作流
 
-1. 确认 Input：milestone committed_issues 中的 I-{key} 存在
-2. 读取 [issue-materialization-checklist.md](references/issue-materialization-checklist.md)
-3. Materialize I-* issue 到 `docs/epics/{epic}/{story}/issues/`
-4. 写 prd.md、pre-tests.md、tasks.md
-5. 写 code-review（含 Implementation Decision Note）
-6. 更新 milestones.md committed_issues
+1. 确认 Input：milestones.md candidate_issues 中有 status=promoted 的 candidate
+2. 读取 candidate 的 `promoted_issue_id`，确认 I-* issue 目标路径
+3. 读取 [issue-materialization-checklist.md](references/issue-materialization-checklist.md)
+4. Materialize I-* issue 到 `docs/epics/{epic-name}/{story-name}/raw-{raw-key}/issues/`
+5. 写 prd.md、pre-tests.md、tasks.md
+6. 写 code-review（含 Implementation Decision Note）
+7. 更新 milestones.md committed_issues（写入物化后的 I-* issue）
 7. 若发现边界外新问题：返回 `next_recommended_route=freely-doc-B1_IBM-execution`
 8. B2_IBM 完成后，进入 RED 阶段（skill:freely-test-RED-execution）确认全部测试 RED → dev-loop 实现 → GREEN → pr-create-guarded（提 PR）→ pr-merge-guarded（门禁合并）→ wt-close（收口）

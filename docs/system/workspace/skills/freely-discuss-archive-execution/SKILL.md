@@ -1,6 +1,10 @@
 ---
 name: freely-discuss-archive-execution
-description: 讨论归档 skill。分析讨论 session → 产出评论或 raw issue → 记录产出 ID → 关闭讨论。由 freely discuss --archive 通过 ACP session/prompt 触发。
+description: >- 讨论归档 skill。分析讨论 session、产出评论或 raw issue、记录产出 ID、
+  关闭讨论。由 `freely discuss --archive` 命令通过 ACP session/prompt 触发。
+
+  Use when: `freely discuss --archive` 命令触发归档。
+  触发词："归档讨论"、"archive discussion"、"关闭讨论"。
 ---
 
 # skill:freely-discuss-archive-execution

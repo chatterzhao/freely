@@ -10,9 +10,9 @@
 
 1. `git worktree list --porcelain`
 2. `./bin/wt-fleet-status`
-3. `./bin/freely stop --project /Users/zhaoyu/Downloads/code/my-freely/freely`
-4. `./bin/freely stop --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-scheduler-capacity-candidate-replay`
-5. `./bin/freely stop --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-develop-merge-prep-fleet-closure`
+3. `freely stop --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+4. `freely stop --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-scheduler-capacity-candidate-replay`
+5. `freely stop --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-develop-merge-prep-fleet-closure`
 6. `git -C /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-develop-merge-prep-fleet-closure status --short`
 7. `git -C /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-develop-merge-prep-fleet-closure commit -m "docs: stabilize watchdog fleet closeout judgment"`
 8. `git -C /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260327-feature-upstream-governance-merge-prep merge --no-ff feature/ibm-pretests-integration-acceptance-quality-20260326`

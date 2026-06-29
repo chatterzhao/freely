@@ -30,9 +30,9 @@
 - target environment: `guarded feature -> test-pre-merge -> develop replay`
 - required evidence: `merge receipts plus protected-lane verification artifact`
 - blocker taxonomy: `execution_pending_or_failed`
-1. Merge `feature/runtime-time-format-unification-20260423` into a fresh `test-pre-merge-*` lane via `./bin/pr-merge-guarded`.
+1. Merge `feature/runtime-time-format-unification-20260423` into a fresh `test-pre-merge-*` lane via `freely pr-merge-guarded`.
 2. On the protected lane, rerun the bounded time-helper regressions and stage a fresh owner review artifact.
-3. Merge the protected lane into `develop` via `./bin/pr-merge-guarded`.
+3. Merge the protected lane into `develop` via `freely pr-merge-guarded`.
 4. Confirm canonical `develop` still renders human display timestamps in host-local time while machine timestamps remain UTC-backed.
 
 ## Real-Environment

@@ -1,6 +1,10 @@
 ---
 name: freely-laws-enforcer
-description: 执行和验证法律级别的工作流和验收标准。当 AI 需要将宪法约束转换为 doc-loop、dev-loop、auto-loop 输出和完成证据的操作检查时使用。
+description: >- 执行和验证 `docs/LAWS.md` 级别的工作流和验收标准。将宪法约束转换
+  为 doc-loop、dev-loop、auto-loop 的操作检查与完成证据。
+
+  Use when: AI 需要将抽象约束转换为具体操作检查。
+  触发词："laws check"、"法律检查"、"验收标准"、"操作检查"。
 ---
 
 # skill:freely-laws-enforcer

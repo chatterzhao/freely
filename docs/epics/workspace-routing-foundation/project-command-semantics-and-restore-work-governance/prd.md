@@ -10,11 +10,11 @@
 
 ## Product Surface
 
-1. `./bin/freely start`
-2. `./bin/freely stop`
-3. `./bin/freely restart`
-4. `./bin/freely start --force`
-5. `./bin/freely restore-work`
+1. `freely start`
+2. `freely stop`
+3. `freely restart`
+4. `freely start --force`
+5. `freely restore-work`
 6. project-local `.freely/run/**` runtime/control-plane artifacts
 
 ## Non-Goals

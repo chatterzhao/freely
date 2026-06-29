@@ -1,6 +1,10 @@
 ---
 name: freely-auto-loop-orchestrator
-description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 lead-agent、上下文判定，再进入 sibling 的 doc-loop 或 dev-loop，并回到发现阶段。当 AI 运行自主持续交付循环时使用。
+description: >- 编排 AI 自主持续交付循环。从启动外部 AI CLI 工具到首跳 lead-agent、
+  上下文判定、进入 doc-loop/dev-loop，再回到发现阶段。
+
+  Use when: AI 运行自主持续交付循环，或需要编排多 agent 协作。
+  触发词："auto-loop"、"自主循环"、"持续交付"、"编排 agent"。
 ---
 
 # skill:freely-auto-loop-orchestrator
@@ -59,7 +63,7 @@ description: 编排 A:auto-loop(ADD)，从启动外部 AI CLI 工具到首跳 le
    - `event source`：interruption / review finding / test failure / runtime anomaly / worker-discovered gap
   - `standing source`：external issue / milestones / issue / progress / recovery / interruption backlog / pre-brainstorm lifecycle / fleet
 10. 对 `event source`，主管及时 notice；对 `standing source`，主管周期扫描，并在必要时生成 derived problem signal。
-   - 推荐统一脚本入口：`./bin/freely task-source-scan --project <project> --json`
+   - 推荐统一脚本入口：`freely task-source-scan --project <project> --json`
    - 该 JSON 是 standing-source inventory，不替代 canonical issue / progress / milestone / source closeout 真相
 11. 因此 `auto-loop` 对主管而言至少有两类入口：
    - `event-driven`

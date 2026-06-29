@@ -14,7 +14,7 @@
 
 - `git merge-base --is-ancestor c80cb34 develop`
 - `sed -n '1,220p' /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-worker-launch-state.env`
-- `./bin/freely status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+- `freely status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
 - `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption`
 
 ## Residual Risk

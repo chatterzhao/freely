@@ -58,8 +58,8 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-blocked-supervision-status-surface`
 - `./bin/governance-check`
 - `git diff --check`
-- `/usr/bin/time -p ./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
-- `cd /Users/zhaoyu/Downloads/code/my-freely/freely && /usr/bin/time -p ./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+- `/usr/bin/time -p freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+- `cd /Users/zhaoyu/Downloads/code/my-freely/freely && /usr/bin/time -p freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
 - `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/code-reviews/20260407-runtime-status-truth-verification-replay.md`
 
 ## Next Action

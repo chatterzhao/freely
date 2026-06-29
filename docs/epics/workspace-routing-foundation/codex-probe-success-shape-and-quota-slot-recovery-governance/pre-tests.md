@@ -28,10 +28,10 @@
 - required evidence: `real bounded startup replay`
 - blocker taxonomy: `execution_pending_or_failed`
 1. Run `./bin/ai switch codex account-worahe1001@outlook-com-1 --yes`.
-2. Run `./bin/freely start --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-runtime-slot-recovery-network-failure`.
+2. Run `freely start --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-runtime-slot-recovery-network-failure`.
 3. Capture `tail -n 80 .freely/logs/runtime-events.log`.
 4. Confirm `~/.codex/active-slot` advances to `account-worahe1000@outlook-com-1`.
-5. Run `./bin/freely stop --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-runtime-slot-recovery-network-failure`.
+5. Run `freely stop --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-runtime-slot-recovery-network-failure`.
 
 ## Real-Environment
 - acceptance target: `The guarded promote lane preserves the same owner-bound verification evidence without inventing a broader scheduler policy owner.`

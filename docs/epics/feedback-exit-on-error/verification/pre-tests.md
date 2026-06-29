@@ -40,7 +40,7 @@
 ### acceptance-5
 - acceptance_target: feedback --help still works
 - testing_layer: end-to-end
-- test_command: ./bin/freely feedback --help 2>&1 | head -3
+- test_command: freely feedback --help 2>&1 | head -3
 - expected_output: Usage text
 - actual_output: Usage text displayed correctly
 - evidence_file: .freely/run/test-evidence/acceptance-5.log

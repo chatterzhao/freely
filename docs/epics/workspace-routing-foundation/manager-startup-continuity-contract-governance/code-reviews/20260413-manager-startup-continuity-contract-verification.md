@@ -42,4 +42,4 @@ Verify that the new owner:
 - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
 - `./bin/governance-check`
 - `git diff --check`
-- `./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+- `freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`

@@ -1,6 +1,10 @@
 ---
 name: freely-premerge-reconcile
-description: 在不回退治理的情况下协调高风险合并冲突。当临时验证批次 merge 到 `test-pre-merge-*` 失败或语义回归风险出现时使用；从活跃测试批次创建临时 premerge 分支，按语义意图解决，合并回该测试批次，并清理。
+description: >- 在不回退治理的情况下协调高风险合并冲突。从 test-pre-merge-* 创建
+  临时 premerge 分支，按语义意图解决冲突后合并回测试批次并清理。
+
+  Use when: test-pre-merge-* 合并失败或出现语义回归风险。
+  触发词："合并冲突"、"premerge"、"语义回归"、"reconcile"。
 ---
 
 # skill:freely-premerge-reconcile
@@ -14,8 +18,8 @@ description: 在不回退治理的情况下协调高风险合并冲突。当临�
 - 创建专用分支：
   - `git branch feature/premerge-YYYYMMDDTHHMM[SS]Z--<topic> <active-test-pre-merge-branch>`
   - `cd <your-project-path>`
-  - 优先：`./bin/wt-create feature/premerge-YYYYMMDDTHHMM[SS]Z--<topic> --base <active-test-pre-merge-branch>`
-  - 手工兜底：`git worktree add ../<your-project-worktrees>/<branch-dir> feature/premerge-YYYYMMDDTHHMM[SS]Z--<topic> && ./bin/freely sync-tooling --source-project <your-project-path> --project ../<your-project-worktrees>/<branch-dir>`
+  - 优先：`freely wt-create feature/premerge-YYYYMMDDTHHMM[SS]Z--<topic> --base <active-test-pre-merge-branch>`
+  - 手工兜底：`git worktree add ../<your-project-worktrees>/<branch-dir> feature/premerge-YYYYMMDDTHHMM[SS]Z--<topic> && freely sync-tooling --source-project <your-project-path> --project ../<your-project-worktrees>/<branch-dir>`
   - `cd ../<your-project-worktrees>/<branch-dir>`
   - 对 `feature/premerge-20260307T1015Z--topic`，`<branch-dir>` 应为 `20260307T1015Z-feature-premerge-topic`
 

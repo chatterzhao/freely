@@ -11,7 +11,7 @@
 2. `bash docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
 3. `bash docs/system/workspace/scripts/tests/test-freely-start-requires-interruption-dispatcher-ready`
 4. `./bin/governance-check`
-5. `./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260327-200651-feature-start-restart-control-plane-semantics`
+5. `freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260327-200651-feature-start-restart-control-plane-semantics`
 
 ## Result
 

@@ -49,9 +49,9 @@ This owner reconciles canonical tracked `.codex/config.toml` plus canonical loca
 
 1. Canonical tracked `.codex/config.toml` matches the already-canonical `auto` posture for project-local Codex materialization.
 2. Canonical repo bootstrap produces activation-consent truth in a managed local config that satisfies the current execution-boundary audit.
-3. `./bin/freely live-status --project <repo>` no longer reports `activation_consent_status=unknown-legacy`.
-4. `./bin/freely live-status --project <repo>` no longer reports `codex_approval_policy=on-request expected=never`.
-5. `./bin/freely doctor --project <repo>` passes on the canonical repo.
+3. `freely live-status --project <repo>` no longer reports `activation_consent_status=unknown-legacy`.
+4. `freely live-status --project <repo>` no longer reports `codex_approval_policy=on-request expected=never`.
+5. `freely doctor --project <repo>` passes on the canonical repo.
 6. The owner remains a narrow bootstrap-reconciliation follow-on, not a reopened umbrella.
 
 ## Completion
@@ -70,12 +70,12 @@ This owner reconciles canonical tracked `.codex/config.toml` plus canonical loca
 
 ## Verification
 
-- `./bin/freely init --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-feature-canonical-product-posture-bootstrap-reconciliation --intent /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-feature-canonical-product-posture-bootstrap-reconciliation/docs/PROJECT_INTENT.md --constitution /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-feature-canonical-product-posture-bootstrap-reconciliation/docs/CONSTITUTION.md --ai codex:gpt-5.4:auto --accept-default-autonomy --force`
-- `./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-feature-canonical-product-posture-bootstrap-reconciliation`
-- `./bin/freely doctor --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-feature-canonical-product-posture-bootstrap-reconciliation`
-- `./bin/freely init --project /Users/zhaoyu/Downloads/code/my-freely/freely --intent /Users/zhaoyu/Downloads/code/my-freely/freely/docs/PROJECT_INTENT.md --constitution /Users/zhaoyu/Downloads/code/my-freely/freely/docs/CONSTITUTION.md --ai codex:gpt-5.4:auto --accept-default-autonomy --force`
-- `./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
-- `./bin/freely doctor --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+- `freely init --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-feature-canonical-product-posture-bootstrap-reconciliation --intent /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-feature-canonical-product-posture-bootstrap-reconciliation/docs/PROJECT_INTENT.md --constitution /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-feature-canonical-product-posture-bootstrap-reconciliation/docs/CONSTITUTION.md --ai codex:gpt-5.4:auto --accept-default-autonomy --force`
+- `freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-feature-canonical-product-posture-bootstrap-reconciliation`
+- `freely doctor --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-feature-canonical-product-posture-bootstrap-reconciliation`
+- `freely init --project /Users/zhaoyu/Downloads/code/my-freely/freely --intent /Users/zhaoyu/Downloads/code/my-freely/freely/docs/PROJECT_INTENT.md --constitution /Users/zhaoyu/Downloads/code/my-freely/freely/docs/CONSTITUTION.md --ai codex:gpt-5.4:auto --accept-default-autonomy --force`
+- `freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+- `freely doctor --project /Users/zhaoyu/Downloads/code/my-freely/freely`
 - `bash docs/system/workspace/scripts/tests/test-freely-init-codex-project-config-force`
 - `./bin/governance-check`
 

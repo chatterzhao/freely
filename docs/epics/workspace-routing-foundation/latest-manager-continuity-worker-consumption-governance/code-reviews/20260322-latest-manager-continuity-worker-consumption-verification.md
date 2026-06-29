@@ -48,8 +48,8 @@
   - `bash docs/system/workspace/scripts/tests/test-freely-delegated-continuation-active-prompt-visibility`
   - `./bin/governance-check`
 - this closeout writeback round re-read only:
-  - `./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
-  - `./bin/freely fleet-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+  - `freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+  - `freely fleet-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
   - `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-worker-launch-state.env`
 - sidecar runtime/test audit rechecked:
   - `docs/system/workspace/scripts/runtime/freely`

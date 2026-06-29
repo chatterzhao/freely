@@ -219,7 +219,7 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 - `bash docs/system/workspace/scripts/tests/test-pretests-retirement-gate`
 - `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely --issue docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
 - `./bin/governance-check`
-- canonical `develop` self-host replay: `./bin/freely daemon start`
+- canonical `develop` self-host replay: `freely daemon start`
 - `git worktree list`
 
 ## 2026-04-25 Continuation Note: Post-L042 Followthrough Keepalive

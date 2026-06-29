@@ -9,7 +9,7 @@
 - blocker taxonomy: execution_pending_or_failed
 - not_applicable_reason: human_observation_only
 - not_applicable_explanation: Shell script verified by direct execution and human review of output.
-- replacement_evidence: ./bin/deploy-skills --dry-run output confirms all skills synced
+- replacement_evidence: freely deploy-skills --dry-run output confirms all skills synced
 
 ## Integration
 - acceptance target: gate passes for this doc-only merge

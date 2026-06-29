@@ -14,8 +14,8 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-earliest-reset-wait-revive`
 - `./bin/governance-check`
 - direct CLI verification:
-  - `./bin/freely ensure-manager --project <tmp-project>`
-  - `./bin/freely start --project <tmp-project>`
+  - `freely ensure-manager --project <tmp-project>`
+  - `freely start --project <tmp-project>`
 
 ## What Changed
 

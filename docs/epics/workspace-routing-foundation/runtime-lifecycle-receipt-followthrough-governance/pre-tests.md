@@ -26,11 +26,11 @@
 - target environment: `guarded develop-bound merge chain`
 - required evidence: `merge receipts plus verification artifact`
 - blocker taxonomy: `execution_pending_or_failed`
-1. Merge `feature/runtime-lifecycle-receipt-closeout-reconcile-20260424` into `test-pre-merge-runtime-lifecycle-receipt-closeout-20260425` via `./bin/pr-merge-guarded`.
+1. Merge `feature/runtime-lifecycle-receipt-closeout-reconcile-20260424` into `test-pre-merge-runtime-lifecycle-receipt-closeout-20260425` via `freely pr-merge-guarded`.
 2. Re-run `./bin/test-lane premerge-integration -- ./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260425-test-pre-merge-runtime-lifecycle-receipt-closeout --issue docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`.
 3. Re-run `git diff --check`.
 4. Re-run `./bin/test-lane premerge-integration -- ./bin/governance-check`.
-5. Merge `test-pre-merge-runtime-lifecycle-receipt-closeout-20260425` into `develop` via `./bin/pr-merge-guarded`.
+5. Merge `test-pre-merge-runtime-lifecycle-receipt-closeout-20260425` into `develop` via `freely pr-merge-guarded`.
 6. Confirm the guarded develop path now sees a concrete owner chain instead of only the ledger change.
 
 ## Real-Environment

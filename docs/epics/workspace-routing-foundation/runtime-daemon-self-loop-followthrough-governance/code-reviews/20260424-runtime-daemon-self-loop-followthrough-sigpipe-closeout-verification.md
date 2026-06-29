@@ -13,7 +13,7 @@
 - `PASS`: the blocker is narrow and same-owner. Cached discovery producers were still writing with bare `printf` into process-substitution and early-return consumers, so a lawful short-circuit in continuity selection or PID/worktree discovery could abort the supervising shell under `set -euo pipefail`.
 - `PASS`: `project_worktree_list_porcelain_cached()` and `manager_continuity_files_desc_for_project()` now emit cached multi-line output through a bounded helper that traps `PIPE`, ignores `SIGPIPE`, and returns success when the downstream consumer stops after finding the first needed record.
 - `PASS`: the repair stays continuity-first. It does not widen task-selection policy, relax worker launchability, or bypass exit-contract truth; it only prevents producer-side closed-pipe exits from killing manager/worker supervision before closeout can consume the already-written artifacts.
-- `PENDING`: guarded promote into canonical `develop` and a fresh `./bin/freely daemon start` replay still need to prove this seam is the last blocker on retained cleanup closeout and next-task continuation.
+- `PENDING`: guarded promote into canonical `develop` and a fresh `freely daemon start` replay still need to prove this seam is the last blocker on retained cleanup closeout and next-task continuation.
 
 ## Commands
 

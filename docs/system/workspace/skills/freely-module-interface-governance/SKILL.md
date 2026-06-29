@@ -1,6 +1,10 @@
 ---
 name: freely-module-interface-governance
-description: 应用可插拔模块和接口版本治理以支持并行演进。当 AI 引入替换、版本化契约或模块间迁移路径时使用。
+description: >- 应用可插拔模块和接口版本治理，支持并行演进。覆盖模块替换、
+  版本化契约和模块间迁移路径。
+
+  Use when: 引入模块替换、版本化接口或模块间迁移。
+  触发词："模块治理"、"接口版本"、"migration path"、"替换模块"。
 ---
 
 # skill:freely-module-interface-governance

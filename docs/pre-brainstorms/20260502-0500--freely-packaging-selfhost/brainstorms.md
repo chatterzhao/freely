@@ -49,7 +49,7 @@ test-pre-merge 批次是一次性验证容器，不产生持久版本。
 
 ## 打包脚本
 
-`./bin/freely-package --version <ver> [--output <dir>]`
+`freely-package --version <ver> [--output <dir>]`
 
 1. 读取 workspace 下的 allowlist（`install-lifecycle-allowlist.txt` 扩展为 `package-allowlist.txt`）
 2. 复制 allowlist 中的文件到输出目录

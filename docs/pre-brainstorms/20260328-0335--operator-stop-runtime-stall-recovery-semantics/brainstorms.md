@@ -136,7 +136,7 @@
 
 subagent 代码复核还确认了一条重要负边界：
 
-- `./bin/freely stop --project <project>` 是 intended operator control surface
+- `freely stop --project <project>` 是 intended operator control surface
 - 但“日志里出现 `operator_stop_requested`”这件事本身并不能证明是用户显式执行了 `freely stop`
 - 同一个事件也会在 supervisor 被 runtime 内部 `TERM` 时出现
 

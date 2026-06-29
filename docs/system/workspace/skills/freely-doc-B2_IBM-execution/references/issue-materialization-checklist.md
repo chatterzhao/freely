@@ -48,14 +48,89 @@ docs/epics/{epic-name}/                               ← epic：一个能力域
 
 ### 如何确定 epic-name 和 story-name
 
-1. **读取 `docs/epics-map.svg`**：了解现有 epic 和 story 的全貌
-2. **从 candidate 提取关键词**：取 candidate title 的核心能力名词，转为 kebab-case slug
-3. **搜索已有 epic**：
-   - 关键词匹配已有 epic 名 → 用已有 epic
-   - 已有 epic 下有 story → 判断本批次是否可归入已有 story，还是需要新建 story
-   - 无匹配 → 新建 epic（kebab-case，简短描述能力域，如 `chat-refactor`）
-4. **新建 story 的命名**：`{epic-name}` 下的子交付 slug，如 `comment-module`
-5. **更新 `docs/epics-map.svg`**：新建或变更 epic/story 后必须更新 SVG，门禁会检查对齐
+> **Epic 和 story 是架构决策，不是字符串转换。** 不要从 candidate title 机械提取关键词拼 kebab-case——那是机器思维，产出的是无法理解的目录名。正确做法：理解这个 raw issue 在解决什么能力问题，然后基于语义确定它属于哪个能力域。
+
+#### 什么是 Epic
+
+一个**能力域**（capability domain），可独立理解、独立交付、独立验收。判断标准：如果 3 个月后有人问"Freely 的 XX 是怎么做的"，XX 就是 epic 名。
+
+| ✅ 好的 epic 名 | ❌ 坏的 epic 名 |
+|----------------|----------------|
+| `worktree-lifecycle`（工位全生命周期） | `fix-wt-create-local-bug`（用 bug 标题当 epic） |
+| `ai-session-continuity`（AI 会话连续性） | `acp-session-id-format-fix`（用修复手段当 epic） |
+| `process-supervision`（进程监督） | `sup-pid-file-fix`（太窄，单个修复） |
+| `issue-sync-platform`（issue 平台同步） | `platform-adapter-title-key`（太具体） |
+
+命名规则：全小写英文，用 `-` 连接，表达一个**稳定的能力概念**，不是任务描述。不包含 `fix-`、`feat-`、`raw-` 前缀。
+
+#### 什么是 Story
+
+Epic 下的一个**可交付切片**。一个 raw issue 的完整生命周期（raw → candidate → I-* issue）通常对应一个 story。同一 epic 下，不同 story 解决 epic 的不同子问题。
+
+Epic `worktree-lifecycle` 下：
+- `creation-from-raw-issue`（wt-create 创建工位）
+- `cross-worktree-consistency`（dev↔test 一致性）
+- `cleanup-and-retirement`（wt-close 收口）
+
+Epic `ai-session-continuity` 下：
+- `session-id-extraction`（session ID 提取兼容）
+- `prompt-branch-output-fix`（prompt 分支输出修正）
+
+命名规则：全小写英文，用 `-` 连接，表达 story 解决的**具体切面**。
+
+#### 决策流程
+
+1. **读全貌**：`docs/epics-map.svg` 了解已有 epic 和 story。epics-map.svg 是架构地图——每个 `<rect id="epic-{name}">` 是一个能力域，其下 `<rect id="story-{name}">` 是各 epic 的子交付切片。
+2. **读 candidate**：理解这个 raw issue 到底在解决什么**能力层面**的问题。不是"修了一个 bug"，而是"这个 bug 属于哪个能力域的哪个切面"。
+3. **判是否已有 epic 覆盖**：
+   - 涉及的**能力域**与已有 epic 重叠 → 复用该 epic。例如：raw issue 修的是 session ID 提取的 OpenCode 兼容问题 → epic `ai-session-continuity`（不是 `acp-session-id-format-fix`——那是修复手段，不是能力域）
+   - 涉及的**能力域**与所有已有 epic **正交**（独立可理解、独立可验收）→ 新建 epic
+4. **判 story**：
+   - 同一 epic 下已解决过这个子问题 → 续到已有 story 的 `raw-{raw-key}` 目录
+   - 是 epic 下的新子问题 → 新建 story
+5. **不需要脚本自动化**：epic 和 story 的名字是人读的架构索引——基于语义判断，不基于关键词匹配
+6. **更新 `docs/epics-map.svg`**：新建或变更 epic/story 后必须更新 SVG。在 SVG 中添加对应的 `<rect id="epic-{name}">` 和/或 `<rect id="story-{name}">` 元素。门禁（`./bin/check-epics-map`）会检查 SVG 与 `docs/epics/` 目录结构是否对齐——不对齐则拦截
+
+#### 层级模型
+
+```
+docs/epics/
+└── {epic}/                  ← 能力域。一个 epic 下可以有多个 story
+    ├── {story-1}/           ← epic 的一个切面
+    │   ├── raw-{key-A}/     ← 一个 raw issue 的全部 B2 产物
+    │   └── raw-{key-B}/     ← 同 story 的另一个 raw issue
+    └── {story-2}/           ← epic 的另一个切面
+        └── raw-{key-C}/
+```
+
+- **一个 epic**：放多个相关的 story
+- **一个 story**：放多个相关的 `raw-{raw-key}` 目录（continuation、closeout 等同一子问题的不同阶段）
+- **一个 `raw-{raw-key}` 目录**：一个 raw issue 的全部 B2 产物（I-* issue、brainstorms、prd、pre-tests、tasks、code-reviews）
+
+#### 维护职责
+
+B2_IBM 确定 epic 和 story 后，必须完成以下维护操作，不能只写文件不更新索引：
+
+1. **新建 epic 时**：在 `docs/epics-map.svg` 中添加 `<rect id="epic-{name}">`，放在合适的垂直位置（按字母序或能力关联）
+2. **新建 story 时**：在对应 epic 的 `<rect>` 下方添加 `<rect id="story-{name}">`
+3. **复用已有 epic/story 时**：如果 SVG 中没有对应条目（epic/story 在文件系统存在但 SVG 未记录），补上
+4. **写完后验证**：运行 `./bin/check-epics-map --project .` 确认对齐。不对齐 → 门禁拦截，必须修正后再继续
+5. **更新 milestones.md**：`promoted_issue_id` 必须指向物化后的实际路径
+
+#### 一个 raw → 一个 story 还是多个？
+
+- 一个 raw issue 的 scope 是一个独立子问题 → 一个 story
+- raw issue scope 太大、cover 多个独立切面 → B1_IBM 阶段拆成多个 candidate，每个 candidate → 自己的 story
+- 多个 raw issue 解决同一个子问题的不同阶段 → 同一个 story 下多个 `raw-{raw-key}` 目录
+
+#### 判定示例
+
+| raw issue | 能力域判断 | epic | story |
+|-----------|----------|------|-------|
+| "wt-create 的 local 关键字 bug" | 工位创建生命周期 | `worktree-lifecycle`（已有则复用） | `creation-from-raw-issue` |
+| "session ID 提取不兼容 OpenCode ses_ 格式" | AI 会话连续性 | `ai-session-continuity` | `session-id-extraction` |
+| "pr-create-guarded 错误信息不含 cd 指引" | PR 门禁流程 | `pr-guarded-workflow` | `error-message-guidance` |
+| "新增一个 AI CLI 工具的 adapter 支持" | 工具适配层（全新能力） | `tool-adapter-framework`（新建 epic） | `new-cli-adapter-support` |
 
 ### 需确认的字段
 
@@ -89,7 +164,7 @@ Issue front matter 还应显式绑定：
 
 ## Required write-back
 
-- `candidates.md.promoted_issue_path`
+- `candidates.md.promoted_issue_id`
 - `docs/milestones.md.issue_path`
 - 若从一个 `M-{issue-id}` 拆出多个 `I-{issue-id}*`，则 milestone 的正式编排区必须写回这些 `I-*` 的顺序与阶段归属
 - 原始 `M-{issue-id}` 只保留来源/追溯语义，不继续代替正式执行编排

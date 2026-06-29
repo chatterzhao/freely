@@ -4,7 +4,7 @@ kind: raw
 phase_state: absorbed
 absorbed_into: I-20260508T232413Z-A
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
-updated_at: 2026-05-17 04:47:25+00:00
+updated_at: '2026-06-29T13:43:02Z'
 platform_ids:
   github:
     issue_id: '262'
@@ -19,7 +19,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
+platform_state: closed
 ---
 
 ## 背景
@@ -62,7 +62,7 @@ pr-merge-guarded 第 292-303 行报错输出改为：
 
 <具体的 gate 错误>
 
-修复后在 source worktree 重试: cd <worktree> && ./bin/pr-merge-guarded ...
+修复后在 source worktree 重试: cd <worktree> && freely pr-merge-guarded ...
 ```
 - pre_tests_path: docs/epics/merge-error-ibm-guide/verification/pre-tests.md
 - verification_artifact_dir: docs/epics/merge-error-ibm-guide/code-reviews

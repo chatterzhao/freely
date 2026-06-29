@@ -11,7 +11,7 @@
 
 ## Scope Verdict
 
-- `PASS`: `./bin/pr-merge-guarded test-pre-merge-runtime-lifecycle-receipt-closeout-20260425 feature/runtime-lifecycle-receipt-closeout-reconcile-20260424` created fresh guarded replay merge commit `ac8262b8`.
+- `PASS`: `freely pr-merge-guarded test-pre-merge-runtime-lifecycle-receipt-closeout-20260425 feature/runtime-lifecycle-receipt-closeout-reconcile-20260424` created fresh guarded replay merge commit `ac8262b8`.
 - `PASS`: `./bin/test-lane premerge-integration -- ./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260425-test-pre-merge-runtime-lifecycle-receipt-closeout --issue docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md` exited `0`.
 - `PASS`: `git diff --check` in the fresh replay batch exited `0`.
 - `PASS`: `./bin/test-lane premerge-integration -- ./bin/governance-check` exited `0`.
@@ -19,14 +19,14 @@
 
 ## Commands
 
-1. `./bin/pr-merge-guarded test-pre-merge-runtime-lifecycle-receipt-closeout-20260425 feature/runtime-lifecycle-receipt-closeout-reconcile-20260424`
+1. `freely pr-merge-guarded test-pre-merge-runtime-lifecycle-receipt-closeout-20260425 feature/runtime-lifecycle-receipt-closeout-reconcile-20260424`
 2. `./bin/test-lane premerge-integration -- ./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260425-test-pre-merge-runtime-lifecycle-receipt-closeout --issue docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
 3. `git diff --check`
 4. `./bin/test-lane premerge-integration -- ./bin/governance-check`
 
 ## Command Results
 
-1. `./bin/pr-merge-guarded ...`
+1. `freely pr-merge-guarded ...`
    - Exit `0`
    - Output: `[MERGE-GUARD] allowed: feature/runtime-lifecycle-receipt-closeout-reconcile-20260424 -> test-pre-merge-runtime-lifecycle-receipt-closeout-20260425`
    - Output: `Merge branch 'feature/runtime-lifecycle-receipt-closeout-reconcile-20260424' into test-pre-merge-runtime-lifecycle-receipt-closeout-20260425`

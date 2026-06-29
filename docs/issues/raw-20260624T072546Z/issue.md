@@ -13,11 +13,12 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-24T07:26:03Z'
-updated_at: '2026-06-24T07:26:03Z'
+updated_at: '2026-06-29T13:43:40Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 ## 问题
@@ -32,5 +33,5 @@ Freely 设计为平台可配置（支持 GitHub、Gitee，未来可能加 GitLab
 ## 修复原则
 - 不提及具体平台名（GitHub/Gitee）
 - 不写死命令参数格式（--repo --title --body）
-- 统一指向 ./bin/freely feedback --help
+- 统一指向 freely feedback --help
 - 如果出错是因为没有 raw issue → 提示用 feedback 命令创建，不知道怎么用就 --help

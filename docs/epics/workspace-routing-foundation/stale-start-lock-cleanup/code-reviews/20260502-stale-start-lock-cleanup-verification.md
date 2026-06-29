@@ -14,9 +14,9 @@
 
 ## Commands
 
-1. `./bin/freely daemon start` → 确认启动正常
-2. `./bin/freely daemon status` → 确认 scan 扫描正确
-3. `./bin/freely daemon stop` → 确认 stop 不阻塞
+1. `freely daemon start` → 确认启动正常
+2. `freely daemon status` → 确认 scan 扫描正确
+3. `freely daemon stop` → 确认 stop 不阻塞
 4. `bash -n docs/system/workspace/scripts/runtime/freely` → 语法检查通过
 
 ## Implementation Decision Note

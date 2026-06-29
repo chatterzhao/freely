@@ -30,8 +30,8 @@
 - target environment: `develop-bound guarded merge chain`
 - required evidence: `guarded feature -> test-pre-merge -> develop merge receipts plus owner review artifact`
 - blocker taxonomy: `execution_pending_or_failed`
-1. Merge `feature/verification-contract-adequacy-gate-materialization-20260409` into `test-pre-merge-verification-contract-adequacy-gate-r2-20260409` via `./bin/pr-merge-guarded`.
-2. Merge `test-pre-merge-verification-contract-adequacy-gate-r2-20260409` into `develop` via `./bin/pr-merge-guarded`.
+1. Merge `feature/verification-contract-adequacy-gate-materialization-20260409` into `test-pre-merge-verification-contract-adequacy-gate-r2-20260409` via `freely pr-merge-guarded`.
+2. Merge `test-pre-merge-verification-contract-adequacy-gate-r2-20260409` into `develop` via `freely pr-merge-guarded`.
 3. Materialize same-line owner evidence before `develop` push so the guarded push path cannot treat the implementation as a bare code change.
 
 ## Real-Environment

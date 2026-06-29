@@ -29,10 +29,10 @@
 18. `git diff --check`
 19. `./bin/governance-check`
 20. Protected-root replay:
-   - `./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
-   - `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+   - `freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+   - `freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely`
    - wait about 70 seconds
-   - `./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+   - `freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
 
 ## Results
 
@@ -67,5 +67,5 @@
 ## Remaining Closeout
 
 1. Replay the guarded `test-pre-merge-20260422-live-status-hang-root-cause -> develop` merge now that the owner lifecycle artifacts are in the diff.
-2. Restart canonical root `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely` and verify the old `L041 ai_launch_observed -> L223 supervisor_alive_ai_missing_after_grace` sequence no longer appears.
+2. Restart canonical root `freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely` and verify the old `L041 ai_launch_observed -> L223 supervisor_alive_ai_missing_after_grace` sequence no longer appears.
 3. Push `develop`, retire the dedicated premerge lane, and retire `feature/live-status-hang-root-cause-20260422` after canonical replay is green.

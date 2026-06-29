@@ -1,6 +1,10 @@
 ---
 name: freely-multi-worktree-supervision
-description: 当需要像项目负责人一样同时监督多个 Freely worktree、安排哪些工位继续开发、哪些先 checkpoint、哪些进入集成批次时使用。
+description: >- 同时监督多个 Freely worktree 的进度和状态。安排哪些工位继续开发、
+  哪些先 checkpoint、哪些进入集成批次。
+
+  Use when: 同时管理 2 个以上 worktree，需要做优先级排序和批次规划。
+  触发词："多工位"、"fleet"、"checkpoint"、"集成批次"、"supervision"。
 ---
 
 # skill:freely-multi-worktree-supervision
@@ -14,13 +18,13 @@ description: 当需要像项目负责人一样同时监督多个 Freely worktree
 ## 工作流
 
 1. 先看项目级当前态。
-   - `./bin/freely live-status --project <主管工位>`
+   - `freely live-status --project <主管工位>`
    - 先用它看 day-1 `current-state plane`：当前活跃 supervisor / dispatcher / ai、prompt excerpt、continuity excerpt、最小 acceptance 摘要与 deep refs
    - 它负责回答“现在谁在干活、在干什么”
 
 2. 再看项目级工位总览。
    - `./bin/wt-fleet-status`
-   - 或 `./bin/freely fleet-status --project <任一该仓库 worktree>`
+   - 或 `freely fleet-status --project <任一该仓库 worktree>`
    - 这里承接 day-1 `fleet plane`，只镜像最小 acceptance 摘要；若要判断 issue 是否真的完成或工位是否可删，必须继续顺着 `acceptance_ref` 回 artifact evidence
 
 3. 看单个工位 checkpoint 压力。
@@ -28,7 +32,7 @@ description: 当需要像项目负责人一样同时监督多个 Freely worktree
    - commit 前用 `./bin/checkpoint-guard --staged-only`
 
 4. 看单个工位 baseline snapshot。
-   - `./bin/freely baseline-status --project <worktree>`
+   - `freely baseline-status --project <worktree>`
    - 它负责 durable / baseline / session-state 视图，而不是当前谁在干活
 
 5. 决策规则。

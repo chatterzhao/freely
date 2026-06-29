@@ -40,8 +40,8 @@ Current canonical `develop` can reach manager prompt publication during `freely 
 
 ## Verification
 
-- `./bin/freely live-status --project <project-root>`
-- `./bin/freely start --project <project-root>`
+- `freely live-status --project <project-root>`
+- `freely start --project <project-root>`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-continuity-current-worker-prompt-parsing`
 - `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption-current-format`
 - inspect `.freely/logs/runtime-events.log`

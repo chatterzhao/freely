@@ -56,7 +56,7 @@ Manager 和 Worker 的 agent 定义中完全没有 `freely feedback` 工具，�
 
 | 工具 | 用途 | 条件 |
 |------|------|------|
-| `./bin/freely feedback --title "..." --body "..."` | 创建新 raw issue | 发现 bug、识别改进机会、需要追踪的新任务 |
+| `freely feedback --title "..." --body "..."` | 创建新 raw issue | 发现 bug、识别改进机会、需要追踪的新任务 |
 
 ### Manager 决策指南
 

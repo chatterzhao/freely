@@ -13,7 +13,7 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-07T10:46:27Z'
-updated_at: 2026-05-17T04:47:25Z
+updated_at: '2026-06-29T13:42:52Z'
 intake_id: ''
 author: platform
 channel: github
@@ -39,7 +39,7 @@ platform_state: closed
 ### `--source` 必填参数
 
 ```
-./bin/wt-create --raw-key <key> --source <source> --skill <path> --slug <slug>
+freely wt-create --raw-key <key> --source <source> --skill <path> --slug <slug>
 ```
 
 | --source 值 | 含义 | scan source_family | pull 方法 |
@@ -126,7 +126,7 @@ _pull_raw_issue() {
 - scan 没有 → 自动跑 scan → 再查 → 仍没有 → 拒绝
 - pull 完成后 → docs/issues/raw-{key}/issue.md 存在且 platform_ids 完整（所有已配置平台都有）
 - chat-inbox 来源的 raw issue → platform_ids 不再为空
-- 旧接口 `./bin/wt-create <branch>` 不受影响
+- 旧接口 `freely wt-create <branch>` 不受影响
 
 ## 改动范围
 

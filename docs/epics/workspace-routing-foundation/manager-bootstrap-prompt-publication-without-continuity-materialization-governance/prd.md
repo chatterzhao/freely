@@ -13,7 +13,7 @@
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-manager-continuity-current-worker-prompt-parsing`
 - `docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption-current-format`
-- `./bin/freely live-status`
+- `freely live-status`
 
 ## Non-Goals
 

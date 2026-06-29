@@ -1,6 +1,11 @@
 ---
 name: freely-worktree-maintenance-governance
-description: 当主管需要核清单个 worktree 的真实状态、为多条 worktree 制定安全 merge 顺序、处理存在父子依赖的 stacked merge-chain、做全仓 fleet closure 审计，或处理 companion/obsolete worktree 的 salvage_then_retire 时使用。
+description: >- 核清单个 worktree 真实状态、制定多条 worktree 安全 merge 顺序、
+  处理 stacked merge-chain、做 fleet closure 审计、处理 retired worktree。
+
+  Use when: 主管需要做 worktree 级别的维护决策和审计。
+  触发词："worktree maintenance"、"工位维护"、"fleet audit"、
+  "merge order"、"retire"、"salvage"。
 ---
 
 # skill:freely-worktree-maintenance-governance

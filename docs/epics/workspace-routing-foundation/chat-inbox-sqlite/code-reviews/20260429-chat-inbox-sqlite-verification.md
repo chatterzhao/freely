@@ -18,7 +18,7 @@
 1. `python3 docs/system/workspace/scripts/runtime/chat-inbox.py init --db /tmp/test.db`
 2. `python3 docs/system/workspace/scripts/runtime/chat-inbox.py add --db /tmp/test.db --type new-issue --issue-id raw-test --message "test"`
 3. `python3 docs/system/workspace/scripts/runtime/chat-inbox.py list --db /tmp/test.db`
-4. `./bin/freely chat --new-issue --project <path> "test"`
+4. `freely chat --new-issue --project <path> "test"`
 5. `./bin/governance-merge-gate --range develop..feature/chat-inbox-sqlite-20260429`
 
 ## Implementation Decision Note

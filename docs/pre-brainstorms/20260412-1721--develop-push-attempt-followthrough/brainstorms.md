@@ -30,7 +30,7 @@ Freely 已经有 `push_pending` / `push_deferred` / `push_urgency` / `resync_req
 
 ### 1. 自动触发点应是显式 merge 入口，不是 hook
 
-最稳的落点是受保护的 merge 入口，例如 `./bin/pr-merge-guarded` 在 `develop` merge 成功后触发一次 `develop-push attempt`。
+最稳的落点是受保护的 merge 入口，例如 `freely pr-merge-guarded` 在 `develop` merge 成功后触发一次 `develop-push attempt`。
 
 原因：
 

@@ -41,4 +41,4 @@
 - `pass`: guarded merge now triggers exactly one attempt after a successful `develop` merge and does not fail the completed merge when delivery is blocked.
 - `pass`: existing defer/pending/fleet/pre-push contracts still pass after the refactor.
 - `pass`: the owner's real-environment verdict is the guarded `test-pre-merge -> develop` promotion path itself; no second synthetic live environment is required beyond that canonical boundary.
-- `pass`: canonical `develop` absorbed the owner through merge receipt `9bcf5fcf`, and `./bin/freely develop-push attempt --project /Users/zhaoyu/Downloads/code/my-freely/freely` completed remote delivery with `attempt_status: pushed`.
+- `pass`: canonical `develop` absorbed the owner through merge receipt `9bcf5fcf`, and `freely develop-push attempt --project /Users/zhaoyu/Downloads/code/my-freely/freely` completed remote delivery with `attempt_status: pushed`.

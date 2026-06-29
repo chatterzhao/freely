@@ -13,16 +13,17 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-22T12:32:15Z'
-updated_at: '2026-06-22T13:03:53Z'
+updated_at: '2026-06-29T13:43:36Z'
 intake_id: ''
 author: platform
 channel: github
 session_refs: []
+platform_state: closed
 ---
 
 ## 问题
 
-Manager/Worker Agent 当前用 Bash 工具直接跑 `./bin/wt-create`、`./bin/wt-close` 等封装命令，没有 Tool Policy 约束。Agent 可以绕过 Skill 直接用 Bash 跑 `gh issue create`、`git push` 等裸命令。
+Manager/Worker Agent 当前用 Bash 工具直接跑 `freely wt-create`、`freely wt-close` 等封装命令，没有 Tool Policy 约束。Agent 可以绕过 Skill 直接用 Bash 跑 `gh issue create`、`git push` 等裸命令。
 
 ## 设计
 

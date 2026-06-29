@@ -1,6 +1,10 @@
 ---
 name: freely-url-content-intake
-description: 当输入是 URL 时，识别平台并调用 skill 自带脚本抓取正文或返回结构化失败信息。
+description: >- 当输入是 URL 时，识别平台并调用自带脚本抓取正文，或返回结构化
+  失败信息（含失败原因和可重试条件）。
+
+  Use when: 用户提供 URL 需要抓取内容。
+  触发词："抓取"、"fetch URL"、"读取链接"、"这个网址"。
 ---
 
 # skill:freely-url-content-intake

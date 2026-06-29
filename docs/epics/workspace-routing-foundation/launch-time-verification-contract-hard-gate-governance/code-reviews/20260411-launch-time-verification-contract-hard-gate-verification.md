@@ -32,7 +32,7 @@
 13. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
 14. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-branch-only-prompt`
 15. `./bin/test-lane premerge-integration -- ./bin/governance-check`
-16. `./bin/pr-merge-guarded test-pre-merge-20260412-completed-owner-closeout-truth feature/completed-owner-closeout-truth-20260412`
+16. `freely pr-merge-guarded test-pre-merge-20260412-completed-owner-closeout-truth feature/completed-owner-closeout-truth-20260412`
 
 ## Implementation Decision Note
 

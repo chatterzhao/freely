@@ -27,9 +27,9 @@
 
 ## Real Replay Evidence
 
-- First replay on `2026-04-19` exposed a true blocker: `./bin/freely daemon start --project <worktree>` could hang before `.freely/run` existed because project start-lock acquisition used `mkdir "$lock_dir"` without first creating the parent directory.
+- First replay on `2026-04-19` exposed a true blocker: `freely daemon start --project <worktree>` could hang before `.freely/run` existed because project start-lock acquisition used `mkdir "$lock_dir"` without first creating the parent directory.
 - After fixing the missing parent creation, replay showed first-start success with `supervisor_pid=93757` and `live-status` truth `desired_runtime_state=running`, `last_supervisor_state=up`, `last_ai_state=down`, `last_exit_reason=starting`.
-- A repeated `./bin/freely daemon start --project <worktree>` no longer launched a replacement supervisor; the command now stops at the user precheck with `daemon start refused: project runtime is already running`.
+- A repeated `freely daemon start --project <worktree>` no longer launched a replacement supervisor; the command now stops at the user precheck with `daemon start refused: project runtime is already running`.
 - A guarded follow-up replay with a 12-second delay preserved the same no-relaunch behavior after runtime advance: first start returned `supervisor_pid=98716`, runtime events recorded `event=ai_launch_begin`, `live-status` reported `last_supervisor_state=up` and `last_ai_state=up`, and the second start still exited with code `2` at `user_start_rejected_already_running`.
 - Added worker attach regression coverage for the narrower seam behind that replay: when a worker supervisor is authoritative and startup truth is already written, attach stays on the live runtime even if `ai.pid` has not landed yet.
 - `./bin/pretests-gate` now passes for this owner after writing back the completed acceptance-item status and narrowing the real-environment surface to the truthful active checkpoint worktree replay.

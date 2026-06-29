@@ -1,6 +1,14 @@
 ---
 name: freely-tdd-review
-description: IBM 链路逐级消化审查。按 raw→B1→B2→实现→测试顺序，每级检查下游是否忠实消化了上游。下层是上层的具体化，能从下层归纳回上层。不是门禁——查内容质量，不查文件存在。
+description: >-
+  IBM 四节点链路（raw → candidate → milestone → I-* issue）逐级消化审查。
+  按 raw issue → B1 brainstorms → candidate → milestone → B2 brainstorms →
+  B2 物化（I-* issue + 设计文档）→ 实现 → 测试四层顺序，每级检查下游是否
+  忠实消化了上游。不是门禁——查内容质量和 fidelity，不查文件存在。
+
+  Use when: PR review 阶段，或 B1/B2/dev 任一阶段完成后需要独立验证
+  消化质量。触发词："review"、"审查"、"消化"、"fidelity"、"评审"、
+  "检查质量"、"逐级审查"。
 ---
 
 # skill:freely-tdd-review
@@ -12,20 +20,27 @@ description: IBM 链路逐级消化审查。按 raw→B1→B2→实现→测试�
 ## 核心方法
 
 ```
-raw issue（问题）──→ B1 brainstorms（分析/决策）──→ candidate（结晶）
+raw issue（问题）──→ B1 brainstorms（分析/决策）──→ candidate（结晶，C-{key}-A）
     ↓ 忠实消化？          ↓ 忠实消化？
     
-candidate ──→ I-* issue（正式任务）──→ B2 brainstorms（实现分析）
-    ↓ 忠实消化？              ↓ 忠实消化？
-
-B2 brainstorms ──→ prd / pre-tests / tasks / code-review（设计/测试/分解）
+candidate ──→ milestone（M-{key}-A，candidate_issues 入队）
     ↓ 忠实消化？
+        ┌─ B2 B 阶段：brainstorms（实现分析）
+        │       ↓ 忠实消化？
+milestone ──┤
+        │   B2 M 阶段：I-* issue 物化（I-{key}-{suffix}，committed_issues 出队）
+        │             → prd / pre-tests / tasks / code-review
+        └─      ↓ 忠实消化？
 
 B2 文档 ──→ 实现代码（TDD：测试驱动实现）
     ↓ 忠实消化？
 
 pre-tests ──→ 测试执行（全 GREEN + 真实 evidence）
 ```
+
+> 四节点链路（raw → C → M → I）：raw issue、candidate（C-{key}-{suffix}）、milestone（M-{key}-A）、I-* issue（I-{key}-{suffix}）共享同一时间戳 {key}。milestone 是 milestones.md 中的 `## M-{key}-A` 节点——candidate 通过 `candidate_issues` 入队，I-* issue 通过 `committed_issues` 出队。Milestone 始终使用 -A（一个 raw issue 一个 milestone 容器），candidate 和 I-* 的 suffix 可变（多个 candidate 时 -A、-B...）。
+>
+> `freely-doc-B2_IBM-execution` skill 消费 milestone 中的 promoted candidate，做 B（Brainstorm：实现分析）和 M（Map：**物化 I-* issue 完整文档** + prd + pre-tests + tasks + code-review）。**I-* issue 是 B2 的产出，不是 B2 的输入。** gate 校验四节点完整性，审查校验相邻节点间的消化 fidelity。
 
 审查就是检查每个 "↓ 忠实消化？" 箭头。
 
@@ -36,10 +51,13 @@ pre-tests ──→ 测试执行（全 GREEN + 真实 evidence）
 审查者从工位自行读取：
 1. `docs/issues/raw-{key}/issue.md`
 2. `docs/pre-brainstorms/{key}--{slug}/brainstorms.md` + `candidates.md`
-3. `docs/epics/{epic}/{story}/raw-{raw-key}/issues/I-{raw-key}-A.md`
-4. `docs/epics/{epic}/{story}/raw-{raw-key}/brainstorms/b-I-{raw-key}-A.md`
-5. `docs/epics/{epic}/{story}/raw-{raw-key}/prd.md`、`verification/pre-tests.md`、`verification/tasks.md`、`code-reviews/`
-6. `git diff develop..HEAD`（实际代码变更）
+3. `docs/milestones.md`（四节点链路：C-{key}-{suffix} → M-{key}-A → I-{key}-{suffix}）
+4. `docs/epics/{epic-name}/{story-name}/raw-{raw-key}/issues/I-{raw-key}-{suffix}.md`（suffix 继承 candidate 的 suffix：C-{key}-{suffix} → I-{key}-{suffix}）
+5. `docs/epics/{epic-name}/{story-name}/raw-{raw-key}/brainstorms/b-I-{raw-key}-{suffix}.md`
+6. `docs/epics/{epic-name}/{story-name}/raw-{raw-key}/prd.md`、`verification/pre-tests.md`、`verification/tasks.md`、`code-reviews/`
+7. `git diff develop..HEAD`（实际代码变更）
+
+> `{epic-name}` 和 `{story-name}` 由 `freely-doc-B2_IBM-execution` skill 在物化 I-* issue 时确定。epic 是能力域（如 `worktree-lifecycle`），story 是 epic 下的可交付切片（如 `creation-from-raw-issue`）。详见 `freely-doc-B2_IBM-execution` skill §M：Map。
 
 ## 四层逐级审查
 
@@ -61,16 +79,17 @@ pre-tests ──→ 测试执行（全 GREEN + 真实 evidence）
 - candidate 曲解了 brainstorms 的哪个决策，正确的 acceptance_criteria 应该是什么
 - scope 为什么不合理，应该拆成几个 candidate、每个的边界是什么
 
-### 第二层：B1 → B2 — 决策到设计的消化
+### 第二层：B1 → B2 — candidate 经 milestone 到 B2 产出的消化
 
-> candidate → I-* issue（正式任务）→ B2 brainstorms（实现分析）→ prd/pre-tests/tasks/code-review（具体设计文档）
+> candidate（C-{key}-{suffix}）→ milestone（M-{key}-A，candidate_issues 入队）→ `freely-doc-B2_IBM-execution` skill B 阶段（brainstorms 实现分析）→ M 阶段（物化 I-* issue + prd/pre-tests/tasks/code-review）
 
-**核心问题**：B2 的每份文档能不能追溯到 candidate 的意图？prd 的设计能不能从 b-I-*.md 的分析中推导出来？
+**核心问题**：candidate 是否正确进入了 milestone？B2 brainstorms 是否基于 candidate 做了充分的实现分析？B2 M 阶段物化的 I-* issue 是否忠实消化了 candidate？prd/pre-tests 等设计文档是否从 brainstorms 推导出来？
 
 | 检查项 | 怎么审 |
 |--------|--------|
-| candidate → I-* 忠实 | I-* 的 acceptance_criteria 和 promotion_gate 是否完整承载了 candidate？I-* 的 phase_state、字段是否齐全？ |
-| I-* → B2 brainstorms | b-I-*.md 是否分析了 I-* 的实现面？是否评估了替代实现方案？是否对齐了 I-* 的验收标准？每个 I-* 是否有对应 b-I-*.md？个数对齐？ |
+| candidate → milestone 入队 | candidate 是否正确绑定到 milestone（M-{key}-A）？candidate 的 `milestone` 字段是否与 milestones.md 中的 M-{key}-A 一致？ |
+| candidate → B2 brainstorms | b-I-*.md 是否分析了 candidate 的实现面？是否评估了替代实现方案？是否对齐了 candidate 的 acceptance_criteria？ |
+| B2 brainstorms → I-* 忠实 | I-* 的 acceptance_criteria 和 promotion_gate 是否完整承载了 candidate？I-* 的 phase_state、字段是否齐全？是否在 milestones.md committed_issues 中有对应条目？ |
 | B2 brainstorms → prd | prd 的模块划分是否从 b-I-*.md 的实现方案分析中自然推导出来？prd 的 Goal 是否对应 b-I-*.md 的设计决策？ |
 | B2 brainstorms → pre-tests | pre-tests 的每条 acceptance 是否可追溯到 prd 的模块需求？test_command 是否针对改动面设计？覆盖层级（unit/integration/e2e）是否与改动范围匹配？覆盖率是否达标（改动面是否被充分测试，不是挂一漏万）？ |
 | B2 brainstorms → tasks | tasks 的分解是否对应 prd 的模块？是否可从 tasks 回溯到 b-I-*.md 的实现顺序？ |
@@ -131,9 +150,9 @@ pre-tests ──→ 测试执行（全 GREEN + 真实 evidence）
 - 具体发现: ...
 - 问题与修复建议: ...
 
-## 第二层：B1 → B2（决策到设计）
+## 第二层：B1 → B2（candidate → milestone → B2 设计产出）
 - status: passed | fail
-- 消化评估: B2 产物是否忠实消化了 candidate/I-*
+- 消化评估: candidate 是否正确入队 milestone，B2 brainstorms 是否充分分析，I-* 是否忠实消化 candidate，B2 设计产物是否完整
 - 具体发现: ...
 - 问题与修复建议: ...
 

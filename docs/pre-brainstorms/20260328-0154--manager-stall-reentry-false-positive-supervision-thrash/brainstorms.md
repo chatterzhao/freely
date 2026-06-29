@@ -57,13 +57,13 @@
 
 在完成三路 review 后，又补做了一轮 develop 现场核对，并确认 Freely 已进入“不值得继续放着空转”的状态：
 
-- `./bin/freely live-status --project <develop>` 显示：
+- `freely live-status --project <develop>` 显示：
   - `activity_state: stalled_without_runtime`
   - `desired_runtime_state: running`
   - `last_supervisor_state: up`
   - `last_ai_state: down`
   - `last_exit_reason: starting`
-- `./bin/freely fleet-status --project <develop>` 显示：
+- `freely fleet-status --project <develop>` 显示：
   - `develop` 当前 `sup=none ai=none`
   - canonical worker `feature/start-restart-control-plane-semantics-20260327-200651` 当前也 `sup=none ai=none`
   - canonical worker 仍是 `DIRTY`，并带 `checkpoint=true`
@@ -84,7 +84,7 @@
 3. develop manager 与 canonical worker 最终都掉成 `desired=running but no runtime`
 4. 继续让 Freely 自转只会重复烧 token，而不会自然收敛出新的诊断价值
 
-基于这一轮证据，已执行 `./bin/freely stop --project <develop>`，主动停止空转，保留现场用于后续测试设计与最小修复实验。
+基于这一轮证据，已执行 `freely stop --project <develop>`，主动停止空转，保留现场用于后续测试设计与最小修复实验。
 
 ### 1. canonical worker 曾真实推进，但当前现场已不再是单纯 active-worker 等待
 
@@ -103,11 +103,11 @@
 
 但到最新一次现场核对时，状态又进一步恶化：
 
-- `./bin/freely live-status --project <develop>` 显示 `activity_state: stalled_without_runtime`
+- `freely live-status --project <develop>` 显示 `activity_state: stalled_without_runtime`
 - `manager-worker-launch-state.env` 显示：
   - `ACTIVE_RUNNING_WORKER_COUNT="0"`
   - `QUEUED_WORKER_PROMPTS="...004525..., ...004859..., ...005230..., ...005619..., ...011227..., ...011652..., ...014114..."`
-- `./bin/freely fleet-status` / `./bin/wt-fleet-status` 也显示 develop manager 与 canonical worker 当前都处于 `desired=running` 但 supervisor/AI 都已 down
+- `freely fleet-status` / `./bin/wt-fleet-status` 也显示 develop manager 与 canonical worker 当前都处于 `desired=running` 但 supervisor/AI 都已 down
 
 所以当前不能再把问题仅表述成“active worker 正常运行，但 manager 被误杀”。
 

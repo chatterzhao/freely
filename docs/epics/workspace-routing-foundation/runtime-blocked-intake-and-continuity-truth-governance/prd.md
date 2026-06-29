@@ -20,8 +20,8 @@
   - `.freely/intake/*/meta.env`
   - `.freely/run/prompt-*.txt`
   - `.freely/run/manager-continuity-*.md`
-  - `./bin/freely live-status`
-  - `./bin/freely fleet-status`
+  - `freely live-status`
+  - `freely fleet-status`
 - current evidence families:
   - execution-time websocket permission denied
   - shared slot-switch busy before launch

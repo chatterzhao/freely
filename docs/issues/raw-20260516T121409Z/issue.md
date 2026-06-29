@@ -11,7 +11,7 @@ platform_ids:
     issue_id: '368'
     url: https://github.com/chatterzhao/freely/issues/368
     synced_at: '2026-05-16T12:14:17Z'
-updated_at: '2026-06-17T00:21:15Z'
+updated_at: '2026-06-29T13:43:06Z'
 primary_platform: github
 platform_state: closed
 force_closed_at: '2026-05-16T12:59:11Z'
@@ -48,7 +48,7 @@ Manager 每轮收到含 scan 数据的 prompt（131 条 ready 条目），但不
 
 | stage | action | exit_kind |
 |-------|--------|-----------|
-| local_only (ready) | 用 ./bin/issue-sync push | delegate_workers（批量） |
+| local_only (ready) | 用 freely issue-sync push | delegate_workers（批量） |
 | local_needs_closeout (ready) | 更新 phase_state → completed | delegate_workers（批量） |
 | branch_deleted (ready) | 更新 phase_state → absorbed | delegate_workers（批量） |
 | platform_create (ready) | wt-create 开工位 | delegate_workers |

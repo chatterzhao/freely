@@ -1,6 +1,10 @@
 ---
 name: freely-tool-cc-codex-mcp-runtime
-description: 安装并配置 Claude Code 主 provider，在 Claude Code 中注册 Codex MCP，并为 `tool=cc` 模式定义 `codex` / `codex-reply` 的默认自动路由、自动批准和验证步骤。
+description: >- 安装并配置 Claude Code 主 provider。在 Claude Code 中注册 Codex MCP，
+  为 tool=cc 模式定义 codex/codex-reply 的自动路由和验证步骤。
+
+  Use when: 首次配置或切换 AI 工具，需要注册 MCP server。
+  触发词："配置工具"、"MCP"、"codex"、"切换 AI"、"安装 provider"。
 ---
 
 # skill:freely-tool-cc-codex-mcp-runtime

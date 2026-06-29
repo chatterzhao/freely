@@ -1,6 +1,10 @@
 ---
 name: freely-worktree-hygiene-supervision
-description: 当某个 worktree 进入 checkpoint 预警、dirty-budget 漂移或提交边界失控时，指导 manager/worker 如何优先做 continuity、验证、原子提交或分流。
+description: >- 当 worktree 进入 checkpoint 预警、dirty-budget 漂移或提交边界失控时，
+  指导 manager/worker 做 continuity、验证、原子提交或分流。
+
+  Use when: worktree 状态异常需要卫生检查和处理。
+  触发词："hygiene"、"卫生检查"、"dirty"、"checkpoint"、"提交边界"。
 ---
 
 # skill:freely-worktree-hygiene-supervision
@@ -16,7 +20,7 @@ description: 当某个 worktree 进入 checkpoint 预警、dirty-budget 漂移�
 
 1. 先读当前 worktree 的 hygiene 信号。
    - `./bin/checkpoint-guard`
-   - `./bin/freely baseline-status --project <current-worktree>`
+   - `freely baseline-status --project <current-worktree>`
 
 2. 若已达到最小验证门：
    - 先更新 issue / continuity artifact
@@ -35,7 +39,7 @@ description: 当某个 worktree 进入 checkpoint 预警、dirty-budget 漂移�
 
 1. 读取项目级 hygiene 告警：
    - `./bin/wt-fleet-status`
-   - `./bin/freely fleet-status --project <develop>`
+   - `freely fleet-status --project <develop>`
 
 2. 判断 owner：
    - 单工位局部收口：`worker-owned`

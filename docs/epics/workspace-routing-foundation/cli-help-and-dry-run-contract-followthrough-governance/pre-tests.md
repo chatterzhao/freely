@@ -28,8 +28,8 @@
 - target environment: `guarded develop-bound merge chain`
 - required evidence: `merge receipts plus verification artifacts`
 - blocker taxonomy: `execution_pending_or_failed`
-1. Merge `feature/cli-help-dry-run-contract-followthrough-20260406-0408` into `test-pre-merge-20260406-0408-cli-help-dry-run-contract-followthrough` via `./bin/pr-merge-guarded`.
-2. Merge `test-pre-merge-20260406-0408-cli-help-dry-run-contract-followthrough` into `develop` via `./bin/pr-merge-guarded`.
+1. Merge `feature/cli-help-dry-run-contract-followthrough-20260406-0408` into `test-pre-merge-20260406-0408-cli-help-dry-run-contract-followthrough` via `freely pr-merge-guarded`.
+2. Merge `test-pre-merge-20260406-0408-cli-help-dry-run-contract-followthrough` into `develop` via `freely pr-merge-guarded`.
 3. Confirm canonical `develop` still carries the same help-contract and bounded dry-run semantics instead of reopening runtime or bootstrap owners.
 
 ## Real-Environment

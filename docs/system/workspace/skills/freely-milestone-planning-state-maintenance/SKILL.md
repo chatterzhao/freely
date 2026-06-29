@@ -1,6 +1,15 @@
 ---
 name: freely-milestone-planning-state-maintenance
-description: 扫描 `docs/milestones.md` 与关联 candidate / issue / progress / recovery / cleanup evidence，做 sequencing、状态维护和写回一致性收口。当主管发现 standing-source drift、排序冲突或队列失衡时使用。
+description: >- 维护四节点链路（raw → candidate → milestone → I-* issue）中
+  milestone（M-{key}-A）节点的 sequencing 和状态一致性。扫描 `docs/milestones.md`
+  与关联 candidate、issue、progress evidence，在 B2_IBM materialization 后将
+  `M-{issue-id}` 候选编排切换到 `I-*` 正式编排。
+
+  Use when: 主管发现 milestone 排序冲突、队列失衡或 standing-source drift。
+  触发词："milestone"、"排序"、"队列"、"sequencing"、"状态维护"。
+
+  Use when: 主管发现 milestone 排序冲突、队列失衡或 standing-source drift。
+  触发词："milestone"、"排序"、"队列"、"sequencing"、"状态维护"。
 ---
 
 # skill:freely-milestone-planning-state-maintenance
@@ -16,7 +25,7 @@ description: 扫描 `docs/milestones.md` 与关联 candidate / issue / progress 
 - 当当前 milestone 已确认不消费某条 `needs_research` candidate 时，负责判断它应继续留当前 milestone、后移到更合适的 active milestone，还是直接 dropped
 - 识别 milestone 与关联产物的状态漂移
 - 回写 milestone 与相关摘要，让治理事务收口
-- 当 B2_IBM materialization 已产出一个或多个 `I-{issue-id}*` 时，把正式编排从 `M-{issue-id}` 候选位切到这些 `I-*`
+- 当 `freely-doc-B2_IBM-execution` skill materialization 已产出一个或多个 `I-{issue-id}*` 时，把正式编排从 `M-{issue-id}` 候选位切到这些 `I-*`
 
 ## 输入
 
@@ -63,7 +72,7 @@ description: 扫描 `docs/milestones.md` 与关联 candidate / issue / progress 
 
 - `C-{issue-id}`：pre-brainstorm candidate 身份
 - `M-{issue-id}`：milestone candidate 身份
-- `I-{issue-id}*`：B2_IBM materialization 后的正式 issue 身份
+- `I-{issue-id}*`：`freely-doc-B2_IBM-execution` skill materialization 后的正式 issue 身份
 
 事务完成条件是：
 

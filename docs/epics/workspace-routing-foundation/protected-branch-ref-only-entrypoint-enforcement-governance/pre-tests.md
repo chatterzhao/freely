@@ -29,8 +29,8 @@
 - target environment: `guarded protected-branch merge chain`
 - required evidence: `guarded merge receipts plus verification artifact`
 - blocker taxonomy: `execution_pending_or_failed`
-1. Merge `feature/protected-branch-ff-only-gate-20260419` into a disposable `test-pre-merge-*` branch via `./bin/pr-merge-guarded`.
-2. Merge that `test-pre-merge-*` branch into `develop` via `./bin/pr-merge-guarded`.
+1. Merge `feature/protected-branch-ff-only-gate-20260419` into a disposable `test-pre-merge-*` branch via `freely pr-merge-guarded`.
+2. Merge that `test-pre-merge-*` branch into `develop` via `freely pr-merge-guarded`.
 3. Confirm the protected-root merge path accepts the receipt-bearing merge commit while rejecting non-receipted ref-only updates.
 
 ## Real-Environment

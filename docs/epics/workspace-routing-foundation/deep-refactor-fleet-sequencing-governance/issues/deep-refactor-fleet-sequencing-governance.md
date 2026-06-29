@@ -35,8 +35,8 @@ Freely 在准备 broad/deep refactor 时，真实 fleet 一度同时存在：
 1. 把 pre-refactor sequencing audit 写进开发 Freely 的入口规则：
 - 运行 `git worktree list --porcelain`
 - 运行 `./bin/wt-fleet-status`
-- 运行 `./bin/freely live-status --project <project-root>`
-- 运行 `./bin/freely fleet-status --project <project-root>`
+- 运行 `freely live-status --project <project-root>`
+- 运行 `freely fleet-status --project <project-root>`
 - 把结果与 `docs/milestones.md` / 相关 `progress` 对齐
 
 2. 明确大重构前的优先顺序：
@@ -84,9 +84,9 @@ Freely 在准备 broad/deep refactor 时，真实 fleet 一度同时存在：
 
 - `git worktree list --porcelain`
 - `./bin/wt-fleet-status`
-- `./bin/freely stop --project /Users/zhaoyu/Downloads/code/my-freely/freely`
-- `./bin/freely stop --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-scheduler-capacity-candidate-replay`
-- `./bin/freely stop --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-develop-merge-prep-fleet-closure`
+- `freely stop --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+- `freely stop --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-scheduler-capacity-candidate-replay`
+- `freely stop --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-develop-merge-prep-fleet-closure`
 - `git -C /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260325-feature-develop-merge-prep-fleet-closure status --short`
 - `git -C /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260327-feature-upstream-governance-merge-prep rev-list --left-right --count develop...HEAD`
 - `./bin/governance-check`

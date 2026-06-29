@@ -4,7 +4,7 @@
 
 这条 issue 只解决一件事：
 
-- `develop` merge commit 进入 hook 时，必须已经证明自己来自 `./bin/pr-merge-guarded`
+- `develop` merge commit 进入 hook 时，必须已经证明自己来自 `freely pr-merge-guarded`
 
 不解决：
 
@@ -17,7 +17,7 @@
 最小实现优先放在 `pre-merge-commit`：
 
 1. 若当前是 `develop` merge commit，则先要求 canonical guarded state + completion marker + target/source 与当前 merge 一致。
-2. 若缺少上述 handshake，立即失败并提示改用 `./bin/pr-merge-guarded`。
+2. 若缺少上述 handshake，立即失败并提示改用 `freely pr-merge-guarded`。
 3. 只有握手通过后，才继续执行 governance materialization gate 与 promotion ownership gate。
 
 ## Test Shape

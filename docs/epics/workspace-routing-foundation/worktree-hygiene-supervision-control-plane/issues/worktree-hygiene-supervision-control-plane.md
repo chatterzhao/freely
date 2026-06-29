@@ -36,7 +36,7 @@ Freely 已有 checkpoint-guard、fleet-status 与 manager/worker 角色边界，
 - `docs/system/workspace/skills/worktree-hygiene-supervision/SKILL.md` 存在并被技能目录索引。
 - worker 在 `checkpoint_drift_streak >= threshold` 时，prompt 中出现 `Worktree hygiene intervention`。
 - manager 在存在 drift worker 时，prompt 中出现 `Worktree hygiene alert` 和 `next_action=delegate_hygiene_worker`。
-- `./bin/freely baseline-status --project <worktree>` 能显示 `checkpoint_drift_streak`。
+- `freely baseline-status --project <worktree>` 能显示 `checkpoint_drift_streak`。
 - 新旧 checkpoint / supervision 相关测试同时通过。
 
 ## Completion

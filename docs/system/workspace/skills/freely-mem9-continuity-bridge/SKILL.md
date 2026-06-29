@@ -1,6 +1,10 @@
 ---
 name: freely-mem9-continuity-bridge
-description: 评估并约束 mem9 作为 Freely 可选连续性后端的接入边界，确保本地治理事实源始终优先。
+description: >- 评估并约束 mem9 作为 Freely 可选连续性后端的接入边界。确保本地
+  `docs/` 治理事实源始终优先于外部后端。
+
+  Use when: 配置或排查 mem9 连续性后端，或本地与远端状态不一致。
+  触发词："mem9"、"continuity backend"、"连续性后端"、"state sync"。
 ---
 
 # skill:freely-mem9-continuity-bridge

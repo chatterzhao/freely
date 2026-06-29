@@ -17,7 +17,7 @@
 - `PASS`: delegated cleanup handoff ancestry proof is now explicit. The absorbed feature tip `9b1fd4c5717652309325b6c6d399e14399559a4d` and absorbed test-pre-merge tip `4941df4b3ee47a8b8c01750178222f21141d26bc` are ancestors of both the handoff's develop tip `d0564874860d15530aa6c8fb97656cec771cc88c` and the current local `develop` tip `cc2a01f26443e27b2ded09842bb61452d2f24b73`.
 - `PASS`: `git rev-list --left-right --count` reports `0 66` for `feature/absorbed-merged-scan-routing-fix-20260421...develop` and `0 62` for `test-pre-merge-20260421-absorbed-merged-scan-routing-fix...develop`, so neither retained target carries unique unabsorbed behavior that would justify replay.
 - `PASS`: both absorbed targets are now `retire-only` with explicit local/remote branch disposition, so replay is no longer lawful or necessary from this owner.
-- `PASS`: fresh 2026-04-22 06:10 UTC cleanup-governance recheck preserved the same ancestry proof, branch-count evidence, remote-branch absence, governance gate pass, and cleanup routing outcome from `./bin/freely task-source-scan --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260421-feature-absorbed-cleanup-retirement-handoff --json`, so the retirement-handoff verdict remains current rather than historical.
+- `PASS`: fresh 2026-04-22 06:10 UTC cleanup-governance recheck preserved the same ancestry proof, branch-count evidence, remote-branch absence, governance gate pass, and cleanup routing outcome from `freely task-source-scan --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260421-feature-absorbed-cleanup-retirement-handoff --json`, so the retirement-handoff verdict remains current rather than historical.
 
 ## Commands
 
@@ -39,7 +39,7 @@
 16. `git rev-list --left-right --count test-pre-merge-20260421-absorbed-merged-scan-routing-fix...develop`
 17. `git ls-remote --heads origin feature/absorbed-merged-scan-routing-fix-20260421 test-pre-merge-20260421-absorbed-merged-scan-routing-fix`
 18. `git ls-remote --heads github feature/absorbed-merged-scan-routing-fix-20260421 test-pre-merge-20260421-absorbed-merged-scan-routing-fix`
-19. `./bin/freely task-source-scan --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260421-feature-absorbed-cleanup-retirement-handoff --json`
+19. `freely task-source-scan --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260421-feature-absorbed-cleanup-retirement-handoff --json`
 
 ## Implementation Decision Note
 

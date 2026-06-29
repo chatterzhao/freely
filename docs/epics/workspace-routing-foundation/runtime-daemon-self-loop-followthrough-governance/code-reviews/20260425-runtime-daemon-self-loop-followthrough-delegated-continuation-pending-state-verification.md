@@ -15,7 +15,7 @@
 - `PASS`: focused verification passed for the exact contradiction and the adjacent consumed-continuity resume anchor:
   1. `bash docs/system/workspace/scripts/tests/test-freely-delegated-continuation-session-state-clears-pending-on-active-prompt`
   2. `bash docs/system/workspace/scripts/tests/test-freely-manager-consumed-continuity-resume-focus`
-- `PENDING`: replay the guarded merge path, absorb into canonical `develop`, restart `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely`, and verify manager now advances from consumed delegated followthrough into real work instead of looping on contradictory pending/consumed session-state.
+- `PENDING`: replay the guarded merge path, absorb into canonical `develop`, restart `freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely`, and verify manager now advances from consumed delegated followthrough into real work instead of looping on contradictory pending/consumed session-state.
 
 ## Commands
 

@@ -6,7 +6,7 @@
 
 ## Observed Runtime Facts
 
-- `./bin/freely live-status --project <project-root>` reported `activity_state: stalled_without_runtime`, `desired_runtime_state: stopped`, and `last_exit_reason: operator_stop` on `2026-04-04`.
+- `freely live-status --project <project-root>` reported `activity_state: stalled_without_runtime`, `desired_runtime_state: stopped`, and `last_exit_reason: operator_stop` on `2026-04-04`.
 - `.freely/run/prompt-20260404-134336.txt` was generated, but no new manager continuity or worker prompt consumption followed.
 - `runtime-events.log` showed prompt-generation-era startup activity but the control plane did not stay alive long enough to consume the new supervision turn.
 - This boundary is not covered by `I-20260403-2245-A`; that issue is scoped to sandbox-home / `ps` degraded bootstrap, not manager continuity publication failure after prompt generation.

@@ -51,7 +51,7 @@ Freely already exposes develop push debt as explicit truth, but it still stops s
 ## Completion Evidence
 
 - guarded develop merge receipt: `9bcf5fcf`
-- canonical delivery command: `./bin/freely develop-push attempt --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+- canonical delivery command: `freely develop-push attempt --project /Users/zhaoyu/Downloads/code/my-freely/freely`
 - canonical delivery result: `attempt_status: pushed`
 - verification artifact: `docs/epics/workspace-routing-foundation/develop-push-attempt-followthrough-governance/code-reviews/20260412-develop-push-attempt-followthrough-verification.md`
 
