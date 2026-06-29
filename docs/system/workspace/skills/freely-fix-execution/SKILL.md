@@ -127,11 +127,27 @@ hotfix/*          → main + develop (pr-merge-guarded)
 
 ### 阶段 4：Test 验证
 
+**核心原则：测试工位永远跑完整的最终代码。开发与测试工位必须一致，测试结果才有意义。**
+
 ```
-1. cherry-pick dev 提交到 test-pre-merge 工位
-2. 在 test 工位按 pre-tests.md 逐条重跑
-3. 有问题 → 回 fix 工位修复 → cherry-pick 同步 → 重测
-4. 全绿 → 进入 pr-create
+1. 确保两边一致（先提交再 cherry-pick）:
+   - 开发工位有未提交的修改 → git add + git commit
+   - cherry-pick 开发工位的提交到测试工位
+
+2. 在测试工位按 pre-tests.md 逐条重跑
+   - 测试工位现在包含最终要合并的完整代码
+
+3. 结果判定:
+   - 全绿 → 开发与测试工位一致，测试通过，进入 pr-create
+   - 有 red → 回开发工位修复
+
+4. 修复后重新同步（循环直到全绿）:
+   - 在开发工位修改 → git add + git commit
+   - cherry-pick 新的提交到测试工位（如果修改发生在测试工位，反过来 cherry-pick 到开发工位）
+   - 重跑测试
+   - 循环直到全部 green
+
+5. 最终状态: 开发工位 ≡ 测试工位（commit 完全一致），测试全部 passed
 ```
 
 ### 阶段 5：pr-create-guarded 提 PR
