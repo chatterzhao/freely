@@ -2,9 +2,10 @@
 name: freely-doc-B2_IBM-execution
 description: >-
   IBM Framework 第二阶段。消费 `freely-doc-B1_IBM-execution` skill 在
-  milestones.md candidate_issues 中 promote 的 candidate（C-{key}-A），
-  根据其 `promoted_issue_path` 物化完整 I-* issue 文档，并产出全部设计产物：
-  prd.md + pre-tests.md + tasks.md + code-reviews/。
+  milestones.md candidate_issues 中 promote 的 candidate，根据其
+  `promoted_issue_path` 物化完整 I-* issue 文档到
+  `docs/epics/{epic}/{story}/raw-{raw-key}/issues/I-{raw-key}-A.md`，
+  并产出全部设计产物：prd.md + pre-tests.md + tasks.md + code-reviews/。
   交付给 `freely-dev-loop-execution` skill。
 
   Use when: `freely-doc-B1_IBM-execution` skill 完成 candidate promoted
@@ -24,7 +25,7 @@ B2_IBM 是 IBM Framework 第二阶段。消费 `freely-doc-B1_IBM-execution` ski
 
 | 阶段 | 含义 | 谁准备 | 产物 |
 |------|------|--------|------|
-| **I** | Input | `freely-doc-B1_IBM-execution` skill | promoted candidate（C-{key}-A）在 milestones.md candidate_issues 中，其 `promoted_issue_path` 指向 I-* 目标路径 |
+| **I** | Input | `freely-doc-B1_IBM-execution` skill | promoted candidate 在 milestones.md candidate_issues 中，其 `promoted_issue_path` 指向 I-* issue 目标路径 |
 | **B** | Brainstorm | `freely-doc-B2_IBM-execution` skill | b-I-{key}-A.md：实现前置设计、替代方案评估、验收标准 |
 | **M** | Map | `freely-doc-B2_IBM-execution` skill | 完整 I-* issue 文档（物化） + prd.md + pre-tests.md + tasks.md + code-reviews/ |
 
@@ -44,11 +45,11 @@ candidate 的 `promoted_issue_path` 字段包含了 I-* issue 文档的目标路
 
 ### M：Map — 物化 I-* issue + 完整产物目录
 
-产出 `docs/epics/{epic-name}/{story-name}/` 下的完整目录。其中 I-* issue 是本 skill 的核心产物——将 B1_IBM 产生的 key 物化为包含完整 frontmatter 和正文的文档文件。
+产出 `docs/epics/{epic}/{story}/raw-{raw-key}/` 下的完整目录。其中 I-* issue 是本 skill 的核心产物——根据 candidate 的 `promoted_issue_path`，在该路径物化包含完整 frontmatter 和正文的 issue 文档。
 
 | 产物 | 要求 |
 |------|------|
-| `issues/{name}.md` | **I-* issue 完整文档**（物化自 B1_IBM 的 key）。含 phase_state、pre_tests_path、verification_artifact_dir 等全部字段 |
+| `issues/I-{raw-key}-A.md` | **I-* issue 完整文档**（物化自 candidate 的 `promoted_issue_path`）。含 phase_state、pre_tests_path、verification_artifact_dir 等全部字段 |
 | `prd.md` | Goal → Dev-Loop Handoff |
 | `pre-tests.md` | 结构化测试计划（含 test_command + expected_output），模板见下方 |
 | `tasks.md` | 任务分解，关联 owner issue |

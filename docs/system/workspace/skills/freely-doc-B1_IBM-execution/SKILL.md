@@ -2,8 +2,9 @@
 name: freely-doc-B1_IBM-execution
 description: >-
   IBM Framework 第一阶段。消费 raw issue 做 Brainstorm 发散收敛，
-  产出 candidate（C-{key}-A）进入 milestone 规划队列。candidate promote
-  时通过 `promoted_issue_path` 决定 I-* issue 的 key 和目标路径，
+  产出 candidate 进入 milestone 规划队列。candidate promote 时通过
+  `promoted_issue_path` 决定 I-* issue 的 key 和路径（
+  `docs/epics/{epic}/{story}/raw-{raw-key}/issues/I-{raw-key}-A.md`），
   handoff 给 `freely-doc-B2_IBM-execution` skill 做实现设计。
   标准产物：brainstorms.md + candidates.md + milestones.md 更新。
 
@@ -24,9 +25,9 @@ B1_IBM 是 IBM Framework 第一阶段。I（Input）由 `freely wt-create` 命�
 |------|------|--------|------|
 | **I** | Input | `freely wt-create` 命令（已物化到工位） | `docs/issues/raw-{key}/issue.md` |
 | **B** | Brainstorm | `freely-doc-B1_IBM-execution` skill | `docs/pre-brainstorms/{key}--{slug}/brainstorms.md`：发散→收敛→决策 |
-| **M** | Milestone | `freely-doc-B1_IBM-execution` skill | `docs/pre-brainstorms/{key}--{slug}/candidates.md`（C-{key}-A）+ milestones.md candidate_issues（含 `promoted_issue_path` → I-{key}-A 目标路径） |
+| **M** | Milestone | `freely-doc-B1_IBM-execution` skill | `docs/pre-brainstorms/{key}--{slug}/candidates.md`（candidate 文档）+ milestones.md candidate_issues（candidate 的 `promoted_issue_path` 指向 I-* issue 目标路径） |
 
-> Candidate promote 时，`promoted_issue_path` 字段指定 I-* issue 的目标路径。这个路径是 B1_IBM 产出的一部分——它决定了 I-* 的 key 和文件位置。但 I-* 的完整文档文件由 `freely-doc-B2_IBM-execution` skill 物化。
+> Candidate promote 时，`promoted_issue_path` 字段指定 I-* issue 的目标路径（`docs/epics/{epic}/{story}/raw-{raw-key}/issues/I-{raw-key}-A.md`）。这个路径是 `freely-doc-B1_IBM-execution` skill 产出的一部分——它决定了 I-* issue 的 key 和文件位置。但 I-* issue 的完整文档由 `freely-doc-B2_IBM-execution` skill 物化。
 
 ### I：Input — `freely wt-create` 命令准备的 raw issue
 
