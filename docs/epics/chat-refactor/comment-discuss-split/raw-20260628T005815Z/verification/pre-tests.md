@@ -17,7 +17,7 @@
 - actual_output: 2 new glob matches, 0 old I-* matches — all paths updated correctly
 - evidence_file: docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/verification/test-evidence/acceptance-1.log
 - blocker: (失败时填写)
-^- status: passed
+- status: passed
 
 ### acceptance-2: pr-review-guarded uses new glob patterns
 - id: AT-002
@@ -33,7 +33,7 @@
 - actual_output: 9 new glob matches, 0 old I-* matches — all paths updated correctly
 - evidence_file: docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/verification/test-evidence/acceptance-2.log
 - blocker: (失败时填写)
-^- status: passed
+- status: passed
 
 ### acceptance-3: task-lifecycle-scan scans new epics structure
 - id: AT-003
@@ -49,7 +49,7 @@
 - actual_output: epics_dir.glob("*/*/raw-*/issues/I-*.md") line found
 - evidence_file: docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/verification/test-evidence/acceptance-3.log
 - blocker: (失败时填写)
-^- status: passed
+- status: passed
 
 ### acceptance-4: gate scripts use new path patterns
 - id: AT-004
@@ -65,7 +65,7 @@
 - actual_output: checkpoint-guard=2, promotion-gate=1, merge-gate=2 — all updated
 - evidence_file: docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/verification/test-evidence/acceptance-4.log
 - blocker: (失败时填写)
-^- status: passed
+- status: passed
 
 ## Unit
 - acceptance_target: 所有6个文件路径已更新并通过grep检查验证
