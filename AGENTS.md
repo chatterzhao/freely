@@ -181,7 +181,7 @@ Freely 开发 Freely 时，默认先问四件事：
 - wt-close 会自动消费该工位的所有 worker handoff
 - **禁止在 develop 上直接修改、提交**——那是受保护主管工位
 
-## Bug 修复：fix skill 完整流程
+## 开发工作流：统一流程入口
 
 当发现运行时 bug，使用 `skill:freely-workflow-guarded-execution`。fix 与 feature 流程完全一致（B1→B2→dev→test）。先判场景：
 
