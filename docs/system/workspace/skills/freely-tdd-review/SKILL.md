@@ -57,6 +57,8 @@ pre-tests ──→ 测试执行（全 GREEN + 真实 evidence）
 6. `docs/epics/{epic}/{story}/raw-{raw-key}/prd.md`、`verification/pre-tests.md`、`verification/tasks.md`、`code-reviews/`
 7. `git diff develop..HEAD`（实际代码变更）
 
+> `{epic}` 和 `{story}` 由 `freely-doc-B2_IBM-execution` skill 在物化 I-* issue 时确定。epic 是能力域（如 `worktree-lifecycle`），story 是 epic 下的可交付切片（如 `creation-from-raw-issue`）。详见 `freely-doc-B2_IBM-execution` skill §M：Map。
+
 ## 四层逐级审查
 
 ### 第一层：Raw → B1 — 问题到决策的消化
