@@ -1,4 +1,19 @@
 
+## M-20260629T132042Z-A
+- title: fix: replace ./bin/ with freely in hook scripts and start-lead-agent
+- status: active
+### candidate_issues
+1. `C-20260629T132042Z-A`
+- milestone: M-20260629T132042Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/command-normalize/hook-scripts-bin-to-freely/raw-20260629T132042Z/issues/I-20260629T132042Z-A.md`
+### committed_issues
+1. `I-20260629T132042Z-A`
+- title: fix: replace ./bin/ with freely in hook scripts and start-lead-agent; milestone_state: committed
+- issue_path: `docs/epics/command-normalize/hook-scripts-bin-to-freely/raw-20260629T132042Z/issues/I-20260629T132042Z-A.md`
+- phase_state: `done_b2_ibm`
+### completed_issues
+
 ## M-20260629T122647Z-A
 - title: feat: freely feedback edit — 编辑已有 raw issue 的标题和正文
 - status: active
