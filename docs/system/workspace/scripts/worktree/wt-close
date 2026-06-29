@@ -914,7 +914,7 @@ else
 	  echo "wt-close: --discard-unmerged, using -D..." >&2
 	  git branch -D "$branch" 2>/dev/null || true
 	else
-	  local _wt_skill _wt_skill_name
+	  _wt_skill=""; _wt_skill_name=""
 	  case "$branch" in
 	    fix/*)
 	      _wt_skill="freely-fix-execution"

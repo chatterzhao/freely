@@ -335,6 +335,14 @@ attempt_develop_push_followthrough_if_needed() {
 
   if [[ -z "$failed_remotes" ]]; then
     echo "[MERGE-GUARD] all remotes synced ✓"
+    cat <<NEXTSTEP
+
+┌─ 下一步 ──────────────────────────────────────────────┐
+│  运行 wt-close 收口工位（删远程+删工位+删本地分支）      │
+│  cd <project-root> && ./bin/wt-close <branch>         │
+│  完整链路最后一步，不可跳过                             │
+└──────────────────────────────────────────────────────┘
+NEXTSTEP
   else
     # ── BLOCKING: push failed on some platforms. Do not continue. ──
     cat >&2 <<GATE_BLOCKED
