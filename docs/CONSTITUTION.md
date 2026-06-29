@@ -46,7 +46,7 @@ Freely 是一个自主循环运行器：
 - `PRE_TEST` 与 `TEST` 的职责边界由 `docs/LAWS.md` 第 2 章与第 11 章定义。
 - develop-bound 能力若先进入 `test-pre-merge-*`，验证通过后应回到来源 `feature/*` / `fix/*` 走 guarded PR/merge 进入 `develop`，并保留测试批次与来源 feature / bundle 追溯证据；不得把 `test-pre-merge-*` 当作合并来源。
 - `test-pre-merge-*` 的退出形态固定为：验证结束后立即删除；若同一能力仍要继续验证，只能从当前 `develop` 重新创建新批次。
-- `main` / `develop` / `test-pre-merge-*` 上，hook/gate bypass 永久禁止。`FREELY_SKIP_IBM_GATE=1` 是唯一合法豁免。
+- `main` / `develop` / `test-pre-merge-*` 上，hook/gate bypass 永久禁止。`FREELY_SKIP_IBM_GATE="违规绕过门禁中，理由充分，是：<业务理由>"` 是唯一合法豁免。
 “这次应该没问题”不能构成 protected-branch bypass 的依据。
 
 `premerge` 临时分支规则（用于复杂冲突收敛，不新增长期分支层级）：
