@@ -152,8 +152,8 @@ Freely 开发 Freely 时，默认先问四件事：
 | 9. 关工位 | `freely wt-close <branch>` 清理工位+分支 | [命令] | Worker/Manager |
 
 - Manager 负责入口路由（feedback/scan 判定）和步骤 0-1，Worker 负责步骤 2-9 执行
-- 步骤 2-9 由 Worker 在 skill 约束下完成，完成后写 handoff JSON 汇报
-- wt-close 会自动消费该工位的所有 worker handoff
+- 步骤 2-9 由 Worker 在 skill 约束下完成，完成后通过 a2a-exit --state completed 更新 A2A Task 状态
+- wt-close Phase 4.5/5 会停止 worker 进程并通过 a2a_task.py auto-consume 消费该工位的所有 terminal tasks
 - **禁止在 develop 上直接修改、提交**——那是受保护主管工位
 
 ## 开发工作流：统一流程入口
