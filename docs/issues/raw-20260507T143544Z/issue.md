@@ -4,7 +4,7 @@ kind: raw
 phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
-updated_at: '2026-06-17T00:21:30Z'
+updated_at: '2026-06-29T13:39:27Z'
 platform_ids:
   github:
     issue_id: '247'

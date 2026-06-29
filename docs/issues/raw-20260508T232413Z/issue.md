@@ -4,7 +4,7 @@ kind: raw
 phase_state: absorbed
 absorbed_into: I-20260508T232413Z-A
 closeout_note: 平台 issue 已关闭，本地 lifecycle 标记完成（batch round7）
-updated_at: 2026-05-17 04:47:25+00:00
+updated_at: '2026-06-29T13:39:32Z'
 platform_ids:
   github:
     issue_id: '262'
@@ -19,7 +19,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-platform_state: open
+platform_state: closed
 ---
 
 ## 背景

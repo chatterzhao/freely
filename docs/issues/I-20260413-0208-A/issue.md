@@ -3,7 +3,7 @@ local_id: I-20260413-0208-A
 kind: linked
 phase_state: completed
 absorbed_at: '2026-05-16T14:27:11Z'
-completed_at: "2026-05-19T23:20:00Z"
+completed_at: '2026-05-19T23:20:00Z'
 platform_ids:
   github:
     issue_id: '143'
@@ -19,7 +19,7 @@ last_synced_comment_at:
   github: '2026-04-27T11:27:07Z'
 hash: ''
 created_at: '2026-04-27T11:27:07Z'
-updated_at: '2026-05-17T12:24:25Z'
+updated_at: '2026-06-29T13:38:57Z'
 platform_state: closed
 ---
 
