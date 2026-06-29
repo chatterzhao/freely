@@ -114,9 +114,9 @@ fi
 |------|------|------|
 | 不在 test-* 测试工位 | **硬拦截** | 提示 cd 到 test 工位 |
 | test 工位落后于 dev 工位 | **硬拦截** | cherry-pick 同步后再跑 |
-| pre-tests.md 不存在 | **硬拦截** | B2 阶段未完成，回 B2_IBM |
-| test_command 为占位符 | **硬拦截** | 测试用例是假的，回 B2_IBM 重新设计 |
-| 全部 acceptance 都是 not_applicable | **硬拦截** | 糊弄测试，回 B2_IBM 重新设计 |
+| pre-tests.md 不存在 | **硬拦截** | B2 阶段未完成，回 `freely-doc-B2_IBM-execution` skill |
+| test_command 为占位符 | **硬拦截** | 测试用例是假的，回 `freely-doc-B2_IBM-execution` skill 重新设计 |
+| 全部 acceptance 都是 not_applicable | **硬拦截** | 糊弄测试，回 `freely-doc-B2_IBM-execution` skill 重新设计 |
 | red-green-status != green | **硬拦截** | TDD 循环未完成，回 dev-loop |
 | actual_output 为空 | **硬拦截** | 测试未执行，必须逐条跑完 |
 | evidence_file 缺失或为空 | **硬拦截** | 无证据，证明不了测试执行过 |
@@ -143,7 +143,7 @@ fi
 
 ## 不负责
 
-- 不写 pre-tests.md（B2_IBM 负责）
+- 不写 pre-tests.md（`freely-doc-B2_IBM-execution` skill 负责）
 - 不修改源码（dev-loop 负责）
 - 不跑 RED（skill:freely-test-RED-execution 负责）
 - 不创建 PR 或 merge（branch-management 负责）

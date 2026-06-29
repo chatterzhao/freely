@@ -18,7 +18,7 @@ description: >- 对 pre-brainstorm candidate 做独立 acceptance review。重�
 ## 重点检查
 
 - `acceptance_criteria` 是否表达了 pre-brainstorm 完成条件
-- `promotion_gate` 是否表达了进入 B2_IBM 前必须满足的边界
+- `promotion_gate` 是否表达了进入 `freely-doc-B2_IBM-execution` skill 前必须满足的边界
 - `open_questions` 是否仍暴露关键未决问题
 - `acceptance_reviews` 是否已有独立 review 记录
 

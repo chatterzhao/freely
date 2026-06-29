@@ -53,7 +53,7 @@ description: >-
 2. 读 pre-tests.md → 逐条 acceptance item:
    a. 已有 test_command → 直接执行
       - FAIL → ✅ red-green-status = red，记录 actual_RED_output
-      - PASS → ❌ 测试有问题：bug 已修复 / 测试没测到真正的 bug → 回 B2 修
+      - PASS → ❌ 测试有问题：bug 已修复 / 测试没测到真正的 bug → 回 `freely-doc-B2_IBM-execution` skill 修
    b. 没有 test_command → 设计复现测试，写入 test_command，然后执行
    c. 测试层级不足以复现 → 补充手工端到端复现步骤到 red_how
 3. 全部 red（或合理 not_applicable）→ 进入 dev
@@ -78,11 +78,11 @@ RED 证据要求（red_how 字段）:
    a. 缺少 test_command → 按上述原则设计测试，补到 test_command
    b. 测试层级不合理（只有单元没有端到端）→ 补充端到端测试
 2. 确认测试设计打分:
-   - 没有端到端测试 → ❌ 设计不完整，回 B2 补
+   - 没有端到端测试 → ❌ 设计不完整，回 `freely-doc-B2_IBM-execution` skill 补
    - 端到端覆盖了用户可见行为 → ✅ 可以进入 RED 执行
 3. 逐条执行:
    - FAIL → ✅ red-green-status = red，记录 actual_RED_output
-   - PASS → ❌ 功能已经存在 / 测试写错了 / 测试太弱 → 回 B2 修
+   - PASS → ❌ 功能已经存在 / 测试写错了 / 测试太弱 → 回 `freely-doc-B2_IBM-execution` skill 修
 4. 全部 red（或合理 not_applicable）→ 进入 dev
 
 RED 证据要求（red_how 字段）:
@@ -111,7 +111,7 @@ RED 证据要求（red_how 字段）:
      d. 执行，记录 actual_RED_output
      e. 判定:
         - 真的 FAIL → red-green-status = red ✅
-        - 意外 PASS → 回 B2 修 pre-tests ❌
+        - 意外 PASS → 回 `freely-doc-B2_IBM-execution` skill 修 pre-tests ❌
      f. 填写 red_how
 
 3. 全部 red 后，更新 pre-tests.md，git commit
@@ -125,11 +125,11 @@ RED 证据要求（red_how 字段）:
 
 | 情况 | 处理 |
 |------|------|
-| pre-tests.md 不存在 | 回 B2 |
+| pre-tests.md 不存在 | 回 `freely-doc-B2_IBM-execution` skill |
 | 有一条 red-green-status != pending | 检查是否已执行过 RED |
-| 测试意外 PASS（fix: bug 不复现；feature: 功能已存在） | 回 B2 修 pre-tests |
-| feature 没有端到端测试 | 回 B2 补充端到端设计 |
-| 全部 not_applicable | 疑似糊弄，回 B2 设计真实测试 |
+| 测试意外 PASS（fix: bug 不复现；feature: 功能已存在） | 回 `freely-doc-B2_IBM-execution` skill 修 pre-tests |
+| feature 没有端到端测试 | 回 `freely-doc-B2_IBM-execution` skill 补充端到端设计 |
+| 全部 not_applicable | 疑似糊弄，回 `freely-doc-B2_IBM-execution` skill 设计真实测试 |
 
 ---
 
