@@ -983,4 +983,13 @@
 1. `C-20260627T121248Z-A`
 - milestone: M-20260627T121248Z-A; status: promoted
 - promoted_issue_path: `docs/issues/I-20260627T121248Z-A/issue.md`
+
+## M-20260629T095905Z-A
+- title: optimize workflow skill — stage 0, cd hint, CLAUDE.md chain
+- status: active
+### candidate_issues
+1. `C-20260629T095905Z-A`
+- milestone: M-20260629T095905Z-A; status: promoted
+- promoted_issue_path: `docs/issues/I-20260629T095905Z-A/issue.md`
+
 ### completed_issues
