@@ -23,7 +23,7 @@ description: >-
 
 B2_IBM 是 IBM Framework 第二阶段。消费 `freely-doc-B1_IBM-execution` skill promote 的 candidate，做 B（Brainstorm）和 M（Map），**在 milestones.md committed_issues 生成 I-* 正式条目并物化完整文档**，同时产出全部设计产物。
 
-> 四节点链路中，本 skill 负责 milestone → **I-* issue 物化**。M（milestone，M-{key}-A）和 candidate 的 `promoted_issue_id`（I-{key}-{suffix}）由 B1_IBM 提供。本 skill 据此 key：① 确定 epic-name/story-name；② 在 milestones.md committed_issues 中生成 I-* 正式条目并**填写 epics 下的真实路径**（`docs/epics/{epic-name}/{story-name}/raw-{raw-key}/issues/I-{raw-key}-{suffix}.md`）；③ 在该路径物化完整 I-* issue 文档。
+> 四节点链路中，本 skill 负责 milestone → **I-* issue 物化**。M（milestone，M-{key}-A）和 candidate 的 `promoted_issue_id`（I-{key}-{suffix}）由 B1_IBM 提供。本 skill 据此 key：① 按 [issue-materialization-checklist.md](references/issue-materialization-checklist.md) 规范确定 epic-name/story-name；② 在 milestones.md committed_issues 中生成 I-* 正式条目并**填写 epics 下的真实路径**（`docs/epics/{epic-name}/{story-name}/raw-{raw-key}/issues/I-{raw-key}-{suffix}.md`）；③ 在该路径物化完整 I-* issue 文档。
 >
 > 关键区分：B1_IBM 产出的是 key（I-{key}-{suffix}，在 candidate_issues 中）。B2_IBM 将 key 变成 milestones.md 中的**正式条目（含真实路径）**和 epics 目录下的**完整文档**。
 
@@ -240,7 +240,7 @@ phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
 ## 不负责
 
 - 不决定 I-* issue 的 key（key 由 `freely-doc-B1_IBM-execution` skill 的 candidate 通过 `promoted_issue_id` 指定）
-- **负责**根据 key 确定 epic-name 和 story-name，构造完整路径，物化文件
+- **负责**根据 key 确定 epic-name 和 story-name（按 [issue-materialization-checklist.md](references/issue-materialization-checklist.md) 规范），构造完整路径，物化文件
 - 不实现代码或运行测试（由 `freely-dev-loop-execution` skill 负责）
 - 不直接写 progress（由 `freely-dev-loop-execution` skill 负责）
 

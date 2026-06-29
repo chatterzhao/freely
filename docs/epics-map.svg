@@ -410,8 +410,8 @@
 <text x="50" y="9900" font-size="13" font-weight="bold" fill="#1a73e8">skill-name-reminder</text>
 <rect id="epic-skill-ref-cleanup" x="35" y="9929" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="9953" font-size="13" font-weight="bold" fill="#1a73e8">skill-ref-cleanup</text>
-<rect id="story-description-and-chain-unify" x="55" y="9950" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
-<text x="65" y="9965" font-size="11" fill="#34a853">├ description-and-chain-unify</text>
+<rect id="story-description-and-chain-unify" x="55" y="9955" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
+<text x="65" y="9970" font-size="11" fill="#34a853">├ description-and-chain-unify</text>
 <rect id="epic-skill-standardize" x="35" y="9982" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="10006" font-size="13" font-weight="bold" fill="#1a73e8">skill-standardize</text>
 <rect id="epic-slot-assemble-unify" x="35" y="10035" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
