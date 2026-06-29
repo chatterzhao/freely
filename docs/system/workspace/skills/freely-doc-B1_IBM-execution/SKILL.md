@@ -3,7 +3,7 @@ name: freely-doc-B1_IBM-execution
 description: >-
   IBM Framework 第一阶段。消费 raw issue 做 Brainstorm 发散收敛，
   产出 candidate 进入 milestone 规划队列。candidate promote 时通过
-  `promoted_issue_path` 决定 I-* issue 的 key 和目标路径（路径格式由
+  `promoted_issue_id` 决定 I-* issue 的 key 和目标路径（路径格式由
   `freely-doc-B2_IBM-execution` skill 定义），handoff 给 B2 做实现设计。
   标准产物：brainstorms.md + candidates.md + milestones.md 更新。
 
@@ -24,9 +24,9 @@ B1_IBM 是 IBM Framework 第一阶段。I（Input）由 `freely wt-create` 命�
 |------|------|--------|------|
 | **I** | Input | `freely wt-create` 命令（已物化到工位） | `docs/issues/raw-{key}/issue.md` |
 | **B** | Brainstorm | `freely-doc-B1_IBM-execution` skill | `docs/pre-brainstorms/{key}--{slug}/brainstorms.md`：发散→收敛→决策 |
-| **M** | Milestone | `freely-doc-B1_IBM-execution` skill | `docs/pre-brainstorms/{key}--{slug}/candidates.md`（candidate 文档）+ milestones.md candidate_issues（candidate 的 `promoted_issue_path` 指向 I-* issue 在 B2 产物目录下的目标路径） |
+| **M** | Milestone | `freely-doc-B1_IBM-execution` skill | `docs/pre-brainstorms/{key}--{slug}/candidates.md`（candidate 文档）+ milestones.md candidate_issues（candidate 的 `promoted_issue_id` 指定 I-* issue 的身份标识） |
 
-> Candidate promote 时，`promoted_issue_path` 字段指向 I-* issue 的目标路径。路径格式由 `freely-doc-B2_IBM-execution` skill 定义（见其 references/issue-materialization-checklist.md §目录结构）。B1_IBM 不定义路径格式——只负责在 candidate 中**填入** B2 要求的路径。I-* issue 的完整文档由 `freely-doc-B2_IBM-execution` skill 按此路径物化。
+> Candidate promote 时，`promoted_issue_id` 字段确定 I-* issue 的 key（如 `I-{key}-A`）。`freely-doc-B2_IBM-execution` skill 根据此 ID，自行确定 epic/story 后构造完整路径（`docs/epics/{epic}/{story}/raw-{raw-key}/issues/I-{key}-A.md`）并物化文件。B1_IBM 不决定文件放在哪个 epic/story——那是 B2_IBM 的架构决策。
 
 ### I：Input — `freely wt-create` 命令准备的 raw issue
 
@@ -50,7 +50,7 @@ B1_IBM 是 IBM Framework 第一阶段。I（Input）由 `freely wt-create` 命�
 
 1. 从 brainstorms.md 收敛结论产出 `candidates.md`（candidate 文档）。candidate 的 ID 命名规则：`C-{key}-{suffix}`，suffix 从 A 开始递增（C-{key}-A、C-{key}-B...）。**一个 raw issue 通常只有一个 candidate（C-{key}-A）；raw issue scope 过大时拆成多个 candidate。**
 2. 在 `docs/milestones.md` 中创建 `## M-{key}-A` milestone 节点，将 candidate 写入 `candidate_issues` 队列。Milestone ID 与第一个 candidate 对齐（M-{key}-A）。
-3. Candidate 的 `promoted_issue_path` 字段**决定 I-* issue 的 key 和文件路径**——I-* 的 suffix 继承 candidate 的 suffix（C-{key}-A → I-{key}-A，C-{key}-B → I-{key}-B）。这是对接 `freely-doc-B2_IBM-execution` skill 的关键字段。
+3. Candidate 的 `promoted_issue_id` 字段**决定 I-* issue 的身份标识**。值是 I-* 的 key（如 `I-20260629T095905Z-A`），suffix 继承 candidate 的 suffix（C-{key}-A → I-{key}-A，C-{key}-B → I-{key}-B）。`freely-doc-B2_IBM-execution` skill 根据此 ID 确定 epic/story 后构造完整路径并物化文件。
 4. Candidate 路径：`proposed → needs_research → blocked → promoted / absorbed / dropped`
 5. 状态变为 promoted 后，handoff 给 `freely-doc-B2_IBM-execution` skill
 
@@ -78,10 +78,12 @@ B1_IBM 是 IBM Framework 第一阶段。I（Input）由 `freely wt-create` 命�
   - mode: subagent
   - summary: 审查 #247/#251 门禁拦截历史，确认 skill 修改方向正确
   - verdict: pass
-- promoted_issue_path: docs/epics/skill-gate-alignment/skill-gate-fix/raw-20260508T011858Z/issues/I-20260508T011858Z-A.md
+- promoted_issue_id: I-20260508T011858Z-A
 - milestone: M-20260508T011858Z-A
 - session_refs: []
 ```
+
+> `promoted_issue_id` 的值是 I-* issue 的 key（如 `I-20260508T011858Z-A`），不含路径。`freely-doc-B2_IBM-execution` skill 根据此 key 确定 epic/story 后构造完整路径并物化文件。
 
 **milestones.md 对应条目**：
 
@@ -93,7 +95,7 @@ B1_IBM 是 IBM Framework 第一阶段。I（Input）由 `freely wt-create` 命�
 1. `C-20260508T011858Z-A`
 - milestone: M-20260508T011858Z-A
 - status: promoted
-- promoted_issue_path: `docs/epics/skill-gate-alignment/skill-gate-fix/raw-20260508T011858Z/issues/I-20260508T011858Z-A.md`
+- promoted_issue_id: `I-20260508T011858Z-A`
 ```
 
 注意 `milestone` 使用 `M-{key}-A` 格式，与 candidate 的 key 一致。candidates.md 和 milestones.md 中的 milestone 名称必须一致。
@@ -155,7 +157,7 @@ milestone: M-20260508T011858Z-A
   - mode: plan-subagent
   - summary: 评审摘要
   - verdict: pass
-- promoted_issue_path: docs/epics/{epic}/{story}/raw-20260508T011858Z/issues/I-20260508T011858Z-A.md
+- promoted_issue_id: I-20260508T011858Z-A
 - milestone: M-20260508T011858Z-A
 - session_refs: []
 ```

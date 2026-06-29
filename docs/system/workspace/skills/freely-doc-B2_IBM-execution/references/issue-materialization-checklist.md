@@ -115,7 +115,7 @@ B2_IBM 确定 epic 和 story 后，必须完成以下维护操作，不能只写
 2. **新建 story 时**：在对应 epic 的 `<rect>` 下方添加 `<rect id="story-{name}">`
 3. **复用已有 epic/story 时**：如果 SVG 中没有对应条目（epic/story 在文件系统存在但 SVG 未记录），补上
 4. **写完后验证**：运行 `./bin/check-epics-map --project .` 确认对齐。不对齐 → 门禁拦截，必须修正后再继续
-5. **更新 milestones.md**：`promoted_issue_path` 必须指向物化后的实际路径
+5. **更新 milestones.md**：`promoted_issue_id` 必须指向物化后的实际路径
 
 #### 一个 raw → 一个 story 还是多个？
 
@@ -164,7 +164,7 @@ Issue front matter 还应显式绑定：
 
 ## Required write-back
 
-- `candidates.md.promoted_issue_path`
+- `candidates.md.promoted_issue_id`
 - `docs/milestones.md.issue_path`
 - 若从一个 `M-{issue-id}` 拆出多个 `I-{issue-id}*`，则 milestone 的正式编排区必须写回这些 `I-*` 的顺序与阶段归属
 - 原始 `M-{issue-id}` 只保留来源/追溯语义，不继续代替正式执行编排

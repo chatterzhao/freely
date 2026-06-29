@@ -26,6 +26,6 @@ milestone: M-20260629T095905Z-A
   - mode: subagent
   - summary: 审查 workflow skill 修改是否覆盖所有缺口，CLAUDE.md 是否足够强制性
   - verdict: pass
-- promoted_issue_path: docs/epics/skill-docs-optimization/description-and-chain-unify/raw-20260629T095905Z/issues/I-20260629T095905Z-A.md
+- promoted_issue_id: I-20260629T095905Z-A
 - milestone: M-20260629T095905Z-A
 - session_refs: []
