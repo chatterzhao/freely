@@ -28,7 +28,7 @@ candidate ──→ milestone（M-{key}-A，candidate_issues 入队）
         ┌─ B2 B 阶段：brainstorms（实现分析）
         │       ↓ 忠实消化？
 milestone ──┤
-        │   B2 M 阶段：I-* issue 物化（I-{key}-A，committed_issues 出队）
+        │   B2 M 阶段：I-* issue 物化（I-{key}-{suffix}，committed_issues 出队）
         │             → prd / pre-tests / tasks / code-review
         └─      ↓ 忠实消化？
 
@@ -38,7 +38,7 @@ B2 文档 ──→ 实现代码（TDD：测试驱动实现）
 pre-tests ──→ 测试执行（全 GREEN + 真实 evidence）
 ```
 
-> 四节点链路（raw → C → M → I）：raw issue、candidate（C-{key}-A）、milestone（M-{key}-A）、I-* issue（I-{key}-A）共享同一时间戳 {key}。milestone 是 milestones.md 中的 `## M-{key}-A` 节点——candidate 通过 `candidate_issues` 入队，I-* issue 通过 `committed_issues` 出队。
+> 四节点链路（raw → C → M → I）：raw issue、candidate（C-{key}-{suffix}）、milestone（M-{key}-{suffix}）、I-* issue（I-{key}-{suffix}）共享同一时间戳 {key}。milestone 是 milestones.md 中的 `## M-{key}-A` 节点——candidate 通过 `candidate_issues` 入队，I-* issue 通过 `committed_issues` 出队。
 >
 > `freely-doc-B2_IBM-execution` skill 消费 milestone 中的 promoted candidate，做 B（Brainstorm：实现分析）和 M（Map：**物化 I-* issue 完整文档** + prd + pre-tests + tasks + code-review）。**I-* issue 是 B2 的产出，不是 B2 的输入。** gate 校验四节点完整性，审查校验相邻节点间的消化 fidelity。
 
@@ -51,8 +51,8 @@ pre-tests ──→ 测试执行（全 GREEN + 真实 evidence）
 审查者从工位自行读取：
 1. `docs/issues/raw-{key}/issue.md`
 2. `docs/pre-brainstorms/{key}--{slug}/brainstorms.md` + `candidates.md`
-3. `docs/milestones.md`（四节点链路：C-{key}-A → M-{key}-A → I-{key}-A）
-4. `docs/epics/{epic}/{story}/raw-{raw-key}/issues/I-{raw-key}-{suffix}.md`（suffix 继承 candidate 的 suffix：C-{key}-A → I-{key}-A）
+3. `docs/milestones.md`（四节点链路：C-{key}-{suffix} → M-{key}-A → I-{key}-{suffix}）
+4. `docs/epics/{epic}/{story}/raw-{raw-key}/issues/I-{raw-key}-{suffix}.md`（suffix 继承 candidate 的 suffix：C-{key}-{suffix} → I-{key}-{suffix}）
 5. `docs/epics/{epic}/{story}/raw-{raw-key}/brainstorms/b-I-{raw-key}-{suffix}.md`
 6. `docs/epics/{epic}/{story}/raw-{raw-key}/prd.md`、`verification/pre-tests.md`、`verification/tasks.md`、`code-reviews/`
 7. `git diff develop..HEAD`（实际代码变更）
@@ -81,7 +81,7 @@ pre-tests ──→ 测试执行（全 GREEN + 真实 evidence）
 
 ### 第二层：B1 → B2 — candidate 经 milestone 到 B2 产出的消化
 
-> candidate（C-{key}-A）→ milestone（M-{key}-A，candidate_issues 入队）→ `freely-doc-B2_IBM-execution` skill B 阶段（brainstorms 实现分析）→ M 阶段（物化 I-* issue + prd/pre-tests/tasks/code-review）
+> candidate（C-{key}-{suffix}）→ milestone（M-{key}-A，candidate_issues 入队）→ `freely-doc-B2_IBM-execution` skill B 阶段（brainstorms 实现分析）→ M 阶段（物化 I-* issue + prd/pre-tests/tasks/code-review）
 
 **核心问题**：candidate 是否正确进入了 milestone？B2 brainstorms 是否基于 candidate 做了充分的实现分析？B2 M 阶段物化的 I-* issue 是否忠实消化了 candidate？prd/pre-tests 等设计文档是否从 brainstorms 推导出来？
 
