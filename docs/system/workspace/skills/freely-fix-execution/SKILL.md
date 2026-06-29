@@ -141,43 +141,27 @@ hotfix/*          → main + develop (pr-merge-guarded)
    → 更新 phase_state → in_dev
 ```
 
-### 阶段 5：GREEN — 确认 bug 已修复（写代码之后）
+### 阶段 5：test-GREEN — test-pre-merge 最终验证
 
 ```
-1. 在 fix 工位逐条重新执行 pre-tests.md 的 test_command
-2. fix 的 GREEN 含义: 确认 bug 已修复，没有引入回归
-3. 每条 acceptance item:
-   - PASS 了 → red-green-status = green，填写 actual_output
-   - 还是 FAIL → 回阶段 4 继续修
-4. 全部 green（或合理 not_applicable）→ 进入 test-pre-merge
+1. skill:freely-test-execution
+   → 在 test-pre-merge 工位执行
+   → 运行前确认: test 工位包含全部 dev 最新提交（cherry-pick 同步，不能落后）
+
+2. GREEN 判定（每条 acceptance item 必须同时满足）:
+   - red-green-status = green（RED→dev→GREEN 循环完成）
+   - status = passed（测试已执行）
+   - actual_output 已填写且不是占位符
+   - actual_output 与 expected_output 一致
+
+3. 结果:
+   - 全部 green → 开发与测试工位一致，进入 pr-create
+   - 有任何不 green → 回阶段 4 修复 → git commit → cherry-pick 到 test 工位 → 重跑全量测试
+
+4. 最终状态: 开发工位 ≡ 测试工位（commit 完全一致），全部 green
 ```
 
-### 阶段 6：Test 验证
-
-**核心原则：测试工位永远跑完整的最终代码。开发与测试工位必须一致，测试结果才有意义。**
-
-```
-1. 确保两边一致（先提交再 cherry-pick）:
-   - 开发工位有未提交的修改 → git add + git commit
-   - cherry-pick 开发工位的提交到测试工位
-
-2. 在测试工位按 pre-tests.md 逐条重跑
-   - 测试工位现在包含最终要合并的完整代码
-
-3. 结果判定:
-   - 全绿 → 开发与测试工位一致，测试通过，进入 pr-create
-   - 有 red → 回开发工位修复
-
-4. 修复后重新同步（循环直到全绿）:
-   - 在开发工位修改 → git add + git commit
-   - cherry-pick 新的提交到测试工位（如果修改发生在测试工位，反过来 cherry-pick 到开发工位）
-   - 重跑测试
-   - 循环直到全部 green
-
-5. 最终状态: 开发工位 ≡ 测试工位（commit 完全一致），测试全部 passed
-```
-
-### 阶段 7：pr-create-guarded 提 PR
+### 阶段 6：pr-create-guarded 提 PR
 
 ```
 1. 在 fix worktree 中执行 ./bin/pr-create-guarded
@@ -185,14 +169,14 @@ hotfix/*          → main + develop (pr-merge-guarded)
 3. 禁止用 gh pr create 替代
 ```
 
-### 阶段 8：pr-review-guarded 独立 review
+### 阶段 7：pr-review-guarded 独立 review
 
 ```
 1. ./bin/pr-review-guarded fix/<branch>
 2. 6 维 review → verdict 文档
 ```
 
-### 阶段 9：pr-merge-guarded 门禁合并
+### 阶段 8：pr-merge-guarded 门禁合并
 
 ```
 1. 切换到 develop 分支: git checkout develop
@@ -200,7 +184,7 @@ hotfix/*          → main + develop (pr-merge-guarded)
 3. PR gate → promotion gate → merge → develop-push → platform-adapter close
 ```
 
-### 阶段 10：wt-close 收口
+### 阶段 9：wt-close 收口
 
 ```
 1. ./bin/wt-close test-pre-merge-<key>-<slug>  # 先关测试工位

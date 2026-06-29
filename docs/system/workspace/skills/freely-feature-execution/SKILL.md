@@ -93,51 +93,35 @@ freely-feature-execution 在不同阶段调用下层 skill：
    → 更新 progress phase_state → in_dev
 ```
 
-### 阶段 5：GREEN — 确认功能已实现（写代码之后）
+### 阶段 5：test-GREEN — test-pre-merge 最终验证
 
 ```
-1. 在 feature 工位逐条重新执行 pre-tests.md 的 test_command
-2. feature 的 GREEN 含义: 确认功能已实现，验收测试通过
-3. 每条 acceptance item:
-   - PASS 了 → red-green-status = green，填写 actual_output
-   - 还是 FAIL → 回阶段 4 继续实现
-4. 全部 green（或合理 not_applicable）→ phase_state → in_verification，进入 test-pre-merge
+1. skill:freely-test-execution
+   → 在 test-pre-merge 工位执行
+   → 运行前确认: test 工位包含全部 dev 最新提交（cherry-pick 同步，不能落后）
+
+2. GREEN 判定（每条 acceptance item 必须同时满足）:
+   - red-green-status = green（RED→dev→GREEN 循环完成）
+   - status = passed（测试已执行）
+   - actual_output 已填写且不是占位符
+   - actual_output 与 expected_output 一致
+
+3. 结果:
+   - 全部 green → phase_state → in_verification，进入 pr-create
+   - 有任何不 green → 回阶段 4 修复 → git commit → cherry-pick 到 test 工位 → 重跑全量测试
+
+4. 最终状态: 开发工位 ≡ 测试工位（commit 完全一致），全部 green
 ```
 
-### 阶段 6：test-pre-merge 验证
-
-**核心原则：测试工位永远跑完整的最终代码。开发与测试工位必须一致，测试结果才有意义。**
-
-```
-1. 确保两边一致（先提交再 cherry-pick）:
-   - 开发工位有未提交的修改 → git add + git commit
-   - cherry-pick 开发工位的提交到测试工位
-
-2. 在测试工位按 pre-tests.md 逐条重跑
-   - 测试工位现在包含最终要合并的完整代码
-
-3. 结果判定:
-   - 全绿 → 开发与测试工位一致，测试通过，进入 pr-create
-   - 有 red → 回开发工位修复
-
-4. 修复后重新同步（循环直到全绿）:
-   - 在开发工位修改 → git add + git commit
-   - cherry-pick 新的提交到测试工位（如果修改发生在测试工位，反过来 cherry-pick 到开发工位）
-   - 重跑测试
-   - 循环直到全部 green
-
-5. 最终状态: 开发工位 ≡ 测试工位（commit 完全一致），phase_state → in_verification
-```
-
-### 阶段 7：pr-create-guarded 提 PR
-阶段 7.5：pr-review-guarded 独立 review
+### 阶段 6：pr-create-guarded 提 PR
+阶段 6.5：pr-review-guarded 独立 review
 ```
 1. 在 feature worktree 运行 dry-run 门禁检查
 2. 运行 `freely pr-create-guarded` 命令
 3. PR 审查通过后进入门禁合并
 ```
 
-### 阶段 8：`freely pr-merge-guarded` 命令门禁合并
+### 阶段 7：`freely pr-merge-guarded` 命令门禁合并
 ```
 1. 切换到 develop 分支，运行 `freely pr-merge-guarded develop <pr-branch>` 命令（必须在 develop 分支执行）
 2. PR gate 检查
@@ -146,7 +130,7 @@ freely-feature-execution 在不同阶段调用下层 skill：
 5. issue-sync close
 ```
 
-### 阶段 9：`freely wt-close` 命令收口
+### 阶段 8：`freely wt-close` 命令收口
 ```
 1. 更新 issue phase_state → completed
 2. 更新 milestones.md
