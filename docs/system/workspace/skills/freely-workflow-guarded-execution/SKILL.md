@@ -2,8 +2,10 @@
 name: freely-workflow-guarded-execution
 description: >-
   Freely 项目所有开发工作的唯一流程入口。编排从 `freely feedback` 命令到
-  `freely wt-close` 命令的完整生命周期：B1 预研 → B2 设计 → RED 测试先行 →
-  dev 实现 → test-GREEN 验证 → PR 门禁合并 → 收口。fix 和 feature 共用同一流程。
+  `freely wt-close` 命令的完整生命周期。底层是 raw → candidate（C-{key}-A）
+  → milestone（M-{key}-A）→ I-* issue（I-{key}-A）四节点链路，上层是 B1 预研 →
+  B2 设计 → RED 测试先行 → dev 实现 → test-GREEN 验证 → PR 门禁合并 → 收口。
+  fix 和 feature 共用同一流程。
 
   Use when: starting any development task, fixing a bug, implementing
   a feature, creating a worktree, or when the user mentions "修 bug",

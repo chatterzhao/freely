@@ -21,6 +21,8 @@ description: >-
 
 B2_IBM 是 IBM Framework 第二阶段。消费 `freely-doc-B1_IBM-execution` skill promote 的 candidate，做 B（Brainstorm）和 M（Map），**物化完整的 I-* issue 文档**并产出全部设计产物。
 
+> 四节点链路中，本 skill 负责 milestone → **I-* issue 物化**。M（milestone，M-{key}-A）由 `freely-doc-B1_IBM-execution` skill 创建，I-* issue（I-{key}-A）由本 skill 物化到 `docs/epics/{epic}/{story}/raw-{raw-key}/issues/`，并写入 milestones.md committed_issues。
+>
 > 关键区分：I-* issue 的 **key**（I-{key}-A）由 `freely-doc-B1_IBM-execution` skill 的 candidate promote 决定——candidate 的 `promoted_issue_path` 字段指向 I-* 文档的目标路径。但此时 candidate_issues 里只有一个路径字符串，没有实际文件。`freely-doc-B2_IBM-execution` skill **根据这个路径物化完整的 I-* issue 文档**——包含 phase_state、pre_tests_path、verification_artifact_dir、完整 frontmatter 和正文。
 
 | 阶段 | 含义 | 谁准备 | 产物 |

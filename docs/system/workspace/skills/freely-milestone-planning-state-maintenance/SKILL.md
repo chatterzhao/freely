@@ -1,7 +1,12 @@
 ---
 name: freely-milestone-planning-state-maintenance
-description: >- 扫描 `docs/milestones.md` 与关联 candidate、issue、progress evidence，
-  做 sequencing、状态维护和写回一致性收口。
+description: >- 维护四节点链路（raw → candidate → milestone → I-* issue）中
+  milestone（M-{key}-A）节点的 sequencing 和状态一致性。扫描 `docs/milestones.md`
+  与关联 candidate、issue、progress evidence，在 B2_IBM materialization 后将
+  `M-{issue-id}` 候选编排切换到 `I-*` 正式编排。
+
+  Use when: 主管发现 milestone 排序冲突、队列失衡或 standing-source drift。
+  触发词："milestone"、"排序"、"队列"、"sequencing"、"状态维护"。
 
   Use when: 主管发现 milestone 排序冲突、队列失衡或 standing-source drift。
   触发词："milestone"、"排序"、"队列"、"sequencing"、"状态维护"。
