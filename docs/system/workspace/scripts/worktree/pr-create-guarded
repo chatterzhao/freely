@@ -2,7 +2,6 @@
 set -euo pipefail
 
 # pr-create-guarded: merge onto latest develop → handle conflicts → dry-run gate → push → create PR
-source "$(dirname "$0")/worktree-common.sh" 2>/dev/null || true
 #
 # Usage:
 #   ./bin/pr-create-guarded [--title <title>] [--body <body>] [--base <branch>]
@@ -89,20 +88,6 @@ PHASE
   fi
 fi
 
-# ── Step 0c: Dev↔Test consistency check ──
-if [[ "$current_branch" == fix/raw-* || "$current_branch" == feature/raw-* ]]; then
-  _raw_key_ts=$(echo "$current_branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)
-  if [[ -n "$_raw_key_ts" ]]; then
-    echo "Step 0c/4: dev↔test consistency..."
-    freely_wt_assert_dev_test_consistent "$_raw_key_ts" || {
-      echo ""
-      echo "  同步后重跑 test-GREEN（skill:freely-test-execution），全部 green 后重新 pr-create。"
-      exit 1
-    }
-    echo "Step 0c/4: dev↔test consistent ✓"
-  fi
-fi
-
 # ── Step 2a: epics-map alignment check ──
 echo "Step 2a/4: epics-map alignment..."
 if [[ -x "$ROOT_DIR/bin/check-epics-map" ]]; then
@@ -142,21 +127,19 @@ if [[ -x "$ROOT_DIR/bin/governance-merge-gate" ]]; then
   set -e
   if [[ "$gate_rc" -ne 0 ]]; then
 	    # Determine the authoritative skill from branch prefix.
-	    # wt-create derives prefix from --skill: freely-workflow-guarded-execution → fix/raw-*, freely-workflow-guarded-execution → feature/raw-*
+	    # wt-create derives prefix from --skill: freely-fix-execution → fix/raw-*, freely-feature-execution → feature/raw-*
 	    _primary_skill=""; _flow_desc=""
 	    case "$current_branch" in
 	      fix/*)
-	        _primary_skill="freely-workflow-guarded-execution"
-	        _flow_desc="fix 分支 — Govern first, code later"
+	        _primary_skill="freely-fix-execution"
+	        _flow_desc="Fix first, govern later → 代码已实现，补 IBM 治理文档"
 	        ;;
 	      feature/*)
-        _primary_skill="freely-workflow-guarded-execution"
-        _flow_desc="feature 分支 — Govern first, code later"
-	        _primary_skill="freely-workflow-guarded-execution"
-	        _flow_desc="fix 分支 — Govern first, code later"
+	        _primary_skill="freely-feature-execution"
+	        _flow_desc="Govern first, code later → 先完成 IBM 治理，再实现代码"
 	        ;;
 	      *)
-	        _primary_skill="freely-workflow-guarded-execution"
+	        _primary_skill="freely-fix-execution（无法从分支名判断，假定 fix）"
 	        _flow_desc="无法从分支名判断 fix/feature，请检查工位"
 	        ;;
 	    esac

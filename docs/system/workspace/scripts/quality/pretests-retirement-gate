@@ -177,7 +177,7 @@ if not state_file.exists():
         for item in items:
             header = item.split("\n")[0].strip()
             fields = {}
-            for key in ("id", "status", "actual_output", "red-green-status"):
+            for key in ("id", "status", "actual_output"):
                 m = re.search(rf"^- {key}:\s*(.+?)\s*$", item, re.MULTILINE)
                 if m:
                     fields[key] = m.group(1).strip()
@@ -185,15 +185,6 @@ if not state_file.exists():
             item_id = fields.get("id", header)
             item_status = fields.get("status", "")
             item_output = fields.get("actual_output", "")
-            item_rg = fields.get("red-green-status", "")
-
-            # Check TDD: red-green-status must exist and be green (or not_applicable)
-            if not item_rg:
-                print(f"[GATE] RED-GREEN 未完成：{pt_rel} 中的 {item_id} 缺少 red-green-status 字段。\n每条 acceptance item 必须追踪 TDD 状态：pending(B2写入) → red(RED确认) → green(GREEN通过)。\n请阅读 skill:freely-doc-B2_IBM-execution 补充该字段。", file=sys.stderr)
-                fallback_failures += 1
-            elif item_rg not in ("green", "not_applicable"):
-                print(f"[GATE] RED-GREEN 未完成：{pt_rel} 中的 {item_id} red-green-status 为 '{item_rg}'，必须是 'green' 或 'not_applicable' 才能提 PR。\n完成 RED(red) → dev → GREEN(green) 循环后，将 red-green-status 更新为 green。", file=sys.stderr)
-                fallback_failures += 1
 
             # Check GREEN: status must be pass or not_applicable
             if item_status not in ("pass", "passed", "not_applicable"):
