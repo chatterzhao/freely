@@ -45,7 +45,7 @@ REASON_GATE
   load_guarded_state || {
     cat <<MSG
 [HOOK] Merge blocked: canonical guarded merge state is missing or malformed.
-Re-run the merge through ./bin/pr-merge-guarded.
+Re-run the merge through freely pr-merge-guarded.
 MSG
     exit 1
   }
@@ -71,7 +71,7 @@ GATE_WARN
   # Delegate to governance-merge-gate with --skip-ibm-gate for path validation.
   # The gate has canonical path definitions (is_governance_only_path) that
   # work for both Freely and non-Freely projects via env var configuration.
-  if [[ ! -x "./bin/governance-merge-gate" ]]; then
+  if ! [[ -x "./bin/governance-merge-gate" ]]; then
     cat <<MSG
 [HOOK] FREELY_SKIP_IBM_GATE=1 but governance-merge-gate not found at ./bin/governance-merge-gate.
 Install the gate or remove FREELY_SKIP_IBM_GATE=1 to use the full governance path.
@@ -120,7 +120,7 @@ require_valid_guarded_merge_state() {
   load_guarded_state || {
     cat <<MSG
 [HOOK] Merge blocked: canonical guarded merge state is missing or malformed.
-Raw develop merges are not an allowed entrypoint. Re-run the merge through ./bin/pr-merge-guarded so hooks can verify the canonical handshake.
+Raw develop merges are not an allowed entrypoint. Re-run the merge through freely pr-merge-guarded so hooks can verify the canonical handshake.
 MSG
     exit 1
   }
@@ -128,7 +128,7 @@ MSG
   if [[ "${FREELY_GUARDED_MERGE_COMPLETION:-0}" != "1" ]]; then
     cat <<MSG
 [HOOK] Merge blocked: canonical guarded merge handshake marker is missing.
-Raw develop merges are not an allowed entrypoint. Re-run the merge through ./bin/pr-merge-guarded.
+Raw develop merges are not an allowed entrypoint. Re-run the merge through freely pr-merge-guarded.
 MSG
     exit 1
   fi
@@ -163,7 +163,7 @@ if git diff --cached --quiet --diff-filter=ACMR --; then
   exit 0
 fi
 
-if [[ ! -x "./bin/governance-merge-gate" ]]; then
+if ! [[ -x "./bin/governance-merge-gate" ]]; then
   exit 0
 fi
 
@@ -185,7 +185,7 @@ fi
 
 echo "$gate_output"
 
-if [[ ! -x "./bin/governance-promotion-gate" ]]; then
+if ! [[ -x "./bin/governance-merge-gate" ]]; then
   exit 0
 fi
 

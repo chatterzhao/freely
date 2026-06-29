@@ -1,0 +1,4 @@
+GREEN: AT-003 PASS
+Test: grep for [[ -x "./bin/governance-merge-gate" ]] in pre-commit.sh files
+Result: Both files retain the governance-merge-gate [[ -x check (and checkpoint-guard, pretests-gate checks)
+governance/checkpoint/pretests scripts not yet migrated to freely subcommands — intentionally preserved

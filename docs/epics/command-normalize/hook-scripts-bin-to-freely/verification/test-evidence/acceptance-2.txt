@@ -1,0 +1,3 @@
+GREEN: AT-002 PASS
+Test: grep for source worktree-common.sh in .githooks/pre-commit.sh and docs/system/workspace/hooks/pre-commit.sh
+Result: Both files retain source ./bin/worktree-common.sh and [[ -f "./bin/worktree-common.sh" ]] references
