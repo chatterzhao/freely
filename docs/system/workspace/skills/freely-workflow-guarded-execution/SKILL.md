@@ -6,6 +6,23 @@ description: Freely 开发工作流统一入口。feedback 之后、wt-create �
 # skill:freely-workflow-guarded-execution
 
 > 全链路: [cmd] freely feedback → [skill][here] freely-workflow-guarded-execution → [cmd] freely wt-create → [skill] freely-doc-B1_IBM-execution → [skill] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
+>
+> 文档中可能用简称指代上述节点。对应关系:
+>
+> | 简称 | 全称 | 类型 |
+> |------|------|------|
+> | feedback / feedback 命令 | `freely feedback` | [cmd] |
+> | workflow / workflow skill | `freely-workflow-guarded-execution` | [skill] |
+> | wt-create | `freely wt-create` | [cmd] |
+> | B1 / B1 skill / B1_IBM | `freely-doc-B1_IBM-execution` | [skill] |
+> | B2 / B2 skill / B2_IBM | `freely-doc-B2_IBM-execution` | [skill] |
+> | RED / RED skill | `freely-test-RED-execution` | [skill] |
+> | dev / dev-loop | `freely-dev-loop-execution` | [skill] |
+> | test / test-GREEN / test skill | `freely-test-execution` | [skill] |
+> | pr-create | `freely pr-create-guarded` | [cmd] |
+> | pr-review | `freely pr-review-guarded` | [cmd] |
+> | pr-merge | `freely pr-merge-guarded` | [cmd] |
+> | wt-close | `freely wt-close` | [cmd] |
 
 ## 定位
 
