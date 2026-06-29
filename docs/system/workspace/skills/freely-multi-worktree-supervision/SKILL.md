@@ -1,6 +1,10 @@
 ---
 name: freely-multi-worktree-supervision
-description: 当需要像项目负责人一样同时监督多个 Freely worktree、安排哪些工位继续开发、哪些先 checkpoint、哪些进入集成批次时使用。
+description: >- 同时监督多个 Freely worktree 的进度和状态。安排哪些工位继续开发、
+  哪些先 checkpoint、哪些进入集成批次。
+
+  Use when: 同时管理 2 个以上 worktree，需要做优先级排序和批次规划。
+  触发词："多工位"、"fleet"、"checkpoint"、"集成批次"、"supervision"。
 ---
 
 # skill:freely-multi-worktree-supervision
