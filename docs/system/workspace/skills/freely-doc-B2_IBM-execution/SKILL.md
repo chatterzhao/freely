@@ -1,9 +1,11 @@
 ---
 name: freely-doc-B2_IBM-execution
 description: >-
-  IBM Framework 第二阶段。消费 `freely-doc-B1_IBM-execution` skill 产生的
-  I-* issue key，物化为完整 I-* issue 文档，并产出全部设计产物：prd.md +
-  pre-tests.md + tasks.md + code-reviews/。交付给 `freely-dev-loop-execution` skill。
+  IBM Framework 第二阶段。消费 `freely-doc-B1_IBM-execution` skill 在
+  milestones.md candidate_issues 中 promote 的 candidate（C-{key}-A），
+  根据其 `promoted_issue_path` 物化完整 I-* issue 文档，并产出全部设计产物：
+  prd.md + pre-tests.md + tasks.md + code-reviews/。
+  交付给 `freely-dev-loop-execution` skill。
 
   Use when: `freely-doc-B1_IBM-execution` skill 完成 candidate promoted
   之后。触发词："B2"、"物化 issue"、"设计"、"pre-tests"、"写测试方案"、
@@ -16,31 +18,29 @@ description: >-
 
 ## I→B→M 骨架
 
-B2_IBM 是 IBM Framework 第二阶段。消费 B1_IBM 阶段 promote 的 I-* issue（只有 key 和 milestone 绑定），做 B（Brainstorm）和 M（Map），**物化完整的 I-* issue 文档**并产出全部设计产物。
+B2_IBM 是 IBM Framework 第二阶段。消费 `freely-doc-B1_IBM-execution` skill promote 的 candidate，做 B（Brainstorm）和 M（Map），**物化完整的 I-* issue 文档**并产出全部设计产物。
 
-> 关键区分：I-* issue 的 **key** 由 `freely-doc-B1_IBM-execution` skill 的 candidate promote 产生（写入 milestones.md committed_issues）。B2_IBM **不创建 key，但物化完整文档**——将 key 扩展为包含 pre_tests_path、verification_artifact_dir、完整 frontmatter 和正文的 issue.md 文件。
+> 关键区分：I-* issue 的 **key**（I-{key}-A）由 `freely-doc-B1_IBM-execution` skill 的 candidate promote 决定——candidate 的 `promoted_issue_path` 字段指向 I-* 文档的目标路径。但此时 candidate_issues 里只有一个路径字符串，没有实际文件。`freely-doc-B2_IBM-execution` skill **根据这个路径物化完整的 I-* issue 文档**——包含 phase_state、pre_tests_path、verification_artifact_dir、完整 frontmatter 和正文。
 
 | 阶段 | 含义 | 谁准备 | 产物 |
 |------|------|--------|------|
-| **I** | Input | `freely-doc-B1_IBM-execution` skill | I-{key} 的 key + milestone 绑定（在 milestones.md 中） |
-| **B** | Brainstorm | `freely-doc-B2_IBM-execution` skill | 实现前置设计、替代方案评估、验收标准 |
+| **I** | Input | `freely-doc-B1_IBM-execution` skill | promoted candidate（C-{key}-A）在 milestones.md candidate_issues 中，其 `promoted_issue_path` 指向 I-* 目标路径 |
+| **B** | Brainstorm | `freely-doc-B2_IBM-execution` skill | b-I-{key}-A.md：实现前置设计、替代方案评估、验收标准 |
 | **M** | Map | `freely-doc-B2_IBM-execution` skill | 完整 I-* issue 文档（物化） + prd.md + pre-tests.md + tasks.md + code-reviews/ |
 
-### I：Input — B1_IBM 产生的 I-* key
+### I：Input — B1_IBM 产生的 promoted candidate
 
-从 `docs/milestones.md` → committed_issues 获取 I-{key} 的 key。
-这个 key 由 `freely-doc-B1_IBM-execution` skill 的 candidate promote 产生，已排期、已绑 milestone。
+从 `docs/milestones.md` → candidate_issues 中取 status=promoted 的 candidate（C-{key}-A）。
+candidate 的 `promoted_issue_path` 字段包含了 I-* issue 文档的目标路径。
+这个 candidate 由 `freely-doc-B1_IBM-execution` skill 产出，已排期、已绑 milestone。
 
-此时 I-* issue 只有 key，还没有完整文档。完整文档由本 skill 在 M 阶段物化。
+此时 I-* issue 只有路径，还没有文档文件。完整文档由本 skill 在 M 阶段物化到该路径。
 
 ### B：Brainstorm — 实现前置设计
 
-### B：Brainstorm — 实现前置设计
-
-1. 读取 I-{key} issue 文档（Input）
-2. 读取 candidate 的 acceptance_criteria、promotion_gate
-3. 读实现面、读验收标准、评估替代方案
-4. 产出 `brainstorms/b-{issue-name}.md`
+1. 读取 candidate（Input）的 acceptance_criteria、promotion_gate
+2. 读实现面、读验收标准、评估替代方案
+3. 产出 `docs/epics/{epic}/{story}/brainstorms/b-{issue-name}.md`
 
 ### M：Map — 物化 I-* issue + 完整产物目录
 
@@ -226,13 +226,14 @@ phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
 
 ## 不负责
 
-- 不创建 I-{key} 的 key（由 `freely-doc-B1_IBM-execution` skill 的 candidate promote 产生，写入 milestones.md committed_issues）
+- 不决定 I-* issue 的 key 和路径（由 `freely-doc-B1_IBM-execution` skill 的 candidate 在 milestones.md candidate_issues 中通过 `promoted_issue_path` 指定）
 - 不实现代码或运行测试（由 `freely-dev-loop-execution` skill 负责）
 - 不直接写 progress（由 `freely-dev-loop-execution` skill 负责）
 
 ## 负责
 
-- **物化 I-* issue 完整文档**：将 B1_IBM 产生的 I-* key 扩展为包含完整 frontmatter（phase_state、pre_tests_path、verification_artifact_dir 等）和正文的 `docs/epics/{epic}/{story}/issues/I-{key}-A.md` 文件
+- **物化 I-* issue 完整文档**：读取 candidate_issues 中 promoted candidate 的 `promoted_issue_path`，在该路径创建包含完整 frontmatter（phase_state、pre_tests_path、verification_artifact_dir 等）和正文的 issue.md 文件
+- 将物化后的 I-* issue 写入 milestones.md committed_issues
 - 产出 prd.md、pre-tests.md、tasks.md
 - 产出 code-reviews/（含 Implementation Decision Note）
 
