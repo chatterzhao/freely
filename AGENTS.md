@@ -1,9 +1,20 @@
 # Agent 上下文入口
 
+## 强制 
+强制使用`freely-workflow-guarded-execution`这个 skill。
+
+这个 skill 它内部要求的强制开发流程（详情请阅读其 skill）:
+```
+[cmd] freely feedback → [skill] freely-workflow-guarded-execution → [cmd] freely wt-create → [skill] freely-doc-B1_IBM-execution → [skill] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
+```
+
+> **`[cmd]`** = bin 脚本，在 shell 中直接执行，如`freely feedback ...`。**`[skill]`** = xxx skill，由 AI agent 通过 Skill 工具加载。
+> Skill 是流程的权威来源——具体步骤见各 skill。
+
 ## 权威来源（按优先级排序）
-1. `docs/CONSTITUTION.md`（硬性约束）
-2. `docs/LAWS.md`（操作规则）
-3. `docs/PROJECT_INTENT.md`（产品方向）
+1. `docs/CONSTITUTION.md`（本项目开发的硬性约束）
+2. `docs/LAWS.md`（本项目开发的操作规则）
+3. `docs/PROJECT_INTENT.md`（本项目的产品方向）
 4. `AGENTS.md`（本文档。仅入口指引，不得覆盖 1-3）
 
 如果本文件中的任何陈述与上述三个核心文档冲突，以核心文档为准。
@@ -19,42 +30,6 @@
 - 修改 `.githooks/` 目录内容以削弱检查
 
 **没有例外。** 即使为了调试或加速迭代也不允许。
-正确的做法是走标准开发流程:
-
-```
-feature & fix: [cmd] freely feedback → [skill] freely-workflow-guarded-execution → [cmd] freely wt-create → [skill] freely-doc-B1_IBM-execution → [skill] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
-
-     反馈: freely feedback --repo <repo> --title "..." --body "..."         (raw issue 不存在时需要)
-     评论: freely comment --issue raw-{key} "原话"                           (向已有 raw issue 追加评论)
-     讨论: freely discuss [--continue <id>] [--archive <id>]                  (AI 群聊讨论)
-     工位: wt-create --raw-key <key> --source platform --kind <fix|feature|hotfix> --slug <slug>
-     B1:   skill:freely-doc-B1_IBM-execution
-     B2:   skill:freely-doc-B2_IBM-execution
-     RED:  skill:freely-test-RED-execution
-     dev:  skill:freely-dev-loop-execution
-     test: skill:freely-test-execution
-     pr:   pr-create-guarded → pr-review-guarded → pr-merge-guarded
-     收口: wt-close <branch>
-```
-
-> **`[命令]`** = bin 脚本，在 shell 中直接执行。**`[skill]`** = skill:xxx，由 AI agent 通过 Skill 工具加载。
-> Skill 是流程的权威来源——具体步骤见各 skill 的 SKILL.md。
-> `()` = 可选步骤（raw issue 已存在则跳过）。
-
-## 当前项目阶段
-Freely 处于研究优先的整合阶段。
-当前活跃文档范围：
-- `docs/CONSTITUTION.md`
-- `docs/LAWS.md`
-- `docs/PROJECT_INTENT.md`
-- `docs/pre-brainstorms/`
-- `docs/milestones.md`
-- `docs/epics/`
-- `docs/progress/`
-- `docs/system/workspace/`
-- `docs/system/workspace/ibm-framework.md`（IBM Framework 能力真源）
-
-不要将遗留路径视为活跃工作流输入（例如：旧布局下的 `docs/brainstorms/`、`docs/planning/`、`docs/continuity/`、`docs/validation/`、`docs/reviews/`）。
 
 ## 仓库分层
 
