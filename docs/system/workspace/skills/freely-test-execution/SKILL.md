@@ -1,12 +1,12 @@
 ---
 name: freely-test-execution
-description: TDD GREEN 阶段 + test-pre-merge 最终验证。dev 之后执行——先确保 test-pre-merge 包含全部最新修改，再逐条跑 pre-tests.md，全部 GREEN 才放行到 PR。硬拦截：test 工位落后、未执行、无证据、有 failed。
+description: TDD GREEN 阶段 + 测试工位 GREEN 验证。dev 之后执行——先确保 测试工位 包含全部最新修改，再逐条跑 pre-tests.md，全部 GREEN 才放行到 PR。硬拦截：test 工位落后、未执行、无证据、有 failed。
 ---
 
 # skill:freely-test-execution
 
 > 全链路: RED → dev → test-GREEN → pr
->                [本 skill 自此开始 — test-pre-merge 最终 GREEN 验证，全绿才放行]
+>                [本 skill 自此开始 — 测试工位 最终 GREEN 验证，全绿才放行]
 
 ## 在流程中的位置
 
@@ -40,7 +40,7 @@ test skill 位于 dev-loop 和 pr-create 之间。它是最后一道自动化验
 ## 执行步骤
 
 ```
-1. 确认在 test-pre-merge 工位（不在则硬拦截）
+1. 确认在 测试工位 工位（不在则硬拦截）
 
 2. 同步最新代码: 确保 test 工位包含全部 dev 修改
    - 检查 dev 工位是否有 test 工位没有的提交:
@@ -50,7 +50,7 @@ test skill 位于 dev-loop 和 pr-create 之间。它是最后一道自动化验
    - 原则: test 工位落后于 dev 工位 = 测的不是最终代码 = 测试作废
 
 3. 按 pre-tests.md 逐条执行 test_command
-   - 在 test-pre-merge 工位中运行
+   - 在 测试工位 工位中运行
    - 收集输出到 evidence_file
 
 4. 逐条判定 GREEN:
@@ -105,7 +105,7 @@ fi
 
 | 检查 | 类型 | 说明 |
 |------|------|------|
-| 不在 test-pre-merge 工位 | **硬拦截** | 提示 cd 到 test 工位 |
+| 不在 测试工位 工位 | **硬拦截** | 提示 cd 到 test 工位 |
 | test 工位落后于 dev 工位 | **硬拦截** | cherry-pick 同步后再跑 |
 | pre-tests.md 不存在 | **硬拦截** | B2 阶段未完成，回 B2_IBM |
 | test_command 为占位符 | **硬拦截** | 测试用例是假的，回 B2_IBM 重新设计 |
@@ -144,7 +144,7 @@ fi
 ## 与上下层 skill 的关系
 
 ```
-RED(全红确认) → dev(实现代码) → test-GREEN(本 skill, test-pre-merge 最终验证)
+RED(全红确认) → dev(实现代码) → test-GREEN(本 skill, 测试工位 GREEN 验证)
                                       │
                               全绿 → pr-create
                               不绿 → 回 dev-loop → 修 → cherry-pick → 重跑 test

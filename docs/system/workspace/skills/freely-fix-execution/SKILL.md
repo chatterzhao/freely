@@ -141,7 +141,7 @@ hotfix/*          → main + develop (pr-merge-guarded)
    → 更新 phase_state → in_dev
 ```
 
-### 阶段 5：test-GREEN — test-pre-merge 最终验证
+### 阶段 5：test-GREEN — 测试工位 GREEN 验证
 
 ```
 1. skill:freely-test-execution
