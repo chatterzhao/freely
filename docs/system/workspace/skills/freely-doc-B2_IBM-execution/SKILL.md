@@ -1,13 +1,13 @@
 ---
 name: freely-doc-B2_IBM-execution
 description: >-
-  IBM Framework 第二阶段。消费 milestone 中的 I-* issue 做实现设计，
-  产出完整 Map：prd.md + pre-tests.md + tasks.md + code-reviews/。
-  标准产物交付给 `freely-dev-loop-execution` skill 进入实现阶段。
+  IBM Framework 第二阶段。消费 `freely-doc-B1_IBM-execution` skill 产生的
+  I-* issue key，物化为完整 I-* issue 文档，并产出全部设计产物：prd.md +
+  pre-tests.md + tasks.md + code-reviews/。交付给 `freely-dev-loop-execution` skill。
 
   Use when: `freely-doc-B1_IBM-execution` skill 完成 candidate promoted
-  之后，需要对 I-* issue 做实现设计、编写 pre-tests、分解任务的阶段。
-  触发词："B2"、"设计"、"pre-tests"、"写测试方案"、"PRD"、"分解任务"。
+  之后。触发词："B2"、"物化 issue"、"设计"、"pre-tests"、"写测试方案"、
+  "PRD"、"分解任务"、"I-* 文档"。
 ---
 
 # skill:freely-doc-B2_IBM-execution
@@ -16,20 +16,24 @@ description: >-
 
 ## I→B→M 骨架
 
-B2_IBM 是 IBM Framework 第二阶段。I（Input）从 scan、A2A task 与 continuity evidence 选出的里程碑已提交 issue 来，B2_IBM 做 B（Brainstorm）和 M（Map）。
+B2_IBM 是 IBM Framework 第二阶段。消费 B1_IBM 阶段 promote 的 I-* issue（只有 key 和 milestone 绑定），做 B（Brainstorm）和 M（Map），**物化完整的 I-* issue 文档**并产出全部设计产物。
+
+> 关键区分：I-* issue 的 **key** 由 `freely-doc-B1_IBM-execution` skill 的 candidate promote 产生（写入 milestones.md committed_issues）。B2_IBM **不创建 key，但物化完整文档**——将 key 扩展为包含 pre_tests_path、verification_artifact_dir、完整 frontmatter 和正文的 issue.md 文件。
 
 | 阶段 | 含义 | 谁准备 | 产物 |
 |------|------|--------|------|
-| **I** | Input | milestone committed_issues | I-{key}（已排期，已有正式 issue 文档） |
-| **B** | Brainstorm | B2_IBM skill | 实现前置设计、替代方案评估、验收标准 |
-| **M** | Map | B2_IBM skill | prd.md、pre-tests.md（含 Acceptance Items v2 adequacy）、tasks.md、code-reviews/ |
+| **I** | Input | `freely-doc-B1_IBM-execution` skill | I-{key} 的 key + milestone 绑定（在 milestones.md 中） |
+| **B** | Brainstorm | `freely-doc-B2_IBM-execution` skill | 实现前置设计、替代方案评估、验收标准 |
+| **M** | Map | `freely-doc-B2_IBM-execution` skill | 完整 I-* issue 文档（物化） + prd.md + pre-tests.md + tasks.md + code-reviews/ |
 
-### I：Input — milestone committed_issues
+### I：Input — B1_IBM 产生的 I-* key
 
-从 `docs/milestones.md` → committed_issues 获取 I-{key}。
-I-{key} 由 B1_IBM 阶段 promote 而来，已排期、已有 priority、已有正式 issue 文档。
+从 `docs/milestones.md` → committed_issues 获取 I-{key} 的 key。
+这个 key 由 `freely-doc-B1_IBM-execution` skill 的 candidate promote 产生，已排期、已绑 milestone。
 
-B2_IBM 不创建 I-{key}。
+此时 I-* issue 只有 key，还没有完整文档。完整文档由本 skill 在 M 阶段物化。
+
+### B：Brainstorm — 实现前置设计
 
 ### B：Brainstorm — 实现前置设计
 
@@ -38,13 +42,13 @@ B2_IBM 不创建 I-{key}。
 3. 读实现面、读验收标准、评估替代方案
 4. 产出 `brainstorms/b-{issue-name}.md`
 
-### M：Map — 完整产物目录
+### M：Map — 物化 I-* issue + 完整产物目录
 
-产出 `docs/epics/{epic-name}/{story-name}/` 下的完整目录：
+产出 `docs/epics/{epic-name}/{story-name}/` 下的完整目录。其中 I-* issue 是本 skill 的核心产物——将 B1_IBM 产生的 key 物化为包含完整 frontmatter 和正文的文档文件。
 
 | 产物 | 要求 |
 |------|------|
-| `issues/{name}.md` | I-* issue 文档，完整格式见下方示例 |
+| `issues/{name}.md` | **I-* issue 完整文档**（物化自 B1_IBM 的 key）。含 phase_state、pre_tests_path、verification_artifact_dir 等全部字段 |
 | `prd.md` | Goal → Dev-Loop Handoff |
 | `pre-tests.md` | 结构化测试计划（含 test_command + expected_output），模板见下方 |
 | `tasks.md` | 任务分解，关联 owner issue |
@@ -222,9 +226,15 @@ phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
 
 ## 不负责
 
-- 不创建 I-{key}（B1_IBM 阶段 promote 产生）
-- 不实现代码或运行测试（dev-loop 负责）
-- 不直接写 progress（dev-loop 负责）
+- 不创建 I-{key} 的 key（由 `freely-doc-B1_IBM-execution` skill 的 candidate promote 产生，写入 milestones.md committed_issues）
+- 不实现代码或运行测试（由 `freely-dev-loop-execution` skill 负责）
+- 不直接写 progress（由 `freely-dev-loop-execution` skill 负责）
+
+## 负责
+
+- **物化 I-* issue 完整文档**：将 B1_IBM 产生的 I-* key 扩展为包含完整 frontmatter（phase_state、pre_tests_path、verification_artifact_dir 等）和正文的 `docs/epics/{epic}/{story}/issues/I-{key}-A.md` 文件
+- 产出 prd.md、pre-tests.md、tasks.md
+- 产出 code-reviews/（含 Implementation Decision Note）
 
 ## 门禁常见坑速查
 
