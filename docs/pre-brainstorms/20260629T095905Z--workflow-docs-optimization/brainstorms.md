@@ -51,6 +51,12 @@ freely-workflow-guarded-execution 是 Freely 所有开发工作的唯一流程�
 3. **AGENTS.md 保持为操作速查**，不重复 skill 中的详细步骤
 4. 改动面最小：3 个文件，约 30 行新增
 
+## 自检
+- [x] discovery：Input + Problem 完整
+- [x] research：3 方案（A/B/C）含优缺点对比
+- [x] decision：选 Option B，4 条理由
+- [x] 下一跳明确：进入 `freely-doc-B2_IBM-execution` 创建 I-* issue + pre-tests + code-review
+
 ## Candidate
 - candidate_id: C-20260629T095905Z-A
 - status: promoted
