@@ -22,8 +22,8 @@
 正确的做法是走标准开发流程:
 
 ```
-feature: ([命令] feedback) → [命令] wt-create → [skill] B1 → [skill] B2 → [skill] dev → [skill] test → [命令] pr-create → [命令] pr-review → [命令] pr-merge → [命令] wt-close
-fix:     ([命令] feedback) → [命令] wt-create → [skill] B1 → [skill] B2 → [skill] dev → [skill] test → [命令] pr-create → [命令] pr-review → [命令] pr-merge → [命令] wt-close
+feature: ([命令] feedback) → [命令] wt-create → [skill] B1 → [skill] B2 → [skill] RED → [skill] dev → [skill] test → [命令] pr-create → [命令] pr-review → [命令] pr-merge → [命令] wt-close
+fix:     ([命令] feedback) → [命令] wt-create → [skill] B1 → [skill] B2 → [skill] RED → [skill] dev → [skill] test → [命令] pr-create → [命令] pr-review → [命令] pr-merge → [命令] wt-close
 
      反馈: freely feedback --repo <repo> --title "..." --body "..."         (raw issue 不存在时需要)
      评论: freely comment --issue raw-{key} "原话"                           (向已有 raw issue 追加评论)
@@ -31,6 +31,7 @@ fix:     ([命令] feedback) → [命令] wt-create → [skill] B1 → [skill] B
      工位: wt-create --raw-key <key> --source platform --skill <skill> --slug <slug>
      B1:   skill:freely-doc-B1_IBM-execution
      B2:   skill:freely-doc-B2_IBM-execution
+     RED:  skill:freely-test-RED-execution
      dev:  skill:freely-dev-loop-execution
      test: skill:freely-test-execution
      pr:   pr-create-guarded → pr-review-guarded → pr-merge-guarded

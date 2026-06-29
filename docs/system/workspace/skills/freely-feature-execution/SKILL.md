@@ -5,7 +5,7 @@ description: 新功能/大型改动的完整开发流程——feedback→wt-crea
 
 # skill:freely-feature-execution
 
-> 全链路: feedback → [命令] wt-create → [skill] skill:freely-doc-B1_IBM-execution → [skill] skill:freely-doc-B2_IBM-execution → RED(功能未实现) → dev(实现) → GREEN(功能已实现) → [skill] skill:freely-test-execution(test-pre-merge) → [命令] pr-create-guarded → [命令] pr-review-guarded → [命令] pr-merge-guarded → [命令] wt-close
+> 全链路: feedback → [命令] wt-create → [skill] skill:freely-doc-B1_IBM-execution → [skill] skill:freely-doc-B2_IBM-execution → skill:freely-test-RED-execution(确认功能未实现) → dev(实现) → GREEN(功能已实现) → [skill] skill:freely-test-execution(test-pre-merge) → [命令] pr-create-guarded → [命令] pr-review-guarded → [命令] pr-merge-guarded → [命令] wt-close
 >                                                              [本 skill 自此开始 — B1→B2→dev→test→pr→merge→close 完整抽象]
 
 ## 定位
@@ -65,7 +65,7 @@ freely-feature-execution 在不同阶段调用下层 skill：
    → 写 prd.md / tasks.md / pre-tests.md
    → 更新 progress
    → 更新 milestones.md committed_issues
-2. issue phase_state = done_b2_ibm → 进入 dev
+2. issue phase_state = done_b2_ibm → 进入 RED（skill:freely-test-RED-execution）
 ```
 
 ### 阶段 3：RED — 确认功能未实现（写代码之前）

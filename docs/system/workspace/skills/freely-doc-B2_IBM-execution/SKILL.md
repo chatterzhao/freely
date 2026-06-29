@@ -195,7 +195,7 @@ B2_IBM 阶段直接写入以下格式。AI 按模板填写，无需查看任何�
 - blocker_taxonomy: execution_pending_or_failed
 
 ## Real-Environment
-- real_environment_status: pass | fail | not_tested
+- real_environment_status: pass | fail
 - real_environment_reason: <真实环境验证结果>
 ```
 
@@ -210,7 +210,7 @@ B2_IBM 阶段直接写入以下格式。AI 按模板填写，无需查看任何�
 - [ ] tasks.md 存在且任务已分解
 - [ ] code-reviews/ 含 Implementation Decision Note
 - [ ] milestones.md committed_issues 条目已更新
-- [ ] 下一跳明确：进入 `skill:freely-dev-loop-execution`
+- [ ] 下一跳明确：进入 `skill:freely-test-RED-execution`
 
 phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
 
@@ -327,4 +327,4 @@ phase_state: done_b2_ibm
 5. 写 code-review（含 Implementation Decision Note）
 6. 更新 milestones.md committed_issues
 7. 若发现边界外新问题：返回 `next_recommended_route=freely-doc-B1_IBM-execution`
-8. B2_IBM 完成后，进入 dev-loop 实现 → pr-create-guarded（提 PR）→ pr-merge-guarded（门禁合并）→ wt-close（收口）
+8. B2_IBM 完成后，进入 RED 阶段（skill:freely-test-RED-execution）确认全部测试 RED → dev-loop 实现 → GREEN → pr-create-guarded（提 PR）→ pr-merge-guarded（门禁合并）→ wt-close（收口）
