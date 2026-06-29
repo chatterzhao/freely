@@ -981,7 +981,6 @@ if [[ "$branch" == fix/raw-* || "$branch" == feature/raw-* ]]; then
     # Clean up agent-id.env entries for this raw-key.
     # agent-id.env lives in the main develop project root — NOT in the worktree
     # .freely/ which is a clone from wt-create. Find develop worktree explicitly.
-    _dev_wt
     _dev_wt=$(git worktree list --porcelain 2>/dev/null | awk '$1=="worktree"{wt=$2} $1=="branch"&&$2=="refs/heads/develop"{print wt;exit}')
     [[ -n "$_dev_wt" ]] || _dev_wt="$PROJECT_ROOT"
     _agent_env="$_dev_wt/.freely/agent-id.env"
