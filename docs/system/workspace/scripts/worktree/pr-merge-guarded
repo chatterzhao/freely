@@ -584,8 +584,8 @@ LOCAL_REMOTE_SYNC
     $1=="worktree" { wt=$2 }
     $1=="branch" && $2==br { print wt; exit }
   ')
-  if [[ -n "$_src_wt" && -f "$_src_wt/bin/worktree-common.sh" ]]; then
-    source "$_src_wt/bin/worktree-common.sh"
+  if [[ -n "$_src_wt" && -f "$_src_wt/docs/system/workspace/scripts/worktree/worktree-common.sh" ]]; then
+    source "$_src_wt/docs/system/workspace/scripts/worktree/worktree-common.sh"
     _raw_key="${_raw_key:-$(echo "$source_branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)}"
     if [[ -n "$_raw_key" ]]; then
       freely_wt_assert_dev_test_consistent "$_raw_key" || {
