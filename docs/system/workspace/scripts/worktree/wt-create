@@ -156,13 +156,45 @@ MSG
     exit 1
   fi
   if [[ -z "$branch_kind" ]]; then
-    echo "Missing required: --kind" >&2
-    echo "  Valid values:" >&2
-    echo "    fix      (bug fixes)" >&2
-    echo "    feature  (new features/refactoring)" >&2
-    echo "    hotfix   (emergency fix, merges to main+develop)" >&2
-    echo "Usage: ./bin/wt-create --raw-key <key> --source <source> --kind <fix|feature|hotfix> --slug <slug>" >&2
-    exit 1
+    # Fallback: try to read kind from raw issue (set by 'freely feedback --kind')
+    local _raw_issue_file="docs/issues/raw-${raw_key}/issue.md"
+    if [[ -f "$_raw_issue_file" ]]; then
+      branch_kind=$(grep -m1 '^- kind:' "$_raw_issue_file" 2>/dev/null | sed 's/^- kind: *//' || true)
+    fi
+    if [[ -z "$branch_kind" ]]; then
+      cat >&2 <<KIND_ERR
+Missing required: --kind
+
+  --kind 未在 wt-create 命令行指定，且 raw issue 中也未找到。
+
+  请在 feedback 阶段就选好 kind:
+    freely feedback --title "..." --body "..." --kind fix
+    freely feedback --title "..." --body "..." --kind feature
+
+  或直接在 wt-create 显式指定:
+    wt-create ... --kind fix
+    wt-create ... --kind feature
+
+  --kind 怎么选（仔细分析，选错会影响 RED 阶段行为）:
+
+    fix     bug 可以稳定复现。已有测试能捕获，或可以手工端到端复现。
+            RED 阶段 = 复现 bug，确认它真的存在。
+            分支: fix/raw-{key}-{slug}
+
+    feature 新功能、重构、优化、架构改进。
+            RED 阶段 = 按端到端→集成→单元设计新测试，确认功能未实现。
+            分支: feature/raw-{key}-{slug}
+
+    hotfix  紧急修复，从 main 创建，合并到 main + develop
+            （其他流程与 fix 完全一致，测试不可跳过）
+
+    如果 bug 修复同时需要实现紧相关的新功能 →
+    拆为两个 raw issue，分别 feedback + wt-create。
+
+KIND_ERR
+      exit 1
+    fi
+    echo "wt-create: using kind='${branch_kind}' from raw issue"
   fi
   if [[ -z "$slug" ]]; then
     echo "Missing required: --slug" >&2; usage; exit 1
