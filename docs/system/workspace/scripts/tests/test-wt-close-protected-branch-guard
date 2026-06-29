@@ -79,7 +79,7 @@ fi
 
 # Test 6: guard references skills
 echo "=== Test 6: guard references skills ==="
-if grep -q "freely-fix-execution\|freely-feat-execution" "$GUARD_FILE"; then
+if grep -q "freely-fix-execution\|freely-feature-execution" "$GUARD_FILE"; then
   echo "[PASS] skill reference found in guard message"
 else
   echo "[FAIL] skill reference not found"

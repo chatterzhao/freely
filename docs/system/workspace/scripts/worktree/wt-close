@@ -921,7 +921,7 @@ else
 	      _wt_skill_name="Fix first, govern later"
 	      ;;
 	    feature/*)
-	      _wt_skill="freely-feat-execution"
+	      _wt_skill="freely-feature-execution"
 	      _wt_skill_name="Govern first, code later"
 	      ;;
 	    *)
