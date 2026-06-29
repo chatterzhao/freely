@@ -27,7 +27,7 @@
 - actual_output: PASS
 - evidence_file: .freely/run/test-evidence/acceptance-2.log
 - blocker:
-- status: pass
+^- status: passed
 
 ### acceptance-3
 - acceptance_target: ensure-codex-acp reads .toml
@@ -39,7 +39,7 @@
 - actual_output: PASS
 - evidence_file: .freely/run/test-evidence/acceptance-3.log
 - blocker:
-- status: pass
+^- status: passed
 
 ## Unit
 - acceptance_target: 文件改动正确，无语法错误

@@ -38,5 +38,5 @@
 - target_lane: premerge-integration
 - promotion_gate: develop_merge
 - evidence_level: review
-- status: pass
+^- status: passed
 - artifact_ref: docs/epics/multi-project-isolation/code-reviews/review.md

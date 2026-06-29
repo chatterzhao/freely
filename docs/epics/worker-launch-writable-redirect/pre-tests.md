@@ -41,7 +41,7 @@
 - id: develop-rejected
 - requirement: develop branch 在 worker_prompt_launchable 中被拒绝
 - evidence_level: integration
-- status: pass
+^- status: passed
 - artifact_ref: docs/system/workspace/scripts/tests/test-freely-worker-prompt-protected-branch-rejected
 - surface_kind: integration
 - target_lane: feature-local
@@ -51,7 +51,7 @@
 - id: main-rejected
 - requirement: main branch 被拒绝
 - evidence_level: integration
-- status: pass
+^- status: passed
 - artifact_ref: docs/system/workspace/scripts/tests/test-freely-worker-prompt-protected-branch-rejected
 - surface_kind: integration
 - target_lane: feature-local
@@ -61,7 +61,7 @@
 - id: test-pre-merge-rejected
 - requirement: test-pre-merge-* branch 被拒绝
 - evidence_level: integration
-- status: pass
+^- status: passed
 - artifact_ref: docs/system/workspace/scripts/tests/test-freely-worker-prompt-protected-branch-rejected
 - surface_kind: integration
 - target_lane: feature-local
@@ -71,7 +71,7 @@
 - id: fix-accepted
 - requirement: fix/* branch 正常放行
 - evidence_level: integration
-- status: pass
+^- status: passed
 - artifact_ref: docs/system/workspace/scripts/tests/test-freely-worker-prompt-protected-branch-rejected
 - surface_kind: integration
 - target_lane: feature-local
@@ -81,7 +81,7 @@
 - id: feature-accepted
 - requirement: feature/* branch 正常放行
 - evidence_level: integration
-- status: pass
+^- status: passed
 - artifact_ref: docs/system/workspace/scripts/tests/test-freely-worker-prompt-protected-branch-rejected
 - surface_kind: integration
 - target_lane: feature-local
@@ -91,7 +91,7 @@
 - id: empty-branch-accepted
 - requirement: 空 branch 值放行（不破坏既有流程）
 - evidence_level: integration
-- status: pass
+^- status: passed
 - artifact_ref: docs/system/workspace/scripts/tests/test-freely-worker-prompt-protected-branch-rejected
 - surface_kind: integration
 - target_lane: feature-local
@@ -127,7 +127,7 @@
 - id: fix-merge-to-develop
 - requirement: 完整 fix → test-pre-merge → develop 验证
 - evidence_level: integration
-- status: pass
+^- status: passed
 - artifact_ref: docs/epics/worker-launch-writable-redirect/code-reviews/closeout-review.md
 - surface_kind: integration
 - target_lane: premerge-integration

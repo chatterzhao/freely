@@ -38,5 +38,5 @@
 - target_lane: premerge-integration
 - promotion_gate: develop_merge
 - evidence_level: integration
-- status: pass
+^- status: passed
 - artifact_ref: docs/epics/platform-adapter-title-key/code-reviews/review.md

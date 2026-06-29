@@ -32,7 +32,7 @@
 - id: green-check
 - requirement: gate checks actual_output not file existence
 - evidence_level: mock
-- status: pass
+^- status: passed
 - artifact_ref: docs/epics/red-green-separation/code-reviews/implementation-decision.md
 ## Real-Environment
 - real_environment_status: pass

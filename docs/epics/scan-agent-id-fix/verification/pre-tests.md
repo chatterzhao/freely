@@ -13,7 +13,7 @@
 - actual_output: PASS
 - evidence_file: .freely/run/test-evidence/acceptance-1.log
 - blocker:
-- status: pass
+^- status: passed
 
 ## Unit
 - acceptance_target: 代码改动无语法错误

@@ -37,7 +37,7 @@
 - id: mode-change
 - requirement: all 15 runtime .py files committed with mode 100755
 - evidence_level: mock
-- status: pass
+^- status: passed
 - artifact_ref: docs/epics/runtime-py-chmod/code-reviews/implementation-decision.md
 
 ## Real-Environment

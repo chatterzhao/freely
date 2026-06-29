@@ -8,7 +8,7 @@
 - verdict: fail
 
 ## 1. Worktree Check
-- status: pass
+^- status: passed
 - evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-raw-20260618T065221Z-pr-merge-local-merge branch=feature/raw-20260618T065221Z-pr-merge-local-merge clean=true
 
 ## 2. IBM Completeness
@@ -16,11 +16,11 @@
 - evidence: [FAIL] develop merge governance gate blocked. The following raw/C/M/I lifecycle links are incomplete or inconsistent: - docs/epics/pr-merge-local-merge/code-reviews/implementation-decision.md points to owner issue 'I-20260618T065221Z-A', but that issue cannot be resolved. Every develop-bound merge must stay on a candidate-driven lifecycle. Link the review to a real issue that traces back to a pre-brainstorm candidate. 
 
 ## 3. Code Review Evidence
-- status: pass
+^- status: passed
 - evidence: implementation-decision.md in docs/epics/a2a-native-delegation/code-reviews/, all fields complete
 
 ## 4. Pre-test Evidence
-- status: pass
+^- status: passed
 - evidence: pre-tests.md in docs/epics/acp-a2a-refactor/verification/, 0
 0 acceptance items
 
@@ -29,7 +29,7 @@
 - evidence: pr-merge-guarded not modified by this PR
 
 ## 6. Phase State
-- status: pass
+^- status: passed
 - evidence: raw issue phase_state=absorbed
 
 

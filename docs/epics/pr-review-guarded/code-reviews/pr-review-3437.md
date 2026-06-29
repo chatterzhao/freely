@@ -8,19 +8,19 @@
 - issue_id: I-20260624T141559Z-A
 
 ## 1. Worktree Check
-- status: pass
+^- status: passed
 - evidence: worktree=/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260624T141559Z-feedback-issue-sync branch=fix/raw-20260624T141559Z-feedback-issue-sync clean=true
 
 ## 2. IBM Completeness
-- status: pass
+^- status: passed
 - evidence: governance-merge-gate passed, all raw/C/M/I chain links resolved
 
 ## 3. Code Review Evidence
-- status: pass
+^- status: passed
 - evidence: implementation-decision.md in docs/epics/feedback-issue-sync/code-reviews/, all 5 fields complete
 
 ## 4. Pre-test Evidence
-- status: pass
+^- status: passed
 - evidence: pre-tests.md in docs/epics/feedback-issue-sync/, 5 acceptance items all passed
 
 ## 5. Receipt Integrity
@@ -28,7 +28,7 @@
 - evidence: no pr-merge-guarded modification
 
 ## 6. Phase State
-- status: pass
+^- status: passed
 - evidence: I-20260624T141559Z-A phase_state=completed, raw-20260624T141559Z phase_state=absorbed
 
 ## Overall Verdict

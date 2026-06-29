@@ -13,7 +13,7 @@
 - actual_output: issue-sync before merge line at 558, git merge at 561
 - evidence_file: .freely/run/test-evidence/acceptance-1.log
 - blocker: none
-- status: pass
+^- status: passed
 
 ### acceptance-2
 - acceptance_target: issue-sync 后自动 commit + push
@@ -25,7 +25,7 @@
 - actual_output: 2
 - evidence_file: .freely/run/test-evidence/acceptance-2.log
 - blocker: none
-- status: pass
+^- status: passed
 
 ### acceptance-3
 - acceptance_target: pr-merge-guarded --dry-run gate passes
@@ -37,7 +37,7 @@
 - actual_output: --dry-run complete, exit 0
 - evidence_file: .freely/run/test-evidence/acceptance-3.log
 - blocker: none
-- status: pass
+^- status: passed
 
 ## Unit
 - acceptance_target: 代码级验证 — issue-sync 顺序、auto-commit
@@ -55,7 +55,7 @@
 - actual_output: --dry-run complete, exit 0
 - evidence_file: .freely/run/test-evidence/acceptance-3.log
 - blocker: none
-- status: pass
+^- status: passed
 
 ## End-to-End
 - acceptance_target: 完整 merge 后 source worktree 干净，wt-close 不阻塞

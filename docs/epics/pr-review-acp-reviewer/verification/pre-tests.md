@@ -12,7 +12,7 @@
 - expected_output: PASS
 - actual_output: PASS
 - evidence_file: .freely/run/test-evidence/acceptance-1.log
-- status: pass
+^- status: passed
 
 ### acceptance-2
 - acceptance_target: 多轮循环逻辑正确
@@ -23,7 +23,7 @@
 - expected_output: PASS
 - actual_output: PASS
 - evidence_file: .freely/run/test-evidence/acceptance-2.log
-- status: pass
+^- status: passed
 
 ### acceptance-3
 - acceptance_target: session 状态文件管理
@@ -34,7 +34,7 @@
 - expected_output: PASS
 - actual_output: PASS
 - evidence_file: .freely/run/test-evidence/acceptance-3.log
-- status: pass
+^- status: passed
 
 ## Unit
 - acceptance_target: 脚本结构正确

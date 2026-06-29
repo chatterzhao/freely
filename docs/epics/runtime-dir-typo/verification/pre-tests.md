@@ -7,7 +7,7 @@
 - expected_output: PASS (0 broken refs)
 - actual_output: PASS — 0 broken references remaining
 - evidence_file: .freely/run/test-evidence/acceptance-1.log
-- status: pass
+^- status: passed
 ### acceptance-2
 - acceptance_target: Gitee feedback works
 - testing_layer: integration
@@ -15,7 +15,7 @@
 - expected_output: gitee status=created
 - actual_output: gitee status=created (verified earlier)
 - evidence_file: .freely/run/test-evidence/acceptance-2.log
-- status: pass
+^- status: passed
 ### acceptance-3
 - acceptance_target: bash syntax valid (n/a — Python file)
 - testing_layer: end-to-end
@@ -23,4 +23,4 @@
 - expected_output: OK
 - actual_output: Syntax OK
 - evidence_file: .freely/run/test-evidence/acceptance-3.log
-- status: pass
+^- status: passed

@@ -12,7 +12,7 @@
 - expected_output: PASS
 - actual_output: PASS
 - evidence_file: .freely/run/test-evidence/acceptance-1.log
-- status: pass
+^- status: passed
 
 ## Unit
 - acceptance_target: 过滤逻辑正确

@@ -13,7 +13,7 @@
 - actual_output: PASS
 - evidence_file: .freely/run/test-evidence/acceptance-1.log
 - blocker: (失败时填写)
-- status: pass
+^- status: passed
 
 ### acceptance-2
 - acceptance_target: 门禁拦截表含新增硬拦截项
@@ -25,7 +25,7 @@
 - actual_output: PASS
 - evidence_file: .freely/run/test-evidence/acceptance-2.log
 - blocker: (失败时填写)
-- status: pass
+^- status: passed
 
 ## Unit
 - acceptance_target: 文本验证

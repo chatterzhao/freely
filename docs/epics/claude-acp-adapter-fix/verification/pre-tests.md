@@ -13,7 +13,7 @@
 - actual_output: "PASS: acp found"
 - evidence_file: .freely/run/test-evidence/acceptance-1.log
 - blocker:
-- status: pass
+^- status: passed
 
 ### acceptance-2
 - acceptance_target: Registry 查询 cline adapters.supported 返回 direct,acp
@@ -25,7 +25,7 @@
 - actual_output: "PASS: acp found"
 - evidence_file: .freely/run/test-evidence/acceptance-2.log
 - blocker:
-- status: pass
+^- status: passed
 
 ### acceptance-3
 - acceptance_target: Registry 查询 claude adapters.default 返回 acp
@@ -37,7 +37,7 @@
 - actual_output: "PASS: acp"
 - evidence_file: .freely/run/test-evidence/acceptance-3.log
 - blocker:
-- status: pass
+^- status: passed
 
 ### acceptance-4
 - acceptance_target: 未注册工具触发保守回退（返回 direct）
@@ -49,7 +49,7 @@
 - actual_output: registry 返回 "ERROR: tool not in registry"，tool_supported_adapters_for_runtime 回退到 printf 'direct\n'
 - evidence_file: .freely/run/test-evidence/acceptance-4.log
 - blocker:
-- status: pass
+^- status: passed
 
 ## Unit
 - acceptance_target: 所有已注册工具 (claude, cline, codex, opencode) 的 adapters.supported 均包含 acp
