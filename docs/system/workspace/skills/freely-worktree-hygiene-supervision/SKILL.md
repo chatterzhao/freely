@@ -1,6 +1,10 @@
 ---
 name: freely-worktree-hygiene-supervision
-description: 当某个 worktree 进入 checkpoint 预警、dirty-budget 漂移或提交边界失控时，指导 manager/worker 如何优先做 continuity、验证、原子提交或分流。
+description: >- 当 worktree 进入 checkpoint 预警、dirty-budget 漂移或提交边界失控时，
+  指导 manager/worker 做 continuity、验证、原子提交或分流。
+
+  Use when: worktree 状态异常需要卫生检查和处理。
+  触发词："hygiene"、"卫生检查"、"dirty"、"checkpoint"、"提交边界"。
 ---
 
 # skill:freely-worktree-hygiene-supervision
