@@ -89,18 +89,40 @@ hotfix/*          → main + develop
 
 ## 工作流
 
-### 阶段 0：判断 raw issue 是否存在
+### 阶段 0：判题 — 搜索相似 raw issue + 决定创建还是复用
 
-拿到任务后第一步——判断是否已有 raw issue：
+拿到任务后，第一步不是创建 raw issue，也不是直接进入 B1。先做两件事：
 
-**有 raw issue** → 进入「前置审视」。
-**没有 raw issue** → 先用 `./bin/freely feedback` 创建 raw issue：
+#### 0a. 思考 + 搜索相似 raw issue
+
+把问题想清楚，然后搜索是否已有类似 raw issue：
+- 搜 `docs/issues/raw-*/issue.md` 的标题和正文
+- 搜平台（GitHub/Gitee）上的 open issue
+- 搜 `docs/milestones.md` 看看是否已被某个 candidate/issue 覆盖
+
+#### 0b. 根据搜索结果决策
+
+**找到相似的 raw issue：**
+
+| 你的状态 | 做法 |
+|---------|------|
+| 还没有 raw issue | 不创建新的。用 `./bin/freely comment --issue raw-{key} "..."` 把新发现追加到已有 raw issue |
+| 已有 raw issue，和已有的重复 | 用 `./bin/freely wt-close <branch> --platform-only` 关掉自己这个的平台 issue，用 `./bin/freely comment` 追加到已有的 |
+
+**没找到相似的 raw issue：**
+
+| 你的状态 | 做法 |
+|---------|------|
+| 还没有 raw issue | `./bin/freely feedback --title "fix\|feat\|docs\|refactor: <描述>" --kind <fix\|feature> --body "<详细描述>"` |
+| 已有 raw issue | 进入「前置审视」 |
+
+**已有 raw issue 但描述不准确需要改：**
 
 ```
-./bin/freely feedback --title "fix|feat|docs|refactor: <描述>" --kind <fix|feature> --body "<详细描述>"
+./bin/freely feedback edit --raw-key <key> --title "..." --body "..."
 ```
 
-拿到返回的 raw-{key} 后，继续用 `./bin/wt-create` 创建工位（见阶段 1）。
+拿到 raw-{key} 后，继续用 `./bin/wt-create` 创建工位（见阶段 1）。
 
 ### 前置审视：剖析 raw issue — B1 起手式
 
