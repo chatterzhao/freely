@@ -372,14 +372,14 @@ class Task:
 
 FREELY_SKILLS = [
     AgentSkill(
-        id="freely-fix-execution",
+        id="freely-workflow-guarded-execution",
         name="Bug Fix Execution",
         description="快速修复 bug 的高效策略：隔离验证→正式提交",
         tags=["fix", "bug", "development"],
         examples=["Fix authentication bug in login flow"],
     ),
     AgentSkill(
-        id="freely-feature-execution",
+        id="freely-workflow-guarded-execution",
         name="Feature Execution",
         description="新功能/大型改动的完整开发流程：预研→设计→实现→门禁→合并",
         tags=["feature", "development", "full-cycle"],

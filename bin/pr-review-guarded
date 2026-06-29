@@ -2,6 +2,8 @@
 set -euo pipefail
 
 # pr-review-guarded: ACP-based TDD review gate between pr-create and pr-merge.
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd -P)"
+source "$ROOT_DIR/bin/worktree-common.sh" 2>/dev/null || true
 #
 # Launches an independent Reviewer agent (separate ACP session, same worktree)
 # that performs TDD four-question review: RED → GREEN → ADEQUACY → REFACTOR.
@@ -92,6 +94,15 @@ if [[ -z "$pr_number" ]]; then
   pr_number="local"
 fi
 echo "PR: #$pr_number"
+
+# ── Dev↔Test consistency check ──
+if [[ -n "$_raw_key" ]]; then
+  freely_wt_assert_dev_test_consistent "$_raw_key" || {
+    echo ""
+    echo "  同步后重跑 test-GREEN（skill:freely-test-execution），全部 green 后重新 pr-review。"
+    exit 1
+  }
+fi
 
 # ── Step 2: Find review paths ──
 _raw_key=$(echo "$review_branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)

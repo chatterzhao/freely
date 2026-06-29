@@ -289,8 +289,8 @@ MSG
 
 Read AGENTS.md §核心开发流程, then invoke the correct skill:
 
-  Bug fix  → skill:freely-fix-execution   (Fix first, govern later)
-  Fix|Feature  → skill:freely-fix-execution|freely-feature-execution  (Govern first, then code)
+  Bug fix  → skill:freely-workflow-guarded-execution   (Govern first, code later)
+  Fix|Feature  → skill:freely-workflow-guarded-execution|freely-workflow-guarded-execution  (Govern first, then code)
 
 Quick start:
   cd <project-root>

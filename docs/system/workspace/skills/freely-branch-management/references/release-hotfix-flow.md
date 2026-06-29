@@ -12,7 +12,7 @@
 
 1. 从 `main` 创建 `hotfix/*`
 2. 在 `hotfix/*` dedicated worktree 中完成修复
-3. `pr-create-guarded` 提 PR（可跳过 test-pre-merge）
+3. `pr-create-guarded` 提 PR
 4. PR review 通过后：
    - `pr-merge-guarded main <hotfix-branch>`
    - `pr-merge-guarded develop <hotfix-branch>`
