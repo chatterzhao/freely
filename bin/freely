@@ -5,9 +5,9 @@ set -euo pipefail
 _SCRIPT="$(python3 -c "import os,sys; print(os.path.realpath(sys.argv[1]))" "${BASH_SOURCE[0]}")"
 ROOT_DIR="$(cd "$(dirname "$_SCRIPT")/.." && pwd -P)"
 
-# ── Dev vs Production detection ──
-# Dev mode: this freely is running from a git checkout (not an installed package).
-# Production: this freely was installed via 'freely install' to a system path.
+# ── dev vs prod detection ──
+# dev mode: running from a git checkout (not an installed package).
+# prod mode: installed via 'freely install' to a system path.
 _is_dev=false
 if [[ "${FREELY_DEV_MODE:-}" == "1" ]]; then
   _is_dev=true
@@ -16,7 +16,7 @@ elif git -C "$ROOT_DIR" rev-parse --git-dir >/dev/null 2>&1; then
 fi
 
 if $_is_dev; then
-  echo "  ▸ freely dev (git checkout)" >&2
+  echo "  ▸ freely [dev]" >&2
 fi
 
 # ── PATH setup for development ──
