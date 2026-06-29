@@ -9,7 +9,7 @@
 1. `I-20260629T025659Z-A`
 - title: unify fix skill governance order — B1→B2→dev→test; milestone_state: in_dev
 - issue_path: `docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/issues/I-20260629T025659Z-A.md`
-- phase_state: `done_b2_ibm`
+- phase_state: `completed`
 - verification_artifact_dir: `docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/code-reviews`
 
 ## M-20260629T030408Z-A

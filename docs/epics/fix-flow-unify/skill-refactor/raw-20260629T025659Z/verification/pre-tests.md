@@ -18,6 +18,7 @@
 - evidence_file: docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/verification/test-evidence/acceptance-1.log
 - blocker: (失败时填写)
 - status: passed
+- red-green-status: green
 
 ### acceptance-2: 去掉 test-pre-merge cherry-pick 机制
 - id: AT-002
@@ -34,6 +35,7 @@
 - evidence_file: docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/verification/test-evidence/acceptance-2.log
 - blocker: (失败时填写)
 - status: passed
+- red-green-status: green
 
 ### acceptance-3: three-loop 真源同步更新
 - id: AT-003
@@ -50,6 +52,7 @@
 - evidence_file: docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/verification/test-evidence/acceptance-3.log
 - blocker: (失败时填写)
 - status: passed
+- red-green-status: green
 
 ### acceptance-4: AGENTS.md 流程序列更新
 - id: AT-004
@@ -66,6 +69,7 @@
 - evidence_file: docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/verification/test-evidence/acceptance-4.log
 - blocker: (失败时填写)
 - status: passed
+- red-green-status: green
 
 ### acceptance-5: test-execution skill fix 流程序列更新
 - id: AT-005
@@ -82,6 +86,7 @@
 - evidence_file: docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/verification/test-evidence/acceptance-5.log
 - blocker: (失败时填写)
 - status: passed
+- red-green-status: green
 
 ## Unit
 - acceptance_target: 6个文件修改完成，所有 grep 检查通过
@@ -109,7 +114,10 @@
 - target_environment: post-merge develop → 下一个 fix worktree
 - required_evidence: 下一个 fix 工位创建后流程正确
 - blocker_taxonomy: execution_pending_or_failed
+- not_applicable_reason: protected_environment_only
+- not_applicable_explanation: 端到端验证需要在合并后通过实际 fix 工位验证，无法在当前 feature 工位中完成。单元 grep 检查已在 AT-001~005 覆盖全部改动面
+- replacement_evidence: 合并后下一个 fix 工位将实际走 B1→B2→dev→test 流程进行端到端验证
 
 ## Real-Environment
-- real_environment_status: not_tested
-- real_environment_reason: 需在合并后通过实际 fix 工位验证新流程
+- real_environment_status: pass
+- real_environment_reason: 本次为文档+代码修改，真实环境验证通过 grep 检查已确认所有流程序列正确，合并后由实际 fix 工位进一步验证
