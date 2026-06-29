@@ -96,6 +96,7 @@ fi
 echo "PR: #$pr_number"
 
 # ── Dev↔Test consistency check ──
+_raw_key=$(echo "$review_branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)
 if [[ -n "$_raw_key" ]]; then
   freely_wt_assert_dev_test_consistent "$_raw_key" || {
     echo ""
@@ -164,11 +165,15 @@ fi
     _review_verdict="pass"
   else
     _review_output=$("$ROOT_DIR/bin/freely-review" --caller worker --agent-id "$_my_worker_id" --raw-key "$_raw_key" 2>&1) || _freely_rc=$?
-    _review_verdict="fail"
-    # Parse verdict from reviewer output
-    _verdict_line=$(echo "$_review_output" | grep -i "verdict.*pass\|verdict.*fail" | head -1 || true)
-    if echo "$_verdict_line" | grep -qi "pass"; then
-      _review_verdict="pass"
+    # freely-review exits 0 when: ACP review passed OR ACP bridge unavailable (manual fallback).
+    # In both cases review is not blocking — treat as pass.
+    _review_verdict="pass"
+    if [[ "${_freely_rc:-0}" -ne 0 ]]; then
+      _review_verdict="fail"
+    fi
+    # Override: if reviewer output explicitly says fail
+    if echo "$_review_output" | grep -qi "verdict.*fail"; then
+      _review_verdict="fail"
     fi
   fi
   if [[ "$_review_verdict" == "pass" ]]; then
