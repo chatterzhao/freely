@@ -9,6 +9,12 @@ created_at: 2026-06-29
 
 # B1_IBM: 统一 fix skill 与 feature skill 的治理顺序
 
+## Discovery
+- 提出时间: 2026-06-29，issue 创建不到 1 天，时效性高
+- 未被其他 candidate/issue 覆盖，是独立的新问题
+- 项目当前处于活跃开发阶段，流程改进直接提升后续所有开发质量
+- 价值确认: ✅ 值得投入。统一 fix/feature 流程是架构级改进，影响所有后续工位
+
 ## Input
 - 来源: raw-20260629T025659Z (GitHub #3616, Gitee IJXH20)
 - 当前 fix skill 流程: `wt-create → dev → test → B1 → B2 → pr`
