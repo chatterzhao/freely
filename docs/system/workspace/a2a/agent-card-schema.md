@@ -60,7 +60,7 @@
           "id": {
             "type": "string",
             "description": "Skill ID",
-            "examples": ["freely-workflow-guarded-execution", "freely-workflow-guarded-execution"]
+            "examples": ["freely-fix-execution", "freely-feature-execution"]
           },
           "name": {
             "type": "string",
@@ -203,8 +203,8 @@
     "worktreeIsolation": true,
     "supportedExitKinds": [],
     "supportedSkills": [
-      "freely-workflow-guarded-execution",
-      "freely-workflow-guarded-execution",
+      "freely-fix-execution",
+      "freely-feature-execution",
       "freely-doc-B1_IBM-execution",
       "freely-doc-B2_IBM-execution"
     ],
@@ -228,14 +228,14 @@
   },
   "skills": [
     {
-      "id": "freely-workflow-guarded-execution",
+      "id": "freely-fix-execution",
       "name": "Bug Fix Execution",
       "description": "快速修复 bug 的特殊高效策略",
       "inputModes": ["text", "json"],
       "outputModes": ["text", "json"]
     },
     {
-      "id": "freely-workflow-guarded-execution",
+      "id": "freely-feature-execution",
       "name": "Feature Execution",
       "description": "新功能/大型改动的完整开发流程",
       "inputModes": ["text", "json"],
@@ -269,8 +269,8 @@
     ],
     "a2aSchema": "https://freely.dev/schemas/a2a-task-v1",
     "supportedSkills": [
-      "freely-workflow-guarded-execution",
-      "freely-workflow-guarded-execution",
+      "freely-fix-execution",
+      "freely-feature-execution",
       "freely-doc-B1_IBM-execution",
       "freely-doc-B2_IBM-execution"
     ],

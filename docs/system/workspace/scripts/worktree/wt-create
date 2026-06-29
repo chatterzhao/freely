@@ -4,47 +4,25 @@ set -euo pipefail
 usage() {
   cat <<USAGE
 Usage:
-  ./bin/wt-create --raw-key <key> --source platform --kind <fix|feature|hotfix> --slug <slug> [--base <branch>]
+  ./bin/wt-create --raw-key <key> --source platform --skill <freely-fix-execution|freely-feature-execution> --slug <slug> [--base <branch>]
   ./bin/wt-create <branch> [--base <base-branch>]    (legacy: 补建 test-pre-merge-*、纯文档、init develop、release 分支)
 
 Required:
   --raw-key <key>     Raw issue key (YYYYMMDDTHHMM[SS]Z format, e.g. 20260513T010343Z)
   --source  platform    Raw issue must exist on a configured platform (created via 'freely feedback')
-  --kind    <fix|feature|hotfix>    如何选择 → 见下方「--kind 选择指南」
+  --skill   <freely-fix-execution|freely-feature-execution>
+                        freely-fix-execution  — 快速修复 bug
+                        freely-feature-execution — 新功能/大型改动
   --slug    <slug>    Short descriptive slug for the worktree
 
 Optional:
   --base <branch>     Base branch (default: develop)
-  --skill  <name>     Override workflow skill (default: freely-workflow-guarded-execution)
 
-── --kind 选择指南 ──────────────────────────────────────────
-
-  --kind 决定两件事: ① 分支前缀（fix/ 或 feature/）
-                    ② RED 阶段怎么做（fix RED = 复现，feature RED = 设计新测试）
-
-  --kind fix     bug 可以稳定复现。
-                 已有测试能捕获 → 直接跑，确认 FAIL。
-                 没有测试 → 设计复现测试或手工端到端复现。
-                 RED 含义: bug 存在时按测试方法测试一定是 RED，修复正确后，用修复前一样的测试方法，结论一定是 GREEN
-                 分支: fix/raw-{raw-key}-{slug}
-
-  --kind feature 新功能、重构、优化、架构改进。
-                 RED 阶段按端到端→集成→单元设计新测试，全部 FAIL 才进 dev。
-                 RED 含义: 功能未实现时，按测试方法测试一定是 RED，实现正确后，用实现前一样的测试方法，结论一定是 GREEN
-                 分支: feature/raw-{raw-key}-{slug}
-                 注意: 如果 bug 修复同时需要实现紧相关的新功能 →
-                       拆为两个 raw issue，分别 wt-create。
-
-  --kind hotfix  紧急修复，从 main 创建，合并到 main + develop。
-                 其他流程与 fix 完全一致（测试不可跳过）。
-                 分支: hotfix/<desc>-<YYYYMMDD>
-
-  选了 --kind 之后，skill:freely-test-RED-execution 会根据
-  fix/feature 自动采用对应的 RED 策略。
-
-── 创建内容 ──────────────────────────────────────────────────
-
+What it creates:
   1. {prefix}/raw-{raw-key}-{slug}    ← based on --base (develop), the permanent dev worktree
+     prefix is derived from --skill:
+       freely-fix-execution   → fix/raw-{raw-key}-{slug}
+       freely-feature-execution  → feature/raw-{raw-key}-{slug}
   2. test-pre-merge-{raw-key}-{slug}  ← based on ①, discardable testing sandbox
 
 Before wt-create, create the raw issue on a configured platform first:
@@ -53,7 +31,7 @@ Before wt-create, create the raw issue on a configured platform first:
 Example:
   freely feedback --repo chatterzhao/freely --title "描述" --body "..."
   ./bin/wt-create --raw-key <returned-key> --source platform \
-    --kind fix --slug task-mode-wait-prelaunch-gate
+    --skill freely-fix-execution --slug task-mode-wait-prelaunch-gate
 
 Legacy:
   ./bin/wt-create feature/my-task-20260307 --base develop
@@ -69,9 +47,8 @@ fi
 
 raw_key=""
 source_val=""
-skill_name="freely-workflow-guarded-execution"
-skill_path="docs/system/workspace/skills/freely-workflow-guarded-execution/SKILL.md"
-branch_kind=""
+skill_name=""
+skill_path=""
 slug=""
 base="develop"
 legacy_branch=""
@@ -88,18 +65,14 @@ while [[ $# -gt 0 ]]; do
       [[ -n "$source_val" ]] || { echo "Missing value for --source" >&2; exit 1; }
       shift 2
       ;;
-    --kind)
-      branch_kind="${2:-}"
-      [[ -n "$branch_kind" ]] || { echo "Missing value for --kind" >&2; exit 1; }
-      case "$branch_kind" in
-        fix|feature|hotfix) ;;
-        *) echo "Invalid --kind '$branch_kind'. Must be 'fix', 'feature', or 'hotfix'." >&2; exit 1 ;;
-      esac
-      shift 2
-      ;;
     --skill)
       skill_name="${2:-}"
-      skill_path="docs/system/workspace/skills/${skill_name}/SKILL.md"
+      [[ -n "$skill_name" ]] || { echo "Missing value for --skill" >&2; exit 1; }
+      # Resolve name to path: freely-fix-execution → docs/system/workspace/skills/freely-fix-execution/SKILL.md
+      case "$skill_name" in
+        freely-fix-execution|freely-feature-execution) skill_path="docs/system/workspace/skills/${skill_name}/SKILL.md" ;;
+        *) echo "Invalid --skill '$skill_name'. Must be 'freely-fix-execution' or 'freely-feature-execution'." >&2; exit 1 ;;
+      esac
       shift 2
       ;;
     --slug)
@@ -151,50 +124,17 @@ Missing required: --source
 
   If the scan file doesn't have this key, wt-create will auto-run scan once.
 
-Usage: ./bin/wt-create --raw-key <key> --source platform --kind <fix|feature|hotfix> --slug <slug>
+Usage: ./bin/wt-create --raw-key <key> --source platform --skill <path> --slug <slug>
 MSG
     exit 1
   fi
-  if [[ -z "$branch_kind" ]]; then
-    # Fallback: try to read kind from raw issue (set by 'freely feedback --kind')
-    local _raw_issue_file="docs/issues/raw-${raw_key}/issue.md"
-    if [[ -f "$_raw_issue_file" ]]; then
-      branch_kind=$(grep -m1 '^- kind:' "$_raw_issue_file" 2>/dev/null | sed 's/^- kind: *//' || true)
-    fi
-    if [[ -z "$branch_kind" ]]; then
-      cat >&2 <<KIND_ERR
-Missing required: --kind
-
-  --kind 未在 wt-create 命令行指定，且 raw issue 中也未找到。
-
-  请在 feedback 阶段就选好 kind:
-    freely feedback --title "..." --body "..." --kind fix
-    freely feedback --title "..." --body "..." --kind feature
-
-  或直接在 wt-create 显式指定:
-    wt-create ... --kind fix
-    wt-create ... --kind feature
-
-  --kind 怎么选（仔细分析，选错会影响 RED 阶段行为）:
-
-    fix     bug 可以稳定复现。已有测试能捕获，或可以手工端到端复现。
-            RED 阶段 = 复现——bug 存在时按测试方法测试一定是 RED，修复正确后，用修复前一样的测试方法，结论一定是 GREEN
-            分支: fix/raw-{key}-{slug}
-
-    feature 新功能、重构、优化、架构改进。
-            RED 阶段 = 功能未实现时，按测试方法测试一定是 RED，实现正确后，用实现前一样的测试方法，结论一定是 GREEN
-            分支: feature/raw-{key}-{slug}
-
-    hotfix  紧急修复，从 main 创建，合并到 main + develop
-            （其他流程与 fix 完全一致，测试不可跳过）
-
-    如果 bug 修复同时需要实现紧相关的新功能 →
-    拆为两个 raw issue，分别 feedback + wt-create。
-
-KIND_ERR
-      exit 1
-    fi
-    echo "wt-create: using kind='${branch_kind}' from raw issue"
+  if [[ -z "$skill_path" ]]; then
+    echo "Missing required: --skill" >&2
+    echo "  Valid values:" >&2
+    echo "    freely-fix-execution   (bug fixes)" >&2
+    echo "    freely-feature-execution  (new features)" >&2
+    echo "Usage: ./bin/wt-create --raw-key <key> --source <source> --skill <path> --slug <slug>" >&2
+    exit 1
   fi
   if [[ -z "$slug" ]]; then
     echo "Missing required: --slug" >&2; usage; exit 1
@@ -210,7 +150,7 @@ if [[ "$using_new" -eq 1 ]]; then
     chat-inbox|local)
       echo "Invalid --source '$source_val'. Only 'platform' is allowed." >&2
       echo "  Raw issues must be created on a configured platform via 'freely feedback' first." >&2
-      echo "  Then use: wt-create --raw-key <key> --source platform --kind <fix|feature|hotfix> --slug <slug>" >&2
+      echo "  Then use: wt-create --raw-key <key> --source platform --skill <skill> --slug <slug>" >&2
       exit 1
       ;;
     *)
@@ -221,16 +161,17 @@ if [[ "$using_new" -eq 1 ]]; then
   esac
 fi
 
-# ── Derive prefix from --kind ──────────────────────
+# ── Derive prefix from --skill path ──────────────────────
 
 if [[ "$using_new" -eq 1 ]]; then
-  case "$branch_kind" in
-    fix)     prefix="fix" ;;
-    feature) prefix="feature" ;;
-    hotfix)  prefix="hotfix" ;;
+  case "$skill_path" in
+    *freely-fix-execution/SKILL.md)   prefix="fix" ;;
+    *freely-feature-execution/SKILL.md)  prefix="feature" ;;
     *)
-      echo "Unrecognized --kind: $branch_kind" >&2
-      echo "  Must be one of: fix, feature, hotfix" >&2
+      echo "Unrecognized --skill path: $skill_path" >&2
+      echo "  Must be one of:" >&2
+      echo "    docs/system/workspace/skills/freely-fix-execution/SKILL.md" >&2
+      echo "    docs/system/workspace/skills/freely-feature-execution/SKILL.md" >&2
       exit 1
       ;;
   esac
@@ -485,7 +426,7 @@ _require_issue_exists() {
               echo "  如果出错是因为还没有创建 raw issue：" >&2
               echo "    请使用 ./bin/freely feedback 命令创建 raw issue" >&2
               echo "    如果不清楚用法，请运行 ./bin/freely feedback --help" >&2
-              echo "  创建后重试: wt-create --raw-key $raw_key --source platform --kind <fix|feature|hotfix> --slug <slug>" >&2
+              echo "  创建后重试: wt-create --raw-key $raw_key --source platform --skill <skill> --slug <slug>" >&2
               return 1
             fi
             ;;
@@ -493,13 +434,13 @@ _require_issue_exists() {
             # All sources other than platform: redirect to feedback → platform flow
             if [[ -d "$ROOT_DIR/docs/issues/raw-$raw_key" ]] || [[ -d "$ROOT_DIR/docs/issues/$key" ]]; then
               echo "  发现本地 issue 文件，请使用 --source platform:" >&2
-              echo "    wt-create --raw-key $raw_key --source platform --kind <fix|feature|hotfix> --slug <slug>" >&2
+              echo "    wt-create --raw-key $raw_key --source platform --skill <skill> --slug <slug>" >&2
             else
               echo "拒绝创建工位: raw-$raw_key 不存在" >&2
               echo "  如果出错是因为还没有创建 raw issue：" >&2
               echo "    请使用 ./bin/freely feedback 命令创建 raw issue" >&2
               echo "    如果不清楚用法，请运行 ./bin/freely feedback --help" >&2
-              echo "  创建后重试: wt-create --raw-key $raw_key --source platform --kind <fix|feature|hotfix> --slug <slug>" >&2
+              echo "  创建后重试: wt-create --raw-key $raw_key --source platform --skill <skill> --slug <slug>" >&2
             fi
             return 1
             ;;
@@ -816,7 +757,7 @@ Branch:
 Execution base:
   $base
 
-  wt-create 标准模式: --raw-key <key> --source platform --kind <fix|feature|hotfix> --slug <slug>
+  wt-create 标准模式: --raw-key <key> --source platform --skill <freely-fix-execution|freely-feature-execution> --slug <slug>
     使用场景：从 raw issue 创建 fix|hotfix|feature + test-pre-merge 工位对，走完整 IBM 治理链路
   wt-create legacy 模式: <branch>
     使用场景：已有 fix|hotfix|feature 开发工位但缺 test-pre-merge-<raw-key>-<slug> 时补建测试工位、

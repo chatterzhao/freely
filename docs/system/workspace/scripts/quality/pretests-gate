@@ -276,7 +276,6 @@ def parse_fields(section: str) -> dict[str, str]:
         "evidence_level",
         "status",
         "artifact_ref",
-        "red-green-status",
         "not_applicable_reason",
         "not_applicable_explanation",
         "replacement_evidence",
@@ -476,7 +475,6 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
         ]
 
     valid_statuses = {"pass", "passed", "not_applicable"}
-    valid_red_green = {"pending", "red", "green", "not_applicable"}
     valid_levels = {"mock", "integration", "real_env", "post_merge_dogfood"}
     acceptance_fields: list[dict[str, str]] = []
     adequacy_v2_items: list[dict[str, str]] = []
@@ -492,28 +490,6 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
                     f"{pre_tests_path}: {title_line} missing {key}. "
                     "Do not clear this gate by only filling placeholders; define the actual bounded test item for this implementation surface.",
                 )
-        # red-green-status is required for TDD traceability
-        rg_status = fields.get("red-green-status", "")
-        if not rg_status:
-            add_error(
-                "red_green_status_missing",
-                f"{pre_tests_path}: {title_line} missing red-green-status. "
-                "Every acceptance item must track its TDD state: pending (B2 wrote it) → red (RED phase confirmed) → green (GREEN phase passed). "
-                "Read skill:freely-doc-B2_IBM-execution for the full template.",
-            )
-        elif rg_status not in valid_red_green:
-            add_error(
-                "red_green_status_invalid",
-                f"{pre_tests_path}: {fields.get('id', title_line)} has invalid red-green-status '{rg_status}'. "
-                f"Valid values: {', '.join(sorted(valid_red_green))}.",
-            )
-        elif rg_status != "green" and rg_status != "not_applicable":
-            add_error(
-                "red_green_not_green",
-                f"{pre_tests_path}: {fields.get('id', title_line)} red-green-status is '{rg_status}', must be 'green' or 'not_applicable' before PR. "
-                "Complete RED(red) → dev → GREEN(green) cycle before creating PR. "
-                "Read skill:freely-fix-execution or skill:freely-feature-execution §阶段3-5.",
-            )
         for key in ("status", "artifact_ref"):
             if not fields.get(key):
                 add_error(

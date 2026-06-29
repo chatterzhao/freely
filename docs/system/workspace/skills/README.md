@@ -34,7 +34,7 @@
 | M | `freely-premerge-reconcile` | 合并冲突高风险协调 |
 | M | `freely-milestone-planning-state-maintenance` | 里程碑状态维护与排序 |
 | M | `freely-branch-management` | 完整自主分支生命周期 |
-| M | `freely-workflow-guarded-execution` | 新功能完整开发流程编排 |
+| M | `freely-feature-execution` | 新功能完整开发流程编排 |
 | M | `freely-candidate-acceptance-review` | candidate acceptance 独立评审 |
 | M | `freely-watchdog-control-plane` | 外层监督与恢复控制面 |
 | M | `freely-continuity-watchdog` | 上下文连续性监督 |
@@ -49,7 +49,7 @@
 | W | `freely-dev-loop-execution` | scan-selected / handoff-continued issue 的实现与测试 |
 | W | `freely-doc-B1_IBM-execution` | raw issue → brainstorm → candidate |
 | W | `freely-doc-B2_IBM-execution` | scan/A2A/continuity 选出的 issue → prd/tasks/code-review |
-| W | `freely-workflow-guarded-execution` | bug 快速修复流程 |
+| W | `freely-fix-execution` | bug 快速修复流程 |
 | W | `freely-url-content-intake` | URL 内容抓取与结构化 |
 | W | `freely-rust-tauri-toolchain-bootstrap` | Rust/Tauri toolchain 引导 |
 | W | `freely-tool-cc-codex-mcp-runtime` | Codex MCP 运行时安装配置 |
