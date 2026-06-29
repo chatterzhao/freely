@@ -79,7 +79,7 @@ B1_IBM 是 IBM Framework 第一阶段。I（Input）由 `freely wt-create` 命�
   - mode: subagent
   - summary: 审查 #247/#251 门禁拦截历史，确认 skill 修改方向正确
   - verdict: pass
-- promoted_issue_path: docs/issues/I-20260508T011858Z-A/issue.md
+- promoted_issue_path: docs/epics/skill-gate-alignment/skill-gate-fix/raw-20260508T011858Z/issues/I-20260508T011858Z-A.md
 - milestone: M-20260508T011858Z-A
 - session_refs: []
 ```
@@ -94,7 +94,7 @@ B1_IBM 是 IBM Framework 第一阶段。I（Input）由 `freely wt-create` 命�
 1. `C-20260508T011858Z-A`
 - milestone: M-20260508T011858Z-A
 - status: promoted
-- promoted_issue_path: `docs/issues/I-20260508T011858Z-A/issue.md`
+- promoted_issue_path: `docs/epics/skill-gate-alignment/skill-gate-fix/raw-20260508T011858Z/issues/I-20260508T011858Z-A.md`
 ```
 
 注意 `milestone` 使用 `M-{key}-A` 格式，与 candidate 的 key 一致。candidates.md 和 milestones.md 中的 milestone 名称必须一致。
@@ -156,7 +156,7 @@ milestone: M-20260508T011858Z-A
   - mode: plan-subagent
   - summary: 评审摘要
   - verdict: pass
-- promoted_issue_path: docs/issues/I-20260508T011858Z-A/issue.md
+- promoted_issue_path: docs/epics/{epic}/{story}/raw-20260508T011858Z/issues/I-20260508T011858Z-A.md
 - milestone: M-20260508T011858Z-A
 - session_refs: []
 ```

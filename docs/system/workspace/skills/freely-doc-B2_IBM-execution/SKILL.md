@@ -31,7 +31,7 @@ B2_IBM 是 IBM Framework 第二阶段。消费 `freely-doc-B1_IBM-execution` ski
 
 ### I：Input — B1_IBM 产生的 promoted candidate
 
-从 `docs/milestones.md` → candidate_issues 中取 status=promoted 的 candidate（C-{key}-A）。
+从 `docs/milestones.md` → candidate_issues 中取 status=promoted 的 candidate。
 candidate 的 `promoted_issue_path` 字段包含了 I-* issue 文档的目标路径。
 这个 candidate 由 `freely-doc-B1_IBM-execution` skill 产出，已排期、已绑 milestone。
 
@@ -338,11 +338,12 @@ phase_state: done_b2_ibm
 
 ## 工作流
 
-1. 确认 Input：milestone committed_issues 中的 I-{key} 存在
-2. 读取 [issue-materialization-checklist.md](references/issue-materialization-checklist.md)
-3. Materialize I-* issue 到 `docs/epics/{epic}/{story}/issues/`
-4. 写 prd.md、pre-tests.md、tasks.md
-5. 写 code-review（含 Implementation Decision Note）
-6. 更新 milestones.md committed_issues
+1. 确认 Input：milestones.md candidate_issues 中有 status=promoted 的 candidate
+2. 读取 candidate 的 `promoted_issue_path`，确认 I-* issue 目标路径
+3. 读取 [issue-materialization-checklist.md](references/issue-materialization-checklist.md)
+4. Materialize I-* issue 到 `docs/epics/{epic}/{story}/raw-{raw-key}/issues/`
+5. 写 prd.md、pre-tests.md、tasks.md
+6. 写 code-review（含 Implementation Decision Note）
+7. 更新 milestones.md committed_issues（写入物化后的 I-* issue）
 7. 若发现边界外新问题：返回 `next_recommended_route=freely-doc-B1_IBM-execution`
 8. B2_IBM 完成后，进入 RED 阶段（skill:freely-test-RED-execution）确认全部测试 RED → dev-loop 实现 → GREEN → pr-create-guarded（提 PR）→ pr-merge-guarded（门禁合并）→ wt-close（收口）
