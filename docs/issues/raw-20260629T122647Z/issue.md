@@ -21,6 +21,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
+absorbed_into: I-20260629T122647Z-A
 ---
 
 \n\n## 背景
