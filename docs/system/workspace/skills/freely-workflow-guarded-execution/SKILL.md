@@ -1,6 +1,6 @@
 ---
 name: freely-workflow-guarded-execution
-description: Freely 开发工作流统一入口。feedback 之后、wt-create 之前必须加载。定义 fix 和 feature 的完整 B1→B2→RED→dev→test-GREEN→pr→merge→close 流程。fix 与 feature 的唯一语义差异在 RED 阶段：fix RED = 复现 bug，feature RED = 设计测试——功能未实现时，按测试方法测试一定是 RED，实现正确后，用实现前一样的测试方法，结论一定是 GREEN
+description: Freely 所有开发工作的唯一流程入口。拿到任务后、freely wt-create 命令建工位前必须加载本 skill。定义 fix 和 feature 的完整 freely-doc-B1_IBM-execution→freely-doc-B2_IBM-execution→freely-test-RED-execution→freely-dev-loop-execution→freely-test-execution→freely pr-create-guarded→freely pr-merge-guarded→freely wt-close 流程。fix 与 feature 的唯一语义差异在 freely-test-RED-execution 阶段
 ---
 
 # skill:freely-workflow-guarded-execution
@@ -26,27 +26,27 @@ description: Freely 开发工作流统一入口。feedback 之后、wt-create �
 
 ## 定位
 
-**Freely 所有开发工作的唯一流程入口。** feedback 创建 raw issue 后、wt-create 建工位前必须加载本 skill。
+**Freely 所有开发工作的唯一流程入口。** 在 `freely feedback` 命令创建 raw issue 之后、`freely wt-create` 命令建工位之前，必须先加载本 `freely-workflow-guarded-execution` skill。
 
-fix（bug修复）和 feature（新功能/大型改动）共用同一个流程，唯一语义差异在 RED 阶段：
+fix（bug修复）和 feature（新功能/大型改动）共用同一个流程，唯一语义差异在 `freely-test-RED-execution` skill 阶段：
 
 | 维度 | fix | feature |
 |------|-----|---------|
 | 分支前缀 | `fix/*` / `hotfix/*` | `feature/*` |
-| wt-create | `--kind fix` | `--kind feature` |
-| B1/B2/门禁 | 完全一致 | 完全一致 |
+| `freely wt-create` 命令 | `--kind fix` | `--kind feature` |
+| `freely-doc-B1_IBM-execution` / `freely-doc-B2_IBM-execution` / 门禁 | 完全一致 | 完全一致 |
 | hotfix | 合并到 main + develop | 无 |
 
-## fix 与 feature 的唯一差异：RED 阶段
+## fix 与 feature 的唯一差异：`freely-test-RED-execution` skill 阶段
 
-流程结构完全一致。唯一语义差异在 RED 阶段——测试方法相同，结论不同：
+流程结构完全一致。唯一语义差异在 `freely-test-RED-execution` skill 阶段——测试方法相同，结论不同：
 
 | | fix RED | feature RED |
 |------|----------|------------|
 | **测试方法** | 已有测试 / 新测试 / 手工端到端复现 | 端到端（必须）→ 集成 → 单元 |
 | **RED 结论** | bug 存在时测试一定是 RED | 功能未实现时测试一定是 RED |
 | **GREEN 结论** | 修复正确后，同一套测试一定是 GREEN | 实现正确后，同一套测试一定是 GREEN |
-| **意外 PASS** | bug 不存在/测试写错了 → 回 B2 修 | 功能已存在/测试写错了 → 回 B2 修 |
+| **意外 PASS** | bug 不存在/测试写错了 → 用 `freely-doc-B2_IBM-execution` skill 修正测试设计 | 功能已存在/测试写错了 → 用 `freely-doc-B2_IBM-execution` skill 修正测试设计 |
 
 详细执行步骤见 `skill:freely-test-RED-execution`。workflow skill 不重复描述——编排交给本 skill，执行交给子 skill。
 
@@ -74,12 +74,12 @@ hotfix/*          → main + develop
 
 | 原 feature 工位 | 做法 |
 |---|---|
-| **还在** | 直接在 feature 上做完整流程 |
-| **已退役（已合并/已删）** | wt-create --kind fix 创建 fix 工位 |
+| **还在** | 直接在 feature 工位上走完整流程：`freely-doc-B1_IBM-execution` skill → `freely-doc-B2_IBM-execution` skill → `freely-test-RED-execution` skill → `freely-dev-loop-execution` skill → `freely-test-execution` skill |
+| **已退役（已合并/已删）** | 用 `freely wt-create --kind fix` 命令创建 fix 工位 |
 
 ### 再判严重程度
 
-| 类型 | 分支 | wt-create |
+| 类型 | 分支 | `freely wt-create` 命令 |
 |---|---|---|
 | 普通 fix | `fix/raw-{key}-{slug}` | `--kind fix` |
 | 紧急 hotfix | `hotfix/<desc>-<YYYYMMDD>` | `--kind hotfix` |
@@ -91,7 +91,7 @@ hotfix/*          → main + develop
 
 ### 阶段 0：判题 — 搜索相似 raw issue + 决定创建还是复用
 
-拿到任务后，第一步不是创建 raw issue，也不是直接进入 B1。先做两件事：
+拿到任务后，第一步不是用`freely feedback`命令创建 raw issue，也不是直接用`freely wt-create`命令创建工位，然后就按`freely-doc-B1_IBM-execution`skill 开始工作。先做两件事：
 
 #### 0a. 思考 + 搜索相似 raw issue
 
@@ -106,31 +106,32 @@ hotfix/*          → main + develop
 
 | 你的状态 | 做法 |
 |---------|------|
-| 还没有 raw issue | 不创建新的。用 `./bin/freely comment --issue raw-{key} "..."` 把新发现追加到已有 raw issue |
-| 已有 raw issue，和已有的重复 | 用 `./bin/freely wt-close <branch> --platform-only` 关掉自己这个的平台 issue，用 `./bin/freely comment` 追加到已有的 |
+| 还没有 raw issue | 不创建新的。用 `freely comment --issue raw-{key} "..."` 命令把新发现追加到已有 raw issue |
+| 已有 raw issue，和已有的重复 | 用 `freely wt-close <branch> --platform-only` 命令关掉自己这个的平台 issue，用 `freely comment` 命令追加到已有的 |
 
 **没找到相似的 raw issue：**
 
 | 你的状态 | 做法 |
 |---------|------|
-| 还没有 raw issue | `./bin/freely feedback --title "fix\|feat\|docs\|refactor: <描述>" --kind <fix\|feature> --body "<详细描述>"` |
+| 还没有 raw issue | `freely feedback --title "fix\|feat\|docs\|refactor: <描述>" --kind <fix\|feature> --body "<详细描述>"` 命令 |
 | 已有 raw issue | 进入「前置审视」 |
 
 **已有 raw issue 但描述不准确需要改：**
 
+用 `freely feedback edit` 命令：
 ```
-./bin/freely feedback edit --raw-key <key> --title "..." --body "..."
+freely feedback edit --raw-key <key> --title "..." --body "..."
 ```
 
-拿到 raw-{key} 后，继续用 `./bin/wt-create` 创建工位（见阶段 1）。
+拿到 raw-{key} 后，继续用 `freely wt-create` 命令创建工位（见阶段 1）。
 
 ### 前置审视：剖析 raw issue — B1 起手式
 
-进入 B1 前，必须对 raw issue 做结构化剖析。这不是简单读一遍——而是要拆开看它到底在说什么，为 B1 的 brainstorms 搭好骨架。
+加载 `freely-doc-B1_IBM-execution` skill 之前，必须对 raw issue 做结构化剖析。这不是简单读一遍——而是要拆开看它到底在说什么，为 brainstorms 搭好骨架。
 
 #### 1. 画覆盖域
 
-raw issue 提到了哪些模块、哪些文件、哪些功能点？列出来。每个点 B1 都必须分析到。raw 里写了但 B1 没涉及的 → 遗漏。B1 里凭空出现的 → 偏离。
+raw issue 提到了哪些模块、哪些文件、哪些功能点？列出来。每个点 `freely-doc-B1_IBM-execution` skill 都必须分析到。raw 里写了但 brainstorms 没涉及的 → 遗漏。brainstorms 里凭空出现的 → 偏离。
 
 #### 2. 判 scope
 
@@ -141,7 +142,7 @@ raw issue 提到了哪些模块、哪些文件、哪些功能点？列出来。�
 
 #### 3. 想方案方向
 
-这个问题大概有哪些解法方向？不是现在就做决策，而是让 B1 不要只盯着一个方案走。每个方向要有具体论据，不能只有一句"这个最好"。
+这个问题大概有哪些解法方向？不是现在就做决策，而是让 `freely-doc-B1_IBM-execution` skill 执行时不要只盯着一个方案走。每个方向要有具体论据，不能只有一句"这个最好"。
 
 #### 4. 定 fidelity 基线
 
@@ -153,96 +154,96 @@ candidate 的验收条件必须能从 brainstorms 的 Decision 推导出来。pr
 - 若无价值 → 标记 dropped，写理由，不执行后续流程
 - 若部分有价值 → 明确缩小 scope，说明放弃的部分及理由
 
-### 阶段 1：B1_IBM 预研
+### 阶段 1：`freely-doc-B1_IBM-execution` skill 预研
 
 ```
-1. ./bin/wt-create --raw-key <key> --kind <fix|feature|hotfix> --slug <slug>
-2. cd 到 wt-create 输出的开发工位目录（必须，不 cd 则后续命令在 develop 上执行，直接违规）
-3. skill:freely-doc-B1_IBM-execution
+1. freely wt-create --raw-key <key> --kind <fix|feature|hotfix> --slug <slug>
+2. cd 到 freely wt-create 命令输出的开发工位目录（必须，不 cd 则后续命令在 develop 上执行，直接违规）
+3. 加载 skill:freely-doc-B1_IBM-execution
    → 预研收敛 → candidate 入里程碑
-4. candidate promoted → 进入 B2
+4. candidate promoted → 进入阶段 2
 ```
 
 详细步骤见 `skill:freely-doc-B1_IBM-execution`。
 
-### 阶段 2：B2_IBM
+### 阶段 2：`freely-doc-B2_IBM-execution` skill 设计
 
 ```
-1. skill:freely-doc-B2_IBM-execution
+1. 加载 skill:freely-doc-B2_IBM-execution
    → I-* issue + pre-tests（red-green-status = pending）+ tasks + code-review
    → fix: 写清楚复现方法。feature: 端到端→集成→单元设计测试
-2. phase_state = done_b2_ibm → 进入 RED
+2. phase_state = done_b2_ibm → 进入阶段 3
 ```
 
 详细步骤见 `skill:freely-doc-B2_IBM-execution`。
 
-### 阶段 3：RED（写代码之前。不通过 RED，不允许写实现代码）
+### 阶段 3：`freely-test-RED-execution` skill — 写代码之前，不通过 RED 不允许写实现代码
 
 ```
-1. skill:freely-test-RED-execution
+1. 加载 skill:freely-test-RED-execution
    → fix: 用同一套测试复现 bug，确认 RED
    → feature: 用设计的测试确认功能未实现，确认 RED
-2. 全部 red-green-status = red → 进入 dev
+2. 全部 red-green-status = red → 进入阶段 4
 ```
 
 详细步骤（含意外 PASS 处理）见 `skill:freely-test-RED-execution`。
 
-### 阶段 4：Dev 实现
+### 阶段 4：`freely-dev-loop-execution` skill 实现
 
 ```
-1. skill:freely-dev-loop-execution
+1. 加载 skill:freely-dev-loop-execution
    → 测试先行，代码后行。不碰 pre-tests.md。
    → 写 code-review + Implementation Decision Note
 ```
 
 详细步骤见 `skill:freely-dev-loop-execution`。
 
-### 阶段 5：test-GREEN（测试工位最终验证）
+### 阶段 5：`freely-test-execution` skill — 测试工位最终验证，全量 GREEN
 
 ```
-1. skill:freely-test-execution
+1. 加载 skill:freely-test-execution
    → 在与开发工位 raw key 相同的 test-* 测试工位执行
-   → 先 cherry-pick 同步全部 dev 提交，再跑全量测试
-   → 全部 green → in_verification → pr-create
-   → 不 green → 回阶段 4 修复 → 重新同步 → 重跑
+   → 先 git cherry-pick 同步全部 dev 提交到测试工位，再跑全量测试
+   → 全部 green → in_verification → 进入阶段 6
+   → 不 green → 回阶段 4 用 `freely-dev-loop-execution` skill 修复 → 重新 cherry-pick 同步 → 重跑
 ```
 
 GREEN 判定标准和详细步骤见 `skill:freely-test-execution`。
 
-### 阶段 6：pr-create-guarded 提 PR
+### 阶段 6：`freely pr-create-guarded` 命令提 PR
 
 ```
-1. 在开发工位执行 ./bin/pr-create-guarded
+1. 在开发工位执行 freely pr-create-guarded 命令（禁止在 develop 分支上执行）
 2. 自动完成：pull develop → 冲突处理 → dry-run gate → push → platform-adapter
 ```
 
-### 阶段 7：pr-review-guarded 独立 review
+### 阶段 7：`freely pr-review-guarded` 命令独立 review
 
 ```
-1. ./bin/pr-review-guarded <branch>
+1. freely pr-review-guarded <branch>
 2. 6 维 review → verdict 文档
 ```
 
-### 阶段 8：pr-merge-guarded 门禁合并
+### 阶段 8：`freely pr-merge-guarded` 命令门禁合并
 
 ```
 1. 切换到 develop 分支: git checkout develop
-2. ./bin/pr-merge-guarded develop <branch>
+2. freely pr-merge-guarded develop <branch>
 3. PR gate → promotion gate → merge → develop-push → platform-adapter close
 ```
 
-### 阶段 9：wt-close 收口
+### 阶段 9：`freely wt-close` 命令收口
 
 ```
-1. ./bin/wt-close test-pre-merge-<key>-<slug>  # 先关测试工位
-2. ./bin/wt-close <branch>                      # 再关开发工位
+1. freely wt-close test-pre-merge-<key>-<slug>  # 先关测试工位
+2. freely wt-close <branch>                      # 再关开发工位
 ```
 
 ---
 
 ## Gate 处理
 
-- 合并前必须运行 `./bin/governance-merge-gate --range "develop..HEAD"`
+- 合并前必须运行 `freely pr-merge-guarded --dry-run develop <branch>`（等价于 `governance-merge-gate --range "develop..HEAD"`）
 - `--range` 只检查本分支的变更，不受 develop 预存错误干扰
 - 分支自己的 gate 错误：用对应 skill 修复
 - 预存错误（非本分支引入）：报告但不阻塞
@@ -250,16 +251,16 @@ GREEN 判定标准和详细步骤见 `skill:freely-test-execution`。
 
 ## 硬性规则
 
-- **流程顺序不可变**。B1 → B2 → RED → dev → test-GREEN → pr，fix 和 feature 一致。
+- **流程顺序不可变**。`freely-doc-B1_IBM-execution` → `freely-doc-B2_IBM-execution` → `freely-test-RED-execution` → `freely-dev-loop-execution` → `freely-test-execution` → `freely pr-create-guarded`，fix 和 feature 一致。
 - **不发明新分支名**。只用 `fix/*`、`feature/*`、`hotfix/*`、`test-pre-merge-*`。
-- **test 工位是纯验证沙箱**，禁止在上面直接开发。代码在开发工位写，cherry-pick 到测试工位验证。
-- **B1 必须有根因分析**，不修表面症状。
-- **B2 必须有 pre-tests**，覆盖全部改动面的测试方案，端到端优先。
-- **RED 不可跳过**。不通过 RED 不允许写实现代码。
-- **原 feature 还在就直接在上面修**，不新建工位。
-- `freely pr-create-guarded` 和 `freely pr-merge-guarded` 是提 PR 和合并的唯一合法入口。
-- `freely pr-merge-guarded` 必须在 develop 分支执行。
-- **禁止用原子命令绕过**：gh pr create、gh pr merge --admin、git push --force、git merge。
+- **test-pre-merge-* 工位是纯验证沙箱**，禁止在上面直接开发。代码在开发工位（fix/* 或 feature/*）写，用 `git cherry-pick` 同步到测试工位验证。
+- **`freely-doc-B1_IBM-execution` skill 必须有根因分析**，不修表面症状。
+- **`freely-doc-B2_IBM-execution` skill 必须有 pre-tests**，覆盖全部改动面的测试方案，端到端优先。
+- **`freely-test-RED-execution` skill 不可跳过**。不通过 RED 不允许写实现代码。
+- **原 feature 工位还在就直接在上面修**，不新建工位。
+- `freely pr-create-guarded` 命令和 `freely pr-merge-guarded` 命令是提 PR 和合并的唯一合法入口。
+- `freely pr-merge-guarded` 命令必须在 develop 分支执行。
+- **禁止用原子命令绕过**：`gh pr create`、`gh pr merge --admin`、`git push --force`、`git merge`。
 
 ## 门禁常见坑速查
 
