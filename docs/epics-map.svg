@@ -846,10 +846,12 @@
   <rect id="story-hook-scripts-bin-to-freely" x="55" y="16600.0" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
   <text x="65" y="16615.0" font-size="11" fill="#333">hook-scripts-bin-to-freely</text>
 
-  <rect id="epic-wt-close-raw-key" x="35" y="16646.0" width="700" height="92" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+  <rect id="epic-wt-close-raw-key" x="35" y="16646.0" width="700" height="114" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
   <text x="50" y="16670.0" font-size="13" font-weight="bold" fill="#1a73e8">wt-close-raw-key</text>
   <rect id="story-raw-key-param" x="55" y="16678.0" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
   <rect id="story-raw-key-flag" x="55" y="16700.0" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
+  <rect id="story-args-d-fix" x="55" y="16722.0" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
+  <text x="65" y="16737.0" font-size="11" fill="#333">args-d-fix</text>
   <text x="65" y="16715.0" font-size="11" fill="#333">raw-key-flag</text>
   <text x="65" y="16693.0" font-size="11" fill="#333">raw-key-param</text>
 

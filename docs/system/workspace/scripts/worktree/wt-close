@@ -203,7 +203,11 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-set -- "${args[@]}"
+if [[ ${#args[@]} -gt 0 ]]; then
+  set -- "${args[@]}"
+else
+  set --
+fi
 
 # ── Extract raw key from various formats ──
 # Supports: raw-YYYYMMDDTHHMMSSZ, fix/raw-{key}-{slug}, feature/raw-{key}-{slug}, YYYYMMDDTHHMMSSZ
@@ -1073,7 +1077,7 @@ if [[ "$branch" == fix/raw-* || "$branch" == feature/raw-* ]]; then
           git worktree remove "$_tp_wt" || { echo "wt-close: 删除 test 工位失败" >&2; exit 1; }
         fi
         if git show-ref --verify --quiet "refs/heads/$_tp_branch" 2>/dev/null; then
-          git branch -d "$_tp_branch" || { echo "wt-close: 删除 test 分支失败" >&2; exit 1; }
+          git branch -D "$_tp_branch" || { echo "wt-close: 删除 test 分支失败" >&2; exit 1; }
         fi
         echo "wt-close: test-pre-merge cleaned ✓"
       fi
