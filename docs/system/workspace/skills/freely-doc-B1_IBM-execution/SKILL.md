@@ -3,8 +3,8 @@ name: freely-doc-B1_IBM-execution
 description: >-
   IBM Framework 第一阶段。消费 raw issue 做 Brainstorm 发散收敛，
   产出 candidate 进入 milestone 规划队列。candidate promote 时通过
-  `promoted_issue_id` 决定 I-* issue 的 key 和目标路径（路径格式由
-  `freely-doc-B2_IBM-execution` skill 定义），handoff 给 B2 做实现设计。
+  `promoted_issue_id` 决定 I-* issue 的 key（路径由
+  `freely-doc-B2_IBM-execution` skill 根据 key 自行构造）。
   标准产物：brainstorms.md + candidates.md + milestones.md 更新。
 
   Use when: `freely wt-create` 命令建好工位之后，需要对 raw issue
@@ -46,7 +46,7 @@ B1_IBM 是 IBM Framework 第一阶段。I（Input）由 `freely wt-create` 命�
 3. 读取依赖：已有 milestones.md、相关 epics
 4. 发散→收敛→决策，产出 `docs/pre-brainstorms/{key}--{slug}/brainstorms.md`
 
-### M：Milestone — 创建 milestone 节点（M-{key}-A），candidate 入队，决定 I-* 目标路径
+### M：Milestone — 创建 milestone 节点（M-{key}-A），candidate 入队，决定 I-* 身份标识
 
 1. 从 brainstorms.md 收敛结论产出 `candidates.md`（candidate 文档）。candidate 的 ID 命名规则：`C-{key}-{suffix}`，suffix 从 A 开始递增（C-{key}-A、C-{key}-B...）。**一个 raw issue 通常只有一个 candidate（C-{key}-A）；raw issue scope 过大时拆成多个 candidate。**
 2. 在 `docs/milestones.md` 中创建 `## M-{key}-A` milestone 节点，将 candidate 写入 `candidate_issues` 队列。Milestone ID 与第一个 candidate 对齐（M-{key}-A）。

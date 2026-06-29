@@ -49,7 +49,7 @@ candidate 的 `promoted_issue_id` 字段是 I-* issue 的 key（如 `I-20260508T
 
 **步骤 0：确定 epic-name 和 story-name**（写任何产物前必须先做）。
 
-`{epic}` 是能力域（capability domain），`{story}` 是 epic 下的可交付切片。这是架构决策——基于语义理解，不是从 candidate title 机械提取关键词。详见 [issue-materialization-checklist.md](references/issue-materialization-checklist.md) §如何确定 epic-name 和 story-name。简单原则：
+`{epic-name}` 是能力域（capability domain），`{story-name}` 是 epic 下的可交付切片。这是架构决策——基于语义理解，不是从 candidate title 机械提取关键词。详见 [issue-materialization-checklist.md](references/issue-materialization-checklist.md) §如何确定 epic-name 和 story-name。简单原则：
 - 这个 raw issue 解决的能力问题，和已有 epic 的**能力域重叠** → 复用已有 epic
 - 能力域**正交**（独立可理解、独立可验收）→ 新建 epic
 - 同一 epic 下的新子问题 → 新建 story
@@ -236,7 +236,8 @@ phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
 
 ## 不负责
 
-- 不决定 I-* issue 的 key 和路径（由 `freely-doc-B1_IBM-execution` skill 的 candidate 在 milestones.md candidate_issues 中通过 `promoted_issue_id` 指定）
+- 不决定 I-* issue 的 key（key 由 `freely-doc-B1_IBM-execution` skill 的 candidate 通过 `promoted_issue_id` 指定）
+- **负责**根据 key 确定 epic-name 和 story-name，构造完整路径，物化文件
 - 不实现代码或运行测试（由 `freely-dev-loop-execution` skill 负责）
 - 不直接写 progress（由 `freely-dev-loop-execution` skill 负责）
 
