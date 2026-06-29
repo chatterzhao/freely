@@ -343,13 +343,22 @@ def close_issue(local_id: str, platform_issue_id: str) -> dict[str, dict]:
     return results
 
 
-def update_issue(local_id: str, platform_issue_id: str, title: str = "", body: str = "") -> dict[str, dict]:
-    """Update an issue on all configured platforms."""
+def update_issue(local_id: str, platform_ids: dict, title: str = "", body: str = "") -> dict[str, dict]:
+    """Update an issue on all configured platforms.
+
+    platform_ids is a dict mapping platform -> {issue_id, url, ...}, e.g.:
+      {"github": {"issue_id": "42", "url": "..."}, "gitee": {"issue_id": "17", ...}}
+    """
     results = {}
     for platform in available_platforms():
+        piv = platform_ids.get(platform, {})
+        issue_id = piv.get("issue_id", "") if isinstance(piv, dict) else str(piv)
+        if not issue_id:
+            results[platform] = {"status": "skipped", "error": f"no issue_id for {platform}"}
+            continue
         try:
             if platform == "github":
-                args = ["issue", "edit", "--repo", _gh_repo(), platform_issue_id]
+                args = ["issue", "edit", "--repo", _gh_repo(), issue_id]
                 if title:
                     args += ["--title", title]
                 if body:
@@ -359,7 +368,7 @@ def update_issue(local_id: str, platform_issue_id: str, title: str = "", body: s
             elif platform == "gitee":
                 result = subprocess.run(
                     [sys.executable, str(_RUNTIME_DIR / "gitee-issue.py"),
-                     "--repo", _gitee_repo(), "update", platform_issue_id,
+                     "--repo", _gitee_repo(), "update", issue_id,
                      *(["--title", title] if title else []),
                      *(["--body", body] if body else [])],
                     capture_output=True, text=True
@@ -748,6 +757,13 @@ if __name__ == "__main__":
         local_id, comment_body = sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else ""
         # Look up platform_issue_id from local issue file
         result = _comment_via_local_issue(local_id, comment_body)
+        print(json.dumps(result, indent=2))
+    elif len(sys.argv) > 1 and sys.argv[1] == "update-issue":
+        local_id = sys.argv[2] if len(sys.argv) > 2 else ""
+        platform_ids = json.loads(sys.argv[3]) if len(sys.argv) > 3 else {}
+        title = sys.argv[4] if len(sys.argv) > 4 else ""
+        body = sys.argv[5] if len(sys.argv) > 5 else ""
+        result = update_issue(local_id, platform_ids, title, body)
         print(json.dumps(result, indent=2))
     elif len(sys.argv) > 1 and sys.argv[1] == "create-discussion":
         session_id, title = sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else ""

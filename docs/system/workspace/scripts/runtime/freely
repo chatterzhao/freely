@@ -23445,7 +23445,185 @@ conn.close()
 }
 
 cmd_feedback() {
-  local title="" body="" severity="P2" issue_kind="" raw_key="" stamp="" local_id="" issue_dir="" issue_file="" issue_sync_bin="" sync_result
+  local title="" body="" severity="P2" issue_kind="" raw_key="" stamp="" local_id=""
+  local issue_dir="" issue_file="" issue_sync_bin="" sync_result
+
+  # ── Subcommand detection ──────────────────────────────────
+  local _subcmd="${1:-create}"
+  case "$_subcmd" in
+    edit|create) shift ;;
+    --help|-h) _subcmd="help"; shift ;;
+    --title|--body|--kind|--severity) _subcmd="create" ;;  # legacy: direct args → create
+  esac
+
+  # ── feedback edit ─────────────────────────────────────────
+  if [[ "$_subcmd" == "edit" ]]; then
+    local edit_title="" edit_body="" has_title="" has_body=""
+
+    while [[ $# -gt 0 ]]; do
+      case "$1" in
+        --raw-key) raw_key="${2:-}"; shift 2 ;;
+        --title) edit_title="${2:-}"; has_title="1"; shift 2 ;;
+        --body) edit_body="${2:-}"; has_body="1"; shift 2 ;;
+        --help|-h) cat <<HELP; return 0
+Usage: freely feedback edit --raw-key <key> [--title <text>] [--body <text>]
+
+Edit an existing raw issue — update its title and/or body on all configured
+platforms, then update the local issue.md.
+
+Options:
+  --raw-key <key>   Required. Raw issue key (e.g. 20260629T122254Z).
+  --title <text>    New title for the issue.
+  --body <text>     New body/description for the issue.
+
+At least one of --title or --body must be provided.
+
+Examples:
+  freely feedback edit --raw-key 20260629T122254Z --title "feat: better approach"
+  freely feedback edit --raw-key 20260629T122254Z --body "## 背景\\n\\nUpdated details..."
+  freely feedback edit --raw-key 20260629T122254Z --title "fix: typo" --body "## 修复方案\\n\\n..."
+HELP
+          ;;
+        --repo|--repo=*)
+          log_error "--repo is no longer needed: repo is auto-detected from git remotes. Remove --repo and retry."
+          return 1
+          ;;
+        --*) log_error "unknown option: $1"; return 1 ;;
+        *) break ;;
+      esac
+    done
+
+    [[ -n "$raw_key" ]] || { log_error "--raw-key is required for edit"; return 1; }
+    [[ -n "$has_title" || -n "$has_body" ]] || {
+      log_error "at least one of --title or --body must be provided"
+      return 1
+    }
+
+    local_id="raw-${raw_key}"
+    local _issue_file="$SELF_ROOT/docs/issues/${local_id}/issue.md"
+
+    [[ -f "$_issue_file" ]] || {
+      log_error "local issue file not found: docs/issues/${local_id}/issue.md"
+      echo >&2 "  Use 'freely feedback --help' to create a new issue."
+      echo >&2 "  Or verify the raw-key is correct."
+      return 1
+    }
+
+    # Extract platform_ids and kind from local issue.md YAML frontmatter
+    local _fm_data _platform_ids_json _issue_kind
+    _fm_data=$(python3 -c "
+import sys, json
+with open('$_issue_file') as f:
+    content = f.read()
+parts = content.split('---\n', 2)
+if len(parts) < 2:
+    print(json.dumps({'error': 'no frontmatter'}))
+    sys.exit(1)
+import yaml
+fm = yaml.safe_load(parts[1]) or {}
+print(json.dumps({
+    'platform_ids': fm.get('platform_ids', {}),
+    'kind': fm.get('kind', 'raw')
+}))
+" 2>&1) || {
+      log_error "failed to read issue frontmatter: $_fm_data"
+      return 1
+    }
+
+    _platform_ids_json=$(echo "$_fm_data" | python3 -c "import sys,json; print(json.dumps(json.load(sys.stdin)['platform_ids']))" 2>/dev/null)
+    _issue_kind=$(echo "$_fm_data" | python3 -c "import sys,json; print(json.load(sys.stdin).get('kind','raw'))" 2>/dev/null)
+
+    [[ -n "$_platform_ids_json" && "$_platform_ids_json" != "{}" ]] || {
+      log_error "no platform_ids found in local issue.md — has the issue been synced to a platform?"
+      return 1
+    }
+
+    # Build platform body: prepend kind frontmatter if body is being updated
+    local _platform_body=""
+    if [[ -n "$has_body" ]]; then
+      _platform_body="---\nkind: ${_issue_kind}\n---\n\n${edit_body}"
+    fi
+
+    # Call platform-adapter to update remote issues
+    local _adapter="$SELF_ROOT/docs/system/workspace/scripts/sync/platform-adapter.py"
+    local _adapter_result _updated=0
+
+    echo "[feedback] updating raw-${raw_key}..."
+
+    _adapter_result=$(python3 "$_adapter" update-issue "$local_id" "$_platform_ids_json" "${edit_title}" "${_platform_body}" 2>&1) || {
+      echo "[feedback] ERROR: platform adapter failed (rc=$?)" >&2
+      echo "[feedback] $_adapter_result" >&2
+      return 1
+    }
+    echo "[feedback] adapter output:"
+    echo "$_adapter_result"
+
+    # Check results
+    if echo "$_adapter_result" | grep -q '"status": "updated"'; then
+      _updated=1
+    fi
+
+    if [[ "$_updated" != "1" ]]; then
+      echo "[feedback] ERROR: no platform issue updated" >&2
+      return 1
+    fi
+
+    # Update local issue.md body if --body was provided
+    if [[ -n "$has_body" ]]; then
+      python3 - "$_issue_file" "$edit_body" <<'PYEOF'
+import sys
+file_path = sys.argv[1]
+new_body = sys.argv[2]
+with open(file_path) as f:
+    content = f.read()
+parts = content.split('---\n', 2)
+if len(parts) >= 3:
+    new_content = '---\n' + parts[1] + '---\n\n' + new_body
+    with open(file_path, 'w') as f:
+        f.write(new_content)
+PYEOF
+      echo "[feedback] local issue.md body updated"
+    fi
+
+    echo "[feedback] issue updated: raw-${raw_key}"
+    printf 'raw-%s\n' "$raw_key"
+    return 0
+  fi
+
+  # ── feedback help (explicit freely feedback --help) ─────
+  if [[ "$_subcmd" == "help" ]]; then
+    cat <<HELP
+Usage: freely feedback [create] --title <text> --body <text> --kind <fix|feature> [--severity P0|P1|P2]
+       freely feedback edit --raw-key <key> [--title <text>] [--body <text>]
+
+Commands:
+  create                  Create a new raw issue (default when no command is given).
+  edit                    Edit an existing raw issue — update title/body on all platforms.
+
+Create options:
+  --title <text>     Required. Issue title.
+  --body <text>      Required. Issue body/description.
+  --kind <fix|feature>   Required. Issue kind — determines workflow and RED strategy.
+                        fix:     bug 存在时按测试方法测试一定是 RED，修复正确后，用修复前一样的测试方法，结论一定是 GREEN
+                        feature: 新功能、重构、优化。功能未实现时，按测试方法测试一定是 RED，实现正确后，用实现前一样的测试方法，结论一定是 GREEN
+  --severity <level> Priority: P0 (critical), P1 (high), P2 (default).
+
+Edit options:
+  --raw-key <key>    Required. Raw issue key (e.g. 20260629T122254Z).
+  --title <text>     New title for the issue.
+  --body <text>      New body/description for the issue.
+  At least one of --title or --body must be provided.
+
+Examples:
+  freely feedback --title "fix: something broken" --body "details..." --kind fix
+  freely feedback create --title "feat: new capability" --body "details..." --kind feature --severity P1
+  freely feedback edit --raw-key 20260629T122254Z --title "fix: corrected title"
+  freely feedback edit --raw-key 20260629T122254Z --body "## 修复方案\\n\\nUpdated..."
+HELP
+    return 0
+  fi
+
+  # ── feedback create (existing behaviour) ──────────────────
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -23454,12 +23632,14 @@ cmd_feedback() {
       --kind) issue_kind="${2:-}"; shift 2 ;;
       --severity) severity="${2:-}"; shift 2 ;;
       --help|-h) cat <<HELP; return 0
-Usage: freely feedback --title <text> --body <text> --kind <fix|feature> [--severity P0|P1|P2]
+Usage: freely feedback [create] --title <text> --body <text> --kind <fix|feature> [--severity P0|P1|P2]
+       freely feedback edit --raw-key <key> [--title <text>] [--body <text>]
 
-Create a raw issue on all configured repo platforms (GitHub, Gitee, ...).
-Repo is auto-detected from git remotes — no need to pass it manually.
+Commands:
+  create                  Create a new raw issue (default when no command is given).
+  edit                    Edit an existing raw issue — update title/body on all platforms.
 
-Options:
+Create options:
   --title <text>     Required. Issue title.
   --body <text>      Required. Issue body/description.
   --kind <fix|feature>   Required. Issue kind — determines workflow and RED strategy.
@@ -23467,15 +23647,17 @@ Options:
                         feature: 新功能、重构、优化。功能未实现时，按测试方法测试一定是 RED，实现正确后，用实现前一样的测试方法，结论一定是 GREEN
   --severity <level> Priority: P0 (critical), P1 (high), P2 (default).
 
+Edit options:
+  --raw-key <key>    Required. Raw issue key (e.g. 20260629T122254Z).
+  --title <text>     New title for the issue.
+  --body <text>      New body/description for the issue.
+  At least one of --title or --body must be provided.
+
 Examples:
-
-Before creating a new issue, search for existing open issues on the same topic first.
-If a similar open issue exists, reuse it instead of creating a duplicate:
-  - Comment on the existing issue with additional context
-  - Use the existing raw_key to create/resume a worktree
-
   freely feedback --title "fix: something broken" --body "details..." --kind fix
-  freely feedback --title "feat: new capability" --body "details..." --kind feature --severity P1
+  freely feedback create --title "feat: new capability" --body "details..." --kind feature --severity P1
+  freely feedback edit --raw-key 20260629T122254Z --title "fix: corrected title"
+  freely feedback edit --raw-key 20260629T122254Z --body "## 修复方案\\n\\nUpdated..."
 HELP
         ;;
       --repo|--repo=*)
@@ -23604,8 +23786,8 @@ HELP
 
   echo "[feedback]"
   echo "[feedback] Next: create a worktree to fix or implement:"
-  echo "[feedback]   wt-create --raw-key ${raw_key} --source platform --skill freely-fix-execution --slug <slug>"
-  echo "[feedback]   wt-create --raw-key ${raw_key} --source platform --skill freely-feature-execution --slug <slug>"
+  echo "[feedback]   wt-create --raw-key ${raw_key} --source platform --kind fix --slug <slug>"
+  echo "[feedback]   wt-create --raw-key ${raw_key} --source platform --kind feature --slug <slug>"
 
   printf 'raw-%s\n' "$raw_key"
 }
