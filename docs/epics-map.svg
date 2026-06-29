@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" id="freely-epics-map" viewBox="0 0 1000 16393" width="1000" font-family="monospace">
-<rect id="app-freely" x="10" y="10" width="980" height="16373" fill="none" stroke="#333" stroke-width="3" rx="8"/>
+<svg xmlns="http://www.w3.org/2000/svg" id="freely-epics-map" viewBox="0 0 1000 16475" width="1000" font-family="monospace">
+<rect id="app-freely" x="10" y="10" width="980" height="16455" fill="none" stroke="#333" stroke-width="3" rx="8"/>
 <text x="30" y="38" font-size="20" font-weight="bold" fill="#333">Freely</text>
 <rect id="epic-a2a-h11-noise" x="35" y="55" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="79" font-size="13" font-weight="bold" fill="#1a73e8">a2a-h11-noise</text>
@@ -826,4 +826,9 @@
 <text x="50" y="16346" font-size="13" font-weight="bold" fill="#1a73e8">wt-create-pull-after-worktree</text>
 <rect id="epic-wt-create-skill-prompt" x="35" y="16375" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="16399" font-size="13" font-weight="bold" fill="#1a73e8">wt-create-skill-prompt</text>
+
+<rect id="story-description-and-chain-unify" x="55" y="16450" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
+<text x="65" y="16465" font-size="11" fill="#34a853">├ description-and-chain-unify</text>
+<rect id="epic-skill-docs-optimization" x="35" y="16420" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<text x="50" y="16444" font-size="13" font-weight="bold" fill="#1a73e8">skill-docs-optimization</text>
 </svg>
