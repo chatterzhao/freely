@@ -549,6 +549,14 @@ do_initial_merge() {
       echo "[MERGE-GUARD] PR review: pass ✓"
     fi
   fi
+  # ── Dev↔Test consistency check ──
+  if [[ -n "$_raw_key" ]]; then
+    freely_wt_assert_dev_test_consistent "$_raw_key" || {
+      echo ""
+      echo "  同步后重跑 test-GREEN（skill:freely-test-execution），全部 green 后重新 pr-merge。"
+      exit 1
+    }
+  fi
   run_promotion_gate_if_needed "$target" "$source_branch"
   [[ "$dry_run" == "1" ]] && { echo "[MERGE-GUARD] --dry-run complete."; return 0; }
   # ── Local git merge with receipt ──

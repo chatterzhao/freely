@@ -88,6 +88,20 @@ PHASE
   fi
 fi
 
+# ── Step 0c: Dev↔Test consistency check ──
+if [[ "$_branch" == fix/raw-* || "$_branch" == feature/raw-* ]]; then
+  _raw_key=$(echo "$_branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)
+  if [[ -n "$_raw_key" ]]; then
+    echo "Step 0c/4: dev↔test consistency..."
+    freely_wt_assert_dev_test_consistent "$_raw_key" || {
+      echo ""
+      echo "  同步后重跑 test-GREEN（skill:freely-test-execution），全部 green 后重新 pr-create。"
+      exit 1
+    }
+    echo "Step 0c/4: dev↔test consistent ✓"
+  fi
+fi
+
 # ── Step 2a: epics-map alignment check ──
 echo "Step 2a/4: epics-map alignment..."
 if [[ -x "$ROOT_DIR/bin/check-epics-map" ]]; then

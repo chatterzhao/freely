@@ -506,7 +506,12 @@ NEED_CP
 }
 
 cd "$PROJECT_ROOT" || { echo "Error: cannot cd to $PROJECT_ROOT" >&2; exit 1; }
-_consistency_check "$branch" "$wt_path"
+if [[ "$branch" == fix/raw-* || "$branch" == feature/raw-* ]]; then
+  _raw_key=$(echo "$branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)
+  if [[ -n "$_raw_key" ]]; then
+    _consistency_check "$branch" "$wt_path"
+  fi
+fi
 
 # ── Unmerged commits guard (--force) ──
 if [[ "$FORCE" == true ]]; then

@@ -93,6 +93,15 @@ if [[ -z "$pr_number" ]]; then
 fi
 echo "PR: #$pr_number"
 
+# ── Dev↔Test consistency check ──
+if [[ -n "$_raw_key" ]]; then
+  freely_wt_assert_dev_test_consistent "$_raw_key" || {
+    echo ""
+    echo "  同步后重跑 test-GREEN（skill:freely-test-execution），全部 green 后重新 pr-review。"
+    exit 1
+  }
+fi
+
 # ── Step 2: Find review paths ──
 _raw_key=$(echo "$review_branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)
 # Find all I-* issues under this raw key (may be split: A, B, C...)
