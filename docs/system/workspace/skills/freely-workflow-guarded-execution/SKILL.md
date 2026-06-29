@@ -1,6 +1,6 @@
 ---
 name: freely-workflow-guarded-execution
-description: Freely 开发工作流统一入口。feedback 之后、wt-create 之前必须加载。定义 fix 和 feature 的完整 B1→B2→RED→dev→test-GREEN→pr→merge→close 流程。fix 与 feature 的唯一语义差异在 RED 阶段：fix RED = 复现 bug，feature RED = 设计测试确认功能未实现。
+description: Freely 开发工作流统一入口。feedback 之后、wt-create 之前必须加载。定义 fix 和 feature 的完整 B1→B2→RED→dev→test-GREEN→pr→merge→close 流程。fix 与 feature 的唯一语义差异在 RED 阶段：fix RED = 复现 bug，feature RED = 设计测试——功能未实现时一定是 RED，实现正确后就变 GREEN
 ---
 
 # skill:freely-workflow-guarded-execution

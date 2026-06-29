@@ -23464,7 +23464,7 @@ Options:
   --body <text>      Required. Issue body/description.
   --kind <fix|feature>   Required. Issue kind — determines workflow and RED strategy.
                         fix:     bug 可以稳定复现。RED = 确认 bug 存在。
-                        feature: 新功能、重构、优化。RED = 确认功能未实现。
+                        feature: 新功能、重构、优化。设计测试——功能未实现时一定是 RED，实现正确后就变 GREEN。
   --severity <level> Priority: P0 (critical), P1 (high), P2 (default).
 
 Examples:
@@ -23499,7 +23499,7 @@ HELP
     echo >&2 ""
     echo >&2 "  --kind feature"
     echo >&2 "    新功能、重构、优化、架构改进。"
-    echo >&2 "    RED 阶段 = 按端到端→集成→单元设计新测试，确认功能未实现。"
+    echo >&2 "    RED 阶段 = 设计测试——功能未实现时一定是 RED，实现正确后就变 GREEN。"
     echo >&2 "    分支: feature/raw-{key}-{slug}"
     echo >&2 ""
     echo >&2 "  如果 bug 修复同时需要实现紧相关的新功能 → 拆为两个 raw issue，分别 feedback。"
