@@ -1,6 +1,13 @@
 ---
 name: freely-tdd-review
-description: IBM 链路逐级消化审查。按 raw→B1→B2→实现→测试顺序，每级检查下游是否忠实消化了上游。下层是上层的具体化，能从下层归纳回上层。不是门禁——查内容质量，不查文件存在。
+description: >-
+  IBM 链路逐级消化审查。按 raw issue → B1 brainstorms → B2 设计 →
+  代码实现 → 测试执行四层顺序，每级检查下游是否忠实消化了上游。
+  不是门禁——查内容质量和 fidelity，不查文件存在。
+
+  Use when: PR review 阶段，或 B1/B2/dev 任一阶段完成后需要独立验证
+  消化质量。触发词："review"、"审查"、"消化"、"fidelity"、"评审"、
+  "检查质量"、"逐级审查"。
 ---
 
 # skill:freely-tdd-review
