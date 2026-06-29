@@ -127,7 +127,7 @@ Freely 开发 Freely 时，默认先问四件事：
 阶段0: (可选) [命令] freely feedback --repo <repo> --title "..." --body "..."  — 无 raw issue 时创建
 阶段1: [命令] wt-create --raw-key <key> --source platform --kind <fix|feature|hotfix> --slug <slug>
 阶段2: [skill] skill:freely-doc-B1_IBM-execution（brainstorm → candidate → promote/absorb/drop）
-阶段3: [skill] skill:freely-doc-B2_IBM-execution（I-* → prd/pre-tests/tasks/code-reviews）
+阶段3: [skill] skill:freely-doc-B2_IBM-execution（物化 I-* issue + prd/pre-tests/tasks/code-reviews）
 阶段4: [skill] skill:freely-dev-loop-execution（写代码 → RED-GREEN 验证 → commit）
 > commit 时 checkpoint-guard 输出 scope 诊断（不阻塞）。一个逻辑修改即使 50 个文件也合理，不相关逻辑混在一起即使 1 个文件也违规。按逻辑完整性判，不按文件数判。
 阶段5: [skill] skill:freely-test-execution（test-pre-merge 工位逐条执行 pre-tests → 全绿）
@@ -143,7 +143,7 @@ Freely 开发 Freely 时，默认先问四件事：
 | 0. 反馈 | `freely feedback --repo <repo> --title "..." --body "..."` (raw issue 不存在时) | [命令] | Manager/开发者 |
 | 1. 开工位 | `./bin/wt-create --raw-key <key> --source platform --kind <fix|feature|hotfix> --slug <slug>` | [命令] | Manager/开发者 |
 | 2. B1_IBM 预研 | B1:IBM（brainstorm→candidate→milestone） | [skill] skill:freely-doc-B1_IBM-execution | Worker |
-| 3. B2_IBM 设计 | B2:IBM（I-*→prd/pre-tests/tasks/code-reviews） | [skill] skill:freely-doc-B2_IBM-execution | Worker |
+| 3. B2_IBM 设计 | B2:IBM（物化 I-* issue + prd/pre-tests/tasks/code-reviews） | [skill] skill:freely-doc-B2_IBM-execution | Worker |
 | 4. Dev 实现 | dev-loop-execution → 写代码 → RED-GREEN → commit | [skill] skill:freely-dev-loop-execution | Worker |
 | 5. Test 验证 | test-pre-merge 工位逐条执行 pre-tests → 全绿 | [skill] skill:freely-test-execution | Worker |
 | 6. 提 PR | `./bin/pr-create-guarded` → pull develop → 冲突处理 → dry-run gate → push → platform-adapter | [命令] | Worker/Manager |
@@ -163,7 +163,7 @@ Freely 开发 Freely 时，默认先问四件事：
 - **原 fix|feature worktree 还在** → 直接在 fix|feature 上做 B1→B2→dev→test。走 pr-create → pr-review → pr-merge → develop。
 - **原 feature 已退役（已合并/已删）** → wt-create 创建 fix 工位 + test-pre-merge → B1→B2→dev→test → pr。
 - **普通 fix** 走 `B1 → B2 → dev → test → pr-create → pr-review → pr-merge → develop`；**紧急 hotfix** 用 `hotfix/*`，从 main 创建，合并到 main + develop。测试不可跳过，流程与 fix 完全一致。
-- **治理先行**：B1_IBM（`skill:freely-doc-B1_IBM-execution`：根因分析 → candidate → milestone）→ B2_IBM（`skill:freely-doc-B2_IBM-execution`：I-* → pre-tests → tasks → code-review）→ milestones.md。即使简单 fix 也必须走完整流程。
+- **治理先行**：B1_IBM（`skill:freely-doc-B1_IBM-execution`：根因分析 → candidate → milestone 入队）→ B2_IBM（`skill:freely-doc-B2_IBM-execution`：物化 I-* issue + pre-tests + tasks + code-review）→ milestones.md 更新。即使简单 fix 也必须走完整流程。
 - **原则**：Govern first, code later。治理文档在开发之前，pre-tests 驱动 TDD 实现。
 
 详见 `skill:freely-workflow-guarded-execution`

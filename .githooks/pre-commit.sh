@@ -244,7 +244,7 @@ REASON_GATE
   For implementation changes, complete IBM lifecycle FIRST:
 
     skill:freely-doc-B1_IBM-execution  → raw → brainstorm → candidate → milestones.md
-    skill:freely-doc-B2_IBM-execution  → I-* issue → PRD → tasks → code-review → milestones.md
+    skill:freely-doc-B2_IBM-execution  → 物化 I-* issue 文档 + PRD + tasks + code-review → milestones.md committed_issues
 
   Then commit via proper worktree flow (not directly on develop).
 GUIDE
