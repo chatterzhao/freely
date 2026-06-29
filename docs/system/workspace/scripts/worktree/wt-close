@@ -458,7 +458,7 @@ DIRTY_TEST
 ╔══════════════════════════════════════════════════════════════╗
 ║  ⚠️  wt-close blocked: 测试工位有提交未同步到开发工位        ║
 ╠══════════════════════════════════════════════════════════════╣
-║  开发和对应测试工位不一致，会导致最后测试通过的开发里没有，白干。
+║  开发与测试工位必须一致，否则最后测试通过的代码不在开发里，白干。
 ║                                                              ║
 ║  开发工位: $_dev_wt ($_dev_branch)
 ║  测试工位: $_test_wt (test-pre-merge-$_raw_key-*)
@@ -466,7 +466,7 @@ DIRTY_TEST
 ║  以下提交在测试工位但不在开发工位:                              ║
 ║  $_missing
 ║                                                              ║
-║  请用 cherry-pick 同步到开发工位:                              ║
+║  请用 cherry-pick 同步到开发工位（两边都能互相 cherry-pick）:    ║
 ║    cd $_dev_wt
 ║    git cherry-pick \$(git -C $_test_wt log --format=%H --no-merges $_dev_branch..HEAD)
 ║    git push && pr-review && wt-close
@@ -478,20 +478,27 @@ NEED_CP
   # Check 4: dev has commits not in test (out of sync)
   _missing=$(git -C "$_test_wt" log --oneline --no-merges "HEAD..$_dev_branch" 2>/dev/null || true)
   if [[ -n "$_missing" ]]; then
-    cat >&2 <<NEED_MERGE
+    cat >&2 <<NEED_CP
 ╔══════════════════════════════════════════════════════════════╗
 ║  ⚠️  wt-close blocked: 开发工位有提交未同步到测试工位        ║
 ╠══════════════════════════════════════════════════════════════╣
 ║  开发工位: $_dev_wt ($_dev_branch)
 ║  测试工位: $_test_wt (test-pre-merge-$_raw_key-*)
 ║                                                              ║
+║  开发与测试工位必须一致，否则测试结果没有意义——                  ║
+║  测的不是最终要合并的代码。                                    ║
+║                                                              ║
 ║  以下提交在开发工位但不在测试工位:                              ║
 ║  $_missing
 ║                                                              ║
-║  请合并: cd $_test_wt && git merge $_dev_branch --no-edit
-║    git push && pr-review && wt-close
+║  请用 cherry-pick 同步（两边都能互相 cherry-pick）:             ║
+║    cd $_test_wt
+║    git cherry-pick \$(git -C $_dev_wt log --format=%H --no-merges HEAD..$_dev_branch)
+║                                                              ║
+║  同步后必须在测试工位重跑 pre-tests，验证最终代码。             ║
+║  全部 passed 后再 git push && pr-review && wt-close           ║
 ╚══════════════════════════════════════════════════════════════╝
-NEED_MERGE
+NEED_CP
     exit 1
   fi
 
