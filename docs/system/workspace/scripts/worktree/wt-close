@@ -27,14 +27,22 @@ DRY_RUN=false
 usage() {
   cat <<USAGE
 Usage:
-  ./bin/wt-close <branch> [options]
+  ./bin/wt-close <branch|raw-key> [options]
 
 Close a fix|feature worktree and its platform issue.  The command validates
 phase_state, checks dev↔test worktree consistency, closes the platform issue,
 removes the worktree directory, and deletes the branch.
 
 Arguments:
-  <branch>           Branch name (fix/raw-YYYYMMDDTHHMMSSZ-<slug>) or worktree path
+  <branch|raw-key>    Branch name or raw issue key.  IMPORTANT: 只传 fix|feature
+                      分支名或 raw key——不要传 test-pre-merge-* 分支名。
+                      The companion test-pre-merge worktree is auto-discovered
+                      via raw-key matching and cleaned up automatically.
+
+                      Examples:
+                        ./bin/wt-close fix/raw-20260629T160852Z-my-fix
+                        ./bin/wt-close raw-20260629T160852Z
+                        ./bin/wt-close feature/raw-20260629T160852Z-my-feat
 
 Options (按场景选择，互斥):
   --reason <text>    REQUIRED with any bypass flag below.  Format:
@@ -67,8 +75,11 @@ Options (按场景选择，互斥):
   --dry-run          只打印操作，不执行。
 
 Scenarios:
-  # PR 已 merge，正常收口
+  # PR 已 merge，正常收口（传分支名）
   ./bin/wt-close fix/raw-20260627T021849Z-my-fix
+
+  # PR 已 merge，正常收口（传 raw key——效果相同）
+  ./bin/wt-close raw-20260627T021849Z
 
   # 确定放弃此 issue，丢弃所有修改
   ./bin/wt-close fix/raw-xxx --force --reason "违规绕过门禁中，理由充分，是：该功能确定放弃"
@@ -79,8 +90,8 @@ Scenarios:
   # 工位已手动删除，只关闭平台 issue
   ./bin/wt-close fix/raw-xxx --platform-only --reason "违规绕过门禁中，理由充分，是：工位已清理仅剩平台 issue"
 
-  # test-pre-merge 工位 (自动 --force + --skip-platform)
-  ./bin/wt-close test-pre-merge-20260627T021849Z-my-fix
+  # 注意：不要传 test-pre-merge-* 分支名——wt-close 会根据 raw key
+  # 自动发现并清理 companion test-pre-merge 工位，无需单独操作。
 USAGE
 }
 
@@ -190,6 +201,23 @@ done
 
 set -- "${args[@]}"
 input="${1:-}"
+
+# ── Raw key → branch resolution ──
+# If input is a raw key (raw-YYYYMMDDTHHMMSSZ), derive the fix|feature branch.
+# This mirrors wt-create --raw-key for symmetric API.
+if [[ "$input" =~ ^raw-[0-9]{8}T[0-9]{4,6}Z$ ]]; then
+  _raw_key_input="$input"
+  _matched_branch=$(git branch --list "fix/raw-${_raw_key_input#raw-}-*" "feature/raw-${_raw_key_input#raw-}-*" 2>/dev/null | sed 's/^[* ]*//' | head -1 || true)
+  if [[ -z "$_matched_branch" ]]; then
+    echo "Error: no fix/feature branch found for raw key '$_raw_key_input'" >&2
+    echo "  Searched: fix/raw-* and feature/raw-* with key '${_raw_key_input#raw-}'" >&2
+    echo "  If the worktree still exists, pass the branch name directly:" >&2
+    echo "    ./bin/wt-close fix/raw-${_raw_key_input#raw-}-<slug>" >&2
+    exit 1
+  fi
+  input="$_matched_branch"
+  echo "wt-close: raw key '$_raw_key_input' → branch '$input'"
+fi
 
 # ── --reason gate: bypass flags require valid reason (except test-pre-merge) ──
 # Reason must start with "违规绕过门禁中，理由充分，是：" to prevent casual abuse.
