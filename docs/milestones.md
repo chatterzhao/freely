@@ -1,3 +1,15 @@
+
+## M-20260629T122647Z-A
+- title: feat: freely feedback edit — 编辑已有 raw issue 的标题和正文
+- status: active
+### candidate_issues
+### committed_issues
+1. `I-20260629T122647Z-A`
+- title: feat: freely feedback edit; milestone_state: completed
+- issue_path: `docs/epics/feedback-edit/edit-subcommand/raw-20260629T122647Z/issues/I-20260629T122647Z-A.md`
+- phase_state: `completed`
+### completed_issues
+
 ## M-20260629T025659Z-A
 - title: unify fix skill governance order — B1→B2→dev→test
 - status: active
