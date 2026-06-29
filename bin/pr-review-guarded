@@ -107,23 +107,40 @@ fi
 
 # ── Step 2: Find review paths ──
 _raw_key=$(echo "$review_branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)
-# Find all I-* issues under this raw key (may be split: A, B, C...)
-# New structure: docs/epics/{epic}/{story}/raw-{raw_key}/issues/I-{raw_key}-*.md
+
+# Resolve fix worktree path FIRST (needed for path search even when run from develop)
+_wt_path=$(git worktree list --porcelain 2>/dev/null | awk -v br="refs/heads/$review_branch" '
+  $1=="worktree" { wt=$2 }
+  $1=="branch" && $2==br { print wt; exit }
+')
+_wt_path="${_wt_path:-$ROOT_DIR}"
+
+# Find all I-* issues under this raw key
+# Search in fix worktree first (canonical), then fallback to current worktree
 _all_issues=()
 _raw_issues_dir=""
-_raw_i_glob="docs/epics/*/*/raw-${_raw_key}/issues/I-${_raw_key#raw-}-*.md"
-for _f in $_raw_i_glob; do
-  [[ -f "$_f" ]] || continue
-  _raw_issues_dir="$(dirname "$_f")"
-  _bn=$(basename "$_f" .md)
-  _all_issues+=("$_bn")
-done
-# Fallback: broad search
-if [[ ${#_all_issues[@]} -eq 0 ]]; then
-  while IFS= read -r _f; do
+_search_roots=("$_wt_path" "$ROOT_DIR")
+for _sr in "${_search_roots[@]}"; do
+  [[ -d "$_sr" ]] || continue
+  _raw_i_glob="$_sr/docs/epics/*/*/raw-${_raw_key}/issues/I-${_raw_key#raw-}-*.md"
+  for _f in $_raw_i_glob; do
+    [[ -f "$_f" ]] || continue
+    _raw_issues_dir="$(dirname "$_f")"
     _bn=$(basename "$_f" .md)
-    [[ "$_bn" = I-${_raw_key#raw-}-* ]] && _all_issues+=("$_bn")
-  done < <(find docs/epics -path "*/raw-*/issues/I-*.md" -print 2>/dev/null | head -5)
+    _all_issues+=("$_bn")
+  done
+  [[ ${#_all_issues[@]} -gt 0 ]] && break
+done
+# Fallback: broad search in fix worktree then current
+if [[ ${#_all_issues[@]} -eq 0 ]]; then
+  for _sr in "${_search_roots[@]}"; do
+    [[ -d "$_sr" ]] || continue
+    while IFS= read -r _f; do
+      _bn=$(basename "$_f" .md)
+      [[ "$_bn" = I-${_raw_key#raw-}-* ]] && _all_issues+=("$_bn")
+    done < <(find "$_sr/docs/epics" -path "*/raw-*/issues/I-*.md" -print 2>/dev/null | head -5)
+    [[ ${#_all_issues[@]} -gt 0 ]] && break
+  done
 fi
 _issue_id="${_all_issues[0]:-I-${_raw_key#raw-}-A}"
 _epic_dir=""
@@ -150,90 +167,119 @@ mkdir -p "$REVIEW_STATE_DIR"
 echo "Review document: $review_file"
 echo ""
 
-# ── Step 3: TDD Review via ACP Reviewer ──
-# Resolve slot
-# Use freely-review if available
+# ── Step 3: ACP availability check ──
+# Check BEFORE calling any ACP-dependent tool (freely-review or raw ACP client).
+_acp_available=0
+_acp_unavailable_reason=""
+_acp_bridge_socket=""
+
+_freely_pid=$(pgrep -f 'freely.*daemon\|freely.*start\|freely.*ensure' 2>/dev/null | head -1 || true)
+if [[ -z "$_freely_pid" ]]; then
+  _acp_unavailable_reason="freely daemon 未运行"
+else
+  for _sock in /tmp/freely-acp-*.sock; do
+    if [[ -S "$_sock" ]]; then
+      _acp_bridge_socket="$_sock"
+      break
+    fi
+  done
+  if [[ -z "$_acp_bridge_socket" ]]; then
+    _acp_unavailable_reason="freely daemon 运行中（PID $_freely_pid）但 ACP socket 不存在"
+  elif [[ ! -x "$ACP_PROMPT_CLIENT" ]]; then
+    _acp_unavailable_reason="ACP socket 存在但 run-acp-prompt.py 不可执行"
+  else
+    _acp_available=1
+  fi
+fi
+
+# ── Step 3.5: Call Reviewer (ACP or manual fallback) ──
 _my_worker_id=""
 if [[ -f "$ROOT_DIR/.freely/agent-id.env" ]]; then
   _my_worker_id=$(grep "$(pwd)" "$ROOT_DIR/.freely/agent-id.env" 2>/dev/null | tail -1 | grep -o 'worker_[0-9]*' || true)
 fi
 [[ -z "$_my_worker_id" ]] && _my_worker_id="worker_01"
+
+# Only try freely-review or raw ACP if bridge is actually available
+if [[ "$_acp_available" == "1" ]]; then
+  echo "ACP bridge: $_acp_bridge_socket (freely PID $_freely_pid)"
+
   if [[ -x "$ROOT_DIR/bin/freely-review" ]]; then
-  # freely-review launches reviewer agent with full context.
-  # Review doc is written by the reviewer agent (via freely-review output), not auto-generated here.
-  if [[ "$verdict_override" == "pass" && -n "$verdict_reason" ]]; then
-    _review_verdict="pass"
-  else
-    _review_output=$("$ROOT_DIR/bin/freely-review" --caller worker --agent-id "$_my_worker_id" --raw-key "$_raw_key" 2>&1) || _freely_rc=$?
-    # freely-review exits 0 when: ACP review passed OR ACP bridge unavailable (manual fallback).
-    # In both cases review is not blocking — treat as pass.
-    _review_verdict="pass"
-    if [[ "${_freely_rc:-0}" -ne 0 ]]; then
-      _review_verdict="fail"
-    fi
-    # Override: if reviewer output explicitly says fail
-    if echo "$_review_output" | grep -qi "verdict.*fail"; then
-      _review_verdict="fail"
-    fi
-  fi
-  if [[ "$_review_verdict" == "pass" ]]; then
-    echo "Review PASSED"
-    # Review doc should already exist from freely-review, just commit it
-    if [[ -f "$ROOT_DIR/$review_file" ]]; then
-      git -C "$ROOT_DIR" add "$review_file" 2>/dev/null || true
-      if ! git -C "$ROOT_DIR" diff --cached --quiet 2>/dev/null; then
-        git -C "$ROOT_DIR" commit -m "review: pr-review-guarded verdict=pass for $review_branch
-Co-Authored-By: Claude <noreply@anthropic.com>" 2>/dev/null || true
-        for platform in $(_platform_configs); do
-          remote=$(_platform_remote_name "$platform")
-          git -C "$ROOT_DIR" push "$remote" "$review_branch" 2>&1 || true
-        done
+    # freely-review launches reviewer agent with full context.
+    if [[ "$verdict_override" == "pass" && -n "$verdict_reason" ]]; then
+      _review_verdict="pass"
+    else
+      _review_output=$("$ROOT_DIR/bin/freely-review" --caller worker --agent-id "$_my_worker_id" --raw-key "$_raw_key" 2>&1) || _freely_rc=$?
+      _review_verdict="pass"
+      if [[ "${_freely_rc:-0}" -ne 0 ]]; then
+        _review_verdict="fail"
+      fi
+      if echo "$_review_output" | grep -qi "verdict.*fail"; then
+        _review_verdict="fail"
       fi
     fi
-    exit 0
-  else
-    echo "Review FAILED — see review output above for findings and fix suggestions"
-    exit 1
+    if [[ "$_review_verdict" == "pass" ]]; then
+      echo "Review PASSED"
+      if [[ -f "$ROOT_DIR/$review_file" ]]; then
+        git -C "$ROOT_DIR" add "$review_file" 2>/dev/null || true
+        if ! git -C "$ROOT_DIR" diff --cached --quiet 2>/dev/null; then
+          git -C "$ROOT_DIR" commit -m "review: pr-review-guarded verdict=pass for $review_branch
+Co-Authored-By: Claude <noreply@anthropic.com>" 2>/dev/null || true
+          for platform in $(_platform_configs); do
+            remote=$(_platform_remote_name "$platform")
+            git -C "$ROOT_DIR" push "$remote" "$review_branch" 2>&1 || true
+          done
+        fi
+      fi
+      exit 0
+    else
+      echo "Review FAILED — freely-review exited with error"
+      echo "  _freely_rc=${_freely_rc:-1}"
+      echo "  _review_output=$_review_output"
+      echo ""
+      echo "  ACP review failed.  Try manual review:"
+      echo "    skill:freely-tdd-review"
+      echo "  Review output → $review_file"
+      exit 1
+    fi
   fi
+  # else: ACP available but freely-review not found — fall through to raw ACP client below
+else
+  echo "[INFO] ACP 不可用 — $_acp_unavailable_reason"
+  echo "[INFO] 回退到人工审查"
+  echo ""
+  echo "  请加载 skill:freely-tdd-review 进行人工审查。"
+  echo "  审查结论写入: $review_file"
+  echo ""
 fi
-# Fallback
+
+# ── Manual fallback (ACP unavailable OR freely-review not found) ──
 if [[ -z "$REVIEWER_SLOT" ]]; then
   REVIEWER_SLOT="${AI_TOOL:-claude-apikey-ds-pro-auto}"
 fi
 
-# Get worktree path
-_wt_path=$(git worktree list --porcelain 2>/dev/null | awk -v br="refs/heads/$review_branch" '
-  $1=="worktree" { wt=$2 }
-  $1=="branch" && $2==br { print wt; exit }
-')
-_wt_path="${_wt_path:-$ROOT_DIR}"
-
-# Collect review context — search new structure first
+# Collect review context — search fix worktree first, then current
 _pre_tests_file=""
-# New structure: docs/epics/{epic}/{story}/raw-{raw_key}/verification/pre-tests.md
-for _d in docs/epics/*/*/raw-${_raw_key}/verification/; do
-  if [[ -f "${_d}pre-tests.md" ]]; then
-    _pre_tests_file="${_d}pre-tests.md"
-    break
-  fi
-done
-# Fallback: broad search
-if [[ -z "$_pre_tests_file" ]]; then
-  for _d in docs/epics/*/*/raw-*/verification/; do
+for _sr in "$_wt_path" "$ROOT_DIR"; do
+  [[ -d "$_sr" ]] || continue
+  for _d in "$_sr"/docs/epics/*/*/raw-${_raw_key}/verification/; do
     if [[ -f "${_d}pre-tests.md" ]]; then
       _pre_tests_file="${_d}pre-tests.md"
-      break
+      break 2
     fi
   done
-fi
+done
 
 _diff_file="$REVIEW_STATE_DIR/review-diff.txt"
 git diff "$base..$review_branch" > "$_diff_file" 2>/dev/null || true
 
 _issue_file=""
-if [[ -n "$_raw_key" ]] && [[ -f "docs/issues/$_raw_key/issue.md" ]]; then
-  _issue_file="docs/issues/$_raw_key/issue.md"
-fi
+for _sr in "$_wt_path" "$ROOT_DIR"; do
+  [[ -d "$_sr" ]] || continue
+  if [[ -n "$_raw_key" ]] && [[ -f "$_sr/docs/issues/$_raw_key/issue.md" ]]; then
+    _issue_file="$_sr/docs/issues/$_raw_key/issue.md"
+    break
+  fi
+done
 
 # Determine session state
 _review_round=1
@@ -324,36 +370,9 @@ echo ""
 _review_output=""
 _review_rc=0
 
-# Check if ACP bridge is available.
-# ACP needs: (1) freely daemon running, (2) ACP socket present, (3) run-acp-prompt.py executable.
-# If freely is running but task mode is "wait", ACP socket exists but won't process requests.
-_acp_available=0
-_acp_unavailable_reason=""
-
-# 1. Check freely daemon is running
-_freely_pid=$(pgrep -f 'freely.*daemon\|freely.*start\|freely.*ensure' 2>/dev/null | head -1 || true)
-if [[ -z "$_freely_pid" ]]; then
-  _acp_unavailable_reason="freely daemon 未运行（pgrep 无匹配进程）"
-else
-  # 2. Check ACP socket
-  _acp_bridge_socket=""
-  for _sock in /tmp/freely-acp-*.sock; do
-    if [[ -S "$_sock" ]]; then
-      _acp_bridge_socket="$_sock"
-      break
-    fi
-  done
-  if [[ -z "$_acp_bridge_socket" ]]; then
-    _acp_unavailable_reason="freely daemon 运行中（PID $_freely_pid）但 ACP socket 不存在"
-  elif [[ ! -x "$ACP_PROMPT_CLIENT" ]]; then
-    _acp_unavailable_reason="ACP socket 存在但 run-acp-prompt.py 不可执行"
-  else
-    _acp_available=1
-  fi
-fi
-
-if [[ "$_acp_available" == "1" ]]; then
-  echo "ACP bridge: $_acp_bridge_socket (freely PID $_freely_pid)"
+# Raw ACP client: only reachable if freely-review not found but ACP is available
+if [[ "$_acp_available" == "1" && ! -x "$ROOT_DIR/bin/freely-review" ]]; then
+  echo "--- TDD Review (raw ACP $_acp_launch_kind) ---"
 
   _review_output=$(python3 "$ACP_PROMPT_CLIENT" \
     --bridge-socket "$_acp_bridge_socket" \
@@ -362,62 +381,15 @@ if [[ "$_acp_available" == "1" ]]; then
     --session-id "${_review_session_id:-review-$pr_number}" \
     --model "$REVIEWER_SLOT" 2>&1) || _review_rc=$?
 
-  # Extract session ID from ACP output
   _new_session_id=$(echo "$_review_output" | grep "session id:" | head -1 | sed 's/.*session id: //' | tr -d '[:space:]')
-  if [[ -n "$_new_session_id" ]]; then
-    _review_session_id="$_new_session_id"
-  fi
-  else
-    echo "[INFO] ACP 不可用 — $_acp_unavailable_reason"
-    echo "[INFO] 回退到人工审查"
-    echo ""
-    echo "  请加载 skill:freely-tdd-review，按五层 IBM 链路逐级审查："
-    echo "  第一层 Raw Issue — 问题质量：这是好 issue 吗？"
-    echo "  第二层 Raw→B1 — 质量+完整度+安全：方案最优？周边全覆盖？无隐患？"
-    echo "  第三层 B1→B2 — 设计质量：产物可追溯？设计可执行？"
-    echo "  第四层 B2→实现 — 实现 fidelity+TDD 覆盖率"
-    echo "  第五层 实现→测试 — 执行完成度：全 GREEN？evidence 真实？"
-    echo ""
-    echo "  审查结论按 skill 输出格式写入: $review_file"
-    echo "  上下文文件: $REVIEW_STATE_DIR/review-guide.txt"
-    echo ""
-    _review_guide="$REVIEW_STATE_DIR/review-guide.txt"
-    cat > "$_review_guide" << GUIDEOF
-=== 人工审查指南 ===
-ACP bridge 不可用，请人工执行审查。
-
-审查 Skill: skill:freely-tdd-review（五层 IBM 链路逐级审查）
-审查结论写入: $review_file
-
-=== 审查上下文 ===
-Branch: $review_branch → $base
-Raw Key: $_raw_key
-涉及文件: docs/issues/raw-${_raw_key}/issue.md
-         docs/pre-brainstorms/${_raw_key}--*/brainstorms.md
-         docs/pre-brainstorms/${_raw_key}--*/candidates.md
-         docs/epics/*/*/raw-${_raw_key}/issues/I-${_raw_key}-*.md
-         docs/epics/*/*/raw-${_raw_key}/brainstorms/b-I-${_raw_key}-*.md
-         docs/epics/*/*/raw-${_raw_key}/prd.md
-         docs/epics/*/*/raw-${_raw_key}/verification/pre-tests.md
-         docs/epics/*/*/raw-${_raw_key}/verification/tasks.md
-         docs/epics/*/*/raw-${_raw_key}/code-reviews/
-         git diff $base..$review_branch
-
-=== 审查步骤 ===
-1. 加载 skill:freely-tdd-review
-2. 从 raw issue 开始，逐级向下审查
-3. 每级检查：下层是否忠实消化了上层？
-4. 失败必须给出具体理由和修复建议——不能说"不达标"三个字
-5. 审查结论写入 $review_file（格式见 skill 输出格式）
-
-=== 审查通过后 ===
-./bin/pr-merge-guarded $base $review_branch
-GUIDEOF
-    _review_verdict="manual_required"
-    _review_summary="ACP bridge unavailable — manual review via skill:freely-tdd-review. See $_review_guide"
-    _acp_used=0
-    _review_json="{}"
-    fi  # End ACP bridge available check
+  [[ -n "$_new_session_id" ]] && _review_session_id="$_new_session_id"
+  _acp_used=1
+elif [[ "$_acp_available" == "0" ]]; then
+  # ACP unavailable — manual fallback (already printed message in Step 3)
+  _review_verdict="manual_required"
+  _acp_used=0
+  _review_json="{}"
+fi
 
 # Parse verdict from Reviewer output (only when ACP was actually used)
 if [[ "${_acp_used:-1}" != "0" ]]; then
