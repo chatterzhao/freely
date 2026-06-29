@@ -1,6 +1,14 @@
 ---
 name: freely-test-execution
-description: TDD GREEN 阶段。在与开发工位 raw key 相同的 test-* 测试工位中验证。dev 之后执行——先确保 测试工位 包含全部最新修改，再逐条跑 pre-tests.md，全部 GREEN 才放行到 PR。硬拦截：test 工位落后、未执行、无证据、有 failed。
+description: >-
+  TDD GREEN 阶段。在 test-pre-merge-* 测试工位逐条执行 pre-tests.md，
+  先 `git cherry-pick` 同步全部 dev 提交，再跑全量测试。全部 GREEN
+  才放行到 `freely pr-create-guarded` 命令。硬拦截：工位落后、未执行、
+  无证据、有 failed 或 ghost pass。
+
+  Use when: `freely-dev-loop-execution` skill 实现完成之后，提 PR 之前。
+  触发词："GREEN"、"跑测试"、"验证"、"test"、"测试工位"、"全部通过"、
+  "cherry-pick 测试"。
 ---
 
 # skill:freely-test-execution
