@@ -552,6 +552,7 @@ do_initial_merge() {
   # ── Dev↔Test consistency check ──
   # pr-merge runs from develop. This check activates after merge when both
   # pr-merge-guarded and worktree-common.sh are updated on develop.
+  _raw_key="${_raw_key:-$(echo "$source_branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)}"
   source "$PROJECT_ROOT/bin/worktree-common.sh" 2>/dev/null || true
   if [[ -n "$_raw_key" ]]; then
     freely_wt_assert_dev_test_consistent "$_raw_key" || {
