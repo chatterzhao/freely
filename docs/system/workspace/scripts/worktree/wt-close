@@ -27,24 +27,29 @@ DRY_RUN=false
 usage() {
   cat <<USAGE
 Usage:
-  ./bin/wt-close <branch|raw-key> [options]
+  ./bin/wt-close --raw-key <key> [options]
+  ./bin/wt-close --branch <branch> [options]
 
 Close a fix|feature worktree and its platform issue.  The command validates
 phase_state, checks dev↔test worktree consistency, closes the platform issue,
 removes the worktree directory, and deletes the branch.
 
-Arguments:
-  <branch|raw-key>    Branch name or raw issue key.  IMPORTANT: 只传 fix|feature
-                      分支名或 raw key——不要传 test-pre-merge-* 分支名。
-                      The companion test-pre-merge worktree is auto-discovered
-                      via raw-key matching and cleaned up automatically.
+  ⚠️  IMPORTANT: 只传 --raw-key 或 --branch，不要传 test-pre-merge-* 分支名。
+      The companion test-pre-merge worktree is auto-discovered via raw-key
+      matching and cleaned up automatically (Phase 6b).
 
-                      Examples:
-                        ./bin/wt-close fix/raw-20260629T160852Z-my-fix
-                        ./bin/wt-close raw-20260629T160852Z
-                        ./bin/wt-close feature/raw-20260629T160852Z-my-feat
+Arguments (二选一):
+  --raw-key <key>       Raw issue key.  Compatible with multiple formats:
+                          raw-20260629T160852Z
+                          fix/raw-20260629T160852Z-my-fix
+                          feature/raw-20260629T160852Z-my-feat
+                          20260629T160852Z
+                        Auto-extracts the raw key and resolves the fix|feature branch.
 
-Options (按场景选择，互斥):
+  --branch <branch>     Explicit branch name (fix/raw-YYYYMMDDTHHMMSSZ-<slug>)
+                        or worktree path.  Compatible with existing usage.
+
+Options (按场景选择):
   --reason <text>    REQUIRED with any bypass flag below.  Format:
                       --reason "违规绕过门禁中，理由充分，是：<业务理由>"
 
@@ -75,20 +80,17 @@ Options (按场景选择，互斥):
   --dry-run          只打印操作，不执行。
 
 Scenarios:
+  # PR 已 merge，正常收口（传 raw key）
+  ./bin/wt-close --raw-key 20260627T021849Z
+
   # PR 已 merge，正常收口（传分支名）
-  ./bin/wt-close fix/raw-20260627T021849Z-my-fix
+  ./bin/wt-close --branch fix/raw-20260627T021849Z-my-fix
 
-  # PR 已 merge，正常收口（传 raw key——效果相同）
-  ./bin/wt-close raw-20260627T021849Z
+  # 确定放弃此 issue
+  ./bin/wt-close --raw-key 20260627T021849Z --force --reason "违规绕过门禁中，理由充分，是：该功能确定放弃"
 
-  # 确定放弃此 issue，丢弃所有修改
-  ./bin/wt-close fix/raw-xxx --force --reason "违规绕过门禁中，理由充分，是：该功能确定放弃"
-
-  # 方案被否决，丢弃未 merge 提交
-  ./bin/wt-close fix/raw-xxx --force --discard-unmerged --reason "违规绕过门禁中，理由充分，是：该方案已被否决"
-
-  # 工位已手动删除，只关闭平台 issue
-  ./bin/wt-close fix/raw-xxx --platform-only --reason "违规绕过门禁中，理由充分，是：工位已清理仅剩平台 issue"
+  # 无工位，只关闭平台 issue
+  ./bin/wt-close --raw-key 20260627T021849Z --platform-only --reason "违规绕过门禁中，理由充分，是：工位已清理仅剩平台 issue"
 
   # 注意：不要传 test-pre-merge-* 分支名——wt-close 会根据 raw key
   # 自动发现并清理 companion test-pre-merge 工位，无需单独操作。
@@ -191,6 +193,8 @@ while [[ $# -gt 0 ]]; do
     --discard-unmerged) DISCARD_UNMERGED=true; shift ;;
     --reason) FORCE_REASON="$2"; shift 2 ;;
     --skip-platform) SKIP_PLATFORM=true; shift ;;
+    --raw-key) RAW_KEY="$2"; shift 2 ;;
+    --branch) BRANCH_INPUT="$2"; shift 2 ;;
     --platform-only) PLATFORM_ONLY=true; shift ;;
     --dry-run) DRY_RUN=true; shift ;;
     --help|-h) usage; exit 0 ;;
@@ -200,23 +204,68 @@ while [[ $# -gt 0 ]]; do
 done
 
 set -- "${args[@]}"
-input="${1:-}"
 
-# ── Raw key → branch resolution ──
-# If input is a raw key (raw-YYYYMMDDTHHMMSSZ), derive the fix|feature branch.
-# This mirrors wt-create --raw-key for symmetric API.
-if [[ "$input" =~ ^raw-[0-9]{8}T[0-9]{4,6}Z$ ]]; then
-  _raw_key_input="$input"
-  _matched_branch=$(git branch --list "fix/raw-${_raw_key_input#raw-}-*" "feature/raw-${_raw_key_input#raw-}-*" 2>/dev/null | sed 's/^[* ]*//' | head -1 || true)
-  if [[ -z "$_matched_branch" ]]; then
-    echo "Error: no fix/feature branch found for raw key '$_raw_key_input'" >&2
-    echo "  Searched: fix/raw-* and feature/raw-* with key '${_raw_key_input#raw-}'" >&2
-    echo "  If the worktree still exists, pass the branch name directly:" >&2
-    echo "    ./bin/wt-close fix/raw-${_raw_key_input#raw-}-<slug>" >&2
+# ── Extract raw key from various formats ──
+# Supports: raw-YYYYMMDDTHHMMSSZ, fix/raw-{key}-{slug}, feature/raw-{key}-{slug}, YYYYMMDDTHHMMSSZ
+_extract_raw_key() {
+  local val="$1"
+  # Strip fix/ or feature/ prefix first
+  local stripped="${val#fix/}"
+  stripped="${stripped#feature/}"
+  # Extract raw-YYYYMMDDTHHMMSSZ pattern (just the key part, not the slug)
+  local raw_match
+  raw_match=$(echo "$stripped" | grep -oE 'raw-[0-9]{8}T[0-9]{4,6}Z' 2>/dev/null | head -1 || true)
+  if [[ -n "$raw_match" ]]; then
+    echo "${raw_match#raw-}"
+  elif [[ "$val" =~ ^[0-9]{8}T[0-9]{4,6}Z$ ]]; then
+    echo "$val"
+  else
+    echo ""
+  fi
+}
+
+# ── Resolve branch from raw key ──
+_resolve_branch_from_raw_key() {
+  local raw_key="$1"
+  local matched
+  matched=$(git branch --list "fix/raw-${raw_key}-*" "feature/raw-${raw_key}-*" 2>/dev/null | sed 's/^[*+ ]*//' | head -1 || true)
+  echo "$matched"
+}
+
+# ── Determine input from --raw-key or --branch ──
+if [[ -n "${RAW_KEY:-}" ]]; then
+  _raw_key="$(_extract_raw_key "$RAW_KEY")"
+  if [[ -z "$_raw_key" ]]; then
+    echo "Error: could not extract raw key from '${RAW_KEY}'" >&2
+    echo "  Supported formats: raw-YYYYMMDDTHHMMSSZ, fix/raw-{key}-{slug}, feature/raw-{key}-{slug}, YYYYMMDDTHHMMSSZ" >&2
     exit 1
   fi
-  input="$_matched_branch"
-  echo "wt-close: raw key '$_raw_key_input' → branch '$input'"
+  if [[ "${PLATFORM_ONLY:-false}" == true ]]; then
+    # --platform-only: skip branch resolution, use raw key directly for API close
+    input="raw-${_raw_key}"
+    branch="$input"
+    echo "wt-close: raw key '${_raw_key}' (--platform-only, no branch resolution)"
+  else
+    _matched="$(_resolve_branch_from_raw_key "$_raw_key")"
+    if [[ -z "$_matched" ]]; then
+      echo "Error: no fix/feature branch found for raw key '${_raw_key}'" >&2
+      echo "  Searched: fix/raw-${_raw_key}-* and feature/raw-${_raw_key}-*" >&2
+      echo "  If the worktree still exists, pass --branch with the full branch name:" >&2
+      echo "    ./bin/wt-close --branch fix/raw-${_raw_key}-<slug>" >&2
+      exit 1
+    fi
+    input="$_matched"
+    echo "wt-close: raw key '${_raw_key}' → branch '${input}'"
+  fi
+elif [[ -n "${BRANCH_INPUT:-}" ]]; then
+  input="$BRANCH_INPUT"
+elif [[ -n "${1:-}" ]]; then
+  # Legacy positional arg: try as branch name first
+  input="${1:-}"
+else
+  echo "Error: missing --raw-key or --branch" >&2
+  usage
+  exit 1
 fi
 
 # ── --reason gate: bypass flags require valid reason (except test-pre-merge) ──
@@ -577,6 +626,17 @@ fi
 # Uses gh/gitee API directly to avoid writing to develop.
 if [[ "$PLATFORM_ONLY" == true ]]; then
   echo "wt-close: --platform-only mode (API close only, no local file changes)"
+
+  # raw_key MUST be set for --platform-only
+  if [[ -z "${_raw_key:-}" ]]; then
+    _raw_key="$(_extract_raw_key "${RAW_KEY:-${input:-}}")"
+  fi
+  if [[ -z "${_raw_key:-}" ]]; then
+    echo "Error: --platform-only requires --raw-key <key> to identify the platform issue" >&2
+    exit 1
+  fi
+  raw_key="$_raw_key"
+  issue_id="raw-${raw_key}"
 
   # ── Guard: --platform-only requires NO local worktree ──
   # If a worktree exists for this raw key, the user should use normal

@@ -1,4 +1,19 @@
 
+## M-20260629T164530Z-A
+- title: fix: wt-close --raw-key flag 重构
+- status: active
+### candidate_issues
+1. `C-20260629T164530Z-A`
+- milestone: M-20260629T164530Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/wt-close-raw-key/raw-key-flag/raw-20260629T164530Z/issues/I-20260629T164530Z-A.md`
+### committed_issues
+1. `I-20260629T164530Z-A`
+- title: fix: wt-close --raw-key flag; milestone_state: committed
+- issue_path: `docs/epics/wt-close-raw-key/raw-key-flag/raw-20260629T164530Z/issues/I-20260629T164530Z-A.md`
+- phase_state: `completed`
+### completed_issues
+
 ## M-20260629T160852Z-A
 - title: fix: wt-close 支持 raw-{key} 参数 + help 强调
 - status: active
