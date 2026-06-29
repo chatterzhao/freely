@@ -5,7 +5,7 @@ description: B2_IBM：I→B→M 第二阶段。从 scan、A2A task 与 continuit
 
 # skill:freely-doc-B2_IBM-execution
 
-> 全链路: [cmd] freely feedback → [cmd] freely wt-create → [skill] freely-doc-B1_IBM-execution → [skill][here] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
+> 全链路: [cmd] freely feedback → [skill] freely-workflow-guarded-execution → [cmd] freely wt-create → [skill] freely-doc-B1_IBM-execution → [skill][here] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
 
 ## I→B→M 骨架
 
@@ -62,7 +62,7 @@ created_at: 2026-05-08T01:18:58Z
 updated_at: 2026-05-08T01:18:58Z
 intake_id: ""
 author: zhaoquan
-channel: freely-feature-execution
+channel: freely-workflow-guarded-execution
 session_refs: []
 pre_tests_path: docs/epics/skill-gate-alignment/verification/pre-tests.md
 verification_artifact_dir: docs/epics/skill-gate-alignment/code-reviews

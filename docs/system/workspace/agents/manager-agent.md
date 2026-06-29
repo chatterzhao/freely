@@ -15,8 +15,8 @@
 |-------|--------------|
 | `skill:freely-constitution-guard` | 宪法合规预检 |
 | `skill:freely-laws-enforcer` | 法律级验收检查 |
-| `skill:freely-fix-execution` | wt-create → B1 → B2 → dev → test → pr-* → wt-close |
-| `skill:freely-feature-execution` | wt-create → B1 → B2 → dev → pr-* → wt-close |
+| `skill:freely-workflow-guarded-execution` | wt-create → B1 → B2 → dev → test → pr-* → wt-close |
+| `skill:freely-workflow-guarded-execution` | wt-create → B1 → B2 → dev → pr-* → wt-close |
 | `skill:freely-doc-B1_IBM-execution` | raw → brainstorm → candidate → milestones |
 | `skill:freely-doc-B2_IBM-execution` | I-* → PRD → tasks → pre-tests → milestones |
 | `skill:freely-dev-loop-execution` | implement → test → progress → code-review |
@@ -237,7 +237,7 @@ Worker 是独立 ACP session，由 Runtime 通过 A2A Server 管理。
 2. **创建 Worker task**（无需先写 prompt 文件）：
    ```
    a2a-exit --state submitted --role worker \
-     --skill <freely-fix-execution|freely-dev-loop-execution|...> \
+     --skill <freely-workflow-guarded-execution|freely-dev-loop-execution|...> \
      --worktree /absolute/path/to/worktree \
      --branch <fix|feature>/raw-YYYYMMDDTHHMMSSZ-<slug> \
      --raw-key <key> \
@@ -318,7 +318,7 @@ scan 是任务来源。以下情况必须手动 `freely task-source-scan`：
 3. 连续多轮 `stop_ai` 但怀疑有未处理任务——重扫确认
 
 输出写入 `<project>/.freely/run/manager-task-source-scan-latest.json`，下次 patrol 读到新数据。
-| `freely-feature-execution` | 新功能编排 |
+| `freely-workflow-guarded-execution` | 新功能编排 |
 | `freely-chat-issue-routing` | chat 消息路由 |
 | `freely-human-interruption-manager-triage` | 插话路由 |
 
@@ -329,7 +329,7 @@ Manager 通过 a2a-exit 声明本轮状态。对标 A2A 协议 SendMessage。
 ```bash
 # 委派 Worker: state=submitted, role=worker
 a2a-exit --state submitted --role worker \
-  --skill freely-fix-execution --worktree /path --branch fix/xxx \
+  --skill freely-workflow-guarded-execution --worktree /path --branch fix/xxx \
   --raw-key 20260617T...Z --summary "Worker 的完整 prompt 指令"
 
 # 完成本轮: state=completed

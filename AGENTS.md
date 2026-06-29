@@ -22,7 +22,7 @@
 正确的做法是走标准开发流程:
 
 ```
-feature & fix: [cmd] freely feedback → [cmd] freely wt-create → [skill] freely-doc-B1_IBM-execution → [skill] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
+feature & fix: [cmd] freely feedback → [skill] freely-workflow-guarded-execution → [cmd] freely wt-create → [skill] freely-doc-B1_IBM-execution → [skill] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
 
      反馈: freely feedback --repo <repo> --title "..." --body "..."         (raw issue 不存在时需要)
      评论: freely comment --issue raw-{key} "原话"                           (向已有 raw issue 追加评论)
@@ -183,7 +183,7 @@ Freely 开发 Freely 时，默认先问四件事：
 
 ## Bug 修复：fix skill 完整流程
 
-当发现运行时 bug，使用 `skill:freely-fix-execution`。fix 与 feature 流程完全一致（B1→B2→dev→test）。先判场景：
+当发现运行时 bug，使用 `skill:freely-workflow-guarded-execution`。fix 与 feature 流程完全一致（B1→B2→dev→test）。先判场景：
 
 - **原 fix|feature worktree 还在** → 直接在 fix|feature 上做 B1→B2→dev→test。走 pr-create → pr-review → pr-merge → develop。
 - **原 feature 已退役（已合并/已删）** → wt-create 创建 fix 工位 + test-pre-merge → B1→B2→dev→test → pr。
@@ -191,13 +191,13 @@ Freely 开发 Freely 时，默认先问四件事：
 - **治理先行**：B1_IBM（`skill:freely-doc-B1_IBM-execution`：根因分析 → candidate → milestone）→ B2_IBM（`skill:freely-doc-B2_IBM-execution`：I-* → pre-tests → tasks → code-review）→ milestones.md。即使简单 fix 也必须走完整流程。
 - **原则**：Govern first, code later。治理文档在开发之前，pre-tests 驱动 TDD 实现。
 
-详见 `skill:freely-fix-execution`
+详见 `skill:freely-workflow-guarded-execution`
 
 ## Skill 管理
 
 - 本项目 skill 定义在 `docs/system/workspace/skills/`，已通过 `./bin/deploy-skills` 部署到 `~/.claude/skills/` 供 Claude Code Skill 工具调用。
 - **修改任何 skill 后，必须立即执行 `./bin/deploy-skills`**，否则改动不会对当前及后续会话生效。
-- 项目文件中引用 skill 时只用 skill 名（如 `skill:freely-feature-execution`），不写路径；skill 文件内部互相引用除外。
+- 项目文件中引用 skill 时只用 skill 名（如 `skill:freely-workflow-guarded-execution`），不写路径；skill 文件内部互相引用除外。
 - skill 内部跨 skill 引用使用相对路径（如 `../other-skill/SKILL.md`），不使用项目绝对路径。
 
 ## 吃自己的狗粮规则（Freely 构建 Freely）

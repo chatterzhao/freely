@@ -1,15 +1,15 @@
 ---
-name: freely-fix-execution
-description: bug 修复的完整开发流程——freely feedback → freely wt-create → freely-doc-B1_IBM-execution → freely-doc-B2_IBM-execution → freely-test-RED-execution → freely-dev-loop-execution → freely-test-execution → freely pr-create-guarded → freely pr-merge-guarded → freely wt-close。与 freely-feature-execution 一致。
+name: freely-workflow-guarded-execution
+description: bug 修复的完整开发流程——freely feedback → freely wt-create → freely-doc-B1_IBM-execution → freely-doc-B2_IBM-execution → freely-test-RED-execution → freely-dev-loop-execution → freely-test-execution → freely pr-create-guarded → freely pr-merge-guarded → freely wt-close。与 freely-workflow-guarded-execution 一致。
 ---
 
-# skill:freely-fix-execution
+# skill:freely-workflow-guarded-execution
 
-> 全链路: [cmd] freely feedback → [cmd] freely wt-create → [skill] freely-doc-B1_IBM-execution → [skill] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
+> 全链路: [cmd] freely feedback → [skill] freely-workflow-guarded-execution → [cmd] freely wt-create → [skill] freely-doc-B1_IBM-execution → [skill] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
 
 ## 定位
 
-**fix skill 是 bug 修复的完整开发流程抽象。** 与 `freely-feature-execution`（新功能/大型改动）同级，流程顺序、B1/B2 深度、门禁要求完全一致。
+**fix skill 是 bug 修复的完整开发流程抽象。** 与 `freely-workflow-guarded-execution`（新功能/大型改动）同级，流程顺序、B1/B2 深度、门禁要求完全一致。
 
 fix 和 feature 的唯一差异：
 
@@ -18,9 +18,9 @@ fix 和 feature 的唯一差异：
 | 分支前缀 | `fix/*` / `hotfix/*` | `feature/*` |
 | hotfix 路径 | 合并到 main + develop | 无 |
 
-## 与 freely-feature-execution 的分工
+## 与 freely-workflow-guarded-execution 的分工
 
-| | freely-fix-execution | freely-feature-execution |
+| | freely-workflow-guarded-execution | freely-workflow-guarded-execution |
 |---|---|---|
 | 适用 | bug fix、小改动 | 新功能、大型重构 |
 | 流程 | feedback → wt-create → B1 → B2 → dev → test → pr | feedback → wt-create → B1 → B2 → dev → test → pr |

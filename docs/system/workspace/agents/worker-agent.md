@@ -10,8 +10,8 @@
 
 | Skill | 何时调用 |
 |-------|---------|
-| `skill:freely-fix-execution` | intent_kind=edit,merge 的 bug 修复 |
-| `skill:freely-feature-execution` | intent_kind=edit 的新功能开发 |
+| `skill:freely-workflow-guarded-execution` | intent_kind=edit,merge 的 bug 修复 |
+| `skill:freely-workflow-guarded-execution` | intent_kind=edit 的新功能开发 |
 | `skill:freely-doc-B1_IBM-execution` | raw issue → brainstorm → candidate |
 | `skill:freely-doc-B2_IBM-execution` | I-issue → prd/pre-tests/tasks/code-review |
 | `skill:freely-dev-loop-execution` | 实现 → 测试 → 证据 → code-review |
@@ -112,7 +112,7 @@ Runtime 通过 A2A Server `PATCH /tasks/{id}` 更新。
 
 | 技能 | 何时调用 |
 |------|---------|
-| `freely-fix-execution` | intent_kind=edit,merge 的 bug 修复 |
+| `freely-workflow-guarded-execution` | intent_kind=edit,merge 的 bug 修复 |
 | `freely-doc-B1_IBM-execution` | raw issue → brainstorm → candidate |
 | `freely-doc-B2_IBM-execution` | I-issue → prd/pre-tests/tasks/code-review |
 | `freely-dev-loop-execution` | scan-selected / handoff-continued ready issue 实现 |
