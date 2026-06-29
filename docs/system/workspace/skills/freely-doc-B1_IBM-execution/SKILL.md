@@ -3,9 +3,10 @@ name: freely-doc-B1_IBM-execution
 description: >-
   IBM Framework 第一阶段。消费 raw issue 做 Brainstorm 发散收敛，
   产出 candidate 进入 milestone 规划队列。candidate promote 时通过
-  `promoted_issue_id` 决定 I-* issue 的 key（路径由
-  `freely-doc-B2_IBM-execution` skill 根据 key 自行构造）。
-  标准产物：brainstorms.md + candidates.md + milestones.md 更新。
+  `promoted_issue_id` 提供 I-* issue 的基础信息（key）。B2_IBM
+  根据此 key 确定 epic/story、在 milestones.md committed_issues
+  生成正式条目（含真实路径）并物化完整文档。
+  标准产物：brainstorms.md + candidates.md + milestones.md candidate_issues。
 
   Use when: `freely wt-create` 命令建好工位之后，需要对 raw issue
   做根因分析、方案评估、scope 判定的预研阶段。触发词："B1"、"预研"、
