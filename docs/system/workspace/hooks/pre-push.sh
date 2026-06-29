@@ -35,7 +35,7 @@ while read -r local_ref local_sha remote_ref remote_sha; do
   删除远程分支必须通过 wt-close 收口。
   直接执行 git push --delete 是违规操作。
 
-  Usage: ./bin/wt-close <branch>
+  Usage: freely wt-close <branch>
 
   这是硬性门禁，无法绕过。
 DELETE_BLOCK
@@ -87,7 +87,7 @@ MSG
           exit 1
         fi
       fi
-      if [[ "$local_branch" == "develop" && -x "./bin/governance-merge-gate" ]]; then
+      if [[ "$local_branch" == "develop" ]] && [[ -x "./bin/governance-merge-gate" ]]; then
         if [[ -n "${FREELY_SKIP_IBM_GATE:-}" ]]; then
           if ! echo "${FREELY_SKIP_IBM_GATE}" | grep -q "^违规绕过门禁中，理由充分，是："; then
             cat >&2 <<'REASON_GATE'
@@ -158,10 +158,10 @@ MSG
 
   All fix/feature/hotfix branches must pass pr-create-guarded before pushing.
   Run pr-create-guarded in your worktree:
-    ./bin/pr-create-guarded
+    freely pr-create-guarded
 
   The ONLY valid way to push is:
-    ./bin/pr-create-guarded
+    freely pr-create-guarded
 MSG
           exit 1
         fi
@@ -186,7 +186,7 @@ REASON_GATE
         if git diff --name-only "$_base..HEAD" 2>/dev/null | grep -qE '\.(sh|py|rs|ts|js|tsx|jsx|go|java|c|cpp|h|toml)$'; then
           cat >&2 <<MSG
 [HOOK] FREELY_SKIP_CREATE_GATE rejected: code files must use pr-create-guarded.
-  Run: ./bin/pr-create-guarded
+  Run: freely pr-create-guarded
 MSG
           exit 1
         fi

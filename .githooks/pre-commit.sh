@@ -172,7 +172,7 @@ require_valid_guarded_completion_state() {
   load_guarded_state || {
     cat <<MSG
 [HOOK] Commit blocked: guarded merge completion state is missing or malformed.
-Re-run the merge through ./bin/pr-merge-guarded so hooks can verify a canonical completion handshake.
+Re-run the merge through freely pr-merge-guarded so hooks can verify a canonical completion handshake.
 MSG
   }
 
@@ -268,7 +268,7 @@ GUIDE
 [HOOK] Commit blocked: raw merge completion on '$branch' is forbidden.
 Use the guarded completion path instead:
 
-  ./bin/pr-merge-guarded complete "$branch" <source-branch>
+  freely pr-merge-guarded complete "$branch" <source-branch>
 
 Do not finish protected-branch merges with bare 'git commit' or equivalent bypass.
 MSG
@@ -282,7 +282,7 @@ Read AGENTS.md §核心开发流程, then invoke the correct skill:
 
 Quick start:
   cd <project-root>
-  ./bin/wt-create --raw-key <key> --source <platform|chat-inbox> --skill <skill> --slug <slug>
+  freely wt-create --raw-key <key> --source <platform|chat-inbox> --skill <skill> --slug <slug>
   cd ../<project>-worktrees/<branch-dir>
 
 Do NOT work around this hook. Bypass attempts (skip-worktree, --no-verify,
@@ -294,7 +294,7 @@ MSG
 esac
 
 if ! freely_wt_is_primary_worktree; then
-  if [[ -x "./bin/checkpoint-guard" ]]; then
+  if [[ -x "./bin/governance-merge-gate" ]]; then
     set +e
     checkpoint_output="$(./bin/checkpoint-guard --staged-only  2>&1)"
     checkpoint_rc=$?
@@ -311,7 +311,7 @@ MSG
       exit "$checkpoint_rc"
     fi
   fi
-  if [[ -x "./bin/pretests-gate" ]]; then
+  if [[ -x "./bin/governance-merge-gate" ]]; then
     set +e
     pretests_output="$(./bin/pretests-gate --staged-only 2>&1)"
     pretests_rc=$?
@@ -353,7 +353,7 @@ Start work in worktree:
   cd "$existing_for_branch"
 
 Standard cleanup after merge:
-  ./bin/wt-close "$branch"
+  freely wt-close "$branch"
 MSG
   git worktree list
   exit 1
@@ -366,13 +366,13 @@ No dedicated sibling worktree found for '$branch'.
 
 Create it from the project root with the standard command:
   cd <your-project-name-path>
-  ./bin/wt-create "$branch"
+  freely wt-create "$branch"
   cd ${rel_target}
 
 If you must create it manually instead:
   git worktree add ${rel_target} "$branch"
-  ./bin/freely sync-tooling --source-project <your-project-name-path> --project ${rel_target}
+  freely sync-tooling --source-project <your-project-name-path> --project ${rel_target}
 
 When the work is finished and merged:
-  ./bin/wt-close "$branch"
+  freely wt-close "$branch"
 MSG
