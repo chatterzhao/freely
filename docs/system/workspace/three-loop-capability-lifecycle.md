@@ -261,11 +261,10 @@ dev:             │           └── implement→evidence ──────
 
 ## 变体路径
 
-### Fix 修复（治理先行，B1/B2 轻量版）
+### Fix 修复（治理先行，与 feature 完全一致）
 ```
 ([命令] feedback) → [命令] wt-create → [skill] B1 → [skill] B2 → [skill] dev → [skill] test → [命令] pr-create → [命令] pr-review → [命令] pr-merge → [命令] wt-close
 ```
-fix 与 feature 流程顺序完全一致。区别仅在 B1/B2 的深度：fix 的 B1 为根因分析+修复方案评估（1-2方案），B2 为修复设计+回归测试（至少复现+验证）。
 
 ### Hotfix 紧急修复
 ```

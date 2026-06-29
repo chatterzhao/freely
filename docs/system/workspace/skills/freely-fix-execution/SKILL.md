@@ -1,6 +1,6 @@
 ---
 name: freely-fix-execution
-description: bug 修复的完整开发流程——feedback→wt-create→B1_IBM→B2_IBM→dev→test→pr-create-guarded→pr-merge-guarded→wt-close。与 freely-feature-execution 同级抽象，流程顺序一致，B1/B2 为轻量版。
+description: bug 修复的完整开发流程——feedback→wt-create→B1_IBM→B2_IBM→dev→test→pr-create-guarded→pr-merge-guarded→wt-close。与 freely-feature-execution 同级抽象，流程顺序一致。
 ---
 
 # skill:freely-fix-execution
@@ -10,16 +10,14 @@ description: bug 修复的完整开发流程——feedback→wt-create→B1_IBM�
 
 ## 定位
 
-**fix skill 是 bug 修复的完整开发流程抽象。** 与 `freely-feature-execution`（新功能/大型改动）同级，流程顺序一致——都是 B1_IBM → B2_IBM → dev → test。
+**fix skill 是 bug 修复的完整开发流程抽象。** 与 `freely-feature-execution`（新功能/大型改动）同级，流程顺序、B1/B2 深度、门禁要求完全一致。
 
-fix 和 feature 的区别不在流程顺序，而在各阶段的深度：
+fix 和 feature 的唯一差异：
 
-| 阶段 | fix（轻量） | feature（完整） |
-|------|------------|----------------|
-| **B1** | 根因分析 + 修复方案评估（1-2个方案） | 完整预研 + 多方案发散 |
-| **B2** | 修复设计 + 回归测试（至少复现+验证） | 完整设计 + 全量测试 |
-| **pre-tests** | 至少 1 条复现 bug 的 RED + 验证修复的 GREEN | 全量验收测试 |
-| **hotfix** | 合并到 main + develop（其他同 fix） | 无此路径 |
+| 维度 | fix | feature |
+|------|-----|---------|
+| 分支前缀 | `fix/*` / `hotfix/*` | `feature/*` |
+| hotfix 路径 | 合并到 main + develop | 无 |
 
 ## 与 freely-feature-execution 的分工
 
@@ -28,16 +26,14 @@ fix 和 feature 的区别不在流程顺序，而在各阶段的深度：
 | 适用 | bug fix、小改动 | 新功能、大型重构 |
 | 流程 | feedback → wt-create → B1 → B2 → dev → test → pr | feedback → wt-create → B1 → B2 → dev → test → pr |
 | IBM 顺序 | 治理后实现（Govern first, code later） | 治理后实现（Govern first, code later） |
-| B1 深度 | 根因分析 + 修复方案（1-2方案） | 完整预研 + 多方案发散 |
-| B2 深度 | 修复设计 + 回归测试 | 完整设计 + 全量测试 |
 
 ## 核心原则
 
-> **Govern first, code later.** 即使是简单 fix，先想清楚再动手。
+> **Govern first, code later.** 先想清楚再动手，与 feature 一致的治理标准。
 
 - 不在 `main`/`develop` 上直接改代码（阻塞其他 AI 并发）
 - B1 阶段分析根因、评估修复方案，不修表面症状
-- B2 阶段写 pre-tests（至少复现+验证），让 TDD 驱动实现
+- B2 阶段写 pre-tests（复现+验证），让 TDD 驱动实现
 - dev 阶段在 fix 工位实现，test-pre-merge 验证
 - test-pre-merge 是纯验证沙箱，不参与合并链
 
@@ -99,7 +95,7 @@ hotfix/*          → main + develop (pr-merge-guarded)
 ```
 1. skill:freely-doc-B1_IBM-execution
    → 读取 raw issue，分析根因
-   → 评估修复方案（1-2个方案即可，不需要全面发散）
+   → 评估修复方案，充分发散后收敛
    → 写 docs/pre-brainstorms/{key}--{slug}/brainstorms.md
    → 写 candidates.md，promote 或 absorb
    → 更新 milestones.md candidate_issues
@@ -111,7 +107,7 @@ hotfix/*          → main + develop (pr-merge-guarded)
 ```
 1. skill:freely-doc-B2_IBM-execution
    → materialize I-* issue
-   → 写 pre-tests.md（至少 1 条复现 bug 的 RED + 验证修复的 GREEN）
+   → 写 pre-tests.md（覆盖全部改动面的测试方案）
    → 写 tasks.md
    → 写 code-reviews/implementation-decision-note.md
    → 更新 milestones.md committed_issues
@@ -176,7 +172,7 @@ hotfix/*          → main + develop (pr-merge-guarded)
 - **不发明新分支名**。只用 `fix/*`、`feature/*`、`hotfix/*`、`test-pre-merge-*`。
 - **test-pre-merge-* 是纯验证沙箱**，禁止在上面直接开发。代码在 fix 工位写，cherry-pick 到 test 工位验证。
 - **B1 必须有根因分析**，不修表面症状。
-- **B2 必须有 pre-tests**，至少复现 bug 的 RED + 验证修复的 GREEN。
+- **B2 必须有 pre-tests**，复现 bug 的 RED + 验证修复的 GREEN。
 - **原 feature 还在就直接在上面修**，不新建工位。
 - `freely pr-create-guarded` 和 `freely pr-merge-guarded` 是提 PR 和合并的唯一合法入口。
 - `freely pr-merge-guarded` 必须在 develop 分支执行。
@@ -197,5 +193,5 @@ hotfix/*          → main + develop (pr-merge-guarded)
 | raw issue key 不匹配 | 目录名对齐 candidate date-time key |
 | `owner issue 'missing'` | code-review 用 `issue_id` / `issue_path` |
 | `verification_artifact_dir` missing | issue 添加此字段 |
-| B1 brainstorms 缺失 | 即使简单 fix 也必须写根因分析和方案评估 |
-| B2 pre-tests 缺失 | 至少 1 条复现 + 1 条验证，不写 pre-tests 不能进 dev |
+| B1 brainstorms 缺失 | 必须写完整的根因分析和修复方案评估，与 feature 要求一致 |
+| B2 pre-tests 缺失 | 必须有覆盖全部改动面的 pre-tests，与 feature 要求一致 |

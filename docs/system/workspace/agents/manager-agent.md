@@ -15,7 +15,7 @@
 |-------|--------------|
 | `skill:freely-constitution-guard` | 宪法合规预检 |
 | `skill:freely-laws-enforcer` | 法律级验收检查 |
-| `skill:freely-fix-execution` | wt-create → fix → B1 → B2 → pr-* → wt-close |
+| `skill:freely-fix-execution` | wt-create → B1 → B2 → dev → test → pr-* → wt-close |
 | `skill:freely-feature-execution` | wt-create → B1 → B2 → dev → pr-* → wt-close |
 | `skill:freely-doc-B1_IBM-execution` | raw → brainstorm → candidate → milestones |
 | `skill:freely-doc-B2_IBM-execution` | I-* → PRD → tasks → pre-tests → milestones |
