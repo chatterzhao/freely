@@ -1,3 +1,17 @@
+## M-20260629T030408Z-A
+- title: complete feat → feature rename in all active code
+- status: active
+### candidate_issues
+1. `C-20260629T030408Z-A`
+- milestone: M-20260629T030408Z-A; status: promoted
+- promoted_issue_path: `docs/epics/feat-to-feature/rename-completion/raw-20260629T030408Z/issues/I-20260629T030408Z-A.md`
+### committed_issues
+1. `I-20260629T030408Z-A`
+- title: complete feat → feature rename in all active code; milestone_state: completed
+- issue_path: `docs/epics/feat-to-feature/rename-completion/raw-20260629T030408Z/issues/I-20260629T030408Z-A.md`
+- phase_state: `completed`
+- verification_artifact_dir: `docs/epics/feat-to-feature/rename-completion/raw-20260629T030408Z/code-reviews`
+
 ## M-20260628T005815Z-A
 - title: chat refactor — comment + discuss + archive skill
 - status: active
