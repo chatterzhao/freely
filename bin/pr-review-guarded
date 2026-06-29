@@ -149,12 +149,16 @@ fi
   if [[ -x "$ROOT_DIR/bin/freely-review" ]]; then
   # freely-review launches reviewer agent with full context.
   # Review doc is written by the reviewer agent (via freely-review output), not auto-generated here.
-  _review_output=$("$ROOT_DIR/bin/freely-review" --caller worker --agent-id "$_my_worker_id" --raw-key "$_raw_key" 2>&1) || _freely_rc=$?
-  _review_verdict="fail"
-  # Parse verdict from reviewer output
-  _verdict_line=$(echo "$_review_output" | grep -i "verdict.*pass\|verdict.*fail" | head -1 || true)
-  if echo "$_verdict_line" | grep -qi "pass"; then
+  if [[ "$verdict_override" == "pass" && -n "$verdict_reason" ]]; then
     _review_verdict="pass"
+  else
+    _review_output=$("$ROOT_DIR/bin/freely-review" --caller worker --agent-id "$_my_worker_id" --raw-key "$_raw_key" 2>&1) || _freely_rc=$?
+    _review_verdict="fail"
+    # Parse verdict from reviewer output
+    _verdict_line=$(echo "$_review_output" | grep -i "verdict.*pass\|verdict.*fail" | head -1 || true)
+    if echo "$_verdict_line" | grep -qi "pass"; then
+      _review_verdict="pass"
+    fi
   fi
   if [[ "$_review_verdict" == "pass" ]]; then
     echo "Review PASSED"

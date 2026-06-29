@@ -22,7 +22,7 @@
 正确的做法是走标准开发流程:
 
 ```
-feat: ([命令] feedback) → [命令] wt-create → [skill] B1 → [skill] B2 → [skill] dev → [skill] test → [命令] pr-create → [命令] pr-review → [命令] pr-merge → [命令] wt-close
+feature: ([命令] feedback) → [命令] wt-create → [skill] B1 → [skill] B2 → [skill] dev → [skill] test → [命令] pr-create → [命令] pr-review → [命令] pr-merge → [命令] wt-close
 fix:  ([命令] feedback) → [命令] wt-create → [skill] dev → [skill] test → [skill] B1 → [skill] B2 → [命令] pr-create → [命令] pr-review → [命令] pr-merge → [命令] wt-close
 
      反馈: freely feedback --repo <repo> --title "..." --body "..."         (raw issue 不存在时需要)

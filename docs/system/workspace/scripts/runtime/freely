@@ -6546,7 +6546,7 @@ _write_chat_to_issue() {
     log_info "[chat] Next: create raw issue on configured platform, then worktree:"
     log_info "[chat]   1. ./bin/freely feedback --help   (review usage, then create the raw issue)"
     log_info "[chat]   2. wt-create --raw-key <returned-key> --source platform --skill freely-fix-execution --slug <slug>"
-    log_info "[chat] Then follow the skill: skill:freely-fix-execution (Fix first) or skill:freely-feat-execution (Govern first)"
+    log_info "[chat] Then follow the skill: skill:freely-fix-execution (Fix first) or skill:freely-feature-execution (Govern first)"
   fi
 
   # Step 2: Try direct sync if a worktree exists for this issue
@@ -8477,7 +8477,7 @@ EOF
 ### Skill 体系
 所有 skill 以 `freely-` 前缀命名:
 - `freely-fix-execution` — bug 修复工作流
-- `freely-feat-execution` — 功能开发工作流
+- `freely-feature-execution` — 功能开发工作流
 - `freely-dev-loop-execution` — 开发循环（code review + pre-tests）
 - `freely-doc-B1_IBM-execution` / `freely-doc-B2_IBM-execution` — IBM 治理
 - `freely-branch-management` — 分支管理
@@ -10805,7 +10805,7 @@ materialize_cleanup_worker_prompt_from_manager_continuity_if_needed() {
         if [[ "$companion_branch" == fix/* ]]; then
           printf 'freely-fix-execution 模式: test-pre-merge 可临时修改测试（dirty only），实际提交需 cd 到上述路径后 commit。\n'
         elif [[ "$companion_branch" == feature/* ]]; then
-          printf 'freely-feat-execution 模式: 所有开发和提交需在 feature 工位进行，不在当前工位修改。\n'
+          printf 'freely-feature-execution 模式: 所有开发和提交需在 feature 工位进行，不在当前工位修改。\n'
         fi
       fi
     fi
@@ -23575,7 +23575,7 @@ HELP
   echo "[feedback]"
   echo "[feedback] Next: create a worktree to fix or implement:"
   echo "[feedback]   wt-create --raw-key ${raw_key} --source platform --skill freely-fix-execution --slug <slug>"
-  echo "[feedback]   wt-create --raw-key ${raw_key} --source platform --skill freely-feat-execution --slug <slug>"
+  echo "[feedback]   wt-create --raw-key ${raw_key} --source platform --skill freely-feature-execution --slug <slug>"
 
   printf 'raw-%s\n' "$raw_key"
 }
@@ -23700,7 +23700,7 @@ cmd_intake_chat() {
     echo "[chat]"
     echo "[chat] Then follow the skill to complete the work:"
     echo "[chat]   skill:freely-fix-execution  — Fix first, govern later"
-    echo "[chat]   skill:freely-feat-execution — Govern first, then code"
+    echo "[chat]   skill:freely-feature-execution — Govern first, then code"
   fi
 }
 
