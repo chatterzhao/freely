@@ -1,6 +1,13 @@
 ---
 name: freely-test-RED-execution
-description: TDD RED 阶段——B2 之后、dev 之前。执行 pre-tests.md 中全部测试，确认全部 RED（失败），证明 bug 可复现（fix）或功能未实现（feature）。不通过 RED 绝不允许写一行实现代码。
+description: >-
+  TDD RED 阶段。执行 pre-tests.md 中全部测试，确认全部 RED（失败）。
+  fix: 证明 bug 可复现。feature: 证明功能未实现。不通过 RED 绝不允许
+  进入 `freely-dev-loop-execution` skill 写实现代码。
+
+  Use when: `freely-doc-B2_IBM-execution` skill 完成之后，写代码之前。
+  触发词："RED"、"测试先行"、"先跑测试"、"确认失败"、"复现 bug"、
+  "TDD"、"red phase"。
 ---
 
 # skill:freely-test-RED-execution
