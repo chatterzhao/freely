@@ -35,7 +35,7 @@ _caller_is_wt_create() {
   while [[ "$pid" -gt 1 ]]; do
     cmd=$(ps -o comm= -p "$pid" 2>/dev/null || true)
     case "$cmd" in
-      wt-create|bash*)  # bash* covers "bash freely wt-create" invocation
+      wt-create|bash*)  # bash* covers "bash ./bin/wt-create" invocation
         # Verify by checking if the process command line contains wt-create
         local full_cmd
         full_cmd=$(ps -o args= -p "$pid" 2>/dev/null || true)
@@ -108,8 +108,8 @@ while read -r old_oid new_oid refname; do
   fix/feature/hotfix/test-pre-merge 分支禁止手动创建。
   完整开发流程（详见 AGENTS.md §核心开发流程）：
 
-  阶段2: 创建 raw issue → freely feedback --repo <user/repo> --title '...' --body '...'
-  阶段3: 创建工位   → freely wt-create --raw-key <key> --source <platform|chat-inbox|local> \\
+  阶段2: 创建 raw issue → ./bin/freely feedback --repo <user/repo> --title '...' --body '...'
+  阶段3: 创建工位   → ./bin/wt-create --raw-key <key> --source <platform|chat-inbox|local> \\
                           --skill <freely-workflow-guarded-execution|freely-workflow-guarded-execution> --slug <slug>
 
 MSG
@@ -145,7 +145,7 @@ NAME_BLOCK
   fix/feature/hotfix/test-pre-merge 分支禁止手动删除。
   必须通过 wt-close 收口（验 phase_state → 关平台 issue → 删 worktree → 删分支）。
 
-  Usage: freely wt-close <branch>
+  Usage: ./bin/wt-close <branch>
 
 DELETE_BLOCK
       exit 1
@@ -198,7 +198,7 @@ REASON_GATE
          git show $new_oid
          git log --oneline $new_oid --not $old_oid | head -5
     2. If the commit IS a protected merge, re-run with pr-merge-guarded:
-         freely pr-merge-guarded $branch_name <source-branch>
+         ./bin/pr-merge-guarded $branch_name <source-branch>
        This ensures the merge receipt is properly injected.
     3. If this is an emergency bypass, use FREELY_SKIP_IBM_GATE="违规绕过门禁中，理由充分，是：<业务理由>"
        (governance-only changes only — code changes will be rejected).

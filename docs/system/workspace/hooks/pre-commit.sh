@@ -172,7 +172,7 @@ require_valid_guarded_completion_state() {
   load_guarded_state || {
     cat <<MSG
 [HOOK] Commit blocked: guarded merge completion state is missing or malformed.
-Re-run the merge through freely pr-merge-guarded so hooks can verify a canonical completion handshake.
+Re-run the merge through ./bin/pr-merge-guarded so hooks can verify a canonical completion handshake.
 MSG
   }
 
@@ -207,7 +207,7 @@ if freely_wt_is_test_pre_merge_branch "$branch"; then
 [HOOK] Commit blocked: raw merge completion on '$branch' is forbidden.
 Use the guarded completion path instead:
 
-  freely pr-merge-guarded complete "$branch" <source-branch>
+  ./bin/pr-merge-guarded complete "$branch" <source-branch>
 
 MSG
   fi
@@ -255,7 +255,7 @@ REASON_GATE
   For implementation changes, complete IBM lifecycle FIRST:
 
     skill:freely-doc-B1_IBM-execution  → raw → brainstorm → candidate → milestones.md
-    skill:freely-doc-B2_IBM-execution  → 物化 I-* issue 文档 + PRD + tasks + code-review → milestones.md committed_issues
+    skill:freely-doc-B2_IBM-execution  → I-* issue → PRD → tasks → code-review → milestones.md
 
   Then commit via proper worktree flow (not directly on develop).
 GUIDE
@@ -279,7 +279,7 @@ GUIDE
 [HOOK] Commit blocked: raw merge completion on '$branch' is forbidden.
 Use the guarded completion path instead:
 
-  freely pr-merge-guarded complete "$branch" <source-branch>
+  ./bin/pr-merge-guarded complete "$branch" <source-branch>
 
 Do not finish protected-branch merges with bare 'git commit' or equivalent bypass.
 MSG
@@ -294,7 +294,7 @@ Read AGENTS.md §核心开发流程, then invoke the correct skill:
 
 Quick start:
   cd <project-root>
-  freely wt-create --raw-key <key> --source <platform|chat-inbox> --skill <skill> --slug <slug>
+  ./bin/wt-create --raw-key <key> --source <platform|chat-inbox> --skill <skill> --slug <slug>
   cd ../<project>-worktrees/<branch-dir>
 
 Do NOT work around this hook. Bypass attempts (skip-worktree, --no-verify,
@@ -365,7 +365,7 @@ Start work in worktree:
   cd "$existing_for_branch"
 
 Standard cleanup after merge:
-  freely wt-close "$branch"
+  ./bin/wt-close "$branch"
 MSG
   git worktree list
   exit 1
@@ -378,13 +378,13 @@ No dedicated sibling worktree found for '$branch'.
 
 Create it from the project root with the standard command:
   cd <your-project-name-path>
-  freely wt-create "$branch"
+  ./bin/wt-create "$branch"
   cd ${rel_target}
 
 If you must create it manually instead:
   git worktree add ${rel_target} "$branch"
-  freely sync-tooling --source-project <your-project-name-path> --project ${rel_target}
+  ./bin/freely sync-tooling --source-project <your-project-name-path> --project ${rel_target}
 
 When the work is finished and merged:
-  freely wt-close "$branch"
+  ./bin/wt-close "$branch"
 MSG
