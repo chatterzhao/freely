@@ -17,25 +17,21 @@ fix（bug修复）和 feature（新功能/大型改动）共用同一个流程�
 |------|-----|---------|
 | 分支前缀 | `fix/*` / `hotfix/*` | `feature/*` |
 | wt-create | `--kind fix` | `--kind feature` |
-| RED 含义 | 确认 bug 可复现 | 设计测试，确认功能未实现 |
-| hotfix | 合并到 main + develop | 无 |
 | B1/B2/门禁 | 完全一致 | 完全一致 |
+| hotfix | 合并到 main + develop | 无 |
 
-## fix RED vs feature RED
+## fix 与 feature 的唯一差异：RED 阶段
 
-```
-fix RED — 确认 bug 可复现:
-  1. 已有测试能捕获 bug → 直接跑，确认 FAIL
-  2. 需要新设计测试 → 先写好再跑，确认 FAIL
-  3. 手工端到端复现 → 记录步骤到 actual_RED_output
-  4. 意外 PASS → 测试有问题，回 B2 修 pre-tests
+流程结构完全一致。唯一语义差异在 RED 阶段——测试方法相同，结论不同：
 
-feature RED — 确认功能未实现:
-  1. 按重要度设计测试: 端到端（必须）→ 集成 → 单元
-  2. 逐个执行，必须全部 FAIL（功能确实没做）
-  3. 没有端到端 → 设计不完整，回 B2 补
-  4. 意外 PASS → 功能已存在/测试写错了，回 B2 修
-```
+| | fix RED | feature RED |
+|------|----------|------------|
+| **测试方法** | 已有测试 / 新测试 / 手工端到端复现 | 端到端（必须）→ 集成 → 单元 |
+| **RED 结论** | bug 存在时测试一定是 RED | 功能未实现时测试一定是 RED |
+| **GREEN 结论** | 修复正确后，同一套测试一定是 GREEN | 实现正确后，同一套测试一定是 GREEN |
+| **意外 PASS** | bug 不存在/测试写错了 → 回 B2 修 | 功能已存在/测试写错了 → 回 B2 修 |
+
+详细执行步骤见 `skill:freely-test-RED-execution`。workflow skill 不重复描述——编排交给本 skill，执行交给子 skill。
 
 ## 分支规范速查
 
@@ -83,78 +79,57 @@ hotfix/*          → main + develop
 ### 阶段 1：B1_IBM 预研
 
 ```
-1. 创建工位:
-   ./bin/wt-create --raw-key <key> --kind <fix|feature|hotfix> --slug <slug>
-
-   自动创建:
-   ├─ <kind>/raw-{raw-key}-{slug}      (基于 develop，永久开发工位)
-   └─ test-pre-merge-{raw-key}-{slug}   (基于 dev，丢弃式测试沙箱)
-
+1. ./bin/wt-create --raw-key <key> --kind <fix|feature|hotfix> --slug <slug>
 2. skill:freely-doc-B1_IBM-execution
-   → 写 docs/pre-brainstorms/{key}--{slug}/brainstorms.md
-   → 写 candidates.md，每个 candidate 标注 promote/absorb/drop
-   → 更新 milestones.md candidate_issues
-3. candidate 决策：promote → 进入 B2_IBM
+   → 预研收敛 → candidate 入里程碑
+3. candidate promoted → 进入 B2
 ```
+
+详细步骤见 `skill:freely-doc-B1_IBM-execution`。
 
 ### 阶段 2：B2_IBM
 
 ```
 1. skill:freely-doc-B2_IBM-execution
-   → materialize I-* issue
-   → 写 pre-tests.md（覆盖全部改动面的测试方案，端到端优先）
-     · 每条 acceptance item: red-green-status = pending
-     · fix: 写清楚 RED 阶段如何复现 bug
-     · feature: 按端到端→集成→单元设计测试
-   → 写 prd.md / tasks.md
-   → 写 code-reviews/implementation-decision-note.md
-   → 更新 milestones.md committed_issues
-2. issue phase_state = done_b2_ibm → 进入 RED
+   → I-* issue + pre-tests（red-green-status = pending）+ tasks + code-review
+   → fix: 写清楚复现方法。feature: 端到端→集成→单元设计测试
+2. phase_state = done_b2_ibm → 进入 RED
 ```
 
-### 阶段 3：RED — fix 复现 / feature 设计测试（写代码之前）
+详细步骤见 `skill:freely-doc-B2_IBM-execution`。
 
-**不通过 RED，绝不允许写一行实现代码。**
+### 阶段 3：RED（写代码之前。不通过 RED，不允许写实现代码）
 
 ```
 1. skill:freely-test-RED-execution
-
-   fix:  确认 bug 真的可复现（已有测试/新测试/手工端到端）
-   feature: 按端到端→集成→单元设计测试，确认全部 FAIL（功能未实现）
-
-2. 每条 acceptance item:
-   - 真的 FAIL → red-green-status = red，记录 actual_RED_output
-   - 意外 PASS → 测试有问题，回 B2 修 pre-tests
-3. 全部 red（或合理 not_applicable）→ 进入 dev
+   → fix: 用同一套测试复现 bug，确认 RED
+   → feature: 用设计的测试确认功能未实现，确认 RED
+2. 全部 red-green-status = red → 进入 dev
 ```
+
+详细步骤（含意外 PASS 处理）见 `skill:freely-test-RED-execution`。
 
 ### 阶段 4：Dev 实现
 
 ```
 1. skill:freely-dev-loop-execution
-   → 在开发工位中实现
-   → 不碰 pre-tests.md 的测试方案（测试先行，代码后行）
-   → 写 code-review（含 Implementation Decision Note）
-   → 更新 phase_state → in_dev
+   → 测试先行，代码后行。不碰 pre-tests.md。
+   → 写 code-review + Implementation Decision Note
 ```
 
-### 阶段 5：test-GREEN — 测试工位最终验证
+详细步骤见 `skill:freely-dev-loop-execution`。
+
+### 阶段 5：test-GREEN（测试工位最终验证）
 
 ```
 1. skill:freely-test-execution
    → 在与开发工位 raw key 相同的 test-* 测试工位执行
-   → 运行前确认: test 工位包含全部 dev 最新提交（cherry-pick 同步，不能落后）
-
-2. GREEN 判定（每条 acceptance item 必须同时满足）:
-   - red-green-status = green（RED→dev→GREEN 循环完成）
-   - status = passed（测试已执行）
-   - actual_output 已填写且不是占位符
-   - actual_output 与 expected_output 一致
-
-3. 结果:
-   - 全部 green → phase_state → in_verification，进入 pr-create
-   - 有任何不 green → 回阶段 4 修复 → git commit → cherry-pick → 重跑
+   → 先 cherry-pick 同步全部 dev 提交，再跑全量测试
+   → 全部 green → in_verification → pr-create
+   → 不 green → 回阶段 4 修复 → 重新同步 → 重跑
 ```
+
+GREEN 判定标准和详细步骤见 `skill:freely-test-execution`。
 
 ### 阶段 6：pr-create-guarded 提 PR
 
