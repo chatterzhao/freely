@@ -1,7 +1,7 @@
 # Agent 上下文入口
 
 ## 强制 
-强制使用`freely-workflow-guarded-execution`这个 skill。
+MUST 强制在任何工作开始前遵守`freely-workflow-guarded-execution`这个 skill。
 
 这个 skill 它内部要求的强制开发流程（详情请阅读其 skill）:
 ```
