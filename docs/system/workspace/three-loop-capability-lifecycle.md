@@ -269,12 +269,12 @@ fix 与 feature 流程顺序完全一致。区别仅在 B1/B2 的深度：fix �
 
 ### Hotfix 紧急修复
 ```
-从 main 创建 hotfix/* → dev → pr-create → pr-review → pr-merge main → pr-merge develop → wt-close
-（可跳过 test-pre-merge，双合并 main+develop）
+从 main 创建 hotfix/* → B1 → B2 → dev → test → pr-create → pr-review → pr-merge main → pr-merge develop → wt-close
+（与 fix 流程完全一致，唯一区别：合并目标为 main + develop）
 ```
 
 ### Doc-only 纯文档
 ```
 dev → pr-create → pr-review → pr-merge → wt-close
-（跳过 test-pre-merge、B1、B2）
+（跳过 B1、B2。test 不可跳过，即使是纯文档也必须验证）
 ```

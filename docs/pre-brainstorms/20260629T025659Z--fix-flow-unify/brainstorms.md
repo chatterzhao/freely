@@ -63,25 +63,26 @@ fix 采用"Fix first, govern later"（先写代码，后补治理文档）导致
 - 复杂 fix → B1 + B2 完整流程
 - 缺点：引入主观判断（"什么是简单 fix"），门禁无法区分，会变成绕过借口
 
-## Decision: Option B — 统一为 B1 → B2 → dev → test
+## Decision: Option B — 统一为 B1 → B2 → dev → test，与 feature 完全一致
 
 理由：
 1. 治理文档在开发之前，是质量保证，不是额外负担
-2. fix 的 B1/B2 是轻量版——与 feature 结构相同但深度不同
+2. fix 和 feature 的 B1/B2 要求完全相同——相同的结构、相同的深度、相同的门禁
 3. 去掉 test-pre-merge cherry-pick 机制，简化实现
 4. 两个 skill 流程一致，降低认知负担
 
-保留的差异：
+fix 和 feature 的唯一合理差异：
 | 维度 | fix | feature |
 |------|-----|---------|
-| 分支 | `fix/*` / `hotfix/*` | `feature/*` |
-| B1 范围 | 根因分析 + 修复方案评估（1-2方案） | 完整预研 + 多方案发散 |
-| B2 范围 | 修复设计 + 回归测试 | 完整设计 + 全量测试 |
-| hotfix | 可跳过 test-pre-merge，双合并 | 无此路径 |
+| 分支前缀 | `fix/*` / `hotfix/*` | `feature/*` |
+| hotfix 路径 | 有（从 main 创建，合并到 main + develop） | 无 |
+
+除此之外，B1/B2/dev/test 的流程、深度、门禁完全一致。不存在"fix 的 B1 可以简单写"——根因分析不到位，修复方案评估不充分，和 feature 的预研不充分一样，都是质量问题。
 
 去掉的机制：
 - test-pre-merge 写代码 → cherry-pick 到 fix 工位
 - "Fix first, govern later" 哲学
+- "fix 的 B1/B2 是轻量版"的错误观念
 
 波及文件：
 1. `~/.claude/skills/freely-fix-execution/SKILL.md` — 重写流程顺序

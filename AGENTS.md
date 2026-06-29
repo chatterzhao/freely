@@ -187,7 +187,7 @@ Freely 开发 Freely 时，默认先问四件事：
 
 - **原 fix|feature worktree 还在** → 直接在 fix|feature 上做 B1→B2→dev→test。走 pr-create → pr-review → pr-merge → develop。
 - **原 feature 已退役（已合并/已删）** → wt-create 创建 fix 工位 + test-pre-merge → B1→B2→dev→test → pr。
-- **普通 fix** 走 `B1 → B2 → dev → test → pr-create → pr-review → pr-merge → develop`；**紧急 hotfix** 用 `hotfix/*` → develop（hotfix 从 main 创建，可跳过 test-pre-merge）。
+- **普通 fix** 走 `B1 → B2 → dev → test → pr-create → pr-review → pr-merge → develop`；**紧急 hotfix** 用 `hotfix/*`，从 main 创建，合并到 main + develop。测试不可跳过，流程与 fix 完全一致。
 - **治理先行**：B1_IBM（`skill:freely-doc-B1_IBM-execution`：根因分析 → candidate → milestone）→ B2_IBM（`skill:freely-doc-B2_IBM-execution`：I-* → pre-tests → tasks → code-review）→ milestones.md。即使简单 fix 也必须走完整流程，B1/B2 为轻量版。
 - **原则**：Govern first, code later。治理文档在开发之前，pre-tests 驱动 TDD 实现。
 

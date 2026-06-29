@@ -19,7 +19,7 @@ fix 和 feature 的区别不在流程顺序，而在各阶段的深度：
 | **B1** | 根因分析 + 修复方案评估（1-2个方案） | 完整预研 + 多方案发散 |
 | **B2** | 修复设计 + 回归测试（至少复现+验证） | 完整设计 + 全量测试 |
 | **pre-tests** | 至少 1 条复现 bug 的 RED + 验证修复的 GREEN | 全量验收测试 |
-| **hotfix** | 可跳过 test-pre-merge，双合并 main+develop | 无此路径 |
+| **hotfix** | 合并到 main + develop（其他同 fix） | 无此路径 |
 
 ## 与 freely-feature-execution 的分工
 
@@ -84,7 +84,7 @@ hotfix/*          → main + develop (pr-merge-guarded)
 | 类型 | 分支 | 合并路径 |
 |---|---|---|
 | 普通 fix | `fix/raw-{raw-key}-{slug}` | fix → pr-create → pr-review → pr-merge develop |
-| 紧急 hotfix | `hotfix/<desc>-<YYYYMMDD>` | hotfix → pr-merge-guarded main + develop（可跳过 test-pre-merge） |
+| 紧急 hotfix | `hotfix/<desc>-<YYYYMMDD>` | hotfix → B1→B2→dev→test→pr → pr-merge-guarded main + develop |
 
 ---
 
