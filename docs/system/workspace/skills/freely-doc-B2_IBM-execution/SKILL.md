@@ -1,6 +1,13 @@
 ---
 name: freely-doc-B2_IBM-execution
-description: B2_IBM：I→B→M 第二阶段。从 scan、A2A task 与 continuity evidence 选出的 milestone committed_issues 取 I-{key}，经 Brainstorm 实现设计，产出 Map（prd/pre-tests/tasks/code-review）交付 dev-loop。
+description: >-
+  IBM Framework 第二阶段。消费 milestone 中的 I-* issue 做实现设计，
+  产出完整 Map：prd.md + pre-tests.md + tasks.md + code-reviews/。
+  标准产物交付给 `freely-dev-loop-execution` skill 进入实现阶段。
+
+  Use when: `freely-doc-B1_IBM-execution` skill 完成 candidate promoted
+  之后，需要对 I-* issue 做实现设计、编写 pre-tests、分解任务的阶段。
+  触发词："B2"、"设计"、"pre-tests"、"写测试方案"、"PRD"、"分解任务"。
 ---
 
 # skill:freely-doc-B2_IBM-execution
