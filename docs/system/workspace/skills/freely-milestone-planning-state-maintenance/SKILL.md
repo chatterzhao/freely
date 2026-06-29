@@ -1,6 +1,10 @@
 ---
 name: freely-milestone-planning-state-maintenance
-description: 扫描 `docs/milestones.md` 与关联 candidate / issue / progress / recovery / cleanup evidence，做 sequencing、状态维护和写回一致性收口。当主管发现 standing-source drift、排序冲突或队列失衡时使用。
+description: >- 扫描 `docs/milestones.md` 与关联 candidate、issue、progress evidence，
+  做 sequencing、状态维护和写回一致性收口。
+
+  Use when: 主管发现 milestone 排序冲突、队列失衡或 standing-source drift。
+  触发词："milestone"、"排序"、"队列"、"sequencing"、"状态维护"。
 ---
 
 # skill:freely-milestone-planning-state-maintenance
