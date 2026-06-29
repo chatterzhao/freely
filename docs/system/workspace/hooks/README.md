@@ -37,7 +37,7 @@
 
 - hook/gate bypass（包括 `--no-verify`）永久禁止。无例外。
 - hook/gate 失败时，默认动作是回源修正；不要把“我相信这是误判”当成自动豁免。
-- gate 误判应通过修正 gate 模式或向 `FREELY_SKIP_IBM_GATE=1` 白名单收敛解决，不得绕过。
+- gate 误判应通过修正 gate 模式或向 `FREELY_SKIP_IBM_GATE="违规绕过门禁中，理由充分，是：<业务理由>"` 白名单收敛解决，不得绕过。
 - canonical 治理依赖：hook 时机阻断 + `pr-merge-guarded` 受控 receipt + `governance-check` post-merge audit。
 
 ## Guarded Completion Handshake
@@ -47,7 +47,7 @@
 - `FREELY_GUARDED_MERGE_COMPLETION=1`
   - 表示当前提交是受控 merge completion，而不是裸 `git commit`
   - 必须与 git-dir scoped guarded completion state 一起出现；单独设置环境变量不构成合法握手
-- `FREELY_SKIP_IBM_GATE=1`
+- `FREELY_SKIP_IBM_GATE="违规绕过门禁中，理由充分，是：<业务理由>"`
   - 唯一合法 bypass 机制：仅跳过 IBM governance 文档门禁，保留安全/分支保护门禁
   - 仅限 document|cleanup|format 等结构上无需 IBM lifecycle 证据的变更
 
