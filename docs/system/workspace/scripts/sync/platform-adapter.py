@@ -350,8 +350,12 @@ def update_issue(local_id: str, platform_ids: dict, title: str = "", body: str =
       {"github": {"issue_id": "42", "url": "..."}, "gitee": {"issue_id": "17", ...}}
     """
     results = {}
+    if not isinstance(platform_ids, dict):
+        platform_ids = {}
     for platform in available_platforms():
         piv = platform_ids.get(platform, {})
+        if piv is None:
+            piv = {}
         issue_id = piv.get("issue_id", "") if isinstance(piv, dict) else str(piv)
         if not issue_id:
             results[platform] = {"status": "skipped", "error": f"no issue_id for {platform}"}
