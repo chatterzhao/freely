@@ -1,6 +1,14 @@
 ---
 name: freely-workflow-guarded-execution
-description: Freely 所有开发工作的唯一流程入口。拿到任务后、freely wt-create 命令建工位前必须加载本 skill。定义 fix 和 feature 的完整 freely-doc-B1_IBM-execution→freely-doc-B2_IBM-execution→freely-test-RED-execution→freely-dev-loop-execution→freely-test-execution→freely pr-create-guarded→freely pr-merge-guarded→freely wt-close 流程。fix 与 feature 的唯一语义差异在 freely-test-RED-execution 阶段
+description: >-
+  Freely 项目所有开发工作的统一流程入口。指导从 raw issue 创建、
+  B1 预研、B2 设计、RED 测试、dev 实现到 PR 合并收口的完整生命周期。
+
+  Use when: starting any development task, fixing a bug, implementing
+  a feature, creating a worktree, or when the user mentions "修 bug",
+  "开工位", "开发流程", "怎么开始", "反馈", "提 PR" without specifying
+  which skill to use. Also use when the user describes a task without
+  a clear workflow — this skill provides the canonical process.
 ---
 
 # skill:freely-workflow-guarded-execution
