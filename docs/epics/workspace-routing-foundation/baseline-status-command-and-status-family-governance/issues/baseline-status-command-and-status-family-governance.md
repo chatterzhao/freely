@@ -33,9 +33,9 @@ Freely 已经形成三块状态面：
 
 ## Acceptance
 
-- `./bin/freely baseline-status --project <path>` 可用，输出与原 baseline snapshot 一致。
-- `./bin/freely status --project <path>` 默认输出聚合视图，不再伪装成 baseline alias。
-- `./bin/freely status --view baseline|live|fleet|all` 可用。
+- `freely baseline-status --project <path>` 可用，输出与原 baseline snapshot 一致。
+- `freely status --project <path>` 默认输出聚合视图，不再伪装成 baseline alias。
+- `freely status --view baseline|live|fleet|all` 可用。
 - 当前活跃 skill / 文档 / 测试不再把 baseline snapshot 错称为 `status`。
 - `live-status` 与 `fleet-status` 的职责边界不被回退。
 

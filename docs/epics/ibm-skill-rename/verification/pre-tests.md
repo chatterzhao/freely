@@ -26,8 +26,8 @@
 - target environment: `develop-bound guarded merge chain`
 - required evidence: `guarded merge receipts`
 - blocker taxonomy: `execution_pending_or_failed`
-1. Merge feature into test-pre-merge via ./bin/pr-merge-guarded.
-2. Merge test-pre-merge into develop via ./bin/pr-merge-guarded.
+1. Merge feature into test-pre-merge via freely pr-merge-guarded.
+2. Merge test-pre-merge into develop via freely pr-merge-guarded.
 
 ## Real-Environment
 - real_environment_status: `pass`

@@ -15,8 +15,8 @@
 ## Commands
 
 1. `bash -n docs/system/workspace/scripts/runtime/freely`
-2. `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely`
-3. `./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+2. `freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+3. `freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
 
 ## Implementation Decision Note
 

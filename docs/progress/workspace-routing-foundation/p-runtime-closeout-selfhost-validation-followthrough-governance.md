@@ -17,7 +17,7 @@
 - This owner materializes the real follow-on behavior preserved on the runtime closeout/self-host checkpoint branch instead of letting it drift as undocumented branch-local truth.
 - The bounded seam is one shared closeout/self-host validation surface: lawful daemon reuse, safe ambiguous start-lock cleanup, and interruption-manager fast paths for the prompts that repeatedly arise during worktree retirement and continuation routing.
 - Focused feature-local regressions are green in the current worktree, including the missing `.freely/run` start-lock parent fix and a worker startup-truth attach regression that preserves healthy in-flight runtimes before `ai.pid` lands.
-- Real self-host replay in this worktree no longer relaunches a second supervisor on repeated `./bin/freely daemon start`; after the first successful start (`supervisor_pid=93757`), a second start is rejected as `already running` instead of spawning another control-plane.
+- Real self-host replay in this worktree no longer relaunches a second supervisor on repeated `freely daemon start`; after the first successful start (`supervisor_pid=93757`), a second start is rejected as `already running` instead of spawning another control-plane.
 - A second guarded replay with a longer delay kept the same result after the runtime progressed past bootstrap: first start returned `supervisor_pid=98716`, `ai_launch_begin` landed in runtime events, `live-status` reached `last_ai_state=up`, and a second `daemon start` 12 seconds later still stopped at `user_start_rejected_already_running`.
 - `./bin/pretests-gate` now accepts the owner contract in this worktree, so the issue-bound pre-tests truth is no longer blocked on stale `pending` metadata.
 - Canonical `develop` self-host replay on `2026-04-24` exposed a new repair seam inside the same closeout/self-host owner: when runtime resumed a retained cleanup worker for `worker_exit_contract_invalid`, the broad lead-agent preamble stayed ahead of the repair contract, so the worker kept writing a minimal `worker_done` receipt instead of the bounded blocker contract needed for lawful cleanup followthrough.
@@ -41,7 +41,7 @@
 4. `bash docs/system/workspace/scripts/tests/test-freely-daemon-start-releases-start-lock-when-launch-fails`
 5. `bash docs/system/workspace/scripts/tests/test-interruption-manager-handler`
 6. `bash docs/system/workspace/scripts/tests/test-interruption-manager-handler-cc`
-7. Real replay on `2026-04-19`: first `./bin/freely daemon start --project <worktree>` returned `supervisor_pid: 93757`; second `daemon start` was rejected with `daemon start refused: project runtime is already running`
+7. Real replay on `2026-04-19`: first `freely daemon start --project <worktree>` returned `supervisor_pid: 93757`; second `daemon start` was rejected with `daemon start refused: project runtime is already running`
 8. Guarded long-delay replay on `2026-04-19`: first `daemon start` returned `supervisor_pid: 98716`; runtime events recorded `ai_launch_begin`; second `daemon start` 12 seconds later returned exit code `2` with `daemon start refused: project runtime is already running`
 9. `./bin/pretests-gate --project <worktree> --issue docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/issues/runtime-closeout-selfhost-validation-followthrough-governance.md`
 10. `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260419-runtime-closeout-selfhost-validation-followthrough-verification.md`
@@ -73,7 +73,7 @@
 ## Next Action
 
 1. Promote this runtime-launch fix through a fresh `test-pre-merge-*` replay into `develop`.
-2. Restart canonical `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely` and verify retained cleanup replay now stays on continuation truth, clears stale repair handoff on the relaunched worker, and produces bounded cleanup truth instead of repair-only receipts.
+2. Restart canonical `freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely` and verify retained cleanup replay now stays on continuation truth, clears stale repair handoff on the relaunched worker, and produces bounded cleanup truth instead of repair-only receipts.
 3. Only after that retained cleanup lane settles lawfully should manager move on to the next scan-selected task; until then, keep all other dirty retained-lane residue frozen.
 
 ## Closeout

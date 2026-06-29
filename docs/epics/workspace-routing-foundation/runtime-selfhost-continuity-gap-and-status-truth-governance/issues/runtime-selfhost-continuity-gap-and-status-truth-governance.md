@@ -100,8 +100,8 @@ This is not a CLI-first owner and not a generic watchdog redesign. It is the nex
 - `bash docs/system/workspace/scripts/tests/test-freely-blocked-supervision-status-surface`
 - `./bin/governance-check`
 - `git diff --check`
-- `/usr/bin/time -p ./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
-- `cd /Users/zhaoyu/Downloads/code/my-freely/freely && /usr/bin/time -p ./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+- `/usr/bin/time -p freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+- `cd /Users/zhaoyu/Downloads/code/my-freely/freely && /usr/bin/time -p freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
 
 ## Next
 

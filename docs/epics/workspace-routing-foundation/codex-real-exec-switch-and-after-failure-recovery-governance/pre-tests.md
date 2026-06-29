@@ -26,7 +26,7 @@
 - required evidence: `real bad-slot start, live-status/log observation, and restored runtime state`
 - blocker taxonomy: `execution_pending_or_failed`
 1. Switch Codex to the real limited slot `account-worahe1001@outlook-com-1`.
-2. Run `./bin/freely start`, observe runtime logs for the first failure and ordered recovery probes, then stop after the first usable slot is adopted.
+2. Run `freely start`, observe runtime logs for the first failure and ordered recovery probes, then stop after the first usable slot is adopted.
 3. Verify the recovered slot is a later saved slot and that `freely stop` leaves no lingering supervisor/monitor/codex child.
 
 ## Real-Environment

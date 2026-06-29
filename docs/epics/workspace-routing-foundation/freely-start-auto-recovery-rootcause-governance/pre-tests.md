@@ -25,7 +25,7 @@
 - target environment: `test-pre-merge-20260414-freely-start-auto-recovery-rootcause`
 - required evidence: `guarded merge replay plus premerge governance audit`
 - blocker taxonomy: `execution_pending_or_failed`
-1. Run `./bin/pr-merge-guarded test-pre-merge-20260414-freely-start-auto-recovery-rootcause feature/freely-start-auto-recovery-rootcause-20260414`.
+1. Run `freely pr-merge-guarded test-pre-merge-20260414-freely-start-auto-recovery-rootcause feature/freely-start-auto-recovery-rootcause-20260414`.
 2. Run `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-pretests-gate`.
 3. Run `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-governance-merge-gate`.
 4. Run `./bin/test-lane premerge-integration -- ./bin/governance-check`.

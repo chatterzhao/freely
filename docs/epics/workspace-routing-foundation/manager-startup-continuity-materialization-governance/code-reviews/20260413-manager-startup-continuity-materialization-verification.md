@@ -15,8 +15,8 @@
 6. `PASS`: `./bin/governance-check`
 7. `PASS`: `git diff --check`
 8. `PASS`: bounded local runtime replay
-   - foreground replay: `./bin/freely start --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260413-feature-manager-startup-continuity-materialization-governance`, observed `desired_runtime_state: running`, `last_supervisor_state: up`, then clean `./bin/freely stop`
-   - daemon replay: `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260413-feature-manager-startup-continuity-materialization-governance`, observed `daemon_status: running`, then clean `./bin/freely daemon stop`
+   - foreground replay: `freely start --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260413-feature-manager-startup-continuity-materialization-governance`, observed `desired_runtime_state: running`, `last_supervisor_state: up`, then clean `freely stop`
+   - daemon replay: `freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260413-feature-manager-startup-continuity-materialization-governance`, observed `daemon_status: running`, then clean `freely daemon stop`
    - stop validation: both replays ended with `desired_runtime_state: stopped`, `last_supervisor_state: down`, `last_ai_state: down`, and no remaining same-worktree freely runtime processes in `ps`
 
 ## Review

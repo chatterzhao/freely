@@ -14,14 +14,14 @@
 
 ## Commands
 
-1. `./bin/pr-merge-guarded test-pre-merge-20260413-runtime-daemon-semantics feature/runtime-daemon-semantics`
+1. `freely pr-merge-guarded test-pre-merge-20260413-runtime-daemon-semantics feature/runtime-daemon-semantics`
 2. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-daemon-command-semantics`
 3. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-detach-and-shared-status`
 4. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
 5. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-runtime-supervisor-event-log`
 6. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-stop-terminates-all-same-project-supervisors`
 7. `./bin/test-lane premerge-integration -- ./bin/governance-check`
-8. `./bin/pr-merge-guarded develop test-pre-merge-20260413-runtime-daemon-semantics`
+8. `freely pr-merge-guarded develop test-pre-merge-20260413-runtime-daemon-semantics`
 9. `./bin/test-lane post-merge-followthrough -- ./bin/governance-check`
 
 ## Closure Note

@@ -32,8 +32,8 @@
 - target environment: `guarded develop-bound merge chain`
 - required evidence: `merge receipts plus verification artifact`
 - blocker taxonomy: `execution_pending_or_failed`
-1. Merge `feature/runtime-concurrent-start-stop-followthrough-20260411` into its guarded `test-pre-merge-*` lane via `./bin/pr-merge-guarded`.
-2. Merge that `test-pre-merge-*` lane into `develop` via `./bin/pr-merge-guarded`.
+1. Merge `feature/runtime-concurrent-start-stop-followthrough-20260411` into its guarded `test-pre-merge-*` lane via `freely pr-merge-guarded`.
+2. Merge that `test-pre-merge-*` lane into `develop` via `freely pr-merge-guarded`.
 3. Confirm the generated-truth status half remains out of scope while the runtime followthrough lands canonically.
 
 ## Real-Environment

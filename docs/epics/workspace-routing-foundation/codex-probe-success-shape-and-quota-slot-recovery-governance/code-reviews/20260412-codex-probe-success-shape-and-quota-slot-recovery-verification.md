@@ -26,11 +26,11 @@
 2. `bash docs/system/workspace/scripts/tests/test-freely-rate-limit-log-defers-to-watchdog`
 3. `bash docs/system/workspace/scripts/tests/test-freely-active-runtime-reconnect-stays-network-local`
 4. `./bin/ai switch codex account-worahe1001@outlook-com-1 --yes`
-5. `./bin/freely start --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-runtime-slot-recovery-network-failure`
-6. `./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-runtime-slot-recovery-network-failure`
+5. `freely start --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-runtime-slot-recovery-network-failure`
+6. `freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-runtime-slot-recovery-network-failure`
 7. `tail -n 80 .freely/logs/runtime-events.log`
 8. `cat ~/.codex/active-slot`
-9. `./bin/freely stop --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-runtime-slot-recovery-network-failure`
+9. `freely stop --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-runtime-slot-recovery-network-failure`
 
 ## Real-Environment Notes
 

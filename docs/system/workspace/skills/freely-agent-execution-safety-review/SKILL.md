@@ -30,7 +30,7 @@ description: >- 在 Freely workspace 中执行 execution-boundary review，输�
 ## 核心流程
 
 1. 先运行：
-   - `./bin/freely security-review-brief --project <project-root>`
+   - `freely security-review-brief --project <project-root>`
 2. 读取以下真相：
    - `execution_boundary_audit_status`
    - `execution_boundary_audit_detail`

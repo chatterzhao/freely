@@ -49,7 +49,7 @@
 
 1. Update candidate and milestone truth so `I-20260417-0445-A` is the canonical owner bound to `C-20260417-0445-A`.
 2. Re-run `./bin/governance-check` in the source writable worktree.
-3. Replay `./bin/pr-merge-guarded develop test-pre-merge-runtime-lifecycle-20260417`, then run the canonical `develop` followthrough and retire the disposable `test-pre-merge-*` worktree.
+3. Replay `freely pr-merge-guarded develop test-pre-merge-runtime-lifecycle-20260417`, then run the canonical `develop` followthrough and retire the disposable `test-pre-merge-*` worktree.
 
 ## Closeout
 

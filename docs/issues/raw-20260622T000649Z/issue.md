@@ -46,7 +46,7 @@ session_refs: []
   请加上绕过理由参数：
     --reason "具体绕过原因"
 
-  示例: ./bin/wt-close --force --reason "emergency: worktree corrupted" <branch>
+  示例: freely wt-close --force --reason "emergency: worktree corrupted" <branch>
 ```
 
 ## 涉及文件

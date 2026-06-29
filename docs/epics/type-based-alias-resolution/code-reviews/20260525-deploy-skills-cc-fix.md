@@ -4,6 +4,6 @@
 - change: updated `cc* → (not yet supported)` to `cc* → ~/.claude/skills/` in usage text and error message
 - verification: |
     - `bash -n bin/deploy-skills` — syntax OK
-    - `./bin/deploy-skills --help` — cc* maps to ~/.claude/skills/ in usage output
-    - `./bin/deploy-skills --dry-run --tools cc-test` — resolved to /Users/zhaoyu/.claude/skills/
-    - `./bin/deploy-skills --dry-run --tools unknown-tool 2>&1` — error includes cc* in supported list
+    - `freely deploy-skills --help` — cc* maps to ~/.claude/skills/ in usage output
+    - `freely deploy-skills --dry-run --tools cc-test` — resolved to /Users/zhaoyu/.claude/skills/
+    - `freely deploy-skills --dry-run --tools unknown-tool 2>&1` — error includes cc* in supported list

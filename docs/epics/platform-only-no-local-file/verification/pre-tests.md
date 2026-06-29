@@ -6,7 +6,7 @@
 - testing_layer: integration
 - target_environment: test-pre-merge-20260627T021849Z-platform-only-no-local-file
 - required_evidence: --dry-run 成功
-- test_command: ./bin/pr-merge-guarded develop fix/raw-20260627T021849Z-platform-only-no-local-file --dry-run
+- test_command: freely pr-merge-guarded develop fix/raw-20260627T021849Z-platform-only-no-local-file --dry-run
 - expected_output: --dry-run complete, exit 0
 - actual_output: --dry-run complete, exit 0
 - evidence_file: .freely/run/test-evidence/acceptance-1.log
@@ -22,7 +22,7 @@
 - testing_layer: integration
 - target_environment: test-pre-merge-20260627T021849Z-platform-only-no-local-file
 - required_evidence: acceptance-1 pass
-- test_command: ./bin/pr-merge-guarded develop fix/raw-20260627T021849Z-platform-only-no-local-file --dry-run
+- test_command: freely pr-merge-guarded develop fix/raw-20260627T021849Z-platform-only-no-local-file --dry-run
 - expected_output: --dry-run complete
 - actual_output: --dry-run complete
 ^- status: passed

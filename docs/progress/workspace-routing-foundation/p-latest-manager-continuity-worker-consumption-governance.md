@@ -14,8 +14,8 @@
   - {tool: codex, session_id: "019d1e4e-709f-7571-a958-b79828dc38f4", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/23/rollout-2026-03-23T22-25-50-019d1e4e-709f-7571-a958-b79828dc38f4.jsonl", role: "fresh_with_handoff_source"}
 - summary: same-family canonical replay on 2026-03-26 confirms the reopened continuity parser gap is resolved on `develop`. `manager-worker-launch-state.env` and `freely status` now agree on latest continuity/prompt generated and consumed truth for the same round, so this issue closes as completed canonical writeback rather than staying in `in_verification`.
 - verification:
-  - `./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
-  - `./bin/freely fleet-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+  - `freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+  - `freely fleet-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
   - `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-worker-launch-state.env`
   - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
   - `bash docs/system/workspace/scripts/tests/test-freely-worker-active-reentry-from-manager-launch`
@@ -30,7 +30,7 @@
 ## 2026-03-26 Canonical Develop Recheck
 
 - Replayed the same truth surfaces after merged same-family fixes landed on canonical `develop`:
-  - `./bin/freely status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+  - `freely status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
   - `/Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-worker-launch-state.env`
   - `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption`
 - Current canonical evidence:
@@ -124,8 +124,8 @@
   - `bash docs/system/workspace/scripts/tests/test-freely-manager-semantic-loop-status-surface`
   - `bash docs/system/workspace/scripts/tests/test-freely-live-status`
   - `bash docs/system/workspace/scripts/tests/test-freely-fleet-status`
-  - `./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
-  - `./bin/freely fleet-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+  - `freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+  - `freely fleet-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
 - Current judgement:
   - absorb this as a same-family repair inside `I-20260322-0445`
   - do not widen `C-20260404-1545-A`; that candidate still owns the separate blocked-intake / websocket / slot-switch supervision contract question

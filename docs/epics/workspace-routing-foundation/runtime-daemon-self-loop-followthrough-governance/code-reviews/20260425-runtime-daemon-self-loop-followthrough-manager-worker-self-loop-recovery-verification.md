@@ -28,7 +28,7 @@
 - `PASS`: the same implementation already survived one protected replay as merge commit `08129972ab13aa9672521f1167feba279a32ec66` on `test-pre-merge-runtime-lifecycle-followthrough-20260424`, and these protected-lane checks passed there:
   1. `bash docs/system/workspace/scripts/tests/test-freely-runtime-effective-worker-role-from-contract`
   2. `bash docs/system/workspace/scripts/tests/test-freely-delegated-worker-starting-stuck-reclaim`
-- `PENDING`: rerun protected replay with the owner-linked lifecycle materialization now in diff, merge into canonical `develop`, then verify real `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely` completes one full select -> finish -> merge/retire -> next-task loop without manual intervention.
+- `PENDING`: rerun protected replay with the owner-linked lifecycle materialization now in diff, merge into canonical `develop`, then verify real `freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely` completes one full select -> finish -> merge/retire -> next-task loop without manual intervention.
 
 ## Commands
 
@@ -42,7 +42,7 @@
 8. `bash docs/system/workspace/scripts/tests/test-freely-runtime-effective-worker-role-from-contract`
 9. `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-during-between-rounds-relaunch-grace`
 10. `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-while-worker-active`
-11. `./bin/pr-merge-guarded test-pre-merge-runtime-lifecycle-followthrough-20260424 feature/runtime-target-worker-role-and-starting-stuck-recovery-20260424`
+11. `freely pr-merge-guarded test-pre-merge-runtime-lifecycle-followthrough-20260424 feature/runtime-target-worker-role-and-starting-stuck-recovery-20260424`
 12. `bash docs/system/workspace/scripts/tests/test-freely-runtime-effective-worker-role-from-contract`
 13. `bash docs/system/workspace/scripts/tests/test-freely-delegated-worker-starting-stuck-reclaim`
 

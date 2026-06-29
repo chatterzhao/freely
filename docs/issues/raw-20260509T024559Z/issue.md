@@ -32,7 +32,7 @@ platform_state: closed
 开发过程（狗粮）:
 ```
 cd /path/to/freely
-./bin/freely daemon start --task-mode auto --project /path/to/freely
+freely daemon start --task-mode auto --project /path/to/freely
 ```
 
 安装后:
@@ -73,6 +73,6 @@ freely daemon start --task-mode auto --project <root>
 Freely 开发 Freely 就是:
 ```
 cd /path/to/freely
-./bin/freely daemon start --task-mode auto --project /path/to/freely
+freely daemon start --task-mode auto --project /path/to/freely
 ```
 和其他项目无区别。

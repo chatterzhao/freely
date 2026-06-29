@@ -20,13 +20,13 @@
 1. `bash docs/system/workspace/scripts/tests/test-cli-help-contracts`
    - 结果：通过
    - 说明：覆盖 `wt-create`、`wt-enter`、`wt-add`、`pr-merge-guarded`、`freely` 的 help surface；同时证明 `wt-create --help` 不创建 branch/worktree。
-2. `./bin/wt-create --help`
+2. `freely wt-create --help`
    - 结果：通过
    - 说明：直接返回 usage，退出码 `0`。
 3. `bash -lc 'source ./bin/wt-enter --help'`
    - 结果：通过
    - 说明：sourced helper help 直接返回 usage，退出码 `0`。
-4. `./bin/pr-merge-guarded --help`
+4. `freely pr-merge-guarded --help`
    - 结果：通过
    - 说明：usage-only invocation 退出码 `0`。
 5. `./bin/freely --help`

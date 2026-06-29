@@ -13,7 +13,7 @@
 
 ## Commands
 
-1. `./bin/pr-merge-guarded test-pre-merge-runtime-lifecycle-20260417 feature/runtime-process-leak-20260417`
+1. `freely pr-merge-guarded test-pre-merge-runtime-lifecycle-20260417 feature/runtime-process-leak-20260417`
 2. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-daemon-start-precheck-ignores-self-owned-start-lock`
 3. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-daemon-start-rejects-when-runtime-already-running`
 4. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-daemon-start-releases-start-lock-when-launch-fails`

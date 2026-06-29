@@ -8,7 +8,7 @@
 - testing_layer: end-to-end
 - target_environment: test-pre-merge-20260624T141559Z-feedback-issue-sync
 - required_evidence: help 输出不含 `--repo` 字样，含 "auto-detected from git remotes"
-- test_command: ./bin/freely feedback --help 2>&1 | grep -v '\-\-repo' && echo "PASS: no --repo in help"
+- test_command: freely feedback --help 2>&1 | grep -v '\-\-repo' && echo "PASS: no --repo in help"
 - expected_output: PASS: no --repo in help
 - actual_output: (执行后填写)
 - evidence_file: (执行后填写)
@@ -20,7 +20,7 @@
 - testing_layer: end-to-end
 - target_environment: test-pre-merge-20260624T141559Z-feedback-issue-sync
 - required_evidence: 错误信息提示 repo 已自动检测
-- test_command: ./bin/freely feedback --repo foo/bar --title x --body y 2>&1; echo "EXIT=$?"
+- test_command: freely feedback --repo foo/bar --title x --body y 2>&1; echo "EXIT=$?"
 - expected_output: ERROR: --repo is no longer needed; EXIT=1
 - actual_output: (执行后填写)
 - evidence_file: (执行后填写)
@@ -33,9 +33,9 @@
 - target_environment: test-pre-merge-20260624T141559Z-feedback-issue-sync
 - required_evidence: 三种错误场景均返回 exit 1 + 正确错误信息
 - test_command: |
-  ./bin/freely feedback --body "test" 2>&1; echo "---"
-  ./bin/freely feedback --title "test" 2>&1; echo "---"
-  ./bin/freely feedback --title "test" --body "test" --severity P5 2>&1
+  freely feedback --body "test" 2>&1; echo "---"
+  freely feedback --title "test" 2>&1; echo "---"
+  freely feedback --title "test" --body "test" --severity P5 2>&1
 - expected_output: |
   ERROR: --title is required
   ---
@@ -53,7 +53,7 @@
 - target_environment: fix/raw-20260624T141559Z-feedback-issue-sync
 - required_evidence: issue.md 存在且包含正确的 frontmatter 字段
 - test_command: |
-  ./bin/freely feedback --title "e2e test" --body "test body" 2>&1
+  freely feedback --title "e2e test" --body "test body" 2>&1
   ls docs/issues/raw-*/issue.md | tail -1 | xargs head -5
 - expected_output: |
   local_id: raw-...
@@ -70,7 +70,7 @@
 - target_environment: fix/raw-20260624T141559Z-feedback-issue-sync
 - required_evidence: GitHub issue URL 出现在 feedback 输出中
 - test_command: |
-  ./bin/freely feedback --title "pre-test e2e" --body "test" 2>&1 | grep "github.com"
+  freely feedback --title "pre-test e2e" --body "test" 2>&1 | grep "github.com"
 - expected_output: https://github.com/chatterzhao/freely/issues/...
 - actual_output: (执行后填写)
 - evidence_file: (执行后填写)

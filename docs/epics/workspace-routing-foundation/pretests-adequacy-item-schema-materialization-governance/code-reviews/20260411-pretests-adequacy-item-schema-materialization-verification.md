@@ -25,7 +25,7 @@
 5. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-pretests-gate`
 6. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
 7. `./bin/test-lane premerge-integration -- ./bin/governance-check`
-8. `./bin/pr-merge-guarded test-pre-merge-20260412-completed-owner-closeout-truth feature/completed-owner-closeout-truth-20260412`
+8. `freely pr-merge-guarded test-pre-merge-20260412-completed-owner-closeout-truth feature/completed-owner-closeout-truth-20260412`
 
 ## Implementation Decision Note
 

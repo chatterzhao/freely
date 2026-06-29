@@ -18,21 +18,21 @@ Freely 是一个自主项目循环运行器：
 ```bash
 chmod +x ./bin/freely
 
-./bin/freely init \
+freely init \
   --project <项目绝对路径> \
   --intent <项目意图文件绝对路径> \
   --constitution <宪法文件绝对路径> \
   --ai codex:gpt-5-codex:auto
 
-./bin/freely doctor --project <项目绝对路径>
-./bin/freely start --project <项目绝对路径>
+freely doctor --project <项目绝对路径>
+freely start --project <项目绝对路径>
 ```
 
 在另一个终端中：
 
 ```bash
-./bin/freely status --project <项目绝对路径>
-./bin/freely stop --project <项目绝对路径>
+freely status --project <项目绝对路径>
+freely stop --project <项目绝对路径>
 ```
 
 ## 文档门禁

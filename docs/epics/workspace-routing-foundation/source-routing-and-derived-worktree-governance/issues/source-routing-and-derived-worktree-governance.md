@@ -31,7 +31,7 @@
 
 1. 更新路由与边界治理文档。
 2. 更新 `context-source-skill`、`doc-pre-brainstorm-execution`、`doc-ibm-execution`、`dev-loop-execution`、`branch-management`。
-3. 增加标准 worktree 创建入口 `./bin/wt-create`。
+3. 增加标准 worktree 创建入口 `freely wt-create`。
 4. 更新 hook / AGENTS 提示，使其支持 derived worktree 语义。
 5. 明确 IBM 正式产物目录必须在 `docs/epics/{epic-name}/{story-name}/...`。
 6. 对齐 `lead-agent`、`workspace/tools.md`、首跳启动 prompt 与脚本回归，禁止同工具场景只输出 `next_prompt` 结束。
@@ -42,7 +42,7 @@
 - 核心 skills 以“情景 -> 动作 -> 产物 -> 下一跳”表达。
 - `doc-pre-brainstorm-execution` 明确 pre-brainstorm 应在合适 worktree 中写入。
 - `doc-ibm-execution` 明确先确定 `epic-name/story-name/issue-name`，再写正式 IBM 产物。
-- `./bin/wt-create` 可支持默认基线和 `--base` 派生基线。
+- `freely wt-create` 可支持默认基线和 `--base` 派生基线。
 - `lead-agent`、`workspace/tools.md` 与首跳启动 prompt 对“同工具继续第二跳”保持一致。
 - 回归测试锁住“默认不要只输出 `next_prompt`”与“必须在当前会话内继续执行第二跳”。
 

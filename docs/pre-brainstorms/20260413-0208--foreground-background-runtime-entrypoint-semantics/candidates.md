@@ -10,7 +10,7 @@
 ### C-20260413-0208-A
 - candidate_format_version: `v2`
 - title: Foreground/background runtime entrypoint semantics governance
-- problem: 近期 dogfooding 已确认 `./bin/freely start` 是前台附着 supervisor，会随调用会话结束而停机；但 Freely 的产品心智与未来 UI/TUI 默认需要一个显式后台自治 runtime。现有实现与测试又已经把 `start/restart/stop/status` 锁成前台/控制面 contract，因此不能直接把 `start` 偷改成后台模式。当前需要先把 foreground、daemon、UI 关闭默认、shared status truth 与回归保护面冻结成 canonical owner，再进入 dev-loop 实现。
+- problem: 近期 dogfooding 已确认 `freely start` 是前台附着 supervisor，会随调用会话结束而停机；但 Freely 的产品心智与未来 UI/TUI 默认需要一个显式后台自治 runtime。现有实现与测试又已经把 `start/restart/stop/status` 锁成前台/控制面 contract，因此不能直接把 `start` 偷改成后台模式。当前需要先把 foreground、daemon、UI 关闭默认、shared status truth 与回归保护面冻结成 canonical owner，再进入 dev-loop 实现。
 - why_now: 如果在没有冻结入口 contract 的情况下直接修 `start`，极易同时打破 event-log / PID / wait / ownership tests、watchdog/recovery 边界，以及未来 UI 启停心智。这已经是产品入口治理问题，不应继续停留在悬空 pre-brainstorm。
 - acceptance_criteria:
   - `Freely truth explicitly preserves foreground attached mode and background daemon mode as separate first-class runtime entrypoints.`

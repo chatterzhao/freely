@@ -26,9 +26,9 @@
 - target environment: `guarded develop-bound merge chain`
 - required evidence: `merge receipts plus verification artifact`
 - blocker taxonomy: `pass`
-1. Merge `feature/three-loop-model-refactor-20260418` into `test-pre-merge-three-loop-governance-20260419` via `./bin/pr-merge-guarded`.
+1. Merge `feature/three-loop-model-refactor-20260418` into `test-pre-merge-three-loop-governance-20260419` via `freely pr-merge-guarded`.
 2. Run `./bin/governance-check` in `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260419-test-pre-merge-three-loop-governance`.
-3. Merge `test-pre-merge-three-loop-governance-20260419` into `develop` via `./bin/pr-merge-guarded`.
+3. Merge `test-pre-merge-three-loop-governance-20260419` into `develop` via `freely pr-merge-guarded`.
 
 ## Real-Environment
 - acceptance target: `Record canonical develop publication and retirement of the temporary feature and test-pre-merge worktrees as the final protected-branch acceptance surface.`

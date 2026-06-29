@@ -26,8 +26,8 @@
 - target environment: `guarded develop-bound merge chain`
 - required evidence: `merge receipts plus verification artifact`
 - blocker taxonomy: `execution_pending_or_failed`
-1. Merge `feature/runtime-evidence-provenance-research-retirement-20260409` into `test-pre-merge-runtime-evidence-provenance-retirement-20260409` via `./bin/pr-merge-guarded`.
-2. Merge `test-pre-merge-runtime-evidence-provenance-retirement-20260409` into `develop` via `./bin/pr-merge-guarded`.
+1. Merge `feature/runtime-evidence-provenance-research-retirement-20260409` into `test-pre-merge-runtime-evidence-provenance-retirement-20260409` via `freely pr-merge-guarded`.
+2. Merge `test-pre-merge-runtime-evidence-provenance-retirement-20260409` into `develop` via `freely pr-merge-guarded`.
 3. Confirm the guarded push path now sees a concrete owner chain instead of only candidate-level retirement notes.
 
 ## Real-Environment

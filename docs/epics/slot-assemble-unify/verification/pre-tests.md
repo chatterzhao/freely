@@ -18,14 +18,14 @@
 ### acceptance-3
 - acceptance_target: pr-merge-guarded --dry-run
 - testing_layer: integration
-- test_command: ./bin/pr-merge-guarded develop fix/raw-20260626T173930Z-slot-assemble-unify --dry-run
+- test_command: freely pr-merge-guarded develop fix/raw-20260626T173930Z-slot-assemble-unify --dry-run
 - expected_output: --dry-run complete
 - actual_output: --dry-run complete
 ^- status: passed
 ## Integration
 - acceptance_target: dry-run pass
 - testing_layer: integration
-- test_command: ./bin/pr-merge-guarded develop fix/raw-20260626T173930Z-slot-assemble-unify --dry-run
+- test_command: freely pr-merge-guarded develop fix/raw-20260626T173930Z-slot-assemble-unify --dry-run
 - expected_output: --dry-run complete
 - actual_output: --dry-run complete
 ^- status: passed

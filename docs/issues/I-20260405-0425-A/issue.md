@@ -23,9 +23,9 @@ updated_at: '2026-05-17T12:22:41Z'
 platform_state: closed
 ---
 
-Freely 已经有 `./bin/pr-merge-guarded` 作为 merge 真源，但 `develop` 上的 `pre-merge-commit` 仍允许“没有 canonical guarded handshake 的 merge”继续走后续 gate。结果是：
+Freely 已经有 `freely pr-merge-guarded` 作为 merge 真源，但 `develop` 上的 `pre-merge-commit` 仍允许“没有 canonical guarded handshake 的 merge”继续走后续 gate。结果是：
 
-1. 手工裸 `git merge` 与仓库自有 `./bin/pr-merge-guarded` 入口并存。
+1. 手工裸 `git merge` 与仓库自有 `freely pr-merge-guarded` 入口并存。
 2. 只要 staged merge 内容满足 governance / promotion gate，裸 merge 仍能落地。
 3. 这类误用又会在 protected branch 上制造新的治理偏差，并且让人类和 agent 在两个 merge 入口之间来回误用。
 

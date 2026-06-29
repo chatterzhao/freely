@@ -16,7 +16,7 @@
   1. `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-workers-absorbs-terminal-handoff-followthrough`
   2. `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-absorbs-terminal-handoff-followthrough`
   3. `bash docs/system/workspace/scripts/tests/test-freely-manager-launch-path-collapses-terminal-handoff-worker-slot`
-- `PENDING`: canonical `develop` acceptance remains open until this owner evidence is lawfully promoted, `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely` is replayed from merged `develop`, and live runtime evidence proves the retained lane now continues through review/cleanup/retirement and then advances to another task.
+- `PENDING`: canonical `develop` acceptance remains open until this owner evidence is lawfully promoted, `freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely` is replayed from merged `develop`, and live runtime evidence proves the retained lane now continues through review/cleanup/retirement and then advances to another task.
 
 ## Commands
 

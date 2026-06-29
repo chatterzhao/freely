@@ -84,9 +84,9 @@
 - target environment: `guarded feature -> test-pre-merge -> develop replay`
 - required evidence: `merge receipts plus develop-side runtime observation`
 - blocker taxonomy: `pass`
-1. Merge `feature/runtime-daemon-self-loop-blocker-20260421` into `test-pre-merge-20260421-runtime-self-loop-blocker` via `./bin/pr-merge-guarded`.
-2. Merge `test-pre-merge-20260421-runtime-self-loop-blocker` into `develop` via `./bin/pr-merge-guarded`.
-3. On canonical `develop`, run `./bin/freely daemon start`.
+1. Merge `feature/runtime-daemon-self-loop-blocker-20260421` into `test-pre-merge-20260421-runtime-self-loop-blocker` via `freely pr-merge-guarded`.
+2. Merge `test-pre-merge-20260421-runtime-self-loop-blocker` into `develop` via `freely pr-merge-guarded`.
+3. On canonical `develop`, run `freely daemon start`.
 4. Observe that Freely selects at least one task, completes it to the current-project success standard, closes the temporary worktree, and proceeds to another task instead of falling into `operator_stop`.
 
 ## Real-Environment

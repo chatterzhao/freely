@@ -233,7 +233,7 @@ a2a_task.py list --raw-key <key> --status working,submitted
 Worker 是独立 ACP session，由 Runtime 通过 A2A Server 管理。
 你通过 a2a-exit 创建 submitted Worker task，Runtime 自动启动 Worker。
 
-1. **开工位**（如不存在）：`./bin/wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>`
+1. **开工位**（如不存在）：`freely wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>`
 2. **创建 Worker task**（无需先写 prompt 文件）：
    ```
    a2a-exit --state submitted --role worker \

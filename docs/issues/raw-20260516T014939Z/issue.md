@@ -56,7 +56,7 @@ title: "deploy-skills 应支持当前 AI_TOOL 并自动部署，freely start 时
 1. deploy-skills 不识别项目当前配置的 `AI_TOOL`，只从 `FREELY_TOOLS` 或硬编码 `claude` 读取
 2. 不支持 opencode、cc、iflow 等工具的 skill 路径
 3. `freely start` / `freely daemon start` 没有自动触发 skill 部署
-4. 修改 skill 后执行 `./bin/deploy-skills` 的人为步骤可能被遗漏
+4. 修改 skill 后执行 `freely deploy-skills` 的人为步骤可能被遗漏
 
 ## 需求
 

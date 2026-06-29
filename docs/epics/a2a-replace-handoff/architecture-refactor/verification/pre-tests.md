@@ -74,10 +74,10 @@
 ### 环境准备
 ```bash
 # 启动 A2A Server (Worker 端)
-./bin/freely start --mode worker
+freely start --mode worker
 
 # 启动 Manager
-./bin/freely start --mode manager
+freely start --mode manager
 ```
 
 ### 执行测试

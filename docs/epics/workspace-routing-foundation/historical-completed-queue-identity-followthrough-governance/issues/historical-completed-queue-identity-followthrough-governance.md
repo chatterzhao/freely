@@ -64,9 +64,9 @@ Canonical milestone queue policy is already frozen, but one historical completed
 ## Verification
 
 - `./bin/governance-check`
-- `./bin/wt-create test-pre-merge-20260412-watchdog-completed-identity-followthrough --base develop`
-- `./bin/pr-merge-guarded test-pre-merge-20260412-watchdog-completed-identity-followthrough feature/watchdog-completed-identity-followthrough-20260412`
-- `./bin/pr-merge-guarded develop test-pre-merge-20260412-watchdog-completed-identity-followthrough`
+- `freely wt-create test-pre-merge-20260412-watchdog-completed-identity-followthrough --base develop`
+- `freely pr-merge-guarded test-pre-merge-20260412-watchdog-completed-identity-followthrough feature/watchdog-completed-identity-followthrough-20260412`
+- `freely pr-merge-guarded develop test-pre-merge-20260412-watchdog-completed-identity-followthrough`
 
 ## Next
 

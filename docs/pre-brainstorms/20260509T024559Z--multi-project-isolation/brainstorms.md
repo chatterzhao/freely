@@ -108,13 +108,13 @@ fi
 Manager daemon 本身不"住"在任何 worktree。它从 project root 运行:
 ```
 cd $project_root
-./bin/freely daemon start --project $project_root
+freely daemon start --project $project_root
 ```
 
 Manager 使用的工具:
 - `git -C $project_root worktree list` — 查看所有工位
 - `git -C $project_root log` — 查看 develop 历史
-- `./bin/freely task-scan --project $project_root` — 扫描任务
+- `freely task-scan --project $project_root` — 扫描任务
 
 Manager **永远不在 test-pre-merge 或 fix/feature 工位中 cd**——它只读 project root 的数据做决策。Worker 才 cd 到工位。
 
@@ -244,10 +244,10 @@ freely daemon start --task-mode auto --project ~/freely,~/my-app
 
 ```
 Freely 开发 Freely:
-  ./bin/freely daemon start --project /path/to/freely
+  freely daemon start --project /path/to/freely
 
 用户开发自己的应用:
-  ./bin/freely daemon start --project ~/my-app
+  freely daemon start --project ~/my-app
 ```
 
 两者模型完全一致。
@@ -259,7 +259,7 @@ test-pre-merge 是 e2e 验证环境——fix/feature 代码合并进去后，在
 ```
 fix/raw-{key} → merge → test-pre-merge-{key}
   → cd test-pre-merge-{key}
-    → ./bin/freely daemon start --project <项目根>
+    → freely daemon start --project <项目根>
       → 端到端测试
 ```
 
@@ -332,7 +332,7 @@ fix/raw-{key} 或 feature/raw-{key}
   ├─ merge → test-pre-merge-{key}
   │
   ├─ cd test-pre-merge-{key}
-  ├─ 打包: ./bin/freely-package
+  ├─ 打包: freely-package
   ├─ 安装: 替换全局 freely 命令
   │
   ├─ freely daemon start --project /path/to/freely

@@ -45,7 +45,7 @@ REASON_GATE
   load_guarded_state || {
     cat <<MSG
 [HOOK] Merge blocked: canonical guarded merge state is missing or malformed.
-Re-run the merge through ./bin/pr-merge-guarded.
+Re-run the merge through freely pr-merge-guarded.
 MSG
     exit 1
   }
@@ -120,7 +120,7 @@ require_valid_guarded_merge_state() {
   load_guarded_state || {
     cat <<MSG
 [HOOK] Merge blocked: canonical guarded merge state is missing or malformed.
-Raw develop merges are not an allowed entrypoint. Re-run the merge through ./bin/pr-merge-guarded so hooks can verify the canonical handshake.
+Raw develop merges are not an allowed entrypoint. Re-run the merge through freely pr-merge-guarded so hooks can verify the canonical handshake.
 MSG
     exit 1
   }
@@ -128,7 +128,7 @@ MSG
   if [[ "${FREELY_GUARDED_MERGE_COMPLETION:-0}" != "1" ]]; then
     cat <<MSG
 [HOOK] Merge blocked: canonical guarded merge handshake marker is missing.
-Raw develop merges are not an allowed entrypoint. Re-run the merge through ./bin/pr-merge-guarded.
+Raw develop merges are not an allowed entrypoint. Re-run the merge through freely pr-merge-guarded.
 MSG
     exit 1
   fi

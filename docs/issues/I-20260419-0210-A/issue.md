@@ -23,7 +23,7 @@ updated_at: '2026-05-17T12:24:44Z'
 platform_state: closed
 ---
 
-Freely already declares `./bin/pr-merge-guarded` as the canonical protected-merge entrypoint, but the current enforcement only covers merge-commit creation and merge completion. A real protected-root replay on `2026-04-19` proved that `git merge --ff-only` can still advance `develop` directly to a feature commit because no merge commit is created and `pre-merge-commit` never runs.
+Freely already declares `freely pr-merge-guarded` as the canonical protected-merge entrypoint, but the current enforcement only covers merge-commit creation and merge completion. A real protected-root replay on `2026-04-19` proved that `git merge --ff-only` can still advance `develop` directly to a feature commit because no merge commit is created and `pre-merge-commit` never runs.
 
 That means the protected-branch entrypoint contract is still incomplete.
 

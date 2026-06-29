@@ -29,7 +29,7 @@
 - target environment: `test-pre-merge-success-standard-governance-20260420-0215`
 - required evidence: `premerge replay evidence plus owner verification artifact`
 - blocker taxonomy: `execution_pending_or_failed`
-1. Merge `feature/success-standard-governance-20260420` into `test-pre-merge-success-standard-governance-20260420-0215` through `./bin/pr-merge-guarded`.
+1. Merge `feature/success-standard-governance-20260420` into `test-pre-merge-success-standard-governance-20260420-0215` through `freely pr-merge-guarded`.
 2. Rerun the focused regression set plus `./bin/governance-check` in the pre-merge batch.
 3. Use the resulting verification artifact to justify guarded promote into `develop`.
 
@@ -39,7 +39,7 @@
 - target environment: `test-pre-merge-20260424-manager-continuity-worker-prompt-plain-list-parser`
 - required evidence: `premerge replay evidence plus fresh owner verification artifact`
 - blocker taxonomy: `execution_pending_or_failed`
-1. Merge `feature/manager-continuity-worker-prompt-plain-list-parser-20260424` into `test-pre-merge-20260424-manager-continuity-worker-prompt-plain-list-parser` through `./bin/pr-merge-guarded`.
+1. Merge `feature/manager-continuity-worker-prompt-plain-list-parser-20260424` into `test-pre-merge-20260424-manager-continuity-worker-prompt-plain-list-parser` through `freely pr-merge-guarded`.
 2. Rerun `bash docs/system/workspace/scripts/tests/test-freely-manager-continuity-current-worker-prompt-parsing`, `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption`, and `./bin/governance-check` in the pre-merge batch.
 3. Use the resulting verification artifact to justify guarded promote into `develop`.
 

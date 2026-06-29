@@ -13,7 +13,7 @@
 
 ## Commands
 
-1. `./bin/pr-merge-guarded test-pre-merge-20260413-manager-startup-continuity-materialization feature/manager-startup-continuity-materialization-governance-20260413`
+1. `freely pr-merge-guarded test-pre-merge-20260413-manager-startup-continuity-materialization feature/manager-startup-continuity-materialization-governance-20260413`
 2. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-manager-startup-continuity-stub-materialization`
 3. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-live-status-manager-handoff-state-surface`
 4. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-stop-materializes-missing-manager-continuity`

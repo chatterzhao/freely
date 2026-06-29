@@ -14,16 +14,16 @@ Freely 当前进入 `cli first` 审计阶段，本轮在 dedicated feature workt
 
 ### 项目归属与 bootstrap
 
-- `./bin/freely baseline-status --project <non-root-project>` 返回 0，但 `project:` 指向 root repo。
-- `./bin/freely status --project <non-root-project>` 的 baseline 段同样漂移到 root repo。
-- `./bin/freely sync-tooling --source-project <repo> --project <fresh-project>` 后，`freely init` 仍因缺失 `.githooks` 失败，需要手工复制 `.githooks` 才能初始化成功。
-- `./bin/freely ensure-interruption-dispatch --project <project>` 在 `.freely/intake` 不存在时退出 0，但直接打印原始 `find: ... No such file or directory`。
+- `freely baseline-status --project <non-root-project>` 返回 0，但 `project:` 指向 root repo。
+- `freely status --project <non-root-project>` 的 baseline 段同样漂移到 root repo。
+- `freely sync-tooling --source-project <repo> --project <fresh-project>` 后，`freely init` 仍因缺失 `.githooks` 失败，需要手工复制 `.githooks` 才能初始化成功。
+- `freely ensure-interruption-dispatch --project <project>` 在 `.freely/intake` 不存在时退出 0，但直接打印原始 `find: ... No such file or directory`。
 
 ### runtime / intake / control-plane
 
-- `./bin/freely start`、`restart`、`stop`、`restore-work` 在审计 worktree 上暴露 stale pid 修复、control-plane readiness 不稳与 stop 时强制 hard-kill 回退。
-- `./bin/freely chat --project <audit-worktree> 'cli audit ping'` 记录并 claim intake 后未能干净完成。
-- `./bin/freely intake status` 在 claim / resolve 后出现 `items: none`，但 `active_items`、`classified_items`、`absorbed_items` 仍不一致。
+- `freely start`、`restart`、`stop`、`restore-work` 在审计 worktree 上暴露 stale pid 修复、control-plane readiness 不稳与 stop 时强制 hard-kill 回退。
+- `freely chat --project <audit-worktree> 'cli audit ping'` 记录并 claim intake 后未能干净完成。
+- `freely intake status` 在 claim / resolve 后出现 `items: none`，但 `active_items`、`classified_items`、`absorbed_items` 仍不一致。
 
 ### wrapper / 测试打包 / 回归入口
 
@@ -47,15 +47,15 @@ Freely 当前进入 `cli first` 审计阶段，本轮在 dedicated feature workt
 
 ### 已重放的命令
 
-- `./bin/freely sync-tooling --source-project /Users/zhaoyu/Downloads/code/my-freely/freely --project <fresh-git-project>`
+- `freely sync-tooling --source-project /Users/zhaoyu/Downloads/code/my-freely/freely --project <fresh-git-project>`
   - 结果：成功返回，但目标项目仍缺少 `.githooks`
-- `./bin/freely init --project <fresh-git-project> --intent ... --constitution ... --ai codex:gpt-5.4:auto --accept-default-autonomy --force`
+- `freely init --project <fresh-git-project> --intent ... --constitution ... --ai codex:gpt-5.4:auto --accept-default-autonomy --force`
   - 结果：在 fresh git project 上仍因缺失 `.githooks` 失败；手工复制 `.githooks` 后可成功初始化
-- `./bin/freely baseline-status --project <initialized-project>`
+- `freely baseline-status --project <initialized-project>`
   - 结果：仍返回 0，但 baseline 段 `project:` 继续漂回 Freely root，而不是目标项目
-- `./bin/freely status --project <initialized-project>`
+- `freely status --project <initialized-project>`
   - 结果：`live` 段指向目标项目，但 `baseline` 段仍漂回 Freely root；因此 `status` 只部分尊重 `--project`
-- `./bin/freely ensure-interruption-dispatch --project <initialized-project>`
+- `freely ensure-interruption-dispatch --project <initialized-project>`
   - 结果：当前通过 doc gate 显式失败，报缺失 `docs/PROJECT_INTENT.md` / `docs/CONSTITUTION.md` / `docs/LAWS.md` / `docs/pre-brainstorms/*`，没有再泄漏原始 `find: ... No such file or directory`
 
 ### 收敛结论
@@ -76,13 +76,13 @@ Freely 当前进入 `cli first` 审计阶段，本轮在 dedicated feature workt
 
 - `./bin/freely`
   - 结果：打印 usage，但返回码为 1；当前更像“缺参数 usage”而非标准 help surface。
-- `./bin/wt-create --help`
+- `freely wt-create --help`
   - 结果：没有进入 help 分支，而是把 `--help` 当成 branch 名继续执行，最终落到 `git branch`/`invalid reference` 错误。
 - `./bin/wt-enter --help`
   - 结果：返回 `Please run with: source bin/wt-enter <branch>`，没有标准 `--help` 契约。
 - `./bin/wt-add --help`
   - 结果：返回 `Please run with: source bin/wt-add [branch] -- <git-add-args>`，没有标准 `--help` 契约。
-- `./bin/pr-merge-guarded --help`
+- `freely pr-merge-guarded --help`
   - 结果：打印 usage，但退出码仍为 1，而不是 clean help 成功返回。
 - `./bin/ai list --format json`
   - 结果：成功列出保存的 slots。

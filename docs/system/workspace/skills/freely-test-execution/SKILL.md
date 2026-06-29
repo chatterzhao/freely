@@ -137,7 +137,7 @@ fi
 ## 完成后
 
 ```
-全绿 → ./bin/pr-create-guarded
+全绿 → freely pr-create-guarded
 有红 → 回 skill:freely-dev-loop-execution 修复 → cherry-pick 同步 → 重新 test
 ```
 

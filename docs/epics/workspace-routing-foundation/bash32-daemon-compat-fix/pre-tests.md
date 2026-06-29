@@ -25,7 +25,7 @@
 - target environment: `feature/fix-daemon-bash32-crash-20260429`
 - required evidence: `lifecycle trace showing L010→L020→L040 passage`
 - blocker taxonomy: `execution_pending_or_failed`
-1. Run `./bin/freely daemon start --project <path>` on bash 3.2 host and observe 30s stability.
+1. Run `freely daemon start --project <path>` on bash 3.2 host and observe 30s stability.
 
 ## Real-Environment
 - acceptance target: `The guarded promote lane carries the bash 3.2 daemon compat fixes without regression.`

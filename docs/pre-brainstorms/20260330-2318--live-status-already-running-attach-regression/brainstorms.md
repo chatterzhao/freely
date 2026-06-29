@@ -3,8 +3,8 @@
 ## Context
 
 - observed symptom on `develop`:
-  - `./bin/freely fleet-status --project <root>` reports `develop | sup=none | ai=none`
-  - `./bin/freely live-status --project <root>` simultaneously reports:
+  - `freely fleet-status --project <root>` reports `develop | sup=none | ai=none`
+  - `freely live-status --project <root>` simultaneously reports:
     - `activity_state: supervising_with_pending_intake`
     - `last_supervisor_state: up`
     - `last_ai_state: up`

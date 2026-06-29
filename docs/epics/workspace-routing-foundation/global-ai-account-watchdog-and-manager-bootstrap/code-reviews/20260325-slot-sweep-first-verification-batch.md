@@ -33,7 +33,7 @@
   - two additional 20260326 watchdog-related feature worktrees are now visible in the fleet and already absorbed by `develop`, but their dispositions differ: `feature/watchdog-auth-failure-control-plane-recovery-20260326` is still `ownership-followthrough-needed`, while `feature/watchdog-live-status-and-dispatcher-ready-20260326` is `cleanup-followthrough-needed`
   - `feature/latest-manager-continuity-worker-consumption-reconcile-20260326` remains an unresolved verification/cleanup followthrough lane and currently sits `develop...HEAD = 11/0`
   - three other 20260326 watchdog-related clean trees remain `supervision-needed`: `feature/watchdog-probe-early-deactivated-workspace-detect-20260326`, `feature/watchdog-slot-switch-global-launch-gate-20260326`, and `feature/watchdog-switch-stability-and-probe-freeze-20260326` still lack canonical owner/phase binding, and now sit `develop...HEAD = 1/1`, `5/0`, and `6/1`
-  - `./bin/freely live-status --project ...` reports `pending_delegated_continuation_ids=none`, so the closeout lane stays manager-owned in the current worktree instead of emitting a new worker prompt
+  - `freely live-status --project ...` reports `pending_delegated_continuation_ids=none`, so the closeout lane stays manager-owned in the current worktree instead of emitting a new worker prompt
 
 ## Remaining Acceptance
 

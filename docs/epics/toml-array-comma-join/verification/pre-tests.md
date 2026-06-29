@@ -32,7 +32,7 @@
 - testing_layer: integration
 - target_environment: test-pre-merge-20260626T150328Z-toml-array-comma-join
 - required_evidence: exit code 1，stderr 含 "title must start with a type prefix"
-- test_command: ./bin/freely feedback --title "bad title without prefix" --body "## test body with enough characters to satisfy the fifty character minimum requirement" 2>&1; echo "exit:$?"
+- test_command: freely feedback --title "bad title without prefix" --body "## test body with enough characters to satisfy the fifty character minimum requirement" 2>&1; echo "exit:$?"
 - expected_output: ERROR.*title must start with a type prefix.*exit:1
 - actual_output: "[ERROR] title must start with a type prefix: fix, feat, docs, refactor, chore, test, build, ci, perf, style" / exit:1
 - evidence_file: .freely/run/test-evidence/acceptance-3.log
@@ -44,7 +44,7 @@
 - testing_layer: integration
 - target_environment: test-pre-merge-20260626T150328Z-toml-array-comma-join
 - required_evidence: exit code 1，stderr 含 "title too long"
-- test_command: ./bin/freely feedback --title "fix: $(python3 -c "print('x'*80)")" --body "## test body with enough characters to satisfy the fifty character minimum requirement" 2>&1; echo "exit:$?"
+- test_command: freely feedback --title "fix: $(python3 -c "print('x'*80)")" --body "## test body with enough characters to satisfy the fifty character minimum requirement" 2>&1; echo "exit:$?"
 - expected_output: ERROR.*title too long.*exit:1
 - actual_output: "[ERROR] title too long: 113 chars (max 100 including [RAW-{key}] prefix)" / exit:1
 - evidence_file: .freely/run/test-evidence/acceptance-4.log
@@ -56,7 +56,7 @@
 - testing_layer: integration
 - target_environment: test-pre-merge-20260626T150328Z-toml-array-comma-join
 - required_evidence: exit code 1，stderr 含 "body too short"
-- test_command: ./bin/freely feedback --title "fix: test" --body "short" 2>&1; echo "exit:$?"
+- test_command: freely feedback --title "fix: test" --body "short" 2>&1; echo "exit:$?"
 - expected_output: ERROR.*body too short.*exit:1
 - actual_output: "[ERROR] body too short (5 non-ws chars, need ≥ 50)" / exit:1
 - evidence_file: .freely/run/test-evidence/acceptance-5.log
@@ -68,7 +68,7 @@
 - testing_layer: integration
 - target_environment: test-pre-merge-20260626T150328Z-toml-array-comma-join
 - required_evidence: exit code 1，stderr 含 "body must contain at least one ##"
-- test_command: ./bin/freely feedback --title "fix: test" --body "this body has no section heading just plain text that meets the minimum character count requirement" 2>&1; echo "exit:$?"
+- test_command: freely feedback --title "fix: test" --body "this body has no section heading just plain text that meets the minimum character count requirement" 2>&1; echo "exit:$?"
 - expected_output: ERROR.*body must contain at least one ##.*exit:1
 - actual_output: "[ERROR] body must contain at least one ## section heading" / exit:1
 - evidence_file: .freely/run/test-evidence/acceptance-6.log

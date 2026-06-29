@@ -67,7 +67,7 @@
 | `edit` | 代码/文档修改 | `skill:freely-dev-loop-execution` |
 | `merge` | 合并到 develop | `skill:freely-branch-management`（含 pr-create-guarded / pr-merge-guarded） |
 | `closeout` | 批量收口关闭 | `skill:freely-worktree-maintenance-governance`（含 wt-close） |
-| `sync` | 平台同步 | `./bin/issue-sync`（直接用工具） |
+| `sync` | 平台同步 | `freely issue-sync`（直接用工具） |
 | `cleanup` | 清理过期资源 | `skill:freely-worktree-hygiene-supervision` |
 | `doc` | B1/B2 文档预研/设计 | `skill:freely-doc-B1_IBM-execution`（brainstorm→candidate）或 `skill:freely-doc-B2_IBM-execution`（prd→tasks→code-review） |
 | `dev` | 代码实现 | `skill:freely-dev-loop-execution`（implement→test→evidence） |

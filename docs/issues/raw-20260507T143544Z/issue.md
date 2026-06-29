@@ -33,7 +33,7 @@ platform_state: closed
 `bin/raw-issue-pull` 目前有 3 个缺陷：
 
 ### 1. 缺少工位/分支名拦截
-当前从 `develop` 等受保护分支直接调用 `./bin/raw-issue-pull --raw-key xxx` 可以成功拉取任意 issue，没有任何校验当前分支或工位名是否包含该 raw-key。设计意图是：**只能在包含该 raw-key 的工位/分支中 pull 自己的 issue**。
+当前从 `develop` 等受保护分支直接调用 `freely raw-issue-pull --raw-key xxx` 可以成功拉取任意 issue，没有任何校验当前分支或工位名是否包含该 raw-key。设计意图是：**只能在包含该 raw-key 的工位/分支中 pull 自己的 issue**。
 
 ### 2. `bin/freely raw-issue-pull` CLI dispatch 缺失
 在 `docs/system/workspace/scripts/runtime/freely` 的 help 文本（line 555）中列出了该命令，但 dispatch case 语句中没有对应分支，调用返回 "unknown command"。

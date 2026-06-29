@@ -28,7 +28,7 @@ This bounded follow-on turns develop push followthrough from pure visible debt i
 
 - `docs/epics/workspace-routing-foundation/develop-push-attempt-followthrough-governance/code-reviews/20260412-develop-push-attempt-followthrough-verification.md`
 - guarded `test-pre-merge-develop-push-attempt-followthrough-20260412 -> develop` merge receipt: `9bcf5fcf`
-- canonical delivery receipt: `./bin/freely develop-push attempt --project /Users/zhaoyu/Downloads/code/my-freely/freely` returned `attempt_status: pushed`
+- canonical delivery receipt: `freely develop-push attempt --project /Users/zhaoyu/Downloads/code/my-freely/freely` returned `attempt_status: pushed`
 - root `develop` is clean and synced with `origin/develop`
 
 ## Next Action

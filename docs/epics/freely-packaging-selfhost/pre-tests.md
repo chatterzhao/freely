@@ -20,10 +20,10 @@
 - target environment: `feature/raw-20260520T013044Z-packaging-selfhost`
 - required evidence: `bin/freely-package 运行输出和产物验证`
 - blocker taxonomy: `execution_pending_or_failed`
-1. 运行 `./bin/freely-package --version 20260520-test --output /tmp/freely-pkg-test`
+1. 运行 `freely-package --version 20260520-test --output /tmp/freely-pkg-test`
 2. 验证产物目录包含 allowlist 中所有路径
 3. 验证 `FREELY_VERSION` 内容为 `20260520-test`
-4. 运行 `./bin/freely-package --version bad-version` 验证版本号格式校验
+4. 运行 `freely-package --version bad-version` 验证版本号格式校验
 
 ## End-to-End
 

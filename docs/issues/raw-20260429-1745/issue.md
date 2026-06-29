@@ -24,7 +24,7 @@ platform_state: closed
 
 macOS bash 3.2 兼容性修复：daemon 自检测自杀 + select_launch_kind pipefail 崩溃。
 
-通过 chat 插话发现：`./bin/freely daemon start` 在 macOS 上无法正常启动。经 `bash -x` trace 定位到两个 bash 3.2 兼容性 bug：
+通过 chat 插话发现：`freely daemon start` 在 macOS 上无法正常启动。经 `bash -x` trace 定位到两个 bash 3.2 兼容性 bug：
 1. `resolve_active_supervisor_pid_for_start` 中 daemon 进程自检测后自杀
 2. `select_launch_kind` 中 `ls` 空 glob + `pipefail` 导致 shell 崩溃
 

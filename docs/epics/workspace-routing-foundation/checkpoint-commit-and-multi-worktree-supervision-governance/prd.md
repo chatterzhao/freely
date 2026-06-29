@@ -8,5 +8,5 @@
 
 - `./bin/checkpoint-guard`
 - `./bin/wt-fleet-status`
-- `./bin/freely baseline-status --project <worktree>`
+- `freely baseline-status --project <worktree>`
 - `pre-commit` staged scope gate

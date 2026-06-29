@@ -39,8 +39,8 @@
 
 ## Commands
 
-1. `./bin/wt-create test-pre-merge-runtime-target-worker-role-and-starting-stuck-recovery-20260425 --base develop`
-2. `./bin/pr-merge-guarded test-pre-merge-runtime-target-worker-role-and-starting-stuck-recovery-20260425 feature/runtime-target-worker-role-and-starting-stuck-recovery-20260424`
+1. `freely wt-create test-pre-merge-runtime-target-worker-role-and-starting-stuck-recovery-20260425 --base develop`
+2. `freely pr-merge-guarded test-pre-merge-runtime-target-worker-role-and-starting-stuck-recovery-20260425 feature/runtime-target-worker-role-and-starting-stuck-recovery-20260424`
 3. `bash docs/system/workspace/scripts/tests/test-freely-control-plane-pid-validation-prefers-authoritative-runtime-source`
 4. `bash docs/system/workspace/scripts/tests/test-freely-worker-control-plane-reconcile-clears-stale-runtime-source`
 5. `bash docs/system/workspace/scripts/tests/test-freely-start-workcell-supervisor-prefers-active-runtime-source`

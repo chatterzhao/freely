@@ -24,7 +24,7 @@ session_refs: []
 
 在开发 Freely 自身的过程中，AI （Claude Code）直接跳过了项目 governance 规则：
 1. 在 `develop` 分支上直接创建文件（违反 AGENTS.md L17-19, L74, L127）
-2. 手动创建 raw issue 目录而非通过 `./bin/freely feedback` 命令（违反 AGENTS.md L130-131）
+2. 手动创建 raw issue 目录而非通过 `freely feedback` 命令（违反 AGENTS.md L130-131）
 
 ## 根因诊断
 

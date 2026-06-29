@@ -60,7 +60,7 @@
 ### 命令签名
 
 ```
-./bin/pr-review-guarded <branch> [--reviewer <name>] [--verdict pass|fail|needs_changes]
+freely pr-review-guarded <branch> [--reviewer <name>] [--verdict pass|fail|needs_changes]
 ```
 
 ### 执行流程

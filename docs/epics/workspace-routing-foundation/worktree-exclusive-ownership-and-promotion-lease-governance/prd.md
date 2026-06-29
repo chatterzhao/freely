@@ -15,8 +15,8 @@
 - `docs/system/workspace/agents/manager-agent.md`
 - `docs/system/workspace/agents/worker-agent.md`
 - `docs/system/workspace/skills/worktree-maintenance-governance/**`
-- `./bin/freely live-status`
-- `./bin/freely fleet-status`
+- `freely live-status`
+- `freely fleet-status`
 
 ## Non-Goals
 

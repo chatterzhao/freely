@@ -11,21 +11,21 @@
 
 ## Scope Verdict
 
-- `BLOCKED`: `./bin/pr-merge-guarded test-pre-merge-runtime-lifecycle-followthrough-20260424 feature/runtime-lifecycle-receipt-closeout-reconcile-20260424` returned `Already up to date.` followed by `[MERGE-GUARD] blocked: no merge in progress.`
+- `BLOCKED`: `freely pr-merge-guarded test-pre-merge-runtime-lifecycle-followthrough-20260424 feature/runtime-lifecycle-receipt-closeout-reconcile-20260424` returned `Already up to date.` followed by `[MERGE-GUARD] blocked: no merge in progress.`
 - `BLOCKED`: the stale batch already carried the committed source owner ancestor, while the newer bounded owner truth still existed only as dirty, uncommitted source-worktree changes.
 - `PASS`: the failure proved the remaining blocker was lifecycle sequencing, not missing issue/progress/review fields in the bounded owner scope.
 - `REQUIRED`: retire `test-pre-merge-runtime-lifecycle-followthrough-20260424`, checkpoint the owner truth on `feature/runtime-lifecycle-receipt-closeout-reconcile-20260424`, and replay that checkpoint through a fresh disposable `test-pre-merge-*` batch created from current `develop`.
 
 ## Commands
 
-1. `./bin/pr-merge-guarded test-pre-merge-runtime-lifecycle-followthrough-20260424 feature/runtime-lifecycle-receipt-closeout-reconcile-20260424`
+1. `freely pr-merge-guarded test-pre-merge-runtime-lifecycle-followthrough-20260424 feature/runtime-lifecycle-receipt-closeout-reconcile-20260424`
 2. `git status --short`
 3. `git rev-list --left-right --count test-pre-merge-runtime-lifecycle-followthrough-20260424...feature/runtime-lifecycle-receipt-closeout-reconcile-20260424`
 4. `git diff --name-only develop...test-pre-merge-runtime-lifecycle-followthrough-20260424`
 
 ## Command Results
 
-1. `./bin/pr-merge-guarded ...`
+1. `freely pr-merge-guarded ...`
    - Exit `1`
    - Output: `[MERGE-GUARD] allowed: feature/runtime-lifecycle-receipt-closeout-reconcile-20260424 -> test-pre-merge-runtime-lifecycle-followthrough-20260424`, then `Already up to date.` and `[MERGE-GUARD] blocked: no merge in progress.`
 2. `git status --short`
@@ -44,4 +44,4 @@
 2. Checkpoint the bounded owner truth on `feature/runtime-lifecycle-receipt-closeout-reconcile-20260424`.
 3. Retire `test-pre-merge-runtime-lifecycle-followthrough-20260424`; do not reuse it.
 4. Create a fresh disposable `test-pre-merge-*` batch from current `develop`.
-5. Replay `feature/runtime-lifecycle-receipt-closeout-reconcile-20260424` into that fresh batch with `./bin/pr-merge-guarded`.
+5. Replay `feature/runtime-lifecycle-receipt-closeout-reconcile-20260424` into that fresh batch with `freely pr-merge-guarded`.

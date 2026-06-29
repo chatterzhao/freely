@@ -36,6 +36,6 @@
 ## Next Action
 
 1. Merge this closeout writeback into `test-pre-merge-20260420-autonomous-task-governance`.
-2. Replay `./bin/pr-merge-guarded develop test-pre-merge-20260420-autonomous-task-governance`.
-3. Run `./bin/pr-merge-guarded complete develop test-pre-merge-20260420-autonomous-task-governance`.
+2. Replay `freely pr-merge-guarded develop test-pre-merge-20260420-autonomous-task-governance`.
+3. Run `freely pr-merge-guarded complete develop test-pre-merge-20260420-autonomous-task-governance`.
 4. Retire the temporary feature and test-pre-merge worktrees once canonical develop absorbs the owner chain.

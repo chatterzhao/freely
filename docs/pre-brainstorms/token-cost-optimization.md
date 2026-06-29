@@ -571,7 +571,7 @@ freely init --project /path/to/user-project
 <用户填写>
 
 ## 会话启动
-- 分支/Worktree 检查：先执行 cd <project>，再使用 ./bin/wt-create 创建 feature worktree
+- 分支/Worktree 检查：先执行 cd <project>，再使用 freely wt-create 创建 feature worktree
 - Hook 检查：确认 git config --get core.hooksPath 返回 .githooks
 - 测试前判 lane：feature/* → feature-local，test-pre-merge-* → premerge-integration
 ```
@@ -1463,7 +1463,7 @@ stable 版（正式发布）： <YYYY>.<MM>.<DD>-stable
 develop (当前)
   │
   ├─ 1. 打包
-  │    ./bin/freely-package --version 20260501-001-dev
+  │    freely-package --version 20260501-001-dev
   │    → 输出到 ~/.freely/versions/20260501-001-dev/
   │
   ├─ 2. 用打包版本开发 Freely
@@ -1485,7 +1485,7 @@ develop (当前)
 
 ### 9.4 打包脚本设计
 
-`./bin/freely-package --version <ver> [--output <dir>]`
+`freely-package --version <ver> [--output <dir>]`
 
 ```
 打包内容（Freely 产品能力，随版本发布）：

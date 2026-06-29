@@ -4,8 +4,8 @@
 
 2026-04-04 在 canonical root `develop` 完成 push 后，对 root runtime 的重新拉起与监督暴露出一条新的运行时缺口：
 
-- `./bin/freely start --project /Users/zhaoyu/Downloads/code/my-freely/freely` 首轮报 `manager watchdog did not become ready`
-- `./bin/freely ensure-manager --project ... --watch` 随后确认 watchdog 已 running
+- `freely start --project /Users/zhaoyu/Downloads/code/my-freely/freely` 首轮报 `manager watchdog did not become ready`
+- `freely ensure-manager --project ... --watch` 随后确认 watchdog 已 running
 - runtime 持续生成新的 `prompt-20260404-153503.txt`、`prompt-20260404-153521.txt`、`prompt-20260404-153556.txt`、`prompt-20260404-153611.txt`
 - 但没有生成新的 manager continuity，最新 continuity 仍停在 `.freely/run/manager-continuity-20260404-143843.md`
 - 两条新的 human chat intake 已 durable 写入 `.freely/intake/20260404-153515-*` 与 `.freely/intake/20260404-153535-*`，也被带进新 prompt，但 `meta.env` 仍停留在 `STATUS="new"`

@@ -10,7 +10,7 @@ Canonical `develop` was advanced locally with `git merge --ff-only feature/runti
 
 The result is a narrower but real protected-branch gap:
 
-1. The repository claims `./bin/pr-merge-guarded` is the canonical protected-merge entrypoint.
+1. The repository claims `freely pr-merge-guarded` is the canonical protected-merge entrypoint.
 2. Existing `pre-merge-commit` enforcement only covers merge-commit creation and merge completion.
 3. Git still permits ref-only protected-branch advances such as `git merge --ff-only ...` before push-time gates run.
 4. This lets protected-root local truth drift away from the declared entrypoint contract even when push is eventually blocked or later succeeds.

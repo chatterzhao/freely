@@ -27,7 +27,7 @@
 - required evidence: `verification artifact records one foreground or daemon replay and one clean stop`
 - blocker taxonomy: `execution_pending_or_failed`
 1. Run a bounded local startup replay from this feature worktree.
-2. Inspect `./bin/freely live-status --project <worktree>` while the runtime is up.
+2. Inspect `freely live-status --project <worktree>` while the runtime is up.
 3. Stop the runtime and confirm no lingering freely runtime processes remain for the worktree.
 
 ## Real-Environment

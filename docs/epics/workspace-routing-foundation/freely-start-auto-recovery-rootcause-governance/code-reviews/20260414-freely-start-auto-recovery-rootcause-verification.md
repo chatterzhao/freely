@@ -21,7 +21,7 @@
 3. `./bin/test-lane feature-local -- bash docs/system/workspace/scripts/tests/test-freely-codex-after-failure-uses-next-slot-not-probe`
 4. `./bin/test-lane feature-local -- bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-codex-slot-first-then-cross-tool`
 5. `git diff --check`
-6. `./bin/pr-merge-guarded test-pre-merge-20260414-freely-start-auto-recovery-rootcause feature/freely-start-auto-recovery-rootcause-20260414`
+6. `freely pr-merge-guarded test-pre-merge-20260414-freely-start-auto-recovery-rootcause feature/freely-start-auto-recovery-rootcause-20260414`
 7. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-codex-after-failure-next-slot-ignores-availability-cache`
 8. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-codex-select-next-slot-does-not-wrap`
 9. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-codex-after-failure-uses-next-slot-not-probe`

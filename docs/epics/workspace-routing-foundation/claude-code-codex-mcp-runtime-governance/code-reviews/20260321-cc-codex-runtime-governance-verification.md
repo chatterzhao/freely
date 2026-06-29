@@ -27,8 +27,8 @@
 - `bash docs/system/workspace/scripts/tests/test-session-evidence-resolver`
 - `bash docs/system/workspace/scripts/tests/test-freely-cc-codex-evidence-status`
 - live smoke:
-  - `./bin/freely init --ai cc-use-codex-cli:auto`
-  - `./bin/freely start`
+  - `freely init --ai cc-use-codex-cli:auto`
+  - `freely start`
   - verified `.freely/logs/cycle-20260320-224425.debug.log` contains `Calling MCP tool: codex` and `Tool 'codex' completed successfully`
 
 ## Residual Risks

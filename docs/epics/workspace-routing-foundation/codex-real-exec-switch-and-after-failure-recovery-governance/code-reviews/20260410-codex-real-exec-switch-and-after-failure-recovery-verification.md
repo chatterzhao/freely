@@ -30,9 +30,9 @@
 13. `./bin/ai login codex apikey`
 14. `./bin/ai save codex`
 15. `./bin/ai delete codex <slot>`
-16. `./bin/freely start`
-17. `./bin/freely live-status`
-18. `./bin/freely stop`
+16. `freely start`
+17. `freely live-status`
+18. `freely stop`
 19. `./bin/ai --quiet --format json whoami codex`
 
 ## Real-Environment Notes

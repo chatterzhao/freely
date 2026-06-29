@@ -26,7 +26,7 @@
 - target environment: `test-pre-merge-20260416-memark-init`
 - required evidence: `guarded merge replay plus pretests-gate and governance evidence`
 - blocker taxonomy: `execution_pending_or_failed`
-1. Run `./bin/pr-merge-guarded test-pre-merge-20260416-memark-init feature/memark-init`.
+1. Run `freely pr-merge-guarded test-pre-merge-20260416-memark-init feature/memark-init`.
 2. Run `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260416-test-pre-merge-memark-init --issue docs/epics/freely-product-architecture/memark-protected-root-bootstrap-followthrough-governance/issues/memark-protected-root-bootstrap-followthrough-governance.md`.
 3. Run `./bin/test-lane premerge-integration -- ./bin/governance-check`.
 

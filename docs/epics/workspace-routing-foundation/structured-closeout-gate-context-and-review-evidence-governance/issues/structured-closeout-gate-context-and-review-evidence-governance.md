@@ -92,9 +92,9 @@
 - `bash docs/system/workspace/scripts/tests/test-pretests-gate`
 - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
 - `./bin/governance-check`
-- `./bin/wt-create test-pre-merge-20260412-structured-closeout-gate-review-evidence-final --base develop`
-- `./bin/pr-merge-guarded test-pre-merge-20260412-structured-closeout-gate-review-evidence-final feature/structured-closeout-gate-and-review-evidence-followon-20260412`
-- `./bin/pr-merge-guarded develop test-pre-merge-20260412-structured-closeout-gate-review-evidence-final`
+- `freely wt-create test-pre-merge-20260412-structured-closeout-gate-review-evidence-final --base develop`
+- `freely pr-merge-guarded test-pre-merge-20260412-structured-closeout-gate-review-evidence-final feature/structured-closeout-gate-and-review-evidence-followon-20260412`
+- `freely pr-merge-guarded develop test-pre-merge-20260412-structured-closeout-gate-review-evidence-final`
 
 ## Next
 

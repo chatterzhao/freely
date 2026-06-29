@@ -249,8 +249,8 @@ OAuth / URL inventory 适合低成本筛选，但不能覆盖“刚刚真实失�
 1. 在本 worktree 中真实执行 `bin/ai xx` 命令面，记录命令返回与副作用
 2. 先切到真实 limit slot，再 `freely start`
 3. 连续观察：
-   - `./bin/freely live-status`
-   - `./bin/freely fleet-status`
+   - `freely live-status`
+   - `freely fleet-status`
    - `.freely/logs/runtime-events.log`
    - `.freely/logs/cycle-*.log`
    - `.freely/run/workcell-state.env`

@@ -63,7 +63,7 @@ description: >- 编排 AI 自主持续交付循环。从启动外部 AI CLI 工�
    - `event source`：interruption / review finding / test failure / runtime anomaly / worker-discovered gap
   - `standing source`：external issue / milestones / issue / progress / recovery / interruption backlog / pre-brainstorm lifecycle / fleet
 10. 对 `event source`，主管及时 notice；对 `standing source`，主管周期扫描，并在必要时生成 derived problem signal。
-   - 推荐统一脚本入口：`./bin/freely task-source-scan --project <project> --json`
+   - 推荐统一脚本入口：`freely task-source-scan --project <project> --json`
    - 该 JSON 是 standing-source inventory，不替代 canonical issue / progress / milestone / source closeout 真相
 11. 因此 `auto-loop` 对主管而言至少有两类入口：
    - `event-driven`

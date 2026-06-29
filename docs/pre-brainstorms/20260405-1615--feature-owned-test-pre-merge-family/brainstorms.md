@@ -36,7 +36,7 @@
 
 ### 现有能力现状
 
-- `./bin/wt-create` 当前只创建请求的单个 branch/worktree，不会自动配对测试批次
+- `freely wt-create` 当前只创建请求的单个 branch/worktree，不会自动配对测试批次
 - `test-pre-merge-*` 当前定义为临时批次，必须从当前 `develop` 新建，用完即删
 - 当前规范默认是“按需启用测试批次”，而不是“每个 feature 必经独立测试批次”
 
@@ -229,7 +229,7 @@
 - 若法律最终升级为“feature 必经自己的 `test-pre-merge` lane”，则没有 active verified batch receipt 的 feature 不得 promote 到 `develop`
 
 适合落点：
-- `./bin/pr-merge-guarded` 的 develop promotion 入口
+- `freely pr-merge-guarded` 的 develop promotion 入口
 - `governance-check` 对 merge receipt / issue evidence / verification artifact 的审计
 
 文档不足之处：

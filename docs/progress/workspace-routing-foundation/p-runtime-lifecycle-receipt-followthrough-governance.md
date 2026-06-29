@@ -37,8 +37,8 @@
 
 1. Checkpoint the bounded owner truth on `feature/runtime-lifecycle-receipt-closeout-reconcile-20260424`.
 2. Retire `test-pre-merge-runtime-lifecycle-followthrough-20260424`; do not reuse it for another replay.
-3. Create a fresh disposable `test-pre-merge-*` batch from current `develop` and replay `feature/runtime-lifecycle-receipt-closeout-reconcile-20260424` into it via `./bin/pr-merge-guarded`.
-4. Replay that temporary batch into `develop` via `./bin/pr-merge-guarded`, then re-run governance followthrough on canonical `develop`.
+3. Create a fresh disposable `test-pre-merge-*` batch from current `develop` and replay `feature/runtime-lifecycle-receipt-closeout-reconcile-20260424` into it via `freely pr-merge-guarded`.
+4. Replay that temporary batch into `develop` via `freely pr-merge-guarded`, then re-run governance followthrough on canonical `develop`.
 
 ## Closeout
 

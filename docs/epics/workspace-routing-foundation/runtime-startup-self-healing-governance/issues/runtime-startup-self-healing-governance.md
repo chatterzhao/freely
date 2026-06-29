@@ -87,7 +87,7 @@ Protected-root replay on `2026-04-19` showed a narrower startup seam than the ex
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status`
 - `git diff --check`
 - `./bin/governance-check`
-- protected-root replay: `./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely` then `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+- protected-root replay: `freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely` then `freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely`
 
 ## Success Criteria
 

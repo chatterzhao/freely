@@ -55,8 +55,8 @@
 - real_environment_status: `pass`
 - real_environment_reason: `Protected-root replay must confirm the post-L041 bootstrap grace repair lands on canonical develop so the manager lane no longer self-restarts immediately after ai_launch_observed.`
 1. Inspect the protected root stale state before replay.
-2. Run `./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely` and confirm startup self-heal canonicalizes stale machine state.
-3. Run `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely`, wait through the startup grace window, and verify the runtime no longer remains in contradictory fake-up state.
+2. Run `freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely` and confirm startup self-heal canonicalizes stale machine state.
+3. Run `freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely`, wait through the startup grace window, and verify the runtime no longer remains in contradictory fake-up state.
 4. Verify the detached supervisor survives after the non-interactive `daemon start` caller exits, instead of only staying alive while the caller shell/session remains open.
 
 ## Acceptance Items

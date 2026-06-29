@@ -43,7 +43,7 @@ Freely 已经有 runtime watchdog、manager continuity、interruption intake 和
 
 ## Acceptance
 
-- `./bin/freely live-status --project <path>` 存在。
+- `freely live-status --project <path>` 存在。
 - 输出只展示仍活跃的 `supervisor / interruption dispatcher / ai` pid。
 - 输出包含 prompt excerpt，能帮助识别“这个 pid 当前在干什么”。
 - 输出包含 `last_tool_jsonl_path` 与 `last_cycle_log` 作为深挖入口。

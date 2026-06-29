@@ -12,7 +12,7 @@
 
 - `PASS`: this closeout stays inside the existing `I-20260404-0640-A` scope and only backfills the newly discovered ordinary protected-merge receipt gap `eec65f3`.
 - `PASS`: the ledger now covers the two receiptless merges created while closing out `1100`, without reopening broader protected-branch merge policy.
-- `PASS`: the final develop replay for this closeout is expected to use `./bin/pr-merge-guarded develop feature/protected-pr-merge-guarded-receipt-closeout-20260404-0725`, so the next protected merge lands with canonical receipt fields instead of creating another gap.
+- `PASS`: the final develop replay for this closeout is expected to use `freely pr-merge-guarded develop feature/protected-pr-merge-guarded-receipt-closeout-20260404-0725`, so the next protected merge lands with canonical receipt fields instead of creating another gap.
 
 ## Commands
 

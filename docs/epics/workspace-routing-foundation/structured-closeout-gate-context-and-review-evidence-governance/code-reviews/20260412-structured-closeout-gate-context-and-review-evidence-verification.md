@@ -31,15 +31,15 @@
 10. `bash docs/system/workspace/scripts/tests/test-pretests-gate`
 11. `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
 12. `./bin/governance-check`
-13. `./bin/wt-create test-pre-merge-20260412-structured-closeout-gate-review-evidence --base develop`
-14. `./bin/pr-merge-guarded test-pre-merge-20260412-structured-closeout-gate-review-evidence feature/structured-closeout-gate-and-review-evidence-followon-20260412`
-15. `./bin/pr-merge-guarded develop test-pre-merge-20260412-structured-closeout-gate-review-evidence`
-16. `./bin/wt-create test-pre-merge-20260412-structured-closeout-gate-review-evidence-replay --base develop`
-17. `./bin/pr-merge-guarded test-pre-merge-20260412-structured-closeout-gate-review-evidence-replay feature/structured-closeout-gate-and-review-evidence-followon-20260412`
-18. `./bin/pr-merge-guarded develop test-pre-merge-20260412-structured-closeout-gate-review-evidence-replay`
-19. `./bin/wt-create test-pre-merge-20260412-structured-closeout-gate-review-evidence-final --base develop`
-20. `./bin/pr-merge-guarded test-pre-merge-20260412-structured-closeout-gate-review-evidence-final feature/structured-closeout-gate-and-review-evidence-followon-20260412`
-21. `./bin/pr-merge-guarded develop test-pre-merge-20260412-structured-closeout-gate-review-evidence-final`
+13. `freely wt-create test-pre-merge-20260412-structured-closeout-gate-review-evidence --base develop`
+14. `freely pr-merge-guarded test-pre-merge-20260412-structured-closeout-gate-review-evidence feature/structured-closeout-gate-and-review-evidence-followon-20260412`
+15. `freely pr-merge-guarded develop test-pre-merge-20260412-structured-closeout-gate-review-evidence`
+16. `freely wt-create test-pre-merge-20260412-structured-closeout-gate-review-evidence-replay --base develop`
+17. `freely pr-merge-guarded test-pre-merge-20260412-structured-closeout-gate-review-evidence-replay feature/structured-closeout-gate-and-review-evidence-followon-20260412`
+18. `freely pr-merge-guarded develop test-pre-merge-20260412-structured-closeout-gate-review-evidence-replay`
+19. `freely wt-create test-pre-merge-20260412-structured-closeout-gate-review-evidence-final --base develop`
+20. `freely pr-merge-guarded test-pre-merge-20260412-structured-closeout-gate-review-evidence-final feature/structured-closeout-gate-and-review-evidence-followon-20260412`
+21. `freely pr-merge-guarded develop test-pre-merge-20260412-structured-closeout-gate-review-evidence-final`
 22. `git log -1 --format=%H develop`
 
 ## Implementation Decision Note

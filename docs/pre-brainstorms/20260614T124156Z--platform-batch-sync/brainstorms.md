@@ -28,7 +28,7 @@ Scan detects drift but doesn't execute the sync.
 ## Options
 
 ### A. Manual batch run
-Run `./bin/issue-sync batch` directly.
+Run `freely issue-sync batch` directly.
 Fastest, but requires human/agent action.
 
 ### B. Auto-sync after scan
@@ -45,6 +45,6 @@ Start with A (manual batch to clear backlog).
 Evaluate B as a follow-up if backlog recurs.
 
 ## Next
-1. Run `./bin/issue-sync batch` on worktree
+1. Run `freely issue-sync batch` on worktree
 2. Verify sync results
 3. Close platform issue #2667

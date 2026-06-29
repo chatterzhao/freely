@@ -34,7 +34,7 @@
   - `develop`
   - `feature/manager-scheduler-capacity-candidate-replay-20260324`
   - 另有一棵 `dirty + desired=running`：`feature/develop-merge-prep-fleet-closure-20260325`
-- `./bin/freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely` 当前显示：
+- `freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely` 当前显示：
   - `activity_state: stalled_without_runtime`
   - `desired_runtime_state: running`
   - `active_running_worker_count: 2`

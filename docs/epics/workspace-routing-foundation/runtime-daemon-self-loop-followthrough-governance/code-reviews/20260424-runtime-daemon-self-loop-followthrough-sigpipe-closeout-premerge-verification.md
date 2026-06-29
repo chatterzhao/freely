@@ -9,10 +9,10 @@
 
 ## Scope Verdict
 
-- `PASS`: the SIGPIPE closeout repair was replayed through the disposable protected lane with a lawful `./bin/pr-merge-guarded` merge from `feature/runtime-sigpipe-supervisor-closeout-20260424`.
+- `PASS`: the SIGPIPE closeout repair was replayed through the disposable protected lane with a lawful `freely pr-merge-guarded` merge from `feature/runtime-sigpipe-supervisor-closeout-20260424`.
 - `PASS`: the same focused regression set that exercises closed-pipe worktree summary, early-awk supervisor discovery, and early-return manager continuity selection passed on the premerge lane as well.
 - `PASS`: this staged review is the required develop-bound evidence for the same-owner guarded promote. It does not claim canonical `develop` acceptance yet; it only proves the protected assembly lane carries the bounded repair and fresh owner evidence together.
-- `PENDING`: guarded merge into canonical `develop` plus a fresh `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely` replay still need to confirm retained cleanup closeout and next-task continuation on the canonical runtime path.
+- `PENDING`: guarded merge into canonical `develop` plus a fresh `freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely` replay still need to confirm retained cleanup closeout and next-task continuation on the canonical runtime path.
 
 ## Commands
 

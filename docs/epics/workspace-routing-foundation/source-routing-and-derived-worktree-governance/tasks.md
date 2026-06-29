@@ -14,7 +14,7 @@
 - 对齐 `lead-agent` 与 `workspace/tools.md` 的同工具第二跳协议
 
 ## T3 Worktree 引导
-- 新增 `./bin/wt-create`
+- 新增 `freely wt-create`
 - 更新 `.githooks/pre-commit`
 - 更新 `.githooks/post-checkout`
 - 更新 `AGENTS.md`

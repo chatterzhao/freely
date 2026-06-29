@@ -39,7 +39,7 @@ Freely 当前已经会 worktree 隔离、session handoff、rate-limit account sw
 - `./bin/checkpoint-guard` 可输出结构化 checkpoint 结论。
 - `./bin/checkpoint-guard --staged-only --fail-on-required` 对混 scope staged commit 返回非零。
 - `./bin/wt-fleet-status` 能列出多个 worktree，并展示 dirty / checkpoint / supervisor / ai。
-- `./bin/freely baseline-status --project <worktree>` 能显示 `checkpoint_required` 与 `checkpoint_reasons`。
+- `freely baseline-status --project <worktree>` 能显示 `checkpoint_required` 与 `checkpoint_reasons`。
 - `pre-commit` 对超预算 staged commit 给出阻断信息，不再只是 scope hint。
 
 ## Completion

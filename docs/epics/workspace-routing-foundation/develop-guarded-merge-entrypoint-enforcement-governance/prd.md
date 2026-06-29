@@ -4,7 +4,7 @@
 
 `develop` 上当前同时存在两种 merge 入口：
 
-1. canonical `./bin/pr-merge-guarded`
+1. canonical `freely pr-merge-guarded`
 2. 裸 `git merge`
 
 由于 `pre-merge-commit` 只检查 merge 内容的治理合法性，而不检查 merge 是否来自 canonical 入口，第二种入口仍能成功。这使得 protected merge 的操作语义继续漂移。
@@ -14,7 +14,7 @@
 Freely 必须把 `develop` merge 的入口约束成单一路径：
 
 - merge commit 进入 `pre-merge-commit` 时，必须已经携带 `pr-merge-guarded` canonical handshake
-- 没有 handshake 时，hook 直接拒绝并告诉操作者改用 `./bin/pr-merge-guarded`
+- 没有 handshake 时，hook 直接拒绝并告诉操作者改用 `freely pr-merge-guarded`
 - 有 handshake 时，继续照常执行治理 gate，而不是把后续 gate 短路
 
 ## Canonical Surfaces

@@ -82,7 +82,7 @@ session_refs: []
   请查看该命令支持的绕过参数，加上:
     --reason "具体绕过原因"
 
-  示例: ./bin/wt-close --force --reason "emergency cleanup: worktree corrupted" <branch>
+  示例: freely wt-close --force --reason "emergency cleanup: worktree corrupted" <branch>
 ```
 
 ## 修复清单

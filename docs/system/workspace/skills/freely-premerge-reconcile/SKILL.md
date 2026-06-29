@@ -18,8 +18,8 @@ description: >- 在不回退治理的情况下协调高风险合并冲突。从 
 - 创建专用分支：
   - `git branch feature/premerge-YYYYMMDDTHHMM[SS]Z--<topic> <active-test-pre-merge-branch>`
   - `cd <your-project-path>`
-  - 优先：`./bin/wt-create feature/premerge-YYYYMMDDTHHMM[SS]Z--<topic> --base <active-test-pre-merge-branch>`
-  - 手工兜底：`git worktree add ../<your-project-worktrees>/<branch-dir> feature/premerge-YYYYMMDDTHHMM[SS]Z--<topic> && ./bin/freely sync-tooling --source-project <your-project-path> --project ../<your-project-worktrees>/<branch-dir>`
+  - 优先：`freely wt-create feature/premerge-YYYYMMDDTHHMM[SS]Z--<topic> --base <active-test-pre-merge-branch>`
+  - 手工兜底：`git worktree add ../<your-project-worktrees>/<branch-dir> feature/premerge-YYYYMMDDTHHMM[SS]Z--<topic> && freely sync-tooling --source-project <your-project-path> --project ../<your-project-worktrees>/<branch-dir>`
   - `cd ../<your-project-worktrees>/<branch-dir>`
   - 对 `feature/premerge-20260307T1015Z--topic`，`<branch-dir>` 应为 `20260307T1015Z-feature-premerge-topic`
 

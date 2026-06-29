@@ -178,7 +178,7 @@ TUI 的正确站位应是：
 
 更进一步的实现建议：
 
-- 把 TUI 做成 `./bin/freely tui --project <abs_path>`
+- 把 TUI 做成 `freely tui --project <abs_path>`
 - 内部仍调用 runtime/freely 的既有子命令
 - 不在 TUI 层复制业务规则
 

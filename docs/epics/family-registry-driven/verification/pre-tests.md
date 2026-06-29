@@ -68,7 +68,7 @@
 - testing_layer: end-to-end
 - target_environment: test-pre-merge worktree
 - required_evidence: doc gate and execution-boundary audit both pass
-- test_command: ./bin/freely doctor --project "$(pwd)" 2>&1 | head -20
+- test_command: freely doctor --project "$(pwd)" 2>&1 | head -20
 - expected_output: doc gate PASS, execution-boundary audit PASS
 - actual_output: doc gate PASS, hook gate PASS, execution-boundary audit PASS aligned
 - evidence_file: .freely/run/test-evidence/acceptance-6.log

@@ -7,8 +7,8 @@
    - 依赖未合并父分支：`execution_base=<parent feature branch>`
    - `integration_target` 默认仍是 `develop`
 2. 回到项目根目录后创建 dedicated worktree：
-   - 推荐：`./bin/wt-create feature/<topic> --base <execution_base>`
-   - 手工兜底：`git worktree add -b feature/<topic> ../<your-project-worktrees>/<branch-dir> <execution_base> && ./bin/freely sync-tooling --source-project <your-project-path> --project ../<your-project-worktrees>/<branch-dir>`
+   - 推荐：`freely wt-create feature/<topic> --base <execution_base>`
+   - 手工兜底：`git worktree add -b feature/<topic> ../<your-project-worktrees>/<branch-dir> <execution_base> && freely sync-tooling --source-project <your-project-path> --project ../<your-project-worktrees>/<branch-dir>`
 3. `<branch-dir>` 规则：
    - `feature/my-topic` -> `feature-my-topic`
    - `feature/my-topic-20260307-1015` -> `20260307-1015-feature-my-topic`

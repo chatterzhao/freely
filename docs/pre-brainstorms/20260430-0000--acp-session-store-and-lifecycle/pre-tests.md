@@ -216,9 +216,9 @@ curl -s -w "TIME=%{time_total}s HTTP=%{http_code}" --max-time 60 \
 ### Test J: Stop kills ALL project processes
 ```bash
 # 1. Start daemon
-./bin/freely daemon start --project $PWD
+freely daemon start --project $PWD
 # 2. Stop
-./bin/freely daemon stop --project $PWD
+freely daemon stop --project $PWD
 sleep 3
 # 3. Verify no residue
 ps aux | grep -E "freely|acp-bridge|claude-agent|watchdog|daemon-run" | grep -v grep | grep -v memark
@@ -230,7 +230,7 @@ ps aux | grep -E "freely|acp-bridge|claude-agent|watchdog|daemon-run" | grep -v 
 # 1. Create restart storm state
 echo 'LAST_RESTART_STORM_COUNT="5"' >> .freely/run/session-state.env
 # 2. Start daemon
-./bin/freely daemon start --project $PWD
+freely daemon start --project $PWD
 # 3. Verify: should either force clean start or reject with clear error
 # 4. Check daemon log for "refusing to attach" or "forcing clean daemon start"
 ```

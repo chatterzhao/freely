@@ -20,7 +20,7 @@ description: >- 当 worktree 进入 checkpoint 预警、dirty-budget 漂移或�
 
 1. 先读当前 worktree 的 hygiene 信号。
    - `./bin/checkpoint-guard`
-   - `./bin/freely baseline-status --project <current-worktree>`
+   - `freely baseline-status --project <current-worktree>`
 
 2. 若已达到最小验证门：
    - 先更新 issue / continuity artifact
@@ -39,7 +39,7 @@ description: >- 当 worktree 进入 checkpoint 预警、dirty-budget 漂移或�
 
 1. 读取项目级 hygiene 告警：
    - `./bin/wt-fleet-status`
-   - `./bin/freely fleet-status --project <develop>`
+   - `freely fleet-status --project <develop>`
 
 2. 判断 owner：
    - 单工位局部收口：`worker-owned`

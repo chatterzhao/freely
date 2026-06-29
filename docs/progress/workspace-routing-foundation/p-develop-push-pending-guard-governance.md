@@ -37,7 +37,7 @@
 - closure_evidence:
   - `develop` commits `08fb096`, `8feae13`, `11f310b`
   - `docs/epics/workspace-routing-foundation/develop-push-pending-guard-governance/code-reviews/20260401-develop-push-pending-guard-verification.md`
-  - `./bin/freely develop-push status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
+  - `freely develop-push status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
   - `./bin/governance-check`
 
 ## Next Action

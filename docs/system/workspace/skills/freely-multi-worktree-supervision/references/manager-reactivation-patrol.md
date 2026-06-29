@@ -4,8 +4,8 @@
 
 ## 输入顺序
 
-1. `./bin/freely live-status --project <develop>`
-2. `./bin/freely fleet-status --project <develop>` 或等价工位总览
+1. `freely live-status --project <develop>`
+2. `freely fleet-status --project <develop>` 或等价工位总览
 3. `docs/milestones.md`
 4. 当前 active milestone 阶段对应的 worktree / issue / progress / recovery
 5. interruption backlog、external issue source backlog、resume / handoff 证据、以及 relevant candidate / pre-brainstorm artifacts

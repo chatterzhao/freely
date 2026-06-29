@@ -19,7 +19,7 @@
 ### acceptance-3
 - acceptance_target: wt-close --help works
 - testing_layer: end-to-end
-- test_command: ./bin/wt-close --help 2>&1 | head -3
+- test_command: freely wt-close --help 2>&1 | head -3
 - expected_output: Usage
 - actual_output: Usage text displayed
 - evidence_file: .freely/run/test-evidence/acceptance-3.log

@@ -16,7 +16,7 @@
 ### 打包脚本 (`bin/freely-package`)
 
 ```
-Usage: ./bin/freely-package --version <ver> [--output <dir>]
+Usage: freely-package --version <ver> [--output <dir>]
 ```
 
 **流程:**

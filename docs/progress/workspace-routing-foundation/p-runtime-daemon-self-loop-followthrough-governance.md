@@ -119,7 +119,7 @@
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-keeps-fresh-materialized-worker-with-authoritative-edit-prompt`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-launches-materialized-cleanup-worker-without-continuity-prompt`
-- `PENDING`: replay this same-owner repair through fresh protected premerge and guarded `develop`, then rerun canonical `./bin/freely daemon start` until Freely both closes the retained cleanup lane and advances to the next scan-selected task.
+- `PENDING`: replay this same-owner repair through fresh protected premerge and guarded `develop`, then rerun canonical `freely daemon start` until Freely both closes the retained cleanup lane and advances to the next scan-selected task.
 
 ## 2026-04-22 06:05 PDT Proxy Guidance Followthrough
 
@@ -168,7 +168,7 @@
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-tool-runtime-failure-skips-known-unavailable-kiro`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-tool-runtime-failure-uses-unified-auto-recovery-path`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-priority-list-fallback`
-- `PENDING`: absorb this same-owner followthrough into canonical `develop`, then rerun `./bin/freely daemon start` until a real task completes, the corresponding worktree is lawfully closed, and the daemon proceeds to another task.
+- `PENDING`: absorb this same-owner followthrough into canonical `develop`, then rerun `freely daemon start` until a real task completes, the corresponding worktree is lawfully closed, and the daemon proceeds to another task.
 
 ## 2026-04-21 09:25 PDT Develop Push Followthrough Tracking Refresh Verification
 
@@ -238,7 +238,7 @@
 - `PASS`: the same helper now keeps recorded worker resume-evidence checks aligned with that stricter Codex truth, so a zero-byte `LAST_TOOL_JSONL_PATH` no longer advertises resumable state elsewhere in the runtime.
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-explicit-resume-target-contract`
 - `PASS`: `./bin/governance-check`
-- `PENDING`: replay this owner through fresh protected premerge, merge into canonical `develop`, restart `./bin/freely daemon start`, and verify cleanup governance falls back away from the empty Codex session file, retires the blocker cleanup lane, and advances to the next task.
+- `PENDING`: replay this owner through fresh protected premerge, merge into canonical `develop`, restart `freely daemon start`, and verify cleanup governance falls back away from the empty Codex session file, retires the blocker cleanup lane, and advances to the next task.
 
 ## 2026-04-22 09:48 PDT Empty Repair Resume Target Followthrough
 
@@ -249,7 +249,7 @@
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-repair-handoff-missing-resume-evidence-falls-back`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-explicit-resume-target-contract`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-codex-args`
-- `PENDING`: promote through fresh protected premerge, merge into canonical `develop`, restart `./bin/freely daemon start`, and verify this owner finally clears cleanup followthrough, retires the temporary blocker lane, and continues to another task instead of stopping at monitor preflight.
+- `PENDING`: promote through fresh protected premerge, merge into canonical `develop`, restart `freely daemon start`, and verify this owner finally clears cleanup followthrough, retires the temporary blocker lane, and continues to another task instead of stopping at monitor preflight.
 
 ## 2026-04-23 07:18 PDT Cleanup Followthrough Resume Extraction
 
@@ -294,7 +294,7 @@
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-runtime-auth-failure-signal-filter`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-log-has-auth-failure-ignores-codex-apikey-oauth-refresh-noise`
 - `PASS`: `./bin/governance-check`
-- `PENDING`: replay this repair through guarded premerge and canonical `develop`, then rerun `./bin/freely daemon start` on `develop` to verify manager keeps the continuity/queued-worker truth alive, consumes the retained cleanup lane handoff, and resumes the larger self-host closeout loop instead of stopping on a fake `auth_failure`.
+- `PENDING`: replay this repair through guarded premerge and canonical `develop`, then rerun `freely daemon start` on `develop` to verify manager keeps the continuity/queued-worker truth alive, consumes the retained cleanup lane handoff, and resumes the larger self-host closeout loop instead of stopping on a fake `auth_failure`.
 
 ## 2026-04-24 01:18 PDT Retained Cleanup Self-Intent Relaunch Boundary
 
@@ -350,7 +350,7 @@
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-daemon-stop-refreshes-manager-operator-boundary`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-live-status-ignores-pre-stop-manager-continuity-focus`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-daemon-command-semantics`
-- `PENDING`: promote this same-owner repair through protected premerge and guarded `develop`, rerun canonical `./bin/freely daemon start`, and verify startup patrol now discards pre-stop continuity, picks from fresh scan JSON, and continues through lawful task closeout instead of re-entering the stale cleanup anchor.
+- `PENDING`: promote this same-owner repair through protected premerge and guarded `develop`, rerun canonical `freely daemon start`, and verify startup patrol now discards pre-stop continuity, picks from fresh scan JSON, and continues through lawful task closeout instead of re-entering the stale cleanup anchor.
 
 ## 2026-04-23 23:58 PDT Queue State Worker Prompt Launch Followthrough
 
@@ -363,7 +363,7 @@
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-duplicate-promotion-queue-recorded-owner`
 - `PASS`: `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-cleanup-worker-blocked-consumption-boundary --issue /Users/zhaoyu/Downloads/code/my-freely/freely/docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
 - `PASS`: `./bin/governance-check`
-- `PENDING`: promote this same-owner repair through fresh protected premerge, merge into canonical `develop`, then rerun `./bin/freely daemon start` until the retained cleanup lane stays blocked/consumed instead of relaunching and the manager advances to the next scan-selected task.
+- `PENDING`: promote this same-owner repair through fresh protected premerge, merge into canonical `develop`, then rerun `freely daemon start` until the retained cleanup lane stays blocked/consumed instead of relaunching and the manager advances to the next scan-selected task.
 
 - `FAIL`: after the stale pre-stop continuity was fenced off, canonical replay re-delegated the retained cleanup lane with `EXIT_KIND=delegate_workers`, but `manager-worker-launch-state.env` still showed `LAST_MANAGER_WORKER_PROMPTS_GENERATED=""`, `QUEUED_WORKER_PROMPTS=""`, and `LAUNCHED_WORKER_PROMPTS=""`.
 - `FAIL`: the manager continuity was lawful and launchable, but runtime only parsed direct `## Worker Delegation` handoffs; the current `## Queue State` continuity shape with bare `worker_prompts:` was treated as prompt-empty, so the selected worker was never queued or launched.
@@ -566,7 +566,7 @@ All commands passed again in the feature worktree during this worker continuatio
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-refreshes-stale-discovery-cache`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-skips-retire-ready-merged-prompt`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-skips-absorbed-merged-dirty-worker`
-- `PASS`: replayed `feature/manager-followthrough-handoff-resume-20260421 -> test-pre-merge-20260421-manager-followthrough-handoff-resume` through `./bin/pr-merge-guarded`; the protected test lane stayed green on the representative same-owner regressions.
+- `PASS`: replayed `feature/manager-followthrough-handoff-resume-20260421 -> test-pre-merge-20260421-manager-followthrough-handoff-resume` through `freely pr-merge-guarded`; the protected test lane stayed green on the representative same-owner regressions.
 - `PENDING`: absorb this repair into canonical `develop`, then complete the required self-host daemon acceptance and temporary lane retirement.
 
 ## 2026-04-21 08:31 PDT Manager Launch-State Supersession Verification
@@ -590,8 +590,8 @@ All commands passed again in the feature worktree during this worker continuatio
 
 ## Next Action
 
-1. Replay `feature/manager-exit-contract-expected-worker-guard-20260421 -> test-pre-merge-20260421-manager-exit-contract-expected-worker-guard -> develop` through `./bin/pr-merge-guarded` with this refreshed owner evidence included.
-2. On canonical `develop`, run `./bin/freely daemon start` until one task completes to the current-project success standard, its temporary worktree closes lawfully, and the daemon proceeds to the next task.
+1. Replay `feature/manager-exit-contract-expected-worker-guard-20260421 -> test-pre-merge-20260421-manager-exit-contract-expected-worker-guard -> develop` through `freely pr-merge-guarded` with this refreshed owner evidence included.
+2. On canonical `develop`, run `freely daemon start` until one task completes to the current-project success standard, its temporary worktree closes lawfully, and the daemon proceeds to the next task.
 3. Retire the temporary feature/test-pre-merge lanes for this stop-guard followthrough after canonical replay succeeds.
 
 ## 2026-04-21 23:10 PDT Ordinary Manager Stall Recovery Followthrough
@@ -649,7 +649,7 @@ All commands passed again in the feature worktree during this worker continuatio
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-ignores-unexpected-term-without-stop-marker`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-daemon-start-reuses-live-supervisor-without-relaunch`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-waits-for-supervisor-teardown-before-fallback`
-- `PENDING`: absorb this daemon-preservation repair into canonical `develop`, rerun `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely`, and continue supervision until Freely finishes a real task, merges upward, retires that lane, and autonomously selects the next task.
+- `PENDING`: absorb this daemon-preservation repair into canonical `develop`, rerun `freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely`, and continue supervision until Freely finishes a real task, merges upward, retires that lane, and autonomously selects the next task.
 
 ## 2026-04-24 07:05 PDT Superseded Frozen Prompt Reclaim
 
@@ -684,7 +684,7 @@ All commands passed again in the feature worktree during this worker continuatio
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-duplicate-promotion-queue-explainability-queued-owner`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-continuity-current-worker-prompt-parsing`
 - `PASS`: `bash -n docs/system/workspace/scripts/runtime/freely`
-- `PENDING`: run owner gates on this feature lane, stage protected premerge evidence, merge back to canonical `develop`, and rerun `./bin/freely daemon start` until the retained lane closes lawfully and runtime advances to the next scan-selected task.
+- `PENDING`: run owner gates on this feature lane, stage protected premerge evidence, merge back to canonical `develop`, and rerun `freely daemon start` until the retained lane closes lawfully and runtime advances to the next scan-selected task.
 
 ## 2026-04-24 07:26 PDT Worker Exit Contract Wins Over Network Transient
 
@@ -696,7 +696,7 @@ All commands passed again in the feature worktree during this worker continuatio
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-done-overrides-network-transient`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-invalid-does-not-override-network-transient`
 - `PASS`: `bash -n docs/system/workspace/scripts/runtime/freely`
-- `PENDING`: run owner gates on this feature lane, stage protected premerge evidence, merge to canonical `develop`, and rerun `./bin/freely daemon start` until the retained cleanup lane closes, promotes/cleans up lawfully, and runtime returns to the next scan-selected task source.
+- `PENDING`: run owner gates on this feature lane, stage protected premerge evidence, merge to canonical `develop`, and rerun `freely daemon start` until the retained cleanup lane closes, promotes/cleans up lawfully, and runtime returns to the next scan-selected task source.
 
 ## 2026-04-24 07:44 PDT Manager-Owned Worker Runtime Source Rebind
 
@@ -722,9 +722,9 @@ All commands passed again in the feature worktree during this worker continuatio
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-discover-supervisor-pid-sigpipe-guard`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-continuity-discovery-tolerates-closed-pipe`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-ignores-pre-stop-continuity`
-- `PASS`: replayed the same focused regression set on protected lane `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-test-pre-merge-runtime-sigpipe-supervisor-closeout` after a lawful `./bin/pr-merge-guarded` merge from `feature/runtime-sigpipe-supervisor-closeout-20260424`.
+- `PASS`: replayed the same focused regression set on protected lane `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-test-pre-merge-runtime-sigpipe-supervisor-closeout` after a lawful `freely pr-merge-guarded` merge from `feature/runtime-sigpipe-supervisor-closeout-20260424`.
 - `FAIL`: the next guarded merge into canonical `develop` is blocked only by missing same-owner lifecycle materialization in the diff, not by code or test failure.
-- `PENDING`: rerun guarded promote into `develop`, then replay canonical `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely` to confirm retained cleanup closeout is consumed without another SIGPIPE stall and runtime continues to the next task source.
+- `PENDING`: rerun guarded promote into `develop`, then replay canonical `freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely` to confirm retained cleanup closeout is consumed without another SIGPIPE stall and runtime continues to the next task source.
 
 ## 2026-04-24 16:05 PDT Daemon Entrypoint Mode Preservation Followthrough
 
@@ -734,7 +734,7 @@ All commands passed again in the feature worktree during this worker continuatio
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-pid`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-failure-recovery-preserves-daemon`
 - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-daemon-start-detach-contract`
-- `PENDING`: replay this repair through fresh protected premerge and canonical `develop`, then rerun `./bin/freely daemon start` until runtime completes one task lawfully, retires that lane, and advances to the next task instead of drifting back into foreground ownership.
+- `PENDING`: replay this repair through fresh protected premerge and canonical `develop`, then rerun `freely daemon start` until runtime completes one task lawfully, retires that lane, and advances to the next task instead of drifting back into foreground ownership.
 
 ## 2026-04-25 11:20 PDT Manager / Worker Self-Loop Recovery Absorption
 
@@ -773,7 +773,7 @@ All commands passed again in the feature worktree during this worker continuatio
   - `bash docs/system/workspace/scripts/tests/test-freely-manager-runtime-recovery-blocks-without-verification-contract`
   - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-keeps-supervisor-while-worker-active`
 - `FAIL`: the current owner pre-tests had drifted into falsely advertising canonical develop acceptance as already `pass`. That status is now corrected back to `pending` until real daemon replay proves the full success standard: select task -> finish -> merge upward -> retire worktree -> continue to next task.
-- `PENDING`: commit this same-owner continuation, replay it through fresh protected premerge and guarded `develop`, then rerun canonical `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely` until Freely either meets the full autonomous-loop success standard or exposes the next bounded same-owner seam with fresh evidence.
+- `PENDING`: commit this same-owner continuation, replay it through fresh protected premerge and guarded `develop`, then rerun canonical `freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely` until Freely either meets the full autonomous-loop success standard or exposes the next bounded same-owner seam with fresh evidence.
 
 ## 2026-04-25 16:20 PDT Manager / Worker Terminal Followthrough Materialization
 
@@ -893,7 +893,7 @@ All commands passed again in the feature worktree during this worker continuatio
   - `bash docs/system/workspace/scripts/tests/test-freely-manager-consumed-continuity-resume-focus`
   - `./bin/governance-check`
 - `PASS`: owner-linked verification for this continuation is now explicit in `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-exit-contract-prompt-narrowing-verification.md`.
-- `PENDING`: rerun guarded feature/premerge verification with the owner-linked evidence, merge into canonical `develop`, restart root `./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely`, and watch whether the next repair/fresh-with-handoff manager round now produces continuity + exit contract instead of looping on `manager_empty_success_cycle_detected`.
+- `PENDING`: rerun guarded feature/premerge verification with the owner-linked evidence, merge into canonical `develop`, restart root `freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely`, and watch whether the next repair/fresh-with-handoff manager round now produces continuity + exit contract instead of looping on `manager_empty_success_cycle_detected`.
 
 ## 2026-04-25 20:58 PDT Manager Repair Handoff Preservation
 

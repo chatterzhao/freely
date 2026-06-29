@@ -115,7 +115,7 @@
 - Current canonical runtime truth now shows aligned continuity and prompt consumption for the same round:
   - `LAST_MANAGER_CONTINUITY_GENERATED == LAST_MANAGER_CONTINUITY_CONSUMED == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/manager-continuity-20260326-064827.md`
   - `LAST_MANAGER_WORKER_PROMPTS_GENERATED == LAST_MANAGER_WORKER_PROMPTS_CONSUMED == /Users/zhaoyu/Downloads/code/my-freely/freely/.freely/run/worker-prompts/20260326-064827-worker-i-20260318-1630-closeout-followthrough-codex.txt`
-- `./bin/freely status --project /Users/zhaoyu/Downloads/code/my-freely/freely` now surfaces the same generated/consumed truth in the canonical status surface.
+- `freely status --project /Users/zhaoyu/Downloads/code/my-freely/freely` now surfaces the same generated/consumed truth in the canonical status surface.
 - `bash docs/system/workspace/scripts/tests/test-freely-latest-manager-continuity-worker-consumption` passes on canonical `develop`, proving the current `## Worker Prompts` / queue parsing contract is consumed correctly while the supervisor is already running.
 - The repair is already present in `develop` through same-family commit `c80cb34` (`fix: reconcile latest manager continuity prompt parsing`), so this issue should close as canonical writeback, not reopen as new implementation work.
 

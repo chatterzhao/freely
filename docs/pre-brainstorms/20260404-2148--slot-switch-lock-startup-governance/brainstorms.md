@@ -2,11 +2,11 @@
 
 ## 背景
 
-2026-04-04 在 root `develop` 监督 `./bin/freely start --project /Users/zhaoyu/Downloads/code/my-freely/freely` 时，曾经出现启动失败且需要手工删除 `~/.codex/slot-switch.lock` 才能恢复的现场。当前再次复核后，最新失败主因已经不是 live lock，而是 `auth_failure`：
+2026-04-04 在 root `develop` 监督 `freely start --project /Users/zhaoyu/Downloads/code/my-freely/freely` 时，曾经出现启动失败且需要手工删除 `~/.codex/slot-switch.lock` 才能恢复的现场。当前再次复核后，最新失败主因已经不是 live lock，而是 `auth_failure`：
 
 - `~/.codex/slot-switch.lock` 当前不存在
 - `.freely/logs/runtime-events.log` 最新两轮 `ai_cycle_finished` 都记录 `slot_switch_reason=auth_failure` 且 `exit_reason=auth_failure`
-- `./bin/freely live-status --project ...` 当前也不是在报告一个仍然存在的 shared lock
+- `freely live-status --project ...` 当前也不是在报告一个仍然存在的 shared lock
 
 因此，当前 root 失败不是“现在有 lock 卡住”；但 stale shared lock 曾经真实阻塞过启动，并且目前仍主要依赖操作者手工清理，这说明 `freely start` / `doctor` / status surface 的治理还缺一条更窄的 owner。
 

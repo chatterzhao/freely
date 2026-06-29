@@ -76,7 +76,7 @@
 - testing_layer: end-to-end
 - target_environment: test-pre-merge worktree → develop merge chain
 - required_evidence: Daemon starts and bridge connects with cline slot
-- test_command: ./bin/freely daemon start --project . --task-mode wait 2>&1 | head -5
+- test_command: freely daemon start --project . --task-mode wait 2>&1 | head -5
 - expected_output: daemon_status: running
 - actual_output: Requires merged develop with cline slot configured and cline --acp binary available
 - evidence_file: (none, test skipped)
