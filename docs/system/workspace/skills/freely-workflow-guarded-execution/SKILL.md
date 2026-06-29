@@ -181,7 +181,8 @@ candidate 的验收条件必须能从 brainstorms 的 Decision 推导出来。pr
 
 ```
 1. 加载 skill:freely-doc-B2_IBM-execution
-   → I-* issue + pre-tests（red-green-status = pending）+ tasks + code-review
+   → B 阶段：实现分析 brainstorms → 替代方案评估
+   → M 阶段：物化 I-* issue 完整文档 + pre-tests（red-green-status = pending）+ tasks + code-review
    → fix: 写清楚复现方法。feature: 端到端→集成→单元设计测试
 2. phase_state = done_b2_ibm → 进入阶段 3
 ```
