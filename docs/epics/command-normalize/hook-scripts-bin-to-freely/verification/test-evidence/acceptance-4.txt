@@ -1,0 +1,4 @@
+GREEN: AT-004 PASS
+Test: grep for ./bin/freely, ./bin/pr-*, ./bin/wt-* in user-facing messages (Usage/help/errors) across 6 files
+Result: All 6 files clean — all user-facing messages updated to freely xxx format
+Before fix: 6 files had ./bin/ references in help/usage/error messages

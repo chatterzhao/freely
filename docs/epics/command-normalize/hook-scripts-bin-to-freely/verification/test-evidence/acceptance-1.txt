@@ -1,0 +1,4 @@
+GREEN: AT-001 PASS
+Test: grep for ./bin/freely, ./bin/pr-*, ./bin/wt-* in 6 .sh files
+Result: All 6 files clean — no residual CLI command references
+4 of 6 files had references before fix (pre-commit.sh x2, pre-push.sh, reference-transaction.sh)
