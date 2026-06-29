@@ -1,6 +1,13 @@
 ---
 name: freely-dev-loop-execution
-description: 执行 scan-selected 或 handoff-continued ready issue 的实现、测试与进度回写。
+description: >-
+  执行 issue 的代码实现与 TDD RED-GREEN 验证。测试先行，代码后行。
+  产出 code-review + Implementation Decision Note。不碰 pre-tests.md
+  （测试方案由 `freely-doc-B2_IBM-execution` skill 编写）。
+
+  Use when: `freely-test-RED-execution` skill 确认全部 RED 之后，
+  需要写实现代码。触发词："写代码"、"dev"、"实现"、"开发"、
+  "开始写"、"coding"。
 ---
 
 # skill:freely-dev-loop-execution
