@@ -54,17 +54,11 @@ FREELY_HOME = ""
 # 二、AI 工具配置
 # ══════════════════════════════════════════════════════════════════════
 
-# [用户必填] 主 AI 工具。决定 freely 用哪个 AI CLI 执行工作。
-# 合法值（选择一个填入）:
-#   claude    — Claude Code (Anthropic)，需 `claude` CLI + `claude-agent-acp`
-#   codex     — Codex CLI (OpenAI)，需 `codex` CLI + `codex-acp`
-#   opencode  — OpenCode (Anthropic)，需 `opencode` CLI（内置 ACP）
-#   cline     — Cline，需 `cline` CLI（内置 ACP）
-#   iflow     — iFlow CLI
-#   kiro-cli  — Kiro CLI
-#   cc        — Claude Code 别名
-# 选择后需确保对应 ACP binary 可用（freeely init 会检查并提示下载）。
-# ⚠️ 不填影响: freely daemon start 失败——无法启动 AI 进程。
+# [已废弃] AI_TOOL 不再作为运行时配置源。
+# 运行时从 agent-table.toml 的 AGENT_AI_TOOL 派生（`freely_config.py` L4186 注释: "AI_TOOL 已弃用"）。
+# 仅保留用于无 agent-table 时的回退兼容。
+# 设置 AI 工具应编辑 .freely/agent-table.toml 中的 manager_slot / worker_slot。
+# ⚠️ 不填影响: 无 agent-table 时 daemon start 失败。
 AI_TOOL = ""
 
 # [用户必填] AI 模型名称。格式: 工具前缀-模型名。
@@ -118,6 +112,16 @@ AI_TOOL_ADAPTER = "acp"
 # ⚠️ 不填影响: 默认 direct，直接透传。
 AI_TOOL_ADAPTER_POLICY = "direct"
 
+# [可选] 自定义 AI 能力列表（逗号分隔）。留空使用工具默认。
+# 由 init 写入（L4266），运行时传递给 AI CLI。
+# ⚠️ 不填影响: 使用工具默认能力集。
+# AI_TOOL_CAPABILITIES = ""
+
+# [可选] 全局 AI 策略。留空使用工具默认。
+# 由 init 写入（L4267），运行时传递给 AI CLI。
+# ⚠️ 不填影响: 使用工具默认策略。
+# AI_TOOL_POLICY = ""
+
 
 # ══════════════════════════════════════════════════════════════════════
 # 四、Codex 特定（仅 AI_TOOL=codex 时生效）
@@ -169,7 +173,8 @@ AUTO_SWITCH_SLOT = true
 # 合法值: true(开启) / false(关闭)
 # 默认值: true
 # ⚠️ 不填影响: 默认 true，自动回退。
-AUTO_SWITCH_TOOL = true
+# ⚠️ 代码默认值为 false（L5149: `${AUTO_SWITCH_TOOL:-false}`）
+AUTO_SWITCH_TOOL = false
 
 # [可选] init 时自动配置网络代理。
 # 合法值: true(开启) / false(关闭)
@@ -217,7 +222,8 @@ MAX_RESTARTS = 0
 # 八、流控
 # ══════════════════════════════════════════════════════════════════════
 
-IFLOW_MAX_TURNS = 100            # session 最大对话轮数
+# [已失效] 运行时代码从未读取此字段。IFlow 在 tool-launchers.sh L672 硬编码 --max-turns 100。
+IFLOW_MAX_TURNS = 100            # ⚠️ 已失效 — 运行时未使用，硬编码在 tool-launchers.sh
 MAX_RESUME_STREAK = 24           # 最大连续恢复次数
 MAX_ROUTE_ONLY_STREAK = 1        # 最大仅路由次数
 ROTATE_ON_CONTEXT_COMPACTED = 1  # 上下文压缩后轮转(1=是,0=否)
@@ -239,6 +245,7 @@ CONTEXT_WARN_RATIO = 0.70
 # 必须 > CONTEXT_WARN_RATIO。
 # 默认值: 0.85 (85%)
 # ⚠️ 不填影响: 默认 85%。
+# ⚠️ 代码回退为 0.70（L17882: ${CONTEXT_ROTATE_RATIO:-0.70}），init 写入 0.85
 CONTEXT_ROTATE_RATIO = 0.85
 
 
@@ -264,9 +271,11 @@ RESTART_STORM_WINDOW_SECS = 30
 # [可选] 风暴检测阈值。窗口内重启超过此次数触发保护。
 # 默认值: 10（次）
 # ⚠️ 不填影响: 默认 10 次。
+# ⚠️ 代码回退为 4（L14639: ${RESTART_STORM_COUNT:-4}），init 写入 10
 RESTART_STORM_COUNT = 10
 
-PROCESS_CHURN_PEAK = 10                     # 进程抖动峰值
+# ⚠️ 代码回退为 3（L14643: ${PROCESS_CHURN_PEAK:-3}），init 写入 10
+PROCESS_CHURN_PEAK = 10                     # 进程抖动峰值（代码默认 3）
 RESTART_STORM_OBSERVE_DELAY_SECS = 30       # 触发后观察延迟（秒）
 
 
