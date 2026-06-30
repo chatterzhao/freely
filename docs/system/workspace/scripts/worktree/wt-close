@@ -759,10 +759,6 @@ if [[ "$FORCE" == true && -z "$wt_path" ]]; then
     if "$PROJECT_ROOT/bin/issue-sync" --project "$wt_path" close "$issue_id" completed 2>&1; then
       echo "wt-close: platform issue closed ✓"
 
-      _fm_set_str "$issue_file" "platform_state" "closed"
-      _fm_set_str "$issue_file" "updated_at" "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-      echo "wt-close: frontmatter updated (platform_state=closed)"
-
       # Also close the absorbed I-* issue if it has its own platform_ids.
       # When a raw issue is absorbed (absorbed_into: I-XXXXX-A), the I-* issue
       # may have been pushed to GitHub as a separate issue.  wt-close must close
