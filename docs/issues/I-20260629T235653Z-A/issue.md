@@ -2,4 +2,5 @@
 - kind: linked
 - phase_state: completed
 - source_raw: raw-20260629T235653Z
+- source_candidate: docs/pre-brainstorms/20260629T235653Z--fix-handoff-docs/candidates.md
 - title: docs: replace outdated handoff JSON with A2A tasks in AGENTS.md

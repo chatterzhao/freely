@@ -1,4 +1,19 @@
 
+## M-20260629T235653Z-A
+- title: docs: fix handoff references in AGENTS.md
+- status: active
+### candidate_issues
+1. `C-20260629T235653Z-A`
+- milestone: M-20260629T235653Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260629T235653Z-A/issue.md`
+### committed_issues
+1. `I-20260629T235653Z-A`
+- title: docs: fix handoff references; milestone_state: committed
+- issue_path: `docs/issues/I-20260629T235653Z-A/issue.md`
+- phase_state: `completed`
+### completed_issues
+
 ## M-20260629T163137Z-A
 - title: fix: pr-review-guarded path + ACP detection
 - status: active
