@@ -1,4 +1,13 @@
 
+## M-20260630T124528Z-A
+- title: feat: freely init ACP tool setup + tool-registry download config
+- status: active
+### candidate_issues
+1. `C-20260630T124528Z-A`
+- milestone: M-20260630T124528Z-A
+- status: promoted
+- promoted_issue_id: `I-20260630T124528Z-A`
+
 ## M-20260630T113839Z-A
 - title: fix: daemon dirty check excludes .freely/run/
 - status: active
