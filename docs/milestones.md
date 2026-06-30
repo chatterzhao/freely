@@ -1,3 +1,12 @@
+## M-20260630T224941Z-A
+- title: feat: config.toml.example overhaul + init create + merge lock
+- status: active
+### candidate_issues
+1. `C-20260630T224941Z-A`
+- milestone: M-20260630T224941Z-A
+- status: promoted
+- promoted_issue_id: `I-20260630T224941Z-A`
+
 ## M-20260630T151209Z-A
 - title: fix: unified config reader + --reset
 - status: active
