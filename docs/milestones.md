@@ -8,11 +8,11 @@
 - status: promoted
 - promoted_issue_path: `docs/issues/I-20260630T095936Z-A/issue.md`
 ### committed_issues
+### completed_issues
 1. `I-20260630T095936Z-A`
 - title: fix: consistency check merge fix; milestone_state: committed
 - issue_path: `docs/issues/I-20260630T095936Z-A/issue.md`
-- phase_state: `done_b2_ibm`
-### completed_issues
+- phase_state: `completed`
 
 ## M-20260630T085809Z-A
 - title: fix: A2A Server 健康检查修复 — socket 检查 + log 抑制 + shell 注入 + 超时
