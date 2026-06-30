@@ -22,8 +22,8 @@
 - actual_RED_output: (RED 阶段执行后填写)
 - actual_output: (GREEN 阶段执行后填写)
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - red_how: |
     修复前 worktree-common.sh:287: `git cherry-pick ...` — cherry-pick 被 hook 阻止
     修复前 wt-close:581: `git cherry-pick ...` — 同上
@@ -47,8 +47,8 @@
 - actual_RED_output: (RED 阶段执行后填写)
 - actual_output: (GREEN 阶段执行后填写)
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - red_how: |
     修复前 worktree-common.sh:260: 提示 cherry-pick 回开发工位
     修复前 wt-close:556: 提示 cherry-pick 回开发工位
@@ -70,8 +70,8 @@
 - actual_RED_output: (RED 阶段执行后填写)
 - actual_output: (GREEN 阶段执行后填写)
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - red_how: 修复前 pre-commit.sh 未对 test-pre-merge-* 分支做任何阻断
 
 ### acceptance-4
@@ -91,8 +91,8 @@
 - actual_RED_output: (RED 阶段执行后填写)
 - actual_output: (GREEN 阶段执行后填写)
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - red_how: |
     修复前 wt-close:527: `git add -A && git commit -m "test: results"`
     修复前 wt-close:531: `git cherry-pick ...` 提示同步回开发工位
