@@ -219,6 +219,8 @@ if [[ "$_acp_available" == "1" ]]; then
     fi
     if [[ "$_review_verdict" == "pass" ]]; then
       echo "Review PASSED"
+      # Update I-* phase_state → completed (before commit, so it flows into merge)
+      _update_issue_phase_state "$_raw_key"
       if [[ -f "$ROOT_DIR/$review_file" ]]; then
         git -C "$ROOT_DIR" add "$review_file" 2>/dev/null || true
         if ! git -C "$ROOT_DIR" diff --cached --quiet 2>/dev/null; then
@@ -452,6 +454,7 @@ REVIEWDOC
   rm -f "$REVIEW_SESSION_FILE" "$REVIEW_PROMPT_FILE"
 
   # Auto-commit and push
+  _update_issue_phase_state "$_raw_key"
   git add "$review_file" 2>/dev/null || true
   if ! git diff --cached --quiet 2>/dev/null; then
     git commit -m "review: pr-review-guarded verdict=pass for PR #$pr_number (TDD rounds=$_review_round)
@@ -543,5 +546,21 @@ if fixes:
 fi
 
 # ── Helper functions ────────────────────────────────────────
+
+# Update I-* issue phase_state to completed when review passes.
+# Called before git add/commit so the state update flows into develop via merge.
+_update_issue_phase_state() {
+  local _raw_key="$1"
+  [[ -n "$_raw_key" ]] || return 0
+  local _i_file
+  _i_file=$(find "$ROOT_DIR/docs/issues" -maxdepth 2 -name "I-${_raw_key}*.md" 2>/dev/null | head -1)
+  if [[ -n "$_i_file" && -f "$_i_file" ]]; then
+    if grep -q "phase_state: done_b2_ibm" "$_i_file" 2>/dev/null; then
+      sed -i '' 's/phase_state: done_b2_ibm/phase_state: completed/' "$_i_file"
+      git -C "$ROOT_DIR" add "${_i_file#$ROOT_DIR/}" 2>/dev/null || true
+      echo "Updated phase_state → completed in ${_i_file#$ROOT_DIR/}"
+    fi
+  fi
+}
 
 
