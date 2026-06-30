@@ -20042,7 +20042,7 @@ REASON_GATE
 
   # Platform configuration gate (#3336)
   local _platforms _platforms_config
-  _platforms="$(get_config FREELY_REPO_PLATFORMS "")"
+  _platforms="$(grep -E "^\s*FREELY_REPO_PLATFORMS\s*=" "$project/.freely/config.toml" 2>/dev/null | sed 's/^[^=]*=\s*"\?//;s/"\s*$//' | head -1 || true)"
   if [[ -z "$_platforms" ]]; then
     cat >&2 <<'PLATFORM_GATE'
 [BLOCKED] 未配置仓库平台 (FREELY_REPO_PLATFORMS)。
@@ -20124,7 +20124,20 @@ PLATFORM_GATE
       _config_key="FREELY_ACP_$(echo "$_tool" | tr '[:lower:]' '[:upper:]')_BIN"
 
       # 1. Check config.toml cache first — already configured, skip
-      _found_path="$(get_config "$_config_key" "")"
+_found_path="$(python3 -c "
+import sys, re
+key = sys.argv[1]
+try:
+    with open(sys.argv[2]) as f:
+        for line in f:
+            m = re.match(r'^\s*' + re.escape(key) + r'\s*=\s*\"(.+)\"\s*$', line)
+            if m:
+                print(m.group(1))
+                sys.exit(0)
+except Exception:
+    pass
+sys.exit(1)
+" "$_config_key" "$project/.freely/config.toml" 2>/dev/null || true)"
       if [[ -n "$_found_path" && -x "$_found_path" ]]; then
         log_info "  $_tool: $_binary → $_found_path (config.toml)"
         continue

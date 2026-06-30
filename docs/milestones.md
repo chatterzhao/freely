@@ -1,3 +1,18 @@
+## M-20260630T143515Z-A
+- title: fix: get_config → python3 reader
+- status: active
+### candidate_issues
+1. `C-20260630T143515Z-A`
+- milestone: M-20260630T143515Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/acp-tool-setup/fix-get-config-init/raw-20260630T143515Z/issues/I-20260630T143515Z-A.md`
+### committed_issues
+### completed_issues
+1. `I-20260630T143515Z-A`
+- title: fix get_config; milestone_state: committed
+- issue_path: `docs/epics/acp-tool-setup/fix-get-config-init/raw-20260630T143515Z/issues/I-20260630T143515Z-A.md`
+- phase_state: `completed`
+
 ## M-20260630T134353Z-A
 - title: feat: init --auto + config.toml cache
 - status: active
