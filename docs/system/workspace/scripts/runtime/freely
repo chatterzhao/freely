@@ -19996,9 +19996,10 @@ EOF
 }
 
 cmd_init() {
-  local project="" intent="" constitution="" ai_spec="" tool_adapter_arg="" tool_adapter_policy_arg="" reasoning_effort="" force="false" accept_default_autonomy="false" auto_mode="false"
+  local project="" intent="" constitution="" ai_spec="" tool_adapter_arg="" tool_adapter_policy_arg="" reasoning_effort="" force="false" accept_default_autonomy="false" auto_mode="false" reset_mode="false"
   while [[ $# -gt 0 ]]; do
     case "$1" in
+      --reset) reset_mode="true"; shift ;;
       --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
       --intent) intent="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
       --constitution) constitution="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
@@ -20042,7 +20043,7 @@ REASON_GATE
 
   # Platform configuration gate (#3336)
   local _platforms _platforms_config
-  _platforms="$(get_config FREELY_REPO_PLATFORMS "")"
+  _platforms="$(grep -E "^\s*FREELY_REPO_PLATFORMS\s*=" "$project/.freely/config.toml" 2>/dev/null | sed 's/^[^=]*=\s*"\?//;s/"\s*$//' | head -1 || true)"
   if [[ -z "$_platforms" ]]; then
     cat >&2 <<'PLATFORM_GATE'
 [BLOCKED] 未配置仓库平台 (FREELY_REPO_PLATFORMS)。
@@ -20094,11 +20095,36 @@ PLATFORM_GATE
   tool_adapter_policy="$(resolve_tool_adapter_policy_for_project_or_global "$project" "$tool" "$tool_adapter_policy_arg" "$tool_adapter_arg")"
   tool_adapter="$(resolve_tool_adapter_for_project_or_global "$project" "$tool" "$tool_adapter_arg" "$tool_adapter_policy")"
 
+  # ── Unified config.toml reader ──────────────────────────────────────
+  # Gracefully handles missing config.toml (returns empty string).
+  # With existing config: reads field by field, never modifies existing values.
+  _read_config_value() {
+    local _key="$1"
+    [[ -n "$_key" ]] || { echo ""; return 0; }
+    local _cfg="$project/.freely/config.toml"
+    [[ -f "$_cfg" ]] || { echo ""; return 0; }
+    python3 -c "
+import sys, re
+key = sys.argv[1]
+try:
+    with open(sys.argv[2]) as f:
+        for line in f:
+            m = re.match(r'^\s*' + re.escape(key) + r'\s*=\s*\"(.+)\"\s*$', line)
+            if m:
+                print(m.group(1))
+                sys.exit(0)
+except Exception:
+    pass
+sys.exit(1)
+" "$_key" "$_cfg" 2>/dev/null || true
+  }
+
   # ── ACP tool setup: discover/download ACP binaries for all registered tools ──
   # Reads tool-registry.toml, searches system PATH/cache, prompts for download,
   # writes binary paths to config.toml for runtime use.
   _init_acp_tool_setup() {
-    local _auto_mode="${1:-false}"  # --auto: skip interactive confirmation
+    local _auto_mode="${1:-false}"    # --auto: skip interactive confirmation
+    local _reset_mode="${2:-false}"   # --reset: overwrite all config fields
     local registry="$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-registry.toml"
     local registry_query="$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-registry-query.py"
     local ensure_script="$SELF_ROOT/docs/system/workspace/scripts/runtime/ensure-acp-binary"
@@ -20123,8 +20149,11 @@ PLATFORM_GATE
       _url="$("$registry_query" "$registry" "$_tool" "acp.download_url" 2>/dev/null || true)"
       _config_key="FREELY_ACP_$(echo "$_tool" | tr '[:lower:]' '[:upper:]')_BIN"
 
-      # 1. Check config.toml cache first — already configured, skip
-      _found_path="$(get_config "$_config_key" "")"
+      # 1. Check config.toml cache first — already configured, skip (unless --reset)
+      _found_path=""
+      if [[ "$_reset_mode" != "true" ]]; then
+        _found_path="$(_read_config_value "$_config_key")"
+      fi
       if [[ -n "$_found_path" && -x "$_found_path" ]]; then
         log_info "  $_tool: $_binary → $_found_path (config.toml)"
         continue
@@ -20140,7 +20169,7 @@ PLATFORM_GATE
 
       if [[ -n "$_found_path" && -x "$_found_path" ]]; then
         log_info "  $_tool: found $_binary at $_found_path → updating config.toml"
-        set_config "$_config_key" "$_found_path"
+        upsert_config_key "$project" "$_config_key" "$_found_path"
         continue
       fi
 
@@ -20170,7 +20199,7 @@ PLATFORM_GATE
         _found_path="$("$ensure_script" --tool "$_tool" 2>/dev/null)" || true
         if [[ -n "$_found_path" && -x "$_found_path" ]]; then
           log_info "  $_tool: installed to $_found_path → config.toml"
-          set_config "$_config_key" "$_found_path"
+          upsert_config_key "$project" "$_config_key" "$_found_path"
         else
           log_warn "  $_tool: download failed, retry: $ensure_script --tool $_tool"
         fi
@@ -20208,7 +20237,7 @@ SDK_HELP
     fi
 
     # Run ACP tool setup (discover/download all registered tools)
-    _init_acp_tool_setup "$auto_mode"
+    _init_acp_tool_setup "$auto_mode" "$reset_mode"
   fi
 
   tool_capabilities="$(tool_default_capabilities_for_runtime "$tool")"
