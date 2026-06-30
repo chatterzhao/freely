@@ -14,7 +14,7 @@
 #   - 浮点:   key = 0.70
 #
 # 标记说明:
-#   [init自动]  freely init 时自动填入
+#   [init代填]  freely init 时自动填入
 #   [用户必填]  必须根据项目实际情况修改
 #   [可选]      有默认值，可按需修改
 #   ⚠️          留空或删除此字段的后果
@@ -24,24 +24,24 @@
 # 一、项目基础
 # ══════════════════════════════════════════════════════════════════════
 
-# [init自动] 项目根目录的绝对路径。freely 所有 git/worktree/文件操作以此为基准。
+# [init代填] 项目根目录的绝对路径。freely 所有 git/worktree/文件操作以此为基准。
 # init 时自动填入当前 git 仓库根目录 (`git rev-parse --show-toplevel`)。
 # ⚠️ 留空 = freely 完全无法工作
 PROJECT_ROOT = ""
 
-# [init自动] 项目意图文件 (PROJECT_INTENT.md)，描述项目目标和核心需求。
+# [init代填] 项目意图文件 (PROJECT_INTENT.md)，描述项目目标和核心需求。
 # Manager 将此文件内容注入 AI 提示作为行为约束。
 # init 时自动检测 $PROJECT_ROOT/docs/PROJECT_INTENT.md。
 # ⚠️ 留空 = AI 缺少目标约束
 INTENT_FILE = ""
 
-# [init自动] 项目宪法文件 (CONSTITUTION.md)，定义不可违背的架构和开发约束。
+# [init代填] 项目宪法文件 (CONSTITUTION.md)，定义不可违背的架构和开发约束。
 # Manager 将此文件内容注入 AI 提示作为硬性边界。
 # init 时自动检测 $PROJECT_ROOT/docs/CONSTITUTION.md。
 # ⚠️ 留空 = AI 缺少硬性边界约束
 CONSTITUTION_FILE = ""
 
-# [init自动] Freely 安装根目录。用于定位模板、脚本、skill 等资源文件。
+# [init代填] Freely 安装根目录。用于定位模板、脚本、skill 等资源文件。
 # init 时自动填入当前 freely 执行路径。
 # ⚠️ 留空 = 部分模板和脚本功能不可用
 FREELY_HOME = ""
@@ -296,36 +296,36 @@ FREELY_SECURITY_REVIEW_SCOPE = "execution-boundary-and-reviewer-support"
 # 十五、自治与安全姿态 (init 时自动设置)
 # ══════════════════════════════════════════════════════════════════════
 
-# [init自动] 自治级别。由 AI_MODE 推导: auto→autonomous-default, step→supervised。
+# [init代填] 自治级别。由 AI_MODE 推导: auto→autonomous-default, step→supervised。
 FREELY_AUTONOMY_PROFILE = "autonomous-default"
 
-# [init自动] 交互姿态。由 AI_MODE 推导: auto→non-interactive, step→interactive。
+# [init代填] 交互姿态。由 AI_MODE 推导: auto→non-interactive, step→interactive。
 FREELY_INTERACTION_POSTURE = "non-interactive"
 
-# [init自动] 批准姿态。由 AI_MODE 推导: auto→automatic-where-supported, step→explicit。
+# [init代填] 批准姿态。由 AI_MODE 推导: auto→automatic-where-supported, step→explicit。
 FREELY_APPROVAL_POSTURE = "automatic-where-supported"
 
-# [init自动] 防护引导: recommended-nonblocking(建议不阻塞) | strict-blocking(严格阻塞)
+# [init代填] 防护引导: recommended-nonblocking(建议不阻塞) | strict-blocking(严格阻塞)
 FREELY_SAFEGUARD_GUIDANCE_POSTURE = "recommended-nonblocking"
 
-# [init自动] 运行时决策: internal-ai-escalation-before-stop(AI内部升级后停止) | operator-decide(操作者决定)
+# [init代填] 运行时决策: internal-ai-escalation-before-stop(AI内部升级后停止) | operator-decide(操作者决定)
 FREELY_RUNTIME_DECISION_POSTURE = "internal-ai-escalation-before-stop"
 
-# [init自动] 最小风险姿态 (固定值，不可修改)
+# [init代填] 最小风险姿态 (固定值，不可修改)
 FREELY_MINIMAL_RISK_POSTURE = "last-resort-safe-stop"
 
 # ── 激活同意 (init 时自动设置) ──
 
-# [init自动] auto 模式需要激活同意
+# [init代填] auto 模式需要激活同意
 FREELY_ACTIVATION_CONSENT_REQUIRED = "true"
 
-# [init自动] 同意状态: accepted(已同意) | pending(待同意) | not-required(不需要)
+# [init代填] 同意状态: accepted(已同意) | pending(待同意) | not-required(不需要)
 FREELY_ACTIVATION_CONSENT_STATUS = "accepted"
 
-# [init自动] 激活同意记录时间 (ISO 8601 UTC, init 时自动填入)
+# [init代填] 激活同意记录时间 (ISO 8601 UTC, init 时自动填入)
 FREELY_ACTIVATION_CONSENT_RECORDED_AT = ""
 
-# [init自动] 激活同意记录方式 (flag / interactive / freely-init)
+# [init代填] 激活同意记录方式 (flag / interactive / freely-init)
 FREELY_ACTIVATION_CONSENT_RECORDED_VIA = ""
 
 
@@ -333,7 +333,7 @@ FREELY_ACTIVATION_CONSENT_RECORDED_VIA = ""
 # 十六、ACP Binary 路径 (init 自动发现/下载后填入)
 # ══════════════════════════════════════════════════════════════════════
 
-# [init自动] 各工具 ACP binary 的绝对路径。
+# [init代填] 各工具 ACP binary 的绝对路径。
 # freely init 会自动搜索系统 (PATH、npm 全局安装、缓存目录)，找到后填入。
 # 未找到则提示下载 (--auto 自动确认)。
 # 留空 = 使用该工具的 agent 无法启动 ACP bridge。
