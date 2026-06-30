@@ -20041,6 +20041,53 @@ REASON_GATE
   [[ -f "$constitution" ]] || { log_error "constitution file not found: $constitution"; exit 1; }
   validate_project_branch_names "$project"
 
+  # ── Ensure config.toml exists ──────────────────────────────────────
+  # Creates config.toml from example if missing.  Handles --reset.
+  local _cfg="$project/.freely/config.toml"
+  local _example_src="$SELF_ROOT/templates/config.toml.example"
+
+  if [[ "$reset_mode" == "true" && -f "$_cfg" ]]; then
+    # --reset: confirm, backup, overwrite from example
+    local _confirm="n"
+    if [[ "$auto_mode" == "true" ]]; then
+      _confirm="y"
+      log_info "--reset --auto: auto-confirming config.toml reset"
+    elif [[ -t 0 ]]; then
+      printf '\n⚠️  即将重置 config.toml（备份后从模板重建）。确认？ [y/N] '
+      read -t 30 _confirm 2>/dev/null || _confirm="n"
+    fi
+    case "$_confirm" in
+      [yY]|[yY][eE][sS])
+        local _ts; _ts=$(date -u +%Y%m%dT%H%M%SZ)
+        cp "$_cfg" "$project/.freely/config.toml.${_ts}.bak"
+        log_info "config.toml backed up to config.toml.${_ts}.bak"
+        cp "$_example_src" "$_cfg"
+        log_info "config.toml reset from template"
+        ;;
+      *)
+        log_info "config.toml reset cancelled"
+        ;;
+    esac
+  elif [[ ! -f "$_cfg" ]]; then
+    # No config.toml: create from example
+    if [[ -f "$_example_src" ]]; then
+      cp "$_example_src" "$_cfg"
+      log_info "config.toml created from template"
+    else
+      log_warn "config.toml.example not found at $_example_src — creating empty config"
+      touch "$_cfg"
+    fi
+  fi
+
+  # Auto-fill known values (both for new and reset configs)
+  if [[ -f "$_cfg" ]]; then
+    local _project_root; _project_root="$(git -C "$project" rev-parse --show-toplevel 2>/dev/null || echo "$project")"
+    upsert_config_key "$project" "PROJECT_ROOT" "$_project_root"
+    upsert_config_key "$project" "FREELY_HOME" "$SELF_ROOT"
+    [[ -f "$project/docs/PROJECT_INTENT.md" ]] && upsert_config_key "$project" "INTENT_FILE" "$project/docs/PROJECT_INTENT.md"
+    [[ -f "$project/docs/CONSTITUTION.md" ]] && upsert_config_key "$project" "CONSTITUTION_FILE" "$project/docs/CONSTITUTION.md"
+  fi
+
   # Platform configuration gate (#3336)
   local _platforms _platforms_config
   _platforms="$(grep -E "^\s*FREELY_REPO_PLATFORMS\s*=" "$project/.freely/config.toml" 2>/dev/null | sed 's/^[^=]*=\s*"\?//;s/"\s*$//' | head -1 || true)"
@@ -20264,14 +20311,11 @@ SDK_HELP
   ensure_repo_hooks_enabled_or_fail "$project"
   sync_repo_hook_assets_from_source "$SELF_ROOT" "$project"
 
-  # Release config.toml.example — user must copy and configure manually.
-  # We do NOT auto-generate config.toml because users must read the
-  # comments to understand what each value means.
+  # Release config.toml.example for reference — config.toml already created above.
   local _example_src="$SELF_ROOT/templates/config.toml.example"
   local _example_dst="$project/.freely/config.toml.example"
   if [[ -f "$_example_src" ]]; then
     cp "$_example_src" "$_example_dst"
-    log_info "config.toml.example released to .freely/"
   fi
 
   # ── Agent table template ──────────────────────────────────
@@ -20346,14 +20390,14 @@ EOF
   fi
   ensure_a2a_server_running "$project"
   ensure_task_mode_gate "$project" "wait"
-  log_info "init complete — config.toml.example released to .freely/"
+  log_info "init complete"
   echo ""
   echo "┌─ 下一步 ──────────────────────────────────────────────┐"
-  echo "│  config.toml.example 已释放到 .freely/ 目录              │"
+  echo "│  config.toml 已就绪（含自动填入的项目路径）              │"
   echo "│                                                        │"
-  echo "│  1. 复制并编辑配置:                                     │"
-  echo "│    cp .freely/config.toml.example .freely/config.toml"
-  echo "│    vim .freely/config.toml  (按注释修改 PROJECT_ROOT 等)"
+  echo "│  1. 请编辑 .freely/config.toml，检查并补充必要配置:      │"
+  echo "│    vim .freely/config.toml"
+  echo "│    至少需确认: AI_TOOL, AI_MODEL, FREELY_REPO_PLATFORMS"
   echo "│                                                        │"
   echo "│  2. 启动 freely:                                        │"
   echo "│    freely start --project $project"
