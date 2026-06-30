@@ -8,6 +8,10 @@
 - status: promoted
 - promoted_issue_path: `docs/epics/a2a-state-standard/state-rename/raw-20260630T021946Z/issues/I-20260630T021946Z-A.md`
 ### committed_issues
+1. `I-20260630T021946Z-A`
+- title: fix: a2a state alignment; milestone_state: committed
+- issue_path: `docs/epics/a2a-state-standard/state-rename/raw-20260630T021946Z/issues/I-20260630T021946Z-A.md`
+- phase_state: `completed`
 ### completed_issues
 
 ## M-20260629T235653Z-A

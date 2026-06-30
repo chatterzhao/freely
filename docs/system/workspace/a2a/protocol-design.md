@@ -67,7 +67,7 @@ Task 是 A2A 的核心任务单元，包含完整状态机。
 └───────┘              └──────────┘
     │
 ┌───▼────────┐   ┌──────────────┐
-│input_required│◄─│pending-input │
+│input-required│◄─│input-required│
 └────────────┘   └──────────────┘
 ```
 
@@ -93,15 +93,13 @@ Freely Agent Card 扩展 A2A 标准，声明 Freely 特有能力：
   "freely": {
     "worktreeIsolation": true,
     "worktreeRoot": "/path/to/project-worktrees",
-    "supportedExitKinds": [
-      "manager_working",
-      "worker_working",
-      "worker_done",
-      "worker_blocked",
-      "worker_handoff_needed",
-      "delegate_workers",
-      "resume_manager",
-      "stop_ai"
+    "supportedStates": [
+      "submitted",
+      "working",
+      "input-required",
+      "completed",
+      "failed",
+      "canceled"
     ],
     "a2aSchema": "https://freely.dev/schemas/a2a-task-v1",
     "supportedSkills": [
@@ -116,18 +114,20 @@ Freely Agent Card 扩展 A2A 标准，声明 Freely 特有能力：
 }
 ```
 
-## exit_kind → A2A Task 状态映射
+## A2A Task 状态（Google A2A 标准）
 
-| Freely exit_kind | A2A Task state | 说明 |
-|------------------|----------------|------|
-| manager_working | submitted | Manager 已提交任务 |
-| worker_working | working | Worker 正在执行 |
-| worker_done | completed | 任务完成 |
-| worker_blocked | input-required | 需要 Manager 输入 |
-| worker_handoff_needed | pending-input | 需要 Manager 介入 |
-| delegate_workers | submitted | 委派新 Worker |
-| resume_manager | completed | 返回 Manager |
-| stop_ai | failed | AI 停止 |
+`a2a-exit --state <value>` 直接写入标准 A2A Task.state。
+
+| A2A Task state | 含义 | Freely 使用场景 |
+|---------------|------|----------------|
+| `submitted` | 任务已提交 | Manager 创建任务 |
+| `working` | Agent 执行中 | Worker/Reviewer 工作中 |
+| `input-required` | 需要外部输入 | Worker 完成 phase，等 reviewer GO/FIX |
+| `completed` | 任务成功 | wt-close 后 |
+| `failed` | 任务失败 | 崩溃/超时 |
+| `canceled` | 任务被取消 | Manager 主动放弃 |
+
+> 旧 `exit_kind` (worker_blocked, worker_done 等) 已废弃。直接使用标准 state 名。
 
 ## Freely 特有 artifact 类型
 

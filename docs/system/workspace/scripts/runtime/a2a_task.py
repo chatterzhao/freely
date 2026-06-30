@@ -4,7 +4,7 @@
 Communicates via A2A protocol (HTTP over Unix socket to A2A Server).
 AI replies are A2A Messages; the state block at the end drives Task state transitions.
 
-A2A states: submitted, working, completed, failed, input-required, pending-input
+A2A states: submitted, working, completed, failed, input-required, canceled (Google A2A standard)
 """
 
 import argparse
@@ -517,7 +517,6 @@ class State:
     COMPLETED = "completed"
     FAILED = "failed"
     INPUT_REQUIRED = "input-required"
-    PENDING_INPUT = "pending-input"
     CANCELED = "canceled"
 
 
@@ -637,9 +636,10 @@ def read_state_only(reply_text: str) -> dict:
     return extract_task_state(reply_text)
 
 
+# A2A standard states (Google A2A protocol)
 VALID_STATES = {
     'submitted', 'working', 'completed', 'failed',
-    'input-required', 'pending-input', 'canceled',
+    'input-required', 'canceled',
 }
 
 STATE_ALIASES = {
@@ -659,8 +659,9 @@ STATE_ALIASES = {
     'nothing': 'failed', 'no_work': 'failed', 'idle': 'failed',
     'stop': 'failed', 'error': 'failed',
     'blocked': 'input-required', 'block': 'input-required',
-    'needs_manager': 'pending-input', 'needs_input': 'pending-input',
-    'handoff': 'pending-input',
+    # Legacy aliases (deprecated, use standard --state values directly)
+    'needs_manager': 'input-required', 'needs_input': 'input-required',
+    'handoff': 'input-required',
 }
 
 def normalize_state(raw: str) -> str:
@@ -799,7 +800,7 @@ def _main() -> int:
 
     # ── a2a-exit: AI explicitly sets A2A Task state (standard A2A pattern) ──
     p_exit = sub.add_parser("a2a-exit")
-    p_exit.add_argument("--state", required=True, help="A2A state: submitted|working|completed|failed|input-required|pending-input")
+    p_exit.add_argument("--state", required=True, help="A2A state: submitted|working|completed|failed|input-required|canceled")
     p_exit.add_argument("--summary", default="", help="Completion summary")
     p_exit.add_argument("--next", default="", help="Next action")
     p_exit.add_argument("--evidence", default="", help="Evidence paths")
@@ -991,7 +992,7 @@ def _main() -> int:
                 # Find last task with a state set by a2a-exit
                 for t in reversed(tasks):
                     state = t.get('state', '')
-                    if state in ('submitted', 'completed', 'failed', 'working', 'input-required', 'pending-input'):
+                    if state in ('submitted', 'completed', 'failed', 'working', 'input-required', 'canceled'):
                         print(state)
                         break
                 else:
