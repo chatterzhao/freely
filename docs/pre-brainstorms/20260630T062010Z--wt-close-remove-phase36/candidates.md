@@ -12,3 +12,4 @@ milestone: M-20260630T062010Z-A
 - acceptance_criteria: [Phase 3.6 removed, --force help clear, block message clear]
 - promotion_gate: merge
 - promoted_issue_path: docs/epics/wt-close-raw-key/remove-phase36/raw-20260630T062010Z/issues/I-20260630T062010Z-A.md
+- milestone: M-20260630T062010Z-A
