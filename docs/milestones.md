@@ -1,4 +1,15 @@
 
+## M-20260630T021946Z-A
+- title: fix: a2a_tasks 状态对齐 Google A2A 标准
+- status: active
+### candidate_issues
+1. `C-20260630T021946Z-A`
+- milestone: M-20260630T021946Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/a2a-state-standard/state-rename/raw-20260630T021946Z/issues/I-20260630T021946Z-A.md`
+### committed_issues
+### completed_issues
+
 ## M-20260629T235653Z-A
 - title: docs: fix handoff references in AGENTS.md
 - status: active
