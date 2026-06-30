@@ -2,7 +2,7 @@
 - kind: fix
 - phase_state: completed
 - milestone: M-20260630T102830Z-A
-- source_candidate: ""
+- source_candidate: docs/pre-brainstorms/20260630T102830Z--agents-worktree-rule/candidates.md#C-20260630T102830Z-A
 - verification_artifact_dir: ""
 - pre_tests_path: ""
 - canonical_issue_path: ""
