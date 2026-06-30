@@ -39,6 +39,13 @@
 - not_applicable_explanation: ""
 - replacement_evidence: ""
 - red_how: 代码审查确认 freely:8620 `s.sendall(b'GET /tasks HTTP/1.1...')` — 健康检查发送原始 HTTP 请求；A2A 日志 97.7% 为 Invalid HTTP 错误
+- actual_output: |
+    GREEN: no HTTP sendall in health check
+    GREEN: FREELY_A2A_SOCKET env var used (line 8615/8617)
+    GREEN: health check uses socket connect only (no data sent)
+- evidence_file: docs/epics/a2a-healthcheck-fix/socket-healthcheck/test-evidence/acceptance-1.log
+- red-green-status: green
+- status: passed
 
 ### acceptance-2
 - id: AT-002
@@ -70,6 +77,12 @@
 - not_applicable_explanation: ""
 - replacement_evidence: ""
 - red_how: 代码审查确认 freely:8619 `s.connect('$a2a_socket')` — 直接拼接变量到 Python -c 字符串，与之前修复的 freely-cycle shell 注入同类
+- actual_output: |
+    GREEN: A2A health check at line 8615-8617 uses os.environ.get('FREELY_A2A_SOCKET')
+    NOTE: 3 other instances (13755 bridge_socket, 13868/14140 socket) are out of scope — separate issues in ACP bridge code
+- evidence_file: docs/epics/a2a-healthcheck-fix/socket-healthcheck/test-evidence/acceptance-2.log
+- red-green-status: green
+- status: passed
 
 ### acceptance-3
 - id: AT-003
@@ -123,6 +136,12 @@
 - not_applicable_explanation: ""
 - replacement_evidence: ""
 - red_how: 修复前 line 8612: `while [[ $_health_waited -lt 20 ]]` = 10 秒超时，服务器恢复历史 task 需要 >10 秒
+- actual_output: |
+    GREEN: freely:8613 `while [[ $_health_waited -lt 30 ]]` — max 30 iterations
+    GREEN: freely:8633 `sleep 1` — 30 × 1s = 30 秒超时
+- evidence_file: docs/epics/a2a-healthcheck-fix/socket-healthcheck/test-evidence/acceptance-4.log
+- red-green-status: green
+- status: passed
 
 ### acceptance-5
 - id: AT-005
@@ -151,6 +170,12 @@
 - not_applicable_explanation: ""
 - replacement_evidence: ""
 - red_how: 修复前 A2A 日志所有条目无时间戳，无法追踪问题时间线
+- actual_output: |
+    GREEN: a2a_server.py _a2a_uvicorn_log_config() now has formatters.default.format with %(asctime)s
+    GREEN: datefmt: '%Y-%m-%dT%H:%M:%SZ' (ISO 8601)
+- evidence_file: docs/epics/a2a-healthcheck-fix/socket-healthcheck/test-evidence/acceptance-5.log
+- red-green-status: green
+- status: passed
 
 ## Unit
 - acceptance_target: 语法检查 — bash -n freely 脚本 + python3 -c "import a2a_server" 编译检查
