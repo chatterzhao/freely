@@ -126,7 +126,7 @@ class SQLiteTaskStore(BaseTaskStore):
         m = {'submitted': TaskState.TASK_STATE_SUBMITTED, 'working': TaskState.TASK_STATE_WORKING,
              'completed': TaskState.TASK_STATE_COMPLETED, 'failed': TaskState.TASK_STATE_FAILED,
              'input-required': TaskState.TASK_STATE_INPUT_REQUIRED,
-             'pending-input': TaskState.TASK_STATE_INPUT_REQUIRED,
+             'canceled': TaskState.TASK_STATE_CANCELED,
              'canceled': TaskState.TASK_STATE_CANCELED}
         return m.get(db_state, TaskState.TASK_STATE_SUBMITTED)
 

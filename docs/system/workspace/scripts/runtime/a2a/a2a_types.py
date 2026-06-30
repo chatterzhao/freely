@@ -25,7 +25,7 @@ class TaskState(str, Enum):
     CANCELED = "canceled"
 
     # Alias from A2A spec
-    PENDING_INPUT = "pending-input"
+    CANCELED = "canceled"
 
 
 # ── Task Status ──────────────────────────────────────────────────────────

@@ -4,7 +4,7 @@
 The AI's reply is an A2A Message (role/type/content). The structured state
 block at the end provides the A2A Task state transition data.
 
-A2A states: submitted, working, completed, failed, input-required, pending-input
+A2A states: submitted, working, completed, failed, input-required, canceled
 """
 """DEPRECATED: a2a_task_parser.py — text JSON extraction is now FALLBACK ONLY.
 
@@ -24,7 +24,7 @@ import re
 
 VALID_STATES = {
     'submitted', 'working', 'completed', 'failed',
-    'input-required', 'pending-input',
+    'input-required', 'canceled',
 }
 
 # Required fields per A2A state (summary is always required)
@@ -34,7 +34,7 @@ REQUIRED_FIELDS = {
     'completed':      ['summary'],
     'failed':         ['summary'],
     'input-required': ['summary'],
-    'pending-input':  ['summary'],
+    'canceled':  ['summary'],
 }
 
 # Natural language → A2A state aliases (AI may output NL variants)
@@ -60,9 +60,9 @@ STATE_ALIASES = {
     'stop': 'failed', 'error': 'failed',
     # input-required
     'blocked': 'input-required', 'block': 'input-required',
-    # pending-input
-    'needs_manager': 'pending-input', 'needs_input': 'pending-input',
-    'handoff': 'pending-input',
+    # canceled
+    'needs_manager': 'canceled', 'needs_input': 'canceled',
+    'handoff': 'canceled',
 }
 
 
