@@ -32,9 +32,12 @@
 - required_evidence: bash -n 无错误
 - blocker_taxonomy: execution_pending_or_failed
   - not_applicable_reason: no_executable_boundary_at_this_layer
+  - not_applicable_explanation: Unit verification done via AT-001 code review
+  - replacement_evidence: Syntax check (bash -n OK) + grep verification
+  - not_applicable_reason: no_executable_boundary_at_this_layer
   - not_applicable_explanation: Unit tests covered by AT-001 code review + bash -n
   - replacement_evidence: Syntax check passed
-- status: passed
+- status: not_applicable
 
 ## Integration
 - acceptance_target: freely init --auto 正常执行

@@ -1,0 +1,6 @@
+- issue_id: I-20260630T135725Z-A
+- decision: Replace get_config/set_config with upsert_config_key + grep + indirect expansion
+- why_this: Functions didn't exist, regression from #3658+#3660
+- alternatives_considered: Define new functions (more code, not needed)
+- boundary_non_goals: Not changing config read/write architecture
+- residual_risk: None — existing upsert_config_key is proven
