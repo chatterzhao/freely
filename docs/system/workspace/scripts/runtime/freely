@@ -823,7 +823,7 @@ preflight_codex_slot_recovery_before_start_or_fail() {
 usage() {
   cat <<'EOF'
 Usage:
-  freely init [--project <abs_path>] --intent <abs_file> --constitution <abs_file> [--ai <tool[:model][:mode]>] [--tool-adapter <adapter>] [--tool-adapter-policy <policy>] [--reasoning-effort <effort>] [--accept-default-autonomy] [--force] [--reason <text>]
+  freely init [--project <abs_path>] --intent <abs_file> --constitution <abs_file> [--ai <tool[:model][:mode]>] [--tool-adapter <adapter>] [--tool-adapter-policy <policy>] [--reasoning-effort <effort>] [--auto] [--accept-default-autonomy] [--force] [--reason <text>]
   freely set-tool [--project <abs_path>] --tool <name> [--tool-adapter <adapter>] [--tool-adapter-policy <policy>]
   freely sync-tooling [--project <abs_path>] --source-project <abs_path>
   freely doctor [--project <abs_path>]
@@ -873,6 +873,12 @@ Usage:
 AI mode:
   auto  -> non-interactive, auto-approve (where supported)
   step  -> interactive/approval mode
+
+freely init options:
+  --auto 跳过 ACP 工具下载的交互确认，自动下载所有工具的 ACP binary。
+         适合 AI agent 调用或 CI 环境。不带 --auto 则每个缺失的工具会提示 [y/N]。
+  init 会自动搜索系统已有安装 → 写入 config.toml → 缺失时提示/自动下载。
+  再次运行 init 时，config.toml 已有有效路径则跳过搜索，直接复用。
 
 Bypass gates (--force / --skip-platform / --discard-unmerged) require --reason:
   这些命令的 bypass 标志（--force、--skip-platform、--discard-unmerged）必须配合 --reason 使用。
@@ -19990,7 +19996,7 @@ EOF
 }
 
 cmd_init() {
-  local project="" intent="" constitution="" ai_spec="" tool_adapter_arg="" tool_adapter_policy_arg="" reasoning_effort="" force="false" accept_default_autonomy="false"
+  local project="" intent="" constitution="" ai_spec="" tool_adapter_arg="" tool_adapter_policy_arg="" reasoning_effort="" force="false" accept_default_autonomy="false" auto_mode="false"
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
@@ -20000,6 +20006,7 @@ cmd_init() {
       --tool-adapter) tool_adapter_arg="${2:-}"; shift 2 ;;
       --tool-adapter-policy) tool_adapter_policy_arg="${2:-}"; shift 2 ;;
       --reasoning-effort) reasoning_effort="${2:-}"; shift 2 ;;
+      --auto) auto_mode="true"; shift ;;
       --accept-default-autonomy) accept_default_autonomy="true"; shift ;;
       --force) force="true"; shift ;;
       --reason) reason="${2:-}"; shift 2 ;;
@@ -20091,6 +20098,7 @@ PLATFORM_GATE
   # Reads tool-registry.toml, searches system PATH/cache, prompts for download,
   # writes binary paths to config.toml for runtime use.
   _init_acp_tool_setup() {
+    local _auto_mode="${1:-false}"  # --auto: skip interactive confirmation
     local registry="$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-registry.toml"
     local registry_query="$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-registry-query.py"
     local ensure_script="$SELF_ROOT/docs/system/workspace/scripts/runtime/ensure-acp-binary"
@@ -20109,15 +20117,20 @@ PLATFORM_GATE
     local _tool _binary _method _url _found_path _config_key
     for _tool in "${_all_tools[@]}"; do
       _binary="$("$registry_query" "$registry" "$_tool" "acp.binary" 2>/dev/null || true)"
-      [[ -n "$_binary" ]] || continue  # skip tools without ACP config
+      [[ -n "$_binary" ]] || continue
 
       _method="$("$registry_query" "$registry" "$_tool" "acp.install_method" 2>/dev/null || true)"
       _url="$("$registry_query" "$registry" "$_tool" "acp.download_url" 2>/dev/null || true)"
-
-      # Build config key: FREELY_ACP_CLAUDE_BIN, FREELY_ACP_CODEX_BIN, etc.
       _config_key="FREELY_ACP_$(echo "$_tool" | tr '[:lower:]' '[:upper:]')_BIN"
 
-      # Search system first
+      # 1. Check config.toml cache first — already configured, skip
+      _found_path="$(get_config "$_config_key" "")"
+      if [[ -n "$_found_path" && -x "$_found_path" ]]; then
+        log_info "  $_tool: $_binary → $_found_path (config.toml)"
+        continue
+      fi
+
+      # 2. Search system (PATH + cache)
       _found_path=""
       if command -v "$_binary" >/dev/null 2>&1; then
         _found_path="$(command -v "$_binary")"
@@ -20126,35 +20139,40 @@ PLATFORM_GATE
       fi
 
       if [[ -n "$_found_path" && -x "$_found_path" ]]; then
-        log_info "  $_tool: found $_binary at $_found_path"
+        log_info "  $_tool: found $_binary at $_found_path → updating config.toml"
         set_config "$_config_key" "$_found_path"
         continue
       fi
 
-      # Not found — prompt user for download
+      # 3. Not found — need download
       if [[ -z "$_method" || -z "$_url" ]]; then
-        log_warn "  $_tool: $_binary not found, and registry missing install_method/download_url — skipping"
+        log_warn "  $_tool: $_binary not found, registry missing install_method/download_url — skipping"
         continue
       fi
 
-      # Interactive confirmation
-      if [[ -t 0 ]]; then
+      # 4. Confirm download
+      if [[ "$_auto_mode" == "true" ]]; then
+        log_info "  $_tool: --auto mode, downloading $_binary..."
+      elif [[ -t 0 ]]; then
         printf '\n%s\n' "  $_tool: $_binary 未安装。从 $_method 下载？ [y/N]"
         read -r _confirm
         case "$_confirm" in
           [yY]|[yY][eE][sS]) ;;
           *) log_info "  $_tool: skipped by user"; continue ;;
         esac
+      else
+        log_info "  $_tool: non-interactive, skipping (use --auto to auto-download)"
+        continue
       fi
 
       # Download via ensure-acp-binary
       if [[ -x "$ensure_script" ]]; then
         _found_path="$("$ensure_script" --tool "$_tool" 2>/dev/null)" || true
         if [[ -n "$_found_path" && -x "$_found_path" ]]; then
-          log_info "  $_tool: installed to $_found_path"
+          log_info "  $_tool: installed to $_found_path → config.toml"
           set_config "$_config_key" "$_found_path"
         else
-          log_warn "  $_tool: download failed, you can retry with: $ensure_script --tool $_tool"
+          log_warn "  $_tool: download failed, retry: $ensure_script --tool $_tool"
         fi
       else
         log_warn "  $_tool: ensure-acp-binary not found at $ensure_script"
@@ -20190,7 +20208,7 @@ SDK_HELP
     fi
 
     # Run ACP tool setup (discover/download all registered tools)
-    _init_acp_tool_setup
+    _init_acp_tool_setup "$auto_mode"
   fi
 
   tool_capabilities="$(tool_default_capabilities_for_runtime "$tool")"
