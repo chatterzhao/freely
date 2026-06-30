@@ -7,6 +7,12 @@
 - milestone: M-20260630T124528Z-A
 - status: promoted
 - promoted_issue_id: `I-20260630T124528Z-A`
+### committed_issues
+1. `I-20260630T124528Z-A`
+- title: feat: ACP init + registry download; milestone_state: committed
+- issue_path: `docs/epics/acp-tool-setup/init-registry-download/raw-20260630T124528Z/issues/I-20260630T124528Z-A.md`
+- phase_state: `done_b2_ibm`
+### completed_issues
 
 ## M-20260630T113839Z-A
 - title: fix: daemon dirty check excludes .freely/run/
