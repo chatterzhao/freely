@@ -1,4 +1,19 @@
 
+## M-20260630T062010Z-A
+- title: fix: wt-close remove Phase 3.6 + force semantics
+- status: active
+### candidate_issues
+1. `C-20260630T062010Z-A`
+- milestone: M-20260630T062010Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/wt-close-raw-key/remove-phase36/raw-20260630T062010Z/issues/I-20260630T062010Z-A.md`
+### committed_issues
+1. `I-20260630T062010Z-A`
+- title: fix: wt-close fixes; milestone_state: committed
+- issue_path: `docs/epics/wt-close-raw-key/remove-phase36/raw-20260630T062010Z/issues/I-20260630T062010Z-A.md`
+- phase_state: `completed`
+### completed_issues
+
 ## M-20260630T054652Z-A
 - title: fix: cleanup PENDING_INPUT residues
 - status: active
