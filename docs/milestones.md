@@ -1,3 +1,18 @@
+## M-20260630T224941Z-A
+- title: feat: config.toml.example overhaul + init create + merge lock
+- status: active
+### candidate_issues
+1. `C-20260630T224941Z-A`
+- milestone: M-20260630T224941Z-A
+- status: promoted
+- promoted_issue_id: `I-20260630T224941Z-A`
+### committed_issues
+### completed_issues
+1. `I-20260630T224941Z-A`
+- title: feat: config.toml.example overhaul; milestone_state: committed
+- issue_path: `docs/epics/config-toml-example/overhaul/raw-20260630T224941Z/issues/I-20260630T224941Z-A.md`
+- phase_state: `completed`
+
 ## M-20260630T151209Z-A
 - title: fix: unified config reader + --reset
 - status: active

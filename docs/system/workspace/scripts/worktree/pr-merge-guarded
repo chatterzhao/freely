@@ -43,7 +43,39 @@ merge_lock_dir() {
 acquire_merge_lock() {
   local lock_dir; lock_dir="$(merge_lock_dir)"
   local timeout="${MERGE_LOCK_TIMEOUT:-300}" waited=0 interval=2
+  local lock_pid="" lock_pid_file="$lock_dir/pid"
   while ! mkdir "$lock_dir" 2>/dev/null; do
+    # Diagnose: is another merge genuinely running, or is this a stale lock?
+    if [[ -f "$lock_pid_file" ]]; then
+      lock_pid=$(cat "$lock_pid_file" 2>/dev/null || true)
+      if [[ -n "$lock_pid" ]] && kill -0 "$lock_pid" 2>/dev/null; then
+        cat >&2 <<LIVE_LOCK
+╔══════════════════════════════════════════════════════════════╗
+║  [MERGE-GUARD] 另一个 merge 正在进行中                       ║
+╠══════════════════════════════════════════════════════════════╣
+║  PID: $lock_pid
+║  Lock: $lock_dir
+║  请等待该 merge 完成后再试。                                  ║
+╚══════════════════════════════════════════════════════════════╝
+LIVE_LOCK
+        return 1
+      else
+        cat >&2 <<STALE_LOCK
+╔══════════════════════════════════════════════════════════════╗
+║  ⚠️  [MERGE-GUARD] 疑似死锁 — lock 存在但进程已不存在        ║
+╠══════════════════════════════════════════════════════════════╣
+║  Lock:  $lock_dir
+║  PID:   ${lock_pid:-unknown} (进程已终止)
+║                                                              ║
+║  如果确认没有其他 merge 在运行，可手动清理:                    ║
+║    rm -rf $lock_dir
+║                                                              ║
+║  清理后重新运行 pr-merge-guarded。                            ║
+╚══════════════════════════════════════════════════════════════╝
+STALE_LOCK
+        return 1
+      fi
+    fi
     if [[ "$waited" -ge "$timeout" ]]; then
       echo "[MERGE-GUARD] merge lock timeout after ${timeout}s (another merge in progress?)" >&2
       return 1
@@ -51,11 +83,14 @@ acquire_merge_lock() {
     sleep "$interval"
     waited=$((waited + interval))
   done
+  # Write PID so next waiter can diagnose
+  echo $$ > "$lock_pid_file"
   echo "[MERGE-GUARD] merge lock acquired (waited ${waited}s)."
   trap 'release_merge_lock' EXIT
 }
 release_merge_lock() {
   local lock_dir; lock_dir="$(merge_lock_dir)"
+  rm -f "$lock_dir/pid" 2>/dev/null || true
   rmdir "$lock_dir" 2>/dev/null || true
 }
 cleanup_merge_residue() {
