@@ -1,3 +1,18 @@
+## M-20260630T151209Z-A
+- title: fix: unified config reader + --reset
+- status: active
+### candidate_issues
+1. `C-20260630T151209Z-A`
+- milestone: M-20260630T151209Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/acp-tool-setup/unified-config-reader/raw-20260630T151209Z/issues/I-20260630T151209Z-A.md`
+### committed_issues
+### completed_issues
+1. `I-20260630T151209Z-A`
+- title: unified config reader; milestone_state: committed
+- issue_path: `docs/epics/acp-tool-setup/unified-config-reader/raw-20260630T151209Z/issues/I-20260630T151209Z-A.md`
+- phase_state: `completed`
+
 ## M-20260630T134353Z-A
 - title: feat: init --auto + config.toml cache
 - status: active
