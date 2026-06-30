@@ -5,13 +5,13 @@
 1. `C-20260630T135725Z-A`
 - milestone: M-20260630T135725Z-A
 - status: promoted
-- promoted_issue_path: `docs/issues/I-20260630T135725Z-A/issue.md`
+- promoted_issue_path: `docs/epics/acp-tool-setup/fix-get-config/raw-20260630T135725Z/issues/I-20260630T135725Z-A.md`
 ### committed_issues
 ### completed_issues
 1. `I-20260630T135725Z-A`
 - title: fix get_config; milestone_state: committed
-- issue_path: `docs/issues/I-20260630T135725Z-A/issue.md`
-- phase_state: `completed`
+- issue_path: `docs/epics/acp-tool-setup/fix-get-config/raw-20260630T135725Z/issues/I-20260630T135725Z-A.md`
+- phase_state: `done_b2_ibm`
 
 ## M-20260630T134353Z-A
 - title: feat: init --auto + config.toml cache
@@ -26,7 +26,7 @@
 1. `I-20260630T134353Z-A`
 - title: init --auto flag; milestone_state: committed
 - issue_path: `docs/issues/I-20260630T134353Z-A/issue.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 
 
 ## M-20260630T124528Z-A
@@ -42,7 +42,7 @@
 1. `I-20260630T124528Z-A`
 - title: feat: ACP init + registry download; milestone_state: committed
 - issue_path: `docs/epics/acp-tool-setup/init-registry-download/raw-20260630T124528Z/issues/I-20260630T124528Z-A.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 
 ## M-20260630T113839Z-A
 - title: fix: daemon dirty check excludes .freely/run/
@@ -57,7 +57,7 @@
 1. `I-20260630T113839Z-A`
 - title: fix: runtime dirty fix; milestone_state: committed
 - issue_path: `docs/issues/I-20260630T113839Z-A/issue.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 
 
 ## M-20260630T111641Z-A
@@ -73,7 +73,7 @@
 1. `I-20260630T111641Z-A`
 - title: fix: review state update; milestone_state: committed
 - issue_path: `docs/issues/I-20260630T111641Z-A/issue.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 
 
 ## M-20260630T085809Z-A
@@ -88,7 +88,7 @@
 1. `I-20260630T085809Z-A`
 - title: fix: A2A Server 健康检查修复; milestone_state: committed
 - issue_path: `docs/issues/I-20260630T085809Z-A/issue.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 ### completed_issues
 
 ## M-20260629T122254Z-A
@@ -103,7 +103,7 @@
 1. `I-20260629T122254Z-A`
 - title: feat: command standardization; milestone_state: committed
 - issue_path: `docs/epics/cmd-standardize/subcommand-add/raw-20260629T122254Z/issues/I-20260629T122254Z-A.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 ### completed_issues
 
 ## M-20260630T002621Z-A
@@ -118,7 +118,7 @@
 1. `I-20260630T002621Z-A`
 - title: feat: supervisor cycle Phase 1; milestone_state: committed
 - issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 ### completed_issues
 
 ## M-20260630T062010Z-A
@@ -133,7 +133,7 @@
 1. `I-20260630T062010Z-A`
 - title: fix: wt-close fixes; milestone_state: committed
 - issue_path: `docs/epics/wt-close-raw-key/remove-phase36/raw-20260630T062010Z/issues/I-20260630T062010Z-A.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 ### completed_issues
 ## M-20260630T054652Z-A
 - title: fix: cleanup PENDING_INPUT residues
@@ -147,11 +147,11 @@
 1. `I-20260630T002621Z-A`
 - title: feat: supervisor cycle Phase 1; milestone_state: committed
 - issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 1. `I-20260630T054652Z-A`
 - title: fix: cleanup PENDING_INPUT residues; milestone_state: committed
 - issue_path: `docs/epics/a2a-state-standard/cleanup-pending/raw-20260630T054652Z/issues/I-20260630T054652Z-A.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 ### completed_issues
 
 ## M-20260630T021946Z-A
@@ -166,11 +166,11 @@
 1. `I-20260630T002621Z-A`
 - title: feat: supervisor cycle Phase 1; milestone_state: committed
 - issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 1. `I-20260630T021946Z-A`
 - title: fix: a2a state alignment; milestone_state: committed
 - issue_path: `docs/epics/a2a-state-standard/state-rename/raw-20260630T021946Z/issues/I-20260630T021946Z-A.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 ### completed_issues
 
 ## M-20260629T235653Z-A
@@ -185,11 +185,11 @@
 1. `I-20260630T002621Z-A`
 - title: feat: supervisor cycle Phase 1; milestone_state: committed
 - issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 1. `I-20260629T235653Z-A`
 - title: docs: fix handoff references; milestone_state: committed
 - issue_path: `docs/issues/I-20260629T235653Z-A/issue.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 ### completed_issues
 
 ## M-20260629T163137Z-A
@@ -204,11 +204,11 @@
 1. `I-20260630T002621Z-A`
 - title: feat: supervisor cycle Phase 1; milestone_state: committed
 - issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 1. `I-20260629T163137Z-A`
 - title: fix: pr-review-guarded path + ACP; milestone_state: committed
 - issue_path: `docs/epics/pr-review-guarded/review-fixes/raw-20260629T163137Z/issues/I-20260629T163137Z-A.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 ### completed_issues
 
 ## M-20260629T165403Z-A
@@ -223,11 +223,11 @@
 1. `I-20260630T002621Z-A`
 - title: feat: supervisor cycle Phase 1; milestone_state: committed
 - issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 1. `I-20260629T165403Z-A`
 - title: fix: wt-close args unbound + test-pre-merge -D; milestone_state: committed
 - issue_path: `docs/epics/wt-close-raw-key/args-d-fix/raw-20260629T165403Z/issues/I-20260629T165403Z-A.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 ### completed_issues
 
 ## M-20260629T164530Z-A
@@ -242,11 +242,11 @@
 1. `I-20260630T002621Z-A`
 - title: feat: supervisor cycle Phase 1; milestone_state: committed
 - issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 1. `I-20260629T164530Z-A`
 - title: fix: wt-close --raw-key flag; milestone_state: committed
 - issue_path: `docs/epics/wt-close-raw-key/raw-key-flag/raw-20260629T164530Z/issues/I-20260629T164530Z-A.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 ### completed_issues
 
 ## M-20260629T160852Z-A
@@ -261,11 +261,11 @@
 1. `I-20260630T002621Z-A`
 - title: feat: supervisor cycle Phase 1; milestone_state: committed
 - issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 1. `I-20260629T160852Z-A`
 - title: fix: wt-close 支持 raw-{key} 参数; milestone_state: committed
 - issue_path: `docs/epics/wt-close-raw-key/raw-key-param/raw-20260629T160852Z/issues/I-20260629T160852Z-A.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 ### completed_issues
 
 ## M-20260629T132042Z-A
@@ -280,11 +280,11 @@
 1. `I-20260630T002621Z-A`
 - title: feat: supervisor cycle Phase 1; milestone_state: committed
 - issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 1. `I-20260629T132042Z-A`
 - title: fix: replace ./bin/ with freely in hook scripts and start-lead-agent; milestone_state: committed
 - issue_path: `docs/epics/command-normalize/hook-scripts-bin-to-freely/raw-20260629T132042Z/issues/I-20260629T132042Z-A.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 ### completed_issues
 
 ## M-20260629T122647Z-A
@@ -295,11 +295,11 @@
 1. `I-20260630T002621Z-A`
 - title: feat: supervisor cycle Phase 1; milestone_state: committed
 - issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 1. `I-20260629T122647Z-A`
 - title: feat: freely feedback edit; milestone_state: completed
 - issue_path: `docs/epics/feedback-edit/edit-subcommand/raw-20260629T122647Z/issues/I-20260629T122647Z-A.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 ### completed_issues
 
 ## M-20260629T025659Z-A
@@ -313,11 +313,11 @@
 1. `I-20260630T002621Z-A`
 - title: feat: supervisor cycle Phase 1; milestone_state: committed
 - issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 1. `I-20260629T025659Z-A`
 - title: unify fix skill governance order — B1→B2→dev→test; milestone_state: completed
 - issue_path: `docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/issues/I-20260629T025659Z-A.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 - verification_artifact_dir: `docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/code-reviews`
 
 ## M-20260629T030408Z-A
@@ -331,11 +331,11 @@
 1. `I-20260630T002621Z-A`
 - title: feat: supervisor cycle Phase 1; milestone_state: committed
 - issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 1. `I-20260629T030408Z-A`
 - title: complete feat → feature rename in all active code; milestone_state: completed
 - issue_path: `docs/epics/feat-to-feature/rename-completion/raw-20260629T030408Z/issues/I-20260629T030408Z-A.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 - verification_artifact_dir: `docs/epics/feat-to-feature/rename-completion/raw-20260629T030408Z/code-reviews`
 
 ## M-20260628T005815Z-A
@@ -349,11 +349,11 @@
 1. `I-20260630T002621Z-A`
 - title: feat: supervisor cycle Phase 1; milestone_state: committed
 - issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 1. `I-20260628T005815Z-A`
 - title: chat refactor — comment + discuss + archive skill; milestone_state: completed
 - issue_path: `docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/issues/I-20260628T005815Z-A.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 - verification_artifact_dir: `docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/code-reviews`
 
 ## M-20260628T054513Z-A
@@ -367,7 +367,7 @@
 1. `I-20260628T054513Z-A`
 - title: scope hard block → advisory warning; milestone_state: completed
 - issue_path: `docs/issues/I-20260628T054513Z-A/issue.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 - verification_artifact_dir: `docs/epics/scope-warning/code-reviews`
 
 ## M-20260627T135126Z-A
@@ -381,7 +381,7 @@
 1. `I-20260627T135126Z-A`
 - title: pr-create merge + checkpoint scope; milestone_state: completed
 - issue_path: `docs/issues/I-20260627T135126Z-A/issue.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 - verification_artifact_dir: `docs/epics/checkpoint-merge-fix/code-reviews`
 
 ## M-20260510T1339Z-A
@@ -395,11 +395,11 @@
 1. `I-20260630T002621Z-A`
 - title: feat: supervisor cycle Phase 1; milestone_state: committed
 - issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 1. `I-20260510T1339Z-A`
 - title: wt-create 创建顺序重构; milestone_state: completed
 - issue_path: `docs/issues/I-20260510T1339Z-A/issue.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 
 ## M-20260522T045227Z-A
 - title: C-20260522T045227Z-A
@@ -979,7 +979,7 @@
 1. `I-20260624T072546Z-A`
 - title: auto-generated; milestone_state: completed
 - issue_path: `docs/issues/I-20260624T072546Z-A/issue.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 
 ## M-20260624T081358Z-A
 - title: 测试文档 daemon 假设修复
@@ -1315,10 +1315,10 @@
 1. `I-20260630T002621Z-A`
 - title: feat: supervisor cycle Phase 1; milestone_state: committed
 - issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 1. `I-20260629T095905Z-A`
 - title: optimize workflow skill — stage 0, cd hint, CLAUDE.md chain; milestone_state: completed
 - issue_path: `docs/epics/skill-standardize/description-and-chain-unify/raw-20260629T095905Z/issues/I-20260629T095905Z-A.md`
-- phase_state: `completed`
+- phase_state: `done_b2_ibm`
 
 ### completed_issues

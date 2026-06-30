@@ -8,5 +8,5 @@ milestone: M-20260630T135725Z-A
 - candidate_format_version: v2
 - title: fix get_config/set_config regression
 - status: promoted
-- promoted_issue_path: docs/issues/I-20260630T135725Z-A/issue.md
+- promoted_issue_path: docs/epics/acp-tool-setup/fix-get-config/raw-20260630T135725Z/issues/I-20260630T135725Z-A.md
 - milestone: M-20260630T135725Z-A
