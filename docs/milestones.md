@@ -1,4 +1,19 @@
 
+## M-20260630T054652Z-A
+- title: fix: cleanup PENDING_INPUT residues
+- status: active
+### candidate_issues
+1. `C-20260630T054652Z-A`
+- milestone: M-20260630T054652Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/a2a-state-standard/cleanup-pending/raw-20260630T054652Z/issues/I-20260630T054652Z-A.md`
+### committed_issues
+1. `I-20260630T054652Z-A`
+- title: fix: cleanup PENDING_INPUT residues; milestone_state: committed
+- issue_path: `docs/epics/a2a-state-standard/cleanup-pending/raw-20260630T054652Z/issues/I-20260630T054652Z-A.md`
+- phase_state: `completed`
+### completed_issues
+
 ## M-20260630T021946Z-A
 - title: fix: a2a_tasks 状态对齐 Google A2A 标准
 - status: active
