@@ -118,10 +118,10 @@
           "type": "string",
           "description": "Worktree 根目录路径"
         },
-        "supportedExitKinds": {
+        "supportedStates": {
           "type": "array",
           "items": { "type": "string" },
-          "description": "支持的所有 exit_kind 类型"
+          "description": "支持的 A2A 标准状态列表"
         },
         "a2aSchema": {
           "type": "string",
@@ -201,7 +201,7 @@
   "freely": {
     "agentType": "manager",
     "worktreeIsolation": true,
-    "supportedExitKinds": [],
+    "supportedStates": [],
     "supportedSkills": [
       "freely-workflow-guarded-execution",
       "freely-workflow-guarded-execution",

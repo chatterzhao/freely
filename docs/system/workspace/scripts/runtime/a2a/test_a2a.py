@@ -61,7 +61,7 @@ def test_parser_states():
     assert 'completed' in VALID_STATES
     assert 'failed' in VALID_STATES
     assert 'input-required' in VALID_STATES
-    assert 'pending-input' in VALID_STATES
+    assert 'canceled' in VALID_STATES
     r = extract_task_state('```json\n{"state":"completed","summary":"done"}\n```')
     assert r['ok'] and r['state'] == 'completed'
 
@@ -84,7 +84,7 @@ def test_parser_aliases():
     assert normalize_state('delegate') == 'submitted'
     assert normalize_state('blocked') == 'input-required'
     assert normalize_state('stopped') == 'failed'
-    assert normalize_state('handoff') == 'pending-input'
+    assert normalize_state('handoff') == 'input-required'
     # Valid states pass through
     assert normalize_state('working') == 'working'
     assert normalize_state('completed') == 'completed'
