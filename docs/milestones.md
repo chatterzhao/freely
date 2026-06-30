@@ -1,4 +1,20 @@
 
+## M-20260630T113839Z-A
+- title: fix: daemon dirty check excludes .freely/run/
+- status: active
+### candidate_issues
+1. `C-20260630T113839Z-A`
+- milestone: M-20260630T113839Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260630T113839Z-A/issue.md`
+### committed_issues
+### completed_issues
+1. `I-20260630T113839Z-A`
+- title: fix: runtime dirty fix; milestone_state: committed
+- issue_path: `docs/issues/I-20260630T113839Z-A/issue.md`
+- phase_state: `completed`
+
+
 ## M-20260630T111641Z-A
 - title: fix: pr-review writes state, wt-close stops modifying files
 - status: active
