@@ -1,6 +1,6 @@
 - issue_id: I-20260630T095936Z-A
 - kind: fix
-- phase_state: done_b2_ibm
+- phase_state: completed
 - milestone: M-20260630T095936Z-A
 - source_candidate: docs/pre-brainstorms/20260630T095936Z--consistency-merge/candidates.md#C-20260630T095936Z-A
 - verification_artifact_dir: docs/epics/consistency-merge/merge-fix/code-reviews
