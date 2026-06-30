@@ -8605,38 +8605,38 @@ print(h)" 2>/dev/null || true).pid"
   mkdir -p "$(run_dir_for_project "$project")"
   printf '%s\n' "$a2a_pid" > "$a2a_cached_pid_file"
 
-  # ── Wait for A2A Server with HTTP health check (up to 10s) ──────────
-  # Connects to the Unix socket and sends GET /tasks to verify the server
-  # is fully initialized and responding to HTTP requests.
+  # ── Wait for A2A Server with socket connect health check (up to 30s) ──
+  # Unix socket exists + connect succeeds → server is listening on the socket.
+  # Socket path passed via env var to avoid shell injection (no $var in Python string).
+  # No HTTP data is sent — avoids h11 "Invalid HTTP request" log noise.
   local _health_waited=0 _health_ok=0
-  while [[ $_health_waited -lt 20 ]]; do
+  while [[ $_health_waited -lt 30 ]]; do
     if [[ -S "$a2a_socket" ]]; then
-      if python3 -c "
-import socket, sys
+      if FREELY_A2A_SOCKET="$a2a_socket" python3 -c "
+import os, socket, sys
+sp = os.environ.get('FREELY_A2A_SOCKET', '')
+if not sp:
+    sys.exit(1)
 try:
     s = socket.socket(socket.AF_UNIX)
     s.settimeout(2)
-    s.connect('$a2a_socket')
-    s.sendall(b'GET /tasks HTTP/1.1\r\nHost: localhost\r\n\r\n')
-    resp = s.recv(128)
+    s.connect(sp)
     s.close()
-    if resp.startswith(b'HTTP'):
-        sys.exit(0)
+    sys.exit(0)
 except Exception:
-    pass
-sys.exit(1)
+    sys.exit(1)
 " 2>/dev/null; then
         _health_ok=1
         break
       fi
     fi
-    sleep 0.5
+    sleep 1
     _health_waited=$((_health_waited + 1))
   done
   if [[ "$_health_ok" == "1" ]]; then
-    log_info "A2A server ready (PID $a2a_pid) on $a2a_socket (http healthcheck ok)"
+    log_info "A2A server ready (PID $a2a_pid) on $a2a_socket (socket connect ok)"
   else
-    log_warn "A2A server start timed out after 10s (check DB size, zombie PIDs, or disk I/O)"
+    log_warn "A2A server start timed out after 30s (check DB size, zombie PIDs, or disk I/O)"
   fi
   return 0
 }

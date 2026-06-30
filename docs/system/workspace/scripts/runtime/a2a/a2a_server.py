@@ -297,14 +297,41 @@ class FreelyAgentExecutor(BaseAgentExecutor):
 # With Content-Length fixed (a2a_task.py L170 uses len(http_body_bytes)),
 # remaining noise is from external probes or stray connections.
 # Configure h11 logger at ERROR level to suppress diagnostic noise.
+# Also adds timestamp format — uvicorn's default formatter omits asctime.
 
 def _a2a_uvicorn_log_config():
     return {
         "version": 1,
-        "disable_existing_loggers": False,
+        "disable_existing_loggers": True,
+        "formatters": {
+            "default": {
+                "()": "uvicorn.logging.DefaultFormatter",
+                "format": "%(asctime)s %(levelprefix)s %(message)s",
+                "datefmt": "%Y-%m-%dT%H:%M:%SZ",
+            },
+            "access": {
+                "()": "uvicorn.logging.AccessFormatter",
+                "format": '%(asctime)s %(levelprefix)s %(client_addr)s — "%(request_line)s" %(status_code)s',
+                "datefmt": "%Y-%m-%dT%H:%M:%SZ",
+            },
+        },
+        "handlers": {
+            "default": {
+                "formatter": "default",
+                "class": "logging.StreamHandler",
+                "stream": "ext://sys.stderr",
+            },
+            "access": {
+                "formatter": "access",
+                "class": "logging.StreamHandler",
+                "stream": "ext://sys.stdout",
+            },
+        },
         "loggers": {
-            "h11": {"level": "ERROR"},
-            "uvicorn": {"level": "INFO"},
+            "h11": {"level": "ERROR", "handlers": [], "propagate": False},
+            "uvicorn": {"level": "INFO", "handlers": ["default"], "propagate": False},
+            "uvicorn.access": {"level": "INFO", "handlers": ["access"], "propagate": False},
+            "uvicorn.error": {"level": "INFO"},
         },
     }
 
