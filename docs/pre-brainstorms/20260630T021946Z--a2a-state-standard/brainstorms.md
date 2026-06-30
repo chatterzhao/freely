@@ -44,37 +44,46 @@ a2a_task.py 已有一层映射（line 661, 827）：
 | `worker-agent.md` | 状态说明 | 更新可用 state 列表 |
 | SQLite DB schema (freely.db) | 已有数据 | 不迁移历史数据；新 task 用新 state |
 
-### 关于 `worker_blocked` exit kind
+### 全链路标准化，不留 `blocked`
 
-exit kind 是 **Freely 内部约定**（Worker 的 `a2a-exit --kind worker_blocked`），A2A state 是 **A2A 协议标准**（`input-required`）。映射关系：
+当前 exit kind `worker_blocked` → 映射层 → A2A state `input-required`。留 `worker_blocked` 造成理解摩擦：
+- 开发者看到 `worker_blocked` 要想"这是 A2A 的 input-required 吗？"
+- `failed`/`canceled` 也可能被理解为"session blocked 了"
+- 映射层增加认知负担
+
+**全改**：
 
 ```
-Worker 执行: a2a-exit --kind worker_blocked
-  → a2a_task.py 映射: 'worker_blocked' → 'input-required'
-  → a2a_tasks 表写入: state = 'input-required'
-  → A2A Server 对外暴露: Task.state = 'input-required'  ← 对齐标准
+之前:
+  a2a-exit --kind worker_blocked → 映射 'blocked': 'input-required' → state=input-required
+
+之后:
+  a2a-exit --kind input_required → 直接 → state=input-required
 ```
 
-**exit kind 不需要改**。`worker_blocked` 是给 Worker agent 的口令（"我阻塞了"），`input-required` 是 A2A 协议标准状态名。内部映射层保持不变。
+| 维度 | 之前 | 之后 |
+|------|------|------|
+| exit kind | `worker_blocked` | `input_required` |
+| 映射层 | `'blocked': 'input-required'` | 删除，exit kind 直接当 state 用 |
+| A2A state | `input-required` | 不变 |
+| `failed` | exit kind: `worker_failed` | exit kind: `failed` |
+| `canceled` | 不存在 | exit kind: `canceled`（新增） |
+| `completed` | exit kind: `completed` | 不变 |
 
-### 改什么 vs 不改什么
+### 改动面（全量）
 
-**改**：
-- `a2a_task.py`: State class 常量名，SQLite CHECK，state 值
-- `a2a/protocol-design.md`: 状态说明中的 `blocked` → `input-required`
-- `wt-close`: 注释中的 `blocked` → `input-required`
-- 新增 `canceled` state + 对应 exit kind
-
-**不改**：
-- `worker_blocked` exit kind 名（内部口令，不对外）
-- 映射表逻辑（已有 `'blocked': 'input-required'` 映射，保持不变）
-- wt-close UI 消息中的 "blocked"（那是英文动词 "被阻塞"，不是状态名）
-
-## Problem
-
-`blocked` 是非标准状态名。Google A2A 标准对应态是 `input-required`。Freely 在内部使用 `blocked` 然后在映射层转 `input-required`——绕了一圈。应该直接使用标准名。
-
-缺少 `canceled` 终止态。当前只有 `completed` 和 `failed`，manager_01 主动取消时只能复用 `failed` 或 `completed`，语义不清。
+| 文件 | 改动 |
+|------|------|
+| `a2a_task.py` State class | `BLOCKED="blocked"` → `INPUT_REQUIRED="input-required"`；新增 `CANCELED="canceled"`；`FAILED` 值不变（已是 `"failed"`） |
+| `a2a_task.py` 映射表 (line 661,827) | 删除 `'blocked': 'input-required'` 等映射；exit kind 直接当 state |
+| `a2a_task.py` SQLite CHECK | 更新合法 state 列表 |
+| `a2a/exit-kind-mapping.md` | `worker_blocked` → `input_required`；新增 `canceled`；删除旧映射表 |
+| `a2a/protocol-design.md` | `worker_blocked` → `input_required` |
+| `a2a/agent-card-schema.md` | `worker_blocked` → `input_required` |
+| `wt-close` 注释 | `blocked` → `input-required` |
+| `worker-agent.md` | 状态列表更新 |
+| `a2a-exit` 调用处（agent prompt 模板、shell 脚本等） | `--kind worker_blocked` → `--kind input_required` |
+| 所有 grep/awk 匹配 `blocked` state 的逻辑 | 更新为 `input-required`
 
 ## Decision: 直接用标准状态名
 
