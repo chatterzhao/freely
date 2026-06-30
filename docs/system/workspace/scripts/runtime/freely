@@ -14049,7 +14049,7 @@ _ensure_acp_bridge_running() {
   # a pre-recorded path (set by freely init). This avoids re-searching PATH
   # on every daemon start and supports non-PATH install locations.
   local _config_key; _config_key="FREELY_ACP_$(echo "$base_tool" | tr '[:lower:]' '[:upper:]')_BIN"
-  local _config_path; _config_path="$(get_config "$_config_key" "")"
+  local _config_path; _config_path="${!_config_key:-}"
   if [[ -n "$_config_path" && -x "$_config_path" ]]; then
     acp_bin="$_config_path"
   elif ! command -v "$acp_bin" >/dev/null 2>&1; then
@@ -20124,7 +20124,7 @@ PLATFORM_GATE
       _config_key="FREELY_ACP_$(echo "$_tool" | tr '[:lower:]' '[:upper:]')_BIN"
 
       # 1. Check config.toml cache first — already configured, skip
-      _found_path="$(get_config "$_config_key" "")"
+      _found_path="$(grep -E "^\s*${_config_key}\s*=" "$PROJECT_ROOT/.freely/config.toml" 2>/dev/null | sed 's/^[^=]*=\s*\"\?//;s/\"\s*$//' | head -1 || true)"
       if [[ -n "$_found_path" && -x "$_found_path" ]]; then
         log_info "  $_tool: $_binary → $_found_path (config.toml)"
         continue
@@ -20140,7 +20140,7 @@ PLATFORM_GATE
 
       if [[ -n "$_found_path" && -x "$_found_path" ]]; then
         log_info "  $_tool: found $_binary at $_found_path → updating config.toml"
-        set_config "$_config_key" "$_found_path"
+        upsert_config_key "$project" "$_config_key" "$_found_path"
         continue
       fi
 
@@ -20170,7 +20170,7 @@ PLATFORM_GATE
         _found_path="$("$ensure_script" --tool "$_tool" 2>/dev/null)" || true
         if [[ -n "$_found_path" && -x "$_found_path" ]]; then
           log_info "  $_tool: installed to $_found_path → config.toml"
-          set_config "$_config_key" "$_found_path"
+          upsert_config_key "$project" "$_config_key" "$_found_path"
         else
           log_warn "  $_tool: download failed, retry: $ensure_script --tool $_tool"
         fi
