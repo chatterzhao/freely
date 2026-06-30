@@ -15,13 +15,11 @@ milestone: M-20260630T021946Z-A
 - next_action: 进入 B2_IBM → 物化 I-* issue → pre-tests → RED → dev → GREEN → PR
 - revisit_trigger: N/A
 - acceptance_criteria:
-  - a2a_task.py: State 常量全标准名 `INPUT_REQUIRED`, `FAILED`, `COMPLETED`, `CANCELED`
-  - SQLite CHECK 更新
-  - exit kind 全标准名：`input_required`, `failed`, `completed`, `canceled`
-  - 删除映射层（`'blocked': 'input-required'` 等），exit kind 直接当 state
-  - `worker_blocked` → `input_required`（exit kind）
+  - a2a_task.py: State 常量全标准名；`--kind` → `--state`，值直接用 A2A state
+  - 删除 exit kind 映射层（`'worker_blocked'→'input-required'` 等），`--state` 值直接写 DB
+  - 所有 `--kind worker_blocked` 调用处改为 `--state input-required`
   - A2A 文档全部更新
-  - wt-close 注释 + agent prompt 模板更新
+  - wt-close + agent prompt 模板更新
 - promotion_gate: all tests GREEN + merge
 - open_questions:
   - 历史 DB 中 `state=blocked` 的行是否需要迁移？（决定：不迁移，新 task 用新 state，旧 task 已完成）

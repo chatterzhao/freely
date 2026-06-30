@@ -44,46 +44,44 @@ a2a_task.py 已有一层映射（line 661, 827）：
 | `worker-agent.md` | 状态说明 | 更新可用 state 列表 |
 | SQLite DB schema (freely.db) | 已有数据 | 不迁移历史数据；新 task 用新 state |
 
-### 全链路标准化，不留 `blocked`
+### `exit_kind` 是 Freely 自己发明的，应该去掉
 
-当前 exit kind `worker_blocked` → 映射层 → A2A state `input-required`。留 `worker_blocked` 造成理解摩擦：
-- 开发者看到 `worker_blocked` 要想"这是 A2A 的 input-required 吗？"
-- `failed`/`canceled` 也可能被理解为"session blocked 了"
-- 映射层增加认知负担
+A2A 协议只定义了 `Task.state`（`submitted`/`working`/`input-required`/`completed`/`failed`/`canceled`）。
+没有 `exit_kind` 这个概念——那是 Freely 的内部抽象层。
 
-**全改**：
+**直接用 `--state`**：
 
 ```
-之前:
-  a2a-exit --kind worker_blocked → 映射 'blocked': 'input-required' → state=input-required
-
-之后:
-  a2a-exit --kind input_required → 直接 → state=input-required
+之前:  a2a-exit --kind worker_blocked → 映射层 → state=input-required  (三层)
+之后:  a2a-exit --state input-required                          (一层)
 ```
 
 | 维度 | 之前 | 之后 |
 |------|------|------|
-| exit kind | `worker_blocked` | `input_required` |
-| 映射层 | `'blocked': 'input-required'` | 删除，exit kind 直接当 state 用 |
+| Worker 命令 | `a2a-exit --kind worker_blocked` | `a2a-exit --state input-required` |
+| Worker 命令 | `a2a-exit --kind completed` | `a2a-exit --state completed` |
+| Worker 命令 | `a2a-exit --kind worker_failed` | `a2a-exit --state failed` |
+| Worker 命令 | 不存在 | `a2a-exit --state canceled`（新增） |
+| 映射层 | `'worker_blocked': 'input-required'` | **删除** |
 | A2A state | `input-required` | 不变 |
-| `failed` | exit kind: `worker_failed` | exit kind: `failed` |
-| `canceled` | 不存在 | exit kind: `canceled`（新增） |
-| `completed` | exit kind: `completed` | 不变 |
+
+`a2a-exit` 的 `--kind` 参数改为 `--state`，值直接用 A2A 标准 state。
 
 ### 改动面（全量）
 
 | 文件 | 改动 |
 |------|------|
-| `a2a_task.py` State class | `BLOCKED="blocked"` → `INPUT_REQUIRED="input-required"`；新增 `CANCELED="canceled"`；`FAILED` 值不变（已是 `"failed"`） |
-| `a2a_task.py` 映射表 (line 661,827) | 删除 `'blocked': 'input-required'` 等映射；exit kind 直接当 state |
-| `a2a_task.py` SQLite CHECK | 更新合法 state 列表 |
-| `a2a/exit-kind-mapping.md` | `worker_blocked` → `input_required`；新增 `canceled`；删除旧映射表 |
-| `a2a/protocol-design.md` | `worker_blocked` → `input_required` |
-| `a2a/agent-card-schema.md` | `worker_blocked` → `input_required` |
-| `wt-close` 注释 | `blocked` → `input-required` |
-| `worker-agent.md` | 状态列表更新 |
-| `a2a-exit` 调用处（agent prompt 模板、shell 脚本等） | `--kind worker_blocked` → `--kind input_required` |
-| 所有 grep/awk 匹配 `blocked` state 的逻辑 | 更新为 `input-required`
+| `a2a_task.py` State class | `BLOCKED` → `INPUT_REQUIRED`；新增 `CANCELED` |
+| `a2a_task.py` SQLite CHECK | 合法 state 列表更新 |
+| `a2a_task.py` 映射表 | 删除 `'worker_blocked'→'input-required'` 等映射。`--state` 值直接写入 |
+| `a2a_task.py` CLI parser | `--kind` → `--state`；合法值列表 |
+| `a2a/exit-kind-mapping.md` | 重构：exit kind → state 的文档改为 state 直接说明 |
+| `a2a/protocol-design.md` | `worker_blocked` → `input-required` |
+| `a2a/agent-card-schema.md` | `worker_blocked` → `input-required` |
+| `wt-close` | 注释 + state 匹配逻辑 |
+| `worker-agent.md` | `a2a-exit --state` 指令说明 |
+| Agent prompt 模板 | `a2a-exit --kind worker_blocked` → `a2a-exit --state input-required` |
+| Shell 脚本 | 所有 `--kind worker_blocked` 调用
 
 ## Decision: 直接用标准状态名
 
