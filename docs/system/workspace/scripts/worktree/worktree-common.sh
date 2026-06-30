@@ -241,25 +241,30 @@ freely_wt_assert_dev_test_consistent() {
 
   [[ -z "$_dev_wt" || -z "$_dev_branch" ]] && return 0  # no dev worktree, skip
 
-  # Check 1: test has commits not in dev
+  # Check 1: test has commits not in dev — REJECTED
+  # test-pre-merge is a disposable sandbox. Commits must flow dev→test, never test→dev.
+  # If test has unique commits, they were created in the wrong worktree.
   local _missing
   _missing=$(git -C "$_test_wt" log --oneline --no-merges "$_dev_branch..HEAD" 2>/dev/null || true)
   if [[ -n "$_missing" ]]; then
     cat >&2 <<FREELY_CONSISTENCY_ERR
 ╔══════════════════════════════════════════════════════════════╗
-║  ⚠️  开发与测试工位不一致 — 测试工位有提交未同步到开发工位    ║
+║  ⛔  开发与测试工位不一致 — 测试工位有提交未同步到开发工位    ║
 ╠══════════════════════════════════════════════════════════════╣
 ║  开发工位: $_dev_wt ($_dev_branch)
 ║  测试工位: $_test_wt
 ║                                                              ║
+║  测试工位是丢弃式沙箱，不能在测试工位上直接提交。              ║
 ║  以下提交在测试工位但不在开发工位:                              ║
 ║  $_missing
 ║                                                              ║
-║  请用 cherry-pick 同步（两边都能互相 cherry-pick）:             ║
-║    cd $_dev_wt
-║    git cherry-pick \$(git -C $_test_wt log --format=%H --no-merges $_dev_branch..HEAD)
+║  正确流程:                                                    ║
+║    1. cd $_test_wt && git stash   （保存测试工位修改）         ║
+║    2. cd $_dev_wt && 在开发工位完成实际的代码提交               ║
+║    3. cd $_test_wt && git merge --no-ff $_dev_branch   ← 用 merge 同步开发工位到测试工位
+║       （commit message 需含 Freely-Merge-Path: pr-merge-guarded）
+║    4. 在测试工位重跑 test-GREEN（skill:freely-test-execution）  ║
 ║                                                              ║
-║  同步后必须重跑 test-GREEN（skill:freely-test-execution）。     ║
 ║  开发与测试一致 + 全部 green 后才能继续。                       ║
 ╚══════════════════════════════════════════════════════════════╝
 FREELY_CONSISTENCY_ERR
@@ -282,9 +287,11 @@ FREELY_CONSISTENCY_ERR
 ║  以下提交在开发工位但不在测试工位:                              ║
 ║  $_missing
 ║                                                              ║
-║  请用 cherry-pick 同步（两边都能互相 cherry-pick）:             ║
+║  请用 git merge 同步（merge 创建 merge commit，hook 放行）:     ║
 ║    cd $_test_wt
-║    git cherry-pick \$(git -C $_dev_wt log --format=%H --no-merges HEAD..$_dev_branch)
+║    git merge --no-ff $_dev_branch -m "merge: sync dev → test-pre-merge
+║
+║Freely-Merge-Path: pr-merge-guarded"
 ║                                                              ║
 ║  同步后必须在测试工位重跑 test-GREEN（skill:freely-test-execution）。
 ║  全部 passed 后才能继续。                                      ║

@@ -519,48 +519,51 @@ DIRTY_DEV
   if git -C "$_test_wt" status --short 2>/dev/null | grep -q .; then
     cat >&2 <<DIRTY_TEST
 ╔══════════════════════════════════════════════════════════════╗
-║  ⚠️  wt-close blocked: 测试工位有未提交的测试结果            ║
+║  ⛔  wt-close blocked: 测试工位有未提交的修改                 ║
 ╠══════════════════════════════════════════════════════════════╣
 ║  测试工位: $_test_wt (test-pre-merge-$_raw_key-*)
 ║                                                              ║
-║  git 跟踪的文件必须提交。请处理后再 wt-close:                  ║
-║    cd $_test_wt && git add -A && git commit -m "test: results"
+║  测试工位是丢弃式沙箱，不允许在测试工位上直接提交。            ║
 ║                                                              ║
-║  ⚠️  然后必须同步到开发工位，否则测试通过的代码会丢失:         ║
-║    cd $_dev_wt
-║    git cherry-pick \$(git -C $_test_wt log --format=%H --no-merges $_dev_branch..HEAD)
-║    git push && pr-review && wt-close
+║  正确流程:                                                    ║
+║    1. cd $_test_wt && git stash   （保存测试修改）             ║
+║    2. cd $_dev_wt && 在开发工位完成实际代码提交                ║
+║    3. cd $_test_wt && git merge --no-ff $_dev_branch   ← merge 同步
+║       （commit message 需含 Freely-Merge-Path: pr-merge-guarded）
+║    4. 重跑 pre-tests 验证 → wt-close                          ║
 ╚══════════════════════════════════════════════════════════════╝
 DIRTY_TEST
     exit 1
   fi
 
-  # Check 3: test has commits not in dev (test results need cherry-pick)
+  # Check 3: test has commits not in dev — REJECTED
   local _missing
   _missing=$(git -C "$_test_wt" log --oneline --no-merges "$_dev_branch..HEAD" 2>/dev/null || true)
   if [[ -n "$_missing" ]]; then
     cat >&2 <<NEED_CP
 ╔══════════════════════════════════════════════════════════════╗
-║  ⚠️  wt-close blocked: 测试工位有提交未同步到开发工位        ║
+║  ⛔  wt-close blocked: 测试工位有提交未同步到开发工位        ║
 ╠══════════════════════════════════════════════════════════════╣
-║  开发与测试工位必须一致，否则最后测试通过的代码不在开发里，白干。
+║  测试工位是丢弃式沙箱，不能在测试工位上直接提交。              ║
 ║                                                              ║
 ║  开发工位: $_dev_wt ($_dev_branch)
 ║  测试工位: $_test_wt (test-pre-merge-$_raw_key-*)
 ║                                                              ║
-║  以下提交在测试工位但不在开发工位:                              ║
+║  以下提交在测试工位但不在开发工位（测试工位不应有独立提交）:    ║
 ║  $_missing
 ║                                                              ║
-║  请用 cherry-pick 同步到开发工位（两边都能互相 cherry-pick）:    ║
-║    cd $_dev_wt
-║    git cherry-pick \$(git -C $_test_wt log --format=%H --no-merges $_dev_branch..HEAD)
-║    git push && pr-review && wt-close
+║  正确流程:                                                    ║
+║    1. cd $_test_wt && git stash   （保存测试修改）             ║
+║    2. cd $_dev_wt && 在开发工位完成实际代码提交                ║
+║    3. cd $_test_wt && git merge --no-ff $_dev_branch   ← merge 同步
+║       （commit message 需含 Freely-Merge-Path: pr-merge-guarded）
+║    4. 重跑 pre-tests 验证 → wt-close                          ║
 ╚══════════════════════════════════════════════════════════════╝
 NEED_CP
     exit 1
   fi
 
-  # Check 4: dev has commits not in test (out of sync)
+  # Check 4: dev has commits not in test
   _missing=$(git -C "$_test_wt" log --oneline --no-merges "HEAD..$_dev_branch" 2>/dev/null || true)
   if [[ -n "$_missing" ]]; then
     cat >&2 <<NEED_CP
@@ -576,11 +579,13 @@ NEED_CP
 ║  以下提交在开发工位但不在测试工位:                              ║
 ║  $_missing
 ║                                                              ║
-║  请用 cherry-pick 同步（两边都能互相 cherry-pick）:             ║
+║  请用 git merge 同步（merge 创建 merge commit，hook 放行）:     ║
 ║    cd $_test_wt
-║    git cherry-pick \$(git -C $_dev_wt log --format=%H --no-merges HEAD..$_dev_branch)
+║    git merge --no-ff $_dev_branch -m "merge: sync dev → test-pre-merge
+║
+║Freely-Merge-Path: pr-merge-guarded"
 ║                                                              ║
-║  同步后必须在测试工位重跑 pre-tests，验证最终代码。             ║
+║  同步后必须重跑 pre-tests，验证最终代码。                       ║
 ║  全部 passed 后再 git push && pr-review && wt-close           ║
 ╚══════════════════════════════════════════════════════════════╝
 NEED_CP

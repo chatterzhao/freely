@@ -36,6 +36,39 @@ _fleet_audit_orphans() {
 }
 _fleet_audit_orphans
 
+# ── Test worktree commit gate ─────────────────────────────────
+# test-pre-merge-* is a disposable sandbox. No direct commits allowed.
+# All code changes must originate in fix/* or feature/* worktrees.
+# Use git merge --no-ff from the dev worktree to sync code for testing.
+_test_premerge_commit_gate() {
+  local branch
+  branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
+  case "$branch" in
+    test-pre-merge-*)
+      cat >&2 <<TEST_COMMIT_BLOCK
+╔══════════════════════════════════════════════════════════════╗
+║  ⛔  Commit blocked: test-pre-merge 分支不允许直接提交        ║
+╠══════════════════════════════════════════════════════════════╣
+║  当前分支: $branch
+║                                                              ║
+║  测试工位是丢弃式沙箱，不允许 git add + git commit。           ║
+║  代码变更只能在 fix/* 或 feature/* 开发工位中提交。            ║
+║                                                              ║
+║  正确流程:                                                    ║
+║    1. 在开发工位完成代码提交:                                   ║
+║       cd <dev-worktree> && git add -A && git commit           ║
+║    2. 用 git merge 同步到测试工位（merge commit 可通过 hook）:   ║
+║       cd $_test_wt && git merge --no-ff <dev-branch>          ║
+║       （commit message 需含 Freely-Merge-Path: pr-merge-guarded）
+║    3. 在测试工位重跑 pre-tests（skill:freely-test-execution）   ║
+╚══════════════════════════════════════════════════════════════╝
+TEST_COMMIT_BLOCK
+      exit 1
+      ;;
+  esac
+}
+_test_premerge_commit_gate
+
 # ── Secret detection gate ──────────────────────────────────────
 # Scans staged files for API keys, tokens, and credentials before commit.
 # Patterns: Anthropic/OpenAI/DeepSeek keys, generic high-entropy tokens.
