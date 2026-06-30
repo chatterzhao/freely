@@ -257,15 +257,13 @@
     "agentType": "worker",
     "worktreeIsolation": true,
     "worktreeRoot": "/path/to/project-worktrees",
-    "supportedExitKinds": [
-      "manager_working",
-      "worker_working",
-      "worker_done",
-      "worker_blocked",
-      "worker_handoff_needed",
-      "delegate_workers",
-      "resume_manager",
-      "stop_ai"
+    "supportedStates": [
+      "submitted",
+      "working",
+      "input-required",
+      "completed",
+      "failed",
+      "canceled"
     ],
     "a2aSchema": "https://freely.dev/schemas/a2a-task-v1",
     "supportedSkills": [
