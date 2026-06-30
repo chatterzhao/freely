@@ -2,51 +2,48 @@
 # Freely 项目配置文件 (config.toml)
 # ───────────────────────────────────────────────────────────────────
 #
-# 生成方式:
-#   freely init --ai <tool:model:mode> [--auto] [--reset]
-#   - 无 config.toml: 自动从此模板创建，填入项目路径等已知值
-#   - 有 config.toml: 只补充缺失字段，不动已有值
-#   - --reset: 备份(时间戳)后从此模板重建
+# 此文件由 freely init 自动创建和更新:
+#   - 首次 init: 从 config.toml.example 复制
+#   - 后续 init: 只补充缺失字段，不动已有值
+#   - --reset:   备份(时间戳)后重新从 example 复制，再更新
 #
 # 格式: TOML
 #   - 字符串: key = "value"
-#   - 布尔:   key = true / false（不加引号）
+#   - 布尔:   key = true / false (不加引号)
 #   - 整数:   key = 10
 #   - 浮点:   key = 0.70
 #
 # 标记说明:
-#   [init自动] = freely init 自动填入，一般不需手动改
-#   [用户必填] = 必须根据项目实际情况修改
-#   [可选]     = 有默认值，可按需修改
-#   ⚠️ 不填影响 = 留空或删除此字段的后果
+#   [init自动]  freely init 时自动填入
+#   [用户必填]  必须根据项目实际情况修改
+#   [可选]      有默认值，可按需修改
+#   ⚠️          留空或删除此字段的后果
 
 
 # ══════════════════════════════════════════════════════════════════════
 # 一、项目基础
 # ══════════════════════════════════════════════════════════════════════
 
-# [init自动] 项目根目录的绝对路径。
-# freely 的所有 git 操作、文件读写、worktree 管理都以此为基准。
+# [init自动] 项目根目录的绝对路径。freely 所有 git/worktree/文件操作以此为基准。
 # init 时自动填入当前 git 仓库根目录 (`git rev-parse --show-toplevel`)。
-# ⚠️ 不填影响: freely 完全无法工作——所有路径操作失败。
+# ⚠️ 留空 = freely 完全无法工作
 PROJECT_ROOT = ""
 
-# [init自动] 项目意图文件，描述项目目标和核心需求。
-# Manager 将此文件内容注入 AI prompt，约束 AI 行为方向。
-# init 时自动填入 $PROJECT_ROOT/docs/PROJECT_INTENT.md（如存在）。
-# ⚠️ 不填影响: AI 缺少目标约束，可能偏离项目方向。
+# [init自动] 项目意图文件 (PROJECT_INTENT.md)，描述项目目标和核心需求。
+# Manager 将此文件内容注入 AI 提示作为行为约束。
+# init 时自动检测 $PROJECT_ROOT/docs/PROJECT_INTENT.md。
+# ⚠️ 留空 = AI 缺少目标约束
 INTENT_FILE = ""
 
-# [init自动] 项目宪法文件，定义不可违背的架构和开发约束。
-# Manager 将此文件内容注入 AI prompt 作为硬性边界。
-# init 时自动填入 $PROJECT_ROOT/docs/CONSTITUTION.md（如存在）。
-# ⚠️ 不填影响: AI 缺少边界约束，可能违反项目架构规则。
+# [init自动] 项目宪法文件 (CONSTITUTION.md)，定义不可违背的架构和开发约束。
+# Manager 将此文件内容注入 AI 提示作为硬性边界。
+# init 时自动检测 $PROJECT_ROOT/docs/CONSTITUTION.md。
+# ⚠️ 留空 = AI 缺少硬性边界约束
 CONSTITUTION_FILE = ""
 
-# [init自动] Freely 安装根目录。
-# 用于定位 freely 自带的模板、脚本、skill 等资源文件。
+# [init自动] Freely 安装根目录。用于定位模板、脚本、skill 等资源文件。
 # init 时自动填入当前 freely 执行路径。
-# ⚠️ 不填影响: 部分模板和脚本功能不可用。
+# ⚠️ 留空 = 部分模板和脚本功能不可用
 FREELY_HOME = ""
 
 
@@ -54,40 +51,30 @@ FREELY_HOME = ""
 # 二、AI 工具配置
 # ══════════════════════════════════════════════════════════════════════
 
-# [已废弃] AI_TOOL 不再作为运行时配置源。
-# 运行时从 agent-table.toml 的 AGENT_AI_TOOL 派生（`freely_config.py` L4186 注释: "AI_TOOL 已弃用"）。
-# 仅保留用于无 agent-table 时的回退兼容。
-# 设置 AI 工具应编辑 .freely/agent-table.toml 中的 manager_slot / worker_slot。
-# ⚠️ 不填影响: 无 agent-table 时 daemon start 失败。
+# [已废弃] 运行时不再使用此字段。AI 工具改为通过 agent-table.toml 的 slot 配置决定。
+# 保留仅用于无 agent-table 时的回退兼容。
+# 如需修改 AI 工具，请编辑 .freely/agent-table.toml 中的 manager_slot / worker_slot。
 AI_TOOL = ""
 
-# [用户必填] AI 模型名称。格式: 工具前缀-模型名。
+# [用户必填] AI 模型名称。通过 ACP binary 的 --model 标志传递给 AI CLI。
 # 不同工具支持的模型不同，详见对应工具文档。
-# 示例:
-#   claude: claude-sonnet-4-6 / claude-opus-4-8 / claude-haiku-4-5
-#   codex:  gpt-5.5 / gpt-5.4
-# 传参方式: 通过 ACP binary 的 --model flag 传递给 AI CLI。
-# ⚠️ 不填影响: AI 工具使用其默认模型，可能不是你想用的。
+# 示例: claude-sonnet-4-6 / claude-opus-4-8 / gpt-5.5
+# ⚠️ 留空 = 使用工具默认模型
 AI_MODEL = ""
 
 # [可选] 运行模式。控制 freely 的自主程度和交互行为。
 # 合法值:
-#   auto — 全自主模式。自动执行、自动批准（在安全范围内）。
-#          设置后自动推导: autonomy=autonomous-default, interaction=non-interactive,
-#          approval=automatic-where-supported
+#   auto — 全自主模式。自动执行、自动批准。
 #   step — 交互模式。每次执行前等待确认。
-#          设置后自动推导: autonomy=supervised, interaction=interactive, approval=explicit
 #   wait — 监听模式。不主动执行，只响应人类插话。
-#          设置后自动推导: 同上 step
 # 默认值: "auto"
-# ⚠️ 不填影响: 默认 auto，AI 会自主执行任务。
+# ⚠️ 留空 = 默认 auto
 AI_MODE = "auto"
 
-# [可选] 推理深度。控制 AI 思考时间。
+# [可选] 推理深度。通过 ACP binary 的 --effort 标志传递给 AI CLI。
 # 合法值: low(快速) | medium(均衡) | high(深度推理)
 # 默认值: "medium"
-# 传参方式: 通过 ACP binary 的 --effort flag 传递给 AI CLI。
-# ⚠️ 不填影响: 默认 medium，适合大多数场景。
+# ⚠️ 留空 = 默认 medium
 AI_REASONING_EFFORT = "medium"
 
 
@@ -97,89 +84,64 @@ AI_REASONING_EFFORT = "medium"
 
 # [可选] AI 通信协议。
 # 合法值:
-#   acp    — Agent Client Protocol。通过 ACP bridge 与 AI agent 通信。
-#            支持 session/resume/fork 等持久化能力。推荐。
-#   direct — 直接调用 AI CLI（已废弃）。每次新建进程，无 session 持久化。
+#   acp    — Agent Client Protocol。通过 ACP bridge 通信，支持 session/resume/fork。
+#   direct — 直接调用 AI CLI (已废弃)。
 # 默认值: "acp"
-# ⚠️ 不填影响: 默认 acp。
+# ⚠️ 留空 = 默认 acp
 AI_TOOL_ADAPTER = "acp"
 
 # [可选] 适配器策略。
-# 合法值:
-#   direct  — 透传。AI CLI 输出直接返回，Freely 不做中间处理。
-#   managed — Freely 管理。Freely 拦截并处理 AI CLI 输出。
-# 默认值: "direct"
-# ⚠️ 不填影响: 默认 direct，直接透传。
-AI_TOOL_ADAPTER_POLICY = "direct"
+# 合法值: direct(透传) | acp(强制ACP) | prefer_acp_fallback_direct(ACP优先)
+# 默认值: "acp"
+AI_TOOL_ADAPTER_POLICY = "acp"
 
-# [可选] 自定义 AI 能力列表（逗号分隔）。留空使用工具默认。
-# 由 init 写入（L4266），运行时传递给 AI CLI。
-# ⚠️ 不填影响: 使用工具默认能力集。
-# AI_TOOL_CAPABILITIES = ""
+# [可选] 自定义 AI 能力列表（逗号分隔）。留空使用工具默认能力。
+AI_TOOL_CAPABILITIES = ""
 
-# [可选] 全局 AI 策略。留空使用工具默认。
-# 由 init 写入（L4267），运行时传递给 AI CLI。
-# ⚠️ 不填影响: 使用工具默认策略。
-# AI_TOOL_POLICY = ""
+# [可选] 全局 AI 策略。留空使用工具默认策略。
+AI_TOOL_POLICY = ""
 
 
 # ══════════════════════════════════════════════════════════════════════
-# 四、Codex 特定（仅 AI_TOOL=codex 时生效）
+# 四、Codex 特定 (仅 AI_TOOL=codex 时生效)
 # ══════════════════════════════════════════════════════════════════════
 
-# [可选] Codex 使用的模型（同 AI_MODEL）。
-# ⚠️ 不填影响: 用 AI_MODEL 的值。
+# [可选] Codex 使用的模型。留空使用 AI_MODEL 的值。
 AI_CAPABILITY_CODEX_MODEL = ""
 
 # [可选] Codex 沙箱模式。
-# 合法值:
-#   read-only          — 只读。不可修改任何文件。
-#   workspace-write    — 工作区写入。可修改项目文件。(推荐)
-#   danger-full-access — 全权限。可修改系统任意文件。
-# 默认值: "workspace-write"
-# ⚠️ 不填影响: 默认 workspace-write。
-AI_CAPABILITY_CODEX_SANDBOX = "workspace-write"
+# 合法值: read-only(只读) | workspace-write(可写工作区) | danger-full-access(全权限)
+# 默认值: "project-bootstrap-managed"
+# ⚠️ 留空 = 默认 project-bootstrap-managed
+AI_CAPABILITY_CODEX_SANDBOX = "project-bootstrap-managed"
 
 # [可选] Codex 批准策略。
-# 合法值:
-#   never      — 从不询问。自动批准所有操作。(auto 模式推荐)
-#   on-failure — 失败时询问。
-#   on-request — 工具请求时询问。(step 模式推荐)
-#   always     — 每次操作都询问。
-# 默认值: "never"
-# ⚠️ 不填影响: 默认 never（auto 模式）。
-AI_CAPABILITY_CODEX_APPROVAL_POLICY = "never"
+# 合法值: never(自动批准) | on-failure(失败时) | on-request(请求时) | always(每次)
+# 默认值: "project-bootstrap-managed"
+# ⚠️ 留空 = 默认 project-bootstrap-managed
+AI_CAPABILITY_CODEX_APPROVAL_POLICY = "project-bootstrap-managed"
 
 # [可选] Codex 工作目录模式。
-# 合法值:
-#   project — 以项目根目录为工作目录。(推荐)
-#   auto    — Codex 自己决定工作目录。
-# 默认值: "project"
-# ⚠️ 不填影响: 默认 project。
-AI_CAPABILITY_CODEX_CWD_MODE = "project"
+# 合法值: project(项目根目录) | auto(Codex 决定)
+# 默认值: "project-root"
+# ⚠️ 留空 = 默认 project-root
+AI_CAPABILITY_CODEX_CWD_MODE = "project-root"
 
 
 # ══════════════════════════════════════════════════════════════════════
 # 五、自动切换
 # ══════════════════════════════════════════════════════════════════════
 
-# [可选] Slot 自动切换。当前 slot 限流/失效时自动换备用 slot。
-# 合法值: true(开启) / false(关闭)
+# [可选] Slot 自动切换。当前 slot 限流/失效时自动换备用。
 # 默认值: true
-# ⚠️ 不填影响: 默认 true，自动切换。
 AUTO_SWITCH_SLOT = true
 
-# [可选] 跨工具自动回退。当前工具不可用时依次尝试 AI_FALLBACK_TOOLS。
-# 合法值: true(开启) / false(关闭)
-# 默认值: true
-# ⚠️ 不填影响: 默认 true，自动回退。
-# ⚠️ 代码默认值为 false（L5149: `${AUTO_SWITCH_TOOL:-false}`）
+# [可选] 跨工具自动回退。当前工具不可用时按 AI_FALLBACK_TOOLS 顺序尝试。
+# 默认值: false
 AUTO_SWITCH_TOOL = false
 
-# [可选] init 时自动配置网络代理。
-# 合法值: true(开启) / false(关闭)
+# [可选] 网络失败后自动修复代理配置。
 # 默认值: true
-# ⚠️ 不填影响: 默认 true。
 AUTO_SETUP_FREELY_PROXY = true
 
 
@@ -187,11 +149,11 @@ AUTO_SETUP_FREELY_PROXY = true
 # 六、回退工具
 # ══════════════════════════════════════════════════════════════════════
 
-# [可选] 备选 AI 工具列表。当主工具 (AI_TOOL) 不可用时，按此顺序尝试。
-# 格式: 逗号分隔的工具名，如 "codex,opencode,cline"
-# 工具名必须与 tool-registry.toml 中的 section 名一致。
-# 默认值: ""（不启用跨工具回退）
-# ⚠️ 不填影响: 空=不自动回退。主工具失败则 daemon 停止等待人工干预。
+# [可选] 备选 AI 工具列表。当主工具不可用时按此顺序尝试。
+# 格式: 逗号分隔的工具名 (如 "codex,opencode,cline")
+# 工具名需与 tool-registry.toml 中的 section 名一致。
+# 默认值: "" (不启用跨工具回退)
+# ⚠️ 留空 = 不自动回退，daemon 停止等待人工干预
 AI_FALLBACK_TOOLS = ""
 
 
@@ -199,22 +161,16 @@ AI_FALLBACK_TOOLS = ""
 # 七、循环控制
 # ══════════════════════════════════════════════════════════════════════
 
-# [可选] Manager 主循环检查间隔（秒）。
-# Manager 每隔此秒数扫描一次待办、检查 worker 状态。
+# [可选] Manager 主循环检查间隔 (秒)。越小响应越快但 CPU 消耗越大。
 # 默认值: 10
-# 影响: 值越小扫描越频繁（CPU 消耗越大），值越大响应越慢。
-# ⚠️ 不填影响: 默认 10 秒。
 CHECK_INTERVAL = 10
 
 # [可选] 异常退出后等待此秒数再重启。
 # 默认值: 2
-# ⚠️ 不填影响: 默认 2 秒。
 RESTART_DELAY = 2
 
-# [可选] 最大连续重启次数。达到后停止自动重启，需人工介入。
-# 设为 0 表示不限制。
-# 默认值: 0（不限制）
-# ⚠️ 不填影响: 默认不限制，异常时会一直重启。
+# [可选] 最大连续重启次数。0 = 不限制。达到后停止自动重启。
+# 默认值: 0 (不限制)
 MAX_RESTARTS = 0
 
 
@@ -222,61 +178,68 @@ MAX_RESTARTS = 0
 # 八、流控
 # ══════════════════════════════════════════════════════════════════════
 
-# [已失效] 运行时代码从未读取此字段。IFlow 在 tool-launchers.sh L672 硬编码 --max-turns 100。
-IFLOW_MAX_TURNS = 100            # ⚠️ 已失效 — 运行时未使用，硬编码在 tool-launchers.sh
-MAX_RESUME_STREAK = 24           # 最大连续恢复次数
-MAX_ROUTE_ONLY_STREAK = 1        # 最大仅路由次数
-ROTATE_ON_CONTEXT_COMPACTED = 1  # 上下文压缩后轮转(1=是,0=否)
-SESSION_HANDOFF_TAIL_LINES = 80  # handoff 传递尾部行数
+# [可选] 最大连续恢复次数。超过后强制轮转 session。
+# 默认值: 24
+MAX_RESUME_STREAK = 24
+
+# [可选] 最大连续仅路由 handoff 次数。超过后强制轮转。
+# 默认值: 1
+MAX_ROUTE_ONLY_STREAK = 1
+
+# [可选] 上下文压缩后是否轮转 session。1=轮转, 0=不轮转。
+# 默认值: 1
+ROTATE_ON_CONTEXT_COMPACTED = 1
+
+# [可选] Handoff 传递的前次会话日志尾部行数。
+# 默认值: 80
+SESSION_HANDOFF_TAIL_LINES = 80
 
 
 # ══════════════════════════════════════════════════════════════════════
 # 九、上下文管理
 # ══════════════════════════════════════════════════════════════════════
 
-# [可选] 上下文使用警告阈值（占最大 context 的比例，0-1）。
-# 达到此阈值时 Manager 会发出警告但继续运行。
+# [可选] 上下文使用警告阈值 (占最大 context 的比例, 0-1)。
+# 达到此值时 Manager 发出警告但继续运行。
 # 默认值: 0.70 (70%)
-# ⚠️ 不填影响: 默认 70%。
 CONTEXT_WARN_RATIO = 0.70
 
-# [可选] 上下文强制轮转阈值（占最大 context 的比例，0-1）。
-# 达到此阈值时 Manager 强制轮转 session，启动新 session 继续工作。
-# 必须 > CONTEXT_WARN_RATIO。
-# 默认值: 0.85 (85%)
-# ⚠️ 不填影响: 默认 85%。
-# ⚠️ 代码回退为 0.70（L17882: ${CONTEXT_ROTATE_RATIO:-0.70}），init 写入 0.85
-CONTEXT_ROTATE_RATIO = 0.85
+# [可选] 上下文强制轮转阈值 (占最大 context 的比例, 0-1)。
+# 达到此值时 Manager 强制轮转 session。必须 >= CONTEXT_WARN_RATIO。
+# 默认值: 0.70
+# 注意: init 会写入 0.85，但运行时空值回退为 0.70。如需更早轮转，手动设为 0.85。
+CONTEXT_ROTATE_RATIO = 0.70
 
 
 # ══════════════════════════════════════════════════════════════════════
 # 十、Checkpoint
 # ══════════════════════════════════════════════════════════════════════
 
-CHECKPOINT_WARN_DIRTY_ENTRIES = 40     # 脏文件警告阈值（个）
-CHECKPOINT_BLOCK_DIRTY_ENTRIES = 120   # 脏文件阻塞阈值（个）
-CHECKPOINT_DRIFT_STREAK_THRESHOLD = 2  # 漂移检测阈值（连续次数）
+CHECKPOINT_WARN_DIRTY_ENTRIES = 40     # 脏文件警告阈值 (个)
+CHECKPOINT_BLOCK_DIRTY_ENTRIES = 120   # 脏文件阻塞阈值 (个)
+CHECKPOINT_DRIFT_STREAK_THRESHOLD = 2  # 漂移检测阈值 (连续次数)
 
 
 # ══════════════════════════════════════════════════════════════════════
 # 十一、风暴保护
 # ══════════════════════════════════════════════════════════════════════
 
-# [可选] Manager 在这个时间窗口内重启超过阈值次数时触发风暴保护。
+# [可选] 风暴检测时间窗口 (秒)。窗口内重启超过阈值次数触发保护。
 # 触发后暂停自动重启，等待人工介入。
-# 默认值: 30（秒）
-# ⚠️ 不填影响: 默认 30 秒窗口。
+# 默认值: 30
 RESTART_STORM_WINDOW_SECS = 30
 
-# [可选] 风暴检测阈值。窗口内重启超过此次数触发保护。
-# 默认值: 10（次）
-# ⚠️ 不填影响: 默认 10 次。
-# ⚠️ 代码回退为 4（L14639: ${RESTART_STORM_COUNT:-4}），init 写入 10
-RESTART_STORM_COUNT = 10
+# [可选] 风暴检测阈值 (次)。窗口内重启超过此次数触发保护。
+# 默认值: 4
+RESTART_STORM_COUNT = 4
 
-# ⚠️ 代码回退为 3（L14643: ${PROCESS_CHURN_PEAK:-3}），init 写入 10
-PROCESS_CHURN_PEAK = 10                     # 进程抖动峰值（代码默认 3）
-RESTART_STORM_OBSERVE_DELAY_SECS = 30       # 触发后观察延迟（秒）
+# [可选] 进程抖动峰值。并发进程超过此值触发保护。
+# 默认值: 3
+PROCESS_CHURN_PEAK = 3
+
+# [可选] 风暴触发后观察延迟 (秒)。
+# 默认值: 30
+RESTART_STORM_OBSERVE_DELAY_SECS = 30
 
 
 # ══════════════════════════════════════════════════════════════════════
@@ -289,15 +252,14 @@ RESTART_STORM_OBSERVE_DELAY_SECS = 30       # 触发后观察延迟（秒）
 #   disabled — 直连，不使用任何代理
 #   explicit — 使用下面自定义的代理地址
 # 默认值: "inherit"
-# ⚠️ 不填影响: 默认 inherit。
 FREELY_NETWORK_PROXY_MODE = "inherit"
 
 # 以下仅在 mode=explicit 时需要填写
-FREELY_NETWORK_PROXY_URL = ""   # 通用代理(http://host:port 或 socks5://)
+FREELY_NETWORK_PROXY_URL = ""   # 通用代理 (http://host:port 或 socks5://)
 FREELY_HTTP_PROXY = ""          # HTTP 代理
 FREELY_HTTPS_PROXY = ""         # HTTPS 代理
-FREELY_ALL_PROXY = ""           # 全局代理(覆盖上述)
-FREELY_NO_PROXY = ""            # 不走代理的地址(逗号分隔)
+FREELY_ALL_PROXY = ""           # 全局代理 (覆盖上述)
+FREELY_NO_PROXY = ""            # 不走代理的地址 (逗号分隔)
 
 
 # ══════════════════════════════════════════════════════════════════════
@@ -305,13 +267,10 @@ FREELY_NO_PROXY = ""            # 不走代理的地址(逗号分隔)
 # ══════════════════════════════════════════════════════════════════════
 
 # [用户必填] Freely 扫描 Issues/PRs 的代码托管平台。
-# 合法值: 逗号分隔的组合，可选 "github", "gitee"
-# 示例:
-#   FREELY_REPO_PLATFORMS = "github,gitee"  — 两个平台都扫描
-#   FREELY_REPO_PLATFORMS = "github"         — 仅 GitHub
-#   FREELY_REPO_PLATFORMS = ""               — 不扫描任何平台
-# 需要对应的 CLI 工具: github→gh, gitee→gitee
-# ⚠️ 不填影响: 空=不扫描任何平台。Manager 不会自动发现 Issues/PRs。
+# 合法值: 逗号分隔 "github" / "gitee"
+# 示例: "github,gitee" 或 "github"
+# 需要对应 CLI: github→gh, gitee→gitee
+# ⚠️ 留空 = 不扫描任何平台，Manager 不会自动发现 Issues/PRs
 FREELY_REPO_PLATFORMS = ""
 
 
@@ -324,16 +283,12 @@ FREELY_REPO_PLATFORMS = ""
 #   advisory-on-high-risk-or-uncertainty — 高风险或不确定时建议审查 (推荐)
 #   always                               — 每次都审查
 #   never                                — 不审查
-# 默认值: "advisory-on-high-risk-or-uncertainty"
-# ⚠️ 不填影响: 默认仅高风险时审查。
 FREELY_SECURITY_REVIEW_POLICY = "advisory-on-high-risk-or-uncertainty"
 
 # [可选] 安全审查范围。
 # 合法值:
-#   execution-boundary-and-reviewer-support — 执行边界+审查者支持 (推荐)
+#   execution-boundary-and-reviewer-support — 执行边界 + 审查者支持 (推荐)
 #   full-boundary-audit                     — 全边界审计
-# 默认值: "execution-boundary-and-reviewer-support"
-# ⚠️ 不填影响: 默认执行边界范围。
 FREELY_SECURITY_REVIEW_SCOPE = "execution-boundary-and-reviewer-support"
 
 
@@ -341,19 +296,13 @@ FREELY_SECURITY_REVIEW_SCOPE = "execution-boundary-and-reviewer-support"
 # 十五、自治与安全姿态 (init 时自动设置)
 # ══════════════════════════════════════════════════════════════════════
 
-# [init自动] 自治级别。由 AI_MODE 推导。
-# 合法值: autonomous-default(全自主) | supervised(受监督) | manual(手动)
-# ⚠️ 不填影响: init 根据 AI_MODE 自动设置。
+# [init自动] 自治级别。由 AI_MODE 推导: auto→autonomous-default, step→supervised。
 FREELY_AUTONOMY_PROFILE = "autonomous-default"
 
-# [init自动] 交互姿态。由 AI_MODE 推导。
-# 合法值: non-interactive(非交互) | interactive(交互式)
-# ⚠️ 不填影响: init 根据 AI_MODE 自动设置。
+# [init自动] 交互姿态。由 AI_MODE 推导: auto→non-interactive, step→interactive。
 FREELY_INTERACTION_POSTURE = "non-interactive"
 
-# [init自动] 批准姿态。由 AI_MODE 推导。
-# 合法值: automatic-where-supported(尽可能自动) | explicit(显式批准)
-# ⚠️ 不填影响: init 根据 AI_MODE 自动设置。
+# [init自动] 批准姿态。由 AI_MODE 推导: auto→automatic-where-supported, step→explicit。
 FREELY_APPROVAL_POSTURE = "automatic-where-supported"
 
 # [init自动] 防护引导: recommended-nonblocking(建议不阻塞) | strict-blocking(严格阻塞)
@@ -362,10 +311,10 @@ FREELY_SAFEGUARD_GUIDANCE_POSTURE = "recommended-nonblocking"
 # [init自动] 运行时决策: internal-ai-escalation-before-stop(AI内部升级后停止) | operator-decide(操作者决定)
 FREELY_RUNTIME_DECISION_POSTURE = "internal-ai-escalation-before-stop"
 
-# [init自动] 最小风险姿态（固定值，不可修改）
+# [init自动] 最小风险姿态 (固定值，不可修改)
 FREELY_MINIMAL_RISK_POSTURE = "last-resort-safe-stop"
 
-# ── 激活同意（init 时自动设置）──
+# ── 激活同意 (init 时自动设置) ──
 
 # [init自动] auto 模式需要激活同意
 FREELY_ACTIVATION_CONSENT_REQUIRED = "true"
@@ -373,7 +322,7 @@ FREELY_ACTIVATION_CONSENT_REQUIRED = "true"
 # [init自动] 同意状态: accepted(已同意) | pending(待同意) | not-required(不需要)
 FREELY_ACTIVATION_CONSENT_STATUS = "accepted"
 
-# [init自动] 激活同意记录时间（ISO 8601 UTC, init 时自动填入）
+# [init自动] 激活同意记录时间 (ISO 8601 UTC, init 时自动填入)
 FREELY_ACTIVATION_CONSENT_RECORDED_AT = ""
 
 # [init自动] 激活同意记录方式 (flag / interactive / freely-init)
@@ -385,10 +334,9 @@ FREELY_ACTIVATION_CONSENT_RECORDED_VIA = ""
 # ══════════════════════════════════════════════════════════════════════
 
 # [init自动] 各工具 ACP binary 的绝对路径。
-# freely init 会自动搜索系统（PATH、npm 全局安装、缓存目录），
-# 找到后填入实际路径。未找到则提示下载（--auto 自动确认）。
-# 留空 = 未安装该工具的 ACP binary，用到时会报错。
-# ⚠️ 不填影响: 使用该工具的 agent 无法启动 ACP bridge。
+# freely init 会自动搜索系统 (PATH、npm 全局安装、缓存目录)，找到后填入。
+# 未找到则提示下载 (--auto 自动确认)。
+# 留空 = 使用该工具的 agent 无法启动 ACP bridge。
 
 FREELY_ACP_CLAUDE_BIN = ""
 FREELY_ACP_CODEX_BIN = ""
