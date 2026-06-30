@@ -1,0 +1,5 @@
+- issue_id: I-20260629T235653Z-A
+- kind: linked
+- phase_state: completed
+- source_raw: raw-20260629T235653Z
+- title: docs: replace outdated handoff JSON with A2A tasks in AGENTS.md
