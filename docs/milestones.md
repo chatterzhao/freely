@@ -1,4 +1,20 @@
 
+## M-20260630T102830Z-A
+- title: docs: forbid git worktree/branch deletion in AGENTS.md
+- status: active
+### candidate_issues
+1. `C-20260630T102830Z-A`
+- milestone: M-20260630T102830Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260630T102830Z-A/issue.md`
+### committed_issues
+### completed_issues
+1. `I-20260630T102830Z-A`
+- title: docs: AGENTS.md worktree rules; milestone_state: committed
+- issue_path: `docs/issues/I-20260630T102830Z-A/issue.md`
+- phase_state: `completed`
+
+
 ## M-20260630T085809Z-A
 - title: fix: A2A Server 健康检查修复 — socket 检查 + log 抑制 + shell 注入 + 超时
 - status: active
