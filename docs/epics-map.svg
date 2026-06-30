@@ -867,4 +867,8 @@
   <rect id="story-cleanup-pending" x="55" y="16908" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
   <text x="65" y="16908" font-size="11" fill="#333">cleanup-pending</text>
   <text x="65" y="16923.0" font-size="11" fill="#333">state-rename</text>
+  <rect id="epic-supervisor-cycle" x="35" y="17006.0" width="700" height="70" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+  <text x="50" y="17030.0" font-size="13" font-weight="bold" fill="#1a73e8">supervisor-cycle</text>
+  <rect id="story-phase1-cycle-poll" x="55" y="17038.0" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
+  <text x="65" y="17053.0" font-size="11" fill="#333">phase1-cycle-poll</text>
 </svg>
