@@ -28,6 +28,7 @@ MUST 强制在任何工作开始前遵守`freely-workflow-guarded-execution`这�
 - `--no-verify` / `--no-gpg-sign` — 跳过 hook
 - 直接在 `main`/`develop` 上 `git commit`
 - 修改 `.githooks/` 目录内容以削弱检查
+- `git worktree remove` / `git branch -d` / `git branch -D` / `rm -rf <worktree>` — 绕过 wt-close 生命周期，跳过 hook 验证。worktree 或分支禁止直接用 git 命令删除，必须用 `freely wt-close`（详见 `freely wt-close --help`）
 
 **没有例外。** 即使为了调试或加速迭代也不允许。
 
@@ -232,7 +233,7 @@ Freely 必须在 Freely 治理规则下开发，不得有项目特定的例外�
 - `cd <your-project-path>`
 - `freely wt-create <branch> [--base <base-branch>]`
 - `git worktree add -b <branch> ../<your-project-worktrees>/<branch-dir> <base> && freely sync-tooling --source-project <project-root> --project ../<your-project-worktrees>/<branch-dir>`
-- `git worktree remove ../<your-project-worktrees>/<branch-dir> && git branch -d <branch>`
+- `freely wt-close <branch>` — 收口工位（自动关平台 issue → 删 worktree → 删分支）。`freely wt-close --help` 查看完整用法
 - `source ./bin/wt-enter <branch>`
 - `source ./bin/wt-add <branch> -- <git-add-args>`
 

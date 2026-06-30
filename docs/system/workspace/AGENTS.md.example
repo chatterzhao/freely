@@ -145,7 +145,7 @@ raw issue → B1_IBM → candidate → B2_IBM → I-issue → dev-loop → merge
 - 命名：`fix/raw-{YYYYMMDDTHHMM[SS]Z}-{slug}` / `feature/raw-{YYYYMMDDTHHMM[SS]Z}-{slug}`
 - 创建：`wt-create --raw-key <key> --source <source> --skill <skill> --slug <slug>`
 - 合并：`fix/feature → test-pre-merge-* → develop`（测试通过后可直达 develop）
-- `test-pre-merge-*` 临时测试面，用完即删，不可 commit/push
+- `test-pre-merge-*` 临时测试面，不可 commit/push。测试结束必须用 `freely wt-close` 收口，禁止用 `git worktree remove` / `git branch -D` / `rm -rf` 删除
 
 ## 自动兜底
 
@@ -179,4 +179,5 @@ IBM 仪式（raw issue → candidate → I-issue）仅在下述情况可跳过�
 - 不在 `main`/`develop` 上直接 commit（永远禁止，无论什么理由）
 - 不绕过 `merge-guarded`
 - 不在 `test-pre-merge-*` 上 commit/push
+- 不用 `git worktree remove` / `git branch -d/-D` / `rm -rf` 删除 worktree 或分支。删除统一走 `freely wt-close`（详见 `freely wt-close --help`）
 - 不跨工位用 `cp`/`stash` 转移文件
