@@ -1,4 +1,19 @@
 
+## M-20260630T124528Z-A
+- title: feat: freely init ACP tool setup + tool-registry download config
+- status: active
+### candidate_issues
+1. `C-20260630T124528Z-A`
+- milestone: M-20260630T124528Z-A
+- status: promoted
+- promoted_issue_id: `I-20260630T124528Z-A`
+### committed_issues
+### completed_issues
+1. `I-20260630T124528Z-A`
+- title: feat: ACP init + registry download; milestone_state: committed
+- issue_path: `docs/epics/acp-tool-setup/init-registry-download/raw-20260630T124528Z/issues/I-20260630T124528Z-A.md`
+- phase_state: `completed`
+
 ## M-20260630T113839Z-A
 - title: fix: daemon dirty check excludes .freely/run/
 - status: active
@@ -43,7 +58,7 @@
 1. `I-20260630T085809Z-A`
 - title: fix: A2A Server 健康检查修复; milestone_state: committed
 - issue_path: `docs/issues/I-20260630T085809Z-A/issue.md`
-- phase_state: `done_b2_ibm`
+- phase_state: `completed`
 ### completed_issues
 
 ## M-20260629T122254Z-A

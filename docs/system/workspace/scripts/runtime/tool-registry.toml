@@ -60,6 +60,8 @@ test_command = "claude -p 'say hi' --output-format text --dangerously-skip-permi
 [claude.acp]
 binary = "claude-agent-acp"
 args = []
+install_method = "npm"
+download_url = "npm:@anthropic-ai/claude-agent-acp"
 bridge_socket_suffix = "acp"
 
 [claude.permission]
@@ -164,7 +166,8 @@ test_command = "codex exec 'say hi' --max-tokens 50"
 [codex.acp]
 binary = "codex-acp"
 args = []
-auto_download = true
+install_method = "github_release"
+download_url = "https://github.com/zed-industries/codex-acp/releases/download/v{version}/codex-acp-{version}-{triplet}.tar.gz"
 download_version = "0.15.0"
 download_repo = "zed-industries/codex-acp"
 bridge_socket_suffix = "acp"
@@ -268,6 +271,8 @@ test_command = "opencode run 'say hi' --pure"
 [opencode.acp]
 binary = "opencode"
 args = ["acp"]
+install_method = "npm"
+download_url = "npm:@anthropic-ai/opencode"
 bridge_socket_suffix = "opencode"
 
 [opencode.permission]
@@ -367,6 +372,8 @@ test_command = "cline 'say hi' --auto-approve true"
 [cline.acp]
 binary = "cline"
 args = ["--acp"]                    # native ACP via @agentclientprotocol/sdk over stdio/ndjson
+install_method = "npm"
+download_url = "npm:cline"
 bridge_socket_suffix = "cline"
 
 [cline.permission]

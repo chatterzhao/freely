@@ -1,0 +1,179 @@
+#!/usr/bin/env bash
+# ensure-acp-binary: download (if needed) and print ACP binary path for a tool.
+# Generalization of ensure-codex-acp. Reads install_method + download_url from
+# tool-registry.toml. Supports npm, github_release, cargo, pip install methods.
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REGISTRY="$SCRIPT_DIR/tool-registry.toml"
+REGISTRY_QUERY="$SCRIPT_DIR/tool-registry-query.py"
+
+usage() {
+  cat <<'USAGE'
+Usage: ensure-acp-binary --tool <name> [--dry-run]
+
+  Reads [<tool>.acp] from tool-registry.toml, downloads the ACP binary
+  if not already cached, and prints the binary path.
+
+Options:
+  --tool <name>     Tool name (claude, codex, opencode, cline, etc.)
+  --dry-run         Print the expected path without downloading
+
+Download methods (from registry install_method):
+  npm              npm install -g <package>  → prints binary name (in PATH)
+  github_release   curl + tar from download_url → caches to ~/.cache/freely/acp/
+  cargo            cargo install <crate>
+  pip              pip3 install <package>
+USAGE
+  exit 0
+}
+
+_reg_get() {
+  local tool="$1" field="$2"
+  python3 "$REGISTRY_QUERY" "$REGISTRY" "$tool" "$field" 2>/dev/null
+}
+
+# ── Parse args ──
+TOOL=""
+DRY_RUN=false
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --tool) TOOL="${2:-}"; shift 2 ;;
+    --dry-run) DRY_RUN=true; shift ;;
+    --help|-h) usage ;;
+    *) echo "ERROR: unknown arg: $1" >&2; usage; exit 1 ;;
+  esac
+done
+
+[[ -n "$TOOL" ]] || { echo "ERROR: --tool is required" >&2; usage; exit 1; }
+
+# ── Read config from tool registry ──
+BINARY="$(_reg_get "$TOOL" "acp.binary")"
+INSTALL_METHOD="$(_reg_get "$TOOL" "acp.install_method")"
+DOWNLOAD_URL="$(_reg_get "$TOOL" "acp.download_url")"
+VERSION="$(_reg_get "$TOOL" "acp.download_version")"
+VERSION="${VERSION:-unknown}"
+
+[[ -n "$BINARY" ]] || { echo "ERROR: no acp.binary for tool '$TOOL' in registry" >&2; exit 1; }
+[[ -n "$INSTALL_METHOD" ]] || { echo "ERROR: no acp.install_method for tool '$TOOL' in registry" >&2; exit 1; }
+[[ -n "$DOWNLOAD_URL" ]] || { echo "ERROR: no acp.download_url for tool '$TOOL' in registry" >&2; exit 1; }
+
+# ── Platform triplet (for github_release) ──
+case "$(uname -s):$(uname -m)" in
+  Darwin:arm64)  TRIPLET="aarch64-apple-darwin" ;;
+  Darwin:x86_64) TRIPLET="x86_64-apple-darwin" ;;
+  Linux:aarch64|Linux:arm64) TRIPLET="aarch64-unknown-linux-gnu" ;;
+  Linux:x86_64)  TRIPLET="x86_64-unknown-linux-gnu" ;;
+  *) TRIPLET="unknown" ;;
+esac
+
+# ── npm method ──
+_install_npm() {
+  local pkg="${DOWNLOAD_URL#npm:}"
+  [[ -n "$pkg" ]] || { echo "ERROR: invalid npm download_url: $DOWNLOAD_URL" >&2; exit 1; }
+  if [[ "$DRY_RUN" == "true" ]]; then
+    echo "[dry-run] would run: npm install -g $pkg" >&2
+    printf '%s\n' "$BINARY"
+    return 0
+  fi
+  echo "[INFO] installing $pkg via npm..." >&2
+  npm install -g "$pkg" 2>&1 | tail -3 >&2
+  # npm global bin is in PATH, binary name is the command
+  if command -v "$BINARY" >/dev/null 2>&1; then
+    printf '%s\n' "$(command -v "$BINARY")"
+  else
+    echo "ERROR: $BINARY not found in PATH after npm install" >&2
+    exit 1
+  fi
+}
+
+# ── github_release method ──
+_install_github_release() {
+  local url="$DOWNLOAD_URL"
+  url="${url//\{version\}/$VERSION}"
+  url="${url//\{triplet\}/$TRIPLET}"
+
+  CACHE_ROOT="${FREELY_ACP_CACHE_DIR:-$HOME/.cache/freely/acp}"
+  INSTALL_DIR="$CACHE_ROOT/$TOOL/$VERSION/$TRIPLET"
+  BINARY_PATH="$INSTALL_DIR/$BINARY"
+
+  # Already cached?
+  if [[ -x "$BINARY_PATH" ]]; then
+    if [[ "$DRY_RUN" == "true" ]]; then
+      echo "[dry-run] already cached: $BINARY_PATH" >&2
+    fi
+    printf '%s\n' "$BINARY_PATH"
+    return 0
+  fi
+
+  if [[ "$DRY_RUN" == "true" ]]; then
+    echo "[dry-run] would download from $url" >&2
+    echo "[dry-run] would extract to $INSTALL_DIR" >&2
+    printf '%s\n' "$BINARY_PATH"
+    return 0
+  fi
+
+  echo "[INFO] downloading $BINARY $VERSION for $TRIPLET from $url" >&2
+  mkdir -p "$INSTALL_DIR"
+  TMP_ARCHIVE="$(mktemp "$INSTALL_DIR/${BINARY}.XXXXXX")"
+
+  if curl -fsSL "$url" -o "$TMP_ARCHIVE" 2>/dev/null && \
+     tar -xzf "$TMP_ARCHIVE" -C "$INSTALL_DIR" 2>/dev/null && \
+     [[ -f "$BINARY_PATH" ]]; then
+    chmod +x "$BINARY_PATH" 2>/dev/null || true
+    rm -f "$TMP_ARCHIVE"
+    echo "[INFO] $BINARY $VERSION installed to $BINARY_PATH" >&2
+    printf '%s\n' "$BINARY_PATH"
+  else
+    rm -f "$TMP_ARCHIVE"
+    echo "ERROR: failed to download $BINARY from $url" >&2
+    exit 1
+  fi
+}
+
+# ── cargo method ──
+_install_cargo() {
+  local crate="${DOWNLOAD_URL#cargo:}"
+  [[ -n "$crate" ]] || { echo "ERROR: invalid cargo download_url: $DOWNLOAD_URL" >&2; exit 1; }
+  if [[ "$DRY_RUN" == "true" ]]; then
+    echo "[dry-run] would run: cargo install $crate" >&2
+    printf '%s\n' "$BINARY"
+    return 0
+  fi
+  echo "[INFO] installing $crate via cargo..." >&2
+  cargo install "$crate" 2>&1 | tail -3 >&2
+  if command -v "$BINARY" >/dev/null 2>&1; then
+    printf '%s\n' "$(command -v "$BINARY")"
+  else
+    echo "ERROR: $BINARY not found in PATH after cargo install" >&2
+    exit 1
+  fi
+}
+
+# ── pip method ──
+_install_pip() {
+  local pkg="${DOWNLOAD_URL#pip:}"
+  [[ -n "$pkg" ]] || { echo "ERROR: invalid pip download_url: $DOWNLOAD_URL" >&2; exit 1; }
+  if [[ "$DRY_RUN" == "true" ]]; then
+    echo "[dry-run] would run: pip3 install $pkg" >&2
+    printf '%s\n' "$BINARY"
+    return 0
+  fi
+  echo "[INFO] installing $pkg via pip3..." >&2
+  pip3 install "$pkg" 2>&1 | tail -3 >&2
+  if command -v "$BINARY" >/dev/null 2>&1; then
+    printf '%s\n' "$(command -v "$BINARY")"
+  else
+    echo "ERROR: $BINARY not found in PATH after pip3 install" >&2
+    exit 1
+  fi
+}
+
+# ── Dispatch ──
+case "$INSTALL_METHOD" in
+  npm)             _install_npm ;;
+  github_release)  _install_github_release ;;
+  cargo)           _install_cargo ;;
+  pip)             _install_pip ;;
+  *) echo "ERROR: unsupported install_method '$INSTALL_METHOD' for tool '$TOOL'" >&2; exit 1 ;;
+esac

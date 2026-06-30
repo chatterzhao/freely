@@ -13860,12 +13860,16 @@ _acp_bridge_health_check() {
   local project="$1" timeout="${2:-5}" socket
   socket="$(_acp_bridge_socket "$project")"
   [[ -S "$socket" ]] || return 1
-  python3 -c "
-import socket, json, sys
+  FREELY_ACP_HEALTH_SOCKET="$socket" FREELY_ACP_HEALTH_TIMEOUT="$timeout" python3 -c "
+import os, socket, json, sys
+sp = os.environ.get('FREELY_ACP_HEALTH_SOCKET', '')
+if not sp:
+    sys.exit(1)
+timeout = float(os.environ.get('FREELY_ACP_HEALTH_TIMEOUT', '5'))
 sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-sock.settimeout($timeout)
+sock.settimeout(timeout)
 try:
-    sock.connect('$socket')
+    sock.connect(sp)
     sock.sendall(json.dumps({'jsonrpc':'2.0','id':9999,'method':'initialize','params':{'protocolVersion':1,'clientCapabilities':{}}}).encode() + b'\n')
     data = sock.recv(4096)
     for line in data.split(b'\n'):
@@ -14032,6 +14036,19 @@ _ensure_acp_bridge_running() {
       fi
     fi
     rm -f "$pid_file" "$socket" "$acp_bin_file" "$acp_tool_file"
+  fi
+
+  # ── Config.toml binary path lookup ──
+  # After resolving the binary name from registry, check if config.toml has
+  # a pre-recorded path (set by freely init). This avoids re-searching PATH
+  # on every daemon start and supports non-PATH install locations.
+  local _config_key; _config_key="FREELY_ACP_$(echo "$base_tool" | tr '[:lower:]' '[:upper:]')_BIN"
+  local _config_path; _config_path="$(get_config "$_config_key" "")"
+  if [[ -n "$_config_path" && -x "$_config_path" ]]; then
+    acp_bin="$_config_path"
+  elif ! command -v "$acp_bin" >/dev/null 2>&1; then
+    log_warn "ACP binary '$acp_bin' not in PATH and not found in config.toml ($_config_key)"
+    log_warn "Run 'freely init' to set up ACP tools, or set $_config_key in .freely/config.toml"
   fi
 
   local bridge_script="$SELF_ROOT/docs/system/workspace/scripts/runtime/acp-bridge.py"
@@ -20070,44 +20087,85 @@ PLATFORM_GATE
   tool_adapter_policy="$(resolve_tool_adapter_policy_for_project_or_global "$project" "$tool" "$tool_adapter_policy_arg" "$tool_adapter_arg")"
   tool_adapter="$(resolve_tool_adapter_for_project_or_global "$project" "$tool" "$tool_adapter_arg" "$tool_adapter_policy")"
 
-  # ACP binary pre-flight check (default adapter is now acp)
-  if [[ "$tool_adapter" == "acp" ]]; then
-    case "$tool" in
-      codex)
-        local codex_acp_bin="${FREELY_CODEX_ACP_BIN:-}"
-        if [[ -z "$codex_acp_bin" ]]; then
-          local _ver="${FREELY_CODEX_ACP_VERSION:-0.15.0}"
-          local _triplet; _triplet="$(uname -s):$(uname -m)"
-          case "$_triplet" in
-            Darwin:arm64) _triplet="aarch64-apple-darwin" ;;
-            Darwin:x86_64) _triplet="x86_64-apple-darwin" ;;
-            Linux:aarch64|Linux:arm64) _triplet="aarch64-unknown-linux-gnu" ;;
-            Linux:x86_64) _triplet="x86_64-unknown-linux-gnu" ;;
-            *) log_error "Unsupported platform for codex-acp: $_triplet"; exit 1 ;;
-          esac
-          codex_acp_bin="$HOME/.cache/freely/acp/codex-acp/$_ver/$_triplet/codex-acp"
-        fi
-        if [[ ! -x "$codex_acp_bin" ]]; then
-          log_error "ACP binary (codex-acp) not found: $codex_acp_bin"
-          log_error "Required for tool: $tool (adapter: acp)"
-          log_error "Install codex-acp or set FREELY_CODEX_ACP_BIN"
-          exit 1
-        fi
-        ;;
-      *)
-        local _acp_bin="${FREELY_CLAUDE_ACP_BIN:-claude-agent-acp}"
-        if ! command -v "$_acp_bin" >/dev/null 2>&1; then
-          log_error "ACP binary not found: $_acp_bin"
-          log_error "Required for tool: $tool (adapter: acp)"
-          log_error "Install claude-agent-acp or set FREELY_CLAUDE_ACP_BIN"
-          exit 1
-        fi
-        ;;
-    esac
+  # ── ACP tool setup: discover/download ACP binaries for all registered tools ──
+  # Reads tool-registry.toml, searches system PATH/cache, prompts for download,
+  # writes binary paths to config.toml for runtime use.
+  _init_acp_tool_setup() {
+    local registry="$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-registry.toml"
+    local registry_query="$SELF_ROOT/docs/system/workspace/scripts/runtime/tool-registry-query.py"
+    local ensure_script="$SELF_ROOT/docs/system/workspace/scripts/runtime/ensure-acp-binary"
+    [[ -f "$registry" ]] || { log_warn "tool-registry.toml not found, skipping ACP tool setup"; return 0; }
 
-    # ACP SDK pre-flight check: agent-client-protocol must be installed.
-    # The ACP adapter uses the official SDK to communicate with AI CLI tools
-    # (claude-agent-acp, codex-acp, opencode). Without it, daemon start will fail.
+    # Discover all tool names from registry
+    local -a _all_tools=()
+    local _t
+    while IFS= read -r _t; do
+      [[ -n "$_t" ]] && _all_tools+=("$_t")
+    done < <(python3 "$registry_query" "$registry" "_list_tools" "" 2>/dev/null || grep '^\[[a-z]' "$registry" 2>/dev/null | sed 's/^\[//;s/\]$//' | grep -v '\.' | sort -u || true)
+
+    [[ ${#_all_tools[@]} -gt 0 ]] || { log_warn "no tools found in registry"; return 0; }
+
+    log_info "ACP tool setup: checking ${#_all_tools[@]} tool(s) from registry..."
+    local _tool _binary _method _url _found_path _config_key
+    for _tool in "${_all_tools[@]}"; do
+      _binary="$("$registry_query" "$registry" "$_tool" "acp.binary" 2>/dev/null || true)"
+      [[ -n "$_binary" ]] || continue  # skip tools without ACP config
+
+      _method="$("$registry_query" "$registry" "$_tool" "acp.install_method" 2>/dev/null || true)"
+      _url="$("$registry_query" "$registry" "$_tool" "acp.download_url" 2>/dev/null || true)"
+
+      # Build config key: FREELY_ACP_CLAUDE_BIN, FREELY_ACP_CODEX_BIN, etc.
+      _config_key="FREELY_ACP_$(echo "$_tool" | tr '[:lower:]' '[:upper:]')_BIN"
+
+      # Search system first
+      _found_path=""
+      if command -v "$_binary" >/dev/null 2>&1; then
+        _found_path="$(command -v "$_binary")"
+      elif [[ -x "$HOME/.cache/freely/acp/$_tool"/*/*/"$_binary" ]] 2>/dev/null; then
+        _found_path="$(ls -1 "$HOME/.cache/freely/acp/$_tool"/*/*/"$_binary" 2>/dev/null | head -1)"
+      fi
+
+      if [[ -n "$_found_path" && -x "$_found_path" ]]; then
+        log_info "  $_tool: found $_binary at $_found_path"
+        set_config "$_config_key" "$_found_path"
+        continue
+      fi
+
+      # Not found — prompt user for download
+      if [[ -z "$_method" || -z "$_url" ]]; then
+        log_warn "  $_tool: $_binary not found, and registry missing install_method/download_url — skipping"
+        continue
+      fi
+
+      # Interactive confirmation
+      if [[ -t 0 ]]; then
+        printf '\n%s\n' "  $_tool: $_binary 未安装。从 $_method 下载？ [y/N]"
+        read -r _confirm
+        case "$_confirm" in
+          [yY]|[yY][eE][sS]) ;;
+          *) log_info "  $_tool: skipped by user"; continue ;;
+        esac
+      fi
+
+      # Download via ensure-acp-binary
+      if [[ -x "$ensure_script" ]]; then
+        _found_path="$("$ensure_script" --tool "$_tool" 2>/dev/null)" || true
+        if [[ -n "$_found_path" && -x "$_found_path" ]]; then
+          log_info "  $_tool: installed to $_found_path"
+          set_config "$_config_key" "$_found_path"
+        else
+          log_warn "  $_tool: download failed, you can retry with: $ensure_script --tool $_tool"
+        fi
+      else
+        log_warn "  $_tool: ensure-acp-binary not found at $ensure_script"
+      fi
+    done
+  }
+
+  # ACP SDK pre-flight check: agent-client-protocol must be installed.
+  # The ACP adapter uses the official SDK to communicate with AI CLI tools
+  # (claude-agent-acp, codex-acp, opencode). Without it, daemon start will fail.
+  if [[ "$tool_adapter" == "acp" ]]; then
     if ! python3 -c "from acp import Agent" 2>/dev/null; then
       cat <<SDK_HELP >&2
 [$(date -u +"%Y-%m-%dT%H:%M:%SZ")] [ERROR] agent-client-protocol SDK not installed
@@ -20130,6 +20188,9 @@ PLATFORM_GATE
 SDK_HELP
       exit 1
     fi
+
+    # Run ACP tool setup (discover/download all registered tools)
+    _init_acp_tool_setup
   fi
 
   tool_capabilities="$(tool_default_capabilities_for_runtime "$tool")"
