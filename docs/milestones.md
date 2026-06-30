@@ -1,4 +1,19 @@
 
+## M-20260630T085809Z-A
+- title: fix: A2A Server 健康检查修复 — socket 检查 + log 抑制 + shell 注入 + 超时
+- status: active
+### candidate_issues
+1. `C-20260630T085809Z-A`
+- milestone: M-20260630T085809Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260630T085809Z-A/issue.md`
+### committed_issues
+1. `I-20260630T085809Z-A`
+- title: fix: A2A Server 健康检查修复; milestone_state: committed
+- issue_path: `docs/issues/I-20260630T085809Z-A/issue.md`
+- phase_state: `done_b2_ibm`
+### completed_issues
+
 ## M-20260629T122254Z-A
 - title: feat: command standardization
 - status: active
