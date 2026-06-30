@@ -859,8 +859,12 @@
   <text x="50" y="16807.0" font-size="13" font-weight="bold" fill="#1a73e8">pr-review-guarded</text>
   <rect id="story-review-fixes" x="55" y="16815.0" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
   <text x="65" y="16830.0" font-size="11" fill="#333">review-fixes</text>
-  <rect id="epic-a2a-state-standard" x="35" y="16876.0" width="700" height="70" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+  <rect id="epic-a2a-state-standard" x="35" y="16876.0" width="700" height="92" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
   <text x="50" y="16900.0" font-size="13" font-weight="bold" fill="#1a73e8">a2a-state-standard</text>
   <rect id="story-state-rename" x="55" y="16908.0" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
+  <rect id="story-cleanup-pending" x="55" y="16945.0" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
+  <text x="65" y="16960.0" font-size="11" fill="#333">cleanup-pending</text>
+  <rect id="story-cleanup-pending" x="55" y="16908" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
+  <text x="65" y="16908" font-size="11" fill="#333">cleanup-pending</text>
   <text x="65" y="16923.0" font-size="11" fill="#333">state-rename</text>
 </svg>
