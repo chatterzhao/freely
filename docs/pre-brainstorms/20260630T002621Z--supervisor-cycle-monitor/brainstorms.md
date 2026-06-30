@@ -1710,7 +1710,7 @@ reviewer_id = "reviewer_worker_01"           # 配对 reviewer
 
 | 维度 | 早期结论 | 最终结论 | 推翻原因 |
 |------|---------|---------|---------|
-| 卡点机制 | ~~Worker 主动 HALT~~ / ~~Prompt 级门控为主~~ | 命令日志 `[CMD]`（100%准确）+ A2A input-required（尽力） | Q18: Agent 可能不做 input-required，但命令一定执行。命令顶部打印标准化日志，Runtime grep 检测 |
+| 卡点机制 | ~~Worker 主动 HALT~~ / ~~Prompt 级门控为主~~ | 命令日志 `[CMD]`（覆盖有命令的 phase：pr-create/wt-create/a2a-exit）+ A2A input-required（尽力覆盖所有 phase） | Q18: 命令一定执行因此日志可靠，但 B1/B2/RED/dev/GREEN 无对应 CLI 命令，无法用 [CMD] 覆盖——这些 phase 依赖 prompt 指令 + reviewer 审核 |
 | 状态名 | ~~blocked~~ | `input-required`（A2A 标准） | Q12: 对标 Google A2A |
 | phase 检测 | ~~文件系统产物检测~~ | Reviewer 语义审核 | Q11: 文件检测不可靠，语义判断需要 Reviewer |
 | 终止态 | ~~只有 completed/failed~~ | + `canceled` | Q12: A2A 标准三个终止态 |
@@ -1787,9 +1787,10 @@ Candidate B: #3638 supervisor-cycle-monitor（本 feature）
   │     └── 异常恢复（crash / timeout / 连续 fail / session leak）
   └── 依赖 Candidate A
 
-前置验证（B 启动前必须完成）：
+前置验证（B 启动前必须完成。BLOCKING：不通过则 B 方案基础动摇）：
   - ACP session/prompt 非自主继续假设验证：手动对 Worker session 发 session/prompt，
-    确认 AI 在 response 后 session 空闲，不自发继续。（基础假设，不验证后面全白做）
+    确认 AI 在 response 后 session 空闲，不自发继续。
+  - 如果验证失败（AI 自发继续）：B 方案需重新设计卡点机制。
 
 Candidate C: agent-table A2A 对齐（后续）
   └── name, version, url, capabilities, supportedSkills
@@ -1997,6 +1998,23 @@ Runtime:    读到 [WATCHDOG] FAILED →
 **类比**：这就是 Freely 自身的门禁（gate）逻辑——不信任 Agent 自述，检查客观证据。`[CMD]` 日志就是 Runtime 的 gate check。
 
 **Manager 也有自己的流程**：feedback → wt-create 是 Manager 的 phase，同样有 `[CMD]` 标记 + input-required 卡点。
+
+### 补充说明（Reviewer 反馈）
+
+**Q1/Q3 设计保持有效**：SessionReader 抽象层（ACP 探针注入 / Codex JSONL / a2a message 兜底）和 InterventionAdapter（nudge/interrupt/finish/get_status per tool）未被推翻，在 B1b 实现时需要。综合收敛未重复列出，但它们仍是有效设计。
+
+**B1b 对 Candidate C 的独立性**：reviewer dispatch 可以始终使用 `session/fork`（不重用已有 session），先不依赖 agent-id.env session_id 逻辑。缓存命中率会降低但不阻塞功能。C 是优化项。
+
+**Phase 1 交付范围**：Manager daemon cycle（B1a）在 Phase 1 内。Watchdog `[CMD]` 日志检测 + PRE_CHECK_MAP 在 Phase 1 内作为兜底层。两者都在 Phase 1。
+
+**[CMD] 日志需改的命令列表**：
+- `pr-create-guarded`、`pr-merge-guarded`、`wt-create`、`wt-close`
+- `a2a-exit`（已有 `--state`）
+- 文件：`bin/pr-create-guarded`、`bin/pr-merge-guarded`、`docs/system/workspace/scripts/worktree/wt-create`、`docs/system/workspace/scripts/worktree/wt-close`、`a2a_task.py` (a2a-exit)
+
+**PRE_CHECK_MAP 与现有 gate 去重**：部分检查项与 governance-merge-gate / pretests-gate 重叠。Watchdog 的 PRE_CHECK_MAP 是**运行时实时检查**（命令执行时触发），gate 是**提交/合并时检查**（commit/merge 时触发）。时机不同、目的不同——不去重，并存。
+
+**Worker prompt 模板位置**：存放在 `docs/system/workspace/agents/worker-agent.md` 中，作为 Worker agent 的标准 prompt 模板。Phase 实现时在此文件中定义逐 phase 指令格式。
 
 ### 已知风险与缓解
 
