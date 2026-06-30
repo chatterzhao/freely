@@ -25287,6 +25287,38 @@ cmd_wt_close() {
   exec bash "$SELF_ROOT/bin/wt-close" "$@"
 }
 
+cmd_pr_review_guarded() {
+  exec bash "$SELF_ROOT/bin/pr-review-guarded" "$@"
+}
+
+cmd_cycle() {
+  exec bash "$SELF_ROOT/bin/freely-cycle" "$@"
+}
+
+cmd_watchdog() {
+  exec bash "$SELF_ROOT/bin/freely-watchdog" "$@"
+}
+
+cmd_deploy_skills() {
+  exec bash "$SELF_ROOT/bin/deploy-skills" "$@"
+}
+
+cmd_governance_check() {
+  exec bash "$SELF_ROOT/bin/governance-check" "$@"
+}
+
+cmd_checkpoint_guard() {
+  exec bash "$SELF_ROOT/bin/checkpoint-guard" "$@"
+}
+
+cmd_pretests_gate() {
+  exec bash "$SELF_ROOT/bin/pretests-gate" "$@"
+}
+
+cmd_pretests_retirement_gate() {
+  exec bash "$SELF_ROOT/bin/pretests-retirement-gate" "$@"
+}
+
 main() {
   local cmd="${1:-}"
   if [[ "$cmd" == "--help" || "$cmd" == "-h" ]]; then
@@ -25351,6 +25383,14 @@ main() {
     pr-create-guarded) cmd_pr_create_guarded "$@" ;;
     pr-merge-guarded) cmd_pr_merge_guarded "$@" ;;
     wt-close) cmd_wt_close "$@" ;;
+    pr-review-guarded) cmd_pr_review_guarded "$@" ;;
+    cycle) cmd_cycle "$@" ;;
+    watchdog) cmd_watchdog "$@" ;;
+    deploy-skills) cmd_deploy_skills "$@" ;;
+    governance-check) cmd_governance_check "$@" ;;
+    checkpoint-guard) cmd_checkpoint_guard "$@" ;;
+    pretests-gate) cmd_pretests_gate "$@" ;;
+    pretests-retirement-gate) cmd_pretests_retirement_gate "$@" ;;
     stop) cmd_stop "$@" ;;
     *) log_error "unknown command: $cmd"; usage; exit 1 ;;
   esac

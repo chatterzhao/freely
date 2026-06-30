@@ -1,4 +1,19 @@
 
+## M-20260629T122254Z-A
+- title: feat: command standardization
+- status: active
+### candidate_issues
+1. `C-20260629T122254Z-A`
+- milestone: M-20260629T122254Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/cmd-standardize/subcommand-add/raw-20260629T122254Z/issues/I-20260629T122254Z-A.md`
+### committed_issues
+1. `I-20260629T122254Z-A`
+- title: feat: command standardization; milestone_state: committed
+- issue_path: `docs/epics/cmd-standardize/subcommand-add/raw-20260629T122254Z/issues/I-20260629T122254Z-A.md`
+- phase_state: `completed`
+### completed_issues
+
 ## M-20260630T002621Z-A
 - title: feat: supervisor cycle Phase 1 — freely cycle + watchdog
 - status: active
