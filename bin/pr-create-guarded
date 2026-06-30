@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
-# [CMD] log: printed at command start for watchdog detection
-echo "[CMD] pr-create-guarded called, raw-key: ${raw_key:-unknown}" >&2
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+# [CMD] log: derive raw_key from current git branch, then print for watchdog detection
+_raw_key=$(git -C "$ROOT_DIR" branch --show-current 2>/dev/null | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)
+echo "[CMD] pr-create-guarded called, raw-key: ${_raw_key:-unknown}" >&2
 exec bash "$ROOT_DIR/docs/system/workspace/scripts/worktree/pr-create-guarded" "$@"
