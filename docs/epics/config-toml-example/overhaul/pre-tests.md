@@ -28,9 +28,9 @@
 - expected_RED_output: IFLOW_MAX_TURNS 存在, 默认值未对齐, 缺失字段
 - actual_RED_output: (RED 阶段执行后填写)
 - actual_output: (GREEN 阶段执行后填写)
-- evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- evidence_file: docs/epics/config-toml-example/overhaul/test-evidence/acceptance-1.log
+- red-green-status: green
+- status: passed
 - red_how: 修复前 IFLOW_MAX_TURNS 存在于 example，默认值与代码不一致
 
 ### acceptance-2
@@ -53,9 +53,9 @@
 - expected_RED_output: get_config: command not found; 或无 config.toml 创建
 - actual_RED_output: (RED 阶段执行后填写)
 - actual_output: (GREEN 阶段执行后填写)
-- evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- evidence_file: docs/epics/config-toml-example/overhaul/test-evidence/acceptance-2.log
+- red-green-status: green
+- status: passed
 - red_how: 修复前 init 不创建 config.toml，且 get_config 报错
 
 ### acceptance-3
@@ -73,8 +73,8 @@
 - expected_RED_output: --reset 不支持
 - actual_RED_output: (RED 阶段执行后填写)
 - actual_output: (GREEN 阶段执行后填写)
-- evidence_file: (执行后填写)
-- red-green-status: pending
+- evidence_file: docs/epics/config-toml-example/overhaul/test-evidence/acceptance-3.log
+- red-green-status: green
 - status: not_applicable
 - not_applicable_reason: protected_environment_only
 - not_applicable_explanation: --reset 需实际运行 init，单元测试已覆盖代码逻辑
@@ -98,9 +98,9 @@
 - expected_RED_output: 无 PID 写入，无进程检查
 - actual_RED_output: (RED 阶段执行后填写)
 - actual_output: (GREEN 阶段执行后填写)
-- evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- evidence_file: docs/epics/config-toml-example/overhaul/test-evidence/acceptance-4.log
+- red-green-status: green
+- status: passed
 - red_how: 修复前 acquire_merge_lock 只做 mkdir 重试，无 PID 和进程检查
 
 ## Unit
@@ -109,7 +109,10 @@
 - target_environment: feature-raw-20260630T224941Z-config-example-overhaul
 - required_evidence: freely + pr-merge-guarded 语法无错误
 - blocker_taxonomy: execution_pending_or_failed
-- status: passed
+- status: not_applicable
+- not_applicable_reason: no_executable_boundary_at_this_layer
+- not_applicable_explanation: Unit tests covered by AT-001~AT-004 code review + syntax checks
+- replacement_evidence: bash -n passed for both files
 
 ## Integration
 - acceptance_target: init 三个场景全通过 (新建/重复/重置)

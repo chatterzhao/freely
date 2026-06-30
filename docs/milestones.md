@@ -10,7 +10,7 @@
 1. `I-20260630T224941Z-A`
 - title: feat: config.toml.example overhaul; milestone_state: committed
 - issue_path: `docs/epics/config-toml-example/overhaul/raw-20260630T224941Z/issues/I-20260630T224941Z-A.md`
-- phase_state: `done_b2_ibm`
+- phase_state: `completed`
 ### completed_issues
 
 ## M-20260630T151209Z-A
