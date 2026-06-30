@@ -57,10 +57,14 @@ Options (按场景选择):
   (no flags)         Standard close.  Requires clean worktree, synced test worktree,
                       passed pretests, completed phase_state.
 
-  ── 丢弃未 merge 的修改 ──
-  --force            放弃此 raw issue，丢弃所有本地修改。
-                      ⚠️ 但凡还要继续推进此 issue，就不能用 --force。
-                      ⚠️ 遇到 gate/pretests 报错应修复根因，不是 --force 绕过。
+  ── 彻底丢弃（不可恢复）──
+  --force            永久丢弃。本地修改 + 远程分支 + 平台 issue 同时删除，无法找回。
+                      ⚠️ --force 只有一个目标: 彻底丢弃。如果不是这个意图，不要用。
+                      ⚠️ 觉得"已经 merge 了可以删" → 用不带 force 的正常 wt-close。
+                         不带 force 报错 → 说明没 merge → STOP，不要继续。
+                      ⚠️ 暂时排不上做、也不会马上 merge → 搁置。工位留在原地，
+                         不占资源。以后随时可以继续。不要为了"清理"用 --force。
+                      ⚠️ 遇到 gate/pretests 报错 → 修复根因，不是 --force。
                       必须配合 --reason。
   --discard-unmerged  确认丢弃未 merge 的提交（需同时 --force）。
                       仅用于：方案已被否决，确认丢弃。
@@ -607,14 +611,19 @@ if [[ "$FORCE" == true ]]; then
       cat >&2 <<UNMERGED_BLOCK
 [wt-close] BLOCKED: '$branch' has unmerged commits that would be lost.
 
-  These commits may contain valuable work. Before force-closing:
+  ⚠️  --force 只有一个目标: 彻底丢弃。如果意图不是丢弃，STOP。
+
+  如果你认为"已经 merge 了，可以删除":
+    → 用不带 --force 的正常 wt-close:  freely wt-close --raw-key <key>
+    → 不带 force 报错 → 说明没有 merge → 回到工位完成 merge → 再 wt-close
+    → 不要用 --force 绕过"未 merge"报错
+
+  如果确定要彻底丢弃这些提交:
   1. Review the unmerged commits listed above
   2. If useful: create a new raw issue to extract and preserve the work
      ./bin/freely chat --new-issue "extract: <what to preserve from $branch>"
   3. Then re-run with --discard-unmerged to confirm:
      ./bin/wt-close --force --discard-unmerged --reason "..." $branch
-
-  Governance: do not discard useful work. Extract first, then clean up.
 UNMERGED_BLOCK
       exit 1
     fi
@@ -818,17 +827,6 @@ fi
 # absorbed_into. wt-close only removes the worktree + branch.
 # Phase 3 above guards against overwriting this with --force.
 
-# ── Phase 3.6: Guard — ensure raw issue exists in develop ──
-# After merge, the raw issue should exist in develop's docs/issues/.
-# If it's only in the worktree (merge was skipped), copy it before deleting.
-if [[ -n "$issue_id" ]] && [[ -f "${PROJECT_WORKTREE_PATH}/docs/issues/${issue_id}/issue.md" ]]; then
-  _dev_issue="$PROJECT_ROOT/docs/issues/${issue_id}/issue.md"
-  if [[ ! -f "$_dev_issue" ]]; then
-    echo "wt-close: raw issue not in develop, copying from worktree"
-    mkdir -p "$(dirname "$_dev_issue")"
-    cp "${PROJECT_WORKTREE_PATH}/docs/issues/${issue_id}/issue.md" "$_dev_issue"
-  fi
-fi
 
 # ── Phase 4: Remote branch delete ──
 
