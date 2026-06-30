@@ -1,4 +1,20 @@
 
+## M-20260630T002621Z-A
+- title: feat: supervisor cycle Phase 1 — freely cycle + watchdog
+- status: active
+### candidate_issues
+1. `C-20260630T002621Z-A`
+- milestone: M-20260630T002621Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
+### committed_issues
+1. `I-20260630T002621Z-A`
+- title: feat: supervisor cycle Phase 1; milestone_state: committed
+- issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
+- phase_state: `completed`
+### completed_issues
+
+
 ## M-20260630T054652Z-A
 - title: fix: cleanup PENDING_INPUT residues
 - status: active
