@@ -1,3 +1,18 @@
+## M-20260630T135725Z-A
+- title: fix: get_config/set_config regression
+- status: active
+### candidate_issues
+1. `C-20260630T135725Z-A`
+- milestone: M-20260630T135725Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260630T135725Z-A/issue.md`
+### committed_issues
+### completed_issues
+1. `I-20260630T135725Z-A`
+- title: fix get_config; milestone_state: committed
+- issue_path: `docs/issues/I-20260630T135725Z-A/issue.md`
+- phase_state: `completed`
+
 ## M-20260630T134353Z-A
 - title: feat: init --auto + config.toml cache
 - status: active

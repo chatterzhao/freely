@@ -2,4 +2,9 @@
 - kind: fix
 - phase_state: completed
 - milestone: M-20260630T135725Z-A
-- title: fix get_config/set_config not found
+- issue_id: I-20260630T135725Z-A
+- kind: fix
+- phase_state: completed
+- milestone: M-20260630T135725Z-A
+- source_candidate: docs/pre-brainstorms/20260630T135725Z--fix-get-config/candidates.md#C-20260630T135725Z-A
+- title: fix get_config/set_config regression
