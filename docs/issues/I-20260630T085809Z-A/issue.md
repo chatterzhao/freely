@@ -1,6 +1,6 @@
 - issue_id: I-20260630T085809Z-A
 - kind: fix
-- phase_state: done_b2_ibm
+- phase_state: completed
 - milestone: M-20260630T085809Z-A
 - source_candidate: docs/pre-brainstorms/20260630T085809Z--a2a-healthcheck-fix/candidates.md#C-20260630T085809Z-A
 - verification_artifact_dir: docs/epics/a2a-healthcheck-fix/socket-healthcheck/code-reviews
