@@ -1,0 +1,5 @@
+- issue_id: I-20260630T135725Z-A
+- kind: fix
+- phase_state: completed
+- milestone: M-20260630T135725Z-A
+- title: fix get_config/set_config not found
