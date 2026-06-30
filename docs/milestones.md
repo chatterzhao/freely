@@ -1,3 +1,18 @@
+## M-20260630T134353Z-A
+- title: feat: init --auto + config.toml cache
+- status: active
+### candidate_issues
+1. `C-20260630T134353Z-A`
+- milestone: M-20260630T134353Z-A
+- status: promoted
+- promoted_issue_path: `docs/issues/I-20260630T134353Z-A/issue.md`
+### committed_issues
+### completed_issues
+1. `I-20260630T134353Z-A`
+- title: init --auto flag; milestone_state: committed
+- issue_path: `docs/issues/I-20260630T134353Z-A/issue.md`
+- phase_state: `completed`
+
 
 ## M-20260630T124528Z-A
 - title: feat: freely init ACP tool setup + tool-registry download config
