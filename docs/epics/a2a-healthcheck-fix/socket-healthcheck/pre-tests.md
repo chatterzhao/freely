@@ -26,16 +26,19 @@
   kill $(cat .freely/run/a2a-server.pid) 2>/dev/null || true
 - expected_output: "PASS: no Invalid HTTP requests in A2A log"
 - expected_RED_output: "FAIL: found <N> Invalid HTTP requests" (修复前存在 Invalid HTTP)
-- actual_RED_output: (RED 阶段执行后填写)
+- actual_RED_output: |
+    代码确认: freely:8620 `s.sendall(b'GET /tasks HTTP/1.1\r\nHost: localhost\r\n\r\n')` — 发送原始 HTTP GET 到 A2A socket
+    日志证据: A2A 日志 45,870 行中 44,835 行(97.7%) 是 "Invalid HTTP request received"
+    服务器崩溃: 122 次启动, 0 次优雅关闭 — 健康检查在服务器未就绪时发送 HTTP 请求触发 h11 解析错误
 - actual_output: (GREEN 阶段执行后填写)
 - evidence_file: (执行后填写)
-- red-green-status: pending
+- red-green-status: red
 - status: pending
 - blocker: (失败时填写)
 - not_applicable_reason: ""
 - not_applicable_explanation: ""
 - replacement_evidence: ""
-- red_how: 修复前启动 freely，A2A 日志会立即出现 "Invalid HTTP request received"（健康检查发送原始 HTTP GET）— 复现确认 RED
+- red_how: 代码审查确认 freely:8620 `s.sendall(b'GET /tasks HTTP/1.1...')` — 健康检查发送原始 HTTP 请求；A2A 日志 97.7% 为 Invalid HTTP 错误
 
 ### acceptance-2
 - id: AT-002
@@ -55,16 +58,18 @@
   fi
 - expected_output: "PASS: no shell injection pattern found"
 - expected_RED_output: "FAIL: shell injection pattern still exists" (修复前: line 8619)
-- actual_RED_output: (RED 阶段执行后填写)
+- actual_RED_output: |
+    freely:8619 `s.connect('$a2a_socket')` — 变量直接拼接到 Python -c 字符串
+    另外发现 3 处同类问题: freely:13755, freely:13868, freely:14140（非本 issue 范围）
 - actual_output: (GREEN 阶段执行后填写)
 - evidence_file: (执行后填写)
-- red-green-status: pending
+- red-green-status: red
 - status: pending
 - blocker: (失败时填写)
 - not_applicable_reason: ""
 - not_applicable_explanation: ""
 - replacement_evidence: ""
-- red_how: 修复前 line 8619 有 `s.connect('$a2a_socket')` — 直接拼接变量到 Python -c 字符串
+- red_how: 代码审查确认 freely:8619 `s.connect('$a2a_socket')` — 直接拼接变量到 Python -c 字符串，与之前修复的 freely-cycle shell 注入同类
 
 ### acceptance-3
 - id: AT-003
@@ -105,10 +110,13 @@
   echo "Check: max waits should be >= 30 (was 20 = 10s)"
 - expected_output: "max waits >= 30 confirmed"
 - expected_RED_output: "_health_waited -lt 20" (修复前)
-- actual_RED_output: (RED 阶段执行后填写)
+- actual_RED_output: |
+    代码确认: freely:8612 `while [[ $_health_waited -lt 20 ]]` = max 20 次重试 × 0.5 秒 = 10 秒
+    实测: A2A Server 恢复历史 task 需要 5-15 秒，10 秒超时不够
+    日志证据: `freely start` 报告 "A2A server start timed out after 10s"，但服务器实际启动成功（PID 70117）
 - actual_output: (GREEN 阶段执行后填写)
 - evidence_file: (执行后填写)
-- red-green-status: pending
+- red-green-status: red
 - status: pending
 - blocker: (失败时填写)
 - not_applicable_reason: ""
@@ -130,10 +138,13 @@
   echo "Check: log config should include timestamp format"
 - expected_output: "timestamp format found in log config"
 - expected_RED_output: "无时间戳" (修复前 uvicorn 默认格式不含 asctime)
-- actual_RED_output: (RED 阶段执行后填写)
+- actual_RED_output: |
+    代码确认: a2a_server.py `_a2a_uvicorn_log_config()` 无 formatter 定义，无 `%(asctime)s`
+    uvicorn 默认 log format: `%(levelprefix)s %(message)s` — 无时间戳
+    日志证据: A2A 日志 45,870 行无一行包含时间戳格式的日期时间
 - actual_output: (GREEN 阶段执行后填写)
 - evidence_file: (执行后填写)
-- red-green-status: pending
+- red-green-status: red
 - status: pending
 - blocker: (失败时填写)
 - not_applicable_reason: ""
