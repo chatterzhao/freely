@@ -11,7 +11,7 @@
 1. `I-20260630T124528Z-A`
 - title: feat: ACP init + registry download; milestone_state: committed
 - issue_path: `docs/epics/acp-tool-setup/init-registry-download/raw-20260630T124528Z/issues/I-20260630T124528Z-A.md`
-- phase_state: `done_b2_ibm`
+- phase_state: `completed`
 ### completed_issues
 
 ## M-20260630T113839Z-A
@@ -58,7 +58,7 @@
 1. `I-20260630T085809Z-A`
 - title: fix: A2A Server 健康检查修复; milestone_state: committed
 - issue_path: `docs/issues/I-20260630T085809Z-A/issue.md`
-- phase_state: `done_b2_ibm`
+- phase_state: `completed`
 ### completed_issues
 
 ## M-20260629T122254Z-A
