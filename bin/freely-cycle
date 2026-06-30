@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+# freely-cycle: Manager cycle — poll a2a_tasks for worker status
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd -P)"
+A2A_TASK="$ROOT_DIR/docs/system/workspace/scripts/runtime/a2a_task.py"
+
+usage() {
+  cat <<'USAGE'
+Usage: freely cycle --raw-key <key> [--json] [--all]
+
+Poll a2a_tasks for worker/reviewer status on the given raw key.
+Manager uses this to detect input-required state and dispatch reviewers.
+
+Options:
+  --raw-key <key>  Raw issue key
+  --json           Output as JSON
+  --all            Scan all raw keys (daemon mode)
+  --help           This help
+USAGE
+}
+
+raw_key=""
+json_out=false
+all_mode=false
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --raw-key) raw_key="$2"; shift 2 ;;
+    --json) json_out=true; shift ;;
+    --all) all_mode=true; shift ;;
+    --help|-h) usage; exit 0 ;;
+    *) echo "Unknown: $1" >&2; usage; exit 1 ;;
+  esac
+done
+
+if [[ "$all_mode" == false && -z "$raw_key" ]]; then
+  echo "Error: --raw-key required (or use --all)" >&2
+  usage
+  exit 1
+fi
+
+# Query a2a_tasks for the given raw key
+poll_task() {
+  local rk="$1"
+  python3 "$A2A_TASK" list --raw-key "$rk" 2>/dev/null | python3 -c "
+import json, sys
+try:
+    data = json.load(sys.stdin)
+    rows = data.get('rows', data if isinstance(data, list) else [])
+except:
+    rows = []
+if not rows:
+    print(json.dumps({'raw_key': '$rk', 'worker_state': 'unknown', 'tasks': 0}))
+    sys.exit(0)
+
+# Find the most recent worker task
+worker_tasks = [r for r in rows if r.get('role') == 'worker' or 'worker' in str(r.get('agent_id',''))]
+if worker_tasks:
+    t = worker_tasks[0]
+    state = t.get('state', 'unknown')
+    msg = t.get('message', '')
+    task_id = t.get('task_id', '')
+    
+    # Parse phase from message
+    phase = 'unknown'
+    if msg:
+        try:
+            msg_json = json.loads(msg) if isinstance(msg, str) else msg
+            phase = msg_json.get('phase', 'unknown')
+        except:
+            phase = 'unknown'
+    
+    # Quality checks
+    quality = {'RED': {'status': 'pass'}, 'GREEN': {'status': 'pass'}}
+    if phase == 'RED' or state == 'input-required':
+        quality['RED'] = {'status': 'warn', 'note': 'RED phase — verify actual_RED_output not placeholder'}
+    if phase == 'GREEN':
+        quality['GREEN'] = {'status': 'warn', 'note': 'GREEN phase — verify evidence_file content'}
+    
+    # Suggested action
+    review_assigned = False
+    if msg and 'review_assigned' in str(msg):
+        review_assigned = True
+    
+    if state == 'input-required' and not review_assigned:
+        suggested = 'dispatch_reviewer'
+    elif state == 'input-required' and review_assigned:
+        suggested = 'continue'  # review already assigned
+    elif state == 'completed':
+        suggested = 'wt_close'
+    elif state == 'working':
+        suggested = 'continue'
+    else:
+        suggested = 'continue'
+    
+    print(json.dumps({
+        'raw_key': '$rk',
+        'worker_state': state,
+        'phase': phase,
+        'task_id': task_id,
+        'quality_checks': quality,
+        'suggested_action': suggested,
+        'review_assigned': review_assigned,
+        'tasks': len(rows)
+    }, indent=2))
+else:
+    print(json.dumps({'raw_key': '$rk', 'worker_state': 'no_worker_task', 'tasks': len(rows)}))
+" 2>/dev/null
+}
+
+if [[ "$all_mode" == true ]]; then
+  # Scan all raw keys from a2a_tasks
+  python3 "$A2A_TASK" list 2>/dev/null | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+rows = data.get('rows', data if isinstance(data, list) else [])
+keys = set()
+for r in rows:
+    rk = r.get('raw_key', '')
+    if rk: keys.add(rk)
+for k in sorted(keys):
+    print(k)
+" | while read -r rk; do
+    poll_task "$rk"
+  done
+else
+  poll_task "$raw_key"
+fi

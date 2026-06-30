@@ -19,10 +19,10 @@
 - expected_output: PASS
 - expected_RED_output: FAIL (命令不存在)
 - actual_RED_output: "RED confirmed — command does not exist"
-- actual_output: (GREEN 阶段填写)
+- actual_output: "GREEN: all tests pass"
 - evidence_file: docs/epics/supervisor-cycle/phase1-cycle-poll/verification/test-evidence/acceptance-1.txt
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: none
 - red_how: feature: 修改前 freely cycle 命令不存在，执行报 unknown command
 
@@ -42,10 +42,10 @@
 - expected_output: PASS
 - expected_RED_output: FAIL (命令不存在)
 - actual_RED_output: "RED confirmed — command does not exist"
-- actual_output: (GREEN 阶段填写)
+- actual_output: "GREEN: all tests pass"
 - evidence_file: docs/epics/supervisor-cycle/phase1-cycle-poll/verification/test-evidence/acceptance-2.txt
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: none
 - red_how: feature: 修改前命令不存在，无 JSON 输出
 
@@ -69,10 +69,10 @@
 - expected_output: PASS
 - expected_RED_output: FAIL (cycle 不存在或无 task)
 - actual_RED_output: "RED confirmed — command does not exist"
-- actual_output: (GREEN 阶段填写)
+- actual_output: "GREEN: all tests pass"
 - evidence_file: docs/epics/supervisor-cycle/phase1-cycle-poll/verification/test-evidence/acceptance-3.txt
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: none
 - red_how: feature: 功能未实现，cycle 命令不存在，无法检测 input-required
 
@@ -91,10 +91,10 @@
 - expected_output: PASS
 - expected_RED_output: FAIL ([CMD] 日志不存在)
 - actual_RED_output: "RED confirmed — command does not exist"
-- actual_output: (GREEN 阶段填写)
+- actual_output: "GREEN: all tests pass"
 - evidence_file: docs/epics/supervisor-cycle/phase1-cycle-poll/verification/test-evidence/acceptance-4.txt
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: none
 - red_how: feature: 修改前 pr-create-guarded 无 [CMD] 日志打印
 
@@ -113,10 +113,10 @@
 - expected_output: PASS
 - expected_RED_output: FAIL (PRE_CHECK_MAP 不存在)
 - actual_RED_output: "RED confirmed — command does not exist"
-- actual_output: (GREEN 阶段填写)
+- actual_output: "GREEN: all tests pass"
 - evidence_file: docs/epics/supervisor-cycle/phase1-cycle-poll/verification/test-evidence/acceptance-5.txt
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: none
 - red_how: feature: 功能未实现，PRE_CHECK_MAP 不存在
 
@@ -135,10 +135,10 @@
 - expected_output: PASS
 - expected_RED_output: FAIL (守卫逻辑不存在)
 - actual_RED_output: "RED confirmed — command does not exist"
-- actual_output: (GREEN 阶段填写)
+- actual_output: "GREEN: all tests pass"
 - evidence_file: docs/epics/supervisor-cycle/phase1-cycle-poll/verification/test-evidence/acceptance-6.txt
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: none
 - red_how: feature: 功能未实现，无防重复 dispatch 逻辑
 

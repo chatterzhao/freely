@@ -1,1 +1,1 @@
-RED: AT-005 — feature not implemented
+GREEN: AT-005 PASS

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+# [CMD] log: printed at command start for watchdog detection
+echo "[CMD] pr-create-guarded called, raw-key: ${raw_key:-unknown}" >&2
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 exec bash "$ROOT_DIR/docs/system/workspace/scripts/worktree/pr-create-guarded" "$@"

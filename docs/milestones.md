@@ -8,6 +8,10 @@
 - status: promoted
 - promoted_issue_path: `docs/epics/a2a-state-standard/cleanup-pending/raw-20260630T054652Z/issues/I-20260630T054652Z-A.md`
 ### committed_issues
+1. `I-20260630T002621Z-A`
+- title: feat: supervisor cycle Phase 1; milestone_state: committed
+- issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
+- phase_state: `completed`
 1. `I-20260630T054652Z-A`
 - title: fix: cleanup PENDING_INPUT residues; milestone_state: committed
 - issue_path: `docs/epics/a2a-state-standard/cleanup-pending/raw-20260630T054652Z/issues/I-20260630T054652Z-A.md`
@@ -23,6 +27,10 @@
 - status: promoted
 - promoted_issue_path: `docs/epics/a2a-state-standard/state-rename/raw-20260630T021946Z/issues/I-20260630T021946Z-A.md`
 ### committed_issues
+1. `I-20260630T002621Z-A`
+- title: feat: supervisor cycle Phase 1; milestone_state: committed
+- issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
+- phase_state: `completed`
 1. `I-20260630T021946Z-A`
 - title: fix: a2a state alignment; milestone_state: committed
 - issue_path: `docs/epics/a2a-state-standard/state-rename/raw-20260630T021946Z/issues/I-20260630T021946Z-A.md`
@@ -38,6 +46,10 @@
 - status: promoted
 - promoted_issue_path: `docs/issues/I-20260629T235653Z-A/issue.md`
 ### committed_issues
+1. `I-20260630T002621Z-A`
+- title: feat: supervisor cycle Phase 1; milestone_state: committed
+- issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
+- phase_state: `completed`
 1. `I-20260629T235653Z-A`
 - title: docs: fix handoff references; milestone_state: committed
 - issue_path: `docs/issues/I-20260629T235653Z-A/issue.md`
@@ -53,6 +65,10 @@
 - status: promoted
 - promoted_issue_path: `docs/epics/pr-review-guarded/review-fixes/raw-20260629T163137Z/issues/I-20260629T163137Z-A.md`
 ### committed_issues
+1. `I-20260630T002621Z-A`
+- title: feat: supervisor cycle Phase 1; milestone_state: committed
+- issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
+- phase_state: `completed`
 1. `I-20260629T163137Z-A`
 - title: fix: pr-review-guarded path + ACP; milestone_state: committed
 - issue_path: `docs/epics/pr-review-guarded/review-fixes/raw-20260629T163137Z/issues/I-20260629T163137Z-A.md`
@@ -68,6 +84,10 @@
 - status: promoted
 - promoted_issue_path: `docs/epics/wt-close-raw-key/args-d-fix/raw-20260629T165403Z/issues/I-20260629T165403Z-A.md`
 ### committed_issues
+1. `I-20260630T002621Z-A`
+- title: feat: supervisor cycle Phase 1; milestone_state: committed
+- issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
+- phase_state: `completed`
 1. `I-20260629T165403Z-A`
 - title: fix: wt-close args unbound + test-pre-merge -D; milestone_state: committed
 - issue_path: `docs/epics/wt-close-raw-key/args-d-fix/raw-20260629T165403Z/issues/I-20260629T165403Z-A.md`
@@ -83,6 +103,10 @@
 - status: promoted
 - promoted_issue_path: `docs/epics/wt-close-raw-key/raw-key-flag/raw-20260629T164530Z/issues/I-20260629T164530Z-A.md`
 ### committed_issues
+1. `I-20260630T002621Z-A`
+- title: feat: supervisor cycle Phase 1; milestone_state: committed
+- issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
+- phase_state: `completed`
 1. `I-20260629T164530Z-A`
 - title: fix: wt-close --raw-key flag; milestone_state: committed
 - issue_path: `docs/epics/wt-close-raw-key/raw-key-flag/raw-20260629T164530Z/issues/I-20260629T164530Z-A.md`
@@ -98,6 +122,10 @@
 - status: promoted
 - promoted_issue_path: `docs/epics/wt-close-raw-key/raw-key-param/raw-20260629T160852Z/issues/I-20260629T160852Z-A.md`
 ### committed_issues
+1. `I-20260630T002621Z-A`
+- title: feat: supervisor cycle Phase 1; milestone_state: committed
+- issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
+- phase_state: `completed`
 1. `I-20260629T160852Z-A`
 - title: fix: wt-close 支持 raw-{key} 参数; milestone_state: committed
 - issue_path: `docs/epics/wt-close-raw-key/raw-key-param/raw-20260629T160852Z/issues/I-20260629T160852Z-A.md`
@@ -113,6 +141,10 @@
 - status: promoted
 - promoted_issue_path: `docs/epics/command-normalize/hook-scripts-bin-to-freely/raw-20260629T132042Z/issues/I-20260629T132042Z-A.md`
 ### committed_issues
+1. `I-20260630T002621Z-A`
+- title: feat: supervisor cycle Phase 1; milestone_state: committed
+- issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
+- phase_state: `completed`
 1. `I-20260629T132042Z-A`
 - title: fix: replace ./bin/ with freely in hook scripts and start-lead-agent; milestone_state: committed
 - issue_path: `docs/epics/command-normalize/hook-scripts-bin-to-freely/raw-20260629T132042Z/issues/I-20260629T132042Z-A.md`
@@ -124,6 +156,10 @@
 - status: active
 ### candidate_issues
 ### committed_issues
+1. `I-20260630T002621Z-A`
+- title: feat: supervisor cycle Phase 1; milestone_state: committed
+- issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
+- phase_state: `completed`
 1. `I-20260629T122647Z-A`
 - title: feat: freely feedback edit; milestone_state: completed
 - issue_path: `docs/epics/feedback-edit/edit-subcommand/raw-20260629T122647Z/issues/I-20260629T122647Z-A.md`
@@ -138,6 +174,10 @@
 - milestone: M-20260629T025659Z-A; status: promoted
 - promoted_issue_id: `docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/issues/I-20260629T025659Z-A.md`
 ### committed_issues
+1. `I-20260630T002621Z-A`
+- title: feat: supervisor cycle Phase 1; milestone_state: committed
+- issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
+- phase_state: `completed`
 1. `I-20260629T025659Z-A`
 - title: unify fix skill governance order — B1→B2→dev→test; milestone_state: completed
 - issue_path: `docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/issues/I-20260629T025659Z-A.md`
@@ -152,6 +192,10 @@
 - milestone: M-20260629T030408Z-A; status: promoted
 - promoted_issue_id: `docs/epics/feat-to-feature/rename-completion/raw-20260629T030408Z/issues/I-20260629T030408Z-A.md`
 ### committed_issues
+1. `I-20260630T002621Z-A`
+- title: feat: supervisor cycle Phase 1; milestone_state: committed
+- issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
+- phase_state: `completed`
 1. `I-20260629T030408Z-A`
 - title: complete feat → feature rename in all active code; milestone_state: completed
 - issue_path: `docs/epics/feat-to-feature/rename-completion/raw-20260629T030408Z/issues/I-20260629T030408Z-A.md`
@@ -166,6 +210,10 @@
 - milestone: M-20260628T005815Z-A; status: promoted
 - promoted_issue_id: `docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/issues/I-20260628T005815Z-A.md`
 ### committed_issues
+1. `I-20260630T002621Z-A`
+- title: feat: supervisor cycle Phase 1; milestone_state: committed
+- issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
+- phase_state: `completed`
 1. `I-20260628T005815Z-A`
 - title: chat refactor — comment + discuss + archive skill; milestone_state: completed
 - issue_path: `docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/issues/I-20260628T005815Z-A.md`
@@ -208,6 +256,10 @@
 - milestone: M-20260510T1339Z-A; status: promoted
 - promoted_issue_id: `docs/issues/I-20260510T1339Z-A/issue.md`
 ### committed_issues
+1. `I-20260630T002621Z-A`
+- title: feat: supervisor cycle Phase 1; milestone_state: committed
+- issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
+- phase_state: `completed`
 1. `I-20260510T1339Z-A`
 - title: wt-create 创建顺序重构; milestone_state: completed
 - issue_path: `docs/issues/I-20260510T1339Z-A/issue.md`
@@ -1124,6 +1176,10 @@
 - milestone: M-20260629T095905Z-A; status: promoted
 - promoted_issue_id: `I-20260629T095905Z-A`
 ### committed_issues
+1. `I-20260630T002621Z-A`
+- title: feat: supervisor cycle Phase 1; milestone_state: committed
+- issue_path: `docs/epics/supervisor-cycle/phase1-cycle-poll/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md`
+- phase_state: `completed`
 1. `I-20260629T095905Z-A`
 - title: optimize workflow skill — stage 0, cd hint, CLAUDE.md chain; milestone_state: completed
 - issue_path: `docs/epics/skill-standardize/description-and-chain-unify/raw-20260629T095905Z/issues/I-20260629T095905Z-A.md`

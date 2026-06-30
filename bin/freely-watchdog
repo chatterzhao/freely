@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+# freely-watchdog: detect [CMD] logs and run PRE_CHECK_MAP
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd -P)"
+LOG_FILE="${FREELY_WATCHDOG_LOG:-/tmp/freely-watchdog.log}"
+
+PRE_CHECK_MAP() {
+  local cmd="$1" raw_key="$2"
+  local wt="$ROOT_DIR/../freely-worktrees"
+  
+  case "$cmd" in
+    pr-create-guarded)
+      # Check B1 artifacts
+      local b1_ok=0 b2_ok=0 red_ok=0 green_ok=0
+      ls "$wt/fix-raw-${raw_key}-"*/docs/pre-brainstorms/${raw_key}--*/brainstorms.md 2>/dev/null && b1_ok=1
+      ls "$wt/fix-raw-${raw_key}-"*/docs/epics/*/*/raw-${raw_key}/verification/pre-tests.md 2>/dev/null && b2_ok=1
+      # RED check: pre-tests items should not be pending
+      local pre_tests=$(ls "$wt/fix-raw-${raw_key}-"*/docs/epics/*/*/raw-${raw_key}/verification/pre-tests.md 2>/dev/null | head -1)
+      if [[ -n "$pre_tests" && -f "$pre_tests" ]]; then
+        grep -q 'red-green-status: red\|red-green-status: green' "$pre_tests" 2>/dev/null && red_ok=1
+        grep -q 'red-green-status: green' "$pre_tests" 2>/dev/null && green_ok=1
+      fi
+      
+      local fails=0
+      [[ $b1_ok -eq 1 ]] || { echo "[WATCHDOG] ✗ B1 not done: brainstorms.md missing"; fails=$((fails+1)); }
+      [[ $b2_ok -eq 1 ]] || { echo "[WATCHDOG] ✗ B2 not done: pre-tests.md missing"; fails=$((fails+1)); }
+      [[ $red_ok -eq 1 ]] || { echo "[WATCHDOG] ✗ RED not executed: red-green-status not red/green"; fails=$((fails+1)); }
+      [[ $green_ok -eq 1 ]] || { echo "[WATCHDOG] ✗ GREEN not passed: red-green-status not green"; fails=$((fails+1)); }
+      
+      if [[ $fails -gt 0 ]]; then
+        echo "[WATCHDOG] $cmd 执行前应满足以下前置条件，但未满足:"
+        [[ $b1_ok -eq 0 ]] && echo "[WATCHDOG]   - B1 未完成: brainstorms.md 缺失"
+        [[ $b2_ok -eq 0 ]] && echo "[WATCHDOG]   - B2 未完成: pre-tests.md 缺失"
+        [[ $red_ok -eq 0 ]] && echo "[WATCHDOG]   - RED 未执行"
+        [[ $green_ok -eq 0 ]] && echo "[WATCHDOG]   - GREEN 未通过"
+        echo "[WATCHDOG] $fails/4 FAILED → 请暂停，等进一步指令。"
+        return 1
+      fi
+      echo "[WATCHDOG] $cmd: all 4 pre-checks passed ✓"
+      ;;
+    *)
+      echo "[WATCHDOG] $cmd: no pre-checks defined"
+      ;;
+  esac
+  return 0
+}
+
+# Main: grep [CMD] from log and run checks
+tail -f "$LOG_FILE" 2>/dev/null | while read -r line; do
+  if echo "$line" | grep -q '\[CMD\]'; then
+    cmd=$(echo "$line" | sed 's/.*\[CMD\] //' | sed 's/ called.*//')
+    raw_key=$(echo "$line" | grep -oE 'raw-key: [^ ]+' | sed 's/raw-key: //')
+    echo "[WATCHDOG] detected: $cmd, raw-key=$raw_key"
+    PRE_CHECK_MAP "$cmd" "$raw_key"
+  fi
+done
