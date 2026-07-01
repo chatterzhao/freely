@@ -131,3 +131,42 @@ agent-table-query --get-reviewer worker_01 → 返回 reviewer_worker_01 + slot 
 - status: needs_research
 - next_action: 本 candidate 为 Phase 1 预研结论。后续可拆为多个子 candidate 逐 phase 推进
 - revisit_trigger: Phase 1 实现后评估 Phase 2 复杂度
+
+## B1 审查结论 (2026-07-01)
+
+### 组件分析准确性 — 全部通过 ✅
+7 个组件的分析均与代码实际行为一致。A2A SSE、freely-cycle、agent-table 等基础设施确实已就位。
+
+### 缺口分析准确性 — 6 个缺口确认 ✅
+A-F 全部确认。核心缺口 A（reviewer 不独立）是所有后续缺口的前提。
+
+### 审查中发现的补充点
+
+**补充 1: Reviewer slot 应独立于 worker slot**
+当前 reviewer_worker_01 和 worker_01 共用同一个 slot（均为 claude-apikey-ds-pro-auto）。
+本轮观察发现 agent-table slot 会被 auto-switch 自动切换（claude→opencode）。
+如果 reviewer 和 worker 共用 slot，两者会互相抢占、同时被限流。
+→ Phase 1 应确保 reviewer 使用独立 slot（如 `reviewer-apikey-*` 或至少不同工具）。
+
+**补充 2: Reviewer 运行在哪个 worktree？**
+Manager 在 develop，Worker 在 fix/feature worktree。Reviewer 应该：
+- 方案 A：复用 Manager 的 develop worktree（共享 ACP session，零额外开销）
+- 方案 B：独立 reviewer worktree（隔离，但增加复杂度）
+→ 建议 Phase 1 先用方案 A（复用 develop），Phase 2 再评估是否需独立。
+
+**补充 3: Reviewer guidance 的回写机制**
+Reviewer 产出审查结论后，通过什么渠道回传给 worker？
+- A2A task message 字段（已有）
+- 写入 pre-tests.md / code-reviews/ 文件（已有 pattern）
+- SSE 推送状态变更 → runtime 路由 → worker 收到 continuation
+→ Phase 1 需明确选择，建议先复用 A2A task message 字段。
+
+**补充 4: `[reviewer]` 加入 next_action 路由**
+当前 runtime next_action 只识别 `[manager]` 和 `[worker]` 前缀。
+→ Phase 1 需增加 `[reviewer]` 路由支持。
+
+### open_questions 补充
+- Reviewer 审查结论格式：结构化 JSON 还是自然语言 guidance？
+- 每步 reviewer 介入是否会导致流程过慢？（B1→B2 每步都要等 reviewer）
+  - 建议：关键步骤（B1/B2/pr-*）必审，其他步骤（RED/dev/test）可选审
+- Reviewer slot 是否应该用更便宜的 model（节省 token 成本）？

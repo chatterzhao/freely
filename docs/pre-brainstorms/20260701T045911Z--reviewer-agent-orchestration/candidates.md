@@ -21,9 +21,16 @@ milestone: M-20260701T045911Z-A
   - Phase 4: Worker pool N>1 并发
 - promotion_gate: Phase 1 reviewer 能接收 A2A task 并产出审查结论
 - open_questions:
-  - Reviewer 用什么 AI model？（和 worker 同 tool？独立 tool？）
-  - Reviewer 审查结论格式？
-  - 每步都要 reviewer 还是关键步骤（B1/B2/pr-*）？
+  - Reviewer slot 是否独立于 worker？（建议独立，避免 rate-limit 竞争）
+  - Reviewer 运行在 develop worktree（复用 Manager）还是独立 worktree？
+  - Reviewer guidance 回写机制：A2A message / 文件 / SSE？
+  - 审查结论格式：结构化 JSON 还是自然语言？
+  - 每步介入还是关键步骤（B1/B2/pr-*）？
+  - 是否需要 `[reviewer]` next_action 路由？
+- review_conclusion: |
+    B1 审查通过。7 组件分析准确，6 缺口确认，4 补充点已加入 brainstorms。
+    Phase 1 scope 明确：ensure_reviewer() + A2A reviewer role + [reviewer]路由。
+    建议拆 C-20260701T045911Z-A 为子 candidate 逐 Phase 推进。
 - promoted_issue_id: (待拆分为子 candidate)
 - milestone: M-20260701T045911Z-A
 - session_refs: []
