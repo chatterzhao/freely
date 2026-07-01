@@ -12,6 +12,7 @@ from typing import Optional
 # Add project root for imports
 PROJECT_ROOT = os.environ.get("PROJECT_ROOT", os.getcwd())
 sys.path.insert(0, os.path.join(PROJECT_ROOT, "docs", "system", "workspace", "scripts", "runtime"))
+sys.path.insert(0, os.path.join(PROJECT_ROOT, "docs", "system", "workspace", "agents"))
 
 from agent_working import (
     agent_list_by_raw_key, agent_next_free, agent_assign, agent_get_session
@@ -103,7 +104,12 @@ def _handle_needs_reviewer(project: str, metadata: dict, reason: InputRequiredRe
         return
 
     print(f"[watchdog] creating reviewer {reviewer_id} for {raw_key} (requested by {from_agent})", file=sys.stderr)
-    # Runtime will call _ensure_reviewer_agent with this reviewer_id
+    # Record in agent_working table
+    try:
+        agent_assign(project, raw_key, "reviewer", reviewer_id)
+        print(f"[watchdog] reviewer {reviewer_id} assigned to {raw_key}", file=sys.stderr)
+    except Exception as e:
+        print(f"[watchdog] failed to assign reviewer: {e}", file=sys.stderr)
 
 
 def _handle_needs_manager(project: str, metadata: dict, reason: InputRequiredReason):
@@ -114,6 +120,13 @@ def _handle_needs_manager(project: str, metadata: dict, reason: InputRequiredRea
 
 
 def _handle_needs_worker(project: str, metadata: dict, reason: InputRequiredReason):
-    """Reviewer/Manager needs worker retry/task."""
+    """Reviewer/Manager needs worker retry/task. Resume or notify worker."""
     raw_key = metadata.get("raw_key", "")
-    print(f"[watchdog] routing to worker for {raw_key}: {reason.value}", file=sys.stderr)
+    from_agent = metadata.get("from_agent", "")
+    print(f"[watchdog] routing to worker for {raw_key}: {reason.value} (from {from_agent})", file=sys.stderr)
+    # Resume worker ACP session if exists
+    session = agent_get_session(project, raw_key, "worker")
+    if session:
+        print(f"[watchdog] worker session {session} found for {raw_key}, routing guidance", file=sys.stderr)
+    else:
+        print(f"[watchdog] no worker session for {raw_key}, delegating to manager", file=sys.stderr)

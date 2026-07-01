@@ -1297,6 +1297,136 @@ def h_a2a_task_get_launched_pids(daemon: DbDaemon, params: dict) -> dict:
 
 # delivery_status RPC handlers removed — SSE replaces polling-based delivery
 
+# ── agent_working.* handlers ──────────────────────────────────────────
+
+@_h("agent_working.upsert")
+def h_aw_upsert(daemon: DbDaemon, params: dict) -> dict:
+    """agent_assign: INSERT or UPDATE agent_working row."""
+    raw_key = params["raw_key"]
+    col = params["col"]; val = params["val"]
+    c = daemon.conn
+    row = c.execute("SELECT * FROM agent_working WHERE raw_key = ?", (raw_key,)).fetchone()
+    if row:
+        c.execute(f"UPDATE agent_working SET {col}=?, updated_at=datetime('now') WHERE raw_key=?",
+                  (val, raw_key))
+    else:
+        c.execute(
+            "INSERT INTO agent_working (raw_key, worktree, branch, test_worktree, test_branch, {col}) "
+            "VALUES (?,?,?,?,?,?)".format(col=col),
+            (raw_key, params.get("worktree",""), params.get("branch",""),
+             params.get("test_worktree",""), params.get("test_branch",""), val))
+    daemon.conn.commit()
+    return {"status": "ok"}
+
+
+@_h("agent_working.release")
+def h_aw_release(daemon: DbDaemon, params: dict) -> dict:
+    """agent_release: strip session from agent_id column."""
+    raw_key = params["raw_key"]; role = params.get("role",""); col = f"{role}_id"
+    agent_id = params.get("agent_id","")
+    c = daemon.conn
+    row = c.execute(f"SELECT {col} FROM agent_working WHERE raw_key = ?", (raw_key,)).fetchone()
+    if not row: return {"status": "not_found"}
+    current = row[col] or ""
+    if role == "reviewer" and agent_id:
+        pairs = dict(p.split(":",1) for p in current.split(",") if ":" in p) if current else {}
+        pairs.pop(agent_id, None)
+        new_val = ",".join(f"{k}:{v}" for k,v in pairs.items()) if pairs else None
+    else:
+        new_val = current.split(":",1)[0] if ":" in current else None
+    c.execute(f"UPDATE agent_working SET {col}=?, updated_at=datetime('now') WHERE raw_key=?",
+              (new_val, raw_key))
+    daemon.conn.commit()
+    return {"status": "ok"}
+
+
+@_h("agent_working.delete")
+def h_aw_delete(daemon: DbDaemon, params: dict) -> dict:
+    """agent_release_all: delete row by raw_key."""
+    daemon.conn.execute("DELETE FROM agent_working WHERE raw_key = ?", (params["raw_key"],))
+    daemon.conn.commit()
+    return {"status": "ok"}
+
+
+@_h("agent_working.get_session")
+def h_aw_get_session(daemon: DbDaemon, params: dict) -> dict:
+    """agent_get_session: return session_id for agent."""
+    raw_key = params["raw_key"]; role = params.get("role",""); col = f"{role}_id"
+    agent_id = params.get("agent_id","")
+    row = daemon.conn.execute(f"SELECT {col} FROM agent_working WHERE raw_key = ?", (raw_key,)).fetchone()
+    if not row or not row[col]: return {"session_id": None}
+    if role == "reviewer" and agent_id:
+        pairs = dict(p.split(":",1) for p in row[col].split(",") if ":" in p) if row[col] else {}
+        return {"session_id": pairs.get(agent_id)}
+    return {"session_id": row[col].split(":",1)[1] if ":" in (row[col] or "") else None}
+
+
+@_h("agent_working.next_free")
+def h_aw_next_free(daemon: DbDaemon, params: dict) -> dict:
+    """agent_next_free: compute next free agent NN from pool."""
+    role = params["role"]; pool_size = int(params.get("pool_size","10"))
+    col = f"{role}_id"; prefix = f"{role}_"
+    rows = daemon.conn.execute(f"SELECT {col} FROM agent_working WHERE {col} IS NOT NULL").fetchall()
+    occupied = set()
+    for r in rows:
+        val = r[col] or ""
+        if role == "reviewer":
+            if val:
+                for p in val.split(","):
+                    if ":" in p: occupied.add(p.split(":",1)[0])
+        else:
+            agent_part = val.split(":",1)[0] if ":" in val else val
+            if agent_part: occupied.add(agent_part)
+    all_ids = {f"{prefix}{i:02d}" for i in range(1, pool_size + 1)}
+    free = sorted(all_ids - occupied)
+    return {"agent_id": free[0] if free else None, "free_list": free}
+
+
+@_h("agent_working.get")
+def h_aw_get(daemon: DbDaemon, params: dict) -> dict:
+    """agent_list_by_raw_key: return full row as dict."""
+    row = daemon.conn.execute("SELECT * FROM agent_working WHERE raw_key = ?", (params["raw_key"],)).fetchone()
+    if not row: return {"row": {}}
+    cols = [d[0] for d in daemon.conn.execute("PRAGMA table_info(agent_working)").fetchall()]
+    return {"row": dict(zip(cols, row))}
+
+
+@_h("agent_working.cleanup_stale")
+def h_aw_cleanup_stale(daemon: DbDaemon, params: dict) -> dict:
+    """agent_cleanup_stale: remove rows for missing worktrees."""
+    import os as _os
+    max_age = int(params.get("max_age_hours","24"))
+    rows = daemon.conn.execute("SELECT raw_key, worktree, test_worktree FROM agent_working").fetchall()
+    cleaned = 0
+    for r in rows:
+        if r["worktree"] and not _os.path.exists(r["worktree"]):
+            daemon.conn.execute("DELETE FROM agent_working WHERE raw_key = ?", (r["raw_key"],))
+            cleaned += 1
+        elif r["test_worktree"] and not _os.path.exists(r["test_worktree"]):
+            daemon.conn.execute("UPDATE agent_working SET test_worktree=NULL, test_branch=NULL WHERE raw_key=?",
+                               (r["raw_key"],))
+            cleaned += 1
+    daemon.conn.commit()
+    return {"cleaned": cleaned}
+
+
+@_h("agent_working.stats")
+def h_aw_stats(daemon: DbDaemon, params: dict) -> dict:
+    """agent_stats: occupancy per role."""
+    result = {}
+    for role, pool in [("manager",1),("worker",10),("reviewer",99)]:
+        col = f"{role}_id"
+        rows = daemon.conn.execute(f"SELECT {col} FROM agent_working WHERE {col} IS NOT NULL").fetchall()
+        occupied = 0
+        for r in rows:
+            val = r[col] or ""
+            if role == "reviewer" and val:
+                occupied += len([p for p in val.split(",") if ":" in p])
+            elif val:
+                occupied += 1
+        result[role] = {"occupied": occupied, "pool": pool, "free": pool - occupied}
+    return result
+
 # ── CLI ───────────────────────────────────────────────────────────────────
 
 def cmd_start(args) -> int:
