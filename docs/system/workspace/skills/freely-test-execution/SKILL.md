@@ -2,13 +2,13 @@
 name: freely-test-execution
 description: >-
   TDD GREEN 阶段。在 test-pre-merge-* 测试工位逐条执行 pre-tests.md，
-  先 `git cherry-pick` 同步全部 dev 提交，再跑全量测试。全部 GREEN
+  先 merge（首选）或 `git cherry-pick` 同步全部 dev 提交，再跑全量测试。全部 GREEN
   才放行到 `freely pr-create-guarded` 命令。硬拦截：工位落后、未执行、
   无证据、有 failed 或 ghost pass。
 
   Use when: `freely-dev-loop-execution` skill 实现完成之后，提 PR 之前。
   触发词："GREEN"、"跑测试"、"验证"、"test"、"测试工位"、"全部通过"、
-  "cherry-pick 测试"。
+  "merge 同步"、 "cherry-pick 测试"。
 ---
 
 # skill:freely-test-execution
@@ -40,9 +40,9 @@ test skill 位于 dev-loop 和 pr-create 之间。它是最后一道自动化验
 
 ## 三条铁律
 
-1. **test 工位必须包含全部最新修改** — 跑测试之前，先确认 dev 工位的提交已全部 cherry-pick 到 test 工位。测试工位落后于开发工位 = 测试结果无意义。
+1. **test 工位必须包含全部最新修改** — 跑测试之前，先确认 dev 工位的提交已全部 merge（首选）或 cherry-pick 到 test 工位。测试工位落后于开发工位 = 测试结果无意义。
 2. **逐条执行，逐条写回** — 不批量改 status，不跳过。每条 acceptance item 都要有真实的 test_command 执行记录。
-3. **全绿才过** — 有一条 failed 就不能进 PR。回 dev-loop 修，修完 cherry-pick 同步，重新跑全量测试。
+3. **全绿才过** — 有一条 failed 就不能进 PR。回 dev-loop 修，修完 merge（首选）或 cherry-pick 同步，重新跑全量测试。
 
 ## 执行步骤
 
@@ -52,8 +52,8 @@ test skill 位于 dev-loop 和 pr-create 之间。它是最后一道自动化验
 2. 同步最新代码: 确保 test 工位包含全部 dev 修改
    - 检查 dev 工位是否有 test 工位没有的提交:
      git -C <dev_wt> log --oneline <test_branch>..<dev_branch>
-   - 如果有 → cherry-pick 到 test 工位
-   - 如果 dev 有未提交的修改 → 提示先到 dev 工位提交
+   - 如果有 → merge（首选）或 cherry-pick 到 test 工位
+   - 如果 dev 有未提交的修改 → 直接 cp 到 test（不想提交时）或先到 dev 工位提交再 merge
    - 原则: test 工位落后于 dev 工位 = 测的不是最终代码 = 测试作废
 
 3. 按 pre-tests.md 逐条执行 test_command
@@ -67,7 +67,7 @@ test skill 位于 dev-loop 和 pr-create 之间。它是最后一道自动化验
 
 5. 全部 green → 进入 pr-create-guarded
    有任何不 green → 回 skill:freely-dev-loop-execution 修复
-     → 修复后提交 → cherry-pick 到 test 工位 → 重新跑全量测试
+     → 修复后提交 → merge（首选）或 cherry-pick 到 test 工位 → 重新跑全量测试
 
 6. 清理测试运行环境
 ```
@@ -85,8 +85,9 @@ _missing=$(git -C "$_dev_wt" log --oneline HEAD.. 2>/dev/null || true)
 if [[ -n "$_missing" ]]; then
   echo "测试工位落后于开发工位，以下提交未同步:"
   echo "$_missing"
-  echo "请先 cherry-pick 到测试工位:"
-  echo "  git cherry-pick <commit-hash>..."
+  echo "请先 merge（首选）或 cherry-pick 到测试工位:"
+  echo "  git merge <dev_branch>          # 首选
+  git cherry-pick <commit-hash>...  # 备选"
   exit 1
 fi
 ```
@@ -113,7 +114,7 @@ fi
 | 检查 | 类型 | 说明 |
 |------|------|------|
 | 不在 test-* 测试工位 | **硬拦截** | 提示 cd 到 test 工位 |
-| test 工位落后于 dev 工位 | **硬拦截** | cherry-pick 同步后再跑 |
+| test 工位落后于 dev 工位 | **硬拦截** | merge（首选）或 cherry-pick 同步后再跑 |
 | pre-tests.md 不存在 | **硬拦截** | B2 阶段未完成，回 `freely-doc-B2_IBM-execution` skill |
 | test_command 为占位符 | **硬拦截** | 测试用例是假的，回 `freely-doc-B2_IBM-execution` skill 重新设计 |
 | 全部 acceptance 都是 not_applicable | **硬拦截** | 糊弄测试，回 `freely-doc-B2_IBM-execution` skill 重新设计 |
@@ -138,7 +139,7 @@ fi
 
 ```
 全绿 → freely pr-create-guarded
-有红 → 回 skill:freely-dev-loop-execution 修复 → cherry-pick 同步 → 重新 test
+有红 → 回 skill:freely-dev-loop-execution 修复 → merge（首选）或 cherry-pick 同步 → 重新 test
 ```
 
 ## 不负责
@@ -154,5 +155,5 @@ fi
 RED(全红确认) → dev(实现代码) → test-GREEN(本 skill, test-* 测试工位 GREEN 验证)
                                       │
                               全绿 → pr-create
-                              不绿 → 回 dev-loop → 修 → cherry-pick → 重跑 test
+                              不绿 → 回 dev-loop → 修 → merge（首选）或 cherry-pick → 重跑 test
 ```

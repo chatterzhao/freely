@@ -215,9 +215,9 @@ candidate 的验收条件必须能从 brainstorms 的 Decision 推导出来。pr
 ```
 1. 加载 skill:freely-test-execution
    → 在与开发工位 raw key 相同的 test-* 测试工位执行
-   → 先 git cherry-pick 同步全部 dev 提交到测试工位，再跑全量测试
+   → 先 merge（首选）或 git cherry-pick 同步全部 dev 提交到测试工位，再跑全量测试
    → 全部 green → in_verification → 进入阶段 6
-   → 不 green → 回阶段 4 用 `freely-dev-loop-execution` skill 修复 → 重新 cherry-pick 同步 → 重跑
+   → 不 green → 回阶段 4 用 `freely-dev-loop-execution` skill 修复 → 重新 merge（首选）或 cherry-pick 同步 → 重跑
 ```
 
 GREEN 判定标准和详细步骤见 `skill:freely-test-execution`。
@@ -265,7 +265,7 @@ GREEN 判定标准和详细步骤见 `skill:freely-test-execution`。
 
 - **流程顺序不可变**。`freely-doc-B1_IBM-execution` → `freely-doc-B2_IBM-execution` → `freely-test-RED-execution` → `freely-dev-loop-execution` → `freely-test-execution` → `freely pr-create-guarded`，fix 和 feature 一致。
 - **不发明新分支名**。只用 `fix/*`、`feature/*`、`hotfix/*`、`test-pre-merge-*`。
-- **test-pre-merge-* 工位是纯验证沙箱**，禁止在上面直接开发。代码在开发工位（fix/* 或 feature/*）写，用 `git cherry-pick` 同步到测试工位验证。
+- **test-pre-merge-* 工位是纯验证沙箱**，禁止在上面直接开发（禁止手动 add+commit 原创）。代码在开发工位（fix/* 或 feature/*）写，用 merge（首选）或 `git cherry-pick` 同步到测试工位验证。
 - **`freely-doc-B1_IBM-execution` skill 必须有根因分析**，不修表面症状。
 - **`freely-doc-B2_IBM-execution` skill 必须有 pre-tests**，覆盖全部改动面的测试方案，端到端优先。
 - **`freely-test-RED-execution` skill 不可跳过**。不通过 RED 不允许写实现代码。

@@ -14049,7 +14049,7 @@ _ensure_acp_bridge_running() {
   # a pre-recorded path (set by freely init). This avoids re-searching PATH
   # on every daemon start and supports non-PATH install locations.
   local _config_key; _config_key="FREELY_ACP_$(echo "$base_tool" | tr '[:lower:]' '[:upper:]')_BIN"
-  local _config_path; _config_path="$(get_config "$_config_key" "")"
+  local _config_path; _config_path="${!_config_key:-}"
   if [[ -n "$_config_path" && -x "$_config_path" ]]; then
     acp_bin="$_config_path"
   elif ! command -v "$acp_bin" >/dev/null 2>&1; then

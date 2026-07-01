@@ -49,7 +49,7 @@
 判定规则：
 1. 分支来源、merge 方向、保护分支策略符合宪法分支表。
 2. `feature/*` 默认从 `develop` 创建并在 worktree 内开发；若 issue 明确依赖未合并父分支改动，可从父 `feature/*` 派生 dedicated worktree，但必须记录依赖关系与最终集成目标。
-3. `main/develop/test-pre-merge-*` 保持 add/commit 禁止；`test-pre-merge-*` 还必须禁止 push。
+3. `main/develop` 保持 add/commit 禁止（仅接受 merge）。`test-pre-merge-*` 允许 merge、cherry-pick（commit 内容来自 dev），允许直接修改文件（未提交、快速验证），禁止手动 `git add` + `git commit` 原创提交，且禁止 push。
 4. `develop` 合并前，`TEST`（含集成验收）通过；`develop` 的正常合法来源是已通过 guarded PR/merge 的来源 `feature/*` / `fix/*` 与符合热修复规则的 `hotfix/*`。若经过 `test-pre-merge-*` 验证，当前批次必须可追溯到 single-feature lane 或 explicit multi-bundle 的来源 feature、source shas、merge order 与 base develop sha，但 `test-pre-merge-*` 本身不得作为 develop merge source。
 4b. `test-pre-merge-*` 只承担主线前的临时验证职责，不承担“在 `develop` 上先预测试”的替代语义；需要主线前验证时，应进入新的 `test-pre-merge-*` 批次，需要主线后真实环境验收时，才进入 `develop` 的 completion verification。
 4d. `develop` 在本地 merge 后允许存在短暂的 post-merge acceptance / cleanup followthrough 窗口；但若本地 `develop` 已领先其 tracked remote，这段窗口必须以显式的 status / patrol truth 暴露，不得静默假装已经完成远端 canonical followthrough。

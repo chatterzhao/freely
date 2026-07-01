@@ -202,7 +202,7 @@ freely_wt_resolve_target_path() {
 # ── Dev↔Test consistency gate ─────────────────────────────
 # Called by pr-create-guarded, pr-review-guarded, pr-merge-guarded, wt-close.
 # Checks that the dev worktree and its paired test worktree have identical commits.
-# If not → blocks with cherry-pick + re-run test-GREEN guidance.
+# If not → blocks with merge/cherry-pick + re-run test-GREEN guidance.
 #
 # Usage: freely_wt_assert_dev_test_consistent <raw_key>
 #   raw_key: timestamp portion of the raw key (e.g. 20260629T025659Z)
@@ -255,8 +255,10 @@ freely_wt_assert_dev_test_consistent() {
 ║  以下提交在测试工位但不在开发工位:                              ║
 ║  $_missing
 ║                                                              ║
-║  请用 cherry-pick 同步（两边都能互相 cherry-pick）:             ║
+║  请用 merge（首选）或 cherry-pick 同步:                        ║
 ║    cd $_dev_wt
+║    git merge $_dev_branch                                     ║
+║    # 或 cherry-pick 特定 commit:                               ║
 ║    git cherry-pick \$(git -C $_test_wt log --format=%H --no-merges $_dev_branch..HEAD)
 ║                                                              ║
 ║  同步后必须重跑 test-GREEN（skill:freely-test-execution）。     ║
@@ -282,8 +284,10 @@ FREELY_CONSISTENCY_ERR
 ║  以下提交在开发工位但不在测试工位:                              ║
 ║  $_missing
 ║                                                              ║
-║  请用 cherry-pick 同步（两边都能互相 cherry-pick）:             ║
+║  请用 merge（首选）或 cherry-pick 同步:                        ║
 ║    cd $_test_wt
+║    git merge $_dev_branch                                     ║
+║    # 或 cherry-pick 特定 commit:                               ║
 ║    git cherry-pick \$(git -C $_dev_wt log --format=%H --no-merges HEAD..$_dev_branch)
 ║                                                              ║
 ║  同步后必须在测试工位重跑 test-GREEN（skill:freely-test-execution）。

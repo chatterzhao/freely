@@ -8,8 +8,11 @@ zero_oid='0000000000000000000000000000000000000000'
 
 protected_branch_ref() {
   local refname="$1"
+  # test-pre-merge is NOT a ref-update-protected branch.
+  # It is a discardable testing sandbox — merges INTO it and commits ON it are allowed.
+  # Only main and develop are protected from direct ref updates.
   case "$refname" in
-    refs/heads/main|refs/heads/develop|refs/heads/test-pre-merge-*) return 0 ;;
+    refs/heads/main|refs/heads/develop) return 0 ;;
   esac
   return 1
 }

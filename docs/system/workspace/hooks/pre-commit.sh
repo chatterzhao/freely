@@ -198,27 +198,18 @@ run_guarded_merge_followthrough_hook() {
 }
 
 if freely_wt_is_test_pre_merge_branch "$branch"; then
+  # test-pre-merge is a discardable testing sandbox — merge and cherry-pick
+  # commits from dev are allowed. Convention: no manual git add+commit on test;
+  # all commits should originate from the dev worktree (via merge or cherry-pick).
+  # Only block: pr-merge-guarded complete path (develop merge with receipt injection).
   if git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1; then
     if [[ "${FREELY_GUARDED_MERGE_COMPLETION:-0}" == "1" ]]; then
       require_valid_guarded_completion_state
       exit 0
     fi
-    cat <<MSG
-[HOOK] Commit blocked: raw merge completion on '$branch' is forbidden.
-Use the guarded completion path instead:
-
-  freely pr-merge-guarded complete "$branch" <source-branch>
-
-MSG
+    # Normal merges from fix/feature for testing: allowed
   fi
-  cat <<MSG
-[HOOK] Commit blocked: direct development on '$branch' is forbidden.
-Test pre-merge batches are ephemeral verification surfaces.
-- merge fix|feature branches into this batch for testing
-- fix failures back in the source feature worktree
-- delete the batch when testing ends
-
-MSG
+  # Commits from cherry-pick: allowed (content originates from dev, not test)
 fi
 
 case "$branch" in
