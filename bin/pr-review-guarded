@@ -503,7 +503,7 @@ _platform_remote_name() {
 elif [[ "$_review_verdict" == "manual_required" ]]; then
   echo "📋 人工审查 — ACP bridge 不可用，需按 skill:freely-tdd-review 手动审查"
   echo ""
-  echo "  审查指南: $_review_guide"
+  echo "  审查指南: skill:freely-tdd-review"
   echo "  审查结论写入: $review_file"
   echo ""
   echo "  审查步骤:"
