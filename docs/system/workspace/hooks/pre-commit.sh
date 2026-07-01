@@ -198,7 +198,9 @@ run_guarded_merge_followthrough_hook() {
 }
 
 if freely_wt_is_test_pre_merge_branch "$branch"; then
-  # test-pre-merge is a discardable testing sandbox — commits and merges INTO it are allowed.
+  # test-pre-merge is a discardable testing sandbox — merge and cherry-pick
+  # commits from dev are allowed. Convention: no manual git add+commit on test;
+  # all commits should originate from the dev worktree (via merge or cherry-pick).
   # Only block: pr-merge-guarded complete path (develop merge with receipt injection).
   if git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1; then
     if [[ "${FREELY_GUARDED_MERGE_COMPLETION:-0}" == "1" ]]; then
@@ -207,7 +209,7 @@ if freely_wt_is_test_pre_merge_branch "$branch"; then
     fi
     # Normal merges from fix/feature for testing: allowed
   fi
-  # Direct commits for test evidence: allowed
+  # Commits from cherry-pick: allowed (content originates from dev, not test)
 fi
 
 case "$branch" in

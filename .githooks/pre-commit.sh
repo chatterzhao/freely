@@ -207,7 +207,7 @@ if freely_wt_is_test_pre_merge_branch "$branch"; then
     fi
     # Normal merges from fix/feature for testing: allowed
   fi
-  # Direct commits for test evidence: allowed
+  # Commits from cherry-pick: allowed (content originates from dev, not test)
 fi
 
 case "$branch" in
