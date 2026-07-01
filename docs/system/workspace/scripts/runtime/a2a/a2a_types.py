@@ -370,7 +370,24 @@ class Task:
 
 # ── Helpers ──────────────────────────────────────────────────────────────
 
-FREELY_SKILLS = [
+def load_role_skills(project: str, role: str = "worker"):
+    """Load skills from roles.toml. Falls back to hardcoded list if file missing."""
+    import tomllib
+    roles_path = f"{project}/docs/system/workspace/agents/roles.toml"
+    try:
+        with open(roles_path, "rb") as f:
+            data = tomllib.load(f)
+        role_data = data.get(role, {})
+        return [
+            AgentSkill(id=sid, name=sid.replace("freely-", "").replace("-", " ").title(), tags=[role])
+            for sid in role_data.get("skills", [])
+        ]
+    except Exception:
+        pass
+    return _FREELY_SKILLS_FALLBACK
+
+
+_FREELY_SKILLS_FALLBACK = [
     AgentSkill(
         id="freely-workflow-guarded-execution",
         name="Bug Fix Execution",
