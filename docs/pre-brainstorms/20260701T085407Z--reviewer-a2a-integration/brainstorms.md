@@ -292,3 +292,37 @@ Slot 在 ACP session 创建时从 agent-table 读取。
 - promoted_issue_id: I-20260701T085407Z-A
 - decision_reason: 基于 A2A/ACP 协议 + Zed 参考 + 3 轮 subagent 审查 + 12 项关键决策
 - next_action: B2 设计 → 逐 Phase 实现 → PR
+
+## 16. 数据库架构决策 — 复用现有 DB 封装
+
+### 原则：不直接操作 SQLite，走 freely_db_manager daemon
+
+```
+所有 DB 操作:
+  agent_working.py ──socket RPC──▶ freely_db_manager.py ──sqlite3──▶ freely.db
+  a2a_server.py    ──socket RPC──▶ freely_db_manager.py ──sqlite3──▶ freely.db
+  freely-db-cli    ──socket RPC──▶ freely_db_manager.py ──sqlite3──▶ freely.db
+
+禁止:
+  ❌ sqlite3.connect() 直接打开 freely.db
+  ❌ 独立 migration SQL 文件
+  ❌ 绕过 DB daemon
+```
+
+### agent_working 表创建位置
+
+- **表结构**: `freely_db_manager.py._ensure_tables()` (与 chats, sessions, a2a_tasks 并列)
+- **索引**: 同上，`CREATE INDEX IF NOT EXISTS`
+- **Schema migration**: 同上，`ALTER TABLE ... ADD COLUMN` (review_stage)
+- **CRUD**: `agent_working.py` 通过 `_db_rpc()` socket 调用
+
+### 已有 DB 基础设施
+
+| 组件 | 职责 |
+|------|------|
+| `freely_db_manager.py` | DB daemon，管理所有表，监听 Unix socket |
+| `freely-db-cli` | CLI 客户端，`python3 freely-db-cli --project ... table.action` |
+| `a2a_task.py` | A2A task 专用 CLI |
+| `SQLiteTaskStore (a2a_server.py)` | A2A server 内部使用的 task store |
+
+agent_working 复用 `_db_rpc()` 模式（与 `SQLiteTaskStore._db_rpc()` 一致）。
