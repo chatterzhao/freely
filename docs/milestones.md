@@ -1,3 +1,18 @@
+## M-20260701T040012Z-A
+- title: fix: A2A health check log-based
+- status: active
+### candidate_issues
+1. `C-20260701T040012Z-A`
+- milestone: M-20260701T040012Z-A
+- status: promoted
+- promoted_issue_id: `I-20260701T040012Z-A`
+### committed_issues
+### completed_issues
+1. `I-20260701T040012Z-A`
+- title: fix: A2A health check log-based; milestone_state: completed
+- issue_path: `docs/epics/a2a-healthcheck/log-based/raw-20260701T040012Z/issues/I-20260701T040012Z-A.md`
+- phase_state: `completed`
+
 ## M-20260701T031733Z-A
 - title: feat: pr-create pre-flight + skill-gate alignment
 - status: active

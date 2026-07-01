@@ -8611,38 +8611,27 @@ print(h)" 2>/dev/null || true).pid"
   mkdir -p "$(run_dir_for_project "$project")"
   printf '%s\n' "$a2a_pid" > "$a2a_cached_pid_file"
 
-  # ── Wait for A2A Server with socket connect health check (up to 30s) ──
-  # Unix socket exists + connect succeeds → server is listening on the socket.
-  # Socket path passed via env var to avoid shell injection (no $var in Python string).
-  # No HTTP data is sent — avoids h11 "Invalid HTTP request" log noise.
-  local _health_waited=0 _health_ok=0
-  while [[ $_health_waited -lt 30 ]]; do
-    if [[ -S "$a2a_socket" ]]; then
-      if FREELY_A2A_SOCKET="$a2a_socket" python3 -c "
-import os, socket, sys
-sp = os.environ.get('FREELY_A2A_SOCKET', '')
-if not sp:
-    sys.exit(1)
-try:
-    s = socket.socket(socket.AF_UNIX)
-    s.settimeout(2)
-    s.connect(sp)
-    s.close()
-    sys.exit(0)
-except Exception:
-    sys.exit(1)
-" 2>/dev/null; then
-        _health_ok=1
-        break
-      fi
+  # ── Wait for A2A Server: poll process log for uvicorn ready message ──
+  # The A2A log writes "Uvicorn running on unix socket ..." once bound.
+  # This is more reliable than polling the socket file directly.
+  local _health_waited=0 _health_ok=0 _health_max=15
+  local _a2a_log="$project/.freely/run/a2a-server.log"
+  while [[ $_health_waited -lt $_health_max ]]; do
+    if ! kill -0 "$a2a_pid" 2>/dev/null; then
+      log_warn "A2A server process (PID $a2a_pid) died during startup"
+      break
+    fi
+    if grep -q "Uvicorn running on unix socket" "$_a2a_log" 2>/dev/null; then
+      _health_ok=1
+      break
     fi
     sleep 1
     _health_waited=$((_health_waited + 1))
   done
   if [[ "$_health_ok" == "1" ]]; then
-    log_info "A2A server ready (PID $a2a_pid) on $a2a_socket (socket connect ok)"
+    log_info "A2A server ready (PID $a2a_pid) on $a2a_socket (uvicorn running)"
   else
-    log_warn "A2A server start timed out after 30s (check DB size, zombie PIDs, or disk I/O)"
+    log_warn "A2A server start timed out after ${_health_max}s (check A2A log, DB size, or zombie PIDs)"
   fi
   return 0
 }
