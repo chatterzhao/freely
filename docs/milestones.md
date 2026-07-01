@@ -1,3 +1,14 @@
+## M-20260701T031733Z-A
+- title: feat: pr-create pre-flight + skill-gate alignment
+- status: active
+### candidate_issues
+1. `C-20260701T031733Z-A`
+- milestone: M-20260701T031733Z-A
+- status: promoted
+- promoted_issue_id: `I-20260701T031733Z-A`
+### committed_issues
+### completed_issues
+
 ## M-20260701T024449Z-A
 - title: fix: pr-review-guarded _review_guide unbound variable crash
 - status: active

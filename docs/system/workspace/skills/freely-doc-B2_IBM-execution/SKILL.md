@@ -166,7 +166,7 @@ B2_IBM 阶段直接写入以下格式。AI 按模板填写，无需查看任何�
 - expected_RED_output: <RED 阶段的预期输出——fix: 证明 bug 存在；feature: 证明功能未实现>
 - actual_RED_output: (RED 阶段执行后填写)
 - actual_output: (GREEN 阶段由 skill:freely-test-execution 执行后填写)
-- evidence_file: (执行后填写，指向 staged 证据文件)
+- evidence_file: (执行后填写。注意 .log 文件可能被 .gitignore 忽略，需 `git add -f` force-add)
 - red-green-status: pending | red | green
 > B2 写入 = pending。RED 确认后 = red（证明测试真的会失败）。dev 实现后跑 GREEN 通过 = green。
 - status: pending | passed | failed | not_applicable
@@ -233,6 +233,7 @@ B2_IBM 阶段直接写入以下格式。AI 按模板填写，无需查看任何�
 - [ ] tasks.md 存在且任务已分解
 - [ ] code-reviews/ 含 Implementation Decision Note
 - [ ] milestones.md committed_issues 条目已更新
+- [ ] `docs/epics-map.svg` 已更新（新增 epic/story 时必须，运行 `./bin/check-epics-map` 验证）
 - [ ] 下一跳明确：进入 `skill:freely-test-RED-execution`
 
 phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`

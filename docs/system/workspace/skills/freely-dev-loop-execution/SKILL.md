@@ -216,3 +216,11 @@ dev-loop 完成 → test skill（全绿）→ pr-create-guarded
 - 开发完成后：在 worktree 中执行 `freely pr-create-guarded` 命令提 PR → 切换到 develop 分支执行 `freely pr-merge-guarded develop <branch>` 命令合并。禁止绕过。
 - 若有依赖父分支，已明确后续 restack / promote 要求。
 - terminal completion / cleanup / retirement 仍由 `auto-loop` 判定。
+
+## dev↔test 同步
+
+每次 `git commit` 后立即 merge 到 test-pre-merge：
+```
+git -C <test-worktree> merge <current-branch>
+```
+pr-create-guarded 检查两边一致，不一致则硬拦截。
