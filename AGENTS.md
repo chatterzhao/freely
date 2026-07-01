@@ -5,7 +5,7 @@ MUST 强制在任何工作开始前遵守`freely-workflow-guarded-execution`这�
 
 这个 skill 它内部要求的强制开发流程（详情请阅读其 skill）:
 ```
-[cmd] freely feedback → [skill] freely-workflow-guarded-execution → [cmd] freely wt-create → [skill] freely-doc-B1_IBM-execution → [skill] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
+[skill] freely-workflow-guarded-execution → [cmd] freely feedback → [cmd] freely wt-create → [skill] freely-doc-B1_IBM-execution → [skill] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
 ```
 
 > **`[cmd]`** = bin 脚本，在 shell 中直接执行，如`freely feedback ...`。**`[skill]`** = xxx skill，由 AI agent 通过 Skill 工具加载。
@@ -125,7 +125,7 @@ Freely 开发 Freely 时，默认先问四件事：
       scan ──→ 已有 raw issue ─┤
       scan ──→ 已有工位 ──→ 直接进入继续
                                 ↓
-阶段0: (可选) [命令] freely feedback --repo <repo> --title "..." --body "..."  — 无 raw issue 时创建
+阶段0: [skill] freely-workflow-guarded-execution  — 判题：搜索已有 issue，决定创建还是复用
 阶段1: [命令] wt-create --raw-key <key> --source platform --kind <fix|feature|hotfix> --slug <slug>
 阶段2: [skill] skill:freely-doc-B1_IBM-execution（brainstorm → candidate → promote/absorb/drop）
 阶段3: [skill] skill:freely-doc-B2_IBM-execution（物化 I-* issue + prd/pre-tests/tasks/code-reviews）

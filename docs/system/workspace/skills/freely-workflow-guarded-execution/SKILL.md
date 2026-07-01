@@ -37,7 +37,7 @@ description: >-
 
 ## 定位
 
-**Freely 所有开发工作的唯一流程入口。** 在 `freely feedback` 命令创建 raw issue 之后、`freely wt-create` 命令建工位之前，必须先加载本 `freely-workflow-guarded-execution` skill。
+**Freely 所有开发工作的唯一流程入口。** 在任何开发工作开始之前（即 `freely feedback` 命令之前），必须先加载本 `freely-workflow-guarded-execution` skill。它判定是否需要创建 raw issue、是否需要复用已有工位。
 
 fix（bug修复）和 feature（新功能/大型改动）共用同一个流程，唯一语义差异在 `freely-test-RED-execution` skill 阶段：
 
