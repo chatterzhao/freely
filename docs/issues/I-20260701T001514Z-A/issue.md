@@ -1,0 +1,5 @@
+- issue_id: I-20260701T001514Z-A
+- kind: fix
+- phase_state: completed
+- milestone: M-20260701T001514Z-A
+- title: fix --reset timeout message + non-TTY guidance

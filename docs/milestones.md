@@ -1,3 +1,14 @@
+## M-20260701T001514Z-A
+- title: fix: --reset timeout message + non-TTY guidance
+- status: active
+### candidate_issues
+### committed_issues
+### completed_issues
+1. `I-20260701T001514Z-A`
+- title: reset timeout msg; milestone_state: committed
+- issue_path: `docs/issues/I-20260701T001514Z-A/issue.md`
+- phase_state: `completed`
+
 ## M-20260630T224941Z-A
 - title: feat: config.toml.example overhaul + init create + merge lock
 - status: active

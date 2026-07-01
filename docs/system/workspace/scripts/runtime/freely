@@ -20054,7 +20054,16 @@ REASON_GATE
       log_info "--reset --auto: auto-confirming config.toml reset"
     elif [[ -t 0 ]]; then
       printf '\n⚠️  即将重置 config.toml（备份后从模板重建）。确认？ [y/N] '
-      read -t 30 _confirm 2>/dev/null || _confirm="n"
+      local _timed_out="false"
+      read -t 30 _confirm 2>/dev/null || { _confirm="n"; _timed_out="true"; }
+      if [[ "$_timed_out" == "true" ]]; then
+        printf '\n交互输入超时（30秒），默认取消。如果要自动批准请加 --auto\n'
+      fi
+    else
+      # Non-TTY (AI/pipe): cannot interact — print guidance and cancel
+      log_info "--reset 需要交互确认，当前终端不支持。请加 --auto 自动批准。
+如需手动操作，请先备份:
+  cp .freely/config.toml .freely/config.toml.$(date -u +%Y%m%dT%H%M%SZ).bak && rm .freely/config.toml && freely init ..."
     fi
     case "$_confirm" in
       [yY]|[yY][eE][sS])
