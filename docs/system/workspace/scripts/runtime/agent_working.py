@@ -123,3 +123,43 @@ def _parse_pairs(s: str) -> dict:
 
 def _format_pairs(d: dict) -> str:
     return ",".join(f"{k}:{v}" for k, v in d.items() if v)
+
+
+def agent_cleanup_stale(project: str, max_age_hours: int = 24):
+    """Remove agent_working rows for worktrees that no longer exist."""
+    import os as _os
+    db = _connect(project)
+    rows = db.execute("SELECT raw_key, worktree, test_worktree FROM agent_working").fetchall()
+    cleaned = 0
+    for row in rows:
+        wt = row["worktree"]
+        twt = row["test_worktree"]
+        if wt and not _os.path.exists(wt):
+            db.execute("DELETE FROM agent_working WHERE raw_key = ?", [row["raw_key"]])
+            cleaned += 1
+        elif twt and not _os.path.exists(twt):
+            db.execute("UPDATE agent_working SET test_worktree=NULL, test_branch=NULL WHERE raw_key=?",
+                       [row["raw_key"]])
+            cleaned += 1
+    db.commit()
+    db.close()
+    return cleaned
+
+
+def agent_stats(project: str) -> dict:
+    """Return occupancy stats per role."""
+    db = _connect(project)
+    result = {}
+    for role, pool in [("manager", 1), ("worker", 10), ("reviewer", 99)]:
+        col = f"{role}_id"
+        rows = db.execute(f"SELECT {col} FROM agent_working WHERE {col} IS NOT NULL").fetchall()
+        occupied = 0
+        for r in rows:
+            val = r[col] or ""
+            if role == "reviewer":
+                occupied += len(_parse_pairs(val))
+            elif val:
+                occupied += 1
+        result[role] = {"occupied": occupied, "pool": pool, "free": pool - occupied}
+    db.close()
+    return result
