@@ -1092,13 +1092,22 @@ a2a_server.py                 _restore_tasks()                    agent_id 前�
 ### 最终 agent_working 表
 
 ```sql
+-- 一个 raw_key 一行。多个 reviewer 在 reviewer_id 列逗号隔开。
 CREATE TABLE agent_working (
-    worktree    TEXT NOT NULL PRIMARY KEY,
-    agent_id    TEXT NOT NULL,
-    role        TEXT NOT NULL CHECK(role IN ('manager','worker','reviewer')),
-    raw_key     TEXT NOT NULL,
-    created_at  TEXT NOT NULL DEFAULT (datetime('now'))
+    raw_key         TEXT PRIMARY KEY,     -- develop / raw-YYYYMMDDTHHMMSSZ
+    worktree        TEXT NOT NULL,        -- develop 或 fix/raw-KEY-slug
+    branch          TEXT NOT NULL,        -- develop / fix/raw-KEY-slug
+    test_worktree   TEXT,                 -- test-pre-merge-KEY-slug (reviewer 工位)
+    test_branch     TEXT,                 -- test-pre-merge-KEY-slug
+    manager_id      TEXT,                 -- manager_01
+    worker_id       TEXT,                 -- worker_03
+    reviewer_id     TEXT,                 -- reviewer_05,reviewer_08 (逗号隔开)
+    created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at      TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+CREATE INDEX idx_aw_worker ON agent_working(worker_id);
+CREATE INDEX idx_aw_manager ON agent_working(manager_id);
 ```
 
 ## 14. 最终 TODO List (按依赖排序)
@@ -1106,8 +1115,8 @@ CREATE TABLE agent_working (
 ### Phase 0: Foundation — Bug Fix + Schema
 
 - [ ] P0.1 修 a2a_server.py _restore_tasks 三处 and/or 优先级 bug (L403, L442, L663)
-- [ ] P0.2 建 agent_working 表 (migration SQL)
-- [ ] P0.3 实现 agent_working.py CRUD (assign/release/list_by_role/next_free)
+- [ ] P0.2 建 agent_working 表 (raw_key PK, reviewer_id 逗号隔开)
+- [ ] P0.3 实现 agent_working.py CRUD (assign/release/release_reviewer/list_by_role/next_free)
 
 ### Phase 1: Agent-Table v2
 
