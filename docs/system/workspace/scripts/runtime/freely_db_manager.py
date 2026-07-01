@@ -234,7 +234,7 @@ class DbDaemon:
                 name TEXT NOT NULL DEFAULT '',
                 description TEXT NOT NULL DEFAULT '',
                 state TEXT NOT NULL DEFAULT 'submitted'
-                    CHECK(state IN ('submitted','working','input-required','canceled','completed','failed','canceled')),
+                    CHECK(state IN ('submitted','working','input-required','canceled','completed','failed')),
                 agent_id TEXT NOT NULL DEFAULT '',
                 skill TEXT NOT NULL DEFAULT '',
                 session_id TEXT NOT NULL DEFAULT '',

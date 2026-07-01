@@ -78,7 +78,8 @@ def _load_role_skills(project: str, role: str) -> list:
     import tomllib
     roles_path = os.path.join(project, "docs", "system", "workspace", "agents", "roles.toml")
     if not os.path.exists(roles_path):
-        return FREELY_SKILLS  # fallback to hardcoded
+        print(f"[WARN] roles.toml not found at {roles_path}, using empty skills", file=__import__("sys").stderr)
+        return []
     try:
         with open(roles_path, "rb") as f:
             data = tomllib.load(f)
@@ -92,8 +93,9 @@ def _load_role_skills(project: str, role: str) -> list:
             )
             for skill_id in skill_ids
         ]
-    except Exception:
-        return FREELY_SKILLS
+    except Exception as e:
+        print(f"[WARN] failed to load roles.toml: {e}, using empty skills", file=__import__("sys").stderr)
+        return []
 
 
 def _build_agent_card(project: str, role: str = "worker") -> AgentCard:

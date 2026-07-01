@@ -22,7 +22,7 @@ from input_required_reason import InputRequiredReason
 
 def watchdog_run(project: str, a2a_socket: str):
     """Main Watchdog loop: subscribe to SSE, handle events."""
-    sse_url = f"http://localhost/tasks/stream"
+    sse_url = f"unix://{a2a_socket}/tasks/stream"
     backoff = 1
     max_backoff = 30
 
