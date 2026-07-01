@@ -940,3 +940,125 @@ wt-close 时删除                    任务完成后 state=completed
 查空闲 agent 用这张表              查任务进度用那张表
 ```
 
+
+## 11. agent_working_id 表创建代码
+
+### 建表 SQL
+
+```sql
+-- freely.db: agent_working_id table
+-- Tracks which agent is working on which worktree.
+-- Written at ACP session/new|fork|resume, cleared at session/close (wt-close).
+
+CREATE TABLE IF NOT EXISTS agent_working_id (
+    raw_key         TEXT PRIMARY KEY,     -- develop (for manager) or raw-YYYYMMDDTHHMMSSZ
+    worktree        TEXT NOT NULL UNIQUE, -- absolute path
+    branch          TEXT NOT NULL,        -- develop / fix/raw-KEY-slug / test-pre-merge-KEY-slug
+    manager_id      TEXT,                 -- manager_01
+    worker_id       TEXT,                 -- worker_03
+    reviewer_id     TEXT,                 -- reviewer_05,reviewer_08 (comma-separated)
+    created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at      TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_agent_working_branch ON agent_working_id(branch);
+CREATE INDEX IF NOT EXISTS idx_agent_working_manager ON agent_working_id(manager_id);
+CREATE INDEX IF NOT EXISTS idx_agent_working_worker ON agent_working_id(worker_id);
+```
+
+### Python 操作封装
+
+```python
+# freely-db-cli 新增命令
+
+def agent_working_assign(raw_key, worktree, branch, role, agent_id):
+    """ACP session 创建时调用。将 agent 绑定到 worktree。"""
+    col = f"{role}_id"
+    existing = db.get("SELECT * FROM agent_working_id WHERE raw_key = ?", [raw_key])
+    if existing:
+        if role == "reviewer":
+            # reviewer 追加，不覆盖已有
+            cur = existing.get("reviewer_id", "") or ""
+            new_val = f"{cur},{agent_id}" if cur else agent_id
+        else:
+            new_val = agent_id
+        db.execute(f"UPDATE agent_working_id SET {col} = ?, updated_at = datetime('now') WHERE raw_key = ?",
+                   [new_val, raw_key])
+    else:
+        db.execute(f"INSERT INTO agent_working_id (raw_key, worktree, branch, {col}) VALUES (?,?,?,?)",
+                   [raw_key, worktree, branch, agent_id])
+
+
+def agent_working_release(raw_key, role, agent_id=None):
+    """ACP session/close 时调用。释放 agent 绑定。"""
+    if role == "reviewer" and agent_id:
+        cur = db.get("SELECT reviewer_id FROM agent_working_id WHERE raw_key = ?", [raw_key])
+        if cur and cur["reviewer_id"]:
+            ids = [x.strip() for x in cur["reviewer_id"].split(",") if x.strip() != agent_id]
+            db.execute("UPDATE agent_working_id SET reviewer_id = ?, updated_at = datetime('now') WHERE raw_key = ?",
+                       [",".join(ids) if ids else None, raw_key])
+    else:
+        col = f"{role}_id"
+        db.execute(f"UPDATE agent_working_id SET {col} = NULL, updated_at = datetime('now') WHERE raw_key = ?",
+                   [raw_key])
+
+
+def agent_working_free(role, pool_size):
+    """查询空闲 agent NN 列表。"""
+    col = f"{role}_id"
+    prefix = f"{role}_"
+    rows = db.list(f"SELECT {col} FROM agent_working_id WHERE {col} IS NOT NULL")
+    occupied = set()
+    for r in rows:
+        val = r.get(col, "")
+        if val:
+            for v in val.split(","):
+                occupied.add(v.strip())
+    all_ids = {f"{prefix}{i:02d}" for i in range(1, pool_size + 1)}
+    return sorted(all_ids - occupied)
+
+
+def agent_working_next(role, pool_size):
+    """返回下一个可用的 agent NN。"""
+    free = agent_working_free(role, pool_size)
+    return free[0] if free else None
+```
+
+## 12. 因 agent-table / agent-id 变更需修改的逻辑
+
+### 影响面全量
+
+```
+组件                          影响                                  改动
+──────────────────────────    ───────────────────────────────────  ────────
+agent-table.toml              字段重构: role + {role}_id/slot      ✅ 模板已更新
+                              扁平化: reviewer 独立 [[]]           agent-table-query 需重写
+
+agent-table-query             --get-slot 参数变化                  需要适配新字段名
+                              --get-reviewer 废弃                  不再需要
+                              新增 --list-role --next-free         新功能
+
+agent-id.env                  废弃，改为 agent_working_id 表       freely-db-cli 新增命令
+                                                                  agent-id.env 读取逻辑全部替换
+
+_ensure_reviewer_agent()      reviewer slot 获取方式变化           读 agent-table-query --get-slot reviewer_01
+                              reviewer_id 分配逻辑                 调用 agent_working_next("reviewer", 99)
+
+ensure_manager_once()         manager slot 获取                   保持不变 (manager_01 slot 仍读 agent-table)
+                              写入 agent_working_id 表             新增
+
+launch_worker_from_manager    worker slot 获取                    读 agent-table-query --get-slot worker_NN
+                              worker_NN 分配                      调用 agent_working_next("worker", 10)
+                              写入 agent_working_id 表             新增
+                              agent-id.env 写入逻辑               替换为 agent_working_assign()
+
+wt-close                      session/close 时释放 agent          调用 agent_working_release()
+                              agent-id.env 清理逻辑               替换为 agent_working_id DELETE
+
+freely-cycle                  dispatch_reviewer 时查空闲          调用 agent_working_next("reviewer", 99)
+                              创建 reviewer task                  携带 agent_id, raw_key, parent_worker
+
+a2a_server.py                 _restore_tasks()                    agent_id 前缀匹配需加 reviewer
+                              agent card 生成                     从 agent-table 读 role 字段
+```
+
