@@ -296,6 +296,31 @@ class DbDaemon:
                 except Exception:
                     pass
 
+        # agent_working — tracks which agent is on which worktree (replaces agent-id.env)
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS agent_working (
+                raw_key         TEXT PRIMARY KEY,
+                worktree        TEXT NOT NULL DEFAULT '',
+                branch          TEXT NOT NULL DEFAULT '',
+                test_worktree   TEXT DEFAULT '',
+                test_branch     TEXT DEFAULT '',
+                manager_id      TEXT DEFAULT NULL,
+                worker_id       TEXT DEFAULT NULL,
+                reviewer_id     TEXT DEFAULT NULL,
+                created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+                updated_at      TEXT NOT NULL DEFAULT (datetime('now'))
+            )
+        """)
+        c.execute("CREATE INDEX IF NOT EXISTS idx_aw_worker ON agent_working(worker_id)")
+        c.execute("CREATE INDEX IF NOT EXISTS idx_aw_manager ON agent_working(manager_id)")
+        c.execute("CREATE INDEX IF NOT EXISTS idx_aw_reviewer ON agent_working(reviewer_id)")
+
+        # Schema migration: review_stage for a2a_tasks
+        try:
+            c.execute("ALTER TABLE a2a_tasks ADD COLUMN review_stage TEXT DEFAULT ''")
+        except Exception:
+            pass
+
         self.conn.commit()
         self.log("all tables ensured")
 
