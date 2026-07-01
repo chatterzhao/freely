@@ -7,6 +7,10 @@
 - status: promoted
 ### committed_issues
 ### completed_issues
+1. `I-20260701T045911Z-A`
+- title: Phase1: reviewer; milestone_state: completed
+- issue_path: `docs/epics/reviewer-agent/phase1-ensure-reviewer/raw-20260701T045911Z/issues/I-20260701T045911Z-A.md`
+- phase_state: `completed`
 
 ## M-20260701T040012Z-A
 - title: fix: A2A health check log-based
