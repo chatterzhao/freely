@@ -1,3 +1,18 @@
+## M-20260701T081450Z-A
+- title: fix: merge lock orphan self-heal
+- status: active
+### candidate_issues
+1. `C-20260701T081450Z-A`
+- milestone: M-20260701T081450Z-A
+- status: promoted
+- promoted_issue_id: `I-20260701T081450Z-A`
+### committed_issues
+### completed_issues
+1. `I-20260701T081450Z-A`
+- title: fix: merge lock; milestone_state: completed
+- issue_path: `docs/epics/merge-lock/orphan-heal/raw-20260701T081450Z/issues/I-20260701T081450Z-A.md`
+- phase_state: `completed`
+
 ## M-20260701T045911Z-A
 - title: feat: reviewer agent Phase 1
 - status: active
