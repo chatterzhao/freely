@@ -10,7 +10,7 @@
 4. _restore_tasks fixes verified by tests: PASS
 5. Unit tests pass (18 tests): PASS
 6. No sqlite3.connect in new code: PASS
-7. roles.toml git-tracked: PASS
+7. agent-roles.toml git-tracked: PASS
 8. agent-table v2 format: PASS
 9. B1 TODO list complete: PASS
 10. No remaining CRITICAL bugs: PASS (after AttributeError fix)

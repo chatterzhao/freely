@@ -371,9 +371,9 @@ class Task:
 # ── Helpers ──────────────────────────────────────────────────────────────
 
 def load_role_skills(project: str, role: str = "worker"):
-    """Load skills from roles.toml. Falls back to hardcoded list if file missing."""
+    """Load skills from agent-roles.toml. Falls back to hardcoded list if file missing."""
     import tomllib
-    roles_path = f"{project}/docs/system/workspace/agents/roles.toml"
+    roles_path = f"{project}/docs/system/workspace/agents/agent-roles.toml"
     try:
         with open(roles_path, "rb") as f:
             data = tomllib.load(f)

@@ -14,4 +14,4 @@
 ## Phase-by-phase
 P0 Bug Fix: 100% | P1 agent_working: 100% | P2 agent-table-query: 90%
 P3 agent-id.env: 10% | P4 ACP Session: 25% | P5 A2A: 40%
-P6 Watchdog SSE: 55% | P7 roles.toml: 100% | P8 routing: 82% | P9 Lifecycle: 25%
+P6 Watchdog SSE: 55% | P7 agent-roles.toml: 100% | P8 routing: 82% | P9 Lifecycle: 25%

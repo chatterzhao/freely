@@ -8,7 +8,7 @@
 2. SSE stream endpoint: GET /tasks/stream does not exist (only /tasks/{id}/stream)
 3. SSE event format: watchdog parser format ≠ a2a_server output format
 4. ACP session creation: design specifies session/new|fork|resume per route, implementation only logs
-5. FREELY_SKILLS: design says roles.toml only, implementation keeps hardcoded fallback
+5. FREELY_SKILLS: design says agent-roles.toml only, implementation keeps hardcoded fallback
 6. Reviewer allocation: two independent paths (agent-table-query vs agent_working)
 7. input-required metadata: schema not enforced, fields not normalized
 

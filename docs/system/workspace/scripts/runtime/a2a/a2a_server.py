@@ -76,9 +76,9 @@ FREELY_SKILLS = [
 
 def _load_role_skills(project: str, role: str) -> list:
     import tomllib
-    roles_path = os.path.join(project, "docs", "system", "workspace", "agents", "roles.toml")
+    roles_path = os.path.join(project, "docs", "system", "workspace", "agents", "agent-roles.toml")
     if not os.path.exists(roles_path):
-        print(f"[WARN] roles.toml not found at {roles_path}, using empty skills", file=__import__("sys").stderr)
+        print(f"[WARN] agent-roles.toml not found at {roles_path}, using empty skills", file=__import__("sys").stderr)
         return []
     try:
         with open(roles_path, "rb") as f:
@@ -94,7 +94,7 @@ def _load_role_skills(project: str, role: str) -> list:
             for skill_id in skill_ids
         ]
     except Exception as e:
-        print(f"[WARN] failed to load roles.toml: {e}, using empty skills", file=__import__("sys").stderr)
+        print(f"[WARN] failed to load agent-roles.toml: {e}, using empty skills", file=__import__("sys").stderr)
         return []
 
 
@@ -388,7 +388,7 @@ class A2AServer:
         self.project = project
         self._running = False
         self._servers: list = []
-        # agent card now built per-request in _agent_card_endpoint via roles.toml
+        # agent card now built per-request in _agent_card_endpoint via agent-roles.toml
         self.task_store = SQLiteTaskStore(project)
         self.executor = FreelyAgentExecutor(self)
         # Note: _restore_tasks() is deferred to start() to avoid blocking

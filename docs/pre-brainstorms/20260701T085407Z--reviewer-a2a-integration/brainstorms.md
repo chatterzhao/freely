@@ -178,10 +178,10 @@ message 保证接收方 agent 有足够上下文开始工作，不需要回头�
 所有参数接收方都可用。不需要再回头查 agent_working 或 a2a_tasks。
 Manager 收到后判断: 手动处理 / 创建新 issue / 标记 failed / 忽略噪音。
 
-### Card 设计 (roles.toml)
+### Card 设计 (agent-roles.toml)
 
 ```
-docs/system/workspace/agents/roles.toml  ← git tracked, 纯能力声明
+docs/system/workspace/agents/agent-roles.toml  ← git tracked, 纯能力声明
 
 [manager]   skills: workflow-guarded-execution, branch-management
 [worker]    skills: B1, B2, RED, dev, test
@@ -201,7 +201,7 @@ Slot 在 ACP session 创建时从 agent-table 读取。
 | D4 | agent_working SQLite 替代 agent-id.env | 事务、索引、SQL 查询空闲 |
 | D5 | session 嵌在 agent_id 列 (冒号分隔) | 无需额外列，一列同时读 |
 | D6 | Reviewer 独立 slot | 可用不同 AI 工具，独立 rate limit |
-| D7 | 单文件 roles.toml | 简化维护 |
+| D7 | 单文件 agent-roles.toml | 简化维护 |
 | D8 | reviewer_id 逗号分隔 (不拆表) | 写入串行，无并发冲突 |
 | D9 | 6 种双向 input-required | 无遗漏处理场景 |
 | D10 | review_stage 字段 | 区分 b1/b2/dev 审查阶段 |
@@ -242,7 +242,7 @@ Slot 在 ACP session 创建时从 agent-table 读取。
 - [ ] P4.4 wt-close: session/close + agent_session_remove + 删除行
 
 ### P5: A2A Multi-Card + Task
-- [ ] P5.1 agent-card?role= 端点 + roles.toml
+- [ ] P5.1 agent-card?role= 端点 + agent-roles.toml
 - [ ] P5.2 Manager POST /tasks 委派 Worker
 - [ ] P5.3 Manager POST /tasks 委派 Reviewer
 - [ ] P5.4 PATCH /tasks/{id} SSE 推送 + 订阅过滤
@@ -259,11 +259,11 @@ Slot 在 ACP session 创建时从 agent-table 读取。
 - [ ] P6.7 任务僵死检测 (working > N min → stall event)
 - [ ] P6.8 SSE 集成测试
 
-### P7: roles.toml
-- [ ] P7.1 创建 docs/system/workspace/agents/roles.toml
+### P7: agent-roles.toml
+- [ ] P7.1 创建 docs/system/workspace/agents/agent-roles.toml
 - [ ] P7.2 三角色 skills 定义
 - [ ] P7.3 确认 git tracked (不含 slot/pool)
-- [ ] P7.4 agent card 端点读取 roles.toml
+- [ ] P7.4 agent card 端点读取 agent-roles.toml
 
 ### P8: input-required 双向路由 + 兜底
 - [ ] P8.1 规范 input-required schema (task_id, from_agent, needs_agent, needs_role, reason, message, raw_key, review_stage, parent_agent, timestamp)
