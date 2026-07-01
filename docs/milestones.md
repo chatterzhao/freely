@@ -1,3 +1,18 @@
+## M-20260701T061924Z-A
+- title: feat: unify all gate outputs
+- status: active
+### candidate_issues
+1. `C-20260701T061924Z-A`
+- milestone: M-20260701T061924Z-A
+- status: promoted
+- promoted_issue_id: `I-20260701T061924Z-A`
+### committed_issues
+### completed_issues
+1. `I-20260701T061924Z-A`
+- title: feat: unify gates; milestone_state: completed
+- issue_path: `docs/epics/gate-output-unify/grouped-output/raw-20260701T061924Z/issues/I-20260701T061924Z-A.md`
+- phase_state: `completed`
+
 ## M-20260701T061531Z-A
 - title: feat: gate summary output
 - status: active

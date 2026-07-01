@@ -279,7 +279,14 @@ if not state_file.exists():
         fallback_failures += 1
 
     if fallback_failures > 0:
-        print(f"\n[GATE] 共 {fallback_failures} 项 GREEN 测试未执行。\n请阅读 skill:freely-test-execution 完成上述测试，不要逐条改状态绕过。\n如需豁免某项测试，在 acceptance item 中设置 status=not_applicable 并填写 not_applicable_reason。", file=sys.stderr)
+        print(f"\n[GATE] 共 {fallback_failures} 项 GREEN 测试未执行。", file=sys.stderr)
+        print(file=sys.stderr)
+        print("── 需要阅读的 Skill ──", file=sys.stderr)
+        print("  skill:freely-test-execution §GREEN 判定标准与执行步骤", file=sys.stderr)
+        print("  skill:freely-doc-B2_IBM-execution §pre-tests 模板与门禁常见坑速查", file=sys.stderr)
+        print(file=sys.stderr)
+        print("不要逐条改状态绕过——去跑测试，把真实结果写回 actual_output 和 evidence_file。", file=sys.stderr)
+        print("如需豁免某项测试，设置 status=not_applicable 并填写 not_applicable_reason。", file=sys.stderr)
     sys.exit(1 if fallback_failures > 0 else 0)
 if not owner_issue and not recorded_pre_tests and not closeout_gate and not closeout_gate_command:
     print("[pretests_retirement_binding_missing] worker state does not record owner issue, pre-tests path, or closeout context", file=sys.stderr)
