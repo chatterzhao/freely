@@ -891,4 +891,6 @@
   <text x="50" y="17455.0" font-size="13" font-weight="bold" fill="#1a73e8">config-toml-example</text>
   <rect id="story-overhaul" x="55" y="17463.0" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
   <text x="65" y="17478.0" font-size="11" fill="#333">overhaul</text>
+  <rect id="story-block-init" x="55" y="17500.0" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
+  <text x="65" y="17515.0" font-size="11" fill="#333">block-init</text>
 </svg>

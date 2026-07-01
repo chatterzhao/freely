@@ -1,3 +1,18 @@
+## M-20260701T003241Z-A
+- title: fix: remove --ai + block init on existing config
+- status: active
+### candidate_issues
+1. `C-20260701T003241Z-A`
+- milestone: M-20260701T003241Z-A
+- status: promoted
+- promoted_issue_path: `docs/epics/config-toml-example/block-init/raw-20260701T003241Z/issues/I-20260701T003241Z-A.md`
+### committed_issues
+1. `I-20260701T003241Z-A`
+- title: remove --ai; milestone_state: committed
+- issue_path: `docs/epics/config-toml-example/block-init/raw-20260701T003241Z/issues/I-20260701T003241Z-A.md`
+- phase_state: `completed`
+### completed_issues
+
 ## M-20260630T224941Z-A
 - title: feat: config.toml.example overhaul + init create + merge lock
 - status: active
