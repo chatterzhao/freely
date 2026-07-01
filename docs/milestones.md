@@ -10,7 +10,7 @@
 1. `I-20260701T003241Z-A`
 - title: remove --ai; milestone_state: committed
 - issue_path: `docs/epics/config-toml-example/block-init/raw-20260701T003241Z/issues/I-20260701T003241Z-A.md`
-- phase_state: `in_b2_ibm`
+- phase_state: `completed`
 ### completed_issues
 
 ## M-20260630T224941Z-A
