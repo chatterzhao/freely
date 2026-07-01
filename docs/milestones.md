@@ -4,7 +4,7 @@
 ### candidate_issues
 1. `C-20260701T045911Z-A`
 - milestone: M-20260701T045911Z-A
-- status: needs_research
+- status: promoted
 ### committed_issues
 ### completed_issues
 

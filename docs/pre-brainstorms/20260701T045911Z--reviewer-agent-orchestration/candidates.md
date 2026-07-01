@@ -1,6 +1,6 @@
 ---
 candidate_id: C-20260701T045911Z-A
-status: needs_research
+status: promoted
 source_raw: raw-20260701T045911Z
 created_at: 2026-07-01
 milestone: M-20260701T045911Z-A
@@ -10,7 +10,7 @@ milestone: M-20260701T045911Z-A
 
 - candidate_format_version: v2
 - title: Reviewer 成为独立 agent，workflow 每步经过 reviewer 审查
-- status: needs_research
+- status: promoted
 - decision_reason: 7 个已有组件研究完成。4 个 Phase 待拆分推进。
 - next_action: 拆分 Phase 1（Reviewer 独立 agent）为子 candidate，先实现基础 reviewer 生命周期
 - revisit_trigger: Phase 1 完成后评估是否需要拆 Phase 2-4
@@ -31,6 +31,7 @@ milestone: M-20260701T045911Z-A
     B1 审查通过。7 组件分析准确，6 缺口确认，4 补充点已加入 brainstorms。
     Phase 1 scope 明确：ensure_reviewer() + A2A reviewer role + [reviewer]路由。
     建议拆 C-20260701T045911Z-A 为子 candidate 逐 Phase 推进。
-- promoted_issue_id: (待拆分为子 candidate)
+- promoted_issue_id: I-20260701T045911Z-A
 - milestone: M-20260701T045911Z-A
+- next_action: 进入 B2，Phase 1 子 candidate → I-20260701T045911Z-A
 - session_refs: []
