@@ -1,3 +1,18 @@
+## M-20260701T013527Z-A
+- title: fix: get_config undefined → bash indirect expansion
+- status: active
+### candidate_issues
+1. `C-20260701T013527Z-A`
+- milestone: M-20260701T013527Z-A
+- status: promoted
+- promoted_issue_id: `I-20260701T013527Z-A`
+### committed_issues
+1. `I-20260701T013527Z-A`
+- title: fix: get_config undefined → bash indirect expansion; milestone_state: committed
+- issue_path: `docs/epics/acp-tool-setup/config-reader-fix/raw-20260701T013527Z/issues/I-20260701T013527Z-A.md`
+- phase_state: `in_b2_ibm`
+### completed_issues
+
 ## M-20260701T003241Z-A
 - title: fix: remove --ai + block init on existing config
 - status: active
