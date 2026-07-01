@@ -1,3 +1,18 @@
+## M-20260701T054502Z-A
+- title: fix: gate skill references
+- status: active
+### candidate_issues
+1. `C-20260701T054502Z-A`
+- milestone: M-20260701T054502Z-A
+- status: promoted
+- promoted_issue_id: `I-20260701T054502Z-A`
+### committed_issues
+### completed_issues
+1. `I-20260701T054502Z-A`
+- title: fix: gate skill refs; milestone_state: completed
+- issue_path: `docs/epics/gate-skill-refs/add-refs/raw-20260701T054502Z/issues/I-20260701T054502Z-A.md`
+- phase_state: `completed`
+
 ## M-20260701T051138Z-A
 - title: docs: workflow skill before feedback
 - status: active
