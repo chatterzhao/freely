@@ -315,3 +315,82 @@ reviewer slot 继承     +   Reviewer card skills  →   acp-bridge.py start
 - promoted_issue_id: I-20260701T085407Z-A
 - decision_reason: 基于 A2A/ACP 协议最佳实践 + Zed 参考，5 阶段渐进重构
 - next_action: B2 设计 → 逐 Phase 实现 → PR
+
+## 5. ACP vs A2A — 职责边界
+
+### 一句话
+
+```
+ACP = agent ↔ AI     (垂直：给 agent 装上大脑)
+A2A = agent ↔ agent  (水平：agent 之间协作)
+```
+
+### 对比
+
+| 维度 | ACP | A2A |
+|------|-----|-----|
+| **通信方向** | Client → AI CLI tool | Agent ↔ Agent |
+| **谁用** | Runtime 给 agent 创建 session | Agent 之间委派任务 |
+| **传输** | JSON-RPC over stdio | HTTP + SSE over Unix socket |
+| **核心概念** | session, conversation_id, fork/resume | task, agent card, state machine |
+| **状态管理** | 会话上下文 (对话历史) | 任务状态 (submitted→working→completed) |
+| **实时推送** | 无 (同步 RPC) | SSE (状态变更实时通知) |
+| **谁启动** | Runtime 启动 acp-bridge.py | Runtime 启动 a2a_server.py |
+| **配置来源** | agent-table.toml (slot) | role.card.toml (skills) |
+
+### 在 Freely 中的具体场景
+
+```
+场景                          用哪个      具体操作
+──────────────────────────    ────       ──────────────────────────────
+Runtime 给 Manager 装大脑      ACP        acp-bridge.py → session/new
+                                          prompt: "你是 Manager, 巡逻..."
+
+Manager 委派 Worker 做 B1     A2A        POST /tasks {role:worker, skill:B1}
+                                          state: submitted → working
+
+Worker 报告 B1 完成            A2A        PATCH /tasks/{id} state=input-required
+                                          → A2A SSE push → Manager 收到
+
+Manager 委派 Reviewer 审查     A2A        POST /tasks {role:reviewer, skill:tdd-review}
+
+Runtime 给 Reviewer 装大脑     ACP        acp-bridge.py → session/new
+                                          prompt: "审查 B1 产物..."
+
+Reviewer 输出审查结论          A2A        PATCH /tasks/{id} state=completed
+                                          message: {verdict:pass, guidance:"..."}
+                                          → A2A SSE push → Manager 收到
+
+Manager 让 Worker 继续 B2     A2A        POST /tasks {role:worker, skill:B2}
+                                          (附带 reviewer guidance)
+
+Daemon 重启，恢复 Manager     ACP        session/resume (从 session-store)
+                                          或 session/new (无历史时)
+
+Daemon 重启，恢复未完成 task   A2A        _restore_tasks() 读 SQLite
+                                          检查 worker/reviewer 存活状态
+```
+
+### 关键认知
+
+```
+ACP 不关心 agent 之间怎么协作 —— 它只管"这个 agent 能不能调用 AI"
+A2A 不关心 agent 用哪个 AI  —— 它只管"agent 之间怎么发现、委派、同步状态"
+
+两者正交：
+  - 同一个 ACP process 可以服务 Manager + Reviewer (不同 session)
+  - 同一个 A2A task 可以经历多个 ACP session (daemon 重启后 resume)
+  - Agent card (A2A) 声明"我能做什么"，agent-table (ACP 配置) 声明"我用什么做"
+```
+
+### 当前实现偏差
+
+```
+场景                          应该用      当前实际用      问题
+──────────────────────────    ────       ──────────      ──────────────────
+Manager 委派 Worker           A2A task   prompt 文件      无状态追踪，无 SSE
+Worker 报告完成                A2A SSE    a2a_task.py 轮询 延迟高，实时性差
+Reviewer 不存在                A2A+ACP    无              完全缺失
+Agent 身份                    3 card     1 card "Worker"  Manager/Reviewer 无独立 card
+```
+
