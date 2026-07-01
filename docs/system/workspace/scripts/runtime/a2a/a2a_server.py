@@ -386,7 +386,7 @@ class A2AServer:
         self.project = project
         self._running = False
         self._servers: list = []
-        self.agent_card = _build_agent_card(project)
+        # agent card now built per-request in _agent_card_endpoint via roles.toml
         self.task_store = SQLiteTaskStore(project)
         self.executor = FreelyAgentExecutor(self)
         # Note: _restore_tasks() is deferred to start() to avoid blocking

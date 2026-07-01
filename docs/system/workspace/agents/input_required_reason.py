@@ -34,6 +34,7 @@ class InputRequiredReason(Enum):
 
     @classmethod
     def from_string(cls, s: str) -> "InputRequiredReason":
+        s = (s or "").strip()
         for reason in cls:
             if reason.value == s:
                 return reason
