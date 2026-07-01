@@ -490,3 +490,85 @@ Runtime 介入 (ACP session/new):           Runtime 不介入 (Agent 直连 A2A 
          所有 input-required → 判断是否需创建新 agent
 ```
 
+
+## 7. input-required 路由：不是一种，是多种
+
+### input-required 类型与处理方式
+
+```
+Worker 发出 state=input-required
+         reason={type}
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ reason                         谁处理          ACP 动作             │
+├─────────────────────────────────────────────────────────────────────┤
+│ needs-human-input              Manager        session/resume       │
+│   worker 需要人回答一个问题      (已有 session)  prompt: "worker 问:..." │
+│                                 Manager 通过 ACP prompt 问人         │
+│                                 人回答后 Manager 通过 ACP 回复 worker │
+├─────────────────────────────────────────────────────────────────────┤
+│ needs-review:b1                 Reviewer       session/fork (同 tool)│
+│   B1 完成，需审查是否达标        (不存在!)      session/new  (跨 tool) │
+│                                                Reviewer 审查 B1 产物  │
+│                                                verdict: pass → B2    │
+│                                                verdict: redo → 重做 B1│
+├─────────────────────────────────────────────────────────────────────┤
+│ needs-review:b2                 Reviewer       同上                  │
+│   B2 设计完成，需审查设计质量    (可能存在)     如果已存在 → 复用 sess │
+│                                 (同 worker 配对) verdict: pass → RED  │
+├─────────────────────────────────────────────────────────────────────┤
+│ needs-review:dev                Reviewer       同上                  │
+│   代码实现完成，需 TDD 审查      (可能存在)     verdict: pass → test   │
+├─────────────────────────────────────────────────────────────────────┤
+│ needs-manager-decision          Manager         session/resume       │
+│   遇到阻塞/冲突/需决策           (已有 session)  Manager 判断:         │
+│                                                merge? close?         │
+│                                                re-delegate? stop?    │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Reviewer 启动策略
+
+```
+Reviewer 是否存在?    用什么 ACP 动作          原因
+──────────────────   ────────────────────     ──────────────────────
+首次需要 Reviewer     session/new             没有可复用的 session
+同 tool (claude)     session/fork (from Mgr)  复用连接，轻量启动
+跨 tool (codex)      session/new              不同 binary，必须新建
+上次 crash 后恢复     session/resume           从 session-store 恢复
+已存在且空闲         直接 A2A SSE 推送 task    最快，零启动
+```
+
+### 完整 B1 场景示例
+
+```
+Worker: 完成 B1 brainstorms + candidate
+        → a2a_store: state=input-required, reason=needs-review:b1
+        → a2a_sse: push to subscribers
+
+Runtime Watchdog:
+  收到 SSE: {worker=wrk-01, state=input-required, reason=needs-review:b1}
+  → 判断: 需要 Reviewer，且 reviewer_worker_01 不存在
+  → ACP: session/fork (同 tool=claude, 从 Manager session fork)
+  → 启动 Reviewer agent: "审查 worker wrk-01 的 B1 产物"
+
+Reviewer (ACP session 启动后):
+  → 读取 Worker 的 B1 产物 (brainstorms.md, candidates.md)
+  → 按 skill:freely-tdd-review 四层审查
+  → 结论:
+    Option A: "B1 达标，可以进入 B2"
+      → a2a_store: state=completed, verdict=pass, guidance="继续 B2"
+      → a2a_sse push → Worker 收到
+    Option B: "B1 不达标，根因分析不充分"
+      → a2a_store: state=completed, verdict=fail, guidance="重做根因分析"
+      → a2a_sse push → Worker 收到 → 重做 B1
+    Option C: "scope 太大，需 Manager 决策是否拆分"
+      → a2a_store: state=completed, verdict=blocked, guidance="scope太大"
+      → a2a_sse push → Manager 收到 → Manager 决策拆分/继续
+
+Worker (收到 Reviewer verdict):
+  pass    → 继续下一步 (B2 skill)
+  fail    → 回到当前步重做
+  blocked → 等待 Manager 决策
+```
+
