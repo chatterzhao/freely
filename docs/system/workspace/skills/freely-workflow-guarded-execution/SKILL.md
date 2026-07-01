@@ -16,7 +16,7 @@ description: >-
 
 # skill:freely-workflow-guarded-execution
 
-> 全链路: [cmd] freely feedback → [skill][here] freely-workflow-guarded-execution → [cmd] freely wt-create → [skill] freely-doc-B1_IBM-execution → [skill] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
+> 全链路: [skill][here] freely-workflow-guarded-execution → [cmd] freely feedback → [cmd] freely wt-create → [skill] freely-doc-B1_IBM-execution → [skill] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
 >
 > 文档中可能用简称指代上述节点。对应关系:
 >
@@ -37,7 +37,7 @@ description: >-
 
 ## 定位
 
-**Freely 所有开发工作的唯一流程入口。** 在 `freely feedback` 命令创建 raw issue 之后、`freely wt-create` 命令建工位之前，必须先加载本 `freely-workflow-guarded-execution` skill。
+**Freely 所有开发工作的唯一流程入口。** 在任何开发工作开始之前（即 `freely feedback` 命令之前），必须先加载本 `freely-workflow-guarded-execution` skill。它判定是否需要创建 raw issue、是否需要复用已有工位。
 
 fix（bug修复）和 feature（新功能/大型改动）共用同一个流程，唯一语义差异在 `freely-test-RED-execution` skill 阶段：
 

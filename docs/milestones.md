@@ -1,3 +1,18 @@
+## M-20260701T051138Z-A
+- title: docs: workflow skill before feedback
+- status: active
+### candidate_issues
+1. `C-20260701T051138Z-A`
+- milestone: M-20260701T051138Z-A
+- status: promoted
+- promoted_issue_id: `I-20260701T051138Z-A`
+### committed_issues
+### completed_issues
+1. `I-20260701T051138Z-A`
+- title: fix: chain order; milestone_state: completed
+- issue_path: `docs/epics/workflow-chain/fix-order/raw-20260701T051138Z/issues/I-20260701T051138Z-A.md`
+- phase_state: `completed`
+
 ## M-20260701T040012Z-A
 - title: fix: A2A health check log-based
 - status: active
