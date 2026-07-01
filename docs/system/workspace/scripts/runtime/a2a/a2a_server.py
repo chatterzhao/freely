@@ -536,7 +536,7 @@ class A2AServer:
         request_handler = DefaultRequestHandler(
             agent_executor=self.executor,
             task_store=self.task_store,
-            agent_card=self.agent_card,
+            agent_card=_build_agent_card(self.project, "worker"),
         )
         routes = create_jsonrpc_routes(request_handler=request_handler, rpc_url="/")
         routes.extend([
