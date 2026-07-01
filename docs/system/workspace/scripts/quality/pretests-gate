@@ -719,8 +719,37 @@ for issue_path in targets:
     failures.extend(validate_issue(issue_path, issue_text, source))
 
 if failures:
+    # ── Classify and group failures ──
+    b2_errors = []; test_errors = []; other_errors = []
+    for f in failures:
+        if any(kw in f for kw in ["task_closeout","testcase_derivation","section '",
+                "pre_tests_missing","red_green_not_green","pre_tests_path",
+                "verification_artifact_dir","missing requirement","missing section"]):
+            b2_errors.append(f)
+        elif any(kw in f for kw in ["execution_missing","verification_state_missing",
+                "actual_output","evidence_file","got passed","got pending"]):
+            test_errors.append(f)
+        else:
+            other_errors.append(f)
     print("[pretests-gate] blocked completion due to pre-tests evidence failures:", file=sys.stderr)
-    for failure in failures:
-        print(f"- {failure}", file=sys.stderr)
+    print(file=sys.stderr)
+    if b2_errors or test_errors:
+        print("── 需要阅读的 Skill ──", file=sys.stderr)
+        if b2_errors:
+            print(f"  skill:freely-doc-B2_IBM-execution §pre-tests 模板与门禁常见坑速查 ({len(b2_errors)} 个)", file=sys.stderr)
+        if test_errors:
+            print(f"  skill:freely-test-execution §GREEN 判定标准 ({len(test_errors)} 个)", file=sys.stderr)
+        print(file=sys.stderr)
+    if b2_errors:
+        print(f"── B2 pre-tests 设计问题 ({len(b2_errors)}) ──", file=sys.stderr)
+        for f in b2_errors: print(f"  - {f}", file=sys.stderr)
+        print(file=sys.stderr)
+    if test_errors:
+        print(f"── test-GREEN 执行问题 ({len(test_errors)}) ──", file=sys.stderr)
+        for f in test_errors: print(f"  - {f}", file=sys.stderr)
+        print(file=sys.stderr)
+    if other_errors:
+        for f in other_errors: print(f"  - {f}", file=sys.stderr)
+    print("不要逐条改字段——先看上面「需要阅读的 Skill」，加载对应 skill 修正。", file=sys.stderr)
     sys.exit(1)
 PY

@@ -1,15 +1,61 @@
-## M-20260701T045911Z-A
-- title: feat: reviewer agent + per-step workflow 介入 + SSE routing
+## M-20260701T061924Z-A
+- title: feat: unify all gate outputs
 - status: active
 ### candidate_issues
-1. `C-20260701T045911Z-A`
-- milestone: M-20260701T045911Z-A
+1. `C-20260701T061924Z-A`
+- milestone: M-20260701T061924Z-A
 - status: promoted
+- promoted_issue_id: `I-20260701T061924Z-A`
 ### committed_issues
 ### completed_issues
-1. `I-20260701T045911Z-A`
-- title: Phase1: reviewer; milestone_state: completed
-- issue_path: `docs/epics/reviewer-agent/phase1-ensure-reviewer/raw-20260701T045911Z/issues/I-20260701T045911Z-A.md`
+1. `I-20260701T061924Z-A`
+- title: feat: unify gates; milestone_state: completed
+- issue_path: `docs/epics/gate-output-unify/grouped-output/raw-20260701T061924Z/issues/I-20260701T061924Z-A.md`
+- phase_state: `completed`
+
+## M-20260701T061531Z-A
+- title: feat: gate summary output
+- status: active
+### candidate_issues
+1. `C-20260701T061531Z-A`
+- milestone: M-20260701T061531Z-A
+- status: promoted
+- promoted_issue_id: `I-20260701T061531Z-A`
+### committed_issues
+### completed_issues
+1. `I-20260701T061531Z-A`
+- title: feat: gate summary; milestone_state: completed
+- issue_path: `docs/epics/gate-summary-output/add-summary/raw-20260701T061531Z/issues/I-20260701T061531Z-A.md`
+- phase_state: `completed`
+
+## M-20260701T054502Z-A
+- title: fix: gate skill references
+- status: active
+### candidate_issues
+1. `C-20260701T054502Z-A`
+- milestone: M-20260701T054502Z-A
+- status: promoted
+- promoted_issue_id: `I-20260701T054502Z-A`
+### committed_issues
+### completed_issues
+1. `I-20260701T054502Z-A`
+- title: fix: gate skill refs; milestone_state: completed
+- issue_path: `docs/epics/gate-skill-refs/add-refs/raw-20260701T054502Z/issues/I-20260701T054502Z-A.md`
+- phase_state: `completed`
+
+## M-20260701T051138Z-A
+- title: docs: workflow skill before feedback
+- status: active
+### candidate_issues
+1. `C-20260701T051138Z-A`
+- milestone: M-20260701T051138Z-A
+- status: promoted
+- promoted_issue_id: `I-20260701T051138Z-A`
+### committed_issues
+### completed_issues
+1. `I-20260701T051138Z-A`
+- title: fix: chain order; milestone_state: completed
+- issue_path: `docs/epics/workflow-chain/fix-order/raw-20260701T051138Z/issues/I-20260701T051138Z-A.md`
 - phase_state: `completed`
 
 ## M-20260701T040012Z-A
