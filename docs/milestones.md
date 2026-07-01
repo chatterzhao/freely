@@ -8,6 +8,10 @@
 - promoted_issue_id: `I-20260701T031733Z-A`
 ### committed_issues
 ### completed_issues
+1. `I-20260701T031733Z-A`
+- title: feat: skill-gate alignment + dev-test sync; milestone_state: completed
+- issue_path: `docs/epics/gate-skill-alignment/skill-template-fix/raw-20260701T031733Z/issues/I-20260701T031733Z-A.md`
+- phase_state: `completed`
 
 ## M-20260701T024449Z-A
 - title: fix: pr-review-guarded _review_guide unbound variable crash
