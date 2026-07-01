@@ -394,3 +394,99 @@ Reviewer 不存在                A2A+ACP    无              完全缺失
 Agent 身份                    3 card     1 card "Worker"  Manager/Reviewer 无独立 card
 ```
 
+
+## 6. Runtime Watchdog + Agent 直连 A2A SSE
+
+### 核心原则
+
+```
+Runtime 不是中间人，是启动者。
+
+  Runtime Watchdog           Agent ↔ Agent
+  ────────────────           ─────────────
+  监听 SSE                   直连 A2A SSE
+  检测"需要新 agent"信号      互相推送 task state
+  ACP 创建 session           不需要 Runtime 中转
+  然后退到后台继续监听        自己对话
+```
+
+### 完整时序
+
+```
+Runtime Watchdog     ACP            a2a_tasks       Worker           Reviewer
+(SSE listener)      (session factory)              (fix wt)         (develop)
+     │                 │                │             │                 │
+     │                 │                │──B1 done───▶│                 │
+     │                 │                │ state=      │                 │
+     │                 │                │ input-required               │
+     │                 │                │             │                 │
+     │◀──A2A SSE push──│                │             │                 │
+     │  detect:        │                │             │                 │
+     │  worker needs   │                │             │                 │
+     │  review         │                │             │                 │
+     │                 │                │             │                 │
+     │──ACP session/new▶               │             │                 │
+     │  role=reviewer  │                │             │                 │
+     │  paired=worker  │                │             │                 │
+     │                 │                │             │                 │
+     │                 │──Reviewer boots─────────────▶│                 │
+     │                 │                │             │                 │
+     │ (退到后台)       │                │             │                 │
+     │                 │                │             │                 │
+     │                 │                │◀──A2A SSE────────────────────│
+     │                 │                │  "开始审查 B1 产物"           │
+     │                 │                │             │                 │
+     │                 │                │──A2A SSE───▶│                 │
+     │                 │                │  "审查中..."  │                 │
+     │                 │                │             │                 │
+     │                 │                │◀──A2A SSE────────────────────│
+     │                 │                │  state=completed             │
+     │                 │                │  verdict=pass                │
+     │                 │                │  guidance="没有问题，继续推进" │
+     │                 │                │             │                 │
+     │                 │                │──A2A SSE───▶│                 │
+     │                 │                │  "reviewer:│                 │
+     │                 │                │   pass,     │                 │
+     │                 │                │   继续 B2"  │                 │
+     │                 │                │             │                 │
+     │                 │                │             │──B2 skill────▶  │
+     │                 │                │             │                 │
+     │ (Runtime 不需要介入这步)          │             │                 │
+```
+
+### Runtime 介入 vs 不介入
+
+```
+Runtime 介入 (ACP session/new):           Runtime 不介入 (Agent 直连 A2A SSE):
+──────────────────────────────           ──────────────────────────────
+• Worker 第一次需要 Reviewer              • Worker 报告进度给 Reviewer
+• Reviewer 还没启动                       • Reviewer 推送 verdict 给 Worker  
+• Agent crash 需重新启动                  • 正常的 task state 变更
+• Daemon 重启需恢复 agent                 • "working", "completed" 等状态更新
+```
+
+### 三个 agent 的 A2A SSE 订阅关系
+
+```
+                    a2a_tasks
+                   ┌─────────┐
+                   │  SSE    │
+                   │  Push   │
+                   └──┬──┬───┘
+                      │  │
+         ┌────────────┼──┼────────────┐
+         │            │  │            │
+         ▼            ▼  ▼            ▼
+     Manager       Worker         Reviewer
+   (develop)      (fix wt)       (develop)
+       │              │               │
+       │ 订阅:         │ 订阅:          │ 订阅:
+       │ 所有 worker   │ 自己 task      │ 自己被委派
+       │ 所有 reviewer │ 的配对 reviewer│ 的 task
+       │ 的 state 变更 │ 的 verdict     │
+       │              │               │
+       └──────────────┴───────────────┘
+         Runtime Watchdog 额外订阅:
+         所有 input-required → 判断是否需创建新 agent
+```
+
