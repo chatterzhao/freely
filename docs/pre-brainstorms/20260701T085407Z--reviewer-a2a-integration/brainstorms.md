@@ -1153,30 +1153,24 @@ CREATE INDEX idx_aw_manager ON agent_working(manager_id);
 - [ ] P5.4 freely-cycle dispatch_reviewer 实际执行
 
 
-## 15. agent_working 表补充 — session_id 记录
 
-### 为什么需要记录 session_id
+## 15. agent_working 表 — agent_id 列同时存 session
 
-```
-agent-id.env 当前记录:  worktree_path = role = agent_id
-缺失:                  每个 agent 的 ACP session_id
+### 设计
 
-session_id 用途:
-  - daemon 重启 → session/resume 需要知道上次的 session_id
-  - wt-close → session/close 需要 session_id
-  - 故障恢复 → 知道哪个 session 死了，是否需要重新创建
-  - 多 agent 同 raw_key → 每个有自己的 session，需区分
-```
-
-### session_ids 列设计
+不另加 session_ids 列。直接用 manager_id / worker_id / reviewer_id 列，
+值格式为 `agent_id:session_id`。没有 session 时只有 agent_id。
 
 ```
-列名: session_ids
-格式: agent_id:session_id 键值对，逗号分隔
-
-示例值:
-  manager_01:ses_abc123,worker_03:ses_def456,reviewer_05:ses_ghi789,reviewer_08:ses_jkl012
+列            值                                              含义
+----------    ----------------------------------------------  ------------------
+manager_id    manager_01:ses_abc123                           manager 的 session
+worker_id     worker_03:ses_def456                            worker 的 session
+reviewer_id   reviewer_05:ses_ghi,reviewer_08:ses_jkl012      多个 reviewer，各带 session
 ```
+
+reviewer 因为不会同时写入（一个一个委派），不会有写冲突。
+逗号隔开多个 `reviewer_NN:session_id` 对。
 
 ### 最终 agent_working 表
 
@@ -1187,56 +1181,45 @@ CREATE TABLE agent_working (
     branch          TEXT NOT NULL,
     test_worktree   TEXT,
     test_branch     TEXT,
-    manager_id      TEXT,
-    worker_id       TEXT,
-    reviewer_id     TEXT,       -- reviewer_05,reviewer_08 (逗号隔开)
-    session_ids     TEXT,       -- manager_01:ses_abc,worker_03:ses_def,reviewer_05:ses_ghi
+    manager_id      TEXT,       -- manager_01:ses_xxx
+    worker_id       TEXT,       -- worker_03:ses_xxx
+    reviewer_id     TEXT,       -- reviewer_05:ses_xxx,reviewer_08:ses_yyy
     created_at      TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at      TEXT NOT NULL DEFAULT (datetime('now'))
 );
 ```
 
-### session_ids 读写
+### agent_session_set(raw_key, role, agent_id, session_id)
 
-```python
-def session_set(raw_key, agent_id, session_id):
-    """ACP session/new 后写入"""
-    row = db.get("SELECT session_ids FROM agent_working WHERE raw_key = ?", [raw_key])
-    pairs = parse_pairs(row["session_ids"]) if row else {}
-    pairs[agent_id] = session_id
-    db.execute("UPDATE agent_working SET session_ids = ?, updated_at = datetime('now') WHERE raw_key = ?",
-               [format_pairs(pairs), raw_key])
+ACP session/new 后调用。更新对应 role 列。
+reviewer 追加不覆盖，其他 role 直接覆盖。
 
-def session_get(raw_key, agent_id):
-    """查某个 agent 的 session_id"""
-    row = db.get("SELECT session_ids FROM agent_working WHERE raw_key = ?", [raw_key])
-    pairs = parse_pairs(row["session_ids"]) if row else {}
-    return pairs.get(agent_id)
+### agent_session_get(raw_key, role, agent_id=None)
 
-def session_remove(raw_key, agent_id):
-    """session/close 时移除"""
-    row = db.get("SELECT session_ids FROM agent_working WHERE raw_key = ?", [raw_key])
-    pairs = parse_pairs(row["session_ids"]) if row else {}
-    pairs.pop(agent_id, None)
-    db.execute("UPDATE agent_working SET session_ids = ? WHERE raw_key = ?",
-               [format_pairs(pairs), raw_key])
+查 session_id。reviewer 需指定 agent_id，返回该 reviewer 的 session。
+其他 role 直接返回 `列值.split(":",1)[1]`。
 
-# helper
-def parse_pairs(s):
-    """manager_01:ses_abc,worker_03:ses_def → {manager_01: ses_abc, worker_03: ses_def}"""
-    if not s: return {}
-    return dict(p.split(":", 1) for p in s.split(",") if ":" in p)
+### agent_session_remove(raw_key, role, agent_id=None)
 
-def format_pairs(d):
-    return ",".join(f"{k}:{v}" for k, v in d.items())
+session/close 时调用。清除 session 部分，保留 agent_id。
+reviewer 从逗号列表中移除对应项。
+
+### 示例数据
+
+```sql
+-- develop: manager 运行中
+INSERT INTO agent_working VALUES ('develop', '/path/to/freely', 'develop',
+    NULL, NULL, 'manager_01:ses_abc123', NULL, NULL);
+
+-- fix: worker_03 已分配，session 未启动
+INSERT INTO agent_working VALUES ('20260701T085407Z',
+    '/path/to/fix-raw-KEY-xxx', 'fix/raw-KEY-xxx',
+    '/path/to/test-pre-merge-KEY-xxx', 'test-pre-merge-KEY-xxx',
+    NULL, 'worker_03', NULL);
+
+-- B1 完成后: worker + 2 reviewers 都在运行
+UPDATE agent_working SET
+    worker_id = 'worker_03:ses_def456',
+    reviewer_id = 'reviewer_05:ses_ghi789,reviewer_08:ses_jkl012'
+WHERE raw_key = '20260701T085407Z';
 ```
-
-### 使用场景
-
-```
-1. ACP session/new → session_set(raw_key, agent_id, session_id)
-2. daemon 重启 → session_get(raw_key, agent_id) → session/resume
-3. wt-close → session_get(raw_key, agent_id) → session/close → session_remove(raw_key, agent_id)
-4. agent crash 检测 → session_get 返回非空但进程不存在 → 标记 failed
-```
-
