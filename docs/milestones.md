@@ -1,3 +1,14 @@
+## M-20260701T085407Z-A
+- title: fix: A2A reviewer restore + routing + session
+- status: active
+### candidate_issues
+1. `C-20260701T085407Z-A`
+- milestone: M-20260701T085407Z-A
+- status: promoted
+- promoted_issue_id: `I-20260701T085407Z-A`
+### committed_issues
+### completed_issues
+
 ## M-20260701T081450Z-A
 - title: fix: merge lock orphan self-heal
 - status: active
