@@ -2,6 +2,10 @@
 - title: docs: workflow skill before feedback
 - status: active
 ### candidate_issues
+1. `C-20260701T051138Z-A`
+- milestone: M-20260701T051138Z-A
+- status: promoted
+- promoted_issue_id: `I-20260701T051138Z-A`
 ### committed_issues
 ### completed_issues
 1. `I-20260701T051138Z-A`
