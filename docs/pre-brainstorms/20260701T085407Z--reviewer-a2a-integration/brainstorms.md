@@ -699,3 +699,132 @@ worker_10 needs-reviewer → Runtime Watchdog 检测 → 创建 reviewer_worker_
   5. SSE 订阅按 task_id 过滤，不会收到其他 reviewer 的事件
 ```
 
+
+## 9. agent-id.env — 工作分配的唯一真相源
+
+### 设计原则
+
+```
+agent-table.toml          agent-id.env               freely.db (a2a_tasks)
+─────────────────         ────────────               ────────────────────
+定义有哪些 agent           记录"谁在哪个工位"          查询"谁空闲/谁占用"
+(静态配置)                 (运行时真相)                (SQL 快速统计)
+```
+
+### agent-table.toml — 扁平化，reviewer 独立
+
+```toml
+# 旧设计 (绑定):                     # 新设计 (并列):
+[[agents]]                           [[agents]]
+manager_id = "manager_01"            agent_id = "manager_01"
+manager_slot = "..."                 role = "manager"
+reviewer_id = "reviewer_manager_01"  slot = "claude-apikey-ds-pro-auto"
+reviewer_slot = "..."                pool = 1
+                                     [[agents]]
+[[agents]]                           agent_id = "worker"
+worker_id = "worker_01"              role = "worker"
+worker_slot = "..."                  slot = "claude-apikey-ds-pro-auto"
+reviewer_id = "reviewer_worker_01"   pool = 10     # → worker_01..10
+reviewer_slot = "..."
+pool = 10                            [[agents]]
+                                     agent_id = "reviewer"
+                                     role = "reviewer"
+                                     slot = "claude-apikey-ds-pro-auto"
+                                     pool = 10     # → reviewer_01..10
+```
+
+**关键变化**:
+- reviewer 不再绑定在 manager/worker 下
+- 命名: `reviewer_01` 不是 `reviewer_manager_01`
+- pool=N 自动生成编号: worker_01..10, reviewer_01..10
+- 配对不再靠 agent-table，而是靠 agent-id.env 的运行时记录
+
+### agent-id.env — 运行时唯一真相
+
+```
+# agent-id.env — 每个工位当前由哪个 agent_working_id 工作
+# ACP session/new|fork|resume 时写入，session/close 时清除
+# 查询"谁在这个工位" → 读这个文件
+
+/Users/.../freely                                    = manager_01
+/Users/.../freely-worktrees/fix-raw-KEY1-xxx         = worker_03
+/Users/.../freely-worktrees/test-pre-merge-KEY1-xxx  = reviewer_05
+/Users/.../freely-worktrees/fix-raw-KEY2-yyy         = worker_01
+/Users/.../freely-worktrees/test-pre-merge-KEY2-yyy  = reviewer_02
+/Users/.../freely-worktrees/fix-raw-KEY3-zzz         = worker_07
+```
+
+**规则**:
+- Manager 永远在 develop 工位 (`manager_01`)
+- Worker 在 fix/raw-{key} 工位
+- Reviewer 在 test-pre-merge-{key} 工位
+- **一个工位可以有多个 agent** (e.g., 2 个 reviewer 审查不同面)
+- ACP session 创建时写入，关闭时移除
+- **以这个文件为准**，不以 agent-table 的静态配置为准
+
+### 一个工位多个 Reviewer
+
+```
+test-pre-merge-KEY1-xxx = reviewer_05  (审查代码质量)
+                         reviewer_08  (审查安全合规)
+                         
+agent-id.env 支持同一 worktree 多行:
+/Users/.../test-pre-merge-KEY1-xxx = reviewer_05
+/Users/.../test-pre-merge-KEY1-xxx = reviewer_08
+```
+
+### SQL 查询空闲 agent
+
+```sql
+-- freely.db: 哪些 agent 正在工作（占用中）
+SELECT agent_id, worktree, state 
+FROM a2a_tasks 
+WHERE state IN ('submitted', 'working', 'input-required')
+  AND agent_id LIKE 'worker_%';
+
+-- 哪些 worker 空闲（pool=10 但未出现在占用列表）
+-- Python: set(worker_01..worker_10) - set(occupied_workers)
+
+-- 下一个可用 worker NN:
+-- min(available_workers) 
+
+-- 统计各角色占用/空闲:
+SELECT 
+  SUBSTR(agent_id, 1, INSTR(agent_id, '_') - 1) as role,
+  COUNT(*) as occupied,
+  (SELECT pool FROM agent_table WHERE agent_id = role) - COUNT(*) as free
+FROM a2a_tasks 
+WHERE state IN ('submitted', 'working', 'input-required')
+GROUP BY role;
+```
+
+### ACP session 创建流程（修正版）
+
+```
+1. Manager 决定需要 Worker → 查 freely.db 哪个 worker_NN 空闲 → 分配 worker_03
+2. Runtime ACP session/new → 写入 agent-id.env:
+     fix/raw-KEY1-xxx = worker_03
+3. Worker 工作完成 → needs-reviewer
+4. Manager/Runtime 检测到 → 查 freely.db 哪个 reviewer_NN 空闲 → 分配 reviewer_05
+5. Runtime ACP session/new → 写入 agent-id.env:
+     test-pre-merge-KEY1-xxx = reviewer_05
+6. Reviewer 通过 raw-key 找到 Worker 产物 → 审查
+7. wt-close → session/close → 从 agent-id.env 移除对应行
+```
+
+### 配对不再靠 agent-table，靠 agent-id.env
+
+```
+旧方式: agent-table 写死配对 (reviewer_worker_01 ↔ worker_01)
+新方式: agent-id.env 运行时记录
+
+Worker 需要 Reviewer 时:
+  1. 查 agent-id.env → 找到自己的 worker_NN
+  2. 查 freely.db → 找到空闲的 reviewer_NN
+  3. 创建 A2A task → raw_key 关联两者
+  4. Reviewer 通过 raw_key 找到 Worker 的工位和产物
+
+不需要 reviewer_NN == worker_NN。
+只需要 reviewer 知道 raw_key，就能找到 Worker 的所有产物。
+```
+
