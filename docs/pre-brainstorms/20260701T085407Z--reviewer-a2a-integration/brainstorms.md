@@ -828,3 +828,114 @@ Worker 需要 Reviewer 时:
 只需要 reviewer 知道 raw_key，就能找到 Worker 的所有产物。
 ```
 
+
+## 10. agent-id.env → agent_working_id (SQLite 表)
+
+### 为什么用 SQLite 表代替文件
+
+```
+agent-id.env (文件)              agent_working_id (SQLite 表)
+─────────────────────            ─────────────────────────────
+每个 worktree 一行文本           主键 raw_key，结构化查询
+多 reviewer 需重复行             一列存多个 reviewer_id
+查询需 grep/awk                  SQL 直接查
+无事务保护                       SQLite 事务
+统计空闲 agent 需额外脚本         一条 SQL 统计占用/空闲
+```
+
+### 表结构
+
+```sql
+CREATE TABLE agent_working_id (
+    raw_key         TEXT PRIMARY KEY,     -- raw-20260701T085407Z
+    worktree        TEXT NOT NULL,        -- /path/to/fix/raw-KEY-slug
+    branch          TEXT NOT NULL,        -- fix/raw-KEY-slug (worktree 可有多分支)
+    manager_id      TEXT,                 -- manager_01 (develop 独占)
+    worker_id       TEXT,                 -- worker_03
+    reviewer_id     TEXT,                 -- reviewer_05,reviewer_08 (多个逗号分隔)
+    created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at      TEXT NOT NULL DEFAULT (datetime('now'))
+);
+```
+
+### 示例数据
+
+```sql
+-- develop 工位: 只有 manager
+INSERT INTO agent_working_id VALUES (
+    'develop',
+    '/Users/.../freely',
+    'develop',
+    'manager_01',
+    NULL,
+    NULL
+);
+
+-- fix 工位: worker_03 在工作
+INSERT INTO agent_working_id VALUES (
+    '20260701T085407Z',
+    '/Users/.../freely-worktrees/fix-raw-20260701T085407Z-xxx',
+    'fix/raw-20260701T085407Z-xxx',
+    NULL,
+    'worker_03',
+    NULL
+);
+
+-- test 工位: 2 个 reviewer 同时审查
+INSERT INTO agent_working_id VALUES (
+    '20260701T085407Z',
+    '/Users/.../freely-worktrees/test-pre-merge-20260701T085407Z-xxx',
+    'test-pre-merge-20260701T085407Z-xxx',
+    NULL,
+    NULL,
+    'reviewer_05,reviewer_08'
+);
+```
+
+### 常用查询
+
+```sql
+-- 某个 raw_key 的工位上谁在工作？
+SELECT worker_id, reviewer_id 
+FROM agent_working_id 
+WHERE raw_key = '20260701T085407Z';
+
+-- 哪些 worker 正在占用中？
+SELECT worker_id FROM agent_working_id WHERE worker_id IS NOT NULL;
+-- → worker_03, worker_01, worker_07 (占用中)
+-- → 空闲 = {worker_01..10} - {占用}
+
+-- 下一个可用 worker NN:
+-- Python: min(set(f'worker_{i:02d}' for i in range(1,11)) - occupied)
+
+-- 某个 reviewer 在审查哪些 raw_key？
+SELECT raw_key, worktree FROM agent_working_id 
+WHERE reviewer_id LIKE '%reviewer_05%';
+
+-- 统计各角色占用/空闲
+SELECT 
+    'worker' as role,
+    COUNT(DISTINCT worker_id) as occupied,
+    10 - COUNT(DISTINCT worker_id) as free
+FROM agent_working_id WHERE worker_id IS NOT NULL
+UNION ALL
+SELECT 
+    'reviewer' as role,
+    COUNT(DISTINCT TRIM(v.value)) as occupied,
+    99 - COUNT(DISTINCT TRIM(v.value)) as free
+FROM agent_working_id, json_each('["' || REPLACE(reviewer_id, ',', '","') || '"]') v
+WHERE reviewer_id IS NOT NULL;
+```
+
+### agent_working_id 与 a2a_tasks 的分工
+
+```
+agent_working_id                  a2a_tasks
+─────────────────                  ─────────
+"谁在哪个工位"                      "谁在做什么任务"
+静态分配关系                        动态任务状态
+ACP session 创建时写入              A2A task 创建/更新时写入
+wt-close 时删除                    任务完成后 state=completed
+查空闲 agent 用这张表              查任务进度用那张表
+```
+
