@@ -823,7 +823,7 @@ preflight_codex_slot_recovery_before_start_or_fail() {
 usage() {
   cat <<'EOF'
 Usage:
-  freely init [--project <abs_path>] --intent <abs_file> --constitution <abs_file> [--ai <tool[:model][:mode]>] [--tool-adapter <adapter>] [--tool-adapter-policy <policy>] [--reasoning-effort <effort>] [--auto] [--accept-default-autonomy] [--force] [--reason <text>]
+  freely init [--project <abs_path>] --intent <abs_file> --constitution <abs_file> [--tool-adapter <adapter>] [--tool-adapter-policy <policy>] [--auto] [--reset] [--accept-default-autonomy] [--force] [--reason <text>]
   freely set-tool [--project <abs_path>] --tool <name> [--tool-adapter <adapter>] [--tool-adapter-policy <policy>]
   freely sync-tooling [--project <abs_path>] --source-project <abs_path>
   freely doctor [--project <abs_path>]
@@ -19996,14 +19996,13 @@ EOF
 }
 
 cmd_init() {
-  local project="" intent="" constitution="" ai_spec="" tool_adapter_arg="" tool_adapter_policy_arg="" reasoning_effort="" force="false" accept_default_autonomy="false" auto_mode="false" reset_mode="false"
+  local project="" intent="" constitution="" tool_adapter_arg="" tool_adapter_policy_arg="" reasoning_effort="" force="false" accept_default_autonomy="false" auto_mode="false" reset_mode="false"
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --reset) reset_mode="true"; shift ;;
       --project) project="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
       --intent) intent="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
       --constitution) constitution="$(abs_path_or_fail "${2:-}")"; shift 2 ;;
-      --ai) ai_spec="${2:-}"; shift 2 ;;
       --tool-adapter) tool_adapter_arg="${2:-}"; shift 2 ;;
       --tool-adapter-policy) tool_adapter_policy_arg="${2:-}"; shift 2 ;;
       --reasoning-effort) reasoning_effort="${2:-}"; shift 2 ;;
@@ -20077,6 +20076,26 @@ REASON_GATE
       log_warn "config.toml.example not found at $_example_src — creating empty config"
       touch "$_cfg"
     fi
+  else
+    # Config exists but --reset not requested: block to prevent accidental modification
+    cat >&2 <<CFG_EXISTS
+╔══════════════════════════════════════════════════════════════╗
+║  config.toml 已存在，init 不会修改已有配置                     ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  如需重置配置（自动备份当前文件后从模板重建）:                  ║
+║    freely init --reset --ai <tool:model:mode> ...              ║
+║    freely init --reset --auto --ai <tool:model:mode> ...       ║
+║                                                              ║
+║  重置会自动备份:                                               ║
+║    config.toml → config.toml.YYYYMMDDTHHMMSSZ.bak            ║
+║                                                              ║
+║  如果只是想补充缺失的 ACP 字段（不动已有值），可以:             ║
+║    直接编辑 .freely/config.toml，参照 .freely/config.toml.example ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+CFG_EXISTS
+    exit 1
   fi
 
   # Auto-fill known values (both for new and reset configs)
@@ -20129,18 +20148,12 @@ PLATFORM_GATE
     esac
   done
 
-  ai_spec="$(resolve_ai_spec_for_project_or_global "$project" "$ai_spec")" || {
-    log_error "missing --ai and no project/global default AI configured"
-    log_error "set --ai explicitly, or define AI_TOOL/AI_MODEL/AI_MODE in $(global_config_file)"
-    exit 1
-  }
-
-  local parsed tool model mode tool_adapter tool_adapter_policy tool_capabilities tool_policy
-  local codex_capability_model codex_capability_sandbox codex_capability_approval_policy codex_capability_cwd_mode
-  parsed="$(parse_ai_spec "$ai_spec")"
-  IFS='|' read -r tool model mode <<<"$parsed"
-  tool_adapter_policy="$(resolve_tool_adapter_policy_for_project_or_global "$project" "$tool" "$tool_adapter_policy_arg" "$tool_adapter_arg")"
-  tool_adapter="$(resolve_tool_adapter_for_project_or_global "$project" "$tool" "$tool_adapter_arg" "$tool_adapter_policy")"
+  # AI tool is now configured via agent-table.toml (slot per role).
+  # Model and approval posture come from the slot's own config file.
+  # init only sets up ACP binaries and project paths — not AI tool/model/mode.
+  local tool_adapter tool_adapter_policy
+  tool_adapter_policy="$(resolve_tool_adapter_policy_for_project_or_global "$project" "" "$tool_adapter_policy_arg" "$tool_adapter_arg")"
+  tool_adapter="$(resolve_tool_adapter_for_project_or_global "$project" "" "$tool_adapter_arg" "$tool_adapter_policy")"
 
   # ── Unified config.toml reader ──────────────────────────────────────
   # Gracefully handles missing config.toml (returns empty string).
@@ -20276,7 +20289,6 @@ sys.exit(1)
   验证安装:
     python3 -c "from acp import Agent; print('OK')"
 
-  当前工具: $tool
   当前适配器: $tool_adapter
 
 SDK_HELP
@@ -20287,23 +20299,6 @@ SDK_HELP
     _init_acp_tool_setup "$auto_mode" "$reset_mode"
   fi
 
-  tool_capabilities="$(tool_default_capabilities_for_runtime "$tool")"
-  tool_policy="$(tool_default_policy_for_runtime "$tool")"
-  codex_capability_model="$(codex_capability_default_model_for_runtime "$tool")"
-  codex_capability_sandbox="$(codex_capability_default_sandbox_for_runtime "$tool")"
-  codex_capability_approval_policy="$(codex_capability_default_approval_policy_for_runtime "$tool")"
-  codex_capability_cwd_mode="$(codex_capability_default_cwd_mode_for_runtime "$tool")"
-  if [[ "$tool" == "codex" ]]; then
-    [[ -n "$model" ]] || model="gpt-5.5"
-    [[ -n "$reasoning_effort" ]] || reasoning_effort="medium"
-  elif [[ "$tool" == "cc" || "$tool" == "cc-use-codex-cli" ]]; then
-    [[ -n "$reasoning_effort" ]] || reasoning_effort="medium"
-  fi
-
-  AI_MODE="$mode"
-  AI_CAPABILITY_CODEX_SANDBOX="$codex_capability_sandbox"
-  AI_CAPABILITY_CODEX_APPROVAL_POLICY="$codex_capability_approval_policy"
-  AI_CAPABILITY_CODEX_CWD_MODE="$codex_capability_cwd_mode"
   require_default_autonomy_activation_consent "$project" "$accept_default_autonomy"
 
   ensure_project_agents_md "$project"
@@ -20397,9 +20392,16 @@ EOF
   echo "│                                                        │"
   echo "│  1. 请编辑 .freely/config.toml，检查并补充必要配置:      │"
   echo "│    vim .freely/config.toml"
-  echo "│    至少需确认: AI_TOOL, AI_MODEL, FREELY_REPO_PLATFORMS"
+  echo "│    至少需确认: FREELY_REPO_PLATFORMS"
   echo "│                                                        │"
-  echo "│  2. 启动 freely:                                        │"
+  echo "│  2. AI 工具通过 agent-table.toml 配置（非 config.toml):  │"
+  echo "│    编辑 .freely/agent-table.toml 设置各 role 的 slot:     │"
+  echo "│      manager_slot  = \"your-tool-apikey-name\"             │"
+  echo "│      worker_slot   = \"your-tool-apikey-name\"             │"
+  echo "│      reviewer_slot = \"your-tool-apikey-name\"             │"
+  echo "│    slot 名对应 ~/.ai-auth/ 下的配置目录                    │"
+  echo "│                                                        │"
+  echo "│  3. 启动 freely:                                        │"
   echo "│    freely start --project $project"
   echo "└────────────────────────────────────────────────────────┘"
 }
