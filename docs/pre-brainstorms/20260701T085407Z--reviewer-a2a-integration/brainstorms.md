@@ -82,7 +82,7 @@ Daemon 重启 → resume           working/completed 更新
 worker_03 和 reviewer_05 无需 NN 匹配。通过 raw_key 关联：
 同一 raw_key 的 dev worktree 和 test worktree，A2A task 携带 raw_key + parent_agent。
 
-### input-required 6 向路由
+### input-required 路由 (6 向 + 兜底)
 
 | # | 方向 | reason | 处理者 | ACP |
 |---|------|--------|--------|-----|
@@ -92,6 +92,10 @@ worker_03 和 reviewer_05 无需 NN 匹配。通过 raw_key 关联：
 | 4 | Reviewer→Manager | needs-manager-scope | Manager | session/resume |
 | 5 | Manager→Reviewer | needs-review:gate | Reviewer | session/new |
 | 6 | Manager→Worker | needs-worker-task | Worker | session/resume/fork |
+| **兜底** | **任何人** | **未识别 / 空 / 未知** | **manager_01** | **session/resume** |
+
+兜底规则: reason 不匹配上述 6 种、为空、或解析失败时，一律路由到 manager_01。
+Manager 收到后判断: 手动处理 / 创建新 issue / 标记 failed / 忽略噪音。
 
 ### Card 设计 (roles.toml)
 
