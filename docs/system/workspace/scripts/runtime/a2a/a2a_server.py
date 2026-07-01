@@ -74,13 +74,41 @@ FREELY_SKILLS = [
 ]
 
 
-def _build_agent_card(project: str) -> AgentCard:
+def _load_role_skills(project: str, role: str) -> list:
+    import tomllib
+    roles_path = os.path.join(project, "docs", "system", "workspace", "agents", "roles.toml")
+    if not os.path.exists(roles_path):
+        return FREELY_SKILLS  # fallback to hardcoded
+    try:
+        with open(roles_path, "rb") as f:
+            data = tomllib.load(f)
+        role_data = data.get(role, {})
+        skill_ids = role_data.get("skills", [])
+        return [
+            AgentSkill(
+                id=skill_id,
+                name=skill_id.replace("freely-", "").replace("-", " ").title(),
+                tags=[role]
+            )
+            for skill_id in skill_ids
+        ]
+    except Exception:
+        return FREELY_SKILLS
+
+
+def _build_agent_card(project: str, role: str = "worker") -> AgentCard:
+    role_names = {"manager": "Freely Manager", "worker": "Freely Worker", "reviewer": "Freely Reviewer"}
+    role_descs = {
+        "manager": "Patrol fleet, delegate workers, judge closeout",
+        "worker": "Worktree-isolated, skill-based execution",
+        "reviewer": "Per-step review, gate check, TDD fidelity",
+    }
     return AgentCard(
-        name="Freely Worker",
-        description="Freely Worker Agent — worktree-isolated, skill-based A2A execution",
+        name=role_names.get(role, "Freely Agent"),
+        description=role_descs.get(role, "Freely Agent — A2A execution"),
         version="1.0.0",
         capabilities=AgentCapabilities(streaming=True, push_notifications=True),
-        skills=FREELY_SKILLS,
+        skills=_load_role_skills(project, role),
         supported_interfaces=[
             AgentInterface(
                 url=f"unix://{_socket_path(project)}",
@@ -578,7 +606,9 @@ class A2AServer:
     # ── Endpoints ──────────────────────────────────────────────────────
 
     async def _agent_card_endpoint(self, request: Request):
-        return Response(MessageToJson(self.agent_card), media_type="application/json")
+        role = request.query_params.get("role", "worker")
+        card = _build_agent_card(self.project, role)
+        return Response(MessageToJson(card), media_type="application/json")
 
     async def _tasks_endpoint(self, request: Request):
         if request.method == "POST":
