@@ -120,6 +120,20 @@ worker_03 和 reviewer_05 无需 NN 匹配。通过 raw_key 关联：
 ```
 
 `reason` = 为什么 (问题类型), `needs_agent` = 找谁 (路由结果)。
+
+### reason vs message
+
+```
+reason  = 机读，路由用     "needs-review:b1"
+message = agent 读，理解用  "B1 brainstorms 和 candidate 已完成，请审查是否达标"
+```
+
+| 字段 | 消费者 | 格式 | 示例 |
+|------|--------|------|------|
+| reason | Runtime Watchdog 路由 | 结构化: needs-{role}:{stage} | needs-review:b1 |
+| message | 接收方 agent (AI) | 自然语言, 足够上下文 | "worker_03 在 raw-20260701T085407Z 完成 B1，产物路径 docs/epics/..." |
+
+reason 决定路由。message 让 agent 不需要回头查任何表就能理解情况并开始工作。
 路由逻辑: 根据 reason 确定 needs_role，查 agent_working 空闲池，分配具体 agent_id。
 兜底: reason 无法识别 → needs_agent=manager_01。
 
@@ -213,15 +227,18 @@ Slot 在 ACP session 创建时从 agent-table 读取。
 - [ ] P7.3 确认 git tracked (不含 slot/pool)
 - [ ] P7.4 agent card 端点读取 roles.toml
 
-### P8: input-required 双向路由
-- [ ] P8.1 规范 input-required schema (task_id, reason, raw_key, review_stage, parent_agent)
-- [ ] P8.2 Worker→Reviewer 路由
-- [ ] P8.3 Worker→Manager 路由
-- [ ] P8.4 Reviewer→Worker 路由
-- [ ] P8.5 Reviewer→Manager 路由
-- [ ] P8.6 Manager→Reviewer 路由
-- [ ] P8.7 Manager→Worker 路由
-- [ ] P8.8 路由验证测试
+### P8: input-required 双向路由 + 兜底
+- [ ] P8.1 规范 input-required schema (task_id, from_agent, needs_agent, needs_role, reason, message, raw_key, review_stage, parent_agent, timestamp)
+- [ ] P8.2 reason 路由表实现 (6 向匹配 + 兜底 → manager_01)
+- [ ] P8.3 needs_agent 分配: 根据 needs_role 查 agent_working 空闲池
+- [ ] P8.4 Worker→Reviewer 路由 (needs-review:b1/b2/dev → next_free reviewer)
+- [ ] P8.5 Worker→Manager 路由 (needs-manager-decision → manager_01)
+- [ ] P8.6 Reviewer→Worker 路由 (needs-worker-retry → from parent_agent)
+- [ ] P8.7 Reviewer→Manager 路由 (needs-manager-scope → manager_01)
+- [ ] P8.8 Manager→Reviewer 路由 (needs-review:gate/audit → next_free reviewer)
+- [ ] P8.9 Manager→Worker 路由 (needs-worker-task → next_free worker)
+- [ ] P8.10 message 自动生成 (包含 from_agent, raw_key, review_stage, 产物路径)
+- [ ] P8.11 路由验证测试 (6 向 + 兜底 + 未知 reason)
 
 ### P9: 生命周期集成
 - [ ] P9.1 wt-close: session/close + release + 删行 + 删 worktree
