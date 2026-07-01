@@ -1333,7 +1333,7 @@ def main() -> int:
         if status == "promoted" and not candidate_queue_entries:
             errors.append(
                 f"{candidate.candidate_id} in {candidate.path} is promoted but has no candidate_issues entry in docs/milestones.md. "
-                f"Promoted candidates must flow through milestone candidate_issues -> committed_issues. "
+                f"Promoted candidates must flow through milestone candidate_issues -> committed_issues.  → 请阅读 skill:freely-doc-B1_IBM-execution §milestone-placement。"
                 f"Add C-{key} as M-{key} to the active milestone's candidate_issues queue."
             )
             continue
@@ -1353,14 +1353,14 @@ def main() -> int:
         ):
             errors.append(
                 f"{candidate.candidate_id} in {candidate.path} is touched by this develop merge, but the same merge does not carry its concrete owner issue/progress/review. "
-                f"Candidate-only evidence or an unrelated issue in the diff is not enough: bind the merge to this candidate's own I-* issue, or for an absorbed candidate include the canonical owner issue/progress/review in the same merge."
+                f"Candidate-only evidence or an unrelated issue in the diff is not enough: bind the merge to this candidate's own I-* issue, or for an absorbed candidate include the canonical owner issue/progress/review in the same merge. "
             )
 
         active_statuses = {"proposed", "needs_research", "blocked", "promoted"}
         if status in active_statuses and (not milestone or milestone == "unassigned" or milestone.startswith("pending://")):
             errors.append(
                 f"{candidate.candidate_id} in {candidate.path} is active with status '{status}', but milestone binding is missing. "
-                f"Create milestone identity M-{key} and place the candidate in docs/milestones.md candidate_issues before merging to develop."
+                f"Create milestone identity M-{key} and place the candidate in docs/milestones.md candidate_issues before merging to develop. → 请阅读 skill:freely-doc-B1_IBM-execution §milestone-placement。"
             )
             continue
 
@@ -1393,12 +1393,12 @@ def main() -> int:
         if status in {"proposed", "needs_research", "blocked"}:
             if not (candidate.next_action or "").strip():
                 errors.append(
-                    f"{candidate.candidate_id} in {candidate.path} is merge-eligible only because it stays in pre-IBM status '{status}', but next_action is missing. "
+                    f"{candidate.candidate_id} in {candidate.path} is merge-eligible only because it stays in pre-IBM status '{status}', but next_action is missing.  → 请阅读 skill:freely-doc-B1_IBM-execution §门禁常见坑速查。"
                     f"Write the concrete next action before merging unresolved research to develop."
                 )
             if not (candidate.revisit_trigger or "").strip():
                 errors.append(
-                    f"{candidate.candidate_id} in {candidate.path} is merge-eligible only because it stays in pre-IBM status '{status}', but revisit_trigger is missing. "
+                    f"{candidate.candidate_id} in {candidate.path} is merge-eligible only because it stays in pre-IBM status '{status}', but revisit_trigger is missing.  Write the restart condition so the candidate does not disappear after merge. → 请阅读 skill:freely-doc-B1_IBM-execution §门禁常见坑速查。"
                     f"Write the restart condition so the candidate does not disappear after merge."
                 )
 
@@ -1429,7 +1429,7 @@ def main() -> int:
             issue_path = owner_path
             if not issue_path or issue_path.startswith("pending://"):
                 errors.append(
-                    f"{candidate.candidate_id} in {candidate.path} is marked promoted, but promoted_issue_path is still '{issue_path or 'missing'}'. "
+                    f"{candidate.candidate_id} in {candidate.path} is marked promoted, but promoted_issue_path is still '{issue_path or 'missing'}'.   → 请阅读 skill:freely-doc-B2_IBM-execution §门禁常见坑速查。"
                     f"Materialize it into one or more I-{key}* issues before merging to develop."
                 )
                 continue
