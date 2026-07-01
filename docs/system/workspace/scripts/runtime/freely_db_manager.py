@@ -1410,6 +1410,13 @@ def h_aw_cleanup_stale(daemon: DbDaemon, params: dict) -> dict:
     return {"cleaned": cleaned}
 
 
+
+@_h("agent_working.get_all")
+def h_aw_get_all(daemon: DbDaemon, params: dict) -> dict:
+    rows = daemon.conn.execute("SELECT * FROM agent_working").fetchall()
+    cols = [d[0] for d in daemon.conn.execute("PRAGMA table_info(agent_working)").fetchall()]
+    return {"rows": [dict(zip(cols, r)) for r in rows]}
+
 @_h("agent_working.stats")
 def h_aw_stats(daemon: DbDaemon, params: dict) -> dict:
     """agent_stats: occupancy per role."""

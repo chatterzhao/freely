@@ -269,6 +269,34 @@ for t in json.load(sys.stdin).get('tools', []):
   done
 }
 
+# ── Agent Working shim — replaces agent-id.env reads ─────────────────
+# Queries agent_working table and outputs in agent-id.env-compatible format.
+# Format: worktree_path=role=agent_id (one per line)
+
+_agent_working_read_all() {
+  local project="$1"
+  local _aw_py="${project}/docs/system/workspace/scripts/runtime/agent_working.py"
+  if [[ -f "$_aw_py" ]]; then
+    python3 -c "
+import sys; sys.path.insert(0, '${project}/docs/system/workspace/scripts/runtime')
+from agent_working import _db_rpc
+result = _db_rpc('${project}', 'agent_working.get_all', {})
+rows = result.get('rows', [])
+for r in rows:
+    for role in ('manager','worker','reviewer'):
+        val = r.get(f'{role}_id','')
+        if val:
+            agent = val.split(':',1)[0] if ':' in str(val) else str(val)
+            wt = r.get('worktree','')
+            print(f'{wt}={role}={agent}')
+            if role == 'reviewer':
+                pairs = [p.split(':',1)[0] for p in str(val).split(',') if ':' in p]
+                for a in pairs:
+                    print(f'{r.get(\"test_worktree\",\"\")}={role}={a}')
+" 2>/dev/null || true
+  fi
+}
+
 # ── Slot testing helpers ──────────────────────────────────────────────
 
 # _resolve_current_agent_id: find which agent (manager_01 / worker_03 / …)
