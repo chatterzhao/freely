@@ -121,19 +121,57 @@ worker_03 和 reviewer_05 无需 NN 匹配。通过 raw_key 关联：
 
 `reason` = 为什么 (问题类型), `needs_agent` = 找谁 (路由结果)。
 
-### reason vs message
+### reason vs message — A2A 协议对齐
 
 ```
-reason  = 机读，路由用     "needs-review:b1"
-message = agent 读，理解用  "B1 brainstorms 和 candidate 已完成，请审查是否达标"
+A2A TaskStatusUpdateEvent:
+  ├── status.message   → message  (A2A 标准字段, Message + Part(text))
+  └── metadata         → reason + from_agent + needs_agent + raw_key + ...
+                          (Freely 自定义, metadata dict)
 ```
 
-| 字段 | 消费者 | 格式 | 示例 |
-|------|--------|------|------|
-| reason | Runtime Watchdog 路由 | 结构化: needs-{role}:{stage} | needs-review:b1 |
-| message | 接收方 agent (AI) | 自然语言, 足够上下文 | "worker_03 在 raw-20260701T085407Z 完成 B1，产物路径 docs/epics/..." |
+| 字段 | 存在 A2A 哪里 | 消费者 | 格式 | 一致性保证 |
+|------|-------------|--------|------|-----------|
+| reason | metadata | Runtime Watchdog 路由 | 枚举值, 不可随意写 | InputRequiredReason Enum |
+| message | status.message | 接收方 agent (AI) | 自然语言 | 自动生成模板 |
 
-reason 决定路由。message 让 agent 不需要回头查任何表就能理解情况并开始工作。
+### reason 枚举 (Freely 代码定义，全仓一致)
+
+```python
+# docs/system/workspace/agents/input_required_reason.py
+from enum import Enum
+
+class InputRequiredReason(Enum):
+    NEEDS_REVIEW_B1 = "needs-review:b1"
+    NEEDS_REVIEW_B2 = "needs-review:b2"
+    NEEDS_REVIEW_DEV = "needs-review:dev"
+    NEEDS_REVIEW_RED = "needs-review:red"
+    NEEDS_REVIEW_TEST = "needs-review:test"
+    NEEDS_REVIEW_GATE = "needs-review:gate"
+    NEEDS_MANAGER_DECISION = "needs-manager-decision"
+    NEEDS_WORKER_RETRY = "needs-worker-retry"
+    NEEDS_MANAGER_SCOPE = "needs-manager-scope"
+    NEEDS_WORKER_TASK = "needs-worker-task"
+    NEEDS_HUMAN_INPUT = "needs-human-input"
+    UNKNOWN = "unknown"  # 兜底 → manager_01
+```
+
+所有 agent 必须使用此 Enum 写入 reason，禁止手写字符串。
+新增 reason 时先改 Enum 再改路由表，编译器/IDE 保证不遗漏。
+
+### message 自动生成
+
+agent 设 input-required 时不手写 message。Runtime 根据参数自动生成：
+
+```
+模板: "{from_agent} 在 raw_key={raw_key} 完成 {review_stage}，需要 {reason}。
+       产物路径: docs/epics/{epic}/{story}/raw-{raw_key}/..."
+
+示例: "worker_03 在 raw-20260701T085407Z 完成 B1，需要 needs-review:b1。
+       产物路径: docs/epics/reviewer-agent/phase1/raw-20260701T085407Z/..."
+```
+
+message 保证接收方 agent 有足够上下文开始工作，不需要回头查任何表。
 路由逻辑: 根据 reason 确定 needs_role，查 agent_working 空闲池，分配具体 agent_id。
 兜底: reason 无法识别 → needs_agent=manager_01。
 
