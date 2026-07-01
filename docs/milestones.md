@@ -1,3 +1,18 @@
+## M-20260701T024449Z-A
+- title: fix: pr-review-guarded _review_guide unbound variable crash
+- status: active
+### candidate_issues
+1. `C-20260701T024449Z-A`
+- milestone: M-20260701T024449Z-A
+- status: promoted
+- promoted_issue_id: `I-20260701T024449Z-A`
+### committed_issues
+### completed_issues
+1. `I-20260701T024449Z-A`
+- title: fix: _review_guide unbound; milestone_state: completed
+- issue_path: `docs/epics/pr-review-guarded/review-guide-unbound/raw-20260701T024449Z/issues/I-20260701T024449Z-A.md`
+- phase_state: `completed`
+
 ## M-20260701T013527Z-A
 - title: fix: get_config undefined → bash indirect expansion
 - status: active
