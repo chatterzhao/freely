@@ -2,4 +2,9 @@
 - kind: fix
 - phase_state: completed
 - milestone: M-20260701T001514Z-A
-- title: fix --reset timeout message + non-TTY guidance
+- issue_id: I-20260701T001514Z-A
+- kind: fix
+- phase_state: completed
+- milestone: M-20260701T001514Z-A
+- source_candidate: docs/pre-brainstorms/20260701T001514Z--reset-timeout-msg/candidates.md#C-20260701T001514Z-A
+- title: fix --reset timeout msg
