@@ -167,37 +167,101 @@ created_at: 2026-07-01
     │            │             │           │            │            │
 ```
 
-## 3. agent-table.toml → Agent Card 生成规则
+## 3. Agent Role Card 设计
+
+### 文件布局
 
 ```
-agent-table.toml (你是谁)              生成的 Agent Card (你能做什么)
-─────────────────────────              ────────────────────────────
+.freely/agent-table.toml                    ← untracked, 用户配置 (slot)
+docs/system/workspace/agents/               ← git tracked, 定义角色能力
+├── manager.card.toml                         (Manager 能做什么)
+├── worker.card.toml                          (Worker 能做什么)
+└── reviewer.card.toml                        (Reviewer 能做什么)
+```
 
-[[agents]]                             Manager Card:
-manager_id = "manager_01"                name: "Freely Manager"
-manager_slot = "claude-..."              skills: [patrol, delegate, wt-create, scan, 
-reviewer_id = "reviewer_manager_01"              route-to-worker, route-to-reviewer]
-pool = 1                                card 生成源: agent-table.manager_id
-                                        slot 来源: agent-table.manager_slot
+### 职责分离
 
-[[agents]]                             Worker Card:
-worker_id = "worker_01"                  name: "Freely Worker"
-worker_slot = "claude-..."              skills: [B1, B2, RED, dev, test, GREEN]
-reviewer_id = "reviewer_worker_01"      card 生成源: agent-table.worker_id
-pool = 10                               slot 来源: agent-table.worker_slot
-                                        pool=N → worker_01..worker_N
+| 文件 | 位置 | Git | 谁维护 | 内容 |
+|------|------|:--:|------|------|
+| agent-table.toml | .freely/ | ❌ | 用户 (freely init) | slot, reviewer配对, pool |
+| manager.card.toml | docs/system/workspace/agents/ | ✅ | 开发者 (代码) | skills, capabilities |
+| worker.card.toml | docs/system/workspace/agents/ | ✅ | 开发者 (代码) | skills, capabilities |
+| reviewer.card.toml | docs/system/workspace/agents/ | ✅ | 开发者 (代码) | skills, capabilities |
 
-(从 agent-table 派生)                  Reviewer Card (Manager's):
-reviewer_manager_01                     name: "Freely Reviewer (Manager)"
-slot = manager_slot                     skills: [tdd-review, gate-check, 
-parent = manager_01                             code-review]
-                                        card 生成源: agent-table.reviewer_id
+### card.toml 示例
 
-(从 agent-table 派生)                  Reviewer Card (Worker's):
-reviewer_worker_01                      name: "Freely Reviewer (Worker)"
-slot = worker_slot                      skills: [tdd-review, per-step-review]
-parent = worker_01                      card 生成源: agent-table.reviewer_id
-                                        pool=N → reviewer_worker_01..N
+```toml
+# docs/system/workspace/agents/manager.card.toml
+[agent]
+name = "Freely Manager"
+description = "Patrol fleet, delegate workers, judge closeout"
+version = "1.0.0"
+
+[capabilities]
+streaming = true
+push_notifications = true
+
+[[skills]]
+id = "freely-workflow-guarded-execution"
+name = "Patrol & Delegate"
+description = "Scan fleet, dispatch workers, route reviewer"
+tags = ["manager", "patrol", "delegate"]
+
+[[skills]]
+id = "freely-branch-management"
+name = "Branch Management"
+description = "pr-create-guarded, pr-merge-guarded"
+tags = ["manager", "branch"]
+```
+
+```toml
+# docs/system/workspace/agents/worker.card.toml
+[agent]
+name = "Freely Worker"
+description = "Worktree-isolated, skill-based execution"
+version = "1.0.0"
+
+[[skills]]
+id = "freely-doc-B1_IBM-execution"
+name = "B1 Pre-Research"
+tags = ["worker", "research"]
+
+[[skills]]
+id = "freely-doc-B2_IBM-execution"
+name = "B2 Design"
+tags = ["worker", "design"]
+# ... B2, RED, dev, test, GREEN
+```
+
+```toml
+# docs/system/workspace/agents/reviewer.card.toml
+[agent]
+name = "Freely Reviewer"
+description = "Per-step review, gate check, TDD fidelity"
+version = "1.0.0"
+
+[[skills]]
+id = "freely-tdd-review"
+name = "TDD Fidelity Review"
+description = "4-layer review: raw→B1→B2→impl→test"
+tags = ["reviewer"]
+
+[[skills]]
+id = "freely-candidate-acceptance-review"
+name = "Candidate Acceptance Review"
+tags = ["reviewer"]
+```
+
+### Runtime 启动时的生成流程
+
+```
+1. 读取 agent-table.toml → 得到所有 agent 的 identity + slot
+2. 读取 *.card.toml → 得到每个角色的 skills
+3. 组合生成 A2A Agent Card (Python dict → MessageToJson)
+4. A2A Server 按 role 参数返回对应 card:
+   GET /.well-known/agent-card.json?role=manager
+   GET /.well-known/agent-card.json?role=worker
+   GET /.well-known/agent-card.json?role=reviewer
 ```
 
 ## 4. 重构 TODO List
