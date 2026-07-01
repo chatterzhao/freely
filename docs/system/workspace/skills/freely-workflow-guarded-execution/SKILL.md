@@ -265,7 +265,7 @@ GREEN 判定标准和详细步骤见 `skill:freely-test-execution`。
 
 - **流程顺序不可变**。`freely-doc-B1_IBM-execution` → `freely-doc-B2_IBM-execution` → `freely-test-RED-execution` → `freely-dev-loop-execution` → `freely-test-execution` → `freely pr-create-guarded`，fix 和 feature 一致。
 - **不发明新分支名**。只用 `fix/*`、`feature/*`、`hotfix/*`、`test-pre-merge-*`。
-- **test-pre-merge-* 工位是纯验证沙箱**，禁止在上面直接开发。代码在开发工位（fix/* 或 feature/*）写，用 `git cherry-pick` 同步到测试工位验证。
+- **test-pre-merge-* 工位是纯验证沙箱**，禁止在上面直接开发（禁止手动 add+commit 原创）。代码在开发工位（fix/* 或 feature/*）写，用 merge（首选）或 `git cherry-pick` 同步到测试工位验证。
 - **`freely-doc-B1_IBM-execution` skill 必须有根因分析**，不修表面症状。
 - **`freely-doc-B2_IBM-execution` skill 必须有 pre-tests**，覆盖全部改动面的测试方案，端到端优先。
 - **`freely-test-RED-execution` skill 不可跳过**。不通过 RED 不允许写实现代码。

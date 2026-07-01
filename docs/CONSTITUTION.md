@@ -28,7 +28,7 @@ Freely 是一个自主循环运行器：
   - 预检运行测试：在不污染 `develop` 的前提下做预集成 smoke / regression / acceptance
   - 预测试 merge：把来源 `feature/*` 临时合入同一批次，暴露组合冲突与集成问题
 - 允许多功能预演而不污染 `develop`。
-- 在这两类职责里发现问题，都必须回到来源 `feature/*` 或新的 dedicated feature worktree 修复；不得在 `test-pre-merge-*` 上直接改实现、写治理真相或提交普通修复。
+- 在这两类职责里发现问题，都必须回到来源 `feature/*` 或新的 dedicated feature worktree 修复；不得在 `test-pre-merge-*` 上做原创 `git add` + `git commit`（代码修改应通过 merge/cherry-pick 从 dev 工位进入 test）。
 - 只有当前批次仍具备权威性时，它才是可消费的验证面；若 `develop` 已继续前进、批次出现 protected-env 独有差异，或 promotion/cleanup 证据断裂，该批次就应被判定为 stale。
 - stale 批次必须退休；如果同一能力仍需继续验证，应从当前 `develop` 重建新的 `test-pre-merge-*` 批次，并按需要重新吸收来源 `feature/*` / `feature/premerge-*` 集合，而不是继续把旧批次快照当成当前真相。
 - 验证完成或失败后必须退出本轮职责，不得继续承担默认 `feature/*` 父分支角色。

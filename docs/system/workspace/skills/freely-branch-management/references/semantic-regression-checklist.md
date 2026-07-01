@@ -4,7 +4,7 @@
 
 1. 分支治理意图：
 - `feature/*` 必须从 `develop` 创建。
-- `main/develop/test-pre-merge-*` 必须保持 add/commit 禁止，且 `test-pre-merge-*` 不得 push。
+- `main/develop` 必须保持 add/commit 禁止（仅接受 merge）。`test-pre-merge-*` 禁止手动 add+commit 原创提交、禁止 push；允许 merge、cherry-pick、直接修改文件。
 
 2. Worktree 治理意图：
 - Worktree 根目录必须是同级 `{project-name}-worktrees`。
