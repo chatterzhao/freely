@@ -572,3 +572,130 @@ Worker (收到 Reviewer verdict):
   blocked → 等待 Manager 决策
 ```
 
+
+## 8. Agent 配对与工作交接机制
+
+### 8a. input-required 是双向的，三向互指
+
+```
+任何 agent 都可以 needs-{另一个}:
+
+Worker ──needs-reviewer──▶ Reviewer   (B1/B2/dev 完成后需审查)
+Worker ──needs-manager───▶ Manager    (遇到阻塞/冲突/需决策)
+Reviewer──needs-worker───▶ Worker     (审查不通过，需重做)
+Reviewer──needs-manager──▶ Manager    (scope 问题需 Manager 决策)
+Manager ──needs-reviewer──▶ Reviewer  (Manager 主动发起审查)
+Manager ──needs-worker───▶ Worker     (Manager 委派新任务)
+```
+
+### 8b. ACP session 与 worktree 绑定
+
+```
+session/new  → 必须有 worktree，在 worktree 上工作
+session/fork → 从父 session fork，继承 worktree
+session/resume → 恢复，仍在原 worktree
+session/close → wt-close 命令内封装，关闭 worktree 时同时关闭
+
+规则:
+  Manager:  worktree = develop (唯一)
+  Worker:   worktree = fix/raw-{key}-{slug} 或 feature/raw-{key}-{slug}
+  Reviewer: worktree = 其配对 Worker 的 test-pre-merge-{key}-{slug}
+  
+  session/close 时机: wt-close 命令内，先关 session 再删 worktree
+```
+
+### 8c. 多工位并发时的配对机制
+
+**核心问题**: 10 个 worker 并发，10 个 reviewer，怎么保证 reviewer_worker_03 审查的是 worker_03 的产出？
+
+**配对链条**:
+
+```
+agent-table.toml          agent-id.env                  worktree
+─────────────────         ────────────                  ────────
+worker_id = worker_01     fix/raw-KEY1-xxx=worker_01    fix/raw-KEY1-xxx
+pool = 10                 fix/raw-KEY2-yyy=worker_02    fix/raw-KEY2-yyy
+                          fix/raw-KEY3-zzz=worker_03    fix/raw-KEY3-zzz
+
+配对规则: NN 对号 + raw-key 对齐 + worktree 绑定
+
+worker_01 ←────────── 配对 ──────────→ reviewer_worker_01
+   │                                       │
+   │ worktree: fix/raw-KEY1-xxx            │ worktree: test-pre-merge-KEY1-xxx
+   │ raw-key: KEY1                         │ raw-key: KEY1 (继承)
+   │                                       │
+   └── 同一个 raw-key ─────────────────────┘
+
+worker_02 ←────────── 配对 ──────────→ reviewer_worker_02
+   │                                       │
+   │ worktree: fix/raw-KEY2-yyy            │ worktree: test-pre-merge-KEY2-yyy
+   │ raw-key: KEY2                         │ raw-key: KEY2 (继承)
+   │                                       │
+   └── 同一个 raw-key ─────────────────────┘
+```
+
+**配对保证机制**:
+
+```
+创建时:
+  1. wt-create 创建 fix/raw-{key}-{slug} + test-pre-merge-{key}-{slug}
+  2. agent-id.env 记录: fix/raw-{key}-{slug}=worker_NN
+  3. worker_NN 是 pool 中下一个可用编号 (01, 02, ...)
+  4. reviewer_worker_NN 自动配对 (同 NN)
+
+运行时:
+  5. Worker 在 fix/raw-{key} 上工作
+  6. Worker 设 needs-reviewer 时，A2A task 携带 raw-key 和 worker_NN
+  7. Runtime Watchdog 检测到 → 创建 reviewer_worker_NN
+  8. Reviewer 绑定到 test-pre-merge-{key} (同 raw-key 的 test 工位)
+  9. Reviewer 通过 raw-key 找到 Worker 的产物 (docs/epics/.../raw-{key}/)
+
+wt-close 时:
+  10. wt-close fix/raw-{key} → 先 session/close worker_NN
+  11. → session/close reviewer_worker_NN (如果存在)
+  12. → 删除 test-pre-merge-{key} worktree
+  13. → 删除 fix/raw-{key} worktree
+  14. agent-id.env 清理: 移除 fix/raw-{key} 的绑定
+```
+
+### 8d. A2A task 中的配对字段
+
+```
+A2A task 创建时携带配对信息:
+
+{
+  "task_id": "uuid",
+  "agent_id": "reviewer_worker_03",     ← 谁处理
+  "role": "reviewer",
+  "raw_key": "20260701T085407Z",        ← 哪个 issue
+  "worktree": "test-pre-merge-20260701T085407Z-xxx",  ← 在哪个工位
+  "parent_agent": "worker_03",          ← 配对的 worker
+  "parent_worktree": "fix/raw-20260701T085407Z-xxx",  ← worker 的工位
+  "skill": "freely-tdd-review",
+  "state": "submitted"
+}
+```
+
+配对字段确保:
+- `raw_key`: Reviewer 能找到 Worker 的产物
+- `parent_agent`: 知道是谁发起的审查请求
+- `worktree` + `parent_worktree`: 同一 raw-key 的 dev↔test 工位对
+
+### 8e. 并发安全
+
+```
+场景: 10 个 Worker 同时 needs-reviewer
+
+worker_01 needs-reviewer → Runtime Watchdog 检测 → 创建 reviewer_worker_01
+worker_02 needs-reviewer → Runtime Watchdog 检测 → 创建 reviewer_worker_02
+...
+worker_10 needs-reviewer → Runtime Watchdog 检测 → 创建 reviewer_worker_10
+
+并发保证:
+  1. 每个 (worker_NN, reviewer_worker_NN) 对独立
+  2. NN 不同 → worktree 不同 → 产物路径不同 → 不会冲突
+  3. A2A task 用 raw_key + agent_id 唯一定位
+  4. Reviewer 只读自己配对的 Worker 的产物
+  5. SSE 订阅按 task_id 过滤，不会收到其他 reviewer 的事件
+```
+
