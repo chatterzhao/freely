@@ -215,9 +215,9 @@ candidate 的验收条件必须能从 brainstorms 的 Decision 推导出来。pr
 ```
 1. 加载 skill:freely-test-execution
    → 在与开发工位 raw key 相同的 test-* 测试工位执行
-   → 先 git cherry-pick 同步全部 dev 提交到测试工位，再跑全量测试
+   → 先 merge（首选）或 git cherry-pick 同步全部 dev 提交到测试工位，再跑全量测试
    → 全部 green → in_verification → 进入阶段 6
-   → 不 green → 回阶段 4 用 `freely-dev-loop-execution` skill 修复 → 重新 cherry-pick 同步 → 重跑
+   → 不 green → 回阶段 4 用 `freely-dev-loop-execution` skill 修复 → 重新 merge（首选）或 cherry-pick 同步 → 重跑
 ```
 
 GREEN 判定标准和详细步骤见 `skill:freely-test-execution`。
