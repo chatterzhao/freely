@@ -18625,6 +18625,37 @@ restart_manager_supervisor_preserving_handoff() {
   done
 }
 
+
+# ── Reviewer Agent ───────────────────────────────────────────
+# Phase 1: Reviewer as independent agent for workflow step review.
+# Uses agent-table reviewer_slot, launches ACP session on develop.
+
+_ensure_reviewer_agent() {
+  local project="$1"
+  local _reviewer_id _reviewer_slot
+  _reviewer_id="reviewer_manager_01"
+  _reviewer_slot="${REVIEWER_AGENT_SLOT:-}"
+
+  # Resolve reviewer slot from agent-table if not set
+  if [[ -z "$_reviewer_slot" ]]; then
+    local _aq="${PROJECT_ROOT}/bin/agent-table-query"
+    if [[ -x "$_aq" ]]; then
+      _reviewer_slot="$("$_aq" --get-reviewer "$_reviewer_id" 2>/dev/null | awk '{print $2}' || true)"
+    fi
+  fi
+
+  if [[ -z "$_reviewer_slot" ]]; then
+    log_warn "reviewer agent slot not configured — agent-table reviewer_slot is empty"
+    return 1
+  fi
+
+  log_info "reviewer agent slot: $_reviewer_slot"
+  # Phase 1: reviewer shares ACP bridge with manager (same develop worktree, same tool)
+  # The bridge supports multiple concurrent sessions via ACP protocol.
+  # Reviewer session will be launched by ensure_manager when reviewer tasks are queued.
+  return 0
+}
+
 ensure_manager_once() {
   local project="$1"
   local run_dir sup_pid_file current_pid current_ai_pid same_tool_blocked desired_state last_exit_reason supervisor_hint

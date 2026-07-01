@@ -82,6 +82,8 @@ if worker_tasks:
 
     if state == 'input-required' and not review_assigned:
         suggested = 'dispatch_reviewer'
+        # Phase 1: log dispatch intent for runtime to pick up
+        print(f'[cycle] dispatch_reviewer: raw_key={rk} task_id={task_id}', file=__import__('sys').stderr)
     elif state == 'input-required' and review_assigned:
         suggested = 'continue'
     elif state == 'completed':

@@ -400,7 +400,7 @@ class A2AServer:
                 worker_pid = row.get("worker_pid", "")
                 worktree = row.get("worktree", "")
 
-                if state == "working" and str(agent_id).startswith("worker"):
+                if state == "working" and str(agent_id).startswith("worker") or str(agent_id).startswith("reviewer"):
                     alive = False
                     if worker_pid:
                         try:
@@ -439,7 +439,7 @@ class A2AServer:
                             f"Marked failed."))
                     continue
 
-                elif state == "submitted" and str(agent_id).startswith("manager"):
+                elif state == "submitted" and str(agent_id).startswith("manager") or r.get("agent_id", "").startswith("reviewer"):
                     created = row.get("created_at", "")
                     if created:
                         try:
@@ -660,7 +660,7 @@ class A2AServer:
         raw_key = request.query_params.get("raw_key", "")
         result = []
         for r in self.task_store.get_all_dicts():
-            if str(r.get("agent_id","")).startswith("worker") and r.get("state") == "working" and r.get("worker_pid"):
+            if str(r.get("agent_id","")).startswith("worker") or str(r.get("agent_id","")).startswith("reviewer")) and r.get("state") == "working" and r.get("worker_pid"):
                 if not raw_key or r.get("raw_key") == raw_key:
                     result.append({"task_id": r["task_id"], "worker_pid": r["worker_pid"],
                                    "worktree": r.get("worktree", "")})
