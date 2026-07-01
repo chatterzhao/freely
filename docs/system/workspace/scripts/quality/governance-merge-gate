@@ -1871,18 +1871,63 @@ def main() -> int:
             pass  # SQLite check is best-effort
 
     if errors:
+        # ── Classify errors by skill ──
+        b1_keywords = ["raw issue", "phase_state", "absorbed_into", "local_id",
+                       "candidate_issues", "milestone binding", "milestone queue",
+                       "next_action", "revisit_trigger", "pre-IBM", "candidate in",
+                       "no candidate_issues entry", "still queued under milestone",
+                       "no valid source_candidate", "B1"]
+        b2_keywords = ["promoted_issue_path", "I-", "committed_issues",
+                       "committed/completed", "materialized to", "owner issue",
+                       "verification_artifact_dir", "pre_tests_path",
+                       "code-review", "progress", "review", "candidate-only",
+                       "B2"]
+        b1_errors = []
+        b2_errors = []
+        other_errors = []
+        for msg in errors:
+            if any(kw in msg for kw in b1_keywords):
+                b1_errors.append(msg)
+            elif any(kw in msg for kw in b2_keywords):
+                b2_errors.append(msg)
+            else:
+                other_errors.append(msg)
+
         print("[FAIL] develop merge governance gate blocked.")
-        print("The following raw/C/M/I lifecycle links are incomplete or inconsistent:")
-        for message in errors:
-            print(f"- {message}")
         print()
+
+        # ── Skill summary ──
+        if b1_errors or b2_errors:
+            print("── 需要阅读的 Skill ──")
+            if b1_errors:
+                print(f"  skill:freely-doc-B1_IBM-execution §门禁常见坑速查 ({len(b1_errors)} 个错误)")
+            if b2_errors:
+                print(f"  skill:freely-doc-B2_IBM-execution §门禁常见坑速查 ({len(b2_errors)} 个错误)")
+            print()
+
+        # ── Errors grouped by skill ──
+        if b1_errors:
+            print(f"── B1_IBM 相关错误 ({len(b1_errors)}) ──")
+            for msg in b1_errors:
+                print(f"  - {msg}")
+            print()
+        if b2_errors:
+            print(f"── B2_IBM 相关错误 ({len(b2_errors)}) ──")
+            for msg in b2_errors:
+                print(f"  - {msg}")
+            print()
+        if other_errors:
+            print(f"── 其他错误 ({len(other_errors)}) ──")
+            for msg in other_errors:
+                print(f"  - {msg}")
+            print()
+
         print("Allowed candidate statuses before merge:")
         for message in allowed_status_guide:
             print(f"- {message}")
         print()
-        print("这些错误不是让你改文档凑字段来绕过门禁。")
-        print("它们出现意味着实际的实现、验证、评审工作还没完成，或者完成了但没有诚实反映到产物里。")
-        print("请回到工位把该做的事情做完，然后再更新对应的 document/status。不要跳过工作只改状态字。")
+        print("不要对着错误逐条改字段。")
+        print("先看上面「需要阅读的 Skill」——加载对应的 skill 按规范流程修正。")
         if warnings:
             print()
             print("Warnings:")
