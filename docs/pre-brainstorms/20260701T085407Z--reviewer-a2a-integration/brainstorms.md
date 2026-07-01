@@ -326,3 +326,115 @@ Slot 在 ACP session 创建时从 agent-table 读取。
 | `SQLiteTaskStore (a2a_server.py)` | A2A server 内部使用的 task store |
 
 agent_working 复用 `_db_rpc()` 模式（与 `SQLiteTaskStore._db_rpc()` 一致）。
+
+## 17. Agent 协作核心流程（Freely 能力基础）
+
+### 类比：subagent 委派模式
+
+```
+主管 (Manager) 委派任务给下属 (Worker)，下属做完汇报。
+主管审阅结果，必要时请审查员 (Reviewer) 把关，再决定下一步。
+
+Freely 多了一层 ACP（AI CLI 工具给 agent 装大脑），
+以及 A2A (SSE) 作为 agent 之间的通信总线。
+```
+
+### 完整时序
+
+```
+Runtime      ACP          a2a_tasks      Manager        Worker         Reviewer
+(Watchdog)   (AI能力)     (状态账本)     (develop)      (fix wt)       (develop/test)
+    │           │             │              │              │              │
+    │──ACP session/new──────▶│              │              │              │
+    │  "你是 Manager"        │              │              │              │
+    │           │             │              │──patrol scan▶│              │
+    │           │             │              │ 发现待办 issue│              │
+    │           │             │              │              │              │
+    │           │             │              │──A2A task──▶ │              │
+    │           │             │              │ POST /tasks  │              │
+    │           │             │              │ role=worker  │              │
+    │           │             │              │ skill=B1     │              │
+    │           │             │              │              │              │
+    │──ACP session/new──────▶│              │              │              │
+    │  "你是 Worker"         │              │              │              │
+    │           │             │              │              │──B1 skill──▶ │
+    │           │             │              │              │ working      │
+    │           │             │◀──PATCH──────│              │              │
+    │           │             │ state=input- │              │              │
+    │           │             │ required     │              │              │
+    │           │             │ reason=needs-│              │              │
+    │           │             │ review:b1    │              │              │
+    │           │             │              │              │              │
+    │           │             │──SSE push──▶ │              │              │
+    │           │             │              │              │              │
+    │◀──SSE subscribe─────────│              │              │              │
+    │  detect: needs-review   │              │              │              │
+    │           │             │              │              │              │
+    │──ACP session/new──────▶│              │              │              │
+    │  "你是 Reviewer"        │              │              │              │
+    │           │             │              │              │              │
+    │           │             │              │──A2A task──▶ │              │──review────▶
+    │           │             │              │ role=reviewer│              │ working      │
+    │           │             │              │              │              │
+    │           │             │◀──PATCH──────│              │              │──verdict────▶
+    │           │             │ state=completed            │              │ pass/fail    │
+    │           │             │ verdict=pass               │              │              │
+    │           │             │              │              │              │
+    │           │             │──SSE push──▶ │              │              │
+    │           │             │              │              │              │
+    │           │             │              │──处理结果──▶ │              │
+    │           │             │              │ verdict=pass │              │
+    │           │             │              │ → 继续 B2    │──B2 skill──▶ │
+    │           │             │              │              │              │
+```
+
+### 三个 Agent 的职责与通信
+
+```
+Manager (develop):
+  职责: 巡逻、委派、收口
+  启动: Runtime ACP session/new
+  通信: 通过 A2A POST /tasks 委派 Worker/Reviewer
+       通过 A2A SSE 接收 Worker/Reviewer 状态变更
+       通过 ACP session/prompt 处理复杂决策
+
+Worker (fix/raw-{key}):
+  职责: 执行 skill (B1/B2/RED/dev/test)
+  启动: Manager 委派后 Runtime ACP session/new
+  通信: 通过 A2A PATCH /tasks/{id} 更新状态
+       通过 A2A SSE 接收 Reviewer verdict
+       完成时设 input-required → Manager 收到
+
+Reviewer (test-pre-merge-{key} 或 develop):
+  职责: 审查 Worker 产物，给出 verdict
+  启动: Runtime Watchdog 检测到 needs-review 后 ACP session/new
+  通信: 通过 A2A PATCH /tasks/{id} 写 verdict
+       通过 A2A SSE 推送 verdict 给 Manager + Worker
+```
+
+### 关键通信路径
+
+| 场景 | 通信方式 | 说明 |
+|------|---------|------|
+| Manager 委派 Worker | A2A POST /tasks | "你去做 B1" |
+| Worker 报告完成 | A2A PATCH state=input-required | "我做完了，请审查" |
+| Worker 通知 Manager | A2A SSE → Manager | 实时推送 |
+| Runtime 启动 Reviewer | ACP session/new | "你需要审查这个" |
+| Reviewer 给出结论 | A2A PATCH state=completed | "通过，继续" 或 "不通过，重做" |
+| Reviewer 通知 Worker | A2A SSE → Worker | 实时推送 verdict |
+| Manager 决定下一步 | ACP session/prompt | AI 决策：继续/重做/停止 |
+
+### 与 subagent 委派的类比
+
+```
+人类主管委派 subagent:
+  主管: "审查一下这个 PR"
+  subagent: 审查 → "通过，没有发现问题"
+  主管: 收到结果 → merge
+
+Freely 的等价:
+  Manager (ACP): 通过 A2A POST /tasks 委派 Reviewer
+  Reviewer (ACP): 审查 → A2A PATCH state=completed, verdict=pass
+  Manager: 通过 A2A SSE 收到 → ACP session/prompt 决策 → 告诉 Worker 继续
+```
+
