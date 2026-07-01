@@ -105,17 +105,23 @@ worker_03 和 reviewer_05 无需 NN 匹配。通过 raw_key 关联：
   "from_role":     "worker",                  // manager|worker|reviewer
   "from_worktree": "/path/to/fix/raw-KEY",   // 发出方工位
   "from_branch":   "fix/raw-KEY-slug",       // 发出方分支
+  "needs_agent":   "reviewer_05",             // 需要谁来处理 (路由决定)
+  "needs_role":    "reviewer",                // manager|worker|reviewer
   "raw_key":       "20260701T085407Z",        // 哪个 issue
   "state":         "input-required",          // 当前状态
-  "reason":        "needs-review:b1",         // 路由 key
+  "reason":        "needs-review:b1",         // 为什么需要 (路由 key)
   "review_stage":  "b1",                      // b1|b2|dev|red|test|gate (可选)
   "skill":         "freely-tdd-review",       // 需要执行的 skill (可选)
   "message":       "B1 完成，请审查",          // 人类可读描述
-  "parent_agent":  "manager_01",              // 谁委派的 (可选)
+  "parent_agent":  "manager_01",              // 谁委派的原始任务 (可选)
   "session_id":    "ses_abc123",              // 发出方 ACP session (可选)
   "timestamp":     "2026-07-01T08:00:00Z"    // 事件时间
 }
 ```
+
+`reason` = 为什么 (问题类型), `needs_agent` = 找谁 (路由结果)。
+路由逻辑: 根据 reason 确定 needs_role，查 agent_working 空闲池，分配具体 agent_id。
+兜底: reason 无法识别 → needs_agent=manager_01。
 
 所有参数接收方都可用。不需要再回头查 agent_working 或 a2a_tasks。
 Manager 收到后判断: 手动处理 / 创建新 issue / 标记 failed / 忽略噪音。
