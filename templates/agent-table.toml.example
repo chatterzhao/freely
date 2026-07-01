@@ -28,11 +28,11 @@ pool = 1
 [[agents]]
 role = "worker"
 worker_id = "worker_01"
-worker_slot = "<ai cli tool>-apikey|account-custom-others"  # 如 "claude-apikey-ds-pro"
+worker_slot = "<ai cli tool>-apikey|account-custom-others"  # 如 "codex-account-myaccount"
 pool = 10
 
 [[agents]]
 role = "reviewer"
 reviewer_id = "reviewer_01"
-reviewer_slot = "<ai cli tool>-apikey|account-custom-others"  # 如 "claude-apikey-ds-pro"
+reviewer_slot = "<ai cli tool>-apikey|account-custom-others"  # 如 "opencode-apikey-glm-5.1-auto"
 pool = 99
