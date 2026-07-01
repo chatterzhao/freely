@@ -1,36 +1,38 @@
 # Freely Agent Table — multi-agent instance registry
 # =============================================================================
-# This file defines agent identities and their AI CLI tool slots.
-# Runtime reads this to know which agents exist and what tools they use.
+# This file is THE single source of truth for all agent slots.
+# AI_TOOL is deprecated — agent-table replaces it entirely.
 #
 # Setup:
 #   1. Create slot folders under ~/.ai-auth/<tool>-apikey-<name>/
-#   2. Fill in the slot fields below with your folder names
-#   3. freely init auto-generates this file from this template
+#      (e.g. ~/.ai-auth/claude-apikey-ds-pro-auto/)
+#   2. Configure credentials in that folder (settings.json, config.toml, etc.)
+#   3. Fill in the slot fields below with your folder names
+#   4. Test: bin/agent-table-query --get-slot manager_01
 #
-# Fields:
-#   role      — agent role: manager, worker, reviewer
-#   agent_id  — unique ID, pool=N auto-generates agent_id_01..agent_id_N
-#   slot      — which AI CLI tool slot to use
-#   pool      — how many concurrent instances (1 for manager, N for worker/reviewer)
+# Fields per [[agents]]:
+#   role         — agent role: manager, worker, reviewer
+#   {role}_id    — agent identifier (e.g. manager_01, worker_01, reviewer_01)
+#   {role}_slot  — AI CLI tool slot name (maps to ~/.ai-auth/ subfolder)
+#   pool         — max concurrent instances
 #
-# Reviewer pool=99: reviewers don't modify code, can have many per worktree.
+# Reviewer pool=99: reviewers don't modify code, many can work per worktree.
 # =============================================================================
 
 [[agents]]
 role = "manager"
-agent_id = "manager"
-slot = "claude-apikey-ds-pro-auto"
+manager_id = "manager_01"
+manager_slot = "claude-apikey-ds-pro-auto"
 pool = 1
 
 [[agents]]
 role = "worker"
-agent_id = "worker"
-slot = "claude-apikey-ds-pro-auto"
+worker_id = "worker_01"
+worker_slot = "claude-apikey-ds-pro-auto"
 pool = 10
 
 [[agents]]
 role = "reviewer"
-agent_id = "reviewer"
-slot = "claude-apikey-ds-pro-auto"
+reviewer_id = "reviewer_01"
+reviewer_slot = "claude-apikey-ds-pro-auto"
 pool = 99

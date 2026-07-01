@@ -716,21 +716,22 @@ agent-table.toml          agent-id.env               freely.db (a2a_tasks)
 ```toml
 # 旧设计 (绑定):                     # 新设计 (并列):
 [[agents]]                           [[agents]]
-manager_id = "manager_01"            agent_id = "manager_01"
-manager_slot = "..."                 role = "manager"
-reviewer_id = "reviewer_manager_01"  slot = "claude-apikey-ds-pro-auto"
+manager_id = "manager_01"            role = "manager"
+manager_slot = "..."                 manager_id = "manager_01"
+reviewer_id = "reviewer_manager_01"  manager_slot = "claude-apikey-ds-pro-auto"
 reviewer_slot = "..."                pool = 1
+pool = 1
                                      [[agents]]
-[[agents]]                           agent_id = "worker"
-worker_id = "worker_01"              role = "worker"
-worker_slot = "..."                  slot = "claude-apikey-ds-pro-auto"
+[[agents]]                           role = "worker"
+worker_id = "worker_01"              worker_id = "worker_01"
+worker_slot = "..."                  worker_slot = "claude-apikey-ds-pro-auto"
 reviewer_id = "reviewer_worker_01"   pool = 10     # → worker_01..10
 reviewer_slot = "..."
 pool = 10                            [[agents]]
-                                     agent_id = "reviewer"
                                      role = "reviewer"
-                                     slot = "claude-apikey-ds-pro-auto"
-                                     pool = 10     # → reviewer_01..10
+                                     reviewer_id = "reviewer_01"
+                                     reviewer_slot = "claude-apikey-ds-pro-auto"
+                                     pool = 99     # → reviewer_01..99
 ```
 
 **关键变化**:
