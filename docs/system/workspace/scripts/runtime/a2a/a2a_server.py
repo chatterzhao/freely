@@ -489,7 +489,7 @@ class A2AServer:
                                 else:
                                     # B4: active workers exist, restore supervision
                                     notifications.append((task_id,
-                                        f"[Restart Recovery] Manager had active workers before shutdown. "
+                                        f"[Restart Recovery] Agent {agent_id} had active workers before shutdown. "
                                         f"Resuming supervision of {len(active_workers)} worker(s)."))
                         except Exception:
                             pass
@@ -662,6 +662,7 @@ class A2AServer:
             fields = {}
             if "state" in body: fields["state"] = sm.get(body["state"])  # reject unknown states
             for k in ["completion_summary","evidence_paths","error",
+
                        "reason","next_action","progress","summary","next","evidence",
                        "session_id"]:
                 if k in body: fields[k] = body[k]

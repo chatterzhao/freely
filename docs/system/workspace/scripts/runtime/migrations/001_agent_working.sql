@@ -16,3 +16,4 @@ CREATE TABLE IF NOT EXISTS agent_working (
 
 CREATE INDEX IF NOT EXISTS idx_aw_worker ON agent_working(worker_id);
 CREATE INDEX IF NOT EXISTS idx_aw_manager ON agent_working(manager_id);
+CREATE INDEX IF NOT EXISTS idx_aw_reviewer ON agent_working(reviewer_id);
