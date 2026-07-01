@@ -20342,11 +20342,50 @@ SDK_HELP
   fi
 
   # ── Write project .gitignore with template ignore rule ──
+  # .freely/ must be ignored from day 1 — all runtime state lives there.
   local gitignore="$project/.gitignore"
+  local _need_freely_ignore=1
+  if [[ -f "$gitignore" ]]; then
+    if grep -q '^\.freely/' "$gitignore" 2>/dev/null; then
+      _need_freely_ignore=0
+    fi
+  fi
   if [[ ! -f "$gitignore" || "$force" == "true" ]]; then
     cat >"$gitignore" <<'EOF'
-templates/*.template
+# Runtime state (managed by freely, never commit)
+.freely/
+.memark/
+corpus/
+
+# Local environment files
+.env
+.env.local
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+target/
+
+# Logs and temp
+*.log
+*.pid
+*.tmp
+
+# Editor/OS
+.DS_Store
+.vscode/
+.idea/
+__pycache__/
 EOF
+  elif [[ "$_need_freely_ignore" == "1" ]]; then
+    # Existing .gitignore doesn't have .freely/ — append it
+    printf '\n# Runtime state (managed by freely, never commit)\n.freely/\n' >>"$gitignore"
+    log_info ".gitignore: .freely/ appended to existing file"
   fi
 
   # ── Copy project templates to docs/ ──
