@@ -95,6 +95,29 @@ worker_03 和 reviewer_05 无需 NN 匹配。通过 raw_key 关联：
 | **兜底** | **任何人** | **未识别 / 空 / 未知** | **manager_01** | **session/resume** |
 
 兜底规则: reason 不匹配上述 6 种、为空、或解析失败时，一律路由到 manager_01。
+
+### input-required 事件完整参数
+
+```json
+{
+  "task_id":       "uuid",                    // A2A task ID
+  "from_agent":    "worker_03",               // 谁发出的
+  "from_role":     "worker",                  // manager|worker|reviewer
+  "from_worktree": "/path/to/fix/raw-KEY",   // 发出方工位
+  "from_branch":   "fix/raw-KEY-slug",       // 发出方分支
+  "raw_key":       "20260701T085407Z",        // 哪个 issue
+  "state":         "input-required",          // 当前状态
+  "reason":        "needs-review:b1",         // 路由 key
+  "review_stage":  "b1",                      // b1|b2|dev|red|test|gate (可选)
+  "skill":         "freely-tdd-review",       // 需要执行的 skill (可选)
+  "message":       "B1 完成，请审查",          // 人类可读描述
+  "parent_agent":  "manager_01",              // 谁委派的 (可选)
+  "session_id":    "ses_abc123",              // 发出方 ACP session (可选)
+  "timestamp":     "2026-07-01T08:00:00Z"    // 事件时间
+}
+```
+
+所有参数接收方都可用。不需要再回头查 agent_working 或 a2a_tasks。
 Manager 收到后判断: 手动处理 / 创建新 issue / 标记 failed / 忽略噪音。
 
 ### Card 设计 (roles.toml)
