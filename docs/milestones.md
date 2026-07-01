@@ -1,3 +1,19 @@
+## M-20260701T045911Z-A
+- title: feat: reviewer agent Phase 1
+- status: active
+### candidate_issues
+1. `C-20260701T045911Z-A`
+- milestone: M-20260701T045911Z-A
+- status: promoted
+- promoted_issue_id: `I-20260701T045911Z-A`
+- promoted_issue_path: docs/epics/reviewer-agent/phase1-ensure-reviewer/raw-20260701T045911Z/issues/I-20260701T045911Z-A.md
+### committed_issues
+### completed_issues
+1. `I-20260701T045911Z-A`
+- title: Phase1: reviewer; milestone_state: completed
+- issue_path: `docs/epics/reviewer-agent/phase1-ensure-reviewer/raw-20260701T045911Z/issues/I-20260701T045911Z-A.md`
+- phase_state: `completed`
+
 ## M-20260701T061924Z-A
 - title: feat: unify all gate outputs
 - status: active
