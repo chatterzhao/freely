@@ -897,4 +897,8 @@
   <text x="65" y="17478.0" font-size="11" fill="#333">overhaul</text>
   <rect id="story-block-init" x="55" y="17500.0" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
   <text x="65" y="17515.0" font-size="11" fill="#333">block-init</text>
+  <rect id="epic-gate-skill-alignment" x="35" y="17531.0" width="700" height="70" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+  <text x="50" y="17555.0" font-size="13" font-weight="bold" fill="#1a73e8">gate-skill-alignment</text>
+  <rect id="story-skill-template-fix" x="55" y="17563.0" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
+  <text x="65" y="17578.0" font-size="11" fill="#333">skill-template-fix</text>
 </svg>

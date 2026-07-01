@@ -80,6 +80,7 @@ B1_IBM 是 IBM Framework 第一阶段。I（Input）由 `freely wt-create` 命�
   - summary: 审查 #247/#251 门禁拦截历史，确认 skill 修改方向正确
   - verdict: pass
 - promoted_issue_id: I-20260508T011858Z-A
+- promoted_issue_path: docs/epics/{epic-name}/{story-name}/raw-{raw-key}/issues/I-{raw-key}-{suffix}.md
 - milestone: M-20260508T011858Z-A
 - session_refs: []
 ```
@@ -159,6 +160,7 @@ milestone: M-20260508T011858Z-A
   - summary: 评审摘要
   - verdict: pass
 - promoted_issue_id: I-20260508T011858Z-A
+- promoted_issue_path: docs/epics/{epic-name}/{story-name}/raw-{raw-key}/issues/I-{raw-key}-{suffix}.md
 - milestone: M-20260508T011858Z-A
 - session_refs: []
 ```
