@@ -1062,3 +1062,84 @@ a2a_server.py                 _restore_tasks()                    agent_id 前�
                               agent card 生成                     从 agent-table 读 role 字段
 ```
 
+
+## 13. Subagent 审查结论 & 最终收敛设计
+
+### 发现的矛盾 (已解决)
+
+| # | 矛盾 | 收敛决策 |
+|---|------|---------|
+| C1 | agent_working_id raw_key PK 冲突 | worktree 做主键，允许多 reviewer 行 |
+| C2 | reviewer slot 继承 vs 独立 | **独立 slot**，agent-table 各配各的 |
+| C3 | 静态 NN 配对 vs 运行时配对 | **运行时配对**，靠 raw_key 不靠 NN |
+| C4 | _restore_tasks L442 用错变量 | 统一用局部 `agent_id` |
+| C5 | Runtime 创建 task vs Manager 创建 | **Manager 创建** A2A task，Runtime 只启动 ACP |
+| C6 | input-required 类型不全 | 补全双向6种 + review_stage 字段 |
+| C7 | raw_key 命名不一致 | 统一 `raw-{key}` |
+| C8 | pool 应该 track 还是 untracked | pool 放模板，用户可覆盖 |
+
+### 可简化
+
+| # | 简化 | 采纳 |
+|---|------|:--:|
+| S1 | 废弃 agent-id.env，直接用 SQLite | ✅ |
+| S2 | reviewer_id 独立表（不用逗号分隔） | ✅ |
+| S3 | 5 Phase 合并为 Foundation/A2A/Orchestration | ✅ |
+| S4 | 3 个 card 文件合并为 1 个 roles.toml | ✅ |
+| S5 | 移除 Manager 初始 A2A task | ✅ |
+| S6 | agent_working 简化 schema | ✅ |
+
+### 最终 agent_working 表
+
+```sql
+CREATE TABLE agent_working (
+    worktree    TEXT NOT NULL PRIMARY KEY,
+    agent_id    TEXT NOT NULL,
+    role        TEXT NOT NULL CHECK(role IN ('manager','worker','reviewer')),
+    raw_key     TEXT NOT NULL,
+    created_at  TEXT NOT NULL DEFAULT (datetime('now'))
+);
+```
+
+## 14. 最终 TODO List (按依赖排序)
+
+### Phase 0: Foundation — Bug Fix + Schema
+
+- [ ] P0.1 修 a2a_server.py _restore_tasks 三处 and/or 优先级 bug (L403, L442, L663)
+- [ ] P0.2 建 agent_working 表 (migration SQL)
+- [ ] P0.3 实现 agent_working.py CRUD (assign/release/list_by_role/next_free)
+
+### Phase 1: Agent-Table v2
+
+- [ ] P1.1 确认 .freely/agent-table.toml v2 格式 (已完成 ✅)
+- [ ] P1.2 重写 agent-table-query (废弃 --get-reviewer, 新增 --next-free)
+- [ ] P1.3 全局替换 agent-id.env → agent_working 表
+
+### Phase 2: ACP Session
+
+- [ ] P2.1 _ensure_reviewer_agent() 接受 reviewer_id + parent_worktree 参数
+- [ ] P2.2 ensure_manager_once() 写 agent_working 表
+- [ ] P2.3 launch_worker_from_manager() 用 agent_working.next_free + assign
+- [ ] P2.4 wt-close 释放 agent_working
+
+### Phase 3: A2A Multi-Card + Task
+
+- [ ] P3.1 agent-card 端点支持 ?role= 参数
+- [ ] P3.2 Manager 通过 POST /tasks 委派 Worker/Reviewer
+- [ ] P3.3 PATCH /tasks/{id} SSE 推送 + 订阅过滤
+- [ ] P3.4 task 增加 review_stage 字段
+
+### Phase 4: Watchdog SSE
+
+- [ ] P4.1 Runtime Watchdog 订阅 SSE + 重连
+- [ ] P4.2 SSE 事件处理: needs-review → 创建 Reviewer session
+- [ ] P4.3 轮询降级为 fallback
+- [ ] P4.4 任务僵死检测
+
+### Phase 5: Card + input-required 补全
+
+- [ ] P5.1 创建 docs/system/workspace/agents/roles.toml
+- [ ] P5.2 input-required 双向路由补全
+- [ ] P5.3 wt-close 生命周期集成
+- [ ] P5.4 freely-cycle dispatch_reviewer 实际执行
+
