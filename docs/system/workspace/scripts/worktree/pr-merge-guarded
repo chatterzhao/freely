@@ -67,21 +67,26 @@ LIVE_LOCK
 ║  Lock:  $lock_dir
 ║  PID:   ${lock_pid:-unknown} (进程已终止)
 ║                                                              ║
-║  如果确认没有其他 merge 在运行，可手动清理:                    ║
-║    rm -rf $lock_dir
-║                                                              ║
-║  清理后重新运行 pr-merge-guarded。                            ║
+║  自动清理锁并继续。如果反复出现，检查是否有 merge 脚本异常退出。  ║
 ╚══════════════════════════════════════════════════════════════╝
 STALE_LOCK
-        return 1
+        rm -rf "$lock_dir"
+        continue
       fi
+    else
+      # Lock dir exists but no pid file — orphaned lock, auto-clean
+      cat >&2 <<ORPHAN_LOCK
+╔══════════════════════════════════════════════════════════════╗
+║  ⚠️  [MERGE-GUARD] 锁目录存在但无 pid 文件 — 孤儿锁，自动清理  ║
+╠══════════════════════════════════════════════════════════════╣
+║  Lock:  $lock_dir
+║  原因: 进程在写入 pid 前崩溃，或上次 merge 异常退出              ║
+║  操作: 自动清理孤儿锁，继续本次 merge                           ║
+╚══════════════════════════════════════════════════════════════╝
+ORPHAN_LOCK
+      rm -rf "$lock_dir"
+      continue
     fi
-    if [[ "$waited" -ge "$timeout" ]]; then
-      echo "[MERGE-GUARD] merge lock timeout after ${timeout}s (another merge in progress?)" >&2
-      return 1
-    fi
-    sleep "$interval"
-    waited=$((waited + interval))
   done
   # Write PID so next waiter can diagnose
   echo $$ > "$lock_pid_file"
