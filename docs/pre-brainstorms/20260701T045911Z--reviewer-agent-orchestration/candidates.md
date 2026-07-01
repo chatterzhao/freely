@@ -32,6 +32,7 @@ milestone: M-20260701T045911Z-A
     Phase 1 scope 明确：ensure_reviewer() + A2A reviewer role + [reviewer]路由。
     建议拆 C-20260701T045911Z-A 为子 candidate 逐 Phase 推进。
 - promoted_issue_id: I-20260701T045911Z-A
+- promoted_issue_path: docs/epics/reviewer-agent/phase1-ensure-reviewer/raw-20260701T045911Z/issues/I-20260701T045911Z-A.md
 - milestone: M-20260701T045911Z-A
 - next_action: 进入 B2，Phase 1 子 candidate → I-20260701T045911Z-A
 - session_refs: []
