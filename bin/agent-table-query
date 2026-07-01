@@ -5,7 +5,7 @@ Usage:
   agent-table-query --list <role>                        list all IDs for a role
   agent-table-query --get <id>                           get full agent entry
   agent-table-query --get-slot <id>                      get slot for an agent
-  agent-table-query --get-reviewer <worker_id>           get reviewer_id+slot for worker
+  agent-table-query --next-free <role> <pool_size>       get next available agent NN
   agent-table-query --next-available <role>              get next free agent ID
   agent-table-query --mark-busy <id>                     mark agent as busy
   agent-table-query --mark-free <id>                     mark agent as free

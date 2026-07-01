@@ -299,7 +299,7 @@ class A2AChecker:
         try:
             row = self.conn.execute(
                 # sessions.role currently stores generic roles ('worker').
-                # agent-id.env stores specific IDs ('worker_03').
+                # agent_working table stores specific IDs ('worker_03').
                 # Extract role prefix for query compatibility.
                 "SELECT COUNT(*) FROM sessions WHERE (role=? OR role=?) AND status='active'",
                 (agent_id, agent_id.split('_')[0] if '_' in agent_id else agent_id)
@@ -534,7 +534,7 @@ def scan(project: Path) -> dict:
                     "branch": wt.get("branch", ""),
                     "agent_id": "",
                     "ready": True,
-                    "detail": "agent-id.env missing — delegated but never bound",
+                    "detail": "agent_working table missing — delegated but never bound",
                     "next_action": "[manager] re-delegate worker for this raw key",
                 })
             elif not a2a.agent_session_active(agent_id):
