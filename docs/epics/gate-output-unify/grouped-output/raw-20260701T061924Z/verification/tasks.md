@@ -3,10 +3,10 @@
 ## Acceptance Items
 ### acceptance-1
 - id: AT-001
-- requirement: 3+ gates have skill summary
+- requirement: 3+ gates have skill summary section
 - testing_layer: unit
 - target_environment: test-pre-merge-20260701T061924Z-unify-gate-outputs
-- required_evidence: grep
+- required_evidence: grep count
 - evidence_level: integration
 - artifact_ref: docs/epics/gate-output-unify/grouped-output/raw-20260701T061924Z/verification/acceptance-1.log
 - test_command: grep -lc "需要阅读的 Skill" docs/system/workspace/scripts/quality/*gate*
@@ -16,7 +16,7 @@
 - evidence_file: docs/epics/gate-output-unify/grouped-output/raw-20260701T061924Z/verification/acceptance-1.log
 - red-green-status: green
 - status: passed
-- red_how: feature: 修复前仅 governance-merge-gate 有分组
+- red_how: feature: 仅 governance-merge-gate 有分组
 ## Unit
 - acceptance_target: 3+ gates grouped
 - testing_layer: unit
@@ -28,7 +28,7 @@
 - replacement_evidence: AT-001 green
 - status: not_applicable
 ## Integration
-- acceptance_target: consistent output
+- acceptance_target: consistent
 - testing_layer: integration
 - target_environment: test-pre-merge-20260701T061924Z-unify-gate-outputs
 - required_evidence: manual
@@ -38,7 +38,7 @@
 - replacement_evidence: AT-001 green
 - status: not_applicable
 ## End-to-End
-- acceptance_target: next gate run shows grouped output
+- acceptance_target: verified in next run
 - testing_layer: end-to-end
 - target_environment: test-pre-merge-20260701T061924Z-unify-gate-outputs
 - required_evidence: observation
@@ -49,4 +49,4 @@
 - status: not_applicable
 ## Real-Environment
 - real_environment_status: pass
-- real_environment_reason: 4 gate outputs unified
+- real_environment_reason: 4 gates unified
