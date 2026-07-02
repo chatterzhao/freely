@@ -1301,7 +1301,12 @@ def h_a2a_task_get_launched_pids(daemon: DbDaemon, params: dict) -> dict:
 
 @_h("agent_working.upsert")
 def h_aw_upsert(daemon: DbDaemon, params: dict) -> dict:
-    """agent_assign: INSERT or UPDATE agent_working row."""
+    """agent_assign: INSERT or UPDATE agent_working row.
+
+    For reviewer_id column: APPENDS new pairs (comma-separated) instead
+    of overwriting. Multiple reviewers can review the same raw_key.
+    For other columns (worker_id, manager_id): overwrites (one per raw_key).
+    """
     raw_key = params["raw_key"]
     col = params["col"]; val = params["val"]
     # Defense-in-depth: validate col matches expected {role}_id pattern
@@ -1311,6 +1316,17 @@ def h_aw_upsert(daemon: DbDaemon, params: dict) -> dict:
     c = daemon.conn
     row = c.execute("SELECT * FROM agent_working WHERE raw_key = ?", (raw_key,)).fetchone()
     if row:
+        if col == "reviewer_id" and row[col]:
+            # Append new reviewer pair (comma-separated). Update existing pair
+            # if same agent_id already present, otherwise append.
+            existing = row[col] or ""
+            new_agent_id = val.split(":", 1)[0] if ":" in val else val
+            pairs = dict(p.split(":", 1) for p in existing.split(",") if ":" in p) if existing else {}
+            if ":" in val:
+                pairs[new_agent_id] = val.split(":", 1)[1]  # update/replace session
+            else:
+                pairs.pop(new_agent_id, None)  # remove if no session
+            val = ",".join(f"{k}:{v}" for k, v in pairs.items()) if pairs else new_agent_id
         c.execute(f"UPDATE agent_working SET {col}=?, updated_at=datetime('now') WHERE raw_key=?",
                   (val, raw_key))
     else:
