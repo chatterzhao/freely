@@ -18724,7 +18724,43 @@ agent_assign('${project}', '${_raw_key}', 'reviewer', '${_reviewer_id}',
   # Start ACP session for reviewer (reuse same bridge, new session)
   # The ACP bridge already runs for Manager; reviewer uses session/fork (same tool)
   # or session/new (different tool). For Phase 1, reviewer shares Manager's tool.
-  log_info "reviewer $_reviewer_id: ACP session will be created via ensure_manager"
+  log_info "reviewer $_reviewer_id: creating ACP session/new via bridge"
+
+  # Create ACP session for reviewer via bridge socket
+  local _bridge_socket="/tmp/freely-acp-$(python3 -c "import hashlib,os; print(hashlib.sha256(os.path.abspath('${PROJECT_ROOT}').encode()).hexdigest()[:16])" 2>/dev/null)"
+  if [[ -S "$_bridge_socket" ]]; then
+    local _session_id; _session_id="rev_$(date +%s)_${_reviewer_id}"
+    python3 -c "
+import json, socket, sys
+req = json.dumps({'jsonrpc':'2.0','id':1,'method':'session/new','params':{'session_id':'${_session_id}','cwd':'${PROJECT_ROOT}'}}) + '
+'
+s = socket.socket(socket.AF_UNIX)
+s.settimeout(5)
+try:
+    s.connect('${_bridge_socket}')
+    s.sendall(req.encode())
+    s.shutdown(socket.SHUT_WR)
+    resp = b''
+    while True:
+        chunk = s.recv(4096)
+        if not chunk: break
+        resp += chunk
+    result = json.loads(resp.decode()).get('result',{})
+    sid = result.get('sessionId','')
+    if sid:
+        # Write session_id to agent_working
+        sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime')
+        from agent_working import agent_assign
+        agent_assign('${PROJECT_ROOT}', '${_raw_key}', 'reviewer', '${_reviewer_id}', session_id=sid)
+        print(f'[reviewer] session created: {sid}', file=sys.stderr)
+except Exception as e:
+    print(f'[reviewer] failed to create ACP session: {e}', file=sys.stderr)
+finally:
+    s.close()
+" 2>/dev/null || log_warn "reviewer $_reviewer_id: ACP session creation failed (bridge not ready)"
+  else
+    log_warn "reviewer $_reviewer_id: ACP bridge socket not found, session deferred"
+  fi
   return 0
 }
 
