@@ -300,13 +300,37 @@ for r in rows:
 # ── Slot testing helpers ──────────────────────────────────────────────
 
 # _resolve_current_agent_id: find which agent (manager_01 / worker_03 / …)
-# owns the current worktree, via agent-id.env.  Defaults to manager_01.
+# owns the current worktree. Uses agent_working table, falls back to agent-id.env.
 _resolve_current_agent_id() {
   local project="${1:-${PROJECT_ROOT:-$(pwd)}}"
-  local _agent_env="$project/.freely/agent-id.env" _my_id=""
-  if [[ -f "$_agent_env" ]]; then
-    _my_id=$(grep -F "$(pwd)" "$_agent_env" 2>/dev/null | grep -oE '(manager_[0-9]+|worker_[0-9]+)' | head -1 || true)
+  local _my_id="" _current_path; _current_path="$(pwd)"
+
+  # Phase 1: try agent_working table first
+  local _aw_py="${project}/docs/system/workspace/scripts/runtime/agent_working.py"
+  if [[ -f "$_aw_py" ]]; then
+    _my_id=$(python3 -c "
+import sys; sys.path.insert(0, '${project}/docs/system/workspace/scripts/runtime')
+from agent_working import _db_rpc
+rows = _db_rpc('${project}', 'agent_working.get_all', {}).get('rows', [])
+for r in rows:
+    wt = r.get('worktree',''); twt = r.get('test_worktree','')
+    if '${_current_path}' in (wt, twt):
+        for role in ('worker','manager','reviewer'):
+            val = r.get(f'{role}_id','')
+            if val:
+                print(val.split(':',1)[0] if ':' in str(val) else str(val))
+                break
+" 2>/dev/null || true)
   fi
+
+  # Fallback to agent-id.env for compatibility
+  if [[ -z "$_my_id" ]]; then
+    local _agent_env="$project/.freely/agent-id.env"
+    if [[ -f "$_agent_env" ]]; then
+      _my_id=$(grep -F "$_current_path" "$_agent_env" 2>/dev/null | grep -oE '(manager_[0-9]+|worker_[0-9]+|reviewer_[0-9]+)' | head -1 || true)
+    fi
+  fi
+
   [[ -z "$_my_id" ]] && _my_id="manager_01"
   printf '%s\n' "$_my_id"
 }
