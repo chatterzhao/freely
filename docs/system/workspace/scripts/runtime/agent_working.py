@@ -94,3 +94,25 @@ def agent_cleanup_stale(project: str, max_age_hours: int = 24):
 def agent_stats(project: str) -> dict:
     """返回各角色占用/空闲统计。"""
     return _db_rpc(project, "agent_working.stats", {})
+
+# ── CLI entry point ──────────────────────────────────────────────
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) < 3:
+        print("Usage: agent_working.py <action> <project> [args...]", file=sys.stderr)
+        sys.exit(1)
+    action = sys.argv[1]
+    project = sys.argv[2]
+    if action == "cleanup_stale":
+        result = agent_cleanup_stale(project)
+        print(f"cleaned: {result}")
+    elif action == "release_all":
+        raw_key = sys.argv[3] if len(sys.argv) > 3 else ""
+        agent_release_all(project, raw_key)
+        print("released")
+    elif action == "stats":
+        import json
+        print(json.dumps(agent_stats(project), indent=2))
+    else:
+        print(f"Unknown action: {action}", file=sys.stderr)
+        sys.exit(1)

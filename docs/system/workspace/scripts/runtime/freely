@@ -12832,7 +12832,11 @@ worker_project_is_actively_running() {
 manager_reconcile_agent_id_env() {
   local _aw_py="${PROJECT_ROOT}/docs/system/workspace/scripts/runtime/agent_working.py"
   if [[ -f "$_aw_py" ]]; then
-    python3 "$_aw_py" cleanup_stale "${PROJECT_ROOT}" 2>/dev/null || true
+    python3 -c "
+import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime')
+from agent_working import agent_cleanup_stale
+agent_cleanup_stale('${PROJECT_ROOT}')
+" 2>/dev/null || true
     return 0
   fi
   # Fallback: old agent-id.env file-based cleanup
@@ -18708,10 +18712,12 @@ _ensure_reviewer_agent() {
 
   # Write to agent_working table
   local _agent_py="${PROJECT_ROOT}/docs/system/workspace/scripts/runtime/agent_working.py"
-  if [[ -f "$_agent_py" ]]; then
-    python3 "$_agent_py" assign "$project" "$_raw_key" reviewer "$_reviewer_id" \
-      --worktree "$(pwd)" --branch "$(git branch --show-current)" 2>/dev/null || true
-  fi
+  python3 -c "
+import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime')
+from agent_working import agent_assign
+agent_assign('${project}', '${_raw_key}', 'reviewer', '${_reviewer_id}',
+             worktree='$(pwd)', branch='$(git branch --show-current 2>/dev/null || echo develop)')
+" 2>/dev/null || true
 
   # Start ACP session for reviewer (reuse same bridge, new session)
   # The ACP bridge already runs for Manager; reviewer uses session/fork (same tool)
