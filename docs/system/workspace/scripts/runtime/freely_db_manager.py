@@ -1339,6 +1339,39 @@ def h_aw_upsert(daemon: DbDaemon, params: dict) -> dict:
     return {"status": "ok"}
 
 
+@_h("agent_working.upsert_only")
+def h_aw_upsert_only(daemon: DbDaemon, params: dict) -> dict:
+    """Reviewer-only: UPDATE existing row. Fails if row doesn't exist.
+
+    Reviewer must never create a new agent_working row — the row is
+    created by Worker (UPSERT). If the row doesn't exist, the worktree
+    was already wt-closed or there's a bug.
+    """
+    raw_key = params["raw_key"]
+    col = params["col"]; val = params["val"]
+    import re as _re
+    if not _re.match(r'^(manager|worker|reviewer)_id$', col):
+        return {"status": "error", "message": f"invalid column: {col}"}
+    c = daemon.conn
+    row = c.execute("SELECT * FROM agent_working WHERE raw_key = ?", (raw_key,)).fetchone()
+    if not row:
+        return {"status": "error", "message": f"row not found for {raw_key} — worktree may be closed"}
+    # Same append logic as h_aw_upsert for reviewer_id
+    if col == "reviewer_id" and row[col]:
+        existing = row[col] or ""
+        new_agent_id = val.split(":", 1)[0] if ":" in val else val
+        pairs = dict(p.split(":", 1) for p in existing.split(",") if ":" in p) if existing else {}
+        if ":" in val:
+            pairs[new_agent_id] = val.split(":", 1)[1]
+        else:
+            pairs.pop(new_agent_id, None)
+        val = ",".join(f"{k}:{v}" for k, v in pairs.items()) if pairs else new_agent_id
+    c.execute(f"UPDATE agent_working SET {col}=?, updated_at=datetime('now') WHERE raw_key=?",
+              (val, raw_key))
+    daemon.conn.commit()
+    return {"status": "ok"}
+
+
 @_h("agent_working.release")
 def h_aw_release(daemon: DbDaemon, params: dict) -> dict:
     """agent_release: strip session from agent_id column."""

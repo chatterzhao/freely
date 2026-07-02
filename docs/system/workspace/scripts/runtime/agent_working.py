@@ -38,11 +38,19 @@ def _db_rpc(project: str, method: str, params: dict, timeout: float = 5.0) -> di
 
 def agent_assign(project: str, raw_key: str, role: str, agent_id: str,
                  worktree: str = "", branch: str = "", session_id: str = "",
-                 test_worktree: str = "", test_branch: str = ""):
-    """ACP session/new 时写入。通过 DB RPC。"""
+                 test_worktree: str = "", test_branch: str = "",
+                 update_only: bool = False):
+    """ACP session/new|fork 时写入。通过 DB RPC。
+
+    Worker:  UPSERT (INSERT OR UPDATE) — raw_key 行不存在就创建
+    Reviewer: UPDATE ONLY — raw_key 行必须已存在（Worker 创建的），
+             行不存在说明 worktree 已被 wt-close 删除或存在 bug
+    Manager: 独立行 "__manager__"，UPSERT
+    """
     col = f"{role}_id"
     val = f"{agent_id}:{session_id}" if session_id else agent_id
-    return _db_rpc(project, "agent_working.upsert", {
+    method = "agent_working.upsert_only" if update_only else "agent_working.upsert"
+    return _db_rpc(project, method, {
         "raw_key": raw_key, "col": col, "val": val,
         "worktree": worktree, "branch": branch,
         "test_worktree": test_worktree, "test_branch": test_branch,

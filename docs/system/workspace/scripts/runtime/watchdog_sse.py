@@ -374,17 +374,21 @@ def _create_reviewer_session(project: str, raw_key: str, reviewer_id: str,
         session_id = _acp_session_new(project, "reviewer", reviewer_id)
         session_mode = "new"
 
-    # Record assignment in agent_working
+    # Record assignment in agent_working (UPDATE ONLY — Worker created the row)
     if session_id:
-        agent_assign(project, raw_key, "reviewer", f"{reviewer_id}:{session_id}")
-        print(f"[watchdog] reviewer {reviewer_id} session={session_id[:20]}... mode={session_mode} for {raw_key}", file=sys.stderr)
+        result = agent_assign(project, raw_key, "reviewer", f"{reviewer_id}:{session_id}",
+                              update_only=True)
+        if result and result.get("status") == "error":
+            print(f"[watchdog] ERROR: reviewer update failed for {raw_key}: {result.get('message','')} — worktree may be closed", file=sys.stderr)
+        else:
+            print(f"[watchdog] reviewer {reviewer_id} session={session_id[:20]}... mode={session_mode} for {raw_key}", file=sys.stderr)
         # Deliver the review task to the newly created session
         task_msg = _build_review_task_message(raw_key, from_agent, reason)
         if not _acp_session_prompt(project, session_id, task_msg):
             print(f"[watchdog] WARNING: task delivery failed for {reviewer_id} session={session_id[:20]}...", file=sys.stderr)
     else:
-        # Session creation failed — record assignment for retry
-        agent_assign(project, raw_key, "reviewer", reviewer_id)
+        # Session creation failed — record assignment for retry (update_only)
+        agent_assign(project, raw_key, "reviewer", reviewer_id, update_only=True)
         print(f"[watchdog] reviewer {reviewer_id} assigned (no session, will retry)", file=sys.stderr)
 
 
