@@ -22,6 +22,11 @@
 - status: passed
 - red-green-status: green
 - blocker: (无)
+- surface_kind: fix
+- target_lane: fix/raw-20260701T085407Z-reviewer-a2a-integration
+- promotion_gate: governance
+- task_refs: A1-A6, B1-B8, C1-C14, D1-D13
+- case_design: unit tests for agent_working pair parsing/formatting/roundtrip with edge cases (empty, single, multi, no-session, roundtrip)
 - red_how: feature: 8 单元测试覆盖 pair 解析/格式化/空值/单值/roundtrip。实现前 8 failed。
 
 ### acceptance-2
