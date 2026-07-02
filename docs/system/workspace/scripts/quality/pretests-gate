@@ -625,7 +625,7 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
             sufficient_items = [
                 fields
                 for fields in matching_items
-                if fields.get("status") == "pass"
+                if fields.get("status") in {"pass", "passed"}
                 and artifact_exists(fields.get("artifact_ref", ""), source)
                 and (
                     target_lane != "premerge-integration"
@@ -658,7 +658,7 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
                 fields
                 for fields in acceptance_fields
                 if fields.get("evidence_level") in {"real_env", "post_merge_dogfood"}
-                and fields.get("status") == "pass"
+                and fields.get("status") in {"pass", "passed"}
                 and artifact_exists(fields.get("artifact_ref", ""), source)
             ]
             if not strong_live_items:
