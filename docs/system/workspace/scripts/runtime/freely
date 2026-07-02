@@ -5960,6 +5960,8 @@ sync_project_tooling_from_source() {
 	    if [[ -n "$_next_worker" ]]; then
 	      mkdir -p "$(dirname "$_agent_env")"
 	      echo "$target_project=worker=$_next_worker" >> "$_agent_env"
+		      # Phase 1: dual-write to agent_working table
+		      python3 -c "import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime'); from agent_working import agent_assign; agent_assign('${PROJECT_ROOT}', 'develop', 'worker', '$_next_worker', worktree='${target_project}')" 2>/dev/null || true
 	      log_info "agent-table: assigned $_next_worker to $target_project (agent-id.env)"
 	    fi
 	  fi
