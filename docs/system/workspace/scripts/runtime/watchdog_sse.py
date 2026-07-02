@@ -136,11 +136,20 @@ def _handle_sse_event(project: str, event_text: str):
             except json.JSONDecodeError:
                 pass
 
-    state = data.get("statusUpdate", {}).get("status", {}).get("state", "")
+    # A2A _notify_sse sends: {"task_id":..., "state":..., "reason":..., ...}
+    # The event format is flat (not wrapped in statusUpdate), matching what
+    # _notify_sse in a2a_server.py constructs at PATCH time.
+    state = data.get("state", "")
     if state != "input-required":
         return
 
-    metadata = data.get("statusUpdate", {}).get("metadata", {})
+    # Metadata fields are top-level in the SSE data dict (see PATCH handler L740-745)
+    metadata = {
+        k: data.get(k, "") for k in (
+            "reason", "from_agent", "needs_agent", "needs_role",
+            "raw_key", "message", "task_id", "review_stage",
+        )
+    }
     reason_str = metadata.get("reason", "")
     reason = InputRequiredReason.from_string(reason_str)
     needs_role = reason.needs_role
@@ -155,9 +164,16 @@ def _handle_sse_event(project: str, event_text: str):
         _handle_needs_worker(project, metadata, reason)
 
 
+def _normalize_raw_key(raw_key: str) -> str:
+    """Ensure raw_key has the 'raw-' prefix for consistent lookups."""
+    if not raw_key:
+        return raw_key
+    return f"raw-{raw_key}" if not raw_key.startswith("raw-") else raw_key
+
+
 def _handle_needs_reviewer(project: str, metadata: dict, reason: InputRequiredReason):
     """Worker/Manager needs reviewer. Create reviewer agent if not exists."""
-    raw_key = metadata.get("raw_key", "")
+    raw_key = _normalize_raw_key(metadata.get("raw_key", ""))
     from_agent = metadata.get("from_agent", "")
 
     # Check if reviewer already exists for this raw_key
@@ -198,7 +214,7 @@ def _handle_needs_reviewer(project: str, metadata: dict, reason: InputRequiredRe
 
 def _handle_needs_manager(project: str, metadata: dict, reason: InputRequiredReason):
     """Agent needs manager decision. Resume manager ACP session."""
-    raw_key = metadata.get("raw_key", "")
+    raw_key = _normalize_raw_key(metadata.get("raw_key", ""))
     from_agent = metadata.get("from_agent", "")
     print(f"[watchdog] routing to manager: {from_agent} needs decision on {raw_key} ({reason.value})", file=sys.stderr)
 
@@ -226,7 +242,7 @@ def _handle_needs_manager(project: str, metadata: dict, reason: InputRequiredRea
 
 def _handle_needs_worker(project: str, metadata: dict, reason: InputRequiredReason):
     """Reviewer/Manager needs worker retry/task. Resume worker ACP session."""
-    raw_key = metadata.get("raw_key", "")
+    raw_key = _normalize_raw_key(metadata.get("raw_key", ""))
     from_agent = metadata.get("from_agent", "")
     print(f"[watchdog] routing to worker for {raw_key}: {reason.value} (from {from_agent})", file=sys.stderr)
 
@@ -284,7 +300,6 @@ def _check_agent_liveness(project: str):
                     print(f"[watchdog] DEAD {role}: {agent_id} session={session_id} for {raw_key}", file=sys.stderr)
                     # Clear the dead session_id but keep the agent assigned
                     try:
-                        from agent_working import _db_rpc
                         _db_rpc(project, "agent_working.upsert", {
                             "raw_key": raw_key,
                             f"{role}_id": agent_id  # session_id cleared
@@ -303,7 +318,7 @@ SESSION_STALE_SECONDS = 1800  # 30 minutes without activity = stale
 
 
 def _check_session_staleness(project: str):
-    """C13: Periodically scan for stale agent sessions."""
+    """C13: Periodically scan for stale agent sessions and clean them up."""
     global _last_staleness_check
     now = time.time()
     if now - _last_staleness_check < STALENESS_INTERVAL:
@@ -311,7 +326,7 @@ def _check_session_staleness(project: str):
     _last_staleness_check = now
 
     try:
-        from agent_working import _db_rpc
+        from agent_working import _db_rpc, agent_release
         result = _db_rpc(project, "agent_working.get_all", {})
         rows = result.get("rows", [])
     except Exception:
@@ -323,7 +338,11 @@ def _check_session_staleness(project: str):
             val = str(row.get(f"{role}_id", "") or "")
             if not val:
                 continue
-            # Check for stall: assigned but no session_id (never started)
+            # Stale: assigned but no session_id (never started within timeout)
             if ":" not in val:
-                print(f"[watchdog] STALE {role} for {raw_key}: assigned but never started", file=sys.stderr)
-            # TODO: check updated_at timestamp when agent_working table supports it
+                agent_id = val
+                print(f"[watchdog] STALE {role} {agent_id} for {raw_key}: assigned but never started — releasing", file=sys.stderr)
+                try:
+                    agent_release(project, raw_key, role, agent_id)
+                except Exception as e:
+                    print(f"[watchdog] release failed for {agent_id}: {e}", file=sys.stderr)

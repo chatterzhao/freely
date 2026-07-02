@@ -88,22 +88,27 @@ if worker_tasks:
         if project:
             aw_py = f'{project}/docs/system/workspace/scripts/runtime/agent_working.py'
             if os.path.exists(aw_py):
-                result = subprocess.run([sys.executable, '-c', f'''
-import sys; sys.path.insert(0, "{project}/docs/system/workspace/scripts/runtime")
+                # Pass args via env vars to avoid f-string injection (raw_key/project may contain special chars)
+                _env = {**os.environ, 'FREELY_RAW_KEY': rk, 'FREELY_PROJECT': project}
+                result = subprocess.run([sys.executable, '-c', '''
+import sys, os, json
+rk = os.environ["FREELY_RAW_KEY"]
+project = os.environ["FREELY_PROJECT"]
+sys.path.insert(0, os.path.join(project, "docs", "system", "workspace", "scripts", "runtime"))
 from agent_working import agent_next_free, agent_assign, agent_list_by_raw_key
-row = agent_list_by_raw_key("{project}", "{rk}")
+row = agent_list_by_raw_key(project, rk)
 already = row.get("reviewer_id", "") if row else ""
 if already:
     sys.exit(0)  # already dispatched, skip
-rid = agent_next_free("{project}", "reviewer", 99)
+rid = agent_next_free(project, "reviewer", 99)
 if rid:
-    agent_assign("{project}", "{rk}", "reviewer", rid)
-    print(f"[cycle] reviewer {{rid}} dispatched for raw_key={rk}", file=sys.stderr)
+    agent_assign(project, rk, "reviewer", rid)
+    print(f"[cycle] reviewer {rid} dispatched for raw_key={rk}", file=sys.stderr)
     sys.exit(0)
 else:
     print(f"[cycle] no free reviewer for raw_key={rk}", file=sys.stderr)
     sys.exit(1)
-'''], capture_output=True, text=True, timeout=10)
+'''], capture_output=True, text=True, timeout=10, env=_env)
                 if result.returncode == 0:
                     suggested = 'continue'  # dispatch succeeded, move on
         print(f'[cycle] dispatch_reviewer: raw_key={rk} task_id={task_id}', file=__import__('sys').stderr)

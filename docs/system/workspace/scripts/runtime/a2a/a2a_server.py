@@ -156,7 +156,6 @@ class SQLiteTaskStore(BaseTaskStore):
         m = {'submitted': TaskState.TASK_STATE_SUBMITTED, 'working': TaskState.TASK_STATE_WORKING,
              'completed': TaskState.TASK_STATE_COMPLETED, 'failed': TaskState.TASK_STATE_FAILED,
              'input-required': TaskState.TASK_STATE_INPUT_REQUIRED,
-             'canceled': TaskState.TASK_STATE_CANCELED,
              'canceled': TaskState.TASK_STATE_CANCELED}
         return m.get(db_state, TaskState.TASK_STATE_SUBMITTED)
 
@@ -728,9 +727,9 @@ class A2AServer:
             fields = {}
             if "state" in body: fields["state"] = sm.get(body["state"])  # reject unknown states
             for k in ["completion_summary","evidence_paths","error",
-
                        "reason","next_action","progress","summary","next","evidence",
-                       "session_id"]:
+                       "session_id","from_agent","needs_agent","needs_role",
+                       "raw_key","review_stage"]:
                 if k in body: fields[k] = body[k]
             if "summary" in fields: fields.setdefault("completion_summary", fields.pop("summary"))
             if "next" in fields: fields.setdefault("next_action", fields.pop("next"))

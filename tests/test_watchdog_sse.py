@@ -47,7 +47,7 @@ class TestSseEventParsing(unittest.TestCase):
         """SSE event with needs-review triggers reviewer handler."""
         event_text = (
             'event: state_update\n'
-            'data: {"statusUpdate":{"status":{"state":"input-required"},"metadata":{"reason":"needs-review:b2","raw_key":"raw-20260701T000000Z","from_agent":"worker_01"}}}\n'
+            'data: {"task_id":"task-123","state":"input-required","reason":"needs-review:b2","raw_key":"raw-20260701T000000Z","from_agent":"worker_01","needs_role":"reviewer"}\n'
         )
         with patch('watchdog_sse._handle_needs_reviewer') as mock_handler:
             _handle_sse_event(TEST_PROJECT, event_text)
@@ -57,7 +57,7 @@ class TestSseEventParsing(unittest.TestCase):
         """SSE event routes to manager handler."""
         event_text = (
             'event: state_update\n'
-            'data: {"statusUpdate":{"status":{"state":"input-required"},"metadata":{"reason":"needs-manager-decision","raw_key":"raw-20260701T000000Z","from_agent":"worker_01"}}}\n'
+            'data: {"task_id":"task-456","state":"input-required","reason":"needs-manager-decision","raw_key":"raw-20260701T000000Z","from_agent":"worker_01","needs_role":"manager"}\n'
         )
         with patch('watchdog_sse._handle_needs_manager') as mock_handler:
             _handle_sse_event(TEST_PROJECT, event_text)
@@ -67,7 +67,7 @@ class TestSseEventParsing(unittest.TestCase):
         """SSE event routes to worker handler."""
         event_text = (
             'event: state_update\n'
-            'data: {"statusUpdate":{"status":{"state":"input-required"},"metadata":{"reason":"needs-worker-retry","raw_key":"raw-20260701T000000Z","from_agent":"reviewer_01"}}}\n'
+            'data: {"task_id":"task-789","state":"input-required","reason":"needs-worker-retry","raw_key":"raw-20260701T000000Z","from_agent":"reviewer_01","needs_role":"worker"}\n'
         )
         with patch('watchdog_sse._handle_needs_worker') as mock_handler:
             _handle_sse_event(TEST_PROJECT, event_text)
@@ -75,7 +75,7 @@ class TestSseEventParsing(unittest.TestCase):
 
     def test_skip_non_input_required(self):
         """SSE events with other states are ignored."""
-        event_text = 'event: state_update\ndata: {"statusUpdate":{"status":{"state":"working"}}}\n'
+        event_text = 'event: state_update\ndata: {"task_id":"task-skip","state":"working"}\n'
         with patch('watchdog_sse._handle_needs_reviewer') as m1, \
              patch('watchdog_sse._handle_needs_manager') as m2, \
              patch('watchdog_sse._handle_needs_worker') as m3:
