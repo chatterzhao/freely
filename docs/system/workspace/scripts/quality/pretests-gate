@@ -499,7 +499,7 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
                 "red_green_status_missing",
                 f"{pre_tests_path}: {title_line} missing red-green-status. "
                 "Every acceptance item must track its TDD state: pending (B2 wrote it) → red (RED phase confirmed) → green (GREEN phase passed). "
-                "Read skill:freely-doc-B2_IBM-execution for the full template.",
+                "Read skill `freely-doc-B2_IBM-execution` for the full template.",
             )
         elif rg_status not in valid_red_green:
             add_error(
@@ -512,7 +512,7 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
                 "red_green_not_green",
                 f"{pre_tests_path}: {fields.get('id', title_line)} red-green-status is '{rg_status}', must be 'green' or 'not_applicable' before PR. "
                 "Complete RED(red) → dev → GREEN(green) cycle before creating PR. "
-                "Read skill:freely-fix-execution or skill:freely-feature-execution §阶段3-5.",
+                "Read skill `freely-fix-execution` or skill `freely-feature-execution` §阶段3-5.",
             )
         for key in ("status", "artifact_ref"):
             if not fields.get(key):
@@ -736,9 +736,9 @@ if failures:
     if b2_errors or test_errors:
         print("── 需要阅读的 Skill ──", file=sys.stderr)
         if b2_errors:
-            print(f"  skill:freely-doc-B2_IBM-execution §pre-tests 模板与门禁常见坑速查 ({len(b2_errors)} 个)", file=sys.stderr)
+            print(f"  skill `freely-doc-B2_IBM-execution` §pre-tests 模板与门禁常见坑速查 ({len(b2_errors)} 个)", file=sys.stderr)
         if test_errors:
-            print(f"  skill:freely-test-execution §GREEN 判定标准 ({len(test_errors)} 个)", file=sys.stderr)
+            print(f"  skill `freely-test-execution` §GREEN 判定标准 ({len(test_errors)} 个)", file=sys.stderr)
         print(file=sys.stderr)
     if b2_errors:
         print(f"── B2 pre-tests 设计问题 ({len(b2_errors)}) ──", file=sys.stderr)

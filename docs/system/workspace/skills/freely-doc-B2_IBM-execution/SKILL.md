@@ -15,7 +15,7 @@ description: >-
   "PRD"、"分解任务"、"I-* 文档"。
 ---
 
-# skill:freely-doc-B2_IBM-execution
+# skill `freely-doc-B2_IBM-execution`
 
 > 全链路: [skill] freely-workflow-guarded-execution → [cmd] freely feedback → [cmd] freely wt-create → [skill] freely-doc-B1_IBM-execution → [skill][here] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
 
@@ -165,7 +165,7 @@ B2_IBM 阶段直接写入以下格式。AI 按模板填写，无需查看任何�
 - expected_output: <命令的预期输出（GREEN 时的输出），如：所有测试 PASSED>
 - expected_RED_output: <RED 阶段的预期输出——fix: 证明 bug 存在；feature: 证明功能未实现>
 - actual_RED_output: (RED 阶段执行后填写)
-- actual_output: (GREEN 阶段由 skill:freely-test-execution 执行后填写)
+- actual_output: (GREEN 阶段由 skill `freely-test-execution` 执行后填写)
 - evidence_file: (执行后填写。注意 .log 文件可能被 .gitignore 忽略，需 `git add -f` force-add)
 - red-green-status: pending | red | green
 > B2 写入 = pending。RED 确认后 = red（证明测试真的会失败）。dev 实现后跑 GREEN 通过 = green。
@@ -234,7 +234,7 @@ B2_IBM 阶段直接写入以下格式。AI 按模板填写，无需查看任何�
 - [ ] code-reviews/ 含 Implementation Decision Note
 - [ ] milestones.md committed_issues 条目已更新
 - [ ] `docs/epics-map.svg` 已更新（新增 epic/story 时必须，运行 `./bin/check-epics-map` 验证）
-- [ ] 下一跳明确：进入 `skill:freely-test-RED-execution`
+- [ ] 下一跳明确：进入 skill `freely-test-RED-execution`
 
 phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
 
@@ -264,9 +264,9 @@ phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
 | 节点 | 路径 | 谁创建 | 何时 |
 |------|------|--------|------|
 | raw issue | `docs/issues/raw-{key}/issue.md` | `freely wt-create` | B1 之前 |
-| brainstorms | `docs/pre-brainstorms/{key}--{slug}/brainstorms.md` | skill:freely-doc-B1_IBM-execution | B1 Brainstorm |
-| candidate | `docs/pre-brainstorms/{key}--{slug}/candidates.md` | skill:freely-doc-B1_IBM-execution | B1 Milestone |
-| I-* issue | `docs/epics/{epic}/{story}/raw-{raw-key}/issues/I-{raw-key}-{suffix}.md` | **skill:freely-doc-B2_IBM-execution（本 skill）** | B2 Map（物化） |
+| brainstorms | `docs/pre-brainstorms/{key}--{slug}/brainstorms.md` | skill `freely-doc-B1_IBM-execution` | B1 Brainstorm |
+| candidate | `docs/pre-brainstorms/{key}--{slug}/candidates.md` | skill `freely-doc-B1_IBM-execution` | B1 Milestone |
+| I-* issue | `docs/epics/{epic}/{story}/raw-{raw-key}/issues/I-{raw-key}-{suffix}.md` | **skill `freely-doc-B2_IBM-execution`（本 skill）** | B2 Map（物化） |
 
 ### B2 设计产物（本 skill 负责创建）
 
@@ -449,4 +449,4 @@ phase_state: done_b2_ibm
 6. 写 code-review（含 Implementation Decision Note）
 7. 更新 milestones.md committed_issues（写入物化后的 I-* issue）
 7. 若发现边界外新问题：返回 `next_recommended_route=freely-doc-B1_IBM-execution`
-8. B2_IBM 完成后，进入 RED 阶段（skill:freely-test-RED-execution）确认全部测试 RED → dev-loop 实现 → GREEN → pr-create-guarded（提 PR）→ pr-merge-guarded（门禁合并）→ wt-close（收口）
+8. B2_IBM 完成后，进入 RED 阶段（skill `freely-test-RED-execution`）确认全部测试 RED → dev-loop 实现 → GREEN → pr-create-guarded（提 PR）→ pr-merge-guarded（门禁合并）→ wt-close（收口）
