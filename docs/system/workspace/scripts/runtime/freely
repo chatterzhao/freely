@@ -19839,7 +19839,7 @@ cmd_ensure_interruption_dispatch_watch() {
 _start_watchdog_sse_py() {
   local project="$1"
   local _watchdog_py="${project}/docs/system/workspace/scripts/runtime/watchdog_sse.py"
-  local _a2a_socket; _a2a_socket="/tmp/freely-a2a-$(python3 -c "import hashlib,os; print(hashlib.sha256(os.path.abspath('${project}').encode()).hexdigest()[:16])" 2>/dev/null)"
+  local _a2a_socket; _a2a_socket="/tmp/freely-a2a-$(python3 -c "import hashlib,os; print(hashlib.sha256(os.path.abspath('${project}').encode()).hexdigest()[:16])" 2>/dev/null).sock"
   if [[ -f "$_watchdog_py" && -S "$_a2a_socket" ]]; then
     log_info "starting watchdog_sse.py for $project"
     nohup python3 "$_watchdog_py" --project "$project" --a2a-socket "$_a2a_socket" </dev/null >>"$project/.freely/run/watchdog-sse.log" 2>&1 &
@@ -21981,6 +21981,7 @@ start_project_runtime() {
     if [[ "${effective_desired_state:-stopped}" == "running" ]] && [[ "$(role_hint_for_project "$project")" == "manager" ]]; then
       launch_interruption_dispatcher "$project"
       launch_manager_watchdog "$project"
+      launch_sse_watchdog "$project"
     fi
   }
 
@@ -22019,6 +22020,7 @@ start_project_runtime() {
   if [[ "$(role_hint_for_project "$project")" == "manager" ]]; then
     exit_if_stop_requested_before_launch
     launch_manager_watchdog "$project"
+    launch_sse_watchdog "$project"
     ensure_manager_watchdog_ready_or_fail "$project" || {
       exit_if_stop_requested_before_launch
       log_error "freely manager watchdog did not become ready for project: $project"
