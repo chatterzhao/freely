@@ -98,12 +98,16 @@ def _acp_session_fork(project: str, parent_role: str, child_role: str,
 
     Forks from Manager session — inherits project governance context
     (CONSTITUTION, LAWS, codebase map) without Worker's implementation bias.
+
+    Manager session is stored under hardcoded key "__manager__" (Manager has
+    no issue key — it's the orchestrator, not tied to any raw issue).
     Returns session_id on success, None on failure.
     """
-    # Get Manager's session_id from agent_working
-    mgr_sid = agent_get_session(project, raw_key, parent_role)
+    # Manager session stored under "__manager__", not issue raw_key
+    lookup_key = "__manager__" if parent_role == "manager" else raw_key
+    mgr_sid = agent_get_session(project, lookup_key, parent_role)
     if not mgr_sid:
-        print(f"[watchdog] no {parent_role} session to fork from for {raw_key}", file=sys.stderr)
+        print(f"[watchdog] no {parent_role} session to fork from (key={lookup_key})", file=sys.stderr)
         return None
 
     params = {
@@ -136,8 +140,9 @@ def _should_use_fork(project: str, raw_key: str, reason: InputRequiredReason) ->
     if reason == InputRequiredReason.NEEDS_REVIEW_GATE:
         return False
 
-    # Check if Manager has an active session to fork from
-    mgr_sid = agent_get_session(project, raw_key, "manager")
+    # Manager session is stored under hardcoded raw_key "__manager__"
+    # (Manager has no issue key — it's the orchestrator, not tied to any raw issue)
+    mgr_sid = agent_get_session(project, "__manager__", "manager")
     if not mgr_sid:
         return False
 
@@ -396,34 +401,40 @@ def _build_review_task_message(raw_key: str, from_agent: str, reason: InputRequi
 
 
 def _handle_needs_manager(project: str, metadata: dict, reason: InputRequiredReason):
-    """Agent needs manager decision. Resume manager ACP session."""
-    raw_key = _normalize_raw_key(metadata.get("raw_key", ""))
+    """Agent needs manager decision. Resume manager ACP session.
+
+    Manager uses hardcoded raw_key "__manager__" — it has no issue key.
+    Manager is the orchestrator, running on develop worktree, with no
+    associated test worktree.
+    """
+    issue_key = _normalize_raw_key(metadata.get("raw_key", ""))
     from_agent = metadata.get("from_agent", "")
-    print(f"[watchdog] routing to manager: {from_agent} needs decision on {raw_key} ({reason.value})", file=sys.stderr)
+    MANAGER_KEY = "__manager__"
+    print(f"[watchdog] routing to manager: {from_agent} needs decision on {issue_key} ({reason.value})", file=sys.stderr)
 
-    mgr_msg = f"[Freely Watchdog] {from_agent} needs manager input on {raw_key}. Reason: {reason.value}."
+    mgr_msg = f"[Freely Watchdog] {from_agent} needs manager input on {issue_key}. Reason: {reason.value}."
 
-    # Step 1: Try session/prompt to alive manager session
-    sid = agent_get_session(project, raw_key, "manager")
+    # Step 1: Try session/prompt to alive manager session (keyed by __manager__)
+    sid = agent_get_session(project, MANAGER_KEY, "manager")
     if sid:
         if _acp_session_prompt(project, sid, mgr_msg):
-            print(f"[watchdog] manager session {sid[:20]}... notified for {raw_key}", file=sys.stderr)
+            print(f"[watchdog] manager session {sid[:20]}... notified", file=sys.stderr)
             return
         print(f"[watchdog] manager session dead, creating new", file=sys.stderr)
 
-    # Step 2: No alive session — check if manager exists in agent_working
-    row = agent_list_by_raw_key(project, raw_key)
+    # Step 2: No alive session — check if manager entry exists
+    row = agent_list_by_raw_key(project, MANAGER_KEY)
     if row and row.get("manager_id"):
         mid = row["manager_id"].split(":")[0] if ":" in str(row.get("manager_id", "")) else row.get("manager_id", "")
         if mid:
             new_sid = _acp_session_new(project, "manager", mid)
             if new_sid:
-                agent_assign(project, raw_key, "manager", f"{mid}:{new_sid}")
+                agent_assign(project, MANAGER_KEY, "manager", f"{mid}:{new_sid}")
                 _acp_session_prompt(project, new_sid, mgr_msg)
-                print(f"[watchdog] manager {mid} new session={new_sid[:20]}... for {raw_key}", file=sys.stderr)
+                print(f"[watchdog] manager {mid} new session={new_sid[:20]}...", file=sys.stderr)
                 return
 
-    print(f"[watchdog] could not route to manager for {raw_key} — needs human attention", file=sys.stderr)
+    print(f"[watchdog] could not route to manager for {issue_key} — needs human attention", file=sys.stderr)
 
 
 def _handle_needs_worker(project: str, metadata: dict, reason: InputRequiredReason):

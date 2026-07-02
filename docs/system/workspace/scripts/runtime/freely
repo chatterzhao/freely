@@ -18823,10 +18823,13 @@ finally: s.close()
 # FORBIDDEN: fork from Worker (self-review bias).
 _acp_session_fork() {
   local project="$1" parent_role="$2" child_role="$3" child_agent_id="$4" raw_key="$5"
+  # Manager session stored under "__manager__", not issue raw_key
+  local _lookup_key="$raw_key"
+  [[ "$parent_role" == "manager" ]] && _lookup_key="__manager__"
   local _parent_sid; _parent_sid=$(python3 -c "
 import sys; sys.path.insert(0, '${project}/docs/system/workspace/scripts/runtime')
 from agent_working import agent_get_session
-print(agent_get_session('${project}', '${raw_key}', '${parent_role}') or '')
+print(agent_get_session('${project}', '${_lookup_key}', '${parent_role}') or '')
 " 2>/dev/null)
   [[ -z "$_parent_sid" ]] && { log_warn "no ${parent_role} session to fork for ${raw_key}"; return 1; }
   local _bridge_socket; _bridge_socket="/tmp/freely-acp-$(python3 -c "import hashlib,os; print(hashlib.sha256('${project}'.encode()).hexdigest()[:16])" 2>/dev/null).sock"
