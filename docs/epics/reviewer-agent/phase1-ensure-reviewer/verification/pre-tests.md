@@ -21,10 +21,10 @@
 - red-green-status: green
 - status: passed
 - blocker: (无)
-- surface_kind: implementation
-- target_lane: fix/raw-20260701T085407Z-reviewer-a2a-integration
+- surface_kind: end_to_end
+- target_lane: premerge-integration
 - promotion_gate: governance
-- task_refs: A1-A6
+- task_refs: A1-A6,B1-B8,C1-C14,D1-D13
 - case_design: 8 unit tests covering pair parse/format/empty/single/multi/no-session/roundtrip edge cases
 - red_how: feature: tests written before implementation, confirmed 8 failed then fixed
 
