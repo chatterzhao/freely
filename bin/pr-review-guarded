@@ -28,19 +28,41 @@ REVIEWER_SKILL="freely-tdd-review"
 # Slot for Reviewer agent — uses same slot as main AI_TOOL for now.
 # When agent-table is fully deployed, this reads from reviewer_slot.
 REVIEWER_SLOT="${REVIEWER_AGENT_SLOT:-}"
-# Try agent-table for reviewer_slot if available.
-# Uses agent-id.env (current format), not worker-id.env (deprecated).
+# Try agent_working table for reviewer_slot if available (preferred over agent-id.env).
 _agent_query="$ROOT_DIR/bin/agent-table-query"
-if [[ -z "$REVIEWER_SLOT" && -x "$_agent_query" ]]; then
-  _agent_env="$ROOT_DIR/.freely/agent-id.env"
-  if [[ -f "$_agent_env" ]]; then
-    _my_worker_id=$(grep -F "$(pwd)" "$_agent_env" 2>/dev/null | grep -oE 'worker_[0-9]+' | head -1 || true)
-    if [[ -n "$_my_worker_id" ]]; then
-      # --get-reviewer returns the paired reviewer_id + slot from agent-table
+_aw_py="$ROOT_DIR/docs/system/workspace/scripts/runtime/agent_working.py"
+if [[ -z "$REVIEWER_SLOT" ]]; then
+  if [[ -f "$_aw_py" ]]; then
+    _my_worker_id=$(python3 -c "
+import sys; sys.path.insert(0, '$ROOT_DIR/docs/system/workspace/scripts/runtime')
+from agent_working import agent_list_by_raw_key
+rk = '$(echo "$review_branch" | grep -oE "[0-9]{8}T[0-9]{6}Z" | head -1 || echo "")'
+if rk:
+    row = agent_list_by_raw_key('$ROOT_DIR', 'raw-'+rk)
+    if row:
+        wid = row.get('worker_id', '')
+        if wid:
+            print(wid.split(':')[0] if ':' in str(wid) else wid)
+" 2>/dev/null || true)
+    if [[ -n "$_my_worker_id" && -x "$_agent_query" ]]; then
       _rev_info=$("$_agent_query" --get-reviewer "$_my_worker_id" 2>/dev/null || true)
       if [[ -n "$_rev_info" ]]; then
         _rev_slot=$(echo "$_rev_info" | python3 -c "import json,sys; print(json.load(sys.stdin).get('slot',''))" 2>/dev/null || true)
         [[ -n "$_rev_slot" ]] && REVIEWER_SLOT="$_rev_slot"
+      fi
+    fi
+  fi
+  # Fallback: legacy agent-id.env
+  if [[ -z "$REVIEWER_SLOT" ]]; then
+    _agent_env="$ROOT_DIR/.freely/agent-id.env"
+    if [[ -f "$_agent_env" ]]; then
+      _my_worker_id=$(grep -F "$(pwd)" "$_agent_env" 2>/dev/null | grep -oE 'worker_[0-9]+' | head -1 || true)
+      if [[ -n "$_my_worker_id" && -x "$_agent_query" ]]; then
+        _rev_info=$("$_agent_query" --get-reviewer "$_my_worker_id" 2>/dev/null || true)
+        if [[ -n "$_rev_info" ]]; then
+          _rev_slot=$(echo "$_rev_info" | python3 -c "import json,sys; print(json.load(sys.stdin).get('slot',''))" 2>/dev/null || true)
+          [[ -n "$_rev_slot" ]] && REVIEWER_SLOT="$_rev_slot"
+        fi
       fi
     fi
   fi
@@ -194,7 +216,21 @@ fi
 
 # ── Step 3.5: Call Reviewer (ACP or manual fallback) ──
 _my_worker_id=""
-if [[ -f "$ROOT_DIR/.freely/agent-id.env" ]]; then
+# Prefer agent_working table (new), fallback to agent-id.env (legacy)
+if [[ -f "$_aw_py" ]]; then
+  _my_worker_id=$(python3 -c "
+import sys; sys.path.insert(0, '$ROOT_DIR/docs/system/workspace/scripts/runtime')
+from agent_working import agent_list_by_raw_key
+rk = '$(echo "$review_branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || echo '')'
+if rk:
+    row = agent_list_by_raw_key('$ROOT_DIR', 'raw-'+rk)
+    if row:
+        wid = row.get('worker_id', '')
+        if wid:
+            print(wid.split(':')[0] if ':' in str(wid) else wid)
+" 2>/dev/null || true)
+fi
+if [[ -z "$_my_worker_id" && -f "$ROOT_DIR/.freely/agent-id.env" ]]; then
   _my_worker_id=$(grep "$(pwd)" "$ROOT_DIR/.freely/agent-id.env" 2>/dev/null | tail -1 | grep -o 'worker_[0-9]*' || true)
 fi
 [[ -z "$_my_worker_id" ]] && _my_worker_id="worker_01"

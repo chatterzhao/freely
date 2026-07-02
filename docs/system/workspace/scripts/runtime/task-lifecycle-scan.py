@@ -509,21 +509,32 @@ def scan(project: Path) -> dict:
         # ── Category 3: worktree exists → check agent liveness ────
         if wt_exists:
             wt_path = wt["path"]
-            # Read from project-global agent-id.env (develop/.freely/agent-id.env)
-            agent_env_file = project / ".freely" / "agent-id.env"
+            # Query agent_working table first (preferred), fallback to agent-id.env
             agent_id = ""
-            if agent_env_file.exists():
-                try:
-                    wt_path_str = str(wt_path)
-                    for line in agent_env_file.read_text().split("\n"):
-                        if wt_path_str in line:
-                            # Format: {path}={role}={agent_id}
-                            parts = line.strip().split("=")
-                            if len(parts) >= 3:
-                                agent_id = parts[-1]
-                            break
-                except Exception:
-                    pass
+            try:
+                from agent_working import agent_list_by_raw_key
+                row = agent_list_by_raw_key(str(project), f"raw-{raw_key}")
+                if row:
+                    wid = row.get("worker_id", "")
+                    if wid:
+                        agent_id = wid.split(":")[0] if ":" in str(wid) else str(wid)
+            except Exception:
+                pass
+
+            # Fallback: legacy agent-id.env file
+            if not agent_id:
+                agent_env_file = project / ".freely" / "agent-id.env"
+                if agent_env_file.exists():
+                    try:
+                        wt_path_str = str(wt_path)
+                        for line in agent_env_file.read_text().split("\n"):
+                            if wt_path_str in line:
+                                parts = line.strip().split("=")
+                                if len(parts) >= 3:
+                                    agent_id = parts[-1]
+                                break
+                    except Exception:
+                        pass
 
             if not agent_id:
                 items.append({
@@ -534,7 +545,7 @@ def scan(project: Path) -> dict:
                     "branch": wt.get("branch", ""),
                     "agent_id": "",
                     "ready": True,
-                    "detail": "agent_working table missing — delegated but never bound",
+                    "detail": "agent_working + agent-id.env both missing — delegated but never bound",
                     "next_action": "[manager] re-delegate worker for this raw key",
                 })
             elif not a2a.agent_session_active(agent_id):

@@ -32,6 +32,6 @@ def test_l663_fix():
     """launched_pids: both prefixes wrapped in parens."""
     r = {"agent_id": "reviewer_05", "state": "working", "worker_pid": "12345"}
     result = (r["agent_id"].startswith("worker") or r["agent_id"].startswith("reviewer")) and r["state"] == "working" and r.get("worker_pid")
-    assert result == True, f"reviewer working with pid SHOULD match"
+    assert bool(result) is True, f"reviewer working with pid SHOULD match (got {result!r})"
 
 print("All _restore_tasks priority tests passed ✅")

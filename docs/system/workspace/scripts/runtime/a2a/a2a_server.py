@@ -531,24 +531,27 @@ class A2AServer:
                             "completion_summary": note[:200]})  # truncated for DB
                     except Exception:
                         pass
-            # Phase 1: attempt ACP session/resume for working agents after restore
+            # D5: attempt ACP session/resume for working agents after restore
             try:
-                import subprocess, os as _os
-                aw_py = _os.path.join(self.project, 'docs', 'system', 'workspace', 'scripts', 'runtime', 'agent_working.py')
-                if _os.path.exists(aw_py):
-                    subprocess.run([_sys.executable, '-c', f'''
-import sys; sys.path.insert(0, "{self.project}/docs/system/workspace/scripts/runtime")
-from agent_working import _db_rpc
-rows = _db_rpc("{self.project}", "agent_working.get_all", {{}}).get("rows", [])
-for r in rows:
-    for role in ("manager", "worker", "reviewer"):
-        val = r.get(f"{{role}}_id", "")
-        if val and ":" in str(val):
-            raw_key = r.get("raw_key", "")
-            print(f"[restore] agent {{role}} session present for {{raw_key}}", file=_sys.stderr)
-'''], timeout=10)
+                import subprocess as _sp, os as _os2
+                aw_py = _os2.path.join(self.project, 'docs', 'system', 'workspace', 'scripts', 'runtime', 'agent_working.py')
+                if _os2.path.exists(aw_py):
+                    _sp.run([_sys.executable, aw_py, 'stats'], timeout=10)
             except Exception:
                 pass
+            # D6: push restore-complete SSE event so watchdog re-subscribes
+            if restored > 0 or failed > 0:
+                try:
+                    import asyncio as _asyncio, json as _json6
+                    event_data = {
+                        "state": "restore_complete",
+                        "restored": restored, "failed": failed,
+                        "notifications_count": len(notifications)
+                    }
+                    _asyncio.run(self._notify_sse(
+                        "__system__", "restore_complete", event_data, is_global=True))
+                except Exception:
+                    pass
         except Exception:
             pass  # DB not available → start with empty TaskStore (降级运行)
 
@@ -646,15 +649,25 @@ for r in rows:
             headers={"Cache-Control": "no-cache", "Connection": "keep-alive", "X-Accel-Buffering": "no"},
         )
 
-    async def _notify_sse(self, task_id: str, event_type: str, data: dict):
-        """Notify all SSE subscribers for a task of a state change."""
+    async def _notify_sse(self, task_id: str, event_type: str, data: dict, is_global: bool = False):
+        """Notify SSE subscribers of a state change.
+
+        When is_global=True, notify ALL subscribers (per-task + global).
+        Otherwise notify only the specific task's subscribers + global subscribers.
+        """
         self.__init_sse()
-        # Notify per-task subscribers
-        for q in self._sse_subscribers.get(task_id, []):
-            await q.put({"event": event_type, "data": data})
-        # Also notify global subscribers (Runtime Watchdog)
-        for q in self._sse_subscribers.get("__global__", []):
-            await q.put({"event": event_type, "data": data})
+        if is_global:
+            # Push to every subscriber (used for restart/restore broadcasts)
+            for subscribers in self._sse_subscribers.values():
+                for q in subscribers:
+                    await q.put({"event": event_type, "data": data})
+        else:
+            # Notify per-task subscribers
+            for q in self._sse_subscribers.get(task_id, []):
+                await q.put({"event": event_type, "data": data})
+            # Also notify global subscribers (Runtime Watchdog)
+            for q in self._sse_subscribers.get("__global__", []):
+                await q.put({"event": event_type, "data": data})
 
     # ── Endpoints ──────────────────────────────────────────────────────
 
