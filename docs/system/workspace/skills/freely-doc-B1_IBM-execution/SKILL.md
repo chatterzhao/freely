@@ -69,9 +69,9 @@ B1_IBM 是 IBM Framework 第一阶段。I（Input）由 `freely wt-create` 命�
 - next_action: 修改 doc-B1/doc-B2/dev-loop skill → 合并
 - revisit_trigger: N/A（已 promote）
 - acceptance_criteria:
-  - doc-B1: candidate 格式示例完整可用
-  - doc-B2: I-* issue 示例覆盖全部必需字段
-  - dev-loop: pre-tests 结构和产物要求清晰
+  - skill:freely-doc-B1_IBM-execution: candidate 格式示例完整可用
+  - skill:freely-doc-B2_IBM-execution: I-* issue 示例覆盖全部必需字段
+  - skill:freely-dev-loop-execution: pre-tests 结构和产物要求清晰
 - promotion_gate: 三个 skill 修改完成且语法无误
 - open_questions: []
 - acceptance_reviews:

@@ -264,9 +264,9 @@ phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
 | 节点 | 路径 | 谁创建 | 何时 |
 |------|------|--------|------|
 | raw issue | `docs/issues/raw-{key}/issue.md` | `freely wt-create` | B1 之前 |
-| brainstorms | `docs/pre-brainstorms/{key}--{slug}/brainstorms.md` | B1_IBM skill | B1 Brainstorm |
-| candidate | `docs/pre-brainstorms/{key}--{slug}/candidates.md` | B1_IBM skill | B1 Milestone |
-| I-* issue | `docs/epics/{epic}/{story}/raw-{raw-key}/issues/I-{raw-key}-{suffix}.md` | **B2_IBM skill（本 skill）** | B2 Map（物化） |
+| brainstorms | `docs/pre-brainstorms/{key}--{slug}/brainstorms.md` | skill:freely-doc-B1_IBM-execution | B1 Brainstorm |
+| candidate | `docs/pre-brainstorms/{key}--{slug}/candidates.md` | skill:freely-doc-B1_IBM-execution | B1 Milestone |
+| I-* issue | `docs/epics/{epic}/{story}/raw-{raw-key}/issues/I-{raw-key}-{suffix}.md` | **skill:freely-doc-B2_IBM-execution（本 skill）** | B2 Map（物化） |
 
 ### B2 设计产物（本 skill 负责创建）
 
