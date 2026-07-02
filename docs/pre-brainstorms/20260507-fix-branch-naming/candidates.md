@@ -10,5 +10,5 @@
 - milestone: M-20260507T0100Z-A
 - acceptance_criteria:
   - fix-execution SKILL.md 中 7 处 feature/ 前缀统一替换为 fix/
-  - 分支名格式使用 raw-{raw key}-{slug} 规范
+  - 分支名格式使用 raw-{raw-key}-{slug} 规范
   - 不破坏其他 skill 的分支命名逻辑

@@ -79,12 +79,12 @@ Optional:
                  已有测试能捕获 → 直接跑，确认 FAIL。
                  没有测试 → 设计复现测试或手工端到端复现。
                  RED 含义: bug 存在时按测试方法测试一定是 RED，修复正确后，用修复前一样的测试方法，结论一定是 GREEN
-                 分支: fix/raw-{raw key}-{slug}
+                 分支: fix/raw-{raw-key}-{slug}
 
   --kind feature 新功能、重构、优化、架构改进。
                  RED 阶段按端到端→集成→单元设计新测试，全部 FAIL 才进 dev。
                  RED 含义: 功能未实现时，按测试方法测试一定是 RED，实现正确后，用实现前一样的测试方法，结论一定是 GREEN
-                 分支: feature/raw-{raw key}-{slug}
+                 分支: feature/raw-{raw-key}-{slug}
                  注意: 如果 bug 修复同时需要实现紧相关的新功能 →
                        拆为两个 raw issue，分别 wt-create。
 
@@ -97,8 +97,8 @@ Optional:
 
 ── 创建内容 ──────────────────────────────────────────────────
 
-  1. {prefix}/raw-{raw key}-{slug}    ← based on --base (develop), the permanent dev worktree
-  2. test-pre-merge-{raw key}-{slug}  ← based on ①, discardable testing sandbox
+  1. {prefix}/raw-{raw-key}-{slug}    ← based on --base (develop), the permanent dev worktree
+  2. test-pre-merge-{raw-key}-{slug}  ← based on ①, discardable testing sandbox
 
 Before wt-create, create the raw issue on a configured platform first:
   ./bin/freely feedback --help    (review usage, then create the raw issue)
