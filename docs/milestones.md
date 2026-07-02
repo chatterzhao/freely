@@ -3,6 +3,10 @@
 - status: completed
 ### candidate_issues
 ### committed_issues
+1. `I-20260701T085407Z-A`
+- milestone: M-20260701T085407Z-A
+- phase_state: completed
+- path: docs/epics/reviewer-agent/phase1-ensure-reviewer/raw-20260701T085407Z/issues/I-20260701T085407Z-A.md
 ### completed_issues
 1. `C-20260701T085407Z-A`
 - milestone: M-20260701T085407Z-A
