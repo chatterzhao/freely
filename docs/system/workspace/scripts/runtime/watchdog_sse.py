@@ -75,8 +75,11 @@ def _acp_session_new(project: str, role: str, agent_id: str, slot: str = None) -
 
 
 def watchdog_run(project: str, a2a_socket: str):
-    """Main Watchdog loop: subscribe to SSE, handle events."""
-    sse_url = f"unix://{a2a_socket}/tasks/stream"
+    """Main Watchdog loop: subscribe to SSE, handle events.
+
+    Runs liveness/staleness checks on a background timer via socket timeout,
+    so they execute even during an active SSE connection (not just on reconnect).
+    """
     backoff = 1
     max_backoff = 30
     last_liveness_check = 0
@@ -90,15 +93,13 @@ def watchdog_run(project: str, a2a_socket: str):
             time.sleep(backoff)
             backoff = min(backoff * 2, max_backoff)
 
-        # C12: periodic agent crash detection
+        # Run checks between reconnections too (belt-and-suspenders)
         if time.time() - last_liveness_check > 120:
             try:
                 _check_agent_liveness(project)
                 last_liveness_check = time.time()
             except Exception:
                 pass
-
-        # C13: periodic session staleness check
         try:
             _check_session_staleness(project)
         except Exception:
@@ -106,24 +107,66 @@ def watchdog_run(project: str, a2a_socket: str):
 
 
 def _subscribe_and_process(project: str, a2a_socket: str):
-    """Connect to A2A SSE and process events."""
-    import http.client
+    """Connect to A2A SSE and process events.
+
+    Uses socket timeout to periodically run liveness/staleness checks
+    even during an active SSE connection (not just on reconnect).
+    """
     import socket as sock
 
-    # Connect via Unix socket
     s = sock.socket(sock.AF_UNIX, sock.SOCK_STREAM)
+    s.settimeout(30.0)  # 30s recv timeout → periodic background checks
     s.connect(a2a_socket)
     s.sendall(b"GET /tasks/stream HTTP/1.1\r\nHost: localhost\r\nAccept: text/event-stream\r\n\r\n")
 
     buf = b""
+    # Timer state as mutable dict (so _run_periodic_checks can update it)
+    _timers = {"last_liveness": time.time(), "last_staleness": 0.0}
+    LIVENESS_INTERVAL = 120.0  # C12: every 2 minutes
+    STALENESS_INTERVAL = 300.0  # C13: every 5 minutes
+
     while True:
-        chunk = s.recv(4096)
+        try:
+            chunk = s.recv(4096)
+        except sock.timeout:
+            # Timeout is expected — run background checks while SSE is idle
+            _run_periodic_checks(project, _timers, LIVENESS_INTERVAL, STALENESS_INTERVAL)
+            continue
+        except OSError:
+            break  # socket closed
+
         if not chunk:
             break
         buf += chunk
         while b"\n\n" in buf:
             event, buf = buf.split(b"\n\n", 1)
             _handle_sse_event(project, event.decode())
+
+        # After processing events, run checks if intervals have elapsed
+        now = time.time()
+        if now - _timers["last_liveness"] > LIVENESS_INTERVAL or now - _timers["last_staleness"] > STALENESS_INTERVAL:
+            _run_periodic_checks(project, _timers, LIVENESS_INTERVAL, STALENESS_INTERVAL)
+
+
+def _run_periodic_checks(project: str, timers: dict,
+                         liveness_interval: float, staleness_interval: float):
+    """Run liveness/staleness checks if their intervals have elapsed.
+
+    Updates timers dict in-place so intervals are respected across calls.
+    """
+    now = time.time()
+    if now - timers["last_liveness"] > liveness_interval:
+        try:
+            _check_agent_liveness(project)
+            timers["last_liveness"] = now
+        except Exception:
+            pass
+    if now - timers["last_staleness"] > staleness_interval:
+        try:
+            _check_session_staleness(project)
+            timers["last_staleness"] = now
+        except Exception:
+            pass
 
 
 def _handle_sse_event(project: str, event_text: str):
