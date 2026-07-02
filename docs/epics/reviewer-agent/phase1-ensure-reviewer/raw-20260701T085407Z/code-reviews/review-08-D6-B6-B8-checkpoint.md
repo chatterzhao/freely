@@ -1,6 +1,6 @@
 # Code Review 08: D6+B6+B8 Checkpoint
 
-- owner_issue: I-20260701T085407Z-A
+- issue_id: I-20260701T085407Z-A
 
 **Reviewer**: Claude Code
 **Date**: 2026-07-01

@@ -1,6 +1,6 @@
 # Review 04: Restart Scenarios + ACP Session Modes
 
-- owner_issue: I-20260701T085407Z-A
+- issue_id: I-20260701T085407Z-A
 - date: 2026-07-01
 
 ## 两种重启场景

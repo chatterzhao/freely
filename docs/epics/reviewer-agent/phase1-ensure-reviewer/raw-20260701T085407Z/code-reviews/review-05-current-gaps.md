@@ -1,6 +1,6 @@
 # Review 05: Current Working vs Broken Paths
 
-- owner_issue: I-20260701T085407Z-A
+- issue_id: I-20260701T085407Z-A
 - date: 2026-07-01
 
 ## Scenario A: Manager 启动巡逻

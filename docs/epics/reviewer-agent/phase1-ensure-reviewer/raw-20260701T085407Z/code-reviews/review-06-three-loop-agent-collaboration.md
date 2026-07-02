@@ -1,6 +1,6 @@
 # Review 06: Three-Loop + Agent 协作模型
 
-- owner_issue: I-20260701T085407Z-A
+- issue_id: I-20260701T085407Z-A
 - date: 2026-07-01
 
 ## Three Loops
