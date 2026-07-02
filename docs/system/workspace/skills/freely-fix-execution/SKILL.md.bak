@@ -78,7 +78,7 @@ hotfix/*          → main + develop (pr-merge-guarded)
 
 | 类型 | 分支 | 合并路径 |
 |---|---|---|
-| 普通 fix | `fix/raw-{raw-key}-{slug}` | fix → pr-create → pr-review → pr-merge develop |
+| 普通 fix | `fix/raw-{raw key}-{slug}` | fix → pr-create → pr-review → pr-merge develop |
 | 紧急 hotfix | `hotfix/<desc>-<YYYYMMDD>` | hotfix → B1→B2→dev→test→pr → pr-merge-guarded main + develop |
 
 ---

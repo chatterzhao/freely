@@ -1,0 +1,34 @@
+# Freely Agent Role Cards — capability definitions
+# =============================================================================
+# Each role declares what skills it can perform.
+# This file is git-tracked. Never reference slots, API keys, or pool sizes here.
+# Those are in .freely/agent-table.toml (untracked, user-configured).
+
+[manager]
+name = "Freely Manager"
+description = "Patrol fleet, delegate workers, judge closeout"
+skills = [
+    "freely-workflow-guarded-execution",
+    "freely-branch-management",
+    "freely-constitution-guard",
+    "freely-laws-enforcer",
+]
+
+[worker]
+name = "Freely Worker"
+description = "Worktree-isolated, skill-based execution"
+skills = [
+    "freely-doc-B1_IBM-execution",
+    "freely-doc-B2_IBM-execution",
+    "freely-test-RED-execution",
+    "freely-dev-loop-execution",
+    "freely-test-execution",
+]
+
+[reviewer]
+name = "Freely Reviewer"
+description = "Per-step review, gate check, TDD fidelity"
+skills = [
+    "freely-tdd-review",
+    "freely-candidate-acceptance-review",
+]

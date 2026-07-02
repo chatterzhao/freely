@@ -704,6 +704,10 @@ def _main() -> int:
     p_update = sub.add_parser("update")
     p_update.add_argument("--task-id", default="")
     p_update.add_argument("--state", default=None)
+    p_update.add_argument("--reason", default=None, help="Required when state=input-required")
+    p_update.add_argument("--from-agent", default=None, help="Agent sending the input-required event")
+    p_update.add_argument("--needs-agent", default=None, help="Agent that should handle this")
+    p_update.add_argument("--review-stage", default=None, help="b1|b2|dev|red|test|gate")
     p_update.add_argument("--session-id", default=None, help="Worker ACP session ID")
     p_update.add_argument("--exit-kind", default=None, help=argparse.SUPPRESS)
     p_update.add_argument("--status", default=None, help=argparse.SUPPRESS)
@@ -872,6 +876,9 @@ def _main() -> int:
             if getattr(args, 'state', None): kwargs['state'] = args.state
             if getattr(args, 'session_id', None): kwargs['session_id'] = args.session_id
             if getattr(args, 'reason', None): kwargs['reason'] = args.reason
+            if getattr(args, 'from_agent', None): kwargs['from_agent'] = args.from_agent
+            if getattr(args, 'needs_agent', None): kwargs['needs_agent'] = args.needs_agent
+            if getattr(args, 'review_stage', None): kwargs['review_stage'] = args.review_stage
             if getattr(args, 'completion_summary', None): kwargs['completion_summary'] = args.completion_summary
             if getattr(args, 'next_action', None): kwargs['next_action'] = args.next_action
             if getattr(args, 'exit_kind', None): kwargs['exit_kind'] = args.exit_kind

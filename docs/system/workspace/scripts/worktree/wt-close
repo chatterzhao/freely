@@ -344,6 +344,31 @@ if [[ "$branch" == test-pre-merge-* ]]; then
   echo "wt-close: test-pre-merge branch (disposable), skipping checks and platform close"
   SKIP_PLATFORM=true
   FORCE=true
+  # D4: cleanup reviewer agents from agent_working for test-pre-merge branches
+  _tp_raw_key_cleanup=$(echo "$branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)
+  if [[ -n "$_tp_raw_key_cleanup" ]]; then
+    _dev_wt_for_c=$(git -C "$PROJECT_ROOT" worktree list --porcelain 2>/dev/null | awk '$1=="worktree"{wt=$2} $1=="branch"&&$2=="refs/heads/develop"{print wt;exit}')
+    [[ -n "$_dev_wt_for_c" ]] || _dev_wt_for_c="$PROJECT_ROOT"
+    python3 -c "
+import sys,os,json,socket,hashlib
+sys.path.insert(0, '$_dev_wt_for_c/docs/system/workspace/scripts/runtime')
+from agent_working import agent_list_by_raw_key, agent_get_session, agent_release_all
+row = agent_list_by_raw_key('$_dev_wt_for_c', 'raw-$_tp_raw_key_cleanup')
+if row:
+    h = hashlib.sha256('$_dev_wt_for_c'.encode()).hexdigest()[:16]
+    bridge = f'/tmp/freely-acp-{h}.sock'
+    if os.path.exists(bridge):
+        for role in ('worker', 'reviewer', 'manager'):
+            sid = agent_get_session('$_dev_wt_for_c', 'raw-$_tp_raw_key_cleanup', role)
+            if sid:
+                try:
+                    s=socket.socket(socket.AF_UNIX); s.settimeout(2); s.connect(bridge)
+                    req=json.dumps({'jsonrpc':'2.0','id':1,'method':'session/close','params':{'sessionId':sid}})+'\n'
+                    s.sendall(req.encode()); s.shutdown(socket.SHUT_WR); s.recv(4096); s.close()
+                except Exception: pass
+    agent_release_all('$_dev_wt_for_c', 'raw-$_tp_raw_key_cleanup')
+" 2>/dev/null && echo "wt-close: test-pre-merge reviewer cleanup ✓" || true
+  fi
 elif _is_protected_branch "$branch"; then
   echo "Error: '$branch' is a protected branch, cannot close" >&2
   exit 1
@@ -949,7 +974,19 @@ except: pass
 
       # Gracefully close ACP session before marking task completed
       if [[ -n "$_wsession" ]]; then
-        _acp_session_close "$PROJECT_ROOT" "$_wsession"
+        _acp_bridge="/tmp/freely-acp-$(python3 -c "import hashlib,os; print(hashlib.sha256(os.path.abspath('$PROJECT_ROOT').encode()).hexdigest()[:16])" 2>/dev/null).sock"
+        if [[ -S "$_acp_bridge" ]]; then
+          python3 -c "
+import json, socket
+req = json.dumps({'jsonrpc':'2.0','id':1,'method':'session/close','params':{'sessionId':'$_wsession'}}) + '\n'
+s = socket.socket(socket.AF_UNIX); s.settimeout(5)
+try:
+    s.connect('$_acp_bridge'); s.sendall(req.encode()); s.shutdown(socket.SHUT_WR)
+    s.recv(4096)
+except: pass
+finally: s.close()
+" 2>/dev/null || true
+        fi
       fi
       # Mark task as completed (was 'consumed' — invalid A2A state, silently rejected by SQLite CHECK)
       python3 "$_a2a_task_py" update --task-id "$_wtask_id" --state completed >/dev/null 2>&1 || true
@@ -1076,16 +1113,43 @@ if [[ "$branch" == fix/raw-* || "$branch" == feature/raw-* ]]; then
         echo "wt-close: test-pre-merge cleaned ✓"
       fi
     fi
-    # Clean up agent-id.env entries for this raw-key.
-    # agent-id.env lives in the main develop project root — NOT in the worktree
-    # .freely/ which is a clone from wt-create. Find develop worktree explicitly.
-    _dev_wt=$(git worktree list --porcelain 2>/dev/null | awk '$1=="worktree"{wt=$2} $1=="branch"&&$2=="refs/heads/develop"{print wt;exit}')
-    [[ -n "$_dev_wt" ]] || _dev_wt="$PROJECT_ROOT"
-    _agent_env="$_dev_wt/.freely/agent-id.env"
-    if [[ -f "$_agent_env" ]]; then
-      sed -i.bak "/raw-${_tp_raw_key}/d" "$_agent_env" 2>/dev/null || true
-      echo "wt-close: agent-id.env cleaned for raw-${_tp_raw_key} ✓"
-    fi
+	    # Release agent from agent_working table (replaces agent-id.env cleanup).
+	    _dev_wt=$(git worktree list --porcelain 2>/dev/null | awk '$1=="worktree"{wt=$2} $1=="branch"&&$2=="refs/heads/develop"{print wt;exit}')
+	    [[ -n "$_dev_wt" ]] || _dev_wt="$PROJECT_ROOT"
+	    # Phase 1: close ACP sessions + release agent_working table
+	    if [[ -f "$_dev_wt/docs/system/workspace/scripts/runtime/agent_working.py" ]]; then
+	      # Close ACP sessions (worker + reviewer) before releasing table entries
+	      python3 -c "
+import sys,os,json,socket,hashlib
+sys.path.insert(0, '$_dev_wt/docs/system/workspace/scripts/runtime')
+from agent_working import agent_list_by_raw_key, agent_get_session
+row = agent_list_by_raw_key('$_dev_wt', 'raw-${_tp_raw_key}')
+if row:
+    h = hashlib.sha256('$_dev_wt'.encode()).hexdigest()[:16]
+    bridge = f'/tmp/freely-acp-{h}.sock'
+    if os.path.exists(bridge):
+        for role in ('worker', 'reviewer', 'manager'):
+            sid = agent_get_session('$_dev_wt', 'raw-${_tp_raw_key}', role)
+            if sid:
+                try:
+                    s=socket.socket(socket.AF_UNIX); s.settimeout(2); s.connect(bridge)
+                    req=json.dumps({'jsonrpc':'2.0','id':1,'method':'session/close','params':{'sessionId':sid}})+'
+'
+                    s.sendall(req.encode()); s.shutdown(socket.SHUT_WR); s.recv(4096); s.close()
+                except: pass
+" 2>/dev/null || true
+	      # Release from agent_working table
+	      python3 -c "
+import sys; sys.path.insert(0, '$_dev_wt/docs/system/workspace/scripts/runtime')
+from agent_working import agent_release_all
+agent_release_all('$_dev_wt', 'raw-${_tp_raw_key}')
+" 2>/dev/null && echo "wt-close: agent_working released for raw-${_tp_raw_key}" || true
+	    fi
+	    # Fallback: legacy agent-id.env cleanup
+	    _agent_env="$_dev_wt/.freely/agent-id.env"
+	    if [[ -f "$_agent_env" ]]; then
+	      sed -i.bak "/raw-${_tp_raw_key}/d" "$_agent_env" 2>/dev/null || true
+	    fi
   fi
 fi
 

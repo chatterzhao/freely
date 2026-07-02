@@ -27,7 +27,7 @@ B1_IBM 是 IBM Framework 第一阶段。I（Input）由 `freely wt-create` 命�
 | **B** | Brainstorm | `freely-doc-B1_IBM-execution` skill | `docs/pre-brainstorms/{key}--{slug}/brainstorms.md`：发散→收敛→决策 |
 | **M** | Milestone | `freely-doc-B1_IBM-execution` skill | `docs/pre-brainstorms/{key}--{slug}/candidates.md`（candidate 文档）+ milestones.md candidate_issues（candidate 的 `promoted_issue_id` 指定 I-* issue 的身份标识） |
 
-> Candidate promote 时，`promoted_issue_id` 字段确定 I-* issue 的 key。值是 `I-{key}-{suffix}`（如 `I-20260508T011858Z-A`），suffix 继承 candidate 的 suffix。`freely-doc-B2_IBM-execution` skill 根据此 key，自行确定 epic/story 后构造完整路径（`docs/epics/{epic-name}/{story-name}/raw-{raw-key}/issues/I-{raw-key}-{suffix}.md`）并物化文件。B1_IBM 不决定文件放在哪个 epic/story——那是 B2_IBM 的架构决策。
+> Candidate promote 时，`promoted_issue_id` 字段确定 I-* issue 的 key。值是 `I-{key}-{suffix}`（如 `I-20260508T011858Z-A`），suffix 继承 candidate 的 suffix。`freely-doc-B2_IBM-execution` skill 根据此 key，自行确定 epic/story 后构造完整路径（`docs/epics/{epic-name}/{story-name}/raw-{raw key}/issues/I-{raw key}-{suffix}.md`）并物化文件。B1_IBM 不决定文件放在哪个 epic/story——那是 B2_IBM 的架构决策。
 
 ### I：Input — `freely wt-create` 命令准备的 raw issue
 
@@ -69,9 +69,9 @@ B1_IBM 是 IBM Framework 第一阶段。I（Input）由 `freely wt-create` 命�
 - next_action: 修改 doc-B1/doc-B2/dev-loop skill → 合并
 - revisit_trigger: N/A（已 promote）
 - acceptance_criteria:
-  - doc-B1: candidate 格式示例完整可用
-  - doc-B2: I-* issue 示例覆盖全部必需字段
-  - dev-loop: pre-tests 结构和产物要求清晰
+  - skill:freely-doc-B1_IBM-execution: candidate 格式示例完整可用
+  - skill:freely-doc-B2_IBM-execution: I-* issue 示例覆盖全部必需字段
+  - skill:freely-dev-loop-execution: pre-tests 结构和产物要求清晰
 - promotion_gate: 三个 skill 修改完成且语法无误
 - open_questions: []
 - acceptance_reviews:
@@ -80,7 +80,7 @@ B1_IBM 是 IBM Framework 第一阶段。I（Input）由 `freely wt-create` 命�
   - summary: 审查 #247/#251 门禁拦截历史，确认 skill 修改方向正确
   - verdict: pass
 - promoted_issue_id: I-20260508T011858Z-A
-- promoted_issue_path: docs/epics/{epic-name}/{story-name}/raw-{raw-key}/issues/I-{raw-key}-{suffix}.md
+- promoted_issue_path: docs/epics/{epic-name}/{story-name}/raw-{raw key}/issues/I-{raw key}-{suffix}.md
 - milestone: M-20260508T011858Z-A
 - session_refs: []
 ```
@@ -160,7 +160,7 @@ milestone: M-20260508T011858Z-A
   - summary: 评审摘要
   - verdict: pass
 - promoted_issue_id: I-20260508T011858Z-A
-- promoted_issue_path: docs/epics/{epic-name}/{story-name}/raw-{raw-key}/issues/I-{raw-key}-{suffix}.md
+- promoted_issue_path: docs/epics/{epic-name}/{story-name}/raw-{raw key}/issues/I-{raw key}-{suffix}.md
 - milestone: M-20260508T011858Z-A
 - session_refs: []
 ```

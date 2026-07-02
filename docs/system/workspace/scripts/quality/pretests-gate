@@ -65,6 +65,9 @@ target_lane = sys.argv[5]
 promotion_gate = sys.argv[6]
 
 ISSUE_RE = re.compile(r"^docs/epics/.+/issues/[^/]+\.md$")
+# Canonical path patterns — gate enforces these to catch wrong-location errors
+PRETESTS_PATH_RE = re.compile(r"^docs/epics/.+/raw-[^/]+/verification/pre-tests\.md$")
+VERIFICATION_DIR_RE = re.compile(r"^docs/epics/.+/raw-[^/]+/code-reviews$")
 REQUIRED_SECTION_NAMES = ("Unit", "Integration", "End-to-End", "Real-Environment")
 REQUIRED_SECTION_SCALARS = (
     "acceptance_target",
@@ -166,11 +169,32 @@ def parse_issue_binding(issue_path: str, text: str) -> tuple[str, str]:
     verification_dir = extract("verification_artifact_dir")
     errors: list[str] = []
     if not pre_tests_path:
-        errors.append(f"{issue_path}: missing pre_tests_path")
+        errors.append(
+            f"{issue_path}: 缺少 pre_tests_path 字段。\n"
+            f"  在此 I-* issue 文件中添加: - pre_tests_path: docs/epics/{{epic-name}}/{{story-name}}/raw-{{raw key}}/verification/pre-tests.md"
+        )
     elif not Path(pre_tests_path).is_relative_to(Path("docs")) and not pre_tests_path.startswith(".freely/"):
-        errors.append(f"{issue_path}: pre_tests_path must point inside repo, got {pre_tests_path}")
+        errors.append(
+            f"{issue_path}: pre_tests_path 必须在 repo 内，当前值: {pre_tests_path}。\n"
+            f"  正确格式: docs/epics/{{epic-name}}/{{story-name}}/raw-{{raw key}}/verification/pre-tests.md"
+        )
     if not verification_dir:
-        errors.append(f"{issue_path}: missing verification_artifact_dir")
+        errors.append(
+            f"{issue_path}: 缺少 verification_artifact_dir 字段。\n"
+            f"  在此 I-* issue 文件中添加: - verification_artifact_dir: docs/epics/{{epic-name}}/{{story-name}}/raw-{{raw key}}/code-reviews"
+        )
+    # Validate canonical path patterns
+    if pre_tests_path and not PRETESTS_PATH_RE.match(pre_tests_path):
+        errors.append(
+            f"{issue_path}: pre_tests_path 不符合规范路径格式: {pre_tests_path}。\n"
+            f"  文件可能放错了位置！规范路径: docs/epics/{{epic-name}}/{{story-name}}/raw-{{raw key}}/verification/pre-tests.md\n"
+            f"  先检查文件是否在 raw-{{raw key}}/verification/ 下，不要对着错误路径的文件改内容。"
+        )
+    if verification_dir and not VERIFICATION_DIR_RE.match(verification_dir):
+        errors.append(
+            f"{issue_path}: verification_artifact_dir 不符合规范路径格式: {verification_dir}。\n"
+            f"  规范路径: docs/epics/{{epic-name}}/{{story-name}}/raw-{{raw key}}/code-reviews"
+        )
     if errors:
         raise ValueError("\n".join(errors))
     return pre_tests_path, verification_dir
@@ -377,15 +401,21 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
 
     pretests_text = get_staged_text(pre_tests_path) if source == "staged" else get_worktree_text(pre_tests_path)
     if not pretests_text:
-        return [f"[pre_tests_missing] {issue_path}: bound pre-tests file missing or unreadable: {pre_tests_path}"]
+        return [f"[pre_tests_missing] {issue_path}: bound pre-tests file missing or unreadable: {pre_tests_path}\n"
+                f"  先检查: 文件是否存在于上述路径？I-* issue 的 pre_tests_path 字段是否指向正确位置？\n"
+                f"  正确路径格式: docs/epics/{{epic-name}}/{{story-name}}/raw-{{raw key}}/verification/pre-tests.md\n"
+                f"  文件不存在 → 按 skill `freely-doc-B2_IBM-execution` 模板创建。\n"
+                f"  文件存在但路径不对 → 修正 I-* issue 的 pre_tests_path 字段。"]
 
     if phase_state(issue_text) == "completed" or require_adequacy:
         tasks_text = tasks_text_for_source(tasks_path, source)
         if not tasks_text:
             add_error(
                 "task_closeout_missing",
-                f"{issue_path}: bound tasks file missing or unreadable: {tasks_path}. "
-                "Completion and guarded promote closeout require the owner task decomposition to remain visible.",
+                f"{issue_path}: bound tasks file missing or unreadable: {tasks_path}.\n"
+                f"  先检查: 文件是否存在于上述路径？与 pre-tests.md 同目录（verification/）。\n"
+                f"  文件不存在 → 创建 tasks.md，所有任务标记 [x]。\n"
+                f"  Completion and guarded promote closeout require the owner task decomposition to remain visible.",
             )
         else:
             unchecked = unchecked_task_lines(tasks_text)
@@ -499,7 +529,7 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
                 "red_green_status_missing",
                 f"{pre_tests_path}: {title_line} missing red-green-status. "
                 "Every acceptance item must track its TDD state: pending (B2 wrote it) → red (RED phase confirmed) → green (GREEN phase passed). "
-                "Read skill:freely-doc-B2_IBM-execution for the full template.",
+                "Read skill `freely-doc-B2_IBM-execution` for the full template.",
             )
         elif rg_status not in valid_red_green:
             add_error(
@@ -512,7 +542,7 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
                 "red_green_not_green",
                 f"{pre_tests_path}: {fields.get('id', title_line)} red-green-status is '{rg_status}', must be 'green' or 'not_applicable' before PR. "
                 "Complete RED(red) → dev → GREEN(green) cycle before creating PR. "
-                "Read skill:freely-fix-execution or skill:freely-feature-execution §阶段3-5.",
+                "Read skill `freely-fix-execution` or skill `freely-feature-execution` §阶段3-5.",
             )
         for key in ("status", "artifact_ref"):
             if not fields.get(key):
@@ -567,8 +597,10 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
         elif artifact_ref and not artifact_exists(artifact_ref, source):
             add_error(
                 "verification_state_missing",
-                f"{pre_tests_path}: {fields.get('id', title_line)} references missing artifact {artifact_ref}. "
-                "Keep the gate tied to traceable test evidence; unstaged or imaginary records do not count.",
+                f"{pre_tests_path}: {fields.get('id', title_line)} 引用的 artifact 文件不存在: {artifact_ref}。\n"
+                f"  先检查: artifact_ref 路径是否正确？文件是否已提交（git add）？\n"
+                f"  路径错误 → 修正 pre-tests.md 中该 item 的 artifact_ref 字段。\n"
+                f"  文件未提交 → git add -f <文件> 然后重新运行。",
             )
         if require_adequacy and acceptance_item_uses_adequacy_v2(fields):
             adequacy_v2_items.append(fields)
@@ -625,7 +657,7 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
             sufficient_items = [
                 fields
                 for fields in matching_items
-                if fields.get("status") == "pass"
+                if fields.get("status") in {"pass", "passed"}
                 and artifact_exists(fields.get("artifact_ref", ""), source)
                 and (
                     target_lane != "premerge-integration"
@@ -658,7 +690,7 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
                 fields
                 for fields in acceptance_fields
                 if fields.get("evidence_level") in {"real_env", "post_merge_dogfood"}
-                and fields.get("status") == "pass"
+                and fields.get("status") in {"pass", "passed"}
                 and artifact_exists(fields.get("artifact_ref", ""), source)
             ]
             if not strong_live_items:
@@ -733,23 +765,17 @@ if failures:
             other_errors.append(f)
     print("[pretests-gate] blocked completion due to pre-tests evidence failures:", file=sys.stderr)
     print(file=sys.stderr)
-    if b2_errors or test_errors:
-        print("── 需要阅读的 Skill ──", file=sys.stderr)
-        if b2_errors:
-            print(f"  skill:freely-doc-B2_IBM-execution §pre-tests 模板与门禁常见坑速查 ({len(b2_errors)} 个)", file=sys.stderr)
-        if test_errors:
-            print(f"  skill:freely-test-execution §GREEN 判定标准 ({len(test_errors)} 个)", file=sys.stderr)
-        print(file=sys.stderr)
     if b2_errors:
-        print(f"── B2 pre-tests 设计问题 ({len(b2_errors)}) ──", file=sys.stderr)
+        print(f"── 请按 skill `freely-doc-B2_IBM-execution` §pre-tests 模板与门禁常见坑速查 检查 ({len(b2_errors)} 项) ──", file=sys.stderr)
         for f in b2_errors: print(f"  - {f}", file=sys.stderr)
         print(file=sys.stderr)
     if test_errors:
-        print(f"── test-GREEN 执行问题 ({len(test_errors)}) ──", file=sys.stderr)
+        print(f"── 请按 skill `freely-test-execution` §GREEN 判定标准与执行步骤 检查 ({len(test_errors)} 项) ──", file=sys.stderr)
         for f in test_errors: print(f"  - {f}", file=sys.stderr)
         print(file=sys.stderr)
     if other_errors:
         for f in other_errors: print(f"  - {f}", file=sys.stderr)
-    print("不要逐条改字段——先看上面「需要阅读的 Skill」，加载对应 skill 修正。", file=sys.stderr)
+        print(file=sys.stderr)
+    print("不要逐条改字段——打开上面指定的 skill，按 skill 规范修正每一项。", file=sys.stderr)
     sys.exit(1)
 PY

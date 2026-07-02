@@ -1,3 +1,19 @@
+## M-20260701T085407Z-A
+- title: A2A reviewer agent — ACP/A2A 集成 + session/fork 复用
+- status: completed
+### candidate_issues
+### committed_issues
+1. `I-20260701T085407Z-A`
+- milestone: M-20260701T085407Z-A
+- phase_state: completed
+- path: docs/epics/reviewer-agent/phase1-ensure-reviewer/raw-20260701T085407Z/issues/I-20260701T085407Z-A.md
+### completed_issues
+1. `C-20260701T085407Z-A`
+- milestone: M-20260701T085407Z-A
+- status: absorbed
+- absorbed_into: `raw-20260701T085407Z`
+- summary: 94 commits, 82 tests, ACP/A2A/SSE/session 全链路集成
+
 ## M-20260701T081450Z-A
 - title: fix: merge lock orphan self-heal
 - status: active

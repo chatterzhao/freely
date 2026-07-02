@@ -234,7 +234,7 @@ class DbDaemon:
                 name TEXT NOT NULL DEFAULT '',
                 description TEXT NOT NULL DEFAULT '',
                 state TEXT NOT NULL DEFAULT 'submitted'
-                    CHECK(state IN ('submitted','working','input-required','canceled','completed','failed','canceled')),
+                    CHECK(state IN ('submitted','working','input-required','canceled','completed','failed')),
                 agent_id TEXT NOT NULL DEFAULT '',
                 skill TEXT NOT NULL DEFAULT '',
                 session_id TEXT NOT NULL DEFAULT '',
@@ -295,6 +295,31 @@ class DbDaemon:
                     c.execute(f"ALTER TABLE a2a_tasks ADD COLUMN {col_name} {col_def}")
                 except Exception:
                     pass
+
+        # agent_working — tracks which agent is on which worktree (replaces agent-id.env)
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS agent_working (
+                raw_key         TEXT PRIMARY KEY,
+                worktree        TEXT NOT NULL DEFAULT '',
+                branch          TEXT NOT NULL DEFAULT '',
+                test_worktree   TEXT DEFAULT '',
+                test_branch     TEXT DEFAULT '',
+                manager_id      TEXT DEFAULT NULL,
+                worker_id       TEXT DEFAULT NULL,
+                reviewer_id     TEXT DEFAULT NULL,
+                created_at      TEXT NOT NULL DEFAULT (datetime('now')),
+                updated_at      TEXT NOT NULL DEFAULT (datetime('now'))
+            )
+        """)
+        c.execute("CREATE INDEX IF NOT EXISTS idx_aw_worker ON agent_working(worker_id)")
+        c.execute("CREATE INDEX IF NOT EXISTS idx_aw_manager ON agent_working(manager_id)")
+        c.execute("CREATE INDEX IF NOT EXISTS idx_aw_reviewer ON agent_working(reviewer_id)")
+
+        # Schema migration: review_stage for a2a_tasks
+        try:
+            c.execute("ALTER TABLE a2a_tasks ADD COLUMN review_stage TEXT DEFAULT ''")
+        except Exception:
+            pass
 
         self.conn.commit()
         self.log("all tables ensured")
@@ -1271,6 +1296,254 @@ def h_a2a_task_get_launched_pids(daemon: DbDaemon, params: dict) -> dict:
 
 
 # delivery_status RPC handlers removed — SSE replaces polling-based delivery
+
+# ── agent_working.* handlers ──────────────────────────────────────────
+
+@_h("agent_working.upsert")
+def h_aw_upsert(daemon: DbDaemon, params: dict) -> dict:
+    """agent_assign: INSERT or UPDATE agent_working row.
+
+    For reviewer_id column: APPENDS new pairs (comma-separated) instead
+    of overwriting. Multiple reviewers can review the same raw_key.
+    For other columns (worker_id, manager_id): overwrites (one per raw_key).
+    """
+    raw_key = params["raw_key"]
+    col = params["col"]; val = params["val"]
+    # Defense-in-depth: validate col matches expected {role}_id pattern
+    import re as _re
+    if not _re.match(r'^(manager|worker|reviewer)_id$', col):
+        return {"status": "error", "message": f"invalid column: {col}"}
+    c = daemon.conn
+    row = c.execute("SELECT * FROM agent_working WHERE raw_key = ?", (raw_key,)).fetchone()
+    if row:
+        if col == "reviewer_id" and row[col]:
+            # Append new reviewer pair (comma-separated). Update existing pair
+            # if same agent_id already present, otherwise append.
+            existing = row[col] or ""
+            new_agent_id = val.split(":", 1)[0] if ":" in val else val
+            pairs = dict(p.split(":", 1) for p in existing.split(",") if ":" in p) if existing else {}
+            if ":" in val:
+                pairs[new_agent_id] = val.split(":", 1)[1]  # update/replace session
+            else:
+                pairs.pop(new_agent_id, None)  # remove if no session
+            val = ",".join(f"{k}:{v}" for k, v in pairs.items()) if pairs else new_agent_id
+        c.execute(f"UPDATE agent_working SET {col}=?, updated_at=datetime('now') WHERE raw_key=?",
+                  (val, raw_key))
+    else:
+        c.execute(
+            "INSERT INTO agent_working (raw_key, worktree, branch, test_worktree, test_branch, {col}) "
+            "VALUES (?,?,?,?,?,?)".format(col=col),
+            (raw_key, params.get("worktree",""), params.get("branch",""),
+             params.get("test_worktree",""), params.get("test_branch",""), val))
+    daemon.conn.commit()
+    return {"status": "ok"}
+
+
+@_h("agent_working.upsert_only")
+def h_aw_upsert_only(daemon: DbDaemon, params: dict) -> dict:
+    """Reviewer-only: UPDATE existing row. Fails if row doesn't exist.
+
+    Reviewer must never create a new agent_working row — the row is
+    created by Worker (UPSERT). If the row doesn't exist, the worktree
+    was already wt-closed or there's a bug.
+    """
+    raw_key = params["raw_key"]
+    col = params["col"]; val = params["val"]
+    import re as _re
+    if not _re.match(r'^(manager|worker|reviewer)_id$', col):
+        return {"status": "error", "message": f"invalid column: {col}"}
+    c = daemon.conn
+    row = c.execute("SELECT * FROM agent_working WHERE raw_key = ?", (raw_key,)).fetchone()
+    if not row:
+        return {"status": "error", "message": f"row not found for {raw_key} — worktree may be closed"}
+    # Same append logic as h_aw_upsert for reviewer_id
+    if col == "reviewer_id" and row[col]:
+        existing = row[col] or ""
+        new_agent_id = val.split(":", 1)[0] if ":" in val else val
+        pairs = dict(p.split(":", 1) for p in existing.split(",") if ":" in p) if existing else {}
+        if ":" in val:
+            pairs[new_agent_id] = val.split(":", 1)[1]
+        else:
+            pairs.pop(new_agent_id, None)
+        val = ",".join(f"{k}:{v}" for k, v in pairs.items()) if pairs else new_agent_id
+    c.execute(f"UPDATE agent_working SET {col}=?, updated_at=datetime('now') WHERE raw_key=?",
+              (val, raw_key))
+    daemon.conn.commit()
+    return {"status": "ok"}
+
+
+@_h("agent_working.release")
+def h_aw_release(daemon: DbDaemon, params: dict) -> dict:
+    """agent_release: strip session from agent_id column."""
+    raw_key = params["raw_key"]; role = params.get("role",""); col = f"{role}_id"
+    agent_id = params.get("agent_id","")
+    c = daemon.conn
+    row = c.execute(f"SELECT {col} FROM agent_working WHERE raw_key = ?", (raw_key,)).fetchone()
+    if not row: return {"status": "not_found"}
+    current = row[col] or ""
+    if role == "reviewer" and agent_id:
+        pairs = dict(p.split(":",1) for p in current.split(",") if ":" in p) if current else {}
+        pairs.pop(agent_id, None)
+        new_val = ",".join(f"{k}:{v}" for k,v in pairs.items()) if pairs else None
+    else:
+        new_val = current.split(":",1)[0] if ":" in current else None
+    c.execute(f"UPDATE agent_working SET {col}=?, updated_at=datetime('now') WHERE raw_key=?",
+              (new_val, raw_key))
+    daemon.conn.commit()
+    return {"status": "ok"}
+
+
+@_h("agent_working.delete")
+def h_aw_delete(daemon: DbDaemon, params: dict) -> dict:
+    """agent_release_all: delete row by raw_key."""
+    daemon.conn.execute("DELETE FROM agent_working WHERE raw_key = ?", (params["raw_key"],))
+    daemon.conn.commit()
+    return {"status": "ok"}
+
+
+@_h("agent_working.get_session")
+def h_aw_get_session(daemon: DbDaemon, params: dict) -> dict:
+    """agent_get_session: return session_id for agent."""
+    raw_key = params["raw_key"]; role = params.get("role","")
+    if role not in ("manager", "worker", "reviewer"):
+        return {"session_id": None}
+    col = f"{role}_id"
+    agent_id = params.get("agent_id","")
+    row = daemon.conn.execute(f"SELECT {col} FROM agent_working WHERE raw_key = ?", (raw_key,)).fetchone()
+    if not row or not row[col]: return {"session_id": None}
+    if role == "reviewer":
+        # reviewer column holds comma-separated pairs: "r01:sid1,r02:sid2"
+        pairs = dict(p.split(":",1) for p in row[col].split(",") if ":" in p) if row[col] else {}
+        if agent_id:
+            return {"session_id": pairs.get(agent_id)}
+        # No agent_id specified → return the first reviewer's session
+        return {"session_id": next(iter(pairs.values()), None) if pairs else None}
+    return {"session_id": row[col].split(":",1)[1] if ":" in (row[col] or "") else None}
+
+
+@_h("agent_working.next_free")
+def h_aw_next_free(daemon: DbDaemon, params: dict) -> dict:
+    """agent_next_free: compute next free agent NN from pool."""
+    role = params["role"]; pool_size = int(params.get("pool_size","10"))
+    if role not in ("manager", "worker", "reviewer"):
+        return {"agent_id": None}
+    col = f"{role}_id"; prefix = f"{role}_"
+    rows = daemon.conn.execute(f"SELECT {col} FROM agent_working WHERE {col} IS NOT NULL").fetchall()
+    occupied = set()
+    for r in rows:
+        val = r[col] or ""
+        if role == "reviewer":
+            if val:
+                for p in val.split(","):
+                    if ":" in p: occupied.add(p.split(":",1)[0])
+        else:
+            agent_part = val.split(":",1)[0] if ":" in val else val
+            if agent_part: occupied.add(agent_part)
+    all_ids = {f"{prefix}{i:02d}" for i in range(1, pool_size + 1)}
+    free = sorted(all_ids - occupied)
+    return {"agent_id": free[0] if free else None, "free_list": free}
+
+
+@_h("agent_working.next_free_and_assign")
+def h_aw_next_free_and_assign(daemon: DbDaemon, params: dict) -> dict:
+    """Atomic next_free + assign: allocate a free agent and immediately write it.
+
+    Eliminates the TOCTOU window between agent_next_free and agent_assign
+    where concurrent callers could get the same agent_id.
+    """
+    role = params["role"]; raw_key = params["raw_key"]; pool_size = int(params.get("pool_size","10"))
+    if role not in ("manager", "worker", "reviewer"):
+        return {"agent_id": None, "assigned": False}
+    col = f"{role}_id"; prefix = f"{role}_"
+    rows = daemon.conn.execute(f"SELECT raw_key, {col} FROM agent_working WHERE {col} IS NOT NULL").fetchall()
+    occupied = set()
+    for r in rows:
+        val = r[col] or ""
+        if role == "reviewer":
+            if val:
+                for p in val.split(","):
+                    if ":" in p: occupied.add(p.split(":",1)[0])
+        else:
+            agent_part = val.split(":",1)[0] if ":" in val else val
+            if agent_part: occupied.add(agent_part)
+    all_ids = {f"{prefix}{i:02d}" for i in range(1, pool_size + 1)}
+    free = sorted(all_ids - occupied)
+    if not free:
+        return {"agent_id": None, "assigned": False}
+    agent_id = free[0]
+    # Atomically: check no other caller claimed this agent, then write
+    existing = daemon.conn.execute(
+        f"SELECT {col} FROM agent_working WHERE raw_key = ?", (raw_key,)
+    ).fetchone()
+    if existing and existing[col]:
+        # Row exists — append to reviewer column or overwrite for other roles
+        if role == "reviewer":
+            new_val = f"{existing[col]},{agent_id}:pending"
+        else:
+            new_val = f"{agent_id}:pending"
+        daemon.conn.execute(
+            f"UPDATE agent_working SET {col}=?, updated_at=datetime('now') WHERE raw_key=?",
+            (new_val, raw_key))
+    else:
+        daemon.conn.execute(
+            f"INSERT INTO agent_working (raw_key, {col}, updated_at) VALUES (?, ?, datetime('now'))"
+            f" ON CONFLICT(raw_key) DO UPDATE SET {col}=excluded.{col}, updated_at=excluded.updated_at",
+            (raw_key, f"{agent_id}:pending"))
+    daemon.conn.commit()
+    return {"agent_id": agent_id, "assigned": True}
+
+
+@_h("agent_working.get")
+def h_aw_get(daemon: DbDaemon, params: dict) -> dict:
+    """agent_list_by_raw_key: return full row as dict."""
+    row = daemon.conn.execute("SELECT * FROM agent_working WHERE raw_key = ?", (params["raw_key"],)).fetchone()
+    if not row: return {"row": {}}
+    cols = [d[0] for d in daemon.conn.execute("PRAGMA table_info(agent_working)").fetchall()]
+    return {"row": dict(zip(cols, row))}
+
+
+@_h("agent_working.cleanup_stale")
+def h_aw_cleanup_stale(daemon: DbDaemon, params: dict) -> dict:
+    """agent_cleanup_stale: remove rows for missing worktrees."""
+    import os as _os
+    max_age = int(params.get("max_age_hours","24"))
+    rows = daemon.conn.execute("SELECT raw_key, worktree, test_worktree FROM agent_working").fetchall()
+    cleaned = 0
+    for r in rows:
+        if r["worktree"] and not _os.path.exists(r["worktree"]):
+            daemon.conn.execute("DELETE FROM agent_working WHERE raw_key = ?", (r["raw_key"],))
+            cleaned += 1
+        elif r["test_worktree"] and not _os.path.exists(r["test_worktree"]):
+            daemon.conn.execute("UPDATE agent_working SET test_worktree=NULL, test_branch=NULL WHERE raw_key=?",
+                               (r["raw_key"],))
+            cleaned += 1
+    daemon.conn.commit()
+    return {"cleaned": cleaned}
+
+
+
+@_h("agent_working.get_all")
+def h_aw_get_all(daemon: DbDaemon, params: dict) -> dict:
+    rows = daemon.conn.execute("SELECT * FROM agent_working").fetchall()
+    cols = [d[0] for d in daemon.conn.execute("PRAGMA table_info(agent_working)").fetchall()]
+    return {"rows": [dict(zip(cols, r)) for r in rows]}
+
+@_h("agent_working.stats")
+def h_aw_stats(daemon: DbDaemon, params: dict) -> dict:
+    """agent_stats: occupancy per role."""
+    result = {}
+    for role, pool in [("manager",1),("worker",10),("reviewer",99)]:
+        col = f"{role}_id"
+        rows = daemon.conn.execute(f"SELECT {col} FROM agent_working WHERE {col} IS NOT NULL").fetchall()
+        occupied = 0
+        for r in rows:
+            val = r[col] or ""
+            if role == "reviewer" and val:
+                occupied += len([p for p in val.split(",") if ":" in p])
+            elif val:
+                occupied += 1
+        result[role] = {"occupied": occupied, "pool": pool, "free": pool - occupied}
+    return result
 
 # ── CLI ───────────────────────────────────────────────────────────────────
 

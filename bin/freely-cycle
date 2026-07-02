@@ -82,7 +82,38 @@ if worker_tasks:
 
     if state == 'input-required' and not review_assigned:
         suggested = 'dispatch_reviewer'
-        # Phase 1: log dispatch intent for runtime to pick up
+        # Phase 1: dispatch reviewer once per cycle (avoid duplicates)
+        import subprocess, os
+        project = os.environ.get('PROJECT_ROOT', os.environ.get('FREELY_HOME', ''))
+        if project:
+            aw_py = f'{project}/docs/system/workspace/scripts/runtime/agent_working.py'
+            if os.path.exists(aw_py):
+                # Pass args via env vars to avoid f-string injection (raw_key/project may contain special chars)
+                _env = {**os.environ, 'FREELY_RAW_KEY': rk, 'FREELY_PROJECT': project}
+                result = subprocess.run([sys.executable, '-c', '''
+import sys, os, json
+rk = os.environ["FREELY_RAW_KEY"]
+project = os.environ["FREELY_PROJECT"]
+sys.path.insert(0, os.path.join(project, "docs", "system", "workspace", "scripts", "runtime"))
+from agent_working import agent_next_free, agent_assign, agent_list_by_raw_key
+row = agent_list_by_raw_key(project, rk)
+already = row.get("reviewer_id", "") if row else ""
+if already:
+    sys.exit(0)  # already dispatched, skip
+rid = agent_next_free(project, "reviewer", 99)
+if rid:
+    result = agent_assign(project, rk, "reviewer", rid, update_only=True)
+    if result and result.get("status") == "error":
+        print(f"[cycle] reviewer update failed for {rk}: {result.get('message','')}", file=sys.stderr)
+        sys.exit(1)
+    print(f"[cycle] reviewer {rid} dispatched for raw_key={rk}", file=sys.stderr)
+    sys.exit(0)
+else:
+    print(f"[cycle] no free reviewer for raw_key={rk}", file=sys.stderr)
+    sys.exit(1)
+'''], capture_output=True, text=True, timeout=10, env=_env)
+                if result.returncode == 0:
+                    suggested = 'continue'  # dispatch succeeded, move on
         print(f'[cycle] dispatch_reviewer: raw_key={rk} task_id={task_id}', file=__import__('sys').stderr)
     elif state == 'input-required' and review_assigned:
         suggested = 'continue'

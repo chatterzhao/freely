@@ -5,7 +5,7 @@ Usage:
   agent-table-query --list <role>                        list all IDs for a role
   agent-table-query --get <id>                           get full agent entry
   agent-table-query --get-slot <id>                      get slot for an agent
-  agent-table-query --get-reviewer <worker_id>           get reviewer_id+slot for worker
+  agent-table-query --next-free <role> <pool_size>       get next available agent NN
   agent-table-query --next-available <role>              get next free agent ID
   agent-table-query --mark-busy <id>                     mark agent as busy
   agent-table-query --mark-free <id>                     mark agent as free
@@ -246,22 +246,20 @@ def main():
             sys.exit(1)
     elif args.next_free:
         role = args.next_free
-        busy = set()
-        # Read agent-id.env at project root
-        env_file = os.path.join(os.path.dirname(data['path']), 'agent-id.env')
-        if os.path.exists(env_file):
-            for line in open(env_file):
-                line = line.strip()
-                if '=' in line:
-                    parts = line.split('=', 2)  # worktree_path=agent_type=agent_id
-                    if len(parts) >= 2:
-                        busy.add(parts[-1])  # agent_id is the last part
-        all_ids = list_agents(data, role)
-        free = [aid for aid in all_ids if aid not in busy]
-        if free:
-            print(free[0] if not args.json else json.dumps({'free': free, 'busy': list(busy)}))
-        else:
-            print(f'ERROR: no free {role} agent', file=sys.stderr)
+        pool_size = int(args.pool_size) if args.pool_size else 10
+        # Delegate to agent_working.agent_next_free() via RPC
+        import subprocess
+        result = subprocess.run(
+            [sys.executable, '-c', f'''
+import sys; sys.path.insert(0, "{data["path"]}/docs/system/workspace/scripts/runtime")
+from agent_working import agent_next_free
+print(agent_next_free("{data["path"]}", "{role}", {pool_size}) or "")
+'''],
+            capture_output=True, text=True, timeout=5
+        )
+        agent_id = result.stdout.strip()
+        if agent_id:
+            print(agent_id)
             sys.exit(1)
     elif args.next_free:
         role = args.next_free

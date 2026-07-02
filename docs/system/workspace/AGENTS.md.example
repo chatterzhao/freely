@@ -77,11 +77,11 @@ scan 没有发现任务时，写 `stop_ai` 并说明原因。不要循环重启�
 
 ## 命名约定
 
-`raw-key` 是 `YYYYMMDDTHHMM[SS]Z` 格式的时间戳。`raw-{raw-key}` 即 `raw-YYYYMMDDTHHMM[SS]Z`，就是 raw issue 的 local_id。
+`raw-key` 是 `YYYYMMDDTHHMM[SS]Z` 格式的时间戳。`raw-{raw key}` 即 `raw-YYYYMMDDTHHMM[SS]Z`，就是 raw issue 的 local_id。
 
 例如 `raw-key=20260511T1029Z` → raw issue id = `raw-20260511T1029Z`。
 
-分支名和工位名中的 `raw-{raw-key}` 都遵循这个规则。
+分支名和工位名中的 `raw-{raw key}` 都遵循这个规则。
 
 ## 规范流程
 

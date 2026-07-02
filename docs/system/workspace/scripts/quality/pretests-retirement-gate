@@ -101,7 +101,11 @@ if not pretests_gate.exists():
     print(f"[pretests_retirement_missing] missing gate: {pretests_gate}", file=sys.stderr)
     sys.exit(1)
 if not state_file.exists():
-    print(f"[pretests_retirement_state_missing] missing worker state: {state_file}, falling back to manual GREEN check", file=sys.stderr)
+    print(f"[pretests_retirement_state_missing] missing worker state: {state_file}", file=sys.stderr)
+    print(f"  先检查: .freely/run/workcell-state.env 是否存在？", file=sys.stderr)
+    print(f"  不存在 → 创建该文件，必填字段: LAST_WORKER_OWNER_ISSUE / LAST_WORKER_PRE_TESTS_PATH / LAST_WORKER_CLOSEOUT_*", file=sys.stderr)
+    print(f"  详见 skill `freely-doc-B2_IBM-execution` §workcell-state.env 必填字段", file=sys.stderr)
+    print(f"  回退到手动 GREEN 检查...", file=sys.stderr)
     # Fallback: no Worker metadata — find the worktree's owning pre-tests.md via branch name.
     # Only checks GREEN evidence for the issue bound to THIS worktree, not all epics.
     import subprocess as _sp
@@ -120,7 +124,8 @@ if not state_file.exists():
     fallback_entries: list[tuple[str, str]] = []
     if _raw_key:
         # Find I-* issue bound to this raw key
-        issue_files = list(worktree.glob("docs/issues/I-*/issue.md")) + list(worktree.glob("docs/epics/**/issues/I-*.md"))
+        # I-* issues only live under docs/epics/ — docs/issues/ is for raw issues only
+        issue_files = list(worktree.glob("docs/epics/**/issues/I-*.md"))
         for issue_file in sorted(issue_files):
             try:
                 text = issue_file.read_text()
@@ -158,7 +163,13 @@ if not state_file.exists():
                     if cand_path.exists():
                         fallback_entries.append((str(raw_issue.relative_to(worktree)), "manual-no-pre-tests"))
     if not fallback_entries:
-        print("[GATE] RED 未完成：未找到 pre-tests.md。\n请阅读 skill:freely-doc-B2_IBM-execution，根据本次修改目标，在 pre-tests.md 中设计合理的测试方案。\n测试方案应根据改动类型选择：AI 相关 md、测试脚本、或构建编译启动端到端测试。\n不要凑格式字段——理解修改后设计对应的测试。", file=sys.stderr)
+        print("[GATE] RED 未完成：未找到 pre-tests.md。", file=sys.stderr)
+        print(f"  尝试过的路径: I-* issue 的 pre_tests_path → raw issue → source_candidate", file=sys.stderr)
+        print(f"  正确位置: docs/epics/{{epic-name}}/{{story-name}}/verification/pre-tests.md", file=sys.stderr)
+        print(f"  1. 先确认文件是否存在于上述路径（不存在就创建）", file=sys.stderr)
+        print(f"  2. 确认 I-* issue 的 pre_tests_path 字段指向该文件", file=sys.stderr)
+        print(f"  3. 文件存在后再按 skill `freely-doc-B2_IBM-execution` §pre-tests 模板填写内容", file=sys.stderr)
+        print(f"  不要凑格式字段——理解修改后设计对应的测试。", file=sys.stderr)
         sys.exit(1)
 
     # GREEN-only check: verify actual_output is filled for each acceptance item
@@ -189,7 +200,7 @@ if not state_file.exists():
 
             # Check TDD: red-green-status must exist and be green (or not_applicable)
             if not item_rg:
-                print(f"[GATE] RED-GREEN 未完成：{pt_rel} 中的 {item_id} 缺少 red-green-status 字段。\n每条 acceptance item 必须追踪 TDD 状态：pending(B2写入) → red(RED确认) → green(GREEN通过)。\n请阅读 skill:freely-doc-B2_IBM-execution 补充该字段。", file=sys.stderr)
+                print(f"[GATE] RED-GREEN 未完成：{pt_rel} 中的 {item_id} 缺少 red-green-status 字段。\n每条 acceptance item 必须追踪 TDD 状态：pending(B2写入) → red(RED确认) → green(GREEN通过)。\n请阅读 skill `freely-doc-B2_IBM-execution` 补充该字段。", file=sys.stderr)
                 fallback_failures += 1
             elif item_rg not in ("green", "not_applicable"):
                 print(f"[GATE] RED-GREEN 未完成：{pt_rel} 中的 {item_id} red-green-status 为 '{item_rg}'，必须是 'green' 或 'not_applicable' 才能提 PR。\n完成 RED(red) → dev → GREEN(green) 循环后，将 red-green-status 更新为 green。", file=sys.stderr)
@@ -197,13 +208,13 @@ if not state_file.exists():
 
             # Check GREEN: status must be pass or not_applicable
             if item_status not in ("pass", "passed", "not_applicable"):
-                print(f"[GATE] GREEN 未完成：{pt_rel} 中的 {item_id} 状态为 {item_status}。\n请阅读 skill:freely-test-execution，根据 pre-tests.md 设计的测试方案实际执行测试。\n不要改 status 字段假装通过——去跑测试，把真实结果写回 actual_output。", file=sys.stderr)
+                print(f"[GATE] GREEN 未完成：{pt_rel} 中的 {item_id} 状态为 {item_status}。\n请阅读 skill `freely-test-execution`，根据 pre-tests.md 设计的测试方案实际执行测试。\n不要改 status 字段假装通过——去跑测试，把真实结果写回 actual_output。", file=sys.stderr)
                 fallback_failures += 1
                 continue
 
             # Check GREEN: actual_output must be filled, not placeholder
             if item_status in ("pass", "passed") and (not item_output or item_output in ("(执行后填写)",)):
-                print(f"[GATE] GREEN 未完成：{pt_rel} 中的 {item_id} 未填写 actual_output。\n请阅读 skill:freely-test-execution，根据 pre-tests.md 设计的测试方案实际执行测试，把真实结果写回 actual_output 和 evidence_file。", file=sys.stderr)
+                print(f"[GATE] GREEN 未完成：{pt_rel} 中的 {item_id} 未填写 actual_output。\n请阅读 skill `freely-test-execution`，根据 pre-tests.md 设计的测试方案实际执行测试，把真实结果写回 actual_output 和 evidence_file。", file=sys.stderr)
                 fallback_failures += 1
 
     # Anti-cheating: if all items are mock/not_applicable with no real evidence, hard-reject
@@ -216,7 +227,7 @@ if not state_file.exists():
     if _cheat_total > 0 and _cheat_real == 0 and (_cheat_mock + _cheat_na) == _cheat_total:
         print(f"\n[GATE] pre-tests.md 疑似糊弄: {_cheat_total} 个测试项，{_cheat_mock} mock + {_cheat_na} not_applicable，0 个真实通过的测试。", file=sys.stderr)
         print("测试方案必须根据改动范围设计真实测试——改了哪里、可能坏哪里、怎么证明没坏。", file=sys.stderr)
-        print("如果不知道该测什么，重新阅读 raw issue 理解改动，然后阅读 skill:freely-doc-B2_IBM-execution 重新设计测试方案。", file=sys.stderr)
+        print("如果不知道该测什么，重新阅读 raw issue 理解改动，然后阅读 skill `freely-doc-B2_IBM-execution` 重新设计测试方案。", file=sys.stderr)
         fallback_failures += 1
 
     # E2E and Integration test adequacy — the most critical safeguard in AI programming
@@ -264,8 +275,8 @@ if not state_file.exists():
         print("AI 生成的代码最容易在模块边界和端到端流程中出错，只跑单元测试不够。", file=sys.stderr)
         print("", file=sys.stderr)
         print("请重新阅读以下 skill，重新审查当前修改需求：", file=sys.stderr)
-        print("  - skill:freely-doc-B2_IBM-execution（反糊弄铁律、测试方案设计）", file=sys.stderr)
-        print("  - skill:freely-test-execution（可执行性检查、反 ghost pass）", file=sys.stderr)
+        print("  - skill `freely-doc-B2_IBM-execution`（反糊弄铁律、测试方案设计）", file=sys.stderr)
+        print("  - skill `freely-test-execution`（可执行性检查、反 ghost pass）", file=sys.stderr)
         print("", file=sys.stderr)
         if _label.startswith("端到端"):
             print("如果该改动影响用户可见行为、UI 交互、完整业务流程 → 必须设计端到端测试。", file=sys.stderr)
@@ -281,21 +292,28 @@ if not state_file.exists():
     if fallback_failures > 0:
         print(f"\n[GATE] 共 {fallback_failures} 项 GREEN 测试未执行。", file=sys.stderr)
         print(file=sys.stderr)
-        print("── 需要阅读的 Skill ──", file=sys.stderr)
-        print("  skill:freely-test-execution §GREEN 判定标准与执行步骤", file=sys.stderr)
-        print("  skill:freely-doc-B2_IBM-execution §pre-tests 模板与门禁常见坑速查", file=sys.stderr)
+        print("── 请按以下 skill 逐项检查修正 ──", file=sys.stderr)
+        print("  设计/格式问题 → skill `freely-doc-B2_IBM-execution` §pre-tests 模板与门禁常见坑速查", file=sys.stderr)
+        print("  执行/证据问题 → skill `freely-test-execution` §GREEN 判定标准与执行步骤", file=sys.stderr)
         print(file=sys.stderr)
         print("不要逐条改状态绕过——去跑测试，把真实结果写回 actual_output 和 evidence_file。", file=sys.stderr)
         print("如需豁免某项测试，设置 status=not_applicable 并填写 not_applicable_reason。", file=sys.stderr)
     sys.exit(1 if fallback_failures > 0 else 0)
 if not owner_issue and not recorded_pre_tests and not closeout_gate and not closeout_gate_command:
-    print("[pretests_retirement_binding_missing] worker state does not record owner issue, pre-tests path, or closeout context", file=sys.stderr)
+    print("[pretests_retirement_binding_missing] worker state 缺少 owner issue / pre-tests path / closeout 上下文", file=sys.stderr)
+    print(f"  文件: {state_file}", file=sys.stderr)
+    print(f"  必填字段: LAST_WORKER_OWNER_ISSUE / LAST_WORKER_PRE_TESTS_PATH / LAST_WORKER_CLOSEOUT_GATE / LAST_WORKER_CLOSEOUT_GATE_COMMAND", file=sys.stderr)
+    print(f"  详见 skill `freely-doc-B2_IBM-execution` §workcell-state.env 必填字段", file=sys.stderr)
     sys.exit(1)
 if not owner_issue:
-    print("[pretests_retirement_binding_missing] worktree recorded cleanup state but owner issue is missing", file=sys.stderr)
+    print(f"[pretests_retirement_binding_missing] workcell state 缺少 owner issue", file=sys.stderr)
+    print(f"  文件: {state_file}", file=sys.stderr)
+    print(f"  添加: LAST_WORKER_OWNER_ISSUE=I-{'{raw key}'}-A", file=sys.stderr)
     sys.exit(1)
 if not recorded_pre_tests:
-    print("[pretests_retirement_binding_missing] worktree recorded cleanup state but pre-tests path is missing", file=sys.stderr)
+    print(f"[pretests_retirement_binding_missing] workcell state 缺少 pre-tests path", file=sys.stderr)
+    print(f"  文件: {state_file}", file=sys.stderr)
+    print(f"  添加: LAST_WORKER_PRE_TESTS_PATH=docs/epics/{{epic-name}}/{{story-name}}/raw-{{raw key}}/verification/pre-tests.md", file=sys.stderr)
     sys.exit(1)
 
 missing_closeout_fields: list[str] = []
@@ -319,11 +337,13 @@ if missing_closeout_fields:
     if closeout_gate and not closeout_gate_command:
         legacy_hint = f" legacy_closeout_gate={closeout_gate}"
     print(
-        "[pretests_retirement_closeout_context_missing] worktree cleanup snapshot is missing structured closeout fields: "
-        + ",".join(missing_closeout_fields)
+        "[pretests_retirement_closeout_context_missing] workcell state 缺少 closeout 字段: "
+        + ", ".join(missing_closeout_fields)
         + legacy_hint,
         file=sys.stderr,
     )
+    print(f"  文件: {state_file}", file=sys.stderr)
+    print(f"  补充缺失字段，详见 skill `freely-doc-B2_IBM-execution` §workcell-state.env 必填字段", file=sys.stderr)
     sys.exit(1)
 
 issue_path, issue_error = resolve_issue_path(owner_issue)
@@ -334,7 +354,9 @@ if not issue_path:
             file=sys.stderr,
         )
     else:
-        print(f"[pretests_retirement_issue_missing] cannot resolve issue path for recorded owner issue {owner_issue}", file=sys.stderr)
+        print(f"[pretests_retirement_issue_missing] 无法解析 owner issue {owner_issue} 的文件路径", file=sys.stderr)
+        print(f"  I-* issue 唯一正确位置: docs/epics/{{epic-name}}/{{story-name}}/raw-{{raw key}}/issues/{owner_issue}.md", file=sys.stderr)
+        print(f"  文件不存在 → 按 skill `freely-doc-B2_IBM-execution` 创建 I-* issue", file=sys.stderr)
     sys.exit(1)
 
 cmd = [str(pretests_gate), "--project", str(project), "--issue", issue_path]

@@ -74,13 +74,43 @@ FREELY_SKILLS = [
 ]
 
 
-def _build_agent_card(project: str) -> AgentCard:
+def _load_role_skills(project: str, role: str) -> list:
+    import tomllib
+    roles_path = os.path.join(project, "docs", "system", "workspace", "agents", "agent-roles.toml")
+    if not os.path.exists(roles_path):
+        print(f"[WARN] agent-roles.toml not found at {roles_path}, using empty skills", file=__import__("sys").stderr)
+        return []
+    try:
+        with open(roles_path, "rb") as f:
+            data = tomllib.load(f)
+        role_data = data.get(role, {})
+        skill_ids = role_data.get("skills", [])
+        return [
+            AgentSkill(
+                id=skill_id,
+                name=skill_id.replace("freely-", "").replace("-", " ").title(),
+                tags=[role]
+            )
+            for skill_id in skill_ids
+        ]
+    except Exception as e:
+        print(f"[WARN] failed to load agent-roles.toml: {e}, using empty skills", file=__import__("sys").stderr)
+        return []
+
+
+def _build_agent_card(project: str, role: str = "worker") -> AgentCard:
+    role_names = {"manager": "Freely Manager", "worker": "Freely Worker", "reviewer": "Freely Reviewer"}
+    role_descs = {
+        "manager": "Patrol fleet, delegate workers, judge closeout",
+        "worker": "Worktree-isolated, skill-based execution",
+        "reviewer": "Per-step review, gate check, TDD fidelity",
+    }
     return AgentCard(
-        name="Freely Worker",
-        description="Freely Worker Agent — worktree-isolated, skill-based A2A execution",
+        name=role_names.get(role, "Freely Agent"),
+        description=role_descs.get(role, "Freely Agent — A2A execution"),
         version="1.0.0",
         capabilities=AgentCapabilities(streaming=True, push_notifications=True),
-        skills=FREELY_SKILLS,
+        skills=_load_role_skills(project, role),
         supported_interfaces=[
             AgentInterface(
                 url=f"unix://{_socket_path(project)}",
@@ -126,7 +156,6 @@ class SQLiteTaskStore(BaseTaskStore):
         m = {'submitted': TaskState.TASK_STATE_SUBMITTED, 'working': TaskState.TASK_STATE_WORKING,
              'completed': TaskState.TASK_STATE_COMPLETED, 'failed': TaskState.TASK_STATE_FAILED,
              'input-required': TaskState.TASK_STATE_INPUT_REQUIRED,
-             'canceled': TaskState.TASK_STATE_CANCELED,
              'canceled': TaskState.TASK_STATE_CANCELED}
         return m.get(db_state, TaskState.TASK_STATE_SUBMITTED)
 
@@ -336,6 +365,48 @@ def _a2a_uvicorn_log_config():
     }
 
 
+# D5: Resume script for _restore_tasks — runs agent_working scan + ACP session/resume
+_aw_resume_script = '''
+import os, sys, json, socket, hashlib
+project = os.environ["FREELY_PROJECT"]
+sys.path.insert(0, os.path.join(project, "docs", "system", "workspace", "scripts", "runtime"))
+from agent_working import _db_rpc
+result = _db_rpc(project, "agent_working.get_all", {})
+rows = result.get("rows", [])
+if rows:
+    h = hashlib.sha256(os.path.abspath(project).encode()).hexdigest()[:16]
+    bridge = f"/tmp/freely-acp-{h}.sock"
+    for r in rows:
+        raw_key = r.get("raw_key", "")
+        for role in ("manager", "worker", "reviewer"):
+            val = str(r.get(f"{role}_id", "") or "")
+            if not val or ":" not in val:
+                continue
+            agent_id, session_id = val.split(":", 1)
+            if not session_id or session_id == "pending":
+                continue
+            print(f"agent {role} {agent_id} session={session_id[:16]}... for {raw_key}")
+            if os.path.exists(bridge):
+                try:
+                    s = socket.socket(socket.AF_UNIX); s.settimeout(5); s.connect(bridge)
+                    req = json.dumps({"jsonrpc":"2.0","id":1,"method":"session/resume","params":{"sessionId":session_id,"cwd":project}}) + "\\n"
+                    s.sendall(req.encode()); s.shutdown(socket.SHUT_WR)
+                    resp = b""
+                    while True:
+                        chunk = s.recv(4096)
+                        if not chunk: break
+                        resp += chunk
+                    s.close()
+                    result_r = json.loads(resp.decode())
+                    if "error" in result_r:
+                        print(f"  resume failed: {result_r['error']}")
+                    else:
+                        print(f"  resumed ok")
+                except Exception as e:
+                    print(f"  resume error: {e}")
+'''
+
+
 class A2AServer:
     """A2A Protocol Server — async, official SDK + Starlette + Uvicorn.
 
@@ -358,7 +429,7 @@ class A2AServer:
         self.project = project
         self._running = False
         self._servers: list = []
-        self.agent_card = _build_agent_card(project)
+        # agent card now built per-request in _agent_card_endpoint via agent-roles.toml
         self.task_store = SQLiteTaskStore(project)
         self.executor = FreelyAgentExecutor(self)
         # Note: _restore_tasks() is deferred to start() to avoid blocking
@@ -400,7 +471,7 @@ class A2AServer:
                 worker_pid = row.get("worker_pid", "")
                 worktree = row.get("worktree", "")
 
-                if state == "working" and str(agent_id).startswith("worker") or str(agent_id).startswith("reviewer"):
+                if state == "working" and (str(agent_id).startswith("worker") or str(agent_id).startswith("reviewer")):
                     alive = False
                     if worker_pid:
                         try:
@@ -439,7 +510,7 @@ class A2AServer:
                             f"Marked failed."))
                     continue
 
-                elif state == "submitted" and str(agent_id).startswith("manager") or r.get("agent_id", "").startswith("reviewer"):
+                elif state == "submitted" and (str(agent_id).startswith("manager") or str(agent_id).startswith("reviewer")):
                     created = row.get("created_at", "")
                     if created:
                         try:
@@ -461,7 +532,7 @@ class A2AServer:
                                 else:
                                     # B4: active workers exist, restore supervision
                                     notifications.append((task_id,
-                                        f"[Restart Recovery] Manager had active workers before shutdown. "
+                                        f"[Restart Recovery] Agent {agent_id} had active workers before shutdown. "
                                         f"Resuming supervision of {len(active_workers)} worker(s)."))
                         except Exception:
                             pass
@@ -501,6 +572,34 @@ class A2AServer:
                             "completion_summary": note[:200]})  # truncated for DB
                     except Exception:
                         pass
+            # D5: attempt ACP session/resume for working agents after restore
+            try:
+                import subprocess as _sp, os as _os2, json as _j5
+                aw_py = _os2.path.join(self.project, 'docs', 'system', 'workspace', 'scripts', 'runtime', 'agent_working.py')
+                if _os2.path.exists(aw_py):
+                    result = _sp.run(
+                        [_sys.executable, '-c', _aw_resume_script],
+                        capture_output=True, text=True, timeout=15,
+                        env={**_os2.environ, 'FREELY_PROJECT': str(self.project)},
+                    )
+                    for line in (result.stdout or '').splitlines():
+                        if line.strip():
+                            print(f"[restore] {line.strip()}", file=_sys.stderr)
+            except Exception:
+                pass
+            # D6: push restore-complete SSE event so watchdog re-subscribes
+            if restored > 0 or failed > 0:
+                try:
+                    import asyncio as _asyncio, json as _json6
+                    event_data = {
+                        "state": "restore_complete",
+                        "restored": restored, "failed": failed,
+                        "notifications_count": len(notifications)
+                    }
+                    _asyncio.run(self._notify_sse(
+                        "__system__", "restore_complete", event_data, is_global=True))
+                except Exception:
+                    pass
         except Exception:
             pass  # DB not available → start with empty TaskStore (降级运行)
 
@@ -508,7 +607,7 @@ class A2AServer:
         request_handler = DefaultRequestHandler(
             agent_executor=self.executor,
             task_store=self.task_store,
-            agent_card=self.agent_card,
+            agent_card=_build_agent_card(self.project, "worker"),
         )
         routes = create_jsonrpc_routes(request_handler=request_handler, rpc_url="/")
         routes.extend([
@@ -517,6 +616,7 @@ class A2AServer:
             Route("/tasks", self._tasks_endpoint, methods=["GET", "POST"]),
             Route("/tasks/latest-manager", self._latest_manager, methods=["GET"]),
             Route("/tasks/launched-pids", self._launched_pids, methods=["GET"]),
+            Route("/tasks/stream", self._global_task_stream_endpoint, methods=["GET"]),
             Route("/tasks/{task_id:path}", self._task_endpoint, methods=["GET", "PATCH"]),
             Route("/tasks/{task_id}/stream", self._task_stream_endpoint, methods=["GET"]),
         ])
@@ -528,6 +628,34 @@ class A2AServer:
         """Lazy-init SSE subscriber registry."""
         if not hasattr(self, '_sse_subscribers'):
             self._sse_subscribers: dict[str, list] = {}
+
+    async def _global_task_stream_endpoint(self, request: Request):
+        """Global SSE endpoint: stream ALL task state changes. Used by Runtime Watchdog."""
+        self.__init_sse()
+        queue: asyncio.Queue = asyncio.Queue()
+        global_key = "__global__"
+        if global_key not in self._sse_subscribers:
+            self._sse_subscribers[global_key] = []
+        self._sse_subscribers[global_key].append(queue)
+
+        async def event_generator():
+            try:
+                while True:
+                    event = await queue.get()
+                    event_type = event.get("event", "message")
+                    data = json.dumps(event.get("data", {}), default=str)
+                    yield f"event: {event_type}\ndata: {data}\n\n"
+            except asyncio.CancelledError:
+                pass
+            finally:
+                if global_key in self._sse_subscribers and queue in self._sse_subscribers[global_key]:
+                    self._sse_subscribers[global_key].remove(queue)
+
+        return Response(
+            event_generator(),
+            media_type="text/event-stream",
+            headers={"Cache-Control": "no-cache", "Connection": "keep-alive", "X-Accel-Buffering": "no"},
+        )
 
     async def _task_stream_endpoint(self, request: Request):
         """SSE endpoint: stream task state changes as Server-Sent Events.
@@ -569,16 +697,32 @@ class A2AServer:
             headers={"Cache-Control": "no-cache", "Connection": "keep-alive", "X-Accel-Buffering": "no"},
         )
 
-    async def _notify_sse(self, task_id: str, event_type: str, data: dict):
-        """Notify all SSE subscribers for a task of a state change."""
+    async def _notify_sse(self, task_id: str, event_type: str, data: dict, is_global: bool = False):
+        """Notify SSE subscribers of a state change.
+
+        When is_global=True, notify ALL subscribers (per-task + global).
+        Otherwise notify only the specific task's subscribers + global subscribers.
+        """
         self.__init_sse()
-        for q in self._sse_subscribers.get(task_id, []):
-            await q.put({"event": event_type, "data": data})
+        if is_global:
+            # Push to every subscriber (used for restart/restore broadcasts)
+            for subscribers in self._sse_subscribers.values():
+                for q in subscribers:
+                    await q.put({"event": event_type, "data": data})
+        else:
+            # Notify per-task subscribers
+            for q in self._sse_subscribers.get(task_id, []):
+                await q.put({"event": event_type, "data": data})
+            # Also notify global subscribers (Runtime Watchdog)
+            for q in self._sse_subscribers.get("__global__", []):
+                await q.put({"event": event_type, "data": data})
 
     # ── Endpoints ──────────────────────────────────────────────────────
 
     async def _agent_card_endpoint(self, request: Request):
-        return Response(MessageToJson(self.agent_card), media_type="application/json")
+        role = request.query_params.get("role", "worker")
+        card = _build_agent_card(self.project, role)
+        return Response(MessageToJson(card), media_type="application/json")
 
     async def _tasks_endpoint(self, request: Request):
         if request.method == "POST":
@@ -633,7 +777,8 @@ class A2AServer:
             if "state" in body: fields["state"] = sm.get(body["state"])  # reject unknown states
             for k in ["completion_summary","evidence_paths","error",
                        "reason","next_action","progress","summary","next","evidence",
-                       "session_id"]:
+                       "session_id","from_agent","needs_agent","needs_role",
+                       "raw_key","review_stage","verdict","required_fixes"]:
                 if k in body: fields[k] = body[k]
             if "summary" in fields: fields.setdefault("completion_summary", fields.pop("summary"))
             if "next" in fields: fields.setdefault("next_action", fields.pop("next"))
@@ -660,7 +805,7 @@ class A2AServer:
         raw_key = request.query_params.get("raw_key", "")
         result = []
         for r in self.task_store.get_all_dicts():
-            if str(r.get("agent_id","")).startswith("worker") or str(r.get("agent_id","")).startswith("reviewer")) and r.get("state") == "working" and r.get("worker_pid"):
+            if (str(r.get("agent_id","")).startswith("worker") or str(r.get("agent_id","")).startswith("reviewer")) and r.get("state") == "working" and r.get("worker_pid"):
                 if not raw_key or r.get("raw_key") == raw_key:
                     result.append({"task_id": r["task_id"], "worker_pid": r["worker_pid"],
                                    "worktree": r.get("worktree", "")})

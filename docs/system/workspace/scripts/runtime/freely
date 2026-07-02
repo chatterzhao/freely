@@ -269,16 +269,68 @@ for t in json.load(sys.stdin).get('tools', []):
   done
 }
 
+# ── Agent Working shim — replaces agent-id.env reads ─────────────────
+# Queries agent_working table and outputs in agent-id.env-compatible format.
+# Format: worktree_path=role=agent_id (one per line)
+
+_agent_working_read_all() {
+  local project="$1"
+  local _aw_py="${project}/docs/system/workspace/scripts/runtime/agent_working.py"
+  if [[ -f "$_aw_py" ]]; then
+    python3 -c "
+import sys; sys.path.insert(0, '${project}/docs/system/workspace/scripts/runtime')
+from agent_working import _db_rpc
+result = _db_rpc('${project}', 'agent_working.get_all', {})
+rows = result.get('rows', [])
+for r in rows:
+    for role in ('manager','worker','reviewer'):
+        val = r.get(f'{role}_id','')
+        if val:
+            agent = val.split(':',1)[0] if ':' in str(val) else str(val)
+            wt = r.get('worktree','')
+            print(f'{wt}={role}={agent}')
+            if role == 'reviewer':
+                pairs = [p.split(':',1)[0] for p in str(val).split(',') if ':' in p]
+                for a in pairs:
+                    print(f'{r.get(\"test_worktree\",\"\")}={role}={a}')
+" 2>/dev/null || true
+  fi
+}
+
 # ── Slot testing helpers ──────────────────────────────────────────────
 
 # _resolve_current_agent_id: find which agent (manager_01 / worker_03 / …)
-# owns the current worktree, via agent-id.env.  Defaults to manager_01.
+# owns the current worktree. Uses agent_working table, falls back to agent-id.env.
 _resolve_current_agent_id() {
   local project="${1:-${PROJECT_ROOT:-$(pwd)}}"
-  local _agent_env="$project/.freely/agent-id.env" _my_id=""
-  if [[ -f "$_agent_env" ]]; then
-    _my_id=$(grep -F "$(pwd)" "$_agent_env" 2>/dev/null | grep -oE '(manager_[0-9]+|worker_[0-9]+)' | head -1 || true)
+  local _my_id="" _current_path; _current_path="$(pwd)"
+
+  # Phase 1: try agent_working table first
+  local _aw_py="${project}/docs/system/workspace/scripts/runtime/agent_working.py"
+  if [[ -f "$_aw_py" ]]; then
+    _my_id=$(python3 -c "
+import sys; sys.path.insert(0, '${project}/docs/system/workspace/scripts/runtime')
+from agent_working import _db_rpc
+rows = _db_rpc('${project}', 'agent_working.get_all', {}).get('rows', [])
+for r in rows:
+    wt = r.get('worktree',''); twt = r.get('test_worktree','')
+    if '${_current_path}' in (wt, twt):
+        for role in ('worker','manager','reviewer'):
+            val = r.get(f'{role}_id','')
+            if val:
+                print(val.split(':',1)[0] if ':' in str(val) else str(val))
+                break
+" 2>/dev/null || true)
   fi
+
+  # Fallback to agent-id.env for compatibility
+  if [[ -z "$_my_id" ]]; then
+    local _agent_env="$project/.freely/agent-id.env"
+    if [[ -f "$_agent_env" ]]; then
+      _my_id=$(grep -F "$_current_path" "$_agent_env" 2>/dev/null | grep -oE '(manager_[0-9]+|worker_[0-9]+|reviewer_[0-9]+)' | head -1 || true)
+    fi
+  fi
+
   [[ -z "$_my_id" ]] && _my_id="manager_01"
   printf '%s\n' "$_my_id"
 }
@@ -5908,6 +5960,8 @@ sync_project_tooling_from_source() {
 	    if [[ -n "$_next_worker" ]]; then
 	      mkdir -p "$(dirname "$_agent_env")"
 	      echo "$target_project=worker=$_next_worker" >> "$_agent_env"
+		      # Phase 1: dual-write to agent_working table
+		      python3 -c "import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime'); from agent_working import agent_assign; agent_assign('${PROJECT_ROOT}', 'develop', 'worker', '$_next_worker', worktree='${target_project}')" 2>/dev/null || true
 	      log_info "agent-table: assigned $_next_worker to $target_project (agent-id.env)"
 	    fi
 	  fi
@@ -12775,16 +12829,20 @@ worker_project_is_actively_running() {
   worker_project_is_actively_running_for_status "$project"
 }
 
-# manager_reconcile_agent_id_env — remove zombie entries (worktree gone, agent-id still present).
+# manager_reconcile_agent_id_env — delegate to agent_working.cleanup_stale().
 # Called before delegation when approaching pool limit, and by agent-table-query --reconcile.
 manager_reconcile_agent_id_env() {
-  local _agent_env="${1:-}"
-  if [[ -z "$_agent_env" ]]; then
-    # Find develop worktree — agent-id.env is project-global, not worktree-local
-    local _dev_wt
-    _dev_wt=$(git worktree list --porcelain 2>/dev/null | awk '$1=="worktree"{wt=$2} $1=="branch"&&$2=="refs/heads/develop"{print wt;exit}')
-    _agent_env="${_dev_wt:-$PROJECT_ROOT}/.freely/agent-id.env"
+  local _aw_py="${PROJECT_ROOT}/docs/system/workspace/scripts/runtime/agent_working.py"
+  if [[ -f "$_aw_py" ]]; then
+    python3 -c "
+import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime')
+from agent_working import agent_cleanup_stale
+agent_cleanup_stale('${PROJECT_ROOT}')
+" 2>/dev/null || true
+    return 0
   fi
+  # Fallback: old agent-id.env file-based cleanup
+  local _agent_env="${1:-${PROJECT_ROOT}/.freely/agent-id.env}"
   [[ -f "$_agent_env" ]] || return 0
   local _cleaned=0 _line _wt_path
   while IFS= read -r _line; do
@@ -12792,11 +12850,10 @@ manager_reconcile_agent_id_env() {
     _wt_path="${_line%%=*}"
     if [[ ! -d "$_wt_path" ]]; then
       sed -i.bak "|^$_line$|d" "$_agent_env" 2>/dev/null || true
-      log_info "agent-id.env: removed zombie $_wt_path (worktree gone)"
       _cleaned=$((_cleaned + 1))
     fi
   done < "$_agent_env"
-  [[ "$_cleaned" -gt 0 ]] && log_info "agent-id.env: cleaned $_cleaned zombie entries"
+  [[ "$_cleaned" -gt 0 ]] && log_info "agent-id.env: cleaned $_cleaned zombie entries (fallback)"
   return 0
 }
 
@@ -14138,6 +14195,7 @@ _ensure_acp_bridge_running() {
 # before the bridge is killed.  Works for all ACP implementations (claude/codex/opencode)
 # since the bridge forwards session/close to the SDK via _send_request.
 # Falls back silently if bridge is dead or SDK does not support the method.
+# Signature: (project, session_id) — for direct session_id-based close.
 _acp_session_close() {
   local project="$1" session_id="$2"
   local socket; socket="$(_acp_bridge_socket "$project")"
@@ -18012,6 +18070,8 @@ launch_sse_watchdog() {
   argv0="runtime/sse-watchdog.sh --project $project --watch"
   nohup bash -lc "cd '$project' && exec -a '$argv0' bash '$_sse_watchdog_sh' --project '$project' --watch --interval 10" </dev/null >/dev/null 2>&1 &
   disown "$!" 2>/dev/null || true
+  # Phase 1: also launch Python SSE watchdog for ACP-aware event handling
+  _start_watchdog_sse_py "$project"
 }
 
 launch_manager_watchdog() {
@@ -18627,33 +18687,204 @@ restart_manager_supervisor_preserving_handoff() {
 
 
 # ── Reviewer Agent ───────────────────────────────────────────
-# Phase 1: Reviewer as independent agent for workflow step review.
-# Uses agent-table reviewer_slot, launches ACP session on develop.
+# Reviewer as independent agent. Allocated from pool via agent_working_next.
+# Uses agent-table reviewer_slot. ACP session/fork from Manager (same tool) or session/new.
 
 _ensure_reviewer_agent() {
   local project="$1"
-  local _reviewer_id _reviewer_slot
-  _reviewer_id="reviewer_manager_01"
-  _reviewer_slot="${REVIEWER_AGENT_SLOT:-}"
+  local _reviewer_id="${2:-}"              # e.g. reviewer_05 (explicit) or auto-allocated
+  local _raw_key="${3:-}"                  # which issue this reviewer serves
+  local _parent_worktree="${4:-}"          # parent worktree for tool inheritance
+  local _reviewer_slot=""
 
-  # Resolve reviewer slot from agent-table if not set
-  if [[ -z "$_reviewer_slot" ]]; then
+  # If no reviewer_id given, allocate next free from pool
+  if [[ -z "$_reviewer_id" ]]; then
     local _aq="${PROJECT_ROOT}/bin/agent-table-query"
     if [[ -x "$_aq" ]]; then
-      _reviewer_slot="$("$_aq" --get-reviewer "$_reviewer_id" 2>/dev/null | awk '{print $2}' || true)"
+      _reviewer_id="$("$_aq" --next-free reviewer 99 2>/dev/null || true)"
+    fi
+    [[ -z "$_reviewer_id" ]] && { log_warn "no free reviewer slot available (pool exhausted)"; return 1; }
+  fi
+
+  # Resolve slot from agent-table v2 (flat format)
+  local _aq="${PROJECT_ROOT}/bin/agent-table-query"
+  if [[ -x "$_aq" ]]; then
+    _reviewer_slot="$("$_aq" --get-slot "$_reviewer_id" 2>/dev/null || true)"
+  fi
+  [[ -z "$_reviewer_slot" ]] && { log_warn "reviewer slot not found for $_reviewer_id"; return 1; }
+
+  log_info "reviewer agent: $_reviewer_id slot=$_reviewer_slot raw_key=$_raw_key"
+
+  # Write to agent_working table
+  local _agent_py="${PROJECT_ROOT}/docs/system/workspace/scripts/runtime/agent_working.py"
+  python3 -c "
+import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime')
+from agent_working import agent_assign
+agent_assign('${project}', '${_raw_key}', 'reviewer', '${_reviewer_id}',
+             worktree='$(pwd)', branch='$(git branch --show-current 2>/dev/null || echo develop)')
+" 2>/dev/null || true
+
+  # Start ACP session for reviewer (reuse same bridge, new session)
+  # The ACP bridge already runs for Manager; reviewer uses session/fork (same tool)
+  # or session/new (different tool). For Phase 1, reviewer shares Manager's tool.
+  log_info "reviewer $_reviewer_id: creating ACP session/new via bridge"
+
+  # Create ACP session for reviewer via bridge socket
+  local _bridge_socket="/tmp/freely-acp-$(python3 -c "import hashlib,os; print(hashlib.sha256('${PROJECT_ROOT}'.encode()).hexdigest()[:16])" 2>/dev/null)"
+  if [[ -S "$_bridge_socket" ]]; then
+    local _session_id; _session_id="rev_$(date +%s)_${_reviewer_id}"
+    python3 -c "
+import json, socket, sys
+req = json.dumps({'jsonrpc':'2.0','id':1,'method':'session/new','params':{'sessionId':'${_session_id}','cwd':'${PROJECT_ROOT}'}}) + '
+'
+s = socket.socket(socket.AF_UNIX)
+s.settimeout(5)
+try:
+    s.connect('${_bridge_socket}')
+    s.sendall(req.encode())
+    s.shutdown(socket.SHUT_WR)
+    resp = b''
+    while True:
+        chunk = s.recv(4096)
+        if not chunk: break
+        resp += chunk
+    result = json.loads(resp.decode()).get('result',{})
+    sid = result.get('sessionId','')
+    if sid:
+        # Write session_id to agent_working
+        sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime')
+        from agent_working import agent_assign
+        agent_assign('${PROJECT_ROOT}', '${_raw_key}', 'reviewer', '${_reviewer_id}', session_id=sid)
+        print(f'[reviewer] session created: {sid}', file=sys.stderr)
+except Exception as e:
+    print(f'[reviewer] failed to create ACP session: {e}', file=sys.stderr)
+finally:
+    s.close()
+" 2>/dev/null || log_warn "reviewer $_reviewer_id: ACP session creation failed (bridge not ready)"
+  else
+    log_warn "reviewer $_reviewer_id: ACP bridge socket not found, session deferred"
+  fi
+  return 0
+}
+
+# ── ACP Session Helpers ────────────────────────────────────────
+# C2: Create new ACP session for any agent role.
+_acp_session_new() {
+  local project="$1" role="$2" agent_id="$3" raw_key="$4"
+  local _bridge_socket; _bridge_socket="/tmp/freely-acp-$(python3 -c "import hashlib,os; print(hashlib.sha256('${project}'.encode()).hexdigest()[:16])" 2>/dev/null)"
+  [[ -S "$_bridge_socket" ]] || { log_warn "ACP bridge not found for session/new ($role $agent_id)"; return 1; }
+  local _session_id; _session_id="${role}_$(date +%s)_${agent_id}"
+  python3 -c "
+import json, socket, sys
+req = json.dumps({'jsonrpc':'2.0','id':1,'method':'session/new','params':{'sessionId':'${_session_id}','cwd':'${project}'}}) + '\n'
+s = socket.socket(socket.AF_UNIX); s.settimeout(5)
+try:
+    s.connect('${_bridge_socket}'); s.sendall(req.encode()); s.shutdown(socket.SHUT_WR)
+    resp = b''; [resp := resp + chunk for chunk in iter(lambda: s.recv(4096), b'')]
+    sid = json.loads(resp.decode()).get('result',{}).get('sessionId','')
+    if sid:
+        sys.path.insert(0, '${project}/docs/system/workspace/scripts/runtime')
+        from agent_working import agent_assign
+        agent_assign('${project}', '${raw_key}', '${role}', '${agent_id}', session_id=sid)
+        print(sid)
+except Exception as e: print(f'ERROR:{e}', file=sys.stderr)
+finally: s.close()
+" 2>/dev/null
+}
+
+# C3: Resume existing ACP session.
+_acp_session_resume() {
+  local project="$1" role="$2" raw_key="$3"
+  # Get session_id from agent_working table
+  local _session_id; _session_id=$(python3 -c "
+import sys; sys.path.insert(0, '${project}/docs/system/workspace/scripts/runtime')
+from agent_working import agent_get_session
+print(agent_get_session('${project}', '${raw_key}', '${role}') or '')
+" 2>/dev/null)
+  [[ -z "$_session_id" ]] && { log_warn "no session to resume for $role on $raw_key"; return 1; }
+  local _bridge_socket; _bridge_socket="/tmp/freely-acp-$(python3 -c "import hashlib,os; print(hashlib.sha256('${project}'.encode()).hexdigest()[:16])" 2>/dev/null)"
+  [[ -S "$_bridge_socket" ]] || { log_warn "ACP bridge not found for session/resume"; return 1; }
+  python3 -c "
+import json, socket
+req = json.dumps({'jsonrpc':'2.0','id':1,'method':'session/resume','params':{'sessionId':'${_session_id}','cwd':'${project}'}}) + '\n'
+s = socket.socket(socket.AF_UNIX); s.settimeout(5)
+try:
+    s.connect('${_bridge_socket}'); s.sendall(req.encode()); s.shutdown(socket.SHUT_WR)
+    resp = b''; [resp := resp + chunk for chunk in iter(lambda: s.recv(4096), b'')]
+    print(json.loads(resp.decode()).get('result',{}).get('sessionId','ok'))
+except Exception as e: print(f'ERROR:{e}', file=sys.stderr)
+finally: s.close()
+" 2>/dev/null
+}
+
+# D13: Fork child session from parent agent session.
+# session/fork inherits parent's system prompt + tools + cache prefix (~80% token savings).
+# Used for Reviewer dispatch: fork from Manager (neutral, has governance context).
+# FORBIDDEN: fork from Worker (self-review bias).
+_acp_session_fork() {
+  local project="$1" parent_role="$2" child_role="$3" child_agent_id="$4" raw_key="$5"
+  # Manager session stored under "__manager__", not issue raw_key
+  local _lookup_key="$raw_key"
+  [[ "$parent_role" == "manager" ]] && _lookup_key="__manager__"
+  local _parent_sid; _parent_sid=$(python3 -c "
+import sys; sys.path.insert(0, '${project}/docs/system/workspace/scripts/runtime')
+from agent_working import agent_get_session
+print(agent_get_session('${project}', '${_lookup_key}', '${parent_role}') or '')
+" 2>/dev/null)
+  [[ -z "$_parent_sid" ]] && { log_warn "no ${parent_role} session to fork for ${raw_key}"; return 1; }
+  local _bridge_socket; _bridge_socket="/tmp/freely-acp-$(python3 -c "import hashlib,os; print(hashlib.sha256('${project}'.encode()).hexdigest()[:16])" 2>/dev/null).sock"
+  [[ -S "$_bridge_socket" ]] || { log_warn "ACP bridge not found for session/fork"; return 1; }
+  python3 -c "
+import json, socket
+params = {'sessionId': '${_parent_sid}', 'role': '${child_role}', 'agentId': '${child_agent_id}'}
+req = json.dumps({'jsonrpc':'2.0','id':1,'method':'session/fork','params':params}) + '\n'
+s = socket.socket(socket.AF_UNIX); s.settimeout(10)
+try:
+    s.connect('${_bridge_socket}'); s.sendall(req.encode()); s.shutdown(socket.SHUT_WR)
+    resp = b''; [resp := resp + chunk for chunk in iter(lambda: s.recv(4096), b'')]
+    result = json.loads(resp.decode())
+    sid = result.get('result',{}).get('sessionId','')
+    if sid:
+        import sys; sys.path.insert(0, '${project}/docs/system/workspace/scripts/runtime')
+        from agent_working import agent_assign
+        agent_assign('${project}', '${raw_key}', '${child_role}', '${child_agent_id}', session_id=sid)
+        print(sid)
+    else:
+        print(f'fork error: {result}', file=__import__('sys').stderr)
+except Exception as e: print(f'fork error: {e}', file=__import__('sys').stderr)
+finally: s.close()
+" 2>/dev/null
+}
+
+# C4: Close agent ACP session and release agent_working entry.
+_acp_agent_session_close() {
+  local project="$1" role="$2" raw_key="$3"
+  local _session_id; _session_id=$(python3 -c "
+import sys; sys.path.insert(0, '${project}/docs/system/workspace/scripts/runtime')
+from agent_working import agent_get_session
+print(agent_get_session('${project}', '${raw_key}', '${role}') or '')
+" 2>/dev/null)
+  if [[ -n "$_session_id" ]]; then
+    local _bridge_socket; _bridge_socket="/tmp/freely-acp-$(python3 -c "import hashlib,os; print(hashlib.sha256('${project}'.encode()).hexdigest()[:16])" 2>/dev/null)"
+    if [[ -S "$_bridge_socket" ]]; then
+      python3 -c "
+import json, socket
+req = json.dumps({'jsonrpc':'2.0','id':1,'method':'session/close','params':{'sessionId':'${_session_id}'}}) + '\n'
+s = socket.socket(socket.AF_UNIX); s.settimeout(5)
+try:
+    s.connect('${_bridge_socket}'); s.sendall(req.encode()); s.shutdown(socket.SHUT_WR)
+    s.recv(4096)
+except: pass
+finally: s.close()
+" 2>/dev/null
     fi
   fi
-
-  if [[ -z "$_reviewer_slot" ]]; then
-    log_warn "reviewer agent slot not configured — agent-table reviewer_slot is empty"
-    return 1
-  fi
-
-  log_info "reviewer agent slot: $_reviewer_slot"
-  # Phase 1: reviewer shares ACP bridge with manager (same develop worktree, same tool)
-  # The bridge supports multiple concurrent sessions via ACP protocol.
-  # Reviewer session will be launched by ensure_manager when reviewer tasks are queued.
-  return 0
+  # Release from agent_working
+  python3 -c "
+import sys; sys.path.insert(0, '${project}/docs/system/workspace/scripts/runtime')
+from agent_working import agent_release
+agent_release('${project}', '${raw_key}', '${role}')
+" 2>/dev/null || true
 }
 
 ensure_manager_once() {
@@ -19642,6 +19873,17 @@ cmd_ensure_interruption_dispatch_watch() {
     fi
     sleep "$interval"
   done
+}
+
+_start_watchdog_sse_py() {
+  local project="$1"
+  local _watchdog_py="${project}/docs/system/workspace/scripts/runtime/watchdog_sse.py"
+  local _a2a_socket; _a2a_socket="/tmp/freely-a2a-$(python3 -c "import hashlib,os; print(hashlib.sha256(os.path.abspath('${project}').encode()).hexdigest()[:16])" 2>/dev/null).sock"
+  if [[ -f "$_watchdog_py" && -S "$_a2a_socket" ]]; then
+    log_info "starting watchdog_sse.py for $project"
+    nohup python3 "$_watchdog_py" --project "$project" --a2a-socket "$_a2a_socket" </dev/null >>"$project/.freely/run/watchdog-sse.log" 2>&1 &
+    disown $!
+  fi
 }
 
 cmd_ensure_sse_watchdog_watch() {
@@ -21778,6 +22020,7 @@ start_project_runtime() {
     if [[ "${effective_desired_state:-stopped}" == "running" ]] && [[ "$(role_hint_for_project "$project")" == "manager" ]]; then
       launch_interruption_dispatcher "$project"
       launch_manager_watchdog "$project"
+      launch_sse_watchdog "$project"
     fi
   }
 
@@ -21816,6 +22059,7 @@ start_project_runtime() {
   if [[ "$(role_hint_for_project "$project")" == "manager" ]]; then
     exit_if_stop_requested_before_launch
     launch_manager_watchdog "$project"
+    launch_sse_watchdog "$project"
     ensure_manager_watchdog_ready_or_fail "$project" || {
       exit_if_stop_requested_before_launch
       log_error "freely manager watchdog did not become ready for project: $project"
