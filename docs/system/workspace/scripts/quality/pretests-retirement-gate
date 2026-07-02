@@ -299,13 +299,20 @@ if not state_file.exists():
         print("如需豁免某项测试，设置 status=not_applicable 并填写 not_applicable_reason。", file=sys.stderr)
     sys.exit(1 if fallback_failures > 0 else 0)
 if not owner_issue and not recorded_pre_tests and not closeout_gate and not closeout_gate_command:
-    print("[pretests_retirement_binding_missing] worker state does not record owner issue, pre-tests path, or closeout context", file=sys.stderr)
+    print("[pretests_retirement_binding_missing] worker state 缺少 owner issue / pre-tests path / closeout 上下文", file=sys.stderr)
+    print(f"  文件: {state_file}", file=sys.stderr)
+    print(f"  必填字段: LAST_WORKER_OWNER_ISSUE / LAST_WORKER_PRE_TESTS_PATH / LAST_WORKER_CLOSEOUT_GATE / LAST_WORKER_CLOSEOUT_GATE_COMMAND", file=sys.stderr)
+    print(f"  详见 skill `freely-doc-B2_IBM-execution` §workcell-state.env 必填字段", file=sys.stderr)
     sys.exit(1)
 if not owner_issue:
-    print("[pretests_retirement_binding_missing] worktree recorded cleanup state but owner issue is missing", file=sys.stderr)
+    print(f"[pretests_retirement_binding_missing] workcell state 缺少 owner issue", file=sys.stderr)
+    print(f"  文件: {state_file}", file=sys.stderr)
+    print(f"  添加: LAST_WORKER_OWNER_ISSUE=I-{'{key}'}-A", file=sys.stderr)
     sys.exit(1)
 if not recorded_pre_tests:
-    print("[pretests_retirement_binding_missing] worktree recorded cleanup state but pre-tests path is missing", file=sys.stderr)
+    print(f"[pretests_retirement_binding_missing] workcell state 缺少 pre-tests path", file=sys.stderr)
+    print(f"  文件: {state_file}", file=sys.stderr)
+    print(f"  添加: LAST_WORKER_PRE_TESTS_PATH=docs/epics/{{epic}}/{{story}}/verification/pre-tests.md", file=sys.stderr)
     sys.exit(1)
 
 missing_closeout_fields: list[str] = []
@@ -329,11 +336,13 @@ if missing_closeout_fields:
     if closeout_gate and not closeout_gate_command:
         legacy_hint = f" legacy_closeout_gate={closeout_gate}"
     print(
-        "[pretests_retirement_closeout_context_missing] worktree cleanup snapshot is missing structured closeout fields: "
-        + ",".join(missing_closeout_fields)
+        "[pretests_retirement_closeout_context_missing] workcell state 缺少 closeout 字段: "
+        + ", ".join(missing_closeout_fields)
         + legacy_hint,
         file=sys.stderr,
     )
+    print(f"  文件: {state_file}", file=sys.stderr)
+    print(f"  补充缺失字段，详见 skill `freely-doc-B2_IBM-execution` §workcell-state.env 必填字段", file=sys.stderr)
     sys.exit(1)
 
 issue_path, issue_error = resolve_issue_path(owner_issue)
@@ -344,7 +353,11 @@ if not issue_path:
             file=sys.stderr,
         )
     else:
-        print(f"[pretests_retirement_issue_missing] cannot resolve issue path for recorded owner issue {owner_issue}", file=sys.stderr)
+        print(f"[pretests_retirement_issue_missing] 无法解析 owner issue {owner_issue} 的文件路径", file=sys.stderr)
+        print(f"  先检查: I-* issue 文件是否存在于以下位置之一?", file=sys.stderr)
+        print(f"    docs/issues/{owner_issue}/issue.md", file=sys.stderr)
+        print(f"    docs/epics/{{epic}}/{{story}}/raw-{{key}}/issues/{owner_issue}.md", file=sys.stderr)
+        print(f"  文件不存在 → 按 skill `freely-doc-B2_IBM-execution` 创建 I-* issue", file=sys.stderr)
     sys.exit(1)
 
 cmd = [str(pretests_gate), "--project", str(project), "--issue", issue_path]
