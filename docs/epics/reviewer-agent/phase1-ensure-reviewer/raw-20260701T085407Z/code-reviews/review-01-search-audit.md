@@ -1,6 +1,6 @@
 # Review 01: Search Audit + Completeness
 
-- owner_issue: raw-20260701T085407Z
+- owner_issue: I-20260701T085407Z-A
 - date: 2026-07-01
 - reviewer: subagent (Explore)
 - verdict: Phase P0+P1+P7+P8 ready, P3+P4+P5+P6+P9 need work

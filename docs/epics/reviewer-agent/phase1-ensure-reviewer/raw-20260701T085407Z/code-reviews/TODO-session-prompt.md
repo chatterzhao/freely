@@ -1,6 +1,6 @@
 # TODO: session/prompt 最优方案实现
 
-- owner_issue: raw-20260701T085407Z
+- owner_issue: I-20260701T085407Z-A
 
 - date: 2026-07-02
 - 基于: review-10 最终确认架构 + 用户讨论

@@ -1,6 +1,6 @@
 # Review 02: Logic + Design Convergence
 
-- owner_issue: raw-20260701T085407Z
+- owner_issue: I-20260701T085407Z-A
 - date: 2026-07-01
 - reviewer: subagent (Plan)
 - verdict: 7 contradictions between design and implementation
