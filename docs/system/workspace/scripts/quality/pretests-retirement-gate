@@ -189,7 +189,7 @@ if not state_file.exists():
             header = item.split("\n")[0].strip()
             fields = {}
             for key in ("id", "status", "actual_output", "red-green-status"):
-                m = re.search(rf"^- {raw key}:\s*(.+?)\s*$", item, re.MULTILINE)
+                m = re.search(rf"^- {key}:\s*(.+?)\s*$", item, re.MULTILINE)
                 if m:
                     fields[key] = m.group(1).strip()
 
