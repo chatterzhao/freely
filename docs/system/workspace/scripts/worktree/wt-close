@@ -344,6 +344,31 @@ if [[ "$branch" == test-pre-merge-* ]]; then
   echo "wt-close: test-pre-merge branch (disposable), skipping checks and platform close"
   SKIP_PLATFORM=true
   FORCE=true
+  # D4: cleanup reviewer agents from agent_working for test-pre-merge branches
+  _tp_raw_key_cleanup=$(echo "$branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)
+  if [[ -n "$_tp_raw_key_cleanup" ]]; then
+    _dev_wt_for_c=$(git -C "$PROJECT_ROOT" worktree list --porcelain 2>/dev/null | awk '$1=="worktree"{wt=$2} $1=="branch"&&$2=="refs/heads/develop"{print wt;exit}')
+    [[ -n "$_dev_wt_for_c" ]] || _dev_wt_for_c="$PROJECT_ROOT"
+    python3 -c "
+import sys,os,json,socket,hashlib
+sys.path.insert(0, '$_dev_wt_for_c/docs/system/workspace/scripts/runtime')
+from agent_working import agent_list_by_raw_key, agent_get_session, agent_release_all
+row = agent_list_by_raw_key('$_dev_wt_for_c', 'raw-$_tp_raw_key_cleanup')
+if row:
+    h = hashlib.sha256('$_dev_wt_for_c'.encode()).hexdigest()[:16]
+    bridge = f'/tmp/freely-acp-{h}.sock'
+    if os.path.exists(bridge):
+        for role in ('worker', 'reviewer', 'manager'):
+            sid = agent_get_session('$_dev_wt_for_c', 'raw-$_tp_raw_key_cleanup', role)
+            if sid:
+                try:
+                    s=socket.socket(socket.AF_UNIX); s.settimeout(2); s.connect(bridge)
+                    req=json.dumps({'jsonrpc':'2.0','id':1,'method':'session/close','params':{'sessionId':sid}})+'\n'
+                    s.sendall(req.encode()); s.shutdown(socket.SHUT_WR); s.recv(4096); s.close()
+                except Exception: pass
+    agent_release_all('$_dev_wt_for_c', 'raw-$_tp_raw_key_cleanup')
+" 2>/dev/null && echo "wt-close: test-pre-merge reviewer cleanup ✓" || true
+  fi
 elif _is_protected_branch "$branch"; then
   echo "Error: '$branch' is a protected branch, cannot close" >&2
   exit 1
