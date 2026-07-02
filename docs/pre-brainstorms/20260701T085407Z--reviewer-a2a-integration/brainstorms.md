@@ -765,3 +765,44 @@ Worker session 包含:
 同一 raw_key 的生命周期内（B1→B2→RED→dev→test→gate），
 原来需要 6 次 cold start，优化后只需 1 次 fork + 4 次 resume + 1 次 new (gate)。
 
+### 实现后修正（2026-07-02，基于实际码码审查）
+
+**Session 存活模型（纠正此前误解）**：
+
+ACP bridge 的 `ACP_IDLE_TIMEOUT = 180s` **只在 `session/prompt` 调用期间检测 AI 响应性**，
+不在两次调用之间杀 session。Worker 完成 B1 后 session 进入空闲等待，不会被 timeout 杀掉。
+session 持久存活直到主动 `session/close` 或 freely stop 清理。
+
+**Agent 间消息投递机制**：
+
+`session/resume` + `prompt` 参数 = 一次性「唤醒 session + 投递消息」。
+不阻塞等待 AI 完成，只等 resume 确认即返回。ACP bridge 透传 prompt 到 AI CLI tool。
+
+**ACP / A2A 分工最终确认**：
+
+```
+A2A = 信号系统                  ACP = 对话系统
+PATCH task state                session/new|fork|resume  启停对话
+SSE push 实时通知                session/resume + prompt  投递消息
+a2a_tasks 表持久落盘             session/prompt           语义封装
+                                session/close            关闭对话
+
+串联: Agent 完成阶段 → A2A SSE 发出信号 → watchdog 消费 →
+      ACP 启动/投递到目标 agent → agent 工作 → Skill 指令约束交接 →
+      A2A SSE 发出下一轮信号 → 闭环
+```
+
+**Handler 决策树（实现后）**：
+
+三个 handler 统一为: alive? → `_acp_session_prompt` → dead? → fork/new + prompt
+- Reviewer: 首次 fork from Manager，后续 resume+prompt（同 raw_key 连续审查）
+- Worker: 活 session prompt，死 session fork/new + prompt（verdict 在 prompt 里）
+- Manager: 活 session prompt，死 session new + prompt
+
+**关键修复记录**：
+
+- Phase 1: Bridge `session/resume` 原丢弃 prompt 参数 → 修复透传
+- Phase 2: Handler 统一 session/prompt 优先 + session 创建后立即投递任务
+- Review bugfix: `_handle_needs_reviewer` prompt 失败后漏 return → 会分配第二个 reviewer
+- Review bugfix: `_build_worker_verdict_message` metadata 参数未使用 → 提取 verdict/summary
+
