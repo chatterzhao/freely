@@ -7,6 +7,7 @@ import time
 import urllib.request
 import os
 import sys
+import socket as _socket
 from typing import Optional
 
 # Add project root for imports
@@ -18,6 +19,59 @@ from agent_working import (
     agent_list_by_raw_key, agent_next_free, agent_assign, agent_get_session
 )
 from input_required_reason import InputRequiredReason
+
+
+def _acp_bridge_socket(project: str) -> Optional[str]:
+    """Find the ACP bridge Unix socket for this project."""
+    import hashlib
+    h = hashlib.sha256(os.path.abspath(project).encode()).hexdigest()[:16]
+    sock_path = f"/tmp/freely-acp-{h}.sock"
+    return sock_path if os.path.exists(sock_path) else None
+
+
+def _acp_rpc(project: str, method: str, params: dict) -> Optional[dict]:
+    """Send a JSON-RPC call to the ACP bridge and return the result."""
+    bridge = _acp_bridge_socket(project)
+    if not bridge:
+        return None
+    try:
+        s = _socket.socket(_socket.AF_UNIX, _socket.SOCK_STREAM)
+        s.settimeout(5)
+        s.connect(bridge)
+        req = json.dumps({"jsonrpc": "2.0", "id": 1, "method": method, "params": params}) + "\n"
+        s.sendall(req.encode())
+        resp = s.recv(4096)
+        s.close()
+        return json.loads(resp.decode())
+    except Exception as e:
+        print(f"[watchdog] ACP RPC error ({method}): {e}", file=sys.stderr)
+        return None
+
+
+def _acp_session_resume(project: str, session_id: str, prompt: str = None) -> bool:
+    """Resume an existing ACP session with optional prompt."""
+    params = {"sessionId": session_id}
+    if prompt:
+        params["prompt"] = prompt
+    result = _acp_rpc(project, "session/resume", params)
+    if result and "error" not in result:
+        print(f"[watchdog] ACP session resume ok: {session_id}", file=sys.stderr)
+        return True
+    return False
+
+
+def _acp_session_new(project: str, role: str, agent_id: str, slot: str = None) -> Optional[str]:
+    """Create a new ACP session and return the session_id."""
+    params = {"role": role, "agentId": agent_id}
+    if slot:
+        params["slot"] = slot
+    result = _acp_rpc(project, "session/new", params)
+    if result and "result" in result:
+        sid = result["result"].get("sessionId", "")
+        if sid:
+            print(f"[watchdog] ACP session/new: {agent_id} → {sid}", file=sys.stderr)
+            return sid
+    return None
 
 
 def watchdog_run(project: str, a2a_socket: str):
@@ -94,7 +148,19 @@ def _handle_needs_reviewer(project: str, metadata: dict, reason: InputRequiredRe
     # Check if reviewer already exists for this raw_key
     existing = agent_list_by_raw_key(project, raw_key)
     if existing and existing.get("reviewer_id"):
-        print(f"[watchdog] reviewer already assigned for {raw_key}, skipping", file=sys.stderr)
+        # Reviewer already assigned — resume session if exists
+        sid = agent_get_session(project, raw_key, "reviewer")
+        if sid:
+            print(f"[watchdog] reviewer session {sid} exists for {raw_key}, resuming", file=sys.stderr)
+            _acp_session_resume(project, sid, f"Reviewer needed for {raw_key}, reason: {reason.value}")
+        else:
+            print(f"[watchdog] reviewer assigned but no session for {raw_key}, creating new session", file=sys.stderr)
+            # Create ACP session for the reviewer
+            rid = existing["reviewer_id"].split(":")[0] if ":" in str(existing.get("reviewer_id", "")) else existing.get("reviewer_id", "")
+            if rid:
+                new_sid = _acp_session_new(project, "reviewer", rid)
+                if new_sid:
+                    agent_assign(project, raw_key, "reviewer", f"{rid}:{new_sid}")
         return
 
     # Allocate next free reviewer
@@ -104,29 +170,70 @@ def _handle_needs_reviewer(project: str, metadata: dict, reason: InputRequiredRe
         return
 
     print(f"[watchdog] creating reviewer {reviewer_id} for {raw_key} (requested by {from_agent})", file=sys.stderr)
-    # Record in agent_working table
-    try:
+    # Create ACP session for the new reviewer
+    new_sid = _acp_session_new(project, "reviewer", reviewer_id)
+    if new_sid:
+        agent_assign(project, raw_key, "reviewer", f"{reviewer_id}:{new_sid}")
+        print(f"[watchdog] reviewer {reviewer_id} session={new_sid} assigned to {raw_key}", file=sys.stderr)
+    else:
+        # Session creation failed — still record the assignment for retry
         agent_assign(project, raw_key, "reviewer", reviewer_id)
-        print(f"[watchdog] reviewer {reviewer_id} assigned to {raw_key}", file=sys.stderr)
-    except Exception as e:
-        print(f"[watchdog] failed to assign reviewer: {e}", file=sys.stderr)
+        print(f"[watchdog] reviewer {reviewer_id} assigned (no session yet, will retry)", file=sys.stderr)
 
 
 def _handle_needs_manager(project: str, metadata: dict, reason: InputRequiredReason):
-    """Agent needs manager decision. Manager already has session (resume)."""
+    """Agent needs manager decision. Resume manager ACP session."""
     raw_key = metadata.get("raw_key", "")
     from_agent = metadata.get("from_agent", "")
-    print(f"[watchdog] routing to manager: {from_agent} needs decision on {raw_key}", file=sys.stderr)
+    print(f"[watchdog] routing to manager: {from_agent} needs decision on {raw_key} ({reason.value})", file=sys.stderr)
+
+    # Look up manager session from agent_working
+    sid = agent_get_session(project, raw_key, "manager")
+    if sid:
+        prompt = f"[Watchdog] Agent {from_agent} needs manager input on {raw_key}. Reason: {reason.value}.\nContinue from where you left off."
+        if _acp_session_resume(project, sid, prompt):
+            print(f"[watchdog] manager session {sid} resumed for {raw_key}", file=sys.stderr)
+            return
+
+    # No manager session — check if manager exists in agent_working
+    row = agent_list_by_raw_key(project, raw_key)
+    if row and row.get("manager_id"):
+        mid = row["manager_id"].split(":")[0] if ":" in str(row.get("manager_id", "")) else row.get("manager_id", "")
+        if mid:
+            new_sid = _acp_session_new(project, "manager", mid)
+            if new_sid:
+                agent_assign(project, raw_key, "manager", f"{mid}:{new_sid}")
+                print(f"[watchdog] created manager session {new_sid} for {raw_key}", file=sys.stderr)
+                return
+
+    print(f"[watchdog] could not route to manager for {raw_key} — needs human attention", file=sys.stderr)
 
 
 def _handle_needs_worker(project: str, metadata: dict, reason: InputRequiredReason):
-    """Reviewer/Manager needs worker retry/task. Resume or notify worker."""
+    """Reviewer/Manager needs worker retry/task. Resume worker ACP session."""
     raw_key = metadata.get("raw_key", "")
     from_agent = metadata.get("from_agent", "")
     print(f"[watchdog] routing to worker for {raw_key}: {reason.value} (from {from_agent})", file=sys.stderr)
+
     # Resume worker ACP session if exists
-    session = agent_get_session(project, raw_key, "worker")
-    if session:
-        print(f"[watchdog] worker session {session} found for {raw_key}, routing guidance", file=sys.stderr)
-    else:
-        print(f"[watchdog] no worker session for {raw_key}, delegating to manager", file=sys.stderr)
+    sid = agent_get_session(project, raw_key, "worker")
+    if sid:
+        prompt = f"[Watchdog] Agent {from_agent} requests your input on {raw_key}. Reason: {reason.value}.\nContinue."
+        if _acp_session_resume(project, sid, prompt):
+            print(f"[watchdog] worker session {sid} resumed for {raw_key}", file=sys.stderr)
+            return
+
+    # No worker session — try to create one from agent_working
+    row = agent_list_by_raw_key(project, raw_key)
+    if row and row.get("worker_id"):
+        wid = row["worker_id"].split(":")[0] if ":" in str(row.get("worker_id", "")) else row.get("worker_id", "")
+        if wid:
+            new_sid = _acp_session_new(project, "worker", wid)
+            if new_sid:
+                agent_assign(project, raw_key, "worker", f"{wid}:{new_sid}")
+                print(f"[watchdog] created worker session {new_sid} for {raw_key}", file=sys.stderr)
+                return
+
+    # Last resort: delegate back to manager
+    print(f"[watchdog] no worker session for {raw_key}, delegating to manager", file=sys.stderr)
+    _handle_needs_manager(project, metadata, InputRequiredReason.from_string("NEEDS_MANAGER_INPUT"))
