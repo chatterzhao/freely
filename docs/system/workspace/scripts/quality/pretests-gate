@@ -310,7 +310,7 @@ def parse_fields(section: str) -> dict[str, str]:
         "task_refs",
         "case_design",
     ):
-        match = re.search(rf"^- {raw key}:\s*`?([^`\n]+)`?\s*$", section, re.MULTILINE)
+        match = re.search(rf"^- {key}:\s*`?([^`\n]+)`?\s*$", section, re.MULTILINE)
         if match:
             fields[key] = match.group(1).strip()
     return fields
@@ -464,7 +464,7 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
             if not parse_scalar(section_text, key):
                 add_error(
                     "pre_tests_missing",
-                    f"{pre_tests_path}: section '{required_name}' missing '{raw key}'",
+                    f"{pre_tests_path}: section '{required_name}' missing '{key}'",
                 )
         if not has_blocker_taxonomy(section_text):
             add_error(
@@ -519,7 +519,7 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
             if not fields.get(key):
                 add_error(
                     "testcase_derivation_missing",
-                    f"{pre_tests_path}: {title_line} missing {raw key}. "
+                    f"{pre_tests_path}: {title_line} missing {key}. "
                     "Do not clear this gate by only filling placeholders; define the actual bounded test item for this implementation surface.",
                 )
         # red-green-status is required for TDD traceability
@@ -548,7 +548,7 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
             if not fields.get(key):
                 add_error(
                     "verification_state_missing",
-                    f"{pre_tests_path}: {title_line} missing {raw key}. "
+                    f"{pre_tests_path}: {title_line} missing {key}. "
                     "A passing owner still needs real test execution writeback; metadata alone is not enough.",
                 )
         if not fields:
@@ -608,7 +608,7 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
                 if not fields.get(key):
                     add_error(
                         "testcase_derivation_missing",
-                        f"{pre_tests_path}: {fields.get('id', title_line)} opts into adequacy v2 but is missing {raw key}",
+                        f"{pre_tests_path}: {fields.get('id', title_line)} opts into adequacy v2 but is missing {key}",
                     )
             surface_kind = fields.get("surface_kind", "")
             if surface_kind and surface_kind not in VALID_SURFACE_KINDS:
