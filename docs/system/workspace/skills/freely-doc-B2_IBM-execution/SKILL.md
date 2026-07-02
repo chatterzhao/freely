@@ -57,15 +57,51 @@ candidate 条目包含 `promoted_issue_id`（I-* issue 的 key）和 `source_can
 - 能力域**正交**（独立可理解、独立可验收）→ 新建 epic
 - 同一 epic 下的新子问题 → 新建 story
 
-**步骤 1：产出目录**。产出 `docs/epics/{epic-name}/{story-name}/raw-{raw-key}/` 下的完整目录。其中 I-* issue 是本 skill 的核心产物——根据 candidate 的 `promoted_issue_id`，在该路径物化包含完整 frontmatter 和正文的 issue 文档。
+**步骤 1：按规范目录结构产出**。B2 所有产物都放在 `docs/epics/{epic-name}/{story-name}/raw-{raw-key}/` 下。其中 I-* issue 是本 skill 的核心产物——根据 candidate 的 `promoted_issue_id`，在该路径物化包含完整 frontmatter 和正文的 issue 文档。
 
-| 产物 | 要求 |
-|------|------|
-| `issues/I-{raw-key}-{suffix}.md` | **I-* issue 完整文档**（物化自 candidate 的 `promoted_issue_id`）。含 phase_state、pre_tests_path、verification_artifact_dir 等全部字段 |
-| `prd.md` | Goal → Dev-Loop Handoff |
-| `pre-tests.md` | 结构化测试计划（含 test_command + expected_output），模板见下方 |
-| `tasks.md` | 任务分解，关联 owner issue |
-| `code-reviews/` | Implementation Decision Note（decision/why_this/alternatives_considered/boundary_non_goals/residual_risk） |
+> **`{raw-key}`** = raw issue 的时间戳 key（如 `20260701T085407Z`）。
+> **`{suffix}`** = 来自 Input（candidate 的 `promoted_issue_id` 字段，如 `I-{key}-A` 中的 `A`）。B2 **不发明** suffix——直接沿用 B1 candidate 提供的值。
+> **`{epic-name}`** 和 **`{story-name}`** 由 B2_IBM 的步骤 0 决定（按语义判断能力域和可交付切片）。
+
+### 规范目录结构
+
+```
+docs/epics/{epic-name}/{story-name}/
+└── raw-{raw-key}/                           ← 一个 raw issue 一个目录
+    │
+    ├── prd.md                               ← M: Map 产物（Goal → Dev-Loop Handoff）
+    │
+    ├── brainstorms/                          ← B: Brainstorm（每个 I-* 一个，研究实现方案）
+    │   ├── b-I-{raw-key}-A.md               ← 对应 I-{raw-key}-A
+    │   └── b-I-{raw-key}-B.md               ← 对应 I-{raw-key}-B
+    │
+    ├── issues/                               ← M: Map 物化（I-* issue，来自 Input 的 key+suffix）
+    │   ├── I-{raw-key}-A.md                 ← 物化自 candidate C-{key}-A
+    │   └── I-{raw-key}-B.md                 ← 物化自 candidate C-{key}-B
+    │
+    ├── verification/                         ← M: Map 产物（测试方案+任务分解+证据）
+    │   ├── pre-tests.md
+    │   ├── tasks.md
+    │   └── test-evidence/
+    │       └── acceptance-*.log
+    │
+    └── code-reviews/                         ← M: Map 产物（评审记录+决策笔记）
+        ├── implementation-decision-note.md
+        └── pr-review-*.md
+```
+
+> `brainstorms/b-I-{key}-A.md` 与 `issues/I-{key}-A.md` **suffix 一一对应**。
+> suffix 来自 Input（candidate），不是 B2 取的。一个 candidate → 一个 I-* issue → 一个 brainstorm。
+
+### B2 产物清单
+
+| 产物 | 路径 | 要求 |
+|------|------|------|
+| `issues/I-{raw-key}-{suffix}.md` | （见上树） | **I-* issue 完整文档**。含 phase_state、pre_tests_path、verification_artifact_dir 等全部字段 |
+| `prd.md` | （见上树） | Goal → Dev-Loop Handoff |
+| `pre-tests.md` | （见上树） | 结构化测试计划（含 test_command + expected_output），模板见下方 |
+| `tasks.md` | （见上树） | 任务分解，关联 owner issue |
+| `code-reviews/` | （见上树） | Implementation Decision Note（5 字段） |
 
 **I-* issue 完整示例**（`docs/epics/{epic-name}/{story-name}/raw-{raw-key}/issues/I-{raw-key}-{suffix}.md`，此处 suffix = A）：
 
@@ -254,66 +290,19 @@ phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
 - 产出 prd.md、pre-tests.md、tasks.md
 - 产出 code-reviews/（含 Implementation Decision Note）
 
-## B2 产物文件路径速查
+## 门禁报错时路径速查
 
-> 门禁报 `missing`/`not found` 时，**先对照此树检查文件是否放对位置**，
-> 再检查文件内容。在错误路径改内容永远过不了门禁。
+> 门禁报 `missing`/`not found` 时，先对照 M 阶段「规范目录结构」确认文件放对位置。
+> 在错误路径改内容永远过不了门禁。
 
-### 规范目录树（所有产物都在 `raw-{raw-key}/` 下）
-
-```
-docs/epics/{epic-name}/{story-name}/
-└── raw-{raw-key}/                           ← 一个 raw issue 一个目录
-    │
-    ├── prd.md                               ← M: Map 产物（需求→实现设计）
-    │
-    ├── brainstorms/                          ← B: Brainstorm 产物（每个 I-* 一个）
-    │   ├── b-I-{raw-key}-A.md               ← I-{raw-key}-A 的头脑风暴
-    │   └── b-I-{raw-key}-B.md               ← I-{raw-key}-B 的头脑风暴
-    │
-    ├── issues/                               ← M: Map 物化产物（I-* issue）
-    │   ├── I-{raw-key}-A.md                 ← suffix 与 brainstorms 一一对应
-    │   └── I-{raw-key}-B.md                 ← 一个 raw issue 可有多个 I-*
-    │
-    ├── verification/                         ← M: Map 产物（测试方案+分解）
-    │   ├── pre-tests.md
-    │   ├── tasks.md
-    │   └── test-evidence/                    ← 多文件目录
-    │       └── acceptance-*.log
-    │
-    └── code-reviews/                         ← M: Map 产物（评审记录）
-        ├── implementation-decision-note.md
-        └── pr-review-*.md
-```
-
-> **IBM 四节点链路**: raw issue (Input) → candidate (B1 预研) → **I-* issue (B2 物化)** → dev-loop 实现。
-> 本目录树全部是 **B2_IBM 的 M (Map) 阶段产物**——I-* issue、prd.md、pre-tests.md、tasks.md、code-reviews 都是 B2 的**输出**，不是输入。
-> 路径中的 `{epic-name}` 和 `{story-name}` 由 B2_IBM 的步骤 0 决定。
-> `{raw-key}` = raw issue 的时间戳 key（如 `20260701T085407Z`）。
-> `{suffix}` = candidate suffix（A/B/C），`brainstorms/` 和 `issues/` 中同名 suffix 一一对应。
-
-### IBM 四节点全链路（Input → B1 → B2 → dev）
-
-| 阶段 | 节点 | 路径 | 谁创建 |
-|------|------|------|--------|
-| **I** (Input) | raw issue | `docs/issues/raw-{key}/issue.md` | `freely wt-create` |
-| **B1** (Brainstorm) | brainstorms | `docs/pre-brainstorms/{key}--{slug}/brainstorms.md` | skill `freely-doc-B1_IBM-execution` |
-| **B1** (Milestone) | candidate | `docs/pre-brainstorms/{key}--{slug}/candidates.md` | skill `freely-doc-B1_IBM-execution` |
-| **B2** (Brainstorm) | b-I-* | `docs/epics/{epic}/{story}/raw-{raw-key}/brainstorms/b-I-{raw-key}-{suffix}.md` | skill `freely-doc-B2_IBM-execution`（本 skill） |
-| **B2** (Map 物化) | I-* issue | `docs/epics/{epic}/{story}/raw-{raw-key}/issues/I-{raw-key}-{suffix}.md` | skill `freely-doc-B2_IBM-execution`（本 skill） |
-
-> **关键区分**: B1 阶段产出 key（I-{key}-{suffix}），在 B2 阶段物化为 `raw-{key}/issues/` 下的真实文件。
-> `brainstorms/b-I-{key}-A.md` 与 `issues/I-{key}-A.md` suffix 一一对应——B 研究的就是这个 I-* issue 的实现方案。
-> I-* issue 是 B2 的**输出**（Map 物化产物），不是输入。
-
-### B2 设计产物（本 skill 负责创建）
-
-| 产物 | 路径 | 说明 |
-|------|------|------|
-| pre-tests.md | `docs/epics/{epic}/{story}/raw-{raw-key}/verification/pre-tests.md` | 测试方案，**B2 写** |
-| tasks.md | `docs/epics/{epic}/{story}/raw-{raw-key}/verification/tasks.md` | 任务分解，所有 [x] 才过门禁 |
-| prd.md | `docs/epics/{epic}/{story}/raw-{raw-key}/prd.md` | 产品需求文档 |
-| Implementation Decision Note | `docs/epics/{epic}/{story}/raw-{raw-key}/code-reviews/implementation-decision-note.md` | 5 字段 (decision/why_this/alternatives/boundary/residual_risk) |
+| 产物 | 路径 |
+|------|------|
+| I-* issue | `docs/epics/{epic}/{story}/raw-{raw-key}/issues/I-{raw-key}-{suffix}.md` |
+| b-I-* | `docs/epics/{epic}/{story}/raw-{raw-key}/brainstorms/b-I-{raw-key}-{suffix}.md` |
+| prd.md | `docs/epics/{epic}/{story}/raw-{raw-key}/prd.md` |
+| pre-tests.md | `docs/epics/{epic}/{story}/raw-{raw-key}/verification/pre-tests.md` |
+| tasks.md | `docs/epics/{epic}/{story}/raw-{raw-key}/verification/tasks.md` |
+| IDN | `docs/epics/{epic}/{story}/raw-{raw-key}/code-reviews/implementation-decision-note.md` |
 
 ### 治理文件（B2 需更新）
 
