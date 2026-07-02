@@ -733,23 +733,17 @@ if failures:
             other_errors.append(f)
     print("[pretests-gate] blocked completion due to pre-tests evidence failures:", file=sys.stderr)
     print(file=sys.stderr)
-    if b2_errors or test_errors:
-        print("── 需要阅读的 Skill ──", file=sys.stderr)
-        if b2_errors:
-            print(f"  skill `freely-doc-B2_IBM-execution` §pre-tests 模板与门禁常见坑速查 ({len(b2_errors)} 个)", file=sys.stderr)
-        if test_errors:
-            print(f"  skill `freely-test-execution` §GREEN 判定标准 ({len(test_errors)} 个)", file=sys.stderr)
-        print(file=sys.stderr)
     if b2_errors:
-        print(f"── B2 pre-tests 设计问题 ({len(b2_errors)}) ──", file=sys.stderr)
+        print(f"── 请按 skill `freely-doc-B2_IBM-execution` §pre-tests 模板与门禁常见坑速查 检查 ({len(b2_errors)} 项) ──", file=sys.stderr)
         for f in b2_errors: print(f"  - {f}", file=sys.stderr)
         print(file=sys.stderr)
     if test_errors:
-        print(f"── test-GREEN 执行问题 ({len(test_errors)}) ──", file=sys.stderr)
+        print(f"── 请按 skill `freely-test-execution` §GREEN 判定标准与执行步骤 检查 ({len(test_errors)} 项) ──", file=sys.stderr)
         for f in test_errors: print(f"  - {f}", file=sys.stderr)
         print(file=sys.stderr)
     if other_errors:
         for f in other_errors: print(f"  - {f}", file=sys.stderr)
-    print("不要逐条改字段——先看上面「需要阅读的 Skill」，加载对应 skill 修正。", file=sys.stderr)
+        print(file=sys.stderr)
+    print("不要逐条改字段——打开上面指定的 skill，按 skill 规范修正每一项。", file=sys.stderr)
     sys.exit(1)
 PY

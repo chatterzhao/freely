@@ -281,9 +281,9 @@ if not state_file.exists():
     if fallback_failures > 0:
         print(f"\n[GATE] 共 {fallback_failures} 项 GREEN 测试未执行。", file=sys.stderr)
         print(file=sys.stderr)
-        print("── 需要阅读的 Skill ──", file=sys.stderr)
-        print("  skill `freely-test-execution` §GREEN 判定标准与执行步骤", file=sys.stderr)
-        print("  skill `freely-doc-B2_IBM-execution` §pre-tests 模板与门禁常见坑速查", file=sys.stderr)
+        print("── 请按以下 skill 逐项检查修正 ──", file=sys.stderr)
+        print("  设计/格式问题 → skill `freely-doc-B2_IBM-execution` §pre-tests 模板与门禁常见坑速查", file=sys.stderr)
+        print("  执行/证据问题 → skill `freely-test-execution` §GREEN 判定标准与执行步骤", file=sys.stderr)
         print(file=sys.stderr)
         print("不要逐条改状态绕过——去跑测试，把真实结果写回 actual_output 和 evidence_file。", file=sys.stderr)
         print("如需豁免某项测试，设置 status=not_applicable 并填写 not_applicable_reason。", file=sys.stderr)
