@@ -166,11 +166,20 @@ def parse_issue_binding(issue_path: str, text: str) -> tuple[str, str]:
     verification_dir = extract("verification_artifact_dir")
     errors: list[str] = []
     if not pre_tests_path:
-        errors.append(f"{issue_path}: missing pre_tests_path")
+        errors.append(
+            f"{issue_path}: 缺少 pre_tests_path 字段。\n"
+            f"  在此 I-* issue 文件中添加: - pre_tests_path: docs/epics/{{epic}}/{{story}}/verification/pre-tests.md"
+        )
     elif not Path(pre_tests_path).is_relative_to(Path("docs")) and not pre_tests_path.startswith(".freely/"):
-        errors.append(f"{issue_path}: pre_tests_path must point inside repo, got {pre_tests_path}")
+        errors.append(
+            f"{issue_path}: pre_tests_path 必须在 repo 内，当前值: {pre_tests_path}。\n"
+            f"  正确格式: docs/epics/{{epic}}/{{story}}/verification/pre-tests.md"
+        )
     if not verification_dir:
-        errors.append(f"{issue_path}: missing verification_artifact_dir")
+        errors.append(
+            f"{issue_path}: 缺少 verification_artifact_dir 字段。\n"
+            f"  在此 I-* issue 文件中添加: - verification_artifact_dir: docs/epics/{{epic}}/{{story}}/raw-{{key}}/code-reviews"
+        )
     if errors:
         raise ValueError("\n".join(errors))
     return pre_tests_path, verification_dir
@@ -377,15 +386,21 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
 
     pretests_text = get_staged_text(pre_tests_path) if source == "staged" else get_worktree_text(pre_tests_path)
     if not pretests_text:
-        return [f"[pre_tests_missing] {issue_path}: bound pre-tests file missing or unreadable: {pre_tests_path}"]
+        return [f"[pre_tests_missing] {issue_path}: bound pre-tests file missing or unreadable: {pre_tests_path}\n"
+                f"  先检查: 文件是否存在于上述路径？I-* issue 的 pre_tests_path 字段是否指向正确位置？\n"
+                f"  正确路径格式: docs/epics/{{epic}}/{{story}}/verification/pre-tests.md\n"
+                f"  文件不存在 → 按 skill `freely-doc-B2_IBM-execution` 模板创建。\n"
+                f"  文件存在但路径不对 → 修正 I-* issue 的 pre_tests_path 字段。"]
 
     if phase_state(issue_text) == "completed" or require_adequacy:
         tasks_text = tasks_text_for_source(tasks_path, source)
         if not tasks_text:
             add_error(
                 "task_closeout_missing",
-                f"{issue_path}: bound tasks file missing or unreadable: {tasks_path}. "
-                "Completion and guarded promote closeout require the owner task decomposition to remain visible.",
+                f"{issue_path}: bound tasks file missing or unreadable: {tasks_path}.\n"
+                f"  先检查: 文件是否存在于上述路径？与 pre-tests.md 同目录（verification/）。\n"
+                f"  文件不存在 → 创建 tasks.md，所有任务标记 [x]。\n"
+                f"  Completion and guarded promote closeout require the owner task decomposition to remain visible.",
             )
         else:
             unchecked = unchecked_task_lines(tasks_text)
@@ -567,8 +582,10 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
         elif artifact_ref and not artifact_exists(artifact_ref, source):
             add_error(
                 "verification_state_missing",
-                f"{pre_tests_path}: {fields.get('id', title_line)} references missing artifact {artifact_ref}. "
-                "Keep the gate tied to traceable test evidence; unstaged or imaginary records do not count.",
+                f"{pre_tests_path}: {fields.get('id', title_line)} 引用的 artifact 文件不存在: {artifact_ref}。\n"
+                f"  先检查: artifact_ref 路径是否正确？文件是否已提交（git add）？\n"
+                f"  路径错误 → 修正 pre-tests.md 中该 item 的 artifact_ref 字段。\n"
+                f"  文件未提交 → git add -f <文件> 然后重新运行。",
             )
         if require_adequacy and acceptance_item_uses_adequacy_v2(fields):
             adequacy_v2_items.append(fields)
