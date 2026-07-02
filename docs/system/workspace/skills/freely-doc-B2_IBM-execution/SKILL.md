@@ -17,7 +17,7 @@ description: >-
 
 # skill:freely-doc-B2_IBM-execution
 
-> 全链路: [skill] freely-workflow-guarded-execution → [cmd] freely feedback → [cmd] freely wt-create → [skill] freely-doc-B1_IBM-execution → [skill][here] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
+> 全链路: [cmd] freely feedback → [skill] freely-workflow-guarded-execution → [cmd] freely wt-create → [skill] freely-doc-B1_IBM-execution → [skill][here] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
 
 ## I→B→M 骨架
 
@@ -254,9 +254,85 @@ phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
 - 产出 prd.md、pre-tests.md、tasks.md
 - 产出 code-reviews/（含 Implementation Decision Note）
 
+## B2 产物文件路径速查
+
+> 门禁报 `missing`/`not found` 时，先查此表确定文件应该放在哪里。
+> 路径中的 `{epic-name}` 和 `{story-name}` 由 B2_IBM 的步骤 0 决定（按语义判断能力域和可交付切片）。
+
+### raw issue → candidate → I-* issue 链路
+
+| 节点 | 路径 | 谁创建 | 何时 |
+|------|------|--------|------|
+| raw issue | `docs/issues/raw-{key}/issue.md` | `freely wt-create` | B1 之前 |
+| brainstorms | `docs/pre-brainstorms/{key}--{slug}/brainstorms.md` | B1_IBM skill | B1 Brainstorm |
+| candidate | `docs/pre-brainstorms/{key}--{slug}/candidates.md` | B1_IBM skill | B1 Milestone |
+| I-* issue | `docs/epics/{epic}/{story}/raw-{raw-key}/issues/I-{raw-key}-{suffix}.md` | **B2_IBM skill（本 skill）** | B2 Map（物化） |
+
+### B2 设计产物（本 skill 负责创建）
+
+| 产物 | 路径 | 说明 |
+|------|------|------|
+| pre-tests.md | `docs/epics/{epic}/{story}/verification/pre-tests.md` | 测试方案，**B2 写** |
+| tasks.md | `docs/epics/{epic}/{story}/verification/tasks.md` | 任务分解，所有 [x] 才过门禁 |
+| prd.md | `docs/epics/{epic}/{story}/prd.md` | 产品需求文档 |
+| Implementation Decision Note | `docs/epics/{epic}/{story}/raw-{raw-key}/code-reviews/implementation-decision-note.md` | 5 字段 (decision/why_this/alternatives/boundary/residual_risk) |
+
+### 治理文件（B2 需更新）
+
+| 文件 | 路径 | 更新什么 |
+|------|------|---------|
+| milestones.md | `docs/milestones.md` | I-* issue 写入 `committed_issues`（含 `path:` 字段指向 epics 下真实路径） |
+| epics-map.svg | `docs/epics-map.svg` | 新增 epic/story 时必须更新（运行 `./bin/check-epics-map`） |
+| workcell-state.env | `{worktree}/.freely/run/workcell-state.env` | GREEN 证据绑定（见下方 workcell 字段表） |
+
+### workcell-state.env 必填字段
+
+```
+DESIRED_RUNTIME_STATE=running
+LAST_EXIT_REASON=up
+LAST_WORKER_OWNER_ISSUE=I-{key}-A          # 绑定 I-* issue
+LAST_WORKER_PRE_TESTS_PATH=docs/epics/{epic}/{story}/verification/pre-tests.md
+LAST_WORKER_CLOSEOUT_GATE=create             # pr-create-guarded 时填 create
+LAST_WORKER_CLOSEOUT_GATE_COMMAND=freely pr-create-guarded
+LAST_WORKER_CLOSEOUT_TARGET_LANE=premerge-integration  # 合法值见下方枚举表
+LAST_WORKER_CLOSEOUT_PROMOTION_GATE=develop_merge       # 合法值见下方枚举表
+LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY=true
+LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY=code-reviews
+```
+
+### pre-tests.md 各 section 字段速查
+
+| Section | 必填字段 | 特殊约束 |
+|---------|---------|---------|
+| `## Acceptance Items` → `### acceptance-N` | id, requirement, evidence_level, artifact_ref, red-green-status, status, test_command, expected_output, actual_output | status 写 `passed`（不是 `passed`），red-green-status 写 `green` |
+| `## Unit` | acceptance_target, testing_layer, target_environment, required_evidence, blocker_taxonomy | 没有 concrete test tasks 时必须写 not_applicable_reason + not_applicable_explanation + replacement_evidence |
+| `## Integration` | 同上 | 同上 |
+| `## End-to-End` | 同上 | 同上 |
+| `## Real-Environment` | real_environment_status, real_environment_reason | real_environment_status 只能是 `pass` 或 `fail` |
+
+### 枚举值合法范围（从 gate 源码提取）
+
+| 字段 | 合法值 |
+|------|--------|
+| `surface_kind` | `unit` / `integration` / `end_to_end` / `real_environment` / `post_merge_followthrough` |
+| `target_lane` | `feature-local` / `premerge-integration` / `post-merge-followthrough` |
+| `promotion_gate` | `completion` / `develop_merge` / `retirement` |
+| `evidence_level` | `mock` / `integration` / `real_env` / `post_merge_dogfood` |
+| `red-green-status` | `pending` / `red` / `green` / `not_applicable` |
+| `status` (acceptance item) | `pass` / `passed` / `not_applicable` |
+| `not_applicable_reason` | `change_not_touching_this_layer` / `no_executable_boundary_at_this_layer` / `protected_environment_only` / `human_observation_only` / `covered_by_more_realistic_required_surface` |
+
+---
+
 ## 门禁常见坑速查
 
 > 若 gate 报错，先在此表查找匹配项。更多细节见下方规范模板。
+>
+> **⚠️ 全字段速查**: 每个 acceptance item 必须包含以下字段（缺一不可）:
+> `id` / `requirement` / `acceptance_target` / `testing_layer` / `target_environment` /
+> `required_evidence` / `evidence_level` / `artifact_ref` / `test_command` / `expected_output` /
+> `expected_RED_output` / `actual_RED_output` / `actual_output` / `evidence_file` /
+> `red-green-status` / `status` / `blocker`
 
 | gate 报错关键词 | 原因 | 正确格式 |
 |-----------|------|---------|
@@ -268,12 +344,23 @@ phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
 | pre_tests_path 验证失败 | I-* issue 需声明 pre_tests_path | `pre_tests_path: docs/epics/{epic-name}/verification/pre-tests.md` |
 | section missing acceptance_target/testing_layer | 字段名必须用下划线，不是空格 | `- acceptance_target:` / `- testing_layer:` / `- target_environment:` / `- required_evidence:` |
 | acceptance item missing id/requirement/evidence_level/artifact_ref | 每个 acceptance item 必须有这 4 个字段 | `- id: AT-001` / `- requirement: ...` / `- evidence_level: mock` / `- artifact_ref: <path>` |
+| red-green-status missing / invalid / not green | 每个 item 必须有 TDD 状态追踪。合法值: pending\|red\|green\|not_applicable | `- red-green-status: green` |
+| evidence_level unsupported | 合法值仅 4 个 | `mock` / `integration` / `real_env` / `post_merge_dogfood` |
+| status must be pass or not_applicable | 合法值仅 3 个 | `pass` (GREEN 通过) / `passed` (同义) / `not_applicable` (不适用) |
+| artifact_ref references missing / pending:// | artifact_ref 必须指向磁盘或 git 跟踪的真实文件 | `- artifact_ref: tests/pytest-output.log` |
 | execution_missing: got passed | passed 需要 worker state（.freely/run/workcell-state.env），无则改用 not_applicable | `- status: not_applicable` + not_applicable_reason + replacement_evidence |
-| not_applicable missing replacement_evidence | not_applicable 的 item 必须写 replacement_evidence | `- replacement_evidence: <替代验证方式>` |
-| section marked not applicable but missing replacement_evidence | section 级别 not_applicable 也要写 replacement_evidence | 同上 |
-| 全部 not_applicable 被判 "疑似糊弄" | 需至少 1 个 status=passed，或改为 mock | acceptance-1 用 `- evidence_level: mock` + `- status: not_applicable` |
+| not_applicable missing replacement_evidence | not_applicable 的 item/section 必须写 replacement_evidence | `- replacement_evidence: <替代验证方式>` |
 | not_applicable_reason 不支持 | 合法值仅 5 个 | `change_not_touching_this_layer` / `no_executable_boundary_at_this_layer` / `protected_environment_only` / `human_observation_only` / `covered_by_more_realistic_required_surface` |
+| section 'X' has no concrete test tasks | section 下需有编号列表测试任务(如 `1. task`)或 lawful not_applicable_reason | 添加 `- not_applicable_reason:` + `- not_applicable_explanation:` + `- replacement_evidence:` |
+| Real-Environment missing / unsupported status | real_environment_status 只能是 pass 或 fail | `- real_environment_status: pass` + `- real_environment_reason: <理由>` |
 | section missing blocker_taxonomy | Unit/Integration/End-to-End 必须声明 blocker_taxonomy | `- blocker_taxonomy: execution_pending_or_failed` |
+| workcell state missing / binding missing | .freely/run/workcell-state.env 缺失或字段不全 | 创建 workcell-state.env 含 `LAST_WORKER_OWNER_ISSUE` / `LAST_WORKER_PRE_TESTS_PATH` / `LAST_WORKER_CLOSEOUT_GATE` / `LAST_WORKER_CLOSEOUT_TARGET_LANE` / `LAST_WORKER_CLOSEOUT_PROMOTION_GATE` / `LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY` |
+| surface_kind unsupported | 合法值仅 5 个 | `unit` / `integration` / `end_to_end` / `real_environment` / `post_merge_followthrough` |
+| target_lane unsupported | 合法值仅 3 个 | `feature-local` / `premerge-integration` / `post-merge-followthrough` |
+| promotion_gate unsupported | 合法值仅 3 个 | `completion` / `develop_merge` / `retirement` |
+| evidence_plan_missing — needs real premerge-quality test evidence | premerge+develop_merge 要求的 adequacy v2 item: evidence_level≥integration, status=pass, artifact_ref 存在 | `- surface_kind: end_to_end` / `- target_lane: premerge-integration` / `- promotion_gate: develop_merge` / `- task_refs: A1-A6` / `- case_design: <测试设计说明>` |
+| task_closeout_missing / task_closeout_incomplete | I-* completed 时须有 tasks.md 且全部 [x] | 创建 tasks.md，所有任务标记 [x] |
+| pretests_retirement_binding_missing | workcell-state.env 缺少 closeout 字段 | 补充 `LAST_WORKER_CLOSEOUT_*` 系列字段 |
 
 ## 规范文档示例(copy-paste可用)
 
