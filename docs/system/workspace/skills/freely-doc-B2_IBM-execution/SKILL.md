@@ -256,8 +256,32 @@ phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
 
 ## B2 产物文件路径速查
 
-> 门禁报 `missing`/`not found` 时，先查此表确定文件应该放在哪里。
+> 门禁报 `missing`/`not found` 时，**先对照此树检查文件是否放对位置**，
+> 再检查文件内容。在错误路径改内容永远过不了门禁。
+
+### 规范目录树（所有文件都在 `raw-{raw-key}/` 下）
+
+```
+docs/epics/{epic-name}/{story-name}/
+└── raw-{raw-key}/
+    ├── prd.md
+    ├── brainstorms/                          ← 多文件目录
+    │   └── b-I-{raw-key}-{suffix}.md
+    ├── issues/                               ← 多文件目录（一个 raw issue 可有多个 I-*）
+    │   ├── I-{raw-key}-A.md
+    │   └── I-{raw-key}-B.md
+    ├── verification/
+    │   ├── pre-tests.md
+    │   ├── tasks.md
+    │   └── test-evidence/                    ← 多文件目录
+    │       └── acceptance-*.log
+    └── code-reviews/                         ← 多文件目录
+        ├── implementation-decision-note.md
+        └── pr-review-*.md
+```
+
 > 路径中的 `{epic-name}` 和 `{story-name}` 由 B2_IBM 的步骤 0 决定（按语义判断能力域和可交付切片）。
+> `{raw-key}` = raw issue 的时间戳 key（如 `20260701T085407Z`）。
 
 ### raw issue → candidate → I-* issue 链路
 
