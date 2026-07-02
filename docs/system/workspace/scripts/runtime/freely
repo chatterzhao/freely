@@ -18764,6 +18764,87 @@ finally:
   return 0
 }
 
+# ── ACP Session Helpers ────────────────────────────────────────
+# C2: Create new ACP session for any agent role.
+_acp_session_new() {
+  local project="$1" role="$2" agent_id="$3" raw_key="$4"
+  local _bridge_socket; _bridge_socket="/tmp/freely-acp-$(python3 -c "import hashlib,os; print(hashlib.sha256('${project}'.encode()).hexdigest()[:16])" 2>/dev/null)"
+  [[ -S "$_bridge_socket" ]] || { log_warn "ACP bridge not found for session/new ($role $agent_id)"; return 1; }
+  local _session_id; _session_id="${role}_$(date +%s)_${agent_id}"
+  python3 -c "
+import json, socket, sys
+req = json.dumps({'jsonrpc':'2.0','id':1,'method':'session/new','params':{'sessionId':'${_session_id}','cwd':'${project}'}}) + '\n'
+s = socket.socket(socket.AF_UNIX); s.settimeout(5)
+try:
+    s.connect('${_bridge_socket}'); s.sendall(req.encode()); s.shutdown(socket.SHUT_WR)
+    resp = b''; [resp := resp + chunk for chunk in iter(lambda: s.recv(4096), b'')]
+    sid = json.loads(resp.decode()).get('result',{}).get('sessionId','')
+    if sid:
+        sys.path.insert(0, '${project}/docs/system/workspace/scripts/runtime')
+        from agent_working import agent_assign
+        agent_assign('${project}', '${raw_key}', '${role}', '${agent_id}', session_id=sid)
+        print(sid)
+except Exception as e: print(f'ERROR:{e}', file=sys.stderr)
+finally: s.close()
+" 2>/dev/null
+}
+
+# C3: Resume existing ACP session.
+_acp_session_resume() {
+  local project="$1" role="$2" raw_key="$3"
+  # Get session_id from agent_working table
+  local _session_id; _session_id=$(python3 -c "
+import sys; sys.path.insert(0, '${project}/docs/system/workspace/scripts/runtime')
+from agent_working import agent_get_session
+print(agent_get_session('${project}', '${raw_key}', '${role}') or '')
+" 2>/dev/null)
+  [[ -z "$_session_id" ]] && { log_warn "no session to resume for $role on $raw_key"; return 1; }
+  local _bridge_socket; _bridge_socket="/tmp/freely-acp-$(python3 -c "import hashlib,os; print(hashlib.sha256('${project}'.encode()).hexdigest()[:16])" 2>/dev/null)"
+  [[ -S "$_bridge_socket" ]] || { log_warn "ACP bridge not found for session/resume"; return 1; }
+  python3 -c "
+import json, socket
+req = json.dumps({'jsonrpc':'2.0','id':1,'method':'session/resume','params':{'sessionId':'${_session_id}','cwd':'${project}'}}) + '\n'
+s = socket.socket(socket.AF_UNIX); s.settimeout(5)
+try:
+    s.connect('${_bridge_socket}'); s.sendall(req.encode()); s.shutdown(socket.SHUT_WR)
+    resp = b''; [resp := resp + chunk for chunk in iter(lambda: s.recv(4096), b'')]
+    print(json.loads(resp.decode()).get('result',{}).get('sessionId','ok'))
+except Exception as e: print(f'ERROR:{e}', file=sys.stderr)
+finally: s.close()
+" 2>/dev/null
+}
+
+# C4: Close ACP session and release agent_working entry.
+_acp_session_close() {
+  local project="$1" role="$2" raw_key="$3"
+  local _session_id; _session_id=$(python3 -c "
+import sys; sys.path.insert(0, '${project}/docs/system/workspace/scripts/runtime')
+from agent_working import agent_get_session
+print(agent_get_session('${project}', '${raw_key}', '${role}') or '')
+" 2>/dev/null)
+  if [[ -n "$_session_id" ]]; then
+    local _bridge_socket; _bridge_socket="/tmp/freely-acp-$(python3 -c "import hashlib,os; print(hashlib.sha256('${project}'.encode()).hexdigest()[:16])" 2>/dev/null)"
+    if [[ -S "$_bridge_socket" ]]; then
+      python3 -c "
+import json, socket
+req = json.dumps({'jsonrpc':'2.0','id':1,'method':'session/close','params':{'sessionId':'${_session_id}'}}) + '\n'
+s = socket.socket(socket.AF_UNIX); s.settimeout(5)
+try:
+    s.connect('${_bridge_socket}'); s.sendall(req.encode()); s.shutdown(socket.SHUT_WR)
+    s.recv(4096)
+except: pass
+finally: s.close()
+" 2>/dev/null
+    fi
+  fi
+  # Release from agent_working
+  python3 -c "
+import sys; sys.path.insert(0, '${project}/docs/system/workspace/scripts/runtime')
+from agent_working import agent_release
+agent_release('${project}', '${raw_key}', '${role}')
+" 2>/dev/null || true
+}
+
 ensure_manager_once() {
   local project="$1"
   local run_dir sup_pid_file current_pid current_ai_pid same_tool_blocked desired_state last_exit_reason supervisor_hint
