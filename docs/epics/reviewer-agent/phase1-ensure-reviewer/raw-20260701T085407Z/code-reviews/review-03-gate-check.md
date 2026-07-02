@@ -1,4 +1,6 @@
 # Review 03: Quality Gate Check
+
+- owner_issue: raw-20260701T085407Z
 - date: 2026-07-01
 - reviewer: subagent (Plan)
 - verdict: 10/10 gates PASS after fixes

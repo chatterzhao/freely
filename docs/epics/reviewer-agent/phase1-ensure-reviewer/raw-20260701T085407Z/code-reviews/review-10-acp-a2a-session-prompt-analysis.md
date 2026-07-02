@@ -1,5 +1,7 @@
 # Review 10: ACP/A2A 职责边界 + Session 启停 + 消息投递 — 最终确认
 
+- owner_issue: raw-20260701T085407Z
+
 - date: 2026-07-02
 - 状态: confirmed (与用户充分讨论达成一致)
 

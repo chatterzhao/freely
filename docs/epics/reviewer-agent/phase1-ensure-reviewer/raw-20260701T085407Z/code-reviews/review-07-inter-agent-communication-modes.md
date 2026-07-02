@@ -1,4 +1,6 @@
 # Review 07: Agent 间通信 — Session 活跃 vs 不活跃
+
+- owner_issue: raw-20260701T085407Z
 - date: 2026-07-01
 
 ## 两种通信模式

@@ -1,5 +1,7 @@
 # Review 09: Routa vs Freely 架构对比
 
+- owner_issue: raw-20260701T085407Z
+
 - date: 2026-07-02
 - routa: https://github.com/phodal/routa (MIT, TypeScript+Rust, ~1.7k stars)
 - freely: chatterzhao/freely (Shell+Python, private)

@@ -30,6 +30,8 @@
 
 
 # Freely Phase 1 Reviewer Agent — Final Converged TODO
+
+- owner_issue: raw-20260701T085407Z
 - date: 2026-07-01
 - based on: 7 review docs + B1 design + subagent convergence (3 iterations)
 

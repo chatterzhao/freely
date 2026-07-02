@@ -1,5 +1,7 @@
 # Code Review 08: D6+B6+B8 Checkpoint
 
+- owner_issue: raw-20260701T085407Z
+
 **Reviewer**: Claude Code
 **Date**: 2026-07-01
 **Branch**: fix/raw-20260701T085407Z-reviewer-a2a-integration
