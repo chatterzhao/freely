@@ -805,4 +805,6 @@ a2a_tasks 表持久落盘             session/prompt           语义封装
 - Phase 2: Handler 统一 session/prompt 优先 + session 创建后立即投递任务
 - Review bugfix: `_handle_needs_reviewer` prompt 失败后漏 return → 会分配第二个 reviewer
 - Review bugfix: `_build_worker_verdict_message` metadata 参数未使用 → 提取 verdict/summary
+- **`__manager__`**：Manager 硬编码 raw_key，与 issue raw_key 分离。`_should_use_fork` 和 `_acp_session_fork` 查 `__manager__` 而不是 issue key
+- **`update_only`**：Reviewer 只能 UPDATE 已有行（Worker 创建），不允许 INSERT。防止 worktree 已被 wt-close 删后 Reviewer 误创建幽灵行
 

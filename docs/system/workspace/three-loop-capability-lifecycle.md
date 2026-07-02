@@ -85,7 +85,8 @@ scan (文件系统读取) ──→ intake gate ──→ routing ──→ disp
                                                     │
                                                     ├─ InputRequiredReason 路由 (6向+兜底)
                                                     ├─ agent_working.next_free → Reviewer 分配
-                                                    └─ ACP session/new → Reviewer Agent 启动
+                                                    ├─ session/fork from Manager (继承治理上下文)
+                                                    └─ session/prompt → Reviewer 收到审查任务
                                                         │
                                                         ▼
                                               Reviewer 审查 → PATCH verdict (pass/fail)
