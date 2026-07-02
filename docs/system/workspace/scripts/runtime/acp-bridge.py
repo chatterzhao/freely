@@ -636,13 +636,21 @@ def handle_client(conn, bridge):
                 try:
                     # Ensure server is alive before forwarding (lazy restart).
                     bridge._ensure_server_alive()
-                    # Route session/new and session/resume through bridge methods
+                    # Route session/new, session/fork, and session/resume through bridge methods
                     # so session/set_mode is called for claude-agent-acp.
                     if method == "session/new":
                         sid = bridge.session_new(
                             session_id=params.get("sessionId"),
                             cwd=params.get("cwd"),
                         )
+                        result = {"sessionId": sid}
+                    elif method == "session/fork":
+                        sid = bridge._send_request("session/fork", {
+                            "sessionId": params.get("sessionId"),
+                            "role": params.get("role"),
+                            "agentId": params.get("agentId"),
+                        }, timeout=30)
+                        bridge.log(f"session/fork: parent={params.get('sessionId','?')[:20]}... → {sid}")
                         result = {"sessionId": sid}
                     elif method == "session/resume":
                         sid = bridge.session_resume(

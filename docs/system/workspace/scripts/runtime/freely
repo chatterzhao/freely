@@ -18817,6 +18817,42 @@ finally: s.close()
 " 2>/dev/null
 }
 
+# D13: Fork child session from parent agent session.
+# session/fork inherits parent's system prompt + tools + cache prefix (~80% token savings).
+# Used for Reviewer dispatch: fork from Manager (neutral, has governance context).
+# FORBIDDEN: fork from Worker (self-review bias).
+_acp_session_fork() {
+  local project="$1" parent_role="$2" child_role="$3" child_agent_id="$4" raw_key="$5"
+  local _parent_sid; _parent_sid=$(python3 -c "
+import sys; sys.path.insert(0, '${project}/docs/system/workspace/scripts/runtime')
+from agent_working import agent_get_session
+print(agent_get_session('${project}', '${raw_key}', '${parent_role}') or '')
+" 2>/dev/null)
+  [[ -z "$_parent_sid" ]] && { log_warn "no ${parent_role} session to fork for ${raw_key}"; return 1; }
+  local _bridge_socket; _bridge_socket="/tmp/freely-acp-$(python3 -c "import hashlib,os; print(hashlib.sha256('${project}'.encode()).hexdigest()[:16])" 2>/dev/null).sock"
+  [[ -S "$_bridge_socket" ]] || { log_warn "ACP bridge not found for session/fork"; return 1; }
+  python3 -c "
+import json, socket
+params = {'sessionId': '${_parent_sid}', 'role': '${child_role}', 'agentId': '${child_agent_id}'}
+req = json.dumps({'jsonrpc':'2.0','id':1,'method':'session/fork','params':params}) + '\n'
+s = socket.socket(socket.AF_UNIX); s.settimeout(10)
+try:
+    s.connect('${_bridge_socket}'); s.sendall(req.encode()); s.shutdown(socket.SHUT_WR)
+    resp = b''; [resp := resp + chunk for chunk in iter(lambda: s.recv(4096), b'')]
+    result = json.loads(resp.decode())
+    sid = result.get('result',{}).get('sessionId','')
+    if sid:
+        import sys; sys.path.insert(0, '${project}/docs/system/workspace/scripts/runtime')
+        from agent_working import agent_assign
+        agent_assign('${project}', '${raw_key}', '${child_role}', '${child_agent_id}', session_id=sid)
+        print(sid)
+    else:
+        print(f'fork error: {result}', file=__import__('sys').stderr)
+except Exception as e: print(f'fork error: {e}', file=__import__('sys').stderr)
+finally: s.close()
+" 2>/dev/null
+}
+
 # C4: Close agent ACP session and release agent_working entry.
 _acp_agent_session_close() {
   local project="$1" role="$2" raw_key="$3"

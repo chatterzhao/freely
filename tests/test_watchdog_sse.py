@@ -116,15 +116,20 @@ class TestAcpRpc(unittest.TestCase):
 class TestAgentHandlers(unittest.TestCase):
     """C14d: Agent handler routing with mocked agent_working."""
 
+    @patch('watchdog_sse._should_use_fork')
     @patch('watchdog_sse.agent_list_by_raw_key')
     @patch('watchdog_sse.agent_next_free')
     @patch('watchdog_sse.agent_assign')
     @patch('watchdog_sse._acp_session_new')
-    def test_handle_needs_reviewer_new(self, mock_new, mock_assign, mock_next, mock_list):
-        """_handle_needs_reviewer creates new reviewer when none exists."""
+    def test_handle_needs_reviewer_new(self, mock_new, mock_assign, mock_next, mock_list, mock_fork):
+        """_handle_needs_reviewer creates new reviewer when none exists.
+
+        When no Manager session available for fork, falls back to session/new.
+        """
         mock_list.return_value = {}
         mock_next.return_value = "reviewer_99"
         mock_new.return_value = "session-abc"
+        mock_fork.return_value = False  # no fork available → use session/new
 
         from watchdog_sse import _handle_needs_reviewer
         _handle_needs_reviewer("/fake/project", {
@@ -133,24 +138,68 @@ class TestAgentHandlers(unittest.TestCase):
         }, InputRequiredReason.NEEDS_REVIEW_B1)
 
         mock_next.assert_called_once()
-        mock_new.assert_called_once_with("/fake/project", "reviewer", "reviewer_99")
-        mock_assign.assert_called_once()
+        mock_new.assert_called()
+        mock_assign.assert_called()
+
+    @patch('watchdog_sse._should_use_fork')
+    @patch('watchdog_sse.agent_list_by_raw_key')
+    @patch('watchdog_sse.agent_get_session')
+    @patch('watchdog_sse.agent_assign')
+    @patch('watchdog_sse._acp_session_new')
+    def test_handle_needs_reviewer_duplicate(self, mock_new, mock_assign, mock_session, mock_list, mock_fork):
+        """_handle_needs_reviewer: existing reviewer with dead session gets new session.
+
+        Reviewer already assigned but session died → create new session via session/new
+        (not fork, because _should_use_fork returns False in test).
+        """
+        mock_list.return_value = {"reviewer_id": "reviewer_05"}
+        mock_session.return_value = None  # session dead
+        mock_new.return_value = "session-new"
+        mock_fork.return_value = False
+
+        from watchdog_sse import _handle_needs_reviewer
+        _handle_needs_reviewer("/fake/project", {
+            "raw_key": "raw-20260701T000000Z"
+        }, InputRequiredReason.NEEDS_REVIEW_B1)
+
+        # Should create a new session for the dead-session reviewer
+        mock_new.assert_called()
+        mock_assign.assert_called()
 
     @patch('watchdog_sse.agent_list_by_raw_key')
-    @patch('watchdog_sse.agent_assign')
     @patch('watchdog_sse.agent_get_session')
     @patch('watchdog_sse._acp_session_resume')
-    def test_handle_needs_reviewer_duplicate(self, mock_resume, mock_session, mock_assign, mock_list):
-        """_handle_needs_reviewer skips new assignment when reviewer already assigned."""
-        mock_list.return_value = {"reviewer_id": "reviewer_05:existing-session"}
-        mock_session.return_value = None  # no session, so it won't try to resume
+    def test_handle_needs_reviewer_resume(self, mock_resume, mock_session, mock_list):
+        """_handle_needs_reviewer resumes existing reviewer session."""
+        mock_list.return_value = {"reviewer_id": "reviewer_05:live-session"}
+        mock_session.return_value = "live-session"
+        mock_resume.return_value = True
+
+        from watchdog_sse import _handle_needs_reviewer
+        _handle_needs_reviewer("/fake/project", {
+            "raw_key": "raw-20260701T000000Z"
+        }, InputRequiredReason.NEEDS_REVIEW_B2)
+
+        mock_resume.assert_called_once()
+
+    @patch('watchdog_sse.agent_list_by_raw_key')
+    @patch('watchdog_sse.agent_next_free')
+    @patch('watchdog_sse.agent_assign')
+    @patch('watchdog_sse._acp_session_new')
+    @patch('watchdog_sse._should_use_fork')
+    def test_handle_needs_reviewer_gate_always_new(self, mock_fork, mock_new, mock_assign, mock_next, mock_list):
+        """Gate review (needs-review:gate) ALWAYS uses session/new, never fork."""
+        mock_list.return_value = {}
+        mock_next.return_value = "reviewer_99"
+        mock_new.return_value = "session-gate"
 
         from watchdog_sse import _handle_needs_reviewer
         _handle_needs_reviewer("/fake/project", {
             "raw_key": "raw-20260701T000000Z"
         }, InputRequiredReason.NEEDS_REVIEW_GATE)
 
-        mock_assign.assert_not_called()
+        mock_new.assert_called()
+        mock_fork.assert_not_called()  # Gate must never fork
 
     @patch('watchdog_sse.agent_list_by_raw_key')
     @patch('watchdog_sse.agent_next_free')

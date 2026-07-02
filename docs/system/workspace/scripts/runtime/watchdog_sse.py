@@ -74,6 +74,60 @@ def _acp_session_new(project: str, role: str, agent_id: str, slot: str = None) -
     return None
 
 
+def _acp_session_fork(project: str, parent_role: str, child_role: str,
+                      child_agent_id: str, raw_key: str) -> Optional[str]:
+    """Fork a child session from parent agent's session.
+
+    Forks from Manager session — inherits project governance context
+    (CONSTITUTION, LAWS, codebase map) without Worker's implementation bias.
+    Returns session_id on success, None on failure.
+    """
+    # Get Manager's session_id from agent_working
+    mgr_sid = agent_get_session(project, raw_key, parent_role)
+    if not mgr_sid:
+        print(f"[watchdog] no {parent_role} session to fork from for {raw_key}", file=sys.stderr)
+        return None
+
+    params = {
+        "sessionId": mgr_sid,
+        "role": child_role,
+        "agentId": child_agent_id,
+    }
+    result = _acp_rpc(project, "session/fork", params)
+    if result and "result" in result:
+        sid = result["result"].get("sessionId", "")
+        if sid:
+            print(f"[watchdog] ACP session/fork: {parent_role}→{child_role} {child_agent_id} → {sid}", file=sys.stderr)
+            return sid
+    print(f"[watchdog] ACP session/fork failed, will fallback to session/new", file=sys.stderr)
+    return None
+
+
+def _should_use_fork(project: str, raw_key: str, reason: InputRequiredReason) -> bool:
+    """Determine if session/fork from Manager is appropriate.
+
+    session/fork from Manager is safe because Manager has governance context
+    but NOT Worker's implementation details (Manager runs in develop worktree).
+    session/fork from Worker is FORBIDDEN (self-review bias).
+
+    session/new is used for:
+    - Gate reviews (needs-review:gate) — maximum impartiality for critical gates
+    - Cross-tool scenarios — different AI tool can't fork
+    """
+    # Gate review: always use session/new for maximum impartiality
+    if reason == InputRequiredReason.NEEDS_REVIEW_GATE:
+        return False
+
+    # Check if Manager has an active session to fork from
+    mgr_sid = agent_get_session(project, raw_key, "manager")
+    if not mgr_sid:
+        return False
+
+    # Check same tool (simplified: same project = same tool config)
+    # Full implementation would compare agent-table slot values
+    return True
+
+
 def watchdog_run(project: str, a2a_socket: str):
     """Main Watchdog loop: subscribe to SSE, handle events.
 
@@ -215,44 +269,91 @@ def _normalize_raw_key(raw_key: str) -> str:
 
 
 def _handle_needs_reviewer(project: str, metadata: dict, reason: InputRequiredReason):
-    """Worker/Manager needs reviewer. Create reviewer agent if not exists."""
+    """Worker/Manager needs reviewer.
+
+    Session selection decision tree (§19 in brainstorms.md):
+      1. Same raw_key previously reviewed? → session/resume (best cache + impartial)
+      2. Gate review (needs-review:gate)? → session/new always (impartiality > cache)
+      3. Manager session available + same tool? → session/fork (cache + neutral)
+      4. Fallback → session/new (cold start, maximum impartiality)
+
+    session/fork from Manager is safe: Manager has governance context
+    (CONSTITUTION, LAWS, codebase) but NOT Worker's implementation details.
+    session/fork from Worker is FORBIDDEN (self-review bias).
+    """
     raw_key = _normalize_raw_key(metadata.get("raw_key", ""))
     from_agent = metadata.get("from_agent", "")
 
-    # Check if reviewer already exists for this raw_key
+    # Step 1: Check if reviewer already exists for this raw_key
     existing = agent_list_by_raw_key(project, raw_key)
     if existing and existing.get("reviewer_id"):
-        # Reviewer already assigned — resume session if exists
         sid = agent_get_session(project, raw_key, "reviewer")
         if sid:
-            print(f"[watchdog] reviewer session {sid} exists for {raw_key}, resuming", file=sys.stderr)
-            _acp_session_resume(project, sid, f"Reviewer needed for {raw_key}, reason: {reason.value}")
+            # Same reviewer already has a session → resume (best: cache + impartial)
+            print(f"[watchdog] reviewer session {sid[:20]}... exists for {raw_key}, resuming", file=sys.stderr)
+            _acp_session_resume(project, sid, f"Continue review for {raw_key}, stage: {reason.value}")
+            return
         else:
-            print(f"[watchdog] reviewer assigned but no session for {raw_key}, creating new session", file=sys.stderr)
-            # Create ACP session for the reviewer
+            # Reviewer assigned but session dead → try fork from Manager, then new
             rid = existing["reviewer_id"].split(":")[0] if ":" in str(existing.get("reviewer_id", "")) else existing.get("reviewer_id", "")
             if rid:
-                new_sid = _acp_session_new(project, "reviewer", rid)
-                if new_sid:
-                    agent_assign(project, raw_key, "reviewer", f"{rid}:{new_sid}")
-        return
+                print(f"[watchdog] reviewer {rid} assigned but session dead for {raw_key}", file=sys.stderr)
+                _create_reviewer_session(project, raw_key, rid, from_agent, reason)
+            return
 
-    # Allocate next free reviewer
+    # Step 2: Allocate next free reviewer
     reviewer_id = agent_next_free(project, "reviewer", 99)
     if not reviewer_id:
         print(f"[watchdog] no free reviewer slots", file=sys.stderr)
         return
 
-    print(f"[watchdog] creating reviewer {reviewer_id} for {raw_key} (requested by {from_agent})", file=sys.stderr)
-    # Create ACP session for the new reviewer
-    new_sid = _acp_session_new(project, "reviewer", reviewer_id)
-    if new_sid:
-        agent_assign(project, raw_key, "reviewer", f"{reviewer_id}:{new_sid}")
-        print(f"[watchdog] reviewer {reviewer_id} session={new_sid} assigned to {raw_key}", file=sys.stderr)
+    print(f"[watchdog] dispatching reviewer {reviewer_id} for {raw_key} (from {from_agent}, reason={reason.value})", file=sys.stderr)
+    _create_reviewer_session(project, raw_key, reviewer_id, from_agent, reason)
+
+
+def _create_reviewer_session(project: str, raw_key: str, reviewer_id: str,
+                              from_agent: str, reason: InputRequiredReason):
+    """Create reviewer session using decision tree: fork → new.
+
+    Tries session/fork from Manager first (cache + impartial).
+    Falls back to session/new (cold start, maximum impartiality).
+    Gate reviews ALWAYS use session/new.
+    """
+    session_mode = "new"  # default
+    session_id = None
+
+    # Gate reviews: session/new always (maximum impartiality for critical gates)
+    if reason == InputRequiredReason.NEEDS_REVIEW_GATE:
+        print(f"[watchdog] gate review → session/new (impartiality priority)", file=sys.stderr)
+        session_id = _acp_session_new(project, "reviewer", reviewer_id)
+        session_mode = "new"
+
+    # Try fork from Manager (safe: Manager is neutral, has governance context)
+    elif _should_use_fork(project, raw_key, reason):
+        print(f"[watchdog] attempting session/fork from Manager for {reviewer_id}", file=sys.stderr)
+        session_id = _acp_session_fork(project, "manager", "reviewer", reviewer_id, raw_key)
+        if session_id:
+            session_mode = "fork"
+        else:
+            # Fork failed → fallback to session/new
+            print(f"[watchdog] fork failed, falling back to session/new", file=sys.stderr)
+            session_id = _acp_session_new(project, "reviewer", reviewer_id)
+            session_mode = "new"
+
+    # Fallback: session/new
     else:
-        # Session creation failed — still record the assignment for retry
+        print(f"[watchdog] session/new for {reviewer_id} (no fork available)", file=sys.stderr)
+        session_id = _acp_session_new(project, "reviewer", reviewer_id)
+        session_mode = "new"
+
+    # Record assignment in agent_working
+    if session_id:
+        agent_assign(project, raw_key, "reviewer", f"{reviewer_id}:{session_id}")
+        print(f"[watchdog] reviewer {reviewer_id} session={session_id} mode={session_mode} for {raw_key}", file=sys.stderr)
+    else:
+        # Session creation failed — record assignment for retry
         agent_assign(project, raw_key, "reviewer", reviewer_id)
-        print(f"[watchdog] reviewer {reviewer_id} assigned (no session yet, will retry)", file=sys.stderr)
+        print(f"[watchdog] reviewer {reviewer_id} assigned (no session, will retry)", file=sys.stderr)
 
 
 def _handle_needs_manager(project: str, metadata: dict, reason: InputRequiredReason):

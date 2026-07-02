@@ -638,4 +638,130 @@ wt-close 的 test-pre-merge cleanup (Phase 6b) 通过 raw_key 自动发现 compa
 | ACP session 关闭 | 单一 session/close | 双函数（直接/agent_working） | ⚠️ 已更新（见 §18.5） |
 | 原子分配 | 未提及 | next_free_and_assign | ⚠️ 新增（见 §18.6） |
 | SQL 注入防护 | 未提及 | col/role 验证 | ⚠️ 新增（见 §18.8） |
+| Reviewer session 复用 | 未涉及 | 见 §19 | ⚠️ 新增（见 §19） |
+
+## 19. Reviewer Session 复用策略（2026-07-02 研究）
+
+### 问题
+
+当前 `_handle_needs_reviewer` 对每次 needs-review 都调用 `_acp_session_new`。
+即使同一 raw_key 的 B1→B2→RED→dev→test 连续多轮审查，每次都启动全新 session，
+每次冷启动都要重新加载 CONSTITUTION、LAWS、代码库上下文。大量 token 浪费。
+
+另一方面，如果直接 fork Worker 的 session，Reviewer 会继承 Worker 的完整对话历史——
+包括 Worker 的实现思路、决策过程、踩坑记录。这会导致"自己审自己"的偏见：
+Reviewer 看到 Worker 是怎么想的，很难保持独立判断。
+
+### 业界研究
+
+**Claude Code 内部**：
+- Fork：继承父 session 的 system prompt + tools + conversation history → 首轮命中缓存
+- Subagent：独立 system prompt + 独立 context window → 冷启动，但完全隔离
+- Anthropic 刻意将两者分开："fork 用于 compaction（缓存优先），subagent 用于 review（隔离优先）"
+
+**Qwen Code**：
+- Named subagent：干净 context + 自定义 system prompt → 适合专项任务
+- Fork subagent：继承父 context + 80% token 节省 → 适合并行探索
+
+**ttal 多 agent 系统**：
+- Brainstorm → Fork → Plan → Review 四阶段模式
+- Fork 从同一个 master session 分叉出多个 project-specific session
+- 保持上下文共享的同时做到 scope 隔离
+
+**关键发现**：业界共识是 fork Manager session 是效率与公平的最佳平衡点。
+Manager 有项目治理上下文（CONSTITUTION/LAWS/代码库结构），但没有 Worker 的实现细节。
+Fork Manager 出来的 Reviewer 继承了"审查所需的上下文"但不继承"被审查者的思路"。
+
+### 设计决策
+
+```
+Reviewer dispatch session 选择决策树:
+
+1. 同一 raw_key 之前审查过？
+   ├─ YES + session 存活 (agent_working 有 session_id)
+   │   → session/resume
+   │   Cache: ⭐⭐⭐ (完整审查历史)  Impartial: ⭐⭐⭐
+   │   例子: Reviewer 审了 B1，现在审 B2，直接在同一对话继续
+   │
+   └─ YES + session 已死 → 进入步骤 2
+
+2. Manager 与 Reviewer 是否同 AI tool？
+   ├─ YES → session/fork from Manager ← 默认首选
+   │   Cache: ⭐⭐ (Manager 有项目宪法+代码库，≈80% token 节省)
+   │   Impartial: ⭐⭐⭐ (Manager 是中立角色，无 Worker 偏见)
+   │
+   └─ NO (跨 tool) → session/new
+       Cache: ⭐ (完全冷启动)
+       Impartial: ⭐⭐⭐
+
+3. 是否是 Gate 审查 (needs-review:gate)？
+   └─ → session/new 始终
+       理由: Gate 是最关键的放行节点，值得付出冷启动成本换最大化公正性
+```
+
+### session/fork from Manager 为什么是安全的
+
+```
+Manager session 包含:
+  ✅ CONSTITUTION.md, LAWS.md, PROJECT_INTENT.md (治理上下文)
+  ✅ 代码库结构理解 (directory tree，关键文件位置)
+  ✅ 项目历史上下文 (之前处理过的 issue)
+  ✅ Skill 指令定义
+
+Manager session 不包含:
+  ❌ Worker 的具体实现代码 (Worker 在自己工位，Manager 在 develop)
+  ❌ Worker 的推理过程 (Worker 有自己的 ACP session，不共享)
+  ❌ Worker 的踩坑记录
+  ❌ Worker 的自我评估
+
+→ Fork Manager 出来的 Reviewer 有足够的上下文开始审查，
+   但没有 Worker 的"作案思路"，能保持独立判断。
+```
+
+### session/fork from Worker 为什么必须禁止
+
+```
+Worker session 包含:
+  ❌ 实现思路和决策过程 ("我选择方案A因为...")
+  ❌ 中途的自我怀疑和修正 ("等等，这里可能有问题...让我改一下")
+  ❌ 对测试结果的解释 ("这个失败是环境问题，不是代码bug")
+  ❌ 对自己的代码的正面评价 ("这个实现很优雅")
+
+→ Fork Worker 出来的 Reviewer 会被这些信息影响判断。
+   人类代码审查时也不会先让作者讲一遍思路再审查。
+```
+
+### 实现计划
+
+1. **新增 `_acp_session_fork()`**（freely 脚本 + watchdog_sse.py）
+   - 通过 ACP bridge 发送 `session/fork` RPC
+   - 参数: parent_role (manager), child_role (reviewer), parent_session_id, raw_key
+
+2. **修改 `_handle_needs_reviewer()` 决策树**
+   - 步骤 1: 查 agent_working → 有 session_id → session/resume
+   - 步骤 2: 判断同 tool → session/fork from Manager
+   - 步骤 3: 跨 tool 或 gate → session/new
+
+3. **agent_working 记录 session_mode**
+   - 新增字段: `reviewer_session_mode` (fork|resume|new)
+   - 或在现有列值中追加模式标记: `reviewer_05:ses_abc:fork`
+
+4. **Gate 审查特殊处理**
+   - `needs-review:gate` → 强制 session/new（即使缓存可用）
+   - 在 agent_working 标记 `force_new=true`
+
+### 预期效果
+
+| 场景 | 当前 (always new) | 优化后 | 节省 |
+|------|------------------|--------|------|
+| B1 审查 (首次) | session/new (cold) | session/fork (Manager cache) | ~80% |
+| B2 审查 (同 raw_key) | session/new (cold) | session/resume (reviewer cache) | ~90% |
+| RED 审查 | session/new (cold) | session/resume | ~90% |
+| dev 审查 | session/new (cold) | session/resume | ~90% |
+| test 审查 | session/new (cold) | session/resume | ~90% |
+| Gate 审查 | session/new | session/new (故意保留) | 0% (公正优先) |
+| 跨 tool 审查 | session/new | session/new (被迫) | 0% |
+
+同一 raw_key 的生命周期内（B1→B2→RED→dev→test→gate），
+原来需要 6 次 cold start，优化后只需 1 次 fork + 4 次 resume + 1 次 new (gate)。
 
