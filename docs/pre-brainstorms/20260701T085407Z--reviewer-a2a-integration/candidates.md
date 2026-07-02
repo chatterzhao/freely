@@ -23,7 +23,7 @@ milestone: M-20260701T085407Z-A
   - 82 tests GREEN
 - promotion_gate: N/A（已 absorb）
 - open_questions: []
-- absorbed_into: raw-20260701T085407Z
-- absorbed_into_path: docs/issues/raw-20260701T085407Z/issue.md
+- absorbed_into: I-20260701T085407Z-A
+- promoted_issue_path: docs/epics/reviewer-agent/phase1-ensure-reviewer/raw-20260701T085407Z/issues/I-20260701T085407Z-A.md
 - milestone: M-20260701T085407Z-A
 - session_refs: []
