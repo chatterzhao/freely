@@ -385,33 +385,55 @@ def _handle_needs_manager(project: str, metadata: dict, reason: InputRequiredRea
 
 
 def _handle_needs_worker(project: str, metadata: dict, reason: InputRequiredReason):
-    """Reviewer/Manager needs worker retry/task. Resume worker ACP session."""
+    """Reviewer/Manager needs worker retry/task.
+
+    Session selection (mirrors Reviewer decision tree):
+      1. Worker session alive? → session/resume (best: full context)
+      2. Fork from Manager? → session/fork (cache + neutral, wrong cwd needs fix)
+      3. Fallback → session/new (cold start, but prompt carries verdict)
+      4. Last resort → delegate back to Manager
+
+    NOTE: After review (5-15 min), Worker session is almost always dead
+    (ACP idle timeout = 180s). session/new with verdict in prompt is the
+    normal path — equivalent to developer reading PR comments and fixing.
+    """
     raw_key = _normalize_raw_key(metadata.get("raw_key", ""))
     from_agent = metadata.get("from_agent", "")
     print(f"[watchdog] routing to worker for {raw_key}: {reason.value} (from {from_agent})", file=sys.stderr)
 
-    # Resume worker ACP session if exists
+    # Step 1: Resume if session still alive (unlikely after idle timeout, but try)
     sid = agent_get_session(project, raw_key, "worker")
     if sid:
-        prompt = f"[Watchdog] Agent {from_agent} requests your input on {raw_key}. Reason: {reason.value}.\nContinue."
+        prompt = f"[Watchdog] Agent {from_agent} requests your input on {raw_key}. Reason: {reason.value}."
         if _acp_session_resume(project, sid, prompt):
-            print(f"[watchdog] worker session {sid} resumed for {raw_key}", file=sys.stderr)
+            print(f"[watchdog] worker session {sid[:20]}... resumed for {raw_key}", file=sys.stderr)
             return
+        print(f"[watchdog] worker session {sid[:20]}... dead, trying fork/new", file=sys.stderr)
 
-    # No worker session — try to create one from agent_working
+    # Step 2: Get worker_id from agent_working
     row = agent_list_by_raw_key(project, raw_key)
+    wid = None
     if row and row.get("worker_id"):
         wid = row["worker_id"].split(":")[0] if ":" in str(row.get("worker_id", "")) else row.get("worker_id", "")
-        if wid:
-            new_sid = _acp_session_new(project, "worker", wid)
-            if new_sid:
-                agent_assign(project, raw_key, "worker", f"{wid}:{new_sid}")
-                print(f"[watchdog] created worker session {new_sid} for {raw_key}", file=sys.stderr)
-                return
 
-    # Last resort: delegate back to manager
+    if wid:
+        # Step 2a: Try fork from Manager first (cache savings, same as Reviewer path)
+        session_id = _acp_session_fork(project, "manager", "worker", wid, raw_key)
+        if session_id:
+            agent_assign(project, raw_key, "worker", f"{wid}:{session_id}")
+            print(f"[watchdog] worker {wid} forked from Manager session={session_id} for {raw_key}", file=sys.stderr)
+            return
+
+        # Step 2b: Fallback to session/new
+        new_sid = _acp_session_new(project, "worker", wid)
+        if new_sid:
+            agent_assign(project, raw_key, "worker", f"{wid}:{new_sid}")
+            print(f"[watchdog] worker {wid} new session={new_sid} for {raw_key}", file=sys.stderr)
+            return
+
+    # Step 3: Last resort — delegate back to manager
     print(f"[watchdog] no worker session for {raw_key}, delegating to manager", file=sys.stderr)
-    _handle_needs_manager(project, metadata, InputRequiredReason.from_string("NEEDS_MANAGER_INPUT"))
+    _handle_needs_manager(project, metadata, InputRequiredReason.from_string("needs-manager-decision"))
 
 
 # ── C12: Agent crash detection ────────────────────────────────────────────────
