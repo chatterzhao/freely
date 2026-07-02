@@ -263,11 +263,12 @@ def _handle_sse_event(project: str, event_text: str):
     if state != "input-required":
         return
 
-    # Metadata fields are top-level in the SSE data dict (see PATCH handler L740-745)
+    # Metadata fields are top-level in the SSE data dict (see PATCH handler L773-795)
     metadata = {
         k: data.get(k, "") for k in (
             "reason", "from_agent", "needs_agent", "needs_role",
             "raw_key", "message", "task_id", "review_stage",
+            "verdict", "completion_summary", "summary", "required_fixes",
         )
     }
     reason_str = metadata.get("reason", "")
@@ -426,17 +427,22 @@ def _handle_needs_manager(project: str, metadata: dict, reason: InputRequiredRea
             return
         print(f"[watchdog] manager session dead, creating new", file=sys.stderr)
 
-    # Step 2: No alive session — check if manager entry exists
+    # Step 2: No alive session — get or create manager entry
+    # Manager is always manager_01 (pool=1). Bootstrap the __manager__ row
+    # on first call if it doesn't exist yet.
     row = agent_list_by_raw_key(project, MANAGER_KEY)
+    mid = None
     if row and row.get("manager_id"):
         mid = row["manager_id"].split(":")[0] if ":" in str(row.get("manager_id", "")) else row.get("manager_id", "")
-        if mid:
-            new_sid = _acp_session_new(project, "manager", mid)
-            if new_sid:
-                agent_assign(project, MANAGER_KEY, "manager", f"{mid}:{new_sid}")
-                _acp_session_prompt(project, new_sid, mgr_msg)
-                print(f"[watchdog] manager {mid} new session={new_sid[:20]}...", file=sys.stderr)
-                return
+    if not mid:
+        mid = "manager_01"  # Manager always uses manager_01 (pool=1)
+
+    new_sid = _acp_session_new(project, "manager", mid)
+    if new_sid:
+        agent_assign(project, MANAGER_KEY, "manager", f"{mid}:{new_sid}")
+        _acp_session_prompt(project, new_sid, mgr_msg)
+        print(f"[watchdog] manager {mid} session={new_sid[:20]}... bootstrapped" if not row else f"[watchdog] manager {mid} session={new_sid[:20]}...", file=sys.stderr)
+        return
 
     print(f"[watchdog] could not route to manager for {issue_key} — needs human attention", file=sys.stderr)
 

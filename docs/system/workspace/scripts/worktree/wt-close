@@ -974,7 +974,19 @@ except: pass
 
       # Gracefully close ACP session before marking task completed
       if [[ -n "$_wsession" ]]; then
-        _acp_session_close "$PROJECT_ROOT" "$_wsession"
+        _acp_bridge="/tmp/freely-acp-$(python3 -c "import hashlib,os; print(hashlib.sha256(os.path.abspath('$PROJECT_ROOT').encode()).hexdigest()[:16])" 2>/dev/null).sock"
+        if [[ -S "$_acp_bridge" ]]; then
+          python3 -c "
+import json, socket
+req = json.dumps({'jsonrpc':'2.0','id':1,'method':'session/close','params':{'sessionId':'$_wsession'}}) + '\n'
+s = socket.socket(socket.AF_UNIX); s.settimeout(5)
+try:
+    s.connect('$_acp_bridge'); s.sendall(req.encode()); s.shutdown(socket.SHUT_WR)
+    s.recv(4096)
+except: pass
+finally: s.close()
+" 2>/dev/null || true
+        fi
       fi
       # Mark task as completed (was 'consumed' — invalid A2A state, silently rejected by SQLite CHECK)
       python3 "$_a2a_task_py" update --task-id "$_wtask_id" --state completed >/dev/null 2>&1 || true

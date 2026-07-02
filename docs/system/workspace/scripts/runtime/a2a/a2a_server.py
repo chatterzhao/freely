@@ -778,7 +778,7 @@ class A2AServer:
             for k in ["completion_summary","evidence_paths","error",
                        "reason","next_action","progress","summary","next","evidence",
                        "session_id","from_agent","needs_agent","needs_role",
-                       "raw_key","review_stage"]:
+                       "raw_key","review_stage","verdict","required_fixes"]:
                 if k in body: fields[k] = body[k]
             if "summary" in fields: fields.setdefault("completion_summary", fields.pop("summary"))
             if "next" in fields: fields.setdefault("next_action", fields.pop("next"))
