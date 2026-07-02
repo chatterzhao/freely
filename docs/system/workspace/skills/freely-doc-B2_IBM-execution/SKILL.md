@@ -259,38 +259,52 @@ phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
 > 门禁报 `missing`/`not found` 时，**先对照此树检查文件是否放对位置**，
 > 再检查文件内容。在错误路径改内容永远过不了门禁。
 
-### 规范目录树（所有文件都在 `raw-{raw-key}/` 下）
+### 规范目录树（所有产物都在 `raw-{raw-key}/` 下）
 
 ```
 docs/epics/{epic-name}/{story-name}/
-└── raw-{raw-key}/
-    ├── prd.md
-    ├── brainstorms/                          ← 多文件目录
-    │   └── b-I-{raw-key}-{suffix}.md
-    ├── issues/                               ← 多文件目录（一个 raw issue 可有多个 I-*）
-    │   ├── I-{raw-key}-A.md
-    │   └── I-{raw-key}-B.md
-    ├── verification/
+└── raw-{raw-key}/                           ← 一个 raw issue 一个目录
+    │
+    ├── prd.md                               ← M: Map 产物（需求→实现设计）
+    │
+    ├── brainstorms/                          ← B: Brainstorm 产物（每个 I-* 一个）
+    │   ├── b-I-{raw-key}-A.md               ← I-{raw-key}-A 的头脑风暴
+    │   └── b-I-{raw-key}-B.md               ← I-{raw-key}-B 的头脑风暴
+    │
+    ├── issues/                               ← M: Map 物化产物（I-* issue）
+    │   ├── I-{raw-key}-A.md                 ← suffix 与 brainstorms 一一对应
+    │   └── I-{raw-key}-B.md                 ← 一个 raw issue 可有多个 I-*
+    │
+    ├── verification/                         ← M: Map 产物（测试方案+分解）
     │   ├── pre-tests.md
     │   ├── tasks.md
     │   └── test-evidence/                    ← 多文件目录
     │       └── acceptance-*.log
-    └── code-reviews/                         ← 多文件目录
+    │
+    └── code-reviews/                         ← M: Map 产物（评审记录）
         ├── implementation-decision-note.md
         └── pr-review-*.md
 ```
 
-> 路径中的 `{epic-name}` 和 `{story-name}` 由 B2_IBM 的步骤 0 决定（按语义判断能力域和可交付切片）。
+> **IBM 四节点链路**: raw issue (Input) → candidate (B1 预研) → **I-* issue (B2 物化)** → dev-loop 实现。
+> 本目录树全部是 **B2_IBM 的 M (Map) 阶段产物**——I-* issue、prd.md、pre-tests.md、tasks.md、code-reviews 都是 B2 的**输出**，不是输入。
+> 路径中的 `{epic-name}` 和 `{story-name}` 由 B2_IBM 的步骤 0 决定。
 > `{raw-key}` = raw issue 的时间戳 key（如 `20260701T085407Z`）。
+> `{suffix}` = candidate suffix（A/B/C），`brainstorms/` 和 `issues/` 中同名 suffix 一一对应。
 
-### raw issue → candidate → I-* issue 链路
+### IBM 四节点全链路（Input → B1 → B2 → dev）
 
-| 节点 | 路径 | 谁创建 | 何时 |
-|------|------|--------|------|
-| raw issue | `docs/issues/raw-{key}/issue.md` | `freely wt-create` | B1 之前 |
-| brainstorms | `docs/pre-brainstorms/{key}--{slug}/brainstorms.md` | skill `freely-doc-B1_IBM-execution` | B1 Brainstorm |
-| candidate | `docs/pre-brainstorms/{key}--{slug}/candidates.md` | skill `freely-doc-B1_IBM-execution` | B1 Milestone |
-| I-* issue | `docs/epics/{epic}/{story}/raw-{raw-key}/issues/I-{raw-key}-{suffix}.md` | **skill `freely-doc-B2_IBM-execution`（本 skill）** | B2 Map（物化） |
+| 阶段 | 节点 | 路径 | 谁创建 |
+|------|------|------|--------|
+| **I** (Input) | raw issue | `docs/issues/raw-{key}/issue.md` | `freely wt-create` |
+| **B1** (Brainstorm) | brainstorms | `docs/pre-brainstorms/{key}--{slug}/brainstorms.md` | skill `freely-doc-B1_IBM-execution` |
+| **B1** (Milestone) | candidate | `docs/pre-brainstorms/{key}--{slug}/candidates.md` | skill `freely-doc-B1_IBM-execution` |
+| **B2** (Brainstorm) | b-I-* | `docs/epics/{epic}/{story}/raw-{raw-key}/brainstorms/b-I-{raw-key}-{suffix}.md` | skill `freely-doc-B2_IBM-execution`（本 skill） |
+| **B2** (Map 物化) | I-* issue | `docs/epics/{epic}/{story}/raw-{raw-key}/issues/I-{raw-key}-{suffix}.md` | skill `freely-doc-B2_IBM-execution`（本 skill） |
+
+> **关键区分**: B1 阶段产出 key（I-{key}-{suffix}），在 B2 阶段物化为 `raw-{key}/issues/` 下的真实文件。
+> `brainstorms/b-I-{key}-A.md` 与 `issues/I-{key}-A.md` suffix 一一对应——B 研究的就是这个 I-* issue 的实现方案。
+> I-* issue 是 B2 的**输出**（Map 物化产物），不是输入。
 
 ### B2 设计产物（本 skill 负责创建）
 
