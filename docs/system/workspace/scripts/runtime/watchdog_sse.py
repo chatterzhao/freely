@@ -312,6 +312,10 @@ def _handle_needs_reviewer(project: str, metadata: dict, reason: InputRequiredRe
             if _acp_session_prompt(project, sid, task_msg):
                 print(f"[watchdog] review task delivered to reviewer {sid[:20]}... for {raw_key}", file=sys.stderr)
                 return
+            # Prompt failed (session dead / bridge error) — log and return.
+            # Do NOT fall through: would allocate a second reviewer for same raw_key.
+            print(f"[watchdog] reviewer session {sid[:20]}... prompt failed for {raw_key}, will retry on next cycle", file=sys.stderr)
+            return
         else:
             # Reviewer assigned but session dead → try fork from Manager, then new
             rid = existing["reviewer_id"].split(":")[0] if ":" in str(existing.get("reviewer_id", "")) else existing.get("reviewer_id", "")
@@ -368,10 +372,11 @@ def _create_reviewer_session(project: str, raw_key: str, reviewer_id: str,
     # Record assignment in agent_working
     if session_id:
         agent_assign(project, raw_key, "reviewer", f"{reviewer_id}:{session_id}")
-        print(f"[watchdog] reviewer {reviewer_id} session={session_id} mode={session_mode} for {raw_key}", file=sys.stderr)
+        print(f"[watchdog] reviewer {reviewer_id} session={session_id[:20]}... mode={session_mode} for {raw_key}", file=sys.stderr)
         # Deliver the review task to the newly created session
         task_msg = _build_review_task_message(raw_key, from_agent, reason)
-        _acp_session_prompt(project, session_id, task_msg)
+        if not _acp_session_prompt(project, session_id, task_msg):
+            print(f"[watchdog] WARNING: task delivery failed for {reviewer_id} session={session_id[:20]}...", file=sys.stderr)
     else:
         # Session creation failed — record assignment for retry
         agent_assign(project, raw_key, "reviewer", reviewer_id)
@@ -478,13 +483,28 @@ def _handle_needs_worker(project: str, metadata: dict, reason: InputRequiredReas
 
 def _build_worker_verdict_message(raw_key: str, from_agent: str,
                                    reason: InputRequiredReason, metadata: dict) -> str:
-    """Build the verdict/fix message for a Worker session."""
-    return (
-        f"[Freely Watchdog] {from_agent} 有反馈给你。\n"
-        f"raw_key: {raw_key}\n"
-        f"原因: {reason.value}\n"
-        f"请根据 Skill 指令处理，完成后调 a2a-exit 声明状态。"
-    )
+    """Build the verdict/fix message for a Worker session.
+
+    Includes verdict details from metadata (if available) so the Worker
+    doesn't need to query a2a_tasks for the reviewer's findings.
+    """
+    parts = [
+        f"[Freely Watchdog] {from_agent} 有反馈给你。",
+        f"raw_key: {raw_key}",
+        f"原因: {reason.value}",
+    ]
+    # Include reviewer's verdict details if present in SSE metadata
+    verdict = metadata.get("verdict", "")
+    if verdict:
+        parts.append(f"审查结论: {verdict}")
+    summary = metadata.get("summary", metadata.get("completion_summary", ""))
+    if summary:
+        parts.append(f"摘要: {summary}")
+    message = metadata.get("message", "")
+    if message:
+        parts.append(f"消息: {message}")
+    parts.append("请根据 Skill 指令处理，完成后调 a2a-exit 声明状态。")
+    return "\n".join(parts)
 
 
 # ── C12: Agent crash detection ────────────────────────────────────────────────

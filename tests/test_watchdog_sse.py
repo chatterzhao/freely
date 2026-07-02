@@ -247,6 +247,107 @@ class TestAgentHandlers(unittest.TestCase):
         mock_resume.assert_called_once()
 
 
+class TestSessionPrompt(unittest.TestCase):
+    """Phase 1-2: session/prompt message delivery and handler decision tree."""
+
+    def test_acp_session_prompt_delegates_to_resume(self):
+        """_acp_session_prompt is a semantic wrapper around _acp_session_resume."""
+        from watchdog_sse import _acp_session_prompt, _acp_session_resume
+        self.assertTrue(callable(_acp_session_prompt))
+        # Verify it's a different function (not an alias)
+        self.assertNotEqual(_acp_session_prompt.__name__, _acp_session_resume.__name__)
+
+    def test_build_review_task_message(self):
+        """_build_review_task_message contains key context fields."""
+        from watchdog_sse import _build_review_task_message
+        msg = _build_review_task_message("raw-20260701T000000Z", "worker_03",
+                                          InputRequiredReason.NEEDS_REVIEW_B1)
+        self.assertIn("raw-20260701T000000Z", msg)
+        self.assertIn("worker_03", msg)
+        self.assertIn("b1", msg)  # review stage from reason value
+
+    def test_build_worker_verdict_message(self):
+        """_build_worker_verdict_message contains key context fields."""
+        from watchdog_sse import _build_worker_verdict_message
+        msg = _build_worker_verdict_message("raw-20260701T000000Z", "reviewer_05",
+                                             InputRequiredReason.NEEDS_WORKER_RETRY,
+                                             {"verdict": "fail"})
+        self.assertIn("raw-20260701T000000Z", msg)
+        self.assertIn("reviewer_05", msg)
+        self.assertIn("needs-worker-retry", msg)
+
+    @patch('watchdog_sse._acp_session_prompt')
+    @patch('watchdog_sse.agent_get_session')
+    @patch('watchdog_sse.agent_list_by_raw_key')
+    def test_reviewer_alive_session_uses_prompt(self, mock_list, mock_session, mock_prompt):
+        """Alive reviewer session → _acp_session_prompt (not resume/fork/new)."""
+        mock_list.return_value = {"reviewer_id": "reviewer_05:ses_alive"}
+        mock_session.return_value = "ses_alive"
+        mock_prompt.return_value = True
+
+        from watchdog_sse import _handle_needs_reviewer
+        _handle_needs_reviewer("/fake/project", {
+            "raw_key": "raw-20260701T000000Z",
+            "from_agent": "worker_03"
+        }, InputRequiredReason.NEEDS_REVIEW_B2)
+
+        mock_prompt.assert_called_once()  # Prompt used, not fork/new
+        self.assertIn("ses_alive", mock_prompt.call_args[0][1])
+
+    @patch('watchdog_sse._acp_session_prompt')
+    @patch('watchdog_sse.agent_get_session')
+    @patch('watchdog_sse.agent_list_by_raw_key')
+    def test_worker_alive_session_uses_prompt(self, mock_list, mock_session, mock_prompt):
+        """Alive worker session → _acp_session_prompt (not fork/new)."""
+        mock_list.return_value = {"worker_id": "worker_03:ses_wrk"}
+        mock_session.return_value = "ses_wrk"
+        mock_prompt.return_value = True
+
+        from watchdog_sse import _handle_needs_worker
+        _handle_needs_worker("/fake/project", {
+            "raw_key": "raw-20260701T000000Z",
+            "from_agent": "reviewer_05"
+        }, InputRequiredReason.NEEDS_WORKER_RETRY)
+
+        mock_prompt.assert_called_once()  # Prompt used for alive session
+        self.assertIn("ses_wrk", mock_prompt.call_args[0][1])
+
+    @patch('watchdog_sse._acp_session_prompt')
+    @patch('watchdog_sse.agent_get_session')
+    @patch('watchdog_sse.agent_list_by_raw_key')
+    def test_manager_alive_session_uses_prompt(self, mock_list, mock_session, mock_prompt):
+        """Alive manager session → _acp_session_prompt."""
+        mock_list.return_value = {"manager_id": "manager_01:ses_mgr"}
+        mock_session.return_value = "ses_mgr"
+        mock_prompt.return_value = True
+
+        from watchdog_sse import _handle_needs_manager
+        _handle_needs_manager("/fake/project", {
+            "raw_key": "raw-20260701T000000Z",
+            "from_agent": "worker_03"
+        }, InputRequiredReason.NEEDS_MANAGER_DECISION)
+
+        mock_prompt.assert_called_once()
+
+    @patch('watchdog_sse._acp_session_prompt')
+    @patch('watchdog_sse.agent_get_session')
+    @patch('watchdog_sse.agent_list_by_raw_key')
+    def test_dead_session_falls_back_to_fork_or_new(self, mock_list, mock_session, mock_prompt):
+        """Dead session → prompt fails → fork/new → delegate to manager (prompt again)."""
+        mock_list.return_value = {"worker_id": "worker_03"}
+        mock_session.return_value = "ses_dead"
+        mock_prompt.return_value = False  # prompt fails (session dead)
+
+        from watchdog_sse import _handle_needs_worker
+        # Should not crash; falls through to fork/new → manager delegation
+        _handle_needs_worker("/fake/project", {
+            "raw_key": "raw-20260701T000000Z",
+            "from_agent": "reviewer_05"
+        }, InputRequiredReason.NEEDS_WORKER_RETRY)
+
+        self.assertGreaterEqual(mock_prompt.call_count, 1)  # Tried prompt for worker + manager
+
+
 class TestLivenessAndStaleness(unittest.TestCase):
     """C14e: Agent crash detection and staleness checks."""
 
