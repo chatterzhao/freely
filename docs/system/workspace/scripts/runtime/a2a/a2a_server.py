@@ -547,6 +547,7 @@ class A2AServer:
             Route("/tasks", self._tasks_endpoint, methods=["GET", "POST"]),
             Route("/tasks/latest-manager", self._latest_manager, methods=["GET"]),
             Route("/tasks/launched-pids", self._launched_pids, methods=["GET"]),
+            Route("/tasks/stream", self._global_task_stream_endpoint, methods=["GET"]),
             Route("/tasks/{task_id:path}", self._task_endpoint, methods=["GET", "PATCH"]),
             Route("/tasks/{task_id}/stream", self._task_stream_endpoint, methods=["GET"]),
         ])
@@ -558,6 +559,34 @@ class A2AServer:
         """Lazy-init SSE subscriber registry."""
         if not hasattr(self, '_sse_subscribers'):
             self._sse_subscribers: dict[str, list] = {}
+
+    async def _global_task_stream_endpoint(self, request: Request):
+        """Global SSE endpoint: stream ALL task state changes. Used by Runtime Watchdog."""
+        self.__init_sse()
+        queue: asyncio.Queue = asyncio.Queue()
+        global_key = "__global__"
+        if global_key not in self._sse_subscribers:
+            self._sse_subscribers[global_key] = []
+        self._sse_subscribers[global_key].append(queue)
+
+        async def event_generator():
+            try:
+                while True:
+                    event = await queue.get()
+                    event_type = event.get("event", "message")
+                    data = json.dumps(event.get("data", {}), default=str)
+                    yield f"event: {event_type}\ndata: {data}\n\n"
+            except asyncio.CancelledError:
+                pass
+            finally:
+                if global_key in self._sse_subscribers and queue in self._sse_subscribers[global_key]:
+                    self._sse_subscribers[global_key].remove(queue)
+
+        return Response(
+            event_generator(),
+            media_type="text/event-stream",
+            headers={"Cache-Control": "no-cache", "Connection": "keep-alive", "X-Accel-Buffering": "no"},
+        )
 
     async def _task_stream_endpoint(self, request: Request):
         """SSE endpoint: stream task state changes as Server-Sent Events.
@@ -602,7 +631,11 @@ class A2AServer:
     async def _notify_sse(self, task_id: str, event_type: str, data: dict):
         """Notify all SSE subscribers for a task of a state change."""
         self.__init_sse()
+        # Notify per-task subscribers
         for q in self._sse_subscribers.get(task_id, []):
+            await q.put({"event": event_type, "data": data})
+        # Also notify global subscribers (Runtime Watchdog)
+        for q in self._sse_subscribers.get("__global__", []):
             await q.put({"event": event_type, "data": data})
 
     # ── Endpoints ──────────────────────────────────────────────────────
