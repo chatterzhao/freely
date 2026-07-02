@@ -19833,6 +19833,17 @@ cmd_ensure_interruption_dispatch_watch() {
   done
 }
 
+_start_watchdog_sse_py() {
+  local project="$1"
+  local _watchdog_py="${project}/docs/system/workspace/scripts/runtime/watchdog_sse.py"
+  local _a2a_socket; _a2a_socket="/tmp/freely-a2a-$(python3 -c "import hashlib,os; print(hashlib.sha256(os.path.abspath('${project}').encode()).hexdigest()[:16])" 2>/dev/null)"
+  if [[ -f "$_watchdog_py" && -S "$_a2a_socket" ]]; then
+    log_info "starting watchdog_sse.py for $project"
+    nohup python3 "$_watchdog_py" --project "$project" --a2a-socket "$_a2a_socket" </dev/null >>"$project/.freely/run/watchdog-sse.log" 2>&1 &
+    disown $!
+  fi
+}
+
 cmd_ensure_sse_watchdog_watch() {
   local project="$1" interval="$2" pid_file existing_pid
   pid_file="$(sse_watchdog_pid_file "$project")"

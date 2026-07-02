@@ -531,6 +531,24 @@ class A2AServer:
                             "completion_summary": note[:200]})  # truncated for DB
                     except Exception:
                         pass
+            # Phase 1: attempt ACP session/resume for working agents after restore
+            try:
+                import subprocess, os as _os
+                aw_py = _os.path.join(self.project, 'docs', 'system', 'workspace', 'scripts', 'runtime', 'agent_working.py')
+                if _os.path.exists(aw_py):
+                    subprocess.run([_sys.executable, '-c', f'''
+import sys; sys.path.insert(0, "{self.project}/docs/system/workspace/scripts/runtime")
+from agent_working import _db_rpc
+rows = _db_rpc("{self.project}", "agent_working.get_all", {{}}).get("rows", [])
+for r in rows:
+    for role in ("manager", "worker", "reviewer"):
+        val = r.get(f"{{role}}_id", "")
+        if val and ":" in str(val):
+            raw_key = r.get("raw_key", "")
+            print(f"[restore] agent {{role}} session present for {{raw_key}}", file=_sys.stderr)
+'''], timeout=10)
+            except Exception:
+                pass
         except Exception:
             pass  # DB not available → start with empty TaskStore (降级运行)
 
