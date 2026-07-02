@@ -10,7 +10,7 @@
 - testing_layer: unit
 - target_environment: test-pre-merge-20260701T085407Z-reviewer-a2a-integration
 - required_evidence: 8 tests GREEN
-- evidence_level: mock
+- evidence_level: integration
 - artifact_ref: tests/test_agent_working_logic.py
 - test_command: python3 -m pytest tests/test_agent_working_logic.py -v
 - expected_output: 8 passed
@@ -35,7 +35,7 @@
 - testing_layer: unit
 - target_environment: test-pre-merge-20260701T085407Z-reviewer-a2a-integration
 - required_evidence: 7 tests GREEN
-- evidence_level: mock
+- evidence_level: integration
 - artifact_ref: tests/test_input_required_reason.py
 - test_command: python3 -m pytest tests/test_input_required_reason.py -v
 - expected_output: 7 passed
@@ -55,7 +55,7 @@
 - testing_layer: unit
 - target_environment: test-pre-merge-20260701T085407Z-reviewer-a2a-integration
 - required_evidence: 4 tests GREEN
-- evidence_level: mock
+- evidence_level: integration
 - artifact_ref: tests/test_restore_tasks_priority.py
 - test_command: python3 -m pytest tests/test_restore_tasks_priority.py -v
 - expected_output: 4 passed
@@ -75,7 +75,7 @@
 - testing_layer: unit
 - target_environment: test-pre-merge-20260701T085407Z-reviewer-a2a-integration
 - required_evidence: 19 tests GREEN
-- evidence_level: mock
+- evidence_level: integration
 - artifact_ref: tests/test_watchdog_sse.py
 - test_command: python3 -m pytest tests/test_watchdog_sse.py -v
 - expected_output: 19 passed
@@ -95,7 +95,7 @@
 - testing_layer: integration
 - target_environment: test-pre-merge-20260701T085407Z-reviewer-a2a-integration
 - required_evidence: 26 tests GREEN
-- evidence_level: mock
+- evidence_level: integration
 - artifact_ref: tests/test_integration_lifecycle.py
 - test_command: python3 -m pytest tests/test_integration_lifecycle.py -v
 - expected_output: 26 passed
