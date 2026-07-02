@@ -42,7 +42,7 @@ description: >- 讨论归档 skill。分析讨论 session、产出评论或 raw 
 ### 6. 关闭
 - SQLite discussions 表 status → closed
 - adapter close-discussion 关闭平台 Discussions
-- 平台关闭确认后 → 移出 agent-id.env 对应条目
+- 平台关闭确认后 → 移出 agent_working 对应条目（agent-id.env 已废弃）
 
 ## 不负责
 - 不自动触发（纯手工 via cmd_discuss --archive）

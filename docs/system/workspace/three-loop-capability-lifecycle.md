@@ -16,7 +16,7 @@ SVG 图展示的五层实体，从上到下、从内到外：
 |----|------|------|------|
 | **Layer 1** | Freely Runtime-managed boundary | 虚线大框 | supervisor + managed daemons 的系统边界，不等于单一进程 |
 | **Layer 2** | auto-loop / doc-loop / dev-loop | 实线泳道 / gate | lifecycle workflow surface，表达阶段、gate 和回环，不是进程 |
-| **Layer 3** | Manager Agent / Worker Agent | 虚线框 | prompt-defined AI role，由下方 AI provider 的 ACP session 执行；不是独立进程 |
+| **Layer 3** | Manager Agent / Worker Agent / Reviewer Agent | 虚线框 | prompt-defined AI role，由下方 AI provider 的 ACP session 执行；不是独立进程 |
 | **Layer 3a** | M-Skills / W-Skills | 点线框 | instruction / capability modules，被 Manager / Worker role 选择和消费；不是 Actor |
 | **Layer 4** | ACP Bridge / A2A Server / freely-db daemon / SQLite-WAL | 服务框 + 存储框 | ACP Bridge/A2A Server/freely-db daemon 是服务/守护进程；SQLite/WAL 是 durable datastore 文件 |
 | **Layer 5** | AI provider / AI CLI tool (Claude Code/codex/opencode/...) | 外部进程框 | 外部 AI 执行提供层；Freely 通过 ACP 对其发 prompt、resume/fork session 并接收 stopReason |
@@ -36,7 +36,7 @@ SVG 图展示的五层实体，从上到下、从内到外：
     **故障检测分层** (#3301/#3303):
     - **Layer 1 (通用)**: idle timeout / network failure / quota exhausted — 所有工具生效。idle timeout 默认 180s，超时后不重试，直接触发 auto-recovery。
     - **Layer 2 (工具专属)**: codex rate-limit / kiro monthly-limit — 按工具注册的故障模式。
-- **A2A (Agent-to-Agent Protocol)**：Manager role 与 Worker role 之间的 task coordination / state / notification protocol。A2A Server 是 coordination service；`a2a_task.py` / `a2a-exit` 是 CLI client/tool。Manager 用 `a2a-exit --state submitted --role worker` 创建 Worker Task（**必须用 `--role worker`，不能使用已废弃的 `--agent-id worker`**，否则 Task 会以默认 `agent_id=manager` 创建，Runtime 无法发现）。Runtime 通过 `list --role worker --status submitted` 发现 pending Task → 生成 Worker prompt file → ACP Bridge 启动独立 Worker ACP session。Worker 完成后调用 `a2a-exit --state completed` → A2A task state 更新 + SSE 通知 Manager。旧 `handoffs` 文件/表语义已被 `a2a_tasks` 取代。
+- **A2A (Agent-to-Agent Protocol)**：Manager / Worker / Reviewer 三角色之间的 task coordination / state / notification protocol。A2A Server 是 coordination service；`a2a_task.py` / `a2a-exit` 是 CLI client/tool。Manager 用 `a2a-exit --state submitted --role worker` 创建 Worker Task（**必须用 `--role worker`，不能使用已废弃的 `--agent-id worker`**，否则 Task 会以默认 `agent_id=manager` 创建，Runtime 无法发现）。Runtime 通过 `list --role worker --status submitted` 发现 pending Task → 生成 Worker prompt file → ACP Bridge 启动独立 Worker ACP session。Worker 完成后调用 `a2a-exit --state completed` 或 PATCH `state=input-required`（携带 `reason` Enum 值触发 Reviewer 路由）→ A2A task state 更新 + `_notify_sse()` 推送到全局流 (`GET /tasks/stream`) + 按 task_id 推送到单 task subscriber。watchdog_sse.py 订阅全局流，按 `InputRequiredReason` 枚举值路由到 Manager/Worker/Reviewer。旧 `handoffs` 文件/表语义已被 `a2a_tasks` 取代。
 
 ### SQLite 表职责
 
@@ -49,6 +49,7 @@ SQLite 不是单一职责的 crash-recovery 文件；不同表在 Freely runtime
 | `sessions` | ACP session、tool adapter、launch_kind、父子 session 关系 |
 | `tool_failure_log` / `tool_switch_events` | tool availability、slot-first recovery、跨工具切换证据 |
 | `task_mode_gate` | `auto` / `wait` / `listen` 模式门控 |
+| `agent_working` | agent-worktree-session 绑定（替代 agent-id.env）。raw_key 为主键，manager_id/worker_id/reviewer_id 列存 `agent_id:session_id` 格式。reviewer 逗号分隔多对 |
 
 ### 关键数据流
 
@@ -77,10 +78,20 @@ scan (文件系统读取) ──→ intake gate ──→ routing ──→ disp
               │                               │
               └───────────┬───────────────────┘
                           ▼
-              a2a-exit --state completed
-                          │
-                          ▼
-              SSE → Manager 下一轮 patrol → test gate → ... → closeout
+              a2a-exit --state completed   OR   PATCH state=input-required (reason=needs-review:*)
+                          │                                    │
+                          ▼                                    ▼
+              SSE → Manager 下一轮 patrol        SSE global stream → watchdog_sse.py
+                                                    │
+                                                    ├─ InputRequiredReason 路由 (6向+兜底)
+                                                    ├─ agent_working.next_free → Reviewer 分配
+                                                    └─ ACP session/new → Reviewer Agent 启动
+                                                        │
+                                                        ▼
+                                              Reviewer 审查 → PATCH verdict (pass/fail)
+                                                        │
+                                              pass? → SSE → Manager/Worker 继续
+                                              fail? → needs-worker-retry → Worker 重做
 
 Manager 是常驻 session，Runtime 通过 session/prompt 驱动每轮 patrol。
 a2a-exit 提交本轮决策后回到守候，进程不休。
@@ -96,11 +107,13 @@ Manager 决策出口（manager_exit_contract_kind）:
 
 | Loop | 驱动源 | 角色 | 核心职责 |
 |------|--------|------|---------|
-| **auto-loop** | task-mode (auto/wait/listen) → scan + A2A/continuity evidence | 主管 (Manager) | 信号接收 → 路由分发 → gate 序列 → 收口 |
-| **doc-loop** | auto-loop dispatch gate → 委派 Worker | Worker | B1_IBM (预研) → B2_IBM (设计) |
-| **dev-loop** | auto-loop dispatch gate → 委派 Worker | Worker | 实现 → 测试 → 证据 |
+| **auto-loop (L3)** | task-mode (auto/wait/listen) → scan + A2A SSE + continuity evidence | Manager + Runtime Watchdog | 信号接收 → 路由分发 → gate 序列 → Reviewer 调度 → 收口 |
+| **doc-loop (L1)** | auto-loop dispatch gate → 委派 Worker → Reviewer 审查 | Worker + Reviewer | B1_IBM (预研) → Reviewer → B2_IBM (设计) → Reviewer |
+| **dev-loop (L2)** | auto-loop dispatch gate → 委派 Worker → Reviewer 审查 | Worker + Reviewer | RED → Reviewer → dev → Reviewer → test-GREEN → Reviewer |
 
-auto-loop 是唯一的调度中枢。doc-loop 和 dev-loop 不自行启动，始终由 auto-loop 的 dispatch gate 触发，完成后返回 auto-loop 继续下一 gate。
+auto-loop 是唯一的调度中枢。doc-loop 和 dev-loop 不自行启动，始终由 auto-loop 的 dispatch gate 触发。
+每阶段完成后通过 A2A SSE (input-required + reason Enum) 触发 Reviewer 审查，
+审查通过后返回继续下一阶段，完成后返回 auto-loop 继续下一 gate。
 
 ## auto-loop（主管调度层）
 
@@ -157,8 +170,8 @@ submitted ──→ working (launched) ──→ completed
 - `working`: Worker ACP session 已启动
 - `completed`: Worker 正常完成
 - `failed`: Worker 异常退出
-- `input-required`: Worker 需要 Manager 提供额外输入
-- `pending-input`: Worker 等待外部输入
+- `input-required`: Worker/Manager/Reviewer 需要其他 agent 介入。携带 `reason` 字段（InputRequiredReason Enum，12值），通过 A2A SSE 全局流推送到 watchdog_sse.py，按 `needs_role` 路由到 Manager/Worker/Reviewer，触发 ACP session/new 或 session/resume
+- `pending-input`: 等待外部输入（human interruption 等）
 
 #### test gate（阶段7）
 - 触发: dev-loop 返回 evidence 就绪

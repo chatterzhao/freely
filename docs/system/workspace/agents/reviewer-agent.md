@@ -1,35 +1,62 @@
-# Reviewer Agent
+# Reviewer Agent (v2 — ACP + A2A SSE 集成)
 
-独立评审 agent。非 Worker 上下文——必须 fork Manager session，禁止 fork Worker session（自己评审自己会导致结论不中立甚至耍滑头）。
+独立评审 agent。通过 A2A SSE 事件驱动 + ACP session/new 启动，按 InputRequiredReason
+枚举值路由到对应审查阶段。与 Worker/Manager 通过 agent_working 表 + raw_key 关联。
 
 ## 角色
 
-- **独立 session**：不同 AI session，无上下文共享
-- **工作目录**：Manager 触发 → develop 工位（代码已合并）；Worker 触发 → test-pre-merge 工位（pr-review-guarded）
-- **不创建独立工位**：评审在已有工位进行
+- **独立 ACP session**：watchdog_sse.py 检测到 needs-review 后通过 ACP bridge 创建
+- **工作目录**：test-pre-merge-{raw_key}-{slug} 工位（git worktree 隔离）
+- **pool=99**：独立 reviewer 池，与 worker pool 解耦
 - **零容忍**：糊弄测试是导致项目失败的严重失职行为
 
-## 启动方式
+## 启动方式（v2 架构）
 
-### Worker 路径（pr-review-guarded，ACP sync）
-
-```
-Worker 完成 → pr-review-guarded
-  → 读 agent-id.env → 找当前工位 raw-key
-  → agent-table-query --get-reviewer <worker_id> → reviewer_id + reviewer_slot
-  → AGENT_AI_TOOL = reviewer_slot
-  → fork MANAGER session（非 Worker session!）
-  → 在 test-pre-merge 工位执行 freely-tdd-review
-```
-
-### Manager 路径（SSE 触发，A2A async）
+### 事件驱动路径（A2A SSE → watchdog → ACP session/new）
 
 ```
-Runtime SSE 收到 worker_done
-  → 启动 reviewer_manager_01
-  → AGENT_AI_TOOL = reviewer_slot（来自 agent-table.toml）
-  → fork MANAGER session
-  → 审查已合并的 develop 代码
+Worker PATCH /tasks/{id} {state: "input-required", reason: "needs-review:b1", ...}
+  → A2A Server._notify_sse() → SSE 全局流 (GET /tasks/stream)
+    → watchdog_sse.py._handle_sse_event()
+      → InputRequiredReason.from_string(reason) → needs_role = "reviewer"
+        → _handle_needs_reviewer()
+          ├─ agent_list_by_raw_key(project, raw_key) → 已分配? skip
+          ├─ agent_next_free(project, "reviewer", 99) → reviewer_NN
+          ├─ agent_assign(project, raw_key, "reviewer", reviewer_NN)
+          └─ _acp_session_new(project, "reviewer", reviewer_NN, raw_key)
+              → ACP bridge socket → session/new → agent 启动
+```
+
+### 轮询降级路径（freely-cycle fallback）
+
+```
+Manager daemon → freely-cycle --all → 轮询 a2a_tasks
+  → 检测 state=input-required + review_assigned=false
+    → agent_next_free("reviewer", 99) → agent_assign
+      → agent_working 表标记（不启动进程，等 watchdog 接管）
+```
+
+## 审查阶段路由（InputRequiredReason）
+
+| Enum 值 | review_stage | 触发时机 | 审查内容 |
+|---------|-------------|---------|---------|
+| `needs-review:b1` | b1 | B1 完成 | brainstorms.md + candidates.md 根因分析质量 |
+| `needs-review:b2` | b2 | B2 完成 | PRD/pre-tests 是否覆盖改动面 |
+| `needs-review:red` | red | RED 完成 | actual_RED_output 是否真实（非 placeholder） |
+| `needs-review:dev` | dev | dev 完成 | 代码是否按 TDD 实现，commit 完整性 |
+| `needs-review:test` | test | test-GREEN 完成 | 测试证据是否真实，全 GREEN |
+| `needs-review:gate` | gate | PR 前 | 门禁合规检查（epics-map, IBM lifecycle） |
+
+不通过 → `needs-worker-retry`（打回 Worker 重做）。
+通过 → `state=completed, verdict=pass` → Manager SSE 收到 → 进入下一阶段。
+
+## 6 向通信路由中的 Reviewer
+
+```
+#1 Worker → Reviewer: needs-review:*  → SSE push → watchdog → ACP session/new
+#3 Reviewer → Worker: needs-worker-retry → SSE push → watchdog → ACP session/resume
+#4 Reviewer → Manager: needs-manager-scope → SSE push → watchdog → ACP session/resume
+#5 Manager → Reviewer: needs-review:gate → freely-cycle dispatch
 ```
 
 ## Tool Policy
@@ -42,6 +69,7 @@ Runtime SSE 收到 worker_done
 | Skill | 何时调用 |
 |-------|---------|
 | `skill:freely-tdd-review` | 四层评审（Clean&Sync → 代码质量 → 完整度 → 代码安全） |
+| `skill:freely-candidate-acceptance-review` | candidate promotion 前 acceptance criteria 审查 |
 | `skill:freely-constitution-guard` | 宪法合规预检 |
 | `skill:freely-laws-enforcer` | 法律级验收检查 |
 
@@ -73,7 +101,7 @@ ps, ls, cat, head, tail, wc, grep, find
 
 ### 输入
 
-1. 待审分支 / raw-key
+1. 待审分支 / raw-key（从 A2A task metadata 获取）
 2. `pre-tests.md`（含 actual_output + evidence_file）
 3. `git diff <branch>..HEAD` — 差异应只有测试结果
 4. raw issue 的 acceptance_criteria
@@ -106,7 +134,7 @@ ps, ls, cat, head, tail, wc, grep, find
 
 - 第 1 轮：全面审查
 - 第 2+ 轮：重点审上一轮的 required_fixes
-- 3 轮未过 → escalate，等 Manager 裁定
+- 3 轮未过 → escalate，reason=`needs-manager-scope` → Manager 裁定
 
 ### 不可逾越底线（直接 fail）
 
@@ -114,34 +142,61 @@ ps, ls, cat, head, tail, wc, grep, find
 - 全部 not_applicable 且理由敷衍（"不适用"三个字）
 - status=pass 但 actual_output 为空或 "(执行后填写)"
 
-## 与 Manager / Worker 的交互
+## 与 Manager / Worker 的交互（v2）
 
 ```
-Manager 委派 Worker → Worker 完成 (worker_done)
-  → Runtime SSE 收到 worker_done → 触发 reviewer_manager_01
-  → Reviewer fork Manager session → 独立评审
-  → pass → Manager 收口
-  → fail → Manager 创建 follow-up issue 或 reopen raw issue
+L1 Doc Loop:
+  Worker B1 完成 → PATCH input-required (needs-review:b1)
+    → SSE → watchdog → Reviewer ACP session/new
+      → Reviewer 审查 → pass? → Worker B2
+                      → fail? → needs-worker-retry → Worker 重做 B1
+
+L2 Dev Loop:
+  Worker RED/dev/test 完成 → input-required (needs-review:red/dev/test)
+    → SSE → watchdog → Reviewer ACP session/new
+      → pass? → 下一阶段
+      → fail? → Worker 重做
+
+L3 Auto Loop:
+  pr-create/pr-merge gate 自动检查 + Reviewer 可选审查
+    → pass? → merge → wt-close (ACP close + agent_working release)
+    → fail? → 修复 → 重试
 ```
 
-Worker 不直接调用 Reviewer。Review 由 Manager 或 Runtime 触发。
+Worker 不直接调用 Reviewer。Review 由 A2A SSE 事件 + watchdog 路由触发。
+Manager 通过 freely-cycle 轮询作为 fallback。
 
-## agent-table 配置
+## agent_working 绑定
+
+Reviewer 分配后写入 agent_working 表：
+
+```
+raw_key = "raw-20260701T085407Z"
+reviewer_id = "reviewer_05:ses_abc123"  -- agent_id:session_id 格式
+```
+
+wt-close 时释放：
+- `_acp_agent_session_close(project, "reviewer", raw_key)` → ACP session/close
+- `agent_release_all(project, raw_key)` → 清除 agent_working 行
+
+## agent-table.toml 配置
 
 ```toml
 [[agents]]
-manager_id = "manager_01"
-manager_slot = "claude-apikey-ds-pro-auto"
-reviewer_id = "reviewer_manager_01"
+role = "reviewer"
+reviewer_id = "reviewer_01"
 reviewer_slot = "claude-apikey-ds-pro-auto"
-pool = 1  # 暂时只有 1 个 reviewer
-
-[[agents]]
-worker_id = "worker_01"
-worker_slot = "claude-apikey-ds-pro-auto"
-reviewer_id = "reviewer_worker_01"
-reviewer_slot = "claude-apikey-ds-pro-auto"
-pool = 10
+pool = 99
 ```
 
-Reviewer 通过 `AGENT_AI_TOOL` 使用自己的 slot，独立于 Manager/Worker 的 slot。
+Reviewer 独立 entry，pool=99 表示最多 99 个并发 reviewer。
+Slot 在 ACP session/new 时从 agent-table 读取，不在 agent-roles.toml 中。
+
+## agent-roles.toml 声明（git-tracked）
+
+```toml
+[reviewer]
+skills = ["freely-tdd-review", "freely-candidate-acceptance-review"]
+```
+
+不提 slot，不提 pool。纯能力声明。
