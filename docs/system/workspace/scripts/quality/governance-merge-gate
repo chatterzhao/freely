@@ -1559,7 +1559,7 @@ def main() -> int:
         expected_queue = queue_for_phase.get((issue.phase_state or "").strip("`").strip())
         entries = milestone_by_issue_path.get(issue.path, [])
         # Linked I-* issues: also try canonical path for milestone matching
-        # New structure: docs/epics/{epic}/{story}/raw-{raw-key}/issues/I-*.md
+        # New structure: docs/epics/{epic}/{story}/raw-{raw key}/issues/I-*.md
         if not entries and (issue.path.startswith("docs/issues/I-") or (issue.path.startswith("docs/epics/") and "/issues/I-" in issue.path)):
             try:
                 text = read_repo_text(issue.path)

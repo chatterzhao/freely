@@ -381,7 +381,7 @@ def read_issues_dir(project: Path) -> list[dict]:
                 "frontmatter": fm,
             })
 
-    # Also scan I-* issues under new structure: docs/epics/{epic}/{story}/raw-{raw-key}/issues/
+    # Also scan I-* issues under new structure: docs/epics/{epic}/{story}/raw-{raw key}/issues/
     epics_dir = project / "docs" / "epics"
     if epics_dir.is_dir():
         for mf in sorted(epics_dir.glob("*/*/raw-*/issues/I-*.md")):

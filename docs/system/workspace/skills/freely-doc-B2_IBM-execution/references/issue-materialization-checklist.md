@@ -24,9 +24,9 @@
 ```
 docs/epics/{epic-name}/                               ← epic：一个能力域
 └── {story-name}/                                     ← story：子交付批次
-    └── raw-{raw-key}/                                ← 一个 raw issue 的全部 B2 产物
-        ├── issues/I-{raw-key}-{suffix}.md            ← I-* issue（B2 物化）
-        ├── brainstorms/b-I-{raw-key}-{suffix}.md      ← B2 头脑风暴
+    └── raw-{raw key}/                                ← 一个 raw issue 的全部 B2 产物
+        ├── issues/I-{raw key}-{suffix}.md            ← I-* issue（B2 物化）
+        ├── brainstorms/b-I-{raw key}-{suffix}.md      ← B2 头脑风暴
         ├── prd.md                                    ← 本 raw 的需求设计
         ├── verification/
         │   ├── pre-tests.md                          ← 本 raw 的测试计划
@@ -35,16 +35,16 @@ docs/epics/{epic-name}/                               ← epic：一个能力域
 ```
 
 **命名约定**：
-- `raw-{raw-key}` = 完整的 raw issue local_id，如 `raw-20260628T005815Z`。`raw-` 是 raw issue 的前缀，`{raw-key}` 是时间戳 key（`YYYYMMDDTHHMMSSZ`）。**目录名必须是完整的 `raw-{raw-key}`**，不是去掉前缀的 `{raw-key}`
-- I-* 命名继承 raw key + suffix：`I-{raw-key}-{suffix}`，如 `I-20260628T005815Z-A`
-- b-I-* 命名同 I-*：`b-I-{raw-key}-{suffix}`
+- `raw-{raw key}` = 完整的 raw issue local_id，如 `raw-20260628T005815Z`。`raw-` 是 raw issue 的前缀，`{raw key}` 是时间戳 key（`YYYYMMDDTHHMMSSZ`）。**目录名必须是完整的 `raw-{raw key}`**，不是去掉前缀的 `{raw key}`
+- I-* 命名继承 raw key + suffix：`I-{raw key}-{suffix}`，如 `I-20260628T005815Z-A`
+- b-I-* 命名同 I-*：`b-I-{raw key}-{suffix}`
 
 **规则**：
-- 一个 epic 放多个 story；一个 story 放多个 `raw-{raw-key}` 目录
+- 一个 epic 放多个 story；一个 story 放多个 `raw-{raw key}` 目录
 - 新 raw → 看归哪个已有 story（如重构 story、修复 story），或新建 story
-- 同名 `raw-{raw-key}` → 续到已有 story 下的已有目录
-- 门禁检查：目录名 `raw-{raw-key}` 与 `docs/issues/raw-{raw-key}/` 的 raw issue 不匹配 → 拦截
-- 门禁检查：I-* 文件名中的 `{raw-key}` 与目录名不一致 → 拦截
+- 同名 `raw-{raw key}` → 续到已有 story 下的已有目录
+- 门禁检查：目录名 `raw-{raw key}` 与 `docs/issues/raw-{raw key}/` 的 raw issue 不匹配 → 拦截
+- 门禁检查：I-* 文件名中的 `{raw key}` 与目录名不一致 → 拦截
 
 ### 如何确定 epic-name 和 story-name
 
@@ -86,7 +86,7 @@ Epic `ai-session-continuity` 下：
    - 涉及的**能力域**与已有 epic 重叠 → 复用该 epic。例如：raw issue 修的是 session ID 提取的 OpenCode 兼容问题 → epic `ai-session-continuity`（不是 `acp-session-id-format-fix`——那是修复手段，不是能力域）
    - 涉及的**能力域**与所有已有 epic **正交**（独立可理解、独立可验收）→ 新建 epic
 4. **判 story**：
-   - 同一 epic 下已解决过这个子问题 → 续到已有 story 的 `raw-{raw-key}` 目录
+   - 同一 epic 下已解决过这个子问题 → 续到已有 story 的 `raw-{raw key}` 目录
    - 是 epic 下的新子问题 → 新建 story
 5. **不需要脚本自动化**：epic 和 story 的名字是人读的架构索引——基于语义判断，不基于关键词匹配
 6. **更新 `docs/epics-map.svg`**：新建或变更 epic/story 后必须更新 SVG。在 SVG 中添加对应的 `<rect id="epic-{name}">` 和/或 `<rect id="story-{name}">` 元素。门禁（`./bin/check-epics-map`）会检查 SVG 与 `docs/epics/` 目录结构是否对齐——不对齐则拦截
@@ -104,8 +104,8 @@ docs/epics/
 ```
 
 - **一个 epic**：放多个相关的 story
-- **一个 story**：放多个相关的 `raw-{raw-key}` 目录（continuation、closeout 等同一子问题的不同阶段）
-- **一个 `raw-{raw-key}` 目录**：一个 raw issue 的全部 B2 产物（I-* issue、brainstorms、prd、pre-tests、tasks、code-reviews）
+- **一个 story**：放多个相关的 `raw-{raw key}` 目录（continuation、closeout 等同一子问题的不同阶段）
+- **一个 `raw-{raw key}` 目录**：一个 raw issue 的全部 B2 产物（I-* issue、brainstorms、prd、pre-tests、tasks、code-reviews）
 
 #### 维护职责
 
@@ -121,7 +121,7 @@ B2_IBM 确定 epic 和 story 后，必须完成以下维护操作，不能只写
 
 - 一个 raw issue 的 scope 是一个独立子问题 → 一个 story
 - raw issue scope 太大、cover 多个独立切面 → B1_IBM 阶段拆成多个 candidate，每个 candidate → 自己的 story
-- 多个 raw issue 解决同一个子问题的不同阶段 → 同一个 story 下多个 `raw-{raw-key}` 目录
+- 多个 raw issue 解决同一个子问题的不同阶段 → 同一个 story 下多个 `raw-{raw key}` 目录
 
 #### 判定示例
 

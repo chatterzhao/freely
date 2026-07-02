@@ -31,10 +31,10 @@ session_refs: []
 - verification_artifact_dir: docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/code-reviews
 
 ## Problem
-B2 skill defines docs/epics/{epic}/{story}/raw-{raw-key}/ but code still reads/writes old paths (docs/issues/I-*, docs/epics/*/verification/).
+B2 skill defines docs/epics/{epic}/{story}/raw-{raw key}/ but code still reads/writes old paths (docs/issues/I-*, docs/epics/*/verification/).
 
 ## Scope
 6 files: bin/freely-review, bin/pr-review-guarded, checkpoint-guard, governance-merge-gate, governance-promotion-gate, task-lifecycle-scan.py.
 
 ## Acceptance
-All code uses docs/epics/*/*/raw-{raw-key}/ pattern. Existing files NOT moved.
+All code uses docs/epics/*/*/raw-{raw key}/ pattern. Existing files NOT moved.

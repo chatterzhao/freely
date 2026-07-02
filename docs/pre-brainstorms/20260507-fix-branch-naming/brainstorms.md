@@ -9,7 +9,7 @@
 - platform_state: open
 
 ### 问题陈述
-fix-execution SKILL.md 分支规范表中普通 fix 的分支前缀错误地使用了 `feature/` 而不是 `fix/`。需要将 7 处 `feature/` 统一替换为 `fix/`，并使用 `raw-{raw-key}-{slug}` 格式。
+fix-execution SKILL.md 分支规范表中普通 fix 的分支前缀错误地使用了 `feature/` 而不是 `fix/`。需要将 7 处 `feature/` 统一替换为 `fix/`，并使用 `raw-{raw key}-{slug}` 格式。
 
 ### 当前状态
 Raw issue 已确认，但未进入 B1 预研阶段。需要正式记录问题边界和影响范围。

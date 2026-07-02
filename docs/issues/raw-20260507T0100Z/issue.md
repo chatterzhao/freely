@@ -24,7 +24,7 @@ platform_state: closed
 fix-execution SKILL.md 分支规范表中普通 fix 的分支前缀是 feature/ 不是 fix/。
 
 ## 修复
-7 处 feature/ → fix/，使用 raw-{raw-key}-{slug} 格式。
+7 处 feature/ → fix/，使用 raw-{raw key}-{slug} 格式。
 
 - pre_tests_path: `docs/epics/fix-branch-naming/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/fix-branch-naming/code-reviews`
