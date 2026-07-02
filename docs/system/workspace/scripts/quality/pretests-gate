@@ -171,29 +171,29 @@ def parse_issue_binding(issue_path: str, text: str) -> tuple[str, str]:
     if not pre_tests_path:
         errors.append(
             f"{issue_path}: 缺少 pre_tests_path 字段。\n"
-            f"  在此 I-* issue 文件中添加: - pre_tests_path: docs/epics/{{epic}}/{{story}}/raw-{{raw-key}}/verification/pre-tests.md"
+            f"  在此 I-* issue 文件中添加: - pre_tests_path: docs/epics/{{epic-name}}/{{story-name}}/raw-{{raw key}}/verification/pre-tests.md"
         )
     elif not Path(pre_tests_path).is_relative_to(Path("docs")) and not pre_tests_path.startswith(".freely/"):
         errors.append(
             f"{issue_path}: pre_tests_path 必须在 repo 内，当前值: {pre_tests_path}。\n"
-            f"  正确格式: docs/epics/{{epic}}/{{story}}/raw-{{raw-key}}/verification/pre-tests.md"
+            f"  正确格式: docs/epics/{{epic-name}}/{{story-name}}/raw-{{raw key}}/verification/pre-tests.md"
         )
     if not verification_dir:
         errors.append(
             f"{issue_path}: 缺少 verification_artifact_dir 字段。\n"
-            f"  在此 I-* issue 文件中添加: - verification_artifact_dir: docs/epics/{{epic}}/{{story}}/raw-{{key}}/code-reviews"
+            f"  在此 I-* issue 文件中添加: - verification_artifact_dir: docs/epics/{{epic-name}}/{{story-name}}/raw-{{raw key}}/code-reviews"
         )
     # Validate canonical path patterns
     if pre_tests_path and not PRETESTS_PATH_RE.match(pre_tests_path):
         errors.append(
             f"{issue_path}: pre_tests_path 不符合规范路径格式: {pre_tests_path}。\n"
-            f"  文件可能放错了位置！规范路径: docs/epics/{{epic}}/{{story}}/raw-{{raw-key}}/verification/pre-tests.md\n"
-            f"  先检查文件是否在 raw-{{raw-key}}/verification/ 下，不要对着错误路径的文件改内容。"
+            f"  文件可能放错了位置！规范路径: docs/epics/{{epic-name}}/{{story-name}}/raw-{{raw key}}/verification/pre-tests.md\n"
+            f"  先检查文件是否在 raw-{{raw key}}/verification/ 下，不要对着错误路径的文件改内容。"
         )
     if verification_dir and not VERIFICATION_DIR_RE.match(verification_dir):
         errors.append(
             f"{issue_path}: verification_artifact_dir 不符合规范路径格式: {verification_dir}。\n"
-            f"  规范路径: docs/epics/{{epic}}/{{story}}/raw-{{raw-key}}/code-reviews"
+            f"  规范路径: docs/epics/{{epic-name}}/{{story-name}}/raw-{{raw key}}/code-reviews"
         )
     if errors:
         raise ValueError("\n".join(errors))
@@ -310,7 +310,7 @@ def parse_fields(section: str) -> dict[str, str]:
         "task_refs",
         "case_design",
     ):
-        match = re.search(rf"^- {key}:\s*`?([^`\n]+)`?\s*$", section, re.MULTILINE)
+        match = re.search(rf"^- {raw key}:\s*`?([^`\n]+)`?\s*$", section, re.MULTILINE)
         if match:
             fields[key] = match.group(1).strip()
     return fields
@@ -403,7 +403,7 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
     if not pretests_text:
         return [f"[pre_tests_missing] {issue_path}: bound pre-tests file missing or unreadable: {pre_tests_path}\n"
                 f"  先检查: 文件是否存在于上述路径？I-* issue 的 pre_tests_path 字段是否指向正确位置？\n"
-                f"  正确路径格式: docs/epics/{{epic}}/{{story}}/raw-{{raw-key}}/verification/pre-tests.md\n"
+                f"  正确路径格式: docs/epics/{{epic-name}}/{{story-name}}/raw-{{raw key}}/verification/pre-tests.md\n"
                 f"  文件不存在 → 按 skill `freely-doc-B2_IBM-execution` 模板创建。\n"
                 f"  文件存在但路径不对 → 修正 I-* issue 的 pre_tests_path 字段。"]
 
@@ -464,7 +464,7 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
             if not parse_scalar(section_text, key):
                 add_error(
                     "pre_tests_missing",
-                    f"{pre_tests_path}: section '{required_name}' missing '{key}'",
+                    f"{pre_tests_path}: section '{required_name}' missing '{raw key}'",
                 )
         if not has_blocker_taxonomy(section_text):
             add_error(
@@ -519,7 +519,7 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
             if not fields.get(key):
                 add_error(
                     "testcase_derivation_missing",
-                    f"{pre_tests_path}: {title_line} missing {key}. "
+                    f"{pre_tests_path}: {title_line} missing {raw key}. "
                     "Do not clear this gate by only filling placeholders; define the actual bounded test item for this implementation surface.",
                 )
         # red-green-status is required for TDD traceability
@@ -548,7 +548,7 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
             if not fields.get(key):
                 add_error(
                     "verification_state_missing",
-                    f"{pre_tests_path}: {title_line} missing {key}. "
+                    f"{pre_tests_path}: {title_line} missing {raw key}. "
                     "A passing owner still needs real test execution writeback; metadata alone is not enough.",
                 )
         if not fields:
@@ -608,7 +608,7 @@ def validate_issue(issue_path: str, issue_text: str, source: str) -> list[str]:
                 if not fields.get(key):
                     add_error(
                         "testcase_derivation_missing",
-                        f"{pre_tests_path}: {fields.get('id', title_line)} opts into adequacy v2 but is missing {key}",
+                        f"{pre_tests_path}: {fields.get('id', title_line)} opts into adequacy v2 but is missing {raw key}",
                     )
             surface_kind = fields.get("surface_kind", "")
             if surface_kind and surface_kind not in VALID_SURFACE_KINDS:
