@@ -1076,16 +1076,22 @@ if [[ "$branch" == fix/raw-* || "$branch" == feature/raw-* ]]; then
         echo "wt-close: test-pre-merge cleaned ✓"
       fi
     fi
-    # Clean up agent-id.env entries for this raw-key.
-    # agent-id.env lives in the main develop project root — NOT in the worktree
-    # .freely/ which is a clone from wt-create. Find develop worktree explicitly.
-    _dev_wt=$(git worktree list --porcelain 2>/dev/null | awk '$1=="worktree"{wt=$2} $1=="branch"&&$2=="refs/heads/develop"{print wt;exit}')
-    [[ -n "$_dev_wt" ]] || _dev_wt="$PROJECT_ROOT"
-    _agent_env="$_dev_wt/.freely/agent-id.env"
-    if [[ -f "$_agent_env" ]]; then
-      sed -i.bak "/raw-${_tp_raw_key}/d" "$_agent_env" 2>/dev/null || true
-      echo "wt-close: agent-id.env cleaned for raw-${_tp_raw_key} ✓"
-    fi
+	    # Release agent from agent_working table (replaces agent-id.env cleanup).
+	    _dev_wt=$(git worktree list --porcelain 2>/dev/null | awk '$1=="worktree"{wt=$2} $1=="branch"&&$2=="refs/heads/develop"{print wt;exit}')
+	    [[ -n "$_dev_wt" ]] || _dev_wt="$PROJECT_ROOT"
+	    # Phase 1: agent_working table release
+	    if [[ -f "$_dev_wt/docs/system/workspace/scripts/runtime/agent_working.py" ]]; then
+	      python3 -c "
+import sys; sys.path.insert(0, '$_dev_wt/docs/system/workspace/scripts/runtime')
+from agent_working import agent_release_all
+agent_release_all('$_dev_wt', 'raw-${_tp_raw_key}')
+" 2>/dev/null && echo "wt-close: agent_working released for raw-${_tp_raw_key}" || true
+	    fi
+	    # Fallback: legacy agent-id.env cleanup
+	    _agent_env="$_dev_wt/.freely/agent-id.env"
+	    if [[ -f "$_agent_env" ]]; then
+	      sed -i.bak "/raw-${_tp_raw_key}/d" "$_agent_env" 2>/dev/null || true
+	    fi
   fi
 fi
 
