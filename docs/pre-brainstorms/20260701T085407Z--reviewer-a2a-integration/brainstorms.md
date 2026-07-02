@@ -124,10 +124,15 @@ worker_03 和 reviewer_05 无需 NN 匹配。通过 raw_key 关联：
 ### reason vs message — A2A 协议对齐
 
 ```
-A2A TaskStatusUpdateEvent:
+A2A TaskStatusUpdateEvent (完整协议路径):
   ├── status.message   → message  (A2A 标准字段, Message + Part(text))
   └── metadata         → reason + from_agent + needs_agent + raw_key + ...
                           (Freely 自定义, metadata dict)
+
+内部 SSE 推送 (简化路径, _notify_sse 直出):
+  {"task_id": "...", "state": "input-required", "reason": "needs-review:b1",
+   "from_agent": "worker_03", "needs_role": "reviewer", "raw_key": "...", ...}
+  所有字段平铺在顶层，不套 statusUpdate。
 ```
 
 | 字段 | 存在 A2A 哪里 | 消费者 | 格式 | 一致性保证 |
@@ -206,7 +211,7 @@ Slot 在 ACP session 创建时从 agent-table 读取。
 | D9 | 6 种双向 input-required | 无遗漏处理场景 |
 | D10 | review_stage 字段 | 区分 b1/b2/dev 审查阶段 |
 | D11 | session/fork 同 tool, session/new 跨 tool | 复用连接，减少开销 |
-| D12 | 轮询降级为 SSE fallback | 主路径 SSE，断连时回退 |
+| D12 | SSE 主路径 + 轮询 fallback — SSE 断连时回退到轮询 | 主路径 SSE（push），轮询（pull）降级兜底 |
 
 ## 3. TODO List
 
@@ -437,4 +442,200 @@ Freely 的等价:
   Reviewer (ACP): 审查 → A2A PATCH state=completed, verdict=pass
   Manager: 通过 A2A SSE 收到 → ACP session/prompt 决策 → 告诉 Worker 继续
 ```
+
+## 18. B2 实现后反向更新（Implementation Reconciliation）
+
+此章节在 B2 实现完成后写入，记录设计文档与实际实现之间的差异，
+确保 B1 设计文档与最终代码一致，避免后续读者困惑。
+
+> 更新日期: 2026-07-02
+> 来源: 3 轮 subagent 审查 + 连通性审计 + 73 测试 + 69 commits
+> 审查文档: review-01~09 (docs/epics/.../code-reviews/)
+
+### 18.1 SSE 事件格式（设计 vs 实现）
+
+**B1 设计**（§1 reason vs message）:
+```json
+{"statusUpdate": {"status": {"state": "input-required"}, "metadata": {...}}}
+```
+A2A TaskStatusUpdateEvent 标准嵌套格式。
+
+**实际实现**:
+```json
+{"task_id": "...", "state": "input-required", "reason": "needs-review:b1", ...}
+```
+平铺格式。`_notify_sse()` 直接构造 `{task_id, state, ...fields}`，不套 `statusUpdate`。
+
+**原因**: A2A `_notify_sse` 是内部函数，不经过完整 A2A protocol buffer 序列化。
+PATCH handler 直接将 whitelisted fields 传给 SSE subscribers。
+`watchdog_sse.py._handle_sse_event()` 相应地解析平铺格式。
+
+**影响**: §1 的 "A2A 协议对齐" 表格（`status.message → message`, `metadata → reason`）仅适用于完整 A2A 协议路径。
+内部 SSE 推送走简化格式。两者在 `_notify_sse` 层面统一。
+
+### 18.2 SSE 全局流端点
+
+**B1 设计**（§5 A2A Multi-Card + Task）:
+仅提到 per-task SSE stream (`/tasks/{id}/stream`)，用于单 task 订阅。
+
+**实际实现**:
+新增了 `GET /tasks/stream` 全局 SSE 端点（`_global_task_stream_endpoint`）。
+所有 task 的 state 变更都推送到此流。watchdog 订阅全局流而非逐 task 订阅。
+
+**原因**: per-task stream 要求 watchdog 提前知道所有 task_id，无法处理"新 task 动态出现"的场景。
+全局流让 watchdog 只需维护一个 SSE 连接即可监听所有 agent 的 input-required 事件。
+
+### 18.3 双看门狗架构
+
+**B1 设计**（§1 Runtime Watchdog = Bootstrapper）:
+只描述了一个 Runtime Watchdog，负责检测 needs-review + 创建 ACP session。
+
+**实际实现**:
+两个看门狗并行运行：
+- **Shell watchdog** (`sse-watchdog.sh`): 轮询 A2A tasks，更新 agent_working，兼容存量
+- **Python watchdog** (`watchdog_sse.py`): 事件驱动，订阅全局 SSE 流，处理 input-required 路由 + ACP session 创建 + liveness/staleness 检测
+
+**启动**: `launch_sse_watchdog()` 同时启动两者。Python watchdog 通过 socket timeout (30s) 在 SSE 活跃期间运行定时检查。
+
+### 18.4 agent_get_session 多 Reviewer 处理
+
+**B1 设计**（§1 agent_working 表）:
+`reviewer_id` 列格式: `reviewer_05:ses_ghi,reviewer_08:ses_jkl`（逗号分隔多对）。
+未指定如何从多 reviewer 中取 session_id。
+
+**实际实现**:
+`h_aw_get_session` 逻辑:
+- 有 `agent_id` 参数: 解析逗号分隔 pairs，返回匹配的 session_id
+- 无 `agent_id` 参数: 返回第一个 reviewer 的 session_id（`next(iter(pairs.values()))`)
+- 修复了原 `split(":",1)[1]` 在逗号分隔字符串上返回垃圾的 bug
+
+### 18.5 ACP session 关闭双函数
+
+**B1 设计**（§1 ACP vs A2A）:
+只提到 `session/close`，未区分使用场景。
+
+**实际实现**:
+两个函数，不同签名和使用场景：
+- `_acp_session_close(project, session_id)`: 直接按 session_id 关闭。用于 ACP bridge 重启路径（bridge 切换时关闭旧 session）
+- `_acp_agent_session_close(project, role, raw_key)`: 从 agent_working 查 session_id 再关闭。用于 wt-close 路径
+
+函数重命名历史: 原始 `_acp_session_close` → 错误地重命名为 `_acp_agent_session_close`（签名变化导致 bridge 重启路径调用未定义函数）→ 恢复 `_acp_session_close` 并保留 `_acp_agent_session_close`
+
+### 18.6 TOCTOU 防护: 原子 next_free_and_assign
+
+**B1 设计**（§1 agent_working 表 + TODO P1.3）:
+`agent_working_next(role, pool)` + `agent_working_free(role, pool)` 两个独立操作。
+
+**实际实现**:
+新增 `agent_working.next_free_and_assign` RPC handler（原子操作）:
+1. 计算空闲 agent_id
+2. 在同一 RPC 内完成 INSERT/UPDATE
+3. 消除 `next_free` → `assign` 之间的 TOCTOU 窗口
+
+原有的 `agent_next_free` + `agent_assign` 仍然保留（用于需要分步检查的场景）。
+
+### 18.7 freely-cycle 注入防护
+
+**B1 设计**:
+未涉及 freely-cycle 的实现细节。
+
+**实际实现**:
+`bin/freely-cycle` 中的 dispatch_reviewer 逻辑原本使用 f-string 将 `raw_key`/`project` 直接插值进 Python 代码。
+修复后使用环境变量 `FREELY_RAW_KEY`/`FREELY_PROJECT` 传递数据，消除注入风险。
+
+### 18.8 SQL 注入防护
+
+**B1 设计**:
+未涉及 DB handler 防御细节。
+
+**实际实现**:
+`freely_db_manager.py` 中的 `@_h` handler 新增列名验证：
+- `h_aw_upsert`: `col` 参数必须匹配 `^(manager|worker|reviewer)_id$`
+- `h_aw_get_session` / `h_aw_next_free`: `role` 参数必须为 `manager|worker|reviewer`
+- 防止通过构造恶意 col/role 参数注入 SQL
+
+### 18.9 _restore_tasks: 从日志到实际恢复
+
+**B1 设计**（§1 Daemon 重启 → resume）:
+daemon 重启时恢复 agent session。
+
+**实际实现**:
+- D5: 新增 `_aw_resume_script` 模块级常量（Python inline script），扫描 agent_working 表
+  中所有带 session_id 的条目，通过 ACP bridge socket 逐个调用 `session/resume`
+- D6: 推送 `restore_complete` SSE 事件（is_global=True），通知所有 subscriber
+- 原设计只有 "Daemon 重启 → resume" 一句话，实现补充了完整的恢复链路
+
+### 18.10 PATCH handler 字段白名单
+
+**B1 设计**（§1 input-required 事件完整参数）:
+定义了 15+ 字段的完整事件参数（task_id, from_agent, from_role, needs_agent, needs_role, raw_key, reason, review_stage, skill, message, parent_agent, session_id, timestamp）。
+
+**实际实现**:
+`a2a_server.py` PATCH handler 白名单:
+```
+completion_summary, evidence_paths, error, reason, next_action, progress,
+summary, next, evidence, session_id, from_agent, needs_agent, needs_role,
+raw_key, review_stage
+```
+
+并非所有 B1 设计的字段都在白名单中。`from_role`、`skill`、`parent_agent`、`timestamp` 不在 PATCH 白名单中——它们通过其他途径传递（A2A task 的 agent_id 字段推断 role，skill 在 task 创建时设置，timestamp 由 a2a_tasks 的 created_at/updated_at 提供）。
+
+### 18.11 消息自动生成（未实现）
+
+**B1 设计**（§1 message 自动生成）:
+```
+"agent 设 input-required 时不手写 message。Runtime 根据参数自动生成：
+ {from_agent} 在 raw_key={raw_key} 完成 {review_stage}，需要 {reason}。
+ 产物路径: docs/epics/{epic}/{story}/raw-{raw_key}/..."
+```
+
+**实际状态**: 此功能尚未实现。message 字段通过 PATCH handler 的 `message` 参数手动传入。
+自动生成逻辑待后续版本添加。
+
+**影响**: 当前依赖 agent 手动填写 message。如果 agent 未填写，接收方 agent 需要从其他字段（raw_key + reason + review_stage）推断上下文。
+
+### 18.12 设计决策 D12（轮询降级）的澄清
+
+**B1 D12**: "轮询降级为 SSE fallback"
+
+**实际实现**:
+- 主路径是 `watchdog_sse.py` 订阅 A2A SSE 全局流（push 模式）
+- Fallback 是 `bin/freely-cycle --all`（pull 模式，Manager daemon 每 N 秒轮询一次）
+- D12 原文措辞有歧义——"轮询降级为 SSE fallback" 暗示 SSE 是 fallback
+- 实际是 **SSE 主路径，轮询降级**（即"SSE 为主，轮询为 fallback"）
+- 更正: 主路径 SSE，断连时回退到轮询
+
+### 18.13 双工位模型（dev + test-pre-merge）
+
+**B1 设计**（§1 三角色 + Worktree 绑定）:
+Reviewer 绑定到 test-pre-merge-{key} 工位。
+
+**实际实现**:
+wt-close 的 test-pre-merge cleanup (Phase 6b) 通过 raw_key 自动发现 companion test worktree:
+- 从 `fix/raw-{key}-{slug}` 推导 `test-pre-merge-{key}-{slug}`
+- 删除前先关闭 ACP session（所有角色）
+- 释放 agent_working 表条目
+- 删除 worktree + branch
+
+审查者工位与开发工位共享 raw_key，通过分支命名约定关联（无需存储关系）。
+
+### 18.14 设计文档一致性自检
+
+| 检查项 | B1 设计 | 实现 | 状态 |
+|--------|---------|------|------|
+| agent_working 表结构 | raw_key PK, 6 列 + timestamps | 同设计 | ✅ 一致 |
+| agent_working 值格式 | agent_id:session_id | 同设计 | ✅ 一致 |
+| reviewer 逗号分隔 | 多对逗号分隔 | 同设计 + 修复 get_session bug | ✅ 一致 |
+| InputRequiredReason Enum | 12 值 (含 UNKNOWN) | 同设计 | ✅ 一致 |
+| 6 向路由 | 完整路由表 | 同设计 | ✅ 一致 |
+| agent-roles.toml | git tracked, 不提 slot/pool | 同设计 | ✅ 一致 |
+| agent-table.toml v2 | 扁平格式, role 字段 | 同设计 | ✅ 一致 |
+| SSE 事件格式 | statusUpdate 嵌套 | 平铺格式 | ⚠️ 已更新（见 §18.1） |
+| SSE 全局流 | 未提及 | 已实现 | ⚠️ 已更新（见 §18.2） |
+| 双看门狗 | 单一 Watchdog | Shell + Python 并行 | ⚠️ 已更新（见 §18.3） |
+| message 自动生成 | Runtime 自动生成 | 未实现（agent 手动填写） | ⚠️ 待实现 |
+| 轮询降级 | "轮询降级为 SSE fallback" | SSE 主路径，轮询为 fallback | ⚠️ 已更正（见 §18.12） |
+| ACP session 关闭 | 单一 session/close | 双函数（直接/agent_working） | ⚠️ 已更新（见 §18.5） |
+| 原子分配 | 未提及 | next_free_and_assign | ⚠️ 新增（见 §18.6） |
+| SQL 注入防护 | 未提及 | col/role 验证 | ⚠️ 新增（见 §18.8） |
 
