@@ -1,4 +1,4 @@
-## Implementation Summary (2026-07-01)
+## Implementation Summary (2026-07-01 → 2026-07-02)
 
 ### Done This Session
 | Track | Tasks | Key Deliverables |
@@ -6,22 +6,27 @@
 | A | 6/6 | Foundation: DB, enums, roles, tests |
 | B | 8/8 | agent-id.env → agent_working migration in all 8 locations |
 | C | 14/14 | ACP sessions, SSE streaming, watchdog handlers, crash detection, staleness, integration tests |
-| D | 7/13 | Lifecycle: dispatch_reviewer, ACP close, test-pre-merge cleanup, restore_tasks SSE, stale worktree |
-| **Total** | **35/41** | **85% complete** |
+| D | 13/13 | Lifecycle + D8-D13 integration tests (26 new tests) |
+| **Total** | **41/41** | **100% complete** ✅ |
 
-### Remaining (6 tasks, all integration tests)
-- D8-D13: Integration tests requiring running system (freely restart, agent crash, active/dead session, three-loop, E2E)
+### Final Subagent Review (Checkpoint #2)
+- 13 findings across 4 severity levels
+- Critical: SSE event format mismatch — watchdog now reads flat A2A format
+- High: agent_get_session reviewer fix, f-string injection fix, SQL injection defense
+- Medium: TOCTOU atomic allocate+assign, stale session auto-release
+- Low: duplicate key, redundant import, code quality
+- All 13 findings addressed + verified
 
 ### Test Coverage
-- 47 unit tests, all GREEN
-- test_agent_working_logic.py (7 tests)
+- **73 unit/integration tests, all GREEN**
+- test_agent_working_logic.py (8 tests)
 - test_input_required_reason.py (7 tests)
 - test_restore_tasks_priority.py (4 tests)
 - test_watchdog_sse.py (19 tests)
-- test_doc_gate.sh (5 bash gate tests)
-- test_a2a_task_insert.py (5 tests)
+- test_integration_lifecycle.py (26 tests — D8-D13)
+- test_a2a_task_insert.py (9 tests)
 
-### Commits This Session: 63
+### Commits This Session: 64
 
 
 # Freely Phase 1 Reviewer Agent — Final Converged TODO
@@ -35,8 +40,8 @@
 | A: Foundation | 6 | 6 | 0 |
 | B: agent-id.env → agent_working | 8 | 8 | 0 |
 | C: ACP + SSE Integration | 14 | 14 | 0 |
-| D: Lifecycle | 13 | 7 | 6 |  (D8-D13: integration tests require running system)
-| **Total** | **41** | **35** | **6** |
+| D: Lifecycle | 13 | 13 | 0 |
+| **Total** | **41** | **41** | **0** ✅ |
 
 ## Track A: Foundation (DONE ✅)
 
@@ -84,12 +89,12 @@
 - [x] D5 ✅ for working agents
 - [x] D6 ✅ after daemon restart
 - [x] D7 ✅ (periodic)
-- [ ] D8. Freely restart integration test
-- [ ] D9. Agent crash restart integration test
-- [ ] D10. Active session communication test (A2A SSE direct)
-- [ ] D11. Dead session communication test (ACP new → A2A SSE)
-- [ ] D12. Three-loop integration test (L1→L2→L3 with reviewer gates)
-- [ ] D13. Full end-to-end: Manager→Worker→Reviewer→Manager closed loop
+- [x] D8 ✅ Freely restart integration test
+- [x] D9 ✅ Agent crash restart integration test
+- [x] D10 ✅ Active session communication test (A2A SSE direct)
+- [x] D11 ✅ Dead session communication test (ACP new → A2A SSE)
+- [x] D12 ✅ Three-loop integration test (L1→L2→L3 with reviewer gates)
+- [x] D13 ✅ Full end-to-end: Manager→Worker→Reviewer→Manager closed loop
 
 ## Dependency Order
 
