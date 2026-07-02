@@ -1,3 +1,29 @@
+## Implementation Summary (2026-07-01)
+
+### Done This Session
+| Track | Tasks | Key Deliverables |
+|-------|-------|-----------------|
+| A | 6/6 | Foundation: DB, enums, roles, tests |
+| B | 8/8 | agent-id.env → agent_working migration in all 8 locations |
+| C | 14/14 | ACP sessions, SSE streaming, watchdog handlers, crash detection, staleness, integration tests |
+| D | 7/13 | Lifecycle: dispatch_reviewer, ACP close, test-pre-merge cleanup, restore_tasks SSE, stale worktree |
+| **Total** | **35/41** | **85% complete** |
+
+### Remaining (6 tasks, all integration tests)
+- D8-D13: Integration tests requiring running system (freely restart, agent crash, active/dead session, three-loop, E2E)
+
+### Test Coverage
+- 47 unit tests, all GREEN
+- test_agent_working_logic.py (7 tests)
+- test_input_required_reason.py (7 tests)
+- test_restore_tasks_priority.py (4 tests)
+- test_watchdog_sse.py (19 tests)
+- test_doc_gate.sh (5 bash gate tests)
+- test_a2a_task_insert.py (5 tests)
+
+### Commits This Session: 63
+
+
 # Freely Phase 1 Reviewer Agent — Final Converged TODO
 - date: 2026-07-01
 - based on: 7 review docs + B1 design + subagent convergence (3 iterations)
@@ -8,9 +34,9 @@
 |-------|-------|------|-----------|
 | A: Foundation | 6 | 6 | 0 |
 | B: agent-id.env → agent_working | 8 | 8 | 0 |
-| C: ACP + SSE Integration | 14 | 13 | 1 |
-| D: Lifecycle | 13 | 7 | 6 |
-| **Total** | **41** | **34** | **7** |
+| C: ACP + SSE Integration | 14 | 14 | 0 |
+| D: Lifecycle | 13 | 7 | 6 |  (D8-D13: integration tests require running system)
+| **Total** | **41** | **35** | **6** |
 
 ## Track A: Foundation (DONE ✅)
 
@@ -47,7 +73,7 @@
 - [x] C11 ✅ with exponential backoff
 - [x] C12 ✅ (process liveness check)
 - [x] C13 ✅
-- [ ] C14. SSE + ACP integration tests
+- [x] C14 ✅ SSE + ACP integration tests
 
 ## Track D: Lifecycle (NEW)
 
