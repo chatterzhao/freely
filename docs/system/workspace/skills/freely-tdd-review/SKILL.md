@@ -20,17 +20,17 @@ description: >-
 ## 核心方法
 
 ```
-raw issue（问题）──→ B1 brainstorms（分析/决策）──→ candidate（结晶，C-{key}-A）
+raw issue（问题）──→ B1 brainstorms（分析/决策）──→ candidate（结晶，C-{raw key}-A）
     ↓ 忠实消化？          ↓ 忠实消化？
     
-candidate ──→ milestone（M-{key}-A，candidate_issues 入队）
+candidate ──→ milestone（M-{raw key}-A，candidate_issues 入队）
     ↓ 忠实消化？
-        ┌─ B2 B 阶段：brainstorms（实现分析）
+        ┌─ B2 I（Input）：读 candidate → 获取 I-* issue 元信息（key+suffix）
         │       ↓ 忠实消化？
-milestone ──┤
-        │   B2 M 阶段：I-* issue 物化（I-{key}-{suffix}，committed_issues 出队）
-        │             → prd / pre-tests / tasks / code-review
-        └─      ↓ 忠实消化？
+milestone ──┤   B2 B（Brainstorm）：研究方案 → 物化 I-* issue → 产出全部设计文件
+        │   （brainstorms/ + issues/ + prd.md + pre-tests.md + tasks.md + code-reviews/）
+        │       ↓ 忠实消化？
+        └─ B2 M（Map）：确认规范目录结构 → milestones.md committed_issues → 交付
 
 B2 文档 ──→ 实现代码（TDD：测试驱动实现）
     ↓ 忠实消化？
@@ -38,9 +38,9 @@ B2 文档 ──→ 实现代码（TDD：测试驱动实现）
 pre-tests ──→ 测试执行（全 GREEN + 真实 evidence）
 ```
 
-> 四节点链路（raw → C → M → I）：raw issue、candidate（C-{key}-{suffix}）、milestone（M-{key}-A）、I-* issue（I-{key}-{suffix}）共享同一时间戳 {key}。milestone 是 milestones.md 中的 `## M-{key}-A` 节点——candidate 通过 `candidate_issues` 入队，I-* issue 通过 `committed_issues` 出队。Milestone 始终使用 -A（一个 raw issue 一个 milestone 容器），candidate 和 I-* 的 suffix 可变（多个 candidate 时 -A、-B...）。
+> 四节点链路（raw → C → M → I）：raw issue、candidate（C-{raw key}-{suffix}）、milestone（M-{raw key}-A）、I-* issue（I-{raw key}-{suffix}）共享同一时间戳 {raw key}。milestone 是 milestones.md 中的 `## M-{raw key}-A` 节点——candidate 通过 `candidate_issues` 入队，I-* issue 通过 `committed_issues` 出队。Milestone 始终使用 -A（一个 raw issue 一个 milestone 容器），candidate 和 I-* 的 suffix 可变（多个 candidate 时 -A、-B...）。
 >
-> `freely-doc-B2_IBM-execution` skill 消费 milestone 中的 promoted candidate，做 B（Brainstorm：实现分析）和 M（Map：**物化 I-* issue 完整文档** + prd + pre-tests + tasks + code-review）。**I-* issue 是 B2 的产出，不是 B2 的输入。** gate 校验四节点完整性，审查校验相邻节点间的消化 fidelity。
+> `freely-doc-B2_IBM-execution` skill 的 I→B→M：**I** 读 B1 candidate（元信息）→ **B** 做全部产生工作（研究 + 物化 I-* issue + 产出 prd/pre-tests/tasks/IDN）→ **M** 确认路径 + 写 milestones。**I-* issue 是 B 阶段的产出，所有设计文件都在 B 阶段生成。** gate 校验四节点完整性，审查校验相邻节点间的消化 fidelity。
 
 审查就是检查每个 "↓ 忠实消化？" 箭头。
 
