@@ -19,7 +19,7 @@
 - actual_output: 8 passed in 0.07s
 - evidence_file: tests/pytest-output.log
 - red-green-status: green
-- status: passed
+- status: pass
 - blocker: (无)
 - surface_kind: end_to_end
 - target_lane: premerge-integration
@@ -44,7 +44,7 @@
 - actual_output: 7 passed in 0.07s
 - evidence_file: tests/pytest-output.log
 - red-green-status: green
-- status: passed
+- status: pass
 - blocker: (无)
 - red_how: feature: enum defined before tests, confirmed RED then GREEN
 
@@ -64,7 +64,7 @@
 - actual_output: 4 passed in 0.07s
 - evidence_file: tests/pytest-output.log
 - red-green-status: green
-- status: passed
+- status: pass
 - blocker: (无)
 - red_how: fix: tests reproduce and/or bugs, confirmed RED→GREEN
 
@@ -84,7 +84,7 @@
 - actual_output: 19 passed in 0.07s
 - evidence_file: tests/pytest-output.log
 - red-green-status: green
-- status: passed
+- status: pass
 - blocker: (无)
 - red_how: feature: watchdog_sse.py created after tests, RED→GREEN
 
@@ -104,7 +104,7 @@
 - actual_output: 26 passed in 0.09s
 - evidence_file: tests/pytest-output.log
 - red-green-status: green
-- status: passed
+- status: pass
 - blocker: (无)
 - red_how: feature: integration tests validate agent lifecycle, RED→GREEN
 
@@ -124,7 +124,7 @@
 - actual_output: 82 passed in 0.10s
 - evidence_file: tests/pytest-output.log
 - red-green-status: green
-- status: passed
+- status: pass
 - blocker: (无)
 - red_how: feature: full suite RED before implementation, all GREEN after
 
