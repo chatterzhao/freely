@@ -49,15 +49,33 @@ def _acp_rpc(project: str, method: str, params: dict) -> Optional[dict]:
 
 
 def _acp_session_resume(project: str, session_id: str, prompt: str = None) -> bool:
-    """Resume an existing ACP session with optional prompt."""
+    """Resume an existing ACP session with optional prompt.
+
+    When prompt is provided: session/resume + prompt = wake up + deliver message.
+    This is the primary mechanism for agent-to-agent message delivery.
+    Returns after session resume confirmation (does NOT wait for AI completion).
+    """
     params = {"sessionId": session_id}
     if prompt:
         params["prompt"] = prompt
     result = _acp_rpc(project, "session/resume", params)
     if result and "error" not in result:
-        print(f"[watchdog] ACP session resume ok: {session_id}", file=sys.stderr)
+        print(f"[watchdog] ACP session resume ok: {session_id[:20]}...", file=sys.stderr)
         return True
     return False
+
+
+def _acp_session_prompt(project: str, session_id: str, message: str) -> bool:
+    """Send a message to an ALIVE ACP session.
+
+    Semantic wrapper around _acp_session_resume. Use this when the target
+    agent's session is known to be alive (e.g., Worker waiting for Reviewer
+    verdict). The message is delivered via session/resume + prompt.
+
+    For dead sessions, use _acp_session_resume without prompt first,
+    then _acp_session_prompt after resume succeeds.
+    """
+    return _acp_session_resume(project, session_id, prompt=message)
 
 
 def _acp_session_new(project: str, role: str, agent_id: str, slot: str = None) -> Optional[str]:

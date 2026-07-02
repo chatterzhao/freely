@@ -497,9 +497,17 @@ class AcpBridge:
                 sys.stderr.flush()
         return sid
 
-    def session_resume(self, session_id, cwd=None):
-        """Resume an existing ACP session."""
+    def session_resume(self, session_id, cwd=None, prompt=None):
+        """Resume an existing ACP session.
+
+        If prompt is provided, it is forwarded to the AI CLI tool as the
+        initial prompt after resume — this is the mechanism for agent-to-agent
+        message delivery. session/resume + prompt = wake up + deliver message.
+        The call returns after session resume confirmation (not after AI completion).
+        """
         params = {"sessionId": session_id, "cwd": cwd or self.project, "mcpServers": []}
+        if prompt:
+            params["prompt"] = prompt
         result = self._send_request("session/resume", params, timeout=30)
         sid = result.get("sessionId", "")
         if self._is_claude_acp:
@@ -656,6 +664,7 @@ def handle_client(conn, bridge):
                         sid = bridge.session_resume(
                             session_id=params.get("sessionId"),
                             cwd=params.get("cwd"),
+                            prompt=params.get("prompt"),
                         )
                         result = {"sessionId": sid}
                     else:
