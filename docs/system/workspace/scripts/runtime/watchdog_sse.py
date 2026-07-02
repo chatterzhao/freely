@@ -346,3 +346,15 @@ def _check_session_staleness(project: str):
                     agent_release(project, raw_key, role, agent_id)
                 except Exception as e:
                     print(f"[watchdog] release failed for {agent_id}: {e}", file=sys.stderr)
+
+
+# ── CLI Entry Point ───────────────────────────────────────────────────────────
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Freely SSE Watchdog (Python)")
+    parser.add_argument("--project", required=True, help="Project root path")
+    parser.add_argument("--a2a-socket", required=True, help="Path to A2A Unix socket")
+    args = parser.parse_args()
+    print(f"[watchdog] starting: project={args.project} socket={args.a2a_socket}", file=sys.stderr)
+    watchdog_run(args.project, args.a2a_socket)

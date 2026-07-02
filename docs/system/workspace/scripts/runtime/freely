@@ -18069,6 +18069,8 @@ launch_sse_watchdog() {
   argv0="runtime/sse-watchdog.sh --project $project --watch"
   nohup bash -lc "cd '$project' && exec -a '$argv0' bash '$_sse_watchdog_sh' --project '$project' --watch --interval 10" </dev/null >/dev/null 2>&1 &
   disown "$!" 2>/dev/null || true
+  # Phase 1: also launch Python SSE watchdog for ACP-aware event handling
+  _start_watchdog_sse_py "$project"
 }
 
 launch_manager_watchdog() {
