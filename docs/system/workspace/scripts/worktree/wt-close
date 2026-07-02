@@ -1079,8 +1079,29 @@ if [[ "$branch" == fix/raw-* || "$branch" == feature/raw-* ]]; then
 	    # Release agent from agent_working table (replaces agent-id.env cleanup).
 	    _dev_wt=$(git worktree list --porcelain 2>/dev/null | awk '$1=="worktree"{wt=$2} $1=="branch"&&$2=="refs/heads/develop"{print wt;exit}')
 	    [[ -n "$_dev_wt" ]] || _dev_wt="$PROJECT_ROOT"
-	    # Phase 1: agent_working table release
+	    # Phase 1: close ACP sessions + release agent_working table
 	    if [[ -f "$_dev_wt/docs/system/workspace/scripts/runtime/agent_working.py" ]]; then
+	      # Close ACP sessions (worker + reviewer) before releasing table entries
+	      python3 -c "
+import sys,os,json,socket,hashlib
+sys.path.insert(0, '$_dev_wt/docs/system/workspace/scripts/runtime')
+from agent_working import agent_list_by_raw_key, agent_get_session
+row = agent_list_by_raw_key('$_dev_wt', 'raw-${_tp_raw_key}')
+if row:
+    h = hashlib.sha256('$_dev_wt'.encode()).hexdigest()[:16]
+    bridge = f'/tmp/freely-acp-{h}.sock'
+    if os.path.exists(bridge):
+        for role in ('worker', 'reviewer', 'manager'):
+            sid = agent_get_session('$_dev_wt', 'raw-${_tp_raw_key}', role)
+            if sid:
+                try:
+                    s=socket.socket(socket.AF_UNIX); s.settimeout(2); s.connect(bridge)
+                    req=json.dumps({'jsonrpc':'2.0','id':1,'method':'session/close','params':{'sessionId':sid}})+'
+'
+                    s.sendall(req.encode()); s.shutdown(socket.SHUT_WR); s.recv(4096); s.close()
+                except: pass
+" 2>/dev/null || true
+	      # Release from agent_working table
 	      python3 -c "
 import sys; sys.path.insert(0, '$_dev_wt/docs/system/workspace/scripts/runtime')
 from agent_working import agent_release_all

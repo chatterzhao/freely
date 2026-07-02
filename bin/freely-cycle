@@ -82,21 +82,30 @@ if worker_tasks:
 
     if state == 'input-required' and not review_assigned:
         suggested = 'dispatch_reviewer'
-        # Phase 1: dispatch reviewer via agent_working + ACP bridge
+        # Phase 1: dispatch reviewer once per cycle (avoid duplicates)
         import subprocess, os
         project = os.environ.get('PROJECT_ROOT', os.environ.get('FREELY_HOME', ''))
-        aw_py = f'{project}/docs/system/workspace/scripts/runtime/agent_working.py'
-        if project and os.path.exists(aw_py):
-            subprocess.run([sys.executable, '-c', f'''
+        if project:
+            aw_py = f'{project}/docs/system/workspace/scripts/runtime/agent_working.py'
+            if os.path.exists(aw_py):
+                result = subprocess.run([sys.executable, '-c', f'''
 import sys; sys.path.insert(0, "{project}/docs/system/workspace/scripts/runtime")
-from agent_working import agent_next_free, agent_assign
+from agent_working import agent_next_free, agent_assign, agent_list_by_raw_key
+row = agent_list_by_raw_key("{project}", "{rk}")
+already = row.get("reviewer_id", "") if row else ""
+if already:
+    sys.exit(0)  # already dispatched, skip
 rid = agent_next_free("{project}", "reviewer", 99)
 if rid:
     agent_assign("{project}", "{rk}", "reviewer", rid)
     print(f"[cycle] reviewer {{rid}} dispatched for raw_key={rk}", file=sys.stderr)
+    sys.exit(0)
 else:
     print(f"[cycle] no free reviewer for raw_key={rk}", file=sys.stderr)
-'''], timeout=10)
+    sys.exit(1)
+'''], capture_output=True, text=True, timeout=10)
+                if result.returncode == 0:
+                    suggested = 'continue'  # dispatch succeeded, move on
         print(f'[cycle] dispatch_reviewer: raw_key={rk} task_id={task_id}', file=__import__('sys').stderr)
     elif state == 'input-required' and review_assigned:
         suggested = 'continue'
