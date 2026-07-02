@@ -1,13 +1,14 @@
 ## M-20260701T085407Z-A
-- title: fix: A2A reviewer restore + routing + session
-- status: active
+- title: A2A reviewer agent — ACP/A2A 集成 + session/fork 复用
+- status: completed
 ### candidate_issues
-1. `C-20260701T085407Z-A`
-- milestone: M-20260701T085407Z-A
-- status: promoted
-- promoted_issue_id: `I-20260701T085407Z-A`
 ### committed_issues
 ### completed_issues
+1. `C-20260701T085407Z-A`
+- milestone: M-20260701T085407Z-A
+- status: absorbed
+- absorbed_into: `raw-20260701T085407Z`
+- summary: 94 commits, 82 tests, ACP/A2A/SSE/session 全链路集成
 
 ## M-20260701T081450Z-A
 - title: fix: merge lock orphan self-heal
