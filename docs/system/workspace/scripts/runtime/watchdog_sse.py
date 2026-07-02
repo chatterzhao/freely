@@ -79,6 +79,7 @@ def watchdog_run(project: str, a2a_socket: str):
     sse_url = f"unix://{a2a_socket}/tasks/stream"
     backoff = 1
     max_backoff = 30
+    last_liveness_check = 0
 
     while True:
         try:
@@ -88,6 +89,20 @@ def watchdog_run(project: str, a2a_socket: str):
             print(f"[watchdog] SSE error: {e}, reconnecting in {backoff}s", file=sys.stderr)
             time.sleep(backoff)
             backoff = min(backoff * 2, max_backoff)
+
+        # C12: periodic agent crash detection
+        if time.time() - last_liveness_check > 120:
+            try:
+                _check_agent_liveness(project)
+                last_liveness_check = time.time()
+            except Exception:
+                pass
+
+        # C13: periodic session staleness check
+        try:
+            _check_session_staleness(project)
+        except Exception:
+            pass
 
 
 def _subscribe_and_process(project: str, a2a_socket: str):
@@ -237,3 +252,78 @@ def _handle_needs_worker(project: str, metadata: dict, reason: InputRequiredReas
     # Last resort: delegate back to manager
     print(f"[watchdog] no worker session for {raw_key}, delegating to manager", file=sys.stderr)
     _handle_needs_manager(project, metadata, InputRequiredReason.from_string("NEEDS_MANAGER_INPUT"))
+
+
+# ── C12: Agent crash detection ────────────────────────────────────────────────
+
+def _check_agent_liveness(project: str):
+    """C12: Scan agent_working for dead agent processes and mark them."""
+    import subprocess
+    try:
+        from agent_working import _db_rpc
+        result = _db_rpc(project, "agent_working.get_all", {})
+        rows = result.get("rows", [])
+    except Exception:
+        return
+
+    for row in rows:
+        raw_key = row.get("raw_key", "")
+        for role in ("worker", "reviewer", "manager"):
+            val = str(row.get(f"{role}_id", "") or "")
+            if not val or ":" not in val:
+                continue
+            agent_id, session_id = val.split(":", 1)
+            # Check if the process for this session is still alive
+            try:
+                # Look for a process with this session_id in the command line
+                result = subprocess.run(
+                    ["pgrep", "-f", session_id],
+                    capture_output=True, text=True, timeout=3
+                )
+                if result.returncode != 0:
+                    print(f"[watchdog] DEAD {role}: {agent_id} session={session_id} for {raw_key}", file=sys.stderr)
+                    # Clear the dead session_id but keep the agent assigned
+                    try:
+                        from agent_working import _db_rpc
+                        _db_rpc(project, "agent_working.upsert", {
+                            "raw_key": raw_key,
+                            f"{role}_id": agent_id  # session_id cleared
+                        })
+                    except Exception:
+                        pass
+            except Exception as e:
+                print(f"[watchdog] liveness check error for {agent_id}: {e}", file=sys.stderr)
+
+
+# ── C13: Session staleness timeout ────────────────────────────────────────────
+
+_last_staleness_check = 0
+STALENESS_INTERVAL = 300  # 5 minutes between staleness scans
+SESSION_STALE_SECONDS = 1800  # 30 minutes without activity = stale
+
+
+def _check_session_staleness(project: str):
+    """C13: Periodically scan for stale agent sessions."""
+    global _last_staleness_check
+    now = time.time()
+    if now - _last_staleness_check < STALENESS_INTERVAL:
+        return
+    _last_staleness_check = now
+
+    try:
+        from agent_working import _db_rpc
+        result = _db_rpc(project, "agent_working.get_all", {})
+        rows = result.get("rows", [])
+    except Exception:
+        return
+
+    for row in rows:
+        raw_key = row.get("raw_key", "")
+        for role in ("worker", "reviewer", "manager"):
+            val = str(row.get(f"{role}_id", "") or "")
+            if not val:
+                continue
+            # Check for stall: assigned but no session_id (never started)
+            if ":" not in val:
+                print(f"[watchdog] STALE {role} for {raw_key}: assigned but never started", file=sys.stderr)
+            # TODO: check updated_at timestamp when agent_working table supports it
