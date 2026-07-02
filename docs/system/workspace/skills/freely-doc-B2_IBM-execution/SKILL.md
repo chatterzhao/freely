@@ -88,7 +88,7 @@ intake_id: ""
 author: zhaoquan
 channel: freely-workflow-guarded-execution
 session_refs: []
-pre_tests_path: docs/epics/skill-gate-alignment/verification/pre-tests.md
+pre_tests_path: docs/epics/skill-gate-alignment/raw-20260508T011858Z/verification/pre-tests.md
 verification_artifact_dir: docs/epics/skill-gate-alignment/code-reviews
 ---
 
@@ -272,9 +272,9 @@ phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
 
 | 产物 | 路径 | 说明 |
 |------|------|------|
-| pre-tests.md | `docs/epics/{epic}/{story}/verification/pre-tests.md` | 测试方案，**B2 写** |
-| tasks.md | `docs/epics/{epic}/{story}/verification/tasks.md` | 任务分解，所有 [x] 才过门禁 |
-| prd.md | `docs/epics/{epic}/{story}/prd.md` | 产品需求文档 |
+| pre-tests.md | `docs/epics/{epic}/{story}/raw-{raw-key}/verification/pre-tests.md` | 测试方案，**B2 写** |
+| tasks.md | `docs/epics/{epic}/{story}/raw-{raw-key}/verification/tasks.md` | 任务分解，所有 [x] 才过门禁 |
+| prd.md | `docs/epics/{epic}/{story}/raw-{raw-key}/prd.md` | 产品需求文档 |
 | Implementation Decision Note | `docs/epics/{epic}/{story}/raw-{raw-key}/code-reviews/implementation-decision-note.md` | 5 字段 (decision/why_this/alternatives/boundary/residual_risk) |
 
 ### 治理文件（B2 需更新）
@@ -291,7 +291,7 @@ phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
 DESIRED_RUNTIME_STATE=running
 LAST_EXIT_REASON=up
 LAST_WORKER_OWNER_ISSUE=I-{key}-A          # 绑定 I-* issue
-LAST_WORKER_PRE_TESTS_PATH=docs/epics/{epic}/{story}/verification/pre-tests.md
+LAST_WORKER_PRE_TESTS_PATH=docs/epics/{epic}/{story}/raw-{raw-key}/verification/pre-tests.md
 LAST_WORKER_CLOSEOUT_GATE=create             # pr-create-guarded 时填 create
 LAST_WORKER_CLOSEOUT_GATE_COMMAND=freely pr-create-guarded
 LAST_WORKER_CLOSEOUT_TARGET_LANE=premerge-integration  # 合法值见下方枚举表
@@ -341,7 +341,7 @@ LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY=code-reviews
 | owner issue 'missing' / that issue cannot be resolved | review/code-review 文件需 bullet 格式的 issue_id | `- issue_id: I-20260508T011858Z-A` |
 | I-* canonical fields silently cleared | I-* frontmatter 用了 `---` YAML 包裹格式；canonical reader 只解析 bullet | 去掉 `---` 包裹，用 bullet 格式：`- phase_state: completed` |
 | phase_state cannot own capability/implementation changes | 实现变更的 I-* 需 completed | `phase_state: completed` |
-| pre_tests_path 验证失败 | I-* issue 需声明 pre_tests_path | `pre_tests_path: docs/epics/{epic-name}/verification/pre-tests.md` |
+| pre_tests_path 验证失败 | I-* issue 需声明 pre_tests_path | `pre_tests_path: docs/epics/{epic-name}/{story-name}/raw-{raw-key}/verification/pre-tests.md` |
 | section missing acceptance_target/testing_layer | 字段名必须用下划线，不是空格 | `- acceptance_target:` / `- testing_layer:` / `- target_environment:` / `- required_evidence:` |
 | acceptance item missing id/requirement/evidence_level/artifact_ref | 每个 acceptance item 必须有这 4 个字段 | `- id: AT-001` / `- requirement: ...` / `- evidence_level: mock` / `- artifact_ref: <path>` |
 | red-green-status missing / invalid / not green | 每个 item 必须有 TDD 状态追踪。合法值: pending\|red\|green\|not_applicable | `- red-green-status: green` |
