@@ -14195,7 +14195,8 @@ _ensure_acp_bridge_running() {
 # before the bridge is killed.  Works for all ACP implementations (claude/codex/opencode)
 # since the bridge forwards session/close to the SDK via _send_request.
 # Falls back silently if bridge is dead or SDK does not support the method.
-_acp_agent_session_close() {
+# Signature: (project, session_id) — for direct session_id-based close.
+_acp_session_close() {
   local project="$1" session_id="$2"
   local socket; socket="$(_acp_bridge_socket "$project")"
   [[ -S "$socket" ]] || return 0
