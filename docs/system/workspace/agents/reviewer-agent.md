@@ -1,18 +1,23 @@
 # Reviewer Agent (v2 — ACP + A2A SSE 集成)
 
-独立评审 agent。通过 A2A SSE 事件驱动 + ACP session/new 启动，按 InputRequiredReason
-枚举值路由到对应审查阶段。与 Worker/Manager 通过 agent_working 表 + raw_key 关联。
+独立评审 agent。通过 A2A SSE 事件驱动 + ACP session/fork from Manager 启动
+（跨 tool 时降级为 session/new），按 InputRequiredReason 枚举值路由到对应
+审查阶段。与 Worker/Manager 通过 agent_working 表 + raw_key 关联。
 
 ## 角色
 
 - **独立 ACP session**：watchdog_sse.py 检测到 needs-review 后通过 ACP bridge 创建
+- **session/fork from Manager**：默认路径，继承 Manager 的治理上下文（CONSTITUTION/LAWS/代码库），
+  首轮命中缓存 ~80% token 节省。从不 fork Worker（自己审自己偏见）
+- **session/resume + prompt**：同 raw_key 连续审查时，直接往活 session 投递 review task
 - **工作目录**：test-pre-merge-{raw_key}-{slug} 工位（git worktree 隔离）
 - **pool=99**：独立 reviewer 池，与 worker pool 解耦
+- **UPDATE ONLY**：reviewer 只能更新 agent_working 已有行（Worker 创建），不允许新建行
 - **零容忍**：糊弄测试是导致项目失败的严重失职行为
 
-## 启动方式（v2 架构）
+## 启动方式（v2 架构 — session/fork 优先）
 
-### 事件驱动路径（A2A SSE → watchdog → ACP session/new）
+### 事件驱动路径（A2A SSE → watchdog → session/fork → session/prompt）
 
 ```
 Worker PATCH /tasks/{id} {state: "input-required", reason: "needs-review:b1", ...}
@@ -20,20 +25,21 @@ Worker PATCH /tasks/{id} {state: "input-required", reason: "needs-review:b1", ..
     → watchdog_sse.py._handle_sse_event()
       → InputRequiredReason.from_string(reason) → needs_role = "reviewer"
         → _handle_needs_reviewer()
-          ├─ agent_list_by_raw_key(project, raw_key) → 已分配? skip
-          ├─ agent_next_free(project, "reviewer", 99) → reviewer_NN
-          ├─ agent_assign(project, raw_key, "reviewer", reviewer_NN)
-          └─ _acp_session_new(project, "reviewer", reviewer_NN, raw_key)
-              → ACP bridge socket → session/new → agent 启动
+          ├─ 已有 reviewer + session 存活? → _acp_session_prompt (投递 task)
+          ├─ 首次审查? → _should_use_fork(check Manager alive)
+          │   ├─ YES → _acp_session_fork(manager→reviewer) → prompt
+          │   │   继承 Manager 治理上下文, ~80% 缓存命中
+          │   └─ NO/cross-tool → _acp_session_new(reviewer) → prompt
+          └─ agent_assign(update_only=True) → 追加 reviewer_id
 ```
 
-### 轮询降级路径（freely-cycle fallback）
+### 轮询降级路径（freely-cycle fallback，SSE 断连时）
 
 ```
 Manager daemon → freely-cycle --all → 轮询 a2a_tasks
   → 检测 state=input-required + review_assigned=false
-    → agent_next_free("reviewer", 99) → agent_assign
-      → agent_working 表标记（不启动进程，等 watchdog 接管）
+    → agent_next_free("reviewer", 99) → agent_assign(update_only=True)
+      → agent_working 表标记 → 等 watchdog 下次循环接管
 ```
 
 ## 审查阶段路由（InputRequiredReason）
@@ -142,42 +148,51 @@ ps, ls, cat, head, tail, wc, grep, find
 - 全部 not_applicable 且理由敷衍（"不适用"三个字）
 - status=pass 但 actual_output 为空或 "(执行后填写)"
 
-## 与 Manager / Worker 的交互（v2）
+## 与 Manager / Worker 的交互（v2 — session/fork + session/prompt）
 
 ```
 L1 Doc Loop:
   Worker B1 完成 → PATCH input-required (needs-review:b1)
-    → SSE → watchdog → Reviewer ACP session/new
-      → Reviewer 审查 → pass? → Worker B2
+    → SSE → watchdog → Reviewer session/fork from Manager
+      → _acp_session_prompt → "审查 B1 产物: brainstorms.md"
+      → Reviewer 审查 → pass? → Worker B2 (session/prompt 投递 verdict)
                       → fail? → needs-worker-retry → Worker 重做 B1
 
 L2 Dev Loop:
   Worker RED/dev/test 完成 → input-required (needs-review:red/dev/test)
-    → SSE → watchdog → Reviewer ACP session/new
+    → SSE → watchdog → Reviewer session/resume (同 raw_key 连续审查)
       → pass? → 下一阶段
-      → fail? → Worker 重做
+      → fail? → needs-worker-retry → Worker session/prompt 收到 verdict
 
 L3 Auto Loop:
   pr-create/pr-merge gate 自动检查 + Reviewer 可选审查
-    → pass? → merge → wt-close (ACP close + agent_working release)
+    → pare? → merge → wt-close
+      ├─ ACP session/close (所有 role)
+      └─ agent_release_all(raw_key) → DELETE 整行
     → fail? → 修复 → 重试
 ```
 
-Worker 不直接调用 Reviewer。Review 由 A2A SSE 事件 + watchdog 路由触发。
-Manager 通过 freely-cycle 轮询作为 fallback。
+Worker 不直接调用 Reviewer。Review 由 A2A SSE 事件 → watchdog 路由 → ACP session/fork → session/prompt 触发。
+Manager 通过 freely-cycle 轮询作为 fallback。freely stop 保留 agent_working 行，重启后 resume。
 
 ## agent_working 绑定
 
-Reviewer 分配后写入 agent_working 表：
+Reviewer 分配后**更新** agent_working 已有行（Worker 创建的行，raw_key 为主键）：
 
 ```
 raw_key = "raw-20260701T085407Z"
-reviewer_id = "reviewer_05:ses_abc123"  -- agent_id:session_id 格式
+reviewer_id = "reviewer_05:ses_abc123"  -- 追加到已有行，逗号分隔多个
 ```
+
+**写入约束**：Reviewer 使用 `agent_assign(update_only=True)`。
+如果 raw_key 行不存在（worktree 已被 wt-close 删除），写入失败并报错。
 
 wt-close 时释放：
 - `_acp_agent_session_close(project, "reviewer", raw_key)` → ACP session/close
-- `agent_release_all(project, raw_key)` → 清除 agent_working 行
+- `agent_release_all(project, raw_key)` → DELETE 整行
+
+freely stop 时不动 agent_working。重启后 `_restore_tasks` 读 `agent_working.get_all`
+恢复所有活跃 session。
 
 ## agent-table.toml 配置
 
