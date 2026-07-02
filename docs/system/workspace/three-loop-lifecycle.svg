@@ -26,8 +26,8 @@
   <rect width="1400" height="1350" fill="#fafbfc"/>
 
   <!-- ===== TITLE ===== -->
-  <text x="20" y="30" font-size="16" font-weight="bold" fill="#1e293b" font-family="system-ui, sans-serif">Freely — Agent Role 驱动的能力生命周期</text>
-  <text x="20" y="50" font-size="10" fill="#64748b" font-family="system-ui, sans-serif">Runtime → ACP Bridge → AI CLI ACP Session（执行 Manager/Worker Role，装载 Skill）→ 调用 Commands / A2A / DB</text>
+  <text x="20" y="30" font-size="16" font-weight="bold" fill="#1e293b" font-family="system-ui, sans-serif">Freely — Agent Role 驱动的能力生命周期 (三 Loop 模型: L1 Doc → L2 Dev → L3 Auto)</text>
+  <text x="20" y="50" font-size="10" fill="#64748b" font-family="system-ui, sans-serif">Runtime → ACP Bridge → AI CLI ACP Session（执行 Manager/Worker/Reviewer Role，装载 Skill）→ 调用 Commands / A2A SSE / DB / agent_working</text>
 
   <!-- =================================================================== -->
   <!-- RUNTIME — 系统心跳层                                                  -->
@@ -37,7 +37,7 @@
   <text x="175" y="71" text-anchor="middle" font-size="10" font-weight="bold" fill="white" font-family="system-ui, sans-serif">Freely Runtime — 系统心跳 (while-true)</text>
   <text x="350" y="82" font-size="10" fill="#334155" font-family="system-ui, sans-serif">while true; do</text>
   <text x="350" y="98" font-size="10" fill="#475569" font-family="system-ui, sans-serif">  scan pulse → 发现任务 → 启动 Agent Role   |   AI 死 → restart → 继续 scan</text>
-  <text x="350" y="112" font-size="8" fill="#94a3b8" font-family="system-ui, sans-serif">🔵 代码级循环 — Runtime 硬编码的 while-true + scan 脉冲</text>
+  <text x="350" y="112" font-size="8" fill="#94a3b8" font-family="system-ui, sans-serif">🔵 代码级循环 — L3 Auto Loop: Runtime 硬编码的 while-true + scan 脉冲 + SSE Watchdog (watchdog_sse.py)</text>
   <rect x="895" y="35" width="475" height="31" rx="5" fill="#fff7ed" stroke="#fb923c" stroke-width="1.2" stroke-dasharray="4,3"/>
   <text x="910" y="48" font-size="8.5" font-weight="bold" fill="#c2410c" font-family="system-ui, sans-serif">Human side-channel（旁路，不阻塞 loop）</text>
   <text x="910" y="61" font-size="7.5" fill="#9a3412" font-family="system-ui, sans-serif">freely feedback→platform raw issue | freely chat→DB→issue/comment；scan 暴露</text>
@@ -115,9 +115,9 @@
   <text x="495" y="558" text-anchor="middle" font-size="8" fill="#475569" font-family="system-ui, sans-serif">prd → pre-tests → tasks → done_b2_ibm</text>
   <!-- doc-loop internal retry -->
   <path d="M80,575 C80,586 345,586 345,575" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#loop-arrow)"/>
-  <text x="212" y="583" text-anchor="middle" font-size="7.5" fill="#888" font-family="system-ui, sans-serif">↻ B1边界未稳继续 | B2设计未ready继续</text>
+  <text x="212" y="583" text-anchor="middle" font-size="7.5" fill="#888" font-family="system-ui, sans-serif">↻ B1→Reviewer审查→pass?→B2 | B2→Reviewer审查→pass?→RED</text>
   <rect x="65" y="592" width="570" height="22" rx="4" fill="#fefce8" stroke="#eab308" stroke-width="0.8"/>
-  <text x="75" y="607" font-size="8" fill="#a16207" font-family="system-ui, sans-serif">🟠 门禁报错循环：gate fail → 报错信息指定调用哪个命令/调哪个 Skill → Agent 修复 → 重试 gate</text>
+  <text x="75" y="607" font-size="8" fill="#a16207" font-family="system-ui, sans-serif">🟠 L1 Doc Loop: Reviewer 审查每步 → gate fail → 报错 → Agent 修复 → 重试 → 通过后进入 L2</text>
 
   <!-- Worker: dev-loop (right) -->
   <rect x="670" y="492" width="680" height="132" rx="6" fill="white" stroke="#f87171" stroke-width="1.5"/>
@@ -131,9 +131,9 @@
   <text x="1170" y="558" text-anchor="middle" font-size="8" fill="#475569" font-family="system-ui, sans-serif">progress → code-review → in_verification</text>
   <!-- dev-loop internal retry -->
   <path d="M700,575 C700,586 970,586 970,575" fill="none" stroke="#888" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#loop-arrow)"/>
-  <text x="835" y="583" text-anchor="middle" font-size="7.5" fill="#888" font-family="system-ui, sans-serif">↻ test 不通过 → fix → re-test</text>
+  <text x="835" y="583" text-anchor="middle" font-size="7.5" fill="#888" font-family="system-ui, sans-serif">↻ RED→Reviewer→dev→Reviewer→test-GREEN→Reviewer</text>
   <rect x="685" y="592" width="650" height="22" rx="4" fill="#fefce8" stroke="#eab308" stroke-width="0.8"/>
-  <text x="695" y="607" font-size="8" fill="#a16207" font-family="system-ui, sans-serif">🟠 门禁报错循环：pr-create / pr-merge fail → 报错信息指导调用 skill:doc-B1/B2 或更新 metadata → 修复 → 重试</text>
+  <text x="695" y="607" font-size="8" fill="#a16207" font-family="system-ui, sans-serif">🟠 L2 Dev Loop: 每阶段 Reviewer 审查 → fail→重做 → pass→下一阶段 → pr-create/pr-merge gate → L3</text>
 
   <!-- =================================================================== -->
   <!-- COMMANDS / TOOLS — 工具层                                             -->
@@ -164,12 +164,12 @@
 
   <rect x="710" y="735" width="660" height="120" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="1.8"/>
   <rect x="720" y="723" width="300" height="20" rx="3" fill="#10b981"/>
-  <text x="870" y="736" text-anchor="middle" font-size="10" font-weight="bold" fill="white" font-family="system-ui, sans-serif">A2A — Agent 间任务协调 (Manager ↔ Worker)</text>
-  <text x="725" y="760" font-size="9" fill="#065f46" font-family="system-ui, sans-serif">Task 状态机: submitted → working → completed | failed | input-required | pending-input</text>
-  <text x="725" y="778" font-size="9" fill="#475569" font-family="system-ui, sans-serif">Manager 委派: a2a-exit --state submitted --role worker --summary "..." (⚠ 不可用 --agent-id)</text>
-  <text x="725" y="796" font-size="9" fill="#475569" font-family="system-ui, sans-serif">Worker 完成: a2a-exit --state completed → A2A task state 更新 → SSE 通知 Manager</text>
-  <text x="725" y="814" font-size="9" fill="#475569" font-family="system-ui, sans-serif">Manager 查询: a2a_task.py list --role worker --status blocked|completed</text>
-  <text x="725" y="835" font-size="8" fill="#94a3b8" font-family="system-ui, sans-serif">A2A 存任务状态与载荷；Runtime Task Launcher 负责读取 → 生成 prompt → 启动 Worker</text>
+  <text x="870" y="736" text-anchor="middle" font-size="10" font-weight="bold" fill="white" font-family="system-ui, sans-serif">A2A — Agent 间任务协调 (Manager ↔ Worker ↔ Reviewer)</text>
+  <text x="725" y="760" font-size="9" fill="#065f46" font-family="system-ui, sans-serif">Task 状态机: submitted → working → input-required → completed | failed</text>
+  <text x="725" y="778" font-size="9" fill="#475569" font-family="system-ui, sans-serif">input-required + reason Enum (12值) → A2A SSE 推送 → watchdog_sse.py 路由 → ACP session/new|resume</text>
+  <text x="725" y="796" font-size="9" fill="#475569" font-family="system-ui, sans-serif">Reviewer verdict → PATCH state=completed → SSE 通知 Worker + Manager</text>
+  <text x="725" y="814" font-size="9" fill="#475569" font-family="system-ui, sans-serif">Manager 查询: a2a_task.py list --role worker|reviewer --status blocked|completed</text>
+  <text x="725" y="835" font-size="8" fill="#94a3b8" font-family="system-ui, sans-serif">A2A 存任务状态 + SSE 推送 → watchdog 路由 → ACP session 创建 → agent_working 记录</text>
 
   <!-- Runtime Task Launcher box -->
   <rect x="1015" y="752" width="340" height="90" rx="6" fill="#d1fae5" stroke="#059669" stroke-width="1.8"/>
@@ -190,7 +190,7 @@
   <rect x="40" y="863" width="180" height="20" rx="3" fill="#eab308"/>
   <text x="130" y="876" text-anchor="middle" font-size="10" font-weight="bold" fill="white" font-family="system-ui, sans-serif">freely-db + SQLite/WAL</text>
   <text x="240" y="890" font-size="9" fill="#475569" font-family="system-ui, sans-serif">DB 守护进程 (freely_db_manager.py) — single-writer, Unix socket JSON-RPC</text>
-  <text x="240" y="910" font-size="9" fill="#854d0e" font-family="system-ui, sans-serif">a2a_tasks（委派状态+载荷）| chats（freely chat 插话/评论）| sessions（ACP session）| tool_*（工具切换）| task_mode_gate（模式）</text>
+  <text x="240" y="910" font-size="9" fill="#854d0e" font-family="system-ui, sans-serif">a2a_tasks（委派状态+载荷）| chats（插话/评论）| sessions（ACP session）| tool_*（工具切换）| agent_working（agent-session 绑定）| task_mode_gate</text>
 
   <rect x="710" y="875" width="660" height="60" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
   <text x="725" y="895" font-size="9" fill="#475569" font-family="system-ui, sans-serif">Runtime bridge: consume_delegate_workers → list --role worker --status submitted → prompt → launch</text>
@@ -228,27 +228,33 @@
   <text x="50" y="1062" font-size="11" font-weight="bold" fill="#334155" font-family="system-ui, sans-serif">执行链路</text>
   <text x="50" y="1080" font-size="9" fill="#475569" font-family="system-ui, sans-serif">Runtime → ACP Bridge → AI CLI ACP Session（执行 Manager/Worker Role，装载 Skill）→ 调用 Commands / A2A / DB</text>
 
-  <text x="50" y="1108" font-size="11" font-weight="bold" fill="#334155" font-family="system-ui, sans-serif">三种循环机制</text>
+  <text x="50" y="1108" font-size="11" font-weight="bold" fill="#334155" font-family="system-ui, sans-serif">三种循环机制 (Three-Loop Model)</text>
   <rect x="50" y="1118" width="14" height="11" rx="2" fill="#dbeafe" stroke="#3b82f6"/>
-  <text x="70" y="1127" font-size="9" fill="#475569" font-family="system-ui, sans-serif">🔵 代码级循环 — Runtime while-true + scan 脉冲（硬编码，不依赖 Skill）</text>
+  <text x="70" y="1127" font-size="9" fill="#475569" font-family="system-ui, sans-serif">🔵 L1 Doc Loop (B1→Review→B2) — Skill 行为循环: doc-B1/doc-B2 skill + tdd-review 审查</text>
   <rect x="550" y="1118" width="14" height="11" rx="2" fill="#fef3c7" stroke="#f59e0b"/>
-  <text x="570" y="1127" font-size="9" fill="#475569" font-family="system-ui, sans-serif">🟠 门禁报错循环 — gate fail → exit 1 + 报错给出具体命令/Skill 名 → Agent 修复 → 重试 gate</text>
+  <text x="570" y="1127" font-size="9" fill="#475569" font-family="system-ui, sans-serif">🟠 L2 Dev Loop (RED→dev→test-GREEN) + 门禁报错循环 — gate fail → exit 1 + 报错 → 修复 → 重试</text>
   <rect x="1020" y="1118" width="14" height="11" rx="2" fill="#faf5ff" stroke="#a855f7"/>
-  <text x="1040" y="1127" font-size="9" fill="#475569" font-family="system-ui, sans-serif">🟣 Skill 行为循环 — Skill 注入 prompt 指导 Agent "当 X 发生就做 Y"</text>
+  <text x="1040" y="1127" font-size="9" fill="#475569" font-family="system-ui, sans-serif">🟣 L3 Auto Loop — Runtime while-true + scan 脉冲 + SSE Watchdog + crash recovery + wt-close</text>
 
   <text x="50" y="1155" font-size="10" font-weight="bold" fill="#334155" font-family="system-ui, sans-serif">颜色</text>
   <rect x="90" y="1147" width="14" height="11" rx="2" fill="#eff6ff" stroke="#2563eb"/>
-  <text x="108" y="1156" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">Manager Role</text>
-  <rect x="205" y="1147" width="14" height="11" rx="2" fill="#fef2f2" stroke="#dc2626"/>
-  <text x="223" y="1156" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">Worker Role</text>
-  <rect x="315" y="1147" width="14" height="11" rx="2" fill="#faf5ff" stroke="#c084fc"/>
-  <text x="333" y="1156" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">Skill（指令程序）</text>
-  <rect x="438" y="1147" width="14" height="11" rx="2" fill="#eef2ff" stroke="#6366f1"/>
-  <text x="456" y="1156" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">ACP（会话通道）</text>
-  <rect x="567" y="1147" width="14" height="11" rx="2" fill="#ecfdf5" stroke="#10b981"/>
-  <text x="585" y="1156" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">A2A（任务协调）</text>
-  <rect x="690" y="1147" width="14" height="11" rx="2" fill="#f3f4f6" stroke="#6b7280"/>
-  <text x="708" y="1156" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">AI CLI Tool（外部）</text>
-  <rect x="835" y="1147" width="14" height="11" rx="2" fill="#fff7ed" stroke="#fb923c"/>
-  <text x="853" y="1156" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">Human side-channel</text>
+  <text x="108" y="1156" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">Manager</text>
+  <rect x="180" y="1147" width="14" height="11" rx="2" fill="#fef2f2" stroke="#dc2626"/>
+  <text x="198" y="1156" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">Worker</text>
+  <rect x="258" y="1147" width="14" height="11" rx="2" fill="#f0fdf4" stroke="#16a34a"/>
+  <text x="276" y="1156" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">Reviewer (v2)</text>
+  <rect x="378" y="1147" width="14" height="11" rx="2" fill="#faf5ff" stroke="#c084fc"/>
+  <text x="396" y="1156" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">Skill</text>
+  <rect x="440" y="1147" width="14" height="11" rx="2" fill="#eef2ff" stroke="#6366f1"/>
+  <text x="458" y="1156" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">ACP</text>
+  <rect x="505" y="1147" width="14" height="11" rx="2" fill="#ecfdf5" stroke="#10b981"/>
+  <text x="523" y="1156" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">A2A SSE</text>
+  <rect x="600" y="1147" width="14" height="11" rx="2" fill="#f3f4f6" stroke="#6b7280"/>
+  <text x="618" y="1156" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">AI CLI</text>
+  <rect x="675" y="1147" width="14" height="11" rx="2" fill="#fff7ed" stroke="#fb923c"/>
+  <text x="693" y="1156" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">Human</text>
+  <rect x="755" y="1147" width="14" height="11" rx="2" fill="#fefce8" stroke="#eab308"/>
+  <text x="773" y="1156" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">DB/SQLite</text>
+  <rect x="855" y="1147" width="14" height="11" rx="2" fill="#fce7f3" stroke="#ec4899"/>
+  <text x="873" y="1156" font-size="9" fill="#64748b" font-family="system-ui, sans-serif">agent_working</text>
 </svg>
