@@ -1,13 +1,15 @@
 ---
 candidate_id: C-20260703T121233Z-A
-status: promoted
+status: absorbed
+absorbed_into: I-20260703T121233Z-A
 source_raw: raw-20260703T121233Z
 milestone: M-20260703T121233Z-A
 ---
 
 ## C-20260703T121233Z-A: 修复进程清理 + bridge 误重启
 
-- status: promoted
+- status: absorbed
+absorbed_into: I-20260703T121233Z-A
 - decision_reason: |
   三个修复属同一边界——进程生命周期管理：
   1. stop 用进程组杀代替逐 PID 杀
