@@ -5,7 +5,7 @@ MUST 强制在任何工作开始前遵守`freely-workflow-guarded-execution`这�
 
 这个 skill 它内部要求的强制开发流程（详情请阅读其 skill）:
 ```
-[skill] freely-workflow-guarded-execution → [cmd] freely feedback → [cmd] freely wt-create → [skill] freely-doc-B1_IBM-execution → [skill] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
+[skill] freely-workflow-guarded-execution → [cmd] freely feedback → [cmd] freely wt-create（创建工位后cd到工位进行工作） → [skill] freely-doc-B1_IBM-execution → [skill] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
 ```
 
 > **`[cmd]`** = bin 脚本，在 shell 中直接执行，如`freely feedback ...`。**`[skill]`** = xxx skill，由 AI agent 通过 Skill 工具加载。
@@ -126,7 +126,7 @@ Freely 开发 Freely 时，默认先问四件事：
       scan ──→ 已有工位 ──→ 直接进入继续
                                 ↓
 阶段0: [skill] freely-workflow-guarded-execution  — 判题：搜索已有 issue，决定创建还是复用
-阶段1: [命令] wt-create --raw-key <key> --source platform --kind <fix|feature|hotfix> --slug <slug>
+阶段1: [命令] wt-create --raw-key <key> --source platform --kind <fix|feature|hotfix> --slug <slug>（创建工位后cd到工位进行工作）
 阶段2: [skill] skill:freely-doc-B1_IBM-execution（brainstorm → candidate → promote/absorb/drop）
 阶段3: [skill] skill:freely-doc-B2_IBM-execution（物化 I-* issue + prd/pre-tests/tasks/code-reviews）
 阶段4: [skill] skill:freely-dev-loop-execution（写代码 → RED-GREEN 验证 → commit）
@@ -142,7 +142,7 @@ Freely 开发 Freely 时，默认先问四件事：
 | 步骤 | 操作 | 类型 | 谁执行 |
 |------|------|------|--------|
 | 0. 反馈 | `freely feedback --repo <repo> --title "..." --body "..."` (raw issue 不存在时) | [命令] | Manager/开发者 |
-| 1. 开工位 | `freely wt-create --raw-key <key> --source platform --kind <fix|feature|hotfix> --slug <slug>` | [命令] | Manager/开发者 |
+| 1. 开工位 | `freely wt-create --raw-key <key> --source platform --kind <fix|feature|hotfix> --slug <slug>`（创建工位后cd到工位进行工作） | [命令] | Manager/开发者 |
 | 2. B1_IBM 预研 | B1:IBM（brainstorm→candidate→milestone） | [skill] skill:freely-doc-B1_IBM-execution | Worker |
 | 3. B2_IBM 设计 | B2:IBM（物化 I-* issue + prd/pre-tests/tasks/code-reviews） | [skill] skill:freely-doc-B2_IBM-execution | Worker |
 | 4. Dev 实现 | dev-loop-execution → 写代码 → RED-GREEN → commit | [skill] skill:freely-dev-loop-execution | Worker |

@@ -15,7 +15,7 @@ description: >-
 
 # skill:freely-doc-B1_IBM-execution
 
-> 全链路: [skill] freely-workflow-guarded-execution → [cmd] freely feedback → [cmd] freely wt-create → [skill][here] freely-doc-B1_IBM-execution → [skill] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
+> 全链路: [skill] freely-workflow-guarded-execution → [cmd] freely feedback → [cmd] freely wt-create（创建工位后cd到工位进行工作） → [skill][here] freely-doc-B1_IBM-execution → [skill] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
 
 ## I→B→M 骨架
 

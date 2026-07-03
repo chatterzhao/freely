@@ -13,13 +13,13 @@ description: >-
 
 # skill:freely-test-execution
 
-> 全链路: [skill] freely-workflow-guarded-execution → [cmd] freely feedback → [cmd] freely wt-create → [skill] freely-doc-B1_IBM-execution → [skill] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill][here] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
+> 全链路: [skill] freely-workflow-guarded-execution → [cmd] freely feedback → [cmd] freely wt-create（创建工位后cd到工位进行工作） → [skill] freely-doc-B1_IBM-execution → [skill] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill][here] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
 
 ## 在流程中的位置
 
 ```
 feat: B1 → B2(写pre-tests) → RED(确认功能未实现) → dev(实现) → test-GREEN → pr
-fix:  wt-create → B1 → B2(写pre-tests) → RED(确认bug可复现) → dev(修复) → test-GREEN → pr
+fix:  wt-create（创建工位后cd到工位进行工作） → B1 → B2(写pre-tests) → RED(确认bug可复现) → dev(修复) → test-GREEN → pr
 ```
 
 test skill 位于 dev-loop 和 pr-create 之间。它是最后一道自动化验证闸门——任何一条测试不通过，都不能进入 PR。
