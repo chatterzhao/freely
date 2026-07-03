@@ -15,8 +15,8 @@
 - .gitignore 已有 `.freely/` 规则，该文件不应被跟踪
 
 ### A3: 端到端验证
-- [ ] daemon start 成功且无命令注入
-- [ ] workcell-state.env 生成格式正确
+- [x] daemon start 成功且无命令注入
+- [x] workcell-state.env 生成格式正确
 
 ### A4: 文档更新
 - [x] B1 brainstorms + candidates
