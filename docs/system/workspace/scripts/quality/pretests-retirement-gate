@@ -96,16 +96,10 @@ _test_status = gate_env.get("TEST_STATUS", "")
 _last_tested_commit = gate_env.get("LAST_TESTED_COMMIT", "")
 _last_tested_at = gate_env.get("LAST_TESTED_AT", "")
 
-# Closeout fields kept for backward compat with wt-close (worker retirement check).
-# These are read from workcell-state.env which may still have them from older daemon runs.
-owner_issue = env.get("LAST_WORKER_OWNER_ISSUE", "")
-recorded_pre_tests = env.get("LAST_WORKER_PRE_TESTS_PATH", "")
-closeout_gate = env.get("LAST_WORKER_CLOSEOUT_GATE", "")
-closeout_gate_command = env.get("LAST_WORKER_CLOSEOUT_GATE_COMMAND", "")
-closeout_target_lane = env.get("LAST_WORKER_CLOSEOUT_TARGET_LANE", "")
-closeout_promotion_gate = env.get("LAST_WORKER_CLOSEOUT_PROMOTION_GATE", "")
-closeout_requires_adequacy = env.get("LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY", "").lower()
-closeout_review_artifact_policy = env.get("LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY", "")
+# Closeout context is now read from worker-verification-contract.env
+# (the authoritative source). See closeout check block below.
+owner_issue = ""
+recorded_pre_tests = ""
 
 if not pretests_gate.exists():
     print(f"[pretests_retirement_missing] missing gate: {pretests_gate}", file=sys.stderr)
@@ -355,38 +349,55 @@ if _latest_commit and _last_tested_commit and _latest_commit != _last_tested_com
     sys.exit(1)
 
 # Tests are current — test-gate commit matches HEAD.
-# Closeout fields below are only required for worker retirement (wt-close).
-# For pr-create-guarded on test-pre-merge (manager role), skip closeout checks.
+# Closeout context is read from worker-verification-contract.env
+# (the authoritative source written by the manager on worker launch).
+# If the contract file doesn't exist (manager role, test-pre-merge daemon),
+# closeout checks are skipped — they only apply to worker retirement.
+_contract_file = worktree / ".freely" / "run" / "worker-verification-contract.env"
+_contract_env = parse_env(_contract_file) if _contract_file.exists() else {}
 
-missing_closeout_fields: list[str] = []
-if not closeout_gate_command:
-    missing_closeout_fields.append("closeout_gate_command")
-if not closeout_requires_adequacy:
-    missing_closeout_fields.append("closeout_requires_adequacy")
-if not closeout_review_artifact_policy:
-    missing_closeout_fields.append("closeout_review_artifact_policy")
+_contract_closeout_gate = _contract_env.get("CLOSEOUT_GATE", "")
+_contract_closeout_gate_command = _contract_env.get("CLOSEOUT_GATE_COMMAND", "")
+_contract_closeout_target_lane = _contract_env.get("CLOSEOUT_TARGET_LANE", "")
+_contract_closeout_promotion_gate = _contract_env.get("CLOSEOUT_PROMOTION_GATE", "")
+_contract_closeout_requires_adequacy = _contract_env.get("CLOSEOUT_REQUIRES_ADEQUACY", "").lower()
+_contract_closeout_review_artifact_policy = _contract_env.get("CLOSEOUT_REVIEW_ARTIFACT_POLICY", "")
+_contract_owner_issue = _contract_env.get("OWNER_ISSUE", "")
+_contract_pre_tests_path = _contract_env.get("PRE_TESTS_PATH", "")
 
-require_adequacy = closeout_requires_adequacy == "true"
-if closeout_requires_adequacy not in ("true", "false", ""):
-    missing_closeout_fields.append("closeout_requires_adequacy")
-if require_adequacy and not closeout_target_lane:
-    missing_closeout_fields.append("closeout_target_lane")
-if require_adequacy and not closeout_promotion_gate:
-    missing_closeout_fields.append("closeout_promotion_gate")
+# Only enforce closeout checks when the contract file actually exists
+# (worker worktrees launched by the manager). Manager/test worktrees
+# won't have this file, and that's expected.
+if _contract_file.exists():
+    missing_closeout_fields: list[str] = []
+    if not _contract_closeout_gate_command:
+        missing_closeout_fields.append("closeout_gate_command")
+    if not _contract_closeout_requires_adequacy:
+        missing_closeout_fields.append("closeout_requires_adequacy")
+    if not _contract_closeout_review_artifact_policy:
+        missing_closeout_fields.append("closeout_review_artifact_policy")
 
-if missing_closeout_fields:
-    legacy_hint = ""
-    if closeout_gate and not closeout_gate_command:
-        legacy_hint = f" legacy_closeout_gate={closeout_gate}"
-    print(
-        "[pretests_retirement_closeout_context_missing] workcell state 缺少 closeout 字段: "
-        + ", ".join(missing_closeout_fields)
-        + legacy_hint,
-        file=sys.stderr,
-    )
-    print(f"  文件: {state_file}", file=sys.stderr)
-    print(f"  补充缺失字段，详见 skill `freely-doc-B2_IBM-execution` §workcell-state.env 必填字段", file=sys.stderr)
-    sys.exit(1)
+    require_adequacy = _contract_closeout_requires_adequacy == "true"
+    if _contract_closeout_requires_adequacy not in ("true", "false", ""):
+        missing_closeout_fields.append("closeout_requires_adequacy")
+    if require_adequacy and not _contract_closeout_target_lane:
+        missing_closeout_fields.append("closeout_target_lane")
+    if require_adequacy and not _contract_closeout_promotion_gate:
+        missing_closeout_fields.append("closeout_promotion_gate")
+
+    if missing_closeout_fields:
+        print(
+            "[pretests_retirement_closeout_context_missing] worker verification contract 缺少 closeout 字段: "
+            + ", ".join(missing_closeout_fields),
+            file=sys.stderr,
+        )
+        print(f"  文件: {_contract_file}", file=sys.stderr)
+        print(f"  补充缺失字段，详见 skill `freely-doc-B2_IBM-execution`", file=sys.stderr)
+        sys.exit(1)
+
+    # Use contract values for issue resolution below
+    owner_issue = _contract_owner_issue
+    recorded_pre_tests = _contract_pre_tests_path
 
 issue_path, issue_error = resolve_issue_path(owner_issue)
 if not issue_path:
