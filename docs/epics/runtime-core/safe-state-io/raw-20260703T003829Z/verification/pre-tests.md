@@ -9,6 +9,11 @@
 - requirement: daemon 启动不再因 workcell-state.env 的多词值而执行意外命令
 - acceptance_target: daemon start 成功，无 pr-create-guarded 被意外调用
 - testing_layer: end-to-end
+- surface_kind: end_to_end
+- target_lane: premerge-integration
+- promotion_gate: develop_merge
+- task_refs: A1,A2,A3
+- case_design: 在 test-pre-merge 工位启动 daemon，验证 source 替换为 meta_env_value 后不再触发命令注入，daemon 正常启动运行
 - target_environment: test-pre-merge-20260703T003829Z-safe-env-source
 - required_evidence: daemon 启动日志显示 supervisor 正常运行
 - evidence_level: real_env
