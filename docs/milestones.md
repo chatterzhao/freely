@@ -1,3 +1,14 @@
+## M-20260703T051533Z-A
+- title: fix: remove tracked __pycache__ .pyc files
+- status: active
+### candidate_issues
+1. `C-20260703T051533Z-A`
+- milestone: M-20260703T051533Z-A
+- status: promoted
+- promoted_issue_id: `I-20260703T051533Z-A`
+### committed_issues
+### completed_issues
+
 ## M-20260703T003829Z-A
 - title: fix: write_workcell_state unsafe source → meta_env_value
 - status: completed
