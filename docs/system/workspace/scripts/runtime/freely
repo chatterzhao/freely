@@ -22133,7 +22133,7 @@ import sys; sys.path.insert(0, '${project}/docs/system/workspace/scripts/runtime
 from agent_working import agent_assign
 agent_assign('${project}', '__manager__', 'manager', 'manager_01',
              worktree='${project}', branch='develop')
-" 2>/dev/null || true
+" 2>&1 || log_warn "agent_working __manager__ record write failed"
   fi
 
   while true; do
