@@ -22806,6 +22806,14 @@ print(ready)
     FIRST_ROUND=false
 
     log_warn "ai process exited rc=$rc (pid=${child_pid:-unknown}, session_id=${tool_session_id:-unavailable}, context_compacted=$context_compacted, context_ratio=${context_ratio:-unavailable}, jsonl_path=${tool_jsonl_path:-unavailable}, primary_rate_limit_used_percent=${primary_rate_limit_used_percent:-unavailable}, primary_rate_limit_resets_at=${primary_rate_limit_resets_at:-unavailable}, secondary_rate_limit_used_percent=${secondary_rate_limit_used_percent:-unavailable}, secondary_rate_limit_resets_at=${secondary_rate_limit_resets_at:-unavailable}, route_only_handoff=${route_only_handoff})"
+    # Preserve crash evidence: save debug log when AI exits non-zero.
+    # Uses $AI_TOOL (registry-derived, not hardcoded) — works for any tool.
+    if [[ "$rc" != "0" && -f "${cycle_debug_log:-}" ]]; then
+      local _crash_log; _crash_log="$(logs_dir_for_project "$PROJECT_ROOT")/crash-${AI_TOOL:-unknown}-$(date +%Y%m%d-%H%M%S).log"
+      cp "$cycle_debug_log" "$_crash_log" 2>/dev/null || true
+      [[ -f "$cycle_log" ]] && cp "$cycle_log" "${_crash_log}.stdout" 2>/dev/null || true
+      log_info "crash evidence saved: $_crash_log"
+    fi
     # ACP mode: bridge persists across cycles — keep child_pid_file so watchdog knows AI is alive
     if [[ "${AI_TOOL_ADAPTER:-direct}" != "acp" ]]; then
       rm -f "$child_pid_file"
