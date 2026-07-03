@@ -57,7 +57,7 @@ bash 将其解释为 `VAR=val command`，导致 daemon 启动时意外执行 `pr
 
 `LAST_STATE_UPDATED_AT` 的职责是让门禁判断"测试跑过了没有"。
 这个职责不应该混在 workcell-state.env（运行时状态文件）里，
-应该独立为 **test-evidence.env**，由 wt-create 在测试工位创建。
+应该独立为 **test-gate.env**，由 wt-create 在测试工位创建。
 
 ### 文件分布设计
 
@@ -65,7 +65,7 @@ bash 将其解释为 `VAR=val command`，导致 daemon 启动时意外执行 `pr
 项目根目录 (develop/fix/feature)         测试工位 (test-pre-merge-*)
 ├── .freely/run/                         ├── .freely/run/
 │   └── workcell-state.env               │   ├── workcell-state.env    ← daemon 运行时状态，全局一致
-│       (6 运行时字段 + 时间戳)            │   └── test-evidence.env    ← 测试证据，仅此工位有
+│       (6 运行时字段 + 时间戳)            │   └── test-gate.env    ← 测试证据，仅此工位有
 │                                         │       wt-create 创建
 │                                         │       daemon 启动/停止时更新
 │                                         │       门禁检查这个文件
@@ -82,7 +82,7 @@ LAST_ROLE_HINT="manager"
 LAST_STATE_UPDATED_AT="2026-07-03T02:01:59Z"
 ```
 
-**test-evidence.env**（仅 test-pre-merge 工位有，wt-create 创建）：
+**test-gate.env**（仅 test-pre-merge 工位有，wt-create 创建）：
 ```
 TEST_STATUS="not_tested"           # not_tested → testing → completed
 LAST_TESTED_AT="1970-01-01T00:00:00Z"
@@ -91,7 +91,7 @@ LAST_TESTED_COMMIT=""              # 测试时 HEAD 的 commit hash
 
 ### 生命周期
 
-1. **wt-create**：创建 test-pre-merge 时写入 test-evidence.env，初始 `not_tested`
+1. **wt-create**：创建 test-pre-merge 时写入 test-gate.env，初始 `not_tested`
 2. **daemon 启动**：将 `TEST_STATUS` 更新为 `testing`，`LAST_TESTED_AT` 更新
 3. **daemon 停止**：将 `TEST_STATUS` 更新为 `completed`，记录 `LAST_TESTED_COMMIT`
 4. **门禁**：对比 `LAST_TESTED_COMMIT` vs HEAD；`LAST_TESTED_AT` 作为兜底时间戳
@@ -100,7 +100,7 @@ LAST_TESTED_COMMIT=""              # 测试时 HEAD 的 commit hash
 ### 门禁检查逻辑
 
 ```
-if test-evidence.env 不存在:
+if test-gate.env 不存在:
     → "请先在测试工位运行 daemon"
 if LAST_TESTED_COMMIT != HEAD:
     → "测试工位有新提交未重新测试"
@@ -162,18 +162,14 @@ closeout 字段在此是纯透传——读出来，什么也不改，原样写�
   3. **closeout 字段改为直接从 worker-verification-contract.env 读**——不经过 workcell-state.env 中转
   4. 写回时只写运行时字段 + 时间戳，不再写 closeout
 
-### 消费者 3：`start-lead-agent.sh` (line 102-132)
+### 消费者 3：`start-lead-agent.sh` prompt_role_for_project() (line 142-164)
 
-```bash
-source "$state_file"  # 读 role_hint + closeout context
-```
+`prompt_role_for_project()` 用 source 读 `LAST_ROLE_HINT`。
+closeout 字段已经通过 `worker_verification_contract_launchable()` 从 contract 文件直读——不从 workcell-state.env 读。
 
-- 读什么：`LAST_ROLE_HINT`, `LAST_WORKER_CLOSEOUT_*`
-- `LAST_ROLE_HINT` 的权威源：`effective_runtime_role_for_project()` 函数——从 config + worktree 类型推导
-- closeout 字段的权威源：worker prompt 文件（`start-lead-agent.sh` 的调用者已经传入了 prompt 文件路径）
-- 重构方向：
-  1. `LAST_ROLE_HINT` → 改调用 `effective_runtime_role_for_project()`
-  2. closeout 字段 → 从 worker prompt 文件直接读取（prompt 里已有这些字段）
+- 读什么：仅 `LAST_ROLE_HINT`（closeout 已从 contract 读）
+- 权威源：daemon 写入的运行时记录，`effective_runtime_role_for_project()` 作为兜底
+- 重构方向：source 改为 meta_env_value 读 LAST_ROLE_HINT，空则 fallback 到函数推导
 
 ### 消费者 4：状态展示函数 (lines 1716-1950)
 
@@ -231,9 +227,9 @@ state_file = os.path.join(wt_path, ".freely", "run", "workcell-state.env")
 
 | 优先级 | 改动 | 影响 |
 |--------|------|------|
-| P0 | **创建 test-evidence.env**：wt-create 写入 + daemon 更新 + 门禁检查 | 测试证据从 workcell-state.env 独立出来 |
+| P0 | **创建 test-gate.env**：wt-create 写入 + daemon 更新 + 门禁检查 | 测试证据从 workcell-state.env 独立出来 |
 | P0 | **精简 workcell-state.env**：删掉 16 个 LAST_WORKER_* | 职责清晰，只剩运行时状态 |
-| P0 | `monitor-ai-cli.sh` closeout 透传改为从 contract 直读 | 消除冗余中转 |
+| P0 | `monitor-ai-cli.sh` source 改 meta_env_value + 停止写 closeout | 消除与 write_workcell_state 同源的命令注入向量 |
 | P0 | `start-lead-agent.sh` role_hint 改为调函数、closeout 从 prompt 读 | 消除 source + 冗余读取 |
 | P1 | 其他 shell `source` → `meta_env_value`（6处） | 消除所有 unsafe source |
 | P2 | Python fleet status 不用改（已安全） | — |
