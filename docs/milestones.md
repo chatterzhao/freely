@@ -1,3 +1,18 @@
+## M-20260703T054629Z-A
+- title: fix: wt-close pretests gate worktree path
+- status: completed
+### candidate_issues
+### committed_issues
+1. `I-20260703T054629Z-A`
+- milestone: M-20260703T054629Z-A
+- phase_state: completed
+- path: docs/epics/closeout-chain/wt-close-test-gate/raw-20260703T054629Z/issues/I-20260703T054629Z-A.md
+### completed_issues
+1. `C-20260703T054629Z-A`
+- milestone: M-20260703T054629Z-A
+- status: absorbed
+- absorbed_into: `I-20260703T054629Z-A`
+
 ## M-20260703T051533Z-A
 - title: fix: remove tracked __pycache__ .pyc files
 - status: completed
