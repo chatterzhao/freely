@@ -22124,6 +22124,18 @@ ${_msg}" >/dev/null 2>&1 || true
   # Kill the heartbeat subprocess when the supervisor exits (belt and suspenders)
   trap 'kill $_heartbeat_bg_pid 2>/dev/null || true' EXIT
 
+  # Record manager presence in agent_working table.
+  # Manager is created at daemon startup, not lazily. Single row: __manager__.
+  # On restart, the existing row carries the previous session_id for resume.
+  if [[ "$(effective_runtime_role_for_project "$project")" == "manager" ]]; then
+    python3 -c "
+import sys; sys.path.insert(0, '${project}/docs/system/workspace/scripts/runtime')
+from agent_working import agent_assign
+agent_assign('${project}', '__manager__', 'manager', 'manager_01',
+             worktree='${project}', branch='develop')
+" 2>/dev/null || true
+  fi
+
   while true; do
     _update_heartbeat "$PROJECT_ROOT"
     # Re-load session state each cycle so resume/fork decisions see latest values
