@@ -1,3 +1,18 @@
+## M-20260703T162506Z-A
+- title: fix: _update_agent_table_slot pattern match
+- status: completed
+### candidate_issues
+### committed_issues
+1. `I-20260703T162506Z-A`
+- milestone: M-20260703T162506Z-A
+- phase_state: completed
+- path: docs/epics/closeout-chain/fix-agent-table-update/raw-20260703T162506Z/issues/I-20260703T162506Z-A.md
+### completed_issues
+1. `C-20260703T162506Z-A`
+- milestone: M-20260703T162506Z-A
+- status: absorbed
+- absorbed_into: `I-20260703T162506Z-A`
+
 ## M-20260701T001514Z-A
 - title: fix: --reset timeout message + non-TTY guidance
 - status: active
