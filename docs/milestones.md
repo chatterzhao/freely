@@ -1,3 +1,18 @@
+## M-20260703T080443Z-A
+- title: fix: write __manager__ record at daemon startup + inline meta_env_value in start-lead-agent.sh
+- status: completed
+### candidate_issues
+### committed_issues
+1. `I-20260703T080443Z-A`
+- milestone: M-20260703T080443Z-A
+- phase_state: done_b2_ibm
+- path: docs/epics/closeout-chain/manager-startup-record/raw-20260703T080443Z/issues/I-20260703T080443Z-A.md
+### completed_issues
+1. `C-20260703T080443Z-A`
+- milestone: M-20260703T080443Z-A
+- status: absorbed
+- absorbed_into: `I-20260703T080443Z-A`
+
 ## M-20260703T054629Z-A
 - title: fix: wt-close pretests gate worktree path
 - status: completed
