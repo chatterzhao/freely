@@ -234,18 +234,18 @@ parse_ai_spec_or_fail() {
   done
   if [[ "$_is_known" == "0" ]]; then
     cat >&2 <<SLOT_ERR
-[ERROR] slot 配置对应的工具 '$tool' 在 freely 中没有注册，不在支持列表中。
+[ERROR] slot 对应的工具 '$tool' 未在 tool-registry.toml 中注册。
 
   已注册的工具: $_reg_tools
 
-  请检查:
-  1. agent-table.toml 中 {role}_slot 配置的工具名是否正确
-  2. slot 目录命名是否规范: {tool-name}-apikey|account-{custom}
-     例: claude-apikey-ds-pro-auto → 工具=claude
-         opencode-apikey-ds-flash-auto → 工具=opencode
-         codex-account-user@example-com-1 → 工具=codex
+  slot 是 ~/.ai-auth/ 下的鉴权目录，命名约定为 {tool-name}-{apikey|account}-{custom}。
+  tool-name 必须是已注册的工具名（首段 -apikey- 或 -account- 之前的部分）。
 
-  如果工具名正确但不在 registry 中，请更新 tool-registry.toml 添加该工具。
+  例: claude-apikey-ds-pro-auto → 工具=claude
+      opencode-apikey-ds-flash-auto → 工具=opencode
+      codex-account-user@example-com-1 → 工具=codex
+
+  请检查 agent-table.toml 中 {role}_slot 字段是否使用了已注册的 tool-name。
 SLOT_ERR
     exit 1
   fi
