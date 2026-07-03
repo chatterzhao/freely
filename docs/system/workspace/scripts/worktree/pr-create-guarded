@@ -201,12 +201,33 @@ echo ""
 # Checks that pretests execution evidence exists before allowing PR creation.
 # Mirrors the check in wt-close to catch untested code before PR creation.
 echo "Step 2d/4: pretests execution evidence check..."
-# Use the current worktree as both project (for issue/doc lookup) and worktree path
-# (for runtime evidence). During development, governance files live in the worktree
-# alongside the code changes, so the worktree root is the correct project root here.
+
+# ── Verify .freely/run/workcell-state.env is NOT tracked by git ──
+# Runtime state files must never be committed; .freely/ is gitignored.
+if git ls-files --error-unmatch .freely/run/workcell-state.env >/dev/null 2>&1; then
+  cat >&2 <<'GIT_TRACK_GATE'
+╔══════════════════════════════════════════════════════════════╗
+║  [PRETESTS-GATE] .freely/run/workcell-state.env 不应被 git 跟踪 ║
+╠══════════════════════════════════════════════════════════════╣
+║  .freely/ 目录已在 .gitignore 中，该文件是运行时自动生成的状态文件。  ║
+║  修复: git rm --cached .freely/run/workcell-state.env            ║
+╚══════════════════════════════════════════════════════════════╝
+GIT_TRACK_GATE
+  exit 1
+fi
+
+# Find test-pre-merge worktree for runtime evidence check.
+# The fix/feature worktree doesn't run the daemon — runtime state
+# (workcell-state.env closeout fields) lives in test-pre-merge where
+# the daemon was actually started during GREEN testing.
+_test_wt=$(git worktree list --porcelain 2>/dev/null | awk -v k="test-pre-merge-${_raw_key_ts:-}" '
+  $1=="worktree" { wt=$2 }
+  $1=="branch" && $2 ~ k { print wt; exit }
+')
+_wt_path="${_test_wt:-$ROOT_DIR}"
 if [[ -x "$ROOT_DIR/bin/pretests-retirement-gate" ]]; then
   set +e
-  _gate_output="$("$ROOT_DIR/bin/pretests-retirement-gate" --project "$ROOT_DIR" --worktree-path "$ROOT_DIR" 2>&1)"
+  _gate_output="$("$ROOT_DIR/bin/pretests-retirement-gate" --project "$ROOT_DIR" --worktree-path "$_wt_path" 2>&1)"
   _gate_rc=$?
   set -e
   if [[ "$_gate_rc" -ne 0 ]]; then
