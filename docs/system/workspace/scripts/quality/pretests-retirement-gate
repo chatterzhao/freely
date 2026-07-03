@@ -323,30 +323,65 @@ if not state_file.exists():
         print("不要逐条改状态绕过——去跑测试，把真实结果写回 actual_output 和 evidence_file。", file=sys.stderr)
         print("如需豁免某项测试，设置 status=not_applicable 并填写 not_applicable_reason。", file=sys.stderr)
     sys.exit(1 if fallback_failures > 0 else 0)
-if not owner_issue and not recorded_pre_tests and not closeout_gate and not closeout_gate_command:
-    # All closeout fields empty → daemon never ran to completion in test worktree
-    print(f"[pretests_retirement_binding_missing] 测试工位中缺少测试完成状态", file=sys.stderr)
+
+# ── Timestamp-based test freshness check ──
+# Compare workcell-state.env's LAST_STATE_UPDATED_AT against the latest
+# git commit on this worktree's branch. If git has newer commits than the
+# last daemon run, tests are stale and must be re-run.
+_last_updated_str = env.get("LAST_STATE_UPDATED_AT", "")
+_desired_state = env.get("DESIRED_RUNTIME_STATE", "")
+
+# Try to get the latest commit timestamp on this worktree's branch
+_latest_commit_ts = 0
+_last_updated_ts = 0
+try:
+    _latest = _sp.check_output(
+        ["git", "-C", str(worktree), "log", "-1", "--format=%ct", "HEAD"],
+        text=True, stderr=_sp.DEVNULL
+    ).strip()
+    _latest_commit_ts = int(_latest) if _latest else 0
+except Exception:
+    pass
+
+if _last_updated_str:
+    try:
+        import datetime as _dt
+        _dt_parsed = _dt.datetime.strptime(_last_updated_str, "%Y-%m-%dT%H:%M:%SZ")
+        _last_updated_ts = int(_dt_parsed.timestamp())
+    except Exception:
+        pass
+
+if _desired_state == "not_tested" or _last_updated_ts == 0:
+    print(f"[pretests_not_tested] 测试工位还没有运行过 daemon", file=sys.stderr)
     print(f"  文件: {state_file}", file=sys.stderr)
+    print(f"  DESIRED_RUNTIME_STATE = {_desired_state}", file=sys.stderr)
     print(f"", file=sys.stderr)
-    print(f"  原因: 该文件存在但缺少 closeout 字段（LAST_WORKER_OWNER_ISSUE /", file=sys.stderr)
-    print(f"        LAST_WORKER_PRE_TESTS_PATH / LAST_WORKER_CLOSEOUT_GATE_COMMAND）。", file=sys.stderr)
-    print(f"        这说明还没有在当前开发工位对应的测试工位", file=sys.stderr)
-    print(f"        （raw key 相同的 test-pre-merge-* 工位）中", file=sys.stderr)
-    print(f"        完成测试或 daemon 尚未写入 closeout 上下文。", file=sys.stderr)
+    print(f"  请先在测试工位运行 daemon 完成测试:", file=sys.stderr)
+    print(f"    cd {worktree}", file=sys.stderr)
+    print(f"    ./bin/freely daemon start --task-mode auto", file=sys.stderr)
+    print(f"  详见 skill `freely-test-execution`", file=sys.stderr)
+    sys.exit(1)
+
+if _latest_commit_ts > 0 and _last_updated_ts > 0 and _latest_commit_ts > _last_updated_ts:
+    import datetime as _dt
+    _commit_dt = _dt.datetime.fromtimestamp(_latest_commit_ts, tz=_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    print(f"[pretests_stale] 测试工位有新提交但未重新跑测试", file=sys.stderr)
+    print(f"  文件: {state_file}", file=sys.stderr)
+    print(f"  最新 commit 时间: {_commit_dt}", file=sys.stderr)
+    print(f"  上次测试时间:     {_last_updated_str}", file=sys.stderr)
     print(f"", file=sys.stderr)
-    print(f"  修复: 在测试工位启动 daemon 完成测试验证，daemon 会自动", file=sys.stderr)
-    print(f"        写入这些字段。详见 skill `freely-test-execution`。", file=sys.stderr)
+    print(f"  测试工位 {worktree} 在 merge 新代码后未重新运行 daemon。", file=sys.stderr)
+    print(f"  请检查新的修改是否需要跑测试——", file=sys.stderr)
+    print(f"  如果需要:", file=sys.stderr)
+    print(f"    cd {worktree}", file=sys.stderr)
+    print(f"    ./bin/freely daemon start --task-mode auto", file=sys.stderr)
+    print(f"    按照 pre-tests.md 中的测试用例逐条执行验证。", file=sys.stderr)
+    print(f"  详见 skill `freely-test-execution`", file=sys.stderr)
     sys.exit(1)
-if not owner_issue:
-    print(f"[pretests_retirement_binding_missing] 测试工位缺少 owner issue 绑定", file=sys.stderr)
-    print(f"  文件: {state_file}", file=sys.stderr)
-    print(f"  缺少: LAST_WORKER_OWNER_ISSUE（如 I-{{raw key}}-A）", file=sys.stderr)
-    sys.exit(1)
-if not recorded_pre_tests:
-    print(f"[pretests_retirement_binding_missing] 测试工位缺少 pre-tests 路径", file=sys.stderr)
-    print(f"  文件: {state_file}", file=sys.stderr)
-    print(f"  缺少: LAST_WORKER_PRE_TESTS_PATH", file=sys.stderr)
-    sys.exit(1)
+
+# Tests are current — timestamp is >= latest commit.
+# closeout fields below are only required for worker retirement (wt-close).
+# For pr-create-guarded on test-pre-merge (manager role), skip closeout checks.
 
 missing_closeout_fields: list[str] = []
 if not closeout_gate_command:

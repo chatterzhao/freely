@@ -731,6 +731,21 @@ fi
     # Do NOT copy: run/ (PIDs, sockets — daemon start recreates them)
     # Do NOT copy: logs/ (test worktree should have own logs)
     # config.toml is already synced by sync-tooling
+
+    # Initialize test state marker — marks this worktree as "not yet tested".
+    # The daemon will overwrite LAST_STATE_UPDATED_AT with the real timestamp
+    # when it starts. The gate compares this against the latest git commit to
+    # detect whether tests have been re-run after new commits.
+    mkdir -p "$tp_target/.freely/run"
+    cat > "$tp_target/.freely/run/workcell-state.env" <<'TEST_INIT'
+DESIRED_RUNTIME_STATE="not_tested"
+LAST_STATE_UPDATED_AT="1970-01-01T00:00:00Z"
+LAST_EXIT_REASON=""
+LAST_ENTRYPOINT_MODE=""
+LAST_ROLE_HINT=""
+TEST_INIT
+    echo "  test-pre-merge: initialized workcell-state.env (not_tested)"
+
     echo "  test-pre-merge: cloned .freely state from develop"
   fi
 
