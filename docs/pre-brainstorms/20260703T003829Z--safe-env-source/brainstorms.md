@@ -16,26 +16,64 @@ created_at: 2026-07-03
 
 ## Problem
 
-`write_workcell_state()` 在 `docs/system/workspace/scripts/runtime/freely:8426` 使用
-`source "$state_file"` 读取 `LAST_ENTRYPOINT_MODE`。
+### 触发症状
 
-当 `workcell-state.env` 中包含未加引号的多词值（如
-`LAST_WORKER_CLOSEOUT_GATE_COMMAND=freely pr-create-guarded`）时，
-bash 将其解释为 `VAR=val command` 语法——设置变量后执行命令。
-导致 `pr-create-guarded` 在 daemon 启动期间被意外执行，在 develop
-分支上因分支保护检查而失败。
+`write_workcell_state()` 使用 `source "$state_file"` 读取 `LAST_ENTRYPOINT_MODE`。
+当 env 文件中含未引号多词值（如 `LAST_WORKER_CLOSEOUT_GATE_COMMAND=freely pr-create-guarded`）时，
+bash 将其解释为 `VAR=val command`，导致 daemon 启动时意外执行 `pr-create-guarded` 而失败。
 
-此外，`.freely/run/workcell-state.env` 被错误地提交到了 git
-（尽管 `.gitignore` 已有 `.freely/` 规则），每次 checkout 都会
-恢复含未引用值的损坏版本。
+### 根因：workcell-state.env 的 23 个字段混入了三类职责
+
+#### 第一类：daemon 运行时状态（6字段）—— 全局的，属于项目根目录
+
+`DESIRED_RUNTIME_STATE` / `LAST_SUPERVISOR_STATE` / `LAST_AI_STATE` /
+`LAST_EXIT_REASON` / `LAST_ENTRYPOINT_MODE` / `LAST_ROLE_HINT`
+
+这些是 daemon 进程的运行时快照，在项目根 `.freely/run/` 下存在是合理的——不管哪个 worktree，daemon 只有一个。`write_workcell_state()` 和 `monitor-ai-cli.sh` 共同维护。
+
+#### 第二类：Worker closeout 上下文（16字段）—— 按 raw_key 索引，应该进 agent_working 表
+
+`LAST_WORKER_OWNER_ISSUE` / `LAST_WORKER_PRE_TESTS_PATH` /
+`LAST_WORKER_CLOSEOUT_GATE` / `LAST_WORKER_CLOSEOUT_GATE_COMMAND` /
+`LAST_WORKER_CLOSEOUT_TARGET_LANE` / `LAST_WORKER_CLOSEOUT_PROMOTION_GATE` / ...
+
+这些是 manager 委派 worker 时注入的治理数据——告诉 worker 属于哪个 issue、测试路径在哪、走什么门禁。
+
+数据流：manager → `write_worker_verification_contract_file()` → contract.env →
+`write_workcell_state()` 读取写入 → `monitor-ai-cli.sh` 在每次 AI cycle 中读回保留。
+
+问题：这是**按 raw_key 索引**的治理数据。`agent_working` 表已有 `raw_key`(PK)、
+`branch`、`test_worktree`、`test_branch`，天然适合承载。放在 shell env 文件里导致
+① `source` 解析不安全 ② 门禁检查困难 ③ 与运行时状态职责混淆。
+
+#### 第三类：测试时间戳（1字段）—— 测试工位专属
+
+`LAST_STATE_UPDATED_AT`：用于门禁对比 test 分支最新 commit 时间，判断测试是否过期。
+
+### 之前理解的错误
+
+1. **closeout 字段不该在 workcell-state.env** —— 应进 `agent_working` 表，随 worktree 生命周期更新
+2. **门禁不应检查 closeout 字段** —— test-pre-merge 是 manager 角色，这些字段永远为空。正确做法是比较时间戳
+3. **`monitor-ai-cli.sh:351` 也在用 `source`** —— 同样 unsafe，但 heredoc 已加引号，风险较小
 
 ## Scope 判定
 
-这是一个独立的 bug，范围明确：
-- 影响模块：`write_workcell_state()` 函数
-- 影响文件：`docs/system/workspace/scripts/runtime/freely`
-- 附带清理：`.freely/run/workcell-state.env` 从 git 跟踪中移除
-- 不涉及其他模块或架构变更
+### 本 issue 已完成的修复
+
+1. `write_workcell_state()`: `source` → `meta_env_value`
+2. `.freely/run/workcell-state.env`: `git rm --cached`
+3. `pr-create-guarded`: `--worktree-path` 指向 test-pre-merge
+4. `pretests-retirement-gate`: closeout 字段检查 → 时间戳比较
+5. `wt-create`: test-pre-merge 创建时初始化 `not_tested` 状态
+6. Skill 全链路文档: `wt-create` 后加 `cd` 提醒
+7. 门禁报错文案: 用户友好的中文提示
+
+### 需要后续 issue 跟进的重构
+
+1. **closeout 16 字段迁移到 agent_working** —— 新增列，随 worktree 生命周期 upsert/delete
+2. **`monitor-ai-cli.sh:351` 的 `source` 改安全读取**
+3. **workcell-state.env 精简为 6 运行时字段 + 时间戳**
+4. **测试证据文件独立** —— 在 `verification/test-evidence/` 下，门禁直接查 pre-tests.md 的 artifact_ref
 
 ## Brainstorm
 
@@ -82,15 +120,12 @@ bash 将其解释为 `VAR=val command` 语法——设置变量后执行命令�
 - 对于包含 `=` 的值处理不正确
 - 增加维护负担
 
-## Decision: Option A — 用 meta_env_value 替换 source
+## Decision: Option A + 附带修复（已完成）；后续 B/C 新开 issue
 
 理由：
-1. `meta_env_value` 是项目已有的标准安全读取方式
-2. 改动最小、最安全
-3. 整个 `write_workcell_state()` 的 heredoc 模板已经用双引号格式
-   （`KEY="value"`），与 `meta_env_value` 的解析约定一致
-4. 附带修复：从 git 跟踪中移除 `.freely/run/workcell-state.env`
-   （`.gitignore` 已有 `.freely/` 规则，该文件不应被跟踪）
+1. `meta_env_value` 是最小改动，复用已有安全机制
+2. closeout 字段迁移（Option B）和测试证据独立（Option C）是架构重构，
+   不应混在同一个 fix 里——先止血，再治本
 
 ## Candidate
 - candidate_id: C-20260703T003829Z-A
