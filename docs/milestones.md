@@ -1,3 +1,18 @@
+## M-20260703T121233Z-A
+- title: fix: process cleanup + watchdog guard + bridge normalize
+- status: completed
+### candidate_issues
+### committed_issues
+1. `I-20260703T121233Z-A`
+- milestone: M-20260703T121233Z-A
+- phase_state: completed
+- path: docs/epics/closeout-chain/stop-process-cleanup/raw-20260703T121233Z/issues/I-20260703T121233Z-A.md
+### completed_issues
+1. `C-20260703T121233Z-A`
+- milestone: M-20260703T121233Z-A
+- status: absorbed
+- absorbed_into: `I-20260703T121233Z-A`
+
 ## M-20260703T114618Z-A
 - title: fix: unify agent_working write at ACP session creation
 - status: completed

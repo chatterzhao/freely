@@ -14076,10 +14076,17 @@ _ensure_acp_bridge_running() {
         log_info "ACP bridge binary changed ($running_bin → $acp_bin), gracefully closing session before restart"
         _acp_session_close "$project" "${CLAUDE_SESSION_ID_CURRENT:-}"
         _stop_acp_bridge "$project"
-      elif [[ -n "$running_tool" && "$running_tool" != "${AGENT_AI_TOOL:-claude}" ]]; then
-        log_info "ACP bridge tool changed ($running_tool → ${AGENT_AI_TOOL:-claude}), gracefully closing session before restart"
-        _acp_session_close "$project" "${CLAUDE_SESSION_ID_CURRENT:-}"
-        _stop_acp_bridge "$project"
+      elif [[ -n "$running_tool" ]]; then
+        # Compare base tool names (slot suffix may differ between cycles).
+        # opencode-apikey-ds-flash-auto and opencode are the same base tool.
+        local _running_base="${running_tool%%-*}"
+        local _current_base="${AGENT_AI_TOOL%%-*}"
+        _current_base="${_current_base:-claude}"
+        if [[ "$_running_base" != "$_current_base" ]]; then
+          log_info "ACP bridge tool changed ($running_tool → ${AGENT_AI_TOOL:-claude}), gracefully closing session before restart"
+          _acp_session_close "$project" "${CLAUDE_SESSION_ID_CURRENT:-}"
+          _stop_acp_bridge "$project"
+        fi
       elif _acp_bridge_health_check "$project" 5; then
         return 0
       else
@@ -19878,9 +19885,19 @@ _start_watchdog_sse_py() {
   local project="$1"
   local _watchdog_py="${project}/docs/system/workspace/scripts/runtime/watchdog_sse.py"
   local _a2a_socket; _a2a_socket="/tmp/freely-a2a-$(python3 -c "import hashlib,os; print(hashlib.sha256(os.path.abspath('${project}').encode()).hexdigest()[:16])" 2>/dev/null).sock"
+  # Guard: don't launch if already running (prevents duplicate instances on restart)
+  local _pid_file; _pid_file="$(run_dir_for_project "$project")/watchdog-sse.pid"
+  if [[ -f "$_pid_file" ]]; then
+    local _existing_pid; _existing_pid=$(cat "$_pid_file" 2>/dev/null || true)
+    if [[ -n "$_existing_pid" ]] && kill -0 "$_existing_pid" 2>/dev/null; then
+      return 0
+    fi
+    rm -f "$_pid_file"
+  fi
   if [[ -f "$_watchdog_py" && -S "$_a2a_socket" ]]; then
     log_info "starting watchdog_sse.py for $project"
     nohup python3 "$_watchdog_py" --project "$project" --a2a-socket "$_a2a_socket" </dev/null >>"$project/.freely/run/watchdog-sse.log" 2>&1 &
+    echo $! > "$_pid_file"
     disown $!
   fi
 }
@@ -21467,10 +21484,21 @@ print(f'/tmp/freely-db-{h}.pid')
     "acp-bridge.py.*start.*--project.*${project}"
     "monitor-ai-acp.sh.*--project.*${project}"
     "monitor-ai-cli.sh.*--project.*${project}"
+    "watchdog_sse.py.*--project.*${project}"
+    "sse-watchdog.sh.*--project.*${project}"
+    "a2a_server.py.*--project.*${project}"
     "claude-agent-acp"
     "claude.*--session-id.*--replay-user-messages"
     "run-acp-prompt.py"
   )
+  # Add current tool's base binary pattern (derived from registry, not hardcoded)
+  local _stop_base_tool="${AGENT_AI_TOOL%%-*}"
+  # Fallback: read from agent-table if AGENT_AI_TOOL not set (stop command in fresh shell)
+  if [[ -z "$_stop_base_tool" && -x "$SELF_ROOT/bin/agent-table-query" ]]; then
+    local _stop_slot; _stop_slot=$("$SELF_ROOT/bin/agent-table-query" --get-slot manager_01 2>/dev/null || true)
+    [[ -n "$_stop_slot" ]] && _stop_base_tool="${_stop_slot%%-*}"
+  fi
+  [[ -n "$_stop_base_tool" && "$_stop_base_tool" != "claude" ]] && _cleanup_patterns+=("$_stop_base_tool")
   for _p in "${_cleanup_patterns[@]}"; do
     pkill -f "$_p" 2>/dev/null || true
   done
