@@ -4028,6 +4028,30 @@ STATEEOF
     mv "$anchor_tmp" "$state_file"
     log_info "session anchor persisted early: ${CLAUDE_SESSION_ID_CURRENT}"
   fi
+
+  # ── agent_working: register this agent's session ──
+  # Every ACP session creation (new/fork/resume) writes to agent_working
+  # so the table is the universal session registry for recovery.
+  # Manager uses hardcoded raw_key "__manager__" (no raw issue to bind to).
+  local _aw_role _aw_key _aw_agent_id
+  _aw_role="$(effective_runtime_role_for_project "$project")"
+  if [[ "$_aw_role" == "manager" ]]; then
+    _aw_key="__manager__"
+    _aw_agent_id="manager_01"
+  else
+    # Worker/reviewer: raw_key comes from the worktree's issue binding.
+    # _handle_needs_worker/reviewer in watchdog_sse.py handles the initial
+    # session/fork agent_assign; this call updates with current session_id.
+    return 0
+  fi
+  # UPSERT: creates __manager__ row on first call, updates session_id on subsequent calls
+  python3 -c "
+import sys; sys.path.insert(0, '${project}/docs/system/workspace/scripts/runtime')
+from agent_working import agent_assign
+agent_assign('${project}', '${_aw_key}', '${_aw_role}', '${_aw_agent_id}',
+             worktree='${project}', branch='develop',
+             session_id='${CLAUDE_SESSION_ID_CURRENT:-}')
+" 2>/dev/null || true
 }
 
 # _tool_session_dir: return the session directory for a given tool family.
