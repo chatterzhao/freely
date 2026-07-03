@@ -357,22 +357,23 @@ import sys
 agent_id, new_slot = sys.argv[1], sys.argv[2]
 with open('$_at', 'r') as f:
     lines = f.readlines()
-# Find the agent entry and update its slot line
+# Find agent by matching _id = \"agent_id\" pattern (e.g. worker_id = \"worker_01\")
 in_target = False
 for i, line in enumerate(lines):
     s = line.strip()
     if s.startswith('[[agents]]'):
         in_target = False
-    if agent_id + ' =' in s or s.startswith(agent_id + ' ='):
+    if f'_id = \"{agent_id}\"' in s:
         in_target = True
+        continue
     if in_target and '_slot =' in s:
         old = lines[i].split('=', 1)[0]
         lines[i] = f'{old}= \"{new_slot}\"\n'
         break
 with open('$_at', 'w') as f:
     f.writelines(lines)
-print(f'updated {agent_id} slot → {new_slot}')
-" "$_agent_id" "$_new_slot" 2>/dev/null
+print(f'updated {agent_id} slot → {new_slot}', file=sys.stderr)
+" "$_agent_id" "$_new_slot"
 }
 
 # ── Cooldown cycle state ─────────────────────────────────────────────
