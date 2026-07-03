@@ -21490,8 +21490,10 @@ print(f'/tmp/freely-db-{h}.pid')
     "claude-agent-acp"
     "claude.*--session-id.*--replay-user-messages"
     "run-acp-prompt.py"
-    "opencode"
   )
+  # Add current tool's base binary pattern (derived from registry, not hardcoded)
+  local _stop_base_tool="${AGENT_AI_TOOL%%-*}"
+  [[ -n "$_stop_base_tool" && "$_stop_base_tool" != "claude" ]] && _cleanup_patterns+=("$_stop_base_tool")
   for _p in "${_cleanup_patterns[@]}"; do
     pkill -f "$_p" 2>/dev/null || true
   done

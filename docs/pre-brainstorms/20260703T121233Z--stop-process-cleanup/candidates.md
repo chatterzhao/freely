@@ -10,6 +10,7 @@ milestone: M-20260703T121233Z-A
 
 - status: absorbed
 absorbed_into: I-20260703T121233Z-A
+- promoted_issue_path: docs/epics/closeout-chain/stop-process-cleanup/raw-20260703T121233Z/issues/I-20260703T121233Z-A.md
 - decision_reason: |
   三个修复属同一边界——进程生命周期管理：
   1. stop 用进程组杀代替逐 PID 杀
