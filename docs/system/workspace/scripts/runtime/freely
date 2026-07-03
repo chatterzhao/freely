@@ -8421,10 +8421,8 @@ write_workcell_state() {
   updated_at="$(current_timestamp_utc_for_machine)"
   entrypoint_mode="${WORKCELL_ENTRYPOINT_MODE_OVERRIDE:-}"
   if [[ -z "$entrypoint_mode" && -f "$state_file" ]]; then
-    unset LAST_ENTRYPOINT_MODE
-    # shellcheck disable=SC1090
-    source "$state_file"
-    entrypoint_mode="${LAST_ENTRYPOINT_MODE:-}"
+    entrypoint_mode="$(meta_env_value "$state_file" "LAST_ENTRYPOINT_MODE")"
+    entrypoint_mode="${entrypoint_mode:-}"
   fi
   case "$entrypoint_mode" in
     daemon|foreground) ;;
