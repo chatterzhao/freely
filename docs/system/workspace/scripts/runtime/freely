@@ -8446,9 +8446,12 @@ EOF
 # Called on daemon start/stop so the gate can compare LAST_TESTED_COMMIT vs HEAD.
 _update_test_gate() {
   local project="$1" status="$2"
-  local gate_file
+  local gate_file branch
   gate_file="$(run_dir_for_project "$project")/test-gate.env"
-  [[ -f "$gate_file" ]] || return 0
+  # Only for test-pre-merge worktrees. Other worktrees don't need test-gate.
+  branch="$(git -C "$project" rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
+  [[ "$branch" == test-pre-merge-* ]] || return 0
+  mkdir -p "$(dirname "$gate_file")"
   local tested_at tested_commit
   tested_at="$(current_timestamp_utc_for_machine)"
   tested_commit=""
