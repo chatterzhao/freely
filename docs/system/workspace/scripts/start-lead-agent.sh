@@ -212,7 +212,11 @@ parse_ai_spec_or_fail() {
   # Registry is the authority — any registered tool with slots gets normalized.
   local _case_tool="$tool"
   local _reg_tools _t
-  _reg_tools="$(_tool_registry_tools 2>/dev/null || true)"
+  # Inline tool registry query — start-lead-agent.sh runs as a subprocess,
+  # it doesn't have access to _tool_registry_tools from the runtime script.
+  _script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+  _runtime_dir="$_script_dir/runtime"
+  _reg_tools="$("$_runtime_dir/tool-registry-query.py" "$_runtime_dir/tool-registry.toml" --list 2>/dev/null || true)"
   for _t in $_reg_tools; do
     [[ -n "$_t" ]] || continue
     if [[ "$_case_tool" == "$_t"-* || "$_case_tool" == "$_t" ]]; then
