@@ -4,8 +4,8 @@
 ### candidate_issues
 1. `C-20260703T051533Z-A`
 - milestone: M-20260703T051533Z-A
-- status: promoted
-- promoted_issue_id: `I-20260703T051533Z-A`
+- status: absorbed
+- absorbed_into: raw-20260703T051533Z `I-20260703T051533Z-A`
 ### committed_issues
 ### completed_issues
 
@@ -50,8 +50,8 @@
 ### candidate_issues
 1. `C-20260701T081450Z-A`
 - milestone: M-20260701T081450Z-A
-- status: promoted
-- promoted_issue_id: `I-20260701T081450Z-A`
+- status: absorbed
+- absorbed_into: raw-20260703T051533Z `I-20260701T081450Z-A`
 ### committed_issues
 ### completed_issues
 1. `I-20260701T081450Z-A`
@@ -65,8 +65,8 @@
 ### candidate_issues
 1. `C-20260701T045911Z-A`
 - milestone: M-20260701T045911Z-A
-- status: promoted
-- promoted_issue_id: `I-20260701T045911Z-A`
+- status: absorbed
+- absorbed_into: raw-20260703T051533Z `I-20260701T045911Z-A`
 - promoted_issue_path: docs/epics/reviewer-agent/phase1-ensure-reviewer/raw-20260701T045911Z/issues/I-20260701T045911Z-A.md
 ### committed_issues
 ### completed_issues
@@ -81,8 +81,8 @@
 ### candidate_issues
 1. `C-20260701T061924Z-A`
 - milestone: M-20260701T061924Z-A
-- status: promoted
-- promoted_issue_id: `I-20260701T061924Z-A`
+- status: absorbed
+- absorbed_into: raw-20260703T051533Z `I-20260701T061924Z-A`
 ### committed_issues
 ### completed_issues
 1. `I-20260701T061924Z-A`
@@ -96,8 +96,8 @@
 ### candidate_issues
 1. `C-20260701T061531Z-A`
 - milestone: M-20260701T061531Z-A
-- status: promoted
-- promoted_issue_id: `I-20260701T061531Z-A`
+- status: absorbed
+- absorbed_into: raw-20260703T051533Z `I-20260701T061531Z-A`
 ### committed_issues
 ### completed_issues
 1. `I-20260701T061531Z-A`
@@ -111,8 +111,8 @@
 ### candidate_issues
 1. `C-20260701T054502Z-A`
 - milestone: M-20260701T054502Z-A
-- status: promoted
-- promoted_issue_id: `I-20260701T054502Z-A`
+- status: absorbed
+- absorbed_into: raw-20260703T051533Z `I-20260701T054502Z-A`
 ### committed_issues
 ### completed_issues
 1. `I-20260701T054502Z-A`
@@ -126,8 +126,8 @@
 ### candidate_issues
 1. `C-20260701T051138Z-A`
 - milestone: M-20260701T051138Z-A
-- status: promoted
-- promoted_issue_id: `I-20260701T051138Z-A`
+- status: absorbed
+- absorbed_into: raw-20260703T051533Z `I-20260701T051138Z-A`
 ### committed_issues
 ### completed_issues
 1. `I-20260701T051138Z-A`
@@ -141,8 +141,8 @@
 ### candidate_issues
 1. `C-20260701T040012Z-A`
 - milestone: M-20260701T040012Z-A
-- status: promoted
-- promoted_issue_id: `I-20260701T040012Z-A`
+- status: absorbed
+- absorbed_into: raw-20260703T051533Z `I-20260701T040012Z-A`
 ### committed_issues
 ### completed_issues
 1. `I-20260701T040012Z-A`
@@ -156,8 +156,8 @@
 ### candidate_issues
 1. `C-20260701T031733Z-A`
 - milestone: M-20260701T031733Z-A
-- status: promoted
-- promoted_issue_id: `I-20260701T031733Z-A`
+- status: absorbed
+- absorbed_into: raw-20260703T051533Z `I-20260701T031733Z-A`
 ### committed_issues
 ### completed_issues
 1. `I-20260701T031733Z-A`
@@ -171,8 +171,8 @@
 ### candidate_issues
 1. `C-20260701T024449Z-A`
 - milestone: M-20260701T024449Z-A
-- status: promoted
-- promoted_issue_id: `I-20260701T024449Z-A`
+- status: absorbed
+- absorbed_into: raw-20260703T051533Z `I-20260701T024449Z-A`
 ### committed_issues
 ### completed_issues
 1. `I-20260701T024449Z-A`
@@ -186,8 +186,8 @@
 ### candidate_issues
 1. `C-20260701T013527Z-A`
 - milestone: M-20260701T013527Z-A
-- status: promoted
-- promoted_issue_id: `I-20260701T013527Z-A`
+- status: absorbed
+- absorbed_into: raw-20260703T051533Z `I-20260701T013527Z-A`
 ### committed_issues
 ### completed_issues
 1. `I-20260701T013527Z-A`
@@ -216,8 +216,8 @@
 ### candidate_issues
 1. `C-20260630T224941Z-A`
 - milestone: M-20260630T224941Z-A
-- status: promoted
-- promoted_issue_id: `I-20260630T224941Z-A`
+- status: absorbed
+- absorbed_into: raw-20260703T051533Z `I-20260630T224941Z-A`
 ### committed_issues
 ### completed_issues
 1. `I-20260630T224941Z-A`
@@ -262,8 +262,8 @@
 ### candidate_issues
 1. `C-20260630T124528Z-A`
 - milestone: M-20260630T124528Z-A
-- status: promoted
-- promoted_issue_id: `I-20260630T124528Z-A`
+- status: absorbed
+- absorbed_into: raw-20260703T051533Z `I-20260630T124528Z-A`
 ### committed_issues
 ### completed_issues
 1. `I-20260630T124528Z-A`
