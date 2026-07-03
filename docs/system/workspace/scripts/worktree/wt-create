@@ -731,6 +731,19 @@ fi
     # Do NOT copy: run/ (PIDs, sockets — daemon start recreates them)
     # Do NOT copy: logs/ (test worktree should have own logs)
     # config.toml is already synced by sync-tooling
+
+    # Initialize test-gate.env — marks this test worktree as "not yet tested".
+    # The daemon updates TEST_STATUS and LAST_TESTED_COMMIT when it runs.
+    # The gate compares LAST_TESTED_COMMIT against HEAD to detect whether
+    # tests have been re-run after new commits.
+    mkdir -p "$tp_target/.freely/run"
+    cat > "$tp_target/.freely/run/test-gate.env" <<'TEST_INIT'
+TEST_STATUS="not_tested"
+LAST_TESTED_AT="1970-01-01T00:00:00Z"
+LAST_TESTED_COMMIT=""
+TEST_INIT
+    echo "  test-pre-merge: initialized test-gate.env (not_tested)"
+
     echo "  test-pre-merge: cloned .freely state from develop"
   fi
 

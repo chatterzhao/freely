@@ -17,7 +17,7 @@ description: >-
 
 # skill `freely-doc-B2_IBM-execution`
 
-> 全链路: [skill] freely-workflow-guarded-execution → [cmd] freely feedback → [cmd] freely wt-create → [skill] freely-doc-B1_IBM-execution → [skill][here] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
+> 全链路: [skill] freely-workflow-guarded-execution → [cmd] freely feedback → [cmd] freely wt-create（创建工位后cd到工位进行工作） → [skill] freely-doc-B1_IBM-execution → [skill][here] freely-doc-B2_IBM-execution → [skill] freely-test-RED-execution → [skill] freely-dev-loop-execution → [skill] freely-test-execution → [cmd] freely pr-create-guarded → [cmd] freely pr-review-guarded → [cmd] freely pr-merge-guarded → [cmd] freely wt-close
 
 ## I→B→M 骨架
 
@@ -352,21 +352,32 @@ phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
 |------|------|---------|
 | milestones.md | `docs/milestones.md` | I-* issue 写入 `committed_issues`（含 `path:` 字段指向 epics 下真实路径） |
 | epics-map.svg | `docs/epics-map.svg` | 新增 epic/story 时必须更新（运行 `./bin/check-epics-map`） |
-| workcell-state.env | `{worktree}/.freely/run/workcell-state.env` | GREEN 证据绑定（见下方 workcell 字段表） |
+| test-gate.env | `{test-worktree}/.freely/run/test-gate.env` | 测试证据（wt-create 创建，daemon 启停更新，门禁检查） |
+| worker-verification-contract.env | `{worker-worktree}/.freely/run/worker-verification-contract.env` | Worker closeout 上下文（manager 委派 worker 时写入） |
 
-### workcell-state.env 必填字段
+### 测试证据文件：test-gate.env
+
+仅存在于 test-pre-merge 工位，由 wt-create 创建，daemon 自动更新：
 
 ```
-DESIRED_RUNTIME_STATE=running
-LAST_EXIT_REASON=up
-LAST_WORKER_OWNER_ISSUE=I-{raw key}-A          # 绑定 I-* issue
-LAST_WORKER_PRE_TESTS_PATH=docs/epics/{epic-name}/{story-name}/raw-{raw key}/verification/pre-tests.md
-LAST_WORKER_CLOSEOUT_GATE=create             # pr-create-guarded 时填 create
-LAST_WORKER_CLOSEOUT_GATE_COMMAND=freely pr-create-guarded
-LAST_WORKER_CLOSEOUT_TARGET_LANE=premerge-integration  # 合法值见下方枚举表
-LAST_WORKER_CLOSEOUT_PROMOTION_GATE=develop_merge       # 合法值见下方枚举表
-LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY=true
-LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY=code-reviews
+TEST_STATUS="completed"                  # not_tested → testing → completed
+LAST_TESTED_AT="2026-07-03T02:58:09Z"
+LAST_TESTED_COMMIT="27b55acbe290f..."    # 测试时 HEAD commit hash
+```
+
+### Worker closeout 上下文：worker-verification-contract.env
+
+Manager 委派 worker 时写入，worker daemon 从中读取：
+
+```
+OWNER_ISSUE=I-{raw key}-A
+PRE_TESTS_PATH=docs/epics/{epic-name}/{story-name}/raw-{raw key}/verification/pre-tests.md
+CLOSEOUT_GATE=create
+CLOSEOUT_GATE_COMMAND=freely pr-create-guarded
+CLOSEOUT_TARGET_LANE=premerge-integration
+CLOSEOUT_PROMOTION_GATE=develop_merge
+CLOSEOUT_REQUIRES_ADEQUACY=true
+CLOSEOUT_REVIEW_ARTIFACT_POLICY=code-reviews
 ```
 
 ### pre-tests.md 各 section 字段速查
@@ -417,19 +428,19 @@ LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY=code-reviews
 | evidence_level unsupported | 合法值仅 4 个 | `mock` / `integration` / `real_env` / `post_merge_dogfood` |
 | status must be pass or not_applicable | 合法值仅 3 个 | `pass` (GREEN 通过) / `passed` (同义) / `not_applicable` (不适用) |
 | artifact_ref references missing / pending:// | artifact_ref 必须指向磁盘或 git 跟踪的真实文件 | `- artifact_ref: tests/pytest-output.log` |
-| execution_missing: got passed | passed 需要 worker state（.freely/run/workcell-state.env），无则改用 not_applicable | `- status: not_applicable` + not_applicable_reason + replacement_evidence |
+| execution_missing: got passed | passed 需要测试证据，无则改用 not_applicable | `- status: not_applicable` + not_applicable_reason + replacement_evidence |
 | not_applicable missing replacement_evidence | not_applicable 的 item/section 必须写 replacement_evidence | `- replacement_evidence: <替代验证方式>` |
 | not_applicable_reason 不支持 | 合法值仅 5 个 | `change_not_touching_this_layer` / `no_executable_boundary_at_this_layer` / `protected_environment_only` / `human_observation_only` / `covered_by_more_realistic_required_surface` |
 | section 'X' has no concrete test tasks | section 下需有编号列表测试任务(如 `1. task`)或 lawful not_applicable_reason | 添加 `- not_applicable_reason:` + `- not_applicable_explanation:` + `- replacement_evidence:` |
 | Real-Environment missing / unsupported status | real_environment_status 只能是 pass 或 fail | `- real_environment_status: pass` + `- real_environment_reason: <理由>` |
 | section missing blocker_taxonomy | Unit/Integration/End-to-End 必须声明 blocker_taxonomy | `- blocker_taxonomy: execution_pending_or_failed` |
-| workcell state missing / binding missing | .freely/run/workcell-state.env 缺失或字段不全 | 创建 workcell-state.env 含 `LAST_WORKER_OWNER_ISSUE` / `LAST_WORKER_PRE_TESTS_PATH` / `LAST_WORKER_CLOSEOUT_GATE` / `LAST_WORKER_CLOSEOUT_TARGET_LANE` / `LAST_WORKER_CLOSEOUT_PROMOTION_GATE` / `LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY` |
+| test gate missing / not tested | test-gate.env 缺失或 TEST_STATUS=not_tested | 在 test-pre-merge 工位启动 daemon：`./bin/freely daemon start --task-mode auto` |
 | surface_kind unsupported | 合法值仅 5 个 | `unit` / `integration` / `end_to_end` / `real_environment` / `post_merge_followthrough` |
 | target_lane unsupported | 合法值仅 3 个 | `feature-local` / `premerge-integration` / `post-merge-followthrough` |
 | promotion_gate unsupported | 合法值仅 3 个 | `completion` / `develop_merge` / `retirement` |
 | evidence_plan_missing — needs real premerge-quality test evidence | premerge+develop_merge 要求的 adequacy v2 item: evidence_level≥integration, status=pass, artifact_ref 存在 | `- surface_kind: end_to_end` / `- target_lane: premerge-integration` / `- promotion_gate: develop_merge` / `- task_refs: A1-A6` / `- case_design: <测试设计说明>` |
 | task_closeout_missing / task_closeout_incomplete | I-* completed 时须有 tasks.md 且全部 [x] | 创建 tasks.md，所有任务标记 [x] |
-| pretests_retirement_binding_missing | workcell-state.env 缺少 closeout 字段 | 补充 `LAST_WORKER_CLOSEOUT_*` 系列字段 |
+| pretests_retirement_binding_missing | worker-verification-contract.env 缺少 closeout 字段 | 补充 `CLOSEOUT_GATE_COMMAND` 等字段到 contract 文件，详见上方 worker-verification-contract.env 模板 |
 
 ## 规范文档示例(copy-paste可用)
 

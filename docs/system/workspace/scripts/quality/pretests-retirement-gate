@@ -44,6 +44,7 @@ project = Path(sys.argv[1]).resolve()
 worktree = Path(sys.argv[2]).resolve()
 runtime_root = Path(sys.argv[3]).resolve()
 state_file = worktree / ".freely" / "run" / "workcell-state.env"
+gate_file = worktree / ".freely" / "run" / "test-gate.env"
 pretests_gate = project / "bin" / "pretests-gate"
 if not pretests_gate.exists():
     pretests_gate = runtime_root / "bin" / "pretests-gate"
@@ -88,263 +89,121 @@ def resolve_issue_path(issue_ref: str) -> tuple[str, str]:
 
 
 env = parse_env(state_file)
-owner_issue = env.get("LAST_WORKER_OWNER_ISSUE", "")
-recorded_pre_tests = env.get("LAST_WORKER_PRE_TESTS_PATH", "")
-closeout_gate = env.get("LAST_WORKER_CLOSEOUT_GATE", "")
-closeout_gate_command = env.get("LAST_WORKER_CLOSEOUT_GATE_COMMAND", "")
-closeout_target_lane = env.get("LAST_WORKER_CLOSEOUT_TARGET_LANE", "")
-closeout_promotion_gate = env.get("LAST_WORKER_CLOSEOUT_PROMOTION_GATE", "")
-closeout_requires_adequacy = env.get("LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY", "").lower()
-closeout_review_artifact_policy = env.get("LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY", "")
+gate_env = parse_env(gate_file)
+
+# test-gate.env fields (only exist in test worktrees)
+_test_status = gate_env.get("TEST_STATUS", "")
+_last_tested_commit = gate_env.get("LAST_TESTED_COMMIT", "")
+_last_tested_at = gate_env.get("LAST_TESTED_AT", "")
+
+# Closeout context is now read from worker-verification-contract.env
+# (the authoritative source). See closeout check block below.
+owner_issue = ""
+recorded_pre_tests = ""
 
 if not pretests_gate.exists():
     print(f"[pretests_retirement_missing] missing gate: {pretests_gate}", file=sys.stderr)
     sys.exit(1)
-if not state_file.exists():
-    print(f"[pretests_retirement_state_missing] missing worker state: {state_file}", file=sys.stderr)
-    print(f"  先检查: .freely/run/workcell-state.env 是否存在？", file=sys.stderr)
-    print(f"  不存在 → 创建该文件，必填字段: LAST_WORKER_OWNER_ISSUE / LAST_WORKER_PRE_TESTS_PATH / LAST_WORKER_CLOSEOUT_*", file=sys.stderr)
-    print(f"  详见 skill `freely-doc-B2_IBM-execution` §workcell-state.env 必填字段", file=sys.stderr)
-    print(f"  回退到手动 GREEN 检查...", file=sys.stderr)
-    # Fallback: no Worker metadata — find the worktree's owning pre-tests.md via branch name.
-    # Only checks GREEN evidence for the issue bound to THIS worktree, not all epics.
-    import subprocess as _sp
-    _branch = ""
-    try:
-        _branch = _sp.check_output(
-            ["git", "-C", str(worktree), "rev-parse", "--abbrev-ref", "HEAD"],
-            text=True, stderr=_sp.DEVNULL
-        ).strip()
-    except Exception:
-        pass
-    # Extract raw key from branch: fix/raw-20260624T235907Z-... → raw-20260624T235907Z
-    _raw_key_match = re.search(r"raw-[0-9]{8}T[0-9]{6}Z", _branch or "")
-    _raw_key = _raw_key_match.group(0) if _raw_key_match else ""
+if not gate_file.exists():
+    print(f"[pretests_not_tested] 测试工位还没有运行过 daemon", file=sys.stderr)
+    print(f"  文件: {gate_file}", file=sys.stderr)
+    print(f"", file=sys.stderr)
+    print(f"  请在测试工位运行 daemon 完成测试:", file=sys.stderr)
+    print(f"    cd {worktree}", file=sys.stderr)
+    print(f"    ./bin/freely daemon start --task-mode auto", file=sys.stderr)
+    print(f"  详见 skill `freely-test-execution`", file=sys.stderr)
+    sys.exit(1)
 
-    fallback_entries: list[tuple[str, str]] = []
-    if _raw_key:
-        # Find I-* issue bound to this raw key
-        # I-* issues only live under docs/epics/ — docs/issues/ is for raw issues only
-        issue_files = list(worktree.glob("docs/epics/**/issues/I-*.md"))
-        for issue_file in sorted(issue_files):
-            try:
-                text = issue_file.read_text()
-            except OSError:
-                continue
-            if f"source_raw: {_raw_key}" in text or f"source_raw: raw-{_raw_key}" in text:
-                # Found the I-* issue — get pre_tests_path
-                m = re.search(r"^- pre_tests_path:\s*(.+?)\s*$", text, re.MULTILINE)
-                if m:
-                    pt_rel = m.group(1).strip()
-                    pt_full = worktree / pt_rel
-                    if pt_full.exists():
-                        fallback_entries.append((str(issue_file.relative_to(worktree)), pt_rel))
-                break
-    if not fallback_entries and _raw_key:
-        # Fallback: try raw issue itself — check for pre_tests_path first, then source_candidate
-        raw_issue = worktree / "docs" / "issues" / _raw_key / "issue.md"
-        if raw_issue.exists():
-            try:
-                text = raw_issue.read_text()
-            except OSError:
-                text = ""
-            # Check for pre_tests_path directly in raw issue (absorbed fixes etc.)
-            m = re.search(r"^- pre_tests_path:\s*(.+?)\s*$", text, re.MULTILINE)
-            if m:
-                pt_rel = m.group(1).strip()
-                pt_full = worktree / pt_rel
-                if pt_full.exists():
-                    fallback_entries.append((str(raw_issue.relative_to(worktree)), pt_rel))
-            # Fallback: source_candidate → candidate path exists (governance confirmed)
-            if not fallback_entries:
-                m = re.search(r"^- source_candidate:\s*(.+?)\s*$", text, re.MULTILINE)
-                if m:
-                    cand_path = worktree / m.group(1).split("#")[0]
-                    if cand_path.exists():
-                        fallback_entries.append((str(raw_issue.relative_to(worktree)), "manual-no-pre-tests"))
-    if not fallback_entries:
-        print("[GATE] RED 未完成：未找到 pre-tests.md。", file=sys.stderr)
-        print(f"  尝试过的路径: I-* issue 的 pre_tests_path → raw issue → source_candidate", file=sys.stderr)
-        print(f"  正确位置: docs/epics/{{epic-name}}/{{story-name}}/verification/pre-tests.md", file=sys.stderr)
-        print(f"  1. 先确认文件是否存在于上述路径（不存在就创建）", file=sys.stderr)
-        print(f"  2. 确认 I-* issue 的 pre_tests_path 字段指向该文件", file=sys.stderr)
-        print(f"  3. 文件存在后再按 skill `freely-doc-B2_IBM-execution` §pre-tests 模板填写内容", file=sys.stderr)
-        print(f"  不要凑格式字段——理解修改后设计对应的测试。", file=sys.stderr)
+# ── Test-gate freshness check ──
+# Compare test-gate.env's LAST_TESTED_COMMIT against HEAD.
+# If HEAD is ahead, tests are stale and must be re-run.
+
+_latest_commit = ""
+try:
+    _latest_commit = _sp.check_output(
+        ["git", "-C", str(worktree), "rev-parse", "HEAD"],
+        text=True, stderr=_sp.DEVNULL
+    ).strip()
+except Exception:
+    pass
+
+if _test_status == "not_tested" or not _last_tested_at or _last_tested_at == "1970-01-01T00:00:00Z":
+    print(f"[pretests_not_tested] 测试工位还没有运行过 daemon", file=sys.stderr)
+    print(f"  文件: {gate_file}", file=sys.stderr)
+    print(f"  TEST_STATUS = {_test_status or '<empty>'}", file=sys.stderr)
+    print(f"", file=sys.stderr)
+    print(f"  请先在测试工位运行 daemon 完成测试:", file=sys.stderr)
+    print(f"    cd {worktree}", file=sys.stderr)
+    print(f"    ./bin/freely daemon start --task-mode auto", file=sys.stderr)
+    print(f"  详见 skill `freely-test-execution`", file=sys.stderr)
+    sys.exit(1)
+
+if _latest_commit and _last_tested_commit and _latest_commit != _last_tested_commit:
+    print(f"[pretests_stale] 测试工位有新提交但未重新跑测试", file=sys.stderr)
+    print(f"  文件: {gate_file}", file=sys.stderr)
+    print(f"  当前 HEAD:  {_latest_commit[:12]}", file=sys.stderr)
+    print(f"  上次测试时: {_last_tested_commit[:12] if _last_tested_commit else '<empty>'}", file=sys.stderr)
+    print(f"  上次测试时间: {_last_tested_at}", file=sys.stderr)
+    print(f"", file=sys.stderr)
+    print(f"  测试工位在 merge 新代码后未重新运行 daemon。", file=sys.stderr)
+    print(f"  请检查新的修改是否需要跑测试——", file=sys.stderr)
+    print(f"  如果需要:", file=sys.stderr)
+    print(f"    cd {worktree}", file=sys.stderr)
+    print(f"    ./bin/freely daemon start --task-mode auto", file=sys.stderr)
+    print(f"    按照 pre-tests.md 中的测试用例逐条执行验证。", file=sys.stderr)
+    print(f"  详见 skill `freely-test-execution`", file=sys.stderr)
+    sys.exit(1)
+
+# Tests are current — test-gate commit matches HEAD.
+# Closeout context is read from worker-verification-contract.env
+# (the authoritative source written by the manager on worker launch).
+# If the contract file doesn't exist (manager role, test-pre-merge daemon),
+# closeout checks are skipped — they only apply to worker retirement.
+_contract_file = worktree / ".freely" / "run" / "worker-verification-contract.env"
+_contract_env = parse_env(_contract_file) if _contract_file.exists() else {}
+
+_contract_closeout_gate = _contract_env.get("CLOSEOUT_GATE", "")
+_contract_closeout_gate_command = _contract_env.get("CLOSEOUT_GATE_COMMAND", "")
+_contract_closeout_target_lane = _contract_env.get("CLOSEOUT_TARGET_LANE", "")
+_contract_closeout_promotion_gate = _contract_env.get("CLOSEOUT_PROMOTION_GATE", "")
+_contract_closeout_requires_adequacy = _contract_env.get("CLOSEOUT_REQUIRES_ADEQUACY", "").lower()
+_contract_closeout_review_artifact_policy = _contract_env.get("CLOSEOUT_REVIEW_ARTIFACT_POLICY", "")
+_contract_owner_issue = _contract_env.get("OWNER_ISSUE", "")
+_contract_pre_tests_path = _contract_env.get("PRE_TESTS_PATH", "")
+
+# Only enforce closeout checks when the contract file actually exists
+# (worker worktrees launched by the manager). Manager/test worktrees
+# won't have this file, and that's expected.
+if _contract_file.exists():
+    missing_closeout_fields: list[str] = []
+    if not _contract_closeout_gate_command:
+        missing_closeout_fields.append("closeout_gate_command")
+    if not _contract_closeout_requires_adequacy:
+        missing_closeout_fields.append("closeout_requires_adequacy")
+    if not _contract_closeout_review_artifact_policy:
+        missing_closeout_fields.append("closeout_review_artifact_policy")
+
+    require_adequacy = _contract_closeout_requires_adequacy == "true"
+    if _contract_closeout_requires_adequacy not in ("true", "false", ""):
+        missing_closeout_fields.append("closeout_requires_adequacy")
+    if require_adequacy and not _contract_closeout_target_lane:
+        missing_closeout_fields.append("closeout_target_lane")
+    if require_adequacy and not _contract_closeout_promotion_gate:
+        missing_closeout_fields.append("closeout_promotion_gate")
+
+    if missing_closeout_fields:
+        print(
+            "[pretests_retirement_closeout_context_missing] worker verification contract 缺少 closeout 字段: "
+            + ", ".join(missing_closeout_fields),
+            file=sys.stderr,
+        )
+        print(f"  文件: {_contract_file}", file=sys.stderr)
+        print(f"  补充缺失字段，详见 skill `freely-doc-B2_IBM-execution`", file=sys.stderr)
         sys.exit(1)
 
-    # GREEN-only check: verify actual_output is filled for each acceptance item
-    fallback_failures = 0
-    for issue_path, pt_rel in fallback_entries:
-        pt_full = worktree / pt_rel
-        try:
-            pt_text = pt_full.read_text()
-        except OSError:
-            print(f"[pretests_retirement_fallback_read_error] cannot read {pt_rel}", file=sys.stderr)
-            fallback_failures += 1
-            continue
-
-        # Parse acceptance items
-        items = re.split(r"^###\s+", pt_text, flags=re.MULTILINE)[1:]
-        for item in items:
-            header = item.split("\n")[0].strip()
-            fields = {}
-            for key in ("id", "status", "actual_output", "red-green-status"):
-                m = re.search(rf"^- {key}:\s*(.+?)\s*$", item, re.MULTILINE)
-                if m:
-                    fields[key] = m.group(1).strip()
-
-            item_id = fields.get("id", header)
-            item_status = fields.get("status", "")
-            item_output = fields.get("actual_output", "")
-            item_rg = fields.get("red-green-status", "")
-
-            # Check TDD: red-green-status must exist and be green (or not_applicable)
-            if not item_rg:
-                print(f"[GATE] RED-GREEN 未完成：{pt_rel} 中的 {item_id} 缺少 red-green-status 字段。\n每条 acceptance item 必须追踪 TDD 状态：pending(B2写入) → red(RED确认) → green(GREEN通过)。\n请阅读 skill `freely-doc-B2_IBM-execution` 补充该字段。", file=sys.stderr)
-                fallback_failures += 1
-            elif item_rg not in ("green", "not_applicable"):
-                print(f"[GATE] RED-GREEN 未完成：{pt_rel} 中的 {item_id} red-green-status 为 '{item_rg}'，必须是 'green' 或 'not_applicable' 才能提 PR。\n完成 RED(red) → dev → GREEN(green) 循环后，将 red-green-status 更新为 green。", file=sys.stderr)
-                fallback_failures += 1
-
-            # Check GREEN: status must be pass or not_applicable
-            if item_status not in ("pass", "passed", "not_applicable"):
-                print(f"[GATE] GREEN 未完成：{pt_rel} 中的 {item_id} 状态为 {item_status}。\n请阅读 skill `freely-test-execution`，根据 pre-tests.md 设计的测试方案实际执行测试。\n不要改 status 字段假装通过——去跑测试，把真实结果写回 actual_output。", file=sys.stderr)
-                fallback_failures += 1
-                continue
-
-            # Check GREEN: actual_output must be filled, not placeholder
-            if item_status in ("pass", "passed") and (not item_output or item_output in ("(执行后填写)",)):
-                print(f"[GATE] GREEN 未完成：{pt_rel} 中的 {item_id} 未填写 actual_output。\n请阅读 skill `freely-test-execution`，根据 pre-tests.md 设计的测试方案实际执行测试，把真实结果写回 actual_output 和 evidence_file。", file=sys.stderr)
-                fallback_failures += 1
-
-    # Anti-cheating: if all items are mock/not_applicable with no real evidence, hard-reject
-    _cheat_total = len(items)
-    _cheat_mock = sum(1 for it in items if re.search(r"^- evidence_level:\s*mock\s*$", it, re.MULTILINE))
-    _cheat_na = sum(1 for it in items if re.search(r"^- status:\s*not_applicable\s*$", it, re.MULTILINE))
-    _cheat_real = sum(1 for it in items
-                      if re.search(r"^- status:\s*pass\s*$", it, re.MULTILINE)
-                      and re.search(r"^- actual_output:\s*(?!(\s*$|\([^)]*\)))(.+?)\s*$", it, re.MULTILINE))
-    if _cheat_total > 0 and _cheat_real == 0 and (_cheat_mock + _cheat_na) == _cheat_total:
-        print(f"\n[GATE] pre-tests.md 疑似糊弄: {_cheat_total} 个测试项，{_cheat_mock} mock + {_cheat_na} not_applicable，0 个真实通过的测试。", file=sys.stderr)
-        print("测试方案必须根据改动范围设计真实测试——改了哪里、可能坏哪里、怎么证明没坏。", file=sys.stderr)
-        print("如果不知道该测什么，重新阅读 raw issue 理解改动，然后阅读 skill `freely-doc-B2_IBM-execution` 重新设计测试方案。", file=sys.stderr)
-        fallback_failures += 1
-
-    # E2E and Integration test adequacy — the most critical safeguard in AI programming
-    # Check that pre-tests.md has real E2E and integration test coverage, not just unit tests
-    _e2e_has_real = False
-    _integration_has_real = False
-    for item in items:
-        _layer = ""
-        _m = re.search(r"^- testing_layer:\s*(.+?)\s*$", item, re.MULTILINE)
-        if _m:
-            _layer = _m.group(1).strip()
-        _cmd = ""
-        _m = re.search(r"^- test_command:\s*(.+?)\s*$", item, re.MULTILINE)
-        if _m:
-            _cmd = _m.group(1).strip()
-        # A real test: has a non-empty, non-placeholder test_command
-        _is_real = bool(_cmd and _cmd not in ("(执行后填写)", "") and "echo pass" not in _cmd.lower() and _cmd not in ("true", ":"))
-        if _layer == "end-to-end" and _is_real:
-            _e2e_has_real = True
-        if _layer == "integration" and _is_real:
-            _integration_has_real = True
-
-    # Also check ## End-to-End and ## Integration layer sections
-    _e2e_section = re.search(r"^##\s+End-to-End\s*$(.+?)(?=^##\s|\Z)", pt_text, re.MULTILINE | re.DOTALL)
-    _integration_section = re.search(r"^##\s+Integration\s*$(.+?)(?=^##\s|\Z)", pt_text, re.MULTILINE | re.DOTALL)
-
-    for _section, _label, _has_real in [
-        (_e2e_section, "端到端测试 (End-to-End)", _e2e_has_real),
-        (_integration_section, "集成测试 (Integration)", _integration_has_real),
-    ]:
-        if _has_real:
-            continue
-        _na_reason = ""
-        if _section:
-            _m = re.search(r"^- not_applicable_reason:\s*(.+?)\s*$", _section.group(1), re.MULTILINE)
-            if _m:
-                _na_reason = _m.group(1).strip()
-        # Valid skip: has a real, specific not_applicable reason (not placeholder)
-        if _na_reason and _na_reason not in ("(如不适用填写)", "", "no_executable_boundary_at_this_layer"):
-            continue
-
-        print(f"\n[GATE] 测试层级不充分：{_label} 缺失或无效。", file=sys.stderr)
-        print("", file=sys.stderr)
-        print("端到端测试和集成测试是 AI 编程中防止项目失败的最重要保证。", file=sys.stderr)
-        print("AI 生成的代码最容易在模块边界和端到端流程中出错，只跑单元测试不够。", file=sys.stderr)
-        print("", file=sys.stderr)
-        print("请重新阅读以下 skill，重新审查当前修改需求：", file=sys.stderr)
-        print("  - skill `freely-doc-B2_IBM-execution`（反糊弄铁律、测试方案设计）", file=sys.stderr)
-        print("  - skill `freely-test-execution`（可执行性检查、反 ghost pass）", file=sys.stderr)
-        print("", file=sys.stderr)
-        if _label.startswith("端到端"):
-            print("如果该改动影响用户可见行为、UI 交互、完整业务流程 → 必须设计端到端测试。", file=sys.stderr)
-            print("端到端测试可以是：Playwright/Selenium UI 自动化、实际运行应用并操作、模拟用户点击流程。", file=sys.stderr)
-        if _label.startswith("集成"):
-            print("如果该改动涉及多模块协作、数据流、状态变更 → 必须设计集成测试。", file=sys.stderr)
-            print("集成测试可以是：pytest 集成套件、API 端到端调用链验证、编译+启动+数据流验证。", file=sys.stderr)
-        print("", file=sys.stderr)
-        print("绝对不允许需要端到端测试或集成测试的改动糊弄过去。", file=sys.stderr)
-        print("只有确实不适用时才写 not_applicable_reason，且必须写明具体理由（不能敷衍成\"不适用\"三个字）。", file=sys.stderr)
-        fallback_failures += 1
-
-    if fallback_failures > 0:
-        print(f"\n[GATE] 共 {fallback_failures} 项 GREEN 测试未执行。", file=sys.stderr)
-        print(file=sys.stderr)
-        print("── 请按以下 skill 逐项检查修正 ──", file=sys.stderr)
-        print("  设计/格式问题 → skill `freely-doc-B2_IBM-execution` §pre-tests 模板与门禁常见坑速查", file=sys.stderr)
-        print("  执行/证据问题 → skill `freely-test-execution` §GREEN 判定标准与执行步骤", file=sys.stderr)
-        print(file=sys.stderr)
-        print("不要逐条改状态绕过——去跑测试，把真实结果写回 actual_output 和 evidence_file。", file=sys.stderr)
-        print("如需豁免某项测试，设置 status=not_applicable 并填写 not_applicable_reason。", file=sys.stderr)
-    sys.exit(1 if fallback_failures > 0 else 0)
-if not owner_issue and not recorded_pre_tests and not closeout_gate and not closeout_gate_command:
-    print("[pretests_retirement_binding_missing] worker state 缺少 owner issue / pre-tests path / closeout 上下文", file=sys.stderr)
-    print(f"  文件: {state_file}", file=sys.stderr)
-    print(f"  必填字段: LAST_WORKER_OWNER_ISSUE / LAST_WORKER_PRE_TESTS_PATH / LAST_WORKER_CLOSEOUT_GATE / LAST_WORKER_CLOSEOUT_GATE_COMMAND", file=sys.stderr)
-    print(f"  详见 skill `freely-doc-B2_IBM-execution` §workcell-state.env 必填字段", file=sys.stderr)
-    sys.exit(1)
-if not owner_issue:
-    print(f"[pretests_retirement_binding_missing] workcell state 缺少 owner issue", file=sys.stderr)
-    print(f"  文件: {state_file}", file=sys.stderr)
-    print(f"  添加: LAST_WORKER_OWNER_ISSUE=I-{'{raw key}'}-A", file=sys.stderr)
-    sys.exit(1)
-if not recorded_pre_tests:
-    print(f"[pretests_retirement_binding_missing] workcell state 缺少 pre-tests path", file=sys.stderr)
-    print(f"  文件: {state_file}", file=sys.stderr)
-    print(f"  添加: LAST_WORKER_PRE_TESTS_PATH=docs/epics/{{epic-name}}/{{story-name}}/raw-{{raw key}}/verification/pre-tests.md", file=sys.stderr)
-    sys.exit(1)
-
-missing_closeout_fields: list[str] = []
-if not closeout_gate_command:
-    missing_closeout_fields.append("closeout_gate_command")
-if not closeout_requires_adequacy:
-    missing_closeout_fields.append("closeout_requires_adequacy")
-if not closeout_review_artifact_policy:
-    missing_closeout_fields.append("closeout_review_artifact_policy")
-
-require_adequacy = closeout_requires_adequacy == "true"
-if closeout_requires_adequacy not in ("true", "false", ""):
-    missing_closeout_fields.append("closeout_requires_adequacy")
-if require_adequacy and not closeout_target_lane:
-    missing_closeout_fields.append("closeout_target_lane")
-if require_adequacy and not closeout_promotion_gate:
-    missing_closeout_fields.append("closeout_promotion_gate")
-
-if missing_closeout_fields:
-    legacy_hint = ""
-    if closeout_gate and not closeout_gate_command:
-        legacy_hint = f" legacy_closeout_gate={closeout_gate}"
-    print(
-        "[pretests_retirement_closeout_context_missing] workcell state 缺少 closeout 字段: "
-        + ", ".join(missing_closeout_fields)
-        + legacy_hint,
-        file=sys.stderr,
-    )
-    print(f"  文件: {state_file}", file=sys.stderr)
-    print(f"  补充缺失字段，详见 skill `freely-doc-B2_IBM-execution` §workcell-state.env 必填字段", file=sys.stderr)
-    sys.exit(1)
+    # Use contract values for issue resolution below
+    owner_issue = _contract_owner_issue
+    recorded_pre_tests = _contract_pre_tests_path
 
 issue_path, issue_error = resolve_issue_path(owner_issue)
 if not issue_path:

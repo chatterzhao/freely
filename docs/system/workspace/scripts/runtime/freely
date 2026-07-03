@@ -8414,55 +8414,23 @@ role_hint_for_project() {
 
 write_workcell_state() {
   local project="$1" desired_state="$2" supervisor_state="$3" ai_state="$4" exit_reason="$5"
-  local state_file role_hint updated_at verification_contract_file verification_metadata_present verification_missing_fields verification_owner_issue verification_pre_tests_path verification_artifact_dir verification_test_lanes verification_acceptance_ids verification_evidence_level verification_target_environment verification_closeout_gate verification_closeout_gate_command verification_closeout_target_lane verification_closeout_promotion_gate verification_closeout_requires_adequacy verification_closeout_review_artifact_policy entrypoint_mode
+  local state_file role_hint updated_at entrypoint_mode
   state_file="$(workcell_state_file "$project")"
   mkdir -p "$(dirname "$state_file")"
   role_hint="$(effective_runtime_role_for_project "$project")"
   updated_at="$(current_timestamp_utc_for_machine)"
   entrypoint_mode="${WORKCELL_ENTRYPOINT_MODE_OVERRIDE:-}"
   if [[ -z "$entrypoint_mode" && -f "$state_file" ]]; then
-    unset LAST_ENTRYPOINT_MODE
-    # shellcheck disable=SC1090
-    source "$state_file"
-    entrypoint_mode="${LAST_ENTRYPOINT_MODE:-}"
+    entrypoint_mode="$(meta_env_value "$state_file" "LAST_ENTRYPOINT_MODE")"
+    entrypoint_mode="${entrypoint_mode:-}"
   fi
   case "$entrypoint_mode" in
     daemon|foreground) ;;
     *) entrypoint_mode="foreground" ;;
   esac
-  verification_contract_file="$(worker_verification_contract_state_file "$project")"
-  verification_metadata_present="false"
-  verification_missing_fields=""
-  verification_owner_issue=""
-  verification_pre_tests_path=""
-  verification_artifact_dir=""
-  verification_test_lanes=""
-  verification_acceptance_ids=""
-  verification_evidence_level=""
-  verification_target_environment=""
-  verification_closeout_gate=""
-  verification_closeout_gate_command=""
-  verification_closeout_target_lane=""
-  verification_closeout_promotion_gate=""
-  verification_closeout_requires_adequacy=""
-  verification_closeout_review_artifact_policy=""
-  if [[ -f "$verification_contract_file" ]]; then
-    verification_metadata_present="$(meta_env_value "$verification_contract_file" "VERIFICATION_METADATA_PRESENT")"
-    verification_missing_fields="$(meta_env_value "$verification_contract_file" "VERIFICATION_METADATA_MISSING_FIELDS")"
-    verification_owner_issue="$(meta_env_value "$verification_contract_file" "OWNER_ISSUE")"
-    verification_pre_tests_path="$(meta_env_value "$verification_contract_file" "PRE_TESTS_PATH")"
-    verification_artifact_dir="$(meta_env_value "$verification_contract_file" "VERIFICATION_ARTIFACT_DIR")"
-    verification_test_lanes="$(meta_env_value "$verification_contract_file" "REQUIRED_TEST_LANES_CSV")"
-    verification_acceptance_ids="$(meta_env_value "$verification_contract_file" "REQUIRED_ACCEPTANCE_ITEM_IDS_CSV")"
-    verification_evidence_level="$(meta_env_value "$verification_contract_file" "MINIMUM_EVIDENCE_LEVEL")"
-    verification_target_environment="$(meta_env_value "$verification_contract_file" "TARGET_ENVIRONMENT")"
-    verification_closeout_gate="$(meta_env_value "$verification_contract_file" "CLOSEOUT_GATE")"
-    verification_closeout_gate_command="$(meta_env_value "$verification_contract_file" "CLOSEOUT_GATE_COMMAND")"
-    verification_closeout_target_lane="$(meta_env_value "$verification_contract_file" "CLOSEOUT_TARGET_LANE")"
-    verification_closeout_promotion_gate="$(meta_env_value "$verification_contract_file" "CLOSEOUT_PROMOTION_GATE")"
-    verification_closeout_requires_adequacy="$(meta_env_value "$verification_contract_file" "CLOSEOUT_REQUIRES_ADEQUACY")"
-    verification_closeout_review_artifact_policy="$(meta_env_value "$verification_contract_file" "CLOSEOUT_REVIEW_ARTIFACT_POLICY")"
-  fi
+  # workcell-state.env records daemon runtime status only.
+  # Worker closeout context lives in worker-verification-contract.env
+  # (written by manager on worker launch) and is read directly from there.
   cat >"$state_file" <<EOF
 DESIRED_RUNTIME_STATE="$desired_state"
 LAST_SUPERVISOR_STATE="$supervisor_state"
@@ -8471,22 +8439,29 @@ LAST_EXIT_REASON="$exit_reason"
 LAST_ENTRYPOINT_MODE="$entrypoint_mode"
 LAST_ROLE_HINT="$role_hint"
 LAST_STATE_UPDATED_AT="$updated_at"
-LAST_WORKER_VERIFICATION_CONTRACT_FILE="$verification_contract_file"
-LAST_WORKER_VERIFICATION_METADATA_PRESENT="$verification_metadata_present"
-LAST_WORKER_VERIFICATION_METADATA_MISSING_FIELDS="$verification_missing_fields"
-LAST_WORKER_OWNER_ISSUE="$verification_owner_issue"
-LAST_WORKER_PRE_TESTS_PATH="$verification_pre_tests_path"
-LAST_WORKER_VERIFICATION_ARTIFACT_DIR="$verification_artifact_dir"
-LAST_WORKER_REQUIRED_TEST_LANES_CSV="$verification_test_lanes"
-LAST_WORKER_REQUIRED_ACCEPTANCE_ITEM_IDS_CSV="$verification_acceptance_ids"
-LAST_WORKER_MINIMUM_EVIDENCE_LEVEL="$verification_evidence_level"
-LAST_WORKER_TARGET_ENVIRONMENT="$verification_target_environment"
-LAST_WORKER_CLOSEOUT_GATE="$verification_closeout_gate"
-LAST_WORKER_CLOSEOUT_GATE_COMMAND="$verification_closeout_gate_command"
-LAST_WORKER_CLOSEOUT_TARGET_LANE="$verification_closeout_target_lane"
-LAST_WORKER_CLOSEOUT_PROMOTION_GATE="$verification_closeout_promotion_gate"
-LAST_WORKER_CLOSEOUT_REQUIRES_ADEQUACY="$verification_closeout_requires_adequacy"
-LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_POLICY="$verification_closeout_review_artifact_policy"
+EOF
+}
+
+# _update_test_gate: if test-gate.env exists (test worktree), update its fields.
+# Called on daemon start/stop so the gate can compare LAST_TESTED_COMMIT vs HEAD.
+_update_test_gate() {
+  local project="$1" status="$2"
+  local gate_file branch
+  gate_file="$(run_dir_for_project "$project")/test-gate.env"
+  # Only for test-pre-merge worktrees. Other worktrees don't need test-gate.
+  branch="$(git -C "$project" rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
+  [[ "$branch" == test-pre-merge-* ]] || return 0
+  mkdir -p "$(dirname "$gate_file")"
+  local tested_at tested_commit
+  tested_at="$(current_timestamp_utc_for_machine)"
+  tested_commit=""
+  if [[ "$status" == "completed" ]]; then
+    tested_commit="$(git -C "$project" rev-parse HEAD 2>/dev/null || true)"
+  fi
+  cat >"$gate_file" <<EOF
+TEST_STATUS="$status"
+LAST_TESTED_AT="$tested_at"
+LAST_TESTED_COMMIT="$tested_commit"
 EOF
 }
 
@@ -21481,6 +21456,7 @@ print(f'/tmp/freely-db-{h}.pid')
   done
   rm -f "$stop_marker"
   write_workcell_state "$project" "stopped" "down" "down" "$stop_reason"
+  _update_test_gate "$project" "completed"
   if [[ "$stop_lock_acquired" == "1" ]]; then
     release_project_start_lock_for_runtime "$project"
   fi
@@ -21851,6 +21827,7 @@ start_project_runtime() {
   }
   append_runtime_event "$project" "start_project_runtime_after_doc_gate" \
     "entrypoint_mode=$entrypoint_mode"
+  _update_test_gate "$project" "testing"
 
   # Initialize SQLite worker delegation store + migrate old exit contracts
   local _a2a_task_py _worker_db_path
