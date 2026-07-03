@@ -23,10 +23,13 @@
     bash trace 确认 source "$state_file" 触发了命令执行：
     ++ LAST_WORKER_CLOSEOUT_GATE_COMMAND=freely
     ++ pr-create-guarded
-- actual_output: (GREEN 阶段执行后填写)
-- evidence_file: (执行后填写)
-- red-green-status: red
-- status: pending
+- actual_output: |
+    daemon_status: running
+    supervisor_pid: 3226
+    test-pre-merge daemon 成功启动，无命令注入
+- evidence_file: docs/epics/runtime-core/safe-state-io/raw-20260703T003829Z/verification/test-evidence/acceptance-1.log
+- red-green-status: green
+- status: passed
 - blocker: (失败时填写)
 - not_applicable_reason: (不适用时填写)
 - not_applicable_explanation: (不适用时填写)
@@ -49,10 +52,11 @@
     grep LAST_WORKER_CLOSEOUT_GATE_COMMAND .freely/run/workcell-state.env
     → LAST_WORKER_CLOSEOUT_GATE_COMMAND=freely pr-create-guarded
     （无引号，含空格——符合 RED 预期）
-- actual_output: (GREEN 阶段执行后填写)
-- evidence_file: (执行后填写)
-- red-green-status: red
-- status: pending
+- actual_output: |
+    ALL VALUES PROPERLY QUOTED - PASS
+- evidence_file: docs/epics/runtime-core/safe-state-io/raw-20260703T003829Z/verification/test-evidence/acceptance-2.log
+- red-green-status: green
+- status: passed
 - blocker: (失败时填写)
 - not_applicable_reason: (不适用时填写)
 - not_applicable_explanation: (不适用时填写)
@@ -75,10 +79,12 @@
     git ls-files .freely/run/workcell-state.env
     → .freely/run/workcell-state.env
     （文件在 git 跟踪中——尽管 .gitignore 有 .freely/ 规则）
-- actual_output: (GREEN 阶段执行后填写)
-- evidence_file: (执行后填写)
-- red-green-status: red
-- status: pending
+- actual_output: |
+    not tracked - PASS
+    git ls-files returns empty
+- evidence_file: docs/epics/runtime-core/safe-state-io/raw-20260703T003829Z/verification/test-evidence/acceptance-3.log
+- red-green-status: green
+- status: passed
 - blocker: (失败时填写)
 - not_applicable_reason: (不适用时填写)
 - not_applicable_explanation: (不适用时填写)
