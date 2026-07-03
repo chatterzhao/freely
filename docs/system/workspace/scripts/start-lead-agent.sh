@@ -143,10 +143,7 @@ prompt_role_for_project() {
   local project="$1" branch="$2" state_file role_hint=""
   state_file="$(workcell_state_file "$project")"
   if [[ -f "$state_file" ]]; then
-    unset LAST_ROLE_HINT
-    # shellcheck disable=SC1090
-    source "$state_file"
-    role_hint="${LAST_ROLE_HINT:-}"
+    role_hint="$(meta_env_value "$state_file" "LAST_ROLE_HINT")"
     if [[ "$role_hint" == "manager" || "$role_hint" == "worker" ]]; then
       printf '%s\n' "$role_hint"
       return 0
