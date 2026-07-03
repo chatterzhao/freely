@@ -139,7 +139,7 @@ worker_verification_contract_launchable() {
   [[ -n "$owner_issue" && -n "$pre_tests_path" && -n "$artifact_dir" && -n "$test_lanes_csv" && -n "$acceptance_csv" && -n "$evidence_level" && -n "$target_environment" && -n "$closeout_gate_command" && -n "$closeout_target_lane" && -n "$closeout_promotion_gate" && -n "$closeout_requires_adequacy" && -n "$closeout_review_artifact_policy" ]]
 }
 
-# start-lead-agent.sh runs as subprocess — define helpers inline.
+# start-lead-agent.sh runs as a subprocess — define needed helpers inline.
 _meta_env_value() {
   local meta_file="$1" key="$2"
   [[ -f "$meta_file" ]] || return 0

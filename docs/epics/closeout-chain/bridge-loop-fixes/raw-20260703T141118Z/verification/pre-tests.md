@@ -49,9 +49,35 @@
 - status: passed
 - red_how: before fix: shell for-loop matching failed despite opencode being in registry list
 
-## Unit/Integration/End-to-End/Real-Environment
+## Unit
+- acceptance_target: bridge not restarting every cycle
+- testing_layer: unit
+- target_environment: test-pre-merge
+- required_evidence: 0 bridge restarts + 0 tool registry errors
+- blocker_taxonomy: execution_pending_or_failed
 - not_applicable_reason: covered_by_more_realistic_required_surface
 - not_applicable_explanation: AT-001/002 cover end-to-end
+- replacement_evidence: AT-001/002 acceptance logs
+
+## Integration
+- acceptance_target: bridge not restarting every cycle
+- testing_layer: integration
+- target_environment: test-pre-merge
+- required_evidence: 0 bridge restarts + 0 tool registry errors
+- blocker_taxonomy: execution_pending_or_failed
+- not_applicable_reason: covered_by_more_realistic_required_surface
+- not_applicable_explanation: AT-001/002 cover end-to-end
+- replacement_evidence: AT-001/002 acceptance logs
+
+## End-to-End
+- acceptance_target: bridge not restarting every cycle
+- testing_layer: end-to-end
+- target_environment: test-pre-merge
+- required_evidence: 0 bridge restarts + 0 tool registry errors
+- blocker_taxonomy: execution_pending_or_failed
+- not_applicable_reason: covered_by_more_realistic_required_surface
+- not_applicable_explanation: AT-001/002 cover end-to-end
+- replacement_evidence: AT-001/002 acceptance logs
 
 ## Real-Environment
 - real_environment_status: pass

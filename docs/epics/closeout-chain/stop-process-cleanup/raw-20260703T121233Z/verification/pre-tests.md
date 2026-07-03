@@ -74,7 +74,27 @@
 - status: passed
 - red_how: fix: 修复前每个 cycle "tool changed (opencode-apikey-ds-flash-auto → opencode)"
 
-## Unit/Integration/End-to-End/Real-Environment
+## Unit
+- acceptance_target: all three fixes verified
+- testing_layer: unit
+- target_environment: test-pre-merge
+- required_evidence: 0 orphan procs + 1 instance each + 0 bridge restarts
+- blocker_taxonomy: execution_pending_or_failed
+- not_applicable_reason: covered_by_more_realistic_required_surface
+- not_applicable_explanation: AT-001/002/003 覆盖端到端验证
+- replacement_evidence: AT-001/002/003 acceptance logs
+
+## Integration
+- acceptance_target: all three fixes verified
+- testing_layer: integration
+- target_environment: test-pre-merge
+- required_evidence: 0 orphan procs + 1 instance each + 0 bridge restarts
+- blocker_taxonomy: execution_pending_or_failed
+- not_applicable_reason: covered_by_more_realistic_required_surface
+- not_applicable_explanation: AT-001/002/003 覆盖端到端验证
+- replacement_evidence: AT-001/002/003 acceptance logs
+
+## End-to-End
 - acceptance_target: all three fixes verified
 - testing_layer: end-to-end
 - target_environment: test-pre-merge
@@ -82,6 +102,7 @@
 - blocker_taxonomy: execution_pending_or_failed
 - not_applicable_reason: covered_by_more_realistic_required_surface
 - not_applicable_explanation: AT-001/002/003 覆盖端到端验证
+- replacement_evidence: AT-001/002/003 acceptance logs
 
 ## Real-Environment
 - real_environment_status: pass
