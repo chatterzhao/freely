@@ -215,35 +215,21 @@ parse_ai_spec_or_fail() {
     exit 1
   }
 
-  # Normalize slot-suffixed tool names: strip -suffix to get base name.
-  # Registry is the authority — any registered tool with slots gets normalized.
-  local _case_tool="$tool"
-  local _reg_tools _t
+  # Normalize to base tool name (strip -apikey-* or -account-* suffix).
+  local _case_tool="${tool%%-*}"
   # Inline tool registry query — start-lead-agent.sh runs as a subprocess,
   # it doesn't have access to _tool_registry_tools from the runtime script.
   _script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
   _runtime_dir="$_script_dir/runtime"
-  _reg_tools="$("$_runtime_dir/tool-registry-query.py" "$_runtime_dir/tool-registry.toml" --list 2>/dev/null || true)"
-  for _t in $_reg_tools; do
-    [[ -n "$_t" ]] || continue
-    if [[ "$_case_tool" == "$_t"-* || "$_case_tool" == "$_t" ]]; then
-      _case_tool="$_t"
-      break
-    fi
-  done
-
-  # Validation: check if tool is registered
-  local _is_known=0
-  for _t in $_reg_tools test-; do
-    if [[ "$_case_tool" == "$_t" || "$_case_tool" == "$_t"* ]]; then
-      _is_known=1; break
-    fi
-  done
-  if [[ "$_is_known" == "0" ]]; then
+  # Direct Python query: check if base tool is registered (avoids shell loop issues)
+  local _is_known
+  _is_known=$("$_runtime_dir/tool-registry-query.py" "$_runtime_dir/tool-registry.toml" "$_case_tool" "acp.binary" >/dev/null 2>&1 && echo 1 || echo 0)
+  if [[ "$_is_known" != "1" ]]; then
+    local _reg_list; _reg_list=$("$_runtime_dir/tool-registry-query.py" "$_runtime_dir/tool-registry.toml" --list 2>/dev/null || echo "(query failed)")
     cat >&2 <<SLOT_ERR
-[ERROR] slot 对应的工具 '$tool' 未在 tool-registry.toml 中注册。
+[ERROR] slot 对应的工具 '$tool' (→ base: $_case_tool) 未在 tool-registry.toml 中注册。
 
-  已注册的工具: $_reg_tools
+  已注册的工具: $_reg_list
 
   slot 是 ~/.ai-auth/ 下的鉴权目录，命名约定为 {tool-name}-{apikey|account}-{custom}。
   tool-name 必须是已注册的工具名（首段 -apikey- 或 -account- 之前的部分）。
