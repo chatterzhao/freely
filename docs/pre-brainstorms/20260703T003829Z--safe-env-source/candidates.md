@@ -1,6 +1,7 @@
 ---
 candidate_id: C-20260703T003829Z-A
-status: promoted
+status: absorbed
+absorbed_into: I-20260703T003829Z-A
 source_raw: raw-20260703T003829Z
 created_at: 2026-07-03
 milestone: M-20260703T003829Z-A
@@ -10,10 +11,11 @@ milestone: M-20260703T003829Z-A
 
 - candidate_format_version: v2
 - title: 修复 write_workcell_state 中 unsafe source 导致的命令注入
-- status: promoted
+- status: absorbed
+- absorbed_into: I-20260703T003829Z-A
 - decision_reason: 用已有的 meta_env_value 安全读取，改动最小，一致性最高
-- next_action: 进入 B2_IBM 设计 → dev → test → PR
-- revisit_trigger: N/A（已 promote）
+- next_action: N/A（已吸收到 I-* issue）
+- revisit_trigger: N/A
 - acceptance_criteria:
   - `write_workcell_state()` 不再使用 `source` 读取 env 文件
   - daemon 启动时不会因 env 文件中的多词值而执行意外命令
