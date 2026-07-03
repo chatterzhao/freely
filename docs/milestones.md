@@ -8,7 +8,11 @@
 - phase_state: completed
 - path: docs/epics/runtime-core/safe-state-io/raw-20260703T003829Z/issues/I-20260703T003829Z-A.md
 ### completed_issues
-1. `C-20260703T003829Z-A`
+1. `I-20260703T003829Z-A`
+- title: fix: write_workcell_state unsafe source → meta_env_value
+- issue_path: docs/epics/runtime-core/safe-state-io/raw-20260703T003829Z/issues/I-20260703T003829Z-A.md
+- phase_state: completed
+2. `C-20260703T003829Z-A`
 - milestone: M-20260703T003829Z-A
 - status: absorbed
 - absorbed_into: `I-20260703T003829Z-A`
