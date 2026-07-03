@@ -1,17 +1,17 @@
 ## M-20260703T051533Z-A
 - title: fix: remove tracked __pycache__ .pyc files
-- status: active
+- status: completed
 ### candidate_issues
-1. `C-20260703T051533Z-A`
-- milestone: M-20260703T051533Z-A
-- status: promoted
-- promoted_issue_id: `I-20260703T051533Z-A` `I-20260703T051533Z-A`
 ### committed_issues
 1. `I-20260703T051533Z-A`
 - milestone: M-20260703T051533Z-A
 - phase_state: completed
 - path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
+1. `C-20260703T051533Z-A`
+- milestone: M-20260703T051533Z-A
+- status: absorbed
+- absorbed_into: `I-20260703T051533Z-A`
 
 ## M-20260703T003829Z-A
 - title: fix: write_workcell_state unsafe source → meta_env_value
