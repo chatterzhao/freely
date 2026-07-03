@@ -1,3 +1,14 @@
+## M-20260703T003829Z-A
+- title: fix: write_workcell_state unsafe source → meta_env_value
+- status: active
+### candidate_issues
+1. `C-20260703T003829Z-A`
+- milestone: M-20260703T003829Z-A
+- status: promoted
+- promoted_issue_id: `I-20260703T003829Z-A`
+### committed_issues
+### completed_issues
+
 ## M-20260701T085407Z-A
 - title: A2A reviewer agent — ACP/A2A 集成 + session/fork 复用
 - status: completed
