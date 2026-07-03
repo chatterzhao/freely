@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" id="freely-epics-map" viewBox="0 0 1000 18341.0" width="1000" font-family="monospace">
-<rect id="app-freely" x="10" y="10" width="980" height="18341.0" fill="none" stroke="#333" stroke-width="3" rx="8"/>
+<svg xmlns="http://www.w3.org/2000/svg" id="freely-epics-map" viewBox="0 0 1000 18401.0" width="1000" font-family="monospace">
+<rect id="app-freely" x="10" y="10" width="980" height="18351.0" fill="none" stroke="#333" stroke-width="3" rx="8"/>
 <text x="30" y="38" font-size="20" font-weight="bold" fill="#333">Freely</text>
 <rect id="epic-a2a-h11-noise" x="35" y="55" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="79" font-size="13" font-weight="bold" fill="#1a73e8">a2a-h11-noise</text>
@@ -937,11 +937,16 @@
   <text x="50" y="18185.0" font-size="13" font-weight="bold" fill="#1a73e8">git-hygiene</text>
   <rect id="story-untracked-pycache" x="55" y="18169.0" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
   <text x="65" y="18184.0" font-size="11" fill="#333">untracked-pycache</text>
-  <rect id="epic-closeout-chain" x="35" y="18231.0" width="700" height="100" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+  <rect id="epic-closeout-chain" x="35" y="18231.0" width="700" height="160" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
   <text x="50" y="18255.0" font-size="13" font-weight="bold" fill="#1a73e8">closeout-chain</text>
   <rect id="story-wt-close-test-gate" x="55" y="18239.0" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
   <text x="65" y="18254.0" font-size="11" fill="#333">wt-close-test-gate</text>
   <rect id="story-manager-startup-record" x="55" y="18269.0" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
   <text x="65" y="18284.0" font-size="11" fill="#333">manager-startup-record</text>
-  <text x="65" y="18274.0" font-size="11" fill="#333">manager-startup-record</text>
+  <rect id="story-agent-working-session-unify" x="55" y="18299.0" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
+  <text x="65" y="18314.0" font-size="11" fill="#333">agent-working-session-unify</text>
+  <rect id="story-stop-process-cleanup" x="55" y="18329.0" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
+  <text x="65" y="18344.0" font-size="11" fill="#333">stop-process-cleanup</text>
+  <rect id="story-bridge-loop-fixes" x="55" y="18359.0" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
+  <text x="65" y="18374.0" font-size="11" fill="#333">bridge-loop-fixes</text>
 </svg>
