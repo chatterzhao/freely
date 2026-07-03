@@ -1,3 +1,18 @@
+## M-20260703T141118Z-A
+- title: fix: bridge basename + loop guard + tool registry
+- status: completed
+### candidate_issues
+### committed_issues
+1. `I-20260703T141118Z-A`
+- milestone: M-20260703T141118Z-A
+- phase_state: completed
+- path: docs/epics/closeout-chain/bridge-loop-fixes/raw-20260703T141118Z/issues/I-20260703T141118Z-A.md
+### completed_issues
+1. `C-20260703T141118Z-A`
+- milestone: M-20260703T141118Z-A
+- status: absorbed
+- absorbed_into: `I-20260703T141118Z-A`
+
 ## M-20260703T121233Z-A
 - title: fix: process cleanup + watchdog guard + bridge normalize
 - status: completed
