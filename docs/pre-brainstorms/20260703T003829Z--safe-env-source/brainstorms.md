@@ -79,9 +79,110 @@ bash 将其解释为 `VAR=val command`，导致 daemon 启动时意外执行 `pr
 
 ### 需要后续 issue 跟进的重构
 
-1. **删掉 workcell-state.env 中 16 个 LAST_WORKER_* 字段** —— 冗余缓存，权威源已在 I-* issue / agent_working / 分支名中
-2. **门禁从权威源读值** —— 不依赖 workcell-state.env 的 closeout 副本
+1. **删掉 workcell-state.env 中 16 个 LAST_WORKER_* 字段** —— 冗余缓存
+2. **门禁从权威源读值** —— 不依赖 closeout 副本
 3. **`monitor-ai-cli.sh:351` 的 `source` 改安全读取**
+4. **其他 `source` workcell-state.env 的调用点全部改安全读取**
+
+## 全量消费者分析与重构方向
+
+### 消费者 1：`write_workcell_state()` (line 8424)
+
+```bash
+entrypoint_mode="$(meta_env_value "$state_file" "LAST_ENTRYPOINT_MODE")"
+```
+- 读什么：`LAST_ENTRYPOINT_MODE`
+- 权威源：`WORKCELL_ENTRYPOINT_MODE_OVERRIDE` 环境变量 > state file
+- 状态：**已修复**（source → meta_env_value）
+- 重构方向：不改。entrypoint_mode 是 daemon 进程级配置，env var 兜底合理
+
+### 消费者 2：`monitor-ai-cli.sh` (line 324-397)
+
+大量 `source "$state_file"` 然后读全部 23 个字段，更新运行时字段后全部写回。
+closeout 字段在此是纯透传——读出来，什么也不改，原样写回。
+
+- 读什么：23 个字段全部
+- 运行时 6 字段的权威源：**daemon 进程自身**（它是 AI cycle 的写者）
+- closeout 16 字段的权威源：**worker-verification-contract.env**
+- 重构方向：
+  1. `source` → `meta_env_value` 逐字段安全读取（只读需要的）
+  2. 运行时字段继续从 workcell-state.env 读
+  3. **closeout 字段改为直接从 worker-verification-contract.env 读**——不经过 workcell-state.env 中转
+  4. 写回时只写运行时字段 + 时间戳，不再写 closeout
+
+### 消费者 3：`start-lead-agent.sh` (line 102-132)
+
+```bash
+source "$state_file"  # 读 role_hint + closeout context
+```
+
+- 读什么：`LAST_ROLE_HINT`, `LAST_WORKER_CLOSEOUT_*`
+- `LAST_ROLE_HINT` 的权威源：`effective_runtime_role_for_project()` 函数——从 config + worktree 类型推导
+- closeout 字段的权威源：worker prompt 文件（`start-lead-agent.sh` 的调用者已经传入了 prompt 文件路径）
+- 重构方向：
+  1. `LAST_ROLE_HINT` → 改调用 `effective_runtime_role_for_project()`
+  2. closeout 字段 → 从 worker prompt 文件直接读取（prompt 里已有这些字段）
+
+### 消费者 4：状态展示函数 (lines 1716-1950)
+
+多个函数 `source` workcell-state.env 来展示 baseline/live status：
+- `DESIRED_RUNTIME_STATE` ← baseline status (line 1716)
+- `LAST_EXIT_REASON` ← live status (line 1735)
+- `LAST_STATE_UPDATED_AT` ← live status (line 1830)
+- `LAST_ROLE_HINT` ← live status (line 1913)
+- `LAST_SUPERVISOR_STATE` ← active_runtime check (line 3495)
+
+这些都是**运行时状态读取**，workcell-state.env 就是它们的正确源（daemon 实时写入的文件快照）。
+
+- 重构方向：`source` → `meta_env_value` 逐字段安全读取
+
+### 消费者 5：`startup_self_heal_*` (lines 5464-5616)
+
+```bash
+source "$state_file"  # 判断 daemon 是否 alive
+```
+
+- 读什么：`DESIRED_RUNTIME_STATE`, `LAST_EXIT_REASON`
+- 权威源：workcell-state.env（daemon 运行时写入）
+- 重构方向：`source` → `meta_env_value`
+
+### 消费者 6：`refresh_workcell_state_projection()` (line 12051)
+
+```bash
+desired_state="$(meta_env_value "$state_file" "DESIRED_RUNTIME_STATE")"
+```
+
+- 状态：**已经是 meta_env_value**，无需改动
+
+### 消费者 7：loop guard (lines 9338-9489)
+
+```bash
+source "$state_file"  # 读 DESIRED_RUNTIME_STATE, LAST_EXIT_REASON, LAST_STATE_UPDATED_AT
+```
+
+- 读什么：运行时字段
+- 权威源：workcell-state.env（daemon 运行时）
+- 重构方向：`source` → `meta_env_value`
+
+### 消费者 8：worktree fleet status (Python, line 16475)
+
+```python
+state_file = os.path.join(wt_path, ".freely", "run", "workcell-state.env")
+# 读取 DESIRED_RUNTIME_STATE, LAST_EXIT_REASON
+```
+
+- 读什么：运行时状态
+- 权威源：workcell-state.env
+- 重构方向：**Python 代码已经用 `line.split("=", 1)` 安全解析**，无 source 风险
+
+### 重构优先级
+
+| 优先级 | 改动 | 影响 |
+|--------|------|------|
+| P0 | `monitor-ai-cli.sh` closeout 透传改为从 contract 直读 | 删掉 workcell-state.env 的 16 个冗余字段 |
+| P0 | `start-lead-agent.sh` role_hint 改为调用函数、closeout 从 prompt 读 | 消除又一个 source |
+| P1 | 其他 shell `source` → `meta_env_value`（6处） | 消除所有 unsafe source |
+| P2 | Python fleet status 不用改（已安全） | — |
 
 ## Brainstorm
 
