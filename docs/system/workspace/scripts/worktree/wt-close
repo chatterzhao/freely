@@ -453,21 +453,45 @@ PHASE_GATE
   echo "wt-close: phase_state=$phase_state ✓"
 
   # pretests-retirement-gate check
+  # Find companion test-pre-merge worktree (same raw key timestamp).
+  # test-gate.env lives in the test worktree where the daemon actually ran.
+  # The fix worktree doesn't run daemon so it has no test evidence.
+  _raw_key_ts=$(echo "$branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)
+  _test_wt=""
+  if [[ -n "$_raw_key_ts" ]]; then
+    _test_wt=$(git worktree list --porcelain 2>/dev/null | awk -v k="test-pre-merge-$_raw_key_ts" '
+      $1=="worktree" { wt=$2 }
+      $1=="branch" && $2 ~ k { print wt; exit }
+    ')
+  fi
+  if [[ -z "$_test_wt" || ! -d "$_test_wt" ]]; then
+    cat >&2 <<TEST_MISSING
+[wt-close] 找不到对应的测试工位 test-pre-merge-${_raw_key_ts}-*
+
+  测试工位中的 test-gate.env 是测试已运行的唯一证据。
+  测试工位缺失意味着无法验证测试是否完成。
+
+  如果测试工位被误删，请重新创建并在其中运行 daemon 完成测试，
+  然后再执行 wt-close。
+TEST_MISSING
+    exit 1
+  fi
   if [[ -x "$PROJECT_ROOT/bin/pretests-retirement-gate" ]]; then
-    if "$PROJECT_ROOT/bin/pretests-retirement-gate" --project "$PROJECT_ROOT" --worktree-path "$wt_path" 2>/dev/null; then
+    if "$PROJECT_ROOT/bin/pretests-retirement-gate" --project "$PROJECT_ROOT" --worktree-path "$_test_wt" 2>/dev/null; then
       echo "wt-close: pretests-retirement-gate passed ✓"
     else
       cat >&2 <<PRETEST_GATE
-[wt-close] pretests-retirement-gate 检查未通过: $wt_path
+[wt-close] pretests-retirement-gate 检查未通过: $_test_wt
 
   ── 保留此 issue 继续推进 ────────────────────────────────────
-  请完成测试验证，通过后重新执行 wt-close:
+  请在测试工位完成测试验证:
 
-  1. 测试还没跑完 → 执行 skill:freely-test-execution
-  2. workcell-state.env 缺失（手工执行） → 在 .freely/run/ 下创建
-  3. pre-tests.md 的 actual_output 未填写 → 填回测试结果
+  1. cd $_test_wt
+  2. ./bin/freely daemon start --task-mode auto
+  3. 按 pre-tests.md 的测试用例逐条验证
+  4. daemon 停止后 test-gate.env 会记录测试完成的 commit
 
-  解决上述问题后，wt-close 无需 --force 即可通过。
+  测试通过后重新执行 wt-close。无需 --force。
 
   ── 确定丢弃此 issue ────────────────────────────────────────
   --force 仅用于此场景: 确定不再继续实现此 raw issue。
