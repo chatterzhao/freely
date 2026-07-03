@@ -58,8 +58,19 @@
 - blocker_taxonomy: execution_pending_or_failed
 - not_applicable_reason: covered_by_more_realistic_required_surface
 - not_applicable_explanation: AT-001/002 覆盖端到端验证
+- replacement_evidence: AT-001/002 acceptance logs
 
-## Integration/End-to-End/Real-Environment
+## Integration
+- acceptance_target: full daemon flow
+- testing_layer: integration
+- target_environment: test-pre-merge
+- required_evidence: daemon starts without errors
+- blocker_taxonomy: execution_pending_or_failed
+- not_applicable_reason: covered_by_more_realistic_required_surface
+- not_applicable_explanation: AT-001/002 覆盖
+- replacement_evidence: AT-001/002 acceptance logs
+
+## End-to-End
 - acceptance_target: full daemon flow
 - testing_layer: end-to-end
 - target_environment: test-pre-merge
@@ -67,6 +78,7 @@
 - blocker_taxonomy: execution_pending_or_failed
 - not_applicable_reason: covered_by_more_realistic_required_surface
 - not_applicable_explanation: AT-001/002 覆盖
+- replacement_evidence: AT-001/002 acceptance logs
 
 ## Real-Environment
 - real_environment_status: pass
