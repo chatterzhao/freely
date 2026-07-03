@@ -53,10 +53,62 @@ bash 将其解释为 `VAR=val command`，导致 daemon 启动时意外执行 `pr
 2. workcell-state.env 里删掉这 16 个冗余缓存
 3. 能推导的推导（如 closeout_gate_command 是常量），不存副本
 
-#### 第三类：测试时间戳（1字段）—— 测试工位专属
+#### 第三类：测试证据 —— 独立文件，仅在测试工位
 
-`LAST_STATE_UPDATED_AT`：用于门禁对比 test 分支最新 commit 时间。
-这个值 agent_working 表的 `updated_at` 列已有——每次 upsert 自动更新。
+`LAST_STATE_UPDATED_AT` 的职责是让门禁判断"测试跑过了没有"。
+这个职责不应该混在 workcell-state.env（运行时状态文件）里，
+应该独立为 **test-evidence.env**，由 wt-create 在测试工位创建。
+
+### 文件分布设计
+
+```
+项目根目录 (develop/fix/feature)         测试工位 (test-pre-merge-*)
+├── .freely/run/                         ├── .freely/run/
+│   └── workcell-state.env               │   ├── workcell-state.env    ← daemon 运行时状态，全局一致
+│       (6 运行时字段 + 时间戳)            │   └── test-evidence.env    ← 测试证据，仅此工位有
+│                                         │       wt-create 创建
+│                                         │       daemon 启动/停止时更新
+│                                         │       门禁检查这个文件
+```
+
+**workcell-state.env**（精简后，所有工位都有）：
+```
+DESIRED_RUNTIME_STATE="stopped"
+LAST_SUPERVISOR_STATE="down"
+LAST_AI_STATE="down"
+LAST_EXIT_REASON="operator_stop"
+LAST_ENTRYPOINT_MODE="daemon"
+LAST_ROLE_HINT="manager"
+LAST_STATE_UPDATED_AT="2026-07-03T02:01:59Z"
+```
+
+**test-evidence.env**（仅 test-pre-merge 工位有，wt-create 创建）：
+```
+TEST_STATUS="not_tested"           # not_tested → testing → completed
+LAST_TESTED_AT="1970-01-01T00:00:00Z"
+LAST_TESTED_COMMIT=""              # 测试时 HEAD 的 commit hash
+```
+
+### 生命周期
+
+1. **wt-create**：创建 test-pre-merge 时写入 test-evidence.env，初始 `not_tested`
+2. **daemon 启动**：将 `TEST_STATUS` 更新为 `testing`，`LAST_TESTED_AT` 更新
+3. **daemon 停止**：将 `TEST_STATUS` 更新为 `completed`，记录 `LAST_TESTED_COMMIT`
+4. **门禁**：对比 `LAST_TESTED_COMMIT` vs HEAD；`LAST_TESTED_AT` 作为兜底时间戳
+5. **test-pre-merge 删除**：文件随工位一起删除
+
+### 门禁检查逻辑
+
+```
+if test-evidence.env 不存在:
+    → "请先在测试工位运行 daemon"
+if LAST_TESTED_COMMIT != HEAD:
+    → "测试工位有新提交未重新测试"
+if TEST_STATUS == "not_tested":
+    → "测试工位还没有运行过 daemon"
+else:
+    → 通过
+```
 门禁直接查 SQL 即可，不需要在 env 文件里再存一份。
 
 ### 之前理解的错误
@@ -179,8 +231,10 @@ state_file = os.path.join(wt_path, ".freely", "run", "workcell-state.env")
 
 | 优先级 | 改动 | 影响 |
 |--------|------|------|
-| P0 | `monitor-ai-cli.sh` closeout 透传改为从 contract 直读 | 删掉 workcell-state.env 的 16 个冗余字段 |
-| P0 | `start-lead-agent.sh` role_hint 改为调用函数、closeout 从 prompt 读 | 消除又一个 source |
+| P0 | **创建 test-evidence.env**：wt-create 写入 + daemon 更新 + 门禁检查 | 测试证据从 workcell-state.env 独立出来 |
+| P0 | **精简 workcell-state.env**：删掉 16 个 LAST_WORKER_* | 职责清晰，只剩运行时状态 |
+| P0 | `monitor-ai-cli.sh` closeout 透传改为从 contract 直读 | 消除冗余中转 |
+| P0 | `start-lead-agent.sh` role_hint 改为调函数、closeout 从 prompt 读 | 消除 source + 冗余读取 |
 | P1 | 其他 shell `source` → `meta_env_value`（6处） | 消除所有 unsafe source |
 | P2 | Python fleet status 不用改（已安全） | — |
 
