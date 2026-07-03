@@ -5,7 +5,7 @@
 ### committed_issues
 1. `I-20260703T080443Z-A`
 - milestone: M-20260703T080443Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/closeout-chain/manager-startup-record/raw-20260703T080443Z/issues/I-20260703T080443Z-A.md
 ### completed_issues
 1. `C-20260703T080443Z-A`
