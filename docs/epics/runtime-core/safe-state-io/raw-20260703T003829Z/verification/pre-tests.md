@@ -16,16 +16,22 @@
 - test_command: ./bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/test-pre-merge-20260703T003829Z-safe-env-source --task-mode auto
 - expected_output: daemon_status: running, supervisor_pid 非空
 - expected_RED_output: daemon 启动失败，日志中出现 pr-create-guarded 被意外执行
-- actual_RED_output: (RED 阶段执行后填写)
+- actual_RED_output: |
+    daemon start 失败，终端输出：
+    [CMD] pr-create-guarded called, raw-key: unknown
+    拒绝: 不能在受保护分支 'develop' 上执行 pr-create-guarded。
+    bash trace 确认 source "$state_file" 触发了命令执行：
+    ++ LAST_WORKER_CLOSEOUT_GATE_COMMAND=freely
+    ++ pr-create-guarded
 - actual_output: (GREEN 阶段执行后填写)
 - evidence_file: (执行后填写)
-- red-green-status: pending
+- red-green-status: red
 - status: pending
 - blocker: (失败时填写)
 - not_applicable_reason: (不适用时填写)
 - not_applicable_explanation: (不适用时填写)
 - replacement_evidence: (不适用时填写)
-- red_how: fix: 构造含未引号多词值的 workcell-state.env，启动 daemon，确认 source 触发 pr-create-guarded 导致启动失败
+- red_how: fix: 用 bash -x 执行 daemon start，trace 确认 source workcell-state.env 时触发 LAST_WORKER_CLOSEOUT_GATE_COMMAND=freely pr-create-guarded 被作为命令执行
 
 ### acceptance-2
 - id: AT-002
@@ -39,16 +45,19 @@
 - test_command: grep -c '=' .freely/run/workcell-state.env && ! grep -E '^[A-Z_]+=[^"].* .*[^"]$' .freely/run/workcell-state.env
 - expected_output: 所有行都有 KEY="value" 格式，无未引号多词值
 - expected_RED_output: LAST_WORKER_CLOSEOUT_GATE_COMMAND=freely pr-create-guarded 存在未引号多词值
-- actual_RED_output: (RED 阶段执行后填写)
+- actual_RED_output: |
+    grep LAST_WORKER_CLOSEOUT_GATE_COMMAND .freely/run/workcell-state.env
+    → LAST_WORKER_CLOSEOUT_GATE_COMMAND=freely pr-create-guarded
+    （无引号，含空格——符合 RED 预期）
 - actual_output: (GREEN 阶段执行后填写)
 - evidence_file: (执行后填写)
-- red-green-status: pending
+- red-green-status: red
 - status: pending
 - blocker: (失败时填写)
 - not_applicable_reason: (不适用时填写)
 - not_applicable_explanation: (不适用时填写)
 - replacement_evidence: (不适用时填写)
-- red_how: fix: 执行 write_workcell_state 前，手动放置含未引号多词值的旧 env 文件，确认生成的文件正确带引号
+- red_how: fix: 读取 workcell-state.env 第6行，确认 LAST_WORKER_CLOSEOUT_GATE_COMMAND 值含空格且无引号
 
 ### acceptance-3
 - id: AT-003
@@ -62,16 +71,19 @@
 - test_command: git ls-files .freely/run/workcell-state.env | grep -c . || echo "not tracked - PASS"
 - expected_output: not tracked - PASS
 - expected_RED_output: .freely/run/workcell-state.env（文件在 git 跟踪中）
-- actual_RED_output: (RED 阶段执行后填写)
+- actual_RED_output: |
+    git ls-files .freely/run/workcell-state.env
+    → .freely/run/workcell-state.env
+    （文件在 git 跟踪中——尽管 .gitignore 有 .freely/ 规则）
 - actual_output: (GREEN 阶段执行后填写)
 - evidence_file: (执行后填写)
-- red-green-status: pending
+- red-green-status: red
 - status: pending
 - blocker: (失败时填写)
 - not_applicable_reason: (不适用时填写)
 - not_applicable_explanation: (不适用时填写)
 - replacement_evidence: (不适用时填写)
-- red_how: fix: 修复前 git ls-files 能找到该文件
+- red_how: fix: git ls-files 确认修复前该文件被跟踪
 
 ## Unit
 - acceptance_target: meta_env_value 正确提取 LAST_ENTRYPOINT_MODE
