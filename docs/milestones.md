@@ -1,3 +1,18 @@
+## M-20260703T114618Z-A
+- title: fix: unify agent_working write at ACP session creation
+- status: completed
+### candidate_issues
+### committed_issues
+1. `I-20260703T114618Z-A`
+- milestone: M-20260703T114618Z-A
+- phase_state: completed
+- path: docs/epics/closeout-chain/agent-working-session-unify/raw-20260703T114618Z/issues/I-20260703T114618Z-A.md
+### completed_issues
+1. `C-20260703T114618Z-A`
+- milestone: M-20260703T114618Z-A
+- status: absorbed
+- absorbed_into: `I-20260703T114618Z-A`
+
 ## M-20260703T054629Z-A
 - title: fix: wt-close pretests gate worktree path
 - status: completed
