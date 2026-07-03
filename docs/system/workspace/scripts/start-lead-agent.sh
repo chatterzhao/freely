@@ -139,11 +139,18 @@ worker_verification_contract_launchable() {
   [[ -n "$owner_issue" && -n "$pre_tests_path" && -n "$artifact_dir" && -n "$test_lanes_csv" && -n "$acceptance_csv" && -n "$evidence_level" && -n "$target_environment" && -n "$closeout_gate_command" && -n "$closeout_target_lane" && -n "$closeout_promotion_gate" && -n "$closeout_requires_adequacy" && -n "$closeout_review_artifact_policy" ]]
 }
 
+# start-lead-agent.sh runs as subprocess — define helpers inline.
+_meta_env_value() {
+  local meta_file="$1" key="$2"
+  [[ -f "$meta_file" ]] || return 0
+  awk -F '"' -v key="$key" '$1 == key "=" { print $2; exit }' "$meta_file"
+}
+
 prompt_role_for_project() {
   local project="$1" branch="$2" state_file role_hint=""
   state_file="$(workcell_state_file "$project")"
   if [[ -f "$state_file" ]]; then
-    role_hint="$(meta_env_value "$state_file" "LAST_ROLE_HINT")"
+    role_hint="$(_meta_env_value "$state_file" "LAST_ROLE_HINT")"
     if [[ "$role_hint" == "manager" || "$role_hint" == "worker" ]]; then
       printf '%s\n' "$role_hint"
       return 0
