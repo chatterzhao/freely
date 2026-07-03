@@ -31,28 +31,37 @@ bash 将其解释为 `VAR=val command`，导致 daemon 启动时意外执行 `pr
 
 这些是 daemon 进程的运行时快照，在项目根 `.freely/run/` 下存在是合理的——不管哪个 worktree，daemon 只有一个。`write_workcell_state()` 和 `monitor-ai-cli.sh` 共同维护。
 
-#### 第二类：Worker closeout 上下文（16字段）—— 按 raw_key 索引，应该进 agent_working 表
+#### 第二类：Worker closeout 上下文（16字段）—— 冗余副本，权威源已在别处
 
-`LAST_WORKER_OWNER_ISSUE` / `LAST_WORKER_PRE_TESTS_PATH` /
-`LAST_WORKER_CLOSEOUT_GATE` / `LAST_WORKER_CLOSEOUT_GATE_COMMAND` /
-`LAST_WORKER_CLOSEOUT_TARGET_LANE` / `LAST_WORKER_CLOSEOUT_PROMOTION_GATE` / ...
+这些 16 个字段是 `worker-verification-contract.env` 的缓存副本，
+`write_workcell_state()` 从 contract 读出再写入 workcell-state.env，
+然后 `monitor-ai-cli.sh` 原样保留。但它们的真实数据已经在其他地方有权威源：
 
-这些是 manager 委派 worker 时注入的治理数据——告诉 worker 属于哪个 issue、测试路径在哪、走什么门禁。
+| 冗余字段 | 权威源 | 如何获取 |
+|---------|--------|---------|
+| `LAST_WORKER_OWNER_ISSUE` | agent_working.raw_key → I-* issue | raw_key 就是 issue key |
+| `LAST_WORKER_PRE_TESTS_PATH` | I-* issue `pre_tests_path` 字段 | 读 I-* issue 文档 |
+| `LAST_WORKER_VERIFICATION_ARTIFACT_DIR` | I-* issue `verification_artifact_dir` | 同上 |
+| `LAST_WORKER_CLOSEOUT_GATE_COMMAND` | **常量** — `freely pr-create-guarded` | 写死在门禁逻辑里 |
+| `LAST_WORKER_CLOSEOUT_TARGET_LANE` | **分支类型决定** — test-pre-merge → `premerge-integration` | 从分支名推导 |
+| `LAST_WORKER_CLOSEOUT_PROMOTION_GATE` | **分支类型决定** — fix/feature → `develop_merge` | 同上 |
+| `LAST_WORKER_REQUIRED_TEST_LANES_CSV` | B2 pre-tests.md 中定义 | 从治理文档读取 |
+| 其他 closeout 字段 | 同上模式 | 同上 |
 
-数据流：manager → `write_worker_verification_contract_file()` → contract.env →
-`write_workcell_state()` 读取写入 → `monitor-ai-cli.sh` 在每次 AI cycle 中读回保留。
-
-问题：这是**按 raw_key 索引**的治理数据。`agent_working` 表已有 `raw_key`(PK)、
-`branch`、`test_worktree`、`test_branch`，天然适合承载。放在 shell env 文件里导致
-① `source` 解析不安全 ② 门禁检查困难 ③ 与运行时状态职责混淆。
+**正确做法不是"把 16 个字段搬到 agent_working"，而是：**
+1. 需要这些值时，从权威源读取——I-* issue 文档、分支名、agent_working 表
+2. workcell-state.env 里删掉这 16 个冗余缓存
+3. 能推导的推导（如 closeout_gate_command 是常量），不存副本
 
 #### 第三类：测试时间戳（1字段）—— 测试工位专属
 
-`LAST_STATE_UPDATED_AT`：用于门禁对比 test 分支最新 commit 时间，判断测试是否过期。
+`LAST_STATE_UPDATED_AT`：用于门禁对比 test 分支最新 commit 时间。
+这个值 agent_working 表的 `updated_at` 列已有——每次 upsert 自动更新。
+门禁直接查 SQL 即可，不需要在 env 文件里再存一份。
 
 ### 之前理解的错误
 
-1. **closeout 字段不该在 workcell-state.env** —— 应进 `agent_working` 表，随 worktree 生命周期更新
+1. **closeout 字段不该在 workcell-state.env** —— 它们是 worker-verification-contract.env 的冗余缓存。应该删除，需要时从权威源读：I-* issue frontmatter、分支名推导、agent_working 表
 2. **门禁不应检查 closeout 字段** —— test-pre-merge 是 manager 角色，这些字段永远为空。正确做法是比较时间戳
 3. **`monitor-ai-cli.sh:351` 也在用 `source`** —— 同样 unsafe，但 heredoc 已加引号，风险较小
 
@@ -70,10 +79,9 @@ bash 将其解释为 `VAR=val command`，导致 daemon 启动时意外执行 `pr
 
 ### 需要后续 issue 跟进的重构
 
-1. **closeout 16 字段迁移到 agent_working** —— 新增列，随 worktree 生命周期 upsert/delete
-2. **`monitor-ai-cli.sh:351` 的 `source` 改安全读取**
-3. **workcell-state.env 精简为 6 运行时字段 + 时间戳**
-4. **测试证据文件独立** —— 在 `verification/test-evidence/` 下，门禁直接查 pre-tests.md 的 artifact_ref
+1. **删掉 workcell-state.env 中 16 个 LAST_WORKER_* 字段** —— 冗余缓存，权威源已在 I-* issue / agent_working / 分支名中
+2. **门禁从权威源读值** —— 不依赖 workcell-state.env 的 closeout 副本
+3. **`monitor-ai-cli.sh:351` 的 `source` 改安全读取**
 
 ## Brainstorm
 

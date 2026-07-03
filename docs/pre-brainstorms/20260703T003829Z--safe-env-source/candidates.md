@@ -20,9 +20,9 @@ milestone: M-20260703T003829Z-A
   ③ 测试时间戳（1字段，测试工位专属）
   
   本 fix 止血：source → meta_env_value + 门禁改为时间戳比较 + git 跟踪移除。
-  后续重构：closeout 迁移到 agent_working 表 / monitor-ai-cli.sh 同步修复。
+  后续重构：删掉 workcell-state.env 中 16 个冗余 LAST_WORKER_* 字段，门禁改从权威源读值（I-* issue / agent_working / 分支名）。
 - next_action: N/A（已吸收到 I-* issue）
-- revisit_trigger: closeout 字段迁移到 agent_working 的后续 issue
+- revisit_trigger: workcell-state.env 删冗余副本、门禁从权威源读值的后续 issue
 - acceptance_criteria:
   - `write_workcell_state()` 不再使用 `source` 读取 env 文件
   - daemon 启动不因 env 多词值执行意外命令
@@ -36,8 +36,9 @@ milestone: M-20260703T003829Z-A
   - candidates.md 完成（本文件）
   - milestones.md 已更新
 - open_questions:
-  - closeout 字段何时迁移到 agent_working？
+  - workcell-state.env 中 16 个冗余 LAST_WORKER_* 何时删除？
   - monitor-ai-cli.sh 的 source 何时修复？
+  - 门禁如何改为从权威源读 closeout 值而非 env 副本？
   - reviewer: claude-opus-4.7
   - mode: subagent
   - summary: 审查 unsafe source 替换为 meta_env_value 的正确性，确认无其他同类问题
