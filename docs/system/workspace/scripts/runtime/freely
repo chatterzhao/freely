@@ -14072,7 +14072,10 @@ _ensure_acp_bridge_running() {
       # different slot means different API key; bridge must restart.
       local running_tool=""
       [[ -f "$acp_tool_file" ]] && running_tool=$(cat "$acp_tool_file" 2>/dev/null || true)
-      if [[ -n "$running_bin" && "$running_bin" != "$acp_bin" ]]; then
+      # Compare basename — config.toml may store full path while registry uses short name
+      local _running_bin_name; _running_bin_name=$(basename "$running_bin" 2>/dev/null || echo "$running_bin")
+      local _acp_bin_name; _acp_bin_name=$(basename "$acp_bin" 2>/dev/null || echo "$acp_bin")
+      if [[ -n "$running_bin" && "$_running_bin_name" != "$_acp_bin_name" ]]; then
         log_info "ACP bridge binary changed ($running_bin → $acp_bin), gracefully closing session before restart"
         _acp_session_close "$project" "${CLAUDE_SESSION_ID_CURRENT:-}"
         _stop_acp_bridge "$project"
@@ -14174,8 +14177,9 @@ _ensure_acp_bridge_running() {
   fi
   disown "$!" 2>/dev/null || true
   # Note: bridge writes its own PID file during start_server, don't overwrite it
-  # Record the binary path and tool name so we can detect changes across cycles
-  printf '%s\n' "$acp_bin" > "$acp_bin_file" 2>/dev/null || true
+  # Record the registry short name (not config.toml full path) so comparison
+  # with next cycle's registry lookup uses consistent values.
+  printf '%s\n' "${_reg_bin:-$acp_bin}" > "$acp_bin_file" 2>/dev/null || true
   printf '%s\n' "${AGENT_AI_TOOL:-claude}" > "$acp_tool_file" 2>/dev/null || true
 
   # Wait for readiness (codex-acp cold start ~8s, use 15s margin)
@@ -22930,11 +22934,13 @@ print(ready)
       continue
     fi
     # ── L0-L3 Loop Guard: detect dead loops before next cycle ──
-    loop_guard_check_all "$PROJECT_ROOT" \
-      "${LAST_LAUNCH_KIND:-}" \
-      "${LAST_EXIT_REASON:-}" \
-      "${worker_launched_directly:-0}" \
-      "${LAST_PROMPT_BYTES:-0}" || true  # never block supervisor on guard error
+    if declare -f loop_guard_check_all >/dev/null 2>&1; then
+      loop_guard_check_all "$PROJECT_ROOT" \
+        "${LAST_LAUNCH_KIND:-}" \
+        "${LAST_EXIT_REASON:-}" \
+        "${worker_launched_directly:-0}" \
+        "${LAST_PROMPT_BYTES:-0}" || true  # never block supervisor on guard error
+    fi
 
     sleep_with_rate_limit_recheck "$PROJECT_ROOT" "$next_restart_delay"
   done
