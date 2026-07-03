@@ -44,6 +44,7 @@ project = Path(sys.argv[1]).resolve()
 worktree = Path(sys.argv[2]).resolve()
 runtime_root = Path(sys.argv[3]).resolve()
 state_file = worktree / ".freely" / "run" / "workcell-state.env"
+gate_file = worktree / ".freely" / "run" / "test-gate.env"
 pretests_gate = project / "bin" / "pretests-gate"
 if not pretests_gate.exists():
     pretests_gate = runtime_root / "bin" / "pretests-gate"
@@ -88,6 +89,15 @@ def resolve_issue_path(issue_ref: str) -> tuple[str, str]:
 
 
 env = parse_env(state_file)
+gate_env = parse_env(gate_file)
+
+# test-gate.env fields (only exist in test worktrees)
+_test_status = gate_env.get("TEST_STATUS", "")
+_last_tested_commit = gate_env.get("LAST_TESTED_COMMIT", "")
+_last_tested_at = gate_env.get("LAST_TESTED_AT", "")
+
+# Closeout fields kept for backward compat with wt-close (worker retirement check).
+# These are read from workcell-state.env which may still have them from older daemon runs.
 owner_issue = env.get("LAST_WORKER_OWNER_ISSUE", "")
 recorded_pre_tests = env.get("LAST_WORKER_PRE_TESTS_PATH", "")
 closeout_gate = env.get("LAST_WORKER_CLOSEOUT_GATE", "")
@@ -100,38 +110,18 @@ closeout_review_artifact_policy = env.get("LAST_WORKER_CLOSEOUT_REVIEW_ARTIFACT_
 if not pretests_gate.exists():
     print(f"[pretests_retirement_missing] missing gate: {pretests_gate}", file=sys.stderr)
     sys.exit(1)
-if not state_file.exists():
-    # Extract raw key from worktree branch for a helpful message
-    _wt_raw_key = ""
-    try:
-        _branch = _sp.check_output(
-            ["git", "-C", str(worktree), "rev-parse", "--abbrev-ref", "HEAD"],
-            text=True, stderr=_sp.DEVNULL
-        ).strip()
-        import re as _re
-        _m = _re.search(r'([0-9]{8}T[0-9]{6}Z)', _branch)
-        if _m:
-            _wt_raw_key = _m.group(1)
-    except Exception:
-        pass
-
-    print(f"[pretests_retirement_state_missing] 测试工位中还没有运行时状态文件", file=sys.stderr)
-    print(f"  文件: {state_file}", file=sys.stderr)
+if not gate_file.exists():
+    print(f"[pretests_not_tested] 测试工位还没有运行过 daemon", file=sys.stderr)
+    print(f"  文件: {gate_file}", file=sys.stderr)
     print(f"", file=sys.stderr)
-    print(f"  原因: 还没有在当前开发工位对应的测试工位（raw key 相同的 test-pre-merge-* 工位）", file=sys.stderr)
-    print(f"        中运行 daemon 完成测试。", file=sys.stderr)
-    if _wt_raw_key:
-        print(f"  测试工位分支: test-pre-merge-{_wt_raw_key}-*", file=sys.stderr)
-    print(f"", file=sys.stderr)
-    print(f"  修复步骤:", file=sys.stderr)
-    print(f"    1. cd 到测试工位目录", file=sys.stderr)
-    print(f"    2. ./bin/freely daemon start --task-mode auto", file=sys.stderr)
-    print(f"    3. daemon 运行后会自动生成该文件及 closeout 字段", file=sys.stderr)
-    print(f"    4. 确认测试通过后重新执行 pr-create-guarded", file=sys.stderr)
+    print(f"  请在测试工位运行 daemon 完成测试:", file=sys.stderr)
+    print(f"    cd {worktree}", file=sys.stderr)
+    print(f"    ./bin/freely daemon start --task-mode auto", file=sys.stderr)
     print(f"  详见 skill `freely-test-execution`", file=sys.stderr)
-    print(f"  回退到手动 GREEN 检查...", file=sys.stderr)
-    # Fallback: no Worker metadata — find the worktree's owning pre-tests.md via branch name.
-    # Only checks GREEN evidence for the issue bound to THIS worktree, not all epics.
+    sys.exit(1)
+    # test-gate.env not found — no fallback needed, test-gate is the authoritative source.
+    sys.exit(1)
+if False:  # dead code kept for diff clarity — old fallback removed
     import subprocess as _sp
     _branch = ""
     try:
@@ -324,37 +314,23 @@ if not state_file.exists():
         print("如需豁免某项测试，设置 status=not_applicable 并填写 not_applicable_reason。", file=sys.stderr)
     sys.exit(1 if fallback_failures > 0 else 0)
 
-# ── Timestamp-based test freshness check ──
-# Compare workcell-state.env's LAST_STATE_UPDATED_AT against the latest
-# git commit on this worktree's branch. If git has newer commits than the
-# last daemon run, tests are stale and must be re-run.
-_last_updated_str = env.get("LAST_STATE_UPDATED_AT", "")
-_desired_state = env.get("DESIRED_RUNTIME_STATE", "")
+# ── Test-gate freshness check ──
+# Compare test-gate.env's LAST_TESTED_COMMIT against HEAD.
+# If HEAD is ahead, tests are stale and must be re-run.
 
-# Try to get the latest commit timestamp on this worktree's branch
-_latest_commit_ts = 0
-_last_updated_ts = 0
+_latest_commit = ""
 try:
-    _latest = _sp.check_output(
-        ["git", "-C", str(worktree), "log", "-1", "--format=%ct", "HEAD"],
+    _latest_commit = _sp.check_output(
+        ["git", "-C", str(worktree), "rev-parse", "HEAD"],
         text=True, stderr=_sp.DEVNULL
     ).strip()
-    _latest_commit_ts = int(_latest) if _latest else 0
 except Exception:
     pass
 
-if _last_updated_str:
-    try:
-        import datetime as _dt
-        _dt_parsed = _dt.datetime.strptime(_last_updated_str, "%Y-%m-%dT%H:%M:%SZ")
-        _last_updated_ts = int(_dt_parsed.timestamp())
-    except Exception:
-        pass
-
-if _desired_state == "not_tested" or _last_updated_ts == 0:
+if _test_status == "not_tested" or not _last_tested_at or _last_tested_at == "1970-01-01T00:00:00Z":
     print(f"[pretests_not_tested] 测试工位还没有运行过 daemon", file=sys.stderr)
-    print(f"  文件: {state_file}", file=sys.stderr)
-    print(f"  DESIRED_RUNTIME_STATE = {_desired_state}", file=sys.stderr)
+    print(f"  文件: {gate_file}", file=sys.stderr)
+    print(f"  TEST_STATUS = {_test_status or '<empty>'}", file=sys.stderr)
     print(f"", file=sys.stderr)
     print(f"  请先在测试工位运行 daemon 完成测试:", file=sys.stderr)
     print(f"    cd {worktree}", file=sys.stderr)
@@ -362,15 +338,14 @@ if _desired_state == "not_tested" or _last_updated_ts == 0:
     print(f"  详见 skill `freely-test-execution`", file=sys.stderr)
     sys.exit(1)
 
-if _latest_commit_ts > 0 and _last_updated_ts > 0 and _latest_commit_ts > _last_updated_ts:
-    import datetime as _dt
-    _commit_dt = _dt.datetime.fromtimestamp(_latest_commit_ts, tz=_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+if _latest_commit and _last_tested_commit and _latest_commit != _last_tested_commit:
     print(f"[pretests_stale] 测试工位有新提交但未重新跑测试", file=sys.stderr)
-    print(f"  文件: {state_file}", file=sys.stderr)
-    print(f"  最新 commit 时间: {_commit_dt}", file=sys.stderr)
-    print(f"  上次测试时间:     {_last_updated_str}", file=sys.stderr)
+    print(f"  文件: {gate_file}", file=sys.stderr)
+    print(f"  当前 HEAD:  {_latest_commit[:12]}", file=sys.stderr)
+    print(f"  上次测试时: {_last_tested_commit[:12] if _last_tested_commit else '<empty>'}", file=sys.stderr)
+    print(f"  上次测试时间: {_last_tested_at}", file=sys.stderr)
     print(f"", file=sys.stderr)
-    print(f"  测试工位 {worktree} 在 merge 新代码后未重新运行 daemon。", file=sys.stderr)
+    print(f"  测试工位在 merge 新代码后未重新运行 daemon。", file=sys.stderr)
     print(f"  请检查新的修改是否需要跑测试——", file=sys.stderr)
     print(f"  如果需要:", file=sys.stderr)
     print(f"    cd {worktree}", file=sys.stderr)
@@ -379,8 +354,8 @@ if _latest_commit_ts > 0 and _last_updated_ts > 0 and _latest_commit_ts > _last_
     print(f"  详见 skill `freely-test-execution`", file=sys.stderr)
     sys.exit(1)
 
-# Tests are current — timestamp is >= latest commit.
-# closeout fields below are only required for worker retirement (wt-close).
+# Tests are current — test-gate commit matches HEAD.
+# Closeout fields below are only required for worker retirement (wt-close).
 # For pr-create-guarded on test-pre-merge (manager role), skip closeout checks.
 
 missing_closeout_fields: list[str] = []
