@@ -1628,12 +1628,13 @@ def main() -> int:
                     f"{owner_issue.issue_id or owner_issue.path} in {owner_issue.path} has phase_state '{owner_issue.phase_state}', which cannot own capability/implementation changes in a develop-bound merge. "
                     f"Complete verification and advance phase_state to 'completed' before merging, or keep this merge governance-only."
                 )
-            # 历史遗留豁免：phase_state 为 completed 的 issue 允许后补 capability changes
-            # 这些是历史 issue，之前已完成但后来有后续修复合并进来
+            # phase_state=completed must NOT carry capability changes in the same merge.
+            # Complete verification before marking completed, or keep merge governance-only.
             if phase == "completed":
-                warnings.append(
+                errors.append(
                     f"{owner_issue.issue_id or owner_issue.path} in {owner_issue.path} has phase_state 'completed' but carries capability/implementation changes. "
-                    f"This is allowed for legacy issues with post-completion fixes. Consider creating a follow-up issue for future work."
+                    f"Set phase_state correctly: done_b2_ibm → in_dev → staged → completed (only after GREEN). "
+                    f"Do NOT shortcut to 'completed' in the same commit that introduces code changes."
                 )
 
         for issue in touched_issue_records:
