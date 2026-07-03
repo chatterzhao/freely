@@ -101,10 +101,34 @@ if not pretests_gate.exists():
     print(f"[pretests_retirement_missing] missing gate: {pretests_gate}", file=sys.stderr)
     sys.exit(1)
 if not state_file.exists():
-    print(f"[pretests_retirement_state_missing] missing worker state: {state_file}", file=sys.stderr)
-    print(f"  先检查: .freely/run/workcell-state.env 是否存在？", file=sys.stderr)
-    print(f"  不存在 → 创建该文件，必填字段: LAST_WORKER_OWNER_ISSUE / LAST_WORKER_PRE_TESTS_PATH / LAST_WORKER_CLOSEOUT_*", file=sys.stderr)
-    print(f"  详见 skill `freely-doc-B2_IBM-execution` §workcell-state.env 必填字段", file=sys.stderr)
+    # Extract raw key from worktree branch for a helpful message
+    _wt_raw_key = ""
+    try:
+        _branch = _sp.check_output(
+            ["git", "-C", str(worktree), "rev-parse", "--abbrev-ref", "HEAD"],
+            text=True, stderr=_sp.DEVNULL
+        ).strip()
+        import re as _re
+        _m = _re.search(r'([0-9]{8}T[0-9]{6}Z)', _branch)
+        if _m:
+            _wt_raw_key = _m.group(1)
+    except Exception:
+        pass
+
+    print(f"[pretests_retirement_state_missing] 测试工位中还没有运行时状态文件", file=sys.stderr)
+    print(f"  文件: {state_file}", file=sys.stderr)
+    print(f"", file=sys.stderr)
+    print(f"  原因: 还没有在当前开发工位对应的测试工位（raw key 相同的 test-pre-merge-* 工位）", file=sys.stderr)
+    print(f"        中运行 daemon 完成测试。", file=sys.stderr)
+    if _wt_raw_key:
+        print(f"  测试工位分支: test-pre-merge-{_wt_raw_key}-*", file=sys.stderr)
+    print(f"", file=sys.stderr)
+    print(f"  修复步骤:", file=sys.stderr)
+    print(f"    1. cd 到测试工位目录", file=sys.stderr)
+    print(f"    2. ./bin/freely daemon start --task-mode auto", file=sys.stderr)
+    print(f"    3. daemon 运行后会自动生成该文件及 closeout 字段", file=sys.stderr)
+    print(f"    4. 确认测试通过后重新执行 pr-create-guarded", file=sys.stderr)
+    print(f"  详见 skill `freely-test-execution`", file=sys.stderr)
     print(f"  回退到手动 GREEN 检查...", file=sys.stderr)
     # Fallback: no Worker metadata — find the worktree's owning pre-tests.md via branch name.
     # Only checks GREEN evidence for the issue bound to THIS worktree, not all epics.
@@ -300,20 +324,28 @@ if not state_file.exists():
         print("如需豁免某项测试，设置 status=not_applicable 并填写 not_applicable_reason。", file=sys.stderr)
     sys.exit(1 if fallback_failures > 0 else 0)
 if not owner_issue and not recorded_pre_tests and not closeout_gate and not closeout_gate_command:
-    print("[pretests_retirement_binding_missing] worker state 缺少 owner issue / pre-tests path / closeout 上下文", file=sys.stderr)
+    # All closeout fields empty → daemon never ran to completion in test worktree
+    print(f"[pretests_retirement_binding_missing] 测试工位中缺少测试完成状态", file=sys.stderr)
     print(f"  文件: {state_file}", file=sys.stderr)
-    print(f"  必填字段: LAST_WORKER_OWNER_ISSUE / LAST_WORKER_PRE_TESTS_PATH / LAST_WORKER_CLOSEOUT_GATE / LAST_WORKER_CLOSEOUT_GATE_COMMAND", file=sys.stderr)
-    print(f"  详见 skill `freely-doc-B2_IBM-execution` §workcell-state.env 必填字段", file=sys.stderr)
+    print(f"", file=sys.stderr)
+    print(f"  原因: 该文件存在但缺少 closeout 字段（LAST_WORKER_OWNER_ISSUE /", file=sys.stderr)
+    print(f"        LAST_WORKER_PRE_TESTS_PATH / LAST_WORKER_CLOSEOUT_GATE_COMMAND）。", file=sys.stderr)
+    print(f"        这说明还没有在当前开发工位对应的测试工位", file=sys.stderr)
+    print(f"        （raw key 相同的 test-pre-merge-* 工位）中", file=sys.stderr)
+    print(f"        完成测试或 daemon 尚未写入 closeout 上下文。", file=sys.stderr)
+    print(f"", file=sys.stderr)
+    print(f"  修复: 在测试工位启动 daemon 完成测试验证，daemon 会自动", file=sys.stderr)
+    print(f"        写入这些字段。详见 skill `freely-test-execution`。", file=sys.stderr)
     sys.exit(1)
 if not owner_issue:
-    print(f"[pretests_retirement_binding_missing] workcell state 缺少 owner issue", file=sys.stderr)
+    print(f"[pretests_retirement_binding_missing] 测试工位缺少 owner issue 绑定", file=sys.stderr)
     print(f"  文件: {state_file}", file=sys.stderr)
-    print(f"  添加: LAST_WORKER_OWNER_ISSUE=I-{'{raw key}'}-A", file=sys.stderr)
+    print(f"  缺少: LAST_WORKER_OWNER_ISSUE（如 I-{{raw key}}-A）", file=sys.stderr)
     sys.exit(1)
 if not recorded_pre_tests:
-    print(f"[pretests_retirement_binding_missing] workcell state 缺少 pre-tests path", file=sys.stderr)
+    print(f"[pretests_retirement_binding_missing] 测试工位缺少 pre-tests 路径", file=sys.stderr)
     print(f"  文件: {state_file}", file=sys.stderr)
-    print(f"  添加: LAST_WORKER_PRE_TESTS_PATH=docs/epics/{{epic-name}}/{{story-name}}/raw-{{raw key}}/verification/pre-tests.md", file=sys.stderr)
+    print(f"  缺少: LAST_WORKER_PRE_TESTS_PATH", file=sys.stderr)
     sys.exit(1)
 
 missing_closeout_fields: list[str] = []
