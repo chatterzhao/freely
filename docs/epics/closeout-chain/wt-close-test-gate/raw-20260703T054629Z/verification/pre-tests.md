@@ -19,11 +19,11 @@
 - test_command: cd <project-root> && ./bin/wt-close fix/raw-20260703T054629Z-wt-close-test-gate
 - expected_output: wt-close: pretests-retirement-gate passed
 - expected_RED_output: test worktree not found 或 gate 失败
-- actual_RED_output: gate 检查 fix 工位的 test-gate.env（不存在）→ 失败
-- actual_output: (待执行)
-- evidence_file: (待执行)
-- red-green-status: pending
-- status: pending
+- actual_RED_output: wt-close 传 fix 工位路径 → gate 找不到 test-gate.env → 报错 "pretests_not_tested"
+- actual_output: wt-close: pretests-retirement-gate passed ✓
+- evidence_file: docs/epics/closeout-chain/wt-close-test-gate/raw-20260703T054629Z/verification/test-evidence/acceptance-1.log
+- red-green-status: green
+- status: passed
 - red_how: fix: 修复前 wt-close 传 fix 工位路径 → gate 找不到 test-gate.env → 失败
 
 ## Unit
