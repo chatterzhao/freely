@@ -233,7 +233,21 @@ parse_ai_spec_or_fail() {
     fi
   done
   if [[ "$_is_known" == "0" ]]; then
-    echo "[WARN] tool '$tool' not in registry, passing through for alias resolution" >&2
+    cat >&2 <<SLOT_ERR
+[ERROR] slot 配置对应的工具 '$tool' 在 freely 中没有注册，不在支持列表中。
+
+  已注册的工具: $_reg_tools
+
+  请检查:
+  1. agent-table.toml 中 {role}_slot 配置的工具名是否正确
+  2. slot 目录命名是否规范: {tool-name}-apikey|account-{custom}
+     例: claude-apikey-ds-pro-auto → 工具=claude
+         opencode-apikey-ds-flash-auto → 工具=opencode
+         codex-account-user@example-com-1 → 工具=codex
+
+  如果工具名正确但不在 registry 中，请更新 tool-registry.toml 添加该工具。
+SLOT_ERR
+    exit 1
   fi
 
   printf '%s|%s|%s\n' "$tool" "${model:-}" "$mode"
