@@ -541,7 +541,7 @@
 ### candidate_issues
 1. `C-20260617T063755Z-A`
 - milestone: M-20260617T063755Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260617T063755Z-A/issue.md`
+- promoted_issue_path: docs/issues/I-20260617T063755Z-A/issue.md
 ### completed_issues
 
 ## M-20260617T095105Z-A
