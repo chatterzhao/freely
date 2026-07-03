@@ -205,6 +205,10 @@ if _contract_file.exists():
     owner_issue = _contract_owner_issue
     recorded_pre_tests = _contract_pre_tests_path
 
+if not owner_issue and not _contract_file.exists():
+    # Manager/test worktree with no contract — test-gate already passed.
+    # Issue resolution is only needed for worker retirement (wt-close).
+    sys.exit(0)
 issue_path, issue_error = resolve_issue_path(owner_issue)
 if not issue_path:
     if issue_error.startswith("ambiguous:"):

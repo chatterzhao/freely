@@ -1,3 +1,18 @@
+## M-20260703T051533Z-A
+- title: fix: remove tracked __pycache__ .pyc files
+- status: completed
+### candidate_issues
+### committed_issues
+1. `I-20260703T051533Z-A`
+- milestone: M-20260703T051533Z-A
+- phase_state: completed
+- path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
+### completed_issues
+1. `C-20260703T051533Z-A`
+- milestone: M-20260703T051533Z-A
+- status: absorbed
+- absorbed_into: `I-20260703T051533Z-A`
+
 ## M-20260703T003829Z-A
 - title: fix: write_workcell_state unsafe source → meta_env_value
 - status: completed
@@ -40,8 +55,12 @@
 1. `C-20260701T081450Z-A`
 - milestone: M-20260701T081450Z-A
 - status: promoted
-- promoted_issue_id: `I-20260701T081450Z-A`
+- promoted_issue_id: `I-20260703T051533Z-A` `I-20260701T081450Z-A`
 ### committed_issues
+1. `I-20260703T051533Z-A`
+- milestone: M-20260703T051533Z-A
+- phase_state: completed
+- path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260701T081450Z-A`
 - title: fix: merge lock; milestone_state: completed
@@ -55,9 +74,13 @@
 1. `C-20260701T045911Z-A`
 - milestone: M-20260701T045911Z-A
 - status: promoted
-- promoted_issue_id: `I-20260701T045911Z-A`
+- promoted_issue_id: `I-20260703T051533Z-A` `I-20260701T045911Z-A`
 - promoted_issue_path: docs/epics/reviewer-agent/phase1-ensure-reviewer/raw-20260701T045911Z/issues/I-20260701T045911Z-A.md
 ### committed_issues
+1. `I-20260703T051533Z-A`
+- milestone: M-20260703T051533Z-A
+- phase_state: completed
+- path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260701T045911Z-A`
 - title: Phase1: reviewer; milestone_state: completed
@@ -71,8 +94,12 @@
 1. `C-20260701T061924Z-A`
 - milestone: M-20260701T061924Z-A
 - status: promoted
-- promoted_issue_id: `I-20260701T061924Z-A`
+- promoted_issue_id: `I-20260703T051533Z-A` `I-20260701T061924Z-A`
 ### committed_issues
+1. `I-20260703T051533Z-A`
+- milestone: M-20260703T051533Z-A
+- phase_state: completed
+- path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260701T061924Z-A`
 - title: feat: unify gates; milestone_state: completed
@@ -86,8 +113,12 @@
 1. `C-20260701T061531Z-A`
 - milestone: M-20260701T061531Z-A
 - status: promoted
-- promoted_issue_id: `I-20260701T061531Z-A`
+- promoted_issue_id: `I-20260703T051533Z-A` `I-20260701T061531Z-A`
 ### committed_issues
+1. `I-20260703T051533Z-A`
+- milestone: M-20260703T051533Z-A
+- phase_state: completed
+- path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260701T061531Z-A`
 - title: feat: gate summary; milestone_state: completed
@@ -101,8 +132,12 @@
 1. `C-20260701T054502Z-A`
 - milestone: M-20260701T054502Z-A
 - status: promoted
-- promoted_issue_id: `I-20260701T054502Z-A`
+- promoted_issue_id: `I-20260703T051533Z-A` `I-20260701T054502Z-A`
 ### committed_issues
+1. `I-20260703T051533Z-A`
+- milestone: M-20260703T051533Z-A
+- phase_state: completed
+- path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260701T054502Z-A`
 - title: fix: gate skill refs; milestone_state: completed
@@ -116,8 +151,12 @@
 1. `C-20260701T051138Z-A`
 - milestone: M-20260701T051138Z-A
 - status: promoted
-- promoted_issue_id: `I-20260701T051138Z-A`
+- promoted_issue_id: `I-20260703T051533Z-A` `I-20260701T051138Z-A`
 ### committed_issues
+1. `I-20260703T051533Z-A`
+- milestone: M-20260703T051533Z-A
+- phase_state: completed
+- path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260701T051138Z-A`
 - title: fix: chain order; milestone_state: completed
@@ -131,8 +170,12 @@
 1. `C-20260701T040012Z-A`
 - milestone: M-20260701T040012Z-A
 - status: promoted
-- promoted_issue_id: `I-20260701T040012Z-A`
+- promoted_issue_id: `I-20260703T051533Z-A` `I-20260701T040012Z-A`
 ### committed_issues
+1. `I-20260703T051533Z-A`
+- milestone: M-20260703T051533Z-A
+- phase_state: completed
+- path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260701T040012Z-A`
 - title: fix: A2A health check log-based; milestone_state: completed
@@ -146,8 +189,12 @@
 1. `C-20260701T031733Z-A`
 - milestone: M-20260701T031733Z-A
 - status: promoted
-- promoted_issue_id: `I-20260701T031733Z-A`
+- promoted_issue_id: `I-20260703T051533Z-A` `I-20260701T031733Z-A`
 ### committed_issues
+1. `I-20260703T051533Z-A`
+- milestone: M-20260703T051533Z-A
+- phase_state: completed
+- path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260701T031733Z-A`
 - title: feat: skill-gate alignment + dev-test sync; milestone_state: completed
@@ -161,8 +208,12 @@
 1. `C-20260701T024449Z-A`
 - milestone: M-20260701T024449Z-A
 - status: promoted
-- promoted_issue_id: `I-20260701T024449Z-A`
+- promoted_issue_id: `I-20260703T051533Z-A` `I-20260701T024449Z-A`
 ### committed_issues
+1. `I-20260703T051533Z-A`
+- milestone: M-20260703T051533Z-A
+- phase_state: completed
+- path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260701T024449Z-A`
 - title: fix: _review_guide unbound; milestone_state: completed
@@ -176,8 +227,12 @@
 1. `C-20260701T013527Z-A`
 - milestone: M-20260701T013527Z-A
 - status: promoted
-- promoted_issue_id: `I-20260701T013527Z-A`
+- promoted_issue_id: `I-20260703T051533Z-A` `I-20260701T013527Z-A`
 ### committed_issues
+1. `I-20260703T051533Z-A`
+- milestone: M-20260703T051533Z-A
+- phase_state: completed
+- path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260701T013527Z-A`
 - title: fix: get_config undefined → bash indirect expansion; milestone_state: completed
@@ -206,8 +261,12 @@
 1. `C-20260630T224941Z-A`
 - milestone: M-20260630T224941Z-A
 - status: promoted
-- promoted_issue_id: `I-20260630T224941Z-A`
+- promoted_issue_id: `I-20260703T051533Z-A` `I-20260630T224941Z-A`
 ### committed_issues
+1. `I-20260703T051533Z-A`
+- milestone: M-20260703T051533Z-A
+- phase_state: completed
+- path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260630T224941Z-A`
 - title: feat: config.toml.example overhaul; milestone_state: committed
@@ -223,6 +282,10 @@
 - status: promoted
 - promoted_issue_path: `docs/epics/acp-tool-setup/unified-config-reader/raw-20260630T151209Z/issues/I-20260630T151209Z-A.md`
 ### committed_issues
+1. `I-20260703T051533Z-A`
+- milestone: M-20260703T051533Z-A
+- phase_state: completed
+- path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260630T151209Z-A`
 - title: unified config reader; milestone_state: committed
@@ -238,6 +301,10 @@
 - status: promoted
 - promoted_issue_path: `docs/issues/I-20260630T134353Z-A/issue.md`
 ### committed_issues
+1. `I-20260703T051533Z-A`
+- milestone: M-20260703T051533Z-A
+- phase_state: completed
+- path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260630T134353Z-A`
 - title: init --auto flag; milestone_state: committed
@@ -252,8 +319,12 @@
 1. `C-20260630T124528Z-A`
 - milestone: M-20260630T124528Z-A
 - status: promoted
-- promoted_issue_id: `I-20260630T124528Z-A`
+- promoted_issue_id: `I-20260703T051533Z-A` `I-20260630T124528Z-A`
 ### committed_issues
+1. `I-20260703T051533Z-A`
+- milestone: M-20260703T051533Z-A
+- phase_state: completed
+- path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260630T124528Z-A`
 - title: feat: ACP init + registry download; milestone_state: committed
@@ -269,6 +340,10 @@
 - status: promoted
 - promoted_issue_path: `docs/issues/I-20260630T113839Z-A/issue.md`
 ### committed_issues
+1. `I-20260703T051533Z-A`
+- milestone: M-20260703T051533Z-A
+- phase_state: completed
+- path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260630T113839Z-A`
 - title: fix: runtime dirty fix; milestone_state: committed
@@ -285,6 +360,10 @@
 - status: promoted
 - promoted_issue_path: `docs/issues/I-20260630T111641Z-A/issue.md`
 ### committed_issues
+1. `I-20260703T051533Z-A`
+- milestone: M-20260703T051533Z-A
+- phase_state: completed
+- path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260630T111641Z-A`
 - title: fix: review state update; milestone_state: committed
