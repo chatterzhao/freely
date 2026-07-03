@@ -7,6 +7,10 @@
 - status: promoted
 - promoted_issue_id: `I-20260703T003829Z-A`
 ### committed_issues
+1. `I-20260703T003829Z-A`
+- milestone: M-20260703T003829Z-A
+- phase_state: done_b2_ibm
+- path: docs/epics/runtime-core/safe-state-io/raw-20260703T003829Z/issues/I-20260703T003829Z-A.md
 ### completed_issues
 
 ## M-20260701T085407Z-A
