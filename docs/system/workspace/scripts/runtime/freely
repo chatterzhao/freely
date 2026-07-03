@@ -21493,6 +21493,11 @@ print(f'/tmp/freely-db-{h}.pid')
   )
   # Add current tool's base binary pattern (derived from registry, not hardcoded)
   local _stop_base_tool="${AGENT_AI_TOOL%%-*}"
+  # Fallback: read from agent-table if AGENT_AI_TOOL not set (stop command in fresh shell)
+  if [[ -z "$_stop_base_tool" && -x "$SELF_ROOT/bin/agent-table-query" ]]; then
+    local _stop_slot; _stop_slot=$("$SELF_ROOT/bin/agent-table-query" --get-slot manager_01 2>/dev/null || true)
+    [[ -n "$_stop_slot" ]] && _stop_base_tool="${_stop_slot%%-*}"
+  fi
   [[ -n "$_stop_base_tool" && "$_stop_base_tool" != "claude" ]] && _cleanup_patterns+=("$_stop_base_tool")
   for _p in "${_cleanup_patterns[@]}"; do
     pkill -f "$_p" 2>/dev/null || true
