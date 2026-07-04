@@ -1780,7 +1780,7 @@
 1. `I-20260704T064539Z-A`
 - title: refactor — unify ACP session management
 - milestone: M-20260704T064539Z-A
-- phase_state: done_b2_ibm
+- phase_state: in_dev
 - path: docs/epics/agent-acp/session-lifecycle-unify/raw-20260704T064539Z/issues/I-20260704T064539Z-A.md
 
 
@@ -1792,10 +1792,24 @@
 1. `I-20260704T080808Z-A`
 - title: feat — multi ACP bridge per-agent tool/slot
 - milestone: M-20260704T080808Z-A
-- phase_state: done_b2_ibm
+- phase_state: in_dev
 - path: docs/epics/agent-acp/multi-bridge-per-tool/raw-20260704T080808Z/issues/I-20260704T080808Z-A.md
 ### completed_issues
 1. `C-20260704T080808Z-A`
 - milestone: M-20260704T080808Z-A
 - status: absorbed
 - absorbed_into: `I-20260704T080808Z-A`
+
+## M-20260704T234812Z-A
+- title: fix — #3731 ACP cleanup 遗漏修复 + hook 提示改进
+- status: active
+### candidate_issues
+1. `C-20260704T234812Z-A`
+- milestone: M-20260704T234812Z-A; status: promoted
+- promoted_issue_id: `I-20260704T234812Z-A`
+### committed_issues
+1. `I-20260704T234812Z-A`
+- title: fix — #3731 ACP cleanup 遗漏修复 + hook 提示改进
+- milestone: M-20260704T234812Z-A
+- phase_state: in_dev
+- path: docs/epics/agent-acp/acp-cleanup-loosened/raw-20260704T234812Z/issues/I-20260704T234812Z-A.md
