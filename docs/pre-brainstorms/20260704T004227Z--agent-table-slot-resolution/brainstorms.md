@@ -119,6 +119,62 @@ Even if Bug 1 is fixed (correct binary launched), Bug 2 means:
 2. 再修 `_ensure_acp_bridge_running` 的环境变量清理
 3. 最后修 agent-id grep 子串匹配
 
+### config.toml ACP binary 写入链路（当前正确）
+
+`freely init` → `_init_acp_tool_setup()` (line 20477):
+
+```
+对 tool-registry.toml 中每个 tool:
+  _tool = "claude" / "codex" / "opencode" / "cline"
+  _config_key = "FREELY_ACP_{TOOL}_BIN"  (e.g. FREELY_ACP_OPENCODE_BIN)
+
+  1. 检查 config.toml 是否已有缓存路径 → 有且可执行 → 跳过
+  2. 搜索系统 PATH → command -v <binary>
+  3. 搜索 cache → ~/.cache/freely/acp/{tool}/*/*/{binary}
+  4. 下载 → ensure-acp-binary --tool {tool}
+
+  → upsert_config_key "$project" "$_config_key" "$_found_path"
+```
+
+config.toml 当前值:
+```
+FREELY_ACP_CLAUDE_BIN = "/Users/zhaoyu/.nvm/.../bin/claude-agent-acp"
+FREELY_ACP_CODEX_BIN = "/Users/zhaoyu/.cache/freely/acp/codex/.../codex-acp"
+FREELY_ACP_OPENCODE_BIN = "/Users/zhaoyu/.opencode/bin/opencode"
+FREELY_ACP_CLINE_BIN = "/Users/zhaoyu/.nvm/.../bin/cline"
+```
+
+**这个写入逻辑是正确的。** 问题在消费侧。
+
+### ACP binary 消费链路对比
+
+| 步骤 | `_ensure_acp_bridge_running` (freely) | `_bridge_ensure_running` (monitor-ai-acp.sh) |
+|------|------|------|
+| 获取 tool name | `AGENT_AI_TOOL` → 已有 | 参数 `$2` → `opencode-apikey-ds-flash-auto` |
+| 提取 base_tool | `base_tool="${AGENT_AI_TOOL%%-*}"` ✅ | ❌ **没提取** |
+| 查询 registry acp.binary | `_reg_bin="$(_tool_registry_get "$base_tool" "acp.binary")"` ✅ | ❌ **没查** |
+| 查询 config.toml 路径 | `FREELY_ACP_$(echo "$base_tool" \| tr ...)_BIN` → `${!_config_key}` ✅ | ❌ **没查** |
+| 传 `--acp-bin` 给 bridge | ✅ 传了 | ❌ **没传** → 默认 `claude-agent-acp` |
+| 写 `.bin` 文件 | ✅ `printf ... > "$acp_bin_file"` | ❌ 没写 |
+| 写 `.tool` 文件 | ✅ 写 | ✅ 写 |
+
+`_bridge_ensure_running` 修复伪码:
+```bash
+local base_tool="${tool%%-*}"
+local acp_bin acp_args=()
+acp_bin="$(_tool_registry_get "$base_tool" "acp.binary" 2>/dev/null || echo "claude-agent-acp")"
+# 从 config.toml 读取安装路径（优先）
+local config_key; config_key="FREELY_ACP_$(echo "$base_tool" | tr '[:lower:]' '[:upper:]')_BIN"
+local config_path; config_path="$(_read_config_value "$config_key" 2>/dev/null || true)"
+[[ -n "$config_path" && -x "$config_path" ]] && acp_bin="$config_path"
+# 解析 acp args
+local raw_args; raw_args="$(_tool_registry_get "$base_tool" "acp.args" 2>/dev/null || true)"
+[[ -n "$raw_args" ]] && read -ra acp_args <<<"$raw_args"
+
+python3 "$bridge_script" start --project "$project" --acp-bin "$acp_bin" ${acp_args:+--acp-args "${acp_args[*]}"} >/dev/null 2>&1
+printf '%s\n' "$acp_bin" > "$acp_bin_file"
+```
+
 ## 诊断日志增强
 
 当前日志只说 "launching opencode via acp"，完全不够。以下是必须增加的诊断日志点：
