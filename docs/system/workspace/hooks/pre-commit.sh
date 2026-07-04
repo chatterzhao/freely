@@ -26,12 +26,16 @@ _fleet_audit_orphans() {
       if [[ $issue_count -eq 0 ]]; then
         echo "[freely] WARNING: Orphaned managed branches detected (no active worktree):" >&2
       fi
+      local _raw_key; _raw_key=$(echo "$branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)
       echo "  - $branch" >&2
-      echo "    如果是工作完成收口: wt-close $branch                           " >&2
-      echo "    如果是要废弃并丢弃该 raw issue 的全部实现才允许:                " >&2
-      echo "      wt-close --force --reason \"违规绕过门禁中，理由充分，是：<业务理由>\" $branch" >&2
-      echo "    不是废弃坚决禁止使用 --force。有任何门禁报错都是去解决问题，      " >&2
-      echo "    不是用 --force 绕过。                                           " >&2
+      if [[ -n "$_raw_key" ]]; then
+        echo "    工作收口: freely wt-close --raw-key $_raw_key" >&2
+        echo "    废弃丢弃: freely wt-close --raw-key $_raw_key --force --reason \"违规绕过门禁中，理由充分，是：<业务理由>\"" >&2
+      else
+        echo "    工作收口: freely wt-close $branch" >&2
+      fi
+      echo "    --force = 永久丢弃该 raw issue 的全部实现。不是废弃严禁使用。" >&2
+      echo "    有任何门禁报错都是去解决问题，不是用 --force 绕过。" >&2
       ((issue_count++))
     fi
   done < <(git branch --list 'fix/*' 'feature/*' 'hotfix/*' 'test-pre-merge-*' 2>/dev/null | sed 's/^[* ]*//')
