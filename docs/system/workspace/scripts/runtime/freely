@@ -4274,8 +4274,10 @@ load_config() {
     local _my_id=""
 
     # Resolve agent identity: agent-id.env maps worktree_path → agent_id
+    # Anchor with = to avoid substring match: develop path (.../freely)
+    # must not match worktree paths (.../freely-worktrees/...).
     if [[ -f "$_agent_env" ]]; then
-      _my_id=$(grep -F "$(pwd)" "$_agent_env" 2>/dev/null | grep -oE '(manager_[0-9]+|worker_[0-9]+)' | head -1 || true)
+      _my_id=$(grep -F "$(pwd)=" "$_agent_env" 2>/dev/null | grep -oE '(manager_[0-9]+|worker_[0-9]+)' | head -1 || true)
     fi
     # Manager runs on develop worktree — not in agent-id.env
     [[ -z "$_my_id" ]] && _my_id="manager_01"
@@ -4776,9 +4778,10 @@ _init_agent_table_slot_pin() {
   [[ -x "$_aq" ]] || return 0
 
   # Resolve current agent identity from agent-id.env
+  # Anchor with = to avoid substring match (see load_config above).
   local _agent_env="${PROJECT_ROOT}/.freely/agent-id.env" _my_id=""
   if [[ -f "$_agent_env" ]]; then
-    _my_id=$(grep -F "$(pwd)" "$_agent_env" 2>/dev/null | grep -oE '(manager_[0-9]+|worker_[0-9]+)' | head -1 || true)
+    _my_id=$(grep -F "$(pwd)=" "$_agent_env" 2>/dev/null | grep -oE '(manager_[0-9]+|worker_[0-9]+)' | head -1 || true)
   fi
   [[ -z "$_my_id" ]] && _my_id="manager_01"
 
@@ -14169,6 +14172,24 @@ _ensure_acp_bridge_running() {
 	  _bridge_env=()
 	fi
 
+  # ── Sanitize inherited AI tool environment variables ──────────
+  # The daemon process inherits ANTHROPIC_*/CLAUDE_CODE_*/AI_AGENT
+  # from the parent (e.g. Claude Code session).  Unset them so only
+  # slot-specific vars (from ai_cli_tool_with_auth_assemble) reach
+  # the bridge subprocess.
+  local -a _sanitize_vars=(
+    ANTHROPIC_AUTH_TOKEN ANTHROPIC_BASE_URL ANTHROPIC_MODEL
+    ANTHROPIC_DEFAULT_OPUS_MODEL ANTHROPIC_DEFAULT_SONNET_MODEL ANTHROPIC_DEFAULT_HAIKU_MODEL
+    CLAUDE_CODE_AUTO_COMPACT_WINDOW CLAUDE_CODE_ENTRYPOINT CLAUDE_CODE_EXECPATH
+    CLAUDE_CODE_SESSION_ID CLAUDE_CODE_CHILD_SESSION CLAUDE_CODE_SUBAGENT_MODEL
+    AI_AGENT
+  )
+  local _sanitized=0
+  for _var in "${_sanitize_vars[@]}"; do
+    unset "$_var" 2>/dev/null && ((_sanitized++)) || true
+  done
+  [[ $_sanitized -gt 0 ]] && log_info "acp bridge env sanitized: $_sanitized inherited AI tool vars unset"
+
   # Use --foreground (no fork) + & to avoid child-process lifecycle issues
   local bridge_log; bridge_log="$(run_dir_for_project "$project")/acp-bridge.log"
   if [[ ${#_bridge_env[@]} -gt 0 ]]; then
@@ -14191,7 +14212,7 @@ _ensure_acp_bridge_running() {
   done
   [[ -S "$socket" ]] || { log_warn "ACP bridge socket did not appear"; return 1; }
 
-  append_runtime_event "$project" "acp_bridge_started" "bridge_pid=$(cat "$pid_file" 2>/dev/null || echo unknown)"
+  append_runtime_event "$project" "acp_bridge_started" "bridge_pid=$(cat "$pid_file" 2>/dev/null || echo unknown) binary=$acp_bin base_tool=$base_tool slot=${AGENT_AI_TOOL:-claude}"
   # Record startup in tool_switch_events for session continuity tracking
   local _ts_old_tool=""
   local _ts_record; _ts_record="$(_tool_switch_read_latest "$project")"

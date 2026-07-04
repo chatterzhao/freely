@@ -1751,4 +1751,20 @@
 - issue_path: `docs/epics/skill-standardize/description-and-chain-unify/raw-20260629T095905Z/issues/I-20260629T095905Z-A.md`
 - phase_state: `completed`
 
+## M-20260704T004227Z-A
+- title: fix ACP bridge start chain — binary resolution + env sanitization + agent-id grep
+- status: completed
+### candidate_issues
+### committed_issues
+### completed_issues
+1. `I-20260704T004227Z-A`
+- title: fix ACP bridge startup chain — binary resolution + env sanitization + agent-id grep
+- milestone: M-20260704T004227Z-A
+- phase_state: completed
+- path: docs/epics/agent-acp/agent-table-driven/raw-20260704T004227Z/issues/I-20260704T004227Z-A.md
+2. `C-20260704T004227Z-A`
+- milestone: M-20260704T004227Z-A
+- status: absorbed
+- absorbed_into: `I-20260704T004227Z-A`
+
 ### completed_issues

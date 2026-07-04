@@ -5,7 +5,7 @@
 # Delegates to tool-launchers.sh for per-tool ACP syntax.
 #
 # Architecture:
-#   freely → monitor-ai-acp.sh → tool-launchers.sh → run-acp-prompt.py → acp-bridge → claude-agent-acp
+#   freely → monitor-ai-acp.sh → tool-launchers.sh → run-acp-prompt.py → acp-bridge → tool-registry-driven ACP binary
 #
 # Completion: session/prompt stopReason="end_turn" (ACP-native, not PID exit).
 # Server persistence: acp-bridge keeps claude-agent-acp alive across cycles.
@@ -66,13 +66,18 @@ _bridge_ensure_running() {
     local pid
     pid=$(cat "$pid_file" 2>/dev/null || true)
     if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null && [[ -S "$socket" ]]; then
-      # Same tool/slot? Keep bridge alive.
+      # Same base tool? Keep bridge alive.
+      # Compare base_tool (%%-*) because .tool stores full slot name
+      # (e.g. opencode-apikey-ds-flash-auto) but --tool passes base name
+      # (e.g. opencode from AI_TOOL=${AGENT_AI_TOOL%%-*}).
       last_tool=$(cat "$tool_file" 2>/dev/null || true)
-      if [[ -z "$tool" || "$last_tool" == "$tool" ]]; then
+      local last_base="${last_tool%%-*}"
+      local cur_base="${tool%%-*}"
+      if [[ -z "$cur_base" || "$last_base" == "$cur_base" ]]; then
         return 0
       fi
-      # Tool/slot changed — kill old bridge, restart with new env.
-      echo "[bridge] tool changed ($last_tool → $tool), restarting bridge"
+      # Base tool changed — kill old bridge, restart with new binary.
+      echo "[bridge] tool changed ($last_base → $cur_base), restarting bridge"
       kill "$pid" 2>/dev/null || true
       sleep 1
     fi
@@ -86,70 +91,44 @@ _bridge_ensure_running() {
     return 1
   }
 
-  # Export permission mode from slot config for claude-agent-acp.
-  # _apply_tool_alias_settings returns early for registered tools, so
-  # CLAUDE_CODE_PERMISSION_MODE may not be set. Read it from the slot
-  # config here. Only claude uses session/set_mode; codex/opencode
-  # handle permissions internally via their own config mechanisms.
-  if [[ -n "$tool" && -z "${CLAUDE_CODE_PERMISSION_MODE:-}" ]]; then
-    local _slot_dir _settings_file _base_tool
-    _base_tool="${tool%%-*}"  # claude-apikey-ds-flash-auto → claude
-    _slot_dir=$(ls -d "$HOME/.ai-auth/${tool}" 2>/dev/null | head -1 || true)
-    if [[ -z "$_slot_dir" ]]; then
-      _slot_dir=$(ls -d "$HOME/.ai-auth/${tool}-"* 2>/dev/null | head -1 || true)
-    fi
-    if [[ -n "$_slot_dir" && -d "$_slot_dir" ]]; then
-      # Permission bypass field: registry-driven (no hardcoded case)
-      local _perm_field _perm_fallback _cfg_format
-      _perm_field="$(_tool_config_field "$_base_tool" "permission_bypass" 2>/dev/null || true)"
-      _perm_fallback="$(_tool_config_field_fallback "$_base_tool" "permission_bypass" 2>/dev/null || true)"
-      _cfg_format="$(_tool_config_format "$_base_tool" 2>/dev/null || true)"
-      if [[ -z "$_perm_field" ]]; then
-        # Registry has no permission_bypass — tool handles permissions via ACP native flow
-        echo "[bridge] permission_bypass not declared for tool $_base_tool, using ACP default" >&2
-      fi
+  # ── Resolve ACP binary for the current tool ──────────────────────
+  local base_tool="${tool%%-*}"
+  local acp_bin; acp_bin="$(_tool_registry_get "$base_tool" "acp.binary" 2>/dev/null || echo "claude-agent-acp")"
+  local -a acp_args=()
+  local raw_args; raw_args="$(_tool_registry_get "$base_tool" "acp.args" 2>/dev/null || true)"
+  [[ -n "$raw_args" ]] && read -ra acp_args <<<"$raw_args"
 
-      if [[ -n "$_perm_field" && -f "$_settings_file" ]]; then
-        if [[ "$_cfg_format" == "toml" ]]; then
-          export CLAUDE_CODE_PERMISSION_MODE="$(python3 -c "
-      import tomllib, sys
-      try:
-          with open('$_settings_file','rb') as f:
-              d = tomllib.load(f)
-          print(d.get('$_perm_field','') or '')
-      except: pass
-      " 2>/dev/null)"
-        else
-          export CLAUDE_CODE_PERMISSION_MODE="$(python3 -c "
-      import json
-      try:
-          with open('$_settings_file') as f:
-              d = json.load(f)
-          pm = ''
-          pf = '$_perm_field'
-          fb = '$_perm_fallback'
-          if pf and pf in d:
-              pm = d[pf]
-          elif fb:
-              parts = fb.split('.')
-              cur = d
-              for p in parts:
-                  if isinstance(cur, dict) and p in cur:
-                      cur = cur[p]
-                  else:
-                      cur = None
-                      break
-              if cur is not None:
-                  pm = str(cur)
-          if pm: print(pm)
-      except: pass
-      " 2>/dev/null)"
-        fi
-      fi
-    fi
+  # config.toml installation path (takes priority over registry short name)
+  local config_key; config_key="FREELY_ACP_$(echo "$base_tool" | tr '[:lower:]' '[:upper:]')_BIN"
+  local config_path; config_path=$(awk -F'"' -v k="$config_key" '$1 == k " =" {print $2; exit}' "$project/.freely/config.toml" 2>/dev/null || true)
+  [[ -n "$config_path" && -x "$config_path" ]] && acp_bin="$config_path"
+
+  # Fallback: PATH
+  if ! command -v "$acp_bin" >/dev/null 2>&1; then
+    echo "[WARN] ACP binary '$acp_bin' not found, run 'freely init' to set up ACP tools" >&2
   fi
 
-  python3 "$bridge_script" start --project "$project" >/dev/null 2>&1 || {
+  echo "[bridge] starting: base_tool=$base_tool acp_bin=$acp_bin acp_args=${acp_args[*]:-} slot=$tool config=${config_path:-registry}" >&2
+
+  # ── Sanitize inherited AI tool environment variables ──────────────
+  # The daemon inherits ANTHROPIC_*/CLAUDE_CODE_*/AI_AGENT from the
+  # parent process (e.g. Claude Code session).  Unset them so the
+  # bridge subprocess only sees slot-specific vars extracted from
+  # the slot's settings.json by _bridge_env_for_registered_tool.
+  local -a _sanitize_vars=(
+    ANTHROPIC_AUTH_TOKEN ANTHROPIC_BASE_URL ANTHROPIC_MODEL
+    ANTHROPIC_DEFAULT_OPUS_MODEL ANTHROPIC_DEFAULT_SONNET_MODEL ANTHROPIC_DEFAULT_HAIKU_MODEL
+    CLAUDE_CODE_AUTO_COMPACT_WINDOW CLAUDE_CODE_ENTRYPOINT CLAUDE_CODE_EXECPATH
+    CLAUDE_CODE_SESSION_ID CLAUDE_CODE_CHILD_SESSION CLAUDE_CODE_SUBAGENT_MODEL
+    AI_AGENT
+  )
+  local _sanitized=0
+  for _var in "${_sanitize_vars[@]}"; do
+    unset "$_var" 2>/dev/null && ((_sanitized++)) || true
+  done
+  [[ $_sanitized -gt 0 ]] && echo "[bridge] env sanitized: $_sanitized AI tool vars unset" >&2
+
+  python3 "$bridge_script" start --project "$project" --acp-bin "$acp_bin" ${acp_args:+--acp-args "${acp_args[*]}"} --foreground >/dev/null 2>&1 || {
     echo "[ERROR] failed to start ACP bridge" >&2
     return 1
   }
@@ -162,8 +141,10 @@ _bridge_ensure_running() {
   done
   [[ -S "$socket" ]] || { echo "[ERROR] bridge socket did not appear" >&2; return 1; }
 
-  # Persist the tool/slot that started this bridge so we can detect
-  # changes on the next call (same base tool, different slot → restart).
+  # Persist the binary and tool/slot that started this bridge so we can
+  # detect changes on the next call.
+  local acp_bin_file="${pid_file}.bin"
+  printf '%s\n' "$acp_bin" > "$acp_bin_file" 2>/dev/null || true
   if [[ -n "$tool" ]]; then
     printf '%s\n' "$tool" > "$tool_file"
   fi
