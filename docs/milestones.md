@@ -1751,4 +1751,15 @@
 - issue_path: `docs/epics/skill-standardize/description-and-chain-unify/raw-20260629T095905Z/issues/I-20260629T095905Z-A.md`
 - phase_state: `completed`
 
+## M-20260704T004227Z-A
+- title: fix agent-table slot resolution — agent-id substring match + model mismatch diagnosis
+- status: active
+### candidate_issues
+1. `C-20260704T004227Z-A`
+- milestone: M-20260704T004227Z-A; status: promoted
+- promoted_issue_id: `I-20260704T004227Z-A`
+1. `C-20260704T004227Z-B`
+- milestone: M-20260704T004227Z-A; status: needs_research
+- next_action: 启动 freely 并开启 debug trace，捕获 bridge launch 时的环境变量和 opencode ACP server 的实际行为
+
 ### completed_issues
