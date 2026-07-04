@@ -1752,14 +1752,12 @@
 - phase_state: `completed`
 
 ## M-20260704T004227Z-A
-- title: fix agent-table slot resolution — agent-id substring match + model mismatch diagnosis
+- title: fix agent-table slot resolution — agent-id grep substring match + env var pollution cleanse
 - status: active
 ### candidate_issues
 1. `C-20260704T004227Z-A`
 - milestone: M-20260704T004227Z-A; status: promoted
 - promoted_issue_id: `I-20260704T004227Z-A`
-1. `C-20260704T004227Z-B`
-- milestone: M-20260704T004227Z-A; status: needs_research
-- next_action: 启动 freely 并开启 debug trace，捕获 bridge launch 时的环境变量和 opencode ACP server 的实际行为
+- decision_reason: C-B 已吸收到 C-A — 根因已确认为 Claude Code 父进程的环境变量污染（ANTHROPIC_MODEL/ANTHROPIC_AUTH_TOKEN/CLAUDE_CODE_*），opencode slot 的 settings.json 无 env 字段无法覆盖
 
 ### completed_issues
