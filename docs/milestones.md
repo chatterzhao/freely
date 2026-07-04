@@ -1768,3 +1768,11 @@
 - absorbed_into: `I-20260704T004227Z-A`
 
 ### completed_issues
+
+## M-20260704T064539Z-A
+- title: refactor — unify ACP session management
+- status: active
+### candidate_issues
+1. `C-20260704T064539Z-A`
+- milestone: M-20260704T064539Z-A; status: promoted
+- promoted_issue_id: `I-20260704T064539Z-A`
