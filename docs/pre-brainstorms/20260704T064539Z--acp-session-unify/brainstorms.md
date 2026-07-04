@@ -14,104 +14,141 @@ created_at: 2026-07-04
 
 ## Problem
 
-### 全局理解
+12 个分散的 session 操作调用点，无统一决策逻辑。agent_working 无 slot 列，无法安全 resume。每个 agent 都需要 prompt/resume/fork/new 全路径。
 
-Freely 的 agent 通信模型：agent-table 配置 slot → daemon 启动 ACP bridge → 各 agent 创建/恢复 session → A2A SSE 事件驱动 agent 间通信 → session/prompt 实现 agent 间消息传递。
+## Brainstorm: 穷举场景矩阵
 
-四种 ACP session 操作：
-
-| 操作 | 用途 | 缓存 | 约束 |
-|------|------|:---:|------|
-| `session/new` | 全新开始、slot 变更、跨 tool | ❌ | 无约束 |
-| `session/fork` | 从父 session 继承 context | ✅ | **同 tool 才行**，跨 tool 报错 |
-| `session/resume` | 恢复不活跃 session | ✅ | **slot 必须没变**，否则报错 |
-| `session/prompt` | 向 alive session 发消息 | N/A | session 必须 alive |
-
-### 每个 agent 都需要 resume
-
-Manager 不是唯一需要 resume 的。Worker 和 Reviewer 也会因为 idle timeout 导致 session 不活跃，需要 resume 恢复。当前 watchdog_sse.py 已部分处理（`_handle_needs_worker` line 469-477: 先查 alive session → prompt，失败则 fork/new），但缺少 resume 尝试——如果 session 存在但 dead，应优先 resume 而非直接 new。
-
-### Reviewer 的独立性
-
-Workflow skill 明确：**每个节点后都需要独立 review**。三个 loop 的设计保证了每个环节都有 review gate。
-
-Reviewer **必须 fork Manager，不能 fork Worker**：
-- fork Manager → 继承 governance context (CONSTITUTION, LAWS, project map)，不知道 Worker 的思考过程 → 独立公正
-- fork Worker → 看到 Worker 的实现细节和思考 → 自评自审，失去 review 意义
-- 如果没有 review → 实现会糊弄完成 → loop 的设计就是为了保证每个环节都独立验证
-
-### 当前差距
-
-**1. 无统一 session 操作选择方法。** 决策逻辑散落在 watchdog_sse.py 和 freely shell。
-
-**2. agent_working 无 slot 列。** 无法判断 session 创建时的 slot 是否与当前一致。Manager 每次重启都 session/new，不敢 resume（怕 slot 变了报错）。
-
-**3. Worker/Reviewer 的 resume 路径不完整。** watchdog 有 alive check 和 fork/new，但缺少"dead → resume"的尝试。
-
-## Brainstorm
-
-### 统一方法：acp_session_connect
+### 决策树
 
 ```
-acp_session_connect(project, raw_key, role, agent_id, slot, message=None)
+acp_session_connect(project, raw_key, role, agent_id, slot,
+                    message=None, force_new=False)
   → (session_id, operation_used)
 
-决策树（按优先级）:
-  1. agent_working 有 session_id?
-     ├─ 有 + slot 匹配
-     │   ├─ alive?      → session/prompt(message)     【最快: 0ms】
-     │   └─ dead?       → session/resume → prompt     【恢复: 保留上下文】
-     └─ 有 + slot 不匹配 → session/new                【安全: 不会报错】
-  2. 无 session_id
-     ├─ 同 tool + role≠reviewer_gate → session/fork(Mgr)  【缓存命中: 继承治理】
-     └─ 否则                        → session/new          【兜底: 冷启动】
-  3. 成功 → 写 agent_working (含 slot)
+  # ── 0. 明确要求 new ──
+  if force_new:
+      → session/new (调用方显式要求，如 gate review、跨 tool)
+      return
+
+  # ── 1. 查 agent_working ──
+  existing = agent_working.get(raw_key, role)
+  if existing and existing.session_id and existing.slot:
+      slot_ok = (existing.slot == slot)
+      # ── 2. slot 变了？ ──
+      if not slot_ok:
+          → session/new  (安全: 不同配置不能 resume/fork)
+          return
+      # ── 3. session alive? ──
+      is_alive = _acp_bridge.ping(existing.session_id)
+      if is_alive:
+          if message:
+              → session/prompt(message)  【最快: alive + 有消息】
+          else:
+              → return existing.session_id  【已连接】
+      else:
+          if message:
+              → session/resume + session/prompt(message)  【恢复上下文 + 投递】
+          else:
+              → session/resume  【仅恢复，保留上下文】
+      return
+
+  # ── 4. 无 session，尝试 fork ──
+  same_tool = (_base_tool(slot) == _base_tool(mgr_slot))
+  if same_tool and mgr_session_exists():
+      if role == "reviewer" and parent_role == "worker":
+          # 禁止: 不能 fork Worker（自评自审）
+          → session/new + log("fork from worker forbidden, using new")
+      else:
+          → session/fork(from=manager)  【缓存命中 + 独立公正】
+  else:
+      → session/new  【跨 tool 或 mgr 无 session，必须 new】
 ```
 
-### 三个角色的 session 策略
+### 穷举场景表
 
-| | 首次 | 重启/恢复 | 同 tool fork | 跨 tool | session/prompt |
-|------|------|------|:---:|:---:|:---:|
-| Manager | new | **resume** (需 slot 匹配) | N/A | new | N/A |
-| Worker | fork(Mgr) | prompt / **resume** / new | fork(Mgr) | new | Manager→Worker |
-| Reviewer | fork(Mgr) | prompt / **resume** / new | fork(Mgr) | new | Worker→Reviewer, Reviewer→Worker |
+| # | agent_working 有记录 | slot 匹配 | session alive | 同 tool | message | force_new | role 特殊 | 操作 | 缓存 |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|------|------|:---:|
+| 1 | ✓ | ✓ | ✓ | - | ✓ | - | - | **session/prompt** | ✅ |
+| 2 | ✓ | ✓ | ✓ | - | ✗ | - | - | 直接返回 session_id | - |
+| 3 | ✓ | ✓ | ✗ | - | ✓ | - | - | **session/resume** + prompt | ✅ |
+| 4 | ✓ | ✓ | ✗ | - | ✗ | - | - | **session/resume** | ✅ |
+| 5 | ✓ | ✗ | - | - | - | - | - | **session/new** | ❌ 安全 |
+| 6 | ✗ | - | - | ✓ | - | - | non-gate | **session/fork**(Mgr) | ✅ |
+| 7 | ✗ | - | - | ✗ | - | - | - | **session/new** | ❌ 跨 tool |
+| 8 | - | - | - | - | - | ✓ | - | **session/new** | ❌ 显式 |
+| 9 | - | - | - | - | - | - | reviewer gate | **session/new** | ❌ 中立 |
+| 10 | ✓ | ✓ | ✓ | - | ✓ | - | reviewer fork Worker | **session/new** + 日志 | ❌ 防作弊 |
 
-**Reviewer fork 策略：**
-- 正常 review：fork Manager（继承治理 context，不知道 Worker 思考 → 独立公正）
-- Gate review：session/new（最大独立性，冷启动无偏见）
-- **永不 fork Worker**（自评自审 = 作弊）
+### 回退 new 的场景
 
-### 需要存储 slot
+```
+明确意图 new (正常路径):
+  #5   — slot 变了，必须 new
+  #7   — 跨 tool，无法 fork
+  #8   — force_new=True，调用方显式要求
+  #9   — reviewer gate review，强制独立
 
-`agent_working` 新增 `slot` 列：
-
-```sql
-ALTER TABLE agent_working ADD COLUMN slot TEXT DEFAULT '';
+未知/异常回退 (需打日志):
+  #10  — reviewer 尝试 fork Worker，被拦截
+  #11  — prompt 失败 (session 意外死亡) → 降级 resume → 再失败 → new
+  #12  — resume 失败 (bridge 问题/session 损坏) → 降级 new
+  #13  — fork 失败 (mgr session 不可用/bridge 问题) → 降级 new
+  #14  — 任何未预见的组合 → 降级 new + 日志
 ```
 
-session 创建/更新时写入完整 slot 名（如 `opencode-apikey-ds-flash-auto`），恢复时比对。
+### 回退日志格式
 
-### 需要的方法
+```python
+# 异常回退 (session 操作失败，非预期)
+log_warn(f"[acp-session] {operation} failed for {role}/{agent_id} "
+         f"(session={sid[:16]}...), falling back to session/new: {error}")
 
-| 方法 | 职责 |
-|------|------|
-| `acp_session_connect()` | 统一入口，内部决策 prompt/resume/fork/new |
-| `acp_session_register()` | 写入 agent_working（含 slot） |
-| `acp_session_close()` | 清理 session_id |
-| `acp_session_can_resume()` | 检查 slot 是否匹配，能否安全 resume |
+# 未知场景回退 (决策树未覆盖的组合)
+log_warn(f"[acp-session] no optimal path: role={role} slot={slot} "
+         f"has_session={has_session} slot_match={slot_match} "
+         f"alive={is_alive} same_tool={same_tool} force_new={force_new}, "
+         f"falling back to session/new")
+```
 
-### 附：命名修正
+### 三个角色的典型路径
 
-`CLAUDE_SESSION_ID_CURRENT` → `TOOL_SESSION_ID_CURRENT`（3 文件 11 处）
+**Manager:**
+```
+freely start (首次)    → 场景 #7 (无记录) → session/new
+freely restart (不变)  → 场景 #4 (有记录+slot匹配+dead) → session/resume ✅缓存
+freely restart (换slot)→ 场景 #5 (slot不匹配) → session/new
+```
+
+**Worker:**
+```
+Manager 委派 (首次)    → 场景 #6 (同tool) → session/fork(Mgr) ✅缓存
+Manager 委派 (跨tool)  → 场景 #7 (跨tool) → session/new
+watchdog 发任务 (活)   → 场景 #1 (alive+message) → session/prompt ✅最快
+watchdog 发任务 (死)   → 场景 #3 (dead+message) → session/resume+prompt ✅恢复
+```
+
+**Reviewer:**
+```
+Worker 请求 review (首次) → 场景 #6 (fork Mgr) → session/fork(Mgr) ✅独立
+Worker 请求 review (gate) → 场景 #9 (gate强制) → session/new ✅中立
+watchdog 发任务 (活)      → 场景 #1 (alive+message) → session/prompt
+watchdog 发任务 (死)      → 场景 #3 (dead+message) → session/resume+prompt
+```
+
+### 补充发现
+
+1. agent_working 需要 `slot` 列 (schema 变更)
+2. `CLAUDE_SESSION_ID_CURRENT` → `TOOL_SESSION_ID_CURRENT`
+3. DB upsert UPDATE 时也应更新 worktree/branch/test_*
 
 ## Decision
 
-核心交付：
-1. `acp_session_connect()` — 统一 session 操作选择
-2. agent_working 加 `slot` 列 — 安全 resume 的前提
-3. 三个角色都走同一方法 — prompt>resume>fork>new 优先级
-4. Reviewer 永远 fork Manager（独立），不 fork Worker（作弊）
-5. 命名修正
+核心交付:
+1. `acp_session_connect()` — 穷举场景的决策树
+2. 明确路径: prompt(1/2) > resume(3/4) > fork(6) > new(5/7/8/9)
+3. 回退路径: 所有异常降级到 new + 日志
+4. agent_working + slot 列
+5. Reviewer 防 fork Worker
 
 ## Candidate
 - candidate_id: C-20260704T064539Z-A
