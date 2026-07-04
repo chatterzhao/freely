@@ -36,6 +36,8 @@
 <text x="50" y="817" font-size="13" font-weight="bold" fill="#1a73e8">agent-acp</text>
 <rect id="story-session-lifecycle-unify" x="65" y="833" width="670" height="35" fill="#f0f4ff" stroke="#669df6" stroke-width="1.5" rx="3"/>
 <text x="80" y="855" font-size="12" fill="#1a73e8">session-lifecycle-unify</text>
+<rect id="story-multi-bridge-per-tool" x="65" y="836" width="670" height="35" fill="#f0f4ff" stroke="#669df6" stroke-width="1.5" rx="3"/>
+<text x="80" y="858" font-size="12" fill="#1a73e8">multi-bridge-per-tool</text>
 
 <rect id="story-agent-table-driven" x="65" y="805" width="670" height="35" fill="#f0f4ff" stroke="#669df6" stroke-width="1.5" rx="3"/>
 <text x="80" y="825" font-size="12" fill="#1a73e8">agent-table-driven</text>

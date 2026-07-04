@@ -49,12 +49,14 @@ def _runtime_dir(project):
     return os.path.join(project, ".freely", "run")
 
 
-def _pid_file(project):
-    return f"/tmp/freely-acp-{_short_hash(project)}.pid"
+def _pid_file(project, base_tool=""):
+    suffix = f"-{base_tool}" if base_tool else ""
+    return f"/tmp/freely-acp-{_short_hash(project)}{suffix}.pid"
 
 
-def _socket_path(project):
-    return f"/tmp/freely-acp-{_short_hash(project)}.sock"
+def _socket_path(project, base_tool=""):
+    suffix = f"-{base_tool}" if base_tool else ""
+    return f"/tmp/freely-acp-{_short_hash(project)}{suffix}.sock"
 
 
 def _log_file(project):

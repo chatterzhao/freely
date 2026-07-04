@@ -1783,3 +1783,19 @@
 - phase_state: done_b2_ibm
 - path: docs/epics/agent-acp/session-lifecycle-unify/raw-20260704T064539Z/issues/I-20260704T064539Z-A.md
 
+
+## M-20260704T080808Z-A
+- title: feat — multi ACP bridge per agent tool/slot
+- status: active
+### candidate_issues
+### committed_issues
+1. `I-20260704T080808Z-A`
+- title: feat — multi ACP bridge per-agent tool/slot
+- milestone: M-20260704T080808Z-A
+- phase_state: done_b2_ibm
+- path: docs/epics/agent-acp/multi-bridge-per-tool/raw-20260704T080808Z/issues/I-20260704T080808Z-A.md
+### completed_issues
+1. `C-20260704T080808Z-A`
+- milestone: M-20260704T080808Z-A
+- status: absorbed
+- absorbed_into: `I-20260704T080808Z-A`

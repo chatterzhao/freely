@@ -22,11 +22,12 @@ from agent_working import (
 from input_required_reason import InputRequiredReason
 
 
-def _acp_bridge_socket(project: str) -> Optional[str]:
-    """Find the ACP bridge Unix socket for this project."""
+def _acp_bridge_socket(project: str, base_tool: str = "") -> Optional[str]:
+    """Find the ACP bridge Unix socket for this project/tool."""
     import hashlib
     h = hashlib.sha256(os.path.abspath(project).encode()).hexdigest()[:16]
-    sock_path = f"/tmp/freely-acp-{h}.sock"
+    suffix = f"-{base_tool}" if base_tool else ""
+    sock_path = f"/tmp/freely-acp-{h}{suffix}.sock"
     return sock_path if os.path.exists(sock_path) else None
 
 
