@@ -40,6 +40,8 @@
 <text x="80" y="858" font-size="12" fill="#1a73e8">multi-bridge-per-tool</text>
 <rect id="story-acp-cleanup" x="65" y="838" width="670" height="35" fill="#f0f4ff" stroke="#669df6" stroke-width="1.5" rx="3"/>
 <text x="80" y="860" font-size="12" fill="#1a73e8">acp-cleanup</text>
+<rect id="story-acp-cleanup-loosened" x="65" y="840" width="670" height="35" fill="#f0f4ff" stroke="#669df6" stroke-width="1.5" rx="3"/>
+<text x="80" y="862" font-size="12" fill="#1a73e8">acp-cleanup-loosened</text>
 
 <rect id="story-agent-table-driven" x="65" y="805" width="670" height="35" fill="#f0f4ff" stroke="#669df6" stroke-width="1.5" rx="3"/>
 <text x="80" y="825" font-size="12" fill="#1a73e8">agent-table-driven</text>
