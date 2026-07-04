@@ -1756,13 +1756,13 @@
 - status: completed
 ### candidate_issues
 ### committed_issues
+### completed_issues
 1. `I-20260704T004227Z-A`
 - title: fix ACP bridge startup chain — binary resolution + env sanitization + agent-id grep
 - milestone: M-20260704T004227Z-A
 - phase_state: completed
 - path: docs/epics/agent-acp/agent-table-driven/raw-20260704T004227Z/issues/I-20260704T004227Z-A.md
-### completed_issues
-1. `C-20260704T004227Z-A`
+2. `C-20260704T004227Z-A`
 - milestone: M-20260704T004227Z-A
 - status: absorbed
 - absorbed_into: `I-20260704T004227Z-A`
