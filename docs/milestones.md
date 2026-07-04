@@ -1767,7 +1767,7 @@
 1. `I-20260704T004227Z-A`
 - title: fix ACP bridge startup chain — binary resolution + env sanitization + agent-id grep
 - milestone_state: committed
-- issue_path: `docs/epics/agent-table-slot-chain/bridge-binary-resolution/raw-20260704T004227Z/issues/I-20260704T004227Z-A.md`
+- issue_path: `docs/epics/agent-acp/agent-table-driven/raw-20260704T004227Z/issues/I-20260704T004227Z-A.md`
 - phase_state: `done_b2_ibm`
 
 ### completed_issues

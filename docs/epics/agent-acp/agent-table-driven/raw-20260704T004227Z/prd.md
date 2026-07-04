@@ -1,8 +1,8 @@
 # PRD: ACP Bridge 启动链路修复
 
 - issue_id: I-20260704T004227Z-A
-- epic: agent-table-slot-chain
-- story: bridge-binary-resolution
+- epic: agent-acp
+- story: agent-table-driven
 
 ## Goal
 
