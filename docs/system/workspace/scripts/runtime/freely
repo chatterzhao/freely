@@ -13916,8 +13916,8 @@ _acp_bridge_socket() {
 }
 
 _acp_bridge_health_check() {
-  local project="$1" timeout="${2:-5}" socket
-  socket="$(_acp_bridge_socket "$project")"
+  local project="$1" timeout="${2:-5}" base_tool="${3:-}" socket
+  socket="$(_acp_bridge_socket "$project" "$base_tool")"
   [[ -S "$socket" ]] || return 1
   FREELY_ACP_HEALTH_SOCKET="$socket" FREELY_ACP_HEALTH_TIMEOUT="$timeout" python3 -c "
 import os, socket, json, sys
@@ -18770,8 +18770,8 @@ _ensure_reviewer_agent() {
   local _agent_py="${PROJECT_ROOT}/docs/system/workspace/scripts/runtime/agent_working.py"
   python3 -c "
 import sys; sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime')
-from agent_working import agent_assign
-agent_assign('${project}', '${_raw_key}', 'reviewer', '${_reviewer_id}',
+from agent_working import acp_session_register
+acp_session_register('${project}', '${_raw_key}', 'reviewer', '${_reviewer_id}',
              worktree='$(pwd)', branch='$(git branch --show-current 2>/dev/null || echo develop)')
 " 2>/dev/null || true
 

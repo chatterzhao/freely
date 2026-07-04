@@ -50,29 +50,9 @@ def _acp_rpc(project: str, method: str, params: dict) -> Optional[dict]:
         return None
 
 
-def _acp_session_resume(project: str, session_id: str, prompt: str = None) -> bool:
-    """DEPRECATED: use acp_session_connect() instead."""
-    return None
 
 
-def _acp_session_prompt(project: str, session_id: str, message: str) -> bool:
-    """DEPRECATED: use acp_session_connect() instead."""
-    return None
 
-
-def _acp_session_new(project: str, role: str, agent_id: str, slot: str = None) -> Optional[str]:
-    """DEPRECATED: use acp_session_connect() instead."""
-    return None
-
-
-def _acp_session_fork(project: str, parent_role: str, child_role: str,
-    """DEPRECATED: use acp_session_connect() instead."""
-    return None
-
-
-def _should_use_fork(project: str, raw_key: str, reason: InputRequiredReason) -> bool:
-    """DEPRECATED: use acp_session_connect() instead."""
-    return None
 
 
 def watchdog_run(project: str, a2a_socket: str):
@@ -244,10 +224,6 @@ def _handle_needs_reviewer(project: str, metadata: dict, reason: InputRequiredRe
         print(f"[watchdog] reviewer {rid} connected via {op} session={sid[:20]}... for {raw_key}", file=sys.stderr)
     else:
         print(f"[watchdog] reviewer {rid} session creation failed for {raw_key}", file=sys.stderr)
-
-def _create_reviewer_session(project: str, raw_key: str, reviewer_id: str,
-    """DEPRECATED: use acp_session_connect() instead."""
-    return None
 
 
 def _build_review_task_message(raw_key: str, from_agent: str, reason: InputRequiredReason) -> str:
