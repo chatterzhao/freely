@@ -1752,22 +1752,19 @@
 - phase_state: `completed`
 
 ## M-20260704T004227Z-A
-- title: fix ACP bridge start chain — monitor-ai-acp.sh missing --acp-bin + env pollution + agent-id grep
-- status: active
+- title: fix ACP bridge start chain — binary resolution + env sanitization + agent-id grep
+- status: completed
 ### candidate_issues
-1. `C-20260704T004227Z-A`
-- milestone: M-20260704T004227Z-A; status: promoted
-- promoted_issue_id: `I-20260704T004227Z-A`
-- decision_reason: |
-  根因确认 — 两个独立 Bug 叠加:
-  1. monitor-ai-acp.sh _bridge_ensure_running 不传 --acp-bin → 默认用 claude-agent-acp。
-     架构注释直接写死 "→ claude-agent-acp"。.bin 文件不写 → freely 检查无法检测。
-  2. 父进程 Claude Code 设置的 ANTHROPIC_* 变量被 bridge 子进程继承，opencode slot 无 env 字段覆盖。
 ### committed_issues
 1. `I-20260704T004227Z-A`
 - title: fix ACP bridge startup chain — binary resolution + env sanitization + agent-id grep
-- milestone_state: committed
-- issue_path: `docs/epics/agent-acp/agent-table-driven/raw-20260704T004227Z/issues/I-20260704T004227Z-A.md`
-- phase_state: `done_b2_ibm`
+- milestone: M-20260704T004227Z-A
+- phase_state: completed
+- path: docs/epics/agent-acp/agent-table-driven/raw-20260704T004227Z/issues/I-20260704T004227Z-A.md
+### completed_issues
+1. `C-20260704T004227Z-A`
+- milestone: M-20260704T004227Z-A
+- status: absorbed
+- absorbed_into: `I-20260704T004227Z-A`
 
 ### completed_issues

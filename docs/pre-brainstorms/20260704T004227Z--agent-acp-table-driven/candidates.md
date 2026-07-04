@@ -16,7 +16,8 @@ milestone: M-20260704T004227Z-A
   (1) monitor-ai-acp.sh 未传 --acp-bin → bridge 默认用 claude-agent-acp
   (2) bridge 启动环境被父进程 ANTHROPIC_* 变量污染
   (3) agent-id grep -F 子串匹配导致 develop 上身份错判
-- status: promoted
+- status: absorbed
+- absorbed_into: I-20260704T004227Z-A
 - decision_reason: |
 
   **Bug 1 — 主因**: monitor-ai-acp.sh 的 `_bridge_ensure_running()` (line 152) 不传 `--acp-bin`，
