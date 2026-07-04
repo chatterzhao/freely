@@ -116,7 +116,7 @@ class AcpBridge:
         self.pending = {}  # request_id -> {"event": Event, "response": dict, "method": str}
         self.request_counter = 0
         self.running = False
-        self.socket_path = _socket_path(project)
+        self.socket_path = _socket_path(project, "")
         self.server_ready = threading.Event()
         self._restarting = False
         self.clients = []  # connected client sockets for notification broadcast
@@ -735,7 +735,7 @@ def cmd_start(args):
     log_file = args.log_file or _log_file(project)
 
     # Check if already running
-    pid_file = _pid_file(project)
+    pid_file = _pid_file(project, "")
     if os.path.exists(pid_file):
         try:
             with open(pid_file) as f:
@@ -766,9 +766,9 @@ def cmd_start(args):
         if pid > 0:
             # Parent: wait briefly to confirm child started, then exit
             time.sleep(0.5)
-            if os.path.exists(_pid_file(bridge.project)):
+            if os.path.exists(_pid_file(bridge.project, "")):
                 print(f"acp-bridge started (PID {pid})")
-                print(f"{_pid_file(bridge.project)}")
+                print(f"{_pid_file(bridge.project, "")}")
                 return 0
             else:
                 print("[ERROR] bridge failed to start", file=sys.stderr)
@@ -777,7 +777,7 @@ def cmd_start(args):
     # Child (or foreground): update PID file with real process PID,
     # start the ACP server, and run the socket server.
     os.makedirs(_runtime_dir(bridge.project), exist_ok=True)
-    with open(_pid_file(bridge.project), "w") as f:
+    with open(_pid_file(bridge.project, ""), "w") as f:
         f.write(str(os.getpid()))
     try:
         bridge.start_server()
@@ -792,8 +792,8 @@ def cmd_start(args):
 
 def cmd_stop(args):
     project = args.project
-    pid_file = _pid_file(project)
-    socket_path = _socket_path(project)
+    pid_file = _pid_file(project, "")
+    socket_path = _socket_path(project, "")
 
     if not os.path.exists(pid_file):
         print("acp-bridge not running")
@@ -818,8 +818,8 @@ def cmd_stop(args):
 
 def cmd_status(args):
     project = args.project
-    pid_file = _pid_file(project)
-    socket_path = _socket_path(project)
+    pid_file = _pid_file(project, "")
+    socket_path = _socket_path(project, "")
 
     if os.path.exists(pid_file):
         try:
