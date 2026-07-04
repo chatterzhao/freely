@@ -304,6 +304,7 @@ class DbDaemon:
                 branch          TEXT NOT NULL DEFAULT '',
                 test_worktree   TEXT DEFAULT '',
                 test_branch     TEXT DEFAULT '',
+                slot            TEXT DEFAULT '',
                 manager_id      TEXT DEFAULT NULL,
                 worker_id       TEXT DEFAULT NULL,
                 reviewer_id     TEXT DEFAULT NULL,
@@ -1327,14 +1328,20 @@ def h_aw_upsert(daemon: DbDaemon, params: dict) -> dict:
             else:
                 pairs.pop(new_agent_id, None)  # remove if no session
             val = ",".join(f"{k}:{v}" for k, v in pairs.items()) if pairs else new_agent_id
-        c.execute(f"UPDATE agent_working SET {col}=?, updated_at=datetime('now') WHERE raw_key=?",
-                  (val, raw_key))
+        slot_val = params.get("slot","")
+        if slot_val:
+            c.execute(f"UPDATE agent_working SET {col}=?, slot=?, updated_at=datetime('now') WHERE raw_key=?",
+                      (val, slot_val, raw_key))
+        else:
+            c.execute(f"UPDATE agent_working SET {col}=?, updated_at=datetime('now') WHERE raw_key=?",
+                      (val, raw_key))
     else:
         c.execute(
-            "INSERT INTO agent_working (raw_key, worktree, branch, test_worktree, test_branch, {col}) "
-            "VALUES (?,?,?,?,?,?)".format(col=col),
+            "INSERT INTO agent_working (raw_key, worktree, branch, test_worktree, test_branch, slot, {col}) "
+            "VALUES (?,?,?,?,?,?,?)".format(col=col),
             (raw_key, params.get("worktree",""), params.get("branch",""),
-             params.get("test_worktree",""), params.get("test_branch",""), val))
+             params.get("test_worktree",""), params.get("test_branch",""),
+             params.get("slot",""), val))
     daemon.conn.commit()
     return {"status": "ok"}
 
@@ -1366,8 +1373,13 @@ def h_aw_upsert_only(daemon: DbDaemon, params: dict) -> dict:
         else:
             pairs.pop(new_agent_id, None)
         val = ",".join(f"{k}:{v}" for k, v in pairs.items()) if pairs else new_agent_id
-    c.execute(f"UPDATE agent_working SET {col}=?, updated_at=datetime('now') WHERE raw_key=?",
-              (val, raw_key))
+    slot_val = params.get("slot","")
+        if slot_val:
+            c.execute(f"UPDATE agent_working SET {col}=?, slot=?, updated_at=datetime('now') WHERE raw_key=?",
+                      (val, slot_val, raw_key))
+        else:
+            c.execute(f"UPDATE agent_working SET {col}=?, updated_at=datetime('now') WHERE raw_key=?",
+                      (val, raw_key))
     daemon.conn.commit()
     return {"status": "ok"}
 
