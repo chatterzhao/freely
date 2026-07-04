@@ -16594,7 +16594,12 @@ if completed:
     print()
     print("### Completed / Zombie Workers (needs cleanup)")
     for r in completed:
-        print(f"- `{r['worktree']}`: exit={r['exit_reason'] or 'unknown'} → consider \\`wt-close --force {r['branch']}\\`")
+        _raw = re.search(r'(\d{8}T\d{6}Z)', r['branch'])
+        _rk = _raw.group(1) if _raw else r['branch']
+        print(f"- `{r['worktree']}`: exit={r['exit_reason'] or 'unknown'}")
+        print(f"  工作收口: freely wt-close --raw-key {_rk}")
+        print(f"  废弃丢弃: freely wt-close --raw-key {_rk} --force --reason \"违规绕过门禁中，理由充分，是：<业务理由>\"")
+        print(f"  --force = 永久丢弃。不是废弃严禁使用。门禁报错去解决问题，不是绕过。")
 
 # Scan dedup hint
 scan_covered = set()
