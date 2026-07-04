@@ -8,39 +8,45 @@ milestone: M-20260704T004227Z-A
 
 # Candidates
 
-## C-20260704T004227Z-A: 修复 agent-id 子串匹配 + bridge 环境变量清理
+## C-20260704T004227Z-A: 修复 ACP bridge 启动链路三个 Bug
 
 - candidate_format_version: v2
-- title: 修复 agent-id grep 子串匹配 + _ensure_acp_bridge_running 清理 AI 环境变量污染
+- title: |
+  修复三个导致 agent-table 配置与实际执行不一致的 bug:
+  (1) monitor-ai-acp.sh 未传 --acp-bin → bridge 默认用 claude-agent-acp
+  (2) bridge 启动环境被父进程 ANTHROPIC_* 变量污染
+  (3) agent-id grep -F 子串匹配导致 develop 上身份错判
 - status: promoted
 - decision_reason: |
-  两个独立 bug 都在同一代码路径，合并为一个 candidate 修复：
 
-  1. **agent-id 子串匹配**（line 4278）: `grep -F "$(pwd)"` 在 develop 上匹配所有 worktree 路径前缀，误识别为 worker_01。
-  2. **环境变量污染**（line 14155-14177）: 父进程（Claude Code）设置的 `ANTHROPIC_MODEL=deepseek-v4-pro[1m]` 等变量被透传到 ACP binary。
-     opencode slot 的 settings.json 没有 `env` 字段来覆盖这些变量，导致 opencode ACP binary 使用了错误的模型。
-     对于有 `env` 字段的 slot（如 claude），`ai_cli_tool_with_auth_assemble` 会提取并覆盖，所以偶然没问题。
+  **Bug 1 — 主因**: monitor-ai-acp.sh 的 `_bridge_ensure_running()` (line 152) 不传 `--acp-bin`，
+  导致 acp-bridge.py 默认用 `claude-agent-acp`。架构注释 (line 8) 直接写死 "→ claude-agent-acp"。
+  `_ensure_acp_bridge_running()` 后来检查时，`.bin` 文件为空（monitor-ai-acp.sh 不写），
+  `.tool` 文件匹配（写入了正确 tool name），健康检查通过 → 不重启 → claude-agent-acp 继续运行。
 
-  根因诊断过程:
-  - 排除了 OPENCODE_CONFIG 不生效的可能（bridge env 正确设置了）
-  - 排除了 acp-bridge.py SDK 硬编码的可能（SDK 透传 env，不是主动设置模型）
-  - 确认了当前 shell 环境有 ANTHROPIC_MODEL=deepseek-v4-pro[1m]（来自 Claude Code 父进程）
-  - 确认了 `_ensure_acp_bridge_running` 和 `acp-bridge.py` 都没有清理环境变量
+  **Bug 2 — 叠加**: 父进程 (Claude Code) 设置的 ANTHROPIC_MODEL=deepseek-v4-pro[1m] 等环境变量被
+  所有 bridge 子进程继承。opencode slot 的 settings.json 无 env 字段来覆盖这些变量。
 
-- next_action: B2 设计 → dev 实现 → merge
+  **Bug 3 — 旁路**: agent-id grep 子串匹配 bug。
+
+  三个 Bug 都涉及 bridge 启动/检查链路，合并为一个 candidate。
+
+- next_action: B2 设计物化 I-* issue → dev 实现 → merge
 - revisit_trigger: N/A（已 promote）
 - acceptance_criteria:
-  - agent-id 解析: develop 上 `_my_id` 正确解析为 `manager_01`，worktree 上仍正确
-  - 环境变量清理: bridge 进程环境中无 `ANTHROPIC_*` 和 `CLAUDE_CODE_*` 残留变量
-  - 模型正确: 启动后 session JSONL 中 model 与 agent-table slot 配置一致
-  - opencode slot 正确使用 `deepseek-v4-flash-free`
-  - claude slot 仍正确使用其 `env` 字段指定的模型
-- promotion_gate: 代码修改完成，bridge 启动时环境变量干净
+  - monitor-ai-acp.sh `_bridge_ensure_running` 从 tool registry 解析并传入正确的 `--acp-bin`
+  - `.bin` 文件被正确写入，后续 binary 变化可被检测到
+  - bridge 启动前 unset ANTHROPIC_*/CLAUDE_CODE_*/AI_AGENT，只保留 slot-specific env vars
+  - 启动后 session JSONL 中 model 与 agent-table slot 配置一致
+  - opencode slot → opencode acp binary + deepseek-v4-flash-free 模型
+  - claude slot → claude-agent-acp binary + settings.json env 字段中的模型
+  - agent-id: develop 上 parser 为 manager_01
+- promotion_gate: 三个修复代码完成，启动测试通过
 - open_questions: []
 - acceptance_reviews:
   - reviewer: claude-opus-4.7
   - mode: plan-subagent
-  - summary: 审查环境变量污染根因和修复方案，确认 env cleanse + grep 修复的正确性
+  - summary: 审查 ACP bridge 启动链路的三个 bug，确认修复方案覆盖全部根因
   - verdict: pass
 - promoted_issue_id: I-20260704T004227Z-A
 - promoted_issue_path: docs/epics/{epic-name}/{story-name}/raw-20260704T004227Z/issues/I-20260704T004227Z-A.md

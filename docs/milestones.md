@@ -1752,12 +1752,16 @@
 - phase_state: `completed`
 
 ## M-20260704T004227Z-A
-- title: fix agent-table slot resolution — agent-id grep substring match + env var pollution cleanse
+- title: fix ACP bridge start chain — monitor-ai-acp.sh missing --acp-bin + env pollution + agent-id grep
 - status: active
 ### candidate_issues
 1. `C-20260704T004227Z-A`
 - milestone: M-20260704T004227Z-A; status: promoted
 - promoted_issue_id: `I-20260704T004227Z-A`
-- decision_reason: C-B 已吸收到 C-A — 根因已确认为 Claude Code 父进程的环境变量污染（ANTHROPIC_MODEL/ANTHROPIC_AUTH_TOKEN/CLAUDE_CODE_*），opencode slot 的 settings.json 无 env 字段无法覆盖
+- decision_reason: |
+  根因确认 — 两个独立 Bug 叠加:
+  1. monitor-ai-acp.sh _bridge_ensure_running 不传 --acp-bin → 默认用 claude-agent-acp。
+     架构注释直接写死 "→ claude-agent-acp"。.bin 文件不写 → freely 检查无法检测。
+  2. 父进程 Claude Code 设置的 ANTHROPIC_* 变量被 bridge 子进程继承，opencode slot 无 env 字段覆盖。
 
 ### completed_issues
