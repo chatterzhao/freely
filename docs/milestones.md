@@ -5,7 +5,7 @@
 ### committed_issues
 1. `I-20260703T234313Z-A`
 - milestone: M-20260703T234313Z-A
-- phase_state: completed
+- phase_state: done_b2_ibm
 - path: docs/epics/closeout-chain/close-ibm-loophole/raw-20260703T234313Z/issues/I-20260703T234313Z-A.md
 ### completed_issues
 1. `C-20260703T234313Z-A`
@@ -20,7 +20,7 @@
 ### committed_issues
 1. `I-20260703T170237Z-A`
 - milestone: M-20260703T170237Z-A
-- phase_state: completed
+- phase_state: done_b2_ibm
 - path: docs/epics/closeout-chain/crash-evidence-preserve/raw-20260703T170237Z/issues/I-20260703T170237Z-A.md
 ### completed_issues
 1. `C-20260703T170237Z-A`
@@ -35,7 +35,7 @@
 ### committed_issues
 1. `I-20260703T162506Z-A`
 - milestone: M-20260703T162506Z-A
-- phase_state: completed
+- phase_state: done_b2_ibm
 - path: docs/epics/closeout-chain/fix-agent-table-update/raw-20260703T162506Z/issues/I-20260703T162506Z-A.md
 ### completed_issues
 1. `C-20260703T162506Z-A`
@@ -50,7 +50,7 @@
 ### committed_issues
 1. `I-20260701T001514Z-A`
 - milestone: M-20260701T001514Z-A
-- phase_state: completed
+- phase_state: done_b2_ibm
 - path: docs/issues/I-20260701T001514Z-A/issue.md
 ### completed_issues
 1. `C-20260701T001514Z-A`
@@ -65,7 +65,7 @@
 ### committed_issues
 1. `I-20260703T080443Z-A`
 - milestone: M-20260703T080443Z-A
-- phase_state: completed
+- phase_state: done_b2_ibm
 - path: docs/epics/closeout-chain/manager-startup-record/raw-20260703T080443Z/issues/I-20260703T080443Z-A.md
 ### completed_issues
 1. `C-20260703T080443Z-A`
@@ -80,7 +80,7 @@
 ### committed_issues
 1. `I-20260703T141118Z-A`
 - milestone: M-20260703T141118Z-A
-- phase_state: completed
+- phase_state: done_b2_ibm
 - path: docs/epics/closeout-chain/bridge-loop-fixes/raw-20260703T141118Z/issues/I-20260703T141118Z-A.md
 ### completed_issues
 1. `C-20260703T141118Z-A`
@@ -95,7 +95,7 @@
 ### committed_issues
 1. `I-20260703T121233Z-A`
 - milestone: M-20260703T121233Z-A
-- phase_state: completed
+- phase_state: done_b2_ibm
 - path: docs/epics/closeout-chain/stop-process-cleanup/raw-20260703T121233Z/issues/I-20260703T121233Z-A.md
 ### completed_issues
 1. `C-20260703T121233Z-A`
@@ -110,7 +110,7 @@
 ### committed_issues
 1. `I-20260703T114618Z-A`
 - milestone: M-20260703T114618Z-A
-- phase_state: completed
+- phase_state: done_b2_ibm
 - path: docs/epics/closeout-chain/agent-working-session-unify/raw-20260703T114618Z/issues/I-20260703T114618Z-A.md
 ### completed_issues
 1. `C-20260703T114618Z-A`
@@ -125,7 +125,7 @@
 ### committed_issues
 1. `I-20260703T054629Z-A`
 - milestone: M-20260703T054629Z-A
-- phase_state: completed
+- phase_state: done_b2_ibm
 - path: docs/epics/closeout-chain/wt-close-test-gate/raw-20260703T054629Z/issues/I-20260703T054629Z-A.md
 ### completed_issues
 1. `C-20260703T054629Z-A`
@@ -140,7 +140,7 @@
 ### committed_issues
 1. `I-20260703T051533Z-A`
 - milestone: M-20260703T051533Z-A
-- phase_state: completed
+- phase_state: done_b2_ibm
 - path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `C-20260703T051533Z-A`
@@ -155,13 +155,13 @@
 ### committed_issues
 1. `I-20260703T003829Z-A`
 - milestone: M-20260703T003829Z-A
-- phase_state: completed
+- phase_state: done_b2_ibm
 - path: docs/epics/runtime-core/safe-state-io/raw-20260703T003829Z/issues/I-20260703T003829Z-A.md
 ### completed_issues
 1. `I-20260703T003829Z-A`
 - title: fix: write_workcell_state unsafe source → meta_env_value
 - issue_path: docs/epics/runtime-core/safe-state-io/raw-20260703T003829Z/issues/I-20260703T003829Z-A.md
-- phase_state: completed
+- phase_state: done_b2_ibm
 2. `C-20260703T003829Z-A`
 - milestone: M-20260703T003829Z-A
 - status: absorbed
@@ -174,7 +174,7 @@
 ### committed_issues
 1. `I-20260701T085407Z-A`
 - milestone: M-20260701T085407Z-A
-- phase_state: completed
+- phase_state: done_b2_ibm
 - path: docs/epics/reviewer-agent/phase1-ensure-reviewer/raw-20260701T085407Z/issues/I-20260701T085407Z-A.md
 ### completed_issues
 1. `C-20260701T085407Z-A`
@@ -194,7 +194,7 @@
 ### committed_issues
 1. `I-20260703T051533Z-A`
 - milestone: M-20260703T051533Z-A
-- phase_state: completed
+- phase_state: done_b2_ibm
 - path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260701T081450Z-A`
@@ -214,7 +214,7 @@
 ### committed_issues
 1. `I-20260703T051533Z-A`
 - milestone: M-20260703T051533Z-A
-- phase_state: completed
+- phase_state: done_b2_ibm
 - path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260701T045911Z-A`
@@ -233,7 +233,7 @@
 ### committed_issues
 1. `I-20260703T051533Z-A`
 - milestone: M-20260703T051533Z-A
-- phase_state: completed
+- phase_state: done_b2_ibm
 - path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260701T061924Z-A`
@@ -252,7 +252,7 @@
 ### committed_issues
 1. `I-20260703T051533Z-A`
 - milestone: M-20260703T051533Z-A
-- phase_state: completed
+- phase_state: done_b2_ibm
 - path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260701T061531Z-A`
@@ -271,7 +271,7 @@
 ### committed_issues
 1. `I-20260703T051533Z-A`
 - milestone: M-20260703T051533Z-A
-- phase_state: completed
+- phase_state: done_b2_ibm
 - path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260701T054502Z-A`
@@ -290,7 +290,7 @@
 ### committed_issues
 1. `I-20260703T051533Z-A`
 - milestone: M-20260703T051533Z-A
-- phase_state: completed
+- phase_state: done_b2_ibm
 - path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260701T051138Z-A`
@@ -309,7 +309,7 @@
 ### committed_issues
 1. `I-20260703T051533Z-A`
 - milestone: M-20260703T051533Z-A
-- phase_state: completed
+- phase_state: done_b2_ibm
 - path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260701T040012Z-A`
@@ -328,7 +328,7 @@
 ### committed_issues
 1. `I-20260703T051533Z-A`
 - milestone: M-20260703T051533Z-A
-- phase_state: completed
+- phase_state: done_b2_ibm
 - path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260701T031733Z-A`
@@ -347,7 +347,7 @@
 ### committed_issues
 1. `I-20260703T051533Z-A`
 - milestone: M-20260703T051533Z-A
-- phase_state: completed
+- phase_state: done_b2_ibm
 - path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260701T024449Z-A`
@@ -366,7 +366,7 @@
 ### committed_issues
 1. `I-20260703T051533Z-A`
 - milestone: M-20260703T051533Z-A
-- phase_state: completed
+- phase_state: done_b2_ibm
 - path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260701T013527Z-A`
@@ -400,7 +400,7 @@
 ### committed_issues
 1. `I-20260703T051533Z-A`
 - milestone: M-20260703T051533Z-A
-- phase_state: completed
+- phase_state: done_b2_ibm
 - path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260630T224941Z-A`
@@ -419,7 +419,7 @@
 ### committed_issues
 1. `I-20260703T051533Z-A`
 - milestone: M-20260703T051533Z-A
-- phase_state: completed
+- phase_state: done_b2_ibm
 - path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260630T151209Z-A`
@@ -438,7 +438,7 @@
 ### committed_issues
 1. `I-20260703T051533Z-A`
 - milestone: M-20260703T051533Z-A
-- phase_state: completed
+- phase_state: done_b2_ibm
 - path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260630T134353Z-A`
@@ -458,7 +458,7 @@
 ### committed_issues
 1. `I-20260703T051533Z-A`
 - milestone: M-20260703T051533Z-A
-- phase_state: completed
+- phase_state: done_b2_ibm
 - path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260630T124528Z-A`
@@ -477,7 +477,7 @@
 ### committed_issues
 1. `I-20260703T051533Z-A`
 - milestone: M-20260703T051533Z-A
-- phase_state: completed
+- phase_state: done_b2_ibm
 - path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260630T113839Z-A`
@@ -497,7 +497,7 @@
 ### committed_issues
 1. `I-20260703T051533Z-A`
 - milestone: M-20260703T051533Z-A
-- phase_state: completed
+- phase_state: done_b2_ibm
 - path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 ### completed_issues
 1. `I-20260630T111641Z-A`
@@ -1759,7 +1759,7 @@
 1. `I-20260704T004227Z-A`
 - title: fix ACP bridge startup chain — binary resolution + env sanitization + agent-id grep
 - milestone: M-20260704T004227Z-A
-- phase_state: completed
+- phase_state: done_b2_ibm
 - path: docs/epics/agent-acp/agent-table-driven/raw-20260704T004227Z/issues/I-20260704T004227Z-A.md
 ### completed_issues
 1. `C-20260704T004227Z-A`
