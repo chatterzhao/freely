@@ -16594,7 +16594,10 @@ if completed:
     print()
     print("### Completed / Zombie Workers (needs cleanup)")
     for r in completed:
-        print(f"- `{r['worktree']}`: exit={r['exit_reason'] or 'unknown'} → consider \\`wt-close --force {r['branch']}\\`")
+        print(f"- `{r['worktree']}`: exit={r['exit_reason'] or 'unknown'}")
+        print(f"  工作收口: wt-close {r['branch']}")
+        print(f"  废弃丢弃: wt-close --force --reason \"违规绕过门禁中，理由充分，是：<业务理由>\" {r['branch']}")
+        print(f"  不是废弃严禁用 --force，门禁报错应去解决问题而非绕过")
 
 # Scan dedup hint
 scan_covered = set()
