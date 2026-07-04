@@ -1768,3 +1768,18 @@
 - absorbed_into: `I-20260704T004227Z-A`
 
 ### completed_issues
+
+## M-20260704T064539Z-A
+- title: refactor — unify ACP session management
+- status: active
+### candidate_issues
+1. `C-20260704T064539Z-A`
+- milestone: M-20260704T064539Z-A; status: promoted
+- promoted_issue_id: `I-20260704T064539Z-A`
+### committed_issues
+1. `I-20260704T064539Z-A`
+- title: refactor — unify ACP session management
+- milestone: M-20260704T064539Z-A
+- phase_state: done_b2_ibm
+- path: docs/epics/agent-acp/session-lifecycle-unify/raw-20260704T064539Z/issues/I-20260704T064539Z-A.md
+

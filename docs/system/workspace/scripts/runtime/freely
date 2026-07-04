@@ -3873,7 +3873,7 @@ tool_runtime_resume_target_before_launch() {
   # ACP mode: sessions are persisted in-memory by the bridge.
   # Resume target is the session ID from session state (no JSONL needed).
   if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
-    local sid="${CLAUDE_SESSION_ID_CURRENT:-${LAST_TOOL_SESSION_ID:-}}"
+    local sid="${TOOL_SESSION_ID_CURRENT:-${LAST_TOOL_SESSION_ID:-}}"
     if [[ -n "$sid" ]]; then
       printf '%s\n' "$sid"
     fi
@@ -3882,8 +3882,8 @@ tool_runtime_resume_target_before_launch() {
 
   case "$tool" in
     cc|cc-use-codex-cli)
-      if claude_has_verified_resume_evidence "$project" "${CLAUDE_SESSION_ID_CURRENT:-}"; then
-        printf '%s\n' "${CLAUDE_SESSION_ID_CURRENT:-}"
+      if claude_has_verified_resume_evidence "$project" "${TOOL_SESSION_ID_CURRENT:-}"; then
+        printf '%s\n' "${TOOL_SESSION_ID_CURRENT:-}"
       else
         printf '\n'
       fi
@@ -3935,7 +3935,7 @@ tool_runtime_resume_target_after_cycle() {
       fi
       ;;
     cc|cc-use-codex-cli)
-      printf '%s\n' "${CLAUDE_SESSION_ID_CURRENT:-}"
+      printf '%s\n' "${TOOL_SESSION_ID_CURRENT:-}"
       ;;
     *)
       printf '%s\n' "$launch_resume_target"
@@ -3984,22 +3984,22 @@ is_valid_uuid() {
 # so SIGTERM-killed sessions can be resumed on next launch.
 _persist_session_anchor_early() {
   local project="$1" tool="$2"
-  if tool_uses_claude_session_id "$tool" && [[ -n "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
+  if tool_uses_claude_session_id "$tool" && [[ -n "${TOOL_SESSION_ID_CURRENT:-}" ]]; then
     local state_file
     state_file="$(session_state_file "$project")"
     mkdir -p "$(dirname "$state_file")"
     # SESSION_PARENT_ID: for fresh = own ID (self-rooted), for fork = parent's ID.
     # This is immutable once set — resume does NOT change it.
     if [[ -z "${SESSION_PARENT_ID:-}" ]]; then
-      SESSION_PARENT_ID="${CLAUDE_SESSION_ID_CURRENT:-}"
+      SESSION_PARENT_ID="${TOOL_SESSION_ID_CURRENT:-}"
     fi
     # For fork: LAST_TOOL_RESUME_TARGET must be the PARENT UUID so the launch
     # passes --resume <parent>. After fork completes, subsequent resumes use own ID.
     local anchor_resume_target
     if [[ "${mode_name:-}" == "fork" ]]; then
-      anchor_resume_target="${SESSION_PARENT_ID:-${CLAUDE_SESSION_ID_CURRENT:-}}"
+      anchor_resume_target="${SESSION_PARENT_ID:-${TOOL_SESSION_ID_CURRENT:-}}"
     else
-      anchor_resume_target="${CLAUDE_SESSION_ID_CURRENT:-}"
+      anchor_resume_target="${TOOL_SESSION_ID_CURRENT:-}"
     fi
     # Append anchor fields without destroying other session state.
     # _persist_session_anchor_early runs every cycle, BEFORE the full state
@@ -4027,7 +4027,7 @@ STATEEOF
       done < "$state_file"
     fi
     mv "$anchor_tmp" "$state_file"
-    log_info "session anchor persisted early: ${CLAUDE_SESSION_ID_CURRENT}"
+    log_info "session anchor persisted early: ${TOOL_SESSION_ID_CURRENT}"
   fi
 
   # ── agent_working: register this agent's session ──
@@ -4048,10 +4048,11 @@ STATEEOF
   # UPSERT: creates __manager__ row on first call, updates session_id on subsequent calls
   python3 -c "
 import sys; sys.path.insert(0, '${project}/docs/system/workspace/scripts/runtime')
-from agent_working import agent_assign
-agent_assign('${project}', '${_aw_key}', '${_aw_role}', '${_aw_agent_id}',
-             worktree='${project}', branch='develop',
-             session_id='${CLAUDE_SESSION_ID_CURRENT:-}')
+from agent_working import acp_session_register
+acp_session_register('${project}', '${_aw_key}', '${_aw_role}', '${_aw_agent_id}',
+                     session_id='${TOOL_SESSION_ID_CURRENT:-}',
+                     slot='${AGENT_AI_TOOL:-}',
+                     worktree='${project}', branch='develop')
 " 2>/dev/null || true
 }
 
@@ -4096,16 +4097,16 @@ ensure_runtime_tool_session_anchor() {
   local tool="$1" launch_kind="$2" project="${3:-}"
   if tool_uses_claude_session_id "$tool"; then
     local current_verified="0"
-    if ! is_valid_uuid "${CLAUDE_SESSION_ID_CURRENT:-}"; then
-      CLAUDE_SESSION_ID_CURRENT=""
+    if ! is_valid_uuid "${TOOL_SESSION_ID_CURRENT:-}"; then
+      TOOL_SESSION_ID_CURRENT=""
     fi
-    if ! is_valid_uuid "${CLAUDE_SESSION_ID_PREVIOUS:-}"; then
-      CLAUDE_SESSION_ID_PREVIOUS=""
+    if ! is_valid_uuid "${TOOL_SESSION_ID_PREVIOUS:-}"; then
+      TOOL_SESSION_ID_PREVIOUS=""
     fi
     # Fallback: if state file lost the session ID.
     # ACP mode: use session-store (SQLite), NOT tool directory scan.
     # Non-ACP mode: scan the tool's session dir for JSONL files.
-    if [[ -z "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
+    if [[ -z "${TOOL_SESSION_ID_CURRENT:-}" ]]; then
       if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
         local _acp_sid
         _acp_sid=$(python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli" \
@@ -4113,14 +4114,14 @@ ensure_runtime_tool_session_anchor() {
           --project "$project" \
           --role "${FREELY_ROLE_HINT:-manager}" 2>>"$project/.freely/run/db-daemon.log" || log_warn "session-store query failed")
         if [[ -n "$_acp_sid" ]] && is_valid_uuid "$_acp_sid"; then
-          CLAUDE_SESSION_ID_CURRENT="$_acp_sid"
+          TOOL_SESSION_ID_CURRENT="$_acp_sid"
           log_info "session id recovered from session-store: $_acp_sid"
         fi
       else
         local fallback_id
         fallback_id="$(_find_recent_session_from_tool_dir "$project" "$tool" || true)"
         if [[ -n "$fallback_id" ]]; then
-          CLAUDE_SESSION_ID_CURRENT="$fallback_id"
+          TOOL_SESSION_ID_CURRENT="$fallback_id"
           log_info "session id recovered from tool directory: $fallback_id"
         fi
       fi
@@ -4135,7 +4136,7 @@ ensure_runtime_tool_session_anchor() {
       if [[ -n "$_acp_evidence_sid" ]] && is_valid_uuid "$_acp_evidence_sid"; then
         current_verified="1"
       fi
-    elif claude_has_verified_resume_evidence "$project" "${CLAUDE_SESSION_ID_CURRENT:-}"; then
+    elif claude_has_verified_resume_evidence "$project" "${TOOL_SESSION_ID_CURRENT:-}"; then
       current_verified="1"
     fi
     # Enforcement: if AI_RESUME_ON_START or AI_RESUME_ON_RESTART require resume,
@@ -4147,16 +4148,16 @@ ensure_runtime_tool_session_anchor() {
       resume_required="true"
     fi
     if [[ "$resume_required" == "true" && "$launch_kind" == "resume" ]]; then
-      if [[ -z "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
+      if [[ -z "${TOOL_SESSION_ID_CURRENT:-}" ]]; then
         log_error "AI_RESUME_ON_START/RESTART=true but no valid session ID found. Cannot resume."
         log_error "To force a fresh session: ./bin/freely new-session --project $project && ./bin/freely daemon start --project $project"
         exit 1
       fi
       if [[ "$current_verified" != "1" ]]; then
         if [[ "${AI_TOOL_ADAPTER:-direct}" != "acp" ]]; then
-          log_error "AI_RESUME_ON_START/RESTART=true but session ${CLAUDE_SESSION_ID_CURRENT} has no verifiable JSONL evidence. Cannot resume."
+          log_error "AI_RESUME_ON_START/RESTART=true but session ${TOOL_SESSION_ID_CURRENT} has no verifiable JSONL evidence. Cannot resume."
         else
-          log_error "AI_RESUME_ON_START/RESTART=true but no active session in session-store for ${CLAUDE_SESSION_ID_CURRENT}. Cannot resume."
+          log_error "AI_RESUME_ON_START/RESTART=true but no active session in session-store for ${TOOL_SESSION_ID_CURRENT}. Cannot resume."
         fi
         log_error "To force a fresh session: ./bin/freely new-session --project $project && ./bin/freely daemon start --project $project"
         exit 1
@@ -4165,18 +4166,18 @@ ensure_runtime_tool_session_anchor() {
 
     # Generate new UUID for fresh/fork launches; resume keeps the existing ID.
     if [[ "$launch_kind" == "fresh" || "$launch_kind" == "fresh_with_handoff" ]]; then
-      CLAUDE_SESSION_ID_PREVIOUS="${CLAUDE_SESSION_ID_CURRENT:-}"
-      CLAUDE_SESSION_ID_CURRENT="$(generate_uuid_for_runtime)"
+      TOOL_SESSION_ID_PREVIOUS="${TOOL_SESSION_ID_CURRENT:-}"
+      TOOL_SESSION_ID_CURRENT="$(generate_uuid_for_runtime)"
     elif [[ "$launch_kind" == "fork" ]]; then
       # Fork: generate new child UUID, parent stays as SESSION_PARENT_ID.
       # The parent's JSONL is NOT modified — child writes to its own file.
-      CLAUDE_SESSION_ID_PREVIOUS="${CLAUDE_SESSION_ID_CURRENT:-}"
-      CLAUDE_SESSION_ID_CURRENT="$(generate_uuid_for_runtime)"
+      TOOL_SESSION_ID_PREVIOUS="${TOOL_SESSION_ID_CURRENT:-}"
+      TOOL_SESSION_ID_CURRENT="$(generate_uuid_for_runtime)"
       # SESSION_PARENT_ID already set by manager before worker launch; preserve it.
-      log_info "forked new session ${CLAUDE_SESSION_ID_CURRENT} from parent ${SESSION_PARENT_ID:-unknown}"
-    elif [[ -z "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
+      log_info "forked new session ${TOOL_SESSION_ID_CURRENT} from parent ${SESSION_PARENT_ID:-unknown}"
+    elif [[ -z "${TOOL_SESSION_ID_CURRENT:-}" ]]; then
       # No resume enforcement and no session → generate one (first-ever launch)
-      CLAUDE_SESSION_ID_CURRENT="$(generate_uuid_for_runtime)"
+      TOOL_SESSION_ID_CURRENT="$(generate_uuid_for_runtime)"
     fi
   fi
 }
@@ -8374,8 +8375,8 @@ load_session_state_or_defaults() {
   LAST_CODEX_MCP_USED="0"
   LAST_CODEX_MCP_THREAD_ID=""
   LAST_CODEX_MCP_JSONL_PATH=""
-  CLAUDE_SESSION_ID_CURRENT=""
-  CLAUDE_SESSION_ID_PREVIOUS=""
+  TOOL_SESSION_ID_CURRENT=""
+  TOOL_SESSION_ID_PREVIOUS=""
   LAST_PROJECT_DIRTY_ENTRIES="0"
   LAST_WORKTREE_SUMMARY_TOTAL="0"
   LAST_WORKTREE_SUMMARY_DIRTY="0"
@@ -13162,16 +13163,16 @@ launch_worker_from_manager_prompt_if_needed() {
   worker_cycle_log="$(logs_dir_for_project "$manager_project")/cycle-worker-$worker_ts.log"
 
   write_workcell_state "$target_project" "running" "down" "down" "manager_worker_launch_linkage"
-  if [[ -n "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
+  if [[ -n "${TOOL_SESSION_ID_CURRENT:-}" ]]; then
     local worker_state_file
     worker_state_file="$(session_state_file "$target_project")"
     mkdir -p "$(dirname "$worker_state_file")"
     cat >"$worker_state_file" <<SESSIONEOF
-SESSION_PARENT_ID="${CLAUDE_SESSION_ID_CURRENT:-}"
+SESSION_PARENT_ID="${TOOL_SESSION_ID_CURRENT:-}"
 SESSION_PARENT_PROJECT="$manager_project"
 LAST_LAUNCH_KIND="fork"
 SESSIONEOF
-    log_info "worker session parent set: ${CLAUDE_SESSION_ID_CURRENT} → $target_project"
+    log_info "worker session parent set: ${TOOL_SESSION_ID_CURRENT} → $target_project"
   fi
 
   local _manager_bridge_socket _worker_pid
@@ -13184,7 +13185,7 @@ SESSIONEOF
     (
       cd "$target_project" 2>/dev/null || cd "$manager_project"
       export FREELY_ROLE_HINT=worker
-      export SESSION_PARENT_ID="${CLAUDE_SESSION_ID_CURRENT:-}"
+      export SESSION_PARENT_ID="${TOOL_SESSION_ID_CURRENT:-}"
       python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/run-acp-prompt.py" \
         --agent opencode \
         --cwd "$target_project" \
@@ -13213,7 +13214,7 @@ SESSIONEOF
   (
     cd "$target_project" 2>/dev/null || cd "$manager_project"
     export FREELY_ROLE_HINT=worker
-    export SESSION_PARENT_ID="${CLAUDE_SESSION_ID_CURRENT:-}"
+    export SESSION_PARENT_ID="${TOOL_SESSION_ID_CURRENT:-}"
     export SESSION_PARENT_PROJECT="$manager_project"
     python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/run-acp-prompt.py" \
       --bridge-socket "$_manager_bridge_socket" \
@@ -13908,7 +13909,10 @@ _acp_bridge_pid_file() {
 }
 
 _acp_bridge_socket() {
-  echo "/tmp/freely-acp-$(_acp_bridge_short_hash "$1").sock"
+  local project="$1" base_tool="${2:-}"
+  # Single bridge (current): base_tool ignored.
+  # Multi bridge (future): /tmp/freely-acp-{hash}-{base_tool}.sock
+  echo "/tmp/freely-acp-$(_acp_bridge_short_hash "$project").sock"
 }
 
 _acp_bridge_health_check() {
@@ -14026,16 +14030,12 @@ if added:
 }
 
 _ensure_acp_bridge_running() {
-  local project="$1"
+  local project="$1" base_tool="${2:-claude}"
   local pid_file socket
   pid_file="$(_acp_bridge_pid_file "$project")"
-  socket="$(_acp_bridge_socket "$project")"
+  socket="$(_acp_bridge_socket "$project" "$base_tool")"
 
-  # Determine the correct ACP binary for the current tool via registry
-  local acp_bin="claude-agent-acp"
-  local -a _acp_args=()
-  local base_tool="${AGENT_AI_TOOL:-claude}"  # opencode-apikey-xxx → opencode, codex-apikey-xxx → codex
-  base_tool="${base_tool%%-*}"
+  # Determine the correct ACP binary for the given tool via registry
 
   # Read ACP binary and args from tool registry (single source of truth)
   local _reg_bin; _reg_bin="$(_tool_registry_get "$base_tool" "acp.binary" 2>/dev/null || true)"
@@ -14081,7 +14081,7 @@ _ensure_acp_bridge_running() {
       local _acp_bin_name; _acp_bin_name=$(basename "$acp_bin" 2>/dev/null || echo "$acp_bin")
       if [[ -n "$running_bin" && "$_running_bin_name" != "$_acp_bin_name" ]]; then
         log_info "ACP bridge binary changed ($running_bin → $acp_bin), gracefully closing session before restart"
-        _acp_session_close "$project" "${CLAUDE_SESSION_ID_CURRENT:-}"
+        _acp_session_close "$project" "${TOOL_SESSION_ID_CURRENT:-}"
         _stop_acp_bridge "$project"
       elif [[ -n "$running_tool" ]]; then
         # Compare base tool names (slot suffix may differ between cycles).
@@ -14091,7 +14091,7 @@ _ensure_acp_bridge_running() {
         _current_base="${_current_base:-claude}"
         if [[ "$_running_base" != "$_current_base" ]]; then
           log_info "ACP bridge tool changed ($running_tool → ${AGENT_AI_TOOL:-claude}), gracefully closing session before restart"
-          _acp_session_close "$project" "${CLAUDE_SESSION_ID_CURRENT:-}"
+          _acp_session_close "$project" "${TOOL_SESSION_ID_CURRENT:-}"
           _stop_acp_bridge "$project"
         fi
       elif _acp_bridge_health_check "$project" 5; then
@@ -14616,8 +14616,8 @@ LAST_CLAUDE_JSONL_PATH="$claude_jsonl_path"
 LAST_CODEX_MCP_USED="$codex_mcp_used"
 LAST_CODEX_MCP_THREAD_ID="$codex_mcp_thread_id"
 LAST_CODEX_MCP_JSONL_PATH="$codex_mcp_jsonl_path"
-CLAUDE_SESSION_ID_CURRENT="$claude_session_id_current"
-CLAUDE_SESSION_ID_PREVIOUS="$claude_session_id_previous"
+TOOL_SESSION_ID_CURRENT="$claude_session_id_current"
+TOOL_SESSION_ID_PREVIOUS="$claude_session_id_previous"
 LAST_PROJECT_DIRTY_ENTRIES="$project_dirty_entries"
 LAST_WORKTREE_SUMMARY_TOTAL="$worktree_summary_total"
 LAST_WORKTREE_SUMMARY_DIRTY="$worktree_summary_dirty"
@@ -14774,7 +14774,7 @@ write_session_handoff() {
 - previous_tool_session_id: ${LAST_TOOL_SESSION_ID:-unavailable}
 - previous_tool_resume_target: ${LAST_TOOL_RESUME_TARGET:-unavailable}
 - previous_tool_jsonl_path: ${LAST_TOOL_JSONL_PATH:-unavailable}
-- previous_claude_session_id: ${CLAUDE_SESSION_ID_CURRENT:-unavailable}
+- previous_claude_session_id: ${TOOL_SESSION_ID_CURRENT:-unavailable}
 - previous_claude_jsonl_path: ${LAST_CLAUDE_JSONL_PATH:-unavailable}
 - previous_cc_debug_log: ${LAST_CYCLE_DEBUG_LOG:-unavailable}
 - previous_codex_mcp_used: ${LAST_CODEX_MCP_USED:-0}
@@ -17747,7 +17747,7 @@ select_launch_kind() {
   # bridge restarts that invalidated old sessions.
   if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
     # Fork: worker inherits parent session context.
-    if [[ -n "${SESSION_PARENT_ID:-}" && -z "${CLAUDE_SESSION_ID_CURRENT:-}" \
+    if [[ -n "${SESSION_PARENT_ID:-}" && -z "${TOOL_SESSION_ID_CURRENT:-}" \
           && "${LAST_LAUNCH_KIND:-}" != "fork" && -z "${LAST_LAUNCH_KIND:-}" ]]; then
       local role; role="$(role_hint_for_project "$project")"
       if [[ "$role" == "worker" ]]; then
@@ -17776,7 +17776,7 @@ select_launch_kind() {
       IFS='|' read -r _ _ _ _ _ _ _ts_sid _ <<<"$_ts_record"
     fi
     if [[ -n "$_ts_sid" ]]; then
-      CLAUDE_SESSION_ID_CURRENT="$_ts_sid"
+      TOOL_SESSION_ID_CURRENT="$_ts_sid"
       LAST_TOOL_SESSION_ID="$_ts_sid"
       if [[ "${FREELY_ACP_FIRST_LAUNCH_DONE:-0}" == "1" ]]; then
         LAUNCH_KIND_SELECTED="prompt"
@@ -17796,7 +17796,7 @@ select_launch_kind() {
   # Fork detection: if this worktree has a SESSION_PARENT_ID set (by the
   # delegating manager), and it has never launched before (no own session ID),
   # fork from the parent to inherit its context with prompt cache hit.
-  if [[ -n "${SESSION_PARENT_ID:-}" && -z "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
+  if [[ -n "${SESSION_PARENT_ID:-}" && -z "${TOOL_SESSION_ID_CURRENT:-}" ]]; then
     LAUNCH_KIND_SELECTED="fork"
     LAUNCH_ROTATION_REASON="worker_fork_from_parent"
     # Set resume target to parent so tool-launchers.sh passes --resume <parent>
@@ -17906,7 +17906,7 @@ select_launch_kind() {
           fallback_id="$(_find_recent_session_from_tool_dir "$PROJECT_ROOT" "$AI_TOOL" || true)"
           if [[ -n "$fallback_id" ]]; then
             log_info "resume: found JSONL session $fallback_id in $session_dir"
-            CLAUDE_SESSION_ID_CURRENT="$fallback_id"
+            TOOL_SESSION_ID_CURRENT="$fallback_id"
           elif [[ "$resume_required" == "true" ]]; then
             log_error "JSONL files exist but could not extract valid session ID."
             exit 1
@@ -22149,7 +22149,7 @@ start_project_runtime() {
 
   # ACP bridge lifecycle: ensure persistent claude-agent-acp is running before first cycle
   if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
-    _ensure_acp_bridge_running "$project" || {
+    _ensure_acp_bridge_running "$project" "${AGENT_AI_TOOL%%-*}" || {
       log_error "failed to start ACP bridge for project: $project"
       exit 1
     }
@@ -22238,7 +22238,7 @@ print(result.get('status','error'))
 
     # Ensure ACP bridge binary matches current tool (tool may have been switched by auto-recovery)
     if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
-      _ensure_acp_bridge_running "$project" || log_warn "ACP bridge check failed, continuing with existing bridge"
+      _ensure_acp_bridge_running "$project" "${AGENT_AI_TOOL%%-*}" || log_warn "ACP bridge check failed, continuing with existing bridge"
     fi
 
     # Scan for stale worker PIDs before keepalive decisions
@@ -22394,7 +22394,7 @@ print(ready)
     LAST_DELEGATED_CONTINUATION_PENDING_COUNT="$delegated_pending_count"
     LAST_DELEGATED_CONTINUATION_CONSUMED_IDS="$delegated_consumed_ids"
     LAST_DELEGATED_CONTINUATION_CONSUMED_AT="$delegated_consumed_at"
-    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$prompt_file" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$(runtime_read_tool_current_slot "$project" "$AI_TOOL")" "$LAST_SLOT_SWITCH_REASON" "$LAST_SLOT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}" "${AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV:-}" "${AUTO_RECOVERY_ORIGIN_TOOL:-}" "${SESSION_PARENT_ID:-}"
+    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$prompt_file" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$(runtime_read_tool_current_slot "$project" "$AI_TOOL")" "$LAST_SLOT_SWITCH_REASON" "$LAST_SLOT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${TOOL_SESSION_ID_CURRENT:-}" "${TOOL_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}" "${AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV:-}" "${AUTO_RECOVERY_ORIGIN_TOOL:-}" "${SESSION_PARENT_ID:-}"
     if [[ "$mode_name" == "fresh" || "$mode_name" == "fresh_with_handoff" ]]; then
       rm -f "$(exit_contract_file "$PROJECT_ROOT")"
     fi
@@ -22464,7 +22464,7 @@ print(ready)
         --codex-capability-approval-policy "${AI_CAPABILITY_CODEX_APPROVAL_POLICY:-}" \
         --codex-capability-cwd-mode "${AI_CAPABILITY_CODEX_CWD_MODE:-}" \
         --debug-log-file "$cycle_debug_log" \
-        --claude-session-id "${CLAUDE_SESSION_ID_CURRENT:-}" \
+        --claude-session-id "${TOOL_SESSION_ID_CURRENT:-}" \
         --tool-resume-target "$(tool_runtime_resume_target_before_launch "$AI_TOOL" "$PROJECT_ROOT")" \
         --mode "$AI_MODE" \
         --prompt-file "$prompt_file" \
@@ -22558,9 +22558,9 @@ print(ready)
     if log_has_same_tool_route_only_handoff "$cycle_log" "$AI_TOOL"; then
       route_only_handoff="1"
     fi
-    if tool_uses_claude_session_id "$AI_TOOL" && [[ -n "${CLAUDE_SESSION_ID_CURRENT:-}" ]]; then
+    if tool_uses_claude_session_id "$AI_TOOL" && [[ -n "${TOOL_SESSION_ID_CURRENT:-}" ]]; then
       local resolved_cc_evidence
-      resolved_cc_evidence="$(runtime_capture_or_empty resolve_cc_session_evidence "$PROJECT_ROOT" "${CLAUDE_SESSION_ID_CURRENT:-}")"
+      resolved_cc_evidence="$(runtime_capture_or_empty resolve_cc_session_evidence "$PROJECT_ROOT" "${TOOL_SESSION_ID_CURRENT:-}")"
       if [[ -n "$resolved_cc_evidence" ]]; then
         unset CLAUDE_JSONL_PATH CODEX_MCP_USED CODEX_MCP_THREAD_ID CODEX_MCP_JSONL_PATH
         # shellcheck disable=SC1090
@@ -22573,7 +22573,7 @@ print(ready)
         fi
       fi
       if [[ -z "$claude_jsonl_path" ]]; then
-        CLAUDE_SESSION_ID_CURRENT=""
+        TOOL_SESSION_ID_CURRENT=""
       fi
     fi
     tool_resume_target="$(runtime_capture_or_empty tool_runtime_resume_target_after_cycle "$AI_TOOL" "$tool_session_id" "$tool_jsonl_path" "$launch_resume_target" "${LAST_TOOL_JSONL_PATH:-}")"
@@ -22757,7 +22757,7 @@ print(ready)
     # Persisted via write_session_state below so it survives across loop iterations.
     FREELY_ACP_FIRST_LAUNCH_DONE=1
 
-    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$prompt_file" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$(runtime_capture_or_empty runtime_read_tool_current_slot "$project" "$AI_TOOL")" "$LAST_SLOT_SWITCH_REASON" "$LAST_SLOT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${CLAUDE_SESSION_ID_CURRENT:-}" "${CLAUDE_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}" "${AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV:-}" "${AUTO_RECOVERY_ORIGIN_TOOL:-}" "${SESSION_PARENT_ID:-}"
+    write_session_state "$project" "$LAST_TOOL_SESSION_ID" "$LAST_TOOL_RESUME_TARGET" "$LAST_TOOL_JSONL_PATH" "$LAST_LAUNCH_KIND" "$LAST_ROTATION_REASON" "$LAST_CYCLE_LOG" "$prompt_file" "$LAST_CONTEXT_COMPACTED" "$LAST_CONTEXT_RATIO" "$LAST_PRIMARY_RATE_LIMIT_USED_PERCENT" "$LAST_PRIMARY_RATE_LIMIT_RESETS_AT" "$LAST_SECONDARY_RATE_LIMIT_USED_PERCENT" "$LAST_SECONDARY_RATE_LIMIT_RESETS_AT" "$LAST_ROUTE_ONLY_HANDOFF" "$ROUTE_ONLY_STREAK_CURRENT" "$RESUME_STREAK_CURRENT" "$(runtime_capture_or_empty runtime_read_tool_current_slot "$project" "$AI_TOOL")" "$LAST_SLOT_SWITCH_REASON" "$LAST_SLOT_SWITCH_AT" "$LAST_CYCLE_DEBUG_LOG" "$LAST_CLAUDE_JSONL_PATH" "$LAST_CODEX_MCP_USED" "$LAST_CODEX_MCP_THREAD_ID" "$LAST_CODEX_MCP_JSONL_PATH" "${TOOL_SESSION_ID_CURRENT:-}" "${TOOL_SESSION_ID_PREVIOUS:-}" "$LAST_PROJECT_DIRTY_ENTRIES" "$LAST_WORKTREE_SUMMARY_TOTAL" "$LAST_WORKTREE_SUMMARY_DIRTY" "$CHECKPOINT_DRIFT_STREAK_CURRENT" "$LAST_DELEGATED_CONTINUATION_PENDING_IDS" "$LAST_DELEGATED_CONTINUATION_PENDING_COUNT" "$LAST_DELEGATED_CONTINUATION_CONSUMED_IDS" "$LAST_DELEGATED_CONTINUATION_CONSUMED_AT" "${LAST_RESTART_STORM_WINDOW_SECS:-0}" "${LAST_RESTART_STORM_COUNT:-0}" "${LAST_PROCESS_CHURN_PEAK:-0}" "${LAST_RESTART_STORM_SIGNAL_AT:-}" "${LAST_RESTART_STORM_SIGNAL_REASON:-}" "${LAST_RESTART_STORM_ESCALATED_AT:-}" "${LAST_RESTART_STORM_ESCALATION_TARGET:-}" "${AUTO_RECOVERY_ATTEMPTED_TOOLS_CSV:-}" "${AUTO_RECOVERY_ORIGIN_TOOL:-}" "${SESSION_PARENT_ID:-}"
     # Normalize rc=1 to 0 when the debug log shows a clean SessionEnd completion.
     # Claude Code -p mode may exit 1 even when the session ended gracefully (SessionEnd:other).
     if [[ "${rc:-0}" != "0" && -f "$cycle_debug_log" ]]; then
@@ -24763,8 +24763,8 @@ cmd_baseline_status() {
   echo "last_codex_mcp_used: ${LAST_CODEX_MCP_USED:-0}"
   echo "last_codex_mcp_thread_id: ${LAST_CODEX_MCP_THREAD_ID:-unavailable}"
   echo "last_codex_mcp_jsonl_path: ${LAST_CODEX_MCP_JSONL_PATH:-unavailable}"
-  echo "claude_session_id_current: ${CLAUDE_SESSION_ID_CURRENT:-unavailable}"
-  echo "claude_session_id_previous: ${CLAUDE_SESSION_ID_PREVIOUS:-unavailable}"
+  echo "claude_session_id_current: ${TOOL_SESSION_ID_CURRENT:-unavailable}"
+  echo "claude_session_id_previous: ${TOOL_SESSION_ID_PREVIOUS:-unavailable}"
   echo "last_project_dirty_entries: ${LAST_PROJECT_DIRTY_ENTRIES:-0}"
   echo "last_worktree_summary_total: ${LAST_WORKTREE_SUMMARY_TOTAL:-0}"
   echo "last_worktree_summary_dirty: ${LAST_WORKTREE_SUMMARY_DIRTY:-0}"

@@ -162,12 +162,12 @@ session_extract_id_from_log() {
 
 # ── Strategy: decide launch kind based on current state ─────
 # Returns: launch_kind=<fresh|resume|fork> resume_target=<id> session_id=<id>
-# Caller sets CLAUDE_SESSION_ID_CURRENT and SESSION_PARENT_ID based on output.
+# Caller sets TOOL_SESSION_ID_CURRENT and SESSION_PARENT_ID based on output.
 
 session_strategy_decide() {
   local project="$1" tool="$2"
   local resolved_tool; resolved_tool="$(_resolve_tool_family "$tool")"
-  local session_id="${CLAUDE_SESSION_ID_CURRENT:-}"
+  local session_id="${TOOL_SESSION_ID_CURRENT:-}"
   local parent_id="${SESSION_PARENT_ID:-}"
 
   # 1. Fork: parent ID set, no own session → new worker forking from parent
