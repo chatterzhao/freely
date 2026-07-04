@@ -347,3 +347,27 @@ else:
 | `acp_session_register()` | agent_working.py | ~15 行 |
 | slot 列 | freely_db_manager.py | 1 行 ALTER |
 | 命名替换 | 3 文件 | 11 处 |
+
+## 关联 Issue: raw-20260704T080808Z (多 bridge 并行)
+
+两个 issue 协同设计，本期预留扩展点:
+
+### 本期 (raw-20260704T064539Z) 的设计预留
+
+`acp_session_connect()` 的 `slot` 参数即为后续 bridge 路由的 key:
+- 单 bridge (本期): slot → base_tool → 唯一的 bridge (忽略 base_tool 差异)
+- 多 bridge (下期): slot → base_tool → 对应的 bridge socket
+
+```python
+def acp_session_connect(project, raw_key, role, agent_id, slot, ...):
+    base_tool = _extract_base_tool(slot)  # opencode-apikey-xxx → opencode
+    bridge_socket = _resolve_bridge_socket(project, base_tool)  # 本期: 返回唯一 socket
+    # 下期: _resolve_bridge_socket 根据 base_tool 返回不同 socket
+```
+
+### 下期 (raw-20260704T080808Z) 需解决
+
+1. daemon 启动时扫描 agent-table，为每个不同 base_tool 启动独立 bridge
+2. bridge socket 命名为 `/tmp/freely-acp-{project_hash}-{base_tool}.sock`
+3. fork 跨 slot 策略: 同 bridge 内跨 slot fork? 还是必须同 slot?
+4. bridge 生命周期: 与 manager bridge 一致（随 daemon 启停）
