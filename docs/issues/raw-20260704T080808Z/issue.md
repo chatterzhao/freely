@@ -53,3 +53,4 @@ acp_session_connect() 需要知道: 当前 agent 的 slot → base_tool → 哪�
 2. bridge socket 的命名/寻址（按 base_tool 区分）
 3. slot → base_tool → bridge 的路由
 4. 同 tool 不同 slot 的 fork: 能否跨 slot fork? 同一个 opencode bridge，不同 slot 的 session 之间 fork?
+absorbed_into: I-20260704T080808Z-A

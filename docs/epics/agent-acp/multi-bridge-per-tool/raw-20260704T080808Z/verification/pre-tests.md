@@ -110,6 +110,9 @@
 - target_environment: feature-local
 - required_evidence: AT-001~AT-005 passed
 - blocker_taxonomy: execution_pending_or_failed
+- not_applicable_reason: no_executable_boundary_at_this_layer
+- not_applicable_explanation: shell/Python 跨文件命名变更，无可导出单元函数。grep 等效覆盖 5 ATs。
+- replacement_evidence: AT-001~AT-005 GREEN 通过静态验证
 
 ## Integration
 - acceptance_target: daemon 启动多 bridge，session 路由正确

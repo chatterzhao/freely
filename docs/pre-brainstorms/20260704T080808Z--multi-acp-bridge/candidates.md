@@ -10,7 +10,8 @@ milestone: M-20260704T080808Z-A
 
 - candidate_format_version: v2
 - title: 支持不同 agent 配置不同 slot — 多 ACP bridge 并行
-- status: promoted
+- status: absorbed
+- absorbed_into: I-20260704T080808Z-A
 - decision_reason: |
   前置依赖 (raw-20260704T064539Z) 已合并，bridge 签名已预留 base_tool。
   本期启用: socket/pid 命名 per-tool, daemon 扫描 agent-table 启动所有 bridge,
