@@ -160,19 +160,44 @@ FREELY_ACP_CLINE_BIN = "/Users/zhaoyu/.nvm/.../bin/cline"
 
 `_bridge_ensure_running` 修复伪码:
 ```bash
+# monitor-ai-acp.sh _bridge_ensure_running 需要增加:
 local base_tool="${tool%%-*}"
 local acp_bin acp_args=()
+
+# 1. tool-registry → binary name (e.g. "opencode")
 acp_bin="$(_tool_registry_get "$base_tool" "acp.binary" 2>/dev/null || echo "claude-agent-acp")"
-# 从 config.toml 读取安装路径（优先）
-local config_key; config_key="FREELY_ACP_$(echo "$base_tool" | tr '[:lower:]' '[:upper:]')_BIN"
-local config_path; config_path="$(_read_config_value "$config_key" 2>/dev/null || true)"
-[[ -n "$config_path" && -x "$config_path" ]] && acp_bin="$config_path"
-# 解析 acp args
+# Parse acp args ("acp" for opencode)
 local raw_args; raw_args="$(_tool_registry_get "$base_tool" "acp.args" 2>/dev/null || true)"
 [[ -n "$raw_args" ]] && read -ra acp_args <<<"$raw_args"
 
-python3 "$bridge_script" start --project "$project" --acp-bin "$acp_bin" ${acp_args:+--acp-args "${acp_args[*]}"} >/dev/null 2>&1
+# 2. config.toml → installation path (优先)
+local config_key; config_key="FREELY_ACP_$(echo "$base_tool" | tr '[:lower:]' '[:upper:]')_BIN"
+# 直接读 config.toml（subprocess 没有 source freely，用 awk）
+local config_path; config_path=$(awk -F'"' -v k="$config_key" '$1 == k " =" {print $2; exit}' "$project/.freely/config.toml" 2>/dev/null || true)
+[[ -n "$config_path" && -x "$config_path" ]] && acp_bin="$config_path"
+
+# 3. 如果都没有 → 回退 PATH
+if ! command -v "$acp_bin" >/dev/null 2>&1; then
+  echo "[WARN] ACP binary '$acp_bin' not found, run 'freely init' to set up" >&2
+fi
+
+# 启动 bridge（与 freely _ensure_acp_bridge_running 一致）
+python3 "$bridge_script" start --project "$project" --acp-bin "$acp_bin" \
+  ${acp_args:+--acp-args "${acp_args[*]}"} --foreground >/dev/null 2>&1
+
+# 写 .bin 文件（当前缺失！）
 printf '%s\n' "$acp_bin" > "$acp_bin_file"
+```
+
+### 自愈机制
+
+```
+用户误删 config.toml 中的 FREELY_ACP_OPENCODE_BIN 行
+  → daemon 启动: command -v opencode 仍在 PATH → 仍能工作
+  → _bridge_ensure_running 回退到 registry/PATH → 正常
+  → 下次 freely init → _init_acp_tool_setup 检测条目缺失
+      → 搜索 PATH → 找到 opencode → upsert_config_key 补回
+      → config.toml 又完整了 ✓
 ```
 
 ## 诊断日志增强
