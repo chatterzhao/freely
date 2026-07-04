@@ -14,140 +14,104 @@ created_at: 2026-07-04
 
 ## Problem
 
-### 全局理解：Freely agent 通信模型
+### 全局理解
 
-```
-agent-table.toml 配置 manager/worker/reviewer 的 slot
-       ↓
-  freely daemon 启动 → 创建 ACP bridge
-       ↓
-  Manager 创建 session (new/resume)
-       ↓
-  A2A SSE 事件流 → watchdog_sse.py 监听
-       ↓
-  需要 Worker? → 选 session 操作 (fork/new/prompt)
-       ↓
-  Worker 完成 → 需要 Reviewer?
-       ↓
-  通过 session/prompt 把 verdict 发给 Reviewer session
-```
+Freely 的 agent 通信模型：agent-table 配置 slot → daemon 启动 ACP bridge → 各 agent 创建/恢复 session → A2A SSE 事件驱动 agent 间通信 → session/prompt 实现 agent 间消息传递。
 
-### 四种 ACP session 操作
+四种 ACP session 操作：
 
-| 操作 | 何时用 | 缓存命中 | 约束 |
-|------|--------|:---:|------|
-| `session/new` | 首次、slot 变了、跨 tool 无法 fork | ❌ 冷启动 | 任何情况 |
-| `session/fork` | Worker/Reviewer 从 Manager fork | ✅ 继承 context | **只能同 tool fork**，跨 tool 报错 |
-| `session/resume` | 重启后恢复、session 死了唤醒 | ✅ 恢复历史 | **必须 slot 没变**，变了会报错 |
+| 操作 | 用途 | 缓存 | 约束 |
+|------|------|:---:|------|
+| `session/new` | 全新开始、slot 变更、跨 tool | ❌ | 无约束 |
+| `session/fork` | 从父 session 继承 context | ✅ | **同 tool 才行**，跨 tool 报错 |
+| `session/resume` | 恢复不活跃 session | ✅ | **slot 必须没变**，否则报错 |
 | `session/prompt` | 向 alive session 发消息 | N/A | session 必须 alive |
 
-### 当前问题
+### 每个 agent 都需要 resume
 
-**1. 没有统一的 session 操作选择逻辑。** 每个调用点自己判断，逻辑重复、不完整。
+Manager 不是唯一需要 resume 的。Worker 和 Reviewer 也会因为 idle timeout 导致 session 不活跃，需要 resume 恢复。当前 watchdog_sse.py 已部分处理（`_handle_needs_worker` line 469-477: 先查 alive session → prompt，失败则 fork/new），但缺少 resume 尝试——如果 session 存在但 dead，应优先 resume 而非直接 new。
 
-**2. agent_working 表没有 slot 列。** 无法判断 session 创建时用的 slot 是否与当前 agent-table 配置一致。重启时不知道能不能安全 resume。
+### Reviewer 的独立性
 
-**3. 没有跨 slot 检测。** 同 tool 不同 slot（如 opencode-apikey-ds-flash vs opencode-apikey-openai-gpt）fork 可能可以，但 resume 不行（因为 settings 变了）。跨 tool（opencode → claude）fork 和 resume 都不行。
+Workflow skill 明确：**每个节点后都需要独立 review**。三个 loop 的设计保证了每个环节都有 review gate。
 
-**4. 会话恢复效率低。** Manager 每次启动都 session/new，不检查 agent_working 里有没有可以 resume 的 session。浪费上下文和缓存。
+Reviewer **必须 fork Manager，不能 fork Worker**：
+- fork Manager → 继承 governance context (CONSTITUTION, LAWS, project map)，不知道 Worker 的思考过程 → 独立公正
+- fork Worker → 看到 Worker 的实现细节和思考 → 自评自审，失去 review 意义
+- 如果没有 review → 实现会糊弄完成 → loop 的设计就是为了保证每个环节都独立验证
+
+### 当前差距
+
+**1. 无统一 session 操作选择方法。** 决策逻辑散落在 watchdog_sse.py 和 freely shell。
+
+**2. agent_working 无 slot 列。** 无法判断 session 创建时的 slot 是否与当前一致。Manager 每次重启都 session/new，不敢 resume（怕 slot 变了报错）。
+
+**3. Worker/Reviewer 的 resume 路径不完整。** watchdog 有 alive check 和 fork/new，但缺少"dead → resume"的尝试。
 
 ## Brainstorm
 
-### 统一方法抽象
-
-核心思想：一个方法，传入当前上下文，内部决策用哪种操作。
-
-```python
-def acp_session_connect(project, raw_key, role, agent_id, 
-                        current_slot, message=None):
-    """
-    统一的 ACP session 生命周期管理。
-
-    决策树:
-    1. 查 agent_working: 有没有 {role}_id 记录？有没有 session_id？
-       → 有 session_id:
-         a. agent_working.slot == current_slot（slot 没变）?
-            → session alive? → session/prompt(message) 或直接返回
-            → session dead?  → session/resume → 更新 session_id
-         b. agent_working.slot != current_slot（slot 变了）?
-            → session/new（不能 resume/fork，配置已变）
-       → 无 session_id:
-    2. 能 fork 吗？
-       a. 同 tool (base_tool 相同)?
-          → session/fork from Manager（缓存命中）
-       b. 跨 tool?
-          → session/new（fork 不支持跨 tool）
-    3. 成功 → 写 agent_working（含 slot）
-    
-    Returns: (session_id, operation_used)
-    """
-```
-
-### Manager 场景
+### 统一方法：acp_session_connect
 
 ```
-freely start:
-  → acp_session_connect(__manager__, manager, manager_01, opencode-apikey-ds-flash-auto)
-    → agent_working 有记录 + slot 匹配 → session/resume (缓存命中!)
-    → agent_working 无记录 → session/new
+acp_session_connect(project, raw_key, role, agent_id, slot, message=None)
+  → (session_id, operation_used)
 
-freely restart (slot 变了):
-  → acp_session_connect(__manager__, manager, manager_01, claude-apikey-ds-pro-auto)
-    → agent_working 有记录 + slot 不匹配 → session/new (安全，不会报错)
+决策树（按优先级）:
+  1. agent_working 有 session_id?
+     ├─ 有 + slot 匹配
+     │   ├─ alive?      → session/prompt(message)     【最快: 0ms】
+     │   └─ dead?       → session/resume → prompt     【恢复: 保留上下文】
+     └─ 有 + slot 不匹配 → session/new                【安全: 不会报错】
+  2. 无 session_id
+     ├─ 同 tool + role≠reviewer_gate → session/fork(Mgr)  【缓存命中: 继承治理】
+     └─ 否则                        → session/new          【兜底: 冷启动】
+  3. 成功 → 写 agent_working (含 slot)
 ```
 
-### Worker 场景
+### 三个角色的 session 策略
 
-```
-watchdog 检测到需要 worker:
-  → acp_session_connect(raw_key, worker, worker_01, opencode-apikey-ds-flash, message=task)
-    → 有 session + slot 匹配 + alive → session/prompt (最快)
-    → 有 session + slot 匹配 + dead → session/resume → prompt
-    → 无 session + 同 tool → session/fork from Manager (缓存命中)
-    → 无 session + 跨 tool → session/new
-```
+| | 首次 | 重启/恢复 | 同 tool fork | 跨 tool | session/prompt |
+|------|------|------|:---:|:---:|:---:|
+| Manager | new | **resume** (需 slot 匹配) | N/A | new | N/A |
+| Worker | fork(Mgr) | prompt / **resume** / new | fork(Mgr) | new | Manager→Worker |
+| Reviewer | fork(Mgr) | prompt / **resume** / new | fork(Mgr) | new | Worker→Reviewer, Reviewer→Worker |
 
-### Reviewer 场景
+**Reviewer fork 策略：**
+- 正常 review：fork Manager（继承治理 context，不知道 Worker 思考 → 独立公正）
+- Gate review：session/new（最大独立性，冷启动无偏见）
+- **永不 fork Worker**（自评自审 = 作弊）
 
-```
-watchdog 检测到需要 reviewer:
-  → acp_session_connect(raw_key, reviewer, reviewer_01, opencode-apikey-ds-flash, message=review_task)
-    → 同 Worker 逻辑
-    → 注意: gate review 用 session/new（不 fork，保持中立）
-```
+### 需要存储 slot
 
-### 需要存储 slot 信息
-
-`agent_working` 表需要新增 `slot` 列，session 创建/更新时写入：
+`agent_working` 新增 `slot` 列：
 
 ```sql
 ALTER TABLE agent_working ADD COLUMN slot TEXT DEFAULT '';
 ```
 
-存储格式: `opencode-apikey-ds-flash-auto`（完整 slot 名）
+session 创建/更新时写入完整 slot 名（如 `opencode-apikey-ds-flash-auto`），恢复时比对。
 
 ### 需要的方法
 
 | 方法 | 职责 |
 |------|------|
-| `acp_session_connect(project, raw_key, role, agent_id, slot, message)` | 统一入口，内部决策 new/fork/resume/prompt |
-| `acp_session_register(project, raw_key, role, agent_id, session_id, slot, ...)` | 写入 agent_working（含 slot） |
-| `acp_session_close(project, raw_key, role, agent_id)` | 清理 session_id |
-| `acp_session_check_slot(project, raw_key, role)` | 检查存储的 slot 与当前是否一致 |
+| `acp_session_connect()` | 统一入口，内部决策 prompt/resume/fork/new |
+| `acp_session_register()` | 写入 agent_working（含 slot） |
+| `acp_session_close()` | 清理 session_id |
+| `acp_session_can_resume()` | 检查 slot 是否匹配，能否安全 resume |
 
 ### 附：命名修正
 
 `CLAUDE_SESSION_ID_CURRENT` → `TOOL_SESSION_ID_CURRENT`（3 文件 11 处）
 
-## Decision: 统一方法 `acp_session_connect`
+## Decision
 
-核心抽象：**一个方法，根据 context 自动选择最优 session 操作**。
-
-优先级: prompt > resume > fork > new
-- prompt: alive session，零延迟
-- resume: dead session 复活，保留上下文
-- fork: 从 Manager 继承，缓存命中
-- new: 最后手段，冷启动
+核心交付：
+1. `acp_session_connect()` — 统一 session 操作选择
+2. agent_working 加 `slot` 列 — 安全 resume 的前提
+3. 三个角色都走同一方法 — prompt>resume>fork>new 优先级
+4. Reviewer 永远 fork Manager（独立），不 fork Worker（作弊）
+5. 命名修正
 
 ## Candidate
 - candidate_id: C-20260704T064539Z-A
