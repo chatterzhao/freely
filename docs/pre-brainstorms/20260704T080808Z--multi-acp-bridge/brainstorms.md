@@ -131,3 +131,55 @@ def _resolve_bridge_socket(project, base_tool=""):
 - candidate_id: C-20260704T080808Z-A
 - status: promoted
 - milestone: M-20260704T080808Z-A
+
+## 切号与多 bridge 交互
+
+### 当前切号逻辑
+
+```
+failure → tool_select_ready_slot → _stop_acp_bridge → load_config → next cycle
+          扫描可用 slot, 测试        杀当前 bridge      更新 AGENT_AI_TOOL   重启 bridge
+```
+
+问题: `_stop_acp_bridge "$project"` 会杀死所有 bridge（如果已实现多 bridge）。Manager 切号不应影响 Worker 的 bridge。
+
+### 多 bridge 下的切号行为
+
+```
+Manager 切号 (opencode → claude):
+  1. _stop_acp_bridge "$project" "opencode"  ← 只停 Manager 的旧 bridge
+  2. load_config → AGENT_AI_TOOL=claude-apikey-xxx
+  3. next cycle → _ensure_acp_bridge_running "$project" "claude" ← 启动新 bridge
+  4. Worker 的 opencode bridge 不受影响 ✅
+
+所有 tool 不可用 → fallback:
+  1. 每个 bridge 尝试恢复 → 都不可用 → 报错等待
+  2. _stop_acp_bridge 改为接受 base_tool 参数 (默认全停)
+```
+
+### base_tool 解析验证点
+
+必须在以下时机验证 base_tool 可解析:
+
+| 时机 | 验证 | 失败处理 |
+|------|------|:---:|
+| daemon start | 扫描 agent-table 所有 slot → 每个 base_tool 必须在 registry + config | 硬报错退出 |
+| 切号 | 新 slot 的 base_tool 必须在 registry + config | 硬报错, 不切 |
+| acp_session_connect | slot → base_tool → bridge_socket 解析 | 报错 + 不创建 session |
+
+### _stop_acp_bridge 参数化
+
+```bash
+# Before: _stop_acp_bridge "$project"  (杀所有 bridge)
+# After:
+_stop_acp_bridge() {
+  local project="$1" base_tool="${2:-}"  # 空 = 全停, 有值 = 只停指定 tool
+  if [[ -n "$base_tool" ]]; then
+    _stop_one_bridge "$project" "$base_tool"
+  else
+    for bt in "${_all_running_tools[@]}"; do
+      _stop_one_bridge "$project" "$bt"
+    done
+  fi
+}
+```
