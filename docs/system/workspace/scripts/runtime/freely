@@ -1767,7 +1767,7 @@ runtime_pid_file_for_role() {
     manager_watchdog) printf '%s\n' "$(ensure_manager_watchdog_pid_file "$project")" ;;
     interruption_dispatcher) printf '%s\n' "$(interruption_dispatcher_pid_file "$project")" ;;
     sse_watchdog) printf '%s\n' "$(sse_watchdog_pid_file "$project")" ;;
-    acp_bridge) printf '%s\n' "/tmp/freely-acp-$(_acp_bridge_short_hash "$project").pid" ;;
+    acp_bridge) printf '%s\n' "/tmp/freely-acp-$(_acp_bridge_short_hash "$project")-"*.pid ;;
     *) return 1 ;;
   esac
 }
@@ -1804,7 +1804,8 @@ clear_stale_runtime_pid_file_if_invalid() {
   rm -f "$pid_file"
   # ACP bridge owns a Unix socket — clean it alongside the stale PID.
   if [[ "$role" == "acp_bridge" ]]; then
-    rm -f "/tmp/freely-acp-$(_acp_bridge_short_hash "$project").sock"
+    # Clean up all project bridge sockets (including per-tool variants)
+    rm -f /tmp/freely-acp-$(_acp_bridge_short_hash "$project")*.sock /tmp/freely-acp-$(_acp_bridge_short_hash "$project")*.pid
   fi
   append_runtime_event "$project" "startup_self_heal_stale_pid_cleared" \
     "trigger=$trigger" \
@@ -13800,7 +13801,7 @@ _ai_shows_liveness_acp() {
   fi
 
   # Signal 3: ACP bridge socket responsive
-  local bridge_socket="/tmp/freely-acp-$(_acp_bridge_short_hash "$project").sock"
+  local bridge_socket; bridge_socket="$(_acp_bridge_socket "$project" "$base_tool")"
   if [[ -S "$bridge_socket" ]]; then
     # Quick socket probe: connect and disconnect (non-blocking check)
     if python3 -c "
@@ -13905,14 +13906,13 @@ _acp_bridge_short_hash() {
 }
 
 _acp_bridge_pid_file() {
-  echo "/tmp/freely-acp-$(_acp_bridge_short_hash "$1").pid"
+  local project="$1" base_tool="${2:-}"
+  echo "/tmp/freely-acp-$(_acp_bridge_short_hash "$project")-${base_tool}.pid"
 }
 
 _acp_bridge_socket() {
   local project="$1" base_tool="${2:-}"
-  # Single bridge (current): base_tool ignored.
-  # Multi bridge (future): /tmp/freely-acp-{hash}-{base_tool}.sock
-  echo "/tmp/freely-acp-$(_acp_bridge_short_hash "$project").sock"
+  echo "/tmp/freely-acp-$(_acp_bridge_short_hash "$project")-${base_tool}.sock"
 }
 
 _acp_bridge_health_check() {
@@ -14259,13 +14259,27 @@ except Exception as e:
 }
 
 _stop_acp_bridge() {
-  local project="$1"
+  local project="$1" base_tool="${2:-}"
   local bridge_script="$SELF_ROOT/docs/system/workspace/scripts/runtime/acp-bridge.py"
   [[ -f "$bridge_script" ]] || bridge_script="$(workspace_root_for_project "$project")/scripts/runtime/acp-bridge.py"
-  if [[ -f "$bridge_script" ]]; then
-    python3 "$bridge_script" stop --project "$project" >/dev/null 2>&1 || true
+  if [[ -n "$base_tool" ]]; then
+    # Stop specific bridge
+    if [[ -f "$bridge_script" ]]; then
+      python3 "$bridge_script" stop --project "$project" --base-tool "$base_tool" >/dev/null 2>&1 || true
+    fi
+    local _spid _spid_file; _spid_file="$(_acp_bridge_pid_file "$project" "$base_tool")"
+    _spid=$(cat "$_spid_file" 2>/dev/null || true)
+    [[ -n "$_spid" ]] && kill "$_spid" 2>/dev/null || true
+    rm -f "$_spid_file" "$(_acp_bridge_socket "$project" "$base_tool")"
+  else
+    # Stop all bridges
+    if [[ -f "$bridge_script" ]]; then
+      python3 "$bridge_script" stop --project "$project" >/dev/null 2>&1 || true
+    fi
+    # Clean up all per-tool pid/socket files
+    rm -f /tmp/freely-acp-$(_acp_bridge_short_hash "$project")*.pid /tmp/freely-acp-$(_acp_bridge_short_hash "$project")*.sock
   fi
-  # Kill all claude-agent-acp and claude child processes (SIGTERM first, then SIGKILL)
+  # Kill ACP server processes (SIGTERM first, then SIGKILL)
   local patterns=(
     "claude-agent-acp"
     "claude.*--session-id.*--replay-user-messages"
@@ -14281,7 +14295,7 @@ _stop_acp_bridge() {
     pkill -9 -f "$p" 2>/dev/null || true
   done
   # Clean up state files
-  rm -f "$(_acp_bridge_pid_file "$project")" "$(_acp_bridge_socket "$project")"
+  # pid/socket files cleaned above (per-tool or all)
   rm -f "$(run_dir_for_project "$project")/acp-bridge.log"
 }
 
@@ -22147,12 +22161,36 @@ start_project_runtime() {
   trap '' SIGPIPE
   load_session_state_or_defaults "$project"
 
-  # ACP bridge lifecycle: ensure persistent claude-agent-acp is running before first cycle
+  # ACP bridge lifecycle: start one bridge per unique base_tool in agent-table
   if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
-    _ensure_acp_bridge_running "$project" "${AGENT_AI_TOOL%%-*}" || {
-      log_error "failed to start ACP bridge for project: $project"
-      exit 1
-    }
+    local _at="${PROJECT_ROOT}/.freely/agent-table.toml"
+    local _aq="${PROJECT_ROOT}/bin/agent-table-query"
+    local -a _unique_tools=()
+    local _slot _bt
+    if [[ -f "$_at" && -x "$_aq" ]]; then
+      for role in manager worker reviewer; do
+        _slot=$("$_aq" --get-slot "${role}_01" 2>/dev/null || true)
+        [[ -n "$_slot" ]] || continue
+        _bt="${_slot%%-*}"
+        [[ " ${_unique_tools[*]} " == *" $_bt "* ]] && continue
+        _unique_tools+=("$_bt")
+      done
+    fi
+    # Fallback: if agent-table has no slots, use AGENT_AI_TOOL
+    if [[ ${#_unique_tools[@]} -eq 0 ]]; then
+      _unique_tools+=("${AGENT_AI_TOOL%%-*}")
+    fi
+    for _bt in "${_unique_tools[@]}"; do
+      if ! _tool_is_registered "$_bt" 2>/dev/null; then
+        log_error "base_tool '$_bt' from agent-table not in tool-registry.toml"
+        log_error "Check agent-table.toml {role}_slot fields — base_tool must be a registered tool"
+        exit 1
+      fi
+      _ensure_acp_bridge_running "$project" "$_bt" || {
+        log_error "failed to start ACP bridge for base_tool=$_bt"
+        exit 1
+      }
+    done
   fi
 
   # ERR trap: capture crash → auto-report as raw issue via freely feedback.
@@ -22236,9 +22274,25 @@ print(result.get('status','error'))
     # Re-load session state each cycle so resume/fork decisions see latest values
     load_session_state_or_defaults "$project"
 
-    # Ensure ACP bridge binary matches current tool (tool may have been switched by auto-recovery)
+    # Ensure all ACP bridges are alive (tool may have been switched by auto-recovery)
     if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
-      _ensure_acp_bridge_running "$project" "${AGENT_AI_TOOL%%-*}" || log_warn "ACP bridge check failed, continuing with existing bridge"
+      local _at="${PROJECT_ROOT}/.freely/agent-table.toml"
+      local _aq="${PROJECT_ROOT}/bin/agent-table-query"
+      local -a _cycle_tools=()
+      local _slot _bt
+      if [[ -f "$_at" && -x "$_aq" ]]; then
+        for role in manager worker reviewer; do
+          _slot=$("$_aq" --get-slot "${role}_01" 2>/dev/null || true)
+          [[ -n "$_slot" ]] || continue
+          _bt="${_slot%%-*}"
+          [[ " ${_cycle_tools[*]} " == *" $_bt "* ]] && continue
+          _cycle_tools+=("$_bt")
+        done
+      fi
+      [[ ${#_cycle_tools[@]} -eq 0 ]] && _cycle_tools+=("${AGENT_AI_TOOL%%-*}")
+      for _bt in "${_cycle_tools[@]}"; do
+        _ensure_acp_bridge_running "$project" "$_bt" || log_warn "ACP bridge check failed for $_bt"
+      done
     fi
 
     # Scan for stale worker PIDs before keepalive decisions

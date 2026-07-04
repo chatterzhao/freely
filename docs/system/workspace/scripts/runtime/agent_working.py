@@ -207,14 +207,9 @@ def _acp_bridge_ping(project: str, base_tool: str, session_id: str) -> bool:
 
 
 def _resolve_bridge_socket(project: str, base_tool: str = "") -> str:
-    """Resolve ACP bridge socket path.
-
-    Current (single bridge): returns the project's only bridge socket.
-    Future (multi bridge): returns per-base_tool socket.
-    """
+    """Resolve ACP bridge socket path per base_tool."""
     h = hashlib.sha256(os.path.abspath(project).encode()).hexdigest()[:16]
-    # Future: return f"/tmp/freely-acp-{h}-{base_tool}.sock"
-    return f"/tmp/freely-acp-{h}.sock"
+    return f"/tmp/freely-acp-{h}-{base_tool}.sock"
 
 
 def agent_release(project: str, raw_key: str, role: str, agent_id: str = None):
