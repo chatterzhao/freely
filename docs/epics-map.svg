@@ -2,13 +2,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" id="freely-epics-map" viewBox="0 0 1000 18491.0" width="1000" font-family="monospace">
 <rect id="app-freely" x="10" y="10" width="980" height="18351.0" fill="none" stroke="#333" stroke-width="3" rx="8"/>
 <text x="30" y="38" font-size="20" font-weight="bold" fill="#333">Freely</text>
-<rect id="epic-a2a-h11-noise" x="35" y="55" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-a2a-h11-noise" x="35" y="55" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="79" font-size="13" font-weight="bold" fill="#1a73e8">a2a-h11-noise</text>
-<rect id="epic-a2a-hygiene-after-run" x="35" y="108" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-a2a-hygiene-after-run" x="35" y="108" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="132" font-size="13" font-weight="bold" fill="#1a73e8">a2a-hygiene-after-run</text>
-<rect id="epic-a2a-native-delegation" x="35" y="161" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-a2a-native-delegation" x="35" y="161" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="185" font-size="13" font-weight="bold" fill="#1a73e8">a2a-native-delegation</text>
-<rect id="epic-a2a-phase2-csv-docs" x="35" y="214" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-a2a-phase2-csv-docs" x="35" y="214" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="238" font-size="13" font-weight="bold" fill="#1a73e8">a2a-phase2-csv-docs</text>
 <rect id="epic-a2a-replace-handoff" x="35" y="267" width="700" height="94" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="291" font-size="13" font-weight="bold" fill="#1a73e8">a2a-replace-handoff</text>
@@ -16,83 +16,83 @@
 <text x="65" y="314" font-size="11" fill="#34a853">├ a2a-no-fallback</text>
 <rect id="story-architecture-refactor" x="55" y="323" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
 <text x="65" y="338" font-size="11" fill="#34a853">├ architecture-refactor</text>
-<rect id="epic-a2a-restore-async" x="35" y="369" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-a2a-restore-async" x="35" y="369" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="393" font-size="13" font-weight="bold" fill="#1a73e8">a2a-restore-async</text>
-<rect id="epic-a2a-review-states" x="35" y="422" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-a2a-review-states" x="35" y="422" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="446" font-size="13" font-weight="bold" fill="#1a73e8">a2a-review-states</text>
-<rect id="epic-a2a-state-management" x="35" y="475" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-a2a-state-management" x="35" y="475" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="499" font-size="13" font-weight="bold" fill="#1a73e8">a2a-state-management</text>
-<rect id="epic-a2a-tasks-agent-id" x="35" y="528" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-a2a-tasks-agent-id" x="35" y="528" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="552" font-size="13" font-weight="bold" fill="#1a73e8">a2a-tasks-agent-id</text>
-<rect id="epic-a2a-unified-data-flow" x="35" y="581" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-a2a-unified-data-flow" x="35" y="581" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="605" font-size="13" font-weight="bold" fill="#1a73e8">a2a-unified-data-flow</text>
-<rect id="epic-a2a-worker-pid-fix" x="35" y="634" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-a2a-worker-pid-fix" x="35" y="634" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="658" font-size="13" font-weight="bold" fill="#1a73e8">a2a-worker-pid-fix</text>
-<rect id="epic-acp-a2a-refactor" x="35" y="687" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-acp-a2a-refactor" x="35" y="687" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="711" font-size="13" font-weight="bold" fill="#1a73e8">acp-a2a-refactor</text>
-<rect id="epic-acp-bridge-restart-storm" x="35" y="740" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-acp-bridge-restart-storm" x="35" y="740" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="764" font-size="13" font-weight="bold" fill="#1a73e8">acp-bridge-restart-storm</text>
-<rect id="epic-agent-acp" x="35" y="793" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-agent-acp" x="35" y="793" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="817" font-size="13" font-weight="bold" fill="#1a73e8">agent-acp</text>
 <rect id="story-agent-table-driven" x="65" y="805" width="670" height="35" fill="#f0f4ff" stroke="#669df6" stroke-width="1.5" rx="3"/>
 <text x="80" y="825" font-size="12" fill="#1a73e8">agent-table-driven</text>
 
-<rect id="epic-acp-phase-state-cleanup" x="35" y="889" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-acp-phase-state-cleanup" x="35" y="889" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="913" font-size="13" font-weight="bold" fill="#1a73e8">acp-phase-state-cleanup</text>
-<rect id="epic-acp-session-fork" x="35" y="942" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-acp-session-fork" x="35" y="942" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="966" font-size="13" font-weight="bold" fill="#1a73e8">acp-session-fork</text>
-<rect id="epic-acp-session-id-format-fix" x="35" y="995" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-acp-session-id-format-fix" x="35" y="995" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="1019" font-size="13" font-weight="bold" fill="#1a73e8">acp-session-id-format-fix</text>
-<rect id="epic-acp-tool-switch-integration" x="35" y="1048" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-acp-tool-switch-integration" x="35" y="1048" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="1072" font-size="13" font-weight="bold" fill="#1a73e8">acp-tool-switch-integration</text>
-<rect id="epic-acp-usage-passthrough" x="35" y="1101" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-acp-usage-passthrough" x="35" y="1101" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="1125" font-size="13" font-weight="bold" fill="#1a73e8">acp-usage-passthrough</text>
-<rect id="epic-adapter-add-cli" x="35" y="1154" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-adapter-add-cli" x="35" y="1154" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="1178" font-size="13" font-weight="bold" fill="#1a73e8">adapter-add-cli</text>
-<rect id="epic-add-claude-md-governance" x="35" y="1207" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-add-claude-md-governance" x="35" y="1207" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="1231" font-size="13" font-weight="bold" fill="#1a73e8">add-claude-md-governance</text>
-<rect id="epic-agent-handoff-protocol" x="35" y="1260" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-agent-handoff-protocol" x="35" y="1260" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="1284" font-size="13" font-weight="bold" fill="#1a73e8">agent-handoff-protocol</text>
-<rect id="epic-agent-lifecycle" x="35" y="1313" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-agent-lifecycle" x="35" y="1313" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="1337" font-size="13" font-weight="bold" fill="#1a73e8">agent-lifecycle</text>
-<rect id="epic-agent-table" x="35" y="1366" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-agent-table" x="35" y="1366" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="1390" font-size="13" font-weight="bold" fill="#1a73e8">agent-table</text>
-<rect id="epic-agent-table-reconcile" x="35" y="1419" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-agent-table-reconcile" x="35" y="1419" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="1443" font-size="13" font-weight="bold" fill="#1a73e8">agent-table-reconcile</text>
-<rect id="epic-agent-table-slot-chain" x="35" y="1472" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
-<text x="50" y="1496" font-size="13" font-weight="bold" fill="#1a73e8">agent-table-slot-chain</text><rect id="epic-agent-table-slot-pin" x="35" y="1525" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-agent-table-slot-chain" x="35" y="1472" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<text x="50" y="1496" font-size="13" font-weight="bold" fill="#1a73e8">agent-table-slot-chain</text><rect id="epic-agent-table-slot-pin" x="35" y="1525" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="1549" font-size="13" font-weight="bold" fill="#1a73e8">agent-table-slot-pin</text>
-<rect id="epic-agents-daemon-to-pre-tests" x="35" y="1578" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-agents-daemon-to-pre-tests" x="35" y="1578" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="1602" font-size="13" font-weight="bold" fill="#1a73e8">agents-daemon-to-pre-tests</text>
-<rect id="epic-ai-auth-template-config" x="35" y="1631" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-ai-auth-template-config" x="35" y="1631" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="1655" font-size="13" font-weight="bold" fill="#1a73e8">ai-auth-template-config</text>
-<rect id="epic-ai-cli-apikey-alias-switch" x="35" y="1684" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-ai-cli-apikey-alias-switch" x="35" y="1684" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="1708" font-size="13" font-weight="bold" fill="#1a73e8">ai-cli-apikey-alias-switch</text>
-<rect id="epic-ai-cli-codex-apikey" x="35" y="1737" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-ai-cli-codex-apikey" x="35" y="1737" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="1761" font-size="13" font-weight="bold" fill="#1a73e8">ai-cli-codex-apikey</text>
-<rect id="epic-ai-cli-generic-tool-commands" x="35" y="1790" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-ai-cli-generic-tool-commands" x="35" y="1790" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="1814" font-size="13" font-weight="bold" fill="#1a73e8">ai-cli-generic-tool-commands</text>
 <rect id="epic-ai-native-doc-loop" x="35" y="1843" width="700" height="70" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="1867" font-size="13" font-weight="bold" fill="#1a73e8">ai-native-doc-loop</text>
 <rect id="story-agent-ready-prd-for-freely-flow" x="55" y="1875" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
 <text x="65" y="1890" font-size="11" fill="#34a853">├ agent-ready-prd-for-freely-flow</text>
-<rect id="epic-alias-env-prefix-fix" x="35" y="1921" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-alias-env-prefix-fix" x="35" y="1921" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="1945" font-size="13" font-weight="bold" fill="#1a73e8">alias-env-prefix-fix</text>
-<rect id="epic-anti-cheating-gate" x="35" y="1974" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-anti-cheating-gate" x="35" y="1974" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="1998" font-size="13" font-weight="bold" fill="#1a73e8">anti-cheating-gate</text>
-<rect id="epic-apikey-full-slot-name-fixes" x="35" y="2027" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-apikey-full-slot-name-fixes" x="35" y="2027" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="2051" font-size="13" font-weight="bold" fill="#1a73e8">apikey-full-slot-name-fixes</text>
-<rect id="epic-auto-detect-platforms" x="35" y="2080" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-auto-detect-platforms" x="35" y="2080" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="2104" font-size="13" font-weight="bold" fill="#1a73e8">auto-detect-platforms</text>
-<rect id="epic-b2-ibm-anti-cheating" x="35" y="2133" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-b2-ibm-anti-cheating" x="35" y="2133" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="2157" font-size="13" font-weight="bold" fill="#1a73e8">b2-ibm-anti-cheating</text>
-<rect id="epic-branch-check-no-bypass" x="35" y="2186" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-branch-check-no-bypass" x="35" y="2186" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="2210" font-size="13" font-weight="bold" fill="#1a73e8">branch-check-no-bypass</text>
-<rect id="epic-branch-worktree-check" x="35" y="2239" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-branch-worktree-check" x="35" y="2239" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="2263" font-size="13" font-weight="bold" fill="#1a73e8">branch-worktree-check</text>
-<rect id="epic-bridge-disconnect-fix" x="35" y="2292" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-bridge-disconnect-fix" x="35" y="2292" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="2316" font-size="13" font-weight="bold" fill="#1a73e8">bridge-disconnect-fix</text>
-<rect id="epic-cgrab-yaml-fallback" x="35" y="2345" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-cgrab-yaml-fallback" x="35" y="2345" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="2369" font-size="13" font-weight="bold" fill="#1a73e8">cgrab-yaml-fallback</text>
 <rect id="epic-chat-conversation-extension" x="35" y="2398" width="700" height="70" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="2422" font-size="13" font-weight="bold" fill="#1a73e8">chat-conversation-extension</text>
@@ -102,55 +102,55 @@
 <text x="50" y="2500" font-size="13" font-weight="bold" fill="#1a73e8">chat-refactor</text>
 <rect id="story-comment-discuss-split" x="55" y="2508" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
 <text x="65" y="2523" font-size="11" fill="#34a853">├ comment-discuss-split</text>
-<rect id="epic-checkpoint-merge-fix" x="35" y="2554" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-checkpoint-merge-fix" x="35" y="2554" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="2578" font-size="13" font-weight="bold" fill="#1a73e8">checkpoint-merge-fix</text>
-<rect id="epic-claude-acp-adapter-fix" x="35" y="2607" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-claude-acp-adapter-fix" x="35" y="2607" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="2631" font-size="13" font-weight="bold" fill="#1a73e8">claude-acp-adapter-fix</text>
-<rect id="epic-clean-query-json5-deadcode" x="35" y="2660" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-clean-query-json5-deadcode" x="35" y="2660" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="2684" font-size="13" font-weight="bold" fill="#1a73e8">clean-query-json5-deadcode</text>
-<rect id="epic-cleanup-cc-ds-auto" x="35" y="2713" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-cleanup-cc-ds-auto" x="35" y="2713" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="2737" font-size="13" font-weight="bold" fill="#1a73e8">cleanup-cc-ds-auto</text>
-<rect id="epic-cleanup-scan" x="35" y="2766" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-cleanup-scan" x="35" y="2766" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="2790" font-size="13" font-weight="bold" fill="#1a73e8">cleanup-scan</text>
-<rect id="epic-cline-registry-config" x="35" y="2819" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-cline-registry-config" x="35" y="2819" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="2843" font-size="13" font-weight="bold" fill="#1a73e8">cline-registry-config</text>
-<rect id="epic-cline-registry-fix" x="35" y="2872" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-cline-registry-fix" x="35" y="2872" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="2896" font-size="13" font-weight="bold" fill="#1a73e8">cline-registry-fix</text>
-<rect id="epic-closeout-chain" x="35" y="2925" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-closeout-chain" x="35" y="2925" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="2949" font-size="13" font-weight="bold" fill="#1a73e8">closeout-chain</text>
-<rect id="epic-codex-acp-full-lifecycle" x="35" y="2978" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-codex-acp-full-lifecycle" x="35" y="2978" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="3002" font-size="13" font-weight="bold" fill="#1a73e8">codex-acp-full-lifecycle</text>
-<rect id="epic-config-read-fix" x="35" y="3031" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-config-read-fix" x="35" y="3031" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="3055" font-size="13" font-weight="bold" fill="#1a73e8">config-read-fix</text>
-<rect id="epic-config-toml-complete" x="35" y="3084" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-config-toml-complete" x="35" y="3084" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="3108" font-size="13" font-weight="bold" fill="#1a73e8">config-toml-complete</text>
-<rect id="epic-consistency-cleanup" x="35" y="3137" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-consistency-cleanup" x="35" y="3137" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="3161" font-size="13" font-weight="bold" fill="#1a73e8">consistency-cleanup</text>
 <rect id="epic-control-surface-runtime-convergence" x="35" y="3190" width="700" height="70" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="3214" font-size="13" font-weight="bold" fill="#1a73e8">control-surface-runtime-convergence</text>
 <rect id="story-backend-service-contract-and-adapter-taxonomy" x="55" y="3222" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
 <text x="65" y="3237" font-size="11" fill="#34a853">├ backend-service-contract-and-adapter-taxonomy</text>
-<rect id="epic-crash-dedup-comment-not-new-issue" x="35" y="3268" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-crash-dedup-comment-not-new-issue" x="35" y="3268" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="3292" font-size="13" font-weight="bold" fill="#1a73e8">crash-dedup-comment-not-new-issue</text>
-<rect id="epic-csv-dead-code-removal" x="35" y="3321" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-csv-dead-code-removal" x="35" y="3321" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="3345" font-size="13" font-weight="bold" fill="#1a73e8">csv-dead-code-removal</text>
-<rect id="epic-daemon-stop-kill-acp-bridge" x="35" y="3374" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-daemon-stop-kill-acp-bridge" x="35" y="3374" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="3398" font-size="13" font-weight="bold" fill="#1a73e8">daemon-stop-kill-acp-bridge</text>
-<rect id="epic-db-path-unify" x="35" y="3427" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-db-path-unify" x="35" y="3427" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="3451" font-size="13" font-weight="bold" fill="#1a73e8">db-path-unify</text>
-<rect id="epic-deploy-skills-registry-default" x="35" y="3480" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-deploy-skills-registry-default" x="35" y="3480" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="3504" font-size="13" font-weight="bold" fill="#1a73e8">deploy-skills-registry-default</text>
-<rect id="epic-eliminate-csv" x="35" y="3533" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-eliminate-csv" x="35" y="3533" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="3557" font-size="13" font-weight="bold" fill="#1a73e8">eliminate-csv</text>
-<rect id="epic-exit-kind-insert" x="35" y="3586" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-exit-kind-insert" x="35" y="3586" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="3610" font-size="13" font-weight="bold" fill="#1a73e8">exit-kind-insert</text>
-<rect id="epic-family-registry-driven" x="35" y="3639" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-family-registry-driven" x="35" y="3639" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="3663" font-size="13" font-weight="bold" fill="#1a73e8">family-registry-driven</text>
 <rect id="epic-feat-to-feature" x="35" y="3692" width="700" height="70" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="3716" font-size="13" font-weight="bold" fill="#1a73e8">feat-to-feature</text>
 <rect id="story-rename-completion" x="55" y="3724" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
 <text x="65" y="3739" font-size="11" fill="#34a853">├ rename-completion</text>
-<rect id="epic-feedback-adapter-fix" x="35" y="3770" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-feedback-adapter-fix" x="35" y="3770" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="3794" font-size="13" font-weight="bold" fill="#1a73e8">feedback-adapter-fix</text>
 <!-- raw-issue -->
 <rect id="epic-raw-issue" x="35" y="3823" width="700" height="70" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
@@ -158,39 +158,39 @@
 <rect id="story-multi-platform-edit" x="55" y="3851" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
 <text x="65" y="3866" font-size="11" fill="#34a853">├ multi-platform-edit</text>
 
-<rect id="epic-feedback-exit-on-error" x="35" y="3893" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-feedback-exit-on-error" x="35" y="3893" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="3917" font-size="13" font-weight="bold" fill="#1a73e8">feedback-exit-on-error</text>
-<rect id="epic-feedback-issue-sync" x="35" y="3946" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-feedback-issue-sync" x="35" y="3946" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="3970" font-size="13" font-weight="bold" fill="#1a73e8">feedback-issue-sync</text>
-<rect id="epic-feedback-platform-only" x="35" y="3999" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-feedback-platform-only" x="35" y="3999" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="4023" font-size="13" font-weight="bold" fill="#1a73e8">feedback-platform-only</text>
-<rect id="epic-fix-branch-naming" x="35" y="4052" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-fix-branch-naming" x="35" y="4052" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="4076" font-size="13" font-weight="bold" fill="#1a73e8">fix-branch-naming</text>
-<rect id="epic-fix-execution-stash-transfer" x="35" y="4105" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-fix-execution-stash-transfer" x="35" y="4105" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="4129" font-size="13" font-weight="bold" fill="#1a73e8">fix-execution-stash-transfer</text>
-<rect id="epic-fix-feature-consistency" x="35" y="4158" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-fix-feature-consistency" x="35" y="4158" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="4182" font-size="13" font-weight="bold" fill="#1a73e8">fix-feature-consistency</text>
 <rect id="epic-fix-flow-unify" x="35" y="4211" width="700" height="70" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="4235" font-size="13" font-weight="bold" fill="#1a73e8">fix-flow-unify</text>
 <rect id="story-skill-refactor" x="55" y="4243" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
 <text x="65" y="4258" font-size="11" fill="#34a853">├ skill-refactor</text>
-<rect id="epic-fix-govern-first-skill-pointer" x="35" y="4289" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-fix-govern-first-skill-pointer" x="35" y="4289" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="4313" font-size="13" font-weight="bold" fill="#1a73e8">fix-govern-first-skill-pointer</text>
-<rect id="epic-fix-pull-true" x="35" y="4342" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-fix-pull-true" x="35" y="4342" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="4366" font-size="13" font-weight="bold" fill="#1a73e8">fix-pull-true</text>
-<rect id="epic-fix-rest-routing" x="35" y="4395" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-fix-rest-routing" x="35" y="4395" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="4419" font-size="13" font-weight="bold" fill="#1a73e8">fix-rest-routing</text>
 <rect id="epic-fix-scan-cycling" x="35" y="4448" width="700" height="70" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="4472" font-size="13" font-weight="bold" fill="#1a73e8">fix-scan-cycling</text>
 <rect id="story-verify" x="55" y="4480" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
 <text x="65" y="4495" font-size="11" fill="#34a853">├ verify</text>
-<rect id="epic-fix-worker-prompts-csv" x="35" y="4526" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-fix-worker-prompts-csv" x="35" y="4526" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="4550" font-size="13" font-weight="bold" fill="#1a73e8">fix-worker-prompts-csv</text>
-<rect id="epic-force-abandon-only" x="35" y="4579" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-force-abandon-only" x="35" y="4579" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="4603" font-size="13" font-weight="bold" fill="#1a73e8">force-abandon-only</text>
-<rect id="epic-freely-db-cli-agents-fix" x="35" y="4632" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-freely-db-cli-agents-fix" x="35" y="4632" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="4656" font-size="13" font-weight="bold" fill="#1a73e8">freely-db-cli-agents-fix</text>
-<rect id="epic-freely-packaging-selfhost" x="35" y="4685" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-freely-packaging-selfhost" x="35" y="4685" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="4709" font-size="13" font-weight="bold" fill="#1a73e8">freely-packaging-selfhost</text>
 <rect id="epic-freely-product-architecture" x="35" y="4738" width="700" height="334" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="4762" font-size="13" font-weight="bold" fill="#1a73e8">freely-product-architecture</text>
@@ -218,9 +218,9 @@
 <text x="65" y="5025" font-size="11" fill="#34a853">├ worktree-helper-shell-source-compatibility-governance</text>
 <rect id="story-worktree-tool-boundary-bootstrap-governance" x="55" y="5034" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
 <text x="65" y="5049" font-size="11" fill="#34a853">├ worktree-tool-boundary-bootstrap-governance</text>
-<rect id="epic-freely-review" x="35" y="5080" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-freely-review" x="35" y="5080" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="5104" font-size="13" font-weight="bold" fill="#1a73e8">freely-review</text>
-<rect id="epic-frontend-dynamic-project-list" x="35" y="5133" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-frontend-dynamic-project-list" x="35" y="5133" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="5157" font-size="13" font-weight="bold" fill="#1a73e8">frontend-dynamic-project-list</text>
 <rect id="epic-frontend-probe-dogfooding-loop" x="35" y="5186" width="700" height="190" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="5210" font-size="13" font-weight="bold" fill="#1a73e8">frontend-probe-dogfooding-loop</text>
@@ -236,115 +236,115 @@
 <text x="65" y="5329" font-size="11" fill="#34a853">├ internal-frontend-backend-architecture-review</text>
 <rect id="story-rust-tauri-probe-bridge-v1" x="55" y="5338" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
 <text x="65" y="5353" font-size="11" fill="#34a853">├ rust-tauri-probe-bridge-v1</text>
-<rect id="epic-gate-error-skill-pointers" x="35" y="5384" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-gate-error-skill-pointers" x="35" y="5384" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="5408" font-size="13" font-weight="bold" fill="#1a73e8">gate-error-skill-pointers</text>
-<rect id="epic-gate-range-ls-tree" x="35" y="5437" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-gate-range-ls-tree" x="35" y="5437" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="5461" font-size="13" font-weight="bold" fill="#1a73e8">gate-range-ls-tree</text>
-<rect id="epic-gate-scope-alignment" x="35" y="5490" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-gate-scope-alignment" x="35" y="5490" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="5514" font-size="13" font-weight="bold" fill="#1a73e8">gate-scope-alignment</text>
-<rect id="epic-gate1-timestamp" x="35" y="5543" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-gate1-timestamp" x="35" y="5543" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="5567" font-size="13" font-weight="bold" fill="#1a73e8">gate1-timestamp</text>
-<rect id="epic-gh-merge-receipt" x="35" y="5596" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-gh-merge-receipt" x="35" y="5596" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="5620" font-size="13" font-weight="bold" fill="#1a73e8">gh-merge-receipt</text>
-<rect id="epic-governance-enforce" x="35" y="5649" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-governance-enforce" x="35" y="5649" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="5673" font-size="13" font-weight="bold" fill="#1a73e8">governance-enforce</text>
-<rect id="epic-governance-reminder" x="35" y="5702" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-governance-reminder" x="35" y="5702" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="5726" font-size="13" font-weight="bold" fill="#1a73e8">governance-reminder</text>
-<rect id="epic-handoff-fields" x="35" y="5755" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-handoff-fields" x="35" y="5755" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="5779" font-size="13" font-weight="bold" fill="#1a73e8">handoff-fields</text>
-<rect id="epic-handoff-sqlite-refactor" x="35" y="5808" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-handoff-sqlite-refactor" x="35" y="5808" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="5832" font-size="13" font-weight="bold" fill="#1a73e8">handoff-sqlite-refactor</text>
-<rect id="epic-hook-bash-local-fix" x="35" y="5861" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-hook-bash-local-fix" x="35" y="5861" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="5885" font-size="13" font-weight="bold" fill="#1a73e8">hook-bash-local-fix</text>
 <rect id="epic-i-star-wt-close-fix" x="35" y="5914" width="700" height="70" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="5938" font-size="13" font-weight="bold" fill="#1a73e8">i-star-wt-close-fix</text>
 <rect id="story-verify" x="55" y="5946" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
 <text x="65" y="5961" font-size="11" fill="#34a853">├ verify</text>
-<rect id="epic-ibm-skill-rename" x="35" y="5992" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-ibm-skill-rename" x="35" y="5992" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="6016" font-size="13" font-weight="bold" fill="#1a73e8">ibm-skill-rename</text>
-<rect id="epic-init-branch-check" x="35" y="6045" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-init-branch-check" x="35" y="6045" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="6069" font-size="13" font-weight="bold" fill="#1a73e8">init-branch-check</text>
-<rect id="epic-issue-sync-batch" x="35" y="6098" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-issue-sync-batch" x="35" y="6098" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="6122" font-size="13" font-weight="bold" fill="#1a73e8">issue-sync-batch</text>
-<rect id="epic-issue-sync-before-merge" x="35" y="6151" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-issue-sync-before-merge" x="35" y="6151" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="6175" font-size="13" font-weight="bold" fill="#1a73e8">issue-sync-before-merge</text>
-<rect id="epic-issue-sync-filter" x="35" y="6204" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-issue-sync-filter" x="35" y="6204" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="6228" font-size="13" font-weight="bold" fill="#1a73e8">issue-sync-filter</text>
-<rect id="epic-kill-ai-tool-fallback" x="35" y="6257" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-kill-ai-tool-fallback" x="35" y="6257" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="6281" font-size="13" font-weight="bold" fill="#1a73e8">kill-ai-tool-fallback</text>
 <rect id="epic-lifecycle-scan-phase-state" x="35" y="6310" width="700" height="70" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="6334" font-size="13" font-weight="bold" fill="#1a73e8">lifecycle-scan-phase-state</text>
 <rect id="story-verify" x="55" y="6342" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
 <text x="65" y="6357" font-size="11" fill="#34a853">├ verify</text>
-<rect id="epic-login-claude-interactive-slot" x="35" y="6388" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-login-claude-interactive-slot" x="35" y="6388" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="6412" font-size="13" font-weight="bold" fill="#1a73e8">login-claude-interactive-slot</text>
-<rect id="epic-loop-guard-l0-l3" x="35" y="6441" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-loop-guard-l0-l3" x="35" y="6441" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="6465" font-size="13" font-weight="bold" fill="#1a73e8">loop-guard-l0-l3</text>
-<rect id="epic-merge-absorbs-close" x="35" y="6494" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-merge-absorbs-close" x="35" y="6494" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="6518" font-size="13" font-weight="bold" fill="#1a73e8">merge-absorbs-close</text>
-<rect id="epic-merge-error-ibm-guide" x="35" y="6547" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-merge-error-ibm-guide" x="35" y="6547" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="6571" font-size="13" font-weight="bold" fill="#1a73e8">merge-error-ibm-guide</text>
-<rect id="epic-merge-guard-rebase-integrity" x="35" y="6600" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-merge-guard-rebase-integrity" x="35" y="6600" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="6624" font-size="13" font-weight="bold" fill="#1a73e8">merge-guard-rebase-integrity</text>
-<rect id="epic-merge-guarded-fix-whitelist" x="35" y="6653" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-merge-guarded-fix-whitelist" x="35" y="6653" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="6677" font-size="13" font-weight="bold" fill="#1a73e8">merge-guarded-fix-whitelist</text>
-<rect id="epic-merge-guarded-phase-state-fix" x="35" y="6706" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-merge-guarded-phase-state-fix" x="35" y="6706" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="6730" font-size="13" font-weight="bold" fill="#1a73e8">merge-guarded-phase-state-fix</text>
-<rect id="epic-merge-message-forbidden-branch-name" x="35" y="6759" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-merge-message-forbidden-branch-name" x="35" y="6759" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="6783" font-size="13" font-weight="bold" fill="#1a73e8">merge-message-forbidden-branch-name</text>
-<rect id="epic-migrate-to-adapter" x="35" y="6812" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-migrate-to-adapter" x="35" y="6812" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="6836" font-size="13" font-weight="bold" fill="#1a73e8">migrate-to-adapter</text>
-<rect id="epic-mode-switch-guard" x="35" y="6865" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-mode-switch-guard" x="35" y="6865" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="6889" font-size="13" font-weight="bold" fill="#1a73e8">mode-switch-guard</text>
-<rect id="epic-multi-project-isolation" x="35" y="6918" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-multi-project-isolation" x="35" y="6918" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="6942" font-size="13" font-weight="bold" fill="#1a73e8">multi-project-isolation</text>
-<rect id="epic-opencode-high-failure-rate" x="35" y="6971" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-opencode-high-failure-rate" x="35" y="6971" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="6995" font-size="13" font-weight="bold" fill="#1a73e8">opencode-high-failure-rate</text>
-<rect id="epic-package-version-timestamp-format" x="35" y="7024" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-package-version-timestamp-format" x="35" y="7024" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="7048" font-size="13" font-weight="bold" fill="#1a73e8">package-version-timestamp-format</text>
-<rect id="epic-parse-candidate-heading-regex" x="35" y="7077" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-parse-candidate-heading-regex" x="35" y="7077" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="7101" font-size="13" font-weight="bold" fill="#1a73e8">parse-candidate-heading-regex</text>
-<rect id="epic-parse-prompt-fix" x="35" y="7130" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-parse-prompt-fix" x="35" y="7130" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="7154" font-size="13" font-weight="bold" fill="#1a73e8">parse-prompt-fix</text>
-<rect id="epic-path-var-unify" x="35" y="7183" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-path-var-unify" x="35" y="7183" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="7207" font-size="13" font-weight="bold" fill="#1a73e8">path-var-unify</text>
-<rect id="epic-permission-unify-json-config" x="35" y="7236" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-permission-unify-json-config" x="35" y="7236" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="7260" font-size="13" font-weight="bold" fill="#1a73e8">permission-unify-json-config</text>
-<rect id="epic-platform-adapter-title-key" x="35" y="7289" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-platform-adapter-title-key" x="35" y="7289" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="7313" font-size="13" font-weight="bold" fill="#1a73e8">platform-adapter-title-key</text>
-<rect id="epic-platform-agnostic-error-msgs" x="35" y="7342" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-platform-agnostic-error-msgs" x="35" y="7342" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="7366" font-size="13" font-weight="bold" fill="#1a73e8">platform-agnostic-error-msgs</text>
-<rect id="epic-platform-only-no-local-file" x="35" y="7395" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-platform-only-no-local-file" x="35" y="7395" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="7419" font-size="13" font-weight="bold" fill="#1a73e8">platform-only-no-local-file</text>
-<rect id="epic-platform-pull-standardize" x="35" y="7448" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-platform-pull-standardize" x="35" y="7448" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="7472" font-size="13" font-weight="bold" fill="#1a73e8">platform-pull-standardize</text>
-<rect id="epic-pr-close-after-merge" x="35" y="7501" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-pr-close-after-merge" x="35" y="7501" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="7525" font-size="13" font-weight="bold" fill="#1a73e8">pr-close-after-merge</text>
-<rect id="epic-pr-create-conflict-abort" x="35" y="7554" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-pr-create-conflict-abort" x="35" y="7554" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="7578" font-size="13" font-weight="bold" fill="#1a73e8">pr-create-conflict-abort</text>
-<rect id="epic-pr-create-dirty-check-fix" x="35" y="7607" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-pr-create-dirty-check-fix" x="35" y="7607" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="7631" font-size="13" font-weight="bold" fill="#1a73e8">pr-create-dirty-check-fix</text>
-<rect id="epic-pr-create-pretests-check" x="35" y="7660" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-pr-create-pretests-check" x="35" y="7660" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="7684" font-size="13" font-weight="bold" fill="#1a73e8">pr-create-pretests-check</text>
-<rect id="epic-pr-create-pull-after-gates" x="35" y="7713" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-pr-create-pull-after-gates" x="35" y="7713" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="7737" font-size="13" font-weight="bold" fill="#1a73e8">pr-create-pull-after-gates</text>
-<rect id="epic-pr-create-rebase" x="35" y="7766" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-pr-create-rebase" x="35" y="7766" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="7790" font-size="13" font-weight="bold" fill="#1a73e8">pr-create-rebase</text>
-<rect id="epic-pr-create-untracked-refine" x="35" y="7819" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-pr-create-untracked-refine" x="35" y="7819" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="7843" font-size="13" font-weight="bold" fill="#1a73e8">pr-create-untracked-refine</text>
-<rect id="epic-pr-merge-develop-check" x="35" y="7872" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-pr-merge-develop-check" x="35" y="7872" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="7896" font-size="13" font-weight="bold" fill="#1a73e8">pr-merge-develop-check</text>
-<rect id="epic-pr-merge-flock" x="35" y="7925" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-pr-merge-flock" x="35" y="7925" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="7949" font-size="13" font-weight="bold" fill="#1a73e8">pr-merge-flock</text>
-<rect id="epic-pr-merge-guarded-fix-whitelist" x="35" y="7978" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-pr-merge-guarded-fix-whitelist" x="35" y="7978" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="8002" font-size="13" font-weight="bold" fill="#1a73e8">pr-merge-guarded-fix-whitelist</text>
-<rect id="epic-pr-merge-guarded-phase-state-fix" x="35" y="8031" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-pr-merge-guarded-phase-state-fix" x="35" y="8031" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="8055" font-size="13" font-weight="bold" fill="#1a73e8">pr-merge-guarded-phase-state-fix</text>
-<rect id="epic-pr-merge-local-merge" x="35" y="8084" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-pr-merge-local-merge" x="35" y="8084" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="8108" font-size="13" font-weight="bold" fill="#1a73e8">pr-merge-local-merge</text>
-<rect id="epic-pr-merge-review-gate" x="35" y="8137" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-pr-merge-review-gate" x="35" y="8137" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="8161" font-size="13" font-weight="bold" fill="#1a73e8">pr-merge-review-gate</text>
-<rect id="epic-pr-review-acp-reviewer" x="35" y="8190" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-pr-review-acp-reviewer" x="35" y="8190" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="8214" font-size="13" font-weight="bold" fill="#1a73e8">pr-review-acp-reviewer</text>
 <rect id="epic-pr-review-guarded" x="35" y="8243" width="700" height="22" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="8267" font-size="13" font-weight="bold" fill="#1a73e8">pr-review-guarded</text>
@@ -352,15 +352,15 @@
 <text x="50" y="8320" font-size="13" font-weight="bold" fill="#1a73e8">pr-review-push-fix</text>
 <rect id="story-verify" x="55" y="8328" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
 <text x="65" y="8343" font-size="11" fill="#34a853">├ verify</text>
-<rect id="epic-pr-review-worktree-detection" x="35" y="8374" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-pr-review-worktree-detection" x="35" y="8374" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="8398" font-size="13" font-weight="bold" fill="#1a73e8">pr-review-worktree-detection</text>
-<rect id="epic-premerge-gate-check" x="35" y="8427" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-premerge-gate-check" x="35" y="8427" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="8451" font-size="13" font-weight="bold" fill="#1a73e8">premerge-gate-check</text>
-<rect id="epic-pretests-retirement-gate-fallback" x="35" y="8480" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-pretests-retirement-gate-fallback" x="35" y="8480" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="8504" font-size="13" font-weight="bold" fill="#1a73e8">pretests-retirement-gate-fallback</text>
-<rect id="epic-process-churn-peak-fix" x="35" y="8533" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-process-churn-peak-fix" x="35" y="8533" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="8557" font-size="13" font-weight="bold" fill="#1a73e8">process-churn-peak-fix</text>
-<rect id="epic-promoted-gate-fix" x="35" y="8586" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-promoted-gate-fix" x="35" y="8586" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="8610" font-size="13" font-weight="bold" fill="#1a73e8">promoted-gate-fix</text>
 <!-- raw-issue -->
 <rect id="epic-raw-issue" x="35" y="8639" width="700" height="70" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
@@ -368,129 +368,129 @@
 <rect id="story-multi-platform-edit" x="55" y="8667" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
 <text x="65" y="8682" font-size="11" fill="#34a853">├ multi-platform-edit</text>
 
-<rect id="epic-raw-issue-pull" x="35" y="8709" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-raw-issue-pull" x="35" y="8709" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="8733" font-size="13" font-weight="bold" fill="#1a73e8">raw-issue-pull</text>
-<rect id="epic-raw-issue-pull-git-cwd" x="35" y="8762" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-raw-issue-pull-git-cwd" x="35" y="8762" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="8786" font-size="13" font-weight="bold" fill="#1a73e8">raw-issue-pull-git-cwd</text>
-<rect id="epic-raw-issue-pull-intercept" x="35" y="8815" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-raw-issue-pull-intercept" x="35" y="8815" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="8839" font-size="13" font-weight="bold" fill="#1a73e8">raw-issue-pull-intercept</text>
-<rect id="epic-raw-issue-review-fixes" x="35" y="8868" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-raw-issue-review-fixes" x="35" y="8868" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="8892" font-size="13" font-weight="bold" fill="#1a73e8">raw-issue-review-fixes</text>
-<rect id="epic-red-green-separation" x="35" y="8921" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-red-green-separation" x="35" y="8921" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="8945" font-size="13" font-weight="bold" fill="#1a73e8">red-green-separation</text>
-<rect id="epic-reference-transaction-delete-fix" x="35" y="8974" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-reference-transaction-delete-fix" x="35" y="8974" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="8998" font-size="13" font-weight="bold" fill="#1a73e8">reference-transaction-delete-fix</text>
-<rect id="epic-registry-adapter-acp-dispatch" x="35" y="9027" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-registry-adapter-acp-dispatch" x="35" y="9027" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="9051" font-size="13" font-weight="bold" fill="#1a73e8">registry-adapter-acp-dispatch</text>
-<rect id="epic-registry-probe-boundary-resume" x="35" y="9080" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-registry-probe-boundary-resume" x="35" y="9080" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="9104" font-size="13" font-weight="bold" fill="#1a73e8">registry-probe-boundary-resume</text>
 <rect id="epic-remove-absolute-timeout" x="35" y="9133" width="700" height="70" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="9157" font-size="13" font-weight="bold" fill="#1a73e8">remove-absolute-timeout</text>
 <rect id="story-remove-bridge-absolute-cap" x="55" y="9165" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
 <text x="65" y="9180" font-size="11" fill="#34a853">├ remove-bridge-absolute-cap</text>
-<rect id="epic-remove-json5-fallback" x="35" y="9211" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-remove-json5-fallback" x="35" y="9211" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="9235" font-size="13" font-weight="bold" fill="#1a73e8">remove-json5-fallback</text>
-<rect id="epic-remove-prompt-file" x="35" y="9264" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-remove-prompt-file" x="35" y="9264" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="9288" font-size="13" font-weight="bold" fill="#1a73e8">remove-prompt-file</text>
-<rect id="epic-remove-worker-csv" x="35" y="9317" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-remove-worker-csv" x="35" y="9317" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="9341" font-size="13" font-weight="bold" fill="#1a73e8">remove-worker-csv</text>
-<rect id="epic-review-test-worktree" x="35" y="9370" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-review-test-worktree" x="35" y="9370" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="9394" font-size="13" font-weight="bold" fill="#1a73e8">review-test-worktree</text>
-<rect id="epic-run-acp-prompt-remove-bypass" x="35" y="9423" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-run-acp-prompt-remove-bypass" x="35" y="9423" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="9447" font-size="13" font-weight="bold" fill="#1a73e8">run-acp-prompt-remove-bypass</text>
-<rect id="epic-runtime-dir-typo" x="35" y="9476" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-runtime-dir-typo" x="35" y="9476" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="9500" font-size="13" font-weight="bold" fill="#1a73e8">runtime-dir-typo</text>
-<rect id="epic-runtime-py-chmod" x="35" y="9529" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-runtime-py-chmod" x="35" y="9529" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="9553" font-size="13" font-weight="bold" fill="#1a73e8">runtime-py-chmod</text>
-<rect id="epic-scan-active-worker-guard-fix" x="35" y="9582" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-scan-active-worker-guard-fix" x="35" y="9582" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="9606" font-size="13" font-weight="bold" fill="#1a73e8">scan-active-worker-guard-fix</text>
-<rect id="epic-scan-agent-id-fix" x="35" y="9635" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-scan-agent-id-fix" x="35" y="9635" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="9659" font-size="13" font-weight="bold" fill="#1a73e8">scan-agent-id-fix</text>
-<rect id="epic-scan-non-rawkey-visibility" x="35" y="9688" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-scan-non-rawkey-visibility" x="35" y="9688" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="9712" font-size="13" font-weight="bold" fill="#1a73e8">scan-non-rawkey-visibility</text>
-<rect id="epic-scan-stage-prompt-mismatch" x="35" y="9741" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-scan-stage-prompt-mismatch" x="35" y="9741" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="9765" font-size="13" font-weight="bold" fill="#1a73e8">scan-stage-prompt-mismatch</text>
-<rect id="epic-scan-state-prompt-output" x="35" y="9794" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-scan-state-prompt-output" x="35" y="9794" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="9818" font-size="13" font-weight="bold" fill="#1a73e8">scan-state-prompt-output</text>
-<rect id="epic-scan-v3-refactor" x="35" y="9847" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-scan-v3-refactor" x="35" y="9847" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="9871" font-size="13" font-weight="bold" fill="#1a73e8">scan-v3-refactor</text>
-<rect id="epic-scope-warning" x="35" y="9900" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-scope-warning" x="35" y="9900" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="9924" font-size="13" font-weight="bold" fill="#1a73e8">scope-warning</text>
-<rect id="epic-semantic-conflict-receipt" x="35" y="9953" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-semantic-conflict-receipt" x="35" y="9953" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="9977" font-size="13" font-weight="bold" fill="#1a73e8">semantic-conflict-receipt</text>
-<rect id="epic-semantic-overlap" x="35" y="10006" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-semantic-overlap" x="35" y="10006" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="10030" font-size="13" font-weight="bold" fill="#1a73e8">semantic-overlap</text>
-<rect id="epic-skill-gate-alignment" x="35" y="10059" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-skill-gate-alignment" x="35" y="10059" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="10083" font-size="13" font-weight="bold" fill="#1a73e8">skill-gate-alignment</text>
-<rect id="epic-skill-name-reminder" x="35" y="10112" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-skill-name-reminder" x="35" y="10112" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="10136" font-size="13" font-weight="bold" fill="#1a73e8">skill-name-reminder</text>
-<rect id="epic-skill-ref-cleanup" x="35" y="10165" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-skill-ref-cleanup" x="35" y="10165" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="10189" font-size="13" font-weight="bold" fill="#1a73e8">skill-ref-cleanup</text>
-<rect id="epic-skill-standardize" x="35" y="10218" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-skill-standardize" x="35" y="10218" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="10242" font-size="13" font-weight="bold" fill="#1a73e8">skill-standardize</text>
 <rect id="story-description-and-chain-unify" x="55" y="10244" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
 <text x="65" y="10259" font-size="11" fill="#34a853">├ description-and-chain-unify</text>
-<rect id="epic-slot-assemble-unify" x="35" y="10271" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-slot-assemble-unify" x="35" y="10271" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="10295" font-size="13" font-weight="bold" fill="#1a73e8">slot-assemble-unify</text>
-<rect id="epic-slot-full-name-final-fixes" x="35" y="10324" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-slot-full-name-final-fixes" x="35" y="10324" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="10348" font-size="13" font-weight="bold" fill="#1a73e8">slot-full-name-final-fixes</text>
-<rect id="epic-slot-probe-generic-hi" x="35" y="10377" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-slot-probe-generic-hi" x="35" y="10377" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="10401" font-size="13" font-weight="bold" fill="#1a73e8">slot-probe-generic-hi</text>
-<rect id="epic-source-param" x="35" y="10430" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-source-param" x="35" y="10430" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="10454" font-size="13" font-weight="bold" fill="#1a73e8">source-param</text>
-<rect id="epic-sqlite3-migration" x="35" y="10483" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-sqlite3-migration" x="35" y="10483" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="10507" font-size="13" font-weight="bold" fill="#1a73e8">sqlite3-migration</text>
-<rect id="epic-sse-full-implementation" x="35" y="10536" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-sse-full-implementation" x="35" y="10536" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="10560" font-size="13" font-weight="bold" fill="#1a73e8">sse-full-implementation</text>
-<rect id="epic-stale-pid-keepalive" x="35" y="10589" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-stale-pid-keepalive" x="35" y="10589" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="10613" font-size="13" font-weight="bold" fill="#1a73e8">stale-pid-keepalive</text>
-<rect id="epic-start-lead-agent-backtick-fix" x="35" y="10642" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-start-lead-agent-backtick-fix" x="35" y="10642" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="10666" font-size="13" font-weight="bold" fill="#1a73e8">start-lead-agent-backtick-fix</text>
-<rect id="epic-stdio-transport" x="35" y="10695" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-stdio-transport" x="35" y="10695" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="10719" font-size="13" font-weight="bold" fill="#1a73e8">stdio-transport</text>
-<rect id="epic-sup-pid-file-fix" x="35" y="10748" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-sup-pid-file-fix" x="35" y="10748" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="10772" font-size="13" font-weight="bold" fill="#1a73e8">sup-pid-file-fix</text>
-<rect id="epic-supervisor-crash" x="35" y="10801" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-supervisor-crash" x="35" y="10801" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="10825" font-size="13" font-weight="bold" fill="#1a73e8">supervisor-crash</text>
-<rect id="epic-sync-pipe-fix" x="35" y="10854" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-sync-pipe-fix" x="35" y="10854" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="10878" font-size="13" font-weight="bold" fill="#1a73e8">sync-pipe-fix</text>
-<rect id="epic-task-lifecycle-scan-batch" x="35" y="10907" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-task-lifecycle-scan-batch" x="35" y="10907" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="10931" font-size="13" font-weight="bold" fill="#1a73e8">task-lifecycle-scan-batch</text>
-<rect id="epic-test-exec-anti-ghost-pass" x="35" y="10960" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-test-exec-anti-ghost-pass" x="35" y="10960" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="10984" font-size="13" font-weight="bold" fill="#1a73e8">test-exec-anti-ghost-pass</text>
-<rect id="epic-test-pre-merge-allow" x="35" y="11013" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-test-pre-merge-allow" x="35" y="11013" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="11037" font-size="13" font-weight="bold" fill="#1a73e8">test-pre-merge-allow</text>
-<rect id="epic-test-pre-merge-enforcement" x="35" y="11066" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-test-pre-merge-enforcement" x="35" y="11066" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="11090" font-size="13" font-weight="bold" fill="#1a73e8">test-pre-merge-enforcement</text>
-<rect id="epic-testing-docs-pre-tests-delegation" x="35" y="11119" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-testing-docs-pre-tests-delegation" x="35" y="11119" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="11143" font-size="13" font-weight="bold" fill="#1a73e8">testing-docs-pre-tests-delegation</text>
 <rect id="epic-testing-evidence-ladder" x="35" y="11172" width="700" height="70" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="11196" font-size="13" font-weight="bold" fill="#1a73e8">testing-evidence-ladder</text>
 <rect id="story-testing-evidence-ladder-and-gate-mapping" x="55" y="11204" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
 <text x="65" y="11219" font-size="11" fill="#34a853">├ testing-evidence-ladder-and-gate-mapping</text>
-<rect id="epic-timestamp-seconds-upgrade" x="35" y="11250" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-timestamp-seconds-upgrade" x="35" y="11250" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="11274" font-size="13" font-weight="bold" fill="#1a73e8">timestamp-seconds-upgrade</text>
-<rect id="epic-token-cost-optimization" x="35" y="11303" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-token-cost-optimization" x="35" y="11303" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="11327" font-size="13" font-weight="bold" fill="#1a73e8">token-cost-optimization</text>
-<rect id="epic-toml-array-comma-join" x="35" y="11356" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-toml-array-comma-join" x="35" y="11356" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="11380" font-size="13" font-weight="bold" fill="#1a73e8">toml-array-comma-join</text>
-<rect id="epic-tool-registry-toml" x="35" y="11409" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-tool-registry-toml" x="35" y="11409" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="11433" font-size="13" font-weight="bold" fill="#1a73e8">tool-registry-toml</text>
-<rect id="epic-type-based-alias-resolution" x="35" y="11462" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-type-based-alias-resolution" x="35" y="11462" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="11486" font-size="13" font-weight="bold" fill="#1a73e8">type-based-alias-resolution</text>
-<rect id="epic-type-resolution-env-var-prefix" x="35" y="11515" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-type-resolution-env-var-prefix" x="35" y="11515" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="11539" font-size="13" font-weight="bold" fill="#1a73e8">type-resolution-env-var-prefix</text>
-<rect id="epic-unified-platform" x="35" y="11568" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-unified-platform" x="35" y="11568" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="11592" font-size="13" font-weight="bold" fill="#1a73e8">unified-platform</text>
-<rect id="epic-wait-restart-fix" x="35" y="11621" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-wait-restart-fix" x="35" y="11621" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="11645" font-size="13" font-weight="bold" fill="#1a73e8">wait-restart-fix</text>
-<rect id="epic-while-then-typo" x="35" y="11674" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-while-then-typo" x="35" y="11674" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="11698" font-size="13" font-weight="bold" fill="#1a73e8">while-then-typo</text>
-<rect id="epic-worker-handoff-inject" x="35" y="11727" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-worker-handoff-inject" x="35" y="11727" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="11751" font-size="13" font-weight="bold" fill="#1a73e8">worker-handoff-inject</text>
-<rect id="epic-worker-launch-branch-check" x="35" y="11780" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-worker-launch-branch-check" x="35" y="11780" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="11804" font-size="13" font-weight="bold" fill="#1a73e8">worker-launch-branch-check</text>
-<rect id="epic-worker-launch-writable-redirect" x="35" y="11833" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-worker-launch-writable-redirect" x="35" y="11833" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="11857" font-size="13" font-weight="bold" fill="#1a73e8">worker-launch-writable-redirect</text>
 <rect id="epic-worker-sse-supervision" x="35" y="11886" width="700" height="70" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="11910" font-size="13" font-weight="bold" fill="#1a73e8">worker-sse-supervision</text>
@@ -808,41 +808,41 @@
 <text x="65" y="15683" font-size="11" fill="#34a853">├ worktree-hygiene-supervision-control-plane</text>
 <rect id="story-worktree-maintenance-governance" x="55" y="15692" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
 <text x="65" y="15707" font-size="11" fill="#34a853">├ worktree-maintenance-governance</text>
-<rect id="epic-worktree-guard" x="35" y="15738" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-worktree-guard" x="35" y="15738" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="15762" font-size="13" font-weight="bold" fill="#1a73e8">worktree-guard</text>
-<rect id="epic-worktree-path-architecture" x="35" y="15791" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-worktree-path-architecture" x="35" y="15791" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="15815" font-size="13" font-weight="bold" fill="#1a73e8">worktree-path-architecture</text>
-<rect id="epic-write-task-mode-ordering" x="35" y="15844" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-write-task-mode-ordering" x="35" y="15844" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="15868" font-size="13" font-weight="bold" fill="#1a73e8">write-task-mode-ordering</text>
-<rect id="epic-wt-close-branch-d-check" x="35" y="15897" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-wt-close-branch-d-check" x="35" y="15897" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="15921" font-size="13" font-weight="bold" fill="#1a73e8">wt-close-branch-d-check</text>
-<rect id="epic-wt-close-consistency" x="35" y="15950" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-wt-close-consistency" x="35" y="15950" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="15974" font-size="13" font-weight="bold" fill="#1a73e8">wt-close-consistency</text>
-<rect id="epic-wt-close-force-overwrite-fix" x="35" y="16003" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-wt-close-force-overwrite-fix" x="35" y="16003" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="16027" font-size="13" font-weight="bold" fill="#1a73e8">wt-close-force-overwrite-fix</text>
-<rect id="epic-wt-close-force-phase6b" x="35" y="16056" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-wt-close-force-phase6b" x="35" y="16056" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="16080" font-size="13" font-weight="bold" fill="#1a73e8">wt-close-force-phase6b</text>
-<rect id="epic-wt-close-gate-args" x="35" y="16109" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-wt-close-gate-args" x="35" y="16109" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="16133" font-size="13" font-weight="bold" fill="#1a73e8">wt-close-gate-args</text>
 <rect id="epic-wt-close-local-fix" x="35" y="16162" width="700" height="70" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="16186" font-size="13" font-weight="bold" fill="#1a73e8">wt-close-local-fix</text>
 <rect id="story-verify" x="55" y="16194" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
 <text x="65" y="16209" font-size="11" fill="#34a853">├ verify</text>
-<rect id="epic-wt-close-prune-stale-refs" x="35" y="16240" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-wt-close-prune-stale-refs" x="35" y="16240" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="16264" font-size="13" font-weight="bold" fill="#1a73e8">wt-close-prune-stale-refs</text>
-<rect id="epic-wt-close-remote-delete-fix" x="35" y="16293" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-wt-close-remote-delete-fix" x="35" y="16293" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="16317" font-size="13" font-weight="bold" fill="#1a73e8">wt-close-remote-delete-fix</text>
-<rect id="epic-wt-create-chat-inbox-id-bug" x="35" y="16346" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-wt-create-chat-inbox-id-bug" x="35" y="16346" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="16370" font-size="13" font-weight="bold" fill="#1a73e8">wt-create-chat-inbox-id-bug</text>
-<rect id="epic-wt-create-dual" x="35" y="16399" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-wt-create-dual" x="35" y="16399" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="16423" font-size="13" font-weight="bold" fill="#1a73e8">wt-create-dual</text>
-<rect id="epic-wt-create-fix" x="35" y="16452" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-wt-create-fix" x="35" y="16452" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="16476" font-size="13" font-weight="bold" fill="#1a73e8">wt-create-fix</text>
-<rect id="epic-wt-create-order" x="35" y="16505" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-wt-create-order" x="35" y="16505" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="16529" font-size="13" font-weight="bold" fill="#1a73e8">wt-create-order</text>
-<rect id="epic-wt-create-pull-after-worktree" x="35" y="16558" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-wt-create-pull-after-worktree" x="35" y="16558" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="16582" font-size="13" font-weight="bold" fill="#1a73e8">wt-create-pull-after-worktree</text>
-<rect id="epic-wt-create-skill-prompt" x="35" y="16611" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<rect id="epic-wt-create-skill-prompt" x="35" y="16611" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="16635" font-size="13" font-weight="bold" fill="#1a73e8">wt-create-skill-prompt</text>
 
   <rect id="epic-command-normalize" x="35" y="16664" width="700" height="70" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
@@ -960,9 +960,9 @@
   <rect id="story-close-ibm-loophole" x="55" y="18545" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
   <text x="65" y="18560" font-size="11" fill="#333">close-ibm-loophole</text>
 
-<rect id="epic-workflow" x="35" y="18380" width="700" height="143" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
-<text x="50" y="18404" font-size="13" font-weight="bold" fill="#1a73e8">workflow</text>
-<rect id="story-wt-close" x="65" y="18392" width="670" height="35" fill="#f0f4ff" stroke="#669df6" stroke-width="1.5" rx="3"/>
-<text x="80" y="18414" font-size="12" fill="#1a73e8">wt-close</text>
+<rect id="epic-workflow" x="35" y="18613" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<text x="50" y="18637" font-size="13" font-weight="bold" fill="#1a73e8">workflow</text>
+<rect id="story-wt-close" x="65" y="18653" width="670" height="35" fill="#f0f4ff" stroke="#669df6" stroke-width="1.5" rx="3"/>
+<text x="80" y="18675" font-size="12" fill="#1a73e8">wt-close</text>
 
 </svg>
