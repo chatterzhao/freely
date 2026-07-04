@@ -371,3 +371,102 @@ def acp_session_connect(project, raw_key, role, agent_id, slot, ...):
 2. bridge socket 命名为 `/tmp/freely-acp-{project_hash}-{base_tool}.sock`
 3. fork 跨 slot 策略: 同 bridge 内跨 slot fork? 还是必须同 slot?
 4. bridge 生命周期: 与 manager bridge 一致（随 daemon 启停）
+
+## 多 Bridge 协作分析
+
+### 当前 vs 重构后
+
+```
+当前 (1 bridge per project):
+  /tmp/freely-acp-{hash}.sock  ← 所有 agent 共用
+
+重构后 (1 bridge per base_tool):
+  /tmp/freely-acp-{hash}-opencode.sock  ← manager/worker/reviewer 用 opencode 的走这个
+  /tmp/freely-acp-{hash}-claude.sock    ← 有 agent 用 claude 才启动
+  /tmp/freely-acp-{hash}-codex.sock     ← 同上
+```
+
+### daemon 启动流程
+
+```
+1. load_config → 读 agent-table.toml
+   获取所有 role 的 slot:
+     manager_slot  = opencode-apikey-ds-flash-auto
+     worker_slot   = opencode-apikey-openai-gpt-auto
+     reviewer_slot = claude-apikey-ds-flash-auto
+
+2. 提取所有唯一 base_tool: {opencode, claude}
+
+3. 为每个 base_tool 调用 _ensure_acp_bridge_running(base_tool):
+     → opencode bridge: binary=opencode, args=acp, config=...
+     → claude bridge:   binary=claude-agent-acp, config=...
+
+4. bridge 注册表 (内存或 agent_working):
+     opencode → /tmp/freely-acp-{hash}-opencode.sock
+     claude   → /tmp/freely-acp-{hash}-claude.sock
+```
+
+### acp_session_connect 的 bridge 路由
+
+```python
+def acp_session_connect(project, raw_key, role, agent_id, slot, ...):
+    base_tool = _extract_base_tool(slot)  # slot → opencode / claude
+    bridge = _resolve_bridge_socket(project, base_tool)
+    
+    # 后续所有操作 (new/fork/resume/prompt) 都走这个 bridge
+    
+    # fork 约束:
+    #   同 bridge + 同 slot → fork ✅ (最佳: 完全同配)
+    #   同 bridge + 不同 slot → new ⚠️ (不同 settings.json, fork 可能继承错配置)
+    #   不同 bridge → new ❌ (不同二进制, 不可能 fork)
+```
+
+### fork 策略细化
+
+| parent slot | child slot | base_tool | bridge | fork? | 理由 |
+|------|------|------|------|:---:|------|
+| opencode-ds-flash | opencode-ds-flash | 同 | 同 | ✅ fork | 完全相同, 最佳 |
+| opencode-ds-flash | opencode-openai-gpt | 同 | 同 | ❌ new | 不同 settings.json |
+| opencode-* | claude-* | 不同 | 不同 | ❌ new | 不同二进制 |
+
+### start-lead-agent.sh 的变化
+
+当前 worker prompt 不传 slot → agent-table 查询得到 slot → 但 bridge 已定。
+
+重构后:
+```
+start-lead-agent.sh
+  1. 从 worker worktree 的 agent-table 查该 role 的 slot
+  2. slot → base_tool → bridge socket
+  3. acp_session_connect(slot=..., base_tool=...)
+     → 内部用正确的 bridge 创建 session
+```
+
+### 本期 (raw-20260704T064539Z) 要做的
+
+- `_resolve_bridge_socket(project, base_tool)` 签名预留 base_tool 参数
+- 本期 base_tool 参数被忽略，始终返回唯一 bridge
+- `acp_session_connect` 所有 session 操作通过 `_resolve_bridge_socket` 获取 bridge
+
+### 下期 (raw-20260704T080808Z) 要做的
+
+- daemon start 时扫描 agent-table 所有 base_tool
+- `_ensure_acp_bridge_running` 改为 per-base_tool 调用
+- bridge socket 命名改为 `/tmp/freely-acp-{hash}-{base_tool}.sock`
+- `_resolve_bridge_socket` 实现 base_tool → socket 映射
+- fork 跨 slot 检测
+
+### 两个 issue 的关系
+
+```
+raw-20260704T064539Z (本期): 统一 session 管理
+  ↓ 前提
+raw-20260704T080808Z (下期): 多 bridge 并行
+
+本期不依赖下期，但需预留扩展点。
+下期依赖本期 — acp_session_connect 已抽象好，只需改 bridge 路由。
+```
+
+### 是否需要并行开工位？
+
+不需要。本期是前提——先统一 session 管理，再在统一的基础上做多 bridge。两个 issue 串行，本期设计预留足够。
