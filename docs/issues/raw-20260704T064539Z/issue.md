@@ -57,3 +57,4 @@ session/new、session/fork、session/resume 三种创建方式，但没有统一
 重命名:
 - CLAUDE_SESSION_ID_CURRENT → TOOL_SESSION_ID_CURRENT
 - 相关引用全局替换
+absorbed_into: I-20260704T064539Z-A

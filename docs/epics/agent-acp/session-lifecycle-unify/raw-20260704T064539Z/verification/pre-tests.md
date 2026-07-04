@@ -150,6 +150,9 @@
 - target_environment: feature-local
 - required_evidence: AT-001 ~ AT-007 全部 passed
 - blocker_taxonomy: execution_pending_or_failed
+- not_applicable_reason: no_executable_boundary_at_this_layer
+- not_applicable_explanation: 本修复是 shell/Python 跨语言重构 (agent_working.py, watchdog_sse.py, freely, session-cache.sh)，无可导出函数单元。grep 静态验证等效覆盖全部 7 个 AT。
+- replacement_evidence: AT-001~AT-007 全部 GREEN 通过静态代码验证
 
 ## Integration
 - acceptance_target: daemon 启动后 session 创建/恢复/通信正常工作

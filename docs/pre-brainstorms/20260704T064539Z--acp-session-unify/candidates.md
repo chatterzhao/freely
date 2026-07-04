@@ -10,7 +10,8 @@ milestone: M-20260704T064539Z-A
 
 - candidate_format_version: v2
 - title: 统一 ACP session 管理方法 — acp_session_connect + bridge 解耦 + slot 检测
-- status: promoted
+- status: absorbed
+- absorbed_into: I-20260704T064539Z-A
 - decision_reason: |
   12 个分散的 session 调用点 → 1 个 acp_session_connect()。
   7 处 bridge 耦合 → 签名预留 base_tool，三层解耦。
@@ -37,6 +38,6 @@ milestone: M-20260704T064539Z-A
   - summary: 审查 session 统一 + bridge 解耦方案，确认三层架构合理
   - verdict: pass
 - promoted_issue_id: I-20260704T064539Z-A
-- promoted_issue_path: docs/epics/{epic-name}/{story-name}/raw-20260704T064539Z/issues/I-20260704T064539Z-A.md
+- promoted_issue_path: docs/epics/agent-acp/session-lifecycle-unify/raw-20260704T064539Z/issues/I-20260704T064539Z-A.md
 - milestone: M-20260704T064539Z-A
 - session_refs: []
