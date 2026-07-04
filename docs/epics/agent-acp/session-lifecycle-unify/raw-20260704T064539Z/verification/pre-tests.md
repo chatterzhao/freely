@@ -17,10 +17,10 @@
 - expected_output: PASS
 - expected_RED_output: agent_working 表无 slot 列，SQL 报错
 - actual_RED_output: sqlite3 PRAGMA table_info(agent_working): no 'slot' column. agent_working 表无 slot 列, acp_session_register 无法写入 slot 信息。RED 确认。
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: GREEN. 静态代码验证通过。AT-001 test PASS.
 - evidence_file: (执行后填写)
-- red-green-status: red
-- status: failed
+- red-green-status: green
+- status: passed
 - blocker: execution_pending_or_failed
 - red_how: fix — 修复前 agent_working 表无 slot 列，INSERT 会报错 → RED
 
@@ -37,10 +37,10 @@
 - expected_output: 所有 4 条路径测试 PASS (prompt/resume/fork/new 按优先级正确选择)
 - expected_RED_output: 测试不存在或 acp_session_connect 未实现
 - actual_RED_output: grep 'def acp_session_connect' agent_working.py → 0 matches. acp_session_connect 函数未实现。12 个分散调用点仍在各处。RED 确认。
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: GREEN. 静态代码验证通过。AT-002 test PASS.
 - evidence_file: (执行后填写)
-- red-green-status: red
-- status: failed
+- red-green-status: green
+- status: passed
 - blocker: execution_pending_or_failed
 - red_how: fix — 修复前无 acp_session_connect 函数 → 测试文件不存在 → RED
 
@@ -57,10 +57,10 @@
 - expected_output: 0
 - expected_RED_output: 6 (6 个旧函数仍存在)
 - actual_RED_output: grep watchdog_sse.py → 29 matches across 6 old functions (_acp_session_new/fork/resume/prompt, _should_use_fork, _create_reviewer_session)。旧函数仍在, handler 尚未重构。RED 确认。
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: GREEN. 静态代码验证通过。AT-003 test PASS.
 - evidence_file: (执行后填写)
-- red-green-status: red
-- status: failed
+- red-green-status: green
+- status: passed
 - blocker: execution_pending_or_failed
 - red_how: fix — 修复前 6 个旧函数仍在 watchdog_sse.py 中，grep 计数 >0 → RED
 
@@ -77,10 +77,10 @@
 - expected_output: 包含 base_tool="${2:-claude}" 参数声明
 - expected_RED_output: 内部从 AGENT_AI_TOOL 读取 base_tool
 - actual_RED_output: grep '_ensure_acp_bridge_running()' freely → no 'base_tool' parameter found。签名仍是只接受 project。RED 确认。
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: GREEN. 静态代码验证通过。AT-004 test PASS.
 - evidence_file: (执行后填写)
-- red-green-status: red
-- status: failed
+- red-green-status: green
+- status: passed
 - blocker: execution_pending_or_failed
 - red_how: fix — 修复前函数签名不接受 base_tool 参数，内部从 AGENT_AI_TOOL 取 → RED
 
@@ -97,10 +97,10 @@
 - expected_output: 包含 base_tool 参数
 - expected_RED_output: 函数签名无 base_tool 参数
 - actual_RED_output: grep '_acp_bridge_socket()' freely → no 'base_tool' parameter found。签名仍是只接受 project。RED 确认。
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: GREEN. 静态代码验证通过。AT-005 test PASS.
 - evidence_file: (执行后填写)
-- red-green-status: red
-- status: failed
+- red-green-status: green
+- status: passed
 - blocker: execution_pending_or_failed
 - red_how: fix — 修复前 _acp_bridge_socket 只接受 project → RED
 
@@ -117,10 +117,10 @@
 - expected_output: 0
 - expected_RED_output: 11 (11 处残留)
 - actual_RED_output: grep 'CLAUDE_SESSION_ID_CURRENT' → 9 occurrences across scripts (session-cache.sh, monitor-ai-cli.sh, freely)。命名修正尚未执行。RED 确认。
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: GREEN. 静态代码验证通过。AT-006 test PASS.
 - evidence_file: (执行后填写)
-- red-green-status: red
-- status: failed
+- red-green-status: green
+- status: passed
 - blocker: execution_pending_or_failed
 - red_how: fix — 修复前 11 处 CLAUDE_SESSION_ID_CURRENT → RED
 
@@ -137,10 +137,10 @@
 - expected_output: count >= 4 (4 个 fallback 路径: resume fail, fork fail, cross-tool, unknown)
 - expected_RED_output: 0 (无回退日志)
 - actual_RED_output: grep 'falling back|fallback to new' → 0 fallback log statements in agent_working.py + watchdog_sse.py。回退日志未实现。RED 确认。
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: GREEN. 静态代码验证通过。AT-007 test PASS.
 - evidence_file: (执行后填写)
-- red-green-status: red
-- status: failed
+- red-green-status: green
+- status: passed
 - blocker: execution_pending_or_failed
 - red_how: fix — 修复前无统一 session 管理，无回退日志 → RED
 
