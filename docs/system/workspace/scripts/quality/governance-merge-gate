@@ -1277,13 +1277,15 @@ def main() -> int:
     if not governance_only_merge:
         if not candidate_driven_evidence:
             errors.append(
-                "This develop-bound merge has no raw/C/M/I lifecycle evidence. Every worktree must start from a raw-* issue (chat or platform), proceed through B1 pre-brainstorm research, and hit a traceable C-* candidate in the merge diff. "
-                "Continue existing research by updating its raw/candidate/issue/progress/review artifacts, or if this is a completed-family reopen, create a new raw issue and new candidate that records reopen_of_issue and reopen_reason before replaying the merge."
+                "此 merge 没有按 skill:freely-doc-B1_IBM-execution 治理产出的文档 (brainstorms.md + candidates.md 在 docs/pre-brainstorms/ 下)。"
+                "每个工位必须先加载 skill:freely-workflow-guarded-execution → 创建 raw issue → wt-create → 加载 skill:freely-doc-B1_IBM-execution 完成预研 → 产出 candidate 后才能写代码。"
+                "如果是已有 issue 的延续，在当前工位继续更新其治理文档即可；如果是已完成 issue 的重新打开，需创建新 raw issue + 新 candidate 并记录 reopen_of_issue。"
             )
 
         if not issue_bound_evidence:
             errors.append(
-                "This develop-bound merge is not based on a specific issue. Raw-* or candidate-only evidence is not enough for an implementation-bearing develop merge: the merge diff must carry a concrete I-* issue with progress/review owner, and then the raw/C/M/I chain must still validate."
+                "此 merge 没有按 skill:freely-doc-B2_IBM-execution 治理产出的文档 (I-* issue 在 docs/epics/ 下 + prd.md + pre-tests.md + tasks.md)。"
+                "B1 完成后，必须加载 skill:freely-doc-B2_IBM-execution → 确定 epic/story → 物化 I-* issue + prd + pre-tests + tasks + IDN → 更新 milestones.md committed_issues → phase_state=done_b2_ibm 后才能进入 dev 写代码。"
             )
 
     for candidate in candidate_records:
