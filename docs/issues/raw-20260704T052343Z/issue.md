@@ -39,3 +39,4 @@ session_refs: []
 
 1. pre-commit.sh line 29: 孤儿分支提示
 2. freely line 16597: completed/zombie worker 提示
+absorbed_into: I-20260704T052343Z-A
