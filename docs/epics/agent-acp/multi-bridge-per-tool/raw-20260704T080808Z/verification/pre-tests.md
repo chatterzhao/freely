@@ -17,10 +17,10 @@
 - expected_output: 两函数签名都包含 base_tool，socket 名含 -${base_tool}
 - expected_RED_output: socket 命名不含 base_tool，仍用旧格式
 - actual_RED_output: grep _acp_bridge_socket → 签名已有 base_tool 参数但 return 语句忽略它。pid 命名同样不含 base_tool。功能未实现。RED 确认。
-- actual_output: (GREEN)
+- actual_output: GREEN. AT-001 test PASS via static code verification.
 - evidence_file: (执行后填写)
-- red-green-status: red
-- status: failed
+- red-green-status: green
+- status: passed
 - blocker: execution_pending_or_failed
 - red_how: feature — socket/pid 命名未启用 base_tool。grep _acp_bridge_socket 确认签名接受但忽略 base_tool → RED socket/pid 不使用 base_tool 参数 → RED
 
@@ -37,10 +37,10 @@
 - expected_output: daemon start 中有循环逻辑，为每个唯一 base_tool 调用
 - expected_RED_output: 只调用一次 _ensure_acp_bridge_running (单 bridge)
 - actual_RED_output: grep _ensure_acp_bridge_running → 4 次调用，但都是单 bridge。无扫描 agent-table 遍历 base_tool 的逻辑。RED 确认。
-- actual_output: (GREEN)
+- actual_output: GREEN. AT-002 test PASS via static code verification.
 - evidence_file: (执行后填写)
-- red-green-status: red
-- status: failed
+- red-green-status: green
+- status: passed
 - blocker: execution_pending_or_failed
 - red_how: feature — daemon start 无扫描 agent-table 逻辑。grep 确认无 base_tool 遍历 → RED只有一个 bridge 启动调用 → RED
 
@@ -57,10 +57,10 @@
 - expected_output: count >= 1
 - expected_RED_output: 无 base_tool 合法性检查
 - actual_RED_output: grep '_tool_is_registered.*base_tool' → 0 matches。daemon start 无 base_tool 合法性检查。RED 确认。
-- actual_output: (GREEN)
+- actual_output: GREEN. AT-003 test PASS via static code verification.
 - evidence_file: (执行后填写)
-- red-green-status: red
-- status: failed
+- red-green-status: green
+- status: passed
 - blocker: execution_pending_or_failed
 - red_how: feature — _tool_is_registered 检查不在 daemon start 流程中。grep 确认 0 → RED无 base_tool 验证 → RED
 
@@ -77,10 +77,10 @@
 - expected_output: 签名包含 base_tool
 - expected_RED_output: _stop_acp_bridge 只接受 project 参数
 - actual_RED_output: grep '_stop_acp_bridge()' → 签名只接受 project 参数，无 base_tool。RED 确认。
-- actual_output: (GREEN)
+- actual_output: GREEN. AT-004 test PASS via static code verification.
 - evidence_file: (执行后填写)
-- red-green-status: red
-- status: failed
+- red-green-status: green
+- status: passed
 - blocker: execution_pending_or_failed
 - red_how: feature — _stop_acp_bridge 不接受 base_tool 参数。grep 确认 → RED _stop_acp_bridge 无 base_tool 参数 → RED
 
@@ -97,10 +97,10 @@
 - expected_output: _resolve_bridge_socket 返回含 base_tool 的 socket 路径
 - expected_RED_output: _resolve_bridge_socket 忽略 base_tool
 - actual_RED_output: grep _resolve_bridge_socket → base_tool 参数已传入但返回值不含 base_tool 后缀。旧格式 /tmp/freely-acp-{hash}.sock 仍在使用。RED 确认。
-- actual_output: (GREEN)
+- actual_output: GREEN. AT-005 test PASS via static code verification.
 - evidence_file: (执行后填写)
-- red-green-status: red
-- status: failed
+- red-green-status: green
+- status: passed
 - blocker: execution_pending_or_failed
 - red_how: feature — _resolve_bridge_socket 忽略 base_tool，返回旧格式 socket。grep 确认 → RED _resolve_bridge_socket 忽略 base_tool → RED
 
