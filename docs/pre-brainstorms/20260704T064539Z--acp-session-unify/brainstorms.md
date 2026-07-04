@@ -39,32 +39,55 @@ L3 Agent Logic (watchdog, freely)
 ```
 acp_session_connect(project, raw_key, role, agent_id, slot, message?, force_new?)
 
-  force_new? → session/new    (gate review, 跨 tool, 用户显式)
+  # ── 0. 显式要求 new ──
+  force_new? → session/new  (gate review, 跨 base_tool, 用户显式)
 
+  # ── 1. 有 session_id? ──
   查 agent_working → 有 session_id?
+  ├─ 有 + alive + msg  → prompt
+  ├─ 有 + alive no msg → return id
+  ├─ 有 + dead + msg   → resume → ok → prompt
+  │                              → fail → fallback new + log
+  └─ 有 + dead no msg  → resume → ok → return
+                                  → fail → fallback new + log
 
-  ├─ 有
-  │   ├─ slot 不同? → new + log("slot changed: {old} → {new}")
-  │   │              主动检测，不浪费时间 resume
-  │   │
-  │   └─ slot 相同
-  │       ├─ alive + msg  → prompt
-  │       ├─ alive no msg → return id
-  │       ├─ dead + msg   → resume → ok → prompt
-  │       │                         → fail → new + log("resume failed: {err}")
-  │       └─ dead no msg  → resume → ok → return
-  │                                 → fail → new + log("resume failed: {err}")
-  └─ 无
-      ├─ 同 tool + mgr 有 session → fork(Mgr)
-      │   fork 失败 → new + log("fork failed: {err}")
-      └─ 跨 tool → new + log("cross-tool, using new")
+  # ── 2. 无 session，创建新 session ──
+  #     两种 new: fork (同 base_tool) 优先于 session/new
+  无 session_id
+  ├─ 同 base_tool + mgr 有 session → fork(Mgr)
+  │   fork 失败 → fallback new + log
+  └─ 跨 base_tool → new + log
 ```
+
+### fork 条件：同 base_tool，非同 slot
+
+```
+fork 只要求 ACP binary 相同。同 base_tool 不同 slot 完全可以 fork:
+  Manager:  opencode-apikey-ds-flash 
+  Worker:   opencode-apikey-openai-gpt
+  → 同 base_tool = opencode → fork ✅ (不同 slot 不影响 fork)
+
+fork 不行的只有跨 base_tool:
+  Manager:  opencode-*
+  Worker:   claude-*
+  → base_tool 不同 → fork ❌ → session/new
+```
+
+### 两种 new
+
+| 类型 | 场景 | 日志 |
+|------|------|------|
+| **fork** (优先) | 同 base_tool，无 session | 正常，不记日志 |
+| **session/new** (主动) | 跨 base_tool，force_new，gate review | `"using new: {reason}"` |
+| **session/new** (兜底) | resume 失败，fork 失败，未知异常 | `"falling back to new after {op} failed: {err}"` |
 
 ### 设计原则
 
-**主动检测 (主路径):** slot 变了直接 new，日志清晰记录原因。不浪费 time+cost 尝试必然失败的 resume。
+**能 fork 必须 fork (同 base_tool):** 继承 context，缓存命中。不同 slot 也能 fork——slot 决定 model/provider，不影响 fork。
 
-**回退兜底 (安全网):** resume/fork 意外失败 → new + 日志。即使同 slot 理论上应该成功，runtime 也可能出问题（bridge 重启等），兜底保证不阻塞。
+**resume 不预检 slot:** 不判断 slot 是否变了。直接尝试 resume——同 base_tool 不同 slot 可能成功，失败了自然回退 new + 日志。
+
+**回退兜底:** 任何操作意外失败 → new + 日志。保证不阻塞，方便调试。
 
 ## 本期关键改动
 
