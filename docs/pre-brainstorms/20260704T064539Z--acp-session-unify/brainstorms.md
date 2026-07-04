@@ -154,3 +154,196 @@ watchdog 发任务 (死)      → 场景 #3 (dead+message) → session/resume+pr
 - candidate_id: C-20260704T064539Z-A
 - status: promoted
 - milestone: M-20260704T064539Z-A
+
+## Refactoring Plan: 12 → 1
+
+### Before/After 对照
+
+#### 1. freely shell — Manager session register
+
+**Before** (`_persist_session_anchor_early`, line 4033-4055):
+```bash
+python3 -c "
+from agent_working import agent_assign
+agent_assign('${project}', '__manager__', 'manager', 'manager_01',
+             worktree='${project}', branch='develop',
+             session_id='${CLAUDE_SESSION_ID_CURRENT:-}')  # ← 可能空
+"  # ← 缺 slot
+```
+
+**After**:
+```bash
+python3 -c "
+from agent_working import acp_session_register
+acp_session_register('${project}', '__manager__', 'manager', 'manager_01',
+                     session_id='${TOOL_SESSION_ID_CURRENT:-}',
+                     slot='${AGENT_AI_TOOL}',           # ← 新增
+                     worktree='${project}', branch='develop')
+"
+```
+
+#### 2. watchdog — _handle_needs_reviewer (reviewer session decision)
+
+**Before** (70 行逻辑，手动判断 alive→prompt / dead→fork→new):
+```python
+# Step 1: Check alive session
+existing = agent_list_by_raw_key(project, raw_key)
+if existing and existing.get("reviewer_id"):
+    sid = agent_get_session(project, raw_key, "reviewer")
+    if sid:
+        if _acp_session_prompt(project, sid, task_msg):
+            return     # alive → prompt
+        # prompt failed → return (don't allocate second reviewer)
+    else:
+        _create_reviewer_session(project, raw_key, rid, ...)  # dead → fork→new
+    return
+# Step 2: Allocate next free
+reviewer_id = agent_next_free(project, "reviewer", 99)
+_create_reviewer_session(project, raw_key, reviewer_id, ...)
+```
+
+**After**:
+```python
+sid, op = acp_session_connect(
+    project, raw_key, "reviewer", reviewer_id,
+    slot=reviewer_slot,           # ← 新增 slot 匹配
+    message=task_msg,
+    force_new=(reason == NEEDS_REVIEW_GATE)  # gate → new
+)
+# 内部自动决策: prompt > resume > fork(Mgr) > new
+```
+
+#### 3. watchdog — _handle_needs_worker (worker session decision)
+
+**Before** (50 行逻辑，手动判断 prompt→fork→new→delegate):
+```python
+sid = agent_get_session(project, raw_key, "worker")
+if sid:
+    if _acp_session_prompt(project, sid, verdict_msg): return
+# Try fork from Manager
+session_id = _acp_session_fork(project, "manager", "worker", wid, raw_key)
+if session_id:
+    agent_assign(project, raw_key, "worker", f"{wid}:{session_id}")
+else:
+    new_sid = _acp_session_new(project, "worker", wid)
+    agent_assign(project, raw_key, "worker", f"{wid}:{new_sid}")
+```
+
+**After**:
+```python
+sid, op = acp_session_connect(
+    project, raw_key, "worker", wid,
+    slot=worker_slot,
+    message=verdict_msg
+)
+# 内部: prompt(alive) → resume(dead+slot匹配) → fork(Mgr) → new
+```
+
+#### 4. watchdog — _handle_needs_manager (manager 被唤醒)
+
+**Before** (40 行逻辑):
+```python
+sid = agent_get_session(project, "__manager__", "manager")
+if sid:
+    if _acp_session_prompt(...): return
+# No alive → session/new
+new_sid = _acp_session_new(project, "manager", "manager_01")
+agent_assign(project, "__manager__", "manager", f"manager_01:{new_sid}")
+```
+
+**After**:
+```python
+sid, op = acp_session_connect(
+    project, "__manager__", "manager", "manager_01",
+    slot=manager_slot,
+    message=mgr_msg
+)
+# 内部: prompt(alive) → resume(dead+slot匹配) → new
+# Manager 不 fork（它是 fork 的源）
+```
+
+#### 5. freely shell — Worker launch (line 13209)
+
+**Before** (直接 fork，无 session 决策):
+```bash
+export SESSION_PARENT_ID="${CLAUDE_SESSION_ID_CURRENT:-}"
+python3 run-acp-prompt.py --launch-kind fork --bridge-socket ...
+# agent_assign 由 _persist_session_anchor_early 在 worker daemon 中调用
+```
+
+**After**:
+```bash
+python3 -c "
+from agent_working import acp_session_connect
+sid, op = acp_session_connect(
+    '${target_project}', '${raw_key}', 'worker', '${worker_id}',
+    slot='${worker_slot}',
+    message='${prompt_file}'  # task prompt as message
+)
+# run-acp-prompt.py 不再自己选 session 操作，传 launch_kind=connect
+"
+```
+
+#### 6. freely shell — _ensure_reviewer_agent (line 18764)
+
+**Before** (直接 session/new via bridge socket):
+```python
+req = json.dumps({'method':'session/new','params':{'sessionId':...,'cwd':...}})
+# 之后 agent_assign(reviewer, session_id=sid) — 缺 worktree/branch/slot
+```
+
+**After**:
+```python
+sid, op = acp_session_connect(
+    project, raw_key, "reviewer", reviewer_id,
+    slot=reviewer_slot,
+    worktree=worktree, branch=branch
+)
+```
+
+#### 7. run-acp-prompt.py — session dispatch (line 420-495)
+
+**Before** (80 行 if/elif 分发 fresh/resume/fork/prompt):
+```python
+if launch_kind == "resume":
+    session_result = client.request("session/resume", ...)
+elif launch_kind == "prompt":
+    session_id = resume_target
+elif launch_kind == "fork":
+    session_result = client.request("session/fork", ...)
+else:  # fresh
+    session_result = client.request("session/new", ...)
+```
+
+**After** (新增 `launch_kind=connect` 模式):
+```python
+if launch_kind == "connect":
+    # Session 操作由上游 acp_session_connect 决策
+    # run-acp-prompt.py 只需执行指定的操作
+    session_result = _execute_given_operation(args.operation, args.session_id, ...)
+else:
+    # 兼容旧 launch_kind (fresh/resume/fork/prompt) 逐步迁移
+    ...
+```
+
+### 删除的代码
+
+| 删除 | 文件 | 行数 |
+|------|------|------|
+| `_should_use_fork()` | watchdog_sse.py | ~25 行 |
+| `_create_reviewer_session()` | watchdog_sse.py | ~50 行 |
+| `_acp_session_new()` | watchdog_sse.py | ~12 行 |
+| `_acp_session_fork()` | watchdog_sse.py | ~30 行 |
+| `_acp_session_resume()` | watchdog_sse.py | ~15 行 |
+| `_acp_session_prompt()` | watchdog_sse.py | ~10 行 |
+| session 分发 if/elif | watchdog `_handle_needs_*` | ~100 行 |
+| agent_assign 裸调用 | watchdog + freely | ~8 处 |
+
+### 新增的代码
+
+| 新增 | 文件 | 行数 |
+|------|------|------|
+| `acp_session_connect()` | agent_working.py | ~80 行 |
+| `acp_session_register()` | agent_working.py | ~15 行 |
+| slot 列 | freely_db_manager.py | 1 行 ALTER |
+| 命名替换 | 3 文件 | 11 处 |
