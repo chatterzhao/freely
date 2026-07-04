@@ -106,17 +106,19 @@ def _kill_descendants(parent_pid):
 class AcpBridge:
     """Relays JSON-RPC between Unix socket clients and claude-agent-acp stdin/stdout."""
 
-    def __init__(self, project, acp_bin="claude-agent-acp", log_file=None, acp_args=None):
+    def __init__(self, project, acp_bin="claude-agent-acp", log_file=None, acp_args=None,
+                 base_tool=""):
         self.project = project
         self.acp_bin = acp_bin
         self.acp_args = acp_args or []  # tool-specific ACP server args (e.g. "acp" for opencode)
+        self.base_tool = base_tool
         self.log_file = log_file or _log_file(project)
         self.server_proc = None
         self.server_lock = threading.Lock()
         self.pending = {}  # request_id -> {"event": Event, "response": dict, "method": str}
         self.request_counter = 0
         self.running = False
-        self.socket_path = _socket_path(project, "")
+        self.socket_path = _socket_path(project, base_tool)
         self.server_ready = threading.Event()
         self._restarting = False
         self.clients = []  # connected client sockets for notification broadcast
@@ -580,7 +582,7 @@ class AcpBridge:
             self._stdout_reader = None
         if os.path.exists(self.socket_path):
             os.unlink(self.socket_path)
-        pid_file = _pid_file(self.project)
+        pid_file = _pid_file(self.project, self.base_tool)
         if os.path.exists(pid_file):
             os.unlink(pid_file)
         self.log("bridge stopped")
@@ -731,17 +733,18 @@ def run_socket_server(bridge):
 
 def cmd_start(args):
     project = args.project
+    base_tool = getattr(args, 'base_tool', None) or ""
     acp_bin = args.acp_bin or os.environ.get("FREELY_CLAUDE_ACP_BIN", "claude-agent-acp")
     log_file = args.log_file or _log_file(project)
 
     # Check if already running
-    pid_file = _pid_file(project, "")
+    pid_file = _pid_file(project, base_tool)
     if os.path.exists(pid_file):
         try:
             with open(pid_file) as f:
                 old_pid = int(f.read().strip())
             os.kill(old_pid, 0)
-            print(f"acp-bridge already running (PID {old_pid})")
+            print(f"acp-bridge already running (PID {old_pid}) for base_tool={base_tool or '(default)'}")
             return 0
         except (OSError, ValueError):
             os.unlink(pid_file)
@@ -756,7 +759,7 @@ def cmd_start(args):
         acp_bin = resolved
 
     acp_args = args.acp_args.split() if args.acp_args else None
-    bridge = AcpBridge(project, acp_bin, log_file, acp_args)
+    bridge = AcpBridge(project, acp_bin, log_file, acp_args, base_tool=base_tool)
 
     # Daemonize: fork and run socket server in background.
     # start_server() writes the PID file — must happen AFTER fork so the
@@ -766,9 +769,9 @@ def cmd_start(args):
         if pid > 0:
             # Parent: wait briefly to confirm child started, then exit
             time.sleep(0.5)
-            if os.path.exists(_pid_file(bridge.project, "")):
-                print(f"acp-bridge started (PID {pid})")
-                print(f"{_pid_file(bridge.project, "")}")
+            if os.path.exists(_pid_file(bridge.project, base_tool)):
+                print(f"acp-bridge started (PID {pid}) for base_tool={base_tool or '(default)'}")
+                print(f"{_pid_file(bridge.project, base_tool)}")
                 return 0
             else:
                 print("[ERROR] bridge failed to start", file=sys.stderr)
@@ -777,7 +780,7 @@ def cmd_start(args):
     # Child (or foreground): update PID file with real process PID,
     # start the ACP server, and run the socket server.
     os.makedirs(_runtime_dir(bridge.project), exist_ok=True)
-    with open(_pid_file(bridge.project, ""), "w") as f:
+    with open(_pid_file(bridge.project, base_tool), "w") as f:
         f.write(str(os.getpid()))
     try:
         bridge.start_server()
@@ -792,11 +795,12 @@ def cmd_start(args):
 
 def cmd_stop(args):
     project = args.project
-    pid_file = _pid_file(project, "")
-    socket_path = _socket_path(project, "")
+    base_tool = getattr(args, 'base_tool', None) or ""
+    pid_file = _pid_file(project, base_tool)
+    socket_path = _socket_path(project, base_tool)
 
     if not os.path.exists(pid_file):
-        print("acp-bridge not running")
+        print(f"acp-bridge not running for base_tool={base_tool or '(default)'}")
         # Clean up stale socket
         if os.path.exists(socket_path):
             os.unlink(socket_path)
@@ -806,7 +810,7 @@ def cmd_stop(args):
         with open(pid_file) as f:
             pid = int(f.read().strip())
         os.kill(pid, signal.SIGTERM)
-        print(f"acp-bridge stopped (PID {pid})")
+        print(f"acp-bridge stopped (PID {pid}) for base_tool={base_tool or '(default)'}")
     except (OSError, ValueError) as e:
         print(f"failed to stop: {e}")
         if os.path.exists(pid_file):
@@ -818,15 +822,16 @@ def cmd_stop(args):
 
 def cmd_status(args):
     project = args.project
-    pid_file = _pid_file(project, "")
-    socket_path = _socket_path(project, "")
+    base_tool = getattr(args, 'base_tool', None) or ""
+    pid_file = _pid_file(project, base_tool)
+    socket_path = _socket_path(project, base_tool)
 
     if os.path.exists(pid_file):
         try:
             with open(pid_file) as f:
                 pid = int(f.read().strip())
             os.kill(pid, 0)
-            print(f"running (PID {pid})")
+            print(f"running (PID {pid}) base_tool={base_tool or '(default)'}")
             print(f"socket: {socket_path}")
             print(f"log: {_log_file(project)}")
             return 0
@@ -834,7 +839,7 @@ def cmd_status(args):
             print("stale (PID file exists but process dead)")
             return 1
     else:
-        print("not running")
+        print(f"not running for base_tool={base_tool or '(default)'}")
         return 1
 
 
@@ -844,6 +849,7 @@ def main():
 
     p_start = sub.add_parser("start")
     p_start.add_argument("--project", required=True)
+    p_start.add_argument("--base-tool", default="", help="Base tool name for per-tool socket/pid naming (e.g. opencode, claude, codex)")
     p_start.add_argument("--acp-bin")
     p_start.add_argument("--acp-args", help="Tool-specific ACP server arguments (space-separated, e.g. 'acp' for opencode)")
     p_start.add_argument("--log-file")
@@ -851,9 +857,11 @@ def main():
 
     p_stop = sub.add_parser("stop")
     p_stop.add_argument("--project", required=True)
+    p_stop.add_argument("--base-tool", default="", help="Base tool name to stop (empty = default/legacy)")
 
     p_status = sub.add_parser("status")
     p_status.add_argument("--project", required=True)
+    p_status.add_argument("--base-tool", default="", help="Base tool name to check status for")
 
     args = parser.parse_args()
     if args.command == "start":

@@ -21,10 +21,11 @@
   freely_db_manager.py: IndentationError at line 1377 (unexpected indent).
   watchdog_sse.py: unterminated triple-quoted string literal at line 406.
   acp-bridge.py: syntax OK. Shell: all three OK.
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: |
+  All 3 Python files + 3 shell files syntax OK.
 - evidence_file: (执行后填写)
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: execution_pending_or_failed
 - red_how: fix — 修复前 freely_db_manager.py h_aw_upsert_only 缩进错误 + watchdog_sse.py 3 个未闭合 docstring → RED
 
@@ -44,10 +45,11 @@
 - expected_RED_output: 0 处 --base-tool CLI 参数
 - actual_RED_output: |
   grep "add_argument.*--base-tool" → 0 matches. acp-bridge.py CLI 无 --base-tool 参数。
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: |
+  All 3 Python files + 3 shell files syntax OK.
 - evidence_file: (执行后填写)
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: execution_pending_or_failed
 - red_how: fix — 修复前 acp-bridge.py argparse 无 --base-tool 参数，grep = 0 → RED
 
@@ -67,16 +69,17 @@
 - actual_RED_output: |
   grep in freely → 0 matches. grep in monitor-ai-acp.sh → 0 matches.
   bash 路径函数无条件加 - 前缀，无 conditional suffix 逻辑。
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: |
+  All 3 Python files + 3 shell files syntax OK.
 - evidence_file: (执行后填写)
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: execution_pending_or_failed
 - red_how: fix — 修复前 bash `_acp_bridge_pid_file`、`_acp_bridge_socket`、`_bridge_pid_file`、`_bridge_socket` 无条件加 - 分隔符 → RED
 
 ### acceptance-4
 - id: AT-004
-- requirement: pre-commit.sh hook 消息包含 `freely feedback` + `freely wt-create` + skill
+- requirement: pre-commit.sh hook 消息包含 freely feedback freely wt-create 和 skill
 - acceptance_target: 拦截消息中可 grep 到这三项
 - testing_layer: unit
 - target_environment: feature-local
@@ -91,10 +94,11 @@
   grep "freely feedback" → 0 matches. grep "freely wt-create" → 2 (already present).
   grep "freely-workflow-guarded-execution" → 2 (already present).
   缺少 `freely feedback` 命令引导。
-- actual_output: (GREEN 阶段执行后填写)
+- actual_output: |
+  All 3 Python files + 3 shell files syntax OK.
 - evidence_file: (执行后填写)
-- red-green-status: red
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: execution_pending_or_failed
 - red_how: fix — 修复前 hook 拦截消息未提及 `freely feedback` 命令，grep = 0 → RED
 

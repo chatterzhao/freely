@@ -287,20 +287,11 @@ MSG
     cat <<MSG
 [HOOK] Commit blocked: direct development on '$branch' is forbidden.
 
-Read AGENTS.md §核心开发流程, then invoke the correct skill:
-
-  Bug fix  → skill:freely-workflow-guarded-execution   (Govern first, code later)
-  Fix|Feature  → skill:freely-workflow-guarded-execution|freely-workflow-guarded-execution  (Govern first, then code)
-
-Quick start:
-  cd <project-root>
-  freely wt-create --raw-key <key> --source <platform|chat-inbox> --skill <skill> --slug <slug>
-  cd ../<project>-worktrees/<branch-dir>
+通过 \`freely feedback\` 命令创建 raw issue，再通过 \`freely wt-create\` 命令创建工位，
+在工位中完成修改。完整工作流详见 skill \`freely-workflow-guarded-execution\`。
 
 Do NOT work around this hook. Bypass attempts (skip-worktree, --no-verify,
 removing remotes, etc.) violate CONSTITUTION.md §5.
-The skills enforce the full IBM lifecycle:
-  feedback → wt-create → B1_IBM → B2_IBM → dev → pr-create → pr-merge → wt-close
 MSG
     ;;
 esac

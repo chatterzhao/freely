@@ -13907,12 +13907,16 @@ _acp_bridge_short_hash() {
 
 _acp_bridge_pid_file() {
   local project="$1" base_tool="${2:-}"
-  echo "/tmp/freely-acp-$(_acp_bridge_short_hash "$project")-${base_tool}.pid"
+  local _suffix=""
+  [[ -n "$base_tool" ]] && _suffix="-${base_tool}"
+  echo "/tmp/freely-acp-$(_acp_bridge_short_hash "$project")${_suffix}.pid"
 }
 
 _acp_bridge_socket() {
   local project="$1" base_tool="${2:-}"
-  echo "/tmp/freely-acp-$(_acp_bridge_short_hash "$project")-${base_tool}.sock"
+  local _suffix=""
+  [[ -n "$base_tool" ]] && _suffix="-${base_tool}"
+  echo "/tmp/freely-acp-$(_acp_bridge_short_hash "$project")${_suffix}.sock"
 }
 
 _acp_bridge_health_check() {
@@ -14032,7 +14036,7 @@ if added:
 _ensure_acp_bridge_running() {
   local project="$1" base_tool="${2:-claude}"
   local pid_file socket
-  pid_file="$(_acp_bridge_pid_file "$project")"
+  pid_file="$(_acp_bridge_pid_file "$project" "$base_tool")"
   socket="$(_acp_bridge_socket "$project" "$base_tool")"
 
   # Determine the correct ACP binary for the given tool via registry
@@ -14094,7 +14098,7 @@ _ensure_acp_bridge_running() {
           _acp_session_close "$project" "${TOOL_SESSION_ID_CURRENT:-}"
           _stop_acp_bridge "$project"
         fi
-      elif _acp_bridge_health_check "$project" 5; then
+      elif _acp_bridge_health_check "$project" 5 "$base_tool"; then
         return 0
       else
         log_warn "existing ACP bridge (pid=$pid) is alive but failed health check; restarting"
@@ -14193,9 +14197,9 @@ _ensure_acp_bridge_running() {
   # Use --foreground (no fork) + & to avoid child-process lifecycle issues
   local bridge_log; bridge_log="$(run_dir_for_project "$project")/acp-bridge.log"
   if [[ ${#_bridge_env[@]} -gt 0 ]]; then
-    env "${_bridge_env[@]}" python3 "$bridge_script" start --project "$project" --acp-bin "$acp_bin" ${_acp_args:+--acp-args "${_acp_args[*]}"} --foreground </dev/null >>"$bridge_log" 2>&1 &
+    env "${_bridge_env[@]}" python3 "$bridge_script" start --project "$project" --base-tool "$base_tool" --acp-bin "$acp_bin" ${_acp_args:+--acp-args "${_acp_args[*]}"} --foreground </dev/null >>"$bridge_log" 2>&1 &
   else
-    python3 "$bridge_script" start --project "$project" --acp-bin "$acp_bin" ${_acp_args:+--acp-args "${_acp_args[*]}"} --foreground </dev/null >>"$bridge_log" 2>&1 &
+    python3 "$bridge_script" start --project "$project" --base-tool "$base_tool" --acp-bin "$acp_bin" ${_acp_args:+--acp-args "${_acp_args[*]}"} --foreground </dev/null >>"$bridge_log" 2>&1 &
   fi
   disown "$!" 2>/dev/null || true
   # Note: bridge writes its own PID file during start_server, don't overwrite it
@@ -18781,7 +18785,7 @@ acp_session_register('${project}', '${_raw_key}', 'reviewer', '${_reviewer_id}',
   log_info "reviewer $_reviewer_id: creating ACP session/new via bridge"
 
   # Create ACP session for reviewer via bridge socket
-  local _bridge_socket="/tmp/freely-acp-$(python3 -c "import hashlib,os; print(hashlib.sha256('${PROJECT_ROOT}'.encode()).hexdigest()[:16])" 2>/dev/null)"
+  local _bridge_socket; _bridge_socket="$(_acp_bridge_socket "$PROJECT_ROOT")"
   if [[ -S "$_bridge_socket" ]]; then
     local _session_id; _session_id="rev_$(date +%s)_${_reviewer_id}"
     python3 -c "
@@ -18804,8 +18808,8 @@ try:
     if sid:
         # Write session_id to agent_working
         sys.path.insert(0, '${PROJECT_ROOT}/docs/system/workspace/scripts/runtime')
-        from agent_working import agent_assign
-        agent_assign('${PROJECT_ROOT}', '${_raw_key}', 'reviewer', '${_reviewer_id}', session_id=sid)
+        from agent_working import acp_session_register
+        acp_session_register('${PROJECT_ROOT}', '${_raw_key}', 'reviewer', '${_reviewer_id}', session_id=sid, slot='${_reviewer_slot}')
         print(f'[reviewer] session created: {sid}', file=sys.stderr)
 except Exception as e:
     print(f'[reviewer] failed to create ACP session: {e}', file=sys.stderr)
@@ -18822,7 +18826,7 @@ finally:
 # C2: Create new ACP session for any agent role.
 _acp_session_new() {
   local project="$1" role="$2" agent_id="$3" raw_key="$4"
-  local _bridge_socket; _bridge_socket="/tmp/freely-acp-$(python3 -c "import hashlib,os; print(hashlib.sha256('${project}'.encode()).hexdigest()[:16])" 2>/dev/null)"
+  local _bridge_socket; _bridge_socket="$(_acp_bridge_socket "$project")"
   [[ -S "$_bridge_socket" ]] || { log_warn "ACP bridge not found for session/new ($role $agent_id)"; return 1; }
   local _session_id; _session_id="${role}_$(date +%s)_${agent_id}"
   python3 -c "
@@ -18835,8 +18839,8 @@ try:
     sid = json.loads(resp.decode()).get('result',{}).get('sessionId','')
     if sid:
         sys.path.insert(0, '${project}/docs/system/workspace/scripts/runtime')
-        from agent_working import agent_assign
-        agent_assign('${project}', '${raw_key}', '${role}', '${agent_id}', session_id=sid)
+        from agent_working import acp_session_register
+        acp_session_register('${project}', '${raw_key}', '${role}', '${agent_id}', session_id=sid)
         print(sid)
 except Exception as e: print(f'ERROR:{e}', file=sys.stderr)
 finally: s.close()
@@ -18853,7 +18857,7 @@ from agent_working import agent_get_session
 print(agent_get_session('${project}', '${raw_key}', '${role}') or '')
 " 2>/dev/null)
   [[ -z "$_session_id" ]] && { log_warn "no session to resume for $role on $raw_key"; return 1; }
-  local _bridge_socket; _bridge_socket="/tmp/freely-acp-$(python3 -c "import hashlib,os; print(hashlib.sha256('${project}'.encode()).hexdigest()[:16])" 2>/dev/null)"
+  local _bridge_socket; _bridge_socket="$(_acp_bridge_socket "$project")"
   [[ -S "$_bridge_socket" ]] || { log_warn "ACP bridge not found for session/resume"; return 1; }
   python3 -c "
 import json, socket
@@ -18883,7 +18887,7 @@ from agent_working import agent_get_session
 print(agent_get_session('${project}', '${_lookup_key}', '${parent_role}') or '')
 " 2>/dev/null)
   [[ -z "$_parent_sid" ]] && { log_warn "no ${parent_role} session to fork for ${raw_key}"; return 1; }
-  local _bridge_socket; _bridge_socket="/tmp/freely-acp-$(python3 -c "import hashlib,os; print(hashlib.sha256('${project}'.encode()).hexdigest()[:16])" 2>/dev/null).sock"
+  local _bridge_socket; _bridge_socket="$(_acp_bridge_socket "$project")"
   [[ -S "$_bridge_socket" ]] || { log_warn "ACP bridge not found for session/fork"; return 1; }
   python3 -c "
 import json, socket
@@ -18897,8 +18901,8 @@ try:
     sid = result.get('result',{}).get('sessionId','')
     if sid:
         import sys; sys.path.insert(0, '${project}/docs/system/workspace/scripts/runtime')
-        from agent_working import agent_assign
-        agent_assign('${project}', '${raw_key}', '${child_role}', '${child_agent_id}', session_id=sid)
+        from agent_working import acp_session_register
+        acp_session_register('${project}', '${raw_key}', '${child_role}', '${child_agent_id}', session_id=sid)
         print(sid)
     else:
         print(f'fork error: {result}', file=__import__('sys').stderr)
@@ -18916,7 +18920,7 @@ from agent_working import agent_get_session
 print(agent_get_session('${project}', '${raw_key}', '${role}') or '')
 " 2>/dev/null)
   if [[ -n "$_session_id" ]]; then
-    local _bridge_socket; _bridge_socket="/tmp/freely-acp-$(python3 -c "import hashlib,os; print(hashlib.sha256('${project}'.encode()).hexdigest()[:16])" 2>/dev/null)"
+    local _bridge_socket; _bridge_socket="$(_acp_bridge_socket "$project")"
     if [[ -S "$_bridge_socket" ]]; then
       python3 -c "
 import json, socket
