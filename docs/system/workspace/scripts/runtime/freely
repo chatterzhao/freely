@@ -8657,6 +8657,23 @@ ensure_freely_db() {
 
 # ── A2A Server (Agent-to-Agent protocol) ──────────────────
 
+
+# ── Log rotation: prevent unbounded growth for long-running daemon ──
+_rotate_log() {
+  local _log="$1" _max_size="${2:-10485760}" _max_keep="${3:-3}"
+  [[ -f "$_log" ]] || return 0
+  local _sz; _sz=$(stat -f%z "$_log" 2>/dev/null || stat -c%s "$_log" 2>/dev/null || echo 0)
+  [[ "$_sz" -gt "$_max_size" ]] || return 0
+  rm -f "$_log.$_max_keep" 2>/dev/null || true
+  local _i=$((_max_keep - 1))
+  while [[ $_i -ge 0 ]]; do
+    [[ -f "$_log.$_i" ]] && mv "$_log.$_i" "$_log.$((_i + 1))" 2>/dev/null || true
+    _i=$((_i - 1))
+  done
+  mv "$_log" "$_log.0" 2>/dev/null || true
+  : > "$_log"
+}
+
 ensure_a2a_server_running() {
   local project="$1"
   local a2a_server_py="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a/a2a_server.py"
@@ -8697,6 +8714,8 @@ print(h)" 2>/dev/null || true).pid"
   # Supports local (Unix socket) and remote (TCP)
   # Config: A2A_LISTEN_MODE=unix|tcp|both  A2A_TCP_HOST=0.0.0.0  A2A_TCP_PORT=19100
   log_info "starting A2A server for $project (mode=${A2A_LISTEN_MODE:-unix})"
+  _rotate_log "$project/.freely/run/a2a-server.log"
+
   python3 "$a2a_server_py" --project "$project" --start \
     --listen-mode "${A2A_LISTEN_MODE:-unix}" \
     --tcp-host "${A2A_TCP_HOST:-}" --tcp-port "${A2A_TCP_PORT:-0}" \
@@ -21940,21 +21959,11 @@ start_project_runtime() {
       log_error "    git checkout -- <file>"
       log_error ""
       log_error "  如果是有用的修改 → 按工作流修复:"
-      log_error "    git stash  # 先暂存变更"
-      log_error "    用 \`freely feedback\` 命令创建 raw issue"
-      log_error "    用 \`freely wt-create\` 命令创建工位"
-      log_error "    cd 到工位目录修复"
-      log_error "    详细流程见 skill \`freely-workflow-guarded-execution\`"
       log_error ""
       log_error "Then retry: freely daemon start --project $project"
 
 	      log_error ""
 	      log_error "  如果是有用的修改 → 按工作流修复:"
-	      log_error "    git stash  # 先暂存变更"
-	      log_error "    用 \`freely feedback\` 命令创建 raw issue"
-	      log_error "    用 \`freely wt-create\` 命令创建工位"
-	      log_error "    cd 到工位目录修复"
-	      log_error "    详细流程见 skill \`freely-workflow-guarded-execution\`"
 	      log_error ""
       log_error ""
       log_error "  如果内容已在其他工位存在 → 丢弃:"
@@ -21964,7 +21973,6 @@ start_project_runtime() {
       log_error "    git checkout -- <file>"
       log_error ""
       log_error "  如果是有用的修改 → 按工作流修复:"
-      log_error "    git stash  # 先暂存变更"
       log_error "    freely feedback --kind fix --title '...' --body '...'  # 创建 raw issue"
       log_error "    freely wt-create --raw-key <key> --source local --kind fix --slug <slug>  # 创建工位"
       log_error "    cd ../<project>-worktrees/<dir>  # 进入工位修复"
@@ -22366,6 +22374,7 @@ ${_msg}" >/dev/null 2>&1 || true
   (
     while kill -0 $_supervisor_pid 2>/dev/null; do
       _update_heartbeat "$PROJECT_ROOT"
+    _rotate_log "$PROJECT_ROOT/.freely/run/a2a-server.log" 2>/dev/null || true
       sleep 2
     done
   ) &
@@ -22380,16 +22389,18 @@ ${_msg}" >/dev/null 2>&1 || true
     log_info "agent_working: writing __manager__ record for project=$project"
     _aw_result=$(python3 -c "
 import sys; sys.path.insert(0, '${project}/docs/system/workspace/scripts/runtime')
-from agent_working import agent_assign
-result = agent_assign('${project}', '__manager__', 'manager', 'manager_01',
-                       worktree='${project}', branch='develop')
-print(result.get('status','error'))
+from agent_working import acp_session_register
+acp_session_register('${project}', '__manager__', 'manager', 'manager_01',
+                     slot='${AGENT_AI_TOOL:-}',
+                     worktree='${project}', branch='develop')
+print('ok')
 " 2>&1)
     log_info "agent_working __manager__ write: status=${_aw_result:-empty}"
   fi
 
   while true; do
     _update_heartbeat "$PROJECT_ROOT"
+    _rotate_log "$PROJECT_ROOT/.freely/run/a2a-server.log" 2>/dev/null || true
     # Re-load session state each cycle so resume/fork decisions see latest values
     load_session_state_or_defaults "$project"
 
@@ -22513,6 +22524,7 @@ print(ready)
       "expected_next=L021"
     local prompt_utf8_invalid_count="0"
     _update_heartbeat "$PROJECT_ROOT"
+    _rotate_log "$PROJECT_ROOT/.freely/run/a2a-server.log" 2>/dev/null || true
     if ! build_prompt >"$prompt_file"; then
       LAST_WORKCELL_EXIT_REASON="prompt_build_failed"
       write_workcell_state "$project" "running" "up" "down" "$LAST_WORKCELL_EXIT_REASON"
