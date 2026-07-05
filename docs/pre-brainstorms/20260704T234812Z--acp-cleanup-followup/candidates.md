@@ -1,6 +1,6 @@
 ---
 candidate_id: C-20260704T234812Z-A
-status: promoted
+status: absorbed
 source_raw: raw-20260704T234812Z
 created_at: 2026-07-04
 milestone: M-20260704T234812Z-A
@@ -10,7 +10,7 @@ milestone: M-20260704T234812Z-A
 
 - candidate_format_version: v2
 - title: 修复 #3731 清理遗漏的 base_tool plumbing、语法错误、硬编码路径、hook 提示
-- status: promoted
+- status: absorbed
 - decision_reason: |
   9 个问题全部为机械性 bug，无架构决策分歧。逐项修复即可。
   #3728/#3729 重构时 base_tool 参数已预留于所有签名中，本期只是补齐掉落的调用链。
