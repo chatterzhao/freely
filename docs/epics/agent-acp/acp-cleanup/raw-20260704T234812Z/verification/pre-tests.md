@@ -11,7 +11,7 @@
 - target_environment: feature-local
 - required_evidence: 语法检查命令输出全部 OK
 - evidence_level: integration
-- artifact_ref: docs/epics/agent-acp/acp-cleanup-loosened/raw-20260704T234812Z/verification/test-evidence/syntax-check.log
+- artifact_ref: docs/epics/agent-acp/acp-cleanup/raw-20260704T234812Z/verification/test-evidence/syntax-check.log
 - test_command: |
   python3 -c "import py_compile; py_compile.compile('docs/system/workspace/scripts/runtime/acp-bridge.py', doraise=True); py_compile.compile('docs/system/workspace/scripts/runtime/freely_db_manager.py', doraise=True); py_compile.compile('docs/system/workspace/scripts/runtime/watchdog_sse.py', doraise=True); print('Python: OK')" && bash -n docs/system/workspace/scripts/runtime/freely && bash -n docs/system/workspace/scripts/runtime/monitor-ai-acp.sh && bash -n docs/system/workspace/hooks/pre-commit.sh && echo "Shell: OK"
 - expected_output: Python: OK
@@ -37,7 +37,7 @@
 - target_environment: feature-local
 - required_evidence: grep 确认 CLI 有 --base-tool 参数，_pid_file/_socket_path 调用传 base_tool
 - evidence_level: integration
-- artifact_ref: docs/epics/agent-acp/acp-cleanup-loosened/raw-20260704T234812Z/verification/test-evidence/base-tool-cli.log
+- artifact_ref: docs/epics/agent-acp/acp-cleanup/raw-20260704T234812Z/verification/test-evidence/base-tool-cli.log
 - test_command: |
   grep -c "add_argument.*--base-tool" docs/system/workspace/scripts/runtime/acp-bridge.py && echo "CLI has --base-tool" && grep "_pid_file\|_socket_path" docs/system/workspace/scripts/runtime/acp-bridge.py | grep -c "base_tool"
 - expected_output: CLI has --base-tool
@@ -61,7 +61,7 @@
 - target_environment: feature-local
 - required_evidence: source 检查 conditional suffix 逻辑
 - evidence_level: integration
-- artifact_ref: docs/epics/agent-acp/acp-cleanup-loosened/raw-20260704T234812Z/verification/test-evidence/path-consistency.log
+- artifact_ref: docs/epics/agent-acp/acp-cleanup/raw-20260704T234812Z/verification/test-evidence/path-consistency.log
 - test_command: |
   grep -c '\[\[ -n "\$base_tool" \]\] && _suffix=' docs/system/workspace/scripts/runtime/freely docs/system/workspace/scripts/runtime/monitor-ai-acp.sh && echo "path consistency OK"
 - expected_output: path consistency OK
@@ -85,7 +85,7 @@
 - target_environment: feature-local
 - required_evidence: grep 确认三处关键词
 - evidence_level: integration
-- artifact_ref: docs/epics/agent-acp/acp-cleanup-loosened/raw-20260704T234812Z/verification/test-evidence/hook-message.log
+- artifact_ref: docs/epics/agent-acp/acp-cleanup/raw-20260704T234812Z/verification/test-evidence/hook-message.log
 - test_command: |
   grep -c "freely feedback" docs/system/workspace/hooks/pre-commit.sh && grep -c "freely wt-create" docs/system/workspace/hooks/pre-commit.sh && grep -c "freely-workflow-guarded-execution" docs/system/workspace/hooks/pre-commit.sh && echo "hook message OK"
 - expected_output: hook message OK

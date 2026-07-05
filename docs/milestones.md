@@ -1812,4 +1812,4 @@
 - title: fix — #3731 ACP cleanup 遗漏修复 + hook 提示改进
 - milestone: M-20260704T234812Z-A
 - phase_state: completed
-- path: docs/epics/agent-acp/acp-cleanup-loosened/raw-20260704T234812Z/issues/I-20260704T234812Z-A.md
+- path: docs/epics/agent-acp/acp-cleanup/raw-20260704T234812Z/issues/I-20260704T234812Z-A.md

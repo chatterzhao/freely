@@ -33,6 +33,6 @@ milestone: M-20260704T234812Z-A
   - summary: 审查 9 项修复是否完整覆盖 #3731 遗漏的所有问题
   - verdict: pass
 - promoted_issue_id: I-20260704T234812Z-A
-- promoted_issue_path: docs/epics/agent-acp/acp-cleanup-loosened/raw-20260704T234812Z/issues/I-20260704T234812Z-A.md
+- promoted_issue_path: docs/epics/agent-acp/acp-cleanup/raw-20260704T234812Z/issues/I-20260704T234812Z-A.md
 - milestone: M-20260704T234812Z-A
 - session_refs: []
