@@ -309,7 +309,7 @@ def is_governance_only_path(rel_path: str) -> bool:
         "docs/system/workspace/scan-lifecycle-design.md",
     }:
         return True
-    if rel_path.startswith(("docs/B1-docs/", "docs/B2-docs/", "docs/B2-docs/ibm/_legacy-progress/", "docs/B1-docs/")):
+    if rel_path.startswith(("docs/B1-docs/", "docs/B2-docs/", "docs/B2-docs/ibm/_legacy-progress/")):
         return True
     if rel_path.startswith(("docs/system/workspace/agents/", "docs/system/workspace/skills/")):
         return True
@@ -484,7 +484,7 @@ def parse_issue_file(rel_path: str) -> IssueRecord:
 
     # Linked I-* issues (old docs/B1-docs/ or new docs/B2-docs/.../raw-.../issues/) point
     # to canonical I-*. Follow canonical_issue_path to read authoritative governance fields.
-    if rel_path.startswith("docs/B2-docs/ibm/_legacy-issues/I-") or (rel_path.startswith("docs/B2-docs/") and "/issues/I-" in rel_path):
+    if rel_path.startswith("docs/B2-docs/") and "/issues/I-" in rel_path:
         canonical = grab("canonical_issue_path")
         if canonical and path_exists(canonical):
             try:
@@ -821,7 +821,6 @@ def _validate_raw_issue(issue: IssueRecord, changed_paths: list = None) -> list[
         code_files_in_merge = [
             p for p in changed_paths
             if not p.startswith(("docs/B1-docs/", "docs/B2-docs/"))
-            and not p.startswith("docs/B1-docs/")
             and not p.startswith("docs/milestones.md")
             and not p.startswith("AGENTS.md")
             and not p.startswith("docs/system/workspace/agents/")
