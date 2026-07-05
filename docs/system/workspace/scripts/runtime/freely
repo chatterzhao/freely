@@ -21875,13 +21875,44 @@ start_project_runtime() {
       git diff --name-only 2>/dev/null | while read -r _f; do echo "  (unstaged) $_f"; done
       git diff --cached --name-only 2>/dev/null | while read -r _f; do echo "  (staged)   $_f"; done
       log_error ""
-      log_error "The daemon must start from a clean working tree to avoid"
-      log_error "overwriting uncommitted work during platform sync."
+      log_error "请检查以上 dirty 内容并选择合适的处理方式:"
       log_error ""
-      log_error "Resolve by:"
-      log_error "  git stash       — save changes and restore later"
-      log_error "  git commit ...  — commit changes to a fix|feature branch"
-      log_error "  git checkout -- <file> — discard changes (caution!)"
+      log_error "  如果内容已在其他工位存在 → 丢弃:"
+      log_error "    git checkout -- <file>"
+      log_error ""
+      log_error "  如果是无用的临时文件 → 丢弃:"
+      log_error "    git checkout -- <file>"
+      log_error ""
+      log_error "  如果是有用的修改 → 按工作流修复:"
+      log_error "    git stash  # 先暂存变更"
+      log_error "    用 \`freely feedback\` 命令创建 raw issue"
+      log_error "    用 \`freely wt-create\` 命令创建工位"
+      log_error "    cd 到工位目录修复"
+      log_error "    详细流程见 skill \`freely-workflow-guarded-execution\`"
+      log_error ""
+      log_error "Then retry: freely daemon start --project $project"
+
+	      log_error ""
+	      log_error "  如果是有用的修改 → 按工作流修复:"
+	      log_error "    git stash  # 先暂存变更"
+	      log_error "    用 \`freely feedback\` 命令创建 raw issue"
+	      log_error "    用 \`freely wt-create\` 命令创建工位"
+	      log_error "    cd 到工位目录修复"
+	      log_error "    详细流程见 skill \`freely-workflow-guarded-execution\`"
+	      log_error ""
+      log_error ""
+      log_error "  如果内容已在其他工位存在 → 丢弃:"
+      log_error "    git checkout -- <file>"
+      log_error ""
+      log_error "  如果是无用的临时文件 → 丢弃:"
+      log_error "    git checkout -- <file>"
+      log_error ""
+      log_error "  如果是有用的修改 → 按工作流修复:"
+      log_error "    git stash  # 先暂存变更"
+      log_error "    freely feedback --kind fix --title '...' --body '...'  # 创建 raw issue"
+      log_error "    freely wt-create --raw-key <key> --source local --kind fix --slug <slug>  # 创建工位"
+      log_error "    cd ../<project>-worktrees/<dir>  # 进入工位修复"
+      log_error "    详细流程见 skill \\`freely-workflow-guarded-execution\\`"
       log_error ""
       log_error "Then retry: freely daemon start --project $project"
       exit 1
@@ -22171,19 +22202,46 @@ start_project_runtime() {
     local _aq="${PROJECT_ROOT}/bin/agent-table-query"
     local -a _unique_tools=()
     local _slot _bt
-    if [[ -f "$_at" && -x "$_aq" ]]; then
+    if [[ ! -f "$_at" ]]; then
+      log_warn "agent-table.toml not found: $_at"
+    elif [[ ! -x "$_aq" ]]; then
+      log_warn "agent-table-query not executable: $_aq"
+    else
       for role in manager worker reviewer; do
         _slot=$("$_aq" --get-slot "${role}_01" 2>/dev/null || true)
         [[ -n "$_slot" ]] || continue
         _bt="${_slot%%-*}"
-        [[ " ${_unique_tools[*]} " == *" $_bt "* ]] && continue
+        [[ " ${_unique_tools[*]:-} " == *" $_bt "* ]] && continue
         _unique_tools+=("$_bt")
       done
     fi
-    # Fallback: if agent-table has no slots, use AGENT_AI_TOOL
-    if [[ ${#_unique_tools[@]} -eq 0 ]]; then
+    # Fallback: if scan produced nothing, use AGENT_AI_TOOL
+    if [[ ${#_unique_tools[@]} -eq 0 && -n "${AGENT_AI_TOOL:-}" ]]; then
       _unique_tools+=("${AGENT_AI_TOOL%%-*}")
     fi
+    # Fatal: still empty — nothing to bridge to
+    if [[ ${#_unique_tools[@]} -eq 0 ]]; then
+      log_error "No ACP bridge tools configured — daemon cannot start."
+      log_error ""
+      log_error "Check and fix one of the following:"
+      if [[ ! -f "$_at" ]]; then
+        log_error "  1. agent-table.toml not found: $_at"
+        log_error "     Create it with at least one agent slot, e.g. manager_01"
+      elif [[ ! -x "$_aq" ]]; then
+        log_error "  1. agent-table-query not executable: $_aq"
+      else
+        log_error "  1. No agent has a slot configured in $_at"
+        log_error "     Check: bin/agent-table-query --get-slot manager_01"
+        log_error "     Check: bin/agent-table-query --get-slot worker_01"
+      fi
+      if [[ -z "${AGENT_AI_TOOL:-}" ]]; then
+        log_error "  2. AGENT_AI_TOOL is not set in .freely/config.toml"
+      fi
+      log_error ""
+      log_error "Then retry: freely daemon start --project $project"
+      exit 1
+    fi
+
     for _bt in "${_unique_tools[@]}"; do
       if ! _tool_is_registered "$_bt" 2>/dev/null; then
         log_error "base_tool '$_bt' from agent-table not in tool-registry.toml"
@@ -22289,11 +22347,11 @@ print(result.get('status','error'))
           _slot=$("$_aq" --get-slot "${role}_01" 2>/dev/null || true)
           [[ -n "$_slot" ]] || continue
           _bt="${_slot%%-*}"
-          [[ " ${_cycle_tools[*]} " == *" $_bt "* ]] && continue
+          [[ " ${_cycle_tools[*]:-} " == *" $_bt "* ]] && continue
           _cycle_tools+=("$_bt")
         done
       fi
-      [[ ${#_cycle_tools[@]} -eq 0 ]] && _cycle_tools+=("${AGENT_AI_TOOL%%-*}")
+      [[ ${#_cycle_tools[@]} -eq 0 && -n "${AGENT_AI_TOOL:-}" ]] && _cycle_tools+=("${AGENT_AI_TOOL%%-*}")
       for _bt in "${_cycle_tools[@]}"; do
         _ensure_acp_bridge_running "$project" "$_bt" || log_warn "ACP bridge check failed for $_bt"
       done
