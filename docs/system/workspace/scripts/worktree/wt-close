@@ -407,9 +407,9 @@ TEST_MISSING
   请在测试工位完成测试验证:
 
   1. cd $_test_wt
-  2. git merge <dev-branch>  # 将开发工位最新提交同步到测试工位
-  3. 按 pre-tests.md 中的 test_command 逐条执行验证
-  4. 更新 .freely/run/test-gate.env 记录测试完成
+  2. ./bin/freely daemon start --task-mode auto
+  3. 按 pre-tests.md 的测试用例逐条验证
+  4. daemon 停止后 test-gate.env 会记录测试完成的 commit
 
   测试通过后重新执行 wt-close。无需 --force。
 

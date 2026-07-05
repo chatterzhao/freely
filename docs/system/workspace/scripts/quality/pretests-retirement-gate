@@ -105,19 +105,16 @@ if not pretests_gate.exists():
     print(f"[pretests_retirement_missing] missing gate: {pretests_gate}", file=sys.stderr)
     sys.exit(1)
 if not gate_file.exists():
-    print(f"[pretests_not_tested] 该 raw key 对应的测试工位还没有执行过测试", file=sys.stderr)
+    print(f"[pretests_not_tested] 测试工位还没有执行过测试", file=sys.stderr)
     print(f"  测试工位: {worktree}", file=sys.stderr)
     print(f"", file=sys.stderr)
-    print(f"  请在测试工位中按以下步骤执行测试:", file=sys.stderr)
-    print(f"    cd {worktree}", file=sys.stderr)
-    print(f"    git merge <dev-branch>  # 将开发工位的最新提交同步到测试工位")
-    print(f"  然后按 pre-tests.md 中的 test_command 逐条执行验证。", file=sys.stderr)
+    print(f"  cd {worktree}  # 进入测试工位", file=sys.stderr)
+    print(f"  git merge <dev-branch>  # 同步开发工位最新提交", file=sys.stderr)
+    print(f"  按 pre-tests.md 的指导执行测试。", file=sys.stderr)
     print(f"  详细流程见 skill `freely-test-execution`", file=sys.stderr)
     sys.exit(1)
 
 # ── Test-gate freshness check ──
-# Compare test-gate.env's LAST_TESTED_COMMIT against HEAD.
-# If HEAD is ahead, tests are stale and must be re-run.
 
 _latest_commit = ""
 try:
@@ -129,14 +126,13 @@ except Exception:
     pass
 
 if _test_status == "not_tested" or not _last_tested_at or _last_tested_at == "1970-01-01T00:00:00Z":
-    print(f"[pretests_not_tested] 该 raw key 对应的测试工位还没有执行过测试", file=sys.stderr)
+    print(f"[pretests_not_tested] 测试工位还没有执行过测试", file=sys.stderr)
     print(f"  测试工位: {worktree}", file=sys.stderr)
     print(f"  TEST_STATUS = {_test_status or '<empty>'}", file=sys.stderr)
     print(f"", file=sys.stderr)
-    print(f"  请在测试工位中按以下步骤执行测试:", file=sys.stderr)
-    print(f"    cd {worktree}", file=sys.stderr)
-    print(f"    git merge <dev-branch>  # 将开发工位的最新提交同步到测试工位")
-    print(f"  然后按 pre-tests.md 中的 test_command 逐条执行验证。", file=sys.stderr)
+    print(f"  cd {worktree}  # 进入测试工位", file=sys.stderr)
+    print(f"  git merge <dev-branch>  # 同步开发工位最新提交", file=sys.stderr)
+    print(f"  按 pre-tests.md 的指导执行测试。", file=sys.stderr)
     print(f"  详细流程见 skill `freely-test-execution`", file=sys.stderr)
     sys.exit(1)
 
@@ -147,10 +143,9 @@ if _latest_commit and _last_tested_commit and _latest_commit != _last_tested_com
     print(f"  上次测试时: {_last_tested_commit[:12] if _last_tested_commit else '<empty>'}", file=sys.stderr)
     print(f"  上次测试时间: {_last_tested_at}", file=sys.stderr)
     print(f"", file=sys.stderr)
-    print(f"  测试工位 merge 新代码后需要重新跑测试:", file=sys.stderr)
-    print(f"    cd {worktree}", file=sys.stderr)
-    print(f"    git merge <dev-branch>  # 确保同步到最新")
-    print(f"  然后按 pre-tests.md 中的 test_command 逐条执行验证。", file=sys.stderr)
+    print(f"  cd {worktree}  # 进入测试工位", file=sys.stderr)
+    print(f"  git merge <dev-branch>  # 同步开发工位最新提交", file=sys.stderr)
+    print(f"  按 pre-tests.md 的指导重新执行测试。", file=sys.stderr)
     print(f"  详细流程见 skill `freely-test-execution`", file=sys.stderr)
     sys.exit(1)
 
