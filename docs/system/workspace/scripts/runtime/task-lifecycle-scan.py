@@ -205,7 +205,7 @@ def get_platform_open_issues(project: Path) -> dict[str, dict]:
     cache_file = project / ".freely" / "run" / "platform-open-cache.json"
     cached = cache_get(cache_file, ttl=300)
     if cached is not None:
-        return cached.get("issues", {})
+        return cached.get("B1-docs", {})
 
     issues: dict[str, dict] = {}
     platforms = _detect_platforms(project)
@@ -245,7 +245,7 @@ def get_platform_open_issues(project: Path) -> dict[str, dict]:
         except Exception:
             continue
 
-    cache_put(cache_file, {"issues": issues})
+    cache_put(cache_file, {"B1-docs": issues})
     return issues
 
 def get_all_platform_issue_states(project: Path, open_issues: dict[str, dict]) -> dict[str, str]:

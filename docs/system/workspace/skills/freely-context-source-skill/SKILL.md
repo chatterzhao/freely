@@ -29,7 +29,7 @@ description: >- 对当前输入做来源分层、可执行性判定、workspace 
 - `docs/CONSTITUTION.md`
 - `docs/LAWS.md`
 - `docs/milestones.md`
-- 按需读取相关 `pre-brainstorms/issue/progress/recovery`
+- 按需读取相关 `B1-docs/issue/progress/recovery`
 
 ## 最小输出
 

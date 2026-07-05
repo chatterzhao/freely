@@ -75,7 +75,7 @@
 1. `I-20260701T001514Z-A`
 - milestone: M-20260701T001514Z-A
 - phase_state: completed
-- path: docs/issues/I-20260701T001514Z-A/issue.md
+- path: docs/B2-docs/ibm/_legacy-issues/I-20260701T001514Z-A/issue.md
 ### completed_issues
 1. `C-20260701T001514Z-A`
 - milestone: M-20260701T001514Z-A
@@ -590,7 +590,7 @@
 1. `C-20260630T134353Z-A`
 - milestone: M-20260630T134353Z-A
 - status: promoted
-- promoted_issue_path: `docs/issues/I-20260630T134353Z-A/issue.md`
+- promoted_issue_path: `docs/B2-docs/ibm/_legacy-issues/I-20260630T134353Z-A/issue.md`
 ### committed_issues
 1. `I-20260703T051533Z-A`
 - milestone: M-20260703T051533Z-A
@@ -599,7 +599,7 @@
 ### completed_issues
 1. `I-20260630T134353Z-A`
 - title: init --auto flag; milestone_state: committed
-- issue_path: `docs/issues/I-20260630T134353Z-A/issue.md`
+- issue_path: `docs/B2-docs/ibm/_legacy-issues/I-20260630T134353Z-A/issue.md`
 - phase_state: `completed`
 
 
@@ -641,7 +641,7 @@
 1. `C-20260630T113839Z-A`
 - milestone: M-20260630T113839Z-A
 - status: promoted
-- promoted_issue_path: `docs/issues/I-20260630T113839Z-A/issue.md`
+- promoted_issue_path: `docs/B2-docs/ibm/_legacy-issues/I-20260630T113839Z-A/issue.md`
 ### committed_issues
 1. `I-20260703T051533Z-A`
 - milestone: M-20260703T051533Z-A
@@ -650,7 +650,7 @@
 ### completed_issues
 1. `I-20260630T113839Z-A`
 - title: fix: runtime dirty fix; milestone_state: committed
-- issue_path: `docs/issues/I-20260630T113839Z-A/issue.md`
+- issue_path: `docs/B2-docs/ibm/_legacy-issues/I-20260630T113839Z-A/issue.md`
 - phase_state: `completed`
 
 
@@ -667,7 +667,7 @@
 1. `C-20260630T111641Z-A`
 - milestone: M-20260630T111641Z-A
 - status: promoted
-- promoted_issue_path: `docs/issues/I-20260630T111641Z-A/issue.md`
+- promoted_issue_path: `docs/B2-docs/ibm/_legacy-issues/I-20260630T111641Z-A/issue.md`
 ### committed_issues
 1. `I-20260703T051533Z-A`
 - milestone: M-20260703T051533Z-A
@@ -676,7 +676,7 @@
 ### completed_issues
 1. `I-20260630T111641Z-A`
 - title: fix: review state update; milestone_state: committed
-- issue_path: `docs/issues/I-20260630T111641Z-A/issue.md`
+- issue_path: `docs/B2-docs/ibm/_legacy-issues/I-20260630T111641Z-A/issue.md`
 - phase_state: `completed`
 
 
@@ -693,11 +693,11 @@
 1. `C-20260630T085809Z-A`
 - milestone: M-20260630T085809Z-A
 - status: promoted
-- promoted_issue_path: `docs/issues/I-20260630T085809Z-A/issue.md`
+- promoted_issue_path: `docs/B2-docs/ibm/_legacy-issues/I-20260630T085809Z-A/issue.md`
 ### committed_issues
 1. `I-20260630T085809Z-A`
 - title: fix: A2A Server 健康检查修复; milestone_state: committed
-- issue_path: `docs/issues/I-20260630T085809Z-A/issue.md`
+- issue_path: `docs/B2-docs/ibm/_legacy-issues/I-20260630T085809Z-A/issue.md`
 - phase_state: `completed`
 ### completed_issues
 
@@ -826,7 +826,7 @@
 1. `C-20260629T235653Z-A`
 - milestone: M-20260629T235653Z-A
 - status: promoted
-- promoted_issue_path: `docs/issues/I-20260629T235653Z-A/issue.md`
+- promoted_issue_path: `docs/B2-docs/ibm/_legacy-issues/I-20260629T235653Z-A/issue.md`
 ### committed_issues
 1. `I-20260630T002621Z-A`
 - title: feat: supervisor cycle Phase 1; milestone_state: committed
@@ -834,7 +834,7 @@
 - phase_state: `completed`
 1. `I-20260629T235653Z-A`
 - title: docs: fix handoff references; milestone_state: committed
-- issue_path: `docs/issues/I-20260629T235653Z-A/issue.md`
+- issue_path: `docs/B2-docs/ibm/_legacy-issues/I-20260629T235653Z-A/issue.md`
 - phase_state: `completed`
 ### completed_issues
 
@@ -1068,11 +1068,11 @@
 ### candidate_issues
 1. `C-20260628T054513Z-A`
 - milestone: M-20260628T054513Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260628T054513Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260628T054513Z-A/issue.md`
 ### completed_issues
 1. `I-20260628T054513Z-A`
 - title: scope hard block → advisory warning; milestone_state: completed
-- issue_path: `docs/issues/I-20260628T054513Z-A/issue.md`
+- issue_path: `docs/B2-docs/ibm/_legacy-issues/I-20260628T054513Z-A/issue.md`
 - phase_state: `completed`
 - verification_artifact_dir: `docs/B2-docs/scope-warning/code-reviews`
 
@@ -1088,11 +1088,11 @@
 ### candidate_issues
 1. `C-20260627T135126Z-A`
 - milestone: M-20260627T135126Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260627T135126Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260627T135126Z-A/issue.md`
 ### completed_issues
 1. `I-20260627T135126Z-A`
 - title: pr-create merge + checkpoint scope; milestone_state: completed
-- issue_path: `docs/issues/I-20260627T135126Z-A/issue.md`
+- issue_path: `docs/B2-docs/ibm/_legacy-issues/I-20260627T135126Z-A/issue.md`
 - phase_state: `completed`
 - verification_artifact_dir: `docs/B2-docs/checkpoint-merge-fix/code-reviews`
 
@@ -1108,7 +1108,7 @@
 ### candidate_issues
 1. `C-20260510T1339Z-A`
 - milestone: M-20260510T1339Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260510T1339Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260510T1339Z-A/issue.md`
 ### committed_issues
 1. `I-20260630T002621Z-A`
 - title: feat: supervisor cycle Phase 1; milestone_state: committed
@@ -1116,7 +1116,7 @@
 - phase_state: `completed`
 1. `I-20260510T1339Z-A`
 - title: wt-create 创建顺序重构; milestone_state: completed
-- issue_path: `docs/issues/I-20260510T1339Z-A/issue.md`
+- issue_path: `docs/B2-docs/ibm/_legacy-issues/I-20260510T1339Z-A/issue.md`
 - phase_state: `completed`
 
 ## M-20260522T045227Z-A
@@ -1131,7 +1131,7 @@
 ### candidate_issues
 1. `C-20260522T045227Z-A`
 - milestone: M-20260522T045227Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260522T045227Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260522T045227Z-A/issue.md`
 ### completed_issues
 
 ## M-20260522T051507Z-A
@@ -1146,7 +1146,7 @@
 ### candidate_issues
 1. `C-20260522T051507Z-A`
 - milestone: M-20260522T051507Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260522T051507Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260522T051507Z-A/issue.md`
 ### completed_issues
 
 ## M-20260522T053702Z-A
@@ -1161,7 +1161,7 @@
 ### candidate_issues
 1. `C-20260522T053702Z-A`
 - milestone: M-20260522T053702Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260522T053702Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260522T053702Z-A/issue.md`
 ### completed_issues
 
 ## M-20260522T072450Z-A
@@ -1176,7 +1176,7 @@
 ### candidate_issues
 1. `C-20260522T072450Z-A`
 - milestone: M-20260522T072450Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260522T072450Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260522T072450Z-A/issue.md`
 ### completed_issues
 
 ## M-20260522T075012Z-A
@@ -1191,7 +1191,7 @@
 ### candidate_issues
 1. `C-20260522T075012Z-A`
 - milestone: M-20260522T075012Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260522T075012Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260522T075012Z-A/issue.md`
 ### completed_issues
 
 ## M-20260522T075839Z-A
@@ -1206,7 +1206,7 @@
 ### candidate_issues
 1. `C-20260522T075839Z-A`
 - milestone: M-20260522T075839Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260522T075839Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260522T075839Z-A/issue.md`
 ### completed_issues
 
 ## M-20260522T081853Z-A
@@ -1221,7 +1221,7 @@
 ### candidate_issues
 1. `C-20260522T081853Z-A`
 - milestone: M-20260522T081853Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260522T081853Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260522T081853Z-A/issue.md`
 ### completed_issues
 
 ## M-20260522T083133Z-A
@@ -1236,7 +1236,7 @@
 ### candidate_issues
 1. `C-20260522T083133Z-A`
 - milestone: M-20260522T083133Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260522T083133Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260522T083133Z-A/issue.md`
 ### completed_issues
 
 ## M-20260616T030213Z-A
@@ -1251,7 +1251,7 @@
 ### candidate_issues
 1. `C-20260616T030213Z-A`
 - milestone: M-20260616T030213Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260616T030213Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260616T030213Z-A/issue.md`
 ### completed_issues
 
 ## M-20260616T083810Z-A
@@ -1266,7 +1266,7 @@
 ### candidate_issues
 1. `C-20260616T083810Z-A`
 - milestone: M-20260616T083810Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260616T083810Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260616T083810Z-A/issue.md`
 ### completed_issues
 
 ## M-20260616T143914Z-A
@@ -1281,7 +1281,7 @@
 ### candidate_issues
 1. `C-20260616T143914Z-A`
 - milestone: M-20260616T143914Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260616T143914Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260616T143914Z-A/issue.md`
 ### completed_issues
 
 ## M-20260617T051631Z-A
@@ -1296,7 +1296,7 @@
 ### candidate_issues
 1. `C-20260617T051631Z-A`
 - milestone: M-20260617T051631Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260617T051631Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260617T051631Z-A/issue.md`
 ### completed_issues
 
 ## M-20260617T063755Z-A
@@ -1311,7 +1311,7 @@
 ### candidate_issues
 1. `C-20260617T063755Z-A`
 - milestone: M-20260617T063755Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260617T063755Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260617T063755Z-A/issue.md`
 ### completed_issues
 
 ## M-20260617T095105Z-A
@@ -1326,7 +1326,7 @@
 ### candidate_issues
 1. `C-20260617T095105Z-A`
 - milestone: M-20260617T095105Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260617T095105Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260617T095105Z-A/issue.md`
 ### completed_issues
 
 ## M-20260617T130029Z-A
@@ -1341,7 +1341,7 @@
 ### candidate_issues
 1. `C-20260617T130029Z-A`
 - milestone: M-20260617T130029Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260617T130029Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260617T130029Z-A/issue.md`
 ### completed_issues
 
 ## M-20260617T133709Z-A
@@ -1356,7 +1356,7 @@
 ### candidate_issues
 1. `C-20260617T133709Z-A`
 - milestone: M-20260617T133709Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260617T133709Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260617T133709Z-A/issue.md`
 ### completed_issues
 
 ## M-20260618T035220Z-A
@@ -1371,7 +1371,7 @@
 ### candidate_issues
 1. `C-20260618T035220Z-A`
 - milestone: M-20260618T035220Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260618T035220Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260618T035220Z-A/issue.md`
 ### completed_issues
 
 ## M-20260618T054147Z-A
@@ -1386,7 +1386,7 @@
 ### candidate_issues
 1. `C-20260618T054147Z-A`
 - milestone: M-20260618T054147Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260618T054147Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260618T054147Z-A/issue.md`
 ### completed_issues
 
 ## M-20260618T065221Z-A
@@ -1401,7 +1401,7 @@
 ### candidate_issues
 1. `C-20260618T065221Z-A`
 - milestone: M-20260618T065221Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260618T065221Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260618T065221Z-A/issue.md`
 ### completed_issues
 
 ## M-20260618T091116Z-A
@@ -1416,7 +1416,7 @@
 ### candidate_issues
 1. `C-20260618T091116Z-A`
 - milestone: M-20260618T091116Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260618T091116Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260618T091116Z-A/issue.md`
 ### completed_issues
 
 ## M-20260618T091721Z-A
@@ -1431,7 +1431,7 @@
 ### candidate_issues
 1. `C-20260618T091721Z-A`
 - milestone: M-20260618T091721Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260618T091721Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260618T091721Z-A/issue.md`
 ### completed_issues
 
 ## M-20260619T033758Z-A
@@ -1446,7 +1446,7 @@
 ### candidate_issues
 1. `C-20260619T033758Z-A`
 - milestone: M-20260619T033758Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260619T033758Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260619T033758Z-A/issue.md`
 ### completed_issues
 
 ## M-20260619T043000Z-A
@@ -1461,7 +1461,7 @@
 ### candidate_issues
 1. `C-20260619T043000Z-A`
 - milestone: M-20260619T043000Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260619T043000Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260619T043000Z-A/issue.md`
 ### completed_issues
 
 ## M-20260619T045410Z-A
@@ -1476,7 +1476,7 @@
 ### candidate_issues
 1. `C-20260619T045410Z-A`
 - milestone: M-20260619T045410Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260619T045410Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260619T045410Z-A/issue.md`
 ### completed_issues
 
 ## M-20260619T061448Z-A
@@ -1491,7 +1491,7 @@
 ### candidate_issues
 1. `C-20260619T061448Z-A`
 - milestone: M-20260619T061448Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260619T061448Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260619T061448Z-A/issue.md`
 ### completed_issues
 
 ## M-20260620T142838Z-A
@@ -1506,7 +1506,7 @@
 ### candidate_issues
 1. `C-20260620T142838Z-A`
 - milestone: M-20260620T142838Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260620T142838Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260620T142838Z-A/issue.md`
 ### completed_issues
 
 ## M-20260620T142847Z-A
@@ -1521,7 +1521,7 @@
 ### candidate_issues
 1. `C-20260620T142847Z-A`
 - milestone: M-20260620T142847Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260620T142847Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260620T142847Z-A/issue.md`
 ### completed_issues
 
 ## M-20260621T005656Z-A
@@ -1536,7 +1536,7 @@
 ### candidate_issues
 1. `C-20260621T005656Z-A`
 - milestone: M-20260621T005656Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260621T005656Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260621T005656Z-A/issue.md`
 ### completed_issues
 
 ## M-20260621T043842Z-A
@@ -1551,7 +1551,7 @@
 ### candidate_issues
 1. `C-20260621T043842Z-A`
 - milestone: M-20260621T043842Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260621T043842Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260621T043842Z-A/issue.md`
 ### completed_issues
 
 ## M-20260621T063130Z-A
@@ -1566,7 +1566,7 @@
 ### candidate_issues
 1. `C-20260621T063130Z-A`
 - milestone: M-20260621T063130Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260621T063130Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260621T063130Z-A/issue.md`
 ### completed_issues
 
 ## M-20260621T081426Z-A
@@ -1581,7 +1581,7 @@
 ### candidate_issues
 1. `C-20260621T081426Z-A`
 - milestone: M-20260621T081426Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260621T081426Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260621T081426Z-A/issue.md`
 ### completed_issues
 
 ## M-20260621T081814Z-A
@@ -1596,7 +1596,7 @@
 ### candidate_issues
 1. `C-20260621T081814Z-A`
 - milestone: M-20260621T081814Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260621T081814Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260621T081814Z-A/issue.md`
 ### completed_issues
 
 ## M-20260621T090002Z-A
@@ -1611,7 +1611,7 @@
 ### candidate_issues
 1. `C-20260621T090002Z-A`
 - milestone: M-20260621T090002Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260621T090002Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260621T090002Z-A/issue.md`
 ### completed_issues
 
 ## M-20260621T092609Z-A
@@ -1626,7 +1626,7 @@
 ### candidate_issues
 1. `C-20260621T092609Z-A`
 - milestone: M-20260621T092609Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260621T092609Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260621T092609Z-A/issue.md`
 ### completed_issues
 
 ## M-20260622T000649Z-A
@@ -1641,7 +1641,7 @@
 ### candidate_issues
 1. `C-20260622T000649Z-A`
 - milestone: M-20260622T000649Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260622T000649Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260622T000649Z-A/issue.md`
 ### completed_issues
 
 ## M-20260622T003231Z-A
@@ -1656,7 +1656,7 @@
 ### candidate_issues
 1. `C-20260622T003231Z-A`
 - milestone: M-20260622T003231Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260622T003231Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260622T003231Z-A/issue.md`
 ### completed_issues
 
 ## M-20260622T021126Z-A
@@ -1671,7 +1671,7 @@
 ### candidate_issues
 1. `C-20260622T021126Z-A`
 - milestone: M-20260622T021126Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260622T021126Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260622T021126Z-A/issue.md`
 ### completed_issues
 
 ## M-20260622T023441Z-A
@@ -1686,7 +1686,7 @@
 ### candidate_issues
 1. `C-20260622T023441Z-A`
 - milestone: M-20260622T023441Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260622T023441Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260622T023441Z-A/issue.md`
 ### completed_issues
 
 ## M-20260622T024321Z-A
@@ -1701,7 +1701,7 @@
 ### candidate_issues
 1. `C-20260622T024321Z-A`
 - milestone: M-20260622T024321Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260622T024321Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260622T024321Z-A/issue.md`
 ### completed_issues
 
 ## M-20260622T025044Z-A
@@ -1716,7 +1716,7 @@
 ### candidate_issues
 1. `C-20260622T025044Z-A`
 - milestone: M-20260622T025044Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260622T025044Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260622T025044Z-A/issue.md`
 ### completed_issues
 
 ## M-20260622T025736Z-A
@@ -1731,7 +1731,7 @@
 ### candidate_issues
 1. `C-20260622T025736Z-A`
 - milestone: M-20260622T025736Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260622T025736Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260622T025736Z-A/issue.md`
 ### completed_issues
 
 ## M-20260622T031557Z-A
@@ -1746,7 +1746,7 @@
 ### candidate_issues
 1. `C-20260622T031557Z-A`
 - milestone: M-20260622T031557Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260622T031557Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260622T031557Z-A/issue.md`
 ### completed_issues
 
 ## M-20260622T100348Z-A
@@ -1761,7 +1761,7 @@
 ### candidate_issues
 1. `C-20260622T100348Z-A`
 - milestone: M-20260622T100348Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260622T100348Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260622T100348Z-A/issue.md`
 ### completed_issues
 
 ## M-20260622T104129Z-A
@@ -1776,7 +1776,7 @@
 ### candidate_issues
 1. `C-20260622T104129Z-A`
 - milestone: M-20260622T104129Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260622T104129Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260622T104129Z-A/issue.md`
 ### completed_issues
 
 ## M-20260622T110050Z-A
@@ -1791,7 +1791,7 @@
 ### candidate_issues
 1. `C-20260622T110050Z-A`
 - milestone: M-20260622T110050Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260622T110050Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260622T110050Z-A/issue.md`
 ### completed_issues
 
 ## M-20260622T113847Z-A
@@ -1806,7 +1806,7 @@
 ### candidate_issues
 1. `C-20260622T113847Z-A`
 - milestone: M-20260622T113847Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260622T113847Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260622T113847Z-A/issue.md`
 ### completed_issues
 
 ## M-20260622T114625Z-A
@@ -1821,7 +1821,7 @@
 ### candidate_issues
 1. `C-20260622T114625Z-A`
 - milestone: M-20260622T114625Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260622T114625Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260622T114625Z-A/issue.md`
 ### completed_issues
 
 ## M-20260622T115249Z-A
@@ -1836,7 +1836,7 @@
 ### candidate_issues
 1. `C-20260622T115249Z-A`
 - milestone: M-20260622T115249Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260622T115249Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260622T115249Z-A/issue.md`
 ### completed_issues
 
 ## M-20260622T120046Z-A
@@ -1851,7 +1851,7 @@
 ### candidate_issues
 1. `C-20260622T120046Z-A`
 - milestone: M-20260622T120046Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260622T120046Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260622T120046Z-A/issue.md`
 ### completed_issues
 
 ## M-20260622T123204Z-A
@@ -1866,7 +1866,7 @@
 ### candidate_issues
 1. `C-20260622T123204Z-A`
 - milestone: M-20260622T123204Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260622T123204Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260622T123204Z-A/issue.md`
 ### completed_issues
 
 ## M-20260622T131109Z-A
@@ -1881,7 +1881,7 @@
 ### candidate_issues
 1. `C-20260622T131109Z-A`
 - milestone: M-20260622T131109Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260622T131109Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260622T131109Z-A/issue.md`
 ### completed_issues
 
 ## M-20260623T022909Z-A
@@ -1896,7 +1896,7 @@
 ### candidate_issues
 1. `C-20260623T022909Z-A`
 - milestone: M-20260623T022909Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260623T022909Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260623T022909Z-A/issue.md`
 ### completed_issues
 
 ## M-20260623T075200Z-A
@@ -1911,7 +1911,7 @@
 ### candidate_issues
 1. `C-20260623T075200Z-A`
 - milestone: M-20260623T075200Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260623T075200Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260623T075200Z-A/issue.md`
 ### completed_issues
 
 ## M-20260623T100903Z-A
@@ -1926,7 +1926,7 @@
 ### candidate_issues
 1. `C-20260623T100903Z-A`
 - milestone: M-20260623T100903Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260623T100903Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260623T100903Z-A/issue.md`
 ### completed_issues
 
 ## M-20260623T140410Z-A
@@ -1941,7 +1941,7 @@
 ### candidate_issues
 1. `C-20260623T140410Z-A`
 - milestone: M-20260623T140410Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260623T140410Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260623T140410Z-A/issue.md`
 ### completed_issues
 
 ## M-20260623T162226Z-A
@@ -1956,7 +1956,7 @@
 ### candidate_issues
 1. `C-20260623T162226Z-A`
 - milestone: M-20260623T162226Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260623T162226Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260623T162226Z-A/issue.md`
 ### completed_issues
 
 ## M-20260623T162243Z-A
@@ -1971,7 +1971,7 @@
 ### candidate_issues
 1. `C-20260623T162243Z-A`
 - milestone: M-20260623T162243Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260623T162243Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260623T162243Z-A/issue.md`
 ### completed_issues
 
 ## M-20260624T004510Z-A
@@ -1986,7 +1986,7 @@
 ### candidate_issues
 1. `C-20260624T004510Z-A`
 - milestone: M-20260624T004510Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260624T004510Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260624T004510Z-A/issue.md`
 ### completed_issues
 
 ## M-20260624T004524Z-A
@@ -2001,7 +2001,7 @@
 ### candidate_issues
 1. `C-20260624T004524Z-A`
 - milestone: M-20260624T004524Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260624T004524Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260624T004524Z-A/issue.md`
 ### completed_issues
 
 ## M-20260624T013737Z-A
@@ -2016,7 +2016,7 @@
 ### candidate_issues
 1. `C-20260624T013737Z-A`
 - milestone: M-20260624T013737Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260624T013737Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260624T013737Z-A/issue.md`
 ### completed_issues
 
 ## M-20260624T055231Z-A
@@ -2031,7 +2031,7 @@
 ### candidate_issues
 1. `C-20260624T055231Z-A`
 - milestone: M-20260624T055231Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260624T055231Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260624T055231Z-A/issue.md`
 ### completed_issues
 
 ## M-20260624T061532Z-A
@@ -2046,7 +2046,7 @@
 ### candidate_issues
 1. `C-20260624T061532Z-A`
 - milestone: M-20260624T061532Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260624T061532Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260624T061532Z-A/issue.md`
 ### completed_issues
 
 ## M-20260624T062756Z-A
@@ -2061,7 +2061,7 @@
 ### candidate_issues
 1. `C-20260624T062756Z-A`
 - milestone: M-20260624T062756Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260624T062756Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260624T062756Z-A/issue.md`
 ### completed_issues
 
 ## M-20260624T072546Z-A
@@ -2076,11 +2076,11 @@
 ### candidate_issues
 1. `C-20260624T072546Z-A`
 - milestone: M-20260624T072546Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260624T072546Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260624T072546Z-A/issue.md`
 ### completed_issues
 1. `I-20260624T072546Z-A`
 - title: auto-generated; milestone_state: completed
-- issue_path: `docs/issues/I-20260624T072546Z-A/issue.md`
+- issue_path: `docs/B2-docs/ibm/_legacy-issues/I-20260624T072546Z-A/issue.md`
 - phase_state: `completed`
 
 ## M-20260624T081358Z-A
@@ -2095,7 +2095,7 @@
 ### candidate_issues
 1. `C-20260624T081358Z-A`
 - milestone: M-20260624T081358Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260624T081358Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260624T081358Z-A/issue.md`
 ### completed_issues
 
 ## M-20260624T081419Z-A
@@ -2110,7 +2110,7 @@
 ### candidate_issues
 1. `C-20260624T081419Z-A`
 - milestone: M-20260624T081419Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260624T081419Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260624T081419Z-A/issue.md`
 ### completed_issues
 
 ## M-20260624T085740Z-A
@@ -2125,7 +2125,7 @@
 ### candidate_issues
 1. `C-20260624T085740Z-A`
 - milestone: M-20260624T085740Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260624T085740Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260624T085740Z-A/issue.md`
 ### completed_issues
 
 ## M-20260624T090635Z-A
@@ -2140,7 +2140,7 @@
 ### candidate_issues
 1. `C-20260624T090635Z-A`
 - milestone: M-20260624T090635Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260624T090635Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260624T090635Z-A/issue.md`
 ### completed_issues
 
 ## M-20260624T090651Z-A
@@ -2155,7 +2155,7 @@
 ### candidate_issues
 1. `C-20260624T090651Z-A`
 - milestone: M-20260624T090651Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260624T090651Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260624T090651Z-A/issue.md`
 ### completed_issues
 
 ## M-20260624T090654Z-A
@@ -2170,7 +2170,7 @@
 ### candidate_issues
 1. `C-20260624T090654Z-A`
 - milestone: M-20260624T090654Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260624T090654Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260624T090654Z-A/issue.md`
 ### completed_issues
 
 ## M-20260624T092822Z-A
@@ -2185,7 +2185,7 @@
 ### candidate_issues
 1. `C-20260624T092822Z-A`
 - milestone: M-20260624T092822Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260624T092822Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260624T092822Z-A/issue.md`
 ### completed_issues
 
 ## M-20260624T104229Z-A
@@ -2200,7 +2200,7 @@
 ### candidate_issues
 1. `C-20260624T104229Z-A`
 - milestone: M-20260624T104229Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260624T104229Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260624T104229Z-A/issue.md`
 ### completed_issues
 
 ## M-20260624T104233Z-A
@@ -2215,7 +2215,7 @@
 ### candidate_issues
 1. `C-20260624T104233Z-A`
 - milestone: M-20260624T104233Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260624T104233Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260624T104233Z-A/issue.md`
 ### completed_issues
 
 ## M-20260624T105442Z-A
@@ -2230,7 +2230,7 @@
 ### candidate_issues
 1. `C-20260624T105442Z-A`
 - milestone: M-20260624T105442Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260624T105442Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260624T105442Z-A/issue.md`
 ### completed_issues
 
 ## M-20260624T141559Z-A
@@ -2245,7 +2245,7 @@
 ### candidate_issues
 1. `C-20260624T141559Z-A`
 - milestone: M-20260624T141559Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260624T141559Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260624T141559Z-A/issue.md`
 ### completed_issues
 
 ## M-20260624T151020Z-A
@@ -2260,7 +2260,7 @@
 ### candidate_issues
 1. `C-20260624T151020Z-A`
 - milestone: M-20260624T151020Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260624T151020Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260624T151020Z-A/issue.md`
 ### completed_issues
 
 ## M-20260624T152500Z-A
@@ -2290,7 +2290,7 @@
 ### candidate_issues
 1. `C-20260624T154500Z-A`
 - milestone: M-20260624T154500Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260624T154500Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260624T154500Z-A/issue.md`
 ### completed_issues
 
 ## M-20260624T155212Z-A
@@ -2305,7 +2305,7 @@
 ### candidate_issues
 1. `C-20260624T155212Z-A`
 - milestone: M-20260624T155212Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260624T155212Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260624T155212Z-A/issue.md`
 ### completed_issues
 
 ## M-20260624T235907Z-A
@@ -2320,7 +2320,7 @@
 ### candidate_issues
 1. `C-20260624T235907Z-A`
 - milestone: M-20260624T235907Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260624T235907Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260624T235907Z-A/issue.md`
 ### completed_issues
 
 ## M-20260625T000114Z-A
@@ -2335,7 +2335,7 @@
 ### candidate_issues
 1. `C-20260625T000114Z-A`
 - milestone: M-20260625T000114Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260625T000114Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260625T000114Z-A/issue.md`
 ### completed_issues
 
 ## M-20260625T003331Z-A
@@ -2350,7 +2350,7 @@
 ### candidate_issues
 1. `C-20260625T003331Z-A`
 - milestone: M-20260625T003331Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260625T003331Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260625T003331Z-A/issue.md`
 ### completed_issues
 
 ## M-20260625T012435Z-A
@@ -2365,7 +2365,7 @@
 ### candidate_issues
 1. `C-20260625T012435Z-A`
 - milestone: M-20260625T012435Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260625T012435Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260625T012435Z-A/issue.md`
 ### completed_issues
 
 ## M-20260625T020000Z-A
@@ -2380,7 +2380,7 @@
 ### candidate_issues
 1. `C-20260625T020000Z-A`
 - milestone: M-20260625T020000Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260625T020000Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260625T020000Z-A/issue.md`
 ### completed_issues
 
 ## M-20260625T020333Z-A
@@ -2395,7 +2395,7 @@
 ### candidate_issues
 1. `C-20260625T020333Z-A`
 - milestone: M-20260625T020333Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260625T020333Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260625T020333Z-A/issue.md`
 ### completed_issues
 
 ## M-20260625T030147Z-A
@@ -2410,7 +2410,7 @@
 ### candidate_issues
 1. `C-20260625T030147Z-A`
 - milestone: M-20260625T030147Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260625T030147Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260625T030147Z-A/issue.md`
 ### completed_issues
 
 ## M-20260625T031400Z-A
@@ -2425,7 +2425,7 @@
 ### candidate_issues
 1. `C-20260625T031400Z-A`
 - milestone: M-20260625T031400Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260625T031400Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260625T031400Z-A/issue.md`
 ### completed_issues
 
 ## M-20260625T045400Z-A
@@ -2440,7 +2440,7 @@
 ### candidate_issues
 1. `C-20260625T045400Z-A`
 - milestone: M-20260625T045400Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260625T045400Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260625T045400Z-A/issue.md`
 ### completed_issues
 
 ## M-20260625T045412Z-A
@@ -2455,7 +2455,7 @@
 ### candidate_issues
 1. `C-20260625T045412Z-A`
 - milestone: M-20260625T045412Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260625T045412Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260625T045412Z-A/issue.md`
 ### completed_issues
 
 ## M-20260625T050000Z-A
@@ -2470,7 +2470,7 @@
 ### candidate_issues
 1. `C-20260625T050000Z-A`
 - milestone: M-20260625T050000Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260625T050000Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260625T050000Z-A/issue.md`
 ### completed_issues
 
 ## M-20260625T081835Z-A
@@ -2485,7 +2485,7 @@
 ### candidate_issues
 1. `C-20260625T081835Z-A`
 - milestone: M-20260625T081835Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260625T081835Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260625T081835Z-A/issue.md`
 ### completed_issues
 
 ## M-20260625T084506Z-A
@@ -2500,7 +2500,7 @@
 ### candidate_issues
 1. `C-20260625T084506Z-A`
 - milestone: M-20260625T084506Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260625T084506Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260625T084506Z-A/issue.md`
 ### completed_issues
 
 ## M-20260625T084522Z-A
@@ -2515,7 +2515,7 @@
 ### candidate_issues
 1. `C-20260625T084522Z-A`
 - milestone: M-20260625T084522Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260625T084522Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260625T084522Z-A/issue.md`
 ### completed_issues
 
 ## M-20260625T131154Z-A
@@ -2530,7 +2530,7 @@
 ### candidate_issues
 1. `C-20260625T131154Z-A`
 - milestone: M-20260625T131154Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260625T131154Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260625T131154Z-A/issue.md`
 ### completed_issues
 
 ## M-20260625T153111Z-A
@@ -2545,7 +2545,7 @@
 ### candidate_issues
 1. `C-20260625T153111Z-A`
 - milestone: M-20260625T153111Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260625T153111Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260625T153111Z-A/issue.md`
 ### completed_issues
 
 ## M-20260627T062554Z-A
@@ -2560,7 +2560,7 @@
 ### candidate_issues
 1. `C-20260627T062554Z-A`
 - milestone: M-20260627T062554Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260627T062554Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260627T062554Z-A/issue.md`
 ### completed_issues
 
 ## M-20260627T084523Z-A
@@ -2575,7 +2575,7 @@
 ### candidate_issues
 1. `C-20260627T084523Z-A`
 - milestone: M-20260627T084523Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260627T084523Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260627T084523Z-A/issue.md`
 ### completed_issues
 
 ## M-20260627T084545Z-A
@@ -2590,7 +2590,7 @@
 ### candidate_issues
 1. `C-20260627T084545Z-A`
 - milestone: M-20260627T084545Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260627T084545Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260627T084545Z-A/issue.md`
 ### completed_issues
 
 ## M-20260627T084551Z-A
@@ -2605,7 +2605,7 @@
 ### candidate_issues
 1. `C-20260627T084551Z-A`
 - milestone: M-20260627T084551Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260627T084551Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260627T084551Z-A/issue.md`
 ### completed_issues
 
 ## M-20260627T121248Z-A
@@ -2620,7 +2620,7 @@
 ### candidate_issues
 1. `C-20260627T121248Z-A`
 - milestone: M-20260627T121248Z-A; status: promoted
-- promoted_issue_id: `docs/issues/I-20260627T121248Z-A/issue.md`
+- promoted_issue_id: `docs/B2-docs/ibm/_legacy-issues/I-20260627T121248Z-A/issue.md`
 
 ## M-20260629T095905Z-A
 - title: optimize workflow skill — stage 0, cd hint, CLAUDE.md chain

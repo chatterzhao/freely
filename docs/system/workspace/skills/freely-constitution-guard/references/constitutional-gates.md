@@ -4,7 +4,7 @@
 2. 分支与工作树：分支来源、merge 方向、保护分支与 sibling worktree 根目录符合宪法表；主分支禁止 add/commit。
 3. 版本命名：标签遵循 `YYYY.MM.DD-HHMM-stage`，且分支 / stage 映射正确。
 4. 强制技术栈：未显式修订前，不替换 Tauri / Rust / React / Bun / xterm.js / Rust PTY。
-5. 基线结构：当前研究阶段至少保留 `PROJECT_INTENT`、`CONSTITUTION`、`LAWS` 与 `pre-brainstorms/` 活跃文档集合。
+5. 基线结构：当前研究阶段至少保留 `PROJECT_INTENT`、`CONSTITUTION`、`LAWS` 与 `B1-docs/` 活跃文档集合。
 6. 终端架构：终端必须经 PTY 驱动真实 shell，会话/PID/状态隔离。
 7. AI 执行模式：AI 规格遵循 `tool:model:mode`，`auto` / `step` 语义不被破坏。
 8. 恢复策略：续接优先，不支持续接时桥接恢复；恢复记录保留 branch/worktree/session。

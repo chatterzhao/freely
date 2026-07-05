@@ -148,7 +148,7 @@ Freely 的角色组织遵循四层：
 
 不要把上述四层全部硬塞到同一个 prompt 或单一 skill 中。
 
-## pre-brainstorms 触发
+## B1-docs 触发
 当任一条件成立时，经 `freely-context-source-skill` 判定后进入 `freely-doc-B1_IBM-execution`：
 - 问题来源已发现，但 `epic/story/milestone` 尚未收敛。
 - 验收边界不清，无法直接进入 `dev-loop`。

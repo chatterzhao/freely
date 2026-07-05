@@ -11,7 +11,7 @@ Freely 是一个自主项目循环运行器：
 - 项目意图：`docs/PROJECT_INTENT.md`
 - 宪法：`docs/CONSTITUTION.md`
 - 法律：`docs/LAWS.md`
-- pre-brainstorms 工作区：`docs/pre-brainstorms/README.md`
+- B1-docs 工作区：`docs/B1-docs/README.md`
 
 ## 快速开始
 

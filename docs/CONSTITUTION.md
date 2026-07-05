@@ -149,13 +149,13 @@ Freely 是一个自主循环运行器：
 每个托管项目应至少保持以下基线结构：
 
 - `README.md`（项目入口和运行手册）
-- `docs/`（治理 + pre-brainstorms）
+- `docs/`（治理 + B1-docs）
 - `src/`（主要实现代码）
 - `.env/`（环境模板/脚本/配置片段，版本化）
 - `.env.example`（必需的环境变量模板，不含密钥）
 
 Freely 仓库在“研究优先阶段”有临时覆盖约束：
-- `docs/` 仅保留 `PROJECT_INTENT.md`、`LAWS.md`、`CONSTITUTION.md` 与 `pre-brainstorms/`。
+- `docs/` 仅保留 `PROJECT_INTENT.md`、`LAWS.md`、`CONSTITUTION.md` 与 `B1-docs/`。
 - 历史文档资产不在工作区保留，统一通过 git 历史追溯。
 
 如果项目使用 monorepo 或不同布局，必须在文档中提供等效映射。

@@ -183,7 +183,7 @@ Freely Agent Card 扩展 A2A 标准，声明 Freely 特有能力：
       "data": {
         "paths": [
           "docs/progress/xxx/evidence.md",
-          "docs/issues/xxx/issue.md"
+          "docs/B1-docs/xxx/issue.md"
         ]
       }
     }

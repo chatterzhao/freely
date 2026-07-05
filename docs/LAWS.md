@@ -585,11 +585,11 @@ merge receipt 字段（写入 protected-branch merge commit message）：
 
 判定规则：
 1. Freely 自身开发遵守同一治理链（意图/宪法/法律/skills）。
-2. 架构治理变更先进入 pre-brainstorms，再进入 doc/dev 落地。
+2. 架构治理变更先进入 B1-docs，再进入 doc/dev 落地。
 3. 工具链治理能力可复用到托管项目。
 
 最小验收证据：
-- pre-brainstorms -> doc/dev 落地链路
+- B1-docs -> doc/dev 落地链路
 - 自举治理检查记录
 
 执行技能：
