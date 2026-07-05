@@ -267,15 +267,39 @@ def path_exists(rel_path: Optional[str]) -> bool:
 
 
 def verification_artifact_dir_is_scoped(rel_path: str) -> bool:
+    """Validate canonical format: docs/B2-docs/{epic}/{story}/raw-{key}/code-reviews"""
     parts = [part for part in normalize_scalar(rel_path).split("/") if part]
-    if len(parts) < 4:
+    if len(parts) < 6:
         return False
-    if parts[0] != "docs" or parts[1] != "epics":
+    if parts[0] != "docs" or parts[1] != "B2-docs":
+        return False
+    # Must have raw-{key} layer: parts[2]=epic, parts[3]=story, parts[4]=raw-{key}, parts[5]=code-reviews
+    if not parts[4].startswith("raw-"):
         return False
     if parts[-1] != "code-reviews":
         return False
     return True
 
+
+def b1_docs_path_is_canonical(rel_path: str) -> bool:
+    """Validate B1 path: docs/B1-docs/raw-{key}/"""
+    parts = [p for p in rel_path.split("/") if p]
+    return (
+        len(parts) >= 3
+        and parts[0] == "docs"
+        and parts[1] == "B1-docs"
+        and parts[2].startswith("raw-")
+    )
+
+def b2_docs_path_is_canonical(rel_path: str) -> bool:
+    """Validate B2 path: docs/B2-docs/{epic}/{story}/raw-{key}/..."""
+    parts = [p for p in rel_path.split("/") if p]
+    return (
+        len(parts) >= 5
+        and parts[0] == "docs"
+        and parts[1] == "B2-docs"
+        and parts[4].startswith("raw-")
+    )
 
 def normalized_phase(value: Optional[str]) -> str:
     return (value or "").strip("`").strip()
