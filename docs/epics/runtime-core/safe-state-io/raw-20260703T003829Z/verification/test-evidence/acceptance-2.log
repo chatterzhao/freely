@@ -1,3 +1,0 @@
-AT-002: workcell-state.env format check - PASS
-All 23 lines in KEY="value" format
-No unquoted multi-word values found
