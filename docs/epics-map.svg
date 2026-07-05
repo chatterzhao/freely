@@ -182,6 +182,7 @@
   <rect id="story-historical-completed-queue-identity-followthrough-governance" x="55" y="1938" width="690" height="18" fill="#fff" stroke="#6a1b9a" stroke-width="1" rx="2"/>
   <text x="65" y="1951" fill="#333">historical-completed-queue-identity-followthrough-governance</text>
   <rect id="story-ibm-pretests-executable-acceptance-quality-governance" x="55" y="1958" width="690" height="18" fill="#fff" stroke="#6a1b9a" stroke-width="1" rx="2"/>
+  <rect id="story-b2-governance" x="55" y="1978" width="690" height="18" fill="#fff" stroke="#6a1b9a" stroke-width="1" rx="2"/>
   <text x="65" y="1971" fill="#333">ibm-pretests-executable-acceptance-quality-governance</text>
   <rect id="story-implementation-decision-notes-in-issue-review-artifacts-governance" x="55" y="1978" width="690" height="18" fill="#fff" stroke="#6a1b9a" stroke-width="1" rx="2"/>
   <text x="65" y="1991" fill="#333">implementation-decision-notes-in-issue-review-artifacts-governance</text>
