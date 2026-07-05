@@ -2843,5 +2843,21 @@
 - status: active
 ### candidate_issues
 1. `C-20260705T064047Z-A`
-- milestone: M-20260705T064047Z-A; status: promoted
-- promoted_issue_id: `I-20260705T064047Z-A`
+- milestone: M-20260705T064047Z-A; status: absorbed
+- absorbed_into: `I-20260705T064047Z-A`
+### committed_issues
+1. `I-20260705T064047Z-A`
+- title: fix — unify develop protection messages
+- milestone: M-20260705T064047Z-A
+- phase_state: completed
+- path: docs/epics/agent-acp/unify-protection-msgs/raw-20260705T064047Z/issues/I-20260705T064047Z-A.md
+### completed_issues
+1. `I-20260705T064047Z-A`
+- title: fix — unify develop protection messages
+- milestone: M-20260705T064047Z-A
+- phase_state: completed
+- path: docs/epics/agent-acp/unify-protection-msgs/raw-20260705T064047Z/issues/I-20260705T064047Z-A.md
+2. `C-20260705T064047Z-A`
+- milestone: M-20260705T064047Z-A
+- status: absorbed
+- absorbed_into: `I-20260705T064047Z-A`
