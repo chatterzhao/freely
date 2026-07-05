@@ -1802,14 +1802,15 @@
 
 ## M-20260704T234812Z-A
 - title: fix — #3731 ACP cleanup 遗漏修复 + hook 提示改进
-- status: active
-### candidate_issues
-1. `C-20260704T234812Z-A`
-- milestone: M-20260704T234812Z-A; status: promoted
-- promoted_issue_id: `I-20260704T234812Z-A`
+- status: completed
 ### committed_issues
 1. `I-20260704T234812Z-A`
 - title: fix — #3731 ACP cleanup 遗漏修复 + hook 提示改进
 - milestone: M-20260704T234812Z-A
 - phase_state: completed
 - path: docs/epics/agent-acp/acp-cleanup/raw-20260704T234812Z/issues/I-20260704T234812Z-A.md
+### completed_issues
+1. `C-20260704T234812Z-A`
+- milestone: M-20260704T234812Z-A
+- status: absorbed
+- absorbed_into: `I-20260704T234812Z-A`
