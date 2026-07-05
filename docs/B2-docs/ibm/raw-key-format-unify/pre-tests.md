@@ -9,7 +9,7 @@
 - blocker taxonomy: `definition_missing`
 - not_applicable_reason: `no_executable_boundary_at_this_layer`
 - not_applicable_explanation: `本次为 regex 模式匹配层重构，不涉及可执行的单元测试边界。所有验证通过 grep/sed/scan 命令行手工执行完成。`
-- replacement_evidence: `docs/epics/workspace-routing-foundation/raw-key-format-unify/code-reviews/closeout-review.md`
+- replacement_evidence: `docs/B2-docs/ibm/raw-key-format-unify/code-reviews/closeout-review.md`
 
 ## Integration
 
@@ -20,7 +20,7 @@
 - blocker taxonomy: `definition_missing`
 - not_applicable_reason: `no_executable_boundary_at_this_layer`
 - not_applicable_explanation: `集成测试的验证面是 scan chain trace 和 pre-push hook 的行为不变性。已通过手工运行 scan 和 grep 测试确认旧格式无回归、新格式被识别。`
-- replacement_evidence: `docs/epics/workspace-routing-foundation/raw-key-format-unify/code-reviews/closeout-review.md`
+- replacement_evidence: `docs/B2-docs/ibm/raw-key-format-unify/code-reviews/closeout-review.md`
 
 ## End-to-End
 
@@ -31,7 +31,7 @@
 - blocker taxonomy: `definition_missing`
 - not_applicable_reason: `no_executable_boundary_at_this_layer`
 - not_applicable_explanation: `端到端验证面是完整 Freely 流程，行为完全由 regex 模式匹配决定。手工测试已覆盖所有新旧格式组合。`
-- replacement_evidence: `docs/epics/workspace-routing-foundation/raw-key-format-unify/code-reviews/closeout-review.md`
+- replacement_evidence: `docs/B2-docs/ibm/raw-key-format-unify/code-reviews/closeout-review.md`
 
 ## Real-Environment
 
@@ -46,7 +46,7 @@
 - requirement: `All regex/glob patterns in pre-push.sh, wt-create, task-lifecycle-scan.py, governance-merge-gate, freely accept both old and new raw key formats`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/raw-key-format-unify/code-reviews/closeout-review.md`
+- artifact_ref: `docs/B2-docs/ibm/raw-key-format-unify/code-reviews/closeout-review.md`
 - surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
@@ -57,7 +57,7 @@
 - requirement: `task-lifecycle-scan.py produces identical output for all old-format items; new format items correctly detected`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/raw-key-format-unify/code-reviews/closeout-review.md`
+- artifact_ref: `docs/B2-docs/ibm/raw-key-format-unify/code-reviews/closeout-review.md`
 - surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`

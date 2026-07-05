@@ -37,7 +37,7 @@
 - next_action: materialize focused governance issue, update laws / skills / IBM checklist, implement merge-gate enforcement and regression tests, then keep the owner in `in_verification` until develop merge validates the gate in real usage.
 - revisit_trigger: 如果 field evidence 证明 implementation-bearing path detection 过宽或过窄，或 review artifact 的最小字段仍不足以恢复关键设计取舍，再以 follow-on 收窄 detection scope 或补充 note schema。
 - promoted_issue_id: `I-20260401-2354-A`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/issues/implementation-decision-notes-in-issue-review-artifacts-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/implementation-decision-notes-in-issue-review-artifacts-governance/issues/implementation-decision-notes-in-issue-review-artifacts-governance.md`
 - milestone: `M-20260306-workspace-routing-foundation`
 - session_refs:
   - tool: codex

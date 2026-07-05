@@ -43,35 +43,35 @@
 - requirement: `pr-merge-guarded rejects invalid merge directions (feature→develop, hotfix→develop, feature→main) and allows valid ones (feature→test-pre-merge, test-pre-merge→develop).`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/test-pre-merge-enforcement/code-reviews/rev-20260503-enforce-test-pre-merge.md`
+- artifact_ref: `docs/B2-docs/test-pre-merge-enforcement/code-reviews/rev-20260503-enforce-test-pre-merge.md`
 
 ### AT-002 pr-merge-guarded receipt production
 - id: `pr-merge-guarded-receipt-production`
 - requirement: `Each guarded merge produces canonical Freely-* trailers in the merge commit message.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/test-pre-merge-enforcement/code-reviews/rev-20260503-enforce-test-pre-merge.md`
+- artifact_ref: `docs/B2-docs/test-pre-merge-enforcement/code-reviews/rev-20260503-enforce-test-pre-merge.md`
 
 ### AT-003 pr-merge-guarded conflict completion
 - id: `pr-merge-guarded-conflict-completion`
 - requirement: `Textual merge conflicts leave merge state intact and pr-merge-guarded complete finishes the merge with correct receipt trailers.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/test-pre-merge-enforcement/code-reviews/rev-20260503-enforce-test-pre-merge.md`
+- artifact_ref: `docs/B2-docs/test-pre-merge-enforcement/code-reviews/rev-20260503-enforce-test-pre-merge.md`
 
 ### AT-004 pr-merge-guarded break-glass support
 - id: `pr-merge-guarded-break-glass-support`
 - requirement: `Hotfix→develop break-glass merge produces Freely-Break-Glass-Reason, Freely-Evidence-Ref, and Freely-Follow-On-Issue trailers.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/test-pre-merge-enforcement/code-reviews/rev-20260503-enforce-test-pre-merge.md`
+- artifact_ref: `docs/B2-docs/test-pre-merge-enforcement/code-reviews/rev-20260503-enforce-test-pre-merge.md`
 
 ### AT-005 governance-merge-gate lifecycle validation
 - id: `governance-merge-gate-lifecycle-validation`
 - requirement: `governance-merge-gate blocks merges that lack proper candidate→milestone→issue lifecycle evidence.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/test-pre-merge-enforcement/code-reviews/rev-20260503-enforce-test-pre-merge.md`
+- artifact_ref: `docs/B2-docs/test-pre-merge-enforcement/code-reviews/rev-20260503-enforce-test-pre-merge.md`
 
 ### AT-006 guarded premerge self-bootstrap
 - id: `guarded-premerge-self-bootstrap`
@@ -83,4 +83,4 @@
 - case_design: `Merge feature/raw-20260503T0915Z-enforce-test-pre-merge into test-pre-merge-enforce-gate-20260503 via pr-merge-guarded, then merge into develop via pr-merge-guarded, verifying each step produces guarded receipts and passes governance gates.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/test-pre-merge-enforcement/code-reviews/rev-20260503-enforce-test-pre-merge.md`
+- artifact_ref: `docs/B2-docs/test-pre-merge-enforcement/code-reviews/rev-20260503-enforce-test-pre-merge.md`

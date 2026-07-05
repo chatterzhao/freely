@@ -12,9 +12,9 @@
 - source_brainstorm: `docs/B1-docs/raw-20260401/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/ibm/agent-execution-safety-review-and-security-decision-support/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-agent-execution-safety-review-and-security-decision-support.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/agent-execution-safety-review-and-security-decision-support/code-reviews`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -73,11 +73,11 @@ Freely 的产品面已经在收口“默认高自治 + activation consent + 非�
 
 ## Completion
 
-- `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md`
-- `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/brainstorms/b-agent-execution-safety-review-and-security-decision-support.md`
-- `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/prd.md`
-- `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/tasks.md`
+- `docs/B2-docs/ibm/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md`
+- `docs/B2-docs/ibm/agent-execution-safety-review-and-security-decision-support/brainstorms/b-agent-execution-safety-review-and-security-decision-support.md`
+- `docs/B2-docs/ibm/agent-execution-safety-review-and-security-decision-support/prd.md`
+- `docs/B2-docs/ibm/agent-execution-safety-review-and-security-decision-support/pre-tests.md`
+- `docs/B2-docs/ibm/agent-execution-safety-review-and-security-decision-support/tasks.md`
 - `docs/progress/workspace-routing-foundation/p-agent-execution-safety-review-and-security-decision-support.md`
 - `docs/system/workspace/skills/agent-execution-safety-review/SKILL.md`
 - `docs/system/workspace/skills/agent-execution-safety-review/references/decision-ladder.md`
@@ -96,7 +96,7 @@ Freely 的产品面已经在收口“默认高自治 + activation consent + 非�
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status-security-review-surface`
 - `bash docs/system/workspace/scripts/tests/test-freely-security-review-brief`
 - `bash docs/system/workspace/scripts/tests/test-agent-execution-safety-review-skill`
-- `bin/pretests-gate --issue docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md`
+- `bin/pretests-gate --issue docs/B2-docs/ibm/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md`
 
 ## Implementation Status
 

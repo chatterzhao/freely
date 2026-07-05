@@ -11,8 +11,8 @@
 - source_candidate: `docs/B1-docs/raw-20260426/candidates.md#c-20260426-0000-a`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/pre-tests.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews`
+- pre_tests_path: `docs/B2-docs/ibm/tool-alias-and-opencode-launcher-governance/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/ibm/tool-alias-and-opencode-launcher-governance/code-reviews`
 - session_refs:
   - {tool: opencode, session_id: "20260426-opencode-launcher", jsonl_path: "unavailable://manual", role: "author"}
 

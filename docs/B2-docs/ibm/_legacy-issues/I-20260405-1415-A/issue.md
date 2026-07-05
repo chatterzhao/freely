@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO8N
     synced_at: '2026-04-27T13:16:23Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md
+canonical_issue_path: docs/B2-docs/ibm/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:24:28Z'
 hash: ''
@@ -34,4 +34,4 @@ Freely 已经在当前 Codex owner 中冻结了长期方向: tool auth/switch/pr
 1. 过早拆分，导致 Freely 和 standalone repo 双份维护仍在变化的 tool-private file knowledge
 2. 一直不拆，导致 Freely 持续吸收 backend-sp
 
-canonical: docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md
+canonical: docs/B2-docs/ibm/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md

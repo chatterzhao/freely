@@ -24,7 +24,7 @@
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_id: `I-20260412-0907-A`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/codex-probe-success-shape-and-quota-slot-recovery-governance/issues/codex-probe-success-shape-and-quota-slot-recovery-governance.md`
+- promoted_issue_path: `docs/B2-docs/config/codex-probe-success-shape-and-quota-slot-recovery-governance/issues/codex-probe-success-shape-and-quota-slot-recovery-governance.md`
 - source_brainstorm: `docs/B1-docs/raw-20260412-0907/brainstorms.md`
 - session_refs: []
 - follow_on_to: `I-20260410-1835-B`

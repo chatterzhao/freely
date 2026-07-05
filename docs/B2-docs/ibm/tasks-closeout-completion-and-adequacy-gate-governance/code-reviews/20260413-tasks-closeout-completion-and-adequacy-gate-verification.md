@@ -1,7 +1,7 @@
 # Verification: tasks-closeout-completion-and-adequacy-gate-governance
 
 - issue_id: `I-20260413-1640-A`
-- issue_path: `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/issues/tasks-closeout-completion-and-adequacy-gate-governance.md`
+- issue_path: `docs/B2-docs/ibm/tasks-closeout-completion-and-adequacy-gate-governance/issues/tasks-closeout-completion-and-adequacy-gate-governance.md`
 - verification_date: `2026-04-13`
 - verifier: `codex`
 

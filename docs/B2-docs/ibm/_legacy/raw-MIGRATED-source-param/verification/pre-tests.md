@@ -38,4 +38,4 @@
 - case_design: `missing --source shows scan file path, --source mismatch blocked by gate`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/source-param/code-reviews/review.md`
+- artifact_ref: `docs/B2-docs/source-param/code-reviews/review.md`

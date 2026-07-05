@@ -32,7 +32,7 @@
 - requirement: feedback uses gh/gitee-issue.py directly
 - evidence_level: mock
 ^- status: passed
-- artifact_ref: docs/epics/feedback-adapter-fix/code-reviews/implementation-decision.md
+- artifact_ref: docs/B2-docs/feedback-adapter-fix/code-reviews/implementation-decision.md
 ## Real-Environment
 - real_environment_status: pass
 - real_environment_reason: verified by merge

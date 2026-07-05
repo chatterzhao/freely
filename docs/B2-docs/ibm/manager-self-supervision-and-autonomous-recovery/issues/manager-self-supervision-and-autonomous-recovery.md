@@ -7,12 +7,12 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `manager-self-supervision-and-autonomous-recovery`
 - issue-name: `manager-self-supervision-and-autonomous-recovery`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/manager-self-supervision-and-autonomous-recovery/code-reviews`
 - source_candidate: `docs/B1-docs/raw-20260318/candidates.md#c-20260318-a`
 - source_brainstorm: `docs/B1-docs/raw-20260318/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- depends_on: `docs/epics/workspace-routing-foundation/checkpoint-commit-and-multi-worktree-supervision-governance/issues/checkpoint-commit-and-multi-worktree-supervision-governance.md`
+- depends_on: `docs/B2-docs/gate/checkpoint-commit-and-multi-worktree-supervision-governance/issues/checkpoint-commit-and-multi-worktree-supervision-governance.md`
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}]
 
 ## Why
@@ -70,7 +70,7 @@ Freely 已经具备局部的 worker supervision、account switch、session rotat
   - `bash docs/system/workspace/scripts/tests/test-wt-fleet-status`
   - `bash docs/system/workspace/scripts/tests/test-routing-foundation-loop`
 - 已写入 review 证据：
-  - `docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/code-reviews/20260326-manager-self-supervision-canonical-replay-verification.md`
+  - `docs/B2-docs/ibm/manager-self-supervision-and-autonomous-recovery/code-reviews/20260326-manager-self-supervision-canonical-replay-verification.md`
 - 当前验证重点：
   - 主管是否在 worker 掉线时优先进入 supervision alert
   - 工位状态是否能正确保留 `desired runtime` 和 `exit reason`

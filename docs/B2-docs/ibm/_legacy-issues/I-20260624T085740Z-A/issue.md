@@ -10,7 +10,7 @@ milestone: M-20260624T085740Z-A
 title: 'fix: A2A parse rotting submitted + prompt state semantics'
 platform_ids: {}
 primary_platform: github
-pre_tests_path: docs/epics/parse-prompt-fix/verification/pre-tests.md
+pre_tests_path: docs/B2-docs/parse-prompt-fix/verification/pre-tests.md
 verification_artifact_dir: docs/epics/parse-prompt-fix/code-reviews
 platform_state: open
 ---

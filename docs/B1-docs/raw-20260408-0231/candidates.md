@@ -18,7 +18,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - priority: `P0`
 - promoted_issue_id: `I-20260408-0231-A`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/issues/runtime-concurrent-start-stop-followthrough-governance.md`
+- promoted_issue_path: `docs/B2-docs/runtime/runtime-concurrent-start-stop-followthrough-governance/issues/runtime-concurrent-start-stop-followthrough-governance.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `none`

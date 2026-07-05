@@ -6,7 +6,7 @@
 - title: Governance-check nested test-pre-merge ancestry receipt audit false positive
 - status: `absorbed`
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/governance-check-protected-merge-history-source-policy-governance/issues/governance-check-protected-merge-history-source-policy-governance.md`
+- promoted_issue_path: `docs/B2-docs/gate/governance-check-protected-merge-history-source-policy-governance/issues/governance-check-protected-merge-history-source-policy-governance.md`
 - promoted_issue_id: `I-20260406-0045-A`
 - session_refs:
   - tool: `codex`

@@ -49,28 +49,28 @@
 - requirement: `A successful develop merge triggers one controlled push attempt automatically.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/develop-push-attempt-followthrough-governance/code-reviews/20260412-develop-push-attempt-followthrough-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/develop-push-attempt-followthrough-governance/code-reviews/20260412-develop-push-attempt-followthrough-verification.md`
 
 ### AT-002
 - id: `AT-002`
 - requirement: `A blocked push attempt writes explicit blocked followthrough truth instead of generic push_pending.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/develop-push-attempt-followthrough-governance/code-reviews/20260412-develop-push-attempt-followthrough-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/develop-push-attempt-followthrough-governance/code-reviews/20260412-develop-push-attempt-followthrough-verification.md`
 
 ### AT-003
 - id: `AT-003`
 - requirement: `The owner preserves lawful defer windows and does not add retry-until-success behavior.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/develop-push-attempt-followthrough-governance/code-reviews/20260412-develop-push-attempt-followthrough-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/develop-push-attempt-followthrough-governance/code-reviews/20260412-develop-push-attempt-followthrough-verification.md`
 
 ### AT-004
 - id: `AT-004`
 - requirement: `Canonical develop receives a real-environment verdict that matches this owner's actual merge-to-push surface.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/develop-push-attempt-followthrough-governance/code-reviews/20260412-develop-push-attempt-followthrough-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/develop-push-attempt-followthrough-governance/code-reviews/20260412-develop-push-attempt-followthrough-verification.md`
 - surface_kind: `post_merge_followthrough`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`

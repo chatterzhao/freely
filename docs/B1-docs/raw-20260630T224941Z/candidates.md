@@ -25,6 +25,6 @@ milestone: M-20260630T224941Z-A
   - merge lock 写 PID + 死锁检测 + 清晰提示
 - promotion_gate: 所有字段注释准确，init 三个场景通过测试，merge lock 死锁检测可验证
 - open_questions: []
-- promoted_issue_path: docs/epics/config-toml-example/overhaul/raw-20260630T224941Z/issues/I-20260630T224941Z-A.md
+- promoted_issue_path: docs/B2-docs/config/config-toml/raw-20260630T224941Z/issues/I-20260630T224941Z-A.md
 - milestone: M-20260630T224941Z-A
 - session_refs: []

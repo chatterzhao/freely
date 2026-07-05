@@ -12,12 +12,12 @@
 - source_brainstorm: `docs/B1-docs/raw-20260412/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/develop-push-attempt-followthrough-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/ibm/develop-push-attempt-followthrough-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-develop-push-attempt-followthrough-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/develop-push-attempt-followthrough-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/develop-push-attempt-followthrough-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/develop-push-pending-guard-governance/issues/develop-push-pending-guard-governance.md`
-  - `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md`
+  - `docs/B2-docs/ibm/develop-push-pending-guard-governance/issues/develop-push-pending-guard-governance.md`
+  - `docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -53,7 +53,7 @@ Freely already exposes develop push debt as explicit truth, but it still stops s
 - guarded develop merge receipt: `9bcf5fcf`
 - canonical delivery command: `freely develop-push attempt --project /Users/zhaoyu/Downloads/code/my-freely/freely`
 - canonical delivery result: `attempt_status: pushed`
-- verification artifact: `docs/epics/workspace-routing-foundation/develop-push-attempt-followthrough-governance/code-reviews/20260412-develop-push-attempt-followthrough-verification.md`
+- verification artifact: `docs/B2-docs/ibm/develop-push-attempt-followthrough-governance/code-reviews/20260412-develop-push-attempt-followthrough-verification.md`
 
 ## IBM Handoff
 
@@ -63,9 +63,9 @@ Freely already exposes develop push debt as explicit truth, but it still stops s
 - required_doc_refs:
   - `docs/B1-docs/raw-20260412/brainstorms.md`
   - `docs/B1-docs/raw-20260412/candidates.md`
-  - `docs/epics/workspace-routing-foundation/develop-push-attempt-followthrough-governance/prd.md`
-  - `docs/epics/workspace-routing-foundation/develop-push-attempt-followthrough-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/develop-push-attempt-followthrough-governance/tasks.md`
+  - `docs/B2-docs/ibm/develop-push-attempt-followthrough-governance/prd.md`
+  - `docs/B2-docs/ibm/develop-push-attempt-followthrough-governance/pre-tests.md`
+  - `docs/B2-docs/ibm/develop-push-attempt-followthrough-governance/tasks.md`
   - `docs/system/workspace/scripts/runtime/freely`
   - `docs/system/workspace/scripts/worktree/pr-merge-guarded`
   - `docs/system/workspace/hooks/pre-push.sh`

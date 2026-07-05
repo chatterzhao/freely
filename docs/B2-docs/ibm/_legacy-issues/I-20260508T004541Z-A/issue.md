@@ -19,7 +19,7 @@ intake_id: ''
 author: zhaoquan
 channel: feat-execution
 session_refs: []
-pre_tests_path: docs/epics/skill-ref-cleanup/verification/pre-tests.md
+pre_tests_path: docs/B2-docs/skill-ref-cleanup/verification/pre-tests.md
 verification_artifact_dir: docs/epics/skill-ref-cleanup/code-reviews
 platform_state: closed
 ---
@@ -27,7 +27,7 @@ platform_state: closed
 # I-20260508T004541Z-A: skill 引用全局改为 skill:name
 
 - source_candidate: docs/B1-docs/raw-20260508T004541Z/candidates.md
-- pre_tests_path: docs/epics/skill-ref-cleanup/verification/pre-tests.md
+- pre_tests_path: docs/B2-docs/skill-ref-cleanup/verification/pre-tests.md
 - verification_artifact_dir: docs/epics/skill-ref-cleanup/code-reviews
 
 ## 实现

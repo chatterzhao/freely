@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO5Z
     synced_at: '2026-04-27T13:14:32Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/chat-triggered-worker-runtime-reactivation-governance/issues/chat-triggered-worker-runtime-reactivation-governance.md
+canonical_issue_path: docs/B2-docs/human/chat-triggered-worker-runtime-reactivation-governance/issues/chat-triggered-worker-runtime-reactivation-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:15:34Z'
 hash: ''
@@ -26,4 +26,4 @@ platform_state: closed
 
 这会破坏 Freely 的产品语义：如果 `chat` 是正式入口，那么当 signal 明确要求当前 worker 继续做事时，runtime 必须在安全条件下重新激活正确的 worker loop。
 
-canonical: docs/epics/workspace-routing-foundation/chat-triggered-worker-runtime-reactivation-governance/issues/chat-triggered-worker-runtime-reactivation-governance.md
+canonical: docs/B2-docs/human/chat-triggered-worker-runtime-reactivation-governance/issues/chat-triggered-worker-runtime-reactivation-governance.md

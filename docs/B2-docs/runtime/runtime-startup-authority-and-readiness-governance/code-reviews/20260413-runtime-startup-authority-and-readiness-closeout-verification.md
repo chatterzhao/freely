@@ -1,7 +1,7 @@
 # Verification: runtime-startup-authority-and-readiness-governance closeout
 
 - issue_id: `I-20260413-0420-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/issues/runtime-startup-authority-and-readiness-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/issues/runtime-startup-authority-and-readiness-governance.md`
 - verification_date: `2026-04-13`
 - verifier: `codex`
 

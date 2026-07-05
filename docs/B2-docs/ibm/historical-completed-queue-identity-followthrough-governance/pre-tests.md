@@ -55,7 +55,7 @@
 - requirement: `Guarded develop replay no longer emits the historical watchdog legacy candidate identity warning after this owner lands.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/historical-completed-queue-identity-followthrough-governance/code-reviews/20260412-historical-completed-queue-identity-followthrough-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/historical-completed-queue-identity-followthrough-governance/code-reviews/20260412-historical-completed-queue-identity-followthrough-verification.md`
 - surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`

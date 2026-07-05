@@ -1,6 +1,6 @@
 # Verification: cli-help-and-dry-run-contract-followthrough-governance canonical closeout
 
-- issue_path: `docs/epics/workspace-routing-foundation/cli-help-and-dry-run-contract-followthrough-governance/issues/cli-help-and-dry-run-contract-followthrough-governance.md`
+- issue_path: `docs/B2-docs/human/cli-help-and-dry-run-contract-followthrough-governance/issues/cli-help-and-dry-run-contract-followthrough-governance.md`
 - verified_in_branch: `develop`
 - verified_in_worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely`
 - verified_at: `2026-04-09`

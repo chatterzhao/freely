@@ -11,18 +11,18 @@
 - requirement: freely tui must enter the same high-level submit helper and dispatcher ensure path that freely chat uses.
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/code-reviews/20260322-cli-first-entrypoint-and-observability-surface-unification-verification.md`
+- artifact_ref: `docs/B2-docs/human/cli-first-entrypoint-and-observability-surface-unification/code-reviews/20260322-cli-first-entrypoint-and-observability-surface-unification-verification.md`
 
 ### tui-worker-reactivation-gate
 - id: `tui-worker-reactivation-gate`
 - requirement: freely tui must trigger the same allowed worker runtime reactivation gate as freely chat during continuation flows.
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/code-reviews/20260322-cli-first-entrypoint-and-observability-surface-unification-verification.md`
+- artifact_ref: `docs/B2-docs/human/cli-first-entrypoint-and-observability-surface-unification/code-reviews/20260322-cli-first-entrypoint-and-observability-surface-unification-verification.md`
 
 ### cli-first-contract-preserved
 - id: `cli-first-contract-preserved`
 - requirement: canonical truth must continue to state that freely is the only front-door command and that TUI/GUI are render layers over the same backend contract.
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/code-reviews/20260322-cli-first-entrypoint-and-observability-surface-unification-verification.md`
+- artifact_ref: `docs/B2-docs/human/cli-first-entrypoint-and-observability-surface-unification/code-reviews/20260322-cli-first-entrypoint-and-observability-surface-unification-verification.md`

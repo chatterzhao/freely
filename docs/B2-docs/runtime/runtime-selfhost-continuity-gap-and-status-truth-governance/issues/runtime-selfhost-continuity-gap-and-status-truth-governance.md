@@ -12,13 +12,13 @@
 - source_brainstorm: `docs/B1-docs/raw-20260407/brainstorms.md`
 - execution_base: `feature/runtime-live-status-and-manager-continuity-followthrough-20260407`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-runtime-selfhost-continuity-gap-and-status-truth-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md`
-  - `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
-  - `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
+  - `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md`
+  - `docs/B2-docs/ibm/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
+  - `docs/B2-docs/ibm/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -62,13 +62,13 @@ This is not a CLI-first owner and not a generic watchdog redesign. It is the nex
 
 - `docs/B1-docs/raw-20260407/brainstorms.md`
 - `docs/B1-docs/raw-20260407/candidates.md`
-- `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
-- `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/brainstorms/b-runtime-selfhost-continuity-gap-and-status-truth-governance.md`
-- `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/tasks.md`
-- `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/code-reviews/20260407-runtime-status-truth-implementation-decision.md`
-- `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/code-reviews/20260407-runtime-status-truth-verification-replay.md`
+- `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
+- `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/brainstorms/b-runtime-selfhost-continuity-gap-and-status-truth-governance.md`
+- `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/prd.md`
+- `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/pre-tests.md`
+- `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/tasks.md`
+- `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/code-reviews/20260407-runtime-status-truth-implementation-decision.md`
+- `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/code-reviews/20260407-runtime-status-truth-verification-replay.md`
 - `docs/progress/workspace-routing-foundation/p-runtime-selfhost-continuity-gap-and-status-truth-governance.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-live-status-manager-continuity-gap-surface`
@@ -81,12 +81,12 @@ This is not a CLI-first owner and not a generic watchdog redesign. It is the nex
   - The current implementation slice is allowed to touch runtime status logic, workspace-root fallback logic, interruption-resolution-backed status discovery for blocked-supervision and delegated continuation, manager prompt guardrails needed to keep same-lane owner handoff truthful, and focused regressions only.
   - Broad automatic recovery of missing continuity paths remains a follow-on decision unless the bounded status slice proves insufficient.
 - required_doc_refs:
-  - `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/brainstorms/b-runtime-selfhost-continuity-gap-and-status-truth-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/prd.md`
-  - `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/tasks.md`
-  - `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md`
+  - `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
+  - `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/brainstorms/b-runtime-selfhost-continuity-gap-and-status-truth-governance.md`
+  - `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/prd.md`
+  - `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/pre-tests.md`
+  - `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/tasks.md`
+  - `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md`
 
 ## Verification
 

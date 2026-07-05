@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO5M
     synced_at: '2026-04-27T13:14:18Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/milestone-planning-and-state-maintenance/issues/milestone-planning-and-state-maintenance.md
+canonical_issue_path: docs/B2-docs/ibm/milestone-planning-and-state-maintenance/issues/milestone-planning-and-state-maintenance.md
 last_synced_comment_at:
   github: '2026-04-27T11:14:26Z'
 hash: ''
@@ -26,4 +26,4 @@ Freely 已经把 milestone 当成 standing source 和编排入口，但对 miles
 
 本轮已经把 manager route、auto-loop、lifecycle 与专门 skill 全部补到位。现在需要把这条能力正式 materialize 成 canonical issue，让 milestone planning / state maintenance 成为 Freely 自己治理自身的一等能力。
 
-canonical: docs/epics/workspace-routing-foundation/milestone-planning-and-state-maintenance/issues/milestone-planning-and-state-maintenance.md
+canonical: docs/B2-docs/ibm/milestone-planning-and-state-maintenance/issues/milestone-planning-and-state-maintenance.md

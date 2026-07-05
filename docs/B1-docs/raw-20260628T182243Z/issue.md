@@ -3,8 +3,8 @@ local_id: raw-20260628T182243Z
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260628T005815Z-A
-pre_tests_path: docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/verification/pre-tests.md
-verification_artifact_dir: docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/code-reviews
+pre_tests_path: docs/B2-docs/human/discuss/raw-20260628T005815Z/verification/pre-tests.md
+verification_artifact_dir: docs/B2-docs/human/discuss/raw-20260628T005815Z/code-reviews
 platform_ids:
   github:
     issue_id: '3608'
@@ -27,8 +27,8 @@ session_refs: []
 ---
 
 - absorbed_into: I-20260628T005815Z-A
-- pre_tests_path: docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/verification/pre-tests.md
-- verification_artifact_dir: docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/code-reviews
+- pre_tests_path: docs/B2-docs/human/discuss/raw-20260628T005815Z/verification/pre-tests.md
+- verification_artifact_dir: docs/B2-docs/human/discuss/raw-20260628T005815Z/code-reviews
 
 ## Problem
 B2 skill defines docs/epics/{epic}/{story}/raw-{raw-key}/ but code still reads/writes old paths (docs/issues/I-*, docs/epics/*/verification/).

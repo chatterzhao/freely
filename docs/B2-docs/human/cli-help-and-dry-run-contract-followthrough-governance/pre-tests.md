@@ -49,18 +49,18 @@
 - requirement: `Audited help invocations are explicit, side-effect free, and success-returning for usage-only paths.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/cli-help-and-dry-run-contract-followthrough-governance/code-reviews/20260406-cli-help-and-dry-run-contract-followthrough-verification.md`
+- artifact_ref: `docs/B2-docs/human/cli-help-and-dry-run-contract-followthrough-governance/code-reviews/20260406-cli-help-and-dry-run-contract-followthrough-verification.md`
 
 ### AT-002
 - id: `AT-002`
 - requirement: `ai switch codex dry-run output is stable and machine-consumable.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/cli-help-and-dry-run-contract-followthrough-governance/code-reviews/20260406-cli-help-and-dry-run-contract-followthrough-verification.md`
+- artifact_ref: `docs/B2-docs/human/cli-help-and-dry-run-contract-followthrough-governance/code-reviews/20260406-cli-help-and-dry-run-contract-followthrough-verification.md`
 
 ### AT-003
 - id: `AT-003`
 - requirement: `Governance gates remain green for the bounded owner.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/cli-help-and-dry-run-contract-followthrough-governance/code-reviews/20260406-cli-help-and-dry-run-contract-followthrough-verification.md`
+- artifact_ref: `docs/B2-docs/human/cli-help-and-dry-run-contract-followthrough-governance/code-reviews/20260406-cli-help-and-dry-run-contract-followthrough-verification.md`

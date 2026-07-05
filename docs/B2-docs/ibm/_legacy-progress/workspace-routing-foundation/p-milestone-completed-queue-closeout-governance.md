@@ -1,7 +1,7 @@
 # Progress: milestone-completed-queue-closeout-governance
 
 - issue_id: `I-20260406-1105-A`
-- issue_path: `docs/epics/workspace-routing-foundation/milestone-completed-queue-closeout-governance/issues/milestone-completed-queue-closeout-governance.md`
+- issue_path: `docs/B2-docs/ibm/milestone-completed-queue-closeout-governance/issues/milestone-completed-queue-closeout-governance.md`
 - title: `Milestone completed-queue closeout governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -31,8 +31,8 @@
 - feature commit `4c2d3c2`
 - premerge merge `9e23244`
 - develop merge `c0089e1`
-- `docs/epics/workspace-routing-foundation/milestone-completed-queue-closeout-governance/code-reviews/20260406-milestone-completed-queue-closeout-implementation-decision.md`
-- `docs/epics/workspace-routing-foundation/milestone-completed-queue-closeout-governance/code-reviews/20260406-milestone-completed-queue-closeout-verification.md`
+- `docs/B2-docs/ibm/milestone-completed-queue-closeout-governance/code-reviews/20260406-milestone-completed-queue-closeout-implementation-decision.md`
+- `docs/B2-docs/ibm/milestone-completed-queue-closeout-governance/code-reviews/20260406-milestone-completed-queue-closeout-verification.md`
 
 ## Next Action
 

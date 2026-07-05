@@ -11,7 +11,7 @@
 - target_environment: test-pre-merge-20260630T085809Z-a2a-healthcheck-fix
 - required_evidence: A2A server 启动后日志中无 "Invalid HTTP request received" 新条目
 - evidence_level: integration
-- artifact_ref: docs/epics/a2a-healthcheck-fix/socket-healthcheck/test-evidence/acceptance-1.log
+- artifact_ref: docs/B2-docs/a2a/protocol-health/test-evidence/acceptance-1.log
 - test_command: |
   # 启动 freely，检查 A2A 日志中是否有新增的 Invalid HTTP request
   ROOT_DIR=$(pwd)
@@ -43,7 +43,7 @@
     GREEN: no HTTP sendall in health check
     GREEN: FREELY_A2A_SOCKET env var used (line 8615/8617)
     GREEN: health check uses socket connect only (no data sent)
-- evidence_file: docs/epics/a2a-healthcheck-fix/socket-healthcheck/test-evidence/acceptance-1.log
+- evidence_file: docs/B2-docs/a2a/protocol-health/test-evidence/acceptance-1.log
 - red-green-status: green
 - status: passed
 
@@ -55,7 +55,7 @@
 - target_environment: fix-raw-20260630T085809Z-a2a-healthcheck-fix
 - required_evidence: 代码中无 `s.connect('$a2a_socket')` 模式
 - evidence_level: integration
-- artifact_ref: docs/epics/a2a-healthcheck-fix/socket-healthcheck/test-evidence/acceptance-2.log
+- artifact_ref: docs/B2-docs/a2a/protocol-health/test-evidence/acceptance-2.log
 - test_command: |
   # 检查 freely 脚本中不再有直接拼接 socket 路径到 Python 字符串的模式
   if grep -n "connect.*\\$.*socket" docs/system/workspace/scripts/runtime/freely; then
@@ -80,7 +80,7 @@
 - actual_output: |
     GREEN: A2A health check at line 8615-8617 uses os.environ.get('FREELY_A2A_SOCKET')
     NOTE: 3 other instances (13755 bridge_socket, 13868/14140 socket) are out of scope — separate issues in ACP bridge code
-- evidence_file: docs/epics/a2a-healthcheck-fix/socket-healthcheck/test-evidence/acceptance-2.log
+- evidence_file: docs/B2-docs/a2a/protocol-health/test-evidence/acceptance-2.log
 - red-green-status: green
 - status: passed
 
@@ -92,7 +92,7 @@
 - target_environment: test-pre-merge-20260630T085809Z-a2a-healthcheck-fix
 - required_evidence: A2A server 日志中无 "Invalid HTTP request received"
 - evidence_level: integration
-- artifact_ref: docs/epics/a2a-healthcheck-fix/socket-healthcheck/test-evidence/acceptance-3.log
+- artifact_ref: docs/B2-docs/a2a/protocol-health/test-evidence/acceptance-3.log
 - test_command: |
   # combined with AT-001 verification
   echo "Verified together with AT-001"
@@ -116,7 +116,7 @@
 - target_environment: fix-raw-20260630T085809Z-a2a-healthcheck-fix
 - required_evidence: 代码中 _health_waited 上限 >= 30
 - evidence_level: mock
-- artifact_ref: docs/epics/a2a-healthcheck-fix/socket-healthcheck/test-evidence/acceptance-4.log
+- artifact_ref: docs/B2-docs/a2a/protocol-health/test-evidence/acceptance-4.log
 - test_command: |
   # 检查超时配置
   grep -n "_health_waited.*lt" docs/system/workspace/scripts/runtime/freely | head -3
@@ -139,7 +139,7 @@
 - actual_output: |
     GREEN: freely:8613 `while [[ $_health_waited -lt 30 ]]` — max 30 iterations
     GREEN: freely:8633 `sleep 1` — 30 × 1s = 30 秒超时
-- evidence_file: docs/epics/a2a-healthcheck-fix/socket-healthcheck/test-evidence/acceptance-4.log
+- evidence_file: docs/B2-docs/a2a/protocol-health/test-evidence/acceptance-4.log
 - red-green-status: green
 - status: passed
 
@@ -151,7 +151,7 @@
 - target_environment: fix-raw-20260630T085809Z-a2a-healthcheck-fix
 - required_evidence: a2a_server.py 的 _a2a_uvicorn_log_config() 或 uvicorn.Config 中包含时间戳格式
 - evidence_level: mock
-- artifact_ref: docs/epics/a2a-healthcheck-fix/socket-healthcheck/test-evidence/acceptance-5.log
+- artifact_ref: docs/B2-docs/a2a/protocol-health/test-evidence/acceptance-5.log
 - test_command: |
   grep -n "asctime\|timestamp\|datefmt\|format.*time" docs/system/workspace/scripts/runtime/a2a/a2a_server.py | head -5
   echo "Check: log config should include timestamp format"
@@ -173,7 +173,7 @@
 - actual_output: |
     GREEN: a2a_server.py _a2a_uvicorn_log_config() now has formatters.default.format with %(asctime)s
     GREEN: datefmt: '%Y-%m-%dT%H:%M:%SZ' (ISO 8601)
-- evidence_file: docs/epics/a2a-healthcheck-fix/socket-healthcheck/test-evidence/acceptance-5.log
+- evidence_file: docs/B2-docs/a2a/protocol-health/test-evidence/acceptance-5.log
 - red-green-status: green
 - status: passed
 

@@ -1,6 +1,6 @@
 # Implementation Decision Note: develop-guarded-merge-entrypoint-enforcement-governance
 
-- issue_path: `docs/epics/workspace-routing-foundation/develop-guarded-merge-entrypoint-enforcement-governance/issues/develop-guarded-merge-entrypoint-enforcement-governance.md`
+- issue_path: `docs/B2-docs/ibm/develop-guarded-merge-entrypoint-enforcement-governance/issues/develop-guarded-merge-entrypoint-enforcement-governance.md`
 - branch: `feature/protected-merge-entrypoint-enforcement-20260405-0425`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260405-0425-feature-protected-merge-entrypoint-enforcement`
 

@@ -77,8 +77,8 @@
 - next_action: milestone 正式编排已切到 `I-20260327-2006-A` / `I-20260327-2006-B`。当前 active route 保持 `I-20260327-2006-A` 的 manager-owned `completion_verification`，由 manager 消费现有 feature-lane verification evidence 做 merge review / canonical absorption judgement；即使本轮 fresh-session `live-status` 已变成 `last_ai_state=down`、`last_exit_reason=ai_exit_rc_1`，这也仍是 runtime-owned 恢复信号，而不是回退到 IBM 的依据。`I-20260327-2006-B` 继续保持 downstream `done_ibm` owner，等待前者完成 closeout 后再进入 `dev-loop-execution`。
 - revisit_trigger: 当 IBM materialization 再次试图把 project command blast radius 与 global restore owner 混成同一 issue，或 live incident 暴露 project command 误杀其他项目进程 / 误清 shared state / global restart 丢失此前 running project 集合 / 误恢复 operator 已停止的 project / interrupted AI work 被 silent discard 或 cross-project restore / durable continuity 被 project force 误清 / stale supervisor 被误判为健康 attach / manager continuity 或 worker prompt consumption memory 被 project force 误删时，回到本 candidate 重新校正边界。
 - promoted_issue_path:
-  - `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/issues/project-command-semantics-and-restore-work-governance.md`
-  - `docs/epics/workspace-routing-foundation/global-restart-restore-memory-governance/issues/global-restart-restore-memory-governance.md`
+  - `docs/B2-docs/ibm/project-command-semantics-and-restore-work-governance/issues/project-command-semantics-and-restore-work-governance.md`
+  - `docs/B2-docs/ibm/global-restart-restore-memory-governance/issues/global-restart-restore-memory-governance.md`
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs:
   - tool: codex

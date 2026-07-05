@@ -13,4 +13,4 @@ implemented_in:
   - 83067702
   - 2f960d67
 source_candidate: docs/B1-docs/raw-c-raw-20260603T142127Z-fix-scan-cycling/candidates.md#C-20260603T142127Z-A
-verification_artifact_dir: docs/epics/fix-scan-cycling/verify/code-reviews/main.md
+verification_artifact_dir: docs/B2-docs/runtime/scan/code-reviews/main.md

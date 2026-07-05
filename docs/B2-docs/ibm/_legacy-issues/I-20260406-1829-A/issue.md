@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO94
     synced_at: '2026-04-27T13:16:43Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/codex-current-live-apikey-bootstrap-without-saved-slot-governance/issues/codex-current-live-apikey-bootstrap-without-saved-slot-governance.md
+canonical_issue_path: docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/issues/codex-current-live-apikey-bootstrap-without-saved-slot-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:25:49Z'
 hash: ''
@@ -31,4 +31,4 @@ Freely 已经把 Codex API-key slot bundle、provider-aware probe routing、以�
 
 这不是重开旧的 slot bundle owner，也不是重写 runtime recovery state machine。需要一个新的 follow-on owner，专门冻结 “partial-output reconne
 
-canonical: docs/epics/workspace-routing-foundation/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/issues/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md
+canonical: docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/issues/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md

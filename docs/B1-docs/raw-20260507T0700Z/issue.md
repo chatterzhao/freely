@@ -18,7 +18,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-pre_tests_path: docs/epics/unified-platform/verification/pre-tests.md
+pre_tests_path: docs/B2-docs/unified-platform/verification/pre-tests.md
 verification_artifact_dir: docs/epics/unified-platform/code-reviews
 source_candidate: docs/B1-docs/raw-20260507/candidates.md
 platform_state: closed
@@ -86,5 +86,5 @@ freely → unified platform layer
 - merge develop 后：所有平台上该 issue 状态/评论一致
 - 只有一个 entry point 调用平台 API：`issue-sync`
 
-- pre_tests_path: `docs/epics/unified-platform/verification/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/unified-platform/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/unified-platform/code-reviews`

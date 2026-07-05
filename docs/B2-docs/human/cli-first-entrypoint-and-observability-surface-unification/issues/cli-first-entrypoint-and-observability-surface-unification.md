@@ -7,17 +7,17 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `cli-first-entrypoint-and-observability-surface-unification`
 - issue-name: `cli-first-entrypoint-and-observability-surface-unification`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/human/cli-first-entrypoint-and-observability-surface-unification/code-reviews`
 - priority: P0
 - source_candidate: `docs/B1-docs/raw-20260322/candidates.md#c-20260322-0115-a`
 - source_brainstorm: `docs/B1-docs/raw-20260322/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/human/cli-first-entrypoint-and-observability-surface-unification/pre-tests.md`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/default-project-resolution-and-authorized-project-memory/issues/default-project-resolution-and-authorized-project-memory.md`
-  - `docs/epics/workspace-routing-foundation/chat-triggered-worker-runtime-reactivation-governance/issues/chat-triggered-worker-runtime-reactivation-governance.md`
-  - `docs/epics/workspace-routing-foundation/baseline-status-command-and-status-family-governance/issues/baseline-status-command-and-status-family-governance.md`
+  - `docs/B2-docs/ibm/default-project-resolution-and-authorized-project-memory/issues/default-project-resolution-and-authorized-project-memory.md`
+  - `docs/B2-docs/human/chat-triggered-worker-runtime-reactivation-governance/issues/chat-triggered-worker-runtime-reactivation-governance.md`
+  - `docs/B2-docs/ibm/baseline-status-command-and-status-family-governance/issues/baseline-status-command-and-status-family-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://current-thread", role: "author"}
 
@@ -63,7 +63,7 @@ Freely 已经有：
 - `docs/system/workspace/three-loop-capability-lifecycle.md`
 - `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
 - `docs/progress/workspace-routing-foundation/p-cli-first-entrypoint-and-observability-surface-unification.md`
-- `docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/code-reviews/20260322-cli-first-entrypoint-and-observability-surface-unification-verification.md`
+- `docs/B2-docs/human/cli-first-entrypoint-and-observability-surface-unification/code-reviews/20260322-cli-first-entrypoint-and-observability-surface-unification-verification.md`
 
 ## Verification
 
@@ -74,7 +74,7 @@ Freely 已经有：
 ## Closure Evidence
 
 - `develop` 已包含 `0681fba docs: close out cli-first observability unification`，当前 `git branch --contains 0681fba` 解析到 `develop`
-- canonical verification artifact 已存在：`docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/code-reviews/20260322-cli-first-entrypoint-and-observability-surface-unification-verification.md`
+- canonical verification artifact 已存在：`docs/B2-docs/human/cli-first-entrypoint-and-observability-surface-unification/code-reviews/20260322-cli-first-entrypoint-and-observability-surface-unification-verification.md`
 - 原始 feature branch `feature/cli-first-observability-surfaces-20260322` 已退休，本地分支不存在，远端同名分支也已删除
 - 原始 feature worktree `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260322-feature-cli-first-observability-surfaces` 已退休，不再需要额外 salvage 或 cleanup handoff
 

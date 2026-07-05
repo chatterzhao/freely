@@ -1,7 +1,7 @@
 # Verification: protected-merge-unparseable-subject-receipt-gap-governance
 
 - issue_id: `I-20260411-0217-A`
-- issue_path: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
+- issue_path: `docs/B2-docs/ibm/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
 - verification_date: `2026-04-11`
 - verifier: `codex`
 

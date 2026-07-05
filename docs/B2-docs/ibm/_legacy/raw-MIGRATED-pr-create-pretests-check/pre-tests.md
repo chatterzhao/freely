@@ -21,7 +21,7 @@
 - blocker taxonomy: medium-risk integration point
 - not_applicable_reason: change_not_touching_this_layer
 - not_applicable_explanation: This change only adds a gate call; the actual gate logic (pretests-retirement-gate + pretests-gate) is unchanged and already tested by its own unit tests.
-- replacement_evidence: docs/epics/pr-create-pretests-check/code-reviews/pretests-gate-call-trace.txt
+- replacement_evidence: docs/B2-docs/pr-create-pretests-check/code-reviews/pretests-gate-call-trace.txt
 
 ## End-to-End
 
@@ -32,7 +32,7 @@
 - blocker taxonomy: low-risk (additive-only change)
 - not_applicable_reason: no_executable_boundary_at_this_layer
 - not_applicable_explanation: The pr-create-guarded script requires git remotes and platform credentials for full E2E, which are not available in the isolated test worktree.
-- replacement_evidence: docs/epics/pr-create-pretests-check/code-reviews/design-review-notes.txt
+- replacement_evidence: docs/B2-docs/pr-create-pretests-check/code-reviews/design-review-notes.txt
 
 ## Real-Environment
 
@@ -47,7 +47,7 @@
 - requirement: bash -n must pass on the modified pr-create-guarded script
 - evidence_level: mock
 ^- status: passed
-- artifact_ref: docs/epics/pr-create-pretests-check/code-reviews/syntax-check.txt
+- artifact_ref: docs/B2-docs/pr-create-pretests-check/code-reviews/syntax-check.txt
 
 ### AI-002: Gate structure is correct
 
@@ -55,7 +55,7 @@
 - requirement: Step 2c must appear after Step 2b and before gate-passed marker in the script flow
 - evidence_level: mock
 ^- status: passed
-- artifact_ref: docs/epics/pr-create-pretests-check/code-reviews/design-review-notes.txt
+- artifact_ref: docs/B2-docs/pr-create-pretests-check/code-reviews/design-review-notes.txt
 
 ### AI-003: Error message provides clear instructions
 
@@ -63,4 +63,4 @@
 - requirement: When gate fails, the error message must reference freely-test-execution skill and pr-create-guarded
 - evidence_level: mock
 ^- status: passed
-- artifact_ref: docs/epics/pr-create-pretests-check/code-reviews/design-review-notes.txt
+- artifact_ref: docs/B2-docs/pr-create-pretests-check/code-reviews/design-review-notes.txt

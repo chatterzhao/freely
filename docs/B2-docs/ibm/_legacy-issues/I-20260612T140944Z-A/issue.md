@@ -9,7 +9,7 @@ platform_ids:
     url: https://github.com/chatterzhao/freely/issues/2590
     synced_at: '2026-06-13T10:42:58Z'
 primary_platform: github
-canonical_issue_path: docs/epics/a2a-replace-handoff/architecture-refactor/
+canonical_issue_path: docs/B2-docs/a2a/handoff/
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-13T01:20:00Z'

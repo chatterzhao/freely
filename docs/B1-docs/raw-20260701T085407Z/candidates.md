@@ -24,6 +24,6 @@ milestone: M-20260701T085407Z-A
 - promotion_gate: N/A（已 absorb）
 - open_questions: []
 - absorbed_into: I-20260701T085407Z-A
-- promoted_issue_path: docs/epics/reviewer-agent/phase1-ensure-reviewer/raw-20260701T085407Z/issues/I-20260701T085407Z-A.md
+- promoted_issue_path: docs/B2-docs/a2a/reviewer-agent/raw-20260701T085407Z/issues/I-20260701T085407Z-A.md
 - milestone: M-20260701T085407Z-A
 - session_refs: []

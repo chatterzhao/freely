@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO5G
     synced_at: '2026-04-27T13:14:07Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/context-compaction-continuity-guard-salvage/issues/context-compaction-continuity-guard-salvage.md
+canonical_issue_path: docs/B2-docs/ibm/context-compaction-continuity-guard-salvage/issues/context-compaction-continuity-guard-salvage.md
 last_synced_comment_at:
   github: '2026-04-27T11:14:03Z'
 hash: ''
@@ -24,4 +24,4 @@ platform_state: closed
 
 旧 `context-compaction` 分支不再适合作为继续开发主线，但其独有的 continuity guard 能力仍值得保留。
 
-canonical: docs/epics/workspace-routing-foundation/context-compaction-continuity-guard-salvage/issues/context-compaction-continuity-guard-salvage.md
+canonical: docs/B2-docs/ibm/context-compaction-continuity-guard-salvage/issues/context-compaction-continuity-guard-salvage.md

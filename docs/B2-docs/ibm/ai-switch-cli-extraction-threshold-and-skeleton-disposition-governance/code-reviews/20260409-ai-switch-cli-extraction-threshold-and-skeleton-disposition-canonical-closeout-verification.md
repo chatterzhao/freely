@@ -1,6 +1,6 @@
 # Verification: ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance canonical closeout
 
-- issue_path: `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
+- issue_path: `docs/B2-docs/ibm/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
 - verified_in_branch: `develop`
 - verified_in_worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely`
 - verified_at: `2026-04-09`
@@ -15,7 +15,7 @@
 1. Verification baseline
    - Existing verification artifact already records this owner as the lawful active handoff package and rejects reopening the extraction-boundary debate.
 2. Pre-tests gate
-   - `PASS`: `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260409-044628-feature-ai-switch-cli-extraction-threshold-skeleton-disposition-closeout --issue docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
+   - `PASS`: `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260409-044628-feature-ai-switch-cli-extraction-threshold-skeleton-disposition-closeout --issue docs/B2-docs/ibm/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
 3. Governance
    - `PASS`: `./bin/governance-check`
 4. Diff hygiene

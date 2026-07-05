@@ -22,7 +22,7 @@ author: zhaoquan
 channel: freely-feat-execution
 session_refs: []
 pre_tests_path: docs/B2-docs/ibm/_legacy-issues/I-20260513T040512Z-A/pre-tests.md
-verification_artifact_dir: docs/epics/task-lifecycle-scan-batch/code-reviews/
+verification_artifact_dir: docs/B2-docs/task-lifecycle-scan-batch/code-reviews/
 platform_state: closed
 ---
 

@@ -1,7 +1,7 @@
 # Code Review — Scan Lifecycle Migration
 
 - issue_id: `I-20260503-0200-A`
-- issue_path: `docs/epics/workspace-routing-foundation/scan-lifecycle-migration/issues/I-20260503-0200-A.md`
+- issue_path: `docs/B2-docs/runtime/scan-lifecycle-migration/issues/I-20260503-0200-A.md`
 - review_date: `2026-05-03`
 - reviewer: `ai`
 - verdict: `approved`

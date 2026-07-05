@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO79
     synced_at: '2026-04-27T13:15:20Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/runtime-network-failure-taxonomy-and-bounded-recovery-governance/issues/runtime-network-failure-taxonomy-and-bounded-recovery-governance.md
+canonical_issue_path: docs/B2-docs/runtime/runtime-network-failure-taxonomy-and-bounded-recovery-governance/issues/runtime-network-failure-taxonomy-and-bounded-recovery-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:21:26Z'
 hash: ''
@@ -36,4 +36,4 @@ Freely 现在已经分别具备：
 - prompt assembly 也能继续把这些 intake 带进新的 manager prompt
 - 但 manager 无法完成 intake claim、continuity materialization、或 blocked handoff tr
 
-canonical: docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md
+canonical: docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md

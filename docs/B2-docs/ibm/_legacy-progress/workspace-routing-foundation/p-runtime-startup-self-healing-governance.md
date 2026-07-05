@@ -1,7 +1,7 @@
 # Progress: runtime-startup-self-healing-governance
 
 - issue_id: `I-20260419-1630-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/issues/runtime-startup-self-healing-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-startup-self-healing-governance/issues/runtime-startup-self-healing-governance.md`
 - title: `Runtime startup self-healing governance`
 - phase_state: `completed`
 - runtime_state: `stopped`

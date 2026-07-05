@@ -36,7 +36,7 @@
   - a focused audit plus doctor integration closes an actual gap while preserving narrow owner boundaries
   - this slice creates reusable machine-enforced truth that future CI or hooks can call directly
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/supply-chain-baseline-and-install-intake-audit-governance/issues/supply-chain-baseline-and-install-intake-audit-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/supply-chain-baseline-and-install-intake-audit-governance/issues/supply-chain-baseline-and-install-intake-audit-governance.md`
 - promoted_issue_path_role: `primary-owner`
 - session_refs:
   - tool: `codex`

@@ -16,11 +16,11 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - priority: `P0`
 - promoted_issue_id: `I-20260419-0915-A`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
+- promoted_issue_path: `docs/B2-docs/ibm/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/three-loops-sibling-relationship-and-terminal-governance/issues/three-loops-sibling-relationship-and-terminal-governance.md`
+  - `docs/B2-docs/ibm/three-loops-sibling-relationship-and-terminal-governance/issues/three-loops-sibling-relationship-and-terminal-governance.md`
   - `docs/system/workspace/three-loop-capability-lifecycle.md`
 - problem: The original three-loop owner is already completed, but this follow-on governance pass still needs to land the rule that `docs/system/workspace/three-loop-capability-lifecycle.md` is the sole detailed whole-app lifecycle truth and that downstream skills/agents read and sync against it instead of co-maintaining parallel detailed restatements.
 - why_now:

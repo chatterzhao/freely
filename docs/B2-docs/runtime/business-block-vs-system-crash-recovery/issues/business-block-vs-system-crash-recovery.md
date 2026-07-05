@@ -11,7 +11,7 @@
 - source_brainstorm: `docs/B1-docs/raw-20260308/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- depends_on: `docs/epics/workspace-routing-foundation/stage-prefixed-progress-identifier/issues/stage-prefixed-progress-identifier.md`
+- depends_on: `docs/B2-docs/ibm/stage-prefixed-progress-identifier/issues/stage-prefixed-progress-identifier.md`
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "analysis"}]
 
 ## Why

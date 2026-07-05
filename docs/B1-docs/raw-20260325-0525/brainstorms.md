@@ -101,7 +101,7 @@
 - `docs/system/workspace/scripts/tests/test-freely-ai-account-switch`
 - `docs/system/workspace/scripts/tests/test-freely-rate-limit-defers-to-watchdog`
 - `docs/system/workspace/scripts/tests/test-freely-deactivated-workspace-defers-to-watchdog`
-- `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+- `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 
 ## 生命周期判断
 

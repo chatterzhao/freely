@@ -1,7 +1,7 @@
 # Verification: preferred-auth-method-account-switch-fix
 
 - issue_id: `I-20260410-1430-A`
-- issue_path: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/preferred-auth-method-account-switch-fix.md`
+- issue_path: `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/preferred-auth-method-account-switch-fix.md`
 - verification_date: `2026-04-10`
 - verifier: `codex`
 

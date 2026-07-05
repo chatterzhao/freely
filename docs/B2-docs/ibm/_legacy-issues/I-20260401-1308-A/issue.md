@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO7K
     synced_at: '2026-04-27T13:15:38Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md
+canonical_issue_path: docs/B2-docs/ibm/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md
 last_synced_comment_at:
   github: '2026-04-27T11:21:56Z'
 hash: ''
@@ -32,4 +32,4 @@ Freely has already converged on a broader security direction: automation and enf
 
 This owner fixes t
 
-canonical: docs/epics/workspace-routing-foundation/build-artifact-exposure-and-release-allowlist-audit-governance/issues/build-artifact-exposure-and-release-allowlist-audit-governance.md
+canonical: docs/B2-docs/ibm/build-artifact-exposure-and-release-allowlist-audit-governance/issues/build-artifact-exposure-and-release-allowlist-audit-governance.md

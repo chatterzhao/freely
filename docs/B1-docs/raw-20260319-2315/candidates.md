@@ -22,7 +22,7 @@
 - priority: P0
 - status: promoted
 - decision_reason: 这条需求已经在 Freely runtime 中 materialize 为 `freely tui`，并补齐了中文/多行提交的脚本回归；现在应以正式 issue 记录完成态，而不是继续留在 research 状态。
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/cli-tui-human-interruption-input/issues/cli-tui-human-interruption-input.md`
+- promoted_issue_path: `docs/B2-docs/human/cli-tui-human-interruption-input/issues/cli-tui-human-interruption-input.md`
 - legacy_id_mapping: I-20260319-2315  # 历史遗留的 issue id
 - milestone: `M-20260306-workspace-routing-foundation`
 - session_refs:

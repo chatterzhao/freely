@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO6E
     synced_at: '2026-04-27T13:14:47Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/runtime-worker-launch-linkage-and-stall-recovery-governance/issues/runtime-worker-launch-linkage-and-stall-recovery-governance.md
+canonical_issue_path: docs/B2-docs/runtime/runtime-worker-launch-linkage-and-stall-recovery-governance/issues/runtime-worker-launch-linkage-and-stall-recovery-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:16:38Z'
 hash: ''
@@ -34,4 +34,4 @@ Freely 最新 dogfood 证明：
 
 因此 current gap 已经不在 manager prompt 语义，而在 runtime control plane。
 
-canonical: docs/epics/workspace-routing-foundation/runtime-worker-launch-linkage-and-stall-recovery-governance/issues/runtime-worker-launch-linkage-and-stall-recovery-governance.md
+canonical: docs/B2-docs/runtime/runtime-worker-launch-linkage-and-stall-recovery-governance/issues/runtime-worker-launch-linkage-and-stall-recovery-governance.md

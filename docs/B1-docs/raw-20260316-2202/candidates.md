@@ -4,7 +4,7 @@
 - title: 首跳协议要求同工具场景必须继续执行第二跳而不是停在 next_prompt
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/source-routing-and-derived-worktree-governance/issues/source-routing-and-derived-worktree-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/source-routing-and-derived-worktree-governance/issues/source-routing-and-derived-worktree-governance.md`
 - acceptance_hint:
   - `start-lead-agent.sh` 明确要求同工具场景继续执行第二跳
   - `lead-agent` / tools 口径与启动器一致

@@ -32,7 +32,7 @@
 - priority: P1
 - status: promoted
 - decision_reason: current evidence is sufficient to freeze one narrow follow-up owner under `workspace-routing-foundation`: both residuals sit on the same worker-runtime boundary and can share a first dev-loop step that resolves the surviving local-reentry ambiguity.
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/worker-reactivation-and-local-reentry-residual-runtime-governance/issues/worker-reactivation-and-local-reentry-residual-runtime-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/worker-reactivation-and-local-reentry-residual-runtime-governance/issues/worker-reactivation-and-local-reentry-residual-runtime-governance.md`
 - next_action: finish issue-bound IBM closeout, then run a focused worker-runtime reproduction/repair slice under `I-20260401-1831-A`.
 - milestone: `M-20260306-workspace-routing-foundation`
 - revisit_trigger: if focused reproduction proves local reentry is purely stale fixture truth, narrow the implementation slice and update the issue/tasks rather than reopening candidate-level research.

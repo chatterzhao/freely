@@ -1,7 +1,7 @@
 # Brainstorm: candidate-acceptance-review-governance
 
 - source_brainstorm: `docs/B1-docs/raw-20260320/brainstorms.md`
-- canonical_issue: `docs/epics/workspace-routing-foundation/candidate-acceptance-review-governance/issues/candidate-acceptance-review-governance.md`
+- canonical_issue: `docs/B2-docs/ibm/candidate-acceptance-review-governance/issues/candidate-acceptance-review-governance.md`
 
 ## Key Decisions
 

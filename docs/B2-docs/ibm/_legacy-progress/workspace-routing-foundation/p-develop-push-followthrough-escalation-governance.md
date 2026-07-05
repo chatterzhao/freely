@@ -1,7 +1,7 @@
 # Progress: develop-push-followthrough-escalation-governance
 
 - issue_id: `I-20260408-1200-A`
-- issue_path: `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md`
+- issue_path: `docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md`
 - title: `Develop push followthrough escalation governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -34,10 +34,10 @@
 - `bash docs/system/workspace/scripts/tests/test-wt-fleet-status-develop-push-pending`
 - `bash docs/system/workspace/scripts/tests/test-freely-fleet-status-develop-push-pending`
 - `bash docs/system/workspace/scripts/tests/test-freely-develop-push-status-time-display`
-- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260409-043549-feature-develop-push-followthrough-escalation-closeout --issue docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md`
+- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260409-043549-feature-develop-push-followthrough-escalation-closeout --issue docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md`
 - `./bin/governance-check`
 - `git diff --check`
-- `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/code-reviews/20260408-develop-push-followthrough-escalation-verification.md`
+- `docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/code-reviews/20260408-develop-push-followthrough-escalation-verification.md`
 
 ## Next Action
 

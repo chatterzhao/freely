@@ -110,4 +110,4 @@
 - requirement: `verification artifact records canonical develop replay and lifecycle closeout`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/url-content-intake-skill-and-wechat-fetch-governance/code-reviews/20260401-url-content-intake-skill-verification.md`
+- artifact_ref: `docs/B2-docs/human/url-content-intake-skill-and-wechat-fetch-governance/code-reviews/20260401-url-content-intake-skill-verification.md`

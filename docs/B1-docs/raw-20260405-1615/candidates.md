@@ -45,7 +45,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - source_brainstorm: `docs/B1-docs/raw-20260405-1615/brainstorms.md`
 - promoted_issue_id: `I-20260405-1615-A`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`

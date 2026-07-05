@@ -55,4 +55,4 @@
 - requirement: `real-environment codex ACP fresh-path viability evidence is captured before closeout`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/codex-acp-fresh-path-prototype/code-reviews/20260401-codex-acp-fresh-path-prototype-verification.md`
+- artifact_ref: `docs/B2-docs/config/codex-acp-fresh-path-prototype/code-reviews/20260401-codex-acp-fresh-path-prototype-verification.md`

@@ -33,7 +33,7 @@
 - requirement: gate error block shows fix/feat detection and skill guidance
 - evidence_level: mock
 ^- status: passed
-- artifact_ref: docs/epics/gate-error-skill-pointers/code-reviews/implementation-decision.md
+- artifact_ref: docs/B2-docs/gate-error-skill-pointers/code-reviews/implementation-decision.md
 ## Real-Environment
 - real_environment_status: pass
 - real_environment_reason: pr-create run verifies error block renders

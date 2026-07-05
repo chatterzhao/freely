@@ -32,7 +32,7 @@
     verdict: `promote`
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/develop-push-pending-guard-governance/issues/develop-push-pending-guard-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/develop-push-pending-guard-governance/issues/develop-push-pending-guard-governance.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`

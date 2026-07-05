@@ -7,12 +7,12 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `worktree-hygiene-supervision-control-plane`
 - issue-name: `worktree-hygiene-supervision-control-plane`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/worktree-hygiene-supervision-control-plane/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/git-worktree/worktree-hygiene-supervision-control-plane/code-reviews`
 - source_candidate: `docs/B1-docs/raw-20260318/candidates.md#C-20260318-1825-A`
 - source_brainstorm: `docs/B1-docs/raw-20260318/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- depends_on: `docs/epics/workspace-routing-foundation/checkpoint-commit-and-multi-worktree-supervision-governance/issues/checkpoint-commit-and-multi-worktree-supervision-governance.md`
+- depends_on: `docs/B2-docs/gate/checkpoint-commit-and-multi-worktree-supervision-governance/issues/checkpoint-commit-and-multi-worktree-supervision-governance.md`
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}]
 
 ## Why
@@ -56,7 +56,7 @@ Freely 已有 checkpoint-guard、fleet-status 与 manager/worker 角色边界，
 - `bash docs/system/workspace/scripts/tests/test-freely-worktree-hygiene-alert`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-supervision-alert`
 - `./bin/governance-check`
-- `docs/epics/workspace-routing-foundation/worktree-hygiene-supervision-control-plane/code-reviews/20260326-worktree-hygiene-canonical-replay-verification.md`
+- `docs/B2-docs/git-worktree/worktree-hygiene-supervision-control-plane/code-reviews/20260326-worktree-hygiene-canonical-replay-verification.md`
 
 ## Verification Summary
 

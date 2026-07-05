@@ -10,7 +10,7 @@
   - 但这条 lane 的真正 owner 问题不是“接 OAuth API”，而是把 `limit -> switch usable -> otherwise earliest-reset sleep -> wake -> continue` 的恢复闭环写成 canonical contract
   - `cooldown` 需要被升级成半小时维护的 recovery ledger reset 面，而不是临时残留；命中 limit 时必须先吃这份账本快速切换
   - 无参 `switch codex` 也应刷新所有 auth 目录并直接切一个可用 slot；这已经超出已完成 `I-20260318-1630` 的 closeout contract，应以新的 follow-on lifecycle 物化
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/issues/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/issues/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance.md`
 - legacy_id_mapping: I-20260327-1115  # 历史遗留的 issue id
 - session_refs:
   - tool: `codex`
@@ -31,7 +31,7 @@
   - `docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh`
   - `docs/system/workspace/scripts/runtime/ai-cli`
   - `docs/system/workspace/scripts/runtime/freely`
-  - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+  - `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
   - `.freely/run/codex-slot-cooldowns.tsv`
   - `.freely/run/codex-availability-state.env`
 - next_action:

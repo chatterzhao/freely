@@ -36,7 +36,7 @@
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
 - decision_reason: The question is now narrower than the current Codex verification lane and deserves its own owner so backend extraction timing and skeleton disposition do not stay as informal operator knowledge.
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
 - next_action: Candidate mirror only. `I-20260405-1415-A` is now the canonical `done_ibm` owner for extraction timing, boundary freeze, and skeleton disposition; future extraction work should consume that handoff package instead of reopening candidate research.
 - revisit_trigger: Revisit when Codex-first verification is merged, or when a second tool gains verified bundle/probe semantics that make backend extraction economically justified.
 - session_refs:

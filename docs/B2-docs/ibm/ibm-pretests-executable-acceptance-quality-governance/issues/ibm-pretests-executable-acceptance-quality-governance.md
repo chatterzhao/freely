@@ -7,14 +7,14 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `ibm-pretests-executable-acceptance-quality-governance`
 - issue-name: `ibm-pretests-executable-acceptance-quality-governance`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/ibm-pretests-executable-acceptance-quality-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/ibm-pretests-executable-acceptance-quality-governance/code-reviews`
 - priority: P0
 - source_candidate: `docs/B1-docs/raw-20260326/candidates.md#c-20260326-1733-a`
 - source_brainstorm: `docs/B1-docs/raw-20260326/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/integration-acceptance-first-verification-governance/issues/integration-acceptance-first-verification-governance.md`
+  - `docs/B2-docs/ibm/integration-acceptance-first-verification-governance/issues/integration-acceptance-first-verification-governance.md`
   - `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`
   - `docs/system/workspace/three-loop-capability-lifecycle.md`
 - session_refs:
@@ -70,17 +70,17 @@ Freely 已经把 `pre-tests.md` 定义成 issue-level acceptance 控制面，也
 
 ## Completion
 
-- `docs/epics/workspace-routing-foundation/ibm-pretests-executable-acceptance-quality-governance/issues/ibm-pretests-executable-acceptance-quality-governance.md`
-- `docs/epics/workspace-routing-foundation/ibm-pretests-executable-acceptance-quality-governance/brainstorms/b-ibm-pretests-executable-acceptance-quality-governance.md`
-- `docs/epics/workspace-routing-foundation/ibm-pretests-executable-acceptance-quality-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/ibm-pretests-executable-acceptance-quality-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/ibm-pretests-executable-acceptance-quality-governance/tasks.md`
+- `docs/B2-docs/ibm/ibm-pretests-executable-acceptance-quality-governance/issues/ibm-pretests-executable-acceptance-quality-governance.md`
+- `docs/B2-docs/ibm/ibm-pretests-executable-acceptance-quality-governance/brainstorms/b-ibm-pretests-executable-acceptance-quality-governance.md`
+- `docs/B2-docs/ibm/ibm-pretests-executable-acceptance-quality-governance/prd.md`
+- `docs/B2-docs/ibm/ibm-pretests-executable-acceptance-quality-governance/pre-tests.md`
+- `docs/B2-docs/ibm/ibm-pretests-executable-acceptance-quality-governance/tasks.md`
 - `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`
 - `docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md`
 - `docs/system/workspace/skills/doc-ibm-execution/references/ibm-completion-gate.md`
 - `docs/system/workspace/skills/doc-ibm-execution/references/issue-materialization-checklist.md`
 - `docs/progress/workspace-routing-foundation/p-ibm-pretests-executable-acceptance-quality-governance.md`
-- `docs/epics/workspace-routing-foundation/ibm-pretests-executable-acceptance-quality-governance/code-reviews/20260326-ibm-pretests-executable-acceptance-quality-governance-verification.md`
+- `docs/B2-docs/ibm/ibm-pretests-executable-acceptance-quality-governance/code-reviews/20260326-ibm-pretests-executable-acceptance-quality-governance-verification.md`
 
 ## Verification
 

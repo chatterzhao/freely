@@ -6,7 +6,7 @@
 - runtime_state: `stopped`
 - branch: `feature/pretests-cleanup-retirement-enforcement-20260411`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260411-feature-pretests-cleanup-retirement-enforcement`
-- issue_path: `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/issues/pre-tests-cleanup-and-retirement-enforcement-governance.md`
+- issue_path: `docs/B2-docs/ibm/pre-tests-cleanup-and-retirement-enforcement-governance/issues/pre-tests-cleanup-and-retirement-enforcement-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "dev-loop-closeout"}
 
@@ -24,7 +24,7 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-pretests-retain`
 - `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-retained-continuation`
 - `./bin/governance-check`
-- `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/code-reviews/20260411-pre-tests-cleanup-and-retirement-enforcement-verification.md`
+- `docs/B2-docs/ibm/pre-tests-cleanup-and-retirement-enforcement-governance/code-reviews/20260411-pre-tests-cleanup-and-retirement-enforcement-verification.md`
 
 ## Next Action
 

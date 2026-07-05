@@ -8,4 +8,4 @@
 - id: threshold-increase
 - requirement: RESTART_STORM_COUNT set to 10
 ^- status: passed
-- artifact_ref: docs/epics/process-churn-peak-fix/code-reviews/review.md
+- artifact_ref: docs/B2-docs/process-churn-peak-fix/code-reviews/review.md

@@ -53,7 +53,7 @@
 - case_design: `Replay the existing command-semantics, event-log, and stop-all-supervisors tests without converting them into daemon tests.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-verification.md`
 
 ### Daemon survives parent shell exit
 - id: `daemon-parent-session-detach`
@@ -65,7 +65,7 @@
 - case_design: `Launch daemon mode from a short-lived shell, terminate the launcher, confirm the runtime still reports running, then stop it explicitly.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-verification.md`
 
 ### Shared status truth remains singular
 - id: `daemon-shared-status-truth`
@@ -77,7 +77,7 @@
 - case_design: `Compare daemon status/log outputs with live-status or fleet-status for the same project runtime and confirm they agree on running/stopped state.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-verification.md`
 
 ### Guarded develop promote proves daemon adequacy
 - id: `develop-promote-daemon-entrypoint-proof`
@@ -89,4 +89,4 @@
 - case_design: `Merge the feature lane into a disposable test-pre-merge batch through pr-merge-guarded, rerun the foreground and daemon regressions plus governance-check there, and use the resulting verification artifact to prove the develop-bound lane/gate pair is explicitly covered.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-closeout-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-closeout-verification.md`

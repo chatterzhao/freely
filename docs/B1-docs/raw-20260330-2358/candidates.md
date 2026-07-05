@@ -34,7 +34,7 @@
 - priority: P1
 - status: promoted
 - decision_reason: The taxonomy is now narrow enough to materialize: runtime classifies execution-time network failures and explicit proxy-config-invalid signals into a bounded in-place retry/cooldown contract, while keeping slot/tool fallback out of the default path.
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-network-failure-taxonomy-and-bounded-recovery-governance/issues/runtime-network-failure-taxonomy-and-bounded-recovery-governance.md`
+- promoted_issue_path: `docs/B2-docs/runtime/runtime-network-failure-taxonomy-and-bounded-recovery-governance/issues/runtime-network-failure-taxonomy-and-bounded-recovery-governance.md`
 - milestone: `M-20260306-workspace-routing-foundation`
 - next_action: Keep `I-20260330-2358-A` in verification until the bounded runtime recovery owner, focused regressions, and truth-source updates merge into `develop`.
 - revisit_trigger: Revisit if execution-time network failures still trigger slot/tool fallback, if proxy-config-invalid is routed into auth/account switching, or if persistent dependency outages still spin through generic `ai_exit_rc_*` churn.

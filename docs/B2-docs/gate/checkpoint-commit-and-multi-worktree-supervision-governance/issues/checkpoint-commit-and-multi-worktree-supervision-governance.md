@@ -15,7 +15,7 @@
 - source_brainstorm: `docs/B1-docs/raw-20260317/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- depends_on: `docs/epics/workspace-routing-foundation/session-lifecycle-rotation-and-handoff-governance/issues/session-lifecycle-rotation-and-handoff-governance.md`
+- depends_on: `docs/B2-docs/ibm/session-lifecycle-rotation-and-handoff-governance/issues/session-lifecycle-rotation-and-handoff-governance.md`
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}]
 
 ## Why
@@ -66,8 +66,8 @@ Freely 当前已经会 worktree 隔离、session handoff、rate-limit account sw
   - `bash docs/system/workspace/scripts/tests/test-freely-fleet-status`
   - `bash docs/system/workspace/scripts/tests/test-routing-foundation-loop`
 - 已写入 review 证据：
-  - `docs/epics/workspace-routing-foundation/checkpoint-commit-and-multi-worktree-supervision-governance/code-reviews/20260318-checkpoint-and-fleet-verification.md`
-  - `docs/epics/workspace-routing-foundation/checkpoint-commit-and-multi-worktree-supervision-governance/code-reviews/20260326-checkpoint-and-fleet-canonical-replay-verification.md`
+  - `docs/B2-docs/gate/checkpoint-commit-and-multi-worktree-supervision-governance/code-reviews/20260318-checkpoint-and-fleet-verification.md`
+  - `docs/B2-docs/gate/checkpoint-commit-and-multi-worktree-supervision-governance/code-reviews/20260326-checkpoint-and-fleet-canonical-replay-verification.md`
 - 当前研究阶段尚未启用正式 `docs/progress/**`，本轮 dev-loop 等价执行证据写入 `docs/B1-docs/raw-CONVERGENCE.md`。
 - 本轮补充验证：
   - `./bin/checkpoint-guard` -> `checkpoint_required: no`

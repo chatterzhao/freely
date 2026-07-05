@@ -20,7 +20,7 @@
 5. `bash docs/system/workspace/scripts/tests/test-freely-baseline-status`
 6. `bash docs/system/workspace/scripts/tests/test-freely-status-family`
 7. `./bin/governance-check`
-8. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-1935-test-pre-merge-fresh-project-bootstrap-baseline-scoping-followthrough --issue docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
+8. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-1935-test-pre-merge-fresh-project-bootstrap-baseline-scoping-followthrough --issue docs/B2-docs/config/packaging/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
 9. `git diff --check`
 10. Post-merge followthrough on `develop`:
 11. `bash docs/system/workspace/scripts/tests/test-freely-sync-tooling-fresh-project-bootstrap`
@@ -28,7 +28,7 @@
 13. `bash docs/system/workspace/scripts/tests/test-freely-baseline-status`
 14. `bash docs/system/workspace/scripts/tests/test-freely-status-family`
 15. `./bin/governance-check`
-16. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely --issue docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
+16. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely --issue docs/B2-docs/config/packaging/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
 17. `git diff --check`
 18. `git worktree prune`
 19. `git worktree list --porcelain`

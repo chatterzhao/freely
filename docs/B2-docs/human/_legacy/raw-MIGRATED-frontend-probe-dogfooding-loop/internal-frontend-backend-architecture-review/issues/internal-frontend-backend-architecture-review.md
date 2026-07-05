@@ -7,7 +7,7 @@
 - epic-name: `frontend-probe-dogfooding-loop`
 - story-name: `internal-frontend-backend-architecture-review`
 - issue-name: `internal-frontend-backend-architecture-review`
-- verification_artifact_dir: `docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/human/tui/code-reviews`
 - source_candidate: `docs/B1-docs/raw-20260308/candidates.md#c-20260308-1244-01`
 - source_brainstorm: `docs/B1-docs/raw-20260308/brainstorms.md`
 - execution_base: `develop`
@@ -248,7 +248,7 @@
 
 ## Verification
 
-- `rg -n "ClientCommand|ServerEvent|Snapshot|tauri_adapter|ws_adapter|frontend contract|transport adapter|backend service contract|MVP autonomy milestone|Input arbitration|AI team visibility" docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy -g '*.md'`
+- `rg -n "ClientCommand|ServerEvent|Snapshot|tauri_adapter|ws_adapter|frontend contract|transport adapter|backend service contract|MVP autonomy milestone|Input arbitration|AI team visibility" docs/B2-docs/human/internal-frontend-backend-architecture-review docs/B2-docs/human/frontend-backend-boundary-contract-v1-for-frontend-probe docs/B2-docs/runtime/backend-service-contract-and-adapter-taxonomy -g '*.md'`
 - `rg -n "I-20260308-1245|internal-frontend-backend-architecture-review" docs -g '*.md'`
 - `./bin/governance-check`
 

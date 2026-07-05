@@ -1,7 +1,7 @@
 # Verification: runtime-claude-launch-and-session-evidence-governance
 
 - issue_id: `I-20260419-2245-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-claude-launch-and-session-evidence-governance/issues/runtime-claude-launch-and-session-evidence-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-claude-launch-and-session-evidence-governance/issues/runtime-claude-launch-and-session-evidence-governance.md`
 - verification_date: `2026-04-19`
 - verifier: `codex`
 

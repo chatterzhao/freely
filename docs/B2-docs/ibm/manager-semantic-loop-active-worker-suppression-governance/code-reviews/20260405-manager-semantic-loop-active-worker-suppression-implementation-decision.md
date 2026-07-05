@@ -1,7 +1,7 @@
 # Implementation Decision: manager-semantic-loop-active-worker-suppression-governance
 
 - issue_id: `I-20260405-1505-A`
-- issue_path: `docs/epics/workspace-routing-foundation/manager-semantic-loop-active-worker-suppression-governance/issues/manager-semantic-loop-active-worker-suppression-governance.md`
+- issue_path: `docs/B2-docs/ibm/manager-semantic-loop-active-worker-suppression-governance/issues/manager-semantic-loop-active-worker-suppression-governance.md`
 - date: `2026-04-05`
 
 ## Decision

@@ -33,7 +33,7 @@
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_id: `I-20260408-1205-A`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
 - decision_reason:
   - repeated bug escape to dogfood is better explained by weak contract consumption than by missing high-level test doctrine
   - manager/worker prompt truth currently carries launch metadata, not verification obligations

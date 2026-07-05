@@ -12,14 +12,14 @@
 - source_brainstorm: `docs/B1-docs/raw-20260404/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-runtime-blocked-intake-and-continuity-truth-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/runtime-network-failure-taxonomy-and-bounded-recovery-governance/issues/runtime-network-failure-taxonomy-and-bounded-recovery-governance.md`
-  - `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
-  - `docs/epics/workspace-routing-foundation/manager-delegated-intake-absorption-closure-governance/issues/manager-delegated-intake-absorption-closure-governance.md`
-  - `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
+  - `docs/B2-docs/runtime/runtime-network-failure-taxonomy-and-bounded-recovery-governance/issues/runtime-network-failure-taxonomy-and-bounded-recovery-governance.md`
+  - `docs/B2-docs/ibm/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
+  - `docs/B2-docs/ibm/manager-delegated-intake-absorption-closure-governance/issues/manager-delegated-intake-absorption-closure-governance.md`
+  - `docs/B2-docs/ibm/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -92,14 +92,14 @@ Freely 现在已经分别具备：
 
 - `docs/B1-docs/raw-20260404/brainstorms.md`
 - `docs/B1-docs/raw-20260404/candidates.md`
-- `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md`
-- `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/brainstorms/b-runtime-blocked-intake-and-continuity-truth-governance.md`
-- `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/tasks.md`
-- `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-implementation-decision.md`
-- `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-verification.md`
-- `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-canonical-closeout-verification.md`
+- `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md`
+- `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/brainstorms/b-runtime-blocked-intake-and-continuity-truth-governance.md`
+- `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/prd.md`
+- `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/pre-tests.md`
+- `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/tasks.md`
+- `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-implementation-decision.md`
+- `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-verification.md`
+- `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-canonical-closeout-verification.md`
 - `docs/progress/workspace-routing-foundation/p-runtime-blocked-intake-and-continuity-truth-governance.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-blocked-supervision-status-surface`
@@ -113,19 +113,19 @@ Freely 现在已经分别具备：
   - follow-on implementation 允许同步更新 runtime status surface、blocked artifact writeback、以及 focused regressions。
   - generic network retry/cooldown policy、semantic-loop automation、worker stall recovery、GitHub issue automation 仍留在各自 owner。
 - required_doc_refs:
-  - `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/brainstorms/b-runtime-blocked-intake-and-continuity-truth-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/prd.md`
-  - `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/tasks.md`
-  - `docs/epics/workspace-routing-foundation/runtime-network-failure-taxonomy-and-bounded-recovery-governance/issues/runtime-network-failure-taxonomy-and-bounded-recovery-governance.md`
-  - `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
+  - `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md`
+  - `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/brainstorms/b-runtime-blocked-intake-and-continuity-truth-governance.md`
+  - `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/prd.md`
+  - `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/pre-tests.md`
+  - `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/tasks.md`
+  - `docs/B2-docs/runtime/runtime-network-failure-taxonomy-and-bounded-recovery-governance/issues/runtime-network-failure-taxonomy-and-bounded-recovery-governance.md`
+  - `docs/B2-docs/ibm/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
 
 ## Next
 
 - Completed on canonical `develop` via guarded merge `fd1907b`.
 - This closeout also backfills the previously missing `progress` plus issue-bound verification artifacts so the governance chain is explicitly closed instead of relying on the merge alone.
-- Post-merge closeout verification is recorded in `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-canonical-closeout-verification.md`.
+- Post-merge closeout verification is recorded in `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-canonical-closeout-verification.md`.
 - Reopen only if canonical `develop` again leaves prompt-visible intake stuck without claim/continuity writeback, or if future work tries to widen this owner back into generic watchdog redesign or network taxonomy.
 
 ## Verification
@@ -139,6 +139,6 @@ Freely 现在已经分别具备：
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-semantic-loop-status-surface`
 - `bash docs/system/workspace/scripts/tests/test-freely-restart-storm-status-surface`
 - review `docs/B1-docs/raw-20260404/brainstorms.md`
-- review `docs/epics/workspace-routing-foundation/runtime-network-failure-taxonomy-and-bounded-recovery-governance/issues/runtime-network-failure-taxonomy-and-bounded-recovery-governance.md`
-- review `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
+- review `docs/B2-docs/runtime/runtime-network-failure-taxonomy-and-bounded-recovery-governance/issues/runtime-network-failure-taxonomy-and-bounded-recovery-governance.md`
+- review `docs/B2-docs/ibm/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
 - confirm the resulting docs do not claim broader watchdog redesign or GitHub issue automation

@@ -12,7 +12,7 @@ platform_ids:
   github:
     issue_id: '3412'
 primary_platform: github
-pre_tests_path: docs/epics/fix-execution-stash-transfer/verification/pre-tests.md
+pre_tests_path: docs/B2-docs/fix-execution-stash-transfer/verification/pre-tests.md
 verification_artifact_dir: docs/epics/fix-execution-stash-transfer/code-reviews
 platform_state: open
 updated_at: '2026-06-24T08:14:19Z'
@@ -20,7 +20,7 @@ updated_at: '2026-06-24T08:14:19Z'
 # I-20260624T081419Z-A: fix-execution cp→git stash 工作流优化
 
 - source_candidate: `docs/B1-docs/raw-20260624T081419Z/candidates.md`
-- pre_tests_path: `docs/epics/fix-execution-stash-transfer/verification/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/fix-execution-stash-transfer/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/fix-execution-stash-transfer/code-reviews`
 
 ## 改动

@@ -1,7 +1,7 @@
 # Verification: codex-real-exec-switch-and-after-failure-recovery-governance
 
 - issue_id: `I-20260410-1835-B`
-- issue_path: `docs/epics/workspace-routing-foundation/codex-real-exec-switch-and-after-failure-recovery-governance/issues/codex-real-exec-switch-and-after-failure-recovery-governance.md`
+- issue_path: `docs/B2-docs/config/codex-real-exec-switch-and-after-failure-recovery-governance/issues/codex-real-exec-switch-and-after-failure-recovery-governance.md`
 - verification_date: `2026-04-10`
 - verifier: `codex`
 

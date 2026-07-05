@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO9P
     synced_at: '2026-04-27T13:17:06Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md
+canonical_issue_path: docs/B2-docs/ibm/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:26:51Z'
 hash: ''
@@ -31,4 +31,4 @@ platform_state: closed
 
 这让 gate 经常表现为“最后一步突然拦截”，而不是从 handoff / cleanup replay 开始就可恢复地提示操作者缺哪一层 contract。
 
-canonical: docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md
+canonical: docs/B2-docs/ibm/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md

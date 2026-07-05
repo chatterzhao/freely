@@ -1,7 +1,7 @@
 # Verification: cli-help-and-dry-run-contract-followthrough-governance
 
 - issue_id: `I-20260405-2358-D`
-- issue_path: `docs/epics/workspace-routing-foundation/cli-help-and-dry-run-contract-followthrough-governance/issues/cli-help-and-dry-run-contract-followthrough-governance.md`
+- issue_path: `docs/B2-docs/human/cli-help-and-dry-run-contract-followthrough-governance/issues/cli-help-and-dry-run-contract-followthrough-governance.md`
 - verified_in_branch: `feature/cli-help-dry-run-contract-followthrough-20260406-0408`
 - verified_in_worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-0408-feature-cli-help-dry-run-contract-followthrough`
 - verified_at: `2026-04-06`

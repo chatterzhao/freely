@@ -12,14 +12,14 @@
 - source_brainstorm: `docs/B1-docs/raw-20260420/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/pre-tests.md`
-- tasks_path: `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/tasks.md`
+- pre_tests_path: `docs/B2-docs/ibm/manager-task-source-scan-idle-replan-boundary-governance/pre-tests.md`
+- tasks_path: `docs/B2-docs/ibm/manager-task-source-scan-idle-replan-boundary-governance/tasks.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-manager-task-source-scan-idle-replan-boundary-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/manager-task-source-scan-idle-replan-boundary-governance/code-reviews`
 - depends_on:
   - `docs/B1-docs/raw-20260407/candidates.md#c-20260407-0817-a`
-  - `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md`
-  - `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
+  - `docs/B2-docs/ibm/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md`
+  - `docs/B2-docs/ibm/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
 - created_at: `2026-04-20`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
@@ -77,11 +77,11 @@ This owner freezes the idle/replan scan boundary and lands the first machine-rea
 - `docs/B1-docs/raw-20260420/brainstorms.md`
 - `docs/B1-docs/raw-20260420/candidates.md`
 - `docs/milestones.md`
-- `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/issues/manager-task-source-scan-idle-replan-boundary-governance.md`
-- `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/tasks.md`
+- `docs/B2-docs/ibm/manager-task-source-scan-idle-replan-boundary-governance/issues/manager-task-source-scan-idle-replan-boundary-governance.md`
+- `docs/B2-docs/ibm/manager-task-source-scan-idle-replan-boundary-governance/pre-tests.md`
+- `docs/B2-docs/ibm/manager-task-source-scan-idle-replan-boundary-governance/tasks.md`
 - `docs/progress/workspace-routing-foundation/p-manager-task-source-scan-idle-replan-boundary-governance.md`
-- `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/code-reviews/20260420-manager-task-source-scan-idle-replan-boundary-verification.md`
+- `docs/B2-docs/ibm/manager-task-source-scan-idle-replan-boundary-governance/code-reviews/20260420-manager-task-source-scan-idle-replan-boundary-verification.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/runtime/task-source-scan.py`
 - `docs/system/workspace/scripts/tests/test-freely-manager-prompt-includes-milestone-patrol-seed`

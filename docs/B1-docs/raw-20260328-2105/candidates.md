@@ -40,7 +40,7 @@
 - priority: P1
 - status: promoted
 - decision_reason: The failure is now concrete and reproducible, and the first owner issue has been materialized narrowly: preserve healthy resume, preserve auth/watchdog recovery, repair only the false-positive resume evidence path on the proven `codex` chain, and defer broader cross-tool generalization until it is separately audited.
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/codex-verified-resume-evidence-governance/issues/codex-verified-resume-evidence-governance.md`
+- promoted_issue_path: `docs/B2-docs/config/codex-verified-resume-evidence-governance/issues/codex-verified-resume-evidence-governance.md`
 - milestone: `docs/milestones.md#M-20260306-workspace-routing-foundation`
 - next_action: Complete IBM for the new codex-scoped owner issue, then enter dev-loop with a regression-first repair for false-positive session-id-only resume evidence.
 - revisit_trigger: Reopen or widen this line if future field evidence shows other explicit session-addressed tools can also emit session ids without replayable rollout evidence, or if a proposed fix starts downgrading healthy resumable sessions into unnecessary fresh handoffs.

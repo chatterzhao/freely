@@ -5,7 +5,7 @@
 - priority: `P0`
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_id: `I-20260503T0915Z-enforce-test-pre-merge`
-- promoted_issue_path: `docs/epics/test-pre-merge-enforcement/issues/I-20260503T0915Z-enforce-test-pre-merge.md`
+- promoted_issue_path: `docs/B2-docs/test-pre-merge-enforcement/issues/I-20260503T0915Z-enforce-test-pre-merge.md`
 - session_refs:
   - tool: `github`
     session_id: `freely/issues/180`

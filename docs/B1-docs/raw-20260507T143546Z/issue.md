@@ -19,12 +19,12 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-pre_tests_path: docs/epics/platform-pull-standardize/verification/pre-tests.md
+pre_tests_path: docs/B2-docs/platform-pull-standardize/verification/pre-tests.md
 verification_artifact_dir: docs/epics/platform-pull-standardize/code-reviews
 platform_state: closed
 ---
 
-- pre_tests_path: docs/epics/platform-pull-standardize/verification/pre-tests.md
+- pre_tests_path: docs/B2-docs/platform-pull-standardize/verification/pre-tests.md
 - verification_artifact_dir: docs/epics/platform-pull-standardize/code-reviews
 
 ## 问题

@@ -41,25 +41,25 @@
 - requirement: `A completed issue referenced from docs/milestones.md fails governance-check unless it lives only in completed_issues.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/milestone-completed-queue-closeout-governance/code-reviews/20260406-milestone-completed-queue-closeout-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/milestone-completed-queue-closeout-governance/code-reviews/20260406-milestone-completed-queue-closeout-verification.md`
 
 ### AT-002
 - id: `AT-002`
 - requirement: `The milestone queue audit does not regress existing v2 candidate governance coverage.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/milestone-completed-queue-closeout-governance/code-reviews/20260406-milestone-completed-queue-closeout-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/milestone-completed-queue-closeout-governance/code-reviews/20260406-milestone-completed-queue-closeout-verification.md`
 
 ### AT-003
 - id: `AT-003`
 - requirement: `Canonical milestone truth and the new queue/phase audit pass together on the owner worktree.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/milestone-completed-queue-closeout-governance/code-reviews/20260406-milestone-completed-queue-closeout-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/milestone-completed-queue-closeout-governance/code-reviews/20260406-milestone-completed-queue-closeout-verification.md`
 
 ### AT-004
 - id: `AT-004`
 - requirement: `The owner patch remains free of diff-formatting defects before promotion.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/milestone-completed-queue-closeout-governance/code-reviews/20260406-milestone-completed-queue-closeout-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/milestone-completed-queue-closeout-governance/code-reviews/20260406-milestone-completed-queue-closeout-verification.md`

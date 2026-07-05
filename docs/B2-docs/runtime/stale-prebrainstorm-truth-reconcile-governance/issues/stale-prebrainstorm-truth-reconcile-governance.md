@@ -12,8 +12,8 @@
 - source_brainstorm: `docs/B1-docs/raw-20260411/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/stale-prebrainstorm-truth-reconcile-governance/pre-tests.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/stale-prebrainstorm-truth-reconcile-governance/code-reviews`
+- pre_tests_path: `docs/B2-docs/runtime/stale-prebrainstorm-truth-reconcile-governance/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/runtime/stale-prebrainstorm-truth-reconcile-governance/code-reviews`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -41,9 +41,9 @@
   - 本 owner 是文档真相纠偏，不是能力实现 owner。
   - 每个 reconcile 变更都必须带 canonical truth pointer。
 - required_doc_refs:
-  - `docs/epics/workspace-routing-foundation/stale-prebrainstorm-truth-reconcile-governance/prd.md`
-  - `docs/epics/workspace-routing-foundation/stale-prebrainstorm-truth-reconcile-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/stale-prebrainstorm-truth-reconcile-governance/tasks.md`
+  - `docs/B2-docs/runtime/stale-prebrainstorm-truth-reconcile-governance/prd.md`
+  - `docs/B2-docs/runtime/stale-prebrainstorm-truth-reconcile-governance/pre-tests.md`
+  - `docs/B2-docs/runtime/stale-prebrainstorm-truth-reconcile-governance/tasks.md`
   - `docs/B1-docs/raw-20260408/brainstorms.md`
   - `docs/B1-docs/raw-20260327/brainstorms.md`
 

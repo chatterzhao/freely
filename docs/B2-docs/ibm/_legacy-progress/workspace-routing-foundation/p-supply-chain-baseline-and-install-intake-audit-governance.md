@@ -1,7 +1,7 @@
 # Progress: supply-chain-baseline-and-install-intake-audit-governance
 
 - issue_id: `I-20260401-0115-A`
-- issue_path: `docs/epics/workspace-routing-foundation/supply-chain-baseline-and-install-intake-audit-governance/issues/supply-chain-baseline-and-install-intake-audit-governance.md`
+- issue_path: `docs/B2-docs/ibm/supply-chain-baseline-and-install-intake-audit-governance/issues/supply-chain-baseline-and-install-intake-audit-governance.md`
 - title: `Supply-chain baseline and install-intake audit governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -26,7 +26,7 @@
 3. `bash docs/system/workspace/scripts/tests/test-freely-doctor-execution-boundary-audit`
 4. `bash docs/system/workspace/scripts/tests/test-freely-hook-gate`
 5. `bash docs/system/workspace/scripts/tests/test-freely-chat-and-tui`
-6. `docs/epics/workspace-routing-foundation/supply-chain-baseline-and-install-intake-audit-governance/code-reviews/20260401-supply-chain-baseline-and-install-intake-audit-verification.md`
+6. `docs/B2-docs/ibm/supply-chain-baseline-and-install-intake-audit-governance/code-reviews/20260401-supply-chain-baseline-and-install-intake-audit-verification.md`
 7. `./bin/governance-check`
 
 ## Closure Status
@@ -36,7 +36,7 @@
   - `merge_commit: 1d082fc`
   - `tests: bash docs/system/workspace/scripts/tests/test-check-supply-chain-baseline && bash docs/system/workspace/scripts/tests/test-freely-doctor-supply-chain-gate && bash docs/system/workspace/scripts/tests/test-freely-doctor-execution-boundary-audit && bash docs/system/workspace/scripts/tests/test-freely-hook-gate && bash docs/system/workspace/scripts/tests/test-freely-chat-and-tui`
   - `governance: ./bin/governance-check`
-  - `review: docs/epics/workspace-routing-foundation/supply-chain-baseline-and-install-intake-audit-governance/code-reviews/20260401-supply-chain-baseline-and-install-intake-audit-verification.md`
+  - `review: docs/B2-docs/ibm/supply-chain-baseline-and-install-intake-audit-governance/code-reviews/20260401-supply-chain-baseline-and-install-intake-audit-verification.md`
 
 ## Next Action
 

@@ -53,7 +53,7 @@
 - case_design: `Start a fake argv process, run supervisor validation, and assert it is rejected without published identity truth.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/code-reviews/20260413-runtime-startup-authority-and-readiness-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/code-reviews/20260413-runtime-startup-authority-and-readiness-verification.md`
 
 ### Daemon ready waits for published startup truth
 - id: `daemon-ready-requires-published-truth`
@@ -65,7 +65,7 @@
 - case_design: `Seed a fake supervisor-like process first, then verify daemon start ignores it and returns the actual published supervisor.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/code-reviews/20260413-runtime-startup-authority-and-readiness-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/code-reviews/20260413-runtime-startup-authority-and-readiness-verification.md`
 
 ### Same-project start serializes through startup publication
 - id: `same-project-start-publishes-before-unlock`
@@ -77,7 +77,7 @@
 - case_design: `Replay the concurrent-start regression and confirm startup truth serializes the project launch.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/code-reviews/20260413-runtime-startup-authority-and-readiness-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/code-reviews/20260413-runtime-startup-authority-and-readiness-verification.md`
 
 ### Guarded promote proves premerge adequacy
 - id: `develop-promote-startup-authority-proof`
@@ -89,4 +89,4 @@
 - case_design: `Merge the feature lane into a disposable test-pre-merge batch, rerun the startup-authority regression set plus governance-check there, and record the replay in a closeout verification artifact that the develop gate can consume.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/code-reviews/20260413-runtime-startup-authority-and-readiness-closeout-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/code-reviews/20260413-runtime-startup-authority-and-readiness-closeout-verification.md`

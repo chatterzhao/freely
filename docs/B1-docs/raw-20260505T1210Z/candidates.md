@@ -9,7 +9,7 @@
 - priority: P0
 - status: promoted
 - milestone: M-20260306-workspace-routing-foundation
-- promoted_issue_path: docs/epics/workspace-routing-foundation/issue-state-refactor/issues/I-20260505T1210Z-A.md
+- promoted_issue_path: docs/B2-docs/ibm/issue-state-refactor/issues/I-20260505T1210Z-A.md
 
 ### 改动
 

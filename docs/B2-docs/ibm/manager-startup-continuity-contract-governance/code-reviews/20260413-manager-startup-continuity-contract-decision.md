@@ -1,7 +1,7 @@
 # Contract Decision: manager-startup-continuity-contract-governance
 
 - issue_id: `I-20260413-0420-B`
-- issue_path: `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/issues/manager-startup-continuity-contract-governance.md`
+- issue_path: `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/issues/manager-startup-continuity-contract-governance.md`
 - branch: `feature/manager-startup-continuity-contract-governance-20260413`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260413-feature-manager-startup-continuity-contract-governance`
 - decision_date: `2026-04-13`

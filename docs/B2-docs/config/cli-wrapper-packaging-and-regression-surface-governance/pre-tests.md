@@ -36,18 +36,18 @@
 - requirement: `Audited runnable wrappers are directly executable.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/cli-wrapper-packaging-and-regression-surface-governance/code-reviews/20260406-cli-wrapper-packaging-and-regression-surface-verification.md`
+- artifact_ref: `docs/B2-docs/config/cli-wrapper-packaging-and-regression-surface-governance/code-reviews/20260406-cli-wrapper-packaging-and-regression-surface-verification.md`
 
 ### AT-002
 - id: `AT-002`
 - requirement: `ai help output is clean and deterministic.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/cli-wrapper-packaging-and-regression-surface-governance/code-reviews/20260406-cli-wrapper-packaging-and-regression-surface-verification.md`
+- artifact_ref: `docs/B2-docs/config/cli-wrapper-packaging-and-regression-surface-governance/code-reviews/20260406-cli-wrapper-packaging-and-regression-surface-verification.md`
 
 ### AT-003
 - id: `AT-003`
 - requirement: `auth-change wake regression behaves deterministically across equivalent worktrees.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/cli-wrapper-packaging-and-regression-surface-governance/code-reviews/20260406-cli-wrapper-packaging-and-regression-surface-verification.md`
+- artifact_ref: `docs/B2-docs/config/cli-wrapper-packaging-and-regression-surface-governance/code-reviews/20260406-cli-wrapper-packaging-and-regression-surface-verification.md`

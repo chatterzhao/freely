@@ -1,7 +1,7 @@
 # Verification: freely-start-auto-recovery-rootcause-governance
 
 - issue_id: `I-20260414-0255-A`
-- issue_path: `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/issues/freely-start-auto-recovery-rootcause-governance.md`
+- issue_path: `docs/B2-docs/ibm/freely-start-auto-recovery-rootcause-governance/issues/freely-start-auto-recovery-rootcause-governance.md`
 - verification_date: `2026-04-14`
 - verifier: `codex`
 

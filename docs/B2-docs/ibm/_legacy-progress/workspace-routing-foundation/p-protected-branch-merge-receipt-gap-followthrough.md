@@ -1,7 +1,7 @@
 # Progress: protected-branch-merge-receipt-gap-followthrough
 
 - issue_id: `I-20260404-0640-A`
-- issue_path: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
+- issue_path: `docs/B2-docs/ibm/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
 - phase_state: `completed`
 - runtime_state: `unavailable`
 - milestone: `M-20260306-workspace-routing-foundation`

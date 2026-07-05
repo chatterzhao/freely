@@ -31,7 +31,7 @@
     verdict: `promote`
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-adapter-axis-and-per-tool-adapter-selection/issues/runtime-adapter-axis-and-per-tool-adapter-selection.md`
+- promoted_issue_path: `docs/B2-docs/runtime/runtime-adapter-axis-and-per-tool-adapter-selection/issues/runtime-adapter-axis-and-per-tool-adapter-selection.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`

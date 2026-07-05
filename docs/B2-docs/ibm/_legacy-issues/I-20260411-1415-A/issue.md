@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO9L
     synced_at: '2026-04-27T13:17:03Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/issues/pretests-adequacy-item-schema-materialization-governance.md
+canonical_issue_path: docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/issues/pretests-adequacy-item-schema-materialization-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:26:42Z'
 hash: ''
@@ -25,4 +25,4 @@ platform_state: closed
 
 现在真正缺的是 machine-readable adequacy semantics。最小五件套让 gate 能看见“跑过某些测试”，但还不足以判断“是否跑够了当前 lane / promote gate 需要的测试面”。
 
-canonical: docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/issues/pretests-adequacy-item-schema-materialization-governance.md
+canonical: docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/issues/pretests-adequacy-item-schema-materialization-governance.md

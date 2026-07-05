@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO5Q
     synced_at: '2026-04-27T13:14:22Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/baseline-status-command-and-status-family-governance/issues/baseline-status-command-and-status-family-governance.md
+canonical_issue_path: docs/B2-docs/ibm/baseline-status-command-and-status-family-governance/issues/baseline-status-command-and-status-family-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:14:43Z'
 hash: ''
@@ -30,4 +30,4 @@ Freely 已经形成三块状态面：
 
 但旧命名还让 `freely status` 承担 baseline snapshot，语义已经不准确。
 
-canonical: docs/epics/workspace-routing-foundation/baseline-status-command-and-status-family-governance/issues/baseline-status-command-and-status-family-governance.md
+canonical: docs/B2-docs/ibm/baseline-status-command-and-status-family-governance/issues/baseline-status-command-and-status-family-governance.md

@@ -43,11 +43,11 @@
   - because Freely defaults to autonomous execution, it must define a canonical informed-consent and configuration-mapping path instead of leaving users to infer execution risk from downstream tool flags
   - Freely should support safer environments aggressively without turning safeguard incompleteness into the default blocker for owner-grade autonomy
 - milestone: `M-20260326-freely-product-architecture`
-- promoted_issue_path: `docs/epics/freely-product-architecture/default-autonomy-activation-consent-and-tool-policy-governance/issues/default-autonomy-activation-consent-and-tool-policy-governance.md`
+- promoted_issue_path: `docs/B2-docs/config/packaging/issues/default-autonomy-activation-consent-and-tool-policy-governance.md`
 - promoted_issue_path_role: `primary-owner-for-split-candidate`
 - promoted_issue_paths:
-  - `docs/epics/freely-product-architecture/default-autonomy-activation-consent-and-tool-policy-governance/issues/default-autonomy-activation-consent-and-tool-policy-governance.md`
-  - `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/issues/freely-tool-autonomy-policy-materialization-governance.md`
+  - `docs/B2-docs/config/packaging/issues/default-autonomy-activation-consent-and-tool-policy-governance.md`
+  - `docs/B2-docs/config/packaging/issues/freely-tool-autonomy-policy-materialization-governance.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`

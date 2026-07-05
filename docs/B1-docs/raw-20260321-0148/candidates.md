@@ -5,7 +5,7 @@
   status: promoted
   why_now:
     - 当前 `cc-use-codex-cli` 已可用，但恢复与多并发证据仍偏弱，应该升级为精确 jsonl 解析。
-  promoted_issue_path: docs/epics/workspace-routing-foundation/claude-code-codex-mcp-runtime-governance/issues/claude-code-codex-mcp-runtime-governance.md
+  promoted_issue_path: docs/B2-docs/config/claude-code-codex-mcp-runtime-governance/issues/claude-code-codex-mcp-runtime-governance.md
   milestone: M-20260306-workspace-routing-foundation
   session_refs:
     - tool: cc-use-codex-cli

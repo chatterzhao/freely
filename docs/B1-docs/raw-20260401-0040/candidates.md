@@ -25,7 +25,7 @@
   - the earlier empty placeholder created governance ambiguity without any executable value
   - `C-20260401-0115-A` is the canonical narrow owner for the same capability family
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/supply-chain-baseline-and-install-intake-audit-governance/issues/supply-chain-baseline-and-install-intake-audit-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/supply-chain-baseline-and-install-intake-audit-governance/issues/supply-chain-baseline-and-install-intake-audit-governance.md`
 - promoted_issue_path_role: `absorbed-into-successor`
 - session_refs:
   - tool: `codex`

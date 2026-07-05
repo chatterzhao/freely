@@ -40,7 +40,7 @@
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_id: `I-20260402-0020-A`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/issues/protected-branch-hook-bypass-breakglass-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/protected-branch-hook-bypass-breakglass-governance/issues/protected-branch-hook-bypass-breakglass-governance.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`

@@ -1,7 +1,7 @@
 # Verification: runtime-lifecycle-receipt-followthrough-governance successor owner replay readiness
 
 - issue_id: `I-20260418-1900-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
 - verification_date: `2026-04-25`
 - verifier: `codex`
 - route_judgment: `checkpoint_ready_for_fresh_replay`
@@ -21,10 +21,10 @@
 
 1. `git worktree list --porcelain`
 2. `git branch --list 'feature/runtime-lifecycle-receipt-followthrough-20260418' 'test-pre-merge-runtime-lifecycle-followthrough-20260418' 'feature/runtime-lifecycle-receipt-closeout-reconcile-20260424'`
-3. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-runtime-lifecycle-receipt-closeout-reconcile --issue docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
+3. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-runtime-lifecycle-receipt-closeout-reconcile --issue docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
 4. `git diff --check`
 5. `./bin/governance-check`
-6. `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260425-runtime-lifecycle-receipt-guarded-replay-blocker.md`
+6. `docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260425-runtime-lifecycle-receipt-guarded-replay-blocker.md`
 
 ## Command Results
 
@@ -34,7 +34,7 @@
 2. `git branch --list ...`
    - Exit `0`
    - Local refs show only `feature/runtime-lifecycle-receipt-closeout-reconcile-20260424`; the `20260418` followthrough feature/test-pre-merge refs are absent.
-3. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-runtime-lifecycle-receipt-closeout-reconcile --issue docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
+3. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-runtime-lifecycle-receipt-closeout-reconcile --issue docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
    - Exit `0`
    - The issue-bound pre-tests contract remains satisfiable from the successor owner lane.
 4. `git diff --check`
@@ -43,7 +43,7 @@
 5. `./bin/governance-check`
    - Exit `0`
    - Output: `Governance check passed.`
-6. `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260425-runtime-lifecycle-receipt-guarded-replay-blocker.md`
+6. `docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260425-runtime-lifecycle-receipt-guarded-replay-blocker.md`
    - The stale replay batch is explicitly blocked because the source owner truth was still dirty and uncommitted while the stale batch already carried the committed source ancestor.
 
 ## Implementation Decision Note

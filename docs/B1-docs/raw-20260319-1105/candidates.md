@@ -19,7 +19,7 @@
 - priority: P0
 - status: promoted
 - decision_reason: active truth 审计已经证明现有高层真源仍会把 `auto-loop / doc-loop / dev-loop` 渲染成“`三层`”或接近包含关系，且 terminal / verification / cleanup 的定位持续漂移；当前已足够 materialize 为独立 IBM+dev issue，用 active truth 改写纠正 sibling-loop 关系，再把历史 evidence 保持为历史。
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/three-loops-sibling-relationship-and-terminal-governance/issues/three-loops-sibling-relationship-and-terminal-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/three-loops-sibling-relationship-and-terminal-governance/issues/three-loops-sibling-relationship-and-terminal-governance.md`
 - legacy_id_mapping: I-20260324-0405  # 历史遗留的 issue id
 - milestone: `M-20260306-workspace-routing-foundation`
 - session_refs:

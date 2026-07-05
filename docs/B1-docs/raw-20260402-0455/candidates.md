@@ -47,7 +47,7 @@
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_id: `I-20260402-0455-A`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/issues/worktree-exclusive-ownership-and-promotion-lease-governance.md`
+- promoted_issue_path: `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/issues/worktree-exclusive-ownership-and-promotion-lease-governance.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`

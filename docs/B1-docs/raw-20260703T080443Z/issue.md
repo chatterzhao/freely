@@ -42,5 +42,5 @@ At daemon startup (supervisor ready), UPSERT __manager__ row:
 - On restart: existing row → get session_id → resume session
 
 ## Reference
-Residual risk documented in: docs/epics/reviewer-agent/phase1-ensure-reviewer/raw-20260701T085407Z/code-reviews/implementation-decision-note.md:15
+Residual risk documented in: docs/B2-docs/a2a/reviewer-agent/raw-20260701T085407Z/code-reviews/implementation-decision-note.md:15
   (1) __manager__首次自举依赖_handle_needs_manager触发

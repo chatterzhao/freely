@@ -33,18 +33,18 @@
 - requirement: `The bounded bootstrap grace fix is verified against the first AI-launch window.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/code-reviews/20260404-manager-bootstrap-prompt-publication-without-continuity-materialization-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/code-reviews/20260404-manager-bootstrap-prompt-publication-without-continuity-materialization-verification.md`
 
 ### AT-002
 - id: `AT-002`
 - requirement: `Worker prompts under the current ## Worker Dispatch continuity heading are visible as launchable manager handoff evidence.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/code-reviews/20260404-manager-bootstrap-prompt-publication-without-continuity-materialization-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/code-reviews/20260404-manager-bootstrap-prompt-publication-without-continuity-materialization-verification.md`
 
 ### AT-003
 - id: `AT-003`
 - requirement: `The closeout lane keeps this owner completed and bounded while leaving restart churn to a future owner.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/code-reviews/20260404-manager-bootstrap-prompt-publication-without-continuity-materialization-implementation-decision.md`
+- artifact_ref: `docs/B2-docs/ibm/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/code-reviews/20260404-manager-bootstrap-prompt-publication-without-continuity-materialization-implementation-decision.md`

@@ -14,7 +14,7 @@
 - priority: P0
 - status: promoted
 - decision_reason: 这是把现有分散架构研究收敛成单一中间层真源的前置问题。
-- promoted_issue_path: `docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/issues/backend-service-contract-and-adapter-taxonomy.md`
+- promoted_issue_path: `docs/B2-docs/runtime/control-surface/issues/backend-service-contract-and-adapter-taxonomy.md`
 - legacy_id_mapping: I-20260312-0011  # 历史遗留的 issue id
 - milestone: M-20260312-control-surface-runtime-convergence
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "analysis"}]

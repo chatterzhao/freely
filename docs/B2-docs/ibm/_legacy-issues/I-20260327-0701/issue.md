@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO6X
     synced_at: '2026-04-27T13:15:06Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/issues/pre-tests-evidence-binding-and-completion-gate-governance.md
+canonical_issue_path: docs/B2-docs/ibm/pre-tests-evidence-binding-and-completion-gate-governance/issues/pre-tests-evidence-binding-and-completion-gate-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:17:58Z'
 hash: ''
@@ -28,4 +28,4 @@ The observed miss was not that Freely lacked tests in the abstract. High-level t
 2. the gate only checked the current owner contract, so those waivers looked structurally valid
 3. real `bin/ai`, real `codex exec`, and real `freely sta
 
-canonical: docs/epics/workspace-routing-foundation/auth-switch-real-environment-and-e2e-adequacy-governance/issues/auth-switch-real-environment-and-e2e-adequacy-governance.md
+canonical: docs/B2-docs/ibm/auth-switch-real-environment-and-e2e-adequacy-governance/issues/auth-switch-real-environment-and-e2e-adequacy-governance.md

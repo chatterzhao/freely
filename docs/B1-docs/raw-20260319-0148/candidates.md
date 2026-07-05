@@ -16,7 +16,7 @@
   - 收编完成后退休旧分支/worktree
 - priority: P0
 - status: promoted
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/context-compaction-continuity-guard-salvage/issues/context-compaction-continuity-guard-salvage.md`
+- promoted_issue_path: `docs/B2-docs/ibm/context-compaction-continuity-guard-salvage/issues/context-compaction-continuity-guard-salvage.md`
 - legacy_id_mapping: I-20260319-0148  # 历史遗留的 issue id
 - milestone: `M-20260306-workspace-routing-foundation`
 - session_refs:

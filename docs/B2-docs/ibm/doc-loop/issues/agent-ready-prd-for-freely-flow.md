@@ -48,11 +48,11 @@ Freely 现有的 `prd.md` 普遍偏短，能表达“这轮要做什么”，但
 
 - `docs/B1-docs/raw-20260321/brainstorms.md`
 - `docs/B1-docs/raw-20260321/candidates.md`
-- `docs/epics/ai-native-doc-loop/agent-ready-prd-for-freely-flow/issues/agent-ready-prd-for-freely-flow.md`
-- `docs/epics/ai-native-doc-loop/agent-ready-prd-for-freely-flow/brainstorms/b-agent-ready-prd-for-freely-flow.md`
-- `docs/epics/ai-native-doc-loop/agent-ready-prd-for-freely-flow/prd.md`
-- `docs/epics/ai-native-doc-loop/agent-ready-prd-for-freely-flow/pre-tests.md`
-- `docs/epics/ai-native-doc-loop/agent-ready-prd-for-freely-flow/tasks.md`
+- `docs/B2-docs/ibm/doc-loop/issues/agent-ready-prd-for-freely-flow.md`
+- `docs/B2-docs/ibm/doc-loop/brainstorms/b-agent-ready-prd-for-freely-flow.md`
+- `docs/B2-docs/ibm/doc-loop/prd.md`
+- `docs/B2-docs/ibm/doc-loop/pre-tests.md`
+- `docs/B2-docs/ibm/doc-loop/tasks.md`
 - `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`
 - `docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md`
 - `docs/system/workspace/skills/doc-ibm-execution/references/ibm-completion-gate.md`

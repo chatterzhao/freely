@@ -12,7 +12,7 @@ platform_ids:
   gitee:
     issue_id: ''
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/bash32-daemon-compat-fix/issues/I-20260429-1745-A.md
+canonical_issue_path: docs/B2-docs/runtime/bash32-daemon-compat-fix/issues/I-20260429-1745-A.md
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-04-29T17:45:00Z'
@@ -35,4 +35,4 @@ Minimal changes to `docs/system/workspace/scripts/runtime/freely`.
 ## References
 
 - B1: docs/B1-docs/raw-20260429/
-- Issue: docs/epics/workspace-routing-foundation/bash32-daemon-compat-fix/issues/I-20260429-1745-A.md
+- Issue: docs/B2-docs/runtime/bash32-daemon-compat-fix/issues/I-20260429-1745-A.md

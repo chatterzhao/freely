@@ -1,7 +1,7 @@
 # Progress: cli-help-and-dry-run-contract-followthrough-governance
 
 - issue_id: `I-20260405-2358-D`
-- issue_path: `docs/epics/workspace-routing-foundation/cli-help-and-dry-run-contract-followthrough-governance/issues/cli-help-and-dry-run-contract-followthrough-governance.md`
+- issue_path: `docs/B2-docs/human/cli-help-and-dry-run-contract-followthrough-governance/issues/cli-help-and-dry-run-contract-followthrough-governance.md`
 - title: `CLI help and dry-run contract followthrough governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -37,18 +37,18 @@
 - `bash docs/system/workspace/scripts/tests/test-ai-cli-switch-default-tool`
 - `./bin/ai --quiet --format json --dry-run switch codex`
 - `python3` JSON parse replay for `./bin/ai --quiet --format json --dry-run switch codex`
-- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-0408-feature-cli-help-dry-run-contract-followthrough --issue docs/epics/workspace-routing-foundation/cli-help-and-dry-run-contract-followthrough-governance/issues/cli-help-and-dry-run-contract-followthrough-governance.md`
+- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-0408-feature-cli-help-dry-run-contract-followthrough --issue docs/B2-docs/human/cli-help-and-dry-run-contract-followthrough-governance/issues/cli-help-and-dry-run-contract-followthrough-governance.md`
 - `./bin/governance-check`
 - `git diff --check`
-- `docs/epics/workspace-routing-foundation/cli-help-and-dry-run-contract-followthrough-governance/code-reviews/20260409-cli-help-and-dry-run-contract-followthrough-canonical-closeout-verification.md`
+- `docs/B2-docs/human/cli-help-and-dry-run-contract-followthrough-governance/code-reviews/20260409-cli-help-and-dry-run-contract-followthrough-canonical-closeout-verification.md`
 
 ## Closure Evidence
 
 - feature merge `4c87504a`
 - develop merge `cb46eabf`
-- `docs/epics/workspace-routing-foundation/cli-help-and-dry-run-contract-followthrough-governance/code-reviews/20260406-cli-help-and-dry-run-contract-followthrough-implementation-decision.md`
-- `docs/epics/workspace-routing-foundation/cli-help-and-dry-run-contract-followthrough-governance/code-reviews/20260406-cli-help-and-dry-run-contract-followthrough-verification.md`
-- `docs/epics/workspace-routing-foundation/cli-help-and-dry-run-contract-followthrough-governance/code-reviews/20260409-cli-help-and-dry-run-contract-followthrough-canonical-closeout-verification.md`
+- `docs/B2-docs/human/cli-help-and-dry-run-contract-followthrough-governance/code-reviews/20260406-cli-help-and-dry-run-contract-followthrough-implementation-decision.md`
+- `docs/B2-docs/human/cli-help-and-dry-run-contract-followthrough-governance/code-reviews/20260406-cli-help-and-dry-run-contract-followthrough-verification.md`
+- `docs/B2-docs/human/cli-help-and-dry-run-contract-followthrough-governance/code-reviews/20260409-cli-help-and-dry-run-contract-followthrough-canonical-closeout-verification.md`
 
 ## Next Action
 

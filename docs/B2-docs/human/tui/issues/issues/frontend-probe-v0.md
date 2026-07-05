@@ -11,8 +11,8 @@
 - source_brainstorm: `docs/B1-docs/raw-20260308/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0/pre-tests.md`
-- verification_artifact_dir: `docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0/code-reviews`
+- pre_tests_path: `docs/B2-docs/human/tui/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/human/tui/code-reviews`
 - depends_on: `none`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "doc-ibm"}
@@ -117,11 +117,11 @@
   - 继续承接 `I-20260317-1001` 已冻结的 boundary contract，把 Probe 的最小产品面收敛成可实现 issue。
   - 当前阶段仍是 issue-bound IBM 收敛，不进入前端实现代码。
 - required_doc_refs:
-  - `docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md`
-  - `docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0/brainstorms/b-frontend-probe-v0.md`
-  - `docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0/prd.md`
-  - `docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0/pre-tests.md`
-  - `docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0/tasks.md`
+  - `docs/B2-docs/human/tui/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md`
+  - `docs/B2-docs/human/tui/brainstorms/b-frontend-probe-v0.md`
+  - `docs/B2-docs/human/tui/prd.md`
+  - `docs/B2-docs/human/tui/pre-tests.md`
+  - `docs/B2-docs/human/tui/tasks.md`
 
 ## Next
 

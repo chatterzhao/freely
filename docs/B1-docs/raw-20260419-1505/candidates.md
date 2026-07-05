@@ -25,7 +25,7 @@
   - reopening interruption-manager followthrough scope from other checkpoint owners
   - memark protected-root bootstrap work
 - promoted_issue_id: `I-20260419-1505-A`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/issues/runtime-supervisor-attach-reuse-followthrough-governance.md`
+- promoted_issue_path: `docs/B2-docs/runtime/runtime-supervisor-attach-reuse-followthrough-governance/issues/runtime-supervisor-attach-reuse-followthrough-governance.md`
 - next_action: `Candidate mirror only. I-20260419-1505-A is now the canonical owner for the preserved supervisor attach/reuse checkpoint and its launcher-home isolation followthrough.`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}

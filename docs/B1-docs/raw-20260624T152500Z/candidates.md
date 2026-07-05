@@ -6,7 +6,7 @@ source: raw-20260624T152500Z
 
 - status: promoted
 - milestone: M-20260624T152500Z-A
-- promoted_issue_path: docs/epics/pr-create-pretests-check/issues/I-20260624T152500Z-A.md
+- promoted_issue_path: docs/B2-docs/pr-create-pretests-check/issues/I-20260624T152500Z-A.md
 - acceptance_criteria:
   - pr-create-guarded blocks PR creation when pretests evidence is missing
   - Error message clearly instructs user to run skill:freely-test-execution

@@ -1,7 +1,7 @@
 # Verification: runtime-daemon-self-loop-followthrough-governance queued-owner self-block boundary
 
 - issue_id: `I-20260421-1200-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
 - verification_date: `2026-04-24`
 - verifier: `codex`
 - source_branch: `feature/manager-queued-owner-self-block-reconcile-20260424`

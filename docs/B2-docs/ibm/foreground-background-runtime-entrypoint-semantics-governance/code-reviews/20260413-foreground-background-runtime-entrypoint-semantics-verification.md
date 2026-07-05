@@ -1,7 +1,7 @@
 # Verification: foreground-background-runtime-entrypoint-semantics-governance
 
 - issue_id: `I-20260413-0208-A`
-- issue_path: `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/issues/foreground-background-runtime-entrypoint-semantics-governance.md`
+- issue_path: `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/issues/foreground-background-runtime-entrypoint-semantics-governance.md`
 - verification_date: `2026-04-13`
 - verifier: `codex`
 

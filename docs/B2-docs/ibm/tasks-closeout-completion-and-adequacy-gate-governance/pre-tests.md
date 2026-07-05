@@ -48,7 +48,7 @@
 - requirement: `pretests-gate rejects phase_state=completed owners when bound tasks.md is missing or still contains unchecked task boxes.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/code-reviews/20260413-tasks-closeout-completion-and-adequacy-gate-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/tasks-closeout-completion-and-adequacy-gate-governance/code-reviews/20260413-tasks-closeout-completion-and-adequacy-gate-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -60,7 +60,7 @@
 - requirement: `pretests-gate --require-adequacy applies the same tasks.md closeout blocker before returning an owner-bound pass verdict.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/code-reviews/20260413-tasks-closeout-completion-and-adequacy-gate-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/tasks-closeout-completion-and-adequacy-gate-governance/code-reviews/20260413-tasks-closeout-completion-and-adequacy-gate-verification.md`
 - surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
@@ -72,7 +72,7 @@
 - requirement: `governance-merge-gate inherits the owner tasks closeout contract through pretests-gate delegation without adding a second parser.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/code-reviews/20260413-tasks-closeout-completion-and-adequacy-gate-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/tasks-closeout-completion-and-adequacy-gate-governance/code-reviews/20260413-tasks-closeout-completion-and-adequacy-gate-verification.md`
 - surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`

@@ -1,7 +1,7 @@
 # Verification: historical-completed-queue-identity-followthrough-governance
 
 - issue_id: `I-20260412-1230-A`
-- issue_path: `docs/epics/workspace-routing-foundation/historical-completed-queue-identity-followthrough-governance/issues/historical-completed-queue-identity-followthrough-governance.md`
+- issue_path: `docs/B2-docs/ibm/historical-completed-queue-identity-followthrough-governance/issues/historical-completed-queue-identity-followthrough-governance.md`
 - verification_date: `2026-04-12`
 - verifier: `codex`
 

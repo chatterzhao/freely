@@ -7,7 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `integration-acceptance-first-verification-governance`
 - issue-name: `integration-acceptance-first-verification-governance`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/integration-acceptance-first-verification-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/integration-acceptance-first-verification-governance/code-reviews`
 - priority: P0
 - source_candidate: `docs/B1-docs/raw-20260322/candidates.md#c-20260322-0135-a`
 - source_brainstorm: `docs/B1-docs/raw-20260322/brainstorms.md`
@@ -54,7 +54,7 @@ Freely 在狗粮过程中已经多次证明，真实缺口更常先通过端到�
 - `docs/system/workspace/three-loop-capability-lifecycle.md`
 - `docs/LAWS.md`
 - `docs/progress/workspace-routing-foundation/p-integration-acceptance-first-verification-governance.md`
-- `docs/epics/workspace-routing-foundation/integration-acceptance-first-verification-governance/code-reviews/20260322-integration-acceptance-first-verification-governance-verification.md`
+- `docs/B2-docs/ibm/integration-acceptance-first-verification-governance/code-reviews/20260322-integration-acceptance-first-verification-governance-verification.md`
 
 ## Verification
 

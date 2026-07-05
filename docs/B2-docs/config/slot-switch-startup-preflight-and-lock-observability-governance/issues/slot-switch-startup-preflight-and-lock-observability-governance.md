@@ -12,10 +12,10 @@
 - source_brainstorm: `docs/B1-docs/raw-20260404/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-slot-switch-startup-preflight-and-lock-observability-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews`
-- depends_on: `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/issues/all-tools-unified-slot-contract-governance.md`
+- verification_artifact_dir: `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews`
+- depends_on: `docs/B2-docs/ibm/all-tools-unified-slot-contract-governance/issues/all-tools-unified-slot-contract-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -62,14 +62,14 @@ That combination means the immediate operator diagnosis is currently too implici
 
 - `docs/B1-docs/raw-20260404/brainstorms.md`
 - `docs/B1-docs/raw-20260404/candidates.md`
-- `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
-- `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/brainstorms/b-slot-switch-startup-preflight-and-lock-observability-governance.md`
-- `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-and-lock-observability-implementation-decision.md`
-- `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-and-lock-observability-verification.md`
-- `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-canonical-closeout-verification.md`
-- `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/tasks.md`
+- `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
+- `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/brainstorms/b-slot-switch-startup-preflight-and-lock-observability-governance.md`
+- `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-and-lock-observability-implementation-decision.md`
+- `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-and-lock-observability-verification.md`
+- `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-canonical-closeout-verification.md`
+- `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/prd.md`
+- `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/pre-tests.md`
+- `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/tasks.md`
 - `docs/progress/workspace-routing-foundation/p-slot-switch-startup-preflight-and-lock-observability-governance.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md`

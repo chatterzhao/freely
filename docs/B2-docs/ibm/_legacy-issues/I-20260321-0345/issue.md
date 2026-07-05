@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO5U
     synced_at: '2026-04-27T13:14:26Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/manager-reactivation-and-fleet-patrol-governance/issues/manager-reactivation-and-fleet-patrol-governance.md
+canonical_issue_path: docs/B2-docs/ibm/manager-reactivation-and-fleet-patrol-governance/issues/manager-reactivation-and-fleet-patrol-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:15:02Z'
 hash: ''
@@ -36,4 +36,4 @@ Freely 现在已经能通过 runtime watchdog 拉起主管，也能通过 `live-
 做不到：
 - manager actually supervising the fleet
 
-canonical: docs/epics/workspace-routing-foundation/manager-reactivation-and-fleet-patrol-governance/issues/manager-reactivation-and-fleet-patrol-governance.md
+canonical: docs/B2-docs/ibm/manager-reactivation-and-fleet-patrol-governance/issues/manager-reactivation-and-fleet-patrol-governance.md

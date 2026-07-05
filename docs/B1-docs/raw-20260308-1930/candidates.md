@@ -5,7 +5,7 @@
 - title: 业务阻塞状态与系统崩溃恢复定位治理
 - status: promoted
 - decision_reason: `blocked_*` 与系统崩溃不能混用；auto-loop 需要一套固定的恢复定位顺序和最小恢复字段，才能在 PID 消失后继续原 `in_*` 或做正确诊断。
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/business-block-vs-system-crash-recovery/issues/business-block-vs-system-crash-recovery.md`
+- promoted_issue_path: `docs/B2-docs/runtime/business-block-vs-system-crash-recovery/issues/business-block-vs-system-crash-recovery.md`
 - milestone: `docs/milestones.md#m-20260306-workspace-routing-foundation`
 - acceptance_hint: 1) `blocked_*` 被硬定义为业务阻塞；2) PID/CLI 崩溃不直接改 `phase_state`；3) 恢复定位顺序固定为 `recovery -> progress -> issue -> milestone -> active worktree`; 4) 恢复最小字段包含 `tool/session_id/jsonl_path/branch/worktree_path/phase_state/runtime_state/resume_hint`；5) 相关 skills 统一按该顺序检查。
 - scope:

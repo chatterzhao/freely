@@ -1,6 +1,6 @@
 # Verification: runtime-selfhost-continuity-gap-and-status-truth-governance canonical closeout
 
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
 - verified_in_branch: `develop`
 - verified_in_worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely`
 - verified_at: `2026-04-09`
@@ -16,7 +16,7 @@
    - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-live-status-manager-continuity-gap-surface`
    - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-live-status-pid-hint-and-rg-degrade`
 2. Pre-tests gate
-   - `PASS`: `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260409-040148-feature-runtime-selfhost-continuity-gap-status-truth-closeout --issue docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
+   - `PASS`: `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260409-040148-feature-runtime-selfhost-continuity-gap-status-truth-closeout --issue docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
 3. Governance
    - `PASS`: `./bin/governance-check`
 4. Diff hygiene

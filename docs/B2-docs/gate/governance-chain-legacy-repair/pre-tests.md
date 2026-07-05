@@ -41,14 +41,14 @@
 - requirement: `The 1100 lane is materialized as the canonical owner.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md`
+- artifact_ref: `docs/B2-docs/gate/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md`
 
 ### AT-002
 - id: `AT-002`
 - requirement: `Historical child repair slices no longer pretend they are active issue lanes when they are not.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/child-slice-status.md`
+- artifact_ref: `docs/B2-docs/gate/governance-chain-legacy-repair/child-slice-status.md`
 
 ### AT-003
 - id: `AT-003`
@@ -62,4 +62,4 @@
 - requirement: `The umbrella owner records why absorption is preferred over gate weakening.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/code-reviews/20260403-governance-chain-legacy-repair-implementation-decision.md`
+- artifact_ref: `docs/B2-docs/gate/governance-chain-legacy-repair/code-reviews/20260403-governance-chain-legacy-repair-implementation-decision.md`

@@ -1,6 +1,6 @@
 ---
 issue_id: I-20260705T024320Z-A
-issue_path: docs/epics/agent-acp/per-agent-tool-env/raw-20260705T024320Z/issues/I-20260705T024320Z-A.md
+issue_path: docs/B2-docs/config/agent-table/raw-20260705T024320Z/issues/I-20260705T024320Z-A.md
 phase_state: done_b2_ibm
 ---
 - issue_id: I-20260705T024320Z-A

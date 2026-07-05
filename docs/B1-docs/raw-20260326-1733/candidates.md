@@ -38,7 +38,7 @@
 - next_action: materialize issue-bound IBM artifacts，冻结 `pre-tests.md` 的 executable acceptance contract 质量门槛，然后进入 truth-source dev 改写。
 - revisit_trigger: 当本 issue 完成后，若仍需要统一 verification review 模板或引入 machine-readable acceptance schema，通过新的 lifecycle 承接。
 - promoted_issue_id: `I-20260326-1815`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/ibm-pretests-executable-acceptance-quality-governance/issues/ibm-pretests-executable-acceptance-quality-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/ibm-pretests-executable-acceptance-quality-governance/issues/ibm-pretests-executable-acceptance-quality-governance.md`
 - legacy_id_mapping: I-20260326-1815  # 历史遗留的 issue id
 - milestone: `docs/milestones.md#m-20260306-workspace-routing-foundation`
 - session_refs:

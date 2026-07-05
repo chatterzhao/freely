@@ -41,14 +41,14 @@
 - requirement: `invalid resume targets without rollout/jsonl evidence fail in isolation`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/codex-verified-resume-evidence-governance/code-reviews/20260330-codex-verified-resume-evidence-feature-verification.md`
+- artifact_ref: `docs/B2-docs/config/codex-verified-resume-evidence-governance/code-reviews/20260330-codex-verified-resume-evidence-feature-verification.md`
 
 ### PT-2
 - id: `PT-2`
 - requirement: `observed session id without rollout/jsonl evidence does not select explicit resume next cycle`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/codex-verified-resume-evidence-governance/code-reviews/20260330-codex-verified-resume-evidence-feature-verification.md`
+- artifact_ref: `docs/B2-docs/config/codex-verified-resume-evidence-governance/code-reviews/20260330-codex-verified-resume-evidence-feature-verification.md`
 
 ### PT-3
 - id: `PT-3`

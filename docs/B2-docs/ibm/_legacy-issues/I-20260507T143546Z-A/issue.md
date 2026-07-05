@@ -13,7 +13,7 @@ platform_ids:
 primary_platform: ''
 created_at: 2026-05-07 14:35:46+00:00
 session_refs: []
-pre_tests_path: docs/epics/platform-pull-standardize/verification/pre-tests.md
+pre_tests_path: docs/B2-docs/platform-pull-standardize/verification/pre-tests.md
 verification_artifact_dir: docs/epics/platform-pull-standardize/code-reviews
 platform_state: closed
 updated_at: '2026-05-17T12:25:37Z'
@@ -22,7 +22,7 @@ updated_at: '2026-05-17T12:25:37Z'
 # I-20260507T143546Z-A: platform pull 标题标准化
 
 - source_candidate: docs/B1-docs/raw-20260507T143546Z/candidates.md
-- pre_tests_path: docs/epics/platform-pull-standardize/verification/pre-tests.md
+- pre_tests_path: docs/B2-docs/platform-pull-standardize/verification/pre-tests.md
 - verification_artifact_dir: docs/epics/platform-pull-standardize/code-reviews
 
 ## 实现

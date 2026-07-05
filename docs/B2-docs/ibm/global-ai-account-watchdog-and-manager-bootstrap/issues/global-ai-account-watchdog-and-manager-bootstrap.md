@@ -14,7 +14,7 @@
 - source_brainstorm: `docs/B1-docs/raw-20260318/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- depends_on: `docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md`
+- depends_on: `docs/B2-docs/ibm/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md`
 - session_refs:
   - {tool: codex, session_id: "019d29a9-5895-74b0-aee5-b3d44d9f2390", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T03-20-57-019d29a9-5895-74b0-aee5-b3d44d9f2390.jsonl", role: "manager-closeout-audit"}
   - {tool: codex, session_id: "019d29b2-d89b-7393-9704-c7ea6cd0b526", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/26/rollout-2026-03-26T03-31-19-019d29b2-d89b-7393-9704-c7ea6cd0b526.jsonl", role: "manager-closeout-audit-refresh"}
@@ -77,9 +77,9 @@ Freely 现在已经开始区分 manager、worker 和 runtime，但还缺最上�
 ## Completion
 
 - `docs/B1-docs/raw-20260318/*`
-- `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
-- `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/tasks.md`
+- `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+- `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/pre-tests.md`
+- `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/tasks.md`
 - `docs/system/workspace/skills/watchdog-control-plane/SKILL.md`
 - `docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh`
 - `docs/system/workspace/skills/ai-cli-availability-manager/SKILL.md`

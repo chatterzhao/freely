@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFOAJ
     synced_at: '2026-04-27T13:17:43Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/issues/live-status-scan-summary-and-prompt-anchor-governance.md
+canonical_issue_path: docs/B2-docs/ibm/live-status-scan-summary-and-prompt-anchor-governance/issues/live-status-scan-summary-and-prompt-anchor-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:28:50Z'
 hash: ''
@@ -33,4 +33,4 @@ What was still missing was a narrow implementation owner that applies the separa
 1. prompt lookup on current-state hot paths must prefer explicit session anchors over prompt-history guessing
 2. `live-status` should surface advisory patrol inventory from the existing scan JSON in
 
-canonical: docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/issues/live-status-scan-summary-and-prompt-anchor-governance.md
+canonical: docs/B2-docs/ibm/live-status-scan-summary-and-prompt-anchor-governance/issues/live-status-scan-summary-and-prompt-anchor-governance.md

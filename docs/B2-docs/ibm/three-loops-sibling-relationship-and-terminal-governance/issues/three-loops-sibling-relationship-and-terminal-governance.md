@@ -7,7 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `three-loops-sibling-relationship-and-terminal-governance`
 - issue-name: `three-loops-sibling-relationship-and-terminal-governance`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/three-loops-sibling-relationship-and-terminal-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/three-loops-sibling-relationship-and-terminal-governance/code-reviews`
 - priority: P0
 - source_candidate: `docs/B1-docs/raw-20260319/candidates.md#c-20260319-1105-a`
 - additional_source_candidates:
@@ -75,11 +75,11 @@ Freely 当前已经把 `auto-loop`、`doc-loop`、`dev-loop` 写进多个 active
 
 ## Completion
 
-- `docs/epics/workspace-routing-foundation/three-loops-sibling-relationship-and-terminal-governance/issues/three-loops-sibling-relationship-and-terminal-governance.md`
-- `docs/epics/workspace-routing-foundation/three-loops-sibling-relationship-and-terminal-governance/brainstorms/b-three-loops-sibling-relationship-and-terminal-governance.md`
-- `docs/epics/workspace-routing-foundation/three-loops-sibling-relationship-and-terminal-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/three-loops-sibling-relationship-and-terminal-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/three-loops-sibling-relationship-and-terminal-governance/tasks.md`
+- `docs/B2-docs/ibm/three-loops-sibling-relationship-and-terminal-governance/issues/three-loops-sibling-relationship-and-terminal-governance.md`
+- `docs/B2-docs/ibm/three-loops-sibling-relationship-and-terminal-governance/brainstorms/b-three-loops-sibling-relationship-and-terminal-governance.md`
+- `docs/B2-docs/ibm/three-loops-sibling-relationship-and-terminal-governance/prd.md`
+- `docs/B2-docs/ibm/three-loops-sibling-relationship-and-terminal-governance/pre-tests.md`
+- `docs/B2-docs/ibm/three-loops-sibling-relationship-and-terminal-governance/tasks.md`
 - `docs/progress/workspace-routing-foundation/p-three-loops-sibling-relationship-and-terminal-governance.md`
 - `docs/CONSTITUTION.md`
 - `docs/PROJECT_INTENT.md`
@@ -96,7 +96,7 @@ Freely 当前已经把 `auto-loop`、`doc-loop`、`dev-loop` 写进多个 active
 
 ## Code Review
 
-- `docs/epics/workspace-routing-foundation/three-loops-sibling-relationship-and-terminal-governance/code-reviews/20260324-three-loops-sibling-relationship-verification.md`
+- `docs/B2-docs/ibm/three-loops-sibling-relationship-and-terminal-governance/code-reviews/20260324-three-loops-sibling-relationship-verification.md`
 
 ## Verification Summary
 

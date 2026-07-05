@@ -16,7 +16,7 @@
 - target environment: `feature/runtime-lifecycle-receipt-closeout-reconcile-20260424`
 - required evidence: `command output plus verification artifact`
 - blocker taxonomy: `execution_pending_or_failed`
-1. Run `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-runtime-lifecycle-receipt-closeout-reconcile --issue docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`.
+1. Run `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-runtime-lifecycle-receipt-closeout-reconcile --issue docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`.
 2. Run `git diff --check`.
 3. Run `./bin/governance-check`.
 
@@ -27,7 +27,7 @@
 - required evidence: `merge receipts plus verification artifact`
 - blocker taxonomy: `execution_pending_or_failed`
 1. Merge `feature/runtime-lifecycle-receipt-closeout-reconcile-20260424` into `test-pre-merge-runtime-lifecycle-receipt-closeout-20260425` via `freely pr-merge-guarded`.
-2. Re-run `./bin/test-lane premerge-integration -- ./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260425-test-pre-merge-runtime-lifecycle-receipt-closeout --issue docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`.
+2. Re-run `./bin/test-lane premerge-integration -- ./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260425-test-pre-merge-runtime-lifecycle-receipt-closeout --issue docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`.
 3. Re-run `git diff --check`.
 4. Re-run `./bin/test-lane premerge-integration -- ./bin/governance-check`.
 5. Merge `test-pre-merge-runtime-lifecycle-receipt-closeout-20260425` into `develop` via `freely pr-merge-guarded`.
@@ -56,7 +56,7 @@
 - requirement: `The ledger repair is paired with a concrete issue, pre-tests, progress, tasks, and verification artifact so protected merge no longer sees candidate-only evidence.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260424-runtime-lifecycle-receipt-closeout-reconcile-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260424-runtime-lifecycle-receipt-closeout-reconcile-verification.md`
 
 ### Guarded merge path preserves the receipt closure
 - id: `receipt-followthrough-guarded-merge`
@@ -68,14 +68,14 @@
 - case_design: `Merge the successor owner feature into a fresh disposable test-pre-merge batch from current develop, rerun premerge-integration gates there, then guardedly replay that fresh batch into develop and confirm the guarded path consumes this owner rather than raw ledger-only drift.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260425-runtime-lifecycle-receipt-fresh-replay-premerge-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260425-runtime-lifecycle-receipt-fresh-replay-premerge-verification.md`
 
 ### Temporary followthrough worktrees retire after publication
 - id: `receipt-followthrough-fleet-closeout`
 - requirement: `Once canonical develop absorbs the followthrough owner, the temporary followthrough feature and test-pre-merge worktrees are removed from the active fleet.`
 - evidence_level: `real_env`
 - status: `not_applicable`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260425-runtime-lifecycle-receipt-fresh-replay-premerge-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260425-runtime-lifecycle-receipt-fresh-replay-premerge-verification.md`
 - not_applicable_reason: `protected_environment_only`
 - not_applicable_explanation: `This fleet-closeout step becomes lawful only after canonical develop absorbs the replay batch; source-owner completion should point at the post-merge obligation rather than fake retirement early.`
 - replacement_evidence: `The fresh replay batch verification artifact proves the owner is ready for guarded promote, after which the replay batch retirement becomes a separate followthrough action.`

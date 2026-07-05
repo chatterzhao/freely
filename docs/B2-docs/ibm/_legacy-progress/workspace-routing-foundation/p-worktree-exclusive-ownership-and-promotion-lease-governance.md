@@ -1,7 +1,7 @@
 # Progress: worktree-exclusive-ownership-and-promotion-lease-governance
 
 - issue_id: `I-20260402-0455-A`
-- issue_path: `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/issues/worktree-exclusive-ownership-and-promotion-lease-governance.md`
+- issue_path: `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/issues/worktree-exclusive-ownership-and-promotion-lease-governance.md`
 - title: `Worktree exclusive ownership and promotion lease governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -35,7 +35,7 @@
 12. `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded`
 13. `git diff --check`
 14. `./bin/governance-check`
-15. `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/code-reviews/20260402-worktree-exclusive-ownership-and-promotion-lease-verification.md`
+15. `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/code-reviews/20260402-worktree-exclusive-ownership-and-promotion-lease-verification.md`
 16. canonical `develop` merge commit `a10f6d8`
 
 ## Next Action

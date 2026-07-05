@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO73
     synced_at: '2026-04-27T13:15:12Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/manager-supervision-quiet-period-stall-signal-governance/issues/manager-supervision-quiet-period-stall-signal-governance.md
+canonical_issue_path: docs/B2-docs/ibm/manager-supervision-quiet-period-stall-signal-governance/issues/manager-supervision-quiet-period-stall-signal-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:21:04Z'
 hash: ''
@@ -35,4 +35,4 @@ platform_state: closed
 
 这说明当前 stall detector 仍把 delegated-supervision quiet-period 近似成强 stall 证据。三个 loop 的设计并不要求 manager 在监督 acti
 
-canonical: docs/epics/workspace-routing-foundation/manager-supervision-quiet-period-stall-signal-governance/issues/manager-supervision-quiet-period-stall-signal-governance.md
+canonical: docs/B2-docs/ibm/manager-supervision-quiet-period-stall-signal-governance/issues/manager-supervision-quiet-period-stall-signal-governance.md

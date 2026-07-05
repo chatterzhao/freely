@@ -1,7 +1,7 @@
 # Progress: tasks-closeout-completion-and-adequacy-gate-governance
 
 - issue_id: `I-20260413-1640-A`
-- issue_path: `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/issues/tasks-closeout-completion-and-adequacy-gate-governance.md`
+- issue_path: `docs/B2-docs/ibm/tasks-closeout-completion-and-adequacy-gate-governance/issues/tasks-closeout-completion-and-adequacy-gate-governance.md`
 - title: `Tasks closeout completion and adequacy gate governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -25,7 +25,7 @@
 3. `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
 4. `./bin/governance-check`
 5. `git diff --check`
-6. `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/code-reviews/20260413-tasks-closeout-completion-and-adequacy-gate-verification.md`
+6. `docs/B2-docs/ibm/tasks-closeout-completion-and-adequacy-gate-governance/code-reviews/20260413-tasks-closeout-completion-and-adequacy-gate-verification.md`
 
 ## Current Batch Risks
 

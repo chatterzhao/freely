@@ -7,16 +7,16 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `deep-refactor-fleet-sequencing-governance`
 - issue-name: `deep-refactor-fleet-sequencing-governance`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/deep-refactor-fleet-sequencing-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/deep-refactor-fleet-sequencing-governance/code-reviews`
 - priority: P0
 - source_candidate: `docs/B1-docs/raw-20260326/candidates.md#c-20260326-1825-a`
 - source_brainstorm: `docs/B1-docs/raw-20260326/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
-  - `docs/epics/workspace-routing-foundation/ibm-pretests-executable-acceptance-quality-governance/issues/ibm-pretests-executable-acceptance-quality-governance.md`
-  - `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md`
+  - `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+  - `docs/B2-docs/ibm/ibm-pretests-executable-acceptance-quality-governance/issues/ibm-pretests-executable-acceptance-quality-governance.md`
+  - `docs/B2-docs/ibm/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -71,13 +71,13 @@ Freely 在准备 broad/deep refactor 时，真实 fleet 一度同时存在：
 - `AGENTS.md`
 - `docs/B1-docs/raw-20260326/brainstorms.md`
 - `docs/B1-docs/raw-20260326/candidates.md`
-- `docs/epics/workspace-routing-foundation/deep-refactor-fleet-sequencing-governance/issues/deep-refactor-fleet-sequencing-governance.md`
-- `docs/epics/workspace-routing-foundation/deep-refactor-fleet-sequencing-governance/brainstorms/b-deep-refactor-fleet-sequencing-governance.md`
-- `docs/epics/workspace-routing-foundation/deep-refactor-fleet-sequencing-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/deep-refactor-fleet-sequencing-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/deep-refactor-fleet-sequencing-governance/tasks.md`
+- `docs/B2-docs/ibm/deep-refactor-fleet-sequencing-governance/issues/deep-refactor-fleet-sequencing-governance.md`
+- `docs/B2-docs/ibm/deep-refactor-fleet-sequencing-governance/brainstorms/b-deep-refactor-fleet-sequencing-governance.md`
+- `docs/B2-docs/ibm/deep-refactor-fleet-sequencing-governance/prd.md`
+- `docs/B2-docs/ibm/deep-refactor-fleet-sequencing-governance/pre-tests.md`
+- `docs/B2-docs/ibm/deep-refactor-fleet-sequencing-governance/tasks.md`
 - `docs/progress/workspace-routing-foundation/p-deep-refactor-fleet-sequencing-governance.md`
-- `docs/epics/workspace-routing-foundation/deep-refactor-fleet-sequencing-governance/code-reviews/20260326-deep-refactor-fleet-sequencing-governance-verification.md`
+- `docs/B2-docs/ibm/deep-refactor-fleet-sequencing-governance/code-reviews/20260326-deep-refactor-fleet-sequencing-governance-verification.md`
 - `docs/milestones.md`
 
 ## Verification

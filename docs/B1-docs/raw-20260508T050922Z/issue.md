@@ -40,9 +40,9 @@ kind: linked
 phase_state: completed
 promoted_from: raw-20260508T050922Z
 source_candidate: docs/B1-docs/raw-20260508T050922Z/candidates.md#C-20260508T050922Z-A
-verification_artifact_dir: docs/epics/closeout-chain/code-reviews
-pre_tests_path: docs/epics/closeout-chain/verification/pre-tests.md
+verification_artifact_dir: docs/B2-docs/git-worktree/code-reviews
+pre_tests_path: docs/B2-docs/git-worktree/verification/pre-tests.md
 platform_state: ''
 # I-20260508T050922Z-A: 门禁收口链路修复
-- pre_tests_path: docs/epics/closeout-chain/verification/pre-tests.md
-- verification_artifact_dir: docs/epics/closeout-chain/code-reviews
+- pre_tests_path: docs/B2-docs/git-worktree/verification/pre-tests.md
+- verification_artifact_dir: docs/B2-docs/git-worktree/code-reviews

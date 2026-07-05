@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO7W
     synced_at: '2026-04-27T13:15:51Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md
+canonical_issue_path: docs/B2-docs/runtime/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:22:41Z'
 hash: ''
@@ -27,4 +27,4 @@ platform_state: closed
 
 Because the develop merge gate requires candidate-driven lifecycle evidence even for tiny followthrough patches, this closeo
 
-canonical: docs/epics/workspace-routing-foundation/runtime-loop-log-timezone-label-followthrough-governance/issues/runtime-loop-log-timezone-label-followthrough-governance.md
+canonical: docs/B2-docs/runtime/runtime-loop-log-timezone-label-followthrough-governance/issues/runtime-loop-log-timezone-label-followthrough-governance.md

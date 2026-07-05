@@ -42,5 +42,5 @@ freely wt-create --skill docs/system/workspace/skills/fix-execution/SKILL.md ...
 # 新
 freely wt-create --skill fix-execution ...
 ```
-- pre_tests_path: docs/epics/skill-name-reminder/verification/pre-tests.md
+- pre_tests_path: docs/B2-docs/skill-name-reminder/verification/pre-tests.md
 - verification_artifact_dir: docs/epics/skill-name-reminder/code-reviews

@@ -7,7 +7,7 @@
 - verification_artifact_dir: docs/epics/platform-only-no-local-file/code-reviews
 - canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260627T021849Z-A/issue.md
 - title: wt-close --platform-only fallback
-- pre_tests_path: docs/epics/platform-only-no-local-file/verification/pre-tests.md
+- pre_tests_path: docs/B2-docs/platform-only-no-local-file/verification/pre-tests.md
 
 # I-20260627T021849Z-A: wt-close --platform-only fallback
 wt-close --platform-only: if local issue.md missing, search GitHub/Gitee by raw key.

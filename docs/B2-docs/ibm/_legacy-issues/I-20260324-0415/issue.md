@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO6L
     synced_at: '2026-04-27T13:14:55Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md
+canonical_issue_path: docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md
 last_synced_comment_at:
   github: '2026-04-27T11:17:09Z'
 hash: ''
@@ -37,4 +37,4 @@ Freely 已经具备多种观察面：
 3. 用户、manager、watchdog 应如何共享同一组状态卡片与 deep refs
 4. 这套 contract 如何从 Freely self-host 泛化到未来任意应用
 
-canonical: docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md
+canonical: docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md

@@ -19,5 +19,5 @@
 - milestone: pending://milestone-binding
 - superseded_by:
   - `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
-  - `docs/epics/workspace-routing-foundation/source-routing-and-derived-worktree-governance/issues/source-routing-and-derived-worktree-governance.md`
+  - `docs/B2-docs/ibm/source-routing-and-derived-worktree-governance/issues/source-routing-and-derived-worktree-governance.md`
 - session_refs: []

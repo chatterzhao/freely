@@ -14,7 +14,7 @@
   - delegated manager continuation handoff records generated and consumed evidence
   - `live-status` shows pending vs consumed handoff state
   - `fresh_with_handoff` handoff generation remains shell-safe
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/manager-continuation-handoff-consumption-governance/issues/manager-continuation-handoff-consumption-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/manager-continuation-handoff-consumption-governance/issues/manager-continuation-handoff-consumption-governance.md`
 - legacy_id_mapping: I-20260322-0049  # 历史遗留的 issue id
 - milestone: `M-20260306-workspace-routing-foundation`
 - session_refs:

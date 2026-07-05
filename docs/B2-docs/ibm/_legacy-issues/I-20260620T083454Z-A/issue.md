@@ -2,7 +2,7 @@
 local_id: I-20260620T083454Z-A
 kind: fix
 phase_state: completed
-verification_artifact_dir: docs/epics/lifecycle-scan-phase-state/verify
+verification_artifact_dir: docs/B2-docs/runtime/verify
 milestone: ""
 source_candidate: docs/B1-docs/raw-20260620T083454Z/candidates.md#C-20260620T083454Z-A
 canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260620T083454Z-A/issue.md

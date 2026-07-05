@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO7T
     synced_at: '2026-04-27T13:15:48Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/issues/implementation-decision-notes-in-issue-review-artifacts-governance.md
+canonical_issue_path: docs/B2-docs/ibm/implementation-decision-notes-in-issue-review-artifacts-governance/issues/implementation-decision-notes-in-issue-review-artifacts-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:22:28Z'
 hash: ''
@@ -33,4 +33,4 @@ Freely 已经在 pre-brainstorm 和 IBM 层解决了“为什么值得做”和�
 
 如果这层只散落在会话或自由 prose 里，未来 worker / reviewer 虽然能看到代码 diff，却不一定能快速恢复“为什么不是另一种做法”。这会让 Freely 的 thoughtfulness 在 candidate/PRD 很强、到实现 closeout 却变弱。
 
-canonical: docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/issues/implementation-decision-notes-in-issue-review-artifacts-governance.md
+canonical: docs/B2-docs/ibm/implementation-decision-notes-in-issue-review-artifacts-governance/issues/implementation-decision-notes-in-issue-review-artifacts-governance.md

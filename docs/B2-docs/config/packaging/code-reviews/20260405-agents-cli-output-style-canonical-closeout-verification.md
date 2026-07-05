@@ -1,7 +1,7 @@
 # Verification: agents-cli-output-style-experiment-governance canonical closeout
 
 - issue_id: `I-20260405-cli-output-style-A`
-- issue_path: `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/issues/agents-cli-output-style-experiment-governance.md`
+- issue_path: `docs/B2-docs/config/packaging/issues/agents-cli-output-style-experiment-governance.md`
 - branch: `feature/cli-output-style-closeout-20260405-1615`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260405-1615-feature-cli-output-style-closeout`
 - verification_date: `2026-04-05`

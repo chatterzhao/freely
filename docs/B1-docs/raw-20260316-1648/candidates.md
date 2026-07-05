@@ -14,7 +14,7 @@
 - priority: P0
 - status: promoted
 - decision_reason: 这是当前狗粮启动链路暴露出的最短路径缺口，改动面小且不会破坏宪法中的 AI spec。
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/session-lifecycle-rotation-and-handoff-governance/issues/session-lifecycle-rotation-and-handoff-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/session-lifecycle-rotation-and-handoff-governance/issues/session-lifecycle-rotation-and-handoff-governance.md`
 - milestone: `M-20260306-workspace-routing-foundation`
 - session_refs:
   - tool: codex

@@ -19,7 +19,7 @@
 - priority: P0
 - status: promoted
 - decision_reason: runtime 已具备统一 resolver；本轮补齐 cwd 自动解析和单一已授权项目回退的脚本回归后，已可以 materialize 为 issue。
-- promoted_issue_path: docs/epics/workspace-routing-foundation/default-project-resolution-and-authorized-project-memory/issues/default-project-resolution-and-authorized-project-memory.md
+- promoted_issue_path: docs/B2-docs/ibm/default-project-resolution-and-authorized-project-memory/issues/default-project-resolution-and-authorized-project-memory.md
 - legacy_id_mapping: I-20260320-0018  # 历史遗留的 issue id
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs:

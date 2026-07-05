@@ -10,7 +10,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - route_kind: `chat_intake`
 - phase_state: `done_pre_brainstorm`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/gate-dev-experience-preflight/issues/I-20260429-2000-A.md`
+- promoted_issue_path: `docs/B2-docs/gate/gate-dev-experience-preflight/issues/I-20260429-2000-A.md`
 - session_refs:
   - {tool: ccds, session_id: "20260429-gate-dev-exp", jsonl_path: "unavailable://manual", role: "author"}
 - acceptance_criteria:

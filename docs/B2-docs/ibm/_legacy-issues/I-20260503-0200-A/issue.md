@@ -14,7 +14,7 @@ platform_ids:
   gitee:
     issue_id: ''
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/scan-lifecycle-migration/issues/I-20260503-0200-A.md
+canonical_issue_path: docs/B2-docs/runtime/scan-lifecycle-migration/issues/I-20260503-0200-A.md
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-03T02:00:00Z'

@@ -12,7 +12,7 @@
 - source_brainstorm: `docs/B1-docs/raw-20260312/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- depends_on: `docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/issues/internal-frontend-backend-architecture-review.md`
+- depends_on: `docs/B2-docs/human/tui/issues/internal-frontend-backend-architecture-review.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "doc-ibm"}
 
@@ -56,12 +56,12 @@ Freely 已经接受 `ClientCommand`、`ServerEvent`、`Snapshot` 的方向，但
 - required_doc_refs:
   - `docs/B1-docs/raw-20260312/brainstorms.md`
   - `docs/B1-docs/raw-20260312/candidates.md`
-  - `docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/issues/internal-frontend-backend-architecture-review.md`
-  - `docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md`
+  - `docs/B2-docs/human/tui/issues/internal-frontend-backend-architecture-review.md`
+  - `docs/B2-docs/human/tui/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md`
 
 ## Verification
 
-- `rg -n "ClientCommand|ServerEvent|Snapshot|tauri_adapter|ws_adapter|local_process_adapter|openclaw_adapter|openclaw_adapter/profile" docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy docs/epics/frontend-probe-dogfooding-loop -g '*.md'`
+- `rg -n "ClientCommand|ServerEvent|Snapshot|tauri_adapter|ws_adapter|local_process_adapter|openclaw_adapter|openclaw_adapter/profile" docs/B2-docs/runtime/backend-service-contract-and-adapter-taxonomy docs/epics/frontend-probe-dogfooding-loop -g '*.md'`
 - `rg -n "I-20260312-0011|backend-service-contract-and-adapter-taxonomy" docs -g '*.md'`
 - `./bin/governance-check`
 

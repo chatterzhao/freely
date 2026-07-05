@@ -1,7 +1,7 @@
 # Progress: codex-interactive-login-and-apikey-input-flow-governance
 
 - issue_id: `I-20260406-1851-A`
-- issue_path: `docs/epics/workspace-routing-foundation/codex-interactive-login-and-apikey-input-flow-governance/issues/codex-interactive-login-and-apikey-input-flow-governance.md`
+- issue_path: `docs/B2-docs/config/codex-interactive-login-and-apikey-input-flow-governance/issues/codex-interactive-login-and-apikey-input-flow-governance.md`
 - title: `Codex interactive login and API-key input flow governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -25,11 +25,11 @@
 - `bash docs/system/workspace/scripts/tests/test-ai-cli-login-codex-apikey-interactive`
 - `bash docs/system/workspace/scripts/tests/test-ai-cli-login-codex-apikey-direct-args`
 - `bash docs/system/workspace/scripts/tests/test-ai-cli-login-codex-apikey-empty-input-fails`
-- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-codex-apikey-login-interactive --issue docs/epics/workspace-routing-foundation/codex-interactive-login-and-apikey-input-flow-governance/issues/codex-interactive-login-and-apikey-input-flow-governance.md`
+- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-codex-apikey-login-interactive --issue docs/B2-docs/config/codex-interactive-login-and-apikey-input-flow-governance/issues/codex-interactive-login-and-apikey-input-flow-governance.md`
 - `./bin/governance-check`
 - `git diff --check`
-- `docs/epics/workspace-routing-foundation/codex-interactive-login-and-apikey-input-flow-governance/code-reviews/20260406-codex-interactive-login-and-apikey-input-flow-implementation-decision.md`
-- `docs/epics/workspace-routing-foundation/codex-interactive-login-and-apikey-input-flow-governance/code-reviews/20260406-codex-interactive-login-and-apikey-input-flow-canonical-closeout-verification.md`
+- `docs/B2-docs/config/codex-interactive-login-and-apikey-input-flow-governance/code-reviews/20260406-codex-interactive-login-and-apikey-input-flow-implementation-decision.md`
+- `docs/B2-docs/config/codex-interactive-login-and-apikey-input-flow-governance/code-reviews/20260406-codex-interactive-login-and-apikey-input-flow-canonical-closeout-verification.md`
 
 ## Closure Evidence
 

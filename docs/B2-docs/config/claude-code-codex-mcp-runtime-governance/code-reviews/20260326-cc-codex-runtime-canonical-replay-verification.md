@@ -14,7 +14,7 @@
 - `docs/system/workspace/scripts/monitor-ai-cli.sh`
 - `docs/system/workspace/scripts/runtime/interruption-manager-handler`
 - `docs/system/workspace/scripts/runtime/signal-intent-handler`
-- `docs/epics/workspace-routing-foundation/claude-code-codex-mcp-runtime-governance/issues/claude-code-codex-mcp-runtime-governance.md`
+- `docs/B2-docs/config/claude-code-codex-mcp-runtime-governance/issues/claude-code-codex-mcp-runtime-governance.md`
 - `docs/milestones.md`
 
 ## Findings

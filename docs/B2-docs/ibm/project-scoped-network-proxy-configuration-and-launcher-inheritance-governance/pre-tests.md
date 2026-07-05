@@ -31,32 +31,32 @@
 - requirement: `freely init writes project-scoped proxy defaults into .freely/config.env`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/code-reviews/20260327-project-scoped-network-proxy-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/code-reviews/20260327-project-scoped-network-proxy-verification.md`
 
 ### PT-2
 - id: `PT-2`
 - requirement: `network proxy resolver preserves inherit mode and exports explicit and disabled modes consistently`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/code-reviews/20260327-project-scoped-network-proxy-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/code-reviews/20260327-project-scoped-network-proxy-verification.md`
 
 ### PT-3
 - id: `PT-3`
 - requirement: `codex launcher and OAuth sweep inherit the same project-scoped proxy env and never fall back to hardcoded localhost defaults`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/code-reviews/20260327-project-scoped-network-proxy-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/code-reviews/20260327-project-scoped-network-proxy-verification.md`
 
 ### PT-4
 - id: `PT-4`
 - requirement: `no-arg freely ai switch codex refreshes saved auth inventory before selecting a usable slot`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/code-reviews/20260327-project-scoped-network-proxy-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/code-reviews/20260327-project-scoped-network-proxy-verification.md`
 
 ### PT-5
 - id: `PT-5`
 - requirement: `governance-check stays clean aside from the repository's existing legacy naming warnings`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/code-reviews/20260327-project-scoped-network-proxy-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/code-reviews/20260327-project-scoped-network-proxy-verification.md`

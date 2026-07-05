@@ -33,7 +33,7 @@
 - requirement: create-issue and comment CLI subcommands work
 - evidence_level: mock
 ^- status: passed
-- artifact_ref: docs/epics/adapter-add-cli/code-reviews/implementation-decision.md
+- artifact_ref: docs/B2-docs/adapter-add-cli/code-reviews/implementation-decision.md
 ## Real-Environment
 - real_environment_status: pass
 - real_environment_reason: GitHub issue #3480 created via CLI test

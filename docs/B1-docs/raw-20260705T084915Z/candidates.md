@@ -11,4 +11,4 @@ milestone: M-20260705T084915Z-A
 - decision_reason: _current_base must use bridge's base_tool not global AGENT_AI_TOOL
 - promoted_issue_id: I-20260705T084915Z-A
 - milestone: M-20260705T084915Z-A
-  - promoted_issue_path: docs/epics/agent-acp/tool-change-fix/raw-20260705T084915Z/issues/I-20260705T084915Z-A.md
+  - promoted_issue_path: docs/B2-docs/config/agent-table/raw-20260705T084915Z/issues/I-20260705T084915Z-A.md

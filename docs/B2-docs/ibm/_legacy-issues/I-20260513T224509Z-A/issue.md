@@ -5,7 +5,7 @@ phase_state: absorbed
 promoted_from: raw-20260513T224509Z
 source_candidate: docs/B1-docs/raw-20260513T224509Z/candidates.md#C-20260513T224509Z-A
 verification_artifact_dir: docs/epics/sup-pid-file-fix/code-reviews
-pre_tests_path: docs/epics/sup-pid-file-fix/verification/pre-tests.md
+pre_tests_path: docs/B2-docs/sup-pid-file-fix/verification/pre-tests.md
 platform_state: closed
 platform_ids:
   github:

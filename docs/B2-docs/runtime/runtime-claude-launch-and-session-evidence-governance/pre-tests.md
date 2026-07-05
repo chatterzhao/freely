@@ -57,7 +57,7 @@
 - case_design: `Intercept the launcher path, replay the command with --add-dir, and assert the prompt reaches Claude on stdin instead of as broken argv text.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-claude-launch-and-session-evidence-governance/code-reviews/20260419-runtime-claude-launch-and-session-evidence-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-claude-launch-and-session-evidence-governance/code-reviews/20260419-runtime-claude-launch-and-session-evidence-verification.md`
 
 ### Claude resume target requires verified session evidence
 - id: `claude-resume-target-requires-evidence`
@@ -69,7 +69,7 @@
 - case_design: `Simulate fresh and resume cycles without Claude jsonl evidence, then assert stale session ids are rotated or cleared instead of becoming resumable truth.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-claude-launch-and-session-evidence-governance/code-reviews/20260419-runtime-claude-launch-and-session-evidence-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-claude-launch-and-session-evidence-governance/code-reviews/20260419-runtime-claude-launch-and-session-evidence-verification.md`
 
 ### Guarded promote preserves Claude fallback adequacy
 - id: `guarded-promote-preserves-claude-fallback-adequacy`
@@ -81,4 +81,4 @@
 - case_design: `Replay the focused regression set plus governance-check in the disposable premerge batch and confirm the guarded promote path still carries the same bounded repair.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-claude-launch-and-session-evidence-governance/code-reviews/20260419-runtime-claude-launch-and-session-evidence-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-claude-launch-and-session-evidence-governance/code-reviews/20260419-runtime-claude-launch-and-session-evidence-verification.md`

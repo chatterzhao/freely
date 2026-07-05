@@ -15,7 +15,7 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-autodelegates-cleanup-when-existing-prompt-is-nonlaunchable`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-autodelegates-canonical-cleanup-continuity`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-delegate-workers-requires-launchable-prompt`
-- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-test-pre-merge-cleanup-nonlaunchable-autofill --issue /Users/zhaoyu/Downloads/code/my-freely/freely/docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
+- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-test-pre-merge-cleanup-nonlaunchable-autofill --issue /Users/zhaoyu/Downloads/code/my-freely/freely/docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
 - `./bin/governance-check`
 
 ## Status

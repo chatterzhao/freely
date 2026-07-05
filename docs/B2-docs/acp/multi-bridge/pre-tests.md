@@ -11,7 +11,7 @@
 - target_environment: feature-raw-20260630T124528Z-acp-init-registry
 - required_evidence: 四个工具的 registry 条目完整
 - evidence_level: mock
-- artifact_ref: docs/epics/acp-tool-setup/init-registry-download/test-evidence/acceptance-5.log
+- artifact_ref: docs/B2-docs/acp/multi-bridge/test-evidence/acceptance-5.log
 - test_command: |
   for tool in claude codex opencode cline; do
     echo "=== $tool ==="
@@ -22,7 +22,7 @@
 - expected_RED_output: claude/opencode/cline 的 install_method 和 download_url 为 MISSING（修复前只有 codex 有）
 - actual_RED_output: (RED 阶段执行后填写)
 - actual_output: (GREEN 阶段执行后填写)
-- evidence_file: docs/epics/acp-tool-setup/init-registry-download/test-evidence/acceptance-1.log
+- evidence_file: docs/B2-docs/acp/multi-bridge/test-evidence/acceptance-1.log
 - red-green-status: green
 - status: passed
 - red_how: 修复前 registry 只有 codex 有 download_repo/download_version，其他三种工具有 acp.binary 但没有下载配置
@@ -35,7 +35,7 @@
 - target_environment: feature-raw-20260630T124528Z-acp-init-registry
 - required_evidence: 脚本执行成功，输出可执行文件路径
 - evidence_level: integration
-- artifact_ref: docs/epics/acp-tool-setup/init-registry-download/test-evidence/acceptance-2.log
+- artifact_ref: docs/B2-docs/acp/multi-bridge/test-evidence/acceptance-2.log
 - test_command: |
   # 测试 registry 读取（不需要实际下载，只需验证路径解析正确）
   bash docs/system/workspace/scripts/runtime/ensure-acp-binary --tool codex --dry-run 2>&1
@@ -44,7 +44,7 @@
 - expected_RED_output: 修复前 `ensure-codex-acp` 硬编码 codex，不接受 --tool 参数
 - actual_RED_output: (RED 阶段执行后填写)
 - actual_output: (GREEN 阶段执行后填写)
-- evidence_file: docs/epics/acp-tool-setup/init-registry-download/test-evidence/acceptance-2.log
+- evidence_file: docs/B2-docs/acp/multi-bridge/test-evidence/acceptance-2.log
 - red-green-status: green
 - status: passed
 - red_how: 修复前脚本名为 ensure-codex-acp，硬编码 codex tool 查询，不支持 --tool 参数
@@ -57,7 +57,7 @@
 - target_environment: feature-raw-20260630T124528Z-acp-init-registry
 - required_evidence: 代码中无不区分工具的硬编码分支
 - evidence_level: mock
-- artifact_ref: docs/epics/acp-tool-setup/init-registry-download/test-evidence/acceptance-3.log
+- artifact_ref: docs/B2-docs/acp/multi-bridge/test-evidence/acceptance-3.log
 - test_command: |
   # 旧的硬编码模式不应再存在
   if grep -n 'case.*codex).*acp\|claude-agent-acp.*command -v' docs/system/workspace/scripts/runtime/freely | grep -v "^[[:space:]]*#"; then
@@ -69,7 +69,7 @@
 - expected_RED_output: "FAIL: hardcoded tool branch still exists" (修复前 L20075-20106)
 - actual_RED_output: (RED 阶段执行后填写)
 - actual_output: (GREEN 阶段执行后填写)
-- evidence_file: docs/epics/acp-tool-setup/init-registry-download/test-evidence/acceptance-3.log
+- evidence_file: docs/B2-docs/acp/multi-bridge/test-evidence/acceptance-3.log
 - red-green-status: green
 - status: passed
 - red_how: 修复前 L20075: `case "$tool" in codex) ... ;; *) ... ;; esac` 硬编码两个分支
@@ -82,7 +82,7 @@
 - target_environment: feature-raw-20260630T124528Z-acp-init-registry
 - required_evidence: 代码中包含 get_config FREELY_ACP_ 的调用
 - evidence_level: mock
-- artifact_ref: docs/epics/acp-tool-setup/init-registry-download/test-evidence/acceptance-4.log
+- artifact_ref: docs/B2-docs/acp/multi-bridge/test-evidence/acceptance-4.log
 - test_command: |
   if grep -q "FREELY_ACP_.*_BIN\|get_config.*FREELY_ACP" docs/system/workspace/scripts/runtime/freely; then
     echo "PASS: runtime reads ACP binary from config.toml"
@@ -93,7 +93,7 @@
 - expected_RED_output: "FAIL: no config.toml lookup" (修复前只读 env var + PATH)
 - actual_RED_output: (RED 阶段执行后填写)
 - actual_output: (GREEN 阶段执行后填写)
-- evidence_file: docs/epics/acp-tool-setup/init-registry-download/test-evidence/acceptance-4.log
+- evidence_file: docs/B2-docs/acp/multi-bridge/test-evidence/acceptance-4.log
 - red-green-status: green
 - status: passed
 - red_how: 修复前 _ensure_acp_bridge_running 只从 registry + PATH + env var 找 binary，不读 config.toml
@@ -106,7 +106,7 @@
 - target_environment: feature-raw-20260630T124528Z-acp-init-registry
 - required_evidence: 代码中无 `sock.connect('$socket')` 模式
 - evidence_level: mock
-- artifact_ref: docs/epics/acp-tool-setup/init-registry-download/test-evidence/acceptance-5.log
+- artifact_ref: docs/B2-docs/acp/multi-bridge/test-evidence/acceptance-5.log
 - test_command: |
   # 检查 ACP health check 不再有 shell 注入
   START=$(grep -n "_acp_bridge_health_check()" docs/system/workspace/scripts/runtime/freely | head -1 | cut -d: -f1)
@@ -122,7 +122,7 @@
 - expected_RED_output: "FAIL: shell injection still present" (修复前 L13868)
 - actual_RED_output: (RED 阶段执行后填写)
 - actual_output: (GREEN 阶段执行后填写)
-- evidence_file: docs/epics/acp-tool-setup/init-registry-download/test-evidence/acceptance-5.log
+- evidence_file: docs/B2-docs/acp/multi-bridge/test-evidence/acceptance-5.log
 - red-green-status: green
 - status: passed
 - red_how: 修复前 L13868: `sock.connect('$socket')` — 变量直接拼接到 Python -c 字符串
@@ -135,7 +135,7 @@
 - target_environment: feature-raw-20260630T124528Z-acp-init-registry
 - required_evidence: 四个工具的 download_url 与 acp.binary 名一致
 - evidence_level: mock
-- artifact_ref: docs/epics/acp-tool-setup/init-registry-download/test-evidence/acceptance-6.log
+- artifact_ref: docs/B2-docs/acp/multi-bridge/test-evidence/acceptance-6.log
 - test_command: |
   echo "claude:   binary=claude-agent-acp → url must contain claude-agent-acp"
   echo "codex:    binary=codex-acp         → url must contain codex-acp"
@@ -146,7 +146,7 @@
 - expected_RED_output: registry 中只有 codex 有下载配置，无法交叉验证
 - actual_RED_output: (RED 阶段执行后填写)
 - actual_output: (GREEN 阶段执行后填写)
-- evidence_file: docs/epics/acp-tool-setup/init-registry-download/test-evidence/acceptance-6.log
+- evidence_file: docs/B2-docs/acp/multi-bridge/test-evidence/acceptance-6.log
 - red-green-status: green
 - status: passed
 - red_how: 修复前只有 codex 有 download_repo，claude/opencode/cline 无下载配置，问题不成立

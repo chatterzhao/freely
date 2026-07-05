@@ -7,7 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `watchdog-restart-storm-and-process-churn-governance`
 - issue-name: `watchdog-restart-storm-and-process-churn-governance`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/watchdog-restart-storm-and-process-churn-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/runtime/watchdog-restart-storm-and-process-churn-governance/code-reviews`
 - priority: P0
 - source_candidate: `docs/B1-docs/raw-20260324/candidates.md#c-20260324-0405-a`
 - source_brainstorm: `docs/B1-docs/raw-20260324/brainstorms.md`
@@ -15,9 +15,9 @@
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
-  - `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md`
-  - `docs/epics/workspace-routing-foundation/watchdog-live-status-surface-and-manager-supervision/issues/watchdog-live-status-surface-and-manager-supervision.md`
+  - `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+  - `docs/B2-docs/ibm/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md`
+  - `docs/B2-docs/runtime/watchdog-live-status-surface-and-manager-supervision/issues/watchdog-live-status-surface-and-manager-supervision.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -82,10 +82,10 @@
 
 ## Implementation References
 
-- `docs/epics/workspace-routing-foundation/watchdog-restart-storm-and-process-churn-governance/brainstorms/b-watchdog-restart-storm-and-process-churn-governance.md`
-- `docs/epics/workspace-routing-foundation/watchdog-restart-storm-and-process-churn-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/watchdog-restart-storm-and-process-churn-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/watchdog-restart-storm-and-process-churn-governance/tasks.md`
+- `docs/B2-docs/runtime/watchdog-restart-storm-and-process-churn-governance/brainstorms/b-watchdog-restart-storm-and-process-churn-governance.md`
+- `docs/B2-docs/runtime/watchdog-restart-storm-and-process-churn-governance/prd.md`
+- `docs/B2-docs/runtime/watchdog-restart-storm-and-process-churn-governance/pre-tests.md`
+- `docs/B2-docs/runtime/watchdog-restart-storm-and-process-churn-governance/tasks.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/skills/watchdog-control-plane/SKILL.md`
 - `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
@@ -96,7 +96,7 @@
 - `docs/system/workspace/scripts/tests/test-freely-restart-storm-defers-blind-relaunch`
 - `docs/system/workspace/scripts/tests/test-freely-restart-storm-status-surface`
 - `docs/progress/workspace-routing-foundation/p-watchdog-restart-storm-and-process-churn-governance.md`
-- `docs/epics/workspace-routing-foundation/watchdog-restart-storm-and-process-churn-governance/code-reviews/20260324-watchdog-restart-storm-and-process-churn-verification.md`
+- `docs/B2-docs/runtime/watchdog-restart-storm-and-process-churn-governance/code-reviews/20260324-watchdog-restart-storm-and-process-churn-verification.md`
 
 ## Verification Summary
 

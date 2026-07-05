@@ -6,7 +6,7 @@
 - runtime_state: `closed_for_this_batch`
 - branch: `feature/manager-launch-state-consumed-truth-reconcile-20260324`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260324-feature-manager-launch-state-consumed-truth-reconcile`
-- issue_path: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
+- issue_path: `docs/B2-docs/ibm/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
 - session_refs:
   - {tool: codex, session_id: "019d220d-ce3c-7b42-a5b1-a5ed6b44b905", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/24/rollout-2026-03-24T15-53-43-019d220d-ce3c-7b42-a5b1-a5ed6b44b905.jsonl", role: "closeout-writeback"}
   - {tool: codex, session_id: "019d220f-37e7-7212-9346-55708074bb27", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/24/rollout-2026-03-24T15-55-15-019d220f-37e7-7212-9346-55708074bb27.jsonl", role: "context_compacted_handoff_source"}

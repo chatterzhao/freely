@@ -1,7 +1,7 @@
 # Progress: worktree-helper-shell-source-compatibility-governance
 
 - issue_id: `I-20260405-2302-A`
-- issue_path: `docs/epics/freely-product-architecture/worktree-helper-shell-source-compatibility-governance/issues/worktree-helper-shell-source-compatibility-governance.md`
+- issue_path: `docs/B2-docs/config/packaging/issues/worktree-helper-shell-source-compatibility-governance.md`
 - title: `Worktree helper shell source compatibility governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -25,7 +25,7 @@
 - `bash -lc 'source ./bin/wt-enter develop'`
 - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-wt-wrapper-shell-source-compatibility`
 - `./bin/test-lane post-merge-followthrough -- bash docs/system/workspace/scripts/tests/test-worktree-entry-flow`
-- `docs/epics/freely-product-architecture/worktree-helper-shell-source-compatibility-governance/code-reviews/20260405-worktree-helper-shell-source-compatibility-verification.md`
+- `docs/B2-docs/config/packaging/code-reviews/20260405-worktree-helper-shell-source-compatibility-verification.md`
 
 ## Next Action
 

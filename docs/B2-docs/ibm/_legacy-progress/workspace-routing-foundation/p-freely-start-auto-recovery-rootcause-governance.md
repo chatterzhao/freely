@@ -1,7 +1,7 @@
 # Progress: freely-start-auto-recovery-rootcause-governance
 
 - issue_id: `I-20260414-0255-A`
-- issue_path: `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/issues/freely-start-auto-recovery-rootcause-governance.md`
+- issue_path: `docs/B2-docs/ibm/freely-start-auto-recovery-rootcause-governance/issues/freely-start-auto-recovery-rootcause-governance.md`
 - title: `Freely start after-failure recovery handoff race root cause fix`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -228,7 +228,7 @@ IBM 已完成 materialization。当前 issue 仍处于 feature lane 的 `dev-loo
    - 保持当前 route 为同 issue 的 `dev-loop` continuation，不把这轮 compacted handoff 误路由成新的 pre-brainstorm / IBM / manager patrol
 
 1. IBM 文档 materialization
-   - issue 文档：`docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/issues/freely-start-auto-recovery-rootcause-governance.md`
+   - issue 文档：`docs/B2-docs/ibm/freely-start-auto-recovery-rootcause-governance/issues/freely-start-auto-recovery-rootcause-governance.md`
    - prd.md：已创建，描述核心合同和技术设计
    - pre-tests.md：已创建，包含 Unit/Integration/E2E/Real-Env 四层验收
    - tasks.md：已创建，包含实现、测试、验证、promote、post-merge 五类任务

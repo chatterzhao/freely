@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO9X
     synced_at: '2026-04-27T13:17:18Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/runtime-startup-root-cause-packet-governance/issues/runtime-startup-root-cause-packet-governance.md
+canonical_issue_path: docs/B2-docs/runtime/runtime-startup-root-cause-packet-governance/issues/runtime-startup-root-cause-packet-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:27:23Z'
 hash: ''
@@ -26,4 +26,4 @@ Canonical repo truth showed a narrow closeout drift: `I-20260413-0420-B` and `I-
 
 The missing contract was not in merge orchestration. `pretests-gate` already owned completion and guarded adequacy evaluation through bound `pre-tests.md`, while `governance-merge-gate` simply delegated to that owner gate. The gap was that execution close
 
-canonical: docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/issues/tasks-closeout-completion-and-adequacy-gate-governance.md
+canonical: docs/B2-docs/ibm/tasks-closeout-completion-and-adequacy-gate-governance/issues/tasks-closeout-completion-and-adequacy-gate-governance.md

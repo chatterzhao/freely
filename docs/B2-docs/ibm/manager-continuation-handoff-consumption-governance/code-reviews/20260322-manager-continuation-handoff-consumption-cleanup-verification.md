@@ -24,7 +24,7 @@
 - `git status --short --branch` shows only the current round's cleanup writeback artifacts:
   - `docs/milestones.md`
   - `docs/progress/workspace-routing-foundation/p-manager-continuation-handoff-consumption-governance.md`
-  - `docs/epics/workspace-routing-foundation/manager-continuation-handoff-consumption-governance/code-reviews/20260322-manager-continuation-handoff-consumption-cleanup-verification.md`
+  - `docs/B2-docs/ibm/manager-continuation-handoff-consumption-governance/code-reviews/20260322-manager-continuation-handoff-consumption-cleanup-verification.md`
 - these dirty files are canonical retirement evidence for the current round, not fresh runtime/control-plane implementation drift
 - `git diff --check` passes, so the retained cleanup writeback has no whitespace or conflict-marker damage
 - `git merge-base HEAD develop` equals local `develop`, while `git rev-parse HEAD` is one commit ahead (`git rev-list --left-right --count HEAD...develop` => `1 0`); the branch still has one local cleanup/closure commit outside `develop`

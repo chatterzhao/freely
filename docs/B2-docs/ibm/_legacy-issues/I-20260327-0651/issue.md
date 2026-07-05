@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO6V
     synced_at: '2026-04-27T13:15:05Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/issues/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance.md
+canonical_issue_path: docs/B2-docs/ibm/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/issues/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:17:52Z'
 hash: ''
@@ -30,4 +30,4 @@ Freely runtime 里和代理有关的默认值目前仍然分散在脚本内部�
 
 这条 issue 的目标是把 proxy 变成 Freely 的项目级能力，而不是散落在 runtime shell 里的隐式假设。
 
-canonical: docs/epics/workspace-routing-foundation/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/issues/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance.md
+canonical: docs/B2-docs/ibm/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/issues/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance.md

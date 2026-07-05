@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO4D
     synced_at: '2026-04-27T13:13:11Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/state-sync-and-session-evidence-governance/issues/state-sync-and-session-evidence-governance.md
+canonical_issue_path: docs/B2-docs/ibm/state-sync-and-session-evidence-governance/issues/state-sync-and-session-evidence-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:12:01Z'
 hash: ''

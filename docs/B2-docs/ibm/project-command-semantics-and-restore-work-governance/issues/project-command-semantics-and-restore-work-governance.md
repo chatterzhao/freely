@@ -9,8 +9,8 @@
 - issue-name: `project-command-semantics-and-restore-work-governance`
 - source_candidate: `docs/B1-docs/raw-20260327/candidates.md#c-20260327-2006-a`
 - source_brainstorm: `docs/B1-docs/raw-20260327/brainstorms.md`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/pre-tests.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/code-reviews/`
+- pre_tests_path: `docs/B2-docs/ibm/project-command-semantics-and-restore-work-governance/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/ibm/project-command-semantics-and-restore-work-governance/code-reviews/`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `none`
@@ -57,5 +57,5 @@ Freely 已经有 project-scoped pid ownership 与 `cmd_stop()` 的底层 blast r
 
 ## Next
 
-- `2026-03-30 17:34 PDT` parent owner closeout is complete. The canonical absorption happened at `develop` merge `b93efd2`, and the verification closeout is anchored by `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/code-reviews/20260328-project-command-semantics-feature-verification.md`.
+- `2026-03-30 17:34 PDT` parent owner closeout is complete. The canonical absorption happened at `develop` merge `b93efd2`, and the verification closeout is anchored by `docs/B2-docs/ibm/project-command-semantics-and-restore-work-governance/code-reviews/20260328-project-command-semantics-feature-verification.md`.
 - Downstream work now belongs to its own owner lifecycle. Any future change to project command semantics must open a new lifecycle instead of reopening this completed parent.

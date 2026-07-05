@@ -18,7 +18,7 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-pre_tests_path: docs/epics/source-param/verification/pre-tests.md
+pre_tests_path: docs/B2-docs/source-param/verification/pre-tests.md
 verification_artifact_dir: docs/epics/source-param/code-reviews
 source_candidate: docs/B1-docs/raw-20260507/candidates.md
 platform_state: closed
@@ -145,5 +145,5 @@ _pull_raw_issue() {
 - #240：双工位创建
 - #243：统一仓库平台层
 
-- pre_tests_path: `docs/epics/source-param/verification/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/source-param/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/source-param/code-reviews`

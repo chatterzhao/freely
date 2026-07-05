@@ -11,11 +11,11 @@
 - target_environment: fix-raw-20260628T054513Z-scope-warning
 - required_evidence: grep confirms --fail-on-required not in hook
 - evidence_level: mock
-- artifact_ref: docs/epics/scope-warning/test-evidence/acceptance-1.log
+- artifact_ref: docs/B2-docs/scope-warning/test-evidence/acceptance-1.log
 - test_command: grep -c "fail-on-required" .githooks/pre-commit.sh
 - expected_output: 0
 - actual_output: 0
-- evidence_file: docs/epics/scope-warning/test-evidence/acceptance-1.log
+- evidence_file: docs/B2-docs/scope-warning/test-evidence/acceptance-1.log
 - blocker:
 - status: not_applicable
 - not_applicable_reason: human_observation_only
@@ -30,7 +30,7 @@
 - target_environment: test-pre-merge-20260628T054513Z-scope-warning
 - required_evidence: merge to develop verifies subsequent PRs not blocked
 - evidence_level: integration
-- artifact_ref: docs/epics/scope-warning/test-evidence/acceptance-1.log
+- artifact_ref: docs/B2-docs/scope-warning/test-evidence/acceptance-1.log
 - test_command: merge to develop, create new PR to verify
 - expected_output: PR succeeds with scope warning only
 - actual_output:

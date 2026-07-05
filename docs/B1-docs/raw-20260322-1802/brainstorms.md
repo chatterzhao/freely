@@ -69,6 +69,6 @@ The current `develop` branch already contains the core runtime path for latest-m
 
 - This audit no longer owns a separate implementation path.
 - Its governance conclusion is now absorbed by:
-  - `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/issues/pre-test-merge-responsibility-usage-and-lifecycle-governance.md`
+  - `docs/B2-docs/ibm/pre-test-merge-responsibility-usage-and-lifecycle-governance/issues/pre-test-merge-responsibility-usage-and-lifecycle-governance.md`
 - This worktree remains only as supporting semantic evidence for that governance lifecycle.
 - Once the absorption writeback is committed, this branch should be treated as `retire-ready` unless a new audit-specific gap appears.

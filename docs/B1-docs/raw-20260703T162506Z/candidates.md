@@ -10,6 +10,6 @@ milestone: M-20260703T162506Z-A
 
 - status: absorbed
 - absorbed_into: I-20260703T162506Z-A
-- promoted_issue_path: docs/epics/closeout-chain/fix-agent-table-update/raw-20260703T162506Z/issues/I-20260703T162506Z-A.md
+- promoted_issue_path: docs/B2-docs/git-worktree/closeout/raw-20260703T162506Z/issues/I-20260703T162506Z-A.md
 - decision_reason: pattern match fix, one-line change
 - milestone: M-20260703T162506Z-A

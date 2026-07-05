@@ -10,7 +10,7 @@
 - target_environment: feature-local
 - required_evidence: grep 确认
 - evidence_level: integration
-- artifact_ref: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/verification/test-evidence/at-001.log
+- artifact_ref: docs/B2-docs/git-worktree/wt-close/raw-20260705T010030Z/verification/test-evidence/at-001.log
 - test_command: bash docs/system/workspace/scripts/worktree/wt-close --help 2>&1 | grep -c "\-\-branch" && echo "FAIL" || echo "PASS: no --branch"
 - expected_output: PASS: no --branch
 - expected_RED_output: 1 (--branch still in help)
@@ -30,7 +30,7 @@
 - target_environment: feature-local
 - required_evidence: bash -n 输出
 - evidence_level: integration
-- artifact_ref: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/verification/test-evidence/at-002.log
+- artifact_ref: docs/B2-docs/git-worktree/wt-close/raw-20260705T010030Z/verification/test-evidence/at-002.log
 - test_command: bash -n docs/system/workspace/scripts/worktree/wt-close && echo "- actual_output: PASS: syntax OK"
 - expected_output: - actual_output: PASS: syntax OK
 - expected_RED_output: syntax error

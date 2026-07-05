@@ -33,7 +33,7 @@
 - requirement: start auto-detects platforms and updates config
 - evidence_level: mock
 ^- status: passed
-- artifact_ref: docs/epics/auto-detect-platforms/code-reviews/implementation-decision.md
+- artifact_ref: docs/B2-docs/auto-detect-platforms/code-reviews/implementation-decision.md
 ## Real-Environment
 - real_environment_status: pass
 - real_environment_reason: verified by merge

@@ -12,7 +12,7 @@
 - target_environment: fix worktree
 - required_evidence: grep 输出
 - evidence_level: integration
-- artifact_ref: docs/epics/a2a-state-standard/state-rename/verification/test-evidence/acceptance-1.txt
+- artifact_ref: docs/B2-docs/a2a/task-lifecycle/verification/test-evidence/acceptance-1.txt
 - test_command: |
   _wt="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260630T021946Z-a2a-state-standard"
   grep -q 'INPUT_REQUIRED.*input-required' "$_wt/docs/system/workspace/scripts/runtime/a2a_task.py" || { echo "FAIL: INPUT_REQUIRED not found"; exit 1; }
@@ -23,7 +23,7 @@
 - expected_RED_output: "FAIL: INPUT_REQUIRED not found"
 - actual_RED_output: "RED confirmed — PENDING_INPUT, exit_kind, old mapping present"
 - actual_output: "GREEN: all tests pass"
-- evidence_file: docs/epics/a2a-state-standard/state-rename/verification/test-evidence/acceptance-1.txt
+- evidence_file: docs/B2-docs/a2a/task-lifecycle/verification/test-evidence/acceptance-1.txt
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -37,7 +37,7 @@
 - target_environment: fix worktree
 - required_evidence: grep 输出
 - evidence_level: integration
-- artifact_ref: docs/epics/a2a-state-standard/state-rename/verification/test-evidence/acceptance-2.txt
+- artifact_ref: docs/B2-docs/a2a/task-lifecycle/verification/test-evidence/acceptance-2.txt
 - test_command: |
   _wt="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260630T021946Z-a2a-state-standard"
   grep -q 'add_argument.*--state' "$_wt/docs/system/workspace/scripts/runtime/a2a_task.py" || { echo "FAIL: --state arg not found"; exit 1; }
@@ -47,7 +47,7 @@
 - expected_RED_output: "FAIL: --state arg not found"
 - actual_RED_output: "RED confirmed — PENDING_INPUT, exit_kind, old mapping present"
 - actual_output: "GREEN: all tests pass"
-- evidence_file: docs/epics/a2a-state-standard/state-rename/verification/test-evidence/acceptance-2.txt
+- evidence_file: docs/B2-docs/a2a/task-lifecycle/verification/test-evidence/acceptance-2.txt
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -61,7 +61,7 @@
 - target_environment: fix worktree
 - required_evidence: grep 输出
 - evidence_level: integration
-- artifact_ref: docs/epics/a2a-state-standard/state-rename/verification/test-evidence/acceptance-3.txt
+- artifact_ref: docs/B2-docs/a2a/task-lifecycle/verification/test-evidence/acceptance-3.txt
 - test_command: |
   _wt="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260630T021946Z-a2a-state-standard"
   for f in "$_wt/docs/system/workspace/a2a/exit-kind-mapping.md" "$_wt/docs/system/workspace/a2a/protocol-design.md" "$_wt/docs/system/workspace/a2a/agent-card-schema.md"; do
@@ -72,7 +72,7 @@
 - expected_RED_output: "FAIL: ... still has old blocked reference"
 - actual_RED_output: "RED confirmed — PENDING_INPUT, exit_kind, old mapping present"
 - actual_output: "GREEN: all tests pass"
-- evidence_file: docs/epics/a2a-state-standard/state-rename/verification/test-evidence/acceptance-3.txt
+- evidence_file: docs/B2-docs/a2a/task-lifecycle/verification/test-evidence/acceptance-3.txt
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -86,7 +86,7 @@
 - target_environment: fix worktree
 - required_evidence: grep 输出
 - evidence_level: integration
-- artifact_ref: docs/epics/a2a-state-standard/state-rename/verification/test-evidence/acceptance-4.txt
+- artifact_ref: docs/B2-docs/a2a/task-lifecycle/verification/test-evidence/acceptance-4.txt
 - test_command: |
   _wt="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260630T021946Z-a2a-state-standard"
   grep -q 'input-required.*canceled\|canceled.*input-required' "$_wt/docs/system/workspace/scripts/runtime/a2a_task.py" || { echo "FAIL: CHECK constraint not updated"; exit 1; }
@@ -95,7 +95,7 @@
 - expected_RED_output: "FAIL: CHECK constraint not updated"
 - actual_RED_output: "RED confirmed — PENDING_INPUT, exit_kind, old mapping present"
 - actual_output: "GREEN: all tests pass"
-- evidence_file: docs/epics/a2a-state-standard/state-rename/verification/test-evidence/acceptance-4.txt
+- evidence_file: docs/B2-docs/a2a/task-lifecycle/verification/test-evidence/acceptance-4.txt
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -109,7 +109,7 @@
 - target_environment: fix worktree
 - required_evidence: grep 输出
 - evidence_level: integration
-- artifact_ref: docs/epics/a2a-state-standard/state-rename/verification/test-evidence/acceptance-5.txt
+- artifact_ref: docs/B2-docs/a2a/task-lifecycle/verification/test-evidence/acceptance-5.txt
 - test_command: |
   _wt="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260630T021946Z-a2a-state-standard"
   grep "'blocked'.*'input-required'" "$_wt/docs/system/workspace/scripts/runtime/a2a_task.py" && { echo "FAIL: old mapping still present"; exit 1; } || true
@@ -118,7 +118,7 @@
 - expected_RED_output: "FAIL: old mapping still present"
 - actual_RED_output: "RED confirmed — PENDING_INPUT, exit_kind, old mapping present"
 - actual_output: "GREEN: all tests pass"
-- evidence_file: docs/epics/a2a-state-standard/state-rename/verification/test-evidence/acceptance-5.txt
+- evidence_file: docs/B2-docs/a2a/task-lifecycle/verification/test-evidence/acceptance-5.txt
 - red-green-status: green
 - status: passed
 - blocker: none

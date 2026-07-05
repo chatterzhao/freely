@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFOA4
     synced_at: '2026-04-27T13:17:30Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md
+canonical_issue_path: docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:27:59Z'
 hash: ''
@@ -27,4 +27,4 @@ Canonical `develop` already absorbed the runtime lifecycle implementation owner 
 
 Because direct protected-root edits are forbidden and candidate-only closure is not lawful for a develop-bound diff, this receipt-ledger repair needs its own narrow followthrough owner instead of silently extending the com
 
-canonical: docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md
+canonical: docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md

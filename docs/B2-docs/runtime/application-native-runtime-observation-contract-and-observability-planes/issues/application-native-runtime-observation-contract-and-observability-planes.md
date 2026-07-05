@@ -7,7 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `application-native-runtime-observation-contract-and-observability-planes`
 - issue-name: `application-native-runtime-observation-contract-and-observability-planes`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/code-reviews`
 - priority: P1
 - source_candidate: `docs/B1-docs/raw-20260324/candidates.md#c-20260324-0415-a`
 - source_brainstorm: `docs/B1-docs/raw-20260324/brainstorms.md`
@@ -15,8 +15,8 @@
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/issues/cli-first-entrypoint-and-observability-surface-unification.md`
-  - `docs/epics/workspace-routing-foundation/watchdog-live-status-surface-and-manager-supervision/issues/watchdog-live-status-surface-and-manager-supervision.md`
+  - `docs/B2-docs/human/cli-first-entrypoint-and-observability-surface-unification/issues/cli-first-entrypoint-and-observability-surface-unification.md`
+  - `docs/B2-docs/runtime/watchdog-live-status-surface-and-manager-supervision/issues/watchdog-live-status-surface-and-manager-supervision.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -74,11 +74,11 @@ Freely 已经具备多种观察面：
 
 ## Implementation References
 
-- `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/brainstorms/b-application-native-runtime-observation-contract-and-observability-planes.md`
-- `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/prd.md`
-- `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/tasks.md`
-- `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/code-reviews/20260324-application-native-runtime-observation-contract-and-observability-planes-verification.md`
+- `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/brainstorms/b-application-native-runtime-observation-contract-and-observability-planes.md`
+- `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/prd.md`
+- `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/pre-tests.md`
+- `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/tasks.md`
+- `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/code-reviews/20260324-application-native-runtime-observation-contract-and-observability-planes-verification.md`
 - `docs/system/workspace/skills/multi-worktree-supervision/SKILL.md`
 - `docs/system/workspace/skills/watchdog-control-plane/SKILL.md`
 - `docs/system/workspace/three-loop-capability-lifecycle.md`
@@ -86,7 +86,7 @@ Freely 已经具备多种观察面：
 
 ## Completion Evidence
 
-- `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/code-reviews/20260324-application-native-runtime-observation-contract-and-observability-planes-verification.md`
+- `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/code-reviews/20260324-application-native-runtime-observation-contract-and-observability-planes-verification.md`
 - `./bin/governance-check`
 - `rg -n "current-state plane|fleet plane|artifact plane|acceptance evidence|acceptance_ref|deep ref|progress signal|stall signal" docs/system/workspace/three-loop-capability-lifecycle.md docs/system/workspace/skills/multi-worktree-supervision/SKILL.md docs/system/workspace/skills/watchdog-control-plane/SKILL.md docs/system/workspace/scripts/README.md docs/LAWS.md`
 

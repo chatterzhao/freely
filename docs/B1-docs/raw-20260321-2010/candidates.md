@@ -19,7 +19,7 @@
 - priority: P1
 - status: promoted
 - decision_reason: 现有实现差异已经足够清晰，且 `codex` 正式 CLI 已提供显式续会话能力。继续停留在模糊研究会延后 runtime 真问题的修复。
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/issues/explicit-session-addressed-resume-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/explicit-session-addressed-resume-governance/issues/explicit-session-addressed-resume-governance.md`
 - legacy_id_mapping: I-20260321-2010  # 历史遗留的 issue id
 - milestone: `M-20260306-workspace-routing-foundation`
 - session_refs:

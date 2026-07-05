@@ -1,7 +1,7 @@
 # Implementation Decision: codex-auto-switch-probe-apikey-fallback-governance
 
 - issue_id: `I-20260407-0023-A`
-- issue_path: `docs/epics/workspace-routing-foundation/codex-auto-switch-probe-apikey-fallback-governance/issues/codex-auto-switch-probe-apikey-fallback-governance.md`
+- issue_path: `docs/B2-docs/config/codex-auto-switch-probe-apikey-fallback-governance/issues/codex-auto-switch-probe-apikey-fallback-governance.md`
 - branch: `feature/codex-auto-switch-probe-apikey-fallback-20260406-2138`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-2138-feature-codex-auto-switch-probe-apikey-fallback`
 - decision_date: `2026-04-07`

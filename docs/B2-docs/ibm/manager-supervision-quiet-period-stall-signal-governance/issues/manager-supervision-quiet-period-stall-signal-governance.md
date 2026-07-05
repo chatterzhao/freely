@@ -13,12 +13,12 @@
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/manager-delegated-continuation-stall-recovery-governance/issues/manager-delegated-continuation-stall-recovery-governance.md`
-  - `docs/epics/workspace-routing-foundation/watchdog-restart-storm-and-process-churn-governance/issues/watchdog-restart-storm-and-process-churn-governance.md`
-  - `docs/epics/workspace-routing-foundation/manager-delegated-intake-absorption-closure-governance/issues/manager-delegated-intake-absorption-closure-governance.md`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/manager-supervision-quiet-period-stall-signal-governance/pre-tests.md`
+  - `docs/B2-docs/ibm/manager-delegated-continuation-stall-recovery-governance/issues/manager-delegated-continuation-stall-recovery-governance.md`
+  - `docs/B2-docs/runtime/watchdog-restart-storm-and-process-churn-governance/issues/watchdog-restart-storm-and-process-churn-governance.md`
+  - `docs/B2-docs/ibm/manager-delegated-intake-absorption-closure-governance/issues/manager-delegated-intake-absorption-closure-governance.md`
+- pre_tests_path: `docs/B2-docs/ibm/manager-supervision-quiet-period-stall-signal-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-manager-supervision-quiet-period-stall-signal-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/manager-supervision-quiet-period-stall-signal-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/manager-supervision-quiet-period-stall-signal-governance/code-reviews`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -79,7 +79,7 @@
 - `docs/system/workspace/scripts/tests/test-freely-manager-delegated-continuation-mixed-busy-and-launchable-recovers`
 - `docs/system/workspace/scripts/tests/test-freely-manager-delegated-continuation-busy-and-stale-prompt-recovers`
 - `docs/progress/workspace-routing-foundation/p-manager-supervision-quiet-period-stall-signal-governance.md`
-- `docs/epics/workspace-routing-foundation/manager-supervision-quiet-period-stall-signal-governance/code-reviews/20260328-manager-supervision-quiet-period-stall-signal-verification.md`
+- `docs/B2-docs/ibm/manager-supervision-quiet-period-stall-signal-governance/code-reviews/20260328-manager-supervision-quiet-period-stall-signal-verification.md`
 
 ## Verification
 
@@ -94,5 +94,5 @@
 
 ## Next
 
-- `2026-03-30 17:34 PDT` the minimal behavior repair and verification closeout are already absorbed by `develop` commit `82ea1e6`, with canonical evidence in `docs/epics/workspace-routing-foundation/manager-supervision-quiet-period-stall-signal-governance/code-reviews/20260328-manager-supervision-quiet-period-stall-signal-verification.md`.
+- `2026-03-30 17:34 PDT` the minimal behavior repair and verification closeout are already absorbed by `develop` commit `82ea1e6`, with canonical evidence in `docs/B2-docs/ibm/manager-supervision-quiet-period-stall-signal-governance/code-reviews/20260328-manager-supervision-quiet-period-stall-signal-verification.md`.
 - Restart-storm revalidation or broader observability changes remain follow-on work and must open their own lifecycle if they need implementation.

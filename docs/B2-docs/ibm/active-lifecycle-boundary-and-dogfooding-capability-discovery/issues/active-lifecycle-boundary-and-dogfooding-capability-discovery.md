@@ -12,7 +12,7 @@
 - source_brainstorm: `docs/B1-docs/raw-20260321/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- depends_on: `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md`
+- depends_on: `docs/B2-docs/ibm/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -59,20 +59,20 @@ Freely 当前仍缺少一条稳定的生命周期边界语义，导致团队会�
 
 ## Completion
 
-- `docs/epics/workspace-routing-foundation/active-lifecycle-boundary-and-dogfooding-capability-discovery/issues/active-lifecycle-boundary-and-dogfooding-capability-discovery.md`
-- `docs/epics/workspace-routing-foundation/active-lifecycle-boundary-and-dogfooding-capability-discovery/brainstorms/b-active-lifecycle-boundary-and-dogfooding-capability-discovery.md`
-- `docs/epics/workspace-routing-foundation/active-lifecycle-boundary-and-dogfooding-capability-discovery/prd.md`
-- `docs/epics/workspace-routing-foundation/active-lifecycle-boundary-and-dogfooding-capability-discovery/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/active-lifecycle-boundary-and-dogfooding-capability-discovery/tasks.md`
+- `docs/B2-docs/ibm/active-lifecycle-boundary-and-dogfooding-capability-discovery/issues/active-lifecycle-boundary-and-dogfooding-capability-discovery.md`
+- `docs/B2-docs/ibm/active-lifecycle-boundary-and-dogfooding-capability-discovery/brainstorms/b-active-lifecycle-boundary-and-dogfooding-capability-discovery.md`
+- `docs/B2-docs/ibm/active-lifecycle-boundary-and-dogfooding-capability-discovery/prd.md`
+- `docs/B2-docs/ibm/active-lifecycle-boundary-and-dogfooding-capability-discovery/pre-tests.md`
+- `docs/B2-docs/ibm/active-lifecycle-boundary-and-dogfooding-capability-discovery/tasks.md`
 - `docs/system/workspace/three-loop-capability-lifecycle.md`
 - `docs/PROJECT_INTENT.md`
-- `docs/epics/workspace-routing-foundation/active-lifecycle-boundary-and-dogfooding-capability-discovery/code-reviews/20260321-active-lifecycle-boundary-and-dogfooding-capability-discovery-verification.md`
+- `docs/B2-docs/ibm/active-lifecycle-boundary-and-dogfooding-capability-discovery/code-reviews/20260321-active-lifecycle-boundary-and-dogfooding-capability-discovery-verification.md`
 
 ## Verification
 
 - `./bin/governance-check`
 - wording review of lifecycle boundary and dogfooding principle for contradiction / overlap / residual ambiguity
-- `docs/epics/workspace-routing-foundation/active-lifecycle-boundary-and-dogfooding-capability-discovery/code-reviews/20260326-active-lifecycle-boundary-canonical-replay-verification.md`
+- `docs/B2-docs/ibm/active-lifecycle-boundary-and-dogfooding-capability-discovery/code-reviews/20260326-active-lifecycle-boundary-canonical-replay-verification.md`
 
 ## Next
 

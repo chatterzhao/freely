@@ -1,7 +1,7 @@
 # Progress: develop-guarded-merge-entrypoint-enforcement-governance
 
 - issue_id: `I-20260405-0425-A`
-- issue_path: `docs/epics/workspace-routing-foundation/develop-guarded-merge-entrypoint-enforcement-governance/issues/develop-guarded-merge-entrypoint-enforcement-governance.md`
+- issue_path: `docs/B2-docs/ibm/develop-guarded-merge-entrypoint-enforcement-governance/issues/develop-guarded-merge-entrypoint-enforcement-governance.md`
 - phase_state: `completed`
 - runtime_state: `unavailable`
 - milestone: `M-20260306-workspace-routing-foundation`
@@ -32,7 +32,7 @@
 5. `git diff --check`
 6. `./bin/governance-check`
 7. `git log -1 --format=%B HEAD`
-8. `docs/epics/workspace-routing-foundation/develop-guarded-merge-entrypoint-enforcement-governance/code-reviews/20260405-develop-guarded-merge-entrypoint-canonical-closeout-verification.md`
+8. `docs/B2-docs/ibm/develop-guarded-merge-entrypoint-enforcement-governance/code-reviews/20260405-develop-guarded-merge-entrypoint-canonical-closeout-verification.md`
 
 ## Next Action
 

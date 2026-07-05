@@ -1,11 +1,11 @@
 ---
 issue_id: I-20260704T080808Z-A
-issue_path: docs/epics/agent-acp/multi-bridge-per-tool/raw-20260704T080808Z/issues/I-20260704T080808Z-A.md
+issue_path: docs/B2-docs/config/agent-table/raw-20260704T080808Z/issues/I-20260704T080808Z-A.md
 phase_state: done_b2_ibm
 ---
 
 - issue_id: I-20260704T080808Z-A
-- issue_path: docs/epics/agent-acp/multi-bridge-per-tool/raw-20260704T080808Z/issues/I-20260704T080808Z-A.md
+- issue_path: docs/B2-docs/config/agent-table/raw-20260704T080808Z/issues/I-20260704T080808Z-A.md
 
 ## Implementation Decision Note
 

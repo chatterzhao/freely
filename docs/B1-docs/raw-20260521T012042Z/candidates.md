@@ -32,7 +32,7 @@
   - prd: `docs/epics/stale-pid-keepalive/prd.md`
   - pre-tests: `docs/epics/stale-pid-keepalive/pre-tests.md`
   - tasks: `docs/epics/stale-pid-keepalive/tasks.md`
-  - code-reviews: `docs/epics/stale-pid-keepalive/code-reviews/`
+  - code-reviews: `docs/B2-docs/stale-pid-keepalive/code-reviews/`
 - open_questions:
   - Manager 是否有权限访问所有活跃 worker 的 PID？(同用户/同进程组/跨容器)
   - `kill -0` 在 worker 已 zombie 时的行为是否可靠？

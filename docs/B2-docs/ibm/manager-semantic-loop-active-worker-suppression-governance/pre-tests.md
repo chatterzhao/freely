@@ -33,18 +33,18 @@
 - requirement: `Semantic-loop monitoring clears once active worker execution is already present while preserving the zero-worker signal path.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/manager-semantic-loop-active-worker-suppression-governance/code-reviews/20260405-manager-semantic-loop-active-worker-suppression-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/manager-semantic-loop-active-worker-suppression-governance/code-reviews/20260405-manager-semantic-loop-active-worker-suppression-verification.md`
 
 ### AT-002
 - id: `AT-002`
 - requirement: `Adjacent live-status and fleet-status regressions remain green after the suppression fallback lands.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/manager-semantic-loop-active-worker-suppression-governance/code-reviews/20260405-manager-semantic-loop-active-worker-suppression-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/manager-semantic-loop-active-worker-suppression-governance/code-reviews/20260405-manager-semantic-loop-active-worker-suppression-verification.md`
 
 ### AT-003
 - id: `AT-003`
 - requirement: `The closeout lane materializes a new bounded owner instead of reopening completed I-20260322-0445.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/manager-semantic-loop-active-worker-suppression-governance/code-reviews/20260405-manager-semantic-loop-active-worker-suppression-implementation-decision.md`
+- artifact_ref: `docs/B2-docs/ibm/manager-semantic-loop-active-worker-suppression-governance/code-reviews/20260405-manager-semantic-loop-active-worker-suppression-implementation-decision.md`

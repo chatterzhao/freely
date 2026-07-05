@@ -1,7 +1,7 @@
 # Verification: test-lane-routing-and-enforcement-governance
 
 - issue_id: `I-20260405-1914-A`
-- issue_path: `docs/epics/workspace-routing-foundation/test-lane-routing-and-enforcement-governance/issues/test-lane-routing-and-enforcement-governance.md`
+- issue_path: `docs/B2-docs/gate/test-lane-routing-and-enforcement-governance/issues/test-lane-routing-and-enforcement-governance.md`
 - branch: `feature/testing-lane-guidance-20260405-1545`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260405-1545-feature-testing-lane-guidance`
 - verification_date: `2026-04-05`

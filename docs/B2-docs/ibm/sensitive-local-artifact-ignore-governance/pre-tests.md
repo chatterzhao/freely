@@ -39,4 +39,4 @@
 - requirement: `governance validation passes after the narrow ignore contract is applied`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/sensitive-local-artifact-ignore-governance/code-reviews/20260330-sensitive-local-artifact-ignore-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/sensitive-local-artifact-ignore-governance/code-reviews/20260330-sensitive-local-artifact-ignore-verification.md`

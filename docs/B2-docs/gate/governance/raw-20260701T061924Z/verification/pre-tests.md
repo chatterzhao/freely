@@ -8,12 +8,12 @@
 - target_environment: test-pre-merge-20260701T061924Z-unify-gate-outputs
 - required_evidence: grep count
 - evidence_level: integration
-- artifact_ref: docs/epics/gate-output-unify/grouped-output/raw-20260701T061924Z/verification/acceptance-1.log
+- artifact_ref: docs/B2-docs/gate/governance/raw-20260701T061924Z/verification/acceptance-1.log
 - test_command: grep -lc "需要阅读的 Skill" docs/system/workspace/scripts/quality/*gate*
 - expected_output: >=3
 - actual_RED_output: 1
 - actual_output: 3
-- evidence_file: docs/epics/gate-output-unify/grouped-output/raw-20260701T061924Z/verification/acceptance-1.log
+- evidence_file: docs/B2-docs/gate/governance/raw-20260701T061924Z/verification/acceptance-1.log
 - red-green-status: green
 - status: passed
 - red_how: feature: 仅 governance-merge-gate 有分组

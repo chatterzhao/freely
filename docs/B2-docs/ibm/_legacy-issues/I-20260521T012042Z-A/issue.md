@@ -20,8 +20,8 @@
 - PRD: `docs/epics/stale-pid-keepalive/prd.md`
 - Pre-tests: `docs/epics/stale-pid-keepalive/pre-tests.md`
 - Tasks: `docs/epics/stale-pid-keepalive/tasks.md`
-- Code review: `docs/epics/stale-pid-keepalive/code-reviews/prd-review.md`
-- Implementation decision: `docs/epics/stale-pid-keepalive/code-reviews/implementation-decision-note.md`
+- Code review: `docs/B2-docs/stale-pid-keepalive/code-reviews/prd-review.md`
+- Implementation decision: `docs/B2-docs/stale-pid-keepalive/code-reviews/implementation-decision-note.md`
 
 ### Dev-loop Implementation
 - `docs/system/workspace/scripts/runtime/handoff.py` — Schema migration, CLI commands

@@ -1,7 +1,7 @@
 # Verification: develop-push-pending-guard-governance
 
 - issue_id: `I-20260401-1035-A`
-- issue_path: `docs/epics/workspace-routing-foundation/develop-push-pending-guard-governance/issues/develop-push-pending-guard-governance.md`
+- issue_path: `docs/B2-docs/ibm/develop-push-pending-guard-governance/issues/develop-push-pending-guard-governance.md`
 - branch: `feature/develop-push-pending-guard-20260401`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260401-feature-develop-push-pending-guard`
 - verification_date: `2026-04-01`

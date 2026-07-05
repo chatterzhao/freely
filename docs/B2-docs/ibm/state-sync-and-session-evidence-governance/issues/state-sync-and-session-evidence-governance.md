@@ -67,9 +67,9 @@
 - 已执行验证检查：
   - `rg -n "source_class|route_kind|phase_state|runtime_state|session_refs|done_ibm -> in_dev|in_verification|completion verification" docs/LAWS.md docs/PROJECT_INTENT.md docs/milestones.md docs/system/workspace/skills/context-source-skill/SKILL.md docs/system/workspace/skills/doc-ibm-execution/SKILL.md docs/system/workspace/skills/dev-loop-execution/SKILL.md`
 - 已写入 review 证据：
-  - `docs/epics/workspace-routing-foundation/state-sync-and-session-evidence-governance/code-reviews/20260316-state-sync-verification.md`
-  - `docs/epics/workspace-routing-foundation/state-sync-and-session-evidence-governance/code-reviews/20260317-lead-agent-reentry-verification.md`
-  - `docs/epics/workspace-routing-foundation/state-sync-and-session-evidence-governance/code-reviews/20260326-state-sync-canonical-replay-verification.md`
+  - `docs/B2-docs/ibm/state-sync-and-session-evidence-governance/code-reviews/20260316-state-sync-verification.md`
+  - `docs/B2-docs/ibm/state-sync-and-session-evidence-governance/code-reviews/20260317-lead-agent-reentry-verification.md`
+  - `docs/B2-docs/ibm/state-sync-and-session-evidence-governance/code-reviews/20260326-state-sync-canonical-replay-verification.md`
 - 当前研究阶段尚未启用正式 `docs/progress/**`，本轮等价执行证据写入 `docs/B1-docs/raw-CONVERGENCE.md`。
 
 ## Verification Summary

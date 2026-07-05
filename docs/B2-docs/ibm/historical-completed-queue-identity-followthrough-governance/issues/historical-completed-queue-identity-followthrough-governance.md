@@ -10,16 +10,16 @@
 - priority: `P1`
 - source_candidate: `docs/B1-docs/raw-20260412/candidates.md#c-20260412-1230-a`
 - source_brainstorm: `docs/B1-docs/raw-20260412/brainstorms.md`
-- reopen_of_issue: `docs/epics/workspace-routing-foundation/milestone-completed-queue-closeout-governance/issues/milestone-completed-queue-closeout-governance.md`
+- reopen_of_issue: `docs/B2-docs/ibm/milestone-completed-queue-closeout-governance/issues/milestone-completed-queue-closeout-governance.md`
 - reopen_reason: `guarded develop replay still warns because docs/milestones.md carries the completed watchdog owner under legacy candidate identity C-20260324-0405-A instead of canonical issue identity I-20260324-0405`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/historical-completed-queue-identity-followthrough-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/ibm/historical-completed-queue-identity-followthrough-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-historical-completed-queue-identity-followthrough-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/historical-completed-queue-identity-followthrough-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/historical-completed-queue-identity-followthrough-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/milestone-completed-queue-closeout-governance/issues/milestone-completed-queue-closeout-governance.md`
-  - `docs/epics/workspace-routing-foundation/watchdog-restart-storm-and-process-churn-governance/issues/watchdog-restart-storm-and-process-churn-governance.md`
+  - `docs/B2-docs/ibm/milestone-completed-queue-closeout-governance/issues/milestone-completed-queue-closeout-governance.md`
+  - `docs/B2-docs/runtime/watchdog-restart-storm-and-process-churn-governance/issues/watchdog-restart-storm-and-process-churn-governance.md`
   - `docs/system/workspace/scripts/quality/governance-check`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
@@ -53,11 +53,11 @@ Canonical milestone queue policy is already frozen, but one historical completed
 
 - `docs/B1-docs/raw-20260412/brainstorms.md`
 - `docs/B1-docs/raw-20260412/candidates.md`
-- `docs/epics/workspace-routing-foundation/historical-completed-queue-identity-followthrough-governance/issues/historical-completed-queue-identity-followthrough-governance.md`
-- `docs/epics/workspace-routing-foundation/historical-completed-queue-identity-followthrough-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/historical-completed-queue-identity-followthrough-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/historical-completed-queue-identity-followthrough-governance/tasks.md`
-- `docs/epics/workspace-routing-foundation/historical-completed-queue-identity-followthrough-governance/code-reviews/20260412-historical-completed-queue-identity-followthrough-verification.md`
+- `docs/B2-docs/ibm/historical-completed-queue-identity-followthrough-governance/issues/historical-completed-queue-identity-followthrough-governance.md`
+- `docs/B2-docs/ibm/historical-completed-queue-identity-followthrough-governance/prd.md`
+- `docs/B2-docs/ibm/historical-completed-queue-identity-followthrough-governance/pre-tests.md`
+- `docs/B2-docs/ibm/historical-completed-queue-identity-followthrough-governance/tasks.md`
+- `docs/B2-docs/ibm/historical-completed-queue-identity-followthrough-governance/code-reviews/20260412-historical-completed-queue-identity-followthrough-verification.md`
 - `docs/progress/workspace-routing-foundation/p-historical-completed-queue-identity-followthrough-governance.md`
 - `docs/milestones.md`
 

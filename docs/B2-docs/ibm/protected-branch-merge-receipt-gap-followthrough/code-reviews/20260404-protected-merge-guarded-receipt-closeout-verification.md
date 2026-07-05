@@ -1,7 +1,7 @@
 # Verification: protected-pr-merge-guarded-receipt-closeout
 
 - issue_id: `I-20260404-0640-A`
-- issue_path: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
+- issue_path: `docs/B2-docs/ibm/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
 - branch: `feature/protected-pr-merge-guarded-receipt-closeout-20260404-0725`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260404-0725-feature-protected-pr-merge-guarded-receipt-closeout`
 - verification_date: `2026-04-04`

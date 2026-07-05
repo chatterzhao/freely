@@ -61,4 +61,4 @@
 - requirement: `doctor hook/doc gate behavior remains green after adding the build artifact audit`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/build-artifact-exposure-and-release-allowlist-audit-governance/code-reviews/20260401-build-artifact-exposure-and-release-allowlist-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/build-artifact-exposure-and-release-allowlist-audit-governance/code-reviews/20260401-build-artifact-exposure-and-release-allowlist-verification.md`

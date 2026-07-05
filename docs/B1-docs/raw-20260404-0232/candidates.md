@@ -12,7 +12,7 @@
 - candidate_format_version: `v2`
 - title: Governance merge gate review-aware regression alignment
 - source_brainstorm: `docs/B1-docs/raw-20260404-0232/brainstorms.md`
-- reopen_of_issue: `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/issues/implementation-decision-notes-in-issue-review-artifacts-governance.md`
+- reopen_of_issue: `docs/B2-docs/ibm/implementation-decision-notes-in-issue-review-artifacts-governance/issues/implementation-decision-notes-in-issue-review-artifacts-governance.md`
 - reopen_reason: `post-merge acceptance proved test-governance-merge-gate still uses a pre-review-gate fixture for a mixed unresolved-candidate implementation case, so the regression now fails on missing staged review evidence before it reaches the current allowed path`
 - problem: `test-governance-merge-gate` case `2d` omits the staged review artifact now required by the canonical gate, and the same post-merge inspection also exposed a file-scope bypass that lets same-file `promoted` / `absorbed` candidates borrow an unrelated owner.
 - why_now:
@@ -42,7 +42,7 @@
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_id: `I-20260404-0232-A`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/issues/governance-merge-gate-review-aware-regression-alignment-governance.md`
+- promoted_issue_path: `docs/B2-docs/gate/governance-merge-gate-review-aware-regression-alignment-governance/issues/governance-merge-gate-review-aware-regression-alignment-governance.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`

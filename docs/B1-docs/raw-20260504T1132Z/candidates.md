@@ -21,4 +21,4 @@
   - reviewer: `subagent`
   - status: `pending`
 - next_action: `进入 B2_IBM，materialize I-*，实施 regex/glob 修改`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/raw-key-format-unify/issues/I-20260504T1132Z-A.md`
+- promoted_issue_path: `docs/B2-docs/ibm/raw-key-format-unify/issues/I-20260504T1132Z-A.md`

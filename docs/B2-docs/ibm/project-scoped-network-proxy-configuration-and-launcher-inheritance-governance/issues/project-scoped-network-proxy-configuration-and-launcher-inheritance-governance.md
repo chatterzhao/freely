@@ -12,11 +12,11 @@
 - source_brainstorm: `docs/B1-docs/raw-20260327/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/pre-tests.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/code-reviews`
+- pre_tests_path: `docs/B2-docs/ibm/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/ibm/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
-  - `docs/epics/workspace-routing-foundation/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/issues/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance.md`
+  - `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+  - `docs/B2-docs/ibm/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/issues/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -65,11 +65,11 @@ Freely runtime 里和代理有关的默认值目前仍然分散在脚本内部�
 
 ## Completion
 
-- `docs/epics/workspace-routing-foundation/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/issues/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance.md`
-- `docs/epics/workspace-routing-foundation/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/tasks.md`
-- `docs/epics/workspace-routing-foundation/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/code-reviews/`
+- `docs/B2-docs/ibm/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/issues/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance.md`
+- `docs/B2-docs/ibm/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/prd.md`
+- `docs/B2-docs/ibm/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/pre-tests.md`
+- `docs/B2-docs/ibm/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/tasks.md`
+- `docs/B2-docs/ibm/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/code-reviews/`
 - `docs/progress/workspace-routing-foundation/p-project-scoped-network-proxy-configuration-and-launcher-inheritance-governance.md`
 - `docs/system/workspace/scripts/runtime/network-proxy-resolver.sh`
 - `docs/system/workspace/scripts/runtime/freely`

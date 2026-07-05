@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO65
     synced_at: '2026-04-27T13:14:38Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/manager-chat-reentry-and-cleanup-misrouting-governance/issues/manager-chat-reentry-and-cleanup-misrouting-governance.md
+canonical_issue_path: docs/B2-docs/ibm/manager-chat-reentry-and-cleanup-misrouting-governance/issues/manager-chat-reentry-and-cleanup-misrouting-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:16:01Z'
 hash: ''
@@ -33,4 +33,4 @@ Freely 当前已经有：
 - interruption manager triage 仍可能把它错误解释为 cleanup followthrough
 - 结果是新的 supervisor-level signal 没回到 manager continuation，而是直接吸收到旧 cleanup continuity
 
-canonical: docs/epics/workspace-routing-foundation/manager-chat-reentry-and-cleanup-misrouting-governance/issues/manager-chat-reentry-and-cleanup-misrouting-governance.md
+canonical: docs/B2-docs/ibm/manager-chat-reentry-and-cleanup-misrouting-governance/issues/manager-chat-reentry-and-cleanup-misrouting-governance.md

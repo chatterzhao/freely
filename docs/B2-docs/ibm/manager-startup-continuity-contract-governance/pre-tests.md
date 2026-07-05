@@ -48,7 +48,7 @@
 - requirement: `Canonical docs distinguish launch bootstrapping from manager handoff materialization.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/code-reviews/20260413-manager-startup-continuity-contract-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/code-reviews/20260413-manager-startup-continuity-contract-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -60,7 +60,7 @@
 - requirement: `Canonical docs freeze that the first handoff artifact must appear on the normal startup path and that stop fallback remains repair-only.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/code-reviews/20260413-manager-startup-continuity-contract-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/code-reviews/20260413-manager-startup-continuity-contract-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -72,7 +72,7 @@
 - requirement: `Canonical docs choose the runtime-seeded continuity stub plus machine-readable handoff state seam without widening this owner into implementation.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/code-reviews/20260413-manager-startup-continuity-contract-decision.md`
+- artifact_ref: `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/code-reviews/20260413-manager-startup-continuity-contract-decision.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -84,7 +84,7 @@
 - requirement: `Canonical develop still carries real startup-handoff evidence strong enough to justify freezing the manager continuity contract before implementation.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/code-reviews/20260413-manager-startup-continuity-contract-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/code-reviews/20260413-manager-startup-continuity-contract-verification.md`
 - surface_kind: `real_environment`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`

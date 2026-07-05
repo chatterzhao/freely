@@ -35,7 +35,7 @@
 - milestone: pending://milestone-binding
 - superseded_by:
   - `docs/system/workspace/skills/laws-enforcer/SKILL.md`
-  - `docs/epics/workspace-routing-foundation/state-sync-and-session-evidence-governance/issues/state-sync-and-session-evidence-governance.md`
+  - `docs/B2-docs/ibm/state-sync-and-session-evidence-governance/issues/state-sync-and-session-evidence-governance.md`
 - session_refs: []
 
 ### C-20260304-603
@@ -50,7 +50,7 @@
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
 - superseded_by:
-  - `docs/epics/workspace-routing-foundation/session-lifecycle-rotation-and-handoff-governance/issues/session-lifecycle-rotation-and-handoff-governance.md`
+  - `docs/B2-docs/ibm/session-lifecycle-rotation-and-handoff-governance/issues/session-lifecycle-rotation-and-handoff-governance.md`
   - `docs/system/workspace/skills/watchdog-control-plane/SKILL.md`
 - session_refs: []
 
@@ -66,7 +66,7 @@
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
 - superseded_by:
-  - `docs/epics/workspace-routing-foundation/source-routing-and-derived-worktree-governance/issues/source-routing-and-derived-worktree-governance.md`
+  - `docs/B2-docs/ibm/source-routing-and-derived-worktree-governance/issues/source-routing-and-derived-worktree-governance.md`
   - `docs/system/workspace/skills/context-source-skill/SKILL.md`
 - session_refs: []
 
@@ -96,7 +96,7 @@
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
 - superseded_by:
-  - `docs/epics/workspace-routing-foundation/worktree-maintenance-governance/issues/worktree-maintenance-governance.md`
+  - `docs/B2-docs/git-worktree/worktree-maintenance-governance/issues/worktree-maintenance-governance.md`
   - `docs/system/workspace/skills/branch-management/SKILL.md`
 - session_refs: []
 
@@ -109,6 +109,6 @@
 - status: absorbed
 - adoption_type: supporting_evidence
 - decision_reason: issue-level acceptance、pre-tests executable contract 与相关 checklist/gate 已被后续 IBM acceptance 真源吸收，这条旧候选不再需要独立 materialization。
-- promoted_issue_path: docs/epics/workspace-routing-foundation/ibm-pretests-executable-acceptance-quality-governance/issues/ibm-pretests-executable-acceptance-quality-governance.md
+- promoted_issue_path: docs/B2-docs/ibm/ibm-pretests-executable-acceptance-quality-governance/issues/ibm-pretests-executable-acceptance-quality-governance.md
 - milestone: M-20260306-workspace-routing-foundation
 - session_refs: []

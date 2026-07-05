@@ -11,4 +11,4 @@
 - id: end-turn-grace
 - requirement: cycle log with stop_reason=end_turn normalizes rc=1→0
 ^- status: passed
-- artifact_ref: docs/epics/bridge-disconnect-fix/code-reviews/review.md
+- artifact_ref: docs/B2-docs/bridge-disconnect-fix/code-reviews/review.md

@@ -38,4 +38,4 @@
 - case_design: `issue-sync with Gitee fallback, raw-issue-pull auto-sync`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/unified-platform/code-reviews/review.md`
+- artifact_ref: `docs/B2-docs/unified-platform/code-reviews/review.md`

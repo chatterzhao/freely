@@ -6,7 +6,7 @@ completed_at: '2026-06-16T04:14:56Z'
 promoted_from: raw-20260511T0731Z
 source_candidate: docs/B1-docs/raw-20260511T0731Z/candidates.md
 verification_artifact_dir: docs/epics/worktree-guard/code-reviews
-pre_tests_path: docs/epics/worktree-guard/verification/pre-tests.md
+pre_tests_path: docs/B2-docs/worktree-guard/verification/pre-tests.md
 platform_state: closed
 platform_ids:
   github:

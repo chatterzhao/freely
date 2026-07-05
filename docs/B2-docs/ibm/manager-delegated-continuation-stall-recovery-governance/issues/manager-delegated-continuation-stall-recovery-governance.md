@@ -13,12 +13,12 @@
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/runtime-worker-launch-linkage-and-stall-recovery-governance/issues/runtime-worker-launch-linkage-and-stall-recovery-governance.md`
-  - `docs/epics/workspace-routing-foundation/worker-active-reentry-for-manager-delegated-continuation-governance/issues/worker-active-reentry-for-manager-delegated-continuation-governance.md`
-  - `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/manager-delegated-continuation-stall-recovery-governance/pre-tests.md`
+  - `docs/B2-docs/runtime/runtime-worker-launch-linkage-and-stall-recovery-governance/issues/runtime-worker-launch-linkage-and-stall-recovery-governance.md`
+  - `docs/B2-docs/ibm/worker-active-reentry-for-manager-delegated-continuation-governance/issues/worker-active-reentry-for-manager-delegated-continuation-governance.md`
+  - `docs/B2-docs/ibm/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
+- pre_tests_path: `docs/B2-docs/ibm/manager-delegated-continuation-stall-recovery-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-manager-delegated-continuation-stall-recovery-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/manager-delegated-continuation-stall-recovery-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/manager-delegated-continuation-stall-recovery-governance/code-reviews`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -71,7 +71,7 @@ Freely 已经具备 manager delegated continuation stall recovery 的基础 cont
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-delegated-continuation-busy-and-stale-prompt-recovers`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-relaunches-stale-queued-prompt`
 - manager/worker runtime regression batch around stall recovery, launch-state, semantic loop, worker reentry, and runtime recovery
-- `docs/epics/workspace-routing-foundation/manager-delegated-continuation-stall-recovery-governance/code-reviews/20260328-manager-delegated-continuation-stall-recovery-verification.md`
+- `docs/B2-docs/ibm/manager-delegated-continuation-stall-recovery-governance/code-reviews/20260328-manager-delegated-continuation-stall-recovery-verification.md`
 
 ## Next
 

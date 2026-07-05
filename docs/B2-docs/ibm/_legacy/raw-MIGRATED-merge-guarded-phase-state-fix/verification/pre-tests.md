@@ -19,4 +19,4 @@
 - id: linked-phase-state
 - requirement: linked issue with phase_state=completed triggers issue-sync close
 ^- status: passed
-- artifact_ref: docs/epics/merge-guarded-phase-state-fix/code-reviews/review.md
+- artifact_ref: docs/B2-docs/merge-guarded-phase-state-fix/code-reviews/review.md

@@ -6,7 +6,7 @@
 - runtime_state: `stopped`
 - branch: `develop`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely`
-- issue_path: `docs/epics/workspace-routing-foundation/develop-push-pending-guard-governance/issues/develop-push-pending-guard-governance.md`
+- issue_path: `docs/B2-docs/ibm/develop-push-pending-guard-governance/issues/develop-push-pending-guard-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -36,7 +36,7 @@
 - closure_status: `merged-and-verified`
 - closure_evidence:
   - `develop` commits `08fb096`, `8feae13`, `11f310b`
-  - `docs/epics/workspace-routing-foundation/develop-push-pending-guard-governance/code-reviews/20260401-develop-push-pending-guard-verification.md`
+  - `docs/B2-docs/ibm/develop-push-pending-guard-governance/code-reviews/20260401-develop-push-pending-guard-verification.md`
   - `freely develop-push status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
   - `./bin/governance-check`
 

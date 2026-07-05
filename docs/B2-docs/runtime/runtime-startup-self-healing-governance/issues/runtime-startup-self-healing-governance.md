@@ -12,14 +12,14 @@
 - source_brainstorm: `docs/B1-docs/raw-20260419/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- prd_path: `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/prd.md`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/pre-tests.md`
-- tasks_path: `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/tasks.md`
+- prd_path: `docs/B2-docs/runtime/runtime-startup-self-healing-governance/prd.md`
+- pre_tests_path: `docs/B2-docs/runtime/runtime-startup-self-healing-governance/pre-tests.md`
+- tasks_path: `docs/B2-docs/runtime/runtime-startup-self-healing-governance/tasks.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-runtime-startup-self-healing-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/runtime/runtime-startup-self-healing-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
-  - `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/issues/freely-start-auto-recovery-rootcause-governance.md`
+  - `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
+  - `docs/B2-docs/ibm/freely-start-auto-recovery-rootcause-governance/issues/freely-start-auto-recovery-rootcause-governance.md`
 - created_at: `2026-04-19`
 - updated_at: `2026-04-23`
 - session_refs:

@@ -8,12 +8,12 @@
 
 ## Scope
 
-- `docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/issues/internal-frontend-backend-architecture-review.md`
-- `docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/prd.md`
-- `docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/pre-tests.md`
-- `docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/tasks.md`
-- `docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md`
-- `docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/issues/backend-service-contract-and-adapter-taxonomy.md`
+- `docs/B2-docs/human/tui/issues/internal-frontend-backend-architecture-review.md`
+- `docs/B2-docs/human/tui/prd.md`
+- `docs/B2-docs/human/tui/pre-tests.md`
+- `docs/B2-docs/human/tui/tasks.md`
+- `docs/B2-docs/human/tui/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md`
+- `docs/B2-docs/runtime/control-surface/issues/backend-service-contract-and-adapter-taxonomy.md`
 
 ## Findings
 
@@ -27,7 +27,7 @@
 
 ## Verification Checks
 
-- `rg -n "ClientCommand|ServerEvent|Snapshot|tauri_adapter|ws_adapter|frontend contract|transport adapter|backend service contract|MVP autonomy milestone|Input arbitration|AI team visibility" docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy -g '*.md'`
+- `rg -n "ClientCommand|ServerEvent|Snapshot|tauri_adapter|ws_adapter|frontend contract|transport adapter|backend service contract|MVP autonomy milestone|Input arbitration|AI team visibility" docs/B2-docs/human/internal-frontend-backend-architecture-review docs/B2-docs/human/frontend-backend-boundary-contract-v1-for-frontend-probe docs/B2-docs/runtime/backend-service-contract-and-adapter-taxonomy -g '*.md'`
 - `rg -n "I-20260308-1245|internal-frontend-backend-architecture-review" docs -g '*.md'`
 - `./bin/governance-check`
 

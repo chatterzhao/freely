@@ -12,12 +12,12 @@
 - source_brainstorm: `docs/B1-docs/raw-20260406/brainstorms.md`
 - execution_base: `feature/governance-check-protected-merge-history-20260406-0045`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/governance-check-protected-merge-history-source-policy-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/gate/governance-check-protected-merge-history-source-policy-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-governance-check-protected-merge-history-source-policy-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/governance-check-protected-merge-history-source-policy-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/gate/governance-check-protected-merge-history-source-policy-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md`
-  - `docs/epics/workspace-routing-foundation/test-pre-merge-family-promotion-gate-enforcement-governance/issues/test-pre-merge-family-promotion-gate-enforcement-governance.md`
+  - `docs/B2-docs/ibm/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md`
+  - `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/issues/test-pre-merge-family-promotion-gate-enforcement-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 

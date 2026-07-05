@@ -1,7 +1,7 @@
 # Progress: auth-switch-real-environment-and-e2e-adequacy-governance
 
 - issue_id: `I-20260410-1835-A`
-- issue_path: `docs/epics/workspace-routing-foundation/auth-switch-real-environment-and-e2e-adequacy-governance/issues/auth-switch-real-environment-and-e2e-adequacy-governance.md`
+- issue_path: `docs/B2-docs/ibm/auth-switch-real-environment-and-e2e-adequacy-governance/issues/auth-switch-real-environment-and-e2e-adequacy-governance.md`
 - title: `Auth switch real-environment and end-to-end adequacy governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -24,7 +24,7 @@ This follow-on governance owner explains why the earlier auth/switch regression 
 ## Verification Evidence
 
 - `bash docs/system/workspace/scripts/tests/test-pretests-gate`
-- `docs/epics/workspace-routing-foundation/auth-switch-real-environment-and-e2e-adequacy-governance/code-reviews/20260410-auth-switch-real-environment-and-e2e-adequacy-verification.md`
+- `docs/B2-docs/ibm/auth-switch-real-environment-and-e2e-adequacy-governance/code-reviews/20260410-auth-switch-real-environment-and-e2e-adequacy-verification.md`
 - Git commit `36451387` on the feature branch
 
 ## Next Action

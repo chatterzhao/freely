@@ -1,6 +1,6 @@
 # Verification: develop-push-followthrough-escalation-governance canonical closeout
 
-- issue_path: `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md`
+- issue_path: `docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md`
 - verified_in_branch: `develop`
 - verified_in_worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely`
 - verified_at: `2026-04-09`
@@ -18,7 +18,7 @@
    - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-fleet-status-develop-push-pending`
    - `PASS`: `bash docs/system/workspace/scripts/tests/test-freely-develop-push-status-time-display`
 2. Pre-tests gate
-   - `PASS`: `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260409-043549-feature-develop-push-followthrough-escalation-closeout --issue docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md`
+   - `PASS`: `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260409-043549-feature-develop-push-followthrough-escalation-closeout --issue docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md`
 3. Governance
    - `PASS`: `./bin/governance-check`
 4. Diff hygiene

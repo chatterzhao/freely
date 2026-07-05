@@ -25,6 +25,6 @@ milestone: M-20260629T164530Z-A
   - reviewer: claude
   - mode: in-session
   - verdict: pass
-- promoted_issue_path: docs/epics/wt-close-raw-key/raw-key-flag/raw-20260629T164530Z/issues/I-20260629T164530Z-A.md
+- promoted_issue_path: docs/B2-docs/git-worktree/wt-close/raw-20260629T164530Z/issues/I-20260629T164530Z-A.md
 - milestone: M-20260629T164530Z-A
 - session_refs: []

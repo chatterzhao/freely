@@ -39,4 +39,4 @@
 - promotion_gate: develop_merge
 - evidence_level: integration
 ^- status: passed
-- artifact_ref: docs/epics/acp-bridge-restart-storm/code-reviews/review.md
+- artifact_ref: docs/B2-docs/acp-bridge-restart-storm/code-reviews/review.md

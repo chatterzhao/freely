@@ -1,7 +1,7 @@
 # Implementation Decision Note: develop-push-triage-merge-receipt-gap-followthrough
 
 - issue_id: `I-20260404-0640-A`
-- issue_path: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
+- issue_path: `docs/B2-docs/ibm/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
 - decision_date: `2026-04-04`
 - author: `codex`
 

@@ -32,4 +32,4 @@
   - completion/merge 门禁保持不回退
 - priority: `high`
 - recommendation: `materialize now`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/issues/pre-tests-cleanup-and-retirement-enforcement-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/pre-tests-cleanup-and-retirement-enforcement-governance/issues/pre-tests-cleanup-and-retirement-enforcement-governance.md`

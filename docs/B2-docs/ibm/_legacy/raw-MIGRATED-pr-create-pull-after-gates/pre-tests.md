@@ -21,7 +21,7 @@
 - blocker taxonomy: medium-risk reordering
 - not_applicable_reason: change_not_touching_this_layer
 - not_applicable_explanation: This change only reorders existing logic within the same script; no new gate or external dependency is introduced.
-- replacement_evidence: docs/epics/pr-create-pull-after-gates/code-reviews/flow-verification.txt
+- replacement_evidence: docs/B2-docs/pr-create-pull-after-gates/code-reviews/flow-verification.txt
 
 ## End-to-End
 
@@ -32,7 +32,7 @@
 - blocker taxonomy: low-risk (reorder-only change)
 - not_applicable_reason: no_executable_boundary_at_this_layer
 - not_applicable_explanation: The pr-create-guarded script requires git remotes and platform credentials for full E2E, which are not available in the isolated test worktree.
-- replacement_evidence: docs/epics/pr-create-pull-after-gates/code-reviews/design-review-notes.txt
+- replacement_evidence: docs/B2-docs/pr-create-pull-after-gates/code-reviews/design-review-notes.txt
 
 ## Real-Environment
 
@@ -47,7 +47,7 @@
 - requirement: bash -n must pass on the modified pr-create-guarded script
 - evidence_level: mock
 ^- status: passed
-- artifact_ref: docs/epics/pr-create-pull-after-gates/code-reviews/syntax-check.txt
+- artifact_ref: docs/B2-docs/pr-create-pull-after-gates/code-reviews/syntax-check.txt
 
 ### AI-002: Pull is at Step 3, gates all precede it
 
@@ -55,7 +55,7 @@
 - requirement: git pull origin develop must appear after gate-passed marker and before push, never at Step 1
 - evidence_level: mock
 ^- status: passed
-- artifact_ref: docs/epics/pr-create-pull-after-gates/code-reviews/flow-verification.txt
+- artifact_ref: docs/B2-docs/pr-create-pull-after-gates/code-reviews/flow-verification.txt
 
 ### AI-003: All gate checks still exit early before pull
 
@@ -63,4 +63,4 @@
 - requirement: Every gate failure path must exit 1 before reaching the pull command
 - evidence_level: mock
 ^- status: passed
-- artifact_ref: docs/epics/pr-create-pull-after-gates/code-reviews/flow-verification.txt
+- artifact_ref: docs/B2-docs/pr-create-pull-after-gates/code-reviews/flow-verification.txt

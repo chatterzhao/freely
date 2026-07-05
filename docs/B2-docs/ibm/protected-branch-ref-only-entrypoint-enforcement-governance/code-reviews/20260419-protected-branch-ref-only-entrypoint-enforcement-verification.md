@@ -1,7 +1,7 @@
 # Verification: protected-branch-ref-only-entrypoint-enforcement-governance
 
 - issue_id: `I-20260419-0210-A`
-- issue_path: `docs/epics/workspace-routing-foundation/protected-branch-ref-only-entrypoint-enforcement-governance/issues/protected-branch-ref-only-entrypoint-enforcement-governance.md`
+- issue_path: `docs/B2-docs/ibm/protected-branch-ref-only-entrypoint-enforcement-governance/issues/protected-branch-ref-only-entrypoint-enforcement-governance.md`
 - verification_date: `2026-04-19`
 - verifier: `codex`
 

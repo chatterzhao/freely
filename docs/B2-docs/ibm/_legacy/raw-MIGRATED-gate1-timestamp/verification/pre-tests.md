@@ -38,4 +38,4 @@
 - case_design: `gate detects timestamp drift in raw/C/I chain`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/gate1-timestamp/code-reviews/review.md`
+- artifact_ref: `docs/B2-docs/gate1-timestamp/code-reviews/review.md`

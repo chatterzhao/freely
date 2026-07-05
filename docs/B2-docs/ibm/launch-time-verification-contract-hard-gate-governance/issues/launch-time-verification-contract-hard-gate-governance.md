@@ -12,11 +12,11 @@
 - source_brainstorm: `docs/B1-docs/raw-20260411/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/launch-time-verification-contract-hard-gate-governance/pre-tests.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/launch-time-verification-contract-hard-gate-governance/code-reviews`
+- pre_tests_path: `docs/B2-docs/ibm/launch-time-verification-contract-hard-gate-governance/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/ibm/launch-time-verification-contract-hard-gate-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/runtime-worker-launch-linkage-and-stall-recovery-governance/issues/runtime-worker-launch-linkage-and-stall-recovery-governance.md`
-  - `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
+  - `docs/B2-docs/runtime/runtime-worker-launch-linkage-and-stall-recovery-governance/issues/runtime-worker-launch-linkage-and-stall-recovery-governance.md`
+  - `docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -45,9 +45,9 @@
   - 本 owner 只补 launch-time hard gate，不重做 merge/completion gate。
   - 对 branch-only / 自然语言 prompt，要么拒绝并给 remediation，要么通过显式升级路径补全 contract，不能继续保留默认宽松。
 - required_doc_refs:
-  - `docs/epics/workspace-routing-foundation/launch-time-verification-contract-hard-gate-governance/prd.md`
-  - `docs/epics/workspace-routing-foundation/launch-time-verification-contract-hard-gate-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/launch-time-verification-contract-hard-gate-governance/tasks.md`
+  - `docs/B2-docs/ibm/launch-time-verification-contract-hard-gate-governance/prd.md`
+  - `docs/B2-docs/ibm/launch-time-verification-contract-hard-gate-governance/pre-tests.md`
+  - `docs/B2-docs/ibm/launch-time-verification-contract-hard-gate-governance/tasks.md`
   - `docs/system/workspace/scripts/runtime/freely`
   - `docs/system/workspace/agents/manager-agent.md`
   - `docs/system/workspace/agents/worker-agent.md`
@@ -56,12 +56,12 @@
 ## Completion
 
 - `docs/B1-docs/raw-20260411/candidates.md`
-- `docs/epics/workspace-routing-foundation/launch-time-verification-contract-hard-gate-governance/issues/launch-time-verification-contract-hard-gate-governance.md`
-- `docs/epics/workspace-routing-foundation/launch-time-verification-contract-hard-gate-governance/brainstorms/b-launch-time-verification-contract-hard-gate-governance.md`
-- `docs/epics/workspace-routing-foundation/launch-time-verification-contract-hard-gate-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/launch-time-verification-contract-hard-gate-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/launch-time-verification-contract-hard-gate-governance/tasks.md`
-- `docs/epics/workspace-routing-foundation/launch-time-verification-contract-hard-gate-governance/code-reviews/20260411-launch-time-verification-contract-hard-gate-verification.md`
+- `docs/B2-docs/ibm/launch-time-verification-contract-hard-gate-governance/issues/launch-time-verification-contract-hard-gate-governance.md`
+- `docs/B2-docs/ibm/launch-time-verification-contract-hard-gate-governance/brainstorms/b-launch-time-verification-contract-hard-gate-governance.md`
+- `docs/B2-docs/ibm/launch-time-verification-contract-hard-gate-governance/prd.md`
+- `docs/B2-docs/ibm/launch-time-verification-contract-hard-gate-governance/pre-tests.md`
+- `docs/B2-docs/ibm/launch-time-verification-contract-hard-gate-governance/tasks.md`
+- `docs/B2-docs/ibm/launch-time-verification-contract-hard-gate-governance/code-reviews/20260411-launch-time-verification-contract-hard-gate-verification.md`
 - `docs/progress/workspace-routing-foundation/p-launch-time-verification-contract-hard-gate-governance.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-worker-prompt-verification-metadata`
@@ -93,7 +93,7 @@
 - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-branch-only-prompt`
 - `./bin/test-lane premerge-integration -- ./bin/governance-check`
 - `./bin/governance-check`
-- `docs/epics/workspace-routing-foundation/launch-time-verification-contract-hard-gate-governance/code-reviews/20260411-launch-time-verification-contract-hard-gate-verification.md`
+- `docs/B2-docs/ibm/launch-time-verification-contract-hard-gate-governance/code-reviews/20260411-launch-time-verification-contract-hard-gate-verification.md`
 
 ## Next
 

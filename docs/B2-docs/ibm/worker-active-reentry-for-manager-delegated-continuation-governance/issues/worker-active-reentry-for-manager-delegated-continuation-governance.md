@@ -7,14 +7,14 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `worker-active-reentry-for-manager-delegated-continuation-governance`
 - issue-name: `worker-active-reentry-for-manager-delegated-continuation-governance`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/worker-active-reentry-for-manager-delegated-continuation-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/worker-active-reentry-for-manager-delegated-continuation-governance/code-reviews`
 - priority: P0
 - source_candidate: `docs/B1-docs/raw-20260322/candidates.md#c-20260322-0412-a`
 - source_brainstorm: `docs/B1-docs/raw-20260322/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/runtime-worker-launch-linkage-and-stall-recovery-governance/issues/runtime-worker-launch-linkage-and-stall-recovery-governance.md`
+  - `docs/B2-docs/runtime/runtime-worker-launch-linkage-and-stall-recovery-governance/issues/runtime-worker-launch-linkage-and-stall-recovery-governance.md`
 
 ## Why
 
@@ -45,7 +45,7 @@ manager runtime 已经能把 stable worker prompt 转成目标 worker worktree �
 - `docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-linkage`
 - `docs/system/workspace/scripts/tests/test-freely-worker-active-reentry-from-manager-launch`
 - `docs/progress/workspace-routing-foundation/p-worker-active-reentry-for-manager-delegated-continuation-governance.md`
-- `docs/epics/workspace-routing-foundation/worker-active-reentry-for-manager-delegated-continuation-governance/code-reviews/20260322-worker-active-reentry-for-manager-delegated-continuation-verification.md`
+- `docs/B2-docs/ibm/worker-active-reentry-for-manager-delegated-continuation-governance/code-reviews/20260322-worker-active-reentry-for-manager-delegated-continuation-verification.md`
 
 ## Verification Summary
 

@@ -34,7 +34,7 @@
 - priority: P1
 - status: promoted
 - decision_reason: The bug is real and reproduced on `switch`, and the first safe step is now an IBM-scoped issue that freezes exit semantics, wake re-entrancy boundaries, and non-regression coverage before any runtime patch is attempted. `login` remains a same-family follow-on concern unless cleaner evidence upgrades it inside the issue.
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/ai-auth-change-wake-command-lifecycle-governance/issues/ai-auth-change-wake-command-lifecycle-governance.md`
+- promoted_issue_path: `docs/B2-docs/config/ai-auth-change-wake-command-lifecycle-governance/issues/ai-auth-change-wake-command-lifecycle-governance.md`
 - milestone: `docs/milestones.md#M-20260306-workspace-routing-foundation`
 - next_action: Enter IBM on a narrow owner issue around auth-change-wake recursion and command exit semantics, then decide the minimal safe repair.
 - revisit_trigger: Reopen or widen this line if later evidence shows the same recursion on non-codex auth commands or proves that the residual helpers survive beyond operator interruption in a durable way.

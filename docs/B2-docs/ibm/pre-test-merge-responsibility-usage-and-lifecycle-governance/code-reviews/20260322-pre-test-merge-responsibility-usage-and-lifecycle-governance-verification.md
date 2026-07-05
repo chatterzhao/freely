@@ -12,7 +12,7 @@
 - `docs/system/workspace/skills/branch-management/references/pre-test-merge-flow.md`
 - `docs/system/workspace/skills/branch-management/references/cleanup-lifecycle.md`
 - `docs/system/workspace/skills/multi-worktree-supervision/references/manager-reactivation-patrol.md`
-- `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/issues/pre-test-merge-responsibility-usage-and-lifecycle-governance.md`
+- `docs/B2-docs/ibm/pre-test-merge-responsibility-usage-and-lifecycle-governance/issues/pre-test-merge-responsibility-usage-and-lifecycle-governance.md`
 - `docs/milestones.md`
 
 ## Findings

@@ -1,7 +1,7 @@
 # Verification: runtime-audio-notifier-and-sound-semantics-governance
 
 - issue_id: `I-20260405-1215-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/issues/runtime-audio-notifier-and-sound-semantics-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-audio-notifier-and-sound-semantics-governance/issues/runtime-audio-notifier-and-sound-semantics-governance.md`
 - branch: `feature/runtime-audio-notifier-standard-path-20260405-1215`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260405-1215-feature-runtime-audio-notifier-standard-path`
 - verification_date: `2026-04-05`

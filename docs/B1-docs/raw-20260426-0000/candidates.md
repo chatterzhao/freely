@@ -28,7 +28,7 @@
   - opencode ACP adapter support
   - opencode --add-dir boundary support
 - promoted_issue_id: `I-20260426-0001-A`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/issues/tool-alias-and-opencode-launcher-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/tool-alias-and-opencode-launcher-governance/issues/tool-alias-and-opencode-launcher-governance.md`
 - next_action: `Promoted to I-20260426-0001-A. Complete pre-tests and guarded develop merge.`
 - next_action: `Absorbed into I-20260401-0840-A. No independent issue needed.`
 - session_refs:

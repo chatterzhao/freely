@@ -49,18 +49,18 @@
 - requirement: `frontend validation mode can drive real tauri bridge state changes and observe them via snapshot writeback`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/code-reviews/20260401-rust-tauri-probe-bridge-real-interaction-verification.md`
+- artifact_ref: `docs/B2-docs/human/tui/code-reviews/20260401-rust-tauri-probe-bridge-real-interaction-verification.md`
 
 ### PT-3
 - id: `PT-3`
 - requirement: `rust bridge and frontend app continue to compile after validation instrumentation is added`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/code-reviews/20260401-rust-tauri-probe-bridge-real-interaction-verification.md`
+- artifact_ref: `docs/B2-docs/human/tui/code-reviews/20260401-rust-tauri-probe-bridge-real-interaction-verification.md`
 
 ### PT-4
 - id: `PT-4`
 - requirement: `real tauri host startup remains green while interaction validation is added`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/code-reviews/20260401-rust-tauri-probe-bridge-host-validation-verification.md`
+- artifact_ref: `docs/B2-docs/human/tui/code-reviews/20260401-rust-tauri-probe-bridge-host-validation-verification.md`

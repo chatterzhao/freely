@@ -13,7 +13,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - priority: `P0`
 - promoted_issue_id: `I-20260421-1530-A`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/issues/live-status-scan-summary-and-prompt-anchor-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/live-status-scan-summary-and-prompt-anchor-governance/issues/live-status-scan-summary-and-prompt-anchor-governance.md`
 - problem: `Freely currently risks mixing patrol inventory semantics with current-state observation semantics. Prompt-history lookup can identify a current execution contract only partially, cannot describe all unresolved surfaces, and becomes especially misleading once manager plus multiple worker prompts coexist.`
 - why_now:
   - this round's runtime and doc audit confirmed `task-source-scan` is already the patrol-seed mechanism, while `live-status` is already the current-state plane
@@ -45,7 +45,7 @@
   - the success standard explicitly requires that the active worktree reaches a clean closeout state after the in-scope changes and evidence are complete
 - depends_on:
   - `docs/B1-docs/raw-20260420-1130/candidates.md#C-20260420-1130-A`
-  - `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
+  - `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
   - `docs/system/workspace/three-loop-capability-lifecycle.md`
 - next_action: `Candidate mirror only. I-20260421-1530-A is now the canonical owner for the bounded implementation slice that keeps prompt anchors authoritative, adds advisory scan-summary consumption to live-status, and proves the develop-bound path through guarded test-pre-merge plus develop replay.`
 - revisit_trigger: `Re-open only if later implementation needs a heavier typed scan-item schema, a broader status-family redesign, or a different owner for daemon-start autonomous completion proof.`

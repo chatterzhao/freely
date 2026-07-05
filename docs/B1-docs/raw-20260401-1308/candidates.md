@@ -37,7 +37,7 @@
   - separating this lane from Freely-self product baseline avoids mixing architecture defaults with optional or composable execution workflows
   - because Freely defaults to autonomous execution, downstream projects also need reusable ways to inspect, verify, recommend safer operating conditions, and internally review the actual execution boundary without reintroducing per-step human approvals
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md`
+- promoted_issue_path: `docs/B2-docs/ibm/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md`
 - promoted_issue_path_role: `primary-owner`
 - session_refs:
   - tool: `codex`

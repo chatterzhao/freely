@@ -21,7 +21,7 @@
 3. Run `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-ignores-unexpected-term-without-stop-marker`.
 4. Run `bash docs/system/workspace/scripts/tests/test-freely-daemon-start-reuses-live-supervisor-without-relaunch`.
 5. Run `bash docs/system/workspace/scripts/tests/test-freely-live-status-watchdog-survival`.
-6. Run `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely --issue docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`.
+6. Run `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely --issue docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`.
 7. Run `./bin/governance-check`.
 8. Run `bash docs/system/workspace/scripts/tests/test-freely-sync-tooling-stale-target-worktree-blocked`.
 9. Run `bash docs/system/workspace/scripts/tests/test-freely-sync-tooling-into-worktree`.
@@ -119,7 +119,7 @@
 - case_design: `Materialize stale dispatcher/watchdog pid files without a valid supervisor and verify precheck still clears.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-daemon-recovery-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-daemon-recovery-verification.md`
 
 ### Unexpected daemon TERM does not fake operator stop
 - id: `daemon-unexpected-term-ignored`
@@ -131,7 +131,7 @@
 - case_design: `Launch daemon mode, send TERM directly without writing stop.marker, confirm runtime survives and logs daemon_signal_ignored, then run explicit daemon stop and confirm operator stop still records correctly.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260428-runtime-daemon-self-loop-state-closeout-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260428-runtime-daemon-self-loop-state-closeout-verification.md`
 
 ### Canonical develop proves autonomous continuation
 - id: `develop-self-host-daemon-continuation`
@@ -146,7 +146,7 @@
 - not_applicable_reason: `covered_by_more_realistic_required_surface`
 - not_applicable_explanation: `The truthful acceptance surface for this item only exists after guarded promote reaches canonical develop. Marking it pass before that replay would be false; premerge adequacy is instead anchored by the fresh protected replay artifact, and the immediate next step remains the post-merge canonical daemon replay.`
 - replacement_evidence: `Fresh premerge-integration replay in test-pre-merge-runtime-target-worker-role-and-starting-stuck-recovery-20260425 plus the staged owner verification artifact prove guarded-merge adequacy without pretending canonical develop has already completed the full autonomous loop.`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-control-plane-argv-contract-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-control-plane-argv-contract-verification.md`
 
 ### Guarded promote carries explicit daemon adequacy
 - id: `daemon-self-loop-guarded-promote-proof`
@@ -158,7 +158,7 @@
 - case_design: `Replay the current blocker owner through the disposable protected test lane, including the reconnect-exhaustion 502 network-path regression set, rerun owner gates there, and use that bounded evidence to justify guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-control-plane-argv-contract-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-control-plane-argv-contract-verification.md`
 
 ### Guarded promote carries fresh delegated-continuation stop-boundary evidence
 - id: `guarded-promote-pre-stop-delegated-continuation-boundary-proof`
@@ -170,7 +170,7 @@
 - case_design: `Replay the stop-boundary delegated-continuation repair through the disposable protected lane, rerun the focused prompt/live-status regressions there, and stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-pre-stop-delegated-continuation-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-pre-stop-delegated-continuation-verification.md`
 
 ### Guarded promote carries fresh proxy/network diagnosis evidence
 - id: `guarded-promote-proxy-guidance-proof`
@@ -182,7 +182,7 @@
 - case_design: `Replay the current proxy-guidance repair through the disposable protected test lane, rerun the focused proxy/network regressions there, and stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-proxy-guidance-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-proxy-guidance-verification.md`
 
 ### Guarded promote carries fresh auth-failure classifier evidence
 - id: `guarded-promote-auth-failure-timestamp-proof`
@@ -194,7 +194,7 @@
 - case_design: `Replay the current auth-failure timestamp false-positive repair through the disposable protected lane, rerun the focused auth-classification regressions plus the real-log classifier check, and stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-auth-failure-timestamp-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-auth-failure-timestamp-verification.md`
 
 ### Guarded promote carries fresh superseded-frozen prompt reclaim evidence
 - id: `guarded-promote-superseded-frozen-prompt-proof`
@@ -206,7 +206,7 @@
 - case_design: `Replay the superseded-frozen prompt reclaim repair through the disposable protected lane, rerun the focused manager worker-launch regressions plus owner gates there, and stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-superseded-frozen-prompt-premerge-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-superseded-frozen-prompt-premerge-verification.md`
 
 ### Guarded promote carries fresh daemon entrypoint ownership evidence
 - id: `guarded-promote-daemon-entrypoint-mode-proof`
@@ -218,7 +218,7 @@
 - case_design: `Replay the daemon entrypoint-mode preservation repair through the disposable protected lane, rerun the focused monitor/daemon recovery regressions there, and stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-entrypoint-mode-preservation-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-entrypoint-mode-preservation-verification.md`
 
 ### Guarded promote carries fresh resume-cycle evidence-boundary proof
 - id: `guarded-promote-resume-incremental-output-evidence-proof`
@@ -230,7 +230,7 @@
 - case_design: `Replay the resume evidence-boundary repair through the disposable protected lane, rerun the focused manager exit-contract regressions there, and stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-resume-incremental-output-evidence-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-resume-incremental-output-evidence-verification.md`
 
 ### Guarded promote carries fresh queued-owner self-block evidence
 - id: `guarded-promote-queued-owner-self-block-proof`
@@ -242,7 +242,7 @@
 - case_design: `Replay the queued-owner self-block repair through the disposable protected lane, rerun the focused worker-delegation, active-authoritative, and duplicate queued-owner regressions plus owner gates there, and stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-queued-owner-self-block-premerge-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-queued-owner-self-block-premerge-verification.md`
 
 ### Runtime exit contracts are machine-checkable and self-repairable
 - id: `runtime-exit-contract-enforcement`
@@ -254,7 +254,7 @@
 - case_design: `Exercise manager-invalid, manager-stop, manager-stop-blocked-by-unresolved-worker, manager-delegate-without-launchable-worker, worker-invalid, worker-done, and worker-prompt directive paths so runtime proves prompt injection, post-cycle validation, precise same-session repair behavior, and no premature autonomy stop while recovery-owned worker truth remains open.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260428-runtime-daemon-self-loop-state-closeout-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260428-runtime-daemon-self-loop-state-closeout-verification.md`
 
 ### Cleanup handoff workers are not reclaimed before external cleanup surfaces run
 - id: `cleanup-handoff-not-auto-settled`
@@ -266,7 +266,7 @@
 - case_design: `Construct a merged cleanup-handoff worktree with full verification metadata plus external cleanup write scope and verify runtime neither reclaims ownership nor auto-settles it as retire_ready_merged_worker.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260428-runtime-daemon-self-loop-state-closeout-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260428-runtime-daemon-self-loop-state-closeout-verification.md`
 
 ### Reconnect retries stay local until the tool actually exits
 - id: `reconnect-does-not-trigger-early-cross-tool-switch`
@@ -278,7 +278,7 @@
 - case_design: `Emit a Codex transcript containing only ERROR: Reconnecting... x/5, verify monitor-ai-cli does not write the network-failure marker or kill the child early, then prove runtime classification still maps that log to execution_network_transient while 429 evidence still remains immediate kill/switch-worthy.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260428-runtime-daemon-self-loop-state-closeout-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260428-runtime-daemon-self-loop-state-closeout-verification.md`
 
 ### Benign Codex model-refresh timeout noise does not trigger runtime failure
 - id: `codex-model-refresh-timeout-noise-ignored`
@@ -290,7 +290,7 @@
 - case_design: `Emit only the known Codex model-refresh timeout line, confirm monitor-ai-cli records no failure marker, then keep adjacent real-failure regressions green so 429 and reconnect handling still behave as designed.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-startup-grace-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-startup-grace-verification.md`
 
 ### Exhausted Codex reconnect 502 stays on the execution-network path
 - id: `codex-reconnect-exhaustion-502-stays-network-scoped`
@@ -302,7 +302,7 @@
 - case_design: `Emit a Codex transcript with reconnect exhaustion plus upstream 502 Bad Gateway evidence, verify monitor-ai-cli writes only the network marker, then keep adjacent reconnect-defer and 429-kill regressions green.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-reconnect-502-network-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-reconnect-502-network-verification.md`
 
 ### Cached discovery producers survive closed-pipe consumers
 - id: `cached-discovery-producers-survive-closed-pipe`
@@ -314,7 +314,7 @@
 - case_design: `Exercise worktree-summary, supervisor-discovery, and manager continuity discovery paths under set -euo pipefail with downstream consumers that return as soon as they find the first needed record.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-sigpipe-closeout-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-sigpipe-closeout-verification.md`
 
 ### Guarded promote carries fresh SIGPIPE closeout evidence
 - id: `guarded-promote-sigpipe-closeout-proof`
@@ -326,7 +326,7 @@
 - case_design: `Replay the SIGPIPE closeout repair through the disposable protected lane, rerun the focused closed-pipe regressions there, and stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-sigpipe-closeout-premerge-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-sigpipe-closeout-premerge-verification.md`
 
 ### Manager bootstrap startup stays alive before prompt build begins
 - id: `manager-pre-prompt-startup-grace-preserved`
@@ -338,7 +338,7 @@
 - case_design: `Seed a running/starting manager with an old workcell timestamp but a fresh L010 lifecycle trace entry, and verify ensure-manager keeps the supervisor alive instead of relaunching before prompt build starts.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-startup-grace-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-startup-grace-verification.md`
 
 ### Resumed manager round stays alive while the next prompt is still building
 - id: `manager-resume-prompt-build-startup-grace-preserved`
@@ -350,7 +350,7 @@
 - case_design: `Seed a running manager whose between-rounds grace is already expired, but whose lifecycle trace has a newer L020 prompt_build_begin after the last L042 ai_cycle_finished, and verify ensure-manager keeps the same supervisor alive instead of triggering manager_idle_supervisor_restart.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-resume-prompt-build-grace-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-resume-prompt-build-grace-verification.md`
 
 ### Exhausted fallback episodes restore the original tool
 - id: `fallback-episode-restores-origin-tool`
@@ -362,7 +362,7 @@
 - case_design: `Walk one recovery episode across codex -> cc -> iflow -> kiro-cli failures and verify the attempted-tool memory is preserved within the episode while project tool selection returns to codex after exhaustion.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260428-runtime-daemon-self-loop-state-closeout-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260428-runtime-daemon-self-loop-state-closeout-verification.md`
 
 ### Materialized cleanup worker prompts carry selected tool truth
 - id: `materialized-cleanup-worker-selected-tool-truth`
@@ -374,7 +374,7 @@
 - case_design: `Seed continuity with selected_tool=codex and a retained cleanup worktree whose local config still says cc-use-codex-cli, then verify materialized worker prompt contains selected_tool and launch rewrites the stale worktree config before startup.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-materialized-cleanup-selected-tool-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-materialized-cleanup-selected-tool-verification.md`
 
 ### Protected replay stages materialized cleanup selected-tool evidence
 - id: `materialized-cleanup-worker-selected-tool-premerge-proof`
@@ -386,7 +386,7 @@
 - case_design: `Replay the materialized cleanup selected-tool repair on the disposable protected lane, rerun the four focused selected-tool regressions plus owner gates there, and stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-materialized-cleanup-selected-tool-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-materialized-cleanup-selected-tool-verification.md`
 
 ### Empty Codex session files do not count as resume evidence
 - id: `empty-codex-session-files-fall-back-from-resume`
@@ -398,7 +398,7 @@
 - case_design: `Seed Codex explicit resume state with a zero-byte rollout jsonl, then verify before-launch evidence checks, post-cycle persistence, and tool_has_resume_evidence all reject that state while non-empty jsonl evidence still remains resumable.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-empty-codex-session-resume-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-empty-codex-session-resume-verification.md`
 
 ### Protected replay stages empty Codex session resume evidence
 - id: `empty-codex-session-files-premerge-proof`
@@ -410,7 +410,7 @@
 - case_design: `Replay the empty-session resume repair on the disposable protected lane, rerun the focused explicit-resume contract plus owner gates there, and stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-empty-codex-session-resume-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-empty-codex-session-resume-verification.md`
 
 ### Repair handoff relaunches stay on resume instead of restarting patrol
 - id: `repair-handoff-does-not-regress-to-initial-start`
@@ -422,7 +422,7 @@
 - case_design: `Seed session-state plus a manager_exit_contract_repair handoff and verify launch-kind selection stays on resume rather than rotating to fresh/initial_start.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260428-runtime-daemon-self-loop-state-closeout-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260428-runtime-daemon-self-loop-state-closeout-verification.md`
 
 ### Empty repair resume targets fall back before monitor preflight
 - id: `empty-repair-resume-target-falls-back-before-launch`
@@ -434,7 +434,7 @@
 - case_design: `Seed manager_exit_contract_repair continuity with empty Codex resume state and verify launch-kind selection downgrades to fresh_with_handoff with missing_resume_evidence, while verified resume evidence still preserves the existing repair resume path.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-empty-repair-resume-target-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-empty-repair-resume-target-verification.md`
 
 ### Protected replay stages empty repair resume target evidence
 - id: `empty-repair-resume-target-premerge-proof`
@@ -446,7 +446,7 @@
 - case_design: `Replay the empty repair-resume-target fix on the disposable protected lane, rerun the focused repair-handoff and explicit-resume regressions plus owner gates there, and stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-empty-repair-resume-target-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260422-runtime-daemon-self-loop-followthrough-empty-repair-resume-target-verification.md`
 
 ### Cleanup followthrough runs before manager resume relaunch
 - id: `cleanup-followthrough-precedes-resume-manager-relaunch`
@@ -458,7 +458,7 @@
 - case_design: `Seed a resume_manager exit-contract with cleanup-followthrough continuity and verify runtime either runs cleanup before relaunch or records manager_exit_contract_cleanup_followthrough_failed plus repair handoff when that cleanup path fails.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260423-runtime-daemon-self-loop-followthrough-cleanup-followthrough-resume-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260423-runtime-daemon-self-loop-followthrough-cleanup-followthrough-resume-verification.md`
 
 ### Protected replay stages cleanup followthrough resume evidence
 - id: `cleanup-followthrough-resume-premerge-proof`
@@ -470,7 +470,7 @@
 - case_design: `Replay the cleanup-followthrough resume repair on the disposable protected lane, rerun the focused cleanup-followthrough resume regressions plus owner gates there, and stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260423-runtime-daemon-self-loop-followthrough-cleanup-followthrough-resume-premerge-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260423-runtime-daemon-self-loop-followthrough-cleanup-followthrough-resume-premerge-verification.md`
 
 ### Protected replay stages Codex OAuth refresh network-classification evidence
 - id: `codex-oauth-refresh-network-classification-premerge-proof`
@@ -482,7 +482,7 @@
 - case_design: `Replay the Codex OAuth refresh transport-classification repair on the disposable protected lane, rerun the focused OAuth request-send network classification regressions plus owner gate there, and stage the refreshed owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260428-runtime-daemon-self-loop-state-closeout-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260428-runtime-daemon-self-loop-state-closeout-verification.md`
 
 ### Worker materialization and pipe-safe summary hold on feature lane
 - id: `worker-materialization-and-summary-feature-proof`
@@ -494,7 +494,7 @@
 - case_design: `Run the focused worktree-summary broken-pipe regressions together with worker materialization / authoritative-edit ownership regressions on the writable owner lane and record the bounded followthrough evidence under the owner review directory.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260423-runtime-daemon-self-loop-followthrough-worker-materialization-and-summary-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260423-runtime-daemon-self-loop-followthrough-worker-materialization-and-summary-verification.md`
 
 ### Protected replay stages worker materialization and pipe-safe summary evidence
 - id: `worker-materialization-and-summary-premerge-proof`
@@ -506,7 +506,7 @@
 - case_design: `Replay the pipe-safe worktree-summary and missing-worktree materialization repair on the disposable protected lane, rerun the focused summary and worker-materialization regressions plus owner gates there, and stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260423-runtime-daemon-self-loop-followthrough-worker-materialization-and-summary-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260423-runtime-daemon-self-loop-followthrough-worker-materialization-and-summary-verification.md`
 
 ### Explicit daemon stop invalidates pre-stop patrol continuity
 - id: `daemon-stop-refreshes-pre-stop-boundary`
@@ -518,7 +518,7 @@
 - case_design: `Seed a manager continuity newer than the previous boundary, run stop handling with operator_daemon_stop, and verify the refreshed boundary makes that continuity pre-stop on the next patrol.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260423-runtime-daemon-self-loop-followthrough-daemon-stop-boundary-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260423-runtime-daemon-self-loop-followthrough-daemon-stop-boundary-verification.md`
 
 ### Queue-state worker handoffs stay launchable through delegate_workers
 - id: `queue-state-worker-handoff-launches-worker`
@@ -530,7 +530,7 @@
 - case_design: `Replay the queue-state handoff repair on a disposable protected test lane, rerun the continuity parsing and post-AI-cycle launch regressions there, and stage a fresh owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-queue-state-worker-prompt-premerge-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-queue-state-worker-prompt-premerge-verification.md`
 
 ### Protected replay stages explicit daemon-stop boundary evidence
 - id: `daemon-stop-boundary-premerge-proof`
@@ -542,7 +542,7 @@
 - case_design: `Replay the explicit daemon-stop boundary repair on the disposable protected lane, rerun the focused daemon-stop boundary regression plus owner gates there, and stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260423-runtime-daemon-self-loop-followthrough-daemon-stop-boundary-premerge-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260423-runtime-daemon-self-loop-followthrough-daemon-stop-boundary-premerge-verification.md`
 
 ### Blocked cleanup workers retain authoritative recorded ownership
 - id: `blocked-cleanup-recorded-owner-retained`
@@ -554,7 +554,7 @@
 - case_design: `Simulate a blocked cleanup worker whose verification contract still points at the delegated source prompt while the latest worker AI prompt no longer carries machine-readable Worktree/Branch headers, then verify duplicate cleanup launch requests queue behind the recorded owner instead of relaunching the lane.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-cleanup-blocked-recorded-owner-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-cleanup-blocked-recorded-owner-verification.md`
 
 ### Protected replay stages blocked cleanup ownership evidence
 - id: `blocked-cleanup-recorded-owner-premerge-proof`
@@ -566,7 +566,7 @@
 - case_design: `Replay the blocked-cleanup ownership repair on a disposable protected lane, rerun the duplicate-cleanup, stale-target, and duplicate-promotion recorded-owner regressions there, and stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-cleanup-blocked-recorded-owner-premerge-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-cleanup-blocked-recorded-owner-premerge-verification.md`
 
 ### Existing stale worker worktree bootstrap repair holds on feature lane
 - id: `existing-stale-worker-worktree-bootstrap-feature-proof`
@@ -578,7 +578,7 @@
 - case_design: `Run test-freely-manager-worker-launch-repairs-existing-stale-worktree by seeding an authoritative worker prompt that targets an already-existing sibling worktree containing only copied .freely/config.env, then verify manager launch syncs tooling, recreates runtime baseline state, and starts the worker instead of stalling on the half-materialized directory.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-existing-stale-worker-bootstrap-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-existing-stale-worker-bootstrap-verification.md`
 
 ### Protected replay stages existing stale worker worktree bootstrap repair
 - id: `existing-stale-worker-worktree-bootstrap-premerge-proof`
@@ -590,7 +590,7 @@
 - case_design: `Replay the stale-existing-worktree bootstrap repair on the disposable protected lane, rerun the focused stale-worktree launch repair regression plus missing-worktree materialization and sync-tooling regressions there, and stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-existing-stale-worker-bootstrap-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-existing-stale-worker-bootstrap-verification.md`
 
 ### Cleanup governance autofills nonlaunchable retained-lane prompts
 - id: `cleanup-nonlaunchable-prompt-autofill`
@@ -602,7 +602,7 @@
 - case_design: `Seed canonical cleanup continuity with a retained merged cleanup lane plus an AI-written hygiene prompt that lacks verification metadata, then verify manager exit-contract autofill appends a launchable authoritative cleanup prompt instead of looping on WORKER_PROMPTS_NOT_LAUNCHABLE.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-nonlaunchable-cleanup-autofill-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-nonlaunchable-cleanup-autofill-verification.md`
 
 ### Cleanup governance current-shape continuity recovers from worker verification truth
 - id: `cleanup-current-shape-worker-verification-autofill`
@@ -614,7 +614,7 @@
 - case_design: `Seed current-shape cleanup continuity with top-level route_kind, inline Worker Dispatch prompt references, and a retained merged cleanup lane whose authoritative verification truth already exists on the target worker; verify manager exit-contract autofill rewrites the nonlaunchable hygiene prompt into a launchable authoritative cleanup prompt.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-nonlaunchable-cleanup-autofill-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-nonlaunchable-cleanup-autofill-verification.md`
 
 ### Protected replay stages current-shape cleanup autofill evidence
 - id: `cleanup-current-shape-worker-verification-autofill-premerge-proof`
@@ -626,7 +626,7 @@
 - case_design: `Replay the current-shape retained-lane cleanup prompt repair on a disposable protected lane, rerun the worker-verification-truth autofill regression together with the adjacent nonlaunchable-prompt launchability guard plus owner gates there, and stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-current-shape-cleanup-autofill-premerge-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-current-shape-cleanup-autofill-premerge-verification.md`
 
 ### Dispatch-state cleanup continuity recovers from source prompt fallback
 - id: `cleanup-dispatch-state-source-prompt-fallback`
@@ -638,7 +638,7 @@
 - case_design: `Seed cleanup-governance continuity with dispatch-state worker prompt paths, no legacy issue-truth, and only a merged-lane nonlaunchable edit prompt carrying verification metadata for the same retained worker; verify manager exit-contract autofill writes a fresh cleanup prompt, rebases owner metadata into the retained worker worktree, and keeps the nonlaunchable launchability guard intact.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-dispatch-state-cleanup-source-prompt-fallback-premerge-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-dispatch-state-cleanup-source-prompt-fallback-premerge-verification.md`
 
 ### Protected replay stages dispatch-state cleanup source-prompt fallback evidence
 - id: `cleanup-dispatch-state-source-prompt-fallback-premerge-proof`
@@ -650,7 +650,7 @@
 - case_design: `Replay the dispatch-state retained-lane cleanup prompt repair on a disposable protected lane, rerun the source-prompt fallback regression together with the delegate-workers launchability guard, and stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-dispatch-state-cleanup-source-prompt-fallback-premerge-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-dispatch-state-cleanup-source-prompt-fallback-premerge-verification.md`
 
 ### Retained cleanup self-intent relaunch stays launchable
 - id: `retained-cleanup-self-intent-relaunch`
@@ -662,7 +662,7 @@
 - case_design: `Seed a retained merged cleanup lane whose current recorded cleanup signature matches the authoritative delegated prompt, then verify manager launches that prompt while adjacent duplicate-owner and stale-queue guards remain intact.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-retained-cleanup-self-intent-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-retained-cleanup-self-intent-verification.md`
 
 ### Protected replay stages retained cleanup self-intent relaunch evidence
 - id: `retained-cleanup-self-intent-relaunch-premerge-proof`
@@ -674,7 +674,7 @@
 - case_design: `Replay the retained cleanup self-intent relaunch repair on a disposable protected lane, rerun the focused retained-self-reclaim, duplicate-owner, stale-queue, and post-ai-cycle launch regressions plus owner gates there, and stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-retained-cleanup-self-intent-premerge-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-retained-cleanup-self-intent-premerge-verification.md`
 
 ### Recorded self-intent worker relaunch stays launchable
 - id: `recorded-self-intent-worker-relaunch`
@@ -686,7 +686,7 @@
 - case_design: `Seed a stopped worker lane whose latest prompt leaves an `edit@<target_worktree>` recorded signature behind, delegate the same lane again from manager continuity, and verify launch selection reclaims that self-intent while leaving other queued/frozen holders blocked.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-recorded-self-intent-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-recorded-self-intent-verification.md`
 
 ### Protected replay stages recorded self-intent relaunch evidence
 - id: `recorded-self-intent-worker-relaunch-premerge-proof`
@@ -698,7 +698,7 @@
 - case_design: `Replay the recorded-self-intent relaunch repair on a disposable protected lane, rerun the focused relaunch, retained-cleanup reclaim, duplicate-owner queue, and stale-queue regressions there, then stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-recorded-self-intent-premerge-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-recorded-self-intent-premerge-verification.md`
 
 ### Protected replay stages active authoritative worker prompt consumption evidence
 - id: `active-authoritative-worker-prompt-consumption-premerge-proof`
@@ -710,7 +710,7 @@
 - case_design: `Replay the active-authoritative worker prompt consumption repair on a disposable protected lane, rerun the focused active-authoritative, delegated-busy queue, and launch-state refresh regressions there, then stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-active-authoritative-worker-prompt-premerge-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-active-authoritative-worker-prompt-premerge-verification.md`
 
 ### Guarded promote carries worker exit contract network-transient precedence evidence
 - id: `guarded-promote-worker-exit-contract-network-transient-proof`
@@ -722,7 +722,7 @@
 - case_design: `Replay the worker exit-contract network-transient precedence repair through the disposable protected lane, rerun the focused worker_done, network-transient override, malformed-contract recovery, and owner gates there, then stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-worker-exit-contract-network-transient-premerge-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-worker-exit-contract-network-transient-premerge-verification.md`
 
 ### Guarded promote carries manager-owned worker runtime source rebind evidence
 - id: `guarded-promote-manager-worker-runtime-source-rebind-proof`
@@ -734,7 +734,7 @@
 - case_design: `Replay the manager-owned worker runtime source-rebind repair on a disposable protected lane, rerun the focused source-runtime launch and stale-active-runtime rebind regressions plus owner governance there, and stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-manager-worker-runtime-source-rebind-premerge-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260424-runtime-daemon-self-loop-followthrough-manager-worker-runtime-source-rebind-premerge-verification.md`
 
 ### Guarded promote carries manager/worker self-loop recovery evidence
 - id: `guarded-promote-manager-worker-self-loop-recovery-proof`
@@ -746,7 +746,7 @@
 - case_design: `Replay the manager/worker self-loop recovery repair on the disposable protected lane, rerun the focused delegated-worker role, starting-stuck reclaim, manager keepalive, and autonomous existing-worktree loop regressions there, and stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-worker-self-loop-recovery-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-worker-self-loop-recovery-verification.md`
 
 ### Guarded promote carries terminal followthrough materialization evidence
 - id: `guarded-promote-manager-worker-terminal-followthrough-materialization-proof`
@@ -758,7 +758,7 @@
 - case_design: `Replay the manager/worker terminal followthrough materialization repair on the disposable protected lane, rerun the focused explicit-resume, empty-success, terminal-worker materialization, idempotence, and live-status advisory regressions there, then stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-worker-terminal-followthrough-materialization-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-worker-terminal-followthrough-materialization-verification.md`
 
 ### Guarded promote carries post-ai-cycle finalize keepalive evidence
 - id: `guarded-promote-manager-post-ai-cycle-finalize-grace-proof`
@@ -770,7 +770,7 @@
 - case_design: `Replay the manager post-ai-cycle finalize keepalive repair on the disposable protected lane, rerun the focused finalize-grace and adjacent empty-success / exit-contract regressions there, and stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-post-ai-cycle-finalize-grace-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-post-ai-cycle-finalize-grace-verification.md`
 
 ### Guarded promote carries terminal handoff followthrough absorb evidence
 - id: `guarded-promote-terminal-handoff-followthrough-absorb-proof`
@@ -782,7 +782,7 @@
 - case_design: `Replay the terminal-handoff followthrough absorb repair on the disposable protected lane, rerun the focused absorb, runtime-recovery, and terminal-slot-collapse regressions plus owner governance there, and stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-terminal-handoff-followthrough-absorb-premerge-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-terminal-handoff-followthrough-absorb-premerge-verification.md`
 
 ### Delegated continuation session state clears absorbed pending backlog
 - id: `delegated-continuation-session-state-clears-absorbed-pending-backlog`
@@ -794,7 +794,7 @@
 - case_design: `Seed delegated pending ids, build an active prompt that already contains the delegated continuation handoff block, write session-state, and verify the same ids move to consumed while pending ids/count collapse to empty/zero so resume focus can execute the current followthrough instead of treating it as still-pending backlog.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-delegated-continuation-pending-state-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-delegated-continuation-pending-state-verification.md`
 
 ### Guarded promote carries delegated continuation pending-state evidence
 - id: `guarded-promote-delegated-continuation-pending-state-proof`
@@ -806,7 +806,7 @@
 - case_design: `Replay the delegated-continuation pending-state repair on the disposable protected lane, rerun the focused pending-state and consumed-continuity resume-focus regressions there, and stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-delegated-continuation-pending-state-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-delegated-continuation-pending-state-verification.md`
 
 ### Guarded promote carries resumed prompt-build keepalive evidence
 - id: `guarded-promote-manager-resume-prompt-build-grace-proof`
@@ -818,7 +818,7 @@
 - case_design: `Replay the resumed prompt-build keepalive repair on the disposable protected lane, rerun the focused resumed-prompt-build, between-rounds, pre-prompt, and post-finalize keepalive regressions there, and stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-resume-prompt-build-grace-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-resume-prompt-build-grace-verification.md`
 
 ### Feature-local post-L042 followthrough keepalive evidence is develop-bound adequate
 - id: `feature-local-post-l042-followthrough-keepalive-develop-adequacy`
@@ -830,7 +830,7 @@
 - case_design: `Run the focused post-L042 helper, ensure-manager top-level keepalive, resume-manager cleanup-followthrough, and network-transient override regressions in the writable owner worktree, then record the owner-linked verification artifact that explains why this seam belongs to the runtime middleman rather than task-selection or role-taxonomy design.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-post-l042-followthrough-keepalive-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-post-l042-followthrough-keepalive-verification.md`
 
 ### Guarded promote carries post-L042 followthrough keepalive evidence
 - id: `guarded-promote-post-l042-followthrough-keepalive-proof`
@@ -842,7 +842,7 @@
 - case_design: `Replay the post-L042 keepalive repair on the disposable protected lane, rerun the focused post-L042 helper, ensure-manager top-level keepalive, cleanup-followthrough, and network-transient override regressions there, and stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-post-l042-followthrough-keepalive-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-post-l042-followthrough-keepalive-verification.md`
 
 ### Feature-local manager exit-contract repair prompt narrowing is develop-bound adequate
 - id: `feature-local-manager-exit-contract-repair-prompt-narrowing-develop-adequacy`
@@ -854,7 +854,7 @@
 - case_design: `Run the focused manager repair prompt narrowing regression plus the adjacent empty-success, missing-resume-evidence fallback, worker repair prompt, and consumed-continuity resume-focus regressions in the writable owner worktree, then stage the owner-linked verification artifact that explains why this seam belongs to the runtime prompt contract rather than scan choice or role taxonomy.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-exit-contract-prompt-narrowing-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-exit-contract-prompt-narrowing-verification.md`
 
 ### Guarded promote carries manager exit-contract repair prompt narrowing evidence
 - id: `guarded-promote-manager-exit-contract-repair-prompt-narrowing-proof`
@@ -866,7 +866,7 @@
 - case_design: `Replay the manager exit-contract repair prompt narrowing on the disposable protected lane, rerun the focused manager repair prompt narrowing, empty-success, missing-resume-evidence fallback, worker repair prompt, consumed-continuity resume-focus regressions, and governance gate there, then stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-exit-contract-prompt-narrowing-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-exit-contract-prompt-narrowing-verification.md`
 
 ### Feature-local manager repair handoff survives missing-resume downgrade
 - id: `feature-local-manager-exit-contract-repair-handoff-preservation-develop-adequacy`
@@ -878,7 +878,7 @@
 - case_design: `Run the chain-level manager repair handoff preservation regression together with the prompt narrowing, missing-resume-evidence fallback, worker repair prompt, and empty-success adjacency regressions in the writable owner worktree, then stage the owner-linked verification artifact that pins the failure to the runtime handoff/prompt control plane seam.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-exit-contract-repair-handoff-preservation-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-exit-contract-repair-handoff-preservation-verification.md`
 
 ### Guarded promote carries manager repair handoff preservation evidence
 - id: `guarded-promote-manager-exit-contract-repair-handoff-preservation-proof`
@@ -890,4 +890,4 @@
 - case_design: `Replay the manager repair handoff preservation fix on the disposable protected lane, rerun the chain-level preservation regression plus the adjacent prompt narrowing, empty-success, missing-resume-evidence fallback, worker repair prompt, and governance regressions there, then stage the resulting owner review artifact before guarded promote into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-exit-contract-repair-handoff-preservation-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/code-reviews/20260425-runtime-daemon-self-loop-followthrough-manager-exit-contract-repair-handoff-preservation-verification.md`

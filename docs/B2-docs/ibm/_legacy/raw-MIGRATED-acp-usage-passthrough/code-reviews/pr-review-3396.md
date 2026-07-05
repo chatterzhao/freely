@@ -18,11 +18,11 @@
 
 ## 3. Code Review Evidence
 ^- status: passed
-- evidence: implementation-decision.md in docs/epics/a2a-native-delegation/code-reviews/, all fields complete
+- evidence: implementation-decision.md in docs/B2-docs/a2a-native-delegation/code-reviews/, all fields complete
 
 ## 4. Pre-test Evidence
 ^- status: passed
-- evidence: pre-tests.md in docs/epics/a2a-state-management/verification/, 0
+- evidence: pre-tests.md in docs/B2-docs/a2a-state-management/verification/, 0
 0 acceptance items
 
 ## 5. Receipt Integrity

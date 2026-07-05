@@ -14,6 +14,6 @@
 - priority: P0
 - status: promoted
 - decision_reason: 这是当前治理可信度和可恢复性的结构性缺口；不先补齐，Freely 继续自举只会积累更多“工作做了但状态没同步”的债。
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/state-sync-and-session-evidence-governance/issues/state-sync-and-session-evidence-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/state-sync-and-session-evidence-governance/issues/state-sync-and-session-evidence-governance.md`
 - milestone: `docs/milestones.md#m-20260306-workspace-routing-foundation`
 - session_refs: [{tool: codex, session_id: "019ccaa2-2f48-7782-a713-7d6d6d325030", jsonl_path: "unavailable://codex-thread-only", role: "analysis"}]

@@ -1,7 +1,7 @@
 # PR scan surface + FREELY_REPO_PLATFORMS config
 
 - issue: `I-20260501-0000-A`
-- issue_path: `docs/epics/workspace-routing-foundation/scan-pr-platform-config/issues/I-20260501-0000-A.md`
+- issue_path: `docs/B2-docs/runtime/scan-pr-platform-config/issues/I-20260501-0000-A.md`
 - candidate: `C-20260501-0000-A`
 - candidate_path: `docs/B1-docs/raw-20260501/candidates.md`
 - milestone: `M-20260306-workspace-routing-foundation`

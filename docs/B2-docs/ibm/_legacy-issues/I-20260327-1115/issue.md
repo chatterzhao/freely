@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO6Y
     synced_at: '2026-04-27T13:15:08Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/issues/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance.md
+canonical_issue_path: docs/B2-docs/ibm/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/issues/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:18:05Z'
 hash: ''
@@ -40,4 +40,4 @@ platform_state: closed
 
 这不是给旧 watchdog issue 加一条 supporting evidence，而是要把 inventory truth / co
 
-canonical: docs/epics/workspace-routing-foundation/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/issues/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance.md
+canonical: docs/B2-docs/ibm/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/issues/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance.md

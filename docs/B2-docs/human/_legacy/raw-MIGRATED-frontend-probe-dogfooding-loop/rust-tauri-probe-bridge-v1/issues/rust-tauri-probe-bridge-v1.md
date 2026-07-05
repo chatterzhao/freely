@@ -11,8 +11,8 @@
 - source_brainstorm: `docs/B1-docs/raw-20260317/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/pre-tests.md`
-- verification_artifact_dir: `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/code-reviews`
+- pre_tests_path: `docs/B2-docs/human/tui/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/human/tui/code-reviews`
 - depends_on: `none`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "doc-ibm"}
@@ -93,10 +93,10 @@
   - 当前阶段仍是 issue-bound IBM 收敛，不进入 Rust/Tauri 实现代码。
 - required_doc_refs:
   - `docs/B1-docs/raw-20260317/brainstorms.md`
-  - `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/brainstorms/b-rust-tauri-probe-bridge-v1.md`
-  - `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/prd.md`
-  - `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/pre-tests.md`
-  - `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/tasks.md`
+  - `docs/B2-docs/human/tui/brainstorms/b-rust-tauri-probe-bridge-v1.md`
+  - `docs/B2-docs/human/tui/prd.md`
+  - `docs/B2-docs/human/tui/pre-tests.md`
+  - `docs/B2-docs/human/tui/tasks.md`
 
 ## Next
 

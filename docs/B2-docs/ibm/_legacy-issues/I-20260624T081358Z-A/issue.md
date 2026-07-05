@@ -12,7 +12,7 @@ platform_ids:
   github:
     issue_id: '3411'
 primary_platform: github
-pre_tests_path: docs/epics/testing-docs-pre-tests-delegation/verification/pre-tests.md
+pre_tests_path: docs/B2-docs/testing-docs-pre-tests-delegation/verification/pre-tests.md
 verification_artifact_dir: docs/epics/testing-docs-pre-tests-delegation/code-reviews
 platform_state: open
 updated_at: '2026-06-24T08:13:58Z'
@@ -20,7 +20,7 @@ updated_at: '2026-06-24T08:13:58Z'
 # I-20260624T081358Z-A: 测试文档 daemon 假设修复
 
 - source_candidate: `docs/B1-docs/raw-20260624T081358Z/candidates.md`
-- pre_tests_path: `docs/epics/testing-docs-pre-tests-delegation/verification/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/testing-docs-pre-tests-delegation/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/testing-docs-pre-tests-delegation/code-reviews`
 
 ## 改动

@@ -34,7 +34,7 @@
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_id: `I-20260419-0210-A`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/protected-branch-ref-only-entrypoint-enforcement-governance/issues/protected-branch-ref-only-entrypoint-enforcement-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/protected-branch-ref-only-entrypoint-enforcement-governance/issues/protected-branch-ref-only-entrypoint-enforcement-governance.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`

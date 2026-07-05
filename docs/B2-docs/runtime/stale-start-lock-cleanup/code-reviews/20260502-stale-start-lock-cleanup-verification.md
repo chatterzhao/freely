@@ -1,7 +1,7 @@
 # Verification: stale-start-lock-cleanup
 
 - issue_id: `I-20260502-1028-A`
-- issue_path: `docs/epics/workspace-routing-foundation/stale-start-lock-cleanup/issues/I-20260502-1028-A.md`
+- issue_path: `docs/B2-docs/runtime/stale-start-lock-cleanup/issues/I-20260502-1028-A.md`
 - verification_date: `2026-05-02`
 - verifier: `human`
 

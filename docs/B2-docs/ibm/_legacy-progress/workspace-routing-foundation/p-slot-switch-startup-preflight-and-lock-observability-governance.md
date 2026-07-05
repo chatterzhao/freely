@@ -1,7 +1,7 @@
 # Progress: slot-switch-startup-preflight-and-lock-observability-governance
 
 - issue_id: `I-20260404-2148-A`
-- issue_path: `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
+- issue_path: `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
 - title: `Slot-switch startup preflight and lock observability governance`
 - phase_state: `completed`
 - runtime_state: `stopped`

@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO4I
     synced_at: '2026-04-27T13:13:15Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/stage-prefixed-progress-identifier/issues/stage-prefixed-progress-identifier.md
+canonical_issue_path: docs/B2-docs/ibm/stage-prefixed-progress-identifier/issues/stage-prefixed-progress-identifier.md
 last_synced_comment_at:
   github: '2026-04-27T11:12:15Z'
 hash: ''
@@ -35,7 +35,7 @@ platform_state: closed
 - source_brainstorm: `docs/B1-docs/raw-20260308/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- depends_on: `docs/epics/workspace-routing-foundation/state-sync-and-session-evidence-governance/issues/state-sync-and-session-evidence-governance.md`
+- depends_on: `docs/B2-docs/ibm/state-sync-and-session-evidence-governance/issues/state-sync-and-session-evidence-governance.md`
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "analysis"}]
 
 ## Why

@@ -1,7 +1,7 @@
 # Verification: runtime-forensic-time-alignment-and-stall-recovery-observability-governance closeout
 
 - issue_id: `I-20260412-1845-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/issues/runtime-forensic-time-alignment-and-stall-recovery-observability-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/issues/runtime-forensic-time-alignment-and-stall-recovery-observability-governance.md`
 - branch: `feature/runtime-forensic-time-alignment-closeout-20260412-1935`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260412-1935-feature-runtime-forensic-time-alignment-closeout`
 - verified_at: `2026-04-12`

@@ -12,11 +12,11 @@
 - source_brainstorm: `docs/B1-docs/raw-20260406/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/milestone-completed-queue-closeout-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/ibm/milestone-completed-queue-closeout-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-milestone-completed-queue-closeout-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/milestone-completed-queue-closeout-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/milestone-completed-queue-closeout-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md`
+  - `docs/B2-docs/gate/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md`
   - `docs/system/workspace/scripts/quality/governance-check`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}

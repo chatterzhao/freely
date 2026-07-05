@@ -1,7 +1,7 @@
 # Progress: runtime-selfhost-continuity-gap-and-status-truth-governance
 
 - issue_id: `I-20260407-0215-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
 - title: `Runtime self-host continuity gap and status truth governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -44,10 +44,10 @@
 
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status-manager-continuity-gap-surface`
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status-pid-hint-and-rg-degrade`
-- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260409-040148-feature-runtime-selfhost-continuity-gap-status-truth-closeout --issue docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
+- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260409-040148-feature-runtime-selfhost-continuity-gap-status-truth-closeout --issue docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
 - `./bin/governance-check`
 - `git diff --check`
-- `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/code-reviews/20260409-runtime-selfhost-continuity-gap-and-status-truth-canonical-closeout-verification.md`
+- `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/code-reviews/20260409-runtime-selfhost-continuity-gap-and-status-truth-canonical-closeout-verification.md`
 - `bash -n docs/system/workspace/scripts/runtime/freely`
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status-manager-continuity-gap-surface`
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status-pid-hint-and-rg-degrade`
@@ -60,7 +60,7 @@
 - `git diff --check`
 - `/usr/bin/time -p freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
 - `cd /Users/zhaoyu/Downloads/code/my-freely/freely && /usr/bin/time -p freely live-status --project /Users/zhaoyu/Downloads/code/my-freely/freely`
-- `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/code-reviews/20260407-runtime-status-truth-verification-replay.md`
+- `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/code-reviews/20260407-runtime-status-truth-verification-replay.md`
 
 ## Next Action
 

@@ -17,16 +17,16 @@
 ## 已确认事实
 
 1. `verification-contract-and-premerge-adequacy-governance` 已把 manager/worker handoff 的最小 verification contract 冻结到 machine-readable 字段，但 `Closeout-Gate` 仍是单一字符串字段：
-- `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
+- `docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
 - `docs/progress/workspace-routing-foundation/p-verification-contract-and-premerge-adequacy-governance.md`
 - `docs/system/workspace/scripts/runtime/freely`
 
 2. `pretests-retirement-gate` 已经暴露这个缺口，并明确 residual risk 是“recorded closeout gate 还没捕获 full lane/gate context”：
 - `docs/system/workspace/scripts/quality/pretests-retirement-gate`
-- `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/code-reviews/20260411-pre-tests-cleanup-and-retirement-enforcement-verification.md`
+- `docs/B2-docs/ibm/pre-tests-cleanup-and-retirement-enforcement-governance/code-reviews/20260411-pre-tests-cleanup-and-retirement-enforcement-verification.md`
 
 3. `implementation-decision-notes-in-issue-review-artifacts-governance` 已冻结 develop-bound implementation-bearing diff 需要 staged review artifact，但没有把“closeout-truth only diff 何时也必须 refresh review artifact”上升为更显式的 contract：
-- `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/issues/implementation-decision-notes-in-issue-review-artifacts-governance.md`
+- `docs/B2-docs/ibm/implementation-decision-notes-in-issue-review-artifacts-governance/issues/implementation-decision-notes-in-issue-review-artifacts-governance.md`
 - `docs/system/workspace/scripts/quality/governance-merge-gate`
 
 4. 本轮真实 develop merge 失败证据说明 gate 工作正常，失败点是 owner `pre-tests.md` 虽声明了 `premerge-integration:develop_merge`，但 develop-bound staged diff 里没有 fresh staged review artifact：
@@ -113,7 +113,7 @@ cleanup followthrough / retirement replay 不再从 `LAST_WORKER_CLOSEOUT_GATE` 
 - cleanup replay consumer: `docs/system/workspace/scripts/quality/pretests-retirement-gate`
 - merge / adequacy gate messaging: `docs/system/workspace/scripts/quality/pretests-gate`
 - worker / manager guidance: `docs/system/workspace/agents/worker-agent.md`, `docs/system/workspace/agents/manager-agent.md`
-- owner / follow-on docs: `docs/epics/workspace-routing-foundation/<new-owner>/`
+- owner / follow-on docs: `docs/B2-docs/git-worktree/<new-owner>/`
 
 ## 建议的后续 owner
 

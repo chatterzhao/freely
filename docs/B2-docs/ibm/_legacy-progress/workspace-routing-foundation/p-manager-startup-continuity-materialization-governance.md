@@ -1,7 +1,7 @@
 # Progress: manager-startup-continuity-materialization-governance
 
 - issue_id: `I-20260413-0420-D`
-- issue_path: `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/issues/manager-startup-continuity-materialization-governance.md`
+- issue_path: `docs/B2-docs/ibm/manager-startup-continuity-materialization-governance/issues/manager-startup-continuity-materialization-governance.md`
 - title: `Manager startup continuity materialization governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -38,7 +38,7 @@ This owner turns the frozen startup-handoff contract into runtime behavior:
 - `git diff --check`
 - bounded foreground replay: start -> live-status -> stop on this feature worktree
 - bounded daemon replay: daemon start -> daemon status/live-status -> daemon stop on this feature worktree
-- `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-closeout-verification.md`
+- `docs/B2-docs/ibm/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-closeout-verification.md`
 
 ## Next Action
 

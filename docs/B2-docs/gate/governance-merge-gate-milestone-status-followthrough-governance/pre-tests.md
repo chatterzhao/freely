@@ -47,4 +47,4 @@
 - requirement: `The merge-gate followthrough carries lawful same-line lifecycle evidence.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md`
+- artifact_ref: `docs/B2-docs/gate/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md`

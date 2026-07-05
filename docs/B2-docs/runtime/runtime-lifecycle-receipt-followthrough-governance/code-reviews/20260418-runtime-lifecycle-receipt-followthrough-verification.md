@@ -1,7 +1,7 @@
 # Verification: runtime-lifecycle-receipt-followthrough-governance
 
 - issue_id: `I-20260418-1900-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
 - verification_date: `2026-04-19`
 - verifier: `codex`
 
@@ -15,7 +15,7 @@
 
 ## Commands
 
-1. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260418-feature-runtime-lifecycle-receipt-followthrough --issue docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
+1. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260418-feature-runtime-lifecycle-receipt-followthrough --issue docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
 2. `git diff --check`
 3. `./bin/governance-check`
 4. `git worktree list`

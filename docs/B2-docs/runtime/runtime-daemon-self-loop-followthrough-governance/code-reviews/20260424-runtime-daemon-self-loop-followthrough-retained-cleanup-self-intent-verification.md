@@ -1,7 +1,7 @@
 # Verification: runtime-daemon-self-loop-followthrough-governance retained cleanup self-intent relaunch
 
 - issue_id: `I-20260421-1200-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
 - verification_date: `2026-04-24`
 - verifier: `codex`
 - source_branch: `feature/manager-worker-launch-self-conflict-boundary-20260424`
@@ -22,7 +22,7 @@
 2. `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-duplicate-cleanup-queue-recorded-owner-from-verification-contract`
 3. `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-relaunches-stale-queued-prompt`
 4. `bash docs/system/workspace/scripts/tests/test-freely-manager-launches-workers-after-ai-cycle`
-5. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-manager-worker-launch-self-conflict-boundary --issue /Users/zhaoyu/Downloads/code/my-freely/freely/docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
+5. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-manager-worker-launch-self-conflict-boundary --issue /Users/zhaoyu/Downloads/code/my-freely/freely/docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
 6. `./bin/governance-check`
 
 ## Implementation Decision Note

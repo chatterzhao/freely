@@ -30,6 +30,6 @@ milestone: M-20260705T010030Z-A
   - summary: 审查 wt-close 重构是否符合设计意图
   - verdict: pass
 - promoted_issue_id: I-20260705T010030Z-A
-- promoted_issue_path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
+- promoted_issue_path: docs/B2-docs/git-worktree/wt-close/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 - milestone: M-20260705T010030Z-A
 - session_refs: []

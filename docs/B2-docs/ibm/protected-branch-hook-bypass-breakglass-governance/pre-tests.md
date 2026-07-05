@@ -81,42 +81,42 @@
 - requirement: `The constitutional principle for protected-branch bypass is frozen.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/issues/protected-branch-hook-bypass-breakglass-governance.md`
+- artifact_ref: `docs/B2-docs/ibm/protected-branch-hook-bypass-breakglass-governance/issues/protected-branch-hook-bypass-breakglass-governance.md`
 
 ### AT-002
 - id: `AT-002`
 - requirement: `LAWS is frozen as the only whitelist truth for break-glass reasons and duties.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/prd.md`
+- artifact_ref: `docs/B2-docs/ibm/protected-branch-hook-bypass-breakglass-governance/prd.md`
 
 ### AT-003
 - id: `AT-003`
 - requirement: `Reason taxonomy, required fields, and forbidden examples are frozen.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/brainstorms/b-protected-branch-hook-bypass-breakglass-governance.md`
+- artifact_ref: `docs/B2-docs/ibm/protected-branch-hook-bypass-breakglass-governance/brainstorms/b-protected-branch-hook-bypass-breakglass-governance.md`
 
 ### AT-004
 - id: `AT-004`
 - requirement: `Guarded merge completion no longer falls back to an undefined raw commit path.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/tasks.md`
+- artifact_ref: `docs/B2-docs/ibm/protected-branch-hook-bypass-breakglass-governance/tasks.md`
 
 ### AT-005
 - id: `AT-005`
 - requirement: `A post-hoc audit contract exists for unauthorized bypass on protected-branch merge paths.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/prd.md`
+- artifact_ref: `docs/B2-docs/ibm/protected-branch-hook-bypass-breakglass-governance/prd.md`
 
 ### AT-006
 - id: `AT-006`
 - requirement: `The current judgment about reverting 27faa2e and a10f6d8 is frozen as canonical owner truth.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/brainstorms/b-protected-branch-hook-bypass-breakglass-governance.md`
+- artifact_ref: `docs/B2-docs/ibm/protected-branch-hook-bypass-breakglass-governance/brainstorms/b-protected-branch-hook-bypass-breakglass-governance.md`
 
 ### AT-007
 - id: `AT-007`

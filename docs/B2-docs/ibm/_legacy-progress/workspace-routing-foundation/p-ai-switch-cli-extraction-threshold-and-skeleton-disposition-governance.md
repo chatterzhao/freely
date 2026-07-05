@@ -1,7 +1,7 @@
 # Progress: ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance
 
 - issue_id: `I-20260405-1415-A`
-- issue_path: `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
+- issue_path: `docs/B2-docs/ibm/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
 - title: `ai-switch-cli extraction threshold and skeleton disposition governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -29,10 +29,10 @@
 
 ## Verification Evidence
 
-- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260409-044628-feature-ai-switch-cli-extraction-threshold-skeleton-disposition-closeout --issue docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
+- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260409-044628-feature-ai-switch-cli-extraction-threshold-skeleton-disposition-closeout --issue docs/B2-docs/ibm/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
 - `./bin/governance-check`
 - `git diff --check`
-- `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/code-reviews/20260408-ai-switch-cli-extraction-threshold-and-skeleton-disposition-verification.md`
+- `docs/B2-docs/ibm/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/code-reviews/20260408-ai-switch-cli-extraction-threshold-and-skeleton-disposition-verification.md`
 
 ## Next Action
 

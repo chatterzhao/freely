@@ -11,19 +11,19 @@
 - priority: `P1`
 - source_candidate: `docs/B1-docs/raw-20260418/candidates.md#c-20260418-1900-a`
 - source_brainstorm: `docs/B1-docs/raw-20260418/brainstorms.md`
-- reopen_of_issue: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
+- reopen_of_issue: `docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
 - reopen_reason: `post-merge governance replay proved two historical receipt-gap entries for the absorbed runtime lifecycle test-pre-merge batch were still missing from the protected-branch backfill ledger`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/pre-tests.md`
-- tasks_path: `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/tasks.md`
+- pre_tests_path: `docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/pre-tests.md`
+- tasks_path: `docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/tasks.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-runtime-lifecycle-receipt-followthrough-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/code-reviews`
 - current_owner_branch: `feature/runtime-lifecycle-receipt-closeout-reconcile-20260424`
 - current_owner_worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-feature-runtime-lifecycle-receipt-closeout-reconcile`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
-  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
+  - `docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
+  - `docs/B2-docs/ibm/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
 - created_at: `2026-04-18`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
@@ -58,26 +58,26 @@ Continuation `2026-04-25`: the stale replay batch `test-pre-merge-runtime-lifecy
 
 1. The develop-bound followthrough diff carries concrete issue, pre-tests, progress, tasks, and review artifacts.
 2. `protected-branch-merge-receipt-backfills.md` contains the missing `dc436573...` and `f7145cc...` entries with bounded owner evidence.
-3. `./bin/pretests-gate --project <worktree> --issue docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md` passes.
+3. `./bin/pretests-gate --project <worktree> --issue docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md` passes.
 4. `./bin/governance-check` passes.
 5. Canonical develop absorbs the ledger repair through guarded replay and the temporary followthrough worktrees are retired after merge.
 
 ## Verification
 
-- `./bin/pretests-gate --project <worktree> --issue docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
+- `./bin/pretests-gate --project <worktree> --issue docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
 - `git diff --check`
 - `./bin/governance-check`
 - `git worktree list`
-- `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260424-runtime-lifecycle-receipt-closeout-reconcile-verification.md`
+- `docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260424-runtime-lifecycle-receipt-closeout-reconcile-verification.md`
 
 ## Completion
 
 - `docs/B1-docs/raw-20260418/brainstorms.md`
 - `docs/B1-docs/raw-20260418/candidates.md`
-- `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
-- `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/tasks.md`
+- `docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
+- `docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/pre-tests.md`
+- `docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/tasks.md`
 - `docs/progress/workspace-routing-foundation/p-runtime-lifecycle-receipt-followthrough-governance.md`
-- `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260418-runtime-lifecycle-receipt-followthrough-verification.md`
-- `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260424-runtime-lifecycle-receipt-closeout-reconcile-verification.md`
+- `docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260418-runtime-lifecycle-receipt-followthrough-verification.md`
+- `docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/code-reviews/20260424-runtime-lifecycle-receipt-closeout-reconcile-verification.md`
 - `docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md`

@@ -1,7 +1,7 @@
 # Verification: live-status-scan-summary-and-prompt-anchor-governance
 
 - issue_id: `I-20260421-1530-A`
-- issue_path: `docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/issues/live-status-scan-summary-and-prompt-anchor-governance.md`
+- issue_path: `docs/B2-docs/ibm/live-status-scan-summary-and-prompt-anchor-governance/issues/live-status-scan-summary-and-prompt-anchor-governance.md`
 - verification_date: `2026-04-21`
 - verifier: `codex`
 - branch: `feature/runtime-status-fast-latest-artifact-lookup-20260421`

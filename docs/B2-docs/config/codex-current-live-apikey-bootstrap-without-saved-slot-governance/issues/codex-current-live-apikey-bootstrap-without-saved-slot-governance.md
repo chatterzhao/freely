@@ -12,9 +12,9 @@
 - source_brainstorm: `docs/B1-docs/raw-20260406/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/codex-current-live-apikey-bootstrap-without-saved-slot-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-codex-current-live-apikey-bootstrap-without-saved-slot-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/codex-current-live-apikey-bootstrap-without-saved-slot-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/code-reviews`
 
 ## Why
 
@@ -35,9 +35,9 @@ Freely still needs a bounded owner for the case where current live Codex auth is
 
 ## Verification
 
-- `docs/epics/workspace-routing-foundation/codex-current-live-apikey-bootstrap-without-saved-slot-governance/code-reviews/20260406-codex-current-live-apikey-bootstrap-without-saved-slot-verification.md`
-- `docs/epics/workspace-routing-foundation/codex-current-live-apikey-bootstrap-without-saved-slot-governance/code-reviews/20260406-codex-current-live-apikey-bootstrap-without-saved-slot-implementation-decision.md`
-- `docs/epics/workspace-routing-foundation/codex-current-live-apikey-bootstrap-without-saved-slot-governance/code-reviews/20260406-codex-current-live-apikey-bootstrap-without-saved-slot-canonical-closeout-verification.md`
+- `docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/code-reviews/20260406-codex-current-live-apikey-bootstrap-without-saved-slot-verification.md`
+- `docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/code-reviews/20260406-codex-current-live-apikey-bootstrap-without-saved-slot-implementation-decision.md`
+- `docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/code-reviews/20260406-codex-current-live-apikey-bootstrap-without-saved-slot-canonical-closeout-verification.md`
 
 ## Retirement Handoff
 

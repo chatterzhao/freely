@@ -19,7 +19,7 @@
 - priority: P0
 - status: promoted
 - decision_reason: 这是 Freely 从“manager process alive”走向“manager genuinely supervising the fleet”的关键一步；不先研究清楚，后续自动监督仍会停在 runtime 层。
-- promoted_issue_path: docs/epics/workspace-routing-foundation/manager-reactivation-and-fleet-patrol-governance/issues/manager-reactivation-and-fleet-patrol-governance.md
+- promoted_issue_path: docs/B2-docs/ibm/manager-reactivation-and-fleet-patrol-governance/issues/manager-reactivation-and-fleet-patrol-governance.md
 - legacy_id_mapping: I-20260321-0345  # 历史遗留的 issue id
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs:

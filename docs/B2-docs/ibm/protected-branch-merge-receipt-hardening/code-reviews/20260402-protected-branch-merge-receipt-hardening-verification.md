@@ -1,7 +1,7 @@
 # Verification: protected-branch-merge-receipt-hardening
 
 - issue_id: `I-20260402-1912-A`
-- issue_path: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md`
+- issue_path: `docs/B2-docs/ibm/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md`
 - branch: `feature/protected-branch-merge-receipt-hardening-20260402-1912`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-1912-feature-protected-branch-merge-receipt-hardening`
 - verification_date: `2026-04-02`

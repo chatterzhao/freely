@@ -29,7 +29,7 @@ title: Fix write_task_mode ordering — ensure DB daemon running first
 - PRD: `docs/epics/write-task-mode-ordering/prd.md`
 - Pre-tests: `docs/epics/write-task-mode-ordering/pre-tests.md`
 - Tasks: `docs/epics/write-task-mode-ordering/tasks.md`
-- Code review: `docs/epics/write-task-mode-ordering/code-reviews/review.md`
+- Code review: `docs/B2-docs/write-task-mode-ordering/code-reviews/review.md`
 
 ### Implementation
 - `docs/system/workspace/scripts/runtime/freely` — Added ensure_freely_db before write_task_mode in cmd_start() and cmd_daemon_start()

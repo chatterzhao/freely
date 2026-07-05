@@ -6,7 +6,7 @@
 - runtime_state: `stopped`
 - branch: `feature/upstream-governance-merge-prep-20260327`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260327-feature-upstream-governance-merge-prep`
-- issue_path: `docs/epics/workspace-routing-foundation/context-compaction-continuity-guard-salvage/issues/context-compaction-continuity-guard-salvage.md`
+- issue_path: `docs/B2-docs/ibm/context-compaction-continuity-guard-salvage/issues/context-compaction-continuity-guard-salvage.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "salvage-closeout-writeback"}
 

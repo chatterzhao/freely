@@ -12,9 +12,9 @@
 - source_brainstorm: `docs/B1-docs/raw-20260413/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/ibm/manager-startup-continuity-materialization-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-manager-startup-continuity-materialization-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/manager-startup-continuity-materialization-governance/code-reviews`
 - follow_on_to: `I-20260413-0420-B`
 - created_at: `2026-04-13`
 - session_refs:
@@ -63,11 +63,11 @@ That leaves Freely with a narrow but real product defect: the outer loop can be 
 - required_doc_refs:
   - `docs/B1-docs/raw-20260413/brainstorms.md`
   - `docs/B1-docs/raw-20260413/candidates.md`
-  - `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/issues/manager-startup-continuity-contract-governance.md`
-  - `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/brainstorms/b-manager-startup-continuity-materialization-governance.md`
-  - `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/prd.md`
-  - `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/tasks.md`
+  - `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/issues/manager-startup-continuity-contract-governance.md`
+  - `docs/B2-docs/ibm/manager-startup-continuity-materialization-governance/brainstorms/b-manager-startup-continuity-materialization-governance.md`
+  - `docs/B2-docs/ibm/manager-startup-continuity-materialization-governance/prd.md`
+  - `docs/B2-docs/ibm/manager-startup-continuity-materialization-governance/pre-tests.md`
+  - `docs/B2-docs/ibm/manager-startup-continuity-materialization-governance/tasks.md`
   - `docs/system/workspace/scripts/runtime/freely`
   - `docs/system/workspace/scripts/tests/test-freely-manager-startup-continuity-stub-materialization`
   - `docs/system/workspace/scripts/tests/test-freely-live-status-manager-handoff-state-surface`
@@ -76,9 +76,9 @@ That leaves Freely with a narrow but real product defect: the outer loop can be 
 
 ## Verification
 
-- `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-implementation-decision.md`
-- `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-verification.md`
-- `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-closeout-verification.md`
+- `docs/B2-docs/ibm/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-implementation-decision.md`
+- `docs/B2-docs/ibm/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-verification.md`
+- `docs/B2-docs/ibm/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-closeout-verification.md`
 - `bash -n docs/system/workspace/scripts/runtime/freely`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-startup-continuity-stub-materialization`
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status-manager-handoff-state-surface`
@@ -90,14 +90,14 @@ That leaves Freely with a narrow but real product defect: the outer loop can be 
 ## Completion
 
 - `docs/B1-docs/raw-20260413/candidates.md`
-- `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/issues/manager-startup-continuity-materialization-governance.md`
-- `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/brainstorms/b-manager-startup-continuity-materialization-governance.md`
-- `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/tasks.md`
-- `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-implementation-decision.md`
-- `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-verification.md`
-- `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-closeout-verification.md`
+- `docs/B2-docs/ibm/manager-startup-continuity-materialization-governance/issues/manager-startup-continuity-materialization-governance.md`
+- `docs/B2-docs/ibm/manager-startup-continuity-materialization-governance/brainstorms/b-manager-startup-continuity-materialization-governance.md`
+- `docs/B2-docs/ibm/manager-startup-continuity-materialization-governance/prd.md`
+- `docs/B2-docs/ibm/manager-startup-continuity-materialization-governance/pre-tests.md`
+- `docs/B2-docs/ibm/manager-startup-continuity-materialization-governance/tasks.md`
+- `docs/B2-docs/ibm/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-implementation-decision.md`
+- `docs/B2-docs/ibm/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-verification.md`
+- `docs/B2-docs/ibm/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-closeout-verification.md`
 - `docs/progress/workspace-routing-foundation/p-manager-startup-continuity-materialization-governance.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-manager-startup-continuity-stub-materialization`

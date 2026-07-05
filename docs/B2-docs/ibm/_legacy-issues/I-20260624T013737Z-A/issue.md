@@ -20,14 +20,14 @@ intake_id: ""
 author: zhaoquan
 channel: freely-feat-execution
 session_refs: []
-pre_tests_path: docs/epics/tool-registry-toml/verification/pre-tests.md
+pre_tests_path: docs/B2-docs/tool-registry-toml/verification/pre-tests.md
 verification_artifact_dir: docs/epics/tool-registry-toml/code-reviews
 ---
 
 # I-20260624T013737Z-A: tool-registry TOML 配置驱动注册表（Phase 1+2）
 
 - source_candidate: `docs/B1-docs/raw-20260624T013737Z/candidates.md#C-20260624T013737Z-A`
-- pre_tests_path: `docs/epics/tool-registry-toml/verification/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/tool-registry-toml/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/tool-registry-toml/code-reviews`
 - milestone: M-20260624T013737Z-A
 

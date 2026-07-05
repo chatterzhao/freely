@@ -12,12 +12,12 @@
 - source_brainstorm: `docs/B1-docs/raw-20260405/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/config/packaging/pre-tests.md`
 - progress_path: `docs/progress/freely-product-architecture/p-fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
-- verification_artifact_dir: `docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/config/packaging/code-reviews`
 - depends_on:
-  - `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/issues/worktree-tool-boundary-bootstrap-governance.md`
-  - `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
+  - `docs/B2-docs/config/packaging/issues/worktree-tool-boundary-bootstrap-governance.md`
+  - `docs/B2-docs/config/packaging/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
   - `docs/system/workspace/scripts/runtime/freely`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
@@ -66,14 +66,14 @@ This is a first-hop CLI contract bug. If fresh-project bootstrap is wrong, every
 
 - `docs/B1-docs/raw-20260405/candidates.md`
 - `docs/milestones.md`
-- `docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
-- `docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/code-reviews/20260406-fresh-project-bootstrap-and-baseline-scoping-followthrough-verification.md`
-- `docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/code-reviews/20260406-fresh-project-bootstrap-and-baseline-scoping-followthrough-canonical-closeout-verification.md`
+- `docs/B2-docs/config/packaging/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
+- `docs/B2-docs/config/packaging/code-reviews/20260406-fresh-project-bootstrap-and-baseline-scoping-followthrough-verification.md`
+- `docs/B2-docs/config/packaging/code-reviews/20260406-fresh-project-bootstrap-and-baseline-scoping-followthrough-canonical-closeout-verification.md`
 - `docs/progress/freely-product-architecture/p-fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-sync-tooling-fresh-project-bootstrap`
 
 ## Next
 
-- Completed on canonical `develop` after guarded promotion through `test-pre-merge-fresh-project-bootstrap-baseline-scoping-followthrough-20260406-1935` and closeout verification recorded in `docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/code-reviews/20260406-fresh-project-bootstrap-and-baseline-scoping-followthrough-canonical-closeout-verification.md`.
+- Completed on canonical `develop` after guarded promotion through `test-pre-merge-fresh-project-bootstrap-baseline-scoping-followthrough-20260406-1935` and closeout verification recorded in `docs/B2-docs/config/packaging/code-reviews/20260406-fresh-project-bootstrap-and-baseline-scoping-followthrough-canonical-closeout-verification.md`.
 - Reopen only if fresh-project sync stops retargeting baseline truth to the requested project, `.githooks` disappear again on sync/init replay, or baseline/status surfaces drift back to the source repo.

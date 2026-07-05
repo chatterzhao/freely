@@ -48,7 +48,7 @@
 - case_design: `Replay partial metadata and branch-only worker prompts, then confirm the worker contract file and workcell state retain the blocked reason plus missing-fields projection.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/launch-time-verification-contract-hard-gate-governance/code-reviews/20260411-launch-time-verification-contract-hard-gate-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/launch-time-verification-contract-hard-gate-governance/code-reviews/20260411-launch-time-verification-contract-hard-gate-verification.md`
 
 ### Complete metadata still launches
 - id: `launch-complete-metadata-pass`
@@ -60,7 +60,7 @@
 - case_design: `Use a fully populated worker prompt to prove delegated intake materialization, runtime contract capture, and active-worker reentry still work after hard-gating is enabled.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/launch-time-verification-contract-hard-gate-governance/code-reviews/20260411-launch-time-verification-contract-hard-gate-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/launch-time-verification-contract-hard-gate-governance/code-reviews/20260411-launch-time-verification-contract-hard-gate-verification.md`
 
 ### Branch-only fallback is explicitly resolved
 - id: `branch-only-prompt-launch-policy`
@@ -72,7 +72,7 @@
 - case_design: `Replay branch-only prompt, unresolved worktree, missing prompt, stale cache, and malformed recovery fixtures to prove the runtime now fails closed while preserving operator-facing diagnostics.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/launch-time-verification-contract-hard-gate-governance/code-reviews/20260411-launch-time-verification-contract-hard-gate-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/launch-time-verification-contract-hard-gate-governance/code-reviews/20260411-launch-time-verification-contract-hard-gate-verification.md`
 
 ### Guarded develop promote proves launch-time adequacy
 - id: `develop-promote-launch-gate-proof`
@@ -84,4 +84,4 @@
 - case_design: `Merge the feature lane into a disposable test-pre-merge batch through pr-merge-guarded, rerun the launch-time regressions plus governance-check there, and use the resulting verification artifact to prove the develop-bound lane/gate pair is explicitly covered.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/launch-time-verification-contract-hard-gate-governance/code-reviews/20260411-launch-time-verification-contract-hard-gate-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/launch-time-verification-contract-hard-gate-governance/code-reviews/20260411-launch-time-verification-contract-hard-gate-verification.md`

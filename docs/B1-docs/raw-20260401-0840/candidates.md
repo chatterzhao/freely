@@ -23,7 +23,7 @@
   - prove at least one live chain where current tool fails, Codex current slot is dead, and manager still reaches a usable later slot before relaunch
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/issues/all-tools-unified-slot-contract-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/all-tools-unified-slot-contract-governance/issues/all-tools-unified-slot-contract-governance.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`

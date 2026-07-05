@@ -1,7 +1,7 @@
 # Progress: memark-protected-root-bootstrap-followthrough-governance
 
 - issue_id: `I-20260416-0448-A`
-- issue_path: `docs/epics/freely-product-architecture/memark-protected-root-bootstrap-followthrough-governance/issues/memark-protected-root-bootstrap-followthrough-governance.md`
+- issue_path: `docs/B2-docs/config/packaging/issues/memark-protected-root-bootstrap-followthrough-governance.md`
 - title: `MemArk protected-root bootstrap followthrough governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -26,7 +26,7 @@
 - `/Users/zhaoyu/.memark/venv/bin/memark status --workspace /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-memark-init --project freely --json`
 - `/Users/zhaoyu/.memark/venv/bin/memark context --workspace /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-memark-init --project freely --no-refresh`
 - `./bin/governance-check`
-- `docs/epics/freely-product-architecture/memark-protected-root-bootstrap-followthrough-governance/code-reviews/20260416-memark-protected-root-bootstrap-followthrough-verification.md`
+- `docs/B2-docs/config/packaging/code-reviews/20260416-memark-protected-root-bootstrap-followthrough-verification.md`
 
 ## Next Action
 

@@ -12,8 +12,8 @@
 - source_brainstorm: `docs/B1-docs/raw-20260329/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/sensitive-local-artifact-ignore-governance/pre-tests.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/sensitive-local-artifact-ignore-governance/code-reviews`
+- pre_tests_path: `docs/B2-docs/ibm/sensitive-local-artifact-ignore-governance/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/ibm/sensitive-local-artifact-ignore-governance/code-reviews`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -57,10 +57,10 @@
 - `.gitignore`
 - `docs/system/workspace/scripts/tests/test-sensitive-local-artifact-ignore-governance`
 - `docs/B1-docs/raw-20260329/brainstorms.md`
-- `docs/epics/workspace-routing-foundation/sensitive-local-artifact-ignore-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/sensitive-local-artifact-ignore-governance/tasks.md`
+- `docs/B2-docs/ibm/sensitive-local-artifact-ignore-governance/pre-tests.md`
+- `docs/B2-docs/ibm/sensitive-local-artifact-ignore-governance/tasks.md`
 
 ## Next
 
-- `2026-03-30 17:34 PDT` the minimal ignore contract is already absorbed by `develop` commit `208c591`, with completion evidence recorded in `docs/epics/workspace-routing-foundation/sensitive-local-artifact-ignore-governance/code-reviews/20260330-sensitive-local-artifact-ignore-verification.md`.
+- `2026-03-30 17:34 PDT` the minimal ignore contract is already absorbed by `develop` commit `208c591`, with completion evidence recorded in `docs/B2-docs/ibm/sensitive-local-artifact-ignore-governance/code-reviews/20260330-sensitive-local-artifact-ignore-verification.md`.
 - Any broader sensitive-artifact family should open a new lifecycle instead of reopening this completed owner.

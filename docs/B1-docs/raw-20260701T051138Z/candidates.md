@@ -7,5 +7,5 @@ milestone: M-20260701T051138Z-A
 ## C-20260701T051138Z-A: workflow chain reorder
 - milestone: M-20260701T051138Z-A
 - promoted_issue_id: I-20260701T051138Z-A
-- promoted_issue_path: docs/epics/workflow-chain/fix-order/raw-20260701T051138Z/issues/I-20260701T051138Z-A.md
+- promoted_issue_path: docs/B2-docs/ibm/workflow/raw-20260701T051138Z/issues/I-20260701T051138Z-A.md
 - status: promoted

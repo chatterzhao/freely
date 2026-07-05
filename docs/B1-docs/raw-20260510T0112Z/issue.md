@@ -41,6 +41,6 @@ phase_state: completed
 promoted_from: raw-20260510T0112Z
 source_candidate: docs/B1-docs/raw-20260510T0112Z/candidates.md
 verification_artifact_dir: docs/epics/wait-restart-fix/code-reviews
-pre_tests_path: docs/epics/wait-restart-fix/verification/pre-tests.md
+pre_tests_path: docs/B2-docs/wait-restart-fix/verification/pre-tests.md
 platform_state: ''
 # I-20260510T0112Z-A: L223 task_mode wait 判断

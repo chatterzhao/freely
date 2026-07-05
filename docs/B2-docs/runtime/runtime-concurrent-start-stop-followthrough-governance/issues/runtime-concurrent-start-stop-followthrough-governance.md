@@ -12,12 +12,12 @@
 - source_brainstorm: `docs/B1-docs/raw-20260408/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/runtime/runtime-concurrent-start-stop-followthrough-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-runtime-concurrent-start-stop-followthrough-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/runtime/runtime-concurrent-start-stop-followthrough-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
-  - `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/issues/project-command-semantics-and-restore-work-governance.md`
+  - `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
+  - `docs/B2-docs/ibm/project-command-semantics-and-restore-work-governance/issues/project-command-semantics-and-restore-work-governance.md`
   - `docs/system/workspace/scripts/runtime/freely`
   - `docs/system/workspace/scripts/tests/test-freely-status-latest-generated-manager-continuity-surface`
 - created_at: `2026-04-11`
@@ -77,13 +77,13 @@ That remaining work needs a bounded develop-bound owner instead of staying as ca
 ## Completion
 
 - `docs/B1-docs/raw-20260408/candidates.md`
-- `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/issues/runtime-concurrent-start-stop-followthrough-governance.md`
-- `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/brainstorms/b-runtime-concurrent-start-stop-followthrough-governance.md`
-- `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/tasks.md`
-- `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/code-reviews/20260411-runtime-concurrent-start-stop-followthrough-implementation-decision.md`
-- `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/code-reviews/20260411-runtime-concurrent-start-stop-followthrough-verification.md`
+- `docs/B2-docs/runtime/runtime-concurrent-start-stop-followthrough-governance/issues/runtime-concurrent-start-stop-followthrough-governance.md`
+- `docs/B2-docs/runtime/runtime-concurrent-start-stop-followthrough-governance/brainstorms/b-runtime-concurrent-start-stop-followthrough-governance.md`
+- `docs/B2-docs/runtime/runtime-concurrent-start-stop-followthrough-governance/prd.md`
+- `docs/B2-docs/runtime/runtime-concurrent-start-stop-followthrough-governance/pre-tests.md`
+- `docs/B2-docs/runtime/runtime-concurrent-start-stop-followthrough-governance/tasks.md`
+- `docs/B2-docs/runtime/runtime-concurrent-start-stop-followthrough-governance/code-reviews/20260411-runtime-concurrent-start-stop-followthrough-implementation-decision.md`
+- `docs/B2-docs/runtime/runtime-concurrent-start-stop-followthrough-governance/code-reviews/20260411-runtime-concurrent-start-stop-followthrough-verification.md`
 - `docs/progress/workspace-routing-foundation/p-runtime-concurrent-start-stop-followthrough-governance.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-does-not-double-launch-during-degraded-starting-grace`
@@ -93,5 +93,5 @@ That remaining work needs a bounded develop-bound owner instead of staying as ca
 ## Next
 
 - Completed on canonical `develop` via guarded merge `bf7e5a16`.
-- Post-merge closeout verification is recorded in `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/code-reviews/20260411-runtime-concurrent-start-stop-followthrough-canonical-closeout-verification.md`.
+- Post-merge closeout verification is recorded in `docs/B2-docs/runtime/runtime-concurrent-start-stop-followthrough-governance/code-reviews/20260411-runtime-concurrent-start-stop-followthrough-canonical-closeout-verification.md`.
 - Reopen only if canonical `develop` again regresses same-project bootstrap attach reuse, project-scoped stop breadth, or stop-marker preservation.

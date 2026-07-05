@@ -1,7 +1,7 @@
 # Verification: launch-time-verification-contract-hard-gate-governance
 
 - issue_id: `I-20260411-1414-A`
-- issue_path: `docs/epics/workspace-routing-foundation/launch-time-verification-contract-hard-gate-governance/issues/launch-time-verification-contract-hard-gate-governance.md`
+- issue_path: `docs/B2-docs/ibm/launch-time-verification-contract-hard-gate-governance/issues/launch-time-verification-contract-hard-gate-governance.md`
 - verification_date: `2026-04-12`
 - verifier: `codex`
 

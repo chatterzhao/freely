@@ -12,11 +12,11 @@
 - source_brainstorm: `docs/B1-docs/raw-20260330/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/runtime-network-failure-taxonomy-and-bounded-recovery-governance/pre-tests.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/runtime-network-failure-taxonomy-and-bounded-recovery-governance/code-reviews`
+- pre_tests_path: `docs/B2-docs/runtime/runtime-network-failure-taxonomy-and-bounded-recovery-governance/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/runtime/runtime-network-failure-taxonomy-and-bounded-recovery-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/issues/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance.md`
-  - `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/issues/all-tools-unified-slot-contract-governance.md`
+  - `docs/B2-docs/ibm/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/issues/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance.md`
+  - `docs/B2-docs/ibm/all-tools-unified-slot-contract-governance/issues/all-tools-unified-slot-contract-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -71,9 +71,9 @@ This owner fixes that narrow gap without redesigning the broader availability sy
 - `docs/B1-docs/raw-20260330/candidates.md`
 - `docs/B1-docs/raw-INDEX.md`
 - `docs/milestones.md`
-- `docs/epics/workspace-routing-foundation/runtime-network-failure-taxonomy-and-bounded-recovery-governance/issues/runtime-network-failure-taxonomy-and-bounded-recovery-governance.md`
-- `docs/epics/workspace-routing-foundation/runtime-network-failure-taxonomy-and-bounded-recovery-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/runtime-network-failure-taxonomy-and-bounded-recovery-governance/code-reviews/20260401-runtime-network-failure-taxonomy-and-bounded-recovery-verification.md`
+- `docs/B2-docs/runtime/runtime-network-failure-taxonomy-and-bounded-recovery-governance/issues/runtime-network-failure-taxonomy-and-bounded-recovery-governance.md`
+- `docs/B2-docs/runtime/runtime-network-failure-taxonomy-and-bounded-recovery-governance/pre-tests.md`
+- `docs/B2-docs/runtime/runtime-network-failure-taxonomy-and-bounded-recovery-governance/code-reviews/20260401-runtime-network-failure-taxonomy-and-bounded-recovery-verification.md`
 - `docs/progress/workspace-routing-foundation/p-runtime-network-failure-taxonomy-and-bounded-recovery-governance.md`
 - `docs/system/workspace/tools.md`
 - `docs/system/workspace/scripts/runtime/freely`

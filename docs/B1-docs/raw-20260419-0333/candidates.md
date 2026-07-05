@@ -16,7 +16,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - priority: `P1`
 - promoted_issue_id: `I-20260419-0333-A`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/issues/runtime-closeout-selfhost-validation-followthrough-governance.md`
+- promoted_issue_path: `docs/B2-docs/runtime/runtime-closeout-selfhost-validation-followthrough-governance/issues/runtime-closeout-selfhost-validation-followthrough-governance.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:

@@ -1,7 +1,7 @@
 # Verification: runtime-daemon-self-loop-followthrough-governance active authoritative worker prompt premerge replay
 
 - issue_id: `I-20260421-1200-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
 - verification_date: `2026-04-24`
 - verifier: `codex`
 - lane: `test-pre-merge-20260424-active-authoritative-worker-prompt-consumption`
@@ -19,7 +19,7 @@
 1. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-active-authoritative-worker-consumes-prompt`
 2. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-busy-worker-queue`
 3. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-manager-launch-state-refresh-supersedes-queued-prompt-with-manager-continuity`
-4. `./bin/test-lane premerge-integration -- ./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-test-pre-merge-active-authoritative-worker-prompt-consumption --issue docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
+4. `./bin/test-lane premerge-integration -- ./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260424-test-pre-merge-active-authoritative-worker-prompt-consumption --issue docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
 5. `./bin/test-lane premerge-integration -- ./bin/governance-check`
 
 ## Implementation Decision Note

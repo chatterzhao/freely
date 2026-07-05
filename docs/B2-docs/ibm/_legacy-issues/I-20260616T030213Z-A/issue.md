@@ -4,8 +4,8 @@ kind: linked
 phase_state: done_b2_ibm
 promoted_from: raw-20260616T030213Z
 source_candidate: docs/B1-docs/raw-20260616T030213Z/candidates.md
-canonical_issue_path: docs/epics/gate-scope-alignment/issues/I-20260616T030213Z-A.md
-pre_tests_path: docs/epics/gate-scope-alignment/verification/pre-tests.md
+canonical_issue_path: docs/B2-docs/gate-scope-alignment/issues/I-20260616T030213Z-A.md
+pre_tests_path: docs/B2-docs/gate-scope-alignment/verification/pre-tests.md
 verification_artifact_dir: docs/epics/gate-scope-alignment/code-reviews
 platform_ids:
   github:

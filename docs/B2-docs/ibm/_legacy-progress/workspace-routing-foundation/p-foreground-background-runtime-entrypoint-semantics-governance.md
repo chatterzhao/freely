@@ -1,7 +1,7 @@
 # Progress: foreground-background-runtime-entrypoint-semantics-governance
 
 - issue_id: `I-20260413-0208-A`
-- issue_path: `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/issues/foreground-background-runtime-entrypoint-semantics-governance.md`
+- issue_path: `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/issues/foreground-background-runtime-entrypoint-semantics-governance.md`
 - title: `Foreground/background runtime entrypoint semantics governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -38,14 +38,14 @@ This owner is now closed on canonical `develop`:
 - `bash docs/system/workspace/scripts/tests/test-freely-runtime-supervisor-event-log`
 - `bash docs/system/workspace/scripts/tests/test-freely-stop-terminates-all-same-project-supervisors`
 - `./bin/governance-check`
-- `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-verification.md`
-- `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-closeout-verification.md`
+- `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-verification.md`
+- `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-closeout-verification.md`
 
 ## Closure Evidence
 
 1. `develop` merge `1b55aae6`
-2. `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-verification.md`
-3. `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-closeout-verification.md`
+2. `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-verification.md`
+3. `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-closeout-verification.md`
 
 ## Next Action
 

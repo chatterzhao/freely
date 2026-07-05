@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO4C
     synced_at: '2026-04-27T13:13:09Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/source-routing-and-derived-worktree-governance/issues/source-routing-and-derived-worktree-governance.md
+canonical_issue_path: docs/B2-docs/ibm/source-routing-and-derived-worktree-governance/issues/source-routing-and-derived-worktree-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:13:15Z'
 hash: ''
@@ -31,4 +31,4 @@ platform_state: closed
 - skill 以情景步骤而不是抽象约束来指导 AI 执行
 - 首跳在同工具场景下必须继续执行第二跳，而不是把 `next_prompt` 当作终点
 
-canonical: docs/epics/workspace-routing-foundation/source-routing-and-derived-worktree-governance/issues/source-routing-and-derived-worktree-governance.md
+canonical: docs/B2-docs/ibm/source-routing-and-derived-worktree-governance/issues/source-routing-and-derived-worktree-governance.md

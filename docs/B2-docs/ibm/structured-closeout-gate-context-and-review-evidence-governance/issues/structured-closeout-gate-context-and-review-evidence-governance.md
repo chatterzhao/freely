@@ -12,12 +12,12 @@
 - source_brainstorm: `docs/B1-docs/raw-20260412/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/pre-tests.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/code-reviews`
+- pre_tests_path: `docs/B2-docs/ibm/structured-closeout-gate-context-and-review-evidence-governance/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/ibm/structured-closeout-gate-context-and-review-evidence-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
-  - `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/issues/implementation-decision-notes-in-issue-review-artifacts-governance.md`
-  - `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/issues/pre-tests-cleanup-and-retirement-enforcement-governance.md`
+  - `docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
+  - `docs/B2-docs/ibm/implementation-decision-notes-in-issue-review-artifacts-governance/issues/implementation-decision-notes-in-issue-review-artifacts-governance.md`
+  - `docs/B2-docs/ibm/pre-tests-cleanup-and-retirement-enforcement-governance/issues/pre-tests-cleanup-and-retirement-enforcement-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -53,12 +53,12 @@
 ## Completion
 
 - `docs/B1-docs/raw-20260412/candidates.md`
-- `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md`
-- `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/brainstorms/b-structured-closeout-gate-context-and-review-evidence-governance.md`
-- `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/tasks.md`
-- `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/code-reviews/20260412-structured-closeout-gate-context-and-review-evidence-verification.md`
+- `docs/B2-docs/ibm/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md`
+- `docs/B2-docs/ibm/structured-closeout-gate-context-and-review-evidence-governance/brainstorms/b-structured-closeout-gate-context-and-review-evidence-governance.md`
+- `docs/B2-docs/ibm/structured-closeout-gate-context-and-review-evidence-governance/prd.md`
+- `docs/B2-docs/ibm/structured-closeout-gate-context-and-review-evidence-governance/pre-tests.md`
+- `docs/B2-docs/ibm/structured-closeout-gate-context-and-review-evidence-governance/tasks.md`
+- `docs/B2-docs/ibm/structured-closeout-gate-context-and-review-evidence-governance/code-reviews/20260412-structured-closeout-gate-context-and-review-evidence-verification.md`
 - `docs/progress/workspace-routing-foundation/p-structured-closeout-gate-context-and-review-evidence-governance.md`
 - `docs/system/workspace/agents/manager-agent.md`
 - `docs/system/workspace/agents/worker-agent.md`

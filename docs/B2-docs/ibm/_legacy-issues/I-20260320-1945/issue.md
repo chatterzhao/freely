@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO5P
     synced_at: '2026-04-27T13:14:21Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/watchdog-live-status-surface-and-manager-supervision/issues/watchdog-live-status-surface-and-manager-supervision.md
+canonical_issue_path: docs/B2-docs/runtime/watchdog-live-status-surface-and-manager-supervision/issues/watchdog-live-status-surface-and-manager-supervision.md
 last_synced_comment_at:
   github: '2026-04-27T11:14:37Z'
 hash: ''
@@ -30,4 +30,4 @@ Freely 已经有 runtime watchdog、manager continuity、interruption intake 和
 - 主管监督缺少 canonical current-state 入口
 - 用户需要手工拼 `baseline-status + prompt + continuity + ps + jsonl`
 
-canonical: docs/epics/workspace-routing-foundation/watchdog-live-status-surface-and-manager-supervision/issues/watchdog-live-status-surface-and-manager-supervision.md
+canonical: docs/B2-docs/runtime/watchdog-live-status-surface-and-manager-supervision/issues/watchdog-live-status-surface-and-manager-supervision.md

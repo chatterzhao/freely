@@ -12,5 +12,5 @@ milestone: M-20260703T051533Z-A
 absorbed_into: I-20260703T051533Z-A
 - decision_reason: 删除 git 跟踪的 pyc 文件，.gitignore 已有规则
 - promoted_issue_id: I-20260703T051533Z-A
-- promoted_issue_path: docs/epics/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
+- promoted_issue_path: docs/B2-docs/git-hygiene/untracked-pycache/raw-20260703T051533Z/issues/I-20260703T051533Z-A.md
 - milestone: M-20260703T051533Z-A

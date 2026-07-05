@@ -1,7 +1,7 @@
 # Progress: manager-task-source-scan-idle-replan-boundary-governance
 
 - issue_id: `I-20260420-1130-A`
-- issue_path: `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/issues/manager-task-source-scan-idle-replan-boundary-governance.md`
+- issue_path: `docs/B2-docs/ibm/manager-task-source-scan-idle-replan-boundary-governance/issues/manager-task-source-scan-idle-replan-boundary-governance.md`
 - title: `Manager task-source scan idle/replan boundary governance`
 - phase_state: `completed`
 - runtime_state: `stopped`

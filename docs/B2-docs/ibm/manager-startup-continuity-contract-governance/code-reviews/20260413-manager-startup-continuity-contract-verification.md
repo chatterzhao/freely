@@ -1,7 +1,7 @@
 # Verification: manager-startup-continuity-contract-governance
 
 - issue_id: `I-20260413-0420-B`
-- issue_path: `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/issues/manager-startup-continuity-contract-governance.md`
+- issue_path: `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/issues/manager-startup-continuity-contract-governance.md`
 - branch: `feature/manager-startup-continuity-contract-governance-20260413`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260413-feature-manager-startup-continuity-contract-governance`
 - verification_date: `2026-04-13`
@@ -17,12 +17,12 @@ Verify that the new owner:
 
 ## Evidence
 
-- `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/issues/manager-startup-continuity-contract-governance.md`
-- `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/brainstorms/b-manager-startup-continuity-contract-governance.md`
-- `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/tasks.md`
-- `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/code-reviews/20260413-manager-startup-continuity-contract-decision.md`
+- `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/issues/manager-startup-continuity-contract-governance.md`
+- `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/brainstorms/b-manager-startup-continuity-contract-governance.md`
+- `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/prd.md`
+- `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/pre-tests.md`
+- `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/tasks.md`
+- `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/code-reviews/20260413-manager-startup-continuity-contract-decision.md`
 - `docs/progress/workspace-routing-foundation/p-manager-startup-continuity-contract-governance.md`
 - `docs/B1-docs/raw-20260413/candidates.md`
 - `docs/B1-docs/raw-20260413/brainstorms.md`

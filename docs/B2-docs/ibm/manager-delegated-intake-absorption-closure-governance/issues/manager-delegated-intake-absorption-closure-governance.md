@@ -7,15 +7,15 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `manager-delegated-intake-absorption-closure-governance`
 - issue-name: `manager-delegated-intake-absorption-closure-governance`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/manager-delegated-intake-absorption-closure-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/manager-delegated-intake-absorption-closure-governance/code-reviews`
 - priority: P0
 - source_candidate: `docs/B1-docs/raw-20260326/candidates.md#c-20260326-0445-a`
 - source_brainstorm: `docs/B1-docs/raw-20260326/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/manager-continuation-handoff-consumption-governance/issues/manager-continuation-handoff-consumption-governance.md`
-  - `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
+  - `docs/B2-docs/ibm/manager-continuation-handoff-consumption-governance/issues/manager-continuation-handoff-consumption-governance.md`
+  - `docs/B2-docs/ibm/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
 
 ## Why
 
@@ -74,7 +74,7 @@ Freely 已经解决了 manager delegated continuation 的：
 - `docs/system/workspace/scripts/tests/test-freely-manager-delegated-intake-absorption-closure`
 - `docs/system/workspace/scripts/tests/test-freely-delegated-continuation-active-prompt-visibility`
 - `docs/progress/workspace-routing-foundation/p-manager-delegated-intake-absorption-closure-governance.md`
-- `docs/epics/workspace-routing-foundation/manager-delegated-intake-absorption-closure-governance/code-reviews/20260326-manager-delegated-intake-absorption-closure-verification.md`
+- `docs/B2-docs/ibm/manager-delegated-intake-absorption-closure-governance/code-reviews/20260326-manager-delegated-intake-absorption-closure-verification.md`
 
 ## Verification
 

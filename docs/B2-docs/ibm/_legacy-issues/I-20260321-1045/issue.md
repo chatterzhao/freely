@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO5V
     synced_at: '2026-04-27T13:14:28Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/stacked-worktree-merge-chain-governance/issues/stacked-worktree-merge-chain-governance.md
+canonical_issue_path: docs/B2-docs/ibm/stacked-worktree-merge-chain-governance/issues/stacked-worktree-merge-chain-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:15:09Z'
 hash: ''
@@ -31,4 +31,4 @@ platform_state: closed
 
 如果 skill 不显式表达这条链路，Freely 仍会反复靠人工经验判断“下一步该合谁、该在哪一层停下、问题归因到哪一层”。
 
-canonical: docs/epics/workspace-routing-foundation/stacked-worktree-merge-chain-governance/issues/stacked-worktree-merge-chain-governance.md
+canonical: docs/B2-docs/ibm/stacked-worktree-merge-chain-governance/issues/stacked-worktree-merge-chain-governance.md

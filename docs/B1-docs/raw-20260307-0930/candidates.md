@@ -14,6 +14,6 @@
 - priority: P0
 - status: promoted
 - decision_reason: 这是当前自治可靠性的结构性缺口；如果不先收敛，AI 在多 worktree / 多 agent 条件下会继续漏掉正确的前置动作。
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/source-routing-and-derived-worktree-governance/issues/source-routing-and-derived-worktree-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/source-routing-and-derived-worktree-governance/issues/source-routing-and-derived-worktree-governance.md`
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs: []

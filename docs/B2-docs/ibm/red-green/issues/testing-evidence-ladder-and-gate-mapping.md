@@ -6,10 +6,10 @@ phase_state: done_b2_ibm
 promoted_from: 'pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates'
 source_candidate: 'docs/B1-docs/raw-20260325/candidates.md#C-20260325-0333-A'
 milestone: M-20260306-workspace-routing-foundation
-canonical_issue_path: docs/epics/testing-evidence-ladder/testing-evidence-ladder-and-gate-mapping/issues/testing-evidence-ladder-and-gate-mapping.md
-pre_tests_path: docs/epics/testing-evidence-ladder/testing-evidence-ladder-and-gate-mapping/pre-tests.md
-tasks_path: docs/epics/testing-evidence-ladder/testing-evidence-ladder-and-gate-mapping/tasks.md
-verification_artifact_dir: docs/epics/testing-evidence-ladder/testing-evidence-ladder-and-gate-mapping/code-reviews
+canonical_issue_path: docs/B2-docs/ibm/red-green/issues/testing-evidence-ladder-and-gate-mapping.md
+pre_tests_path: docs/B2-docs/ibm/red-green/pre-tests.md
+tasks_path: docs/B2-docs/ibm/red-green/tasks.md
+verification_artifact_dir: docs/B2-docs/ibm/red-green/code-reviews
 platform_ids: {}
 platform_state: closed
 updated_at: '2026-05-19T00:00:00Z'

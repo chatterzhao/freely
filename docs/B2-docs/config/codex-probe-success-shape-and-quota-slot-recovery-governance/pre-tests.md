@@ -1,7 +1,7 @@
 # Pre-Tests: codex-probe-success-shape-and-quota-slot-recovery-governance
 
 - issue_id: `I-20260412-0907-A`
-- issue_path: `docs/epics/workspace-routing-foundation/codex-probe-success-shape-and-quota-slot-recovery-governance/issues/codex-probe-success-shape-and-quota-slot-recovery-governance.md`
+- issue_path: `docs/B2-docs/config/codex-probe-success-shape-and-quota-slot-recovery-governance/issues/codex-probe-success-shape-and-quota-slot-recovery-governance.md`
 - acceptance target: `codex hi probe success shape and reconnect-plus-quota slot recovery`
 
 ## Unit
@@ -50,7 +50,7 @@
 - requirement: `The watchdog probe only returns usable when the transcript matches user -> hi -> codex -> response -> tokens used.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/codex-probe-success-shape-and-quota-slot-recovery-governance/code-reviews/20260412-codex-probe-success-shape-and-quota-slot-recovery-verification.md`
+- artifact_ref: `docs/B2-docs/config/codex-probe-success-shape-and-quota-slot-recovery-governance/code-reviews/20260412-codex-probe-success-shape-and-quota-slot-recovery-verification.md`
 - surface_kind: `unit`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -62,7 +62,7 @@
 - requirement: `Reconnect text must not hide explicit 403/quota evidence behind execution_network classification.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/codex-probe-success-shape-and-quota-slot-recovery-governance/code-reviews/20260412-codex-probe-success-shape-and-quota-slot-recovery-verification.md`
+- artifact_ref: `docs/B2-docs/config/codex-probe-success-shape-and-quota-slot-recovery-governance/code-reviews/20260412-codex-probe-success-shape-and-quota-slot-recovery-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -74,7 +74,7 @@
 - requirement: `Reconnect/TLS-only evidence still remains on the bounded execution-network retry path.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/codex-probe-success-shape-and-quota-slot-recovery-governance/code-reviews/20260412-codex-probe-success-shape-and-quota-slot-recovery-verification.md`
+- artifact_ref: `docs/B2-docs/config/codex-probe-success-shape-and-quota-slot-recovery-governance/code-reviews/20260412-codex-probe-success-shape-and-quota-slot-recovery-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -86,7 +86,7 @@
 - requirement: `A bad current account slot should trigger bounded same-tool recovery to the next usable slot during freely start.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/codex-probe-success-shape-and-quota-slot-recovery-governance/code-reviews/20260412-codex-probe-success-shape-and-quota-slot-recovery-verification.md`
+- artifact_ref: `docs/B2-docs/config/codex-probe-success-shape-and-quota-slot-recovery-governance/code-reviews/20260412-codex-probe-success-shape-and-quota-slot-recovery-verification.md`
 - surface_kind: `real_environment`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -98,7 +98,7 @@
 - requirement: `The develop-bound merge uses the same bounded owner evidence and does not rely on missing pre-tests metadata or incomplete review notes.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/codex-probe-success-shape-and-quota-slot-recovery-governance/code-reviews/20260412-codex-probe-success-shape-and-quota-slot-recovery-verification.md`
+- artifact_ref: `docs/B2-docs/config/codex-probe-success-shape-and-quota-slot-recovery-governance/code-reviews/20260412-codex-probe-success-shape-and-quota-slot-recovery-verification.md`
 - surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`

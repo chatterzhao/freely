@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO6S
     synced_at: '2026-04-27T13:15:03Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md
+canonical_issue_path: docs/B2-docs/ibm/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:17:40Z'
 hash: ''
@@ -34,4 +34,4 @@ Freely 在自举开发中已经形成了两层真源：
 
 这条 issue 的目标不是发明新 loop，也不是继续扩 runtime，而是把上述边界稳定写回 Freely 的产品能力真源，使 Freely 自己和后续用户都能从 agent / skill / reference 里直接读出正确语义。
 
-canonical: docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md
+canonical: docs/B2-docs/ibm/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md

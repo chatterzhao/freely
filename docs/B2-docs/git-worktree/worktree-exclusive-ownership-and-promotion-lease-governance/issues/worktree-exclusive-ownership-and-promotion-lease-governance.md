@@ -12,13 +12,13 @@
 - source_brainstorm: `docs/B1-docs/raw-20260402/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-worktree-exclusive-ownership-and-promotion-lease-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/worktree-hygiene-supervision-control-plane/issues/worktree-hygiene-supervision-control-plane.md`
-  - `docs/epics/workspace-routing-foundation/worktree-fleet-governance-closure/issues/worktree-fleet-governance-closure.md`
-  - `docs/epics/workspace-routing-foundation/develop-merge-issue-binding-and-cmi-governance/issues/develop-merge-issue-binding-and-cmi-governance.md`
+  - `docs/B2-docs/git-worktree/worktree-hygiene-supervision-control-plane/issues/worktree-hygiene-supervision-control-plane.md`
+  - `docs/B2-docs/git-worktree/worktree-fleet-governance-closure/issues/worktree-fleet-governance-closure.md`
+  - `docs/B2-docs/ibm/develop-merge-issue-binding-and-cmi-governance/issues/develop-merge-issue-binding-and-cmi-governance.md`
   - `docs/system/workspace/three-loop-capability-lifecycle.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
@@ -77,11 +77,11 @@ Freely 已经有 manager-first worker scheduling、fleet patrol、hygiene alert�
 
 - `docs/B1-docs/raw-20260402/brainstorms.md`
 - `docs/B1-docs/raw-20260402/candidates.md`
-- `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/issues/worktree-exclusive-ownership-and-promotion-lease-governance.md`
-- `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/brainstorms/b-worktree-exclusive-ownership-and-promotion-lease-governance.md`
-- `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/tasks.md`
+- `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/issues/worktree-exclusive-ownership-and-promotion-lease-governance.md`
+- `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/brainstorms/b-worktree-exclusive-ownership-and-promotion-lease-governance.md`
+- `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/prd.md`
+- `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/pre-tests.md`
+- `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/tasks.md`
 - `docs/milestones.md`
 
 ## Current Evidence

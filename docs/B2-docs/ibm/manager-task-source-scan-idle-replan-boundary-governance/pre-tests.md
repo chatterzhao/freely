@@ -53,7 +53,7 @@
 - requirement: `Runtime publishes a machine-readable patrol seed that includes milestone unresolved work when startup enters an idle manager round.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/code-reviews/20260420-manager-task-source-scan-idle-replan-boundary-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/manager-task-source-scan-idle-replan-boundary-governance/code-reviews/20260420-manager-task-source-scan-idle-replan-boundary-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -66,7 +66,7 @@
 - requirement: `Manager prompt suppresses broad patrol scan regeneration while a stable active worker is already running.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/code-reviews/20260420-manager-task-source-scan-idle-replan-boundary-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/manager-task-source-scan-idle-replan-boundary-governance/code-reviews/20260420-manager-task-source-scan-idle-replan-boundary-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -79,7 +79,7 @@
 - requirement: `Manager regenerates task-source scan after continuity advances only when there is no active worker and the round has truly re-entered idle/replan state.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/code-reviews/20260420-manager-task-source-scan-idle-replan-boundary-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/manager-task-source-scan-idle-replan-boundary-governance/code-reviews/20260420-manager-task-source-scan-idle-replan-boundary-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -92,7 +92,7 @@
 - requirement: `The authoritative premerge batch carries a staged pass owner review artifact proving idle/replan patrol regeneration remains bounded on the guarded develop path.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/code-reviews/20260420-manager-task-source-scan-idle-replan-boundary-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/manager-task-source-scan-idle-replan-boundary-governance/code-reviews/20260420-manager-task-source-scan-idle-replan-boundary-verification.md`
 - surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
@@ -105,7 +105,7 @@
 - requirement: `Recorded self-host runtime evidence shows startup manager rounds consumed patrol seed truth, active-worker rounds suppressed broad patrol, and idle replan regenerated scan only on bounded triggers.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/code-reviews/20260420-manager-task-source-scan-idle-replan-boundary-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/manager-task-source-scan-idle-replan-boundary-governance/code-reviews/20260420-manager-task-source-scan-idle-replan-boundary-verification.md`
 - surface_kind: `real_environment`
 - target_lane: `feature-local`
 - promotion_gate: `completion`

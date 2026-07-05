@@ -12,8 +12,8 @@
 - source_brainstorm: `docs/B1-docs/raw-20260331/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/active-milestone-placement-and-consumption-gate-governance/pre-tests.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/active-milestone-placement-and-consumption-gate-governance/code-reviews`
+- pre_tests_path: `docs/B2-docs/ibm/active-milestone-placement-and-consumption-gate-governance/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/ibm/active-milestone-placement-and-consumption-gate-governance/code-reviews`
 - depends_on:
   - `docs/B1-docs/raw-20260320/candidates.md`
   - `docs/B1-docs/raw-20260321/brainstorms.md`
@@ -69,12 +69,12 @@ Freely 已经把两条规则写成 canonical truth：
 
 - `docs/B1-docs/raw-20260331/brainstorms.md`
 - `docs/B1-docs/raw-20260331/candidates.md`
-- `docs/epics/workspace-routing-foundation/active-milestone-placement-and-consumption-gate-governance/brainstorms/b-active-milestone-placement-and-consumption-gate-governance.md`
-- `docs/epics/workspace-routing-foundation/active-milestone-placement-and-consumption-gate-governance/issues/active-milestone-placement-and-consumption-gate-governance.md`
-- `docs/epics/workspace-routing-foundation/active-milestone-placement-and-consumption-gate-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/active-milestone-placement-and-consumption-gate-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/active-milestone-placement-and-consumption-gate-governance/tasks.md`
-- `docs/epics/workspace-routing-foundation/active-milestone-placement-and-consumption-gate-governance/code-reviews/20260331-active-milestone-placement-gate-verification.md`
+- `docs/B2-docs/ibm/active-milestone-placement-and-consumption-gate-governance/brainstorms/b-active-milestone-placement-and-consumption-gate-governance.md`
+- `docs/B2-docs/ibm/active-milestone-placement-and-consumption-gate-governance/issues/active-milestone-placement-and-consumption-gate-governance.md`
+- `docs/B2-docs/ibm/active-milestone-placement-and-consumption-gate-governance/prd.md`
+- `docs/B2-docs/ibm/active-milestone-placement-and-consumption-gate-governance/pre-tests.md`
+- `docs/B2-docs/ibm/active-milestone-placement-and-consumption-gate-governance/tasks.md`
+- `docs/B2-docs/ibm/active-milestone-placement-and-consumption-gate-governance/code-reviews/20260331-active-milestone-placement-gate-verification.md`
 - `docs/progress/workspace-routing-foundation/p-active-milestone-placement-and-consumption-gate-governance.md`
 - `docs/LAWS.md`
 - `docs/milestones.md`

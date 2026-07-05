@@ -1,7 +1,7 @@
 # Progress: runtime-closeout-selfhost-validation-followthrough-governance
 
 - issue_id: `I-20260419-0333-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/issues/runtime-closeout-selfhost-validation-followthrough-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-closeout-selfhost-validation-followthrough-governance/issues/runtime-closeout-selfhost-validation-followthrough-governance.md`
 - title: `Runtime closeout selfhost validation followthrough governance`
 - phase_state: `completed`
 - runtime_state: `in_verification`
@@ -43,25 +43,25 @@
 6. `bash docs/system/workspace/scripts/tests/test-interruption-manager-handler-cc`
 7. Real replay on `2026-04-19`: first `freely daemon start --project <worktree>` returned `supervisor_pid: 93757`; second `daemon start` was rejected with `daemon start refused: project runtime is already running`
 8. Guarded long-delay replay on `2026-04-19`: first `daemon start` returned `supervisor_pid: 98716`; runtime events recorded `ai_launch_begin`; second `daemon start` 12 seconds later returned exit code `2` with `daemon start refused: project runtime is already running`
-9. `./bin/pretests-gate --project <worktree> --issue docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/issues/runtime-closeout-selfhost-validation-followthrough-governance.md`
-10. `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260419-runtime-closeout-selfhost-validation-followthrough-verification.md`
+9. `./bin/pretests-gate --project <worktree> --issue docs/B2-docs/runtime/runtime-closeout-selfhost-validation-followthrough-governance/issues/runtime-closeout-selfhost-validation-followthrough-governance.md`
+10. `docs/B2-docs/runtime/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260419-runtime-closeout-selfhost-validation-followthrough-verification.md`
 11. `bash docs/system/workspace/scripts/tests/test-freely-worker-repair-prompt-prioritizes-exit-contract`
 12. `bash docs/system/workspace/scripts/tests/test-freely-worker-prompt-includes-exit-contract-directive`
 13. `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-invalid-forces-resume`
 14. `./bin/governance-check`
-15. `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-exit-contract-repair-focus-verification.md`
+15. `docs/B2-docs/runtime/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-exit-contract-repair-focus-verification.md`
 16. `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-repair-handoff-rebinds-cleanup-closeout`
 17. `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-repair-only-done-forces-resume`
 18. `bash docs/system/workspace/scripts/tests/test-freely-worker-exit-contract-done-stops-ai`
-19. `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-cleanup-reentry-verification.md`
+19. `docs/B2-docs/runtime/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-cleanup-reentry-verification.md`
 20. `bash docs/system/workspace/scripts/tests/test-freely-start-workcell-supervisor-syncs-tooling-before-launch`
 21. `bash docs/system/workspace/scripts/tests/test-freely-manager-delegated-supervision-nonbusy-worker-recovers`
-22. `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-worker-recovery-sync-verification.md`
+22. `docs/B2-docs/runtime/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-worker-recovery-sync-verification.md`
 23. `bash docs/system/workspace/scripts/tests/test-freely-manager-exit-contract-resume-writes-continuation-handoff`
 24. `bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-clears-stale-worker-repair-handoff`
 25. Protected replay on `test-pre-merge-20260424-retained-cleanup-owner-rebind-followthrough`: reran `test-freely-manager-exit-contract-resume-writes-continuation-handoff`, `test-freely-manager-worker-launch-clears-stale-worker-repair-handoff`, `test-freely-worker-repair-prompt-prioritizes-exit-contract`, `test-freely-manager-exit-contract-resume-triggers-cleanup-followthrough`, and `test-freely-worker-exit-contract-invalid-forces-resume`
-26. `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-manager-resume-and-stale-worker-handoff-verification.md`
-27. `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-manager-resume-and-stale-worker-handoff-premerge-verification.md`
+26. `docs/B2-docs/runtime/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-manager-resume-and-stale-worker-handoff-verification.md`
+27. `docs/B2-docs/runtime/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-manager-resume-and-stale-worker-handoff-premerge-verification.md`
 
 ## Current Batch Risks
 

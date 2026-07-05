@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO4V
     synced_at: '2026-04-27T13:13:49Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/session-lifecycle-rotation-and-handoff-governance/issues/session-lifecycle-rotation-and-handoff-governance.md
+canonical_issue_path: docs/B2-docs/ibm/session-lifecycle-rotation-and-handoff-governance/issues/session-lifecycle-rotation-and-handoff-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:12:27Z'
 hash: ''
@@ -31,12 +31,12 @@ platform_state: closed
 - epic-name: `workspace-routing-foundation`
 - story-name: `session-lifecycle-rotation-and-handoff-governance`
 - issue-name: `session-lifecycle-rotation-and-handoff-governance`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/session-lifecycle-rotation-and-handoff-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/session-lifecycle-rotation-and-handoff-governance/code-reviews`
 - source_candidate: `docs/B1-docs/raw-20260303/candidates.md#c-20260303-103`
 - source_brainstorm: `docs/B1-docs/raw-20260303/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- depends_on: `docs/epics/workspace-routing-foundation/business-block-vs-system-crash-recovery/issues/business-block-vs-system-crash-recovery.md`
+- depends_on: `docs/B2-docs/runtime/business-block-vs-system-crash-recovery/issues/business-block-vs-system-crash-recovery.md`
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}]
 
 ## Why

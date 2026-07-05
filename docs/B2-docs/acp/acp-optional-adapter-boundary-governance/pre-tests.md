@@ -59,7 +59,7 @@
 - requirement: `ACP boundary freezes ACP as optional adapter layer and direct as first-class path`
 - evidence_level: `mock`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/acp-optional-adapter-boundary-governance/issues/acp-optional-adapter-boundary-governance.md`
+- artifact_ref: `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/issues/acp-optional-adapter-boundary-governance.md`
 
 ### PT-2
 - id: `PT-2`

@@ -7,13 +7,13 @@
 - verification_artifact_dir: docs/epics/issue-sync-before-merge/code-reviews
 - canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260626T155612Z-A/issue.md
 - title: pr-merge-guarded issue-sync before merge + auto-commit
-- pre_tests_path: docs/epics/issue-sync-before-merge/verification/pre-tests.md
+- pre_tests_path: docs/B2-docs/issue-sync-before-merge/verification/pre-tests.md
 
 # I-20260626T155612Z-A: pr-merge-guarded issue-sync before merge + auto-commit
 
 - source_raw: raw-20260626T155612Z
 - source_candidate: docs/B1-docs/raw-20260626T155612Z/candidates.md#C-20260626T155612Z-A
-- pre_tests_path: docs/epics/issue-sync-before-merge/verification/pre-tests.md
+- pre_tests_path: docs/B2-docs/issue-sync-before-merge/verification/pre-tests.md
 - verification_artifact_dir: docs/epics/issue-sync-before-merge/code-reviews
 
 ## 实现

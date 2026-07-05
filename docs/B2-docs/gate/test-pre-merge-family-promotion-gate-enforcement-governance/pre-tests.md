@@ -45,7 +45,7 @@
 - requirement: `Truth-source update and directly coupled gate enforcement are owned by the same lifecycle.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/test-pre-merge-family-promotion-gate-enforcement-governance/issues/test-pre-merge-family-promotion-gate-enforcement-governance.md`
+- artifact_ref: `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/issues/test-pre-merge-family-promotion-gate-enforcement-governance.md`
 
 ### AT-002
 - id: `AT-002`
@@ -59,4 +59,4 @@
 - requirement: `Lifecycle automation remains a later owner.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/test-pre-merge-family-promotion-gate-enforcement-governance/code-reviews/20260405-test-pre-merge-family-promotion-gate-enforcement-verification.md`
+- artifact_ref: `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/code-reviews/20260405-test-pre-merge-family-promotion-gate-enforcement-verification.md`

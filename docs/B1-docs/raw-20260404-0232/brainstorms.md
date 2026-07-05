@@ -20,7 +20,7 @@ After `I-20260401-2354-A`, implementation-bearing diffs must also stage an owner
 ## Verified Repo Facts
 
 1. `docs/system/workspace/scripts/tests/test-governance-merge-gate` case `2d` predates `I-20260401-2354-A` and never stages a review artifact for the same-line owner.
-2. `docs/epics/workspace-routing-foundation/active-milestone-placement-and-consumption-gate-governance/code-reviews/20260331-active-milestone-placement-gate-verification.md` already records the newer rule: unresolved `proposed|needs_research|blocked` candidate metadata repairs may travel inside the current governance owner while the same merge carries issue/progress/review evidence.
+2. `docs/B2-docs/ibm/active-milestone-placement-and-consumption-gate-governance/code-reviews/20260331-active-milestone-placement-gate-verification.md` already records the newer rule: unresolved `proposed|needs_research|blocked` candidate metadata repairs may travel inside the current governance owner while the same merge carries issue/progress/review evidence.
 3. Reproducing the current path shows `stdout2d` becomes `Develop merge governance gate passed.` once the staged review artifact is added.
 4. The same inspection also exposed a real file-scope bypass: directly touched `promoted` / `absorbed` candidates could share a `candidates.md` file with the true owner candidate and incorrectly skip owner-binding validation.
 5. The follow-on therefore needs both a review-aware fixture refresh for the allowed unresolved-candidate case and a narrow gate repair for same-file borrowed-owner regressions.

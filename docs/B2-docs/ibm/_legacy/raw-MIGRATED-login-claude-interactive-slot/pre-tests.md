@@ -4,12 +4,12 @@
 
 | id | requirement | evidence_level | status | artifact_ref | surface_kind | target_lane | promotion_gate |
 |----|-------------|---------------|--------|-------------|--------------|-------------|----------------|
-| AI-01 | `login claude` 提示 auth_mode → 提示 slot name → 创建 slot + alias | application-native real-environment | pass | `docs/epics/login-claude-interactive-slot/code-reviews/test-log.md` | cli | premerge-integration | develop_merge |
-| AI-02 | `login claude apikey --name foo` 非交互创建 | integration | pass | `docs/epics/login-claude-interactive-slot/code-reviews/test-log.md` | cli | premerge-integration | develop_merge |
-| AI-03 | `login claude account --name foo` 非交互创建 | integration | pass | `docs/epics/login-claude-interactive-slot/code-reviews/test-log.md` | cli | premerge-integration | develop_merge |
-| AI-04 | 空输入终止 exit 2 | integration | pass | `docs/epics/login-claude-interactive-slot/code-reviews/test-log.md` | cli | premerge-integration | develop_merge |
-| AI-05 | `--yes` 无 `--name` 报错 exit 2 | integration | pass | `docs/epics/login-claude-interactive-slot/code-reviews/test-log.md` | cli | premerge-integration | develop_merge |
-| AI-06 | settings.json 为 Anthropic 完整骨架 | script-regression | pass | `docs/epics/login-claude-interactive-slot/code-reviews/test-log.md` | cli | premerge-integration | develop_merge |
+| AI-01 | `login claude` 提示 auth_mode → 提示 slot name → 创建 slot + alias | application-native real-environment | pass | `docs/B2-docs/login-claude-interactive-slot/code-reviews/test-log.md` | cli | premerge-integration | develop_merge |
+| AI-02 | `login claude apikey --name foo` 非交互创建 | integration | pass | `docs/B2-docs/login-claude-interactive-slot/code-reviews/test-log.md` | cli | premerge-integration | develop_merge |
+| AI-03 | `login claude account --name foo` 非交互创建 | integration | pass | `docs/B2-docs/login-claude-interactive-slot/code-reviews/test-log.md` | cli | premerge-integration | develop_merge |
+| AI-04 | 空输入终止 exit 2 | integration | pass | `docs/B2-docs/login-claude-interactive-slot/code-reviews/test-log.md` | cli | premerge-integration | develop_merge |
+| AI-05 | `--yes` 无 `--name` 报错 exit 2 | integration | pass | `docs/B2-docs/login-claude-interactive-slot/code-reviews/test-log.md` | cli | premerge-integration | develop_merge |
+| AI-06 | settings.json 为 Anthropic 完整骨架 | script-regression | pass | `docs/B2-docs/login-claude-interactive-slot/code-reviews/test-log.md` | cli | premerge-integration | develop_merge |
 
 ## Unit
 

@@ -18,8 +18,8 @@ Freely 已经把 `pre-tests.md` 作为 IBM 阶段的成功标准与测试任务�
 - `docs/B1-docs/raw-20260327-0651/brainstorms.md`
 
 2. owner `pre-tests-evidence-binding-and-completion-gate-governance` 明确只先实现 completion gate，并把 retirement auto-check 设为后续：
-- `docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/pre-tests.md`
+- `docs/B2-docs/ibm/pre-tests-evidence-binding-and-completion-gate-governance/prd.md`
+- `docs/B2-docs/ibm/pre-tests-evidence-binding-and-completion-gate-governance/pre-tests.md`
 
 3. merge 侧 gate 已对 `test-pre-merge-* -> develop` 消费 owner `pre-tests.md`：
 - `docs/system/workspace/hooks/pre-merge-commit.sh`
@@ -82,7 +82,7 @@ Freely 已经把 `pre-tests.md` 作为 IBM 阶段的成功标准与测试任务�
 - hook/入口胶水：`docs/system/workspace/hooks/` 与 runtime cleanup route
 - 生命周期真源：`docs/system/workspace/three-loop-capability-lifecycle.md`
 - cleanup 技能真源：`docs/system/workspace/skills/branch-management/references/cleanup-lifecycle.md`
-- owner 文档：`docs/epics/workspace-routing-foundation/<new-owner>/`
+- owner 文档：`docs/B2-docs/git-worktree/<new-owner>/`
 
 ## 后续 owner 候选
 

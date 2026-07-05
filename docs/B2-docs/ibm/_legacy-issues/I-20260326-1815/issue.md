@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO6R
     synced_at: '2026-04-27T13:15:01Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/ibm-pretests-executable-acceptance-quality-governance/issues/ibm-pretests-executable-acceptance-quality-governance.md
+canonical_issue_path: docs/B2-docs/ibm/ibm-pretests-executable-acceptance-quality-governance/issues/ibm-pretests-executable-acceptance-quality-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:17:35Z'
 hash: ''
@@ -30,4 +30,4 @@ Freely 已经把 `pre-tests.md` 定义成 issue-level acceptance 控制面，也
 
 对 Freely 这种自治 AI 开发系统来说，这会让最关键的能力线在 IBM 阶段就失去可执行 acceptance contract，后续 verification、replay 与 closeout 只能靠口头解释恢复。
 
-canonical: docs/epics/workspace-routing-foundation/ibm-pretests-executable-acceptance-quality-governance/issues/ibm-pretests-executable-acceptance-quality-governance.md
+canonical: docs/B2-docs/ibm/ibm-pretests-executable-acceptance-quality-governance/issues/ibm-pretests-executable-acceptance-quality-governance.md

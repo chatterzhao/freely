@@ -16,12 +16,12 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - priority: `P1`
 - promoted_issue_id: `I-20260418-1900-A`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
+- promoted_issue_path: `docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
-  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
+  - `docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
+  - `docs/B2-docs/ibm/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
 - problem: The main runtime lifecycle owner is already merged and pushed, but post-merge governance replay still finds two historical receipt-gap entries missing for the absorbed runtime lifecycle test-pre-merge batch. Direct develop edits are forbidden, so the ledger repair still lacks a lawful owner chain.
 - why_now:
   - canonical `develop` already carries the main runtime lifecycle implementation owner

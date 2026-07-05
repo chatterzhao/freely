@@ -43,4 +43,4 @@
 - case_design: `grep fix/ in fix-execution SKILL.md confirms 5 locations`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/fix-branch-naming/code-reviews/review.md`
+- artifact_ref: `docs/B2-docs/fix-branch-naming/code-reviews/review.md`

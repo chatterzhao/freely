@@ -19,7 +19,7 @@
 - status: absorbed
 - adoption_type: supporting_evidence
 - milestone: M-20260308-frontend-probe-dogfooding-loop
-- promoted_issue_path: docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0/issues/frontend-probe-v0.md
+- promoted_issue_path: docs/B2-docs/human/tui/issues/frontend-probe-v0.md
 - decision_reason: 当前 pre-brainstorm 保留的是跨 surface 的边界结论与行业参考。frontend Probe 显示层由 `I-20260308-1244-03` 吸收；runtime/status/CLI/watchdog 的 human-readable 显示层现已由 `I-20260402-0308-A` materialize。该 research 不再单独维持平行 owner，但继续作为两条收口链的共同依据。
 - next_action: 新增显示时间 surface 继续遵守本 research 结论；若需要共享 formatter/materialization，优先吸收到 runtime-side owner 而不是再把 boundary 留在 absorbed-only 状态。
 - revisit_trigger: 若后续出现需要按“用户自选时区”而不是“宿主系统时区”显示的产品面，或 backup schedule 进入业务时区调度能力，则需要从该 research 再次 materialize 新 owner。

@@ -63,7 +63,7 @@
 - requirement: `governance gates remain green while push-followthrough truth is observational rather than global blocking`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/develop-push-pending-guard-governance/code-reviews/20260401-develop-push-pending-guard-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/develop-push-pending-guard-governance/code-reviews/20260401-develop-push-pending-guard-verification.md`
 
 1. `bash docs/system/workspace/scripts/tests/test-freely-live-status-develop-push-pending`
 2. `bash docs/system/workspace/scripts/tests/test-freely-fleet-status-develop-push-pending`

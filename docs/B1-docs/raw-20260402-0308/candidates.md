@@ -36,7 +36,7 @@
   - frontend absorbed only one surface; runtime/status surfaces need their own owner and verification
   - this owner legitimizes already-landed `ai-cli` and watchdog display changes while extending the same contract into `freely` status outputs
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md`
+- promoted_issue_path: `docs/B2-docs/runtime/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md`
 - promoted_issue_path_role: `primary-owner`
 - session_refs:
   - tool: `codex`

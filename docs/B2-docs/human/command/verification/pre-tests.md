@@ -9,7 +9,7 @@
 - target_environment: feature worktree
 - required_evidence: grep output
 - evidence_level: integration
-- artifact_ref: docs/epics/cmd-standardize/subcommand-add/verification/test-evidence/acceptance-1.txt
+- artifact_ref: docs/B2-docs/human/command/verification/test-evidence/acceptance-1.txt
 - test_command: |
   for c in pr-review-guarded cycle watchdog deploy-skills governance-check checkpoint-guard pretests-gate pretests-retirement-gate; do
     grep -q "$c) cmd_" docs/system/workspace/scripts/runtime/freely || { echo "FAIL: $c"; exit 1; }
@@ -19,7 +19,7 @@
 - expected_RED_output: FAIL
 - actual_RED_output: RED confirmed — commands not registered before
 - actual_output: PASS
-- evidence_file: docs/epics/cmd-standardize/subcommand-add/verification/test-evidence/acceptance-1.txt
+- evidence_file: docs/B2-docs/human/command/verification/test-evidence/acceptance-1.txt
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -32,7 +32,7 @@
 - target_environment: feature worktree
 - required_evidence: grep output
 - evidence_level: integration
-- artifact_ref: docs/epics/cmd-standardize/subcommand-add/verification/test-evidence/acceptance-2.txt
+- artifact_ref: docs/B2-docs/human/command/verification/test-evidence/acceptance-2.txt
 - test_command: |
   for c in governance-merge-gate governance-promotion-gate governance-closeout-gate merge-guarded; do
     grep -q "\"$c\") cmd_" docs/system/workspace/scripts/runtime/freely && { echo "FAIL: $c should be internal"; exit 1; } || true
@@ -42,7 +42,7 @@
 - expected_RED_output: N/A
 - actual_RED_output: N/A
 - actual_output: PASS
-- evidence_file: docs/epics/cmd-standardize/subcommand-add/verification/test-evidence/acceptance-2.txt
+- evidence_file: docs/B2-docs/human/command/verification/test-evidence/acceptance-2.txt
 - red-green-status: green
 - status: passed
 - blocker: none

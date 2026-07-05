@@ -4,7 +4,7 @@
 - candidate_format_version: `v2`
 - title: Label runtime loop log timestamps with the host timezone
 - source_brainstorm: `docs/B1-docs/raw-20260402-0540/brainstorms.md`
-- reopen_of_issue: `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md`
+- reopen_of_issue: `docs/B2-docs/runtime/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md`
 - reopen_reason: `a repo-wide audit found that loop.log headers still printed local wall-clock time without a timezone label after the runtime time-display owner had otherwise closed`
 - problem: `freely` loop logs still expose one human-readable timestamp surface without the timezone label required by the canonical host-local display rule.
 - why_now:
@@ -33,7 +33,7 @@
   - the runtime display contract is already canonical, so a fresh narrow followthrough is smaller and clearer than widening or reopening the previous owner
   - the merge gate requires a full candidate -> issue -> progress -> review trace even for tiny develop-bound fixes
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-loop-log-timezone-label-followthrough-governance/issues/runtime-loop-log-timezone-label-followthrough-governance.md`
+- promoted_issue_path: `docs/B2-docs/runtime/runtime-loop-log-timezone-label-followthrough-governance/issues/runtime-loop-log-timezone-label-followthrough-governance.md`
 - promoted_issue_path_role: `primary-owner`
 - session_refs:
   - tool: `codex`

@@ -17,7 +17,7 @@
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
 - priority: `P0`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-evidence-provenance-research-retirement-followthrough-governance/issues/runtime-evidence-provenance-research-retirement-followthrough-governance.md`
+- promoted_issue_path: `docs/B2-docs/runtime/runtime-evidence-provenance-research-retirement-followthrough-governance/issues/runtime-evidence-provenance-research-retirement-followthrough-governance.md`
 - summary: `Carry a narrow same-line owner for the develop-bound retirement of dropped candidate C-20260407-0603-A so the protected push gate sees concrete issue/pre-tests/review evidence and the obsolete research worktree can be retired without reviving the mixed-owner design packet.`
 - why_now: `The cleanup merge already proved the research packet should be retired, but origin/develop correctly rejects a candidate-only develop diff. A narrow followthrough owner is now required to close the lifecycle lawfully.`
 - acceptance_criteria:

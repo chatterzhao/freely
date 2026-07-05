@@ -1,7 +1,7 @@
 # Progress: governance-chain-legacy-repair
 
 - issue_id: `I-20260403-1100-A`
-- issue_path: `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md`
+- issue_path: `docs/B2-docs/gate/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md`
 - title: `Governance chain legacy repair for develop push unblock`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -17,7 +17,7 @@
 
 - This owner is again backed by canonical issue/progress/epic artifacts instead of only a promoted candidate pointer.
 - Canonical `develop` absorbed the 2026-04-04 truth-repair closeout through merge `5da463c`, restoring the missing `1100` owner set, removing dangling milestone/index references, and keeping the gate strict.
-- The previously discussed `1200/1201/1202/1203` repair slices no longer exist in the active filesystem and are now recorded only as retired historical sub-slices in `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/child-slice-status.md`.
+- The previously discussed `1200/1201/1202/1203` repair slices no longer exist in the active filesystem and are now recorded only as retired historical sub-slices in `docs/B2-docs/gate/governance-chain-legacy-repair/child-slice-status.md`.
 - `1100` is now historical traceability only. Deleted child lanes stay retired, and any future governance-chain backfill must reopen from a new owner on current `develop`.
 
 ## Current Batch Risks
@@ -28,8 +28,8 @@
 ## Closure Evidence
 
 1. develop merge `5da463c`
-2. `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/code-reviews/20260403-governance-chain-legacy-repair-implementation-decision.md`
-3. `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/child-slice-status.md`
+2. `docs/B2-docs/gate/governance-chain-legacy-repair/code-reviews/20260403-governance-chain-legacy-repair-implementation-decision.md`
+3. `docs/B2-docs/gate/governance-chain-legacy-repair/child-slice-status.md`
 
 ## Next Action
 

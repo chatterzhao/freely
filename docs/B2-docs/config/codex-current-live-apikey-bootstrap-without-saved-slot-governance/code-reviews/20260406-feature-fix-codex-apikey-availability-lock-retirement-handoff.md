@@ -1,7 +1,7 @@
 # Cleanup Verification: feature-fix-codex-apikey-availability-lock retirement handoff
 
 - issue_id: `I-20260406-1829-A`
-- linked_issue_path: `docs/epics/workspace-routing-foundation/codex-current-live-apikey-bootstrap-without-saved-slot-governance/issues/codex-current-live-apikey-bootstrap-without-saved-slot-governance.md`
+- linked_issue_path: `docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/issues/codex-current-live-apikey-bootstrap-without-saved-slot-governance.md`
 - audited_worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-fix-codex-apikey-availability-lock`
 - audited_branch: `feature/fix-codex-apikey-availability-lock`
 - audited_at: `2026-04-06`

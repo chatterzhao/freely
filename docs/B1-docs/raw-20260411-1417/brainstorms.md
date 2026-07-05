@@ -39,7 +39,7 @@
   - `.githooks/pre-merge-commit` 路由到 `docs/system/workspace/hooks/pre-merge-commit.sh`
   - `docs/system/workspace/scripts/quality/governance-merge-gate`
   - `docs/system/workspace/scripts/tests/test-governance-merge-gate`
-  - `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/code-reviews/20260408-verification-contract-and-premerge-adequacy-verification.md`
+  - `docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/code-reviews/20260408-verification-contract-and-premerge-adequacy-verification.md`
 - 结论：该陈述已被实现与回归测试推翻
 
 ### 2) `20260406-0055--governance-check-nested-test-pre-merge-receipt-audit`
@@ -130,7 +130,7 @@
 
 ## Status Reconcile
 
-- `C-20260411-1417-B` is absorbed into `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md` as the canonical verification-contract chain for the same launch-time adequacy concern.
+- `C-20260411-1417-B` is absorbed into `docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md` as the canonical verification-contract chain for the same launch-time adequacy concern.
 - Keep this brainstorm narrow on stale-truth reconcile; do not reopen a separate launch-time execution owner from this lane.
 
 ## Verification Plan

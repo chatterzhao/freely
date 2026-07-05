@@ -47,18 +47,18 @@
 - requirement: `Prompt-visible blocked supervision writes delegated continuation truth plus a blocked resolution artifact.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-verification.md`
 
 ### AT-002
 - id: `AT-002`
 - requirement: `Blocked supervision is exposed through bounded live-status and fleet-status surfaces without adjacent status regressions.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-verification.md`
 
 ### AT-003
 - id: `AT-003`
 - requirement: `Completed closeout keeps this owner bounded and governance-complete instead of relying on the merge alone.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-implementation-decision.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-implementation-decision.md`

@@ -1,7 +1,7 @@
 # Verification: runtime-startup-self-healing-governance
 
 - issue_id: `I-20260419-1630-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/issues/runtime-startup-self-healing-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-startup-self-healing-governance/issues/runtime-startup-self-healing-governance.md`
 - verification_date: `2026-04-22`
 - branch: `feature/live-status-hang-root-cause-20260422`
 - worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260422-feature-live-status-hang-root-cause`

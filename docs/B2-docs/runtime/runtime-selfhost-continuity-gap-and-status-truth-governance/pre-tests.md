@@ -54,32 +54,32 @@
 - requirement: `live-status stays readable when pid-file hints fail authoritative validation.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/code-reviews/20260407-runtime-status-truth-verification-replay.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/code-reviews/20260407-runtime-status-truth-verification-replay.md`
 
 ### AT-002
 - id: `AT-002`
 - requirement: `workspace_root_for_project() no longer depends solely on rg being present in PATH.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/code-reviews/20260407-runtime-status-truth-verification-replay.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/code-reviews/20260407-runtime-status-truth-verification-replay.md`
 
 ### AT-003
 - id: `AT-003`
 - requirement: `live-status and fleet-status surface the bounded manager continuity gap truth with named machine-readable fields.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/code-reviews/20260407-runtime-status-truth-verification-replay.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/code-reviews/20260407-runtime-status-truth-verification-replay.md`
 
 ### AT-004
 - id: `AT-004`
 - requirement: `continuity-gap truth includes age and writer-state detail so startup grace is distinguishable from a sustained self-host stall.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/code-reviews/20260407-runtime-status-truth-verification-replay.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/code-reviews/20260407-runtime-status-truth-verification-replay.md`
 
 ### AT-005
 - id: `AT-005`
 - requirement: `manager prompt guardrails and blocked-supervision discovery remain green while this bounded status owner closes out.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/code-reviews/20260407-runtime-status-truth-verification-replay.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/code-reviews/20260407-runtime-status-truth-verification-replay.md`

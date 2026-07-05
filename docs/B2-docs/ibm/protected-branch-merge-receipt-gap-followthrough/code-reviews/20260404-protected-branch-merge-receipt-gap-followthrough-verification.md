@@ -1,7 +1,7 @@
 # Verification: protected-branch-merge-receipt-gap-followthrough
 
 - issue_id: `I-20260404-0640-A`
-- issue_path: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
+- issue_path: `docs/B2-docs/ibm/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
 - branch: `feature/protected-branch-merge-receipt-backfill-20260404-0710`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260404-0710-feature-protected-branch-merge-receipt-backfill`
 - verification_date: `2026-04-04`

@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO5H
     synced_at: '2026-04-27T13:14:08Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/human-chat-intake-and-manager-delegation/issues/human-chat-intake-and-manager-delegation.md
+canonical_issue_path: docs/B2-docs/human/human-chat-intake-and-manager-delegation/issues/human-chat-intake-and-manager-delegation.md
 last_synced_comment_at:
   github: '2026-04-27T11:14:08Z'
 hash: ''
@@ -29,4 +29,4 @@ Freely 已经有 human chat intake 的最小闭环，但要真正“用 Freely �
 - specialized AI 必须产出 resolution artifact，并把 absorption target 写回 canonical pool
 - `claim/resolve`、`skill:human-interruption-handling` 与 manager contract 必须共用同一套语义
 
-canonical: docs/epics/workspace-routing-foundation/human-chat-intake-and-manager-delegation/issues/human-chat-intake-and-manager-delegation.md
+canonical: docs/B2-docs/human/human-chat-intake-and-manager-delegation/issues/human-chat-intake-and-manager-delegation.md

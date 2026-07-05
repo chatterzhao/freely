@@ -19,4 +19,4 @@
 - requirement: `Protected-branch source-policy auditing honors first-parent branch history.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/governance-check-protected-merge-history-source-policy-governance/code-reviews/20260406-governance-check-protected-merge-history-source-policy-verification.md`
+- artifact_ref: `docs/B2-docs/gate/governance-check-protected-merge-history-source-policy-governance/code-reviews/20260406-governance-check-protected-merge-history-source-policy-verification.md`

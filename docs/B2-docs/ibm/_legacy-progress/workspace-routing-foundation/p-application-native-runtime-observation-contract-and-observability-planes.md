@@ -20,7 +20,7 @@
 
 - `./bin/governance-check`
 - `rg -n "current-state plane|fleet plane|artifact plane|acceptance evidence|acceptance_ref|deep ref|progress signal|stall signal" docs/system/workspace/three-loop-capability-lifecycle.md docs/system/workspace/skills/freely-multi-worktree-supervision/SKILL.md docs/system/workspace/skills/freely-watchdog-control-plane/SKILL.md docs/system/workspace/scripts/README.md docs/LAWS.md`
-- `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/code-reviews/20260324-application-native-runtime-observation-contract-and-observability-planes-verification.md`
+- `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/code-reviews/20260324-application-native-runtime-observation-contract-and-observability-planes-verification.md`
 
 ## Completion Note
 

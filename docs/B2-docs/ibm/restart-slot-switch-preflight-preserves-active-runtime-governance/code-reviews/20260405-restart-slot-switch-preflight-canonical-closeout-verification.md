@@ -1,7 +1,7 @@
 # Verification: restart-slot-switch-preflight-preserves-active-runtime-governance canonical closeout
 
 - issue_id: `I-20260405-2055-A`
-- issue_path: `docs/epics/workspace-routing-foundation/restart-slot-switch-preflight-preserves-active-runtime-governance/issues/restart-slot-switch-preflight-preserves-active-runtime-governance.md`
+- issue_path: `docs/B2-docs/ibm/restart-slot-switch-preflight-preserves-active-runtime-governance/issues/restart-slot-switch-preflight-preserves-active-runtime-governance.md`
 - branch: `feature/restart-slot-switch-preflight-closeout-20260405-2235`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260405-2235-feature-restart-slot-switch-preflight-closeout`
 - verification_date: `2026-04-05`

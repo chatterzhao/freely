@@ -7,12 +7,12 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `stacked-worktree-merge-chain-governance`
 - issue-name: `stacked-worktree-merge-chain-governance`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/stacked-worktree-merge-chain-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/stacked-worktree-merge-chain-governance/code-reviews`
 - source_candidate: `docs/B1-docs/raw-20260321/candidates.md#c-20260321-1045-001`
 - source_brainstorm: `docs/B1-docs/raw-20260321/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- depends_on: `docs/epics/workspace-routing-foundation/worktree-maintenance-governance/issues/worktree-maintenance-governance.md`
+- depends_on: `docs/B2-docs/git-worktree/worktree-maintenance-governance/issues/worktree-maintenance-governance.md`
 - session_refs:
   - {tool: cc-use-codex-cli, session_id: "11111111-2222-4333-8444-555555555555", jsonl_path: "/Users/zhaoyu/.claude/projects/-private-tmp-freely-cc-codex-real-ed64yw-project/11111111-2222-4333-8444-555555555555.jsonl", role: "integration-smoke"}
   - {tool: codex-cli, session_id: "019d0f86-7c2e-7f50-999f-10cf4935e7ba", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/21/rollout-2026-03-21T01-27-02-019d0f86-7c2e-7f50-999f-10cf4935e7ba.jsonl", role: "integration-smoke"}
@@ -63,7 +63,7 @@
 
 - `./bin/governance-check`
 - `bash docs/system/workspace/scripts/tests/test-routing-foundation-loop`
-- `docs/epics/workspace-routing-foundation/stacked-worktree-merge-chain-governance/code-reviews/20260326-stacked-merge-chain-canonical-replay-verification.md`
+- `docs/B2-docs/ibm/stacked-worktree-merge-chain-governance/code-reviews/20260326-stacked-merge-chain-canonical-replay-verification.md`
 
 ## Verification Summary
 

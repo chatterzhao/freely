@@ -1,7 +1,7 @@
 # Pre-tests — chat-inbox SQLite
 
 - issue_id: `I-20260429-2040-A`
-- issue_path: `docs/epics/workspace-routing-foundation/chat-inbox-sqlite/issues/I-20260429-2040-A.md`
+- issue_path: `docs/B2-docs/human/chat-inbox-sqlite/issues/I-20260429-2040-A.md`
 
 ## Unit
 - acceptance target: `chat-inbox.py module loads and core functions are callable.`
@@ -43,7 +43,7 @@
 - requirement: `freely init creates chat-inbox.db with chats table.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/chat-inbox-sqlite/code-reviews/20260430-acp-session-store-verification.md`
+- artifact_ref: `docs/B2-docs/human/chat-inbox-sqlite/code-reviews/20260430-acp-session-store-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -55,7 +55,7 @@
 - requirement: `freely chat --new-issue writes to SQLite, not filesystem, leaving git status clean.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/chat-inbox-sqlite/code-reviews/20260430-acp-session-store-verification.md`
+- artifact_ref: `docs/B2-docs/human/chat-inbox-sqlite/code-reviews/20260430-acp-session-store-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -67,7 +67,7 @@
 - requirement: `governance-check reports no new errors.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/chat-inbox-sqlite/code-reviews/20260430-acp-session-store-verification.md`
+- artifact_ref: `docs/B2-docs/human/chat-inbox-sqlite/code-reviews/20260430-acp-session-store-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`

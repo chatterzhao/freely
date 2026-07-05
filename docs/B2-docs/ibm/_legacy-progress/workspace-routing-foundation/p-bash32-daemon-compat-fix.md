@@ -1,7 +1,7 @@
 # Progress: bash32-daemon-compat-fix
 
 - issue_id: `I-20260429-1745-A`
-- issue_path: `docs/epics/workspace-routing-foundation/bash32-daemon-compat-fix/issues/I-20260429-1745-A.md`
+- issue_path: `docs/B2-docs/runtime/bash32-daemon-compat-fix/issues/I-20260429-1745-A.md`
 - title: `Fix daemon self-detection suicide + bash 3.2 pipefail crash`
 - phase_state: `completed`
 - milestone: `M-20260306-workspace-routing-foundation`

@@ -6,7 +6,7 @@
 - title: Fresh-project bootstrap and baseline scoping followthrough after CLI audit
 - status: `promoted`
 - milestone: `M-20260326-freely-product-architecture`
-- promoted_issue_path: `docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
+- promoted_issue_path: `docs/B2-docs/config/packaging/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
 - promoted_issue_id: `I-20260405-2358-A`
 - session_refs:
   - tool: `codex`
@@ -63,7 +63,7 @@
 - title: CLI wrapper packaging and regression-surface audit
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/cli-wrapper-packaging-and-regression-surface-governance/issues/cli-wrapper-packaging-and-regression-surface-governance.md`
+- promoted_issue_path: `docs/B2-docs/config/cli-wrapper-packaging-and-regression-surface-governance/issues/cli-wrapper-packaging-and-regression-surface-governance.md`
 - promoted_issue_id: `I-20260405-2358-C`
 - session_refs:
   - tool: `codex`
@@ -91,7 +91,7 @@
 - title: CLI help and dry-run contract followthrough after canonical audit
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/cli-help-and-dry-run-contract-followthrough-governance/issues/cli-help-and-dry-run-contract-followthrough-governance.md`
+- promoted_issue_path: `docs/B2-docs/human/cli-help-and-dry-run-contract-followthrough-governance/issues/cli-help-and-dry-run-contract-followthrough-governance.md`
 - promoted_issue_id: `I-20260405-2358-D`
 - session_refs:
   - tool: `codex`

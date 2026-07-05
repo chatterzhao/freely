@@ -11,11 +11,11 @@
 - target_environment: feature/raw-20260629T025659Z-fix-flow-unify worktree
 - required_evidence: grep 确认 fix skill 流程序列
 - evidence_level: mock
-- artifact_ref: docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/verification/test-evidence/acceptance-1.log
+- artifact_ref: docs/B2-docs/ibm/fix-flow/raw-20260629T025659Z/verification/test-evidence/acceptance-1.log
 - test_command: grep "B1.*B2.*dev.*test" ~/.claude/skills/freely-fix-execution/SKILL.md && echo "PASS" || echo "FAIL"
 - expected_output: PASS — fix skill 描述 B1→B2→dev→test 顺序
 - actual_output: PASS — fix skill 描述 B1→B2→dev→test 顺序
-- evidence_file: docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/verification/test-evidence/acceptance-1.log
+- evidence_file: docs/B2-docs/ibm/fix-flow/raw-20260629T025659Z/verification/test-evidence/acceptance-1.log
 - blocker: (失败时填写)
 - status: passed
 - red-green-status: green
@@ -28,11 +28,11 @@
 - target_environment: feature/raw-20260629T025659Z-fix-flow-unify worktree
 - required_evidence: grep 确认无 cherry-pick 描述
 - evidence_level: mock
-- artifact_ref: docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/verification/test-evidence/acceptance-2.log
+- artifact_ref: docs/B2-docs/ibm/fix-flow/raw-20260629T025659Z/verification/test-evidence/acceptance-2.log
 - test_command: grep -c "cherry-pick" ~/.claude/skills/freely-fix-execution/SKILL.md && echo "FAIL: still has cherry-pick" || echo "PASS: cherry-pick removed"
 - expected_output: PASS: cherry-pick removed
 - actual_output: PASS — cherry-pick dance removed from fix skill
-- evidence_file: docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/verification/test-evidence/acceptance-2.log
+- evidence_file: docs/B2-docs/ibm/fix-flow/raw-20260629T025659Z/verification/test-evidence/acceptance-2.log
 - blocker: (失败时填写)
 - status: passed
 - red-green-status: green
@@ -45,11 +45,11 @@
 - target_environment: feature/raw-20260629T025659Z-fix-flow-unify worktree
 - required_evidence: grep 确认 three-loop 文档 Fix 路径已更新
 - evidence_level: mock
-- artifact_ref: docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/verification/test-evidence/acceptance-3.log
+- artifact_ref: docs/B2-docs/ibm/fix-flow/raw-20260629T025659Z/verification/test-evidence/acceptance-3.log
 - test_command: grep -A2 "Fix 修复" docs/system/workspace/three-loop-capability-lifecycle.md | grep "B1.*B2.*dev" && echo "PASS" || echo "FAIL"
 - expected_output: PASS — Fix 变体路径 B1→B2→dev
 - actual_output: PASS — Fix 变体路径 B1→B2→dev
-- evidence_file: docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/verification/test-evidence/acceptance-3.log
+- evidence_file: docs/B2-docs/ibm/fix-flow/raw-20260629T025659Z/verification/test-evidence/acceptance-3.log
 - blocker: (失败时填写)
 - status: passed
 - red-green-status: green
@@ -62,11 +62,11 @@
 - target_environment: feature/raw-20260629T025659Z-fix-flow-unify worktree
 - required_evidence: grep 确认 AGENTS.md fix 行已更新
 - evidence_level: mock
-- artifact_ref: docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/verification/test-evidence/acceptance-4.log
+- artifact_ref: docs/B2-docs/ibm/fix-flow/raw-20260629T025659Z/verification/test-evidence/acceptance-4.log
 - test_command: grep "^fix:" AGENTS.md | grep "B1.*B2.*dev.*test" && echo "PASS" || echo "FAIL"
 - expected_output: PASS — fix 行 B1→B2→dev→test
 - actual_output: PASS — fix 行 B1→B2→dev→test
-- evidence_file: docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/verification/test-evidence/acceptance-4.log
+- evidence_file: docs/B2-docs/ibm/fix-flow/raw-20260629T025659Z/verification/test-evidence/acceptance-4.log
 - blocker: (失败时填写)
 - status: passed
 - red-green-status: green
@@ -79,11 +79,11 @@
 - target_environment: feature/raw-20260629T025659Z-fix-flow-unify worktree
 - required_evidence: grep 确认 test skill fix 行已更新
 - evidence_level: mock
-- artifact_ref: docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/verification/test-evidence/acceptance-5.log
+- artifact_ref: docs/B2-docs/ibm/fix-flow/raw-20260629T025659Z/verification/test-evidence/acceptance-5.log
 - test_command: grep "fix:.*B1.*B2.*dev.*test\|fix:.*wt-create.*B1.*B2" ~/.claude/skills/freely-test-execution/SKILL.md && echo "PASS" || echo "FAIL"
 - expected_output: PASS — test skill fix 行 B1→B2→dev→test
 - actual_output: PASS — test skill fix 行 B1→B2→dev→test
-- evidence_file: docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/verification/test-evidence/acceptance-5.log
+- evidence_file: docs/B2-docs/ibm/fix-flow/raw-20260629T025659Z/verification/test-evidence/acceptance-5.log
 - blocker: (失败时填写)
 - status: passed
 - red-green-status: green

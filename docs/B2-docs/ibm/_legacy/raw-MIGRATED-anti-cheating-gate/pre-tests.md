@@ -33,7 +33,7 @@
 - requirement: gate hard-rejects all-mock/not_applicable pre-tests
 - evidence_level: mock
 ^- status: passed
-- artifact_ref: docs/epics/anti-cheating-gate/code-reviews/implementation-decision.md
+- artifact_ref: docs/B2-docs/anti-cheating-gate/code-reviews/implementation-decision.md
 ## Real-Environment
 - real_environment_status: pass
 - real_environment_reason: verified by merge

@@ -1,7 +1,7 @@
 # Progress: absorbed-merged-lane-routing-followthrough-governance
 
 - issue_id: `I-20260421-1330-A`
-- issue_path: `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/issues/absorbed-merged-lane-routing-followthrough-governance.md`
+- issue_path: `docs/B2-docs/ibm/absorbed-merged-lane-routing-followthrough-governance/issues/absorbed-merged-lane-routing-followthrough-governance.md`
 - title: `Absorbed merged lane routing followthrough governance`
 - phase_state: `completed`
 - runtime_state: `closed_for_this_batch`
@@ -55,7 +55,7 @@
 5. `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-regenerates-scan-after-idle-continuity-advance`
 6. `bash docs/system/workspace/scripts/tests/test-freely-manager-prompt-regenerates-scan-after-head-change`
 7. `./bin/governance-check`
-8. `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/code-reviews/20260421-absorbed-merged-lane-routing-followthrough-verification.md`
+8. `docs/B2-docs/ibm/absorbed-merged-lane-routing-followthrough-governance/code-reviews/20260421-absorbed-merged-lane-routing-followthrough-verification.md`
 9. `bash docs/system/workspace/scripts/tests/test-freely-cleanup-governance-retirement-worker-directive`
 10. `git merge-base --is-ancestor 9b1fd4c5717652309325b6c6d399e14399559a4d d0564874860d15530aa6c8fb97656cec771cc88c`
 11. `git merge-base --is-ancestor 4941df4b3ee47a8b8c01750178222f21141d26bc d0564874860d15530aa6c8fb97656cec771cc88c`

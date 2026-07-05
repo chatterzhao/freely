@@ -1,7 +1,7 @@
 # Progress: three-loop-lifecycle-single-source-governance-followthrough
 
 - issue_id: `I-20260419-0915-A`
-- issue_path: `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
+- issue_path: `docs/B2-docs/ibm/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
 - title: `Three-loop lifecycle single-source governance followthrough`
 - phase_state: `done`
 - runtime_state: `stopped`
@@ -20,10 +20,10 @@
 
 ## Verification Evidence
 
-1. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260418-feature-three-loop-model-refactor --issue docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
+1. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260418-feature-three-loop-model-refactor --issue docs/B2-docs/ibm/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
 2. `./bin/governance-check`
 3. `git diff --check`
-4. `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/code-reviews/20260419-three-loop-lifecycle-single-source-followthrough-verification.md`
+4. `docs/B2-docs/ibm/three-loop-lifecycle-single-source-governance-followthrough/code-reviews/20260419-three-loop-lifecycle-single-source-followthrough-verification.md`
 
 ## Next Action
 

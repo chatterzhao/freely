@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFOAK
     synced_at: '2026-04-27T13:17:44Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/issues/tool-alias-and-opencode-launcher-governance.md
+canonical_issue_path: docs/B2-docs/ibm/tool-alias-and-opencode-launcher-governance/issues/tool-alias-and-opencode-launcher-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:11:27Z'
 hash: ''
@@ -36,8 +36,8 @@ platform_state: closed
 - source_candidate: `docs/B1-docs/raw-20260426/candidates.md#c-20260426-0000-a`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/pre-tests.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews`
+- pre_tests_path: `docs/B2-docs/ibm/tool-alias-and-opencode-launcher-governance/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/ibm/tool-alias-and-opencode-launcher-governance/code-reviews`
 - session_refs:
   - {tool: opencode, session_id: "20260426-opencode-launcher", jsonl_path: "unavailable://manual", role: "author"}
 

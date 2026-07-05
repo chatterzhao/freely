@@ -9,11 +9,11 @@
 - issue-name: `global-restart-restore-memory-governance`
 - source_candidate: `docs/B1-docs/raw-20260327/candidates.md#c-20260327-2006-a`
 - source_brainstorm: `docs/B1-docs/raw-20260327/brainstorms.md`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/global-restart-restore-memory-governance/pre-tests.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/global-restart-restore-memory-governance/code-reviews/`
+- pre_tests_path: `docs/B2-docs/ibm/global-restart-restore-memory-governance/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/ibm/global-restart-restore-memory-governance/code-reviews/`
 - execution_base: `develop`
 - integration_target: `develop`
-- depends_on: `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/issues/project-command-semantics-and-restore-work-governance.md`
+- depends_on: `docs/B2-docs/ibm/project-command-semantics-and-restore-work-governance/issues/project-command-semantics-and-restore-work-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
   - {tool: codex, session_id: "019d377f-37b7-7cf2-8b76-d6a4a36a4a7f", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/28/rollout-2026-03-28T19-49-37-019d377f-37b7-7cf2-8b76-d6a4a36a4a7f.jsonl", role: "downstream-issue-continuity-refresh"}
@@ -48,5 +48,5 @@
 
 ## Next
 
-- `2026-03-30 17:34 PDT` owner implementation and verification are already absorbed by `develop` commits `8441b92` and merge `2467cc7`. Completion evidence is anchored by `docs/epics/workspace-routing-foundation/global-restart-restore-memory-governance/code-reviews/20260330-global-restart-restore-memory-feature-verification.md`.
+- `2026-03-30 17:34 PDT` owner implementation and verification are already absorbed by `develop` commits `8441b92` and merge `2467cc7`. Completion evidence is anchored by `docs/B2-docs/ibm/global-restart-restore-memory-governance/code-reviews/20260330-global-restart-restore-memory-feature-verification.md`.
 - Any broader global reset surface must open a new lifecycle rather than rewriting this completed owner.

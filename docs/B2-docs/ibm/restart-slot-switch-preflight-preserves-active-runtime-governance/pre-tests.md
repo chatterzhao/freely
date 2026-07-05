@@ -62,11 +62,11 @@
 - requirement: `Restart-adjacent durability changes do not regress the touched runtime surfaces.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/restart-slot-switch-preflight-preserves-active-runtime-governance/code-reviews/20260405-restart-slot-switch-preflight-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/restart-slot-switch-preflight-preserves-active-runtime-governance/code-reviews/20260405-restart-slot-switch-preflight-verification.md`
 
 ### AT-004
 - id: `AT-004`
 - requirement: `Develop-bound runtime edits are backed by an issue-bound restart-specific decision note.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/restart-slot-switch-preflight-preserves-active-runtime-governance/code-reviews/20260405-restart-slot-switch-preflight-implementation-decision.md`
+- artifact_ref: `docs/B2-docs/ibm/restart-slot-switch-preflight-preserves-active-runtime-governance/code-reviews/20260405-restart-slot-switch-preflight-implementation-decision.md`

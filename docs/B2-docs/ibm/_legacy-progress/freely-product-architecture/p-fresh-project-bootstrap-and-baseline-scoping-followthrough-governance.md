@@ -1,7 +1,7 @@
 # Progress: fresh-project-bootstrap-and-baseline-scoping-followthrough-governance
 
 - issue_id: `I-20260405-2358-A`
-- issue_path: `docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
+- issue_path: `docs/B2-docs/config/packaging/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
 - title: `Fresh-project bootstrap and baseline scoping followthrough governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -27,11 +27,11 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-baseline-status`
 - `bash docs/system/workspace/scripts/tests/test-freely-status-family`
 - `./bin/governance-check`
-- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-1935-test-pre-merge-fresh-project-bootstrap-baseline-scoping-followthrough --issue docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
-- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely --issue docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
+- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-1935-test-pre-merge-fresh-project-bootstrap-baseline-scoping-followthrough --issue docs/B2-docs/config/packaging/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
+- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely --issue docs/B2-docs/config/packaging/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
 - `git diff --check`
-- `docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/code-reviews/20260406-fresh-project-bootstrap-and-baseline-scoping-followthrough-verification.md`
-- `docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/code-reviews/20260406-fresh-project-bootstrap-and-baseline-scoping-followthrough-canonical-closeout-verification.md`
+- `docs/B2-docs/config/packaging/code-reviews/20260406-fresh-project-bootstrap-and-baseline-scoping-followthrough-verification.md`
+- `docs/B2-docs/config/packaging/code-reviews/20260406-fresh-project-bootstrap-and-baseline-scoping-followthrough-canonical-closeout-verification.md`
 
 ## Next Action
 

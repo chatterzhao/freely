@@ -1,6 +1,6 @@
 # Verification: stale-prebrainstorm-truth-reconcile-governance
 
-- issue_path: `docs/epics/workspace-routing-foundation/stale-prebrainstorm-truth-reconcile-governance/issues/stale-prebrainstorm-truth-reconcile-governance.md`
+- issue_path: `docs/B2-docs/runtime/stale-prebrainstorm-truth-reconcile-governance/issues/stale-prebrainstorm-truth-reconcile-governance.md`
 - verified_at: `2026-04-11`
 - verifier: `codex`
 

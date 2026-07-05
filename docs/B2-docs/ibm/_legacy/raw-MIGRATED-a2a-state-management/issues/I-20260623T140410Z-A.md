@@ -21,14 +21,14 @@ channel: freely-fix-execution
 session_refs:
   - tool: claude-code
   - analysis_issue: https://github.com/chatterzhao/freely/issues/3390
-pre_tests_path: docs/epics/a2a-state-management/verification/pre-tests.md
+pre_tests_path: docs/B2-docs/a2a-state-management/verification/pre-tests.md
 verification_artifact_dir: docs/epics/a2a-state-management/code-reviews
 ---
 
 # I-20260623T140410Z-A: A2A 状态管理全量修复
 
 - source_candidate: `docs/B1-docs/raw-20260623T140410Z/candidates.md`
-- pre_tests_path: `docs/epics/a2a-state-management/verification/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/a2a-state-management/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/a2a-state-management/code-reviews`
 
 ## 概述

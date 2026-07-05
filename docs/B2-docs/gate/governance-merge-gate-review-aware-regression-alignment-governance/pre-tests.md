@@ -47,18 +47,18 @@
 - requirement: `The mixed unresolved-candidate implementation regression stages review evidence and passes on the current allowed path.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/code-reviews/20260404-governance-merge-gate-review-aware-regression-alignment-verification.md`
+- artifact_ref: `docs/B2-docs/gate/governance-merge-gate-review-aware-regression-alignment-governance/code-reviews/20260404-governance-merge-gate-review-aware-regression-alignment-verification.md`
 
 ### AT-002
 - id: `AT-002`
 - requirement: `Same-file promoted or absorbed borrowed-owner regressions remain blocked by canonical owner binding.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/code-reviews/20260404-governance-merge-gate-review-aware-regression-alignment-verification.md`
+- artifact_ref: `docs/B2-docs/gate/governance-merge-gate-review-aware-regression-alignment-governance/code-reviews/20260404-governance-merge-gate-review-aware-regression-alignment-verification.md`
 
 ### AT-003
 - id: `AT-003`
 - requirement: `The closeout lane keeps this owner completed and bounded on canonical develop.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/code-reviews/20260404-governance-merge-gate-review-aware-regression-alignment-verification.md`
+- artifact_ref: `docs/B2-docs/gate/governance-merge-gate-review-aware-regression-alignment-governance/code-reviews/20260404-governance-merge-gate-review-aware-regression-alignment-verification.md`

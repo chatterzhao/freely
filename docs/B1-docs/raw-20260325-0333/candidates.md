@@ -80,7 +80,7 @@
 - priority: P0
 - status: completed
 - decision_reason: 这条 slice 足够小，已经可以从 umbrella candidate 中独立 materialize，先把 `pre-tests.md` 质量 gate 固定成硬门禁，再继续后续 ladder / harness 切口。
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/issues/story-level-pre-tests-quality-gate-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/story-level-pre-tests-quality-gate-governance/issues/story-level-pre-tests-quality-gate-governance.md`
 - milestone: `docs/milestones.md#M-20260306-workspace-routing-foundation`
 - completion_note: Story-level `pre-tests.md` 质量 gate 已进入 capability truth，blocker taxonomy 已冻结，verification 已 pass
 - next_action: 本 slice 已完成；后续 testing ladder / real-environment harness 切口由 umbrella candidate `C-20260325-0333-A` 继续承接

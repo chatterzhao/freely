@@ -13,13 +13,13 @@
 - target_environment: test-pre-merge
 - required_evidence: 执行前 opencode → 执行后 claude
 - evidence_level: mock
-- artifact_ref: docs/epics/closeout-chain/fix-agent-table-update/raw-20260703T162506Z/verification/test-evidence/acceptance-1.log
+- artifact_ref: docs/B2-docs/git-worktree/closeout/raw-20260703T162506Z/verification/test-evidence/acceptance-1.log
 - test_command: grep worker_slot .freely/agent-table.toml
 - expected_output: claude-apikey-ds-flash-auto
 - expected_RED_output: opencode-apikey-ds-flash-auto (unchanged - bug)
 - actual_RED_output: opencode-apikey-ds-flash-auto unchanged after "update"
 - actual_output: worker_slot = "claude-apikey-ds-flash-auto"
-- evidence_file: docs/epics/closeout-chain/fix-agent-table-update/raw-20260703T162506Z/verification/test-evidence/acceptance-1.log
+- evidence_file: docs/B2-docs/git-worktree/closeout/raw-20260703T162506Z/verification/test-evidence/acceptance-1.log
 - red-green-status: green
 - status: passed
 - red_how: before fix: print lied about update, file never changed

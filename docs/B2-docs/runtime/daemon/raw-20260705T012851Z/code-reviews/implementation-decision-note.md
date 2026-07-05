@@ -1,6 +1,6 @@
 ---
 issue_id: I-20260705T012851Z-A
-issue_path: docs/epics/runtime-core/bridge-init/raw-20260705T012851Z/issues/I-20260705T012851Z-A.md
+issue_path: docs/B2-docs/runtime/daemon/raw-20260705T012851Z/issues/I-20260705T012851Z-A.md
 phase_state: completed
 ---
 - issue_id: I-20260705T012851Z-A

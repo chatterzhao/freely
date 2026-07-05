@@ -1,7 +1,7 @@
 # Verification: auth-switch-real-environment-and-e2e-adequacy-governance
 
 - issue_id: `I-20260410-1835-A`
-- issue_path: `docs/epics/workspace-routing-foundation/auth-switch-real-environment-and-e2e-adequacy-governance/issues/auth-switch-real-environment-and-e2e-adequacy-governance.md`
+- issue_path: `docs/B2-docs/ibm/auth-switch-real-environment-and-e2e-adequacy-governance/issues/auth-switch-real-environment-and-e2e-adequacy-governance.md`
 - verification_date: `2026-04-10`
 - verifier: `codex`
 

@@ -18,7 +18,7 @@
 - priority: P0
 - status: promoted
 - decision_reason: 边界已经足够清楚，且刚好处在新增 `live-status` 之后，适合立即收口；继续拖延只会增加历史引用面。
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/baseline-status-command-and-status-family-governance/issues/baseline-status-command-and-status-family-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/baseline-status-command-and-status-family-governance/issues/baseline-status-command-and-status-family-governance.md`
 - next_action: materialize issue，并完成命名迁移、聚合入口与关键测试回归
 - revisit_trigger: 若后续需要 JSON family 输出或更细的过滤/排序，再回到同一预研线继续推进
 - milestone: `docs/milestones.md#m-20260306-workspace-routing-foundation`

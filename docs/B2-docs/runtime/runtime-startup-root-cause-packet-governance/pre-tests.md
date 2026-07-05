@@ -40,7 +40,7 @@
 - requirement: `Canonical docs freeze that startup authority is the promote-ready implementation lane and manager handoff remains a separate research-visible follow-on.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-startup-root-cause-packet-governance/code-reviews/20260413-runtime-startup-root-cause-packet-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-startup-root-cause-packet-governance/code-reviews/20260413-runtime-startup-root-cause-packet-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -52,7 +52,7 @@
 - requirement: `The packet owner does not claim fake-supervisor, daemon-ready, or manager continuity behavior is already repaired.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-startup-root-cause-packet-governance/code-reviews/20260413-runtime-startup-root-cause-packet-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-startup-root-cause-packet-governance/code-reviews/20260413-runtime-startup-root-cause-packet-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -64,7 +64,7 @@
 - requirement: `The guarded develop promote consumes issue/progress/review truth for this packet instead of failing as candidate-only evidence.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-startup-root-cause-packet-governance/code-reviews/20260413-runtime-startup-root-cause-packet-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-startup-root-cause-packet-governance/code-reviews/20260413-runtime-startup-root-cause-packet-verification.md`
 - surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`

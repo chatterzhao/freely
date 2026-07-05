@@ -65,25 +65,25 @@
 - requirement: `The runtime can bootstrap a lawful project-scoped operator-state fallback when the default FREELY_HOME is unwritable.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/code-reviews/20260403-sandbox-compatible-runtime-bootstrap-and-operator-state-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/code-reviews/20260403-sandbox-compatible-runtime-bootstrap-and-operator-state-verification.md`
 
 ### AT-002
 - id: `AT-002`
 - requirement: `Ps-less readiness and status surfaces degrade truthfully instead of failing the entire command surface.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/code-reviews/20260403-sandbox-compatible-runtime-bootstrap-and-operator-state-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/code-reviews/20260403-sandbox-compatible-runtime-bootstrap-and-operator-state-verification.md`
 
 ### AT-003
 - id: `AT-003`
 - requirement: `Foreign or stale pid files are refused as project runtime ownership evidence when ps is unavailable.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/code-reviews/20260403-sandbox-compatible-runtime-bootstrap-and-operator-state-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/code-reviews/20260403-sandbox-compatible-runtime-bootstrap-and-operator-state-verification.md`
 
 ### AT-004
 - id: `AT-004`
 - requirement: `The closeout lane keeps this owner completed and bounded on canonical develop.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/code-reviews/20260403-sandbox-compatible-runtime-bootstrap-and-operator-state-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/code-reviews/20260403-sandbox-compatible-runtime-bootstrap-and-operator-state-verification.md`

@@ -16,7 +16,7 @@ updated_at: '2026-05-17T12:25:53Z'
 promoted_from: C-20260513T010343Z-A
 source_candidate: docs/B1-docs/raw-20260513T010343Z/candidates.md#C-20260513T010343Z-A
 pre_tests_path: ''
-verification_artifact_dir: docs/epics/workspace-routing-foundation/raw-key-seconds-cleanup/code-reviews/
+verification_artifact_dir: docs/B2-docs/ibm/raw-key-seconds-cleanup/code-reviews/
 platform_state: closed
 ---
 

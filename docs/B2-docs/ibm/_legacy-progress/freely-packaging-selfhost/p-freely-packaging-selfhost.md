@@ -1,7 +1,7 @@
 # Progress: Freely 打包与自举验证
 
 - issue_id: I-20260502-0500-A
-- issue_path: docs/epics/freely-packaging-selfhost/issues/freely-packaging-selfhost.md
+- issue_path: docs/B2-docs/freely-packaging-selfhost/issues/freely-packaging-selfhost.md
 - phase_state: completed
 
 ## B2_IBM 完成
@@ -10,8 +10,8 @@ B2 产物已提交:
 - PRD: docs/epics/freely-packaging-selfhost/prd.md
 - Pre-Tests: docs/epics/freely-packaging-selfhost/pre-tests.md (+ v2 adequacy judgments)
 - Tasks: docs/epics/freely-packaging-selfhost/tasks.md
-- Code Reviews: docs/epics/freely-packaging-selfhost/code-reviews/Implementation-Decision-Note.md
-- Brainstorm: docs/epics/freely-packaging-selfhost/brainstorms/b-packaging-selfhost.md
+- Code Reviews: docs/B2-docs/freely-packaging-selfhost/code-reviews/Implementation-Decision-Note.md
+- Brainstorm: docs/B2-docs/freely-packaging-selfhost/brainstorms/b-packaging-selfhost.md
 
 ## Dev-Loop 实现
 

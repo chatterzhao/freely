@@ -6,7 +6,7 @@
 - runtime_state: `stopped`
 - branch: `feature/oauth-api-usage-query`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-oauth-api-usage-query`
-- issue_path: `docs/epics/workspace-routing-foundation/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/issues/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance.md`
+- issue_path: `docs/B2-docs/ibm/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/issues/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "dev-loop-initial-slice"}
 
@@ -25,4 +25,4 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager`
 - `bash docs/system/workspace/scripts/tests/test-freely-rate-limit-defers-to-watchdog`
 - `bash docs/system/workspace/scripts/tests/test-ai-cli-switch-default-tool`
-- `docs/epics/workspace-routing-foundation/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/code-reviews/20260327-oauth-sweep-launch-confirmation-verification.md`
+- `docs/B2-docs/ibm/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/code-reviews/20260327-oauth-sweep-launch-confirmation-verification.md`

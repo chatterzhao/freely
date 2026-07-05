@@ -12,9 +12,9 @@
 - source_brainstorm: `docs/B1-docs/raw-20260403/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/gate/governance-chain-legacy-repair/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-governance-chain-legacy-repair.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/gate/governance-chain-legacy-repair/code-reviews`
 - depends_on: `none`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
@@ -65,18 +65,18 @@
 
 - `docs/B1-docs/raw-20260403/brainstorms.md`
 - `docs/B1-docs/raw-20260403/candidates.md`
-- `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md`
-- `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/brainstorms/b-governance-chain-legacy-repair.md`
-- `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/child-slice-status.md`
-- `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/prd.md`
-- `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/tasks.md`
+- `docs/B2-docs/gate/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md`
+- `docs/B2-docs/gate/governance-chain-legacy-repair/brainstorms/b-governance-chain-legacy-repair.md`
+- `docs/B2-docs/gate/governance-chain-legacy-repair/child-slice-status.md`
+- `docs/B2-docs/gate/governance-chain-legacy-repair/prd.md`
+- `docs/B2-docs/gate/governance-chain-legacy-repair/pre-tests.md`
+- `docs/B2-docs/gate/governance-chain-legacy-repair/tasks.md`
 - `docs/progress/workspace-routing-foundation/p-governance-chain-legacy-repair.md`
 
 ## Current Evidence
 
 - `docs/system/workspace/scripts/quality/governance-merge-gate`
-- `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/child-slice-status.md`
+- `docs/B2-docs/gate/governance-chain-legacy-repair/child-slice-status.md`
 - `docs/B1-docs/raw-INDEX.md`
 - `docs/milestones.md`
 

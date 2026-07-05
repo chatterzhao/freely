@@ -50,25 +50,25 @@
 - requirement: `Timely push is the default followthrough after a lawful merge unless a lawful defer is active.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/code-reviews/20260408-develop-push-followthrough-escalation-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/code-reviews/20260408-develop-push-followthrough-escalation-verification.md`
 
 ### AT-002
 - id: `AT-002`
 - requirement: `Defer reasons are finite, reviewable, and recovery-bearing.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/code-reviews/20260408-develop-push-followthrough-escalation-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/code-reviews/20260408-develop-push-followthrough-escalation-verification.md`
 
 ### AT-003
 - id: `AT-003`
 - requirement: `Stale active worktrees are required to resync before latest-develop-sensitive judgment.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/code-reviews/20260408-develop-push-followthrough-escalation-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/code-reviews/20260408-develop-push-followthrough-escalation-verification.md`
 
 ### AT-004
 - id: `AT-004`
 - requirement: `The owner keeps auto-push out of scope.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/code-reviews/20260408-develop-push-followthrough-escalation-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/code-reviews/20260408-develop-push-followthrough-escalation-verification.md`

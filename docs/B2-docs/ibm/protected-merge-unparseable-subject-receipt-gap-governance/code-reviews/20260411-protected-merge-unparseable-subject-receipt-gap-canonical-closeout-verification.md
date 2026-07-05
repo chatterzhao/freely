@@ -1,7 +1,7 @@
 # Verification: protected-merge-unparseable-subject-receipt-gap-governance canonical closeout
 
 - issue_id: `I-20260411-0217-A`
-- issue_path: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
+- issue_path: `docs/B2-docs/ibm/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
 - branch: `feature/protected-merge-unparseable-subject-gap-closeout-20260411`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260411-feature-protected-merge-unparseable-subject-gap-closeout`
 - verification_date: `2026-04-11`

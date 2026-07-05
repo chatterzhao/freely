@@ -3,7 +3,7 @@
 - generated_at: 2026-04-28T06:57:12-07:00
 - review_kind: state-reconciliation-closeout
 - issue_id: I-20260421-1200-A
-- issue_path: docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md
+- issue_path: docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md
 - source_candidate: docs/B1-docs/raw-20260421/candidates.md#c-20260421-1200-a
 - phase_state_before: in_verification
 - phase_state_after: done

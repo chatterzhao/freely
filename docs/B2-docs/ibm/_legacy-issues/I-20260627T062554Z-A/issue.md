@@ -6,7 +6,7 @@
 - source_raw: raw-20260627T062554Z
 - verification_artifact_dir: docs/epics/scan-v3-refactor/code-reviews
 - canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260627T062554Z-A/issue.md
-- pre_tests_path: docs/epics/scan-v3-refactor/verification/pre-tests.md
+- pre_tests_path: docs/B2-docs/scan-v3-refactor/verification/pre-tests.md
 - title: task-lifecycle-scan v3 — 三分类重构
 
 # I-20260627T062554Z-A: Scan v3

@@ -15,10 +15,10 @@
 
 ## Evidence Read
 
-- `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
-- `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/prd.md`
-- `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/tasks.md`
+- `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
+- `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/prd.md`
+- `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/pre-tests.md`
+- `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/tasks.md`
 - `docs/progress/workspace-routing-foundation/p-application-native-runtime-observation-contract-and-observability-planes.md`
 - `docs/system/workspace/three-loop-capability-lifecycle.md`
 - `docs/system/workspace/skills/multi-worktree-supervision/SKILL.md`

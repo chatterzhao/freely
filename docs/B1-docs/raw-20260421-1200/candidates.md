@@ -16,12 +16,12 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - priority: `P0`
 - promoted_issue_id: `I-20260421-1200-A`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
+- promoted_issue_path: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
-  - `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
+  - `docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
+  - `docs/B2-docs/ibm/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
 - problem: Dogfooding proved a remaining runtime-control blocker: daemon-mode Freely could stop self-looping after a patrol round because an unexpected `TERM` was recorded as `operator_stop`, and a lone dispatcher/watchdog residue could also falsely block the next `start` or `daemon start`.
 - followthrough_update: Guarded replay then exposed two same-owner seams on canonical `develop`: runtime could not consume the current `## Worker Delegation` continuity shape into worker launches, and after that repair it could still auto-recover a `merged-clean` blocker worktree instead of routing it to cleanup followthrough retirement.
 - followthrough_update_2: The same autonomous-loop owner then exposed one more control-plane seam: manager and worker AI rounds could exit without a machine-checkable closeout contract, so runtime had no reliable way to distinguish `stop_ai`, `resume_manager`, `delegate_workers`, `worker_done`, `worker_blocked`, and `worker_handoff_needed`, nor to force a precise same-session repair when the artifact was missing.

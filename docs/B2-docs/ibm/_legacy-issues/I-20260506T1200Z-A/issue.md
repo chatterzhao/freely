@@ -6,7 +6,7 @@ completed_at: '2026-06-16T04:14:56Z'
 source_candidate: docs/B1-docs/raw-20260506/candidates.md
 milestone: M-20260506T1200Z-A
 verification_artifact_dir: docs/epics/ibm-skill-rename/code-reviews
-pre_tests_path: docs/epics/ibm-skill-rename/verification/pre-tests.md
+pre_tests_path: docs/B2-docs/ibm-skill-rename/verification/pre-tests.md
 platform_ids:
   github:
     issue_id: '2587'
@@ -23,7 +23,7 @@ created_at: '2026-06-13T10:42:20Z'
 Rename doc-pre-brainstorm-execution → doc-B1_IBM-execution,
 doc-ibm-execution → doc-B2_IBM-execution. Add I→B→M skeleton.
 
-- pre_tests_path: `docs/epics/ibm-skill-rename/verification/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/ibm-skill-rename/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/ibm-skill-rename/code-reviews`
 - issue_id: `I-20260506T1200Z-A`
 - issue_path: `docs/B2-docs/ibm/_legacy-issues/I-20260506T1200Z-A/issue.md`

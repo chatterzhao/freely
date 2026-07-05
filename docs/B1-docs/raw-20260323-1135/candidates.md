@@ -5,7 +5,7 @@
 - source_brainstorm: `docs/B1-docs/raw-20260323-1135/brainstorms.md`
 - status: `absorbed`
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+- promoted_issue_path: `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - decision_reason: `I-20260318-1630` 已吸收 account active probe / cooldown recovery contract，当前候选只保留为该 canonical watchdog owner 的 supporting evidence，不再单独 materialize。
 - session_refs:
   - tool: `codex`

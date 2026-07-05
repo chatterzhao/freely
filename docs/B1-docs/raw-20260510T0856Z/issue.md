@@ -41,5 +41,5 @@ phase_state: completed
 promoted_from: raw-20260510T0856Z
 source_candidate: docs/B1-docs/raw-20260510T0856Z/candidates.md
 verification_artifact_dir: docs/epics/mode-switch-guard/code-reviews
-pre_tests_path: docs/epics/mode-switch-guard/verification/pre-tests.md
+pre_tests_path: docs/B2-docs/mode-switch-guard/verification/pre-tests.md
 platform_state: ''

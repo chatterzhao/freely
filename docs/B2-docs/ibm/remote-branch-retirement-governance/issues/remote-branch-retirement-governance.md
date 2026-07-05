@@ -7,12 +7,12 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `remote-branch-retirement-governance`
 - issue-name: `remote-branch-retirement-governance`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/remote-branch-retirement-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/remote-branch-retirement-governance/code-reviews`
 - source_candidate: `docs/B1-docs/raw-20260321/candidates.md#c-20260321-1515-a`
 - source_brainstorm: `docs/B1-docs/raw-20260321/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- depends_on: `docs/epics/workspace-routing-foundation/worktree-maintenance-governance/issues/worktree-maintenance-governance.md`, `docs/epics/workspace-routing-foundation/worktree-fleet-governance-closure/issues/worktree-fleet-governance-closure.md`
+- depends_on: `docs/B2-docs/git-worktree/worktree-maintenance-governance/issues/worktree-maintenance-governance.md`, `docs/B2-docs/git-worktree/worktree-fleet-governance-closure/issues/worktree-fleet-governance-closure.md`
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}]
 
 ## Why
@@ -58,13 +58,13 @@ Freely 当前已经能：
 - `docs/system/workspace/skills/branch-management/references/cleanup-lifecycle.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-interruption-direct-answer`
-- `docs/epics/workspace-routing-foundation/remote-branch-retirement-governance/code-reviews/20260321-remote-branch-retirement-governance-verification.md`
+- `docs/B2-docs/ibm/remote-branch-retirement-governance/code-reviews/20260321-remote-branch-retirement-governance-verification.md`
 
 ## Verification
 
 - `./bin/governance-check`
 - `bash docs/system/workspace/scripts/tests/test-freely-interruption-direct-answer`
-- `docs/epics/workspace-routing-foundation/remote-branch-retirement-governance/code-reviews/20260326-remote-branch-retirement-canonical-replay-verification.md`
+- `docs/B2-docs/ibm/remote-branch-retirement-governance/code-reviews/20260326-remote-branch-retirement-canonical-replay-verification.md`
 
 ## Next
 

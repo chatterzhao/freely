@@ -6,7 +6,7 @@
 - runtime_state: `stopped`
 - branch: `develop`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely`
-- issue_path: `docs/epics/workspace-routing-foundation/freely-url-content-intake-skill-and-wechat-fetch-governance/issues/freely-url-content-intake-skill-and-wechat-fetch-governance.md`
+- issue_path: `docs/B2-docs/git-worktree/freely-url-content-intake-skill-and-wechat-fetch-governance/issues/freely-url-content-intake-skill-and-wechat-fetch-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -32,7 +32,7 @@
 - closure_status: `merged-and-verified`
 - closure_evidence:
   - `develop` commits `fb1044f`, `232b273`
-  - `docs/epics/workspace-routing-foundation/freely-url-content-intake-skill-and-wechat-fetch-governance/code-reviews/20260401-freely-url-content-intake-skill-verification.md`
+  - `docs/B2-docs/git-worktree/freely-url-content-intake-skill-and-wechat-fetch-governance/code-reviews/20260401-freely-url-content-intake-skill-verification.md`
   - `docs/system/workspace/skills/freely-url-content-intake/SKILL.md`
   - `docs/system/workspace/scripts/tests/test-freely-url-content-intake-skill`
 

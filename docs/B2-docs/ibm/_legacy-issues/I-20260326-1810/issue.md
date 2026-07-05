@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO6Q
     synced_at: '2026-04-27T13:14:59Z'
 primary_platform: github
-canonical_issue_path: docs/epics/freely-product-architecture/freely-layered-architecture-and-tooling-topology/issues/freely-layered-architecture-and-tooling-topology.md
+canonical_issue_path: docs/B2-docs/config/packaging/issues/freely-layered-architecture-and-tooling-topology.md
 last_synced_comment_at:
   github: '2026-04-27T11:17:27Z'
 hash: ''
@@ -30,4 +30,4 @@ Freely 已经在多个局部真源里分别写对了部分边界，例如 `three
 
 本 issue 的目标不是扩写 `docs/system/workspace/**`，而是先把 Freely 自身架构收敛到开发期高层真源，再要求其他开发文档跟随对齐。
 
-canonical: docs/epics/freely-product-architecture/freely-layered-architecture-and-tooling-topology/issues/freely-layered-architecture-and-tooling-topology.md
+canonical: docs/B2-docs/config/packaging/issues/freely-layered-architecture-and-tooling-topology.md

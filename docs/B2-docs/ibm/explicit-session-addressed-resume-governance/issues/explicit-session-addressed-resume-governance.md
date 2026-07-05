@@ -7,15 +7,15 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `explicit-session-addressed-resume-governance`
 - issue-name: `explicit-session-addressed-resume-governance`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/explicit-session-addressed-resume-governance/code-reviews`
 - priority: P1
 - source_candidate: `docs/B1-docs/raw-20260321/candidates.md#c-20260321-2010-a`
 - source_brainstorm: `docs/B1-docs/raw-20260321/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
-  - `docs/epics/workspace-routing-foundation/state-sync-and-session-evidence-governance/issues/state-sync-and-session-evidence-governance.md`
+  - `docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
+  - `docs/B2-docs/ibm/state-sync-and-session-evidence-governance/issues/state-sync-and-session-evidence-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://current-manual-codex-thread-id-not-exposed", role: "author"}
   - {tool: codex, session_id: "019d12c4-479f-7d02-9061-b6dc92bb2fd2", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/21/rollout-2026-03-21T16-39-06-019d12c4-479f-7d02-9061-b6dc92bb2fd2.jsonl", role: "fresh_with_handoff_source"}
@@ -80,7 +80,7 @@ Freely 现在对不同工具的会话续接模型不一致：
 - `docs/system/workspace/scripts/runtime/tool-launchers.sh`
 - `docs/system/workspace/scripts/monitor-ai-cli.sh`
 - `docs/progress/workspace-routing-foundation/p-explicit-session-addressed-resume-governance.md`
-- `docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/code-reviews/20260321-explicit-session-addressed-resume-verification.md`
+- `docs/B2-docs/ibm/explicit-session-addressed-resume-governance/code-reviews/20260321-explicit-session-addressed-resume-verification.md`
 
 ## Verification
 
@@ -110,10 +110,10 @@ Freely 现在对不同工具的会话续接模型不一致：
 
 ## Implementation References
 
-- `docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/brainstorms/b-explicit-session-addressed-resume-governance.md`
-- `docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/tasks.md`
+- `docs/B2-docs/ibm/explicit-session-addressed-resume-governance/brainstorms/b-explicit-session-addressed-resume-governance.md`
+- `docs/B2-docs/ibm/explicit-session-addressed-resume-governance/prd.md`
+- `docs/B2-docs/ibm/explicit-session-addressed-resume-governance/pre-tests.md`
+- `docs/B2-docs/ibm/explicit-session-addressed-resume-governance/tasks.md`
 - `docs/system/workspace/tools.md`
 - `docs/system/workspace/three-loop-capability-lifecycle.md`
 - `docs/system/workspace/scripts/runtime/freely`

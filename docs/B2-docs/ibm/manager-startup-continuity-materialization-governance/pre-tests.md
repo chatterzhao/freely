@@ -54,7 +54,7 @@
 - case_design: `Simulate a fresh startup path, inspect the expected continuity path, and verify the stub exists with startup writer metadata before any stop fallback runs.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-verification.md`
 
 ### Handoff state is machine-readable
 - id: `handoff-state-surfaced`
@@ -66,7 +66,7 @@
 - case_design: `Seed a startup stub and inspect live-status and fleet-status for the bounded handoff state surface.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-verification.md`
 
 ### Stop fallback stays repair-only
 - id: `repair-fallback-stays-distinct`
@@ -78,7 +78,7 @@
 - case_design: `Run the existing stop fallback regression and verify the writer classification still reports repair fallback rather than seeded startup continuity.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-verification.md`
 
 ### Guarded promote proves bounded adequacy
 - id: `develop-promote-manager-handoff-proof`
@@ -90,7 +90,7 @@
 - case_design: `Merge the feature lane into a disposable test-pre-merge batch, rerun the focused startup continuity and status regressions there, and record the replay in a closeout verification artifact for the develop gate.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-closeout-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-closeout-verification.md`
 
 ### Real worker-lane replay stops cleanly
 - id: `real-worker-lane-replay-clean-stop`
@@ -102,4 +102,4 @@
 - case_design: `Run one bounded foreground replay and one bounded daemon replay from the feature worktree, confirm the worker lane stays on worker semantics, and verify stop leaves the worktree at desired_runtime_state stopped with no residual same-worktree freely runtime process.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/manager-startup-continuity-materialization-governance/code-reviews/20260413-manager-startup-continuity-materialization-verification.md`

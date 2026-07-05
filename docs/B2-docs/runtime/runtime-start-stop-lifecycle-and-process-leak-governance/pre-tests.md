@@ -67,7 +67,7 @@
 - case_design: `Start or simulate an active same-project runtime, rerun freely start, and assert the command rejects without spawning an extra runtime chain.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-verification.md`
 
 ### Repeated daemon start rejects while runtime is active
 - id: `repeat-daemon-start-rejects-active-runtime`
@@ -79,7 +79,7 @@
 - case_design: `Simulate an already running same-project runtime, rerun freely daemon start, and assert the command rejects without creating a second daemon/runtime chain.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-verification.md`
 
 ### Start-lock edge cases remain lawful
 - id: `start-lock-edge-cases-stay-lawful`
@@ -91,7 +91,7 @@
 - case_design: `Replay self-owned lock, orphaned ai pid, stale active-owner lock, and launch-failure cleanup regressions and confirm the runtime keeps only lawful start-lock truth.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-verification.md`
 
 ### Stop converges on discovered same-project relaunchers
 - id: `stop-converges-on-discovered-relaunchers`
@@ -103,7 +103,7 @@
 - case_design: `Seed multiple same-project watcher and dispatcher processes, run freely stop, and confirm the discovered relaunch-capable processes are terminated.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-verification.md`
 
 ### AI fast-exit failures stay contained
 - id: `ai-fast-exit-failures-stay-contained`
@@ -115,7 +115,7 @@
 - case_design: `Replay local .iflow fast-exit failure fixtures and assert monitor-ai-cli records runtime failure truth while terminating the full descendant tree.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-verification.md`
 
 ### Guarded promote proves runtime lifecycle adequacy
 - id: `develop-promote-runtime-lifecycle-adequacy`
@@ -127,4 +127,4 @@
 - case_design: `Merge feature/runtime-process-leak-20260417 into test-pre-merge-runtime-lifecycle-20260417 with pr-merge-guarded, rerun the focused regression set plus governance-check there, and record the replay in a closeout verification artifact the develop gate can consume.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260419-runtime-start-stop-lifecycle-and-process-leak-develop-promote-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260419-runtime-start-stop-lifecycle-and-process-leak-develop-promote-verification.md`

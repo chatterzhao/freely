@@ -6,7 +6,7 @@
 - source_raw: raw-20260627T084551Z
 - verification_artifact_dir: docs/epics/acp-session-fork/code-reviews
 - canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260627T084551Z-A/issue.md
-- pre_tests_path: docs/epics/acp-session-fork/verification/pre-tests.md
+- pre_tests_path: docs/B2-docs/acp-session-fork/verification/pre-tests.md
 - title: run-acp-prompt.py fork 改用 session/fork
 
 # I-20260627T084551Z-A: ACP session/fork

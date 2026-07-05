@@ -1,7 +1,7 @@
 # Implementation Decision: runtime-audio-notifier-and-sound-semantics-governance
 
 - issue_id: `I-20260405-1215-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/issues/runtime-audio-notifier-and-sound-semantics-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-audio-notifier-and-sound-semantics-governance/issues/runtime-audio-notifier-and-sound-semantics-governance.md`
 
 ## Implementation Decision Note
 

@@ -1,7 +1,7 @@
 # Progress: scan-lifecycle-migration
 
 - issue_id: `I-20260503-0200-A`
-- issue_path: `docs/epics/workspace-routing-foundation/scan-lifecycle-migration/issues/I-20260503-0200-A.md`
+- issue_path: `docs/B2-docs/runtime/scan-lifecycle-migration/issues/I-20260503-0200-A.md`
 - title: `scan: switch to task-lifecycle-scan v2 with full lifecycle chain trace`
 - phase_state: `in_dev`
 - milestone: `M-20260306-workspace-routing-foundation`

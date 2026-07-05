@@ -17,9 +17,9 @@
 - required evidence: `reviewed owner package plus governance artifact`
 - blocker taxonomy: `execution_pending_or_failed`
 1. Review `docs/B1-docs/raw-20260405/brainstorms.md`.
-2. Review `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/brainstorms/b-ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`.
-3. Review `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/prd.md`.
-4. Review `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/prd.md`.
+2. Review `docs/B2-docs/ibm/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/brainstorms/b-ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`.
+3. Review `docs/B2-docs/ibm/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/prd.md`.
+4. Review `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/prd.md`.
 5. Run `./bin/governance-check`.
 6. Run `git diff --check`.
 
@@ -50,18 +50,18 @@
 - requirement: `The extraction threshold is explicit enough that a future owner can decide split-now versus do-not-split-yet without relying on chat memory.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/code-reviews/20260408-ai-switch-cli-extraction-threshold-and-skeleton-disposition-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/code-reviews/20260408-ai-switch-cli-extraction-threshold-and-skeleton-disposition-verification.md`
 
 ### AT-002
 - id: `AT-002`
 - requirement: `Freely control-plane versus backend responsibility remains explicit and bounded.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/code-reviews/20260408-ai-switch-cli-extraction-threshold-and-skeleton-disposition-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/code-reviews/20260408-ai-switch-cli-extraction-threshold-and-skeleton-disposition-verification.md`
 
 ### AT-003
 - id: `AT-003`
 - requirement: `The local codex-account-switch skeleton is explicitly non-canonical and constrained by written disposition rules.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/code-reviews/20260408-ai-switch-cli-extraction-threshold-and-skeleton-disposition-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/code-reviews/20260408-ai-switch-cli-extraction-threshold-and-skeleton-disposition-verification.md`

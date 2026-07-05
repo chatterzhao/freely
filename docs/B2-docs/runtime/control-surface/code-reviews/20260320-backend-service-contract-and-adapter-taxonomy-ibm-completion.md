@@ -7,10 +7,10 @@
 
 ## Scope
 
-- `docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/issues/backend-service-contract-and-adapter-taxonomy.md`
-- `docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/prd.md`
-- `docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/pre-tests.md`
-- `docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/tasks.md`
+- `docs/B2-docs/runtime/control-surface/issues/backend-service-contract-and-adapter-taxonomy.md`
+- `docs/B2-docs/runtime/control-surface/prd.md`
+- `docs/B2-docs/runtime/control-surface/pre-tests.md`
+- `docs/B2-docs/runtime/control-surface/tasks.md`
 
 ## Findings
 
@@ -25,7 +25,7 @@
 
 ## Verification Checks
 
-- `rg -n "ClientCommand|ServerEvent|Snapshot|tauri_adapter|ws_adapter|local_process_adapter|openclaw_adapter|done_ibm" docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy`
+- `rg -n "ClientCommand|ServerEvent|Snapshot|tauri_adapter|ws_adapter|local_process_adapter|openclaw_adapter|done_ibm" docs/B2-docs/runtime/backend-service-contract-and-adapter-taxonomy`
 
 ## Residual Risks
 

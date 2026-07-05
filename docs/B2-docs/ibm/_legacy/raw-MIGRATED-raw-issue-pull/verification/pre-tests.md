@@ -38,4 +38,4 @@
 - case_design: `raw-issue-pull --raw-key 20260506T1000Z returns github issue_id: "231"`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/raw-issue-pull/code-reviews/review.md`
+- artifact_ref: `docs/B2-docs/raw-issue-pull/code-reviews/review.md`

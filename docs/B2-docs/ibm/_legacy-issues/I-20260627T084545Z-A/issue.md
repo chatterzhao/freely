@@ -6,7 +6,7 @@
 - source_raw: raw-20260627T084545Z
 - verification_artifact_dir: docs/epics/a2a-tasks-agent-id/code-reviews
 - canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260627T084545Z-A/issue.md
-- pre_tests_path: docs/epics/a2a-tasks-agent-id/verification/pre-tests.md
+- pre_tests_path: docs/B2-docs/a2a-tasks-agent-id/verification/pre-tests.md
 - title: a2a_tasks agent_id 改具体编号 + 字段补全
 
 # I-20260627T084545Z-A: a2a_tasks agent_id 改具体编号

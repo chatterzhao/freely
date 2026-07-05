@@ -41,5 +41,5 @@ platform_state: closed
 - #256 已修复 reference-transaction hook delete 拦截（已合并）
 - #257 platform-adapter.py 标题 key 标准化 bug
 
-- pre_tests_path: docs/epics/wt-create-pull-after-worktree/verification/pre-tests.md
+- pre_tests_path: docs/B2-docs/wt-create-pull-after-worktree/verification/pre-tests.md
 - verification_artifact_dir: docs/epics/wt-create-pull-after-worktree/code-reviews

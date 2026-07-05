@@ -1,7 +1,7 @@
 # Progress: incremental-dogfooding-gate-for-backend-increments
 
 - issue_id: `I-20260317-1003`
-- issue_path: `docs/epics/frontend-probe-dogfooding-loop/incremental-dogfooding-gate-for-backend-increments/issues/incremental-dogfooding-gate-for-backend-increments.md`
+- issue_path: `docs/B2-docs/human/tui/issues/incremental-dogfooding-gate-for-backend-increments.md`
 - title: `Incremental Dogfooding Gate for Backend Increments`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -21,10 +21,10 @@
 
 ## Verification Evidence
 
-- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260409-051451-feature-incremental-dogfooding-gate-parked-ibm-closeout --issue docs/epics/frontend-probe-dogfooding-loop/incremental-dogfooding-gate-for-backend-increments/issues/incremental-dogfooding-gate-for-backend-increments.md`
+- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260409-051451-feature-incremental-dogfooding-gate-parked-ibm-closeout --issue docs/B2-docs/human/tui/issues/incremental-dogfooding-gate-for-backend-increments.md`
 - `./bin/governance-check`
 - `git diff --check`
-- `docs/epics/frontend-probe-dogfooding-loop/incremental-dogfooding-gate-for-backend-increments/code-reviews/20260409-incremental-dogfooding-gate-for-backend-increments-canonical-closeout-verification.md`
+- `docs/B2-docs/human/tui/code-reviews/20260409-incremental-dogfooding-gate-for-backend-increments-canonical-closeout-verification.md`
 
 ## Next Action
 

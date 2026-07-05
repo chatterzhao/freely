@@ -1,7 +1,7 @@
 # Progress: github-first-external-issue-source-governance
 
 - issue_id: `I-20260407-1042-A`
-- issue_path: `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/issues/github-first-external-issue-source-governance.md`
+- issue_path: `docs/B2-docs/ibm/github-first-external-issue-source-governance/issues/github-first-external-issue-source-governance.md`
 - title: `GitHub-first external issue source governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -23,8 +23,8 @@ This owner now carries the bounded GitHub-first external-source governance packa
 
 ## Verification Evidence
 
-- `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/code-reviews/20260420-github-first-external-issue-source-governance-decision.md`
-- `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/code-reviews/20260420-github-first-external-issue-source-governance-verification.md`
+- `docs/B2-docs/ibm/github-first-external-issue-source-governance/code-reviews/20260420-github-first-external-issue-source-governance-decision.md`
+- `docs/B2-docs/ibm/github-first-external-issue-source-governance/code-reviews/20260420-github-first-external-issue-source-governance-verification.md`
 - `bash docs/system/workspace/scripts/tests/test-routing-foundation-loop`
 - `bash docs/system/workspace/scripts/tests/test-human-chat-routing`
 - `./bin/governance-check`

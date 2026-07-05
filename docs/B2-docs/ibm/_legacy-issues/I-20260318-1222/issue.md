@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO55
     synced_at: '2026-04-27T13:13:58Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/mem9-continuity-bridge/issues/mem9-continuity-bridge.md
+canonical_issue_path: docs/B2-docs/ibm/mem9-continuity-bridge/issues/mem9-continuity-bridge.md
 last_synced_comment_at:
   github: '2026-04-27T11:13:28Z'
 hash: ''
@@ -28,4 +28,4 @@ Freely 已经拥有本地 continuity / recovery / session rotation / multi-workt
 - 什么必须继续由本地治理事实源裁决
 - 外部 memory 是否只作为 continuity enhancement，而不是 authority
 
-canonical: docs/epics/workspace-routing-foundation/mem9-continuity-bridge/issues/mem9-continuity-bridge.md
+canonical: docs/B2-docs/ibm/mem9-continuity-bridge/issues/mem9-continuity-bridge.md

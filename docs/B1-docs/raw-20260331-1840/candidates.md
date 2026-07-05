@@ -33,7 +33,7 @@
     verdict: `promote`
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/issues/multi-tool-auto-switch-v1-codex-fallback-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/multi-tool-auto-switch-v1-codex-fallback-governance/issues/multi-tool-auto-switch-v1-codex-fallback-governance.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`
@@ -50,7 +50,7 @@
   - `docs/system/workspace/tools.md`
   - `docs/system/workspace/scripts/runtime/ai-cli`
   - `docs/system/workspace/scripts/runtime/freely`
-  - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+  - `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
   - `docs/B1-docs/raw-20260318-1818/brainstorms.md`
 - decision_reason:
   - 原始 brainstorm 与更早的 availability-manager 研究都要求“同工具先恢复，再按工具顺序 fallback”；窄 v1 只是中间桥接，不应覆盖更大的 contract。

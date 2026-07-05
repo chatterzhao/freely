@@ -33,7 +33,7 @@
 - requirement: feedback creates issues via platform-adapter, no local files
 - evidence_level: mock
 ^- status: passed
-- artifact_ref: docs/epics/feedback-platform-only/code-reviews/implementation-decision.md
+- artifact_ref: docs/B2-docs/feedback-platform-only/code-reviews/implementation-decision.md
 ## Real-Environment
 - real_environment_status: pass
 - real_environment_reason: verified during merge

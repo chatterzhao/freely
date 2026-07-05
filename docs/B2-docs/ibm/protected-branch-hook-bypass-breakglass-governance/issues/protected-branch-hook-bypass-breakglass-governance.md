@@ -12,11 +12,11 @@
 - source_brainstorm: `docs/B1-docs/raw-20260402/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/pre-tests.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/code-reviews`
+- pre_tests_path: `docs/B2-docs/ibm/protected-branch-hook-bypass-breakglass-governance/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/ibm/protected-branch-hook-bypass-breakglass-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/develop-merge-issue-binding-and-cmi-governance/issues/develop-merge-issue-binding-and-cmi-governance.md`
-  - `docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/issues/worktree-exclusive-ownership-and-promotion-lease-governance.md`
+  - `docs/B2-docs/ibm/develop-merge-issue-binding-and-cmi-governance/issues/develop-merge-issue-binding-and-cmi-governance.md`
+  - `docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/issues/worktree-exclusive-ownership-and-promotion-lease-governance.md`
   - `docs/system/workspace/hooks/README.md`
   - `docs/system/workspace/scripts/worktree/pr-merge-guarded`
   - `docs/system/workspace/scripts/quality/governance-check`
@@ -63,12 +63,12 @@ Freely 当前已经有 protected-branch hooks、`pr-merge-guarded`、develop-bou
 
 - `docs/B1-docs/raw-20260402/brainstorms.md`
 - `docs/B1-docs/raw-20260402/candidates.md`
-- `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/issues/protected-branch-hook-bypass-breakglass-governance.md`
-- `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/brainstorms/b-protected-branch-hook-bypass-breakglass-governance.md`
-- `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/tasks.md`
-- `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/code-reviews/20260402-protected-branch-hook-bypass-breakglass-verification.md`
+- `docs/B2-docs/ibm/protected-branch-hook-bypass-breakglass-governance/issues/protected-branch-hook-bypass-breakglass-governance.md`
+- `docs/B2-docs/ibm/protected-branch-hook-bypass-breakglass-governance/brainstorms/b-protected-branch-hook-bypass-breakglass-governance.md`
+- `docs/B2-docs/ibm/protected-branch-hook-bypass-breakglass-governance/prd.md`
+- `docs/B2-docs/ibm/protected-branch-hook-bypass-breakglass-governance/pre-tests.md`
+- `docs/B2-docs/ibm/protected-branch-hook-bypass-breakglass-governance/tasks.md`
+- `docs/B2-docs/ibm/protected-branch-hook-bypass-breakglass-governance/code-reviews/20260402-protected-branch-hook-bypass-breakglass-verification.md`
 - `docs/milestones.md`
 
 ## Current Evidence

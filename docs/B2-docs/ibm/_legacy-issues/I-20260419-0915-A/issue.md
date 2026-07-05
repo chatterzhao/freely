@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFOA7
     synced_at: '2026-04-27T13:17:34Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md
+canonical_issue_path: docs/B2-docs/ibm/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md
 last_synced_comment_at:
   github: '2026-04-27T11:28:15Z'
 hash: ''
@@ -27,4 +27,4 @@ The whole-app lifecycle model is important enough that Freely should maintain ex
 
 Because the earlier three-loop architecture owner is already `completed`, this governance-only closeout still needs its own lawful owner chain before `develop` can 
 
-canonical: docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md
+canonical: docs/B2-docs/ibm/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md

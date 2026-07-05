@@ -71,4 +71,4 @@
 - requirement: `live kiro failure plus dead codex slot still converge to a later usable codex slot before launch`
 - evidence_level: `post_merge_dogfood`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/code-reviews/20260401-all-tools-unified-slot-contract-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/all-tools-unified-slot-contract-governance/code-reviews/20260401-all-tools-unified-slot-contract-verification.md`

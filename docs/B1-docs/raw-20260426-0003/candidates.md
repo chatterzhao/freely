@@ -19,5 +19,5 @@
 - session_refs:
   - {tool: ccds, session_id: "20260426-ibm-framework", jsonl_path: "unavailable://manual", role: "author"}
 - absorbed_by_issue: `I-20260426-0000-A`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/issues/tool-alias-and-opencode-launcher-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/tool-alias-and-opencode-launcher-governance/issues/tool-alias-and-opencode-launcher-governance.md`
 - decision_reason: `Governance documentation improvement absorbed into the canonical tool launcher governance issue, which is the active owner for framework-level changes.`

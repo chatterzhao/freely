@@ -85,14 +85,14 @@ intake_id: ""
 author: zhaoquan
 channel: freely-fix-execution
 session_refs: []
-pre_tests_path: docs/epics/a2a-restore-async/verification/pre-tests.md
+pre_tests_path: docs/B2-docs/a2a-restore-async/verification/pre-tests.md
 verification_artifact_dir: docs/epics/a2a-restore-async/code-reviews
 ---
 
 # I-20260624T004524Z-A: A2A server _restore_tasks 异步化
 
 - source_candidate: `docs/B1-docs/raw-20260624T004524Z/candidates.md#C-20260624T004524Z-A`
-- pre_tests_path: `docs/epics/a2a-restore-async/verification/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/a2a-restore-async/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/a2a-restore-async/code-reviews`
 - milestone: M-20260624T004524Z-A
 
@@ -103,7 +103,7 @@ verification_artifact_dir: docs/epics/a2a-restore-async/code-reviews
 IEOF
 
 # B2: pre-tests
-cat > docs/epics/a2a-restore-async/verification/pre-tests.md << 'PEOF'
+cat > docs/B2-docs/a2a-restore-async/verification/pre-tests.md << 'PEOF'
 # Pre-Tests: A2A server _restore_tasks 异步化
 
 - issue_id: I-20260624T004524Z-A
@@ -178,7 +178,7 @@ cat > docs/epics/a2a-restore-async/tasks.md << 'TEOF'
 TEOF
 
 # B2: code-review (implementation decision note)
-cat > docs/epics/a2a-restore-async/code-reviews/implementation-decision-note.md << 'REOF'
+cat > docs/B2-docs/a2a-restore-async/code-reviews/implementation-decision-note.md << 'REOF'
 # Implementation Decision Note: _restore_tasks 异步化
 
 - issue_id: I-20260624T004524Z-A

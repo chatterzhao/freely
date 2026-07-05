@@ -1,7 +1,7 @@
 # Verification: pretests-adequacy-item-schema-materialization-governance
 
 - issue_id: `I-20260411-1415-A`
-- issue_path: `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/issues/pretests-adequacy-item-schema-materialization-governance.md`
+- issue_path: `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/issues/pretests-adequacy-item-schema-materialization-governance.md`
 - verification_date: `2026-04-12`
 - verifier: `codex`
 

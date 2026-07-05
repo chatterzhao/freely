@@ -8,5 +8,5 @@ milestone: M-20260630T151209Z-A
 - candidate_format_version: v2
 - title: unified _read_config_value() + --reset flag
 - status: promoted
-- promoted_issue_path: docs/epics/acp-tool-setup/unified-config-reader/raw-20260630T151209Z/issues/I-20260630T151209Z-A.md
+- promoted_issue_path: docs/B2-docs/acp/multi-bridge/raw-20260630T151209Z/issues/I-20260630T151209Z-A.md
 - milestone: M-20260630T151209Z-A

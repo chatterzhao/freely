@@ -36,7 +36,7 @@
 - priority: P1
 - status: promoted
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md`
+- promoted_issue_path: `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md`
 - next_action: Candidate mirror only. `I-20260405-2136-A` is now the canonical owner for prompt-visible-but-unclaimed runtime supervision; continue all follow-on implementation and verification from the issue-bound package instead of this pre-brainstorm candidate.
 - revisit_trigger: Revisit only if canonical `develop` proves the blocked supervision family actually belongs inside an existing owner, or if the prompt-visible-but-unclaimed surface disappears without needing a dedicated lifecycle.
 - session_refs:

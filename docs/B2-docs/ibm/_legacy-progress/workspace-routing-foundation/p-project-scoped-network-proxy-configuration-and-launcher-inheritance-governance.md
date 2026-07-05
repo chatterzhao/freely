@@ -6,7 +6,7 @@
 - runtime_state: `stopped`
 - branch: `feature/network-proxy-config-capability-restack`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-network-proxy-config-capability-restack`
-- issue_path: `docs/epics/workspace-routing-foundation/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/issues/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance.md`
+- issue_path: `docs/B2-docs/ibm/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/issues/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "dev-loop-initial-slice"}
 

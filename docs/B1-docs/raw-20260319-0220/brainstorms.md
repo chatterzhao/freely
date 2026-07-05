@@ -52,9 +52,9 @@ Freely 当前已经在 `develop` 里具备以下能力：
 
 ### 3. Governance / continuity 层
 
-- `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/**`
-- `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/**`
-- `docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/**`
+- `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/**`
+- `docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/**`
+- `docs/B2-docs/ibm/manager-self-supervision-and-autonomous-recovery/**`
 
 这里已经在文档上接近形成三种不同 owner：
 
@@ -263,9 +263,9 @@ retirement after:
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
-  - `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
-  - `docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md`
+  - `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+  - `docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
+  - `docs/B2-docs/ibm/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md`
 
 ### Next recommended action
 

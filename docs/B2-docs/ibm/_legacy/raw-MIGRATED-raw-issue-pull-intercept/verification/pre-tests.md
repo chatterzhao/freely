@@ -44,7 +44,7 @@
 - promotion_gate: develop_merge
 - evidence_level: integration
 ^- status: passed
-- artifact_ref: docs/epics/raw-issue-pull-intercept/code-reviews/review.md
+- artifact_ref: docs/B2-docs/raw-issue-pull-intercept/code-reviews/review.md
 
 ### AT-002 branch mismatch
 - id: branch-mismatch
@@ -54,7 +54,7 @@
 - promotion_gate: develop_merge
 - evidence_level: integration
 ^- status: passed
-- artifact_ref: docs/epics/raw-issue-pull-intercept/code-reviews/review.md
+- artifact_ref: docs/B2-docs/raw-issue-pull-intercept/code-reviews/review.md
 
 ### AT-003 cli dispatch
 - id: cli-dispatch
@@ -64,4 +64,4 @@
 - promotion_gate: develop_merge
 - evidence_level: integration
 ^- status: passed
-- artifact_ref: docs/epics/raw-issue-pull-intercept/code-reviews/review.md
+- artifact_ref: docs/B2-docs/raw-issue-pull-intercept/code-reviews/review.md

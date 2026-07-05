@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO8L
     synced_at: '2026-04-27T13:16:20Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/issues/runtime-audio-notifier-and-sound-semantics-governance.md
+canonical_issue_path: docs/B2-docs/runtime/runtime-audio-notifier-and-sound-semantics-governance/issues/runtime-audio-notifier-and-sound-semantics-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:24:14Z'
 hash: ''
@@ -34,4 +34,4 @@ Freely 现在能把 runtime signal 暴露到 Tauri/frontend，但还没有一条
 
 因此这条 owner 的职责是冻结标准路径与 sound semantics，而不是把 watchdog 继续做胖。
 
-canonical: docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/issues/runtime-audio-notifier-and-sound-semantics-governance.md
+canonical: docs/B2-docs/runtime/runtime-audio-notifier-and-sound-semantics-governance/issues/runtime-audio-notifier-and-sound-semantics-governance.md

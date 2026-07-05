@@ -54,4 +54,4 @@
 - requirement: `closeout truth sources document the same Kiro failure family as the runtime and focused regression`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/kiro-cli-runtime-availability-failure-governance/code-reviews/20260331-kiro-cli-runtime-availability-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/kiro-cli-runtime-availability-failure-governance/code-reviews/20260331-kiro-cli-runtime-availability-verification.md`

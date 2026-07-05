@@ -13,7 +13,7 @@ platform_ids:
     url: https://github.com/chatterzhao/freely/issues/1145
     synced_at: ''
 primary_platform: github
-canonical_issue_path: docs/epics/freely-packaging-selfhost/issues/freely-packaging-selfhost.md
+canonical_issue_path: docs/B2-docs/freely-packaging-selfhost/issues/freely-packaging-selfhost.md
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-02T05:00:00Z'
@@ -34,12 +34,12 @@ platform_state: closed
 - PRD: docs/epics/freely-packaging-selfhost/prd.md
 - Pre-Tests: docs/epics/freely-packaging-selfhost/pre-tests.md
 - Tasks: docs/epics/freely-packaging-selfhost/tasks.md
-- Brainstorm: docs/epics/freely-packaging-selfhost/brainstorms/b-packaging-selfhost.md
-- Code Reviews: docs/epics/freely-packaging-selfhost/code-reviews/
-- Implementation Decision: docs/epics/freely-packaging-selfhost/code-reviews/Implementation-Decision-Note.md
+- Brainstorm: docs/B2-docs/freely-packaging-selfhost/brainstorms/b-packaging-selfhost.md
+- Code Reviews: docs/B2-docs/freely-packaging-selfhost/code-reviews/
+- Implementation Decision: docs/B2-docs/freely-packaging-selfhost/code-reviews/Implementation-Decision-Note.md
 
 ## References
 
 - B1: docs/B1-docs/raw-20260502/
-- Issue: docs/epics/freely-packaging-selfhost/issues/freely-packaging-selfhost.md
+- Issue: docs/B2-docs/freely-packaging-selfhost/issues/freely-packaging-selfhost.md
 - Progress: docs/progress/freely-packaging-selfhost/p-freely-packaging-selfhost.md

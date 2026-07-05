@@ -19,8 +19,8 @@
 - `docs/B1-docs/raw-20260303-0000/brainstorms.md`
 - `docs/B1-docs/raw-20260304-0000/brainstorms.md`
 - `docs/B1-docs/raw-20260308-1244/brainstorms.md`
-- `docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/prd.md`
-- `docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/issues/internal-frontend-backend-architecture-review.md`
+- `docs/B2-docs/human/tui/prd.md`
+- `docs/B2-docs/human/tui/issues/internal-frontend-backend-architecture-review.md`
 
 第三方生态与扩展研究：
 

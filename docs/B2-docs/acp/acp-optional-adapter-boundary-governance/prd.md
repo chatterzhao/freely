@@ -19,9 +19,9 @@ Freely 的 runtime/governance 已经足够成熟，真正开始暴露出 adapter
 
 - `docs/B1-docs/raw-20260401/brainstorms.md`
 - `docs/B1-docs/raw-20260401/candidates.md`
-- `docs/epics/workspace-routing-foundation/acp-optional-adapter-boundary-governance/issues/acp-optional-adapter-boundary-governance.md`
-- `docs/epics/workspace-routing-foundation/acp-optional-adapter-boundary-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/acp-optional-adapter-boundary-governance/tasks.md`
+- `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/issues/acp-optional-adapter-boundary-governance.md`
+- `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/pre-tests.md`
+- `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/tasks.md`
 - `docs/system/workspace/tools.md`
 - `docs/system/workspace/scripts/runtime/tool-launchers.sh`
 

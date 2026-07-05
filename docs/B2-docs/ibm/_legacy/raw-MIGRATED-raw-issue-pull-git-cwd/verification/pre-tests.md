@@ -3,4 +3,4 @@
 ## Unit
 - acceptance target: raw-issue-pull 在 fix 工位中正常执行
 ^- status: passed
-- artifact_ref: docs/epics/raw-issue-pull-git-cwd/code-reviews/review.md
+- artifact_ref: docs/B2-docs/raw-issue-pull-git-cwd/code-reviews/review.md

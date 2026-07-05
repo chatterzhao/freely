@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO9T
     synced_at: '2026-04-27T13:17:12Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/issues/runtime-forensic-time-alignment-and-stall-recovery-observability-governance.md
+canonical_issue_path: docs/B2-docs/runtime/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/issues/runtime-forensic-time-alignment-and-stall-recovery-observability-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:27:03Z'
 hash: ''
@@ -33,4 +33,4 @@ After absolute-time alignment, the incident proved to be one run, not mixed hist
 
 - startup at `2026-04-13T01:12:03Z` matched local `2026-04-12
 
-canonical: docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/issues/runtime-forensic-time-alignment-and-stall-recovery-observability-governance.md
+canonical: docs/B2-docs/runtime/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/issues/runtime-forensic-time-alignment-and-stall-recovery-observability-governance.md

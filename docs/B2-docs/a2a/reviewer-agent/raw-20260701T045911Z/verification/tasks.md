@@ -11,13 +11,13 @@
 - target_environment: test-pre-merge-20260701T045911Z-reviewer-agent-orchestration
 - required_evidence: grep 输出
 - evidence_level: integration
-- artifact_ref: docs/epics/reviewer-agent/phase1-ensure-reviewer/raw-20260701T045911Z/verification/acceptance-1.log
+- artifact_ref: docs/B2-docs/a2a/reviewer-agent/raw-20260701T045911Z/verification/acceptance-1.log
 - test_command: grep -c "ensure_reviewer\|reviewer.*agent\|reviewer.*ACP" docs/system/workspace/scripts/runtime/freely
 - expected_output: >=3 references
 - expected_RED_output: 0 (函数不存在)
 - actual_RED_output: 0 occurrences — RED confirmed
 - actual_output: 1 occurrence (ensure_reviewer_agent function defined)
-- evidence_file: docs/epics/reviewer-agent/phase1-ensure-reviewer/raw-20260701T045911Z/verification/acceptance-1.log
+- evidence_file: docs/B2-docs/a2a/reviewer-agent/raw-20260701T045911Z/verification/acceptance-1.log
 - red-green-status: green
 - status: passed
 - red_how: feature: 修复前无 ensure_reviewer 函数
@@ -30,13 +30,13 @@ PLACEHOLDER_AT2
 - target_environment: test-pre-merge-20260701T045911Z-reviewer-agent-orchestration
 - required_evidence: grep
 - evidence_level: integration
-- artifact_ref: docs/epics/reviewer-agent/phase1-ensure-reviewer/raw-20260701T045911Z/verification/acceptance-2.log
+- artifact_ref: docs/B2-docs/a2a/reviewer-agent/raw-20260701T045911Z/verification/acceptance-2.log
 - test_command: grep -c "reviewer\|REVIEWER" docs/system/workspace/scripts/runtime/a2a/a2a_server.py
 - expected_output: >=3
 - expected_RED_output: 0
 - actual_RED_output: 0 occurrences in A2A server — RED confirmed
 - actual_output: 3 occurrences (reviewer prefix checks added)
-- evidence_file: docs/epics/reviewer-agent/phase1-ensure-reviewer/raw-20260701T045911Z/verification/acceptance-2.log
+- evidence_file: docs/B2-docs/a2a/reviewer-agent/raw-20260701T045911Z/verification/acceptance-2.log
 - red-green-status: green
 - status: passed
 - red_how: feature: A2A 当前不支持 reviewer agent_id
@@ -49,13 +49,13 @@ PLACEHOLDER_AT2
 - target_environment: test-pre-merge-20260701T045911Z-reviewer-agent-orchestration
 - required_evidence: grep
 - evidence_level: integration
-- artifact_ref: docs/epics/reviewer-agent/phase1-ensure-reviewer/raw-20260701T045911Z/verification/acceptance-3.log
+- artifact_ref: docs/B2-docs/a2a/reviewer-agent/raw-20260701T045911Z/verification/acceptance-3.log
 - test_command: grep -c "dispatch_reviewer\|ensure_reviewer\|launch_reviewer" bin/freely-cycle docs/system/workspace/scripts/runtime/freely
 - expected_output: >=2 处有实际 dispatch 逻辑
 - expected_RED_output: 0
 - actual_RED_output: 仅 1 处 suggest，无实际 dispatch — RED confirmed
 - actual_output: dispatch_reviewer log + ensure_reviewer_agent 函数
-- evidence_file: docs/epics/reviewer-agent/phase1-ensure-reviewer/raw-20260701T045911Z/verification/acceptance-3.log
+- evidence_file: docs/B2-docs/a2a/reviewer-agent/raw-20260701T045911Z/verification/acceptance-3.log
 - red-green-status: green
 - status: passed
 - red_how: feature: freely-cycle 只建议 dispatch，无执行代码

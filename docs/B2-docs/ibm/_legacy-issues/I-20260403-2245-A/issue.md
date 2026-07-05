@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO87
     synced_at: '2026-04-27T13:16:06Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/issues/sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md
+canonical_issue_path: docs/B2-docs/ibm/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/issues/sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:23:21Z'
 hash: ''
@@ -29,4 +29,4 @@ Without this owner, a sandboxed session can lose both sanctioned recovery paths:
 
 1. direct Git ownership work in the intended worktree is blocked by sandbox me
 
-canonical: docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/issues/sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md
+canonical: docs/B2-docs/ibm/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/issues/sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md

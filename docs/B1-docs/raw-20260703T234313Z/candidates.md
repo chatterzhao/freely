@@ -12,6 +12,6 @@ milestone: M-20260703T234313Z-A
 absorbed_into: I-20260703T234313Z-A
 - decision_reason: 消除"历史遗留"豁免，强制完整 workflow
 - absorbed_into: I-20260703T234313Z-A
-- promoted_issue_path: docs/epics/closeout-chain/close-ibm-loophole/raw-20260703T234313Z/issues/I-20260703T234313Z-A.md
+- promoted_issue_path: docs/B2-docs/git-worktree/closeout/raw-20260703T234313Z/issues/I-20260703T234313Z-A.md
 - promoted_issue_id: I-20260703T234313Z-A
 - milestone: M-20260703T234313Z-A

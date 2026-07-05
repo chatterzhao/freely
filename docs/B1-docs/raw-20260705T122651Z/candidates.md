@@ -10,5 +10,5 @@ milestone: M-20260705T122651Z-A
 - status: absorbed
 - decision_reason: B2 示例缺层 + pr-review fallback 历史残留，统一修正
 - promoted_issue_id: I-20260705T122651Z-A
-- promoted_issue_path: docs/epics/git-guidelines/docs-epics-path-fix/raw-20260705T122651Z/issues/I-20260705T122651Z-A.md
+- promoted_issue_path: docs/B2-docs/gate/gitignore/raw-20260705T122651Z/issues/I-20260705T122651Z-A.md
 - milestone: M-20260705T122651Z-A

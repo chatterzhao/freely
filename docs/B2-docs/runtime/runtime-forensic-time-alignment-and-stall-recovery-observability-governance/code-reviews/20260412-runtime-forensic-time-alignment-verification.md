@@ -1,6 +1,6 @@
 # Verification: runtime-forensic-time-alignment-and-stall-recovery-observability-governance
 
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/issues/runtime-forensic-time-alignment-and-stall-recovery-observability-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/issues/runtime-forensic-time-alignment-and-stall-recovery-observability-governance.md`
 - verified_at: `2026-04-12`
 - verifier: `codex`
 

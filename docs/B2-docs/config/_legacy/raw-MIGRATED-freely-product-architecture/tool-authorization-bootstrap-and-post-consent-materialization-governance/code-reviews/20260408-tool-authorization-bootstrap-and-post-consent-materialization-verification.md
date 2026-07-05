@@ -1,7 +1,7 @@
 # Verification: tool-authorization-bootstrap-and-post-consent-materialization-governance
 
 - issue_id: `I-20260405-1235-A`
-- issue_path: `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
+- issue_path: `docs/B2-docs/config/packaging/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
 - verification_date: `2026-04-08`
 - verifier: `codex`
 
@@ -15,7 +15,7 @@
 
 1. `./bin/governance-check`
 2. `git diff --check`
-3. `rg -n "promoted_issue_(path|id)|phase_state" docs/B1-docs/raw-20260405/candidates.md docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md docs/milestones.md`
+3. `rg -n "promoted_issue_(path|id)|phase_state" docs/B1-docs/raw-20260405/candidates.md docs/B2-docs/config/packaging/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md docs/milestones.md`
 
 ## Implementation Decision Note
 

@@ -1,7 +1,7 @@
 # Verification: runtime-daemon-self-loop-followthrough-governance empty Codex session resume followthrough
 
 - issue_id: `I-20260421-1200-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
 - verification_date: `2026-04-22`
 - verifier: `codex`
 - source_branch: `feature/codex-empty-session-resume-fallback-20260422`
@@ -22,7 +22,7 @@
 1. `bash docs/system/workspace/scripts/tests/test-freely-explicit-resume-target-contract`
 2. `./bin/governance-check`
 3. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-explicit-resume-target-contract`
-4. `./bin/test-lane premerge-integration -- ./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260422-test-pre-merge-codex-empty-session-resume-fallback --issue docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
+4. `./bin/test-lane premerge-integration -- ./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260422-test-pre-merge-codex-empty-session-resume-fallback --issue docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
 5. `./bin/test-lane premerge-integration -- ./bin/governance-check`
 
 ## Implementation Decision Note

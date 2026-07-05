@@ -17,7 +17,7 @@
 
 ## 3. Code Review Evidence
 ^- status: passed
-- evidence: implementation-decision.md in docs/epics/feedback-issue-sync/code-reviews/, all 5 fields complete
+- evidence: implementation-decision.md in docs/B2-docs/feedback-issue-sync/code-reviews/, all 5 fields complete
 
 ## 4. Pre-test Evidence
 ^- status: passed

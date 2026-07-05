@@ -1,7 +1,7 @@
 # Progress: runtime-supervisor-attach-reuse-followthrough-governance
 
 - issue_id: `I-20260419-1505-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/issues/runtime-supervisor-attach-reuse-followthrough-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-supervisor-attach-reuse-followthrough-governance/issues/runtime-supervisor-attach-reuse-followthrough-governance.md`
 - title: `Runtime supervisor attach reuse followthrough governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -26,7 +26,7 @@
 4. `bash docs/system/workspace/scripts/tests/test-freely-cc-launch-isolates-home-under-project-runtime`
 5. `git diff --check`
 6. `./bin/governance-check`
-7. `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/code-reviews/20260419-runtime-supervisor-attach-reuse-followthrough-verification.md`
+7. `docs/B2-docs/runtime/runtime-supervisor-attach-reuse-followthrough-governance/code-reviews/20260419-runtime-supervisor-attach-reuse-followthrough-verification.md`
 
 ## Current Batch Risks
 

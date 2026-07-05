@@ -46,7 +46,7 @@
   - `docs/system/workspace/agents/manager-agent.md`
   - `docs/system/workspace/agents/worker-agent.md`
   - `docs/system/workspace/scripts/tests/`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`

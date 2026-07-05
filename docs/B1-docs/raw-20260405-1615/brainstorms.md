@@ -461,8 +461,8 @@
 - stale_statement:
   - `把 feature-owned renewable batch family、rebuild orchestration、family cleanup automation 读成当前仓库已经完整落地的既成事实。`
 - canonical_truth:
-  - `docs/epics/workspace-routing-foundation/test-pre-merge-family-promotion-gate-enforcement-governance/issues/test-pre-merge-family-promotion-gate-enforcement-governance.md`
-  - `docs/epics/workspace-routing-foundation/test-lane-routing-and-enforcement-governance/issues/test-lane-routing-and-enforcement-governance.md`
+  - `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/issues/test-pre-merge-family-promotion-gate-enforcement-governance.md`
+  - `docs/B2-docs/gate/test-lane-routing-and-enforcement-governance/issues/test-lane-routing-and-enforcement-governance.md`
 - materialized_scope:
   - `canonical naming 已统一到 test-pre-merge-*`
   - `develop-bound guarded promotion 已被收紧到 canonical test-pre-merge path`

@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO5S
     synced_at: '2026-04-27T13:14:25Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/worktree-fleet-governance-closure/issues/worktree-fleet-governance-closure.md
+canonical_issue_path: docs/B2-docs/git-worktree/worktree-fleet-governance-closure/issues/worktree-fleet-governance-closure.md
 last_synced_comment_at:
   github: '2026-04-27T11:14:53Z'
 hash: ''
@@ -39,4 +39,4 @@ Freely 已经具备单树 worktree audit、merge-prep、stacked merge-chain 和 
 - 有些树已经 merge 但未 cleanup，治理未真正结束
 - 有些树 candidate / issue 生命周期未闭环，却容易被误判为“完成”
 
-canonical: docs/epics/workspace-routing-foundation/worktree-fleet-governance-closure/issues/worktree-fleet-governance-closure.md
+canonical: docs/B2-docs/git-worktree/worktree-fleet-governance-closure/issues/worktree-fleet-governance-closure.md

@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO9D
     synced_at: '2026-04-27T13:16:53Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md
+canonical_issue_path: docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:26:16Z'
 hash: ''
@@ -27,4 +27,4 @@ platform_state: closed
 
 Because `develop` push lawfully rejects candidate-only retirement evidence, this closure needs its own narrow followthrough owner instead of pretending the d
 
-canonical: docs/epics/workspace-routing-foundation/runtime-evidence-provenance-research-retirement-followthrough-governance/issues/runtime-evidence-provenance-research-retirement-followthrough-governance.md
+canonical: docs/B2-docs/runtime/runtime-evidence-provenance-research-retirement-followthrough-governance/issues/runtime-evidence-provenance-research-retirement-followthrough-governance.md

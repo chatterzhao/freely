@@ -1,7 +1,7 @@
 # Pre-tests — scan-pr-platform-config
 
 - issue_id: `I-20260501-0000-A`
-- issue_path: `docs/epics/workspace-routing-foundation/scan-pr-platform-config/issues/I-20260501-0000-A.md`
+- issue_path: `docs/B2-docs/runtime/scan-pr-platform-config/issues/I-20260501-0000-A.md`
 
 ## Unit
 
@@ -48,7 +48,7 @@
 - requirement: `freely runtime script passes bash -n syntax check.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/scan-pr-platform-config/code-reviews/20260501-scan-pr-platform-config-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/scan-pr-platform-config/code-reviews/20260501-scan-pr-platform-config-verification.md`
 - surface_kind: `unit`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -59,7 +59,7 @@
 - requirement: `governance-check reports no new errors from this branch.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/scan-pr-platform-config/code-reviews/20260501-scan-pr-platform-config-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/scan-pr-platform-config/code-reviews/20260501-scan-pr-platform-config-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -70,7 +70,7 @@
 - requirement: `freely runtime script passes bash -n syntax check via merge flow.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/scan-pr-platform-config/code-reviews/20260501-scan-pr-platform-config-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/scan-pr-platform-config/code-reviews/20260501-scan-pr-platform-config-verification.md`
 - surface_kind: `unit`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
@@ -81,7 +81,7 @@
 - requirement: `governance-check passes during test-pre-merge -> develop merge.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/scan-pr-platform-config/code-reviews/20260501-scan-pr-platform-config-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/scan-pr-platform-config/code-reviews/20260501-scan-pr-platform-config-verification.md`
 - surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`

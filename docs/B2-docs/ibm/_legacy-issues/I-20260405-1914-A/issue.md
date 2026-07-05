@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO8S
     synced_at: '2026-04-27T13:16:30Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/test-lane-routing-and-enforcement-governance/issues/test-lane-routing-and-enforcement-governance.md
+canonical_issue_path: docs/B2-docs/gate/test-lane-routing-and-enforcement-governance/issues/test-lane-routing-and-enforcement-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:24:48Z'
 hash: ''
@@ -33,4 +33,4 @@ platform_state: closed
 
 这说明当前问题已经是独立的 lane-routing/enforcement surface，而不是 promote-gate owner 的附带实现。
 
-canonical: docs/epics/workspace-routing-foundation/test-lane-routing-and-enforcement-governance/issues/test-lane-routing-and-enforcement-governance.md
+canonical: docs/B2-docs/gate/test-lane-routing-and-enforcement-governance/issues/test-lane-routing-and-enforcement-governance.md

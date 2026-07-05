@@ -21,7 +21,7 @@
 - priority: P0
 - status: promoted
 - milestone: M-20260306-workspace-routing-foundation
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/manager-supervision-quiet-period-stall-signal-governance/issues/manager-supervision-quiet-period-stall-signal-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/manager-supervision-quiet-period-stall-signal-governance/issues/manager-supervision-quiet-period-stall-signal-governance.md`
 - decision_reason: 现阶段证据已足以确认 primary owner 是 manager delegated-supervision quiet-period heartbeat contract，而不是旧 `same-lane busy` issue 的 verification 尾巴，也不是纯 observability 命名问题。该问题已经满足独立 issue materialization 条件。
 - next_action: 按新 issue 进入 IBM/dev 流程，先补 negative/paired-positive tests，再选择 delegated-supervision idle-safe contract 或 signal-first / observe-delay 的最小修法，最后再处理 observability 区分。
 - revisit_trigger: 后续仅在实现阶段发现 delegated backlog absorption 与 quiet-period signal contract 实际不可分时，才重新调整 owner 边界。

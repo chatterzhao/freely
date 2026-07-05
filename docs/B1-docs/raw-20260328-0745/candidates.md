@@ -36,7 +36,7 @@
 - priority: P1
 - status: promoted
 - decision_reason: This is not a new product surface and not a broad same-family reopen. It is a narrow current-state reconciliation bug inside `live-status`, so the right lifecycle is a small promoted repair issue with a fresh compliant key rather than mutating an older non-compliant issue family.
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/live-status-current-runtime-state-reconciliation-governance/issues/live-status-current-runtime-state-reconciliation-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/live-status-current-runtime-state-reconciliation-governance/issues/live-status-current-runtime-state-reconciliation-governance.md`
 - milestone: `docs/milestones.md#M-20260306-workspace-routing-foundation`
 - next_action: Merge the narrow runtime/test repair, then leave any broader status-family evolution to separate lifecycles.
 - revisit_trigger: If a future patrol shows `live-status` again mixing current runtime truth with stale persisted state, or if reconciliation starts hiding real degraded conditions without a live project-owned PID, reopen this family as a new focused regression issue.

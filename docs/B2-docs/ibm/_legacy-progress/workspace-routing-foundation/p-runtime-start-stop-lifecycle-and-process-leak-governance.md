@@ -1,7 +1,7 @@
 # Progress: runtime-start-stop-lifecycle-and-process-leak-governance
 
 - issue_id: `I-20260417-0445-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
 - title: `Runtime start/stop lifecycle and process leak governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -36,8 +36,8 @@
 14. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-kills-iflow-descendants-on-runtime-failure`
 15. `./bin/test-lane premerge-integration -- ./bin/governance-check`
 16. `git diff --check`
-17. `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-verification.md`
-18. `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
+17. `docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-verification.md`
+18. `docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews/20260418-runtime-start-stop-lifecycle-and-process-leak-closeout-verification.md`
 
 ## Current Batch Risks
 

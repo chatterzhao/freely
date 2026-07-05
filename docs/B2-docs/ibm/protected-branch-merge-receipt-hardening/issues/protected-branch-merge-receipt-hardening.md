@@ -12,11 +12,11 @@
 - source_brainstorm: `docs/B1-docs/raw-20260402/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/ibm/protected-branch-merge-receipt-hardening/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-protected-branch-merge-receipt-hardening.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/protected-branch-merge-receipt-hardening/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/issues/protected-branch-hook-bypass-breakglass-governance.md`
+  - `docs/B2-docs/ibm/protected-branch-hook-bypass-breakglass-governance/issues/protected-branch-hook-bypass-breakglass-governance.md`
   - `docs/system/workspace/scripts/worktree/pr-merge-guarded`
   - `docs/system/workspace/scripts/quality/governance-check`
   - `docs/system/workspace/scripts/quality/governance-merge-gate`
@@ -77,16 +77,16 @@
 
 - `docs/B1-docs/raw-20260402/brainstorms.md`
 - `docs/B1-docs/raw-20260402/candidates.md`
-- `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md`
-- `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/brainstorms/b-protected-branch-merge-receipt-hardening.md`
-- `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/prd.md`
-- `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/tasks.md`
+- `docs/B2-docs/ibm/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md`
+- `docs/B2-docs/ibm/protected-branch-merge-receipt-hardening/brainstorms/b-protected-branch-merge-receipt-hardening.md`
+- `docs/B2-docs/ibm/protected-branch-merge-receipt-hardening/prd.md`
+- `docs/B2-docs/ibm/protected-branch-merge-receipt-hardening/pre-tests.md`
+- `docs/B2-docs/ibm/protected-branch-merge-receipt-hardening/tasks.md`
 - `docs/progress/workspace-routing-foundation/p-protected-branch-merge-receipt-hardening.md`
 
 ## Current Evidence
 
-- `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/issues/protected-branch-hook-bypass-breakglass-governance.md`
+- `docs/B2-docs/ibm/protected-branch-hook-bypass-breakglass-governance/issues/protected-branch-hook-bypass-breakglass-governance.md`
 - `docs/system/workspace/scripts/worktree/pr-merge-guarded`
 - `docs/system/workspace/scripts/quality/governance-check`
 - `docs/system/workspace/scripts/quality/governance-merge-gate`
@@ -111,7 +111,7 @@
 - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
 - `git diff --check`
 - `./bin/governance-check`
-- `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/code-reviews/20260402-protected-branch-merge-receipt-hardening-verification.md`
+- `docs/B2-docs/ibm/protected-branch-merge-receipt-hardening/code-reviews/20260402-protected-branch-merge-receipt-hardening-verification.md`
 
 ## Next
 

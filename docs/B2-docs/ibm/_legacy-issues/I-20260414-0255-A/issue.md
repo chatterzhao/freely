@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFOA1
     synced_at: '2026-04-27T13:17:22Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/issues/freely-start-auto-recovery-rootcause-governance.md
+canonical_issue_path: docs/B2-docs/ibm/freely-start-auto-recovery-rootcause-governance/issues/freely-start-auto-recovery-rootcause-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:27:41Z'
 hash: ''
@@ -30,4 +30,4 @@ platform_state: closed
 3. 一旦 inner loop 先跳号，现场就会伪装成 “failure type 判断错了” 或 “应该分 limit/network/auth 多种切法”，但那不是根因。
 4. 正确合同只有一条：任何触发切号的失败都走统一切号方法；在同工具内部，先切到当前后的下一个 saved slot 并真正执行，直到 same-tool 耗尽后再交给跨工具外循环。
 
-canonical: docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/issues/freely-start-auto-recovery-rootcause-governance.md
+canonical: docs/B2-docs/ibm/freely-start-auto-recovery-rootcause-governance/issues/freely-start-auto-recovery-rootcause-governance.md

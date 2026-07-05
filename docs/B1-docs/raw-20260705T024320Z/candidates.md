@@ -20,5 +20,5 @@ milestone: M-20260705T024320Z-A
   - sse-watchdog 传 base_tool
 - promotion_gate: 全部修复通过 bash -n + Python AST
 - promoted_issue_id: I-20260705T024320Z-A
-- promoted_issue_path: docs/epics/agent-acp/per-agent-tool-env/raw-20260705T024320Z/issues/I-20260705T024320Z-A.md
+- promoted_issue_path: docs/B2-docs/config/agent-table/raw-20260705T024320Z/issues/I-20260705T024320Z-A.md
 - milestone: M-20260705T024320Z-A

@@ -6,7 +6,7 @@
 - runtime_state: `stopped`
 - branch: `feature/acp-client-agent-protocol-research-20260401`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260401-feature-acp-client-agent-protocol-research`
-- issue_path: `docs/epics/workspace-routing-foundation/codex-acp-fresh-path-prototype/issues/codex-acp-fresh-path-prototype.md`
+- issue_path: `docs/B2-docs/config/codex-acp-fresh-path-prototype/issues/codex-acp-fresh-path-prototype.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "dev-loop-author"}
   - {tool: shell, session_id: "51019", jsonl_path: "unavailable://pty-download-session", role: "binary-acquisition-exec"}
@@ -24,5 +24,5 @@
   - `merge_commit: a0f9a48`
   - `tests: bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-codex-acp-fresh`
   - `tests: bash docs/system/workspace/scripts/tests/test-freely-tool-adapter-policy-resolution`
-  - `review: docs/epics/workspace-routing-foundation/codex-acp-fresh-path-prototype/code-reviews/20260401-codex-acp-fresh-path-prototype-verification.md`
+  - `review: docs/B2-docs/config/codex-acp-fresh-path-prototype/code-reviews/20260401-codex-acp-fresh-path-prototype-verification.md`
   - `governance: ./bin/governance-check`

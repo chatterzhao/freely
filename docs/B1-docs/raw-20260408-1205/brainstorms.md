@@ -385,9 +385,9 @@ worker prompt header / continuity 至少应新增：
 - reconcile_status: `stale_with_follow_on`
 - why: `这里把“当前 develop 尚未 adequacy enforce”与“应如何 materialize follow-on owner”混在了一起。后续 canonical truth 已经把 adequacy 问题收束到独立 owner，但该 owner 的更强 gate 并不等于已经全部合回当前 develop 基线。`
 - canonical_truth:
-  - `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
-  - `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/code-reviews/20260408-verification-contract-and-premerge-adequacy-verification.md`
+  - `docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
+  - `docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/pre-tests.md`
+  - `docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/code-reviews/20260408-verification-contract-and-premerge-adequacy-verification.md`
 - stale_statement:
   - `governance-merge-gate 当前不解析 pre_tests_path，pre-merge-commit 在 develop guarded merge 路径里也不会调用 pretests-gate；因此 test-pre-merge-* -> develop 仍未真正检查 testing adequacy。`
 - follow_on_note: `不要再把这句旧判断当作 owner 归因入口；当前应直接看 adequacy owner 的 issue / pre-tests / verification receipt，并区分“已在 owner 中冻结”“已在某条 feature lane materialize”“已合回 develop”这三个阶段。`

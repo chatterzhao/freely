@@ -1,7 +1,7 @@
 # Implementation Decision: codex-interactive-login-and-apikey-input-flow-governance
 
 - issue_id: `I-20260406-1851-A`
-- issue_path: `docs/epics/workspace-routing-foundation/codex-interactive-login-and-apikey-input-flow-governance/issues/codex-interactive-login-and-apikey-input-flow-governance.md`
+- issue_path: `docs/B2-docs/config/codex-interactive-login-and-apikey-input-flow-governance/issues/codex-interactive-login-and-apikey-input-flow-governance.md`
 - decided_in_branch: `feature/codex-apikey-login-interactive`
 - decided_in_worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-codex-apikey-login-interactive`
 - decided_at: `2026-04-06`

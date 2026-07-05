@@ -1,7 +1,7 @@
 # Implementation Decision Note: cli-help-and-dry-run-contract-followthrough-governance
 
 - issue_id: `I-20260405-2358-D`
-- issue_path: `docs/epics/workspace-routing-foundation/cli-help-and-dry-run-contract-followthrough-governance/issues/cli-help-and-dry-run-contract-followthrough-governance.md`
+- issue_path: `docs/B2-docs/human/cli-help-and-dry-run-contract-followthrough-governance/issues/cli-help-and-dry-run-contract-followthrough-governance.md`
 - decision_date: `2026-04-06`
 - author: `codex`
 

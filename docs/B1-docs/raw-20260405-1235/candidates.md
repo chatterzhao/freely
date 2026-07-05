@@ -31,7 +31,7 @@
   - 本地代码和测试已证明 Freely 具备“部分自动 materialization”能力，因此现在最需要的是边界合同，而不是再堆实现
   - 用户已明确要求这一步先充分研究，不急于直接编码 capability
 - milestone: `M-20260326-freely-product-architecture`
-- promoted_issue_path: `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
+- promoted_issue_path: `docs/B2-docs/config/packaging/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
 - promoted_issue_id: `I-20260405-1235-A`
 - next_action: This candidate is now materialized as `I-20260405-1235-A`. Keep the owner documentation-first: freeze the authorization/bootstrap matrix, post-consent degradation semantics, CLI-first backend contract, and runtime refactor seam before opening narrower implementation follow-ons.
 - revisit_trigger: 当 per-tool matrix 已稳定，或某个工具新增了可验证的 project-local config/trust surface，或 Freely 开始提供 UI/CLI 授权修改入口时。

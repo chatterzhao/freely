@@ -7,7 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `token-efficient-session-continuity-and-rotation-governance`
 - issue-name: `token-efficient-session-continuity-and-rotation-governance`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/code-reviews`
 - priority: P0
 - source_candidate: `docs/B1-docs/raw-20260319/candidates.md#c-20260319-0018-a`
 - source_brainstorm: `docs/B1-docs/raw-20260319/brainstorms.md`
@@ -15,9 +15,9 @@
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/session-lifecycle-rotation-and-handoff-governance/issues/session-lifecycle-rotation-and-handoff-governance.md`
-  - `docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md`
-  - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+  - `docs/B2-docs/ibm/session-lifecycle-rotation-and-handoff-governance/issues/session-lifecycle-rotation-and-handoff-governance.md`
+  - `docs/B2-docs/ibm/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md`
+  - `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
   - {tool: codex, session_id: "019d05d3-be75-7e42-bbd1-aa2b29e1bad0", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/19/rollout-2026-03-19T04-20-56-019d05d3-be75-7e42-bbd1-aa2b29e1bad0.jsonl", role: "fresh_with_handoff_source"}
@@ -68,11 +68,11 @@ Freely 现在已经有：
 
 ## Implementation References
 
-- `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/brainstorms/b-token-efficient-session-continuity-and-rotation-governance.md`
-- `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/tasks.md`
-- `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/references/trigger-owner-matrix.md`
+- `docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/brainstorms/b-token-efficient-session-continuity-and-rotation-governance.md`
+- `docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/prd.md`
+- `docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/pre-tests.md`
+- `docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/tasks.md`
+- `docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/references/trigger-owner-matrix.md`
 - `docs/system/workspace/skills/continuity-watchdog/SKILL.md`
 - `docs/system/workspace/skills/watchdog-control-plane/SKILL.md`
 - `docs/system/workspace/skills/recovery-subagent-governance/SKILL.md`
@@ -85,7 +85,7 @@ Freely 现在已经有：
 - review of `docs/system/workspace/skills/continuity-watchdog/SKILL.md`
 - review of `docs/system/workspace/skills/watchdog-control-plane/SKILL.md`
 - review of `docs/system/workspace/skills/recovery-subagent-governance/SKILL.md`
-- review of `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/references/trigger-owner-matrix.md`
+- review of `docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/references/trigger-owner-matrix.md`
 
 ## Closure Judgment
 

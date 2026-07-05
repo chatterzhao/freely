@@ -19,13 +19,13 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-pre_tests_path: docs/epics/raw-issue-pull-intercept/verification/pre-tests.md
+pre_tests_path: docs/B2-docs/raw-issue-pull-intercept/verification/pre-tests.md
 verification_artifact_dir: docs/epics/raw-issue-pull-intercept/code-reviews
 source_candidate: docs/B1-docs/raw-20260507T143544Z/candidates.md
 platform_state: closed
 ---
 
-- pre_tests_path: `docs/epics/raw-issue-pull-intercept/verification/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/raw-issue-pull-intercept/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/raw-issue-pull-intercept/code-reviews`
 
 ## 问题

@@ -10,7 +10,7 @@ milestone: M-20260624T090654Z-A
 title: 'fix: ai-cli *) fallback to generic for registered tools'
 platform_ids: {}
 primary_platform: github
-pre_tests_path: docs/epics/ai-cli-generic-tool-commands/verification/pre-tests.md
+pre_tests_path: docs/B2-docs/ai-cli-generic-tool-commands/verification/pre-tests.md
 verification_artifact_dir: docs/epics/ai-cli-generic-tool-commands/code-reviews
 platform_state: open
 ---

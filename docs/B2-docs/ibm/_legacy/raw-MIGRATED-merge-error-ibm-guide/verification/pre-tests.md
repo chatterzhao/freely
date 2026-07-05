@@ -39,4 +39,4 @@
 - promotion_gate: develop_merge
 - evidence_level: integration
 ^- status: passed
-- artifact_ref: docs/epics/merge-error-ibm-guide/code-reviews/review.md
+- artifact_ref: docs/B2-docs/merge-error-ibm-guide/code-reviews/review.md

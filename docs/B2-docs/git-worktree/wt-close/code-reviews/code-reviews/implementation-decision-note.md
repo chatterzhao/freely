@@ -1,6 +1,6 @@
 ---
 issue_id: I-20260629T164530Z-A
-issue_path: docs/epics/wt-close-raw-key/raw-key-flag/raw-20260629T164530Z/issues/I-20260629T164530Z-A.md
+issue_path: docs/B2-docs/git-worktree/wt-close/raw-20260629T164530Z/issues/I-20260629T164530Z-A.md
 phase_state: done_b2_ibm
 ---
 - issue_id: I-20260629T164530Z-A

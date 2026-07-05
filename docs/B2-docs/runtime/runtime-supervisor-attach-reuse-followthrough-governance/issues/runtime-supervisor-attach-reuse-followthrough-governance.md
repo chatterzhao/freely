@@ -12,10 +12,10 @@
 - source_brainstorm: `docs/B1-docs/raw-20260419/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/pre-tests.md`
-- tasks_path: `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/tasks.md`
+- pre_tests_path: `docs/B2-docs/runtime/runtime-supervisor-attach-reuse-followthrough-governance/pre-tests.md`
+- tasks_path: `docs/B2-docs/runtime/runtime-supervisor-attach-reuse-followthrough-governance/tasks.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-runtime-supervisor-attach-reuse-followthrough-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/runtime/runtime-supervisor-attach-reuse-followthrough-governance/code-reviews`
 - created_at: `2026-04-19`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}

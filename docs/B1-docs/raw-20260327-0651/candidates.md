@@ -34,7 +34,7 @@
 - next_action: 继续把这条 gate 合入 `develop`，然后由 closeout lane 把 issue 从 `in_verification` 推到 `completed`，再让其他 active worktree 吸收新的 completed gate 后进入 closeout。
 - revisit_trigger: 当 merged worktree cleanup / retirement 仍可能绕过 issue-bound acceptance evidence 时，再以 follow-on 扩到 retirement gate。
 - promoted_issue_id: `I-20260327-0701`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/issues/pre-tests-evidence-binding-and-completion-gate-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/pre-tests-evidence-binding-and-completion-gate-governance/issues/pre-tests-evidence-binding-and-completion-gate-governance.md`
 - legacy_id_mapping: I-20260327-0701  # 历史遗留的 issue id
 - milestone: `M-20260306-workspace-routing-foundation`
 - session_refs:
@@ -71,7 +71,7 @@
 - next_action: 继续在当前 lane 完成 closeout evidence、吸收新的 completed gate，并在验证后合入 `develop`。
 - revisit_trigger: 当前端配置面或非 Codex tooling 需要更细粒度覆盖时，再扩展更结构化的 proxy config surface。
 - promoted_issue_id: `I-20260327-0651`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/issues/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/issues/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance.md`
 - legacy_id_mapping: I-20260327-0651  # 历史遗留的 issue id
 - milestone: `M-20260306-workspace-routing-foundation`
 - session_refs:

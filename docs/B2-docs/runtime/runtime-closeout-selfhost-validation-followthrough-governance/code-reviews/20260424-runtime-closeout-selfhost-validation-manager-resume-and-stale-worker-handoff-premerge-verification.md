@@ -1,7 +1,7 @@
 # Verification: runtime-closeout-selfhost-validation manager resume and stale worker handoff premerge replay
 
 - issue_id: `I-20260419-0333-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/issues/runtime-closeout-selfhost-validation-followthrough-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-closeout-selfhost-validation-followthrough-governance/issues/runtime-closeout-selfhost-validation-followthrough-governance.md`
 - verification_date: `2026-04-24`
 - verifier: `codex`
 - lane: `test-pre-merge-20260424-retained-cleanup-owner-rebind-followthrough`

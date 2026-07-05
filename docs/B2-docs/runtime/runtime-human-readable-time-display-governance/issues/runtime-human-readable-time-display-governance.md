@@ -12,11 +12,11 @@
 - source_brainstorm: `docs/B1-docs/raw-20260402/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/runtime/runtime-human-readable-time-display-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-runtime-human-readable-time-display-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/runtime/runtime-human-readable-time-display-governance/code-reviews`
 - depends_on:
-  - `docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0/issues/frontend-probe-v0.md`
+  - `docs/B2-docs/human/tui/issues/frontend-probe-v0.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -76,14 +76,14 @@ After the status-tail closeout landed, a runtime follow-up found one more consis
 - `docs/B1-docs/raw-20260402/brainstorms.md`
 - `docs/B1-docs/raw-20260402/candidates.md`
 - `docs/milestones.md`
-- `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md`
-- `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/brainstorms/b-runtime-human-readable-time-display-governance.md`
-- `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/tasks.md`
-- `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/code-reviews/20260402-runtime-human-readable-time-display-verification.md`
+- `docs/B2-docs/runtime/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md`
+- `docs/B2-docs/runtime/runtime-human-readable-time-display-governance/brainstorms/b-runtime-human-readable-time-display-governance.md`
+- `docs/B2-docs/runtime/runtime-human-readable-time-display-governance/prd.md`
+- `docs/B2-docs/runtime/runtime-human-readable-time-display-governance/pre-tests.md`
+- `docs/B2-docs/runtime/runtime-human-readable-time-display-governance/tasks.md`
+- `docs/B2-docs/runtime/runtime-human-readable-time-display-governance/code-reviews/20260402-runtime-human-readable-time-display-verification.md`
 - `docs/progress/workspace-routing-foundation/p-runtime-human-readable-time-display-governance.md`
-- `docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0/code-reviews/20260401-frontend-probe-v0-terminal-attach-validation.md`
+- `docs/B2-docs/human/tui/code-reviews/20260401-frontend-probe-v0-terminal-attach-validation.md`
 - `docs/progress/frontend-probe-dogfooding-loop/p-frontend-probe-v0.md`
 - `docs/system/workspace/scripts/runtime/ai-cli`
 - `docs/system/workspace/scripts/runtime/freely`

@@ -18,7 +18,7 @@
 - priority: `P0`
 - status: `promoted`
 - decision_reason: manager 路由、auto-loop skill、专门 worker skill 与 lifecycle 真源都已改到位；继续把这条能力停留在 research 状态，会让 Freely 继续把 milestone maintenance 当成无 owner 的附属工作。
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/milestone-planning-and-state-maintenance/issues/milestone-planning-and-state-maintenance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/milestone-planning-and-state-maintenance/issues/milestone-planning-and-state-maintenance.md`
 - legacy_id_mapping: I-20260320-0512  # 历史遗留的 issue id
 - milestone: `M-20260306-workspace-routing-foundation`
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}]

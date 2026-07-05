@@ -1,7 +1,7 @@
 # Implementation Decision Note: codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance
 
 - issue_id: `I-20260406-0901-A`
-- issue_path: `docs/epics/workspace-routing-foundation/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/issues/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
+- issue_path: `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/issues/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
 - branch: `feature/codex-hi-fast-fail-and-runtime-availability`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-codex-hi-fast-fail-and-runtime-availability`
 - decision_date: `2026-04-06`

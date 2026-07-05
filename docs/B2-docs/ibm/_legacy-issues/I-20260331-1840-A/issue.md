@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO7C
     synced_at: '2026-04-27T13:15:23Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/issues/multi-tool-auto-switch-v1-codex-fallback-governance.md
+canonical_issue_path: docs/B2-docs/ibm/multi-tool-auto-switch-v1-codex-fallback-governance/issues/multi-tool-auto-switch-v1-codex-fallback-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:21:32Z'
 hash: ''
@@ -31,4 +31,4 @@ Freely 最早的 availability-manager 研究和 `20260331-1840` brainstorm 都�
 
 后来物化时把这条 contract 收窄成了 `kiro-cli -> codex` bridge。当前 owner 要把它抬回原始设计，但保留 Codex watchdog 的 probe-first / shared-lock / no-launch invariants。
 
-canonical: docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/issues/multi-tool-auto-switch-v1-codex-fallback-governance.md
+canonical: docs/B2-docs/ibm/multi-tool-auto-switch-v1-codex-fallback-governance/issues/multi-tool-auto-switch-v1-codex-fallback-governance.md

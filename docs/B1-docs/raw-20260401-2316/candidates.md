@@ -4,7 +4,7 @@
 - candidate_format_version: `v2`
 - title: Align the `cc:auto + adapter=acp` init regression test with the canonical activation-consent contract
 - source_brainstorm: `docs/B1-docs/raw-20260401-2316/brainstorms.md`
-- reopen_of_issue: `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/issues/freely-tool-autonomy-policy-materialization-governance.md`
+- reopen_of_issue: `docs/B2-docs/config/packaging/issues/freely-tool-autonomy-policy-materialization-governance.md`
 - reopen_reason: `test-freely-init-cc-config still called the canonical cc:auto ACP init path without --accept-default-autonomy after activation consent became mandatory`
 - problem: canonical `develop` still carries one stale test invocation on the `cc:auto + --tool-adapter acp` init path, so the test now fails even though runtime behavior already matches the frozen activation-consent contract.
 - why_now:
@@ -34,7 +34,7 @@
   - a fresh candidate / issue is the smallest compliant path through the develop merge gate
   - the owner stays narrow enough to close immediately after develop absorption
 - milestone: `M-20260326-freely-product-architecture`
-- promoted_issue_path: `docs/epics/freely-product-architecture/cc-acp-init-autonomy-consent-test-followthrough-governance/issues/cc-acp-init-autonomy-consent-test-followthrough-governance.md`
+- promoted_issue_path: `docs/B2-docs/config/packaging/issues/cc-acp-init-autonomy-consent-test-followthrough-governance.md`
 - promoted_issue_path_role: `primary-owner`
 - session_refs:
   - tool: `codex`

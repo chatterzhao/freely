@@ -1,7 +1,7 @@
 # Progress: runtime-evidence-provenance-research-retirement-followthrough-governance
 
 - issue_id: `I-20260409-1715-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-evidence-provenance-research-retirement-followthrough-governance/issues/runtime-evidence-provenance-research-retirement-followthrough-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-evidence-provenance-research-retirement-followthrough-governance/issues/runtime-evidence-provenance-research-retirement-followthrough-governance.md`
 - title: `Runtime evidence provenance research retirement followthrough governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -21,12 +21,12 @@
 
 ## Verification Evidence
 
-1. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260409-feature-runtime-evidence-provenance-research-retirement --issue docs/epics/workspace-routing-foundation/runtime-evidence-provenance-research-retirement-followthrough-governance/issues/runtime-evidence-provenance-research-retirement-followthrough-governance.md`
+1. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260409-feature-runtime-evidence-provenance-research-retirement --issue docs/B2-docs/runtime/runtime-evidence-provenance-research-retirement-followthrough-governance/issues/runtime-evidence-provenance-research-retirement-followthrough-governance.md`
 2. `git diff --check`
 3. `./bin/governance-check`
 4. `git push origin develop`
 5. `git worktree list --porcelain`
-6. `docs/epics/workspace-routing-foundation/runtime-evidence-provenance-research-retirement-followthrough-governance/code-reviews/20260409-runtime-evidence-provenance-research-retirement-followthrough-verification.md`
+6. `docs/B2-docs/runtime/runtime-evidence-provenance-research-retirement-followthrough-governance/code-reviews/20260409-runtime-evidence-provenance-research-retirement-followthrough-verification.md`
 
 ## Next Action
 

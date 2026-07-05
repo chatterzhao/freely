@@ -1,7 +1,7 @@
 # Implementation Decision Note: test-pre-merge-family-promotion-gate-enforcement-governance
 
 - issue_id: `I-20260405-1805-A`
-- issue_path: `docs/epics/workspace-routing-foundation/test-pre-merge-family-promotion-gate-enforcement-governance/issues/test-pre-merge-family-promotion-gate-enforcement-governance.md`
+- issue_path: `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/issues/test-pre-merge-family-promotion-gate-enforcement-governance.md`
 - decision_date: `2026-04-05`
 - author: `codex`
 

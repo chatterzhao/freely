@@ -22,9 +22,9 @@ wt-create 需要一次性创建两个工位：
 
 - **I-issue**: `docs/B1-docs/raw-I-20260506T1230Z-A/issue.md` — 已存在，`phase_state: in_dev`
 - **Milestone**: `M-20260506T1230Z-A` — 已存在且 active，已关联该 I-issue
-- **Code review**: `docs/epics/wt-create-dual/code-reviews/review.md` — 已完成，决策正确
-- **Pre-tests**: `docs/epics/wt-create-dual/verification/pre-tests.md` — 已完成，覆盖 unit/integration/e2e
-- **Tasks**: `docs/epics/wt-create-dual/verification/tasks.md` — 全部已完成
+- **Code review**: `docs/B2-docs/wt-create-dual/code-reviews/review.md` — 已完成，决策正确
+- **Pre-tests**: `docs/B2-docs/wt-create-dual/verification/pre-tests.md` — 已完成，覆盖 unit/integration/e2e
+- **Tasks**: `docs/B2-docs/wt-create-dual/verification/tasks.md` — 全部已完成
 - **实现脚本**: `docs/system/workspace/scripts/worktree/wt-create` — 已支持 `--raw-key --prefix --skill --slug`
 - **Skill 更新**: `docs/system/workspace/skills/fix-execution/SKILL.md` 和 `feat-execution/SKILL.md` — 已更新
 
@@ -48,7 +48,7 @@ wt-create 需要一次性创建两个工位：
 - **理由**: wt-create dual worktree creation 的全部 B2/实现/测试/合并工作已在并发开发中完成。当前代码库已支持一次性创建 test-pre-merge + fix/feature 双工位，fix→test-pre-merge 为 fast-forward。
 - **证据**:
   - `docs/B1-docs/raw-I-20260506T1230Z-A/issue.md` — I-issue 已存在
-  - `docs/epics/wt-create-dual/code-reviews/review.md` — Code review 已完成
-  - `docs/epics/wt-create-dual/verification/pre-tests.md` — 验收测试通过
-  - `docs/epics/wt-create-dual/verification/tasks.md` — 全部任务完成
+  - `docs/B2-docs/wt-create-dual/code-reviews/review.md` — Code review 已完成
+  - `docs/B2-docs/wt-create-dual/verification/pre-tests.md` — 验收测试通过
+  - `docs/B2-docs/wt-create-dual/verification/tasks.md` — 全部任务完成
   - `docs/system/workspace/scripts/worktree/wt-create` — 实现已落地

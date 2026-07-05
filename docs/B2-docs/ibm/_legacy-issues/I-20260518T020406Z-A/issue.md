@@ -19,7 +19,7 @@ author: zhaoquan
 channel: manager-promotion
 session_refs: []
 pre_tests_path: ''
-verification_artifact_dir: 'docs/epics/chat-conversation-extension/implementation/code-reviews'
+verification_artifact_dir: 'docs/B2-docs/human/discuss/code-reviews'
 platform_state: closed
 ---
 

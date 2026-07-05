@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO78
     synced_at: '2026-04-27T13:15:19Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/manager-attach-reuse-missing-ai-repair-governance/issues/manager-attach-reuse-missing-ai-repair-governance.md
+canonical_issue_path: docs/B2-docs/ibm/manager-attach-reuse-missing-ai-repair-governance/issues/manager-attach-reuse-missing-ai-repair-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:21:22Z'
 hash: ''
@@ -29,4 +29,4 @@ That means the defect is narrower than a general `live-status` redesign:
 
 1. manager attach reuse can accept a live supervisor without a confirmed liv
 
-canonical: docs/epics/workspace-routing-foundation/manager-attach-reuse-missing-ai-repair-governance/issues/manager-attach-reuse-missing-ai-repair-governance.md
+canonical: docs/B2-docs/ibm/manager-attach-reuse-missing-ai-repair-governance/issues/manager-attach-reuse-missing-ai-repair-governance.md

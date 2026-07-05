@@ -69,8 +69,8 @@
   - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-pid`
   - `bash tests/test_doc_gate.sh`
 - 已写入 review 证据：
-  - `docs/epics/workspace-routing-foundation/source-routing-and-derived-worktree-governance/code-reviews/20260316-first-hop-second-hop-verification.md`
-  - `docs/epics/workspace-routing-foundation/source-routing-and-derived-worktree-governance/code-reviews/20260326-source-routing-canonical-replay-verification.md`
+  - `docs/B2-docs/ibm/source-routing-and-derived-worktree-governance/code-reviews/20260316-first-hop-second-hop-verification.md`
+  - `docs/B2-docs/ibm/source-routing-and-derived-worktree-governance/code-reviews/20260326-source-routing-canonical-replay-verification.md`
 - 当前研究阶段尚未启用正式 `docs/progress/**`，本轮 dev-loop 等价执行证据写入 `docs/B1-docs/raw-CONVERGENCE.md`。
 
 ## Next

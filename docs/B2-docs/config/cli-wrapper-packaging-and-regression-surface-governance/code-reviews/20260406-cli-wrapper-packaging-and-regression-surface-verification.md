@@ -1,6 +1,6 @@
 # Verification: cli-wrapper-packaging-and-regression-surface-governance
 
-- issue_path: `docs/epics/workspace-routing-foundation/cli-wrapper-packaging-and-regression-surface-governance/issues/cli-wrapper-packaging-and-regression-surface-governance.md`
+- issue_path: `docs/B2-docs/config/cli-wrapper-packaging-and-regression-surface-governance/issues/cli-wrapper-packaging-and-regression-surface-governance.md`
 - verified_in_branch: `feature/cli-command-audit-20260406-0015`
 - verified_in_worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-0015-feature-cli-command-audit`
 - verified_at: `2026-04-06`

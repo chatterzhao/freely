@@ -10,7 +10,7 @@
   - 本轮 pre-brainstorm 已冻结关键边界：真实恢复真相应转向 failure-driven full slot sweep，而不是继续把 cooldown 当主调度面。
   - 该边界仍由同一组 watchdog 真源、测试面与 live evidence 承担，不需要新开平行 issue。
   - 因此 candidate 生命周期在这里收口，但底层 issue 生命周期继续回到 `I-20260318-1630` 的 doc-loop / dev-loop / verification。
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+- promoted_issue_path: `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`
@@ -28,7 +28,7 @@
   - `docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh`
   - `docs/system/workspace/scripts/runtime/freely`
   - `docs/system/workspace/scripts/runtime/ai-cli`
-  - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+  - `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
   - `docs/progress/workspace-routing-foundation/p-global-ai-account-watchdog-and-manager-bootstrap.md`
 - next_action:
   - 不再继续扩 pre-brainstorm；回到 `I-20260318-1630` 的 doc-loop，显式改写 issue / progress / tasks / capability 真源，把 cooldown 降级为 debug evidence 或排序提示，并把 `rate limit`、`deactivated_workspace`、auth failure、slot probe failure 统一路由到 full slot sweep

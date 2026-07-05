@@ -12,11 +12,11 @@
 - source_brainstorm: `docs/B1-docs/raw-20260327/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/pre-tests.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/code-reviews`
+- pre_tests_path: `docs/B2-docs/ibm/pre-tests-evidence-binding-and-completion-gate-governance/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/ibm/pre-tests-evidence-binding-and-completion-gate-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/issues/story-level-pre-tests-quality-gate-governance.md`
-  - `docs/epics/workspace-routing-foundation/ibm-pretests-executable-acceptance-quality-governance/issues/ibm-pretests-executable-acceptance-quality-governance.md`
+  - `docs/B2-docs/ibm/story-level-pre-tests-quality-gate-governance/issues/story-level-pre-tests-quality-gate-governance.md`
+  - `docs/B2-docs/ibm/ibm-pretests-executable-acceptance-quality-governance/issues/ibm-pretests-executable-acceptance-quality-governance.md`
   - `docs/system/workspace/hooks/pre-commit.sh`
   - `docs/system/workspace/scripts/runtime/freely`
 - session_refs:
@@ -76,10 +76,10 @@ Freely 已经冻结了两层上游真源：
 
 ## Implementation References
 
-- `docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/brainstorms/b-pre-tests-evidence-binding-and-completion-gate-governance.md`
-- `docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/tasks.md`
+- `docs/B2-docs/ibm/pre-tests-evidence-binding-and-completion-gate-governance/brainstorms/b-pre-tests-evidence-binding-and-completion-gate-governance.md`
+- `docs/B2-docs/ibm/pre-tests-evidence-binding-and-completion-gate-governance/prd.md`
+- `docs/B2-docs/ibm/pre-tests-evidence-binding-and-completion-gate-governance/pre-tests.md`
+- `docs/B2-docs/ibm/pre-tests-evidence-binding-and-completion-gate-governance/tasks.md`
 - `docs/system/workspace/hooks/pre-commit.sh`
 - `docs/system/workspace/scripts/quality/`
 - `docs/system/workspace/skills/doc-ibm-execution/references/ibm-completion-gate.md`
@@ -87,11 +87,11 @@ Freely 已经冻结了两层上游真源：
 
 ## Completion
 
-- `docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/issues/pre-tests-evidence-binding-and-completion-gate-governance.md`
-- `docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/brainstorms/b-pre-tests-evidence-binding-and-completion-gate-governance.md`
-- `docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/tasks.md`
+- `docs/B2-docs/ibm/pre-tests-evidence-binding-and-completion-gate-governance/issues/pre-tests-evidence-binding-and-completion-gate-governance.md`
+- `docs/B2-docs/ibm/pre-tests-evidence-binding-and-completion-gate-governance/brainstorms/b-pre-tests-evidence-binding-and-completion-gate-governance.md`
+- `docs/B2-docs/ibm/pre-tests-evidence-binding-and-completion-gate-governance/prd.md`
+- `docs/B2-docs/ibm/pre-tests-evidence-binding-and-completion-gate-governance/pre-tests.md`
+- `docs/B2-docs/ibm/pre-tests-evidence-binding-and-completion-gate-governance/tasks.md`
 - `docs/system/workspace/hooks/pre-commit.sh`
 - `docs/system/workspace/scripts/quality/pretests-gate`
 - `docs/system/workspace/scripts/tests/test-pretests-gate`
@@ -103,7 +103,7 @@ Freely 已经冻结了两层上游真源：
 - `bash docs/system/workspace/scripts/tests/test-pretests-gate`
 - `bash docs/system/workspace/scripts/tests/test-pre-commit-hook`
 - `./bin/governance-check`
-- `docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/code-reviews/20260327-pretests-gate-feature-verification.md`
+- `docs/B2-docs/ibm/pre-tests-evidence-binding-and-completion-gate-governance/code-reviews/20260327-pretests-gate-feature-verification.md`
 
 ## Next
 

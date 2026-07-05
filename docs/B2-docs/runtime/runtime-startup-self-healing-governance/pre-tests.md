@@ -66,14 +66,14 @@
 - requirement: `startup status reads clear stale runtime pid files and downgrade stale startup truth when no authoritative runtime processes exist.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/code-reviews/20260419-runtime-startup-self-healing-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-startup-self-healing-governance/code-reviews/20260419-runtime-startup-self-healing-verification.md`
 
 ### AT-002
 - id: `AT-002`
 - requirement: `launch-state continuity/prompt references are persisted after status refresh rewrites stale continuity anchors.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/code-reviews/20260419-runtime-startup-self-healing-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-startup-self-healing-governance/code-reviews/20260419-runtime-startup-self-healing-verification.md`
 
 ### AT-003
 - id: `AT-003`
@@ -85,4 +85,4 @@
 - case_design: `Merge the followthrough lane into a disposable test-pre-merge batch, rerun the focused startup-self-heal regressions there, explicitly verify AUTO_SWITCH_SLOT=false blocks startup/watchdog slot inventory and probing, then replay protected-root daemon start plus one-minute observation to confirm live-status and lifecycle evidence stay aligned for short-lived non-interactive CLI tools.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/code-reviews/20260423-runtime-startup-self-healing-disabled-slot-auto-switch-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-startup-self-healing-governance/code-reviews/20260423-runtime-startup-self-healing-disabled-slot-auto-switch-verification.md`

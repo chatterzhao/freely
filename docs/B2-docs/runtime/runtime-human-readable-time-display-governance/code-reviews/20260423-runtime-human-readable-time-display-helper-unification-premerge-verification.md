@@ -1,7 +1,7 @@
 # Verification: runtime-human-readable-time-display helper unification premerge replay
 
 - issue_id: `I-20260402-0308-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md`
 - verification_date: `2026-04-23`
 - verification_scope: `protected premerge replay for runtime helper unification`
 
@@ -20,7 +20,7 @@ bash docs/system/workspace/scripts/tests/test-freely-human-display-time-format-u
 bash docs/system/workspace/scripts/tests/test-freely-machine-time-format-uses-shared-helper
 bash docs/system/workspace/scripts/tests/test-freely-manager-startup-continuity-stub-materialization
 bash docs/system/workspace/scripts/tests/test-freely-stop-materializes-missing-manager-continuity
-./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260423-test-pre-merge-runtime-time-format-unification --issue docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md
+./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260423-test-pre-merge-runtime-time-format-unification --issue docs/B2-docs/runtime/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md
 ./bin/governance-check
 ```
 

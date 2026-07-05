@@ -1,11 +1,11 @@
 ---
 issue_id: I-20260701T024449Z-A
-issue_path: docs/epics/pr-review-guarded/review-guide-unbound/raw-20260701T024449Z/issues/I-20260701T024449Z-A.md
+issue_path: docs/B2-docs/git-worktree/branch-pr/raw-20260701T024449Z/issues/I-20260701T024449Z-A.md
 phase_state: done_b2_ibm
 ---
 
 - issue_id: I-20260701T024449Z-A
-- issue_path: docs/epics/pr-review-guarded/review-guide-unbound/raw-20260701T024449Z/issues/I-20260701T024449Z-A.md
+- issue_path: docs/B2-docs/git-worktree/branch-pr/raw-20260701T024449Z/issues/I-20260701T024449Z-A.md
 
 ## Implementation Decision Note
 

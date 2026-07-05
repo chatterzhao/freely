@@ -10,7 +10,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - route_kind: `hotfix`
 - phase_state: `done_pre_brainstorm`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/stale-start-lock-cleanup/issues/I-20260502-1028-A.md`
+- promoted_issue_path: `docs/B2-docs/runtime/stale-start-lock-cleanup/issues/I-20260502-1028-A.md`
 - session_refs:
   - {tool: ccds, session_id: "20260502-stale-lock", jsonl_path: "unavailable://manual", role: "author"}
 - acceptance_criteria:

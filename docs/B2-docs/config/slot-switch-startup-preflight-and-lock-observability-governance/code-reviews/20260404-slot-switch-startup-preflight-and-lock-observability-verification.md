@@ -1,7 +1,7 @@
 # Verification: slot-switch-startup-preflight-and-lock-observability-governance
 
 - issue_id: `I-20260404-2148-A`
-- issue_path: `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
+- issue_path: `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
 - branch: `feature/slot-switch-startup-preflight-governance-20260404-2138`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260404-2138-feature-slot-switch-startup-preflight-governance`
 - verification_date: `2026-04-04`
@@ -19,7 +19,7 @@
 
 ## Implementation Decision Note
 
-- see `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-and-lock-observability-implementation-decision.md`
+- see `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/20260404-slot-switch-startup-preflight-and-lock-observability-implementation-decision.md`
 
 ## Verification
 

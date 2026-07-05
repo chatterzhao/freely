@@ -13,11 +13,11 @@
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/issues/explicit-session-addressed-resume-governance.md`
-  - `docs/epics/workspace-routing-foundation/state-sync-and-session-evidence-governance/issues/state-sync-and-session-evidence-governance.md`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/codex-verified-resume-evidence-governance/pre-tests.md`
+  - `docs/B2-docs/ibm/explicit-session-addressed-resume-governance/issues/explicit-session-addressed-resume-governance.md`
+  - `docs/B2-docs/ibm/state-sync-and-session-evidence-governance/issues/state-sync-and-session-evidence-governance.md`
+- pre_tests_path: `docs/B2-docs/config/codex-verified-resume-evidence-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-codex-verified-resume-evidence-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/codex-verified-resume-evidence-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/config/codex-verified-resume-evidence-governance/code-reviews`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
   - {tool: codex, session_id: "019d374c-6743-7020-a420-14573edb41cd", jsonl_path: "unavailable://no-rollout-found-for-thread-id", role: "reproduced-invalid-resume-target"}
@@ -77,9 +77,9 @@ Freely 已经把 `codex` 的 canonical continuity model 收敛为显式 session-
 
 ## Implementation References
 
-- `docs/epics/workspace-routing-foundation/codex-verified-resume-evidence-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/codex-verified-resume-evidence-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/codex-verified-resume-evidence-governance/tasks.md`
+- `docs/B2-docs/config/codex-verified-resume-evidence-governance/prd.md`
+- `docs/B2-docs/config/codex-verified-resume-evidence-governance/pre-tests.md`
+- `docs/B2-docs/config/codex-verified-resume-evidence-governance/tasks.md`
 - `docs/system/workspace/scripts/runtime/freely`
 
 ## Next
@@ -87,4 +87,4 @@ Freely 已经把 `codex` 的 canonical continuity model 收敛为显式 session-
 - IBM, dev-loop, and verification are complete; this owner is closed.
 - Current implementation stays deliberately narrow: verified rollout/jsonl evidence is now required before the `codex` path can reuse explicit `resume`.
 - Develop already contains the repair in commit `20574fa`; the earlier merge-prep lane is provenance only, not an active owner.
-- Verification truth remains in `docs/epics/workspace-routing-foundation/codex-verified-resume-evidence-governance/code-reviews/20260330-codex-verified-resume-evidence-feature-verification.md`.
+- Verification truth remains in `docs/B2-docs/config/codex-verified-resume-evidence-governance/code-reviews/20260330-codex-verified-resume-evidence-feature-verification.md`.

@@ -1,7 +1,7 @@
 # Verification: runtime-closeout-selfhost-validation-followthrough-governance
 
 - issue_id: `I-20260419-0333-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/issues/runtime-closeout-selfhost-validation-followthrough-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-closeout-selfhost-validation-followthrough-governance/issues/runtime-closeout-selfhost-validation-followthrough-governance.md`
 - verification_date: `2026-04-19`
 - verifier: `codex`
 
@@ -23,7 +23,7 @@
 6. `bash docs/system/workspace/scripts/tests/test-interruption-manager-handler-cc`
 7. `git diff --check`
 8. `./bin/governance-check`
-9. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260418-feature-runtime-closeout-selfhost-validation --issue docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/issues/runtime-closeout-selfhost-validation-followthrough-governance.md`
+9. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260418-feature-runtime-closeout-selfhost-validation --issue docs/B2-docs/runtime/runtime-closeout-selfhost-validation-followthrough-governance/issues/runtime-closeout-selfhost-validation-followthrough-governance.md`
 
 ## Real Replay Evidence
 

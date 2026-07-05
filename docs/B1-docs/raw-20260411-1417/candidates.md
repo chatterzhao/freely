@@ -13,7 +13,7 @@
   - `The policy explicitly preserves pre-tests.md as the single evolving success-standard/test-task artifact name.`
 - fix_approach: Create a narrow governance owner that updates only clearly superseded pre-brainstorm claims, adds canonical pointers, and records why each reconcile action is safe.
 - status: `promoted`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/stale-prebrainstorm-truth-reconcile-governance/issues/stale-prebrainstorm-truth-reconcile-governance.md`
+- promoted_issue_path: `docs/B2-docs/runtime/stale-prebrainstorm-truth-reconcile-governance/issues/stale-prebrainstorm-truth-reconcile-governance.md`
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_id: `I-20260411-1417-A`
 - session_refs: []
@@ -48,7 +48,7 @@
 - decision_reason:
   - the verification-contract / premerge-adequacy owner already materialized the canonical verification metadata contract
   - leaving this candidate as a floating follow-on would duplicate the same owner chain and reintroduce stale-truth drift
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
 - promoted_issue_id: `I-20260408-1205-A`
 - promoted_issue_path_role: `absorbed-into-successor`
 - next_action: `Do not reopen C-20260411-1417-B; use I-20260408-1205-A as canonical truth for the verification contract and premerge adequacy chain.`

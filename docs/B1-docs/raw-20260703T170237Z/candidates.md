@@ -10,6 +10,6 @@ milestone: M-20260703T170237Z-A
 
 - status: absorbed
 - absorbed_into: I-20260703T170237Z-A
-- promoted_issue_path: docs/epics/closeout-chain/crash-evidence-preserve/raw-20260703T170237Z/issues/I-20260703T170237Z-A.md
+- promoted_issue_path: docs/B2-docs/git-worktree/closeout/raw-20260703T170237Z/issues/I-20260703T170237Z-A.md
 - decision_reason: 一行 cp 命令, $AI_TOOL 通用
 - milestone: M-20260703T170237Z-A

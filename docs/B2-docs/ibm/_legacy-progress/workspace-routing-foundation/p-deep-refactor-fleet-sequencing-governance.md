@@ -12,6 +12,6 @@
   - `AGENTS.md`
   - `docs/B1-docs/raw-20260326/brainstorms.md`
   - `docs/B1-docs/raw-20260326/candidates.md`
-  - `docs/epics/workspace-routing-foundation/deep-refactor-fleet-sequencing-governance/code-reviews/20260326-deep-refactor-fleet-sequencing-governance-verification.md`
+  - `docs/B2-docs/ibm/deep-refactor-fleet-sequencing-governance/code-reviews/20260326-deep-refactor-fleet-sequencing-governance-verification.md`
 - next:
   - 后续 broad/deep refactor kickoff 先复用这条 gate；若需要更强自动化或上升到 `LAWS`，另开新 lifecycle

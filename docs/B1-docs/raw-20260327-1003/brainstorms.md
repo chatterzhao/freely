@@ -42,21 +42,21 @@
 1. `docs/B1-docs/raw-20260324-0415/candidates.md`
 - candidate: `C-20260324-0415-A`
 - current state: `status=promoted`
-- promoted issue: `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
+- promoted issue: `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
 - expected: 在 `M-20260306-workspace-routing-foundation` 的 `candidate_issues` 或 `committed_issues` 中可见
 - anomaly: `docs/milestones.md` 中不存在该 issue，也不存在对应 `source_candidates`
 
 2. `docs/B1-docs/raw-20260325-0333/candidates.md`
 - candidate: `C-20260325-0333-B`
 - current state: `status=materialized`
-- promoted issue: `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/issues/story-level-pre-tests-quality-gate-governance.md`
+- promoted issue: `docs/B2-docs/ibm/story-level-pre-tests-quality-gate-governance/issues/story-level-pre-tests-quality-gate-governance.md`
 - expected: 在 `M-20260306-workspace-routing-foundation` 中至少以 promoted candidate 或 committed/completed issue 可见
 - anomaly: issue 已存在，但 milestone 中没有该 issue，也没有用 `source_candidates` 指回本 pre-brainstorm
 
 3. `docs/B1-docs/raw-20260326-1810/candidates.md`
 - candidate: `C-20260326-1810-A`
 - current state: `status=promoted`
-- promoted issue: `docs/epics/freely-product-architecture/freely-layered-architecture-and-tooling-topology/issues/freely-layered-architecture-and-tooling-topology.md`
+- promoted issue: `docs/B2-docs/config/packaging/issues/freely-layered-architecture-and-tooling-topology.md`
 - expected: `docs/milestones.md` 至少存在 `M-20260326-freely-product-architecture`，并收录该 issue
 - anomaly: `docs/milestones.md` 中连 milestone section 都不存在，导致 candidate 与 issue 都没有正式编排入口
 

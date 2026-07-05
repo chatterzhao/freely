@@ -1,7 +1,7 @@
 # Pre-tests — bash 3.2 daemon 兼容性修复
 
 - issue_id: `I-20260429-1745-A`
-- issue_path: `docs/epics/workspace-routing-foundation/bash32-daemon-compat-fix/issues/I-20260429-1745-A.md`
+- issue_path: `docs/B2-docs/runtime/bash32-daemon-compat-fix/issues/I-20260429-1745-A.md`
 
 ## Unit
 - acceptance target: `The freely runtime script passes shell syntax check on macOS bash 3.2.`
@@ -43,7 +43,7 @@
 - requirement: `freely runtime script passes bash -n syntax check on bash 3.2.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/bash32-daemon-compat-fix/code-reviews/20260429-bash32-daemon-compat-fix-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/bash32-daemon-compat-fix/code-reviews/20260429-bash32-daemon-compat-fix-verification.md`
 - surface_kind: `unit`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -55,7 +55,7 @@
 - requirement: `daemon start does not discover and kill itself via supervisor.pid.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/bash32-daemon-compat-fix/code-reviews/20260429-bash32-daemon-compat-fix-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/bash32-daemon-compat-fix/code-reviews/20260429-bash32-daemon-compat-fix-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -67,7 +67,7 @@
 - requirement: `governance-check reports no new errors.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/bash32-daemon-compat-fix/code-reviews/20260429-bash32-daemon-compat-fix-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/bash32-daemon-compat-fix/code-reviews/20260429-bash32-daemon-compat-fix-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`

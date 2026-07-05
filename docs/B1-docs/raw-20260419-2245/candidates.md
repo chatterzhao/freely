@@ -25,7 +25,7 @@
   - lock the runtime to `codex`-only behavior
   - widen the owner into all fallback-tool selection policy
 - promoted_issue_id: `I-20260419-2245-A`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-claude-launch-and-session-evidence-governance/issues/runtime-claude-launch-and-session-evidence-governance.md`
+- promoted_issue_path: `docs/B2-docs/runtime/runtime-claude-launch-and-session-evidence-governance/issues/runtime-claude-launch-and-session-evidence-governance.md`
 - next_action: `Candidate mirror only. I-20260419-2245-A is now the canonical owner for the Claude-family non-interactive launch and verified session-evidence repair.`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}

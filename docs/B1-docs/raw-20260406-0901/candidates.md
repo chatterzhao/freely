@@ -6,7 +6,7 @@
 - title: `Codex reconnect probe fast-fail and runtime network classification alignment`
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/issues/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
+- promoted_issue_path: `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/issues/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
 - promoted_issue_id: `I-20260406-0901-A`
 - source_brainstorm: `docs/B1-docs/raw-20260406-0901/brainstorms.md`
 - session_refs:

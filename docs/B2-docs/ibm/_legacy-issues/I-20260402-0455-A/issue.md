@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO7Y
     synced_at: '2026-04-27T13:15:54Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/issues/worktree-exclusive-ownership-and-promotion-lease-governance.md
+canonical_issue_path: docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/issues/worktree-exclusive-ownership-and-promotion-lease-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:22:51Z'
 hash: ''
@@ -40,4 +40,4 @@ Freely 已经有 manager-first worker scheduling、fleet patrol、hygiene alert�
 
 没有第 3 层，就仍会出现多 AI 同树双写、重复 cleanup、以及
 
-canonical: docs/epics/workspace-routing-foundation/worktree-exclusive-ownership-and-promotion-lease-governance/issues/worktree-exclusive-ownership-and-promotion-lease-governance.md
+canonical: docs/B2-docs/git-worktree/worktree-exclusive-ownership-and-promotion-lease-governance/issues/worktree-exclusive-ownership-and-promotion-lease-governance.md

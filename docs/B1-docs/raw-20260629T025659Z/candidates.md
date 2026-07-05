@@ -22,6 +22,6 @@
   - mode: subagent
   - summary: 审查 fix 和 feature skill 的两个流程版本，确认统一方案正确
   - verdict: pass
-- promoted_issue_path: docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/issues/I-20260629T025659Z-A.md
+- promoted_issue_path: docs/B2-docs/ibm/fix-flow/raw-20260629T025659Z/issues/I-20260629T025659Z-A.md
 - milestone: M-20260629T025659Z-A
 - session_refs: []

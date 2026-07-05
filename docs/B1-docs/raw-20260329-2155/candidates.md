@@ -33,7 +33,7 @@
 - priority: P2
 - status: promoted
 - decision_reason: The problem is real, low-level, and easy to make worse if handled ad hoc. A dedicated issue lets us freeze a conservative ignore contract and verify it without conflating this line with login, slot, or runtime recovery work.
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/sensitive-local-artifact-ignore-governance/issues/sensitive-local-artifact-ignore-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/sensitive-local-artifact-ignore-governance/issues/sensitive-local-artifact-ignore-governance.md`
 - milestone: `docs/milestones.md#M-20260306-workspace-routing-foundation`
 - next_action: Materialize an owner issue, add a focused ignore regression, and land the minimal `.gitignore` contract.
 - revisit_trigger: Reopen this line if a future fixture requires tracked cert/key material or if more sensitive local artifact families appear that the narrow rule set does not cover.

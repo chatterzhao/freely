@@ -1,7 +1,7 @@
 # Implementation Decision: latest-manager-continuity-worker-consumption-governance worker intent fallback
 
 - issue_id: `I-20260322-0445`
-- issue_path: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
+- issue_path: `docs/B2-docs/ibm/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
 - branch: `feature/latest-manager-continuity-worker-intent-fallback-20260408`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260408-feature-latest-manager-continuity-worker-intent-fallback`
 - decision_date: `2026-04-08`

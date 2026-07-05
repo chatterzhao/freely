@@ -3,4 +3,4 @@
 ## Unit
 - acceptance target: cmd_close closes platform issue when I-* has no platform_ids but raw-* does
 ^- status: passed
-- artifact_ref: docs/epics/closeout-chain/code-reviews/review.md
+- artifact_ref: docs/B2-docs/git-worktree/code-reviews/review.md

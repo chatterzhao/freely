@@ -1,7 +1,7 @@
 # Tasks — scan-pr-platform-config
 
 - issue_id: `I-20260501-0000-A`
-- issue_path: `docs/epics/workspace-routing-foundation/scan-pr-platform-config/issues/I-20260501-0000-A.md`
+- issue_path: `docs/B2-docs/runtime/scan-pr-platform-config/issues/I-20260501-0000-A.md`
 
 ## Task 1: Implement PR scan function
 

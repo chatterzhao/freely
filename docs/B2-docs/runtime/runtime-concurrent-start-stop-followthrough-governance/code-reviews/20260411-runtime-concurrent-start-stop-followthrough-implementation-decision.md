@@ -1,7 +1,7 @@
 # Implementation Decision: runtime-concurrent-start-stop-followthrough-governance
 
 - issue_id: `I-20260408-0231-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/issues/runtime-concurrent-start-stop-followthrough-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-concurrent-start-stop-followthrough-governance/issues/runtime-concurrent-start-stop-followthrough-governance.md`
 - branch: `feature/runtime-concurrent-start-stop-followthrough-20260411`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260411-feature-runtime-concurrent-start-stop-followthrough`
 - decision_date: `2026-04-11`

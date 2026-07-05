@@ -53,14 +53,14 @@
 - requirement: `Protected branches fail closed when a ref-only update tries to advance them to a non-receipted commit.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/protected-branch-ref-only-entrypoint-enforcement-governance/code-reviews/20260419-protected-branch-ref-only-entrypoint-enforcement-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/protected-branch-ref-only-entrypoint-enforcement-governance/code-reviews/20260419-protected-branch-ref-only-entrypoint-enforcement-verification.md`
 
 ### Receipt-bearing protected merge commit still succeeds
 - id: `protected-ref-receipt-allow`
 - requirement: `The new ref gate preserves canonical protected merge commits that already carry a valid guarded merge receipt.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/protected-branch-ref-only-entrypoint-enforcement-governance/code-reviews/20260419-protected-branch-ref-only-entrypoint-enforcement-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/protected-branch-ref-only-entrypoint-enforcement-governance/code-reviews/20260419-protected-branch-ref-only-entrypoint-enforcement-verification.md`
 
 ### Guarded premerge promote remains lawful under the new ref gate
 - id: `protected-ref-guarded-promote`
@@ -72,4 +72,4 @@
 - case_design: `Run the focused reference-transaction and guarded merge regressions in the feature lane, then replay the feature through a disposable test-pre-merge branch into develop via pr-merge-guarded and require the protected branch to accept only the receipt-bearing merge commit.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/protected-branch-ref-only-entrypoint-enforcement-governance/code-reviews/20260419-protected-branch-ref-only-entrypoint-enforcement-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/protected-branch-ref-only-entrypoint-enforcement-governance/code-reviews/20260419-protected-branch-ref-only-entrypoint-enforcement-verification.md`

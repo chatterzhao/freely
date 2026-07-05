@@ -29,6 +29,6 @@ milestone: M-20260701T031733Z-A
   - summary: 逐文件对比 gate 规则，确认模板字段完整
   - verdict: pass
 - promoted_issue_id: I-20260701T031733Z-A
-- promoted_issue_path: docs/epics/gate-skill-alignment/skill-template-fix/raw-20260701T031733Z/issues/I-20260701T031733Z-A.md
+- promoted_issue_path: docs/B2-docs/gate/governance/raw-20260701T031733Z/issues/I-20260701T031733Z-A.md
 - milestone: M-20260701T031733Z-A
 - session_refs: []

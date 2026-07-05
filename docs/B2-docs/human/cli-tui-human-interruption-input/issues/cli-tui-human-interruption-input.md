@@ -7,12 +7,12 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `cli-tui-human-interruption-input`
 - issue-name: `cli-tui-human-interruption-input`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/cli-tui-human-interruption-input/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/human/cli-tui-human-interruption-input/code-reviews`
 - source_candidate: `docs/B1-docs/raw-20260319/candidates.md#c-20260319-2315-a`
 - source_brainstorm: `docs/B1-docs/raw-20260319/brainstorms.md`
 - execution_base: `feature/cli-tui-input-interruption-20260319-2310`
 - integration_target: `develop`
-- depends_on: `docs/epics/workspace-routing-foundation/state-sync-and-session-evidence-governance/issues/state-sync-and-session-evidence-governance.md`
+- depends_on: `docs/B2-docs/ibm/state-sync-and-session-evidence-governance/issues/state-sync-and-session-evidence-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 

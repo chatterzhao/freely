@@ -7,5 +7,5 @@ milestone: M-20260701T081450Z-A
 ## C-20260701T081450Z-A: merge lock orphan self-heal
 - milestone: M-20260701T081450Z-A
 - promoted_issue_id: I-20260701T081450Z-A
-- promoted_issue_path: docs/epics/merge-lock/orphan-heal/raw-20260701T081450Z/issues/I-20260701T081450Z-A.md
+- promoted_issue_path: docs/B2-docs/git-worktree/branch-pr/raw-20260701T081450Z/issues/I-20260701T081450Z-A.md
 - status: promoted

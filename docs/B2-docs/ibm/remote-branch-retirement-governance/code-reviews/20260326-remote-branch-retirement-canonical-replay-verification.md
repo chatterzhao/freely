@@ -13,7 +13,7 @@
 - `docs/system/workspace/skills/branch-management/references/cleanup-lifecycle.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-interruption-direct-answer`
-- `docs/epics/workspace-routing-foundation/remote-branch-retirement-governance/issues/remote-branch-retirement-governance.md`
+- `docs/B2-docs/ibm/remote-branch-retirement-governance/issues/remote-branch-retirement-governance.md`
 - `docs/milestones.md`
 
 ## Findings

@@ -20,7 +20,7 @@ session_refs: []
 absorbed_into: I-20260625T044836Z-A
 source_candidate: docs/B1-docs/raw-20260625T044836Z/candidates.md#C-20260625T044836Z-A
 promoted_issue_path: docs/issues/I-20260625T044836Z-A/issue.md
-pre_tests_path: docs/epics/issue-sync-filter/verification/pre-tests.md
+pre_tests_path: docs/B2-docs/issue-sync-filter/verification/pre-tests.md
 ---
 
 ## 问题

@@ -7,15 +7,15 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `human-chat-intake-and-manager-delegation`
 - issue-name: `human-chat-intake-and-manager-delegation`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/human-chat-intake-and-manager-delegation/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/human/human-chat-intake-and-manager-delegation/code-reviews`
 - priority: P0
 - source_candidate: `docs/B1-docs/raw-20260319/candidates.md#c-20260319-1715-a`
 - source_brainstorm: `docs/B1-docs/raw-20260319/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/source-routing-and-derived-worktree-governance/issues/source-routing-and-derived-worktree-governance.md`
-  - `docs/epics/workspace-routing-foundation/state-sync-and-session-evidence-governance/issues/state-sync-and-session-evidence-governance.md`
+  - `docs/B2-docs/ibm/source-routing-and-derived-worktree-governance/issues/source-routing-and-derived-worktree-governance.md`
+  - `docs/B2-docs/ibm/state-sync-and-session-evidence-governance/issues/state-sync-and-session-evidence-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 

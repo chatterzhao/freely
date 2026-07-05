@@ -20,7 +20,7 @@
 - status: absorbed
 - adoption_type: supporting_evidence
 - decision_reason: manager answer-vs-delegation triage 已进入 interruption handler、manager route 与 `I-20260321-1925` 的 canonical owner surface，不再单开平行 issue。
-- promoted_issue_path: docs/epics/workspace-routing-foundation/manager-chat-reentry-and-cleanup-misrouting-governance/issues/manager-chat-reentry-and-cleanup-misrouting-governance.md
+- promoted_issue_path: docs/B2-docs/ibm/manager-chat-reentry-and-cleanup-misrouting-governance/issues/manager-chat-reentry-and-cleanup-misrouting-governance.md
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs:
   - tool: codex

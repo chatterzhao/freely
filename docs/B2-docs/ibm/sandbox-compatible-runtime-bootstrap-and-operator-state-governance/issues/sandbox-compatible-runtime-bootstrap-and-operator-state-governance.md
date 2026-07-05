@@ -12,13 +12,13 @@
 - source_brainstorm: `docs/B1-docs/raw-20260403/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/ibm/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/issues/project-command-semantics-and-restore-work-governance.md`
-  - `docs/epics/workspace-routing-foundation/global-restart-restore-memory-governance/issues/global-restart-restore-memory-governance.md`
-  - `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/issues/worktree-tool-boundary-bootstrap-governance.md`
+  - `docs/B2-docs/ibm/project-command-semantics-and-restore-work-governance/issues/project-command-semantics-and-restore-work-governance.md`
+  - `docs/B2-docs/ibm/global-restart-restore-memory-governance/issues/global-restart-restore-memory-governance.md`
+  - `docs/B2-docs/config/packaging/issues/worktree-tool-boundary-bootstrap-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -63,10 +63,10 @@ That hidden dead-end pressures users and agents back toward protected-root edits
 - `docs/B1-docs/raw-20260403/candidates.md`
 - `docs/B1-docs/raw-INDEX.md`
 - `docs/milestones.md`
-- `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/issues/sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
-- `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/tasks.md`
+- `docs/B2-docs/ibm/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/issues/sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
+- `docs/B2-docs/ibm/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/prd.md`
+- `docs/B2-docs/ibm/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/pre-tests.md`
+- `docs/B2-docs/ibm/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/tasks.md`
 - `docs/progress/workspace-routing-foundation/p-sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-sandbox-operator-state-bootstrap-fallback`

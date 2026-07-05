@@ -3,4 +3,4 @@
 ## Unit
 - acceptance target: _issue_body 为 kind=raw 输出治理提醒
 ^- status: passed
-- artifact_ref: docs/epics/governance-reminder/code-reviews/review.md
+- artifact_ref: docs/B2-docs/governance-reminder/code-reviews/review.md

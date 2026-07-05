@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO84
     synced_at: '2026-04-27T13:16:03Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md
+canonical_issue_path: docs/B2-docs/gate/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md
 last_synced_comment_at:
   github: '2026-04-27T11:23:09Z'
 hash: ''
@@ -33,4 +33,4 @@ platform_state: closed
 4. 一部分 review / candidate 仍使用旧 key 或缺少新的 continuity 字段
 5. 历史上出现过的 `1200/1201/1202/1203` repair slices 已经退出当前文件系统，但 canonical docs 一度还把它们
 
-canonical: docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md
+canonical: docs/B2-docs/gate/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md

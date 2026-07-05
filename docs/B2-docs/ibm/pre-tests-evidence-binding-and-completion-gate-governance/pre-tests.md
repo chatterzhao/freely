@@ -32,18 +32,18 @@
 - requirement: `standalone pretests-gate rejects missing issue binding and incomplete acceptance items`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/code-reviews/20260327-pretests-gate-feature-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/pre-tests-evidence-binding-and-completion-gate-governance/code-reviews/20260327-pretests-gate-feature-verification.md`
 
 ### PT-2
 - id: `PT-2`
 - requirement: `pre-commit blocks a staged issue that switches to completed while its acceptance items are still pending`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/code-reviews/20260327-pretests-gate-feature-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/pre-tests-evidence-binding-and-completion-gate-governance/code-reviews/20260327-pretests-gate-feature-verification.md`
 
 ### PT-3
 - id: `PT-3`
 - requirement: `pre-commit does not block unrelated feature commits when no staged issue is moving to completed`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/code-reviews/20260327-pretests-gate-feature-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/pre-tests-evidence-binding-and-completion-gate-governance/code-reviews/20260327-pretests-gate-feature-verification.md`

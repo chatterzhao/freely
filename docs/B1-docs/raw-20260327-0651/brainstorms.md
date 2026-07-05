@@ -137,8 +137,8 @@
 ## Likely Landing Zones
 
 - `docs/B1-docs/raw-20260327-0651/*`
-- `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/**`
-- `docs/epics/workspace-routing-foundation/ibm-pretests-executable-acceptance-quality-governance/**`
+- `docs/B2-docs/ibm/story-level-pre-tests-quality-gate-governance/**`
+- `docs/B2-docs/ibm/ibm-pretests-executable-acceptance-quality-governance/**`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/runtime/ai-cli`
 - `docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh`
@@ -158,11 +158,11 @@
 - stale_statement:
   - `把 completion / merge / retirement 全链门禁与 project-scoped network proxy capability 继续当成同一个 earliest owner 的已承诺范围。`
 - canonical_truth:
-  - `docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/prd.md`
-  - `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
+  - `docs/B2-docs/ibm/pre-tests-evidence-binding-and-completion-gate-governance/prd.md`
+  - `docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
 - deferred_scope:
   - `retirement auto-check / cleanup followthrough gate 是 follow-on owner scope；即使后续已有独立 owner，也不应回写成最早 pretests gate owner 已完成范围。`
   - `network proxy capability 仍由独立 owner 继续推进，不能把其未完成面误报成 pre-tests gate regression。`
 - follow_on_owner:
-  - `docs/epics/workspace-routing-foundation/runtime-evidence-provenance-research-retirement-followthrough-governance/issues/runtime-evidence-provenance-research-retirement-followthrough-governance.md`
+  - `docs/B2-docs/runtime/runtime-evidence-provenance-research-retirement-followthrough-governance/issues/runtime-evidence-provenance-research-retirement-followthrough-governance.md`
 - reconcile_note: `此条仍保留原始愿景的产品化价值，但后续评审必须按拆分后的 owner 边界判断“已完成”“deferred”“另案推进”，而不是拿混合入口去要求单一 owner 覆盖全部能力。`

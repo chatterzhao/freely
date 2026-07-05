@@ -6,7 +6,7 @@
 - runtime_state: `stopped`
 - branch: `feature/security-capability-execution-boundary-audit-20260401-2230`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260401-2230-feature-security-capability-execution-boundary-audit`
-- issue_path: `docs/epics/workspace-routing-foundation/freely-agent-execution-safety-review-and-security-decision-support/issues/freely-agent-execution-safety-review-and-security-decision-support.md`
+- issue_path: `docs/B2-docs/git-worktree/freely-agent-execution-safety-review-and-security-decision-support/issues/freely-agent-execution-safety-review-and-security-decision-support.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -40,7 +40,7 @@
 - closure_status: `merged-and-verified`
 - closure_evidence:
   - `merge_commit: e72ff86`
-  - `docs/epics/workspace-routing-foundation/freely-agent-execution-safety-review-and-security-decision-support/code-reviews/20260401-freely-agent-execution-safety-review-and-security-decision-support-verification.md`
+  - `docs/B2-docs/git-worktree/freely-agent-execution-safety-review-and-security-decision-support/code-reviews/20260401-freely-agent-execution-safety-review-and-security-decision-support-verification.md`
   - `./bin/governance-check`
 - absorption_note:
   - later execution-boundary audit-only continuation drafts were reviewed after merge and found redundant with this completed owner; future follow-on work must target genuinely new scope such as multi-reviewer runtime orchestration or wider security families.

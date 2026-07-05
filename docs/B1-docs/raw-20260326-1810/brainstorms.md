@@ -186,10 +186,10 @@ Freely 现在缺一套更总览的高层 architecture/topology 表达，导致�
 - `AGENTS.md`
   - 已有：开发 Freely 时区分“开发目录”和“能力目录”的入口指引
   - 漂移风险：当前还没有把“先判断是 Freely 自身产品架构，还是可复用能力”写成更清晰的首跳思考顺序
-- `docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/**`
+- `docs/B2-docs/human/cli-first-entrypoint-and-observability-surface-unification/**`
   - 已有：`chat` submit primitive、status family backend interface、TUI/GUI render-layer direction
   - 漂移风险：结论停留在 issue 语境，没有沉淀成 architecture atlas
-- `docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/**`
+- `docs/B2-docs/runtime/control-surface/**`
   - 已有：contract vs adapter boundary
   - 漂移风险：停留在 control-surface 线，未进入全局产品拓扑
 

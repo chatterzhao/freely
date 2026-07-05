@@ -1,7 +1,7 @@
 # Progress: runtime-concurrent-start-stop-followthrough-governance
 
 - issue_id: `I-20260408-0231-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/issues/runtime-concurrent-start-stop-followthrough-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-concurrent-start-stop-followthrough-governance/issues/runtime-concurrent-start-stop-followthrough-governance.md`
 - title: `Runtime concurrent start-stop followthrough governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -32,9 +32,9 @@ This bounded owner carried the remaining runtime half of `C-20260408-0231-A` aft
 - `bash docs/system/workspace/scripts/tests/test-freely-status-latest-generated-manager-continuity-surface`
 - `bash docs/system/workspace/scripts/tests/test-freely-manager-semantic-loop-status-surface`
 - `bash docs/system/workspace/scripts/tests/test-freely-restart-storm-status-surface`
-- `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/code-reviews/20260411-runtime-concurrent-start-stop-followthrough-implementation-decision.md`
-- `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/code-reviews/20260411-runtime-concurrent-start-stop-followthrough-verification.md`
-- `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/code-reviews/20260411-runtime-concurrent-start-stop-followthrough-canonical-closeout-verification.md`
+- `docs/B2-docs/runtime/runtime-concurrent-start-stop-followthrough-governance/code-reviews/20260411-runtime-concurrent-start-stop-followthrough-implementation-decision.md`
+- `docs/B2-docs/runtime/runtime-concurrent-start-stop-followthrough-governance/code-reviews/20260411-runtime-concurrent-start-stop-followthrough-verification.md`
+- `docs/B2-docs/runtime/runtime-concurrent-start-stop-followthrough-governance/code-reviews/20260411-runtime-concurrent-start-stop-followthrough-canonical-closeout-verification.md`
 - `develop` merge `bf7e5a16`
 
 ## Next Action

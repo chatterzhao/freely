@@ -64,5 +64,5 @@ title: "governance: update phase_state to completed for ACP issues already merge
 
 文件：
 - `docs/issues/I-20260508T225041Z-A/issue.md` — phase_state → completed
-- `docs/epics/workspace-routing-foundation/acp-bridge-crash-resilience/issues/I-20260503-0000-A.md` — phase_state → completed
+- `docs/B2-docs/acp/acp-bridge-crash-resilience/issues/I-20260503-0000-A.md` — phase_state → completed
 - `docs/milestones.md` — 同步 milestone 状态

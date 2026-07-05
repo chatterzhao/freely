@@ -1,7 +1,7 @@
 # Verification: slot-switch-startup-preflight-and-lock-observability-governance canonical closeout
 
 - issue_id: `I-20260404-2148-A`
-- issue_path: `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
+- issue_path: `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
 - branch: `feature/slot-switch-startup-preflight-closeout-20260404-2335`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260404-2335-feature-slot-switch-startup-preflight-closeout`
 - verification_date: `2026-04-04`

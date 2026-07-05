@@ -1,7 +1,7 @@
 # Verification: develop-push-triage-merge-receipt-gap-followthrough
 
 - issue_id: `I-20260404-0640-A`
-- issue_path: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
+- issue_path: `docs/B2-docs/ibm/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
 - branch: `feature/develop-push-governance-blocker-triage-20260404-0745`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260404-0745-feature-develop-push-governance-blocker-triage`
 - verification_date: `2026-04-04`
@@ -20,7 +20,7 @@
 2. `./bin/governance-check`
 3. `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
 4. `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt-backfills`
-5. `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/code-reviews/20260404-develop-push-triage-merge-receipt-gap-implementation-decision.md`
+5. `docs/B2-docs/ibm/protected-branch-merge-receipt-gap-followthrough/code-reviews/20260404-develop-push-triage-merge-receipt-gap-implementation-decision.md`
 
 ## Findings
 

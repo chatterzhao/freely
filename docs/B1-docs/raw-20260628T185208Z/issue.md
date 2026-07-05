@@ -3,13 +3,13 @@ local_id: raw-20260628T185208Z
 kind: raw
 phase_state: absorbed
 absorbed_into: I-20260628T005815Z-A
-pre_tests_path: docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/verification/pre-tests.md
-verification_artifact_dir: docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/code-reviews
+pre_tests_path: docs/B2-docs/human/discuss/raw-20260628T005815Z/verification/pre-tests.md
+verification_artifact_dir: docs/B2-docs/human/discuss/raw-20260628T005815Z/code-reviews
 ---
 
 - absorbed_into: I-20260628T005815Z-A
-- pre_tests_path: docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/verification/pre-tests.md
-- verification_artifact_dir: docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/code-reviews
+- pre_tests_path: docs/B2-docs/human/discuss/raw-20260628T005815Z/verification/pre-tests.md
+- verification_artifact_dir: docs/B2-docs/human/discuss/raw-20260628T005815Z/code-reviews
 
 ## Problem
 Gate/skill alignment: pretests-gate only accepts "pass" not "passed", B2 skill examples show old paths, governance-merge-gate uses *.md instead of I-*.md.

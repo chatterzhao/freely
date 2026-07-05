@@ -11,7 +11,7 @@
 - `docs/system/workspace/tools.md`
 - `docs/system/workspace/scripts/start-lead-agent.sh`
 - `docs/system/workspace/scripts/tests/test-routing-foundation-loop`
-- `docs/epics/workspace-routing-foundation/source-routing-and-derived-worktree-governance/issues/source-routing-and-derived-worktree-governance.md`
+- `docs/B2-docs/ibm/source-routing-and-derived-worktree-governance/issues/source-routing-and-derived-worktree-governance.md`
 - `docs/milestones.md`
 
 ## Findings

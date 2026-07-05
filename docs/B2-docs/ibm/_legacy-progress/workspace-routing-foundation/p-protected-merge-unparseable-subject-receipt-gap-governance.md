@@ -1,7 +1,7 @@
 # Progress: protected-merge-unparseable-subject-receipt-gap-governance
 
 - issue_id: `I-20260411-0217-A`
-- issue_path: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
+- issue_path: `docs/B2-docs/ibm/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
 - title: `Protected-merge unparseable-subject receipt-gap governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -23,8 +23,8 @@
 
 1. `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt-backfills`
 2. `./bin/governance-check`
-3. `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/code-reviews/20260411-protected-merge-unparseable-subject-receipt-gap-verification.md`
-4. `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/code-reviews/20260411-protected-merge-unparseable-subject-receipt-gap-canonical-closeout-verification.md`
+3. `docs/B2-docs/ibm/protected-merge-unparseable-subject-receipt-gap-governance/code-reviews/20260411-protected-merge-unparseable-subject-receipt-gap-verification.md`
+4. `docs/B2-docs/ibm/protected-merge-unparseable-subject-receipt-gap-governance/code-reviews/20260411-protected-merge-unparseable-subject-receipt-gap-canonical-closeout-verification.md`
 5. `git worktree list --porcelain`
 
 ## Next Action

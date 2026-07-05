@@ -12,12 +12,12 @@
 - source_brainstorm: `docs/B1-docs/raw-20260401/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/ibm/implementation-decision-notes-in-issue-review-artifacts-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-implementation-decision-notes-in-issue-review-artifacts-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/implementation-decision-notes-in-issue-review-artifacts-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/candidate-acceptance-review-governance/issues/candidate-acceptance-review-governance.md`
-  - `docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/issues/pre-tests-evidence-binding-and-completion-gate-governance.md`
+  - `docs/B2-docs/ibm/candidate-acceptance-review-governance/issues/candidate-acceptance-review-governance.md`
+  - `docs/B2-docs/ibm/pre-tests-evidence-binding-and-completion-gate-governance/issues/pre-tests-evidence-binding-and-completion-gate-governance.md`
   - `docs/system/workspace/scripts/quality/governance-merge-gate`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
@@ -83,12 +83,12 @@ Freely 已经在 pre-brainstorm 和 IBM 层解决了“为什么值得做”和�
 
 - `docs/B1-docs/raw-20260401/brainstorms.md`
 - `docs/B1-docs/raw-20260401/candidates.md`
-- `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/issues/implementation-decision-notes-in-issue-review-artifacts-governance.md`
-- `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/brainstorms/b-implementation-decision-notes-in-issue-review-artifacts-governance.md`
-- `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/tasks.md`
-- `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/code-reviews/20260401-implementation-decision-notes-in-review-artifacts-verification.md`
+- `docs/B2-docs/ibm/implementation-decision-notes-in-issue-review-artifacts-governance/issues/implementation-decision-notes-in-issue-review-artifacts-governance.md`
+- `docs/B2-docs/ibm/implementation-decision-notes-in-issue-review-artifacts-governance/brainstorms/b-implementation-decision-notes-in-issue-review-artifacts-governance.md`
+- `docs/B2-docs/ibm/implementation-decision-notes-in-issue-review-artifacts-governance/prd.md`
+- `docs/B2-docs/ibm/implementation-decision-notes-in-issue-review-artifacts-governance/pre-tests.md`
+- `docs/B2-docs/ibm/implementation-decision-notes-in-issue-review-artifacts-governance/tasks.md`
+- `docs/B2-docs/ibm/implementation-decision-notes-in-issue-review-artifacts-governance/code-reviews/20260401-implementation-decision-notes-in-review-artifacts-verification.md`
 - `docs/progress/workspace-routing-foundation/p-implementation-decision-notes-in-issue-review-artifacts-governance.md`
 - `docs/LAWS.md`
 - `docs/system/workspace/skills/dev-loop-execution/SKILL.md`
@@ -116,6 +116,6 @@ Freely 已经在 pre-brainstorm 和 IBM 层解决了“为什么值得做”和�
 - canonical_merge_target: `develop`
 - gate_commit: `cdb8278`
 - proof_owner: `I-20260402-0540-A`
-- proof_artifact: `docs/epics/workspace-routing-foundation/runtime-loop-log-timezone-label-followthrough-governance/code-reviews/20260402-runtime-loop-log-timezone-label-followthrough-verification.md`
+- proof_artifact: `docs/B2-docs/runtime/runtime-loop-log-timezone-label-followthrough-governance/code-reviews/20260402-runtime-loop-log-timezone-label-followthrough-verification.md`
 - post_gate_proof: The `runtime-loop-log-timezone-label-followthrough` owner merged to `develop` after `cdb8278` and its staged review artifact carries a complete `Implementation Decision Note` with all required minimum fields.
 - closeout_note: The canonical gate is no longer waiting on hypothetical future usage; a real post-gate develop-bound owner has already exercised the required note path end to end.

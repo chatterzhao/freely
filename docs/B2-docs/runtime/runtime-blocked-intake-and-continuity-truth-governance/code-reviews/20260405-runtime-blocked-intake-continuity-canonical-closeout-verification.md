@@ -1,7 +1,7 @@
 # Verification: runtime-blocked-intake-and-continuity-truth-governance canonical closeout
 
 - issue_id: `I-20260404-1545-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md`
 - branch: `feature/runtime-blocked-intake-continuity-closeout-20260405-2358`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260405-2358-feature-runtime-blocked-intake-continuity-closeout`
 - verification_date: `2026-04-05`
@@ -18,11 +18,11 @@
 
 ## Implementation Decision Note
 
-- `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-implementation-decision.md`
+- `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-implementation-decision.md`
 
 ## Prior Verification Note
 
-- `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-verification.md`
+- `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-verification.md`
 
 ## Verification
 

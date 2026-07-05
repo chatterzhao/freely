@@ -130,4 +130,4 @@ phase_state: completed
 
 - Test database: `/var/folders/4y/s0ffqqjx6y392zmmp6rpm5_c0000gn/T/tmprfwsv0vh.db` (cleaned up after closeout)
 - Test script: `/tmp/handoff_pre_tests.py`
-- All test definitions from `docs/epics/agent-handoff-protocol/verification/pre-tests.md`
+- All test definitions from `docs/B2-docs/agent-handoff-protocol/verification/pre-tests.md`

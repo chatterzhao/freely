@@ -64,7 +64,7 @@
 - case_design: `Seed stale and fresh delegated continuation items around the latest manager continuity timestamp, then verify only the fresh handoff appears in the current manager prompt while delegated items stay out of the front-door queue.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews/20260420-latest-manager-continuity-worker-consumption-delegated-freshness-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/latest-manager-continuity-worker-consumption-governance/code-reviews/20260420-latest-manager-continuity-worker-consumption-delegated-freshness-verification.md`
 
 ### Live-status keeps delegated counts without duplicating queue truth
 - id: `PT-2`
@@ -76,7 +76,7 @@
 - case_design: `Replay a delegated intake item through live-status and confirm the delegated count remains visible while intake_snapshot no longer duplicates the delegated item as untriaged chat.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews/20260420-latest-manager-continuity-worker-consumption-delegated-freshness-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/latest-manager-continuity-worker-consumption-governance/code-reviews/20260420-latest-manager-continuity-worker-consumption-delegated-freshness-verification.md`
 
 ### Guarded promote preserves delegated freshness adequacy
 - id: `PT-3`
@@ -88,7 +88,7 @@
 - case_design: `Merge the feature lane into the disposable test-pre-merge-success-standard-governance-20260420-0215 batch, rerun the focused regressions plus governance-check there, then replay patched daemon start and one-minute chat intake on canonical develop to confirm the new success-standard interruption becomes the consumed delegated continuation for the current manager round.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews/20260420-latest-manager-continuity-worker-consumption-delegated-freshness-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/latest-manager-continuity-worker-consumption-governance/code-reviews/20260420-latest-manager-continuity-worker-consumption-delegated-freshness-verification.md`
 
 ### Guarded promote preserves plain-list worker prompt launchability
 - id: `PT-4`
@@ -100,4 +100,4 @@
 - case_design: `Merge the plain-list parser feature lane into the disposable test-pre-merge-20260424-manager-continuity-worker-prompt-plain-list-parser batch, rerun the focused parser and latest continuity consumption regressions plus governance-check, then use the resulting review artifact to justify guarded promote into develop.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/code-reviews/20260424-latest-manager-continuity-worker-consumption-plain-list-prompt-parser-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/latest-manager-continuity-worker-consumption-governance/code-reviews/20260424-latest-manager-continuity-worker-consumption-plain-list-prompt-parser-verification.md`

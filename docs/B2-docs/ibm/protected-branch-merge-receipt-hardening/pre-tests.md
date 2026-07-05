@@ -57,39 +57,39 @@
 - requirement: `This owner only handles protected-branch merge residual hardening.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md`
+- artifact_ref: `docs/B2-docs/ibm/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md`
 
 ### AT-002
 - id: `AT-002`
 - requirement: `The root staged patch is classified before any implementation is accepted.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/brainstorms/b-protected-branch-merge-receipt-hardening.md`
+- artifact_ref: `docs/B2-docs/ibm/protected-branch-merge-receipt-hardening/brainstorms/b-protected-branch-merge-receipt-hardening.md`
 
 ### AT-003
 - id: `AT-003`
 - requirement: `Break-glass remains merge-completion-only.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/prd.md`
+- artifact_ref: `docs/B2-docs/ibm/protected-branch-merge-receipt-hardening/prd.md`
 
 ### AT-004
 - id: `AT-004`
 - requirement: `Receipt trailer and ledger parity fields are frozen as an auditable contract.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/prd.md`
+- artifact_ref: `docs/B2-docs/ibm/protected-branch-merge-receipt-hardening/prd.md`
 
 ### AT-005
 - id: `AT-005`
 - requirement: `Staged-view and sibling-context regression boundaries are frozen before dev-loop changes.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/tasks.md`
+- artifact_ref: `docs/B2-docs/ibm/protected-branch-merge-receipt-hardening/tasks.md`
 
 ### AT-006
 - id: `AT-006`
 - requirement: `Watchdog repo-root resolution is explicitly excluded from this owner.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md`
+- artifact_ref: `docs/B2-docs/ibm/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md`

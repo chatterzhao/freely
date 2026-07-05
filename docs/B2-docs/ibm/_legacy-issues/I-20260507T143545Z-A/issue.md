@@ -19,7 +19,7 @@ intake_id: ''
 author: zhaoquan
 channel: feat-execution
 session_refs: []
-pre_tests_path: docs/epics/timestamp-seconds-upgrade/verification/pre-tests.md
+pre_tests_path: docs/B2-docs/timestamp-seconds-upgrade/verification/pre-tests.md
 verification_artifact_dir: docs/epics/timestamp-seconds-upgrade/code-reviews
 platform_state: closed
 ---
@@ -27,7 +27,7 @@ platform_state: closed
 # I-20260507T143545Z-A: 时间戳格式带秒升级
 
 - source_candidate: docs/B1-docs/raw-20260507T143545Z/candidates.md
-- pre_tests_path: docs/epics/timestamp-seconds-upgrade/verification/pre-tests.md
+- pre_tests_path: docs/B2-docs/timestamp-seconds-upgrade/verification/pre-tests.md
 - verification_artifact_dir: docs/epics/timestamp-seconds-upgrade/code-reviews
 
 ## 实现

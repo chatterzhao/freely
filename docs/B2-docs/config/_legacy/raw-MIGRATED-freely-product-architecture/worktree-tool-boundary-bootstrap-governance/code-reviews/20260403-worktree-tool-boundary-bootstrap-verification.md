@@ -4,8 +4,8 @@
 - verifier: `codex`
 - branch: `feature/tool-sandbox-worktree-bootstrap-20260403-204147`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260403-204147-feature-tool-sandbox-worktree-bootstrap`
-- issue_path: `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/issues/worktree-tool-boundary-bootstrap-governance.md`
-- decision_note: `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/code-reviews/20260403-worktree-tool-boundary-bootstrap-implementation-decision.md`
+- issue_path: `docs/B2-docs/config/packaging/issues/worktree-tool-boundary-bootstrap-governance.md`
+- decision_note: `docs/B2-docs/config/packaging/code-reviews/20260403-worktree-tool-boundary-bootstrap-implementation-decision.md`
 
 ## Scope
 

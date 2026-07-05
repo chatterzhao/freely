@@ -5,6 +5,6 @@
 - source_candidate: docs/B1-docs/raw-20260625T235017Z/candidates.md#C-20260625T235017Z-A
 - source_raw: raw-20260625T235017Z
 - title: feat→feature rename
-- pre_tests_path: docs/epics/feat-to-feature/verification/pre-tests.md
+- pre_tests_path: docs/B2-docs/git-worktree/verification/pre-tests.md
 
 # I-20260625T235017Z-A: feat→feature rename

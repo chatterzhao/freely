@@ -1,7 +1,7 @@
 # Progress: protected-branch-merge-receipt-hardening
 
 - issue_id: `I-20260402-1912-A`
-- issue_path: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md`
+- issue_path: `docs/B2-docs/ibm/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md`
 - title: `Protected-branch merge receipt hardening`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -34,8 +34,8 @@
 8. `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded-hooked-initial-merge-receipt`
 9. `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
 10. `docs/B1-docs/raw-20260402/brainstorms.md`
-11. `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/brainstorms/b-protected-branch-merge-receipt-hardening.md`
-12. `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/code-reviews/20260402-protected-branch-merge-receipt-hardening-verification.md`
+11. `docs/B2-docs/ibm/protected-branch-merge-receipt-hardening/brainstorms/b-protected-branch-merge-receipt-hardening.md`
+12. `docs/B2-docs/ibm/protected-branch-merge-receipt-hardening/code-reviews/20260402-protected-branch-merge-receipt-hardening-verification.md`
 
 ## Next Action
 
@@ -46,7 +46,7 @@
 
 - closure_status: `completed-on-develop`
 - closure_evidence:
-  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/code-reviews/20260402-protected-branch-merge-receipt-hardening-verification.md`
+  - `docs/B2-docs/ibm/protected-branch-merge-receipt-hardening/code-reviews/20260402-protected-branch-merge-receipt-hardening-verification.md`
   - `bash docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt`
   - `bash docs/system/workspace/scripts/tests/test-pre-commit-hook`
   - `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`

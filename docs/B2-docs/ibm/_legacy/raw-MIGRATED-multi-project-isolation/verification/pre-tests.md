@@ -39,4 +39,4 @@
 - promotion_gate: develop_merge
 - evidence_level: review
 ^- status: passed
-- artifact_ref: docs/epics/multi-project-isolation/code-reviews/review.md
+- artifact_ref: docs/B2-docs/multi-project-isolation/code-reviews/review.md

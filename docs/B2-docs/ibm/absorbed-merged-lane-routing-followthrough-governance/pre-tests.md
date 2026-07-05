@@ -58,14 +58,14 @@
 - requirement: `A merged-absorbed worker lane is visible for cleanup followthrough but not surfaced as role=worker execution capacity.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/code-reviews/20260421-absorbed-merged-lane-routing-followthrough-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/absorbed-merged-lane-routing-followthrough-governance/code-reviews/20260421-absorbed-merged-lane-routing-followthrough-verification.md`
 
 ### Task-source scan routes absorbed merged progress to cleanup
 - id: `task-source-scan-absorbed-merged-cleanup-routing`
 - requirement: `A progress owner bound to an absorbed merged lane remains visible to scan, but its restart point becomes cleanup and manager-owned followthrough instead of verification execution.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/code-reviews/20260421-absorbed-merged-lane-routing-followthrough-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/absorbed-merged-lane-routing-followthrough-governance/code-reviews/20260421-absorbed-merged-lane-routing-followthrough-verification.md`
 
 ### Guarded promote carries absorbed-lane routing evidence
 - id: `absorbed-lane-routing-guarded-promote-proof`
@@ -77,11 +77,11 @@
 - case_design: `Replay the source lane through the disposable test-pre-merge batch, rerun the focused scan/fleet regressions and owner gate there, and then guardedly replay that batch into develop so protected merge consumes concrete owner evidence instead of a raw code diff.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/code-reviews/20260421-absorbed-merged-lane-routing-followthrough-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/absorbed-merged-lane-routing-followthrough-governance/code-reviews/20260421-absorbed-merged-lane-routing-followthrough-verification.md`
 
 ### Guarded replay keeps canonical self-host acceptance explicit
 - id: `develop-self-host-after-absorbed-lane-downgrade`
 - requirement: `This owner keeps canonical develop self-host replay as an explicit post-merge completion duty instead of pretending focused premerge scan/fleet coverage already proved it.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/code-reviews/20260421-absorbed-merged-lane-routing-followthrough-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/absorbed-merged-lane-routing-followthrough-governance/code-reviews/20260421-absorbed-merged-lane-routing-followthrough-verification.md`

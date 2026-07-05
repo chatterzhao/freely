@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO7V
     synced_at: '2026-04-27T13:15:49Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/issues/protected-branch-hook-bypass-breakglass-governance.md
+canonical_issue_path: docs/B2-docs/ibm/protected-branch-hook-bypass-breakglass-governance/issues/protected-branch-hook-bypass-breakglass-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:22:35Z'
 hash: ''
@@ -34,4 +34,4 @@ platform_state: closed
 
 同时，canonical `develop` 根目录出现的一组 staged patch 已证明这个 residua
 
-canonical: docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md
+canonical: docs/B2-docs/ibm/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md

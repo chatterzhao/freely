@@ -1,7 +1,7 @@
 # Verification: sandbox-compatible-runtime-bootstrap-and-operator-state-governance
 
 - issue_id: `I-20260403-2245-A`
-- issue_path: `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/issues/sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
+- issue_path: `docs/B2-docs/ibm/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/issues/sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
 - branch: `feature/sandbox-compatible-runtime-bootstrap-and-operator-state-20260403-2245`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260403-2245-feature-sandbox-compatible-runtime-bootstrap-and-operator-state`
 - verification_date: `2026-04-04`
@@ -28,10 +28,10 @@
 
 - `docs/B1-docs/raw-20260403/brainstorms.md`
 - `docs/B1-docs/raw-20260403/candidates.md`
-- `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/issues/sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
-- `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/tasks.md`
+- `docs/B2-docs/ibm/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/issues/sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
+- `docs/B2-docs/ibm/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/prd.md`
+- `docs/B2-docs/ibm/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/pre-tests.md`
+- `docs/B2-docs/ibm/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/tasks.md`
 - `docs/progress/workspace-routing-foundation/p-sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-start-attaches-when-ps-is-unavailable`

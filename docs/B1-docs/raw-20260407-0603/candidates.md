@@ -38,8 +38,8 @@
 - summary: `This research-only packet documented a real boundary question, but the repo no longer needs to keep it as an active candidate. Later owner lines now absorb the actionable subproblems separately, while the mixed-owner prototype recorded here was explicitly treated as a counterexample rather than a canonical owner composition rule.`
 - decision_reason: `Repeated read-only sweeps were useful to prove non-absorption, but they never produced an IBM-stable bounded owner for the whole package. Since then, canonical runtime / verification / premerge governance has continued through separate owner lines, and keeping this compound research candidate active now only creates false pressure to promote or merge a packet that still mixes non-composable partial owners. The correct disposition is to retain the research record and retire the worktree, not materialize a new issue from this packet.`
 - superseded_by:
-  - `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
-  - `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
+  - `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
+  - `docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
   - `docs/B1-docs/raw-20260408-0231/brainstorms.md`
 - promotion_gate:
   - prove no existing milestone-owned issue already absorbs this full boundary package

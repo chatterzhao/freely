@@ -7,21 +7,21 @@
 - requirement: `When a develop-bound merge materializes implementation-bearing paths, the merge gate resolves the owner issue and rejects the batch if no staged review artifact exists under that issue's verification_artifact_dir.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/code-reviews/20260401-implementation-decision-notes-in-review-artifacts-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/implementation-decision-notes-in-issue-review-artifacts-governance/code-reviews/20260401-implementation-decision-notes-in-review-artifacts-verification.md`
 
 ### AT-2 decision note structure required
 - id: `decision-note-structure-required`
 - requirement: `A staged owner review artifact must contain the implementation decision note fields decision, why_this, alternatives_considered, boundary_non_goals, and residual_risk before the merge gate passes.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/code-reviews/20260401-implementation-decision-notes-in-review-artifacts-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/implementation-decision-notes-in-issue-review-artifacts-governance/code-reviews/20260401-implementation-decision-notes-in-review-artifacts-verification.md`
 
 ### AT-3 laws and execution guidance stay aligned
 - id: `decision-note-governance-alignment`
 - requirement: `LAWS, dev-loop execution guidance, and IBM materialization checklist all point to the same canonical landing surface and minimum decision-note fields.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/code-reviews/20260401-implementation-decision-notes-in-review-artifacts-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/implementation-decision-notes-in-issue-review-artifacts-governance/code-reviews/20260401-implementation-decision-notes-in-review-artifacts-verification.md`
 
 ## Acceptance Matrix
 

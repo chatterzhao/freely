@@ -16,14 +16,14 @@ intake_id: ""
 author: zhaoquan
 channel: freely-fix-execution
 session_refs: []
-pre_tests_path: docs/epics/wt-close-force-overwrite-fix/verification/pre-tests.md
+pre_tests_path: docs/B2-docs/wt-close-force-overwrite-fix/verification/pre-tests.md
 verification_artifact_dir: docs/epics/wt-close-force-overwrite-fix/code-reviews
 ---
 
 # I-20260617T160003Z-A: Fix wt-close --force overwriting pr-merge-guarded frontmatter
 
 - source_candidate: docs/B1-docs/raw-20260617T160003Z/candidates.md
-- pre_tests_path: docs/epics/wt-close-force-overwrite-fix/verification/pre-tests.md
+- pre_tests_path: docs/B2-docs/wt-close-force-overwrite-fix/verification/pre-tests.md
 - verification_artifact_dir: docs/epics/wt-close-force-overwrite-fix/code-reviews
 
 ## 实现

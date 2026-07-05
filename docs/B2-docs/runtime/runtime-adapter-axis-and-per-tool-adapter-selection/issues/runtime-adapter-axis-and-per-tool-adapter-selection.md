@@ -12,12 +12,12 @@
 - source_brainstorm: `docs/B1-docs/raw-20260401/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/runtime-adapter-axis-and-per-tool-adapter-selection/pre-tests.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/runtime-adapter-axis-and-per-tool-adapter-selection/code-reviews`
+- pre_tests_path: `docs/B2-docs/runtime/runtime-adapter-axis-and-per-tool-adapter-selection/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/runtime/runtime-adapter-axis-and-per-tool-adapter-selection/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/acp-optional-adapter-boundary-governance/issues/acp-optional-adapter-boundary-governance.md`
-  - `docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/issues/explicit-session-addressed-resume-governance.md`
-  - `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/issues/all-tools-unified-slot-contract-governance.md`
+  - `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/issues/acp-optional-adapter-boundary-governance.md`
+  - `docs/B2-docs/ibm/explicit-session-addressed-resume-governance/issues/explicit-session-addressed-resume-governance.md`
+  - `docs/B2-docs/ibm/all-tools-unified-slot-contract-governance/issues/all-tools-unified-slot-contract-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -84,13 +84,13 @@ ACP boundary 已经收口，但 runtime 现在还没有 first-class `adapter axi
 
 ## Implementation References
 
-- `docs/epics/workspace-routing-foundation/acp-optional-adapter-boundary-governance/issues/acp-optional-adapter-boundary-governance.md`
+- `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/issues/acp-optional-adapter-boundary-governance.md`
 - `docs/system/workspace/tools.md`
 - `docs/system/workspace/scripts/runtime/tool-launchers.sh`
 - `docs/system/workspace/scripts/runtime/freely`
-- `docs/epics/workspace-routing-foundation/runtime-adapter-axis-and-per-tool-adapter-selection/prd.md`
-- `docs/epics/workspace-routing-foundation/runtime-adapter-axis-and-per-tool-adapter-selection/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/runtime-adapter-axis-and-per-tool-adapter-selection/tasks.md`
+- `docs/B2-docs/runtime/runtime-adapter-axis-and-per-tool-adapter-selection/prd.md`
+- `docs/B2-docs/runtime/runtime-adapter-axis-and-per-tool-adapter-selection/pre-tests.md`
+- `docs/B2-docs/runtime/runtime-adapter-axis-and-per-tool-adapter-selection/tasks.md`
 
 ## Verification
 

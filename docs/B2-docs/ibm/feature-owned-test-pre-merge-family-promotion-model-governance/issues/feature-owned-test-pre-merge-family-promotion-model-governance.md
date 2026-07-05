@@ -12,13 +12,13 @@
 - source_brainstorm: `docs/B1-docs/raw-20260405/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/ibm/feature-owned-test-pre-merge-family-promotion-model-governance/pre-tests.md`
 - progress_path: `pending://progress-created-on-dev-loop`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/feature-owned-test-pre-merge-family-promotion-model-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/issues/pre-test-merge-responsibility-usage-and-lifecycle-governance.md`
-  - `docs/epics/workspace-routing-foundation/develop-guarded-merge-entrypoint-enforcement-governance/issues/develop-guarded-merge-entrypoint-enforcement-governance.md`
-  - `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/issues/protected-branch-hook-bypass-breakglass-governance.md`
+  - `docs/B2-docs/ibm/pre-test-merge-responsibility-usage-and-lifecycle-governance/issues/pre-test-merge-responsibility-usage-and-lifecycle-governance.md`
+  - `docs/B2-docs/ibm/develop-guarded-merge-entrypoint-enforcement-governance/issues/develop-guarded-merge-entrypoint-enforcement-governance.md`
+  - `docs/B2-docs/ibm/protected-branch-hook-bypass-breakglass-governance/issues/protected-branch-hook-bypass-breakglass-governance.md`
   - `docs/B1-docs/raw-20260405/brainstorms.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
@@ -84,11 +84,11 @@
   - 后续只允许基于本 owner 的结论，分别开出 gate enforcement 与 lifecycle automation follow-on。
   - 若本 owner 尚未明确某个 multi-bundle promote 结论，执行层不得提前在脚本中单方面固化。
 - required_doc_refs:
-  - `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md`
-  - `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/brainstorms/b-feature-owned-test-pre-merge-family-promotion-model-governance.md`
-  - `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/prd.md`
-  - `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/tasks.md`
+  - `docs/B2-docs/ibm/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md`
+  - `docs/B2-docs/ibm/feature-owned-test-pre-merge-family-promotion-model-governance/brainstorms/b-feature-owned-test-pre-merge-family-promotion-model-governance.md`
+  - `docs/B2-docs/ibm/feature-owned-test-pre-merge-family-promotion-model-governance/prd.md`
+  - `docs/B2-docs/ibm/feature-owned-test-pre-merge-family-promotion-model-governance/pre-tests.md`
+  - `docs/B2-docs/ibm/feature-owned-test-pre-merge-family-promotion-model-governance/tasks.md`
   - `docs/B1-docs/raw-20260405/brainstorms.md`
 
 ## Verification
@@ -103,13 +103,13 @@
 - `docs/B1-docs/raw-20260405/candidates.md`
 - `docs/B1-docs/raw-INDEX.md`
 - `docs/milestones.md`
-- `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md`
-- `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/brainstorms/b-feature-owned-test-pre-merge-family-promotion-model-governance.md`
-- `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/tasks.md`
-- `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/code-reviews/20260405-feature-owned-test-pre-merge-family-promotion-model-implementation-decision.md`
-- `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/code-reviews/20260405-feature-owned-test-pre-merge-family-promotion-model-verification.md`
+- `docs/B2-docs/ibm/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md`
+- `docs/B2-docs/ibm/feature-owned-test-pre-merge-family-promotion-model-governance/brainstorms/b-feature-owned-test-pre-merge-family-promotion-model-governance.md`
+- `docs/B2-docs/ibm/feature-owned-test-pre-merge-family-promotion-model-governance/prd.md`
+- `docs/B2-docs/ibm/feature-owned-test-pre-merge-family-promotion-model-governance/pre-tests.md`
+- `docs/B2-docs/ibm/feature-owned-test-pre-merge-family-promotion-model-governance/tasks.md`
+- `docs/B2-docs/ibm/feature-owned-test-pre-merge-family-promotion-model-governance/code-reviews/20260405-feature-owned-test-pre-merge-family-promotion-model-implementation-decision.md`
+- `docs/B2-docs/ibm/feature-owned-test-pre-merge-family-promotion-model-governance/code-reviews/20260405-feature-owned-test-pre-merge-family-promotion-model-verification.md`
 
 ## Next
 

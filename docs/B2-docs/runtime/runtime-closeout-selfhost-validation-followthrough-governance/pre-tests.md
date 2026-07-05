@@ -67,7 +67,7 @@
 - case_design: `Start a detached runtime, rerun daemon start, and assert the same supervisor pid is reused without creating another daemon-run process.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260419-runtime-closeout-selfhost-validation-followthrough-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260419-runtime-closeout-selfhost-validation-followthrough-verification.md`
 
 ### Ambiguous missing-state start lock is cleaned safely
 - id: `ambiguous-start-lock-cleans-when-runtime-is-absent`
@@ -79,7 +79,7 @@
 - case_design: `Seed a lock directory without state.env, prove there is no active runtime, and assert freely start cleans the lock before reacquiring it.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260419-runtime-closeout-selfhost-validation-followthrough-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260419-runtime-closeout-selfhost-validation-followthrough-verification.md`
 
 ### Interruption manager fast paths stay bounded
 - id: `interruption-manager-fast-paths-stay-bounded`
@@ -91,7 +91,7 @@
 - case_design: `Replay cleanup, manager-supervision, and generic prompts against interruption-manager-handler, then assert direct fast-path output only where intended and prompt generation still happens for generic codex/cc fallback cases.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260419-runtime-closeout-selfhost-validation-followthrough-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260419-runtime-closeout-selfhost-validation-followthrough-verification.md`
 
 ### Guarded promote preserves closeout selfhost adequacy
 - id: `guarded-promote-preserves-closeout-selfhost-adequacy`
@@ -103,7 +103,7 @@
 - case_design: `Merge this owner into test-pre-merge-20260424-worker-exit-contract-repair-focus, rerun the repair-first prompt regression plus the two existing exit-contract regressions and governance-check there, and confirm the guarded promote path preserves the narrow repair contract ordering.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-exit-contract-repair-focus-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-exit-contract-repair-focus-verification.md`
 
 ### Exit-contract repair prompt stays repair-first
 - id: `exit-contract-repair-prompt-stays-repair-first`
@@ -115,7 +115,7 @@
 - case_design: `Seed a worker repair session handoff, build the prompt, and assert the repair-first override appears before the lead-agent body while the broader exit-contract directive and resume-repair enforcement still pass.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-exit-contract-repair-focus-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-exit-contract-repair-focus-verification.md`
 
 ### Cleanup repair round cannot short-circuit closeout
 - id: `cleanup-repair-round-cannot-short-circuit-closeout`
@@ -127,7 +127,7 @@
 - case_design: `First prove in feature-local that a cleanup worker prompt with authoritative verification metadata rewrites the repair handoff back onto the original closeout gate, then replay the same regressions in the guarded test-pre-merge lane and confirm runtime still rejects a repair-only worker_done that cites only the handoff plus rewritten contract.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-cleanup-reentry-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-cleanup-reentry-verification.md`
 
 ### Worker recovery syncs canonical tooling before launch
 - id: `worker-recovery-syncs-canonical-tooling-before-launch`
@@ -139,7 +139,7 @@
 - case_design: `Seed a target worktree with a stale local bin/freely, invoke the runtime launch helper from a canonical source project, and assert the launched supervisor executes the synced replacement instead of the stale script.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-worker-recovery-sync-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-worker-recovery-sync-verification.md`
 
 ### Manager cleanup resume stays on continuation truth
 - id: `manager-cleanup-resume-stays-on-continuation-truth`
@@ -151,7 +151,7 @@
 - case_design: `Seed a valid cleanup-governance resume_manager contract, run the exit-contract consumer, and assert runtime writes a continuation handoff plus cleanup followthrough evidence instead of a repair handoff.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-manager-resume-and-stale-worker-handoff-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-manager-resume-and-stale-worker-handoff-verification.md`
 
 ### Authoritative worker relaunch clears stale repair handoff
 - id: `authoritative-worker-relaunch-clears-stale-repair-handoff`
@@ -163,4 +163,4 @@
 - case_design: `Seed a retained worker worktree with an old worker_exit_contract_repair handoff, relaunch it through an authoritative manager prompt, and assert the stale handoff is cleared before the next worker round while the adjacent repair-first and invalid-contract regressions still pass in protected replay.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-manager-resume-and-stale-worker-handoff-premerge-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews/20260424-runtime-closeout-selfhost-validation-manager-resume-and-stale-worker-handoff-premerge-verification.md`

@@ -1,7 +1,7 @@
 # Verification: milestone-completed-queue-closeout-governance
 
 - issue_id: `I-20260406-1105-A`
-- issue_path: `docs/epics/workspace-routing-foundation/milestone-completed-queue-closeout-governance/issues/milestone-completed-queue-closeout-governance.md`
+- issue_path: `docs/B2-docs/ibm/milestone-completed-queue-closeout-governance/issues/milestone-completed-queue-closeout-governance.md`
 - branch: `feature/milestone-queue-closeout-followthrough-20260406-1105`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-1105-feature-milestone-queue-closeout-followthrough`
 - verified_at: `2026-04-06`

@@ -38,6 +38,6 @@ milestone: M-20260704T080808Z-A
   - summary: 审查多 bridge 架构设计，确认 per-tool bridge 与 session 路由正确
   - verdict: pass
 - promoted_issue_id: I-20260704T080808Z-A
-- promoted_issue_path: docs/epics/agent-acp/multi-bridge-per-tool/raw-20260704T080808Z/issues/I-20260704T080808Z-A.md
+- promoted_issue_path: docs/B2-docs/config/agent-table/raw-20260704T080808Z/issues/I-20260704T080808Z-A.md
 - milestone: M-20260704T080808Z-A
 - session_refs: []

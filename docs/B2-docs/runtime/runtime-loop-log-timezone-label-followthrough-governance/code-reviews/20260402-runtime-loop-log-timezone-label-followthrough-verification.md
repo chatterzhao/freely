@@ -1,7 +1,7 @@
 # Verification: runtime-loop-log-timezone-label-followthrough-governance
 
 - issue_id: `I-20260402-0540-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-loop-log-timezone-label-followthrough-governance/issues/runtime-loop-log-timezone-label-followthrough-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-loop-log-timezone-label-followthrough-governance/issues/runtime-loop-log-timezone-label-followthrough-governance.md`
 - branch: `feature/runtime-loop-log-timezone-closeout-20260402-0648`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-0648-feature-runtime-loop-log-timezone-closeout`
 - verification_date: `2026-04-02`

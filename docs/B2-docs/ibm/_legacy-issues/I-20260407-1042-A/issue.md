@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO9A
     synced_at: '2026-04-27T13:16:49Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/issues/github-first-external-issue-source-governance.md
+canonical_issue_path: docs/B2-docs/ibm/github-first-external-issue-source-governance/issues/github-first-external-issue-source-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:26:06Z'
 hash: ''
@@ -31,4 +31,4 @@ Without a bounded owner here:
 2. stale external labels/comments can be mistaken for decisive truth
 3. source issue intake, canonical owner linkage, and public trackin
 
-canonical: docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/issues/github-first-external-issue-source-governance.md
+canonical: docs/B2-docs/ibm/github-first-external-issue-source-governance/issues/github-first-external-issue-source-governance.md

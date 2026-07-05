@@ -20,7 +20,7 @@
 - status: absorbed
 - adoption_type: supporting_evidence
 - decision_reason: direct-answer runtime path、resolution artifact 与 writeback 行为已被 `I-20260321-1925` 的 interruption governance 吸收；该候选不再需要独立 materialization。
-- promoted_issue_path: docs/epics/workspace-routing-foundation/manager-chat-reentry-and-cleanup-misrouting-governance/issues/manager-chat-reentry-and-cleanup-misrouting-governance.md
+- promoted_issue_path: docs/B2-docs/ibm/manager-chat-reentry-and-cleanup-misrouting-governance/issues/manager-chat-reentry-and-cleanup-misrouting-governance.md
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs:
   - tool: codex

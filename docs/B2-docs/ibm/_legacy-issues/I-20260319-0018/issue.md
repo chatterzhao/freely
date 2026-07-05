@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO5F
     synced_at: '2026-04-27T13:14:05Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md
+canonical_issue_path: docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:13:59Z'
 hash: ''
@@ -37,4 +37,4 @@ Freely 现在已经有：
 3. manager continuity 与 worker continuity 的目标对象不同，但当前还没有一套明确的正式口径。
 4. 在官方未公开非交互压缩参数前，Freely 需要有明确 fallback；若官方未来支持，应优先重构采用。
 
-canonical: docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md
+canonical: docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md

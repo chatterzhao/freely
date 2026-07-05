@@ -13,11 +13,11 @@
 - execution_base: `develop`
 - integration_target: `develop`
 - progress_path: `docs/progress/workspace-routing-foundation/p-runtime-startup-root-cause-packet-governance.md`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/runtime-startup-root-cause-packet-governance/pre-tests.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/runtime-startup-root-cause-packet-governance/code-reviews`
+- pre_tests_path: `docs/B2-docs/runtime/runtime-startup-root-cause-packet-governance/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/runtime/runtime-startup-root-cause-packet-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/issues/pretests-adequacy-item-schema-materialization-governance.md`
-  - `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md`
+  - `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/issues/pretests-adequacy-item-schema-materialization-governance.md`
+  - `docs/B2-docs/ibm/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -47,20 +47,20 @@
 - required_doc_refs:
   - `docs/B1-docs/raw-20260413/brainstorms.md`
   - `docs/B1-docs/raw-20260413/candidates.md`
-  - `docs/epics/workspace-routing-foundation/runtime-startup-root-cause-packet-governance/prd.md`
-  - `docs/epics/workspace-routing-foundation/runtime-startup-root-cause-packet-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/runtime-startup-root-cause-packet-governance/tasks.md`
+  - `docs/B2-docs/runtime/runtime-startup-root-cause-packet-governance/prd.md`
+  - `docs/B2-docs/runtime/runtime-startup-root-cause-packet-governance/pre-tests.md`
+  - `docs/B2-docs/runtime/runtime-startup-root-cause-packet-governance/tasks.md`
 
 ## Completion
 
 - `docs/B1-docs/raw-20260413/brainstorms.md`
 - `docs/B1-docs/raw-20260413/candidates.md`
-- `docs/epics/workspace-routing-foundation/runtime-startup-root-cause-packet-governance/issues/runtime-startup-root-cause-packet-governance.md`
-- `docs/epics/workspace-routing-foundation/runtime-startup-root-cause-packet-governance/brainstorms/b-runtime-startup-root-cause-packet-governance.md`
-- `docs/epics/workspace-routing-foundation/runtime-startup-root-cause-packet-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/runtime-startup-root-cause-packet-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/runtime-startup-root-cause-packet-governance/tasks.md`
-- `docs/epics/workspace-routing-foundation/runtime-startup-root-cause-packet-governance/code-reviews/20260413-runtime-startup-root-cause-packet-verification.md`
+- `docs/B2-docs/runtime/runtime-startup-root-cause-packet-governance/issues/runtime-startup-root-cause-packet-governance.md`
+- `docs/B2-docs/runtime/runtime-startup-root-cause-packet-governance/brainstorms/b-runtime-startup-root-cause-packet-governance.md`
+- `docs/B2-docs/runtime/runtime-startup-root-cause-packet-governance/prd.md`
+- `docs/B2-docs/runtime/runtime-startup-root-cause-packet-governance/pre-tests.md`
+- `docs/B2-docs/runtime/runtime-startup-root-cause-packet-governance/tasks.md`
+- `docs/B2-docs/runtime/runtime-startup-root-cause-packet-governance/code-reviews/20260413-runtime-startup-root-cause-packet-verification.md`
 - `docs/progress/workspace-routing-foundation/p-runtime-startup-root-cause-packet-governance.md`
 - `docs/milestones.md`
 

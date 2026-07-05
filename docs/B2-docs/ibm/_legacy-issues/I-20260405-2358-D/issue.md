@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO8Y
     synced_at: '2026-04-27T13:16:38Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/cli-help-and-dry-run-contract-followthrough-governance/issues/cli-help-and-dry-run-contract-followthrough-governance.md
+canonical_issue_path: docs/B2-docs/human/cli-help-and-dry-run-contract-followthrough-governance/issues/cli-help-and-dry-run-contract-followthrough-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:25:29Z'
 hash: ''
@@ -31,4 +31,4 @@ canonical CLI replay still exposes a narrow but important contract gap:
 
 Thes
 
-canonical: docs/epics/workspace-routing-foundation/cli-help-and-dry-run-contract-followthrough-governance/issues/cli-help-and-dry-run-contract-followthrough-governance.md
+canonical: docs/B2-docs/human/cli-help-and-dry-run-contract-followthrough-governance/issues/cli-help-and-dry-run-contract-followthrough-governance.md

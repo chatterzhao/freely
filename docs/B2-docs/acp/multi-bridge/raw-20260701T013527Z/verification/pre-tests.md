@@ -11,13 +11,13 @@
 - target_environment: test-pre-merge-20260701T013527Z-get-config-undefined
 - required_evidence: grep 命令输出，确认无 get_config 残留
 - evidence_level: integration
-- artifact_ref: docs/epics/acp-tool-setup/config-reader-fix/raw-20260701T013527Z/verification/acceptance-1.log
+- artifact_ref: docs/B2-docs/acp/multi-bridge/raw-20260701T013527Z/verification/acceptance-1.log
 - test_command: grep -c "get_config" docs/system/workspace/scripts/runtime/freely; test $? -eq 1
 - expected_output: exit code 1 (no match found — get_config 已移除)
 - expected_RED_output: grep 匹配到至少 1 处 `get_config` call
 - actual_RED_output: "freely: line 14052: get_config: command not found" — 确认 bug 可复现
 - actual_output: grep 返回 1（无匹配），脚本中已无 get_config 调用；${!_config_key:-} 语法正确
-- evidence_file: docs/epics/acp-tool-setup/config-reader-fix/raw-20260701T013527Z/verification/acceptance-1.log
+- evidence_file: docs/B2-docs/acp/multi-bridge/raw-20260701T013527Z/verification/acceptance-1.log
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -34,13 +34,13 @@
 - target_environment: test-pre-merge-20260701T013527Z-get-config-undefined
 - required_evidence: 源代码行内容验证
 - evidence_level: integration
-- artifact_ref: docs/epics/acp-tool-setup/config-reader-fix/raw-20260701T013527Z/verification/acceptance-2.log
+- artifact_ref: docs/B2-docs/acp/multi-bridge/raw-20260701T013527Z/verification/acceptance-2.log
 - test_command: grep '_config_path=.*{!_config_key:-}' docs/system/workspace/scripts/runtime/freely
 - expected_output: L14052 包含 ${!_config_key:-}
 - expected_RED_output: L14052 包含 get_config 函数调用
 - actual_RED_output: 修复前 L14052 调用未定义的 get_config 函数
 - actual_output: grep 确认 L14052 为 `${!_config_key:-}`，bash indirect expansion 语法正确
-- evidence_file: docs/epics/acp-tool-setup/config-reader-fix/raw-20260701T013527Z/verification/acceptance-2.log
+- evidence_file: docs/B2-docs/acp/multi-bridge/raw-20260701T013527Z/verification/acceptance-2.log
 - red-green-status: green
 - status: passed
 - blocker: none

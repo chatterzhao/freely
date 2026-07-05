@@ -1,7 +1,7 @@
 # Progress: runtime-loop-log-timezone-label-followthrough-governance
 
 - issue_id: `I-20260402-0540-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-loop-log-timezone-label-followthrough-governance/issues/runtime-loop-log-timezone-label-followthrough-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-loop-log-timezone-label-followthrough-governance/issues/runtime-loop-log-timezone-label-followthrough-governance.md`
 - title: `Runtime loop log timezone label followthrough governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -23,7 +23,7 @@
 
 1. `bash docs/system/workspace/scripts/tests/test-freely-rate-limit-cooldown-falls-back-to-active-slot`
 2. `./bin/governance-check`
-3. `docs/epics/workspace-routing-foundation/runtime-loop-log-timezone-label-followthrough-governance/code-reviews/20260402-runtime-loop-log-timezone-label-followthrough-verification.md`
+3. `docs/B2-docs/runtime/runtime-loop-log-timezone-label-followthrough-governance/code-reviews/20260402-runtime-loop-log-timezone-label-followthrough-verification.md`
 4. canonical `develop` merge commit `5537a7e`
 
 ## Next Action

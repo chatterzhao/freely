@@ -8,12 +8,12 @@
 - target_environment: test-pre-merge-20260701T081450Z-merge-lock-orphan-heal
 - required_evidence: grep
 - evidence_level: integration
-- artifact_ref: docs/epics/merge-lock/orphan-heal/raw-20260701T081450Z/verification/acceptance-1.log
+- artifact_ref: docs/B2-docs/git-worktree/branch-pr/raw-20260701T081450Z/verification/acceptance-1.log
 - test_command: grep -c "ORPHAN_LOCK" docs/system/workspace/scripts/worktree/pr-merge-guarded
 - expected_output: 2
 - actual_RED_output: 0
 - actual_output: 2
-- evidence_file: docs/epics/merge-lock/orphan-heal/raw-20260701T081450Z/verification/acceptance-1.log
+- evidence_file: docs/B2-docs/git-worktree/branch-pr/raw-20260701T081450Z/verification/acceptance-1.log
 - red-green-status: green
 - status: passed
 - red_how: fix: 修复前无孤儿锁自愈，静默等300s

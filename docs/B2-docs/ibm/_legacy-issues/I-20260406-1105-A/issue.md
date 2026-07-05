@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO92
     synced_at: '2026-04-27T13:16:42Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/milestone-completed-queue-closeout-governance/issues/milestone-completed-queue-closeout-governance.md
+canonical_issue_path: docs/B2-docs/ibm/milestone-completed-queue-closeout-governance/issues/milestone-completed-queue-closeout-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:25:43Z'
 hash: ''
@@ -27,4 +27,4 @@ The active milestone still keeps several completed owners in `committed_issues`.
 
 `governance-merge-gate` is not the missing contract here, because it only evaluates the current develop-bound diff. The missing contract is a baseline repo-wide audit that can detect historical queue drift already present on canonical `develop`.
 
-canonical: docs/epics/workspace-routing-foundation/milestone-completed-queue-closeout-governance/issues/milestone-completed-queue-closeout-governance.md
+canonical: docs/B2-docs/ibm/milestone-completed-queue-closeout-governance/issues/milestone-completed-queue-closeout-governance.md

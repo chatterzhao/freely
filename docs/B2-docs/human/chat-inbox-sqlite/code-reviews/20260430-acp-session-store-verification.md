@@ -3,7 +3,7 @@
 - review_id: `20260430-acp-session-store-verification`
 - date: `2026-04-30`
 - reviewer: `claude-opus-4.7`
-- issue_path: `docs/epics/workspace-routing-foundation/chat-inbox-sqlite/issues/I-20260429-2040-A.md`
+- issue_path: `docs/B2-docs/human/chat-inbox-sqlite/issues/I-20260429-2040-A.md`
 
 ## decision
 

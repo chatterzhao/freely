@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFOAC
     synced_at: '2026-04-27T13:17:38Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/runtime-claude-launch-and-session-evidence-governance/issues/runtime-claude-launch-and-session-evidence-governance.md
+canonical_issue_path: docs/B2-docs/runtime/runtime-claude-launch-and-session-evidence-governance/issues/runtime-claude-launch-and-session-evidence-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:28:30Z'
 hash: ''
@@ -29,4 +29,4 @@ Manual replay narrowed the tool-switch failure to two concrete seams:
 2. Freely could record a freshly generated Claude session id and later reuse it as a resume target without any verified Claude session evidence on disk.
 3. That combination made a fallback tool look broken or hung even when `cl
 
-canonical: docs/epics/workspace-routing-foundation/runtime-claude-launch-and-session-evidence-governance/issues/runtime-claude-launch-and-session-evidence-governance.md
+canonical: docs/B2-docs/runtime/runtime-claude-launch-and-session-evidence-governance/issues/runtime-claude-launch-and-session-evidence-governance.md

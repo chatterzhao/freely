@@ -6,7 +6,7 @@
 - runtime_state: `closed_for_this_batch`
 - branch: `feature/codex-session-reentry-and-pty-input-20260321`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260321-feature-codex-session-reentry-and-pty-input`
-- issue_path: `docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/issues/explicit-session-addressed-resume-governance.md`
+- issue_path: `docs/B2-docs/ibm/explicit-session-addressed-resume-governance/issues/explicit-session-addressed-resume-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://current-manual-codex-thread-id-not-exposed", role: "author"}
   - {tool: codex, session_id: "019d12c4-479f-7d02-9061-b6dc92bb2fd2", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/21/rollout-2026-03-21T16-39-06-019d12c4-479f-7d02-9061-b6dc92bb2fd2.jsonl", role: "fresh_with_handoff_source"}
@@ -19,7 +19,7 @@
 ## Scope For This Round
 
 1. 完成 review writeback：
-   - `docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/code-reviews/20260321-explicit-session-addressed-resume-verification.md`
+   - `docs/B2-docs/ibm/explicit-session-addressed-resume-governance/code-reviews/20260321-explicit-session-addressed-resume-verification.md`
 2. 保持 verification 证据：
    - runtime / launcher / interruption tests
 3. 等待 worktree 层 merge / cleanup gate，不再在本 issue 内继续扩 scope

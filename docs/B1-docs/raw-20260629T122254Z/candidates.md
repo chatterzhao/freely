@@ -11,5 +11,5 @@ milestone: M-20260629T122254Z-A
 - decision_reason: workflow [cmd] must be freely xxx for [CMD] log consistency
 - acceptance_criteria: [all 8 commands registered, freely --help shows them]
 - promotion_gate: merge
-- promoted_issue_path: docs/epics/cmd-standardize/subcommand-add/raw-20260629T122254Z/issues/I-20260629T122254Z-A.md
+- promoted_issue_path: docs/B2-docs/human/command/raw-20260629T122254Z/issues/I-20260629T122254Z-A.md
 - milestone: M-20260629T122254Z-A

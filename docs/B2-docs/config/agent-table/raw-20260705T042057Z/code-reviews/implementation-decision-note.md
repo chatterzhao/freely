@@ -1,6 +1,6 @@
 ---
 issue_id: I-20260705T042057Z-A
-issue_path: docs/epics/agent-acp/base-tool-validation/raw-20260705T042057Z/issues/I-20260705T042057Z-A.md
+issue_path: docs/B2-docs/config/agent-table/raw-20260705T042057Z/issues/I-20260705T042057Z-A.md
 phase_state: completed
 ---
 - issue_id: I-20260705T042057Z-A

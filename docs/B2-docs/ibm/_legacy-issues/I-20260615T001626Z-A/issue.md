@@ -5,7 +5,7 @@ kind: linked
 phase_state: in_b2_ibm
 promoted_from: raw-20260615T001626Z
 source_candidate: docs/B1-docs/raw-20260615T001626Z/candidates.md
-canonical_issue_path: docs/epics/a2a-replace-handoff/a2a-no-fallback/issues/I-20260615T001626Z-A.md
+canonical_issue_path: docs/B2-docs/a2a/handoff/issues/I-20260615T001626Z-A.md
 platform_ids:
   github:
     issue_id: "2691"
@@ -24,8 +24,8 @@ session_refs:
     session_id: current-session
     jsonl_path: unavailable://session-continuity-not-enabled
     role: worker
-pre_tests_path: docs/epics/a2a-replace-handoff/a2a-no-fallback/verification/pre-tests.md
-verification_artifact_dir: docs/epics/a2a-replace-handoff/a2a-no-fallback/code-reviews
+pre_tests_path: docs/B2-docs/a2a/handoff/verification/pre-tests.md
+verification_artifact_dir: docs/B2-docs/a2a/handoff/code-reviews
 ---
 
 ## I-20260615T001626Z-A: 移除 A2A 文本 JSON 解析 Fallback (Phase 1+2)
@@ -49,9 +49,9 @@ verification_artifact_dir: docs/epics/a2a-replace-handoff/a2a-no-fallback/code-r
 
 - B1 预研: docs/B1-docs/raw-20260615T001626Z/
 - Candidate: docs/B1-docs/raw-20260615T001626Z/candidates.md#C-20260615T001626Z-A
-- 正式 Issue: docs/epics/a2a-replace-handoff/a2a-no-fallback/issues/I-20260615T001626Z-A.md
-- PRD: docs/epics/a2a-replace-handoff/a2a-no-fallback/prd.md
-- Pre-tests: docs/epics/a2a-replace-handoff/a2a-no-fallback/verification/pre-tests.md
-- Tasks: docs/epics/a2a-replace-handoff/a2a-no-fallback/tasks.md
+- 正式 Issue: docs/B2-docs/a2a/handoff/issues/I-20260615T001626Z-A.md
+- PRD: docs/B2-docs/a2a/handoff/prd.md
+- Pre-tests: docs/B2-docs/a2a/handoff/verification/pre-tests.md
+- Tasks: docs/B2-docs/a2a/handoff/tasks.md
 
 ## Comments

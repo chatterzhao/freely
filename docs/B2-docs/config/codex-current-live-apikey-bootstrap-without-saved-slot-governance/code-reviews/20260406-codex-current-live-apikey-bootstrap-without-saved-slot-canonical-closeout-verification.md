@@ -1,6 +1,6 @@
 # Verification: codex-current-live-apikey-bootstrap-without-saved-slot-governance canonical closeout
 
-- issue_path: `docs/epics/workspace-routing-foundation/codex-current-live-apikey-bootstrap-without-saved-slot-governance/issues/codex-current-live-apikey-bootstrap-without-saved-slot-governance.md`
+- issue_path: `docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/issues/codex-current-live-apikey-bootstrap-without-saved-slot-governance.md`
 - verified_in_branch: `develop`
 - verified_in_worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely`
 - verified_at: `2026-04-06`
@@ -18,7 +18,7 @@
    - `PASS`
 3. `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager-current-live-apikey-without-saved-slot`
    - `PASS`
-4. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-2000-test-pre-merge-codex-current-live-apikey-bootstrap --issue docs/epics/workspace-routing-foundation/codex-current-live-apikey-bootstrap-without-saved-slot-governance/issues/codex-current-live-apikey-bootstrap-without-saved-slot-governance.md`
+4. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-2000-test-pre-merge-codex-current-live-apikey-bootstrap --issue docs/B2-docs/config/codex-current-live-apikey-bootstrap-without-saved-slot-governance/issues/codex-current-live-apikey-bootstrap-without-saved-slot-governance.md`
    - `PASS`
 5. `./bin/governance-check`
    - `PASS` in premerge lane and again on canonical `develop`

@@ -12,13 +12,13 @@
 - source_brainstorm: `docs/B1-docs/raw-20260405/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/config/packaging/pre-tests.md`
 - progress_path: `docs/progress/freely-product-architecture/p-tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
-- verification_artifact_dir: `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/config/packaging/code-reviews`
 - depends_on:
-  - `docs/epics/freely-product-architecture/default-autonomy-activation-consent-and-tool-policy-governance/issues/default-autonomy-activation-consent-and-tool-policy-governance.md`
-  - `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/issues/freely-tool-autonomy-policy-materialization-governance.md`
-  - `docs/epics/freely-product-architecture/project-level-agents-bootstrap-and-management-contract-governance/issues/project-level-agents-bootstrap-and-management-contract-governance.md`
+  - `docs/B2-docs/config/packaging/issues/default-autonomy-activation-consent-and-tool-policy-governance.md`
+  - `docs/B2-docs/config/packaging/issues/freely-tool-autonomy-policy-materialization-governance.md`
+  - `docs/B2-docs/config/packaging/issues/project-level-agents-bootstrap-and-management-contract-governance.md`
   - `docs/system/workspace/tools.md`
   - `docs/system/workspace/scripts/runtime/freely`
   - `docs/system/workspace/scripts/runtime/tool-launchers.sh`
@@ -98,8 +98,8 @@ Freely 已经冻结了 activation consent、默认自治 posture、以及一部�
 
 This owner freezes the product boundary only. The following implementation-shaped truths are delegated and must be consumed by reference rather than redefined here:
 
-1. Codex `account-*` / `apikey-*` slot bundle shape, slot naming, cross-kind switch matrix, provider-aware probe routing, and backup-before-mutation behavior are owned by `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`.
-2. The threshold and repository disposition for any future standalone `ai-switch-cli` backend are owned by `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`.
+1. Codex `account-*` / `apikey-*` slot bundle shape, slot naming, cross-kind switch matrix, provider-aware probe routing, and backup-before-mutation behavior are owned by `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`.
+2. The threshold and repository disposition for any future standalone `ai-switch-cli` backend are owned by `docs/B2-docs/ibm/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`.
 3. This architecture owner only requires that any backend chosen by follow-on owners preserve one cross-tool contract family:
    - slot inventory remains tool-keyed rather than tool-specific ad hoc roots
    - stronger capabilities such as switch, probe, and auto-rotation are claimed only when official tool surfaces are verified
@@ -111,11 +111,11 @@ This owner freezes the product boundary only. The following implementation-shape
 - `docs/B1-docs/raw-20260405/brainstorms.md`
 - `docs/B1-docs/raw-20260405/candidates.md`
 - `docs/milestones.md`
-- `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
-- `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/brainstorms/b-tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
-- `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/prd.md`
-- `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/pre-tests.md`
-- `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/tasks.md`
+- `docs/B2-docs/config/packaging/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
+- `docs/B2-docs/config/packaging/brainstorms/b-tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
+- `docs/B2-docs/config/packaging/prd.md`
+- `docs/B2-docs/config/packaging/pre-tests.md`
+- `docs/B2-docs/config/packaging/tasks.md`
 - `docs/progress/freely-product-architecture/p-tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
 
 ## Verification
@@ -133,13 +133,13 @@ This owner freezes the product boundary only. The following implementation-shape
   - The canonical IBM package now includes the per-tool matrix, shared degradation semantics, and runtime refactor seams required before any narrower implementation owner is opened.
   - Follow-on work must consume this owner as architecture truth rather than reopening umbrella product-boundary debate inside runtime lanes.
 - required_doc_refs:
-  - `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
-  - `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/brainstorms/b-tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
-  - `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/prd.md`
-  - `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/pre-tests.md`
-  - `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/tasks.md`
-  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
-  - `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
+  - `docs/B2-docs/config/packaging/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
+  - `docs/B2-docs/config/packaging/brainstorms/b-tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
+  - `docs/B2-docs/config/packaging/prd.md`
+  - `docs/B2-docs/config/packaging/pre-tests.md`
+  - `docs/B2-docs/config/packaging/tasks.md`
+  - `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+  - `docs/B2-docs/ibm/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
 
 ## Next
 

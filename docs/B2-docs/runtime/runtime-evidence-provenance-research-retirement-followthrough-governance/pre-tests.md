@@ -16,7 +16,7 @@
 - target environment: `feature/runtime-evidence-provenance-research-retirement-20260409`
 - required evidence: `command output plus verification artifact`
 - blocker taxonomy: `execution_pending_or_failed`
-1. Run `./bin/pretests-gate --project "$PWD" --issue docs/epics/workspace-routing-foundation/runtime-evidence-provenance-research-retirement-followthrough-governance/issues/runtime-evidence-provenance-research-retirement-followthrough-governance.md`.
+1. Run `./bin/pretests-gate --project "$PWD" --issue docs/B2-docs/runtime/runtime-evidence-provenance-research-retirement-followthrough-governance/issues/runtime-evidence-provenance-research-retirement-followthrough-governance.md`.
 2. Run `git diff --check`.
 3. Run `./bin/governance-check`.
 
@@ -48,18 +48,18 @@
 - requirement: `The dropped research candidate is paired with a concrete issue, pre-tests, progress, and verification artifact so protected push no longer sees candidate-only evidence.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-evidence-provenance-research-retirement-followthrough-governance/code-reviews/20260409-runtime-evidence-provenance-research-retirement-followthrough-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-evidence-provenance-research-retirement-followthrough-governance/code-reviews/20260409-runtime-evidence-provenance-research-retirement-followthrough-verification.md`
 
 ### Guarded merge path preserves the retirement closure
 - id: `retirement-followthrough-guarded-merge`
 - requirement: `Feature -> test-pre-merge -> develop guarded replay preserves the retirement followthrough without reopening the mixed-owner packet.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-evidence-provenance-research-retirement-followthrough-governance/code-reviews/20260409-runtime-evidence-provenance-research-retirement-followthrough-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-evidence-provenance-research-retirement-followthrough-governance/code-reviews/20260409-runtime-evidence-provenance-research-retirement-followthrough-verification.md`
 
 ### Obsolete research worktree is retired after publication
 - id: `retirement-followthrough-fleet-closeout`
 - requirement: `Once canonical develop absorbs the closeout owner, the obsolete research worktree and branch are removed from the active fleet.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-evidence-provenance-research-retirement-followthrough-governance/code-reviews/20260409-runtime-evidence-provenance-research-retirement-followthrough-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-evidence-provenance-research-retirement-followthrough-governance/code-reviews/20260409-runtime-evidence-provenance-research-retirement-followthrough-verification.md`

@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO7N
     synced_at: '2026-04-27T13:15:40Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/codex-acp-fresh-path-prototype/issues/codex-acp-fresh-path-prototype.md
+canonical_issue_path: docs/B2-docs/config/codex-acp-fresh-path-prototype/issues/codex-acp-fresh-path-prototype.md
 last_synced_comment_at:
   github: '2026-04-27T11:22:02Z'
 hash: ''
@@ -31,4 +31,4 @@ ACP 边界已经冻结，runtime `adapter axis` 也已经 materialize 到 config
 3. ACP 官方 agents / registry 当前已有 Codex CLI adapter 现实，因此它不是纯 speculative target。
 4. Freely 对 `codex` 的 strongest contract 是 explicit resume evidence；因此第一刀 prototype 必须收窄为 fresh path，而不是一开始就假定 ACP 能无损替代 current
 
-canonical: docs/epics/workspace-routing-foundation/codex-acp-fresh-path-prototype/issues/codex-acp-fresh-path-prototype.md
+canonical: docs/B2-docs/config/codex-acp-fresh-path-prototype/issues/codex-acp-fresh-path-prototype.md

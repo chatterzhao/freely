@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO8G
     synced_at: '2026-04-27T13:16:15Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md
+canonical_issue_path: docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:23:52Z'
 hash: ''
@@ -30,4 +30,4 @@ Canonical `develop` has already shown two distinct truths on 2026-04-04:
 
 That combination means the immediate operator diagnosis is currently too implicit. Lower-layer launchers already contain partial stale-cleanup and bounded-wait behavior, but Freely still lacks a go
 
-canonical: docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md
+canonical: docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md

@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO9I
     synced_at: '2026-04-27T13:17:00Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md
+canonical_issue_path: docs/B2-docs/ibm/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:26:36Z'
 hash: ''
@@ -27,4 +27,4 @@ Canonical `develop` is red on a real protected-ancestry receipt-gap class that t
 
 The current fail-closed behavior is correct, but Freely now needs a narrower follow-on owner so this histo
 
-canonical: docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md
+canonical: docs/B2-docs/ibm/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md

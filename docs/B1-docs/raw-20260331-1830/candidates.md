@@ -38,7 +38,7 @@
 - priority: P1
 - status: promoted
 - decision_reason: The observed Kiro failure family has now been proven narrow and already absorbed by a focused runtime fix on `develop`: detect the two observed strings early, write a canonical slot-switch reason, stop local blind relaunch, and defer availability recovery back to the control plane. The correct owner is therefore a dedicated Kiro-scoped closeout issue, not a reopened generic AI-tool redesign.
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/kiro-cli-runtime-availability-failure-governance/issues/kiro-cli-runtime-availability-failure-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/kiro-cli-runtime-availability-failure-governance/issues/kiro-cli-runtime-availability-failure-governance.md`
 - milestone: `docs/milestones.md#M-20260306-workspace-routing-foundation`
 - next_action: Materialize the narrow owner issue, write canonical verification/progress evidence around develop commit `3a6b0e0`, and close this candidate as promoted instead of leaving it in `needs_research`.
 - revisit_trigger: Reopen only if future field evidence shows additional Kiro failure strings still being recorded as healthy exits, or if same-family failures on other tools force a broader cross-tool availability owner.

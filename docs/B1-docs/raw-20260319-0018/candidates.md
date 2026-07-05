@@ -18,7 +18,7 @@
   - 形成一份 `trigger -> owner -> artifact -> action -> fallback` 统一矩阵
 - priority: P0
 - status: promoted
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
 - legacy_id_mapping: I-20260319-0018  # 历史遗留的 issue id
 - milestone: `M-20260306-workspace-routing-foundation`
 - session_refs:
@@ -37,7 +37,7 @@
 - status: proposed
 - next_action: 调研 token 高效会话旋转的具体实现方案
 - revisit_trigger: 当有新的 token 效率需求时
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
 - milestone: `M-20260306-workspace-routing-foundation`
 - session_refs:
   - `feature/token-efficient-session-continuity-20260319`

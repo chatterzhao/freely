@@ -48,7 +48,7 @@
 - requirement: `Canonical docs define raw external source scan as open and unconsumed only, not all open GitHub issues.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/code-reviews/20260420-github-first-external-issue-source-governance-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/github-first-external-issue-source-governance/code-reviews/20260420-github-first-external-issue-source-governance-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -61,7 +61,7 @@
 - requirement: `Canonical docs define repo-native linkage as decisive dedupe authority and external labels/comments as hints only.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/code-reviews/20260420-github-first-external-issue-source-governance-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/github-first-external-issue-source-governance/code-reviews/20260420-github-first-external-issue-source-governance-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -74,7 +74,7 @@
 - requirement: `Source-routing consumer docs use the external issue durable source-family term and keep GitHub scoped to the first platform slice.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/code-reviews/20260420-github-first-external-issue-source-governance-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/github-first-external-issue-source-governance/code-reviews/20260420-github-first-external-issue-source-governance-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -87,7 +87,7 @@
 - requirement: `The guarded test-pre-merge -> develop path carries this owner's issue, pre-tests, tasks, and review evidence instead of leaving the source contract in candidate-only state.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/code-reviews/20260420-github-first-external-issue-source-governance-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/github-first-external-issue-source-governance/code-reviews/20260420-github-first-external-issue-source-governance-verification.md`
 - surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`

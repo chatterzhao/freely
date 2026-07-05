@@ -38,10 +38,10 @@
 - landing_zones:
   - `docs/system/workspace/scripts/runtime/freely`
   - `docs/system/workspace/scripts/tests/`
-  - `docs/epics/workspace-routing-foundation/`
+  - `docs/B2-docs/git-worktree/`
 - promoted_issue_id: `I-20260412-1845-A`
 - recommendation: `materialize this as a new narrow runtime observation owner rather than reopening the completed display-time owner or the broader completed observation contract.`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/issues/runtime-forensic-time-alignment-and-stall-recovery-observability-governance.md`
+- promoted_issue_path: `docs/B2-docs/runtime/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/issues/runtime-forensic-time-alignment-and-stall-recovery-observability-governance.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`

@@ -21,7 +21,7 @@
 3. Run `bash docs/system/workspace/scripts/tests/test-freely-machine-time-format-uses-shared-helper`.
 4. Run `bash docs/system/workspace/scripts/tests/test-freely-manager-startup-continuity-stub-materialization`.
 5. Run `bash docs/system/workspace/scripts/tests/test-freely-stop-materializes-missing-manager-continuity`.
-6. Run `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260423-feature-runtime-time-format-unification --issue docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md`.
+6. Run `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260423-feature-runtime-time-format-unification --issue docs/B2-docs/runtime/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md`.
 7. Run `./bin/governance-check`.
 
 ## End-to-End
@@ -115,4 +115,4 @@
 - case_design: `Replay the helper-unification slice on test-pre-merge, rerun the five bounded regressions plus owner gates there, and stage a fresh premerge verification artifact before promoting into develop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/code-reviews/20260423-runtime-human-readable-time-display-helper-unification-premerge-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-human-readable-time-display-governance/code-reviews/20260423-runtime-human-readable-time-display-helper-unification-premerge-verification.md`

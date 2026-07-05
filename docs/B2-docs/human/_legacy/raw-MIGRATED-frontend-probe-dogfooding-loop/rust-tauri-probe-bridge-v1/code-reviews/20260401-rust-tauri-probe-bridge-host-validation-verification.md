@@ -1,7 +1,7 @@
 # Code Review: rust-tauri-probe-bridge-host-validation-verification
 
 - issue_id: `I-20260317-0332`
-- issue: `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/issues/rust-tauri-probe-bridge-v1.md`
+- issue: `docs/B2-docs/human/tui/issues/rust-tauri-probe-bridge-v1.md`
 - reviewer: `codex`
 - phase: `in_verification`
 - date: `2026-04-01`

@@ -21,7 +21,7 @@ Freely 最近多次暴露出同类问题：
 - `docs/system/workspace/skills/doc-ibm-execution/references/ibm-completion-gate.md`
 - `docs/system/workspace/skills/doc-ibm-execution/references/issue-materialization-checklist.md`
 - `docs/system/workspace/three-loop-capability-lifecycle.md`
-- `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/pre-tests.md`
+- `docs/B2-docs/ibm/pre-test-merge-responsibility-usage-and-lifecycle-governance/pre-tests.md`
 - `docs/LAWS.md`
 
 ## Non-Goals

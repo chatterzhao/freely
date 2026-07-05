@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO7I
     synced_at: '2026-04-27T13:15:34Z'
 primary_platform: github
-canonical_issue_path: docs/epics/freely-product-architecture/default-autonomy-activation-consent-and-tool-policy-governance/issues/default-autonomy-activation-consent-and-tool-policy-governance.md
+canonical_issue_path: docs/B2-docs/config/packaging/issues/default-autonomy-activation-consent-and-tool-policy-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:21:49Z'
 hash: ''
@@ -30,4 +30,4 @@ platform_state: closed
 
 这已经不是新的安全基线问题，而是 workspace-routing 的 worker-runtime residua
 
-canonical: docs/epics/workspace-routing-foundation/worker-reactivation-and-local-reentry-residual-runtime-governance/issues/worker-reactivation-and-local-reentry-residual-runtime-governance.md
+canonical: docs/B2-docs/ibm/worker-reactivation-and-local-reentry-residual-runtime-governance/issues/worker-reactivation-and-local-reentry-residual-runtime-governance.md

@@ -1,7 +1,7 @@
 # Implementation Decision: restart-slot-switch-preflight-preserves-active-runtime-governance
 
 - issue_id: `I-20260405-2055-A`
-- issue_path: `docs/epics/workspace-routing-foundation/restart-slot-switch-preflight-preserves-active-runtime-governance/issues/restart-slot-switch-preflight-preserves-active-runtime-governance.md`
+- issue_path: `docs/B2-docs/ibm/restart-slot-switch-preflight-preserves-active-runtime-governance/issues/restart-slot-switch-preflight-preserves-active-runtime-governance.md`
 - decision_date: `2026-04-05`
 - decision_owner: `codex`
 

@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFOA3
     synced_at: '2026-04-27T13:17:24Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md
+canonical_issue_path: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:27:54Z'
 hash: ''
@@ -27,4 +27,4 @@ Live process inspection showed the runtime leak was not one isolated leftover pi
 
 This owner captures the first implementation slice that closes that seam without reopening broader runtime architecture work: reject repeated user sta
 
-canonical: docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md
+canonical: docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md

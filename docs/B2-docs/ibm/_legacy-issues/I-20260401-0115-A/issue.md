@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO7F
     synced_at: '2026-04-27T13:15:30Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/supply-chain-baseline-and-install-intake-audit-governance/issues/supply-chain-baseline-and-install-intake-audit-governance.md
+canonical_issue_path: docs/B2-docs/ibm/supply-chain-baseline-and-install-intake-audit-governance/issues/supply-chain-baseline-and-install-intake-audit-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:21:39Z'
 hash: ''
@@ -27,4 +27,4 @@ Freely already turned artifact exposure and execution-boundary review into machi
 
 This owner closes that narrow gap without reopening the broader security umbrella.
 
-canonical: docs/epics/workspace-routing-foundation/supply-chain-baseline-and-install-intake-audit-governance/issues/supply-chain-baseline-and-install-intake-audit-governance.md
+canonical: docs/B2-docs/ibm/supply-chain-baseline-and-install-intake-audit-governance/issues/supply-chain-baseline-and-install-intake-audit-governance.md

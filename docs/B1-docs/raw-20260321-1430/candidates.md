@@ -29,10 +29,10 @@
 - decision_reason: 本轮研究结论已被吸收到新的 `manager-watchdog-trigger-and-drift-reconcile-governance` issue 中，后续以该 issue 生命周期为准，不再把本候选保留成平行推进线。
 - next_action: 通过新的 issue 在主管巡检真源中落下 `external drift / out-of-band reconcile` 检查面，并保持本预研仅作为历史追溯输入。
 - revisit_trigger: 若未来需要单独拆出 runtime-level drift detector，而不只是主管 patrol 语义增强，再重新开启新预研。
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md`
 - milestone: `docs/milestones.md#m-20260306-workspace-routing-foundation`
 - superseded_by:
-  - `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md`
+  - `docs/B2-docs/ibm/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md`
 - session_refs:
   - tool: codex
   - session_id: current-thread

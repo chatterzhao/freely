@@ -14,7 +14,7 @@
 - priority: P2
 - status: promoted
 - decision_reason: 研究结论已经稳定到可 materialize 的边界；mem9 适合被定义为可选连续性增强层，而不是治理真源。
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/mem9-continuity-bridge/issues/mem9-continuity-bridge.md`
+- promoted_issue_path: `docs/B2-docs/ibm/mem9-continuity-bridge/issues/mem9-continuity-bridge.md`
 - milestone: `M-20260306-workspace-routing-foundation`
 - session_refs:
   - github:https://github.com/mem9-ai/mem9

@@ -7,14 +7,14 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `chat-triggered-worker-runtime-reactivation-governance`
 - issue-name: `chat-triggered-worker-runtime-reactivation-governance`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/chat-triggered-worker-runtime-reactivation-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/human/chat-triggered-worker-runtime-reactivation-governance/code-reviews`
 - priority: P1
 - source_candidate: `docs/B1-docs/raw-20260321/candidates.md#c-20260321-1706-a`
 - source_brainstorm: `docs/B1-docs/raw-20260321/brainstorms.md`
 - execution_base: `feature/codex-session-reentry-and-pty-input-20260321`
 - integration_target: `develop`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/issues/explicit-session-addressed-resume-governance.md`
+  - `docs/B2-docs/ibm/explicit-session-addressed-resume-governance/issues/explicit-session-addressed-resume-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://manual-author-session", role: "author"}
 
@@ -70,4 +70,4 @@
 - `docs/system/workspace/scripts/tests/test-freely-chat-worker-reactivation`
 - `docs/system/workspace/scripts/tests/test-freely-interruption-direct-answer`
 - `docs/progress/workspace-routing-foundation/p-chat-triggered-worker-runtime-reactivation-governance.md`
-- `docs/epics/workspace-routing-foundation/chat-triggered-worker-runtime-reactivation-governance/code-reviews/20260321-chat-triggered-worker-runtime-reactivation-verification.md`
+- `docs/B2-docs/human/chat-triggered-worker-runtime-reactivation-governance/code-reviews/20260321-chat-triggered-worker-runtime-reactivation-verification.md`

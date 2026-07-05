@@ -12,9 +12,9 @@
 - source_brainstorm: `docs/B1-docs/raw-20260412/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/codex-probe-success-shape-and-quota-slot-recovery-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/config/codex-probe-success-shape-and-quota-slot-recovery-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-codex-probe-success-shape-and-quota-slot-recovery-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/codex-probe-success-shape-and-quota-slot-recovery-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/config/codex-probe-success-shape-and-quota-slot-recovery-governance/code-reviews`
 - follow_on_to: `I-20260410-1835-B`
 - created_at: `2026-04-12`
 - session_refs: []
@@ -51,7 +51,7 @@ This is not a new generic network-taxonomy owner. It is a bounded closeout of th
 
 ## Verification
 
-- `docs/epics/workspace-routing-foundation/codex-probe-success-shape-and-quota-slot-recovery-governance/code-reviews/20260412-codex-probe-success-shape-and-quota-slot-recovery-verification.md`
+- `docs/B2-docs/config/codex-probe-success-shape-and-quota-slot-recovery-governance/code-reviews/20260412-codex-probe-success-shape-and-quota-slot-recovery-verification.md`
 
 ## Completion
 

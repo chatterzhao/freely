@@ -12,11 +12,11 @@
 - source_brainstorm: `docs/B1-docs/raw-20260404/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/ibm/protected-branch-merge-receipt-gap-followthrough/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-protected-branch-merge-receipt-gap-followthrough.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/protected-branch-merge-receipt-gap-followthrough/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md`
+  - `docs/B2-docs/ibm/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md`
   - `docs/system/workspace/scripts/worktree/pr-merge-guarded`
   - `docs/system/workspace/scripts/quality/governance-check`
   - `docs/system/workspace/hooks/protected-branch-breakglass-receipts.md`
@@ -56,10 +56,10 @@ Freely 已经要求 protected-branch merge 写 canonical receipt trailer，也�
 - `docs/B1-docs/raw-20260404/candidates.md`
 - `docs/B1-docs/raw-INDEX.md`
 - `docs/milestones.md`
-- `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
-- `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/prd.md`
-- `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/tasks.md`
+- `docs/B2-docs/ibm/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
+- `docs/B2-docs/ibm/protected-branch-merge-receipt-gap-followthrough/prd.md`
+- `docs/B2-docs/ibm/protected-branch-merge-receipt-gap-followthrough/pre-tests.md`
+- `docs/B2-docs/ibm/protected-branch-merge-receipt-gap-followthrough/tasks.md`
 - `docs/progress/workspace-routing-foundation/p-protected-branch-merge-receipt-gap-followthrough.md`
 - `docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md`
 - `docs/system/workspace/scripts/quality/governance-check`

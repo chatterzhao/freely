@@ -11,13 +11,13 @@
 - target_environment: test-pre-merge-20260701T031733Z-gate-skill-alignment
 - required_evidence: grep 输出
 - evidence_level: integration
-- artifact_ref: docs/epics/gate-skill-alignment/skill-template-fix/raw-20260701T031733Z/verification/acceptance-1.log
+- artifact_ref: docs/B2-docs/gate/governance/raw-20260701T031733Z/verification/acceptance-1.log
 - test_command: grep -c "promoted_issue_path" docs/system/workspace/skills/freely-doc-B1_IBM-execution/SKILL.md
 - expected_output: 匹配到至少 1 处 promoted_issue_path
 - expected_RED_output: 匹配到 0 处 (修复前模板无此字段)
 - actual_RED_output: grep 返回 0（B1 模板无 promoted_issue_path）— RED 确认
 - actual_output: grep 返回 2（模板中 2 处 promoted_issue_path 示例）
-- evidence_file: docs/epics/gate-skill-alignment/skill-template-fix/raw-20260701T031733Z/verification/acceptance-1.log
+- evidence_file: docs/B2-docs/gate/governance/raw-20260701T031733Z/verification/acceptance-1.log
 - red-green-status: green
 - status: passed
 - red_how: feature: 修复前 B1 模板无 promoted_issue_path 字段
@@ -30,13 +30,13 @@
 - target_environment: test-pre-merge-20260701T031733Z-gate-skill-alignment
 - required_evidence: grep 输出
 - evidence_level: integration
-- artifact_ref: docs/epics/gate-skill-alignment/skill-template-fix/raw-20260701T031733Z/verification/acceptance-2.log
+- artifact_ref: docs/B2-docs/gate/governance/raw-20260701T031733Z/verification/acceptance-2.log
 - test_command: grep -c "epics-map\|force-add.*log\|not_applicable_reason.*covered" docs/system/workspace/skills/freely-doc-B2_IBM-execution/SKILL.md
 - expected_output: 匹配到 epics-map、force-add、not_applicable_reason 各至少 1 处
 - expected_RED_output: 匹配数不足 (修复前模板无这些内容)
 - actual_RED_output: grep 返回 0（B2 模板无 epics-map/force-add 提醒）— RED 确认
 - actual_output: epics-map=1 force-add=1 各至少 1 处
-- evidence_file: docs/epics/gate-skill-alignment/skill-template-fix/raw-20260701T031733Z/verification/acceptance-2.log
+- evidence_file: docs/B2-docs/gate/governance/raw-20260701T031733Z/verification/acceptance-2.log
 - red-green-status: green
 - status: passed
 - red_how: feature: 修复前 B2 模板无反引号警告、epics-map 提醒、evidence force-add 提醒
@@ -49,13 +49,13 @@
 - target_environment: test-pre-merge-20260701T031733Z-gate-skill-alignment
 - required_evidence: grep 输出
 - evidence_level: integration
-- artifact_ref: docs/epics/gate-skill-alignment/skill-template-fix/raw-20260701T031733Z/verification/acceptance-3.log
+- artifact_ref: docs/B2-docs/gate/governance/raw-20260701T031733Z/verification/acceptance-3.log
 - test_command: grep -c "merge.*test\|merge.*测试" docs/system/workspace/skills/freely-dev-loop-execution/SKILL.md docs/system/workspace/skills/freely-test-execution/SKILL.md
 - expected_output: 每个文件至少 1 处 merge 到 test 的提醒
 - expected_RED_output: dev-loop skill 无 merge 提醒 (修复前)
 - actual_RED_output: (RED 阶段执行后填写)
 - actual_output: dev-loop 1 处 test-execution 多处 merge 提醒
-- evidence_file: docs/epics/gate-skill-alignment/skill-template-fix/raw-20260701T031733Z/verification/acceptance-3.log
+- evidence_file: docs/B2-docs/gate/governance/raw-20260701T031733Z/verification/acceptance-3.log
 - red-green-status: green
 - status: passed
 - red_how: feature: 修复前 dev-loop skill 无 merge 到 test 提醒

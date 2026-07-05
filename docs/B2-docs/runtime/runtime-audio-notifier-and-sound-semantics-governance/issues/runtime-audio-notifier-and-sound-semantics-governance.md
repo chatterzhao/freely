@@ -12,10 +12,10 @@
 - source_brainstorm: `docs/B1-docs/raw-20260405/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/pre-tests.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/code-reviews`
+- pre_tests_path: `docs/B2-docs/runtime/runtime-audio-notifier-and-sound-semantics-governance/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/runtime/runtime-audio-notifier-and-sound-semantics-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
+  - `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -83,5 +83,5 @@ Freely 现在能把 runtime signal 暴露到 Tauri/frontend，但还没有一条
 ## Next
 
 - Completed on canonical `develop` via guarded merge `a9eba5b`.
-- Post-merge closeout verification is recorded in `docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/code-reviews/20260405-runtime-audio-notifier-canonical-closeout-verification.md`.
+- Post-merge closeout verification is recorded in `docs/B2-docs/runtime/runtime-audio-notifier-and-sound-semantics-governance/code-reviews/20260405-runtime-audio-notifier-canonical-closeout-verification.md`.
 - Reopen only for follow-on lifecycle expansion such as blocked/failed/interruption cues, native notice adapters for more tools, or explicit host-level fallback playback.

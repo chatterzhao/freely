@@ -1,7 +1,7 @@
 # Implementation Decision: governance-chain-legacy-repair
 
 - issue_id: `I-20260403-1100-A`
-- issue_path: `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md`
+- issue_path: `docs/B2-docs/gate/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md`
 - branch: `feature/governance-doc-truth-repair-20260404-1105`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260404-1105-feature-governance-doc-truth-repair`
 

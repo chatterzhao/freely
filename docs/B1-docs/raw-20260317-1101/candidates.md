@@ -14,7 +14,7 @@
 - priority: P0
 - status: completed
 - decision_reason: 这条问题边界已经 materialize 为独立 issue-bound IBM，并已被 `I-20260317-1004` 的 absorption closeout 写回 completed。当前 candidate 仅保留为来源 provenance，不再代表活跃待办。
-- promoted_issue_path: docs/epics/frontend-probe-dogfooding-loop/frontend-runtime-baseline-for-probe/issues/frontend-runtime-baseline-for-probe.md
+- promoted_issue_path: docs/B2-docs/human/tui/issues/frontend-runtime-baseline-for-probe.md
 - legacy_id_mapping: I-20260317-1004  # 历史遗留的 issue id
 - milestone: M-20260308-frontend-probe-dogfooding-loop
 - next_action: 保留为历史来源记录。若后续 frontend host/runtime baseline 再暴露新的缺口，应从当前 canonical truth 新开 candidate/issue，而不是恢复这条 candidate。

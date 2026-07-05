@@ -4,7 +4,7 @@
 - verdict: `approved`
 - reviewed_at: `2026-05-05T00:00:00Z`
 - issue_id: `I-20260504T1132Z-A`
-- issue_path: `docs/epics/workspace-routing-foundation/raw-key-format-unify/issues/I-20260504T1132Z-A.md`
+- issue_path: `docs/B2-docs/ibm/raw-key-format-unify/issues/I-20260504T1132Z-A.md`
 
 ## Scope
 

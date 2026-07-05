@@ -60,7 +60,7 @@
 - priority: P1
 - status: promoted
 - decision_reason: 这条线已经从本次 Freely 自举现场中暴露出来，而且 clearly exceeds `live-status` / stall candidate 的原边界。当前 shared contract 已冻结到足以进入 IBM：`current-state plane` / `fleet plane` day-1 继续承接既有 `live-status` / `fleet-status`，不另造平行 surface；多 subagent day-1 继续通过 lane/worktree/session 暴露活动痕迹，而不是 backend 一等实体；`acceptance evidence schema` 的 canonical truth 固定落在 artifact plane，而 current-state/fleet/API 仅镜像最小摘要与 `acceptance_ref`；CLI/TUI/GUI/API 共享同一组最小 `deep ref groups`，richer surface 只能扩展不能替换。两轮独立 acceptance review 均已确认：剩余 gate 不再是 contract invention，而是将这套最小 shared contract 正式 materialize 为 IBM 输入。
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
+- promoted_issue_path: `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
 - legacy_id_mapping: I-20260324-0415  # 历史遗留的 issue id
 - milestone: `docs/milestones.md#M-20260306-workspace-routing-foundation`
 - next_action: 进入 IBM。将当前 shared contract materialize 为正式 issue / PRD / pre-tests / tasks，并把后续 dev 约束写死：先实现 contract-required truth surfaces 与 machine-readable deep refs，再由后续 follow-on issue 承接 richer runtime / UI observability productization。

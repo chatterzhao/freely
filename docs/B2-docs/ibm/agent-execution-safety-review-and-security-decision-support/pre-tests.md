@@ -7,21 +7,21 @@
 - requirement: `issue artifacts define one reusable execution-boundary review contract across tool flags, project-local config, launch-time injection, and observed posture`
 - evidence_level: `mock`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md`
+- artifact_ref: `docs/B2-docs/ibm/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md`
 
 ### PT-2
 - id: `PT-2`
 - requirement: `security decision support is defined as internal AI reviewer or committee enhancement rather than user approval replacement`
 - evidence_level: `mock`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/prd.md`
+- artifact_ref: `docs/B2-docs/ibm/agent-execution-safety-review-and-security-decision-support/prd.md`
 
 ### PT-3
 - id: `PT-3`
 - requirement: `safeguard recommendation remains supported output without turning safeguard incompleteness into the default runtime blocker`
 - evidence_level: `mock`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/prd.md`
+- artifact_ref: `docs/B2-docs/ibm/agent-execution-safety-review-and-security-decision-support/prd.md`
 
 ### PT-4
 - id: `PT-4`

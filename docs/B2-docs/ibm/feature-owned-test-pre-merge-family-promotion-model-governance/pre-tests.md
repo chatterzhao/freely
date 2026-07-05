@@ -45,18 +45,18 @@
 - requirement: `The owner freezes the promote model at governance level instead of prematurely implementing gate mechanics.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md`
+- artifact_ref: `docs/B2-docs/ibm/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md`
 
 ### AT-002
 - id: `AT-002`
 - requirement: `Single-feature and explicit multi-bundle lanes are distinguished and their remaining open edges are made explicit.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/brainstorms/b-feature-owned-test-pre-merge-family-promotion-model-governance.md`
+- artifact_ref: `docs/B2-docs/ibm/feature-owned-test-pre-merge-family-promotion-model-governance/brainstorms/b-feature-owned-test-pre-merge-family-promotion-model-governance.md`
 
 ### AT-003
 - id: `AT-003`
 - requirement: `The owner routes follow-on work into later enforcement and automation owners instead of widening itself.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/code-reviews/20260405-feature-owned-test-pre-merge-family-promotion-model-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/feature-owned-test-pre-merge-family-promotion-model-governance/code-reviews/20260405-feature-owned-test-pre-merge-family-promotion-model-verification.md`

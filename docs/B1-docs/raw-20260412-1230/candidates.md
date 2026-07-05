@@ -4,7 +4,7 @@
 - candidate_format_version: `v2`
 - title: Normalize historical completed-queue entries to canonical issue identities
 - source_brainstorm: `docs/B1-docs/raw-20260412-1230/brainstorms.md`
-- reopen_of_issue: `docs/epics/workspace-routing-foundation/milestone-completed-queue-closeout-governance/issues/milestone-completed-queue-closeout-governance.md`
+- reopen_of_issue: `docs/B2-docs/ibm/milestone-completed-queue-closeout-governance/issues/milestone-completed-queue-closeout-governance.md`
 - reopen_reason: `a real guarded develop replay still warns because the completed watchdog owner is listed in docs/milestones.md by legacy candidate identity C-20260324-0405-A instead of canonical issue identity I-20260324-0405`
 - problem: `The completed milestone queue still carries one historical legacy candidate identity, which keeps governance warnings alive even though the owner issue itself is already completed and canonical.`
 - why_now:
@@ -33,7 +33,7 @@
   - `the merge gate correctly requires a candidate -> issue -> progress -> review chain even for narrow completed-family writebacks`
   - `a new followthrough owner makes the historical identity repair explicit without pretending the original completed queue governance or watchdog owner is active again`
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/historical-completed-queue-identity-followthrough-governance/issues/historical-completed-queue-identity-followthrough-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/historical-completed-queue-identity-followthrough-governance/issues/historical-completed-queue-identity-followthrough-governance.md`
 - promoted_issue_path_role: `primary-owner`
 - session_refs:
   - tool: `codex`

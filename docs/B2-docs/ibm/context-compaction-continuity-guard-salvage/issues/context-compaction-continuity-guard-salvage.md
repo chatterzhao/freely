@@ -4,14 +4,14 @@
 - issue_id: `I-20260319-0148`
 - epic-name: `workspace-routing-foundation`
 - story-name: `context-compaction-continuity-guard-salvage`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/context-compaction-continuity-guard-salvage/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/context-compaction-continuity-guard-salvage/code-reviews`
 - milestone: `M-20260306-workspace-routing-foundation`
 - phase_state: `completed`
 - priority: P0
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
+  - `docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
 - source_brainstorm: `docs/B1-docs/raw-20260319/brainstorms.md`
 - source_candidate: `docs/B1-docs/raw-20260319/candidates.md`
 

@@ -1,7 +1,7 @@
 # Implementation Decision: runtime-forensic-time-alignment-and-stall-recovery-observability-governance
 
 - issue_id: `I-20260412-1845-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/issues/runtime-forensic-time-alignment-and-stall-recovery-observability-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/issues/runtime-forensic-time-alignment-and-stall-recovery-observability-governance.md`
 - branch: `feature/fix-manager-continuity-gap-20260412`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260412-feature-fix-manager-continuity-gap`
 - decision_date: `2026-04-12`

@@ -1,6 +1,6 @@
 # Verification: codex-interactive-login-and-apikey-input-flow-governance canonical closeout
 
-- issue_path: `docs/epics/workspace-routing-foundation/codex-interactive-login-and-apikey-input-flow-governance/issues/codex-interactive-login-and-apikey-input-flow-governance.md`
+- issue_path: `docs/B2-docs/config/codex-interactive-login-and-apikey-input-flow-governance/issues/codex-interactive-login-and-apikey-input-flow-governance.md`
 - verified_in_branch: `develop`
 - verified_in_worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely`
 - verified_at: `2026-04-06`
@@ -22,7 +22,7 @@
    - `PASS`
 5. `bash docs/system/workspace/scripts/tests/test-ai-cli-login-codex-apikey-empty-input-fails`
    - `PASS`
-6. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-2004-test-pre-merge-codex-interactive-login --issue docs/epics/workspace-routing-foundation/codex-interactive-login-and-apikey-input-flow-governance/issues/codex-interactive-login-and-apikey-input-flow-governance.md`
+6. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-2004-test-pre-merge-codex-interactive-login --issue docs/B2-docs/config/codex-interactive-login-and-apikey-input-flow-governance/issues/codex-interactive-login-and-apikey-input-flow-governance.md`
    - `PASS`
 7. `./bin/governance-check`
    - `PASS` in premerge lane and again on canonical `develop`

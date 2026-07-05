@@ -11,8 +11,8 @@
 - source_brainstorm: `docs/B1-docs/raw-20260331/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/pre-tests.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/code-reviews`
+- pre_tests_path: `docs/B2-docs/ibm/multi-tool-auto-switch-v1-codex-fallback-governance/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/ibm/multi-tool-auto-switch-v1-codex-fallback-governance/code-reviews`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 

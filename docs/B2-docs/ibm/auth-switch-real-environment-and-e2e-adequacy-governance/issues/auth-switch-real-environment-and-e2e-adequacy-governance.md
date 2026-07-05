@@ -12,9 +12,9 @@
 - source_brainstorm: `docs/B1-docs/raw-20260410/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/auth-switch-real-environment-and-e2e-adequacy-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/ibm/auth-switch-real-environment-and-e2e-adequacy-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-auth-switch-real-environment-and-e2e-adequacy-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/auth-switch-real-environment-and-e2e-adequacy-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/auth-switch-real-environment-and-e2e-adequacy-governance/code-reviews`
 - follow_on_to: `I-20260327-0701`
 - created_at: `2026-04-10`
 - session_refs: []
@@ -49,7 +49,7 @@ The observed miss was not that Freely lacked tests in the abstract. High-level t
 
 ## Verification
 
-- `docs/epics/workspace-routing-foundation/auth-switch-real-environment-and-e2e-adequacy-governance/code-reviews/20260410-auth-switch-real-environment-and-e2e-adequacy-verification.md`
+- `docs/B2-docs/ibm/auth-switch-real-environment-and-e2e-adequacy-governance/code-reviews/20260410-auth-switch-real-environment-and-e2e-adequacy-verification.md`
 
 ## Completion
 

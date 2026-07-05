@@ -1,14 +1,14 @@
 # Code Review: PR scan surface + FREELY_REPO_PLATFORMS config
 
 - issue_id: `I-20260501-0000-A`
-- issue_path: `docs/epics/workspace-routing-foundation/scan-pr-platform-config/issues/I-20260501-0000-A.md`
+- issue_path: `docs/B2-docs/runtime/scan-pr-platform-config/issues/I-20260501-0000-A.md`
 - review_date: `2026-05-03`
 - reviewer: `human`
 - status: `approved`
 - decision: `approve`
 - artifacts_reviewed:
   - docs/system/workspace/scripts/runtime/freely
-  - docs/epics/workspace-routing-foundation/scan-pr-platform-config/pre-tests.md
+  - docs/B2-docs/runtime/scan-pr-platform-config/pre-tests.md
   - docs/B1-docs/raw-20260501/candidates.md
 
 ## Implementation Decision Note

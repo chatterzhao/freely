@@ -12,7 +12,7 @@
 - target_environment: fix worktree
 - required_evidence: grep 确认解析逻辑存在，测试 raw key 被转为分支名
 - evidence_level: integration
-- artifact_ref: docs/epics/wt-close-raw-key/raw-key-param/verification/test-evidence/acceptance-1.txt
+- artifact_ref: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-1.txt
 - test_command: |
   cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T160852Z-wt-close-raw-key-param
   # 检查 wt-close 脚本中 raw key 解析逻辑存在
@@ -22,7 +22,7 @@
 - expected_RED_output: "FAIL: no raw key parsing"
 - actual_RED_output: code written before RED test — skip
 - actual_output: "PASS: all tests pass"
-- evidence_file: docs/epics/wt-close-raw-key/raw-key-param/verification/test-evidence/acceptance-1.txt
+- evidence_file: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-1.txt
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -36,7 +36,7 @@
 - target_environment: fix worktree
 - required_evidence: grep 确认 help 文案包含关键提示
 - evidence_level: integration
-- artifact_ref: docs/epics/wt-close-raw-key/raw-key-param/verification/test-evidence/acceptance-2.txt
+- artifact_ref: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-2.txt
 - test_command: |
   cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T160852Z-wt-close-raw-key-param
   grep -q 'test-pre-merge\|自动' docs/system/workspace/scripts/worktree/wt-close || { echo "FAIL: help missing test-pre-merge note"; exit 1; }
@@ -45,7 +45,7 @@
 - expected_RED_output: "FAIL: help missing test-pre-merge note"
 - actual_RED_output: code written before RED test — skip
 - actual_output: "PASS: all tests pass"
-- evidence_file: docs/epics/wt-close-raw-key/raw-key-param/verification/test-evidence/acceptance-2.txt
+- evidence_file: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-2.txt
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -59,7 +59,7 @@
 - target_environment: fix worktree
 - required_evidence: 代码审查确认 _resolve_branch 逻辑未被破坏
 - evidence_level: integration
-- artifact_ref: docs/epics/wt-close-raw-key/raw-key-param/verification/test-evidence/acceptance-3.txt
+- artifact_ref: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-3.txt
 - test_command: |
   cd /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T160852Z-wt-close-raw-key-param
   grep -q '_resolve_branch' docs/system/workspace/scripts/worktree/wt-close || { echo "FAIL: _resolve_branch removed"; exit 1; }
@@ -68,7 +68,7 @@
 - expected_RED_output: N/A
 - actual_RED_output: code written before RED test — skip
 - actual_output: "PASS: all tests pass"
-- evidence_file: docs/epics/wt-close-raw-key/raw-key-param/verification/test-evidence/acceptance-3.txt
+- evidence_file: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-3.txt
 - red-green-status: green
 - status: passed
 - blocker: none

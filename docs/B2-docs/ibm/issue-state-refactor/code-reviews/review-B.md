@@ -1,5 +1,5 @@
 - issue_id: I-20260505T1210Z-A-B
-- issue_path: docs/epics/workspace-routing-foundation/issue-state-refactor/issues/I-20260505T1210Z-A-B.md
+- issue_path: docs/B2-docs/ibm/issue-state-refactor/issues/I-20260505T1210Z-A-B.md
 
 # code-review: issue-sync platform_state fix
 

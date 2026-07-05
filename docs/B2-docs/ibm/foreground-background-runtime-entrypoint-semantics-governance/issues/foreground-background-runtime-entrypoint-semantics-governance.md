@@ -12,9 +12,9 @@
 - source_brainstorm: `docs/B1-docs/raw-20260413/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-foreground-background-runtime-entrypoint-semantics-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/code-reviews`
 - created_at: `2026-04-13`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
@@ -59,11 +59,11 @@ Freely 当前的产品心智与运行时入口 contract 仍存在一条会误导
   - 先保留 foreground contract，再新增显式 daemon control plane；不要把入口语义重构和 recovery hardening 混成一轮大改。
   - 第一轮优先落命令 contract、runtime detach/attach 边界、shared status truth 与 focused regressions；UI 只冻结默认语义，不在本轮做完整前端实现。
 - required_doc_refs:
-  - `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/issues/foreground-background-runtime-entrypoint-semantics-governance.md`
-  - `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/brainstorms/b-foreground-background-runtime-entrypoint-semantics-governance.md`
-  - `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/prd.md`
-  - `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/tasks.md`
+  - `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/issues/foreground-background-runtime-entrypoint-semantics-governance.md`
+  - `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/brainstorms/b-foreground-background-runtime-entrypoint-semantics-governance.md`
+  - `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/prd.md`
+  - `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/pre-tests.md`
+  - `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/tasks.md`
   - `docs/system/workspace/scripts/runtime/freely`
   - `docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
   - `docs/system/workspace/scripts/tests/test-freely-runtime-supervisor-event-log`
@@ -72,8 +72,8 @@ Freely 当前的产品心智与运行时入口 contract 仍存在一条会误导
 
 ## Verification
 
-- `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-verification.md`
-- `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-closeout-verification.md`
+- `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-verification.md`
+- `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-closeout-verification.md`
 - `bash docs/system/workspace/scripts/tests/test-freely-daemon-command-semantics`
 - `bash docs/system/workspace/scripts/tests/test-freely-daemon-runtime-detach-and-shared-status`
 - `bash docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
@@ -84,13 +84,13 @@ Freely 当前的产品心智与运行时入口 contract 仍存在一条会误导
 ## Completion
 
 - `docs/B1-docs/raw-20260413/candidates.md`
-- `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/issues/foreground-background-runtime-entrypoint-semantics-governance.md`
-- `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/brainstorms/b-foreground-background-runtime-entrypoint-semantics-governance.md`
-- `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/tasks.md`
-- `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-verification.md`
-- `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-closeout-verification.md`
+- `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/issues/foreground-background-runtime-entrypoint-semantics-governance.md`
+- `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/brainstorms/b-foreground-background-runtime-entrypoint-semantics-governance.md`
+- `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/prd.md`
+- `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/pre-tests.md`
+- `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/tasks.md`
+- `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-verification.md`
+- `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/code-reviews/20260413-foreground-background-runtime-entrypoint-semantics-closeout-verification.md`
 - `docs/progress/workspace-routing-foundation/p-foreground-background-runtime-entrypoint-semantics-governance.md`
 - `docs/PROJECT_INTENT.md`
 - `docs/system/workspace/scripts/runtime/freely`

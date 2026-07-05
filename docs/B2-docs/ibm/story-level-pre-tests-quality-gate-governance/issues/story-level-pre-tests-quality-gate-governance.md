@@ -13,13 +13,13 @@
 - source_brainstorm: `docs/B1-docs/raw-20260325/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/pre-tests.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/code-reviews`
+- pre_tests_path: `docs/B2-docs/ibm/story-level-pre-tests-quality-gate-governance/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/ibm/story-level-pre-tests-quality-gate-governance/code-reviews`
 - depends_on:
   - `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`
-  - `docs/epics/workspace-routing-foundation/integration-acceptance-first-verification-governance/issues/integration-acceptance-first-verification-governance.md`
-  - `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
-  - `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/issues/pre-test-merge-responsibility-usage-and-lifecycle-governance.md`
+  - `docs/B2-docs/ibm/integration-acceptance-first-verification-governance/issues/integration-acceptance-first-verification-governance.md`
+  - `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
+  - `docs/B2-docs/ibm/pre-test-merge-responsibility-usage-and-lifecycle-governance/issues/pre-test-merge-responsibility-usage-and-lifecycle-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -74,17 +74,17 @@ Freely 已经明确 `pre-tests.md` 是 issue-level acceptance 控制面，但还
 
 ## Implementation References
 
-- `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/brainstorms/b-story-level-pre-tests-quality-gate-governance.md`
-- `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/tasks.md`
+- `docs/B2-docs/ibm/story-level-pre-tests-quality-gate-governance/brainstorms/b-story-level-pre-tests-quality-gate-governance.md`
+- `docs/B2-docs/ibm/story-level-pre-tests-quality-gate-governance/prd.md`
+- `docs/B2-docs/ibm/story-level-pre-tests-quality-gate-governance/pre-tests.md`
+- `docs/B2-docs/ibm/story-level-pre-tests-quality-gate-governance/tasks.md`
 - `docs/B1-docs/raw-20260325/inventory.md`
 - `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`
 - `docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md`
 - `docs/system/workspace/skills/doc-ibm-execution/references/ibm-completion-gate.md`
 - `docs/system/workspace/skills/doc-ibm-execution/references/issue-materialization-checklist.md`
 - `docs/system/workspace/three-loop-capability-lifecycle.md`
-- `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/pre-tests.md`
+- `docs/B2-docs/ibm/pre-test-merge-responsibility-usage-and-lifecycle-governance/pre-tests.md`
 - `docs/LAWS.md`
 
 ## Completion
@@ -95,9 +95,9 @@ Freely 已经明确 `pre-tests.md` 是 issue-level acceptance 控制面，但还
 - `docs/system/workspace/skills/doc-ibm-execution/references/issue-materialization-checklist.md`
 - `docs/system/workspace/three-loop-capability-lifecycle.md`
 - `docs/LAWS.md`
-- `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/pre-tests.md`
+- `docs/B2-docs/ibm/pre-test-merge-responsibility-usage-and-lifecycle-governance/pre-tests.md`
 - `docs/progress/workspace-routing-foundation/p-story-level-pre-tests-quality-gate-governance.md`
-- `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/code-reviews/20260325-story-level-pre-tests-quality-gate-governance-verification.md`
+- `docs/B2-docs/ibm/story-level-pre-tests-quality-gate-governance/code-reviews/20260325-story-level-pre-tests-quality-gate-governance-verification.md`
 
 ## Verification
 

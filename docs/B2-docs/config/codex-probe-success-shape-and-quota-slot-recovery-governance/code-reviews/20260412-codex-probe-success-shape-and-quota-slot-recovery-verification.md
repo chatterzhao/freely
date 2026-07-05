@@ -1,7 +1,7 @@
 # Verification: codex-probe-success-shape-and-quota-slot-recovery-governance
 
 - issue_id: `I-20260412-0907-A`
-- issue_path: `docs/epics/workspace-routing-foundation/codex-probe-success-shape-and-quota-slot-recovery-governance/issues/codex-probe-success-shape-and-quota-slot-recovery-governance.md`
+- issue_path: `docs/B2-docs/config/codex-probe-success-shape-and-quota-slot-recovery-governance/issues/codex-probe-success-shape-and-quota-slot-recovery-governance.md`
 - verification_date: `2026-04-12`
 - verifier: `codex`
 

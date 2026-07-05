@@ -36,7 +36,7 @@
   - current Freely repo topology has an immediate landing zone through `dist/`, `doctor`, and the existing build scripts
   - it remains a sibling capability slice rather than reopening broader product-baseline owners
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/build-artifact-exposure-and-release-allowlist-audit-governance/issues/build-artifact-exposure-and-release-allowlist-audit-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/build-artifact-exposure-and-release-allowlist-audit-governance/issues/build-artifact-exposure-and-release-allowlist-audit-governance.md`
 - promoted_issue_path_role: `primary-owner`
 - session_refs:
   - tool: `codex`

@@ -1,6 +1,6 @@
 # Verification: codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance canonical closeout
 
-- issue_path: `docs/epics/workspace-routing-foundation/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/issues/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
+- issue_path: `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/issues/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
 - verified_in_branch: `develop`
 - verified_in_worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely`
 - verified_at: `2026-04-06`
@@ -26,7 +26,7 @@
    - `PASS`
 7. `bash docs/system/workspace/scripts/tests/test-freely-runtime-auth-failure-signal-filter`
    - `PASS`
-8. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-2014-test-pre-merge-codex-reconnect-fast-fail --issue docs/epics/workspace-routing-foundation/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/issues/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
+8. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260406-2014-test-pre-merge-codex-reconnect-fast-fail --issue docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/issues/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
    - `PASS`
 9. `./bin/governance-check`
    - `PASS` in premerge lane and again on canonical `develop`

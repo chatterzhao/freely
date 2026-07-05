@@ -6,7 +6,7 @@
 - runtime_state: `closed_for_this_batch`
 - branch: `feature/manager-handoff-consumption-reentry-20260322`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260322-feature-manager-handoff-consumption-reentry`
-- issue_path: `docs/epics/workspace-routing-foundation/manager-continuation-handoff-consumption-governance/issues/manager-continuation-handoff-consumption-governance.md`
+- issue_path: `docs/B2-docs/ibm/manager-continuation-handoff-consumption-governance/issues/manager-continuation-handoff-consumption-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://current-manual-codex-thread-id-not-exposed", role: "cleanup-followthrough-worker"}
 
@@ -42,8 +42,8 @@
 - `git rev-list --left-right --count HEAD...develop`
 - `git branch --contains 87d03b7c6d76b7b70d0a3337029f83d16b029c3d`
 - `git branch -r --list 'origin/feature/manager-handoff-consumption-reentry-20260322'`
-- `docs/epics/workspace-routing-foundation/manager-continuation-handoff-consumption-governance/code-reviews/20260322-manager-continuation-handoff-consumption-verification.md`
-- `docs/epics/workspace-routing-foundation/manager-continuation-handoff-consumption-governance/code-reviews/20260322-manager-continuation-handoff-consumption-cleanup-verification.md`
+- `docs/B2-docs/ibm/manager-continuation-handoff-consumption-governance/code-reviews/20260322-manager-continuation-handoff-consumption-verification.md`
+- `docs/B2-docs/ibm/manager-continuation-handoff-consumption-governance/code-reviews/20260322-manager-continuation-handoff-consumption-cleanup-verification.md`
 
 ## Remaining Scope
 

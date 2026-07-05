@@ -14,7 +14,7 @@
 
 - `bash docs/system/workspace/scripts/tests/test-freely-session-rotation`
 - `./bin/governance-check`
-- `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/references/trigger-owner-matrix.md`
+- `docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/references/trigger-owner-matrix.md`
 - `docs/system/workspace/skills/continuity-watchdog/SKILL.md`
 - `docs/system/workspace/skills/watchdog-control-plane/SKILL.md`
 - `docs/system/workspace/skills/recovery-subagent-governance/SKILL.md`

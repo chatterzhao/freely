@@ -1,7 +1,7 @@
 # Verification: runtime-startup-root-cause-packet-governance
 
 - issue_id: `I-20260413-0420-C`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-startup-root-cause-packet-governance/issues/runtime-startup-root-cause-packet-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-startup-root-cause-packet-governance/issues/runtime-startup-root-cause-packet-governance.md`
 - verification_date: `2026-04-13`
 - verifier: `codex`
 

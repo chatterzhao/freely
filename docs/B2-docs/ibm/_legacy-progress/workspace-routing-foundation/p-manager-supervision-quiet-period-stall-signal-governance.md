@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260328-0335-A`
 - title: Manager supervision quiet-period stall-signal governance
-- issue_path: `docs/epics/workspace-routing-foundation/manager-supervision-quiet-period-stall-signal-governance/issues/manager-supervision-quiet-period-stall-signal-governance.md`
+- issue_path: `docs/B2-docs/ibm/manager-supervision-quiet-period-stall-signal-governance/issues/manager-supervision-quiet-period-stall-signal-governance.md`
 - phase_state: `completed`
 - runtime_state: `merged_to_develop`
 - summary: `2026-03-28` dogfood 现场暴露的 quiet-period false positive 已完成最小行为修复，并吸收到 `develop` commit `82ea1e6`。当前 closeout 只负责把治理状态写回 completed，并锚定 verification evidence。
@@ -21,7 +21,7 @@
 
 1. `bash -n docs/system/workspace/scripts/runtime/freely` 已通过。
 2. `./bin/governance-check` 已通过。
-3. canonical verification evidence 在 `docs/epics/workspace-routing-foundation/manager-supervision-quiet-period-stall-signal-governance/code-reviews/20260328-manager-supervision-quiet-period-stall-signal-verification.md`。
+3. canonical verification evidence 在 `docs/B2-docs/ibm/manager-supervision-quiet-period-stall-signal-governance/code-reviews/20260328-manager-supervision-quiet-period-stall-signal-verification.md`。
 
 ## Next slice
 

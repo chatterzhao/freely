@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO95
     synced_at: '2026-04-27T13:16:44Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/codex-interactive-login-and-apikey-input-flow-governance/issues/codex-interactive-login-and-apikey-input-flow-governance.md
+canonical_issue_path: docs/B2-docs/config/codex-interactive-login-and-apikey-input-flow-governance/issues/codex-interactive-login-and-apikey-input-flow-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:25:53Z'
 hash: ''
@@ -31,4 +31,4 @@ Freely 还缺一个受治理约束的 Codex-first interactive login contract。�
 
 这不是重开 bundle/probe owner，也不是 current-live bootstrap 或 reconnect fast-fail。它是一个独立的 first-hop UX owner。
 
-canonical: docs/epics/workspace-routing-foundation/codex-interactive-login-and-apikey-input-flow-governance/issues/codex-interactive-login-and-apikey-input-flow-governance.md
+canonical: docs/B2-docs/config/codex-interactive-login-and-apikey-input-flow-governance/issues/codex-interactive-login-and-apikey-input-flow-governance.md

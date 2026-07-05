@@ -1,7 +1,7 @@
 # Code Review: runtime-daemon-self-loop-followthrough-resume-incremental-output-evidence-verification
 
 - issue_id: `I-20260421-1200-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
 - date: `2026-04-25 20:25 PDT`
 - branch: `feature/runtime-resume-incremental-output-evidence-guard-20260425`
 - worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260425-feature-runtime-resume-incremental-output-evidence-guard`

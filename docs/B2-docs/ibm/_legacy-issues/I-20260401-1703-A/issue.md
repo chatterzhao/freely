@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO7O
     synced_at: '2026-04-27T13:15:42Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/runtime-adapter-axis-and-per-tool-adapter-selection/issues/runtime-adapter-axis-and-per-tool-adapter-selection.md
+canonical_issue_path: docs/B2-docs/runtime/runtime-adapter-axis-and-per-tool-adapter-selection/issues/runtime-adapter-axis-and-per-tool-adapter-selection.md
 last_synced_comment_at:
   github: '2026-04-27T11:22:08Z'
 hash: ''
@@ -35,4 +35,4 @@ ACP boundary 已经收口，但 runtime 现在还没有 first-class `adapter axi
 
 因此这条 owner 的职责不是接 ACP，而是先把 runtime 切出一个安全的 adapter boundary。
 
-canonical: docs/epics/workspace-routing-foundation/runtime-adapter-axis-and-per-tool-adapter-selection/issues/runtime-adapter-axis-and-per-tool-adapter-selection.md
+canonical: docs/B2-docs/runtime/runtime-adapter-axis-and-per-tool-adapter-selection/issues/runtime-adapter-axis-and-per-tool-adapter-selection.md

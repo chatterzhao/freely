@@ -12,13 +12,13 @@
 - source_brainstorm: `docs/B1-docs/raw-20260401/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/worker-reactivation-and-local-reentry-residual-runtime-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/ibm/worker-reactivation-and-local-reentry-residual-runtime-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-worker-reactivation-and-local-reentry-residual-runtime-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/worker-reactivation-and-local-reentry-residual-runtime-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/worker-reactivation-and-local-reentry-residual-runtime-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/chat-triggered-worker-runtime-reactivation-governance/issues/chat-triggered-worker-runtime-reactivation-governance.md`
-  - `docs/epics/workspace-routing-foundation/worker-active-reentry-for-manager-delegated-continuation-governance/issues/worker-active-reentry-for-manager-delegated-continuation-governance.md`
-  - `docs/epics/workspace-routing-foundation/manager-attach-reuse-missing-ai-repair-governance/issues/manager-attach-reuse-missing-ai-repair-governance.md`
+  - `docs/B2-docs/human/chat-triggered-worker-runtime-reactivation-governance/issues/chat-triggered-worker-runtime-reactivation-governance.md`
+  - `docs/B2-docs/ibm/worker-active-reentry-for-manager-delegated-continuation-governance/issues/worker-active-reentry-for-manager-delegated-continuation-governance.md`
+  - `docs/B2-docs/ibm/manager-attach-reuse-missing-ai-repair-governance/issues/manager-attach-reuse-missing-ai-repair-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -63,11 +63,11 @@
 
 ## Current Artifact Set
 
-- `docs/epics/workspace-routing-foundation/worker-reactivation-and-local-reentry-residual-runtime-governance/issues/worker-reactivation-and-local-reentry-residual-runtime-governance.md`
-- `docs/epics/workspace-routing-foundation/worker-reactivation-and-local-reentry-residual-runtime-governance/brainstorms/b-worker-reactivation-and-local-reentry-residual-runtime-governance.md`
-- `docs/epics/workspace-routing-foundation/worker-reactivation-and-local-reentry-residual-runtime-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/worker-reactivation-and-local-reentry-residual-runtime-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/worker-reactivation-and-local-reentry-residual-runtime-governance/tasks.md`
+- `docs/B2-docs/ibm/worker-reactivation-and-local-reentry-residual-runtime-governance/issues/worker-reactivation-and-local-reentry-residual-runtime-governance.md`
+- `docs/B2-docs/ibm/worker-reactivation-and-local-reentry-residual-runtime-governance/brainstorms/b-worker-reactivation-and-local-reentry-residual-runtime-governance.md`
+- `docs/B2-docs/ibm/worker-reactivation-and-local-reentry-residual-runtime-governance/prd.md`
+- `docs/B2-docs/ibm/worker-reactivation-and-local-reentry-residual-runtime-governance/pre-tests.md`
+- `docs/B2-docs/ibm/worker-reactivation-and-local-reentry-residual-runtime-governance/tasks.md`
 - `docs/B1-docs/raw-20260401/brainstorms.md`
 - `docs/B1-docs/raw-20260401/candidates.md`
 - `docs/milestones.md`

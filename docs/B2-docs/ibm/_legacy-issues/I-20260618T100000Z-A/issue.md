@@ -16,14 +16,14 @@ intake_id: ""
 author: freely-manager
 channel: freely-fix-execution
 session_refs: []
-pre_tests_path: docs/epics/wt-create-chat-inbox-id-bug/verification/pre-tests.md
+pre_tests_path: docs/B2-docs/wt-create-chat-inbox-id-bug/verification/pre-tests.md
 verification_artifact_dir: docs/epics/wt-create-chat-inbox-id-bug/code-reviews
 ---
 
 # I-20260618T100000Z-A: wt-create chat-inbox ID normalization
 
 - source_candidate: `docs/B1-docs/raw-20260618T100000Z/candidates.md`
-- pre_tests_path: `docs/epics/wt-create-chat-inbox-id-bug/verification/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/wt-create-chat-inbox-id-bug/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/wt-create-chat-inbox-id-bug/code-reviews`
 
 ## 实现

@@ -12,7 +12,7 @@
 - target_environment: fix worktree
 - required_evidence: grep 确认守卫存在 + --dry-run 执行不报错
 - evidence_level: integration
-- artifact_ref: docs/epics/wt-close-raw-key/args-d-fix/verification/test-evidence/acceptance-1.txt
+- artifact_ref: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-1.txt
 - test_command: |
   _wt="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T165403Z-wt-close-args-d-fix"
   bash -n "$_wt/docs/system/workspace/scripts/worktree/wt-close" || { echo "FAIL: syntax error"; exit 1; }
@@ -22,7 +22,7 @@
 - expected_RED_output: "FAIL: no args guard"
 - actual_RED_output: "RED confirmed — no args guard"
 - actual_output: "GREEN: all tests pass"
-- evidence_file: docs/epics/wt-close-raw-key/args-d-fix/verification/test-evidence/acceptance-1.txt
+- evidence_file: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-1.txt
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -36,7 +36,7 @@
 - target_environment: fix worktree
 - required_evidence: grep -- '-D' 在 test-pre-merge 删除附近
 - evidence_level: integration
-- artifact_ref: docs/epics/wt-close-raw-key/args-d-fix/verification/test-evidence/acceptance-2.txt
+- artifact_ref: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-2.txt
 - test_command: |
   _wt="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T165403Z-wt-close-args-d-fix"
   # Check that test-pre-merge branch deletion uses -D (not just -d)
@@ -46,7 +46,7 @@
 - expected_RED_output: "FAIL: test-pre-merge delete not using -D"
 - actual_RED_output: "RED confirmed — no args guard"
 - actual_output: "GREEN: all tests pass"
-- evidence_file: docs/epics/wt-close-raw-key/args-d-fix/verification/test-evidence/acceptance-2.txt
+- evidence_file: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-2.txt
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -60,7 +60,7 @@
 - target_environment: fix worktree
 - required_evidence: grep 确认 _extract_raw_key 函数存在且处理 bare key
 - evidence_level: integration
-- artifact_ref: docs/epics/wt-close-raw-key/args-d-fix/verification/test-evidence/acceptance-3.txt
+- artifact_ref: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-3.txt
 - test_command: |
   _wt="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T165403Z-wt-close-args-d-fix"
   source "$_wt/docs/system/workspace/scripts/worktree/wt-close" 2>/dev/null || true
@@ -70,7 +70,7 @@
 - expected_RED_output: N/A (regression test)
 - actual_RED_output: "RED confirmed — no args guard"
 - actual_output: "GREEN: all tests pass"
-- evidence_file: docs/epics/wt-close-raw-key/args-d-fix/verification/test-evidence/acceptance-3.txt
+- evidence_file: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-3.txt
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -84,7 +84,7 @@
 - target_environment: fix worktree
 - required_evidence: grep -oE 提取逻辑存在
 - evidence_level: integration
-- artifact_ref: docs/epics/wt-close-raw-key/args-d-fix/verification/test-evidence/acceptance-4.txt
+- artifact_ref: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-4.txt
 - test_command: |
   _wt="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T165403Z-wt-close-args-d-fix"
   result=$(bash -c 'source "$1"; _extract_raw_key "raw-20260629T165403Z"' _ "$_wt/docs/system/workspace/scripts/worktree/wt-close" 2>/dev/null || echo "")
@@ -93,7 +93,7 @@
 - expected_RED_output: N/A (regression test)
 - actual_RED_output: "RED confirmed — no args guard"
 - actual_output: "GREEN: all tests pass"
-- evidence_file: docs/epics/wt-close-raw-key/args-d-fix/verification/test-evidence/acceptance-4.txt
+- evidence_file: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-4.txt
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -107,7 +107,7 @@
 - target_environment: fix worktree
 - required_evidence: 提取结果仅含 bare key 不含 slug
 - evidence_level: integration
-- artifact_ref: docs/epics/wt-close-raw-key/args-d-fix/verification/test-evidence/acceptance-5.txt
+- artifact_ref: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-5.txt
 - test_command: |
   _wt="/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/fix-raw-20260629T165403Z-wt-close-args-d-fix"
   result=$(bash -c 'source "$1"; _extract_raw_key "fix/raw-20260629T165403Z-wt-close-args-d-fix"' _ "$_wt/docs/system/workspace/scripts/worktree/wt-close" 2>/dev/null || echo "")
@@ -116,7 +116,7 @@
 - expected_RED_output: N/A (regression test)
 - actual_RED_output: "RED confirmed — no args guard"
 - actual_output: "GREEN: all tests pass"
-- evidence_file: docs/epics/wt-close-raw-key/args-d-fix/verification/test-evidence/acceptance-5.txt
+- evidence_file: docs/B2-docs/git-worktree/wt-close/verification/test-evidence/acceptance-5.txt
 - red-green-status: green
 - status: passed
 - blocker: none

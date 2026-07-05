@@ -6,7 +6,7 @@
 - runtime_state: `stopped`
 - branch: `feature/launch-time-verification-contract-hard-gate-20260411`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260411-feature-launch-time-verification-contract-hard-gate`
-- issue_path: `docs/epics/workspace-routing-foundation/launch-time-verification-contract-hard-gate-governance/issues/launch-time-verification-contract-hard-gate-governance.md`
+- issue_path: `docs/B2-docs/ibm/launch-time-verification-contract-hard-gate-governance/issues/launch-time-verification-contract-hard-gate-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "dev-loop-closeout"}
 
@@ -35,7 +35,7 @@
 - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-manager-worker-launch-branch-only-prompt`
 - `./bin/test-lane premerge-integration -- ./bin/governance-check`
 - `./bin/governance-check`
-- `docs/epics/workspace-routing-foundation/launch-time-verification-contract-hard-gate-governance/code-reviews/20260411-launch-time-verification-contract-hard-gate-verification.md`
+- `docs/B2-docs/ibm/launch-time-verification-contract-hard-gate-governance/code-reviews/20260411-launch-time-verification-contract-hard-gate-verification.md`
 
 ## Next Action
 

@@ -35,8 +35,8 @@ Still missing:
 
 Source:
 
-- `docs/epics/workspace-routing-foundation/integration-acceptance-first-verification-governance/issues/integration-acceptance-first-verification-governance.md`
-- `docs/epics/workspace-routing-foundation/integration-acceptance-first-verification-governance/pre-tests.md`
+- `docs/B2-docs/ibm/integration-acceptance-first-verification-governance/issues/integration-acceptance-first-verification-governance.md`
+- `docs/B2-docs/ibm/integration-acceptance-first-verification-governance/pre-tests.md`
 - `docs/progress/workspace-routing-foundation/p-integration-acceptance-first-verification-governance.md`
 
 Already frozen:
@@ -55,7 +55,7 @@ Still missing:
 
 Source:
 
-- `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+- `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 
 Already frozen:
 
@@ -72,7 +72,7 @@ Still missing:
 
 Source:
 
-- `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
+- `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
 - `docs/progress/workspace-routing-foundation/p-application-native-runtime-observation-contract-and-observability-planes.md`
 
 Already frozen:

@@ -16,11 +16,11 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - priority: `P0`
 - promoted_issue_id: `I-20260421-1330-A`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/issues/absorbed-merged-lane-routing-followthrough-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/absorbed-merged-lane-routing-followthrough-governance/issues/absorbed-merged-lane-routing-followthrough-governance.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
+  - `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
 - problem: Canonical `develop` dogfooding proved absorbed merged blocker lanes were no longer auto-recovered, but patrol still consumed them as if they were live execution targets because fleet status preserved `role=worker` and task-source-scan preserved `verification` routing for the linked progress owner.
 - why_now:
   - this advisory-surface mismatch keeps the manager drifting back toward an already absorbed lane instead of choosing fresh launchable work

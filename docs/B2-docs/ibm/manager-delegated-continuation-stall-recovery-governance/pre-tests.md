@@ -109,4 +109,4 @@
 - requirement: `verification artifact records the broader manager and worker regression batch plus merge provenance`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/manager-delegated-continuation-stall-recovery-governance/code-reviews/20260328-manager-delegated-continuation-stall-recovery-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/manager-delegated-continuation-stall-recovery-governance/code-reviews/20260328-manager-delegated-continuation-stall-recovery-verification.md`

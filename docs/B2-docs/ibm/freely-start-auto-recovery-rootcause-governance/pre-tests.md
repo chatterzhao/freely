@@ -54,7 +54,7 @@
 - case_design: `Run the focused watchdog selector regression that proves cached-ready still filters by availability while after-failure next-slot ignores the cache and returns the next saved slot.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/code-reviews/20260414-freely-start-auto-recovery-rootcause-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/freely-start-auto-recovery-rootcause-governance/code-reviews/20260414-freely-start-auto-recovery-rootcause-verification.md`
 
 ### Next-slot selection stays strictly forward
 - id: `codex-next-slot-no-wrap`
@@ -66,7 +66,7 @@
 - case_design: `Run the focused selector regression and confirm the final slot returns no next candidate instead of wrapping to the head of the saved-slot list.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/code-reviews/20260414-freely-start-auto-recovery-rootcause-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/freely-start-auto-recovery-rootcause-governance/code-reviews/20260414-freely-start-auto-recovery-rootcause-verification.md`
 
 ### Manager after-failure path uses next-slot recovery
 - id: `freely-codex-after-failure-uses-next-slot`
@@ -78,7 +78,7 @@
 - case_design: `Run the focused runtime regression that stubs the codex auto-recovery path and proves the after-failure branch reaches switch_to_next_codex_slot rather than ensure_codex_slot_ready_for_manager probe logic.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/code-reviews/20260414-freely-start-auto-recovery-rootcause-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/freely-start-auto-recovery-rootcause-governance/code-reviews/20260414-freely-start-auto-recovery-rootcause-verification.md`
 
 ### Same-tool codex recovery still precedes cross-tool fallback
 - id: `freely-ensure-manager-codex-slot-first-then-cross-tool`
@@ -90,7 +90,7 @@
 - case_design: `Run the focused runtime regression that records readiness calls and confirms codex same-tool recovery is attempted before the outer cross-tool tool list is consulted.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/code-reviews/20260414-freely-start-auto-recovery-rootcause-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/freely-start-auto-recovery-rootcause-governance/code-reviews/20260414-freely-start-auto-recovery-rootcause-verification.md`
 
 ### Real feature-lane replay reaches a usable slot and completes work
 - id: `real-env-bad-slot-recovers-to-good-slot`
@@ -102,7 +102,7 @@
 - case_design: `Start from known bad codex slots, observe ordered same-tool traversal, switch to the currently usable slot, then verify real runtime work creates healthcheck14/15 before operator stop.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/code-reviews/20260414-freely-start-auto-recovery-rootcause-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/freely-start-auto-recovery-rootcause-governance/code-reviews/20260414-freely-start-auto-recovery-rootcause-verification.md`
 
 ### Guarded develop promote proves codex recovery adequacy
 - id: `develop-promote-codex-after-failure-adequacy`
@@ -114,4 +114,4 @@
 - case_design: `Merge the feature lane into a disposable test-pre-merge batch via pr-merge-guarded, rerun the focused pretests/governance regressions there, and use the resulting review artifact to prove the owner explicitly covers the premerge-integration:develop_merge lane/gate pair.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/freely-start-auto-recovery-rootcause-governance/code-reviews/20260414-freely-start-auto-recovery-rootcause-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/freely-start-auto-recovery-rootcause-governance/code-reviews/20260414-freely-start-auto-recovery-rootcause-verification.md`

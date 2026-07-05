@@ -48,7 +48,7 @@
 - case_design: `Use a fixture worktree whose recorded owner issue and pre-tests path are consumed by the retirement gate, then prove missing or ambiguous bindings fail closed.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/code-reviews/20260411-pre-tests-cleanup-and-retirement-enforcement-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/pre-tests-cleanup-and-retirement-enforcement-governance/code-reviews/20260411-pre-tests-cleanup-and-retirement-enforcement-verification.md`
 
 ### Pending items block retirement
 - id: `pending-pretests-block-retirement`
@@ -60,7 +60,7 @@
 - case_design: `Replay cleanup followthrough once with pending acceptance items and once with the retirement gate itself unavailable, then verify both cases retain the merged worktree with explicit blocked reasons.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/code-reviews/20260411-pre-tests-cleanup-and-retirement-enforcement-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/pre-tests-cleanup-and-retirement-enforcement-governance/code-reviews/20260411-pre-tests-cleanup-and-retirement-enforcement-verification.md`
 
 ### Existing gates stay intact
 - id: `completion-merge-no-regression`
@@ -72,7 +72,7 @@
 - case_design: `Verify a clean merged worktree still retires, while a dirty merged worktree escalates to manager continuation rather than being force-retired or ignored.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/code-reviews/20260411-pre-tests-cleanup-and-retirement-enforcement-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/pre-tests-cleanup-and-retirement-enforcement-governance/code-reviews/20260411-pre-tests-cleanup-and-retirement-enforcement-verification.md`
 
 ### Guarded develop promote stays adequate
 - id: `develop-promote-cleanup-adequacy`
@@ -84,4 +84,4 @@
 - case_design: `Merge the feature lane into its test-pre-merge batch, run the focused premerge cleanup/governance regressions plus governance-check, then require guarded develop promote to consume this owner-bound verification artifact from the staged diff.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/code-reviews/20260411-pre-tests-cleanup-and-retirement-enforcement-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/pre-tests-cleanup-and-retirement-enforcement-governance/code-reviews/20260411-pre-tests-cleanup-and-retirement-enforcement-verification.md`

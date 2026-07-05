@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO7S
     synced_at: '2026-04-27T13:15:46Z'
 primary_platform: github
-canonical_issue_path: docs/epics/freely-product-architecture/cc-acp-init-autonomy-consent-test-followthrough-governance/issues/cc-acp-init-autonomy-consent-test-followthrough-governance.md
+canonical_issue_path: docs/B2-docs/config/packaging/issues/cc-acp-init-autonomy-consent-test-followthrough-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:22:24Z'
 hash: ''
@@ -27,4 +27,4 @@ platform_state: closed
 
 Because the develop merge gate requires every develop-bound replay to remain candidate-driven, this followthrough needs its own narrow owner instead of silently editing a completed-family surface.
 
-canonical: docs/epics/freely-product-architecture/cc-acp-init-autonomy-consent-test-followthrough-governance/issues/cc-acp-init-autonomy-consent-test-followthrough-governance.md
+canonical: docs/B2-docs/config/packaging/issues/cc-acp-init-autonomy-consent-test-followthrough-governance.md

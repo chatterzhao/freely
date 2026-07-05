@@ -1,7 +1,7 @@
 # Verification: memark-protected-root-bootstrap-followthrough-governance
 
 - issue_id: `I-20260416-0448-A`
-- issue_path: `docs/epics/freely-product-architecture/memark-protected-root-bootstrap-followthrough-governance/issues/memark-protected-root-bootstrap-followthrough-governance.md`
+- issue_path: `docs/B2-docs/config/packaging/issues/memark-protected-root-bootstrap-followthrough-governance.md`
 - branch: `feature/memark-init`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-memark-init`
 - verification_date: `2026-04-16`

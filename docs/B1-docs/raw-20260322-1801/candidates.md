@@ -20,7 +20,7 @@
 - priority: P0
 - status: promoted
 - decision_reason: 这是治理定义问题，不是 runtime 修补问题。它决定 Freely 后续如何使用 `pre-test-merge`，而不是单次如何合并。
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/issues/pre-test-merge-responsibility-usage-and-lifecycle-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/pre-test-merge-responsibility-usage-and-lifecycle-governance/issues/pre-test-merge-responsibility-usage-and-lifecycle-governance.md`
 - legacy_id_mapping: I-20260322-1801  # 历史遗留的 issue id
 - milestone: `docs/milestones.md#M-20260306-workspace-routing-foundation`
 - session_refs:

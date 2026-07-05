@@ -4,9 +4,9 @@ kind: linked
 status: completed
 phase_state: completed
 source_candidate: docs/B1-docs/raw-20260616T044825Z/candidates.md
-verification_artifact_dir: docs/epics/remove-absolute-timeout/remove-bridge-absolute-cap/code-reviews
+verification_artifact_dir: docs/B2-docs/runtime/timeout/code-reviews
 ---
-# docs/epics/remove-absolute-timeout/remove-bridge-absolute-cap/issues/remove-bridge-absolute-cap.md
+# docs/B2-docs/runtime/timeout/issues/remove-bridge-absolute-cap.md
 
 ## Issue Reference
 

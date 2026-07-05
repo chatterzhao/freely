@@ -1,7 +1,7 @@
 # Verification: worktree-bootstrap-closeout merge receipt gap followthrough
 
 - issue_id: `I-20260404-0640-A`
-- issue_path: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
+- issue_path: `docs/B2-docs/ibm/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
 - branch: `feature/protected-merge-receipt-gap-closeout-20260405-1735`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260405-1735-feature-protected-merge-receipt-gap-closeout`
 - verification_date: `2026-04-05`

@@ -12,8 +12,8 @@ created_at: 2026-06-18T04:02:26Z
 author: zhaoquan
 channel: freely-feat-execution
 session_refs: []
-pre_tests_path: docs/epics/pr-review-guarded/verification/pre-tests.md
-verification_artifact_dir: docs/epics/pr-review-guarded/code-reviews
+pre_tests_path: docs/B2-docs/git-worktree/verification/pre-tests.md
+verification_artifact_dir: docs/B2-docs/git-worktree/code-reviews
 ---
 
 # I-20260618T040226Z-A: pr-review-guarded command

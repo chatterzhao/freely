@@ -19,13 +19,13 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-pre_tests_path: docs/epics/skill-standardize/verification/pre-tests.md
-verification_artifact_dir: docs/epics/skill-standardize/code-reviews
+pre_tests_path: docs/B2-docs/ibm/verification/pre-tests.md
+verification_artifact_dir: docs/B2-docs/ibm/code-reviews
 platform_state: closed
 ---
 
-- pre_tests_path: docs/epics/skill-standardize/verification/pre-tests.md
-- verification_artifact_dir: docs/epics/skill-standardize/code-reviews
+- pre_tests_path: docs/B2-docs/ibm/verification/pre-tests.md
+- verification_artifact_dir: docs/B2-docs/ibm/code-reviews
 
 ## 问题
 

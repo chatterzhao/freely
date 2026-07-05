@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO7E
     synced_at: '2026-04-27T13:15:29Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/active-milestone-placement-and-consumption-gate-governance/issues/active-milestone-placement-and-consumption-gate-governance.md
+canonical_issue_path: docs/B2-docs/ibm/active-milestone-placement-and-consumption-gate-governance/issues/active-milestone-placement-and-consumption-gate-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:21:35Z'
 hash: ''
@@ -37,4 +37,4 @@ Freely 已经把两条规则写成 canonical truth：
 
 本 owner 的任务就是把这层 placement correctness 变成正式 gate，并补齐最小 r
 
-canonical: docs/epics/workspace-routing-foundation/active-milestone-placement-and-consumption-gate-governance/issues/active-milestone-placement-and-consumption-gate-governance.md
+canonical: docs/B2-docs/ibm/active-milestone-placement-and-consumption-gate-governance/issues/active-milestone-placement-and-consumption-gate-governance.md

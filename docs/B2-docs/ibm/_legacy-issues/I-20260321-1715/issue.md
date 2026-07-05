@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO60
     synced_at: '2026-04-27T13:14:34Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md
+canonical_issue_path: docs/B2-docs/ibm/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:15:42Z'
 hash: ''
@@ -42,4 +42,4 @@ Freely 当前已经分别定义了：
 - 不新造平行 skill
 - 在当前新生命周期内统一重构 `three-loop` / `manager-agent` / `auto-loop-orchestrator` / patrol reference
 
-canonical: docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md
+canonical: docs/B2-docs/ibm/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md

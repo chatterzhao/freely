@@ -7,16 +7,16 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `manager-owner-stance-and-source-patrol-governance`
 - issue-name: `manager-owner-stance-and-source-patrol-governance`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/manager-owner-stance-and-source-patrol-governance/code-reviews`
 - priority: P0
 - source_candidate: `docs/B1-docs/raw-20260326/candidates.md#c-20260326-1705-a`
 - source_brainstorm: `docs/B1-docs/raw-20260326/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md`
-  - `docs/epics/workspace-routing-foundation/manager-delegation-after-sufficient-patrol-evidence-governance/issues/manager-delegation-after-sufficient-patrol-evidence-governance.md`
-  - `docs/epics/workspace-routing-foundation/active-lifecycle-boundary-and-dogfooding-capability-discovery/issues/active-lifecycle-boundary-and-dogfooding-capability-discovery.md`
+  - `docs/B2-docs/ibm/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md`
+  - `docs/B2-docs/ibm/manager-delegation-after-sufficient-patrol-evidence-governance/issues/manager-delegation-after-sufficient-patrol-evidence-governance.md`
+  - `docs/B2-docs/ibm/active-lifecycle-boundary-and-dogfooding-capability-discovery/issues/active-lifecycle-boundary-and-dogfooding-capability-discovery.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -69,11 +69,11 @@ Freely 在自举开发中已经形成了两层真源：
 
 ## Completion
 
-- `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md`
-- `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/brainstorms/b-manager-owner-stance-and-source-patrol-governance.md`
-- `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/tasks.md`
+- `docs/B2-docs/ibm/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md`
+- `docs/B2-docs/ibm/manager-owner-stance-and-source-patrol-governance/brainstorms/b-manager-owner-stance-and-source-patrol-governance.md`
+- `docs/B2-docs/ibm/manager-owner-stance-and-source-patrol-governance/prd.md`
+- `docs/B2-docs/ibm/manager-owner-stance-and-source-patrol-governance/pre-tests.md`
+- `docs/B2-docs/ibm/manager-owner-stance-and-source-patrol-governance/tasks.md`
 - `docs/system/workspace/agents/manager-agent.md`
 - `docs/system/workspace/agents/worker-agent.md`
 - `docs/system/workspace/skills/human-interruption-manager-triage/SKILL.md`
@@ -82,7 +82,7 @@ Freely 在自举开发中已经形成了两层真源：
 - `docs/system/workspace/skills/context-source-skill/references/continuation-recovery-routing.md`
 - `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
 - `docs/progress/workspace-routing-foundation/p-manager-owner-stance-and-source-patrol-governance.md`
-- `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/code-reviews/20260326-manager-owner-stance-and-source-patrol-governance-verification.md`
+- `docs/B2-docs/ibm/manager-owner-stance-and-source-patrol-governance/code-reviews/20260326-manager-owner-stance-and-source-patrol-governance-verification.md`
 
 ## Verification
 

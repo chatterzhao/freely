@@ -16,12 +16,12 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - priority: `P0`
 - promoted_issue_id: `I-20260421-1200-A`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
+- promoted_issue_path: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
+  - `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
+  - `docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
 - problem: Dogfooding on canonical `develop` at `2026-04-24` proved that `freely daemon start` does start its supervisor loop, but delegated targets do not reliably enter the correct worker execution path. Runtime currently treats branch-derived `role_hint_for_project` as the operative role truth, so a worker-contract target under `test-pre-merge-*` can still enter manager control-plane behavior, attempt to launch its own codex AI, conflict with the parent manager codex slot (`~/.codex/slot-switch.lock`), and stay pinned at `LAST_EXIT_REASON=starting` without ever writing `ai.pid`. Parent `manager_worker_launch_state.env` then keeps `ACTIVE_RUNNING_WORKER_COUNT=1` and `LAUNCHED_WORKER_PROMPTS` populated forever because the dispatch path lacks target-liveness reconciliation for a dead/never-up target launch slot, so the manager regenerates the same worker prompt every `context_compacted` rotation while HEAD never advances.
 - why_now:
   - this blocker prevents Freely from autonomously selecting, finishing, and closing a single task on canonical `develop`; the daemon self-loop owner cannot reach its acceptance surface until this seam is closed

@@ -6,7 +6,7 @@
 - runtime_state: `stopped`
 - branch: `feature/hook-bypass-breakglass-governance-20260402-0020`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-0020-feature-hook-bypass-breakglass-governance`
-- issue_path: `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/issues/protected-branch-hook-bypass-breakglass-governance.md`
+- issue_path: `docs/B2-docs/ibm/protected-branch-hook-bypass-breakglass-governance/issues/protected-branch-hook-bypass-breakglass-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -44,7 +44,7 @@
 
 - closure_status: `completed-on-develop`
 - closure_evidence:
-  - `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/code-reviews/20260402-protected-branch-hook-bypass-breakglass-verification.md`
+  - `docs/B2-docs/ibm/protected-branch-hook-bypass-breakglass-governance/code-reviews/20260402-protected-branch-hook-bypass-breakglass-verification.md`
   - `bash docs/system/workspace/scripts/tests/test-pre-commit-hook`
   - `bash docs/system/workspace/scripts/tests/test-pre-merge-commit-hook`
   - `bash docs/system/workspace/scripts/tests/test-pr-merge-guarded`

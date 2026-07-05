@@ -78,32 +78,32 @@
 - requirement: `AudioCueRequested remains the canonical cross-bridge event payload with stable cue metadata.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/code-reviews/20260405-runtime-audio-notifier-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-audio-notifier-and-sound-semantics-governance/code-reviews/20260405-runtime-audio-notifier-verification.md`
 
 ### AT-002
 - id: `AT-002`
 - requirement: `The bounded manager/worker started/completed cue matrix is emitted by runtime logic without watchdog/transcript fallback semantics.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/code-reviews/20260405-runtime-audio-notifier-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-audio-notifier-and-sound-semantics-governance/code-reviews/20260405-runtime-audio-notifier-verification.md`
 
 ### AT-003
 - id: `AT-003`
 - requirement: `The standard playback path resolves bundled cue assets and ships the four wav files in production build output.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/code-reviews/20260405-runtime-audio-notifier-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-audio-notifier-and-sound-semantics-governance/code-reviews/20260405-runtime-audio-notifier-verification.md`
 
 ### AT-004
 - id: `AT-004`
 - requirement: `Canonical develop still passes Tauri probe validation after guarded replay and continues emitting AudioCueRequested in the observed event set.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/code-reviews/20260405-runtime-audio-notifier-canonical-closeout-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-audio-notifier-and-sound-semantics-governance/code-reviews/20260405-runtime-audio-notifier-canonical-closeout-verification.md`
 
 ### AT-005
 - id: `AT-005`
 - requirement: `Develop-bound implementation is backed by an issue-bound decision note.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/code-reviews/20260405-runtime-audio-notifier-implementation-decision.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-audio-notifier-and-sound-semantics-governance/code-reviews/20260405-runtime-audio-notifier-implementation-decision.md`

@@ -12,9 +12,9 @@
 - source_brainstorm: `docs/B1-docs/raw-20260405/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/develop-guarded-merge-entrypoint-enforcement-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/ibm/develop-guarded-merge-entrypoint-enforcement-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-develop-guarded-merge-entrypoint-enforcement-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/develop-guarded-merge-entrypoint-enforcement-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/develop-guarded-merge-entrypoint-enforcement-governance/code-reviews`
 - depends_on:
   - `docs/system/workspace/hooks/pre-merge-commit.sh`
   - `docs/system/workspace/scripts/worktree/pr-merge-guarded`
@@ -61,9 +61,9 @@ Freely 已经有 `freely pr-merge-guarded` 作为 merge 真源，但 `develop` �
 - `docs/system/workspace/scripts/tests/test-pr-merge-guarded-hooked-initial-merge-receipt`
 - `docs/system/workspace/scripts/tests/test-pr-merge-guarded-breakglass-hook-completion`
 - `docs/system/workspace/scripts/tests/test-pr-merge-guarded`
-- `docs/epics/workspace-routing-foundation/develop-guarded-merge-entrypoint-enforcement-governance/code-reviews/20260405-develop-guarded-merge-entrypoint-enforcement-implementation.md`
-- `docs/epics/workspace-routing-foundation/develop-guarded-merge-entrypoint-enforcement-governance/code-reviews/20260405-develop-guarded-merge-entrypoint-enforcement-verification.md`
-- `docs/epics/workspace-routing-foundation/develop-guarded-merge-entrypoint-enforcement-governance/code-reviews/20260405-develop-guarded-merge-entrypoint-canonical-closeout-verification.md`
+- `docs/B2-docs/ibm/develop-guarded-merge-entrypoint-enforcement-governance/code-reviews/20260405-develop-guarded-merge-entrypoint-enforcement-implementation.md`
+- `docs/B2-docs/ibm/develop-guarded-merge-entrypoint-enforcement-governance/code-reviews/20260405-develop-guarded-merge-entrypoint-enforcement-verification.md`
+- `docs/B2-docs/ibm/develop-guarded-merge-entrypoint-enforcement-governance/code-reviews/20260405-develop-guarded-merge-entrypoint-canonical-closeout-verification.md`
 
 ## Completion Status
 

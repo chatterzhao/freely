@@ -1,7 +1,7 @@
 # Progress: runtime-audio-notifier-and-sound-semantics-governance
 
 - issue_id: `I-20260405-1215-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/issues/runtime-audio-notifier-and-sound-semantics-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-audio-notifier-and-sound-semantics-governance/issues/runtime-audio-notifier-and-sound-semantics-governance.md`
 - title: `Runtime audio notifier and sound semantics governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -31,7 +31,7 @@
 7. `bun run tauri:validate:probe`
 8. `git diff --check`
 9. `./bin/governance-check`
-10. `docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/code-reviews/20260405-runtime-audio-notifier-canonical-closeout-verification.md`
+10. `docs/B2-docs/runtime/runtime-audio-notifier-and-sound-semantics-governance/code-reviews/20260405-runtime-audio-notifier-canonical-closeout-verification.md`
 
 ## Next Action
 

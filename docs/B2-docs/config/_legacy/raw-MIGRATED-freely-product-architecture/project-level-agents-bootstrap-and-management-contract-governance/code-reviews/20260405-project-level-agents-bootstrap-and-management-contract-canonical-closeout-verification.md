@@ -1,7 +1,7 @@
 # Verification: project-level-agents-bootstrap-and-management-contract-governance canonical closeout
 
 - issue_id: `I-20260405-1130-A`
-- issue_path: `docs/epics/freely-product-architecture/project-level-agents-bootstrap-and-management-contract-governance/issues/project-level-agents-bootstrap-and-management-contract-governance.md`
+- issue_path: `docs/B2-docs/config/packaging/issues/project-level-agents-bootstrap-and-management-contract-governance.md`
 - branch: `feature/project-level-agents-contract-closeout-20260405-0325`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260405-0325-feature-project-level-agents-contract-closeout`
 - verification_date: `2026-04-05`

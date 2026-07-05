@@ -1,7 +1,7 @@
 # Progress: codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance
 
 - issue_id: `I-20260406-0901-A`
-- issue_path: `docs/epics/workspace-routing-foundation/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/issues/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
+- issue_path: `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/issues/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
 - title: `Codex reconnect probe fast-fail and runtime network classification governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -27,11 +27,11 @@
 - `bash docs/system/workspace/scripts/tests/test-ai-cli-switch-live-apikey-network-failure`
 - `bash docs/system/workspace/scripts/tests/test-freely-execution-network-failure-classification`
 - `bash docs/system/workspace/scripts/tests/test-freely-runtime-auth-failure-signal-filter`
-- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-codex-hi-fast-fail-and-runtime-availability --issue docs/epics/workspace-routing-foundation/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/issues/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
+- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-codex-hi-fast-fail-and-runtime-availability --issue docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/issues/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
 - `./bin/governance-check`
 - `git diff --check`
-- `docs/epics/workspace-routing-foundation/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/code-reviews/20260406-codex-reconnect-probe-fast-fail-and-runtime-network-classification-verification.md`
-- `docs/epics/workspace-routing-foundation/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/code-reviews/20260406-codex-reconnect-probe-fast-fail-and-runtime-network-classification-canonical-closeout-verification.md`
+- `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/code-reviews/20260406-codex-reconnect-probe-fast-fail-and-runtime-network-classification-verification.md`
+- `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/code-reviews/20260406-codex-reconnect-probe-fast-fail-and-runtime-network-classification-canonical-closeout-verification.md`
 
 ## Closure Evidence
 

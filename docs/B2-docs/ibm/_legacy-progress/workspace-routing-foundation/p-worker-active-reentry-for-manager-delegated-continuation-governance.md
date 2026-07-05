@@ -6,7 +6,7 @@
 - runtime_state: `closed_for_this_batch`
 - branch: `feature/worker-delegated-continuation-reentry-20260322`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260322-feature-worker-delegated-continuation-reentry`
-- issue_path: `docs/epics/workspace-routing-foundation/worker-active-reentry-for-manager-delegated-continuation-governance/issues/worker-active-reentry-for-manager-delegated-continuation-governance.md`
+- issue_path: `docs/B2-docs/ibm/worker-active-reentry-for-manager-delegated-continuation-governance/issues/worker-active-reentry-for-manager-delegated-continuation-governance.md`
 
 ## Summary
 

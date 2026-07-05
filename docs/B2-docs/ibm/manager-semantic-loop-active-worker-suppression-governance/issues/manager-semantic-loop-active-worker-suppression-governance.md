@@ -12,10 +12,10 @@
 - source_brainstorm: `docs/B1-docs/raw-20260405/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/manager-semantic-loop-active-worker-suppression-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/ibm/manager-semantic-loop-active-worker-suppression-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-manager-semantic-loop-active-worker-suppression-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/manager-semantic-loop-active-worker-suppression-governance/code-reviews`
-- depends_on: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
+- verification_artifact_dir: `docs/B2-docs/ibm/manager-semantic-loop-active-worker-suppression-governance/code-reviews`
+- depends_on: `docs/B2-docs/ibm/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 

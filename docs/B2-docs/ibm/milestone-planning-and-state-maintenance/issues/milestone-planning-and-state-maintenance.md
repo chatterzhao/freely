@@ -7,7 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `milestone-planning-and-state-maintenance`
 - issue-name: `milestone-planning-and-state-maintenance`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/milestone-planning-and-state-maintenance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/milestone-planning-and-state-maintenance/code-reviews`
 - source_candidate: `docs/B1-docs/raw-20260320/candidates.md#c-20260320-0512-a`
 - source_brainstorm: `docs/B1-docs/raw-20260320/brainstorms.md`
 - execution_base: `develop`
@@ -52,7 +52,7 @@ Freely 已经把 milestone 当成 standing source 和编排入口，但对 miles
 
 ## Completion
 
-- `docs/epics/workspace-routing-foundation/milestone-planning-and-state-maintenance/code-reviews/20260320-milestone-planning-state-maintenance-verification.md`
+- `docs/B2-docs/ibm/milestone-planning-and-state-maintenance/code-reviews/20260320-milestone-planning-state-maintenance-verification.md`
 - `docs/system/workspace/agents/manager-agent.md`
 - `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
 - `docs/system/workspace/skills/milestone-planning-state-maintenance/SKILL.md`

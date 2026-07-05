@@ -20,14 +20,14 @@ intake_id: ""
 author: zhaoquan
 channel: freely-fix-execution
 session_refs: []
-pre_tests_path: docs/epics/deploy-skills-registry-default/verification/pre-tests.md
+pre_tests_path: docs/B2-docs/deploy-skills-registry-default/verification/pre-tests.md
 verification_artifact_dir: docs/epics/deploy-skills-registry-default/code-reviews
 ---
 
 # I-20260624T004510Z-A: deploy-skills opencode 通配符修复 + registry 驱动默认 tool 检测
 
 - source_candidate: `docs/B1-docs/raw-20260624T004510Z/candidates.md#C-20260624T004510Z-A`
-- pre_tests_path: `docs/epics/deploy-skills-registry-default/verification/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/deploy-skills-registry-default/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/deploy-skills-registry-default/code-reviews`
 - milestone: M-20260624T004510Z-A
 

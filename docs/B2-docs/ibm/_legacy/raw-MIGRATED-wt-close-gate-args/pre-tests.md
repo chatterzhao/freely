@@ -38,7 +38,7 @@
 - requirement: wt-close passes --project and --worktree-path to pretests-retirement-gate
 - evidence_level: mock
 ^- status: passed
-- artifact_ref: docs/epics/wt-close-gate-args/code-reviews/implementation-decision.md
+- artifact_ref: docs/B2-docs/wt-close-gate-args/code-reviews/implementation-decision.md
 
 ## Real-Environment
 - real_environment_status: pass

@@ -11,11 +11,11 @@
 - target_environment: fix/raw-20260628T182243Z-code-path-structure-update worktree
 - required_evidence: grep output confirms all old paths replaced
 - evidence_level: mock
-- artifact_ref: docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/verification/test-evidence/acceptance-1.log
+- artifact_ref: docs/B2-docs/human/discuss/raw-20260628T005815Z/verification/test-evidence/acceptance-1.log
 - test_command: grep -c "docs/epics/\*/\*/raw-" bin/freely-review && ! grep "docs/issues/I-" bin/freely-review
 - expected_output: 新glob匹配，旧I-*路径无匹配
 - actual_output: 2 new glob matches, 0 old I-* matches — all paths updated correctly
-- evidence_file: docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/verification/test-evidence/acceptance-1.log
+- evidence_file: docs/B2-docs/human/discuss/raw-20260628T005815Z/verification/test-evidence/acceptance-1.log
 - blocker: (失败时填写)
 - status: passed
 
@@ -27,11 +27,11 @@
 - target_environment: fix/raw-20260628T182243Z-code-path-structure-update worktree
 - required_evidence: grep confirms all old paths replaced
 - evidence_level: mock
-- artifact_ref: docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/verification/test-evidence/acceptance-2.log
+- artifact_ref: docs/B2-docs/human/discuss/raw-20260628T005815Z/verification/test-evidence/acceptance-2.log
 - test_command: grep -c "docs/epics/\*/\*/raw-" bin/pr-review-guarded && ! grep "docs/issues/I-" bin/pr-review-guarded
 - expected_output: 新glob匹配，旧I-*路径无匹配
 - actual_output: 9 new glob matches, 0 old I-* matches — all paths updated correctly
-- evidence_file: docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/verification/test-evidence/acceptance-2.log
+- evidence_file: docs/B2-docs/human/discuss/raw-20260628T005815Z/verification/test-evidence/acceptance-2.log
 - blocker: (失败时填写)
 - status: passed
 
@@ -43,11 +43,11 @@
 - target_environment: fix/raw-20260628T182243Z-code-path-structure-update worktree
 - required_evidence: grep confirms epics_dir.glob pattern
 - evidence_level: mock
-- artifact_ref: docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/verification/test-evidence/acceptance-3.log
+- artifact_ref: docs/B2-docs/human/discuss/raw-20260628T005815Z/verification/test-evidence/acceptance-3.log
 - test_command: grep "epics_dir.glob" docs/system/workspace/scripts/runtime/task-lifecycle-scan.py
 - expected_output: matches epics_dir.glob("*/*/raw-*/issues/I-*.md")
 - actual_output: epics_dir.glob("*/*/raw-*/issues/I-*.md") line found
-- evidence_file: docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/verification/test-evidence/acceptance-3.log
+- evidence_file: docs/B2-docs/human/discuss/raw-20260628T005815Z/verification/test-evidence/acceptance-3.log
 - blocker: (失败时填写)
 - status: passed
 
@@ -59,11 +59,11 @@
 - target_environment: fix/raw-20260628T182243Z-code-path-structure-update worktree
 - required_evidence: grep confirms updated patterns in all 3 scripts
 - evidence_level: mock
-- artifact_ref: docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/verification/test-evidence/acceptance-4.log
+- artifact_ref: docs/B2-docs/human/discuss/raw-20260628T005815Z/verification/test-evidence/acceptance-4.log
 - test_command: grep -c "epics.*\*.*\*.*\*" docs/system/workspace/scripts/quality/checkpoint-guard && grep -c "raw-\*/" docs/system/workspace/scripts/quality/governance-promotion-gate && grep -c "epics/.*issues/I-" docs/system/workspace/scripts/quality/governance-merge-gate
 - expected_output: checkpoint-guard=2, promotion-gate=1, merge-gate=2
 - actual_output: checkpoint-guard=2, promotion-gate=1, merge-gate=2 — all updated
-- evidence_file: docs/epics/chat-refactor/comment-discuss-split/raw-20260628T005815Z/verification/test-evidence/acceptance-4.log
+- evidence_file: docs/B2-docs/human/discuss/raw-20260628T005815Z/verification/test-evidence/acceptance-4.log
 - blocker: (失败时填写)
 - status: passed
 

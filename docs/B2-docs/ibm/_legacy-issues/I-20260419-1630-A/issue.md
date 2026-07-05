@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFOAB
     synced_at: '2026-04-27T13:17:36Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/issues/runtime-startup-self-healing-governance.md
+canonical_issue_path: docs/B2-docs/runtime/runtime-startup-self-healing-governance/issues/runtime-startup-self-healing-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:28:25Z'
 hash: ''
@@ -29,4 +29,4 @@ Protected-root replay on `2026-04-19` showed a narrower startup seam than the ex
 2. The corresponding `supervisor.pid` and `interruption-dispatch.pid` files remained on disk even though no owned runtime processes were alive anymore.
 3. Launch-state and continuity surfaces could still point to missing worktrees or sta
 
-canonical: docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/issues/runtime-startup-self-healing-governance.md
+canonical: docs/B2-docs/runtime/runtime-startup-self-healing-governance/issues/runtime-startup-self-healing-governance.md

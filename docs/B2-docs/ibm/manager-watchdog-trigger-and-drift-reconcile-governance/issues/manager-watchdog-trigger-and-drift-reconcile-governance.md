@@ -7,12 +7,12 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `manager-watchdog-trigger-and-drift-reconcile-governance`
 - issue-name: `manager-watchdog-trigger-and-drift-reconcile-governance`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/manager-watchdog-trigger-and-drift-reconcile-governance/code-reviews`
 - source_candidate: `docs/B1-docs/raw-20260321/candidates.md#c-20260321-1715-a`
 - source_brainstorm: `docs/B1-docs/raw-20260321/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- depends_on: `docs/epics/workspace-routing-foundation/manager-reactivation-and-fleet-patrol-governance/issues/manager-reactivation-and-fleet-patrol-governance.md`, `docs/epics/workspace-routing-foundation/state-sync-and-session-evidence-governance/issues/state-sync-and-session-evidence-governance.md`
+- depends_on: `docs/B2-docs/ibm/manager-reactivation-and-fleet-patrol-governance/issues/manager-reactivation-and-fleet-patrol-governance.md`, `docs/B2-docs/ibm/state-sync-and-session-evidence-governance/issues/state-sync-and-session-evidence-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -74,16 +74,16 @@ Freely 当前已经分别定义了：
 
 ## Completion
 
-- `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md`
-- `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/brainstorms/b-manager-watchdog-trigger-and-drift-reconcile-governance.md`
-- `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/tasks.md`
+- `docs/B2-docs/ibm/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md`
+- `docs/B2-docs/ibm/manager-watchdog-trigger-and-drift-reconcile-governance/brainstorms/b-manager-watchdog-trigger-and-drift-reconcile-governance.md`
+- `docs/B2-docs/ibm/manager-watchdog-trigger-and-drift-reconcile-governance/prd.md`
+- `docs/B2-docs/ibm/manager-watchdog-trigger-and-drift-reconcile-governance/pre-tests.md`
+- `docs/B2-docs/ibm/manager-watchdog-trigger-and-drift-reconcile-governance/tasks.md`
 - `docs/system/workspace/three-loop-capability-lifecycle.md`
 - `docs/system/workspace/agents/manager-agent.md`
 - `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
 - `docs/system/workspace/skills/multi-worktree-supervision/references/manager-reactivation-patrol.md`
-- `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/code-reviews/20260321-manager-watchdog-trigger-and-drift-reconcile-verification.md`
+- `docs/B2-docs/ibm/manager-watchdog-trigger-and-drift-reconcile-governance/code-reviews/20260321-manager-watchdog-trigger-and-drift-reconcile-verification.md`
 
 ## Verification
 

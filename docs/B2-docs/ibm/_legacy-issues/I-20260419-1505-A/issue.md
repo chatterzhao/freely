@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFOAA
     synced_at: '2026-04-27T13:17:35Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/issues/runtime-supervisor-attach-reuse-followthrough-governance.md
+canonical_issue_path: docs/B2-docs/runtime/runtime-supervisor-attach-reuse-followthrough-governance/issues/runtime-supervisor-attach-reuse-followthrough-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:28:19Z'
 hash: ''
@@ -29,4 +29,4 @@ The checkpoint branch `feature/checkpoint-lifecycle-trace-debuggability-20260419
 2. Foreground `freely start` should attach to the same live supervisor between AI cycles, including the narrower fallback where `ps` is unavailable but project ownership is still provable by cwd evidence.
 3. Cl
 
-canonical: docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/issues/runtime-supervisor-attach-reuse-followthrough-governance.md
+canonical: docs/B2-docs/runtime/runtime-supervisor-attach-reuse-followthrough-governance/issues/runtime-supervisor-attach-reuse-followthrough-governance.md

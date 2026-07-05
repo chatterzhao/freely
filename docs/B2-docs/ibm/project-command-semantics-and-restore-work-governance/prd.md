@@ -122,6 +122,6 @@
 
 ## Dev-Loop Handoff
 
-- implement against `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/pre-tests.md`
+- implement against `docs/B2-docs/ibm/project-command-semantics-and-restore-work-governance/pre-tests.md`
 - keep downstream `global-restart-restore-memory-governance` blocked on this contract, not vice versa
 - write progress only once implementation starts

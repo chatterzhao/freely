@@ -11,18 +11,18 @@
 - priority: `P1`
 - source_candidate: `docs/B1-docs/raw-20260413/candidates.md#c-20260413-1640-a`
 - source_brainstorm: `docs/B1-docs/raw-20260413/brainstorms.md`
-- reopen_of_issue: `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md`
+- reopen_of_issue: `docs/B2-docs/ibm/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md`
 - reopen_reason: `a real owner audit proved closeout hardening still omitted tasks.md, letting completed lifecycle truth drift from unchecked execution closeout boxes`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/pre-tests.md`
-- tasks_path: `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/tasks.md`
+- pre_tests_path: `docs/B2-docs/ibm/tasks-closeout-completion-and-adequacy-gate-governance/pre-tests.md`
+- tasks_path: `docs/B2-docs/ibm/tasks-closeout-completion-and-adequacy-gate-governance/tasks.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-tasks-closeout-completion-and-adequacy-gate-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/tasks-closeout-completion-and-adequacy-gate-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
-  - `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/issues/pre-tests-cleanup-and-retirement-enforcement-governance.md`
-  - `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md`
+  - `docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
+  - `docs/B2-docs/ibm/pre-tests-cleanup-and-retirement-enforcement-governance/issues/pre-tests-cleanup-and-retirement-enforcement-governance.md`
+  - `docs/B2-docs/ibm/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md`
   - `docs/system/workspace/scripts/quality/pretests-gate`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
@@ -51,12 +51,12 @@ The missing contract was not in merge orchestration. `pretests-gate` already own
 ## Completion
 
 - `docs/B1-docs/raw-20260413/candidates.md`
-- `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/issues/tasks-closeout-completion-and-adequacy-gate-governance.md`
-- `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/brainstorms/b-tasks-closeout-completion-and-adequacy-gate-governance.md`
-- `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/tasks.md`
-- `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/code-reviews/20260413-tasks-closeout-completion-and-adequacy-gate-verification.md`
+- `docs/B2-docs/ibm/tasks-closeout-completion-and-adequacy-gate-governance/issues/tasks-closeout-completion-and-adequacy-gate-governance.md`
+- `docs/B2-docs/ibm/tasks-closeout-completion-and-adequacy-gate-governance/brainstorms/b-tasks-closeout-completion-and-adequacy-gate-governance.md`
+- `docs/B2-docs/ibm/tasks-closeout-completion-and-adequacy-gate-governance/prd.md`
+- `docs/B2-docs/ibm/tasks-closeout-completion-and-adequacy-gate-governance/pre-tests.md`
+- `docs/B2-docs/ibm/tasks-closeout-completion-and-adequacy-gate-governance/tasks.md`
+- `docs/B2-docs/ibm/tasks-closeout-completion-and-adequacy-gate-governance/code-reviews/20260413-tasks-closeout-completion-and-adequacy-gate-verification.md`
 - `docs/progress/workspace-routing-foundation/p-tasks-closeout-completion-and-adequacy-gate-governance.md`
 - `docs/system/workspace/scripts/quality/pretests-gate`
 - `docs/system/workspace/scripts/tests/test-pretests-gate`
@@ -69,7 +69,7 @@ The missing contract was not in merge orchestration. `pretests-gate` already own
 - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
 - `./bin/governance-check`
 - `git diff --check`
-- `docs/epics/workspace-routing-foundation/tasks-closeout-completion-and-adequacy-gate-governance/code-reviews/20260413-tasks-closeout-completion-and-adequacy-gate-verification.md`
+- `docs/B2-docs/ibm/tasks-closeout-completion-and-adequacy-gate-governance/code-reviews/20260413-tasks-closeout-completion-and-adequacy-gate-verification.md`
 
 ## Next
 

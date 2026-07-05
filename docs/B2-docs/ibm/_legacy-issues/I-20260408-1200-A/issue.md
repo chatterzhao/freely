@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO9C
     synced_at: '2026-04-27T13:16:52Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md
+canonical_issue_path: docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:26:13Z'
 hash: ''
@@ -35,4 +35,4 @@ Freely 已经能显式暴露 `push_pending` / `push_deferred`，但还没有冻�
 - 活跃树会在 stale upstream 上继续做治理判断
 - AI / runtime 中断会让 lawful merge 长时间停留在 local-only canonical truth
 
-canonical: docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md
+canonical: docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md

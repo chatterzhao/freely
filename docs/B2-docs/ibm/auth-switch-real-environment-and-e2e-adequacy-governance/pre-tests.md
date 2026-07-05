@@ -42,18 +42,18 @@
 - requirement: `Auth/switch/startup-recovery follow-on owners cannot dual-waive End-to-End and Real-Environment without artifact-backed live evidence.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/auth-switch-real-environment-and-e2e-adequacy-governance/code-reviews/20260410-auth-switch-real-environment-and-e2e-adequacy-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/auth-switch-real-environment-and-e2e-adequacy-governance/code-reviews/20260410-auth-switch-real-environment-and-e2e-adequacy-verification.md`
 
 ### pretests-gate blocks the bad pattern
 - id: `AT-002`
 - requirement: `pretests-gate rejects the auth-switch family when both sections are waived and no pass-level real_env or post_merge_dogfood acceptance item exists.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/auth-switch-real-environment-and-e2e-adequacy-governance/code-reviews/20260410-auth-switch-real-environment-and-e2e-adequacy-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/auth-switch-real-environment-and-e2e-adequacy-governance/code-reviews/20260410-auth-switch-real-environment-and-e2e-adequacy-verification.md`
 
 ### Real executable evidence remains mandatory
 - id: `AT-003`
 - requirement: `The owner package records that real bin-ai, codex-exec, or freely-start evidence must remain on the acceptance surface for this family.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/auth-switch-real-environment-and-e2e-adequacy-governance/code-reviews/20260410-auth-switch-real-environment-and-e2e-adequacy-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/auth-switch-real-environment-and-e2e-adequacy-governance/code-reviews/20260410-auth-switch-real-environment-and-e2e-adequacy-verification.md`

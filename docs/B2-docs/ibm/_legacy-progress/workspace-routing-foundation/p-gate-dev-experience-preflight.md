@@ -1,7 +1,7 @@
 # Progress: gate-dev-experience-preflight
 
 - issue_id: `I-20260429-2000-A`
-- issue_path: `docs/epics/workspace-routing-foundation/gate-dev-experience-preflight/issues/I-20260429-2000-A.md`
+- issue_path: `docs/B2-docs/gate/gate-dev-experience-preflight/issues/I-20260429-2000-A.md`
 - title: `Gate dev experience: --range pre-flight + secret detection FP fix`
 - phase_state: `in_dev`
 - milestone: `M-20260306-workspace-routing-foundation`

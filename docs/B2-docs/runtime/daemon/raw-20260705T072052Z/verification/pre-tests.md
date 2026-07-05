@@ -9,7 +9,7 @@
 - target_environment: feature-local
 - required_evidence: bash -n + grep
 - evidence_level: integration
-- artifact_ref: docs/epics/runtime-core/a2a-log-rotation/raw-20260705T072052Z/verification/test-evidence/at-001.log
+- artifact_ref: docs/B2-docs/runtime/daemon/raw-20260705T072052Z/verification/test-evidence/at-001.log
 - test_command: bash -n docs/system/workspace/scripts/runtime/freely && grep -c ': > .*a2a-server.log' docs/system/workspace/scripts/runtime/freely && echo PASS
 - expected_output: PASS
 - expected_RED_output: 0 (no truncate)

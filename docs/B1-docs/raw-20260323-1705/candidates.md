@@ -6,7 +6,7 @@
 - source_brainstorm: `docs/B1-docs/raw-20260323-1705/brainstorms.md`
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/manager-delegated-continuation-stall-recovery-governance/issues/manager-delegated-continuation-stall-recovery-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/manager-delegated-continuation-stall-recovery-governance/issues/manager-delegated-continuation-stall-recovery-governance.md`
 - session_refs:
   - tool: `codex`
     session_id: `019d1d6a-2319-7952-9c01-8606f51dc59c`

@@ -15,13 +15,13 @@
 - target_environment: test-pre-merge
 - required_evidence: rows=1 with raw_key=__manager__, manager_id=manager_01
 - evidence_level: real_env
-- artifact_ref: docs/epics/closeout-chain/manager-startup-record/raw-20260703T080443Z/verification/test-evidence/acceptance-1.log
+- artifact_ref: docs/B2-docs/git-worktree/closeout/raw-20260703T080443Z/verification/test-evidence/acceptance-1.log
 - test_command: python3 -c "from agent_working import _db_rpc; r=_db_rpc('.','agent_working.get_all',{}); assert len(r.get('rows',[]))==1"
 - expected_output: rows=1
 - expected_RED_output: rows=0
 - actual_RED_output: rows=0 (IDN residual_risk documented gap)
 - actual_output: rows=1, __manager__ record confirmed
-- evidence_file: docs/epics/closeout-chain/manager-startup-record/raw-20260703T080443Z/verification/test-evidence/acceptance-1.log
+- evidence_file: docs/B2-docs/git-worktree/closeout/raw-20260703T080443Z/verification/test-evidence/acceptance-1.log
 - red-green-status: green
 - status: passed
 - red_how: fix: 修复前 daemon 启动后 agent_working 表为空
@@ -39,13 +39,13 @@
 - target_environment: test-pre-merge
 - required_evidence: log has no meta_env_value error
 - evidence_level: real_env
-- artifact_ref: docs/epics/closeout-chain/manager-startup-record/raw-20260703T080443Z/verification/test-evidence/acceptance-2.log
+- artifact_ref: docs/B2-docs/git-worktree/closeout/raw-20260703T080443Z/verification/test-evidence/acceptance-2.log
 - test_command: grep "meta_env_value: command not found" .freely/logs/daemon-launch.log && echo FAIL || echo PASS
 - expected_output: PASS
 - expected_RED_output: meta_env_value: command not found
 - actual_RED_output: meta_env_value: command not found at line 146
 - actual_output: no meta_env_value errors in latest daemon start
-- evidence_file: docs/epics/closeout-chain/manager-startup-record/raw-20260703T080443Z/verification/test-evidence/acceptance-2.log
+- evidence_file: docs/B2-docs/git-worktree/closeout/raw-20260703T080443Z/verification/test-evidence/acceptance-2.log
 - red-green-status: green
 - status: passed
 - red_how: fix: 修复前 start-lead-agent.sh:146 报 meta_env_value 未找到

@@ -15,13 +15,13 @@
 - target_environment: test-pre-merge
 - required_evidence: rows=1, raw_key=__manager__, manager_id=manager_01
 - evidence_level: real_env
-- artifact_ref: docs/epics/closeout-chain/agent-working-session-unify/raw-20260703T114618Z/verification/test-evidence/acceptance-1.log
+- artifact_ref: docs/B2-docs/git-worktree/closeout/raw-20260703T114618Z/verification/test-evidence/acceptance-1.log
 - test_command: verify agent_working.get_all returns __manager__ row
 - expected_output: __manager__ row with manager_01
 - expected_RED_output: 0 rows
 - actual_RED_output: 0 rows (gap: only watchdog_sse writes, not daemon startup)
 - actual_output: __manager__ row confirmed, manager_id=manager_01
-- evidence_file: docs/epics/closeout-chain/agent-working-session-unify/raw-20260703T114618Z/verification/test-evidence/acceptance-1.log
+- evidence_file: docs/B2-docs/git-worktree/closeout/raw-20260703T114618Z/verification/test-evidence/acceptance-1.log
 - red-green-status: green
 - status: passed
 - red_how: fix: 修复前 agent_working 表为空，__manager__ 只在 _handle_needs_manager 触发时才创建

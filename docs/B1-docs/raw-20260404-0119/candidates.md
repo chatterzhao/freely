@@ -4,7 +4,7 @@
 - candidate_format_version: `v2`
 - title: Governance merge gate milestone status followthrough
 - source_brainstorm: `docs/B1-docs/raw-20260404-0119/brainstorms.md`
-- reopen_of_issue: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md`
+- reopen_of_issue: `docs/B2-docs/ibm/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md`
 - reopen_reason: `a real develop replay exposed that governance-merge-gate misread nested queue item status lines in docs/milestones.md as the parent milestone status, falsely blocking an unrelated active candidate lane`
 - problem: `governance-merge-gate` currently treats nested queue item `- status:` fields inside `docs/milestones.md` as if they were the milestone's own top-level status, so active milestones can be misclassified as `needs_research` and wrongly block develop-bound replay.
 - why_now:
@@ -33,7 +33,7 @@
   - this is a residual parser bug in a completed merge-governance family, not a reason to mutate the prior completed owner
   - the develop merge gate correctly insists on a new same-line owner for this replay-bound fix, even though the implementation delta is small
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md`
+- promoted_issue_path: `docs/B2-docs/gate/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md`
 - promoted_issue_path_role: `primary-owner`
 - session_refs:
   - tool: `codex`

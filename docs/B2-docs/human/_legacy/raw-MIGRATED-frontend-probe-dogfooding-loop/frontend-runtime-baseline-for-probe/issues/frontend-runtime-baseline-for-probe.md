@@ -11,8 +11,8 @@
 - source_brainstorm: `docs/B1-docs/raw-20260317/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-runtime-baseline-for-probe/pre-tests.md`
-- verification_artifact_dir: `docs/epics/frontend-probe-dogfooding-loop/frontend-runtime-baseline-for-probe/code-reviews`
+- pre_tests_path: `docs/B2-docs/human/tui/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/human/tui/code-reviews`
 - depends_on: `none`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "doc-ibm"}
@@ -66,10 +66,10 @@
   - 当前阶段仍是 issue-bound IBM 收敛，不进入实现代码。
 - required_doc_refs:
   - `docs/B1-docs/raw-20260317/brainstorms.md`
-  - `docs/epics/frontend-probe-dogfooding-loop/frontend-runtime-baseline-for-probe/brainstorms/b-frontend-runtime-baseline-for-probe.md`
-  - `docs/epics/frontend-probe-dogfooding-loop/frontend-runtime-baseline-for-probe/prd.md`
-  - `docs/epics/frontend-probe-dogfooding-loop/frontend-runtime-baseline-for-probe/pre-tests.md`
-  - `docs/epics/frontend-probe-dogfooding-loop/frontend-runtime-baseline-for-probe/tasks.md`
+  - `docs/B2-docs/human/tui/brainstorms/b-frontend-runtime-baseline-for-probe.md`
+  - `docs/B2-docs/human/tui/prd.md`
+  - `docs/B2-docs/human/tui/pre-tests.md`
+  - `docs/B2-docs/human/tui/tasks.md`
 
 ## Next
 

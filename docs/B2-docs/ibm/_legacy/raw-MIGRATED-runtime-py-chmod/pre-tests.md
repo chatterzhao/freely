@@ -38,7 +38,7 @@
 - requirement: all 15 runtime .py files committed with mode 100755
 - evidence_level: mock
 ^- status: passed
-- artifact_ref: docs/epics/runtime-py-chmod/code-reviews/implementation-decision.md
+- artifact_ref: docs/B2-docs/runtime-py-chmod/code-reviews/implementation-decision.md
 
 ## Real-Environment
 - real_environment_status: pass

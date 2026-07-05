@@ -45,21 +45,21 @@
 - requirement: `Worker prompt parsing returns owner issue, pre-tests path, required lanes, acceptance item ids, evidence level, target environment, and closeout gate as machine-readable fields.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/code-reviews/20260408-verification-contract-and-premerge-adequacy-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/code-reviews/20260408-verification-contract-and-premerge-adequacy-verification.md`
 
 ### Worker launch writes verification contract state
 - id: `worker-launch-verification-contract-state`
 - requirement: `Manager delegated launch writes the verification contract into delegated intake and worker runtime state so recovery can continue from structured truth.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/code-reviews/20260408-verification-contract-and-premerge-adequacy-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/code-reviews/20260408-verification-contract-and-premerge-adequacy-verification.md`
 
 ### Pretests gate enforces section schema
 - id: `pretests-gate-four-section-schema`
 - requirement: `pretests-gate rejects owner pre-tests files that omit required sections, required section scalars, or replacement evidence for not-applicable sections.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/code-reviews/20260408-verification-contract-and-premerge-adequacy-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/code-reviews/20260408-verification-contract-and-premerge-adequacy-verification.md`
 
 ### Guarded premerge path survives adequacy contract
 - id: `guarded-premerge-verification-contract`
@@ -71,4 +71,4 @@
 - case_design: `Use the guarded merge fixtures plus the owner-bound review artifact to prove develop promotion consumes explicit verification-contract adequacy truth rather than a bare implementation diff.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/code-reviews/20260412-real-environment-verdict-followthrough.md`
+- artifact_ref: `docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/code-reviews/20260412-real-environment-verdict-followthrough.md`

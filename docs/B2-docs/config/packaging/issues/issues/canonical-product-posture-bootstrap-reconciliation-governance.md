@@ -12,12 +12,12 @@
 - source_brainstorm: `docs/B1-docs/raw-20260402/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/freely-product-architecture/canonical-product-posture-bootstrap-reconciliation-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/config/packaging/pre-tests.md`
 - progress_path: `docs/progress/freely-product-architecture/p-canonical-product-posture-bootstrap-reconciliation-governance.md`
-- verification_artifact_dir: `docs/epics/freely-product-architecture/canonical-product-posture-bootstrap-reconciliation-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/config/packaging/code-reviews`
 - depends_on:
-  - `docs/epics/freely-product-architecture/default-autonomy-activation-consent-and-tool-policy-governance/issues/default-autonomy-activation-consent-and-tool-policy-governance.md`
-  - `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/issues/freely-tool-autonomy-policy-materialization-governance.md`
+  - `docs/B2-docs/config/packaging/issues/default-autonomy-activation-consent-and-tool-policy-governance.md`
+  - `docs/B2-docs/config/packaging/issues/freely-tool-autonomy-policy-materialization-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -60,11 +60,11 @@ This owner reconciles canonical tracked `.codex/config.toml` plus canonical loca
 - `docs/B1-docs/raw-20260402/candidates.md`
 - `docs/B1-docs/raw-INDEX.md`
 - `docs/milestones.md`
-- `docs/epics/freely-product-architecture/canonical-product-posture-bootstrap-reconciliation-governance/issues/canonical-product-posture-bootstrap-reconciliation-governance.md`
-- `docs/epics/freely-product-architecture/canonical-product-posture-bootstrap-reconciliation-governance/brainstorms/b-canonical-product-posture-bootstrap-reconciliation-governance.md`
-- `docs/epics/freely-product-architecture/canonical-product-posture-bootstrap-reconciliation-governance/prd.md`
-- `docs/epics/freely-product-architecture/canonical-product-posture-bootstrap-reconciliation-governance/pre-tests.md`
-- `docs/epics/freely-product-architecture/canonical-product-posture-bootstrap-reconciliation-governance/tasks.md`
+- `docs/B2-docs/config/packaging/issues/canonical-product-posture-bootstrap-reconciliation-governance.md`
+- `docs/B2-docs/config/packaging/brainstorms/b-canonical-product-posture-bootstrap-reconciliation-governance.md`
+- `docs/B2-docs/config/packaging/prd.md`
+- `docs/B2-docs/config/packaging/pre-tests.md`
+- `docs/B2-docs/config/packaging/tasks.md`
 - `docs/progress/freely-product-architecture/p-canonical-product-posture-bootstrap-reconciliation-governance.md`
 - `.codex/config.toml`
 

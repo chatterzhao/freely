@@ -7,16 +7,16 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `runtime-worker-launch-linkage-and-stall-recovery-governance`
 - issue-name: `runtime-worker-launch-linkage-and-stall-recovery-governance`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/runtime-worker-launch-linkage-and-stall-recovery-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/runtime/runtime-worker-launch-linkage-and-stall-recovery-governance/code-reviews`
 - priority: P0
 - source_candidate: `docs/B1-docs/raw-20260322/candidates.md#c-20260322-0245-a`
 - source_brainstorm: `docs/B1-docs/raw-20260322/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/watchdog-live-status-surface-and-manager-supervision/issues/watchdog-live-status-surface-and-manager-supervision.md`
-  - `docs/epics/workspace-routing-foundation/manager-delegation-after-sufficient-patrol-evidence-governance/issues/manager-delegation-after-sufficient-patrol-evidence-governance.md`
-  - `docs/epics/workspace-routing-foundation/manager-continuation-handoff-consumption-governance/issues/manager-continuation-handoff-consumption-governance.md`
+  - `docs/B2-docs/runtime/watchdog-live-status-surface-and-manager-supervision/issues/watchdog-live-status-surface-and-manager-supervision.md`
+  - `docs/B2-docs/ibm/manager-delegation-after-sufficient-patrol-evidence-governance/issues/manager-delegation-after-sufficient-patrol-evidence-governance.md`
+  - `docs/B2-docs/ibm/manager-continuation-handoff-consumption-governance/issues/manager-continuation-handoff-consumption-governance.md`
 - session_refs:
   - {tool: codex, session_id: "019d15e2-5874-7e73-8487-715b7aee1ce1", jsonl_path: "/Users/zhaoyu/.codex/sessions/2026/03/22/rollout-2026-03-22T07-10-48-019d15e2-5874-7e73-8487-715b7aee1ce1.jsonl", role: "cleanup-followthrough"}
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://current-manual-codex-thread-id-not-exposed", role: "cleanup-followthrough-verifier"}

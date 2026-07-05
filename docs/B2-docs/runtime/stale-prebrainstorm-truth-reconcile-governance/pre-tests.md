@@ -40,7 +40,7 @@
 - requirement: `The owner freezes when a stale pre-brainstorm statement may be marked superseded, deferred, or absorbed.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/stale-prebrainstorm-truth-reconcile-governance/code-reviews/20260411-stale-prebrainstorm-truth-reconcile-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/stale-prebrainstorm-truth-reconcile-governance/code-reviews/20260411-stale-prebrainstorm-truth-reconcile-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -52,7 +52,7 @@
 - requirement: `The verification-contract-and-premerge-adequacy pre-brainstorm is marked as stale/follow-on only, and no longer overclaims that a stronger adequacy gate has already landed on current develop.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/stale-prebrainstorm-truth-reconcile-governance/code-reviews/20260411-stale-prebrainstorm-truth-reconcile-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/stale-prebrainstorm-truth-reconcile-governance/code-reviews/20260411-stale-prebrainstorm-truth-reconcile-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -64,7 +64,7 @@
 - requirement: `The nested test-pre-merge receipt audit pre-brainstorm remains clearly marked as absorbed and closed, not as an active unresolved bug.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/stale-prebrainstorm-truth-reconcile-governance/code-reviews/20260411-stale-prebrainstorm-truth-reconcile-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/stale-prebrainstorm-truth-reconcile-governance/code-reviews/20260411-stale-prebrainstorm-truth-reconcile-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -76,7 +76,7 @@
 - requirement: `The mixed pretests-gate and network-proxy pre-brainstorm preserves deferred split scope and does not rewrite later retirement/network follow-ons as if they were already finished by the earliest owner.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/stale-prebrainstorm-truth-reconcile-governance/code-reviews/20260411-stale-prebrainstorm-truth-reconcile-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/stale-prebrainstorm-truth-reconcile-governance/code-reviews/20260411-stale-prebrainstorm-truth-reconcile-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -88,7 +88,7 @@
 - requirement: `The feature-owned test-pre-merge family pre-brainstorm distinguishes landed promotion/lane truth from still-deferred family lifecycle automation without inventing missing owner pointers.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/stale-prebrainstorm-truth-reconcile-governance/code-reviews/20260411-stale-prebrainstorm-truth-reconcile-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/stale-prebrainstorm-truth-reconcile-governance/code-reviews/20260411-stale-prebrainstorm-truth-reconcile-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -100,7 +100,7 @@
 - requirement: `The reconcile batch does not introduce new runtime/gate commitments or rename pre-tests into a parallel test truth.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/stale-prebrainstorm-truth-reconcile-governance/code-reviews/20260411-stale-prebrainstorm-truth-reconcile-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/stale-prebrainstorm-truth-reconcile-governance/code-reviews/20260411-stale-prebrainstorm-truth-reconcile-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -112,7 +112,7 @@
 - requirement: `The stale-prebrainstorm reconcile batch binds C-20260411-1417-B to the canonical verification-contract owner chain and remains consumable by the develop-promote replay without inventing a new execution owner.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/stale-prebrainstorm-truth-reconcile-governance/code-reviews/20260411-stale-prebrainstorm-truth-reconcile-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/stale-prebrainstorm-truth-reconcile-governance/code-reviews/20260411-stale-prebrainstorm-truth-reconcile-verification.md`
 - surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`

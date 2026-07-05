@@ -1,7 +1,7 @@
 # Progress: runtime-blocked-intake-and-continuity-truth-governance
 
 - issue_id: `I-20260404-1545-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md`
 - title: `Runtime blocked intake and continuity truth governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -40,9 +40,9 @@
 ## Closure Evidence
 
 - `develop` merge `fd1907b`
-- `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-implementation-decision.md`
-- `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-verification.md`
-- `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-canonical-closeout-verification.md`
+- `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-implementation-decision.md`
+- `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-verification.md`
+- `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-canonical-closeout-verification.md`
 
 ## Completion Evidence
 
@@ -58,9 +58,9 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-slot-switch-lock-status-surface`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-blocked-supervision-status-surface`
-- `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-implementation-decision.md`
-- `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-verification.md`
-- `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-canonical-closeout-verification.md`
+- `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-implementation-decision.md`
+- `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-verification.md`
+- `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/code-reviews/20260405-runtime-blocked-intake-continuity-canonical-closeout-verification.md`
 
 ## Next Action
 

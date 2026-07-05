@@ -12,9 +12,9 @@
 - source_brainstorm: `docs/B1-docs/raw-20260410/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/codex-real-exec-switch-and-after-failure-recovery-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/config/codex-real-exec-switch-and-after-failure-recovery-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-codex-real-exec-switch-and-after-failure-recovery-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/codex-real-exec-switch-and-after-failure-recovery-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/config/codex-real-exec-switch-and-after-failure-recovery-governance/code-reviews`
 - follow_on_to: `I-20260407-0023-A`
 - created_at: `2026-04-10`
 - session_refs: []
@@ -53,7 +53,7 @@ That left the runtime able to mis-handle the failed current slot, over-probe in 
 
 ## Verification
 
-- `docs/epics/workspace-routing-foundation/codex-real-exec-switch-and-after-failure-recovery-governance/code-reviews/20260410-codex-real-exec-switch-and-after-failure-recovery-verification.md`
+- `docs/B2-docs/config/codex-real-exec-switch-and-after-failure-recovery-governance/code-reviews/20260410-codex-real-exec-switch-and-after-failure-recovery-verification.md`
 
 ## Completion
 

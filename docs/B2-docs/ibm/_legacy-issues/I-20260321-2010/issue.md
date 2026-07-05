@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO66
     synced_at: '2026-04-27T13:14:39Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/issues/explicit-session-addressed-resume-governance.md
+canonical_issue_path: docs/B2-docs/ibm/explicit-session-addressed-resume-governance/issues/explicit-session-addressed-resume-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:16:07Z'
 hash: ''
@@ -47,4 +47,4 @@ Freely 现在对不同工具的会话续接模型不一致：
 
 当作默认 supervisor/runtime 路径。
 
-canonical: docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/issues/explicit-session-addressed-resume-governance.md
+canonical: docs/B2-docs/ibm/explicit-session-addressed-resume-governance/issues/explicit-session-addressed-resume-governance.md

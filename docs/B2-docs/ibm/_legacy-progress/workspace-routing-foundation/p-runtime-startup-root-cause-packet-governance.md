@@ -7,7 +7,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/runtime-foreground-double-start-regression-20260413`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260413-feature-runtime-foreground-double-start-regression`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-startup-root-cause-packet-governance/issues/runtime-startup-root-cause-packet-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-startup-root-cause-packet-governance/issues/runtime-startup-root-cause-packet-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "doc-loop-and-guarded-replay"}
 

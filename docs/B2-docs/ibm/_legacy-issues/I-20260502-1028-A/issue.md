@@ -12,7 +12,7 @@ platform_ids:
   gitee:
     issue_id: ''
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/stale-start-lock-cleanup/issues/I-20260502-1028-A.md
+canonical_issue_path: docs/B2-docs/runtime/stale-start-lock-cleanup/issues/I-20260502-1028-A.md
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-05-02T10:28:00Z'
@@ -35,5 +35,5 @@ One function call added before lock acquisition. No other changes.
 ## References
 
 - B1: docs/B1-docs/raw-20260502/
-- Issue: docs/epics/workspace-routing-foundation/stale-start-lock-cleanup/issues/I-20260502-1028-A.md
+- Issue: docs/B2-docs/runtime/stale-start-lock-cleanup/issues/I-20260502-1028-A.md
 - Progress: docs/progress/workspace-routing-foundation/p-stale-start-lock-cleanup.md

@@ -7,7 +7,7 @@
 - requirement: `the owner is recorded as a narrow follow-on of the completed tool materialization family rather than a reopened umbrella`
 - evidence_level: `mock`
 - status: `pass`
-- artifact_ref: `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/issues/worktree-tool-boundary-bootstrap-governance.md`
+- artifact_ref: `docs/B2-docs/config/packaging/issues/worktree-tool-boundary-bootstrap-governance.md`
 
 ### PT-2
 - id: `PT-2`

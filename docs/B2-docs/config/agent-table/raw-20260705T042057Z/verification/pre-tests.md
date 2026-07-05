@@ -9,7 +9,7 @@
 - target_environment: feature-local
 - required_evidence: bash -n output
 - evidence_level: integration
-- artifact_ref: docs/epics/agent-acp/base-tool-validation/raw-20260705T042057Z/verification/test-evidence/at-001.log
+- artifact_ref: docs/B2-docs/config/agent-table/raw-20260705T042057Z/verification/test-evidence/at-001.log
 - test_command: bash -n docs/system/workspace/scripts/runtime/freely && echo PASS
 - expected_output: PASS
 - expected_RED_output: syntax error

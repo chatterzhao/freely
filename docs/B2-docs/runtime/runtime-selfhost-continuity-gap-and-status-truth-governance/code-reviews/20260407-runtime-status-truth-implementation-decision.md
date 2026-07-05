@@ -1,7 +1,7 @@
 ## Implementation Decision Note
 
 - issue_id: `I-20260407-0215-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
 
 - decision: `Keep the owner on bounded runtime status truth: harden `live-status` degrade paths, remove PATH-sensitive workspace-root lookup, surface prompt-required continuity gaps with full machine-readable fields in `live-status` plus bounded fleet summaries, keep same-lane manager prompt guardrails truthful, and tighten repeated interruption-resolution reads without auto-writing missing continuity files.`
 - why_this: `The current owner fixes the observable status contract inside this feature worktree: the patched entrypoint keeps `live-status` machine-readable, degrades pid-hint and workspace-root failures cleanly, surfaces prompt-required continuity gaps without auto-writing them, narrows blocked-supervision and delegated-continuation discovery to interruption-resolution artifacts, and keeps manager handoff anchored to the active feature worktree instead of misreading owner truth from protected root. Canonical tracked-root absorption is still pending on `develop`, so this decision stays bounded to feature-lane verification truth while preserving worker scope and avoiding a manager-only self-healing redesign.`

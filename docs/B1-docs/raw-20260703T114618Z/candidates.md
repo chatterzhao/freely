@@ -18,5 +18,5 @@ absorbed_into: I-20260703T114618Z-A
   - restart 后 agent_working 中有 manager session_id → 可 resume
   - worker/reviewer 的写入不受影响（已在 watchdog_sse.py 中正确实现）
 - absorbed_into: I-20260703T114618Z-A
-- promoted_issue_path: docs/epics/closeout-chain/agent-working-session-unify/raw-20260703T114618Z/issues/I-20260703T114618Z-A.md
+- promoted_issue_path: docs/B2-docs/git-worktree/closeout/raw-20260703T114618Z/issues/I-20260703T114618Z-A.md
 - milestone: M-20260703T114618Z-A

@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO9Y
     synced_at: '2026-04-27T13:17:19Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/issues/manager-startup-continuity-materialization-governance.md
+canonical_issue_path: docs/B2-docs/ibm/manager-startup-continuity-materialization-governance/issues/manager-startup-continuity-materialization-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:27:29Z'
 hash: ''
@@ -29,4 +29,4 @@ Canonical `develop` now has the two prerequisite truths for this lane:
 3. the runtime already knows the prompt-required continuity path before AI launch
 4. stop fallback already knows how to write a repair continuity file, but normal startup still does not write a first hand
 
-canonical: docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/issues/manager-startup-continuity-materialization-governance.md
+canonical: docs/B2-docs/ibm/manager-startup-continuity-materialization-governance/issues/manager-startup-continuity-materialization-governance.md

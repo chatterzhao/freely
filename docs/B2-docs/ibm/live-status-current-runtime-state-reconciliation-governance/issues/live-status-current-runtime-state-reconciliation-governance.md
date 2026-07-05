@@ -12,9 +12,9 @@
 - source_brainstorm: `docs/B1-docs/raw-20260328/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- depends_on: `docs/epics/workspace-routing-foundation/watchdog-live-status-surface-and-manager-supervision/issues/watchdog-live-status-surface-and-manager-supervision.md`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/live-status-current-runtime-state-reconciliation-governance/pre-tests.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/live-status-current-runtime-state-reconciliation-governance/code-reviews`
+- depends_on: `docs/B2-docs/runtime/watchdog-live-status-surface-and-manager-supervision/issues/watchdog-live-status-surface-and-manager-supervision.md`
+- pre_tests_path: `docs/B2-docs/ibm/live-status-current-runtime-state-reconciliation-governance/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/ibm/live-status-current-runtime-state-reconciliation-governance/code-reviews`
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}]
 
 ## Why
@@ -47,7 +47,7 @@ The contradiction came from reading current runtime PID truth and persisted `wor
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-live-status`
 - `docs/progress/workspace-routing-foundation/p-live-status-current-runtime-state-reconciliation-governance.md`
-- `docs/epics/workspace-routing-foundation/live-status-current-runtime-state-reconciliation-governance/code-reviews/20260328-live-status-current-runtime-state-reconciliation-verification.md`
+- `docs/B2-docs/ibm/live-status-current-runtime-state-reconciliation-governance/code-reviews/20260328-live-status-current-runtime-state-reconciliation-verification.md`
 
 ## Verification
 
@@ -58,7 +58,7 @@ The contradiction came from reading current runtime PID truth and persisted `wor
 ## Closure Evidence
 
 - `develop` 已包含 merge `2ebf39e Merge branch 'feature/fix-last-ai-state-down-20260328-0745' into develop`
-- canonical verification artifact 已存在：`docs/epics/workspace-routing-foundation/live-status-current-runtime-state-reconciliation-governance/code-reviews/20260328-live-status-current-runtime-state-reconciliation-verification.md`
+- canonical verification artifact 已存在：`docs/B2-docs/ibm/live-status-current-runtime-state-reconciliation-governance/code-reviews/20260328-live-status-current-runtime-state-reconciliation-verification.md`
 - 原始 feature worktree `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260328-0745-feature-fix-last-ai-state-down` 已退休，不再需要额外 salvage
 
 ## Next

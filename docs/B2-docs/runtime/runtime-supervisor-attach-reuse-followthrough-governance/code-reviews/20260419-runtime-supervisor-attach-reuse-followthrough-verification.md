@@ -1,7 +1,7 @@
 # Verification: runtime-supervisor-attach-reuse-followthrough-governance
 
 - issue_id: `I-20260419-1505-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/issues/runtime-supervisor-attach-reuse-followthrough-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-supervisor-attach-reuse-followthrough-governance/issues/runtime-supervisor-attach-reuse-followthrough-governance.md`
 - verification_date: `2026-04-19`
 - verifier: `codex`
 

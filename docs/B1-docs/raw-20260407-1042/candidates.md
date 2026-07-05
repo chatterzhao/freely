@@ -81,7 +81,7 @@
   - `docs/system/workspace/scripts/start-lead-agent.sh`
   - `docs/system/workspace/scripts/tests/`
   - `docs/system/workspace/scripts/runtime/freely`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/issues/github-first-external-issue-source-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/github-first-external-issue-source-governance/issues/github-first-external-issue-source-governance.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`

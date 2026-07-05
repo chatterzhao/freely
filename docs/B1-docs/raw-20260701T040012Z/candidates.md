@@ -18,6 +18,6 @@ milestone: M-20260701T040012Z-A
 - promotion_gate: daemon start 不再出现 A2A timeout 警告
 - open_questions: []
 - promoted_issue_id: I-20260701T040012Z-A
-- promoted_issue_path: docs/epics/a2a-healthcheck/log-based/raw-20260701T040012Z/issues/I-20260701T040012Z-A.md
+- promoted_issue_path: docs/B2-docs/a2a/protocol-health/raw-20260701T040012Z/issues/I-20260701T040012Z-A.md
 - milestone: M-20260701T040012Z-A
 - session_refs: []

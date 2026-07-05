@@ -19,7 +19,7 @@
 - priority: P0
 - status: promoted
 - decision_reason: 当前边界已经够清楚，不需要继续停留在纯预研；应直接 materialize 成 issue 并实现最小 CLI 面。
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/watchdog-live-status-surface-and-manager-supervision/issues/watchdog-live-status-surface-and-manager-supervision.md`
+- promoted_issue_path: `docs/B2-docs/runtime/watchdog-live-status-surface-and-manager-supervision/issues/watchdog-live-status-surface-and-manager-supervision.md`
 - next_action: materialize issue，并落最小 CLI + doc + test；后续是否扩成更细的 stall detection 再另开 issue
 - revisit_trigger: 若后续需要 JSON 输出、长期 watch 模式、或更强 stall detection / event stream，再从同一预研线继续扩
 - milestone: `docs/milestones.md#m-20260306-workspace-routing-foundation`

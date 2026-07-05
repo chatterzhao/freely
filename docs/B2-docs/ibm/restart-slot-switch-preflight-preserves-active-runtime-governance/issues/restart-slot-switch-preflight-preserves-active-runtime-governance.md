@@ -12,12 +12,12 @@
 - source_brainstorm: `docs/B1-docs/raw-20260405/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/restart-slot-switch-preflight-preserves-active-runtime-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/ibm/restart-slot-switch-preflight-preserves-active-runtime-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-restart-slot-switch-preflight-preserves-active-runtime-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/restart-slot-switch-preflight-preserves-active-runtime-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/restart-slot-switch-preflight-preserves-active-runtime-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
-  - `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/issues/project-command-semantics-and-restore-work-governance.md`
+  - `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/issues/slot-switch-startup-preflight-and-lock-observability-governance.md`
+  - `docs/B2-docs/ibm/project-command-semantics-and-restore-work-governance/issues/project-command-semantics-and-restore-work-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -70,13 +70,13 @@ Freely 已经为 `freely start` 冻结了 shared codex slot-switch lock 的 star
 
 - `docs/B1-docs/raw-20260405/brainstorms.md`
 - `docs/B1-docs/raw-20260405/candidates.md`
-- `docs/epics/workspace-routing-foundation/restart-slot-switch-preflight-preserves-active-runtime-governance/issues/restart-slot-switch-preflight-preserves-active-runtime-governance.md`
-- `docs/epics/workspace-routing-foundation/restart-slot-switch-preflight-preserves-active-runtime-governance/brainstorms/b-restart-slot-switch-preflight-preserves-active-runtime-governance.md`
-- `docs/epics/workspace-routing-foundation/restart-slot-switch-preflight-preserves-active-runtime-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/restart-slot-switch-preflight-preserves-active-runtime-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/restart-slot-switch-preflight-preserves-active-runtime-governance/tasks.md`
-- `docs/epics/workspace-routing-foundation/restart-slot-switch-preflight-preserves-active-runtime-governance/code-reviews/20260405-restart-slot-switch-preflight-implementation-decision.md`
-- `docs/epics/workspace-routing-foundation/restart-slot-switch-preflight-preserves-active-runtime-governance/code-reviews/20260405-restart-slot-switch-preflight-verification.md`
+- `docs/B2-docs/ibm/restart-slot-switch-preflight-preserves-active-runtime-governance/issues/restart-slot-switch-preflight-preserves-active-runtime-governance.md`
+- `docs/B2-docs/ibm/restart-slot-switch-preflight-preserves-active-runtime-governance/brainstorms/b-restart-slot-switch-preflight-preserves-active-runtime-governance.md`
+- `docs/B2-docs/ibm/restart-slot-switch-preflight-preserves-active-runtime-governance/prd.md`
+- `docs/B2-docs/ibm/restart-slot-switch-preflight-preserves-active-runtime-governance/pre-tests.md`
+- `docs/B2-docs/ibm/restart-slot-switch-preflight-preserves-active-runtime-governance/tasks.md`
+- `docs/B2-docs/ibm/restart-slot-switch-preflight-preserves-active-runtime-governance/code-reviews/20260405-restart-slot-switch-preflight-implementation-decision.md`
+- `docs/B2-docs/ibm/restart-slot-switch-preflight-preserves-active-runtime-governance/code-reviews/20260405-restart-slot-switch-preflight-verification.md`
 - `docs/progress/workspace-routing-foundation/p-restart-slot-switch-preflight-preserves-active-runtime-governance.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-restart-preserves-runtime-on-active-slot-switch-lock`
@@ -85,5 +85,5 @@ Freely 已经为 `freely start` 冻结了 shared codex slot-switch lock 的 star
 ## Next
 
 - Completed on canonical `develop` via guarded merge `255d6dd`.
-- Post-merge closeout verification is recorded in `docs/epics/workspace-routing-foundation/restart-slot-switch-preflight-preserves-active-runtime-governance/code-reviews/20260405-restart-slot-switch-preflight-canonical-closeout-verification.md`.
+- Post-merge closeout verification is recorded in `docs/B2-docs/ibm/restart-slot-switch-preflight-preserves-active-runtime-governance/code-reviews/20260405-restart-slot-switch-preflight-canonical-closeout-verification.md`.
 - Reopen only if canonical `develop` again allows restart to stop a live runtime before shared slot-switch preflight resolves, or if adjacent durability hardenings regress the preserved-runtime contract.

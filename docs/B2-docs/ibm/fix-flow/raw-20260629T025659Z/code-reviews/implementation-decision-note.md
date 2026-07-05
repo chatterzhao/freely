@@ -1,11 +1,11 @@
 ---
 issue_id: I-20260629T025659Z-A
-issue_path: docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/issues/I-20260629T025659Z-A.md
+issue_path: docs/B2-docs/ibm/fix-flow/raw-20260629T025659Z/issues/I-20260629T025659Z-A.md
 phase_state: done_b2_ibm
 ---
 
 - issue_id: I-20260629T025659Z-A
-- issue_path: docs/epics/fix-flow-unify/skill-refactor/raw-20260629T025659Z/issues/I-20260629T025659Z-A.md
+- issue_path: docs/B2-docs/ibm/fix-flow/raw-20260629T025659Z/issues/I-20260629T025659Z-A.md
 
 ## Implementation Decision Note
 

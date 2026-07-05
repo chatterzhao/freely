@@ -1,7 +1,7 @@
 # Verification Blocker: runtime-lifecycle-receipt guarded replay stale batch cannot consume dirty source truth
 
 - issue_id: `I-20260418-1900-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
 - verification_date: `2026-04-25`
 - verifier: `codex`
 - route_judgment: `blocked`

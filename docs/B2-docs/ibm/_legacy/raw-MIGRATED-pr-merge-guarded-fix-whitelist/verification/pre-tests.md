@@ -42,4 +42,4 @@
 - case_design: `Merge fix/* branch into test-pre-merge via pr-merge-guarded.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/pr-merge-guarded-fix-whitelist/code-reviews/review.md`
+- artifact_ref: `docs/B2-docs/pr-merge-guarded-fix-whitelist/code-reviews/review.md`

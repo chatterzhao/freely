@@ -18,11 +18,11 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - priority: `P1`
 - promoted_issue_id: `I-20260411-0217-A`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
+  - `docs/B2-docs/ibm/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
   - `docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md`
   - `docs/system/workspace/scripts/quality/governance-check`
 - problem: The ordinary protected-merge receipt-gap contract only accepts backfills when a trailerless merge still has a parseable `Merge branch '<source>' into <target>` subject. On `2026-04-11`, canonical `develop` exposed six real ancestry gaps from `test-pre-merge-20260410-preferred-auth-fix` whose subjects are generic (`Merge`, `Merge fix`, `Merge updates`, `Merge complete pre-brainstorm`). Explicit ledger entries for those hashes are still rejected because `governance-check` cannot validate them against subject-derived source/target truth.

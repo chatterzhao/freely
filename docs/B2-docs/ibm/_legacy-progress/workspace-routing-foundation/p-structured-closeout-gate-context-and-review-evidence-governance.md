@@ -7,7 +7,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - branch: `feature/structured-closeout-gate-and-review-evidence-followon-20260412`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260412-feature-structured-closeout-gate-and-review-evidence-followon`
-- issue_path: `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md`
+- issue_path: `docs/B2-docs/ibm/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "dev-loop-and-guarded-replay"}
 

@@ -60,32 +60,32 @@
 - requirement: `global restart is an explicit all-project action with a separate manifest-backed restore memory contract`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/global-restart-restore-memory-governance/code-reviews/20260330-global-restart-restore-memory-feature-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/global-restart-restore-memory-governance/code-reviews/20260330-global-restart-restore-memory-feature-verification.md`
 
 ### PT-2
 - id: `PT-2`
 - requirement: `manifest durability uses latest.json plus last-20 history retention under $FREELY_HOME/control-plane/restart`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/global-restart-restore-memory-governance/code-reviews/20260330-global-restart-restore-memory-feature-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/global-restart-restore-memory-governance/code-reviews/20260330-global-restart-restore-memory-feature-verification.md`
 
 ### PT-3
 - id: `PT-3`
 - requirement: `previously-running project set is restored while operator-stopped projects are excluded`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/global-restart-restore-memory-governance/code-reviews/20260330-global-restart-restore-memory-feature-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/global-restart-restore-memory-governance/code-reviews/20260330-global-restart-restore-memory-feature-verification.md`
 
 ### PT-4
 - id: `PT-4`
 - requirement: `mandatory restore anchors remain required inputs and auxiliary runtime evidence remains optional`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/global-restart-restore-memory-governance/code-reviews/20260330-global-restart-restore-memory-feature-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/global-restart-restore-memory-governance/code-reviews/20260330-global-restart-restore-memory-feature-verification.md`
 
 ### PT-5
 - id: `PT-5`
 - requirement: `post-merge protected-branch verification can replay the global restart without turning develop into an implementation surface`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/global-restart-restore-memory-governance/code-reviews/20260330-global-restart-restore-memory-feature-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/global-restart-restore-memory-governance/code-reviews/20260330-global-restart-restore-memory-feature-verification.md`

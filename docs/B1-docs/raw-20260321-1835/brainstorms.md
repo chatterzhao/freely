@@ -136,7 +136,7 @@
 
 - `C-20260321-1835-A` 不再继续作为 absorbed supporting evidence 留在 pre-brainstorm 层。
 - 该候选现已 materialize 为：
-  - `docs/epics/workspace-routing-foundation/develop-merge-issue-binding-and-cmi-governance/issues/develop-merge-issue-binding-and-cmi-governance.md`
+  - `docs/B2-docs/ibm/develop-merge-issue-binding-and-cmi-governance/issues/develop-merge-issue-binding-and-cmi-governance.md`
 - 原因：
   - 这次 develop merge 漏口已经不是 wording 讨论，而是 active gate 真源缺口
   - 若没有独立 issue owner，这次修复本身就会再次违反它要收紧的 merge rule

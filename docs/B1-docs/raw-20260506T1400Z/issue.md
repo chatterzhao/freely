@@ -14,7 +14,7 @@ created_at: 2026-05-06 14:00:00+00:00
 author: zhaoquan
 channel: github
 session_refs: []
-pre_tests_path: docs/epics/merge-guarded-fix-whitelist/verification/pre-tests.md
+pre_tests_path: docs/B2-docs/merge-guarded-fix-whitelist/verification/pre-tests.md
 verification_artifact_dir: docs/epics/merge-guarded-fix-whitelist/code-reviews
 updated_at: '2026-06-21T20:12:47Z'
 platform_state: closed
@@ -26,5 +26,5 @@ pr-merge-guarded 只接受 feature/* 和 hotfix/* → test-pre-merge-*，fix/* �
 ## 修复
 validate_merge_direction + pre-flight gate 增加 fix/* 支持。
 
-- pre_tests_path: `docs/epics/merge-guarded-fix-whitelist/verification/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/merge-guarded-fix-whitelist/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/merge-guarded-fix-whitelist/code-reviews`

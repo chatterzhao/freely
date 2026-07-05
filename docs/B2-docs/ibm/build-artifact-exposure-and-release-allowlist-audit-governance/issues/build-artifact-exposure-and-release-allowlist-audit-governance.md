@@ -12,11 +12,11 @@
 - source_brainstorm: `docs/B1-docs/raw-20260401/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/build-artifact-exposure-and-release-allowlist-audit-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/ibm/build-artifact-exposure-and-release-allowlist-audit-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-build-artifact-exposure-and-release-allowlist-audit-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/build-artifact-exposure-and-release-allowlist-audit-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/build-artifact-exposure-and-release-allowlist-audit-governance/code-reviews`
 - depends_on:
-  - `docs/epics/freely-product-architecture/default-autonomy-activation-consent-and-tool-policy-governance/issues/default-autonomy-activation-consent-and-tool-policy-governance.md`
+  - `docs/B2-docs/config/packaging/issues/default-autonomy-activation-consent-and-tool-policy-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -65,9 +65,9 @@ This owner fixes that first concrete gap without pretending to solve the entire 
 - `docs/B1-docs/raw-20260401/brainstorms.md`
 - `docs/B1-docs/raw-20260401/candidates.md`
 - `docs/milestones.md`
-- `docs/epics/workspace-routing-foundation/build-artifact-exposure-and-release-allowlist-audit-governance/issues/build-artifact-exposure-and-release-allowlist-audit-governance.md`
-- `docs/epics/workspace-routing-foundation/build-artifact-exposure-and-release-allowlist-audit-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/build-artifact-exposure-and-release-allowlist-audit-governance/code-reviews/20260401-build-artifact-exposure-and-release-allowlist-verification.md`
+- `docs/B2-docs/ibm/build-artifact-exposure-and-release-allowlist-audit-governance/issues/build-artifact-exposure-and-release-allowlist-audit-governance.md`
+- `docs/B2-docs/ibm/build-artifact-exposure-and-release-allowlist-audit-governance/pre-tests.md`
+- `docs/B2-docs/ibm/build-artifact-exposure-and-release-allowlist-audit-governance/code-reviews/20260401-build-artifact-exposure-and-release-allowlist-verification.md`
 - `docs/progress/workspace-routing-foundation/p-build-artifact-exposure-and-release-allowlist-audit-governance.md`
 - `docs/system/workspace/release-build-allowlist.txt`
 - `docs/system/workspace/scripts/quality/check-build-artifact-exposure`

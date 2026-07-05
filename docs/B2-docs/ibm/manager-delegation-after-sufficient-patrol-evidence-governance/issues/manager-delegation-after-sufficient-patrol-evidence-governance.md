@@ -7,16 +7,16 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `manager-delegation-after-sufficient-patrol-evidence-governance`
 - issue-name: `manager-delegation-after-sufficient-patrol-evidence-governance`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/manager-delegation-after-sufficient-patrol-evidence-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/manager-delegation-after-sufficient-patrol-evidence-governance/code-reviews`
 - priority: P0
 - source_candidate: `docs/B1-docs/raw-20260322/candidates.md#c-20260322-0228-a`
 - source_brainstorm: `docs/B1-docs/raw-20260322/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md`
-  - `docs/epics/workspace-routing-foundation/manager-continuation-handoff-consumption-governance/issues/manager-continuation-handoff-consumption-governance.md`
-  - `docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/issues/cli-first-entrypoint-and-observability-surface-unification.md`
+  - `docs/B2-docs/ibm/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md`
+  - `docs/B2-docs/ibm/manager-continuation-handoff-consumption-governance/issues/manager-continuation-handoff-consumption-governance.md`
+  - `docs/B2-docs/human/cli-first-entrypoint-and-observability-surface-unification/issues/cli-first-entrypoint-and-observability-surface-unification.md`
 
 ## Why
 
@@ -66,7 +66,7 @@
 - `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
 - `docs/system/workspace/skills/multi-worktree-supervision/SKILL.md`
 - `docs/progress/workspace-routing-foundation/p-manager-delegation-after-sufficient-patrol-evidence-governance.md`
-- `docs/epics/workspace-routing-foundation/manager-delegation-after-sufficient-patrol-evidence-governance/code-reviews/20260322-manager-delegation-after-sufficient-patrol-evidence-governance-verification.md`
+- `docs/B2-docs/ibm/manager-delegation-after-sufficient-patrol-evidence-governance/code-reviews/20260322-manager-delegation-after-sufficient-patrol-evidence-governance-verification.md`
 
 ## Verification
 

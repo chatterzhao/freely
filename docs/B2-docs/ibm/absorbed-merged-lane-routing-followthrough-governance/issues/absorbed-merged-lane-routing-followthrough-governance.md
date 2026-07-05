@@ -10,16 +10,16 @@
 - priority: `P0`
 - source_candidate: `docs/B1-docs/raw-20260421/candidates.md#c-20260421-1330-a`
 - source_brainstorm: `docs/B1-docs/raw-20260421/brainstorms.md`
-- reopen_of_issue: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
+- reopen_of_issue: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
 - reopen_reason: `canonical develop self-host replay proved absorbed merged blocker lanes were no longer auto-recovered, but scan/fleet patrol still routed them as if they were launchable worker execution targets`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/pre-tests.md`
-- tasks_path: `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/tasks.md`
+- pre_tests_path: `docs/B2-docs/ibm/absorbed-merged-lane-routing-followthrough-governance/pre-tests.md`
+- tasks_path: `docs/B2-docs/ibm/absorbed-merged-lane-routing-followthrough-governance/tasks.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-absorbed-merged-lane-routing-followthrough-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/absorbed-merged-lane-routing-followthrough-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
+  - `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
 - created_at: `2026-04-21`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
@@ -80,11 +80,11 @@ This owner exists to downgrade those absorbed lanes to cleanup-followthrough vis
 
 - `docs/B1-docs/raw-20260421/brainstorms.md`
 - `docs/B1-docs/raw-20260421/candidates.md`
-- `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/issues/absorbed-merged-lane-routing-followthrough-governance.md`
-- `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/tasks.md`
+- `docs/B2-docs/ibm/absorbed-merged-lane-routing-followthrough-governance/issues/absorbed-merged-lane-routing-followthrough-governance.md`
+- `docs/B2-docs/ibm/absorbed-merged-lane-routing-followthrough-governance/pre-tests.md`
+- `docs/B2-docs/ibm/absorbed-merged-lane-routing-followthrough-governance/tasks.md`
 - `docs/progress/workspace-routing-foundation/p-absorbed-merged-lane-routing-followthrough-governance.md`
-- `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/code-reviews/20260421-absorbed-merged-lane-routing-followthrough-verification.md`
+- `docs/B2-docs/ibm/absorbed-merged-lane-routing-followthrough-governance/code-reviews/20260421-absorbed-merged-lane-routing-followthrough-verification.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/runtime/task-source-scan.py`
 - `docs/system/workspace/scripts/worktree/wt-fleet-status`

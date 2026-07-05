@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFOAD
     synced_at: '2026-04-27T13:17:39Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/issues/manager-task-source-scan-idle-replan-boundary-governance.md
+canonical_issue_path: docs/B2-docs/ibm/manager-task-source-scan-idle-replan-boundary-governance/issues/manager-task-source-scan-idle-replan-boundary-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:28:37Z'
 hash: ''
@@ -30,4 +30,4 @@ The current self-host replay proved two opposite failures at the same seam:
 1. stale delegated continuation could keep the manager from returning to higher-level task surfaces after startup or closeout
 2. broad patrol could also pull the mana
 
-canonical: docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/issues/manager-task-source-scan-idle-replan-boundary-governance.md
+canonical: docs/B2-docs/ibm/manager-task-source-scan-idle-replan-boundary-governance/issues/manager-task-source-scan-idle-replan-boundary-governance.md

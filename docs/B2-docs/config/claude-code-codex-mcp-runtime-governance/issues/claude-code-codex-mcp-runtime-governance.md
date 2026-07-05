@@ -7,7 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `claude-code-codex-mcp-runtime-governance`
 - issue-name: `claude-code-codex-mcp-runtime-governance`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/claude-code-codex-mcp-runtime-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/config/claude-code-codex-mcp-runtime-governance/code-reviews`
 - source_candidate: `docs/B1-docs/raw-20260320/candidates.md#c-20260320-2145-001`
 - additional_source_candidates:
   - `docs/B1-docs/raw-20260320/candidates.md#c-20260320-2145-002`
@@ -87,7 +87,7 @@ Freely 已经支持多个顶层 AI tool，但 `Claude Code` 仍缺两类关键�
 - `bash docs/system/workspace/scripts/tests/test-monitor-ai-cli-cc-args`
 - `bash docs/system/workspace/scripts/tests/test-session-evidence-resolver`
 - `bash docs/system/workspace/scripts/tests/test-freely-cc-codex-evidence-status`
-- `docs/epics/workspace-routing-foundation/claude-code-codex-mcp-runtime-governance/code-reviews/20260326-cc-codex-runtime-canonical-replay-verification.md`
+- `docs/B2-docs/config/claude-code-codex-mcp-runtime-governance/code-reviews/20260326-cc-codex-runtime-canonical-replay-verification.md`
 - live smoke:
   - `freely init --ai cc-use-codex-cli:auto`
   - `freely start`

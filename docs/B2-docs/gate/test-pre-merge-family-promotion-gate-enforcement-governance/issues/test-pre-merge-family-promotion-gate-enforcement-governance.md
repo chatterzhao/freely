@@ -12,13 +12,13 @@
 - source_brainstorm: `docs/B1-docs/raw-20260405/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/test-pre-merge-family-promotion-gate-enforcement-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/pre-tests.md`
 - progress_path: `pending://progress-created-on-dev-loop`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/test-pre-merge-family-promotion-gate-enforcement-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md`
-  - `docs/epics/workspace-routing-foundation/develop-guarded-merge-entrypoint-enforcement-governance/issues/develop-guarded-merge-entrypoint-enforcement-governance.md`
-  - `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/issues/protected-branch-hook-bypass-breakglass-governance.md`
+  - `docs/B2-docs/ibm/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md`
+  - `docs/B2-docs/ibm/develop-guarded-merge-entrypoint-enforcement-governance/issues/develop-guarded-merge-entrypoint-enforcement-governance.md`
+  - `docs/B2-docs/ibm/protected-branch-hook-bypass-breakglass-governance/issues/protected-branch-hook-bypass-breakglass-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -73,12 +73,12 @@
   - 这条 owner 内允许同时修改 truth sources 与 gate scripts，因为两者需要同轮收敛。
   - stale automation、manifest generation、paired create、runtime surfaces 仍由后续 owner 承接。
 - required_doc_refs:
-  - `docs/epics/workspace-routing-foundation/test-pre-merge-family-promotion-gate-enforcement-governance/issues/test-pre-merge-family-promotion-gate-enforcement-governance.md`
-  - `docs/epics/workspace-routing-foundation/test-pre-merge-family-promotion-gate-enforcement-governance/brainstorms/b-test-pre-merge-family-promotion-gate-enforcement-governance.md`
-  - `docs/epics/workspace-routing-foundation/test-pre-merge-family-promotion-gate-enforcement-governance/prd.md`
-  - `docs/epics/workspace-routing-foundation/test-pre-merge-family-promotion-gate-enforcement-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/test-pre-merge-family-promotion-gate-enforcement-governance/tasks.md`
-  - `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md`
+  - `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/issues/test-pre-merge-family-promotion-gate-enforcement-governance.md`
+  - `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/brainstorms/b-test-pre-merge-family-promotion-gate-enforcement-governance.md`
+  - `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/prd.md`
+  - `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/pre-tests.md`
+  - `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/tasks.md`
+  - `docs/B2-docs/ibm/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md`
 
 ## Verification
 
@@ -109,8 +109,8 @@
 - `docs/system/workspace/skills/branch-management/references/semantic-regression-checklist.md`
 - `docs/system/workspace/skills/doc-ibm-execution/references/ibm-completion-gate.md`
 - `docs/system/workspace/skills/multi-worktree-supervision/references/manager-reactivation-patrol.md`
-- `docs/epics/workspace-routing-foundation/test-pre-merge-family-promotion-gate-enforcement-governance/code-reviews/20260405-test-pre-merge-family-promotion-gate-enforcement-implementation-decision.md`
-- `docs/epics/workspace-routing-foundation/test-pre-merge-family-promotion-gate-enforcement-governance/code-reviews/20260405-test-pre-merge-family-promotion-gate-enforcement-verification.md`
+- `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/code-reviews/20260405-test-pre-merge-family-promotion-gate-enforcement-implementation-decision.md`
+- `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/code-reviews/20260405-test-pre-merge-family-promotion-gate-enforcement-verification.md`
 
 ## Next
 

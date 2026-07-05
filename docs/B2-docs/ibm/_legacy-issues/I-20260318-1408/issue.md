@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO59
     synced_at: '2026-04-27T13:14:02Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md
+canonical_issue_path: docs/B2-docs/ibm/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md
 last_synced_comment_at:
   github: '2026-04-27T11:13:40Z'
 hash: ''
@@ -28,4 +28,4 @@ Freely 已经具备局部的 worker supervision、account switch、session rotat
 - 对“应运行但掉线”与“故意冻结”之间的显式区分
 - 清晰的角色边界，避免主管越权变成执行者
 
-canonical: docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md
+canonical: docs/B2-docs/ibm/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md

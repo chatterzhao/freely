@@ -1,7 +1,7 @@
 # Progress: governance-merge-gate-milestone-status-followthrough-governance
 
 - issue_id: `I-20260404-0119-A`
-- issue_path: `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md`
+- issue_path: `docs/B2-docs/gate/governance-merge-gate-milestone-status-followthrough-governance/issues/governance-merge-gate-milestone-status-followthrough-governance.md`
 - title: `Governance merge gate milestone status followthrough governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -25,7 +25,7 @@
 1. `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
 2. `git diff --check`
 3. `./bin/governance-check`
-4. `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/code-reviews/20260404-governance-merge-gate-milestone-status-followthrough-verification.md`
+4. `docs/B2-docs/gate/governance-merge-gate-milestone-status-followthrough-governance/code-reviews/20260404-governance-merge-gate-milestone-status-followthrough-verification.md`
 
 ## Current Batch Risks
 
@@ -36,7 +36,7 @@
 
 1. implementation merge `908a6ad`
 2. closeout merge `a409301`
-3. `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/code-reviews/20260404-governance-merge-gate-milestone-status-followthrough-verification.md`
+3. `docs/B2-docs/gate/governance-merge-gate-milestone-status-followthrough-governance/code-reviews/20260404-governance-merge-gate-milestone-status-followthrough-verification.md`
 
 ## Next Action
 

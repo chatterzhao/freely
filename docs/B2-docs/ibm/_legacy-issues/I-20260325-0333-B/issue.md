@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO6M
     synced_at: '2026-04-27T13:14:56Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/issues/story-level-pre-tests-quality-gate-governance.md
+canonical_issue_path: docs/B2-docs/ibm/story-level-pre-tests-quality-gate-governance/issues/story-level-pre-tests-quality-gate-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:17:16Z'
 hash: ''
@@ -30,4 +30,4 @@ Freely 已经明确 `pre-tests.md` 是 issue-level acceptance 控制面，但还
 
 在更大的 testing evidence ladder 能力完成前，最先必须硬化的是 story-level `pre-tests.md` 质量 gate。
 
-canonical: docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/issues/story-level-pre-tests-quality-gate-governance.md
+canonical: docs/B2-docs/ibm/story-level-pre-tests-quality-gate-governance/issues/story-level-pre-tests-quality-gate-governance.md

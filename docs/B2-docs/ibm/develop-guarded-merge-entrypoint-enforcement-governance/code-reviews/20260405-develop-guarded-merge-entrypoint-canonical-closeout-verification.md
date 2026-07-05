@@ -1,6 +1,6 @@
 # Canonical Closeout Verification: develop-guarded-merge-entrypoint-enforcement-governance
 
-- issue_path: `docs/epics/workspace-routing-foundation/develop-guarded-merge-entrypoint-enforcement-governance/issues/develop-guarded-merge-entrypoint-enforcement-governance.md`
+- issue_path: `docs/B2-docs/ibm/develop-guarded-merge-entrypoint-enforcement-governance/issues/develop-guarded-merge-entrypoint-enforcement-governance.md`
 - branch: `develop`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely`
 - canonical_merge_commit: `f1965d3`

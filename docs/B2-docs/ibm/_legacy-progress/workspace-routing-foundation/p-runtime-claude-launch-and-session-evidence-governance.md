@@ -1,7 +1,7 @@
 # Progress: runtime-claude-launch-and-session-evidence-governance
 
 - issue_id: `I-20260419-2245-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-claude-launch-and-session-evidence-governance/issues/runtime-claude-launch-and-session-evidence-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-claude-launch-and-session-evidence-governance/issues/runtime-claude-launch-and-session-evidence-governance.md`
 - title: `Runtime Claude launch and session evidence governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -30,7 +30,7 @@
 7. runtime-equivalent resume launcher replay with no verified evidence fell back to fresh execution and returned `hi`
 8. `git diff --check`
 9. `./bin/governance-check`
-10. `docs/epics/workspace-routing-foundation/runtime-claude-launch-and-session-evidence-governance/code-reviews/20260419-runtime-claude-launch-and-session-evidence-verification.md`
+10. `docs/B2-docs/runtime/runtime-claude-launch-and-session-evidence-governance/code-reviews/20260419-runtime-claude-launch-and-session-evidence-verification.md`
 
 ## Current Batch Risks
 

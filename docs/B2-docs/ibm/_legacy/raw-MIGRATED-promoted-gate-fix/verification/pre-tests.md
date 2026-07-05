@@ -38,4 +38,4 @@
 - case_design: `gate validates promoted candidates have candidate_issues entries`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/promoted-gate-fix/code-reviews/review.md`
+- artifact_ref: `docs/B2-docs/promoted-gate-fix/code-reviews/review.md`

@@ -1,7 +1,7 @@
 # Implementation Decision: runtime-blocked-intake-and-continuity-truth-governance
 
 - issue_id: `I-20260404-1545-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-blocked-intake-and-continuity-truth-governance/issues/runtime-blocked-intake-and-continuity-truth-governance.md`
 
 ## Implementation Decision Note
 

@@ -9,13 +9,13 @@
 - target_environment: fix worktree
 - required_evidence: grep output
 - evidence_level: integration
-- artifact_ref: docs/epics/a2a-state-standard/cleanup-pending/verification/test-evidence/acceptance-1.txt
+- artifact_ref: docs/B2-docs/a2a/task-lifecycle/verification/test-evidence/acceptance-1.txt
 - test_command: grep -r 'pending-input\|PENDING_INPUT' docs/system/workspace/scripts/runtime/ --include='*.py' && echo FAIL || echo PASS
 - expected_output: PASS
 - expected_RED_output: FAIL
 - actual_RED_output: RED confirmed — 9 references before fix
 - actual_output: PASS
-- evidence_file: docs/epics/a2a-state-standard/cleanup-pending/verification/test-evidence/acceptance-1.txt
+- evidence_file: docs/B2-docs/a2a/task-lifecycle/verification/test-evidence/acceptance-1.txt
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -28,13 +28,13 @@
 - target_environment: fix worktree
 - required_evidence: grep output
 - evidence_level: integration
-- artifact_ref: docs/epics/a2a-state-standard/cleanup-pending/verification/test-evidence/acceptance-2.txt
+- artifact_ref: docs/B2-docs/a2a/task-lifecycle/verification/test-evidence/acceptance-2.txt
 - test_command: grep 'supportedExitKinds' docs/system/workspace/a2a/agent-card-schema.md && echo FAIL || echo PASS
 - expected_output: PASS
 - expected_RED_output: FAIL
 - actual_RED_output: RED confirmed — 2 references before fix
 - actual_output: PASS
-- evidence_file: docs/epics/a2a-state-standard/cleanup-pending/verification/test-evidence/acceptance-2.txt
+- evidence_file: docs/B2-docs/a2a/task-lifecycle/verification/test-evidence/acceptance-2.txt
 - red-green-status: green
 - status: passed
 - blocker: none

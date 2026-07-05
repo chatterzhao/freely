@@ -12,12 +12,12 @@
 - source_brainstorm: `docs/B1-docs/raw-20260401/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/develop-push-pending-guard-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/ibm/develop-push-pending-guard-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-develop-push-pending-guard-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/develop-push-pending-guard-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/develop-push-pending-guard-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/protected-post-merge-acceptance-route-and-promotion-guard-governance/issues/protected-post-merge-acceptance-route-and-promotion-guard-governance.md`
-  - `docs/epics/workspace-routing-foundation/active-milestone-placement-and-consumption-gate-governance/issues/active-milestone-placement-and-consumption-gate-governance.md`
+  - `docs/B2-docs/git-worktree/protected-post-merge-acceptance-route-and-promotion-guard-governance/issues/protected-post-merge-acceptance-route-and-promotion-guard-governance.md`
+  - `docs/B2-docs/ibm/active-milestone-placement-and-consumption-gate-governance/issues/active-milestone-placement-and-consumption-gate-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -65,9 +65,9 @@ This owner fixes that governance gap without auto-pushing on behalf of the opera
 - `docs/B1-docs/raw-20260401/candidates.md`
 - `docs/B1-docs/raw-INDEX.md`
 - `docs/milestones.md`
-- `docs/epics/workspace-routing-foundation/develop-push-pending-guard-governance/issues/develop-push-pending-guard-governance.md`
-- `docs/epics/workspace-routing-foundation/develop-push-pending-guard-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/develop-push-pending-guard-governance/code-reviews/20260401-develop-push-pending-guard-verification.md`
+- `docs/B2-docs/ibm/develop-push-pending-guard-governance/issues/develop-push-pending-guard-governance.md`
+- `docs/B2-docs/ibm/develop-push-pending-guard-governance/pre-tests.md`
+- `docs/B2-docs/ibm/develop-push-pending-guard-governance/code-reviews/20260401-develop-push-pending-guard-verification.md`
 - `docs/progress/workspace-routing-foundation/p-develop-push-pending-guard-governance.md`
 - `docs/LAWS.md`
 - `docs/system/workspace/agents/manager-agent.md`

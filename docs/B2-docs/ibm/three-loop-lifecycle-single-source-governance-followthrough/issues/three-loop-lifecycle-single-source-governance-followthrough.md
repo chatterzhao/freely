@@ -10,16 +10,16 @@
 - priority: `P0`
 - source_candidate: `docs/B1-docs/raw-20260419/candidates.md#c-20260419-0915-a`
 - source_brainstorm: `docs/B1-docs/raw-20260419/brainstorms.md`
-- reopen_of_issue: `docs/epics/workspace-routing-foundation/three-loops-sibling-relationship-and-terminal-governance/issues/three-loops-sibling-relationship-and-terminal-governance.md`
+- reopen_of_issue: `docs/B2-docs/ibm/three-loops-sibling-relationship-and-terminal-governance/issues/three-loops-sibling-relationship-and-terminal-governance.md`
 - reopen_reason: `the original three-loop model owner already completed, but this follow-on governance pass still needs to land the single detailed truth rule and consumer read/sync contract through a lawful protected-branch path`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/pre-tests.md`
-- tasks_path: `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/tasks.md`
+- pre_tests_path: `docs/B2-docs/ibm/three-loop-lifecycle-single-source-governance-followthrough/pre-tests.md`
+- tasks_path: `docs/B2-docs/ibm/three-loop-lifecycle-single-source-governance-followthrough/tasks.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-three-loop-lifecycle-single-source-governance-followthrough.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/three-loop-lifecycle-single-source-governance-followthrough/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/three-loops-sibling-relationship-and-terminal-governance/issues/three-loops-sibling-relationship-and-terminal-governance.md`
+  - `docs/B2-docs/ibm/three-loops-sibling-relationship-and-terminal-governance/issues/three-loops-sibling-relationship-and-terminal-governance.md`
   - `docs/system/workspace/three-loop-capability-lifecycle.md`
   - `docs/system/workspace/agents/manager-agent.md`
   - `docs/system/workspace/agents/lead-agent.md`
@@ -54,13 +54,13 @@ Because the earlier three-loop architecture owner is already `completed`, this g
 1. `docs/system/workspace/three-loop-capability-lifecycle.md` remains the only detailed whole-app lifecycle spec among the active truth files touched by this lane.
 2. `docs/PROJECT_INTENT.md`, `docs/LAWS.md`, and the touched agent/skill docs reference or defer to the canonical lifecycle doc instead of restating detailed loop semantics in parallel.
 3. The touched skill/agent docs state the consumer contract clearly enough that authors know to read and sync to the canonical lifecycle doc when they need loop semantics or when they update related behavior.
-4. `./bin/pretests-gate --project <worktree> --issue docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md` passes.
+4. `./bin/pretests-gate --project <worktree> --issue docs/B2-docs/ibm/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md` passes.
 5. `./bin/governance-check` passes.
 6. Guarded replay through `test-pre-merge-three-loop-governance-20260419` and then `develop` succeeds, followed by retirement of the temporary feature and test-pre-merge worktrees.
 
 ## Verification
 
-- `./bin/pretests-gate --project <worktree> --issue docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
+- `./bin/pretests-gate --project <worktree> --issue docs/B2-docs/ibm/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
 - `./bin/governance-check`
 - `git diff --check`
 - `rg -n "three-loop-capability-lifecycle|canonical lifecycle truth|read and sync" docs/PROJECT_INTENT.md docs/LAWS.md docs/system/workspace/three-loop-capability-lifecycle.md docs/system/workspace/agents docs/system/workspace/skills`
@@ -70,11 +70,11 @@ Because the earlier three-loop architecture owner is already `completed`, this g
 - `docs/B1-docs/raw-20260419/brainstorms.md`
 - `docs/B1-docs/raw-20260419/candidates.md`
 - `docs/milestones.md`
-- `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
-- `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/tasks.md`
+- `docs/B2-docs/ibm/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
+- `docs/B2-docs/ibm/three-loop-lifecycle-single-source-governance-followthrough/pre-tests.md`
+- `docs/B2-docs/ibm/three-loop-lifecycle-single-source-governance-followthrough/tasks.md`
 - `docs/progress/workspace-routing-foundation/p-three-loop-lifecycle-single-source-governance-followthrough.md`
-- `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/code-reviews/20260419-three-loop-lifecycle-single-source-followthrough-verification.md`
+- `docs/B2-docs/ibm/three-loop-lifecycle-single-source-governance-followthrough/code-reviews/20260419-three-loop-lifecycle-single-source-followthrough-verification.md`
 - `docs/PROJECT_INTENT.md`
 - `docs/LAWS.md`
 - `docs/system/workspace/three-loop-capability-lifecycle.md`

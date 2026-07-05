@@ -1,7 +1,7 @@
 # Verification: agent-execution-safety-review-and-security-decision-support
 
 - issue_id: `I-20260401-1308-A`
-- issue_path: `docs/epics/workspace-routing-foundation/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md`
+- issue_path: `docs/B2-docs/ibm/agent-execution-safety-review-and-security-decision-support/issues/agent-execution-safety-review-and-security-decision-support.md`
 - branch: `feature/security-capability-execution-boundary-audit-20260401-2230`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260401-2230-feature-security-capability-execution-boundary-audit`
 - verification_date: `2026-04-01`

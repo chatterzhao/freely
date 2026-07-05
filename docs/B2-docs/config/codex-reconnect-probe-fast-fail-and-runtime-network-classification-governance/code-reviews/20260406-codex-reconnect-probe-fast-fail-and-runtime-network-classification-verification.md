@@ -1,7 +1,7 @@
 # Verification: codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance
 
 - issue_id: `I-20260406-0901-A`
-- issue_path: `docs/epics/workspace-routing-foundation/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/issues/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
+- issue_path: `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/issues/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
 - verified_in_branch: `feature/codex-hi-fast-fail-and-runtime-availability`
 - verified_in_worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-codex-hi-fast-fail-and-runtime-availability`
 - verified_at: `2026-04-06`
@@ -25,7 +25,7 @@
 4. `bash docs/system/workspace/scripts/tests/test-ai-cli-switch-live-apikey-network-failure`
 5. `bash docs/system/workspace/scripts/tests/test-freely-execution-network-failure-classification`
 6. `bash docs/system/workspace/scripts/tests/test-freely-runtime-auth-failure-signal-filter`
-7. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-codex-hi-fast-fail-and-runtime-availability --issue docs/epics/workspace-routing-foundation/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/issues/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
+7. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-codex-hi-fast-fail-and-runtime-availability --issue docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/issues/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
 8. `./bin/governance-check`
 9. `git diff --check`
 

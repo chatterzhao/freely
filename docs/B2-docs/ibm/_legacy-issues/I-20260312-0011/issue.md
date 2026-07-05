@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO4U
     synced_at: '2026-04-27T13:13:48Z'
 primary_platform: github
-canonical_issue_path: docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/issues/backend-service-contract-and-adapter-taxonomy.md
+canonical_issue_path: docs/B2-docs/runtime/control-surface/issues/backend-service-contract-and-adapter-taxonomy.md
 last_synced_comment_at:
   github: '2026-04-27T11:12:23Z'
 hash: ''
@@ -36,7 +36,7 @@ platform_state: closed
 - source_brainstorm: `docs/B1-docs/raw-20260312/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- depends_on: `docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/issues/internal-frontend-backend-architecture-review.md`
+- depends_on: `docs/B2-docs/human/tui/issues/internal-frontend-backend-architecture-review.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "doc-ibm"}
 

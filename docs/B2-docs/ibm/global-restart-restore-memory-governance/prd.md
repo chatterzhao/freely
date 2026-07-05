@@ -98,5 +98,5 @@ source candidate 已经明确 global restart 不能成为 project force 的隐�
 ## Dev-Loop Handoff
 
 - keep `depends_on` on `I-20260327-2006-A`
-- implement against `docs/epics/workspace-routing-foundation/global-restart-restore-memory-governance/pre-tests.md`
+- implement against `docs/B2-docs/ibm/global-restart-restore-memory-governance/pre-tests.md`
 - write progress only after dev work starts

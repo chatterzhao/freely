@@ -1,7 +1,7 @@
 # Verification: ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance
 
 - issue_id: `I-20260405-1415-A`
-- issue_path: `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
+- issue_path: `docs/B2-docs/ibm/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md`
 - verification_date: `2026-04-08`
 - verifier: `codex`
 
@@ -15,7 +15,7 @@
 
 1. `./bin/governance-check`
 2. `git diff --check`
-3. `rg -n "phase_state|done_ibm|in_verification" docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md docs/milestones.md`
+3. `rg -n "phase_state|done_ibm|in_verification" docs/B2-docs/ibm/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/issues/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance.md docs/milestones.md`
 
 ## Implementation Decision Note
 

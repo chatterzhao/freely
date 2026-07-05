@@ -10,15 +10,15 @@
 - priority: P1
 - source_candidate: `docs/B1-docs/raw-20260404/candidates.md#c-20260404-0119-a`
 - source_brainstorm: `docs/B1-docs/raw-20260404/brainstorms.md`
-- reopen_of_issue: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md`
+- reopen_of_issue: `docs/B2-docs/ibm/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md`
 - reopen_reason: `real replay surfaced a parser regression where nested milestone queue item status lines overwrite parent milestone status inside governance-merge-gate`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/gate/governance-merge-gate-milestone-status-followthrough-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-governance-merge-gate-milestone-status-followthrough-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/governance-merge-gate-milestone-status-followthrough-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/gate/governance-merge-gate-milestone-status-followthrough-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md`
+  - `docs/B2-docs/ibm/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md`
   - `docs/system/workspace/scripts/quality/governance-merge-gate`
   - `docs/system/workspace/scripts/tests/test-governance-merge-gate`
 - session_refs:

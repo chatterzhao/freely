@@ -11,8 +11,8 @@
 - source_brainstorm: `docs/B1-docs/raw-20260401/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/pre-tests.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/code-reviews`
+- pre_tests_path: `docs/B2-docs/ibm/all-tools-unified-slot-contract-governance/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/ibm/all-tools-unified-slot-contract-governance/code-reviews`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -72,7 +72,7 @@ Ordered cross-tool fallback v1 is already in place, but Freely still lacks the f
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-non-codex-slot-first-then-cross-tool`
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-all-tools-unavailable-earliest-tool-slot`
 - `docs/system/workspace/scripts/tests/test-freely-ensure-manager-single-slot-failure-falls-through-to-cross-tool`
-- `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/code-reviews/20260401-all-tools-unified-slot-contract-verification.md`
+- `docs/B2-docs/ibm/all-tools-unified-slot-contract-governance/code-reviews/20260401-all-tools-unified-slot-contract-verification.md`
 - live validation on `develop`
 
 ## Next

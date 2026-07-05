@@ -12,11 +12,11 @@
 - source_brainstorm: `docs/B1-docs/raw-20260411/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/pre-tests.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/code-reviews`
+- pre_tests_path: `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/issues/pre-tests-evidence-binding-and-completion-gate-governance.md`
-  - `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
+  - `docs/B2-docs/ibm/pre-tests-evidence-binding-and-completion-gate-governance/issues/pre-tests-evidence-binding-and-completion-gate-governance.md`
+  - `docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -48,9 +48,9 @@
   - 先把 v2 schema 与 enforcement phase policy 定住，再局部接到 gate。
   - 兼容性优先，不能因为 schema 升级制造历史大回归。
 - required_doc_refs:
-  - `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/prd.md`
-  - `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/tasks.md`
+  - `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/prd.md`
+  - `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/pre-tests.md`
+  - `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/tasks.md`
   - `docs/system/workspace/scripts/quality/pretests-gate`
   - `docs/system/workspace/scripts/quality/governance-merge-gate`
   - `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`
@@ -58,12 +58,12 @@
 ## Completion
 
 - `docs/B1-docs/raw-20260411/candidates.md`
-- `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/issues/pretests-adequacy-item-schema-materialization-governance.md`
-- `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/brainstorms/b-pretests-adequacy-item-schema-materialization-governance.md`
-- `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/tasks.md`
-- `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/code-reviews/20260411-pretests-adequacy-item-schema-materialization-verification.md`
+- `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/issues/pretests-adequacy-item-schema-materialization-governance.md`
+- `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/brainstorms/b-pretests-adequacy-item-schema-materialization-governance.md`
+- `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/prd.md`
+- `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/pre-tests.md`
+- `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/tasks.md`
+- `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/code-reviews/20260411-pretests-adequacy-item-schema-materialization-verification.md`
 - `docs/progress/workspace-routing-foundation/p-pretests-adequacy-item-schema-materialization-governance.md`
 - `docs/system/workspace/scripts/quality/pretests-gate`
 - `docs/system/workspace/scripts/quality/governance-merge-gate`
@@ -84,7 +84,7 @@
 - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-pretests-gate`
 - `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
 - `./bin/test-lane premerge-integration -- ./bin/governance-check`
-- `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/code-reviews/20260411-pretests-adequacy-item-schema-materialization-verification.md`
+- `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/code-reviews/20260411-pretests-adequacy-item-schema-materialization-verification.md`
 
 ## Next
 

@@ -1,7 +1,7 @@
 # Progress: agents-cli-output-style-experiment-governance
 
 - issue_id: `I-20260405-cli-output-style-A`
-- issue_path: `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/issues/agents-cli-output-style-experiment-governance.md`
+- issue_path: `docs/B2-docs/config/packaging/issues/agents-cli-output-style-experiment-governance.md`
 - title: `AGENTS project entry and output style governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -28,8 +28,8 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-init-cc-config`
 - `bash docs/system/workspace/scripts/tests/test-freely-init-ai-default-precedence`
 - `git diff --check`
-- `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/code-reviews/20260405-agents-cli-output-style-experiment-governance-verification.md`
-- `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/code-reviews/20260405-agents-cli-output-style-canonical-closeout-verification.md`
+- `docs/B2-docs/config/packaging/code-reviews/20260405-agents-cli-output-style-experiment-governance-verification.md`
+- `docs/B2-docs/config/packaging/code-reviews/20260405-agents-cli-output-style-canonical-closeout-verification.md`
 - reviewed `AGENTS.md`
 - reviewed `docs/system/workspace/scripts/runtime/freely`
 - reviewed `docs/system/workspace/scripts/tests/test-freely-init-cc-config`

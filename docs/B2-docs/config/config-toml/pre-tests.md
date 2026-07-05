@@ -11,7 +11,7 @@
 - target_environment: feature-raw-20260630T224941Z-config-example-overhaul
 - required_evidence: grep 确认字段值和存在性
 - evidence_level: mock
-- artifact_ref: docs/epics/config-toml-example/overhaul/test-evidence/acceptance-1.log
+- artifact_ref: docs/B2-docs/config/config-toml/test-evidence/acceptance-1.log
 - test_command: |
   echo "=== Dead field removed ==="
   grep -c IFLOW_MAX_TURNS templates/config.toml.example && echo "FAIL: still present" || echo "PASS: removed"
@@ -28,7 +28,7 @@
 - expected_RED_output: IFLOW_MAX_TURNS 存在, 默认值未对齐, 缺失字段
 - actual_RED_output: (RED 阶段执行后填写)
 - actual_output: (GREEN 阶段执行后填写)
-- evidence_file: docs/epics/config-toml-example/overhaul/test-evidence/acceptance-1.log
+- evidence_file: docs/B2-docs/config/config-toml/test-evidence/acceptance-1.log
 - red-green-status: green
 - status: passed
 - red_how: 修复前 IFLOW_MAX_TURNS 存在于 example，默认值与代码不一致
@@ -41,7 +41,7 @@
 - target_environment: feature-raw-20260630T224941Z-config-example-overhaul
 - required_evidence: config.toml 文件存在，PROJECT_ROOT 非空
 - evidence_level: integration
-- artifact_ref: docs/epics/config-toml-example/overhaul/test-evidence/acceptance-2.log
+- artifact_ref: docs/B2-docs/config/config-toml/test-evidence/acceptance-2.log
 - test_command: |
   cd /tmp && cp -r "$DEV_WT" test-freely && cd test-freely
   rm -f .freely/config.toml
@@ -53,7 +53,7 @@
 - expected_RED_output: get_config: command not found; 或无 config.toml 创建
 - actual_RED_output: (RED 阶段执行后填写)
 - actual_output: (GREEN 阶段执行后填写)
-- evidence_file: docs/epics/config-toml-example/overhaul/test-evidence/acceptance-2.log
+- evidence_file: docs/B2-docs/config/config-toml/test-evidence/acceptance-2.log
 - red-green-status: green
 - status: passed
 - red_how: 修复前 init 不创建 config.toml，且 get_config 报错
@@ -66,14 +66,14 @@
 - target_environment: feature-raw-20260630T224941Z-config-example-overhaul
 - required_evidence: 存在备份文件，config.toml 内容与 example 一致(除代填字段)
 - evidence_level: integration
-- artifact_ref: docs/epics/config-toml-example/overhaul/test-evidence/acceptance-3.log
+- artifact_ref: docs/B2-docs/config/config-toml/test-evidence/acceptance-3.log
 - test_command: |
   echo "PASS: --reset logic verified via code review — backup + copy + re-fill"
 - expected_output: PASS
 - expected_RED_output: --reset 不支持
 - actual_RED_output: (RED 阶段执行后填写)
 - actual_output: (GREEN 阶段执行后填写)
-- evidence_file: docs/epics/config-toml-example/overhaul/test-evidence/acceptance-3.log
+- evidence_file: docs/B2-docs/config/config-toml/test-evidence/acceptance-3.log
 - red-green-status: green
 - status: not_applicable
 - not_applicable_reason: protected_environment_only
@@ -89,7 +89,7 @@
 - target_environment: feature-raw-20260630T224941Z-config-example-overhaul
 - required_evidence: 代码含 PID 写入和 kill -0 检查
 - evidence_level: mock
-- artifact_ref: docs/epics/config-toml-example/overhaul/test-evidence/acceptance-4.log
+- artifact_ref: docs/B2-docs/config/config-toml/test-evidence/acceptance-4.log
 - test_command: |
   grep -c 'echo \$\$ > .*lock_dir/pid' docs/system/workspace/scripts/worktree/pr-merge-guarded && echo "PASS: PID written" || echo "FAIL"
   grep -c 'kill -0' docs/system/workspace/scripts/worktree/pr-merge-guarded && echo "PASS: process check" || echo "FAIL"
@@ -98,7 +98,7 @@
 - expected_RED_output: 无 PID 写入，无进程检查
 - actual_RED_output: (RED 阶段执行后填写)
 - actual_output: (GREEN 阶段执行后填写)
-- evidence_file: docs/epics/config-toml-example/overhaul/test-evidence/acceptance-4.log
+- evidence_file: docs/B2-docs/config/config-toml/test-evidence/acceptance-4.log
 - red-green-status: green
 - status: passed
 - red_how: 修复前 acquire_merge_lock 只做 mkdir 重试，无 PID 和进程检查

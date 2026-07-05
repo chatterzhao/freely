@@ -12,11 +12,11 @@
 - source_brainstorm: `docs/B1-docs/raw-20260405/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/freely-product-architecture/worktree-helper-shell-source-compatibility-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/config/packaging/pre-tests.md`
 - progress_path: `docs/progress/freely-product-architecture/p-worktree-helper-shell-source-compatibility-governance.md`
-- verification_artifact_dir: `docs/epics/freely-product-architecture/worktree-helper-shell-source-compatibility-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/config/packaging/code-reviews`
 - depends_on:
-  - `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/issues/worktree-tool-boundary-bootstrap-governance.md`
+  - `docs/B2-docs/config/packaging/issues/worktree-tool-boundary-bootstrap-governance.md`
   - `AGENTS.md`
   - `docs/system/workspace/skills/branch-management/references/feature-worktree-flow.md`
   - `docs/system/workspace/scripts/worktree/wt-add`
@@ -72,13 +72,13 @@ Freely 已经把 worktree boundary、`wt-create`、`sync-tooling` 与 `post-chec
 - `docs/B1-docs/raw-20260405/brainstorms.md`
 - `docs/B1-docs/raw-20260405/candidates.md`
 - `docs/milestones.md`
-- `docs/epics/freely-product-architecture/worktree-helper-shell-source-compatibility-governance/issues/worktree-helper-shell-source-compatibility-governance.md`
-- `docs/epics/freely-product-architecture/worktree-helper-shell-source-compatibility-governance/brainstorms/b-worktree-helper-shell-source-compatibility-governance.md`
-- `docs/epics/freely-product-architecture/worktree-helper-shell-source-compatibility-governance/prd.md`
-- `docs/epics/freely-product-architecture/worktree-helper-shell-source-compatibility-governance/pre-tests.md`
-- `docs/epics/freely-product-architecture/worktree-helper-shell-source-compatibility-governance/tasks.md`
+- `docs/B2-docs/config/packaging/issues/worktree-helper-shell-source-compatibility-governance.md`
+- `docs/B2-docs/config/packaging/brainstorms/b-worktree-helper-shell-source-compatibility-governance.md`
+- `docs/B2-docs/config/packaging/prd.md`
+- `docs/B2-docs/config/packaging/pre-tests.md`
+- `docs/B2-docs/config/packaging/tasks.md`
 - `docs/progress/freely-product-architecture/p-worktree-helper-shell-source-compatibility-governance.md`
-- `docs/epics/freely-product-architecture/worktree-helper-shell-source-compatibility-governance/code-reviews/20260405-worktree-helper-shell-source-compatibility-verification.md`
+- `docs/B2-docs/config/packaging/code-reviews/20260405-worktree-helper-shell-source-compatibility-verification.md`
 - `bin/wt-add`
 - `bin/wt-enter`
 - `docs/system/workspace/scripts/tests/test-worktree-entry-flow`
@@ -95,5 +95,5 @@ Freely 已经把 worktree boundary、`wt-create`、`sync-tooling` 与 `post-chec
 ## Next
 
 - Completed on canonical `develop` via guarded merge `3e0c8b9`.
-- Verification is recorded in `docs/epics/freely-product-architecture/worktree-helper-shell-source-compatibility-governance/code-reviews/20260405-worktree-helper-shell-source-compatibility-verification.md`.
+- Verification is recorded in `docs/B2-docs/config/packaging/code-reviews/20260405-worktree-helper-shell-source-compatibility-verification.md`.
 - Reopen only if canonical `develop` again requires shell-specific workarounds for documented worktree helper commands, or if adjacent sourced worktree helpers prove to share the same contract break.

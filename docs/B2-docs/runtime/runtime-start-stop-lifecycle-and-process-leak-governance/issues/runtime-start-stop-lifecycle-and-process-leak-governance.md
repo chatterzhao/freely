@@ -13,14 +13,14 @@
 - source_brainstorm: `docs/B1-docs/raw-20260417/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/pre-tests.md`
-- tasks_path: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/tasks.md`
+- pre_tests_path: `docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/pre-tests.md`
+- tasks_path: `docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/tasks.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-runtime-start-stop-lifecycle-and-process-leak-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/issues/runtime-startup-authority-and-readiness-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/issues/runtime-concurrent-start-stop-followthrough-governance.md`
-  - `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/issues/foreground-background-runtime-entrypoint-semantics-governance.md`
+  - `docs/B2-docs/runtime/runtime-startup-authority-and-readiness-governance/issues/runtime-startup-authority-and-readiness-governance.md`
+  - `docs/B2-docs/runtime/runtime-concurrent-start-stop-followthrough-governance/issues/runtime-concurrent-start-stop-followthrough-governance.md`
+  - `docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/issues/foreground-background-runtime-entrypoint-semantics-governance.md`
 - created_at: `2026-04-18`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}

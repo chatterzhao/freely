@@ -53,25 +53,25 @@
 - requirement: `After a real failure, automatic recovery skips the failed current slot and probes later saved slots with real exec truth.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/codex-real-exec-switch-and-after-failure-recovery-governance/code-reviews/20260410-codex-real-exec-switch-and-after-failure-recovery-verification.md`
+- artifact_ref: `docs/B2-docs/config/codex-real-exec-switch-and-after-failure-recovery-governance/code-reviews/20260410-codex-real-exec-switch-and-after-failure-recovery-verification.md`
 
 ### Slot-local network failures fast-fail and continue
 - id: `AT-002`
 - requirement: `Slot-local network or certificate failures kill the current test child promptly so the next saved slot can be tried.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/codex-real-exec-switch-and-after-failure-recovery-governance/code-reviews/20260410-codex-real-exec-switch-and-after-failure-recovery-verification.md`
+- artifact_ref: `docs/B2-docs/config/codex-real-exec-switch-and-after-failure-recovery-governance/code-reviews/20260410-codex-real-exec-switch-and-after-failure-recovery-verification.md`
 
 ### Manual switch keeps full-sweep semantics
 - id: `AT-003`
 - requirement: `Manual bin-ai switch codex sweeps saved slots and does not blindly skip the current slot.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/codex-real-exec-switch-and-after-failure-recovery-governance/code-reviews/20260410-codex-real-exec-switch-and-after-failure-recovery-verification.md`
+- artifact_ref: `docs/B2-docs/config/codex-real-exec-switch-and-after-failure-recovery-governance/code-reviews/20260410-codex-real-exec-switch-and-after-failure-recovery-verification.md`
 
 ### Real command surface is restored after testing
 - id: `AT-004`
 - requirement: `Real bin-ai command validation restores the original live auth and leaves no residual temporary slots or lingering runtime children.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/codex-real-exec-switch-and-after-failure-recovery-governance/code-reviews/20260410-codex-real-exec-switch-and-after-failure-recovery-verification.md`
+- artifact_ref: `docs/B2-docs/config/codex-real-exec-switch-and-after-failure-recovery-governance/code-reviews/20260410-codex-real-exec-switch-and-after-failure-recovery-verification.md`

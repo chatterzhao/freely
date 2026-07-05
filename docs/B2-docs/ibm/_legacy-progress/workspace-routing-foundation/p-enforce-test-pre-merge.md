@@ -1,7 +1,7 @@
 # Progress: enforce-test-pre-merge
 
 - issue_id: `I-20260503T0915Z-enforce-test-pre-merge`
-- issue_path: `docs/epics/test-pre-merge-enforcement/issues/I-20260503T0915Z-enforce-test-pre-merge.md`
+- issue_path: `docs/B2-docs/test-pre-merge-enforcement/issues/I-20260503T0915Z-enforce-test-pre-merge.md`
 - title: `Enforce test-pre-merge gate for ALL develop-bound merges`
 - phase_state: `in_dev`
 - milestone: `M-20260306-workspace-routing-foundation`

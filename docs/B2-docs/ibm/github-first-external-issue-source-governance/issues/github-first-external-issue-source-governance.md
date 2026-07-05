@@ -12,13 +12,13 @@
 - source_brainstorm: `docs/B1-docs/raw-20260407/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/pre-tests.md`
-- tasks_path: `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/tasks.md`
+- pre_tests_path: `docs/B2-docs/ibm/github-first-external-issue-source-governance/pre-tests.md`
+- tasks_path: `docs/B2-docs/ibm/github-first-external-issue-source-governance/tasks.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-github-first-external-issue-source-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/github-first-external-issue-source-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/source-routing-and-derived-worktree-governance/issues/source-routing-and-derived-worktree-governance.md`
-  - `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
+  - `docs/B2-docs/ibm/source-routing-and-derived-worktree-governance/issues/source-routing-and-derived-worktree-governance.md`
+  - `docs/B2-docs/ibm/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
   - `docs/system/workspace/skills/context-source-skill/SKILL.md`
 - created_at: `2026-04-20`
 - session_refs:
@@ -70,10 +70,10 @@ This owner freezes the GitHub-first contract and lands the first consumer-facing
 - required_doc_refs:
   - `docs/B1-docs/raw-20260407/brainstorms.md`
   - `docs/B1-docs/raw-20260407/candidates.md`
-  - `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/brainstorms/b-github-first-external-issue-source-governance.md`
-  - `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/prd.md`
-  - `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/tasks.md`
+  - `docs/B2-docs/ibm/github-first-external-issue-source-governance/brainstorms/b-github-first-external-issue-source-governance.md`
+  - `docs/B2-docs/ibm/github-first-external-issue-source-governance/prd.md`
+  - `docs/B2-docs/ibm/github-first-external-issue-source-governance/pre-tests.md`
+  - `docs/B2-docs/ibm/github-first-external-issue-source-governance/tasks.md`
   - `docs/system/workspace/skills/context-source-skill/SKILL.md`
   - `docs/system/workspace/skills/context-source-skill/references/source-classification.md`
   - `docs/system/workspace/scripts/compose-context-source-prompt.sh`
@@ -84,20 +84,20 @@ This owner freezes the GitHub-first contract and lands the first consumer-facing
 - `bash docs/system/workspace/scripts/tests/test-human-chat-routing`
 - `./bin/governance-check`
 - `git diff --check`
-- `rg -n "external issue|source_consumption_state|publication_mode|canonical repo-native linkage" docs/B1-docs/raw-20260407-1042 docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance docs/system/workspace/skills/context-source-skill docs/system/workspace/agents/lead-agent.md docs/system/workspace/scripts/start-lead-agent.sh`
+- `rg -n "external issue|source_consumption_state|publication_mode|canonical repo-native linkage" docs/B1-docs/raw-20260407-1042 docs/B2-docs/git-worktree/github-first-external-issue-source-governance docs/system/workspace/skills/context-source-skill docs/system/workspace/agents/lead-agent.md docs/system/workspace/scripts/start-lead-agent.sh`
 
 ## Completion
 
 - `docs/B1-docs/raw-20260407/brainstorms.md`
 - `docs/B1-docs/raw-20260407/candidates.md`
 - `docs/milestones.md`
-- `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/issues/github-first-external-issue-source-governance.md`
-- `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/brainstorms/b-github-first-external-issue-source-governance.md`
-- `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/tasks.md`
-- `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/code-reviews/20260420-github-first-external-issue-source-governance-decision.md`
-- `docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance/code-reviews/20260420-github-first-external-issue-source-governance-verification.md`
+- `docs/B2-docs/ibm/github-first-external-issue-source-governance/issues/github-first-external-issue-source-governance.md`
+- `docs/B2-docs/ibm/github-first-external-issue-source-governance/brainstorms/b-github-first-external-issue-source-governance.md`
+- `docs/B2-docs/ibm/github-first-external-issue-source-governance/prd.md`
+- `docs/B2-docs/ibm/github-first-external-issue-source-governance/pre-tests.md`
+- `docs/B2-docs/ibm/github-first-external-issue-source-governance/tasks.md`
+- `docs/B2-docs/ibm/github-first-external-issue-source-governance/code-reviews/20260420-github-first-external-issue-source-governance-decision.md`
+- `docs/B2-docs/ibm/github-first-external-issue-source-governance/code-reviews/20260420-github-first-external-issue-source-governance-verification.md`
 - `docs/progress/workspace-routing-foundation/p-github-first-external-issue-source-governance.md`
 - `docs/system/workspace/skills/context-source-skill/SKILL.md`
 - `docs/system/workspace/skills/context-source-skill/references/source-classification.md`

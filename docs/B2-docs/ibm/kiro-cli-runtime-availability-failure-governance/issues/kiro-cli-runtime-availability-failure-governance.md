@@ -12,11 +12,11 @@
 - source_brainstorm: `docs/B1-docs/raw-20260331/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/kiro-cli-runtime-availability-failure-governance/pre-tests.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/kiro-cli-runtime-availability-failure-governance/code-reviews`
+- pre_tests_path: `docs/B2-docs/ibm/kiro-cli-runtime-availability-failure-governance/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/ibm/kiro-cli-runtime-availability-failure-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
-  - `docs/epics/workspace-routing-foundation/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/issues/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance.md`
+  - `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+  - `docs/B2-docs/ibm/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/issues/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -61,11 +61,11 @@ The minimal correct owner is therefore narrow:
 
 ## Completion
 
-- `docs/epics/workspace-routing-foundation/kiro-cli-runtime-availability-failure-governance/issues/kiro-cli-runtime-availability-failure-governance.md`
-- `docs/epics/workspace-routing-foundation/kiro-cli-runtime-availability-failure-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/kiro-cli-runtime-availability-failure-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/kiro-cli-runtime-availability-failure-governance/tasks.md`
-- `docs/epics/workspace-routing-foundation/kiro-cli-runtime-availability-failure-governance/code-reviews/20260331-kiro-cli-runtime-availability-verification.md`
+- `docs/B2-docs/ibm/kiro-cli-runtime-availability-failure-governance/issues/kiro-cli-runtime-availability-failure-governance.md`
+- `docs/B2-docs/ibm/kiro-cli-runtime-availability-failure-governance/prd.md`
+- `docs/B2-docs/ibm/kiro-cli-runtime-availability-failure-governance/pre-tests.md`
+- `docs/B2-docs/ibm/kiro-cli-runtime-availability-failure-governance/tasks.md`
+- `docs/B2-docs/ibm/kiro-cli-runtime-availability-failure-governance/code-reviews/20260331-kiro-cli-runtime-availability-verification.md`
 - `docs/progress/workspace-routing-foundation/p-kiro-cli-runtime-availability-failure-governance.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-kiro-availability-failures-defer-to-control-plane`

@@ -12,8 +12,8 @@
 - source_brainstorm: `docs/B1-docs/raw-20260321/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/develop-merge-issue-binding-and-cmi-governance/pre-tests.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/develop-merge-issue-binding-and-cmi-governance/code-reviews`
+- pre_tests_path: `docs/B2-docs/ibm/develop-merge-issue-binding-and-cmi-governance/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/ibm/develop-merge-issue-binding-and-cmi-governance/code-reviews`
 - depends_on:
   - `docs/system/workspace/scripts/quality/governance-merge-gate`
   - `docs/system/workspace/hooks/pre-merge-commit.sh`
@@ -94,20 +94,20 @@
 
 ## Implementation References
 
-- `docs/epics/workspace-routing-foundation/develop-merge-issue-binding-and-cmi-governance/brainstorms/b-develop-merge-issue-binding-and-cmi-governance.md`
-- `docs/epics/workspace-routing-foundation/develop-merge-issue-binding-and-cmi-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/develop-merge-issue-binding-and-cmi-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/develop-merge-issue-binding-and-cmi-governance/tasks.md`
+- `docs/B2-docs/ibm/develop-merge-issue-binding-and-cmi-governance/brainstorms/b-develop-merge-issue-binding-and-cmi-governance.md`
+- `docs/B2-docs/ibm/develop-merge-issue-binding-and-cmi-governance/prd.md`
+- `docs/B2-docs/ibm/develop-merge-issue-binding-and-cmi-governance/pre-tests.md`
+- `docs/B2-docs/ibm/develop-merge-issue-binding-and-cmi-governance/tasks.md`
 - `docs/system/workspace/scripts/quality/governance-merge-gate`
 - `docs/system/workspace/hooks/pre-merge-commit.sh`
 
 ## Completion
 
-- `docs/epics/workspace-routing-foundation/develop-merge-issue-binding-and-cmi-governance/issues/develop-merge-issue-binding-and-cmi-governance.md`
-- `docs/epics/workspace-routing-foundation/develop-merge-issue-binding-and-cmi-governance/brainstorms/b-develop-merge-issue-binding-and-cmi-governance.md`
-- `docs/epics/workspace-routing-foundation/develop-merge-issue-binding-and-cmi-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/develop-merge-issue-binding-and-cmi-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/develop-merge-issue-binding-and-cmi-governance/tasks.md`
+- `docs/B2-docs/ibm/develop-merge-issue-binding-and-cmi-governance/issues/develop-merge-issue-binding-and-cmi-governance.md`
+- `docs/B2-docs/ibm/develop-merge-issue-binding-and-cmi-governance/brainstorms/b-develop-merge-issue-binding-and-cmi-governance.md`
+- `docs/B2-docs/ibm/develop-merge-issue-binding-and-cmi-governance/prd.md`
+- `docs/B2-docs/ibm/develop-merge-issue-binding-and-cmi-governance/pre-tests.md`
+- `docs/B2-docs/ibm/develop-merge-issue-binding-and-cmi-governance/tasks.md`
 - `docs/progress/workspace-routing-foundation/p-develop-merge-issue-binding-and-cmi-governance.md`
 - `docs/system/workspace/scripts/quality/governance-merge-gate`
 - `docs/system/workspace/scripts/tests/test-governance-merge-gate`
@@ -125,5 +125,5 @@
 
 - `2026-03-30 16:41 PDT` the strengthened gate landed on `develop` as commit `5e3ec97`.
 - Follow-on runtime closeout replay then proved the new boundary in real use: initial merge attempts were blocked for completed-owner and absorbed-candidate misuse, and the corrected same-line execution-owner merge passed as `544e1dd`.
-- Canonical verification truth is now `docs/epics/workspace-routing-foundation/develop-merge-issue-binding-and-cmi-governance/code-reviews/20260330-develop-merge-cmi-gate-verification.md`.
+- Canonical verification truth is now `docs/B2-docs/ibm/develop-merge-issue-binding-and-cmi-governance/code-reviews/20260330-develop-merge-cmi-gate-verification.md`.
 - Future regressions that bypass owner issue binding, same-line `C/M/I`, execution-phase ownership, or same-line progress/review must reopen as new lifecycle work instead of mutating this completed owner.

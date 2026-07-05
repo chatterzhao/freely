@@ -1,7 +1,7 @@
 # Verification: structured-closeout-gate-context-and-review-evidence-governance
 
 - issue_id: `I-20260412-0225-A`
-- issue_path: `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md`
+- issue_path: `docs/B2-docs/ibm/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md`
 - verification_date: `2026-04-12`
 - verifier: `codex`
 

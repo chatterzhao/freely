@@ -28,5 +28,5 @@ feature/three-loop-state-closeout-20260428 → test-pre-merge-three-loop-closeou
 ## Owner Issue
 
 - issue_id: I-20260419-0915-A
-- issue_path: docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md
+- issue_path: docs/B2-docs/ibm/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md
 - source_candidate: docs/B1-docs/raw-20260419/candidates.md#c-20260419-0915-a

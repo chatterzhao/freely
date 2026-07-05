@@ -14,7 +14,7 @@
 - priority: `P0`
 - status: `completed`
 - decision_reason: day-1 bridge 候选已经 materialize 为正式 owner，并由 `I-20260317-0332` 完成 canonical closeout。当前 candidate 仅保留为来源 provenance，不再代表活跃待办。
-- promoted_issue_path: `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/issues/rust-tauri-probe-bridge-v1.md`
+- promoted_issue_path: `docs/B2-docs/human/tui/issues/rust-tauri-probe-bridge-v1.md`
 - milestone: `M-20260308-frontend-probe-dogfooding-loop`
 - next_action: 保留为历史来源记录。若未来要扩展 beyond day-1 subset 的 bridge transport、事件面或宿主集成，应从当前 canonical truth 新开 candidate/issue，而不是恢复这条 candidate。
 - completion_note: `I-20260317-0332` 已完成 canonical closeout；真实宿主启动验证与最小 `Transport=tauri` 闭环已吸收到 `develop`，因此该 candidate 不再构成活跃 queue。

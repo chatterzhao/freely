@@ -12,13 +12,13 @@
 - source_brainstorm: `docs/B1-docs/raw-20260419/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- prd_path: `docs/epics/workspace-routing-foundation/protected-branch-ref-only-entrypoint-enforcement-governance/prd.md`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/protected-branch-ref-only-entrypoint-enforcement-governance/pre-tests.md`
-- tasks_path: `docs/epics/workspace-routing-foundation/protected-branch-ref-only-entrypoint-enforcement-governance/tasks.md`
+- prd_path: `docs/B2-docs/ibm/protected-branch-ref-only-entrypoint-enforcement-governance/prd.md`
+- pre_tests_path: `docs/B2-docs/ibm/protected-branch-ref-only-entrypoint-enforcement-governance/pre-tests.md`
+- tasks_path: `docs/B2-docs/ibm/protected-branch-ref-only-entrypoint-enforcement-governance/tasks.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-protected-branch-ref-only-entrypoint-enforcement-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/protected-branch-ref-only-entrypoint-enforcement-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/protected-branch-ref-only-entrypoint-enforcement-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/develop-guarded-merge-entrypoint-enforcement-governance/issues/develop-guarded-merge-entrypoint-enforcement-governance.md`
+  - `docs/B2-docs/ibm/develop-guarded-merge-entrypoint-enforcement-governance/issues/develop-guarded-merge-entrypoint-enforcement-governance.md`
   - `docs/system/workspace/hooks/reference-transaction.sh`
   - `.githooks/reference-transaction`
   - `docs/system/workspace/scripts/tests/test-reference-transaction-hook`

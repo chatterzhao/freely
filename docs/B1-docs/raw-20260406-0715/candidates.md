@@ -6,7 +6,7 @@
 - title: `Codex live auth identity reconciliation and probe timeout boundary`
 - status: `absorbed`
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+- promoted_issue_path: `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
 - promoted_issue_id: `I-20260405-0027-A`
 - source_brainstorm: `docs/B1-docs/raw-20260406-0715/brainstorms.md`
 - session_refs:

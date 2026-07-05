@@ -40,7 +40,7 @@
 - milestone: `M-20260326-freely-product-architecture`
 - source_brainstorm: `docs/B1-docs/raw-20260405-2302/brainstorms.md`
 - promoted_issue_id: `I-20260405-2302-A`
-- promoted_issue_path: `docs/epics/freely-product-architecture/worktree-helper-shell-source-compatibility-governance/issues/worktree-helper-shell-source-compatibility-governance.md`
+- promoted_issue_path: `docs/B2-docs/config/packaging/issues/worktree-helper-shell-source-compatibility-governance.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`

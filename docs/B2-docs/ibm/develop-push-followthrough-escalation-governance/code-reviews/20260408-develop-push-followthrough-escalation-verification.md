@@ -1,7 +1,7 @@
 # Verification: develop-push-followthrough-escalation-governance
 
 - issue_id: `I-20260408-1200-A`
-- issue_path: `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md`
+- issue_path: `docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md`
 - verification_date: `2026-04-08`
 - verifier: `codex`
 

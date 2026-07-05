@@ -1,7 +1,7 @@
 # Verification: implementation-decision-notes-in-review-artifacts-governance
 
 - issue_id: `I-20260401-2354-A`
-- issue_path: `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/issues/implementation-decision-notes-in-issue-review-artifacts-governance.md`
+- issue_path: `docs/B2-docs/ibm/implementation-decision-notes-in-issue-review-artifacts-governance/issues/implementation-decision-notes-in-issue-review-artifacts-governance.md`
 - branch: `feature/review-decision-notes-governance-20260401-2354`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260401-2354-feature-review-decision-notes-governance`
 - verification_date: `2026-04-01`
@@ -36,7 +36,7 @@
 - gate_commit: `cdb8278`
 - proof_owner: `I-20260402-0540-A`
 - proof_merge_commit: `5537a7e`
-- proof_artifact: `docs/epics/workspace-routing-foundation/runtime-loop-log-timezone-label-followthrough-governance/code-reviews/20260402-runtime-loop-log-timezone-label-followthrough-verification.md`
+- proof_artifact: `docs/B2-docs/runtime/runtime-loop-log-timezone-label-followthrough-governance/code-reviews/20260402-runtime-loop-log-timezone-label-followthrough-verification.md`
 - proof_verdict:
   - post-gate develop-bound implementation lane carried a complete `Implementation Decision Note`
   - required fields `decision`, `why_this`, `alternatives_considered`, `boundary_non_goals`, and `residual_risk` are all present in the proof artifact

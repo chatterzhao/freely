@@ -1,7 +1,7 @@
 # Verification: runtime-daemon-self-loop-followthrough-governance manager exit-contract repair prompt narrowing
 
 - issue_id: `I-20260421-1200-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
 - verification_date: `2026-04-25`
 - verifier: `codex`
 - source_branch: `feature/manager-exit-contract-prompt-narrowing-20260425`
@@ -32,7 +32,7 @@
   4. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-worker-repair-prompt-prioritizes-exit-contract`
   5. `./bin/test-lane premerge-integration -- bash docs/system/workspace/scripts/tests/test-freely-manager-consumed-continuity-resume-focus`
   6. `./bin/test-lane premerge-integration -- ./bin/governance-check`
-  7. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260425-test-pre-merge-manager-exit-contract-prompt-narrowing --issue docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge`
+  7. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260425-test-pre-merge-manager-exit-contract-prompt-narrowing --issue docs/B2-docs/runtime/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md --require-adequacy --target-lane premerge-integration --promotion-gate develop_merge`
 - `PENDING`: canonical `develop` daemon acceptance remains open. This repair is not complete until the merged root replay shows the next manager repair/fresh-with-handoff round producing continuity + exit contract and Freely continuing toward select -> finish -> merge upward -> retire -> next task.
 
 ## Implementation Decision Note

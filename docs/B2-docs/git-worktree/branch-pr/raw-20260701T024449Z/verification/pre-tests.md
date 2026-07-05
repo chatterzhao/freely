@@ -11,13 +11,13 @@
 - target_environment: test-pre-merge-20260701T024449Z-review-guide-unbound
 - required_evidence: grep 输出
 - evidence_level: integration
-- artifact_ref: docs/epics/pr-review-guarded/review-guide-unbound/raw-20260701T024449Z/verification/acceptance-1.log
+- artifact_ref: docs/B2-docs/git-worktree/branch-pr/raw-20260701T024449Z/verification/acceptance-1.log
 - test_command: grep -c '_review_guide' bin/pr-review-guarded; test $? -eq 1
 - expected_output: exit code 1 (no match — _review_guide no longer referenced)
 - expected_RED_output: grep 匹配到 1 处 `_review_guide` 引用且无定义
 - actual_RED_output: grep 确认 L506 引用 _review_guide，脚本中无定义 — RED 确认
 - actual_output: grep 返回 1（无匹配），_review_guide 已移除
-- evidence_file: docs/epics/pr-review-guarded/review-guide-unbound/raw-20260701T024449Z/verification/acceptance-1.log
+- evidence_file: docs/B2-docs/git-worktree/branch-pr/raw-20260701T024449Z/verification/acceptance-1.log
 - red-green-status: green
 - status: passed
 - blocker: (失败时填写)
@@ -31,13 +31,13 @@
 - target_environment: test-pre-merge-20260701T024449Z-review-guide-unbound
 - required_evidence: 源代码行验证
 - evidence_level: integration
-- artifact_ref: docs/epics/pr-review-guarded/review-guide-unbound/raw-20260701T024449Z/verification/acceptance-2.log
+- artifact_ref: docs/B2-docs/git-worktree/branch-pr/raw-20260701T024449Z/verification/acceptance-2.log
 - test_command: grep 'skill:freely-tdd-review' bin/pr-review-guarded
 - expected_output: L506 包含 `skill:freely-tdd-review`
 - expected_RED_output: L506 包含 `$_review_guide` 变量引用
 - actual_RED_output: grep 确认 L506 引用 _review_guide，脚本中无定义 — RED 确认
 - actual_output: grep 确认 L506 为字符串字面量 skill:freely-tdd-review
-- evidence_file: docs/epics/pr-review-guarded/review-guide-unbound/raw-20260701T024449Z/verification/acceptance-2.log
+- evidence_file: docs/B2-docs/git-worktree/branch-pr/raw-20260701T024449Z/verification/acceptance-2.log
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -56,7 +56,7 @@
 - expected_output: PASS (语法正确)
 - status: passed
 - actual_output: bash -n 语法检查通过
-- evidence_file: docs/epics/pr-review-guarded/review-guide-unbound/raw-20260701T024449Z/verification/acceptance-1.log
+- evidence_file: docs/B2-docs/git-worktree/branch-pr/raw-20260701T024449Z/verification/acceptance-1.log
 
 ## Integration
 - acceptance_target: set -euo pipefail 下脚本不因 _review_guide crash

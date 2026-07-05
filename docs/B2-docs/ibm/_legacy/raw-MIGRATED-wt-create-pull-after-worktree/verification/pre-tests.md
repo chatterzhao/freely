@@ -39,4 +39,4 @@
 - promotion_gate: develop_merge
 - evidence_level: integration
 ^- status: passed
-- artifact_ref: docs/epics/wt-create-pull-after-worktree/code-reviews/review.md
+- artifact_ref: docs/B2-docs/wt-create-pull-after-worktree/code-reviews/review.md

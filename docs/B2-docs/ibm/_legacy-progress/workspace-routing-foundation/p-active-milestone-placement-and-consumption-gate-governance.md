@@ -6,7 +6,7 @@
 - runtime_state: `stopped`
 - branch: `feature/milestone-placement-merge-gate-followup-20260331`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260331-feature-milestone-placement-merge-gate-followup`
-- issue_path: `docs/epics/workspace-routing-foundation/active-milestone-placement-and-consumption-gate-governance/issues/active-milestone-placement-and-consumption-gate-governance.md`
+- issue_path: `docs/B2-docs/ibm/active-milestone-placement-and-consumption-gate-governance/issues/active-milestone-placement-and-consumption-gate-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "dev-loop-closeout"}
 
@@ -28,4 +28,4 @@
   - `merge_commits: 79f8bba, b279330, 8972f7c`
   - `tests: bash docs/system/workspace/scripts/tests/test-governance-check-candidate-v2 && bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
   - `governance: ./bin/governance-check`
-  - `review: docs/epics/workspace-routing-foundation/active-milestone-placement-and-consumption-gate-governance/code-reviews/20260331-active-milestone-placement-gate-verification.md`
+  - `review: docs/B2-docs/ibm/active-milestone-placement-and-consumption-gate-governance/code-reviews/20260331-active-milestone-placement-gate-verification.md`

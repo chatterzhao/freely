@@ -18,11 +18,11 @@
 - priority: P0
 - status: dropped
 - decision_reason: 这轮不新开独立 issue；直接作为 candidate lifecycle honesty 修复落到当前 sweep，并由已有 `candidate-acceptance-review-governance` 与 `milestone-planning-and-state-maintenance` 真源吸收。
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/candidate-acceptance-review-governance/issues/candidate-acceptance-review-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/candidate-acceptance-review-governance/issues/candidate-acceptance-review-governance.md`
 - milestone: `M-20260306-workspace-routing-foundation`
 - superseded_by:
-  - `docs/epics/workspace-routing-foundation/candidate-acceptance-review-governance/issues/candidate-acceptance-review-governance.md`
-  - `docs/epics/workspace-routing-foundation/milestone-planning-and-state-maintenance/issues/milestone-planning-and-state-maintenance.md`
+  - `docs/B2-docs/ibm/candidate-acceptance-review-governance/issues/candidate-acceptance-review-governance.md`
+  - `docs/B2-docs/ibm/milestone-planning-and-state-maintenance/issues/milestone-planning-and-state-maintenance.md`
 - session_refs:
   - tool: codex
   - session_id: current-thread

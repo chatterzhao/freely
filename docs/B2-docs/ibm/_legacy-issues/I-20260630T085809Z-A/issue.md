@@ -3,15 +3,15 @@
 - phase_state: completed
 - milestone: M-20260630T085809Z-A
 - source_candidate: docs/B1-docs/raw-20260630T085809Z/candidates.md#C-20260630T085809Z-A
-- verification_artifact_dir: docs/epics/a2a-healthcheck-fix/socket-healthcheck/code-reviews
-- pre_tests_path: docs/epics/a2a-healthcheck-fix/socket-healthcheck/pre-tests.md
+- verification_artifact_dir: docs/B2-docs/a2a/protocol-health/code-reviews
+- pre_tests_path: docs/B2-docs/a2a/protocol-health/pre-tests.md
 - canonical_issue_path: ""
 - title: 修复 A2A Server 健康检查协议错误、日志轰炸、Shell 注入、超时和日志格式
 
 # I-20260630T085809Z-A: A2A Server 健康检查修复
 
 - source_candidate: docs/B1-docs/raw-20260630T085809Z/candidates.md#C-20260630T085809Z-A
-- verification_artifact_dir: docs/epics/a2a-healthcheck-fix/socket-healthcheck/code-reviews
+- verification_artifact_dir: docs/B2-docs/a2a/protocol-health/code-reviews
 
 ## 实现
 修复 5 个互联的 A2A Server 启动期 bug：

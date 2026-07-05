@@ -12,13 +12,13 @@
 - source_brainstorm: `docs/B1-docs/raw-20260405/brainstorms.md`
 - execution_base: `feature/cli-command-audit-20260406-0015`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/cli-wrapper-packaging-and-regression-surface-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/config/cli-wrapper-packaging-and-regression-surface-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-cli-wrapper-packaging-and-regression-surface-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/cli-wrapper-packaging-and-regression-surface-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/config/cli-wrapper-packaging-and-regression-surface-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/issues/project-command-semantics-and-restore-work-governance.md`
-  - `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
-  - `docs/epics/freely-product-architecture/worktree-helper-shell-source-compatibility-governance/issues/worktree-helper-shell-source-compatibility-governance.md`
+  - `docs/B2-docs/ibm/project-command-semantics-and-restore-work-governance/issues/project-command-semantics-and-restore-work-governance.md`
+  - `docs/B2-docs/config/codex-apikey-slot-bundle-and-provider-aware-probe-governance/issues/codex-apikey-slot-bundle-and-provider-aware-probe-governance.md`
+  - `docs/B2-docs/config/packaging/issues/worktree-helper-shell-source-compatibility-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 

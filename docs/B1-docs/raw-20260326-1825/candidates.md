@@ -6,7 +6,7 @@
 - status: `candidate`
 - adoption_type: `planning_truth`
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/deep-refactor-fleet-sequencing-governance/issues/deep-refactor-fleet-sequencing-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/deep-refactor-fleet-sequencing-governance/issues/deep-refactor-fleet-sequencing-governance.md`
 - legacy_id_mapping: I-20260326-1915  # 历史遗留的 issue id
 - session_refs:
   - tool: `codex`

@@ -19,12 +19,12 @@ intake_id: ''
 author: platform
 channel: github
 session_refs: []
-pre_tests_path: docs/epics/timestamp-seconds-upgrade/verification/pre-tests.md
+pre_tests_path: docs/B2-docs/timestamp-seconds-upgrade/verification/pre-tests.md
 verification_artifact_dir: docs/epics/timestamp-seconds-upgrade/code-reviews
 platform_state: closed
 ---
 
-- pre_tests_path: docs/epics/timestamp-seconds-upgrade/verification/pre-tests.md
+- pre_tests_path: docs/B2-docs/timestamp-seconds-upgrade/verification/pre-tests.md
 - verification_artifact_dir: docs/epics/timestamp-seconds-upgrade/code-reviews
 
 ## 问题

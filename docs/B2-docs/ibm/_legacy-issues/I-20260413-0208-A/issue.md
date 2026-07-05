@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO9U
     synced_at: '2026-04-27T13:17:13Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/issues/foreground-background-runtime-entrypoint-semantics-governance.md
+canonical_issue_path: docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/issues/foreground-background-runtime-entrypoint-semantics-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:27:07Z'
 hash: ''
@@ -30,4 +30,4 @@ Freely 当前的产品心智与运行时入口 contract 仍存在一条会误导
 3. 现有测试已经把 `start/restart/stop/status` 锁成前台/控制面 contract，不能静默改成后台
 4. 若不先冻结 foreground/background/UI close/state truth 的边界，后续实现极易把入口语义变更、daemon 引入、恢复链回归混成一次高风险改动
 
-canonical: docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/issues/foreground-background-runtime-entrypoint-semantics-governance.md
+canonical: docs/B2-docs/ibm/foreground-background-runtime-entrypoint-semantics-governance/issues/foreground-background-runtime-entrypoint-semantics-governance.md

@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO6C
     synced_at: '2026-04-27T13:14:44Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/manager-delegation-after-sufficient-patrol-evidence-governance/issues/manager-delegation-after-sufficient-patrol-evidence-governance.md
+canonical_issue_path: docs/B2-docs/ibm/manager-delegation-after-sufficient-patrol-evidence-governance/issues/manager-delegation-after-sufficient-patrol-evidence-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:16:31Z'
 hash: ''
@@ -43,4 +43,4 @@ platform_state: closed
 
 的硬性治理语义。
 
-canonical: docs/epics/workspace-routing-foundation/manager-delegation-after-sufficient-patrol-evidence-governance/issues/manager-delegation-after-sufficient-patrol-evidence-governance.md
+canonical: docs/B2-docs/ibm/manager-delegation-after-sufficient-patrol-evidence-governance/issues/manager-delegation-after-sufficient-patrol-evidence-governance.md

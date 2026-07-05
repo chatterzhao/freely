@@ -1,7 +1,7 @@
 # Verification: manager-bootstrap-prompt-publication-without-continuity-materialization-governance
 
 - issue_id: `I-20260404-1405-A`
-- issue_path: `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
+- issue_path: `docs/B2-docs/ibm/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
 - branch: `feature/manager-bootstrap-prompt-publication-without-continuity-materialization-20260404-1405`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260404-1405-feature-manager-bootstrap-prompt-publication-without-continuity-materialization`
 - verification_date: `2026-04-04`
@@ -19,13 +19,13 @@
 
 ## Implementation Decision Note
 
-- see `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/code-reviews/20260404-manager-bootstrap-prompt-publication-without-continuity-materialization-implementation-decision.md`
+- see `docs/B2-docs/ibm/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/code-reviews/20260404-manager-bootstrap-prompt-publication-without-continuity-materialization-implementation-decision.md`
 
 ## Evidence Read
 
 - `docs/B1-docs/raw-20260404/brainstorms.md`
 - `docs/B1-docs/raw-20260404/candidates.md`
-- `docs/epics/workspace-routing-foundation/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
+- `docs/B2-docs/ibm/manager-bootstrap-prompt-publication-without-continuity-materialization-governance/issues/manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
 - `docs/progress/workspace-routing-foundation/p-manager-bootstrap-prompt-publication-without-continuity-materialization-governance.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-manager-continuity-current-worker-prompt-parsing`

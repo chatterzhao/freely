@@ -48,4 +48,4 @@
 - requirement: `repair preserves adjacent auth inventory behavior without requiring real login or slot deletion`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/ai-auth-change-wake-command-lifecycle-governance/code-reviews/20260330-ai-auth-change-wake-command-lifecycle-verification.md`
+- artifact_ref: `docs/B2-docs/config/ai-auth-change-wake-command-lifecycle-governance/code-reviews/20260330-ai-auth-change-wake-command-lifecycle-verification.md`

@@ -1,7 +1,7 @@
 # Verification: manager-startup-continuity-materialization-governance closeout
 
 - issue_id: `I-20260413-0420-D`
-- issue_path: `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/issues/manager-startup-continuity-materialization-governance.md`
+- issue_path: `docs/B2-docs/ibm/manager-startup-continuity-materialization-governance/issues/manager-startup-continuity-materialization-governance.md`
 - verification_date: `2026-04-13`
 - verifier: `codex`
 

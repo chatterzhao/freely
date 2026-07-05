@@ -9,5 +9,5 @@
   - `docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md`
   - `docs/system/workspace/skills/doc-ibm-execution/references/ibm-completion-gate.md`
   - `docs/system/workspace/skills/doc-ibm-execution/references/issue-materialization-checklist.md`
-  - `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/code-reviews/20260325-story-level-pre-tests-quality-gate-governance-verification.md`
+  - `docs/B2-docs/ibm/story-level-pre-tests-quality-gate-governance/code-reviews/20260325-story-level-pre-tests-quality-gate-governance-verification.md`
 - next_action: issue 已完成，worktree 进入 merge-prep / retirement 判断；umbrella candidate `C-20260325-0333-A` 继续保持 active，等待后续 testing ladder / real-environment harness 切口判断。

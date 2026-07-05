@@ -31,7 +31,7 @@
   - 当前已有 evidence/source 基础，适合先做最小自治声音能力，而不是全量跨工具 fallback
 - next_action: materialize 一个 narrow owner，先冻结 canonical event contract、sound policy 与 Tauri 标准播放路径；manager / worker started/completed 为首批实现目标。
 - revisit_trigger: 当标准路径落地后，需要扩展到 blocked/failed/interruption 全矩阵、其他工具原生 notice 审计，或 CLI/headless fallback 时。
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/issues/runtime-audio-notifier-and-sound-semantics-governance.md`
+- promoted_issue_path: `docs/B2-docs/runtime/runtime-audio-notifier-and-sound-semantics-governance/issues/runtime-audio-notifier-and-sound-semantics-governance.md`
 - milestone: `M-20260306-workspace-routing-foundation`
 - acceptance_reviews:
   - reviewer: `subagent:Turing`

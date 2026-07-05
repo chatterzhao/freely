@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO62
     synced_at: '2026-04-27T13:14:35Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/active-lifecycle-boundary-and-dogfooding-capability-discovery/issues/active-lifecycle-boundary-and-dogfooding-capability-discovery.md
+canonical_issue_path: docs/B2-docs/ibm/active-lifecycle-boundary-and-dogfooding-capability-discovery/issues/active-lifecycle-boundary-and-dogfooding-capability-discovery.md
 last_synced_comment_at:
   github: '2026-04-27T11:15:49Z'
 hash: ''
@@ -35,4 +35,4 @@ Freely 当前仍缺少一条稳定的生命周期边界语义，导致团队会�
 
 同时，Freely 开发 Freely 时暴露出的共性问题也会继续停留在聊天或 continuity 里，而不是 materialize 成用户也能复用的能力。
 
-canonical: docs/epics/workspace-routing-foundation/active-lifecycle-boundary-and-dogfooding-capability-discovery/issues/active-lifecycle-boundary-and-dogfooding-capability-discovery.md
+canonical: docs/B2-docs/ibm/active-lifecycle-boundary-and-dogfooding-capability-discovery/issues/active-lifecycle-boundary-and-dogfooding-capability-discovery.md

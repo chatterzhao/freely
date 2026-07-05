@@ -18,7 +18,7 @@
 - priority: P0
 - status: promoted
 - decision_reason: 这是 worktree 治理闭环中的明确缺口，已经被真实 dogfooding 暴露，而且可通过小范围 skill + runtime + test 增量闭合。
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/remote-branch-retirement-governance/issues/remote-branch-retirement-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/remote-branch-retirement-governance/issues/remote-branch-retirement-governance.md`
 - legacy_id_mapping: I-20260321-1515  # 历史遗留的 issue id
 - milestone: `docs/milestones.md#M-20260306-workspace-routing-foundation`
 - session_refs:

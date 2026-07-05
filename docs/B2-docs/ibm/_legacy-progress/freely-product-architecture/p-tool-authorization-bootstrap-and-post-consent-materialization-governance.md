@@ -1,7 +1,7 @@
 # Progress: tool-authorization-bootstrap-and-post-consent-materialization-governance
 
 - issue_id: `I-20260405-1235-A`
-- issue_path: `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
+- issue_path: `docs/B2-docs/config/packaging/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
 - title: `Tool authorization bootstrap and post-consent materialization governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -22,11 +22,11 @@
 
 ## Verification Evidence
 
-- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260409-045823-feature-tool-authorization-bootstrap-post-consent-materialization-closeout --issue docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
+- `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260409-045823-feature-tool-authorization-bootstrap-post-consent-materialization-closeout --issue docs/B2-docs/config/packaging/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
 - `./bin/governance-check`
 - `git diff --check`
-- `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/code-reviews/20260408-tool-authorization-bootstrap-and-post-consent-materialization-verification.md`
-- `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/code-reviews/20260409-tool-authorization-bootstrap-and-post-consent-materialization-canonical-closeout-verification.md`
+- `docs/B2-docs/config/packaging/code-reviews/20260408-tool-authorization-bootstrap-and-post-consent-materialization-verification.md`
+- `docs/B2-docs/config/packaging/code-reviews/20260409-tool-authorization-bootstrap-and-post-consent-materialization-canonical-closeout-verification.md`
 
 ## Next Action
 

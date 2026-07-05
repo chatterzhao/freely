@@ -1,7 +1,7 @@
 # Code Review: fix-execution skill
 
 - issue_id: `I-20260503-0000-B`
-- issue_path: `docs/epics/workspace-routing-foundation/fix-execution-skill/issues/I-20260503-0000-B.md`
+- issue_path: `docs/B2-docs/ibm/fix-execution-skill/issues/I-20260503-0000-B.md`
 - review_date: `2026-05-03`
 - reviewer: `human`
 - status: `approved`

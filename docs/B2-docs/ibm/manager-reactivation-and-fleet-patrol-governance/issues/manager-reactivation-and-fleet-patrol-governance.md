@@ -7,12 +7,12 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `manager-reactivation-and-fleet-patrol-governance`
 - issue-name: `manager-reactivation-and-fleet-patrol-governance`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/manager-reactivation-and-fleet-patrol-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/manager-reactivation-and-fleet-patrol-governance/code-reviews`
 - source_candidate: `docs/B1-docs/raw-20260321/candidates.md#c-20260321-0345-a`
 - source_brainstorm: `docs/B1-docs/raw-20260321/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- depends_on: `docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md`, `docs/epics/workspace-routing-foundation/worktree-maintenance-governance/issues/worktree-maintenance-governance.md`
+- depends_on: `docs/B2-docs/ibm/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md`, `docs/B2-docs/git-worktree/worktree-maintenance-governance/issues/worktree-maintenance-governance.md`
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}]
 
 ## Why
@@ -57,13 +57,13 @@ Freely 现在已经能通过 runtime watchdog 拉起主管，也能通过 `live-
 - `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
 - `docs/system/workspace/scripts/start-lead-agent.sh`
 - `docs/system/workspace/scripts/tests/test-routing-foundation-loop`
-- `docs/epics/workspace-routing-foundation/manager-reactivation-and-fleet-patrol-governance/code-reviews/20260321-manager-reactivation-and-fleet-patrol-verification.md`
+- `docs/B2-docs/ibm/manager-reactivation-and-fleet-patrol-governance/code-reviews/20260321-manager-reactivation-and-fleet-patrol-verification.md`
 
 ## Verification
 
 - `./bin/governance-check`
 - `bash docs/system/workspace/scripts/tests/test-routing-foundation-loop`
-- `docs/epics/workspace-routing-foundation/manager-reactivation-and-fleet-patrol-governance/code-reviews/20260326-manager-reactivation-and-fleet-patrol-canonical-replay-verification.md`
+- `docs/B2-docs/ibm/manager-reactivation-and-fleet-patrol-governance/code-reviews/20260326-manager-reactivation-and-fleet-patrol-canonical-replay-verification.md`
 
 ## Verification Summary
 

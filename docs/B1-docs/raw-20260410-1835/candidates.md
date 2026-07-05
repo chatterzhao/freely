@@ -22,7 +22,7 @@
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_id: `I-20260410-1835-B`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/codex-real-exec-switch-and-after-failure-recovery-governance/issues/codex-real-exec-switch-and-after-failure-recovery-governance.md`
+- promoted_issue_path: `docs/B2-docs/config/codex-real-exec-switch-and-after-failure-recovery-governance/issues/codex-real-exec-switch-and-after-failure-recovery-governance.md`
 - source_brainstorm: `docs/B1-docs/raw-20260410-1835/brainstorms.md`
 - session_refs: []
 - next_action: Land the bounded follow-on owner with real command-surface evidence, then merge through `test-pre-merge-20260410-codex-switch-real-env`.

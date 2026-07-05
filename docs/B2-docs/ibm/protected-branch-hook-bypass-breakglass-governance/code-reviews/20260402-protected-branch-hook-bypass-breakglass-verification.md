@@ -1,7 +1,7 @@
 # Verification: protected-branch-hook-bypass-breakglass-governance
 
 - issue_id: `I-20260402-0020-A`
-- issue_path: `docs/epics/workspace-routing-foundation/protected-branch-hook-bypass-breakglass-governance/issues/protected-branch-hook-bypass-breakglass-governance.md`
+- issue_path: `docs/B2-docs/ibm/protected-branch-hook-bypass-breakglass-governance/issues/protected-branch-hook-bypass-breakglass-governance.md`
 - branch: `feature/hook-bypass-breakglass-governance-20260402-0020`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260402-0020-feature-hook-bypass-breakglass-governance`
 - verification_date: `2026-04-02`

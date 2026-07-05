@@ -30,7 +30,7 @@
 - priority: P0
 - status: promoted
 - decision_reason: CLI-first intake、manager queue surfacing、`claim/resolve`、resolution artifact 与 `skill:human-interruption-handling` 的最小闭环已经落地；这条线已正式物化为 issue，后续从 issue / verification 继续收口，而不再停留在 pre-brainstorm。
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/human-chat-intake-and-manager-delegation/issues/human-chat-intake-and-manager-delegation.md`
+- promoted_issue_path: `docs/B2-docs/human/human-chat-intake-and-manager-delegation/issues/human-chat-intake-and-manager-delegation.md`
 - legacy_id_mapping: I-20260319-1715  # 历史遗留的 issue id
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs:

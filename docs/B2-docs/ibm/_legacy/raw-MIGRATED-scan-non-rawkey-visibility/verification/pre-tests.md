@@ -10,4 +10,4 @@
 - id: non-rawkey-visibility
 - requirement: scan output includes gh-{number} items for platform issues without raw-key
 ^- status: passed
-- artifact_ref: docs/epics/scan-non-rawkey-visibility/code-reviews/review.md
+- artifact_ref: docs/B2-docs/scan-non-rawkey-visibility/code-reviews/review.md

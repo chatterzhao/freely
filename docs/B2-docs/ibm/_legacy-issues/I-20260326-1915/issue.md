@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO6U
     synced_at: '2026-04-27T13:15:04Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/deep-refactor-fleet-sequencing-governance/issues/deep-refactor-fleet-sequencing-governance.md
+canonical_issue_path: docs/B2-docs/ibm/deep-refactor-fleet-sequencing-governance/issues/deep-refactor-fleet-sequencing-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:17:45Z'
 hash: ''
@@ -30,4 +30,4 @@ Freely 在准备 broad/deep refactor 时，真实 fleet 一度同时存在：
 
 如果不先冻结“大重构前先做 fleet sequencing audit”的开发治理规则，就会把 closeout、runtime 健康判断、upstream merge、以及新的重构实现混在一起，导致 owner、依赖和 cleanup judgement 继续失真。
 
-canonical: docs/epics/workspace-routing-foundation/deep-refactor-fleet-sequencing-governance/issues/deep-refactor-fleet-sequencing-governance.md
+canonical: docs/B2-docs/ibm/deep-refactor-fleet-sequencing-governance/issues/deep-refactor-fleet-sequencing-governance.md

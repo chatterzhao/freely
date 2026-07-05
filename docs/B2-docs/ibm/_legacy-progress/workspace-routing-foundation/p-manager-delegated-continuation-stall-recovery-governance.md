@@ -2,7 +2,7 @@
 
 - issue_id: `I-20260323-1705-A`
 - title: Manager delegated continuation stall recovery governance
-- issue_path: `docs/epics/workspace-routing-foundation/manager-delegated-continuation-stall-recovery-governance/issues/manager-delegated-continuation-stall-recovery-governance.md`
+- issue_path: `docs/B2-docs/ibm/manager-delegated-continuation-stall-recovery-governance/issues/manager-delegated-continuation-stall-recovery-governance.md`
 - phase_state: `completed`
 - runtime_state: `stopped`
 - branch: `develop`
@@ -26,14 +26,14 @@
 - broader manager/worker regression batch passed across stall recovery, launch linkage, semantic-loop surface, worker reentry, runtime recovery, and related parser/launch-state tests
 - `bash -n` passed for runtime script and newly added tests
 - review artifact:
-  - `docs/epics/workspace-routing-foundation/manager-delegated-continuation-stall-recovery-governance/code-reviews/20260328-manager-delegated-continuation-stall-recovery-verification.md`
+  - `docs/B2-docs/ibm/manager-delegated-continuation-stall-recovery-governance/code-reviews/20260328-manager-delegated-continuation-stall-recovery-verification.md`
 
 ## Closure Evidence
 
 - closure_status: `merged-and-verified`
 - closure_evidence:
   - `develop` commit `ce17a17`
-  - `docs/epics/workspace-routing-foundation/manager-delegated-continuation-stall-recovery-governance/code-reviews/20260328-manager-delegated-continuation-stall-recovery-verification.md`
+  - `docs/B2-docs/ibm/manager-delegated-continuation-stall-recovery-governance/code-reviews/20260328-manager-delegated-continuation-stall-recovery-verification.md`
   - `bash docs/system/workspace/scripts/tests/test-freely-manager-delegated-continuation-active-worker-wait-does-not-recover`
   - `bash docs/system/workspace/scripts/tests/test-freely-manager-delegated-continuation-busy-and-stale-prompt-recovers`
 

@@ -54,4 +54,4 @@
 - requirement: `Quality gate aligns with existing integration-acceptance-first, artifact-plane acceptance evidence, and protected/post-merge verification contracts`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/code-reviews/20260325-story-level-pre-tests-quality-gate-governance-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/story-level-pre-tests-quality-gate-governance/code-reviews/20260325-story-level-pre-tests-quality-gate-governance-verification.md`

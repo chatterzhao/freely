@@ -47,7 +47,7 @@
 - requirement: `Lane truth, wrapper behavior, and directly coupled docs are synchronized in one owner.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/test-lane-routing-and-enforcement-governance/issues/test-lane-routing-and-enforcement-governance.md`
+- artifact_ref: `docs/B2-docs/gate/test-lane-routing-and-enforcement-governance/issues/test-lane-routing-and-enforcement-governance.md`
 
 ### AT-002
 - id: `AT-002`
@@ -61,4 +61,4 @@
 - requirement: `Wrapper entrypoints stay directly executable.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/test-lane-routing-and-enforcement-governance/code-reviews/20260405-test-lane-routing-and-enforcement-verification.md`
+- artifact_ref: `docs/B2-docs/gate/test-lane-routing-and-enforcement-governance/code-reviews/20260405-test-lane-routing-and-enforcement-verification.md`

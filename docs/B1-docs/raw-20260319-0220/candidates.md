@@ -7,18 +7,18 @@
 - status: `dropped`
 - summary: 把 `watchdog` 正式定义为 Freely 的外层监督与恢复控制面总称，并稳定 `availability / runtime / continuity watchdog` 三类 owner 边界；该候选已被现有正式 issue 与 skill 吸收，不再单独 materialize。
 - decision_reason: `watchdog-control-plane` 已正式定义 umbrella taxonomy，`I-20260318-1630`、`I-20260318-1408` 与 `I-20260319-0018` 已分别承接 availability / runtime / continuity owner；继续保留为活跃 research 只会重复现有正式治理主线。
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+- promoted_issue_path: `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - milestone: `M-20260306-workspace-routing-foundation`
 - related_artifacts:
-  - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
-  - `docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md`
-  - `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
+  - `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+  - `docs/B2-docs/ibm/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md`
+  - `docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
   - `docs/system/workspace/skills/watchdog-control-plane/SKILL.md`
 - superseded_by:
   - `docs/system/workspace/skills/watchdog-control-plane/SKILL.md`
-  - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
-  - `docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md`
-  - `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
+  - `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+  - `docs/B2-docs/ibm/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md`
+  - `docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`
@@ -32,7 +32,7 @@
 - status: `promoted`
 - summary: 收敛 watchdog control plane 下哪些能力属于 skill 真源，哪些仍应保留为 Freely runtime 的 orchestration 语义；availability 与 runtime 已完成承接，剩余 continuity extraction 已正式并入 `I-20260319-0018` 的 IBM 收口。
 - decision_reason: availability 与 runtime 分层已由 `watchdog-control-plane`、`ai-cli-availability-manager`、`runtime/freely` 和 `I-20260318-1630` 吸收；continuity 侧 capability extraction 也已经有稳定 issue 边界，应转入 `I-20260319-0018` 的 issue-bound IBM，而不是继续保留在 active candidate 队列。
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
 - milestone: `M-20260306-workspace-routing-foundation`
 - depends_on:
   - `C-20260319-0220-A`
@@ -40,7 +40,7 @@
   - `docs/system/workspace/skills/watchdog-control-plane/SKILL.md`
   - `docs/system/workspace/skills/ai-cli-availability-manager/SKILL.md`
   - `docs/system/workspace/scripts/runtime/freely`
-  - `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
+  - `docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`
@@ -79,9 +79,9 @@
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
-  - `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
-  - `docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md`
+  - `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+  - `docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
+  - `docs/B2-docs/ibm/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md`
 - why_now: 当前 worktree 已承载 watchdog governance 的专用上下文；本轮除了把 candidate 同步进 milestone，还需要回填这些 candidate 已被哪些正式 issue / skill / convergence 吸收，避免它们继续以“活跃新研究”名义漂在 pre-brainstorm。
 - next_recommended_route: `doc-ibm-execution`
 - promotion_gate:

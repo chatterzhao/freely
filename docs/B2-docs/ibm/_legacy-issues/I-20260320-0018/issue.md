@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO5K
     synced_at: '2026-04-27T13:14:14Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/default-project-resolution-and-authorized-project-memory/issues/default-project-resolution-and-authorized-project-memory.md
+canonical_issue_path: docs/B2-docs/ibm/default-project-resolution-and-authorized-project-memory/issues/default-project-resolution-and-authorized-project-memory.md
 last_synced_comment_at:
   github: '2026-04-27T11:14:16Z'
 hash: ''
@@ -29,4 +29,4 @@ Freely 的 CLI-first 人类入口已经可用，但默认项目解析仍然需�
 - 只有一个已授权项目时，CLI 可以在外部目录回退到该项目。
 - 解析逻辑不能把任意目录误判为项目。
 
-canonical: docs/epics/workspace-routing-foundation/default-project-resolution-and-authorized-project-memory/issues/default-project-resolution-and-authorized-project-memory.md
+canonical: docs/B2-docs/ibm/default-project-resolution-and-authorized-project-memory/issues/default-project-resolution-and-authorized-project-memory.md

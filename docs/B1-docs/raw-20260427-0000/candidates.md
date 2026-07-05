@@ -159,7 +159,7 @@ target_phase: in_dev  # 当前 issue 正在 dev-loop 中
 
 
 - absorbed_by_issue: `I-20260426-0000-A`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/issues/tool-alias-and-opencode-launcher-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/tool-alias-and-opencode-launcher-governance/issues/tool-alias-and-opencode-launcher-governance.md`
 - decision_reason: `B1 pre-brainstorm for chat intake→issue unification. Implementation artifacts (scripts, storage, sync) absorbed into the canonical tool launcher governance issue.`
 
 ### Closeout

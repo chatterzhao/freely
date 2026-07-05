@@ -1,7 +1,7 @@
 # Verification: codex-auto-switch-probe-apikey-fallback-governance canonical closeout
 
 - issue_id: `I-20260407-0023-A`
-- issue_path: `docs/epics/workspace-routing-foundation/codex-auto-switch-probe-apikey-fallback-governance/issues/codex-auto-switch-probe-apikey-fallback-governance.md`
+- issue_path: `docs/B2-docs/config/codex-auto-switch-probe-apikey-fallback-governance/issues/codex-auto-switch-probe-apikey-fallback-governance.md`
 - verified_at: `2026-04-07`
 - verifier: `codex`
 - verdict: `pass_for_closeout`
@@ -24,6 +24,6 @@
 8. `./bin/test-lane post-merge-followthrough -- bash docs/system/workspace/scripts/tests/test-freely-ai-apikey-switch-oauth-unreachable-falls-back-to-exec`
 9. `./bin/test-lane post-merge-followthrough -- bash docs/system/workspace/scripts/tests/test-freely-ai-account-switch-oauth-unreachable`
 10. `./bin/test-lane post-merge-followthrough -- bash docs/system/workspace/scripts/tests/test-ai-cli-codex-apikey-slot-bundle-switch`
-11. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely --issue docs/epics/workspace-routing-foundation/codex-auto-switch-probe-apikey-fallback-governance/issues/codex-auto-switch-probe-apikey-fallback-governance.md`
+11. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely --issue docs/B2-docs/config/codex-auto-switch-probe-apikey-fallback-governance/issues/codex-auto-switch-probe-apikey-fallback-governance.md`
 12. `./bin/governance-check`
 13. `git diff --check`

@@ -24,7 +24,7 @@
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_id: `I-20260412-1721-A`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/develop-push-attempt-followthrough-governance/issues/develop-push-attempt-followthrough-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/develop-push-attempt-followthrough-governance/issues/develop-push-attempt-followthrough-governance.md`
 - source_brainstorm: `docs/B1-docs/raw-20260412-1721/brainstorms.md`
 - session_refs: []
 - follow_on_to: `I-20260408-1200-A`

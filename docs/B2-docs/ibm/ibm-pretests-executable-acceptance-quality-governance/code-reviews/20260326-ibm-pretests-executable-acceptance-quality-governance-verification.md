@@ -8,7 +8,7 @@
   - `docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md`
   - `docs/system/workspace/skills/doc-ibm-execution/references/ibm-completion-gate.md`
   - `docs/system/workspace/skills/doc-ibm-execution/references/issue-materialization-checklist.md`
-  - `docs/epics/workspace-routing-foundation/ibm-pretests-executable-acceptance-quality-governance/*`
+  - `docs/B2-docs/ibm/ibm-pretests-executable-acceptance-quality-governance/*`
 
 ## Findings
 

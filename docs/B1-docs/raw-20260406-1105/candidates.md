@@ -29,7 +29,7 @@
   - canonical milestone truth is already inconsistent with completed owner truth
   - the missing contract is a repo-wide audit, not another workflow redesign
 - promoted_issue_id: `I-20260406-1105-A`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/milestone-completed-queue-closeout-governance/issues/milestone-completed-queue-closeout-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/milestone-completed-queue-closeout-governance/issues/milestone-completed-queue-closeout-governance.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`

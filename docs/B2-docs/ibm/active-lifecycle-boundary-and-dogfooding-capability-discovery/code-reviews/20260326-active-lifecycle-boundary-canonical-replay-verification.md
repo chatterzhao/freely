@@ -9,7 +9,7 @@
 
 - `docs/system/workspace/three-loop-capability-lifecycle.md`
 - `docs/PROJECT_INTENT.md`
-- `docs/epics/workspace-routing-foundation/active-lifecycle-boundary-and-dogfooding-capability-discovery/issues/active-lifecycle-boundary-and-dogfooding-capability-discovery.md`
+- `docs/B2-docs/ibm/active-lifecycle-boundary-and-dogfooding-capability-discovery/issues/active-lifecycle-boundary-and-dogfooding-capability-discovery.md`
 - `docs/milestones.md`
 
 ## Findings

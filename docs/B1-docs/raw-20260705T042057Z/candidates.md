@@ -10,5 +10,5 @@ milestone: M-20260705T042057Z-A
 - decision_reason: Single function validation at all entry points, absorbed by I-20260705T042057Z-A
 - status: absorbed
 - promoted_issue_id: I-20260705T042057Z-A
-- promoted_issue_path: docs/epics/agent-acp/base-tool-validation/raw-20260705T042057Z/issues/I-20260705T042057Z-A.md
+- promoted_issue_path: docs/B2-docs/config/agent-table/raw-20260705T042057Z/issues/I-20260705T042057Z-A.md
 - milestone: M-20260705T042057Z-A

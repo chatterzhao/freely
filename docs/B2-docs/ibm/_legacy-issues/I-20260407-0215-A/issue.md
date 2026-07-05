@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO99
     synced_at: '2026-04-27T13:16:48Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md
+canonical_issue_path: docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:26:02Z'
 hash: ''
@@ -32,4 +32,4 @@ This owner was opened because canonical root `develop` showed a narrow but reusa
 
 This is not a CLI-first owner and not a generic watchdog redesign. It is the next bounde
 
-canonical: docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md
+canonical: docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md

@@ -13,14 +13,14 @@
 - source_brainstorm: `docs/B1-docs/raw-20260419/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/pre-tests.md`
-- tasks_path: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/tasks.md`
+- pre_tests_path: `docs/B2-docs/runtime/runtime-closeout-selfhost-validation-followthrough-governance/pre-tests.md`
+- tasks_path: `docs/B2-docs/runtime/runtime-closeout-selfhost-validation-followthrough-governance/tasks.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-runtime-closeout-selfhost-validation-followthrough-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/runtime/runtime-closeout-selfhost-validation-followthrough-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
-  - `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/issues/worktree-tool-boundary-bootstrap-governance.md`
+  - `docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
+  - `docs/B2-docs/runtime/runtime-lifecycle-receipt-followthrough-governance/issues/runtime-lifecycle-receipt-followthrough-governance.md`
+  - `docs/B2-docs/config/packaging/issues/worktree-tool-boundary-bootstrap-governance.md`
 - created_at: `2026-04-19`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}

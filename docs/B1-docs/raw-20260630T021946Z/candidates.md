@@ -27,6 +27,6 @@ milestone: M-20260630T021946Z-A
   - reviewer: claude
   - mode: in-session
   - verdict: pass
-- promoted_issue_path: docs/epics/a2a-state-standard/state-rename/raw-20260630T021946Z/issues/I-20260630T021946Z-A.md
+- promoted_issue_path: docs/B2-docs/a2a/task-lifecycle/raw-20260630T021946Z/issues/I-20260630T021946Z-A.md
 - milestone: M-20260630T021946Z-A
 - session_refs: []

@@ -1,7 +1,7 @@
 # Verification: build-artifact-exposure-and-release-allowlist-audit-governance
 
 - issue_id: `I-20260401-2245-A`
-- issue_path: `docs/epics/workspace-routing-foundation/build-artifact-exposure-and-release-allowlist-audit-governance/issues/build-artifact-exposure-and-release-allowlist-audit-governance.md`
+- issue_path: `docs/B2-docs/ibm/build-artifact-exposure-and-release-allowlist-audit-governance/issues/build-artifact-exposure-and-release-allowlist-audit-governance.md`
 - verification_date: `2026-04-01`
 - verification_scope: `focused regression + repo build replay`
 

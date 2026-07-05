@@ -12,7 +12,7 @@ platform_ids:
   gitee:
     issue_id: ''
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/chat-inbox-sqlite/issues/I-20260429-2040-A.md
+canonical_issue_path: docs/B2-docs/human/chat-inbox-sqlite/issues/I-20260429-2040-A.md
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-04-29T20:40:00Z'

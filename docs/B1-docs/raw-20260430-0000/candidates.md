@@ -13,7 +13,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - route_kind: `runtime_fix`
 - phase_state: `done_pre_brainstorm`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/chat-inbox-sqlite/issues/I-20260429-2040-A.md`
+- promoted_issue_path: `docs/B2-docs/human/chat-inbox-sqlite/issues/I-20260429-2040-A.md`
 - decision_reason: `session-store reuses the same freely.db SQLite and CLI pattern introduced by the chat-inbox-sqlite issue; no independent lifecycle needed`
 - session_refs:
   - {tool: ccds, session_id: "20260430-acp-session-store", role: "author"}

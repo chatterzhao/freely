@@ -1,7 +1,7 @@
 # Verification: verification-contract-and-premerge-adequacy-governance real-environment verdict followthrough
 
 - issue_id: `I-20260408-1205-A`
-- issue_path: `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
+- issue_path: `docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
 - verification_date: `2026-04-12`
 - verifier: `codex`
 

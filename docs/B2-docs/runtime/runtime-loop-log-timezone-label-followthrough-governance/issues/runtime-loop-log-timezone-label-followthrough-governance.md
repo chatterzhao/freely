@@ -10,15 +10,15 @@
 - priority: P1
 - source_candidate: `docs/B1-docs/raw-20260402/candidates.md#c-20260402-0540-a`
 - source_brainstorm: `docs/B1-docs/raw-20260402/brainstorms.md`
-- reopen_of_issue: `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md`
+- reopen_of_issue: `docs/B2-docs/runtime/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md`
 - reopen_reason: `a repo-wide time display audit found that loop.log headers still omitted timezone labels after the broader runtime time-display owner completed`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/runtime-loop-log-timezone-label-followthrough-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/runtime/runtime-loop-log-timezone-label-followthrough-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-runtime-loop-log-timezone-label-followthrough-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/runtime-loop-log-timezone-label-followthrough-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/runtime/runtime-loop-log-timezone-label-followthrough-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md`
+  - `docs/B2-docs/runtime/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 

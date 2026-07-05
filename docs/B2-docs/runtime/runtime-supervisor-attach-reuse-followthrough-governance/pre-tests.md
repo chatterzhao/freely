@@ -54,7 +54,7 @@
 - case_design: `Start a detached runtime, rerun daemon start, and assert the same supervisor pid is reused without creating another daemon-run process.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/code-reviews/20260419-runtime-supervisor-attach-reuse-followthrough-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-supervisor-attach-reuse-followthrough-governance/code-reviews/20260419-runtime-supervisor-attach-reuse-followthrough-verification.md`
 
 ### Foreground start attaches between AI cycles
 - id: `foreground-start-attaches-between-ai-cycles`
@@ -66,7 +66,7 @@
 - case_design: `Start a detached runtime, wait for a between-cycles state with missing ai.pid, then assert a foreground start reuses the same supervisor and records already_running_attach.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/code-reviews/20260419-runtime-supervisor-attach-reuse-followthrough-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-supervisor-attach-reuse-followthrough-governance/code-reviews/20260419-runtime-supervisor-attach-reuse-followthrough-verification.md`
 
 ### Attach still works when ps is unavailable
 - id: `attach-persists-when-ps-is-unavailable`
@@ -78,7 +78,7 @@
 - case_design: `Stub ps to fail, keep supervisor and watcher pids alive under the project cwd, and assert freely start still records supervisor_attach_reuse.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/code-reviews/20260419-runtime-supervisor-attach-reuse-followthrough-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-supervisor-attach-reuse-followthrough-governance/code-reviews/20260419-runtime-supervisor-attach-reuse-followthrough-verification.md`
 
 ### Claude launcher HOME stays project-local
 - id: `claude-home-isolated-under-project-runtime`
@@ -90,7 +90,7 @@
 - case_design: `Intercept a Claude launch, inspect HOME and argv, and assert the launcher materializes project-local runtime-home directories.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/code-reviews/20260419-runtime-supervisor-attach-reuse-followthrough-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-supervisor-attach-reuse-followthrough-governance/code-reviews/20260419-runtime-supervisor-attach-reuse-followthrough-verification.md`
 
 ### Guarded promote preserves supervisor attach/reuse adequacy
 - id: `guarded-promote-preserves-supervisor-attach-reuse-adequacy`
@@ -102,4 +102,4 @@
 - case_design: `Merge the checkpoint owner into the current test-pre-merge-runtime-lifecycle-20260419 batch, rerun the bounded regression set plus governance-check there, and confirm the guarded promote path still carries the same attach/reuse behavior.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/runtime-supervisor-attach-reuse-followthrough-governance/code-reviews/20260419-runtime-supervisor-attach-reuse-followthrough-verification.md`
+- artifact_ref: `docs/B2-docs/runtime/runtime-supervisor-attach-reuse-followthrough-governance/code-reviews/20260419-runtime-supervisor-attach-reuse-followthrough-verification.md`

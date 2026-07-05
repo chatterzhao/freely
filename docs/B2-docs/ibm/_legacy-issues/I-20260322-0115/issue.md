@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO68
     synced_at: '2026-04-27T13:14:42Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/issues/cli-first-entrypoint-and-observability-surface-unification.md
+canonical_issue_path: docs/B2-docs/human/cli-first-entrypoint-and-observability-surface-unification/issues/cli-first-entrypoint-and-observability-surface-unification.md
 last_synced_comment_at:
   github: '2026-04-27T11:16:20Z'
 hash: ''
@@ -35,4 +35,4 @@ Freely 已经有：
 2. `chat` 是高层 human entrypoint，但 `tui` 还没有严格复用同一条 post-submit runtime chain。
 3. CLI status family 已形成 backend 可观测面，但尚未被明确为未来 TUI/GUI 的 canonical backend interface。
 
-canonical: docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/issues/cli-first-entrypoint-and-observability-surface-unification.md
+canonical: docs/B2-docs/human/cli-first-entrypoint-and-observability-surface-unification/issues/cli-first-entrypoint-and-observability-surface-unification.md

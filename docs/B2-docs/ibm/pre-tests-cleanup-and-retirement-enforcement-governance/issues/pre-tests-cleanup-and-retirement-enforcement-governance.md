@@ -12,11 +12,11 @@
 - source_brainstorm: `docs/B1-docs/raw-20260411/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/pre-tests.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/code-reviews`
+- pre_tests_path: `docs/B2-docs/ibm/pre-tests-cleanup-and-retirement-enforcement-governance/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/ibm/pre-tests-cleanup-and-retirement-enforcement-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/issues/pre-tests-evidence-binding-and-completion-gate-governance.md`
-  - `docs/epics/workspace-routing-foundation/test-pre-merge-family-promotion-gate-enforcement-governance/issues/test-pre-merge-family-promotion-gate-enforcement-governance.md`
+  - `docs/B2-docs/ibm/pre-tests-evidence-binding-and-completion-gate-governance/issues/pre-tests-evidence-binding-and-completion-gate-governance.md`
+  - `docs/B2-docs/gate/test-pre-merge-family-promotion-gate-enforcement-governance/issues/test-pre-merge-family-promotion-gate-enforcement-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -44,21 +44,21 @@
   - 本 owner 只补 cleanup / retirement gate。
   - 第一阶段只要求最小字段集合，不强推 adequacy schema 扩展。
 - required_doc_refs:
-  - `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/prd.md`
-  - `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/tasks.md`
+  - `docs/B2-docs/ibm/pre-tests-cleanup-and-retirement-enforcement-governance/prd.md`
+  - `docs/B2-docs/ibm/pre-tests-cleanup-and-retirement-enforcement-governance/pre-tests.md`
+  - `docs/B2-docs/ibm/pre-tests-cleanup-and-retirement-enforcement-governance/tasks.md`
   - `docs/system/workspace/skills/branch-management/references/cleanup-lifecycle.md`
   - `docs/system/workspace/three-loop-capability-lifecycle.md`
 
 ## Completion
 
 - `docs/B1-docs/raw-20260411/candidates.md`
-- `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/issues/pre-tests-cleanup-and-retirement-enforcement-governance.md`
-- `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/brainstorms/b-pre-tests-cleanup-and-retirement-enforcement-governance.md`
-- `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/tasks.md`
-- `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/code-reviews/20260411-pre-tests-cleanup-and-retirement-enforcement-verification.md`
+- `docs/B2-docs/ibm/pre-tests-cleanup-and-retirement-enforcement-governance/issues/pre-tests-cleanup-and-retirement-enforcement-governance.md`
+- `docs/B2-docs/ibm/pre-tests-cleanup-and-retirement-enforcement-governance/brainstorms/b-pre-tests-cleanup-and-retirement-enforcement-governance.md`
+- `docs/B2-docs/ibm/pre-tests-cleanup-and-retirement-enforcement-governance/prd.md`
+- `docs/B2-docs/ibm/pre-tests-cleanup-and-retirement-enforcement-governance/pre-tests.md`
+- `docs/B2-docs/ibm/pre-tests-cleanup-and-retirement-enforcement-governance/tasks.md`
+- `docs/B2-docs/ibm/pre-tests-cleanup-and-retirement-enforcement-governance/code-reviews/20260411-pre-tests-cleanup-and-retirement-enforcement-verification.md`
 - `docs/progress/workspace-routing-foundation/p-pre-tests-cleanup-and-retirement-enforcement-governance.md`
 - `bin/pretests-retirement-gate`
 - `docs/system/workspace/scripts/quality/pretests-retirement-gate`
@@ -73,7 +73,7 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-pretests-retain`
 - `bash docs/system/workspace/scripts/tests/test-freely-cleanup-followthrough-retained-continuation`
 - `./bin/governance-check`
-- `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/code-reviews/20260411-pre-tests-cleanup-and-retirement-enforcement-verification.md`
+- `docs/B2-docs/ibm/pre-tests-cleanup-and-retirement-enforcement-governance/code-reviews/20260411-pre-tests-cleanup-and-retirement-enforcement-verification.md`
 
 ## Next
 

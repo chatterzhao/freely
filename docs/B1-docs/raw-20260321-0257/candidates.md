@@ -19,7 +19,7 @@
 - priority: P0
 - status: promoted
 - decision_reason: 这是通过狗粮开发直接发现的治理缺口。现在不收编成 skill，后续每次大批量 worktree 收口都会重复踩同一类问题。
-- promoted_issue_path: docs/epics/workspace-routing-foundation/worktree-fleet-governance-closure/issues/worktree-fleet-governance-closure.md
+- promoted_issue_path: docs/B2-docs/git-worktree/worktree-fleet-governance-closure/issues/worktree-fleet-governance-closure.md
 - legacy_id_mapping: I-20260321-0257  # 历史遗留的 issue id
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs:

@@ -1,7 +1,7 @@
 # Implementation Decision Note: cli-wrapper-packaging-and-regression-surface-governance
 
 - issue_id: `I-20260405-2358-C`
-- issue_path: `docs/epics/workspace-routing-foundation/cli-wrapper-packaging-and-regression-surface-governance/issues/cli-wrapper-packaging-and-regression-surface-governance.md`
+- issue_path: `docs/B2-docs/config/cli-wrapper-packaging-and-regression-surface-governance/issues/cli-wrapper-packaging-and-regression-surface-governance.md`
 - decision_date: `2026-04-06`
 - author: `codex`
 

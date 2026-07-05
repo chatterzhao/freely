@@ -18,7 +18,7 @@
 - priority: P0
 - status: absorbed
 - milestone: M-20260306-workspace-routing-foundation
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/manager-delegated-continuation-stall-recovery-governance/issues/manager-delegated-continuation-stall-recovery-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/manager-delegated-continuation-stall-recovery-governance/issues/manager-delegated-continuation-stall-recovery-governance.md`
 - decision_reason: 本轮已确认这条 false-positive supervision thrash 不是独立 owner，而是 `manager delegated continuation stall recovery` 家族上的新边界。最新最小修复和 targeted regressions 已经把这个边界冻结，因此本条预研转为 supporting evidence，由正式 issue 接管。
 - next_action: 作为 supporting evidence 保留；后续只在正式 issue 需要补充 same-lane busy / stale queue 现场证据时回写，不再单独推进。
 - revisit_trigger: 若正式 issue 之外又出现更广泛的 control-plane thrash contract 漂移，再新开 lifecycle，而不是重新激活本 supporting pre-brainstorm。

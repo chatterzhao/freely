@@ -7,6 +7,6 @@
 - verification_artifact_dir: docs/epics/agent-table-slot-pin/code-reviews
 - canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260626T171144Z-A/issue.md
 - title: agent-table slot pinning at startup
-- pre_tests_path: docs/epics/agent-table-slot-pin/verification/pre-tests.md
+- pre_tests_path: docs/B2-docs/agent-table-slot-pin/verification/pre-tests.md
 # I-20260626T171144Z-A: agent-table slot pinning at startup
 _init_agent_table_slot_pin: daemon start 时将 agent-table 分配的 slot 写入 current-slot 文件

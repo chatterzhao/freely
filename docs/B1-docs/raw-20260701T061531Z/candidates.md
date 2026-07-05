@@ -7,5 +7,5 @@ milestone: M-20260701T061531Z-A
 ## C-20260701T061531Z-A: gate summary output
 - milestone: M-20260701T061531Z-A
 - promoted_issue_id: I-20260701T061531Z-A
-- promoted_issue_path: docs/epics/gate-summary-output/add-summary/raw-20260701T061531Z/issues/I-20260701T061531Z-A.md
+- promoted_issue_path: docs/B2-docs/gate/governance/raw-20260701T061531Z/issues/I-20260701T061531Z-A.md
 - status: promoted

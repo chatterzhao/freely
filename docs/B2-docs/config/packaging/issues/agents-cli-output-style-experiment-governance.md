@@ -12,9 +12,9 @@
 - source_brainstorm: `docs/B1-docs/raw-20260405/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/config/packaging/pre-tests.md`
 - progress_path: `docs/progress/freely-product-architecture/p-agents-cli-output-style-experiment-governance.md`
-- verification_artifact_dir: `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/config/packaging/code-reviews`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -64,12 +64,12 @@ That makes this a product-architecture/developer-entrypoint governance writeback
 - `docs/B1-docs/raw-20260405/brainstorms.md`
 - `docs/B1-docs/raw-20260405/candidates.md`
 - `docs/milestones.md`
-- `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/issues/agents-cli-output-style-experiment-governance.md`
-- `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/brainstorms/b-agents-cli-output-style-experiment-governance.md`
-- `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/prd.md`
-- `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/pre-tests.md`
-- `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/tasks.md`
-- `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/code-reviews/20260405-agents-cli-output-style-experiment-governance-verification.md`
+- `docs/B2-docs/config/packaging/issues/agents-cli-output-style-experiment-governance.md`
+- `docs/B2-docs/config/packaging/brainstorms/b-agents-cli-output-style-experiment-governance.md`
+- `docs/B2-docs/config/packaging/prd.md`
+- `docs/B2-docs/config/packaging/pre-tests.md`
+- `docs/B2-docs/config/packaging/tasks.md`
+- `docs/B2-docs/config/packaging/code-reviews/20260405-agents-cli-output-style-experiment-governance-verification.md`
 - `docs/progress/freely-product-architecture/p-agents-cli-output-style-experiment-governance.md`
 
 ## Verification
@@ -79,5 +79,5 @@ That makes this a product-architecture/developer-entrypoint governance writeback
 
 ## Next
 
-- Completed on canonical `develop` with closeout verification recorded in `docs/epics/freely-product-architecture/agents-cli-output-style-experiment-governance/code-reviews/20260405-agents-cli-output-style-canonical-closeout-verification.md`.
+- Completed on canonical `develop` with closeout verification recorded in `docs/B2-docs/config/packaging/code-reviews/20260405-agents-cli-output-style-canonical-closeout-verification.md`.
 - Reopen only if canonical `develop` stops treating this as an `AGENTS.md`-only experiment or if project-level `AGENTS.md` entrypoint truth needs stronger capability-level materialization.

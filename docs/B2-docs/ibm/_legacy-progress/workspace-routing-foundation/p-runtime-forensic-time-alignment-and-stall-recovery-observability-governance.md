@@ -1,7 +1,7 @@
 # Progress: runtime-forensic-time-alignment-and-stall-recovery-observability-governance
 
 - issue_id: `I-20260412-1845-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/issues/runtime-forensic-time-alignment-and-stall-recovery-observability-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/issues/runtime-forensic-time-alignment-and-stall-recovery-observability-governance.md`
 - title: `Runtime forensic time alignment and stall recovery observability governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -39,15 +39,15 @@ The implementation repairs both bounded runtime gaps while explicitly keeping ti
 - `bash docs/system/workspace/scripts/tests/test-freely-live-status-manager-continuity-gap-surface`
 - `./bin/governance-check`
 - `git diff --check`
-- `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-verification.md`
-- `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-closeout-verification.md`
+- `docs/B2-docs/runtime/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-verification.md`
+- `docs/B2-docs/runtime/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-closeout-verification.md`
 
 ## Closure Evidence
 
 1. `develop` merge `480d839a`
-2. `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-implementation-decision.md`
-3. `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-verification.md`
-4. `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-closeout-verification.md`
+2. `docs/B2-docs/runtime/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-implementation-decision.md`
+3. `docs/B2-docs/runtime/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-verification.md`
+4. `docs/B2-docs/runtime/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-closeout-verification.md`
 
 ## Next Action
 

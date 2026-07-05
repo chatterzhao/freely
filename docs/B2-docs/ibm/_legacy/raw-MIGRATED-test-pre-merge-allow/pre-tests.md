@@ -33,7 +33,7 @@
 - requirement: merge into test-pre-merge not blocked by hooks
 - evidence_level: mock
 ^- status: passed
-- artifact_ref: docs/epics/test-pre-merge-allow/code-reviews/implementation-decision.md
+- artifact_ref: docs/B2-docs/test-pre-merge-allow/code-reviews/implementation-decision.md
 ## Real-Environment
 - real_environment_status: pass
 - real_environment_reason: git merge verified during development

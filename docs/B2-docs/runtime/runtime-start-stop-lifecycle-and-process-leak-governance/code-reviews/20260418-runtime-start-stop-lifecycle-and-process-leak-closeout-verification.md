@@ -1,7 +1,7 @@
 # Verification: runtime-start-stop-lifecycle-and-process-leak-governance closeout
 
 - issue_id: `I-20260417-0445-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
 - verification_date: `2026-04-18`
 - verifier: `codex`
 

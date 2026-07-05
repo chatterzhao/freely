@@ -12,13 +12,13 @@
 - source_brainstorm: `docs/B1-docs/raw-20260412/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/runtime/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-runtime-forensic-time-alignment-and-stall-recovery-observability-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/runtime/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md`
-  - `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
-  - `docs/epics/workspace-routing-foundation/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
+  - `docs/B2-docs/runtime/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md`
+  - `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
+  - `docs/B2-docs/runtime/runtime-selfhost-continuity-gap-and-status-truth-governance/issues/runtime-selfhost-continuity-gap-and-status-truth-governance.md`
 - created_at: `2026-04-12`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
@@ -65,21 +65,21 @@ So the real gap is not human-readable time-display policy. The gap is runtime fo
 
 ## Verification
 
-- `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-implementation-decision.md`
-- `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-verification.md`
-- `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-closeout-verification.md`
+- `docs/B2-docs/runtime/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-implementation-decision.md`
+- `docs/B2-docs/runtime/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-verification.md`
+- `docs/B2-docs/runtime/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-closeout-verification.md`
 
 ## Completion
 
 - `docs/B1-docs/raw-20260412/brainstorms.md`
 - `docs/B1-docs/raw-20260412/candidates.md`
-- `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/issues/runtime-forensic-time-alignment-and-stall-recovery-observability-governance.md`
-- `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/brainstorms/b-runtime-forensic-time-alignment-and-stall-recovery-observability-governance.md`
-- `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/tasks.md`
-- `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-implementation-decision.md`
-- `docs/epics/workspace-routing-foundation/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-verification.md`
+- `docs/B2-docs/runtime/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/issues/runtime-forensic-time-alignment-and-stall-recovery-observability-governance.md`
+- `docs/B2-docs/runtime/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/brainstorms/b-runtime-forensic-time-alignment-and-stall-recovery-observability-governance.md`
+- `docs/B2-docs/runtime/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/prd.md`
+- `docs/B2-docs/runtime/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/pre-tests.md`
+- `docs/B2-docs/runtime/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/tasks.md`
+- `docs/B2-docs/runtime/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-implementation-decision.md`
+- `docs/B2-docs/runtime/runtime-forensic-time-alignment-and-stall-recovery-observability-governance/code-reviews/20260412-runtime-forensic-time-alignment-verification.md`
 - `docs/progress/workspace-routing-foundation/p-runtime-forensic-time-alignment-and-stall-recovery-observability-governance.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-manager-stall-recovery`

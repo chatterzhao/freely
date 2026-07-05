@@ -6,7 +6,7 @@
 - title: Restart slot-switch preflight preserves active runtime governance
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/restart-slot-switch-preflight-preserves-active-runtime-governance/issues/restart-slot-switch-preflight-preserves-active-runtime-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/restart-slot-switch-preflight-preserves-active-runtime-governance/issues/restart-slot-switch-preflight-preserves-active-runtime-governance.md`
 - promoted_issue_id: `I-20260405-2055-A`
 - session_refs:
   - tool: `codex`

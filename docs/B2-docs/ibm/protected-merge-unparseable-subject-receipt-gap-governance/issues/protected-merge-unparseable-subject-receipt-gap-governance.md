@@ -12,11 +12,11 @@
 - source_brainstorm: `docs/B1-docs/raw-20260411/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/ibm/protected-merge-unparseable-subject-receipt-gap-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-protected-merge-unparseable-subject-receipt-gap-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/protected-merge-unparseable-subject-receipt-gap-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
+  - `docs/B2-docs/ibm/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
   - `docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md`
   - `docs/system/workspace/scripts/quality/governance-check`
   - `docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt-backfills`
@@ -62,10 +62,10 @@ The current fail-closed behavior is correct, but Freely now needs a narrower fol
   - Do not touch canonical ledger entries for the April 10 preferred-auth batch until tests and parser changes are both green.
 - required_doc_refs:
   - `docs/B1-docs/raw-20260411/brainstorms.md`
-  - `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/brainstorms/b-protected-merge-unparseable-subject-receipt-gap-governance.md`
-  - `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/prd.md`
-  - `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/tasks.md`
+  - `docs/B2-docs/ibm/protected-merge-unparseable-subject-receipt-gap-governance/brainstorms/b-protected-merge-unparseable-subject-receipt-gap-governance.md`
+  - `docs/B2-docs/ibm/protected-merge-unparseable-subject-receipt-gap-governance/prd.md`
+  - `docs/B2-docs/ibm/protected-merge-unparseable-subject-receipt-gap-governance/pre-tests.md`
+  - `docs/B2-docs/ibm/protected-merge-unparseable-subject-receipt-gap-governance/tasks.md`
   - `docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md`
   - `docs/system/workspace/scripts/quality/governance-check`
   - `docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt-backfills`
@@ -81,13 +81,13 @@ The current fail-closed behavior is correct, but Freely now needs a narrower fol
 - `docs/B1-docs/raw-20260411/brainstorms.md`
 - `docs/B1-docs/raw-20260411/candidates.md`
 - `docs/milestones.md`
-- `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
-- `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/tasks.md`
+- `docs/B2-docs/ibm/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
+- `docs/B2-docs/ibm/protected-merge-unparseable-subject-receipt-gap-governance/prd.md`
+- `docs/B2-docs/ibm/protected-merge-unparseable-subject-receipt-gap-governance/pre-tests.md`
+- `docs/B2-docs/ibm/protected-merge-unparseable-subject-receipt-gap-governance/tasks.md`
 - `docs/progress/workspace-routing-foundation/p-protected-merge-unparseable-subject-receipt-gap-governance.md`
 - `docs/system/workspace/hooks/protected-branch-merge-receipt-backfills.md`
 - `docs/system/workspace/scripts/quality/governance-check`
 - `docs/system/workspace/scripts/tests/test-governance-check-protected-branch-merge-receipt-backfills`
-- `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/code-reviews/20260411-protected-merge-unparseable-subject-receipt-gap-verification.md`
-- `docs/epics/workspace-routing-foundation/protected-merge-unparseable-subject-receipt-gap-governance/code-reviews/20260411-protected-merge-unparseable-subject-receipt-gap-canonical-closeout-verification.md`
+- `docs/B2-docs/ibm/protected-merge-unparseable-subject-receipt-gap-governance/code-reviews/20260411-protected-merge-unparseable-subject-receipt-gap-verification.md`
+- `docs/B2-docs/ibm/protected-merge-unparseable-subject-receipt-gap-governance/code-reviews/20260411-protected-merge-unparseable-subject-receipt-gap-canonical-closeout-verification.md`

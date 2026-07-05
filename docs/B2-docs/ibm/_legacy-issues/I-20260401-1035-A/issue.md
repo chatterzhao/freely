@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO7H
     synced_at: '2026-04-27T13:15:33Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/develop-push-pending-guard-governance/issues/develop-push-pending-guard-governance.md
+canonical_issue_path: docs/B2-docs/ibm/develop-push-pending-guard-governance/issues/develop-push-pending-guard-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:21:45Z'
 hash: ''
@@ -28,4 +28,4 @@ Freely already protects branch topology and develop-bound merges, but still lack
 1. local `develop` can carry merge-complete truth that has not reached the remote canonical integration branch yet, and
 2. post-merge acceptance, cleanup, and next-lane scheduling can continue without any explicit record of whether push is intentionally delayed or silently for
 
-canonical: docs/epics/workspace-routing-foundation/develop-push-pending-guard-governance/issues/develop-push-pending-guard-governance.md
+canonical: docs/B2-docs/ibm/develop-push-pending-guard-governance/issues/develop-push-pending-guard-governance.md

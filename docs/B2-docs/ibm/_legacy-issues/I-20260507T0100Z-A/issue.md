@@ -6,7 +6,7 @@ completed_at: '2026-06-16T04:14:56Z'
 source_candidate: docs/B1-docs/raw-20260507/candidates.md
 milestone: M-20260507T0100Z-A
 verification_artifact_dir: docs/epics/fix-branch-naming/code-reviews
-pre_tests_path: docs/epics/fix-branch-naming/verification/pre-tests.md
+pre_tests_path: docs/B2-docs/fix-branch-naming/verification/pre-tests.md
 platform_ids:
   github:
     issue_id: '2606'
@@ -22,6 +22,6 @@ created_at: '2026-06-13T10:51:03Z'
 
 5 处 feature/ → fix/ in fix-execution SKILL.md.
 
-- pre_tests_path: `docs/epics/fix-branch-naming/verification/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/fix-branch-naming/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/fix-branch-naming/code-reviews`
 - issue_id: `I-20260507T0100Z-A`

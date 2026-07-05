@@ -6,7 +6,7 @@
 - runtime_state: `stopped`
 - branch: `feature/upstream-governance-merge-prep-20260327`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260327-feature-upstream-governance-merge-prep`
-- issue_path: `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
+- issue_path: `docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "canonical-closeout-writeback"}
 
@@ -19,7 +19,7 @@
 
 - `bash docs/system/workspace/scripts/tests/test-freely-session-rotation`
 - `./bin/governance-check`
-- `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/references/trigger-owner-matrix.md`
+- `docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/references/trigger-owner-matrix.md`
 - `docs/system/workspace/tools.md`
 - `docs/system/workspace/skills/freely-continuity-watchdog/SKILL.md`
 - `docs/system/workspace/skills/freely-watchdog-control-plane/SKILL.md`

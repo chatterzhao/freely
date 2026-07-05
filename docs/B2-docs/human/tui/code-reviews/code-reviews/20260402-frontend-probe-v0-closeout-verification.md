@@ -1,7 +1,7 @@
 # Code Review: frontend-probe-v0-closeout-verification
 
 - issue_id: `I-20260308-1244-03`
-- issue: `docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0/issues/frontend-probe-v0.md`
+- issue: `docs/B2-docs/human/tui/issues/frontend-probe-v0.md`
 - reviewer: `codex`
 - phase: `completed`
 - date: `2026-04-02`
@@ -20,12 +20,12 @@
 2. `bun run tauri:validate:probe`
    - result: previously passed and recorded
    - evidence:
-     - `docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0/code-reviews/20260401-frontend-probe-v0-terminal-attach-validation.md`
+     - `docs/B2-docs/human/tui/code-reviews/20260401-frontend-probe-v0-terminal-attach-validation.md`
      - observed flow already covers `start -> create/resume session -> attach terminal -> chat intervention`
 3. `I-20260317-0332`
    - result: completed_on_develop
    - evidence:
-     - `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/issues/rust-tauri-probe-bridge-v1.md`
+     - `docs/B2-docs/human/tui/issues/rust-tauri-probe-bridge-v1.md`
      - real Tauri host bring-up and bridge interaction blocker are closed
 4. `I-20260317-1004`
    - result: absorbed_dependency

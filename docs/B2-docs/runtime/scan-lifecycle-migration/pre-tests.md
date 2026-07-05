@@ -1,7 +1,7 @@
 # Pre-tests — scan lifecycle migration
 
 - issue_id: `I-20260503-0200-A`
-- issue_path: `docs/epics/workspace-routing-foundation/scan-lifecycle-migration/issues/I-20260503-0200-A.md`
+- issue_path: `docs/B2-docs/runtime/scan-lifecycle-migration/issues/I-20260503-0200-A.md`
 
 ## Unit
 - acceptance target: `task-lifecycle-scan.py 输出准确，chain trace 逐 key 验证通过`
@@ -45,7 +45,7 @@
 - requirement: `scan 输出 35 条，chat_inbox=7, chain_trace=17, governance=11，逐条与实际状态一致`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/scan-lifecycle-migration/code-reviews/review.md`
+- artifact_ref: `docs/B2-docs/runtime/scan-lifecycle-migration/code-reviews/review.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -57,7 +57,7 @@
 - requirement: `12 mandatory + 2 optional stations per key，每站 current/next/blokers 与实际一致`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/scan-lifecycle-migration/code-reviews/review.md`
+- artifact_ref: `docs/B2-docs/runtime/scan-lifecycle-migration/code-reviews/review.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -69,7 +69,7 @@
 - requirement: `AF_UNIX socket path < 50 chars，daemon 在长路径工位下正常启动`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/scan-lifecycle-migration/code-reviews/review.md`
+- artifact_ref: `docs/B2-docs/runtime/scan-lifecycle-migration/code-reviews/review.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -81,7 +81,7 @@
 - requirement: `test-pre-merge 集成验证通过，daemon 启动正常，scan 输出准确`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/scan-lifecycle-migration/code-reviews/review.md`
+- artifact_ref: `docs/B2-docs/runtime/scan-lifecycle-migration/code-reviews/review.md`
 - surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
@@ -93,7 +93,7 @@
 - requirement: `governance-merge-gate --range develop..HEAD 通过`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/scan-lifecycle-migration/code-reviews/review.md`
+- artifact_ref: `docs/B2-docs/runtime/scan-lifecycle-migration/code-reviews/review.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `develop_merge`

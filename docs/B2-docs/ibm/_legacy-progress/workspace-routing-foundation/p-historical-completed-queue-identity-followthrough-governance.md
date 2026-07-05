@@ -1,7 +1,7 @@
 # Progress: historical-completed-queue-identity-followthrough-governance
 
 - issue_id: `I-20260412-1230-A`
-- issue_path: `docs/epics/workspace-routing-foundation/historical-completed-queue-identity-followthrough-governance/issues/historical-completed-queue-identity-followthrough-governance.md`
+- issue_path: `docs/B2-docs/ibm/historical-completed-queue-identity-followthrough-governance/issues/historical-completed-queue-identity-followthrough-governance.md`
 - title: `Historical completed-queue identity followthrough governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -23,7 +23,7 @@
 ## Verification Evidence
 
 - `./bin/governance-check`
-- `docs/epics/workspace-routing-foundation/historical-completed-queue-identity-followthrough-governance/code-reviews/20260412-historical-completed-queue-identity-followthrough-verification.md`
+- `docs/B2-docs/ibm/historical-completed-queue-identity-followthrough-governance/code-reviews/20260412-historical-completed-queue-identity-followthrough-verification.md`
 
 ## Next Action
 

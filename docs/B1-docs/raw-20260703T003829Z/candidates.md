@@ -44,6 +44,6 @@ milestone: M-20260703T003829Z-A
   - summary: 审查 unsafe source 替换为 meta_env_value 的正确性，确认无其他同类问题
   - verdict: pass
 - promoted_issue_id: I-20260703T003829Z-A
-- promoted_issue_path: docs/epics/runtime-core/safe-state-io/raw-20260703T003829Z/issues/I-20260703T003829Z-A.md
+- promoted_issue_path: docs/B2-docs/runtime/daemon/raw-20260703T003829Z/issues/I-20260703T003829Z-A.md
 - milestone: M-20260703T003829Z-A
 - session_refs: []

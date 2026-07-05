@@ -12,13 +12,13 @@
 - source_brainstorm: `docs/B1-docs/raw-20260408/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-develop-push-followthrough-escalation-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/develop-push-pending-guard-governance/issues/develop-push-pending-guard-governance.md`
-  - `docs/epics/workspace-routing-foundation/worktree-maintenance-governance/issues/worktree-maintenance-governance.md`
-  - `docs/epics/workspace-routing-foundation/deep-refactor-fleet-sequencing-governance/issues/deep-refactor-fleet-sequencing-governance.md`
+  - `docs/B2-docs/ibm/develop-push-pending-guard-governance/issues/develop-push-pending-guard-governance.md`
+  - `docs/B2-docs/git-worktree/worktree-maintenance-governance/issues/worktree-maintenance-governance.md`
+  - `docs/B2-docs/ibm/deep-refactor-fleet-sequencing-governance/issues/deep-refactor-fleet-sequencing-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -71,11 +71,11 @@ Freely 已经能显式暴露 `push_pending` / `push_deferred`，但还没有冻�
   - 第一阶段优先修改 truth source / status semantics，不要求一次性实现所有 runtime enforcement。
   - 若实现阶段发现 push urgency 与 resync trigger 完全不同步，再拆为两个 dev-loop lane。
 - required_doc_refs:
-  - `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md`
-  - `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/brainstorms/b-develop-push-followthrough-escalation-governance.md`
-  - `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/prd.md`
-  - `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/tasks.md`
+  - `docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md`
+  - `docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/brainstorms/b-develop-push-followthrough-escalation-governance.md`
+  - `docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/prd.md`
+  - `docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/pre-tests.md`
+  - `docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/tasks.md`
   - `docs/system/workspace/agents/manager-agent.md`
   - `docs/system/workspace/scripts/runtime/freely`
   - `docs/system/workspace/scripts/quality/governance-check`

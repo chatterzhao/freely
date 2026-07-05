@@ -48,7 +48,7 @@
 - case_design: `Use the feature-lane verification review to prove the same Acceptance Item now carries adequacy-v2 metadata without regressing legacy parsing.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/code-reviews/20260411-pretests-adequacy-item-schema-materialization-verification.md`
+- artifact_ref: `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/code-reviews/20260411-pretests-adequacy-item-schema-materialization-verification.md`
 
 ### Classify insufficient versus sufficient
 - id: `adequacy-classification-diagnostics`
@@ -60,7 +60,7 @@
 - case_design: `Replay standalone and guarded gate fixtures that each fail for a different adequacy reason, then confirm the final feature-lane verification artifact records the distinct verdicts.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/code-reviews/20260411-pretests-adequacy-item-schema-materialization-verification.md`
+- artifact_ref: `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/code-reviews/20260411-pretests-adequacy-item-schema-materialization-verification.md`
 
 ### Preserve legacy compatibility
 - id: `legacy-owner-compatibility`
@@ -72,7 +72,7 @@
 - case_design: `Retain an unchanged legacy fixture in gate tests while a new-owner fixture opts into adequacy-v2 and guarded develop promote enforcement.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/code-reviews/20260411-pretests-adequacy-item-schema-materialization-verification.md`
+- artifact_ref: `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/code-reviews/20260411-pretests-adequacy-item-schema-materialization-verification.md`
 
 ### Guarded develop promote proves adequacy-v2 coverage
 - id: `develop-promote-adequacy-proof`
@@ -84,4 +84,4 @@
 - case_design: `Merge the feature lane into a disposable test-pre-merge batch through pr-merge-guarded, run premerge-integration gate regressions there, and use the resulting verification artifact to prove the lane/gate pair is now explicitly covered.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/pretests-adequacy-item-schema-materialization-governance/code-reviews/20260411-pretests-adequacy-item-schema-materialization-verification.md`
+- artifact_ref: `docs/B2-docs/gate/pretests-adequacy-item-schema-materialization-governance/code-reviews/20260411-pretests-adequacy-item-schema-materialization-verification.md`

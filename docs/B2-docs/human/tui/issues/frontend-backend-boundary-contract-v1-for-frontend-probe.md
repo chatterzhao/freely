@@ -7,7 +7,7 @@
 - epic-name: `frontend-probe-dogfooding-loop`
 - story-name: `frontend-backend-boundary-contract-v1-for-frontend-probe`
 - issue-name: `frontend-backend-boundary-contract-v1-for-frontend-probe`
-- verification_artifact_dir: `docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/human/tui/code-reviews`
 - source_candidate: `docs/B1-docs/raw-20260308/candidates.md#c-20260308-1244-02`
 - source_brainstorm: `docs/B1-docs/raw-20260308/brainstorms.md`
 - execution_base: `develop`
@@ -133,15 +133,15 @@
   - 基于 `I-20260308-1245` 已完成的总体边界收敛，把 Probe 真正依赖的 sessions / stream / history / status contract 冻结到 v1。
   - 当前 issue 已具备进入 `Frontend Probe v0` 所需的最小文档包，不进入实现代码。
 - required_doc_refs:
-  - `docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/issues/internal-frontend-backend-architecture-review.md`
-  - `docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/brainstorms/b-frontend-backend-boundary-contract-v1-for-frontend-probe.md`
-  - `docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/prd.md`
-  - `docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/pre-tests.md`
-  - `docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/tasks.md`
+  - `docs/B2-docs/human/tui/issues/internal-frontend-backend-architecture-review.md`
+  - `docs/B2-docs/human/tui/brainstorms/b-frontend-backend-boundary-contract-v1-for-frontend-probe.md`
+  - `docs/B2-docs/human/tui/prd.md`
+  - `docs/B2-docs/human/tui/pre-tests.md`
+  - `docs/B2-docs/human/tui/tasks.md`
 
 ## Verification
 
-- `rg -n "CreateOrResumeSession|SendChatIntervention|ControlRun|AttachTerminal|RequestSnapshot|SessionUpserted|RunStatusChanged|AgentStatusChanged|TerminalChunkAppended|GovernanceDecisionRecorded|InputArbitrationRecorded|RecoveryStatusChanged|project_summary|active_sessions|active_runs|active_agents|terminal_targets|governance_summary|recovery_summary|last_event_id" docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0 docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1 -g '*.md'`
+- `rg -n "CreateOrResumeSession|SendChatIntervention|ControlRun|AttachTerminal|RequestSnapshot|SessionUpserted|RunStatusChanged|AgentStatusChanged|TerminalChunkAppended|GovernanceDecisionRecorded|InputArbitrationRecorded|RecoveryStatusChanged|project_summary|active_sessions|active_runs|active_agents|terminal_targets|governance_summary|recovery_summary|last_event_id" docs/B2-docs/human/frontend-backend-boundary-contract-v1-for-frontend-probe docs/B2-docs/human/frontend-probe-v0 docs/B2-docs/human/rust-tauri-probe-bridge-v1 -g '*.md'`
 - `rg -n "I-20260317-1001|frontend-backend-boundary-contract-v1-for-frontend-probe" docs -g '*.md'`
 - `./bin/governance-check`
 

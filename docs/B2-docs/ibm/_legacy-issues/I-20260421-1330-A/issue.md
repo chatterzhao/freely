@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFOAI
     synced_at: '2026-04-27T13:17:42Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/issues/absorbed-merged-lane-routing-followthrough-governance.md
+canonical_issue_path: docs/B2-docs/ibm/absorbed-merged-lane-routing-followthrough-governance/issues/absorbed-merged-lane-routing-followthrough-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:28:45Z'
 hash: ''
@@ -30,4 +30,4 @@ Two bounded surfaces caused that drift:
 1. `wt-fleet-status` preserved `LAST_ROLE_HINT=worker` even when the branch tip was already absorbed into `develop`.
 2. `task-source-scan` kept routing linked progress items back to `verification` because it did not consult the link
 
-canonical: docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/issues/absorbed-merged-lane-routing-followthrough-governance.md
+canonical: docs/B2-docs/ibm/absorbed-merged-lane-routing-followthrough-governance/issues/absorbed-merged-lane-routing-followthrough-governance.md

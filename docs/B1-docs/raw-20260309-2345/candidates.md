@@ -15,7 +15,7 @@
 - status: absorbed
 - adoption_type: supporting_evidence
 - decision_reason: `governance-check` 命名、candidate v2 门禁与脚本回归已由 `I-20260320-0500` 吸收；本候选只保留为 supporting provenance。
-- promoted_issue_path: docs/epics/workspace-routing-foundation/candidate-acceptance-review-governance/issues/candidate-acceptance-review-governance.md
+- promoted_issue_path: docs/B2-docs/ibm/candidate-acceptance-review-governance/issues/candidate-acceptance-review-governance.md
 - milestone: M-20260306-workspace-routing-foundation
 - session_refs:
   - tool: codex

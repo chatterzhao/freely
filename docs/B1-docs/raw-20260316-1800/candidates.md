@@ -14,7 +14,7 @@
 - priority: P0
 - status: promoted
 - decision_reason: 这是当前后台运行不稳定和会话治理缺口的直接承接项，优先级高于 sidecar 演化层与更远期 UI。
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/session-lifecycle-rotation-and-handoff-governance/issues/session-lifecycle-rotation-and-handoff-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/session-lifecycle-rotation-and-handoff-governance/issues/session-lifecycle-rotation-and-handoff-governance.md`
 - milestone: `M-20260306-workspace-routing-foundation`
 - session_refs:
   - tool: codex

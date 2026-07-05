@@ -5,7 +5,7 @@
 - source_brainstorm: `docs/B1-docs/raw-20260324-0405/brainstorms.md`
 - status: `materialized`
 - milestone: `M-20260306-workspace-routing-foundation`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/watchdog-restart-storm-and-process-churn-governance/issues/watchdog-restart-storm-and-process-churn-governance.md`
+- promoted_issue_path: `docs/B2-docs/runtime/watchdog-restart-storm-and-process-churn-governance/issues/watchdog-restart-storm-and-process-churn-governance.md`
 - legacy_id_mapping: I-20260324-0405  # 历史遗留的 issue id
 - session_refs:
   - tool: `codex`

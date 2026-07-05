@@ -12,9 +12,9 @@
 - source_brainstorm: `docs/B1-docs/raw-20260413/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-manager-startup-continuity-contract-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/code-reviews`
 - follow_on_to: `I-20260413-0420-A`
 - created_at: `2026-04-13`
 - session_refs:
@@ -63,16 +63,16 @@ This owner is the contract-freezing follow-on to startup authority. It decides w
 - required_doc_refs:
   - `docs/B1-docs/raw-20260413/brainstorms.md`
   - `docs/B1-docs/raw-20260413/candidates.md`
-  - `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/brainstorms/b-manager-startup-continuity-contract-governance.md`
-  - `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/prd.md`
-  - `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/tasks.md`
-  - `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/code-reviews/20260413-manager-startup-continuity-contract-decision.md`
+  - `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/brainstorms/b-manager-startup-continuity-contract-governance.md`
+  - `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/prd.md`
+  - `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/pre-tests.md`
+  - `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/tasks.md`
+  - `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/code-reviews/20260413-manager-startup-continuity-contract-decision.md`
 
 ## Verification
 
-- `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/code-reviews/20260413-manager-startup-continuity-contract-decision.md`
-- `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/code-reviews/20260413-manager-startup-continuity-contract-verification.md`
+- `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/code-reviews/20260413-manager-startup-continuity-contract-decision.md`
+- `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/code-reviews/20260413-manager-startup-continuity-contract-verification.md`
 - `bash docs/system/workspace/scripts/tests/test-pretests-gate`
 - `bash docs/system/workspace/scripts/tests/test-governance-merge-gate`
 - `./bin/governance-check`
@@ -81,13 +81,13 @@ This owner is the contract-freezing follow-on to startup authority. It decides w
 ## Completion
 
 - `docs/B1-docs/raw-20260413/candidates.md`
-- `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/issues/manager-startup-continuity-contract-governance.md`
-- `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/brainstorms/b-manager-startup-continuity-contract-governance.md`
-- `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/tasks.md`
-- `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/code-reviews/20260413-manager-startup-continuity-contract-decision.md`
-- `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/code-reviews/20260413-manager-startup-continuity-contract-verification.md`
+- `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/issues/manager-startup-continuity-contract-governance.md`
+- `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/brainstorms/b-manager-startup-continuity-contract-governance.md`
+- `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/prd.md`
+- `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/pre-tests.md`
+- `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/tasks.md`
+- `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/code-reviews/20260413-manager-startup-continuity-contract-decision.md`
+- `docs/B2-docs/ibm/manager-startup-continuity-contract-governance/code-reviews/20260413-manager-startup-continuity-contract-verification.md`
 - `docs/progress/workspace-routing-foundation/p-manager-startup-continuity-contract-governance.md`
 - `docs/milestones.md`
 

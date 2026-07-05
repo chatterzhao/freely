@@ -10,16 +10,16 @@
 - priority: `P1`
 - source_candidate: `docs/B1-docs/raw-20260416/candidates.md#c-20260416-0448-a`
 - source_brainstorm: `docs/B1-docs/raw-20260416/brainstorms.md`
-- reopen_of_issue: `docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
+- reopen_of_issue: `docs/B2-docs/config/packaging/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
 - reopen_reason: `memark 0.1.1 requires canonical repo roots to ignore .memark/ and corpus/ before root init, and Freely root still lacked those ignore entries`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/freely-product-architecture/memark-protected-root-bootstrap-followthrough-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/config/packaging/pre-tests.md`
 - progress_path: `docs/progress/freely-product-architecture/p-memark-protected-root-bootstrap-followthrough-governance.md`
-- verification_artifact_dir: `docs/epics/freely-product-architecture/memark-protected-root-bootstrap-followthrough-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/config/packaging/code-reviews`
 - depends_on:
-  - `docs/epics/freely-product-architecture/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
-  - `docs/epics/freely-product-architecture/worktree-tool-boundary-bootstrap-governance/issues/worktree-tool-boundary-bootstrap-governance.md`
+  - `docs/B2-docs/config/packaging/issues/fresh-project-bootstrap-and-baseline-scoping-followthrough-governance.md`
+  - `docs/B2-docs/config/packaging/issues/worktree-tool-boundary-bootstrap-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 

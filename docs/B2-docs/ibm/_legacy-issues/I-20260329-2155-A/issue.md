@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO77
     synced_at: '2026-04-27T13:15:17Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/sensitive-local-artifact-ignore-governance/issues/sensitive-local-artifact-ignore-governance.md
+canonical_issue_path: docs/B2-docs/ibm/sensitive-local-artifact-ignore-governance/issues/sensitive-local-artifact-ignore-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:21:19Z'
 hash: ''
@@ -27,4 +27,4 @@ platform_state: closed
 
 这条线的目标不是重做凭证存储，而是把“误落到仓库里的敏感本地文件不应进入 Git”冻结成一个最小、可测试的 contract。
 
-canonical: docs/epics/workspace-routing-foundation/sensitive-local-artifact-ignore-governance/issues/sensitive-local-artifact-ignore-governance.md
+canonical: docs/B2-docs/ibm/sensitive-local-artifact-ignore-governance/issues/sensitive-local-artifact-ignore-governance.md

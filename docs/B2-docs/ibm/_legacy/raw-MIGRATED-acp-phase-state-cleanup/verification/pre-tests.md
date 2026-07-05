@@ -8,4 +8,4 @@
 - id: phase-state-update
 - requirement: ACP issues show phase_state=completed
 ^- status: passed
-- artifact_ref: docs/epics/acp-phase-state-cleanup/code-reviews/review.md
+- artifact_ref: docs/B2-docs/acp-phase-state-cleanup/code-reviews/review.md

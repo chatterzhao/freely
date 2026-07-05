@@ -15,7 +15,7 @@ Dogfooding on 2026-04-04 proved both that a stale shared lock can block startup 
 - `docs/system/workspace/scripts/tests/test-freely-start-cleans-stale-slot-switch-lock`
 - `docs/system/workspace/scripts/tests/test-freely-start-times-out-on-active-slot-switch-lock`
 - `docs/system/workspace/scripts/tests/test-freely-slot-switch-lock-status-surface`
-- `docs/epics/workspace-routing-foundation/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/*.md`
+- `docs/B2-docs/config/slot-switch-startup-preflight-and-lock-observability-governance/code-reviews/*.md`
 
 ## Non-Goals
 

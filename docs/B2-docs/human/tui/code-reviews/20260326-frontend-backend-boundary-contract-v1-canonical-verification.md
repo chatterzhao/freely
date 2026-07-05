@@ -8,12 +8,12 @@
 
 ## Scope
 
-- `docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md`
-- `docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/prd.md`
-- `docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/pre-tests.md`
-- `docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/tasks.md`
-- `docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0/issues/frontend-probe-v0.md`
-- `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/issues/rust-tauri-probe-bridge-v1.md`
+- `docs/B2-docs/human/tui/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md`
+- `docs/B2-docs/human/tui/prd.md`
+- `docs/B2-docs/human/tui/pre-tests.md`
+- `docs/B2-docs/human/tui/tasks.md`
+- `docs/B2-docs/human/tui/issues/frontend-probe-v0.md`
+- `docs/B2-docs/human/tui/issues/rust-tauri-probe-bridge-v1.md`
 
 ## Findings
 
@@ -27,7 +27,7 @@
 
 ## Verification Checks
 
-- `rg -n "CreateOrResumeSession|SendChatIntervention|ControlRun|AttachTerminal|RequestSnapshot|SessionUpserted|RunStatusChanged|AgentStatusChanged|TerminalChunkAppended|GovernanceDecisionRecorded|InputArbitrationRecorded|RecoveryStatusChanged|project_summary|active_sessions|active_runs|active_agents|terminal_targets|governance_summary|recovery_summary|last_event_id" docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0 docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1 -g '*.md'`
+- `rg -n "CreateOrResumeSession|SendChatIntervention|ControlRun|AttachTerminal|RequestSnapshot|SessionUpserted|RunStatusChanged|AgentStatusChanged|TerminalChunkAppended|GovernanceDecisionRecorded|InputArbitrationRecorded|RecoveryStatusChanged|project_summary|active_sessions|active_runs|active_agents|terminal_targets|governance_summary|recovery_summary|last_event_id" docs/B2-docs/human/frontend-backend-boundary-contract-v1-for-frontend-probe docs/B2-docs/human/frontend-probe-v0 docs/B2-docs/human/rust-tauri-probe-bridge-v1 -g '*.md'`
 - `rg -n "I-20260317-1001|frontend-backend-boundary-contract-v1-for-frontend-probe" docs -g '*.md'`
 - `./bin/governance-check`
 

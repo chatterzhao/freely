@@ -33,7 +33,7 @@
 - requirement: --force described as abandon-only with counter-examples
 - evidence_level: mock
 ^- status: passed
-- artifact_ref: docs/epics/force-abandon-only/code-reviews/implementation-decision.md
+- artifact_ref: docs/B2-docs/force-abandon-only/code-reviews/implementation-decision.md
 ## Real-Environment
 - real_environment_status: pass
 - real_environment_reason: --help output verified

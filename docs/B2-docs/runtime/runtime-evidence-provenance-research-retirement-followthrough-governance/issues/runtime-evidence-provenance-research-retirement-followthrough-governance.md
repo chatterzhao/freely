@@ -10,16 +10,16 @@
 - priority: `P0`
 - source_candidate: `docs/B1-docs/raw-20260409/candidates.md#c-20260409-1715-a`
 - source_brainstorm: `docs/B1-docs/raw-20260409/brainstorms.md`
-- reopen_of_issue: `docs/epics/workspace-routing-foundation/worktree-maintenance-governance/issues/worktree-maintenance-governance.md`
+- reopen_of_issue: `docs/B2-docs/git-worktree/worktree-maintenance-governance/issues/worktree-maintenance-governance.md`
 - reopen_reason: `real develop-bound retirement of dropped candidate C-20260407-0603-A surfaced that candidate-only cleanup evidence still fails protected push and needs a narrow same-line followthrough owner`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/runtime-evidence-provenance-research-retirement-followthrough-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/runtime/runtime-evidence-provenance-research-retirement-followthrough-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-runtime-evidence-provenance-research-retirement-followthrough-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/runtime-evidence-provenance-research-retirement-followthrough-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/runtime/runtime-evidence-provenance-research-retirement-followthrough-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/worktree-maintenance-governance/issues/worktree-maintenance-governance.md`
-  - `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md`
+  - `docs/B2-docs/git-worktree/worktree-maintenance-governance/issues/worktree-maintenance-governance.md`
+  - `docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md`
   - `docs/B1-docs/raw-20260407/candidates.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
@@ -47,13 +47,13 @@ Because `develop` push lawfully rejects candidate-only retirement evidence, this
 
 1. The develop-bound retirement diff carries concrete same-line issue, pre-tests, progress, and verification artifacts.
 2. `C-20260407-0603-A` remains explicitly dropped and historical, with retirement handled by this owner rather than by a revived IBM issue from the old packet.
-3. `./bin/pretests-gate --project <worktree> --issue docs/epics/workspace-routing-foundation/runtime-evidence-provenance-research-retirement-followthrough-governance/issues/runtime-evidence-provenance-research-retirement-followthrough-governance.md` passes.
+3. `./bin/pretests-gate --project <worktree> --issue docs/B2-docs/runtime/runtime-evidence-provenance-research-retirement-followthrough-governance/issues/runtime-evidence-provenance-research-retirement-followthrough-governance.md` passes.
 4. `./bin/governance-check` passes.
 5. The obsolete research worktree is retired after canonical `develop` absorbs the closure.
 
 ## Verification
 
-- `./bin/pretests-gate --project <worktree> --issue docs/epics/workspace-routing-foundation/runtime-evidence-provenance-research-retirement-followthrough-governance/issues/runtime-evidence-provenance-research-retirement-followthrough-governance.md`
+- `./bin/pretests-gate --project <worktree> --issue docs/B2-docs/runtime/runtime-evidence-provenance-research-retirement-followthrough-governance/issues/runtime-evidence-provenance-research-retirement-followthrough-governance.md`
 - `git diff --check`
 - `./bin/governance-check`
 - `git worktree list --porcelain`
@@ -68,6 +68,6 @@ Because `develop` push lawfully rejects candidate-only retirement evidence, this
 - `docs/milestones.md`
 - `docs/B1-docs/raw-20260407/candidates.md`
 - `docs/B1-docs/raw-20260409/candidates.md`
-- `docs/epics/workspace-routing-foundation/runtime-evidence-provenance-research-retirement-followthrough-governance/issues/runtime-evidence-provenance-research-retirement-followthrough-governance.md`
+- `docs/B2-docs/runtime/runtime-evidence-provenance-research-retirement-followthrough-governance/issues/runtime-evidence-provenance-research-retirement-followthrough-governance.md`
 - `docs/progress/workspace-routing-foundation/p-runtime-evidence-provenance-research-retirement-followthrough-governance.md`
-- `docs/epics/workspace-routing-foundation/runtime-evidence-provenance-research-retirement-followthrough-governance/code-reviews/20260409-runtime-evidence-provenance-research-retirement-followthrough-verification.md`
+- `docs/B2-docs/runtime/runtime-evidence-provenance-research-retirement-followthrough-governance/code-reviews/20260409-runtime-evidence-provenance-research-retirement-followthrough-verification.md`

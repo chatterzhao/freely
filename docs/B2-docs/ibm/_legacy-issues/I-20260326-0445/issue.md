@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO6O
     synced_at: '2026-04-27T13:14:58Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/manager-delegated-intake-absorption-closure-governance/issues/manager-delegated-intake-absorption-closure-governance.md
+canonical_issue_path: docs/B2-docs/ibm/manager-delegated-intake-absorption-closure-governance/issues/manager-delegated-intake-absorption-closure-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:17:21Z'
 hash: ''
@@ -40,4 +40,4 @@ Freely 已经解决了 manager delegated continuation 的：
 1. machine-readable backlog 会无限积灰，主管必须不断解释“这些其实已经 absorb 过”；
 2. manager judg
 
-canonical: docs/epics/workspace-routing-foundation/manager-delegated-intake-absorption-closure-governance/issues/manager-delegated-intake-absorption-closure-governance.md
+canonical: docs/B2-docs/ibm/manager-delegated-intake-absorption-closure-governance/issues/manager-delegated-intake-absorption-closure-governance.md

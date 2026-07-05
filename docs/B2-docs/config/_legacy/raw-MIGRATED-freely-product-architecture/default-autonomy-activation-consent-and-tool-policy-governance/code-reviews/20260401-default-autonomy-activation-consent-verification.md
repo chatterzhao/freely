@@ -17,11 +17,11 @@
 
 ## Evidence
 
-- `docs/epics/freely-product-architecture/default-autonomy-activation-consent-and-tool-policy-governance/issues/default-autonomy-activation-consent-and-tool-policy-governance.md`
-- `docs/epics/freely-product-architecture/default-autonomy-activation-consent-and-tool-policy-governance/prd.md`
-- `docs/epics/freely-product-architecture/default-autonomy-activation-consent-and-tool-policy-governance/pre-tests.md`
+- `docs/B2-docs/config/packaging/issues/default-autonomy-activation-consent-and-tool-policy-governance.md`
+- `docs/B2-docs/config/packaging/prd.md`
+- `docs/B2-docs/config/packaging/pre-tests.md`
 - `docs/B1-docs/raw-20260401/brainstorms.md`
-- `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/issues/freely-tool-autonomy-policy-materialization-governance.md`
+- `docs/B2-docs/config/packaging/issues/freely-tool-autonomy-policy-materialization-governance.md`
 
 ## Implementation Decision Note
 

@@ -7,13 +7,13 @@
 - verification_artifact_dir: docs/epics/kill-ai-tool-fallback/code-reviews
 - canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260626T161720Z-A/issue.md
 - title: 废弃 AI_TOOL，agent-table 唯一真相源
-- pre_tests_path: docs/epics/kill-ai-tool-fallback/verification/pre-tests.md
+- pre_tests_path: docs/B2-docs/kill-ai-tool-fallback/verification/pre-tests.md
 
 # I-20260626T161720Z-A: 废弃 AI_TOOL，agent-table 唯一真相源
 
 - source_raw: raw-20260626T161720Z
 - source_candidate: docs/B1-docs/raw-20260626T161720Z/candidates.md#C-20260626T161720Z-A
-- pre_tests_path: docs/epics/kill-ai-tool-fallback/verification/pre-tests.md
+- pre_tests_path: docs/B2-docs/kill-ai-tool-fallback/verification/pre-tests.md
 - verification_artifact_dir: docs/epics/kill-ai-tool-fallback/code-reviews
 
 ## 实现

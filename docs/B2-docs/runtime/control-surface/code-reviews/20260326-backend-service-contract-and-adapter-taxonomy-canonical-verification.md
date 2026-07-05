@@ -8,12 +8,12 @@
 
 ## Scope
 
-- `docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/issues/backend-service-contract-and-adapter-taxonomy.md`
-- `docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/prd.md`
-- `docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/pre-tests.md`
-- `docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/tasks.md`
-- `docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/issues/internal-frontend-backend-architecture-review.md`
-- `docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md`
+- `docs/B2-docs/runtime/control-surface/issues/backend-service-contract-and-adapter-taxonomy.md`
+- `docs/B2-docs/runtime/control-surface/prd.md`
+- `docs/B2-docs/runtime/control-surface/pre-tests.md`
+- `docs/B2-docs/runtime/control-surface/tasks.md`
+- `docs/B2-docs/human/tui/issues/internal-frontend-backend-architecture-review.md`
+- `docs/B2-docs/human/tui/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md`
 
 ## Findings
 
@@ -27,7 +27,7 @@
 
 ## Verification Checks
 
-- `rg -n "ClientCommand|ServerEvent|Snapshot|tauri_adapter|ws_adapter|local_process_adapter|openclaw_adapter|openclaw_adapter/profile" docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy docs/epics/frontend-probe-dogfooding-loop -g '*.md'`
+- `rg -n "ClientCommand|ServerEvent|Snapshot|tauri_adapter|ws_adapter|local_process_adapter|openclaw_adapter|openclaw_adapter/profile" docs/B2-docs/runtime/backend-service-contract-and-adapter-taxonomy docs/epics/frontend-probe-dogfooding-loop -g '*.md'`
 - `rg -n "I-20260312-0011|backend-service-contract-and-adapter-taxonomy" docs -g '*.md'`
 - `./bin/governance-check`
 

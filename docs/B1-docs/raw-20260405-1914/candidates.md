@@ -44,7 +44,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - source_brainstorm: `docs/B1-docs/raw-20260405-1914/brainstorms.md`
 - promoted_issue_id: `I-20260405-1914-A`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/test-lane-routing-and-enforcement-governance/issues/test-lane-routing-and-enforcement-governance.md`
+- promoted_issue_path: `docs/B2-docs/gate/test-lane-routing-and-enforcement-governance/issues/test-lane-routing-and-enforcement-governance.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`

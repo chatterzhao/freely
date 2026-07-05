@@ -6,7 +6,7 @@
 - priority: `P1`
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_to: `I-20260503-0000-B`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/fix-execution-skill/issues/I-20260503-0000-B.md`
+- promoted_issue_path: `docs/B2-docs/ibm/fix-execution-skill/issues/I-20260503-0000-B.md`
 - source_intake: `raw-20260503-fix-skill`
 
 ## Problem

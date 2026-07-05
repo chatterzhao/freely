@@ -1,7 +1,7 @@
 # Implementation Decision Note: feature-owned-test-pre-merge-family-promotion-model-governance
 
 - issue_id: `I-20260405-1615-A`
-- issue_path: `docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md`
+- issue_path: `docs/B2-docs/ibm/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md`
 - decision_date: `2026-04-05`
 - author: `codex`
 

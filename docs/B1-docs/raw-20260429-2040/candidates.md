@@ -13,7 +13,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - route_kind: `chat_intake`
 - phase_state: `done_pre_brainstorm`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/chat-inbox-sqlite/issues/I-20260429-2040-A.md`
+- promoted_issue_path: `docs/B2-docs/human/chat-inbox-sqlite/issues/I-20260429-2040-A.md`
 - session_refs:
   - {tool: ccds, session_id: "20260429-chat-inbox-sqlite", role: "author"}
 - acceptance_criteria:

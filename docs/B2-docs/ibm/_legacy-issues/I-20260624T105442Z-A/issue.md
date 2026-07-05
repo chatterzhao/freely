@@ -10,7 +10,7 @@ milestone: M-20260624T105442Z-A
 title: 'fix: wt-close git branch -d 显式指定 develop 检查目标'
 platform_ids: {}
 primary_platform: github
-pre_tests_path: docs/epics/wt-close-branch-d-check/verification/pre-tests.md
+pre_tests_path: docs/B2-docs/wt-close-branch-d-check/verification/pre-tests.md
 verification_artifact_dir: docs/epics/wt-close-branch-d-check/code-reviews
 platform_state: open
 ---

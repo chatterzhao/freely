@@ -12,13 +12,13 @@
 - source_brainstorm: `docs/B1-docs/raw-20260401/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/codex-acp-fresh-path-prototype/pre-tests.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/codex-acp-fresh-path-prototype/code-reviews`
+- pre_tests_path: `docs/B2-docs/config/codex-acp-fresh-path-prototype/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/config/codex-acp-fresh-path-prototype/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/acp-optional-adapter-boundary-governance/issues/acp-optional-adapter-boundary-governance.md`
-  - `docs/epics/workspace-routing-foundation/runtime-adapter-axis-and-per-tool-adapter-selection/issues/runtime-adapter-axis-and-per-tool-adapter-selection.md`
-  - `docs/epics/workspace-routing-foundation/codex-verified-resume-evidence-governance/issues/codex-verified-resume-evidence-governance.md`
-  - `docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/issues/explicit-session-addressed-resume-governance.md`
+  - `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/issues/acp-optional-adapter-boundary-governance.md`
+  - `docs/B2-docs/runtime/runtime-adapter-axis-and-per-tool-adapter-selection/issues/runtime-adapter-axis-and-per-tool-adapter-selection.md`
+  - `docs/B2-docs/config/codex-verified-resume-evidence-governance/issues/codex-verified-resume-evidence-governance.md`
+  - `docs/B2-docs/ibm/explicit-session-addressed-resume-governance/issues/explicit-session-addressed-resume-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
   - {tool: shell, session_id: "51019", jsonl_path: "unavailable://pty-download-session", role: "binary-acquisition-exec"}
@@ -95,9 +95,9 @@ ACP 边界已经冻结，runtime `adapter axis` 也已经 materialize 到 config
 
 ## Implementation References
 
-- `docs/epics/workspace-routing-foundation/acp-optional-adapter-boundary-governance/issues/acp-optional-adapter-boundary-governance.md`
-- `docs/epics/workspace-routing-foundation/runtime-adapter-axis-and-per-tool-adapter-selection/issues/runtime-adapter-axis-and-per-tool-adapter-selection.md`
-- `docs/epics/workspace-routing-foundation/codex-acp-fresh-path-prototype/brainstorms/b-codex-acp-fresh-path-prototype.md`
+- `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/issues/acp-optional-adapter-boundary-governance.md`
+- `docs/B2-docs/runtime/runtime-adapter-axis-and-per-tool-adapter-selection/issues/runtime-adapter-axis-and-per-tool-adapter-selection.md`
+- `docs/B2-docs/config/codex-acp-fresh-path-prototype/brainstorms/b-codex-acp-fresh-path-prototype.md`
 - `docs/system/workspace/tools.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/runtime/tool-launchers.sh`

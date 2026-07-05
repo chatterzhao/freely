@@ -39,4 +39,4 @@
 - promotion_gate: develop_merge
 - evidence_level: integration
 ^- status: passed
-- artifact_ref: docs/epics/platform-pull-standardize/code-reviews/closeout-review.md
+- artifact_ref: docs/B2-docs/platform-pull-standardize/code-reviews/closeout-review.md

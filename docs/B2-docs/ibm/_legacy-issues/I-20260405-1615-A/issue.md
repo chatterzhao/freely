@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO8Q
     synced_at: '2026-04-27T13:16:28Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md
+canonical_issue_path: docs/B2-docs/ibm/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:24:37Z'
 hash: ''
@@ -35,4 +35,4 @@ platform_state: closed
 - 如果多个 feature 要并行做集成验证，又没有统一的 single-feature / multi-bundle 语义，就会让 `pr-merge-guarded`、hook、`governance-check`、runtime/status 在不同地方各自发明自己的模型。
 - 如果在 owner issue 之前就直接
 
-canonical: docs/epics/workspace-routing-foundation/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md
+canonical: docs/B2-docs/ibm/feature-owned-test-pre-merge-family-promotion-model-governance/issues/feature-owned-test-pre-merge-family-promotion-model-governance.md

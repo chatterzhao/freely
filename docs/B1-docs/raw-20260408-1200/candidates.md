@@ -33,7 +33,7 @@
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_id: `I-20260408-1200-A`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/develop-push-followthrough-escalation-governance/issues/develop-push-followthrough-escalation-governance.md`
 - decision_reason:
   - the repo already has canonical push-debt truth, so the next problem is sequencing, not state discovery
   - the repo has already demonstrated that stale research trees can continue on outdated assumptions until develop is re-absorbed

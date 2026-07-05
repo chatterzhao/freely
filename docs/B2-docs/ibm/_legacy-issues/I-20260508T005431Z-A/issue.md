@@ -17,15 +17,15 @@ intake_id: ''
 author: zhaoquan
 channel: feat-execution
 session_refs: []
-pre_tests_path: docs/epics/skill-standardize/verification/pre-tests.md
-verification_artifact_dir: docs/epics/skill-standardize/code-reviews
+pre_tests_path: docs/B2-docs/ibm/verification/pre-tests.md
+verification_artifact_dir: docs/B2-docs/ibm/code-reviews
 platform_state: closed
 ---
 
 # I-20260508T005431Z-A: 规范 skill 使用
 
-- pre_tests_path: docs/epics/skill-standardize/verification/pre-tests.md
-- verification_artifact_dir: docs/epics/skill-standardize/code-reviews
+- pre_tests_path: docs/B2-docs/ibm/verification/pre-tests.md
+- verification_artifact_dir: docs/B2-docs/ibm/code-reviews
 - source_candidate: docs/B1-docs/raw-20260508T005431Z/candidates.md
 
 ## 实现

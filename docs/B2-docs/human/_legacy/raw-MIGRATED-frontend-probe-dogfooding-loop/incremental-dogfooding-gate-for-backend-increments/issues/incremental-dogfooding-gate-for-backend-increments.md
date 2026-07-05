@@ -11,9 +11,9 @@
 - source_brainstorm: `docs/B1-docs/raw-20260308/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/frontend-probe-dogfooding-loop/incremental-dogfooding-gate-for-backend-increments/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/human/tui/pre-tests.md`
 - progress_path: `docs/progress/frontend-probe-dogfooding-loop/p-incremental-dogfooding-gate-for-backend-increments.md`
-- verification_artifact_dir: `docs/epics/frontend-probe-dogfooding-loop/incremental-dogfooding-gate-for-backend-increments/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/human/tui/code-reviews`
 - depends_on: `none`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "doc-ibm"}
@@ -69,12 +69,12 @@
   - 基于已冻结的 boundary contract 与 Probe v0，继续把“每个后端增量必须被 Probe 验证”收敛为正式门禁。
   - 当前阶段仍是 issue-bound IBM 收敛，不进入实现代码。
 - required_doc_refs:
-  - `docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md`
-  - `docs/epics/frontend-probe-dogfooding-loop/frontend-probe-v0/issues/frontend-probe-v0.md`
-  - `docs/epics/frontend-probe-dogfooding-loop/incremental-dogfooding-gate-for-backend-increments/brainstorms/b-incremental-dogfooding-gate-for-backend-increments.md`
-  - `docs/epics/frontend-probe-dogfooding-loop/incremental-dogfooding-gate-for-backend-increments/prd.md`
-  - `docs/epics/frontend-probe-dogfooding-loop/incremental-dogfooding-gate-for-backend-increments/pre-tests.md`
-  - `docs/epics/frontend-probe-dogfooding-loop/incremental-dogfooding-gate-for-backend-increments/tasks.md`
+  - `docs/B2-docs/human/tui/issues/frontend-backend-boundary-contract-v1-for-frontend-probe.md`
+  - `docs/B2-docs/human/tui/issues/frontend-probe-v0.md`
+  - `docs/B2-docs/human/tui/brainstorms/b-incremental-dogfooding-gate-for-backend-increments.md`
+  - `docs/B2-docs/human/tui/prd.md`
+  - `docs/B2-docs/human/tui/pre-tests.md`
+  - `docs/B2-docs/human/tui/tasks.md`
 
 ## Closeout
 

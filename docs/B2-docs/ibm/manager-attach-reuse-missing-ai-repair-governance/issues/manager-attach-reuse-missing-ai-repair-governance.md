@@ -12,11 +12,11 @@
 - source_brainstorm: `docs/B1-docs/raw-20260330/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/manager-attach-reuse-missing-ai-repair-governance/pre-tests.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/manager-attach-reuse-missing-ai-repair-governance/code-reviews`
+- pre_tests_path: `docs/B2-docs/ibm/manager-attach-reuse-missing-ai-repair-governance/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/ibm/manager-attach-reuse-missing-ai-repair-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/multi-tool-auto-switch-v1-codex-fallback-governance/issues/multi-tool-auto-switch-v1-codex-fallback-governance.md`
-  - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+  - `docs/B2-docs/ibm/multi-tool-auto-switch-v1-codex-fallback-governance/issues/multi-tool-auto-switch-v1-codex-fallback-governance.md`
+  - `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -57,8 +57,8 @@ The smallest correct owner is therefore a manager-only attach gate repair, not a
 
 ## Completion
 
-- `docs/epics/workspace-routing-foundation/manager-attach-reuse-missing-ai-repair-governance/issues/manager-attach-reuse-missing-ai-repair-governance.md`
-- `docs/epics/workspace-routing-foundation/manager-attach-reuse-missing-ai-repair-governance/pre-tests.md`
+- `docs/B2-docs/ibm/manager-attach-reuse-missing-ai-repair-governance/issues/manager-attach-reuse-missing-ai-repair-governance.md`
+- `docs/B2-docs/ibm/manager-attach-reuse-missing-ai-repair-governance/pre-tests.md`
 - `docs/progress/workspace-routing-foundation/p-manager-attach-reuse-missing-ai-repair-governance.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-project-command-semantics`

@@ -7,7 +7,7 @@
 - status: `promoted`
 - adoption_type: `materialized`
 - decision_reason: 真实 dogfood 已证明这不是主管语义缺失，而是 runtime 还没把 manager 产出的 stable worker handoff 转成实际 worker execution，同时也缺少对长时间无输出 AI 进程的 runtime-owned stall recovery。
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/runtime-worker-launch-linkage-and-stall-recovery-governance/issues/runtime-worker-launch-linkage-and-stall-recovery-governance.md`
+- promoted_issue_path: `docs/B2-docs/runtime/runtime-worker-launch-linkage-and-stall-recovery-governance/issues/runtime-worker-launch-linkage-and-stall-recovery-governance.md`
 - legacy_id_mapping: I-20260322-0245  # 历史遗留的 issue id
 - milestone: `M-20260306-workspace-routing-foundation`
 - source_brainstorm: `docs/B1-docs/raw-20260322-0245/brainstorms.md`

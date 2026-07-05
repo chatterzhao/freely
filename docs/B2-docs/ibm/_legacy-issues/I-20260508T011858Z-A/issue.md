@@ -19,7 +19,7 @@ intake_id: ''
 author: zhaoquan
 channel: feat-execution
 session_refs: []
-pre_tests_path: docs/epics/skill-gate-alignment/verification/pre-tests.md
+pre_tests_path: docs/B2-docs/skill-gate-alignment/verification/pre-tests.md
 verification_artifact_dir: docs/epics/skill-gate-alignment/code-reviews
 platform_state: closed
 ---
@@ -27,7 +27,7 @@ platform_state: closed
 # I-20260508T011858Z-A: skill 引导与门禁对齐
 
 - source_candidate: docs/B1-docs/raw-20260508T011858Z/candidates.md
-- pre_tests_path: docs/epics/skill-gate-alignment/verification/pre-tests.md
+- pre_tests_path: docs/B2-docs/skill-gate-alignment/verification/pre-tests.md
 - verification_artifact_dir: docs/epics/skill-gate-alignment/code-reviews
 
 ## 实现

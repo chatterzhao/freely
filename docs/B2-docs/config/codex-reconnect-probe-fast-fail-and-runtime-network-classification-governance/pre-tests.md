@@ -41,7 +41,7 @@
 - required evidence:
   - `./bin/governance-check`
   - `git diff --check`
-  - `docs/epics/workspace-routing-foundation/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/code-reviews/20260406-codex-reconnect-probe-fast-fail-and-runtime-network-classification-implementation-decision.md`
+  - `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/code-reviews/20260406-codex-reconnect-probe-fast-fail-and-runtime-network-classification-implementation-decision.md`
 - blocker taxonomy: `execution_pending_or_failed`
 
 ## Acceptance Items
@@ -72,4 +72,4 @@
 - requirement: `Develop-bound reconnect fast-fail edits are backed by an issue-bound decision note and a passing governance gate.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/code-reviews/20260406-codex-reconnect-probe-fast-fail-and-runtime-network-classification-implementation-decision.md`
+- artifact_ref: `docs/B2-docs/config/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/code-reviews/20260406-codex-reconnect-probe-fast-fail-and-runtime-network-classification-implementation-decision.md`

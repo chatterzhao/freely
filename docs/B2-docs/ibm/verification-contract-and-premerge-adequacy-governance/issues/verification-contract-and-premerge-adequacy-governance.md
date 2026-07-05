@@ -12,12 +12,12 @@
 - source_brainstorm: `docs/B1-docs/raw-20260408/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/pre-tests.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/code-reviews`
+- pre_tests_path: `docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/test-lane-routing-and-enforcement-governance/issues/test-lane-routing-and-enforcement-governance.md`
-  - `docs/epics/workspace-routing-foundation/pre-tests-evidence-binding-and-completion-gate-governance/issues/pre-tests-evidence-binding-and-completion-gate-governance.md`
-  - `docs/epics/workspace-routing-foundation/develop-merge-issue-binding-and-cmi-governance/issues/develop-merge-issue-binding-and-cmi-governance.md`
+  - `docs/B2-docs/gate/test-lane-routing-and-enforcement-governance/issues/test-lane-routing-and-enforcement-governance.md`
+  - `docs/B2-docs/ibm/pre-tests-evidence-binding-and-completion-gate-governance/issues/pre-tests-evidence-binding-and-completion-gate-governance.md`
+  - `docs/B2-docs/ibm/develop-merge-issue-binding-and-cmi-governance/issues/develop-merge-issue-binding-and-cmi-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -92,11 +92,11 @@ Freely 现在已经有测试真源，但没有形成闭环：
   - 第一阶段优先改真源与 prompt/gate contract，不要求一次性完成所有 wrapper adoption。
   - merge gate 的职责是兜底并给可操作诊断，不是替代 manager / worker 设计测试。
 - required_doc_refs:
-  - `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
-  - `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/brainstorms/b-verification-contract-and-premerge-adequacy-governance.md`
-  - `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/prd.md`
-  - `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/pre-tests.md`
-  - `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/tasks.md`
+  - `docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
+  - `docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/brainstorms/b-verification-contract-and-premerge-adequacy-governance.md`
+  - `docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/prd.md`
+  - `docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/pre-tests.md`
+  - `docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/tasks.md`
   - `docs/system/workspace/agents/manager-agent.md`
   - `docs/system/workspace/agents/worker-agent.md`
   - `docs/system/workspace/scripts/runtime/freely`
@@ -113,8 +113,8 @@ Freely 现在已经有测试真源，但没有形成闭环：
 
 ## Completion
 
-- `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
-- `docs/epics/workspace-routing-foundation/verification-contract-and-premerge-adequacy-governance/code-reviews/20260408-verification-contract-and-premerge-adequacy-verification.md`
+- `docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/issues/verification-contract-and-premerge-adequacy-governance.md`
+- `docs/B2-docs/ibm/verification-contract-and-premerge-adequacy-governance/code-reviews/20260408-verification-contract-and-premerge-adequacy-verification.md`
 - `docs/progress/workspace-routing-foundation/p-verification-contract-and-premerge-adequacy-governance.md`
 - `docs/system/workspace/agents/manager-agent.md`
 - `docs/system/workspace/agents/worker-agent.md`

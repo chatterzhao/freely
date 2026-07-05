@@ -1,7 +1,7 @@
 # Verification: runtime-startup-self-healing-governance disabled slot auto-switch continuation
 
 - issue_id: `I-20260419-1630-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/issues/runtime-startup-self-healing-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-startup-self-healing-governance/issues/runtime-startup-self-healing-governance.md`
 - verification_date: `2026-04-23`
 - branch: `feature/guard-disable-slot-switch-probe`
 - worktree: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/feature-guard-disable-slot-switch-probe`

@@ -7,12 +7,12 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `worktree-fleet-governance-closure`
 - issue-name: `worktree-fleet-governance-closure`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/worktree-fleet-governance-closure/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/git-worktree/worktree-fleet-governance-closure/code-reviews`
 - source_candidate: `docs/B1-docs/raw-20260321/candidates.md#c-20260321-0257-a`
 - source_brainstorm: `docs/B1-docs/raw-20260321/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- depends_on: `docs/epics/workspace-routing-foundation/worktree-maintenance-governance/issues/worktree-maintenance-governance.md`, `docs/epics/workspace-routing-foundation/stacked-worktree-merge-chain-governance/issues/stacked-worktree-merge-chain-governance.md`
+- depends_on: `docs/B2-docs/git-worktree/worktree-maintenance-governance/issues/worktree-maintenance-governance.md`, `docs/B2-docs/ibm/stacked-worktree-merge-chain-governance/issues/stacked-worktree-merge-chain-governance.md`
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}]
 
 ## Why
@@ -64,8 +64,8 @@ Freely 已经具备单树 worktree audit、merge-prep、stacked merge-chain 和 
 - `docs/system/workspace/agents/manager-agent.md`
 - `docs/system/workspace/scripts/start-lead-agent.sh`
 - `docs/system/workspace/scripts/tests/test-routing-foundation-loop`
-- `docs/epics/workspace-routing-foundation/worktree-fleet-governance-closure/code-reviews/20260321-worktree-fleet-governance-closure-verification.md`
-- `docs/epics/workspace-routing-foundation/worktree-fleet-governance-closure/code-reviews/20260326-worktree-fleet-governance-closure-canonical-replay-verification.md`
+- `docs/B2-docs/git-worktree/worktree-fleet-governance-closure/code-reviews/20260321-worktree-fleet-governance-closure-verification.md`
+- `docs/B2-docs/git-worktree/worktree-fleet-governance-closure/code-reviews/20260326-worktree-fleet-governance-closure-canonical-replay-verification.md`
 
 ## Verification
 

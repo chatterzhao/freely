@@ -1,7 +1,7 @@
 # Verification: runtime-human-readable-time-display-governance
 
 - issue_id: `I-20260402-0308-A`
-- issue_path: `docs/epics/workspace-routing-foundation/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md`
+- issue_path: `docs/B2-docs/runtime/runtime-human-readable-time-display-governance/issues/runtime-human-readable-time-display-governance.md`
 - verification_date: `2026-04-02`
 - verification_scope: `focused regression + develop writeback replay`
 

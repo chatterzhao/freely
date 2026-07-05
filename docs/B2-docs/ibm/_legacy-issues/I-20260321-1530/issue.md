@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO5Y
     synced_at: '2026-04-27T13:14:31Z'
 primary_platform: github
-canonical_issue_path: docs/epics/ai-native-doc-loop/agent-ready-prd-for-freely-flow/issues/agent-ready-prd-for-freely-flow.md
+canonical_issue_path: docs/B2-docs/ibm/doc-loop/issues/agent-ready-prd-for-freely-flow.md
 last_synced_comment_at:
   github: '2026-04-27T11:15:26Z'
 hash: ''
@@ -26,4 +26,4 @@ Freely 现有的 `prd.md` 普遍偏短，能表达“这轮要做什么”，但
 
 如果 Freely 自己不先把这个结构说明白，后续由 AI 生成 PRD 时就只能继续输出“Goal + Product Surface”一类的薄文档，难以支撑更强的 agentic loop。
 
-canonical: docs/epics/ai-native-doc-loop/agent-ready-prd-for-freely-flow/issues/agent-ready-prd-for-freely-flow.md
+canonical: docs/B2-docs/ibm/doc-loop/issues/agent-ready-prd-for-freely-flow.md

@@ -12,9 +12,9 @@
 - source_brainstorm: `docs/B1-docs/raw-20260318/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/url-content-intake-skill-and-wechat-fetch-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/human/url-content-intake-skill-and-wechat-fetch-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-url-content-intake-skill-and-wechat-fetch-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/url-content-intake-skill-and-wechat-fetch-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/human/url-content-intake-skill-and-wechat-fetch-governance/code-reviews`
 - depends_on: `none`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
@@ -55,9 +55,9 @@
 - `docs/B1-docs/raw-20260318/brainstorms.md`
 - `docs/B1-docs/raw-20260318/candidates.md`
 - `docs/milestones.md`
-- `docs/epics/workspace-routing-foundation/url-content-intake-skill-and-wechat-fetch-governance/issues/url-content-intake-skill-and-wechat-fetch-governance.md`
-- `docs/epics/workspace-routing-foundation/url-content-intake-skill-and-wechat-fetch-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/url-content-intake-skill-and-wechat-fetch-governance/code-reviews/20260401-url-content-intake-skill-verification.md`
+- `docs/B2-docs/human/url-content-intake-skill-and-wechat-fetch-governance/issues/url-content-intake-skill-and-wechat-fetch-governance.md`
+- `docs/B2-docs/human/url-content-intake-skill-and-wechat-fetch-governance/pre-tests.md`
+- `docs/B2-docs/human/url-content-intake-skill-and-wechat-fetch-governance/code-reviews/20260401-url-content-intake-skill-verification.md`
 - `docs/progress/workspace-routing-foundation/p-url-content-intake-skill-and-wechat-fetch-governance.md`
 - `docs/system/workspace/skills/url-content-intake/SKILL.md`
 - `docs/system/workspace/skills/url-content-intake/references/capability-matrix.md`

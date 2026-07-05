@@ -1,7 +1,7 @@
 # Progress: sandbox-compatible-runtime-bootstrap-and-operator-state-governance
 
 - issue_id: `I-20260403-2245-A`
-- issue_path: `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/issues/sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
+- issue_path: `docs/B2-docs/ibm/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/issues/sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
 - title: `Sandbox-compatible runtime bootstrap and operator-state governance`
 - phase_state: `completed`
 - runtime_state: `stopped`
@@ -40,7 +40,7 @@
 
 1. develop merge `1eddbcd`
 2. develop merge `45bed28`
-3. `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/code-reviews/20260403-sandbox-compatible-runtime-bootstrap-and-operator-state-verification.md`
+3. `docs/B2-docs/ibm/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/code-reviews/20260403-sandbox-compatible-runtime-bootstrap-and-operator-state-verification.md`
 
 ## Next Action
 

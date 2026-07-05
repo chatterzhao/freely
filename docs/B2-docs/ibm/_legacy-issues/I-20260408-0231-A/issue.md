@@ -14,7 +14,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO9B
     synced_at: '2026-04-27T13:16:51Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/issues/runtime-concurrent-start-stop-followthrough-governance.md
+canonical_issue_path: docs/B2-docs/runtime/runtime-concurrent-start-stop-followthrough-governance/issues/runtime-concurrent-start-stop-followthrough-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:26:09Z'
 hash: ''
@@ -32,4 +32,4 @@ The first half is already absorbed on canonical `develop`. The remaining open wo
 
 - degraded process inspection can still mis-handle a healthy same-project supervisor that is within bo
 
-canonical: docs/epics/workspace-routing-foundation/runtime-concurrent-start-stop-followthrough-governance/issues/runtime-concurrent-start-stop-followthrough-governance.md
+canonical: docs/B2-docs/runtime/runtime-concurrent-start-stop-followthrough-governance/issues/runtime-concurrent-start-stop-followthrough-governance.md

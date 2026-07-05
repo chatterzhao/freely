@@ -13,10 +13,10 @@
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
-  - `docs/epics/workspace-routing-foundation/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/issues/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance.md`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/ai-auth-change-wake-command-lifecycle-governance/pre-tests.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/ai-auth-change-wake-command-lifecycle-governance/code-reviews`
+  - `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+  - `docs/B2-docs/ibm/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/issues/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance.md`
+- pre_tests_path: `docs/B2-docs/config/ai-auth-change-wake-command-lifecycle-governance/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/config/ai-auth-change-wake-command-lifecycle-governance/code-reviews`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -71,14 +71,14 @@
 
 ## Implementation References
 
-- `docs/epics/workspace-routing-foundation/ai-auth-change-wake-command-lifecycle-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/ai-auth-change-wake-command-lifecycle-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/ai-auth-change-wake-command-lifecycle-governance/tasks.md`
+- `docs/B2-docs/config/ai-auth-change-wake-command-lifecycle-governance/prd.md`
+- `docs/B2-docs/config/ai-auth-change-wake-command-lifecycle-governance/pre-tests.md`
+- `docs/B2-docs/config/ai-auth-change-wake-command-lifecycle-governance/tasks.md`
 - `docs/system/workspace/scripts/runtime/ai-cli`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh`
 
 ## Next
 
-- `2026-03-30 17:34 PDT` owner implementation and verification are already absorbed by `develop` commit `44bb13c`. The canonical closeout evidence is the focused regression set plus `docs/epics/workspace-routing-foundation/ai-auth-change-wake-command-lifecycle-governance/code-reviews/20260330-ai-auth-change-wake-command-lifecycle-verification.md`.
+- `2026-03-30 17:34 PDT` owner implementation and verification are already absorbed by `develop` commit `44bb13c`. The canonical closeout evidence is the focused regression set plus `docs/B2-docs/config/ai-auth-change-wake-command-lifecycle-governance/code-reviews/20260330-ai-auth-change-wake-command-lifecycle-verification.md`.
 - Future auth UX or helper-process expansion must open a new lifecycle rather than reopening this completed owner.

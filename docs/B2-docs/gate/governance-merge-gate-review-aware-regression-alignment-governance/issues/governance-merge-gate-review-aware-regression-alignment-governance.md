@@ -10,16 +10,16 @@
 - priority: P1
 - source_candidate: `docs/B1-docs/raw-20260404/candidates.md#c-20260404-0232-a`
 - source_brainstorm: `docs/B1-docs/raw-20260404/brainstorms.md`
-- reopen_of_issue: `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/issues/implementation-decision-notes-in-issue-review-artifacts-governance.md`
+- reopen_of_issue: `docs/B2-docs/ibm/implementation-decision-notes-in-issue-review-artifacts-governance/issues/implementation-decision-notes-in-issue-review-artifacts-governance.md`
 - reopen_reason: `post-merge acceptance proved the mixed unresolved-candidate implementation regression still uses a fixture from before staged review artifacts became mandatory`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/gate/governance-merge-gate-review-aware-regression-alignment-governance/pre-tests.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-governance-merge-gate-review-aware-regression-alignment-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/governance-merge-gate-review-aware-regression-alignment-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/gate/governance-merge-gate-review-aware-regression-alignment-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/issues/implementation-decision-notes-in-issue-review-artifacts-governance.md`
-  - `docs/epics/workspace-routing-foundation/develop-merge-issue-binding-and-cmi-governance/issues/develop-merge-issue-binding-and-cmi-governance.md`
+  - `docs/B2-docs/ibm/implementation-decision-notes-in-issue-review-artifacts-governance/issues/implementation-decision-notes-in-issue-review-artifacts-governance.md`
+  - `docs/B2-docs/ibm/develop-merge-issue-binding-and-cmi-governance/issues/develop-merge-issue-binding-and-cmi-governance.md`
   - `docs/system/workspace/scripts/tests/test-governance-merge-gate`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}

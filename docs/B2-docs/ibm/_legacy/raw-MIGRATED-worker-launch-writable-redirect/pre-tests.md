@@ -128,7 +128,7 @@
 - requirement: 完整 fix → test-pre-merge → develop 验证
 - evidence_level: integration
 ^- status: passed
-- artifact_ref: docs/epics/worker-launch-writable-redirect/code-reviews/closeout-review.md
+- artifact_ref: docs/B2-docs/worker-launch-writable-redirect/code-reviews/closeout-review.md
 - surface_kind: integration
 - target_lane: premerge-integration
 - promotion_gate: develop_merge

@@ -12,11 +12,11 @@
 - source_brainstorm: `docs/B1-docs/raw-20260401/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/config/packaging/pre-tests.md`
 - progress_path: `docs/progress/freely-product-architecture/p-freely-tool-autonomy-policy-materialization-governance.md`
-- verification_artifact_dir: `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/config/packaging/code-reviews`
 - depends_on:
-  - `docs/epics/freely-product-architecture/default-autonomy-activation-consent-and-tool-policy-governance/issues/default-autonomy-activation-consent-and-tool-policy-governance.md`
+  - `docs/B2-docs/config/packaging/issues/default-autonomy-activation-consent-and-tool-policy-governance.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -61,11 +61,11 @@ Freely 已经明确选择默认高自治方向，但“这份姿势如何被具�
 
 ## Completion
 
-- `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/issues/freely-tool-autonomy-policy-materialization-governance.md`
-- `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/brainstorms/b-freely-tool-autonomy-policy-materialization-governance.md`
-- `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/prd.md`
-- `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/pre-tests.md`
-- `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/tasks.md`
+- `docs/B2-docs/config/packaging/issues/freely-tool-autonomy-policy-materialization-governance.md`
+- `docs/B2-docs/config/packaging/brainstorms/b-freely-tool-autonomy-policy-materialization-governance.md`
+- `docs/B2-docs/config/packaging/prd.md`
+- `docs/B2-docs/config/packaging/pre-tests.md`
+- `docs/B2-docs/config/packaging/tasks.md`
 - `docs/B1-docs/raw-20260401/brainstorms.md`
 - `docs/B1-docs/raw-20260401/candidates.md`
 - `docs/B1-docs/raw-20260323/brainstorms.md`

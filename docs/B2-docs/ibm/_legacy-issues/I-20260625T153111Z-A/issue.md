@@ -6,14 +6,14 @@
 - verification_artifact_dir: docs/epics/agent-table/code-reviews
 - canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260625T153111Z-A/issue.md
 - source_raw: raw-20260625T153111Z
-- pre_tests_path: docs/epics/agent-table/verification/pre-tests.md
+- pre_tests_path: docs/B2-docs/agent-table/verification/pre-tests.md
 - title: agent-table.toml 多 agent 分身注册
 
 # I-20260625T153111Z-A: agent-table.toml 多 agent 分身注册
 
 - source_candidate: docs/B1-docs/raw-20260625T153111Z/candidates.md#C-20260625T153111Z-A
 - verification_artifact_dir: docs/epics/agent-table/code-reviews
-- pre_tests_path: docs/epics/agent-table/verification/pre-tests.md
+- pre_tests_path: docs/B2-docs/agent-table/verification/pre-tests.md
 
 ## 实现
 

@@ -55,4 +55,4 @@
 - requirement: `truth sources and backlog normalization reflect the same placement contract`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/active-milestone-placement-and-consumption-gate-governance/code-reviews/20260331-active-milestone-placement-gate-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/active-milestone-placement-and-consumption-gate-governance/code-reviews/20260331-active-milestone-placement-gate-verification.md`

@@ -3,8 +3,8 @@
 
 ## Scope
 
-- `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/pre-tests.md`
+- `docs/B2-docs/ibm/manager-owner-stance-and-source-patrol-governance/prd.md`
+- `docs/B2-docs/ibm/manager-owner-stance-and-source-patrol-governance/pre-tests.md`
 - `docs/system/workspace/agents/manager-agent.md`
 - `docs/system/workspace/agents/worker-agent.md`
 - `docs/system/workspace/skills/human-interruption-manager-triage/SKILL.md`

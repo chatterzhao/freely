@@ -12,14 +12,14 @@
 - source_brainstorm: `docs/B1-docs/raw-20260421/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/pre-tests.md`
-- tasks_path: `docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/tasks.md`
+- pre_tests_path: `docs/B2-docs/ibm/live-status-scan-summary-and-prompt-anchor-governance/pre-tests.md`
+- tasks_path: `docs/B2-docs/ibm/live-status-scan-summary-and-prompt-anchor-governance/tasks.md`
 - progress_path: `docs/progress/workspace-routing-foundation/p-live-status-scan-summary-and-prompt-anchor-governance.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/live-status-scan-summary-and-prompt-anchor-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/issues/manager-task-source-scan-idle-replan-boundary-governance.md`
-  - `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
-  - `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/issues/runtime-startup-self-healing-governance.md`
+  - `docs/B2-docs/ibm/manager-task-source-scan-idle-replan-boundary-governance/issues/manager-task-source-scan-idle-replan-boundary-governance.md`
+  - `docs/B2-docs/runtime/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
+  - `docs/B2-docs/runtime/runtime-startup-self-healing-governance/issues/runtime-startup-self-healing-governance.md`
 - created_at: `2026-04-21`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
@@ -78,11 +78,11 @@ What was still missing was a narrow implementation owner that applies the separa
 
 - `docs/B1-docs/raw-20260421/brainstorms.md`
 - `docs/B1-docs/raw-20260421/candidates.md`
-- `docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/issues/live-status-scan-summary-and-prompt-anchor-governance.md`
-- `docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/tasks.md`
+- `docs/B2-docs/ibm/live-status-scan-summary-and-prompt-anchor-governance/issues/live-status-scan-summary-and-prompt-anchor-governance.md`
+- `docs/B2-docs/ibm/live-status-scan-summary-and-prompt-anchor-governance/pre-tests.md`
+- `docs/B2-docs/ibm/live-status-scan-summary-and-prompt-anchor-governance/tasks.md`
 - `docs/progress/workspace-routing-foundation/p-live-status-scan-summary-and-prompt-anchor-governance.md`
-- `docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/code-reviews/20260421-live-status-scan-summary-and-prompt-anchor-verification.md`
+- `docs/B2-docs/ibm/live-status-scan-summary-and-prompt-anchor-governance/code-reviews/20260421-live-status-scan-summary-and-prompt-anchor-verification.md`
 - `docs/system/workspace/scripts/runtime/freely`
 - `docs/system/workspace/scripts/tests/test-freely-live-status-includes-scan-summary`
 - `docs/system/workspace/scripts/tests/test-freely-live-status-prefers-session-state-prompt-anchor`

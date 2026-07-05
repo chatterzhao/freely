@@ -1,7 +1,7 @@
 # Verification: absorbed-merged-lane-routing-followthrough-governance
 
 - issue_id: `I-20260421-1330-A`
-- issue_path: `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/issues/absorbed-merged-lane-routing-followthrough-governance.md`
+- issue_path: `docs/B2-docs/ibm/absorbed-merged-lane-routing-followthrough-governance/issues/absorbed-merged-lane-routing-followthrough-governance.md`
 - verification_date: `2026-04-21`
 - verifier: `codex`
 

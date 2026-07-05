@@ -13,7 +13,7 @@
 - `docs/system/workspace/skills/doc-ibm-execution/references/issue-materialization-checklist.md`
 - `docs/system/workspace/three-loop-capability-lifecycle.md`
 - `docs/LAWS.md`
-- `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/pre-tests.md`
+- `docs/B2-docs/ibm/pre-test-merge-responsibility-usage-and-lifecycle-governance/pre-tests.md`
 - `docs/B1-docs/raw-20260325/candidates.md`
 - `docs/milestones.md`
 

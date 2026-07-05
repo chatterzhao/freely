@@ -26,7 +26,7 @@
 ### B2_IBM
 - PRD: `docs/epics/add-claude-md-governance/prd.md`
 - Tasks: `docs/epics/add-claude-md-governance/tasks.md`
-- Code review: `docs/epics/add-claude-md-governance/code-reviews/review.md`
+- Code review: `docs/B2-docs/add-claude-md-governance/code-reviews/review.md`
 
 ### Implementation
 - `CLAUDE.md` — Created at project root, auto-loaded by Claude Code

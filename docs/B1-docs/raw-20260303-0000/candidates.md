@@ -18,7 +18,7 @@
 - promoted_issue_path: pending://issue-materialization
 - milestone: pending://milestone-binding
 - superseded_by:
-  - `docs/epics/workspace-routing-foundation/bootstrap-routing-foundation-artifacts/issues/auto-loop-orchestrator-bootstrap.md`
+  - `docs/B2-docs/ibm/bootstrap-routing-foundation-artifacts/issues/auto-loop-orchestrator-bootstrap.md`
   - `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
 - session_refs: []
 
@@ -46,7 +46,7 @@
 - priority: P1
 - status: promoted
 - decision_reason: 与恢复优先和自治持续运行目标直接对齐，应纳入主线实现。
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/session-lifecycle-rotation-and-handoff-governance/issues/session-lifecycle-rotation-and-handoff-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/session-lifecycle-rotation-and-handoff-governance/issues/session-lifecycle-rotation-and-handoff-governance.md`
 - legacy_id_mapping: I-20260316-1801  # 历史遗留的 issue id
 - milestone: `M-20260306-workspace-routing-foundation`
 - session_refs: []

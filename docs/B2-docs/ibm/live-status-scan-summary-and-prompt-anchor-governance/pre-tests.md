@@ -55,7 +55,7 @@
 - requirement: `When an explicit session prompt anchor exists, live-status and adjacent prompt-reference surfaces prefer that anchor over prompt-history guessing.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/code-reviews/20260421-live-status-scan-summary-and-prompt-anchor-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/live-status-scan-summary-and-prompt-anchor-governance/code-reviews/20260421-live-status-scan-summary-and-prompt-anchor-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -68,7 +68,7 @@
 - requirement: `Live-status exposes advisory scan-summary fields sourced from manager-task-source-scan-latest.json while preserving existing current-state and deep-ref surfaces.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/code-reviews/20260421-live-status-scan-summary-and-prompt-anchor-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/live-status-scan-summary-and-prompt-anchor-governance/code-reviews/20260421-live-status-scan-summary-and-prompt-anchor-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -81,7 +81,7 @@
 - requirement: `The owner does not regress daemon runtime detach/shared status, bounded patrol triggers, worker launch linkage, or verification metadata contracts.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/code-reviews/20260421-live-status-scan-summary-and-prompt-anchor-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/live-status-scan-summary-and-prompt-anchor-governance/code-reviews/20260421-live-status-scan-summary-and-prompt-anchor-verification.md`
 - surface_kind: `integration`
 - target_lane: `feature-local`
 - promotion_gate: `completion`
@@ -94,7 +94,7 @@
 - requirement: `The authoritative test-pre-merge batch carries a staged pass owner review artifact proving prompt-anchor truth and advisory scan-summary output survive the guarded path into develop.`
 - evidence_level: `integration`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/code-reviews/20260421-live-status-scan-summary-and-prompt-anchor-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/live-status-scan-summary-and-prompt-anchor-governance/code-reviews/20260421-live-status-scan-summary-and-prompt-anchor-verification.md`
 - surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
@@ -107,7 +107,7 @@
 - requirement: `After merge into develop, daemon start still selects work, preserves standards-compliant Freely flow, and live-status surfaces prompt-anchor truth plus advisory scan summary on the canonical runtime path.`
 - evidence_level: `real_env`
 - status: `pass`
-- artifact_ref: `docs/epics/workspace-routing-foundation/live-status-scan-summary-and-prompt-anchor-governance/code-reviews/20260421-live-status-scan-summary-and-prompt-anchor-verification.md`
+- artifact_ref: `docs/B2-docs/ibm/live-status-scan-summary-and-prompt-anchor-governance/code-reviews/20260421-live-status-scan-summary-and-prompt-anchor-verification.md`
 - surface_kind: `real_environment`
 - target_lane: `feature-local`
 - promotion_gate: `completion`

@@ -12,13 +12,13 @@
 - source_brainstorm: `docs/B1-docs/raw-20260401/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
-- pre_tests_path: `docs/epics/workspace-routing-foundation/acp-optional-adapter-boundary-governance/pre-tests.md`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/acp-optional-adapter-boundary-governance/code-reviews`
+- pre_tests_path: `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/code-reviews`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/issues/all-tools-unified-slot-contract-governance.md`
-  - `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
-  - `docs/epics/workspace-routing-foundation/explicit-session-addressed-resume-governance/issues/explicit-session-addressed-resume-governance.md`
-  - `docs/epics/control-surface-runtime-convergence/backend-service-contract-and-adapter-taxonomy/issues/backend-service-contract-and-adapter-taxonomy.md`
+  - `docs/B2-docs/ibm/all-tools-unified-slot-contract-governance/issues/all-tools-unified-slot-contract-governance.md`
+  - `docs/B2-docs/ibm/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
+  - `docs/B2-docs/ibm/explicit-session-addressed-resume-governance/issues/explicit-session-addressed-resume-governance.md`
+  - `docs/B2-docs/runtime/control-surface/issues/backend-service-contract-and-adapter-taxonomy.md`
 - session_refs:
   - {tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}
 
@@ -113,10 +113,10 @@ ACP 预研现在已经有稳定边界：
 
 - `docs/B1-docs/raw-20260401/brainstorms.md`
 - `docs/B1-docs/raw-20260401/candidates.md`
-- `docs/epics/workspace-routing-foundation/acp-optional-adapter-boundary-governance/brainstorms/b-acp-optional-adapter-boundary-governance.md`
-- `docs/epics/workspace-routing-foundation/acp-optional-adapter-boundary-governance/prd.md`
-- `docs/epics/workspace-routing-foundation/acp-optional-adapter-boundary-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/acp-optional-adapter-boundary-governance/tasks.md`
+- `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/brainstorms/b-acp-optional-adapter-boundary-governance.md`
+- `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/prd.md`
+- `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/pre-tests.md`
+- `docs/B2-docs/acp/acp-optional-adapter-boundary-governance/tasks.md`
 - `docs/system/workspace/tools.md`
 - `docs/system/workspace/scripts/runtime/tool-launchers.sh`
 - `docs/system/workspace/three-loop-capability-lifecycle.md`

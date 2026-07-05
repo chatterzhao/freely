@@ -1,7 +1,7 @@
 # Verification: three-loop-lifecycle-single-source-governance-followthrough
 
 - issue_id: `I-20260419-0915-A`
-- issue_path: `docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
+- issue_path: `docs/B2-docs/ibm/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
 - verification_date: `2026-04-19`
 - verifier: `codex`
 
@@ -14,7 +14,7 @@
 
 ## Commands
 
-1. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260418-feature-three-loop-model-refactor --issue docs/epics/workspace-routing-foundation/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
+1. `./bin/pretests-gate --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260418-feature-three-loop-model-refactor --issue docs/B2-docs/ibm/three-loop-lifecycle-single-source-governance-followthrough/issues/three-loop-lifecycle-single-source-governance-followthrough.md`
 2. `./bin/governance-check`
 3. `git diff --check`
 4. `rg -n "three-loop-capability-lifecycle|canonical lifecycle truth|read and sync" docs/PROJECT_INTENT.md docs/LAWS.md docs/system/workspace/three-loop-capability-lifecycle.md docs/system/workspace/agents docs/system/workspace/skills`

@@ -1,7 +1,7 @@
 # Implementation Decision: manager-startup-continuity-materialization-governance
 
 - issue_id: `I-20260413-0420-D`
-- issue_path: `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/issues/manager-startup-continuity-materialization-governance.md`
+- issue_path: `docs/B2-docs/ibm/manager-startup-continuity-materialization-governance/issues/manager-startup-continuity-materialization-governance.md`
 - branch: `feature/manager-startup-continuity-materialization-governance-20260413`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260413-feature-manager-startup-continuity-materialization-governance`
 - decision_date: `2026-04-13`

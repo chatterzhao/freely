@@ -76,9 +76,9 @@
     note: `This fresh session absorbed the newer `019dabfa-babb-7a22-bca4-63ce4693ea81` `fresh_with_handoff` restart after `context compacted`, audited the actual narrow dirty tree (`git status --short`, `git diff --stat`, `./bin/checkpoint-guard`, and `freely baseline-status --project /Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260420-feature-startup-task-source-patrol-and-reconcile`), reran the focused patrol checks for milestone-seed inclusion, idle regeneration, active-worker broad-patrol suppression, stale delegated continuation filtering, plus `bash -n docs/system/workspace/scripts/runtime/freely`, and reconfirmed that the older completed `I-20260326-1835` owner still does not absorb this newer idle/replan scan-trigger seam. The only live delta was a two-file candidate-owned continuity/evidence batch, so this round stayed in pre-brainstorm and closed with one narrow doc-only checkpoint commit that restored a clean hold instead of reopening implementation.`
 - depends_on:
   - `docs/B1-docs/raw-20260407-0817/candidates.md#c-20260407-0817-a`
-  - `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md`
+  - `docs/B2-docs/ibm/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md`
 - promoted_issue_id: `I-20260420-1130-A`
-- promoted_issue_path: `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/issues/manager-task-source-scan-idle-replan-boundary-governance.md`
+- promoted_issue_path: `docs/B2-docs/ibm/manager-task-source-scan-idle-replan-boundary-governance/issues/manager-task-source-scan-idle-replan-boundary-governance.md`
 - next_action: `Candidate mirror only. I-20260420-1130-A is now the canonical owner for manager idle/replan task-source scan regeneration, active-worker suppression, stale delegated filtering, and machine-readable patrol seed truth.`
 - revisit_trigger: `Re-open only if provider automation, recovery-surface expansion, or a broader patrol transaction redesign can no longer stay outside this bounded owner.`
 - session_refs:

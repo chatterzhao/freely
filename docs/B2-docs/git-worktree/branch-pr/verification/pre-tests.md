@@ -12,13 +12,13 @@
 - target_environment: fix worktree
 - required_evidence: grep
 - evidence_level: integration
-- artifact_ref: docs/epics/pr-review-guarded/review-fixes/verification/test-evidence/acceptance-1.txt
+- artifact_ref: docs/B2-docs/git-worktree/branch-pr/verification/test-evidence/acceptance-1.txt
 - test_command: grep -q '_sr/docs/epics' bin/pr-review-guarded || { echo FAIL; exit 1; } && echo PASS
 - expected_output: PASS
 - expected_RED_output: FAIL
 - actual_RED_output: code written before RED
 - actual_output: PASS
-- evidence_file: docs/epics/pr-review-guarded/review-fixes/verification/test-evidence/acceptance-1.txt
+- evidence_file: docs/B2-docs/git-worktree/branch-pr/verification/test-evidence/acceptance-1.txt
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -32,13 +32,13 @@
 - target_environment: fix worktree
 - required_evidence: grep
 - evidence_level: integration
-- artifact_ref: docs/epics/pr-review-guarded/review-fixes/verification/test-evidence/acceptance-2.txt
+- artifact_ref: docs/B2-docs/git-worktree/branch-pr/verification/test-evidence/acceptance-2.txt
 - test_command: grep -A5 'Step 3: ACP availability' bin/pr-review-guarded | grep -q 'pgrep\|_acp_available=0' || { echo FAIL; exit 1; } && echo PASS
 - expected_output: PASS
 - expected_RED_output: FAIL
 - actual_RED_output: code written before RED
 - actual_output: PASS
-- evidence_file: docs/epics/pr-review-guarded/review-fixes/verification/test-evidence/acceptance-2.txt
+- evidence_file: docs/B2-docs/git-worktree/branch-pr/verification/test-evidence/acceptance-2.txt
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -52,13 +52,13 @@
 - target_environment: fix worktree
 - required_evidence: grep
 - evidence_level: integration
-- artifact_ref: docs/epics/pr-review-guarded/review-fixes/verification/test-evidence/acceptance-3.txt
+- artifact_ref: docs/B2-docs/git-worktree/branch-pr/verification/test-evidence/acceptance-3.txt
 - test_command: grep -q 'freely-tdd-review' bin/pr-review-guarded || { echo FAIL; exit 1; } && echo PASS
 - expected_output: PASS
 - expected_RED_output: FAIL
 - actual_RED_output: code written before RED
 - actual_output: PASS
-- evidence_file: docs/epics/pr-review-guarded/review-fixes/verification/test-evidence/acceptance-3.txt
+- evidence_file: docs/B2-docs/git-worktree/branch-pr/verification/test-evidence/acceptance-3.txt
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -72,13 +72,13 @@
 - target_environment: fix worktree
 - required_evidence: grep
 - evidence_level: integration
-- artifact_ref: docs/epics/pr-review-guarded/review-fixes/verification/test-evidence/acceptance-4.txt
+- artifact_ref: docs/B2-docs/git-worktree/branch-pr/verification/test-evidence/acceptance-4.txt
 - test_command: grep -q '_freely_rc' bin/pr-review-guarded || { echo FAIL; exit 1; } && echo PASS
 - expected_output: PASS
 - expected_RED_output: FAIL
 - actual_RED_output: code written before RED
 - actual_output: PASS
-- evidence_file: docs/epics/pr-review-guarded/review-fixes/verification/test-evidence/acceptance-4.txt
+- evidence_file: docs/B2-docs/git-worktree/branch-pr/verification/test-evidence/acceptance-4.txt
 - red-green-status: green
 - status: passed
 - blocker: none
@@ -92,13 +92,13 @@
 - target_environment: fix worktree
 - required_evidence: bash -n
 - evidence_level: integration
-- artifact_ref: docs/epics/pr-review-guarded/review-fixes/verification/test-evidence/acceptance-5.txt
+- artifact_ref: docs/B2-docs/git-worktree/branch-pr/verification/test-evidence/acceptance-5.txt
 - test_command: bash -n bin/pr-review-guarded || { echo FAIL; exit 1; } && echo PASS
 - expected_output: PASS
 - expected_RED_output: FAIL
 - actual_RED_output: code written before RED
 - actual_output: PASS
-- evidence_file: docs/epics/pr-review-guarded/review-fixes/verification/test-evidence/acceptance-5.txt
+- evidence_file: docs/B2-docs/git-worktree/branch-pr/verification/test-evidence/acceptance-5.txt
 - red-green-status: green
 - status: passed
 - blocker: none

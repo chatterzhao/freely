@@ -1,7 +1,7 @@
 # Implementation Decision: latest-manager-continuity-worker-consumption-governance missing-run-dir guard
 
 - issue_id: `I-20260322-0445`
-- issue_path: `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
+- issue_path: `docs/B2-docs/ibm/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
 - branch: `feature/runtime-status-missing-run-dir-guard-20260404-2120`
 - worktree_path: `/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260404-2120-feature-runtime-status-missing-run-dir-guard`
 - decision_date: `2026-04-04`

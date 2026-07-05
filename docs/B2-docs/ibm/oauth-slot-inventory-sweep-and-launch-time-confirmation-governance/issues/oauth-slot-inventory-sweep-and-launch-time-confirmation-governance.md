@@ -7,14 +7,14 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `oauth-slot-inventory-sweep-and-launch-time-confirmation-governance`
 - issue-name: `oauth-slot-inventory-sweep-and-launch-time-confirmation-governance`
-- verification_artifact_dir: `docs/epics/workspace-routing-foundation/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/ibm/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/code-reviews`
 - priority: P0
 - source_candidate: `docs/B1-docs/raw-20260327/candidates.md#c-20260327-1115-a`
 - source_brainstorm: `docs/B1-docs/raw-20260327/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
-  - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
+  - `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 
 ## Why
 
@@ -68,9 +68,9 @@
 
 ## Completion
 
-- `docs/epics/workspace-routing-foundation/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/issues/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance.md`
-- `docs/epics/workspace-routing-foundation/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/pre-tests.md`
-- `docs/epics/workspace-routing-foundation/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/tasks.md`
+- `docs/B2-docs/ibm/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/issues/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance.md`
+- `docs/B2-docs/ibm/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/pre-tests.md`
+- `docs/B2-docs/ibm/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/tasks.md`
 - `docs/system/workspace/skills/watchdog-control-plane/scripts/availability-watchdog.sh`
 - `docs/system/workspace/scripts/runtime/ai-cli`
 - `docs/system/workspace/scripts/runtime/freely`
@@ -85,4 +85,4 @@
 - `bash docs/system/workspace/scripts/tests/test-freely-ensure-manager`
 - `bash docs/system/workspace/scripts/tests/test-freely-rate-limit-defers-to-watchdog`
 - `bash docs/system/workspace/scripts/tests/test-ai-cli-switch-default-tool`
-- `docs/epics/workspace-routing-foundation/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/code-reviews/20260327-oauth-sweep-launch-confirmation-verification.md`
+- `docs/B2-docs/ibm/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/code-reviews/20260327-oauth-sweep-launch-confirmation-verification.md`

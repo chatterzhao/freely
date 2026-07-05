@@ -13,7 +13,7 @@ platform_ids:
     url: https://gitee.com/zhaoquan/freely/issues/IJFO6I
     synced_at: '2026-04-27T13:14:51Z'
 primary_platform: github
-canonical_issue_path: docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/issues/pre-test-merge-responsibility-usage-and-lifecycle-governance.md
+canonical_issue_path: docs/B2-docs/ibm/pre-test-merge-responsibility-usage-and-lifecycle-governance/issues/pre-test-merge-responsibility-usage-and-lifecycle-governance.md
 last_synced_comment_at:
   github: '2026-04-27T11:16:52Z'
 hash: ''
@@ -30,4 +30,4 @@ Freely 这次不是遇到一次性 merge 事故，而是暴露出 `pre-test-merg
 
 如果这层职责定义不先稳定，Freely 之后即使补 runtime/status 也只是围绕不清晰的治理对象加功能，仍会继续在狗粮过程中反复误用 `pre-test-merge`。
 
-canonical: docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/issues/pre-test-merge-responsibility-usage-and-lifecycle-governance.md
+canonical: docs/B2-docs/ibm/pre-test-merge-responsibility-usage-and-lifecycle-governance/issues/pre-test-merge-responsibility-usage-and-lifecycle-governance.md
