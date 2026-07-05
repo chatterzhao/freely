@@ -14157,10 +14157,10 @@ _ensure_acp_bridge_running() {
         # Compare base tool names (slot suffix may differ between cycles).
         # opencode-apikey-ds-flash-auto and opencode are the same base tool.
         local _running_base="${running_tool%%-*}"
-        local _current_base="${AGENT_AI_TOOL%%-*}"
+        local _current_base="${base_tool:-claude}"
         _current_base="${_current_base:-claude}"
         if [[ "$_running_base" != "$_current_base" ]]; then
-          log_info "ACP bridge tool changed ($running_tool → ${AGENT_AI_TOOL:-claude}), gracefully closing session before restart"
+          log_info "ACP bridge tool changed ($running_tool → ${base_tool:-claude}), gracefully closing session before restart"
           _acp_session_close "$project" "$base_tool" "${TOOL_SESSION_ID_CURRENT:-}"
           _stop_acp_bridge "$project" "${_cross_base_tool:-}"
         fi
