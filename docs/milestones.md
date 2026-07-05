@@ -2813,3 +2813,11 @@
 - milestone: M-20260705T024320Z-A
 - status: absorbed
 - absorbed_into: `I-20260705T024320Z-A`
+
+## M-20260705T042057Z-A
+- title: fix — base_tool validation + slot naming
+- status: active
+### candidate_issues
+1. `C-20260705T042057Z-A`
+- milestone: M-20260705T042057Z-A; status: promoted
+- promoted_issue_id: `I-20260705T042057Z-A`
