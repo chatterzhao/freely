@@ -8714,7 +8714,11 @@ print(h)" 2>/dev/null || true).pid"
   # Supports local (Unix socket) and remote (TCP)
   # Config: A2A_LISTEN_MODE=unix|tcp|both  A2A_TCP_HOST=0.0.0.0  A2A_TCP_PORT=19100
   log_info "starting A2A server for $project (mode=${A2A_LISTEN_MODE:-unix})"
+<<<<<<< Updated upstream
   _rotate_log "$project/.freely/run/a2a-server.log"
+=======
+  : > "$project/.freely/run/a2a-server.log"
+>>>>>>> Stashed changes
 
   python3 "$a2a_server_py" --project "$project" --start \
     --listen-mode "${A2A_LISTEN_MODE:-unix}" \

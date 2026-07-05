@@ -2,7 +2,10 @@
 local_id: raw-20260705T072052Z
 kind: raw
 phase_state: absorbed
+<<<<<<< Updated upstream
 absorbed_into: I-20260705T072052Z-A
+=======
+>>>>>>> Stashed changes
 platform_ids:
   gitee:
     issue_id: IJYUBF
@@ -13,12 +16,19 @@ canonical_issue_path: ''
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-07-05T15:21:20+08:00'
+<<<<<<< Updated upstream
 updated_at: '2026-07-05T07:34:44Z'
+=======
+updated_at: '2026-07-05T15:21:20+08:00'
+>>>>>>> Stashed changes
 intake_id: ''
 author: platform
 channel: gitee
 session_refs: []
+<<<<<<< Updated upstream
 platform_state: closed
+=======
+>>>>>>> Stashed changes
 ---
 
 \n\n## 问题
