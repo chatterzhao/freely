@@ -2837,3 +2837,11 @@
 - milestone: M-20260705T042057Z-A
 - status: absorbed
 - absorbed_into: `I-20260705T042057Z-A`
+
+## M-20260705T064047Z-A
+- title: fix — unify develop protection messages
+- status: active
+### candidate_issues
+1. `C-20260705T064047Z-A`
+- milestone: M-20260705T064047Z-A; status: promoted
+- promoted_issue_id: `I-20260705T064047Z-A`
