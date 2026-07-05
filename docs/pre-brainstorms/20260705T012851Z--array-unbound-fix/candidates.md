@@ -11,3 +11,4 @@ milestone: M-20260705T012851Z-A
 - decision_reason: bash 3.2 兼容性 + 诊断信息 + 工作流引导
 - promoted_issue_id: I-20260705T012851Z-A
 - milestone: M-20260705T012851Z-A
+  - promoted_issue_path: docs/epics/runtime-core/bridge-init/raw-20260705T012851Z/issues/I-20260705T012851Z-A.md

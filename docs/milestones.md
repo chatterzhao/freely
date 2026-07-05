@@ -5,7 +5,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 ### committed_issues
@@ -26,7 +26,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 ### committed_issues
@@ -47,7 +47,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 ### committed_issues
@@ -68,7 +68,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 ### committed_issues
@@ -89,7 +89,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 ### committed_issues
@@ -110,7 +110,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 ### committed_issues
@@ -131,7 +131,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 ### committed_issues
@@ -152,7 +152,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 ### committed_issues
@@ -173,7 +173,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 ### committed_issues
@@ -194,7 +194,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 ### committed_issues
@@ -215,7 +215,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 ### committed_issues
@@ -240,7 +240,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 ### committed_issues
@@ -262,7 +262,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260701T081450Z-A`
@@ -287,7 +287,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260701T045911Z-A`
@@ -313,7 +313,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260701T061924Z-A`
@@ -338,7 +338,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260701T061531Z-A`
@@ -363,7 +363,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260701T054502Z-A`
@@ -388,7 +388,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260701T051138Z-A`
@@ -413,7 +413,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260701T040012Z-A`
@@ -438,7 +438,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260701T031733Z-A`
@@ -463,7 +463,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260701T024449Z-A`
@@ -488,7 +488,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260701T013527Z-A`
@@ -513,7 +513,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260701T003241Z-A`
@@ -534,7 +534,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260630T224941Z-A`
@@ -559,7 +559,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260630T151209Z-A`
@@ -584,7 +584,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260630T134353Z-A`
@@ -610,7 +610,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260630T124528Z-A`
@@ -635,7 +635,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260630T113839Z-A`
@@ -661,7 +661,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260630T111641Z-A`
@@ -687,7 +687,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260630T085809Z-A`
@@ -708,7 +708,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260629T122254Z-A`
@@ -729,7 +729,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260630T002621Z-A`
@@ -750,7 +750,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260630T062010Z-A`
@@ -770,7 +770,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260630T054652Z-A`
@@ -795,7 +795,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260630T021946Z-A`
@@ -820,7 +820,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260629T235653Z-A`
@@ -845,7 +845,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260629T163137Z-A`
@@ -870,7 +870,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260629T165403Z-A`
@@ -895,7 +895,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260629T164530Z-A`
@@ -920,7 +920,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260629T160852Z-A`
@@ -945,7 +945,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260629T132042Z-A`
@@ -970,7 +970,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 ### committed_issues
@@ -991,7 +991,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260629T025659Z-A`
@@ -1015,7 +1015,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260629T030408Z-A`
@@ -1039,7 +1039,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260628T005815Z-A`
@@ -1063,7 +1063,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260628T054513Z-A`
@@ -1083,7 +1083,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260627T135126Z-A`
@@ -1103,7 +1103,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260510T1339Z-A`
@@ -1126,7 +1126,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260522T045227Z-A`
@@ -1141,7 +1141,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260522T051507Z-A`
@@ -1156,7 +1156,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260522T053702Z-A`
@@ -1171,7 +1171,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260522T072450Z-A`
@@ -1186,7 +1186,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260522T075012Z-A`
@@ -1201,7 +1201,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260522T075839Z-A`
@@ -1216,7 +1216,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260522T081853Z-A`
@@ -1231,7 +1231,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260522T083133Z-A`
@@ -1246,7 +1246,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260616T030213Z-A`
@@ -1261,7 +1261,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260616T083810Z-A`
@@ -1276,7 +1276,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260616T143914Z-A`
@@ -1291,7 +1291,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260617T051631Z-A`
@@ -1306,7 +1306,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260617T063755Z-A`
@@ -1321,7 +1321,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260617T095105Z-A`
@@ -1336,7 +1336,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260617T130029Z-A`
@@ -1351,7 +1351,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260617T133709Z-A`
@@ -1366,7 +1366,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260618T035220Z-A`
@@ -1381,7 +1381,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260618T054147Z-A`
@@ -1396,7 +1396,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260618T065221Z-A`
@@ -1411,7 +1411,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260618T091116Z-A`
@@ -1426,7 +1426,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260618T091721Z-A`
@@ -1441,7 +1441,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260619T033758Z-A`
@@ -1456,7 +1456,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260619T043000Z-A`
@@ -1471,7 +1471,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260619T045410Z-A`
@@ -1486,7 +1486,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260619T061448Z-A`
@@ -1501,7 +1501,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260620T142838Z-A`
@@ -1516,7 +1516,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260620T142847Z-A`
@@ -1531,7 +1531,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260621T005656Z-A`
@@ -1546,7 +1546,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260621T043842Z-A`
@@ -1561,7 +1561,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260621T063130Z-A`
@@ -1576,7 +1576,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260621T081426Z-A`
@@ -1591,7 +1591,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260621T081814Z-A`
@@ -1606,7 +1606,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260621T090002Z-A`
@@ -1621,7 +1621,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260621T092609Z-A`
@@ -1636,7 +1636,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260622T000649Z-A`
@@ -1651,7 +1651,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260622T003231Z-A`
@@ -1666,7 +1666,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260622T021126Z-A`
@@ -1681,7 +1681,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260622T023441Z-A`
@@ -1696,7 +1696,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260622T024321Z-A`
@@ -1711,7 +1711,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260622T025044Z-A`
@@ -1726,7 +1726,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260622T025736Z-A`
@@ -1741,7 +1741,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260622T031557Z-A`
@@ -1756,7 +1756,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260622T100348Z-A`
@@ -1771,7 +1771,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260622T104129Z-A`
@@ -1786,7 +1786,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260622T110050Z-A`
@@ -1801,7 +1801,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260622T113847Z-A`
@@ -1816,7 +1816,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260622T114625Z-A`
@@ -1831,7 +1831,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260622T115249Z-A`
@@ -1846,7 +1846,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260622T120046Z-A`
@@ -1861,7 +1861,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260622T123204Z-A`
@@ -1876,7 +1876,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260622T131109Z-A`
@@ -1891,7 +1891,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260623T022909Z-A`
@@ -1906,7 +1906,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260623T075200Z-A`
@@ -1921,7 +1921,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260623T100903Z-A`
@@ -1936,7 +1936,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260623T140410Z-A`
@@ -1951,7 +1951,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260623T162226Z-A`
@@ -1966,7 +1966,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260623T162243Z-A`
@@ -1981,7 +1981,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260624T004510Z-A`
@@ -1996,7 +1996,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260624T004524Z-A`
@@ -2011,7 +2011,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260624T013737Z-A`
@@ -2026,7 +2026,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260624T055231Z-A`
@@ -2041,7 +2041,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260624T061532Z-A`
@@ -2056,7 +2056,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260624T062756Z-A`
@@ -2071,7 +2071,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260624T072546Z-A`
@@ -2090,7 +2090,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260624T081358Z-A`
@@ -2105,7 +2105,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260624T081419Z-A`
@@ -2120,7 +2120,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260624T085740Z-A`
@@ -2135,7 +2135,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260624T090635Z-A`
@@ -2150,7 +2150,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260624T090651Z-A`
@@ -2165,7 +2165,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260624T090654Z-A`
@@ -2180,7 +2180,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260624T092822Z-A`
@@ -2195,7 +2195,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260624T104229Z-A`
@@ -2210,7 +2210,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260624T104233Z-A`
@@ -2225,7 +2225,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260624T105442Z-A`
@@ -2240,7 +2240,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260624T141559Z-A`
@@ -2255,7 +2255,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260624T151020Z-A`
@@ -2270,7 +2270,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260624T152500Z-A`
@@ -2285,7 +2285,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260624T154500Z-A`
@@ -2300,7 +2300,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260624T155212Z-A`
@@ -2315,7 +2315,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260624T235907Z-A`
@@ -2330,7 +2330,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260625T000114Z-A`
@@ -2345,7 +2345,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260625T003331Z-A`
@@ -2360,7 +2360,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260625T012435Z-A`
@@ -2375,7 +2375,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260625T020000Z-A`
@@ -2390,7 +2390,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260625T020333Z-A`
@@ -2405,7 +2405,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260625T030147Z-A`
@@ -2420,7 +2420,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260625T031400Z-A`
@@ -2435,7 +2435,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260625T045400Z-A`
@@ -2450,7 +2450,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260625T045412Z-A`
@@ -2465,7 +2465,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260625T050000Z-A`
@@ -2480,7 +2480,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260625T081835Z-A`
@@ -2495,7 +2495,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260625T084506Z-A`
@@ -2510,7 +2510,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260625T084522Z-A`
@@ -2525,7 +2525,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260625T131154Z-A`
@@ -2540,7 +2540,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260625T153111Z-A`
@@ -2555,7 +2555,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260627T062554Z-A`
@@ -2570,7 +2570,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260627T084523Z-A`
@@ -2585,7 +2585,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260627T084545Z-A`
@@ -2600,7 +2600,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260627T084551Z-A`
@@ -2615,7 +2615,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260627T121248Z-A`
@@ -2629,7 +2629,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260629T095905Z-A`
@@ -2652,7 +2652,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 ### committed_issues
@@ -2676,7 +2676,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260704T064539Z-A`
@@ -2697,7 +2697,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 ### committed_issues
@@ -2719,7 +2719,7 @@
 1. `I-20260705T010030Z-A`
 - title: fix — wt-close --raw-key 唯一入口重构
 - milestone: M-20260705T010030Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/worktree-close/rawkey-unify/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
 ### candidate_issues
 1. `C-20260704T234812Z-A`
@@ -2777,13 +2777,13 @@
 1. `I-20260705T012851Z-A`
 - title: fix — _unique_tools crash + dirty message
 - milestone: M-20260705T012851Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/runtime-core/bridge-init/raw-20260705T012851Z/issues/I-20260705T012851Z-A.md
 ### completed_issues
 1. `I-20260705T012851Z-A`
 - title: fix — _unique_tools crash + dirty message
 - milestone: M-20260705T012851Z-A
-- phase_state: done_b2_ibm
+- phase_state: completed
 - path: docs/epics/runtime-core/bridge-init/raw-20260705T012851Z/issues/I-20260705T012851Z-A.md
 2. `C-20260705T012851Z-A`
 - milestone: M-20260705T012851Z-A

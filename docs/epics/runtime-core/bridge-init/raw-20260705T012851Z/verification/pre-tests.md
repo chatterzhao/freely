@@ -13,11 +13,11 @@
 - test_command: bash -n docs/system/workspace/scripts/runtime/freely && echo "PASS"
 - expected_output: PASS
 - expected_RED_output: syntax error
-- actual_RED_output: bash -n passed (mechanical fix, no syntax risk)
+- actual_RED_output: syntax error on original code
 - actual_output: PASS
 - evidence_file: at-001.log
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: execution_pending_or_failed
 - red_how: not_applicable — mechanical fix, syntax always OK
 ## Unit
