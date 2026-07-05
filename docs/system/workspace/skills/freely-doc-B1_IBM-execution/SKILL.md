@@ -23,11 +23,11 @@ B1_IBM 是 IBM Framework 第一阶段。I（Input）由 `freely wt-create` 命�
 
 | 阶段 | 含义 | 谁准备 | 产物 |
 |------|------|--------|------|
-| **I** | Input | `freely wt-create` 命令（已物化到工位） | `docs/issues/raw-{key}/issue.md` |
-| **B** | Brainstorm | `freely-doc-B1_IBM-execution` skill | `docs/pre-brainstorms/{key}--{slug}/brainstorms.md`：发散→收敛→决策 |
-| **M** | Milestone | `freely-doc-B1_IBM-execution` skill | `docs/pre-brainstorms/{key}--{slug}/candidates.md`（candidate 文档）+ milestones.md candidate_issues（candidate 的 `promoted_issue_id` 指定 I-* issue 的身份标识） |
+| **I** | Input | `freely wt-create` 命令（已物化到工位） | `docs/B1-docs/raw-{key}/issue.md` |
+| **B** | Brainstorm | `freely-doc-B1_IBM-execution` skill | `docs/B1-docs/raw-{key}/brainstorms.md`：发散→收敛→决策 |
+| **M** | Milestone | `freely-doc-B1_IBM-execution` skill | `docs/B1-docs/raw-{key}/candidates.md`（candidate 文档）+ milestones.md candidate_issues（candidate 的 `promoted_issue_id` 指定 I-* issue 的身份标识） |
 
-> Candidate promote 时，`promoted_issue_id` 字段确定 I-* issue 的 key。值是 `I-{key}-{suffix}`（如 `I-20260508T011858Z-A`），suffix 继承 candidate 的 suffix。`freely-doc-B2_IBM-execution` skill 根据此 key，自行确定 epic/story 后构造完整路径（`docs/epics/{epic-name}/{story-name}/raw-{raw key}/issues/I-{raw key}-{suffix}.md`）并物化文件。B1_IBM 不决定文件放在哪个 epic/story——那是 B2_IBM 的架构决策。
+> Candidate promote 时，`promoted_issue_id` 字段确定 I-* issue 的 key。值是 `I-{key}-{suffix}`（如 `I-20260508T011858Z-A`），suffix 继承 candidate 的 suffix。`freely-doc-B2_IBM-execution` skill 根据此 key，自行确定 epic/story 后构造完整路径（`docs/B2-docs/{epic-name}/{story-name}/raw-{raw key}/issues/I-{raw key}-{suffix}.md`）并物化文件。B1_IBM 不决定文件放在哪个 epic/story——那是 B2_IBM 的架构决策。
 
 ### I：Input — `freely wt-create` 命令准备的 raw issue
 
@@ -35,17 +35,17 @@ B1_IBM 是 IBM Framework 第一阶段。I（Input）由 `freely wt-create` 命�
 - Source 1：`freely.db` chats 表（`chat_type=new-issue, consumed=0`）
 - Source 2：平台 API GitHub/Gitee（OPEN issues 含 `raw-{key}`）
 
-**关键**：Source 1 来的 raw issue 还没有 `platform_ids`（尚未 push 到平台）。`freely-doc-B1_IBM-execution` skill 不关心来源，只消费 `docs/issues/raw-{key}/issue.md`。
+**关键**：Source 1 来的 raw issue 还没有 `platform_ids`（尚未 push 到平台）。`freely-doc-B1_IBM-execution` skill 不关心来源，只消费 `docs/B1-docs/raw-{key}/issue.md`。
 
 `freely-doc-B1_IBM-execution` skill 不创建 raw issue。
 
 ### B：Brainstorm — 发散→收敛→决策
 
 0. 审视 issue 价值与时效性：确认该 raw issue 仍值得投入。检查其提出时间、是否已被其他 issue/candidate 覆盖、当前项目阶段是否仍相关。若认为已过时或价值不足，写入 brainstorms.md 的 discovery 部分说明理由并标记 dropped，直接终止 B1_IBM 流程。
-1. 读取 `docs/issues/raw-{key}/issue.md`（Input）
+1. 读取 `docs/B1-docs/raw-{key}/issue.md`（Input）
 2. 读取边界文档：CONSTITUTION.md、LAWS.md、PROJECT_INTENT.md
 3. 读取依赖：已有 milestones.md、相关 epics
-4. 发散→收敛→决策，产出 `docs/pre-brainstorms/{key}--{slug}/brainstorms.md`
+4. 发散→收敛→决策，产出 `docs/B1-docs/raw-{key}/brainstorms.md`
 
 ### M：Milestone — 创建 milestone 节点（M-{key}-A），candidate 入队，决定 I-* 身份标识
 
@@ -80,7 +80,7 @@ B1_IBM 是 IBM Framework 第一阶段。I（Input）由 `freely wt-create` 命�
   - summary: 审查 #247/#251 门禁拦截历史，确认 skill 修改方向正确
   - verdict: pass
 - promoted_issue_id: I-20260508T011858Z-A
-- promoted_issue_path: docs/epics/{epic-name}/{story-name}/raw-{raw key}/issues/I-{raw key}-{suffix}.md
+- promoted_issue_path: docs/B2-docs/{epic-name}/{story-name}/raw-{raw key}/issues/I-{raw key}-{suffix}.md
 - milestone: M-20260508T011858Z-A
 - session_refs: []
 ```
@@ -120,7 +120,7 @@ B1_IBM 是 IBM Framework 第一阶段。I（Input）由 `freely wt-create` 命�
 
 | gate 报错关键词 | 原因 | 正确格式 | 示例 |
 |-----------|------|---------|------|
-| no valid source_candidate / missing a valid source_candidate | source_candidate 需完整文件路径，不能只写 ID | docs/pre-brainstorms/{key}--{slug}/candidates.md#C-xxx | `docs/pre-brainstorms/20260508T011858Z--skill-gate-alignment/candidates.md#C-20260508T011858Z-A` |
+| no valid source_candidate / missing a valid source_candidate | source_candidate 需完整文件路径，不能只写 ID | docs/B1-docs/raw-{key}/candidates.md#C-xxx | `docs/pre-brainstorms/20260508T011858Z--skill-gate-alignment/candidates.md#C-20260508T011858Z-A` |
 | contains no recognizable candidate heading | candidates.md heading 需 ## 或 ### 开头 | `## C-xxx` | `## C-20260508T011858Z-A: 标题` |
 | phase_state is invalid for B1 | raw issue phase_state 合法值 | proposed / absorbed / dropped | `phase_state: absorbed` |
 | no absorbed_into field | phase_state=absorbed 时必须写吸收目标 | I-* issue ID | `absorbed_into: I-20260508T011858Z-A` |
@@ -160,7 +160,7 @@ milestone: M-20260508T011858Z-A
   - summary: 评审摘要
   - verdict: pass
 - promoted_issue_id: I-20260508T011858Z-A
-- promoted_issue_path: docs/epics/{epic-name}/{story-name}/raw-{raw key}/issues/I-{raw key}-{suffix}.md
+- promoted_issue_path: docs/B2-docs/{epic-name}/{story-name}/raw-{raw key}/issues/I-{raw key}-{suffix}.md
 - milestone: M-20260508T011858Z-A
 - session_refs: []
 ```
@@ -201,7 +201,7 @@ created_at: 2026-05-08
 
 ## 工作流
 
-1. 确认 Input：工位 `docs/issues/raw-{key}/issue.md` 存在
+1. 确认 Input：工位 `docs/B1-docs/raw-{key}/issue.md` 存在
 2. 读取 [entry-and-worktree-checks.md](references/entry-and-worktree-checks.md)
 3. 首次进入：按 [candidate-recording.md](references/candidate-recording.md) + [milestone-placement.md](references/milestone-placement.md) 写 brainstorms.md、candidates.md、milestones.md
 4. 继续研究：沿用同一 reference 补边界、依赖、next_action、revisit_trigger

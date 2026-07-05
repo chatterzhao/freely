@@ -75,7 +75,7 @@
 
 This gate consumes the five-level testing evidence ladder by reference — do not redefine levels locally.
 
-Refer to `docs/epics/testing-evidence-ladder/testing-evidence-ladder-and-gate-mapping/prd.md` for:
+Refer to `docs/B2-docs/testing-evidence-ladder/testing-evidence-ladder-and-gate-mapping/prd.md` for:
 
 - **Five evidence levels**: script regression, integration, end-to-end scenario, application-native real-environment, protected-env post-merge acceptance. Each level has a defined default purpose, promotion trigger, what it can prove, and what it cannot replace.
 - **Completion gate minimum evidence**: per issue class, the minimum `evidence_level` required before `phase_state: completed` may be set.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate docs/epics-map.svg against docs/epics/ directory tree.
+"""Validate docs/B2-map.svg against docs/B2-docs/ directory tree.
 
 Exit 0: aligned. Exit 1: mismatch with diff details.
 Usage: ./bin/check-epics-map [--project <path>]
@@ -55,7 +55,7 @@ def parse_svg(svg_text: str) -> tuple[set[str], dict[str, set[str]]]:
 
 
 def walk_epics(project: Path) -> tuple[set[str], dict[str, set[str]]]:
-    """Walk docs/epics/ and return (epics_set, {epic: {stories}})."""
+    """Walk docs/B2-docs/ and return (epics_set, {epic: {stories}})."""
     epics_dir = project / "docs" / "epics"
     if not epics_dir.exists():
         return set(), {}
@@ -129,9 +129,9 @@ def main():
             print(f"  - {e}")
         print()
         print("── 修复方式 ──")
-        print("  编辑 docs/epics-map.svg，添加缺失的 epic/story 条目。")
+        print("  编辑 docs/B2-map.svg，添加缺失的 epic/story 条目。")
         print("  参考已有条目格式，完成后: ./bin/check-epics-map 验证对齐")
-        print(f"  请更新 docs/epics-map.svg 使其与 docs/epics/ 目录树一致")
+        print(f"  请更新 docs/B2-map.svg 使其与 docs/B2-docs/ 目录树一致")
         sys.exit(1)
 
     print(f"[epics-map] OK: {len(svg_epics)} epics, {sum(len(s) for s in svg_stories.values())} stories aligned ({svg_total} total)")

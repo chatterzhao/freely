@@ -60,7 +60,7 @@ def main():
         # Find canonical issue doc
         # Search only in */issues/*.md files for the canonical issue doc
         issue_file = ''
-        for root, dirs, files in os.walk('docs/epics'):
+        for root, dirs, files in os.walk('docs/B2-docs'):
             if '/issues/' in root or root.endswith('/issues'):
                 for fname in files:
                     if fname.endswith('.md'):

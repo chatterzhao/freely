@@ -284,7 +284,7 @@ GREEN 判定标准和详细步骤见 `skill:freely-test-execution`。
 |---|---|
 | `decision` missing | 用 `## Implementation Decision Note` section |
 | `promoted_issue_path` missing | candidate 显式声明 |
-| `docs/epics/**/issues/I-*` missing | 创建 kind: linked 入口 |
+| `docs/B2-docs/**/issues/I-*` missing | 创建 kind: linked 入口 |
 | milestone 无条目 | 添加到 committed_issues |
 | raw issue key 不匹配 | 目录名对齐 candidate date-time key |
 | `owner issue 'missing'` | code-review 用 `issue_id` / `issue_path` |

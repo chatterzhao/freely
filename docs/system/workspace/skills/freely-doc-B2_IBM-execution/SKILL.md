@@ -6,7 +6,7 @@ description: >-
   `source_candidate` 找到候选文档，读取 acceptance_criteria 等依据）。
   三步产出：① 根据 `promoted_issue_id` 确定 epic-name/story-name，
   在 milestones.md committed_issues 中生成 I-* issue 正式条目（含真实路径）；
-  ② 在 `docs/epics/{epic-name}/{story-name}/raw-{raw key}/issues/` 下物化
+  ② 在 `docs/B2-docs/{epic-name}/{story-name}/raw-{raw key}/issues/` 下物化
   完整 I-* issue 文档；③ 产出设计产物 prd.md + pre-tests.md + tasks.md +
   code-reviews/。交付给 `freely-dev-loop-execution` skill。
 
@@ -23,7 +23,7 @@ description: >-
 
 B2_IBM 是 IBM Framework 第二阶段。消费 `freely-doc-B1_IBM-execution` skill promote 的 candidate，做 B（Brainstorm）和 M（Map），**在 milestones.md committed_issues 生成 I-* 正式条目并物化完整文档**，同时产出全部设计产物。
 
-> 四节点链路中，本 skill 负责 milestone → **I-* issue 物化**。M（milestone，M-{raw key}-A）和 candidate 的 `promoted_issue_id`（I-{raw key}-{suffix}）由 B1_IBM 提供。本 skill 据此 key：① 按 [issue-materialization-checklist.md](references/issue-materialization-checklist.md) 规范确定 epic-name/story-name；② 在 milestones.md committed_issues 中生成 I-* 正式条目并**填写 epics 下的真实路径**（`docs/epics/{epic-name}/{story-name}/raw-{raw key}/issues/I-{raw key}-{suffix}.md`）；③ 在该路径物化完整 I-* issue 文档。
+> 四节点链路中，本 skill 负责 milestone → **I-* issue 物化**。M（milestone，M-{raw key}-A）和 candidate 的 `promoted_issue_id`（I-{raw key}-{suffix}）由 B1_IBM 提供。本 skill 据此 key：① 按 [issue-materialization-checklist.md](references/issue-materialization-checklist.md) 规范确定 epic-name/story-name；② 在 milestones.md committed_issues 中生成 I-* 正式条目并**填写 epics 下的真实路径**（`docs/B2-docs/{epic-name}/{story-name}/raw-{raw key}/issues/I-{raw key}-{suffix}.md`）；③ 在该路径物化完整 I-* issue 文档。
 >
 > 关键区分：B1_IBM 产出的是 key（I-{raw key}-{suffix}，在 candidate_issues 中）。B2_IBM 将 key 变成 milestones.md 中的**正式条目（含真实路径）**和 epics 目录下的**完整文档**。
 
@@ -44,7 +44,7 @@ B2 不创建 I-* issue 的 key——key 由 B1 提供。B2 按以下步骤获取
 1. 打开 `docs/milestones.md` → 找到 `candidate_issues` 中 `status=promoted` 的 candidate
 2. 读取 candidate 条目，获取：
    - `promoted_issue_id`: I-* issue 的 key（如 `I-20260701T085407Z-A`）→ 包含 `{raw key}` 和 `{suffix}`
-   - `source_candidate`: 指向 `docs/pre-brainstorms/{raw key}--{slug}/candidates.md#C-{raw key}-{suffix}` 的完整路径
+   - `source_candidate`: 指向 `docs/B1-docs/raw-{raw key}/candidates.md#C-{raw key}-{suffix}` 的完整路径
 3. 根据 `source_candidate` 打开候选文档，读取：
    - `acceptance_criteria` — 验收标准（Brainstorm 必须覆盖）
    - `promotion_gate` — 晋级条件（Brainstorm 必须满足）
@@ -62,7 +62,7 @@ B 阶段是 B2_IBM 的核心工作。对每个 candidate（即每个 I-* issue�
 读取 candidate 的 acceptance_criteria、promotion_gate，评估实现方案、替代方案、边界条件。将研究过程写入：
 
 ```
-docs/epics/{epic-name}/{story-name}/raw-{raw key}/brainstorms/b-I-{raw key}-{suffix}.md
+docs/B2-docs/{epic-name}/{story-name}/raw-{raw key}/brainstorms/b-I-{raw key}-{suffix}.md
 ```
 
 > `b-I-{raw key}-A.md` 对应 `I-{raw key}-A`。suffix 一一对应。一个 candidate → 一个 I-* issue → 一个 brainstorm。
@@ -72,7 +72,7 @@ docs/epics/{epic-name}/{story-name}/raw-{raw key}/brainstorms/b-I-{raw key}-{suf
 将 key 变成真实文件——写入包含完整 frontmatter 和正文的 issue 文档：
 
 ```
-docs/epics/{epic-name}/{story-name}/raw-{raw key}/issues/I-{raw key}-{suffix}.md
+docs/B2-docs/{epic-name}/{story-name}/raw-{raw key}/issues/I-{raw key}-{suffix}.md
 ```
 
 必填字段：`issue_id`、`phase_state`（初始 `in_b2_ibm`）、`source_candidate`、`pre_tests_path`、`verification_artifact_dir`。格式见 [规范文档示例](#规范文档示例copy-paste可用)。
@@ -106,7 +106,7 @@ docs/epics/{epic-name}/{story-name}/raw-{raw key}/issues/I-{raw key}-{suffix}.md
 ### 规范目录结构（B 阶段产出，M 阶段确认）
 
 ```
-docs/epics/{epic-name}/{story-name}/
+docs/B2-docs/{epic-name}/{story-name}/
 └── raw-{raw key}/                           ← 一个 raw issue 一个目录
     │
     ├── prd.md                               ← B 产出：Goal → Dev-Loop Handoff
@@ -145,7 +145,7 @@ docs/epics/{epic-name}/{story-name}/
 | `tasks.md` | （见上树） | 任务分解，关联 owner issue |
 | `code-reviews/` | （见上树） | Implementation Decision Note（5 字段） |
 
-**I-* issue 完整示例**（`docs/epics/{epic-name}/{story-name}/raw-{raw key}/issues/I-{raw key}-{suffix}.md`，此处 suffix = A）：
+**I-* issue 完整示例**（`docs/B2-docs/{epic-name}/{story-name}/raw-{raw key}/issues/I-{raw key}-{suffix}.md`，此处 suffix = A）：
 
 ```markdown
 ---
@@ -154,7 +154,7 @@ kind: linked
 status: in_dev
 phase_state: in_dev
 promoted_from: raw-20260508T011858Z
-source_candidate: docs/pre-brainstorms/20260508T011858Z--skill-gate-alignment/candidates.md
+source_candidate: docs/B1-docs/raw-20260508T011858Z/candidates.md
 canonical_issue_path: ""
 platform_ids: {}
 primary_platform: ""
@@ -166,15 +166,15 @@ intake_id: ""
 author: zhaoquan
 channel: freely-workflow-guarded-execution
 session_refs: []
-pre_tests_path: docs/epics/skill-gate-alignment/skill-gate-fix/raw-20260508T011858Z/verification/pre-tests.md
-verification_artifact_dir: docs/epics/skill-gate-alignment/skill-gate-fix/raw-20260508T011858Z/code-reviews
+pre_tests_path: docs/B2-docs/skill-gate-fix/raw-20260508T011858Z/verification/pre-tests.md
+verification_artifact_dir: docs/B2-docs/skill-gate-fix/raw-20260508T011858Z/code-reviews
 ---
 
 # I-20260508T011858Z-A: skill 引导与门禁对齐
 
-- source_candidate: `docs/pre-brainstorms/20260508T011858Z--skill-gate-alignment/candidates.md`
-- pre_tests_path: `docs/epics/skill-gate-alignment/skill-gate-fix/raw-20260508T011858Z/verification/pre-tests.md`
-- verification_artifact_dir: `docs/epics/skill-gate-alignment/skill-gate-fix/raw-20260508T011858Z/code-reviews`
+- source_candidate: `docs/B1-docs/raw-20260508T011858Z/candidates.md`
+- pre_tests_path: `docs/B2-docs/skill-gate-fix/raw-20260508T011858Z/verification/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/skill-gate-fix/raw-20260508T011858Z/code-reviews`
 
 ## 实现
 ...
@@ -238,7 +238,7 @@ B2_IBM 阶段直接写入以下格式。AI 按模板填写，无需查看任何�
 - target_environment: test-pre-merge-{raw key}-{slug}
 - required_evidence: <测试通过的证据要求>
 - evidence_level: mock | integration | real_env | post_merge_dogfood
-- artifact_ref: <指向测试产物文件，如 docs/epics/{epic-name}/{story-name}/raw-{raw key}/verification/test-evidence/acceptance-1.log>
+- artifact_ref: <指向测试产物文件，如 docs/B2-docs/{epic-name}/{story-name}/raw-{raw key}/verification/test-evidence/acceptance-1.log>
 - test_command: <实际执行的 shell 命令，如：./bin/test-lane feature-local -- echo ok>
 - expected_output: <命令的预期输出（GREEN 时的输出），如：所有测试 PASSED>
 - expected_RED_output: <RED 阶段的预期输出——fix: 证明 bug 存在；feature: 证明功能未实现>
@@ -311,7 +311,7 @@ B2_IBM 阶段直接写入以下格式。AI 按模板填写，无需查看任何�
 - [ ] tasks.md 存在且任务已分解
 - [ ] code-reviews/ 含 Implementation Decision Note
 - [ ] milestones.md committed_issues 条目已更新
-- [ ] `docs/epics-map.svg` 已更新（新增 epic/story 时必须，运行 `./bin/check-epics-map` 验证）
+- [ ] `docs/B2-docs-map.svg` 已更新（新增 epic/story 时必须，运行 `./bin/check-epics-map` 验证）
 - [ ] 下一跳明确：进入 skill `freely-test-RED-execution`
 
 phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
@@ -325,7 +325,7 @@ phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
 
 ## 负责
 
-- **在 milestones.md committed_issues 中生成 I-* 正式条目**：根据 `promoted_issue_id` 确定的 epic-name/story-name，填写 I-* issue 的真实路径（`docs/epics/{epic-name}/{story-name}/raw-{raw key}/issues/I-{raw key}-{suffix}.md`）
+- **在 milestones.md committed_issues 中生成 I-* 正式条目**：根据 `promoted_issue_id` 确定的 epic-name/story-name，填写 I-* issue 的真实路径（`docs/B2-docs/{epic-name}/{story-name}/raw-{raw key}/issues/I-{raw key}-{suffix}.md`）
 - **物化 I-* issue 完整文档**：在 epics 路径下创建包含完整 frontmatter（phase_state、pre_tests_path、verification_artifact_dir 等）和正文的 issue.md 文件
 - 产出 prd.md、pre-tests.md、tasks.md
 - 产出 code-reviews/（含 Implementation Decision Note）
@@ -339,19 +339,19 @@ phase_state 流转：`in_b2_ibm → done_b2_ibm → in_dev`
 
 | 产物 | 路径 |
 |------|------|
-| I-* issue | `docs/epics/{epic-name}/{story-name}/raw-{raw key}/issues/I-{raw key}-{suffix}.md` |
-| b-I-* | `docs/epics/{epic-name}/{story-name}/raw-{raw key}/brainstorms/b-I-{raw key}-{suffix}.md` |
-| prd.md | `docs/epics/{epic-name}/{story-name}/raw-{raw key}/prd.md` |
-| pre-tests.md | `docs/epics/{epic-name}/{story-name}/raw-{raw key}/verification/pre-tests.md` |
-| tasks.md | `docs/epics/{epic-name}/{story-name}/raw-{raw key}/verification/tasks.md` |
-| IDN | `docs/epics/{epic-name}/{story-name}/raw-{raw key}/code-reviews/implementation-decision-note.md` |
+| I-* issue | `docs/B2-docs/{epic-name}/{story-name}/raw-{raw key}/issues/I-{raw key}-{suffix}.md` |
+| b-I-* | `docs/B2-docs/{epic-name}/{story-name}/raw-{raw key}/brainstorms/b-I-{raw key}-{suffix}.md` |
+| prd.md | `docs/B2-docs/{epic-name}/{story-name}/raw-{raw key}/prd.md` |
+| pre-tests.md | `docs/B2-docs/{epic-name}/{story-name}/raw-{raw key}/verification/pre-tests.md` |
+| tasks.md | `docs/B2-docs/{epic-name}/{story-name}/raw-{raw key}/verification/tasks.md` |
+| IDN | `docs/B2-docs/{epic-name}/{story-name}/raw-{raw key}/code-reviews/implementation-decision-note.md` |
 
 ### 治理文件（B2 需更新）
 
 | 文件 | 路径 | 更新什么 |
 |------|------|---------|
 | milestones.md | `docs/milestones.md` | I-* issue 写入 `committed_issues`（含 `path:` 字段指向 epics 下真实路径） |
-| epics-map.svg | `docs/epics-map.svg` | 新增 epic/story 时必须更新（运行 `./bin/check-epics-map`） |
+| epics-map.svg | `docs/B2-docs-map.svg` | 新增 epic/story 时必须更新（运行 `./bin/check-epics-map`） |
 | test-gate.env | `{test-worktree}/.freely/run/test-gate.env` | 测试证据（wt-create 创建，daemon 启停更新，门禁检查） |
 | worker-verification-contract.env | `{worker-worktree}/.freely/run/worker-verification-contract.env` | Worker closeout 上下文（manager 委派 worker 时写入） |
 
@@ -371,7 +371,7 @@ Manager 委派 worker 时写入，worker daemon 从中读取：
 
 ```
 OWNER_ISSUE=I-{raw key}-A
-PRE_TESTS_PATH=docs/epics/{epic-name}/{story-name}/raw-{raw key}/verification/pre-tests.md
+PRE_TESTS_PATH=docs/B2-docs/{epic-name}/{story-name}/raw-{raw key}/verification/pre-tests.md
 CLOSEOUT_GATE=create
 CLOSEOUT_GATE_COMMAND=freely pr-create-guarded
 CLOSEOUT_TARGET_LANE=premerge-integration
@@ -416,12 +416,12 @@ CLOSEOUT_REVIEW_ARTIFACT_POLICY=code-reviews
 
 | gate 报错关键词 | 原因 | 正确格式 |
 |-----------|------|---------|
-| verification_artifact_dir too broad or non-canonical | 需以 /code-reviews 结尾，规范格式：docs/epics/{epic-name}/{story-name}/raw-{raw key}/code-reviews | `docs/epics/{epic-name}/{story-name}/raw-{raw key}/code-reviews` |
+| verification_artifact_dir too broad or non-canonical | 需以 /code-reviews 结尾，规范格式：docs/B2-docs/{epic-name}/{story-name}/raw-{raw key}/code-reviews | `docs/B2-docs/{epic-name}/{story-name}/raw-{raw key}/code-reviews` |
 | implementation decision note is incomplete | 需 5 个字段 | `decision` / `why_this` / `alternatives_considered` / `boundary_non_goals` / `residual_risk` |
 | owner issue 'missing' / that issue cannot be resolved | review/code-review 文件需 bullet 格式的 issue_id | `- issue_id: I-20260508T011858Z-A` |
 | I-* canonical fields silently cleared | I-* frontmatter 用了 `---` YAML 包裹格式；canonical reader 只解析 bullet | 去掉 `---` 包裹，用 bullet 格式：`- phase_state: completed` |
 | phase_state cannot own capability/implementation changes | 实现变更的 I-* 需 completed | `phase_state: completed` |
-| pre_tests_path 验证失败 | I-* issue 需声明 pre_tests_path | `pre_tests_path: docs/epics/{epic-name}/{story-name}/raw-{raw key}/verification/pre-tests.md` |
+| pre_tests_path 验证失败 | I-* issue 需声明 pre_tests_path | `pre_tests_path: docs/B2-docs/{epic-name}/{story-name}/raw-{raw key}/verification/pre-tests.md` |
 | section missing acceptance_target/testing_layer | 字段名必须用下划线，不是空格 | `- acceptance_target:` / `- testing_layer:` / `- target_environment:` / `- required_evidence:` |
 | acceptance item missing id/requirement/evidence_level/artifact_ref | 每个 acceptance item 必须有这 4 个字段 | `- id: AT-001` / `- requirement: ...` / `- evidence_level: mock` / `- artifact_ref: <path>` |
 | red-green-status missing / invalid / not green | 每个 item 必须有 TDD 状态追踪。合法值: pending\|red\|green\|not_applicable | `- red-green-status: green` |
@@ -453,15 +453,15 @@ CLOSEOUT_REVIEW_ARTIFACT_POLICY=code-reviews
 - kind: fix
 - phase_state: completed
 - milestone: M-20260508T011858Z-A
-- source_candidate: docs/pre-brainstorms/20260508T011858Z--skill-gate-alignment/candidates.md#C-20260508T011858Z-A
-- verification_artifact_dir: docs/epics/skill-gate-alignment/skill-gate-fix/raw-20260508T011858Z/code-reviews
+- source_candidate: docs/B1-docs/raw-20260508T011858Z/candidates.md#C-20260508T011858Z-A
+- verification_artifact_dir: docs/B2-docs/skill-gate-fix/raw-20260508T011858Z/code-reviews
 - canonical_issue_path: ""
 - title: 简短描述
 
 # I-20260508T011858Z-A: 标题
 
-- source_candidate: docs/pre-brainstorms/20260508T011858Z--skill-gate-alignment/candidates.md#C-20260508T011858Z-A
-- verification_artifact_dir: docs/epics/skill-gate-alignment/skill-gate-fix/raw-20260508T011858Z/code-reviews
+- source_candidate: docs/B1-docs/raw-20260508T011858Z/candidates.md#C-20260508T011858Z-A
+- verification_artifact_dir: docs/B2-docs/skill-gate-fix/raw-20260508T011858Z/code-reviews
 ```
 
 ### Implementation Decision Note（完整模板）
@@ -469,12 +469,12 @@ CLOSEOUT_REVIEW_ARTIFACT_POLICY=code-reviews
 ```markdown
 ---
 issue_id: I-20260508T011858Z-A
-issue_path: docs/epics/skill-gate-alignment/skill-gate-fix/raw-20260508T011858Z/issues/I-20260508T011858Z-A.md
+issue_path: docs/B2-docs/skill-gate-fix/raw-20260508T011858Z/issues/I-20260508T011858Z-A.md
 phase_state: done_b2_ibm
 ---
 
 - issue_id: I-20260508T011858Z-A
-- issue_path: docs/epics/skill-gate-alignment/skill-gate-fix/raw-20260508T011858Z/issues/I-20260508T011858Z-A.md
+- issue_path: docs/B2-docs/skill-gate-fix/raw-20260508T011858Z/issues/I-20260508T011858Z-A.md
 
 ## Implementation Decision Note
 
@@ -495,7 +495,7 @@ phase_state: done_b2_ibm
 - reviewer: cli
 - verdict: pass
 - issue_id: I-20260508T011858Z-A
-- issue_path: docs/epics/skill-gate-alignment/skill-gate-fix/raw-20260508T011858Z/issues/I-20260508T011858Z-A.md
+- issue_path: docs/B2-docs/skill-gate-fix/raw-20260508T011858Z/issues/I-20260508T011858Z-A.md
 
 ## 1. Worktree Check
 ^- status: passed
@@ -524,7 +524,7 @@ phase_state: done_b2_ibm
 1. 确认 Input：milestones.md candidate_issues 中有 status=promoted 的 candidate
 2. 读取 candidate 的 `promoted_issue_id`，确认 I-* issue 目标路径
 3. 读取 [issue-materialization-checklist.md](references/issue-materialization-checklist.md)
-4. Materialize I-* issue 到 `docs/epics/{epic-name}/{story-name}/raw-{raw key}/issues/`
+4. Materialize I-* issue 到 `docs/B2-docs/{epic-name}/{story-name}/raw-{raw key}/issues/`
 5. 写 prd.md、pre-tests.md、tasks.md
 6. 写 code-review（含 Implementation Decision Note）
 7. 更新 milestones.md committed_issues（写入物化后的 I-* issue）

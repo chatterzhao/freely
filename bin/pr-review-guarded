@@ -144,7 +144,7 @@ _raw_issues_dir=""
 _search_roots=("$_wt_path" "$ROOT_DIR")
 for _sr in "${_search_roots[@]}"; do
   [[ -d "$_sr" ]] || continue
-  _raw_i_glob="$_sr/docs/epics/*/*/raw-${_raw_key}/issues/I-${_raw_key#raw-}-*.md"
+  _raw_i_glob="$_sr/docs/B2-docs/*/*/raw-${_raw_key}/issues/I-${_raw_key#raw-}-*.md"
   for _f in $_raw_i_glob; do
     [[ -f "$_f" ]] || continue
     _raw_issues_dir="$(dirname "$_f")"
@@ -172,24 +172,24 @@ if [[ -n "$_raw_issues_dir" ]]; then
   _i_issue_file="$_raw_issues_dir/${_issue_id}.md"
 fi
 if [[ -z "$_i_issue_file" || ! -f "$_i_issue_file" ]]; then
-  _i_issue_file=$(find docs/epics -path "*/issues/${_issue_id}.md" -print -quit 2>/dev/null || true)
+  _i_issue_file=$(find docs/B2-docs -path "*/issues/${_issue_id}.md" -print -quit 2>/dev/null || true)
 fi
 	if [[ -z "$_i_issue_file" || ! -f "$_i_issue_file" ]]; then
 	  echo >&2 "[pr-review-guarded] ERROR: I-* issue file not found for issue ${_issue_id}"
-	  echo >&2 "  Expected: docs/epics/{epic-name}/{story-name}/raw-${_raw_key}/issues/${_issue_id}.md"
-	  echo >&2 "  Run: find docs/epics -path '*/raw-${_raw_key}/issues/${_issue_id}.md'"
+	  echo >&2 "  Expected: docs/B2-docs/{epic-name}/{story-name}/raw-${_raw_key}/issues/${_issue_id}.md"
+	  echo >&2 "  Run: find docs/B2-docs -path '*/raw-${_raw_key}/issues/${_issue_id}.md'"
 	  exit 1
 	fi
 	_verification_dir=$(grep "verification_artifact_dir:" "$_i_issue_file" 2>/dev/null | sed "s/.*: *'\([^']*\)'/\1/" | head -1 || true)
 	if [[ -z "$_verification_dir" ]]; then
 	  echo >&2 "[pr-review-guarded] ERROR: verification_artifact_dir missing in $_i_issue_file"
-	  echo >&2 "  Add: verification_artifact_dir: docs/epics/{epic-name}/{story-name}/raw-${_raw_key}/code-reviews"
+	  echo >&2 "  Add: verification_artifact_dir: docs/B2-docs/{epic-name}/{story-name}/raw-${_raw_key}/code-reviews"
 	  exit 1
 	fi
 	if ! echo "$_verification_dir" | grep -qE "^docs/epics/[^/]+/[^/]+/raw-[^/]+/code-reviews$"; then
 	  echo >&2 "[pr-review-guarded] ERROR: verification_artifact_dir path does not match canonical format"
 	  echo >&2 "  Got:      $_verification_dir"
-	  echo >&2 "  Expected: docs/epics/{epic-name}/{story-name}/raw-${_raw_key}/code-reviews"
+	  echo >&2 "  Expected: docs/B2-docs/{epic-name}/{story-name}/raw-${_raw_key}/code-reviews"
 	  echo >&2 "  Required: 4 levels under docs/epics/ — epic/story/raw-{key}/code-reviews"
 	  exit 1
 	fi
@@ -311,7 +311,7 @@ fi
 _pre_tests_file=""
 for _sr in "$_wt_path" "$ROOT_DIR"; do
   [[ -d "$_sr" ]] || continue
-  for _d in "$_sr"/docs/epics/*/*/raw-${_raw_key}/verification/; do
+  for _d in "$_sr"/docs/B2-docs/*/*/raw-${_raw_key}/verification/; do
     if [[ -f "${_d}pre-tests.md" ]]; then
       _pre_tests_file="${_d}pre-tests.md"
       break 2
