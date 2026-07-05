@@ -2765,3 +2765,11 @@
 - milestone: M-20260705T010030Z-A
 - status: absorbed
 - absorbed_into: `I-20260705T010030Z-A`
+
+## M-20260705T012851Z-A
+- title: fix — _unique_tools crash + dirty message
+- status: active
+### candidate_issues
+1. `C-20260705T012851Z-A`
+- milestone: M-20260705T012851Z-A; status: promoted
+- promoted_issue_id: `I-20260705T012851Z-A`
