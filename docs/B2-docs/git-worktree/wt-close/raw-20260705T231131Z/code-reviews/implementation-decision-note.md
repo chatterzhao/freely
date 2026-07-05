@@ -1,3 +1,4 @@
+- issue_id: I-20260705T231131Z-A
 # Implementation Decision Note: 全项目旧路径引用清理
 
 ## Implementation Summary
