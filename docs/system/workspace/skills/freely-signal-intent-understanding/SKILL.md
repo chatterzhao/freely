@@ -25,7 +25,7 @@ description: >- 在 manager routing 之前收敛 signal 的最小意图结构：
 ## 输入
 
 - signal source record
-  - 例如 `.freely/intake/**`
+  - 例如 `docs/B1-docs/raw-*/`
   - review finding
   - test / verification evidence
   - runtime / recovery continuity

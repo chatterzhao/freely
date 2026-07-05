@@ -18,7 +18,7 @@ description: >- 强制恢复耦合和子代理治理约束。确保 AI 委托任
    - 系统崩溃：不得直接写 `blocked_*`，先做恢复定位
 5. 系统崩溃的恢复定位顺序固定为：
    - `docs/recovery/**`
-   - `docs/progress/**`
+   - `docs/B2-docs/**`
    - `issue`
    - `docs/milestones.md`
    - 当前活跃 worktree 与未提交改动

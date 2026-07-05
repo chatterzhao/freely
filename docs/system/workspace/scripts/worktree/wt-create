@@ -157,7 +157,7 @@ MSG
   fi
   if [[ -z "$branch_kind" ]]; then
     # Fallback: try to read kind from raw issue (set by 'freely feedback --kind')
-    local _raw_issue_file="docs/issues/raw-${raw_key}/issue.md"
+    local _raw_issue_file="docs/B1-docs/raw-${raw_key}/issue.md"
     if [[ -f "$_raw_issue_file" ]]; then
       branch_kind=$(grep -m1 '^- kind:' "$_raw_issue_file" 2>/dev/null | sed 's/^- kind: *//' || true)
     fi
@@ -303,7 +303,7 @@ FUZZY_BLOCK
 fi
 
 # ── Raw issue state check ────────────────────────────────
-_issue_file="docs/issues/raw-${raw_key}/issue.md"
+_issue_file="docs/B1-docs/raw-${raw_key}/issue.md"
 if [[ -f "$_issue_file" ]]; then
   _phase=$(grep 'phase_state:' "$_issue_file" 2>/dev/null | head -1 | sed 's/.*: *//' | tr -d "'\"")
   case "$_phase" in
@@ -395,7 +395,7 @@ _pull_raw_issue() {
 
 _fill_platform_ids() {
   local raw_key="$1"
-  local issue_file="$PWD/docs/issues/raw-${raw_key}/issue.md"
+  local issue_file="$PWD/docs/B1-docs/raw-${raw_key}/issue.md"
   [[ -f "$issue_file" ]] || return 0
 
   # Check if any configured platform is missing
@@ -478,7 +478,7 @@ _require_issue_exists() {
             platform_result=$(python3 "$ROOT_DIR/docs/system/workspace/scripts/sync/platform-adapter.py" search "$raw_key" 2>/dev/null || echo "{}")
             if [[ "$platform_result" != "{}" && "$platform_result" != "" ]]; then
               : # found on platform, proceed
-            elif [[ -d "$ROOT_DIR/docs/issues/$key" ]]; then
+            elif [[ -d "$ROOT_DIR/docs/B1-docs/$key" ]]; then
               : # exists locally (local_only — will be pushed to platform by worker)
             else
               echo "拒绝创建工位: raw-$raw_key not found on platform or local" >&2
@@ -491,7 +491,7 @@ _require_issue_exists() {
             ;;
           chat-inbox|local|*)
             # All sources other than platform: redirect to feedback → platform flow
-            if [[ -d "$ROOT_DIR/docs/issues/raw-$raw_key" ]] || [[ -d "$ROOT_DIR/docs/issues/$key" ]]; then
+            if [[ -d "$ROOT_DIR/docs/B1-docs/raw-$raw_key" ]] || [[ -d "$ROOT_DIR/docs/B1-docs/$key" ]]; then
               echo "  发现本地 issue 文件，请使用 --source platform:" >&2
               echo "    wt-create --raw-key $raw_key --source platform --kind <fix|feature|hotfix> --slug <slug>" >&2
             else
@@ -520,7 +520,7 @@ conn.close()
           return 0
         fi
         if [[ "$consumed" == "1" ]]; then
-          if [[ -d "$ROOT_DIR/docs/issues/$key" ]]; then
+          if [[ -d "$ROOT_DIR/docs/B1-docs/$key" ]]; then
             return 0
           fi
           echo "警告: chat $key consumed but issue missing, resetting to pending" >&2
@@ -528,7 +528,7 @@ conn.close()
           return 0
         fi
       fi
-      if [[ -d "$ROOT_DIR/docs/issues/$key" ]]; then
+      if [[ -d "$ROOT_DIR/docs/B1-docs/$key" ]]; then
         return 0
       fi
       # Platform pull is deferred to after worktree creation
@@ -537,7 +537,7 @@ conn.close()
       fi
       ;;
     I-*)
-      if [[ -d "$ROOT_DIR/docs/issues/$key" ]]; then
+      if [[ -d "$ROOT_DIR/docs/B1-docs/$key" ]]; then
         return 0
       fi
       ;;
@@ -576,7 +576,7 @@ conn.close()
     return 0
   fi
 
-  local issue_dir="$target_path/docs/issues/$key"
+  local issue_dir="$target_path/docs/B1-docs/$key"
   mkdir -p "$issue_dir"
 
   if ! python3 "$chat_inbox_py" materialize --db "$db_path" --id "$ts_bare" --target "$issue_dir" >/dev/null 2>&1; then
@@ -631,7 +631,7 @@ except: pass
 _mark_raw_issue_absorbed() {
   local raw_key="$1"
   local target_path="${2:-$ROOT_DIR}"
-  local issue_file="$target_path/docs/issues/raw-${raw_key}/issue.md"
+  local issue_file="$target_path/docs/B1-docs/raw-${raw_key}/issue.md"
   [[ -f "$issue_file" ]] || { echo "warning: issue file not found: $issue_file" >&2; return 0; }
   python3 -c "
 import yaml

@@ -286,7 +286,7 @@ if [[ -z "$PROJECT_WORKTREE_PATH" ]] && [[ -n "$branch" ]]; then
   _wt_dir="$(freely_wt_dir_name_for_branch "$branch")"
   PROJECT_WORKTREE_PATH="${PROJECT_WORKTREES_ROOT}/${_wt_dir}"
 fi
-ISSUES_DIR="$PROJECT_WORKTREE_PATH/docs/issues"
+ISSUES_DIR="$PROJECT_WORKTREE_PATH/docs/B1-docs"
 
 # ── Guard: protected branch (test-pre-merge is disposable, skip checks) ──
 if _is_protected_branch "$branch"; then
@@ -651,7 +651,7 @@ PLATFORM_BLOCK
   # Read issue.md from main repo (read-only).  If the file doesn't exist
   # (e.g. feedback created the issue but no worktree was ever created),
   # fall back to searching the platform by raw key.
-  _po_issue_file="$PROJECT_ROOT/docs/issues/$issue_id/issue.md"
+  _po_issue_file="$PROJECT_ROOT/docs/B1-docs/$issue_id/issue.md"
   if [[ -f "$_po_issue_file" ]]; then
     # Get raw issue's GitHub number from local frontmatter
     _po_raw_gh=$(python3 -c "
@@ -685,7 +685,7 @@ for p, info in fm.get('platform_ids', {}).items():
   # Also close absorbed I-* issue via API
   _po_absorbed_i="$(_fm_get "$_po_issue_file" "absorbed_into")"
   if [[ -n "$_po_absorbed_i" ]]; then
-    _po_i_file="$PROJECT_ROOT/docs/issues/$_po_absorbed_i/issue.md"
+    _po_i_file="$PROJECT_ROOT/docs/B1-docs/$_po_absorbed_i/issue.md"
     if [[ -f "$_po_i_file" ]]; then
       _po_i_phase="$(_fm_get "$_po_i_file" "phase_state")"
       _po_i_ps="$(_fm_get "$_po_i_file" "platform_state")"
@@ -735,7 +735,7 @@ if [[ "$FORCE" == true && -z "$wt_path" ]]; then
       # Note: no "local" here — this is script top-level, not a function.
       _wt_i_absorbed_i="$(_fm_get "$issue_file" "absorbed_into")"
       if [[ -n "$_wt_i_absorbed_i" ]]; then
-        _wt_i_file="$PROJECT_ROOT/docs/issues/$_wt_i_absorbed_i/issue.md"
+        _wt_i_file="$PROJECT_ROOT/docs/B1-docs/$_wt_i_absorbed_i/issue.md"
         if [[ -f "$_wt_i_file" ]]; then
           _wt_i_phase="$(_fm_get "$_wt_i_file" "phase_state")"
           _wt_i_platform_state="$(_fm_get "$_wt_i_file" "platform_state")"

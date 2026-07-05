@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# issue-sync: local docs/issues/ ↔ platform (GitHub/Gitee) bridge.
+# issue-sync: local docs/B1-docs/ ↔ platform (GitHub/Gitee) bridge.
 #
 # This is the ONLY code that touches platform APIs. AI never directly
-# reads/writes GitHub or Gitee — it works on docs/issues/ and this
+# reads/writes GitHub or Gitee — it works on docs/B1-docs/ and this
 # tool handles the local→platform sync.
 #
 # Issue model:
@@ -31,7 +31,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
-ISSUES_DIR="$ROOT_DIR/docs/issues"
+ISSUES_DIR="$ROOT_DIR/docs/B1-docs"
 
 # ── YAML helpers ─────────────────────────────────────────
 
@@ -658,9 +658,9 @@ cmd_promote() {
   local raw_id="$1" i_id="$2"
   local raw_file i_file
   raw_file="$ISSUES_DIR/$raw_id/issue.md"
-  i_file="$ISSUES_DIR/$i_id/issue.md"
+  i_file=$(find "$ROOT_DIR/docs/B2-docs" -name "${i_id}*.md" -print -quit 2>/dev/null || true)
   [[ -f "$raw_file" ]] || { echo "[ERROR] $raw_file not found" >&2; exit 1; }
-  [[ -f "$i_file" ]] || { echo "[ERROR] $i_file not found" >&2; exit 1; }
+  [[ -n "$i_file" && -f "$i_file" ]] || { echo "[ERROR] I-* file not found for $i_id in docs/B2-docs" >&2; exit 1; }
 
   echo "[issue-sync] promote: $raw_id → $i_id"
 
@@ -750,7 +750,7 @@ cmd_batch() {
 	  # to ~10-20 inconsistent issues.
 	  local _tmp _skipped=0
 	  _tmp=$(mktemp /tmp/issue-sync-batch.XXXXXX)
-	  find "$ISSUES_DIR" -name "issue.md" -print0 2>/dev/null > "$_tmp"
+	  { find "$ISSUES_DIR" -name "issue.md" -print0 2>/dev/null; find "$ROOT_DIR/docs/B2-docs" -name "I-*.md" -print0 2>/dev/null; } > "$_tmp"
 	  while IFS= read -r -d '' issue_file; do
 	    [[ -n "$issue_file" ]] || continue
 	    local dir local_id
@@ -846,7 +846,7 @@ cmd_scan() {
   local found=0
   local _scan_tmp
   _scan_tmp=$(mktemp /tmp/issue-sync-scan.XXXXXX)
-  find "$ISSUES_DIR" -name "issue.md" -print0 2>/dev/null > "$_scan_tmp"
+  { find "$ISSUES_DIR" -name "issue.md" -print0 2>/dev/null; find "$ROOT_DIR/docs/B2-docs" -name "I-*.md" -print0 2>/dev/null; } > "$_scan_tmp"
   while IFS= read -r -d '' issue_file; do
     [[ -n "$issue_file" ]] || continue
     local dir local_id
@@ -904,7 +904,7 @@ main() {
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      --project) ROOT_DIR="$2"; ISSUES_DIR="$ROOT_DIR/docs/issues"; shift 2 ;;
+      --project) ROOT_DIR="$2"; ISSUES_DIR="$ROOT_DIR/docs/B1-docs"; shift 2 ;;
       create|update|comment|close|promote|promote-finalize|status|batch|scan)
         action="$1"; shift; break ;;
       *) echo "[ERROR] unknown action: $1" >&2; exit 1 ;;
@@ -935,7 +935,7 @@ main() {
         "  Feature:   skill:freely-feature-execution" \
         "" \
         "Workflow:" \
-        "  1. feedback → create raw issue in docs/issues/" \
+        "  1. feedback → create raw issue in docs/B1-docs/" \
         "  2. wt-create --raw-key <key> --skill <freely-fix-execution|freely-feature-execution> --slug <slug>" \
         "  3. Fix/develop in fix/* or feature/* worktree → git commit" \
         "  4. pr-create-guarded → pull develop → 冲突处理 → dry-run gate → push → gh pr create" \

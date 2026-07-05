@@ -2920,7 +2920,7 @@
 - path: docs/B2-docs/git-hygiene/gitignore-guidelines/raw-20260705T111413Z13Z/issues/I-20260705T111413Z-A.md
 
 ## M-20260705T122651Z-A
-- title: fix — docs/epics 路径规范
+- title: fix — docs/B2-docs 路径规范
 - status: active
 ### candidate_issues
 1. C-20260705T122651Z-A — absorbed → I-20260705T122651Z-A
@@ -2940,3 +2940,27 @@
 - milestone: M-20260705T155347Z-A
 - status: promoted
 - promoted_issue_id: `I-20260705T155347Z-A`
+
+## M-20260705T231131Z-A
+- title: fix — 全项目旧路径清理，补完 docs-structure-refactor 遗漏
+- status: active
+### candidate_issues
+1. `C-20260705T231131Z-A`
+- milestone: M-20260705T231131Z-A
+- milestone: M-20260705T231131Z-A; status: absorbed
+- absorbed_into: `I-20260705T231131Z-A`
+### committed_issues
+1. `I-20260705T231131Z-A`
+- title: fix — 全项目旧路径清理
+- milestone: M-20260705T231131Z-A
+- phase_state: completed
+- path: docs/B2-docs/git-worktree/wt-close/raw-20260705T231131Z/issues/I-20260705T231131Z-A.md
+### completed_issues
+1. `I-20260705T231131Z-A`
+- title: fix — 全项目旧路径清理
+- milestone: M-20260705T231131Z-A
+- phase_state: completed
+- path: docs/B2-docs/git-worktree/wt-close/raw-20260705T231131Z/issues/I-20260705T231131Z-A.md
+2. `C-20260705T231131Z-A`
+- milestone: M-20260705T231131Z-A; status: absorbed
+- absorbed_into: `I-20260705T231131Z-A`

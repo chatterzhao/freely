@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# raw-issue-pull: pull a raw issue from platform (GitHub/Gitee) to local docs/issues/
+# raw-issue-pull: pull a raw issue from platform (GitHub/Gitee) to local docs/B1-docs/
 set -euo pipefail
 
 usage() {
@@ -8,11 +8,11 @@ Usage:
   ./bin/raw-issue-pull --raw-key <key> [--target <dir>]
 
 Pull a raw issue from platform by matching raw-{key} in OPEN issue titles.
-Materializes to docs/issues/raw-{key}/issue.md with proper platform_ids.
+Materializes to docs/B1-docs/raw-{key}/issue.md with proper platform_ids.
 
 Options:
   --raw-key <key>   Raw issue key (YYYYMMDDTHHMMSSZ format)
-  --target  <dir>   Target directory (default: docs/issues/raw-{key}/)
+  --target  <dir>   Target directory (default: docs/B1-docs/raw-{key}/)
 
 Example:
   ./bin/raw-issue-pull --raw-key 20260506T100035Z
@@ -34,7 +34,7 @@ done
 [[ -n "$raw_key" ]] || { echo "Missing --raw-key" >&2; usage; exit 1; }
 
 ROOT_DIR="${PROJECT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)}"
-[[ -z "$target" ]] && target="$(pwd)/docs/issues/raw-${raw_key}"
+[[ -z "$target" ]] && target="$(pwd)/docs/B1-docs/raw-${raw_key}"
 
 # ── Worktree / branch interception ─────────────────────────
 # Only allow pull from fix/* or feature/* worktree whose branch contains the raw-key.

@@ -64,12 +64,12 @@ description: >- 管理 Freely 运行时上下文连续性。覆盖 context warn�
 
 continuity artifact 必须遵循 loop 分层：
 
-- `dev-loop`: `docs/progress/**`
+- `dev-loop`: `docs/B2-docs/**`
 - `doc-loop`: 当前 issue / IBM / pre-brainstorm 产物
 - `recovery`: `docs/recovery/**`
 
 研究阶段等价规则：
-- 若 `docs/progress/**` / `docs/recovery/**` 尚未启用，允许把 continuity 写入 `docs/B1-docs/CONVERGENCE.md`
+- 若 `docs/B2-docs/**` / `docs/recovery/**` 尚未启用，允许把 continuity 写入 `docs/B1-docs/CONVERGENCE.md`
 
 ## Owner Boundary
 

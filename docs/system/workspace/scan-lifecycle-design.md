@@ -33,7 +33,7 @@ raw issues:    docs/B1-docs/raw-*/issue.md
 linked issues: docs/B2-docs/ibm/_legacy-issues/I-*/issue.md  
 pre_brainstorms: docs/B1-docs/*/
 milestones:    docs/milestones.md
-progress:      docs/progress/**/*.md
+progress:      docs/B2-docs/**/*.md
 platforms:     github/gitee issue state
 ```
 

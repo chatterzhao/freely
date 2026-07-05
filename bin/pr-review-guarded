@@ -160,7 +160,7 @@ if [[ ${#_all_issues[@]} -eq 0 ]]; then
     while IFS= read -r _f; do
       _bn=$(basename "$_f" .md)
       [[ "$_bn" = I-${_raw_key#raw-}-* ]] && _all_issues+=("$_bn")
-    done < <(find "$_sr/docs/epics" -path "*/raw-*/issues/I-*.md" -print 2>/dev/null | head -5)
+    done < <(find "$_sr/docs/B2-docs" -path "*/raw-*/issues/I-*.md" -print 2>/dev/null | head -5)
     [[ ${#_all_issues[@]} -gt 0 ]] && break
   done
 fi
@@ -325,8 +325,8 @@ git diff "$base..$review_branch" > "$_diff_file" 2>/dev/null || true
 _issue_file=""
 for _sr in "$_wt_path" "$ROOT_DIR"; do
   [[ -d "$_sr" ]] || continue
-  if [[ -n "$_raw_key" ]] && [[ -f "$_sr/docs/issues/$_raw_key/issue.md" ]]; then
-    _issue_file="$_sr/docs/issues/$_raw_key/issue.md"
+  if [[ -n "$_raw_key" ]] && [[ -f "$_sr/docs/B1-docs/$_raw_key/issue.md" ]]; then
+    _issue_file="$_sr/docs/B1-docs/$_raw_key/issue.md"
     break
   fi
 done
@@ -601,7 +601,7 @@ _update_issue_phase_state() {
   local _raw_key="$1"
   [[ -n "$_raw_key" ]] || return 0
   local _i_file
-  _i_file=$(find "$ROOT_DIR/docs/issues" -maxdepth 2 -name "I-${_raw_key}*.md" 2>/dev/null | head -1)
+  _i_file=$(find "$ROOT_DIR/docs/B2-docs" -name "I-${_raw_key}*.md" 2>/dev/null | head -1)
   if [[ -n "$_i_file" && -f "$_i_file" ]]; then
     if grep -q "phase_state: done_b2_ibm" "$_i_file" 2>/dev/null; then
       sed -i '' 's/phase_state: done_b2_ibm/phase_state: completed/' "$_i_file"

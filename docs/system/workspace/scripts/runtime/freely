@@ -2450,7 +2450,7 @@ manager_operator_stop_boundary_file() {
 }
 
 intake_dir_for_project() {
-  # DEPRECATED: .freely/intake/ replaced by docs/issues/ (IBM Framework B1_IBM).
+  # DEPRECATED: .freely/intake/ replaced by docs/B1-docs/ (IBM Framework B1_IBM).
   # Chat now writes to docs/B1-docs/raw-*/issue.md or appends comments.
   # This function exists for backward compat only. Do not add new callers.
   local project="$1"
@@ -6594,13 +6594,13 @@ write_intake_item() {
   local created_at
   created_at="${created_at_override:-$(current_timestamp_utc_for_machine)}"
 
-  # Write to docs/issues/ — the only intake storage now.
+  # Write to docs/B1-docs/ — the only intake storage now.
   # .freely/intake/ is deprecated. Every chat creates a raw issue or a comment.
   _write_chat_to_issue "$project" "$intake_id" "$author" "$channel" "$message" "$session_refs" "$created_at"
   update_intake_pending_signal "$project"
 }
 
-# _write_chat_to_issue: write chat message to docs/issues/ as new raw issue or comment
+# _write_chat_to_issue: write chat message to docs/B1-docs/ as new raw issue or comment
 # If TARGET_ISSUE is set (via --issue flag), append as comment to that issue.
 # Otherwise create a new raw issue.
 _write_chat_to_issue() {
@@ -6681,7 +6681,7 @@ _write_chat_to_issue() {
   worktrees_root="${project}-worktrees"
   if [[ "$chat_type" != "chat-message" && -d "$worktrees_root" ]]; then
     worktree_found=$(find "$worktrees_root" -maxdepth 1 -type d -name "*${issue_id}*" 2>/dev/null | head -1)
-    if [[ -n "$worktree_found" && -d "$worktree_found/docs/issues/$issue_id" ]]; then
+    if [[ -n "$worktree_found" && -d "$worktree_found/docs/B1-docs/$issue_id" ]]; then
       if [[ "$chat_type" == "new-issue" ]]; then
         local cli="$SELF_ROOT/docs/system/workspace/scripts/runtime/freely-db-cli"
         python3 "$cli" --project "$project" chat.consume \
@@ -6708,8 +6708,8 @@ _check_issue_active_and_signal() {
   local project="$1" target_issue="$2"
   local canonical_path phase
   canonical_path=""
-  if [[ -f "$project/docs/issues/$target_issue/issue.md" ]]; then
-    canonical_path=$(sed -n 's/^canonical_issue_path: "\(.*\)"/\1/p' "$project/docs/issues/$target_issue/issue.md" 2>/dev/null || :)
+  if [[ -f "$project/docs/B1-docs/$target_issue/issue.md" ]]; then
+    canonical_path=$(sed -n 's/^canonical_issue_path: "\(.*\)"/\1/p' "$project/docs/B1-docs/$target_issue/issue.md" 2>/dev/null || :)
   fi
   if [[ -n "$canonical_path" && -f "$project/$canonical_path" ]]; then
     phase=$(sed -n 's/^- phase_state: `\([^`]*\)`/\1/p' "$project/$canonical_path" 2>/dev/null || :)
@@ -6729,7 +6729,7 @@ _check_issue_active_and_signal() {
 _route_chat_to_issue() {
   local project="$1" message="$2"
   local issues_index matched_id
-  issues_index="$project/docs/issues/ISSUES.md"
+  issues_index="$project/docs/B1-docs/ISSUES.md"
 
   [[ -f "$issues_index" ]] || { :; return 0; }
 
@@ -6960,7 +6960,7 @@ worker_terminal_continuation_materialization_is_current() {
   return 0
 }
 
-# Query friedly.db chats table for unconsumed human messages (docs/issues/ migration).
+# Query friedly.db chats table for unconsumed human messages (docs/B1-docs/ migration).
 # Complements intake_snapshot_for_project which reads legacy .freely/intake/.
 chat_intake_snapshot_for_project() {
   local project="$1" limit="${2:-8}"
@@ -7203,9 +7203,9 @@ csv_item_count() {
 rewrite_existing_intake_item() {
   local project="$1" intake_id="$2" status="$3" classification="$4" linked_artifact="$5" delegated_worktree="$6" reaction="$7" claimed_by="$8" claimed_at="$9" absorption_target="${10:-}" resolution_artifact="${11:-}" session_refs_override="${12:-}"
 
-  # New model: update docs/issues/<id>/issue.md frontmatter
+  # New model: update docs/B1-docs/<id>/issue.md frontmatter
   if [[ "$intake_id" == raw-* || "$intake_id" == I-* ]]; then
-    local issue_file="$project/docs/issues/$intake_id/issue.md"
+    local issue_file="$project/docs/B1-docs/$intake_id/issue.md"
     [[ -f "$issue_file" ]] || { log_error "issue not found: $intake_id"; exit 1; }
     python3 -c "
 import re, sys
@@ -7223,7 +7223,7 @@ if len(parts) >= 3:
     with open('$issue_file', 'w') as f:
         f.write(new_content)
 " 2>/dev/null || true
-    log_info "intake updated in docs/issues/: $intake_id -> $status"
+    log_info "intake updated in docs/B1-docs/: $intake_id -> $status"
     return 0
   fi
 
@@ -19718,11 +19718,11 @@ handle_interruption_intake_once() {
   local project="$1" intake_id="$2"
   local meta_file message_file status claimed_by handler_bin handler_output decision reaction classification why_text restart_point ownership handoff_text answer_text
   local lock_acquired="0"
-  # Try new docs/issues/ path first (raw-xxx or I-xxx)
+  # Try new docs/B1-docs/ path first (raw-xxx or I-xxx)
   if [[ "$intake_id" == raw-* || "$intake_id" == I-* ]]; then
-    issue_file="$project/docs/issues/$intake_id/issue.md"
+    issue_file="$project/docs/B1-docs/$intake_id/issue.md"
     [[ -f "$issue_file" ]] || return 1
-    log_info "processing docs/issues/ intake: $intake_id"
+    log_info "processing docs/B1-docs/ intake: $intake_id"
     # For now, skip full claim/resolve for new-model items (deferred to handler migration)
     return 0
   fi
@@ -19940,8 +19940,8 @@ ensure_interruption_dispatch_once() {
     fi
   done < <(find "$(intake_dir_for_project "$project")" -mindepth 1 -maxdepth 1 -type d | sort)
 
-  # Also process new raw issues from docs/issues/ (IBM Framework B1_IBM)
-  local issues_dir="$project/docs/issues"
+  # Also process new raw issues from docs/B1-docs/ (IBM Framework B1_IBM)
+  local issues_dir="$project/docs/B1-docs"
   if [[ -d "$issues_dir" ]]; then
     for raw_dir in "$issues_dir"/raw-*/; do
       [[ -d "$raw_dir" ]] || continue
@@ -23950,9 +23950,9 @@ cmd_chat() {
   # Gate: block new comments on closed issues (#3302)
   if [[ -n "$target_issue" && "$new_issue" != "true" ]]; then
     local _chat_issue_file _chat_phase
-    # Resolve target_issue to local issue file: try raw-<id> or search docs/issues
-    if [[ -f "$project/docs/issues/$target_issue/issue.md" ]]; then
-      _chat_issue_file="$project/docs/issues/$target_issue/issue.md"
+    # Resolve target_issue to local issue file: try raw-<id> or search docs/B1-docs
+    if [[ -f "$project/docs/B1-docs/$target_issue/issue.md" ]]; then
+      _chat_issue_file="$project/docs/B1-docs/$target_issue/issue.md"
     elif [[ -f "$project/docs/B1-docs/raw-$target_issue/issue.md" ]]; then
       _chat_issue_file="$project/docs/B1-docs/raw-$target_issue/issue.md"
     fi
@@ -24255,10 +24255,10 @@ HELP
     }
 
     local_id="raw-${raw_key}"
-    local _issue_file="$SELF_ROOT/docs/issues/${local_id}/issue.md"
+    local _issue_file="$SELF_ROOT/docs/B1-docs/${local_id}/issue.md"
 
     [[ -f "$_issue_file" ]] || {
-      log_error "local issue file not found: docs/issues/${local_id}/issue.md"
+      log_error "local issue file not found: docs/B1-docs/${local_id}/issue.md"
       echo >&2 "  Use 'freely feedback --help' to create a new issue."
       echo >&2 "  Or verify the raw-key is correct."
       return 1
@@ -24719,7 +24719,7 @@ cmd_intake_claim() {
   validate_reaction_or_fail "$reaction"
   validate_absorption_classification_or_fail "$classification"
   if [[ "$intake_id" == raw-* || "$intake_id" == I-* ]]; then
-    # New model: intake_id is a docs/issues/ local_id, no meta.env check needed
+    # New model: intake_id is a docs/B1-docs/ local_id, no meta.env check needed
     :
   else
     meta_file="$(intake_item_meta_file "$project" "$intake_id")"
@@ -24788,7 +24788,7 @@ cmd_intake_resolve() {
       ;;
   esac
   if [[ "$intake_id" == raw-* || "$intake_id" == I-* ]]; then
-    # New model: read from docs/issues/ frontmatter
+    # New model: read from docs/B1-docs/ frontmatter
     claimed_by=""
     claimed_at=""
     reaction_existing=""

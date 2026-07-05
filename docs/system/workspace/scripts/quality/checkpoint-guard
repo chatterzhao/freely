@@ -53,8 +53,8 @@ normalize_path() {
 scope_for_path() {
   local path="$1"
   case "$path" in
-    docs/epics/*/*/*|docs/epics/*/*/*/*|docs/epics/*/*/*/*/*|docs/epics/*/*/*/*/*/*)
-      # Matches docs/epics/{epic}/{story}/raw-{key}/... (new) and docs/epics/{epic}/{story}/... (old)
+    docs/B2-docs/*/*/*|docs/B2-docs/*/*/*/*|docs/B2-docs/*/*/*/*/*|docs/B2-docs/*/*/*/*/*/*)
+      # Matches docs/B2-docs/{epic}/{story}/raw-{key}/... (new) and docs/B2-docs/{epic}/{story}/... (old)
       awk -F/ '{print $1 "/" $2 "/" $3 "/" $4}' <<<"$path"
       ;;
     docs/pre-brainstorms/*/*)
@@ -75,7 +75,7 @@ scope_for_path() {
 story_scope_for_path() {
   local path="$1"
   case "$path" in
-    docs/epics/*/*/*|docs/epics/*/*/*/*|docs/epics/*/*/*/*/*|docs/epics/*/*/*/*/*/*)
+    docs/B2-docs/*/*/*|docs/B2-docs/*/*/*/*|docs/B2-docs/*/*/*/*/*|docs/B2-docs/*/*/*/*/*/*)
       awk -F/ '{print $1 "/" $2 "/" $3 "/" $4}' <<<"$path"
       ;;
     *)
@@ -102,7 +102,7 @@ is_product_scope() {
   esac
   case "$path" in
     Cargo.toml|Cargo.lock|package.json|bun.lock|index.html|tsconfig.json|vite.config.ts) return 0 ;;
-    docs/epics/frontend-probe-dogfooding-loop/*) return 0 ;;
+    docs/B2-docs/frontend-probe-dogfooding-loop/*) return 0 ;;
   esac
   return 1
 }
