@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1270" width="800">
+  <style>text { font-family: monospace; }</style>
+  <rect id="epic-acp" x="35" y="50" width="730" height="135" fill="#fce4ec" stroke="#c62828" stroke-width="2" rx="4"/>
+  <text x="50" y="68" font-size="14" font-weight="bold" fill="#c62828">acp</text>
+  <rect id="story-bridge-lifecycle" x="55" y="78" width="690" height="20" fill="#fff" stroke="#c62828" stroke-width="1" rx="3"/>
+  <text x="65" y="92" font-size="11" fill="#333">bridge-lifecycle</text>
+  <rect id="story-bridge-cleanup" x="55" y="100" width="690" height="20" fill="#fff" stroke="#c62828" stroke-width="1" rx="3"/>
+  <text x="65" y="114" font-size="11" fill="#333">bridge-cleanup</text>
+  <rect id="story-multi-bridge" x="55" y="122" width="690" height="20" fill="#fff" stroke="#c62828" stroke-width="1" rx="3"/>
+  <text x="65" y="136" font-size="11" fill="#333">multi-bridge</text>
+  <rect id="story-transport" x="55" y="144" width="690" height="20" fill="#fff" stroke="#c62828" stroke-width="1" rx="3"/>
+  <text x="65" y="158" font-size="11" fill="#333">transport</text>
+  <rect id="story-codex" x="55" y="166" width="690" height="20" fill="#fff" stroke="#c62828" stroke-width="1" rx="3"/>
+  <text x="65" y="180" font-size="11" fill="#333">codex</text>
+  <rect id="epic-a2a" x="35" y="197" width="730" height="179" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2" rx="4"/>
+  <text x="50" y="215" font-size="14" font-weight="bold" fill="#2e7d32">a2a</text>
+  <rect id="story-protocol-health" x="55" y="225" width="690" height="20" fill="#fff" stroke="#2e7d32" stroke-width="1" rx="3"/>
+  <text x="65" y="239" font-size="11" fill="#333">protocol-health</text>
+  <rect id="story-task-lifecycle" x="55" y="247" width="690" height="20" fill="#fff" stroke="#2e7d32" stroke-width="1" rx="3"/>
+  <text x="65" y="261" font-size="11" fill="#333">task-lifecycle</text>
+  <rect id="story-task-tracking" x="55" y="269" width="690" height="20" fill="#fff" stroke="#2e7d32" stroke-width="1" rx="3"/>
+  <text x="65" y="283" font-size="11" fill="#333">task-tracking</text>
+  <rect id="story-handoff" x="55" y="291" width="690" height="20" fill="#fff" stroke="#2e7d32" stroke-width="1" rx="3"/>
+  <text x="65" y="305" font-size="11" fill="#333">handoff</text>
+  <rect id="story-delegation" x="55" y="313" width="690" height="20" fill="#fff" stroke="#2e7d32" stroke-width="1" rx="3"/>
+  <text x="65" y="327" font-size="11" fill="#333">delegation</text>
+  <rect id="story-data-flow" x="55" y="335" width="690" height="20" fill="#fff" stroke="#2e7d32" stroke-width="1" rx="3"/>
+  <text x="65" y="349" font-size="11" fill="#333">data-flow</text>
+  <rect id="story-reviewer-agent" x="55" y="357" width="690" height="20" fill="#fff" stroke="#2e7d32" stroke-width="1" rx="3"/>
+  <text x="65" y="371" font-size="11" fill="#333">reviewer-agent</text>
+  <rect id="epic-runtime" x="35" y="388" width="730" height="245" fill="#e3f2fd" stroke="#1565c0" stroke-width="2" rx="4"/>
+  <text x="50" y="406" font-size="14" font-weight="bold" fill="#1565c0">runtime</text>
+  <rect id="story-daemon" x="55" y="416" width="690" height="20" fill="#fff" stroke="#1565c0" stroke-width="1" rx="3"/>
+  <text x="65" y="430" font-size="11" fill="#333">daemon</text>
+  <rect id="story-loop-guard" x="55" y="438" width="690" height="20" fill="#fff" stroke="#1565c0" stroke-width="1" rx="3"/>
+  <text x="65" y="452" font-size="11" fill="#333">loop-guard</text>
+  <rect id="story-db-manager" x="55" y="460" width="690" height="20" fill="#fff" stroke="#1565c0" stroke-width="1" rx="3"/>
+  <text x="65" y="474" font-size="11" fill="#333">db-manager</text>
+  <rect id="story-process-management" x="55" y="482" width="690" height="20" fill="#fff" stroke="#1565c0" stroke-width="1" rx="3"/>
+  <text x="65" y="496" font-size="11" fill="#333">process-management</text>
+  <rect id="story-task-mode" x="55" y="504" width="690" height="20" fill="#fff" stroke="#1565c0" stroke-width="1" rx="3"/>
+  <text x="65" y="518" font-size="11" fill="#333">task-mode</text>
+  <rect id="story-agent-launch" x="55" y="526" width="690" height="20" fill="#fff" stroke="#1565c0" stroke-width="1" rx="3"/>
+  <text x="65" y="540" font-size="11" fill="#333">agent-launch</text>
+  <rect id="story-scan" x="55" y="548" width="690" height="20" fill="#fff" stroke="#1565c0" stroke-width="1" rx="3"/>
+  <text x="65" y="562" font-size="11" fill="#333">scan</text>
+  <rect id="story-checkpoint" x="55" y="570" width="690" height="20" fill="#fff" stroke="#1565c0" stroke-width="1" rx="3"/>
+  <text x="65" y="584" font-size="11" fill="#333">checkpoint</text>
+  <rect id="story-sse-watchdog" x="55" y="592" width="690" height="20" fill="#fff" stroke="#1565c0" stroke-width="1" rx="3"/>
+  <text x="65" y="606" font-size="11" fill="#333">sse-watchdog</text>
+  <rect id="story-bug-fix" x="55" y="614" width="690" height="20" fill="#fff" stroke="#1565c0" stroke-width="1" rx="3"/>
+  <text x="65" y="628" font-size="11" fill="#333">bug-fix</text>
+  <rect id="epic-git-worktree" x="35" y="645" width="730" height="157" fill="#fff3e0" stroke="#e65100" stroke-width="2" rx="4"/>
+  <text x="50" y="663" font-size="14" font-weight="bold" fill="#e65100">git-worktree</text>
+  <rect id="story-wt-create" x="55" y="673" width="690" height="20" fill="#fff" stroke="#e65100" stroke-width="1" rx="3"/>
+  <text x="65" y="687" font-size="11" fill="#333">wt-create</text>
+  <rect id="story-wt-close" x="55" y="695" width="690" height="20" fill="#fff" stroke="#e65100" stroke-width="1" rx="3"/>
+  <text x="65" y="709" font-size="11" fill="#333">wt-close</text>
+  <rect id="story-branch-pr" x="55" y="717" width="690" height="20" fill="#fff" stroke="#e65100" stroke-width="1" rx="3"/>
+  <text x="65" y="731" font-size="11" fill="#333">branch-pr</text>
+  <rect id="story-closeout" x="55" y="739" width="690" height="20" fill="#fff" stroke="#e65100" stroke-width="1" rx="3"/>
+  <text x="65" y="753" font-size="11" fill="#333">closeout</text>
+  <rect id="story-test-worktree" x="55" y="761" width="690" height="20" fill="#fff" stroke="#e65100" stroke-width="1" rx="3"/>
+  <text x="65" y="775" font-size="11" fill="#333">test-worktree</text>
+  <rect id="story-worktree-hygiene" x="55" y="783" width="690" height="20" fill="#fff" stroke="#e65100" stroke-width="1" rx="3"/>
+  <text x="65" y="797" font-size="11" fill="#333">worktree-hygiene</text>
+  <rect id="epic-ibm" x="35" y="814" width="730" height="223" fill="#f3e5f5" stroke="#6a1b9a" stroke-width="2" rx="4"/>
+  <text x="50" y="832" font-size="14" font-weight="bold" fill="#6a1b9a">ibm</text>
+  <rect id="story-b1-brainstorm" x="55" y="842" width="690" height="20" fill="#fff" stroke="#6a1b9a" stroke-width="1" rx="3"/>
+  <text x="65" y="856" font-size="11" fill="#333">b1-brainstorm</text>
+  <rect id="story-b2-design" x="55" y="864" width="690" height="20" fill="#fff" stroke="#6a1b9a" stroke-width="1" rx="3"/>
+  <text x="65" y="878" font-size="11" fill="#333">b2-design</text>
+  <rect id="story-anti-cheating" x="55" y="886" width="690" height="20" fill="#fff" stroke="#6a1b9a" stroke-width="1" rx="3"/>
+  <text x="65" y="900" font-size="11" fill="#333">anti-cheating</text>
+  <rect id="story-red-green" x="55" y="908" width="690" height="20" fill="#fff" stroke="#6a1b9a" stroke-width="1" rx="3"/>
+  <text x="65" y="922" font-size="11" fill="#333">red-green</text>
+  <rect id="story-doc-loop" x="55" y="930" width="690" height="20" fill="#fff" stroke="#6a1b9a" stroke-width="1" rx="3"/>
+  <text x="65" y="944" font-size="11" fill="#333">doc-loop</text>
+  <rect id="story-fix-flow" x="55" y="952" width="690" height="20" fill="#fff" stroke="#6a1b9a" stroke-width="1" rx="3"/>
+  <text x="65" y="966" font-size="11" fill="#333">fix-flow</text>
+  <rect id="story-skill-ref" x="55" y="974" width="690" height="20" fill="#fff" stroke="#6a1b9a" stroke-width="1" rx="3"/>
+  <text x="65" y="988" font-size="11" fill="#333">skill-ref</text>
+  <rect id="story-workflow" x="55" y="996" width="690" height="20" fill="#fff" stroke="#6a1b9a" stroke-width="1" rx="3"/>
+  <text x="65" y="1010" font-size="11" fill="#333">workflow</text>
+  <rect id="story-worker-csv" x="55" y="1018" width="690" height="20" fill="#fff" stroke="#6a1b9a" stroke-width="1" rx="3"/>
+  <text x="65" y="1032" font-size="11" fill="#333">worker-csv</text>
+  <rect id="epic-gate" x="35" y="1049" width="730" height="135" fill="#fff8e1" stroke="#f9a825" stroke-width="2" rx="4"/>
+  <text x="50" y="1067" font-size="14" font-weight="bold" fill="#f9a825">gate</text>
+  <rect id="story-governance" x="55" y="1077" width="690" height="20" fill="#fff" stroke="#f9a825" stroke-width="1" rx="3"/>
+  <text x="65" y="1091" font-size="11" fill="#333">governance</text>
+  <rect id="story-pretests" x="55" y="1099" width="690" height="20" fill="#fff" stroke="#f9a825" stroke-width="1" rx="3"/>
+  <text x="65" y="1113" font-size="11" fill="#333">pretests</text>
+  <rect id="story-merge-gate" x="55" y="1121" width="690" height="20" fill="#fff" stroke="#f9a825" stroke-width="1" rx="3"/>
+  <text x="65" y="1135" font-size="11" fill="#333">merge-gate</text>
+  <rect id="story-gitignore" x="55" y="1143" width="690" height="20" fill="#fff" stroke="#f9a825" stroke-width="1" rx="3"/>
+  <text x="65" y="1157" font-size="11" fill="#333">gitignore</text>
+  <rect id="story-hooks" x="55" y="1165" width="690" height="20" fill="#fff" stroke="#f9a825" stroke-width="1" rx="3"/>
+  <text x="65" y="1179" font-size="11" fill="#333">hooks</text>
+  <rect id="epic-human" x="35" y="1196" width="730" height="135" fill="#e0f7fa" stroke="#00838f" stroke-width="2" rx="4"/>
+  <text x="50" y="1214" font-size="14" font-weight="bold" fill="#00838f">human</text>
+  <rect id="story-feedback" x="55" y="1224" width="690" height="20" fill="#fff" stroke="#00838f" stroke-width="1" rx="3"/>
+  <text x="65" y="1238" font-size="11" fill="#333">feedback</text>
+  <rect id="story-discuss" x="55" y="1246" width="690" height="20" fill="#fff" stroke="#00838f" stroke-width="1" rx="3"/>
+  <text x="65" y="1260" font-size="11" fill="#333">discuss</text>
+  <rect id="story-command" x="55" y="1268" width="690" height="20" fill="#fff" stroke="#00838f" stroke-width="1" rx="3"/>
+  <text x="65" y="1282" font-size="11" fill="#333">command</text>
+  <rect id="story-intake" x="55" y="1290" width="690" height="20" fill="#fff" stroke="#00838f" stroke-width="1" rx="3"/>
+  <text x="65" y="1304" font-size="11" fill="#333">intake</text>
+  <rect id="story-tui" x="55" y="1312" width="690" height="20" fill="#fff" stroke="#00838f" stroke-width="1" rx="3"/>
+  <text x="65" y="1326" font-size="11" fill="#333">tui</text>
+  <rect id="epic-config" x="35" y="1343" width="730" height="223" fill="#f5f5f5" stroke="#616161" stroke-width="2" rx="4"/>
+  <text x="50" y="1361" font-size="14" font-weight="bold" fill="#616161">config</text>
+  <rect id="story-config-toml" x="55" y="1371" width="690" height="20" fill="#fff" stroke="#616161" stroke-width="1" rx="3"/>
+  <text x="65" y="1385" font-size="11" fill="#333">config-toml</text>
+  <rect id="story-agent-table" x="55" y="1393" width="690" height="20" fill="#fff" stroke="#616161" stroke-width="1" rx="3"/>
+  <text x="65" y="1407" font-size="11" fill="#333">agent-table</text>
+  <rect id="story-slot-lifecycle" x="55" y="1415" width="690" height="20" fill="#fff" stroke="#616161" stroke-width="1" rx="3"/>
+  <text x="65" y="1429" font-size="11" fill="#333">slot-lifecycle</text>
+  <rect id="story-tool-registry" x="55" y="1437" width="690" height="20" fill="#fff" stroke="#616161" stroke-width="1" rx="3"/>
+  <text x="65" y="1451" font-size="11" fill="#333">tool-registry</text>
+  <rect id="story-family-registry" x="55" y="1459" width="690" height="20" fill="#fff" stroke="#616161" stroke-width="1" rx="3"/>
+  <text x="65" y="1473" font-size="11" fill="#333">family-registry</text>
+  <rect id="story-ai-auth" x="55" y="1481" width="690" height="20" fill="#fff" stroke="#616161" stroke-width="1" rx="3"/>
+  <text x="65" y="1495" font-size="11" fill="#333">ai-auth</text>
+  <rect id="story-availability" x="55" y="1503" width="690" height="20" fill="#fff" stroke="#616161" stroke-width="1" rx="3"/>
+  <text x="65" y="1517" font-size="11" fill="#333">availability</text>
+  <rect id="story-skill-deploy" x="55" y="1525" width="690" height="20" fill="#fff" stroke="#616161" stroke-width="1" rx="3"/>
+  <text x="65" y="1539" font-size="11" fill="#333">skill-deploy</text>
+  <rect id="story-packaging" x="55" y="1547" width="690" height="20" fill="#fff" stroke="#616161" stroke-width="1" rx="3"/>
+  <text x="65" y="1561" font-size="11" fill="#333">packaging</text>
+</svg>
