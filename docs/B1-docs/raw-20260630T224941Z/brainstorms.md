@@ -10,7 +10,7 @@ created_at: 2026-06-30
 # B1_IBM: config.toml.example 全面修订 + init 自动创建 config.toml
 
 ## Input
-- raw issue: `docs/issues/raw-20260630T224941Z/issue.md`
+- raw issue: `docs/B1-docs/raw-20260630T224941Z/issue.md`
 - 平台: GitHub #3669
 
 ## Discovery — 现状调研

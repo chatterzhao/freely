@@ -1216,8 +1216,8 @@ Claude Code:
   "phase": "B1",
   "status": "done",
   "artifacts": [
-    "docs/pre-brainstorms/20260630T002621Z--supervisor-cycle-monitor/brainstorms.md",
-    "docs/pre-brainstorms/20260630T002621Z--supervisor-cycle-monitor/candidates.md"
+    "docs/B1-docs/20260630T002621Z--supervisor-cycle-monitor/brainstorms.md",
+    "docs/B1-docs/20260630T002621Z--supervisor-cycle-monitor/candidates.md"
   ],
   "next_phase": "B2",
   "timestamp": "2026-06-30T01:00:00Z"
@@ -1301,8 +1301,8 @@ manager_01 cycle:
   "phase": "B1",
   "status": "done",
   "artifacts": [
-    "docs/pre-brainstorms/{key}--{slug}/brainstorms.md",
-    "docs/pre-brainstorms/{key}--{slug}/candidates.md"
+    "docs/B1-docs/{key}--{slug}/brainstorms.md",
+    "docs/B1-docs/{key}--{slug}/candidates.md"
   ],
   "timestamp": "2026-06-30T01:00:00Z"
 }
@@ -1901,8 +1901,8 @@ wt-close:                  ← 执行前，PR 应该已 merge
 ```python
 def check_b1_artifacts(worktree: str, raw_key: str) -> CheckResult:
     """检查 B1 产物是否存在"""
-    brainstorms = glob(f"{worktree}/docs/pre-brainstorms/{raw_key}--*/brainstorms.md")
-    candidates = glob(f"{worktree}/docs/pre-brainstorms/{raw_key}--*/candidates.md")
+    brainstorms = glob(f"{worktree}/docs/B1-docs/{raw_key}--*/brainstorms.md")
+    candidates = glob(f"{worktree}/docs/B1-docs/{raw_key}--*/candidates.md")
     if brainstorms and candidates:
         return CheckResult(passed=True)
     return CheckResult(

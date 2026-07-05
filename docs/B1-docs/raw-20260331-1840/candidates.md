@@ -3,7 +3,7 @@
 - id: `C-20260331-1840-A`
 - candidate_format_version: `v2`
 - title: Materialize generic multi-tool availability manager with same-tool-first recovery
-- source_brainstorm: `docs/pre-brainstorms/20260331-1840--multi-tool-group-auto-switch-governance/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/20260331-1840--multi-tool-group-auto-switch-governance/brainstorms.md`
 - problem: Freely's current runtime config and watchdog recovery model remain effectively single-tool even though workspace truth already exposes multiple tools with different continuity and availability contracts. As a result, failures such as tool-specific limits or auth exhaustion can only be handled with ad hoc per-tool logic instead of a canonical recovery order of same-tool slot sweep, controlled cross-tool fallback, and explicit all-tools-unavailable surfacing.
 - why_now:
   - 当前 runtime 配置面仍只有单个 `AI_TOOL`，但能力真源已经承认多个外部工具与工具优先级并存。
@@ -51,7 +51,7 @@
   - `docs/system/workspace/scripts/runtime/ai-cli`
   - `docs/system/workspace/scripts/runtime/freely`
   - `docs/epics/workspace-routing-foundation/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
-  - `docs/pre-brainstorms/20260318-1818--ai-cli-availability-manager/brainstorms.md`
+  - `docs/B1-docs/20260318-1818--ai-cli-availability-manager/brainstorms.md`
 - decision_reason:
   - 原始 brainstorm 与更早的 availability-manager 研究都要求“同工具先恢复，再按工具顺序 fallback”；窄 v1 只是中间桥接，不应覆盖更大的 contract。
   - `tools.md` 仍然只负责任务路由，不直接充当 runtime fallback 顺序真源；因此 recovery order 继续由 project config 的 `AI_FALLBACK_TOOLS` 承接。

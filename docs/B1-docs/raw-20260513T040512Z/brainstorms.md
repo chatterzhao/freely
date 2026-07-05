@@ -31,7 +31,7 @@ Phase 0 — Batch 全量抓
   → platform_all: dict[number → state]
 
 Phase 1 — 本地 vs 平台分类
-  对 docs/issues/ 每个 issue:
+  对 docs/B1-docs/ 每个 issue:
     pid ∈ platform_all? → 一致 / 不一致 / 仅本地
 
 Phase 2 — 反向发现

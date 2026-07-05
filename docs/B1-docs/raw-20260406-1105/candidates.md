@@ -5,7 +5,7 @@
 - title: Milestone completed-queue closeout
 - status: promoted
 - milestone: `M-20260306-workspace-routing-foundation`
-- source_brainstorm: `docs/pre-brainstorms/20260406-1105--milestone-completed-queue-closeout/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/20260406-1105--milestone-completed-queue-closeout/brainstorms.md`
 - problem: `docs/milestones.md` still sequences several completed owners under `committed_issues`, and baseline `./bin/governance-check` does not detect that queue drift once the original develop-bound merge is over.
 - why_now:
   - the active milestone is Freely's primary scan surface, so stale committed placement distorts sequencing truth

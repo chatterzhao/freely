@@ -56,7 +56,7 @@ Freely 当前进入 `cli first` 审计阶段，本轮在 dedicated feature workt
 - `freely status --project <initialized-project>`
   - 结果：`live` 段指向目标项目，但 `baseline` 段仍漂回 Freely root；因此 `status` 只部分尊重 `--project`
 - `freely ensure-interruption-dispatch --project <initialized-project>`
-  - 结果：当前通过 doc gate 显式失败，报缺失 `docs/PROJECT_INTENT.md` / `docs/CONSTITUTION.md` / `docs/LAWS.md` / `docs/pre-brainstorms/*`，没有再泄漏原始 `find: ... No such file or directory`
+  - 结果：当前通过 doc gate 显式失败，报缺失 `docs/PROJECT_INTENT.md` / `docs/CONSTITUTION.md` / `docs/LAWS.md` / `docs/B1-docs/*`，没有再泄漏原始 `find: ... No such file or directory`
 
 ### 收敛结论
 

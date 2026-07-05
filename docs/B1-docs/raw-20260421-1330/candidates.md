@@ -1,7 +1,7 @@
 # Candidates - 20260421-1330--absorbed-merged-lane-routing-followthrough
 
 ## Context
-- Source brainstorm: `docs/pre-brainstorms/20260421-1330--absorbed-merged-lane-routing-followthrough/brainstorms.md`
+- Source brainstorm: `docs/B1-docs/20260421-1330--absorbed-merged-lane-routing-followthrough/brainstorms.md`
 - Status: `promoted`
 - Route: `materialize-absorbed-merged-lane-routing-followthrough-owner-and-replay-through-guarded-develop`
 

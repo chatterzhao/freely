@@ -10,7 +10,7 @@
   - `skill:branch-management` 已覆盖基本 create / promote / cleanup 生命周期
 - 新暴露的问题：
   - 当前技能还缺“全仓 fleet 审计 + 生命周期闭环 + 逐级向上合并 + develop 收口”这一层
-  - `docs/pre-brainstorms/INDEX.md` 在 `develop` 上仍带有冲突标记，说明已有治理产物没有被完整收口
+  - `docs/B1-docs/INDEX.md` 在 `develop` 上仍带有冲突标记，说明已有治理产物没有被完整收口
   - 多条 worktree 已经不是单树判断，而是需要核对：
     - pre-brainstorm candidate 是否准确、是否 materialize
     - milestone / issue 生命周期是否走完

@@ -59,11 +59,11 @@
 - depends_on:
   - `C-20260319-0220-A`
 - related_artifacts:
-  - `docs/pre-brainstorms/CONVERGENCE.md`
-  - `docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/brainstorms.md`
+  - `docs/B1-docs/CONVERGENCE.md`
+  - `docs/B1-docs/20260319-0220--watchdog-control-plane-governance/brainstorms.md`
 - superseded_by:
-  - `docs/pre-brainstorms/CONVERGENCE.md`
-  - `docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/brainstorms.md`
+  - `docs/B1-docs/CONVERGENCE.md`
+  - `docs/B1-docs/20260319-0220--watchdog-control-plane-governance/brainstorms.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`

@@ -2,7 +2,7 @@
 
 ## Context
 
-- Source brainstorm: `docs/pre-brainstorms/20260413-0208--foreground-background-runtime-entrypoint-semantics/brainstorms.md`
+- Source brainstorm: `docs/B1-docs/20260413-0208--foreground-background-runtime-entrypoint-semantics/brainstorms.md`
 - Status: promoted
 
 ## Candidates
@@ -26,7 +26,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_id: `I-20260413-0208-A`
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/foreground-background-runtime-entrypoint-semantics-governance/issues/foreground-background-runtime-entrypoint-semantics-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260413-0208--foreground-background-runtime-entrypoint-semantics/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/20260413-0208--foreground-background-runtime-entrypoint-semantics/brainstorms.md`
 - session_refs:
   - tool: codex
     session_id: current-thread

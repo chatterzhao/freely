@@ -1,6 +1,6 @@
 # Candidates - 20260421-1530--scan-owned-patrol-inventory-and-live-status-on-demand-reading
 
-- Source brainstorm: `docs/pre-brainstorms/20260421-1530--scan-owned-patrol-inventory-and-live-status-on-demand-reading/brainstorms.md`
+- Source brainstorm: `docs/B1-docs/20260421-1530--scan-owned-patrol-inventory-and-live-status-on-demand-reading/brainstorms.md`
 
 ### C-20260421-1530-A
 
@@ -44,7 +44,7 @@
   - the success standard explicitly requires that `daemon start` still leads to lawful task selection and standards-compliant Freely completion rather than merely bounded startup plus observability
   - the success standard explicitly requires that the active worktree reaches a clean closeout state after the in-scope changes and evidence are complete
 - depends_on:
-  - `docs/pre-brainstorms/20260420-1130--manager-task-source-scan-replan-boundary/candidates.md#C-20260420-1130-A`
+  - `docs/B1-docs/20260420-1130--manager-task-source-scan-replan-boundary/candidates.md#C-20260420-1130-A`
   - `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
   - `docs/system/workspace/three-loop-capability-lifecycle.md`
 - next_action: `Candidate mirror only. I-20260421-1530-A is now the canonical owner for the bounded implementation slice that keeps prompt anchors authoritative, adds advisory scan-summary consumption to live-status, and proves the develop-bound path through guarded test-pre-merge plus develop replay.`

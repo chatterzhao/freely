@@ -5,7 +5,7 @@
 - candidate_format_version: `v2`
 - title: Project-level AGENTS bootstrap and management contract
 - status: `promoted`
-- source_brainstorm: `docs/pre-brainstorms/20260405-1130--project-level-agents-bootstrap-and-management/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/20260405-1130--project-level-agents-bootstrap-and-management/brainstorms.md`
 - problem: Freely 已存在“为项目补最小 `AGENTS.md` 并优先读取它”的行为，但缺少稳定 capability contract 来定义模板来源、已有文件保留策略、runtime 组合顺序和 self-hosting 管理边界。
 - why_now:
   - 当前 dogfooding 已经暴露“Freely 管理用户项目的 `AGENTS.md`”与“Freely 管理自己项目的 `AGENTS.md`”是同一条产品能力问题

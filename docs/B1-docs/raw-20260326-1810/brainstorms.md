@@ -77,7 +77,7 @@ Freely 现在缺一套更总览的高层 architecture/topology 表达，导致�
 - 紧随其后的入口对齐：
   - `AGENTS.md`（开发入口同步，不是并列架构真源）
 - 开发期承接：
-  - `docs/pre-brainstorms/`
+  - `docs/B1-docs/`
   - 后续若需要更大范围的 repo 对齐，再进入 `docs/epics/`
 - 暂不把这轮讨论直接落到 `docs/system/workspace/**`
 

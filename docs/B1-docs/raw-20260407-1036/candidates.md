@@ -4,7 +4,7 @@
 
 - candidate_format_version: `v2`
 - title: `Human interruption runtime contract after source-family contraction`
-- source_brainstorm: `docs/pre-brainstorms/20260407-1036--human-interruption-source-governance-boundary/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/20260407-1036--human-interruption-source-governance-boundary/brainstorms.md`
 - problem: `After contracting durable source families, Freely needs a family-specific contract for real human interruptions that preserves runtime durability and manager routing while keeping AI-discovered problems and GitHub publication concerns out of the interruption lane.`
 - why_now:
   - current dogfooding habits can blur true human interruption with AI-discovered intake

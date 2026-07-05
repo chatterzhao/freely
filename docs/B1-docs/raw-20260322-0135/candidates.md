@@ -4,7 +4,7 @@
 - title: Integration-acceptance-first IBM and verification governance
 - status: promoted
 - adoption_type: n/a
-- source_brainstorm: `docs/pre-brainstorms/20260322-0135--integration-acceptance-first-ibm-and-verification/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/20260322-0135--integration-acceptance-first-ibm-and-verification/brainstorms.md`
 - why_now: Freely 狗粮反复证明，很多真实缺口先通过端到端行为暴露；如果 verification 仍默认从代码阅读开始，就会错过 `pre-tests.md` 本应承担的 acceptance 控制面。
 - proposed_scope:
   - clarify `pre-tests.md` as the issue-level acceptance control surface emitted by IBM

@@ -22,7 +22,7 @@
 | `raw-20260517T083030Z` | #504 | 08:30:30Z | C-20260517T083030Z-A (needs_research) |
 | `raw-20260517T083200Z` | #505 | 08:32:00Z | C-20260517T083200Z-A (needs_research) |
 
-- `C-20260517T083030Z-A` (`docs/pre-brainstorms/20260517T083030Z--supervisor-bash-rc0-crash/`) 已完整分析此问题，判定为需研究 supervisor crash 检测逻辑
+- `C-20260517T083030Z-A` (`docs/B1-docs/20260517T083030Z--supervisor-bash-rc0-crash/`) 已完整分析此问题，判定为需研究 supervisor crash 检测逻辑
 - `raw-20260517T082422Z`（GitHub #502）已按同样模式吸收到 C-20260517T083030Z-A
 
 ### 关键确认点

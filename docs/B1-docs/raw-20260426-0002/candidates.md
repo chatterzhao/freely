@@ -1,6 +1,6 @@
 # Candidates - 20260426-0002--break-glass-agents-guidance
 
-- Source brainstorm: `docs/pre-brainstorms/20260426-0002--break-glass-agents-guidance/brainstorms.md`
+- Source brainstorm: `docs/B1-docs/20260426-0002--break-glass-agents-guidance/brainstorms.md`
 
 ### C-20260426-0002-A
 

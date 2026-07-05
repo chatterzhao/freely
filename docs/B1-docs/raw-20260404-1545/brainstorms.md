@@ -69,7 +69,7 @@
 
 现有证据仍支持：
 
-- GitHub issue create/sync 相关能力目前只停留在 `docs/pre-brainstorms/20260403-1000--external-issue-integration-and-self-evolution/*`
+- GitHub issue create/sync 相关能力目前只停留在 `docs/B1-docs/20260403-1000--external-issue-integration-and-self-evolution/*`
 - 当前没有已 materialize 的 runnable `scan/create/sync/close` 能力面
 
 因此这轮监督里不能把“没有自动创建 GitHub issue”误判成 runtime 消费错误；真实情况是该能力本来就还在预研。

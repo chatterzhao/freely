@@ -2,7 +2,7 @@
 
 ## Context
 
-- Source brainstorm: `docs/pre-brainstorms/20260412-1721--develop-push-attempt-followthrough/brainstorms.md`
+- Source brainstorm: `docs/B1-docs/20260412-1721--develop-push-attempt-followthrough/brainstorms.md`
 - Status: promoted
 - Reopens: the completed develop-push followthrough family through a new bounded execution follow-on
 
@@ -25,7 +25,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_id: `I-20260412-1721-A`
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/develop-push-attempt-followthrough-governance/issues/develop-push-attempt-followthrough-governance.md`
-- source_brainstorm: `docs/pre-brainstorms/20260412-1721--develop-push-attempt-followthrough/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/20260412-1721--develop-push-attempt-followthrough/brainstorms.md`
 - session_refs: []
 - follow_on_to: `I-20260408-1200-A`
 - next_action: Land the bounded follow-on owner, wire a single post-merge push attempt through the guarded merge path, and verify both success and blocked writeback behavior through focused regressions.

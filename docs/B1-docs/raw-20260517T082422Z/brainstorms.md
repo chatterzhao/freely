@@ -36,7 +36,7 @@
 3. **launch_kind=prompt**：一次性 prompt 启动，任务完成后进程退出是预期行为。
 4. **可能性 A（正常退出被误分类）最可能**：supervisor 将"进程不再运行"一律视为 crash，未识别正常退出的生命周期语义。
 
-详细分析参照 `docs/pre-brainstorms/20260517T082453Z--supervisor-bash-rc0-crash/brainstorms.md`。
+详细分析参照 `docs/B1-docs/20260517T082453Z--supervisor-bash-rc0-crash/brainstorms.md`。
 
 ## Decision
 

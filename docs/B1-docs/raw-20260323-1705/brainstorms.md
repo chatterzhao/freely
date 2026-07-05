@@ -208,7 +208,7 @@
 
 ## 需求池扫描与优先级
 
-- 本轮优先池：`docs/pre-brainstorms/**` + `docs/milestones.md`
+- 本轮优先池：`docs/B1-docs/**` + `docs/milestones.md`
   - delegated continuation handoff 明确把当前输入收束到 `C-20260323-1705-A` 的 continuation
   - `milestones.md` 仍把该条目保留在 `candidate_issues`，且 `phase_state=in_pre_brainstorm`
 - 已核对但未接管的池：

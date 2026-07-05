@@ -22,5 +22,5 @@
 ### Closeout
 
 - completed_at: `2026-05-19`
-- closeout_evidence: `docs/issues/raw-20260519T033529Z/issue.md (phase_state=dropped); 三项 fix commit 均在 develop 中可查`
+- closeout_evidence: `docs/B1-docs/raw-20260519T033529Z/issue.md (phase_state=dropped); 三项 fix commit 均在 develop 中可查`
 - dropped_reason: `所有三项 handoff JSON 修复已通过独立 fix 分支合并到 develop，无需 I-* 跟踪`

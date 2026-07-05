@@ -8,14 +8,14 @@ produced_candidate: C-20260705T155347Z-A
 # B1: docs/ 目录结构重构 + 8 epic 收敛
 
 ## Input
-- `docs/issues/raw-20260705T155347Z/issue.md`
+- `docs/B1-docs/raw-20260705T155347Z/issue.md`
 - 8 层 epic 设计（acp/a2a/runtime/git-worktree/ibm/gate/human/config）
 - B1/B2 skill 现有结构
 
 ## Problem
-1. B1 产物散落在 `docs/pre-brainstorms/{key}--{slug}/`，无 raw key 目录包裹
+1. B1 产物散落在 `docs/B1-docs/{key}--{slug}/`，无 raw key 目录包裹
 2. B2 产物散落在 `docs/epics/` 下 245 个伪 epic，大多实为 story
-3. skill/代码中硬编码旧路径（`docs/epics/`, `docs/pre-brainstorms/`），新 raw issue 会放错位置
+3. skill/代码中硬编码旧路径（`docs/epics/`, `docs/B1-docs/`），新 raw issue 会放错位置
 4. B1/B2 产物互不可追溯——同一个 raw key 在两个地方
 
 ## Discovery
@@ -24,9 +24,9 @@ produced_candidate: C-20260705T155347Z-A
 
 | 当前 | 目标 |
 |------|------|
-| `docs/pre-brainstorms/{key}--{slug}/` | `docs/B1-docs/raw-{key}/` |
+| `docs/B1-docs/{key}--{slug}/` | `docs/B1-docs/raw-{key}/` |
 | `docs/epics/{old-epic}/{old-story}/` | `docs/B2-docs/{new-epic}/{new-story}/raw-{key}/` |
-| `docs/issues/raw-{key}/` | → `docs/B1-docs/raw-{key}/`（迁入 B1） |
+| `docs/B1-docs/raw-{key}/` | → `docs/B1-docs/raw-{key}/`（迁入 B1） |
 | `docs/epics-map.svg` | 指向 `docs/B2-docs/`，删除重建 |
 | `docs/milestones.md` | 保留，路径引用更新 |
 | `docs/brainstorms/`, `docs/candidates/`, `docs/reviews/` | 废弃 |

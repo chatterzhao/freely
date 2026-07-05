@@ -28,7 +28,7 @@
 
 本 raw issue 与 raw-20260517T082350Z 仅有秒级时间差（08:23:17Z vs 08:23:50Z），显然是同一次 supervisor crash 假阳性事件由不同监控路径上报的多个副本。
 
-- 已有 `C-20260517T083030Z-A` (`docs/pre-brainstorms/20260517T083030Z--supervisor-bash-rc0-crash/`) 完整分析了此问题：supervisor 将 bash rc=0（正常退出）误判为 crash
+- 已有 `C-20260517T083030Z-A` (`docs/B1-docs/20260517T083030Z--supervisor-bash-rc0-crash/`) 完整分析了此问题：supervisor 将 bash rc=0（正常退出）误判为 crash
 - raw-20260517T082350Z (GitHub #501) 和 raw-20260517T082422Z (GitHub #502) 已按同样模式吸收到 C-20260517T083030Z-A
 
 ## Decision

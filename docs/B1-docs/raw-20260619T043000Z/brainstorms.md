@@ -12,7 +12,7 @@ created_at: 2026-06-19
 ## Input
 
 - GitHub #3026
-- Raw issue: docs/issues/raw-20260619T043000Z/issue.md
+- Raw issue: docs/B1-docs/raw-20260619T043000Z/issue.md
 
 ## Problem
 

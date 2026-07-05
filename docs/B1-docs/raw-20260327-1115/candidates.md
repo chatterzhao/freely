@@ -2,7 +2,7 @@
 
 - id: `C-20260327-1115-A`
 - title: Rebuild limit recovery around OAuth-backed inventory truth and earliest-reset sleep
-- source_brainstorm: `docs/pre-brainstorms/20260327-1115--oauth-api-usage-query-refactor/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/20260327-1115--oauth-api-usage-query-refactor/brainstorms.md`
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
 - decision_reason:

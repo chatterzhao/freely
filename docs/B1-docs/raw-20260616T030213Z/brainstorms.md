@@ -12,7 +12,7 @@ created_at: 2026-06-16
 ## Input Source
 
 - GitHub issue #2795: https://github.com/chatterzhao/freely/issues/2795
-- Raw issue: `docs/issues/raw-20260616T030213Z/issue.md`
+- Raw issue: `docs/B1-docs/raw-20260616T030213Z/issue.md`
 - Filed by: platform (AI agent), 2026-06-16
 
 ## Problem
@@ -31,7 +31,7 @@ created_at: 2026-06-16
 
 限制 governance-only 路径为：
 - `AGENTS.md`, `CONSTITUTION.md`, `LAWS.md`, `PROJECT_INTENT.md`
-- `docs/milestones.md`, `docs/pre-brainstorms/`, `docs/epics/`, `docs/progress/`, `docs/issues/`
+- `docs/milestones.md`, `docs/B1-docs/`, `docs/epics/`, `docs/progress/`, `docs/B1-docs/`
 
 所有 workspace 脚本（`docs/system/workspace/scripts/runtime/`, `worktree/`, `hooks/`）**必须走 IBM 生命周期**。
 

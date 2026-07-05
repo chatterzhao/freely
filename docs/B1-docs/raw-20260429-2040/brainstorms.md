@@ -2,7 +2,7 @@
 
 ## 问题
 
-`freely chat` 直接写 `docs/issues/` 污染 develop（protected branch）。
+`freely chat` 直接写 `docs/B1-docs/` 污染 develop（protected branch）。
 
 ## 核心约束
 
@@ -13,7 +13,7 @@
 ```
 chat 写入 DB（consumed=0）
   │
-  ├─ 工位存在？──YES──→ 直接同步到 worktree/docs/issues/ → consumed=1
+  ├─ 工位存在？──YES──→ 直接同步到 worktree/docs/B1-docs/ → consumed=1
   │
   └─ 无工位 ──→ 留在 DB（consumed=0）
                    │
@@ -61,7 +61,7 @@ freely chat --new-issue "msg"
 freely chat --issue raw-xxx "评论"
   → INSERT (consumed=0)
   → find worktrees-root/*raw-xxx*
-     ├─ 找到 → cat >> worktree/docs/issues/raw-xxx/issue.md → consumed=1
+     ├─ 找到 → cat >> worktree/docs/B1-docs/raw-xxx/issue.md → consumed=1
      └─ 未找到 → 留在 DB
 ```
 
@@ -71,13 +71,13 @@ freely chat --issue raw-xxx "评论"
 wt-create feature/raw-{ts}-{slug} --base develop
   → _extract_issue_key → raw-{ts}
   → _require_issue_exists:
-       raw-*: 查 DB(consumed=0) → 查 DB(consumed=1+恢复) → 查 docs/issues/
-       I-*:   查 docs/issues/
+       raw-*: 查 DB(consumed=0) → 查 DB(consumed=1+恢复) → 查 docs/B1-docs/
+       I-*:   查 docs/B1-docs/
        都无 → 拒绝
   → git worktree add
   → _materialize_chat_if_needed:
        查 DB WHERE id={ts} AND consumed=0
-       ├─ 找到 → worktree/docs/issues/raw-{ts}/issue.md → consumed=1
+       ├─ 找到 → worktree/docs/B1-docs/raw-{ts}/issue.md → consumed=1
        │         → 同时搬入该 issue 的待处理评论
        │         → 失败回滚 worktree
        └─ 未找到 → 已有 issue，跳过
@@ -111,7 +111,7 @@ scan_chat_inbox:
 | 2 | `--issue` 评论，工位存在 | 触发点1(直接同步) ✓ |
 | 3 | `--issue` 评论，无工位 | 触发点1(留DB) → 触发点3(AI追加) |
 | 4 | "你好" 噪声 | 触发点1(留DB) → 触发点3(AI标-1) |
-| 5 | wt-create I-* 重新开工 | 触发点2(docs/issues/找到) |
+| 5 | wt-create I-* 重新开工 | 触发点2(docs/B1-docs/找到) |
 | 6 | 同秒两个 chat | INSERT OR IGNORE + +1s 重试 |
 | 7 | materialize 失败 | 触发点2 回滚 worktree |
 | 8 | consumed=1 但 issue 缺失 | 触发点2 异常恢复 reset→0 |

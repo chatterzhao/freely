@@ -33,7 +33,7 @@ created_at: 2026-06-27
 ```
 对每个 raw-{key}:
   ├─ 工位存在 → Cat 3（进行中，判死活）
-  ├─ docs/issues/raw-{key}/ 存在 → Cat 2（已完成，判对齐）
+  ├─ docs/B1-docs/raw-{key}/ 存在 → Cat 2（已完成，判对齐）
   └─ 都没有 → Cat 1（未开始）
 ```
 
@@ -55,7 +55,7 @@ created_at: 2026-06-27
 
 ## 性能设计
 
-1. HEAD-based skip: HEAD 未变 → 不重扫文件（docs/issues/ 只通过 git commit 变更）
+1. HEAD-based skip: HEAD 未变 → 不重扫文件（docs/B1-docs/ 只通过 git commit 变更）
 2. Platform cache: 5min TTL，避免重复 API 调用
 3. Timer 嵌入: 每步耗时可见，方便排查瓶颈
 

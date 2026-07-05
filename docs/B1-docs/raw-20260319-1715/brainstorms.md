@@ -274,8 +274,8 @@ UI 可以后续补，但只能是这个 CLI intake 的前端：
 
 真正写：
 
-- `docs/pre-brainstorms/<id>/brainstorms.md`
-- `docs/pre-brainstorms/<id>/candidates.md`
+- `docs/B1-docs/<id>/brainstorms.md`
+- `docs/B1-docs/<id>/candidates.md`
 - `docs/milestones.md`
 
 的必须是 worker 工位。
@@ -819,8 +819,8 @@ CLI/UI 可以在提交插话时附带标准化元信息，但不应把“这是�
 3. 若无，则新建 dedicated worker worktree
 4. worker 执行 `doc-pre-brainstorm-execution`
 5. 产出：
-   - `docs/pre-brainstorms/<id>/brainstorms.md`
-   - `docs/pre-brainstorms/<id>/candidates.md`
+   - `docs/B1-docs/<id>/brainstorms.md`
+   - `docs/B1-docs/<id>/candidates.md`
    - `docs/milestones.md` candidate 同步
 6. 回写 intake：
    - `status=absorbed`
@@ -1106,7 +1106,7 @@ Freely 正确的主链应是：
 按类型的 canonical absorption：
 
 - 新 discovery
-  - `docs/pre-brainstorms/**`
+  - `docs/B1-docs/**`
   - `docs/milestones.md`
 - 当前 issue continuation
   - `issue`
@@ -1169,7 +1169,7 @@ Freely 需要在 `openclaw` 的 reaction plane 之上，再增加：
 
 ## 需要回答的问题
 
-1. intake artifact 应落在 `.freely/intake/`、`docs/pre-brainstorms/CONVERGENCE.md`，还是别的路径？
+1. intake artifact 应落在 `.freely/intake/`、`docs/B1-docs/CONVERGENCE.md`，还是别的路径？
 2. intake item 的分类由 runtime 预分类，还是完全由 manager/AI 分类？
 3. `steer/followup/collect/interrupt/noise` 是否足够表达 Freely 的 reaction plane；它们与 canonical `source_class/route_kind` 的映射真源应放在哪里？
 4. detection signal 应落在 `.freely/run/` 的什么形式，才能让 manager 稳定知道“有插话”而不依赖会话内交互？
@@ -1310,7 +1310,7 @@ Freely 需要在 `openclaw` 的 reaction plane 之上，再增加：
 - 保存 specialized AI 生成的 resolution artifact / digest / handoff
 
 3. 正式治理层
-- discovery -> `docs/pre-brainstorms/**` + `docs/milestones.md`
+- discovery -> `docs/B1-docs/**` + `docs/milestones.md`
 - continuation -> `issue/progress/recovery`
 - control -> runtime state / manager continuity
 - noise -> resolution note / continuity

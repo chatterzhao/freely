@@ -34,7 +34,7 @@
 - priority: `P0`
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
-- source_brainstorm: `docs/pre-brainstorms/20260405-1805--test-pre-merge-family-promotion-gate-enforcement/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/20260405-1805--test-pre-merge-family-promotion-gate-enforcement/brainstorms.md`
 - promoted_issue_id: `I-20260405-1805-A`
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/test-pre-merge-family-promotion-gate-enforcement-governance/issues/test-pre-merge-family-promotion-gate-enforcement-governance.md`
 - session_refs:

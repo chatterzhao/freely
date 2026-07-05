@@ -10,7 +10,7 @@ created_at: 2026-06-30
 # B1_IBM: freely init ACP 工具准备 + tool-registry 下载配置
 
 ## Input
-- raw issue: `docs/issues/raw-20260630T124528Z/issue.md`
+- raw issue: `docs/B1-docs/raw-20260630T124528Z/issue.md`
 - 平台: GitHub #3657
 
 ## Discovery — 现状调研

@@ -3,7 +3,7 @@
 - id: `C-20260401-1703-A`
 - candidate_format_version: `v2`
 - title: Materialize runtime adapter axis and per-tool adapter selection
-- source_brainstorm: `docs/pre-brainstorms/20260401-1703--runtime-adapter-axis-and-per-tool-adapter-selection/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/20260401-1703--runtime-adapter-axis-and-per-tool-adapter-selection/brainstorms.md`
 - problem: Freely 已经完成 ACP optional adapter boundary 的研究收口，但当前 runtime 仍没有 first-class `adapter axis`。`AI_TOOL`、tool-specific launch glue、continuity writeback 与 status surface 仍纠缠在一起，导致后续无论是否要接 ACP，都缺少一个安全的最小实现切口。
 - why_now:
   - `I-20260401-1545-A` 已明确后续第一刀必须先抽 `adapter axis`

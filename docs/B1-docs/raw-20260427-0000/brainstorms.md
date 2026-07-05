@@ -18,7 +18,7 @@ B1_IBM 的 Input 有两个入口：
 ### 1. 本地 issue 存储结构
 
 ```
-docs/issues/
+docs/B1-docs/
 ├── ISSUES.md                # 索引：所有已知 issue 的映射表
 ├── {issue-local-id}/
 │   └── issue.md             # 正文 + ## Comments 章节（评论追加在此）
@@ -153,7 +153,7 @@ intake 的 claim/resolve 生命周期本质上是"issue 评论的处理状态"�
 | `INTAKE_ID` | 废弃，改用 `comment-{local_id}` |
 | `message.txt` | 废弃，评论直接写入 issue.md 的 `## Comments` 章节 |
 
-**命令兼容**：`freely intake chat --issue <id>` 替代 `--linked-artifact`，底层追加评论到 `docs/issues/<id>/issue.md` 的 `## Comments` 章节。整个 `.freely/intake/` 目录废弃。
+**命令兼容**：`freely intake chat --issue <id>` 替代 `--linked-artifact`，底层追加评论到 `docs/B1-docs/<id>/issue.md` 的 `## Comments` 章节。整个 `.freely/intake/` 目录废弃。
 
 
 
@@ -205,10 +205,10 @@ primary_platform: github
 
 **参考 issueme**：Story = Issue 目录，`M{milestone}-{story-name}/` 包含 issue.md + requirements.md + pre-tests.md + tasks.md。目录名直接带 milestone 前缀，方便查找。
 
-**freely 的差异**：freely 已有 `docs/epics/{epic}/{story}/` 目录结构，不需要改名。但 `docs/issues/` 可以作为平台 issue 的本地缓存层，与 `docs/epics/` 的 B2 产物分离：
+**freely 的差异**：freely 已有 `docs/epics/{epic}/{story}/` 目录结构，不需要改名。但 `docs/B1-docs/` 可以作为平台 issue 的本地缓存层，与 `docs/epics/` 的 B2 产物分离：
 
 ```
-docs/issues/                    # 所有 issue 的本地存储（git 管理）
+docs/B1-docs/                    # 所有 issue 的本地存储（git 管理）
 ├── .scan-state                 # { last_scan_at: "..." }
 ├── ISSUES.md                   # 索引缓存（脚本维护）
 ├── raw-20260427-1030/          # raw issue（B1 输入）
@@ -224,7 +224,7 @@ docs/epics/{epic}/{story}/      # B2 治理产物（canonical docs）
 └── code-reviews/
 ```
 
-两层不重复——`docs/epics/` 是 B2 治理产物，`docs/issues/` 是平台同步存储。linked issue 的 frontmatter 中 `canonical_issue_path` 关联两边的文档。
+两层不重复——`docs/epics/` 是 B2 治理产物，`docs/B1-docs/` 是平台同步存储。linked issue 的 frontmatter 中 `canonical_issue_path` 关联两边的文档。
 
 ### 13. issueme 可借鉴的设计
 
@@ -257,8 +257,8 @@ docs/epics/{epic}/{story}/      # B2 治理产物（canonical docs）
 | 内容 | 在哪里 | 说明 |
 |------|--------|------|
 | 原始问题描述 | 平台 raw issue body | 用户创建时的原始内容 |
-| B1 预研讨论 | 本地 `docs/pre-brainstorms/{id}/brainstorms.md` | AI 内部分析，不上平台 |
-| B1 candidate | 本地 `docs/pre-brainstorms/{id}/candidates.md` | 本地治理产物 |
+| B1 预研讨论 | 本地 `docs/B1-docs/{id}/brainstorms.md` | AI 内部分析，不上平台 |
+| B1 candidate | 本地 `docs/B1-docs/{id}/candidates.md` | 本地治理产物 |
 | 里程碑 issue 规格 | **平台 linked issue body** | 正式 issue 文档的摘要：scope、acceptance、状态 |
 | 里程碑 issue 完整规格 | 本地 `docs/epics/{epic}/{story}/issues/{name}.md` | 详细版，平台 body 是摘要 |
 | B2/IBM 实现头脑风暴 | 本地 `docs/epics/{epic}/{story}/brainstorms/b-{issue}.md` | AI 实现设计，不上平台 |
@@ -321,7 +321,7 @@ canonical: docs/epics/{epic}/{story}/issues/{name}.md
 **根本约束**：freely 的 AI（manager/worker/lead）**永远不直接读平台内容**，也**永远不直接写平台内容**。平台和本地之间只有两条脚本桥接：
 
 ```
-Platform (github/gitee)                    Local (docs/issues/, docs/)
+Platform (github/gitee)                    Local (docs/B1-docs/, docs/)
      │                                              │
      │  ──① scan 下载（task-source-scan.py）──→      │
      │     raw issue, comment, 状态                    │
@@ -360,7 +360,7 @@ Platform (github/gitee)                    Local (docs/issues/, docs/)
 
 **重建流程**：
 ```
-1. 读取 docs/issues/ISSUES.md 索引
+1. 读取 docs/B1-docs/ISSUES.md 索引
 2. 对每个 issue，比较本地 hash 和平台状态
 3. 如果平台不存在 → 创建
 4. 如果平台存在但内容不一致 → 用本地内容覆盖（force push）
@@ -452,7 +452,7 @@ chat → 创建 raw issue (proposed) → scan → B1 预研 → candidate 标记
 **之后**：只有一个 Input source——issue。
 
 用户的任何输入都是 issue 上的操作：
-- 新话题 → 新建 raw issue（`freely chat "新想法"` → `docs/issues/raw-20260427-1030/issue.md`）
+- 新话题 → 新建 raw issue（`freely chat "新想法"` → `docs/B1-docs/raw-20260427-1030/issue.md`）
 - 已有工作相关 → 对应 issue 的评论（`freely chat --issue raw-20260427-1000 "补充"` → 追加到该 issue.md 的 `## Comments`）
 
 `freely chat` 不是 Input source——它是本地的 issue 创建/评论工具。Input source 永远是 issue。
@@ -514,15 +514,15 @@ last_synced_comment_at:
 - push：遍历 `## Comments` 下的所有 `###`，对每个平台，找没有该平台 `comment_id` 的评论，推送。推送后写回 `comment_id`，更新 `last_synced_comment_at`
 - pull：从各平台拉取 `last_synced_comment_at` 之后的新评论，追加到 `## Comments`，写回 `last_synced_comment_at`
 
-### 24. scan 如何集成 docs/issues/
+### 24. scan 如何集成 docs/B1-docs/
 
-当前 `task-source-scan.py` 扫描 6 个来源家族。重构后需要在 scan 中新增对 `docs/issues/` 的扫描：
+当前 `task-source-scan.py` 扫描 6 个来源家族。重构后需要在 scan 中新增对 `docs/B1-docs/` 的扫描：
 
 **新增 scan 家族**：
-- `scan_raw_issues()`：扫描 `docs/issues/raw-*/issue.md`
+- `scan_raw_issues()`：扫描 `docs/B1-docs/raw-*/issue.md`
   - 未与 candidate 关联的 raw issue → `restart_point=pre_brainstorm`
   - 有新评论（`last_synced_comment_at` 之后有新的 `###`）但 issue 未活跃 → 标记有新评论待处理
-- `scan_linked_issues()`：扫描 `docs/issues/I-*/issue.md`
+- `scan_linked_issues()`：扫描 `docs/B1-docs/I-*/issue.md`
   - 与新 raw issue 不同——linked issue 已经关联了 canonical docs
   - 有新评论 → `restart_point=cleanup`（drift reconcile）
 
@@ -534,7 +534,7 @@ last_synced_comment_at:
 
 **废弃的 scan 家族**：
 - `scan_intake()`：`.freely/intake/` 不再存在，移除
-- `scan_external_github/gitee()`：保留，但下载后的内容写入 `docs/issues/raw-*/` 而非临时处理
+- `scan_external_github/gitee()`：保留，但下载后的内容写入 `docs/B1-docs/raw-*/` 而非临时处理
 
 ### 25. sync 的回写流程
 
@@ -542,7 +542,7 @@ sync 不仅推送，还要把平台返回的 ID 写回本地 frontmatter。
 
 **创建 linked issue 的回写**：
 1. candidate promoted → trigger `issue-sync create`
-2. 脚本读取 `docs/issues/I-{key}/issue.md` 的 frontmatter，构建 platform issue body
+2. 脚本读取 `docs/B1-docs/I-{key}/issue.md` 的 frontmatter，构建 platform issue body
 3. 调平台 API 创建 issue → 平台返回 `{id: 42, url: "https://..."}`
 4. 将 platform_id 写回 issue.md frontmatter 的 `platform_ids.{platform}.issue_id`
 5. 更新 ISSUES.md 索引

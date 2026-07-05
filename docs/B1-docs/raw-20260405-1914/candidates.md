@@ -42,7 +42,7 @@
 - priority: `P0`
 - status: `promoted`
 - milestone: `M-20260306-workspace-routing-foundation`
-- source_brainstorm: `docs/pre-brainstorms/20260405-1914--test-lane-routing-and-enforcement/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/20260405-1914--test-lane-routing-and-enforcement/brainstorms.md`
 - promoted_issue_id: `I-20260405-1914-A`
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/test-lane-routing-and-enforcement-governance/issues/test-lane-routing-and-enforcement-governance.md`
 - session_refs:

@@ -3,7 +3,7 @@
 ## Discovery
 
 ### Source
-- Raw issue: `docs/issues/raw-20260506T1230Z/issue.md`
+- Raw issue: `docs/B1-docs/raw-20260506T1230Z/issue.md`
 - GitHub: https://github.com/chatterzhao/freely/issues/280
 - Created: 2026-05-06, author: zhaoquan
 - Channel: github
@@ -20,7 +20,7 @@ wt-create 需要一次性创建两个工位：
 
 检查发现以下事实：
 
-- **I-issue**: `docs/issues/I-20260506T1230Z-A/issue.md` — 已存在，`phase_state: in_dev`
+- **I-issue**: `docs/B1-docs/I-20260506T1230Z-A/issue.md` — 已存在，`phase_state: in_dev`
 - **Milestone**: `M-20260506T1230Z-A` — 已存在且 active，已关联该 I-issue
 - **Code review**: `docs/epics/wt-create-dual/code-reviews/review.md` — 已完成，决策正确
 - **Pre-tests**: `docs/epics/wt-create-dual/verification/pre-tests.md` — 已完成，覆盖 unit/integration/e2e
@@ -47,7 +47,7 @@ wt-create 需要一次性创建两个工位：
 - **结论**: absorbed
 - **理由**: wt-create dual worktree creation 的全部 B2/实现/测试/合并工作已在并发开发中完成。当前代码库已支持一次性创建 test-pre-merge + fix/feature 双工位，fix→test-pre-merge 为 fast-forward。
 - **证据**:
-  - `docs/issues/I-20260506T1230Z-A/issue.md` — I-issue 已存在
+  - `docs/B1-docs/I-20260506T1230Z-A/issue.md` — I-issue 已存在
   - `docs/epics/wt-create-dual/code-reviews/review.md` — Code review 已完成
   - `docs/epics/wt-create-dual/verification/pre-tests.md` — 验收测试通过
   - `docs/epics/wt-create-dual/verification/tasks.md` — 全部任务完成

@@ -7,7 +7,7 @@
 │                                                                    │
 │  来源 A: chat 插话                                                 │
 │    [脚本] freely chat --new-issue                                  │
-│    [脚本] _write_chat_to_issue → docs/issues/raw-YYYYMMDD-HHMM/   │
+│    [脚本] _write_chat_to_issue → docs/B1-docs/raw-YYYYMMDD-HHMM/   │
 │    [脚本] issue-sync create raw-xxx → GitHub + Gitee             │
 │    [脚本] issue-sync normalize → 确保平台有 kind/raw 标签          │
 │                                                                    │
@@ -24,7 +24,7 @@
 ┌─ Phase 2: B1 预研 ───────────────────────────────────────────────┐
 │                                                                    │
 │  [AI] 读取 raw issue，判断是否需要预研                              │
-│  [AI] 创建 docs/pre-brainstorms/YYYYMMDD-HHMM--slug/              │
+│  [AI] 创建 docs/B1-docs/YYYYMMDD-HHMM--slug/              │
 │  [AI] 写 brainstorms.md（发散→收敛→决策）                          │
 │  [AI] 写 candidates.md（一个或多个 C-YYYYMMDD-HHMM-A/B/C）         │
 │  [脚本] gate 检查 candidate_key.startswith(raw_key)               │

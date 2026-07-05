@@ -39,7 +39,7 @@
 - 要先完成全仓 active truth 审计，再修改系统真源，避免直接全量替词造成历史证据面混乱。
 
 对应 continuation 研究面为：
-- `docs/pre-brainstorms/20260323-0241--three-loop-lifecycle-dictionary-and-worktree-completion/`
+- `docs/B1-docs/20260323-0241--three-loop-lifecycle-dictionary-and-worktree-completion/`
 - 该 continuation 不再形成平行 milestone owner，而是作为本 candidate 的 active continuation 吸收。
 
 ## 收敛判断

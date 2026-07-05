@@ -3,7 +3,7 @@
 - id: `C-20260401-2316-A`
 - candidate_format_version: `v2`
 - title: Align the `cc:auto + adapter=acp` init regression test with the canonical activation-consent contract
-- source_brainstorm: `docs/pre-brainstorms/20260401-2316--cc-acp-init-autonomy-consent-test-followthrough/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/20260401-2316--cc-acp-init-autonomy-consent-test-followthrough/brainstorms.md`
 - reopen_of_issue: `docs/epics/freely-product-architecture/freely-tool-autonomy-policy-materialization-governance/issues/freely-tool-autonomy-policy-materialization-governance.md`
 - reopen_reason: `test-freely-init-cc-config still called the canonical cc:auto ACP init path without --accept-default-autonomy after activation consent became mandatory`
 - problem: canonical `develop` still carries one stale test invocation on the `cc:auto + --tool-adapter acp` init path, so the test now fails even though runtime behavior already matches the frozen activation-consent contract.

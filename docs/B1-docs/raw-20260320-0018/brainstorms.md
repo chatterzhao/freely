@@ -56,7 +56,7 @@
 - `docs/CONSTITUTION.md`
 - `docs/LAWS.md`
 - `AGENTS.md`
-- `docs/pre-brainstorms/`
+- `docs/B1-docs/`
 
 它不应把任意目录当作项目，也不应仅凭最近使用项目静默漂移。
 

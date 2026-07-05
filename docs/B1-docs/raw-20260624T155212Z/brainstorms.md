@@ -10,7 +10,7 @@ created_at: 2026-06-24
 # B1_IBM: pretests-retirement-gate fallback for missing workcell-state.env
 
 ## Input
-- raw issue: `docs/issues/raw-20260624T155212Z/issue.md`
+- raw issue: `docs/B1-docs/raw-20260624T155212Z/issue.md`
 - GitHub issue #3446: pretests-retirement-gate fails immediately when workcell-state.env doesn't exist
 - Worktree: fix/raw-20260624T155212Z-pretests-retirement-gate-fallback
 

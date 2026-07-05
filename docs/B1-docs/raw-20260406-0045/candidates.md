@@ -5,7 +5,7 @@
 - title: Governance-check protected-merge history source policy
 - status: promoted
 - milestone: `M-20260306-workspace-routing-foundation`
-- source_brainstorm: `docs/pre-brainstorms/20260406-0045--governance-check-protected-merge-history-source-policy/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/20260406-0045--governance-check-protected-merge-history-source-policy/brainstorms.md`
 - problem: `./bin/governance-check` currently audits all reachable protected merge commits on `develop`, so a valid `feature/* -> test-pre-merge-*` merge inside batch ancestry gets revalidated under develop-only source rules and causes a false negative on canonical post-merge followthrough.
 - why_now:
   - canonical `develop` is currently red after a valid guarded merge

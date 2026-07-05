@@ -32,7 +32,7 @@
 EOF
 
 # B1: candidates
-cat > docs/pre-brainstorms/20260624T004524Z--a2a-restore-async/candidates.md << 'CEOF'
+cat > docs/B1-docs/20260624T004524Z--a2a-restore-async/candidates.md << 'CEOF'
 # Candidates
 
 ## C-20260624T004524Z-A: A2A server _restore_tasks 异步化
@@ -54,23 +54,23 @@ cat > docs/pre-brainstorms/20260624T004524Z--a2a-restore-async/candidates.md << 
   - mode: subagent
   - summary: review a2a_server.py _restore_tasks 异步化安全性
   - verdict: pass
-- promoted_issue_path: docs/issues/I-20260624T004524Z-A/issue.md
+- promoted_issue_path: docs/B1-docs/I-20260624T004524Z-A/issue.md
 - milestone: M-20260624T004524Z-A
 - session_refs: []
 CEOF
 
 # B2: I-issue + pre-tests + tasks + code-review
-mkdir -p docs/issues/I-20260624T004524Z-A docs/epics/a2a-restore-async/{verification,code-reviews}
+mkdir -p docs/B1-docs/I-20260624T004524Z-A docs/epics/a2a-restore-async/{verification,code-reviews}
 
-cat > docs/issues/I-20260624T004524Z-A/issue.md << 'IEOF'
+cat > docs/B1-docs/I-20260624T004524Z-A/issue.md << 'IEOF'
 ---
 local_id: I-20260624T004524Z-A
 kind: linked
 status: completed
 phase_state: completed
 promoted_from: raw-20260624T004524Z
-source_candidate: docs/pre-brainstorms/20260624T004524Z--a2a-restore-async/candidates.md#C-20260624T004524Z-A
-canonical_issue_path: docs/issues/I-20260624T004524Z-A/issue.md
+source_candidate: docs/B1-docs/20260624T004524Z--a2a-restore-async/candidates.md#C-20260624T004524Z-A
+canonical_issue_path: docs/B1-docs/I-20260624T004524Z-A/issue.md
 milestone: "M-20260624T004524Z-A"
 title: "fix: defer _restore_tasks to background thread to prevent A2A startup timeout"
 platform_ids:
@@ -91,7 +91,7 @@ verification_artifact_dir: docs/epics/a2a-restore-async/code-reviews
 
 # I-20260624T004524Z-A: A2A server _restore_tasks 异步化
 
-- source_candidate: `docs/pre-brainstorms/20260624T004524Z--a2a-restore-async/candidates.md#C-20260624T004524Z-A`
+- source_candidate: `docs/B1-docs/20260624T004524Z--a2a-restore-async/candidates.md#C-20260624T004524Z-A`
 - pre_tests_path: `docs/epics/a2a-restore-async/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/a2a-restore-async/code-reviews`
 - milestone: M-20260624T004524Z-A
@@ -182,7 +182,7 @@ cat > docs/epics/a2a-restore-async/code-reviews/implementation-decision-note.md 
 # Implementation Decision Note: _restore_tasks 异步化
 
 - issue_id: I-20260624T004524Z-A
-- issue_path: docs/issues/I-20260624T004524Z-A/issue.md
+- issue_path: docs/B1-docs/I-20260624T004524Z-A/issue.md
 - milestone: M-20260624T004524Z-A
 
 ## Implementation Decision Note

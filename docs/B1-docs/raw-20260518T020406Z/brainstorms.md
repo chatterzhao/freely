@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS chats (
 - `query_pending()` — 查全部 `consumed=0` 的消息
 - `query_by_issue()` — 按 issue_id 查消息
 - `consume()` / `discard()` / `reset()` — 更新 consumed 状态
-- `materialize()` — 将 chat 消息写为新的 raw issue (`docs/issues/raw-{issue_id}/issue.md`)
+- `materialize()` — 将 chat 消息写为新的 raw issue (`docs/B1-docs/raw-{issue_id}/issue.md`)
 - `materialize_comment()` — 将 chat 消息追加到现有 issue
 - **缺少**: `consume_conversation()` — 按 conversation_id 批量消费
 
@@ -83,9 +83,9 @@ CREATE TABLE IF NOT EXISTS chats (
 
 ### 参考文档
 
-- `docs/pre-brainstorms/issue-state-lifecycle.md` §6, §7.3 — issue 状态生命周期和 chat-inbox scan 阶段
-- `docs/pre-brainstorms/20260429-2040--chat-inbox-sqlite/brainstorms.md` — chat-inbox SQLite 原始设计
-- `docs/pre-brainstorms/20260518T020345Z--freely-comment/brainstorms.md` — freely comment 命令设计
+- `docs/B1-docs/issue-state-lifecycle.md` §6, §7.3 — issue 状态生命周期和 chat-inbox scan 阶段
+- `docs/B1-docs/20260429-2040--chat-inbox-sqlite/brainstorms.md` — chat-inbox SQLite 原始设计
+- `docs/B1-docs/20260518T020345Z--freely-comment/brainstorms.md` — freely comment 命令设计
 - `docs/system/workspace/scripts/runtime/chat-inbox.py` — chat-inbox 模块源码
 - `docs/system/workspace/scripts/runtime/task-lifecycle-scan.py` — scan_chat_inbox 实现
 

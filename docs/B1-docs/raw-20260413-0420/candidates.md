@@ -2,7 +2,7 @@
 
 ## Context
 
-- Source brainstorm: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/brainstorms.md`
+- Source brainstorm: `docs/B1-docs/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/brainstorms.md`
 - Status: `split`
 - Route: `promote-bounded-startup-authority-owner-and-keep-manager-handoff-research-visible`
 

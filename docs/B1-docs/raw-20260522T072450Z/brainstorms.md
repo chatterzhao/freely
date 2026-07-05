@@ -10,7 +10,7 @@ The raw issue is now empty (frontmatter only, no body), with `phase_state: absor
 
 ## Research
 
-- Existing pre-brainstorm dir: `docs/pre-brainstorms/20260522T072450Z--fix-list-double-prefix/`
+- Existing pre-brainstorm dir: `docs/B1-docs/20260522T072450Z--fix-list-double-prefix/`
 - Candidate `C-20260522T072450Z-A` was promoted to `I-20260522T072450Z-A`
 - Linked issue `I-20260522T072450Z-A`: `phase_state: completed`
 - Milestone: `M-20260522T072450Z-A` ("fix list double prefix") — active, with promoted candidate and committed issue

@@ -8,7 +8,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/codex-current-live-apikey-bootstrap-without-saved-slot-governance/issues/codex-current-live-apikey-bootstrap-without-saved-slot-governance.md`
 - promoted_issue_id: `I-20260406-1829-A`
-- source_brainstorm: `docs/pre-brainstorms/20260406-1829--codex-current-live-apikey-bootstrap-without-saved-slot/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/20260406-1829--codex-current-live-apikey-bootstrap-without-saved-slot/brainstorms.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`

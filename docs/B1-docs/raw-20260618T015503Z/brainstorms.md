@@ -11,7 +11,7 @@
 Freely 的多条命令在操作治理文档时，路径解析存在系统性错误：
 
 1. **ROOT_DIR 双轨制**：项目中有两种互不兼容的 ROOT_DIR 解析方式
-2. **raw issue 放在 develop**：wt-create 把 raw issue 物化到 develop 的 `docs/issues/`，而非 worktree
+2. **raw issue 放在 develop**：wt-create 把 raw issue 物化到 develop 的 `docs/B1-docs/`，而非 worktree
 3. **wt-close 硬编码 develop**：ROOT_DIR 通过脚本路径推导，永远指向主仓库
 4. **_absorb_close_frontmatter 是补救代码**：因为 raw issue 不在 worktree 中，merge 后需要事后 amend develop
 
@@ -38,7 +38,7 @@ Freely 的多条命令在操作治理文档时，路径解析存在系统性错�
 
 | 文件 | 问题 | 修复 |
 |---|---|---|
-| wt-create | 7 处 `$ROOT_DIR/docs/issues/` → develop | `$target_path/docs/issues/` |
+| wt-create | 7 处 `$ROOT_DIR/docs/B1-docs/` → develop | `$target_path/docs/B1-docs/` |
 | wt-close | ROOT_DIR 硬编码 + 所有 `$ISSUES_DIR` 引用 | `git rev-parse --show-toplevel` |
 | pr-merge-guarded | `_absorb_close_frontmatter` 整段 | 删除 |
 | pr-create-guarded | 缺少 worktree 内 phase_state 检查 | 增加 worktree 路径检查 |
@@ -58,7 +58,7 @@ Freely 的多条命令在操作治理文档时，路径解析存在系统性错�
 ### 执行顺序（按依赖关系）
 
 1. **worktree-common.sh**：修正 ROOT_DIR 定义（被其他脚本 source）
-2. **wt-create**：`$target_path/docs/issues/` 替换 `$ROOT_DIR/docs/issues/`
+2. **wt-create**：`$target_path/docs/B1-docs/` 替换 `$ROOT_DIR/docs/B1-docs/`
 3. **pr-create-guarded**：增加 worktree 内 phase_state 检查
 4. **pr-merge-guarded**：删除 `_absorb_close_frontmatter`（raw issue 由 merge 自然带入）
 5. **wt-close**：ROOT_DIR 改用 `git rev-parse --show-toplevel`

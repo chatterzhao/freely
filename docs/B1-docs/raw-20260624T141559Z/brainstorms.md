@@ -27,7 +27,7 @@ created_at: 2026-06-24
 三个具体问题：
 1. 硬编码 `gh issue create`，不支持 Gitee
 2. `--repo` 参数需要用户手工传，而 `issue-sync` 已有 `_gh_repo()`/`_gitee_repo()` 自动检测
-3. 不写本地 `docs/issues/` 文件，与 `issue-sync` 的 local-first 设计脱节
+3. 不写本地 `docs/B1-docs/` 文件，与 `issue-sync` 的 local-first 设计脱节
 
 ## Brainstorm
 
@@ -44,7 +44,7 @@ created_at: 2026-06-24
 
 ```
 cmd_feedback:
-  1. 生成 raw_key → 写 docs/issues/raw-{key}/issue.md
+  1. 生成 raw_key → 写 docs/B1-docs/raw-{key}/issue.md
   2. 调用 issue-sync create raw-{key}
   3. issue-sync 处理多平台创建 + 回写 platform_ids
 ```
@@ -68,7 +68,7 @@ Option B 是唯一正确的架构选择。`issue-sync` 已经提供了完整的�
 
 改动范围（仅 `docs/system/workspace/scripts/runtime/freely` 一个文件）：
 1. `cmd_feedback` 去掉 `--repo` 参数
-2. 生成 `raw_key` → 写 `docs/issues/raw-{key}/issue.md`
+2. 生成 `raw_key` → 写 `docs/B1-docs/raw-{key}/issue.md`
 3. 调用 `bin/issue-sync create` 替代 `gh issue create`
 4. 删除 `_resolve_gh_repo()` helper
 5. 修复 crash reporter 中的 `feedback --repo` 调用

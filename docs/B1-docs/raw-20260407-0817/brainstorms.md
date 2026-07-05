@@ -6,7 +6,7 @@
   - We are reviewing a proposed redesign around source intake, manager visibility, and protected-root-safe materialization.
   - The motivating pain is real:
     - raw sources currently arrive through different surfaces and are easy to overlook
-    - `docs/pre-brainstorms/INDEX.md` is a registry, not a small unconsumed inbox
+    - `docs/B1-docs/INDEX.md` is a registry, not a small unconsumed inbox
     - manager supervision can drift from implementation truth when status writeback lags reality
     - protected `develop` cannot write canonical docs, so any durable governance writeback must happen in a dedicated worktree
 - User proposals under review:
@@ -28,7 +28,7 @@ We are trying to solve a real governance gap without creating a second orchestra
 The concrete pain is:
 
 - unresolved source visibility is fragmented
-- `docs/pre-brainstorms/INDEX.md` is a registry, not a small unresolved inbox
+- `docs/B1-docs/INDEX.md` is a registry, not a small unresolved inbox
 - protected-root manager work cannot safely materialize canonical docs directly
 - some local source signals should survive runtime restart, but should not automatically become git-tracked governance truth
 - doc/runtime status can drift from implementation truth when absorption and writeback are not checked tightly enough
@@ -327,7 +327,7 @@ Current reality:
 
 - product/law routing truth explicitly names `github-issue` as a discovery source
 - there is already an older dedicated pre-research line:
-  - `docs/pre-brainstorms/20260403-1000--external-issue-integration-and-self-evolution/**`
+  - `docs/B1-docs/20260403-1000--external-issue-integration-and-self-evolution/**`
 - current repo does not yet show an equivalent durable local source-document layer for GitHub issues
 - no evidence yet of a unified source inbox path or generic source document for external issues
 
@@ -418,7 +418,7 @@ Implementation implication:
 Current reality:
 
 - does not yet exist as a first-class, small, manager-facing contract
-- `docs/pre-brainstorms/INDEX.md` is not that inbox
+- `docs/B1-docs/INDEX.md` is not that inbox
 - current local intake is family-specific and runtime-oriented
 - current repo does not yet show `~/.freely/projects/<project-hash>/source-inbox/**`
 
@@ -881,7 +881,7 @@ If `docs/sources/**` becomes a durable catch-all for:
 then it becomes a second orchestration truth surface beside:
 
 - `.freely/intake/**`
-- `docs/pre-brainstorms/**`
+- `docs/B1-docs/**`
 - `docs/milestones.md`
 - issue-bound review / verification artifacts
 
@@ -1176,7 +1176,7 @@ They should not become:
 
 That work belongs in:
 
-- `docs/pre-brainstorms/**`
+- `docs/B1-docs/**`
 - milestone / issue / progress / recovery artifacts
 
 So the split should be:
@@ -1329,7 +1329,7 @@ It should not default to a full manager-style project patrol on every worker tur
 
 ### A. What this pre-research supports
 
-1. A distinct raw-source visibility concept separate from `docs/pre-brainstorms/INDEX.md`
+1. A distinct raw-source visibility concept separate from `docs/B1-docs/INDEX.md`
 2. A small unconsumed source queue rather than a growing consumed-history index
 3. Manager dispatch from protected root, with canonical writeback delegated to worker worktrees
 4. Worker-side reality audit before state-changing or status-claiming actions
@@ -1469,7 +1469,7 @@ This matrix is the current safest framing for future hook/gate design.
   - existing issue / continuation
   - manager direct answer / runtime-local resolution
 - canonical absorption target:
-  - `docs/pre-brainstorms/**`
+  - `docs/B1-docs/**`
   - `docs/epics/**`
   - `docs/progress/**` / `docs/recovery/**`
   - runtime-local resolution artifact for direct-answer class
@@ -1493,7 +1493,7 @@ This matrix is the current safest framing for future hook/gate design.
   - pre-brainstorm
   - existing issue-bound IBM if clearly same owner
 - canonical absorption target:
-  - `docs/pre-brainstorms/**`
+  - `docs/B1-docs/**`
   - then milestone / issue materialization as needed
 - unresolved exit condition:
   - external issue is linked to a canonical owner and no longer appears in any unresolved local summary queue, if such a queue exists
@@ -1554,7 +1554,7 @@ This matrix is the current safest framing for future hook/gate design.
   - pre-brainstorm if it reveals a new product/governance gap
 - canonical absorption target:
   - `docs/recovery/**`
-  - `docs/pre-brainstorms/**`
+  - `docs/B1-docs/**`
   - issue/progress only if the anomaly becomes a stable owner-owned problem
 - unresolved exit condition:
   - runtime-local signal may simply age out after recovery or after canonical owner creation

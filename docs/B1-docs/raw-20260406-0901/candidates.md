@@ -8,7 +8,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance/issues/codex-reconnect-probe-fast-fail-and-runtime-network-classification-governance.md`
 - promoted_issue_id: `I-20260406-0901-A`
-- source_brainstorm: `docs/pre-brainstorms/20260406-0901--codex-reconnect-probe-fast-fail/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/20260406-0901--codex-reconnect-probe-fast-fail/brainstorms.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`

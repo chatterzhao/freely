@@ -8,7 +8,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - promoted_issue_path: `docs/epics/workspace-routing-foundation/codex-interactive-login-and-apikey-input-flow-governance/issues/codex-interactive-login-and-apikey-input-flow-governance.md`
 - promoted_issue_id: `I-20260406-1851-A`
-- source_brainstorm: `docs/pre-brainstorms/20260406-1851--codex-interactive-login-and-apikey-input-flow/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/20260406-1851--codex-interactive-login-and-apikey-input-flow/brainstorms.md`
 - session_refs:
   - tool: `codex`
     session_id: `current-thread`

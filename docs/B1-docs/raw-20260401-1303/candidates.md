@@ -3,7 +3,7 @@
 - id: `C-20260401-1303-A`
 - candidate_format_version: `v2`
 - title: Freeze Freely product security baseline across init, doctor, runtime, and status surfaces
-- source_brainstorm: `docs/pre-brainstorms/20260401-1303--freely-product-security-baseline-governance/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/20260401-1303--freely-product-security-baseline-governance/brainstorms.md`
 - problem: Freely currently has narrow security-adjacent governance slices, but no product-level security baseline that defines how default unattended automatic approval must be disclosed, what must be detected and acknowledged during init, how Freely policy maps into tool-specific configuration and launch-time injection, what must be configured by default, and what must be audited before runtime.
 - why_now:
   - recent supply-chain and agent-execution incidents make ad hoc repo habits insufficient

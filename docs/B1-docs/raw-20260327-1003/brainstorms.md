@@ -1,9 +1,9 @@
 # Brainstorms - 20260327-1003--prebrainstorm-materialization-audit
 
 ## Context
-- Source: 2026-03-27 对 `docs/pre-brainstorms/*` 与 `docs/milestones.md` 的全量交叉审计
+- Source: 2026-03-27 对 `docs/B1-docs/*` 与 `docs/milestones.md` 的全量交叉审计
 - Goal: 只记录“不正常”的 pre-brainstorm -> candidate -> milestone materialization 漂移；正常项不重复登记
-- Scope checked: 114 个 `docs/pre-brainstorms/*` 目录
+- Scope checked: 114 个 `docs/B1-docs/*` 目录
 - Audit rule:
   - 已 `promoted` / `materialized` 的 candidate，必须在 `docs/milestones.md` 中可见其 resulting issue 或明确 candidate handoff
   - 已绑定 milestone 的 `needs_research` / `proposed` / `candidate`，必须继续留在对应 milestone 的 `candidate_issues`
@@ -15,23 +15,23 @@
 
 ### A. 已绑定 milestone，但 candidate 没有继续留在 `candidate_issues`
 
-1. `docs/pre-brainstorms/20260320-0052--interruption-direct-answer-control-plane/candidates.md`
+1. `docs/B1-docs/20260320-0052--interruption-direct-answer-control-plane/candidates.md`
 - candidate: `C-20260320-0052-A`
 - current state: `status=needs_research`，`milestone=docs/milestones.md#m-20260306-workspace-routing-foundation`
 - anomaly: milestone 已绑定，但 `docs/milestones.md` 中没有这条 candidate 的可见队列项
 - impact: 研究项会从 active scan 中静默消失，违反 `LAWS 2A/2C` 的 candidate persistence 要求
 
-2. `docs/pre-brainstorms/20260320-0120--interruption-manager-agent-triage/candidates.md`
+2. `docs/B1-docs/20260320-0120--interruption-manager-agent-triage/candidates.md`
 - candidate: `C-20260320-0120-A`
 - current state: `status=needs_research`，`milestone=docs/milestones.md#m-20260306-workspace-routing-foundation`
 - anomaly: 已绑定 milestone，但未出现在 `candidate_issues`
 
-3. `docs/pre-brainstorms/20260320-1745--dirty-worktree-governance-redesign/candidates.md`
+3. `docs/B1-docs/20260320-1745--dirty-worktree-governance-redesign/candidates.md`
 - candidate: `C-20260320-1745-A`
 - current state: `status=candidate`，`milestone=docs/milestones.md#m-20260306-workspace-routing-foundation`
 - anomaly: 已明确属于 `workspace-routing-foundation`，但 milestone 队列缺席
 
-4. `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/candidates.md`
+4. `docs/B1-docs/20260325-0333--testing-evidence-ladder-and-real-environment-gates/candidates.md`
 - candidate: `C-20260325-0333-A`
 - current state: `status=proposed`，`milestone=docs/milestones.md#M-20260306-workspace-routing-foundation`
 - anomaly: umbrella candidate 仍在继续研究，但 milestone 没有保留它的 candidate 可见性
@@ -39,21 +39,21 @@
 
 ### B. candidate 已提升 / 已 materialize，但 milestone 没有收入口径
 
-1. `docs/pre-brainstorms/20260324-0415--application-native-observability-planes/candidates.md`
+1. `docs/B1-docs/20260324-0415--application-native-observability-planes/candidates.md`
 - candidate: `C-20260324-0415-A`
 - current state: `status=promoted`
 - promoted issue: `docs/epics/workspace-routing-foundation/application-native-runtime-observation-contract-and-observability-planes/issues/application-native-runtime-observation-contract-and-observability-planes.md`
 - expected: 在 `M-20260306-workspace-routing-foundation` 的 `candidate_issues` 或 `committed_issues` 中可见
 - anomaly: `docs/milestones.md` 中不存在该 issue，也不存在对应 `source_candidates`
 
-2. `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/candidates.md`
+2. `docs/B1-docs/20260325-0333--testing-evidence-ladder-and-real-environment-gates/candidates.md`
 - candidate: `C-20260325-0333-B`
 - current state: `status=materialized`
 - promoted issue: `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/issues/story-level-pre-tests-quality-gate-governance.md`
 - expected: 在 `M-20260306-workspace-routing-foundation` 中至少以 promoted candidate 或 committed/completed issue 可见
 - anomaly: issue 已存在，但 milestone 中没有该 issue，也没有用 `source_candidates` 指回本 pre-brainstorm
 
-3. `docs/pre-brainstorms/20260326-1810--freely-layered-architecture-and-tooling-topology/candidates.md`
+3. `docs/B1-docs/20260326-1810--freely-layered-architecture-and-tooling-topology/candidates.md`
 - candidate: `C-20260326-1810-A`
 - current state: `status=promoted`
 - promoted issue: `docs/epics/freely-product-architecture/freely-layered-architecture-and-tooling-topology/issues/freely-layered-architecture-and-tooling-topology.md`
@@ -62,19 +62,19 @@
 
 ### C. pre-brainstorm 自身状态漂移，已经指向现有 issue，但字段仍不一致
 
-1. `docs/pre-brainstorms/20260318-2245--worktree-pid-ownership-validation/candidates.md`
+1. `docs/B1-docs/20260318-2245--worktree-pid-ownership-validation/candidates.md`
 - candidate: `C-20260318-A`
 - current state: `promoted_issue_path` 已指向 `checkpoint-commit-and-multi-worktree-supervision-governance`
 - anomaly: `milestone` 仍是 `pending://issue-materialization`
 - interpretation: 这条线已经被吸收到既有 issue，但 pre-brainstorm 文档没有完成 normalization
 
-2. `docs/pre-brainstorms/20260318-2358--manager-workcell-supervision-and-continuity/candidates.md`
+2. `docs/B1-docs/20260318-2358--manager-workcell-supervision-and-continuity/candidates.md`
 - candidates: `C-20260318-2358-A`, `C-20260318-2358-B`
 - current state: `status=proposed`，但 `promoted_issue_path` 都已指向 `checkpoint-commit-and-multi-worktree-supervision-governance`
 - anomaly: candidate 状态仍停留在 `proposed`，与已存在的 issue 映射冲突；同时 milestone 没有把这份 pre-brainstorm 作为 supporting provenance 挂住
 - interpretation: 这里需要决定它们是“absorbed supporting evidence”，还是要重新拆成独立 follow-on candidate
 
-3. `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md`
+3. `docs/B1-docs/20260318-1630--global-ai-account-watchdog/candidates.md`
 - candidate: `C-20260318-A`
 - current state: `promoted_issue_path=pending://issue-materialization`，`milestone=pending://milestone-binding`
 - anomaly: `docs/milestones.md` 已把这个 pre-brainstorm 作为 `I-20260318-1630` 的 `source_candidates`，但 pre-brainstorm 仍像未 materialize
@@ -84,61 +84,61 @@
 
 这类条目不是“正常旧档案”。它们仍是 active candidate，却没有进入任何 milestone 可见队列，违反当前 `candidate persistence` 规则。
 
-1. `docs/pre-brainstorms/20260303-0000--ai-consistency-closed-loop-freely-alignment/candidates.md`
+1. `docs/B1-docs/20260303-0000--ai-consistency-closed-loop-freely-alignment/candidates.md`
 - candidates: `C-20260303-001`, `C-20260303-002`
 - current state: `needs_research`，但 `milestone=pending://milestone-binding`
 
-2. `docs/pre-brainstorms/20260304-0000--architecture-backend-first-and-frontend-decoupling/candidates.md`
+2. `docs/B1-docs/20260304-0000--architecture-backend-first-and-frontend-decoupling/candidates.md`
 - candidate: `C-20260304-202`
 - current state: `proposed`，但 `milestone=pending://milestone-binding`
 
-3. `docs/pre-brainstorms/20260304-0000--openclaw-workspace-freely-feasibility/candidates.md`
+3. `docs/B1-docs/20260304-0000--openclaw-workspace-freely-feasibility/candidates.md`
 - candidate: `C-20260304-501`
 - current state: `needs_research`，但 `milestone=pending://milestone-binding`
 
-4. `docs/pre-brainstorms/20260304-0000--research-redo-owner-tool-alignment/candidates.md`
+4. `docs/B1-docs/20260304-0000--research-redo-owner-tool-alignment/candidates.md`
 - candidates: `C-20260304-605`, `C-20260304-607`
 - current state: active candidate 仍未绑定 milestone
 
-5. `docs/pre-brainstorms/20260305-0000--doc-loop-dev-loop-directory-unification/candidates.md`
+5. `docs/B1-docs/20260305-0000--doc-loop-dev-loop-directory-unification/candidates.md`
 - candidate: `C-20260305-803`
 - current state: `needs_research`，但没有正式 milestone queue
 
-6. `docs/pre-brainstorms/20260305-0000--freely-dogfooding-governance-worktree-policy/candidates.md`
+6. `docs/B1-docs/20260305-0000--freely-dogfooding-governance-worktree-policy/candidates.md`
 - candidate: `C-20260305-703`
 - current state: `needs_research`，但没有正式 milestone queue
 
-7. `docs/pre-brainstorms/20260306-0016--freely-githooks-install-mode/candidates.md`
+7. `docs/B1-docs/20260306-0016--freely-githooks-install-mode/candidates.md`
 - candidate: `C-20260306-002`
 - current state: `needs_research`，但没有正式 milestone queue
 
-8. `docs/pre-brainstorms/20260309-1943--agent-skills-standard-compliance/candidates.md`
+8. `docs/B1-docs/20260309-1943--agent-skills-standard-compliance/candidates.md`
 - candidate: `C-20260309-1943`
 - current state: `proposed`，但没有正式 milestone queue
 
-9. `docs/pre-brainstorms/20260309-2003--document-skill-boundary-planning/candidates.md`
+9. `docs/B1-docs/20260309-2003--document-skill-boundary-planning/candidates.md`
 - candidates: `C-20260309-2003-A`, `C-20260309-2003-B`, `C-20260309-2003-C`
 - current state: 三条都还是 `proposed`，但没有正式 milestone queue
 
-10. `docs/pre-brainstorms/20260309-2345--governance-check-naming-alignment/candidates.md`
+10. `docs/B1-docs/20260309-2345--governance-check-naming-alignment/candidates.md`
 - candidates: `C-20260309-2345-A`, `C-20260309-2345-B`
 - current state: `proposed`，但没有正式 milestone queue
 
-11. `docs/pre-brainstorms/20260310-0056--evolver-autonomous-development-leverage/candidates.md`
+11. `docs/B1-docs/20260310-0056--evolver-autonomous-development-leverage/candidates.md`
 - candidates: `C-20260310-0056-A`, `C-20260310-0056-B`
 - current state: active candidate 仍未绑定 milestone
 
-12. `docs/pre-brainstorms/20260320-0512--milestone-planning-and-state-maintenance/candidates.md`
+12. `docs/B1-docs/20260320-0512--milestone-planning-and-state-maintenance/candidates.md`
 - candidate: `C-20260327-parked-worktree-retirement`
 - current state: `needs_research`，但仍是 `pending://milestone-binding`
 
-13. `docs/pre-brainstorms/20260321-1835--lifecycle-complete-before-merge-governance/candidates.md`
+13. `docs/B1-docs/20260321-1835--lifecycle-complete-before-merge-governance/candidates.md`
 - candidate: `C-20260321-1835-A`
 - current state: `proposed`，但仍是 `pending://milestone-binding`
 
 ### E. legacy `done` 条目没有正规 milestone / issue 归档
 
-1. `docs/pre-brainstorms/20260318-1818--ai-cli-availability-manager/candidates.md`
+1. `docs/B1-docs/20260318-1818--ai-cli-availability-manager/candidates.md`
 - candidates: `C-20260318-A` 到 `C-20260318-G`
 - current state: 全部 `status=done`
 - anomaly: 仍停留在 pre-brainstorm 自说自话的 `done`，既不符合当前 `phase_state` 词典，也没有 milestone / owner issue 的正式落点
@@ -170,25 +170,25 @@
 
 这些条目已经能追溯到现有 owner issue 或能力真源，不应再被当成“没有后续实现”；真正缺的是 pre-brainstorm 字段回写与 provenance 归一。
 
-1. `docs/pre-brainstorms/20260318-2245--worktree-pid-ownership-validation/candidates.md`
+1. `docs/B1-docs/20260318-2245--worktree-pid-ownership-validation/candidates.md`
 - 现状：`promoted_issue_path` 已指向 `checkpoint-commit-and-multi-worktree-supervision-governance`
 - refined verdict: `normalization-only drift`
 
-2. `docs/pre-brainstorms/20260318-2358--manager-workcell-supervision-and-continuity/candidates.md`
+2. `docs/B1-docs/20260318-2358--manager-workcell-supervision-and-continuity/candidates.md`
 - 两条 candidate 都已指向 `checkpoint-commit-and-multi-worktree-supervision-governance`
 - 但 status 仍是 `proposed`
 - refined verdict: `absorbed-by-existing-issue but not normalized`
 
-3. `docs/pre-brainstorms/20260318-1630--global-ai-account-watchdog/candidates.md`
+3. `docs/B1-docs/20260318-1630--global-ai-account-watchdog/candidates.md`
 - milestone、issue、progress 都存在：`I-20260318-1630` 已 completed，且 issue 明确引用该 pre-brainstorm
 - refined verdict: `owner exists; pre-brainstorm fields stale`
 
-4. `docs/pre-brainstorms/20260310-0056--evolver-autonomous-development-leverage/candidates.md`
+4. `docs/B1-docs/20260310-0056--evolver-autonomous-development-leverage/candidates.md`
 - `C-20260310-0056-A` 已在 `docs/milestones.md` 的 candidate queue 中可见
 - refined verdict: `A 条不是缺 milestone，而是 pre-brainstorm 仍未把 milestone 字段正常化`
 - note: `C-20260310-0056-B` 仍未单独出现在 milestone queue，因此 B 条仍属 active candidate visibility gap
 
-5. `docs/pre-brainstorms/20260318-1818--ai-cli-availability-manager/candidates.md`
+5. `docs/B1-docs/20260318-1818--ai-cli-availability-manager/candidates.md`
 - 这组并非“完全没有实现”：repo 已存在 `skill:ai-cli-availability-manager`，`I-20260318-1630` 也把 availability watchdog / bootstrap 吸收为 canonical owner 的一部分
 - 但 pre-brainstorm 内部仍保留 pre-v2 的多条 `done` 子项，且没有逐条声明各自最终去向
 - refined verdict: `substance largely absorbed, normalization debt remains`

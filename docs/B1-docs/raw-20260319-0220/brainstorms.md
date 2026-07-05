@@ -175,7 +175,7 @@ owner:
   - 这些内容更适合作为新的治理 pre-brainstorm 输入，而不是继续保留老 worktree 作为活跃执行枝
 
 handoff target:
-- `docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/*`
+- `docs/B1-docs/20260319-0220--watchdog-control-plane-governance/*`
 
 retirement precondition:
 - 新 pre-brainstorm 已记录 umbrella term、skill/runtime 分层、旧 worktree disposition
@@ -194,9 +194,9 @@ retirement after:
 
 ## Intended Landing
 
-- `docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/brainstorms.md`
-- `docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/candidates.md`
-- `docs/pre-brainstorms/INDEX.md`
+- `docs/B1-docs/20260319-0220--watchdog-control-plane-governance/brainstorms.md`
+- `docs/B1-docs/20260319-0220--watchdog-control-plane-governance/candidates.md`
+- `docs/B1-docs/INDEX.md`
 
 后续如继续 materialize，目标应是：
 
@@ -219,7 +219,7 @@ retirement after:
   - 目前没有新的失败测试或 code-review 直接要求进入 dev-loop
 - human chat / session evidence
   - 当前会话明确要求进入 Freely 首跳闭环，并核对 watchdog control plane 研究线的路由
-  - `docs/pre-brainstorms/CONVERGENCE.md` 已记录旧工位 `materialize_then_retire` 的 handoff 证据
+  - `docs/B1-docs/CONVERGENCE.md` 已记录旧工位 `materialize_then_retire` 的 handoff 证据
 - github issue
   - 本轮未发现新的 github issue 输入
 - `docs/PROJECT_INTENT.md`
@@ -241,7 +241,7 @@ retirement after:
 
 1. umbrella taxonomy、skill/runtime 边界与 retirement disposition 的主要内容已经分别被现有正式 issue 和 `watchdog-control-plane` skill 吸收，不适合再重新物化成一个新的单体 IBM issue。
 2. 当前缺的不是更多研究，而是把候选与已有 `I-20260318-1630`、`I-20260318-1408`、`I-20260319-0018` 及 `watchdog-control-plane` skill 的承接关系写清。
-3. 旧 worktree retirement 已在 `docs/pre-brainstorms/CONVERGENCE.md` 留痕；当前需要的是 disposition 对齐与归档，而不是重开 issue。
+3. 旧 worktree retirement 已在 `docs/B1-docs/CONVERGENCE.md` 留痕；当前需要的是 disposition 对齐与归档，而不是重开 issue。
 
 ### Binding result
 
@@ -253,7 +253,7 @@ retirement after:
   - continuity extraction 已确认进入稳定 issue `I-20260319-0018` 的 IBM 收口
   - disposition: promote 到既有 issue，下一跳走 `doc-ibm-execution`
 - `C-20260319-0220-C`
-  - 已被 `docs/pre-brainstorms/CONVERGENCE.md` 的 `materialize_then_retire` handoff 与当前 brainstorm 的 retirement heuristic 吸收
+  - 已被 `docs/B1-docs/CONVERGENCE.md` 的 `materialize_then_retire` handoff 与当前 brainstorm 的 retirement heuristic 吸收
   - disposition: archive，不新开 IBM
 
 ### Workspace judgment
@@ -269,7 +269,7 @@ retirement after:
 
 ### Next recommended action
 
-- 继续作为 `pre_brainstorm` 留在 `docs/pre-brainstorms/20260319-0220--watchdog-control-plane-governance/`
+- 继续作为 `pre_brainstorm` 留在 `docs/B1-docs/20260319-0220--watchdog-control-plane-governance/`
 - 把 A / C 从 active candidate queue 收口为 archive trace
 - 把 B 提升并绑定到 `I-20260319-0018`，从 active candidate queue 移出
 - 当前 pre-brainstorm 已完成 binding 和 archive，不再继续扩研究 scope

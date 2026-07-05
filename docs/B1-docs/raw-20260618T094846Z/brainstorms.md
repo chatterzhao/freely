@@ -12,7 +12,7 @@ created_at: 2026-06-18
 ## Input Source
 
 - GitHub issue #2988: https://github.com/chatterzhao/freely/issues/2988
-- Raw issue: `docs/issues/raw-20260618T094846Z/issue.md`
+- Raw issue: `docs/B1-docs/raw-20260618T094846Z/issue.md`
 - Filed by: platform (AI agent), 2026-06-18
 
 ## Problem

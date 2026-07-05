@@ -60,7 +60,7 @@ README 关键信息：
    - `docs/CONSTITUTION.md`
    - `docs/LAWS.md`
    - `docs/PROJECT_INTENT.md`
-   - `docs/pre-brainstorms/`
+   - `docs/B1-docs/`
    - issue / milestone / review / tests 等治理产物
 
 2. `mem9` 只承接可外部化的“连续性增强层”：

@@ -3,7 +3,7 @@
 - id: `C-20260401-0115-A`
 - candidate_format_version: `v2`
 - title: Materialize automation-first supply-chain and install-intake baseline audit
-- source_brainstorm: `docs/pre-brainstorms/20260401-0115--supply-chain-baseline-and-install-intake-audit-capability/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/20260401-0115--supply-chain-baseline-and-install-intake-audit-capability/brainstorms.md`
 - problem: Freely still lacks a canonical automation-first audit for lockfile presence, risky install lifecycle scripts, non-registry dependency specifiers, and mutable GitHub Actions refs. That leaves a real security baseline topic trapped in human review memory.
 - why_now:
   - the broader security baseline explicitly called out supply-chain, install script, and mutable action ref risk

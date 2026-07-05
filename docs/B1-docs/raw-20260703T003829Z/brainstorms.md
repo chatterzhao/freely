@@ -10,7 +10,7 @@ created_at: 2026-07-03
 # B1_IBM: workcell-state.env unsafe source 导致 daemon 启动时命令注入
 
 ## Input
-- 来源: `docs/issues/raw-20260703T003829Z/issue.md`
+- 来源: `docs/B1-docs/raw-20260703T003829Z/issue.md`
 - 平台: GitHub #3699, Gitee IJYGUQ
 - 严重程度: P1 — daemon 无法启动
 

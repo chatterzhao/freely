@@ -10,7 +10,7 @@ created_at: 2026-06-30
 # B1_IBM: A2A Server 健康检查协议错误导致日志轰炸和启动超时
 
 ## Input
-- raw issue: `docs/issues/raw-20260630T085809Z/issue.md`
+- raw issue: `docs/B1-docs/raw-20260630T085809Z/issue.md`
 - 平台: GitHub #3647, Gitee #IJXVF2
 - 发现方式: `freely start --task-mode auto` 启动时观测
 

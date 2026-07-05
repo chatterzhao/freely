@@ -13,4 +13,4 @@ Update C-20260618T015503Z-A acceptance_criteria to match actual implementation (
 The path audit for #2956 used grep for docs/issues. Call-chain tracing would have caught _fill_platform_ids and worktree-common.sh wrapper. Document this as a lesson for future audits.
 
 ### 3. wt-close guard
-Before deleting worktree, check if raw issue exists in develop's docs/issues/. If not, copy from worktree. Prevents data loss.
+Before deleting worktree, check if raw issue exists in develop's docs/B1-docs/. If not, copy from worktree. Prevents data loss.

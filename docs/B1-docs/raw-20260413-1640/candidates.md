@@ -11,7 +11,7 @@
 
 - candidate_format_version: `v2`
 - title: Tasks closeout completion and adequacy gate governance
-- source_brainstorm: `docs/pre-brainstorms/20260413-1640--tasks-closeout-completion-and-adequacy-gate/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/20260413-1640--tasks-closeout-completion-and-adequacy-gate/brainstorms.md`
 - reopen_of_issue: `docs/epics/workspace-routing-foundation/structured-closeout-gate-context-and-review-evidence-governance/issues/structured-closeout-gate-context-and-review-evidence-governance.md`
 - reopen_reason: `a real owner audit and guarded develop replay proved closeout contract hardening still omitted tasks.md, allowing completed lifecycle truth to drift from unchecked execution closeout boxes`
 - problem: `pretests-gate` bound completion and guarded adequacy to issue `pre-tests.md` but did not also require sibling `tasks.md` closeout completeness, so owners could be recorded as completed while leaving unchecked execution tasks behind.

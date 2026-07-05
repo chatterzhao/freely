@@ -2,7 +2,7 @@
 
 - id: `C-20260327-1003-A`
 - title: Pre-brainstorm materialization audit and normalization follow-up
-- source_brainstorm: `docs/pre-brainstorms/20260327-1003--prebrainstorm-materialization-audit/brainstorms.md`
+- source_brainstorm: `docs/B1-docs/20260327-1003--prebrainstorm-materialization-audit/brainstorms.md`
 - status: `candidate`
 - adoption_type: `planning_truth`
 - milestone: `M-20260306-workspace-routing-foundation`
@@ -17,7 +17,7 @@
   - 当前已经可以冻结后续治理 lane，但还不适合直接把整份 audit materialize 成单一 issue，因为后续动作会分别回到 milestone reconciliation、pre-brainstorm normalization 与 absorption-or-drop sweep。
   - 因此这里保留为开发治理真源，负责记录异常分类、收口边界与后续 lane。
 - scope:
-  - 审计 `docs/pre-brainstorms/*` 与 `docs/milestones.md` 的 materialization 漂移
+  - 审计 `docs/B1-docs/*` 与 `docs/milestones.md` 的 materialization 漂移
   - 区分 milestone-only gap、normalization drift、partial absorption 与 legacy active debt
   - 给出最小收口方式，避免继续扩大扫描面
 - next_action:

@@ -59,7 +59,7 @@ Freely 的目标不是“一个保守的 AI 辅助壳”，而是 owner-grade AI
 
 已有最接近的前史是：
 
-- `docs/pre-brainstorms/20260329-2155--sensitive-local-artifact-ignore-governance/**`
+- `docs/B1-docs/20260329-2155--sensitive-local-artifact-ignore-governance/**`
 - `docs/epics/workspace-routing-foundation/sensitive-local-artifact-ignore-governance/**`
 
 这条线已经证明：

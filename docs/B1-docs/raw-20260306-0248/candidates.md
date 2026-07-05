@@ -57,7 +57,7 @@
 - title: `doc-pre-brainstorm-execution.md`
 - problem: 当前缺少一个真正按“工作能力”命名的 pre-brainstorm 执行 skill，导致“没有 usable issue”这种路由条件被误建模成技能本体。
 - why_now: `pre-brainstorm` 是独立的文档工作环，不只是路由结果；如果不把它抽成正式执行 skill，`context-source-skill` 与中间 handoff skill 会继续重叠。
-- acceptance_hint: 创建 `docs/system/workspace/skills/doc-pre-brainstorm-execution/SKILL.md`，明确：1) 它属于 docs 工作的一种前置形态；2) 负责前置研究收敛；3) 产出 `docs/pre-brainstorms/<id>/brainstorms.md` 与 `candidates.md`；4) candidate 必须原子同步进 `docs/milestones.md`；5) 它不产出正式 issue-bound `brainstorms/prd/pre-tests/tasks`。
+- acceptance_hint: 创建 `docs/system/workspace/skills/doc-pre-brainstorm-execution/SKILL.md`，明确：1) 它属于 docs 工作的一种前置形态；2) 负责前置研究收敛；3) 产出 `docs/B1-docs/<id>/brainstorms.md` 与 `candidates.md`；4) candidate 必须原子同步进 `docs/milestones.md`；5) 它不产出正式 issue-bound `brainstorms/prd/pre-tests/tasks`。
 - priority: P0
 - status: promoted
 - decision_reason: `pre-brainstorm` 本身是独立执行环；用“没 issue”来命名 skill 会把路由条件和工作能力混在一起。

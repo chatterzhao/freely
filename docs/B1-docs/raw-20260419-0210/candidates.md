@@ -1,6 +1,6 @@
 # Candidates - 20260419-0210--protected-branch-ref-only-entrypoint-gap
 
-- Source brainstorm: `docs/pre-brainstorms/20260419-0210--protected-branch-ref-only-entrypoint-gap/brainstorms.md`
+- Source brainstorm: `docs/B1-docs/20260419-0210--protected-branch-ref-only-entrypoint-gap/brainstorms.md`
 
 ### C-20260419-0210-A
 
