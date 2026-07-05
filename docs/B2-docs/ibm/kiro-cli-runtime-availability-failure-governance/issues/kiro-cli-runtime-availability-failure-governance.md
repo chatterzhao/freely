@@ -8,8 +8,8 @@
 - story-name: `kiro-cli-runtime-availability-failure-governance`
 - issue-name: `kiro-cli-runtime-availability-failure-governance`
 - priority: P1
-- source_candidate: `docs/pre-brainstorms/20260331-1830--kiro-cli-monthly-request-limit-runtime-loop-governance/candidates.md#c-20260331-1830-a`
-- source_brainstorm: `docs/pre-brainstorms/20260331-1830--kiro-cli-monthly-request-limit-runtime-loop-governance/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260331-1830/candidates.md#c-20260331-1830-a`
+- source_brainstorm: `docs/B1-docs/raw-20260331-1830/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/kiro-cli-runtime-availability-failure-governance/pre-tests.md`

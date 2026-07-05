@@ -2,5 +2,5 @@
 - kind: fix
 - phase_state: completed
 - milestone: M-20260522T075012Z-A
-- source_candidate: docs/pre-brainstorms/20260522T075012Z--fix-help-text/candidates.md#C-20260522T075012Z-A
-- canonical_issue_path: docs/issues/I-20260522T075012Z-A/issue.md
+- source_candidate: docs/B1-docs/raw-20260522T075012Z/candidates.md#C-20260522T075012Z-A
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260522T075012Z-A/issue.md

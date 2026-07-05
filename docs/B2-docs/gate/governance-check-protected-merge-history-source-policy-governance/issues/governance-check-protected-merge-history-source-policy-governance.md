@@ -8,8 +8,8 @@
 - story-name: `governance-check-protected-merge-history-source-policy-governance`
 - issue-name: `governance-check-protected-merge-history-source-policy-governance`
 - priority: `P0`
-- source_candidate: `docs/pre-brainstorms/20260406-0045--governance-check-protected-merge-history-source-policy/candidates.md#c-20260406-0045-a`
-- source_brainstorm: `docs/pre-brainstorms/20260406-0045--governance-check-protected-merge-history-source-policy/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260406-0045/candidates.md#c-20260406-0045-a`
+- source_brainstorm: `docs/B1-docs/raw-20260406-0045/brainstorms.md`
 - execution_base: `feature/governance-check-protected-merge-history-20260406-0045`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/governance-check-protected-merge-history-source-policy-governance/pre-tests.md`

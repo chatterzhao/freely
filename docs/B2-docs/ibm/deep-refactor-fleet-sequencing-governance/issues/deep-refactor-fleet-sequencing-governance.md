@@ -9,8 +9,8 @@
 - issue-name: `deep-refactor-fleet-sequencing-governance`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/deep-refactor-fleet-sequencing-governance/code-reviews`
 - priority: P0
-- source_candidate: `docs/pre-brainstorms/20260326-1825--deep-refactor-fleet-sequencing/candidates.md#c-20260326-1825-a`
-- source_brainstorm: `docs/pre-brainstorms/20260326-1825--deep-refactor-fleet-sequencing/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260326-1825/candidates.md#c-20260326-1825-a`
+- source_brainstorm: `docs/B1-docs/raw-20260326-1825/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
@@ -69,8 +69,8 @@ Freely 在准备 broad/deep refactor 时，真实 fleet 一度同时存在：
 ## Completion
 
 - `AGENTS.md`
-- `docs/pre-brainstorms/20260326-1825--deep-refactor-fleet-sequencing/brainstorms.md`
-- `docs/pre-brainstorms/20260326-1825--deep-refactor-fleet-sequencing/candidates.md`
+- `docs/B1-docs/raw-20260326-1825/brainstorms.md`
+- `docs/B1-docs/raw-20260326-1825/candidates.md`
 - `docs/epics/workspace-routing-foundation/deep-refactor-fleet-sequencing-governance/issues/deep-refactor-fleet-sequencing-governance.md`
 - `docs/epics/workspace-routing-foundation/deep-refactor-fleet-sequencing-governance/brainstorms/b-deep-refactor-fleet-sequencing-governance.md`
 - `docs/epics/workspace-routing-foundation/deep-refactor-fleet-sequencing-governance/prd.md`

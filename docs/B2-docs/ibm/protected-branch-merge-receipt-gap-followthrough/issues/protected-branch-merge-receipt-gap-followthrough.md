@@ -8,8 +8,8 @@
 - story-name: `protected-branch-merge-receipt-gap-followthrough`
 - issue-name: `protected-branch-merge-receipt-gap-followthrough`
 - priority: P1
-- source_candidate: `docs/pre-brainstorms/20260404-0640--protected-branch-merge-receipt-gap-followthrough/candidates.md#c-20260404-0640-a`
-- source_brainstorm: `docs/pre-brainstorms/20260404-0640--protected-branch-merge-receipt-gap-followthrough/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260404-0640/candidates.md#c-20260404-0640-a`
+- source_brainstorm: `docs/B1-docs/raw-20260404-0640/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/pre-tests.md`
@@ -52,9 +52,9 @@ Freely 已经要求 protected-branch merge 写 canonical receipt trailer，也�
 
 ## Completion
 
-- `docs/pre-brainstorms/20260404-0640--protected-branch-merge-receipt-gap-followthrough/brainstorms.md`
-- `docs/pre-brainstorms/20260404-0640--protected-branch-merge-receipt-gap-followthrough/candidates.md`
-- `docs/pre-brainstorms/INDEX.md`
+- `docs/B1-docs/raw-20260404-0640/brainstorms.md`
+- `docs/B1-docs/raw-20260404-0640/candidates.md`
+- `docs/B1-docs/raw-INDEX.md`
 - `docs/milestones.md`
 - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/issues/protected-branch-merge-receipt-gap-followthrough.md`
 - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-gap-followthrough/prd.md`

@@ -4,7 +4,7 @@ kind: linked
 status: in_dev
 phase_state: completed
 promoted_from: raw-20260618T031437Z
-source_candidate: docs/pre-brainstorms/20260618T031437Z--wt-close-remote-delete-fix/candidates.md
+source_candidate: docs/B1-docs/raw-20260618T031437Z/candidates.md
 pre_tests_path: docs/epics/wt-close-remote-delete-fix/verification/pre-tests.md
 verification_artifact_dir: docs/epics/wt-close-remote-delete-fix/code-reviews
 platform_ids:

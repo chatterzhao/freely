@@ -3,7 +3,7 @@ local_id: I-20260617T110109Z-A
 kind: linked
 status: in_dev
 phase_state: completed
-source_candidate: docs/pre-brainstorms/20260617T110109Z--remove-prompt-file/candidates.md
+source_candidate: docs/B1-docs/raw-20260617T110109Z/candidates.md
 promoted_from: raw-20260617T110109Z
 verification_artifact_dir: docs/epics/remove-prompt-file/code-reviews
 platform_ids:

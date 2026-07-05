@@ -2,7 +2,7 @@
 - kind: fix
 - phase_state: completed
 - milestone: M-20260630T085809Z-A
-- source_candidate: docs/pre-brainstorms/20260630T085809Z--a2a-healthcheck-fix/candidates.md#C-20260630T085809Z-A
+- source_candidate: docs/B1-docs/raw-20260630T085809Z/candidates.md#C-20260630T085809Z-A
 - verification_artifact_dir: docs/epics/a2a-healthcheck-fix/socket-healthcheck/code-reviews
 - pre_tests_path: docs/epics/a2a-healthcheck-fix/socket-healthcheck/pre-tests.md
 - canonical_issue_path: ""
@@ -10,7 +10,7 @@
 
 # I-20260630T085809Z-A: A2A Server 健康检查修复
 
-- source_candidate: docs/pre-brainstorms/20260630T085809Z--a2a-healthcheck-fix/candidates.md#C-20260630T085809Z-A
+- source_candidate: docs/B1-docs/raw-20260630T085809Z/candidates.md#C-20260630T085809Z-A
 - verification_artifact_dir: docs/epics/a2a-healthcheck-fix/socket-healthcheck/code-reviews
 
 ## 实现

@@ -2,10 +2,10 @@
 local_id: I-20260621T063130Z-A
 kind: linked
 phase_state: completed
-source_candidate: docs/pre-brainstorms/20260621T063130Z--wt-close-test-premerge-cleanup/candidates.md#C-20260621T063130Z-A
+source_candidate: docs/B1-docs/raw-20260621T063130Z/candidates.md#C-20260621T063130Z-A
 platform_ids: {}
 primary_platform: github
-canonical_issue_path: docs/pre-brainstorms/20260621T063130Z--wt-close-test-premerge-cleanup/candidates.md
+canonical_issue_path: docs/B1-docs/raw-20260621T063130Z/candidates.md
 created_at: '2026-06-21T06:31:30Z'
 author: claude
 channel: claude

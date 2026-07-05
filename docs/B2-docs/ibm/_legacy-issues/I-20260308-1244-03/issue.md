@@ -31,8 +31,8 @@ platform_state: closed
 - epic-name: `frontend-probe-dogfooding-loop`
 - story-name: `frontend-runtime-baseline-for-probe`
 - issue-name: `frontend-runtime-baseline-for-probe`
-- source_candidate: `docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/candidates.md#c-20260317-1101`
-- source_brainstorm: `docs/pre-brainstorms/20260317-1101--frontend-runtime-baseline-for-probe/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260317-1101/candidates.md#c-20260317-1101`
+- source_brainstorm: `docs/B1-docs/raw-20260317-1101/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/frontend-probe-dogfooding-loop/frontend-runtime-baseline-for-probe/pre-tests.md`

@@ -8,8 +8,8 @@
 - story-name: `milestone-planning-and-state-maintenance`
 - issue-name: `milestone-planning-and-state-maintenance`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/milestone-planning-and-state-maintenance/code-reviews`
-- source_candidate: `docs/pre-brainstorms/20260320-0512--milestone-planning-and-state-maintenance/candidates.md#c-20260320-0512-a`
-- source_brainstorm: `docs/pre-brainstorms/20260320-0512--milestone-planning-and-state-maintenance/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260320-0512/candidates.md#c-20260320-0512-a`
+- source_brainstorm: `docs/B1-docs/raw-20260320-0512/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `docs/milestones.md#m-20260306-workspace-routing-foundation`
@@ -44,7 +44,7 @@ Freely 已经把 milestone 当成 standing source 和编排入口，但对 miles
 - `docs/system/workspace/skills/milestone-planning-state-maintenance/SKILL.md`
 - `docs/system/workspace/skills/README.md`
 - `docs/system/workspace/three-loop-capability-lifecycle.md`
-- `docs/pre-brainstorms/20260320-0512--milestone-planning-and-state-maintenance/**`
+- `docs/B1-docs/raw-20260320-0512/**`
 
 ## Verification
 
@@ -58,7 +58,7 @@ Freely 已经把 milestone 当成 standing source 和编排入口，但对 miles
 - `docs/system/workspace/skills/milestone-planning-state-maintenance/SKILL.md`
 - `docs/system/workspace/skills/README.md`
 - `docs/system/workspace/three-loop-capability-lifecycle.md`
-- `docs/pre-brainstorms/20260320-0512--milestone-planning-and-state-maintenance/**`
+- `docs/B1-docs/raw-20260320-0512/**`
 
 ## Completion Note
 

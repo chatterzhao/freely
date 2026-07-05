@@ -3,8 +3,8 @@ local_id: I-20260616T110714Z-parse-env-removal
 kind: linked
 phase_state: completed
 promoted_from: raw-20260616T110714Z
-source_candidate: docs/pre-brainstorms/20260616T110714Z--parse-env-file-removal/candidates.md
-canonical_issue_path: docs/issues/I-20260616T110714Z-parse-env-removal/issue.md
+source_candidate: docs/B1-docs/raw-20260616T110714Z/candidates.md
+canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260616T110714Z-parse-env-removal/issue.md
 verification_artifact_dir: docs/epics/config-toml-complete/code-reviews
 primary_platform: github
 platform_ids:

@@ -8,8 +8,8 @@
 - story-name: `codex-real-exec-switch-and-after-failure-recovery-governance`
 - issue-name: `codex-real-exec-switch-and-after-failure-recovery-governance`
 - priority: `P1`
-- source_candidate: `docs/pre-brainstorms/20260410-1835--codex-limit-triggered-slot-recovery-and-real-bin-ai-verification/candidates.md#c-20260410-1835-b`
-- source_brainstorm: `docs/pre-brainstorms/20260410-1835--codex-limit-triggered-slot-recovery-and-real-bin-ai-verification/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260410-1835/candidates.md#c-20260410-1835-b`
+- source_brainstorm: `docs/B1-docs/raw-20260410-1835/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/codex-real-exec-switch-and-after-failure-recovery-governance/pre-tests.md`

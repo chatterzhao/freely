@@ -3,8 +3,8 @@ issue_id: I-20260618T091116Z-A
 kind: fix
 phase_state: completed
 milestone: M-20260618T091116Z-A
-source_candidate: docs/pre-brainstorms/raw-20260618T091116Z-write-task-mode-ordering/candidates.md#C-20260618T091116Z-A
-canonical_issue_path: docs/issues/I-20260618T091116Z-A/issue.md
+source_candidate: docs/B1-docs/raw-20260618T091116Z-write-task-mode-ordering/candidates.md#C-20260618T091116Z-A
+canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260618T091116Z-A/issue.md
 title: Fix write_task_mode ordering — ensure DB daemon running first
 ---
 
@@ -13,7 +13,7 @@ title: Fix write_task_mode ordering — ensure DB daemon running first
 - title: Fix write_task_mode ordering — ensure DB daemon running first
 - source: `raw-20260618T091116Z` (GitHub #2985)
 - milestone: M-20260618T091116Z-A
-- source_candidate: `docs/pre-brainstorms/raw-20260618T091116Z-write-task-mode-ordering/candidates.md#C-20260618T091116Z-A`
+- source_candidate: `docs/B1-docs/raw-20260618T091116Z-write-task-mode-ordering/candidates.md#C-20260618T091116Z-A`
 - issue_id: I-20260618T091116Z-A
 - phase_state: completed
 - component: runtime

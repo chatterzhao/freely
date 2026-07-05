@@ -8,8 +8,8 @@
 - story-name: `governance-merge-gate-milestone-status-followthrough-governance`
 - issue-name: `governance-merge-gate-milestone-status-followthrough-governance`
 - priority: P1
-- source_candidate: `docs/pre-brainstorms/20260404-0119--governance-merge-gate-milestone-status-followthrough/candidates.md#c-20260404-0119-a`
-- source_brainstorm: `docs/pre-brainstorms/20260404-0119--governance-merge-gate-milestone-status-followthrough/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260404-0119/candidates.md#c-20260404-0119-a`
+- source_brainstorm: `docs/B1-docs/raw-20260404-0119/brainstorms.md`
 - reopen_of_issue: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md`
 - reopen_reason: `real replay surfaced a parser regression where nested milestone queue item status lines overwrite parent milestone status inside governance-merge-gate`
 - execution_base: `develop`

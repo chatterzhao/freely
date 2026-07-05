@@ -8,8 +8,8 @@
 - story-name: `implementation-decision-notes-in-issue-review-artifacts-governance`
 - issue-name: `implementation-decision-notes-in-issue-review-artifacts-governance`
 - priority: P0
-- source_candidate: `docs/pre-brainstorms/20260401-2354--implementation-decision-notes-in-review-artifacts/candidates.md#c-20260401-2354-a`
-- source_brainstorm: `docs/pre-brainstorms/20260401-2354--implementation-decision-notes-in-review-artifacts/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260401-2354/candidates.md#c-20260401-2354-a`
+- source_brainstorm: `docs/B1-docs/raw-20260401-2354/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/pre-tests.md`
@@ -81,8 +81,8 @@ Freely 已经在 pre-brainstorm 和 IBM 层解决了“为什么值得做”和�
 
 ## Completion
 
-- `docs/pre-brainstorms/20260401-2354--implementation-decision-notes-in-review-artifacts/brainstorms.md`
-- `docs/pre-brainstorms/20260401-2354--implementation-decision-notes-in-review-artifacts/candidates.md`
+- `docs/B1-docs/raw-20260401-2354/brainstorms.md`
+- `docs/B1-docs/raw-20260401-2354/candidates.md`
 - `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/issues/implementation-decision-notes-in-issue-review-artifacts-governance.md`
 - `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/brainstorms/b-implementation-decision-notes-in-issue-review-artifacts-governance.md`
 - `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/prd.md`

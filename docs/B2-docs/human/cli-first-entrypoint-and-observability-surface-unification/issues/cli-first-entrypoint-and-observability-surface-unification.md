@@ -9,8 +9,8 @@
 - issue-name: `cli-first-entrypoint-and-observability-surface-unification`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/code-reviews`
 - priority: P0
-- source_candidate: `docs/pre-brainstorms/20260322-0115--cli-first-entrypoint-and-observability-surface-unification/candidates.md#c-20260322-0115-a`
-- source_brainstorm: `docs/pre-brainstorms/20260322-0115--cli-first-entrypoint-and-observability-surface-unification/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260322-0115/candidates.md#c-20260322-0115-a`
+- source_brainstorm: `docs/B1-docs/raw-20260322-0115/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/cli-first-entrypoint-and-observability-surface-unification/pre-tests.md`

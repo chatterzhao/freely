@@ -10,7 +10,7 @@ platform_ids:
     url: https://github.com/chatterzhao/freely/issues/3315
 primary_platform: github
 canonical_issue_path: ''
-source_candidate: docs/pre-brainstorms/20260622T021126Z--platform-sync-batch/candidates.md#C-20260622T021126Z-A
+source_candidate: docs/B1-docs/raw-20260622T021126Z/candidates.md#C-20260622T021126Z-A
 created_at: '2026-06-22T02:11:43Z'
 updated_at: '2026-06-22T02:11:43Z'
 author: platform

@@ -8,7 +8,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `tool-alias-and-opencode-launcher-governance`
 - issue-name: `tool-alias-and-opencode-launcher-governance`
-- source_candidate: `docs/pre-brainstorms/20260426-0000--opencode-direct-launcher-integration/candidates.md#c-20260426-0000-a`
+- source_candidate: `docs/B1-docs/raw-20260426-0000/candidates.md#c-20260426-0000-a`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/pre-tests.md`

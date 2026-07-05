@@ -8,8 +8,8 @@
 - story-name: `test-lane-routing-and-enforcement-governance`
 - issue-name: `test-lane-routing-and-enforcement-governance`
 - priority: `P0`
-- source_candidate: `docs/pre-brainstorms/20260405-1914--test-lane-routing-and-enforcement/candidates.md#c-20260405-1914-a`
-- source_brainstorm: `docs/pre-brainstorms/20260405-1914--test-lane-routing-and-enforcement/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260405-1914/candidates.md#c-20260405-1914-a`
+- source_brainstorm: `docs/B1-docs/raw-20260405-1914/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/test-lane-routing-and-enforcement-governance/pre-tests.md`
@@ -80,9 +80,9 @@
 
 ## Completion
 
-- `docs/pre-brainstorms/20260405-1914--test-lane-routing-and-enforcement/brainstorms.md`
-- `docs/pre-brainstorms/20260405-1914--test-lane-routing-and-enforcement/candidates.md`
-- `docs/pre-brainstorms/INDEX.md`
+- `docs/B1-docs/raw-20260405-1914/brainstorms.md`
+- `docs/B1-docs/raw-20260405-1914/candidates.md`
+- `docs/B1-docs/raw-INDEX.md`
 - `docs/milestones.md`
 - `AGENTS.md`
 - `docs/CONSTITUTION.md`

@@ -8,8 +8,8 @@
 - story-name: `runtime-audio-notifier-and-sound-semantics-governance`
 - issue-name: `runtime-audio-notifier-and-sound-semantics-governance`
 - priority: P1
-- source_candidate: `docs/pre-brainstorms/20260405-1215--runtime-audio-notifier-and-sound-semantics/candidates.md#c-20260405-1215-a`
-- source_brainstorm: `docs/pre-brainstorms/20260405-1215--runtime-audio-notifier-and-sound-semantics/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260405-1215/candidates.md#c-20260405-1215-a`
+- source_brainstorm: `docs/B1-docs/raw-20260405-1215/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/runtime-audio-notifier-and-sound-semantics-governance/pre-tests.md`

@@ -2,8 +2,8 @@
 local_id: I-20260621T130954Z-A
 kind: I
 phase_state: completed
-source_candidate: `docs/pre-brainstorms/20260621T130954Z--a2a-unix-request-route-fix/candidates.md#c-20260621T130954Z-A`
-verification_artifact_dir: docs/pre-brainstorms/20260621T130954Z--a2a-unix-request-route-fix
+source_candidate: `docs/B1-docs/raw-20260621T130954Z/candidates.md#c-20260621T130954Z-A`
+verification_artifact_dir: docs/B1-docs/raw-20260621T130954Z
 raw_refs:
   - raw-20260621T130954Z
 candidate_refs:

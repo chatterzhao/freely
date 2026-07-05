@@ -4,14 +4,14 @@ kind: linked
 status: completed
 phase_state: completed
 promoted_from: raw-20260616T111514Z
-source_candidate: docs/pre-brainstorms/20260616T111514Z--config-write-python/candidates.md
+source_candidate: docs/B1-docs/raw-20260616T111514Z/candidates.md
 canonical_issue_path: ''
 created_at: 2026-06-17 00:00:00+00:00
 updated_at: 2026-06-17 00:00:00+00:00
 author: zhaoquan
 channel: freely-fix-execution
 pre_tests_path: ''
-verification_artifact_dir: docs/pre-brainstorms/20260616T111514Z--config-write-python/code-reviews
+verification_artifact_dir: docs/B1-docs/raw-20260616T111514Z/code-reviews
 platform_state: closed
 ---
 

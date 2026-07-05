@@ -3,7 +3,7 @@
 - issue: `I-20260501-0000-A`
 - issue_path: `docs/epics/workspace-routing-foundation/scan-pr-platform-config/issues/I-20260501-0000-A.md`
 - candidate: `C-20260501-0000-A`
-- candidate_path: `docs/pre-brainstorms/20260501-0000--scan-pr-platform-config/candidates.md`
+- candidate_path: `docs/B1-docs/raw-20260501-0000/candidates.md`
 - milestone: `M-20260306-workspace-routing-foundation`
 - phase_state: `done_pre_brainstorm`
 - runtime_state: `verified_on_worktree`

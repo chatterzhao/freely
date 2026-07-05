@@ -8,8 +8,8 @@
 - story-name: `protected-branch-merge-receipt-hardening`
 - issue-name: `protected-branch-merge-receipt-hardening`
 - priority: P1
-- source_candidate: `docs/pre-brainstorms/20260402-1912--protected-branch-merge-receipt-hardening/candidates.md#c-20260402-1912-a`
-- source_brainstorm: `docs/pre-brainstorms/20260402-1912--protected-branch-merge-receipt-hardening/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260402-1912/candidates.md#c-20260402-1912-a`
+- source_brainstorm: `docs/B1-docs/raw-20260402-1912/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/pre-tests.md`
@@ -75,8 +75,8 @@
 
 ## Current Artifact Set
 
-- `docs/pre-brainstorms/20260402-1912--protected-branch-merge-receipt-hardening/brainstorms.md`
-- `docs/pre-brainstorms/20260402-1912--protected-branch-merge-receipt-hardening/candidates.md`
+- `docs/B1-docs/raw-20260402-1912/brainstorms.md`
+- `docs/B1-docs/raw-20260402-1912/candidates.md`
 - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/issues/protected-branch-merge-receipt-hardening.md`
 - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/brainstorms/b-protected-branch-merge-receipt-hardening.md`
 - `docs/epics/workspace-routing-foundation/protected-branch-merge-receipt-hardening/prd.md`

@@ -8,8 +8,8 @@
 - story-name: `ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance`
 - issue-name: `ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance`
 - priority: `P1`
-- source_candidate: `docs/pre-brainstorms/20260405-1415--ai-switch-cli-extraction-threshold-and-skeleton-disposition/candidates.md#c-20260405-1415-a`
-- source_brainstorm: `docs/pre-brainstorms/20260405-1415--ai-switch-cli-extraction-threshold-and-skeleton-disposition/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260405-1415/candidates.md#c-20260405-1415-a`
+- source_brainstorm: `docs/B1-docs/raw-20260405-1415/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/ai-switch-cli-extraction-threshold-and-skeleton-disposition-governance/pre-tests.md`
@@ -97,6 +97,6 @@ Freely 已经在当前 Codex owner 中冻结了长期方向: tool auth/switch/pr
 ## Verification
 
 - `./bin/governance-check`
-- review `docs/pre-brainstorms/20260405-1415--ai-switch-cli-extraction-threshold-and-skeleton-disposition/brainstorms.md`
+- review `docs/B1-docs/raw-20260405-1415/brainstorms.md`
 - review `docs/epics/workspace-routing-foundation/codex-apikey-slot-bundle-and-provider-aware-probe-governance/prd.md`
 - confirm the resulting docs do not claim standalone extraction has already started

@@ -8,8 +8,8 @@
 - story-name: `pre-tests-cleanup-and-retirement-enforcement-governance`
 - issue-name: `pre-tests-cleanup-and-retirement-enforcement-governance`
 - priority: `P1`
-- source_candidate: `docs/pre-brainstorms/20260411-1416--pretests-cleanup-retirement-enforcement/candidates.md#c-20260411-1416-a`
-- source_brainstorm: `docs/pre-brainstorms/20260411-1416--pretests-cleanup-retirement-enforcement/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260411-1416/candidates.md#c-20260411-1416-a`
+- source_brainstorm: `docs/B1-docs/raw-20260411-1416/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/pre-tests.md`
@@ -52,7 +52,7 @@
 
 ## Completion
 
-- `docs/pre-brainstorms/20260411-1416--pretests-cleanup-retirement-enforcement/candidates.md`
+- `docs/B1-docs/raw-20260411-1416/candidates.md`
 - `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/issues/pre-tests-cleanup-and-retirement-enforcement-governance.md`
 - `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/brainstorms/b-pre-tests-cleanup-and-retirement-enforcement-governance.md`
 - `docs/epics/workspace-routing-foundation/pre-tests-cleanup-and-retirement-enforcement-governance/prd.md`

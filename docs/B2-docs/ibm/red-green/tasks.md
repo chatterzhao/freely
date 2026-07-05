@@ -51,7 +51,7 @@
 - description: Update C-20260325-0333-A umbrella status to reflect the materialization decision for Slice 2.
 - owner: I-20260519-0333-C
 - status: completed
-- artifact: docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/candidates.md
+- artifact: docs/B1-docs/raw-20260325-0333/candidates.md
 
 ### T-008: Update milestones.md
 

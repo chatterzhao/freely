@@ -8,8 +8,8 @@
 - story-name: `develop-guarded-merge-entrypoint-enforcement-governance`
 - issue-name: `develop-guarded-merge-entrypoint-enforcement-governance`
 - priority: P1
-- source_candidate: `docs/pre-brainstorms/20260405-0425--develop-guarded-merge-entrypoint-enforcement/candidates.md#c-20260405-0425-a`
-- source_brainstorm: `docs/pre-brainstorms/20260405-0425--develop-guarded-merge-entrypoint-enforcement/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260405-0425/candidates.md#c-20260405-0425-a`
+- source_brainstorm: `docs/B1-docs/raw-20260405-0425/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/develop-guarded-merge-entrypoint-enforcement-governance/pre-tests.md`

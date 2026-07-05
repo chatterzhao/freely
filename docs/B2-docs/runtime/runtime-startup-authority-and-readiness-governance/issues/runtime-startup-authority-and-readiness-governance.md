@@ -8,8 +8,8 @@
 - story-name: `runtime-startup-authority-and-readiness-governance`
 - issue-name: `runtime-startup-authority-and-readiness-governance`
 - priority: `P0`
-- source_candidate: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/candidates.md#c-20260413-0420-a`
-- source_brainstorm: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260413-0420/candidates.md#c-20260413-0420-a`
+- source_brainstorm: `docs/B1-docs/raw-20260413-0420/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/pre-tests.md`
@@ -89,7 +89,7 @@ The root-cause packet is already canonically split. This owner is the bounded ex
 
 ## Completion
 
-- `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/candidates.md`
+- `docs/B1-docs/raw-20260413-0420/candidates.md`
 - `docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/issues/runtime-startup-authority-and-readiness-governance.md`
 - `docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/brainstorms/b-runtime-startup-authority-and-readiness-governance.md`
 - `docs/epics/workspace-routing-foundation/runtime-startup-authority-and-readiness-governance/prd.md`

@@ -8,8 +8,8 @@
 - story-name: `frontend-backend-boundary-contract-v1-for-frontend-probe`
 - issue-name: `frontend-backend-boundary-contract-v1-for-frontend-probe`
 - verification_artifact_dir: `docs/epics/frontend-probe-dogfooding-loop/frontend-backend-boundary-contract-v1-for-frontend-probe/code-reviews`
-- source_candidate: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/candidates.md#c-20260308-1244-02`
-- source_brainstorm: `docs/pre-brainstorms/20260308-1244--frontend-probe-dogfooding-loop/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260308-1244/candidates.md#c-20260308-1244-02`
+- source_brainstorm: `docs/B1-docs/raw-20260308-1244/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `none`

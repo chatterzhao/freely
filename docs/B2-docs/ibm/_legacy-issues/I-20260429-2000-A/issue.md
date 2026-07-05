@@ -34,5 +34,5 @@ governance-merge-gate --range, pr-merge-guarded pre-flight, pre-commit FP fix.
 
 ## References
 
-- B1: docs/pre-brainstorms/20260429-2000--gate-dev-experience-preflight/
+- B1: docs/B1-docs/raw-20260429-2000/
 - Issue: docs/epics/workspace-routing-foundation/gate-dev-experience-preflight/issues/I-20260429-2000-A.md

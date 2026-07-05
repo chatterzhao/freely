@@ -1,7 +1,7 @@
 # Code Review: wt-create Dual Worktree Creation
 
 - issue_id: `raw-20260506T1230Z`
-- issue_path: `docs/issues/raw-20260506T1230Z/issue.md`
+- issue_path: `docs/B1-docs/raw-20260506T1230Z/issue.md`
 
 ## Implementation Decision Note
 - decision: wt-create creates two worktrees at once — test-pre-merge from develop, fix/feature from test-pre-merge

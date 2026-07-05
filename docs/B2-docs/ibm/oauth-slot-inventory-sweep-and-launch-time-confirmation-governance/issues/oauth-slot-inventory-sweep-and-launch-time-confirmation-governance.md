@@ -9,8 +9,8 @@
 - issue-name: `oauth-slot-inventory-sweep-and-launch-time-confirmation-governance`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/oauth-slot-inventory-sweep-and-launch-time-confirmation-governance/code-reviews`
 - priority: P0
-- source_candidate: `docs/pre-brainstorms/20260327-1115--oauth-api-usage-query-refactor/candidates.md#c-20260327-1115-a`
-- source_brainstorm: `docs/pre-brainstorms/20260327-1115--oauth-api-usage-query-refactor/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260327-1115/candidates.md#c-20260327-1115-a`
+- source_brainstorm: `docs/B1-docs/raw-20260327-1115/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:

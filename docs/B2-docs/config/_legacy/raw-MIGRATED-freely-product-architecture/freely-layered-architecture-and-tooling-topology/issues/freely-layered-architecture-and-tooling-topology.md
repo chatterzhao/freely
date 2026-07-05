@@ -9,8 +9,8 @@
 - issue-name: `freely-layered-architecture-and-tooling-topology`
 - verification_artifact_dir: `docs/epics/freely-product-architecture/freely-layered-architecture-and-tooling-topology/code-reviews`
 - priority: P0
-- source_candidate: `docs/pre-brainstorms/20260326-1810--freely-layered-architecture-and-tooling-topology/candidates.md#c-20260326-1810-a`
-- source_brainstorm: `docs/pre-brainstorms/20260326-1810--freely-layered-architecture-and-tooling-topology/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260326-1810/candidates.md#c-20260326-1810-a`
+- source_brainstorm: `docs/B1-docs/raw-20260326-1810/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:
@@ -64,8 +64,8 @@ Freely 已经在多个局部真源里分别写对了部分边界，例如 `three
 - `docs/LAWS.md`
 - `AGENTS.md`
 - `docs/milestones.md`
-- `docs/pre-brainstorms/20260326-1810--freely-layered-architecture-and-tooling-topology/brainstorms.md`
-- `docs/pre-brainstorms/20260326-1810--freely-layered-architecture-and-tooling-topology/candidates.md`
+- `docs/B1-docs/raw-20260326-1810/brainstorms.md`
+- `docs/B1-docs/raw-20260326-1810/candidates.md`
 - `docs/epics/freely-product-architecture/freely-layered-architecture-and-tooling-topology/brainstorms/b-freely-layered-architecture-and-tooling-topology.md`
 - `docs/epics/freely-product-architecture/freely-layered-architecture-and-tooling-topology/prd.md`
 - `docs/epics/freely-product-architecture/freely-layered-architecture-and-tooling-topology/pre-tests.md`

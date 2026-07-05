@@ -11,7 +11,7 @@
   - {tool: ccds, session_id: "20260429-chat-inbox-sqlite", role: "author"}
   - {tool: ccds, session_id: "20260430-acp-session-store", role: "author", absorbed: true}
 - absorbed_candidates:
-  - `docs/pre-brainstorms/20260430-0000--acp-session-store-and-lifecycle/candidates.md#C-20260430-0000-A`
+  - `docs/B1-docs/raw-20260430-0000/candidates.md#C-20260430-0000-A`
 
 ## 2026-04-30: ACP session-store absorbed
 

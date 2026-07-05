@@ -37,4 +37,4 @@
 ## Residual Risks
 
 - 尚未形成 promote / cleanup 证据，因此本 issue 仍停留在 `in_verification`。
-- 当前研究阶段没有正式 `docs/progress/**`，执行证据仍临时落在 `docs/pre-brainstorms/CONVERGENCE.md`。
+- 当前研究阶段没有正式 `docs/progress/**`，执行证据仍临时落在 `docs/B1-docs/raw-CONVERGENCE.md`。

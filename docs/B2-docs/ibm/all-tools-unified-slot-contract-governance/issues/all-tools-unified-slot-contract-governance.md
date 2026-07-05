@@ -7,8 +7,8 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `all-tools-unified-slot-contract-governance`
 - issue-name: `all-tools-unified-slot-contract-governance`
-- source_candidate: `docs/pre-brainstorms/20260401-0840--all-tools-unified-slot-contract-governance/candidates.md#c-20260401-0840-a`
-- source_brainstorm: `docs/pre-brainstorms/20260401-0840--all-tools-unified-slot-contract-governance/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260401-0840/candidates.md#c-20260401-0840-a`
+- source_brainstorm: `docs/B1-docs/raw-20260401-0840/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/pre-tests.md`
@@ -54,8 +54,8 @@ Ordered cross-tool fallback v1 is already in place, but Freely still lacks the f
 
 ## Completion
 
-- `docs/pre-brainstorms/20260401-0840--all-tools-unified-slot-contract-governance/brainstorms.md`
-- `docs/pre-brainstorms/20260401-0840--all-tools-unified-slot-contract-governance/candidates.md`
+- `docs/B1-docs/raw-20260401-0840/brainstorms.md`
+- `docs/B1-docs/raw-20260401-0840/candidates.md`
 - `docs/milestones.md`
 - `docs/system/workspace/tools.md`
 - `docs/system/workspace/scripts/runtime/ai-cli`

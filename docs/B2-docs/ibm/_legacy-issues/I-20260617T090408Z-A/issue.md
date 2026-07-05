@@ -4,7 +4,7 @@ kind: linked
 status: in_dev
 phase_state: completed
 promoted_from: raw-20260617T090408Z
-source_candidate: docs/pre-brainstorms/20260617T090408Z--fix-worker-prompts-csv/candidates.md
+source_candidate: docs/B1-docs/raw-20260617T090408Z/candidates.md
 pre_tests_path: docs/epics/fix-worker-prompts-csv/pre-tests.md
 verification_artifact_dir: docs/epics/fix-worker-prompts-csv/code-reviews
 ---

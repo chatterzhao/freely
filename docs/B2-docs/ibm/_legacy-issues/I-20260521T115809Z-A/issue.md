@@ -2,8 +2,8 @@
 - kind: fix
 - phase_state: completed
 - milestone: M-20260521T115809Z-A
-- source_candidate: docs/pre-brainstorms/20260521T115809Z--merge-message-forbidden-branch-name/candidates.md#C-20260521T115809Z-A
+- source_candidate: docs/B1-docs/raw-20260521T115809Z/candidates.md#C-20260521T115809Z-A
 - verification_artifact_dir: docs/epics/merge-message-forbidden-branch-name/code-reviews
-- canonical_issue_path: docs/issues/I-20260521T115809Z-A/issue.md
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260521T115809Z-A/issue.md
 - title: pr-merge-guarded source branch name shows forbidden
 - summary: One-line fix: remove "forbidden" parameter from render_merge_message call in do_initial_merge.

@@ -2,10 +2,10 @@
 local_id: I-20260621T092609Z-A
 kind: linked
 phase_state: completed
-source_candidate: docs/pre-brainstorms/20260621T092609Z--zombie-resume-on-restart/candidates.md#C-20260621T092609Z-A
+source_candidate: docs/B1-docs/raw-20260621T092609Z/candidates.md#C-20260621T092609Z-A
 platform_ids: {}
 primary_platform: github
-canonical_issue_path: docs/pre-brainstorms/20260621T092609Z--zombie-resume-on-restart/candidates.md
+canonical_issue_path: docs/B1-docs/raw-20260621T092609Z/candidates.md
 created_at: '2026-06-21T09:26:09Z'
 author: claude
 channel: claude

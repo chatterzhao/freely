@@ -16,8 +16,8 @@
 
 ## Evidence
 
-- `docs/pre-brainstorms/20260401-0840--all-tools-unified-slot-contract-governance/brainstorms.md`
-- `docs/pre-brainstorms/20260401-0840--all-tools-unified-slot-contract-governance/candidates.md`
+- `docs/B1-docs/raw-20260401-0840/brainstorms.md`
+- `docs/B1-docs/raw-20260401-0840/candidates.md`
 - `docs/epics/workspace-routing-foundation/all-tools-unified-slot-contract-governance/issues/all-tools-unified-slot-contract-governance.md`
 - `docs/system/workspace/scripts/tests/test-ai-cli-generic-tool-login-creates-slot-container`
 - `docs/system/workspace/scripts/tests/test-ai-cli-generic-tool-switch-persists-current-slot`

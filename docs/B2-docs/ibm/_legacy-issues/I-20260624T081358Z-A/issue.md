@@ -4,8 +4,8 @@ kind: linked
 status: completed
 phase_state: completed
 promoted_from: raw-20260624T081358Z
-source_candidate: docs/pre-brainstorms/20260624T081358Z--testing-docs-pre-tests-delegation/candidates.md#C-20260624T081358Z-A
-canonical_issue_path: docs/issues/I-20260624T081358Z-A/issue.md
+source_candidate: docs/B1-docs/raw-20260624T081358Z/candidates.md#C-20260624T081358Z-A
+canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260624T081358Z-A/issue.md
 milestone: M-20260624T081358Z-A
 title: 'fix: skills/AGENTS 测试文档 daemon 假设改为 pre-tests.md 委托'
 platform_ids:
@@ -19,7 +19,7 @@ updated_at: '2026-06-24T08:13:58Z'
 ---
 # I-20260624T081358Z-A: 测试文档 daemon 假设修复
 
-- source_candidate: `docs/pre-brainstorms/20260624T081358Z--testing-docs-pre-tests-delegation/candidates.md`
+- source_candidate: `docs/B1-docs/raw-20260624T081358Z/candidates.md`
 - pre_tests_path: `docs/epics/testing-docs-pre-tests-delegation/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/testing-docs-pre-tests-delegation/code-reviews`
 

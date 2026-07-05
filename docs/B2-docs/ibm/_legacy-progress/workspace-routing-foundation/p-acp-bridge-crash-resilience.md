@@ -3,7 +3,7 @@
 - issue: `I-20260503-0000-A`
 - issue_path: `docs/epics/workspace-routing-foundation/acp-bridge-crash-resilience/issues/I-20260503-0000-A.md`
 - candidate: `C-20260503-0000-A`
-- candidate_path: `docs/pre-brainstorms/20260503-acp-bridge-crash/candidates.md`
+- candidate_path: `docs/B1-docs/raw-20260503-acp-bridge-crash/candidates.md`
 - milestone: `M-20260306-workspace-routing-foundation`
 - phase_state: `done_ibm`
 - runtime_state: `verified_on_develop`

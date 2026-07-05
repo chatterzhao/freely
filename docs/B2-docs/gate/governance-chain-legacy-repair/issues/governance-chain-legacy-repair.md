@@ -8,8 +8,8 @@
 - story-name: `governance-chain-legacy-repair`
 - issue-name: `governance-chain-legacy-repair`
 - priority: P0
-- source_candidate: `docs/pre-brainstorms/20260403-1100--governance-chain-legacy-repair/candidates.md#c-20260403-1100-a`
-- source_brainstorm: `docs/pre-brainstorms/20260403-1100--governance-chain-legacy-repair/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260403-1100/candidates.md#c-20260403-1100-a`
+- source_brainstorm: `docs/B1-docs/raw-20260403-1100/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/pre-tests.md`
@@ -63,8 +63,8 @@
 
 ## Current Artifact Set
 
-- `docs/pre-brainstorms/20260403-1100--governance-chain-legacy-repair/brainstorms.md`
-- `docs/pre-brainstorms/20260403-1100--governance-chain-legacy-repair/candidates.md`
+- `docs/B1-docs/raw-20260403-1100/brainstorms.md`
+- `docs/B1-docs/raw-20260403-1100/candidates.md`
 - `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/issues/governance-chain-legacy-repair.md`
 - `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/brainstorms/b-governance-chain-legacy-repair.md`
 - `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/child-slice-status.md`
@@ -77,7 +77,7 @@
 
 - `docs/system/workspace/scripts/quality/governance-merge-gate`
 - `docs/epics/workspace-routing-foundation/governance-chain-legacy-repair/child-slice-status.md`
-- `docs/pre-brainstorms/INDEX.md`
+- `docs/B1-docs/raw-INDEX.md`
 - `docs/milestones.md`
 
 ## Verification

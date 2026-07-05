@@ -8,8 +8,8 @@
 - story-name: `sensitive-local-artifact-ignore-governance`
 - issue-name: `sensitive-local-artifact-ignore-governance`
 - priority: P2
-- source_candidate: `docs/pre-brainstorms/20260329-2155--sensitive-local-artifact-ignore-governance/candidates.md#c-20260329-2155-a`
-- source_brainstorm: `docs/pre-brainstorms/20260329-2155--sensitive-local-artifact-ignore-governance/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260329-2155/candidates.md#c-20260329-2155-a`
+- source_brainstorm: `docs/B1-docs/raw-20260329-2155/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/sensitive-local-artifact-ignore-governance/pre-tests.md`
@@ -56,7 +56,7 @@
 
 - `.gitignore`
 - `docs/system/workspace/scripts/tests/test-sensitive-local-artifact-ignore-governance`
-- `docs/pre-brainstorms/20260329-2155--sensitive-local-artifact-ignore-governance/brainstorms.md`
+- `docs/B1-docs/raw-20260329-2155/brainstorms.md`
 - `docs/epics/workspace-routing-foundation/sensitive-local-artifact-ignore-governance/pre-tests.md`
 - `docs/epics/workspace-routing-foundation/sensitive-local-artifact-ignore-governance/tasks.md`
 

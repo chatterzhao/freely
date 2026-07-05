@@ -8,8 +8,8 @@
 - story-name: `manager-task-source-scan-idle-replan-boundary-governance`
 - issue-name: `manager-task-source-scan-idle-replan-boundary-governance`
 - priority: `P0`
-- source_candidate: `docs/pre-brainstorms/20260420-1130--manager-task-source-scan-replan-boundary/candidates.md#c-20260420-1130-a`
-- source_brainstorm: `docs/pre-brainstorms/20260420-1130--manager-task-source-scan-replan-boundary/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260420-1130/candidates.md#c-20260420-1130-a`
+- source_brainstorm: `docs/B1-docs/raw-20260420-1130/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/pre-tests.md`
@@ -17,7 +17,7 @@
 - progress_path: `docs/progress/workspace-routing-foundation/p-manager-task-source-scan-idle-replan-boundary-governance.md`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/code-reviews`
 - depends_on:
-  - `docs/pre-brainstorms/20260407-0817--source-ledger-routing-and-manager-audit-boundary/candidates.md#c-20260407-0817-a`
+  - `docs/B1-docs/raw-20260407-0817/candidates.md#c-20260407-0817-a`
   - `docs/epics/workspace-routing-foundation/manager-owner-stance-and-source-patrol-governance/issues/manager-owner-stance-and-source-patrol-governance.md`
   - `docs/epics/workspace-routing-foundation/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
 - created_at: `2026-04-20`
@@ -74,8 +74,8 @@ This owner freezes the idle/replan scan boundary and lands the first machine-rea
 
 ## Completion
 
-- `docs/pre-brainstorms/20260420-1130--manager-task-source-scan-replan-boundary/brainstorms.md`
-- `docs/pre-brainstorms/20260420-1130--manager-task-source-scan-replan-boundary/candidates.md`
+- `docs/B1-docs/raw-20260420-1130/brainstorms.md`
+- `docs/B1-docs/raw-20260420-1130/candidates.md`
 - `docs/milestones.md`
 - `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/issues/manager-task-source-scan-idle-replan-boundary-governance.md`
 - `docs/epics/workspace-routing-foundation/manager-task-source-scan-idle-replan-boundary-governance/pre-tests.md`

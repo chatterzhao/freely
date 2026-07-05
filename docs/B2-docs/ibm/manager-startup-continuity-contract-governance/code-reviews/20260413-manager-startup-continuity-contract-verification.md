@@ -24,8 +24,8 @@ Verify that the new owner:
 - `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/tasks.md`
 - `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/code-reviews/20260413-manager-startup-continuity-contract-decision.md`
 - `docs/progress/workspace-routing-foundation/p-manager-startup-continuity-contract-governance.md`
-- `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/candidates.md`
-- `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/brainstorms.md`
+- `docs/B1-docs/raw-20260413-0420/candidates.md`
+- `docs/B1-docs/raw-20260413-0420/brainstorms.md`
 - `docs/milestones.md`
 
 ## Verification Result

@@ -4,7 +4,7 @@ kind: linked
 phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
 promoted_from: raw-20260508T045527Z
-source_candidate: docs/pre-brainstorms/20260508T045527Z--cleanup-scan/candidates.md#C-20260508T045527Z-A
+source_candidate: docs/B1-docs/raw-20260508T045527Z/candidates.md#C-20260508T045527Z-A
 verification_artifact_dir: docs/epics/cleanup-scan/code-reviews
 pre_tests_path: docs/epics/cleanup-scan/verification/pre-tests.md
 platform_state: closed

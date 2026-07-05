@@ -1,7 +1,7 @@
 # B2 Brainstorm: Freely 打包与自举验证
 
 - I-*: I-20260502-0500-A
-- source_candidate: `docs/pre-brainstorms/20260502-0500--freely-packaging-selfhost/candidates.md#C-20260502-0500-A`
+- source_candidate: `docs/B1-docs/raw-20260502-0500/candidates.md#C-20260502-0500-A`
 - 日期: 2026-05-20
 
 ## B1 已收敛的决策

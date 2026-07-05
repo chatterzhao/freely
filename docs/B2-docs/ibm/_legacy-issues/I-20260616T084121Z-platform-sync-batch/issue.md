@@ -3,8 +3,8 @@ local_id: I-20260616T084121Z-platform-sync-batch
 kind: linked
 phase_state: completed
 promoted_from: raw-20260616T084121Z
-source_candidate: docs/pre-brainstorms/20260616T084121Z--platform-sync-batch/candidates.md
-canonical_issue_path: docs/issues/I-20260616T084121Z-platform-sync-batch/issue.md
+source_candidate: docs/B1-docs/raw-20260616T084121Z/candidates.md
+canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260616T084121Z-platform-sync-batch/issue.md
 primary_platform: github
 platform_ids:
   github:

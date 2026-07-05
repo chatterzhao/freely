@@ -8,8 +8,8 @@
 - story-name: `manager-chat-reentry-and-cleanup-misrouting-governance`
 - issue-name: `manager-chat-reentry-and-cleanup-misrouting-governance`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/manager-chat-reentry-and-cleanup-misrouting-governance/code-reviews`
-- source_candidate: `docs/pre-brainstorms/20260321-1925--manager-chat-reentry-and-cleanup-misrouting/candidates.md#c-20260321-1925-a`
-- source_brainstorm: `docs/pre-brainstorms/20260321-1925--manager-chat-reentry-and-cleanup-misrouting/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260321-1925/candidates.md#c-20260321-1925-a`
+- source_brainstorm: `docs/B1-docs/raw-20260321-1925/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `docs/epics/workspace-routing-foundation/human-chat-intake-and-manager-delegation/issues/human-chat-intake-and-manager-delegation.md`, `docs/epics/workspace-routing-foundation/remote-branch-retirement-governance/issues/remote-branch-retirement-governance.md`

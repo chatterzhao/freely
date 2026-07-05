@@ -8,8 +8,8 @@
 - story-name: `develop-push-pending-guard-governance`
 - issue-name: `develop-push-pending-guard-governance`
 - priority: P0
-- source_candidate: `docs/pre-brainstorms/20260401-1035--develop-push-pending-guard-governance/candidates.md#c-20260401-1035-a`
-- source_brainstorm: `docs/pre-brainstorms/20260401-1035--develop-push-pending-guard-governance/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260401-1035/candidates.md#c-20260401-1035-a`
+- source_brainstorm: `docs/B1-docs/raw-20260401-1035/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/develop-push-pending-guard-governance/pre-tests.md`
@@ -61,9 +61,9 @@ This owner fixes that governance gap without auto-pushing on behalf of the opera
 
 ## Completion
 
-- `docs/pre-brainstorms/20260401-1035--develop-push-pending-guard-governance/brainstorms.md`
-- `docs/pre-brainstorms/20260401-1035--develop-push-pending-guard-governance/candidates.md`
-- `docs/pre-brainstorms/INDEX.md`
+- `docs/B1-docs/raw-20260401-1035/brainstorms.md`
+- `docs/B1-docs/raw-20260401-1035/candidates.md`
+- `docs/B1-docs/raw-INDEX.md`
 - `docs/milestones.md`
 - `docs/epics/workspace-routing-foundation/develop-push-pending-guard-governance/issues/develop-push-pending-guard-governance.md`
 - `docs/epics/workspace-routing-foundation/develop-push-pending-guard-governance/pre-tests.md`

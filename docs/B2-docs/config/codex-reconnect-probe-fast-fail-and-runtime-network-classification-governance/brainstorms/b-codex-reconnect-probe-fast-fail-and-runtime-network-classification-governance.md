@@ -2,8 +2,8 @@
 
 ## Source Boundary
 
-- canonical source candidate: `docs/pre-brainstorms/20260406-0901--codex-reconnect-probe-fast-fail/candidates.md#c-20260406-0901-a`
-- absorbed sibling: `docs/pre-brainstorms/20260406-0715--codex-live-auth-identity-and-probe-lock-boundary/candidates.md#c-20260406-0715-a`
+- canonical source candidate: `docs/B1-docs/raw-20260406-0901/candidates.md#c-20260406-0901-a`
+- absorbed sibling: `docs/B1-docs/raw-20260406-0715/candidates.md#c-20260406-0715-a`
 
 ## Framing
 

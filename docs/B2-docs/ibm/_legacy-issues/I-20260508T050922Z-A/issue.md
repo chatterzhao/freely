@@ -4,7 +4,7 @@ kind: linked
 phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
 promoted_from: raw-20260508T050922Z
-source_candidate: docs/pre-brainstorms/20260508T050922Z--closeout-chain/candidates.md#C-20260508T050922Z-A
+source_candidate: docs/B1-docs/raw-20260508T050922Z/candidates.md#C-20260508T050922Z-A
 verification_artifact_dir: docs/epics/closeout-chain/code-reviews
 pre_tests_path: docs/epics/closeout-chain/verification/pre-tests.md
 platform_state: closed

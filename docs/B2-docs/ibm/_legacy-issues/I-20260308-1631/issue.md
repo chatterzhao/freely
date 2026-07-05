@@ -31,8 +31,8 @@ platform_state: closed
 - epic-name: `workspace-routing-foundation`
 - story-name: `stage-prefixed-progress-identifier`
 - issue-name: `stage-prefixed-progress-identifier`
-- source_candidate: `docs/pre-brainstorms/20260308-1630--stage-prefixed-progress-identifier/candidates.md#c-20260308-1631`
-- source_brainstorm: `docs/pre-brainstorms/20260308-1630--stage-prefixed-progress-identifier/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260308-1630/candidates.md#c-20260308-1631`
+- source_brainstorm: `docs/B1-docs/raw-20260308-1630/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `docs/epics/workspace-routing-foundation/state-sync-and-session-evidence-governance/issues/state-sync-and-session-evidence-governance.md`

@@ -8,8 +8,8 @@
 - story-name: `active-lifecycle-boundary-and-dogfooding-capability-discovery`
 - issue-name: `active-lifecycle-boundary-and-dogfooding-capability-discovery`
 - verification_artifact_dir: `docs/epics/- epic-name: `workspace-routing-foundation`/- story-name: `active-lifecycle-boundary-and-dogfooding-capability-discovery`/code-reviews`
-- source_candidate: `docs/pre-brainstorms/20260321-1745--active-lifecycle-boundary-and-dogfooding-capability-discovery/candidates.md#c-20260321-1745-a`
-- source_brainstorm: `docs/pre-brainstorms/20260321-1745--active-lifecycle-boundary-and-dogfooding-capability-discovery/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260321-1745/candidates.md#c-20260321-1745-a`
+- source_brainstorm: `docs/B1-docs/raw-20260321-1745/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/issues/manager-watchdog-trigger-and-drift-reconcile-governance.md`

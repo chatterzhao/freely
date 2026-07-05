@@ -40,6 +40,6 @@ platform_state: closed
 
 ## References
 
-- B1: docs/pre-brainstorms/20260502-0500--freely-packaging-selfhost/
+- B1: docs/B1-docs/raw-20260502-0500/
 - Issue: docs/epics/freely-packaging-selfhost/issues/freely-packaging-selfhost.md
 - Progress: docs/progress/freely-packaging-selfhost/p-freely-packaging-selfhost.md

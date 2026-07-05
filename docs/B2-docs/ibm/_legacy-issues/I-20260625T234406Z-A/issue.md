@@ -1,7 +1,7 @@
 - issue_id: I-20260625T234406Z-A
 - kind: fix
 - phase_state: completed
-- source_candidate: docs/pre-brainstorms/20260625T235348Z--wt-close-consistency/candidates.md#C-20260625T235348Z-A
+- source_candidate: docs/B1-docs/raw-20260625T235348Z/candidates.md#C-20260625T235348Z-A
 # source_raw: raw-20260625T234406Z
 - pre_tests_path: docs/epics/fix-feature-consistency/verification/pre-tests.md
 - title: fix|feature consistency across codebase

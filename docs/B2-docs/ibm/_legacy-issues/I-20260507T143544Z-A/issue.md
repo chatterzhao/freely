@@ -5,7 +5,7 @@ phase_state: completed
 completed_at: "2026-05-19T23:20:00Z"
 absorbed_at: '2026-05-16T14:27:11Z'
 promoted_from: raw-20260507T143544Z
-source_candidate: docs/pre-brainstorms/20260507T143544Z--intercept-guard/candidates.md
+source_candidate: docs/B1-docs/raw-20260507T143544Z/candidates.md
 canonical_issue_path: ''
 platform_ids:
   github:
@@ -28,7 +28,7 @@ platform_state: closed
 
 - pre_tests_path: `docs/epics/raw-issue-pull-intercept/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/raw-issue-pull-intercept/code-reviews`
-- source_candidate: `docs/pre-brainstorms/20260507T143544Z--intercept-guard/candidates.md`
+- source_candidate: `docs/B1-docs/raw-20260507T143544Z/candidates.md`
 
 ## 实现
 - `bin/raw-issue-pull`: 分支拦截 + 修复 bash bug

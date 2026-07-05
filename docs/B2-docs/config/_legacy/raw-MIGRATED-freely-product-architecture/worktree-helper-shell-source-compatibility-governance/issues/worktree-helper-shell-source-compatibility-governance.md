@@ -8,8 +8,8 @@
 - story-name: `worktree-helper-shell-source-compatibility-governance`
 - issue-name: `worktree-helper-shell-source-compatibility-governance`
 - priority: `P1`
-- source_candidate: `docs/pre-brainstorms/20260405-2302--worktree-helper-shell-source-compatibility/candidates.md#c-20260405-2302-a`
-- source_brainstorm: `docs/pre-brainstorms/20260405-2302--worktree-helper-shell-source-compatibility/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260405-2302/candidates.md#c-20260405-2302-a`
+- source_brainstorm: `docs/B1-docs/raw-20260405-2302/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/freely-product-architecture/worktree-helper-shell-source-compatibility-governance/pre-tests.md`
@@ -68,9 +68,9 @@ Freely 已经把 worktree boundary、`wt-create`、`sync-tooling` 与 `post-chec
 
 ## Completion
 
-- `docs/pre-brainstorms/INDEX.md`
-- `docs/pre-brainstorms/20260405-2302--worktree-helper-shell-source-compatibility/brainstorms.md`
-- `docs/pre-brainstorms/20260405-2302--worktree-helper-shell-source-compatibility/candidates.md`
+- `docs/B1-docs/raw-INDEX.md`
+- `docs/B1-docs/raw-20260405-2302/brainstorms.md`
+- `docs/B1-docs/raw-20260405-2302/candidates.md`
 - `docs/milestones.md`
 - `docs/epics/freely-product-architecture/worktree-helper-shell-source-compatibility-governance/issues/worktree-helper-shell-source-compatibility-governance.md`
 - `docs/epics/freely-product-architecture/worktree-helper-shell-source-compatibility-governance/brainstorms/b-worktree-helper-shell-source-compatibility-governance.md`

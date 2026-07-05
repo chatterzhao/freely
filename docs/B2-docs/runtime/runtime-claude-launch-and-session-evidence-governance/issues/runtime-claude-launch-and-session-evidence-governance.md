@@ -8,8 +8,8 @@
 - story-name: `runtime-claude-launch-and-session-evidence-governance`
 - issue-name: `runtime-claude-launch-and-session-evidence-governance`
 - priority: `P0`
-- source_candidate: `docs/pre-brainstorms/20260419-2245--runtime-claude-launch-and-session-evidence/candidates.md#c-20260419-2245-a`
-- source_brainstorm: `docs/pre-brainstorms/20260419-2245--runtime-claude-launch-and-session-evidence/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260419-2245/candidates.md#c-20260419-2245-a`
+- source_brainstorm: `docs/B1-docs/raw-20260419-2245/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/runtime-claude-launch-and-session-evidence-governance/pre-tests.md`

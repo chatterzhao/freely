@@ -8,8 +8,8 @@
 - story-name: `codex-auto-switch-probe-apikey-fallback-governance`
 - issue-name: `codex-auto-switch-probe-apikey-fallback-governance`
 - priority: `P1`
-- source_candidate: `docs/pre-brainstorms/20260407-0023--codex-auto-switch-probe-apikey-fallback/candidates.md#c-20260407-0023-a`
-- source_brainstorm: `docs/pre-brainstorms/20260407-0023--codex-auto-switch-probe-apikey-fallback/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260407-0023/candidates.md#c-20260407-0023-a`
+- source_brainstorm: `docs/B1-docs/raw-20260407-0023/brainstorms.md`
 - execution_base: `feature/codex-auto-switch-probe-apikey-fallback-20260406-2138`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/codex-auto-switch-probe-apikey-fallback-governance/pre-tests.md`

@@ -21,7 +21,7 @@
 
 ## T4 目录归属治理
 - 明确 IBM 产物路径为 `docs/epics/{epic-name}/{story-name}/...`
-- 禁止 IBM 正式产物继续落在 `docs/pre-brainstorms/`
+- 禁止 IBM 正式产物继续落在 `docs/B1-docs/raw-`
 
 ## T5 首跳执行闭环回归
 - 更新 `workspace/scripts/start-lead-agent.sh`

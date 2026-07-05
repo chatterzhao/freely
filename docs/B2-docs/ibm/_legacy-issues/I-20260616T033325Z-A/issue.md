@@ -3,7 +3,7 @@ local_id: I-20260616T033325Z-A
 kind: linked
 phase_state: completed
 promoted_from: raw-20260616T033325Z
-source_candidate: docs/pre-brainstorms/20260616T033325Z--premerge-gate-check/candidates.md
+source_candidate: docs/B1-docs/raw-20260616T033325Z/candidates.md
 canonical_issue_path: docs/epics/premerge-gate-check/issues/I-20260616T033325Z-A.md
 pre_tests_path: docs/epics/premerge-gate-check/verification/pre-tests.md
 verification_artifact_dir: docs/epics/premerge-gate-check/code-reviews

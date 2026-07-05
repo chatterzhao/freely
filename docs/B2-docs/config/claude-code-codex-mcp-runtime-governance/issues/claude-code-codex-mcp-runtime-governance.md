@@ -8,13 +8,13 @@
 - story-name: `claude-code-codex-mcp-runtime-governance`
 - issue-name: `claude-code-codex-mcp-runtime-governance`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/claude-code-codex-mcp-runtime-governance/code-reviews`
-- source_candidate: `docs/pre-brainstorms/20260320-2145--cc-tool-profiles-and-concurrent-session-continuity/candidates.md#c-20260320-2145-001`
+- source_candidate: `docs/B1-docs/raw-20260320-2145/candidates.md#c-20260320-2145-001`
 - additional_source_candidates:
-  - `docs/pre-brainstorms/20260320-2145--cc-tool-profiles-and-concurrent-session-continuity/candidates.md#c-20260320-2145-002`
-  - `docs/pre-brainstorms/20260321-0148--cc-codex-session-evidence-resolution/candidates.md#c-20260321-0148-001`
+  - `docs/B1-docs/raw-20260320-2145/candidates.md#c-20260320-2145-002`
+  - `docs/B1-docs/raw-20260321-0148/candidates.md#c-20260321-0148-001`
 - source_brainstorm:
-  - `docs/pre-brainstorms/20260320-2145--cc-tool-profiles-and-concurrent-session-continuity/brainstorms.md`
-  - `docs/pre-brainstorms/20260321-0148--cc-codex-session-evidence-resolution/brainstorms.md`
+  - `docs/B1-docs/raw-20260320-2145/brainstorms.md`
+  - `docs/B1-docs/raw-20260321-0148/brainstorms.md`
 - execution_base: `feature/research-codex-in-cc-mcp`
 - integration_target: `feature/research-codex-in-cc-mcp`
 - depends_on: `feature/research-codex-in-cc-mcp`

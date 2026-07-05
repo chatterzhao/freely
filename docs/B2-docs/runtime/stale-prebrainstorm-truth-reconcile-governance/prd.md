@@ -16,17 +16,17 @@ Establish a narrow reconcile policy for pre-brainstorms whose statements are sta
 ## Representative Batch For First Materialization
 
 1. Superseded-by-implementation sample:
-   - `docs/pre-brainstorms/20260408-1205--verification-contract-and-premerge-adequacy/brainstorms.md`
+   - `docs/B1-docs/raw-20260408-1205/brainstorms.md`
 2. Absorbed-and-closed sample:
-   - `docs/pre-brainstorms/20260406-0055--governance-check-nested-test-pre-merge-receipt-audit/brainstorms.md`
+   - `docs/B1-docs/raw-20260406-0055/brainstorms.md`
 3. Deferred-by-owner-boundary sample:
-   - `docs/pre-brainstorms/20260327-0651--pretests-gate-and-network-proxy-config/brainstorms.md`
+   - `docs/B1-docs/raw-20260327-0651/brainstorms.md`
 4. Split-and-partially-materialized sample:
-   - `docs/pre-brainstorms/20260405-1615--feature-owned-test-pre-merge-family/brainstorms.md`
+   - `docs/B1-docs/raw-20260405-1615/brainstorms.md`
 
 ## Non-Requirements
 
 1. No runtime, hook, or quality gate logic modifications.
 2. No auto-scan or auto-rewrite system for all historical pre-brainstorms.
-3. No broad `docs/pre-brainstorms/INDEX.md` rewrite in the first batch; only minimal owner-registration append is allowed when required by standard materialization.
+3. No broad `docs/B1-docs/raw-INDEX.md` rewrite in the first batch; only minimal owner-registration append is allowed when required by standard materialization.
 4. No bundling of launch-time hard-gate owner work into this owner.

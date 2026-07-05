@@ -4,7 +4,7 @@ kind: linked
 phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
 promoted_from: raw-20260519T155813Z
-source_candidate: docs/pre-brainstorms/20260519T155813Z--launchable-check-reason/candidates.md
+source_candidate: docs/B1-docs/raw-20260519T155813Z/candidates.md
 canonical_issue_path: ''
 platform_ids:
   github:

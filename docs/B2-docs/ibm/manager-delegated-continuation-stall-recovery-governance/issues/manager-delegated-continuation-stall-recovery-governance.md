@@ -8,8 +8,8 @@
 - story-name: `manager-delegated-continuation-stall-recovery-governance`
 - issue-name: `manager-delegated-continuation-stall-recovery-governance`
 - priority: P0
-- source_candidate: `docs/pre-brainstorms/20260323-1705--manager-delegated-continuation-stall-recovery/candidates.md#c-20260323-1705-a`
-- source_brainstorm: `docs/pre-brainstorms/20260323-1705--manager-delegated-continuation-stall-recovery/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260323-1705/candidates.md#c-20260323-1705-a`
+- source_brainstorm: `docs/B1-docs/raw-20260323-1705/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:

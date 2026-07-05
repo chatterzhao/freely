@@ -41,7 +41,7 @@ There are two conflicting conventions for raw_key format across the codebase:
 
 ### Root cause
 
-The canonical format in the codebase for file paths is `raw-{key}` (e.g., `docs/issues/raw-20260629T.../issue.md`). But the A2A metadata flow uses just `{key}` (extracted from branch names with `grep -oE '[0-9]{8}T[0-9]{6}Z'`). The agent_working table inherits the A2A metadata format, but the query sites add the document path prefix.
+The canonical format in the codebase for file paths is `raw-{key}` (e.g., `docs/B1-docs/raw-20260629T.../issue.md`). But the A2A metadata flow uses just `{key}` (extracted from branch names with `grep -oE '[0-9]{8}T[0-9]{6}Z'`). The agent_working table inherits the A2A metadata format, but the query sites add the document path prefix.
 
 ### Fix
 

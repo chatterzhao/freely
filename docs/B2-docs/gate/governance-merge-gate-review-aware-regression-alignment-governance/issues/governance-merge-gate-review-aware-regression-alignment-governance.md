@@ -8,8 +8,8 @@
 - story-name: `governance-merge-gate-review-aware-regression-alignment-governance`
 - issue-name: `governance-merge-gate-review-aware-regression-alignment-governance`
 - priority: P1
-- source_candidate: `docs/pre-brainstorms/20260404-0232--governance-merge-gate-review-aware-regression-alignment/candidates.md#c-20260404-0232-a`
-- source_brainstorm: `docs/pre-brainstorms/20260404-0232--governance-merge-gate-review-aware-regression-alignment/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260404-0232/candidates.md#c-20260404-0232-a`
+- source_brainstorm: `docs/B1-docs/raw-20260404-0232/brainstorms.md`
 - reopen_of_issue: `docs/epics/workspace-routing-foundation/implementation-decision-notes-in-issue-review-artifacts-governance/issues/implementation-decision-notes-in-issue-review-artifacts-governance.md`
 - reopen_reason: `post-merge acceptance proved the mixed unresolved-candidate implementation regression still uses a fixture from before staged review artifacts became mandatory`
 - execution_base: `develop`

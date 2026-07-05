@@ -4,7 +4,7 @@ kind: linked
 status: in_dev
 phase_state: completed
 promoted_from: raw-20260617T055840Z
-source_candidate: docs/pre-brainstorms/20260617T055840Z--merge-guard-rebase-integrity/candidates.md
+source_candidate: docs/B1-docs/raw-20260617T055840Z/candidates.md
 canonical_issue_path: ''
 platform_ids:
   github:
@@ -27,7 +27,7 @@ platform_state: closed
 
 # I-20260617T055840Z-A: Merge Guard + Rebase Integrity
 
-- source_candidate: `docs/pre-brainstorms/20260617T055840Z--merge-guard-rebase-integrity/candidates.md`
+- source_candidate: `docs/B1-docs/raw-20260617T055840Z/candidates.md`
 - pre_tests_path: `docs/epics/merge-guard-rebase-integrity/pre-tests.md`
 - verification_artifact_dir: `docs/epics/merge-guard-rebase-integrity/code-reviews`
 - branch: `fix/raw-20260617T055840Z-merge-guard-rebase-integrity`

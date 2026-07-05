@@ -5,7 +5,7 @@
 ### AI-1: wt-create materializes raw issue to worktree
 - **Given**: wt-create --raw-key <key> --source platform
 - **When**: worktree created
-- **Then**: docs/issues/raw-{key}/issue.md exists IN worktree, not in develop
+- **Then**: docs/B1-docs/raw-{key}/issue.md exists IN worktree, not in develop
 - **adequacy**: verified
 
 ### AI-2: wt-close resolves ROOT_DIR from CWD

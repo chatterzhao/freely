@@ -8,8 +8,8 @@
 - story-name: `manager-reactivation-and-fleet-patrol-governance`
 - issue-name: `manager-reactivation-and-fleet-patrol-governance`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/manager-reactivation-and-fleet-patrol-governance/code-reviews`
-- source_candidate: `docs/pre-brainstorms/20260321-0345--manager-reactivation-and-fleet-patrol/candidates.md#c-20260321-0345-a`
-- source_brainstorm: `docs/pre-brainstorms/20260321-0345--manager-reactivation-and-fleet-patrol/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260321-0345/candidates.md#c-20260321-0345-a`
+- source_brainstorm: `docs/B1-docs/raw-20260321-0345/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/issues/manager-self-supervision-and-autonomous-recovery.md`, `docs/epics/workspace-routing-foundation/worktree-maintenance-governance/issues/worktree-maintenance-governance.md`

@@ -8,8 +8,8 @@
 - story-name: `codex-acp-fresh-path-prototype`
 - issue-name: `codex-acp-fresh-path-prototype`
 - priority: P1
-- source_candidate: `docs/pre-brainstorms/20260401-1545--acp-client-agent-protocol-runtime-adoption/candidates.md#c-20260401-1545-a`
-- source_brainstorm: `docs/pre-brainstorms/20260401-1545--acp-client-agent-protocol-runtime-adoption/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260401-1545/candidates.md#c-20260401-1545-a`
+- source_brainstorm: `docs/B1-docs/raw-20260401-1545/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/codex-acp-fresh-path-prototype/pre-tests.md`

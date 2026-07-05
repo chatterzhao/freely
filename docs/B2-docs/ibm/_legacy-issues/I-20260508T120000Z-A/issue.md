@@ -3,7 +3,7 @@ local_id: I-20260508T120000Z-A
 kind: linked
 phase_state: completed
 promoted_from: raw-20260508T120000Z
-source_candidate: docs/pre-brainstorms/20260508T120000Z--wt-create-fix/candidates.md
+source_candidate: docs/B1-docs/raw-20260508T120000Z/candidates.md
 canonical_issue_path: ''
 platform_ids:
   github:
@@ -16,7 +16,7 @@ updated_at: '2026-05-12T14:23:43Z'
 
 # I-20260508T120000Z-A: wt-create fix
 
-- source_candidate: docs/pre-brainstorms/20260508T120000Z--wt-create-fix/candidates.md
+- source_candidate: docs/B1-docs/raw-20260508T120000Z/candidates.md
 - pre_tests_path: docs/epics/wt-create-fix/verification/pre-tests.md
 - verification_artifact_dir: docs/epics/wt-create-fix/code-reviews
 

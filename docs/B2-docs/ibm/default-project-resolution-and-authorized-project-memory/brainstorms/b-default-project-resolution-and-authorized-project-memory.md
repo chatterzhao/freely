@@ -1,6 +1,6 @@
 # Brainstorm: default-project-resolution-and-authorized-project-memory
 
-- source: `docs/pre-brainstorms/20260320-0018--default-project-resolution-and-authorized-project-memory/brainstorms.md`
+- source: `docs/B1-docs/raw-20260320-0018/brainstorms.md`
 - status: `materialized`
 
 ## Summary

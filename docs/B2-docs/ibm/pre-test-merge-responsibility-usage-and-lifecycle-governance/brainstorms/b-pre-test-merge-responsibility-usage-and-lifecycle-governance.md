@@ -8,8 +8,8 @@
 
 ## Source freeze
 
-- `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/brainstorms.md`
-- `docs/pre-brainstorms/20260322-1801--pre-test-merge-governance-lifecycle/candidates.md`
+- `docs/B1-docs/raw-20260322-1801/brainstorms.md`
+- `docs/B1-docs/raw-20260322-1801/candidates.md`
 - `docs/system/workspace/skills/branch-management/references/pre-test-merge-flow.md`
 - `docs/CONSTITUTION.md`
 - `docs/LAWS.md`

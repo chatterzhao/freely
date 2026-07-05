@@ -8,8 +8,8 @@
 - story-name: `manager-watchdog-trigger-and-drift-reconcile-governance`
 - issue-name: `manager-watchdog-trigger-and-drift-reconcile-governance`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/manager-watchdog-trigger-and-drift-reconcile-governance/code-reviews`
-- source_candidate: `docs/pre-brainstorms/20260321-1715--manager-patrol-trigger-and-restart-routing/candidates.md#c-20260321-1715-a`
-- source_brainstorm: `docs/pre-brainstorms/20260321-1715--manager-patrol-trigger-and-restart-routing/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260321-1715/candidates.md#c-20260321-1715-a`
+- source_brainstorm: `docs/B1-docs/raw-20260321-1715/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `docs/epics/workspace-routing-foundation/manager-reactivation-and-fleet-patrol-governance/issues/manager-reactivation-and-fleet-patrol-governance.md`, `docs/epics/workspace-routing-foundation/state-sync-and-session-evidence-governance/issues/state-sync-and-session-evidence-governance.md`
@@ -40,8 +40,8 @@ Freely 当前已经分别定义了：
 
 ## Absorbed Research Inputs
 
-- `docs/pre-brainstorms/20260321-1715--manager-patrol-trigger-and-restart-routing/brainstorms.md`
-- `docs/pre-brainstorms/20260321-1430--external-drift-and-out-of-band-reconcile/brainstorms.md`
+- `docs/B1-docs/raw-20260321-1715/brainstorms.md`
+- `docs/B1-docs/raw-20260321-1430/brainstorms.md`
 
 ## Scope
 

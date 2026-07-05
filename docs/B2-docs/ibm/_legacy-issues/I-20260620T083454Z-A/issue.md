@@ -4,8 +4,8 @@ kind: fix
 phase_state: completed
 verification_artifact_dir: docs/epics/lifecycle-scan-phase-state/verify
 milestone: ""
-source_candidate: docs/pre-brainstorms/20260620T083454Z--lifecycle-scan-phase-state/candidates.md#C-20260620T083454Z-A
-canonical_issue_path: docs/issues/I-20260620T083454Z-A/issue.md
+source_candidate: docs/B1-docs/raw-20260620T083454Z/candidates.md#C-20260620T083454Z-A
+canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260620T083454Z-A/issue.md
 title: "fix: task-source-scan check phase_state before reporting incomplete"
 created_at: "2026-06-20T09:50:00Z"
 author: manager

@@ -2,16 +2,16 @@
 - kind: feat
 - phase_state: completed
 - milestone: M-20260625T152446Z-A
-- source_candidate: docs/pre-brainstorms/20260625T152446Z--pr-review-acp-reviewer/candidates.md#C-20260625T152446Z-A
+- source_candidate: docs/B1-docs/raw-20260625T152446Z/candidates.md#C-20260625T152446Z-A
 - verification_artifact_dir: docs/epics/pr-review-acp-reviewer/code-reviews
-- canonical_issue_path: docs/issues/I-20260625T152446Z-A/issue.md
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260625T152446Z-A/issue.md
 - source_raw: raw-20260625T152446Z
 - pre_tests_path: docs/epics/pr-review-acp-reviewer/verification/pre-tests.md
 - title: pr-review-guarded ACP TDD Reviewer
 
 # I-20260625T152446Z-A: pr-review-guarded ACP TDD Reviewer
 
-- source_candidate: docs/pre-brainstorms/20260625T152446Z--pr-review-acp-reviewer/candidates.md#C-20260625T152446Z-A
+- source_candidate: docs/B1-docs/raw-20260625T152446Z/candidates.md#C-20260625T152446Z-A
 - verification_artifact_dir: docs/epics/pr-review-acp-reviewer/code-reviews
 - pre_tests_path: docs/epics/pr-review-acp-reviewer/verification/pre-tests.md
 

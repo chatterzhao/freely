@@ -4,7 +4,7 @@ kind: linked
 status: in_dev
 phase_state: completed
 promoted_from: raw-20260618T040226Z
-source_candidate: docs/pre-brainstorms/20260618T040226Z--pr-review-guarded/candidates.md
+source_candidate: docs/B1-docs/raw-20260618T040226Z/candidates.md
 canonical_issue_path: ""
 platform_ids: {}
 primary_platform: ""

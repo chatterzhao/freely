@@ -2,7 +2,7 @@
 - kind: fix
 - phase_state: completed
 - milestone: M-20260625T003331Z-A
-- source_candidate: docs/pre-brainstorms/20260625T003331Z--feedback-platform-only/candidates.md#C-20260625T003331Z-A
+- source_candidate: docs/B1-docs/raw-20260625T003331Z/candidates.md#C-20260625T003331Z-A
 - verification_artifact_dir: docs/epics/feedback-platform-only/code-reviews
-- canonical_issue_path: docs/issues/I-20260625T003331Z-A/issue.md
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260625T003331Z-A/issue.md
 - title: feedback platform-only

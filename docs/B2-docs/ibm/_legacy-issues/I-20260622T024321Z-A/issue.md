@@ -9,7 +9,7 @@ platform_ids:
     issue_id: '3322'
     url: https://github.com/chatterzhao/freely/issues/3322
 primary_platform: github
-source_candidate: docs/pre-brainstorms/20260622T024321Z--platform-sync-batch/candidates.md#C-20260622T024321Z-A
+source_candidate: docs/B1-docs/raw-20260622T024321Z/candidates.md#C-20260622T024321Z-A
 created_at: '2026-06-22T02:43:21Z'
 updated_at: '2026-06-22T02:43:21Z'
 author: platform

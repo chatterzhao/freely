@@ -2,16 +2,16 @@
 - kind: fix
 - phase_state: completed
 - milestone: M-20260627T084523Z-A
-- source_candidate: docs/pre-brainstorms/20260627T084523Z--agent-lifecycle/candidates.md#C-20260627T084523Z-A
+- source_candidate: docs/B1-docs/raw-20260627T084523Z/candidates.md#C-20260627T084523Z-A
 - source_raw: raw-20260627T084523Z
 - verification_artifact_dir: docs/epics/agent-lifecycle/code-reviews
-- canonical_issue_path: docs/issues/I-20260627T084523Z-A/issue.md
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260627T084523Z-A/issue.md
 - pre_tests_path: docs/epics/agent-lifecycle/verification/pre-tests.md
 - title: Agent 生命周期管理 — 僵尸清理、并发控制、session 关闭
 
 # I-20260627T084523Z-A: Agent 生命周期管理
 
-- source_candidate: docs/pre-brainstorms/20260627T084523Z--agent-lifecycle/candidates.md#C-20260627T084523Z-A
+- source_candidate: docs/B1-docs/raw-20260627T084523Z/candidates.md#C-20260627T084523Z-A
 - verification_artifact_dir: docs/epics/agent-lifecycle/code-reviews
 - pre_tests_path: docs/epics/agent-lifecycle/verification/pre-tests.md
 

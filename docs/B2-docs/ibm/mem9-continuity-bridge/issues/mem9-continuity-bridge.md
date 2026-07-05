@@ -7,8 +7,8 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `mem9-continuity-bridge`
 - issue-name: `mem9-continuity-bridge`
-- source_candidate: `docs/pre-brainstorms/20260318-1222--mem9-shared-memory-fit-for-freely/candidates.md#c-20260318-1222-01`
-- source_brainstorm: `docs/pre-brainstorms/20260318-1222--mem9-shared-memory-fit-for-freely/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260318-1222/candidates.md#c-20260318-1222-01`
+- source_brainstorm: `docs/B1-docs/raw-20260318-1222/brainstorms.md`
 - execution_base: `feature/mem9-research-20260318`
 - integration_target: `develop`
 - depends_on: `none`
@@ -35,13 +35,13 @@ Freely 已经拥有本地 continuity / recovery / session rotation / multi-workt
 - `mem9` 不会被描述为 Freely 的正式治理事实源。
 - 本地治理事实源的优先级保持不变。
 - `skill:mem9-continuity-bridge` 已存在并被技能索引收录。
-- `docs/pre-brainstorms/.../candidates.md` 已回写到正式 issue 路径。
+- `docs/B1-docs/raw-.../candidates.md` 已回写到正式 issue 路径。
 - 这条研究不再停留在“只有 brainstorm，没有承接”的状态。
 
 ## Completion
 
-- `docs/pre-brainstorms/20260318-1222--mem9-shared-memory-fit-for-freely/brainstorms.md`
-- `docs/pre-brainstorms/20260318-1222--mem9-shared-memory-fit-for-freely/candidates.md`
+- `docs/B1-docs/raw-20260318-1222/brainstorms.md`
+- `docs/B1-docs/raw-20260318-1222/candidates.md`
 - `docs/system/workspace/skills/mem9-continuity-bridge/SKILL.md`
 - `docs/system/workspace/skills/README.md`
 

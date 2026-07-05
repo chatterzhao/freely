@@ -5,7 +5,7 @@ status: in_dev
 phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
 promoted_from: raw-20260612T000223Z
-source_candidate: docs/pre-brainstorms/20260612T000223Z--a2a-replace-handoff/candidates.md
+source_candidate: docs/B1-docs/raw-20260612T000223Z/candidates.md
 canonical_issue_path: ''
 platform_ids:
   github:
@@ -28,7 +28,7 @@ platform_state: closed
 
 # I-20260612T000223Z-A: A2A 协议替换 Freely Handoff 架构重构
 
-- source_candidate: `docs/pre-brainstorms/20260612T000223Z--a2a-replace-handoff/candidates.md`
+- source_candidate: `docs/B1-docs/raw-20260612T000223Z/candidates.md`
 - pre_tests_path: `docs/epics/a2a-replace-handoff/architecture-refactor/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/a2a-replace-handoff/architecture-refactor/code-reviews`
 

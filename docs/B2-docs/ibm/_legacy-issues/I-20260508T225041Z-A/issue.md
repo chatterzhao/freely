@@ -4,7 +4,7 @@ kind: linked
 phase_state: absorbed
 platform_state: open
 promoted_from: raw-20260508T225041Z
-source_candidate: docs/pre-brainstorms/20260508T225041Z--acp-bridge-restart-storm/candidates.md#C-20260508T225041Z-A
+source_candidate: docs/B1-docs/raw-20260508T225041Z/candidates.md#C-20260508T225041Z-A
 verification_artifact_dir: docs/epics/acp-bridge-restart-storm/code-reviews
 pre_tests_path: docs/epics/acp-bridge-restart-storm/verification/pre-tests.md
 platform_ids:

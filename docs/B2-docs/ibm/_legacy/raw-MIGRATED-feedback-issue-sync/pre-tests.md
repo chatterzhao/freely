@@ -48,13 +48,13 @@
 ^- status: passed
 
 ### acceptance-4: 本地文件创建
-- acceptance_target: 调用 feedback 后生成 `docs/issues/raw-{key}/issue.md`
+- acceptance_target: 调用 feedback 后生成 `docs/B1-docs/raw-{key}/issue.md`
 - testing_layer: end-to-end
 - target_environment: fix/raw-20260624T141559Z-feedback-issue-sync
 - required_evidence: issue.md 存在且包含正确的 frontmatter 字段
 - test_command: |
   freely feedback --title "e2e test" --body "test body" 2>&1
-  ls docs/issues/raw-*/issue.md | tail -1 | xargs head -5
+  ls docs/B1-docs/raw-*/issue.md | tail -1 | xargs head -5
 - expected_output: |
   local_id: raw-...
   kind: raw

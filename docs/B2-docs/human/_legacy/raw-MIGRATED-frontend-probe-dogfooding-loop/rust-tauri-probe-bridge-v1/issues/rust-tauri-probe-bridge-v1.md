@@ -7,8 +7,8 @@
 - epic-name: `frontend-probe-dogfooding-loop`
 - story-name: `rust-tauri-probe-bridge-v1`
 - issue-name: `rust-tauri-probe-bridge-v1`
-- source_candidate: `docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/candidates.md#c-20260317-0332`
-- source_brainstorm: `docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260317-0332/candidates.md#c-20260317-0332`
+- source_brainstorm: `docs/B1-docs/raw-20260317-0332/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/pre-tests.md`
@@ -92,7 +92,7 @@
   - 把 `Frontend Probe v0` 当前缺失的 backend bridge 独立成正式 issue，避免继续把 backend 问题混在前端 dev-loop 中。
   - 当前阶段仍是 issue-bound IBM 收敛，不进入 Rust/Tauri 实现代码。
 - required_doc_refs:
-  - `docs/pre-brainstorms/20260317-0332--rust-tauri-probe-bridge-v1/brainstorms.md`
+  - `docs/B1-docs/raw-20260317-0332/brainstorms.md`
   - `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/brainstorms/b-rust-tauri-probe-bridge-v1.md`
   - `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/prd.md`
   - `docs/epics/frontend-probe-dogfooding-loop/rust-tauri-probe-bridge-v1/pre-tests.md`

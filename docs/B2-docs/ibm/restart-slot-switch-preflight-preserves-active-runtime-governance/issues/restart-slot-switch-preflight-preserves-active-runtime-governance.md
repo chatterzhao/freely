@@ -8,8 +8,8 @@
 - story-name: `restart-slot-switch-preflight-preserves-active-runtime-governance`
 - issue-name: `restart-slot-switch-preflight-preserves-active-runtime-governance`
 - priority: `P1`
-- source_candidate: `docs/pre-brainstorms/20260405-2055--restart-slot-switch-preflight-preserves-active-runtime/candidates.md#c-20260405-2055-a`
-- source_brainstorm: `docs/pre-brainstorms/20260405-2055--restart-slot-switch-preflight-preserves-active-runtime/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260405-2055/candidates.md#c-20260405-2055-a`
+- source_brainstorm: `docs/B1-docs/raw-20260405-2055/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/restart-slot-switch-preflight-preserves-active-runtime-governance/pre-tests.md`
@@ -68,8 +68,8 @@ Freely 已经为 `freely start` 冻结了 shared codex slot-switch lock 的 star
 
 ## Completion
 
-- `docs/pre-brainstorms/20260405-2055--restart-slot-switch-preflight-preserves-active-runtime/brainstorms.md`
-- `docs/pre-brainstorms/20260405-2055--restart-slot-switch-preflight-preserves-active-runtime/candidates.md`
+- `docs/B1-docs/raw-20260405-2055/brainstorms.md`
+- `docs/B1-docs/raw-20260405-2055/candidates.md`
 - `docs/epics/workspace-routing-foundation/restart-slot-switch-preflight-preserves-active-runtime-governance/issues/restart-slot-switch-preflight-preserves-active-runtime-governance.md`
 - `docs/epics/workspace-routing-foundation/restart-slot-switch-preflight-preserves-active-runtime-governance/brainstorms/b-restart-slot-switch-preflight-preserves-active-runtime-governance.md`
 - `docs/epics/workspace-routing-foundation/restart-slot-switch-preflight-preserves-active-runtime-governance/prd.md`

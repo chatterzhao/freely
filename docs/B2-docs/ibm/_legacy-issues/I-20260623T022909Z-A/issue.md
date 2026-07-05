@@ -4,8 +4,8 @@ kind: fix
 phase_state: completed
 verification_artifact_dir: ""
 milestone: "M-20260623T022909Z-A"
-source_candidate: docs/pre-brainstorms/20260623T022909Z--scan-import-fix/candidates.md#C-20260623T022909Z-A
-canonical_issue_path: docs/issues/I-20260623T022909Z-A/issue.md
+source_candidate: docs/B1-docs/raw-20260623T022909Z/candidates.md#C-20260623T022909Z-A
+canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260623T022909Z-A/issue.md
 title: "fix: task-lifecycle-scan.py platform_adapter import broken by hyphenated filename"
 created_at: "2026-06-23T02:33:00Z"
 author: worker

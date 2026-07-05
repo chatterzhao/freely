@@ -8,8 +8,8 @@
 - story-name: `sandbox-compatible-runtime-bootstrap-and-operator-state-governance`
 - issue-name: `sandbox-compatible-runtime-bootstrap-and-operator-state-governance`
 - priority: P0
-- source_candidate: `docs/pre-brainstorms/20260403-2245--sandbox-compatible-runtime-bootstrap-and-operator-state/candidates.md#c-20260403-2245-a`
-- source_brainstorm: `docs/pre-brainstorms/20260403-2245--sandbox-compatible-runtime-bootstrap-and-operator-state/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260403-2245/candidates.md#c-20260403-2245-a`
+- source_brainstorm: `docs/B1-docs/raw-20260403-2245/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/pre-tests.md`
@@ -59,9 +59,9 @@ That hidden dead-end pressures users and agents back toward protected-root edits
 
 ## Completion
 
-- `docs/pre-brainstorms/20260403-2245--sandbox-compatible-runtime-bootstrap-and-operator-state/brainstorms.md`
-- `docs/pre-brainstorms/20260403-2245--sandbox-compatible-runtime-bootstrap-and-operator-state/candidates.md`
-- `docs/pre-brainstorms/INDEX.md`
+- `docs/B1-docs/raw-20260403-2245/brainstorms.md`
+- `docs/B1-docs/raw-20260403-2245/candidates.md`
+- `docs/B1-docs/raw-INDEX.md`
 - `docs/milestones.md`
 - `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/issues/sandbox-compatible-runtime-bootstrap-and-operator-state-governance.md`
 - `docs/epics/workspace-routing-foundation/sandbox-compatible-runtime-bootstrap-and-operator-state-governance/prd.md`

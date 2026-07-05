@@ -8,8 +8,8 @@
 - story-name: `manager-self-supervision-and-autonomous-recovery`
 - issue-name: `manager-self-supervision-and-autonomous-recovery`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/manager-self-supervision-and-autonomous-recovery/code-reviews`
-- source_candidate: `docs/pre-brainstorms/20260318-1408--manager-self-supervision-and-autonomous-recovery/candidates.md#c-20260318-a`
-- source_brainstorm: `docs/pre-brainstorms/20260318-1408--manager-self-supervision-and-autonomous-recovery/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260318-1408/candidates.md#c-20260318-a`
+- source_brainstorm: `docs/B1-docs/raw-20260318-1408/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `docs/epics/workspace-routing-foundation/checkpoint-commit-and-multi-worktree-supervision-governance/issues/checkpoint-commit-and-multi-worktree-supervision-governance.md`

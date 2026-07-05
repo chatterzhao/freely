@@ -172,7 +172,7 @@
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
 - task_refs: `tasks.md#T-11`
-- case_design: `Verify write_intake_item creates docs/issues/raw-*/issue.md. Verify scan_raw_issues returns raw issues.`
+- case_design: `Verify write_intake_item creates docs/B1-docs/raw-*/issue.md. Verify scan_raw_issues returns raw issues.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-chat-intake-to-issue.md`
 
 ### PT-12
@@ -281,7 +281,7 @@
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
 - task_refs: `tasks.md#T-21`
-- case_design: `Verify ensure_interruption_dispatch_once scans docs/issues/raw-* for unprocessed issues.`
+- case_design: `Verify ensure_interruption_dispatch_once scans docs/B1-docs/raw-* for unprocessed issues.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260427-b2-handler-bridge.md`
 
 ### PT-22
@@ -638,7 +638,7 @@
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
 - task_refs: `tasks.md#T-50`
-- case_design: `Verify phase_state=completed in docs/issues/I-20260426-0000-A/issue.md. Verify scan excludes completed issues.`
+- case_design: `Verify phase_state=completed in docs/B2-docs/ibm/_legacy-issues/I-20260426-0000-A/issue.md. Verify scan excludes completed issues.`
 - artifact_ref: `docs/epics/workspace-routing-foundation/tool-alias-and-opencode-launcher-governance/code-reviews/20260428-fix-phase-state.md`
 
 

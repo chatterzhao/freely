@@ -8,8 +8,8 @@
 - story-name: `stale-prebrainstorm-truth-reconcile-governance`
 - issue-name: `stale-prebrainstorm-truth-reconcile-governance`
 - priority: `P1`
-- source_candidate: `docs/pre-brainstorms/20260411-1417--stale-prebrainstorm-truth-reconcile/candidates.md#c-20260411-1417-a`
-- source_brainstorm: `docs/pre-brainstorms/20260411-1417--stale-prebrainstorm-truth-reconcile/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260411-1417/candidates.md#c-20260411-1417-a`
+- source_brainstorm: `docs/B1-docs/raw-20260411-1417/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/stale-prebrainstorm-truth-reconcile-governance/pre-tests.md`
@@ -44,8 +44,8 @@
   - `docs/epics/workspace-routing-foundation/stale-prebrainstorm-truth-reconcile-governance/prd.md`
   - `docs/epics/workspace-routing-foundation/stale-prebrainstorm-truth-reconcile-governance/pre-tests.md`
   - `docs/epics/workspace-routing-foundation/stale-prebrainstorm-truth-reconcile-governance/tasks.md`
-  - `docs/pre-brainstorms/20260408-1205--verification-contract-and-premerge-adequacy/brainstorms.md`
-  - `docs/pre-brainstorms/20260327-0651--pretests-gate-and-network-proxy-config/brainstorms.md`
+  - `docs/B1-docs/raw-20260408-1205/brainstorms.md`
+  - `docs/B1-docs/raw-20260327-0651/brainstorms.md`
 
 ## Next
 

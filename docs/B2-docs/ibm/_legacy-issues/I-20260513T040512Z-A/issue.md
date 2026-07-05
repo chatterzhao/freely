@@ -4,7 +4,7 @@ kind: i_issue
 phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
 promoted_from: raw-20260513T040512Z
-source_candidate: docs/pre-brainstorms/20260513T040512Z--task-lifecycle-scan-batch/candidates.md
+source_candidate: docs/B1-docs/raw-20260513T040512Z/candidates.md
 milestone: M-20260513T040512Z-A
 candidate: C-20260513T040512Z-A
 canonical_issue_path: ''
@@ -21,16 +21,16 @@ intake_id: ''
 author: zhaoquan
 channel: freely-feat-execution
 session_refs: []
-pre_tests_path: docs/issues/I-20260513T040512Z-A/pre-tests.md
+pre_tests_path: docs/B2-docs/ibm/_legacy-issues/I-20260513T040512Z-A/pre-tests.md
 verification_artifact_dir: docs/epics/task-lifecycle-scan-batch/code-reviews/
 platform_state: closed
 ---
 
 # I-20260513T040512Z-A: task-lifecycle-scan 批量化 — 1+3 阶段扫描替代 O(n) API 逐项查询
 
-- source_candidate: `docs/pre-brainstorms/20260513T040512Z--task-lifecycle-scan-batch/candidates.md`
+- source_candidate: `docs/B1-docs/raw-20260513T040512Z/candidates.md`
 - milestone: `M-20260513T040512Z-A`
-- pre_tests_path: `docs/issues/I-20260513T040512Z-A/pre-tests.md`
+- pre_tests_path: `docs/B2-docs/ibm/_legacy-issues/I-20260513T040512Z-A/pre-tests.md`
 
 ## 目标
 

@@ -4,7 +4,7 @@ kind: linked
 status: completed
 phase_state: completed
 promoted_from: raw-20260623T140410Z
-source_candidate: docs/pre-brainstorms/20260623T140410Z--restore-tasks-edge-cases/candidates.md
+source_candidate: docs/B1-docs/raw-20260623T140410Z/candidates.md
 canonical_issue_path: ""
 platform_ids:
   github:
@@ -27,7 +27,7 @@ verification_artifact_dir: docs/epics/a2a-state-management/code-reviews
 
 # I-20260623T140410Z-A: A2A 状态管理全量修复
 
-- source_candidate: `docs/pre-brainstorms/20260623T140410Z--restore-tasks-edge-cases/candidates.md`
+- source_candidate: `docs/B1-docs/raw-20260623T140410Z/candidates.md`
 - pre_tests_path: `docs/epics/a2a-state-management/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/a2a-state-management/code-reviews`
 

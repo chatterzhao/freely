@@ -8,8 +8,8 @@
 - story-name: `supply-chain-baseline-and-install-intake-audit-governance`
 - issue-name: `supply-chain-baseline-and-install-intake-audit-governance`
 - priority: P1
-- source_candidate: `docs/pre-brainstorms/20260401-0115--supply-chain-baseline-and-install-intake-audit-capability/candidates.md#c-20260401-0115-a`
-- source_brainstorm: `docs/pre-brainstorms/20260401-0115--supply-chain-baseline-and-install-intake-audit-capability/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260401-0115/candidates.md#c-20260401-0115-a`
+- source_brainstorm: `docs/B1-docs/raw-20260401-0115/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/supply-chain-baseline-and-install-intake-audit-governance/pre-tests.md`
@@ -67,9 +67,9 @@ This owner closes that narrow gap without reopening the broader security umbrell
 
 ## Completion
 
-- `docs/pre-brainstorms/INDEX.md`
-- `docs/pre-brainstorms/20260401-0115--supply-chain-baseline-and-install-intake-audit-capability/brainstorms.md`
-- `docs/pre-brainstorms/20260401-0115--supply-chain-baseline-and-install-intake-audit-capability/candidates.md`
+- `docs/B1-docs/raw-INDEX.md`
+- `docs/B1-docs/raw-20260401-0115/brainstorms.md`
+- `docs/B1-docs/raw-20260401-0115/candidates.md`
 - `docs/milestones.md`
 - `docs/epics/workspace-routing-foundation/supply-chain-baseline-and-install-intake-audit-governance/issues/supply-chain-baseline-and-install-intake-audit-governance.md`
 - `docs/epics/workspace-routing-foundation/supply-chain-baseline-and-install-intake-audit-governance/pre-tests.md`

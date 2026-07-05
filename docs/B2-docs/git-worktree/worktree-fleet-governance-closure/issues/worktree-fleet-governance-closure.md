@@ -8,8 +8,8 @@
 - story-name: `worktree-fleet-governance-closure`
 - issue-name: `worktree-fleet-governance-closure`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/worktree-fleet-governance-closure/code-reviews`
-- source_candidate: `docs/pre-brainstorms/20260321-0257--worktree-fleet-governance-closure/candidates.md#c-20260321-0257-a`
-- source_brainstorm: `docs/pre-brainstorms/20260321-0257--worktree-fleet-governance-closure/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260321-0257/candidates.md#c-20260321-0257-a`
+- source_brainstorm: `docs/B1-docs/raw-20260321-0257/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `docs/epics/workspace-routing-foundation/worktree-maintenance-governance/issues/worktree-maintenance-governance.md`, `docs/epics/workspace-routing-foundation/stacked-worktree-merge-chain-governance/issues/stacked-worktree-merge-chain-governance.md`

@@ -8,8 +8,8 @@
 - story-name: `absorbed-merged-lane-routing-followthrough-governance`
 - issue-name: `absorbed-merged-lane-routing-followthrough-governance`
 - priority: `P0`
-- source_candidate: `docs/pre-brainstorms/20260421-1330--absorbed-merged-lane-routing-followthrough/candidates.md#c-20260421-1330-a`
-- source_brainstorm: `docs/pre-brainstorms/20260421-1330--absorbed-merged-lane-routing-followthrough/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260421-1330/candidates.md#c-20260421-1330-a`
+- source_brainstorm: `docs/B1-docs/raw-20260421-1330/brainstorms.md`
 - reopen_of_issue: `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
 - reopen_reason: `canonical develop self-host replay proved absorbed merged blocker lanes were no longer auto-recovered, but scan/fleet patrol still routed them as if they were launchable worker execution targets`
 - execution_base: `develop`
@@ -78,8 +78,8 @@ This owner exists to downgrade those absorbed lanes to cleanup-followthrough vis
 
 ## Completion
 
-- `docs/pre-brainstorms/20260421-1330--absorbed-merged-lane-routing-followthrough/brainstorms.md`
-- `docs/pre-brainstorms/20260421-1330--absorbed-merged-lane-routing-followthrough/candidates.md`
+- `docs/B1-docs/raw-20260421-1330/brainstorms.md`
+- `docs/B1-docs/raw-20260421-1330/candidates.md`
 - `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/issues/absorbed-merged-lane-routing-followthrough-governance.md`
 - `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/pre-tests.md`
 - `docs/epics/workspace-routing-foundation/absorbed-merged-lane-routing-followthrough-governance/tasks.md`

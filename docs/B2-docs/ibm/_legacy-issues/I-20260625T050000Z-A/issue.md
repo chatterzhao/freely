@@ -4,7 +4,7 @@ kind: linked
 status: completed
 phase_state: completed
 promoted_from: C-20260625T050000Z-A
-source_candidate: docs/pre-brainstorms/20260625T050000Z--pr-create-pull-after-gates/candidates.md#C-20260625T050000Z-A
+source_candidate: docs/B1-docs/raw-20260625T050000Z/candidates.md#C-20260625T050000Z-A
 canonical_issue_path: docs/epics/pr-create-pull-after-gates/issues/I-20260625T050000Z-A.md
 milestone: M-20260625T050000Z-A
 title: 'fix: move git pull in pr-create-guarded after all gates pass'

@@ -9,8 +9,8 @@
 - story-name: `story-level-pre-tests-quality-gate-governance`
 - issue-name: `story-level-pre-tests-quality-gate-governance`
 - priority: P0
-- source_candidate: `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/candidates.md#c-20260325-0333-b`
-- source_brainstorm: `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260325-0333/candidates.md#c-20260325-0333-b`
+- source_brainstorm: `docs/B1-docs/raw-20260325-0333/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/pre-tests.md`
@@ -78,7 +78,7 @@ Freely 已经明确 `pre-tests.md` 是 issue-level acceptance 控制面，但还
 - `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/prd.md`
 - `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/pre-tests.md`
 - `docs/epics/workspace-routing-foundation/story-level-pre-tests-quality-gate-governance/tasks.md`
-- `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/inventory.md`
+- `docs/B1-docs/raw-20260325-0333/inventory.md`
 - `docs/system/workspace/skills/doc-ibm-execution/SKILL.md`
 - `docs/system/workspace/skills/doc-ibm-execution/references/prd-quality-bar.md`
 - `docs/system/workspace/skills/doc-ibm-execution/references/ibm-completion-gate.md`

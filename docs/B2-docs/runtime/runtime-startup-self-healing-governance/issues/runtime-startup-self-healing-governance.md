@@ -8,8 +8,8 @@
 - story-name: `runtime-startup-self-healing-governance`
 - issue-name: `runtime-startup-self-healing-governance`
 - priority: `P0`
-- source_candidate: `docs/pre-brainstorms/20260419-1630--runtime-startup-self-healing-boundary/candidates.md#c-20260419-1630-a`
-- source_brainstorm: `docs/pre-brainstorms/20260419-1630--runtime-startup-self-healing-boundary/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260419-1630/candidates.md#c-20260419-1630-a`
+- source_brainstorm: `docs/B1-docs/raw-20260419-1630/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - prd_path: `docs/epics/workspace-routing-foundation/runtime-startup-self-healing-governance/prd.md`

@@ -5,7 +5,7 @@
 - `docs/system/workspace/scripts/tests/test-freely-chat-worker-reactivation`
 - `docs/system/workspace/scripts/tests/test-freely-interruption-direct-answer`
 - `docs/system/workspace/scripts/tests/test-freely-project-command-semantics`
-- `docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/brainstorms.md`
+- `docs/B1-docs/raw-20260401-1831/brainstorms.md`
 
 ## Completed Validation
 

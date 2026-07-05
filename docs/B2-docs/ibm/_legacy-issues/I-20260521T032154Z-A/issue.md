@@ -4,7 +4,7 @@ kind: linked
 status: done_b2_ibm
 phase_state: done_b2_ibm
 promoted_from: raw-20260521T032154Z
-source_candidate: docs/pre-brainstorms/raw-20260521T032154Z--supervisor-crash-set-e-exit-cmd/candidates.md
+source_candidate: docs/B1-docs/raw-20260521T032154Z--supervisor-crash-set-e-exit-cmd/candidates.md
 canonical_issue_path: ""
 platform_ids:
   github:
@@ -27,7 +27,7 @@ milestone: M-20260521T032154Z-A
 
 # I-20260521T032154Z-A: Fix _on_supervisor_err recursive ERR trap false positive
 
-- source_candidate: `docs/pre-brainstorms/raw-20260521T032154Z--supervisor-crash-set-e-exit-cmd/candidates.md#C-20260521T032154Z-A`
+- source_candidate: `docs/B1-docs/raw-20260521T032154Z--supervisor-crash-set-e-exit-cmd/candidates.md#C-20260521T032154Z-A`
 - pre_tests_path: `docs/epics/supervisor-crash/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/supervisor-crash/code-reviews`
 - milestone: M-20260521T032154Z-A

@@ -4,7 +4,7 @@ kind: linked
 status: in_dev
 phase_state: completed
 promoted_from: raw-20260618T050413Z
-source_candidate: docs/pre-brainstorms/20260618T050413Z--pr-create-untracked-refine/candidates.md
+source_candidate: docs/B1-docs/raw-20260618T050413Z/candidates.md
 pre_tests_path: docs/epics/pr-create-untracked-refine/verification/pre-tests.md
 verification_artifact_dir: docs/epics/pr-create-untracked-refine/code-reviews
 platform_ids:

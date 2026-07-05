@@ -8,8 +8,8 @@
 - story-name: `auth-switch-real-environment-and-e2e-adequacy-governance`
 - issue-name: `auth-switch-real-environment-and-e2e-adequacy-governance`
 - priority: `P1`
-- source_candidate: `docs/pre-brainstorms/20260410-1835--auth-switch-real-environment-and-e2e-governance-gap/candidates.md#c-20260410-1835-a`
-- source_brainstorm: `docs/pre-brainstorms/20260410-1835--auth-switch-real-environment-and-e2e-governance-gap/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260410-1835/candidates.md#c-20260410-1835-a`
+- source_brainstorm: `docs/B1-docs/raw-20260410-1835/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/auth-switch-real-environment-and-e2e-adequacy-governance/pre-tests.md`

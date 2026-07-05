@@ -2,10 +2,10 @@
 local_id: I-20260616T143914Z-A
 kind: linked
 phase_state: completed
-source_candidate: docs/pre-brainstorms/20260616T143914Z--workflow-docs-governance/candidates.md#C-20260616T143914Z-A
+source_candidate: docs/B1-docs/raw-20260616T143914Z/candidates.md#C-20260616T143914Z-A
 platform_ids: {}
 primary_platform: github
-canonical_issue_path: docs/pre-brainstorms/20260616T143914Z--workflow-docs-governance/candidates.md
+canonical_issue_path: docs/B1-docs/raw-20260616T143914Z/candidates.md
 last_synced_comment_at: {}
 hash: ''
 created_at: '2026-06-16T14:39:14Z'

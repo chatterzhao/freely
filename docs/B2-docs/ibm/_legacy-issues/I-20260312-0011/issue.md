@@ -32,8 +32,8 @@ platform_state: closed
 - story-name: `backend-service-contract-and-adapter-taxonomy`
 - issue-name: `backend-service-contract-and-adapter-taxonomy`
 - verification_artifact_dir: `docs/epics/- epic-name: `control-surface-runtime-convergence`/- story-name: `backend-service-contract-and-adapter-taxonomy`/code-reviews`
-- source_candidate: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/candidates.md#c-20260312-0011-a`
-- source_brainstorm: `docs/pre-brainstorms/20260312-0011--architecture-synthesis-and-api-boundary/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260312-0011/candidates.md#c-20260312-0011-a`
+- source_brainstorm: `docs/B1-docs/raw-20260312-0011/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `docs/epics/frontend-probe-dogfooding-loop/internal-frontend-backend-architecture-review/issues/internal-frontend-backend-architecture-review.md`

@@ -4,7 +4,7 @@ kind: linked
 phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
 promoted_from: raw-20260516T094405Z
-source_candidate: docs/pre-brainstorms/20260516T094405Z--delegate-workers-exclusive-conflict/candidates.md
+source_candidate: docs/B1-docs/raw-20260516T094405Z/candidates.md
 canonical_issue_path: ''
 platform_ids:
   github:

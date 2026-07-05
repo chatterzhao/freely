@@ -8,7 +8,7 @@
 
 `cmd_feedback` 当前是唯一绕过多平台抽象层 `issue-sync` 的命令（硬编码 `gh issue create`，仅支持 GitHub）。将其改为 `issue-sync create` 的薄封装，实现：
 1. repo 从 git remote 自动检测，去掉 `--repo` 参数
-2. 创建本地 `docs/issues/raw-{key}/issue.md` 作为 single source of truth
+2. 创建本地 `docs/B1-docs/raw-{key}/issue.md` 作为 single source of truth
 3. 多平台创建委托给 `issue-sync`，加新平台只需在 adapter 层新增
 
 ## Dev-Loop Handoff

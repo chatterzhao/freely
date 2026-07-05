@@ -9,8 +9,8 @@
 - issue-name: `chat-triggered-worker-runtime-reactivation-governance`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/chat-triggered-worker-runtime-reactivation-governance/code-reviews`
 - priority: P1
-- source_candidate: `docs/pre-brainstorms/20260321-1706--chat-triggered-worker-runtime-reactivation/candidates.md#c-20260321-1706-a`
-- source_brainstorm: `docs/pre-brainstorms/20260321-1706--chat-triggered-worker-runtime-reactivation/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260321-1706/candidates.md#c-20260321-1706-a`
+- source_brainstorm: `docs/B1-docs/raw-20260321-1706/brainstorms.md`
 - execution_base: `feature/codex-session-reentry-and-pty-input-20260321`
 - integration_target: `develop`
 - depends_on:

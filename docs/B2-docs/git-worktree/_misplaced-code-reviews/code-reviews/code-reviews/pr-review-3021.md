@@ -6,9 +6,9 @@
 - review_date: 2026-06-19
 - verdict: pass
 - issue_id: raw-20260618T094846Z
-- issue_path: docs/issues/raw-20260618T094846Z/issue.md
+- issue_path: docs/B1-docs/raw-20260618T094846Z/issue.md
 - candidate_id: C-20260618T094846Z-A
-- candidate_path: docs/pre-brainstorms/20260618T094846Z--update-three-loop-svg/candidates.md
+- candidate_path: docs/B1-docs/raw-20260618T094846Z/candidates.md
 
 ## 1. Worktree Check - pass
 ## 2. IBM Completeness - pass  

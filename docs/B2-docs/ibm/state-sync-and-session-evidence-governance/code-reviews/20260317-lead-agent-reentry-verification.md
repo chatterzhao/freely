@@ -14,7 +14,7 @@
 - `docs/system/workspace/tools.md`
 - `docs/system/workspace/skills/context-source-skill/SKILL.md`
 - `docs/system/workspace/skills/dev-loop-execution/SKILL.md`
-- `docs/pre-brainstorms/CONVERGENCE.md`
+- `docs/B1-docs/raw-CONVERGENCE.md`
 
 ## Findings
 

@@ -8,8 +8,8 @@
 - story-name: `manager-startup-continuity-materialization-governance`
 - issue-name: `manager-startup-continuity-materialization-governance`
 - priority: `P0`
-- source_candidate: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/candidates.md#c-20260413-0420-d`
-- source_brainstorm: `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260413-0420/candidates.md#c-20260413-0420-d`
+- source_brainstorm: `docs/B1-docs/raw-20260413-0420/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/pre-tests.md`
@@ -61,8 +61,8 @@ That leaves Freely with a narrow but real product defect: the outer loop can be 
   - The implementation remains bounded: write a startup stub if the prompt-required file is absent, classify the observed handoff artifact by writer/source, and surface that classification in status.
   - Startup authority/readiness remains owned by `I-20260413-0420-A`; manager continuity contract shape remains owned by `I-20260413-0420-B`.
 - required_doc_refs:
-  - `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/brainstorms.md`
-  - `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/candidates.md`
+  - `docs/B1-docs/raw-20260413-0420/brainstorms.md`
+  - `docs/B1-docs/raw-20260413-0420/candidates.md`
   - `docs/epics/workspace-routing-foundation/manager-startup-continuity-contract-governance/issues/manager-startup-continuity-contract-governance.md`
   - `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/brainstorms/b-manager-startup-continuity-materialization-governance.md`
   - `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/prd.md`
@@ -89,7 +89,7 @@ That leaves Freely with a narrow but real product defect: the outer loop can be 
 
 ## Completion
 
-- `docs/pre-brainstorms/20260413-0420--real-repo-daemon-gap-and-foreground-double-start-regression/candidates.md`
+- `docs/B1-docs/raw-20260413-0420/candidates.md`
 - `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/issues/manager-startup-continuity-materialization-governance.md`
 - `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/brainstorms/b-manager-startup-continuity-materialization-governance.md`
 - `docs/epics/workspace-routing-foundation/manager-startup-continuity-materialization-governance/prd.md`

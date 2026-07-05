@@ -5,7 +5,7 @@ phase_state: completed
 completed_at: "2026-05-19T23:20:00Z"
 absorbed_at: '2026-05-16T14:27:11Z'
 promoted_from: raw-20260513T075904Z
-source_candidate: docs/pre-brainstorms/20260513T075904Z--pr-merge-guarded-phase-state-fix/candidates.md#C-20260513T075904Z-A
+source_candidate: docs/B1-docs/raw-20260513T075904Z/candidates.md#C-20260513T075904Z-A
 verification_artifact_dir: docs/epics/pr-merge-guarded-phase-state-fix/code-reviews
 pre_tests_path: docs/epics/pr-merge-guarded-phase-state-fix/verification/pre-tests.md
 platform_ids:

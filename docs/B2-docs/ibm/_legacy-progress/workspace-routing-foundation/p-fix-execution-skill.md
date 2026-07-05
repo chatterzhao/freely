@@ -3,7 +3,7 @@
 - issue: `I-20260503-0000-B`
 - issue_path: `docs/epics/workspace-routing-foundation/freely-fix-execution-skill/issues/I-20260503-0000-B.md`
 - candidate: `C-20260503-0000-B`
-- candidate_path: `docs/pre-brainstorms/20260503-fix-skill/candidates.md`
+- candidate_path: `docs/B1-docs/raw-20260503-fix-skill/candidates.md`
 - milestone: `M-20260306-workspace-routing-foundation`
 - phase_state: `done`
 - runtime_state: `ready_for_merge`

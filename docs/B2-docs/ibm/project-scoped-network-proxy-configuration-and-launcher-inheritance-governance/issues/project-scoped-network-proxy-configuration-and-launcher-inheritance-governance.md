@@ -8,8 +8,8 @@
 - story-name: `project-scoped-network-proxy-configuration-and-launcher-inheritance-governance`
 - issue-name: `project-scoped-network-proxy-configuration-and-launcher-inheritance-governance`
 - priority: P0
-- source_candidate: `docs/pre-brainstorms/20260327-0651--pretests-gate-and-network-proxy-config/candidates.md#c-20260327-0651-b`
-- source_brainstorm: `docs/pre-brainstorms/20260327-0651--pretests-gate-and-network-proxy-config/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260327-0651/candidates.md#c-20260327-0651-b`
+- source_brainstorm: `docs/B1-docs/raw-20260327-0651/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/project-scoped-network-proxy-configuration-and-launcher-inheritance-governance/pre-tests.md`

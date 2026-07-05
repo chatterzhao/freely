@@ -5,7 +5,7 @@ phase_state: completed
 completed_at: "2026-05-19T23:20:00Z"
 absorbed_at: '2026-05-16T14:27:11Z'
 promoted_from: raw-20260507T143545Z
-source_candidate: docs/pre-brainstorms/20260507T143545Z--timestamp-seconds-upgrade/candidates.md
+source_candidate: docs/B1-docs/raw-20260507T143545Z/candidates.md
 canonical_issue_path: ''
 platform_ids:
   github:
@@ -26,7 +26,7 @@ platform_state: closed
 
 # I-20260507T143545Z-A: 时间戳格式带秒升级
 
-- source_candidate: docs/pre-brainstorms/20260507T143545Z--timestamp-seconds-upgrade/candidates.md
+- source_candidate: docs/B1-docs/raw-20260507T143545Z/candidates.md
 - pre_tests_path: docs/epics/timestamp-seconds-upgrade/verification/pre-tests.md
 - verification_artifact_dir: docs/epics/timestamp-seconds-upgrade/code-reviews
 

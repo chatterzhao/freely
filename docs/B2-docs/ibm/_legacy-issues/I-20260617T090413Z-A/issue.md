@@ -4,7 +4,7 @@ kind: linked
 status: in_dev
 phase_state: completed
 promoted_from: raw-20260617T090413Z
-source_candidate: docs/pre-brainstorms/20260617T090413Z--fix-rest-routing/candidates.md
+source_candidate: docs/B1-docs/raw-20260617T090413Z/candidates.md
 verification_artifact_dir: docs/epics/fix-rest-routing/code-reviews
 ---
 # I-20260617T090413Z-A: REST routing for a2a-exit

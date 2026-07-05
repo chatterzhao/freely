@@ -3,7 +3,7 @@ local_id: I-20260508T005431Z-A
 kind: linked
 phase_state: completed
 promoted_from: raw-20260508T005431Z
-source_candidate: docs/pre-brainstorms/20260508T005431Z--skill-standardize/candidates.md
+source_candidate: docs/B1-docs/raw-20260508T005431Z/candidates.md
 canonical_issue_path: ''
 platform_ids:
   github:
@@ -26,7 +26,7 @@ platform_state: closed
 
 - pre_tests_path: docs/epics/skill-standardize/verification/pre-tests.md
 - verification_artifact_dir: docs/epics/skill-standardize/code-reviews
-- source_candidate: docs/pre-brainstorms/20260508T005431Z--skill-standardize/candidates.md
+- source_candidate: docs/B1-docs/raw-20260508T005431Z/candidates.md
 
 ## 实现
 - bin/deploy-skills: 增量部署脚本

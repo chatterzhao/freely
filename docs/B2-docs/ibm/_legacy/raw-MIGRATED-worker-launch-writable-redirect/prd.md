@@ -7,7 +7,7 @@ Runtime 层验证 worker target branch 必须是可写工位（fix/*/feature/*�
 
 ## Background
 
-参见 `docs/pre-brainstorms/20260509T022152Z--worker-launch-writable-redirect/brainstorms.md` 根因分析。
+参见 `docs/B1-docs/raw-20260509T022152Z/brainstorms.md` 根因分析。
 
 ## Dev-Loop Handoff
 

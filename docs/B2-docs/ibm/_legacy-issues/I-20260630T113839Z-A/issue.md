@@ -2,7 +2,7 @@
 - kind: fix
 - phase_state: completed
 - milestone: M-20260630T113839Z-A
-- source_candidate: docs/pre-brainstorms/20260630T113839Z--runtime-dirty-fix/candidates.md#C-20260630T113839Z-A
+- source_candidate: docs/B1-docs/raw-20260630T113839Z/candidates.md#C-20260630T113839Z-A
 - verification_artifact_dir: ""
 - pre_tests_path: ""
 - canonical_issue_path: ""

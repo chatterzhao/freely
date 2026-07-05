@@ -4,8 +4,8 @@ kind: linked
 status: completed
 phase_state: completed
 promoted_from: raw-20260624T105442Z
-source_candidate: docs/pre-brainstorms/20260624T105442Z--wt-close-branch-d-check/candidates.md#C-20260624T105442Z-A
-canonical_issue_path: docs/issues/I-20260624T105442Z-A/issue.md
+source_candidate: docs/B1-docs/raw-20260624T105442Z/candidates.md#C-20260624T105442Z-A
+canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260624T105442Z-A/issue.md
 milestone: M-20260624T105442Z-A
 title: 'fix: wt-close git branch -d 显式指定 develop 检查目标'
 platform_ids: {}

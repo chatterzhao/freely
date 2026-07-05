@@ -4,7 +4,7 @@ issue_title: "移除 A2A 文本 JSON 解析 Fallback (Phase 1+2)"
 kind: linked
 phase_state: in_b2_ibm
 promoted_from: raw-20260615T001626Z
-source_candidate: docs/pre-brainstorms/20260615T001626Z--a2a-no-fallback/candidates.md
+source_candidate: docs/B1-docs/raw-20260615T001626Z/candidates.md
 canonical_issue_path: docs/epics/a2a-replace-handoff/a2a-no-fallback/issues/I-20260615T001626Z-A.md
 platform_ids:
   github:
@@ -47,8 +47,8 @@ verification_artifact_dir: docs/epics/a2a-replace-handoff/a2a-no-fallback/code-r
 
 ### References
 
-- B1 预研: docs/pre-brainstorms/20260615T001626Z--a2a-no-fallback/
-- Candidate: docs/pre-brainstorms/20260615T001626Z--a2a-no-fallback/candidates.md#C-20260615T001626Z-A
+- B1 预研: docs/B1-docs/raw-20260615T001626Z/
+- Candidate: docs/B1-docs/raw-20260615T001626Z/candidates.md#C-20260615T001626Z-A
 - 正式 Issue: docs/epics/a2a-replace-handoff/a2a-no-fallback/issues/I-20260615T001626Z-A.md
 - PRD: docs/epics/a2a-replace-handoff/a2a-no-fallback/prd.md
 - Pre-tests: docs/epics/a2a-replace-handoff/a2a-no-fallback/verification/pre-tests.md

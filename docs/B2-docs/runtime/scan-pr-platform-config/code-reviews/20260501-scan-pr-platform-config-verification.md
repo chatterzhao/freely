@@ -9,7 +9,7 @@
 - artifacts_reviewed:
   - docs/system/workspace/scripts/runtime/freely
   - docs/epics/workspace-routing-foundation/scan-pr-platform-config/pre-tests.md
-  - docs/pre-brainstorms/20260501-0000--scan-pr-platform-config/candidates.md
+  - docs/B1-docs/raw-20260501-0000/candidates.md
 
 ## Implementation Decision Note
 

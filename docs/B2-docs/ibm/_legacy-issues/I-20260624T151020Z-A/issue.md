@@ -2,14 +2,14 @@
 - kind: fix
 - phase_state: completed
 - milestone: M-20260624T151020Z-A
-- source_candidate: docs/pre-brainstorms/20260624T151020Z--wt-close-gate-args/candidates.md#C-20260624T151020Z-A
+- source_candidate: docs/B1-docs/raw-20260624T151020Z/candidates.md#C-20260624T151020Z-A
 - verification_artifact_dir: docs/epics/wt-close-gate-args/code-reviews
-- canonical_issue_path: docs/issues/I-20260624T151020Z-A/issue.md
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260624T151020Z-A/issue.md
 - title: wt-close pretests-retirement-gate 传参修复
 
 # I-20260624T151020Z-A: wt-close pretests-retirement-gate 传参修复
 
-- source_candidate: docs/pre-brainstorms/20260624T151020Z--wt-close-gate-args/candidates.md#C-20260624T151020Z-A
+- source_candidate: docs/B1-docs/raw-20260624T151020Z/candidates.md#C-20260624T151020Z-A
 - source_raw: raw-20260624T151020Z
 - verification_artifact_dir: docs/epics/wt-close-gate-args/code-reviews
 

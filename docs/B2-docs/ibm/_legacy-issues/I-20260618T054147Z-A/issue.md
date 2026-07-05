@@ -4,7 +4,7 @@ kind: linked
 status: in_dev
 phase_state: completed
 promoted_from: raw-20260618T054147Z
-source_candidate: docs/pre-brainstorms/20260618T054147Z--wt-close-prune-stale-refs/candidates.md
+source_candidate: docs/B1-docs/raw-20260618T054147Z/candidates.md
 verification_artifact_dir: docs/epics/wt-close-prune-stale-refs/code-reviews
 platform_ids: {}
 primary_platform: ""

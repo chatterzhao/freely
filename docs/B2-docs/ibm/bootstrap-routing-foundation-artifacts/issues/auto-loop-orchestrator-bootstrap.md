@@ -7,7 +7,7 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `bootstrap-routing-foundation-artifacts`
 - issue-name: `auto-loop-orchestrator-bootstrap`
-- source_candidate: `docs/pre-brainstorms/20260306-0248--issue-brainstorm-routing-guard/candidates.md#c-20260306-1105`
+- source_candidate: `docs/B1-docs/raw-20260306-0248/candidates.md#c-20260306-1105`
 - evidence: `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`, `docs/system/workspace/scripts/README.md`, `docs/system/workspace/scripts/tests/test-routing-foundation-loop`, `docs/system/workspace/hooks/pre-commit.sh`
 
 ## Outcome

@@ -8,8 +8,8 @@
 - story-name: `tool-authorization-bootstrap-and-post-consent-materialization-governance`
 - issue-name: `tool-authorization-bootstrap-and-post-consent-materialization-governance`
 - priority: P1
-- source_candidate: `docs/pre-brainstorms/20260405-1235--tool-authorization-bootstrap-and-post-consent-materialization/candidates.md#c-20260405-1235-a`
-- source_brainstorm: `docs/pre-brainstorms/20260405-1235--tool-authorization-bootstrap-and-post-consent-materialization/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260405-1235/candidates.md#c-20260405-1235-a`
+- source_brainstorm: `docs/B1-docs/raw-20260405-1235/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/pre-tests.md`
@@ -107,9 +107,9 @@ This owner freezes the product boundary only. The following implementation-shape
 
 ## Completion
 
-- `docs/pre-brainstorms/INDEX.md`
-- `docs/pre-brainstorms/20260405-1235--tool-authorization-bootstrap-and-post-consent-materialization/brainstorms.md`
-- `docs/pre-brainstorms/20260405-1235--tool-authorization-bootstrap-and-post-consent-materialization/candidates.md`
+- `docs/B1-docs/raw-INDEX.md`
+- `docs/B1-docs/raw-20260405-1235/brainstorms.md`
+- `docs/B1-docs/raw-20260405-1235/candidates.md`
 - `docs/milestones.md`
 - `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/issues/tool-authorization-bootstrap-and-post-consent-materialization-governance.md`
 - `docs/epics/freely-product-architecture/tool-authorization-bootstrap-and-post-consent-materialization-governance/brainstorms/b-tool-authorization-bootstrap-and-post-consent-materialization-governance.md`

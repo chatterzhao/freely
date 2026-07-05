@@ -2,16 +2,16 @@
 - kind: fix
 - phase_state: completed
 - milestone: M-20260625T131154Z-A
-- source_candidate: docs/pre-brainstorms/20260625T131154Z--pr-create-rebase/candidates.md#C-20260625T131154Z-A
+- source_candidate: docs/B1-docs/raw-20260625T131154Z/candidates.md#C-20260625T131154Z-A
 - verification_artifact_dir: docs/epics/pr-create-rebase/code-reviews
-- canonical_issue_path: docs/issues/I-20260625T131154Z-A/issue.md
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260625T131154Z-A/issue.md
 - source_raw: raw-20260625T131154Z
 - pre_tests_path: docs/epics/pr-create-rebase/verification/pre-tests.md
 - title: pr-create-guarded rebase 替代 merge
 
 # I-20260625T131154Z-A: pr-create-guarded rebase 替代 merge
 
-- source_candidate: docs/pre-brainstorms/20260625T131154Z--pr-create-rebase/candidates.md#C-20260625T131154Z-A
+- source_candidate: docs/B1-docs/raw-20260625T131154Z/candidates.md#C-20260625T131154Z-A
 - verification_artifact_dir: docs/epics/pr-create-rebase/code-reviews
 - pre_tests_path: docs/epics/pr-create-rebase/verification/pre-tests.md
 

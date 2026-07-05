@@ -4,7 +4,7 @@ kind: linked
 status: in_dev
 phase_state: completed
 promoted_from: raw-20260618T043121Z
-source_candidate: docs/pre-brainstorms/20260618T043121Z--pr-create-dirty-check-fix/candidates.md
+source_candidate: docs/B1-docs/raw-20260618T043121Z/candidates.md
 pre_tests_path: docs/epics/pr-create-dirty-check-fix/verification/pre-tests.md
 verification_artifact_dir: docs/epics/pr-create-dirty-check-fix/code-reviews
 platform_ids: {}

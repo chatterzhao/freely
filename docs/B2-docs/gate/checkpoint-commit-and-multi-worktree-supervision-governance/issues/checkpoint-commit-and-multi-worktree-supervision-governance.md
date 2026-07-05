@@ -8,11 +8,11 @@
 - story-name: `checkpoint-commit-and-multi-worktree-supervision-governance`
 - issue-name: `checkpoint-commit-and-multi-worktree-supervision-governance`
 - verification_artifact_dir: `docs/epics/- epic-name: `workspace-routing-foundation`/- story-name: `checkpoint-commit-and-multi-worktree-supervision-governance`/code-reviews`
-- source_candidate: `docs/pre-brainstorms/20260318-2245--worktree-pid-ownership-validation/candidates.md#c-20260318-A`
+- source_candidate: `docs/B1-docs/raw-20260318-2245/candidates.md#c-20260318-A`
 - additional_source_candidates:
-  - `docs/pre-brainstorms/20260318-2358--manager-workcell-supervision-and-continuity/candidates.md#c-20260318-2358-a`
-  - `docs/pre-brainstorms/20260318-2358--manager-workcell-supervision-and-continuity/candidates.md#c-20260318-2358-b`
-- source_brainstorm: `docs/pre-brainstorms/20260317-0735--account-aware-loop-and-checkpoint-commit-governance/brainstorms.md`
+  - `docs/B1-docs/raw-20260318-2358/candidates.md#c-20260318-2358-a`
+  - `docs/B1-docs/raw-20260318-2358/candidates.md#c-20260318-2358-b`
+- source_brainstorm: `docs/B1-docs/raw-20260317-0735/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `docs/epics/workspace-routing-foundation/session-lifecycle-rotation-and-handoff-governance/issues/session-lifecycle-rotation-and-handoff-governance.md`
@@ -68,7 +68,7 @@ Freely 当前已经会 worktree 隔离、session handoff、rate-limit account sw
 - 已写入 review 证据：
   - `docs/epics/workspace-routing-foundation/checkpoint-commit-and-multi-worktree-supervision-governance/code-reviews/20260318-checkpoint-and-fleet-verification.md`
   - `docs/epics/workspace-routing-foundation/checkpoint-commit-and-multi-worktree-supervision-governance/code-reviews/20260326-checkpoint-and-fleet-canonical-replay-verification.md`
-- 当前研究阶段尚未启用正式 `docs/progress/**`，本轮 dev-loop 等价执行证据写入 `docs/pre-brainstorms/CONVERGENCE.md`。
+- 当前研究阶段尚未启用正式 `docs/progress/**`，本轮 dev-loop 等价执行证据写入 `docs/B1-docs/raw-CONVERGENCE.md`。
 - 本轮补充验证：
   - `./bin/checkpoint-guard` -> `checkpoint_required: no`
   - `./bin/wt-fleet-status` -> 仅当前 worktree 为 `DIRTY`

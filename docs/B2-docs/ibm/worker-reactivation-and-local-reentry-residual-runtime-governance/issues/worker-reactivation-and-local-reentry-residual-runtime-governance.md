@@ -8,8 +8,8 @@
 - story-name: `worker-reactivation-and-local-reentry-residual-runtime-governance`
 - issue-name: `worker-reactivation-and-local-reentry-residual-runtime-governance`
 - priority: P1
-- source_candidate: `docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/candidates.md#c-20260401-1831-a`
-- source_brainstorm: `docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260401-1831/candidates.md#c-20260401-1831-a`
+- source_brainstorm: `docs/B1-docs/raw-20260401-1831/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/worker-reactivation-and-local-reentry-residual-runtime-governance/pre-tests.md`
@@ -68,8 +68,8 @@
 - `docs/epics/workspace-routing-foundation/worker-reactivation-and-local-reentry-residual-runtime-governance/prd.md`
 - `docs/epics/workspace-routing-foundation/worker-reactivation-and-local-reentry-residual-runtime-governance/pre-tests.md`
 - `docs/epics/workspace-routing-foundation/worker-reactivation-and-local-reentry-residual-runtime-governance/tasks.md`
-- `docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/brainstorms.md`
-- `docs/pre-brainstorms/20260401-1831--worker-reactivation-reentry-residual-runtime-gaps/candidates.md`
+- `docs/B1-docs/raw-20260401-1831/brainstorms.md`
+- `docs/B1-docs/raw-20260401-1831/candidates.md`
 - `docs/milestones.md`
 
 ## Current Evidence

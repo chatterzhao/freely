@@ -4,14 +4,14 @@ kind: linked
 status: in_dev
 phase_state: completed
 promoted_from: raw-20260617T031719Z
-source_candidate: docs/pre-brainstorms/20260617T031719Z--acp-a2a-final-review-fixes/candidates.md
+source_candidate: docs/B1-docs/raw-20260617T031719Z/candidates.md
 canonical_issue_path: ''
 created_at: 2026-06-17 03:17:19+00:00
 updated_at: '2026-06-17T17:08:23Z'
 author: zhaoquan
 channel: freely-fix-execution
 pre_tests_path: ''
-verification_artifact_dir: docs/pre-brainstorms/20260617T031719Z--acp-a2a-final-review-fixes/code-reviews
+verification_artifact_dir: docs/B1-docs/raw-20260617T031719Z/code-reviews
 platform_ids:
   github:
     issue_id: '2944'
@@ -23,9 +23,9 @@ platform_state: closed
 
 # I-20260617T031719Z-A: ACP/A2A Final Review Fixes
 
-- source_candidate: `docs/pre-brainstorms/20260617T031719Z--acp-a2a-final-review-fixes/candidates.md`
+- source_candidate: `docs/B1-docs/raw-20260617T031719Z/candidates.md`
 - pre_tests_path: ""
-- verification_artifact_dir: `docs/pre-brainstorms/20260617T031719Z--acp-a2a-final-review-fixes/code-reviews`
+- verification_artifact_dir: `docs/B1-docs/raw-20260617T031719Z/code-reviews`
 
 ## 实现
 
@@ -33,7 +33,7 @@ platform_state: closed
 
 ## Implementation Decision Note
 
-见 `docs/pre-brainstorms/20260617T031719Z--acp-a2a-final-review-fixes/code-reviews/implementation-decision.md`
+见 `docs/B1-docs/raw-20260617T031719Z/code-reviews/implementation-decision.md`
 
 ## 实现清单
 - [x] ACP-1: _read_stderr fatal detection → _fatal_detected

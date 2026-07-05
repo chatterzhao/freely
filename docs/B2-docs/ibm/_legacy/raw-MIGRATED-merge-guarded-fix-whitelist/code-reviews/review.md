@@ -1,7 +1,7 @@
 # Code Review: merge-guarded fix/* whitelist
 
 - issue_id: `raw-20260506T1400Z`
-- issue_path: `docs/issues/raw-20260506T1400Z/issue.md`
+- issue_path: `docs/B1-docs/raw-20260506T1400Z/issue.md`
 
 ## Implementation Decision Note
 - decision: Add fix/* to merge-guarded whitelist

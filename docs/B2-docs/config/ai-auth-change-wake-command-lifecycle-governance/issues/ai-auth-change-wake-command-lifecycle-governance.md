@@ -8,8 +8,8 @@
 - story-name: `ai-auth-change-wake-command-lifecycle-governance`
 - issue-name: `ai-auth-change-wake-command-lifecycle-governance`
 - priority: P1
-- source_candidate: `docs/pre-brainstorms/20260329-2045--ai-auth-change-wake-recursion-and-command-lifecycle/candidates.md#c-20260329-2045-a`
-- source_brainstorm: `docs/pre-brainstorms/20260329-2045--ai-auth-change-wake-recursion-and-command-lifecycle/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260329-2045/candidates.md#c-20260329-2045-a`
+- source_brainstorm: `docs/B1-docs/raw-20260329-2045/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:

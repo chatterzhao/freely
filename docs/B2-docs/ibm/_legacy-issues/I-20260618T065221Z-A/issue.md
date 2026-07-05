@@ -4,7 +4,7 @@ kind: linked
 status: in_dev
 phase_state: completed
 promoted_from: raw-20260618T065221Z
-source_candidate: docs/pre-brainstorms/20260618T065221Z--pr-merge-local-merge/candidates.md
+source_candidate: docs/B1-docs/raw-20260618T065221Z/candidates.md
 verification_artifact_dir: docs/epics/pr-merge-local-merge/code-reviews
 platform_ids: {}
 primary_platform: ''

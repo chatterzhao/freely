@@ -9,10 +9,10 @@
 - issue-name: `three-loops-sibling-relationship-and-terminal-governance`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/three-loops-sibling-relationship-and-terminal-governance/code-reviews`
 - priority: P0
-- source_candidate: `docs/pre-brainstorms/20260319-1105--three-loop-capability-lifecycle-governance/candidates.md#c-20260319-1105-a`
+- source_candidate: `docs/B1-docs/raw-20260319-1105/candidates.md#c-20260319-1105-a`
 - additional_source_candidates:
-  - `docs/pre-brainstorms/20260323-0241--three-loop-lifecycle-dictionary-and-worktree-completion/candidates.md#c-20260323-0241-a`
-- source_brainstorm: `docs/pre-brainstorms/20260319-1105--three-loop-capability-lifecycle-governance/brainstorms.md`
+  - `docs/B1-docs/raw-20260323-0241/candidates.md#c-20260323-0241-a`
+- source_brainstorm: `docs/B1-docs/raw-20260319-1105/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on:

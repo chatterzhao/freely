@@ -5,7 +5,7 @@ phase_state: completed
 completed_at: "2026-05-19T23:20:00Z"
 absorbed_at: '2026-05-16T14:27:11Z'
 promoted_from: raw-20260507T143546Z
-source_candidate: docs/pre-brainstorms/20260507T143546Z--platform-pull-standardize/candidates.md
+source_candidate: docs/B1-docs/raw-20260507T143546Z/candidates.md
 canonical_issue_path: ''
 platform_ids:
   github:
@@ -21,7 +21,7 @@ updated_at: '2026-05-17T12:25:37Z'
 
 # I-20260507T143546Z-A: platform pull 标题标准化
 
-- source_candidate: docs/pre-brainstorms/20260507T143546Z--platform-pull-standardize/candidates.md
+- source_candidate: docs/B1-docs/raw-20260507T143546Z/candidates.md
 - pre_tests_path: docs/epics/platform-pull-standardize/verification/pre-tests.md
 - verification_artifact_dir: docs/epics/platform-pull-standardize/code-reviews
 

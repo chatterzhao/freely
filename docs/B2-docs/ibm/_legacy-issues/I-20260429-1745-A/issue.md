@@ -34,5 +34,5 @@ Minimal changes to `docs/system/workspace/scripts/runtime/freely`.
 
 ## References
 
-- B1: docs/pre-brainstorms/20260429-1745--bash32-daemon-compat-fix/
+- B1: docs/B1-docs/raw-20260429-1745/
 - Issue: docs/epics/workspace-routing-foundation/bash32-daemon-compat-fix/issues/I-20260429-1745-A.md

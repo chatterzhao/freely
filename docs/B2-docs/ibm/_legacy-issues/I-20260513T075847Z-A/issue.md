@@ -5,7 +5,7 @@ phase_state: completed
 completed_at: "2026-05-19T23:20:00Z"
 absorbed_at: '2026-05-16T14:27:11Z'
 promoted_from: raw-20260513T075847Z
-source_candidate: docs/pre-brainstorms/20260513T075847Z--scan-non-rawkey-visibility/candidates.md#C-20260513T075847Z-A
+source_candidate: docs/B1-docs/raw-20260513T075847Z/candidates.md#C-20260513T075847Z-A
 verification_artifact_dir: docs/epics/scan-non-rawkey-visibility/code-reviews
 pre_tests_path: docs/epics/scan-non-rawkey-visibility/verification/pre-tests.md
 platform_ids:

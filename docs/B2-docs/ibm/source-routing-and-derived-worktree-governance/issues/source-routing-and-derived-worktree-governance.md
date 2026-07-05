@@ -8,8 +8,8 @@
 - story-name: `source-routing-and-derived-worktree-governance`
 - issue-name: `source-routing-and-derived-worktree-governance`
 - verification_artifact_dir: `docs/epics/- epic-name: `workspace-routing-foundation`/- story-name: `source-routing-and-derived-worktree-governance`/code-reviews`
-- source_candidate: `docs/pre-brainstorms/20260307-0930--source-routing-and-derived-worktree-governance/candidates.md#c-20260307-1201`
-- source_brainstorm: `docs/pre-brainstorms/20260307-0930--source-routing-and-derived-worktree-governance/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260307-0930/candidates.md#c-20260307-1201`
+- source_brainstorm: `docs/B1-docs/raw-20260307-0930/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `none`
@@ -71,7 +71,7 @@
 - 已写入 review 证据：
   - `docs/epics/workspace-routing-foundation/source-routing-and-derived-worktree-governance/code-reviews/20260316-first-hop-second-hop-verification.md`
   - `docs/epics/workspace-routing-foundation/source-routing-and-derived-worktree-governance/code-reviews/20260326-source-routing-canonical-replay-verification.md`
-- 当前研究阶段尚未启用正式 `docs/progress/**`，本轮 dev-loop 等价执行证据写入 `docs/pre-brainstorms/CONVERGENCE.md`。
+- 当前研究阶段尚未启用正式 `docs/progress/**`，本轮 dev-loop 等价执行证据写入 `docs/B1-docs/raw-CONVERGENCE.md`。
 
 ## Next
 

@@ -1,10 +1,10 @@
 - issue_id: I-20260626T130431Z-A
 - kind: fix
 - phase_state: completed
-- source_candidate: docs/pre-brainstorms/20260626T130431Z--wt-close-force-phase6b/candidates.md#C-20260626T130431Z-A
+- source_candidate: docs/B1-docs/raw-20260626T130431Z/candidates.md#C-20260626T130431Z-A
 - pre_tests_path: docs/epics/wt-close-force-phase6b/verification/pre-tests.md
 - source_raw: raw-20260626T130431Z
-- canonical_issue_path: docs/issues/I-20260626T130431Z-A/issue.md
+- canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260626T130431Z-A/issue.md
 - title: wt-close Phase 6b respects --force, errors not silently swallowed
 
 # I-20260626T130431Z-A: wt-close Phase 6b force fix

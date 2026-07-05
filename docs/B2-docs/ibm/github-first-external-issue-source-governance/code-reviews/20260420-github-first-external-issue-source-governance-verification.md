@@ -18,7 +18,7 @@
 2. `bash docs/system/workspace/scripts/tests/test-human-chat-routing`
 3. `./bin/governance-check`
 4. `git diff --check`
-5. `rg -n "external issue|source_consumption_state|publication_mode|canonical repo-native linkage" docs/pre-brainstorms/20260407-1042--external-issue-identity-and-publication-boundary docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance docs/system/workspace/skills/context-source-skill docs/system/workspace/agents/lead-agent.md docs/system/workspace/scripts/compose-context-source-prompt.sh`
+5. `rg -n "external issue|source_consumption_state|publication_mode|canonical repo-native linkage" docs/B1-docs/raw-20260407-1042 docs/epics/workspace-routing-foundation/github-first-external-issue-source-governance docs/system/workspace/skills/context-source-skill docs/system/workspace/agents/lead-agent.md docs/system/workspace/scripts/compose-context-source-prompt.sh`
 
 ## Residual Risks
 

@@ -8,8 +8,8 @@
 - story-name: `state-sync-and-session-evidence-governance`
 - issue-name: `state-sync-and-session-evidence-governance`
 - verification_artifact_dir: `docs/epics/- epic-name: `workspace-routing-foundation`/- story-name: `state-sync-and-session-evidence-governance`/code-reviews`
-- source_candidate: `docs/pre-brainstorms/20260308-0145--state-sync-and-session-evidence-governance/candidates.md#c-20260308-0101`
-- source_brainstorm: `docs/pre-brainstorms/20260308-0145--state-sync-and-session-evidence-governance/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260308-0145/candidates.md#c-20260308-0101`
+- source_brainstorm: `docs/B1-docs/raw-20260308-0145/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - depends_on: `none`
@@ -70,7 +70,7 @@
   - `docs/epics/workspace-routing-foundation/state-sync-and-session-evidence-governance/code-reviews/20260316-state-sync-verification.md`
   - `docs/epics/workspace-routing-foundation/state-sync-and-session-evidence-governance/code-reviews/20260317-lead-agent-reentry-verification.md`
   - `docs/epics/workspace-routing-foundation/state-sync-and-session-evidence-governance/code-reviews/20260326-state-sync-canonical-replay-verification.md`
-- 当前研究阶段尚未启用正式 `docs/progress/**`，本轮等价执行证据写入 `docs/pre-brainstorms/CONVERGENCE.md`。
+- 当前研究阶段尚未启用正式 `docs/progress/**`，本轮等价执行证据写入 `docs/B1-docs/raw-CONVERGENCE.md`。
 
 ## Verification Summary
 

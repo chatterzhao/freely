@@ -7,8 +7,8 @@
 - epic-name: `workspace-routing-foundation`
 - story-name: `project-command-semantics-and-restore-work-governance`
 - issue-name: `project-command-semantics-and-restore-work-governance`
-- source_candidate: `docs/pre-brainstorms/20260327-2006--start-restart-control-plane-semantics/candidates.md#c-20260327-2006-a`
-- source_brainstorm: `docs/pre-brainstorms/20260327-2006--start-restart-control-plane-semantics/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260327-2006/candidates.md#c-20260327-2006-a`
+- source_brainstorm: `docs/B1-docs/raw-20260327-2006/brainstorms.md`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/pre-tests.md`
 - verification_artifact_dir: `docs/epics/workspace-routing-foundation/project-command-semantics-and-restore-work-governance/code-reviews/`
 - execution_base: `develop`

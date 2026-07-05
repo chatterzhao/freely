@@ -8,8 +8,8 @@
 - story-name: `runtime-daemon-self-loop-followthrough-governance`
 - issue-name: `runtime-daemon-self-loop-followthrough-governance`
 - priority: `P0`
-- source_candidate: `docs/pre-brainstorms/20260421-1200--runtime-daemon-self-loop-followthrough/candidates.md#c-20260421-1200-a`
-- source_brainstorm: `docs/pre-brainstorms/20260421-1200--runtime-daemon-self-loop-followthrough/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260421-1200/candidates.md#c-20260421-1200-a`
+- source_brainstorm: `docs/B1-docs/raw-20260421-1200/brainstorms.md`
 - reopen_of_issue: `docs/epics/workspace-routing-foundation/runtime-start-stop-lifecycle-and-process-leak-governance/issues/runtime-start-stop-lifecycle-and-process-leak-governance.md`
 - reopen_reason: `real self-host dogfooding on 2026-04-21 showed one remaining daemon self-loop blocker after the broader runtime lifecycle owner landed: unexpected daemon TERM could be recorded as operator_stop, and orphan dispatcher/watchdog residue could block lawful restart`
 - execution_base: `develop`
@@ -230,8 +230,8 @@ This owner exists to carry the narrow fix through a lawful protected-branch path
 
 ## Completion
 
-- `docs/pre-brainstorms/20260421-1200--runtime-daemon-self-loop-followthrough/brainstorms.md`
-- `docs/pre-brainstorms/20260421-1200--runtime-daemon-self-loop-followthrough/candidates.md`
+- `docs/B1-docs/raw-20260421-1200/brainstorms.md`
+- `docs/B1-docs/raw-20260421-1200/candidates.md`
 - `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/issues/runtime-daemon-self-loop-followthrough-governance.md`
 - `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/pre-tests.md`
 - `docs/epics/workspace-routing-foundation/runtime-daemon-self-loop-followthrough-governance/tasks.md`

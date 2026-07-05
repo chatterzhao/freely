@@ -4,8 +4,8 @@ kind: linked
 status: completed
 phase_state: completed
 promoted_from: raw-20260624T004524Z
-source_candidate: docs/pre-brainstorms/20260624T004524Z--a2a-restore-async/candidates.md#C-20260624T004524Z-A
-canonical_issue_path: docs/issues/I-20260624T004524Z-A/issue.md
+source_candidate: docs/B1-docs/raw-20260624T004524Z/candidates.md#C-20260624T004524Z-A
+canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260624T004524Z-A/issue.md
 milestone: "M-20260624T004524Z-A"
 title: "fix: defer _restore_tasks to background thread to prevent A2A startup timeout"
 platform_ids:
@@ -26,7 +26,7 @@ verification_artifact_dir: docs/epics/a2a-restore-async/code-reviews
 
 # I-20260624T004524Z-A: A2A server _restore_tasks 异步化
 
-- source_candidate: `docs/pre-brainstorms/20260624T004524Z--a2a-restore-async/candidates.md#C-20260624T004524Z-A`
+- source_candidate: `docs/B1-docs/raw-20260624T004524Z/candidates.md#C-20260624T004524Z-A`
 - pre_tests_path: `docs/epics/a2a-restore-async/verification/pre-tests.md`
 - verification_artifact_dir: `docs/epics/a2a-restore-async/code-reviews`
 - milestone: M-20260624T004524Z-A

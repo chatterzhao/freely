@@ -14,7 +14,7 @@
 - `docs/system/workspace/three-loop-capability-lifecycle.md`
 - `docs/LAWS.md`
 - `docs/epics/workspace-routing-foundation/pre-test-merge-responsibility-usage-and-lifecycle-governance/pre-tests.md`
-- `docs/pre-brainstorms/20260325-0333--testing-evidence-ladder-and-real-environment-gates/candidates.md`
+- `docs/B1-docs/raw-20260325-0333/candidates.md`
 - `docs/milestones.md`
 
 ## Findings

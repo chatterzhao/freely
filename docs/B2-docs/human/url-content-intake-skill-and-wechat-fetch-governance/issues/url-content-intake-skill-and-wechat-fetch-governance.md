@@ -8,8 +8,8 @@
 - story-name: `url-content-intake-skill-and-wechat-fetch-governance`
 - issue-name: `url-content-intake-skill-and-wechat-fetch-governance`
 - priority: P1
-- source_candidate: `docs/pre-brainstorms/20260318-1246--iflow-wechat-webfetch-capability/candidates.md`
-- source_brainstorm: `docs/pre-brainstorms/20260318-1246--iflow-wechat-webfetch-capability/brainstorms.md`
+- source_candidate: `docs/B1-docs/raw-20260318-1246/candidates.md`
+- source_brainstorm: `docs/B1-docs/raw-20260318-1246/brainstorms.md`
 - execution_base: `develop`
 - integration_target: `develop`
 - pre_tests_path: `docs/epics/workspace-routing-foundation/url-content-intake-skill-and-wechat-fetch-governance/pre-tests.md`
@@ -52,8 +52,8 @@
 
 ## Completion
 
-- `docs/pre-brainstorms/20260318-1246--iflow-wechat-webfetch-capability/brainstorms.md`
-- `docs/pre-brainstorms/20260318-1246--iflow-wechat-webfetch-capability/candidates.md`
+- `docs/B1-docs/raw-20260318-1246/brainstorms.md`
+- `docs/B1-docs/raw-20260318-1246/candidates.md`
 - `docs/milestones.md`
 - `docs/epics/workspace-routing-foundation/url-content-intake-skill-and-wechat-fetch-governance/issues/url-content-intake-skill-and-wechat-fetch-governance.md`
 - `docs/epics/workspace-routing-foundation/url-content-intake-skill-and-wechat-fetch-governance/pre-tests.md`
