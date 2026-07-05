@@ -78,3 +78,4 @@ __pycache__/
 .codex/
 .opencode/
 .claude/
+projects.tsv
