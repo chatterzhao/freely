@@ -166,15 +166,15 @@ intake_id: ""
 author: zhaoquan
 channel: freely-workflow-guarded-execution
 session_refs: []
-pre_tests_path: docs/epics/skill-gate-alignment/raw-20260508T011858Z/verification/pre-tests.md
-verification_artifact_dir: docs/epics/skill-gate-alignment/code-reviews
+pre_tests_path: docs/epics/skill-gate-alignment/skill-gate-fix/raw-20260508T011858Z/verification/pre-tests.md
+verification_artifact_dir: docs/epics/skill-gate-alignment/skill-gate-fix/raw-20260508T011858Z/code-reviews
 ---
 
 # I-20260508T011858Z-A: skill 引导与门禁对齐
 
 - source_candidate: `docs/pre-brainstorms/20260508T011858Z--skill-gate-alignment/candidates.md`
-- pre_tests_path: `docs/epics/skill-gate-alignment/verification/pre-tests.md`
-- verification_artifact_dir: `docs/epics/skill-gate-alignment/code-reviews`
+- pre_tests_path: `docs/epics/skill-gate-alignment/skill-gate-fix/raw-20260508T011858Z/verification/pre-tests.md`
+- verification_artifact_dir: `docs/epics/skill-gate-alignment/skill-gate-fix/raw-20260508T011858Z/code-reviews`
 
 ## 实现
 ...
@@ -238,7 +238,7 @@ B2_IBM 阶段直接写入以下格式。AI 按模板填写，无需查看任何�
 - target_environment: test-pre-merge-{raw key}-{slug}
 - required_evidence: <测试通过的证据要求>
 - evidence_level: mock | integration | real_env | post_merge_dogfood
-- artifact_ref: <指向测试产物文件，如 docs/epics/{epic-name}/test-evidence/acceptance-1.log>
+- artifact_ref: <指向测试产物文件，如 docs/epics/{epic-name}/{story-name}/raw-{raw key}/verification/test-evidence/acceptance-1.log>
 - test_command: <实际执行的 shell 命令，如：./bin/test-lane feature-local -- echo ok>
 - expected_output: <命令的预期输出（GREEN 时的输出），如：所有测试 PASSED>
 - expected_RED_output: <RED 阶段的预期输出——fix: 证明 bug 存在；feature: 证明功能未实现>
@@ -416,7 +416,7 @@ CLOSEOUT_REVIEW_ARTIFACT_POLICY=code-reviews
 
 | gate 报错关键词 | 原因 | 正确格式 |
 |-----------|------|---------|
-| verification_artifact_dir too broad or non-canonical | 需以 /code-reviews 结尾，至少4段路径 | `docs/epics/{epic-name}/{story-name}/code-reviews` |
+| verification_artifact_dir too broad or non-canonical | 需以 /code-reviews 结尾，规范格式：docs/epics/{epic-name}/{story-name}/raw-{raw key}/code-reviews | `docs/epics/{epic-name}/{story-name}/raw-{raw key}/code-reviews` |
 | implementation decision note is incomplete | 需 5 个字段 | `decision` / `why_this` / `alternatives_considered` / `boundary_non_goals` / `residual_risk` |
 | owner issue 'missing' / that issue cannot be resolved | review/code-review 文件需 bullet 格式的 issue_id | `- issue_id: I-20260508T011858Z-A` |
 | I-* canonical fields silently cleared | I-* frontmatter 用了 `---` YAML 包裹格式；canonical reader 只解析 bullet | 去掉 `---` 包裹，用 bullet 格式：`- phase_state: completed` |
@@ -454,14 +454,14 @@ CLOSEOUT_REVIEW_ARTIFACT_POLICY=code-reviews
 - phase_state: completed
 - milestone: M-20260508T011858Z-A
 - source_candidate: docs/pre-brainstorms/20260508T011858Z--skill-gate-alignment/candidates.md#C-20260508T011858Z-A
-- verification_artifact_dir: docs/epics/skill-gate-alignment/code-reviews
+- verification_artifact_dir: docs/epics/skill-gate-alignment/skill-gate-fix/raw-20260508T011858Z/code-reviews
 - canonical_issue_path: ""
 - title: 简短描述
 
 # I-20260508T011858Z-A: 标题
 
 - source_candidate: docs/pre-brainstorms/20260508T011858Z--skill-gate-alignment/candidates.md#C-20260508T011858Z-A
-- verification_artifact_dir: docs/epics/skill-gate-alignment/code-reviews
+- verification_artifact_dir: docs/epics/skill-gate-alignment/skill-gate-fix/raw-20260508T011858Z/code-reviews
 ```
 
 ### Implementation Decision Note（完整模板）
