@@ -909,7 +909,7 @@ def main() -> int:
     candidate_records: List[CandidateRecord] = []
     progress_records: List[ProgressRecord] = [parse_progress_file(path) for path in sorted(progress_paths)]
     review_records: List[ReviewRecord] = [parse_review_file(path) for path in sorted(review_paths)]
-    candidate_paths = {p for p in candidate_paths if not _is_legacy_path(p)}
+    # candidate_paths = {p for p in candidate_paths if not _is_legacy_path(p)}  # DISABLED for testing
     for candidate_path in sorted(candidate_paths):
         candidate_records.extend(parse_candidate_file(candidate_path))
 
@@ -920,7 +920,7 @@ def main() -> int:
             if candidate_source_path:
                 candidate_paths.add(candidate_source_path)
 
-    progress_records = [p for p in progress_records if not _is_legacy_path(p.path)]
+    # progress_records = [p for p in progress_records if not _is_legacy_path(p.path)]  # DISABLED for testing
     for progress in progress_records:
         owner_issue = None
         if progress.issue_path:
@@ -932,7 +932,7 @@ def main() -> int:
             if candidate_source_path:
                 candidate_paths.add(candidate_source_path)
 
-    review_records = [r for r in review_records if not _is_legacy_path(r.path)]
+    # review_records = [r for r in review_records if not _is_legacy_path(r.path)]  # DISABLED for testing
     for review in review_records:
         owner_issue = issues_by_id.get(review.issue_id or "")
         if owner_issue:
