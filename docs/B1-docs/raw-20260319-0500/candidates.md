@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260319-0500-01：为 Freely 补一份更强的 orchestrator executable spec
+## C-20260319-0500-A: legacy issue
 
 - status: `proposed`
 - problem: Freely 已有方法论与治理规则，但运行器层的可移植、可验证、可实现规范还不如 Symphony 的 `SPEC.md` 那样集中。
@@ -18,7 +18,7 @@
 - milestone: pending://milestone-binding
 - session_refs: []
 
-## C-20260319-0500-02：统一 issue-level continuity artifact 设计
+## C-20260319-0500-A: legacy issue
 
 - status: `needs_research`
 - problem: Symphony 用单 persistent workpad comment 维持单 issue 执行态，降低了执行记录碎片；Freely 当前的 continuity 仍分散在 issue / progress / recovery / brainstorm 等层。
@@ -36,7 +36,7 @@
 - milestone: pending://milestone-binding
 - session_refs: []
 
-## C-20260319-0500-03：评估远程 worker / SSH 执行扩展对 Freely 的适用性
+## C-20260319-0500-A: legacy issue
 
 - status: `needs_research`
 - problem: Symphony 已把 SSH worker 作为可选扩展建模，Freely 后续也可能需要 manager/worker 跨主机执行。
@@ -53,7 +53,7 @@
 - milestone: pending://milestone-binding
 - session_refs: []
 
-## C-20260319-0500-04：不把 Symphony 当作 Freely 架构模板
+## C-20260319-0500-A: legacy issue
 
 - status: `dropped`
 - problem: Symphony 具备较强执行器形态，容易让后续讨论误把它当成 Freely 的直接蓝图。

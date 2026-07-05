@@ -7,7 +7,7 @@
 
 ## Candidates
 
-### C-20260418-1900-A
+### C-20260418-1900-A: legacy issue
 - candidate_format_version: `v2`
 - title: `Runtime lifecycle receipt followthrough governance`
 - research_only: `false`

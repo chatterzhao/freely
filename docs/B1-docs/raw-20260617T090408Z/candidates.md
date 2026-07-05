@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260617T090408Z-A: Fix worker_prompts_csv dead loop
+## C-20260617T090408Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: FreelyAgentExecutor 持久化 worker_prompts_csv 等 Freely 特有字段

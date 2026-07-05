@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260320-1945-A
+### C-20260320-1945-A: legacy issue
 - title: Watchdog live status surface and manager supervision contract
 - problem: Freely 当前只有 `baseline-status / fleet-status / prompt / continuity / jsonl / ps` 这些碎片化证据，没有统一 current-state surface。结果就是后台进程仍在跑时，主管和用户仍无法快速判断“谁在跑、在做什么、是否停在 handoff”。
 - why_now: 这是 Freely 用自己开发自己时已经真实暴露的控制面缺口；若不先做最小 live status，后续多 AI / 多 worktree / subagent 并行时，全局监督会继续退化成人工 grep。

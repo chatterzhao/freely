@@ -1,6 +1,6 @@
 # Candidates - 20260519T033529Z--handoff-json-corruption
 
-### C-20260519T033529Z-A
+### C-20260519T033529Z-A: legacy issue
 
 - title: `Worker handoff JSON corruption — ACP stream contamination, missing handoff blocks, exit_kind alias`
 - source_class: `bug_report`

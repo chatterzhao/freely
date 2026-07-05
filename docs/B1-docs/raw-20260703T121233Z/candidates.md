@@ -6,11 +6,11 @@ source_raw: raw-20260703T121233Z
 milestone: M-20260703T121233Z-A
 ---
 
-## C-20260703T121233Z-A: 修复进程清理 + bridge 误重启
+## C-20260703T121233Z-A: legacy issue
 
 - status: absorbed
 absorbed_into: I-20260703T121233Z-A
-- promoted_issue_path: docs/B2-docs/git-worktree/closeout/raw-20260703T121233Z/issues/I-20260703T121233Z-A.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260703T121233Z-A/issue.md
 - decision_reason: |
   三个修复属同一边界——进程生命周期管理：
   1. stop 用进程组杀代替逐 PID 杀

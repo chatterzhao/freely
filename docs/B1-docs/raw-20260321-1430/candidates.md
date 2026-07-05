@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260321-1430-A
+### C-20260321-1430-A: legacy issue
 - title: External drift and out-of-band reconcile governance
 - problem: 仓库真实状态可能被 Freely 之外的动作推进，但 `.freely` 的 intake / continuity / worktree / runtime 视图仍停留在旧状态。主管缺少一条标准能力来检测“仓库现实已经越过 Freely 记录”并做 reconcile。
 - why_now: 本轮狗粮开发已经真实出现这种情况。继续依赖人工判断会让 Freely 反复尝试续接已经收口的工作，或长期保留悬空 intake / continuity / worktree 状态。

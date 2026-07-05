@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260329-2045-A
+### C-20260329-2045-A: legacy issue
 - candidate_format_version: v2
 - title: Decouple ai auth success-path commands from recursive auth-change wake
 - problem: `bin/ai switch codex` can print a successful switch result and still not exit because it synchronously enters `auth-change-wake`, which process-tree evidence shows as the immediate child of the still-alive `ai-cli`. The wider `watchdog-driven slot switching -> ai switch -> notify` loop is the strongest current hypothesis, not yet a fully captured closed loop. `bin/ai login codex` is a likely same-family path, but the clean hard reproduction for this candidate remains `switch`.

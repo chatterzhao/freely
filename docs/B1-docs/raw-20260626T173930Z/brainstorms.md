@@ -1,7 +1,7 @@
 ---
-b1_id: B1-20260626T173930Z; phase_state: completed
+b1_id: B1-20260626T173930Z
 source_raw: raw-20260626T173930Z
-produced_candidate: C-20260626T173930Z-A; created_at: 2026-06-26
+produced_candidate: C-20260626T173930Z-A
 ---
 # B1_IBM: 统一 slot 组装 + slot recovery 基于 agent-table
 ## Problem

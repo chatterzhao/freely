@@ -1,5 +1,5 @@
 # Candidates
-## C-20260511T0407Z-A: handoff 表加 worker 汇报字段
+## C-20260511T0407Z-A: legacy issue
 - title: handoff 加 rich context 字段，worker→manager 通信完整
 - status: promoted
 - decision_reason: handoff 表缺少 completion_summary/blocked_reason/next_action/evidence_paths 字段，主管无法阅读 worker 详细结果

@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260616T224707Z-A: ACP Session ID 格式污染修复 — 兼容三种 AI CLI 的 Session ID 提取
+## C-20260616T224707Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: ACP Session ID 格式污染修复 — 兼容三种 AI CLI (Claude Code / Codex CLI / OpenCode) 的 Session ID 提取

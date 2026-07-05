@@ -1,5 +1,5 @@
 # Candidates
-## C-20260522T071901Z-A
+## C-20260522T071901Z-A: legacy issue
 - title: slot full-name compat final fixes
 - priority: P1
 - status: promoted

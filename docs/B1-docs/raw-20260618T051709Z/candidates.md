@@ -1,5 +1,5 @@
 # Candidates
-## C-20260618T051709Z-A: pr-merge review gate
+## C-20260618T051709Z-A: legacy issue
 - candidate_format_version: v2
 - title: Add review gate to pr-merge-guarded
 - status: promoted

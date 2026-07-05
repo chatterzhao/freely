@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260619T033758Z-A: login claude 交互式 slot 命名与 alias 创建
+## C-20260619T033758Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: login claude 交互式 slot 命名与 alias 创建

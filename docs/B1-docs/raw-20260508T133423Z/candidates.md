@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260508T133423Z-A: raw-issue-pull git CWD 修复
+## C-20260508T133423Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: raw-issue-pull 的 git 路径不再依赖项目根目录

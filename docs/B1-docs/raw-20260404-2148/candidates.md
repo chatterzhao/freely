@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260404-2148-A
+### C-20260404-2148-A: legacy issue
 - candidate_format_version: v2
 - title: Bound startup governance for stale or ambiguous codex slot-switch lock
 - problem: Freely has already seen a real startup failure where a stale shared `~/.codex/slot-switch.lock` blocked runtime launch until the operator manually deleted it. The current root failure on 2026-04-04 is no longer a live lock, but startup governance still lacks a clear preflight and truth surface for stale, active, or ambiguous shared lock states.

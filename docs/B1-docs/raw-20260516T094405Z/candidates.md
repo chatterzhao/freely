@@ -1,6 +1,6 @@
 # Candidates — 20260516T094405Z--delegate-workers-exclusive-conflict
 
-## C-20260516T094405Z-A: delegate_workers 被 exclusive_fields_conflict 拒绝
+## C-20260516T094405Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: delegate_workers 被 exclusive_fields_conflict 拒绝

@@ -6,7 +6,7 @@ created_at: 2026-06-27
 milestone: M-20260627T121241Z-A
 ---
 
-## C-20260627T121241Z-A: scan agent-id.env path + sessions query fix
+## C-20260627T121241Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: scan agent-id.env path + sessions query fix

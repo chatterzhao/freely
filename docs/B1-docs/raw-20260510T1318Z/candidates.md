@@ -1,5 +1,5 @@
 # Candidates
-## C-20260510T1318Z-A: handoff.py insert 支持 exit_kind
+## C-20260510T1318Z-A: legacy issue
 - title: insert + AI prompt 加 exit_kind
 - status: promoted
 - decision_reason: handoff.py insert 不支持 exit_kind，AI prompt 无法指导 AI 写入 exit_kind

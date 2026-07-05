@@ -5,7 +5,7 @@ source_raw: raw-20260705T024320Z
 created_at: 2026-07-05
 milestone: M-20260705T024320Z-A
 ---
-## C-20260705T024320Z-A: per-agent tool/slot 全链路修复
+## C-20260705T024320Z-A: legacy issue
 - candidate_format_version: v2
 - title: 支持不同 role agent 使用不同 base_tool 或同 base_tool 不同 slot
 - status: absorbed
@@ -20,5 +20,5 @@ milestone: M-20260705T024320Z-A
   - sse-watchdog 传 base_tool
 - promotion_gate: 全部修复通过 bash -n + Python AST
 - promoted_issue_id: I-20260705T024320Z-A
-- promoted_issue_path: docs/B2-docs/config/agent-table/raw-20260705T024320Z/issues/I-20260705T024320Z-A.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260705T024320Z-A/issue.md
 - milestone: M-20260705T024320Z-A

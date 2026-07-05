@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260615T001626Z-A: 移除 A2A 文本 JSON 解析 Fallback (Phase 1+2)
+## C-20260615T001626Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: 移除 A2A 文本 JSON 解析 Fallback (Phase 1+2)

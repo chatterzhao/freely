@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260624T081419Z-A: fix-execution cp→git stash 工作流优化
+## C-20260624T081419Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: fix-execution 修改转移方式从 cp 改为 git stash push/apply

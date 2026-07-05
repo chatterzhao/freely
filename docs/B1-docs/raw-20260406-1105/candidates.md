@@ -1,6 +1,6 @@
 # Candidates
 
-### C-20260406-1105-A
+### C-20260406-1105-A: legacy issue
 - candidate_format_version: v2
 - title: Milestone completed-queue closeout
 - status: promoted

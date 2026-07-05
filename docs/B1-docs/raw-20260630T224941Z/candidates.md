@@ -6,7 +6,7 @@ created_at: 2026-06-30
 milestone: M-20260630T224941Z-A
 ---
 
-## C-20260630T224941Z-A: config.toml.example 全面修订 + init 创建逻辑 + merge lock 死锁诊断
+## C-20260630T224941Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: config.toml.example 修订、init 创建 config.toml、merge lock 诊断
@@ -25,6 +25,6 @@ milestone: M-20260630T224941Z-A
   - merge lock 写 PID + 死锁检测 + 清晰提示
 - promotion_gate: 所有字段注释准确，init 三个场景通过测试，merge lock 死锁检测可验证
 - open_questions: []
-- promoted_issue_path: docs/B2-docs/config/config-toml/raw-20260630T224941Z/issues/I-20260630T224941Z-A.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260630T224941Z-A/issue.md
 - milestone: M-20260630T224941Z-A
 - session_refs: []

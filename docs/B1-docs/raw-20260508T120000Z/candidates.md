@@ -1,5 +1,5 @@
 # Candidates
-## C-20260508T120000Z-A: wt-create fix
+## C-20260508T120000Z-A: legacy issue
 - candidate_format_version: v2
 - title: fix wt-create regex + scan_lookup
 - status: promoted

@@ -1,5 +1,5 @@
 # Candidates
-## C-20260508T045527Z-A: 删除废弃 task-source-scan.py
+## C-20260508T045527Z-A: legacy issue
 - candidate_format_version: v2
 - title: 删除废弃扫描脚本
 - status: promoted

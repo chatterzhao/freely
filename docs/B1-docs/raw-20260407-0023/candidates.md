@@ -1,6 +1,6 @@
 # Candidates - 20260407-0023--codex-auto-switch-probe-apikey-fallback
 
-## C-20260407-0023-A
+## C-20260407-0023-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: `Codex auto switch keeps probing saved apikey slots after all-unavailable OAuth sweep`

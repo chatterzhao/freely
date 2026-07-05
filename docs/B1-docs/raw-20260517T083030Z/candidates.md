@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260517T083030Z-A: supervisor crash false positive on bash rc=0
+## C-20260517T083030Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: supervisor crash 对 bash rc=0 的假阳性检测

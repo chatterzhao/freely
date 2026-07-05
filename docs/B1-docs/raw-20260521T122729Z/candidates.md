@@ -1,5 +1,5 @@
 # Candidates
-## C-20260521T122729Z-A
+## C-20260521T122729Z-A: legacy issue
 - title: strip env var prefix from alias expansion in tool family resolution
 - priority: P0
 - status: promoted

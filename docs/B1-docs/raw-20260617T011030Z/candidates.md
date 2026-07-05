@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260617T011030Z-A: ACP/A2A 架构重构 — 统一协议层 + 事件溯源 WAL + 跨 tool 委托 + 全状态暴露
+## C-20260617T011030Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: ACP/A2A 架构重构 — 统一 JSON-RPC 协议、事件溯源持久化、跨 AI CLI tool 差异化、ACP↔A2A 状态桥接、Worker A2A 标准化

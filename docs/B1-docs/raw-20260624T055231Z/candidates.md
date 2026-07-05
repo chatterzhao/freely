@@ -1,5 +1,5 @@
 # Candidates
-## C-20260624T055231Z-A: 彻底移除 JSON5 回退
+## C-20260624T055231Z-A: legacy issue
 - candidate_format_version: v2
 - title: 删除 JSON5 文件，所有消费端只读 TOML
 - status: promoted

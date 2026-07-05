@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260320-0500-A
+### C-20260320-0500-A: legacy issue
 - title: Candidate acceptance review governance
 - problem: Freely 的 candidate 过去更像“问题摘要 + next_action”，缺少 candidate-level acceptance boundary；同时，candidate promotion 到 IBM 前也缺少规范化的独立 acceptance review 记录，导致 promotion gate 与 IBM acceptance deepening 都不够稳定。
 - why_now: 本轮已经把 future candidate 的 v2 schema、独立 acceptance review 记录、`governance-check` 门禁，以及 IBM acceptance deepening 真源一起补进仓库。当前缺口不再是 pre-brainstorm 边界，而是把这条能力正式 materialize 为 canonical issue。

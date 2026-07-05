@@ -1,6 +1,6 @@
 # Candidates - 20260405-1235--tool-authorization-bootstrap-and-post-consent-materialization
 
-## C-20260405-1235-A
+## C-20260405-1235-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: Tool authorization bootstrap and post-consent materialization contract

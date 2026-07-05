@@ -1,6 +1,6 @@
 # Candidates: 里程碑状态标识符语义收敛
 
-## C-20260308-1501
+## C-20260308-1500-A: legacy issue
 
 - title: 里程碑状态标识符重命名与职责边界收紧
 - status: dropped

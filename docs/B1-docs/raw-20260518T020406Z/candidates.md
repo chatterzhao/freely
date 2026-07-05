@@ -1,6 +1,6 @@
 # Candidates — 20260518T020406Z--chat-conversation-extension
 
-## C-20260518T020406Z-A: chats 表扩展 conversation_id + chat-message 类型 + scan 对齐
+## C-20260518T020406Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: chats 表扩展 conversation_id + chat-message 类型 + scan 对齐

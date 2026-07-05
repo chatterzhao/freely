@@ -2,7 +2,7 @@
 
 - Source brainstorm: `docs/B1-docs/raw-20260420-1130/brainstorms.md`
 
-### C-20260420-1130-A
+### C-20260420-1130-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: `Manager task-source scan idle/replan boundary governance`

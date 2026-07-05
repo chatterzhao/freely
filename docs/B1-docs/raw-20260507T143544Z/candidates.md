@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260507T143544Z-A: raw-issue-pull 工位拦截
+## C-20260507T143544Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: raw-issue-pull 添加工位/分支拦截校验 + CLI dispatch

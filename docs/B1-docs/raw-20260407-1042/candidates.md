@@ -1,6 +1,6 @@
 # Candidates - 20260407-1042--external-issue-identity-and-publication-boundary
 
-## C-20260407-1042-A
+## C-20260407-1042-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: `External issue identity, mapping, and publication model after source-family contraction`

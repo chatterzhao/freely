@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260514T001746Z-A
+## C-20260514T001746Z-A: legacy issue
 - title: implement ACP support for opencode via stdio subprocess
 - priority: P2
 - status: promoted

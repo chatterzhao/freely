@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260508T005431Z-A: skill 标准化
+## C-20260508T005431Z-A: legacy issue
 - candidate_format_version: v2
 - title: 规范 skill 部署、引用、相对路径
 - status: promoted

@@ -7,7 +7,7 @@
 
 ## Candidates
 
-### C-20260413-1640-A
+### C-20260413-1640-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: Tasks closeout completion and adequacy gate governance

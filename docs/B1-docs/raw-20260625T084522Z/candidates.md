@@ -6,7 +6,7 @@ created_at: 2026-06-25
 milestone: M-20260625T084522Z-A
 ---
 
-## C-20260625T084522Z-A: test-execution skill 反 ghost pass
+## C-20260625T084522Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: test-execution skill 增加 pre-tests.md 可执行性检查

@@ -1,5 +1,5 @@
 # Candidates
-## C-20260623T075200Z-A: ACP usage workaround
+## C-20260623T075200Z-A: legacy issue
 - candidate_format_version: v2
 - title: ACP usage workaround — prompt_bytes estimation + cache_metrics token fields
 - status: promoted

@@ -1,11 +1,11 @@
 # Candidates: parse_env_file removal
 
-## C-20260616T110714Z-parse-env-removal
+## C-20260616T110714Z-A: legacy issue
 
 - raw_issue: raw-20260616T110714Z
-- milestone: M-20260616T110714Z-parse-env-removal
+- milestone: M-20260616T110714Z-A
 - status: `promoted`
-- promoted_issue_id: I-20260616T110714Z-parse-env-removal
+- promoted_issue_id: I-20260616T110714Z-A
 - promoted_issue_path: docs/issues/I-20260616T110714Z-parse-env-removal/issue.md
 - decision_reason: parse_env_file 被有意删除（而非恢复）。彻底 TOML-only 方案不需要 config.env 迁移代码。自带完整 IBM 链。
 - acceptance_criteria:

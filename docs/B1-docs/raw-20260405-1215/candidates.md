@@ -1,6 +1,6 @@
 # Candidates - 20260405-1215--runtime-audio-notifier-and-sound-semantics
 
-## C-20260405-1215-A
+## C-20260405-1215-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: Runtime audio notifier and sound semantics

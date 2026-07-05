@@ -1,5 +1,5 @@
 # Candidates
-## C-20260624T105442Z-A: wt-close -d develop ref
+## C-20260624T105442Z-A: legacy issue
 - candidate_format_version: v2
 - title: wt-close git branch -d 显式指定 develop 检查目标
 - status: promoted

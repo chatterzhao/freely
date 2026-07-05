@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260327-2006-A
+### C-20260327-2006-A: legacy issue
 - candidate_format_version: v2
 - title: Start/restart control-plane semantics and project-vs-global lifecycle boundary
 - problem: Freely 已经有 project-scoped pid ownership、project-local stop/start wiring，以及 global slot/account watchdog 能力，但还没有冻结 `freely start`、`freely start --force`、`freely stop`、`freely restart` 与 explicit global/shared control-plane reset 之间的命令语义边界。缺这层 contract 时，project command 很容易误触 global reset，或把 partial local recovery 和 shared watchdog/account recovery 混成一个 owner。

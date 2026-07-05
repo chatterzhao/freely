@@ -1,6 +1,6 @@
 # Candidates - 20260402-0020--hook-bypass-breakglass-governance
 
-### C-20260402-0020-A
+### C-20260402-0020-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: Hook bypass break-glass governance

@@ -1,6 +1,6 @@
 # Candidates - 20260430-0000--acp-session-store-and-lifecycle
 
-### C-20260430-0000-A: ACP session identity store + cycle-log fallback removal
+### C-20260430-0000-A: legacy issue
 
 - title: `ACP session identity in SQLite, replacing cycle-log text parsing`
 - status: `absorbed`
@@ -40,7 +40,7 @@
 
 - pre_tests_update: `2026-04-30`
 
-### C-20260430-0000-B: Claude stream-json adapter (prototype, shelved)
+### C-20260430-0000-A: legacy issue
 
 - title: `Claude stream-json direct adapter replacing claude-agent-acp`
 - status: `dropped`

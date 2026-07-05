@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260507T143545Z-A: 时间戳格式带秒升级
+## C-20260507T143545Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: YYYYMMDDTHHMMSSZ 带秒格式升级，全局正则兼容旧格式

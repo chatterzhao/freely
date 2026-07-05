@@ -1,5 +1,5 @@
 # Candidates
-## C-20260507T143546Z-A: platform pull title standardization
+## C-20260507T143546Z-A: legacy issue
 - candidate_format_version: v2
 - title: platform pull 时根据 created_at 标准化标题 key
 - status: promoted

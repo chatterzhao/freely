@@ -1,5 +1,5 @@
 # Candidates
-## C-20260508T004541Z-A: skill ref cleanup
+## C-20260508T004541Z-A: legacy issue
 - candidate_format_version: v2
 - title: lead-agent.md skill 引用改为 dual-mode
 - status: promoted

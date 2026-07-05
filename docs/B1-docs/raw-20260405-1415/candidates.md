@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260405-1415-A
+### C-20260405-1415-A: legacy issue
 - candidate_format_version: `v2`
 - title: ai-switch-cli extraction threshold and skeleton disposition governance
 - problem: Freely has already frozen the long-term direction toward a standalone `ai-switch-cli` backend, but there is still no canonical rule for when extraction should start, which implementation pieces must already be stable, or how to treat the local uncommitted skeleton repository that still uses the older `codex-account-switch` name.

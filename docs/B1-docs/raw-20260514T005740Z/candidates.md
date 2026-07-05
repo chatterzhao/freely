@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260514T005740Z-A
+## C-20260514T005740Z-A: legacy issue
 - title: generalize alias env prefix resolution
 - priority: P1
 - status: promoted

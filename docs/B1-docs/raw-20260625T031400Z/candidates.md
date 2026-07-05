@@ -5,7 +5,7 @@ source_raw: raw-20260625T031400Z
 milestone: M-20260625T031400Z-A
 promoted_issue_path: docs/issues/I-20260625T031400Z-A/issue.md
 ---
-## C-20260625T031400Z-A: feedback adapter fix
+## C-20260625T031400Z-A: legacy issue
 - title: use gh/gitee-issue.py directly
 - status: promoted
 - promoted_issue_path: docs/issues/I-20260625T031400Z-A/issue.md

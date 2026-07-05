@@ -1,5 +1,5 @@
 # Candidates
-## C-20260522T085354Z-A
+## C-20260522T085354Z-A: legacy issue
 - title: codex account switch updates config.env
 - priority: P1
 - status: promoted

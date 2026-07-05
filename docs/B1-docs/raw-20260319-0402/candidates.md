@@ -32,7 +32,7 @@
    - 吞吐量叙事与全 agent 纯度
    - 明确 `dropped`
 
-## C-20260319-0402-01：定义 Freely 的 completion model 与 change guardrails
+## C-20260319-0402-A: legacy issue
 
 - status: `proposed`
 - problem: Freely 已有 worktree/governance/doc-loop 基础，但“什么叫完成、何时升级验证、哪些风险必须人工复核、经验如何回写系统”仍分散存在，缺少统一 completion model。
@@ -53,7 +53,7 @@
 - milestone: pending://milestone-binding
 - session_refs: []
 
-## C-20260319-0402-02：把 worktree 级验证信号统一暴露成 agent 可消费接口
+## C-20260319-0402-A: legacy issue
 
 - status: `proposed`
 - problem: 当前 worktree discipline 很强，但 runtime、日志、dirty budget、验证状态对 agent 的读取面仍不够统一。
@@ -77,7 +77,7 @@
 - milestone: pending://milestone-binding
 - session_refs: []
 
-## C-20260320-01：为 Freely 增加 guardrail planner 与 validation escalation
+## C-20260319-0402-A: legacy issue
 
 - status: `proposed`
 - problem: 即使状态变得可读，Freely 仍缺少一个把 `change type + risk` 映射到 `required gates + escalation path` 的控制面，因此三层循环还无法稳定表现出真正的 harness 能力。
@@ -98,7 +98,7 @@
 - milestone: pending://milestone-binding
 - session_refs: []
 
-## C-20260320-02：为 Freely 增加 bootstrap ladder 与 experiment ledger
+## C-20260319-0402-A: legacy issue
 
 - status: `proposed`
 - problem: Freely 已有 loop 和治理，但还缺“agent 如何逐层长出闭环能力”的正式模型，也缺一层统一的实验记录面来支撑跨 session 持续推进。
@@ -117,7 +117,7 @@
 - milestone: pending://milestone-binding
 - session_refs: []
 
-## C-20260320-03：以 issue acceptance 驱动 Freely 的最小集成测试 substrate
+## C-20260319-0402-A: legacy issue
 
 - status: `proposed`
 - problem: Freely 当前已有测试与治理，但“issue 验收标准如何第一时间落成可执行集成门”还不稳定，导致 agent 容易停留在单测或静态结果层面，闭环缺少运行时事实校验。
@@ -136,7 +136,7 @@
 - milestone: pending://milestone-binding
 - session_refs: []
 
-## C-20260319-0402-03：建立文档园艺与 AI 残渣清理的周期性后台循环
+## C-20260319-0402-A: legacy issue
 
 - status: `needs_research`
 - problem: OpenAI 的经验表明，全 agent 代码库会持续产生漂移；如果 Freely 没有自动清理环，治理成本会不断上升。
@@ -154,7 +154,7 @@
 - milestone: pending://milestone-binding
 - session_refs: []
 
-## C-20260319-0402-04：不把吞吐量叙事和全 agent 纯度当近期目标
+## C-20260319-0402-A: legacy issue
 
 - status: `dropped`
 - problem: 外部案例容易把讨论带偏到“更多 PR、更少人工、全 agent 生成代码”，但这不是 Freely 当前阶段的核心成功标准。

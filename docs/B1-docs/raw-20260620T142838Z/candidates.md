@@ -1,6 +1,6 @@
 # Candidates: cgrab YAML fallback + skill format docs
 
-## C-20260620T142838Z-A
+## C-20260620T142838Z-A: legacy issue
 - title: cgrab supports YAML format; I-* template uses bullet format
 - status: promoted
 - promoted_issue_path: docs/issues/I-20260620T142838Z-A/issue.md

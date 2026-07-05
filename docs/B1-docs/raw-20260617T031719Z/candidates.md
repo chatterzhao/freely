@@ -1,5 +1,5 @@
 # Candidates
-## C-20260617T031719Z-A: ACP/A2A Final Review Fixes
+## C-20260617T031719Z-A: legacy issue
 - candidate_format_version: v2
 - title: Fix 8 remaining ACP/A2A review gaps
 - status: promoted

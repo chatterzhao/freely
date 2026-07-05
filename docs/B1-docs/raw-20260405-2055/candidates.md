@@ -1,6 +1,6 @@
 # Candidates - 20260405-2055--restart-slot-switch-preflight-preserves-active-runtime
 
-## C-20260405-2055-A
+## C-20260405-2055-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: Restart slot-switch preflight preserves active runtime governance

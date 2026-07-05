@@ -1,6 +1,6 @@
 # Candidates - 20260402-0455--worktree-exclusive-ownership-governance
 
-## C-20260402-0455-A
+## C-20260402-0455-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: Worktree exclusive ownership and promotion lease governance

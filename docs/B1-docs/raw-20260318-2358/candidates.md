@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260318-2358-A
+### C-20260318-2358-A: legacy issue
 - title: 项目级工位快照进入首跳 prompt 与 handoff
 - problem: 当前主管会话没有项目级工位清单，只能看见总量，无法可靠排班。
 - why_now: 这是主管工位真正可用的前置条件。
@@ -21,7 +21,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - session_refs: []
 
-### C-20260318-2358-B
+### C-20260318-2358-A: legacy issue
 - title: lead-agent 与 auto-loop 的主管模式协议
 - problem: 当前首跳协议只定义单工位路由，没有正式定义主管如何分配工位与委派 subagent。
 - why_now: 如果协议层不落地，runtime 注入再多上下文也只是提示，不是 Freely 能力。

@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260623T162243Z-A: scan_state 输出到 Manager prompt
+## C-20260623T162243Z-A: legacy issue
 - candidate_format_version: v2
 - title: scan_state 输出到 Manager prompt + 死 Worker 检测
 - status: promoted

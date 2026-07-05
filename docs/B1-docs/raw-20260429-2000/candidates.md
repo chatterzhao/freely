@@ -1,6 +1,6 @@
 # Candidates - 20260429-2000--gate-dev-experience-preflight
 
-### C-20260429-2000-A
+### C-20260429-2000-A: legacy issue
 
 - title: `Gate dev experience: --range pre-flight + secret detection FP fix`
 - status: `promoted`

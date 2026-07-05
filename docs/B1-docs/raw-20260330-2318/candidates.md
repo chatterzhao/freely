@@ -7,7 +7,7 @@
 
 ## Candidates
 
-### C-20260330-2318-A
+### C-20260330-2318-A: legacy issue
 - candidate_format_version: v2
 - title: Live-status false already-running-attach regression
 - problem: `develop` can reach a state where `fleet-status` correctly reports `sup=none ai=none`, but `workcell-state.env` is later rewritten to `running/up/up/already_running_attach`, causing `live-status` to present stale optimistic runtime truth with no current project-owned supervisor or AI PID.

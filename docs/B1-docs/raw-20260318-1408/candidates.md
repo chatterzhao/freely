@@ -1,6 +1,6 @@
 # Candidates
 
-### C-20260318-A
+### C-20260318-1408-A: legacy issue
 - title: 主管自检与工位舰队异常恢复
 - why:
   - Freely 自举时，主管不能依赖人工运行 `wt-fleet-status` 才发现 worker/supervisor 已失活。

@@ -1,5 +1,5 @@
 # Candidates
-## C-20260510T1840Z-A: 分支校验不可绕过
+## C-20260510T1840Z-A: legacy issue
 - title: init 和 daemon start 强制分支校验
 - status: promoted
 - decision_reason: --skip-branch-check 可绕过分支校验，daemon start 也不检查，需要强制校验

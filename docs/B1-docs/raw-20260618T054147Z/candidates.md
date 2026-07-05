@@ -1,5 +1,5 @@
 # Candidates
-## C-20260618T054147Z-A: wt-close prune stale tracking refs
+## C-20260618T054147Z-A: legacy issue
 - candidate_format_version: v2
 - title: Prune stale tracking refs after remote branch deletion
 - status: promoted

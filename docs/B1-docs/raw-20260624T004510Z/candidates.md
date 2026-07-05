@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260624T004510Z-A: deploy-skills opencode 通配符修复 + registry 驱动默认 tool
+## C-20260624T004510Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: deploy-skills 默认部署到 tool-registry.json5 全部已安装 tool

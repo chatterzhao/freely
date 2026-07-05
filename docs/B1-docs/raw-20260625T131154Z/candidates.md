@@ -6,7 +6,7 @@ created_at: 2026-06-25
 milestone: M-20260625T131154Z-A
 ---
 
-## C-20260625T131154Z-A: pr-create-guarded rebase 替代 merge
+## C-20260625T131154Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: pr-create-guarded Step 3 用 rebase 替代 merge

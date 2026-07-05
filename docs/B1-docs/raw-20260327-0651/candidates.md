@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260327-0651-A
+### C-20260327-0651-A: legacy issue
 - candidate_format_version: v2
 - title: Materialize issue-bound pre-tests evidence gate and retirement enforcement
 - problem: 现有 Freely 真源已经要求 `pre-tests.md` 具备质量线与真实环境验收面，但 closeout、merge、worktree retirement 仍没有稳定消费这些定义。系统知道“应该测”，却还不知道“当前 issue 的哪些 acceptance 已经由哪类证据满足”，所以 `pre-tests.md` 仍可能沦为摆设。
@@ -43,7 +43,7 @@
     jsonl_path: unavailable://codex-thread-only
     role: author
 
-### C-20260327-0651-B
+### C-20260327-0651-A: legacy issue
 - candidate_format_version: v2
 - title: Add project-scoped network proxy configuration for Freely runtime and tooling
 - problem: 现在 Freely 的网络出口没有统一能力面。`codex exec` 路径在 watchdog 里仍写死 `127.0.0.1:7890`，而 `curl`/OAuth sweep 等路径又靠环境继承，导致真实环境下不同工具看到不同代理语义，前端未来也无从配置统一网络策略。

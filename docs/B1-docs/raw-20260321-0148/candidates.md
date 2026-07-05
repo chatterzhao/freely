@@ -5,8 +5,8 @@
   status: promoted
   why_now:
     - 当前 `cc-use-codex-cli` 已可用，但恢复与多并发证据仍偏弱，应该升级为精确 jsonl 解析。
-  promoted_issue_path: docs/B2-docs/config/claude-code-codex-mcp-runtime-governance/issues/claude-code-codex-mcp-runtime-governance.md
-  milestone: M-20260306-workspace-routing-foundation
+  promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260321-0148-A/issue.md
+  milestone: M-20260321-0148-A
   session_refs:
     - tool: cc-use-codex-cli
       session_id: 11111111-2222-4333-8444-555555555555

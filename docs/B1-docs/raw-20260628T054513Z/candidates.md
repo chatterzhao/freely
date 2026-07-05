@@ -6,7 +6,7 @@ created_at: 2026-06-28
 milestone: M-20260628T054513Z-A
 ---
 
-## C-20260628T054513Z-A: scope 硬阻塞 → 警告
+## C-20260628T054513Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: checkpoint-guard 从硬阻塞改为建议警告

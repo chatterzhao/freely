@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260404-1545-A
+### C-20260404-1545-A: legacy issue
 - candidate_format_version: v2
 - title: Bound runtime supervision when websocket permission-denied failures block manager continuity and intake claim
 - problem: On canonical root `develop`, Freely can durably ingest human chat interruptions and inject them into fresh manager prompts, but repeated websocket `Operation not permitted` failures prevent the manager from writing new continuity or claiming intake items. The system therefore presents a false-active state: prompts keep refreshing while `intake/*.meta.env` remains `STATUS="new"` and no new continuity is materialized.

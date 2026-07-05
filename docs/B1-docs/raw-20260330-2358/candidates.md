@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260330-2358-A
+### C-20260330-2358-A: legacy issue
 - candidate_format_version: v2
 - title: Introduce explicit network-failure taxonomy and bounded recovery contracts in Freely runtime
 - problem: Freely already distinguishes `auth_failure`, rate-limit exhaustion, and `oauth_unreachable` during account inventory refresh, but it still lacks a canonical classification for generic in-flight network and proxy failures inside running `codex exec` workcells. As a result, transient or persistent execution-time network faults can collapse into generic `ai_exit_rc_*` handling and depend on coarse restart-storm protection rather than an explicit retry, cooldown, or circuit-breaker contract.

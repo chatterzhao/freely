@@ -6,7 +6,7 @@ created_at: 2026-06-29
 milestone: M-20260629T164530Z-A
 ---
 
-## C-20260629T164530Z-A: wt-close --raw-key flag 重构
+## C-20260629T164530Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: wt-close --raw-key flag 重构
@@ -25,6 +25,6 @@ milestone: M-20260629T164530Z-A
   - reviewer: claude
   - mode: in-session
   - verdict: pass
-- promoted_issue_path: docs/B2-docs/git-worktree/wt-close/raw-20260629T164530Z/issues/I-20260629T164530Z-A.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260629T164530Z-A/issue.md
 - milestone: M-20260629T164530Z-A
 - session_refs: []

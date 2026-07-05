@@ -1,11 +1,11 @@
 # Candidates — Issue Lifecycle + Scan + Platform Sync
 
 - promoted_issue_path: ""
-- milestone: M-20260306-workspace-routing-foundation
+- milestone: M-20260428-1737-A
 - session_refs:
   - {tool: "manual", session_id: "pre-brainstorm-creation", jsonl_path: "unavailable"}
 
-## C-20260428-1737-A: 统一生命周期 Scan 模块（task-lifecycle-scan.py）
+## C-20260428-1737-A: legacy issue
 
 - status: proposed
 - scope: 一个 raw→I 链条一个 JSON 对象，只输出未完成项，8 项 completion checklist
@@ -20,7 +20,7 @@
 4. 全部通过 → 排除；任一未通过 → 输出，列具体 blockers
 5. 区分"状态未改"（platform 已关但 phase_state 未更新）和"事情没做"（真没实现）
 
-## C-20260428-1737-B: 修复 I-* ID 格式（HHMM + 后缀）
+## C-20260428-1737-A: legacy issue
 
 - status: proposed
 - scope: raw-YYYYMMDD-HHMM（无后缀），I-YYYYMMDD-HHMM-A/B/C（有后缀），B1 目录 YYYYMMDD-HHMM--slug
@@ -35,7 +35,7 @@
 4. 门禁: candidate_key.startswith(raw_key)，candidate_key == issue_key（去前缀）
 5. 历史 0000 格式不管
 
-## C-20260428-1737-C: issue-sync promote 完整流程
+## C-20260428-1737-A: legacy issue
 
 - status: proposed
 - scope: 一个脚本调用完成 raw→I 的全部 sync 操作
@@ -58,7 +58,7 @@ issue-sync promote raw-xxx:
      c. 更新 raw 本地: status=absorbed
 ```
 
-## C-20260428-1737-D: issue-sync pull + normalize
+## C-20260428-1737-A: legacy issue
 
 - status: proposed
 - scope: 拉取平台 issue 和评论到本地；自动修正标签
@@ -77,7 +77,7 @@ issue-sync pull:
   6. I-* 格式标题但无 kind/linked 标签 → 仍按 raw 处理
 ```
 
-## C-20260428-1737-E: 评论消费状态
+## C-20260428-1737-A: legacy issue
 
 - status: proposed
 - scope: 评论 status 字段（pending/resolved/noted），scan 检查未消费评论
@@ -100,7 +100,7 @@ scan 检查:
   有 status=pending 的 comment → incomplete: "unresolved_comments:N"
 ```
 
-## C-20260428-1737-F: 门禁 raw→C→M→I 链（GATE 6.3）
+## C-20260428-1737-A: legacy issue
 
 - status: proposed
 - scope: governance-merge-gate 验证 raw→C→M→I 完整身份链
@@ -117,7 +117,7 @@ gate 检查:
   4. raw 平台 issue 已关闭（如果已 promote 完毕）
 ```
 
-## C-20260428-1737-G: 更新 three-loop 图
+## C-20260428-1737-A: legacy issue
 
 - status: proposed
 - scope: three-loop-capability-lifecycle.md 补充 raw 入口、platform sync、promote、评论消费

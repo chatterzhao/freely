@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260618T071502Z-A: pr-merge local merge 替代 gh pr merge
+## C-20260618T071502Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: Replace gh pr merge --merge with local git merge --no-ff in pr-merge-guarded

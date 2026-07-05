@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260319-2315-A
+### C-20260319-2315-A: legacy issue
 - title: CLI TUI interruption input box for Freely
 - problem: Freely 已经有 human interruption 的 CLI-first intake 链，但真实人类入口仍偏脚本化；缺少一个启动即有输入框、输入即成为 interruption、且支持中文的 TUI 前端，导致“插话”能力还不够可用。
 - why_now: 如果要让接下来的对话真正进入“插话模式”，就必须先给人一个稳定前台入口，而不是继续依赖手动拼 `freely intake chat` 命令。

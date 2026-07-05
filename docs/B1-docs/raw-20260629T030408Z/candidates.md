@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260629T030408Z-A: 完成 feat → feature 重命名
+## C-20260629T030408Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: 全局替换残留的 freely-feat-execution → freely-feature-execution
@@ -19,6 +19,6 @@
   - mode: subagent
   - summary: 审查 8 个文件的字符串替换，确认无逻辑变更
   - verdict: pass
-- promoted_issue_path: docs/B2-docs/git-worktree/branch-pr/raw-20260629T030408Z/issues/I-20260629T030408Z-A.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260629T030408Z-A/issue.md
 - milestone: M-20260629T030408Z-A
 - session_refs: []

@@ -1,6 +1,6 @@
 # Candidates - 20260406-0055--governance-check-nested-test-pre-merge-receipt-audit
 
-## C-20260406-0055-A
+## C-20260406-0055-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: Governance-check nested test-pre-merge ancestry receipt audit false positive

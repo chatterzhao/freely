@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260624T013737Z-A: tool-registry.json5 → TOML 基础层（Phase 1+2）
+## C-20260624T013737Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: tool-registry TOML 格式迁移 + config_schema 字段抽象层（Phase 1+2/10）

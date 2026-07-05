@@ -2,7 +2,7 @@
 
 - Source brainstorm: `docs/B1-docs/raw-20260421-1530/brainstorms.md`
 
-### C-20260421-1530-A
+### C-20260421-1530-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: `Scan-owned patrol inventory and live-status on-demand reading contract`

@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260506T1230Z-A: wt-create Dual Worktree Creation (B1 materialization)
+## C-20260506T1230Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: wt-create dual worktree creation（B1 物料化确认）

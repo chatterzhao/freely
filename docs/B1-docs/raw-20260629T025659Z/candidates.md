@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260629T025659Z-A: 统一 fix skill 治理顺序为 B1→B2→dev→test
+## C-20260629T025659Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: 统一 fix skill 与 feature skill 的 IBM 治理顺序
@@ -22,6 +22,6 @@
   - mode: subagent
   - summary: 审查 fix 和 feature skill 的两个流程版本，确认统一方案正确
   - verdict: pass
-- promoted_issue_path: docs/B2-docs/ibm/fix-flow/raw-20260629T025659Z/issues/I-20260629T025659Z-A.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260629T025659Z-A/issue.md
 - milestone: M-20260629T025659Z-A
 - session_refs: []

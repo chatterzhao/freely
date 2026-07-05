@@ -6,7 +6,7 @@ created_at: 2026-07-05
 milestone: M-20260705T010030Z-A
 ---
 
-## C-20260705T010030Z-A: wt-close --raw-key 唯一入口重构
+## C-20260705T010030Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: wt-close 重构 — --raw-key 唯一必填参数，自动发现双工位
@@ -30,6 +30,6 @@ milestone: M-20260705T010030Z-A
   - summary: 审查 wt-close 重构是否符合设计意图
   - verdict: pass
 - promoted_issue_id: I-20260705T010030Z-A
-- promoted_issue_path: docs/B2-docs/git-worktree/wt-close/raw-20260705T010030Z/issues/I-20260705T010030Z-A.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260705T010030Z-A/issue.md
 - milestone: M-20260705T010030Z-A
 - session_refs: []

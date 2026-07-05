@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260318-1210：rate-limit backoff 的周期性重判与提前唤醒
+## C-20260318-1210-A: legacy issue
 
 - problem: Codex supervisor 在 rate-limit backoff 后可能因为长 sleep 而错过较早恢复的账号，导致恢复时间已过仍 `ai down`。
 - change:

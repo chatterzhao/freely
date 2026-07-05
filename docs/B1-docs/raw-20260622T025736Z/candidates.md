@@ -1,5 +1,5 @@
 # Candidates
-## C-20260622T025736Z-A
+## C-20260622T025736Z-A: legacy issue
 - title: Platform sync batch
 - status: promoted
 - milestone: M-20260622T025736Z-A

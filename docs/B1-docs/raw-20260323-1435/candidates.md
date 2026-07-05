@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260323-1435-A
+### C-20260323-1435-A: legacy issue
 - title: Interactive init bootstrap and fine-grained force/skip governance
 - problem: `freely init` 当前缺少“目录接管 + 空仓 bootstrap + 逐项 skip/force + 非交互 CLI contract + 项目级工具配置 bootstrap + tool adapter 分层”这条统一语义，导致实现退化成了“重写 `.freely/config.env` 的命令”，既不能正确处理空目录 bootstrap，也不能安全地对待已有项目配置，也无法把 `.codex/config.toml` 这类应随 worktree 继承的项目级工具配置与 Claude/Kiro/IfLow 这类参数注入型工具区分对待。
 - why_now: 这次狗粮讨论已经明确，`init` 是人工触发的正式接管入口；如果不先把它的 bootstrap 语义写稳，后续再往里塞项目级 Codex 配置、context policy 或 worktrees 访问设置，只会继续扩大偏差，甚至把 Freely 推向不该碰的用户 home 配置。

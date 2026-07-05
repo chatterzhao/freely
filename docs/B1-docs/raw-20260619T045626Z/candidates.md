@@ -6,7 +6,7 @@ created_at: 2026-06-19
 milestone: M-20260619T045626Z-A
 ---
 
-## C-20260619T045626Z-A: pr-merge-guarded flock concurrency
+## C-20260619T045626Z-A: legacy issue
 
 - candidate_format_version: v2
 - status: promoted

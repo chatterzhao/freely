@@ -6,7 +6,7 @@ created_at: 2026-06-30
 milestone: M-20260630T002621Z-A
 ---
 
-## C-20260630T002621Z-A: 主管持续监督 — Phase 1 cycle 轮询
+## C-20260630T002621Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: 主管持续监督 — freely cycle + Worker HALT 协议 + Reviewer 直连
@@ -31,6 +31,6 @@ milestone: M-20260630T002621Z-A
   - mode: in-session
   - summary: B1 预研覆盖现状分析、对标分析（Conveyor/CAO/Superharness）、四个方案对比、分 Phase 交付策略。Phase 1 范围明确（旁观不介入），留有 Phase 2/3 扩展空间
   - verdict: pass
-- promoted_issue_path: docs/B2-docs/runtime/daemon/raw-20260630T002621Z/issues/I-20260630T002621Z-A.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260630T002621Z-A/issue.md
 - milestone: M-20260630T002621Z-A
 - session_refs: []

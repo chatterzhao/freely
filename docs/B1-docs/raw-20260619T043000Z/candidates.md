@@ -6,7 +6,7 @@ created_at: 2026-06-19
 milestone: M-20260619T043000Z-A
 ---
 
-## C-20260619T043000Z-A: IBM治理快速达标
+## C-20260619T043000Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: IBM治理快速达标 — skill门禁常见坑速查+规范模板+gate报错引导

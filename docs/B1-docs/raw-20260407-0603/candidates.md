@@ -8,7 +8,7 @@
 
 ## Candidates
 
-### C-20260407-0603-A
+### C-20260407-0603-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: `Runtime evidence provenance and canonical absorption gate governance`

@@ -1,5 +1,5 @@
 # Candidates
-## C-20260508T121541Z-A
+## C-20260508T121541Z-A: legacy issue
 - candidate_format_version: v2
 - title: platform-adapter skip key standardization when title has raw-key
 - status: promoted

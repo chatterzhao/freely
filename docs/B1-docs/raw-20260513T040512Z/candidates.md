@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260513T040512Z-A: task-lifecycle-scan batch optimization
+## C-20260513T040512Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: task-lifecycle-scan 批量化 — 1+3 阶段扫描替代 O(n) API 逐项查询

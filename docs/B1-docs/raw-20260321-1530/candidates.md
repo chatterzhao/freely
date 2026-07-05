@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260321-1530-A
+### C-20260321-1530-A: legacy issue
 - title: Agent-ready PRD architecture for Freely IBM flow
 - problem: Freely 当前的 `prd.md` 更偏“人类摘要”，还没有明确把 PRD 定义成 AI 时代的执行控制面。这会导致 AI 在 doc-loop 和 dev-loop 里只能拿到粗粒度目标，却缺 non-goals、task decomposition、prototype path、eval plan 和 model-upgrade revisit 触发器。
 - why_now: 用户直接提出“在 IBM 流程里，AI 来出 PRD 应该长什么样”，且外部研究已经足以形成稳定判断；继续停留在抽象讨论，会让 Freely 自己的 doc-loop 仍沿用旧时代的 PRD 结构。
@@ -18,7 +18,7 @@
 - priority: P0
 - status: completed
 - decision_reason: 这轮研究已经从外部材料和 Freely 自身现状得出稳定结论：PRD 需要从“读物”变成“可执行包”。该判断已经 materialize 为正式 IBM issue，并完成最小质量门槛、governance-check 与回归测试的真源吸收，因此此 candidate 现在只保留历史 provenance。
-- promoted_issue_path: docs/B2-docs/ibm/doc-loop/issues/agent-ready-prd-for-freely-flow.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260321-1530-A/issue.md
 - legacy_id_mapping: I-20260321-1530  # 历史遗留的 issue id
 - milestone: docs/milestones.md#m-20260321-ai-native-doc-loop
 - next_action: 保留为历史来源记录。若未来要继续扩展 PRD 模板生成器、lint 或更强 doc-loop 自动化，应从当前 canonical truth 新开 candidate/issue，而不是重新激活这条 candidate。

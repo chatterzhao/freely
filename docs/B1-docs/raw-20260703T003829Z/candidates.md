@@ -7,7 +7,7 @@ created_at: 2026-07-03
 milestone: M-20260703T003829Z-A
 ---
 
-## C-20260703T003829Z-A: 修复 workcell-state.env unsafe source 及门禁逻辑
+## C-20260703T003829Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: 修复 workcell-state.env unsafe source 导致命令注入，重构门禁为时间戳比较
@@ -44,6 +44,6 @@ milestone: M-20260703T003829Z-A
   - summary: 审查 unsafe source 替换为 meta_env_value 的正确性，确认无其他同类问题
   - verdict: pass
 - promoted_issue_id: I-20260703T003829Z-A
-- promoted_issue_path: docs/B2-docs/runtime/daemon/raw-20260703T003829Z/issues/I-20260703T003829Z-A.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260703T003829Z-A/issue.md
 - milestone: M-20260703T003829Z-A
 - session_refs: []

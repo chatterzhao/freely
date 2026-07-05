@@ -1,6 +1,6 @@
 # Candidates - 20260406-1851--codex-interactive-login-and-apikey-input-flow
 
-## C-20260406-1851-A
+## C-20260406-1851-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: `Codex interactive login and API-key input flow`

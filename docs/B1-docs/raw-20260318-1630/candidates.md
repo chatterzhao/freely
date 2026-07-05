@@ -1,6 +1,6 @@
 # Candidates
 
-### C-20260318-A
+### C-20260318-1630-A: legacy issue
 - title: 全局 AI 账号 watchdog 与主管拉起
 - status: promoted
 - why:
@@ -28,4 +28,4 @@
 - promoted_issue_path: `docs/B2-docs/ibm/global-ai-account-watchdog-and-manager-bootstrap/issues/global-ai-account-watchdog-and-manager-bootstrap.md`
 - legacy_id_mapping: I-20260318-1630  # 历史遗留的 issue id
 - session_refs: []
-- milestone: M-20260306-workspace-routing-foundation
+- milestone: M-20260318-1630-A

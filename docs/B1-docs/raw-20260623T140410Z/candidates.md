@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260623T140410Z-A: _restore_tasks 重启恢复——状态修正 + 环境恢复
+## C-20260623T140410Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: A2A 状态管理全量修复：stop 不动状态 + 重启恢复 + 审计 bug 修复（14 项）

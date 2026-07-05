@@ -1,4 +1,4 @@
-## C-20260621T043842Z-A
+## C-20260621T043842Z-A: legacy issue
 
 <!-- 使用 bullet 格式: `- key: value`，不要用 YAML `---` 分隔符 -->
 

@@ -24,7 +24,7 @@
 
 ## Candidate issue
 
-### C-20260322-1802-A
+### C-20260322-1802-A: legacy issue
 
 - title: `pre-test-merge governance and lifecycle capability`
 - status: `absorbed`

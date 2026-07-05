@@ -6,7 +6,7 @@ created_at: 2026-07-04
 milestone: M-20260704T064539Z-A
 ---
 
-## C-20260704T064539Z-A: 统一 ACP session 管理 + Bridge 解耦
+## C-20260704T064539Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: 统一 ACP session 管理方法 — acp_session_connect + bridge 解耦 + slot 检测
@@ -38,6 +38,6 @@ milestone: M-20260704T064539Z-A
   - summary: 审查 session 统一 + bridge 解耦方案，确认三层架构合理
   - verdict: pass
 - promoted_issue_id: I-20260704T064539Z-A
-- promoted_issue_path: docs/B2-docs/config/agent-table/raw-20260704T064539Z/issues/I-20260704T064539Z-A.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260704T064539Z-A/issue.md
 - milestone: M-20260704T064539Z-A
 - session_refs: []

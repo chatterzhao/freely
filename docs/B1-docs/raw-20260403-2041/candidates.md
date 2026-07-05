@@ -1,6 +1,6 @@
 # Candidates - 20260403-2041--worktree-tool-boundary-bootstrap
 
-## C-20260403-2041-A
+## C-20260403-2041-A: legacy issue
 
 - title: Worktree tool boundary bootstrap governance
 - problem: Freely's completed tool-materialization family still leaves a real sibling-worktree gap: managed tool boundaries materialize in the project root, but new worktrees do not automatically regain the same local tool surfaces and launch-time writable-root extensions, which leaves a path back to protected-root implementation drift.

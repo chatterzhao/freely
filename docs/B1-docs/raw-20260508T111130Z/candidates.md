@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260508T111130Z-A: reference-transaction delete fix
+## C-20260508T111130Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: reference-transaction hook skip aborted txns to allow branch deletion

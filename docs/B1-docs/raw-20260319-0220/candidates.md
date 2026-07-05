@@ -1,6 +1,6 @@
 # Candidates: watchdog-control-plane-governance
 
-### C-20260319-0220-A
+### C-20260319-0220-A: legacy issue
 
 - candidate_id: `c-20260319-0220-a`
 - title: `Watchdog umbrella term and sub-control-plane taxonomy`
@@ -25,7 +25,7 @@
     jsonl_path: `unavailable://codex-thread-only`
     role: `author`
 
-### C-20260319-0220-B
+### C-20260319-0220-A: legacy issue
 
 - candidate_id: `c-20260319-0220-b`
 - title: `Skill-first watchdog capability extraction`
@@ -47,7 +47,7 @@
     jsonl_path: `unavailable://codex-thread-only`
     role: `author`
 
-### C-20260319-0220-C
+### C-20260319-0220-A: legacy issue
 
 - candidate_id: `c-20260319-0220-c`
 - title: `Historical watchdog productization worktree retirement handoff`

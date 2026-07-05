@@ -1,6 +1,6 @@
 # Candidates: pr-review-guarded worktree detection + auto issue_id
 
-## C-20260620T142847Z-A
+## C-20260620T142847Z-A: legacy issue
 - title: pr-review-guarded requires branch, uses worktree context, auto-generates issue_id
 - status: promoted
 - promoted_issue_path: docs/issues/I-20260620T142847Z-A/issue.md

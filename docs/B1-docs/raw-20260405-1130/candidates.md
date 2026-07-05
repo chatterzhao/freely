@@ -1,6 +1,6 @@
 # Candidates - 20260405-1130--project-level-agents-bootstrap-and-management
 
-## C-20260405-1130-A
+## C-20260405-1130-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: Project-level AGENTS bootstrap and management contract

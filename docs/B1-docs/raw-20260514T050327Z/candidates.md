@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260514T050327Z-A
+## C-20260514T050327Z-A: legacy issue
 - title: fix while/then typo
 - priority: P1
 - status: promoted

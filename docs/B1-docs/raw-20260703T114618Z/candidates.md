@@ -6,7 +6,7 @@ source_raw: raw-20260703T114618Z
 milestone: M-20260703T114618Z-A
 ---
 
-## C-20260703T114618Z-A: 统一 agent_working 写入 — _persist_session_anchor_early()
+## C-20260703T114618Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: 在 _persist_session_anchor_early() 中按 role 写入 agent_working session 记录
@@ -18,5 +18,5 @@ absorbed_into: I-20260703T114618Z-A
   - restart 后 agent_working 中有 manager session_id → 可 resume
   - worker/reviewer 的写入不受影响（已在 watchdog_sse.py 中正确实现）
 - absorbed_into: I-20260703T114618Z-A
-- promoted_issue_path: docs/B2-docs/git-worktree/closeout/raw-20260703T114618Z/issues/I-20260703T114618Z-A.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260703T114618Z-A/issue.md
 - milestone: M-20260703T114618Z-A

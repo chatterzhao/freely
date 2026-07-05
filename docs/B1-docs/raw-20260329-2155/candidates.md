@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260329-2155-A
+### C-20260329-2155-A: legacy issue
 - candidate_format_version: v2
 - title: Ignore common miswritten local sensitive artifacts before they can enter Git
 - problem: A real repository-root `auth.json` containing live credential structure was observed in `develop`, and the repository had no ignore rule for it or other common local credential/private-key artifacts. That means Freely can surface sensitive local byproducts as ordinary untracked files even though they are not valid repository assets.

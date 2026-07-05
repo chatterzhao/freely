@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260617T160807Z-A: wt-close --force local regression fix
+## C-20260617T160807Z-A: legacy issue
 - candidate_format_version: v2
 - title: Remove 'local' from wt-close Phase 3 _current_phase
 - status: promoted

@@ -5,7 +5,7 @@ source_raw: raw-20260626T121349Z
 milestone: M-20260626T121349Z-A
 ---
 
-## C-20260626T121349Z-A: agent-table help + test docs + cherry-pick consistency
+## C-20260626T121349Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: Post-refactoring documentation and tool consistency cleanup

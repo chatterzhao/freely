@@ -6,7 +6,7 @@ created_at: 2026-06-25
 milestone: M-20260625T084506Z-A
 ---
 
-## C-20260625T084506Z-A: B2_IBM skill 反糊弄铁律
+## C-20260625T084506Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: B2_IBM skill 加入 pre-tests.md 反糊弄铁律 + gate 端到端/集成测试层级检查

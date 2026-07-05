@@ -2,7 +2,7 @@
 
 - Source brainstorm: `docs/B1-docs/raw-20260419-1630/brainstorms.md`
 
-### C-20260419-1630-A
+### C-20260419-1630-A: legacy issue
 
 - title: `Runtime startup self-healing boundary`
 - source_class: `discovery`

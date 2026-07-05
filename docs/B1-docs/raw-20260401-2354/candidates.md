@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260401-2354-A
+### C-20260401-2354-A: legacy issue
 - candidate_format_version: v2
 - title: Implementation decision notes in issue-bound review artifacts
 - problem: Freely 已把 candidate / PRD / pre-tests / verification 各层的治理边界基本冻结，但 dev-loop 里的具体实现决策仍缺少统一、可追溯、可 gate 的记录面。现在 reviewer 可能看到代码和测试，却无法直接恢复“为什么这次选这个实现、拒绝了哪些方案、还有哪些边界与残余风险”。

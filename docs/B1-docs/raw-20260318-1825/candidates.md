@@ -1,13 +1,13 @@
 # Candidate Issues
 
-### C-20260318-1825-A
+### C-20260318-1825-A: legacy issue
 - status: promoted
 - legacy_id_mapping: I-20260318-1825
 - Title: worktree hygiene supervision control plane
 - Problem: Freely 缺少针对 dirty-budget / checkpoint drift 的自治监督控制面，manager 只能观察，不能稳定推动 worker 收口。
 - Expected outcome: 明确 manager/worker/runtime/hook 的 hygiene 分工，并新增可执行能力与测试。
-- promoted_issue_path: docs/B2-docs/git-worktree/worktree-hygiene-supervision-control-plane/issues/worktree-hygiene-supervision-control-plane.md
-- milestone: M-20260306-workspace-routing-foundation
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260318-1825-A/issue.md
+- milestone: M-20260318-1825-A
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}]
 
 ## Candidate B

@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260328-0335-A
+### C-20260328-0335-A: legacy issue
 - title: Clarify whether repeated `operator_stop` during manager recovery is intended runtime semantics or a new stall-detector false positive
 - problem: 修复 `same-lane busy` 误判后，`develop` manager 不再立即卡在 delegated continuation backlog，但仍会每隔约 3-4 分钟被 `runtime-stalled-ai-recovery -> local_continuation_reentry` TERM 一次，外显成 `operator_stop_requested`。更深层的现场还显示：manager watchdog 以 `cycle-*.log/prompt mtime > 90s` 作为主要 stall 判据，而 manager prompt 仍反复注入历史 delegated backlog，导致 manager 长时间没有新 continuity 写回。当前需要判断这到底是合法长静默 supervision 被误判，还是 delegated backlog 收口缺口与 stall detector 叠加形成的控制面 thrash。
 - latest_evidence: `2026-03-28T10:47:11Z` 的新 manager cycle 在 `2026-03-28T10:50:32Z` 再次被 `operator_stop_requested` 杀掉，并于 `10:50:42Z` 自动拉起新 supervisor。对应 cycle log 在启动后只短暂更新，随后静默超过 `90s`。这把“90 秒静默后稳定复现 thrash”从推测提升成了直接现场证据。
@@ -20,7 +20,7 @@
   - 若需要 follow-on，拆清“stall detector contract”“delegated backlog absorption”“runtime event naming semantics”是否应分成独立 owner
 - priority: P0
 - status: promoted
-- milestone: M-20260306-workspace-routing-foundation
+- milestone: M-20260328-0335-A
 - promoted_issue_path: `docs/B2-docs/ibm/manager-supervision-quiet-period-stall-signal-governance/issues/manager-supervision-quiet-period-stall-signal-governance.md`
 - decision_reason: 现阶段证据已足以确认 primary owner 是 manager delegated-supervision quiet-period heartbeat contract，而不是旧 `same-lane busy` issue 的 verification 尾巴，也不是纯 observability 命名问题。该问题已经满足独立 issue materialization 条件。
 - next_action: 按新 issue 进入 IBM/dev 流程，先补 negative/paired-positive tests，再选择 delegated-supervision idle-safe contract 或 signal-first / observe-delay 的最小修法，最后再处理 observability 区分。

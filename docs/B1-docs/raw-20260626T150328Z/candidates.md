@@ -6,7 +6,7 @@ created_at: 2026-06-26
 milestone: M-20260626T150328Z-A
 ---
 
-## C-20260626T150328Z-A: TOML array comma-join + feedback validation + bash 3.2 guard
+## C-20260626T150328Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: TOML array comma-join + feedback validation + bash 3.2 guard

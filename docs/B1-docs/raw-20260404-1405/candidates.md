@@ -1,6 +1,6 @@
 # Candidates - 20260404-1405--manager-bootstrap-prompt-publication-without-continuity-materialization
 
-## C-20260404-1405-A
+## C-20260404-1405-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: Manager bootstrap prompt publication without continuity materialization governance

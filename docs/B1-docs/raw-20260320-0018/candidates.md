@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260320-0018-A
+### C-20260320-0018-A: legacy issue
 - title: Default project resolution and authorized project memory for CLI-first interruption entrypoints
 - problem: `freely chat` / `freely tui` / `freely intake status` 等命令要求反复显式传 `--project`，使当前项目插话体验偏底层；同时若解析逻辑过宽，又会把任意目录误判为项目。
 - why_now: human interruption 已经可用，下一步必须让常用 CLI 入口符合日常使用习惯，否则 TUI 与 chat 仍会被路径样板代码拖住。
@@ -19,7 +19,7 @@
 - priority: P0
 - status: promoted
 - decision_reason: runtime 已具备统一 resolver；本轮补齐 cwd 自动解析和单一已授权项目回退的脚本回归后，已可以 materialize 为 issue。
-- promoted_issue_path: docs/B2-docs/ibm/default-project-resolution-and-authorized-project-memory/issues/default-project-resolution-and-authorized-project-memory.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260320-0018-A/issue.md
 - legacy_id_mapping: I-20260320-0018  # 历史遗留的 issue id
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs:

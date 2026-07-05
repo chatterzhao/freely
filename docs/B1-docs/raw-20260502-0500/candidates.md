@@ -12,7 +12,7 @@ next_action: 推进到 B2_IBM，创建 issue 进行实现
 revisit_trigger: 无
 ---
 
-## C-20260502-0500-A
+## C-20260502-0500-A: legacy issue
 - status: promoted
 
 # Candidate: 打包与自举验证

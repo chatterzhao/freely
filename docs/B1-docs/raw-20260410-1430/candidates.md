@@ -7,7 +7,7 @@
 
 ## Candidates
 
-### C-20260410-1430-A
+### C-20260410-1430-A: legacy issue
 - candidate_format_version: `v2`
 - title: Fix preferred_auth_method lost when switching to account slot
 - problem: When switching from an apikey slot to an account slot, `preferred_auth_method` is deleted from live config but not restored, because account slots have empty `config-auth.toml` fragments.

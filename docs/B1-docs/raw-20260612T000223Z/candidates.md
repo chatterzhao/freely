@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260612T000223Z-A: A2A 协议替换 Freely Handoff 架构重构
+## C-20260612T000223Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: A2A 协议替换 Freely Handoff 架构重构

@@ -1,6 +1,6 @@
 # Candidates - 20260405-1615--feature-owned-test-pre-merge-family
 
-### C-20260405-1615-A
+### C-20260405-1615-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: Feature-owned test-pre-merge family promotion model

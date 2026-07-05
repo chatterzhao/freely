@@ -6,7 +6,7 @@ created_at: 2026-06-29
 milestone: M-20260629T095905Z-A
 ---
 
-## C-20260629T095905Z-A: 优化 workflow skill 覆盖缺口
+## C-20260629T095905Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: 优化 workflow skill — 覆盖无 raw issue 场景、cd 工位提示、CLAUDE.md 启动链

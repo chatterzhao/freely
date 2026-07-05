@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260303-101
+### C-20260303-0000-A: legacy issue
 - title: CLI 编排最小闭环实现
 - problem: 现有编排概念完整，但缺少最小执行落点。
 - why_now: 是让 auto-loop 可运行的直接前置。
@@ -22,7 +22,7 @@
   - `docs/system/workspace/skills/auto-loop-orchestrator/SKILL.md`
 - session_refs: []
 
-### C-20260303-102
+### C-20260303-0000-A: legacy issue
 - title: 集成测试优先门禁落地
 - problem: 验收标准存在，但门禁执行路径不稳定。
 - why_now: 自治开发优先保障可运行与可回归。
@@ -38,7 +38,7 @@
   - `docs/system/workspace/skills/branch-management/SKILL.md`
 - session_refs: []
 
-### C-20260303-103
+### C-20260303-0000-A: legacy issue
 - title: 会话管理机制（恢复/压缩/新会话）
 - problem: 自治循环缺少标准化会话生命周期管理，恢复链路不稳。
 - why_now: 属于后续行动清单中的直接工程项，影响无人值守连续性。

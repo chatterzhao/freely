@@ -1,6 +1,6 @@
 # Candidate Issues
 
-## C-20260322-0412-A
+## C-20260322-0412-A: legacy issue
 - title: Worker active reentry for manager-delegated continuation governance
 - status: promoted
 - why_now: manager 已能生成 worker handoff 并拉起 worker，但 active worker 不会自动消费新 delegated continuation，导致生命周期悬空。

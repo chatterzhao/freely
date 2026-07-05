@@ -8,7 +8,7 @@ promoted_issue_path: docs/issues/I-20260624T141559Z-A/issue.md
 updated_at: '2026-06-24T14:45:00Z'
 ---
 
-## C-20260624T141559Z-A: cmd_feedback 对齐 issue-sync 多平台架构
+## C-20260624T141559Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: cmd_feedback 改为 issue-sync 薄封装，去掉 --repo，支持多平台

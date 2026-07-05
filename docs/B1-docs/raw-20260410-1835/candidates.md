@@ -7,7 +7,7 @@
 
 ## Candidates
 
-### C-20260410-1835-B
+### C-20260410-1835-A: legacy issue
 - candidate_format_version: `v2`
 - title: Codex real exec switch and after-failure recovery governance
 - problem: `freely start` and related Codex switch surfaces were still mixing inventory truth, manual sweep semantics, and after-failure recovery semantics. That left real limit/network failures able to stall on the failed current slot, let `status` mutate auth unexpectedly, and kept the command surface insufficiently verified against real `bin/ai` and `freely start` execution.

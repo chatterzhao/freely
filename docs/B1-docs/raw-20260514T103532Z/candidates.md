@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260514T103532Z-A: agent handoff protocol v2
+## C-20260514T103532Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: 设计 agent handoff protocol v2 — 字段语义、状态机、线程模型、消费语义
@@ -40,7 +40,7 @@
       - open_questions: 空 — 所有问题在预研中已收敛
       - B2_IBM_materialization: 完整 — PRD/pre-tests/tasks/code-reviews 均存在
       - issue_state: I-20260514T103532Z-A phase_state=completed, platform_state=closed
-      - milestone: M-20260514T103532Z-A status=completed, candidate 已标记为 promoted
+      - milestone: M-20260514T103532Z-A
 - promoted_issue_path: docs/issues/I-20260514T103532Z-A/issue.md
 - milestone: M-20260514T103532Z-A
 - session_refs: []

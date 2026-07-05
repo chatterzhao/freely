@@ -8,7 +8,7 @@
 
 ## Candidates
 
-### C-20260413-0420-D
+### C-20260413-0420-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: `Manager startup continuity materialization governance`
@@ -57,7 +57,7 @@
     jsonl_path: `unavailable://codex-thread-only`
     role: `author`
 
-### C-20260413-0420-C
+### C-20260413-0420-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: `Runtime startup root-cause packet governance`
@@ -104,7 +104,7 @@
     jsonl_path: `unavailable://codex-thread-only`
     role: `author`
 
-### C-20260413-0420-A
+### C-20260413-0420-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: `Runtime startup authority and readiness governance`
@@ -154,7 +154,7 @@
     jsonl_path: `unavailable://codex-thread-only`
     role: `author`
 
-### C-20260413-0420-B
+### C-20260413-0420-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: `Manager startup continuity contract governance`

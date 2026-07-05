@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260320-1628-A
+### C-20260320-1628-A: legacy issue
 - title: Add a standard Claude Code install/provider/MCP workflow to Freely
 - problem: Freely 当前把顶层 `tool` 视为主执行 CLI，但尚未表达“Claude Code 作为执行器、内部再挂 Codex MCP 能力”这类组合路径。若继续把这种组合硬塞成新的长名字 tool，会把执行器、模型和内部能力耦合成不可扩展的命名。
 - why_now: 研究已验证 `Claude Code + Codex MCP` 在本机可正常使用，且前置条件已经收敛清楚：Claude 主 provider 必须先可用，Codex 作为其内部 MCP capability 被调用。这已经从概念讨论进入可实施的运行器接入问题。
@@ -22,8 +22,8 @@
 - priority: P1
 - status: promoted
 - decision_reason: 这条路径已经在本机通过 `CCR + Claude Code + codex mcp-server` 跑通，并最终收敛成 `cc` / `cc-use-codex-cli` 两个显式工具、`skill:tool-cc-codex-mcp-runtime`、以及双层 session evidence runtime。早期 capability-only 命名建议已被后续实现与用户交互方式取代。
-- promoted_issue_path: docs/B2-docs/config/claude-code-codex-mcp-runtime-governance/issues/claude-code-codex-mcp-runtime-governance.md
-- milestone: M-20260306-workspace-routing-foundation
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260320-1628-A/issue.md
+- milestone: M-20260320-1628-A
 - session_refs:
   - tool: cc-use-codex-cli
     session_id: 11111111-2222-4333-8444-555555555555

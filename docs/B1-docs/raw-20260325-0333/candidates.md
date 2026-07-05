@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260325-0333-A
+### C-20260325-0333-A: legacy issue
 - candidate_format_version: v2
 - title: Testing evidence ladder and real-environment gates for Freely
 - problem: Freely 已经把 `pre-tests.md` 固定成 issue-level acceptance 控制面，但仍缺少一套统一、可执行、可恢复的测试能力 contract，去定义 script regression、integration、end-to-end、application-native real-environment 与 protected-env acceptance 各自的职责、最低证据 bar，以及它们如何进入 completion / promote / retirement gate。结果就是：本地测试可能都过了，但真实 runtime/dogfood 仍会暴露关键缺口；而这些缺口当前只能事后通过新 issue 回补。
@@ -54,7 +54,7 @@
   - jsonl_path: unavailable://codex-thread-only
   - role: author
 
-### C-20260325-0333-B
+### C-20260325-0333-A: legacy issue
 - candidate_format_version: v2
 - title: Story-level pre-tests quality gate governance
 - problem: Freely 已明确 `pre-tests.md` 是 issue-level acceptance 控制面，但还没有冻结 story-level 最低质量线，导致 commands-only 或 acceptance-target 缺失的 `pre-tests.md` 仍可能形式上“存在”，却无法真正定义测试与验收边界。

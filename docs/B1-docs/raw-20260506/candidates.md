@@ -1,6 +1,6 @@
-## C-20260506T1230Z-A
+## C-20260506-A: legacy issue
 
 - status: promoted
-- milestone: M-20260506T1230Z-A
+- milestone: M-20260506-A
 - promoted_issue_path: `docs/issues/I-20260506T1230Z-A/issue.md`
 - decision: wt-create dual worktree creation

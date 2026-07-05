@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260517T082453Z-A: supervisor bash rc=0 crash — 进程正常退出与 crash 分类歧义
+## C-20260517T082453Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: supervisor 进程正常退出 (rc=0) 被误分类为 crash
@@ -20,7 +20,7 @@
   - 若需修复，修改面在 supervisor 控制面还是 adapter 退出溯源报告逻辑？
 - acceptance_reviews: []
 - promoted_issue_path: ""
-- milestone: M-20260312-control-surface-runtime-convergence
+- milestone: M-20260517T082453Z-A
 - session_refs:
   - tool: cc
     session_id: "20260517100656-b45840"

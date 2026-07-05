@@ -1,6 +1,6 @@
 # Candidates - 20260404-0640--protected-branch-merge-receipt-gap-followthrough
 
-## C-20260404-0640-A
+## C-20260404-0640-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: Protected-branch merge receipt gap followthrough

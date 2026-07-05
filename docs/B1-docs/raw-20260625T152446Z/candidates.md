@@ -6,7 +6,7 @@ created_at: 2026-06-25
 milestone: M-20260625T152446Z-A
 ---
 
-## C-20260625T152446Z-A: pr-review-guarded ACP TDD Reviewer
+## C-20260625T152446Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: pr-review-guarded 接入 ACP TDD Reviewer agent

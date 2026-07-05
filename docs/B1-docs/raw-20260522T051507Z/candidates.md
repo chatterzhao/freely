@@ -1,5 +1,5 @@
 # Candidates
-## C-20260522T051507Z-A
+## C-20260522T051507Z-A: legacy issue
 - title: slot full name backward compat
 - priority: P1
 - status: promoted

@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260508T050922Z-A: 门禁收口链路修复
+## C-20260508T050922Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: issue-sync close 支持从 raw-* 继承 platform_ids

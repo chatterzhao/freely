@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260326-1705-A
+### C-20260326-1705-A: legacy issue
 - candidate_format_version: v2
 - title: Manager owner stance and source-patrol completeness governance
 - problem: 当前真源分别定义了 manager patrol、human interruption、progress continuation 与 pre-brainstorm 生命周期，但仍缺少一条分层清楚的治理语义：开发 Freely 的治理文档不能直接充当产品化后的 manager / worker 能力真源；而产品能力真源里也还没有把“主管是项目主人、插话只是 advisory signal、主管要巡检 interruption / milestone / progress / pre-brainstorm 直到状态闭环”完整写死。

@@ -1,6 +1,6 @@
 # Candidates: write_task_mode before ensure_freely_db ordering fix
 
-## C-20260618T091116Z-A
+## C-20260618T091116Z-A: legacy issue
 - title: Fix write_task_mode ordering — ensure DB daemon running first
 - status: promoted
 - promoted_issue_path: docs/issues/I-20260618T091116Z-A/issue.md

@@ -6,7 +6,7 @@ created_at: 2026-07-04
 milestone: M-20260704T234812Z-A
 ---
 
-## C-20260704T234812Z-A: #3731 ACP cleanup 遗漏修复 + hook 提示改进
+## C-20260704T234812Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: 修复 #3731 清理遗漏的 base_tool plumbing、语法错误、硬编码路径、hook 提示
@@ -33,6 +33,6 @@ milestone: M-20260704T234812Z-A
   - summary: 审查 9 项修复是否完整覆盖 #3731 遗漏的所有问题
   - verdict: pass
 - promoted_issue_id: I-20260704T234812Z-A
-- promoted_issue_path: docs/B2-docs/config/agent-table/raw-20260704T234812Z/issues/I-20260704T234812Z-A.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260704T234812Z-A/issue.md
 - milestone: M-20260704T234812Z-A
 - session_refs: []

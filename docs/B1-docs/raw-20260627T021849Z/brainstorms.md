@@ -1,6 +1,6 @@
 ---
-b1_id: B1-20260627T021849Z; phase_state: completed
-source_raw: raw-20260627T021849Z; produced_candidate: C-20260627T021849Z-A; created_at: 2026-06-27
+b1_id: B1-20260627T021849Z
+source_raw: raw-20260627T021849Z
 ---
 # B1_IBM: wt-close --platform-only requires local file
 ## Problem: --platform-only falsely requires local issue.md. Fix: fallback to platform search.

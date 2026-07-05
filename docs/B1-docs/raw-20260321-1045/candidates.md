@@ -6,9 +6,9 @@
   why_now:
     - 当前实际 dogfooding 已经证明，复杂 worktree 不是“单棵树 ready 就 merge”，而是需要 `child -> parent -> merge-prep-from-develop -> develop` 的逐层治理。
     - 这类规则目前还在人工经验里，没有沉淀成 Freely 可复用的 skill 能力。
-  promoted_issue_path: docs/B2-docs/ibm/stacked-worktree-merge-chain-governance/issues/stacked-worktree-merge-chain-governance.md
+  promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260321-1045-A/issue.md
   legacy_id_mapping: I-20260321-1045  # 历史遗留的 issue id
-  milestone: M-20260306-workspace-routing-foundation
+  milestone: M-20260321-1045-A
   session_refs:
     - tool: cc-use-codex-cli
       session_id: 11111111-2222-4333-8444-555555555555

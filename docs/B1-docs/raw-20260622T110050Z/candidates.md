@@ -1,6 +1,6 @@
 # Candidates: wt-close error messages guide user instead of pushing --force
 
-## C-20260622T110050Z-A
+## C-20260622T110050Z-A: legacy issue
 - title: wt-close phase_state and pretests-gate errors provide three-way guidance
 - status: promoted
 - promoted_issue_path: docs/issues/I-20260622T110050Z-A/issue.md

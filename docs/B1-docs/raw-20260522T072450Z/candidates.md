@@ -1,5 +1,5 @@
 # Candidates
-## C-20260522T072450Z-A
+## C-20260522T072450Z-A: legacy issue
 - title: fix list double prefix
 - priority: P1
 - status: promoted

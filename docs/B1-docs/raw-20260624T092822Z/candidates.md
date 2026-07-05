@@ -1,5 +1,5 @@
 # Candidates
-## C-20260624T092822Z-A: Cline CLI registry 配置
+## C-20260624T092822Z-A: legacy issue
 - candidate_format_version: v2
 - title: tool-registry.toml 添加 Cline CLI 配置
 - status: promoted

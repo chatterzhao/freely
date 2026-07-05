@@ -1,6 +1,6 @@
 # Candidates: 业务阻塞与系统崩溃恢复分层
 
-## C-20260308-1931
+## C-20260308-1930-A: legacy issue
 
 - title: 业务阻塞状态与系统崩溃恢复定位治理
 - status: promoted

@@ -1,6 +1,6 @@
 # Candidates: CLAUDE.md project governance auto-loading
 
-## C-20260618T091721Z-A
+## C-20260618T091721Z-A: legacy issue
 - title: Add CLAUDE.md for automatic AI governance rule loading
 - status: promoted
 - promoted_issue_path: docs/issues/I-20260618T091721Z-A/issue.md

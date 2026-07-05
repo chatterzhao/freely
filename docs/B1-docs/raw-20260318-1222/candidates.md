@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260318-1222-01
+### C-20260318-1222-A: legacy issue
 - title: Evaluate mem9 as an optional continuity-plane backend for Freely
 - problem: Freely 已有本地 continuity / recovery / session rotation，但缺少跨工具、跨机器的共享记忆候选评估。
 - why_now: `mem9` 明确支持多种 AI coding agent，且方向与 Freely 的多工具未来形态有重叠。

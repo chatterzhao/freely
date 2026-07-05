@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260616T055035Z-A
+### C-20260616T055035Z-A: legacy issue
 - candidate_id: C-20260616T055035Z-A
 - title: A2A server hygiene + after-run worker detection for prompt mode
 - problem: A2A zombie processes accumulate on daemon restart; startup healthcheck is insufficient; after-run worker detection missing for prompt mode

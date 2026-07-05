@@ -1,5 +1,5 @@
 # Candidates
-## C-20260618T044047Z-A: pr-merge develop path + clean check
+## C-20260618T044047Z-A: legacy issue
 - candidate_format_version: v2
 - title: pr-merge explicit cd + develop cleanliness check
 - status: promoted

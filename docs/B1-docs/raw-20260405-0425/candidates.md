@@ -1,6 +1,6 @@
 # Candidates - 20260405-0425--develop-guarded-merge-entrypoint-enforcement
 
-## C-20260405-0425-A
+## C-20260405-0425-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: Develop guarded merge entrypoint enforcement

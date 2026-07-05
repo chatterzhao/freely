@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260321-1515-A
+### C-20260321-1515-A: legacy issue
 - title: Remote branch retirement check for worktree governance
 - problem: 当前 worktree 治理已经能做本地 worktree / 本地 branch 收口，但还没有把远程 feature branch 的删除或保留判断纳入 cleanup followthrough，导致治理闭环只完成一半。
 - why_now: 本轮 fleet closure 已经暴露出这个缺口。若不把 remote branch disposition 正式收进 skill 和 runtime，后续每轮 promote 后都要手工补删远程分支。

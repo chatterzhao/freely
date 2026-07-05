@@ -7,7 +7,7 @@ milestone: M-20260624T151020Z-A
 promoted_issue_path: docs/issues/I-20260624T151020Z-A/issue.md
 ---
 
-## C-20260624T151020Z-A: wt-close gate 传参修复
+## C-20260624T151020Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: wt-close 传递正确的 pretests-retirement-gate 参数

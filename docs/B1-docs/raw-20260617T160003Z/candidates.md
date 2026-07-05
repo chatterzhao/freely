@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260617T160003Z-A: wt-close --force frontmatter guard
+## C-20260617T160003Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: Add phase_state guard to wt-close --force so it doesn't overwrite pr-merge-guarded frontmatter

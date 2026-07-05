@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260618T040226Z-A: pr-review-guarded — 独立 PR review 门禁
+## C-20260618T040226Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: pr-review-guarded command + review document + full workflow integration

@@ -6,7 +6,7 @@ created_at: 2026-07-01
 milestone: M-20260701T045911Z-A
 ---
 
-## C-20260701T045911Z-A: Reviewer agent + per-step workflow 介入
+## C-20260701T045911Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: Reviewer 成为独立 agent，workflow 每步经过 reviewer 审查
@@ -32,7 +32,7 @@ milestone: M-20260701T045911Z-A
     Phase 1 scope 明确：ensure_reviewer() + A2A reviewer role + [reviewer]路由。
     建议拆 C-20260701T045911Z-A 为子 candidate 逐 Phase 推进。
 - promoted_issue_id: I-20260701T045911Z-A
-- promoted_issue_path: docs/B2-docs/a2a/reviewer-agent/raw-20260701T045911Z/issues/I-20260701T045911Z-A.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260701T045911Z-A/issue.md
 - milestone: M-20260701T045911Z-A
 - next_action: 进入 B2，Phase 1 子 candidate → I-20260701T045911Z-A
 - session_refs: []

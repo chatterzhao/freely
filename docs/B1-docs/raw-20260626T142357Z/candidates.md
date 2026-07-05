@@ -4,7 +4,7 @@ status: absorbed
 source_raw: raw-20260626T142357Z
 milestone: M-20260626T142357Z-A
 ---
-## C-20260626T142357Z-A: wt-close local fix
+## C-20260626T142357Z-A: legacy issue
 - candidate_format_version: v2
 - title: remove local from wt-close
 - status: absorbed

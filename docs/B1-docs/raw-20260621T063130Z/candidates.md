@@ -1,4 +1,4 @@
-## C-20260621T063130Z-A
+## C-20260621T063130Z-A: legacy issue
 
 - candidate_format_version: v2
 - status: promoted

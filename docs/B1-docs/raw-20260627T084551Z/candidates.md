@@ -6,7 +6,7 @@ created_at: 2026-06-27
 milestone: M-20260627T084551Z-A
 ---
 
-## C-20260627T084551Z-A: run-acp-prompt.py fork 改用 session/fork
+## C-20260627T084551Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: run-acp-prompt.py fork 改用 session/fork

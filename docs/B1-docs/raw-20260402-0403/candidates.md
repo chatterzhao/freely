@@ -1,6 +1,6 @@
 # Candidates - 20260402-0403--canonical-product-posture-bootstrap-reconciliation
 
-## C-20260402-0403-A
+## C-20260402-0403-A: legacy issue
 
 - title: Canonical product posture bootstrap reconciliation
 - problem: canonical `develop` still fails Freely's own execution-boundary audit because tracked and bootstrap-managed repo posture truth lag the already-completed product and tool-materialization owners; `.codex/config.toml` still uses guarded approval posture and canonical local bootstrap state still lacks recorded activation-consent truth.

@@ -1,5 +1,5 @@
 # Candidates
-## C-20260510T0856Z-A: mode_just_switched 豁免
+## C-20260510T0856Z-A: legacy issue
 - title: task_mode 切换后看门狗豁免一次
 - status: promoted
 - decision_reason: wait→auto 切换竞态导致看门狗误杀 supervisor，需要 mode_just_switched 豁免机制

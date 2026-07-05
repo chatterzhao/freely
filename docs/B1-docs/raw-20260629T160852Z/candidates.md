@@ -6,7 +6,7 @@ created_at: 2026-06-29
 milestone: M-20260629T160852Z-A
 ---
 
-## C-20260629T160852Z-A: wt-close 支持 raw-{key} 参数 + help 强调
+## C-20260629T160852Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: wt-close 支持 raw-{key} 参数 + help 强调不要传 test 分支
@@ -25,6 +25,6 @@ milestone: M-20260629T160852Z-A
   - mode: in-session
   - summary: wt-close Phase 6b 已有 test-pre-merge 自动清理逻辑，只需加 raw key 入口 + help
   - verdict: pass
-- promoted_issue_path: docs/B2-docs/git-worktree/wt-close/raw-20260629T160852Z/issues/I-20260629T160852Z-A.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260629T160852Z-A/issue.md
 - milestone: M-20260629T160852Z-A
 - session_refs: []

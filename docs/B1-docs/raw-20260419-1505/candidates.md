@@ -2,7 +2,7 @@
 
 - Source brainstorm: `docs/B1-docs/raw-20260419-1505/brainstorms.md`
 
-### C-20260419-1505-A
+### C-20260419-1505-A: legacy issue
 
 - title: `Runtime supervisor attach reuse followthrough`
 - source_class: `discovery`

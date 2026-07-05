@@ -1,6 +1,6 @@
 # Candidates - 20260405-1805--test-pre-merge-family-promotion-gate-enforcement
 
-### C-20260405-1805-A
+### C-20260405-1805-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: Test-pre-merge family promotion gate enforcement

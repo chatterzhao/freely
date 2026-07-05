@@ -1,5 +1,5 @@
 # Candidates
-## C-20260511T0229Z-A: worker prompt 注入 handoff 汇报指令
+## C-20260511T0229Z-A: legacy issue
 - title: worker prompt 末尾注入 handoff update 指令
 - status: promoted
 - decision_reason: Worker 不知 manager 中心 DB 路径和自己 handoff ID，无法汇报完成

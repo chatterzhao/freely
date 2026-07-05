@@ -2,7 +2,7 @@
 
 ## Candidate Issues
 
-### C-20260503T1235Z-A: 将 continuity-based worker recovery 推迟到首次 AI patrol 之后
+### C-20260503-1235-A: legacy issue
 
 - title: `Defer manager_runtime_launch_workers_from_latest_handoff to after first AI patrol cycle`
 - status: `promoted`

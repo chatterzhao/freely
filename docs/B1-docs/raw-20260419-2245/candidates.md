@@ -2,7 +2,7 @@
 
 - Source brainstorm: `docs/B1-docs/raw-20260419-2245/brainstorms.md`
 
-### C-20260419-2245-A
+### C-20260419-2245-A: legacy issue
 
 - title: `Runtime Claude launch and session evidence governance`
 - source_class: `discovery`

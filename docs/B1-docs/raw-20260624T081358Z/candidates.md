@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260624T081358Z-A: 测试文档 daemon 假设修复
+## C-20260624T081358Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: 修复 skills/AGENTS 中测试步骤的 daemon 硬编码假设

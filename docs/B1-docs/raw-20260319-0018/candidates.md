@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260319-0018-A
+### C-20260319-0018-A: legacy issue
 - title: token-efficient continuity before session rotation
 - problem: Freely 当前在 context pressure 下已经能 `fresh_with_handoff`，但缺少“先主动写 continuity，再低 token 轮换”的统一策略。
 - why_now: 这是把当前 `context_ratio` / `fresh_with_handoff` / manager continuity 真正融合成高质量自治链的前提。
@@ -24,7 +24,7 @@
 - session_refs:
   - `feature/token-efficient-session-continuity-20260319`
 
-### C-20260319-0018-B
+### C-20260319-0018-A: legacy issue
 - title: session evidence references as fallback, not prompt payload
 - problem: 若把整份旧 `jsonl` / log 直接重喂，会浪费 token；但完全丢掉旧证据又会降低恢复质量。
 - why_now: 这是“节省 token”和“保留恢复证据”之间的关键平衡点。

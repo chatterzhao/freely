@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260623T100903Z-A: 彻底实现 SSE — SSE 客户端 + 替代轮询 + 废弃 delivery_status
+## C-20260623T100903Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: 彻底实现 SSE：SSE 客户端 + 替代轮询 + 废弃 delivery_status + Manager 实时决策闭环 + _restore_tasks 修复

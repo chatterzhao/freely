@@ -1,6 +1,6 @@
 # Candidates - 20260402-1912--protected-branch-merge-receipt-hardening
 
-## C-20260402-1912-A
+## C-20260402-1912-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: Protected-branch merge receipt hardening

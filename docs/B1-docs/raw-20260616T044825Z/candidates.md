@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260616T044825Z-A: Remove BRIDGE_TIMEOUT absolute cap for session/prompt
+## C-20260616T044825Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: Remove BRIDGE_TIMEOUT absolute cap for session/prompt in acp-bridge.py

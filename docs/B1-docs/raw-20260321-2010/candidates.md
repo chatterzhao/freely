@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260321-2010-A
+### C-20260321-2010-A: legacy issue
 - title: Define explicit session-addressed resume as Freely's canonical continuity model
 - problem: Freely 当前对不同工具的 continuity 寻址不一致。`cc` 已用显式 `session-id`，但 `codex` 仍用 `resume --last`，`iflow` / `kiro-cli` 也没有显式 workcell-scoped session contract。在多进程并行下，这会让 resume 命中错误会话，也会让 supervisor/runtime 混淆“最近会话”和“当前 workcell 应接的会话”。
 - why_now: 本轮自举明确暴露了 manager event re-entry 错路由问题；同时本机研究已确认 `codex exec resume` 支持显式 `SESSION_ID` 与 stdin prompt，因此已经有足够清晰的正式 primitive 可被 Freely 收编。

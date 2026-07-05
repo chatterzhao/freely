@@ -24,8 +24,8 @@
   - `in_dev` issue 必须声明 commit boundary
   - 验证通过后触发 checkpoint policy
   - dirty-tree 超阈值时 runtime 不再继续扩展实现
-  promoted_issue_path: docs/B2-docs/gate/checkpoint-commit-and-multi-worktree-supervision-governance/issues/checkpoint-commit-and-multi-worktree-supervision-governance.md
-  milestone: M-20260306-workspace-routing-foundation
+  promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260317-0735-A/issue.md
+  milestone: M-20260317-0735-A
   session_refs: []
 
 - ID: C-20260317-0735-C
@@ -37,6 +37,6 @@
   Acceptance Hint:
   - supervisor/status 能展示 worktree phase、dirty budget、checkpoint readiness
   - promotion 必须绑定集成测试与依赖关系
-  promoted_issue_path: docs/B2-docs/gate/checkpoint-commit-and-multi-worktree-supervision-governance/issues/checkpoint-commit-and-multi-worktree-supervision-governance.md
-  milestone: M-20260306-workspace-routing-foundation
+  promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260317-0735-A/issue.md
+  milestone: M-20260317-0735-A
   session_refs: []

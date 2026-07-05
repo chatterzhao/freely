@@ -4,7 +4,7 @@ status: promoted
 source_raw: raw-20260629T163137Z
 milestone: M-20260629T163137Z-A
 ---
-## C-20260629T163137Z-A: pr-review-guarded fixes
+## C-20260629T163137Z-A: legacy issue
 - candidate_format_version: v2
 - title: pr-review-guarded path + ACP detection fixes
 - status: promoted
@@ -14,6 +14,6 @@ milestone: M-20260629T163137Z-A
   - ACP 不可用时显式报错并引导 skill:freely-tdd-review
   - freely-review 失败有 explicit error message
 - promotion_gate: all AT green + merge
-- promoted_issue_path: docs/B2-docs/git-worktree/branch-pr/raw-20260629T163137Z/issues/I-20260629T163137Z-A.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260629T163137Z-A/issue.md
 - milestone: M-20260629T163137Z-A
 - session_refs: []

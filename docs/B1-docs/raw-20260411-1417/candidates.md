@@ -1,6 +1,6 @@
 # Candidates - 20260411-1417--stale-prebrainstorm-truth-reconcile
 
-### C-20260411-1417-A
+### C-20260411-1417-A: legacy issue
 - candidate_format_version: `v2`
 - title: Stale pre-brainstorm truth reconcile governance
 - problem: Multiple active audits still consume pre-brainstorm statements that have already been superseded by owner issues, gate scripts, and regression tests, causing false negatives/false positives in governance decisions.
@@ -32,7 +32,7 @@
     verdict: `pass`
     rationale: `Narrow owner boundary reduces audit drift without conflating stale text cleanup with runtime hardening work.`
 
-### C-20260411-1417-B
+### C-20260411-1417-A: legacy issue
 - candidate_format_version: `v2`
 - title: Launch-time verification contract hard gate governance
 - problem: Runtime launch can proceed with missing verification metadata, so issues surface late at merge/closeout gates.

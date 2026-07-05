@@ -1,5 +1,5 @@
 # Candidates
-## C-20260522T044515Z-A
+## C-20260522T044515Z-A: legacy issue
 - title: generic slot probe for all tools
 - priority: P1
 - status: promoted

@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260617T090413Z-A: REST routing for a2a-exit
+## C-20260617T090413Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: a2a_task.py create/update 走 REST 端点保留 worker_prompts_csv

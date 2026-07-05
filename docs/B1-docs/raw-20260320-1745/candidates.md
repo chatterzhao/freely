@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260320-1745-A
+### C-20260320-1745-A: legacy issue
 - title: Dirty worktree gate redesign for multi-worktree autonomy
 - problem: 当前 `dirty fleet` 被当成全局二元门禁，导致 unrelated dirty / busy worktree 也会阻断本可安全执行的 `audit / merge_prep / cleanup-followthrough`。在多 AI / 多 worktree / subagent 并行场景下，这会把“系统正在工作”误判成“系统异常”。
 - why_now: Freely 已开始用自己开发自己，插话 runtime 已真实暴露出这类误伤；如果不拆分 dirty gate，未来并行度一提高，cleanup 与 worktree 维护会频繁卡死。

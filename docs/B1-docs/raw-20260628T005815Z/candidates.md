@@ -6,7 +6,7 @@ created_at: 2026-06-28
 milestone: M-20260628T005815Z-A
 ---
 
-## C-20260628T005815Z-A: chat 重构 — comment + discuss + archive skill
+## C-20260628T005815Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: 将 freely chat 拆分为 comment（评论）和 discuss（讨论），新增讨论归档 skill
@@ -31,6 +31,6 @@ milestone: M-20260628T005815Z-A
   - mode: plan-subagent
   - summary: 审查 chat 拆分设计，验证 comment/discuss/export 三模块边界清晰，平台兼容策略合理
   - verdict: pass
-- promoted_issue_path: docs/B2-docs/human/discuss/raw-20260628T005815Z/issues/I-20260628T005815Z-A.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260628T005815Z-A/issue.md
 - milestone: M-20260628T005815Z-A
 - session_refs: []

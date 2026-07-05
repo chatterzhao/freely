@@ -1,6 +1,6 @@
 # Candidates - 20260429-2040--chat-inbox-sqlite
 
-### C-20260429-2040-A: SQLite chat-inbox 暂存区
+### C-20260429-2040-A: legacy issue
 
 - title: `SQLite chat-inbox staging for protected-branch chat intake`
 - status: `promoted`

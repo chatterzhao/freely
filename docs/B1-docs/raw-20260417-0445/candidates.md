@@ -7,7 +7,7 @@
 
 ## Candidates
 
-### C-20260417-0445-A
+### C-20260417-0445-A: legacy issue
 - candidate_format_version: `v2`
 - title: `Enforce CLI-first runtime lifecycle contract for Freely start/stop without watcher leakage`
 - research_only: `false`

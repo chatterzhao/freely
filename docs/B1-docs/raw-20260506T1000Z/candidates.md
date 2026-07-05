@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260506T1000Z-A: supervisor 主循环前置 task_mode wait 门禁
+## C-20260506T1000Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: supervisor 主循环 select_launch_kind 前添加 task_mode=wait 门禁

@@ -1,6 +1,6 @@
 # Candidates - 20260406-1829--codex-current-live-apikey-bootstrap-without-saved-slot
 
-## C-20260406-1829-A
+## C-20260406-1829-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: `Codex current-live apikey bootstrap without saved-slot inventory`

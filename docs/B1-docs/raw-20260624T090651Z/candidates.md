@@ -1,5 +1,5 @@
 # Candidates
-## C-20260624T090651Z-A: probe/resume registry-driven
+## C-20260624T090651Z-A: legacy issue
 - candidate_format_version: v2
 - title: probe/resume_target/capabilities registry-driven
 - status: promoted

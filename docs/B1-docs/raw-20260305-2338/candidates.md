@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260305-902
+### C-20260305-2338-A: legacy issue
 - title: Governance Alignment Compiler for Skills / Hooks / Bin
 - problem: 当前治理文档与运行时门禁脚本存在目录、门禁颗粒度和执行顺序漂移，导致 skills 无法稳定落地到 hooks/bin。
 - why_now: 这是 Freely 自举治理可信度的基础缺口，不修正会持续制造伪合规状态。

@@ -1,5 +1,5 @@
 # Candidates
-## C-20260522T053702Z-A
+## C-20260522T053702Z-A: legacy issue
 - title: cmd_login apikey unified at top
 - priority: P1
 - status: promoted

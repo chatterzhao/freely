@@ -2,7 +2,7 @@
 
 ## Candidate Issues
 
-### C-20260322-0245-A
+### C-20260322-0245-A: legacy issue
 - title: `Runtime worker launch linkage and stall recovery governance`
 - status: `promoted`
 - adoption_type: `materialized`

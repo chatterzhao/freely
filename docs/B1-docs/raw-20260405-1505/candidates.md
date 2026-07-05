@@ -1,6 +1,6 @@
 # Candidates - 20260405-1505--manager-semantic-loop-active-worker-suppression
 
-## C-20260405-1505-A
+## C-20260405-1505-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: Manager semantic-loop active-worker suppression governance

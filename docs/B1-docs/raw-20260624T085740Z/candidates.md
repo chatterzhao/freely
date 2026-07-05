@@ -1,5 +1,5 @@
 # Candidates
-## C-20260624T085740Z-A: parse + prompt fix
+## C-20260624T085740Z-A: legacy issue
 - candidate_format_version: v2
 - title: A2A parse rotting submitted + prompt state semantics
 - status: promoted

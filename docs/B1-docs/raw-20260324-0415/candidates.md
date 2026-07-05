@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260324-0415-A
+### C-20260324-0415-A: legacy issue
 - candidate_format_version: v2
 - title: Application-native runtime observation contract and observability planes
 - problem: Freely 当前已经有 `live-status`、`fleet-status`、session jsonl、cycle log、continuity artifact 等多种观察面，但还没有统一 contract 去说明“真实环境测试时先看什么、怎样判断仍在推进/已空转、怎样给用户提供插话着力点”。同时这套 contract 不能绑死在 Freely 自己的日志上，因为未来 Freely 要开发任意应用，而其他应用的可观察信号、日志形态和交互表面可能完全不同。

@@ -6,7 +6,7 @@ created_at: 2026-06-25
 milestone: M-20260625T235348Z-A
 ---
 
-## C-20260625T235348Z-A: wt-close consistency check
+## C-20260625T235348Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: wt-close CWD safety + dev↔test consistency + local-first order

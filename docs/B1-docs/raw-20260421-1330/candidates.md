@@ -7,7 +7,7 @@
 
 ## Candidates
 
-### C-20260421-1330-A
+### C-20260421-1330-A: legacy issue
 - candidate_format_version: `v2`
 - title: `Absorbed merged lane routing followthrough governance`
 - research_only: `false`

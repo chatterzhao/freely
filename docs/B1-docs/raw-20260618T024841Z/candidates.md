@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260618T024841Z-A: raw issue completeness fixes
+## C-20260618T024841Z-A: legacy issue
 - candidate_format_version: v2
 - title: Fix candidate drift, audit gaps, and raw issue data loss
 - status: promoted

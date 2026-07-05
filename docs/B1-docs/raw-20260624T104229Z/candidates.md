@@ -1,5 +1,5 @@
 # Candidates
-## C-20260624T104229Z-A: wt-create success → read skill
+## C-20260624T104229Z-A: legacy issue
 - candidate_format_version: v2
 - title: wt-create 成功后引导读对应 skill
 - status: promoted

@@ -1,6 +1,6 @@
 # Candidates - 20260321-1706--chat-triggered-worker-runtime-reactivation
 
-### C-20260321-1706-A
+### C-20260321-1706-A: legacy issue
 - title: Worker runtime reactivation after chat-triggered delegated continuation
 - status: promoted
 - why_now: `freely chat` 在 worker 工位上会产生 delegated continuation，但在 `operator_stop` 后不会自动把 worker 主循环拉起，真实狗粮已出现“插话成功但无人推进”的假活性。

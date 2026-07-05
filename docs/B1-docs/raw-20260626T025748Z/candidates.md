@@ -4,7 +4,7 @@ status: promoted
 source_raw: raw-20260626T025748Z
 milestone: M-20260626T025748Z-A
 ---
-## C-20260626T025748Z-A: A2A review states
+## C-20260626T025748Z-A: legacy issue
 - candidate_format_version: v2
 - title: A2A/SSE review states
 - status: promoted

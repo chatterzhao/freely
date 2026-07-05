@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260521T032154Z-A: supervisor crash — _on_supervisor_err 递归 ERR trap 假阳性
+## C-20260521T032154Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: 修复 _on_supervisor_err 递归 ERR trap 导致的假阳性 crash 报告

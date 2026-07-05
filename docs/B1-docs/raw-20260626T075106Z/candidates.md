@@ -5,7 +5,7 @@ source_raw: raw-20260626T075106Z
 milestone: M-20260626T075106Z-A
 ---
 
-## C-20260626T075106Z-A: tool family de-hardcode + AGENT_AI_TOOL + agent-id.env + reviewer
+## C-20260626T075106Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: Registry-driven tool family, per-agent slots, agent-id.env lifecycle, reviewer agent

@@ -6,7 +6,7 @@ created_at: 2026-06-24
 milestone: M-20260624T104233Z-A
 ---
 
-## C-20260624T104233Z-A: AGENTS.md 中测试硬编码改为 pre-tests.md 委托
+## C-20260624T104233Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: AGENTS.md 中测试硬编码改为 pre-tests.md 委托

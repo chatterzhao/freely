@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260514T022352Z-A
+## C-20260514T022352Z-A: legacy issue
 - title: remove hardcoded cc-ds-auto alias
 - scope: 3 files, remove alias from case lists
 - priority: P2

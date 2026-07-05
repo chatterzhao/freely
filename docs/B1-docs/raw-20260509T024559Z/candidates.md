@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260509T024559Z-A: daemon 从 project root 运行 + raw-key 定位工位
+## C-20260509T024559Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: Manager 从 project root 运行，Worker 通过 raw-key 定位工位

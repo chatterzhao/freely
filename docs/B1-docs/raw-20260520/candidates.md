@@ -1,6 +1,6 @@
 # Candidates: Agent 设计优化
 
-## C-20260520-agent-skill-design-A: Agent doc 重构 + skill 触发约束
+## C-20260520-A: legacy issue
 
 **Status:** needs_research
 **Priority:** P0
@@ -29,7 +29,7 @@
 
 ---
 
-## C-20260520-agent-skill-design-B: Worker prompt 必填字段增强
+## C-20260520-A: legacy issue
 
 **Status:** needs_research
 **Priority:** P1
@@ -47,7 +47,7 @@
 
 ---
 
-## C-20260520-agent-skill-design-C: 工具角色绑定
+## C-20260520-A: legacy issue
 
 **Status:** needs_research
 **Priority:** P2
@@ -66,7 +66,7 @@
 
 ---
 
-## C-20260520-agent-skill-design-D: Skill 懒加载（中长期）
+## C-20260520-A: legacy issue
 
 **Status:** needs_research
 **Priority:** P3

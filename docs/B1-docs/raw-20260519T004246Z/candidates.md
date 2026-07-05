@@ -1,6 +1,6 @@
 # Candidate: Agent docs fix — evidence_paths REQUIRED_FIELDS
 
-## C-20260519T004246Z-A
+## C-20260519T004246Z-A: legacy issue
 
 - **status**: `needs_research`
 - **premerge**: allowed

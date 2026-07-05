@@ -8,7 +8,7 @@
 
 ## Candidates
 
-### C-20260409-1715-A
+### C-20260409-1715-A: legacy issue
 
 - title: `Runtime evidence provenance research retirement followthrough governance`
 - candidate_format_version: `v2`

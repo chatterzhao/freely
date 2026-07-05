@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260309-1943
+### C-20260309-1943-A: legacy issue
 - title: Workspace Skill Governance and Agent Skills Compliance Alignment
 - problem: Freely 当前 workspace skills 满足最小 `SKILL.md` 格式，但 skill 索引、目录自包含性、progressive disclosure 和“修改 skill 本身”的治理入口都还不完整。
 - why_now: Freely 正在用 skill 体系治理自己；如果 skill 自身不可发现、不可移植、不可审计，后续所有 dogfooding 都会建立在半合规结构上。

@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260307-1201
+### C-20260307-0930-A: legacy issue
 - title: 源分类、milestone-owned issue 与派生 worktree 路由治理
 - problem: 当前对“哪些地方发现新问题”“里程碑是否能直接执行”“IBM 的 issue 来源”“progress 跟踪什么”“未合并父分支上的从属 issue 应从哪里创建 worktree”仍缺统一执行口径，导致 AI 容易只记住约束却不会在对的时机执行。
 - why_now: Freely 作为自治系统，必须先把路由与 workspace 准备动作写成标准步骤，才能稳定吃自己的狗粮。

@@ -7,7 +7,7 @@
 
 ## Candidates
 
-### C-20260403-2245-A
+### C-20260403-2245-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: Sandbox-compatible runtime bootstrap and operator-state governance

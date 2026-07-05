@@ -1,6 +1,6 @@
 # Candidates - 20260406-0901--codex-reconnect-probe-fast-fail
 
-## C-20260406-0901-A
+## C-20260406-0901-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: `Codex reconnect probe fast-fail and runtime network classification alignment`

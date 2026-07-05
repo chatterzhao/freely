@@ -1,6 +1,6 @@
 # Candidates: Dynamic project list via adapter
 
-## C-20260617T051631Z-A
+## C-20260617T051631Z-A: legacy issue
 - title: Replace hardcoded project list with adapter-driven discovery
 - status: promoted
 - promoted_issue_path: docs/issues/I-20260617T051631Z-A/issue.md

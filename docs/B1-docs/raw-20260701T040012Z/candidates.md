@@ -6,7 +6,7 @@ created_at: 2026-07-01
 milestone: M-20260701T040012Z-A
 ---
 
-## C-20260701T040012Z-A: A2A health check log-based
+## C-20260701T040012Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: 将 A2A 健康检查从 socket 轮询改为日志检测
@@ -18,6 +18,6 @@ milestone: M-20260701T040012Z-A
 - promotion_gate: daemon start 不再出现 A2A timeout 警告
 - open_questions: []
 - promoted_issue_id: I-20260701T040012Z-A
-- promoted_issue_path: docs/B2-docs/a2a/protocol-health/raw-20260701T040012Z/issues/I-20260701T040012Z-A.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260701T040012Z-A/issue.md
 - milestone: M-20260701T040012Z-A
 - session_refs: []

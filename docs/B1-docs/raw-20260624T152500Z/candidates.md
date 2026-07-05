@@ -2,11 +2,11 @@
 source: raw-20260624T152500Z
 ---
 
-## C-20260624T152500Z-A
+## C-20260624T152500Z-A: legacy issue
 
 - status: promoted
 - milestone: M-20260624T152500Z-A
-- promoted_issue_path: docs/B2-docs/pr-create-pretests-check/issues/I-20260624T152500Z-A.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260624T152500Z-A/issue.md
 - acceptance_criteria:
   - pr-create-guarded blocks PR creation when pretests evidence is missing
   - Error message clearly instructs user to run skill:freely-test-execution

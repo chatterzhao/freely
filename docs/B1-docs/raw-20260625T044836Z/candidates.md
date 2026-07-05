@@ -6,7 +6,7 @@ created_at: 2026-06-25
 milestone: M-20260625T044836Z-A
 ---
 
-## C-20260625T044836Z-A: issue-sync filter — skip closed
+## C-20260625T044836Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: issue-sync batch 只处理不一致的 issue

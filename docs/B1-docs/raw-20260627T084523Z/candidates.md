@@ -6,7 +6,7 @@ created_at: 2026-06-27
 milestone: M-20260627T084523Z-A
 ---
 
-## C-20260627T084523Z-A: Agent 生命周期管理 — 僵尸清理、并发控制、session 关闭
+## C-20260627T084523Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: Agent 生命周期管理 — 僵尸清理、并发控制、session 关闭

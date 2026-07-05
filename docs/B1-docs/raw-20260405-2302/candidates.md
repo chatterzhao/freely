@@ -1,6 +1,6 @@
 # Candidates - 20260405-2302--worktree-helper-shell-source-compatibility
 
-### C-20260405-2302-A
+### C-20260405-2302-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: Worktree helper shell source compatibility governance

@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260521T095313Z-A
+## C-20260521T095313Z-A: legacy issue
 - title: use type instead of alias for AI_TOOL resolution
 - priority: P1
 - status: promoted

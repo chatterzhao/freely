@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260521T115809Z-A
+## C-20260521T115809Z-A: legacy issue
 - title: pr-merge-guarded source branch name shows forbidden instead of actual branch
 - priority: P1
 - status: promoted

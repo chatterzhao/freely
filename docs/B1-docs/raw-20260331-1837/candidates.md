@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260331-1837-A
+### C-20260331-1837-A: legacy issue
 - candidate_format_version: v2
 - title: Worker first-hop role boundary regression in prompt generation and follow-on reentry
 - problem: On a live dogfood worker lane, the delegated feature-worktree session completed its assigned verification-closeout task and then re-entered a new cycle that behaved like a manager session. The worker prompt still routed through `lead-agent` despite `MANAGER_MODE=false`, and the follow-on worker session began reading root `develop` live-status and writing a `manager-continuity-*` artifact from the worker worktree. This violates the frozen manager/worker boundary and risks letting worker lanes perform project-level supervision, merge-prep judgement, and cleanup disposition outside the canonical manager runtime.

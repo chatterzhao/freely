@@ -1,6 +1,6 @@
 # Candidates: A2A server h11 noise suppression
 
-## C-20260619T061448Z-A
+## C-20260619T061448Z-A: legacy issue
 - title: Suppress h11 non-HTTP noise via uvicorn log config
 - status: promoted
 - promoted_issue_path: docs/issues/I-20260619T061448Z-A/issue.md

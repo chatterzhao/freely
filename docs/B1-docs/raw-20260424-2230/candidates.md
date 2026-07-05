@@ -7,7 +7,7 @@
 
 ## Candidates
 
-### C-20260424-2230-A
+### C-20260424-2230-A: legacy issue
 - candidate_format_version: `v2`
 - title: `Runtime target worker role and starting-stuck recovery governance`
 - research_only: `false`

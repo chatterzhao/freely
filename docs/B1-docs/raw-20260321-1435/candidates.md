@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260321-1435-A
+### C-20260321-1435-A: legacy issue
 - title: Normalize legacy promoted candidates that never materialized
 - problem: 一批 legacy candidate 仍写着 `status: promoted`，但 `promoted_issue_path` 仍是 `pending://issue-materialization`，制造了假的 issue 生命周期。
 - why_now: 当前 sweep 已进入最终 review / promote-ready 阶段，继续保留这类假 promotion 会污染主管监督和 worktree governance。

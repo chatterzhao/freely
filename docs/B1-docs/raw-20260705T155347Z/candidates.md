@@ -5,7 +5,7 @@ source_raw: raw-20260705T155347Z
 milestone: M-20260705T155347Z-A
 ---
 
-## C-20260705T155347Z-A: docs/ 目录结构重构
+## C-20260705T155347Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: B1/B2 目录结构重构 + 8 epic 收敛 + 全量 skill/门禁路径更新
@@ -29,6 +29,6 @@ milestone: M-20260705T155347Z-A
 - open_questions: []
 - acceptance_reviews: []
 - promoted_issue_id: I-20260705T155347Z-A
-- promoted_issue_path: docs/B2-docs/ibm/b2-governance/raw-20260705T155347Z/issues/I-20260705T155347Z-A.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260705T155347Z-A/issue.md
 - milestone: M-20260705T155347Z-A
 - session_refs: []

@@ -1,5 +1,5 @@
 # Candidates
-## C-20260618T050413Z-A: scope pr-create untracked check
+## C-20260618T050413Z-A: legacy issue
 - candidate_format_version: v2
 - title: Limit untracked file check to governance directories
 - status: promoted

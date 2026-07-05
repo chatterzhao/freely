@@ -4,7 +4,7 @@ status: promoted
 source_raw: raw-20260629T235653Z
 milestone: M-20260629T235653Z-A
 ---
-## C-20260629T235653Z-A: fix handoff docs
+## C-20260629T235653Z-A: legacy issue
 - candidate_format_version: v2
 - title: fix handoff docs
 - status: promoted

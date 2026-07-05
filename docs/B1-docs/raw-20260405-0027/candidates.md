@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260405-0027-A
+### C-20260405-0027-A: legacy issue
 - candidate_format_version: `v2`
 - title: Codex API-key slot bundle and provider-aware probe governance
 - problem: Freely currently saves and switches Codex slots as if `auth.json` were the only live truth. That model breaks for real API-key/provider usage where slot usability depends on both `auth.json` and `config.toml`, including provider-scoped `base_url`, auth mode, and provider selection.

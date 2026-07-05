@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260508T225041Z-A: worker prompt 写入配对可写工位信息
+## C-20260508T225041Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: Worker prompt 自动包含配对 fix/feature 工位路径和写规则

@@ -5,7 +5,7 @@ source_raw: raw-20260626T075340Z
 milestone: M-20260626T075340Z-A
 ---
 
-## C-20260626T075340Z-A: cline registry fix + bridge_config_env dual mode
+## C-20260626T075340Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: cline tool-registry.toml slot/session fix + bridge_config_env CLI flag mode

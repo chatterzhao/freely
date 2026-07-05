@@ -1,6 +1,6 @@
 # Candidates — 20260518T020345Z--freely-comment
 
-## C-20260518T020345Z-A: 新增 freely comment 命令
+## C-20260518T020345Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: 新增 freely comment 命令：封装评论写入 + phase_state 重定向与防御

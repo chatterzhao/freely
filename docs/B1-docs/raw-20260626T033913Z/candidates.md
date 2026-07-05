@@ -4,7 +4,7 @@ status: promoted
 source_raw: raw-20260626T033913Z
 milestone: M-20260626T033913Z-A
 ---
-## C-20260626T033913Z-A: freely-review
+## C-20260626T033913Z-A: legacy issue
 - candidate_format_version: v2
 - title: agent-id.env + freely-review dual caller
 - status: promoted

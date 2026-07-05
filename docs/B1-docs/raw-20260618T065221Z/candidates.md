@@ -1,5 +1,5 @@
 # Candidates
-## C-20260618T065221Z-A: pr-merge local merge + wt-create consistency check
+## C-20260618T065221Z-A: legacy issue
 - candidate_format_version: v2
 - title: Replace gh pr merge --merge with local git merge; add platform consistency check to wt-create
 - status: promoted

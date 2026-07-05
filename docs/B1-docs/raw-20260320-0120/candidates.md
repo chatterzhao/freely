@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260320-0120-A
+### C-20260320-0120-A: legacy issue
 - title: Interruption manager agent decides direct answer vs delegation
 - problem: 当前 direct-answer dispatcher 已能快速处理少数控制查询，但仍偏规则机，不能代表“主管基于职责自主判断是否自己回答”。
 - why_now: human interruption 的核心体验不是收件箱，而是第一跳判断质量；必须把这一步从硬编码提升为主管型 AI 决策。
@@ -20,7 +20,7 @@
 - status: absorbed
 - adoption_type: supporting_evidence
 - decision_reason: manager answer-vs-delegation triage 已进入 interruption handler、manager route 与 `I-20260321-1925` 的 canonical owner surface，不再单开平行 issue。
-- promoted_issue_path: docs/B2-docs/ibm/manager-chat-reentry-and-cleanup-misrouting-governance/issues/manager-chat-reentry-and-cleanup-misrouting-governance.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260320-0120-A/issue.md
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs:
   - tool: codex

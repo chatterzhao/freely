@@ -6,7 +6,7 @@ created_at: 2026-06-30
 milestone: M-20260630T085809Z-A
 ---
 
-## C-20260630T085809Z-A: A2A Server 健康检查修复
+## C-20260630T085809Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: 修复 A2A Server 健康检查协议错误、日志轰炸、Shell 注入、超时和日志格式

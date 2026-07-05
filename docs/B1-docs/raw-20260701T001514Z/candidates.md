@@ -4,7 +4,7 @@ status: absorbed
 source_raw: raw-20260701T001514Z
 milestone: M-20260701T001514Z-A
 ---
-## C-20260701T001514Z-A: --reset timeout message fix
+## C-20260701T001514Z-A: legacy issue
 - candidate_format_version: v2
 - title: fix --reset timeout message + non-TTY guidance
 - status: absorbed

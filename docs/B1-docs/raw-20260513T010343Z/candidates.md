@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260513T010343Z-A: 秒级 raw key 格式清理——遗漏修复
+## C-20260513T010343Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: 秒级 raw key 格式清理——4 处 regex 遗漏 + 10+ 处文档更新
@@ -14,4 +14,4 @@
   - 3 个 skill 文件 + pre-push.sh 格式文字已更新
   - grep -rn THHMMZ（不含 [SS]/SS）在 docs/system/ 中仅剩 2 处 task-lifecycle-scan.py 注释（文档性，非格式规范）
 - promoted_issue_path: docs/issues/I-20260513T010343Z-A/issue.md
-- milestone: M-20260306-workspace-routing-foundation
+- milestone: M-20260513T010343Z-A

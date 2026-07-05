@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260320-0052-A
+### C-20260320-0052-A: legacy issue
 - title: Runtime interruption dispatcher for direct-answer control queries
 - problem: 高注意力的询问型插话会 durable 落盘，但主主管长循环不一定及时 claim，导致“看看后台 AI 进程在做什么”这类问题得不到即时响应。
 - why_now: 这类询问正是人类插话体验的最敏感场景；若连这里都不能及时响应，human interruption 能力就还不算可用。
@@ -20,7 +20,7 @@
 - status: absorbed
 - adoption_type: supporting_evidence
 - decision_reason: direct-answer runtime path、resolution artifact 与 writeback 行为已被 `I-20260321-1925` 的 interruption governance 吸收；该候选不再需要独立 materialization。
-- promoted_issue_path: docs/B2-docs/ibm/manager-chat-reentry-and-cleanup-misrouting-governance/issues/manager-chat-reentry-and-cleanup-misrouting-governance.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260320-0052-A/issue.md
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs:
   - tool: codex

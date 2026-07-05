@@ -7,7 +7,7 @@
 
 ## Candidates
 
-### C-20260401-1831-A
+### C-20260401-1831-A: legacy issue
 - candidate_format_version: v2
 - title: Worker reactivation and local reentry residual runtime gap
 - problem: completed workspace-routing owners still claim worker reactivation/reentry verification is closed, but current runtime evidence shows two residual gaps: worker chat/tui reactivation can still return optimistic `already_running_attach` without a durable `ai.pid`, and delegated continuation reentry still lacks a frozen canonical predicate for "active worker" on the worker side.

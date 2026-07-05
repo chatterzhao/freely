@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260319-0148-A
+### C-20260319-0148-A: legacy issue
 - title: salvage continuity-guard-only changes from obsolete context-compaction branch
 - problem: 旧 context-compaction 分支的大部分治理语义已被主线覆盖，但仍有少量 continuity guard 价值未收编。
 - why_now: 若不及时收编，旧工位会持续制造重复判断成本。

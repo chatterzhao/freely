@@ -1,6 +1,6 @@
 # Candidates
 
-### C-20260406-0045-A
+### C-20260406-0045-A: legacy issue
 - candidate_format_version: v2
 - title: Governance-check protected-merge history source policy
 - status: promoted

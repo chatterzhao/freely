@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260316-1648-A
+### C-20260316-1648-A: legacy issue
 - title: Project-Scoped Codex Reasoning Effort Runtime Wiring
 - problem: Freely 当前只能显式指定 `tool / model / mode`，无法把 Codex 的 reasoning effort 作为项目级运行时状态记录并传递给 `monitor-ai-cli.sh`，导致 `gpt-5.4 medium` 这类实际运行配置依赖用户全局 `~/.codex/config.toml`。
 - why_now: 当前仓库已经开始在 dedicated worktree 中用 Freely 自举启动 Codex；如果 reasoning effort 仍是隐式全局状态，狗粮行为就不可复现，也无法通过 `freely baseline-status` 自检。

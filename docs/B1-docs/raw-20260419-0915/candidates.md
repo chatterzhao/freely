@@ -7,7 +7,7 @@
 
 ## Candidates
 
-### C-20260419-0915-A
+### C-20260419-0915-A: legacy issue
 - candidate_format_version: `v2`
 - title: `Three-loop lifecycle single-source governance followthrough`
 - research_only: `false`

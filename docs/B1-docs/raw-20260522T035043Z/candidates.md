@@ -1,5 +1,5 @@
 # Candidates
-## C-20260522T035043Z-A
+## C-20260522T035043Z-A: legacy issue
 - title: codex apikey unified flow
 - priority: P1
 - status: promoted

@@ -1,6 +1,6 @@
 # Candidates - 20260405-1914--test-lane-routing-and-enforcement
 
-### C-20260405-1914-A
+### C-20260405-1914-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: Test lane routing and enforcement

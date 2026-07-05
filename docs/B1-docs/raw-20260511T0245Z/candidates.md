@@ -1,5 +1,5 @@
 # Candidates
-## C-20260511T0245Z-A: DB 路径统一
+## C-20260511T0245Z-A: legacy issue
 - title: 抽取 project_db_path() 统一所有 DB 路径
 - status: promoted
 - decision_reason: freely.db 路径构造散落在 19 处，格式不统一，需抽取统一函数

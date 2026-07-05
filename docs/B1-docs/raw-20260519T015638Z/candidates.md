@@ -1,6 +1,6 @@
 # Candidate: Systematic stale_pid — worker process exits before handoff
 
-## C-20260519T015638Z-A
+## C-20260519T015638Z-A: legacy issue
 
 - **status**: `needs_research`
 - **premerge**: allowed

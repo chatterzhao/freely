@@ -1,5 +1,5 @@
 # Candidates
-## C-20260522T075839Z-A
+## C-20260522T075839Z-A: legacy issue
 - title: switch auto-extract tool from slot name
 - priority: P1
 - status: promoted

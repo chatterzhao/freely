@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260326-1733-A
+### C-20260326-1733-A: legacy issue
 - candidate_format_version: v2
 - title: IBM pre-tests executable real-environment acceptance quality governance
 - problem: 现有真源已经要求 `pre-tests.md` 是 issue-level acceptance 控制面，并强调 integration / acceptance-first，但 enforcement 仍不足。新 issue 仍会把 `pre-tests.md` 写成文档阅读检查，特别是治理型 issue，导致 Freely 这种自治 AI 系统缺少必须的集成、真环境和端到端狗粮验收 contract。

@@ -1,6 +1,6 @@
 # Candidates - 20260502-1028--stale-start-lock-cleanup
 
-### C-20260502-1028-A
+### C-20260502-1028-A: legacy issue
 
 - title: `Clean stale start lock before daemon stop`
 - status: `promoted`

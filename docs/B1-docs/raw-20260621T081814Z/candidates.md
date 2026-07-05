@@ -1,4 +1,4 @@
-## C-20260621T081814Z-A
+## C-20260621T081814Z-A: legacy issue
 - candidate_format_version: v2
 - status: promoted
 - promoted_issue_path: docs/issues/I-20260621T081814Z-A/issue.md

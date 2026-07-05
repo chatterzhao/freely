@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260317-0332
+### C-20260317-0332-A: legacy issue
 - title: `Rust/Tauri Probe Bridge v1`
 - problem: `Frontend Probe v0` 的 frontend contract、transport diagnostics、manifest 与错误面已经基本收敛，但仓库里仍不存在任何 Rust/Tauri backend bridge 来提供 `probe_request_snapshot`、`probe_send_command`、`probe_server_event`。
 - why_now: 如果 backend bridge 继续缺失，`I-20260317-1002` 只能反复在前端 mock seam 上空转，无法进入真实宿主与后端联调。

@@ -7,7 +7,7 @@
 
 ## Candidates
 
-### C-20260411-1414-A
+### C-20260411-1414-A: legacy issue
 - candidate_format_version: `v2`
 - title: Launch-time verification contract hard gate governance
 - problem: Freely already has strong verification truth at doc/gate layers, but manager dispatch still launches workers when verification metadata is incomplete. Missing fields are recorded, not enforced, so contract drift is discovered late at completion/merge gates.
@@ -38,7 +38,7 @@
 - promoted_issue_path: `docs/B2-docs/ibm/launch-time-verification-contract-hard-gate-governance/issues/launch-time-verification-contract-hard-gate-governance.md`
 - next_action: candidate mirror only. `I-20260411-1414-A` is now the canonical owner for launch-time verification contract hard gating.
 
-### C-20260411-1414-B
+### C-20260411-1414-A: legacy issue
 - candidate_format_version: `v2`
 - title: Pre-tests adequacy schema materialization governance
 - problem: richer adequacy semantics were defined in governance discussions but executable gate coverage remains at a minimal field subset, allowing under-specified premerge adequacy.

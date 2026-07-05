@@ -2,7 +2,7 @@
 
 - Source brainstorm: `docs/B1-docs/raw-20260426-0000/brainstorms.md`
 
-### C-20260426-0000-A
+### C-20260426-0000-A: legacy issue
 
 - title: `Add opencode direct launcher integration`
 - source_class: `discovery`

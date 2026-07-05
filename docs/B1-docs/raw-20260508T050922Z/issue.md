@@ -35,7 +35,7 @@ platform_state: closed
 ---
 
 
-local_id: I-20260508T050922Z-A
+local_id: raw-20260508T050922Z
 kind: linked
 phase_state: completed
 promoted_from: raw-20260508T050922Z

@@ -1,5 +1,5 @@
 # Candidates
-## C-20260522T045227Z-A
+## C-20260522T045227Z-A: legacy issue
 - title: slot probe say hi
 - priority: P2
 - status: promoted

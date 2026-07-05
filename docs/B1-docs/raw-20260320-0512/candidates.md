@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260320-0512-A
+### C-20260320-0512-A: legacy issue
 - title: Milestone planning and state maintenance
 - problem: Freely 已经把 `docs/milestones.md` 作为 standing source 和项目级编排入口，但还没有一个明确能力专门负责 milestone sequencing、candidate/committed/completed 队列维护，以及 candidate/issue/progress/recovery/cleanup 之间的状态 reconcile，导致这些工作长期靠业务 worker 顺手补写。
 - why_now: 本轮已经把 manager、auto-loop、lifecycle 与专门 skill 中的 milestone planning / state maintenance worker 语义落盘。当前缺口不再是“是否需要这个能力”，而是正式 materialize 为 canonical issue，避免真源和 milestone 仍停在 `pending://...materialization`。
@@ -23,7 +23,7 @@
 - milestone: `M-20260306-workspace-routing-foundation`
 - session_refs: [{tool: codex, session_id: "current-thread", jsonl_path: "unavailable://codex-thread-only", role: "author"}]
 
-### C-20260327-parked-worktree-retirement
+### C-20260320-0512-A: legacy issue
 - title: Milestone-coupled parked worktree retirement planning
 - problem: 当前 Freely 已经能维护 milestone sequencing，也能做 worktree retirement handoff，但还没有一条显式能力说明：当某个 research / merge-prep worktree 的剩余动作只是在 milestone 中把远期 issue 排到后面时，应优先完成 milestone 写回并退休该 worktree，而不是把 worktree 长期保留为未来 queue 的占位符。
 - why_now: 随着治理树、frontend probe 和多条 follow-on issue 同时存在，单靠“暂时还会再用到这棵树”会让 worktree fleet 越挂越多。Freely 需要把“近程 active batch”和“已排序但暂不执行的 parked issue”区分开，并让 milestone maintenance 与 worktree retirement 配套。

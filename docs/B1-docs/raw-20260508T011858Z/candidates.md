@@ -1,5 +1,5 @@
 # Candidates
-## C-20260508T011858Z-A: skill gate alignment
+## C-20260508T011858Z-A: legacy issue
 - candidate_format_version: v2
 - title: skill 引导与门禁对齐
 - status: promoted

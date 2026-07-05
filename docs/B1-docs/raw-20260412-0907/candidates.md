@@ -8,7 +8,7 @@
 
 ## Candidates
 
-### C-20260412-0907-A
+### C-20260412-0907-A: legacy issue
 - candidate_format_version: `v2`
 - title: Codex probe success shape and quota slot recovery governance
 - problem: `freely start` could still stall on a bad Codex slot because reconnect-plus-403/quota logs were being misclassified as `execution_network_*`, while the watchdog probe still treated almost any `codex exec "hi"` `rc=0` output as usable.

@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260513T075847Z-A
+## C-20260513T075847Z-A: legacy issue
 - title: scan emits platform_only for non-raw-key open issues
 - scope: scan_classification + scan_platform_issues fallback logic
 - priority: P1

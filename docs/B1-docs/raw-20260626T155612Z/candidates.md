@@ -6,7 +6,7 @@ created_at: 2026-06-26
 milestone: M-20260626T155612Z-A
 ---
 
-## C-20260626T155612Z-A: pr-merge-guarded issue-sync before merge
+## C-20260626T155612Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: pr-merge-guarded issue-sync before merge + auto-commit

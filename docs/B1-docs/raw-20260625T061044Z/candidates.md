@@ -6,7 +6,7 @@ created_at: 2026-06-25
 milestone: M-20260625T061044Z-A
 ---
 
-## C-20260625T061044Z-A: issue-sync batch before daemon scan
+## C-20260625T061044Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: daemon start 时自动运行 issue-sync batch

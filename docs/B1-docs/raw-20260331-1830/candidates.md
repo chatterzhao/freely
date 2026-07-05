@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260331-1830-A
+### C-20260331-1830-A: legacy issue
 - candidate_format_version: v2
 - title: Classify Kiro subscription-limit failures as first-class runtime availability failures
 - problem: Freely runtime currently treats `kiro-cli` output like `Unable to verify subscription status: service error` and `Monthly request limit reached` as a normal `ai_exit_rc_0` cycle instead of a canonical availability failure. That leaves `slot_switch_reason=none` and `rate_limit_reason=none`, so the supervisor immediately relaunches into a short loop and hides the real reason the session cannot continue.

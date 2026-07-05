@@ -7,7 +7,7 @@
 
 ## Candidates
 
-### C-20260419-0333-A
+### C-20260419-0333-A: legacy issue
 - candidate_format_version: `v2`
 - title: `Runtime closeout selfhost validation followthrough`
 - research_only: `false`

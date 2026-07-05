@@ -2,7 +2,7 @@
 
 - Source brainstorm: `docs/B1-docs/raw-20260426-0003/brainstorms.md`
 
-### C-20260426-0003-A
+### C-20260426-0003-A: legacy issue
 
 - title: `IBM Framework canonical documentation and terminology unification`
 - source_class: `discovery`

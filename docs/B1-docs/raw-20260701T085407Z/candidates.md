@@ -6,7 +6,7 @@ created_at: 2026-07-01
 milestone: M-20260701T085407Z-A
 ---
 
-## C-20260701T085407Z-A: A2A reviewer restore + routing + session
+## C-20260701T085407Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: A2A reviewer agent — ACP/A2A 集成 + session/fork 复用 + agent_working 表
@@ -24,6 +24,6 @@ milestone: M-20260701T085407Z-A
 - promotion_gate: N/A（已 absorb）
 - open_questions: []
 - absorbed_into: I-20260701T085407Z-A
-- promoted_issue_path: docs/B2-docs/a2a/reviewer-agent/raw-20260701T085407Z/issues/I-20260701T085407Z-A.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260701T085407Z-A/issue.md
 - milestone: M-20260701T085407Z-A
 - session_refs: []

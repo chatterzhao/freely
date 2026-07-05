@@ -1,4 +1,4 @@
-### C-20260504T1132Z-A
+### C-20260504T1132Z-A: legacy issue
 
 - title: `raw key 格式统一：所有代码接受 YYYYMMDDTHHMMZ 和 YYYYMMDD-HHMM 双格式`
 - status: `promoted`

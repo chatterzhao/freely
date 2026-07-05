@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260624T004524Z-A: A2A server _restore_tasks 异步化
+## C-20260624T004524Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: A2A server _restore_tasks 后台线程化，消除启动超时

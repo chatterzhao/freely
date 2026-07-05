@@ -1,5 +1,5 @@
 # Candidates
-## C-20260522T042725Z-A
+## C-20260522T042725Z-A: legacy issue
 - title: apikey slot uses full directory name everywhere
 - priority: P1
 - status: promoted

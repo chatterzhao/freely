@@ -2,7 +2,7 @@
 
 - Source brainstorm: `docs/B1-docs/raw-20260419-0210/brainstorms.md`
 
-### C-20260419-0210-A
+### C-20260419-0210-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: `Protected-branch ref-only entrypoint enforcement`

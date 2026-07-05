@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260513T080636Z-A
+## C-20260513T080636Z-A: legacy issue
 - title: update stale ACP issue phase_state to completed
 - scope: frontmatter update for ACP issues merged to develop
 - priority: P2

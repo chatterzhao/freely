@@ -1,5 +1,5 @@
 # Candidates
-## C-20260522T091606Z-A
+## C-20260522T091606Z-A: legacy issue
 - title: default adapter to acp
 - priority: P0
 - status: promoted

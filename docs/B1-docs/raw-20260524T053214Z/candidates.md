@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260524T053214Z-A: ACP 路径集成 tool_switch_events
+## C-20260524T053214Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: ACP session 生命周期接入 tool_switch_events 统一真相源

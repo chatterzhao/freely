@@ -1,6 +1,6 @@
 # Candidates — 20260519T155813Z--launchable-check-reason
 
-## C-20260519T155813Z-A: launchable check failed reason too vague
+## C-20260519T155813Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: launchable check failed reason too vague

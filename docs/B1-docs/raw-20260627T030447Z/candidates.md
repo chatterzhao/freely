@@ -6,7 +6,7 @@ created_at: 2026-06-27
 milestone: M-20260627T030447Z-A
 ---
 
-## C-20260627T030447Z-A: 移除工具适配器硬编码，改为 registry 驱动
+## C-20260627T030447Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: 移除工具适配器硬编码，改为 registry 驱动

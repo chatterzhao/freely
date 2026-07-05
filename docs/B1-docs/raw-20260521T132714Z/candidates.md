@@ -1,5 +1,5 @@
 # Candidates
-## C-20260521T132714Z-A
+## C-20260521T132714Z-A: legacy issue
 - title: daemon stop kills ACP bridge by tracked pid
 - priority: P1
 - status: promoted

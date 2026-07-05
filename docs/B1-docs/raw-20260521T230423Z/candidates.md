@@ -1,5 +1,5 @@
 # Candidates
-## C-20260521T230423Z-A
+## C-20260521T230423Z-A: legacy issue
 - title: restrict active-worker scan skip to prompt path
 - priority: P0
 - status: promoted

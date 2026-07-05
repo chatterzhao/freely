@@ -1,5 +1,5 @@
 # Candidates
-## C-20260511T0019Z-A: sync 管道改直接 SQLite 查询
+## C-20260511T0019Z-A: legacy issue
 - title: 消掉 latest-manager 管道脆弱性
 - status: promoted
 - decision_reason: 管道串两个 python3 2>/dev/null 吞错误导致 false positive，需改为直接 SQLite 查询

@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260309-2003-A
+### C-20260309-2003-A: legacy issue
 - title: Documentation Layer Boundary Realignment
 - problem: `PROJECT_INTENT`、`CONSTITUTION`、`LAWS`、`AGENTS.md`、`README.md` 与 workspace skills 之间的职责边界还未被显式固定，导致部分内容重复、越层或漂移。
 - why_now: Freely 把 skill 当作产品能力接口，如果上层文档和 skill 边界不稳，后续能力设计会持续混层。
@@ -23,7 +23,7 @@
 - session_refs: []
 - sequencing_rank: 1
 
-### C-20260309-2003-B
+### C-20260309-2003-A: legacy issue
 - title: Workspace Skill Architecture Restructure
 - problem: 当前 skills 还未完全按产品能力接口来设计，核心编排 skill 的主文过胖，而“修改 skill 本身”的治理入口缺失。
 - why_now: 不先重组 skill 架构，Freely 的能力暴露面就会继续停留在“项目流程文档”而不是“产品能力包”。
@@ -42,7 +42,7 @@
 - depends_on:
   - C-20260309-2003-A
 
-### C-20260309-2003-C
+### C-20260309-2003-A: legacy issue
 - title: Review Alignment Recovery and Loop Boundary Governance
 - problem: Freely 还未把“评审发现不对齐时是直接修补还是 git 撤销重做”“每个循环何时应提交”“继续用旧 worktree 还是新建”收敛成显式治理能力。
 - why_now: 如果这些前置规则缺失，文档重构和代码实现都会更容易跨边界补丁化，增加 token 消耗，并提高语义丢失和结构污染风险。
@@ -51,7 +51,7 @@
 - status: proposed
 - decision_reason: 这是控制重构与实现边界、避免“不断修改掉进地狱”的前置治理能力。
 - promoted_issue_path: pending://issue-materialization
-- milestone: M-20260306-workspace-routing-foundation
+- milestone: M-20260309-2003-A
 - next_action: 继续预研，明确评审分流规则与循环提交粒度边界后再推进。
 - revisit_trigger: 当 Freely 需要显式治理评审与循环边界时，再推进到 IBM。
 - session_refs: []

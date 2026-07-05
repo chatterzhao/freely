@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260509T022152Z-A: worker launch 验证 target 必须是 fix/feature
+## C-20260509T022152Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: worker_prompt_launchable_for_manager_project 拒绝非 fix/feature 工位

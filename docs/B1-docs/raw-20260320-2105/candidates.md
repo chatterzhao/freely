@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260320-2105-A
+### C-20260320-2105-A: legacy issue
 - title: Baseline-status command and status family governance
 - problem: 当前 `freely status` 已经不再代表“当前状态”，而是更像基线/持久快照。与此同时 `live-status` 和 `fleet-status` 已经形成独立状态面，导致 `status` 命名与职责错位。
 - why_now: 刚刚新增 `live-status` 后，这个错位已经从轻微变成显性；如果不先把 baseline 语义固定，后续再想把 `status` 做成聚合入口会更容易回退或混淆。

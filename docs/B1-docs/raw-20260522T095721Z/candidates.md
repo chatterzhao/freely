@@ -1,5 +1,5 @@
 # Candidates
-## C-20260522T095721Z-A
+## C-20260522T095721Z-A: legacy issue
 - title: codex acp supports full lifecycle
 - priority: P1
 - status: promoted

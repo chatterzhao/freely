@@ -1,6 +1,6 @@
 # Candidates - 20260403-1000--external-issue-integration-and-self-evolution
 
-## C-20260403-1000-A
+## C-20260403-1000-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: 外部 Issue 消化与候选 Issue 闭环流程
@@ -56,7 +56,7 @@
 
 ---
 
-## C-20260403-1000-B
+## C-20260403-1000-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: GitHub Issue 扫描与状态同步 Skill
@@ -110,7 +110,7 @@
 
 ---
 
-## C-20260403-1000-C
+## C-20260403-1000-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: 内部需求回流机制
@@ -159,7 +159,7 @@
 
 ---
 
-## C-20260403-1000-D
+## C-20260403-1000-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: Freely 自身迭代与用户项目开发调度策略

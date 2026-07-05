@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260316-1800-A
+### C-20260316-1800-A: legacy issue
 - title: Session Rotation and Handoff Policy for Auto-Run AI CLIs
 - problem: Freely 当前只有“首轮 fresh、后续一律 resume”的粗粒度策略，无法在 `context compacted` 或连续 resume 退化后切换到更健康的新会话，也没有明确 handoff 交接面。
 - why_now: 这已经直接影响 Freely 用自己理念持续开发自己。若不先解决，会话会在后台无限续接旧上下文，导致首跳重复、恢复判断失真、产品狗粮质量下降。

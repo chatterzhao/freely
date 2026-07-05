@@ -6,7 +6,7 @@ created_at: 2026-06-25
 milestone: M-20260625T222357Z-A
 ---
 
-## C-20260625T222357Z-A: Review in test-pre-merge
+## C-20260625T222357Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: pr-review-guarded review in test-pre-merge + three-layer review

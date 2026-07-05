@@ -29,7 +29,7 @@
 
 ## Candidates
 
-### C-20260306-1101
+### C-20260306-0248-A: legacy issue
 - title: `lead-agent.md`
 - problem: 当前还缺少一个明确的首跳 AI 中枢代理说明，定义从 `sh/ps1` 启动外部 AI CLI 工具后，到底由谁承担首段闭环编排职责。
 - why_now: 如果没有 `lead-agent` 这一层，启动器、来源适配、usable issue 判定和第二跳 skill 会继续混在一起，无法形成统一主链。
@@ -41,7 +41,7 @@
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs: []
 
-### C-20260306-1102
+### C-20260306-0248-A: legacy issue
 - title: `context-source-skill.md`
 - problem: 当前缺少一个供 `lead-agent` 使用的来源适配与上下文判定规则文件，无法稳定把 `<source input>` 转换成 usable issue 判断和下一跳分支编排决策。
 - why_now: 首跳不是直接执行业务工作，而是先做来源适配、上下文识别和基于来源的编排；如果没有这一层，首跳 AI 只能重新自由发挥。
@@ -53,7 +53,7 @@
 - milestone: docs/milestones.md#m-20260306-workspace-routing-foundation
 - session_refs: []
 
-### C-20260306-1103
+### C-20260306-0248-A: legacy issue
 - title: `doc-pre-brainstorm-execution.md`
 - problem: 当前缺少一个真正按“工作能力”命名的 pre-brainstorm 执行 skill，导致“没有 usable issue”这种路由条件被误建模成技能本体。
 - why_now: `pre-brainstorm` 是独立的文档工作环，不只是路由结果；如果不把它抽成正式执行 skill，`context-source-skill` 与中间 handoff skill 会继续重叠。
@@ -66,7 +66,7 @@
 - session_refs: []
 
 
-### C-20260306-1104
+### C-20260306-0248-A: legacy issue
 - title: `doc-ibm-execution.md` 与 `dev-loop-execution.md` 的外循环接驳边界
 - problem: 当前 issue-bound 文档环与开发环的接驳边界还不够硬，容易被中间层 handoff 设计重复描述，侵入正式 loop 职责。
 - why_now: `doc-loop` 与 `dev-loop` 是宪法/法律已经固定的正式内循环；外循环应该编排它们，而不是再造一层“有 issue skill”去部分重复它们。
@@ -79,7 +79,7 @@
 - session_refs: []
 
 
-### C-20260306-1105
+### C-20260306-0248-A: legacy issue
 - title: 现有 `auto-loop-orchestrator` skill 对齐到首段闭环模型
 - problem: 当前 `PROJECT_INTENT` 与现有 `auto-loop-orchestrator` skill 之间仍有断层，尚未显式说明 `sh/ps1 -> external AI CLI tool -> lead-agent -> context-source-skill -> pre-brainstorm/doc-loop/dev-loop` 这条实现链。
 - why_now: 如果不把现有 orchestrator skill 一起对齐，后续实现会出现“脑中模型”和规范文案两套说法并存。

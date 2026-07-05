@@ -1,4 +1,4 @@
-### C-20260503-0200-A
+### C-20260503-0200-A: legacy issue
 
 - title: `scan: switch to task-lifecycle-scan v2 with full lifecycle chain trace`
 - status: `promoted`

@@ -7,7 +7,7 @@
 
 ## Candidates
 
-### C-20260404-0232-A
+### C-20260404-0232-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: Governance merge gate review-aware regression alignment

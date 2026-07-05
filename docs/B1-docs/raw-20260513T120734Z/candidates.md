@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260513T120734Z-A
+## C-20260513T120734Z-A: legacy issue
 - title: increase RESTART_STORM_COUNT 4→10
 - scope: single constant change in freely runtime
 - priority: P1

@@ -1,6 +1,6 @@
 # Candidates - 20260407-1036--human-interruption-source-governance-boundary
 
-## C-20260407-1036-A
+## C-20260407-1036-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: `Human interruption runtime contract after source-family contraction`

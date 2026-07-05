@@ -2,7 +2,7 @@
 
 - Source brainstorm: `docs/B1-docs/raw-20260426-0002/brainstorms.md`
 
-### C-20260426-0002-A
+### C-20260426-0002-A: legacy issue
 
 - title: `Harden AGENTS.md break-glass guidance`
 - source_class: `discovery`

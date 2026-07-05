@@ -6,7 +6,7 @@ created_at: 2026-06-29
 milestone: M-20260629T165403Z-A
 ---
 
-## C-20260629T165403Z-A: wt-close args unbound + test-pre-merge -D
+## C-20260629T165403Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: wt-close args unbound + test-pre-merge -D
@@ -23,6 +23,6 @@ milestone: M-20260629T165403Z-A
   - reviewer: claude
   - mode: in-session
   - verdict: pass
-- promoted_issue_path: docs/B2-docs/git-worktree/wt-close/raw-20260629T165403Z/issues/I-20260629T165403Z-A.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260629T165403Z-A/issue.md
 - milestone: M-20260629T165403Z-A
 - session_refs: []

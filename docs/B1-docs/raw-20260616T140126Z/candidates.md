@@ -2,7 +2,7 @@
 
 **raw-key**: 20260616T140126Z
 
-## C-20260616T140126Z-1: ai-auth Template Config Files
+## C-20260616T140126Z-A: legacy issue
 
 **status**: proposed
 **milestone**: unassigned

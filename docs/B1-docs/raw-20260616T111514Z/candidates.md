@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260616T111514Z-A: write_config heredoc → Python 序列化 + 补齐 posture 字段
+## C-20260616T111514Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: write_config bash heredoc 替换为 Python freely_config.py init-toml，补齐 10 个 posture 字段

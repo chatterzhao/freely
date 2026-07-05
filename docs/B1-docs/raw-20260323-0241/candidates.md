@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260323-0241-A
+### C-20260323-0241-A: legacy issue
 - title: Restore three-loop-capability-lifecycle as the full application event map
 - problem: 当前 Freely 已经实现了大量 skill / agent / runtime / worktree 能力，但 `three-loop-capability-lifecycle` 没有继续把它们吸收成统一地图；同时“按三层 loop 工作”的中文口径又容易把 `auto-loop / doc-loop / dev-loop` 误读成包含关系。结果是 agent 仍不能直接回答从哪里起、哪里循环、为什么不能停、下一跳是谁、terminal 在哪里；worktree 生命周期、promotion / cleanup 只是这个更大缺口下的一个子面。
 - why_now: 本轮 Freely 自举里已经真实暴露出后果：agent 会停在 verification 或 merge-ready，不是因为能力不存在，而是因为三 loop 地图没把这类事件和分支收进去，也没有把 `doc-loop` / `dev-loop` 是并列 sibling loop 这一点说清。若不尽快修正，未来 Freely 开发自己和开发其他应用都会继续依赖人类解释下一跳，自治会退化为“人说一步动一步”。

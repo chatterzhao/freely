@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260623T162226Z-A: L0-L3 兜底死循环检测
+## C-20260623T162226Z-A: legacy issue
 - candidate_format_version: v2
 - title: L0-L3 四层递进兜底死循环检测
 - status: promoted

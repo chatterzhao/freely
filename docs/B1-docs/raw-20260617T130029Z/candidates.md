@@ -1,6 +1,6 @@
 # Candidates: pr-create-guarded conflict handling improvements
 
-## C-20260617T130029Z-A
+## C-20260617T130029Z-A: legacy issue
 - title: Show conflicted files and abort path when pr-create-guarded hits merge conflicts
 - status: promoted
 - promoted_issue_path: docs/issues/I-20260617T130029Z-A/issue.md

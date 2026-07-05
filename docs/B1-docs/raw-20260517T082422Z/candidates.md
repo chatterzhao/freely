@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260517T082422Z-A: supervisor bash rc=0 crash — 吸收到已有 candidate
+## C-20260517T082422Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: supervisor bash rc=0 crash（吸收到已有 candidate）
@@ -16,7 +16,7 @@
 - open_questions: []
 - acceptance_reviews: []
 - promoted_issue_path: docs/B1-docs/raw-20260517T083030Z/candidates.md
-- milestone: M-20260517T083030Z-A
+- milestone: M-20260517T082422Z-A
 - session_refs:
   - tool: cc
     session_id: "20260517101640-3a1654"

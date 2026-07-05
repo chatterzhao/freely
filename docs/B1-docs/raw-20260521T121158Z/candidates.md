@@ -1,5 +1,5 @@
 # Candidates
-## C-20260521T121158Z-A
+## C-20260521T121158Z-A: legacy issue
 - title: package version format add hour-minute to nightly
 - priority: P2
 - status: promoted

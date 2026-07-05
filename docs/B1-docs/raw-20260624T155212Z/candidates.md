@@ -6,7 +6,7 @@ created_at: 2026-06-24
 milestone: M-20260624T155212Z-A
 ---
 
-## C-20260624T155212Z-A: pretests-retirement-gate fallback for missing workcell-state.env
+## C-20260624T155212Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: pretests-retirement-gate fallback for missing workcell-state.env

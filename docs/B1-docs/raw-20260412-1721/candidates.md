@@ -8,7 +8,7 @@
 
 ## Candidates
 
-### C-20260412-1721-A
+### C-20260412-1721-A: legacy issue
 - candidate_format_version: `v2`
 - title: Develop push attempt followthrough governance
 - problem: Freely currently exposes `push_pending` and escalates its urgency, but a successful `develop` merge still relies on later manual followthrough to actually attempt remote delivery. That leaves local-only canonical truth hanging longer than necessary and fails to distinguish “not yet attempted” from “attempted and blocked.”

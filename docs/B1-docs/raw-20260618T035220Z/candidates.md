@@ -1,6 +1,6 @@
 # Candidates: semantic conflict receipt check + ref-transaction errors
 
-## C-20260618T035220Z-A
+## C-20260618T035220Z-A: legacy issue
 - title: Post-merge receipt verification + actionable ref-transaction errors
 - status: promoted
 - promoted_issue_path: docs/issues/I-20260618T035220Z-A/issue.md

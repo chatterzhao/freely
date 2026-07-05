@@ -1,6 +1,6 @@
 # Candidates - 20260429-1745--bash32-daemon-compat-fix
 
-### C-20260429-1745-A
+### C-20260429-1745-A: legacy issue
 
 - title: `Fix daemon self-detection suicide + bash 3.2 pipefail crash`
 - status: `promoted`

@@ -1,5 +1,5 @@
 # Candidates
-## C-20260521T144550Z-A
+## C-20260521T144550Z-A: legacy issue
 - title: remove bypassPermissions from run-acp-prompt.py
 - priority: P1
 - status: promoted

@@ -6,7 +6,7 @@ created_at: 2026-07-01
 milestone: M-20260701T024449Z-A
 ---
 
-## C-20260701T024449Z-A: 修复 _review_guide 未定义变量
+## C-20260701T024449Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: 将 `$_review_guide` 替换为字符串字面量
@@ -26,6 +26,6 @@ milestone: M-20260701T024449Z-A
   - summary: 确认 _review_guide 无其他引用，修复方案正确
   - verdict: pass
 - promoted_issue_id: I-20260701T024449Z-A
-- promoted_issue_path: docs/B2-docs/git-worktree/branch-pr/raw-20260701T024449Z/issues/I-20260701T024449Z-A.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260701T024449Z-A/issue.md
 - milestone: M-20260701T024449Z-A
 - session_refs: []

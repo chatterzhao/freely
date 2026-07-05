@@ -1,5 +1,5 @@
 # Candidates
-## C-20260617T110109Z-A
+## C-20260617T110109Z-A: legacy issue
 - candidate_format_version: v2
 - title: Remove prompt_file from A2A layer
 - status: promoted

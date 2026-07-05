@@ -1,6 +1,6 @@
 # Candidates - 20260406-0715--codex-live-auth-identity-and-probe-lock-boundary
 
-## C-20260406-0715-A
+## C-20260406-0715-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: `Codex live auth identity reconciliation and probe timeout boundary`

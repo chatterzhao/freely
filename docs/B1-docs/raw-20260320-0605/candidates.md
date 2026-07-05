@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260320-0605-A
+### C-20260320-0605-A: legacy issue
 - title: Agent state time-machine and shared continuity control plane
 - problem: Freely 当前已经治理了 worktree、checkpoint、continuity、handoff、recovery，但这些能力仍分散在多个 artifact 与 loop 中，尚未形成“哪些状态需要统一 snapshot / fork / rollback / shared continuity”的明确能力边界；一旦进入多 agent、多设备或更强恢复场景，单靠 Git/worktree 不足以完整恢复自治运行上下文。
 - why_now: 2026-03-20 的微信文章《把 Agent 的状态放进数据库》把问题提炼得很清楚：真正值得吸收的不是 PGFS 本身，而是 `time machine` 与 `shared brain` 这两个产品能力。Freely 现在正处于多 worktree 监督、interruption、handoff 与恢复治理收敛期，适合把这条能力先收敛成 pre-brainstorm 边界。

@@ -6,7 +6,7 @@ created_at: 2026-07-01
 milestone: M-20260701T013527Z-A
 ---
 
-## C-20260701T013527Z-A: 修复 get_config 未定义 → bash indirect expansion
+## C-20260701T013527Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: 将 get_config 调用替换为 bash indirect variable expansion
@@ -26,6 +26,6 @@ milestone: M-20260701T013527Z-A
   - summary: 确认 get_config 无其他调用者，修复方案正确
   - verdict: pass
 - promoted_issue_id: I-20260701T013527Z-A
-- promoted_issue_path: docs/B2-docs/acp/multi-bridge/raw-20260701T013527Z/issues/I-20260701T013527Z-A.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260701T013527Z-A/issue.md
 - milestone: M-20260701T013527Z-A
 - session_refs: []

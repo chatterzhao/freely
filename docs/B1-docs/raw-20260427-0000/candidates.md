@@ -2,7 +2,7 @@
 
 - Source brainstorm: `docs/B1-docs/raw-20260427-0000/brainstorms.md`
 
-### C-20260427-0000-A
+### C-20260427-0000-A: legacy issue
 
 - title: `Issue-centric intake: platform isolation, local storage, deterministic sync`
 - source_class: `discovery`

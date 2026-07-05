@@ -6,7 +6,7 @@ created_at: 2026-06-26
 milestone: M-20260625T211802Z-A
 ---
 
-## C-20260625T211802Z-A: agent-table slot chain
+## C-20260625T211802Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: agent-table slot 全链路

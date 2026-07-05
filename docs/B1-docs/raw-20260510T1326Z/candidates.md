@@ -1,5 +1,5 @@
 # Candidates
-## C-20260510T1326Z-A: init 分支名校验
+## C-20260510T1326Z-A: legacy issue
 - title: freely init 时校验分支名规范
 - status: promoted
 - decision_reason: init 无分支名校验，不合规分支进入后 AI 无法处理后续流程

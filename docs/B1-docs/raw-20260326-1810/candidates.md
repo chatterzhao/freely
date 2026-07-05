@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260326-1810-A
+### C-20260326-1810-A: legacy issue
 - candidate_format_version: v2
 - title: Freely layered architecture and tooling topology
 - problem: Freely 现在缺少一份更上位的系统拓扑收敛。`three-loop-capability-lifecycle` 只适合表达 loop / route / lifecycle，不足以承担整栋系统拓扑；`tools.md` 虽然已经定义了 `codex`、`cc`、`cc-use-codex-cli` 等 external AI tooling contract，却还没有被放进一张稳定的层级图里；`cli-first-entrypoint-and-observability-surface-unification` 与 `backend-service-contract-and-adapter-taxonomy` 也分别冻结了 command family / status family / contract-vs-adapter 的局部边界，但尚未被一张总图统一吸收。这导致 `chat`、`status` family 与 `CLI shell / TUI shell / GUI app` 容易被错误并列，也导致 external AI tooling、service contract、adapter taxonomy 缺少清晰站位。

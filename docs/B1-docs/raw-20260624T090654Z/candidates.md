@@ -1,5 +1,5 @@
 # Candidates
-## C-20260624T090654Z-A: ai-cli generic
+## C-20260624T090654Z-A: legacy issue
 - candidate_format_version: v2
 - title: ai-cli *) fallback to generic
 - status: promoted

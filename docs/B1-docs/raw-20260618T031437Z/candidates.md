@@ -1,5 +1,5 @@
 # Candidates
-## C-20260618T031437Z-A: wt-close remote branch deletion fix
+## C-20260618T031437Z-A: legacy issue
 - candidate_format_version: v2
 - title: Fix wt-close SELF_ROOT undefined + silent remote delete failures
 - status: promoted

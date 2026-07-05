@@ -8,7 +8,7 @@
 
 ## Candidates
 
-### C-20260408-0231-A
+### C-20260408-0231-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: `Runtime concurrent start lock and generated status-surface alignment`

@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260322-1801-A
+### C-20260322-1801-A: legacy issue
 - title: pre-test-merge responsibility, usage, and lifecycle governance
 - note: 历史候选名保留 `pre-test-merge`，当前 canonical 语义按 `test-pre-merge-*` 测试批次前缀族解释
 - problem: `pre-test-merge` 现在同时被用作临时预集成验证批次、真实验收环境的比较基线，以及旧实现回收的中间站，但职责边界、允许操作、失效条件和退休条件都没有被明确收束。
@@ -29,7 +29,7 @@
   - jsonl_path: unavailable://codex-thread-only
   - role: author
 
-### C-20260322-1801-B
+### C-20260322-1801-A: legacy issue
 - candidate_format_version: v2
 - title: pre-test-merge lifecycle management capability for Freely
 - note: 历史候选名保留 `pre-test-merge`，当前 canonical 语义按 `test-pre-merge-*` 测试批次前缀族解释
@@ -485,7 +485,7 @@
   - jsonl_path: unavailable://codex-thread-only
   - role: author
 
-### C-20260322-1801-C
+### C-20260322-1801-A: legacy issue
 - candidate_format_version: v2
 - title: worker self-loop exit and scheduler closeout governance
 - note: 本候选里凡是提到 stale `pre-test-merge` governance，均指向 `test-pre-merge-*` 测试批次族，不再指单例 branch

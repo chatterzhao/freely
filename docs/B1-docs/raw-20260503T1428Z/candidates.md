@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260503T1428Z-A
+## C-20260503T1428Z-A: legacy issue
 - title: bridge disconnect fix — end_turn grace period + broken pipe tolerance
 - scope: run-acp-prompt.py grace period + freely rc=1 normalization
 - priority: P1

@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260617T145428Z-A: freely-db-cli syntax + AGENTS.md flow + hook skill routing
+## C-20260617T145428Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: Fix freely-db-cli IndentationError, AGENTS.md feedback entry, and pre-commit hook skill routing

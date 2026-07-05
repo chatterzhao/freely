@@ -1,5 +1,5 @@
 # Candidates
-## C-20260522T030835Z-A
+## C-20260522T030835Z-A: legacy issue
 - title: ai-cli apikey mode: generate settings from params, alias, update config.env
 - priority: P1
 - status: promoted

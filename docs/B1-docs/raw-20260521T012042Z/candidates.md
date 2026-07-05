@@ -1,12 +1,12 @@
 # Candidates
 
-## C-20260521T012042Z-A: Manager keepalive stale-pid 扫描 + Worker ACP 初始化超时自愈
+## C-20260521T012042Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: Manager keepalive 扫描 launched worker + Worker ACP 初始化超时自愈
 - status: promoted
 - priority: P1
-- source_raw: `raw-20260521T012042Z` (GitHub #1519)
+- source_raw: raw-20260521T012042Z
 - decision_reason: 2026-05-20 Runtime Crash Postmortem 暴露两个关联的 worker 生命周期管理缺陷。子问题 1（keepalive 不扫描）有明确修复方向；子问题 2（ACP init 超时）与 C-20260519T015638Z-A 重叠需协调。合并为一个 candidate 因为共享同一代码域且修复链互补。
 - next_action: 子问题 1 B2 已完成（见 `docs/B2-docs/stale-pid-keepalive/`），进入 dev 实现；子问题 2 与 C-20260519T015638Z-A 协调研究根因
 - revisit_trigger: 子问题 2 的根因研究有结论时重新评估

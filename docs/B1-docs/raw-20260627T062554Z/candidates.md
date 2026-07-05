@@ -6,7 +6,7 @@ created_at: 2026-06-27
 milestone: M-20260627T062554Z-A
 ---
 
-## C-20260627T062554Z-A: task-lifecycle-scan v3 — 三分类重构
+## C-20260627T062554Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: task-lifecycle-scan v3 — 三分类重构

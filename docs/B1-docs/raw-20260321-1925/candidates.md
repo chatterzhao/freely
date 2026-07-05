@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260321-1925-A
+### C-20260321-1925-A: legacy issue
 - title: Route broad supervisor chat reentry away from cleanup misrouting
 - problem: 当前 `freely chat -> interruption dispatcher` 在广义主管巡检任务上，容易把新 signal 错误归到 `cleanup://merged-worktree-followthrough`，导致它没有回到主管主循环做新的 patrol / restart-point routing。
 - why_now: 这已在真实 `develop` 工位集成测试中复现。若不修复，Freely “只能通过 chat 插话驱动自己开发自己”这条 dogfooding 路线就会持续失真。

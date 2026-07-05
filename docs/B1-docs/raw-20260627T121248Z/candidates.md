@@ -6,7 +6,7 @@ created_at: 2026-06-27
 milestone: M-20260627T121248Z-A
 ---
 
-## C-20260627T121248Z-A: a2a worker_pid + manager check fix
+## C-20260627T121248Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: a2a worker_pid + manager check fix

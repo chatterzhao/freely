@@ -1,5 +1,5 @@
 # Candidates
-## C-20260522T002426Z-A
+## C-20260522T002426Z-A: legacy issue
 - title: crash dedup via search existing open issue
 - priority: P1
 - status: promoted

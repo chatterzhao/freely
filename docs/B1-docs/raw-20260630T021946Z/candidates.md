@@ -6,7 +6,7 @@ created_at: 2026-06-30
 milestone: M-20260630T021946Z-A
 ---
 
-## C-20260630T021946Z-A: a2a_tasks 状态对齐 Google A2A 标准
+## C-20260630T021946Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: a2a_tasks 状态对齐 Google A2A 标准 — input-required + canceled
@@ -27,6 +27,6 @@ milestone: M-20260630T021946Z-A
   - reviewer: claude
   - mode: in-session
   - verdict: pass
-- promoted_issue_path: docs/B2-docs/a2a/task-lifecycle/raw-20260630T021946Z/issues/I-20260630T021946Z-A.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260630T021946Z-A/issue.md
 - milestone: M-20260630T021946Z-A
 - session_refs: []

@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260305-901
+### C-20260305-1402-A: legacy issue
 - title: Doc-loop 治理维护职责显式化（IBM+G）
 - problem: doc-loop 当前执行语义偏向 IBM，治理资产维护职责不显式，导致自举执行可能偏离宪法/法律/skills 一致性。
 - why_now: 属于 Freely 自举治理主线，若不修正会持续放大流程偏差。

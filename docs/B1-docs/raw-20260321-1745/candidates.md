@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260321-1745-A
+### C-20260321-1745-A: legacy issue
 - title: Clarify active lifecycle boundary and dogfooding capability discovery
 - problem: 当前对“历史 vs 当前可修改真源”的边界主要依赖人工口头判断，容易把未收口 issue/worktree 错当历史，或把已闭环 issue 错当当前承接面；同时，狗粮中暴露的问题还缺少一条明确原则，说明它们默认应先被判断为 Freely 的能力发现，而不是一次性项目经验。
 - why_now: 这已经直接影响 Freely 开发 Freely 时如何开新生命周期、如何重构真源、以及如何把狗粮发现的问题真正产品化。如果不收敛，后续会继续在“回写历史”与“遗漏能力发现”之间反复摇摆。

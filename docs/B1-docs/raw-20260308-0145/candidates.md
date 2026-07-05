@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260308-0101
+### C-20260308-0145-A: legacy issue
 - title: 状态联动、流程标识词典与 session evidence 传播治理
 - problem: Freely 当前缺少统一的流程标识语义和状态联动矩阵，导致 milestone / issue / progress / recovery 容易不同步；同时 `session_refs` 没有从 pre-brainstorm 持续传播到 IBM 与 dev-loop。
 - why_now: 这已经直接影响 Freely 吃自己的狗粮能力；如果 AI 不知道这些自定义流程标识的统一含义，它就只能凭猜测做状态更新。

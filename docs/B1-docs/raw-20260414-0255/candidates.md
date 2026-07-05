@@ -7,7 +7,7 @@
 
 ## Candidates
 
-### C-20260414-0255-A
+### C-20260414-0255-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: `Freely start codex after-failure recovery must honor saved-slot order`

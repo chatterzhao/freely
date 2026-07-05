@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260513T160637Z-A
+## C-20260513T160637Z-A: legacy issue
 - title: fix backtick command substitution in start-lead-agent.sh
 - scope: single heredoc in start-lead-agent.sh
 - priority: P1

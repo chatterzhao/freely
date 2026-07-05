@@ -6,7 +6,7 @@ created_at: 2026-07-01
 milestone: M-20260701T031733Z-A
 ---
 
-## C-20260701T031733Z-A: skill 模板对齐 gate 期望 + dev↔test 同步提醒
+## C-20260701T031733Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: 修正 5 个 skill 模板/检查清单，减少门禁反复失败
@@ -29,6 +29,6 @@ milestone: M-20260701T031733Z-A
   - summary: 逐文件对比 gate 规则，确认模板字段完整
   - verdict: pass
 - promoted_issue_id: I-20260701T031733Z-A
-- promoted_issue_path: docs/B2-docs/gate/governance/raw-20260701T031733Z/issues/I-20260701T031733Z-A.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260701T031733Z-A/issue.md
 - milestone: M-20260701T031733Z-A
 - session_refs: []

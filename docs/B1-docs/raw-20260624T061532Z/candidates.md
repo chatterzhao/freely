@@ -1,5 +1,5 @@
 # Candidates
-## C-20260624T061532Z-A: tool-registry-query.py 清理 JSON5 dead code
+## C-20260624T061532Z-A: legacy issue
 - candidate_format_version: v2
 - title: 删除 query tool 中 JSON5 兼容函数
 - status: promoted

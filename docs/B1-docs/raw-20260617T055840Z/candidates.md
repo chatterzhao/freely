@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260617T055840Z-A: Merge Guard + Rebase Integrity
+## C-20260617T055840Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: GitHub branch protection 拦截直接 merge + post-rewrite hook rebase 完整性校验

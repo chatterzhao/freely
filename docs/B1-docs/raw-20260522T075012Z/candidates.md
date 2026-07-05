@@ -1,5 +1,5 @@
 # Candidates
-## C-20260522T075012Z-A
+## C-20260522T075012Z-A: legacy issue
 - title: help text generic
 - priority: P2
 - status: promoted

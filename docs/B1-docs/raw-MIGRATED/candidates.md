@@ -5,7 +5,7 @@ source_raw: raw-MIGRATED
 milestone: M-MIGRATED-A
 ---
 
-## C-MIGRATED-A: migrated legacy candidates
+## C-MIGRATED-A: legacy issue
 
 - candidate_format_version: v2
 - title: Migration placeholder for issues without traceable B1

@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260305-903
+### C-20260305-2355-A: legacy issue
 - title: `pre-develop` -> `pre-test-merge` 职责迁移
 - problem: 当前 `pre-develop` 兼任默认开发父分支和长期测试集成分支，偏离主流分支模型，导致人和 AI 都更容易误用。
 - why_now: 这是分支治理的核心心智负担来源，继续保留会放大后续 hooks / skill / 自动化复杂度。
@@ -22,7 +22,7 @@
   - `docs/system/workspace/skills/branch-management/SKILL.md`
 - session_refs: []
 
-### C-20260305-904
+### C-20260305-2355-A: legacy issue
 - title: `wt-enter` / `post-checkout` worktree 引导修复
 - problem: 创建 feature 分支后，当前脚本可能把主 worktree 留在 feature 分支上，而不是稳定引导进入 dedicated sibling worktree。
 - why_now: 该问题会直接破坏“主 worktree 只停留在受保护集成分支、开发在 dedicated worktree 中进行”的基本纪律。

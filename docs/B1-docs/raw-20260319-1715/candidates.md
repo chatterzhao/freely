@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260319-1715-A
+### C-20260319-1715-A: legacy issue
 - title: CLI-first human chat intake and manager delegation loop
 - problem: Freely 已定义 human chat 是 discovery source，也有 prompt 组装器与单测，但缺少可恢复的 intake 入口、主管监督面、worker 委派闭环和“已被 milestone 吸收”的完成信号，因此人类插话仍无法被系统稳定吸收。
 - why_now: Freely 要真正“用 Freely 开发自己”，就不能继续依赖当前聊天线程上的人工解释；人的插话必须像 github issue、review/test 一样，成为可被主管监督和路由的正式输入面。

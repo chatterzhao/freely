@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260620T113909Z-A
+## C-20260620T113909Z-A: legacy issue
 - status: promoted
 - milestone: M-20260620T113909Z-A
 - promoted_issue_path: docs/issues/I-20260620T113909Z-A/issue.md

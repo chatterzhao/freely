@@ -1,5 +1,5 @@
 - promoted_issue_path: ""
-- milestone: M-20260306-workspace-routing-foundation
+- milestone: M-20260501-0000-A
 - session_refs:
   - {tool: "manual", session_id: "pre-brainstorm-creation", jsonl_path: "unavailable"}
 - worker_launch_docs: `2026-05-01`

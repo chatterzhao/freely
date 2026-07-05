@@ -6,7 +6,7 @@ created_at: 2026-06-25
 milestone: M-20260625T153111Z-A
 ---
 
-## C-20260625T153111Z-A: agent-table.toml 多 agent 分身注册
+## C-20260625T153111Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: .freely/agent-table.toml — agent 池声明 + 解析器 + wt-create 集成

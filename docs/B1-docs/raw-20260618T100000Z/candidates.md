@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260618T100000Z-A: wt-create chat-inbox ID normalization
+## C-20260618T100000Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: wt-create chat-inbox ID normalization — pass bare ID to chat-inbox.py

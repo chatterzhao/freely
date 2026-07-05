@@ -1,5 +1,5 @@
 # Candidates
-## C-20260624T062756Z-A: tools.md json5 → toml
+## C-20260624T062756Z-A: legacy issue
 - candidate_format_version: v2
 - title: tools.md 文档引用更新
 - status: promoted

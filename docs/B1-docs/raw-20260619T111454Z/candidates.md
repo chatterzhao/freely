@@ -13,10 +13,10 @@ open_questions: []
 next_action: merge to develop
 session_refs: []
 promoted_issue_path: docs/issues/I-20260619T111454Z-A/issue.md
-milestone: M-20260616T084121Z-platform-sync-batch
+milestone: M-20260619T111454Z-A
 ---
 # Platform Sync Batch - 20260619T111454Z
 
-## C-20260619T111454Z-platform-sync-batch
+## C-20260619T111454Z-A: legacy issue
 
 Batch sync operational record.

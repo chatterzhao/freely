@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260517T082350Z-A: supervisor bash rc=0 crash (absorbed)
+## C-20260517T082350Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: supervisor 对 bash rc=0 的假阳性 crash 检测（被吸收）

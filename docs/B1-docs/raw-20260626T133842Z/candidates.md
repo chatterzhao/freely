@@ -5,7 +5,7 @@ source_raw: raw-20260626T133842Z
 milestone: M-20260626T133842Z-A
 ---
 
-## C-20260626T133842Z-A: feedback exit on platform error
+## C-20260626T133842Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: freely feedback exits 1 on platform failure

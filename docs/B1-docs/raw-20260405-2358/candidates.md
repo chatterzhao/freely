@@ -1,6 +1,6 @@
 # Candidates - 20260405-2358--cli-command-audit-regressions
 
-## C-20260405-2358-A
+## C-20260405-2358-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: Fresh-project bootstrap and baseline scoping followthrough after CLI audit
@@ -29,7 +29,7 @@
 - next_action: This candidate is now materialized as `I-20260405-2358-A`. Keep the owner narrow: repair `sync-tooling` retargeting plus `.githooks` rematerialization, prove `baseline-status` / `status --view baseline` stay pinned to the target project, and keep `ensure-interruption-dispatch` as a non-regression guard rather than reopening runtime control-plane work.
 - revisit_trigger: fresh-project bootstrap still requires manual hook copying, `baseline-status` / `status` baseline scoping still drifts from the target project, or another project-targeted CLI command regresses the current doc-gate semantics.
 
-## C-20260405-2358-B
+## C-20260405-2358-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: Runtime control-plane CLI stability after full command audit
@@ -57,7 +57,7 @@
 - next_action: keep this candidate in `M-20260306-workspace-routing-foundation`, separate “stale pid / readiness / restart” evidence from “intake status / chat completion” evidence, and confirm whether they belong in one supervision owner or two adjacent ones.
 - revisit_trigger: any audited runtime command still requires manual cleanup of stale children or reports contradictory intake state on canonical develop.
 
-## C-20260405-2358-C
+## C-20260405-2358-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: CLI wrapper packaging and regression-surface audit
@@ -85,7 +85,7 @@
 - next_action: materialize the packaging-focused owner under `workspace-routing-foundation`, then repair the broken runnable wrapper set, clean the `freely ai --help` surface, and stabilize the auth-change wake regression coverage.
 - revisit_trigger: newly added `bin/` wrappers ship without executable permission or audited regression commands remain shell-noisy / worktree-sensitive.
 
-## C-20260405-2358-D
+## C-20260405-2358-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: CLI help and dry-run contract followthrough after canonical audit

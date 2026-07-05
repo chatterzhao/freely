@@ -6,7 +6,7 @@ created_at: 2026-06-27
 milestone: M-20260627T135126Z-A
 ---
 
-## C-20260627T135126Z-A: pr-create merge 策略 + checkpoint scope 放行
+## C-20260627T135126Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: pr-create merge 策略 + checkpoint scope 放行

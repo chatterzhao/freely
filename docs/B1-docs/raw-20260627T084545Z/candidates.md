@@ -6,7 +6,7 @@ created_at: 2026-06-27
 milestone: M-20260627T084545Z-A
 ---
 
-## C-20260627T084545Z-A: a2a_tasks agent_id 改具体编号 + 字段补全
+## C-20260627T084545Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: a2a_tasks agent_id 改具体编号 + 字段补全

@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260521T014556Z-A: Manager 委派结果即时反馈
+## C-20260521T014556Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: Manager prompt 注入 dispatch results section，消除委派结果信息 gap

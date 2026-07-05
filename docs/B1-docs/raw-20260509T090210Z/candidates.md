@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260509T090210Z-A: handoffs 表替代交接文件
+## C-20260509T090210Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: 主管-worker 交接从文件重构为 SQLite handoffs 表

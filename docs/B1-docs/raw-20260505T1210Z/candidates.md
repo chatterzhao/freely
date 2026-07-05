@@ -1,6 +1,6 @@
 # candidates: issue 状态字段重构
 
-## C-20260505T1210Z-A: scan 常量对齐 IBM Framework
+## C-20260505T1210Z-A: legacy issue
 
 - candidate_id: C-20260505T1210Z-A
 - title: 修正 scan 的 TERMINAL_RAW / DONE_STATES / ACTIVE_B2 常量
@@ -8,8 +8,8 @@
 - non_goals: 不改 scan 逻辑，只改常量
 - priority: P0
 - status: promoted
-- milestone: M-20260306-workspace-routing-foundation
-- promoted_issue_path: docs/B2-docs/ibm/issue-state-refactor/issues/I-20260505T1210Z-A.md
+- milestone: M-20260505T1210Z-A
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260505T1210Z-A/issue.md
 
 ### 改动
 

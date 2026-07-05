@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260322-1615-A
+### C-20260322-1615-A: legacy issue
 - title: Protected post-merge acceptance route and promotion guard governance
 - note: 本候选保留历史形成的 `pre-test-merge` 命名；当前 canonical 语义一律按 `test-pre-merge-*` 临时测试批次前缀族解释。
 - problem: Freely 已经允许 `post-merge acceptance` 在 `develop` / `test-pre-merge-*` 这类 protected environment 里发生，而且当前 canonical promote path 也已经固定为 `feature/* -> test-pre-merge-* -> develop`。但 hook 与 promotion/cleanup gate 还没有把“这里只能验证、不能留下新的未归属实现来源”完全兜住。当前能拦 commit，却不能彻底防 raw `git add`；而历史预研里仍残留 replay-only 假设，容易把后续 route 拉回过时模型。

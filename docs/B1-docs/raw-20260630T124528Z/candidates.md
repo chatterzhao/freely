@@ -6,7 +6,7 @@ created_at: 2026-06-30
 milestone: M-20260630T124528Z-A
 ---
 
-## C-20260630T124528Z-A: freely init ACP 工具准备 + tool-registry 下载配置
+## C-20260630T124528Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: freely init 统一 ACP 工具发现/下载/配置，tool-registry 新增 download_url + install_method
@@ -30,6 +30,6 @@ milestone: M-20260630T124528Z-A
   - mode: inline
   - summary: 全面审查 freely init ACP 流程、tool-registry 字段设计、ensure-codex-acp 通用化方案、config.toml schema 扩展
   - verdict: pass
-- promoted_issue_path: docs/B2-docs/acp/multi-bridge/raw-20260630T124528Z/issues/I-20260630T124528Z-A.md
+- promoted_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260630T124528Z-A/issue.md
 - milestone: M-20260630T124528Z-A
 - session_refs: []

@@ -1,5 +1,5 @@
 # Candidates
-## C-20260521T222919Z-A
+## C-20260521T222919Z-A: legacy issue
 - title: dynamic stage list for scan prompt builder
 - priority: P0
 - status: promoted

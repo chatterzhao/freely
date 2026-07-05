@@ -1,6 +1,6 @@
 # Candidates: 阶段前缀式进度标识
 
-## C-20260308-1631
+## C-20260308-1630-A: legacy issue
 
 - title: 用阶段前缀式主进度标识替代 `in_progress` / `active`
 - status: promoted

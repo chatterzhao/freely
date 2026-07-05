@@ -5,7 +5,7 @@ source_raw: raw-20260626T130431Z
 milestone: M-20260626T130431Z-A
 ---
 
-## C-20260626T130431Z-A: wt-close Phase 6b force fix
+## C-20260626T130431Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: wt-close Phase 6b respects --force

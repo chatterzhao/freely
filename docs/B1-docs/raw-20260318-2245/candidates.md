@@ -1,6 +1,6 @@
 # Candidates
 
-### C-20260318-A
+### C-20260318-2245-A: legacy issue
 - title: worktree 级 supervisor pid 归属校验
 - status: promoted
 - why:
@@ -16,4 +16,4 @@
 - promoted_issue_path: `docs/B2-docs/gate/checkpoint-commit-and-multi-worktree-supervision-governance/issues/checkpoint-commit-and-multi-worktree-supervision-governance.md`
 - legacy_id_mapping: I-20260318-0930  # 历史遗留的 issue id
 - session_refs: []
-- milestone: M-20260306-workspace-routing-foundation
+- milestone: M-20260318-2245-A

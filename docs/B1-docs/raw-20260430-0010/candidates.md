@@ -1,6 +1,6 @@
 # Candidates - 20260430-0010--doc-sync-chat-inbox
 
-### C-20260430-0010-A
+### C-20260430-0010-A: legacy issue
 
 - title: `Sync docs + fix governance-only paths for architecture docs`
 - status: `promoted`

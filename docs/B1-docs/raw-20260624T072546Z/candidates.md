@@ -1,5 +1,5 @@
 # Candidates
-## C-20260624T072546Z-A: 平台硬编码报错修复
+## C-20260624T072546Z-A: legacy issue
 - candidate_format_version: v2
 - title: 修复 wt-create/hook/freely feedback 中的平台硬编码报错
 - status: promoted

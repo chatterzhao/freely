@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260513T224509Z-A
+## C-20260513T224509Z-A: legacy issue
 - title: define sup_pid_file in start_project_runtime
 - scope: single variable addition in freely runtime
 - priority: P1

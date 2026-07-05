@@ -1,6 +1,6 @@
 # Candidates: raw-20260624T104236Z
 
-## C-20260624T104236Z-A
+## C-20260624T104236Z-A: legacy issue
 
 - **status**: promoted
 - **promoted_issue_path**: docs/issues/I-20260624T104236Z-A/issue.md

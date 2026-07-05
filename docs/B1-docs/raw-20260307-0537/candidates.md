@@ -5,7 +5,7 @@
 
 ---
 
-## C-20260307-1101：iflow 添加 worktrees 目录访问参数
+## C-20260307-0537-A: legacy issue
 
 ### 基本信息
 - promoted_issue_path: `pending://issue-materialization`
@@ -64,7 +64,7 @@
 
 ---
 
-## C-20260307-1102：tools.md 补充目录访问能力说明
+## C-20260307-0537-A: legacy issue
 
 ### 基本信息
 - promoted_issue_path: `pending://issue-materialization`

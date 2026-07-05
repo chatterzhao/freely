@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260328-0745-A
+### C-20260328-0745-A: legacy issue
 - candidate_format_version: v2
 - title: Live-status current runtime state reconciliation governance
 - problem: `live-status` simultaneously exposed a current-state answer (`activity_state: ai_active`) and stale persisted state (`last_ai_state: down`, `last_exit_reason: starting`), which made the current-state surface internally inconsistent whenever supervisor start had already launched AI but `workcell-state.env` had not been refreshed again.

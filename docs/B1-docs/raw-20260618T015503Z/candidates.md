@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260618T015503Z-A: worktree 路径架构修正
+## C-20260618T015503Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: Fix ROOT_DIR resolution — raw issues live in worktree, not develop

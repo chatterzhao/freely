@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260624T090635Z-A: adapter/ACP dispatch/launch_kind 注册表驱动化
+## C-20260624T090635Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: tool-launchers.sh adapter 查询/ACP dispatch/tool family 解析注册表驱动化

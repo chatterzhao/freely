@@ -6,7 +6,7 @@
 
 ## Candidates
 
-### C-20260328-2105-A
+### C-20260328-2105-A: legacy issue
 - candidate_format_version: v2
 - title: Define verified resume evidence governance for false-positive session recovery
 - problem: Freely currently treats an observed `session_id` as sufficient `resume_target` evidence for `codex`, even when the same cycle has already proven `jsonl_path=unavailable`. This lets a non-resumable thread id enter persisted recovery state and turns a single failed fresh launch into repeated invalid `resume` attempts and restart-storm churn.

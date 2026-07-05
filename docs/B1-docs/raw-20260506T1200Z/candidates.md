@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260506T1200Z-A: IBM Skill 重命名
+## C-20260506T1200Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: doc-pre-brainstorm-execution / doc-ibm-execution 重命名为 B1_IBM/B2_IBM

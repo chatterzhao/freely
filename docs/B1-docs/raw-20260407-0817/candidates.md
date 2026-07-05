@@ -1,6 +1,6 @@
 # Candidates - 20260407-0817--source-ledger-routing-and-manager-audit-boundary
 
-## C-20260407-0817-A
+## C-20260407-0817-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: `Source inbox, routing absorption boundary, and manager/worker audit contract`
@@ -92,7 +92,7 @@
 - revisit_trigger:
   - revisit when there is a concrete bounded proposal for the first source family and its storage boundary, or when another dogfooding incident proves the current source visibility gap cannot be solved by tightening existing pre-brainstorm/milestone/routing contracts alone
 
-## C-20260407-0817-B
+## C-20260407-0817-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: `Family-validated minimal source view and unresolved-index contract`
@@ -137,7 +137,7 @@
 - revisit_trigger:
   - revisit when the first family slice has made a reusable subset legible enough to promote into a shared contract, or when family validation shows the shared layer should remain only invariant-level
 
-## C-20260407-0817-C
+## C-20260407-0817-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: `Human interruption and local intake alignment with narrow source contract`
@@ -177,7 +177,7 @@
 - revisit_trigger:
   - revisit when the family slice has either produced a reusable shared subset for 0817-B or shown that the shared contract must remain narrower than originally expected
 
-## C-20260407-0817-D
+## C-20260407-0817-A: legacy issue
 
 - candidate_format_version: `v2`
 - title: `Stage-based source absorption backstop`

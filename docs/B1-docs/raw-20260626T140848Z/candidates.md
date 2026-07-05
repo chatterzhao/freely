@@ -4,7 +4,7 @@ status: absorbed
 source_raw: raw-20260626T140848Z
 milestone: M-20260626T140848Z-A
 ---
-## C-20260626T140848Z-A: RUNTIME_DIR typo
+## C-20260626T140848Z-A: legacy issue
 - candidate_format_version: v2
 - title: RUNTIME_DIR → _RUNTIME_DIR typo
 - status: absorbed

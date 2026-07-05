@@ -1,6 +1,6 @@
 # Candidates
 
-## C-20260517T083200Z-A: supervisor crash — investigate rc=0 crash detection
+## C-20260517T083200Z-A: legacy issue
 
 - candidate_format_version: v2
 - title: 调查 supervisor 将 rc=0 进程终止判定为 crash 的根因

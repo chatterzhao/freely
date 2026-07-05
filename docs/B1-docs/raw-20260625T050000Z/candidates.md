@@ -1,4 +1,4 @@
-## C-20260625T050000Z-A
+## C-20260625T050000Z-A: legacy issue
 - title: Move git pull in pr-create-guarded after all gates pass
 - status: promoted
 - promoted_issue_path: docs/issues/I-20260625T050000Z-A/issue.md
