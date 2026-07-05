@@ -974,8 +974,8 @@
 
   <rect id="epic-closeout-chain" x="35" y="18327" width="700" height="250" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
   <text x="50" y="18351" font-size="13" font-weight="bold" fill="#1a73e8">closeout-chain</text>
-  <rect id="story-wt-close-test-gate" x="55" y="18335" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
-  <text x="65" y="18350" font-size="11" fill="#333">wt-close-test-gate</text>
+  <rect id="story-wt-close-test-gate" x="55" y="18355" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
+  <text x="65" y="18370" font-size="11" fill="#333">wt-close-test-gate</text>
   <rect id="story-manager-startup-record" x="55" y="18365" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
   <text x="65" y="18380" font-size="11" fill="#333">manager-startup-record</text>
   <rect id="story-agent-working-session-unify" x="55" y="18395" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
