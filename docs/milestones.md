@@ -2918,3 +2918,16 @@
 ### committed_issues
 1. I-20260705T111413Z-A — phase_state completed
 - path: docs/epics/git-hygiene/gitignore-guidelines/raw-20260705T111413Z/issues/I-20260705T111413Z-A.md
+
+## M-20260705T122651Z-A
+- title: fix — docs/epics 路径规范
+- status: active
+### candidate_issues
+1. C-20260705T122651Z-A — absorbed → I-20260705T122651Z-A
+### committed_issues
+1. I-20260705T122651Z-A — phase_state completed
+- path: docs/epics/git-guidelines/docs-epics-path-fix/raw-20260705T122651Z/issues/I-20260705T122651Z-A.md
+### completed_issues
+1. I-20260705T122651Z-A — phase_state completed
+- path: docs/epics/git-guidelines/docs-epics-path-fix/raw-20260705T122651Z/issues/I-20260705T122651Z-A.md
+2. C-20260705T122651Z-A — absorbed → I-20260705T122651Z-A
