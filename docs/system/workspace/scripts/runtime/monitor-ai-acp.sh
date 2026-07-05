@@ -44,12 +44,16 @@ _bridge_short_hash() {
 
 _bridge_pid_file() {
   local project="$1" base_tool="${2:-}"
-  echo "/tmp/freely-acp-$(_bridge_short_hash "$project")-${base_tool}.pid"
+  local _suffix=""
+  [[ -n "$base_tool" ]] && _suffix="-${base_tool}"
+  echo "/tmp/freely-acp-$(_bridge_short_hash "$project")${_suffix}.pid"
 }
 
 _bridge_socket() {
   local project="$1" base_tool="${2:-}"
-  echo "/tmp/freely-acp-$(_bridge_short_hash "$project")-${base_tool}.sock"
+  local _suffix=""
+  [[ -n "$base_tool" ]] && _suffix="-${base_tool}"
+  echo "/tmp/freely-acp-$(_bridge_short_hash "$project")${_suffix}.sock"
 }
 
 _bridge_log_file() {
@@ -58,10 +62,11 @@ _bridge_log_file() {
 
 _bridge_ensure_running() {
   local project="$1" tool="${2:-}"
+  local base_tool="${tool%%-*}"
   local pid_file socket bridge_script tool_file last_tool
-  pid_file="$(_bridge_pid_file "$project")"
-  socket="$(_bridge_socket "$project")"
-  tool_file="$(_bridge_pid_file "$project").tool"
+  pid_file="$(_bridge_pid_file "$project" "$base_tool")"
+  socket="$(_bridge_socket "$project" "$base_tool")"
+  tool_file="$(_bridge_pid_file "$project" "$base_tool").tool"
 
   # Already running?
   if [[ -f "$pid_file" ]]; then
@@ -94,7 +99,6 @@ _bridge_ensure_running() {
   }
 
   # ── Resolve ACP binary for the current tool ──────────────────────
-  local base_tool="${tool%%-*}"
   local acp_bin; acp_bin="$(_tool_registry_get "$base_tool" "acp.binary" 2>/dev/null || echo "claude-agent-acp")"
   local -a acp_args=()
   local raw_args; raw_args="$(_tool_registry_get "$base_tool" "acp.args" 2>/dev/null || true)"
@@ -111,6 +115,9 @@ _bridge_ensure_running() {
   fi
 
   echo "[bridge] starting: base_tool=$base_tool acp_bin=$acp_bin acp_args=${acp_args[*]:-} slot=$tool config=${config_path:-registry}" >&2
+
+  local _bt_flag=()
+  [[ -n "$base_tool" ]] && _bt_flag=(--base-tool "$base_tool")
 
   # ── Sanitize inherited AI tool environment variables ──────────────
   # The daemon inherits ANTHROPIC_*/CLAUDE_CODE_*/AI_AGENT from the
@@ -130,7 +137,7 @@ _bridge_ensure_running() {
   done
   [[ $_sanitized -gt 0 ]] && echo "[bridge] env sanitized: $_sanitized AI tool vars unset" >&2
 
-  python3 "$bridge_script" start --project "$project" --acp-bin "$acp_bin" ${acp_args:+--acp-args "${acp_args[*]}"} --foreground >/dev/null 2>&1 || {
+  python3 "$bridge_script" start --project "$project" "${_bt_flag[@]}" --acp-bin "$acp_bin" ${acp_args:+--acp-args "${acp_args[*]}"} --foreground >/dev/null 2>&1 || {
     echo "[ERROR] failed to start ACP bridge" >&2
     return 1
   }

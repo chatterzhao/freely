@@ -31,9 +31,9 @@ def _acp_bridge_socket(project: str, base_tool: str = "") -> Optional[str]:
     return sock_path if os.path.exists(sock_path) else None
 
 
-def _acp_rpc(project: str, method: str, params: dict) -> Optional[dict]:
+def _acp_rpc(project: str, method: str, params: dict, base_tool: str = "") -> Optional[dict]:
     """Send a JSON-RPC call to the ACP bridge and return the result."""
-    bridge = _acp_bridge_socket(project)
+    bridge = _acp_bridge_socket(project, base_tool)
     if not bridge:
         return None
     try:
@@ -197,7 +197,7 @@ def _normalize_raw_key(raw_key: str) -> str:
 
 
 def _handle_needs_reviewer(project: str, metadata: dict, reason: InputRequiredReason):
-    """Worker/Manager needs reviewer.
+    """Worker/Manager needs reviewer."""
     raw_key = _normalize_raw_key(metadata.get("raw_key", ""))
     from_agent = metadata.get("from_agent", "")
 
@@ -239,7 +239,7 @@ def _build_review_task_message(raw_key: str, from_agent: str, reason: InputRequi
 
 
 def _handle_needs_manager(project: str, metadata: dict, reason: InputRequiredReason):
-    """Agent needs manager decision. Resume manager ACP session.
+    """Agent needs manager decision. Resume manager ACP session."""
     issue_key = _normalize_raw_key(metadata.get("raw_key", ""))
     from_agent = metadata.get("from_agent", "")
     MANAGER_KEY = "__manager__"
@@ -258,7 +258,7 @@ def _handle_needs_manager(project: str, metadata: dict, reason: InputRequiredRea
         print(f"[watchdog] could not route to manager — needs human attention", file=sys.stderr)
 
 def _handle_needs_worker(project: str, metadata: dict, reason: InputRequiredReason):
-    """Reviewer/Manager needs worker retry/task.
+    """Reviewer/Manager needs worker retry/task."""
     raw_key = _normalize_raw_key(metadata.get("raw_key", ""))
     from_agent = metadata.get("from_agent", "")
     verdict_msg = _build_worker_verdict_message(raw_key, from_agent, reason, metadata)

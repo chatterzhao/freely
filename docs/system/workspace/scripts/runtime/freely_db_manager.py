@@ -1374,12 +1374,12 @@ def h_aw_upsert_only(daemon: DbDaemon, params: dict) -> dict:
             pairs.pop(new_agent_id, None)
         val = ",".join(f"{k}:{v}" for k, v in pairs.items()) if pairs else new_agent_id
     slot_val = params.get("slot","")
-        if slot_val:
-            c.execute(f"UPDATE agent_working SET {col}=?, slot=?, updated_at=datetime('now') WHERE raw_key=?",
-                      (val, slot_val, raw_key))
-        else:
-            c.execute(f"UPDATE agent_working SET {col}=?, updated_at=datetime('now') WHERE raw_key=?",
-                      (val, raw_key))
+    if slot_val:
+        c.execute(f"UPDATE agent_working SET {col}=?, slot=?, updated_at=datetime('now') WHERE raw_key=?",
+                  (val, slot_val, raw_key))
+    else:
+        c.execute(f"UPDATE agent_working SET {col}=?, updated_at=datetime('now') WHERE raw_key=?",
+                  (val, raw_key))
     daemon.conn.commit()
     return {"status": "ok"}
 
