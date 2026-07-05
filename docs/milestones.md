@@ -2789,3 +2789,11 @@
 - milestone: M-20260705T012851Z-A
 - status: absorbed
 - absorbed_into: `I-20260705T012851Z-A`
+
+## M-20260705T024320Z-A
+- title: fix — per-agent tool/slot 全链路修复
+- status: active
+### candidate_issues
+1. `C-20260705T024320Z-A`
+- milestone: M-20260705T024320Z-A; status: promoted
+- promoted_issue_id: `I-20260705T024320Z-A`
