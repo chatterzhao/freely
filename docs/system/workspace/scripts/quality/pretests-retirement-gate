@@ -70,7 +70,7 @@ def resolve_issue_path(issue_ref: str) -> tuple[str, str]:
     if not issue_root.exists():
         return "", "missing_issue_root"
     candidate_path = project / issue_ref
-    if issue_ref.startswith("docs/epics/") and candidate_path.exists():
+    if issue_ref.startswith("docs/B2-docs/") and candidate_path.exists():
         return issue_ref, ""
     pattern = re.compile(rf"^- issue_id:\s*`?{re.escape(issue_ref)}`?\s*$", re.MULTILINE)
     matches: list[str] = []
@@ -213,7 +213,7 @@ if not issue_path:
         )
     else:
         print(f"[pretests_retirement_issue_missing] 无法解析 owner issue {owner_issue} 的文件路径", file=sys.stderr)
-        print(f"  I-* issue 唯一正确位置: docs/epics/{{epic-name}}/{{story-name}}/raw-{{raw key}}/issues/{owner_issue}.md", file=sys.stderr)
+        print(f"  I-* issue 唯一正确位置: docs/B2-docs/{{epic-name}}/{{story-name}}/raw-{{raw key}}/issues/{owner_issue}.md", file=sys.stderr)
         print(f"  文件不存在 → 按 skill `freely-doc-B2_IBM-execution` 创建 I-* issue", file=sys.stderr)
     sys.exit(1)
 

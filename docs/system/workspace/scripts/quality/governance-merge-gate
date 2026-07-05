@@ -309,7 +309,7 @@ def is_governance_only_path(rel_path: str) -> bool:
         "docs/system/workspace/scan-lifecycle-design.md",
     }:
         return True
-    if rel_path.startswith(("docs/pre-brainstorms/", "docs/epics/", "docs/progress/", "docs/issues/")):
+    if rel_path.startswith(("docs/B1-docs/", "docs/B2-docs/", "docs/B2-docs/ibm/_legacy-progress/", "docs/B1-docs/")):
         return True
     if rel_path.startswith(("docs/system/workspace/agents/", "docs/system/workspace/skills/")):
         return True
@@ -482,9 +482,9 @@ def parse_issue_file(rel_path: str) -> IssueRecord:
     source_candidate = grab("source_candidate")
     verification_artifact_dir = grab("verification_artifact_dir")
 
-    # Linked I-* issues (old docs/issues/ or new docs/epics/.../raw-.../issues/) point
+    # Linked I-* issues (old docs/B1-docs/ or new docs/B2-docs/.../raw-.../issues/) point
     # to canonical I-*. Follow canonical_issue_path to read authoritative governance fields.
-    if rel_path.startswith("docs/issues/I-") or (rel_path.startswith("docs/epics/") and "/issues/I-" in rel_path):
+    if rel_path.startswith("docs/B2-docs/ibm/_legacy-issues/I-") or (rel_path.startswith("docs/B2-docs/") and "/issues/I-" in rel_path):
         canonical = grab("canonical_issue_path")
         if canonical and path_exists(canonical):
             try:
@@ -648,25 +648,25 @@ def anchorless_source_candidate(source_candidate: Optional[str]) -> Optional[str
 def build_issue_index() -> Dict[str, IssueRecord]:
     # Canonical issue files in epics/
     try:
-        output = git("ls-files", "docs/epics/**/issues/I-*.md")
+        output = git("ls-files", "docs/B2-docs/**/issues/I-*.md")
         paths = [line.strip() for line in output.splitlines() if line.strip()]
     except Exception:
         paths = []
-    # Scan docs/issues/ for raw-* and I-* linked issue files.
+    # Scan docs/B1-docs/ for raw-* and I-* linked issue files.
     # When validating a range (pr-review-guarded from outside the worktree),
     # discover files from the source ref via git ls-tree so we find new
     # I-* and raw-* that only exist in the fix branch.
     if USE_RANGE_VIEW and RANGE_SOURCE_REF:
         try:
-            # ls-tree from docs/issues/ subtree returns paths relative to that dir
-            # (e.g. "raw-20260620T142838Z/issue.md"). Prepend docs/issues/ prefix.
-            output = git("ls-tree", "--name-only", "-r", f"{RANGE_SOURCE_REF}:docs/issues/")
+            # ls-tree from docs/B1-docs/ subtree returns paths relative to that dir
+            # (e.g. "raw-20260620T142838Z/issue.md"). Prepend docs/B1-docs/ prefix.
+            output = git("ls-tree", "--name-only", "-r", f"{RANGE_SOURCE_REF}:docs/B1-docs/")
             for line in output.splitlines():
                 line = line.strip()
                 if not line:
                     continue
                 if line.endswith("/issue.md") and not line.startswith(".scan"):
-                    full_path = f"docs/issues/{line}"
+                    full_path = f"docs/B1-docs/{line}"
                     if full_path not in paths:
                         paths.append(full_path)
         except Exception:
@@ -807,7 +807,7 @@ def _validate_raw_issue(issue: IssueRecord, changed_paths: list = None) -> list[
                     if found: break
             if not found:
                 errors.append(
-                    f"{iid} in {issue.path}: absorbed_into '{target_id}' not found at docs/issues/ or docs/epics/**/."
+                    f"{iid} in {issue.path}: absorbed_into '{target_id}' not found at docs/B1-docs/ or docs/B2-docs/**/."
                 )
         else:
             errors.append(
@@ -820,8 +820,8 @@ def _validate_raw_issue(issue: IssueRecord, changed_paths: list = None) -> list[
     if phase == "dropped" and changed_paths:
         code_files_in_merge = [
             p for p in changed_paths
-            if not p.startswith(("docs/issues/", "docs/epics/"))
-            and not p.startswith("docs/pre-brainstorms/")
+            if not p.startswith(("docs/B1-docs/", "docs/B2-docs/"))
+            and not p.startswith("docs/B1-docs/")
             and not p.startswith("docs/milestones.md")
             and not p.startswith("AGENTS.md")
             and not p.startswith("docs/system/workspace/agents/")
@@ -829,7 +829,7 @@ def _validate_raw_issue(issue: IssueRecord, changed_paths: list = None) -> list[
         if code_files_in_merge:
             errors.append(
                 f"{iid} in {issue.path}: phase_state is 'dropped' but the merge contains "
-                f"{len(code_files_in_merge)} code file(s) beyond docs/issues/ or agent docs. "
+                f"{len(code_files_in_merge)} code file(s) beyond docs/B1-docs/ or agent docs. "
                 f"dropped means the issue was abandoned without code changes. "
                 f"If code was implemented and merged, use 'absorbed' (with absorbed_into pointing to the I-* issue) "
                 f"or go through B1→candidate→I-* chain. "
@@ -857,11 +857,11 @@ def main() -> int:
         RANGE_SOURCE_REF = args.range.split("...")[-1].split("..")[-1]
 
     changed_paths = changed_paths_from_args(args)
-    candidate_paths: Set[str] = {p for p in changed_paths if p.startswith("docs/pre-brainstorms/") and p.endswith("/candidates.md")}
+    candidate_paths: Set[str] = {p for p in changed_paths if p.startswith("docs/B1-docs/") and p.endswith("/candidates.md")}
     touched_candidate_paths: Set[str] = set(candidate_paths)
-    issue_paths: Set[str] = {p for p in changed_paths if re.match(r"docs/epics/.+/issues/.+\.md$", p) or re.match(r"docs/issues/(raw-|I-).+/issue\.md$", p)}
-    progress_paths: Set[str] = {p for p in changed_paths if re.match(r"docs/progress/.+\.md$", p)}
-    review_paths: Set[str] = {p for p in changed_paths if re.match(r"docs/epics/.+/code-reviews/.+\.md$", p)}
+    issue_paths: Set[str] = {p for p in changed_paths if re.match(r"docs/B2-docs/.+/issues/.+\.md$", p) or re.match(r"docs/B1-docs/(raw-|I-).+/issue\.md$", p)}
+    progress_paths: Set[str] = {p for p in changed_paths if re.match(r"docs/B2-docs/ibm/_legacy-progress/.+\.md$", p)}
+    review_paths: Set[str] = {p for p in changed_paths if re.match(r"docs/B2-docs/.+/code-reviews/.+\.md$", p)}
     milestones_changed = "docs/milestones.md" in changed_paths
 
     # ── SKIP IBM GATE: skip lifecycle validation, only check governance-only ──
@@ -1074,7 +1074,7 @@ def main() -> int:
                             # Only consume the chat whose issue_id matches the branch key
                             if chat_issue_id == branch_issue_key or chat_issue_id.startswith(branch_issue_key):
                                 raw_dir = os.path.join(ROOT_DIR, "docs", "issues", branch_issue_key)
-                                # Auto-materialize to docs/issues/ if missing
+                                # Auto-materialize to docs/B1-docs/ if missing
                                 if not os.path.isdir(raw_dir) or not os.path.isfile(os.path.join(raw_dir, "issue.md")):
                                     os.makedirs(raw_dir, exist_ok=True)
                                     chat_row = conn.execute(
@@ -1194,10 +1194,10 @@ def main() -> int:
         issue = issues_index.get(issue_path)
         if not issue:
             continue
-        # Raw issues (docs/issues/raw-*) are the lifecycle entry point.
+        # Raw issues (docs/B1-docs/raw-*) are the lifecycle entry point.
         # They don't have source_candidate — they ARE the source.
         # I-* issues must have source_candidate linking back to a candidate.
-        is_raw_issue = issue.path.startswith("docs/issues/raw-")
+        is_raw_issue = issue.path.startswith("docs/B1-docs/raw-")
         if is_raw_issue or issue.source_candidate:
             issue_bound_evidence.add(issue.issue_id or issue.path)
             issue_bound_issue_paths.add(issue.path)
@@ -1277,14 +1277,14 @@ def main() -> int:
     if not governance_only_merge:
         if not candidate_driven_evidence:
             errors.append(
-                "此 merge 没有按 skill:freely-doc-B1_IBM-execution 治理产出的文档 (brainstorms.md + candidates.md 在 docs/pre-brainstorms/ 下)。"
+                "此 merge 没有按 skill:freely-doc-B1_IBM-execution 治理产出的文档 (brainstorms.md + candidates.md 在 docs/B1-docs/ 下)。"
                 "每个工位必须先加载 skill:freely-workflow-guarded-execution → 创建 raw issue → wt-create → 加载 skill:freely-doc-B1_IBM-execution 完成预研 → 产出 candidate 后才能写代码。"
                 "如果是已有 issue 的延续，在当前工位继续更新其治理文档即可；如果是已完成 issue 的重新打开，需创建新 raw issue + 新 candidate 并记录 reopen_of_issue。"
             )
 
         if not issue_bound_evidence:
             errors.append(
-                "此 merge 没有按 skill:freely-doc-B2_IBM-execution 治理产出的文档 (I-* issue 在 docs/epics/ 下 + prd.md + pre-tests.md + tasks.md)。"
+                "此 merge 没有按 skill:freely-doc-B2_IBM-execution 治理产出的文档 (I-* issue 在 docs/B2-docs/ 下 + prd.md + pre-tests.md + tasks.md)。"
                 "B1 完成后，必须加载 skill:freely-doc-B2_IBM-execution → 确定 epic/story → 物化 I-* issue + prd + pre-tests + tasks + IDN → 更新 milestones.md committed_issues → phase_state=done_b2_ibm 后才能进入 dev 写代码。"
             )
 
@@ -1423,9 +1423,9 @@ def main() -> int:
                 # GATE 6.3: promoted candidate must trace back to a raw-* issue (B1 input source)
                 c_key_val = candidate_key(candidate.candidate_id) or candidate.candidate_id
                 errors.append(
-                    f"GATE 6.3: {candidate.candidate_id} in {candidate.path} is promoted but has no matching raw-* issue in docs/issues/. "
+                    f"GATE 6.3: {candidate.candidate_id} in {candidate.path} is promoted but has no matching raw-* issue in docs/B1-docs/. "
                     f"Every promoted candidate must share its date-time key with a raw issue (raw-{c_key_val.split('-')[0] if '-' in str(c_key_val) else c_key_val} → {candidate.candidate_id}). "
-                    f"Create docs/issues/raw-{{key}}/issue.md for this candidate, or if the candidate came from a platform issue, ensure scan creates the raw-* entry."
+                    f"Create docs/B1-docs/raw-{{key}}/issue.md for this candidate, or if the candidate came from a platform issue, ensure scan creates the raw-* entry."
                 )
 
             issue_path = owner_path
@@ -1544,7 +1544,7 @@ def main() -> int:
 
         # Raw issues are B1 entry points — they don't have source_candidate.
         # Instead, validate raw-specific requirements.
-        if issue.path.startswith("docs/issues/raw-"):
+        if issue.path.startswith("docs/B1-docs/raw-"):
             raw_errors = _validate_raw_issue(issue, changed_paths)
             errors.extend(raw_errors)
             continue
@@ -1561,8 +1561,8 @@ def main() -> int:
         expected_queue = queue_for_phase.get((issue.phase_state or "").strip("`").strip())
         entries = milestone_by_issue_path.get(issue.path, [])
         # Linked I-* issues: also try canonical path for milestone matching
-        # New structure: docs/epics/{epic}/{story}/raw-{raw key}/issues/I-*.md
-        if not entries and (issue.path.startswith("docs/issues/I-") or (issue.path.startswith("docs/epics/") and "/issues/I-" in issue.path)):
+        # New structure: docs/B2-docs/{epic}/{story}/raw-{raw key}/issues/I-*.md
+        if not entries and (issue.path.startswith("docs/B2-docs/ibm/_legacy-issues/I-") or (issue.path.startswith("docs/B2-docs/") and "/issues/I-" in issue.path)):
             try:
                 text = read_repo_text(issue.path)
                 m = re.search(r"^canonical_issue_path:\s*(.+?)\s*$", text, re.MULTILINE)
@@ -1622,7 +1622,7 @@ def main() -> int:
                 continue
             # Raw issues (B1 input) have their own valid phases (proposed/absorbed/dropped).
             # Skip the B2 execution-phase check for raw issues.
-            if owner_issue.path.startswith("docs/issues/raw-"):
+            if owner_issue.path.startswith("docs/B1-docs/raw-"):
                 continue
             phase = normalized_phase(owner_issue.phase_state)
             if phase not in capability_owner_phases:
@@ -1660,7 +1660,7 @@ def main() -> int:
             if not owner_issue:
                 continue
             # Raw issues (B1 input) don't need verification_artifact_dir.
-            if owner_issue.path.startswith("docs/issues/raw-"):
+            if owner_issue.path.startswith("docs/B1-docs/raw-"):
                 continue
 
             verification_dir = normalize_scalar(owner_issue.verification_artifact_dir or "")
@@ -1679,7 +1679,7 @@ def main() -> int:
             if not verification_artifact_dir_is_scoped(verification_dir):
                 errors.append(
                     f"{owner_issue.issue_id or owner_issue.path} in {owner_issue.path} uses verification_artifact_dir '{verification_dir}', which is too broad or non-canonical. "
-                    f"Use an issue-scoped docs/epics/.../code-reviews directory before merging implementation-bearing changes."
+                    f"Use an issue-scoped docs/B2-docs/.../code-reviews directory before merging implementation-bearing changes."
                 )
                 continue
 
@@ -1776,7 +1776,7 @@ def main() -> int:
                     f"Prefer formal I-{{issue-id}} identities for new develop-bound work."
                 )
 
-    # GATE 6.2: linked issues must have platform_ids in docs/issues/
+    # GATE 6.2: linked issues must have platform_ids in docs/B1-docs/
     for issue_path in sorted(issue_bound_issue_paths):
         matched = re.match(r".*/(I-\d{8}-\d{4}[A-Za-z0-9-]*)\.md$", issue_path)
         if not matched:
@@ -1788,12 +1788,12 @@ def main() -> int:
                 docs_text = f.read()
             if "platform_ids:" not in docs_text or "issue_id:" not in docs_text.split("platform_ids:")[1][:100] if "platform_ids:" in docs_text else True:
                 errors.append(
-                    f"GATE 6.2: {issue_local_id} in docs/issues/ has no platform_ids. "
+                    f"GATE 6.2: {issue_local_id} in docs/B1-docs/ has no platform_ids. "
                     "Run bin/issue-sync-bootstrap to sync before merge."
                 )
         else:
             errors.append(
-                f"GATE 6.2: {issue_local_id} has no docs/issues/ entry. "
+                f"GATE 6.2: {issue_local_id} has no docs/B1-docs/ entry. "
                 "Run bin/issue-sync-bootstrap to create it before merge."
             )
 
