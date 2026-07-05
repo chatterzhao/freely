@@ -945,6 +945,9 @@
   <rect id="epic-runtime-core" x="35" y="18187" width="700" height="70" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
   <text x="50" y="18211" font-size="13" font-weight="bold" fill="#1a73e8">runtime-core</text>
   <rect id="story-safe-state-io" x="55" y="18195" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
+  <rect id="story-bridge-init" x="55" y="18217" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
+  <text x="65" y="18232" font-size="11" fill="#34a853">bridge-init</text>
+
   <text x="65" y="18210" font-size="11" fill="#333">safe-state-io</text>
   <rect id="epic-git-hygiene" x="35" y="18257" width="700" height="70" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
   <text x="50" y="18281" font-size="13" font-weight="bold" fill="#1a73e8">git-hygiene</text>
