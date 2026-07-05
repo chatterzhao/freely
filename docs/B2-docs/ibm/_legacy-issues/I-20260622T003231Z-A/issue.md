@@ -11,7 +11,7 @@ platform_ids:
 primary_platform: github
 canonical_issue_path: docs/epics/hook-bash-local-fix
 source_candidate: docs/B1-docs/raw-20260622T003231Z/candidates.md#C-20260622T003231Z-A
-verification_artifact_dir: docs/epics/hook-bash-local-fix/code-reviews
+verification_artifact_dir: docs/B2-docs/hook-bash-local-fix/code-reviews
 created_at: '2026-06-22T00:32:48Z'
 updated_at: '2026-06-22T00:32:48Z'
 author: platform

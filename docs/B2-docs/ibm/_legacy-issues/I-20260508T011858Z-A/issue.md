@@ -20,7 +20,7 @@ author: zhaoquan
 channel: feat-execution
 session_refs: []
 pre_tests_path: docs/B2-docs/skill-gate-alignment/verification/pre-tests.md
-verification_artifact_dir: docs/epics/skill-gate-alignment/code-reviews
+verification_artifact_dir: docs/B2-docs/skill-gate-alignment/code-reviews
 platform_state: closed
 ---
 
@@ -28,7 +28,7 @@ platform_state: closed
 
 - source_candidate: docs/B1-docs/raw-20260508T011858Z/candidates.md
 - pre_tests_path: docs/B2-docs/skill-gate-alignment/verification/pre-tests.md
-- verification_artifact_dir: docs/epics/skill-gate-alignment/code-reviews
+- verification_artifact_dir: docs/B2-docs/skill-gate-alignment/code-reviews
 
 ## 实现
 - doc-B1: candidates.md 完整示例 + milestones 示例

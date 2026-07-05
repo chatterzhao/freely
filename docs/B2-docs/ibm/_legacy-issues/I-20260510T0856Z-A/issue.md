@@ -5,7 +5,7 @@ phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
 promoted_from: raw-20260510T0856Z
 source_candidate: docs/B1-docs/raw-20260510T0856Z/candidates.md
-verification_artifact_dir: docs/epics/mode-switch-guard/code-reviews
+verification_artifact_dir: docs/B2-docs/mode-switch-guard/code-reviews
 pre_tests_path: docs/B2-docs/mode-switch-guard/verification/pre-tests.md
 platform_state: closed
 platform_ids:

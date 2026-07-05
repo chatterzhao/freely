@@ -17,15 +17,15 @@ intake_id: ""
 author: zhaoquan
 channel: freely-fix-execution
 session_refs: []
-pre_tests_path: docs/epics/login-claude-interactive-slot/pre-tests.md
-verification_artifact_dir: docs/epics/login-claude-interactive-slot/code-reviews
+pre_tests_path: docs/B2-docs/login-claude-interactive-slot/pre-tests.md
+verification_artifact_dir: docs/B2-docs/login-claude-interactive-slot/code-reviews
 ---
 
 # I-20260619T033758Z-A: login claude 交互式 slot 命名与 alias 创建
 
 - source_candidate: `docs/B1-docs/raw-20260619T033758Z/candidates.md`
-- pre_tests_path: `docs/epics/login-claude-interactive-slot/pre-tests.md`
-- verification_artifact_dir: `docs/epics/login-claude-interactive-slot/code-reviews`
+- pre_tests_path: `docs/B2-docs/login-claude-interactive-slot/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/login-claude-interactive-slot/code-reviews`
 
 ## 实现
 

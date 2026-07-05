@@ -4,7 +4,7 @@
 - milestone: M-20260624T141559Z-A
 - source_candidate: docs/B1-docs/raw-20260624T141559Z/candidates.md#C-20260624T141559Z-A
 - source_raw: raw-20260624T141559Z
-- verification_artifact_dir: docs/epics/feedback-issue-sync/code-reviews
+- verification_artifact_dir: docs/B2-docs/feedback-issue-sync/code-reviews
 - canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260624T141559Z-A/issue.md
 - title: cmd_feedback 改为 issue-sync 薄封装
 
@@ -12,8 +12,8 @@
 
 - source_candidate: `docs/B1-docs/raw-20260624T141559Z/candidates.md#C-20260624T141559Z-A`
 - source_raw: `raw-20260624T141559Z`
-- verification_artifact_dir: `docs/epics/feedback-issue-sync/code-reviews`
-- pre_tests_path: `docs/epics/feedback-issue-sync/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/feedback-issue-sync/code-reviews`
+- pre_tests_path: `docs/B2-docs/feedback-issue-sync/pre-tests.md`
 
 ## 实现
 

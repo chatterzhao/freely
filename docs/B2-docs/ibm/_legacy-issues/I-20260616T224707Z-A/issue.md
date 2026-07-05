@@ -16,8 +16,8 @@ intake_id: ''
 author: zhaoquan
 channel: freely-fix-execution
 session_refs: []
-pre_tests_path: docs/epics/acp-session-id-format-fix/pre-tests.md
-verification_artifact_dir: docs/epics/acp-session-id-format-fix/code-reviews
+pre_tests_path: docs/B2-docs/acp-session-id-format-fix/pre-tests.md
+verification_artifact_dir: docs/B2-docs/acp-session-id-format-fix/code-reviews
 platform_state: closed
 ---
 

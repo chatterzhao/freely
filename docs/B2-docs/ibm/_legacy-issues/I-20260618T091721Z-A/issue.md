@@ -3,7 +3,7 @@
 - phase_state: completed
 - milestone: M-20260618T091721Z-A
 - source_candidate: docs/B1-docs/raw-20260618T091721Z-add-claude-md/candidates.md#C-20260618T091721Z-A
-- verification_artifact_dir: docs/epics/add-claude-md-governance/code-reviews
+- verification_artifact_dir: docs/B2-docs/add-claude-md-governance/code-reviews
 - canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260618T091721Z-A/issue.md
 - title: Add CLAUDE.md — automatic AI governance rule loading
 
@@ -24,8 +24,8 @@
 ## Deliverables
 
 ### B2_IBM
-- PRD: `docs/epics/add-claude-md-governance/prd.md`
-- Tasks: `docs/epics/add-claude-md-governance/tasks.md`
+- PRD: `docs/B2-docs/add-claude-md-governance/prd.md`
+- Tasks: `docs/B2-docs/add-claude-md-governance/tasks.md`
 - Code review: `docs/B2-docs/add-claude-md-governance/code-reviews/review.md`
 
 ### Implementation

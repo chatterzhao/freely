@@ -3,7 +3,7 @@
 - phase_state: completed
 - milestone: M-20260619T061448Z-A
 - source_candidate: docs/B1-docs/raw-20260619T061448Z-a2a-h11-noise/candidates.md#C-20260619T061448Z-A
-- verification_artifact_dir: docs/epics/a2a-h11-noise/code-reviews
+- verification_artifact_dir: docs/B2-docs/a2a-h11-noise/code-reviews
 - canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260619T061448Z-A/issue.md
 - title: Suppress A2A server h11 non-HTTP noise
 

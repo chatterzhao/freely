@@ -21,7 +21,7 @@ author: zhaoquan
 channel: freely-fix-execution
 session_refs: []
 pre_tests_path: docs/B2-docs/supervisor-crash/verification/pre-tests.md
-verification_artifact_dir: docs/epics/supervisor-crash/code-reviews
+verification_artifact_dir: docs/B2-docs/supervisor-crash/code-reviews
 milestone: M-20260521T032154Z-A
 ---
 
@@ -29,7 +29,7 @@ milestone: M-20260521T032154Z-A
 
 - source_candidate: `docs/B1-docs/raw-20260521T032154Z/candidates.md#C-20260521T032154Z-A`
 - pre_tests_path: `docs/B2-docs/supervisor-crash/verification/pre-tests.md`
-- verification_artifact_dir: `docs/epics/supervisor-crash/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/supervisor-crash/code-reviews`
 - milestone: M-20260521T032154Z-A
 
 ## Problem

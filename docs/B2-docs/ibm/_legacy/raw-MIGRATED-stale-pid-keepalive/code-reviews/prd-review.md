@@ -7,7 +7,7 @@ issue_id: I-20260521T012042Z-A
 - issue_id: I-20260521T012042Z-A
 
 **Reviewer:** B2_IBM (design review mode)
-**Artifact:** `docs/epics/stale-pid-keepalive/prd.md`
+**Artifact:** `docs/B2-docs/stale-pid-keepalive/prd.md`
 **Date:** 2026-05-21
 
 ## Summary

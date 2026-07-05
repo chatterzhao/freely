@@ -5,7 +5,7 @@
 - phase_state: completed
 - milestone: M-20260625T084506Z-A
 - source_candidate: docs/B1-docs/raw-20260625T084506Z/candidates.md#C-20260625T084506Z-A
-- verification_artifact_dir: docs/epics/b2-ibm-anti-cheating/code-reviews
+- verification_artifact_dir: docs/B2-docs/b2-ibm-anti-cheating/code-reviews
 - canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260625T084506Z-A/issue.md
 - source_raw: raw-20260625T084506Z
 - pre_tests_path: docs/B2-docs/b2-ibm-anti-cheating/verification/pre-tests.md
@@ -14,7 +14,7 @@
 # I-20260625T084506Z-A: B2_IBM skill 反糊弄铁律 + gate E2E/集成测试层级检查
 
 - source_candidate: docs/B1-docs/raw-20260625T084506Z/candidates.md#C-20260625T084506Z-A
-- verification_artifact_dir: docs/epics/b2-ibm-anti-cheating/code-reviews
+- verification_artifact_dir: docs/B2-docs/b2-ibm-anti-cheating/code-reviews
 - pre_tests_path: docs/B2-docs/b2-ibm-anti-cheating/verification/pre-tests.md
 
 ## 实现

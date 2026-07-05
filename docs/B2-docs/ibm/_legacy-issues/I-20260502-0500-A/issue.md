@@ -4,9 +4,9 @@ issue_title: Freely 打包与自举验证
 kind: linked
 phase_state: completed
 promoted_from: pre-brainstorms/20260502-0500--freely-packaging-selfhost
-pre_tests_path: docs/epics/freely-packaging-selfhost/pre-tests.md
-tasks_path: docs/epics/freely-packaging-selfhost/tasks.md
-verification_artifact_dir: docs/epics/freely-packaging-selfhost/code-reviews
+pre_tests_path: docs/B2-docs/freely-packaging-selfhost/pre-tests.md
+tasks_path: docs/B2-docs/freely-packaging-selfhost/tasks.md
+verification_artifact_dir: docs/B2-docs/freely-packaging-selfhost/code-reviews
 platform_ids:
   github:
     issue_id: '1145'
@@ -31,9 +31,9 @@ platform_state: closed
 
 ## Artifacts
 
-- PRD: docs/epics/freely-packaging-selfhost/prd.md
-- Pre-Tests: docs/epics/freely-packaging-selfhost/pre-tests.md
-- Tasks: docs/epics/freely-packaging-selfhost/tasks.md
+- PRD: docs/B2-docs/freely-packaging-selfhost/prd.md
+- Pre-Tests: docs/B2-docs/freely-packaging-selfhost/pre-tests.md
+- Tasks: docs/B2-docs/freely-packaging-selfhost/tasks.md
 - Brainstorm: docs/B2-docs/freely-packaging-selfhost/brainstorms/b-packaging-selfhost.md
 - Code Reviews: docs/B2-docs/freely-packaging-selfhost/code-reviews/
 - Implementation Decision: docs/B2-docs/freely-packaging-selfhost/code-reviews/Implementation-Decision-Note.md

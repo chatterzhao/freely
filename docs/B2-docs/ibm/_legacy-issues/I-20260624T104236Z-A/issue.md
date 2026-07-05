@@ -14,7 +14,7 @@ platform_ids:
     url: https://github.com/chatterzhao/freely/issues/3428
 primary_platform: github
 pre_tests_path: ''
-verification_artifact_dir: docs/epics/fix-govern-first-skill-pointer/code-reviews
+verification_artifact_dir: docs/B2-docs/fix-govern-first-skill-pointer/code-reviews
 platform_state: open
 ---
 # I-20260624T104236Z-A: Add skill doc pointer after Fix/Govern first

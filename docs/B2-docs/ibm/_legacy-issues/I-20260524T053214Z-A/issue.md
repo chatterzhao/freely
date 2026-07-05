@@ -22,7 +22,7 @@ author: zhaoquan
 channel: freely-fix-execution
 session_refs: []
 pre_tests_path: docs/B1-docs/raw-20260524T053214Z/pre-tests.md
-verification_artifact_dir: docs/epics/acp-tool-switch-integration/code-reviews
+verification_artifact_dir: docs/B2-docs/acp-tool-switch-integration/code-reviews
 milestone: M-20260524T053214Z-A
 milestone_state: committed
 platform_state: closed
@@ -32,7 +32,7 @@ platform_state: closed
 
 - source_candidate: `docs/B1-docs/raw-20260524T053214Z/candidates.md`
 - pre_tests_path: `docs/B1-docs/raw-20260524T053214Z/pre-tests.md`
-- verification_artifact_dir: `docs/epics/acp-tool-switch-integration/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/acp-tool-switch-integration/code-reviews`
 
 ## 问题
 

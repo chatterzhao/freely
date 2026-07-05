@@ -4,7 +4,7 @@ kind: linked
 phase_state: absorbed
 promoted_from: raw-20260508T232413Z
 source_candidate: docs/B1-docs/raw-20260508T232413Z/candidates.md#C-20260508T232413Z-A
-verification_artifact_dir: docs/epics/merge-error-ibm-guide/code-reviews
+verification_artifact_dir: docs/B2-docs/merge-error-ibm-guide/code-reviews
 pre_tests_path: docs/B2-docs/merge-error-ibm-guide/verification/pre-tests.md
 platform_state: open
 platform_ids:
@@ -18,4 +18,4 @@ created_at: '2026-05-17T04:48:25Z'
 ---
 # I-20260508T232413Z-A: pr-merge-guarded IBM 阶段引导
 - pre_tests_path: docs/B2-docs/merge-error-ibm-guide/verification/pre-tests.md
-- verification_artifact_dir: docs/epics/merge-error-ibm-guide/code-reviews
+- verification_artifact_dir: docs/B2-docs/merge-error-ibm-guide/code-reviews

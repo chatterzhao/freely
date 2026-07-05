@@ -5,7 +5,7 @@ phase_state: completed
 promoted_from: raw-20260616T044030Z
 source_candidate: docs/B1-docs/raw-20260616T044030Z/candidates.md
 canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260616T044030Z-A/issue.md
-verification_artifact_dir: docs/epics/config-toml-complete/code-reviews
+verification_artifact_dir: docs/B2-docs/config-toml-complete/code-reviews
 platform_ids:
   github:
     issue_id: "2815"

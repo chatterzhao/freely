@@ -3,7 +3,7 @@
 - phase_state: completed
 - milestone: M-20260625T211802Z-A
 - source_candidate: docs/B1-docs/raw-20260625T211802Z/candidates.md#C-20260625T211802Z-A
-- verification_artifact_dir: docs/epics/agent-table-slot-chain/code-reviews
+- verification_artifact_dir: docs/B2-docs/agent-table-slot-chain/code-reviews
 - canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260625T211802Z-A/issue.md
 - source_raw: raw-20260625T211802Z
 - pre_tests_path: docs/B2-docs/agent-table-slot-chain/verification/pre-tests.md
@@ -12,7 +12,7 @@
 # I-20260625T211802Z-A: agent-table slot chain
 
 - source_candidate: docs/B1-docs/raw-20260625T211802Z/candidates.md#C-20260625T211802Z-A
-- verification_artifact_dir: docs/epics/agent-table-slot-chain/code-reviews
+- verification_artifact_dir: docs/B2-docs/agent-table-slot-chain/code-reviews
 - pre_tests_path: docs/B2-docs/agent-table-slot-chain/verification/pre-tests.md
 
 ## 实现

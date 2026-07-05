@@ -4,7 +4,7 @@ kind: linked
 phase_state: done_b2_ibm
 source_raw: raw-20260619T043000Z
 source_candidate: docs/B1-docs/raw-20260619T043000Z/candidates.md#C-20260619T043000Z-A
-verification_artifact_dir: docs/epics/ibm-gate-to-skill-quickref/code-reviews
+verification_artifact_dir: docs/B2-docs/ibm-gate-to-skill-quickref/code-reviews
 platform_ids: {}
 primary_platform: github
 canonical_issue_path: I-20260619T043000Z-A
@@ -16,7 +16,7 @@ session_refs: []
 # I-20260619T043000Z-A: IBM治理快速达标
 
 - source_candidate: docs/B1-docs/raw-20260619T043000Z/candidates.md#C-20260619T043000Z-A
-- verification_artifact_dir: docs/epics/ibm-gate-to-skill-quickref/code-reviews
+- verification_artifact_dir: docs/B2-docs/ibm-gate-to-skill-quickref/code-reviews
 
 ## 实现范围
 

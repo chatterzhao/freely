@@ -9,7 +9,7 @@ platform_ids:
   github:
     issue_id: '253'
 pre_tests_path: docs/B2-docs/wt-create-fix/verification/pre-tests.md
-verification_artifact_dir: docs/epics/wt-create-fix/code-reviews
+verification_artifact_dir: docs/B2-docs/wt-create-fix/code-reviews
 platform_state: closed
 updated_at: '2026-05-12T14:23:43Z'
 ---
@@ -18,7 +18,7 @@ updated_at: '2026-05-12T14:23:43Z'
 
 - source_candidate: docs/B1-docs/raw-20260508T120000Z/candidates.md
 - pre_tests_path: docs/B2-docs/wt-create-fix/verification/pre-tests.md
-- verification_artifact_dir: docs/epics/wt-create-fix/code-reviews
+- verification_artifact_dir: docs/B2-docs/wt-create-fix/code-reviews
 
 ## 实现
 - _extract_issue_key: [0-9]{4} → [0-9]{4,6}

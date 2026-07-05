@@ -13,6 +13,6 @@ platform_ids:
     issue_id: '3403'
 primary_platform: github
 pre_tests_path: docs/B2-docs/remove-json5-fallback/verification/pre-tests.md
-verification_artifact_dir: docs/epics/remove-json5-fallback/code-reviews
+verification_artifact_dir: docs/B2-docs/remove-json5-fallback/code-reviews
 ---
 # I-20260624T055231Z-A: 彻底移除 JSON5 回退

@@ -7,9 +7,9 @@
 ## B2_IBM 完成
 
 B2 产物已提交:
-- PRD: docs/epics/freely-packaging-selfhost/prd.md
-- Pre-Tests: docs/epics/freely-packaging-selfhost/pre-tests.md (+ v2 adequacy judgments)
-- Tasks: docs/epics/freely-packaging-selfhost/tasks.md
+- PRD: docs/B2-docs/freely-packaging-selfhost/prd.md
+- Pre-Tests: docs/B2-docs/freely-packaging-selfhost/pre-tests.md (+ v2 adequacy judgments)
+- Tasks: docs/B2-docs/freely-packaging-selfhost/tasks.md
 - Code Reviews: docs/B2-docs/freely-packaging-selfhost/code-reviews/Implementation-Decision-Note.md
 - Brainstorm: docs/B2-docs/freely-packaging-selfhost/brainstorms/b-packaging-selfhost.md
 

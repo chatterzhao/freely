@@ -11,7 +11,7 @@ title: 'fix: probe/resume_target/capabilities registry-driven'
 platform_ids: {}
 primary_platform: github
 pre_tests_path: docs/B2-docs/registry-probe-boundary-resume/verification/pre-tests.md
-verification_artifact_dir: docs/epics/registry-probe-boundary-resume/code-reviews
+verification_artifact_dir: docs/B2-docs/registry-probe-boundary-resume/code-reviews
 platform_state: open
 ---
 # I-20260624T090651Z-A: probe/resume/capabilities registry-driven

@@ -20,16 +20,16 @@ intake_id: ''
 author: zhaoquan
 channel: freely-fix-execution
 session_refs: []
-pre_tests_path: docs/epics/merge-guard-rebase-integrity/pre-tests.md
-verification_artifact_dir: docs/epics/merge-guard-rebase-integrity/code-reviews
+pre_tests_path: docs/B2-docs/merge-guard-rebase-integrity/pre-tests.md
+verification_artifact_dir: docs/B2-docs/merge-guard-rebase-integrity/code-reviews
 platform_state: closed
 ---
 
 # I-20260617T055840Z-A: Merge Guard + Rebase Integrity
 
 - source_candidate: `docs/B1-docs/raw-20260617T055840Z/candidates.md`
-- pre_tests_path: `docs/epics/merge-guard-rebase-integrity/pre-tests.md`
-- verification_artifact_dir: `docs/epics/merge-guard-rebase-integrity/code-reviews`
+- pre_tests_path: `docs/B2-docs/merge-guard-rebase-integrity/pre-tests.md`
+- verification_artifact_dir: `docs/B2-docs/merge-guard-rebase-integrity/code-reviews`
 - branch: `fix/raw-20260617T055840Z-merge-guard-rebase-integrity`
 
 ## 目标

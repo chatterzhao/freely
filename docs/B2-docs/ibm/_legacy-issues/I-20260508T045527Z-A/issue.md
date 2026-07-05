@@ -5,7 +5,7 @@ phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
 promoted_from: raw-20260508T045527Z
 source_candidate: docs/B1-docs/raw-20260508T045527Z/candidates.md#C-20260508T045527Z-A
-verification_artifact_dir: docs/epics/cleanup-scan/code-reviews
+verification_artifact_dir: docs/B2-docs/cleanup-scan/code-reviews
 pre_tests_path: docs/B2-docs/cleanup-scan/verification/pre-tests.md
 platform_state: closed
 platform_ids:

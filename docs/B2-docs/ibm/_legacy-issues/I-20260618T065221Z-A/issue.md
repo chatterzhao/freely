@@ -5,7 +5,7 @@ status: in_dev
 phase_state: completed
 promoted_from: raw-20260618T065221Z
 source_candidate: docs/B1-docs/raw-20260618T065221Z/candidates.md
-verification_artifact_dir: docs/epics/pr-merge-local-merge/code-reviews
+verification_artifact_dir: docs/B2-docs/pr-merge-local-merge/code-reviews
 platform_ids: {}
 primary_platform: ''
 created_at: 2026-06-18 06:52:21+00:00

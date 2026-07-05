@@ -3,8 +3,8 @@
 - issue_id: I-20260503T0915Z-enforce-test-pre-merge
 - source_candidate: docs/B1-docs/raw-MIGRATED/candidates.md
 - phase_state: in_dev
-- verification_artifact_dir: docs/epics/test-pre-merge-enforcement/code-reviews
-- pre_tests_path: `docs/epics/test-pre-merge-enforcement/pre-tests.md`
+- verification_artifact_dir: docs/B2-docs/test-pre-merge-enforcement/code-reviews
+- pre_tests_path: `docs/B2-docs/test-pre-merge-enforcement/pre-tests.md`
 - platform_ids:
   github:
     - "180"

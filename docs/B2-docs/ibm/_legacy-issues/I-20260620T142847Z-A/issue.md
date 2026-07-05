@@ -3,7 +3,7 @@
 - phase_state: completed
 - milestone: M-20260620T142847Z-A
 - source_candidate: docs/B1-docs/raw-20260620T142847Z-pr-review-worktree/candidates.md#C-20260620T142847Z-A
-- verification_artifact_dir: docs/epics/pr-review-worktree-detection/code-reviews
+- verification_artifact_dir: docs/B2-docs/pr-review-worktree-detection/code-reviews
 - canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260620T142847Z-A/issue.md
 - title: pr-review-guarded worktree detection + auto issue_id
 

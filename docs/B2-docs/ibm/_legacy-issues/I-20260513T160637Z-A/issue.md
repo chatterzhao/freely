@@ -4,7 +4,7 @@ kind: linked
 phase_state: absorbed
 promoted_from: raw-20260513T160637Z
 source_candidate: docs/B1-docs/raw-20260513T160637Z/candidates.md#C-20260513T160637Z-A
-verification_artifact_dir: docs/epics/start-lead-agent-backtick-fix/code-reviews
+verification_artifact_dir: docs/B2-docs/start-lead-agent-backtick-fix/code-reviews
 pre_tests_path: docs/B2-docs/start-lead-agent-backtick-fix/verification/pre-tests.md
 platform_state: closed
 platform_ids:

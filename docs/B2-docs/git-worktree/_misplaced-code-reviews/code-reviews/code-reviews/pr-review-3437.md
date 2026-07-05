@@ -21,7 +21,7 @@
 
 ## 4. Pre-test Evidence
 ^- status: passed
-- evidence: pre-tests.md in docs/epics/feedback-issue-sync/, 5 acceptance items all passed
+- evidence: pre-tests.md in docs/B2-docs/feedback-issue-sync/, 5 acceptance items all passed
 
 ## 5. Receipt Integrity
 - status: n/a

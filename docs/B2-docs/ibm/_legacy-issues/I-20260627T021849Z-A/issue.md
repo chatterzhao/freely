@@ -4,7 +4,7 @@
 - milestone: M-20260627T021849Z-A
 - source_raw: raw-20260627T021849Z
 - source_candidate: docs/B1-docs/raw-20260627T021849Z/candidates.md#C-20260627T021849Z-A
-- verification_artifact_dir: docs/epics/platform-only-no-local-file/code-reviews
+- verification_artifact_dir: docs/B2-docs/platform-only-no-local-file/code-reviews
 - canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260627T021849Z-A/issue.md
 - title: wt-close --platform-only fallback
 - pre_tests_path: docs/B2-docs/platform-only-no-local-file/verification/pre-tests.md

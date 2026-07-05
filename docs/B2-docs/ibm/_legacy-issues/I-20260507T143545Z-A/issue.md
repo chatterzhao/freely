@@ -20,7 +20,7 @@ author: zhaoquan
 channel: feat-execution
 session_refs: []
 pre_tests_path: docs/B2-docs/timestamp-seconds-upgrade/verification/pre-tests.md
-verification_artifact_dir: docs/epics/timestamp-seconds-upgrade/code-reviews
+verification_artifact_dir: docs/B2-docs/timestamp-seconds-upgrade/code-reviews
 platform_state: closed
 ---
 
@@ -28,7 +28,7 @@ platform_state: closed
 
 - source_candidate: docs/B1-docs/raw-20260507T143545Z/candidates.md
 - pre_tests_path: docs/B2-docs/timestamp-seconds-upgrade/verification/pre-tests.md
-- verification_artifact_dir: docs/epics/timestamp-seconds-upgrade/code-reviews
+- verification_artifact_dir: docs/B2-docs/timestamp-seconds-upgrade/code-reviews
 
 ## 实现
 - _normalize_key_variants: 支持 6位秒 + bare→new

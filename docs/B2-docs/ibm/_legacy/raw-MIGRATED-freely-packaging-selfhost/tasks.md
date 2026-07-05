@@ -34,4 +34,4 @@
 - description: issue/PRD/pre-tests/tasks/code-review/milestones 治理产物维护
 - owner: I-20260502-0500-A
 - status: completed
-- artifact: docs/epics/freely-packaging-selfhost/
+- artifact: docs/B2-docs/freely-packaging-selfhost/

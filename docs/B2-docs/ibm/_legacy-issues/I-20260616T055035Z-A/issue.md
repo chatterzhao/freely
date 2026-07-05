@@ -15,13 +15,13 @@ intake_id: ""
 author: claude
 channel: freely-fix-execution
 session_refs: []
-verification_artifact_dir: docs/epics/a2a-hygiene-after-run/code-reviews
+verification_artifact_dir: docs/B2-docs/a2a-hygiene-after-run/code-reviews
 ---
 
 # I-20260616T055035Z-A: A2A server hygiene + after-run worker detection for prompt mode
 
 - source_candidate: `docs/B1-docs/raw-20260616T055035Z/candidates.md`
-- verification_artifact_dir: `docs/epics/a2a-hygiene-after-run/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/a2a-hygiene-after-run/code-reviews`
 
 ## Summary
 

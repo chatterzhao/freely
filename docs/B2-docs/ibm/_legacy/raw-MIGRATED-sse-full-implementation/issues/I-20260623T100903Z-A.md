@@ -23,14 +23,14 @@ session_refs:
   - session_id: ses_10db3c52bffeGN8LMZ4sJ03H7f
   - analysis_issue: https://github.com/chatterzhao/freely/issues/3381
 pre_tests_path: docs/B2-docs/sse-full-implementation/verification/pre-tests.md
-verification_artifact_dir: docs/epics/sse-full-implementation/code-reviews
+verification_artifact_dir: docs/B2-docs/sse-full-implementation/code-reviews
 ---
 
 # I-20260623T100903Z-A: 彻底实现 SSE
 
 - source_candidate: `docs/B1-docs/raw-20260623T100903Z/candidates.md`
 - pre_tests_path: `docs/B2-docs/sse-full-implementation/verification/pre-tests.md`
-- verification_artifact_dir: `docs/epics/sse-full-implementation/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/sse-full-implementation/code-reviews`
 
 ## 概述
 

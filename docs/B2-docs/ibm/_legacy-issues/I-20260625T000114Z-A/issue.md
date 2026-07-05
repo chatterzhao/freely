@@ -3,6 +3,6 @@
 - phase_state: completed
 - milestone: M-20260625T000114Z-A
 - source_candidate: docs/B1-docs/raw-20260625T000114Z/candidates.md#C-20260625T000114Z-A
-- verification_artifact_dir: docs/epics/path-var-unify/code-reviews
+- verification_artifact_dir: docs/B2-docs/path-var-unify/code-reviews
 - canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260625T000114Z-A/issue.md
 - title: wt-close -D fix

@@ -17,14 +17,14 @@ author: zhaoquan
 channel: freely-feat-execution
 session_refs: []
 pre_tests_path: docs/B2-docs/acp-a2a-refactor/verification/pre-tests.md
-verification_artifact_dir: docs/epics/acp-a2a-refactor/code-reviews
+verification_artifact_dir: docs/B2-docs/acp-a2a-refactor/code-reviews
 ---
 
 # I-20260617T011030Z-A: ACP/A2A 架构重构
 
 - source_candidate: `docs/B1-docs/raw-20260617T011030Z/candidates.md`
 - pre_tests_path: `docs/B2-docs/acp-a2a-refactor/verification/pre-tests.md`
-- verification_artifact_dir: `docs/epics/acp-a2a-refactor/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/acp-a2a-refactor/code-reviews`
 - milestone: M-20260617T011030Z-A
 
 ## 实现

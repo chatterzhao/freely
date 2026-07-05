@@ -11,7 +11,7 @@ title: 'feat: adapter/ACP dispatch/launch_kind/tool family 注册表驱动化'
 platform_ids: {}
 primary_platform: github
 pre_tests_path: docs/B2-docs/registry-adapter-acp-dispatch/verification/pre-tests.md
-verification_artifact_dir: docs/epics/registry-adapter-acp-dispatch/code-reviews
+verification_artifact_dir: docs/B2-docs/registry-adapter-acp-dispatch/code-reviews
 platform_state: open
 updated_at: '2026-06-24T09:06:35Z'
 ---
@@ -19,7 +19,7 @@ updated_at: '2026-06-24T09:06:35Z'
 
 - source_candidate: `docs/B1-docs/raw-20260624T090635Z/candidates.md`
 - pre_tests_path: `docs/B2-docs/registry-adapter-acp-dispatch/verification/pre-tests.md`
-- verification_artifact_dir: `docs/epics/registry-adapter-acp-dispatch/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/registry-adapter-acp-dispatch/code-reviews`
 
 ## 改动
 6 个函数/位置的硬编码 case 分支改为 registry 驱动查询。

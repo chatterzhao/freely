@@ -79,7 +79,7 @@
 - surface_kind: `integration`
 - target_lane: `premerge-integration`
 - promotion_gate: `develop_merge`
-- task_refs: `T-005 in docs/epics/test-pre-merge-enforcement/tasks.md`
+- task_refs: `T-005 in docs/B2-docs/test-pre-merge-enforcement/tasks.md`
 - case_design: `Merge feature/raw-20260503T0915Z-enforce-test-pre-merge into test-pre-merge-enforce-gate-20260503 via pr-merge-guarded, then merge into develop via pr-merge-guarded, verifying each step produces guarded receipts and passes governance gates.`
 - evidence_level: `integration`
 - status: `pass`

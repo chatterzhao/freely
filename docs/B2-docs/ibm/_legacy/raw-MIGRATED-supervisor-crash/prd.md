@@ -31,6 +31,6 @@ The `_on_supervisor_err` function is called by `trap '_on_supervisor_err $LINENO
 
 - Issue: I-20260521T032154Z-A
 - Worktree: fix/raw-20260521T032154Z-supervisor-crash-b2
-- Epic: docs/epics/supervisor-crash/
+- Epic: docs/B2-docs/supervisor-crash/
 - Implementation boundary: single function `_on_supervisor_err`, ~4 lines affected
 - Verification: pre-tests.md → test the fix; code-reviews/ → decision note

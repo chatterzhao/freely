@@ -3,5 +3,5 @@
 - phase_state: completed
 - milestone: M-20260522T030835Z-A
 - source_candidate: docs/B1-docs/raw-20260522T030835Z/candidates.md#C-20260522T030835Z-A
-- verification_artifact_dir: docs/epics/ai-cli-apikey-alias-switch/code-reviews
+- verification_artifact_dir: docs/B2-docs/ai-cli-apikey-alias-switch/code-reviews
 - canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260522T030835Z-A/issue.md

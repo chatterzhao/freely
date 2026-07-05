@@ -21,7 +21,7 @@ author: zhaoquan
 channel: freely-fix-execution
 session_refs: []
 pre_tests_path: docs/B2-docs/freely-db-cli-agents-fix/verification/pre-tests.md
-verification_artifact_dir: docs/epics/freely-db-cli-agents-fix/code-reviews
+verification_artifact_dir: docs/B2-docs/freely-db-cli-agents-fix/code-reviews
 platform_state: closed
 ---
 
@@ -29,7 +29,7 @@ platform_state: closed
 
 - source_candidate: `docs/B1-docs/raw-20260617T145428Z/candidates.md`
 - pre_tests_path: `docs/B2-docs/freely-db-cli-agents-fix/verification/pre-tests.md`
-- verification_artifact_dir: `docs/epics/freely-db-cli-agents-fix/code-reviews`
+- verification_artifact_dir: `docs/B2-docs/freely-db-cli-agents-fix/code-reviews`
 
 ## 实现
 

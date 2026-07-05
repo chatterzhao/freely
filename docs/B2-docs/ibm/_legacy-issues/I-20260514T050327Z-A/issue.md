@@ -6,7 +6,7 @@ completed_at: "2026-05-19T23:20:00Z"
 absorbed_at: '2026-05-16T14:27:11Z'
 promoted_from: raw-20260514T050327Z
 source_candidate: docs/B1-docs/raw-20260514T050327Z/candidates.md#C-20260514T050327Z-A
-verification_artifact_dir: docs/epics/while-then-typo/code-reviews
+verification_artifact_dir: docs/B2-docs/while-then-typo/code-reviews
 pre_tests_path: docs/B2-docs/while-then-typo/verification/pre-tests.md
 platform_ids:
   github:

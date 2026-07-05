@@ -26,9 +26,9 @@ title: Fix write_task_mode ordering — ensure DB daemon running first
 ## Deliverables
 
 ### B2_IBM
-- PRD: `docs/epics/write-task-mode-ordering/prd.md`
-- Pre-tests: `docs/epics/write-task-mode-ordering/pre-tests.md`
-- Tasks: `docs/epics/write-task-mode-ordering/tasks.md`
+- PRD: `docs/B2-docs/write-task-mode-ordering/prd.md`
+- Pre-tests: `docs/B2-docs/write-task-mode-ordering/pre-tests.md`
+- Tasks: `docs/B2-docs/write-task-mode-ordering/tasks.md`
 - Code review: `docs/B2-docs/write-task-mode-ordering/code-reviews/review.md`
 
 ### Implementation

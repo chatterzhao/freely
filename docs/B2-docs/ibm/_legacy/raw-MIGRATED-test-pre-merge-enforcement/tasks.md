@@ -24,7 +24,7 @@
 - description: Epic PRD, issue, progress, milestones, pre-brainstorm, code review, and pre-tests artifacts
 - owner: I-20260503T0915Z-enforce-test-pre-merge
 - status: completed
-- artifact: docs/epics/test-pre-merge-enforcement/
+- artifact: docs/B2-docs/test-pre-merge-enforcement/
 
 ### T-005 self-bootstrap verification
 - description: Merge feature→test-pre-merge→develop to verify the gate enforces itself

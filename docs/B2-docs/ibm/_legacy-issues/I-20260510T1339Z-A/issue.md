@@ -5,7 +5,7 @@ phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
 promoted_from: raw-20260510T1339Z
 source_candidate: docs/B1-docs/raw-20260510T1339Z/candidates.md
-verification_artifact_dir: docs/epics/wt-create-order/code-reviews
+verification_artifact_dir: docs/B2-docs/wt-create-order/code-reviews
 pre_tests_path: docs/B2-docs/wt-create-order/verification/pre-tests.md
 platform_state: closed
 platform_ids:

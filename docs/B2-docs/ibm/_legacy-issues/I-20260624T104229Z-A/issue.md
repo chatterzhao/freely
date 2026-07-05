@@ -11,7 +11,7 @@ title: 'fix: wt-create success message → read skill'
 platform_ids: {}
 primary_platform: github
 pre_tests_path: docs/B2-docs/wt-create-skill-prompt/verification/pre-tests.md
-verification_artifact_dir: docs/epics/wt-create-skill-prompt/code-reviews
+verification_artifact_dir: docs/B2-docs/wt-create-skill-prompt/code-reviews
 platform_state: open
 ---
 # I-20260624T104229Z-A: wt-create success message fix

@@ -3,7 +3,7 @@
 - phase_state: completed
 - milestone: M-20260620T142838Z-A
 - source_candidate: docs/B1-docs/raw-20260620T142838Z-cgrab-yaml-fallback/candidates.md#C-20260620T142838Z-A
-- verification_artifact_dir: docs/epics/cgrab-yaml-fallback/code-reviews
+- verification_artifact_dir: docs/B2-docs/cgrab-yaml-fallback/code-reviews
 - canonical_issue_path: docs/B2-docs/ibm/_legacy-issues/I-20260620T142838Z-A/issue.md
 - title: cgrab YAML fallback + skill format docs
 
