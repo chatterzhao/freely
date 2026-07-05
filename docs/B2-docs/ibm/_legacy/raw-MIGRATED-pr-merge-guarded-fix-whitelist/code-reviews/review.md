@@ -1,0 +1,11 @@
+# Code Review: pr-merge-guarded fix/* whitelist
+
+- issue_id: `raw-20260506T140000Z`
+- issue_path: `docs/B1-docs/raw-20260506T140000Z/issue.md`
+
+## Implementation Decision Note
+- decision: Add fix/* to pr-merge-guarded whitelist
+- why_this: fix-execution skill produces fix/* branches that need to merge to test-pre-merge
+- alternatives_considered: None — fix/* branches must be supported
+- boundary_non_goals: Other merge directions unchanged
+- residual_risk: None — one-line change in 3 places

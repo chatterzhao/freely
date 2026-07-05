@@ -1,6 +1,0 @@
-- issue_id: I-20260522T075839Z-A
-- kind: fix
-- phase_state: completed
-- milestone: M-20260522T075839Z-A
-- source_candidate: docs/pre-brainstorms/20260522T075839Z--switch-auto-extract-tool/candidates.md#C-20260522T075839Z-A
-- canonical_issue_path: docs/issues/I-20260522T075839Z-A/issue.md

@@ -1,0 +1,22 @@
+# 候选：latest-manager-continuity-worker-consumption
+
+- id: `C-20260322T044500Z-A`
+- title: Make manager runtime consume the latest manager continuity and worker prompt set
+- source_brainstorm: `docs/B1-docs/raw-20260322T044500Z/brainstorms.md`
+- status: `promoted`
+- milestone: `M-20260306-workspace-routing-foundation`
+- promoted_issue_path: `docs/B2-docs/ibm/latest-manager-continuity-worker-consumption-governance/issues/latest-manager-continuity-worker-consumption-governance.md`
+- legacy_id_mapping: I-20260322T044500Z  # 历史遗留的 issue id
+- session_refs: []
+- why_now:
+  - real dogfooding shows manager can now produce correct worktree dispositions
+  - but runtime still leaves workers on older delegated continuations even after a newer manager continuity and prompt set are generated
+  - this blocks true autonomous followthrough from supervision to worker execution
+- expected_outcome:
+  - define a canonical latest-continuity consumption contract for worker launch/reentry
+  - ensure active workers can be reentered against the newest delegated prompt set
+  - expose generated/consumed prompt-set truth in runtime observability
+- acceptance_hint:
+  - after a new manager continuity is written, worker launch state moves to that continuity instead of staying on the previous one
+  - worker `live-status` reflects the newly delegated intake/prompt set, not an older one
+  - `develop -> manager continuity -> worker prompt -> runtime launch/reentry` closes on the latest supervision round

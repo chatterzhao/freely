@@ -89,7 +89,7 @@
 - 分支/worktree 清理记录
 
 研究优先阶段的等价留痕：
-- 若 `docs/progress/**` / `docs/recovery/**` 尚未启用，允许将验证批次、恢复上下文与 cleanup 结果记录到 `docs/pre-brainstorms/CONVERGENCE.md`
+- 若 `docs/progress/**` / `docs/recovery/**` 尚未启用，允许将验证批次、恢复上下文与 cleanup 结果记录到 `docs/B1-docs/CONVERGENCE.md`
 - 该临时落点只用于当前研究阶段；正式目录启用后，证据必须回到规范路径
 
 执行技能：
@@ -128,7 +128,7 @@
 ## 2B. B2 与 Progress 边界（硬性要求）
 
 判定规则：
-1. `B2_IBM` 中的 `I` 是 milestone-owned issue，而不是任意发现到的问题。正式 B2_IBM 产物目录必须先确定为 `docs/epics/{epic-name}/{story-name}/...`。
+1. `B2_IBM` 中的 `I` 是 milestone-owned issue，而不是任意发现到的问题。正式 B2_IBM 产物目录必须先确定为 `docs/B2-docs/{epic-name}/{story-name}/...`。
 2. candidate 未进入 milestone 前，不得声称已经进入 B2_IBM。
 3. `progress` 只跟踪 dev-loop 中的实现、测试、阻塞、恢复与回写，不跟踪 candidate 收敛或纯 B2 文档收敛。
 4. 若 dev-loop 暴露出边界外新问题，应回到 `pre-brainstorm`，而不是塞回当前 issue 进度。
@@ -208,7 +208,7 @@
 3. `milestone_state` 只表达 milestone 队列归属，建议值保持为 `candidate | committed | completed`；不得再拿它表达 B2 / dev / verification 阶段。
 4. 任何跨环迁移都必须同步更新对应产物，最少遵循：
    - `discovery -> pre_brainstorm`：更新 `brainstorms.md`、`candidates.md`、`milestones.md.candidate_issues`，并使用 `candidate.status=proposed | needs_research | blocked`
-   - `candidate → milestone → I-* issue`（四节点链路）：`freely-doc-B1_IBM-execution` skill 把 candidate（`C-{key}-A`）接入 milestone（`M-{key}-A`，写入 milestones.md candidate_issues）；`freely-doc-B2_IBM-execution` skill 把该 `M-{key}-A` materialize 成 I-* issue（`I-{key}-A`），物化到 `docs/epics/{epic-name}/{story-name}/raw-{raw key}/issues/`，并同步更新 milestones.md committed_issues，然后进入 `phase_state=in_b2_ibm`
+   - `candidate → milestone → I-* issue`（四节点链路）：`freely-doc-B1_IBM-execution` skill 把 candidate（`C-{key}-A`）接入 milestone（`M-{key}-A`，写入 milestones.md candidate_issues）；`freely-doc-B2_IBM-execution` skill 把该 `M-{key}-A` materialize 成 I-* issue（`I-{key}-A`），物化到 `docs/B2-docs/{epic-name}/{story-name}/raw-{raw key}/issues/`，并同步更新 milestones.md committed_issues，然后进入 `phase_state=in_b2_ibm`
    - `in_b2_ibm -> done_b2_ibm`：更新 `issue`、`docs/milestones.md`，不得强制创建 `progress`
    - `done_b2_ibm -> in_dev`：更新 `issue`、`docs/milestones.md`、`progress`
    - `in_dev -> blocked_dev`：更新 `issue`、`progress`、`docs/milestones.md`，并记录 blocker
@@ -585,11 +585,11 @@ merge receipt 字段（写入 protected-branch merge commit message）：
 
 判定规则：
 1. Freely 自身开发遵守同一治理链（意图/宪法/法律/skills）。
-2. 架构治理变更先进入 pre-brainstorms，再进入 doc/dev 落地。
+2. 架构治理变更先进入 B1-docs，再进入 doc/dev 落地。
 3. 工具链治理能力可复用到托管项目。
 
 最小验收证据：
-- pre-brainstorms -> doc/dev 落地链路
+- B1-docs -> doc/dev 落地链路
 - 自举治理检查记录
 
 执行技能：

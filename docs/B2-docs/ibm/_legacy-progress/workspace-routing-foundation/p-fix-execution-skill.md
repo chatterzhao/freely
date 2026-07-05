@@ -1,0 +1,11 @@
+# freely-fix-execution skill
+
+- issue: `I-20260503-0000-B`
+- issue_path: `docs/B2-docs/git-worktree/freely-fix-execution-skill/issues/I-20260503-0000-B.md`
+- candidate: `C-20260503-0000-B`
+- candidate_path: `docs/B1-docs/raw-20260503/candidates.md`
+- milestone: `M-20260306-workspace-routing-foundation`
+- phase_state: `done`
+- runtime_state: `ready_for_merge`
+- updated_at: `2026-05-03T02:00:00Z`
+- next_action: `merge_to_develop_via_merge_guarded`

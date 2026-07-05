@@ -148,15 +148,15 @@ Freely 的角色组织遵循四层：
 
 不要把上述四层全部硬塞到同一个 prompt 或单一 skill 中。
 
-## pre-brainstorms 触发
+## B1-docs 触发
 当任一条件成立时，经 `freely-context-source-skill` 判定后进入 `freely-doc-B1_IBM-execution`：
 - 问题来源已发现，但 `epic/story/milestone` 尚未收敛。
 - 验收边界不清，无法直接进入 `dev-loop`。
 - 需要跨工具或子代理进行分歧收敛。
 
 最小产物：
-- `docs/pre-brainstorms/<id>/brainstorms.md`
-- `docs/pre-brainstorms/<id>/candidates.md`
+- `docs/B1-docs/<id>/brainstorms.md`
+- `docs/B1-docs/<id>/candidates.md`
 - 会话证据（jsonl）在 `candidates.md` 的 `session_refs` 留痕，并在后续 issue / progress / recovery 中继续传播。
 
 ## 完成

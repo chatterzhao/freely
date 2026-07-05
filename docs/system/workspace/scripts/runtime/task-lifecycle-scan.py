@@ -205,7 +205,7 @@ def get_platform_open_issues(project: Path) -> dict[str, dict]:
     cache_file = project / ".freely" / "run" / "platform-open-cache.json"
     cached = cache_get(cache_file, ttl=300)
     if cached is not None:
-        return cached.get("issues", {})
+        return cached.get("B1-docs", {})
 
     issues: dict[str, dict] = {}
     platforms = _detect_platforms(project)
@@ -245,7 +245,7 @@ def get_platform_open_issues(project: Path) -> dict[str, dict]:
         except Exception:
             continue
 
-    cache_put(cache_file, {"issues": issues})
+    cache_put(cache_file, {"B1-docs": issues})
     return issues
 
 def get_all_platform_issue_states(project: Path, open_issues: dict[str, dict]) -> dict[str, str]:
@@ -351,9 +351,9 @@ class A2AChecker:
 # ── Local issue reader ──────────────────────────────────────────────
 
 def read_issues_dir(project: Path) -> list[dict]:
-    """Read all raw-* and I-* issues from docs/issues/ and docs/epics/."""
+    """Read all raw-* and I-* issues from docs/issues/ and docs/B2-docs/."""
     issues = []
-    issues_dir = project / "docs" / "issues"
+    issues_dir = project / "docs" / "B1-docs"
     if issues_dir.is_dir():
         for d in sorted(issues_dir.iterdir()):
             if not d.is_dir():
@@ -381,8 +381,8 @@ def read_issues_dir(project: Path) -> list[dict]:
                 "frontmatter": fm,
             })
 
-    # Also scan I-* issues under new structure: docs/epics/{epic}/{story}/raw-{raw key}/issues/
-    epics_dir = project / "docs" / "epics"
+    # Also scan I-* issues under new structure: docs/B2-docs/{epic}/{story}/raw-{raw key}/issues/
+    epics_dir = project / "docs" / "B2-docs"
     if epics_dir.is_dir():
         for mf in sorted(epics_dir.glob("*/*/raw-*/issues/I-*.md")):
             try:

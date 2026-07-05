@@ -43,9 +43,9 @@ MUST 强制在任何工作开始前遵守`freely-workflow-guarded-execution`这�
 - `docs/CONSTITUTION.md`
 - `docs/LAWS.md`
 - `docs/PROJECT_INTENT.md`
-- `docs/pre-brainstorms/`
+- `docs/B1-docs/`
 - `docs/milestones.md`
-- `docs/epics/`
+- `docs/B2-docs/`
 - `docs/progress/`
 
 ### 2. Freely 开发完成后的能力目录
@@ -86,12 +86,12 @@ MUST 强制在任何工作开始前遵守`freely-workflow-guarded-execution`这�
    - 测未 merge 的主管态示例：`/Users/zhaoyu/Downloads/code/my-freely/freely-worktrees/20260420-feature-startup-task-source-patrol-and-reconcile/bin/freely daemon start --project /Users/zhaoyu/Downloads/code/my-freely/freely`
 2. **大重构先做 fleet sequencing audit**：若当前任务会同时改多层真源、跨多个现有 worktree / issue，或可能重排架构主干，先运行 `git worktree list --porcelain`、`./bin/wt-fleet-status`、`freely live-status --project <project-root>`、`freely fleet-status --project <project-root>`，并把结果与 `docs/milestones.md` / 相关 `progress` 对齐。优先收束 `dirty` 或仍在 `desired=running` 的 worktree，识别必须先合并的上游治理树，再决定是否开大重构 lane；不要在 fleet 状态模糊时直接开始深层重构。
 3. **首跳先判 loop，不要先判 cleanup**：
-   - 如果是 Freely 自举中暴露的新共性问题，先判它是否应成为 Freely 能力发现；若边界未稳定，先进入 B1_IBM（`docs/pre-brainstorms/`）
+   - 如果是 Freely 自举中暴露的新共性问题，先判它是否应成为 Freely 能力发现；若边界未稳定，先进入 B1_IBM（`docs/B1-docs/`）
    - 如果当前变更已落在现有 issue scope 内，优先吸收到既有 `issue / milestones / progress / code-review` 生命周期，不要为了一个新 worktree 再伪造新 candidate / issue
    - 只有当问题已经是“现有 lifecycle 走到 merge / verification / cleanup 哪一步”时，才切到 worktree promotion / retirement 判断
 4. **IBM Framework 路由**：工作项按 `docs/system/workspace/ibm-framework.md` 定义的两阶段推进。
-   - B1_IBM（Input → Brainstorm → Milestone）：Input source（github/gitee issue、chat 插话）→ 预研收敛 → candidate 入里程碑。文档落 `docs/pre-brainstorms/{b1-id}/`
-   - B2_IBM（Input → Brainstorm → Map）：Input source（milestone committed_issues 中的正式 issue）→ 实现设计 → Map 产物（epic/story/{name}/ + PRD + pre-tests + tasks + code-review）。文档落 `docs/epics/{epic-name}/{story-name}/`
+   - B1_IBM（Input → Brainstorm → Milestone）：Input source（github/gitee issue、chat 插话）→ 预研收敛 → candidate 入里程碑。文档落 `docs/B1-docs/{b1-id}/`
+   - B2_IBM（Input → Brainstorm → Map）：Input source（milestone committed_issues 中的正式 issue）→ 实现设计 → Map 产物（epic/story/{name}/ + PRD + pre-tests + tasks + code-review）。文档落 `docs/B2-docs/{epic-name}/{story-name}/`
 
 ## Freely 自举首跳
 
@@ -182,7 +182,7 @@ Freely 必须在 Freely 治理规则下开发，不得有项目特定的例外�
 “吃自己的狗粮”在本项目中的具体含义：
 - Freely 开发过程中暴露的问题，不只是在修当前仓库；但不要把任何新讨论都自动沉淀为 Freely 对外可复用能力。
 - 先判断它是 Freely 自身产品架构、开发治理，还是 Freely 可复用能力。
-- 若某个解决方案最终会被 Freely runtime、agent、skill、CLI 或打包产物长期消费，它必须落到 Freely 能力目录中，例如 `docs/system/**`、`bin/**`、实现代码目录；不要把这类能力定义留在 `pre-brainstorms`、`epics`、`progress` 等过程文档里。
+- 若某个解决方案最终会被 Freely runtime、agent、skill、CLI 或打包产物长期消费，它必须落到 Freely 能力目录中，例如 `docs/system/**`、`bin/**`、实现代码目录；不要把这类能力定义留在 `B1-docs`、`epics`、`progress` 等过程文档里。
 - 若某个讨论首先只是在定义 Freely 自身的产品形态、宿主壳关系或开发入口判断，它应先落在 `PROJECT_INTENT / CONSTITUTION / LAWS / AGENTS.md`，而不是直接写进能力目录。
 - 过程文档可以记录“为什么要做、边界如何收敛、当前结论是什么”，但不能替代最终能力真源。
 - 对已经稳定、可复用的提示词编排、角色职责、执行约束，优先拆到 `agents/**` 或 `skills/**`；runtime 脚本只保留启动、上下文注入、状态托管和恢复动作。
@@ -191,7 +191,7 @@ Freely 必须在 Freely 治理规则下开发，不得有项目特定的例外�
 要求：
 - 使用对用户项目期望的相同分支/worktree/钩子规范。
 - Worktree 根目录遵循宪法策略：项目同级目录，命名为 `{project-name}-worktrees`。
-- 架构/治理变更必须先进入 `docs/pre-brainstorms/<id>/`，然后才能进入执行循环落地。
+- 架构/治理变更必须先进入 `docs/B1-docs/<id>/`，然后才能进入执行循环落地。
 - Freely 自举中发现的新能力，默认优先判断是否已被现有 milestone-owned issue 吸收；仅当现有 issue 无法承接时，才新开 candidate / issue。
 - 若当前项目的 Freely runtime 已在运行，优先通过 `freely chat --project <project-root> <message>` 这类 human interruption / intake 入口指导它继续开发；不要绕过 runtime 另造一套平行调度。
 - 若在插话驱动的开发过程中发现 bug、缺口或新的能力沉淀点，仍按同一治理规则处理：必要时让 Freely 创建/进入 dedicated worktree 修复、验证、合并到 `develop`、重启 runtime，再继续通过 interruption 推进。

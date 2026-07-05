@@ -1,0 +1,8 @@
+# Candidates
+## C-20260522T002426Z-A: legacy issue
+- title: crash dedup via search existing open issue
+- priority: P1
+- status: promoted
+- milestone: M-20260522T002426Z-A
+- promoted_issue_id: I-20260522T002426Z-A
+- promoted_issue_path: docs/issues/I-20260522T002426Z-A/issue.md

@@ -22,7 +22,7 @@
 ### 目录结构
 
 ```
-docs/epics/{epic-name}/                               ← epic：一个能力域
+docs/B2-docs/{epic-name}/                               ← epic：一个能力域
 └── {story-name}/                                     ← story：子交付批次
     └── raw-{raw key}/                                ← 一个 raw issue 的全部 B2 产物
         ├── issues/I-{raw key}-{suffix}.md            ← I-* issue（B2 物化）
@@ -43,7 +43,7 @@ docs/epics/{epic-name}/                               ← epic：一个能力域
 - 一个 epic 放多个 story；一个 story 放多个 `raw-{raw key}` 目录
 - 新 raw → 看归哪个已有 story（如重构 story、修复 story），或新建 story
 - 同名 `raw-{raw key}` → 续到已有 story 下的已有目录
-- 门禁检查：目录名 `raw-{raw key}` 与 `docs/issues/raw-{raw key}/` 的 raw issue 不匹配 → 拦截
+- 门禁检查：目录名 `raw-{raw key}` 与 `docs/B1-docs/raw-{raw key}/` 的 raw issue 不匹配 → 拦截
 - 门禁检查：I-* 文件名中的 `{raw key}` 与目录名不一致 → 拦截
 
 ### 如何确定 epic-name 和 story-name
@@ -89,12 +89,12 @@ Epic `ai-session-continuity` 下：
    - 同一 epic 下已解决过这个子问题 → 续到已有 story 的 `raw-{raw key}` 目录
    - 是 epic 下的新子问题 → 新建 story
 5. **不需要脚本自动化**：epic 和 story 的名字是人读的架构索引——基于语义判断，不基于关键词匹配
-6. **更新 `docs/epics-map.svg`**：新建或变更 epic/story 后必须更新 SVG。在 SVG 中添加对应的 `<rect id="epic-{name}">` 和/或 `<rect id="story-{name}">` 元素。门禁（`./bin/check-epics-map`）会检查 SVG 与 `docs/epics/` 目录结构是否对齐——不对齐则拦截
+6. **更新 `docs/epics-map.svg`**：新建或变更 epic/story 后必须更新 SVG。在 SVG 中添加对应的 `<rect id="epic-{name}">` 和/或 `<rect id="story-{name}">` 元素。门禁（`./bin/check-epics-map`）会检查 SVG 与 `docs/B2-docs/` 目录结构是否对齐——不对齐则拦截
 
 #### 层级模型
 
 ```
-docs/epics/
+docs/B2-docs/
 └── {epic}/                  ← 能力域。一个 epic 下可以有多个 story
     ├── {story-1}/           ← epic 的一个切面
     │   ├── raw-{key-A}/     ← 一个 raw issue 的全部 B2 产物
@@ -147,11 +147,11 @@ B2_IBM 确定 epic 和 story 后，必须完成以下维护操作，不能只写
 
 ## Required artifacts
 
-- `docs/epics/{epic-name}/{story-name}/issues/{issue-name}.md`
-- `docs/epics/{epic-name}/{story-name}/brainstorms/b-{issue-name}.md`
-- `docs/epics/{epic-name}/{story-name}/prd.md`
-- `docs/epics/{epic-name}/{story-name}/pre-tests.md`
-- `docs/epics/{epic-name}/{story-name}/tasks.md`
+- `docs/B2-docs/{epic-name}/{story-name}/issues/{issue-name}.md`
+- `docs/B2-docs/{epic-name}/{story-name}/brainstorms/b-{issue-name}.md`
+- `docs/B2-docs/{epic-name}/{story-name}/prd.md`
+- `docs/B2-docs/{epic-name}/{story-name}/pre-tests.md`
+- `docs/B2-docs/{epic-name}/{story-name}/tasks.md`
 
 Issue front matter 还应显式绑定：
 
@@ -252,7 +252,7 @@ Issue front matter 还应显式绑定：
 
 Acceptance items MUST reference the five-level testing evidence ladder by name — do not redefine levels locally.
 
-Refer to `docs/epics/testing-evidence-ladder/testing-evidence-ladder-and-gate-mapping/prd.md` for:
+Refer to `docs/B2-docs/testing-evidence-ladder/testing-evidence-ladder-and-gate-mapping/prd.md` for:
 
 - **Five evidence levels**: script regression, integration, end-to-end scenario, application-native real-environment, protected-env post-merge acceptance.
 - **Completion verification minimum evidence**: per issue class, the minimum `evidence_level` required before `phase_state: completed` may be set.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate docs/epics-map.svg against docs/epics/ directory tree.
+"""Validate docs/epics-map.svg against docs/B2-docs/ directory tree.
 
 Exit 0: aligned. Exit 1: mismatch with diff details.
 Usage: ./bin/check-epics-map [--project <path>]
@@ -8,6 +8,7 @@ import os, re, sys
 from pathlib import Path
 
 IGNORE_DIRS = {"code-reviews", "verification", "issues", "brainstorms", "test-evidence"}
+STORY_IGNORE_PREFIXES = ("_",)  # skip _legacy*, _misplaced*
 
 def parse_svg(svg_text: str) -> tuple[set[str], dict[str, set[str]]]:
     """Extract epics and stories from SVG. Returns (epics_set, {epic: {stories}})."""
@@ -55,8 +56,8 @@ def parse_svg(svg_text: str) -> tuple[set[str], dict[str, set[str]]]:
 
 
 def walk_epics(project: Path) -> tuple[set[str], dict[str, set[str]]]:
-    """Walk docs/epics/ and return (epics_set, {epic: {stories}})."""
-    epics_dir = project / "docs" / "epics"
+    """Walk docs/B2-docs/ and return (epics_set, {epic: {stories}})."""
+    epics_dir = project / "docs" / "B2-docs"
     if not epics_dir.exists():
         return set(), {}
 
@@ -71,7 +72,7 @@ def walk_epics(project: Path) -> tuple[set[str], dict[str, set[str]]]:
         stories_by_epic[ename] = set()
 
         for child in epic_d.iterdir():
-            if child.is_dir() and child.name not in IGNORE_DIRS:
+            if child.is_dir() and child.name not in IGNORE_DIRS and not child.name.startswith(STORY_IGNORE_PREFIXES):
                 stories_by_epic[ename].add(child.name)
 
     return epics, stories_by_epic
@@ -131,7 +132,7 @@ def main():
         print("── 修复方式 ──")
         print("  编辑 docs/epics-map.svg，添加缺失的 epic/story 条目。")
         print("  参考已有条目格式，完成后: ./bin/check-epics-map 验证对齐")
-        print(f"  请更新 docs/epics-map.svg 使其与 docs/epics/ 目录树一致")
+        print(f"  请更新 docs/epics-map.svg 使其与 docs/B2-docs/ 目录树一致")
         sys.exit(1)
 
     print(f"[epics-map] OK: {len(svg_epics)} epics, {sum(len(s) for s in svg_stories.values())} stories aligned ({svg_total} total)")

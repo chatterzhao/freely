@@ -1,8 +1,0 @@
-- issue_id: I-20260521T121158Z-A
-- kind: fix
-- phase_state: completed
-- milestone: M-20260521T121158Z-A
-- source_candidate: docs/pre-brainstorms/20260521T121158Z--package-version-timestamp-format/candidates.md#C-20260521T121158Z-A
-- verification_artifact_dir: docs/epics/package-version-timestamp-format/code-reviews
-- canonical_issue_path: docs/issues/I-20260521T121158Z-A/issue.md
-- title: package version format add hour-minute to nightly

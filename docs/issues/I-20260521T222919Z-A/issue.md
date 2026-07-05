@@ -1,7 +1,0 @@
-- issue_id: I-20260521T222919Z-A
-- kind: fix
-- phase_state: completed
-- milestone: M-20260521T222919Z-A
-- source_candidate: docs/pre-brainstorms/20260521T222919Z--scan-stage-prompt-mismatch/candidates.md#C-20260521T222919Z-A
-- verification_artifact_dir: docs/epics/scan-stage-prompt-mismatch/code-reviews
-- canonical_issue_path: docs/issues/I-20260521T222919Z-A/issue.md

@@ -1,8 +1,0 @@
-- issue_id: I-20260521T135911Z-A
-- kind: fix
-- phase_state: completed
-- milestone: M-20260521T135911Z-A
-- source_candidate: docs/pre-brainstorms/20260521T135911Z--permission-unify-json-config/candidates.md#C-20260521T135911Z-A
-- verification_artifact_dir: docs/epics/permission-unify-json-config/code-reviews
-- canonical_issue_path: docs/issues/I-20260521T135911Z-A/issue.md
-- title: unify permissions in JSON config files

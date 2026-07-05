@@ -1,8 +1,0 @@
-- issue_id: I-20260625T030147Z-A
-- kind: feat
-- phase_state: completed
-- milestone: M-20260625T030147Z-A
-- source_candidate: docs/pre-brainstorms/20260625T030147Z--auto-detect-platforms/candidates.md#C-20260625T030147Z-A
-- verification_artifact_dir: docs/epics/auto-detect-platforms/code-reviews
-- canonical_issue_path: docs/issues/I-20260625T030147Z-A/issue.md
-- title: auto-detect platforms

@@ -1,7 +1,0 @@
-- issue_id: I-20260522T030835Z-A
-- kind: fix
-- phase_state: completed
-- milestone: M-20260522T030835Z-A
-- source_candidate: docs/pre-brainstorms/20260522T030835Z--ai-cli-apikey-alias-switch/candidates.md#C-20260522T030835Z-A
-- verification_artifact_dir: docs/epics/ai-cli-apikey-alias-switch/code-reviews
-- canonical_issue_path: docs/issues/I-20260522T030835Z-A/issue.md

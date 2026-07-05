@@ -47,8 +47,8 @@ description: >- 核清单个 worktree 真实状态、制定多条 worktree 安�
 
 - `research-only` 指研究结论当前只保留在 canonical 文档，不指“长期保留这棵 research worktree”。
 - research worktree 是一次研究执行容器；研究完成后，默认把结论回写到：
-  - `docs/pre-brainstorms/<id>/brainstorms.md`
-  - `docs/pre-brainstorms/<id>/candidates.md`
+  - `docs/B1-docs/<id>/brainstorms.md`
+  - `docs/B1-docs/<id>/candidates.md`
   - `docs/milestones.md` 的 candidate / 待研究区域
 - 回写完成后，research worktree 默认进入 `retirement_handoff`，不长期挂在项目里。
 - 若后续继续研究同一主题，应重新创建新的 dedicated worktree，并继续更新原 canonical brainstorm/candidate，而不是复活旧 research worktree。

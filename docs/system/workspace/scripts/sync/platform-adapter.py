@@ -258,7 +258,7 @@ def _comment_via_local_issue(local_id: str, comment_body: str) -> dict[str, dict
     falls back to searching platform by raw-key if a platform's issue_id is missing."""
     raw_key = local_id[4:] if local_id.startswith("raw-") else local_id
     project_root = Path(os.environ.get("FREELY_PROJECT_ROOT", os.getcwd()))
-    issue_file = project_root / "docs" / "issues" / f"raw-{raw_key}" / "issue.md"
+    issue_file = project_root / "docs" / "B1-docs" / f"raw-{raw_key}" / "issue.md"
     # 1. Read known platform_ids from local issue.md
     platform_ids = {}
     if issue_file.exists():
@@ -506,7 +506,7 @@ def _resolve_issue_state(local_id: str) -> str:
     raw_key = local_id[4:] if local_id.startswith("raw-") else local_id
     # Find platform issue IDs from local issue.md
     project_root = Path(os.environ.get("FREELY_PROJECT_ROOT", os.getcwd()))
-    issue_file = project_root / "docs" / "issues" / f"raw-{raw_key}" / "issue.md"
+    issue_file = project_root / "docs" / "B1-docs" / f"raw-{raw_key}" / "issue.md"
     platform_ids = {}
     if issue_file.exists():
         text = issue_file.read_text(encoding="utf-8")
@@ -595,7 +595,7 @@ def pull_raw_issue(raw_key: str, target_dir: Path) -> Optional[dict]:
                 raw_key = standard_key
                 target_dir = target_dir.parent / f"raw-{raw_key}"
 
-    # 4. Materialize to docs/issues/raw-{key}/issue.md
+    # 4. Materialize to docs/B1-docs/raw-{key}/issue.md
     target_dir.mkdir(parents=True, exist_ok=True)
     issue_file = target_dir / "issue.md"
 
@@ -734,7 +734,7 @@ if __name__ == "__main__":
         print(json.dumps(result, indent=2))
     elif len(sys.argv) > 1 and sys.argv[1] == "pull":
         raw_key = sys.argv[2]
-        target = Path(sys.argv[3]) if len(sys.argv) > 3 else Path(f"docs/issues/raw-{raw_key}")
+        target = Path(sys.argv[3]) if len(sys.argv) > 3 else Path(f"docs/B1-docs/raw-{raw_key}")
         result = pull_raw_issue(raw_key, target)
         print(json.dumps(result, indent=2, default=str))
     elif len(sys.argv) > 1 and sys.argv[1] == "create-pr":

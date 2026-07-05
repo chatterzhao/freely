@@ -7,8 +7,8 @@
 ## 必查面
 
 1. `git status`
-2. `docs/pre-brainstorms/**`
-3. `docs/epics/**` 下的 issue / prd / pre-tests / tasks / code-reviews
+2. `docs/B1-docs/**`
+3. `docs/B2-docs/**` 下的 issue / prd / pre-tests / tasks / code-reviews
 4. `docs/milestones.md`
 5. 相关测试或 runtime 变更
 

@@ -69,7 +69,7 @@ continuity artifact 必须遵循 loop 分层：
 - `recovery`: `docs/recovery/**`
 
 研究阶段等价规则：
-- 若 `docs/progress/**` / `docs/recovery/**` 尚未启用，允许把 continuity 写入 `docs/pre-brainstorms/CONVERGENCE.md`
+- 若 `docs/progress/**` / `docs/recovery/**` 尚未启用，允许把 continuity 写入 `docs/B1-docs/CONVERGENCE.md`
 
 ## Owner Boundary
 
@@ -108,6 +108,6 @@ continuity artifact 必须遵循 loop 分层：
 
 ## References
 
-- `docs/epics/workspace-routing-foundation/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
+- `docs/B2-docs/token-efficient-session-continuity-and-rotation-governance/issues/token-efficient-session-continuity-and-rotation-governance.md`
 - `../freely-recovery-subagent-governance/SKILL.md`
 - `../freely-context-source-skill/references/continuation-recovery-routing.md`

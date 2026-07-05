@@ -93,8 +93,8 @@ Freely 自身首先是一个产品，不应被拆成一堆并列的 shell、命�
 ```
 人类 ←──→ Discuss Session ←──→ AI
               │
-              ├── 讨论先进入 B1_IBM：沉淀到 pre-brainstorms/*/brainstorms.md
-              ├── candidate 写入 pre-brainstorms/*/candidates.md（B1_IBM 产物，进入 milestone）
+              ├── 讨论先进入 B1_IBM：沉淀到 B1-docs/*/brainstorms.md
+              ├── candidate 写入 B1-docs/*/candidates.md（B1_IBM 产物，进入 milestone）
               ├── 多 AI/子代理会话日志以 jsonl 作为 session evidence
               └── 在 candidates.md / issue / progress / recovery 中持续维护 `session_refs`
 ```

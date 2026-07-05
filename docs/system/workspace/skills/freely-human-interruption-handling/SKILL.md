@@ -38,7 +38,7 @@ description: >- 处理 human interruption intake。接收 manager 已 claim 的�
   - `docs/CONSTITUTION.md`
   - `docs/LAWS.md`
   - `docs/milestones.md`
-  - 按需读取相关 `pre-brainstorms / issue / progress / recovery`
+  - 按需读取相关 `B1-docs / issue / progress / recovery`
 - 若已知目标工位或当前 issue，也应带入：
   - `execution_base`
   - `integration_target`

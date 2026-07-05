@@ -24,7 +24,7 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument('--repo', required=True)
     p.add_argument('--batch', type=int, default=1)
-    p.add_argument('--issues-dir', default='docs/issues')
+    p.add_argument('--issues-dir', default='docs/B1-docs')
     p.add_argument('--milestones', default='docs/milestones.md')
     p.add_argument('--dry-run', action='store_true')
     args = p.parse_args()
@@ -60,7 +60,7 @@ def main():
         # Find canonical issue doc
         # Search only in */issues/*.md files for the canonical issue doc
         issue_file = ''
-        for root, dirs, files in os.walk('docs/epics'):
+        for root, dirs, files in os.walk('docs/B2-docs'):
             if '/issues/' in root or root.endswith('/issues'):
                 for fname in files:
                     if fname.endswith('.md'):

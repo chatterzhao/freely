@@ -82,7 +82,7 @@
 
 PRDs MUST consume the five-level testing evidence ladder by reference — do not redefine levels locally.
 
-Refer to `docs/epics/testing-evidence-ladder/testing-evidence-ladder-and-gate-mapping/prd.md` for:
+Refer to `docs/B2-docs/testing-evidence-ladder/testing-evidence-ladder-and-gate-mapping/prd.md` for:
 
 - **Five evidence levels**: script regression, integration, end-to-end scenario, application-native real-environment, protected-env post-merge acceptance.
 - **Completion/retirement gate mapping**: per issue class, the minimum evidence level required.

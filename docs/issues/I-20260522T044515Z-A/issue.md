@@ -1,7 +1,0 @@
-- issue_id: I-20260522T044515Z-A
-- kind: feat
-- phase_state: completed
-- milestone: M-20260522T044515Z-A
-- source_candidate: docs/pre-brainstorms/20260522T044515Z--slot-probe-generic-hi/candidates.md#C-20260522T044515Z-A
-- verification_artifact_dir: docs/epics/slot-probe-generic-hi/code-reviews
-- canonical_issue_path: docs/issues/I-20260522T044515Z-A/issue.md

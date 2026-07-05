@@ -76,7 +76,7 @@ Freely 是一个自主循环运行器：
   - 如果存在远程分支，删除远程功能分支
   - 在进度/恢复文档中记录清理结果
 - 研究优先阶段的临时等价规则：
-  - 若 `docs/progress/**` 与 `docs/recovery/**` 目录尚未启用，允许把验证批次、恢复上下文与 cleanup 结果记录到 `docs/pre-brainstorms/CONVERGENCE.md`
+  - 若 `docs/progress/**` 与 `docs/recovery/**` 目录尚未启用，允许把验证批次、恢复上下文与 cleanup 结果记录到 `docs/B1-docs/CONVERGENCE.md`
   - 一旦正式 `progress/recovery` 路径启用，后续批次必须回到规范目录，不再继续使用该临时落点
 - 分支/工作树生命周期状态：
   - active（活跃）：分支有未完成的 STORY 所有权
@@ -149,13 +149,13 @@ Freely 是一个自主循环运行器：
 每个托管项目应至少保持以下基线结构：
 
 - `README.md`（项目入口和运行手册）
-- `docs/`（治理 + pre-brainstorms）
+- `docs/`（治理 + B1-docs）
 - `src/`（主要实现代码）
 - `.env/`（环境模板/脚本/配置片段，版本化）
 - `.env.example`（必需的环境变量模板，不含密钥）
 
 Freely 仓库在“研究优先阶段”有临时覆盖约束：
-- `docs/` 仅保留 `PROJECT_INTENT.md`、`LAWS.md`、`CONSTITUTION.md` 与 `pre-brainstorms/`。
+- `docs/` 仅保留 `PROJECT_INTENT.md`、`LAWS.md`、`CONSTITUTION.md` 与 `B1-docs/`。
 - 历史文档资产不在工作区保留，统一通过 git 历史追溯。
 
 如果项目使用 monorepo 或不同布局，必须在文档中提供等效映射。

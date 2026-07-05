@@ -1,7 +1,0 @@
-- issue_id: I-20260522T035043Z-A
-- kind: fix
-- phase_state: completed
-- milestone: M-20260522T035043Z-A
-- source_candidate: docs/pre-brainstorms/20260522T035043Z--ai-cli-codex-apikey/candidates.md#C-20260522T035043Z-A
-- verification_artifact_dir: docs/epics/ai-cli-codex-apikey/code-reviews
-- canonical_issue_path: docs/issues/I-20260522T035043Z-A/issue.md

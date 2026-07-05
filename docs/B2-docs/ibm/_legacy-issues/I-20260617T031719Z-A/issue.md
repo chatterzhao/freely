@@ -1,0 +1,43 @@
+---
+local_id: I-20260617T031719Z-A
+kind: linked
+status: in_dev
+phase_state: completed
+promoted_from: raw-20260617T031719Z19Z
+source_candidate: docs/B1-docs/raw-20260617T031719Z19Z/candidates.md
+canonical_issue_path: ''
+created_at: 2026-06-17 03:17:19+00:00
+updated_at: '2026-06-17T17:08:23Z'
+author: zhaoquan
+channel: freely-fix-execution
+pre_tests_path: ''
+verification_artifact_dir: docs/B1-docs/raw-20260617T031719Z19Z/code-reviews
+platform_ids:
+  github:
+    issue_id: '2944'
+    url: https://github.com/chatterzhao/freely/issues/2944
+    synced_at: '2026-06-17T17:08:23Z'
+primary_platform: github
+platform_state: closed
+---
+
+# I-20260617T031719Z-A: ACP/A2A Final Review Fixes
+
+- source_candidate: `docs/B1-docs/raw-20260617T031719Z19Z/candidates.md`
+- pre_tests_path: ""
+- verification_artifact_dir: `docs/B1-docs/raw-20260617T031719Z19Z/code-reviews`
+
+## 实现
+
+9 个修复：ACP _fatal_detected + stopReason + session_ping; A2A extended ops → _db_rpc; G1 Signal 5 liveness.
+
+## Implementation Decision Note
+
+见 `docs/B1-docs/raw-20260617T031719Z19Z/code-reviews/implementation-decision.md`
+
+## 实现清单
+- [x] ACP-1: _read_stderr fatal detection → _fatal_detected
+- [x] ACP-2: _dispatch() stopReason normalization  
+- [x] ACP-3: monitor-ai-acp.sh session_ping loop
+- [x] A2A-1: extended ops via _db_rpc
+- [x] G1: _ai_shows_liveness_acp Signal 5

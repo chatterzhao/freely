@@ -49,12 +49,12 @@ pre-tests ──→ 测试执行（全 GREEN + 真实 evidence）
 ## 输入
 
 审查者从工位自行读取：
-1. `docs/issues/raw-{key}/issue.md`
-2. `docs/pre-brainstorms/{key}--{slug}/brainstorms.md` + `candidates.md`
+1. `docs/B1-docs/raw-{key}/issue.md`
+2. `docs/B1-docs/{key}--{slug}/brainstorms.md` + `candidates.md`
 3. `docs/milestones.md`（四节点链路：C-{key}-{suffix} → M-{key}-A → I-{key}-{suffix}）
-4. `docs/epics/{epic-name}/{story-name}/raw-{raw key}/issues/I-{raw key}-{suffix}.md`（suffix 继承 candidate 的 suffix：C-{key}-{suffix} → I-{key}-{suffix}）
-5. `docs/epics/{epic-name}/{story-name}/raw-{raw key}/brainstorms/b-I-{raw key}-{suffix}.md`
-6. `docs/epics/{epic-name}/{story-name}/raw-{raw key}/prd.md`、`verification/pre-tests.md`、`verification/tasks.md`、`code-reviews/`
+4. `docs/B2-docs/{epic-name}/{story-name}/raw-{raw key}/issues/I-{raw key}-{suffix}.md`（suffix 继承 candidate 的 suffix：C-{key}-{suffix} → I-{key}-{suffix}）
+5. `docs/B2-docs/{epic-name}/{story-name}/raw-{raw key}/brainstorms/b-I-{raw key}-{suffix}.md`
+6. `docs/B2-docs/{epic-name}/{story-name}/raw-{raw key}/prd.md`、`verification/pre-tests.md`、`verification/tasks.md`、`code-reviews/`
 7. `git diff develop..HEAD`（实际代码变更）
 
 > `{epic-name}` 和 `{story-name}` 由 `freely-doc-B2_IBM-execution` skill 在物化 I-* issue 时确定。epic 是能力域（如 `worktree-lifecycle`），story 是 epic 下的可交付切片（如 `creation-from-raw-issue`）。详见 `freely-doc-B2_IBM-execution` skill §M：Map。

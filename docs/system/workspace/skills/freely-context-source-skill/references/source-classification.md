@@ -25,7 +25,7 @@
 - `chat_intake`（来自 freely.db 的未消费 chat）
   - 仍属于 `discovery`
   - 默认首跳：AI 判断 → 有价值的创建工位（wt-create 自动 materialize），噪声标记 consumed=-1
-  - 语义：插话暂存于 SQLite，等待 AI 消费。与 `docs/issues/` 中的 raw issue 不同，chat 尚未进入 IBM 生命周期
+  - 语义：插话暂存于 SQLite，等待 AI 消费。与 `docs/B1-docs/` 中的 raw issue 不同，chat 尚未进入 IBM 生命周期
 - `human interruption` 与 `external issue` 是默认 durable source families，但它们的 consumption / dedupe / closeout 规则不同，不能因为都属于 `discovery` 就混成一个来源池
 - `github_raw_issue` / `gitee_raw_issue`
   - 仍属于 `discovery`

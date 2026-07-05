@@ -1,8 +1,0 @@
-- issue_id: I-20260522T071901Z-A
-- kind: fix
-- phase_state: completed
-- milestone: M-20260522T071901Z-A
-- source_candidate: docs/pre-brainstorms/20260522T071901Z--slot-full-name-final-fixes/candidates.md#C-20260522T071901Z-A
-- verification_artifact_dir: docs/epics/slot-full-name-final-fixes/code-reviews
-- canonical_issue_path: docs/issues/I-20260522T071901Z-A/issue.md
-- title: slot full-name compat final fixes

@@ -1,8 +1,0 @@
-- issue_id: I-20260624T235907Z-A
-- kind: fix
-- phase_state: completed
-- milestone: M-20260624T235907Z-A
-- source_candidate: docs/pre-brainstorms/20260624T235907Z--anti-cheating-gate/candidates.md#C-20260624T235907Z-A
-- verification_artifact_dir: docs/epics/red-green-separation/code-reviews
-- canonical_issue_path: docs/issues/I-20260624T235907Z-A/issue.md
-- title: RED/GREEN separation

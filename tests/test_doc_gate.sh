@@ -24,33 +24,33 @@ expect_pass() {
 new_project() {
   local dir
   dir="$(mktemp -d)"
-  mkdir -p "$dir/docs/pre-brainstorms/20260309-0000--sample"
+  mkdir -p "$dir/docs/B1-docs/20260309-0000--sample"
   cp "$ROOT_DIR/docs/PROJECT_INTENT.md" "$dir/docs/PROJECT_INTENT.md"
   cp "$ROOT_DIR/docs/CONSTITUTION.md" "$dir/docs/CONSTITUTION.md"
   cp "$ROOT_DIR/docs/LAWS.md" "$dir/docs/LAWS.md"
   cp "$ROOT_DIR/AGENTS.md" "$dir/AGENTS.md"
-  cp "$ROOT_DIR/docs/pre-brainstorms/README.md" "$dir/docs/pre-brainstorms/README.md"
-  cp "$ROOT_DIR/docs/pre-brainstorms/INDEX.md" "$dir/docs/pre-brainstorms/INDEX.md"
-  cp "$ROOT_DIR/docs/pre-brainstorms/CONVERGENCE.md" "$dir/docs/pre-brainstorms/CONVERGENCE.md"
-  cp "$ROOT_DIR/docs/pre-brainstorms/20260309-2345--governance-check-naming-alignment/brainstorms.md" \
-    "$dir/docs/pre-brainstorms/20260309-0000--sample/brainstorms.md"
-  cp "$ROOT_DIR/docs/pre-brainstorms/20260309-2345--governance-check-naming-alignment/candidates.md" \
-    "$dir/docs/pre-brainstorms/20260309-0000--sample/candidates.md"
-  cat > "$dir/docs/pre-brainstorms/INDEX.md" <<'EOT'
+  cp "$ROOT_DIR/docs/B1-docs/README.md" "$dir/docs/B1-docs/README.md"
+  cp "$ROOT_DIR/docs/B1-docs/INDEX.md" "$dir/docs/B1-docs/INDEX.md"
+  cp "$ROOT_DIR/docs/B1-docs/CONVERGENCE.md" "$dir/docs/B1-docs/CONVERGENCE.md"
+  cp "$ROOT_DIR/docs/B1-docs/20260309-2345--governance-check-naming-alignment/brainstorms.md" \
+    "$dir/docs/B1-docs/20260309-0000--sample/brainstorms.md"
+  cp "$ROOT_DIR/docs/B1-docs/20260309-2345--governance-check-naming-alignment/candidates.md" \
+    "$dir/docs/B1-docs/20260309-0000--sample/candidates.md"
+  cat > "$dir/docs/B1-docs/INDEX.md" <<'EOT'
 # Pre-brainstorm 索引（IBM Framework B1）
 
 ## 条目
 - 20260309-0000--sample
-  - brainstorms: docs/pre-brainstorms/20260309-0000--sample/brainstorms.md
-  - candidates: docs/pre-brainstorms/20260309-0000--sample/candidates.md
+  - brainstorms: docs/B1-docs/20260309-0000--sample/brainstorms.md
+  - candidates: docs/B1-docs/20260309-0000--sample/candidates.md
 EOT
   echo "$dir"
 }
 
-# CASE-001: pre-brainstorms 缺失时 doctor 失败
+# CASE-001: B1-docs 缺失时 doctor 失败
 p1="$(new_project)"
-rm -rf "$p1/docs/pre-brainstorms"
-expect_fail "CASE-001 doctor fails when pre-brainstorms missing" "$FREELY" doctor --project "$p1"
+rm -rf "$p1/docs/B1-docs"
+expect_fail "CASE-001 doctor fails when B1-docs missing" "$FREELY" doctor --project "$p1"
 
 # CASE-002: 缺失 AGENTS 时 doctor 失败
 p2="$(new_project)"

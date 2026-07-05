@@ -1,8 +1,0 @@
-- issue_id: I-20260625T081835Z-A
-- kind: fix
-- phase_state: completed
-- milestone: M-20260625T081835Z-A
-- source_candidate: docs/pre-brainstorms/20260625T081835Z--config-read-fix/candidates.md#C-20260625T081835Z-A
-- verification_artifact_dir: docs/epics/config-read-fix/code-reviews
-- canonical_issue_path: docs/issues/I-20260625T081835Z-A/issue.md
-- title: config read fix

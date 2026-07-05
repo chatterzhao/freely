@@ -998,9 +998,9 @@ check_doc_gate_or_fail() {
     "docs/CONSTITUTION.md"
     "docs/LAWS.md"
     "AGENTS.md"
-    "docs/pre-brainstorms/README.md"
-    "docs/pre-brainstorms/INDEX.md"
-    "docs/pre-brainstorms/CONVERGENCE.md"
+    "docs/B1-docs/README.md"
+    "docs/B1-docs/INDEX.md"
+    "docs/B1-docs/CONVERGENCE.md"
   )
 
   for rel in "${required[@]}"; do
@@ -2451,7 +2451,7 @@ manager_operator_stop_boundary_file() {
 
 intake_dir_for_project() {
   # DEPRECATED: .freely/intake/ replaced by docs/issues/ (IBM Framework B1_IBM).
-  # Chat now writes to docs/issues/raw-*/issue.md or appends comments.
+  # Chat now writes to docs/B1-docs/raw-*/issue.md or appends comments.
   # This function exists for backward compat only. Do not add new callers.
   local project="$1"
   echo "$(state_dir "$project")/intake"
@@ -11081,9 +11081,9 @@ worker_prompt_launchable_for_manager_project() {
   fi
   # Gate: validate raw issue exists and is open before launching worker (#3290)
   if [[ -n "$raw_key_hint" ]]; then
-    local _raw_issue_file="$manager_project/docs/issues/raw-${raw_key_hint}/issue.md"
+    local _raw_issue_file="$manager_project/docs/B1-docs/raw-${raw_key_hint}/issue.md"
     if [[ ! -f "$_raw_issue_file" ]]; then
-      LAUNCH_REJECT_REASON="raw-${raw_key_hint} has no corresponding raw issue at docs/issues/raw-${raw_key_hint}/issue.md — check raw_key is correct. If the issue was renamed/moved, update the task's raw_key."
+      LAUNCH_REJECT_REASON="raw-${raw_key_hint} has no corresponding raw issue at docs/B1-docs/raw-${raw_key_hint}/issue.md — check raw_key is correct. If the issue was renamed/moved, update the task's raw_key."
       log_warn "worker_prompt_launchable: $LAUNCH_REJECT_REASON"
       return 1
     fi
@@ -16857,7 +16857,7 @@ PY
 pre_brainstorm_patrol_seed_snapshot_for_project() {
   local project="$1" limit="${2:-6}"
   local index_file
-  index_file="$project/docs/pre-brainstorms/INDEX.md"
+  index_file="$project/docs/B1-docs/INDEX.md"
   [[ -f "$index_file" ]] || return 0
   python3 - "$project" "$index_file" "$limit" <<'PY'
 import re
@@ -23953,8 +23953,8 @@ cmd_chat() {
     # Resolve target_issue to local issue file: try raw-<id> or search docs/issues
     if [[ -f "$project/docs/issues/$target_issue/issue.md" ]]; then
       _chat_issue_file="$project/docs/issues/$target_issue/issue.md"
-    elif [[ -f "$project/docs/issues/raw-$target_issue/issue.md" ]]; then
-      _chat_issue_file="$project/docs/issues/raw-$target_issue/issue.md"
+    elif [[ -f "$project/docs/B1-docs/raw-$target_issue/issue.md" ]]; then
+      _chat_issue_file="$project/docs/B1-docs/raw-$target_issue/issue.md"
     fi
     if [[ -n "${_chat_issue_file:-}" && -f "$_chat_issue_file" ]]; then
       _chat_phase="$(sed -n '/^---$/,/^---$/p' "$_chat_issue_file" | grep "^phase_state:" | sed 's/^phase_state: *//' | tr -d '"' 2>/dev/null || true)"

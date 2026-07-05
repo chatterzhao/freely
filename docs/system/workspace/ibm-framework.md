@@ -6,7 +6,7 @@ Freely doc-loop 的治理框架。每个工作项经历两个 IBM 阶段——B1
 
 本文件是 IBM Framework 的能力真源。Freely 开发自身项目时吃自己的狗粮，外部项目由 Freely 托管时同样以此框架推进。执行路由（auto/dev loop）见 `docs/system/workspace/three-loop-capability-lifecycle.md`，治理规则见 `docs/LAWS.md` §2。
 
-> **注意**: 以下 ASCII 图不反映 chat-inbox 架构（chat 不再直接写 `docs/issues/`）。
+> **注意**: 以下 ASCII 图不反映 chat-inbox 架构（chat 不再直接写 `docs/B1-docs/`）。
 > 计划后续用 SVG 重绘。
 
 ## 总览
@@ -38,16 +38,16 @@ Freely doc-loop 的治理框架。每个工作项经历两个 IBM 阶段——B1
 | M | Milestone | 产出 candidate（`candidates.md`）：scope、non-goals、priority、status、milestone 归属 |
 
 **信号进入 B1_IBM**：
-- 平台 issue（github/gitee）：`task-source-scan.py` 下载到本地 `docs/issues/`。raw issue 的 `restart_point=pre_brainstorm`，lead agent 路由到 B1_IBM
-- chat 插话：`freely chat` → `chat-routing skill` 判断属于哪个 issue → 写入 `.freely/freely.db`（git-ignored 暂存，不污染 protected branch）。`task-source-scan` 扫出未消费的 chat，AI 判断后创建工位（wt-create 自动 materialize 到 `docs/issues/`）或追加评论
-- chat 写入时若有对应工位，则直接同步到 worktree 的 `docs/issues/`，跳过暂存
+- 平台 issue（github/gitee）：`task-source-scan.py` 下载到本地 `docs/B1-docs/`。raw issue 的 `restart_point=pre_brainstorm`，lead agent 路由到 B1_IBM
+- chat 插话：`freely chat` → `chat-routing skill` 判断属于哪个 issue → 写入 `.freely/freely.db`（git-ignored 暂存，不污染 protected branch）。`task-source-scan` 扫出未消费的 chat，AI 判断后创建工位（wt-create 自动 materialize 到 `docs/B1-docs/`）或追加评论
+- chat 写入时若有对应工位，则直接同步到 worktree 的 `docs/B1-docs/`，跳过暂存
 - 其他信号（runtime anomaly、review 发现）：通过 chat 插话进入，同上
-- AI **永远不直接读平台内容**——只读本地 `docs/issues/` 中的副本。平台内容由 scan 脚本下载一次
+- AI **永远不直接读平台内容**——只读本地 `docs/B1-docs/` 中的副本。平台内容由 scan 脚本下载一次
 - 详细路由见 `freely-context-source-skill` 和 `docs/system/workspace/three-loop-capability-lifecycle.md`
 
 **B1_IBM 回答**：这个值得做吗？排在哪？边界是什么？
 
-**目录**：`docs/pre-brainstorms/{b1-id}/`
+**目录**：`docs/B1-docs/{b1-id}/`
 
 ```
 {b1-id}/
@@ -71,7 +71,7 @@ Freely doc-loop 的治理框架。每个工作项经历两个 IBM 阶段——B1
 
 **B2_IBM 回答**：怎么做？怎么验收？替代方案是什么？
 
-**目录**：`docs/epics/{epic-name}/{story-name}/`
+**目录**：`docs/B2-docs/{epic-name}/{story-name}/`
 
 ```
 {story-name}/
@@ -130,7 +130,7 @@ IBM Framework 的 I（Input source）统一为 github/gitee issue。平台 issue
 ### 本地存储
 
 ```
-docs/issues/
+docs/B1-docs/
 ├── raw-{YYYYMMDD}-{HHMM}/             # raw issue（旧格式）
 ├── raw-{YYYYMMDDTHHMM[SS]Z}/              # raw issue（新格式, ISO 8601 紧凑型）
 └── I-{YYYYMMDDTHHMM[SS]Z}-{A,B,C}/       # linked issue（新旧格式均支持）
@@ -146,7 +146,7 @@ docs/issues/
 | `raw-{key}` | `key` = UTC 创建时间戳，如 `20260505T101010Z` | feedback / 平台扫描 | 对外联络的平台 issue |
 | `C-{key}-{suffix}` | 继承 raw key，加后缀 A/B/C… | B1 预研 | 候选 issue。一个 raw 可拆为多个 C-* |
 | `M-{key}-{suffix}` | 与 C-* 同名 | B1 里程碑编排 | 进入里程碑的候选。未被丢弃的 C-* |
-| `I-{key}-{suffix}` | 与 M-* 同名 | B2 物化 | 当前里程碑正在开发的正式 issue。由 B2 skill 物化到 `docs/issues/` |
+| `I-{key}-{suffix}` | 与 M-* 同名 | B2 物化 | 当前里程碑正在开发的正式 issue。由 B2 skill 物化到 `docs/B1-docs/` |
 
 **关键规则**：
 - `{key}` 从 raw issue 取（`raw-` 前缀之后的部分）
@@ -184,7 +184,7 @@ chat 插话 / 平台扫描
 ### 平台隔离
 
 - AI **永远不直接读写平台**（不调 github/gitee API）
-- **scan**（`task-source-scan.py`）是平台→本地的唯一桥梁：下载 issue、评论到 `docs/issues/`
+- **scan**（`task-source-scan.py`）是平台→本地的唯一桥梁：下载 issue、评论到 `docs/B1-docs/`
 - **sync**（`bin/issue-sync`）是本地→平台的唯一桥梁：创建 issue、更新状态、推送评论
 - sync 触发是确定性的生命周期事件（candidate promoted、phase_state 变更、merge），不是 AI 判断
 - 本地是唯一真相源。平台数据丢失时从本地重建
@@ -193,10 +193,10 @@ chat 插话 / 平台扫描
 
 每条 `freely chat` 必须落地为 issue 或已有 issue 的评论：
 
-- 所有 chat 先写入 `.freely/freely.db`（SQLite，git-ignored），不直接写 `docs/issues/`
-- chat 写入时若有对应工位，直接同步到 worktree 的 `docs/issues/`，标记 consumed=1
+- 所有 chat 先写入 `.freely/freely.db`（SQLite，git-ignored），不直接写 `docs/B1-docs/`
+- chat 写入时若有对应工位，直接同步到 worktree 的 `docs/B1-docs/`，标记 consumed=1
 - 无工位时留在 DB（consumed=0），由 task-source-scan 扫出供 AI 判断
-- 如果是新话题（`--new-issue`）：AI 创建工位 → wt-create 自动 materialize 到 worktree 的 `docs/issues/`
+- 如果是新话题（`--new-issue`）：AI 创建工位 → wt-create 自动 materialize 到 worktree 的 `docs/B1-docs/`
 - 如果是已有 issue 的评论（`--issue <id>`）：AI 在 worktree 中追加评论
 - 噪声（如"你好"）：标记 consumed=-1 丢弃
 - 如果 `--issue raw-xxx` 但该 raw 已被 promote（`phase_state=absorbed`）：自动路由到 `absorbed_into` 指向的 I-*
@@ -237,9 +237,9 @@ body 结构（I-*）：
 <从 candidate.md 或 issue doc 提取的 scope/non-goals>
 
 ### References
-- B1 预研: docs/pre-brainstorms/<b1-id>/
-- Candidate: docs/pre-brainstorms/<b1-id>/candidates.md#c-xxx
-- 正式 Issue: docs/epics/<epic>/<story>/issues/<name>.md
+- B1 预研: docs/B1-docs/<b1-id>/
+- Candidate: docs/B1-docs/<b1-id>/candidates.md#c-xxx
+- 正式 Issue: docs/B2-docs/<epic>/<story>/issues/<name>.md
 ```
 
 ## 术语约定
@@ -268,7 +268,7 @@ platform_ids:
   github: {issue_id: "42", url: "https://...", synced_at: "..."}
   gitee: {issue_id: "IJFOAK", url: "https://...", synced_at: "..."}
 primary_platform: github
-canonical_issue_path: "docs/epics/.../issues/....md"
+canonical_issue_path: "docs/B2-docs/.../issues/....md"
 last_synced_comment_at:
   github: "2026-04-27T10:25:00Z"
   gitee: "2026-04-27T10:25:00Z"
@@ -286,8 +286,8 @@ session_refs:
 <scope/non-goals>
 
 ## References
-- B1: docs/pre-brainstorms/{b1-id}/
-- Issue: docs/epics/{epic}/{story}/issues/{name}.md
+- B1: docs/B1-docs/{b1-id}/
+- Issue: docs/B2-docs/{epic}/{story}/issues/{name}.md
 
 ## Comments
 
