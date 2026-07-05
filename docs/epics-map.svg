@@ -45,6 +45,9 @@
 
 <rect id="story-agent-table-driven" x="65" y="805" width="670" height="35" fill="#f0f4ff" stroke="#669df6" stroke-width="1.5" rx="3"/>
   <rect id="story-per-agent-tool-env" x="65" y="815" width="670" height="35" fill="#f0f4ff" stroke="#669df6" stroke-width="1.5" rx="3"/>
+  <rect id="story-base-tool-validation" x="65" y="818" width="670" height="35" fill="#f0f4ff" stroke="#669df6" stroke-width="1.5" rx="3"/>
+  <text x="80" y="838" font-size="12" fill="#1a73e8">base-tool-validation</text>
+
   <text x="80" y="835" font-size="12" fill="#1a73e8">per-agent-tool-env</text>
 
 <text x="80" y="825" font-size="12" fill="#1a73e8">agent-table-driven</text>
