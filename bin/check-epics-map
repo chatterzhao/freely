@@ -8,6 +8,7 @@ import os, re, sys
 from pathlib import Path
 
 IGNORE_DIRS = {"code-reviews", "verification", "issues", "brainstorms", "test-evidence"}
+STORY_IGNORE_PREFIXES = ("_",)  # skip _legacy*, _misplaced*
 
 def parse_svg(svg_text: str) -> tuple[set[str], dict[str, set[str]]]:
     """Extract epics and stories from SVG. Returns (epics_set, {epic: {stories}})."""
@@ -56,7 +57,7 @@ def parse_svg(svg_text: str) -> tuple[set[str], dict[str, set[str]]]:
 
 def walk_epics(project: Path) -> tuple[set[str], dict[str, set[str]]]:
     """Walk docs/B2-docs/ and return (epics_set, {epic: {stories}})."""
-    epics_dir = project / "docs" / "epics"
+    epics_dir = project / "docs" / "B2-docs"
     if not epics_dir.exists():
         return set(), {}
 
@@ -71,7 +72,7 @@ def walk_epics(project: Path) -> tuple[set[str], dict[str, set[str]]]:
         stories_by_epic[ename] = set()
 
         for child in epic_d.iterdir():
-            if child.is_dir() and child.name not in IGNORE_DIRS:
+            if child.is_dir() and child.name not in IGNORE_DIRS and not child.name.startswith(STORY_IGNORE_PREFIXES):
                 stories_by_epic[ename].add(child.name)
 
     return epics, stories_by_epic
