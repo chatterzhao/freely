@@ -2947,12 +2947,20 @@
 ### candidate_issues
 1. `C-20260705T231131Z-A`
 - milestone: M-20260705T231131Z-A
-- status: promoted
-- promoted_issue_id: `I-20260705T231131Z-A`
-- promoted_issue_path: docs/B2-docs/git-worktree/wt-close/raw-20260705T231131Z/issues/I-20260705T231131Z-A.md
+- milestone: M-20260705T231131Z-A; status: absorbed
+- absorbed_into: `I-20260705T231131Z-A`
 ### committed_issues
 1. `I-20260705T231131Z-A`
 - title: fix — 全项目旧路径清理
 - milestone: M-20260705T231131Z-A
-- phase_state: in_b2_ibm
+- phase_state: completed
 - path: docs/B2-docs/git-worktree/wt-close/raw-20260705T231131Z/issues/I-20260705T231131Z-A.md
+### completed_issues
+1. `I-20260705T231131Z-A`
+- title: fix — 全项目旧路径清理
+- milestone: M-20260705T231131Z-A
+- phase_state: completed
+- path: docs/B2-docs/git-worktree/wt-close/raw-20260705T231131Z/issues/I-20260705T231131Z-A.md
+2. `C-20260705T231131Z-A`
+- milestone: M-20260705T231131Z-A; status: absorbed
+- absorbed_into: `I-20260705T231131Z-A`
