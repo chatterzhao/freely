@@ -2949,3 +2949,10 @@
 - milestone: M-20260705T231131Z-A
 - status: promoted
 - promoted_issue_id: `I-20260705T231131Z-A`
+- promoted_issue_path: docs/B2-docs/git-worktree/wt-close/raw-20260705T231131Z/issues/I-20260705T231131Z-A.md
+### committed_issues
+1. `I-20260705T231131Z-A`
+- title: fix — 全项目旧路径清理
+- milestone: M-20260705T231131Z-A
+- phase_state: in_b2_ibm
+- path: docs/B2-docs/git-worktree/wt-close/raw-20260705T231131Z/issues/I-20260705T231131Z-A.md
