@@ -2837,3 +2837,27 @@
 - milestone: M-20260705T042057Z-A
 - status: absorbed
 - absorbed_into: `I-20260705T042057Z-A`
+
+## M-20260705T072052Z-A
+- title: fix — truncate a2a-server.log on daemon start
+- status: active
+### candidate_issues
+1. `C-20260705T072052Z-A`
+- milestone: M-20260705T072052Z-A; status: absorbed
+- absorbed_into: `I-20260705T072052Z-A`
+### committed_issues
+1. `I-20260705T072052Z-A`
+- title: fix — truncate a2a-server.log
+- milestone: M-20260705T072052Z-A
+- phase_state: completed
+- path: docs/epics/runtime-core/a2a-log-rotation/raw-20260705T072052Z/issues/I-20260705T072052Z-A.md
+### completed_issues
+1. `I-20260705T072052Z-A`
+- title: fix — truncate a2a-server.log
+- milestone: M-20260705T072052Z-A
+- phase_state: completed
+- path: docs/epics/runtime-core/a2a-log-rotation/raw-20260705T072052Z/issues/I-20260705T072052Z-A.md
+2. `C-20260705T072052Z-A`
+- milestone: M-20260705T072052Z-A
+- status: absorbed
+- absorbed_into: `I-20260705T072052Z-A`

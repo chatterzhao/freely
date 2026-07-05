@@ -2,6 +2,7 @@
 local_id: raw-20260705T072052Z
 kind: raw
 phase_state: absorbed
+absorbed_into: I-20260705T072052Z-A
 platform_ids:
   gitee:
     issue_id: IJYUBF
