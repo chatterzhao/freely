@@ -382,7 +382,7 @@ def read_issues_dir(project: Path) -> list[dict]:
             })
 
     # Also scan I-* issues under new structure: docs/B2-docs/{epic}/{story}/raw-{raw key}/issues/
-    epics_dir = project / "docs" / "epics"
+    epics_dir = project / "docs" / "B2-docs"
     if epics_dir.is_dir():
         for mf in sorted(epics_dir.glob("*/*/raw-*/issues/I-*.md")):
             try:
