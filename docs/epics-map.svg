@@ -964,13 +964,13 @@
   <text x="65" y="18232" font-size="11" fill="#34a853">bridge-init</text>
 
   <text x="65" y="18210" font-size="11" fill="#333">safe-state-io</text>
-  <rect id="epic-git-hygiene" x="35" y="18257" width="700" height="70" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
-  <text x="50" y="18281" font-size="13" font-weight="bold" fill="#1a73e8">git-hygiene</text>
-  <rect id="story-untracked-pycache" x="55" y="18265" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
-  <text x="65" y="18280" font-size="11" fill="#333">untracked-pycache</text>
+  <rect id="epic-git-guidelines" x="35" y="18257" width="700" height="90" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+  <text x="50" y="18281" font-size="13" font-weight="bold" fill="#1a73e8">git-guidelines</text>
 
-  <rect id="story-gitignore-guidelines" x="55" y="18287" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
+  <text x="50" y="18281" font-size="13" font-weight="bold" fill="#1a73e8">git-guidelines</text>
   <text x="65" y="18302" font-size="11" fill="#34a853">gitignore-guidelines</text>
+  <text x="65" y="18325" font-size="11" fill="#34a853">docs-epics-path-fix</text>
+  <rect id="story-docs-epics-path-fix" x="55" y="18310" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
 
   <rect id="epic-closeout-chain" x="35" y="18327" width="700" height="250" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
   <text x="50" y="18351" font-size="13" font-weight="bold" fill="#1a73e8">closeout-chain</text>
