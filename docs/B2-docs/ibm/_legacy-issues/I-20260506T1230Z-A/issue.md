@@ -3,7 +3,7 @@ local_id: I-20260506T1230Z-A
 kind: linked
 phase_state: dropped
 completed_at: '2026-06-16T04:14:56Z'
-source_candidate: docs/B1-docs/raw-20260506-wt-create-dual/candidates.md
+source_candidate: docs/B1-docs/raw-20260506/candidates.md
 milestone: M-20260506T1230Z-A
 verification_artifact_dir: docs/epics/wt-create-dual/code-reviews
 pre_tests_path: docs/epics/wt-create-dual/verification/pre-tests.md
