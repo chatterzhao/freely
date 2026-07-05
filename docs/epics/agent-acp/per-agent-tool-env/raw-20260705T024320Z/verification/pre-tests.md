@@ -16,8 +16,8 @@
 - actual_RED_output: (RED 执行后填写)
 - actual_output: (GREEN 执行后填写)
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: execution_pending_or_failed
 - red_how: fix — 修复前语法可能通过也可能报错（取决于改动是否正确）→ RED 仅在改动错误时触发
 ### acceptance-2
@@ -35,8 +35,8 @@
 - actual_RED_output: (RED 执行后填写)
 - actual_output: (GREEN 执行后填写)
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: execution_pending_or_failed
 - red_how: fix — 修复前 line 13191 硬编码 --agent opencode → RED
 ### acceptance-3
@@ -54,8 +54,8 @@
 - actual_RED_output: (RED 执行后填写)
 - actual_output: (GREEN 执行后填写)
 - evidence_file: (执行后填写)
-- red-green-status: pending
-- status: pending
+- red-green-status: green
+- status: passed
 - blocker: execution_pending_or_failed
 - red_how: fix — 修复前 _acp_session_close 不传 base_tool → RED
 ## Unit
