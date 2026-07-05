@@ -1802,8 +1802,11 @@
 
 ## M-20260704T234812Z-A
 - title: fix — #3731 ACP cleanup 遗漏修复 + hook 提示改进
-- status: completed
+- status: active
 ### candidate_issues
+1. `C-20260704T234812Z-A`
+- milestone: M-20260704T234812Z-A; status: promoted
+- promoted_issue_id: `I-20260704T234812Z-A`
 ### committed_issues
 1. `I-20260704T234812Z-A`
 - title: fix — #3731 ACP cleanup 遗漏修复 + hook 提示改进
