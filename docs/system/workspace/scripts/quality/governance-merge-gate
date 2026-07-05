@@ -1705,9 +1705,14 @@ def main() -> int:
             if not verification_artifact_dir_is_scoped(verification_dir):
                 errors.append(
                     f"{owner_issue.issue_id or owner_issue.path} in {owner_issue.path} uses verification_artifact_dir '{verification_dir}', which is too broad or non-canonical. "
-                    f"Use an issue-scoped docs/B2-docs/.../code-reviews directory before merging implementation-bearing changes."
+                    f"Expected format: docs/B2-docs/{{epic}}/{{story}}/raw-{{key}}/code-reviews"
                 )
                 continue
+            if not os.path.isdir(os.path.join(ROOT_DIR, verification_dir)):
+                errors.append(
+                    f"{owner_issue.issue_id or owner_issue.path} in {owner_issue.path}: verification_artifact_dir '{verification_dir}' does not exist on disk. "
+                    f"Create this directory before merging."
+                )
 
             normalized_dir = verification_dir.rstrip("/")
             owner_reviews = [review for review in review_records if review.path.startswith(f"{normalized_dir}/")]
