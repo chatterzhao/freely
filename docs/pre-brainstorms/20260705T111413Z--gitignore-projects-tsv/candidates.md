@@ -10,5 +10,5 @@ milestone: M-20260705T111413Z-A
 - status: absorbed
 - decision_reason: machine-specific global state
 - promoted_issue_id: I-20260705T111413Z-A
-- promoted_issue_path: docs/epics/runtime-core/gitignore-tsv/raw-20260705T111413Z/issues/I-20260705T111413Z-A.md
+- promoted_issue_path: docs/epics/git-hygiene/ignore-tsv/raw-20260705T111413Z/issues/I-20260705T111413Z-A.md
 - milestone: M-20260705T111413Z-A

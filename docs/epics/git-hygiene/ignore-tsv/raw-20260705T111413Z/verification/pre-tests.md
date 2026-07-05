@@ -9,7 +9,7 @@
 - target_environment: feature-local
 - required_evidence: grep
 - evidence_level: integration
-- artifact_ref: docs/epics/runtime-core/gitignore-tsv/raw-20260705T111413Z/verification/test-evidence/at-001.log
+- artifact_ref: docs/epics/git-hygiene/ignore-tsv/raw-20260705T111413Z/verification/test-evidence/at-001.log
 - test_command: grep -q "projects.tsv" .gitignore && echo PASS
 - expected_output: PASS
 - expected_RED_output: not found

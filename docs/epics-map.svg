@@ -954,8 +954,6 @@
   <rect id="story-bridge-init" x="55" y="18217" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
   <rect id="story-a2a-log-rotation" x="55" y="18239" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
   <rect id="story-log-rotation-full" x="55" y="18245" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
-  <rect id="story-gitignore-tsv" x="55" y="18248" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
-  <text x="65" y="18263" font-size="11" fill="#34a853">gitignore-tsv</text>
 
   <rect id="story-tool-change-fix" x="65" y="842" width="670" height="35" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
   <text x="65" y="864" font-size="11" fill="#34a853">tool-change-fix</text>
@@ -970,6 +968,9 @@
   <rect id="epic-git-hygiene" x="35" y="18257" width="700" height="70" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
   <text x="50" y="18281" font-size="13" font-weight="bold" fill="#1a73e8">git-hygiene</text>
   <rect id="story-untracked-pycache" x="55" y="18265" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
+  <rect id="story-ignore-tsv" x="65" y="858" width="670" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
+  <text x="75" y="873" font-size="11" fill="#34a853">ignore-tsv</text>
+
   <text x="65" y="18280" font-size="11" fill="#333">untracked-pycache</text>
   <rect id="epic-closeout-chain" x="35" y="18327" width="700" height="250" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
   <text x="50" y="18351" font-size="13" font-weight="bold" fill="#1a73e8">closeout-chain</text>

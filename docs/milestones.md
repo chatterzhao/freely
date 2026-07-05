@@ -2917,4 +2917,4 @@
 1. C-20260705T111413Z-A — absorbed → I-20260705T111413Z-A
 ### committed_issues
 1. I-20260705T111413Z-A — phase_state completed
-- path: docs/epics/runtime-core/gitignore-tsv/raw-20260705T111413Z/issues/I-20260705T111413Z-A.md
+- path: docs/epics/git-hygiene/ignore-tsv/raw-20260705T111413Z/issues/I-20260705T111413Z-A.md
