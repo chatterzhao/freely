@@ -969,6 +969,11 @@
   <rect id="story-close-ibm-loophole" x="55" y="18545" width="660" height="22" fill="#f0fff0" stroke="#34a853" stroke-width="1" rx="3"/>
   <text x="65" y="18560" font-size="11" fill="#333">close-ibm-loophole</text>
 
+<rect id="epic-worktree-close" x="35" y="18663" width="700" height="70" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
+<text x="50" y="18687" font-size="13" font-weight="bold" fill="#1a73e8">worktree-close</text>
+<rect id="story-rawkey-unify" x="65" y="18693" width="670" height="35" fill="#f0f4ff" stroke="#669df6" stroke-width="1.5" rx="3"/>
+<text x="80" y="18715" font-size="12" fill="#1a73e8">rawkey-unify</text>
+
 <rect id="epic-workflow" x="35" y="18613" width="700" height="45" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2" rx="4"/>
 <text x="50" y="18637" font-size="13" font-weight="bold" fill="#1a73e8">workflow</text>
 <rect id="story-wt-close" x="65" y="18653" width="670" height="35" fill="#f0f4ff" stroke="#669df6" stroke-width="1.5" rx="3"/>
