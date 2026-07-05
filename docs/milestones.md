@@ -2885,3 +2885,27 @@
 - milestone: M-20260705T074631Z-A
 - status: absorbed
 - absorbed_into: `I-20260705T074631Z-A`
+
+## M-20260705T084915Z-A
+- title: fix — tool change detection
+- status: active
+### candidate_issues
+1. `C-20260705T084915Z-A`
+- milestone: M-20260705T084915Z-A; status: absorbed
+- absorbed_into: `I-20260705T084915Z-A`
+### committed_issues
+1. `I-20260705T084915Z-A`
+- title: fix — tool change detection
+- milestone: M-20260705T084915Z-A
+- phase_state: completed
+- path: docs/epics/agent-acp/tool-change-fix/raw-20260705T084915Z/issues/I-20260705T084915Z-A.md
+### completed_issues
+1. `I-20260705T084915Z-A`
+- title: fix — tool change detection
+- milestone: M-20260705T084915Z-A
+- phase_state: completed
+- path: docs/epics/agent-acp/tool-change-fix/raw-20260705T084915Z/issues/I-20260705T084915Z-A.md
+2. `C-20260705T084915Z-A`
+- milestone: M-20260705T084915Z-A
+- status: absorbed
+- absorbed_into: `I-20260705T084915Z-A`
