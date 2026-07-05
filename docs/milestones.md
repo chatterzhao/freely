@@ -2861,3 +2861,27 @@
 - milestone: M-20260705T072052Z-A
 - status: absorbed
 - absorbed_into: `I-20260705T072052Z-A`
+
+## M-20260705T074631Z-A
+- title: fix — 全部日志 rotation 覆盖
+- status: active
+### candidate_issues
+1. `C-20260705T074631Z-A`
+- milestone: M-20260705T074631Z-A; status: absorbed
+- absorbed_into: `I-20260705T074631Z-A`
+### committed_issues
+1. `I-20260705T074631Z-A`
+- title: fix — 全部日志 rotation
+- milestone: M-20260705T074631Z-A
+- phase_state: completed
+- path: docs/epics/runtime-core/log-rotation-full/raw-20260705T074631Z/issues/I-20260705T074631Z-A.md
+### completed_issues
+1. `I-20260705T074631Z-A`
+- title: fix — 全部日志 rotation
+- milestone: M-20260705T074631Z-A
+- phase_state: completed
+- path: docs/epics/runtime-core/log-rotation-full/raw-20260705T074631Z/issues/I-20260705T074631Z-A.md
+2. `C-20260705T074631Z-A`
+- milestone: M-20260705T074631Z-A
+- status: absorbed
+- absorbed_into: `I-20260705T074631Z-A`
