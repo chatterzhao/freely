@@ -2789,3 +2789,27 @@
 - milestone: M-20260705T012851Z-A
 - status: absorbed
 - absorbed_into: `I-20260705T012851Z-A`
+
+## M-20260705T024320Z-A
+- title: fix — per-agent tool/slot 全链路修复
+- status: active
+### candidate_issues
+1. `C-20260705T024320Z-A`
+- milestone: M-20260705T024320Z-A; status: absorbed
+- absorbed_into: `I-20260705T024320Z-A`
+### committed_issues
+1. `I-20260705T024320Z-A`
+- title: fix — per-agent tool/slot 全链路修复
+- milestone: M-20260705T024320Z-A
+- phase_state: completed
+- path: docs/epics/agent-acp/per-agent-tool-env/raw-20260705T024320Z/issues/I-20260705T024320Z-A.md
+### completed_issues
+1. `I-20260705T024320Z-A`
+- title: fix — per-agent tool/slot 全链路修复
+- milestone: M-20260705T024320Z-A
+- phase_state: completed
+- path: docs/epics/agent-acp/per-agent-tool-env/raw-20260705T024320Z/issues/I-20260705T024320Z-A.md
+2. `C-20260705T024320Z-A`
+- milestone: M-20260705T024320Z-A
+- status: absorbed
+- absorbed_into: `I-20260705T024320Z-A`

@@ -5681,7 +5681,7 @@ prepare_manager_cross_tool_fallback_if_needed() {
   if [[ -n "${fallback_tool:-}" ]]; then
     persist_project_tool_selection "$project" "$fallback_tool"
     # Kill old ACP bridge immediately so next cycle starts with new tool's binary
-    _stop_acp_bridge "$project"
+    _stop_acp_bridge "$project" "${_cross_base_tool:-}"
     FREELY_ACP_FIRST_LAUNCH_DONE=0
     runtime_clear_session_state_for_fresh_launch "$project"
     record_tool_auto_switch_event "$project" "$current_tool" "$fallback_tool" "${fallback_slot:-}" "$last_exit_reason"
@@ -5698,7 +5698,7 @@ prepare_manager_cross_tool_fallback_if_needed() {
 
   if [[ -n "$earliest_tool" && -n "$earliest_reset" ]]; then
     persist_project_tool_selection "$project" "$earliest_tool"
-    _stop_acp_bridge "$project"
+    _stop_acp_bridge "$project" "${_cross_base_tool:-}"
     runtime_clear_session_state_for_fresh_launch "$project"
     [[ -n "$earliest_slot" ]] && runtime_write_tool_current_slot "$earliest_tool" "$earliest_slot"
     record_tool_auto_switch_event "$project" "$current_tool" "$earliest_tool" "${earliest_slot:-}" "all_tools_unavailable" "$earliest_reset" "true" "waiting" "${earliest_slot:-}"
@@ -13177,7 +13177,13 @@ SESSIONEOF
   fi
 
   local _manager_bridge_socket _worker_pid
-  _manager_bridge_socket="$(_acp_bridge_socket "$manager_project")"
+  # Resolve worker base_tool from agent-table
+  local _worker_slot _worker_base
+  _worker_slot=$("$PROJECT_ROOT/bin/agent-table-query" --get-slot worker_01 2>/dev/null || true)
+  _worker_base="${_worker_slot%%-*}"
+  [[ -z "$_worker_base" ]] && _worker_base="opencode"
+
+  _manager_bridge_socket="$(_acp_bridge_socket "$manager_project" "$_worker_base")"
   if [[ ! -S "$_manager_bridge_socket" ]]; then
     log_warn "manager bridge socket not found; falling back to --agent mode (opencode)"
     local _worker_next_file
@@ -13188,7 +13194,7 @@ SESSIONEOF
       export FREELY_ROLE_HINT=worker
       export SESSION_PARENT_ID="${TOOL_SESSION_ID_CURRENT:-}"
       python3 "$SELF_ROOT/docs/system/workspace/scripts/runtime/run-acp-prompt.py" \
-        --agent opencode \
+        --agent "$_worker_base" \
         --cwd "$target_project" \
         --prompt-file "$prompt_file" \
         --launch-kind fork \
@@ -14085,8 +14091,8 @@ _ensure_acp_bridge_running() {
       local _acp_bin_name; _acp_bin_name=$(basename "$acp_bin" 2>/dev/null || echo "$acp_bin")
       if [[ -n "$running_bin" && "$_running_bin_name" != "$_acp_bin_name" ]]; then
         log_info "ACP bridge binary changed ($running_bin → $acp_bin), gracefully closing session before restart"
-        _acp_session_close "$project" "${TOOL_SESSION_ID_CURRENT:-}"
-        _stop_acp_bridge "$project"
+        _acp_session_close "$project" "$base_tool" "${TOOL_SESSION_ID_CURRENT:-}"
+        _stop_acp_bridge "$project" "${_cross_base_tool:-}"
       elif [[ -n "$running_tool" ]]; then
         # Compare base tool names (slot suffix may differ between cycles).
         # opencode-apikey-ds-flash-auto and opencode are the same base tool.
@@ -14095,8 +14101,8 @@ _ensure_acp_bridge_running() {
         _current_base="${_current_base:-claude}"
         if [[ "$_running_base" != "$_current_base" ]]; then
           log_info "ACP bridge tool changed ($running_tool → ${AGENT_AI_TOOL:-claude}), gracefully closing session before restart"
-          _acp_session_close "$project" "${TOOL_SESSION_ID_CURRENT:-}"
-          _stop_acp_bridge "$project"
+          _acp_session_close "$project" "$base_tool" "${TOOL_SESSION_ID_CURRENT:-}"
+          _stop_acp_bridge "$project" "${_cross_base_tool:-}"
         fi
       elif _acp_bridge_health_check "$project" 5 "$base_tool"; then
         return 0
@@ -14130,7 +14136,18 @@ _ensure_acp_bridge_running() {
   # Collect per-slot env vars to pass to the bridge process only (not global export).
   # This isolates concurrent projects using different slots.
   local -a _bridge_env=()
-  local tool_name="${AGENT_AI_TOOL:-claude}"
+  # Resolve slot for this base_tool from agent-table (per-agent, not global AGENT_AI_TOOL)
+  local _bridge_slot=""
+  if [[ -f "$_at" && -x "$_aq" ]]; then
+    for _role in manager worker reviewer; do
+      _bridge_slot=$("$_aq" --get-slot "${_role}_01" 2>/dev/null || true)
+      [[ -n "$_bridge_slot" && "${_bridge_slot%%-*}" == "$base_tool" ]] && break
+      _bridge_slot=""
+    done
+  fi
+  [[ -z "$_bridge_slot" ]] && _bridge_slot="${AGENT_AI_TOOL:-claude}"
+
+  local tool_name="$_bridge_slot"
 
   # ── Unified auth-driven bridge env dispatch ──────────────────
   # ai_cli_tool_with_auth_assemble work reads ALL behavior from the
@@ -14206,7 +14223,7 @@ _ensure_acp_bridge_running() {
   # Record the registry short name (not config.toml full path) so comparison
   # with next cycle's registry lookup uses consistent values.
   printf '%s\n' "${_reg_bin:-$acp_bin}" > "$acp_bin_file" 2>/dev/null || true
-  printf '%s\n' "${AGENT_AI_TOOL:-claude}" > "$acp_tool_file" 2>/dev/null || true
+  printf '%s\n' "$_bridge_slot" > "$acp_tool_file" 2>/dev/null || true
 
   # Wait for readiness (codex-acp cold start ~8s, use 15s margin)
   local waited=0
@@ -14233,8 +14250,9 @@ _ensure_acp_bridge_running() {
 # Falls back silently if bridge is dead or SDK does not support the method.
 # Signature: (project, session_id) — for direct session_id-based close.
 _acp_session_close() {
-  local project="$1" session_id="$2"
-  local socket; socket="$(_acp_bridge_socket "$project")"
+  local base_tool="${2:-}"
+  local project="$1" session_id="${3:-}"
+  local socket; socket="$(_acp_bridge_socket "$project" "$base_tool")"
   [[ -S "$socket" ]] || return 0
   [[ -n "$session_id" ]] || return 0
 
@@ -21507,7 +21525,7 @@ print(f'/tmp/freely-db-{h}.pid')
     *)
       rm -f "$(session_state_file "$project")" "$(exit_contract_file "$project")"
       if [[ "${AI_TOOL_ADAPTER:-direct}" == "acp" ]]; then
-        _stop_acp_bridge "$project"
+        _stop_acp_bridge "$project" "${_cross_base_tool:-}"
       fi
       # Aggressively kill ALL project-related AI processes.
       # SIGTERM first, brief wait, then SIGKILL for any survivors.

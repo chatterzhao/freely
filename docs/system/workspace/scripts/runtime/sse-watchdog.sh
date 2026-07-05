@@ -33,7 +33,7 @@ load_config "$PROJECT"
 A2A_TASK_PY="$SELF_ROOT/docs/system/workspace/scripts/runtime/a2a_task.py"
 QUEUE_FILE="$(run_dir_for_project "$PROJECT")/sse-events.jsonl"
 PID_FILE="$(run_dir_for_project "$PROJECT")/sse-watchdog.pid"
-ACP_BRIDGE_SOCK="$(_acp_bridge_socket "$PROJECT")"
+ACP_BRIDGE_SOCK="$(_acp_bridge_socket "$PROJECT" "${AGENT_AI_TOOL%%-*}")"  # was:  "$PROJECT")"
 MANAGER_SESSION_FILE="$(run_dir_for_project "$PROJECT")/manager-session-id"
 
 mkdir -p "$(run_dir_for_project "$PROJECT")"
