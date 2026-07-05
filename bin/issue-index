@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# issue-index: maintain docs/issues/ cache index
+# issue-index: maintain docs/B1-docs/ and docs/B2-docs/ cache index
 # Usage:
 #   bin/issue-index [--project <path>]             # incremental: scan files newer than last_scan_at
 #   bin/issue-index --rebuild [--project <path>]   # full rebuild from all issue.md frontmatter
@@ -16,7 +16,8 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-ISSUES_DIR="$PROJECT/docs/issues"
+ISSUES_DIR="$PROJECT/docs/B1-docs"
+B2_ISSUES_DIR="$PROJECT/docs/B2-docs"
 SCAN_STATE="$ISSUES_DIR/.scan-state"
 INDEX_FILE="$ISSUES_DIR/ISSUES.md"
 REBUILD="${REBUILD:-0}"
@@ -31,9 +32,9 @@ fi
 # Find issue.md files to process
 if [[ -n "$last_scan_at" ]]; then
   # macOS-compatible: use mtime comparison
-  files=$(find "$ISSUES_DIR" -name "issue.md" -newermt "$last_scan_at" 2>/dev/null | sort || find "$ISSUES_DIR" -name "issue.md" | sort)
+  files=$( { find "$ISSUES_DIR" -name "issue.md" -newermt "$last_scan_at" 2>/dev/null; find "$B2_ISSUES_DIR" -name "I-*.md" -newermt "$last_scan_at" 2>/dev/null; } | sort || { find "$ISSUES_DIR" -name "issue.md" 2>/dev/null; find "$B2_ISSUES_DIR" -name "I-*.md" 2>/dev/null; } | sort)
 else
-  files=$(find "$ISSUES_DIR" -name "issue.md" | sort)
+  files=$( { find "$ISSUES_DIR" -name "issue.md" 2>/dev/null; find "$B2_ISSUES_DIR" -name "I-*.md" 2>/dev/null; } | sort)
 fi
 
 # Rebuild header

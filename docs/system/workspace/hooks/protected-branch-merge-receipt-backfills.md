@@ -353,7 +353,7 @@
 - bounded_issue: `docs/B2-docs/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
 - verification_ref: `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
 - evidence_refs:
-  - `docs/progress/workspace-routing-foundation/p-preferred-auth-method-account-switch-fix.md`
+  - `docs/B2-docs/ibm/_legacy-progress/workspace-routing-foundation/p-preferred-auth-method-account-switch-fix.md`
   - `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/pre-tests.md`
   - `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
 
@@ -370,7 +370,7 @@
 - bounded_issue: `docs/B2-docs/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
 - verification_ref: `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
 - evidence_refs:
-  - `docs/progress/workspace-routing-foundation/p-preferred-auth-method-account-switch-fix.md`
+  - `docs/B2-docs/ibm/_legacy-progress/workspace-routing-foundation/p-preferred-auth-method-account-switch-fix.md`
   - `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/pre-tests.md`
   - `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
 
@@ -387,7 +387,7 @@
 - bounded_issue: `docs/B2-docs/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
 - verification_ref: `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
 - evidence_refs:
-  - `docs/progress/workspace-routing-foundation/p-preferred-auth-method-account-switch-fix.md`
+  - `docs/B2-docs/ibm/_legacy-progress/workspace-routing-foundation/p-preferred-auth-method-account-switch-fix.md`
   - `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/pre-tests.md`
   - `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
 
@@ -404,7 +404,7 @@
 - bounded_issue: `docs/B2-docs/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
 - verification_ref: `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
 - evidence_refs:
-  - `docs/progress/workspace-routing-foundation/p-preferred-auth-method-account-switch-fix.md`
+  - `docs/B2-docs/ibm/_legacy-progress/workspace-routing-foundation/p-preferred-auth-method-account-switch-fix.md`
   - `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/pre-tests.md`
   - `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
 
@@ -421,7 +421,7 @@
 - bounded_issue: `docs/B2-docs/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
 - verification_ref: `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
 - evidence_refs:
-  - `docs/progress/workspace-routing-foundation/p-preferred-auth-method-account-switch-fix.md`
+  - `docs/B2-docs/ibm/_legacy-progress/workspace-routing-foundation/p-preferred-auth-method-account-switch-fix.md`
   - `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/pre-tests.md`
   - `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
 
@@ -438,6 +438,6 @@
 - bounded_issue: `docs/B2-docs/protected-merge-unparseable-subject-receipt-gap-governance/issues/protected-merge-unparseable-subject-receipt-gap-governance.md`
 - verification_ref: `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`
 - evidence_refs:
-  - `docs/progress/workspace-routing-foundation/p-preferred-auth-method-account-switch-fix.md`
+  - `docs/B2-docs/ibm/_legacy-progress/workspace-routing-foundation/p-preferred-auth-method-account-switch-fix.md`
   - `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/pre-tests.md`
   - `docs/B2-docs/codex-apikey-slot-bundle-and-provider-aware-probe-governance/code-reviews/20260410-preferred-auth-method-account-switch-fix-review.md`

@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# issue-migrate-intake: one-time migration from .freely/intake/ to docs/issues/
+# issue-migrate-intake: one-time migration from .freely/intake/ to docs/B1-docs/
 # Run once, verify, then delete .freely/intake/
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 PROJECT="${1:-$ROOT_DIR}"
 INTAKE_DIR="$PROJECT/.freely/intake"
-ISSUES_DIR="$PROJECT/docs/issues"
+ISSUES_DIR="$PROJECT/docs/B1-docs"
 
 [[ -d "$INTAKE_DIR" ]] || { echo "[migrate] no .freely/intake/ directory to migrate"; exit 0; }
 [[ -d "$ISSUES_DIR" ]] || mkdir -p "$ISSUES_DIR"
@@ -55,4 +55,4 @@ ISSUEEOF
 done
 
 echo "[migrate] done: $migrated migrated, $skipped skipped"
-echo "[migrate] verify docs/issues/ contents, then: rm -rf $INTAKE_DIR"
+echo "[migrate] verify docs/B1-docs/ contents, then: rm -rf $INTAKE_DIR"

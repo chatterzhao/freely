@@ -465,13 +465,13 @@ _sync_issues_changed_in_merge() {
   _wt_path=$(git worktree list --porcelain 2>/dev/null | awk -v br="$_src_branch" '$1=="worktree"{wt=$2} $1=="branch" && index($2,br){print wt}' | head -1)
   [[ -z "$_wt_path" ]] && _wt_path="$PWD"
 
-  local issues_dir="$PWD/docs/issues"
+  local issues_dir="$PWD/docs/B1-docs"
   [[ -d "$issues_dir" ]] || return 0
   [[ -x "$PWD/bin/issue-sync" ]] || return 0
 
   # Compare source branch against target (pre-merge), not HEAD vs HEAD^ (post-merge)
   local changed_issues synced=0
-  changed_issues=$(git diff --name-only "$_target" "$_src_branch" -- "$issues_dir" 2>/dev/null | grep 'issue\.md$' | sed 's|docs/issues/||' | sed 's|/issue\.md$||' | sort -u || true)
+  changed_issues=$(git diff --name-only "$_target" "$_src_branch" -- "$issues_dir" 2>/dev/null | grep 'issue\.md$' | sed 's|docs/B1-docs/||' | sed 's|/issue\.md$||' | sort -u || true)
   [[ -n "$changed_issues" ]] || return 0
 
   for local_id in $changed_issues; do
@@ -519,7 +519,7 @@ _sync_issues_changed_in_merge() {
     # Auto-commit + push in source worktree so it stays clean for wt-close.
     # Mirrors pr-review-guarded: review → commit → push → merge.
     if [[ -d "$_wt_path" ]]; then
-      git -C "$_wt_path" add docs/issues/ 2>/dev/null || true
+      git -C "$_wt_path" add docs/B1-docs/ 2>/dev/null || true
       if ! git -C "$_wt_path" diff --cached --quiet 2>/dev/null; then
         git -C "$_wt_path" commit -m "chore: issue-sync before merge
 
@@ -580,7 +580,7 @@ do_initial_merge() {
   if [[ "$dry_run" != "1" ]]; then
     _raw_key=$(echo "$source_branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)
     if [[ -n "$_raw_key" ]]; then
-      _review_file="$(find docs/epics -name "pr-review-raw-${_raw_key}.md" 2>/dev/null | head -1 || true)"
+      _review_file="$(find docs/B2-docs -name "pr-review-raw-${_raw_key}.md" 2>/dev/null | head -1 || true)"
       if [[ -z "$_review_file" ]]; then
         git fetch github "$source_branch" 2>/dev/null || true
         _review_file="$(git ls-tree -r --name-only "refs/remotes/github/$source_branch" 2>/dev/null | grep "pr-review-raw-${_raw_key}.md" | head -1 || true)"

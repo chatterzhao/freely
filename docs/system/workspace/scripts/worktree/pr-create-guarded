@@ -55,7 +55,7 @@ echo "Step 0a/4: worktree clean ✓"
 # ── Step 0b: Worktree phase_state check ──
 _raw_key=$(echo "$current_branch" | grep -oE 'raw-[0-9]{8}T[0-9]{6}Z' | head -1 || true)
 if [[ -n "$_raw_key" ]]; then
-  _issue_file="$ROOT_DIR/docs/issues/${_raw_key}/issue.md"
+  _issue_file="$ROOT_DIR/docs/B1-docs/${_raw_key}/issue.md"
   if [[ -f "$_issue_file" ]]; then
     _phase="$(python3 -c "
 import yaml
@@ -74,7 +74,7 @@ This means the IBM lifecycle is complete and the issue is ready for merge.
   Required:      phase_state=absorbed
 
   If work is done but phase_state not updated:
-    1. Edit $ROOT_DIR/docs/issues/${_raw_key}/issue.md
+    1. Edit $ROOT_DIR/docs/B1-docs/${_raw_key}/issue.md
     2. Set phase_state: absorbed
     3. Set absorbed_into: 'I-{key}-A' (the I-* issue that absorbs this)
     4. git add + git commit
@@ -270,7 +270,7 @@ echo ""
 # lacks a resolution sub-comment (adopted/discarded).
 echo "Step 2e/4: comment resolution check..."
 _comment_check_failed=0
-for _raw_file in $(find "$ROOT_DIR/docs/issues" -maxdepth 2 -name "issue.md" -path "*/raw-*" 2>/dev/null); do
+for _raw_file in $(find "$ROOT_DIR/docs/B1-docs" -maxdepth 2 -name "issue.md" -path "*/raw-*" 2>/dev/null); do
   _raw_text="$(cat "$_raw_file")"
   # Check for human comments without resolution
   _unresolved=$(echo "$_raw_text" | grep -c "^### comment-" 2>/dev/null || true)

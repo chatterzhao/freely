@@ -107,32 +107,32 @@ if [[ "$caller" == "worker" ]]; then
   done
 
   if [[ -n "$_acp_sock" && -x "$ACP_CLIENT" ]]; then
-	    _raw_issue_file="docs/issues/raw-${raw_key}/issue.md"
+	    _raw_issue_file="docs/B1-docs/raw-${raw_key}/issue.md"
 	    _raw_issue_text=""
 	    [[ -f "$_raw_issue_file" ]] && _raw_issue_text="$(head -80 "$_raw_issue_file" 2>/dev/null || true)"
 	    _pre_tests_text=""
-	    # New structure: docs/epics/{epic}/{story}/raw-{raw_key}/verification/pre-tests.md
-	    for _pt in docs/epics/*/*/raw-${raw_key}/verification/pre-tests.md; do
+	    # New structure: docs/B2-docs/{epic}/{story}/raw-{raw_key}/verification/pre-tests.md
+	    for _pt in docs/B2-docs/*/*/raw-${raw_key}/verification/pre-tests.md; do
 	      [[ -f "$_pt" ]] && _pre_tests_text="$(cat "$_pt" 2>/dev/null || true)" && break
 	    done
 	    if [[ -z "$_pre_tests_text" ]]; then
-	      for _pt in docs/epics/*/*/raw-*/verification/pre-tests.md; do
+	      for _pt in docs/B2-docs/*/*/raw-*/verification/pre-tests.md; do
 	        [[ -f "$_pt" ]] && _pre_tests_text="$(cat "$_pt" 2>/dev/null || true)" && break
 	      done
 	    fi
 	    _diff_summary="$(git diff --stat develop..HEAD 2>/dev/null | head -30 || true)"
 		    _issue_id="I-${raw_key}-A"
 		    _epic_dir=""
-		    # Search I-* issue under new structure: docs/epics/{epic}/{story}/raw-{raw_key}/issues/
-		    _i_issue_file=$(find docs/epics -path "*/raw-${raw_key}/issues/${_issue_id}.md" -print -quit 2>/dev/null || true)
+		    # Search I-* issue under new structure: docs/B2-docs/{epic}/{story}/raw-{raw_key}/issues/
+		    _i_issue_file=$(find docs/B2-docs -path "*/raw-${raw_key}/issues/${_issue_id}.md" -print -quit 2>/dev/null || true)
 		    if [[ -z "$_i_issue_file" ]]; then
-		      _i_issue_file=$(find docs/epics -path "*/issues/${_issue_id}.md" -print -quit 2>/dev/null || true)
+		      _i_issue_file=$(find docs/B2-docs -path "*/issues/${_issue_id}.md" -print -quit 2>/dev/null || true)
 		    fi
 		    if [[ -n "$_i_issue_file" && -f "$_i_issue_file" ]]; then
 		      _verification_dir=$(grep "verification_artifact_dir:" "$_i_issue_file" 2>/dev/null | sed "s/.*: *'*\([^']*\)'*/\1/" | head -1 || true)
 		      [[ -n "$_verification_dir" && -d "$_verification_dir" ]] && _epic_dir="$_verification_dir"
 		    fi
-		    [[ -z "$_epic_dir" ]] && _epic_dir="docs/epics/pr-review-guarded/code-reviews"
+		    [[ -z "$_epic_dir" ]] && _epic_dir="docs/B2-docs/gate/code-reviews"
 		    _review_file="$_epic_dir/pr-review-raw-${raw_key}.md"
 		    mkdir -p "$(dirname "$_review_file")"
 			rm -f /tmp/freely-review-prompt-*.md 2>/dev/null; _pf=$(mktemp /tmp/freely-review-prompt-XXXXXXXX.md)

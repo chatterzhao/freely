@@ -26,7 +26,7 @@ description: >- 处理 human interruption intake。接收 manager 已 claim 的�
 
 ## 最小输入
 
-- raw intake item：`.freely/intake/<intake_id>/`
+- raw intake item：`docs/B1-docs/raw-{key}/`
 - manager 已选的 reaction：
   - `steer`
   - `followup`

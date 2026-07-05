@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Closeout gate: reconcile comments across chats, docs/issues, and platforms.
+"""Closeout gate: reconcile comments across chats, docs/B1-docs, and platforms.
 
 Three-source reconciliation before issue close:
-  1. chats → docs/issues: every unconsumed comment must appear in issue.md
-  2. docs/issues → chats: every comment in issue.md must be consumed or discarded
-  3. platform → docs/issues: every platform comment must exist in issue.md
-  4. docs/issues → platform: local-only comments are OK (pending sync), warn only
+  1. chats → docs/B1-docs: every unconsumed comment must appear in issue.md
+  2. docs/B1-docs → chats: every comment in issue.md must be consumed or discarded
+  3. platform → docs/B1-docs: every platform comment must exist in issue.md
+  4. docs/B1-docs → platform: local-only comments are OK (pending sync), warn only
 
 Usage: governance-closeout-gate --issue raw-20260430-0010 [--project /path]
 """
@@ -16,7 +16,25 @@ from pathlib import Path
 
 
 def _issue_file(project: Path, issue_id: str) -> Path | None:
-    p = project / "docs" / "issues" / issue_id / "issue.md"
+    # raw-* issues live under docs/B1-docs/
+    if issue_id.startswith("raw-"):
+        p = project / "docs" / "B1-docs" / issue_id / "issue.md"
+        return p if p.is_file() else None
+    # I-* issues live under docs/B2-docs/{epic}/{story}/raw-{raw_key}/issues/
+    m = re.match(r'I-(\d{8}T\d{6}Z)-A', issue_id)
+    if m:
+        raw_key = m.group(1)
+        pattern = f"docs/B2-docs/*/*/raw-{raw_key}*/issues/{issue_id}*"
+        matches = sorted(project.glob(pattern))
+        if matches:
+            return matches[0]
+        # Fallback: search without raw- dir (old format I-* keys)
+        fallback = f"docs/B2-docs/*/*/issues/{issue_id}*"
+        matches2 = sorted(project.glob(fallback))
+        if matches2:
+            return matches2[0]
+    # Fallback for unrecognized formats
+    p = project / "docs" / "B1-docs" / issue_id / "issue.md"
     return p if p.is_file() else None
 
 
@@ -165,7 +183,7 @@ def run_closeout_gate(project: Path, issue_id: str) -> dict:
 
     issue_file = _issue_file(project, issue_id)
 
-    # ── Check 1: chats → docs/issues ──
+    # ── Check 1: chats → docs/B1-docs ──
     chat_comments = _chat_comments(project, issue_id)
     issue_comments = _issue_comments(issue_file) if issue_file else []
     issue_comment_ids = {c["id"] for c in issue_comments}
@@ -185,7 +203,7 @@ def run_closeout_gate(project: Path, issue_id: str) -> dict:
             unconsumed_missing.append(c)
 
     if unconsumed_missing:
-        blocks.append(f"chats→docs/issues: {len(unconsumed_missing)} unconsumed comments not in issue.md")
+        blocks.append(f"chats→docs/B1-docs: {len(unconsumed_missing)} unconsumed comments not in issue.md")
         details["unconsumed_missing"] = [
             {"chat_id": c["id"], "preview": (c.get("message") or "")[:80]} for c in unconsumed_missing
         ]
@@ -194,7 +212,7 @@ def run_closeout_gate(project: Path, issue_id: str) -> dict:
     else:
         details["unconsumed_ok"] = "no unconsumed comments"
 
-    # ── Check 2: docs/issues → chats (every issue.md comment must be consumed) ──
+    # ── Check 2: docs/B1-docs → chats (every issue.md comment must be consumed) ──
     orphan_comments = []
     for ic in issue_comments:
         cid = ic["id"]
@@ -218,12 +236,12 @@ def run_closeout_gate(project: Path, issue_id: str) -> dict:
                                         "consumed": "no chat record, no platform_ids"})
 
     if orphan_comments:
-        blocks.append(f"docs/issues→chats: {len(orphan_comments)} comments with invalid consumed state")
+        blocks.append(f"docs/B1-docs→chats: {len(orphan_comments)} comments with invalid consumed state")
         details["orphan_comments"] = orphan_comments
     else:
         details["consumed_state_ok"] = f"all {len(issue_comments)} issue.md comments have valid consumed state"
 
-    # ── Check 3: platform → docs/issues ──
+    # ── Check 3: platform → docs/B1-docs ──
     plat_ids = _platform_issue_ids(issue_file) if issue_file else {}
     for plat, issue_num in plat_ids.items():
         if not issue_num:
@@ -244,21 +262,21 @@ def run_closeout_gate(project: Path, issue_id: str) -> dict:
         local_ids = {ic.get(comment_id_field) for ic in issue_comments if ic.get(comment_id_field)}
         missing_from_local = [c for c in plat_comments if str(c["id"]) not in local_ids]
         if missing_from_local:
-            blocks.append(f"{plat}→docs/issues: {len(missing_from_local)} platform comments missing locally")
+            blocks.append(f"{plat}→docs/B1-docs: {len(missing_from_local)} platform comments missing locally")
             details[f"{plat}_missing_local"] = [
                 {"id": c["id"], "preview": c.get("body", "")[:80]} for c in missing_from_local
             ]
         else:
             details[f"{plat}_ok"] = f"all {len(plat_comments)} {plat} comments in issue.md"
 
-    # ── Check 4: docs/issues → platform (warn only) ──
+    # ── Check 4: docs/B1-docs → platform (warn only) ──
     synced_ids = set()
     for ic in issue_comments:
         if ic.get("github_comment_id"):
             synced_ids.add(ic["github_comment_id"])
     local_only = [ic for ic in issue_comments if not ic.get("github_comment_id") and not ic.get("gitee_comment_id")]
     if local_only:
-        warns.append(f"docs/issues→platform: {len(local_only)} local comments not yet synced (OK, pending push)")
+        warns.append(f"docs/B1-docs→platform: {len(local_only)} local comments not yet synced (OK, pending push)")
         details["local_unsynced"] = [ic["id"] for ic in local_only]
 
     # ── Result ──

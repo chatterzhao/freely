@@ -15,7 +15,7 @@
   - `docs/milestones.md` 中的 `candidate_issues` / `committed_issues` / `completed_issues`
 - `source_class=continuation`
   - issue
-  - `docs/progress/**`
+  - `docs/B2-docs/**`
   - `docs/recovery/**`
   - 系统监控命中的活跃执行上下文
 

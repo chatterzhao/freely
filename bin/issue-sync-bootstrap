@@ -35,7 +35,7 @@ echo ""
 
 PY_CMD=(python3 "$SCRIPT_DIR/issue-sync-batch.py"
   --repo "$GITHUB_REPO"
-  --issues-dir "$ROOT_DIR/docs/issues"
+  --issues-dir "$ROOT_DIR/docs/B1-docs"
   --milestones "$ROOT_DIR/docs/milestones.md"
 )
 

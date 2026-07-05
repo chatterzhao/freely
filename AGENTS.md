@@ -46,7 +46,7 @@ MUST 强制在任何工作开始前遵守`freely-workflow-guarded-execution`这�
 - `docs/B1-docs/`
 - `docs/milestones.md`
 - `docs/B2-docs/`
-- `docs/progress/`
+- `docs/B2-docs/`
 
 ### 2. Freely 开发完成后的能力目录
 

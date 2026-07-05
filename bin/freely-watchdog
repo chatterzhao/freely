@@ -16,10 +16,10 @@ PRE_CHECK_MAP() {
       # Match both fix-raw-* and feature-raw-* worktree directories
       for _prefix in fix feature; do
         ls "$wt/${_prefix}-raw-${raw_key}-"*/docs/pre-brainstorms/${raw_key}--*/brainstorms.md 2>/dev/null && b1_ok=1
-        ls "$wt/${_prefix}-raw-${raw_key}-"*/docs/epics/*/*/raw-${raw_key}/verification/pre-tests.md 2>/dev/null && b2_ok=1
+        ls "$wt/${_prefix}-raw-${raw_key}-"*/docs/B2-docs/*/*/raw-${raw_key}/verification/pre-tests.md 2>/dev/null && b2_ok=1
       done
       # RED check: pre-tests items should not be pending
-      local pre_tests=$(for _prefix in fix feature; do ls "$wt/${_prefix}-raw-${raw_key}-"*/docs/epics/*/*/raw-${raw_key}/verification/pre-tests.md 2>/dev/null; done | head -1)
+      local pre_tests=$(for _prefix in fix feature; do ls "$wt/${_prefix}-raw-${raw_key}-"*/docs/B2-docs/*/*/raw-${raw_key}/verification/pre-tests.md 2>/dev/null; done | head -1)
       if [[ -n "$pre_tests" && -f "$pre_tests" ]]; then
         grep -q 'red-green-status: red\|red-green-status: green' "$pre_tests" 2>/dev/null && red_ok=1
         grep -q 'red-green-status: green' "$pre_tests" 2>/dev/null && green_ok=1

@@ -95,10 +95,13 @@ done
   exit 1
 }
 
-# Support both legacy .freely/intake/ and new docs/issues/ (IBM Framework B1_IBM)
-if [[ "$intake_id" == raw-* || "$intake_id" == I-* ]]; then
-  issue_file="$project/docs/issues/$intake_id/issue.md"
+# Support both legacy .freely/intake/ and new docs/B1-docs/ + docs/B2-docs/
+if [[ "$intake_id" == raw-* ]]; then
+  issue_file="$project/docs/B1-docs/$intake_id/issue.md"
   [[ -f "$issue_file" ]] || exit 1
+elif [[ "$intake_id" == I-* ]]; then
+  issue_file=$(find "$project/docs/B2-docs" -name "${intake_id}*.md" -print -quit 2>/dev/null || true)
+  [[ -n "$issue_file" && -f "$issue_file" ]] || exit 1
   # Extract message from issue.md: read between first --- and the next --- (YAML frontmatter),
   # then take everything after as the message body.
   message="$(sed -n '/^---$/,/^---$/!p; /^---$/,/^---$/{/^---$/!p}' "$issue_file" | tail -n +2 | head -c 32768 || true)"
