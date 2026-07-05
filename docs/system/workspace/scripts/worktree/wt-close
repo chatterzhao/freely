@@ -28,27 +28,14 @@ usage() {
   cat <<USAGE
 Usage:
   ./bin/wt-close --raw-key <key> [options]
-  ./bin/wt-close --branch <branch> [options]
 
-Close a fix|feature worktree and its platform issue.  The command validates
-phase_state, checks dev↔test worktree consistency, closes the platform issue,
-removes the worktree directory, and deletes the branch.
-
-  ⚠️  IMPORTANT: 只传 --raw-key 或 --branch，不要传 test-pre-merge-* 分支名。
-      The companion test-pre-merge worktree is auto-discovered via raw-key
-      matching and cleaned up automatically (Phase 6b).
-
-Arguments (二选一):
+Close both the fix|feature worktree and its companion test-pre-merge worktree.
+--raw-key 是唯一必填参数。命令从 raw key 自动发现两个工位，按先测试后开发的顺序关闭。
   --raw-key <key>       Raw issue key.  Compatible with multiple formats:
                           raw-20260629T160852Z
                           fix/raw-20260629T160852Z-my-fix
                           feature/raw-20260629T160852Z-my-feat
                           20260629T160852Z
-                        Auto-extracts the raw key and resolves the fix|feature branch.
-
-  --branch <branch>     Explicit branch name (fix/raw-YYYYMMDDTHHMMSSZ-<slug>)
-                        or worktree path.  Compatible with existing usage.
-
 Options (按场景选择):
   --reason <text>    REQUIRED with any bypass flag below.  Format:
                       --reason "违规绕过门禁中，理由充分，是：<业务理由>"
@@ -58,46 +45,27 @@ Options (按场景选择):
                       passed pretests, completed phase_state.
 
   ── 彻底丢弃（不可恢复）──
-  --force            永久丢弃。本地修改 + 远程分支 + 平台 issue 同时删除，无法找回。
-                      ⚠️ --force 只有一个目标: 彻底丢弃。如果不是这个意图，不要用。
-                      ⚠️ 觉得"已经 merge 了可以删" → 用不带 force 的正常 wt-close。
-                         不带 force 报错 → 说明没 merge → STOP，不要继续。
-                      ⚠️ 暂时排不上做、也不会马上 merge → 搁置。工位留在原地，
-                         不占资源。以后随时可以继续。不要为了"清理"用 --force。
-                      ⚠️ 遇到 gate/pretests 报错 → 修复根因，不是 --force。
-                      必须配合 --reason。
+  --force            永久丢弃。必须配合 --raw-key 和 --reason。
   --discard-unmerged  确认丢弃未 merge 的提交（需同时 --force）。
-                      仅用于：方案已被否决，确认丢弃。
 
   ── 仅操作平台，不管本地 ──
-  --platform-only    只关闭平台 issue。前提：本地没有此 raw key 的工位
-                     （无论从未用 wt-create 创建过，还是工位已被删除）。
-                      检查：搜 git worktree list，有工位则阻塞 → 用正常 wt-close。
-                      适用：feedback 创建 issue 后从未开过工位，决定不要了。
-                      适用：工位已手动删除，仅剩平台 issue 需关闭。
-                      为何用此命令而非 gh/gitee：wt-close 封装了多平台自动执行，
-                      一次关闭 GitHub + Gitee，无需逐个平台操作。
-                      必须配合 --reason。
+  --platform-only    只关闭平台 issue。必须配合 --raw-key 和 --reason。
 
   ── 其他 ──
-  --skip-platform    跳过平台 issue 关闭。仅用于：平台 issue 已手动关闭。
+  --skip-platform    跳过平台 issue 关闭。
   --dry-run          只打印操作，不执行。
 
 Scenarios:
-  # PR 已 merge，正常收口（传 raw key）
+    # PR 已 merge，正常收口
   ./bin/wt-close --raw-key 20260627T021849Z
-
-  # PR 已 merge，正常收口（传分支名）
-  ./bin/wt-close --branch fix/raw-20260627T021849Z-my-fix
-
   # 确定放弃此 issue
+    # PR 已 merge，正常收口
   ./bin/wt-close --raw-key 20260627T021849Z --force --reason "违规绕过门禁中，理由充分，是：该功能确定放弃"
 
   # 无工位，只关闭平台 issue
+    # PR 已 merge，正常收口
   ./bin/wt-close --raw-key 20260627T021849Z --platform-only --reason "违规绕过门禁中，理由充分，是：工位已清理仅剩平台 issue"
 
-  # 注意：不要传 test-pre-merge-* 分支名——wt-close 会根据 raw key
-  # 自动发现并清理 companion test-pre-merge 工位，无需单独操作。
 USAGE
 }
 
@@ -161,19 +129,6 @@ _resolve_worktree_path() {
   return 1
 }
 
-_extract_issue_id() {
-  local branch="$1"
-  if echo "$branch" | grep -qoE 'raw-[0-9]{8}[-T][0-9]{4,6}Z?'; then
-    echo "$branch" | grep -oE 'raw-[0-9]{8}[-T][0-9]{4,6}Z?' | head -1
-    return 0
-  fi
-  if echo "$branch" | grep -qoE 'I-[0-9]{8}[-T][0-9]{4,6}Z?(-[A-Z0-9]+)?'; then
-    echo "$branch" | grep -oE 'I-[0-9]{8}[-T][0-9]{4}Z?(-[A-Z0-9]+)?' | head -1
-    return 0
-  fi
-  return 1
-}
-
 _is_protected_branch() {
   local branch="$1"
   case "$branch" in
@@ -198,7 +153,6 @@ while [[ $# -gt 0 ]]; do
     --reason) FORCE_REASON="$2"; shift 2 ;;
     --skip-platform) SKIP_PLATFORM=true; shift ;;
     --raw-key) RAW_KEY="$2"; shift 2 ;;
-    --branch) BRANCH_INPUT="$2"; shift 2 ;;
     --platform-only) PLATFORM_ONLY=true; shift ;;
     --dry-run) DRY_RUN=true; shift ;;
     --help|-h) usage; exit 0 ;;
@@ -240,7 +194,7 @@ _resolve_branch_from_raw_key() {
   echo "$matched"
 }
 
-# ── Determine input from --raw-key or --branch ──
+# ── Determine input from --raw-key ──
 if [[ -n "${RAW_KEY:-}" ]]; then
   _raw_key="$(_extract_raw_key "$RAW_KEY")"
   if [[ -z "$_raw_key" ]]; then
@@ -258,27 +212,22 @@ if [[ -n "${RAW_KEY:-}" ]]; then
     if [[ -z "$_matched" ]]; then
       echo "Error: no fix/feature branch found for raw key '${_raw_key}'" >&2
       echo "  Searched: fix/raw-${_raw_key}-* and feature/raw-${_raw_key}-*" >&2
-      echo "  If the worktree still exists, pass --branch with the full branch name:" >&2
-      echo "    ./bin/wt-close --branch fix/raw-${_raw_key}-<slug>" >&2
+      echo "  Check available branches:" >&2
+      echo "    git branch --list \"fix/raw-${_raw_key}-*\" \"feature/raw-${_raw_key}-*\"" >&2
       exit 1
     fi
     input="$_matched"
     echo "wt-close: raw key '${_raw_key}' → branch '${input}'"
   fi
-elif [[ -n "${BRANCH_INPUT:-}" ]]; then
-  input="$BRANCH_INPUT"
-elif [[ -n "${1:-}" ]]; then
-  # Legacy positional arg: try as branch name first
-  input="${1:-}"
 else
-  echo "Error: missing --raw-key or --branch" >&2
+  echo "Error: --raw-key is required" >&2
   usage
   exit 1
 fi
 
-# ── --reason gate: bypass flags require valid reason (except test-pre-merge) ──
+# ── --reason gate: bypass flags require valid reason ──
 # Reason must start with "违规绕过门禁中，理由充分，是：" to prevent casual abuse.
-if [[ "$input" != test-pre-merge-* ]]; then
+if true; then  # --raw-key always passes through reason check
   _require_reason() {
     local flag="$1" flag_name="$2"
     if [[ "${!flag:-false}" != "true" ]]; then
@@ -319,7 +268,7 @@ GATE
 fi
 
 if [[ -z "$input" ]]; then
-  echo "Error: missing <branch> or <worktree-path>" >&2
+  echo "Error: --raw-key is required" >&2
   usage
   exit 1
 fi
@@ -340,36 +289,7 @@ fi
 ISSUES_DIR="$PROJECT_WORKTREE_PATH/docs/issues"
 
 # ── Guard: protected branch (test-pre-merge is disposable, skip checks) ──
-if [[ "$branch" == test-pre-merge-* ]]; then
-  echo "wt-close: test-pre-merge branch (disposable), skipping checks and platform close"
-  SKIP_PLATFORM=true
-  FORCE=true
-  # D4: cleanup reviewer agents from agent_working for test-pre-merge branches
-  _tp_raw_key_cleanup=$(echo "$branch" | grep -oE '[0-9]{8}T[0-9]{6}Z' | head -1 || true)
-  if [[ -n "$_tp_raw_key_cleanup" ]]; then
-    _dev_wt_for_c=$(git -C "$PROJECT_ROOT" worktree list --porcelain 2>/dev/null | awk '$1=="worktree"{wt=$2} $1=="branch"&&$2=="refs/heads/develop"{print wt;exit}')
-    [[ -n "$_dev_wt_for_c" ]] || _dev_wt_for_c="$PROJECT_ROOT"
-    python3 -c "
-import sys,os,json,socket,hashlib
-sys.path.insert(0, '$_dev_wt_for_c/docs/system/workspace/scripts/runtime')
-from agent_working import agent_list_by_raw_key, agent_get_session, agent_release_all
-row = agent_list_by_raw_key('$_dev_wt_for_c', 'raw-$_tp_raw_key_cleanup')
-if row:
-    h = hashlib.sha256('$_dev_wt_for_c'.encode()).hexdigest()[:16]
-    bridge = f'/tmp/freely-acp-{h}.sock'
-    if os.path.exists(bridge):
-        for role in ('worker', 'reviewer', 'manager'):
-            sid = agent_get_session('$_dev_wt_for_c', 'raw-$_tp_raw_key_cleanup', role)
-            if sid:
-                try:
-                    s=socket.socket(socket.AF_UNIX); s.settimeout(2); s.connect(bridge)
-                    req=json.dumps({'jsonrpc':'2.0','id':1,'method':'session/close','params':{'sessionId':sid}})+'\n'
-                    s.sendall(req.encode()); s.shutdown(socket.SHUT_WR); s.recv(4096); s.close()
-                except Exception: pass
-    agent_release_all('$_dev_wt_for_c', 'raw-$_tp_raw_key_cleanup')
-" 2>/dev/null && echo "wt-close: test-pre-merge reviewer cleanup ✓" || true
-  fi
-elif _is_protected_branch "$branch"; then
+if _is_protected_branch "$branch"; then
   echo "Error: '$branch' is a protected branch, cannot close" >&2
   exit 1
 fi
@@ -385,7 +305,7 @@ if [[ -z "$wt_path" ]]; then
     fi
   else
     echo "Error: no worktree found for branch '$branch'" >&2
-    echo "  Use --force to close an orphaned branch (worktree already removed)." >&2
+    echo "  Use --force with --raw-key to close an orphaned worktree." >&2
     echo "  Or use --platform-only to just close the platform issue via API." >&2
     exit 1
   fi
@@ -394,7 +314,7 @@ else
 fi
 
 # ── Extract issue id ──
-issue_id="$(_extract_issue_id "$branch")" || true
+issue_id="raw-${_raw_key}"  # always derived from raw key
 if [[ -z "$issue_id" ]]; then
   echo "Warning: could not extract issue id from branch '$branch'" >&2
   echo "  Skipping phase_state check and platform close." >&2
@@ -871,8 +791,6 @@ fi
 # The merge commit carries phase_state=absorbed, force_closed_at, and
 # absorbed_into. wt-close only removes the worktree + branch.
 # Phase 3 above guards against overwriting this with --force.
-
-
 # ── Phase 4: Remote branch delete ──
 
 remotes=()
@@ -917,8 +835,6 @@ if [[ ${#remotes[@]} -gt 0 ]]; then
     fi
   done
 fi
-
-
   # Prune stale local tracking refs for deleted remote branches
   for _r in "${remotes[@]}"; do
     git remote prune "$_r" 2>/dev/null || true
